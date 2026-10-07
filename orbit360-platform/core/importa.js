@@ -216,8 +216,56 @@ Orbit.importa = (function () {
     };
   }
 
+  function insurerCatalogState(){
+    const scope=state&&state.scope||{},country=clean(scope.pais).toUpperCase(),ramo=clean(state.insurerDocRamo);
+    let ramos=[],productos=[],planes=[];
+    try{ramos=Orbit.cat&&Orbit.cat.ramosDe?Orbit.cat.ramosDe(country)||[]:[];}catch(e){}
+    try{productos=ramo&&Orbit.cat&&Orbit.cat.subramosDe?Orbit.cat.subramosDe(country,ramo)||[]:[];}catch(e){}
+    try{productos=productos.concat(Orbit.cat&&Orbit.cat.get?Orbit.cat.get('productos')||[]:[]);}catch(e){}
+    try{planes=Orbit.cat&&Orbit.cat.get?Orbit.cat.get('planes')||[]:[];}catch(e){}
+    return{country,ramos:[...new Set(ramos)],productos:[...new Set(productos)],planes:[...new Set(planes)]};
+  }
+  function exactCatalogMatch(text,values){
+    const src=norm(text),rows=[].concat(values||[]).filter(Boolean).sort((a,b)=>String(b).length-String(a).length);
+    return rows.find(v=>src.includes(norm(v)))||'';
+  }
+  function sourceCategoryFromText(text){
+    const reg=Orbit.insurerSourceRegistry,id=reg&&reg.taxonomyId?reg.taxonomyId(text):'otro_requiere_clasificacion';
+    const row=reg&&Array.isArray(reg.TAXONOMY)?reg.TAXONOMY.find(x=>x[0]===id):null;
+    return row?row[1]:'Otro/requiere clasificación';
+  }
+  async function analyzeInsurerSourceText(text,fileName){
+    const raw=String(fileName||'')+'\n'+String(text||''),cat=insurerCatalogState();
+    let ramo=exactCatalogMatch(raw,cat.ramos),productos=ramo&&Orbit.cat&&Orbit.cat.subramosDe?Orbit.cat.subramosDe(cat.country,ramo)||[]:cat.productos;
+    productos=[...new Set([].concat(productos||[],cat.productos||[]))];
+    let producto=exactCatalogMatch(raw,productos),plan=exactCatalogMatch(raw,cat.planes),category=sourceCategoryFromText(raw);
+    let version='',vigencia='';const vm=raw.match(/\b(?:versi[oó]n|version|v)\s*[:#-]?\s*([A-Za-z0-9._-]{1,24})\b/i);if(vm)version=clean(vm[1]);
+    const ym=raw.match(/\b(20\d{2})(?:\s*[-–]\s*(20\d{2}))?\b/);if(ym)vigencia=ym[2]?ym[1]+'–'+ym[2]:ym[1];
+    let method='análisis del contenido',aiUsed=false;
+    if(Orbit.ia&&typeof Orbit.ia.disponible==='function'&&Orbit.ia.disponible()&&raw.replace(/\s/g,'').length>20){
+      try{
+        const prompt='Analiza esta fuente de una aseguradora. Devuelve SOLO JSON con category, ramo, producto, plan, version, vigencia. '
+          +'No inventes. category debe ser una de: '+(Orbit.insurerSourceRegistry&&Orbit.insurerSourceRegistry.labels?Orbit.insurerSourceRegistry.labels().join(' | '):'Otro/requiere clasificación')+'. '
+          +'ramo debe ser uno de: '+cat.ramos.join(' | ')+'. producto debe ser uno de: '+productos.join(' | ')+'. plan debe ser uno de: '+cat.planes.join(' | ')+'. '
+          +'Si no aparece evidencia suficiente usa cadena vacía. Documento: """'+raw.slice(0,7000)+'"""';
+        const out=await Orbit.ia.complete(prompt),m=String(out).match(/\{[\s\S]*\}/);if(m){const ai=JSON.parse(m[0]),pick=(v,allowed)=>allowed.find(x=>norm(x)===norm(v))||'';category=pick(ai.category,Orbit.insurerSourceRegistry&&Orbit.insurerSourceRegistry.labels?Orbit.insurerSourceRegistry.labels():[])||category;ramo=pick(ai.ramo,cat.ramos)||ramo;const pRows=ramo&&Orbit.cat&&Orbit.cat.subramosDe?[...new Set([].concat(Orbit.cat.subramosDe(cat.country,ramo)||[],cat.productos||[]))]:productos;producto=pick(ai.producto,pRows)||producto;plan=pick(ai.plan,cat.planes)||plan;version=clean(ai.version)||version;vigencia=clean(ai.vigencia)||vigencia;aiUsed=true;method='análisis del contenido + IA asistida';}
+      }catch(e){}
+    }
+    state.insurerDocCategory=category||state.insurerDocCategory||'Otro/requiere clasificación';
+    state.insurerDocRamo=ramo||state.insurerDocRamo||'';
+    state.insurerDocProducto=producto||state.insurerDocProducto||'';
+    state.insurerDocPlan=plan||state.insurerDocPlan||'';
+    state.insurerDocVersion=version||state.insurerDocVersion||'';
+    state.insurerDocVigencia=vigencia||state.insurerDocVigencia||'';
+    state.insurerDocFamily=state.insurerDocCategory;
+    const found=[state.insurerDocCategory,state.insurerDocRamo,state.insurerDocProducto,state.insurerDocPlan,state.insurerDocVersion,state.insurerDocVigencia].filter(Boolean).length;
+    state.insurerAnalysis={method,aiUsed,recognized:found,needsReview:!state.insurerDocRamo||!state.insurerDocProducto,analyzedAt:new Date().toISOString()};
+    return state.insurerAnalysis;
+  }
+
   /* Procesa texto de documento: intenta IA, si no, heurística. (async) */
   async function procesarTexto(text) {
+    if(state.kind==='docs-aseguradora'){showLoading('🧠 Analizando y clasificando la fuente…');try{await analyzeInsurerSourceText(text,state.files&&state.files[0]);}finally{state.processing=null;state.step=2;paint();}return;}
     showLoading('🧠 Extracción inteligente con IA…');
     let parsed = null;
     try { parsed = await aiExtract(text, state.kind); } catch (e) { parsed = null; }
@@ -877,8 +925,8 @@ Orbit.importa = (function () {
     ensureDom();
     const meta = KINDS[kind] || KINDS['clientes'];
     // docs-aseguradora es documental (guarda archivos; no escribe registros estructurados a ciegas) — P0-06.
-    const modoIni = (kind === 'docs-aseguradora') ? 'documental' : ((opts && opts.modo) || 'inteligente');
-    state = { kind, meta, step: 1, opts: opts || {}, multi: opts && opts.multi, scope: opts && opts.scope, modo: modoIni, files: [], insurerDocCategory: clean(opts && opts.docCategory) || 'Otro/requiere clasificación', insurerDocRamo: clean(opts && opts.scope && opts.scope.ramo), insurerDocProducto: clean(opts && opts.scope && opts.scope.producto), insurerDocPlan: clean(opts && opts.scope && opts.scope.plan), insurerDocFamily: '', insurerDocVersion: '', insurerDocVigencia: '' };
+    const modoIni = (opts && opts.modo) || 'inteligente';
+    state = { kind, meta, step: 1, opts: opts || {}, multi: opts && opts.multi, scope: opts && opts.scope, modo: modoIni, files: [], insurerDocCategory: clean(opts && opts.docCategory) || 'Otro/requiere clasificación', insurerDocRamo: clean(opts && opts.scope && opts.scope.ramo), insurerDocProducto: clean(opts && opts.scope && opts.scope.producto), insurerDocPlan: clean(opts && opts.scope && opts.scope.plan), insurerDocFamily: '', insurerDocVersion: '', insurerDocVigencia: '', insurerAnalysis: null };
     document.getElementById('imp-back').classList.add('open');
     document.getElementById('imp-drawer').classList.add('open');
     paint();
@@ -906,9 +954,10 @@ Orbit.importa = (function () {
   function step1(m) {
     if (state.processing) return `<div style="text-align:center;padding:48px 16px"><div class="imp-spinner"></div><div style="font-family:var(--f-display);font-weight:700;font-size:16px;margin-top:16px">${U.esc(state.processing)}</div><p class="muted" style="font-size:13px;margin-top:6px">Procesando <b>${U.esc(state.files[0] || '')}</b> en tu navegador…</p></div>`;
     const insurerSource = state.kind === 'docs-aseguradora';
-    const sourceFields = insurerSource ? `<div class="card" style="padding:12px;margin-bottom:12px"><div style="font-weight:800;margin-bottom:8px">Clasificar fuente</div><div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px"><label class="ce-l">Tipo de fuente<select class="o-sel" id="imp-insurer-cat">${(Orbit.insurerSourceRegistry&&Orbit.insurerSourceRegistry.labels?Orbit.insurerSourceRegistry.labels():['Otro/requiere clasificación']).map(x=>`<option ${x===state.insurerDocCategory?'selected':''}>${U.esc(x)}</option>`).join('')}</select></label><label class="ce-l">Ramo / línea<input class="o-sel" id="imp-insurer-ramo" value="${U.esc(state.insurerDocRamo||'')}"></label><label class="ce-l">Producto<input class="o-sel" id="imp-insurer-producto" value="${U.esc(state.insurerDocProducto||'')}"></label><label class="ce-l">Plan<input class="o-sel" id="imp-insurer-plan" value="${U.esc(state.insurerDocPlan||'')}"></label><label class="ce-l">Familia documental<input class="o-sel" id="imp-insurer-family" value="${U.esc(state.insurerDocFamily||state.insurerDocCategory||'')}"></label><label class="ce-l">Versión<input class="o-sel" id="imp-insurer-version" value="${U.esc(state.insurerDocVersion||'')}"></label><label class="ce-l">Vigencia<input class="o-sel" id="imp-insurer-vigencia" value="${U.esc(state.insurerDocVigencia||'')}" placeholder="AAAA-MM-DD o periodo"></label></div><div class="cfg-note" style="margin-top:9px"><b>${U.esc(state.scope&&state.scope.aseguradoraNombre||'Aseguradora')}:</b> se registrarán metadata, ubicación y provenance. Registrar la fuente no activa cálculos; Quote Authority conserva el control.</div></div>` : '';
+    const sourceCat=insurerSource?insurerCatalogState():{ramos:[],productos:[],planes:[]};
+    const sourceFields = insurerSource ? `<div class="card insurer-source-classifier" style="padding:12px;margin-bottom:12px"><div style="font-weight:800;margin-bottom:3px">Clasificación propuesta</div><div class="muted" style="font-size:12px;margin-bottom:9px">El análisis propone valores; tú confirmas antes de guardar.</div><div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px"><label class="ce-l">Tipo de fuente<select class="o-sel" id="imp-insurer-cat">${(Orbit.insurerSourceRegistry&&Orbit.insurerSourceRegistry.labels?Orbit.insurerSourceRegistry.labels():['Otro/requiere clasificación']).map(x=>`<option ${x===state.insurerDocCategory?'selected':''}>${U.esc(x)}</option>`).join('')}</select></label><label class="ce-l">Ramo / línea<select class="o-sel" id="imp-insurer-ramo"><option value="">Pendiente de clasificar</option>${sourceCat.ramos.map(x=>`<option ${x===state.insurerDocRamo?'selected':''}>${U.esc(x)}</option>`).join('')}</select></label><label class="ce-l">Producto<select class="o-sel" id="imp-insurer-producto"><option value="">Pendiente de clasificar</option>${sourceCat.productos.map(x=>`<option ${x===state.insurerDocProducto?'selected':''}>${U.esc(x)}</option>`).join('')}</select></label><label class="ce-l">Plan<select class="o-sel" id="imp-insurer-plan"><option value="">Sin plan específico / pendiente</option>${sourceCat.planes.map(x=>`<option ${x===state.insurerDocPlan?'selected':''}>${U.esc(x)}</option>`).join('')}</select></label><label class="ce-l">Familia documental<input class="o-sel" id="imp-insurer-family" value="${U.esc(state.insurerDocFamily||state.insurerDocCategory||'')}"></label><label class="ce-l">Versión<input class="o-sel" id="imp-insurer-version" value="${U.esc(state.insurerDocVersion||'')}" placeholder="Ej. 2026.1"></label><label class="ce-l">Vigencia<input class="o-sel" id="imp-insurer-vigencia" value="${U.esc(state.insurerDocVigencia||'')}" placeholder="Ej. 2026 o 2026-01 a 2026-12"></label></div><div class="cfg-note" style="margin-top:9px"><b>${U.esc(state.scope&&state.scope.aseguradoraNombre||'Aseguradora')}:</b> el archivo se conserva en Drive y la clasificación queda vinculada a esta aseguradora. Nada se habilita en Cotizador o Comparativo sin validación posterior.</div></div>` : '';
     return `${scopeBanner(state.kind)}<p class="imp-desc">${U.esc(m.desc)}</p>
-      ${insurerSource ? '' : `<div class="imp-mode" id="imp-mode"><button class="imp-mode-b ${state.modo !== 'documental' ? 'on' : ''}" data-modo="inteligente">✨ Inteligente<small>extrae y mapea a los módulos</small></button><button class="imp-mode-b ${state.modo === 'documental' ? 'on' : ''}" data-modo="documental">📁 Documental<small>solo almacena para consulta</small></button></div>`}
+      ${`<div class="imp-mode" id="imp-mode"><button class="imp-mode-b ${state.modo !== 'documental' ? 'on' : ''}" data-modo="inteligente">✨ ${insurerSource?'Analizar y clasificar':'Inteligente'}<small>${insurerSource?'lee el contenido y propone la clasificación':'extrae y mapea a los módulos'}</small></button><button class="imp-mode-b ${state.modo === 'documental' ? 'on' : ''}" data-modo="documental">📁 Solo guardar<small>conserva el archivo sin interpretar su contenido</small></button></div>`}
       ${sourceFields}
       <div class="imp-drop" id="imp-drop">
         <div style="font-size:40px">⬆️</div>
@@ -933,7 +982,7 @@ Orbit.importa = (function () {
             <div><span class="muted">Producto / plan</span><b style="display:block">${U.esc(state.insurerDocProducto||'Pendiente de clasificar')}</b></div>
             <div><span class="muted">Versión / vigencia</span><b style="display:block">${U.esc(state.insurerDocVersion||'Pendiente de clasificar')}</b></div>
           </div>
-          <div class="cfg-note" style="margin-top:12px"><b>Qué ocurrirá al confirmar:</b> el archivo se guardará en Drive y quedará vinculado a esta aseguradora con procedencia y estado <b>Documento recibido · requiere validación</b>. <b>No se extraerán ni aplicarán tarifas automáticamente en este flujo</b> y no se habilitarán Cotizador, Comparativo ni IA.</div>
+          <div class="cfg-note" style="margin-top:12px"><b>${state.modo==='documental'?'Archivo listo para guardar':'Análisis completado'}:</b> ${state.modo==='documental'?'se conservará en Drive sin interpretar su contenido.':'se leyó el contenido y se propuso la clasificación mostrada arriba. '+(state.insurerAnalysis&&state.insurerAnalysis.needsReview?'Ramo o producto todavía necesitan confirmación.':'La propuesta tiene dimensiones reconocidas para revisión.')} Al confirmar, el archivo quedará en Drive como <b>Documento recibido · requiere validación</b>. Ninguna tarifa se aplicará ni se habilitará automáticamente.</div>
         </div>`;
     }
     // Base de datos inicial: si aún no se resolvió a una entidad real, hacerlo aquí (nunca mostrar la tabla de ejemplo)
@@ -1167,7 +1216,9 @@ Orbit.importa = (function () {
         driveUserEmail: uploaded.driveUserEmail || '',
         contentHash: uploaded.contentHash || '',
         creado: Orbit.ui && Orbit.ui.today ? Orbit.ui.today() : new Date().toISOString().slice(0,10),
-        provenance: { source: 'usuario', repository: 'Drive', confirmed: true, driveUserEmail: uploaded.driveUserEmail || '' }
+        provenance: { source: 'usuario', repository: 'Drive', confirmed: true, driveUserEmail: uploaded.driveUserEmail || '' },
+        analysisMethod: state.kind === 'docs-aseguradora' && state.insurerAnalysis ? state.insurerAnalysis.method : '',
+        analysisRecognized: state.kind === 'docs-aseguradora' && state.insurerAnalysis ? state.insurerAnalysis.recognized : 0
       });
     }
 
@@ -1228,9 +1279,9 @@ Orbit.importa = (function () {
     dr.querySelectorAll('.imp-mode-b').forEach(b => b.addEventListener('click', () => { state.modo = b.dataset.modo; paint(); }));
     const insurerCat=dr.querySelector('#imp-insurer-cat'),insurerRamo=dr.querySelector('#imp-insurer-ramo'),insurerProducto=dr.querySelector('#imp-insurer-producto'),insurerPlan=dr.querySelector('#imp-insurer-plan'),insurerFamily=dr.querySelector('#imp-insurer-family'),insurerVersion=dr.querySelector('#imp-insurer-version'),insurerVigencia=dr.querySelector('#imp-insurer-vigencia');
     if(insurerCat) insurerCat.addEventListener('change',e=>state.insurerDocCategory=e.target.value);
-    if(insurerRamo) insurerRamo.addEventListener('input',e=>state.insurerDocRamo=e.target.value);
-    if(insurerProducto) insurerProducto.addEventListener('input',e=>state.insurerDocProducto=e.target.value);
-    if(insurerPlan) insurerPlan.addEventListener('input',e=>state.insurerDocPlan=e.target.value);
+    if(insurerRamo) insurerRamo.addEventListener('change',e=>{state.insurerDocRamo=e.target.value;state.insurerDocProducto='';paint();});
+    if(insurerProducto) insurerProducto.addEventListener('change',e=>state.insurerDocProducto=e.target.value);
+    if(insurerPlan) insurerPlan.addEventListener('change',e=>state.insurerDocPlan=e.target.value);
     if(insurerFamily) insurerFamily.addEventListener('input',e=>state.insurerDocFamily=e.target.value);
     if(insurerVersion) insurerVersion.addEventListener('input',e=>state.insurerDocVersion=e.target.value);
     if(insurerVigencia) insurerVigencia.addEventListener('input',e=>state.insurerDocVigencia=e.target.value);
@@ -1259,7 +1310,7 @@ Orbit.importa = (function () {
       // CSV / TSV / TXT
       if (ext === 'csv' || ext === 'tsv' || ext === 'txt') {
         const rd = new FileReader();
-        rd.onload = () => { try { state.parsed = (ext === 'txt') ? textToParsed(String(rd.result), state.kind) : parseDelimited(String(rd.result)); } catch (err) { state.parsed = null; } goPreview(); };
+        rd.onload = async () => { try { if(state.kind==='docs-aseguradora'){await analyzeInsurerSourceText(String(rd.result),f0.name);state.parsed=null;} else state.parsed = (ext === 'txt') ? textToParsed(String(rd.result), state.kind) : parseDelimited(String(rd.result)); } catch (err) { state.parsed = null; } goPreview(); };
         rd.onerror = () => fail('No se pudo leer el archivo');
         rd.readAsText(f0); return;
       }
@@ -1294,6 +1345,7 @@ Orbit.importa = (function () {
                 hojas.procesadas.push({ hoja: sn, filas: p.rows.length, pais: paisHoja || '—', moneda: monedaHoja || '—', periodo: periodoHoja || '—' });
               });
               state.hojas = hojas;
+              if(state.kind==='docs-aseguradora'){await analyzeInsurerSourceText(dump,f0.name);state.parsed=null;state.processing=null;state.step=2;paint();return;}
               const parsedXls = { headers: headerRow || [], rows: combined };
               const mapped = Object.keys(mapHeaders(state.kind, parsedXls.headers)).length;
               if (mapped < 2 && Orbit.ia.disponible()) { showLoading('🧠 Extracción inteligente con IA…'); const ai = await aiExtract(dump, state.kind); state.parsed = ai || parsedXls; }
@@ -1342,7 +1394,7 @@ Orbit.importa = (function () {
       if (/^(png|jpe?g|webp|gif|bmp|tiff?)$/.test(ext)) {
         showLoading('🖼️ OCR de la imagen… (puede tardar unos segundos)');
         loadLib('https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/5.1.0/tesseract.min.js', 'Tesseract').then(async () => {
-          try { const out = await Tesseract.recognize(f0, 'spa+eng'); state.parsed = textToParsed(out.data.text, state.kind); goPreview(); } catch (err) { fail('No se pudo procesar la imagen'); }
+          try { const out = await Tesseract.recognize(f0, 'spa+eng'); if(state.kind==='docs-aseguradora')await procesarTexto(out.data.text);else{state.parsed = textToParsed(out.data.text, state.kind);goPreview();} } catch (err) { fail('No se pudo procesar la imagen'); }
         }).catch(() => fail('No se pudo cargar el OCR')); return;
       }
       // otro formato: vista de ejemplo
@@ -1390,7 +1442,7 @@ Orbit.importa = (function () {
       const kind = state.kind;
       const cfgFin = IMPORT_MAP[kind];
       const isConc = !!(cfgFin && cfgFin.conciliacion === true);
-      const mustPersistRawDocument = state.modo === 'documental' || (kind === 'documentos' && state.scope && state.scope.cid);
+      const mustPersistRawDocument = kind === 'docs-aseguradora' || state.modo === 'documental' || (kind === 'documentos' && state.scope && state.scope.cid);
       if (mustPersistRawDocument) {
         fin.disabled = true;
         const oldText = fin.textContent;
@@ -1403,8 +1455,8 @@ Orbit.importa = (function () {
           return;
         }
         msg = '✓ ' + docs.uploaded.length + ' documento(s) confirmado(s) en Drive';
-        if (state.modo === 'documental') {
-          if (Orbit.ui && Orbit.ui.toast) Orbit.ui.toast(msg);
+        if (kind === 'docs-aseguradora' || state.modo === 'documental') {
+          if (Orbit.ui && Orbit.ui.toast) Orbit.ui.toast(kind==='docs-aseguradora'?'Fuente guardada en Drive y vinculada para validación.':msg);
           close();
           if (state.opts.onDone) state.opts.onDone();
           return;
