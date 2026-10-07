@@ -72,7 +72,29 @@ function documentRequestAllowed({claimExists,customerScopeResolved,requestReason
   return {ok:errors.length===0,errors};
 }
 
+function assistanceChannelProjection({insurer,aysWhatsapp,aysEmail}={}){
+  const emergency=clean(insurer&&(insurer.emergencia||insurer.assistance||insurer.emergency),220);
+  const lastReviewedAt=clean(insurer&&(insurer.ultimaRevision||insurer.lastReviewedAt),40);
+  return Object.freeze({
+    ays:Object.freeze({
+      whatsapp:clean(aysWhatsapp,40),
+      email:clean(aysEmail,220)
+    }),
+    insurer:Object.freeze({
+      emergencyContactRegistered:!!emergency,
+      emergencyContact:emergency,
+      lastReviewedAt:lastReviewedAt,
+      verifiedCurrent:false
+    }),
+    truth:Object.freeze({
+      aysFallbackIsOperationalChannel:true,
+      insurerContactIsDirectoryDataNotCoverageConfirmation:true,
+      insurerContactFreshnessMustBeValidated:true
+    })
+  });
+}
+
 module.exports=Object.freeze({
   VERSION,INTERNAL_STATES,PUBLIC_STATE,POLICY,
-  clean,publicState,publicClaimProjection,assistanceTruth,documentRequestAllowed
+  clean,publicState,publicClaimProjection,assistanceTruth,documentRequestAllowed,assistanceChannelProjection
 });
