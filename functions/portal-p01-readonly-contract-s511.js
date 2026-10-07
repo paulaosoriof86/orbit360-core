@@ -3,6 +3,19 @@
 const VERSION='ays-portal-p01-readonly-contract-v0.1';
 const TENANT_ID='alianzas-soluciones';
 
+const BACKEND_CONTRACT=Object.freeze({
+  transport:'firebase_callable',
+  auth:'firebase_auth_external_customer',
+  grantCollection:'portalCustomerAccessGrants',
+  grantLookup:'server_side',
+  dataAccess:'admin_sdk_server_side',
+  browserFirestoreRead:false,
+  browserFirestoreWrite:false,
+  customerAsTenantMember:false,
+  projection:'allowlisted_read_only_dto',
+  failClosed:true
+});
+
 const POLICY=Object.freeze({
   version:VERSION,
   sourceOnly:true,
@@ -120,7 +133,7 @@ function buildReadOnlyProjection({client,policies,insurersById,documents}={}){
 }
 
 module.exports=Object.freeze({
-  VERSION,TENANT_ID,POLICY,CUSTOMER_IDENTITY_FIELDS,ACCESS_GRANT_FIELDS,
+  VERSION,TENANT_ID,BACKEND_CONTRACT,POLICY,CUSTOMER_IDENTITY_FIELDS,ACCESS_GRANT_FIELDS,
   clean,norm,validatePortalIdentity,validateAccessGrant,resolveClientScope,
   accountProjection,policyProjection,documentProjection,buildReadOnlyProjection
 });
