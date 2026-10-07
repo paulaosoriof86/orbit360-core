@@ -83,3 +83,29 @@ test('S5.12a missing insurer emergency contact never becomes publishable',()=>{
     {publishable:false,code:'NO_DIRECTORY_CHANNEL'}
   );
 });
+
+
+test('S5.12a public resolver falls back to A&S when insurer channel is stale',()=>{
+  const r=s.resolvePublicAssistanceChannels({
+    insurer:{emergencia:'2225-7500',ultimaRevision:''},
+    aysWhatsapp:'+502 5614 9048',
+    aysEmail:'info@aysseguros.com',
+    officialEvidenceVerified:false
+  });
+  assert.equal(r.channels.length,2);
+  assert.equal(r.insurerChannel,null);
+  assert.equal(r.insurerChannelStatus,'REVIEW_DATE_REQUIRED');
+  assert.equal(r.truth.requestChannelDoesNotConfirmCoverage,true);
+});
+
+test('S5.12a public resolver exposes insurer channel only after full freshness gate',()=>{
+  const r=s.resolvePublicAssistanceChannels({
+    insurer:{emergencia:'1789',ultimaRevision:'2026-10-07'},
+    aysWhatsapp:'+502 5614 9048',
+    aysEmail:'info@aysseguros.com',
+    officialEvidenceVerified:true
+  });
+  assert.equal(r.insurerChannel.value,'1789');
+  assert.equal(r.insurerChannel.validated,true);
+  assert.equal(r.insurerChannelStatus,'CURRENT_CHANNEL_VALIDATED');
+});
