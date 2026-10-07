@@ -132,8 +132,57 @@ function buildReadOnlyProjection({client,policies,insurersById,documents}={}){
   });
 }
 
+async function makeReadOnlyHandler(deps,input={}){
+  const d=deps||{};
+  const authUid=clean(input.authUid,180);
+  if(!authUid)return {ok:false,code:'AUTH_REQUIRED'};
+  if(typeof d.loadGrant!=='function'||typeof d.loadClient!=='function'||typeof d.loadPolicies!=='function'||typeof d.loadInsurers!=='function'||typeof d.loadDocuments!=='function'){
+    return {ok:false,code:'BACKEND_DEPENDENCIES_REQUIRED'};
+  }
+
+  const identity={
+    subject:authUid,
+    provider:clean(input.provider||'firebase_auth_external_customer',80),
+    emailVerified:input.emailVerified===true,
+    status:clean(input.identityStatus||'active',40)
+  };
+  const idCheck=validatePortalIdentity(identity);
+  if(!idCheck.ok)return {ok:false,code:'IDENTITY_DENY',errors:idCheck.errors};
+
+  const grant=await d.loadGrant(authUid);
+  const scope=resolveClientScope({identity,grant,requestedClientId:input.requestedClientId,nowIso:input.nowIso});
+  if(!scope.ok)return scope;
+
+  const requestedAccountRef=clean(input.accountRef,180);
+  if(requestedAccountRef&&scope.clientIds.indexOf(requestedAccountRef)<0)return {ok:false,code:'ACCOUNT_SCOPE_DENY'};
+  const clientId=requestedAccountRef||scope.clientIds[0];
+  if(!clientId)return {ok:false,code:'ACCOUNT_SCOPE_EMPTY'};
+
+  const [client,policies,insurers,documents]=await Promise.all([
+    d.loadClient(clientId),
+    d.loadPolicies(clientId),
+    d.loadInsurers(),
+    d.loadDocuments(clientId)
+  ]);
+  if(!client||clean(client.id,180)!==clientId)return {ok:false,code:'CLIENT_NOT_FOUND_OR_SCOPE_MISMATCH'};
+
+  const insurersById={};
+  for(const row of [].concat(insurers||[])){
+    const id=clean(row&&row.id,180);
+    if(id)insurersById[id]=row;
+  }
+
+  return {
+    ok:true,
+    tenantId:TENANT_ID,
+    accountRef:clientId,
+    allowedAccountRefs:scope.clientIds.slice(),
+    projection:buildReadOnlyProjection({client,policies,insurersById,documents})
+  };
+}
+
 module.exports=Object.freeze({
   VERSION,TENANT_ID,BACKEND_CONTRACT,POLICY,CUSTOMER_IDENTITY_FIELDS,ACCESS_GRANT_FIELDS,
   clean,norm,validatePortalIdentity,validateAccessGrant,resolveClientScope,
-  accountProjection,policyProjection,documentProjection,buildReadOnlyProjection
+  accountProjection,policyProjection,documentProjection,buildReadOnlyProjection,makeReadOnlyHandler
 });
