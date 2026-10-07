@@ -163,18 +163,32 @@ async function inboxStateFor(browser,who,noticeId,action){
  const token=await auth.createCustomToken(who.uid),ctx=await browser.newContext({ignoreHTTPSErrors:false}),p=await ctx.newPage();
  try{await applyLegal(p,who);await p.goto(target+'/#/inicio',{waitUntil:'domcontentloaded',timeout:60000});await p.waitForFunction(()=>!!window.Orbit?.productRuntimeBrowserProvidersP0,null,{timeout:30000});return await p.evaluate(async({token,tenantId,activeRole,noticeId,action})=>{const provider=Orbit.productRuntimeBrowserProvidersP0,c=await provider.initialize();if(!c.auth.currentUser)await c.modules.auth.signInWithCustomToken(c.auth,token);return await provider.callFunction('orbit360UpdateAdvisorOpsInboxStatePreview',{tenantId,activeRole,noticeId,action},'us-east1');},{token,tenantId,activeRole:who.activeRole,noticeId,action});}finally{await ctx.close();}
 }
-async function collaborationFor(browser,who,businessId,type,message){
+async function collaborationFor(browser,who,businessId,type,message,withAttachment=false){
  const token=await auth.createCustomToken(who.uid),ctx=await browser.newContext({ignoreHTTPSErrors:false}),p=await ctx.newPage();
  try{
   await applyLegal(p,who);await p.goto(target+'/#/ops',{waitUntil:'domcontentloaded',timeout:60000});await bootProduct(p,token);
   await p.waitForFunction(id=>!!Orbit.store?.get('negocios',id),businessId,{timeout:30000});
   const before=await p.evaluate(()=>{const s=Orbit.productOperationalWriteP0?.status?.()||{};return{pending:Number(s.pending||0),failed:Number(s.failed||0),committed:Number(s.committed||0),lastError:String(s.lastError||'')};});
-  await p.evaluate(id=>Orbit.ciclo.openNegocio(id),businessId);await p.waitForSelector('#ciclo-modal #ng-com-type',{timeout:10000});await p.selectOption('#ciclo-modal #ng-com-type',{label:type});await p.fill('#ciclo-modal #ng-com-new',message);await p.click('#ciclo-modal #ng-com-add');
+  const openStarted=Date.now();await p.evaluate(id=>Orbit.ciclo.openNegocio(id),businessId);await p.waitForSelector('#ciclo-modal #ng-com-type',{timeout:10000});const openMs=Date.now()-openStarted;
+  const visual=await p.evaluate(()=>{const m=document.getElementById('ciclo-modal'),panel=m?.querySelector('.ciclo-collab-panel'),header=m?.querySelector('.ciclo-h-brand'),help=String(panel?.innerText||'');const css=panel?getComputedStyle(panel):null;return{panel:!!panel,brandHeader:!!header,helpImmediate:/Registrar guarda la colaboración inmediatamente/.test(help),panelBackground:css?.backgroundColor||'',panelBorder:css?.borderColor||''};});
+  await p.selectOption('#ciclo-modal #ng-com-type',{label:type});await p.fill('#ciclo-modal #ng-com-new',message);
+  if(withAttachment)await p.setInputFiles('#ciclo-modal #ng-com-file',{name:'b4-r20-ui-attachment-'+run+'.txt',mimeType:'text/plain',buffer:Buffer.from('B4-003 R20 UI attachment '+run,'utf8')});
+  await p.click('#ciclo-modal #ng-com-add');
   await p.waitForFunction(({businessId,type})=>{const n=Orbit.store?.get('negocios',businessId),rows=[].concat(n?.comentarios||[]);return rows.some(x=>String(x.tipo||'')===type&&String(x.direction||''));},{businessId,type},{timeout:30000});
   await p.waitForFunction(()=>{const s=Orbit.productOperationalWriteP0?.status?.()||{};return Number(s.pending||0)===0;},null,{timeout:30000});
   const after=await p.evaluate(({businessId,type})=>{const s=Orbit.productOperationalWriteP0?.status?.()||{},n=Orbit.store?.get('negocios',businessId),rows=[].concat(n?.comentarios||[]);const c=rows.find(x=>String(x.tipo||'')===type&&String(x.direction||''));return{pending:Number(s.pending||0),failed:Number(s.failed||0),committed:Number(s.committed||0),lastError:String(s.lastError||''),comment:c||null};},{businessId,type});
   need(after.pending===0&&after.failed===before.failed&&!!after.comment,'B4_003_R19_HANDOFF_DURABLE_BROWSER_COMMIT_NOT_CONFIRMED:'+JSON.stringify({before,after}));
-  return after;
+  need(openMs<2500&&visual.panel&&visual.brandHeader&&visual.helpImmediate,'B4_003_R20_SECOND_REVIEW_BUSINESS_MODAL_LATENCY_OR_VISUAL_FAILED:'+JSON.stringify({openMs,visual}));
+  let attachmentRead=null,attachmentCleanup=null;
+  const documentRef=clean(after.comment?.attachment?.documentRef);
+  if(withAttachment){
+    need(!!documentRef,'B4_003_R20_SECOND_REVIEW_COLLAB_UI_ATTACHMENT_REF_MISSING:'+JSON.stringify(after.comment));
+    attachmentRead=await p.evaluate(async({tenantId,activeRole,businessId,documentRef})=>Orbit.productRuntimeBrowserProvidersP0.callFunction('orbit360DocumentDriveReadPreview',{tenantId,activeRole,entidad:'negocio',entidadId:businessId,sourceModule:'ops-leads',documentRef},'us-east1'),{tenantId,activeRole:who.activeRole,businessId,documentRef});
+    need(attachmentRead?.ok===true,'B4_003_R20_SECOND_REVIEW_COLLAB_UI_ATTACHMENT_READBACK_FAILED:'+JSON.stringify(attachmentRead));
+    attachmentCleanup=await p.evaluate(async({tenantId,activeRole,businessId,documentRef})=>Orbit.productRuntimeBrowserProvidersP0.callFunction('orbit360DocumentDriveCleanupPreview',{tenantId,activeRole,entidad:'negocio',entidadId:businessId,sourceModule:'ops-leads',documentRef},'us-east1'),{tenantId,activeRole:who.activeRole,businessId,documentRef});
+    need(attachmentCleanup?.ok===true&&attachmentCleanup?.deleted===true,'B4_003_R20_SECOND_REVIEW_COLLAB_UI_ATTACHMENT_CLEANUP_FAILED:'+JSON.stringify(attachmentCleanup));
+  }
+  return Object.assign({},after,{openMs,visual,attachmentRead,attachmentCleanup});
  }finally{await ctx.close();}
 }
 async function collaborationCommandFor(browser,who,businessId,type,message,direction){
@@ -1139,7 +1153,7 @@ try{
  const dup=await tenant.collection('data').doc('negocios').collection('items').where('cancelacionId','==',ids.cancelation).get();
  need(dup.size===1,'B4_003_RECOVERY_DUPLICATE_CREATED');
  proof.assertions.recoveryIdempotentRetry=true;
- await collaborationFor(browser,directionActor,ids.collabBusiness,'Solicitar información al asesor','B4-003 R20 solicitud sintética al asesor');
+ const collabUi=await collaborationFor(browser,directionActor,ids.collabBusiness,'Solicitar información al asesor','B4-003 R20 solicitud sintética al asesor',true);proof.r20SecondCollaborationUi=collabUi;proof.assertions.collaborationUiAttachmentDurable=true;proof.assertions.businessCardOpenUnder2500ms=true;proof.assertions.collaborationVisualHierarchy=true;
  const requestRow=(await ref('negocios',ids.collabBusiness).get()).data()||{},requestComment=[].concat(requestRow.comentarios||[]).slice(-1)[0]||{};
  need(requestComment.direction==='advisor'&&requestComment.eventId&&requestComment.actorUid&&requestComment.actorName&&requestComment.user===requestComment.actorName,'B4_003_R20_HANDOFF_REQUEST_COMMIT_MISSING');
  need(/^\d{4}-\d{2}-\d{2}T/.test(String(requestComment.ts||'')),'B4_003_R20_HANDOFF_CANONICAL_TIMESTAMP_MISSING');
