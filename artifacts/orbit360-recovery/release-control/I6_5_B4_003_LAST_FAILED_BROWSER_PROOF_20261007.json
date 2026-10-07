@@ -1,25 +1,25 @@
 {
   "schema": "GRAVICENTRA_I6_5_B4_003_PREVIEW_PROOF_R19_V1",
-  "status": "INIT",
-  "target": "https://ays-orbit-360-lab--gi-i65-b4-37661727840-f63wpd9j.web.app",
+  "status": "FAIL",
+  "target": "https://ays-orbit-360-lab--gi-i65-b4-37663659220-8v1qm4h8.web.app",
   "ids": {
-    "client": "b4003qa_client_37661727840",
-    "renewalPolicy": "b4003qa_policy_renew_37661727840",
-    "expiredRenewPolicy": "b4003qa_policy_expired_renew_37661727840",
-    "unknownRenewPolicy": "b4003qa_policy_unknown_37661727840",
-    "renewabilityWritePolicy": "b4003qa_policy_renewwrite_37661727840",
-    "cancelPolicy": "b4003qa_policy_cancel_37661727840",
-    "healthPolicy": "b4003qa_policy_health_37661727840",
-    "healthReceipt1": "b4003qa_receipt_health_1_37661727840",
-    "healthReceipt2": "b4003qa_receipt_health_2_37661727840",
-    "healthReceiptShadow": "b4003qa_receipt_health_shadow_37661727840",
-    "cancelation": "b4003qa_cancel_37661727840",
-    "insurer": "b4003qa_insurer_37661727840",
-    "collabBusiness": "b4003qa_business_collab_37661727840",
-    "collabNoClientBusiness": "b4003qa_business_collab_noclient_37661727840",
-    "renewActivity": "act_ren_b4003qa_policy_renew_37661727840_20261007",
-    "cancelActivity": "act_rec_b4003qa_cancel_37661727840",
-    "recoveryBusiness": "neg_rec_b4003qa_cancel_37661727840"
+    "client": "b4003qa_client_37663659220",
+    "renewalPolicy": "b4003qa_policy_renew_37663659220",
+    "expiredRenewPolicy": "b4003qa_policy_expired_renew_37663659220",
+    "unknownRenewPolicy": "b4003qa_policy_unknown_37663659220",
+    "renewabilityWritePolicy": "b4003qa_policy_renewwrite_37663659220",
+    "cancelPolicy": "b4003qa_policy_cancel_37663659220",
+    "healthPolicy": "b4003qa_policy_health_37663659220",
+    "healthReceipt1": "b4003qa_receipt_health_1_37663659220",
+    "healthReceipt2": "b4003qa_receipt_health_2_37663659220",
+    "healthReceiptShadow": "b4003qa_receipt_health_shadow_37663659220",
+    "cancelation": "b4003qa_cancel_37663659220",
+    "insurer": "b4003qa_insurer_37663659220",
+    "collabBusiness": "b4003qa_business_collab_37663659220",
+    "collabNoClientBusiness": "b4003qa_business_collab_noclient_37663659220",
+    "renewActivity": "act_ren_b4003qa_policy_renew_37663659220_20261007",
+    "cancelActivity": "act_rec_b4003qa_cancel_37663659220",
+    "recoveryBusiness": "neg_rec_b4003qa_cancel_37663659220"
   },
   "assertions": {
     "qaResidueReadOnlyAdjudicated": true,
@@ -121,9 +121,9 @@
   "cleanupWrites": 35,
   "pageErrors": [],
   "consoleErrors": [
-    "Access to fetch at 'https://us-east1-ays-orbit-360-lab.cloudfunctions.net/orbit360DocumentDriveListFolderPreview' from origin 'https://ays-orbit-360-lab--gi-i65-b4-37661727840-f63wpd9j.web.app' has been blocked by CORS policy: Response to preflight request doesn't pass access control check: No 'Access-Control-Allow-Origin' header is present on the requested resource.",
+    "Access to fetch at 'https://us-east1-ays-orbit-360-lab.cloudfunctions.net/orbit360DocumentDriveListFolderPreview' from origin 'https://ays-orbit-360-lab--gi-i65-b4-37663659220-8v1qm4h8.web.app' has been blocked by CORS policy: Response to preflight request doesn't pass access control check: No 'Access-Control-Allow-Origin' header is present on the requested resource.",
     "Failed to load resource: net::ERR_FAILED",
-    "Access to fetch at 'https://us-east1-ays-orbit-360-lab.cloudfunctions.net/orbit360DocumentDriveListFolderPreview' from origin 'https://ays-orbit-360-lab--gi-i65-b4-37661727840-f63wpd9j.web.app' has been blocked by CORS policy: Response to preflight request doesn't pass access control check: No 'Access-Control-Allow-Origin' header is present on the requested resource.",
+    "Access to fetch at 'https://us-east1-ays-orbit-360-lab.cloudfunctions.net/orbit360DocumentDriveListFolderPreview' from origin 'https://ays-orbit-360-lab--gi-i65-b4-37663659220-8v1qm4h8.web.app' has been blocked by CORS policy: Response to preflight request doesn't pass access control check: No 'Access-Control-Allow-Origin' header is present on the requested resource.",
     "Failed to load resource: net::ERR_FAILED"
   ],
   "httpErrors": [],
@@ -388,7 +388,7 @@
       "visible": true,
       "sampleNumber": "91-59247519",
       "emptyState": false,
-      "textSample": "✕ Cancelaciones · Fuga de cartera MOTIVOS·VALOR PERDIDO·TASA DE FUGA CANCELADAS 490 histórico VALOR PERDIDO GTQ 1,842,217 USD 91,823,506 COP 26,564,526 prima anual · por moneda MOTIVO PRINCIPAL Sin motivo registrado más frecuente CANCELADAS / CARTERA 34% histórico acumulado · no es churn temporal Motivos de cancelación Sin motivo registrado 489 · 100% Prueba sintética B4-003 1 · 0% Motivo Prueba sintética B4-003 Sin motivo registrado Asesor Braulio Hernández Carlos Castro Fernando Arias Johanna Salgado Nicole Castro Paula Osorio Samuel Daza 490 de 490 FECHA CLIENTE PÓLIZA RAMO MOTIVO VALOR PERDIDO ACCIÓN 07 oct 2026 BQ B4-003 QA Cliente Persona · GT B4-003-CAN-37661727840 Auto Prueba sintética B4-003 Q 700 Ver cancelación 16 sept 2026 ML MARÍA LUISA LARIOS CALDERÓN natural · GT 223092797 VEHICULOS Sin motivo registrado Q 2,436 Ver cancelación 14 sept 2026 SK SEON KEUN KIM natural · GT 225121245 VEHICULOS Sin motivo registrado Q 6,250 Ver cancelación 07 sept 2026 JI JHEFRI ISAAC RAMIREZ AGUSTÍN natural · GT AUTO-514726 VEHICULOS Sin motivo registrado Q 25,116 Ver cancelación 07 sept 2026 FA FRANCISCO ANTONIO VÁSQUEZ MARTINEZ natural · GT VA125-00006039 VEHICULOS Sin motivo registrad"
+      "textSample": "✕ Cancelaciones · Fuga de cartera MOTIVOS·VALOR PERDIDO·TASA DE FUGA CANCELADAS 490 histórico VALOR PERDIDO GTQ 1,842,217 USD 91,823,506 COP 26,564,526 prima anual · por moneda MOTIVO PRINCIPAL Sin motivo registrado más frecuente CANCELADAS / CARTERA 34% histórico acumulado · no es churn temporal Motivos de cancelación Sin motivo registrado 489 · 100% Prueba sintética B4-003 1 · 0% Motivo Prueba sintética B4-003 Sin motivo registrado Asesor Braulio Hernández Carlos Castro Fernando Arias Johanna Salgado Nicole Castro Paula Osorio Samuel Daza 490 de 490 FECHA CLIENTE PÓLIZA RAMO MOTIVO VALOR PERDIDO ACCIÓN 07 oct 2026 BQ B4-003 QA Cliente Persona · GT B4-003-CAN-37663659220 Auto Prueba sintética B4-003 Q 700 Ver cancelación 16 sept 2026 ML MARÍA LUISA LARIOS CALDERÓN natural · GT 223092797 VEHICULOS Sin motivo registrado Q 2,436 Ver cancelación 14 sept 2026 SK SEON KEUN KIM natural · GT 225121245 VEHICULOS Sin motivo registrado Q 6,250 Ver cancelación 07 sept 2026 JI JHEFRI ISAAC RAMIREZ AGUSTÍN natural · GT AUTO-514726 VEHICULOS Sin motivo registrado Q 25,116 Ver cancelación 07 sept 2026 FA FRANCISCO ANTONIO VÁSQUEZ MARTINEZ natural · GT VA125-00006039 VEHICULOS Sin motivo registrad"
     }
   },
   "actor": {
@@ -919,7 +919,12 @@
     "cancelDenied": false,
     "cancelSnapshotError": "",
     "cancelAttached": true,
-    "optionalMissing": [],
+    "optionalMissing": [
+      "metas",
+      "reclamos",
+      "comisiones",
+      "auditoria"
+    ],
     "backendCancelationExists": true,
     "backendCancelPolicyExists": true
   },
@@ -1512,8 +1517,8 @@
       "CO",
       "CO"
     ],
-    "cancelGtMs": 70.30000000004657,
-    "cancelCoMs": 52.79999999998836,
+    "cancelGtMs": 53.60000000000582,
+    "cancelCoMs": 32.5,
     "cancelExplicitTargetsGT": true,
     "cancelExplicitTargetsCO": true,
     "cancelCrossCountryExplicitGT": true,
@@ -1781,7 +1786,7 @@
     "cancelKpiDetailOpen": true
   },
   "r11Browser": {
-    "clientHref": "#/cliente360?c=b4003qa_client_37661727840&t=polizas",
+    "clientHref": "#/cliente360?c=b4003qa_client_37663659220&t=polizas",
     "policyTargetPresent": true,
     "explicitCancelTargetPresent": true,
     "rowMisleadingClickable": false,
@@ -1857,8 +1862,8 @@
       "CO",
       "CO"
     ],
-    "qualityGtMs": 209.30000000004657,
-    "qualityCoMs": 110.20000000001164,
+    "qualityGtMs": 164,
+    "qualityCoMs": 82.79999999998836,
     "qualityGtRows": 50,
     "qualityCoRows": 17,
     "financialGtRows": 72,
@@ -1868,10 +1873,10 @@
   },
   "r1604ConfigFirstPaint": {
     "state": "loading",
-    "syncPaintMs": 1.1000000000349246,
+    "syncPaintMs": 1,
     "hasVisibleState": true,
     "text": "Confirmando catálogos canónicos… La plataforma está leyendo la configuración protegida del tenant. No se usan valores locales como autoridad.",
-    "canonicalReadyMs": 797,
+    "canonicalReadyMs": 790,
     "finalState": "ready"
   },
   "r16CatalogAndQuality": {
@@ -1906,7 +1911,7 @@
       "reason": "Se excluyeron 1 registro(s) histórico(s) duplicado(s); el calendario activo aún supera la prima contractual."
     },
     "rowVisible": true,
-    "rowText": "B4-003-HEALTH-376617278402 recibo(s) vigente(s) · 1 legado(s) excluido(s) BQ B4-003 QA Cliente Persona · GuatemalaQ 407Póliza · prima totalProgramación según cuotas de la póliza0 fila(s) requieren revisiónQ 543Q 136Q 0Se excluyeron 1 registro(s) histórico(s) duplicado(s); el calendario activo aún supera la prima contractual.Revisar diferenciaVer recibos",
+    "rowText": "B4-003-HEALTH-376636592202 recibo(s) vigente(s) · 1 legado(s) excluido(s) BQ B4-003 QA Cliente Persona · GuatemalaQ 407Póliza · prima totalProgramación según cuotas de la póliza0 fila(s) requieren revisiónQ 543Q 136Q 0Se excluyeron 1 registro(s) histórico(s) duplicado(s); el calendario activo aún supera la prima contractual.Revisar diferenciaVer recibos",
     "technicalToken": false,
     "exactAction": true,
     "mobileContract": true
@@ -1945,7 +1950,7 @@
     "technical": false
   },
   "r17QualityReceiptsDeepLink": {
-    "hash": "#/cliente360?c=b4003qa_client_37661727840&p=b4003qa_policy_health_37661727840&t=recibos",
+    "hash": "#/cliente360?c=b4003qa_client_37663659220&p=b4003qa_policy_health_37663659220&t=recibos",
     "receiptsTarget": true
   },
   "policyEditorPreservation": {
@@ -2034,9 +2039,9 @@
   },
   "r18CommercialMobile": {
     "viewport": 390,
-    "cardWidth": 390,
-    "cardScrollWidth": 388,
-    "cardClientWidth": 388,
+    "cardWidth": 388.875,
+    "cardScrollWidth": 387,
+    "cardClientWidth": 387,
     "footerButtons": 2
   },
   "r18ManagementModal": {
@@ -2073,7 +2078,7 @@
         "ids": [
           "pol_ad0ed5f26dd834d5e1d38f50eb0e",
           "pol_b9a883095c9fae8f7502ce1cb054",
-          "b4003qa_policy_expired_renew_37661727840",
+          "b4003qa_policy_expired_renew_37663659220",
           "pol_8231bbb8f9b7272c02891f5a4caf",
           "pol_df6bf097045762297ec31fd4e5c5"
         ]
@@ -2082,9 +2087,9 @@
         "key": "d15",
         "count": 3,
         "ids": [
-          "b4003qa_policy_renew_37661727840",
-          "b4003qa_policy_renewwrite_37661727840",
-          "b4003qa_policy_unknown_37661727840"
+          "b4003qa_policy_renew_37663659220",
+          "b4003qa_policy_renewwrite_37663659220",
+          "b4003qa_policy_unknown_37663659220"
         ]
       },
       {
@@ -2144,9 +2149,9 @@
     "unknownReview": true,
     "parallelDispositionAbsent": true,
     "date45ExpectedIds": [
-      "b4003qa_policy_renew_37661727840",
-      "b4003qa_policy_renewwrite_37661727840",
-      "b4003qa_policy_unknown_37661727840",
+      "b4003qa_policy_renew_37663659220",
+      "b4003qa_policy_renewwrite_37663659220",
+      "b4003qa_policy_unknown_37663659220",
       "pol_3ddc9e613f40252f02b2e122072d",
       "pol_638e276218baad9e84018415b0ba",
       "pol_7280c9b1a5253a1fe1e463e5993b",
@@ -2158,9 +2163,9 @@
       "pol_d5e61976a38be76ba5e3c1e12575"
     ],
     "date45VisibleIds": [
-      "b4003qa_policy_renew_37661727840",
-      "b4003qa_policy_renewwrite_37661727840",
-      "b4003qa_policy_unknown_37661727840",
+      "b4003qa_policy_renew_37663659220",
+      "b4003qa_policy_renewwrite_37663659220",
+      "b4003qa_policy_unknown_37663659220",
       "pol_3ddc9e613f40252f02b2e122072d",
       "pol_638e276218baad9e84018415b0ba",
       "pol_7280c9b1a5253a1fe1e463e5993b",
@@ -2190,7 +2195,7 @@
     ]
   },
   "r19RenewabilityDurable": {
-    "policyId": "b4003qa_policy_renewwrite_37661727840",
+    "policyId": "b4003qa_policy_renewwrite_37663659220",
     "serverValue": true,
     "reloadValue": true
   },
@@ -2200,10 +2205,10 @@
     "hasPrev": true
   },
   "r13PolicyPerformance": {
-    "routeMs": 234,
-    "searchMs": 225,
-    "detailMs": 342,
-    "searchNumber": "B4-003-REN-37661727840",
+    "routeMs": 287,
+    "searchMs": 229,
+    "detailMs": 323,
+    "searchNumber": "B4-003-REN-37663659220",
     "refreshFlicker": {
       "states": [
         {
@@ -2502,12 +2507,12 @@
     "allIds": [
       "pol_ad0ed5f26dd834d5e1d38f50eb0e",
       "pol_b9a883095c9fae8f7502ce1cb054",
-      "b4003qa_policy_expired_renew_37661727840",
+      "b4003qa_policy_expired_renew_37663659220",
       "pol_8231bbb8f9b7272c02891f5a4caf",
       "pol_df6bf097045762297ec31fd4e5c5",
-      "b4003qa_policy_renew_37661727840",
-      "b4003qa_policy_renewwrite_37661727840",
-      "b4003qa_policy_unknown_37661727840",
+      "b4003qa_policy_renew_37663659220",
+      "b4003qa_policy_renewwrite_37663659220",
+      "b4003qa_policy_unknown_37663659220",
       "pol_638e276218baad9e84018415b0ba",
       "pol_b39a58e5c216d8fb0f9fca4da4d6",
       "pol_7280c9b1a5253a1fe1e463e5993b",
@@ -2609,5 +2614,9 @@
         "value": "COP 68,149,688GTQ 103,415"
       }
     ]
+  },
+  "failure": {
+    "message": "page.evaluate: FirebaseError: El documento no pertenece al expediente autorizado.",
+    "stack": "page.evaluate: FirebaseError: El documento no pertenece al expediente autorizado.\n    at collaborationFor (/home/runner/work/orbit360-core/orbit360-core/tools/gravicentra-i6-5-b4-003-preview-proof.mjs:222:28)\n    at async file:///home/runner/work/orbit360-core/orbit360-core/tools/gravicentra-i6-5-b4-003-preview-proof.mjs:1192:17"
   }
 }
