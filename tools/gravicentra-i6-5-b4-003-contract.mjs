@@ -352,6 +352,7 @@ need(base.includes('Vencidas renovables')&&base.includes('data-expired-historica
 need(insurer.includes('data-insurer-preview-uat="1"')&&insurer.includes('data-rupload')&&insurer.includes('insurer-premium-section')&&!insurer.includes('Registry técnico y provenance'),'B4_003_R20_INSURER_HUMAN_UAT_OR_VISUAL_REDESIGN_MISSING');
 need(quality.includes('sourceLabel(x.contractualSource)')&&quality.includes('Prima total en póliza')&&quality.includes('Total de recibos programados')&&quality.includes('programación de pagos')&&quality.includes('quality-workbench'),'B4_003_R20_SECOND_REVIEW_QUALITY_HUMAN_LANGUAGE_MISSING');
 need(driveBackend.includes("entity==='negocio'")&&driveBackend.includes('refsFrom(target.business||{})')&&driveBackend.includes("target.entityType==='negocio'?await ensureFolder(rootId,'_NEGOCIOS'")&&!driveBackend.includes("if(!clientId)throw new HttpsError('failed-precondition','El negocio no tiene cliente vinculado"),'B4_003_R20_COLLAB_DRIVE_TARGET_MISSING');
+need(driveBackend.includes("for(const key of ['attachment','adjunto'])append(row&&row[key])")&&driveBackend.includes('...businessHistory.flatMap(refsFrom)'),'B4_003_R20_COLLAB_ATTACHMENT_NESTED_REF_AUTH_MISSING');
 need(opBackend.includes('b4003qa_'),'B4_003_R20_INSURER_ASSET_PREVIEW_UAT_MISSING');
 
 need(workflow.includes("onSchedule")&&workflow.includes('orbit360OpsLeadsCadenceScheduler')&&workflow.includes('previewNotificationOutbox')&&workflow.includes("advisorAllowed(authz.member")&&workflow.includes("'leads'"),'B4_003_R20_CADENCE_SCOPE_PREVIEW_BACKEND_MISSING');

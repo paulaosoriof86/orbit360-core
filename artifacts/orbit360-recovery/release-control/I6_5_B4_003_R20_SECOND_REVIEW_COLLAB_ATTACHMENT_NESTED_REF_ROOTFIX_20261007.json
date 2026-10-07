@@ -1,0 +1,29 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R20_SECOND_REVIEW_COLLAB_ATTACHMENT_NESTED_REF_ROOTFIX_V1",
+  "recordedAt": "2026-10-07T20:15:00Z",
+  "status": "SOURCE_FIXED_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+  "findingId": "B4-003-R20-B12",
+  "failedRunId": 37661727840,
+  "failedSourceSha": "7f9442d615d6c582bd89216bad11bdd6c5320588",
+  "failedPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b4-37661727840-f63wpd9j.web.app",
+  "failedBuildId": "gi-i65-b4-7f9442d615d6-57f234755dc1",
+  "failureCode": "FIREBASE_DOCUMENT_NOT_BOUND_TO_AUTHORIZED_CASE",
+  "failureMessage": "El documento no pertenece al expediente autorizado.",
+  "rootCause": "CANONICAL_COMMENT_STORES_THE_DRIVE_REFERENCE_IN_SINGULAR_ATTACHMENT_DOCUMENTREF_BUT_REFSFROM_ONLY_PROJECTED_TOP_LEVEL_REFERENCES_AND_PLURAL_ARRAYS",
+  "fix": "Project only the explicit singular attachment and adjunto objects from each already-authorized business comment or log entry, preserving the same-business authorization boundary.",
+  "productBlobs": {
+    "functions/document-drive-domain.js": "078764a3a40772b46500ba812f247dbd1402b1d7"
+  },
+  "qaBlobs": {
+    "tools/gravicentra-i6-5-b4-003-contract.mjs": "3cbdf9abeec648a7aeb866facaf563351d58e15c",
+    "tools/gravicentra-i6-5-b4-003-preview-proof.mjs": "7bf12a2d8edd084fabadec979952838098573679"
+  },
+  "authorizationBoundary": "SAME_AUTHORIZED_BUSINESS_EXPLICIT_ATTACHMENT_FIELDS_ONLY",
+  "proofFailureReceiptPersistence": true,
+  "dataMutation": false,
+  "operationalBusinessWrites": 0,
+  "reimport": false,
+  "live": false,
+  "b4004Held": true,
+  "nextAction": "B4_003_R20_CONTRACT_AND_EXACT_PREVIEW"
+}

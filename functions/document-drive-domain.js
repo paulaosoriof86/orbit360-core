@@ -284,12 +284,14 @@ async function authorizeTarget(request,tenantId,input,mode,previewOnly){
 }
 function refsFrom(row){
   const out=[];
+  const append=item=>{
+    if(typeof item==='string')out.push(driveIdFromUrl(item)||clean(item,180));
+    else if(item&&typeof item==='object')out.push(clean(item.documentRef||item.fileId||item.archivoRef,180)||driveIdFromUrl(item.driveUrl||item.externalUrl||item.url||''));
+  };
   for(const key of ['documentos','docs','adjuntos','attachments','files']){
-    for(const item of (Array.isArray(row&&row[key])?row[key]:[])){
-      if(typeof item==='string')out.push(driveIdFromUrl(item)||clean(item,180));
-      else if(item&&typeof item==='object')out.push(clean(item.documentRef||item.fileId||item.archivoRef,180)||driveIdFromUrl(item.driveUrl||item.externalUrl||item.url||''));
-    }
+    for(const item of (Array.isArray(row&&row[key])?row[key]:[]))append(item);
   }
+  for(const key of ['attachment','adjunto'])append(row&&row[key]);
   if(row&&typeof row==='object')out.push(clean(row.documentRef||row.fileId||row.archivoRef,180)||driveIdFromUrl(row.driveUrl||row.externalUrl||row.url||''));
   return new Set(out.filter(Boolean));
 }

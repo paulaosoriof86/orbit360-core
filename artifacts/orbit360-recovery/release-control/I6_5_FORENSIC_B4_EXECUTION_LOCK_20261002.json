@@ -577,7 +577,7 @@
   },
   "findingLedgerBlobSha": "e03a5b251973a0234668a4f2cd2c6e9e17658587",
   "continuityRegisterBlobSha": "31c6646999730ea0c77021818cfa4dddaf8908a7",
-  "compositionLockBlobSha": "68babc6722cac2dee533f4e8dab55cedc465b742",
+  "compositionLockBlobSha": "aa0130ea9d8127a74535d085082be6dca4a327cb",
   "r18SourceFix": {
     "status": "SOURCE_FIXED_R18_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_SOURCE_FIX_20261005.json",
@@ -950,6 +950,20 @@
     "blobSha": "b95f70f8f4f2c663b237e6cba06792620e9ff289",
     "compositionLockBlobSha": "68babc6722cac2dee533f4e8dab55cedc465b742",
     "authorizationBoundary": "SAME_AUTHORIZED_BUSINESS_ONLY",
+    "dataMutation": false,
+    "noLive": true,
+    "noReimport": true
+  },
+  "r20SecondReviewCollabAttachmentNestedRefRootFix": {
+    "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_SECOND_REVIEW_COLLAB_ATTACHMENT_NESTED_REF_ROOTFIX_20261007.json",
+    "blobSha": "cca2e89aece35e0f0a149ef9af92ba3fee9f113b",
+    "compositionLockBlobSha": "aa0130ea9d8127a74535d085082be6dca4a327cb",
+    "qaBlobs": {
+      "tools/gravicentra-i6-5-b4-003-contract.mjs": "3cbdf9abeec648a7aeb866facaf563351d58e15c",
+      "tools/gravicentra-i6-5-b4-003-preview-proof.mjs": "7bf12a2d8edd084fabadec979952838098573679"
+    },
+    "authorizationBoundary": "SAME_AUTHORIZED_BUSINESS_EXPLICIT_ATTACHMENT_FIELDS_ONLY",
     "dataMutation": false,
     "noLive": true,
     "noReimport": true

@@ -1411,6 +1411,9 @@ try{
  proof.assertions.r19MobilePolicySearchQuery=true;
  proof.assertions.r19InsurerHierarchyCollapsedRegistry=true;
  proof.status=proof.r13RenewalDataBlocker&&proof.r13RenewalDataBlocker.blocking===true?'PASS_EXCEPT_EXPLICIT_RENEWAL_DATA_BLOCKER':'PASS';
+} catch(error) {
+ proof.status='FAIL';
+ proof.failure={message:clean(error&&error.message||error),stack:clean(error&&error.stack||error).slice(0,8000)};
 } finally {
  if(page)await page.close().catch(()=>{});
  if(context)await context.close().catch(()=>{});
