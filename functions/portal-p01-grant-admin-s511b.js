@@ -18,7 +18,7 @@ function stable(v){
 function digest(v){return sha(JSON.stringify(stable(v)));}
 
 function rolesFrom(member={}){
-  return Array.from(new Set([].concat(member.roles||[],member.activeRole||[],member.defaultRole||[],member.rol||[]).map(clean).filter(Boolean)));
+  return Array.from(new Set([].concat(member.roles||[],member.activeRole||[],member.defaultRole||[],member.rol||[]).map(v=>clean(v,120)).filter(Boolean)));
 }
 function canManage(member={}){
   if(member.active===false||member.activo===false)return false;
