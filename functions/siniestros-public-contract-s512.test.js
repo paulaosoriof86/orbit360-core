@@ -61,3 +61,25 @@ test('assistance channel keeps insurer directory data separate from coverage tru
   assert.equal(r.truth.insurerContactIsDirectoryDataNotCoverageConfirmation,true);
   assert.equal(r.truth.insurerContactFreshnessMustBeValidated,true);
 });
+
+
+test('S5.12a public insurer channel requires review date and official evidence',()=>{
+  assert.deepEqual(
+    s.channelFreshnessStatus({emergencyContact:'1800-TEST',lastReviewedAt:'',officialEvidenceVerified:false}),
+    {publishable:false,code:'REVIEW_DATE_REQUIRED'}
+  );
+  assert.deepEqual(
+    s.channelFreshnessStatus({emergencyContact:'1800-TEST',lastReviewedAt:'2026-10-07',officialEvidenceVerified:false}),
+    {publishable:false,code:'OFFICIAL_EVIDENCE_REQUIRED'}
+  );
+  const ok=s.channelFreshnessStatus({emergencyContact:'1800-TEST',lastReviewedAt:'2026-10-07',officialEvidenceVerified:true});
+  assert.equal(ok.publishable,true);
+  assert.equal(ok.code,'CURRENT_CHANNEL_VALIDATED');
+});
+
+test('S5.12a missing insurer emergency contact never becomes publishable',()=>{
+  assert.deepEqual(
+    s.channelFreshnessStatus({emergencyContact:'',lastReviewedAt:'2026-10-07',officialEvidenceVerified:true}),
+    {publishable:false,code:'NO_DIRECTORY_CHANNEL'}
+  );
+});
