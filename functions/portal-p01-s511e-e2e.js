@@ -78,7 +78,7 @@ async function main(){
     const token=await signIn(key,email,password);
     const token2=await signIn(key,email2,password);
     const success=await callPortal(token,{accountRef:clientId});
-    if(!success.ok||!success.body.result||success.body.result.readOnly!==true)throw new Error('CALLABLE_SUCCESS_PATH_FAILED');
+    if(!success.ok||!success.body.result||success.body.result.readOnly!==true){const err=success.body&&success.body.error||{};throw new Error('CALLABLE_SUCCESS_PATH_FAILED|HTTP_'+success.httpStatus+'|'+String(err.status||'')+'|'+String(err.message||'').slice(0,100));}
     const result=success.body.result;
     if(result.projection.account.clientRef!==clientId||result.projection.policies.length!==1||result.projection.documents.length!==1)throw new Error('CALLABLE_PROJECTION_FAILED');
     if(Object.prototype.hasOwnProperty.call(result.projection.documents[0],'storagePath'))throw new Error('CALLABLE_RAW_STORAGE_EXPOSED');
