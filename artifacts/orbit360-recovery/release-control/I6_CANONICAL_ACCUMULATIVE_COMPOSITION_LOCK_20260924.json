@@ -208,7 +208,7 @@
     "orbit360-platform/data/tenant-alianzas-soluciones-insurers-p10.js": "41d2e31a42dac73eb68af304d5f532897210d0ee",
     "orbit360-platform/data/tenant-config/alianzas-soluciones.aseguradoras-knowledge-summary-v20261003.js": "2000d9ea8ab67bdd37d8bf404a29a405fa6374dd",
     "orbit360-platform/data/tenant-public-branding-index.js": "dc543c463f5ecd8ea44e49156d6282113bd95db6",
-    "orbit360-platform/index.html": "1aa2416b013132a6935fbb0d366c61886818a258",
+    "orbit360-platform/index.html": "b0fdfc0ef4f107ddd176db00218741b94739ae2f",
     "orbit360-platform/modules/academia.js": "d27aa080eac091057310aa7c952d3093677b50f0",
     "orbit360-platform/modules/aseguradoras-v1202-import-bridge.js": "db5f012abe505c2dd27d77a47d0694868bee5348",
     "orbit360-platform/modules/aseguradoras.js": "31f0baa6823d3d051651a4950224f69406a3805b",
@@ -219,7 +219,7 @@
     "orbit360-platform/modules/cobros.js": "866570f35d87f8d4d7709736058831a218cb461e",
     "orbit360-platform/modules/comisiones.js": "5b26dfc1cf2331af99eadb7a71f8348c9c053594",
     "orbit360-platform/modules/conciliaciones.js": "e0c4ef051fadb033e1a66ac4f0db67a52186ed25",
-    "orbit360-platform/modules/configuracion.js": "28e5fed13ea131ce7b721b8ecb8d909036c5ff02",
+    "orbit360-platform/modules/configuracion.js": "bc30918ac226d0f510fa180141a30af8ff8a7933",
     "orbit360-platform/modules/cotizador-v1203-source-gate.js": "87882325e73c6e66e5e82fbef4246208a22b719a",
     "orbit360-platform/modules/crm-v1198-operational-bridge.js": "0ec76280098c2f47982779fbd8d3a220745ea912",
     "orbit360-platform/modules/cronograma.js": "c2c5e2cccae88e5c3492aef0e7f109a0a896e5fa",
@@ -3709,5 +3709,15 @@
     "continuityRegisterBlobSha": "31c6646999730ea0c77021818cfa4dddaf8908a7",
     "masterPlanBlobSha": "43c8e73dad2eebef5a52a958a8aa7fbef92eb36f",
     "tinyFishRequiredBeforePaulaHandoff": true
+  },
+  "r20SecondReviewCatalogUiRootFix": {
+    "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_SECOND_REVIEW_CATALOG_UI_ROOTFIX_20261007.json",
+    "blobSha": "df6e7fefcf2e6b17625f9301a058eb2c605b2199",
+    "productBlobs": {
+      "orbit360-platform/modules/configuracion.js": "bc30918ac226d0f510fa180141a30af8ff8a7933",
+      "orbit360-platform/index.html": "b0fdfc0ef4f107ddd176db00218741b94739ae2f"
+    },
+    "b4004Held": true
   }
 }
