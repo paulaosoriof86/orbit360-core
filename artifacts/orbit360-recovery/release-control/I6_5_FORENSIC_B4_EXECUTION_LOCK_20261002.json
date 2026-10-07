@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B4_EXECUTION_LOCK_V1",
   "recordedAt": "2026-10-05T11:24:00-06:00",
-  "status": "B4_003_R20_SECOND_REVIEW_CAUSES_DEMONSTRATED_SOURCE_FIX_AUTHORIZED",
+  "status": "B4_003_SOURCE_FIXED_R20_PENDING_CONTRACT_AND_EXACT_PREVIEW",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "block": "B4",
@@ -38,9 +38,9 @@
   "activeFinding": {
     "id": "B4-003",
     "title": "Cumulative B4-003 remediation: Renovaciones, Cancelaciones and source-backed insurer knowledge.",
-    "status": "B4_003_R20_SECOND_REVIEW_CAUSES_DEMONSTRATED_SOURCE_FIX_AUTHORIZED",
+    "status": "B4_003_SOURCE_FIXED_R20_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "blocking": true,
-    "nextAction": "B4_003_R20_SECOND_REVIEW_SINGLE_CUMULATIVE_SOURCE_FIX",
+    "nextAction": "B4_003_R20_CONTRACT_AND_EXACT_PREVIEW",
     "humanVisualStatus": "REJECTED_R20_SECOND_REVIEW",
     "knowledgePreview": true
   },
@@ -84,7 +84,7 @@
     ],
     "reimportAuthorized": false,
     "livePromotionAuthorized": false,
-    "syntheticQaWritesAuthorized": false,
+    "syntheticQaWritesAuthorized": true,
     "syntheticQaScope": "R20 exact Preview only: disposable insurer/logo/product/plan/requirement/document and Ops/Leads handoff/cadence fixtures; mandatory server commit, readback, reload and cleanup; no real operational row mutation.",
     "paulaVisualAcceptanceRequiredBeforeAdvance": true,
     "cotcompRealTransportAuthorized": false,
@@ -106,7 +106,7 @@
     "authorizedDataMutation": "Only exact R20 renewability target set bound to dry-run digests; fields renewable/provenance/rule only; max 1415 writes; automatic rollback on failure.",
     "renewabilityApplyRepeatAuthorized": false
   },
-  "nextAction": "B4_003_R20_SECOND_REVIEW_SINGLE_CUMULATIVE_SOURCE_FIX",
+  "nextAction": "B4_003_R20_CONTRACT_AND_EXACT_PREVIEW",
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
     "blobSha": "edce8dfcaed778bfd2c8e191683f611167d15ae5"
@@ -575,9 +575,9 @@
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_RENEWAL_KPI_PARITY_CAUSAL_ADDENDUM_20261005.json",
     "blobSha": "87bab7ee2778a0525cdbe81cf4cbf82020bf6139"
   },
-  "findingLedgerBlobSha": "bfac4a737619f6bdf90d65ce88a96e812ab86dfd",
-  "continuityRegisterBlobSha": "4bc063d9ec181774b0fedcfa31d06f665d0db8e0",
-  "compositionLockBlobSha": "af779e2bd0fe6aabb747edb332f66a3008f0c5a9",
+  "findingLedgerBlobSha": "0dfaa45d2ed9524044bed523386926039dfbd653",
+  "continuityRegisterBlobSha": "1bba67d5e4047d76fc1b6f8eca5bbf0681ad9328",
+  "compositionLockBlobSha": "f81252122da3f23da97f740b173af15a5abbb43e",
   "r18SourceFix": {
     "status": "SOURCE_FIXED_R18_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_SOURCE_FIX_20261005.json",
@@ -603,7 +603,7 @@
     "ledgerBlobSha": "4c0834cc86c6c5db466a2d8b9aff2f4d46a067af",
     "carryBlobSha": "7c428e7f808c39032f579a44822b24d89b03feb7"
   },
-  "masterPlanBlobSha": "249145294df8f9d8e0241a9059cd48f4ee5222f4",
+  "masterPlanBlobSha": "a74fb1e70b295147d37b42262a9f1123079bb24e",
   "r19NoLossFreeze": {
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_PAULA_VISUAL_REJECTION_R19_NOLOSS_FREEZE_20261005.json",
     "blobSha": "5277c2a052ea8dcea3bb9e15eb7eb3f6b55e0c5d"
@@ -649,7 +649,7 @@
     "carryBlobSha": "de9b2d94a70cd580f565b81f2fd03a32241afdec",
     "masterPlanBlobSha": "64f9b11ade950b4c2734265d2c6b3ecfed3a6976"
   },
-  "productMutationAuthorized": true,
+  "productMutationAuthorized": false,
   "dataMutationAuthorized": false,
   "reimportAuthorized": false,
   "livePromotionAuthorized": false,
@@ -919,5 +919,12 @@
     "continuityRegisterBlobSha": "4bc063d9ec181774b0fedcfa31d06f665d0db8e0",
     "masterPlanBlobSha": "249145294df8f9d8e0241a9059cd48f4ee5222f4",
     "tinyFishRequiredBeforePaulaHandoff": true
+  },
+  "r20SecondReviewPreview": {
+    "status": "AUTHORIZED_EXACT_PREVIEW",
+    "dataWritesAuthorized": false,
+    "syntheticQaWritesAuthorized": true,
+    "tinyFishRequiredBeforePaulaHandoff": true,
+    "liveReleaseDriftBlocksProduction": true
   }
 }
