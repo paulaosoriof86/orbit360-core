@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B4_EXECUTION_LOCK_V1",
   "recordedAt": "2026-10-05T11:24:00-06:00",
-  "status": "B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL",
+  "status": "PAULA_VISUAL_REJECTED_R20_SECOND_REVIEW_REMEDIATION_REQUIRED",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "block": "B4",
@@ -38,10 +38,10 @@
   "activeFinding": {
     "id": "B4-003",
     "title": "Cumulative B4-003 remediation: Renovaciones, Cancelaciones and source-backed insurer knowledge.",
-    "status": "B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL",
+    "status": "PAULA_VISUAL_REJECTED_R20_SECOND_REVIEW_REMEDIATION_REQUIRED",
     "blocking": true,
-    "nextAction": "B4_003_R20_TARGETED_PAULA_VISUAL",
-    "humanVisualStatus": "PENDING_R20_TARGETED_VISUAL",
+    "nextAction": "B4_003_R20_SECOND_REVIEW_CAUSAL_REMEDIATION",
+    "humanVisualStatus": "REJECTED_R20_SECOND_REVIEW",
     "knowledgePreview": true
   },
   "rules": {
@@ -106,7 +106,7 @@
     "authorizedDataMutation": "Only exact R20 renewability target set bound to dry-run digests; fields renewable/provenance/rule only; max 1415 writes; automatic rollback on failure.",
     "renewabilityApplyRepeatAuthorized": false
   },
-  "nextAction": "B4_003_R20_TARGETED_PAULA_VISUAL",
+  "nextAction": "B4_003_R20_SECOND_REVIEW_CAUSAL_REMEDIATION",
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
     "blobSha": "edce8dfcaed778bfd2c8e191683f611167d15ae5"
@@ -283,7 +283,7 @@
     "livePromotion": false
   },
   "visualAcceptance": {
-    "status": "REJECTED_R20_REMEDIATION_REQUIRED",
+    "status": "REJECTED_R20_SECOND_REVIEW_REMEDIATION_REQUIRED",
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_VISUAL_ACCEPTANCE_GOVERNANCE_REPAIR_20261003.json",
     "receiptBlobSha": "b6c18ae40d86ff0cdc3003e7201ead3de3d7d745",
     "machinePassMayAdvanceFinding": false,
@@ -293,10 +293,10 @@
       "B4-003"
     ],
     "nextFindingHeld": "B4-004",
-    "requiredBeforeAdvance": "B4_003_TARGETED_PAULA_VISUAL_PASS",
+    "requiredBeforeAdvance": "COMPLETE_R20_SECOND_TARGETED_UAT_PASS",
     "advanceAuthorized": false,
-    "currentB4003HumanStatus": "REJECTED_R20_BLOCKERS_REMAIN",
-    "humanVisualStatus": "PENDING_AFTER_MACHINE_PASS"
+    "currentB4003HumanStatus": "REJECTED_R20_SECOND_REVIEW",
+    "humanVisualStatus": "REJECTED_R20_SECOND_REVIEW"
   },
   "r7CumulativeFreeze": {
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R7_CUMULATIVE_PLAN_FINDINGS_PREMIUM_AND_MANUAL_ACTION_LOCK_20261003.json",
@@ -575,9 +575,9 @@
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_RENEWAL_KPI_PARITY_CAUSAL_ADDENDUM_20261005.json",
     "blobSha": "87bab7ee2778a0525cdbe81cf4cbf82020bf6139"
   },
-  "findingLedgerBlobSha": "6db251a806cbfd4b4f7cde4f41f466cf76600e87",
-  "continuityRegisterBlobSha": "bae26681cf60e42459ab8c379373ac76bb9f1919",
-  "compositionLockBlobSha": "5f5730cbf1d3d2f1b773f087e11768514ff9142d",
+  "findingLedgerBlobSha": "c7d35adb3f980cae310a5f7051c77715e8f485a2",
+  "continuityRegisterBlobSha": "233364d5ca31265677fd3cd204f1d235f2866ca5",
+  "compositionLockBlobSha": "1de25e0265ddb3f5cec594328a8a7f2386ab9d20",
   "r18SourceFix": {
     "status": "SOURCE_FIXED_R18_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_SOURCE_FIX_20261005.json",
@@ -603,7 +603,7 @@
     "ledgerBlobSha": "4c0834cc86c6c5db466a2d8b9aff2f4d46a067af",
     "carryBlobSha": "7c428e7f808c39032f579a44822b24d89b03feb7"
   },
-  "masterPlanBlobSha": "1231c9a9866ec8b61813dda48b0fba5618830401",
+  "masterPlanBlobSha": "dfd562bd4afa72200bd9cbad8ce86056f30bcfed",
   "r19NoLossFreeze": {
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_PAULA_VISUAL_REJECTION_R19_NOLOSS_FREEZE_20261005.json",
     "blobSha": "5277c2a052ea8dcea3bb9e15eb7eb3f6b55e0c5d"
@@ -886,5 +886,15 @@
     "dataMutationAuthorized": false,
     "noLive": true,
     "noReimport": true
+  },
+  "r20SecondHumanReview": {
+    "status": "FROZEN_REJECTED",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_SECOND_PAULA_VISUAL_REJECTION_NOLOSS_20261007.json",
+    "blobSha": "2767c83eed40b42a1445b2d6c512b3284a1c9c31",
+    "ledgerBlobSha": "c7d35adb3f980cae310a5f7051c77715e8f485a2",
+    "carryBlobSha": "233364d5ca31265677fd3cd204f1d235f2866ca5",
+    "masterPlanBlobSha": "dfd562bd4afa72200bd9cbad8ce86056f30bcfed",
+    "compositionBlobSha": "1de25e0265ddb3f5cec594328a8a7f2386ab9d20",
+    "b4004Held": true
   }
 }
