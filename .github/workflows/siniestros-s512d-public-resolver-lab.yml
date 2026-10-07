@@ -1,0 +1,136 @@
+name: Siniestros S5.12D Public Resolver LAB
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - ays/siniestros-s512d-public-resolver-lab-20261007
+    paths:
+      - 'functions/siniestros-public-resolver-s512d.js'
+      - 'functions/siniestros-s512d-public-surface.test.js'
+      - 'functions/bootstrap.js'
+      - 'orbit360-platform/siniestros-asistencia-lab.html'
+      - 'orbit360-platform/core/siniestros-s512d-public.js'
+      - '.github/workflows/siniestros-s512d-public-resolver-lab.yml'
+
+permissions:
+  contents: read
+
+env:
+  GCLOUD_PROJECT: ays-orbit-360-lab
+  LAB_HOST: https://ays-orbit-360-lab.web.app
+  RESOLVER_URL: https://us-central1-ays-orbit-360-lab.cloudfunctions.net/siniestrosPublicResolverS512D
+
+jobs:
+  public-resolver-lab:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    env:
+      FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      FIREBASE_SERVICE_ACCOUNT_FALLBACK: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install functions dependencies
+        working-directory: functions
+        run: npm ci
+      - name: Source and structural QA
+        working-directory: functions
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check siniestros-public-resolver-s512d.js
+          node --check ../orbit360-platform/core/siniestros-s512d-public.js
+          node --test siniestros-s512d-public-surface.test.js
+          grep -q "require('./siniestros-public-resolver-s512d')" bootstrap.js
+          grep -q "Primero seguridad" ../orbit360-platform/siniestros-asistencia-lab.html
+          grep -q "Reportar no confirma cobertura" ../orbit360-platform/siniestros-asistencia-lab.html
+      - name: Prepare LAB credential
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/s512d/evidence"
+          SA="$FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB"
+          if [ -z "$SA" ]; then SA="$FIREBASE_SERVICE_ACCOUNT_FALLBACK"; fi
+          test -n "$SA"
+          CRED="$RUNNER_TEMP/s512d/firebase-service-account.json"
+          printf '%s' "$SA" > "$CRED"
+          chmod 600 "$CRED"
+          PROJECT="$(node -e "const fs=require('fs');console.log(JSON.parse(fs.readFileSync(process.argv[1],'utf8')).project_id||'')" "$CRED")"
+          test "$PROJECT" = "ays-orbit-360-lab"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$CRED" >> "$GITHUB_ENV"
+      - name: Install Firebase CLI
+        run: npm install --global firebase-tools@15.32.0
+      - name: Deploy resolver and LAB hosting
+        shell: bash
+        run: |
+          set -euo pipefail
+          firebase deploy --only "functions:siniestrosPublicResolverS512D,hosting" --project "$GCLOUD_PROJECT" --non-interactive --force
+      - name: Resolver runtime readback
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -fsSL "$RESOLVER_URL?action=list&country=GT" -o "$RUNNER_TEMP/s512d/evidence/list.json"
+          curl -fsSL "$RESOLVER_URL?country=GT&insurer=SEGUROS%20EL%20ROBLE" -o "$RUNNER_TEMP/s512d/evidence/elroble.json"
+          curl -fsSL "$RESOLVER_URL?country=GT&insurer=SEGUROS%20UNIVERSALES" -o "$RUNNER_TEMP/s512d/evidence/universales.json"
+          node - "$RUNNER_TEMP/s512d/evidence/list.json" "$RUNNER_TEMP/s512d/evidence/elroble.json" "$RUNNER_TEMP/s512d/evidence/universales.json" <<'NODE'
+          const fs=require('fs');
+          const [list,ok,stale]=process.argv.slice(2).map(p=>JSON.parse(fs.readFileSync(p,'utf8')));
+          if(!list.ok||list.count!==8||list.truth.coverageConfirmed!==false)process.exit(1);
+          if(!ok.ok||!ok.insurerChannel||ok.insurerChannel.value!=='1797'||ok.insurerChannel.validated!==true)process.exit(1);
+          if(!stale.ok||stale.insurerChannel!==null||stale.insurerChannelStatus!=='NO_VALIDATED_INSURER_CHANNEL'||stale.fallbackChannels.length!==2)process.exit(1);
+          NODE
+      - name: Negative HTTP/CORS checks
+        shell: bash
+        run: |
+          set -euo pipefail
+          CODE1="$(curl -sS -o "$RUNNER_TEMP/s512d/evidence/co.json" -w '%{http_code}' "$RESOLVER_URL?country=CO&insurer=X")"
+          test "$CODE1" = "400"
+          CODE2="$(curl -sS -o "$RUNNER_TEMP/s512d/evidence/origin.json" -w '%{http_code}' -H 'Origin: https://example.com' "$RESOLVER_URL?action=list&country=GT")"
+          test "$CODE2" = "403"
+          CODE3="$(curl -sS -o "$RUNNER_TEMP/s512d/evidence/post.json" -w '%{http_code}' -X POST "$RESOLVER_URL")"
+          test "$CODE3" = "405"
+      - name: Hosted UI readback
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -fsSL "$LAB_HOST/siniestros-asistencia-lab.html" -o "$RUNNER_TEMP/s512d/evidence/page.html"
+          curl -fsSL "$LAB_HOST/core/siniestros-s512d-public.js" -o "$RUNNER_TEMP/s512d/evidence/client.js"
+          grep -q "Siniestros S5.12D · LAB" "$RUNNER_TEMP/s512d/evidence/page.html"
+          grep -q "Primero seguridad" "$RUNNER_TEMP/s512d/evidence/page.html"
+          grep -q "siniestrosPublicResolverS512D" "$RUNNER_TEMP/s512d/evidence/client.js"
+      - name: Build sanitized receipt
+        shell: bash
+        run: |
+          set -euo pipefail
+          node - <<'NODE' > "$RUNNER_TEMP/s512d/evidence/receipt.json"
+          console.log(JSON.stringify({
+            schemaVersion:'ays-siniestros-s512d-public-resolver-lab-v1',
+            labResolverDeployed:true,
+            labSurfaceDeployed:true,
+            validatedRegistryCount:8,
+            knownValidatedChannelReadback:true,
+            staleChannelSuppressed:true,
+            aysFallbackPreserved:true,
+            safetyGateVisible:true,
+            unsupportedCountryDenied:true,
+            untrustedOriginDenied:true,
+            writeMethodDenied:true,
+            coverageConfirmed:false,
+            eligibilityConfirmed:false,
+            realCustomerDataUsed:false,
+            productionTouched:false
+          },null,2));
+          NODE
+      - name: Upload sanitized evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: siniestros-s512d-public-resolver-${{ github.run_id }}
+          path: ${{ runner.temp }}/s512d/evidence/receipt.json
+          if-no-files-found: error
+          retention-days: 30
+      - name: Remove transient credential
+        if: always()
+        run: rm -f "$RUNNER_TEMP/s512d/firebase-service-account.json"
