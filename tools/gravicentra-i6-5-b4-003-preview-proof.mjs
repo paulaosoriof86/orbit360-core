@@ -108,13 +108,16 @@ async function bootProduct(page,token){
    const p=Orbit.productRuntimeBrowserProvidersP0,c=await p.initialize();
    if(!c.auth.currentUser)await c.modules.auth.signInWithCustomToken(c.auth,token);
    const requested=['clientes','polizas','vehiculos','recibosEsperados','cancelaciones','negocios','gestiones','aseguradoras'];
-   const forced={called:false,phase:'',requested:[]};
+   const forced={called:false,phase:'',requested:[],bootstrapTrace:[]};
    const forceCollections=(event)=>{
      try{
+       const detail=event?.detail||{};
+       forced.bootstrapTrace.push({phase:String(detail.phase||''),ready:detail.ready===true,collectionCount:Number(detail.collectionCount||0),errors:Array.isArray(detail.errors)?detail.errors.slice(0,8).map(String):[]});
+       if(forced.bootstrapTrace.length>16)forced.bootstrapTrace.shift();
        if(!Orbit.store||typeof Orbit.store._ensureCollections!=='function')return;
        const attached=Orbit.store._ensureCollections(requested)||[];
        forced.called=Array.isArray(attached)&&attached.includes('cancelaciones');
-       forced.phase=String(event?.detail?.phase||'available-readonly-store');
+       forced.phase=String(detail.phase||'available-readonly-store');
        forced.requested=Array.isArray(attached)?attached.slice():[];
      }catch(error){forced.error=String(error&&error.message||error);}
    };
@@ -128,7 +131,8 @@ async function bootProduct(page,token){
          lastActivationError='';
        }catch(error){
          lastActivationError=String(error&&error.message||error||'');
-         if(!/PRODUCT_(?:READONLY_BOOTSTRAP_NOT_READY|STORE_NOT_READY)/.test(lastActivationError)||attempt===6)throw error;
+         if(!/PRODUCT_(?:READONLY_BOOTSTRAP_NOT_READY|STORE_NOT_READY)/.test(lastActivationError))throw error;
+         if(attempt===6)throw new Error(lastActivationError+'|BOOTSTRAP_TRACE='+JSON.stringify(forced.bootstrapTrace));
          await new Promise(resolve=>setTimeout(resolve,Math.min(2500,500*attempt)));
        }
      }

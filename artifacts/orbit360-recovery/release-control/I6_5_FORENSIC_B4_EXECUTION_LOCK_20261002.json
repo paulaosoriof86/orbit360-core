@@ -577,7 +577,7 @@
   },
   "findingLedgerBlobSha": "e03a5b251973a0234668a4f2cd2c6e9e17658587",
   "continuityRegisterBlobSha": "31c6646999730ea0c77021818cfa4dddaf8908a7",
-  "compositionLockBlobSha": "ffbb5f07877a76532463db28ed4b40cd4bf7f230",
+  "compositionLockBlobSha": "1f232e6d3eb20a4ec437a01b518f88dd54b31f90",
   "r18SourceFix": {
     "status": "SOURCE_FIXED_R18_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_SOURCE_FIX_20261005.json",
@@ -1012,9 +1012,9 @@
     "noReimport": true
   },
   "r20AdvisorColdBootstrapContiguousBudgetRootFix": {
-    "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW",
+    "status": "HYPOTHESIS_REJECTED_BY_EXACT_PREVIEW_ROLLED_BACK",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_ADVISOR_COLD_BOOTSTRAP_CONTIGUOUS_BUDGET_ROOTFIX_20261007.json",
-    "blobSha": "0bb2e2be85cb3aa68b016890f7b8c3751e82bfe4",
+    "blobSha": "3b5809bb3dbb33db34b14cff269ffa4db33c7987",
     "compositionLockBlobSha": "ffbb5f07877a76532463db28ed4b40cd4bf7f230",
     "productBlobs": {
       "orbit360-platform/core/product-app-p0.js": "6938e9083fd28dc96e003cc216954566282b29be"
@@ -1022,6 +1022,22 @@
     "qaBlobs": {
       "tools/gravicentra-i6-5-b4-003-contract.mjs": "a489eda326bfc84aeba3234a25f87105fc02277e",
       "tools/gravicentra-i6-5-b4-003-preview-proof.mjs": "d0d0e49ec4228448eb826f3f7f29e0808e247fc4"
+    },
+    "dataMutation": false,
+    "noLive": true,
+    "noReimport": true
+  },
+  "r20AdvisorBootstrapSanitizedTraceDiagnostic": {
+    "status": "DIAGNOSTIC_INSTRUMENTED_PENDING_EXACT_PREVIEW",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_ADVISOR_BOOTSTRAP_SANITIZED_TRACE_DIAGNOSTIC_20261007.json",
+    "blobSha": "e426904334658a99a62a4af8e57067114f79c41f",
+    "compositionLockBlobSha": "1f232e6d3eb20a4ec437a01b518f88dd54b31f90",
+    "productRollback": {
+      "orbit360-platform/core/product-app-p0.js": "f85a76eeab1c1ea0854ec91296357b0530020de7"
+    },
+    "qaBlobs": {
+      "tools/gravicentra-i6-5-b4-003-contract.mjs": "e4440a5e4c3620d9bbb6a5f238f66305e8ff41d9",
+      "tools/gravicentra-i6-5-b4-003-preview-proof.mjs": "80a28b8f8957ea9840aeb3c32c7df32b017c57e5"
     },
     "dataMutation": false,
     "noLive": true,

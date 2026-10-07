@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_B4_003_R20_ADVISOR_COLD_BOOTSTRAP_CONTIGUOUS_BUDGET_ROOTFIX_V1",
   "recordedAt": "2026-10-07T19:10:00Z",
-  "status": "SOURCE_FIXED_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+  "status": "HYPOTHESIS_REJECTED_BY_EXACT_PREVIEW_ROLLED_BACK",
   "findingId": "B4-003-R20-QA-ADVISOR-COLD-BOOTSTRAP-01",
   "failedRunId": 37671301642,
   "failedSourceSha": "db3e061eab9ac132aec3ab5cc276c830be12da0c",
@@ -32,6 +32,13 @@
     "eachFailureDetachesStore": true
   },
   "fix": "Align product-app with the canonical 20-second contiguous bootstrap budget so the cold advisor authoritative read can finish without its store being destroyed and restarted.",
+  "hypothesisValidation": {
+    "runId": 37672792409,
+    "sourceSha": "3120aa82df467695228868dbf69cafbeff5f8682",
+    "proofCommitSha": "fc17c99ced2abefeef30a1fa6f9e2ad5fa4911d3",
+    "result": "REJECTED_SAME_PRODUCT_READONLY_BOOTSTRAP_NOT_READY",
+    "disposition": "ROLL_BACK_TIMEOUT_CHANGE_AND_CAPTURE_SANITIZED_BOOTSTRAP_PHASE_ERRORS"
+  },
   "productBlobs": {
     "orbit360-platform/core/product-app-p0.js": "6938e9083fd28dc96e003cc216954566282b29be"
   },

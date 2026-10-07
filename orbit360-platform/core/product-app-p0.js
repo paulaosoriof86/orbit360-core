@@ -2,7 +2,7 @@
 (function(){
   'use strict';
   window.Orbit=window.Orbit||{};
-  var VERSION='fase-a-i2-clean-20261007.r20f4-advisor-cold-bootstrap';
+  var VERSION='fase-a-i2-clean-20261007.r20f3-pending-landing';
   var state={initialized:false,activating:false,started:false,routerStarted:false,tenantContextReady:false,operationalWriteReady:false,lastError:''};
   var activationPromise=null;
 
@@ -77,7 +77,7 @@
         authorizedProductReadOnly:true,
         runtimeAuthorized:true,
         collections:bootstrapCollections,
-        snapshotTimeoutMs:20000
+        snapshotTimeoutMs:8000
       }).then(function(result){
         if(result&&result.ready===true&&Orbit.store&&typeof Orbit.store._ensureCollections==='function'){
           var lazy=[].concat(hydration.optional||[]);
