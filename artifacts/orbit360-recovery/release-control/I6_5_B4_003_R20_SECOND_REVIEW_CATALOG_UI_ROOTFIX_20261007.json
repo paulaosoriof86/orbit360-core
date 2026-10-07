@@ -1,0 +1,26 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R20_SECOND_REVIEW_CATALOG_UI_ROOTFIX_V1",
+  "recordedAt": "2026-10-07T10:39:00-06:00",
+  "status": "SOURCE_FIXED_PENDING_REBOUND_EXACT_PREVIEW",
+  "findingIds": [
+    "B4-003-R20-B13",
+    "B4-003-R20-V2-16-TRANSVERSAL-VISUAL-HIERARCHY"
+  ],
+  "demonstratedCause": "Canonical tenant config already had a distinct planes authority and guardarCatalogos wrote next.planes, but Configuración > Catálogos rendered only a combined 'Productos / planes' textarea and no cf-cat-planes control. The save owner therefore had a dead/missing input and the insurer offering matrix could not be administered truthfully.",
+  "changedProductFiles": {
+    "orbit360-platform/modules/configuracion.js": "bc30918ac226d0f510fa180141a30af8ff8a7933",
+    "orbit360-platform/index.html": "b0fdfc0ef4f107ddd176db00218741b94739ae2f"
+  },
+  "implemented": [
+    "Render separate Productos generales and Planes comerciales catalog controls.",
+    "Keep product-by-ramo authority in ramosPais and distinct tenant plans authority.",
+    "Bump Configuración cache binding so exact Preview cannot reuse the older combined catalog UI."
+  ],
+  "boundaries": {
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false,
+    "b4004Held": true
+  },
+  "nextAction": "B4_003_R20_CONTRACT_AND_EXACT_PREVIEW"
+}
