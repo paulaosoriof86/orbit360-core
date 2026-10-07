@@ -20,9 +20,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     env:
-      FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB: \${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
-      FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB: \${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
-      FIREBASE_SERVICE_ACCOUNT_FALLBACK: \${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      FIREBASE_SERVICE_ACCOUNT_FALLBACK: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -77,8 +77,8 @@ jobs:
       - name: Upload sanitized evidence
         uses: actions/upload-artifact@v4
         with:
-          name: cotcomp-s507-designated-routing-rehearsal-\${{ github.run_id }}
-          path: \${{ runner.temp }}/s507-routing/evidence/ROUTING_REHEARSAL.json
+          name: cotcomp-s507-designated-routing-rehearsal-${{ github.run_id }}
+          path: ${{ runner.temp }}/s507-routing/evidence/ROUTING_REHEARSAL.json
           if-no-files-found: error
           retention-days: 30
       - name: Remove transient credential
