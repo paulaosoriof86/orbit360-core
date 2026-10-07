@@ -33,8 +33,8 @@
   }
   function callableNames() {
     return isPreview()
-      ? { status: 'orbit360DocumentDriveStatusPreview', upload: 'orbit360DocumentDriveUploadPreview', read: 'orbit360DocumentDriveReadPreview', download: 'orbit360DocumentDriveDownloadPreview', finalize: 'orbit360DocumentDriveFinalizePreview', quarantine: 'orbit360DocumentDriveQuarantinePreview', bootstrap: 'orbit360DocumentDriveBootstrapPreview', region: 'us-east1' }
-      : { status: 'orbit360DocumentDriveStatus', upload: 'orbit360DocumentDriveUpload', read: 'orbit360DocumentDriveRead', download: 'orbit360DocumentDriveDownload', finalize: 'orbit360DocumentDriveFinalize', quarantine: 'orbit360DocumentDriveQuarantine', bootstrap: 'orbit360DocumentDriveBootstrap', region: 'us-central1' };
+      ? { status: 'orbit360DocumentDriveStatusPreview', upload: 'orbit360DocumentDriveUploadPreview', listFolder: 'orbit360DocumentDriveListFolderPreview', readDossier: 'orbit360DocumentDriveReadDossierPreview', read: 'orbit360DocumentDriveReadPreview', download: 'orbit360DocumentDriveDownloadPreview', finalize: 'orbit360DocumentDriveFinalizePreview', quarantine: 'orbit360DocumentDriveQuarantinePreview', bootstrap: 'orbit360DocumentDriveBootstrapPreview', region: 'us-east1' }
+      : { status: 'orbit360DocumentDriveStatus', upload: 'orbit360DocumentDriveUpload', listFolder: 'orbit360DocumentDriveListFolder', readDossier: 'orbit360DocumentDriveReadDossier', read: 'orbit360DocumentDriveRead', download: 'orbit360DocumentDriveDownload', finalize: 'orbit360DocumentDriveFinalize', quarantine: 'orbit360DocumentDriveQuarantine', bootstrap: 'orbit360DocumentDriveBootstrap', region: 'us-central1' };
   }
   function requestBase(extra) {
     return {
@@ -191,6 +191,23 @@
       return { ok: false, status: /permission-denied/i.test(raw) ? 'sin_permiso' : /not-found/i.test(raw) ? 'sin_referencia' : /SETUP_REQUIRED/i.test(raw) ? 'tenant_setup_required' : 'no_disponible', message: 'No fue posible guardar el documento en Drive.', code: raw };
     }
   }
+  async function listFolder(extra) {
+    const names=callableNames();
+    try{
+      const out=await call(names.listFolder,Object.assign(requestBase(extra),{folderId:String(extra&&extra.folderId||'')}),names.region);
+      return Object.assign({ok:false,status:'no_disponible',items:[]},out||{});
+    }catch(error){return{ok:false,status:'no_disponible',items:[],message:'No fue posible consultar la carpeta de Drive.',code:String(error&&(error.code||error.message)||'')};}
+  }
+  async function resolveDossier(ref,extra) {
+    const id=driveFileId(ref);if(!id)return{ok:false,status:'sin_referencia',message:'Documento sin referencia Drive.'};
+    const names=callableNames();
+    try{
+      const out=await call(names.readDossier,Object.assign(requestBase(extra),{documentRef:id}),names.region);
+      if(!out||out.ok!==true||!out.base64)return Object.assign({ok:false,status:'sin_readback'},out||{});
+      const blob=bytesFromBase64(out.base64,out.mimeType),blobUrl=URL.createObjectURL(blob);
+      return Object.assign({},out,{ok:true,status:'disponible',previewUrl:out.previewAvailable===true?blobUrl:'',downloadAvailable:true,backendPersistent:true});
+    }catch(error){return{ok:false,status:'no_disponible',message:'No fue posible abrir el documento del expediente.',code:String(error&&(error.code||error.message)||'')};}
+  }
   async function resolve(ref, extra) {
     const id = driveFileId(ref);
     if (!id) return { ok: false, status: 'sin_referencia', message: 'Documento sin referencia Drive.', downloadAvailable: false };
@@ -257,7 +274,7 @@
   }
 
   const provider = {
-    resolve, download, upload, finalize, quarantine, pendingDocument, connect, bootstrap,
+    resolve, resolveDossier, listFolder, download, upload, finalize, quarantine, pendingDocument, connect, bootstrap,
     uploadStatus: () => {
       const stale = Date.now() - state.lastProbeAt > 30000;
       if (!state.probing && (!state.probed || stale)) setTimeout(() => probe(true), 0);
@@ -286,7 +303,7 @@
 
   Orbit.productDriveDocumentProviderP0 = Object.freeze({
     VERSION: 'b3-004-r10-20260930.3-payment-staged-lifecycle',
-    connect, bootstrap, probe, upload, finalize, quarantine, pendingDocument, resolve, download,
+    connect, bootstrap, probe, upload, finalize, quarantine, pendingDocument, resolve, resolveDossier, listFolder, download,
     status: () => Object.assign({}, state.status),
     previewIsolated: isPreview(),
     oauthDelegated: false,
