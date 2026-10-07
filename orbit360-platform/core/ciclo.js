@@ -237,6 +237,16 @@ Orbit.ciclo = (function () {
   }
 
   /* ===================== tarjetas ===================== */
+  function collaborationState(n,board){
+    const comments=[].concat(n&&n.comentarios||[]),last=comments.length?comments[comments.length-1]:null,direction=last&&last.direction||'';
+    const needsAction=(board==='ops'&&direction==='operations')||(board==='leads'&&direction==='advisor');
+    return{last,direction,needsAction,ts:String(last&&last.ts||n&&n.actualizado||n&&n.creado||'')};
+  }
+  function actionQueueRanks(board){
+    const rows=negocios({surface:board}).map(n=>({n,state:collaborationState(n,board)})).filter(x=>x.state.needsAction);
+    rows.sort((a,b)=>String(a.state.ts||'').localeCompare(String(b.state.ts||''))||String(a.n.id||'').localeCompare(String(b.n.id||'')));
+    const out={};rows.forEach((x,i)=>{out[x.n.id]=i+1;});return out;
+  }
   function cardNegocio(n, opts) {
     opts = opts || {};
     const ase = q.asesor(n.asesorId), ei = etapaInfo(n.etapa);
@@ -244,9 +254,9 @@ Orbit.ciclo = (function () {
     const done = (n.checklist || []).filter(c => c.done).length, tot = (n.checklist || []).length;
     const pr = { Alta: 'danger', Media: 'warn', Baja: 'neutral' }[n.prioridad] || 'neutral';
     const espejo = opts.espejo,comments=[].concat(n.comentarios||[]),lastCollab=comments.length?comments[comments.length-1]:null;
-    const collabDirection=lastCollab&&lastCollab.direction||'',collabSeq=Number(lastCollab&&lastCollab.sequence)||comments.length;
-    const collabNeedsAction=(opts.board==='ops'&&collabDirection==='operations')||(opts.board==='leads'&&collabDirection==='advisor');
-    const collabLabel=!collabDirection?'':collabNeedsAction?('Acción requerida · #'+collabSeq):((collabDirection==='advisor'?'Esperando asesor':'Esperando Operaciones')+' · #'+collabSeq);
+    const collab=collaborationState(n,opts.board),collabDirection=collab.direction,collabNeedsAction=collab.needsAction;
+    const queueRank=Number(opts.actionRank)||0;
+    const collabLabel=!collabDirection?'':collabNeedsAction?('Acción requerida · #'+(queueRank||1)):(collabDirection==='advisor'?'Enviado al asesor':'Enviado a Operaciones');
     const collabClass=collabNeedsAction?'collab-action':'collab-wait';
     return `<div class="kcard ${espejo ? 'kcard-espejo' : ''}" data-neg="${n.id}">
       <div class="kcard-top">
@@ -256,7 +266,7 @@ Orbit.ciclo = (function () {
         ${opts.board === 'ops' && n.origen ? `<span class="badge info" title="Ingreso por ${n.origen}">${n.origen === 'Leads' ? '🎯' : n.origen === 'Solicitud del cliente' ? '🙋' : '🗂'} ${U.esc(U.text(n.origen, 'Sin origen'))}</span>` : ''}
         ${espejo ? `<span class="kmirror" title="Gestión operativa en curso por el equipo">🔗 en Ops</span>` : ''}
         ${n.cadenciaActiva ? `<span class="badge ok" title="Cadencia automática activa">🔁</span>` : ''}
-        ${collabLabel ? `<span class="badge ${collabClass}" data-collab-state="${U.esc(collabDirection)}" data-collab-seq="${collabSeq}">↔ ${U.esc(collabLabel)}</span>` : ''}
+        ${collabLabel ? `<span class="badge ${collabClass}" data-collab-state="${U.esc(collabDirection)}" data-collab-rank="${queueRank||0}">↔ ${U.esc(collabLabel)}</span>` : ''}
       </div>
       <div class="kcard-t">${U.esc(n.nombre)}</div>
       <div class="kcard-cli">${U.esc(n.producto)} · <span class="mono">${primaShort(n)}</span></div>
@@ -1228,7 +1238,7 @@ Orbit.ciclo = (function () {
   return {
     ETAPAS, E, FLUJO, opsListas, leadsListas, etapaInfo, flag,
     negocios, gestiones, opsBoard, leadsBoard, metricasLeads,
-    cardNegocio, cardGestion, wireCards, notify, gestionarListas,
+    cardNegocio, cardGestion, actionQueueRanks, collaborationState, wireCards, notify, gestionarListas,
     setEtapa, decidirCierre, perder, archivar, emitir, crearGestion, crearGestionDurable,
     openNegocio, openGestion, managementCreateModal, solicitarGestion, nuevoNegocio, nuevaGestion, assignableAdvisors
   };
