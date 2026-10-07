@@ -90,7 +90,7 @@ need(r19Source.status==='SOURCE_FIXED_R19_PENDING_CONTRACT_AND_EXACT_PREVIEW'&&r
 need(r20Source.status==='SOURCE_FIXED_R20_PENDING_CONTRACT_AND_EXACT_PREVIEW'&&r20Source.findingCountAfter===264&&r20Source.operationalBusinessWrites===0&&r20Source.livePromoted===false&&r20Source.renewabilityApplyWrites===1415,'B4_003_R20_SOURCE_FIX_RECEIPT_INVALID');
 need(r20FollowupReview.status==='FROZEN_PAULA_VISUAL_REJECTED_R20_FOLLOWUP','B4_003_R20_FOLLOWUP_REVIEW_NOT_FROZEN');
 need(r20FollowupDiagnostic.status==='CAUSES_DEMONSTRATED_SINGLE_CUMULATIVE_SOURCE_FIX_AUTHORIZED','B4_003_R20_FOLLOWUP_DIAGNOSTIC_INVALID');
-need(r20FollowupSource.status==='SOURCE_FIXED_R20_FOLLOWUP_PENDING_CONTRACT_AND_EXACT_PREVIEW'&&r20FollowupSource.operationalBusinessWrites===0&&r20FollowupSource.dataMutation===false&&r20FollowupSource.livePromotion===false,'B4_003_R20_FOLLOWUP_SOURCE_RECEIPT_INVALID');
+need(r20FollowupSource.status==='SOURCE_FIXED_R20_FOLLOWUP_PENDING_CONTRACT_AND_EXACT_PREVIEW'&&r20FollowupSource.boundaries?.operationalBusinessWrites===0&&r20FollowupSource.boundaries?.dataMutation===false&&r20FollowupSource.boundaries?.livePromotion===false&&r20FollowupSource.boundaries?.reimport===false,'B4_003_R20_FOLLOWUP_SOURCE_RECEIPT_INVALID');
 need(r18Forensic.status==='READONLY_FORENSIC_COMPLETE'&&r18Forensic.counts?.within45===11&&r18Forensic.renewal45?.exactlyAccounted===true,'B4_003_R18_FORENSIC_INVALID');
 need(r18Forensic.targetPolicyCollision?.collisions?.some(x=>x.classification==='LEGITIMATE_EDITION_PATTERN_LINEAGE_INCOMPLETE'),'B4_003_R18_POLICY_EDITION_FORENSIC_MISSING');
 need(r18KpiAdd.status==='CAUSE_CONFIRMED_ADD_TO_SAME_R18_CANDIDATE','B4_003_R18_KPI_PARITY_ADDENDUM_INVALID');
