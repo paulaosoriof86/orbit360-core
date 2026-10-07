@@ -221,7 +221,7 @@ need(/needsCountry=f\.some\(x=>x\.k==='pais'\)/.test(quality)&&/needsCountry \? 
 need(/Tolerancia \/ causa/.test(quality)&&/calendarAuthority/.test(quality)&&/contractualSource/.test(policyDetail)&&/Math\.abs\(delta\)<0\.0000001\?0:delta/.test(policyDetail),'B4_003_R16_FINANCIAL_QUALITY_ACTIONABILITY_MISSING');
 need(/Prima pendiente de fuente/.test(base)&&/Orbit\.modules\.cliente360\.verPoliza/.test(base)&&/return\s*\{\s*render\s*\}/.test(base),'B4_003_R16_RENEWAL_FAIL_CLOSED_REVIEW_PATH_MISSING');
 need(/gravicentra-insurer-source-registry-v1/.test(read('orbit360-platform/core/config.js'))&&/Tarifario \/ Excel cotizador/.test(read('orbit360-platform/core/config.js'))&&/Legal\/regulatorio/.test(read('orbit360-platform/core/config.js'))&&/gravicentra-quote-authority-v1/.test(read('orbit360-platform/core/config.js')),'B4_003_R16_INSURER_CANONICAL_SOURCE_REGISTRY_MISSING');
-need(insurer.includes('data-technical-registry="1"')&&insurer.includes('Detalle de fuentes y trazabilidad')&&/Biblioteca \+ Drive/.test(insurer)&&/familiaDocumento/.test(importer)&&/vigenciaFuente/.test(importer),'B4_003_R20_INSURER_REGISTRY_UI_OR_METADATA_MISSING');
+need(insurer.includes('data-technical-registry="1"')&&insurer.includes('Fuentes y respaldo')&&/Biblioteca \+ Drive/.test(insurer)&&/familiaDocumento/.test(importer)&&/vigenciaFuente/.test(importer),'B4_003_R20_INSURER_REGISTRY_UI_OR_METADATA_MISSING');
 need(!read('orbit360-platform/core/config.js').includes('automaticCalculationAllowed:true'),'B4_003_R16_INSURER_SOURCE_AUTO_CALC_FORBIDDEN');
 
 need(/\^\(\?:b4\[-_\]\|b4003qa_\)/.test(importer)||/b4003qa_/.test(importer),'B4_003_R13_INSURER_PREVIEW_GUARD_ALIGNMENT_MISSING');
