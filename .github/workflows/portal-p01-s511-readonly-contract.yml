@@ -9,6 +9,7 @@ on:
       - ays/portal-p01-s511b-grant-admin-contract-20261007
       - ays/portal-p01-s511c-auth-config-readback-20261007
       - ays/portal-p01-s511d-synthetic-projection-rehearsal-20261007
+      - ays/portal-p01-s511e-protected-callable-lab-20261007
     paths:
       - 'functions/portal-p01-readonly-contract-s511.js'
       - 'functions/portal-p01-readonly-contract-s511.test.js'
@@ -16,6 +17,9 @@ on:
       - 'functions/portal-p01-grant-admin-s511b.test.js'
       - 'functions/portal-p01-s511c-auth-config-readonly.js'
       - 'functions/portal-p01-s511d-synthetic-rehearsal.js'
+      - 'functions/portal-p01-readonly-s511e.js'
+      - 'functions/portal-p01-s511e-e2e.js'
+      - 'functions/bootstrap.js'
       - '.github/workflows/portal-p01-s511-readonly-contract.yml'
 
 permissions:
@@ -24,7 +28,7 @@ permissions:
 jobs:
   portal-p01-contract:
     runs-on: ubuntu-latest
-    timeout-minutes: 8
+    timeout-minutes: 18
     env:
       GCLOUD_PROJECT: ays-orbit-360-lab
       FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
@@ -109,6 +113,49 @@ jobs:
         with:
           name: portal-p01-s511d-synthetic-rehearsal-${{ github.run_id }}
           path: ${{ runner.temp }}/s511c/PORTAL_SYNTHETIC_REHEARSAL.json
+          if-no-files-found: error
+          retention-days: 30
+      - name: S5.11E callable source guard
+        if: hashFiles('functions/portal-p01-s511e-e2e.js') != ''
+        working-directory: functions
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check portal-p01-readonly-s511e.js
+          node --check portal-p01-s511e-e2e.js
+          grep -q "staffMemberExists" portal-p01-readonly-s511e.js
+          grep -q "email_verified" portal-p01-readonly-s511e.js
+          grep -q "BROWSER_CLIENT_ID_DENY" portal-p01-readonly-contract-s511.js
+          grep -q "require('./portal-p01-readonly-s511e')" bootstrap.js
+      - name: Install Firebase CLI
+        if: hashFiles('functions/portal-p01-s511e-e2e.js') != ''
+        run: npm install --global firebase-tools@15.32.0
+      - name: Deploy protected Portal callable to LAB
+        if: hashFiles('functions/portal-p01-s511e-e2e.js') != ''
+        shell: bash
+        run: |
+          set -euo pipefail
+          firebase deploy --only "functions:portalP01ReadOnlyS511E" --project "$GCLOUD_PROJECT" --non-interactive --force
+      - name: S5.11E synthetic authenticated E2E
+        if: hashFiles('functions/portal-p01-s511e-e2e.js') != ''
+        working-directory: functions
+        shell: bash
+        run: |
+          set -euo pipefail
+          node portal-p01-s511e-e2e.js | tee "$RUNNER_TEMP/s511c/PORTAL_S511E_E2E.json"
+          node - "$RUNNER_TEMP/s511c/PORTAL_S511E_E2E.json" <<'NODE'
+          const fs=require('fs');
+          const r=JSON.parse(fs.readFileSync(process.argv[2],'utf8'));
+          const must=['syntheticOnly','functionInvoked','verifiedEmailSuccess','grantResolved','accountProjected','policyProjected','documentProjected','rawStorageExcluded','outsideAccountDenied','browserClientIdDenied','unverifiedEmailDenied','staffSessionReuseDenied','paymentsExcluded','claimsTransactionsExcluded','uploadsExcluded','policyChangesExcluded'];
+          for(const k of must)if(r[k]!==true)process.exit(1);
+          if(r.customerDataUsed!==false||r.productionTouched!==false)process.exit(1);
+          NODE
+      - name: Upload S5.11E E2E evidence
+        if: hashFiles('functions/portal-p01-s511e-e2e.js') != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: portal-p01-s511e-e2e-${{ github.run_id }}
+          path: ${{ runner.temp }}/s511c/PORTAL_S511E_E2E.json
           if-no-files-found: error
           retention-days: 30
       - name: Remove transient credential
