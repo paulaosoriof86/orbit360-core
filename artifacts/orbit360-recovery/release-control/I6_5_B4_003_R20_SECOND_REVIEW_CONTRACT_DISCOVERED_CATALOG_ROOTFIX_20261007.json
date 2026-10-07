@@ -1,0 +1,20 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R20_SECOND_REVIEW_CONTRACT_DISCOVERED_CATALOG_ROOTFIX_V1",
+  "status": "SOURCE_CORRECTION_FROZEN_PENDING_EXACT_PREVIEW",
+  "cause": "Static contract detected that the separately defined planes authority was not exposed in Configuración after an interrupted/overwritten catalog edit. The correction restores Productos generales and Planes comerciales as distinct durable fields and refreshes the entrypoint cache binding.",
+  "productCommits": [
+    "44d562b90a800342a69114003a9f9640ee246a54",
+    "3b5dd4b4ebb0a441bab14dfc847f76b02a1a2e87"
+  ],
+  "allowedProductFiles": [
+    "orbit360-platform/modules/configuracion.js",
+    "orbit360-platform/index.html"
+  ],
+  "boundaries": {
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false,
+    "b4004Held": true
+  },
+  "nextAction": "B4_003_R20_CONTRACT_AND_EXACT_PREVIEW"
+}
