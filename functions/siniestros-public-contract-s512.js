@@ -72,6 +72,15 @@ function documentRequestAllowed({claimExists,customerScopeResolved,requestReason
   return {ok:errors.length===0,errors};
 }
 
+function channelFreshnessStatus({emergencyContact,lastReviewedAt,officialEvidenceVerified}={}){
+  const contact=clean(emergencyContact,220);
+  const reviewed=clean(lastReviewedAt,40);
+  if(!contact)return Object.freeze({publishable:false,code:'NO_DIRECTORY_CHANNEL'});
+  if(!reviewed||!Number.isFinite(Date.parse(reviewed)))return Object.freeze({publishable:false,code:'REVIEW_DATE_REQUIRED'});
+  if(officialEvidenceVerified!==true)return Object.freeze({publishable:false,code:'OFFICIAL_EVIDENCE_REQUIRED'});
+  return Object.freeze({publishable:true,code:'CURRENT_CHANNEL_VALIDATED',lastReviewedAt:reviewed});
+}
+
 function assistanceChannelProjection({insurer,aysWhatsapp,aysEmail}={}){
   const emergency=clean(insurer&&(insurer.emergencia||insurer.assistance||insurer.emergency),220);
   const lastReviewedAt=clean(insurer&&(insurer.ultimaRevision||insurer.lastReviewedAt),40);
@@ -96,5 +105,5 @@ function assistanceChannelProjection({insurer,aysWhatsapp,aysEmail}={}){
 
 module.exports=Object.freeze({
   VERSION,INTERNAL_STATES,PUBLIC_STATE,POLICY,
-  clean,publicState,publicClaimProjection,assistanceTruth,documentRequestAllowed,assistanceChannelProjection
+  clean,publicState,publicClaimProjection,assistanceTruth,documentRequestAllowed,channelFreshnessStatus,assistanceChannelProjection
 });
