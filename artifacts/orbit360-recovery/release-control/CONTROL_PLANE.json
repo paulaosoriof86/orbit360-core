@@ -4869,7 +4869,7 @@
       "entryGuardReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_ENTRY_GUARD_PASS_20261002.json",
       "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
       "executionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B4_EXECUTION_LOCK_20261002.json",
-      "executionLockBlobSha": "21051ebebabe391cdb192b3c706cb810ae7d8607",
+      "executionLockBlobSha": "47549567ce8503c67be8001515f8c966efa8e007",
       "compositionLockBlobSha": "3d8736677d3faa7f59c282fbfe3b46205305ded5",
       "findingLedgerBlobSha": "35105b099e4a33be237149071c2d1e95b3396ff0",
       "activeFindingId": "B4-003",
