@@ -576,8 +576,8 @@
     "blobSha": "87bab7ee2778a0525cdbe81cf4cbf82020bf6139"
   },
   "findingLedgerBlobSha": "bfac4a737619f6bdf90d65ce88a96e812ab86dfd",
-  "continuityRegisterBlobSha": "233364d5ca31265677fd3cd204f1d235f2866ca5",
-  "compositionLockBlobSha": "7d6ca56297d920ebd3f66171413546bfdcafb467",
+  "continuityRegisterBlobSha": "4bc063d9ec181774b0fedcfa31d06f665d0db8e0",
+  "compositionLockBlobSha": "af779e2bd0fe6aabb747edb332f66a3008f0c5a9",
   "r18SourceFix": {
     "status": "SOURCE_FIXED_R18_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_SOURCE_FIX_20261005.json",
@@ -603,7 +603,7 @@
     "ledgerBlobSha": "4c0834cc86c6c5db466a2d8b9aff2f4d46a067af",
     "carryBlobSha": "7c428e7f808c39032f579a44822b24d89b03feb7"
   },
-  "masterPlanBlobSha": "dfd562bd4afa72200bd9cbad8ce86056f30bcfed",
+  "masterPlanBlobSha": "249145294df8f9d8e0241a9059cd48f4ee5222f4",
   "r19NoLossFreeze": {
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_PAULA_VISUAL_REJECTION_R19_NOLOSS_FREEZE_20261005.json",
     "blobSha": "5277c2a052ea8dcea3bb9e15eb7eb3f6b55e0c5d"
@@ -911,5 +911,13 @@
     "productFileCount": 102,
     "dataMutationAuthorized": false,
     "b4004Held": true
+  },
+  "r20SecondReviewExecution": {
+    "status": "SOURCE_FIX_AND_READONLY_DRYRUNS_ACTIVE",
+    "compositionLockBlobSha": "af779e2bd0fe6aabb747edb332f66a3008f0c5a9",
+    "findingLedgerBlobSha": "bfac4a737619f6bdf90d65ce88a96e812ab86dfd",
+    "continuityRegisterBlobSha": "4bc063d9ec181774b0fedcfa31d06f665d0db8e0",
+    "masterPlanBlobSha": "249145294df8f9d8e0241a9059cd48f4ee5222f4",
+    "tinyFishRequiredBeforePaulaHandoff": true
   }
 }
