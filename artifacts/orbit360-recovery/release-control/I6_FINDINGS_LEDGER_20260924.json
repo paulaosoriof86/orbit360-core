@@ -9656,7 +9656,11 @@
       "r20FollowupDiagnosticPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_FOLLOWUP_CAUSAL_DIAGNOSTIC_20261006.json",
       "r20FollowupDiagnosticBlobSha": "2eead6a938b6378d1a4f26160d38180339124a79",
       "r20FollowupSourceFixPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_FOLLOWUP_CUMULATIVE_SOURCE_FIX_20261007.json",
-      "r20FollowupSourceFixBlobSha": "360542cca021b187cda638c3742dff8353137416"
+      "r20FollowupSourceFixBlobSha": "360542cca021b187cda638c3742dff8353137416",
+      "r20FollowupInsurerVisualRootFixPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_FOLLOWUP_INSURER_VISUAL_ROOTFIX_20261007.json",
+      "r20FollowupInsurerVisualRootFixBlobSha": "2fbd7532a778013df05d1b8107769a563ea3a30a",
+      "productSourceBlobSha": "32d35bfcb0045632346af96984b03c7dccdc9dee",
+      "humanVisualStatus": "REJECTED_R20_FOLLOWUP_PENDING_RETEST"
     },
     {
       "id": "B4-003-R20-B06",
@@ -9692,7 +9696,11 @@
       "r20FollowupDiagnosticPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_FOLLOWUP_CAUSAL_DIAGNOSTIC_20261006.json",
       "r20FollowupDiagnosticBlobSha": "2eead6a938b6378d1a4f26160d38180339124a79",
       "r20FollowupSourceFixPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_FOLLOWUP_CUMULATIVE_SOURCE_FIX_20261007.json",
-      "r20FollowupSourceFixBlobSha": "360542cca021b187cda638c3742dff8353137416"
+      "r20FollowupSourceFixBlobSha": "360542cca021b187cda638c3742dff8353137416",
+      "r20FollowupInsurerVisualRootFixPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_FOLLOWUP_INSURER_VISUAL_ROOTFIX_20261007.json",
+      "r20FollowupInsurerVisualRootFixBlobSha": "2fbd7532a778013df05d1b8107769a563ea3a30a",
+      "productSourceBlobSha": "32d35bfcb0045632346af96984b03c7dccdc9dee",
+      "humanVisualStatus": "REJECTED_R20_FOLLOWUP_PENDING_RETEST"
     },
     {
       "id": "B4-003-R20-B07",
@@ -9767,7 +9775,11 @@
       "r20FollowupDiagnosticPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_FOLLOWUP_CAUSAL_DIAGNOSTIC_20261006.json",
       "r20FollowupDiagnosticBlobSha": "2eead6a938b6378d1a4f26160d38180339124a79",
       "r20FollowupSourceFixPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_FOLLOWUP_CUMULATIVE_SOURCE_FIX_20261007.json",
-      "r20FollowupSourceFixBlobSha": "360542cca021b187cda638c3742dff8353137416"
+      "r20FollowupSourceFixBlobSha": "360542cca021b187cda638c3742dff8353137416",
+      "r20FollowupInsurerVisualRootFixPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_FOLLOWUP_INSURER_VISUAL_ROOTFIX_20261007.json",
+      "r20FollowupInsurerVisualRootFixBlobSha": "2fbd7532a778013df05d1b8107769a563ea3a30a",
+      "productSourceBlobSha": "32d35bfcb0045632346af96984b03c7dccdc9dee",
+      "humanVisualStatus": "REJECTED_R20_FOLLOWUP_PENDING_RETEST"
     },
     {
       "id": "B4-003-R20-B09",
@@ -10410,7 +10422,7 @@
     "requiredBeforeAdvance": "B4_003_TARGETED_PAULA_VISUAL_PASS",
     "currentB4003HumanStatus": "REJECTED_R13"
   },
-  "lastUpdatedAt": "2026-10-06T19:55:00-06:00",
+  "lastUpdatedAt": "2026-10-06T22:05:00-06:00",
   "lastR16SourceFix": {
     "status": "SOURCE_FIXED_R16_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "receiptBlobSha": "dcd545e14795e387a8f67130d5fa51aabfcd63ce",
@@ -10616,5 +10628,17 @@
     "dataMutation": false,
     "reimport": false,
     "livePromotion": false
+  },
+  "r20FollowupInsurerVisualRootFix": {
+    "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_FOLLOWUP_INSURER_VISUAL_ROOTFIX_20261007.json",
+    "blobSha": "2fbd7532a778013df05d1b8107769a563ea3a30a",
+    "sourceCommit": "86a54019ce2500b65ea2745517bde4dd5a5eecef",
+    "sourceBlob": "32d35bfcb0045632346af96984b03c7dccdc9dee",
+    "findings": [
+      "B4-003-R20-B05",
+      "B4-003-R20-B06",
+      "B4-003-R20-B08"
+    ]
   }
 }
