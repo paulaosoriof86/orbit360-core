@@ -183,7 +183,7 @@
     "orbit360-platform/core/issuance-workflow-v1201.js": "ab138f218e041b41ac737ff250c7e808edc8c030",
     "orbit360-platform/core/policy-receipts-engine.js": "b04fdd580efcc2fdfa8703238e92ab5bc51d6347",
     "orbit360-platform/core/policy-receipts-v1199-refinements.js": "3f222509093ede51676efd7edd6347d5794c7e05",
-    "orbit360-platform/core/product-app-p0.js": "f85a76eeab1c1ea0854ec91296357b0530020de7",
+    "orbit360-platform/core/product-app-p0.js": "6938e9083fd28dc96e003cc216954566282b29be",
     "orbit360-platform/core/product-drive-document-provider-p0.js": "074b38c168ed0e7c78569395f815a2ff037c2c3c",
     "orbit360-platform/core/product-hydration-required-optional-p0.js": "21f870d3e0e165487843d1d6efa454474fd73563",
     "orbit360-platform/core/product-insurer-credential-provider-p0.js": "3bf5ba98271c7012dd1328df2894f1b38f3983eb",
@@ -3782,6 +3782,15 @@
       "tools/gravicentra-i6-5-b4-003-preview-proof.mjs": "d0d0e49ec4228448eb826f3f7f29e0808e247fc4"
     },
     "productFilesChanged": 0,
+    "b4004Held": true
+  },
+  "r20AdvisorColdBootstrapContiguousBudgetRootFix": {
+    "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_ADVISOR_COLD_BOOTSTRAP_CONTIGUOUS_BUDGET_ROOTFIX_20261007.json",
+    "blobSha": "0bb2e2be85cb3aa68b016890f7b8c3751e82bfe4",
+    "productBlobs": {
+      "orbit360-platform/core/product-app-p0.js": "6938e9083fd28dc96e003cc216954566282b29be"
+    },
     "b4004Held": true
   }
 }

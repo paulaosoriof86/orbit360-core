@@ -577,7 +577,7 @@
   },
   "findingLedgerBlobSha": "e03a5b251973a0234668a4f2cd2c6e9e17658587",
   "continuityRegisterBlobSha": "31c6646999730ea0c77021818cfa4dddaf8908a7",
-  "compositionLockBlobSha": "bfc639ba3b358f1a210c70336eba04b6d037baef",
+  "compositionLockBlobSha": "ffbb5f07877a76532463db28ed4b40cd4bf7f230",
   "r18SourceFix": {
     "status": "SOURCE_FIXED_R18_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_SOURCE_FIX_20261005.json",
@@ -1007,6 +1007,22 @@
       "tools/gravicentra-i6-5-b4-003-preview-proof.mjs": "d0d0e49ec4228448eb826f3f7f29e0808e247fc4"
     },
     "productFilesChanged": 0,
+    "dataMutation": false,
+    "noLive": true,
+    "noReimport": true
+  },
+  "r20AdvisorColdBootstrapContiguousBudgetRootFix": {
+    "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_ADVISOR_COLD_BOOTSTRAP_CONTIGUOUS_BUDGET_ROOTFIX_20261007.json",
+    "blobSha": "0bb2e2be85cb3aa68b016890f7b8c3751e82bfe4",
+    "compositionLockBlobSha": "ffbb5f07877a76532463db28ed4b40cd4bf7f230",
+    "productBlobs": {
+      "orbit360-platform/core/product-app-p0.js": "6938e9083fd28dc96e003cc216954566282b29be"
+    },
+    "qaBlobs": {
+      "tools/gravicentra-i6-5-b4-003-contract.mjs": "a489eda326bfc84aeba3234a25f87105fc02277e",
+      "tools/gravicentra-i6-5-b4-003-preview-proof.mjs": "d0d0e49ec4228448eb826f3f7f29e0808e247fc4"
+    },
     "dataMutation": false,
     "noLive": true,
     "noReimport": true
