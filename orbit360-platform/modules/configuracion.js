@@ -78,7 +78,7 @@ Orbit.modules.configuracion = (function () {
     const val=id=>(document.getElementById(id)||{}).value||'',list=id=>val(id).split(/\r?\n/).map(x=>x.trim()).filter(Boolean),reason=val('cf-cat-motivo').trim();
     if(reason.length<5)return U.toast('Indica un motivo claro para el cambio.');
     const cur=Orbit.cat.all(),next=JSON.parse(JSON.stringify(cur)),rebuild=(country,names)=>{const old=(cur.ramosPais||{})[country]||{},out={};names.forEach(n=>{out[n]=Array.isArray(old[n])?old[n].slice():[];});return out;};
-    next.canales=list('cf-cat-canales');next.productos=list('cf-cat-productos');next.segmentos=list('cf-cat-segmentos');next.prioridades=list('cf-cat-prioridades');
+    next.canales=list('cf-cat-canales');next.productos=list('cf-cat-productos');next.planes=list('cf-cat-planes');next.segmentos=list('cf-cat-segmentos');next.prioridades=list('cf-cat-prioridades');
     next.ramosPais=Object.assign({},cur.ramosPais||{},{GT:rebuild('GT',list('cf-cat-ramos-gt')),CO:rebuild('CO',list('cf-cat-ramos-co'))});
     next.ramos=[...new Set(Object.keys(next.ramosPais.GT||{}).concat(Object.keys(next.ramosPais.CO||{})))];
     next.puntosIngreso=[].concat(cur.puntosIngreso||[]).map((p,i)=>Object.assign({},p,{label:((document.querySelector('[data-cat-point="'+i+'"]')||{}).value||p.label||'').trim()}));
