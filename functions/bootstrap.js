@@ -32,5 +32,6 @@ module.exports = Object.assign(
   require('./cotcomp-public-inbound-lab-s505'),
   require('./cotcomp-owner-review-s506'),
   require('./cotcomp-real-customer-pilot-s508'),
-  require('./advisor-lead-attention-s509')
+  require('./advisor-lead-attention-s509'),
+  require('./siniestros-public-resolver-s512d')
 );
