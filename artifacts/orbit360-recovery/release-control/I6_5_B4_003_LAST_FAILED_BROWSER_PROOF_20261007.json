@@ -1,25 +1,25 @@
 {
   "schema": "GRAVICENTRA_I6_5_B4_003_PREVIEW_PROOF_R19_V1",
   "status": "FAIL",
-  "target": "https://ays-orbit-360-lab--gi-i65-b4-37701246038-81jtdtio.web.app",
+  "target": "https://ays-orbit-360-lab--gi-i65-b4-37702135469-av1gczr6.web.app",
   "ids": {
-    "client": "b4003qa_client_37701246038",
-    "renewalPolicy": "b4003qa_policy_renew_37701246038",
-    "expiredRenewPolicy": "b4003qa_policy_expired_renew_37701246038",
-    "unknownRenewPolicy": "b4003qa_policy_unknown_37701246038",
-    "renewabilityWritePolicy": "b4003qa_policy_renewwrite_37701246038",
-    "cancelPolicy": "b4003qa_policy_cancel_37701246038",
-    "healthPolicy": "b4003qa_policy_health_37701246038",
-    "healthReceipt1": "b4003qa_receipt_health_1_37701246038",
-    "healthReceipt2": "b4003qa_receipt_health_2_37701246038",
-    "healthReceiptShadow": "b4003qa_receipt_health_shadow_37701246038",
-    "cancelation": "b4003qa_cancel_37701246038",
-    "insurer": "b4003qa_insurer_37701246038",
-    "collabBusiness": "b4003qa_business_collab_37701246038",
-    "collabNoClientBusiness": "b4003qa_business_collab_noclient_37701246038",
-    "renewActivity": "act_ren_b4003qa_policy_renew_37701246038_20261007",
-    "cancelActivity": "act_rec_b4003qa_cancel_37701246038",
-    "recoveryBusiness": "neg_rec_b4003qa_cancel_37701246038"
+    "client": "b4003qa_client_37702135469",
+    "renewalPolicy": "b4003qa_policy_renew_37702135469",
+    "expiredRenewPolicy": "b4003qa_policy_expired_renew_37702135469",
+    "unknownRenewPolicy": "b4003qa_policy_unknown_37702135469",
+    "renewabilityWritePolicy": "b4003qa_policy_renewwrite_37702135469",
+    "cancelPolicy": "b4003qa_policy_cancel_37702135469",
+    "healthPolicy": "b4003qa_policy_health_37702135469",
+    "healthReceipt1": "b4003qa_receipt_health_1_37702135469",
+    "healthReceipt2": "b4003qa_receipt_health_2_37702135469",
+    "healthReceiptShadow": "b4003qa_receipt_health_shadow_37702135469",
+    "cancelation": "b4003qa_cancel_37702135469",
+    "insurer": "b4003qa_insurer_37702135469",
+    "collabBusiness": "b4003qa_business_collab_37702135469",
+    "collabNoClientBusiness": "b4003qa_business_collab_noclient_37702135469",
+    "renewActivity": "act_ren_b4003qa_policy_renew_37702135469_20261007",
+    "cancelActivity": "act_rec_b4003qa_cancel_37702135469",
+    "recoveryBusiness": "neg_rec_b4003qa_cancel_37702135469"
   },
   "assertions": {
     "qaResidueReadOnlyAdjudicated": true,
@@ -120,6 +120,9 @@
     "collaborationVisualHierarchy": true,
     "currentActionQueueRank": true,
     "actionRequiredSolidVisual": true,
+    "pendingTaskAdvisorLandingLeads": true,
+    "inboxActionProgressVisible": true,
+    "inboxHumanStateUi": true,
     "cleanupComplete": true
   },
   "syntheticWrites": 14,
@@ -408,7 +411,7 @@
       "visible": true,
       "sampleNumber": "91-59247519",
       "emptyState": false,
-      "textSample": "✕ Cancelaciones · Fuga de cartera MOTIVOS·VALOR PERDIDO·TASA DE FUGA CANCELADAS 490 histórico VALOR PERDIDO GTQ 1,842,217 USD 91,823,506 COP 26,564,526 prima anual · por moneda MOTIVO PRINCIPAL Sin motivo registrado más frecuente CANCELADAS / CARTERA 34% histórico acumulado · no es churn temporal Motivos de cancelación Sin motivo registrado 489 · 100% Prueba sintética B4-003 1 · 0% Motivo Prueba sintética B4-003 Sin motivo registrado Asesor Braulio Hernández Carlos Castro Fernando Arias Johanna Salgado Nicole Castro Paula Osorio Samuel Daza 490 de 490 FECHA CLIENTE PÓLIZA RAMO MOTIVO VALOR PERDIDO ACCIÓN 07 oct 2026 BQ B4-003 QA Cliente Persona · GT B4-003-CAN-37701246038 Auto Prueba sintética B4-003 Q 700 Ver cancelación 16 sept 2026 ML MARÍA LUISA LARIOS CALDERÓN natural · GT 223092797 VEHICULOS Sin motivo registrado Q 2,436 Ver cancelación 14 sept 2026 SK SEON KEUN KIM natural · GT 225121245 VEHICULOS Sin motivo registrado Q 6,250 Ver cancelación 07 sept 2026 JI JHEFRI ISAAC RAMIREZ AGUSTÍN natural · GT AUTO-514726 VEHICULOS Sin motivo registrado Q 25,116 Ver cancelación 07 sept 2026 FA FRANCISCO ANTONIO VÁSQUEZ MARTINEZ natural · GT VA125-00006039 VEHICULOS Sin motivo registrad"
+      "textSample": "✕ Cancelaciones · Fuga de cartera MOTIVOS·VALOR PERDIDO·TASA DE FUGA CANCELADAS 490 histórico VALOR PERDIDO GTQ 1,842,217 USD 91,823,506 COP 26,564,526 prima anual · por moneda MOTIVO PRINCIPAL Sin motivo registrado más frecuente CANCELADAS / CARTERA 34% histórico acumulado · no es churn temporal Motivos de cancelación Sin motivo registrado 489 · 100% Prueba sintética B4-003 1 · 0% Motivo Prueba sintética B4-003 Sin motivo registrado Asesor Braulio Hernández Carlos Castro Fernando Arias Johanna Salgado Nicole Castro Paula Osorio Samuel Daza 490 de 490 FECHA CLIENTE PÓLIZA RAMO MOTIVO VALOR PERDIDO ACCIÓN 07 oct 2026 BQ B4-003 QA Cliente Persona · GT B4-003-CAN-37702135469 Auto Prueba sintética B4-003 Q 700 Ver cancelación 16 sept 2026 ML MARÍA LUISA LARIOS CALDERÓN natural · GT 223092797 VEHICULOS Sin motivo registrado Q 2,436 Ver cancelación 14 sept 2026 SK SEON KEUN KIM natural · GT 225121245 VEHICULOS Sin motivo registrado Q 6,250 Ver cancelación 07 sept 2026 JI JHEFRI ISAAC RAMIREZ AGUSTÍN natural · GT AUTO-514726 VEHICULOS Sin motivo registrado Q 25,116 Ver cancelación 07 sept 2026 FA FRANCISCO ANTONIO VÁSQUEZ MARTINEZ natural · GT VA125-00006039 VEHICULOS Sin motivo registrad"
     }
   },
   "actor": {
@@ -940,6 +943,7 @@
     "cancelSnapshotError": "",
     "cancelAttached": true,
     "optionalMissing": [
+      "estadosCuentaAseguradora",
       "recibosAseguradora",
       "conciliacionesPrimas",
       "conciliaciones",
@@ -1540,8 +1544,8 @@
       "CO",
       "CO"
     ],
-    "cancelGtMs": 112.19999999995343,
-    "cancelCoMs": 57.59999999997672,
+    "cancelGtMs": 77.90000000002328,
+    "cancelCoMs": 35.300000000046566,
     "cancelExplicitTargetsGT": true,
     "cancelExplicitTargetsCO": true,
     "cancelCrossCountryExplicitGT": true,
@@ -1809,7 +1813,7 @@
     "cancelKpiDetailOpen": true
   },
   "r11Browser": {
-    "clientHref": "#/cliente360?c=b4003qa_client_37701246038&t=polizas",
+    "clientHref": "#/cliente360?c=b4003qa_client_37702135469&t=polizas",
     "policyTargetPresent": true,
     "explicitCancelTargetPresent": true,
     "rowMisleadingClickable": false,
@@ -1885,8 +1889,8 @@
       "CO",
       "CO"
     ],
-    "qualityGtMs": 248.09999999997672,
-    "qualityCoMs": 126.29999999998836,
+    "qualityGtMs": 163.29999999998836,
+    "qualityCoMs": 84.70000000001164,
     "qualityGtRows": 50,
     "qualityCoRows": 17,
     "financialGtRows": 72,
@@ -1896,10 +1900,10 @@
   },
   "r1604ConfigFirstPaint": {
     "state": "loading",
-    "syncPaintMs": 1.2000000000116415,
+    "syncPaintMs": 1.1000000000349246,
     "hasVisibleState": true,
     "text": "Confirmando catálogos canónicos… La plataforma está leyendo la configuración protegida del tenant. No se usan valores locales como autoridad.",
-    "canonicalReadyMs": 792,
+    "canonicalReadyMs": 790,
     "finalState": "ready"
   },
   "r16CatalogAndQuality": {
@@ -1934,7 +1938,7 @@
       "reason": "Se excluyeron 1 registro(s) histórico(s) duplicado(s); el calendario activo aún supera la prima contractual."
     },
     "rowVisible": true,
-    "rowText": "B4-003-HEALTH-377012460382 recibo(s) vigente(s) · 1 legado(s) excluido(s) BQ B4-003 QA Cliente Persona · GuatemalaQ 407Póliza · prima totalProgramación según cuotas de la póliza0 fila(s) requieren revisiónQ 543Q 136Q 0Se excluyeron 1 registro(s) histórico(s) duplicado(s); el calendario activo aún supera la prima contractual.Revisar diferenciaVer recibos",
+    "rowText": "B4-003-HEALTH-377021354692 recibo(s) vigente(s) · 1 legado(s) excluido(s) BQ B4-003 QA Cliente Persona · GuatemalaQ 407Póliza · prima totalProgramación según cuotas de la póliza0 fila(s) requieren revisiónQ 543Q 136Q 0Se excluyeron 1 registro(s) histórico(s) duplicado(s); el calendario activo aún supera la prima contractual.Revisar diferenciaVer recibos",
     "technicalToken": false,
     "exactAction": true,
     "mobileContract": true
@@ -1973,7 +1977,7 @@
     "technical": false
   },
   "r17QualityReceiptsDeepLink": {
-    "hash": "#/cliente360?c=b4003qa_client_37701246038&p=b4003qa_policy_health_37701246038&t=recibos",
+    "hash": "#/cliente360?c=b4003qa_client_37702135469&p=b4003qa_policy_health_37702135469&t=recibos",
     "receiptsTarget": true
   },
   "policyEditorPreservation": {
@@ -2062,9 +2066,9 @@
   },
   "r18CommercialMobile": {
     "viewport": 390,
-    "cardWidth": 386.5,
-    "cardScrollWidth": 385,
-    "cardClientWidth": 385,
+    "cardWidth": 388.875,
+    "cardScrollWidth": 387,
+    "cardClientWidth": 387,
     "footerButtons": 2
   },
   "r18ManagementModal": {
@@ -2101,7 +2105,7 @@
         "ids": [
           "pol_ad0ed5f26dd834d5e1d38f50eb0e",
           "pol_b9a883095c9fae8f7502ce1cb054",
-          "b4003qa_policy_expired_renew_37701246038",
+          "b4003qa_policy_expired_renew_37702135469",
           "pol_8231bbb8f9b7272c02891f5a4caf",
           "pol_df6bf097045762297ec31fd4e5c5"
         ]
@@ -2110,9 +2114,9 @@
         "key": "d15",
         "count": 3,
         "ids": [
-          "b4003qa_policy_renew_37701246038",
-          "b4003qa_policy_renewwrite_37701246038",
-          "b4003qa_policy_unknown_37701246038"
+          "b4003qa_policy_renew_37702135469",
+          "b4003qa_policy_renewwrite_37702135469",
+          "b4003qa_policy_unknown_37702135469"
         ]
       },
       {
@@ -2172,9 +2176,9 @@
     "unknownReview": true,
     "parallelDispositionAbsent": true,
     "date45ExpectedIds": [
-      "b4003qa_policy_renew_37701246038",
-      "b4003qa_policy_renewwrite_37701246038",
-      "b4003qa_policy_unknown_37701246038",
+      "b4003qa_policy_renew_37702135469",
+      "b4003qa_policy_renewwrite_37702135469",
+      "b4003qa_policy_unknown_37702135469",
       "pol_3ddc9e613f40252f02b2e122072d",
       "pol_638e276218baad9e84018415b0ba",
       "pol_7280c9b1a5253a1fe1e463e5993b",
@@ -2186,9 +2190,9 @@
       "pol_d5e61976a38be76ba5e3c1e12575"
     ],
     "date45VisibleIds": [
-      "b4003qa_policy_renew_37701246038",
-      "b4003qa_policy_renewwrite_37701246038",
-      "b4003qa_policy_unknown_37701246038",
+      "b4003qa_policy_renew_37702135469",
+      "b4003qa_policy_renewwrite_37702135469",
+      "b4003qa_policy_unknown_37702135469",
       "pol_3ddc9e613f40252f02b2e122072d",
       "pol_638e276218baad9e84018415b0ba",
       "pol_7280c9b1a5253a1fe1e463e5993b",
@@ -2218,7 +2222,7 @@
     ]
   },
   "r19RenewabilityDurable": {
-    "policyId": "b4003qa_policy_renewwrite_37701246038",
+    "policyId": "b4003qa_policy_renewwrite_37702135469",
     "serverValue": true,
     "reloadValue": true
   },
@@ -2228,14 +2232,32 @@
     "hasPrev": true
   },
   "r13PolicyPerformance": {
-    "routeMs": 427,
-    "searchMs": 396,
-    "detailMs": 2054,
-    "searchNumber": "B4-003-REN-37701246038",
+    "routeMs": 490,
+    "searchMs": 266,
+    "detailMs": 426,
+    "searchNumber": "B4-003-REN-37702135469",
     "refreshFlicker": {
       "states": [
         {
           "loading": false,
+          "hasPolicy": false,
+          "hasClient": false,
+          "route": "#/polizas"
+        },
+        {
+          "loading": false,
+          "hasPolicy": false,
+          "hasClient": false,
+          "route": "#/polizas"
+        },
+        {
+          "loading": true,
+          "hasPolicy": false,
+          "hasClient": false,
+          "route": "#/polizas"
+        },
+        {
+          "loading": true,
           "hasPolicy": false,
           "hasClient": false,
           "route": "#/polizas"
@@ -2330,8 +2352,8 @@
     "owner": "polizas.policyMetrics.isRenewalWithin45Days"
   },
   "r19InicioReadiness": {
-    "text": "🌅 Buen día · esto es lo importante hoy METAS DEL MES·PRIORIDADES·AVANCE POR ASESOR Abrir Cliente 360 → METAS DEL MES · OCTUBRE 2026 Avance real del mes Quedan 24 días para cerrar el mes. La producción usa la prima neta de pólizas con inicio de vigencia en el mes y el recaudo usa pagos confirmados con fecha efectiva del mes. Si no existe meta configurada, no se inventa un porcentaje. 440 clientes 1425 pólizas 582 registros vencidos en cartera — Q11K GTQ Producción neta del mes Meta no disponible para este alcance — Sin movimientos Recaudo confirmado del mes Meta no disponible para este alcance COBROS CONFIRMADOS Q851K GTQ $205.8M COP 1243 pagos confirmados › PENDIENTE DE COBRO Q 8,058 GTQ $ 0 COP 734 obligaciones · 18 con monto › CARTERA VENCIDA Q 8,274 GTQ $ 0 COP 582 obligaciones · 16 con monto › VENCEN ≤45 D 16 mismo universo de Pólizas › Avance por asesor producción neta del mes vs meta configurada Avance por asesor no disponible. Producción o metas no están disponibles para este rol/alcance; no se mantiene un estado de carga indefinido. Prioridades 🔄 IMPAGUA, SOCIEDAD ANONIMA DAÑOS · renueva en 3 d 🔄 IMPAGUA, SOCIEDAD ANONIMA DAÑOS · renueva en 3 d 🔄 B4-003 QA Cliente Accidentes · renueva en 9 d 🔄 B4-003 QA Cliente Auto · renueva en 9 d ⚠ NORA LUCIA HURTARTE FLORES cuota — vencida · — ⚠ LUIS ESTUARDO PEREZ CIFUENTES cuota — vencida · — ⚠ ERICKA LIZETTE AGUILAR LUNA cuota — vencida · — Seguimientos de hoy sin cadencia automática · gestiona por WhatsApp 🌱 B4-003 QA colaboración · Carlos Castro · mañana · Nuevo ingreso 🧮 B4-003 QA colaboración pre-emisión · Carlos Castro · mañana · Cotizando 🧮 Paula Andrea Osorio Franco · Vida Temporal Samuel Daza · vencido · Cotizando ✉ Correo 🧮 Fernando Arias · Salud Familiar Carlos Castro · vencido · Cotizando Al activar la",
-    "terminal": "unavailable"
+    "text": "🌅 Buen día · esto es lo importante hoy METAS DEL MES·PRIORIDADES·AVANCE POR ASESOR Abrir Cliente 360 → METAS DEL MES · OCTUBRE 2026 Avance real del mes Quedan 24 días para cerrar el mes. La producción usa la prima neta de pólizas con inicio de vigencia en el mes y el recaudo usa pagos confirmados con fecha efectiva del mes. Si no existe meta configurada, no se inventa un porcentaje. 440 clientes 1425 pólizas 582 registros vencidos en cartera 14% Q11K GTQ Producción neta del mes Meta Q80K 0% Sin movimientos Recaudo confirmado del mes Meta Q50K COBROS CONFIRMADOS Q851K GTQ $205.8M COP 1243 pagos confirmados › PENDIENTE DE COBRO Q 8,058 GTQ $ 0 COP 734 obligaciones · 18 con monto › CARTERA VENCIDA Q 8,274 GTQ $ 0 COP 582 obligaciones · 16 con monto › VENCEN ≤45 D 16 mismo universo de Pólizas › Avance por asesor producción neta del mes vs meta configurada PO Paula Osorio Q11K GTQ 14% BH Braulio Hernández Sin movimientos Meta no configurada — CC Carlos Castro Sin movimientos Meta no configurada — FA Fernando Arias Sin movimientos Meta no configurada — JS Johanna Salgado Sin movimientos Meta no configurada — NC Nicole Castro Sin movimientos Meta no configurada — SD Samuel Daza Sin movimientos Meta no configurada — Prioridades 🔄 IMPAGUA, SOCIEDAD ANONIMA DAÑOS · renueva en 3 d 🔄 IMPAGUA, SOCIEDAD ANONIMA DAÑOS · renueva en 3 d 🔄 B4-003 QA Cliente Accidentes · renueva en 9 d 🔄 B4-003 QA Cliente Auto · renueva en 9 d ⚠ NORA LUCIA HURTARTE FLORES cuota — vencida · — ⚠ LUIS ESTUARDO PEREZ CIFUENTES cuota — vencida · — ⚠ ERICKA LIZETTE AGUILAR LUNA cuota — vencida · — Seguimientos de hoy sin cadencia automática · gestiona por WhatsApp 🌱 B4-003 QA colaboración · Carlos Castro · mañana · Nuevo ingreso 🧮 B4-003 QA colaboración pre-emisión · Carlos Castro · mañana · Cotizando 🧮",
+    "terminal": "ready"
   },
   "renewalRenderStability": {
     "mutationCount": 80,
@@ -2339,7 +2361,7 @@
     "route": "renovaciones",
     "records": [
       {
-        "ms": 773,
+        "ms": 298,
         "type": "childList",
         "target": "DIV",
         "added": [],
@@ -2348,7 +2370,7 @@
         ]
       },
       {
-        "ms": 773,
+        "ms": 299,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -2357,7 +2379,7 @@
         "removed": []
       },
       {
-        "ms": 773,
+        "ms": 299,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -2368,7 +2390,7 @@
         ]
       },
       {
-        "ms": 773,
+        "ms": 299,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -2379,7 +2401,7 @@
         ]
       },
       {
-        "ms": 773,
+        "ms": 299,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -2390,7 +2412,7 @@
         ]
       },
       {
-        "ms": 773,
+        "ms": 299,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -2401,7 +2423,7 @@
         ]
       },
       {
-        "ms": 773,
+        "ms": 299,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -2412,7 +2434,7 @@
         ]
       },
       {
-        "ms": 773,
+        "ms": 299,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -2423,7 +2445,7 @@
         ]
       },
       {
-        "ms": 773,
+        "ms": 299,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -2434,7 +2456,7 @@
         ]
       },
       {
-        "ms": 773,
+        "ms": 299,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -2445,7 +2467,7 @@
         ]
       },
       {
-        "ms": 773,
+        "ms": 299,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -2456,7 +2478,7 @@
         ]
       },
       {
-        "ms": 773,
+        "ms": 299,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -2467,7 +2489,7 @@
         ]
       },
       {
-        "ms": 773,
+        "ms": 299,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -2479,7 +2501,7 @@
         ]
       },
       {
-        "ms": 773,
+        "ms": 299,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -2490,7 +2512,7 @@
         ]
       },
       {
-        "ms": 773,
+        "ms": 299,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2501,7 +2523,7 @@
         ]
       },
       {
-        "ms": 773,
+        "ms": 299,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2512,7 +2534,7 @@
         ]
       },
       {
-        "ms": 773,
+        "ms": 299,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2523,7 +2545,7 @@
         ]
       },
       {
-        "ms": 773,
+        "ms": 299,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2534,7 +2556,7 @@
         ]
       },
       {
-        "ms": 773,
+        "ms": 299,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2545,7 +2567,7 @@
         ]
       },
       {
-        "ms": 773,
+        "ms": 299,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2556,7 +2578,7 @@
         ]
       },
       {
-        "ms": 773,
+        "ms": 299,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2567,7 +2589,7 @@
         ]
       },
       {
-        "ms": 773,
+        "ms": 299,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2578,7 +2600,7 @@
         ]
       },
       {
-        "ms": 773,
+        "ms": 299,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2589,7 +2611,7 @@
         ]
       },
       {
-        "ms": 773,
+        "ms": 299,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2600,7 +2622,7 @@
         ]
       },
       {
-        "ms": 773,
+        "ms": 299,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2611,7 +2633,7 @@
         ]
       },
       {
-        "ms": 773,
+        "ms": 299,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2622,7 +2644,7 @@
         ]
       },
       {
-        "ms": 773,
+        "ms": 299,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2633,7 +2655,7 @@
         ]
       },
       {
-        "ms": 773,
+        "ms": 299,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2644,7 +2666,7 @@
         ]
       },
       {
-        "ms": 773,
+        "ms": 299,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2655,7 +2677,7 @@
         ]
       },
       {
-        "ms": 773,
+        "ms": 299,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2666,7 +2688,7 @@
         ]
       },
       {
-        "ms": 773,
+        "ms": 299,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2677,7 +2699,7 @@
         ]
       },
       {
-        "ms": 773,
+        "ms": 299,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2688,7 +2710,7 @@
         ]
       },
       {
-        "ms": 773,
+        "ms": 299,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2699,7 +2721,7 @@
         ]
       },
       {
-        "ms": 773,
+        "ms": 299,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2710,7 +2732,7 @@
         ]
       },
       {
-        "ms": 773,
+        "ms": 299,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2721,7 +2743,7 @@
         ]
       },
       {
-        "ms": 773,
+        "ms": 299,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2732,7 +2754,7 @@
         ]
       },
       {
-        "ms": 773,
+        "ms": 299,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2743,7 +2765,7 @@
         ]
       },
       {
-        "ms": 773,
+        "ms": 299,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2754,7 +2776,7 @@
         ]
       },
       {
-        "ms": 773,
+        "ms": 299,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2765,7 +2787,7 @@
         ]
       },
       {
-        "ms": 773,
+        "ms": 299,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2776,7 +2798,7 @@
         ]
       },
       {
-        "ms": 773,
+        "ms": 299,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2787,7 +2809,7 @@
         ]
       },
       {
-        "ms": 773,
+        "ms": 299,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2798,7 +2820,7 @@
         ]
       },
       {
-        "ms": 773,
+        "ms": 299,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2809,7 +2831,7 @@
         ]
       },
       {
-        "ms": 773,
+        "ms": 299,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2820,7 +2842,7 @@
         ]
       },
       {
-        "ms": 773,
+        "ms": 299,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2831,7 +2853,7 @@
         ]
       },
       {
-        "ms": 773,
+        "ms": 299,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2842,7 +2864,7 @@
         ]
       },
       {
-        "ms": 774,
+        "ms": 299,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2853,7 +2875,7 @@
         ]
       },
       {
-        "ms": 774,
+        "ms": 299,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2864,7 +2886,7 @@
         ]
       },
       {
-        "ms": 774,
+        "ms": 299,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2875,7 +2897,7 @@
         ]
       },
       {
-        "ms": 774,
+        "ms": 299,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2886,7 +2908,7 @@
         ]
       },
       {
-        "ms": 774,
+        "ms": 299,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2897,7 +2919,7 @@
         ]
       },
       {
-        "ms": 774,
+        "ms": 299,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2908,7 +2930,7 @@
         ]
       },
       {
-        "ms": 774,
+        "ms": 299,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2919,7 +2941,7 @@
         ]
       },
       {
-        "ms": 774,
+        "ms": 299,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2930,7 +2952,7 @@
         ]
       },
       {
-        "ms": 774,
+        "ms": 299,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2941,7 +2963,7 @@
         ]
       },
       {
-        "ms": 774,
+        "ms": 299,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2952,7 +2974,7 @@
         ]
       },
       {
-        "ms": 774,
+        "ms": 299,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2963,7 +2985,7 @@
         ]
       },
       {
-        "ms": 774,
+        "ms": 299,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2974,7 +2996,7 @@
         ]
       },
       {
-        "ms": 774,
+        "ms": 299,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2985,7 +3007,7 @@
         ]
       },
       {
-        "ms": 774,
+        "ms": 299,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2996,7 +3018,7 @@
         ]
       },
       {
-        "ms": 774,
+        "ms": 299,
         "type": "childList",
         "target": "BUTTON",
         "added": [
@@ -3007,7 +3029,7 @@
         ]
       },
       {
-        "ms": 774,
+        "ms": 299,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -3016,7 +3038,7 @@
         "removed": []
       },
       {
-        "ms": 774,
+        "ms": 299,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -3025,7 +3047,7 @@
         "removed": []
       },
       {
-        "ms": 774,
+        "ms": 299,
         "type": "childList",
         "target": "BUTTON",
         "added": [
@@ -3036,7 +3058,7 @@
         ]
       },
       {
-        "ms": 774,
+        "ms": 299,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -3045,7 +3067,7 @@
         "removed": []
       },
       {
-        "ms": 774,
+        "ms": 299,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -3054,7 +3076,7 @@
         "removed": []
       },
       {
-        "ms": 774,
+        "ms": 299,
         "type": "childList",
         "target": "BUTTON",
         "added": [
@@ -3065,7 +3087,7 @@
         ]
       },
       {
-        "ms": 774,
+        "ms": 299,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -3074,7 +3096,7 @@
         "removed": []
       },
       {
-        "ms": 774,
+        "ms": 299,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -3083,7 +3105,7 @@
         "removed": []
       },
       {
-        "ms": 774,
+        "ms": 299,
         "type": "childList",
         "target": "BUTTON",
         "added": [
@@ -3094,7 +3116,7 @@
         ]
       },
       {
-        "ms": 774,
+        "ms": 299,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -3103,7 +3125,7 @@
         "removed": []
       },
       {
-        "ms": 774,
+        "ms": 299,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -3112,7 +3134,7 @@
         "removed": []
       },
       {
-        "ms": 774,
+        "ms": 299,
         "type": "childList",
         "target": "BUTTON",
         "added": [
@@ -3123,7 +3145,7 @@
         ]
       },
       {
-        "ms": 774,
+        "ms": 299,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -3132,7 +3154,7 @@
         "removed": []
       },
       {
-        "ms": 774,
+        "ms": 299,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -3141,7 +3163,7 @@
         "removed": []
       },
       {
-        "ms": 774,
+        "ms": 299,
         "type": "childList",
         "target": "BUTTON",
         "added": [
@@ -3152,7 +3174,7 @@
         ]
       },
       {
-        "ms": 774,
+        "ms": 299,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -3161,7 +3183,7 @@
         "removed": []
       },
       {
-        "ms": 774,
+        "ms": 299,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -3170,7 +3192,7 @@
         "removed": []
       },
       {
-        "ms": 774,
+        "ms": 299,
         "type": "childList",
         "target": "BUTTON",
         "added": [
@@ -3181,7 +3203,7 @@
         ]
       },
       {
-        "ms": 774,
+        "ms": 299,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -3192,54 +3214,24 @@
     ],
     "events": [
       {
-        "ms": 37,
-        "kind": "store",
-        "detail": "clientes"
-      },
-      {
-        "ms": 87,
-        "kind": "store",
-        "detail": "vehiculos"
-      },
-      {
-        "ms": 166,
-        "kind": "store",
-        "detail": "recibosEsperados"
-      },
-      {
-        "ms": 175,
-        "kind": "store",
-        "detail": "cancelaciones"
-      },
-      {
-        "ms": 181,
-        "kind": "store",
-        "detail": "negocios"
-      },
-      {
-        "ms": 188,
-        "kind": "store",
-        "detail": "gestiones"
-      },
-      {
-        "ms": 202,
-        "kind": "store",
-        "detail": "aseguradoras"
-      },
-      {
-        "ms": 209,
-        "kind": "store",
-        "detail": "cobros"
-      },
-      {
-        "ms": 253,
-        "kind": "store",
-        "detail": "carteraPrimas"
-      },
-      {
-        "ms": 947,
+        "ms": 584,
         "kind": "store",
         "detail": "metas"
+      },
+      {
+        "ms": 589,
+        "kind": "store",
+        "detail": "reclamos"
+      },
+      {
+        "ms": 593,
+        "kind": "store",
+        "detail": "comisiones"
+      },
+      {
+        "ms": 599,
+        "kind": "store",
+        "detail": "auditoria"
       }
     ],
     "canonicalRerenderObserved": true
@@ -3415,12 +3407,12 @@
     "allIds": [
       "pol_ad0ed5f26dd834d5e1d38f50eb0e",
       "pol_b9a883095c9fae8f7502ce1cb054",
-      "b4003qa_policy_expired_renew_37701246038",
+      "b4003qa_policy_expired_renew_37702135469",
       "pol_8231bbb8f9b7272c02891f5a4caf",
       "pol_df6bf097045762297ec31fd4e5c5",
-      "b4003qa_policy_renew_37701246038",
-      "b4003qa_policy_renewwrite_37701246038",
-      "b4003qa_policy_unknown_37701246038",
+      "b4003qa_policy_renew_37702135469",
+      "b4003qa_policy_renewwrite_37702135469",
+      "b4003qa_policy_unknown_37702135469",
       "pol_638e276218baad9e84018415b0ba",
       "pol_b39a58e5c216d8fb0f9fca4da4d6",
       "pol_7280c9b1a5253a1fe1e463e5993b",
@@ -3529,21 +3521,21 @@
     "committed": 1,
     "lastError": "",
     "comment": {
-      "ts": "2026-10-07T23:21:59.356Z",
+      "ts": "2026-10-07T23:32:49.538Z",
       "user": "Orbit LAB",
       "tipo": "Solicitar información al asesor",
       "texto": "B4-003 R20 solicitud sintética al asesor",
       "direction": "advisor",
-      "eventId": "collab_muyqfews_hm0lr",
+      "eventId": "collab_muyqtcle_teisp",
       "attachment": {
-        "documentRef": "13uPsu66PadMo72nEf4U8IKRJQ-MjmNHy",
-        "driveUrl": "https://drive.google.com/file/d/13uPsu66PadMo72nEf4U8IKRJQ-MjmNHy/view?usp=drivesdk",
-        "nombre": "b4-r20-ui-attachment-37701246038.txt",
+        "documentRef": "1K8frkkHmF8V21-alo03XSE07aBYlWXb_",
+        "driveUrl": "https://drive.google.com/file/d/1K8frkkHmF8V21-alo03XSE07aBYlWXb_/view?usp=drivesdk",
+        "nombre": "b4-r20-ui-attachment-37702135469.txt",
         "mimeType": "text/plain",
         "size": 36
       }
     },
-    "openMs": 1164,
+    "openMs": 690,
     "visual": {
       "panel": true,
       "brandHeader": true,
@@ -3554,27 +3546,27 @@
     "attachmentRead": {
       "ok": true,
       "status": "disponible",
-      "documentRef": "13uPsu66PadMo72nEf4U8IKRJQ-MjmNHy",
-      "fileId": "13uPsu66PadMo72nEf4U8IKRJQ-MjmNHy",
-      "nombre": "b4-r20-ui-attachment-37701246038.txt",
+      "documentRef": "1K8frkkHmF8V21-alo03XSE07aBYlWXb_",
+      "fileId": "1K8frkkHmF8V21-alo03XSE07aBYlWXb_",
+      "nombre": "b4-r20-ui-attachment-37702135469.txt",
       "mimeType": "text/plain",
       "size": 36,
-      "base64": "QjQtMDAzIFIyMCBVSSBhdHRhY2htZW50IDM3NzAxMjQ2MDM4",
+      "base64": "QjQtMDAzIFIyMCBVSSBhdHRhY2htZW50IDM3NzAyMTM1NDY5",
       "previewAvailable": true,
       "downloadAvailable": true,
-      "externalUrl": "https://drive.google.com/file/d/13uPsu66PadMo72nEf4U8IKRJQ-MjmNHy/view?usp=drivesdk",
-      "driveUrl": "https://drive.google.com/file/d/13uPsu66PadMo72nEf4U8IKRJQ-MjmNHy/view?usp=drivesdk",
+      "externalUrl": "https://drive.google.com/file/d/1K8frkkHmF8V21-alo03XSE07aBYlWXb_/view?usp=drivesdk",
+      "driveUrl": "https://drive.google.com/file/d/1K8frkkHmF8V21-alo03XSE07aBYlWXb_/view?usp=drivesdk",
       "backendPersistent": true,
       "previewIsolated": true
     },
     "attachmentCleanup": {
       "ok": true,
       "status": "deleted_preview_qa",
-      "documentRef": "13uPsu66PadMo72nEf4U8IKRJQ-MjmNHy",
+      "documentRef": "1K8frkkHmF8V21-alo03XSE07aBYlWXb_",
       "deleted": true,
       "previewIsolated": true,
       "entityType": "negocio",
-      "entityId": "b4003qa_business_collab_37701246038"
+      "entityId": "b4003qa_business_collab_37702135469"
     }
   },
   "r20SecondAdvisorActionCard": {
@@ -3587,8 +3579,23 @@
     "color": "rgb(255, 255, 255)",
     "priorityText": "Sin prioridad"
   },
+  "r20SecondAdvisorInboxUi": {
+    "landingHash": "#/leads",
+    "expectedSurface": "leads",
+    "header": {
+      "countText": "4 activas",
+      "countLeft": 736,
+      "drawerLeft": 720,
+      "drawerWidth": 560
+    },
+    "pendingSeen": true,
+    "final": {
+      "present": true,
+      "text": "Solicitar información al asesor Atendida B4-003 R20 solicitud sintética al asesor ✓ Atendida Archivar"
+    }
+  },
   "failure": {
-    "message": "B4_003_INBOX_SESSION_ROLE_NOT_READY:asesor",
-    "stack": "Error: B4_003_INBOX_SESSION_ROLE_NOT_READY:asesor\n    at need (file:///home/runner/work/orbit360-core/orbit360-core/tools/gravicentra-i6-5-b4-003-preview-proof.mjs:12:32)\n    at inboxUiFor (file:///home/runner/work/orbit360-core/orbit360-core/tools/gravicentra-i6-5-b4-003-preview-proof.mjs:191:3)\n    at runNextTicks (node:internal/process/task_queues:64:5)\n    at process.processImmediate (node:internal/timers:452:9)\n    at process.callbackTrampoline (node:internal/async_hooks:130:17)\n    at async file:///home/runner/work/orbit360-core/orbit360-core/tools/gravicentra-i6-5-b4-003-preview-proof.mjs:1214:23"
+    "message": "B4_003_R20_OPERATIONS_NOTICE_NOT_DEDUPED:{\"ok\":true,\"version\":\"orbit360-ops-advisor-inbox-v6-r20-recipient-dedupe-state\",\"tenantId\":\"alianzas-soluciones\",\"scope\":\"all\",\"opsScope\":\"all\",\"leadsScope\":\"all\",\"advisorId\":\"ase-carlos-castro\",\"activeRole\":\"operativo\",\"preview\":true,\"storageMode\":\"legacyCompatible\",\"productCanonicalDataOwner\":true,\"compatibilityOwnerMerged\":true,\"managements\":[{\"id\":\"b4001_37080168106_ops\",\"type\":\"management\",\"title\":\"QA B4-001 Ops\",\"clientId\":\"b4001_synthetic_client\",\"policyId\":\"\",\"businessId\":\"\",\"advisorId\":\"ase-braulio-hernandez\",\"insurerId\":\"\",\"stage\":\"\",\"status\":\"Pendiente\",\"priority\":\"Baja\",\"nextAction\":\"\",\"note\":\"Fixture sintético B4-001\",\"origin\":\"Ops\",\"dueDate\":\"\",\"updatedAt\":{\"_seconds\":1790985763,\"_nanoseconds\":344000000}},{\"id\":\"b4001_37080579197_ops\",\"type\":\"management\",\"title\":\"QA B4-001 Ops\",\"clientId\":\"b4001_synthetic_client\",\"policyId\":\"\",\"businessId\":\"\",\"advisorId\":\"ase-braulio-hernandez\",\"insurerId\":\"\",\"stage\":\"\",\"status\":\"Pendiente\",\"priority\":\"Baja\",\"nextAction\":\"\",\"note\":\"Fixture sintético B4-001\",\"origin\":\"Ops\",\"dueDate\":\"\",\"updatedAt\":{\"_seconds\":1790986131,\"_nanoseconds\":7000000}},{\"id\":\"ges3306127\",\"type\":\"management\",\"title\":\"Renovación aceptada\",\"clientId\":\"cli_siga_48999e7ea238b1a0e5\",\"policyId\":\"pol_965de501d871c56f3964a24b7724\",\"businessId\":\"\",\"advisorId\":\"ase-paula-osorio\",\"insurerId\":\"gt-seguros-columna\",\"stage\":\"\",\"status\":\"Resuelta\",\"priority\":\"Media\",\"nextAction\":\"Cerrada\",\"note\":\"Renovación registrada · póliza prueba\",\"origin\":\"Renovaciones\",\"dueDate\":\"2026-10-18\",\"updatedAt\":{\"_seconds\":1790473582,\"_nanoseconds\":430000000}},{\"id\":\"ges8842881\",\"type\":\"management\",\"title\":\"Nueva gestión\",\"clientId\":\"\",\"policyId\":\"\",\"businessId\":\"\",\"advisorId\":\"ase001\",\"insurerId\":\"\",\"stage\":\"\",\"status\":\"Pendiente\",\"priority\":\"Media\",\"nextAction\":\"Pendiente de definir\",\"note\":\"\",\"origin\":\"manual\",\"dueDate\":\"2026-09-29\",\"updatedAt\":{\"_seconds\":1790108848,\"_nanoseconds\":311000000}},{\"id\":\"ges9861490\",\"type\":\"management\",\"title\":\"Renovación WC-AHKGD0\",\"clientId\":\"cli_siga_2f32e9c002202b7bb58f\",\"policyId\":\"pol_ad0ed5f26dd834d5e1d38f50eb0e\",\"businessId\":\"\",\"advisorId\":\"ase-carlos-castro\",\"insurerId\":\"co-smi\",\"stage\":\"\",\"status\":\"Pendiente\",\"priority\":\"Alta\",\"nextAction\":\"Cotizar con fuentes vigentes\",\"note\":\"Pendiente de cotización real. No usar estimaciones ni tarifas no validadas.\",\"origin\":\"Renovaciones\",\"dueDate\":\"2026-09-29\",\"updatedAt\":{\"_seconds\":1790209867,\"_nanoseconds\":851000000}},{\"id\":\"ges_emi_muf2bwbf\",\"type\":\"management\",\"title\":\"Emisión de renovación · B2-POL-35957889987 · B2 QA 35957889987\",\"clientId\":\"cli_muf2bnqn\",\"policyId\":\"pol_muf2bqj4\",\"businessId\":\"\",\"advisorId\":\"ase-paula-osorio\",\"insurerId\":\"gt-aseguradora-general\",\"stage\":\"\",\"status\":\"Pendiente\",\"priority\":\"Alta\",\"nextAction\":\"Completar documentos y solicitar emisión\",\"note\":\"Propuesta aceptada. Pendiente completar requisitos y recibir número real de póliza.\",\"origin\":\"Comparativo\",\"dueDate\":\"2027-09-24\",\"updatedAt\":{\"_seconds\":1790225989,\"_nanoseconds\":730000000}}],\"businesses\":[{\"id\":\"s508_neg_4505da31546962e8a890\",\"type\":\"business\",\"title\":\"Paula Osorio\",\"clientId\":\"\",\"policyId\":\"\",\"businessId\":\"\",\"advisorId\":\"ase-paula-osorio\",\"insurerId\":\"\",\"stage\":\"nuevo\",\"status\":\"\",\"priority\":\"Media\",\"nextAction\":\"\",\"note\":\"\",\"origin\":\"Web CotComp\",\"dueDate\":\"\",\"updatedAt\":{\"_seconds\":1791388801,\"_nanoseconds\":72000000}},{\"id\":\"b4003qa_business_collab_37656401571\",\"type\":\"business\",\"title\":\"\",\"clientId\":\"\",\"policyId\":\"\",\"businessId\":\"\",\"advisorId\":\"\",\"insurerId\":\"\",\"stage\":\"\",\"status\":\"\",\"priority\":\"\",\"nextAction\":\"\",\"note\":\"\",\"origin\":\"\",\"dueDate\":\"\",\"updatedAt\":null},{\"id\":\"b4003qa_business_collab_37661727840\",\"type\":\"business\",\"title\":\"\",\"clientId\":\"\",\"policyId\":\"\",\"businessId\":\"\",\"advisorId\":\"\",\"insurerId\":\"\",\"stage\":\"\",\"status\":\"\",\"priority\":\"\",\"nextAction\":\"\",\"note\":\"\",\"origin\":\"\",\"dueDate\":\"\",\"updatedAt\":null},{\"id\":\"b4003qa_business_collab_37663659220\",\"type\":\"business\",\"title\":\"\",\"clientId\":\"\",\"policyId\":\"\",\"businessId\":\"\",\"advisorId\":\"\",\"insurerId\":\"\",\"stage\":\"\",\"status\":\"\",\"priority\":\"\",\"nextAction\":\"\",\"note\":\"\",\"origin\":\"\",\"dueDate\":\"\",\"updatedAt\":null},{\"id\":\"b4003qa_business_collab_37702135469\",\"type\":\"business\",\"title\":\"B4-003 QA colaboración\",\"clientId\":\"b4003qa_client_37702135469\",\"policyId\":\"\",\"businessId\":\"\",\"advisorId\":\"ase-carlos-castro\",\"insurerId\":\"\",\"stage\":\"nuevo\",\"status\":\"Nuevo\",\"priority\":\"\",\"nextAction\":\"\",\"note\":\"\",\"origin\":\"Ops\",\"dueDate\":\"\",\"updatedAt\":{\"_seconds\":1791415994,\"_nanoseconds\":151000000}},{\"id\":\"b4003qa_business_collab_noclient_37702135469\",\"type\":\"business\",\"title\":\"B4-003 QA colaboración pre-emisión\",\"clientId\":\"\",\"policyId\":\"\",\"businessId\":\"\",\"advisorId\":\"ase-carlos-castro\",\"insurerId\":\"\",\"stage\":\"cotizando\",\"status\":\"Cotizando\",\"priority\":\"\",\"nextAction\":\"\",\"note\":\"\",\"origin\":\"Leads\",\"dueDate\":\"\",\"updatedAt\":{\"_seconds\":1791415905,\"_nanoseconds\":106000000}},{\"id\":\"neg1587347\",\"type\":\"business\",\"title\":\"Paula Andrea Osorio Franco\",\"clientId\":\"\",\"policyId\":\"\",\"businessId\":\"\",\"advisorId\":\"ase-samuel-daza\",\"insurerId\":\"gt-aseguradora-general\",\"stage\":\"cotizando\",\"status\":\"\",\"priority\":\"Alta\",\"nextAction\":\"\",\"note\":\"\",\"origin\":\"Leads\",\"dueDate\":\"2026-10-12\",\"updatedAt\":{\"_seconds\":1791331935,\"_nanoseconds\":714000000}},{\"id\":\"neg3188258\",\"type\":\"business\",\"title\":\"Paula Andrea Osorio Franco\",\"clientId\":\"\",\"policyId\":\"\",\"businessId\":\"\",\"advisorId\":\"ase-samuel-daza\",\"insurerId\":\"gt-aseguradora-general\",\"stage\":\"propuesta\",\"status\":\"\",\"priority\":\"Alta\",\"nextAction\":\"\",\"note\":\"\",\"origin\":\"Ops\",\"dueDate\":\"2026-10-12\",\"updatedAt\":{\"_seconds\":1791203908,\"_nanoseconds\":605000000}},{\"id\":\"neg3761191\",\"type\":\"business\",\"title\":\"Fernando Arias\",\"clientId\":\"\",\"policyId\":\"\",\"businessId\":\"\",\"advisorId\":\"ase-carlos-castro\",\"insurerId\":\"\",\"stage\":\"cotizando\",\"status\":\"\",\"priority\":\"Alta\",\"nextAction\":\"\",\"note\":\"\",\"origin\":\"Ops\",\"dueDate\":\"2026-10-12\",\"updatedAt\":{\"_seconds\":1791314978,\"_nanoseconds\":905000000}},{\"id\":\"neg_rec_b4003qa_cancel_37702135469\",\"type\":\"business\",\"title\":\"B4-003 QA Cliente · recuperación\",\"clientId\":\"b4003qa_client_37702135469\",\"policyId\":\"b4003qa_policy_cancel_37702135469\",\"businessId\":\"\",\"advisorId\":\"ase-paula-osorio\",\"insurerId\":\"\",\"stage\":\"nuevo\",\"status\":\"\",\"priority\":\"Alta\",\"nextAction\":\"\",\"note\":\"B4-003 synthetic durable recovery\\n[2026-10-07] B4-003 synthetic durable recovery\",\"origin\":\"Recuperación\",\"dueDate\":\"\",\"updatedAt\":{\"_seconds\":1791415963,\"_nanoseconds\":368000000}}],\"notices\":[{\"id\":\"evt_459dfc4268f0a7763709020b5d6d\",\"eventId\":\"evt_459dfc4268f0a7763709020b5d6d\",\"entityType\":\"negocios\",\"entityId\":\"b4003qa_business_collab_37702135469\",\"operation\":\"update_business\",\"status\":\"pending_provider\",\"title\":\"Solicitar información al asesor\",\"message\":\"B4-003 R20 solicitud sintética al asesor\",\"attemptCount\":0,\"retryEligible\":false,\"lastError\":\"\",\"nextAttemptAt\":null,\"processedAt\":null,\"channelStates\":{},\"externalChannelsPendingConnection\":[],\"createdAt\":{\"_seconds\":1791415975,\"_nanoseconds\":111000000},\"direction\":\"advisor\",\"targetType\":\"advisor\",\"targetId\":\"ase-carlos-castro\",\"targetSurface\":\"leads\",\"actorUid\":\"woJlxR1iFEeiQZvTscPj4qQ5Qc73\",\"sourceRank\":2,\"readAt\":null,\"attendedAt\":null,\"archivedAt\":null,\"read\":false,\"attended\":false,\"archived\":false,\"statusLabel\":\"Nueva\"},{\"id\":\"collab_muyqtcle_teisp\",\"eventId\":\"collab_muyqtcle_teisp\",\"entityType\":\"negocios\",\"entityId\":\"b4003qa_business_collab_37702135469\",\"operation\":\"typed_collaboration\",\"status\":\"internal_committed\",\"title\":\"Solicitar información al asesor\",\"message\":\"B4-003 R20 solicitud sintética al asesor\",\"attemptCount\":0,\"retryEligible\":false,\"lastError\":\"\",\"nextAttemptAt\":null,\"processedAt\":null,\"channelStates\":{\"internal\":\"committed\"},\"externalChannelsPendingConnection\":[],\"createdAt\":\"2026-10-07T23:32:54.987Z\",\"direction\":\"advisor\",\"targetType\":\"advisor\",\"targetId\":\"ase-carlos-castro\",\"targetSurface\":\"leads\",\"actorUid\":\"woJlxR1iFEeiQZvTscPj4qQ5Qc73\",\"sourceRank\":1,\"readAt\":{\"_seconds\":1791415989,\"_nanoseconds\":41000000},\"attendedAt\":{\"_seconds\":1791415989,\"_nanoseconds\":41000000},\"archivedAt\":null,\"read\":true,\"attended\":true,\"archived\":false,\"statusLabel\":\"Atendida\"},{\"id\":\"evt_31881ccf63e7fcd74f0532f91864\",\"eventId\":\"evt_31881ccf63e7fcd74f0532f91864\",\"entityType\":\"negocios\",\"entityId\":\"b4003qa_business_collab_37701246038\",\"operation\":\"update_business\",\"status\":\"pending_provider\",\"title\":\"Solicitar información al asesor\",\"message\":\"B4-003 R20 solicitud sintética al asesor\",\"attemptCount\":0,\"retryEligible\":false,\"lastError\":\"\",\"nextAttemptAt\":null,\"processedAt\":null,\"channelStates\":{},\"externalChannelsPendingConnection\":[],\"createdAt\":{\"_seconds\":1791415324,\"_nanoseconds\":653000000},\"direction\":\"advisor\",\"targetType\":\"advisor\",\"targetId\":\"ase-carlos-castro\",\"targetSurface\":\"leads\",\"actorUid\":\"woJlxR1iFEeiQZvTscPj4qQ5Qc73\",\"sourceRank\":2,\"readAt\":null,\"attendedAt\":null,\"archivedAt\":null,\"read\":false,\"attended\":false,\"archived\":false,\"statusLabel\":\"Nueva\"},{\"id\":\"evt_44fb6ff6976317535d577df893a9\",\"eventId\":\"evt_44fb6ff6976317535d577df893a9\",\"entityType\":\"negocios\",\"entityId\":\"b4003qa_business_collab_37698524090\",\"operation\":\"update_business\",\"status\":\"pending_provider\",\"title\":\"Solicitar información al asesor\",\"message\":\"B4-003 R20 solicitud sintética al asesor\",\"attemptCount\":0,\"retryEligible\":false,\"lastError\":\"\",\"nextAttemptAt\":null,\"processedAt\":null,\"channelStates\":{},\"externalChannelsPendingConnection\":[],\"createdAt\":{\"_seconds\":1791413698,\"_nanoseconds\":260000000},\"direction\":\"advisor\",\"targetType\":\"advisor\",\"targetId\":\"ase-carlos-castro\",\"targetSurface\":\"leads\",\"actorUid\":\"woJlxR1iFEeiQZvTscPj4qQ5Qc73\",\"sourceRank\":2,\"readAt\":null,\"attendedAt\":null,\"archivedAt\":null,\"read\":false,\"attended\":false,\"archived\":false,\"statusLabel\":\"Nueva\"},{\"id\":\"collab_muxcqggw_ozbne\",\"eventId\":\"collab_muxcqggw_ozbne\",\"entityType\":\"negocios\",\"entityId\":\"neg1587347\",\"operation\":\"typed_collaboration\",\"status\":\"internal_committed\",\"title\":\"Reenviado a Operaciones\",\"message\":\"Envío información\",\"attemptCount\":0,\"retryEligible\":false,\"lastError\":\"\",\"nextAttemptAt\":null,\"processedAt\":null,\"channelStates\":{\"internal\":\"committed\"},\"externalChannelsPendingConnection\":[],\"createdAt\":\"2026-10-07 18:10\",\"direction\":\"operations\",\"targetType\":\"role\",\"targetId\":\"operations\",\"targetSurface\":\"ops\",\"actorUid\":\"\",\"sourceRank\":1,\"readAt\":null,\"attendedAt\":null,\"archivedAt\":null,\"read\":false,\"attended\":false,\"archived\":false,\"statusLabel\":\"Nueva\"},{\"id\":\"evt_6aabb13246ae5b37c089f1496320\",\"eventId\":\"evt_6aabb13246ae5b37c089f1496320\",\"entityType\":\"negocios\",\"entityId\":\"b4003qa_business_collab_37569139879\",\"operation\":\"update_business\",\"status\":\"pending_provider\",\"title\":\"Reenviado a Operaciones\",\"message\":\"B4-003 R20 respuesta sintética del asesor\",\"attemptCount\":0,\"retryEligible\":false,\"lastError\":\"\",\"nextAttemptAt\":null,\"processedAt\":null,\"channelStates\":{},\"externalChannelsPendingConnection\":[],\"createdAt\":{\"_seconds\":1791345745,\"_nanoseconds\":105000000},\"direction\":\"operations\",\"targetType\":\"role\",\"targetId\":\"operations\",\"targetSurface\":\"ops\",\"actorUid\":\"89WBRjbHAiYTOHmJFtT4KkDbzT32\",\"sourceRank\":2,\"readAt\":null,\"attendedAt\":null,\"archivedAt\":null,\"read\":false,\"attended\":false,\"archived\":false,\"statusLabel\":\"Nueva\"},{\"id\":\"evt_3c6593b0a093835fd19a82052277\",\"eventId\":\"evt_3c6593b0a093835fd19a82052277\",\"entityType\":\"negocios\",\"entityId\":\"neg1587347\",\"operation\":\"update_business\",\"status\":\"pending_provider\",\"title\":\"Reenviado a Operaciones\",\"message\":\"Envío información\",\"attemptCount\":0,\"retryEligible\":false,\"lastError\":\"\",\"nextAttemptAt\":null,\"processedAt\":null,\"channelStates\":{},\"externalChannelsPendingConnection\":[],\"createdAt\":{\"_seconds\":1791331935,\"_nanoseconds\":714000000},\"direction\":\"\",\"targetType\":\"role\",\"targetId\":\"operations\",\"targetSurface\":\"ops\",\"actorUid\":\"\",\"sourceRank\":2,\"readAt\":null,\"attendedAt\":null,\"archivedAt\":null,\"read\":false,\"attended\":false,\"archived\":false,\"statusLabel\":\"Nueva\"},{\"id\":\"evt_202380213700b6142dbbb68c2c43\",\"eventId\":\"evt_202380213700b6142dbbb68c2c43\",\"entityType\":\"negocios\",\"entityId\":\"neg1587347\",\"operation\":\"update_business\",\"status\":\"pending_provider\",\"title\":\"Reenviado a Operaciones\",\"message\":\"Envío información\",\"attemptCount\":0,\"retryEligible\":false,\"lastError\":\"\",\"nextAttemptAt\":null,\"processedAt\":null,\"channelStates\":{},\"externalChannelsPendingConnection\":[],\"createdAt\":{\"_seconds\":1791331854,\"_nanoseconds\":44000000},\"direction\":\"\",\"targetType\":\"role\",\"targetId\":\"operations\",\"targetSurface\":\"ops\",\"actorUid\":\"\",\"sourceRank\":2,\"readAt\":null,\"attendedAt\":null,\"archivedAt\":null,\"read\":false,\"attended\":false,\"archived\":false,\"statusLabel\":\"Nueva\"},{\"id\":\"evt_135b3fe8a855a82ec048b76d2f67\",\"eventId\":\"evt_135b3fe8a855a82ec048b76d2f67\",\"entityType\":\"negocios\",\"entityId\":\"b4003qa_business_collab_37546965774\",\"operation\":\"update_business\",\"status\":\"pending_provider\",\"title\":\"Respuesta del asesor\",\"message\":\"B4-003 R19 respuesta sintética del asesor\",\"attemptCount\":0,\"retryEligible\":false,\"lastError\":\"\",\"nextAttemptAt\":null,\"processedAt\":null,\"channelStates\":{},\"externalChannelsPendingConnection\":[],\"createdAt\":{\"_seconds\":1791329771,\"_nanoseconds\":511000000},\"direction\":\"\",\"targetType\":\"role\",\"targetId\":\"operations\",\"targetSurface\":\"ops\",\"actorUid\":\"\",\"sourceRank\":2,\"readAt\":null,\"attendedAt\":null,\"archivedAt\":null,\"read\":false,\"attended\":false,\"archived\":false,\"statusLabel\":\"Nueva\"}],\"noticeStatusCounts\":{\"pending_provider\":7,\"internal_committed\":2},\"counts\":{\"managements\":6,\"businesses\":10,\"notices\":9,\"unread\":8,\"attended\":1}}",
+    "stack": "Error: B4_003_R20_OPERATIONS_NOTICE_NOT_DEDUPED:{\"ok\":true,\"version\":\"orbit360-ops-advisor-inbox-v6-r20-recipient-dedupe-state\",\"tenantId\":\"alianzas-soluciones\",\"scope\":\"all\",\"opsScope\":\"all\",\"leadsScope\":\"all\",\"advisorId\":\"ase-carlos-castro\",\"activeRole\":\"operativo\",\"preview\":true,\"storageMode\":\"legacyCompatible\",\"productCanonicalDataOwner\":true,\"compatibilityOwnerMerged\":true,\"managements\":[{\"id\":\"b4001_37080168106_ops\",\"type\":\"management\",\"title\":\"QA B4-001 Ops\",\"clientId\":\"b4001_synthetic_client\",\"policyId\":\"\",\"businessId\":\"\",\"advisorId\":\"ase-braulio-hernandez\",\"insurerId\":\"\",\"stage\":\"\",\"status\":\"Pendiente\",\"priority\":\"Baja\",\"nextAction\":\"\",\"note\":\"Fixture sintético B4-001\",\"origin\":\"Ops\",\"dueDate\":\"\",\"updatedAt\":{\"_seconds\":1790985763,\"_nanoseconds\":344000000}},{\"id\":\"b4001_37080579197_ops\",\"type\":\"management\",\"title\":\"QA B4-001 Ops\",\"clientId\":\"b4001_synthetic_client\",\"policyId\":\"\",\"businessId\":\"\",\"advisorId\":\"ase-braulio-hernandez\",\"insurerId\":\"\",\"stage\":\"\",\"status\":\"Pendiente\",\"priority\":\"Baja\",\"nextAction\":\"\",\"note\":\"Fixture sintético B4-001\",\"origin\":\"Ops\",\"dueDate\":\"\",\"updatedAt\":{\"_seconds\":1790986131,\"_nanoseconds\":7000000}},{\"id\":\"ges3306127\",\"type\":\"management\",\"title\":\"Renovación aceptada\",\"clientId\":\"cli_siga_48999e7ea238b1a0e5\",\"policyId\":\"pol_965de501d871c56f3964a24b7724\",\"businessId\":\"\",\"advisorId\":\"ase-paula-osorio\",\"insurerId\":\"gt-seguros-columna\",\"stage\":\"\",\"status\":\"Resuelta\",\"priority\":\"Media\",\"nextAction\":\"Cerrada\",\"note\":\"Renovación registrada · póliza prueba\",\"origin\":\"Renovaciones\",\"dueDate\":\"2026-10-18\",\"updatedAt\":{\"_seconds\":1790473582,\"_nanoseconds\":430000000}},{\"id\":\"ges8842881\",\"type\":\"management\",\"title\":\"Nueva gestión\",\"clientId\":\"\",\"policyId\":\"\",\"businessId\":\"\",\"advisorId\":\"ase001\",\"insurerId\":\"\",\"stage\":\"\",\"status\":\"Pendiente\",\"priority\":\"Media\",\"nextAction\":\"Pendiente de definir\",\"note\":\"\",\"origin\":\"manual\",\"dueDate\":\"2026-09-29\",\"updatedAt\":{\"_seconds\":1790108848,\"_nanoseconds\":311000000}},{\"id\":\"ges9861490\",\"type\":\"management\",\"title\":\"Renovación WC-AHKGD0\",\"clientId\":\"cli_siga_2f32e9c002202b7bb58f\",\"policyId\":\"pol_ad0ed5f26dd834d5e1d38f50eb0e\",\"businessId\":\"\",\"advisorId\":\"ase-carlos-castro\",\"insurerId\":\"co-smi\",\"stage\":\"\",\"status\":\"Pendiente\",\"priority\":\"Alta\",\"nextAction\":\"Cotizar con fuentes vigentes\",\"note\":\"Pendiente de cotización real. No usar estimaciones ni tarifas no validadas.\",\"origin\":\"Renovaciones\",\"dueDate\":\"2026-09-29\",\"updatedAt\":{\"_seconds\":1790209867,\"_nanoseconds\":851000000}},{\"id\":\"ges_emi_muf2bwbf\",\"type\":\"management\",\"title\":\"Emisión de renovación · B2-POL-35957889987 · B2 QA 35957889987\",\"clientId\":\"cli_muf2bnqn\",\"policyId\":\"pol_muf2bqj4\",\"businessId\":\"\",\"advisorId\":\"ase-paula-osorio\",\"insurerId\":\"gt-aseguradora-general\",\"stage\":\"\",\"status\":\"Pendiente\",\"priority\":\"Alta\",\"nextAction\":\"Completar documentos y solicitar emisión\",\"note\":\"Propuesta aceptada. Pendiente completar requisitos y recibir número real de póliza.\",\"origin\":\"Comparativo\",\"dueDate\":\"2027-09-24\",\"updatedAt\":{\"_seconds\":1790225989,\"_nanoseconds\":730000000}}],\"businesses\":[{\"id\":\"s508_neg_4505da31546962e8a890\",\"type\":\"business\",\"title\":\"Paula Osorio\",\"clientId\":\"\",\"policyId\":\"\",\"businessId\":\"\",\"advisorId\":\"ase-paula-osorio\",\"insurerId\":\"\",\"stage\":\"nuevo\",\"status\":\"\",\"priority\":\"Media\",\"nextAction\":\"\",\"note\":\"\",\"origin\":\"Web CotComp\",\"dueDate\":\"\",\"updatedAt\":{\"_seconds\":1791388801,\"_nanoseconds\":72000000}},{\"id\":\"b4003qa_business_collab_37656401571\",\"type\":\"business\",\"title\":\"\",\"clientId\":\"\",\"policyId\":\"\",\"businessId\":\"\",\"advisorId\":\"\",\"insurerId\":\"\",\"stage\":\"\",\"status\":\"\",\"priority\":\"\",\"nextAction\":\"\",\"note\":\"\",\"origin\":\"\",\"dueDate\":\"\",\"updatedAt\":null},{\"id\":\"b4003qa_business_collab_37661727840\",\"type\":\"business\",\"title\":\"\",\"clientId\":\"\",\"policyId\":\"\",\"businessId\":\"\",\"advisorId\":\"\",\"insurerId\":\"\",\"stage\":\"\",\"status\":\"\",\"priority\":\"\",\"nextAction\":\"\",\"note\":\"\",\"origin\":\"\",\"dueDate\":\"\",\"updatedAt\":null},{\"id\":\"b4003qa_business_collab_37663659220\",\"type\":\"business\",\"title\":\"\",\"clientId\":\"\",\"policyId\":\"\",\"businessId\":\"\",\"advisorId\":\"\",\"insurerId\":\"\",\"stage\":\"\",\"status\":\"\",\"priority\":\"\",\"nextAction\":\"\",\"note\":\"\",\"origin\":\"\",\"dueDate\":\"\",\"updatedAt\":null},{\"id\":\"b4003qa_business_collab_37702135469\",\"type\":\"business\",\"title\":\"B4-003 QA colaboración\",\"clientId\":\"b4003qa_client_37702135469\",\"policyId\":\"\",\"businessId\":\"\",\"advisorId\":\"ase-carlos-castro\",\"insurerId\":\"\",\"stage\":\"nuevo\",\"status\":\"Nuevo\",\"priority\":\"\",\"nextAction\":\"\",\"note\":\"\",\"origin\":\"Ops\",\"dueDate\":\"\",\"updatedAt\":{\"_seconds\":1791415994,\"_nanoseconds\":151000000}},{\"id\":\"b4003qa_business_collab_noclient_37702135469\",\"type\":\"business\",\"title\":\"B4-003 QA colaboración pre-emisión\",\"clientId\":\"\",\"policyId\":\"\",\"businessId\":\"\",\"advisorId\":\"ase-carlos-castro\",\"insurerId\":\"\",\"stage\":\"cotizando\",\"status\":\"Cotizando\",\"priority\":\"\",\"nextAction\":\"\",\"note\":\"\",\"origin\":\"Leads\",\"dueDate\":\"\",\"updatedAt\":{\"_seconds\":1791415905,\"_nanoseconds\":106000000}},{\"id\":\"neg1587347\",\"type\":\"business\",\"title\":\"Paula Andrea Osorio Franco\",\"clientId\":\"\",\"policyId\":\"\",\"businessId\":\"\",\"advisorId\":\"ase-samuel-daza\",\"insurerId\":\"gt-aseguradora-general\",\"stage\":\"cotizando\",\"status\":\"\",\"priority\":\"Alta\",\"nextAction\":\"\",\"note\":\"\",\"origin\":\"Leads\",\"dueDate\":\"2026-10-12\",\"updatedAt\":{\"_seconds\":1791331935,\"_nanoseconds\":714000000}},{\"id\":\"neg3188258\",\"type\":\"business\",\"title\":\"Paula Andrea Osorio Franco\",\"clientId\":\"\",\"policyId\":\"\",\"businessId\":\"\",\"advisorId\":\"ase-samuel-daza\",\"insurerId\":\"gt-aseguradora-general\",\"stage\":\"propuesta\",\"status\":\"\",\"priority\":\"Alta\",\"nextAction\":\"\",\"note\":\"\",\"origin\":\"Ops\",\"dueDate\":\"2026-10-12\",\"updatedAt\":{\"_seconds\":1791203908,\"_nanoseconds\":605000000}},{\"id\":\"neg3761191\",\"type\":\"business\",\"title\":\"Fernando Arias\",\"clientId\":\"\",\"policyId\":\"\",\"businessId\":\"\",\"advisorId\":\"ase-carlos-castro\",\"insurerId\":\"\",\"stage\":\"cotizando\",\"status\":\"\",\"priority\":\"Alta\",\"nextAction\":\"\",\"note\":\"\",\"origin\":\"Ops\",\"dueDate\":\"2026-10-12\",\"updatedAt\":{\"_seconds\":1791314978,\"_nanoseconds\":905000000}},{\"id\":\"neg_rec_b4003qa_cancel_37702135469\",\"type\":\"business\",\"title\":\"B4-003 QA Cliente · recuperación\",\"clientId\":\"b4003qa_client_37702135469\",\"policyId\":\"b4003qa_policy_cancel_37702135469\",\"businessId\":\"\",\"advisorId\":\"ase-paula-osorio\",\"insurerId\":\"\",\"stage\":\"nuevo\",\"status\":\"\",\"priority\":\"Alta\",\"nextAction\":\"\",\"note\":\"B4-003 synthetic durable recovery\\n[2026-10-07] B4-003 synthetic durable recovery\",\"origin\":\"Recuperación\",\"dueDate\":\"\",\"updatedAt\":{\"_seconds\":1791415963,\"_nanoseconds\":368000000}}],\"notices\":[{\"id\":\"evt_459dfc4268f0a7763709020b5d6d\",\"eventId\":\"evt_459dfc4268f0a7763709020b5d6d\",\"entityType\":\"negocios\",\"entityId\":\"b4003qa_business_collab_37702135469\",\"operation\":\"update_business\",\"status\":\"pending_provider\",\"title\":\"Solicitar información al asesor\",\"message\":\"B4-003 R20 solicitud sintética al asesor\",\"attemptCount\":0,\"retryEligible\":false,\"lastError\":\"\",\"nextAttemptAt\":null,\"processedAt\":null,\"channelStates\":{},\"externalChannelsPendingConnection\":[],\"createdAt\":{\"_seconds\":1791415975,\"_nanoseconds\":111000000},\"direction\":\"advisor\",\"targetType\":\"advisor\",\"targetId\":\"ase-carlos-castro\",\"targetSurface\":\"leads\",\"actorUid\":\"woJlxR1iFEeiQZvTscPj4qQ5Qc73\",\"sourceRank\":2,\"readAt\":null,\"attendedAt\":null,\"archivedAt\":null,\"read\":false,\"attended\":false,\"archived\":false,\"statusLabel\":\"Nueva\"},{\"id\":\"collab_muyqtcle_teisp\",\"eventId\":\"collab_muyqtcle_teisp\",\"entityType\":\"negocios\",\"entityId\":\"b4003qa_business_collab_37702135469\",\"operation\":\"typed_collaboration\",\"status\":\"internal_committed\",\"title\":\"Solicitar información al asesor\",\"message\":\"B4-003 R20 solicitud sintética al asesor\",\"attemptCount\":0,\"retryEligible\":false,\"lastError\":\"\",\"nextAttemptAt\":null,\"processedAt\":null,\"channelStates\":{\"internal\":\"committed\"},\"externalChannelsPendingConnection\":[],\"createdAt\":\"2026-10-07T23:32:54.987Z\",\"direction\":\"advisor\",\"targetType\":\"advisor\",\"targetId\":\"ase-carlos-castro\",\"targetSurface\":\"leads\",\"actorUid\":\"woJlxR1iFEeiQZvTscPj4qQ5Qc73\",\"sourceRank\":1,\"readAt\":{\"_seconds\":1791415989,\"_nanoseconds\":410000"
   }
 }
