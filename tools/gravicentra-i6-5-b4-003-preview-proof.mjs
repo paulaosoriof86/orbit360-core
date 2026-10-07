@@ -1246,6 +1246,24 @@ try{
  await page.click('#asg-ficha #af-cancelar');
  proof.assertions.insurerRamoProductPlanMatrix=true;proof.assertions.insurerRamoCatalogMultiselect=true;proof.assertions.insurerCommercialSelectionPersistent=true;
 
+ await page.evaluate(id=>{document.getElementById('asg-ficha')?.remove();Orbit.modules.aseguradoras.ficha(id);},ids.insurer);
+ await page.click('#asg-ficha #af-editar');
+ await page.waitForSelector('#asg-ficha #af-logo',{timeout:10000});
+ await page.fill('#asg-ficha #af-logo','https://example.invalid/b4-r20-logo-'+run+'.png');
+ const diffProbe=await page.evaluate(async()=>{
+   const original=Orbit.ui.prompt;let resolvePrompt;window.__b4003PromptText='';window.__b4003PromptResolve=null;
+   Orbit.ui.prompt=(text)=>{window.__b4003PromptText=String(text||'');return new Promise(resolve=>{resolvePrompt=resolve;window.__b4003PromptResolve=resolve;});};
+   document.querySelector('#asg-ficha #af-guardar')?.click();
+   for(let i=0;i<50&&!window.__b4003PromptText;i++)await new Promise(r=>setTimeout(r,20));
+   const button=document.querySelector('#asg-ficha #af-guardar'),during=String(button?.textContent||''),prompt=window.__b4003PromptText;
+   if(resolvePrompt)resolvePrompt(null);
+   await new Promise(r=>setTimeout(r,60));Orbit.ui.prompt=original;delete window.__b4003PromptResolve;
+   return{prompt,during,after:String(document.querySelector('#asg-ficha #af-guardar')?.textContent||'')};
+ });
+ need(/Cambios detectados:\s*Logo\./.test(diffProbe.prompt)&&!/NIT|Sitio web|Responsable|Teléfono|Facturación|Contactos|Plataformas|Bancos/.test(diffProbe.prompt)&&/Esperando motivo|Revisando cambios/.test(diffProbe.during),'B4_003_R20_SECOND_REVIEW_INSURER_LOGO_SEMANTIC_DIFF_FAILED:'+JSON.stringify(diffProbe));
+ proof.r20SecondInsurerSemanticDiff=diffProbe;proof.assertions.insurerLogoOnlySemanticDiff=true;proof.assertions.insurerSaveProgressImmediate=true;
+ await page.click('#asg-ficha #af-cancelar');
+
  const driveProbe=await page.evaluate(async()=>{
    const p=Orbit.productDriveDocumentProviderP0;
    if(!p||typeof p.probe!=='function')return{available:false,status:'provider_missing'};
