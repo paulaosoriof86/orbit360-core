@@ -13,7 +13,7 @@
 
   const functionName=()=>window.OrbitBackend&&OrbitBackend.functionNames&&OrbitBackend.functionNames.leadAttention||'orbit360AdvisorLeadAttentionS509';
   const region=()=>window.OrbitBackend&&OrbitBackend.functionsRegion||'us-central1';
-  let timer=null,startedUid='',polling=false;
+  let timer=null,startedUid='',polling=false,pendingIds=[];
 
   function authUser(){
     try{return window.firebase&&firebase.auth&&firebase.auth().currentUser||null;}catch(e){return null;}
@@ -31,6 +31,17 @@
     const old=document.getElementById('lead-attention-s509');
     if(old)old.remove();
   }
+  function onLeadsRoute(){
+    return (location.hash||'').replace(/^#\/?/,'')==='leads';
+  }
+  async function acknowledgeVisibleLeadAttention(){
+    if(!onLeadsRoute())return;
+    const ids=pendingIds.slice();
+    pendingIds=[];
+    removeBanner();
+    if(ids.length)await ack(ids);
+    else await poll(false);
+  }
   function banner(count,onView,auto){
     removeBanner();
     const el=document.createElement('div');
@@ -40,8 +51,10 @@
     el.innerHTML='<div style="font-size:11px;letter-spacing:.06em;text-transform:uppercase;opacity:.68">Gravicentra · nuevo lead</div>'
       +'<div style="font-weight:800;font-size:15px;margin-top:4px">'+(count===1?'Tienes un nuevo lead asignado.':'Tienes '+count+' nuevos leads asignados.')+'</div>'
       +'<div style="font-size:12px;line-height:1.45;opacity:.82;margin-top:5px">'+(auto?'Abriendo Leads para que lo gestiones de inmediato.':'Revísalo en Leads para darle seguimiento oportuno.')+'</div>'
-      +(auto?'':'<button id="lead-attention-s509-open" style="margin-top:10px;border:0;border-radius:9px;padding:8px 11px;background:white;color:#171717;font-weight:700;cursor:pointer">Ver Leads</button>');
+      +'<div style="display:flex;gap:8px;align-items:center;margin-top:10px">'+(auto?'':'<button id="lead-attention-s509-open" style="border:0;border-radius:9px;padding:8px 11px;background:white;color:#171717;font-weight:700;cursor:pointer">Ver Leads</button>')+'<button id="lead-attention-s509-close" aria-label="Cerrar aviso" title="Cerrar aviso" style="margin-left:auto;border:0;background:transparent;color:white;font-size:20px;line-height:1;cursor:pointer">×</button></div>';
     document.body.appendChild(el);
+    const close=el.querySelector('#lead-attention-s509-close');
+    if(close)close.addEventListener('click',()=>removeBanner());
     if(!auto){
       const b=el.querySelector('#lead-attention-s509-open');
       if(b)b.addEventListener('click',()=>{removeBanner();onView&&onView();});
@@ -53,9 +66,10 @@
     try{if(ids&&ids.length)await invoke('ack',{eventIds:ids});}catch(e){}
   }
   async function openLeads(ids,auto){
+    pendingIds=ids.slice();
     banner(ids.length,()=>openLeads(ids,false),!!auto);
     if(location.hash!=='#/leads')location.hash='#/leads';
-    setTimeout(()=>ack(ids),350);
+    setTimeout(()=>ack(ids).then(()=>{pendingIds=[];}),350);
   }
   async function poll(initial){
     if(polling)return;
@@ -68,11 +82,13 @@
       if(!rows.length)return;
       const ids=rows.map(x=>x&&x.eventId).filter(Boolean);
       if(!ids.length)return;
+      pendingIds=ids.slice();
       if(initial){
         await openLeads(ids,true);
-      }else if((location.hash||'').replace(/^#\/?/,'')==='leads'){
+      }else if(onLeadsRoute()){
         banner(ids.length,null,true);
         await ack(ids);
+        pendingIds=[];
       }else{
         banner(ids.length,()=>openLeads(ids,false),false);
       }
@@ -83,6 +99,7 @@
   function stop(){
     if(timer){clearInterval(timer);timer=null;}
     startedUid='';
+    pendingIds=[];
     removeBanner();
   }
   function startForCurrentUser(){
@@ -91,15 +108,13 @@
     if(startedUid===u.uid)return;
     stop();
     startedUid=u.uid;
-    const key='s509-login-poll:'+u.uid;
-    let initial=true;
-    try{initial=sessionStorage.getItem(key)!=='1';sessionStorage.setItem(key,'1');}catch(e){}
-    poll(initial);
+    poll(true);
     timer=setInterval(()=>poll(false),30000);
   }
   setInterval(startForCurrentUser,700);
   document.addEventListener('visibilitychange',()=>{if(!document.hidden)poll(false);});
   window.addEventListener('focus',()=>poll(false));
+  window.addEventListener('hashchange',()=>{if(onLeadsRoute())acknowledgeVisibleLeadAttention();});
 
   window.Orbit.advisorLeadAttentionS509=Object.freeze({VERSION,poll:()=>poll(false),status:()=>({version:VERSION,startedUid,polling})});
 })();
