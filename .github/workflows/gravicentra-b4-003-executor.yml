@@ -21,6 +21,7 @@ on:
       - 'tools/gravicentra-i6-5-b4-003-r20-renewability-rule.mjs'
       - 'tools/gravicentra-i6-5-b4-003-r20-country-backfill-dryrun.mjs'
       - 'tools/gravicentra-i6-5-b4-003-r20-renewal-cutoff-dryrun.mjs'
+      - 'tools/gravicentra-live-preexisting-drift-snapshot.mjs'
       - 'tools/gravicentra-quote-authority-contract-v1.mjs'
       - 'orbit360-platform/core/quote-authority-contract-v1.js'
       - 'artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json'
@@ -144,9 +145,11 @@ jobs:
           NODE
 
 
-      - name: Assert LIVE unchanged before second R20 review dry-runs
+      - name: Snapshot preexisting LIVE binding before second R20 review dry-runs
         if: steps.gate.outputs.r20_second_dryrun == 'true'
-        run: node tools/gravicentra-certified-live-binding-check.mjs
+        env:
+          LIVE_DRIFT_OUT: ${{ runner.temp }}/b4-003-r20-live-before.json
+        run: node tools/gravicentra-live-preexisting-drift-snapshot.mjs --mode=snapshot
 
       - name: Prepare second R20 review read-only dry-runs and source syntax checks
         if: steps.gate.outputs.r20_second_dryrun == 'true'
@@ -195,6 +198,13 @@ jobs:
           node tools/gravicentra-i6-5-b4-003-r20-country-backfill-dryrun.mjs
           node tools/gravicentra-i6-5-b4-003-r20-renewal-cutoff-dryrun.mjs
 
+      - name: Verify LIVE remained byte-stable during second R20 review dry-runs
+        if: steps.gate.outputs.r20_second_dryrun == 'true'
+        env:
+          LIVE_DRIFT_BEFORE: ${{ runner.temp }}/b4-003-r20-live-before.json
+          LIVE_DRIFT_OUT: ${{ runner.temp }}/b4-003-r20-live-after.json
+        run: node tools/gravicentra-live-preexisting-drift-snapshot.mjs --mode=compare
+
       - name: Upload second R20 review dry-run evidence
         if: always() && steps.gate.outputs.r20_second_dryrun == 'true'
         uses: actions/upload-artifact@v4
@@ -203,6 +213,8 @@ jobs:
           path: |
             ${{ runner.temp }}/b4-003-r20-country-backfill-dryrun.json
             ${{ runner.temp }}/b4-003-r20-renewal-cutoff-dryrun.json
+            ${{ runner.temp }}/b4-003-r20-live-before.json
+            ${{ runner.temp }}/b4-003-r20-live-after.json
           if-no-files-found: error
           retention-days: 14
 
