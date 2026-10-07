@@ -188,7 +188,7 @@ Orbit.modules.aseguradoras = (function () {
     [].concat(a.docsRequeridos||[],a.docs||[],knowledgeSources(a)||[]).forEach(x=>{if((!ramo||norm(x&&x.ramo)===norm(ramo))&&(!producto||norm(x&&x.producto)===norm(producto))&&x&&x.plan)out.push(x.plan);});
     return uniqueText(out).sort((x,y)=>x.localeCompare(y,'es'));
   }
-  function selectOptions(values,current,blank){return (blank!=null?'<option value="">'+U.esc(blank)+'</option>':'')+uniqueText(values).map(v=>'<option value="'+U.esc(v)+'" '+(clean(v)===clean(current)?'selected':'')+'>'+U.esc(v)+'</option>').join('');}
+  function commercialPlanCatalog(a,ramo){let out=[];try{out=out.concat(Orbit.cat&&Orbit.cat.get?Orbit.cat.get('planes')||[]:[]);}catch(e){}out=out.concat(planOptionsFor(a,ramo,''));return uniqueText(out).sort((x,y)=>x.localeCompare(y,'es'));}\n  function selectOptions(values,current,blank){return (blank!=null?'<option value="">'+U.esc(blank)+'</option>':'')+uniqueText(values).map(v=>'<option value="'+U.esc(v)+'" '+(clean(v)===clean(current)?'selected':'')+'>'+U.esc(v)+'</option>').join('');}
   function visibleState(value) {
     const key = norm(value).replace(/ /g, '_');
     if (/habilitado.*cotizador/.test(key)) return 'Habilitado para Cotizador';
