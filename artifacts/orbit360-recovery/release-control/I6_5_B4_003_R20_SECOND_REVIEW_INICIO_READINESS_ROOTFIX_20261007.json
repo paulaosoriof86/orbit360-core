@@ -1,0 +1,25 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R20_SECOND_REVIEW_INICIO_READINESS_ROOTFIX_V1",
+  "recordedAt": "2026-10-07T22:24:17.503Z",
+  "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW",
+  "findingId": "B4-003",
+  "rootCause": "INICIO_OPTIONAL_METAS_READINESS_RENDERED_AS_INDEFINITE_PENDING",
+  "failedProofPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_LAST_FAILED_BROWSER_PROOF_20261007.json",
+  "failedTarget": "https://ays-orbit-360-lab--gi-i65-b4-37677027329-8k6f546f.web.app",
+  "failedAssertion": "inicio readiness terminal should not keep displaying Actualizando producción y metas del equipo",
+  "sourceFiles": [
+    "orbit360-platform/modules/inicio.js"
+  ],
+  "productBlobs": {
+    "orbit360-platform/modules/inicio.js": "f1a33a848eef1d543703cb1715f6572c0fceeeeb"
+  },
+  "fixes": [
+    "Treat optional metas/asesores readiness as terminal unavailable once product store is ready and optional collections are unresolved, preserving later reactive rerender if data confirms."
+  ],
+  "productMutationAuthorized": false,
+  "dataMutation": false,
+  "reimport": false,
+  "livePromotion": false,
+  "b4004Held": true,
+  "nextAction": "B4_003_R20_CONTRACT_AND_EXACT_PREVIEW"
+}

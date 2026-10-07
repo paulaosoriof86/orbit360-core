@@ -1,0 +1,21 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R20_SECOND_REVIEW_POLICY_FIRST_PAINT_CONTRACT_ROOTFIX_V1",
+  "recordedAt": "2026-10-07",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW",
+  "contractFailure": "B4_003_R13P3_POLICY_FIRST_PAINT_SEARCH_WORK_REMAINS",
+  "rootCause": "The policy module had already moved search construction into lazy ensure* functions, but buildIndexes still exposed cache slots named basicSearchTextByPolicy/vehicleSearchTextByPolicy inside the first-paint block. The B4-003 contract correctly treats that source shape as ambiguous first-paint search work.",
+  "fix": {
+    "path": "orbit360-platform/modules/polizas.js",
+    "summary": "Renamed lazy cache slots to basicSearchIndex and vehicleSearchIndex; the first-paint index remains relation-only, while search text continues to build only through ensureBasicSearchIndex and ensureVehicleSearchIndex."
+  },
+  "guards": {
+    "dataMutation": false,
+    "liveMutation": false,
+    "reimport": false,
+    "timeoutChanged": false,
+    "assertionWeakened": false
+  },
+  "nextAction": "B4_003_R20_CONTRACT_AND_EXACT_PREVIEW"
+}

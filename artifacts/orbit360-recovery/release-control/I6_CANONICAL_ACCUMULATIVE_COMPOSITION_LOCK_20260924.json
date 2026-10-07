@@ -226,13 +226,13 @@
     "orbit360-platform/modules/equipo-credential-admin-v20260805-bridge.js": "7432bc05938469187fdd120a5bc023c53a000ab9",
     "orbit360-platform/modules/equipo-onboarding-v20260804-bridge.js": "1da619d8abd676d31d69a038d4770463ca67fdc5",
     "orbit360-platform/modules/equipo.js": "b0736237ee18ef45abbae1c13f5c94781178344e",
-    "orbit360-platform/modules/inicio.js": "273242ecca413906088ed734a185281ee71a1c0e",
+    "orbit360-platform/modules/inicio.js": "f1a33a848eef1d543703cb1715f6572c0fceeeeb",
     "orbit360-platform/modules/issuance-endosos-v1201-bridge.js": "43e14e5dc03a296b9fd461bec2ecc3052d6cbce0",
     "orbit360-platform/modules/leads.js": "b4dfdbcdb8d255329e3fbae8df59ffde96f05146",
     "orbit360-platform/modules/ops.js": "f0d04dba984d6f1f6f58aac7574d552362cd8ce3",
     "orbit360-platform/modules/policy-receipts-v1199-bridge.js": "79e8eefc821b17b1abb3ba7b26558e90199a9ea5",
     "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js": "1b8dceb208b93220ce232037b4d0d394bb022f62",
-    "orbit360-platform/modules/polizas.js": "c5dcc45c02de91964338de22125f24bbdb3a3176",
+    "orbit360-platform/modules/polizas.js": "ff6c77a3beb935edf2aa2bb66f2c7ae415848cfb",
     "orbit360-platform/modules/portal-v1142-copyfix.js": "702cae307395361b3a7f61b7a268d15d85b44955",
     "orbit360-platform/modules/portal.js": "957cefe0647bff2b350e5b3f0f78ef7a9e97703f",
     "orbit360-platform/modules/renewals-v1200-operational-bridge.js": "b44695f05170b4406740ed7158b47e6464916d8f",
@@ -3828,5 +3828,24 @@
     },
     "productFilesChanged": 0,
     "b4004Held": true
+  },
+  "r20SecondReviewInicioReadinessRootFix": {
+    "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_SECOND_REVIEW_INICIO_READINESS_ROOTFIX_20261007.json",
+    "blobSha": "d4d6322d665d7c8f699d757656457b2224386d5a",
+    "productBlobs": {
+      "orbit360-platform/modules/inicio.js": "f1a33a848eef1d543703cb1715f6572c0fceeeeb"
+    },
+    "productSourceChanged": true,
+    "dataMutation": false,
+    "noLive": true,
+    "noReimport": true,
+    "masterPlanBlobSha": "6d9d5245b30a834af2135ecb17f08a6f782395b3",
+    "continuityRegisterBlobSha": "6cedeffee532fa441cb3d25f43dc4b3409739ab9"
+  },
+  "r20SecondReviewPolicyFirstPaintContractRootFix": {
+    "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_SECOND_REVIEW_POLICY_FIRST_PAINT_CONTRACT_ROOTFIX_20261007.json",
+    "blobSha": "6cb7ad5fe65c0a5a7bca52cbd2685373eeca4176"
   }
 }

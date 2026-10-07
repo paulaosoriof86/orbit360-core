@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import cp from 'node:child_process';
 
 const need=(v,c)=>{if(!v)throw new Error(c);};
-const read=p=>fs.readFileSync(p,'utf8');
+const read=p=>fs.readFileSync(p,'utf8').replace(/\r\n/g,'\n');
 const json=p=>JSON.parse(read(p));
 const hash=p=>cp.execFileSync('git',['hash-object',p],{encoding:'utf8'}).trim();
 

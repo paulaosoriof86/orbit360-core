@@ -1,0 +1,35 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R20_SECOND_REVIEW_DRIVE_PREVIEW_BACKEND_BINDING_ROOTFIX_V1",
+  "recordedAt": "2026-10-07",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "status": "QA_PREVIEW_BACKEND_BINDING_FIXED_PENDING_EXACT_PREVIEW",
+  "failedProof": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_LAST_FAILED_BROWSER_PROOF_20261007.json",
+    "target": "https://ays-orbit-360-lab--gi-i65-b4-37677027329-8k6f546f.web.app",
+    "observedConsoleError": "CORS blocked callable orbit360DocumentDriveListFolderPreview"
+  },
+  "rootCause": {
+    "code": "PREVIEW_DRIVE_CALLABLE_REFERENCED_BUT_NOT_DEPLOYED_BY_B4_003_EXECUTOR",
+    "summary": "The product Drive provider binds Preview to orbit360DocumentDriveListFolderPreview/readDossier/bootstrap, but the B4-003 exact Preview backend deploy list omitted those Preview functions. The callable source exists with Preview CORS configuration; the isolated Preview backend package was incomplete."
+  },
+  "fix": {
+    "path": ".github/workflows/gravicentra-b4-003-executor.yml",
+    "scope": "B4-003 isolated Preview backend only",
+    "addedPreviewFunctions": [
+      "orbit360DocumentDriveListFolderPreview",
+      "orbit360DocumentDriveReadDossierPreview",
+      "orbit360DocumentDriveBootstrapPreview"
+    ],
+    "bindingEvidenceUpdated": true
+  },
+  "guards": {
+    "productionFunctionsDeployed": false,
+    "LIVE_NOT_TOUCHED": true,
+    "DATA_WRITES_NOT_EXECUTED": true,
+    "B4_004_NOT_OPENED": true,
+    "assertionWeakened": false,
+    "timeoutIncreased": false
+  },
+  "nextAction": "B4_003_R20_CONTRACT_AND_EXACT_PREVIEW"
+}

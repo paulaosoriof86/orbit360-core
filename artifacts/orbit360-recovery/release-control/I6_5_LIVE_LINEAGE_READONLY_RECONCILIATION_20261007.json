@@ -1,0 +1,84 @@
+{
+  "schema": "GRAVICENTRA_I6_5_LIVE_LINEAGE_READONLY_RECONCILIATION_V1",
+  "recordedAt": "2026-10-07T22:31:59.423Z",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "status": "LIVE_LINEAGE_UNRESOLVED",
+  "readOnly": true,
+  "hostingMutation": false,
+  "productionPromotionAuthorized": false,
+  "dataMutation": false,
+  "reimport": false,
+  "liveUrl": "https://ays-orbit-360-lab.web.app",
+  "certifiedExpectedBinding": {
+    "sourceSha": "4bf67a3738751fe2432a130fd23254a6f1c7d16e",
+    "buildId": "gi-i65-4bf67a373875-57f234755dc1",
+    "artifactId": 10575873579,
+    "artifactName": "gravicentra-i6-5-operational-closure-build-35416730679",
+    "artifactArchiveDigest": "d4fc105856a2078054dfccd265a1ad83e23dd059a01d04bdeb715a72fdd62a4f",
+    "hostedPayloadDigest": "84a74f46498618ca36c142ff844dbfe670df5a64501a1ceca22d5cd069e62767",
+    "promotedLiveRunId": 35416730679,
+    "hostedFileCount": 209
+  },
+  "readback": {
+    "base": "https://ays-orbit-360-lab.web.app",
+    "liveFingerprint": "b1d3909e9013d4b166171cedbbdbf44261dc10e5c77af1a4675fa51bf8124082",
+    "certifiedMarkerPresent": false,
+    "preexistingCertifiedBindingMismatch": true,
+    "files": {
+      "/index.html": {
+        "status": 200,
+        "ok": true,
+        "sha256": "07571bf25485b07042f8a07d7510a323990f21d3cf809a76f99f5d39c454e7d0",
+        "bytes": 15768,
+        "cacheControl": "no-store, max-age=0"
+      },
+      "/core/pwa.js": {
+        "status": 200,
+        "ok": true,
+        "sha256": "0907d58c7df31e41ce07359a3fa0112f7d7c0ab7c55a3ff7a42d330a33023416",
+        "bytes": 9550,
+        "cacheControl": "no-store, max-age=0"
+      },
+      "/sw.js": {
+        "status": 200,
+        "ok": true,
+        "sha256": "4a2e172c11ae7ddb0e8266fe73a26f7a86d0dfc8674eaf536b83cd8a5d83e097",
+        "bytes": 6468,
+        "cacheControl": "no-store, max-age=0"
+      },
+      "/product-runtime-config.js": {
+        "status": 200,
+        "ok": true,
+        "sha256": "139c38ee633516bcf5b139f18b26ca22865443fcfa662325e0e140855f4e20bd",
+        "bytes": 408,
+        "cacheControl": "no-store, max-age=0"
+      },
+      "/__recovery__/build.json": {
+        "status": 404,
+        "ok": false,
+        "sha256": "a5209717d04e1213c517d38211b545d82963a4880c6524eb29713b8c4972df36",
+        "bytes": 21376,
+        "cacheControl": "no-store, max-age=0"
+      }
+    }
+  },
+  "candidateResolution": {
+    "resolvedToKnownCertifiedArtifact": false,
+    "reason": "Current LIVE readback fingerprint and sampled physical bytes do not match the certified hosted payload binding, and the immutable build marker is absent at /__recovery__/build.json. No available receipt establishes an unequivocal artifact/release binding for the current LIVE bytes.",
+    "productionConsequence": "BLOCKS_PRODUCTION_PROMOTION_UNTIL_EXACT_LINEAGE_IS_RESOLVED",
+    "previewConsequence": "DOES_NOT_BLOCK_ISOLATED_B4_003_PREVIEW"
+  },
+  "evidence": {
+    "readbackCapturedInline": true,
+    "dryRunReceipt": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_SECOND_REVIEW_DATA_DRYRUNS_20261007.json",
+    "controlPlane": "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json",
+    "pendingClosureMasterPlan": "artifacts/orbit360-recovery/release-control/I6_PENDING_CLOSURE_MASTER_PLAN_LOCK_20261004.json"
+  },
+  "guards": {
+    "LIVE_NOT_TOUCHED": true,
+    "DATA_WRITES_NOT_EXECUTED": true,
+    "B4_004_NOT_OPENED": true,
+    "B3_EVIDENCE_PRESERVED": true
+  }
+}

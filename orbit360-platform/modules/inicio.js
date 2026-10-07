@@ -25,12 +25,18 @@ Orbit.modules.inicio = (function () {
     </div>`;
   }
 
-  function dataReadiness(names) {
+  function dataReadiness(names, options) {
+    options = options || {};
     const store=Orbit.store;
     if(!store || store.__productReadOnlyP0 !== true || typeof store._productStatus !== 'function') return 'ready';
-    const ps=store._productStatus()||{}, confirmed=[].concat(ps.serverConfirmedCollections||[]), denied=[].concat(ps.deniedCollections||[]);
+    const ps=store._productStatus()||{}, confirmed=[].concat(ps.serverConfirmedCollections||[]), denied=[].concat(ps.deniedCollections||[]), optional=[].concat(ps.optionalCollections||[]), failed=Object.keys(ps.snapshotErrors||{});
     if(names.some(name=>denied.includes(name))) return 'unavailable';
-    return names.every(name=>confirmed.includes(name)) ? 'ready' : 'pending';
+    if(names.every(name=>confirmed.includes(name))) return 'ready';
+    if(options.optionalTerminal===true && ps.ready===true) {
+      const unresolved=names.filter(name=>!confirmed.includes(name));
+      if(unresolved.length && unresolved.every(name=>optional.includes(name)||failed.includes(name))) return 'unavailable';
+    }
+    return 'pending';
   }
   function pendingDial(label, readiness) {
     const txt=readiness==='unavailable'?'No disponible':'Actualizando datos';
@@ -101,7 +107,7 @@ Orbit.modules.inicio = (function () {
 
   function render(host) {
     try { if (Orbit.store && typeof Orbit.store._ensureCollections === 'function') Orbit.store._ensureCollections(['clientes','polizas','asesores','metas','cobros','recibosEsperados','carteraPrimas']); } catch (_) {}
-    const clientReadiness=dataReadiness(['clientes']), policyReadiness=dataReadiness(['clientes','polizas']), productionReadiness=dataReadiness(['clientes','polizas']), metaReadiness=dataReadiness(['asesores','metas']), paymentReadiness=dataReadiness(['clientes','polizas','cobros','recibosEsperados','carteraPrimas']), portfolioReadiness=dataReadiness(['clientes','polizas','carteraPrimas']);
+    const clientReadiness=dataReadiness(['clientes']), policyReadiness=dataReadiness(['clientes','polizas']), productionReadiness=dataReadiness(['clientes','polizas']), metaReadiness=dataReadiness(['asesores','metas'],{optionalTerminal:true}), paymentReadiness=dataReadiness(['clientes','polizas','cobros','recibosEsperados','carteraPrimas']), portfolioReadiness=dataReadiness(['clientes','polizas','carteraPrimas']);
     const mesKey=q.currentMonthKey?q.currentMonthKey():U.monthKey();
     const production=productionReadiness==='ready'&&q.produccionMesPorMoneda?q.produccionMesPorMoneda(mesKey):{};
     const recaudoMes=paymentReadiness==='ready'&&q.recaudoMesPorMoneda?q.recaudoMesPorMoneda(mesKey):{};

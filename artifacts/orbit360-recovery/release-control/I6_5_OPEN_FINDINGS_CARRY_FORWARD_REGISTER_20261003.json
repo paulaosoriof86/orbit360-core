@@ -4,7 +4,7 @@
   "authority": "FAIL_CLOSED_FINDING_CONTINUITY",
   "sourceLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
   "sourceLedgerPreviousBlobSha": "bfac4a737619f6bdf90d65ce88a96e812ab86dfd",
-  "expectedLedgerNextBlobSha": "e03a5b251973a0234668a4f2cd2c6e9e17658587",
+  "expectedLedgerNextBlobSha": "0c079ceb72cabf3bff60cd362d362d99ec10d389",
   "policy": {
     "allLedgerFindingsMustAppearExactlyOnce": true,
     "newHumanFindingsMustBeIndividualLedgerEntries": true,
@@ -10968,14 +10968,46 @@
     "dataMutationAuthorized": false
   },
   "liveReleaseBindingDrift": {
-    "status": "PREEXISTING_DRIFT_BLOCKS_PRODUCTION_PROMOTION",
+    "status": "LIVE_LINEAGE_UNRESOLVED",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_LIVE_LINEAGE_READONLY_RECONCILIATION_20261007.json",
+    "receiptBlobSha": "14202afa60cf1c0117e10e7bd2bde1454a0327a4",
     "fingerprint": "b1d3909e9013d4b166171cedbbdbf44261dc10e5c77af1a4675fa51bf8124082",
+    "certifiedBindingMismatch": true,
+    "certifiedMarkerPresent": false,
     "blocksPreview": false,
-    "blocksProduction": true
+    "blocksProduction": true,
+    "productionPromotionAuthorized": false
   },
   "r20SecondReviewContinuitySync": {
     "status": "EXACT_LEDGER_SET_AND_PARENT_STATE_SYNCED",
     "ledgerBlobSha": "e03a5b251973a0234668a4f2cd2c6e9e17658587",
     "inventoryCount": 282
+  },
+  "r20SecondReviewInicioReadinessRootFix": {
+    "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_SECOND_REVIEW_INICIO_READINESS_ROOTFIX_20261007.json",
+    "blobSha": "d4d6322d665d7c8f699d757656457b2224386d5a"
+  },
+  "r20SecondReviewDrivePreviewBackendBindingRootFix": {
+    "status": "QA_PREVIEW_BACKEND_BINDING_FIXED_PENDING_EXACT_PREVIEW",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_SECOND_REVIEW_DRIVE_PREVIEW_BACKEND_BINDING_ROOTFIX_20261007.json",
+    "blobSha": "fa69dc5d48eab1bdf488b7a01e8e5dd09b61f819",
+    "workflowPath": ".github/workflows/gravicentra-b4-003-executor.yml",
+    "workflowBlobSha": "68e906c5fe5d5c2a1480c6db698373110185ce5e",
+    "addedPreviewFunctions": [
+      "orbit360DocumentDriveListFolderPreview",
+      "orbit360DocumentDriveReadDossierPreview",
+      "orbit360DocumentDriveBootstrapPreview"
+    ],
+    "productionFunctionsDeployed": false,
+    "nextAction": "B4_003_R20_CONTRACT_AND_EXACT_PREVIEW"
+  },
+  "r20SecondReviewPolicyFirstPaintContractRootFix": {
+    "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_SECOND_REVIEW_POLICY_FIRST_PAINT_CONTRACT_ROOTFIX_20261007.json",
+    "blobSha": "6cb7ad5fe65c0a5a7bca52cbd2685373eeca4176",
+    "productFile": "orbit360-platform/modules/polizas.js",
+    "productBlobSha": "ff6c77a3beb935edf2aa2bb66f2c7ae415848cfb",
+    "nextAction": "B4_003_R20_CONTRACT_AND_EXACT_PREVIEW"
   }
 }

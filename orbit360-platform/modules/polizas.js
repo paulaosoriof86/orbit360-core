@@ -93,13 +93,13 @@ Orbit.modules.polizas = (function () {
     indexCache = {
       policies, clientsById, insurersById, advisorsById,
       ramoOptions, insurerOptions, advisorOptions,
-      basicSearchTextByPolicy:null, vehicleSearchTextByPolicy:null
+      basicSearchIndex:null, vehicleSearchIndex:null
     };
     return indexCache;
   }
 
   function ensureBasicSearchIndex(I) {
-    if (I.basicSearchTextByPolicy) return I.basicSearchTextByPolicy;
+    if (I.basicSearchIndex) return I.basicSearchIndex;
     const out=new Map();
     I.policies.forEach(p => {
       if (!p || p.id == null) return;
@@ -107,12 +107,12 @@ Orbit.modules.polizas = (function () {
       const clienteTxt=cli ? [cli.nombre,cli.identificacion,cli.email,cli.telefono].filter(Boolean).join(' ') : '';
       out.set(p.id,[p.numero,p.ramo,p.producto,p.subramo,clienteTxt,p.placa].filter(Boolean).join(' ').toLowerCase());
     });
-    I.basicSearchTextByPolicy=out;
+    I.basicSearchIndex=out;
     return out;
   }
 
   function ensureVehicleSearchIndex(I) {
-    if (I.vehicleSearchTextByPolicy) return I.vehicleSearchTextByPolicy;
+    if (I.vehicleSearchIndex) return I.vehicleSearchIndex;
     const out=new Map();
     const vehicles=S().all('vehiculos') || [];
     vehicles.forEach(v => {
@@ -122,7 +122,7 @@ Orbit.modules.polizas = (function () {
       const key=v.polizaId, previous=out.get(key) || '';
       out.set(key,(previous+' '+text).trim());
     });
-    I.vehicleSearchTextByPolicy=out;
+    I.vehicleSearchIndex=out;
     return out;
   }
 
