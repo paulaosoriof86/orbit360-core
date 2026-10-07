@@ -3,8 +3,8 @@
   "recordedAt": "2026-10-05T13:27:00-06:00",
   "authority": "FAIL_CLOSED_FINDING_CONTINUITY",
   "sourceLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-  "sourceLedgerPreviousBlobSha": "35105b099e4a33be237149071c2d1e95b3396ff0",
-  "expectedLedgerNextBlobSha": "6db251a806cbfd4b4f7cde4f41f466cf76600e87",
+  "sourceLedgerPreviousBlobSha": "6db251a806cbfd4b4f7cde4f41f466cf76600e87",
+  "expectedLedgerNextBlobSha": "c7d35adb3f980cae310a5f7051c77715e8f485a2",
   "policy": {
     "allLedgerFindingsMustAppearExactlyOnce": true,
     "newHumanFindingsMustBeIndividualLedgerEntries": true,
@@ -16,7 +16,7 @@
     "deferredItemsRequireOwnerTargetGateAndClosureCondition": true,
     "machinePassNeverSubstitutesRequiredHumanVisualPass": true
   },
-  "inventoryCount": 264,
+  "inventoryCount": 279,
   "attentionCount": 155,
   "inventory": [
     {
@@ -10138,7 +10138,7 @@
     "B3-CARRY-RENEWAL-COMPARATIVE-ENGINE-20260929",
     "B4-CARRY-PORTAL-IMPORT-EMAIL-TRACEABILITY-R6"
   ],
-  "b4AdvanceRule": "B4-004 remains held until exact R20 follow-up Preview closes all current blocking IDs and Paula explicitly accepts the targeted visual/UAT.",
+  "b4AdvanceRule": "B4-004 remains held until the second R20 human-review findings are causally remediated, exact Preview passes, and Paula explicitly accepts the complete targeted UAT checklist.",
   "liveRule": "LIVE remains forbidden until later promotion gate; R20 Quality carry stays visible and must be resolved in next authorized step but is non-blocking for B4-003.",
   "r12DiagnosticPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R12_REMAINING_BLOCKERS_CAUSAL_DIAGNOSTIC_20261003.json",
   "r12DiagnosticBlobSha": "5a50b96370707358f6d40ea4cdd21a52ac9d999c",
@@ -10411,5 +10411,12 @@
       "B4-003-R20-B08"
     ],
     "humanStatus": "REJECTED_PENDING_RETEST"
+  },
+  "r20SecondHumanReview": {
+    "status": "FROZEN_REJECTED",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_SECOND_PAULA_VISUAL_REJECTION_NOLOSS_20261007.json",
+    "blobSha": "2767c83eed40b42a1445b2d6c512b3284a1c9c31",
+    "preservedExistingBlockers": true,
+    "newBlockingFindingCount": 15
   }
 }
