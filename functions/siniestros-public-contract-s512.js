@@ -140,6 +140,34 @@ function validatedChannelRegistrySummary(){
   });
 }
 
+function resolveValidatedGtAssistance({insurerName,aysWhatsapp,aysEmail}={}){
+  const row=validatedGtChannel(insurerName);
+  const fallbacks=[];
+  const wa=clean(aysWhatsapp,40),email=clean(aysEmail,220);
+  if(wa)fallbacks.push(Object.freeze({type:'whatsapp',owner:'A&S',value:wa,validated:true}));
+  if(email)fallbacks.push(Object.freeze({type:'email',owner:'A&S',value:email,validated:true}));
+  return Object.freeze({
+    country:'GT',
+    insurerName:clean(insurerName,180),
+    insurerChannel:row?Object.freeze({
+      type:row.type,
+      owner:'insurer',
+      value:row.channel,
+      scope:row.scope,
+      validated:true,
+      reviewedAt:row.reviewedAt,
+      sourceUrl:row.sourceUrl
+    }):null,
+    insurerChannelStatus:row?'CURRENT_CHANNEL_VALIDATED':'NO_VALIDATED_INSURER_CHANNEL',
+    fallbackChannels:Object.freeze(fallbacks),
+    truth:Object.freeze({
+      channelIsContactOnly:true,
+      coverageConfirmed:false,
+      eligibilityConfirmed:false
+    })
+  });
+}
+
 function channelFreshnessStatus({emergencyContact,lastReviewedAt,officialEvidenceVerified}={}){
   const contact=clean(emergencyContact,220);
   const reviewed=clean(lastReviewedAt,40);
@@ -193,5 +221,5 @@ function assistanceChannelProjection({insurer,aysWhatsapp,aysEmail}={}){
 
 module.exports=Object.freeze({
   VERSION,INTERNAL_STATES,PUBLIC_STATE,VALIDATED_GT_CHANNELS,POLICY,
-  clean,norm,publicState,publicClaimProjection,assistanceTruth,documentRequestAllowed,insurerKey,validatedGtChannel,validatedChannelRegistrySummary,channelFreshnessStatus,resolvePublicAssistanceChannels,assistanceChannelProjection
+  clean,norm,publicState,publicClaimProjection,assistanceTruth,documentRequestAllowed,insurerKey,validatedGtChannel,validatedChannelRegistrySummary,resolveValidatedGtAssistance,channelFreshnessStatus,resolvePublicAssistanceChannels,assistanceChannelProjection
 });
