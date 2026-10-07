@@ -3702,5 +3702,12 @@
     "findingLedgerBlobSha": "0dfaa45d2ed9524044bed523386926039dfbd653",
     "continuityRegisterBlobSha": "ad92f13d76d4ce422b4fd5c5d46ed6251bfcb595",
     "masterPlanBlobSha": "9495c3c7bf30c80066d154692e8dfca4855689c7"
+  },
+  "r20SecondReviewPreview": {
+    "status": "SOURCE_FROZEN_PENDING_EXACT_PREVIEW",
+    "findingLedgerBlobSha": "e03a5b251973a0234668a4f2cd2c6e9e17658587",
+    "continuityRegisterBlobSha": "31c6646999730ea0c77021818cfa4dddaf8908a7",
+    "masterPlanBlobSha": "43c8e73dad2eebef5a52a958a8aa7fbef92eb36f",
+    "tinyFishRequiredBeforePaulaHandoff": true
   }
 }
