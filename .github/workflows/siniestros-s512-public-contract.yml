@@ -6,6 +6,7 @@ on:
     branches:
       - ays/siniestros-public-contract-s512-20261007
       - ays/siniestros-s512a-channel-freshness-20261007
+      - ays/siniestros-s512b-validated-channel-registry-20261007
     paths:
       - 'functions/siniestros-public-contract-s512.js'
       - 'functions/siniestros-public-contract-s512.test.js'
