@@ -7,15 +7,16 @@ const path=require('node:path');
 
 const ciclo=()=>fs.readFileSync(path.join(__dirname,'..','orbit360-platform','core','ciclo.js'),'utf8');
 
-test('S5.10 lead card exposes product, origin, risk, contact availability, stage and advisor summary',()=>{
+test('S5.10 lead card preserves product, origin, risk, contact, stage, premium and advisor information',()=>{
   const src=ciclo();
   assert.match(src,/function leadRiskSummary/);
   assert.match(src,/function leadContactSummary/);
   assert.match(src,/function leadOrigin/);
-  assert.match(src,/Producto \/ familia/);
-  assert.match(src,/Canal de ingreso/);
+  assert.match(src,/const product = U\.text\(n\.producto \|\| n\.ramo/);
+  assert.match(src,/Origen y país/);
   assert.match(src,/Resumen del riesgo/);
   assert.match(src,/Datos de contacto disponibles/);
+  assert.match(src,/Estado comercial/);
   assert.match(src,/Asesor responsable/);
   assert.match(src,/Prima por definir/);
 });
