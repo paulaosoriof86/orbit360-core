@@ -19,9 +19,9 @@
     "conversationIsNotAuthority": true
   },
   "counts": {
-    "total": 280,
+    "total": 281,
     "b2HumanFindings": 61,
-    "currentBlocking": 41,
+    "currentBlocking": 42,
     "countingNote": "Second R20 visual review remains open. Transversal visual hierarchy finding V2-16 added and must receive explicit Paula Preview pass.",
     "currentBlockingB2B3": 0,
     "lastReconciledAt": "2026-10-07"
@@ -10401,6 +10401,26 @@
       "r20VisualWhatsappRequirementsBlobSha": "d47601187d98dbdf56c749f4b3e5ad4676778ce6",
       "nextAction": "B4_003_R20_SECOND_REVIEW_SINGLE_CUMULATIVE_SOURCE_FIX",
       "mayDisappearWithoutDisposition": false
+    },
+    {
+      "id": "B4-003-R20-V2-16-SURFACE-HIERARCHY",
+      "block": "B4",
+      "targetGate": "B4-003",
+      "surface": "Transversal UI",
+      "finding": "Cards, panels, informational blocks, content boxes, secondary containers, section backgrounds and borders need stronger perceptible surface separation and hierarchy without altering the approved typography.",
+      "owner": [
+        "orbit360-platform/styles/infra.css",
+        "all R20 touched surfaces"
+      ],
+      "status": "SOURCE_FIX_IN_PROGRESS_PENDING_EXACT_PREVIEW_AND_PAULA_UAT",
+      "blocking": true,
+      "rootCause": "Newly corrected surfaces inherited low-contrast flat card grammar inconsistently; typography is approved and must remain unchanged.",
+      "remediation": "Apply one canonical surface grammar with more background/card contrast, border/shadow separation, spacing and heading hierarchy; preserve approved font families and semantic brand-color grammar.",
+      "closureCondition": "Exact Preview + Paula visual pass across Ops/Leads card, inbox, insurer Products/Documents/Knowledge/Activity, Quality and Renewals.",
+      "humanVisualStatus": "REJECTED_R20_SECOND_REVIEW",
+      "addendumPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_VISUAL_SYSTEM_AND_WHATSAPP_ARCHITECTURE_ADDENDUM_20261007.json",
+      "addendumBlobSha": "e3816c831e273a975461a0961de20c4a180ca6cd",
+      "nextAction": "B4_003_R20_SECOND_REVIEW_SINGLE_CUMULATIVE_SOURCE_FIX"
     }
   ],
   "phaseBBacklog": [
@@ -10774,7 +10794,7 @@
     "requiredBeforeAdvance": "B4_003_TARGETED_PAULA_VISUAL_PASS",
     "currentB4003HumanStatus": "REJECTED_R13"
   },
-  "lastUpdatedAt": "2026-10-07T09:32:00-06:00",
+  "lastUpdatedAt": "2026-10-07T08:58:00-06:00",
   "lastR16SourceFix": {
     "status": "SOURCE_FIXED_R16_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "receiptBlobSha": "dcd545e14795e387a8f67130d5fa51aabfcd63ce",
@@ -10998,5 +11018,12 @@
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_SECOND_PAULA_VISUAL_REJECTION_NOLOSS_20261007.json",
     "blobSha": "2767c83eed40b42a1445b2d6c512b3284a1c9c31",
     "newFindingCount": 15
+  },
+  "r20VisualSystemAndWhatsAppArchitecture": {
+    "status": "FROZEN_IN_CURRENT_B4_003",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_VISUAL_SYSTEM_AND_WHATSAPP_ARCHITECTURE_ADDENDUM_20261007.json",
+    "blobSha": "e3816c831e273a975461a0961de20c4a180ca6cd",
+    "visualFindingId": "B4-003-R20-V2-16-SURFACE-HIERARCHY",
+    "whatsappCommunityAutomation": "NOT_ASSUMED_UNTIL_OFFICIAL_META_API_SUPPORT_DEMONSTRATED"
   }
 }
