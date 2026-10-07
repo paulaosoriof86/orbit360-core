@@ -1,0 +1,18 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R20_POST_MACHINE_GUARD_REQUEST_V1",
+  "status": "POST_MACHINE_GUARD_REQUESTED",
+  "machineProofPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_MACHINE_PROOF_20261007.json",
+  "machineProofBlobSha": "e0f3d4a73cdeb6a52a864a6264f83920df12f599",
+  "machineProofRunId": 37569139879,
+  "certifiedSourceSha": "9bc3df4c7701e5aae06df3889bd5cdbc794c560b",
+  "certifiedBuildId": "gi-i65-b4-9bc3df4c7701-57f234755dc1",
+  "purpose": "Trigger the central governance guard after the atomic machine-pass freeze. This receipt does not change product source, release bytes, data, LIVE or human finding status.",
+  "boundaries": {
+    "productSourceChanged": false,
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false,
+    "humanStatusChanged": false,
+    "b4004Held": true
+  }
+}
