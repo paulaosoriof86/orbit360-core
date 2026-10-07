@@ -1,0 +1,28 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R20_SECOND_REVIEW_COLLAB_ATTACHMENT_SET_FLATTEN_CLEANUP_ROOTFIX_V1",
+  "recordedAt": "2026-10-07T18:12:00Z",
+  "status": "SOURCE_FIXED_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+  "findingId": "B4-003-R20-B12",
+  "failedRunId": 37663659220,
+  "failedSourceSha": "e81235baf3704bbdfa6cceb1b1b303c04cc11e02",
+  "failedProofCommitSha": "509f00261",
+  "failedPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b4-37663659220-8v1qm4h8.web.app",
+  "failureMessage": "El documento no pertenece al expediente autorizado.",
+  "rootCause": "BUSINESS_HISTORY_USED_ARRAY_FLATMAP_WITH_A_SET_RETURN_VALUE_SO_DOCUMENT_IDS_REMAINED_WRAPPED_IN_SET_OBJECTS_AND_COULD_NEVER_MATCH_THE_STRING_FILE_ID",
+  "secondaryPreventedDefect": "PREVIEW_CLEANUP_USED_A_NARROWER_BINDING_SET_THAN_READ_AUTHORIZATION_AND_WOULD_REJECT_THE_SAME_AUTHORIZED_BUSINESS_ATTACHMENT_AFTER_A_SUCCESSFUL_READ",
+  "fix": "Flatten each explicit reference Set to an array and reuse one refsForTarget authorization projection for both document read and Preview cleanup.",
+  "productBlobs": {
+    "functions/document-drive-domain.js": "928dc218aa09be4648552f84502e50f4c0d65227"
+  },
+  "qaBlobs": {
+    "tools/gravicentra-i6-5-b4-003-contract.mjs": "593f51e2063ec91d3af242bce409bea0575acd96",
+    "tools/gravicentra-i6-5-b4-003-preview-proof.mjs": "7bf12a2d8edd084fabadec979952838098573679"
+  },
+  "authorizationBoundary": "SAME_AUTHORIZED_TARGET_EXPLICIT_BOUND_REFERENCES_ONLY",
+  "dataMutation": false,
+  "operationalBusinessWrites": 0,
+  "reimport": false,
+  "live": false,
+  "b4004Held": true,
+  "nextAction": "B4_003_R20_CONTRACT_AND_EXACT_PREVIEW"
+}

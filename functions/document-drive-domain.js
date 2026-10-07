@@ -295,6 +295,18 @@ function refsFrom(row){
   if(row&&typeof row==='object')out.push(clean(row.documentRef||row.fileId||row.archivoRef,180)||driveIdFromUrl(row.driveUrl||row.externalUrl||row.url||''));
   return new Set(out.filter(Boolean));
 }
+function refsForTarget(target){
+  const businessHistory=[
+    ...(Array.isArray(target&&target.business&&target.business.comentarios)?target.business.comentarios:[]),
+    ...(Array.isArray(target&&target.business&&target.business.bitacora)?target.business.bitacora:[])
+  ];
+  return new Set([
+    ...refsFrom(target&&target.row),
+    ...refsFrom(target&&target.management||{}),
+    ...refsFrom(target&&target.business||{}),
+    ...businessHistory.flatMap(row=>[...refsFrom(row)])
+  ]);
+}
 async function authorizeDocument(request,previewOnly,mode){
   const input=request.data||{};
   const tenantId=__productOperationalDomain.cleanId(input.tenantId,'tenantId');
@@ -302,16 +314,7 @@ async function authorizeDocument(request,previewOnly,mode){
   if(previewOnly===true&&!previewSyntheticTarget(target))throw new HttpsError('permission-denied','Preview documental automatizado solo admite expedientes sintéticos autorizados.');
   const fileId=clean(input.documentRef||input.fileId||input.archivoRef,180)||driveIdFromUrl(input.driveUrl||input.externalUrl||input.url||'');
   if(!/^[A-Za-z0-9_-]{20,}$/.test(fileId))throw new HttpsError('invalid-argument','Referencia documental inválida.');
-  const businessHistory=[
-    ...(Array.isArray(target.business&&target.business.comentarios)?target.business.comentarios:[]),
-    ...(Array.isArray(target.business&&target.business.bitacora)?target.business.bitacora:[])
-  ];
-  const bound=new Set([
-    ...refsFrom(target.row),
-    ...refsFrom(target.management||{}),
-    ...refsFrom(target.business||{}),
-    ...businessHistory.flatMap(refsFrom)
-  ]);
+  const bound=refsForTarget(target);
   if(!bound.has(fileId))throw new HttpsError('permission-denied','El documento no pertenece al expediente autorizado.');
   return{tenantId,target,fileId};
 }
@@ -506,7 +509,7 @@ async function cleanupPreviewDocument(request){
   if(!previewSyntheticTarget(target))throw new HttpsError('permission-denied','La limpieza QA de Drive solo admite expedientes sintéticos de Preview.');
   const fileId=clean(input.documentRef||input.fileId||input.archivoRef,180)||driveIdFromUrl(input.driveUrl||input.externalUrl||input.url||'');
   if(!/^[A-Za-z0-9_-]{20,}$/.test(fileId))throw new HttpsError('invalid-argument','Referencia documental inválida.');
-  const bound=new Set([...refsFrom(target.row),...refsFrom(target.management||{})]);
+  const bound=refsForTarget(target);
   if(!bound.has(fileId))throw new HttpsError('permission-denied','El documento QA no pertenece al expediente sintético autorizado.');
   const auth=await tenantDriveToken(tenantId,true),accessToken=auth.accessToken;
   const meta=await getMeta(fileId,accessToken);
