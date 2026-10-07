@@ -81,6 +81,26 @@ function channelFreshnessStatus({emergencyContact,lastReviewedAt,officialEvidenc
   return Object.freeze({publishable:true,code:'CURRENT_CHANNEL_VALIDATED',lastReviewedAt:reviewed});
 }
 
+function resolvePublicAssistanceChannels({insurer,aysWhatsapp,aysEmail,officialEvidenceVerified}={}){
+  const whatsapp=clean(aysWhatsapp,40);
+  const email=clean(aysEmail,220);
+  const emergency=clean(insurer&&(insurer.emergencia||insurer.assistance||insurer.emergency),220);
+  const reviewed=clean(insurer&&(insurer.ultimaRevision||insurer.lastReviewedAt),40);
+  const freshness=channelFreshnessStatus({emergencyContact:emergency,lastReviewedAt:reviewed,officialEvidenceVerified});
+  const base=[];
+  if(whatsapp)base.push(Object.freeze({type:'whatsapp',value:whatsapp,owner:'A&S',validated:true}));
+  if(email)base.push(Object.freeze({type:'email',value:email,owner:'A&S',validated:true}));
+  return Object.freeze({
+    channels:Object.freeze(base),
+    insurerChannel:freshness.publishable?Object.freeze({type:'insurer_emergency',value:emergency,owner:'insurer',validated:true,lastReviewedAt:reviewed}):null,
+    insurerChannelStatus:freshness.code,
+    truth:Object.freeze({
+      requestChannelDoesNotConfirmCoverage:true,
+      requestChannelDoesNotConfirmEligibility:true
+    })
+  });
+}
+
 function assistanceChannelProjection({insurer,aysWhatsapp,aysEmail}={}){
   const emergency=clean(insurer&&(insurer.emergencia||insurer.assistance||insurer.emergency),220);
   const lastReviewedAt=clean(insurer&&(insurer.ultimaRevision||insurer.lastReviewedAt),40);
@@ -105,5 +125,5 @@ function assistanceChannelProjection({insurer,aysWhatsapp,aysEmail}={}){
 
 module.exports=Object.freeze({
   VERSION,INTERNAL_STATES,PUBLIC_STATE,POLICY,
-  clean,publicState,publicClaimProjection,assistanceTruth,documentRequestAllowed,channelFreshnessStatus,assistanceChannelProjection
+  clean,publicState,publicClaimProjection,assistanceTruth,documentRequestAllowed,channelFreshnessStatus,resolvePublicAssistanceChannels,assistanceChannelProjection
 });
