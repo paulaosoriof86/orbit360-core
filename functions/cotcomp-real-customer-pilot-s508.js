@@ -99,7 +99,7 @@ async function post(req,res){
     await member.delete();
     return res.status(201).json({ok:true,status:'REGISTERED',reference,assignedTo:'Paula Osorio'});
   }catch(err){
-    try{await member.delete();await release(d,{lastFailureAt:new Date().toISOString(),lastFailureCode:clean(err&&(err.code||err.message),120)});}catch{}
+    try{const m=await mode(d),b=bizRef(d,m,x.businessId),q=d.collection('tenants').doc(TENANT_ID).collection('workflowRequests').doc(x.requestId),e=d.collection('tenants').doc(TENANT_ID).collection('workflowEvents').doc(x.eventId),o=d.collection('tenants').doc(TENANT_ID).collection('notificationOutbox').doc(x.eventId);const batch=d.batch();for(const ref of [b,q,e,o]){const s=await ref.get();if(s.exists)batch.delete(ref);}await batch.commit();await member.delete();await release(d,{used:false,lastFailureAt:new Date().toISOString(),lastFailureCode:clean(err&&(err.code||err.message),120)});}catch{}
     return res.status(500).json({ok:false,message:'No fue posible registrar la solicitud. Usa WhatsApp +502 5614 9048 o info@aysseguros.com.'});
   }
 }
