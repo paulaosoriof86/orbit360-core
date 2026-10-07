@@ -1,0 +1,44 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R20_SECOND_REVIEW_VISUAL_AND_WHATSAPP_REQUIREMENTS_V1",
+  "recordedAt": "2026-10-07T09:31:00-06:00",
+  "status": "REQUIREMENTS_FROZEN",
+  "visualStandard": {
+    "blockingForB4003HumanAcceptance": true,
+    "scope": "Transversal: cards, panels, bloques informativos, cajas de contenido, contenedores secundarios, fondos de sección y bordes.",
+    "requirements": [
+      "Increase contrast between page/section background and cards without making the interface aggressive.",
+      "Increase visual separation between functional blocks.",
+      "Make primary/secondary/informative/action hierarchy immediately legible.",
+      "Use borders, elevation, whitespace and restrained background changes consistently.",
+      "Preserve the approved typography family and scale; do not reintroduce mixed typographies.",
+      "Use Gravicentra brand color grammar consistently; yellow/amber is reserved for pending/warning semantics, not as a generic redesign accent."
+    ],
+    "reviewRule": "No visual PASS from machine proof alone. Human review must explicitly inspect hierarchy, contrast, typography consistency and block separation on each changed surface."
+  },
+  "whatsappArchitecture": {
+    "status": "ARCHITECTURE_REVIEW_REQUIRED_NOT_ASSUMED_AS_B4_SCOPE",
+    "intent": "Centralize WhatsApp-origin interactions and link them to canonical Clientes, Negocios/Gestiones and collaboration history.",
+    "preferredModel": [
+      "Treat Gravicentra as system of record for business entities and workflow state.",
+      "Receive supported WhatsApp Business Platform messages/events via webhook and resolve sender/group context to client/business/management records.",
+      "Store a canonical conversation/event reference, not raw secrets, and surface actions from the linked Client/Lead/Ops record.",
+      "Do not make WhatsApp Communities an assumed programmable backend until official API support/eligibility is proven for the tenant.",
+      "If supported group messaging is available for the tenant, model group/channel identifiers separately from client phone identities and require explicit mapping/audit."
+    ],
+    "b4003Impact": "Do not expand current B4-003 into a new external integration build. Preserve this as a frozen architecture requirement; current Ops/Leads collaboration must remain provider-agnostic so WhatsApp can attach later without redesign."
+  },
+  "findingExtension": {
+    "id": "B4-003-R20-V2-16-TRANSVERSAL-VISUAL-HIERARCHY",
+    "status": "PAULA_VISUAL_REJECTED_R20_SECOND_REVIEW_REMEDIATION_REQUIRED",
+    "blocking": true,
+    "surface": "All changed B4-003 surfaces",
+    "closureCondition": "Paula targeted Preview review confirms contrast, separation, hierarchy and typography consistency across Ops/Leads modal+cards, inbox, Aseguradoras three workbenches and Calidad."
+  },
+  "boundaries": {
+    "b4004Held": true,
+    "noLive": true,
+    "noReimport": true,
+    "dataMutation": false,
+    "noTypographyRegression": true
+  }
+}
