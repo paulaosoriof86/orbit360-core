@@ -285,9 +285,9 @@
     "gate": "I6.5 / B4-003",
     "status": "SOURCE_FIXED_R20_FOLLOWUP_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_R20_CONTRACT_AND_EXACT_PREVIEW",
-    "why": "R20 follow-up cumulative source fix materialized; immutable exact Preview proof required before Paula retest; B4-004 held.",
+    "why": "Authenticated R20 exact Preview readback passed but Aseguradoras human UI exposed technical vocabulary and lacked perceptible premium hierarchy. Narrow source rootfix is now frozen; exact immutable Preview proof is required before Paula retest; B4-004 remains held.",
     "currentCandidateReview": "R20_REJECTED_BLOCKERS_PLUS_AUTHORIZED_QUALITY_CARRY",
-    "sourceSha": "41c38ff22f026f2a503d1814817e4a5d671904a4",
+    "sourceSha": "86a54019ce2500b65ea2745517bde4dd5a5eecef",
     "buildId": "gi-i65-b4-41c38ff22f02-57f234755dc1",
     "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-37486500112-bx1qyk0h.web.app",
     "machineProofRunId": 37486500112,
@@ -6218,7 +6218,9 @@
   "carryForwardIntegrity": {
     "inventoryCount": 208,
     "attentionCount": 103,
-    "registerSetMustEqualLedgerSet": true
+    "registerSetMustEqualLedgerSet": true,
+    "latestLedgerBlobSha": "6db251a806cbfd4b4f7cde4f41f466cf76600e87",
+    "latestCarryBlobSha": "bae26681cf60e42459ab8c379373ac76bb9f1919"
   },
   "dataProtection": {
     "alreadyAppliedDoNotRepeat": [
@@ -6552,5 +6554,20 @@
       "B4-003-R20-B02",
       "B4-003-R20-B10"
     ]
+  },
+  "r20FollowupInsurerVisualRootFix": {
+    "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_FOLLOWUP_INSURER_VISUAL_ROOTFIX_20261007.json",
+    "blobSha": "2fbd7532a778013df05d1b8107769a563ea3a30a",
+    "sourceCommit": "86a54019ce2500b65ea2745517bde4dd5a5eecef",
+    "sourceBlob": "32d35bfcb0045632346af96984b03c7dccdc9dee",
+    "findings": [
+      "B4-003-R20-B05",
+      "B4-003-R20-B06",
+      "B4-003-R20-B08"
+    ],
+    "ledgerBlobSha": "6db251a806cbfd4b4f7cde4f41f466cf76600e87",
+    "carryBlobSha": "bae26681cf60e42459ab8c379373ac76bb9f1919",
+    "b4004Held": true
   }
 }
