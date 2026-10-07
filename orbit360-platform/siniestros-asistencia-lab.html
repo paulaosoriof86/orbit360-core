@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="referrer" content="no-referrer">
+  <title>A&S · Siniestros y Asistencia · LAB</title>
+  <style>
+    :root{font-family:Inter,Segoe UI,Arial,sans-serif;color:#171717;background:#f5f3f0;--red:#c9152b;--line:#ded8d2;--muted:#666;--card:#fff}
+    *{box-sizing:border-box}body{margin:0;min-height:100vh;background:linear-gradient(180deg,#fff,#f0ede9)}
+    .wrap{max-width:980px;margin:auto;padding:24px}.top{display:flex;align-items:center;gap:14px}.brand{font-size:20px;font-weight:800}.brand b{color:var(--red)}.lab{margin-left:auto;background:#171717;color:#fff;border-radius:999px;padding:7px 10px;font-size:11px}
+    .hero{margin-top:20px;background:#171717;color:#fff;border-radius:22px;padding:28px}.hero h1{margin:0 0 8px;font-size:34px}.hero p{margin:0;color:#ddd;line-height:1.55}
+    .safety{margin-top:16px;padding:16px;border-left:5px solid var(--red);background:#fff5f6;border-radius:12px;line-height:1.5}.safety b{color:#8c1020}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:18px}.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px}.card h2,.card h3{margin:0 0 10px}.muted{color:var(--muted);line-height:1.5}
+    label{display:block;font-weight:700;font-size:13px;margin:12px 0 6px}select{width:100%;padding:12px;border:1px solid #bbb4ad;border-radius:10px;background:#fff}.btn{margin-top:14px;border:0;border-radius:10px;padding:11px 14px;background:var(--red);color:#fff;font-weight:800;cursor:pointer}.btn:disabled{opacity:.5}
+    .result{margin-top:14px;padding:14px;border-radius:12px;background:#f8f6f3;border:1px solid var(--line)}.hidden{display:none!important}.channel{padding:12px;border-radius:10px;background:#fff;border:1px solid var(--line);margin-top:8px}.channel strong{display:block}.truth{font-size:12px;color:#6b6260;line-height:1.45;margin-top:10px}
+    .routes{display:grid;gap:8px}.route{padding:12px;border:1px solid var(--line);border-radius:10px;background:#fff}.route b{display:block;margin-bottom:3px}.status{font-size:13px;color:var(--muted);margin-top:10px}
+    @media(max-width:760px){.wrap{padding:14px}.grid{grid-template-columns:1fr}.hero{padding:22px}.hero h1{font-size:28px}}
+  </style>
+</head>
+<body>
+<main class="wrap">
+  <header class="top"><div class="brand"><b>A&S</b> · Alianzas y Soluciones</div><div class="lab">Siniestros S5.12D · LAB</div></header>
+
+  <section class="hero">
+    <h1>Siniestros y asistencia</h1>
+    <p>Primero seguridad. Después identificamos qué necesitas hacer y te mostramos únicamente canales validados o una ruta de continuidad con A&S.</p>
+  </section>
+
+  <section class="safety">
+    <b>¿Hay una situación de peligro inmediato?</b><br>
+    Prioriza los servicios de emergencia y seguridad que correspondan a tu situación y ubicación. Este flujo no reemplaza a autoridades, servicios médicos ni a la aseguradora.
+  </section>
+
+  <div class="grid">
+    <section class="card">
+      <h2>¿Qué necesitas hacer?</h2>
+      <div class="routes">
+        <div class="route"><b>Solicitar asistencia</b><span class="muted">Necesitas apoyo inmediato relacionado con el evento.</span></div>
+        <div class="route"><b>Avisar o reportar</b><span class="muted">Quieres informar que ocurrió un evento.</span></div>
+        <div class="route"><b>Presentar una reclamación</b><span class="muted">Necesitas iniciar o estructurar el reclamo correspondiente.</span></div>
+        <div class="route"><b>Consultar o dar seguimiento</b><span class="muted">Ya existe una gestión y buscas conocer el siguiente paso.</span></div>
+      </div>
+      <p class="truth">Reportar no confirma cobertura. Solicitar asistencia no confirma elegibilidad. Un caso abierto no equivale a indemnización.</p>
+    </section>
+
+    <section class="card">
+      <h2>Canal de asistencia validado</h2>
+      <p class="muted">Selecciona tu aseguradora. Si no existe un canal validado para publicación, no mostraremos datos internos posiblemente desactualizados.</p>
+      <label for="insurer">Aseguradora</label>
+      <select id="insurer"><option value="">Cargando aseguradoras validadas…</option></select>
+      <button class="btn" id="resolve" type="button" disabled>Ver canal disponible</button>
+      <div id="status" class="status" role="status" aria-live="polite"></div>
+      <div id="result" class="result hidden"></div>
+    </section>
+  </div>
+
+  <section class="card" style="margin-top:16px">
+    <h3>Estados de seguimiento que puede mostrar una experiencia pública</h3>
+    <p class="muted">Cuando exista un caso autorizado para consulta, la experiencia pública utiliza lenguaje comprensible sin exponer bitácora interna ni rutas de documentos.</p>
+    <div class="routes">
+      <div class="route"><b>Reporte recibido</b><span class="muted">El evento fue registrado.</span></div>
+      <div class="route"><b>En revisión</b><span class="muted">El caso está siendo analizado.</span></div>
+      <div class="route"><b>Documentación en gestión</b><span class="muted">Hay información o documentos pendientes.</span></div>
+      <div class="route"><b>Aprobado / Pago registrado / Rechazado</b><span class="muted">Solo se muestran cuando el estado operacional correspondiente existe.</span></div>
+    </div>
+  </section>
+</main>
+<script src="core/siniestros-s512d-public.js?v=20261007-1"></script>
+</body>
+</html>
