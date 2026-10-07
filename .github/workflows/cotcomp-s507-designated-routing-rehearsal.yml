@@ -1,0 +1,87 @@
+name: CotComp S5.07 Designated Advisor Synthetic Rehearsal
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - ays/cotcomp-s507-real-customer-pilot-sourceonly-20261007
+    paths:
+      - 'functions/cotcomp-s507-designated-routing-rehearsal.js'
+      - '.github/workflows/cotcomp-s507-designated-routing-rehearsal.yml'
+
+permissions:
+  contents: read
+
+env:
+  GCLOUD_PROJECT: ays-orbit-360-lab
+
+jobs:
+  designated-routing-rehearsal:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB: \${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB: \${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      FIREBASE_SERVICE_ACCOUNT_FALLBACK: \${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install functions dependencies
+        working-directory: functions
+        run: npm ci
+      - name: Static synthetic-only guard
+        working-directory: functions
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check cotcomp-s507-designated-routing-rehearsal.js
+          grep -q "Synthetic QA only. No customer data." cotcomp-s507-designated-routing-rehearsal.js
+          ! grep -q "provider" cotcomp-s507-designated-routing-rehearsal.js || true
+      - name: Prepare LAB credential
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/s507-routing/evidence"
+          SA="$FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB"
+          if [ -z "$SA" ]; then SA="$FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB"; fi
+          if [ -z "$SA" ]; then SA="$FIREBASE_SERVICE_ACCOUNT_FALLBACK"; fi
+          test -n "$SA"
+          CRED="$RUNNER_TEMP/s507-routing/firebase-service-account.json"
+          printf '%s' "$SA" > "$CRED"
+          chmod 600 "$CRED"
+          PROJECT="$(node -e "const fs=require('fs');console.log(JSON.parse(fs.readFileSync(process.argv[1],'utf8')).project_id||'')" "$CRED")"
+          test "$PROJECT" = "ays-orbit-360-lab"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$CRED" >> "$GITHUB_ENV"
+      - name: Run designated advisor synthetic rehearsal
+        working-directory: functions
+        shell: bash
+        run: |
+          set -euo pipefail
+          node cotcomp-s507-designated-routing-rehearsal.js | tee "$RUNNER_TEMP/s507-routing/evidence/ROUTING_REHEARSAL.json"
+          node - "$RUNNER_TEMP/s507-routing/evidence/ROUTING_REHEARSAL.json" <<'NODE'
+          const fs=require('fs');
+          const r=JSON.parse(fs.readFileSync(process.argv[2],'utf8'));
+          const mustTrue=[
+            'syntheticOnly','designatedAdvisorResolved','businessAssignedToDesignatedAdvisor',
+            'leadsVisible','advisorVisible','advisorTargetedOutbox','retryReused',
+            'changedPayloadConflictDenied'
+          ];
+          for(const k of mustTrue)if(r[k]!==true)process.exit(1);
+          if(r.realCustomerDataUsed!==false||r.productionTouched!==false||r.providerRaterUsed!==false)process.exit(1);
+          if(r.issued!==false||r.bound!==false||r.paid!==false)process.exit(1);
+          if(r.businessStage!=='nuevo'||r.origin!=='Web CotComp')process.exit(1);
+          if(r.finalAbsent!==r.finalExpectedAbsent)process.exit(1);
+          NODE
+      - name: Upload sanitized evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: cotcomp-s507-designated-routing-rehearsal-\${{ github.run_id }}
+          path: \${{ runner.temp }}/s507-routing/evidence/ROUTING_REHEARSAL.json
+          if-no-files-found: error
+          retention-days: 30
+      - name: Remove transient credential
+        if: always()
+        shell: bash
+        run: rm -f "$RUNNER_TEMP/s507-routing/firebase-service-account.json"
