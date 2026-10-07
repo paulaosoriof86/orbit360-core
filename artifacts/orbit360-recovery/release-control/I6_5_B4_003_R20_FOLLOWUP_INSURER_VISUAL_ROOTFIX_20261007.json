@@ -1,0 +1,48 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R20_FOLLOWUP_INSURER_VISUAL_ROOTFIX_V1",
+  "recordedAt": "2026-10-06T21:58:00-06:00",
+  "status": "SOURCE_FIXED_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "authorization": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_FOLLOWUP_INSURER_VISUAL_CAUSAL_AUTH_20261007.json",
+    "blobSha": "f0931b6b2728ac087942cec84186fee06ec4ed3d"
+  },
+  "parentHead": "3d21773a8ad4a6c10443df23d635af6906364265",
+  "sourceCommit": "86a54019ce2500b65ea2745517bde4dd5a5eecef",
+  "productBlobs": {
+    "orbit360-platform/modules/aseguradoras.js": {
+      "before": "64e64de7b3c14a93e335e633d3ae320e5fab1c76",
+      "after": "32d35bfcb0045632346af96984b03c7dccdc9dee"
+    }
+  },
+  "findings": [
+    "B4-003-R20-B05",
+    "B4-003-R20-B06",
+    "B4-003-R20-B08"
+  ],
+  "implemented": [
+    "Documentos y fuentes uses the existing premium section/head/body design primitives, with visible operational hierarchy instead of a flat administration block.",
+    "The human surface summarizes physical files and related knowledge sources as distinct cards before detailed evidence.",
+    "Visible backend terms metadata/hash/provenance were replaced by human language while retaining the same underlying fields and traceability.",
+    "Nested source-detail object keys are humanized so technical field names do not leak through structured evidence rendering.",
+    "Existing source registry drill-down, Drive/document contracts, identifiers and exact traceability data remain intact."
+  ],
+  "invariants": {
+    "exactSourceRegistryPreserved": true,
+    "driveContractPreserved": true,
+    "insurerUatFixturePreserved": true,
+    "existingTariffPremiumHierarchyPreserved": true,
+    "proofAssertionWeakened": false
+  },
+  "boundaries": {
+    "productMutationComplete": true,
+    "dataMutation": false,
+    "operationalBusinessWrites": 0,
+    "reimport": false,
+    "livePromotion": false,
+    "renewabilityApplyRepeated": false,
+    "b4004Held": true
+  },
+  "nextAction": "B4_003_R20_CONTRACT_AND_EXACT_PREVIEW"
+}
