@@ -1,0 +1,31 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R20_QA_DEPENDENCY_PROVISIONING_BOUNDED_RETRY_V1",
+  "recordedAt": "2026-10-07T18:58:00Z",
+  "status": "QA_INFRASTRUCTURE_FIXED_PENDING_EXACT_PREVIEW",
+  "findingId": "B4-003-R20-QA-DEPENDENCY-PROVISIONING-01",
+  "affectedRunId": 37668083361,
+  "affectedSourceSha": "65a965108571d6d7a316caa1d101c8f7c8a3e137",
+  "affectedJobId": 112952383723,
+  "affectedStep": "Prepare Firebase and browser dependencies",
+  "observedStartedAt": "2026-10-07T18:37:10Z",
+  "observedStillRunningAt": "2026-10-07T18:57:13Z",
+  "historicalComparison": {
+    "priorRunId": 37666118407,
+    "sameStepDurationSeconds": 65,
+    "currentObservedMinimumSeconds": 1203
+  },
+  "rootCause": "THE_QA_WORKFLOW_DEPENDENCY_PROVISIONING_COMMANDS_HAD_NO_COMMAND_LEVEL_TIMEOUT_OR_RETRY_AND_SUPPRESSED_INSTALL_OUTPUT, SO_AN_EXTERNAL_PACKAGE_OR_BROWSER_PROVISIONING_STALL_COULD_CONSUME_THE 45_MINUTE_JOB_BUDGET_WITHOUT_ACTIONABLE_STAGE EVIDENCE",
+  "fix": "Bound the application dependency install to 420 seconds and the Chromium/system dependency install to 600 seconds, retry each once, emit attempt/stage evidence, and fail closed after exhaustion.",
+  "qaBlobs": {
+    ".github/workflows/gravicentra-b4-003-executor.yml": "0dd682368c379d520f30d067e0d8c4e9378e4cab",
+    "tools/gravicentra-i6-5-b4-003-contract.mjs": "1a710a392ef0d9b5917e2f2f78400d9d1434d867",
+    "tools/gravicentra-i6-5-b4-003-preview-proof.mjs": "d0d0e49ec4228448eb826f3f7f29e0808e247fc4"
+  },
+  "productFilesChanged": 0,
+  "dataMutation": false,
+  "operationalBusinessWrites": 0,
+  "reimport": false,
+  "live": false,
+  "b4004Held": true,
+  "nextAction": "B4_003_R20_CONTRACT_AND_EXACT_PREVIEW"
+}

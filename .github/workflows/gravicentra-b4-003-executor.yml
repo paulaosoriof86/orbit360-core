@@ -519,8 +519,19 @@ jobs:
           cp "$SEL" "$RUNNER_TEMP/b4-003-sa.json"
           chmod 600 "$RUNNER_TEMP/b4-003-sa.json"
           echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/b4-003-sa.json" >> "$GITHUB_ENV"
-          npm install --no-save --package-lock=false firebase-admin@13.4.0 playwright@1.55.0 >/dev/null
-          npx playwright install --with-deps chromium >/dev/null
+          retry_bounded() {
+            local limit="$1"
+            shift
+            local attempt
+            for attempt in 1 2; do
+              echo "B4_003_DEPENDENCY_ATTEMPT=$attempt LIMIT_SECONDS=$limit COMMAND=$1"
+              if timeout --foreground "${limit}s" "$@"; then return 0; fi
+              if [ "$attempt" -lt 2 ]; then sleep 5; fi
+            done
+            return 1
+          }
+          retry_bounded 420 npm install --no-save --package-lock=false firebase-admin@13.4.0 playwright@1.55.0
+          retry_bounded 600 npx playwright install --with-deps chromium
 
       - name: Resolve public web config
         if: steps.gate.outputs.run == 'true'

@@ -2,7 +2,7 @@
   "schema": "GRAVICENTRA_I6_5_B4_003_R20_SECOND_REVIEW_CROSS_CONTEXT_BOOTSTRAP_RETRY_ROOTFIX_V1",
   "recordedAt": "2026-10-07T18:34:00Z",
   "status": "QA_HARNESS_FIXED_PENDING_EXACT_PREVIEW",
-  "findingId": "B4-003-R20-B13",
+  "findingId": "B4-003-R20-QA-BOOTSTRAP-RETRY-01",
   "failedRunId": 37666118407,
   "failedSourceSha": "637aedead3bf2fd96d6de8420bf0e11fb50d703c",
   "failedProofCommitSha": "8d0f7825ba32361e9bf4c141d4b79a6432b6a4bd",
