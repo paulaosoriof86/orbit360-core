@@ -80,3 +80,11 @@ test('S5.06 visible modal and terminal expose success/error states and direct ch
   assert.match(h,/Continuar por correo/);
   assert.match(h,/showTerminal/);
 });
+
+
+test('S5.06 renders a single advisor registration control set',()=>{
+  const h=s.html();
+  assert.equal((h.match(/data-s506-card="advisor"/g)||[]).length,1);
+  assert.equal((h.match(/data-s506-consent="advisor"/g)||[]).length,1);
+  assert.equal((h.match(/data-s506-register="advisor"/g)||[]).length,1);
+});
