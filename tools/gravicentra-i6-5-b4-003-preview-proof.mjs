@@ -699,7 +699,7 @@ try{
   const gtMunicipalities=Object.values(gt).reduce((n,a)=>n+(Array.isArray(a)?a.length:0),0),coMunicipalities=Object.values(co).reduce((n,a)=>n+(Array.isArray(a)?a.length:0),0);
   const h=document.getElementById('host');Orbit.modules.calidad.render(h);
   return{catalogStatus,gtDepartments:Object.keys(gt).length,gtMunicipalities,coDepartments:Object.keys(co).length,coMunicipalities,
-   qualityHasCountryHeader:/País actual/.test(h.textContent||''),qualityHasOriginEvidenceHeader:/Origen \/ evidencia/.test(h.textContent||''),
+   qualityHasCountryHeader:/País registrado/.test(h.textContent||''),qualityHasOriginEvidenceHeader:/Cómo se determinó/.test(h.textContent||''),
    qualityDeadChannelButtons:Array.from(h.querySelectorAll('button[disabled]')).filter(b=>/Sin canal/.test(b.textContent||'')).length,qualitySearch:!!h.querySelector('#q-search'),qualityCountry:!!h.querySelector('#q-pais'),qualityMissing:!!h.querySelector('#q-falta'),qualityAdvisor:!!h.querySelector('#q-asesor'),qualityActive:!!h.querySelector('#q-vig'),falseChannelHeading:/\bCanal\b/.test(String(h.querySelector('.quality-main-table thead')?.innerText||'')),catalogEnsureError};
  });
  need(proof.r16CatalogAndQuality.catalogStatus&&proof.r16CatalogAndQuality.catalogStatus.hydrated===true&&proof.r16CatalogAndQuality.catalogStatus.syncPending===false,'B4_003_R16_CATALOG_CANONICAL_HYDRATION_FAILED:'+JSON.stringify(proof.r16CatalogAndQuality));
