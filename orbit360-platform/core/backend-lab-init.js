@@ -25,6 +25,7 @@
     functionNames: Object.assign({}, window.OrbitBackend && window.OrbitBackend.functionNames || {}, {
       opsLeads: 'orbit360OpsLeadsCommandLabV20260804',
       advisorInbox: 'orbit360GetAdvisorOpsInboxLabV20260804',
+      leadAttention: 'orbit360AdvisorLeadAttentionS509',
       reconciliation: 'orbit360CobrosReconciliationCommandLabV20260804',
       recurringImport: 'orbit360RecurringInsuranceImportLabV20260804'
     }),
@@ -91,6 +92,7 @@
     loadScriptOnce('core/ops-leads-domain-client.js?v=20260804-1', 'ops-leads-domain-client', function(){
       afterWindowLoad(function(){
         loadScriptOnce('modules/ops-leads-domain-v20260804-bridge.js?v=20260804-1', 'ops-leads-domain-bridge');
+        loadScriptOnce('core/advisor-lead-attention-s509.js?v=20261007-1', 'advisor-lead-attention-s509');
       });
     });
   }
