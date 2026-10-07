@@ -1,0 +1,22 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R20_SECOND_REVIEW_CATALOG_AUTH_ADDENDUM_V1",
+  "status": "NARROW_CATALOG_OWNER_EXTENSION_AUTHORIZED",
+  "parentDiagnosticPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_SECOND_REVIEW_CAUSAL_DIAGNOSTIC_20261007.json",
+  "parentDiagnosticBlobSha": "5ba6a95204fdc86e9fe5083ecabe61ca99a057ae",
+  "findings": [
+    "B4-003-R20-B13"
+  ],
+  "cause": "Tenant catalog conflates a global 'productos' list labelled Productos / planes while canonical country/ramo product lists live in ramosPais; insurer matrix therefore lacks a distinct managed plan authority.",
+  "allowedProductFiles": [
+    "orbit360-platform/core/config.js",
+    "orbit360-platform/modules/configuracion.js"
+  ],
+  "compatibility": "Preserve ramosPais as product-by-ramo authority and existing productos list. Add distinct planes list without rewriting existing stored catalogs.",
+  "boundaries": {
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false,
+    "b4004Held": true
+  },
+  "nextAction": "B4_003_R20_SECOND_REVIEW_SINGLE_CUMULATIVE_SOURCE_FIX"
+}
