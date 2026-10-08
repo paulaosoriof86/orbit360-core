@@ -4869,7 +4869,7 @@
       "entryGuardReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_ENTRY_GUARD_PASS_20261002.json",
       "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
       "executionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B4_EXECUTION_LOCK_20261002.json",
-      "executionLockBlobSha": "541743538e0509b461431401cd98da3b2c2521b3",
+      "executionLockBlobSha": "5038d015295b1c3f096748cc8703d1d6d08666e0",
       "compositionLockBlobSha": "9daea043563be3cefb9f0e2fba686aad489eb47a",
       "findingLedgerBlobSha": "519a9edb03b6ac88848d90bf427e0dc7c83c60b1",
       "activeFindingId": "B4-003",
@@ -8462,6 +8462,13 @@
       "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_B02_RENEWAL_CUTOFF_APPLY_AUTH_20261008.json",
       "blobSha": "28c42196c14c60cdc0632615334e0468a382d49a",
       "commit": "1fbb186891fdabea90639f8f10ef0f557e6b3758"
+    },
+    "guardRepair": {
+      "failedRunId": 37835528639,
+      "failureCode": "I6_5_B4_LOCK_DRIFT",
+      "status": "REPAIRED_RETRY_REQUESTED",
+      "governanceGuardBlobSha": "35e621e6c25ab7bf2253ea070dff932e84155832",
+      "executionLockBlobSha": "5038d015295b1c3f096748cc8703d1d6d08666e0"
     }
   }
 }
