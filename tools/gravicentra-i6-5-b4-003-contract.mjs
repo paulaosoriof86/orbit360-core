@@ -258,7 +258,7 @@ need(/modules\/cronograma\.js\?v=20261003-b4003r5/.test(index),'B4_003_CRONOGRAM
 need(/store-firestore-product-operational-p0\.js\?v=20261003-b4003r3/.test(index),'B4_003_STORE_CACHE_BINDING_MISSING');
 need(/modules\/cliente360\.js\?v=20261005-r17/.test(index),'B4_003_CLIENT360_R11_CACHE_BINDING_MISSING');
 need(index.includes('modules/calidad.js?v=20261007-r20f2'),'B4_003_QUALITY_R12Q_CACHE_BINDING_MISSING');
-need(index.includes('modules/aseguradoras.js?v=20261007-r20f3'),'B4_003_INSURER_R12_CACHE_BINDING_MISSING');
+need(index.includes('modules/aseguradoras.js?v=20261007-r20f4'),'B4_003_INSURER_R12_CACHE_BINDING_MISSING');
 need(/core\/importa\.js\?v=20261007-r20f2/.test(index),'B4_003_IMPORTER_R13_CACHE_BINDING_MISSING');
 need(/modules\/aseguradoras-v1202-import-bridge\.js\?v=20261004-b4003r13d/.test(index),'B4_003_R13_INSURER_IMPORT_BRIDGE_CACHE_BINDING_MISSING');
 need(index.includes('core/client-insurer-visual-contract-v20260720.js?v=20261004-r16p4'),'B4_003_INSURER_VISUAL_R12_CACHE_BINDING_MISSING');
@@ -284,6 +284,7 @@ need(index.includes('modules/inicio.js?v=20261005-r19')&&index.includes('core/po
 
 need(cycle.includes('function actionQueueRanks')&&cycle.includes('Acción requerida · #')&&cycle.includes('Registrar guarda la colaboración inmediatamente')&&cycle.includes('humanCommentAuthor')&&cycle.includes('assignableAdvisors(n.pais).then'),'B4_003_R20_SECOND_REVIEW_OPS_LEADS_USABILITY_MISSING');
 need(index.includes('Marcando…')&&index.includes('Archivando…')&&index.includes('inbox-active-count')&&index.includes('maybePendingLanding'),'B4_003_R20_SECOND_REVIEW_INBOX_FEEDBACK_MISSING');
+need(insurer.includes('sourceCommissions=S().get')&&insurer.includes('visibleRequirements=[...body.querySelectorAll')&&insurer.includes('draft.docsRequeridos=retained'),'B4_003_R20_INSURER_DRAFT_SOURCE_PRESERVATION_MISSING');
 need(insurer.includes('function semanticValue')&&insurer.includes('Cambios detectados:')&&insurer.includes('Revisando cambios…')&&insurer.includes('Procesando logo…'),'B4_003_R20_SECOND_REVIEW_INSURER_SEMANTIC_DIFF_OR_PROGRESS_MISSING');
 need(importer.includes('analyzeInsurerSourceText')&&importer.includes('Analizar y clasificar')&&importer.includes('insurer-source-classifier')&&importer.includes('Cómo se analizó')&&importer.includes('id="imp-insurer-ramo"')&&importer.includes('id="imp-insurer-producto"')&&importer.includes('id="imp-insurer-plan"'),'B4_003_R20_SECOND_REVIEW_INSURER_IMPORTER_INTELLIGENCE_MISSING');
 need(driveBackend.includes('INSURER_DOSSIER_ROLES')&&driveBackend.includes('listEntityFolder')&&driveBackend.includes('orbit360DocumentDriveListFolderPreview')&&driveProvider.includes('listFolder')&&driveProvider.includes('resolveDossier'),'B4_003_R20_SECOND_REVIEW_INSURER_DRIVE_BROWSER_MISSING');
