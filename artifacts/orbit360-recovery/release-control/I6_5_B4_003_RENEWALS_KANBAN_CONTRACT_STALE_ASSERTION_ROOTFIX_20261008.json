@@ -1,0 +1,52 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_RENEWALS_KANBAN_CONTRACT_STALE_ASSERTION_ROOTFIX_V1",
+  "recordedAt": "2026-10-08T21:47:30Z",
+  "status": "CONTRACT_ROOTFIXED_PENDING_EXACT_PREVIEW",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "parentHead": "8cd3003ea4581eb974816951e19a39be05a1aecf",
+  "failedRun": {
+    "id": 37849075429,
+    "jobId": 113557197479,
+    "step": "Validate B4-003 contract and syntax",
+    "error": "B4_003_R20_RENEWAL_APPROVED_KANBAN_CONTRACT_MISSING",
+    "deploymentReached": false,
+    "liveChanged": false
+  },
+  "cause": {
+    "classification": "STALE_QA_LABEL_ASSERTION_AFTER_APPROVED_SINGLE_KANBAN_RENEWALS_FIX",
+    "obsoleteToken": "Renovabilidad pendiente",
+    "canonicalEvidence": [
+      "data-renewability-pending-count=",
+      "Cada póliza pendiente permanece en su columna",
+      "const renewalPipelineCandidate",
+      "renewabilityState(p)==='NO'",
+      "data-renewal-bucket="
+    ],
+    "exactRenewalsMachineProof": {
+      "runId": 37843233312,
+      "status": "PASS",
+      "policies": 1419,
+      "terminalExcluded": 583,
+      "oldOpen": 0,
+      "recentExactVisible": 24
+    },
+    "productRegression": false
+  },
+  "correction": {
+    "path": "tools/gravicentra-i6-5-b4-003-contract.mjs",
+    "previousBlobSha": "0d65c49000996d941246bff069d5fbb96a55e2d1",
+    "correctedBlobSha": "2ef728ba94011f6b2f1a38d7356f41f05d8d230a",
+    "scope": "Assert the canonical single-Kanban pending-count and in-column disclosure instead of the removed parallel-section label."
+  },
+  "boundaries": {
+    "productSourceChanged": false,
+    "dataMutation": false,
+    "businessWrites": false,
+    "syntheticQaWrites": false,
+    "previewDeployment": false,
+    "livePromotion": false,
+    "reimport": false
+  },
+  "nextAction": "B4_003_R20_CONTRACT_AND_EXACT_PREVIEW"
+}
