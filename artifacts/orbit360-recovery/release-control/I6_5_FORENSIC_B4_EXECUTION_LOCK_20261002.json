@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B4_EXECUTION_LOCK_V1",
-  "recordedAt": "2026-10-08T19:05:00Z",
-  "status": "B4_003_UAT3_P0_BATCH_1_SOURCE_COMPLETE_BATCH_2_SCOPE_PENDING",
+  "recordedAt": "2026-10-08T19:42:00Z",
+  "status": "B4_003_UAT3_P0_BATCH_2_SOURCE_COMPLETE_BATCH_3_SCOPE_PENDING",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "block": "B4",
@@ -83,9 +83,12 @@
     "drivePreviewProductionFunctionsAuthorized": false,
     "renewabilityDataMutationAuthorized": false,
     "authorizedDataMutation": "Only exact R20 renewability target set bound to dry-run digests; fields renewable/provenance/rule only; max 1415 writes; automatic rollback on failure.",
-    "renewabilityApplyRepeatAuthorized": false
+    "renewabilityApplyRepeatAuthorized": false,
+    "buildDispatchAuthorized": false,
+    "previewMutationAuthorized": false,
+    "functionDeploymentAuthorized": false
   },
-  "nextAction": "B4_003_UAT3_P0_SOURCE_FIX_BATCH_2_SHARED_INBOX_SCOPE_LOCK",
+  "nextAction": "B4_003_UAT3_P0_SOURCE_FIX_BATCH_3_SCOPE_LOCK",
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
     "blobSha": "68ffc370fefa5024a1c0a4857b541bdcf12f615e",
@@ -1211,5 +1214,38 @@
     "previewMutation": false,
     "liveMutation": false,
     "nextAction": "B4_003_UAT3_P0_SOURCE_FIX_BATCH_2_SHARED_INBOX_SCOPE_LOCK"
+  },
+  "uat3P0SourceFixBatch2": {
+    "status": "SOURCE_FIXED_STATIC_PASS_DEPLOYMENT_NOT_DISPATCHED",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_UAT3_P0_SOURCE_FIX_BATCH_2_SHARED_INBOX_20261008.json",
+    "blobSha": "e5dbab01f1ba219e8a319f7a52853861d2d8fcc2",
+    "parentHead": "f053df68f11e510d7666ceee98e5720e4e0e1646",
+    "scopeLockBlobSha": "b3ff04d8a920b565d0b62b76c29c267cf7d64925",
+    "observations": [
+      "D-02",
+      "D-11",
+      "D-12",
+      "D-13",
+      "D-17"
+    ],
+    "productFiles": {
+      "functions/ops-advisor-inbox.js": "4fa4510c4911cbf931557b7586ffb607aca20a93",
+      "orbit360-platform/index.html": "ac5057d741a7f2b89c60f6ac7692abbbaf24a37d"
+    },
+    "staticVerification": "PASS",
+    "findingsClosed": [],
+    "sourceCorrectedPendingRuntimeProof": [
+      "D-02",
+      "D-11",
+      "D-12",
+      "D-13",
+      "D-17"
+    ],
+    "dataMutation": false,
+    "buildDispatch": false,
+    "previewMutation": false,
+    "functionDeployment": false,
+    "liveMutation": false,
+    "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_UAT3_P0_SOURCE_FIX_BATCH_3_SCOPE_LOCK"
   }
 }

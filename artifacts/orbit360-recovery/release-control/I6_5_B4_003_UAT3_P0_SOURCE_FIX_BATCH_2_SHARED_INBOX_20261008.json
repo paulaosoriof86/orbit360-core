@@ -1,0 +1,102 @@
+{
+  "schema": "gravicentra-b4-003-uat3-p0-source-fix-batch-2-shared-inbox-v1",
+  "recordedAt": "2026-10-08T19:42:00Z",
+  "status": "SOURCE_FIXED_STATIC_PASS_DEPLOYMENT_NOT_DISPATCHED",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "parentHead": "f053df68f11e510d7666ceee98e5720e4e0e1646",
+  "scopeLock": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_UAT3_P0_SOURCE_FIX_BATCH_2_SHARED_INBOX_SCOPE_LOCK_20261008.json",
+    "blobSha": "b3ff04d8a920b565d0b62b76c29c267cf7d64925"
+  },
+  "observations": [
+    "D-02",
+    "D-11",
+    "D-12",
+    "D-13",
+    "D-17"
+  ],
+  "productFiles": {
+    "functions/ops-advisor-inbox.js": "4fa4510c4911cbf931557b7586ffb607aca20a93",
+    "orbit360-platform/index.html": "ac5057d741a7f2b89c60f6ac7692abbbaf24a37d"
+  },
+  "corrections": [
+    {
+      "observations": [
+        "D-12"
+      ],
+      "change": "A shared inbox task now has one tenant-level resolution record per event. Personal read, acknowledgement and archive state remain user-specific.",
+      "compatibility": "The former attended action is accepted as an alias for shared resolve, but legacy personal attendedAt is treated only as personal acknowledgement."
+    },
+    {
+      "observations": [
+        "D-02",
+        "D-17"
+      ],
+      "change": "Advisor-target notices require the advisor/commercial/assistant role to be actively selected; operations-target notices require the active operations role.",
+      "preserved": "Assigned roles remain unchanged. Only active-role projection is corrected."
+    },
+    {
+      "observations": [
+        "D-11"
+      ],
+      "change": "The backend and drawer expose actor, recipient, owner/assignee, observer identifiers, personal acknowledgement, and shared resolver context as separate metadata."
+    },
+    {
+      "observations": [
+        "D-13"
+      ],
+      "change": "Exact eventId deduplication remains. Semantically similar distinct events are retained and marked as duplicate candidates with their full eventId group for review.",
+      "preserved": "No canonical event is deleted, merged or hidden."
+    }
+  ],
+  "staticVerification": {
+    "pass": true,
+    "checks": {
+      "backendSyntax": true,
+      "inlineUiSyntax": true,
+      "activeRoleAdvisorGate": true,
+      "activeRoleOperationsGate": true,
+      "personalStateSeparated": true,
+      "tenantSharedResolution": true,
+      "resolverIdentityPersisted": true,
+      "exactEventDedupePreserved": true,
+      "semanticCandidatesNotCollapsed": true,
+      "actorRecipientOwnerVisible": true,
+      "attendedBackwardCompatibility": true,
+      "noSourceEventDeletion": true
+    }
+  },
+  "boundaries": {
+    "dataMutation": false,
+    "businessWrites": false,
+    "syntheticQaWrites": false,
+    "buildDispatch": false,
+    "previewMutation": false,
+    "functionDeployment": false,
+    "liveMutation": false,
+    "reimport": false
+  },
+  "findingDisposition": {
+    "closed": [],
+    "sourceCorrectedPendingRuntimeProof": [
+      "D-02",
+      "D-11",
+      "D-12",
+      "D-13",
+      "D-17"
+    ],
+    "newFindingIds": [],
+    "deletedFindingIds": [],
+    "b4003Open": true,
+    "b4004Held": true
+  },
+  "explicitCarry": [
+    "Cross-role Preview proof with one advisor role and one operations role.",
+    "Two-user readback proving personal acknowledgement and shared resolution.",
+    "Exact semantic duplicate candidate review against canonical event records.",
+    "Function deployment and build remain unauthorized."
+  ],
+  "decision": "BATCH_2_SOURCE_COMPLETE_STATIC_PASS_NO_ENVIRONMENT_MUTATION",
+  "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_UAT3_P0_SOURCE_FIX_BATCH_3_SCOPE_LOCK"
+}
