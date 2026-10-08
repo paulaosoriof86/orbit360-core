@@ -1,0 +1,1213 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_RENEWALS_PRIORITY_MACHINE_PROOF_V1",
+  "recordedAt": "2026-10-08T20:33:25.965Z",
+  "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
+  "findingId": "B4-003",
+  "module": "RENOVACIONES",
+  "observations": [
+    "B-01",
+    "B-02",
+    "B-03",
+    "B-04"
+  ],
+  "sourceSha": "ed2957d60697fce7bc6e015a49eb73ffaf9e8f5e",
+  "buildId": "gi-i65-b4-ed2957d60697-57f234755dc1",
+  "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-37839569726-bstn2wiq.web.app",
+  "channelId": "gi-i65-b4-37839569726",
+  "runId": 37839569726,
+  "artifactId": 11576758328,
+  "artifactDigest": "d23f800b1542c25e628295d8a2fef238a1da3411ae3ec62cd9c50870b85dc921",
+  "hostedPayloadDigest": "f5f807bac226544c981034d0155009c25415e5948adeae3f3f221002171409d8",
+  "backendSourceDigest": "778af087e48cf3e74edc8d4d813aa414968709a9e08977ac2a8405c820e50bb4",
+  "bundleDigest": "e3c7a523b1bbe49a0cba3cdcdf80d985e8368855c91f96582c809bea8071a01a",
+  "exactHostingReadback": true,
+  "backend": {
+    "policyCount": 1419,
+    "b02TerminalCount": 583,
+    "b02TerminalIdDigest": "0043dbf02a26681c7fb1607f1de401ca1c99b36e4ae5e6a3d01551d2ebf9fe65",
+    "oldOpenCount": 0,
+    "recentCount": 24,
+    "recentDigest": "3512b167cdde30b51f67acc3c77135f2a94df5f133fd2d3b45cde8540938e67a"
+  },
+  "assertions": {
+    "b02Exact583Terminal": true,
+    "b02OldOpenZero": true,
+    "b02Recent24Untouched": true,
+    "authenticatedDirectionAndOperativo": true,
+    "coldAndWarmBounded": true,
+    "countriesTodosGtCo": true,
+    "desktop390And320": true,
+    "firstPaintNoPartialLeak": true,
+    "policyAndRenewalLabelsSeparate": true,
+    "kpiBucketsCanonical": true,
+    "noRelevantBrowserErrors": true
+  },
+  "sessions": [
+    {
+      "role": "direccion",
+      "actorUidHash": "9579a5675104b2fa",
+      "cold": [
+        {
+          "loadingState": "ready",
+          "bucketKeys": [
+            "vencidas",
+            "d15",
+            "d45",
+            "d90"
+          ],
+          "bucketCounts": [
+            {
+              "key": "vencidas",
+              "count": 4,
+              "visible": 4
+            },
+            {
+              "key": "d15",
+              "count": 0,
+              "visible": 0
+            },
+            {
+              "key": "d45",
+              "count": 9,
+              "visible": 9
+            },
+            {
+              "key": "d90",
+              "count": 31,
+              "visible": 31
+            }
+          ],
+          "expectedCount": 44,
+          "visibleCount": 44,
+          "exactCanonicalIds": true,
+          "recentAccessibleCount": 0,
+          "recentVisibleCount": 0,
+          "recentExact": true,
+          "terminalVisibleCount": 0,
+          "labelOk": true,
+          "cardsFit": true,
+          "actionsFit": true,
+          "boardFits": true,
+          "hostText": "🔄\nRenovaciones · Pipeline por vencer\n90 DÍAS·POR URGENCIA·GESTIÓN\nPreparar campaña de renovación\nVENCIDAS\n4\nRecuperar o cerrar gestión\n≤15 DÍAS\n0\nAtención prioritaria\n16–45 DÍAS\n9\nPlanificar gestión\nPRIMA NETA EN GESTIÓN\nCOP 68,627,858\nGTQ 102,825\nSeparada por moneda; horizonte 90 días\nPipeline de renovación por fecha\nAquí se muestran pólizas que todavía forman parte del proceso de renovación. 4 están vencidas y renovables dentro del pipeline; existen 1158 pólizas con vigencia pasada en el alca",
+          "phase": "cold",
+          "country": "TODOS",
+          "viewport": "DESKTOP",
+          "readyMs": 4868
+        },
+        {
+          "loadingState": "ready",
+          "bucketKeys": [
+            "vencidas",
+            "d15",
+            "d45",
+            "d90"
+          ],
+          "bucketCounts": [
+            {
+              "key": "vencidas",
+              "count": 2,
+              "visible": 2
+            },
+            {
+              "key": "d15",
+              "count": 0,
+              "visible": 0
+            },
+            {
+              "key": "d45",
+              "count": 8,
+              "visible": 8
+            },
+            {
+              "key": "d90",
+              "count": 26,
+              "visible": 26
+            }
+          ],
+          "expectedCount": 36,
+          "visibleCount": 36,
+          "exactCanonicalIds": true,
+          "recentAccessibleCount": 0,
+          "recentVisibleCount": 0,
+          "recentExact": true,
+          "terminalVisibleCount": 0,
+          "labelOk": true,
+          "cardsFit": true,
+          "actionsFit": true,
+          "boardFits": true,
+          "hostText": "🔄\nRenovaciones · Pipeline por vencer\n90 DÍAS·POR URGENCIA·GESTIÓN\nPreparar campaña de renovación\nVENCIDAS\n2\nRecuperar o cerrar gestión\n≤15 DÍAS\n0\nAtención prioritaria\n16–45 DÍAS\n8\nPlanificar gestión\nPRIMA NETA EN GESTIÓN\nGTQ 102,825\nSeparada por moneda; horizonte 90 días\nPipeline de renovación por fecha\nAquí se muestran pólizas que todavía forman parte del proceso de renovación. 2 están vencidas y renovables dentro del pipeline; existen 1061 pólizas con vigencia pasada en el alcance histórico, ",
+          "phase": "cold",
+          "country": "GT",
+          "viewport": "DESKTOP",
+          "readyMs": 2189
+        },
+        {
+          "loadingState": "ready",
+          "bucketKeys": [
+            "vencidas",
+            "d15",
+            "d45",
+            "d90"
+          ],
+          "bucketCounts": [
+            {
+              "key": "vencidas",
+              "count": 2,
+              "visible": 2
+            },
+            {
+              "key": "d15",
+              "count": 0,
+              "visible": 0
+            },
+            {
+              "key": "d45",
+              "count": 1,
+              "visible": 1
+            },
+            {
+              "key": "d90",
+              "count": 5,
+              "visible": 5
+            }
+          ],
+          "expectedCount": 8,
+          "visibleCount": 8,
+          "exactCanonicalIds": true,
+          "recentAccessibleCount": 0,
+          "recentVisibleCount": 0,
+          "recentExact": true,
+          "terminalVisibleCount": 0,
+          "labelOk": true,
+          "cardsFit": true,
+          "actionsFit": true,
+          "boardFits": true,
+          "hostText": "🔄\nRenovaciones · Pipeline por vencer\n90 DÍAS·POR URGENCIA·GESTIÓN\nPreparar campaña de renovación\nVENCIDAS\n2\nRecuperar o cerrar gestión\n≤15 DÍAS\n0\nAtención prioritaria\n16–45 DÍAS\n1\nPlanificar gestión\nPRIMA NETA EN GESTIÓN\nCOP 68,627,858\nSeparada por moneda; horizonte 90 días\nPipeline de renovación por fecha\nAquí se muestran pólizas que todavía forman parte del proceso de renovación. 2 están vencidas y renovables dentro del pipeline; existen 97 pólizas con vigencia pasada en el alcance histórico,",
+          "phase": "cold",
+          "country": "CO",
+          "viewport": "DESKTOP",
+          "readyMs": 1817
+        }
+      ],
+      "warm": [
+        {
+          "loadingState": "ready",
+          "bucketKeys": [
+            "vencidas",
+            "d15",
+            "d45",
+            "d90"
+          ],
+          "bucketCounts": [
+            {
+              "key": "vencidas",
+              "count": 4,
+              "visible": 4
+            },
+            {
+              "key": "d15",
+              "count": 0,
+              "visible": 0
+            },
+            {
+              "key": "d45",
+              "count": 9,
+              "visible": 9
+            },
+            {
+              "key": "d90",
+              "count": 31,
+              "visible": 31
+            }
+          ],
+          "expectedCount": 44,
+          "visibleCount": 44,
+          "exactCanonicalIds": true,
+          "recentAccessibleCount": 0,
+          "recentVisibleCount": 0,
+          "recentExact": true,
+          "terminalVisibleCount": 0,
+          "labelOk": true,
+          "cardsFit": true,
+          "actionsFit": true,
+          "boardFits": true,
+          "hostText": "🔄\nRenovaciones · Pipeline por vencer\n90 DÍAS·POR URGENCIA·GESTIÓN\nPreparar campaña de renovación\nVENCIDAS\n4\nRecuperar o cerrar gestión\n≤15 DÍAS\n0\nAtención prioritaria\n16–45 DÍAS\n9\nPlanificar gestión\nPRIMA NETA EN GESTIÓN\nCOP 68,627,858\nGTQ 102,825\nSeparada por moneda; horizonte 90 días\nPipeline de renovación por fecha\nAquí se muestran pólizas que todavía forman parte del proceso de renovación. 4 están vencidas y renovables dentro del pipeline; existen 1158 pólizas con vigencia pasada en el alca",
+          "phase": "warm",
+          "country": "TODOS",
+          "viewport": "DESKTOP",
+          "readyMs": 1089
+        },
+        {
+          "loadingState": "ready",
+          "bucketKeys": [
+            "vencidas",
+            "d15",
+            "d45",
+            "d90"
+          ],
+          "bucketCounts": [
+            {
+              "key": "vencidas",
+              "count": 2,
+              "visible": 2
+            },
+            {
+              "key": "d15",
+              "count": 0,
+              "visible": 0
+            },
+            {
+              "key": "d45",
+              "count": 8,
+              "visible": 8
+            },
+            {
+              "key": "d90",
+              "count": 26,
+              "visible": 26
+            }
+          ],
+          "expectedCount": 36,
+          "visibleCount": 36,
+          "exactCanonicalIds": true,
+          "recentAccessibleCount": 0,
+          "recentVisibleCount": 0,
+          "recentExact": true,
+          "terminalVisibleCount": 0,
+          "labelOk": true,
+          "cardsFit": true,
+          "actionsFit": true,
+          "boardFits": true,
+          "hostText": "🔄\nRenovaciones · Pipeline por vencer\n90 DÍAS·POR URGENCIA·GESTIÓN\nPreparar campaña de renovación\nVENCIDAS\n2\nRecuperar o cerrar gestión\n≤15 DÍAS\n0\nAtención prioritaria\n16–45 DÍAS\n8\nPlanificar gestión\nPRIMA NETA EN GESTIÓN\nGTQ 102,825\nSeparada por moneda; horizonte 90 días\nPipeline de renovación por fecha\nAquí se muestran pólizas que todavía forman parte del proceso de renovación. 2 están vencidas y renovables dentro del pipeline; existen 1061 pólizas con vigencia pasada en el alcance histórico, ",
+          "phase": "warm",
+          "country": "GT",
+          "viewport": "DESKTOP",
+          "readyMs": 2103
+        },
+        {
+          "loadingState": "ready",
+          "bucketKeys": [
+            "vencidas",
+            "d15",
+            "d45",
+            "d90"
+          ],
+          "bucketCounts": [
+            {
+              "key": "vencidas",
+              "count": 2,
+              "visible": 2
+            },
+            {
+              "key": "d15",
+              "count": 0,
+              "visible": 0
+            },
+            {
+              "key": "d45",
+              "count": 1,
+              "visible": 1
+            },
+            {
+              "key": "d90",
+              "count": 5,
+              "visible": 5
+            }
+          ],
+          "expectedCount": 8,
+          "visibleCount": 8,
+          "exactCanonicalIds": true,
+          "recentAccessibleCount": 0,
+          "recentVisibleCount": 0,
+          "recentExact": true,
+          "terminalVisibleCount": 0,
+          "labelOk": true,
+          "cardsFit": true,
+          "actionsFit": true,
+          "boardFits": true,
+          "hostText": "🔄\nRenovaciones · Pipeline por vencer\n90 DÍAS·POR URGENCIA·GESTIÓN\nPreparar campaña de renovación\nVENCIDAS\n2\nRecuperar o cerrar gestión\n≤15 DÍAS\n0\nAtención prioritaria\n16–45 DÍAS\n1\nPlanificar gestión\nPRIMA NETA EN GESTIÓN\nCOP 68,627,858\nSeparada por moneda; horizonte 90 días\nPipeline de renovación por fecha\nAquí se muestran pólizas que todavía forman parte del proceso de renovación. 2 están vencidas y renovables dentro del pipeline; existen 97 pólizas con vigencia pasada en el alcance histórico,",
+          "phase": "warm",
+          "country": "CO",
+          "viewport": "DESKTOP",
+          "readyMs": 1814
+        }
+      ],
+      "mobile": [
+        {
+          "loadingState": "ready",
+          "bucketKeys": [
+            "vencidas",
+            "d15",
+            "d45",
+            "d90"
+          ],
+          "bucketCounts": [
+            {
+              "key": "vencidas",
+              "count": 4,
+              "visible": 4
+            },
+            {
+              "key": "d15",
+              "count": 0,
+              "visible": 0
+            },
+            {
+              "key": "d45",
+              "count": 9,
+              "visible": 9
+            },
+            {
+              "key": "d90",
+              "count": 31,
+              "visible": 31
+            }
+          ],
+          "expectedCount": 44,
+          "visibleCount": 44,
+          "exactCanonicalIds": true,
+          "recentAccessibleCount": 0,
+          "recentVisibleCount": 0,
+          "recentExact": true,
+          "terminalVisibleCount": 0,
+          "labelOk": true,
+          "cardsFit": true,
+          "actionsFit": true,
+          "boardFits": true,
+          "hostText": "🔄\nRenovaciones\n· Pipeline por vencer\nPreparar campaña de renovación\nVENCIDAS\n4\nRecuperar o cerrar gestión\n≤15 DÍAS\n0\nAtención prioritaria\n16–45 DÍAS\n9\nPlanificar gestión\nPRIMA NETA EN GESTIÓN\nCOP 68,627,858\nGTQ 102,825\nSeparada por moneda; horizonte 90 días\nPipeline de renovación por fecha\nAquí se muestran pólizas que todavía forman parte del proceso de renovación. 4 están vencidas y renovables dentro del pipeline; existen 1158 pólizas con vigencia pasada en el alcance histórico, de las cuales ",
+          "phase": "warm",
+          "country": "TODOS",
+          "viewport": "390x844",
+          "readyMs": 269
+        },
+        {
+          "loadingState": "ready",
+          "bucketKeys": [
+            "vencidas",
+            "d15",
+            "d45",
+            "d90"
+          ],
+          "bucketCounts": [
+            {
+              "key": "vencidas",
+              "count": 2,
+              "visible": 2
+            },
+            {
+              "key": "d15",
+              "count": 0,
+              "visible": 0
+            },
+            {
+              "key": "d45",
+              "count": 8,
+              "visible": 8
+            },
+            {
+              "key": "d90",
+              "count": 26,
+              "visible": 26
+            }
+          ],
+          "expectedCount": 36,
+          "visibleCount": 36,
+          "exactCanonicalIds": true,
+          "recentAccessibleCount": 0,
+          "recentVisibleCount": 0,
+          "recentExact": true,
+          "terminalVisibleCount": 0,
+          "labelOk": true,
+          "cardsFit": true,
+          "actionsFit": true,
+          "boardFits": true,
+          "hostText": "🔄\nRenovaciones\n· Pipeline por vencer\nPreparar campaña de renovación\nVENCIDAS\n2\nRecuperar o cerrar gestión\n≤15 DÍAS\n0\nAtención prioritaria\n16–45 DÍAS\n8\nPlanificar gestión\nPRIMA NETA EN GESTIÓN\nGTQ 102,825\nSeparada por moneda; horizonte 90 días\nPipeline de renovación por fecha\nAquí se muestran pólizas que todavía forman parte del proceso de renovación. 2 están vencidas y renovables dentro del pipeline; existen 1061 pólizas con vigencia pasada en el alcance histórico, de las cuales 100 están marca",
+          "phase": "warm",
+          "country": "GT",
+          "viewport": "390x844",
+          "readyMs": 9088
+        },
+        {
+          "loadingState": "ready",
+          "bucketKeys": [
+            "vencidas",
+            "d15",
+            "d45",
+            "d90"
+          ],
+          "bucketCounts": [
+            {
+              "key": "vencidas",
+              "count": 2,
+              "visible": 2
+            },
+            {
+              "key": "d15",
+              "count": 0,
+              "visible": 0
+            },
+            {
+              "key": "d45",
+              "count": 1,
+              "visible": 1
+            },
+            {
+              "key": "d90",
+              "count": 5,
+              "visible": 5
+            }
+          ],
+          "expectedCount": 8,
+          "visibleCount": 8,
+          "exactCanonicalIds": true,
+          "recentAccessibleCount": 0,
+          "recentVisibleCount": 0,
+          "recentExact": true,
+          "terminalVisibleCount": 0,
+          "labelOk": true,
+          "cardsFit": true,
+          "actionsFit": true,
+          "boardFits": true,
+          "hostText": "🔄\nRenovaciones\n· Pipeline por vencer\nPreparar campaña de renovación\nVENCIDAS\n2\nRecuperar o cerrar gestión\n≤15 DÍAS\n0\nAtención prioritaria\n16–45 DÍAS\n1\nPlanificar gestión\nPRIMA NETA EN GESTIÓN\nCOP 68,627,858\nSeparada por moneda; horizonte 90 días\nPipeline de renovación por fecha\nAquí se muestran pólizas que todavía forman parte del proceso de renovación. 2 están vencidas y renovables dentro del pipeline; existen 97 pólizas con vigencia pasada en el alcance histórico, de las cuales 1 están marcad",
+          "phase": "warm",
+          "country": "CO",
+          "viewport": "390x844",
+          "readyMs": 5421
+        },
+        {
+          "loadingState": "ready",
+          "bucketKeys": [
+            "vencidas",
+            "d15",
+            "d45",
+            "d90"
+          ],
+          "bucketCounts": [
+            {
+              "key": "vencidas",
+              "count": 4,
+              "visible": 4
+            },
+            {
+              "key": "d15",
+              "count": 0,
+              "visible": 0
+            },
+            {
+              "key": "d45",
+              "count": 9,
+              "visible": 9
+            },
+            {
+              "key": "d90",
+              "count": 31,
+              "visible": 31
+            }
+          ],
+          "expectedCount": 44,
+          "visibleCount": 44,
+          "exactCanonicalIds": true,
+          "recentAccessibleCount": 0,
+          "recentVisibleCount": 0,
+          "recentExact": true,
+          "terminalVisibleCount": 0,
+          "labelOk": true,
+          "cardsFit": true,
+          "actionsFit": true,
+          "boardFits": true,
+          "hostText": "🔄\nRenovaciones\n· Pipeline por vencer\nPreparar campaña de renovación\nVENCIDAS\n4\nRecuperar o cerrar gestión\n≤15 DÍAS\n0\nAtención prioritaria\n16–45 DÍAS\n9\nPlanificar gestión\nPRIMA NETA EN GESTIÓN\nCOP 68,627,858\nGTQ 102,825\nSeparada por moneda; horizonte 90 días\nPipeline de renovación por fecha\nAquí se muestran pólizas que todavía forman parte del proceso de renovación. 4 están vencidas y renovables dentro del pipeline; existen 1158 pólizas con vigencia pasada en el alcance histórico, de las cuales ",
+          "phase": "warm",
+          "country": "TODOS",
+          "viewport": "320x568",
+          "readyMs": 414
+        },
+        {
+          "loadingState": "ready",
+          "bucketKeys": [
+            "vencidas",
+            "d15",
+            "d45",
+            "d90"
+          ],
+          "bucketCounts": [
+            {
+              "key": "vencidas",
+              "count": 2,
+              "visible": 2
+            },
+            {
+              "key": "d15",
+              "count": 0,
+              "visible": 0
+            },
+            {
+              "key": "d45",
+              "count": 8,
+              "visible": 8
+            },
+            {
+              "key": "d90",
+              "count": 26,
+              "visible": 26
+            }
+          ],
+          "expectedCount": 36,
+          "visibleCount": 36,
+          "exactCanonicalIds": true,
+          "recentAccessibleCount": 0,
+          "recentVisibleCount": 0,
+          "recentExact": true,
+          "terminalVisibleCount": 0,
+          "labelOk": true,
+          "cardsFit": true,
+          "actionsFit": true,
+          "boardFits": true,
+          "hostText": "🔄\nRenovaciones\n· Pipeline por vencer\nPreparar campaña de renovación\nVENCIDAS\n2\nRecuperar o cerrar gestión\n≤15 DÍAS\n0\nAtención prioritaria\n16–45 DÍAS\n8\nPlanificar gestión\nPRIMA NETA EN GESTIÓN\nGTQ 102,825\nSeparada por moneda; horizonte 90 días\nPipeline de renovación por fecha\nAquí se muestran pólizas que todavía forman parte del proceso de renovación. 2 están vencidas y renovables dentro del pipeline; existen 1061 pólizas con vigencia pasada en el alcance histórico, de las cuales 100 están marca",
+          "phase": "warm",
+          "country": "GT",
+          "viewport": "320x568",
+          "readyMs": 6356
+        },
+        {
+          "loadingState": "ready",
+          "bucketKeys": [
+            "vencidas",
+            "d15",
+            "d45",
+            "d90"
+          ],
+          "bucketCounts": [
+            {
+              "key": "vencidas",
+              "count": 2,
+              "visible": 2
+            },
+            {
+              "key": "d15",
+              "count": 0,
+              "visible": 0
+            },
+            {
+              "key": "d45",
+              "count": 1,
+              "visible": 1
+            },
+            {
+              "key": "d90",
+              "count": 5,
+              "visible": 5
+            }
+          ],
+          "expectedCount": 8,
+          "visibleCount": 8,
+          "exactCanonicalIds": true,
+          "recentAccessibleCount": 0,
+          "recentVisibleCount": 0,
+          "recentExact": true,
+          "terminalVisibleCount": 0,
+          "labelOk": true,
+          "cardsFit": true,
+          "actionsFit": true,
+          "boardFits": true,
+          "hostText": "🔄\nRenovaciones\n· Pipeline por vencer\nPreparar campaña de renovación\nVENCIDAS\n2\nRecuperar o cerrar gestión\n≤15 DÍAS\n0\nAtención prioritaria\n16–45 DÍAS\n1\nPlanificar gestión\nPRIMA NETA EN GESTIÓN\nCOP 68,627,858\nSeparada por moneda; horizonte 90 días\nPipeline de renovación por fecha\nAquí se muestran pólizas que todavía forman parte del proceso de renovación. 2 están vencidas y renovables dentro del pipeline; existen 97 pólizas con vigencia pasada en el alcance histórico, de las cuales 1 están marcad",
+          "phase": "warm",
+          "country": "CO",
+          "viewport": "320x568",
+          "readyMs": 5394
+        }
+      ],
+      "firstPaint": {
+        "state": "pending",
+        "leaked": 0
+      }
+    },
+    {
+      "role": "operativo",
+      "actorUidHash": "09d9412dded2301d",
+      "cold": [
+        {
+          "loadingState": "ready",
+          "bucketKeys": [
+            "vencidas",
+            "d15",
+            "d45",
+            "d90"
+          ],
+          "bucketCounts": [
+            {
+              "key": "vencidas",
+              "count": 4,
+              "visible": 4
+            },
+            {
+              "key": "d15",
+              "count": 0,
+              "visible": 0
+            },
+            {
+              "key": "d45",
+              "count": 9,
+              "visible": 9
+            },
+            {
+              "key": "d90",
+              "count": 31,
+              "visible": 31
+            }
+          ],
+          "expectedCount": 44,
+          "visibleCount": 44,
+          "exactCanonicalIds": true,
+          "recentAccessibleCount": 0,
+          "recentVisibleCount": 0,
+          "recentExact": true,
+          "terminalVisibleCount": 0,
+          "labelOk": true,
+          "cardsFit": true,
+          "actionsFit": true,
+          "boardFits": true,
+          "hostText": "🔄\nRenovaciones · Pipeline por vencer\n90 DÍAS·POR URGENCIA·GESTIÓN\nPreparar campaña de renovación\nVENCIDAS\n4\nRecuperar o cerrar gestión\n≤15 DÍAS\n0\nAtención prioritaria\n16–45 DÍAS\n9\nPlanificar gestión\nPRIMA NETA EN GESTIÓN\nCOP 68,627,858\nGTQ 102,825\nSeparada por moneda; horizonte 90 días\nPipeline de renovación por fecha\nAquí se muestran pólizas que todavía forman parte del proceso de renovación. 4 están vencidas y renovables dentro del pipeline; existen 1158 pólizas con vigencia pasada en el alca",
+          "phase": "cold",
+          "country": "TODOS",
+          "viewport": "DESKTOP",
+          "readyMs": 4729
+        },
+        {
+          "loadingState": "ready",
+          "bucketKeys": [
+            "vencidas",
+            "d15",
+            "d45",
+            "d90"
+          ],
+          "bucketCounts": [
+            {
+              "key": "vencidas",
+              "count": 2,
+              "visible": 2
+            },
+            {
+              "key": "d15",
+              "count": 0,
+              "visible": 0
+            },
+            {
+              "key": "d45",
+              "count": 8,
+              "visible": 8
+            },
+            {
+              "key": "d90",
+              "count": 26,
+              "visible": 26
+            }
+          ],
+          "expectedCount": 36,
+          "visibleCount": 36,
+          "exactCanonicalIds": true,
+          "recentAccessibleCount": 0,
+          "recentVisibleCount": 0,
+          "recentExact": true,
+          "terminalVisibleCount": 0,
+          "labelOk": true,
+          "cardsFit": true,
+          "actionsFit": true,
+          "boardFits": true,
+          "hostText": "🔄\nRenovaciones · Pipeline por vencer\n90 DÍAS·POR URGENCIA·GESTIÓN\nPreparar campaña de renovación\nVENCIDAS\n2\nRecuperar o cerrar gestión\n≤15 DÍAS\n0\nAtención prioritaria\n16–45 DÍAS\n8\nPlanificar gestión\nPRIMA NETA EN GESTIÓN\nGTQ 102,825\nSeparada por moneda; horizonte 90 días\nPipeline de renovación por fecha\nAquí se muestran pólizas que todavía forman parte del proceso de renovación. 2 están vencidas y renovables dentro del pipeline; existen 1061 pólizas con vigencia pasada en el alcance histórico, ",
+          "phase": "cold",
+          "country": "GT",
+          "viewport": "DESKTOP",
+          "readyMs": 2475
+        },
+        {
+          "loadingState": "ready",
+          "bucketKeys": [
+            "vencidas",
+            "d15",
+            "d45",
+            "d90"
+          ],
+          "bucketCounts": [
+            {
+              "key": "vencidas",
+              "count": 2,
+              "visible": 2
+            },
+            {
+              "key": "d15",
+              "count": 0,
+              "visible": 0
+            },
+            {
+              "key": "d45",
+              "count": 1,
+              "visible": 1
+            },
+            {
+              "key": "d90",
+              "count": 5,
+              "visible": 5
+            }
+          ],
+          "expectedCount": 8,
+          "visibleCount": 8,
+          "exactCanonicalIds": true,
+          "recentAccessibleCount": 0,
+          "recentVisibleCount": 0,
+          "recentExact": true,
+          "terminalVisibleCount": 0,
+          "labelOk": true,
+          "cardsFit": true,
+          "actionsFit": true,
+          "boardFits": true,
+          "hostText": "🔄\nRenovaciones · Pipeline por vencer\n90 DÍAS·POR URGENCIA·GESTIÓN\nPreparar campaña de renovación\nVENCIDAS\n2\nRecuperar o cerrar gestión\n≤15 DÍAS\n0\nAtención prioritaria\n16–45 DÍAS\n1\nPlanificar gestión\nPRIMA NETA EN GESTIÓN\nCOP 68,627,858\nSeparada por moneda; horizonte 90 días\nPipeline de renovación por fecha\nAquí se muestran pólizas que todavía forman parte del proceso de renovación. 2 están vencidas y renovables dentro del pipeline; existen 97 pólizas con vigencia pasada en el alcance histórico,",
+          "phase": "cold",
+          "country": "CO",
+          "viewport": "DESKTOP",
+          "readyMs": 2120
+        }
+      ],
+      "warm": [
+        {
+          "loadingState": "ready",
+          "bucketKeys": [
+            "vencidas",
+            "d15",
+            "d45",
+            "d90"
+          ],
+          "bucketCounts": [
+            {
+              "key": "vencidas",
+              "count": 4,
+              "visible": 4
+            },
+            {
+              "key": "d15",
+              "count": 0,
+              "visible": 0
+            },
+            {
+              "key": "d45",
+              "count": 9,
+              "visible": 9
+            },
+            {
+              "key": "d90",
+              "count": 31,
+              "visible": 31
+            }
+          ],
+          "expectedCount": 44,
+          "visibleCount": 44,
+          "exactCanonicalIds": true,
+          "recentAccessibleCount": 0,
+          "recentVisibleCount": 0,
+          "recentExact": true,
+          "terminalVisibleCount": 0,
+          "labelOk": true,
+          "cardsFit": true,
+          "actionsFit": true,
+          "boardFits": true,
+          "hostText": "🔄\nRenovaciones · Pipeline por vencer\n90 DÍAS·POR URGENCIA·GESTIÓN\nPreparar campaña de renovación\nVENCIDAS\n4\nRecuperar o cerrar gestión\n≤15 DÍAS\n0\nAtención prioritaria\n16–45 DÍAS\n9\nPlanificar gestión\nPRIMA NETA EN GESTIÓN\nCOP 68,627,858\nGTQ 102,825\nSeparada por moneda; horizonte 90 días\nPipeline de renovación por fecha\nAquí se muestran pólizas que todavía forman parte del proceso de renovación. 4 están vencidas y renovables dentro del pipeline; existen 1158 pólizas con vigencia pasada en el alca",
+          "phase": "warm",
+          "country": "TODOS",
+          "viewport": "DESKTOP",
+          "readyMs": 1205
+        },
+        {
+          "loadingState": "ready",
+          "bucketKeys": [
+            "vencidas",
+            "d15",
+            "d45",
+            "d90"
+          ],
+          "bucketCounts": [
+            {
+              "key": "vencidas",
+              "count": 2,
+              "visible": 2
+            },
+            {
+              "key": "d15",
+              "count": 0,
+              "visible": 0
+            },
+            {
+              "key": "d45",
+              "count": 8,
+              "visible": 8
+            },
+            {
+              "key": "d90",
+              "count": 26,
+              "visible": 26
+            }
+          ],
+          "expectedCount": 36,
+          "visibleCount": 36,
+          "exactCanonicalIds": true,
+          "recentAccessibleCount": 0,
+          "recentVisibleCount": 0,
+          "recentExact": true,
+          "terminalVisibleCount": 0,
+          "labelOk": true,
+          "cardsFit": true,
+          "actionsFit": true,
+          "boardFits": true,
+          "hostText": "🔄\nRenovaciones · Pipeline por vencer\n90 DÍAS·POR URGENCIA·GESTIÓN\nPreparar campaña de renovación\nVENCIDAS\n2\nRecuperar o cerrar gestión\n≤15 DÍAS\n0\nAtención prioritaria\n16–45 DÍAS\n8\nPlanificar gestión\nPRIMA NETA EN GESTIÓN\nGTQ 102,825\nSeparada por moneda; horizonte 90 días\nPipeline de renovación por fecha\nAquí se muestran pólizas que todavía forman parte del proceso de renovación. 2 están vencidas y renovables dentro del pipeline; existen 1061 pólizas con vigencia pasada en el alcance histórico, ",
+          "phase": "warm",
+          "country": "GT",
+          "viewport": "DESKTOP",
+          "readyMs": 2492
+        },
+        {
+          "loadingState": "ready",
+          "bucketKeys": [
+            "vencidas",
+            "d15",
+            "d45",
+            "d90"
+          ],
+          "bucketCounts": [
+            {
+              "key": "vencidas",
+              "count": 2,
+              "visible": 2
+            },
+            {
+              "key": "d15",
+              "count": 0,
+              "visible": 0
+            },
+            {
+              "key": "d45",
+              "count": 1,
+              "visible": 1
+            },
+            {
+              "key": "d90",
+              "count": 5,
+              "visible": 5
+            }
+          ],
+          "expectedCount": 8,
+          "visibleCount": 8,
+          "exactCanonicalIds": true,
+          "recentAccessibleCount": 0,
+          "recentVisibleCount": 0,
+          "recentExact": true,
+          "terminalVisibleCount": 0,
+          "labelOk": true,
+          "cardsFit": true,
+          "actionsFit": true,
+          "boardFits": true,
+          "hostText": "🔄\nRenovaciones · Pipeline por vencer\n90 DÍAS·POR URGENCIA·GESTIÓN\nPreparar campaña de renovación\nVENCIDAS\n2\nRecuperar o cerrar gestión\n≤15 DÍAS\n0\nAtención prioritaria\n16–45 DÍAS\n1\nPlanificar gestión\nPRIMA NETA EN GESTIÓN\nCOP 68,627,858\nSeparada por moneda; horizonte 90 días\nPipeline de renovación por fecha\nAquí se muestran pólizas que todavía forman parte del proceso de renovación. 2 están vencidas y renovables dentro del pipeline; existen 97 pólizas con vigencia pasada en el alcance histórico,",
+          "phase": "warm",
+          "country": "CO",
+          "viewport": "DESKTOP",
+          "readyMs": 2089
+        }
+      ],
+      "mobile": [
+        {
+          "loadingState": "ready",
+          "bucketKeys": [
+            "vencidas",
+            "d15",
+            "d45",
+            "d90"
+          ],
+          "bucketCounts": [
+            {
+              "key": "vencidas",
+              "count": 4,
+              "visible": 4
+            },
+            {
+              "key": "d15",
+              "count": 0,
+              "visible": 0
+            },
+            {
+              "key": "d45",
+              "count": 9,
+              "visible": 9
+            },
+            {
+              "key": "d90",
+              "count": 31,
+              "visible": 31
+            }
+          ],
+          "expectedCount": 44,
+          "visibleCount": 44,
+          "exactCanonicalIds": true,
+          "recentAccessibleCount": 0,
+          "recentVisibleCount": 0,
+          "recentExact": true,
+          "terminalVisibleCount": 0,
+          "labelOk": true,
+          "cardsFit": true,
+          "actionsFit": true,
+          "boardFits": true,
+          "hostText": "🔄\nRenovaciones\n· Pipeline por vencer\nPreparar campaña de renovación\nVENCIDAS\n4\nRecuperar o cerrar gestión\n≤15 DÍAS\n0\nAtención prioritaria\n16–45 DÍAS\n9\nPlanificar gestión\nPRIMA NETA EN GESTIÓN\nCOP 68,627,858\nGTQ 102,825\nSeparada por moneda; horizonte 90 días\nPipeline de renovación por fecha\nAquí se muestran pólizas que todavía forman parte del proceso de renovación. 4 están vencidas y renovables dentro del pipeline; existen 1158 pólizas con vigencia pasada en el alcance histórico, de las cuales ",
+          "phase": "warm",
+          "country": "TODOS",
+          "viewport": "390x844",
+          "readyMs": 729
+        },
+        {
+          "loadingState": "ready",
+          "bucketKeys": [
+            "vencidas",
+            "d15",
+            "d45",
+            "d90"
+          ],
+          "bucketCounts": [
+            {
+              "key": "vencidas",
+              "count": 2,
+              "visible": 2
+            },
+            {
+              "key": "d15",
+              "count": 0,
+              "visible": 0
+            },
+            {
+              "key": "d45",
+              "count": 8,
+              "visible": 8
+            },
+            {
+              "key": "d90",
+              "count": 26,
+              "visible": 26
+            }
+          ],
+          "expectedCount": 36,
+          "visibleCount": 36,
+          "exactCanonicalIds": true,
+          "recentAccessibleCount": 0,
+          "recentVisibleCount": 0,
+          "recentExact": true,
+          "terminalVisibleCount": 0,
+          "labelOk": true,
+          "cardsFit": true,
+          "actionsFit": true,
+          "boardFits": true,
+          "hostText": "🔄\nRenovaciones\n· Pipeline por vencer\nPreparar campaña de renovación\nVENCIDAS\n2\nRecuperar o cerrar gestión\n≤15 DÍAS\n0\nAtención prioritaria\n16–45 DÍAS\n8\nPlanificar gestión\nPRIMA NETA EN GESTIÓN\nGTQ 102,825\nSeparada por moneda; horizonte 90 días\nPipeline de renovación por fecha\nAquí se muestran pólizas que todavía forman parte del proceso de renovación. 2 están vencidas y renovables dentro del pipeline; existen 1061 pólizas con vigencia pasada en el alcance histórico, de las cuales 100 están marca",
+          "phase": "warm",
+          "country": "GT",
+          "viewport": "390x844",
+          "readyMs": 2462
+        },
+        {
+          "loadingState": "ready",
+          "bucketKeys": [
+            "vencidas",
+            "d15",
+            "d45",
+            "d90"
+          ],
+          "bucketCounts": [
+            {
+              "key": "vencidas",
+              "count": 2,
+              "visible": 2
+            },
+            {
+              "key": "d15",
+              "count": 0,
+              "visible": 0
+            },
+            {
+              "key": "d45",
+              "count": 1,
+              "visible": 1
+            },
+            {
+              "key": "d90",
+              "count": 5,
+              "visible": 5
+            }
+          ],
+          "expectedCount": 8,
+          "visibleCount": 8,
+          "exactCanonicalIds": true,
+          "recentAccessibleCount": 0,
+          "recentVisibleCount": 0,
+          "recentExact": true,
+          "terminalVisibleCount": 0,
+          "labelOk": true,
+          "cardsFit": true,
+          "actionsFit": true,
+          "boardFits": true,
+          "hostText": "🔄\nRenovaciones\n· Pipeline por vencer\nPreparar campaña de renovación\nVENCIDAS\n2\nRecuperar o cerrar gestión\n≤15 DÍAS\n0\nAtención prioritaria\n16–45 DÍAS\n1\nPlanificar gestión\nPRIMA NETA EN GESTIÓN\nCOP 68,627,858\nSeparada por moneda; horizonte 90 días\nPipeline de renovación por fecha\nAquí se muestran pólizas que todavía forman parte del proceso de renovación. 2 están vencidas y renovables dentro del pipeline; existen 97 pólizas con vigencia pasada en el alcance histórico, de las cuales 1 están marcad",
+          "phase": "warm",
+          "country": "CO",
+          "viewport": "390x844",
+          "readyMs": 2041
+        },
+        {
+          "loadingState": "ready",
+          "bucketKeys": [
+            "vencidas",
+            "d15",
+            "d45",
+            "d90"
+          ],
+          "bucketCounts": [
+            {
+              "key": "vencidas",
+              "count": 4,
+              "visible": 4
+            },
+            {
+              "key": "d15",
+              "count": 0,
+              "visible": 0
+            },
+            {
+              "key": "d45",
+              "count": 9,
+              "visible": 9
+            },
+            {
+              "key": "d90",
+              "count": 31,
+              "visible": 31
+            }
+          ],
+          "expectedCount": 44,
+          "visibleCount": 44,
+          "exactCanonicalIds": true,
+          "recentAccessibleCount": 0,
+          "recentVisibleCount": 0,
+          "recentExact": true,
+          "terminalVisibleCount": 0,
+          "labelOk": true,
+          "cardsFit": true,
+          "actionsFit": true,
+          "boardFits": true,
+          "hostText": "🔄\nRenovaciones\n· Pipeline por vencer\nPreparar campaña de renovación\nVENCIDAS\n4\nRecuperar o cerrar gestión\n≤15 DÍAS\n0\nAtención prioritaria\n16–45 DÍAS\n9\nPlanificar gestión\nPRIMA NETA EN GESTIÓN\nCOP 68,627,858\nGTQ 102,825\nSeparada por moneda; horizonte 90 días\nPipeline de renovación por fecha\nAquí se muestran pólizas que todavía forman parte del proceso de renovación. 4 están vencidas y renovables dentro del pipeline; existen 1158 pólizas con vigencia pasada en el alcance histórico, de las cuales ",
+          "phase": "warm",
+          "country": "TODOS",
+          "viewport": "320x568",
+          "readyMs": 299
+        },
+        {
+          "loadingState": "ready",
+          "bucketKeys": [
+            "vencidas",
+            "d15",
+            "d45",
+            "d90"
+          ],
+          "bucketCounts": [
+            {
+              "key": "vencidas",
+              "count": 2,
+              "visible": 2
+            },
+            {
+              "key": "d15",
+              "count": 0,
+              "visible": 0
+            },
+            {
+              "key": "d45",
+              "count": 8,
+              "visible": 8
+            },
+            {
+              "key": "d90",
+              "count": 26,
+              "visible": 26
+            }
+          ],
+          "expectedCount": 36,
+          "visibleCount": 36,
+          "exactCanonicalIds": true,
+          "recentAccessibleCount": 0,
+          "recentVisibleCount": 0,
+          "recentExact": true,
+          "terminalVisibleCount": 0,
+          "labelOk": true,
+          "cardsFit": true,
+          "actionsFit": true,
+          "boardFits": true,
+          "hostText": "🔄\nRenovaciones\n· Pipeline por vencer\nPreparar campaña de renovación\nVENCIDAS\n2\nRecuperar o cerrar gestión\n≤15 DÍAS\n0\nAtención prioritaria\n16–45 DÍAS\n8\nPlanificar gestión\nPRIMA NETA EN GESTIÓN\nGTQ 102,825\nSeparada por moneda; horizonte 90 días\nPipeline de renovación por fecha\nAquí se muestran pólizas que todavía forman parte del proceso de renovación. 2 están vencidas y renovables dentro del pipeline; existen 1061 pólizas con vigencia pasada en el alcance histórico, de las cuales 100 están marca",
+          "phase": "warm",
+          "country": "GT",
+          "viewport": "320x568",
+          "readyMs": 2439
+        },
+        {
+          "loadingState": "ready",
+          "bucketKeys": [
+            "vencidas",
+            "d15",
+            "d45",
+            "d90"
+          ],
+          "bucketCounts": [
+            {
+              "key": "vencidas",
+              "count": 2,
+              "visible": 2
+            },
+            {
+              "key": "d15",
+              "count": 0,
+              "visible": 0
+            },
+            {
+              "key": "d45",
+              "count": 1,
+              "visible": 1
+            },
+            {
+              "key": "d90",
+              "count": 5,
+              "visible": 5
+            }
+          ],
+          "expectedCount": 8,
+          "visibleCount": 8,
+          "exactCanonicalIds": true,
+          "recentAccessibleCount": 0,
+          "recentVisibleCount": 0,
+          "recentExact": true,
+          "terminalVisibleCount": 0,
+          "labelOk": true,
+          "cardsFit": true,
+          "actionsFit": true,
+          "boardFits": true,
+          "hostText": "🔄\nRenovaciones\n· Pipeline por vencer\nPreparar campaña de renovación\nVENCIDAS\n2\nRecuperar o cerrar gestión\n≤15 DÍAS\n0\nAtención prioritaria\n16–45 DÍAS\n1\nPlanificar gestión\nPRIMA NETA EN GESTIÓN\nCOP 68,627,858\nSeparada por moneda; horizonte 90 días\nPipeline de renovación por fecha\nAquí se muestran pólizas que todavía forman parte del proceso de renovación. 2 están vencidas y renovables dentro del pipeline; existen 97 pólizas con vigencia pasada en el alcance histórico, de las cuales 1 están marcad",
+          "phase": "warm",
+          "country": "CO",
+          "viewport": "320x568",
+          "readyMs": 2049
+        }
+      ],
+      "firstPaint": {
+        "state": "pending",
+        "leaked": 0
+      }
+    }
+  ],
+  "pageErrors": [],
+  "consoleErrors": [],
+  "httpErrors": [],
+  "operationalBusinessWrites": 0,
+  "syntheticQaWrites": 0,
+  "additionalDataMutation": false,
+  "reimport": false,
+  "livePromoted": false,
+  "priorityRule": "RENEWALS_ADJUDICATED_FIRST_LATER_MODULE_FAILURES_DO_NOT_ERASE_PASS_UNLESS_CAUSAL",
+  "nextAction": "B4_003_RENEWALS_EXACT_PREVIEW_VISUAL"
+}
