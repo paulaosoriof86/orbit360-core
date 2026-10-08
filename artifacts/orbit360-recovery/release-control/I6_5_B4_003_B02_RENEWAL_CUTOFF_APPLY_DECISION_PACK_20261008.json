@@ -1,0 +1,99 @@
+{
+  "schema": "gravicentra-b4-003-b02-renewal-cutoff-apply-decision-pack-v1",
+  "recordedAt": "2026-10-08T21:28:00Z",
+  "status": "READY_FOR_PAULA_DECISION_NOT_AUTHORIZED",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "priorityAuthority": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PAULA_RELEASE_PRIORITY_FREEZE_20261008.json",
+    "blobSha": "fab0103ffeb10690160eef276e48bd648db998d7"
+  },
+  "observationId": "B-02",
+  "findingId": "B4-003-R20-V2-15-RENEWAL-CUTOFF-DISPOSITION",
+  "separationFromCompletedWork": {
+    "completedClassificationApply": {
+      "status": "PASS_APPLY_DO_NOT_REPEAT",
+      "writes": 1415,
+      "resultPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_RENEWABILITY_APPLY_RESULT_20261006.json",
+      "resultBlobSha": "67d8d480bd85314a01611f5154919c587854af55"
+    },
+    "pendingCutoffDisposition": {
+      "status": "DRY_RUN_PASS_WRITE_NOT_AUTHORIZED",
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_SECOND_REVIEW_DATA_DRYRUNS_20261007.json",
+      "receiptBlobSha": "65f48ab5decb113f6551d5b0f68f994ff00fe7a4"
+    }
+  },
+  "proposedRule": {
+    "cutoff": "2026-07-31",
+    "targetPredicate": "vigenciaFin <= 2026-07-31 AND no renewal, cancellation or terminal outcome AND not explicit non-renewable",
+    "proposedPatch": {
+      "renovacionEstado": "No renovada",
+      "renewalDispositionRuleId": "PAULA_EXPIRED_CUTOFF_20261007",
+      "renewalDispositionReason": "VIGENCIA_FIN_HASTA_2026_07_31_SIN_RENOVACION_NI_CANCELACION"
+    },
+    "proposedFields": [
+      "renovacionEstado",
+      "renewalDispositionRuleId",
+      "renewalDispositionReason"
+    ]
+  },
+  "exactDryRun": {
+    "canonicalPolicyCount": 1419,
+    "expired": 1157,
+    "candidateWrites": 583,
+    "recentExpiredRemainInPipeline": 24,
+    "recentByMonth": {
+      "2026-08": 9,
+      "2026-09": 11,
+      "2026-10": 4
+    },
+    "targetDigest": "744f6f26139f272fa3a26ab35e889a9d011833e802d1495286147734ec7b4d1d",
+    "recentDigest": "3512b167cdde30b51f67acc3c77135f2a94df5f133fd2d3b45cde8540938e67a"
+  },
+  "mandatoryApplyGuards": {
+    "explicitPaulaAuthorizationRequired": true,
+    "recomputeBeforeFirstWrite": true,
+    "exactTargetDigestMustMatch": true,
+    "exactWriteCountMustEqual": 583,
+    "allowedFieldsOnly": [
+      "renovacionEstado",
+      "renewalDispositionRuleId",
+      "renewalDispositionReason"
+    ],
+    "noInserts": true,
+    "noDeletes": true,
+    "recent24Untouched": true,
+    "explicitNonRenewableUntouched": true,
+    "renewedCancelledAndTerminalUntouched": true,
+    "beforeAfterEvidenceRequired": true,
+    "allTargetsReadbackRequired": true,
+    "rollbackExactRequired": true,
+    "abortOnAnyDrift": true,
+    "reimport": false,
+    "livePromotion": false
+  },
+  "afterAuthorizationSequence": [
+    "CREATE_BOUND_APPLY_AUTHORITY_WITH_EXACT_DIGEST",
+    "PREWRITE_CANONICAL_RECOMPUTE_AND_ABORT_ON_DRIFT",
+    "APPLY_MAX_583_ALLOWED_FIELD_PATCHES",
+    "READ_BACK_ALL_583_AND_PROVE_RECENT_24_UNCHANGED",
+    "RENEWALS_EXACT_PREVIEW_AUTHENTICATED_PROOF"
+  ],
+  "currentAuthorization": {
+    "dataMutationAuthorized": false,
+    "buildDispatchAuthorized": false,
+    "previewMutationAuthorized": false,
+    "livePromotionAuthorized": false
+  },
+  "decisionOptions": [
+    {
+      "id": "AUTHORIZE_EXACT_583",
+      "effect": "Authorize the guarded 583-record cutoff disposition apply only."
+    },
+    {
+      "id": "HOLD_DATA_APPLY",
+      "effect": "No writes; B-02 stays blocking while Upsells and parallel tracks continue."
+    }
+  ],
+  "nextAction": "PAULA_DECISION_AUTHORIZE_EXACT_583_OR_HOLD"
+}
