@@ -1,0 +1,42 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_ROLE_RELOAD_NAVIGATION_PROOF_ROOTFIX_V1",
+  "recordedAt": "2026-10-08T23:01:00Z",
+  "status": "PROOF_ROOTFIXED_PENDING_EXACT_PREVIEW",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "parentHead": "79809de696ec057f971f3820a8b22a15bb7084b1",
+  "failedRun": {
+    "id": 37855839985,
+    "jobId": 113579674889,
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-37855839985-3l1eso47.web.app",
+    "failure": "page.waitForFunction expected Leads landing timed out at inboxUiFor line 201",
+    "evidence": {
+      "advisorNoticeProjected": true,
+      "advisorActionCardVisibleInLeads": true,
+      "currentActionQueueRank": true,
+      "cleanupWrites": 35,
+      "syntheticFinalAbsent": true,
+      "livePromotion": false
+    }
+  },
+  "cause": {
+    "classification": "QA_SAME_DOCUMENT_ROLE_RELOAD_RACE",
+    "detail": "After selecting the exact advisor role, page.goto to the same origin and hash could be a same-document navigation. A pending session refresh could observe the prior non-Inicio route and freeze the one-time landing decision before the hash returned to Inicio.",
+    "productRegression": false
+  },
+  "correction": {
+    "path": "tools/gravicentra-i6-5-b4-003-preview-proof.mjs",
+    "previousBlobSha": "758afe01ff5631c2663d6cf7ddd42363b1c45504",
+    "correctedBlobSha": "d187bd47e8f1c23d1406baf60aac4d8a365a2207",
+    "scope": "Force a network document reload with an inert QA query marker after exact role selection, preserving #/inicio and the same immutable Preview package."
+  },
+  "boundaries": {
+    "productSourceChanged": false,
+    "dataMutation": false,
+    "businessWrites": false,
+    "syntheticQaWritesThisCommit": false,
+    "livePromotion": false,
+    "reimport": false
+  },
+  "nextAction": "B4_003_R20_CONTRACT_AND_EXACT_PREVIEW"
+}

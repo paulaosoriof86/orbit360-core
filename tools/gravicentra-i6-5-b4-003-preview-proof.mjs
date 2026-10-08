@@ -192,7 +192,8 @@ async function inboxUiFor(browser,who,eventId,expectedSurface,stateAction){
   need(roleAssigned,'B4_003_INBOX_ROLE_NOT_ASSIGNED_OR_SESSION_NOT_READY:'+expectedRole);
   const roleSelected=await p.evaluate(role=>Orbit.session.set(role)===true,who.activeRole);
   need(roleSelected,'B4_003_INBOX_ROLE_SELECTION_REJECTED:'+expectedRole);
-  await p.goto(target+'/#/inicio',{waitUntil:'domcontentloaded',timeout:60000});await bootProduct(p,token);
+  const roleReloadUrl=target+'/?b4003RoleReload='+encodeURIComponent(expectedRole)+'-'+encodeURIComponent(run)+'#/inicio';
+  await p.goto(roleReloadUrl,{waitUntil:'domcontentloaded',timeout:60000});await bootProduct(p,token);
   const sessionReady=await p.waitForFunction(role=>{
     const raw=String(Orbit.session&&typeof Orbit.session.rol==='function'?Orbit.session.rol():'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_+|_+$/g,'');
     return raw===role;
