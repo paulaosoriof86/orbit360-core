@@ -1079,7 +1079,7 @@ try{
    Orbit.pais='GT';
    let loading=false,leakedRows=-1,readyExpired=false,unknownVisible=false,unknownReview=false,pendingCount=-1,placeholderClient=false;
    try{
-     store._productStatus=function(){const q=original.call(store)||{},confirmed=[].concat(q.serverConfirmedCollections||[]).filter(x=>x!=='aseguradoras');return Object.assign({},q,{serverConfirmedCollections:confirmed});};
+     store._productStatus=function(){const q=original.call(store)||{},confirmed=[].concat(q.serverConfirmedCollections||[]).filter(x=>x!=='polizas');return Object.assign({},q,{serverConfirmedCollections:confirmed});};
      Orbit.modules.renovaciones.render(h);
      loading=!!h.querySelector('[data-renewals-loading]');
      leakedRows=h.querySelectorAll('[data-renewal-policy]').length;
@@ -1097,6 +1097,16 @@ try{
  need(proof.r14RenewalReadiness.readyExpired===true,'B4_003_R14_EXPIRED_RENEWAL_DROPPED');
  need(proof.r14RenewalReadiness.unknownVisible===true&&proof.r14RenewalReadiness.unknownReview===true&&proof.r14RenewalReadiness.pendingCount>=1,'B4_003_R20_UNKNOWN_RENEWABILITY_KANBAN_VISIBILITY_FAILED:'+JSON.stringify(proof.r14RenewalReadiness));
  need(proof.r14RenewalReadiness.placeholderClient===false,'B4_003_R14_RENEWAL_PLACEHOLDER_LEAK');
+ proof.r20InsurerOptionalReadiness=await page.evaluate(()=>{
+   const host=document.getElementById('host'),store=Orbit.store,original=store._productStatus;
+   try{
+     store._productStatus=function(){const q=original.call(store)||{},confirmed=[].concat(q.serverConfirmedCollections||[]).filter(x=>x!=='aseguradoras');return Object.assign({},q,{serverConfirmedCollections:confirmed});};
+     Orbit.modules.renovaciones.render(host);
+     return{loading:!!host.querySelector('[data-renewals-loading]'),buckets:host.querySelectorAll('[data-renewal-bucket]').length};
+   }finally{store._productStatus=original;Orbit.modules.renovaciones.render(host);}
+ });
+ need(!proof.r20InsurerOptionalReadiness.loading&&proof.r20InsurerOptionalReadiness.buckets===4,'B4_003_R20_OPTIONAL_INSURER_READINESS_MUST_NOT_BLOCK');
+ proof.assertions.renewalInsurerDirectoryOptionalNonblocking=true;
  proof.assertions.renewalFirstPaintReadiness=true;
  proof.assertions.expiredRenewalOutcomeContinuity=true;
  proof.assertions.unknownRenewabilityDebtVisibleFailClosed=true;

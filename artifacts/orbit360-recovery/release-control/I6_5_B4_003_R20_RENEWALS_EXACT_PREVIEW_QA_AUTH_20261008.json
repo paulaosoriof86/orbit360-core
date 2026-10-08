@@ -1,0 +1,56 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R20_RENEWALS_QA_AND_PREVIEW_AUTHORIZATION_V1",
+  "recordedAt": "2026-10-08",
+  "status": "AUTHORIZED_EXACT_PREVIEW_OF_CHANGED_SOURCE",
+  "gate": "I6.5/B4-003",
+  "sourceShaAtAuthorization": "767eb3c219f3ac099cacf40d8502747e06a20c03",
+  "reviewedSourceFiles": {
+    "orbit360-platform/modules/renovaciones.js": "de7451777a800374c806ab027cad05e92946fd57",
+    "orbit360-platform/index.html": "b766f7513c0193b526e74b3c673161628dd84881"
+  },
+  "readinessSourceFix": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_RENEWALS_READINESS_SOURCE_FIX_RECEIPT_20261008.json",
+    "blobSha": "dc0b48c41b6e50a62a8a4e27b14aa891a731adca"
+  },
+  "qaBlobs": [
+    {
+      "path": "tools/gravicentra-i6-5-b4-003-contract.mjs",
+      "sha": "01c720bc36d502454063c202a1819df5e64cfe8d",
+      "before": "7ab1cb376e090617aaee6753ba6271aeb18b8fcc"
+    },
+    {
+      "path": "tools/gravicentra-i6-5-b4-003-preview-proof.mjs",
+      "sha": "37d79ec6774332d67efcbe2d2cf79cfcc58c92fb",
+      "before": "d187bd47e8f1c23d1406baf60aac4d8a365a2207"
+    },
+    {
+      "path": "tools/gravicentra-i6-5-b4-003-renewals-priority-preview-proof.mjs",
+      "sha": "b79d8cfb9dd8fec94f15cae53805eeafa50674f6",
+      "before": "4f34ab832ae104f56b215d8c800e88d99dfc4bdb"
+    }
+  ],
+  "qaChangeClassification": "QA_EXPECTATION_CAUSAL_FIX_VERSIONED_NO_RUNNER_MUTATION",
+  "negativeControls": [
+    "Missing policies snapshot => pending/no policy rows",
+    "Missing optional insurers only => four populated renewal buckets",
+    "Role/country/canonical policy data remain authoritative"
+  ],
+  "scope": {
+    "buildOnceNewSource": true,
+    "isolatedHostingPreview": true,
+    "isolatedPreviewFunctions": true,
+    "syntheticQaFixturesOnly": true,
+    "syntheticCleanupMandatory": true,
+    "canonicalReadbackMandatory": true,
+    "allOperationalWritesForbidden": true,
+    "productionHostingMutation": false,
+    "productionFunctionsMutation": false,
+    "reimport": false
+  },
+  "priorProofs": {
+    "b3PaymentVisualPass": true,
+    "r20MachineProofPreservedHistoricalOnly": true,
+    "paulaR20HumanAcceptance": "REJECTED"
+  },
+  "nextAction": "B4_003_R20_EXACT_PREVIEW_EVIDENCE_AND_PAULA_REVIEW"
+}

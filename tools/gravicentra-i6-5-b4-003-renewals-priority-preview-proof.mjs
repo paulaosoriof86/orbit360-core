@@ -201,16 +201,21 @@ async function renderCountry(page,country,phase,viewport){
 async function firstPaintGuard(page){
   const r=await page.evaluate(()=>{
     const h=document.getElementById('host'),store=Orbit.store,original=store._productStatus;
-    let state='',leaked=-1;
+    let state='',leaked=-1,optionalLoading=null,optionalBucketCount=0;
     try{
-      store._productStatus=function(){const q=original.call(store)||{},confirmed=[].concat(q.serverConfirmedCollections||[]).filter(x=>x!=='aseguradoras');return Object.assign({},q,{serverConfirmedCollections:confirmed});};
+      store._productStatus=function(){const q=original.call(store)||{},confirmed=[].concat(q.serverConfirmedCollections||[]).filter(x=>x!=='polizas');return Object.assign({},q,{serverConfirmedCollections:confirmed});};
       Orbit.modules.renovaciones.render(h);
       state=h.querySelector('[data-renewals-loading]')?.getAttribute('data-renewals-loading')||'';
       leaked=h.querySelectorAll('[data-renewal-policy]').length;
+      store._productStatus=function(){const q=original.call(store)||{},confirmed=[].concat(q.serverConfirmedCollections||[]).filter(x=>x!=='aseguradoras');return Object.assign({},q,{serverConfirmedCollections:confirmed});};
+      Orbit.modules.renovaciones.render(h);
+      optionalLoading=!!h.querySelector('[data-renewals-loading]');
+      optionalBucketCount=h.querySelectorAll('[data-renewal-bucket]').length;
     }finally{store._productStatus=original;Orbit.modules.renovaciones.render(h);}
-    return{state,leaked};
+    return{state,leaked,optionalLoading,optionalBucketCount};
   });
   need(r.state==='pending'&&r.leaked===0,'B4_003_RENEWALS_FIRST_PAINT_GUARD');
+  need(r.optionalLoading===false&&r.optionalBucketCount===4,'B4_003_OPTIONAL_INSURER_MUST_NOT_BLOCK_RENEWALS');
   return r;
 }
 

@@ -59,9 +59,14 @@
       "orbit360-platform/modules/renovaciones.js",
       "orbit360-platform/index.html"
     ],
-    "buildDispatchAuthorized": false,
-    "previewMutationAuthorized": false,
-    "functionDeploymentAuthorized": false
+    "buildDispatchAuthorized": true,
+    "previewMutationAuthorized": true,
+    "functionDeploymentAuthorized": true,
+    "allowedQaFiles": [
+      "tools/gravicentra-i6-5-b4-003-contract.mjs",
+      "tools/gravicentra-i6-5-b4-003-preview-proof.mjs",
+      "tools/gravicentra-i6-5-b4-003-renewals-priority-preview-proof.mjs"
+    ]
   },
   "boundaries": {
     "businessWritesAuthorized": false,
@@ -74,7 +79,7 @@
     ],
     "reimportAuthorized": false,
     "livePromotionAuthorized": false,
-    "syntheticQaWritesAuthorized": false,
+    "syntheticQaWritesAuthorized": true,
     "syntheticQaScope": "R20 exact Preview only: disposable insurer/logo/product/plan/requirement/document and Ops/Leads handoff/cadence fixtures; mandatory server commit, readback, reload and cleanup; no real operational row mutation.",
     "paulaVisualAcceptanceRequiredBeforeAdvance": false,
     "cotcompRealTransportAuthorized": false,
@@ -96,10 +101,11 @@
     "renewabilityDataMutationAuthorized": false,
     "authorizedDataMutation": "NONE_POST_B02_APPLY_PASS",
     "renewabilityApplyRepeatAuthorized": false,
-    "buildDispatchAuthorized": false,
-    "previewMutationAuthorized": false,
-    "functionDeploymentAuthorized": false,
-    "renewalCutoffDataMutationAuthorized": false
+    "buildDispatchAuthorized": true,
+    "previewMutationAuthorized": true,
+    "functionDeploymentAuthorized": true,
+    "renewalCutoffDataMutationAuthorized": false,
+    "realOperationalWritesAuthorized": false
   },
   "nextAction": "B4_003_R20_CONTRACT_AND_EXACT_PREVIEW_AUTHORIZATION",
   "compositionLock": {
@@ -1457,5 +1463,10 @@
     "machinePassNotReusedForNewSource": true,
     "previewPending": true,
     "runId": 37856707824
+  },
+  "r20ReadinessExactPreviewAuthorization": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_RENEWALS_EXACT_PREVIEW_QA_AUTH_20261008.json",
+    "blobSha": "4a5b737045bc7b08bf535f0d01f52c99d4036c26",
+    "status": "AUTHORIZED_EXACT_PREVIEW_OF_CHANGED_SOURCE"
   }
 }

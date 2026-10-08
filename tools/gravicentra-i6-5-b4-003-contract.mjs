@@ -152,7 +152,7 @@ need(!/function\s+campana\s*\(/.test(base)&&!/function\s+solicitarPropuestas\s*\
 need(/return\s*\{\s*render\s*\}/.test(base),'B4_003_BASE_RENDER_ONLY_CONTRACT_MISSING');
 need(/p\.renovadaPor/.test(base)&&/terminalRenewalOutcome/.test(base)&&/renovacionEstado/.test(base),'B4_003_BASE_RENEWED_FILTER_MISSING');
 need(base.includes("renewabilityState(p)!=='YES'")&&base.includes("renewabilityState(p)!=='UNKNOWN'"),'B4_003_BASE_RENEWABILITY_FAIL_CLOSED_MISSING');
-need(/renewalDataReadiness/.test(base)&&/data-renewals-loading=/.test(base)&&/REQUIRED_DATA = \['polizas', 'clientes', 'aseguradoras'\]/.test(base),'B4_003_R14_RENEWAL_FIRST_PAINT_READINESS_MISSING');
+need(/renewalDataReadiness/.test(base)&&/data-renewals-loading=/.test(base)&&/REQUIRED_DATA = \['polizas', 'clientes'\]/.test(base)&&/OPTIONAL_ENRICHMENT_DATA = \['aseguradoras'\]/.test(base)&&base.includes("collection !== 'aseguradoras'"),'B4_003_R14_RENEWAL_FIRST_PAINT_READINESS_MISSING');
 need(/renewalPendingValidation/.test(base)&&/data-renewability-pending-count=/.test(base),'B4_003_R14_RENEWABILITY_VALIDATION_DEBT_MISSING');
 need(/\['vigente','porrenovar','vencida'\]/.test(base),'B4_003_R14_EXPIRED_RENEWAL_CONTINUITY_MISSING');
 need(/mod\.campana\s*=\s*campana/.test(bridge)&&/mod\.solicitarPropuestas\s*=\s*solicitarPropuestas/.test(bridge)&&/mod\.registrarAceptacion\s*=\s*registrarAceptacion/.test(bridge),'B4_003_OPERATIONAL_RENEWAL_OWNER_INCOMPLETE');
