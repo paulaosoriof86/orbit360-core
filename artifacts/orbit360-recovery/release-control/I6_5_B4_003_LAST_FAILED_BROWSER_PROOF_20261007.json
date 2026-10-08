@@ -1,25 +1,25 @@
 {
   "schema": "GRAVICENTRA_I6_5_B4_003_PREVIEW_PROOF_R19_V1",
   "status": "FAIL",
-  "target": "https://ays-orbit-360-lab--gi-i65-b4-37853014854-ahynrtdm.web.app",
+  "target": "https://ays-orbit-360-lab--gi-i65-b4-37853808780-v5tunzoh.web.app",
   "ids": {
-    "client": "b4003qa_client_37853014854",
-    "renewalPolicy": "b4003qa_policy_renew_37853014854",
-    "expiredRenewPolicy": "b4003qa_policy_expired_renew_37853014854",
-    "unknownRenewPolicy": "b4003qa_policy_unknown_37853014854",
-    "renewabilityWritePolicy": "b4003qa_policy_renewwrite_37853014854",
-    "cancelPolicy": "b4003qa_policy_cancel_37853014854",
-    "healthPolicy": "b4003qa_policy_health_37853014854",
-    "healthReceipt1": "b4003qa_receipt_health_1_37853014854",
-    "healthReceipt2": "b4003qa_receipt_health_2_37853014854",
-    "healthReceiptShadow": "b4003qa_receipt_health_shadow_37853014854",
-    "cancelation": "b4003qa_cancel_37853014854",
-    "insurer": "b4003qa_insurer_37853014854",
-    "collabBusiness": "b4003qa_business_collab_37853014854",
-    "collabNoClientBusiness": "b4003qa_business_collab_noclient_37853014854",
-    "renewActivity": "act_ren_b4003qa_policy_renew_37853014854_20261008",
-    "cancelActivity": "act_rec_b4003qa_cancel_37853014854",
-    "recoveryBusiness": "neg_rec_b4003qa_cancel_37853014854"
+    "client": "b4003qa_client_37853808780",
+    "renewalPolicy": "b4003qa_policy_renew_37853808780",
+    "expiredRenewPolicy": "b4003qa_policy_expired_renew_37853808780",
+    "unknownRenewPolicy": "b4003qa_policy_unknown_37853808780",
+    "renewabilityWritePolicy": "b4003qa_policy_renewwrite_37853808780",
+    "cancelPolicy": "b4003qa_policy_cancel_37853808780",
+    "healthPolicy": "b4003qa_policy_health_37853808780",
+    "healthReceipt1": "b4003qa_receipt_health_1_37853808780",
+    "healthReceipt2": "b4003qa_receipt_health_2_37853808780",
+    "healthReceiptShadow": "b4003qa_receipt_health_shadow_37853808780",
+    "cancelation": "b4003qa_cancel_37853808780",
+    "insurer": "b4003qa_insurer_37853808780",
+    "collabBusiness": "b4003qa_business_collab_37853808780",
+    "collabNoClientBusiness": "b4003qa_business_collab_noclient_37853808780",
+    "renewActivity": "act_ren_b4003qa_policy_renew_37853808780_20261008",
+    "cancelActivity": "act_rec_b4003qa_cancel_37853808780",
+    "recoveryBusiness": "neg_rec_b4003qa_cancel_37853808780"
   },
   "assertions": {
     "handoffActorsDistinct": true,
@@ -409,7 +409,7 @@
       "visible": true,
       "sampleNumber": "91-59247519",
       "emptyState": false,
-      "textSample": "✕ Cancelaciones · Fuga de cartera MOTIVOS·VALOR PERDIDO·TASA DE FUGA CANCELADAS 490 histórico VALOR PERDIDO GTQ 1,842,217 USD 91,823,506 COP 26,564,526 prima anual · por moneda MOTIVO PRINCIPAL Sin motivo registrado más frecuente CANCELADAS / CARTERA 34% histórico acumulado · no es churn temporal Motivos de cancelación Sin motivo registrado 489 · 100% Prueba sintética B4-003 1 · 0% Motivo Prueba sintética B4-003 Sin motivo registrado Asesor Braulio Hernández Carlos Castro Fernando Arias Johanna Salgado Nicole Castro Paula Osorio Samuel Daza 490 de 490 FECHA CLIENTE PÓLIZA RAMO MOTIVO VALOR PERDIDO ACCIÓN 08 oct 2026 BQ B4-003 QA Cliente Persona · GT B4-003-CAN-37853014854 Auto Prueba sintética B4-003 Q 700 Ver cancelación 16 sept 2026 ML MARÍA LUISA LARIOS CALDERÓN natural · GT 223092797 VEHICULOS Sin motivo registrado Q 2,436 Ver cancelación 14 sept 2026 SK SEON KEUN KIM natural · GT 225121245 VEHICULOS Sin motivo registrado Q 6,250 Ver cancelación 07 sept 2026 JI JHEFRI ISAAC RAMIREZ AGUSTÍN natural · GT AUTO-514726 VEHICULOS Sin motivo registrado Q 25,116 Ver cancelación 07 sept 2026 FA FRANCISCO ANTONIO VÁSQUEZ MARTINEZ natural · GT VA125-00006039 VEHICULOS Sin motivo registrad"
+      "textSample": "✕ Cancelaciones · Fuga de cartera MOTIVOS·VALOR PERDIDO·TASA DE FUGA CANCELADAS 490 histórico VALOR PERDIDO GTQ 1,842,217 USD 91,823,506 COP 26,564,526 prima anual · por moneda MOTIVO PRINCIPAL Sin motivo registrado más frecuente CANCELADAS / CARTERA 34% histórico acumulado · no es churn temporal Motivos de cancelación Sin motivo registrado 489 · 100% Prueba sintética B4-003 1 · 0% Motivo Prueba sintética B4-003 Sin motivo registrado Asesor Braulio Hernández Carlos Castro Fernando Arias Johanna Salgado Nicole Castro Paula Osorio Samuel Daza 490 de 490 FECHA CLIENTE PÓLIZA RAMO MOTIVO VALOR PERDIDO ACCIÓN 08 oct 2026 BQ B4-003 QA Cliente Persona · GT B4-003-CAN-37853808780 Auto Prueba sintética B4-003 Q 700 Ver cancelación 16 sept 2026 ML MARÍA LUISA LARIOS CALDERÓN natural · GT 223092797 VEHICULOS Sin motivo registrado Q 2,436 Ver cancelación 14 sept 2026 SK SEON KEUN KIM natural · GT 225121245 VEHICULOS Sin motivo registrado Q 6,250 Ver cancelación 07 sept 2026 JI JHEFRI ISAAC RAMIREZ AGUSTÍN natural · GT AUTO-514726 VEHICULOS Sin motivo registrado Q 25,116 Ver cancelación 07 sept 2026 FA FRANCISCO ANTONIO VÁSQUEZ MARTINEZ natural · GT VA125-00006039 VEHICULOS Sin motivo registrad"
     }
   },
   "actor": {
@@ -971,7 +971,6 @@
     "cancelSnapshotError": "",
     "cancelAttached": true,
     "optionalMissing": [
-      "estadosCuentaAseguradora",
       "recibosAseguradora",
       "conciliacionesPrimas",
       "conciliaciones",
@@ -1572,8 +1571,8 @@
       "CO",
       "CO"
     ],
-    "cancelGtMs": 99.79999999998836,
-    "cancelCoMs": 41,
+    "cancelGtMs": 48.09999999997672,
+    "cancelCoMs": 32.90000000002328,
     "cancelExplicitTargetsGT": true,
     "cancelExplicitTargetsCO": true,
     "cancelCrossCountryExplicitGT": true,
@@ -1864,7 +1863,7 @@
     "cancelKpiDetailOpen": true
   },
   "r11Browser": {
-    "clientHref": "#/cliente360?c=b4003qa_client_37853014854&t=polizas",
+    "clientHref": "#/cliente360?c=b4003qa_client_37853808780&t=polizas",
     "policyTargetPresent": true,
     "explicitCancelTargetPresent": true,
     "rowMisleadingClickable": false,
@@ -1940,8 +1939,8 @@
       "CO",
       "CO"
     ],
-    "qualityGtMs": 201,
-    "qualityCoMs": 99.29999999998836,
+    "qualityGtMs": 149.59999999997672,
+    "qualityCoMs": 84.20000000006985,
     "qualityGtRows": 50,
     "qualityCoRows": 17,
     "financialGtRows": 72,
@@ -1954,7 +1953,7 @@
     "syncPaintMs": 1.099999999976717,
     "hasVisibleState": true,
     "text": "Confirmando catálogos canónicos… La plataforma está leyendo la configuración protegida del tenant. No se usan valores locales como autoridad.",
-    "canonicalReadyMs": 792,
+    "canonicalReadyMs": 788,
     "finalState": "ready"
   },
   "r16CatalogAndQuality": {
@@ -1989,7 +1988,7 @@
       "reason": "Se excluyeron 1 registro(s) histórico(s) duplicado(s); el calendario activo aún supera la prima contractual."
     },
     "rowVisible": true,
-    "rowText": "B4-003-HEALTH-378530148542 recibo(s) vigente(s) · 1 legado(s) excluido(s) BQ B4-003 QA Cliente Persona · GuatemalaQ 407.01Póliza · prima totalProgramación según cuotas de la póliza0 fila(s) requieren revisiónQ 542.68Q 135.67Q 0.02Se excluyeron 1 registro(s) histórico(s) duplicado(s); el calendario activo aún supera la prima contractual.Revisar diferenciaVer recibos",
+    "rowText": "B4-003-HEALTH-378538087802 recibo(s) vigente(s) · 1 legado(s) excluido(s) BQ B4-003 QA Cliente Persona · GuatemalaQ 407.01Póliza · prima totalProgramación según cuotas de la póliza0 fila(s) requieren revisiónQ 542.68Q 135.67Q 0.02Se excluyeron 1 registro(s) histórico(s) duplicado(s); el calendario activo aún supera la prima contractual.Revisar diferenciaVer recibos",
     "technicalToken": false,
     "exactAction": true,
     "mobileContract": true
@@ -2028,7 +2027,7 @@
     "technical": false
   },
   "r17QualityReceiptsDeepLink": {
-    "hash": "#/cliente360?c=b4003qa_client_37853014854&p=b4003qa_policy_health_37853014854&t=recibos",
+    "hash": "#/cliente360?c=b4003qa_client_37853808780&p=b4003qa_policy_health_37853808780&t=recibos",
     "receiptsTarget": true
   },
   "policyEditorPreservation": {
@@ -2117,9 +2116,9 @@
   },
   "r18CommercialMobile": {
     "viewport": 390,
-    "cardWidth": 386.46875,
-    "cardScrollWidth": 384,
-    "cardClientWidth": 384,
+    "cardWidth": 388.875,
+    "cardScrollWidth": 387,
+    "cardClientWidth": 387,
     "footerButtons": 2
   },
   "r18ManagementModal": {
@@ -2176,7 +2175,7 @@
           "pol_5080266a15e6f2b39f20017d08e4",
           "pol_b9a883095c9fae8f7502ce1cb054",
           "pol_0f89cc0a12840594abcc60d418b2",
-          "b4003qa_policy_expired_renew_37853014854",
+          "b4003qa_policy_expired_renew_37853808780",
           "pol_b8b99324d9016269d118d789095a",
           "pol_8231bbb8f9b7272c02891f5a4caf",
           "pol_df6bf097045762297ec31fd4e5c5"
@@ -2186,9 +2185,9 @@
         "key": "d15",
         "count": 3,
         "ids": [
-          "b4003qa_policy_renew_37853014854",
-          "b4003qa_policy_renewwrite_37853014854",
-          "b4003qa_policy_unknown_37853014854"
+          "b4003qa_policy_renew_37853808780",
+          "b4003qa_policy_renewwrite_37853808780",
+          "b4003qa_policy_unknown_37853808780"
         ]
       },
       {
@@ -2250,9 +2249,9 @@
     "unknownReview": true,
     "parallelDispositionAbsent": true,
     "date45ExpectedIds": [
-      "b4003qa_policy_renew_37853014854",
-      "b4003qa_policy_renewwrite_37853014854",
-      "b4003qa_policy_unknown_37853014854",
+      "b4003qa_policy_renew_37853808780",
+      "b4003qa_policy_renewwrite_37853808780",
+      "b4003qa_policy_unknown_37853808780",
       "pol_3ddc9e613f40252f02b2e122072d",
       "pol_638e276218baad9e84018415b0ba",
       "pol_7280c9b1a5253a1fe1e463e5993b",
@@ -2264,9 +2263,9 @@
       "pol_d5e61976a38be76ba5e3c1e12575"
     ],
     "date45VisibleIds": [
-      "b4003qa_policy_renew_37853014854",
-      "b4003qa_policy_renewwrite_37853014854",
-      "b4003qa_policy_unknown_37853014854",
+      "b4003qa_policy_renew_37853808780",
+      "b4003qa_policy_renewwrite_37853808780",
+      "b4003qa_policy_unknown_37853808780",
       "pol_3ddc9e613f40252f02b2e122072d",
       "pol_638e276218baad9e84018415b0ba",
       "pol_7280c9b1a5253a1fe1e463e5993b",
@@ -2296,7 +2295,7 @@
     ]
   },
   "r19RenewabilityDurable": {
-    "policyId": "b4003qa_policy_renewwrite_37853014854",
+    "policyId": "b4003qa_policy_renewwrite_37853808780",
     "serverValue": true,
     "reloadValue": true
   },
@@ -2306,12 +2305,24 @@
     "hasPrev": true
   },
   "r13PolicyPerformance": {
-    "routeMs": 417,
-    "searchMs": 1298,
-    "detailMs": 400,
-    "searchNumber": "B4-003-REN-37853014854",
+    "routeMs": 545,
+    "searchMs": 230,
+    "detailMs": 370,
+    "searchNumber": "B4-003-REN-37853808780",
     "refreshFlicker": {
       "states": [
+        {
+          "loading": false,
+          "hasPolicy": false,
+          "hasClient": false,
+          "route": "#/polizas"
+        },
+        {
+          "loading": false,
+          "hasPolicy": false,
+          "hasClient": false,
+          "route": "#/polizas"
+        },
         {
           "loading": false,
           "hasPolicy": false,
@@ -2435,7 +2446,7 @@
     "route": "renovaciones",
     "records": [
       {
-        "ms": 696,
+        "ms": 424,
         "type": "childList",
         "target": "DIV",
         "added": [],
@@ -2444,7 +2455,7 @@
         ]
       },
       {
-        "ms": 696,
+        "ms": 425,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -2453,7 +2464,7 @@
         "removed": []
       },
       {
-        "ms": 696,
+        "ms": 425,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -2464,7 +2475,7 @@
         ]
       },
       {
-        "ms": 696,
+        "ms": 425,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -2475,7 +2486,7 @@
         ]
       },
       {
-        "ms": 696,
+        "ms": 425,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -2486,7 +2497,7 @@
         ]
       },
       {
-        "ms": 696,
+        "ms": 425,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -2497,7 +2508,7 @@
         ]
       },
       {
-        "ms": 696,
+        "ms": 425,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -2508,7 +2519,7 @@
         ]
       },
       {
-        "ms": 696,
+        "ms": 425,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -2519,7 +2530,7 @@
         ]
       },
       {
-        "ms": 696,
+        "ms": 425,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -2530,7 +2541,7 @@
         ]
       },
       {
-        "ms": 696,
+        "ms": 425,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -2541,7 +2552,7 @@
         ]
       },
       {
-        "ms": 696,
+        "ms": 425,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -2552,7 +2563,7 @@
         ]
       },
       {
-        "ms": 696,
+        "ms": 425,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -2563,7 +2574,7 @@
         ]
       },
       {
-        "ms": 696,
+        "ms": 425,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -2575,7 +2586,7 @@
         ]
       },
       {
-        "ms": 696,
+        "ms": 425,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -2586,7 +2597,7 @@
         ]
       },
       {
-        "ms": 696,
+        "ms": 425,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2597,7 +2608,7 @@
         ]
       },
       {
-        "ms": 696,
+        "ms": 425,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2608,7 +2619,7 @@
         ]
       },
       {
-        "ms": 696,
+        "ms": 425,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2619,7 +2630,7 @@
         ]
       },
       {
-        "ms": 696,
+        "ms": 425,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2630,7 +2641,7 @@
         ]
       },
       {
-        "ms": 696,
+        "ms": 425,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2641,7 +2652,7 @@
         ]
       },
       {
-        "ms": 696,
+        "ms": 425,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2652,7 +2663,7 @@
         ]
       },
       {
-        "ms": 696,
+        "ms": 425,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2663,7 +2674,7 @@
         ]
       },
       {
-        "ms": 696,
+        "ms": 425,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2674,7 +2685,7 @@
         ]
       },
       {
-        "ms": 696,
+        "ms": 425,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2685,7 +2696,7 @@
         ]
       },
       {
-        "ms": 696,
+        "ms": 425,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2696,7 +2707,7 @@
         ]
       },
       {
-        "ms": 696,
+        "ms": 425,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2707,7 +2718,7 @@
         ]
       },
       {
-        "ms": 696,
+        "ms": 425,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2718,7 +2729,7 @@
         ]
       },
       {
-        "ms": 696,
+        "ms": 425,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2729,7 +2740,7 @@
         ]
       },
       {
-        "ms": 696,
+        "ms": 425,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2740,7 +2751,7 @@
         ]
       },
       {
-        "ms": 696,
+        "ms": 425,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2751,7 +2762,7 @@
         ]
       },
       {
-        "ms": 696,
+        "ms": 425,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2762,7 +2773,7 @@
         ]
       },
       {
-        "ms": 696,
+        "ms": 425,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2773,7 +2784,7 @@
         ]
       },
       {
-        "ms": 696,
+        "ms": 425,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2784,7 +2795,7 @@
         ]
       },
       {
-        "ms": 696,
+        "ms": 425,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2795,7 +2806,7 @@
         ]
       },
       {
-        "ms": 696,
+        "ms": 425,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2806,7 +2817,7 @@
         ]
       },
       {
-        "ms": 696,
+        "ms": 425,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2817,7 +2828,7 @@
         ]
       },
       {
-        "ms": 696,
+        "ms": 425,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2828,7 +2839,7 @@
         ]
       },
       {
-        "ms": 696,
+        "ms": 425,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2839,7 +2850,7 @@
         ]
       },
       {
-        "ms": 696,
+        "ms": 425,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2850,7 +2861,7 @@
         ]
       },
       {
-        "ms": 696,
+        "ms": 425,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2861,7 +2872,7 @@
         ]
       },
       {
-        "ms": 696,
+        "ms": 425,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2872,7 +2883,7 @@
         ]
       },
       {
-        "ms": 696,
+        "ms": 425,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2883,7 +2894,7 @@
         ]
       },
       {
-        "ms": 696,
+        "ms": 425,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2894,7 +2905,7 @@
         ]
       },
       {
-        "ms": 696,
+        "ms": 425,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2905,7 +2916,7 @@
         ]
       },
       {
-        "ms": 696,
+        "ms": 425,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2916,7 +2927,7 @@
         ]
       },
       {
-        "ms": 696,
+        "ms": 425,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2927,7 +2938,7 @@
         ]
       },
       {
-        "ms": 696,
+        "ms": 425,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2938,7 +2949,7 @@
         ]
       },
       {
-        "ms": 696,
+        "ms": 425,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2949,7 +2960,7 @@
         ]
       },
       {
-        "ms": 696,
+        "ms": 425,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2960,7 +2971,7 @@
         ]
       },
       {
-        "ms": 696,
+        "ms": 425,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2971,7 +2982,7 @@
         ]
       },
       {
-        "ms": 696,
+        "ms": 425,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2982,7 +2993,7 @@
         ]
       },
       {
-        "ms": 696,
+        "ms": 425,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2993,7 +3004,7 @@
         ]
       },
       {
-        "ms": 696,
+        "ms": 425,
         "type": "childList",
         "target": "A",
         "added": [
@@ -3004,7 +3015,7 @@
         ]
       },
       {
-        "ms": 696,
+        "ms": 425,
         "type": "childList",
         "target": "A",
         "added": [
@@ -3015,7 +3026,7 @@
         ]
       },
       {
-        "ms": 696,
+        "ms": 425,
         "type": "childList",
         "target": "A",
         "added": [
@@ -3026,7 +3037,7 @@
         ]
       },
       {
-        "ms": 696,
+        "ms": 425,
         "type": "childList",
         "target": "A",
         "added": [
@@ -3037,7 +3048,7 @@
         ]
       },
       {
-        "ms": 696,
+        "ms": 425,
         "type": "childList",
         "target": "A",
         "added": [
@@ -3048,7 +3059,7 @@
         ]
       },
       {
-        "ms": 696,
+        "ms": 425,
         "type": "childList",
         "target": "A",
         "added": [
@@ -3059,7 +3070,7 @@
         ]
       },
       {
-        "ms": 696,
+        "ms": 425,
         "type": "childList",
         "target": "A",
         "added": [
@@ -3070,7 +3081,7 @@
         ]
       },
       {
-        "ms": 696,
+        "ms": 425,
         "type": "childList",
         "target": "A",
         "added": [
@@ -3081,7 +3092,7 @@
         ]
       },
       {
-        "ms": 696,
+        "ms": 425,
         "type": "childList",
         "target": "A",
         "added": [
@@ -3092,7 +3103,7 @@
         ]
       },
       {
-        "ms": 696,
+        "ms": 425,
         "type": "childList",
         "target": "A",
         "added": [
@@ -3103,7 +3114,7 @@
         ]
       },
       {
-        "ms": 696,
+        "ms": 425,
         "type": "childList",
         "target": "A",
         "added": [
@@ -3114,7 +3125,7 @@
         ]
       },
       {
-        "ms": 696,
+        "ms": 425,
         "type": "childList",
         "target": "A",
         "added": [
@@ -3125,7 +3136,7 @@
         ]
       },
       {
-        "ms": 696,
+        "ms": 425,
         "type": "childList",
         "target": "A",
         "added": [
@@ -3136,7 +3147,7 @@
         ]
       },
       {
-        "ms": 696,
+        "ms": 425,
         "type": "childList",
         "target": "A",
         "added": [
@@ -3147,7 +3158,7 @@
         ]
       },
       {
-        "ms": 696,
+        "ms": 425,
         "type": "childList",
         "target": "A",
         "added": [
@@ -3158,7 +3169,7 @@
         ]
       },
       {
-        "ms": 696,
+        "ms": 425,
         "type": "childList",
         "target": "A",
         "added": [
@@ -3169,7 +3180,7 @@
         ]
       },
       {
-        "ms": 696,
+        "ms": 425,
         "type": "childList",
         "target": "A",
         "added": [
@@ -3180,7 +3191,7 @@
         ]
       },
       {
-        "ms": 696,
+        "ms": 425,
         "type": "childList",
         "target": "A",
         "added": [
@@ -3191,7 +3202,7 @@
         ]
       },
       {
-        "ms": 696,
+        "ms": 425,
         "type": "childList",
         "target": "A",
         "added": [
@@ -3202,7 +3213,7 @@
         ]
       },
       {
-        "ms": 696,
+        "ms": 425,
         "type": "childList",
         "target": "A",
         "added": [
@@ -3213,7 +3224,7 @@
         ]
       },
       {
-        "ms": 696,
+        "ms": 425,
         "type": "childList",
         "target": "A",
         "added": [
@@ -3224,7 +3235,7 @@
         ]
       },
       {
-        "ms": 696,
+        "ms": 425,
         "type": "childList",
         "target": "A",
         "added": [
@@ -3235,7 +3246,7 @@
         ]
       },
       {
-        "ms": 696,
+        "ms": 425,
         "type": "childList",
         "target": "A",
         "added": [
@@ -3246,7 +3257,7 @@
         ]
       },
       {
-        "ms": 696,
+        "ms": 425,
         "type": "childList",
         "target": "A",
         "added": [
@@ -3257,7 +3268,7 @@
         ]
       },
       {
-        "ms": 696,
+        "ms": 425,
         "type": "childList",
         "target": "A",
         "added": [
@@ -3268,7 +3279,7 @@
         ]
       },
       {
-        "ms": 696,
+        "ms": 425,
         "type": "childList",
         "target": "A",
         "added": [
@@ -3279,7 +3290,7 @@
         ]
       },
       {
-        "ms": 696,
+        "ms": 425,
         "type": "childList",
         "target": "A",
         "added": [
@@ -3290,7 +3301,7 @@
         ]
       },
       {
-        "ms": 696,
+        "ms": 425,
         "type": "childList",
         "target": "A",
         "added": [
@@ -3301,7 +3312,7 @@
         ]
       },
       {
-        "ms": 696,
+        "ms": 425,
         "type": "childList",
         "target": "A",
         "added": [
@@ -3314,67 +3325,22 @@
     ],
     "events": [
       {
-        "ms": 29,
-        "kind": "store",
-        "detail": "clientes"
-      },
-      {
-        "ms": 67,
-        "kind": "store",
-        "detail": "vehiculos"
-      },
-      {
-        "ms": 131,
-        "kind": "store",
-        "detail": "recibosEsperados"
-      },
-      {
-        "ms": 137,
-        "kind": "store",
-        "detail": "cancelaciones"
-      },
-      {
-        "ms": 142,
-        "kind": "store",
-        "detail": "negocios"
-      },
-      {
-        "ms": 147,
-        "kind": "store",
-        "detail": "gestiones"
-      },
-      {
-        "ms": 158,
-        "kind": "store",
-        "detail": "aseguradoras"
-      },
-      {
-        "ms": 163,
-        "kind": "store",
-        "detail": "cobros"
-      },
-      {
-        "ms": 198,
-        "kind": "store",
-        "detail": "carteraPrimas"
-      },
-      {
-        "ms": 203,
+        "ms": 4,
         "kind": "store",
         "detail": "metas"
       },
       {
-        "ms": 207,
+        "ms": 9,
         "kind": "store",
         "detail": "reclamos"
       },
       {
-        "ms": 724,
+        "ms": 473,
         "kind": "store",
         "detail": "comisiones"
       },
       {
-        "ms": 884,
+        "ms": 621,
         "kind": "store",
         "detail": "auditoria"
       }
@@ -3572,13 +3538,13 @@
       "pol_5080266a15e6f2b39f20017d08e4",
       "pol_b9a883095c9fae8f7502ce1cb054",
       "pol_0f89cc0a12840594abcc60d418b2",
-      "b4003qa_policy_expired_renew_37853014854",
+      "b4003qa_policy_expired_renew_37853808780",
       "pol_b8b99324d9016269d118d789095a",
       "pol_8231bbb8f9b7272c02891f5a4caf",
       "pol_df6bf097045762297ec31fd4e5c5",
-      "b4003qa_policy_renew_37853014854",
-      "b4003qa_policy_renewwrite_37853014854",
-      "b4003qa_policy_unknown_37853014854",
+      "b4003qa_policy_renew_37853808780",
+      "b4003qa_policy_renewwrite_37853808780",
+      "b4003qa_policy_unknown_37853808780",
       "pol_638e276218baad9e84018415b0ba",
       "pol_b39a58e5c216d8fb0f9fca4da4d6",
       "pol_7280c9b1a5253a1fe1e463e5993b",
@@ -3712,23 +3678,23 @@
     "committed": 1,
     "lastError": "",
     "comment": {
-      "ts": "2026-10-08T22:26:53.036Z",
+      "ts": "2026-10-08T22:34:08.728Z",
       "user": "Orbit LAB",
       "actorUid": "woJlxR1iFEeiQZvTscPj4qQ5Qc73",
       "actorName": "Orbit LAB",
       "tipo": "Solicitar información al asesor",
       "texto": "B4-003 R20 solicitud sintética al asesor",
       "direction": "advisor",
-      "eventId": "collab_mv03week_ka4fl",
+      "eventId": "collab_mv045ql4_htcxa",
       "attachment": {
-        "documentRef": "1AsV2tsivbeFRNIEKm6gFhFPVDtEnmmxS",
-        "driveUrl": "https://drive.google.com/file/d/1AsV2tsivbeFRNIEKm6gFhFPVDtEnmmxS/view?usp=drivesdk",
-        "nombre": "b4-r20-ui-attachment-37853014854.txt",
+        "documentRef": "1aZ2NokiKLeWmp5EfN3MBTG7JVkTxGlwL",
+        "driveUrl": "https://drive.google.com/file/d/1aZ2NokiKLeWmp5EfN3MBTG7JVkTxGlwL/view?usp=drivesdk",
+        "nombre": "b4-r20-ui-attachment-37853808780.txt",
         "mimeType": "text/plain",
         "size": 36
       }
     },
-    "openMs": 122,
+    "openMs": 727,
     "visual": {
       "panel": true,
       "brandHeader": true,
@@ -3739,27 +3705,27 @@
     "attachmentRead": {
       "ok": true,
       "status": "disponible",
-      "documentRef": "1AsV2tsivbeFRNIEKm6gFhFPVDtEnmmxS",
-      "fileId": "1AsV2tsivbeFRNIEKm6gFhFPVDtEnmmxS",
-      "nombre": "b4-r20-ui-attachment-37853014854.txt",
+      "documentRef": "1aZ2NokiKLeWmp5EfN3MBTG7JVkTxGlwL",
+      "fileId": "1aZ2NokiKLeWmp5EfN3MBTG7JVkTxGlwL",
+      "nombre": "b4-r20-ui-attachment-37853808780.txt",
       "mimeType": "text/plain",
       "size": 36,
-      "base64": "QjQtMDAzIFIyMCBVSSBhdHRhY2htZW50IDM3ODUzMDE0ODU0",
+      "base64": "QjQtMDAzIFIyMCBVSSBhdHRhY2htZW50IDM3ODUzODA4Nzgw",
       "previewAvailable": true,
       "downloadAvailable": true,
-      "externalUrl": "https://drive.google.com/file/d/1AsV2tsivbeFRNIEKm6gFhFPVDtEnmmxS/view?usp=drivesdk",
-      "driveUrl": "https://drive.google.com/file/d/1AsV2tsivbeFRNIEKm6gFhFPVDtEnmmxS/view?usp=drivesdk",
+      "externalUrl": "https://drive.google.com/file/d/1aZ2NokiKLeWmp5EfN3MBTG7JVkTxGlwL/view?usp=drivesdk",
+      "driveUrl": "https://drive.google.com/file/d/1aZ2NokiKLeWmp5EfN3MBTG7JVkTxGlwL/view?usp=drivesdk",
       "backendPersistent": true,
       "previewIsolated": true
     },
     "attachmentCleanup": {
       "ok": true,
       "status": "deleted_preview_qa",
-      "documentRef": "1AsV2tsivbeFRNIEKm6gFhFPVDtEnmmxS",
+      "documentRef": "1aZ2NokiKLeWmp5EfN3MBTG7JVkTxGlwL",
       "deleted": true,
       "previewIsolated": true,
       "entityType": "negocio",
-      "entityId": "b4003qa_business_collab_37853014854"
+      "entityId": "b4003qa_business_collab_37853808780"
     }
   },
   "r20SecondAdvisorActionCard": {
@@ -3773,7 +3739,7 @@
     "priorityText": "Sin prioridad"
   },
   "failure": {
-    "message": "page.waitForFunction: Timeout 10000ms exceeded.",
-    "stack": "page.waitForFunction: Timeout 10000ms exceeded.\n    at inboxUiFor (/home/runner/work/orbit360-core/orbit360-core/tools/gravicentra-i6-5-b4-003-preview-proof.mjs:200:30)\n    at async file:///home/runner/work/orbit360-core/orbit360-core/tools/gravicentra-i6-5-b4-003-preview-proof.mjs:1231:23"
+    "message": "B4_003_INBOX_ROLE_NOT_ASSIGNED_OR_SESSION_NOT_READY:asesor",
+    "stack": "Error: B4_003_INBOX_ROLE_NOT_ASSIGNED_OR_SESSION_NOT_READY:asesor\n    at need (file:///home/runner/work/orbit360-core/orbit360-core/tools/gravicentra-i6-5-b4-003-preview-proof.mjs:12:32)\n    at inboxUiFor (file:///home/runner/work/orbit360-core/orbit360-core/tools/gravicentra-i6-5-b4-003-preview-proof.mjs:194:3)\n    at runNextTicks (node:internal/process/task_queues:64:5)\n    at process.processImmediate (node:internal/timers:452:9)\n    at process.callbackTrampoline (node:internal/async_hooks:130:17)\n    at async file:///home/runner/work/orbit360-core/orbit360-core/tools/gravicentra-i6-5-b4-003-preview-proof.mjs:1234:23"
   }
 }
