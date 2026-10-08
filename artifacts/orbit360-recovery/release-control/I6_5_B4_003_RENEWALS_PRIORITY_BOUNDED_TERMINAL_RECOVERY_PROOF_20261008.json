@@ -1,0 +1,18 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_RENEWALS_PRIORITY_BOUNDED_TERMINAL_RECOVERY_PROOF_V1",
+  "recordedAt": "2026-10-08T20:40:27.964Z",
+  "status": "QA_PROOF_ALIGNMENT_READY_FOR_EXACT_RETRY",
+  "failedRunId": 37840599704,
+  "failedJobId": 113528683704,
+  "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-37840599704-h81g64q3.web.app",
+  "observation": "Cold Renewals reached the product-owned timed_out terminal within its 8-second budget; it did not remain indefinitely in Cargando cartera.",
+  "classification": "BOUNDED_TERMINAL_OBSERVED_RECOVERY_AND_DATA_VISIBILITY_STILL_REQUIRED",
+  "correction": "Record the bounded terminal, wait a bounded 30 seconds for the same required server confirmations, invoke the product's canonical Reintentar carga control once, then require ready plus the exact 24 recent policies in Vencidas. Denial, persistent timeout or missing rows remains a real failure.",
+  "productSourceChanged": false,
+  "dataMutation": false,
+  "businessWrites": 0,
+  "syntheticQaWrites": 0,
+  "livePromotion": false,
+  "reimport": false,
+  "nextAction": "EXACT_SAME_SCOPE_RETRY"
+}
