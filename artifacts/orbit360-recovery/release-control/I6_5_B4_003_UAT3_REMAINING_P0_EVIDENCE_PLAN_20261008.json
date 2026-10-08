@@ -1,7 +1,7 @@
 {
   "schema": "gravicentra-b4-003-uat3-remaining-p0-evidence-plan-v1",
-  "recordedAt": "2026-10-08T21:31:00Z",
-  "status": "RENEWALS_B02_DECISION_READY_PAULA_AUTHORIZATION_PENDING",
+  "recordedAt": "2026-10-08T20:03:00Z",
+  "status": "RENEWALS_DATA_APPLIED_PASS_EXACT_PREVIEW_AUTHORIZATION_PENDING",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "parentHead": "9f043a779f967f63a142d8dc5ef74583e0e325bc",
@@ -144,7 +144,7 @@
     "b4003Open": true,
     "b4004Held": true
   },
-  "nextAction": "PAULA_DECISION_AUTHORIZE_EXACT_583_OR_HOLD",
+  "nextAction": "I6_5_B4_003_RENEWALS_EXACT_PREVIEW_AUTHORIZATION",
   "executionReceipts": {
     "e1ScopeLock": {
       "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_UAT3_E1_CANONICAL_READONLY_PACK_SCOPE_LOCK_20261008.json",
@@ -195,7 +195,13 @@
       "cutoffDryRun": "583_OLD_EXPIRED_OPEN_PLUS_24_RECENT_EXPIRED_OPEN",
       "cutoff": "2026-07-31",
       "applyAuthorized": false,
-      "next": "Prepare exact B-02 authorization/readback decision; do not infer in UI."
+      "next": "Exact authenticated Preview proof requires separate build/Preview authorization.",
+      "status": "DATA_APPLIED_PASS_PENDING_EXACT_PREVIEW",
+      "writes": 583,
+      "recent24Untouched": true,
+      "resultPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_B02_RENEWAL_CUTOFF_APPLY_RESULT_20261008.json",
+      "resultBlobSha": "debd50227bca77a04c5e10fb8cb5af178858ce6a",
+      "workflowRunId": 37835964035
     },
     "previewFunctionalProofAuthorized": false,
     "b02DecisionPack": {
