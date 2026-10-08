@@ -208,10 +208,10 @@
     "orbit360-platform/data/tenant-alianzas-soluciones-insurers-p10.js": "41d2e31a42dac73eb68af304d5f532897210d0ee",
     "orbit360-platform/data/tenant-config/alianzas-soluciones.aseguradoras-knowledge-summary-v20261003.js": "2000d9ea8ab67bdd37d8bf404a29a405fa6374dd",
     "orbit360-platform/data/tenant-public-branding-index.js": "dc543c463f5ecd8ea44e49156d6282113bd95db6",
-    "orbit360-platform/index.html": "b0fdfc0ef4f107ddd176db00218741b94739ae2f",
+    "orbit360-platform/index.html": "ec9c06e05821ecad3c97c3ba00cc1b4499bab049",
     "orbit360-platform/modules/academia.js": "d27aa080eac091057310aa7c952d3093677b50f0",
     "orbit360-platform/modules/aseguradoras-v1202-import-bridge.js": "db5f012abe505c2dd27d77a47d0694868bee5348",
-    "orbit360-platform/modules/aseguradoras.js": "31f0baa6823d3d051651a4950224f69406a3805b",
+    "orbit360-platform/modules/aseguradoras.js": "c4ef7a28607c38435bf5db243f318885709f237d",
     "orbit360-platform/modules/calidad.js": "f90813a3ba7c249f1b7e3c34ad6e3b5c1279a7bd",
     "orbit360-platform/modules/cancelaciones.js": "63f6dd1bb3ffad24cf8452404dfc540f1b92e2b7",
     "orbit360-platform/modules/cliente360.js": "58f9c1469e50b0e27fb0fcea7c8a6d613ce8f320",
@@ -3847,5 +3847,24 @@
     "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_SECOND_REVIEW_POLICY_FIRST_PAINT_CONTRACT_ROOTFIX_20261007.json",
     "blobSha": "6cb7ad5fe65c0a5a7bca52cbd2685373eeca4176"
+  },
+  "r20InsurerSemanticDraftRootFix": {
+    "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW",
+    "cause": "Product offering snapshot manufactured zero commission overrides and replaced absent or filtered requirements with empty/partial arrays, so changing Logo alone incorrectly reported Comisiones and Requisitos de emisión.",
+    "failedRunId": 37708922891,
+    "insurerBlobSha": "c4ef7a28607c38435bf5db243f318885709f237d",
+    "indexBlobSha": "ec9c06e05821ecad3c97c3ba00cc1b4499bab049",
+    "sourceScope": [
+      "orbit360-platform/modules/aseguradoras.js",
+      "orbit360-platform/index.html"
+    ],
+    "boundaries": {
+      "operationalWrites": 0,
+      "dataMutation": false,
+      "reimport": false,
+      "livePromotion": false,
+      "b4004Held": true
+    },
+    "nextAction": "B4_003_R20_CONTRACT_AND_EXACT_PREVIEW"
   }
 }
