@@ -5685,7 +5685,7 @@
         "livePromotion": false,
         "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW"
       },
-      "findingStatus": "B4_003_SOURCE_FIXED_R20_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+      "findingStatus": "MACHINE_PASS_PENDING_PAULA_VISUAL",
       "r15VisualReview": {
         "status": "PARTIAL_PASS_REMEDIATION_REQUIRED",
         "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R15_PAULA_VISUAL_PARTIAL_ACCEPTANCE_AND_NEW_FINDINGS_20261004.json",
@@ -7089,7 +7089,7 @@
       "livePromotion": false,
       "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW"
     },
-    "findingStatus": "B4_003_HUMAN_UAT3_REJECTED_FINDINGS_RECONCILED_CAUSAL_AUDIT_PENDING",
+    "findingStatus": "MACHINE_PASS_PENDING_PAULA_VISUAL",
     "r15VisualReview": {
       "status": "PARTIAL_PASS_REMEDIATION_REQUIRED",
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R15_PAULA_VISUAL_PARTIAL_ACCEPTANCE_AND_NEW_FINDINGS_20261004.json",
@@ -8579,5 +8579,15 @@
       "rollbackExecuted": false,
       "liveUnchanged": true
     }
+  },
+  "upsellsLeadsOpsPreviewContinuityParentRootfix": {
+    "status": "PASS_RETRY_REQUESTED",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_UPSELLS_LEADS_OPS_CONTINUITY_PARENT_ROOTFIX_20261008.json",
+    "blobSha": "0afd2ceee5526a0859864fe23c346d53f39a5e8c",
+    "failedRunId": 37848313184,
+    "error": "CONTINUITY_B4_003_PARENT_STATUS_DRIFT",
+    "productSourceChanged": false,
+    "dataMutation": false,
+    "livePromotion": false
   }
 }

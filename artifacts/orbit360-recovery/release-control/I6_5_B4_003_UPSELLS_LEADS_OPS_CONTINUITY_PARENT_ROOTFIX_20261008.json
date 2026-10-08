@@ -1,0 +1,20 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_UPSELLS_LEADS_OPS_CONTINUITY_PARENT_ROOTFIX_V1",
+  "recordedAt": "2026-10-08T21:41:37.462Z",
+  "status": "PASS_RETRY_REQUESTED",
+  "parentHead": "9ccb946fe04e3fdbbc23eb2072fb6315d952753c",
+  "failedRun": {
+    "runId": 37848313184,
+    "jobId": 113554651558,
+    "error": "CONTINUITY_B4_003_PARENT_STATUS_DRIFT"
+  },
+  "cause": "Preview authorization updated operational status but left two Control Plane findingStatus mirrors different from the immutable B4-003 parent status in the Findings Ledger.",
+  "correction": "Rebind currentB4.findingStatus and i65ForensicRemediationPlan.b4.findingStatus to the exact Ledger parent status without changing finding disposition or product source.",
+  "ledgerParentStatus": "MACHINE_PASS_PENDING_PAULA_VISUAL",
+  "productSourceChanged": false,
+  "dataMutation": false,
+  "syntheticQaWrites": 0,
+  "reimport": false,
+  "livePromotion": false,
+  "nextAction": "B4_003_R20_CONTRACT_AND_EXACT_PREVIEW"
+}
