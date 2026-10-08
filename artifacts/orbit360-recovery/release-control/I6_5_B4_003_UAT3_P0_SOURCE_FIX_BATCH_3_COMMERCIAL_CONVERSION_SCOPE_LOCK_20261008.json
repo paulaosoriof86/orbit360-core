@@ -1,0 +1,45 @@
+{
+  "schema": "gravicentra-b4-003-uat3-p0-source-fix-batch-3-commercial-conversion-scope-lock-v1",
+  "recordedAt": "2026-10-08T20:05:00Z",
+  "status": "AUTHORIZED_SOURCE_ONLY",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "authorizedParentHead": "432ce24408bf865805d6e09bd45ed342e5585404",
+  "activeFindingId": "B4-003",
+  "observations": [
+    "D-19"
+  ],
+  "allowedProductFiles": [
+    "functions/product-ops-leads-domain.js",
+    "orbit360-platform/core/ciclo.js"
+  ],
+  "authorizedCorrections": [
+    "Resolve or create a client once per stable contact identity inside the same emission transaction.",
+    "Require authoritative policy identity and coverage dates before moving a business to emitted.",
+    "Create or link the policy and optional captured vehicle in the same canonical transaction.",
+    "Return exact client, policy and vehicle readback identifiers without inferring missing business data."
+  ],
+  "invariants": [
+    "Do not create a policy number, coverage dates or vehicle data by inference.",
+    "Do not merge ambiguous existing clients; fail closed for human disambiguation.",
+    "Do not overwrite a policy or vehicle linked to another business/client.",
+    "Preserve idempotence by deterministic identifiers and request replay."
+  ],
+  "authorization": {
+    "productMutationAuthorized": true,
+    "dataMutationAuthorized": false,
+    "businessWritesAuthorized": false,
+    "syntheticQaWritesAuthorized": false,
+    "buildDispatchAuthorized": false,
+    "previewMutationAuthorized": false,
+    "functionDeploymentAuthorized": false,
+    "liveMutationAuthorized": false,
+    "reimportAuthorized": false
+  },
+  "findingDisposition": {
+    "closeNow": [],
+    "b4003RemainsOpen": true,
+    "b4004Held": true
+  },
+  "nextAction": "B4_003_UAT3_P0_SOURCE_FIX_BATCH_3_COMMERCIAL_CONVERSION"
+}
