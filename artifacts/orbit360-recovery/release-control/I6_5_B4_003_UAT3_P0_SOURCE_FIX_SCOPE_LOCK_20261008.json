@@ -1,0 +1,75 @@
+{
+  "schema": "gravicentra-b4-003-uat3-p0-source-fix-scope-lock-v1",
+  "recordedAt": "2026-10-08T18:52:00Z",
+  "status": "AUTHORIZED_NARROW_SOURCE_ONLY_BATCH_1",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "parentHead": "715d887a3d60797bc2797bee17907c8de1ac128b",
+  "authority": {
+    "causalAuditPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_UAT3_CONCENTRATED_CAUSAL_AUDIT_P0_20261008.json",
+    "causalAuditBlobSha": "9860f7d3aaaf8b1bbfdcae57636bb024b71ba33c",
+    "humanDirective": "ARRANCA_CON_LAS_CORRECCIONES",
+    "priority": "BLOCKING_P0"
+  },
+  "authorizedObservations": [
+    "A-07",
+    "B-01",
+    "B-03",
+    "B-04",
+    "C-08",
+    "C-14",
+    "D-01",
+    "D-03",
+    "D-05",
+    "D-07",
+    "D-08",
+    "D-14"
+  ],
+  "allowedProductFiles": [
+    "orbit360-platform/modules/calidad.js",
+    "orbit360-platform/modules/renovaciones.js",
+    "orbit360-platform/modules/aseguradoras.js",
+    "orbit360-platform/core/ciclo.js"
+  ],
+  "allowedQaFiles": [],
+  "requiredCorrections": [
+    "Display financial differences with precision consistent with tolerance; never render a blocking non-zero delta as Q 0.",
+    "Give Renewals a bounded truthful loading/error state and explicit policy-state versus renewal-state labels.",
+    "Make Renewals actions and identity fields reachable at desktop, 390px and 320px without clipped horizontal interaction.",
+    "Guarantee insurer save UI always exits busy state on validation/provider failures and expose recoverable partial-side-effect errors.",
+    "Persist actorUid and actorName for every new collaboration comment without rewriting historical unknown authors.",
+    "Add visible Remove/Replace attachment controls and specific safe-retry errors.",
+    "Render cadence states only from persisted task/provider evidence; never mark sent/done by array index.",
+    "Add client-side timing marks for business-card open and auth boundaries without increasing timeouts."
+  ],
+  "explicitExclusions": [
+    "B-02 renewal cutoff data apply",
+    "Any real client, policy, receipt, renewal, insurer, business or management write",
+    "D-02/D-11/D-12/D-13/D-17 shared inbox backend contract",
+    "All observations pending canonical ID readback",
+    "Build, workflow dispatch, Preview deployment, function deployment and LIVE promotion",
+    "Reimport, QA deletion or historical author/date inference"
+  ],
+  "boundaries": {
+    "productMutationAuthorized": true,
+    "sourceOnly": true,
+    "dataMutationAuthorized": false,
+    "businessWritesAuthorized": false,
+    "syntheticQaWritesAuthorized": false,
+    "buildDispatchAuthorized": false,
+    "previewMutationAuthorized": false,
+    "providerDeploymentAuthorized": false,
+    "livePromotionAuthorized": false,
+    "reimportAuthorized": false
+  },
+  "acceptance": [
+    "Only allowed product files change.",
+    "Static source assertions pass for every correction.",
+    "No duplicate owner or overlay is introduced.",
+    "No existing finding is deleted or marked PASS.",
+    "Commit remains build-free and data-write-free.",
+    "Next step after source commit is contract/static verification, then a separately authorized exact Preview."
+  ],
+  "decision": "AUTHORIZE_CUMULATIVE_SOURCE_BATCH_1_ONLY",
+  "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_UAT3_P0_SOURCE_FIX_BATCH_1"
+}

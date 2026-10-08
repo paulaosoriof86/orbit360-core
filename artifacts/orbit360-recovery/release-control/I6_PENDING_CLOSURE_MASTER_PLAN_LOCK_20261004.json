@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_PENDING_CLOSURE_MASTER_PLAN_LOCK_V1",
-  "recordedAt": "2026-10-08T00:00:00Z",
-  "status": "FROZEN_ACTIVE_UAT3_CAUSAL_AUDIT_COMPLETE_P0_SCOPE_LOCK_PENDING",
+  "recordedAt": "2026-10-08T18:52:00Z",
+  "status": "FROZEN_ACTIVE_UAT3_P0_SOURCE_BATCH_1_AUTHORIZED",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "purpose": "Single no-loss operational closure plan from B4-003 R16 through remaining Fase A Post-Salida. Conversation/memory are context only; this lock, ledger, carry register, Control Plane and physical evidence govern execution.",
@@ -285,9 +285,9 @@
   },
   "currentState": {
     "gate": "I6.5 / B4-003",
-    "status": "B4_003_HUMAN_UAT3_REJECTED_CAUSAL_AUDIT_COMPLETE_P0_SCOPE_LOCK_PENDING",
-    "nextAction": "B4_003_UAT3_P0_SOURCE_FIX_SCOPE_LOCK",
-    "why": "The 29 P0 observations now have a concentrated read-only causal disposition: 18 demonstrated, 8 pending canonical readback and 3 pending runtime trace. No hypothesis was promoted to fact and no product/data/build/Preview/LIVE mutation was performed.",
+    "status": "B4_003_UAT3_P0_SOURCE_BATCH_1_AUTHORIZED",
+    "nextAction": "B4_003_UAT3_P0_SOURCE_FIX_BATCH_1",
+    "why": "Paula explicitly instructed to start corrections. Batch 1 is limited to demonstrated source-only P0 causes in four product files; data, build, Preview and LIVE remain locked.",
     "reviewedSourceSha": "66c3b9b77ef8ffecbe3a26de59897abd55ec677f",
     "reviewedBuildId": "gi-i65-b4-66c3b9b77ef8-57f234755dc1",
     "reviewedPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b4-37710305112-ud58tgnd.web.app",
@@ -14993,5 +14993,44 @@
       "liveMutation": false
     },
     "nextAction": "B4_003_UAT3_P0_SOURCE_FIX_SCOPE_LOCK"
+  },
+  "uat3P0SourceFixScopeLock": {
+    "status": "AUTHORIZED_NARROW_SOURCE_ONLY_BATCH_1",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_UAT3_P0_SOURCE_FIX_SCOPE_LOCK_20261008.json",
+    "blobSha": "519e9ee48ee85a367150dd816e53f2fadf88ba8d",
+    "compositionLockBlobSha": "0b1a56675c0aa2d6fedf1e523a33bdcdc0bd4e4d",
+    "allowedProductFiles": [
+      "orbit360-platform/modules/calidad.js",
+      "orbit360-platform/modules/renovaciones.js",
+      "orbit360-platform/modules/aseguradoras.js",
+      "orbit360-platform/core/ciclo.js"
+    ],
+    "authorizedObservations": [
+      "A-07",
+      "B-01",
+      "B-03",
+      "B-04",
+      "C-08",
+      "C-14",
+      "D-01",
+      "D-03",
+      "D-05",
+      "D-07",
+      "D-08",
+      "D-14"
+    ],
+    "boundaries": {
+      "productMutationAuthorized": true,
+      "sourceOnly": true,
+      "dataMutationAuthorized": false,
+      "businessWritesAuthorized": false,
+      "syntheticQaWritesAuthorized": false,
+      "buildDispatchAuthorized": false,
+      "previewMutationAuthorized": false,
+      "providerDeploymentAuthorized": false,
+      "livePromotionAuthorized": false,
+      "reimportAuthorized": false
+    },
+    "nextAction": "B4_003_UAT3_P0_SOURCE_FIX_BATCH_1"
   }
 }
