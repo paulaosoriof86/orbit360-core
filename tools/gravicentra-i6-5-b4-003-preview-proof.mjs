@@ -868,7 +868,7 @@ try{
    const buckets=bucketKeys.map(key=>{const el=document.querySelector('[data-renewal-bucket="'+key+'"]');return{key,count:Number(el?.getAttribute('data-renewal-bucket-count')||0),ids:Array.from(el?.querySelectorAll('[data-renewal-policy]')||[]).map(x=>String(x.getAttribute('data-renewal-policy')||''))};});
    const pending=Number(document.querySelector('[data-renewability-pending-count]')?.getAttribute('data-renewability-pending-count')||0);
    const unknown=document.querySelector('[data-renewal-policy="'+ids.unknownRenewPolicy+'"]');
-   const unknownBadge=Array.from(unknown?.querySelectorAll('.badge')||[]).some(x=>String(x.textContent||'').trim()==='Renovabilidad pendiente');
+   const unknownBadge=Array.from(unknown?.querySelectorAll('.badge')||[]).some(x=>String(x.textContent||'').trim()==='Decisión: renovabilidad pendiente');
    const unknownReview=!!unknown?.querySelector('[data-renewability-review="'+ids.unknownRenewPolicy+'"]');
    const parallelDispositionAbsent=!document.querySelector('[data-renewal-disposition-detail],[data-renewal-date45-reconciled]');
    const terminal=p=>!!p.renovadaPor||['renovada','norenovada','rechazada','cerrada','cancelada'].includes(String(p.renovacionEstado||'').trim().toLowerCase().replace(/[\s_-]+/g,''));

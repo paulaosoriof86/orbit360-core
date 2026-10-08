@@ -1,0 +1,58 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_RENEWAL_KANBAN_RECONCILIATION_PROOF_ROOTFIX_V1",
+  "recordedAt": "2026-10-08T22:01:10Z",
+  "status": "PROOF_ROOTFIXED_PENDING_EXACT_PREVIEW",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "parentHead": "768f9c8ea4bbc50fbd23290081959697c353d932",
+  "failedRun": {
+    "id": 37850035367,
+    "jobId": 113560396502,
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-37850035367-8uce7ryl.web.app",
+    "error": "B4_003_R20_RENEWAL_KANBAN_RECONCILIATION_FAILED",
+    "observed": {
+      "approvedBuckets": [
+        "vencidas",
+        "d15",
+        "d45",
+        "d90"
+      ],
+      "date45ExpectedCount": 12,
+      "date45VisibleCount": 12,
+      "unknownInKanban": true,
+      "unknownCanonicalBadge": true,
+      "unknownReview": true,
+      "parallelDispositionAbsent": true,
+      "syntheticWrites": 14,
+      "cleanupWrites": 14,
+      "syntheticFinalAbsent": true,
+      "liveByteStable": true
+    }
+  },
+  "cause": {
+    "classification": "SECOND_DUPLICATED_STALE_BROWSER_TEXT_ASSERTION",
+    "obsoleteLabel": "Renovabilidad pendiente",
+    "canonicalLabel": "Decisión: renovabilidad pendiente",
+    "productRegression": false
+  },
+  "correction": {
+    "path": "tools/gravicentra-i6-5-b4-003-preview-proof.mjs",
+    "previousBlobSha": "cfede753e00fc93113a9a9305ae138990f770de2",
+    "correctedBlobSha": "a0a7d1100cfac5a6a1af5803e996cc185e57e5aa",
+    "scope": "Align the later Kanban reconciliation badge check and assert that no stale exact-label comparison remains."
+  },
+  "explicitCarry": {
+    "realRenewalSourceConflictCount": 1,
+    "writeExecuted": false,
+    "authorizationRequiredBeforeAnyApply": true
+  },
+  "boundaries": {
+    "productSourceChanged": false,
+    "dataMutation": false,
+    "businessWrites": false,
+    "syntheticQaWritesThisCommit": false,
+    "livePromotion": false,
+    "reimport": false
+  },
+  "nextAction": "B4_003_R20_CONTRACT_AND_EXACT_PREVIEW"
+}
