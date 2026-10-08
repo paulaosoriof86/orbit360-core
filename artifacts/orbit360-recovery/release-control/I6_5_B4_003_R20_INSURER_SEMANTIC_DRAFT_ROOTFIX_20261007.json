@@ -1,0 +1,27 @@
+{
+  "schema": "GRAVICENTRA_B4_003_R20_INSURER_SEMANTIC_DRAFT_ROOTFIX_V1",
+  "date": "2026-10-07",
+  "gate": "B4-003",
+  "status": "SOURCE_ROOTFIX_PENDING_EXACT_PREVIEW",
+  "failedRunId": 37708922891,
+  "reproduced": "Logo-only input falsely reported changes to Comisiones and Requisitos de emisión.",
+  "cause": "Editing an offering without an explicit commission manufactured an override of 0; unconditional requirement snapshot materialized absent arrays and could drop filtered requirements.",
+  "code": [
+    "orbit360-platform/modules/aseguradoras.js",
+    "orbit360-platform/index.html"
+  ],
+  "bindings": {
+    "insurerBlobSha": "c4ef7a28607c38435bf5db243f318885709f237d",
+    "indexBlobSha": "ec9c06e05821ecad3c97c3ba00cc1b4499bab049",
+    "compositionBlobSha": "bef53d272f6c3934f628bdb79a8174a6fa3ed225"
+  },
+  "guards": {
+    "businessWrites": 0,
+    "dataMutation": false,
+    "reimport": false,
+    "productionPromotion": false,
+    "B4_004": false,
+    "previousMachineProofPreserved": true
+  },
+  "nextAction": "B4_003_R20_CONTRACT_AND_EXACT_PREVIEW"
+}
