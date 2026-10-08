@@ -1,0 +1,51 @@
+{
+  "schema": "gravicentra-b4-003-uat3-p0-source-fix-batch-2-shared-inbox-scope-lock-v1",
+  "recordedAt": "2026-10-08T19:25:00Z",
+  "status": "AUTHORIZED_SOURCE_ONLY",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "authorizedParentHead": "a10e3f6cd847ba43eb39f6da10b8a8c4664495dc",
+  "activeFindingId": "B4-003",
+  "observations": [
+    "D-02",
+    "D-11",
+    "D-12",
+    "D-13",
+    "D-17"
+  ],
+  "allowedProductFiles": [
+    "functions/ops-advisor-inbox.js",
+    "orbit360-platform/index.html"
+  ],
+  "authorizedCorrections": [
+    "Separate personal read/archive state from global task resolution.",
+    "Require the active advisor role for advisor-target delivery; do not union inactive roles.",
+    "Expose actor, recipient, owner/assignee and observer context in the inbox contract and UI.",
+    "Group semantic duplicate candidates without deleting or collapsing distinct canonical events.",
+    "Make the shared drawer show personal acknowledgement and global resolution as different states."
+  ],
+  "invariants": [
+    "Do not delete or rewrite canonical events.",
+    "Do not infer delivery or resolution from personal read state.",
+    "Do not hide distinct events solely because title or message matches.",
+    "Preserve exact eventId dedupe and backward compatibility for attended actions.",
+    "No user business data, configuration or environment mutation."
+  ],
+  "authorization": {
+    "productMutationAuthorized": true,
+    "dataMutationAuthorized": false,
+    "businessWritesAuthorized": false,
+    "syntheticQaWritesAuthorized": false,
+    "buildDispatchAuthorized": false,
+    "previewMutationAuthorized": false,
+    "functionDeploymentAuthorized": false,
+    "liveMutationAuthorized": false,
+    "reimportAuthorized": false
+  },
+  "findingDisposition": {
+    "closeNow": [],
+    "b4003RemainsOpen": true,
+    "b4004Held": true
+  },
+  "nextAction": "B4_003_UAT3_P0_SOURCE_FIX_BATCH_2_SHARED_INBOX"
+}
