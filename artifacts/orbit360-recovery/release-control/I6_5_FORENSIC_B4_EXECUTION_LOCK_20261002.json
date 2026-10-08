@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B4_EXECUTION_LOCK_V1",
   "recordedAt": "2026-10-08T20:36:00Z",
-  "status": "B4_003_R20_RENEWAL_CUTOFF_APPLY_AUTHORIZED",
+  "status": "B4_003_RENEWALS_DATA_APPLIED_PASS_EXACT_PREVIEW_AUTHORIZATION_PENDING",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "block": "B4",
@@ -38,9 +38,9 @@
   "activeFinding": {
     "id": "B4-003",
     "title": "Cumulative B4-003 remediation: Renovaciones, Cancelaciones and source-backed insurer knowledge.",
-    "status": "B4_003_R20_RENEWAL_CUTOFF_APPLY_AUTHORIZED",
+    "status": "B4_003_RENEWALS_DATA_APPLIED_PASS_EXACT_PREVIEW_AUTHORIZATION_PENDING",
     "blocking": true,
-    "nextAction": "B4_003_R20_RENEWAL_CUTOFF_APPLY",
+    "nextAction": "B4_003_RENEWALS_EXACT_PREVIEW_AUTHORIZATION",
     "humanVisualStatus": "REJECTED_UAT3_20261008",
     "knowledgePreview": true
   },
@@ -56,9 +56,9 @@
     "livePromotionForbiddenUntilB4FinalAcceptance": true
   },
   "boundaries": {
-    "businessWritesAuthorized": true,
+    "businessWritesAuthorized": false,
     "configWritesAuthorized": false,
-    "dataMutationAuthorized": true,
+    "dataMutationAuthorized": false,
     "productMutationAuthorized": false,
     "allowedProductFiles": [],
     "reimportAuthorized": false,
@@ -82,14 +82,14 @@
     "drivePreviewFunctionDeploymentAuthorized": true,
     "drivePreviewProductionFunctionsAuthorized": false,
     "renewabilityDataMutationAuthorized": false,
-    "authorizedDataMutation": "Only exact 583-policy R20 cutoff-disposition target set bound to digest 744f6f26139f272fa3a26ab35e889a9d011833e802d1495286147734ec7b4d1d; only renovacionEstado, renewalDispositionRuleId and renewalDispositionReason; automatic rollback on failure.",
+    "authorizedDataMutation": "NONE_POST_B02_APPLY_PASS",
     "renewabilityApplyRepeatAuthorized": false,
     "buildDispatchAuthorized": false,
     "previewMutationAuthorized": false,
     "functionDeploymentAuthorized": false,
-    "renewalCutoffDataMutationAuthorized": true
+    "renewalCutoffDataMutationAuthorized": false
   },
-  "nextAction": "B4_003_R20_RENEWAL_CUTOFF_APPLY",
+  "nextAction": "B4_003_RENEWALS_EXACT_PREVIEW_AUTHORIZATION",
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
     "blobSha": "68ffc370fefa5024a1c0a4857b541bdcf12f615e",
@@ -1305,7 +1305,7 @@
     "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_UAT3_E1_CANONICAL_READONLY_PACK_SCOPE_LOCK"
   },
   "r20RenewalCutoffApplyAuthorization": {
-    "status": "AUTHORIZED_PENDING_APPLY",
+    "status": "APPLIED_PASS_REPEAT_NOT_AUTHORIZED",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_B02_RENEWAL_CUTOFF_APPLY_AUTH_20261008.json",
     "blobSha": "28c42196c14c60cdc0632615334e0468a382d49a",
     "commit": "1fbb186891fdabea90639f8f10ef0f557e6b3758",
@@ -1319,7 +1319,13 @@
       "renovacionEstado",
       "renewalDispositionRuleId",
       "renewalDispositionReason"
-    ]
+    ],
+    "resultPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_B02_RENEWAL_CUTOFF_APPLY_RESULT_20261008.json",
+    "resultBlobSha": "debd50227bca77a04c5e10fb8cb5af178858ce6a",
+    "workflowRunId": 37835964035,
+    "writes": 583,
+    "recent24Untouched": true,
+    "rollbackExecuted": false
   },
   "uat3CumulativeCompositionReconciliation": {
     "status": "PASS_BOUND",
@@ -1330,5 +1336,19 @@
     "dataMutation": false,
     "reimport": false,
     "livePromotion": false
+  },
+  "r20RenewalCutoffApply": {
+    "status": "PASS_APPLY",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_B02_RENEWAL_CUTOFF_APPLY_RESULT_20261008.json",
+    "blobSha": "debd50227bca77a04c5e10fb8cb5af178858ce6a",
+    "commit": "b7675b541d1db9c4a2293bedd5103e8bb2ada0c8",
+    "workflowRunId": 37835964035,
+    "artifactId": 11576385268,
+    "writes": 583,
+    "afterTargetCount": 0,
+    "recentCount": 24,
+    "recent24Untouched": true,
+    "rollbackExecuted": false,
+    "liveUnchanged": true
   }
 }
