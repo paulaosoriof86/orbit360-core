@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B4_EXECUTION_LOCK_V1",
   "recordedAt": "2026-10-08T21:43:35.454Z",
-  "status": "B4_003_R20_HUMAN_REJECTED_RENEWALS_SOURCE_FIX_AUTHORIZED",
+  "status": "B4_003_SOURCE_FIXED_R20_PENDING_CONTRACT_AND_EXACT_PREVIEW",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "block": "B4",
@@ -38,9 +38,9 @@
   "activeFinding": {
     "id": "B4-003",
     "title": "Cumulative B4-003 remediation: Renovaciones, Cancelaciones and source-backed insurer knowledge.",
-    "status": "PAULA_VISUAL_REJECTED_R20_CAUSAL_REMEDIATION_REQUIRED",
+    "status": "B4_003_SOURCE_FIXED_R20_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "blocking": true,
-    "nextAction": "B4_003_R20_RENEWALS_READINESS_SOURCE_FIX",
+    "nextAction": "B4_003_R20_CONTRACT_AND_EXACT_PREVIEW_AUTHORIZATION",
     "humanVisualStatus": "REJECTED_R20_20261008",
     "knowledgePreview": true
   },
@@ -54,7 +54,7 @@
     "productMutationRequiresCausalDefect": true,
     "sourceChangeRequiresNewImmutableCandidate": true,
     "livePromotionForbiddenUntilB4FinalAcceptance": true,
-    "productMutationAuthorized": true,
+    "productMutationAuthorized": false,
     "allowedProductFiles": [
       "orbit360-platform/modules/renovaciones.js",
       "orbit360-platform/index.html"
@@ -67,7 +67,7 @@
     "businessWritesAuthorized": false,
     "configWritesAuthorized": false,
     "dataMutationAuthorized": false,
-    "productMutationAuthorized": true,
+    "productMutationAuthorized": false,
     "allowedProductFiles": [
       "orbit360-platform/modules/renovaciones.js",
       "orbit360-platform/index.html"
@@ -101,7 +101,7 @@
     "functionDeploymentAuthorized": false,
     "renewalCutoffDataMutationAuthorized": false
   },
-  "nextAction": "B4_003_R20_RENEWALS_READINESS_SOURCE_FIX",
+  "nextAction": "B4_003_R20_CONTRACT_AND_EXACT_PREVIEW_AUTHORIZATION",
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
     "blobSha": "71e71175036804318fd9278a85ab29e5d57051f9",
@@ -574,7 +574,7 @@
   },
   "findingLedgerBlobSha": "6c0b06f23b6fd1e882a4b9b14f03c7dc601fec36",
   "continuityRegisterBlobSha": "141ad8a0a1572ad0dcec86c95fdcbbcb7ef706bd",
-  "compositionLockBlobSha": "215e8cd9087addbb49e18f08067b566af7c0f06e",
+  "compositionLockBlobSha": "040f98d2e8a7ff28fee53a310de1b16b9b7d39f9",
   "r18SourceFix": {
     "status": "SOURCE_FIXED_R18_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_SOURCE_FIX_20261005.json",
@@ -646,7 +646,7 @@
     "carryBlobSha": "de9b2d94a70cd580f565b81f2fd03a32241afdec",
     "masterPlanBlobSha": "64f9b11ade950b4c2734265d2c6b3ecfed3a6976"
   },
-  "productMutationAuthorized": true,
+  "productMutationAuthorized": false,
   "dataMutationAuthorized": false,
   "reimportAuthorized": false,
   "livePromotionAuthorized": false,
@@ -1449,5 +1449,13 @@
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_RENEWALS_READINESS_SOURCE_AUTHORIZATION_20261008.json",
     "receiptBlobSha": "0856ed8c80cdae8ac8e73bb83322dc0e8c41a46e",
     "approvedNarrowSourceOnly": true
+  },
+  "lastUatR20ReadinessSourceFix": {
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_RENEWALS_READINESS_SOURCE_FIX_RECEIPT_20261008.json",
+    "receiptBlobSha": "dc0b48c41b6e50a62a8a4e27b14aa891a731adca",
+    "sourceFixed": true,
+    "machinePassNotReusedForNewSource": true,
+    "previewPending": true,
+    "runId": 37856707824
   }
 }

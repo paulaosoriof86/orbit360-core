@@ -1,0 +1,57 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R20_RENEWALS_READINESS_SOURCE_FIX_V1",
+  "date": "2026-10-08",
+  "status": "SOURCE_FIXED_STATIC_PASS_EXACT_PREVIEW_PENDING",
+  "gate": "I6.5/B4-003",
+  "sourceHeadBefore": "f2dab67ea878ba2e4c093da2b9309a9491bf9083",
+  "authorization": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_RENEWALS_READINESS_SOURCE_AUTHORIZATION_20261008.json",
+    "blobSha": "0856ed8c80cdae8ac8e73bb83322dc0e8c41a46e"
+  },
+  "review": {
+    "runId": 37856707824,
+    "humanStatus": "REJECTED",
+    "machineEvidence": "PRESERVED_UNAFFECTED_ONLY"
+  },
+  "files": {
+    "orbit360-platform/modules/renovaciones.js": {
+      "beforeBlobSha": "8e3bc32aa5ac5f577f545700d39499970c2edeaf",
+      "afterBlobSha": "de7451777a800374c806ab027cad05e92946fd57"
+    },
+    "orbit360-platform/index.html": {
+      "beforeBlobSha": "933e48ced9c056b7bea51e21715de27a340d8664",
+      "afterBlobSha": "b766f7513c0193b526e74b3c673161628dd84881"
+    }
+  },
+  "corrections": [
+    "Require only policies+clients authoritative snapshots for renewal pipeline counts",
+    "Treat insurer directory as optional display enrichment, preserving actual policy/insurer IDs",
+    "Rerender on delayed authoritative required snapshots while route remains active",
+    "Preserve bounded 8-second truthful error for truly missing policies/clients",
+    "Bump exact revision of loaded renewals script in canonical index"
+  ],
+  "staticProof": {
+    "syntax": "PASS",
+    "exactAnchorCount": 7,
+    "identityOfBusinessRulesUnchanged": true,
+    "realOperationalWrites": 0
+  },
+  "unmodifiedApprovedOwners": [
+    "orbit360-platform/core/queries.js",
+    "orbit360-platform/modules/conciliaciones.js",
+    "orbit360-platform/modules/cobros.js",
+    "orbit360-platform/core/cobros-reconciliation-domain-client.js",
+    "orbit360-platform/modules/cliente360.js",
+    "orbit360-platform/core/policy-receipts-engine.js"
+  ],
+  "historicalPaymentAcceptance": "B3_008_PASS_PRESERVED_NO_REGRESSION_NO_FINANCIAL_CODE_MUTATION",
+  "boundaries": {
+    "realWrites": false,
+    "dataMutation": false,
+    "reimport": false,
+    "productionMutation": false,
+    "buildDispatch": false,
+    "previewDispatch": false
+  },
+  "nextAction": "B4_003_R20_CONTRACT_AND_EXACT_PREVIEW_AUTHORIZATION"
+}

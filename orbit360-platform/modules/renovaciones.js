@@ -6,11 +6,12 @@ window.Orbit = window.Orbit || {};
 Orbit.modules = Orbit.modules || {};
 Orbit.modules.renovaciones = (function () {
   const U = Orbit.ui, q = Orbit.q, K = Orbit.kit, S = () => Orbit.store;
-  const REQUIRED_DATA = ['polizas', 'clientes', 'aseguradoras'];
+  const REQUIRED_DATA = ['polizas', 'clientes'];
+  const OPTIONAL_ENRICHMENT_DATA = ['aseguradoras'];
   const READINESS_BUDGET_MS = 8000;
-  let readinessStartedAt = 0, readinessTimer = null;
+  let readinessStartedAt = 0, readinessTimer = null, activeHost = null, refreshTimer = null;
   function ensureDataCollections() {
-    try { const store=S(); if(store&&typeof store._ensureCollections==='function') store._ensureCollections(REQUIRED_DATA); } catch (_) {}
+    try { const store=S(); if(store&&typeof store._ensureCollections==='function') store._ensureCollections(REQUIRED_DATA.concat(OPTIONAL_ENRICHMENT_DATA)); } catch (_) {}
   }
   function renewalDataReadiness() {
     const store=S();
@@ -113,6 +114,7 @@ Orbit.modules.renovaciones = (function () {
   }
 
   function render(host) {
+    activeHost = host;
     ensureDataCollections();
     const readiness=renewalDataReadiness();
     if(readiness.state!=='ready'){
@@ -165,7 +167,7 @@ Orbit.modules.renovaciones = (function () {
                   <div class="mono" style="font-size:10.5px;margin-top:4px;color:var(--ink-3)">Póliza ${U.esc(p.numero||'—')}</div>
                   <div class="muted" style="font-size:11.5px;margin-top:4px">${U.esc(p.ramo||'—')} · ${U.esc(p.producto||'—')}</div>
                   <div style="display:flex;align-items:center;justify-content:space-between;margin-top:7px;gap:8px">
-                    <span style="display:flex;align-items:center;gap:5px;font-size:11px;min-width:0"><span class="dot-s" style="background:${asg ? asg.color : '#999'}"></span><span class="renewal-insurer-name" style="min-width:0">${U.esc(asg ? asg.nombre : '—')}</span></span>
+                    <span style="display:flex;align-items:center;gap:5px;font-size:11px;min-width:0"><span class="dot-s" style="background:${asg ? asg.color : '#999'}"></span><span class="renewal-insurer-name" style="min-width:0">${U.esc(asg ? asg.nombre : 'Aseguradora por confirmar')}</span></span>
                     <span class="mono" style="font-size:11px;font-weight:600;white-space:nowrap">${premiumValue(p)==null?'<span class="badge warn">Prima pendiente de fuente</span>':U.moneyShort(premiumValue(p),p.moneda)}</span>
                   </div>
                   <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:7px">
@@ -185,6 +187,23 @@ Orbit.modules.renovaciones = (function () {
         </div>`).join('')}
       </div></div>`;
   }
+  /* Policies + clients determine readiness; insurer directory enriches names only.
+     Never publish partial policy counts while required snapshots are missing.
+     Late authoritative data refreshes the same active route without blocking on insurers. */
+  window.addEventListener('orbit:store:emit', event => {
+    const collection = event && event.detail && event.detail.collection || '*';
+    if (collection !== '*' && !REQUIRED_DATA.includes(collection) && collection !== 'aseguradoras') return;
+    if (!activeHost || !activeHost.isConnected || !String(location.hash || '').startsWith('#/renovaciones')) return;
+    const busy = activeHost.querySelector('[data-renewals-loading]');
+    if (!busy && collection !== 'aseguradoras') return;
+    if (refreshTimer) return;
+    refreshTimer = setTimeout(() => {
+      refreshTimer = null;
+      if (!activeHost || !activeHost.isConnected || !String(location.hash || '').startsWith('#/renovaciones')) return;
+      const next = renewalDataReadiness();
+      if (next.state === 'ready' || next.state === 'unavailable') render(activeHost);
+    }, 45);
+  });
   /* Acciones operativas: owner canónico en renewals-v1200-operational-bridge.js. */
   return { render };
 })();
