@@ -1,0 +1,46 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_UPSELLS_LEADS_OPS_CONTRACT_STALE_ASSERTION_ROOTFIX_V1",
+  "recordedAt": "2026-10-08T21:45:55Z",
+  "status": "CONTRACT_ROOTFIXED_PENDING_EXACT_PREVIEW",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "parentHead": "65abf618b8743fcc72fbdb076a541fd055b9b4bf",
+  "failedRun": {
+    "id": 37848789412,
+    "jobId": 113556251662,
+    "step": "Validate B4-003 contract and syntax",
+    "error": "B4_003_R20_SECOND_REVIEW_INBOX_FEEDBACK_MISSING",
+    "deploymentReached": false,
+    "liveChanged": false
+  },
+  "cause": {
+    "classification": "STALE_QA_ASSERTION_AFTER_APPROVED_SHARED_INBOX_STATE_SEPARATION",
+    "oldExpectedFeedback": [
+      "Marcando…",
+      "Archivando…"
+    ],
+    "canonicalFeedback": [
+      "Reconociendo…",
+      "Resolviendo…",
+      "Archivando…"
+    ],
+    "productRegression": false,
+    "sourceRollbackRequired": false
+  },
+  "correction": {
+    "path": "tools/gravicentra-i6-5-b4-003-contract.mjs",
+    "previousBlobSha": "5f81a23008456c61d42fff5f3b539955caa4c01f",
+    "correctedBlobSha": "0d65c49000996d941246bff069d5fbb96a55e2d1",
+    "scope": "Replace obsolete single attended-state token with the canonical personal acknowledgement and shared resolution progress tokens; preserve archive, count and pending-route assertions."
+  },
+  "boundaries": {
+    "productSourceChanged": false,
+    "dataMutation": false,
+    "businessWrites": false,
+    "syntheticQaWrites": false,
+    "previewDeployment": false,
+    "livePromotion": false,
+    "reimport": false
+  },
+  "nextAction": "B4_003_R20_CONTRACT_AND_EXACT_PREVIEW"
+}
