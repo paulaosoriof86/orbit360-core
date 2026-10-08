@@ -562,7 +562,7 @@
   },
   "findingLedgerBlobSha": "0f2d6916537fb3f69ad4e03b947ccd4e4c5b02f7",
   "continuityRegisterBlobSha": "bbd84d4374160984b1e8840b02df5e0c63ba6c7c",
-  "compositionLockBlobSha": "68ffc370fefa5024a1c0a4857b541bdcf12f615e",
+  "compositionLockBlobSha": "215e8cd9087addbb49e18f08067b566af7c0f06e",
   "r18SourceFix": {
     "status": "SOURCE_FIXED_R18_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_SOURCE_FIX_20261005.json",
@@ -1320,5 +1320,15 @@
       "renewalDispositionRuleId",
       "renewalDispositionReason"
     ]
+  },
+  "uat3CumulativeCompositionReconciliation": {
+    "status": "PASS_BOUND",
+    "compositionLockBlobSha": "215e8cd9087addbb49e18f08067b566af7c0f06e",
+    "compositionCommit": "72263fc616fa8313bf430103605e63d35bb5b864",
+    "priorFailedRunId": 37835749538,
+    "priorFailureCode": "I6_CANONICAL_COMPOSITION_BLOB_DRIFT",
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false
   }
 }
