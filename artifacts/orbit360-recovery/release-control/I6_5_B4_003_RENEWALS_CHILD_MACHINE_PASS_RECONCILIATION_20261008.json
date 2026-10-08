@@ -1,0 +1,31 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_RENEWALS_CHILD_MACHINE_PASS_RECONCILIATION_V1",
+  "recordedAt": "2026-10-08T21:43:35.454Z",
+  "status": "PASS_RETRY_REQUESTED",
+  "parentHead": "f3cdeb9289481b2428f63788501b5ed087dcc22a",
+  "failedRun": {
+    "runId": 37848570425,
+    "jobId": 113555506970,
+    "error": "CONTINUITY_MACHINE_PASS_WITH_STALE_CHILD_STATE:B4-003-R15-07-RENEWALS-BUSINESS-COMPLETENESS"
+  },
+  "findingId": "B4-003-R15-07-RENEWALS-BUSINESS-COMPLETENESS",
+  "priorStatus": "SOURCE_FIXED_R17_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+  "currentStatus": "MACHINE_PASS_PENDING_PAULA_VISUAL",
+  "evidence": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_RENEWALS_PRIORITY_MACHINE_PROOF_20261008.json",
+    "blobSha": "b9576259691b6908dda558b7c02db51e15a75b4f",
+    "runId": 37843233312
+  },
+  "governance": {
+    "ledgerBlobSha": "464cbda4b2ac27388e4c181d852339e23befc526",
+    "carryBlobSha": "a7991cdcc14a0650c1f608aa970e39b47f956cac",
+    "masterPlanBlobSha": "3d9b8c4a32c02b380a03c904622dfd631c5a3e53",
+    "compositionLockBlobSha": "eef28aacac05616aa714a3ebedfb01a6c4c87034"
+  },
+  "productSourceChanged": false,
+  "dataMutation": false,
+  "syntheticQaWrites": 0,
+  "reimport": false,
+  "livePromotion": false,
+  "nextAction": "B4_003_R20_CONTRACT_AND_EXACT_PREVIEW"
+}

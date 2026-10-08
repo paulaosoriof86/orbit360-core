@@ -1,6 +1,6 @@
 {
   "schema": "GRAVICENTRA_I6_PENDING_CLOSURE_MASTER_PLAN_LOCK_V1",
-  "recordedAt": "2026-10-08T20:04:00Z",
+  "recordedAt": "2026-10-08T21:43:35.454Z",
   "status": "FROZEN_ACTIVE_RENEWALS_DATA_APPLIED_PREVIEW_AUTH_PENDING",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
@@ -14524,8 +14524,8 @@
     "exactIdSet": true,
     "newFindingIds": [],
     "deletedFindingIds": [],
-    "ledgerBlobSha": "0f2d6916537fb3f69ad4e03b947ccd4e4c5b02f7",
-    "carryBlobSha": "bbd84d4374160984b1e8840b02df5e0c63ba6c7c",
+    "ledgerBlobSha": "464cbda4b2ac27388e4c181d852339e23befc526",
+    "carryBlobSha": "a7991cdcc14a0650c1f608aa970e39b47f956cac",
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_UAT3_FINDING_PRIORITY_RECONCILIATION_20261008.json",
     "receiptBlobSha": "97f1a5a49d04b15a265c2c4bcd747d6404439eac"
   },
@@ -14974,8 +14974,8 @@
     "status": "PASS_RECONCILIATION_CAUSAL_AUDIT_COMPLETE",
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_UAT3_FINDING_PRIORITY_RECONCILIATION_20261008.json",
     "receiptBlobSha": "97f1a5a49d04b15a265c2c4bcd747d6404439eac",
-    "ledgerBlobSha": "0f2d6916537fb3f69ad4e03b947ccd4e4c5b02f7",
-    "carryBlobSha": "bbd84d4374160984b1e8840b02df5e0c63ba6c7c",
+    "ledgerBlobSha": "464cbda4b2ac27388e4c181d852339e23befc526",
+    "carryBlobSha": "a7991cdcc14a0650c1f608aa970e39b47f956cac",
     "compositionLockBlobSha": "5169713a2ae4d9260376a3feca2b5aed76e61e0f",
     "observations": 52,
     "linkedExistingFindingIds": 60,
@@ -15206,5 +15206,15 @@
       "recent24Untouched": true,
       "rollbackExecuted": false
     }
+  },
+  "renewalsChildMachinePassReconciliation": {
+    "status": "PASS_PENDING_CUMULATIVE_PREVIEW",
+    "findingId": "B4-003-R15-07-RENEWALS-BUSINESS-COMPLETENESS",
+    "runId": 37843233312,
+    "ledgerBlobSha": "464cbda4b2ac27388e4c181d852339e23befc526",
+    "carryBlobSha": "a7991cdcc14a0650c1f608aa970e39b47f956cac",
+    "productSourceChanged": false,
+    "dataMutation": false,
+    "livePromotion": false
   }
 }

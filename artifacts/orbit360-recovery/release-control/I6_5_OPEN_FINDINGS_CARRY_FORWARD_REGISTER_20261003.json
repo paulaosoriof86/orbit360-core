@@ -1,10 +1,10 @@
 {
   "schema": "GRAVICENTRA_I6_5_OPEN_FINDINGS_CARRY_FORWARD_REGISTER_V1",
-  "recordedAt": "2026-10-08T00:00:00Z",
+  "recordedAt": "2026-10-08T21:43:35.454Z",
   "authority": "FAIL_CLOSED_FINDING_CONTINUITY",
   "sourceLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
   "sourceLedgerPreviousBlobSha": "519a9edb03b6ac88848d90bf427e0dc7c83c60b1",
-  "expectedLedgerNextBlobSha": "0f2d6916537fb3f69ad4e03b947ccd4e4c5b02f7",
+  "expectedLedgerNextBlobSha": "464cbda4b2ac27388e4c181d852339e23befc526",
   "policy": {
     "allLedgerFindingsMustAppearExactlyOnce": true,
     "newHumanFindingsMustBeIndividualLedgerEntries": true,
@@ -8493,7 +8493,7 @@
       ],
       "rootCause": "Most policies still lack authoritative renovable YES/NO and some renewal financial fields remain source-incomplete; current product correctly refuses to infer them.",
       "requiredFix": "Open exact policy editor focused on tri-state Renovabilidad with source-safe options; keep UNKNOWN fail-closed; derive KPI and columns from the same immutable bucket snapshot and prove equality.",
-      "status": "SOURCE_FIXED_R17_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+      "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
       "blocking": true,
       "targetGate": "B4-003",
       "closureCondition": "Resolve renewability/financial completeness from source-backed policy/insurer evidence and visible validation workflow; do not auto-promote UNKNOWN.",
@@ -8502,10 +8502,10 @@
       "receiptBlobSha": "afe6193dc1ff4151e94777a276296f9df0ed17a3",
       "noLive": true,
       "noReimport": true,
-      "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW",
+      "nextAction": "B4_003_RENEWALS_TARGETED_PAULA_VISUAL",
       "r16SourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R16_COMPREHENSIVE_SOURCE_FIX_20261004.json",
       "r16SourceFixReceiptBlobSha": "dcd545e14795e387a8f67130d5fa51aabfcd63ce",
-      "humanVisualStatus": "REJECTED_R17",
+      "humanVisualStatus": "PENDING_RENEWALS_PRIORITY_VISUAL",
       "humanEvidence": [
         "2026-10-04 Paula R17: Revisar y clasificar only opens policy; user is left to find the field manually; KPI bucket counts and visible column counts diverged in same review."
       ],
@@ -8529,7 +8529,16 @@
         "priorStatusPreserved": true,
         "noAutomaticPass": true
       },
-      "preUat3Blocking": true
+      "preUat3Blocking": true,
+      "renewalsPriorityMachineProof": {
+        "status": "PASS",
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_RENEWALS_PRIORITY_MACHINE_PROOF_20261008.json",
+        "blobSha": "b9576259691b6908dda558b7c02db51e15a75b4f",
+        "runId": 37843233312,
+        "sourceSha": "2248d58d51a7ff051a9b3d0a8645e6b7e3b59a90",
+        "recent24Visible": true,
+        "terminal583Absent": true
+      }
     },
     {
       "id": "B4-003-R15-08-INSURER-DOCUMENT-TAXONOMY-AND-REGISTRY-CONVERGENCE",

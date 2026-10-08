@@ -2165,7 +2165,7 @@
     "operationalBusinessWrites": 0,
     "syntheticFinalAbsent": true
   },
-  "findingLedgerBlobSha": "0f2d6916537fb3f69ad4e03b947ccd4e4c5b02f7",
+  "findingLedgerBlobSha": "464cbda4b2ac27388e4c181d852339e23befc526",
   "b4002Diagnostic": {
     "status": "CAUSE_DEMONSTRATED_SOURCE_FIX_AUTHORIZED",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_002_POST_COMMIT_NOTIFICATION_DIAGNOSTIC_20261003.json",
@@ -3943,7 +3943,7 @@
     "previewMutation": false,
     "liveMutation": false
   },
-  "recordedAt": "2026-10-08T20:56:51.437Z",
+  "recordedAt": "2026-10-08T21:43:35.454Z",
   "uat3P0SourceFixBatch2": {
     "status": "SOURCE_FIXED_STATIC_PASS_DEPLOYMENT_NOT_DISPATCHED",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_UAT3_P0_SOURCE_FIX_BATCH_2_SHARED_INBOX_20261008.json",
@@ -4064,5 +4064,14 @@
     "qaProofBlobSha": "4f34ab832ae104f56b215d8c800e88d99dfc4bdb",
     "resultPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_RENEWALS_RECENT24_PIPELINE_OWNER_ROOTFIX_20261008.json",
     "resultBlobSha": "9fa145ea6ed378613cbc4761b3fc0a0fe2bb2336"
+  },
+  "renewalsChildMachinePassReconciliation": {
+    "status": "PASS_PENDING_CUMULATIVE_PREVIEW",
+    "findingId": "B4-003-R15-07-RENEWALS-BUSINESS-COMPLETENESS",
+    "runId": 37843233312,
+    "ledgerBlobSha": "464cbda4b2ac27388e4c181d852339e23befc526",
+    "carryBlobSha": "a7991cdcc14a0650c1f608aa970e39b47f956cac",
+    "masterPlanBlobSha": "3d9b8c4a32c02b380a03c904622dfd631c5a3e53",
+    "productSourceChanged": false
   }
 }
