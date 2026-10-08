@@ -208,7 +208,7 @@
     "orbit360-platform/data/tenant-alianzas-soluciones-insurers-p10.js": "41d2e31a42dac73eb68af304d5f532897210d0ee",
     "orbit360-platform/data/tenant-config/alianzas-soluciones.aseguradoras-knowledge-summary-v20261003.js": "2000d9ea8ab67bdd37d8bf404a29a405fa6374dd",
     "orbit360-platform/data/tenant-public-branding-index.js": "dc543c463f5ecd8ea44e49156d6282113bd95db6",
-    "orbit360-platform/index.html": "df9f820b109be2f709eab73f8bc0ac9dcab2c69b",
+    "orbit360-platform/index.html": "933e48ced9c056b7bea51e21715de27a340d8664",
     "orbit360-platform/modules/academia.js": "d27aa080eac091057310aa7c952d3093677b50f0",
     "orbit360-platform/modules/aseguradoras-v1202-import-bridge.js": "db5f012abe505c2dd27d77a47d0694868bee5348",
     "orbit360-platform/modules/aseguradoras.js": "28bb3f15a1ca20130b194bb2dd5b1d296984927d",
@@ -4073,5 +4073,18 @@
     "carryBlobSha": "a7991cdcc14a0650c1f608aa970e39b47f956cac",
     "masterPlanBlobSha": "3d9b8c4a32c02b380a03c904622dfd631c5a3e53",
     "productSourceChanged": false
+  },
+  "uat3CommercialPendingLandingRaceFix": {
+    "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_UPSELLS_LEADS_OPS_PENDING_LANDING_RACE_SOURCE_FIX_20261008.json",
+    "blobSha": "4c0889ff59eec8f849003746bf372914892a83ba",
+    "productFile": "orbit360-platform/index.html",
+    "productBlobSha": "933e48ced9c056b7bea51e21715de27a340d8664",
+    "observations": [
+      "D-02",
+      "D-17"
+    ],
+    "dataMutation": false,
+    "livePromotion": false
   }
 }

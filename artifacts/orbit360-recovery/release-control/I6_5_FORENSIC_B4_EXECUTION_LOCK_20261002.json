@@ -98,7 +98,7 @@
   "nextAction": "B4_003_R20_CONTRACT_AND_EXACT_PREVIEW",
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "blobSha": "eef28aacac05616aa714a3ebedfb01a6c4c87034",
+    "blobSha": "aaf590cb04608aa16e16650e44658bdf903d6f71",
     "status": "FROZEN_ACTIVE_UAT3_P0_BATCH_1_SOURCE_COMPLETE"
   },
   "findingLedger": {
@@ -1417,7 +1417,7 @@
     "resultPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_RENEWALS_RECENT24_PIPELINE_OWNER_ROOTFIX_20261008.json",
     "resultBlobSha": "9fa145ea6ed378613cbc4761b3fc0a0fe2bb2336",
     "productBlobSha": "8e3bc32aa5ac5f577f545700d39499970c2edeaf",
-    "compositionLockBlobSha": "eef28aacac05616aa714a3ebedfb01a6c4c87034",
+    "compositionLockBlobSha": "aaf590cb04608aa16e16650e44658bdf903d6f71",
     "qaProofBlobSha": "4f34ab832ae104f56b215d8c800e88d99dfc4bdb"
   },
   "renewalsRecent24PipelineOwnerRootfix": {
@@ -1444,6 +1444,18 @@
     "ledgerBlobSha": "464cbda4b2ac27388e4c181d852339e23befc526",
     "carryBlobSha": "a7991cdcc14a0650c1f608aa970e39b47f956cac",
     "masterPlanBlobSha": "3d9b8c4a32c02b380a03c904622dfd631c5a3e53",
-    "compositionLockBlobSha": "eef28aacac05616aa714a3ebedfb01a6c4c87034"
+    "compositionLockBlobSha": "aaf590cb04608aa16e16650e44658bdf903d6f71"
+  },
+  "uat3CommercialPendingLandingRaceFix": {
+    "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW",
+    "receiptBlobSha": "4c0889ff59eec8f849003746bf372914892a83ba",
+    "compositionLockBlobSha": "aaf590cb04608aa16e16650e44658bdf903d6f71",
+    "productBlobSha": "933e48ced9c056b7bea51e21715de27a340d8664",
+    "observations": [
+      "D-02",
+      "D-17"
+    ],
+    "dataMutation": false,
+    "livePromotion": false
   }
 }

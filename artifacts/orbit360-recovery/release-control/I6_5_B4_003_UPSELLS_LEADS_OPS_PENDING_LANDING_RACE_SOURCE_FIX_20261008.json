@@ -1,0 +1,46 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_UPSELLS_LEADS_OPS_PENDING_LANDING_RACE_SOURCE_FIX_V1",
+  "recordedAt": "2026-10-08T22:43:00Z",
+  "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "parentHead": "edaed662ddf6956428d49a927076d63f31832a2e",
+  "evidence": {
+    "runId": 37855140563,
+    "jobId": 113577399762,
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-37855140563-q5ldm689.web.app",
+    "directInboxProjectionContainsTask": true,
+    "startupLandingTimeout": true,
+    "cleanupWrites": 35,
+    "syntheticFinalAbsent": true,
+    "liveByteStable": true
+  },
+  "cause": {
+    "classification": "STARTUP_PENDING_TASK_RACE",
+    "detail": "The first successful inbox refresh could return no actionable rows while auth/role/projection converged, but maybePendingLanding permanently marked the one-time decision complete. Later refreshes could display the task but could no longer route Inicio to Leads/Ops."
+  },
+  "correction": {
+    "path": "orbit360-platform/index.html",
+    "previousBlobSha": "df9f820b109be2f709eab73f8bc0ac9dcab2c69b",
+    "correctedBlobSha": "933e48ced9c056b7bea51e21715de27a340d8664",
+    "scope": "Keep the startup decision open while role is unavailable or no actionable task exists; freeze it only after explicit navigation away from Inicio or after routing to an actionable Leads/Ops task."
+  },
+  "findingDisposition": {
+    "sourceCorrectedPendingRuntimeProof": [
+      "D-02",
+      "D-17"
+    ],
+    "closed": [],
+    "b4003Open": true,
+    "b4004Held": true
+  },
+  "boundaries": {
+    "dataMutation": false,
+    "businessWrites": false,
+    "syntheticQaWritesThisCommit": false,
+    "functionDeployment": false,
+    "livePromotion": false,
+    "reimport": false
+  },
+  "nextAction": "B4_003_R20_CONTRACT_AND_EXACT_PREVIEW"
+}
