@@ -1,0 +1,223 @@
+{
+  "schema": "gravicentra-b4-003-uat3-e1-offline-source-reconciliation-v1",
+  "recordedAt": "2026-10-08",
+  "status": "OFFLINE_SOURCE_RECONCILIATION_COMPLETE_CANONICAL_READBACK_STILL_REQUIRED",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "scopeLockCommit": "1476a3811d3b8e32bb19992964aa1273c9bc8ba3",
+  "scopeLockPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_UAT3_E1_CANONICAL_READONLY_PACK_SCOPE_LOCK_20261008.json",
+  "method": {
+    "mutation": false,
+    "workbookAuthoring": false,
+    "sourceFilesModified": false,
+    "parser": "read-only OOXML cell extraction because source styles contain invalid vertical-alignment XML for openpyxl",
+    "liveCanonicalEquivalent": false
+  },
+  "results": [
+    {
+      "observationId": "A-08",
+      "classification": "OFFLINE_SOURCE_VALID_SEQUENCE_CANONICAL_ID_GRAPH_PENDING",
+      "findings": [
+        "VA-57280 appears once in the policy export and as exactly one contractual row for every ordinal 1/12 through 12/12 in the expected-receipt report.",
+        "Five collection workbooks contain zero bare numeric Serie values and zero N/N-versus-N pairs; the observed UI shadow pattern is not present in these source exports.",
+        "A small number of repeated business keys exist for other policies, but the rows carry distinct endoso references and therefore cannot be treated as deletable receipt shadows."
+      ],
+      "exactEvidence": {
+        "policy": {
+          "source": "12-Polizas-16-.xlsx",
+          "row": 361,
+          "policy": "VA-57280",
+          "premiumNet": "1586.0",
+          "premiumTotal": "1776.32",
+          "currency": "GTQ",
+          "frequency": "Mensual"
+        },
+        "expectedSchedule": {
+          "source": "20-Reporte-2026-09-18-061143.xlsx",
+          "rows": [
+            53,
+            85,
+            120,
+            171,
+            223,
+            299,
+            385,
+            469,
+            545,
+            616,
+            685,
+            751
+          ],
+          "ordinals": [
+            "1/12",
+            "2/12",
+            "3/12",
+            "4/12",
+            "5/12",
+            "6/12",
+            "7/12",
+            "8/12",
+            "9/12",
+            "10/12",
+            "11/12",
+            "12/12"
+          ],
+          "receiptTotalEach": "148.03"
+        },
+        "collectionCoverage": {
+          "17-CobranzaCendoso-27-.xlsx": [
+            "12/12"
+          ],
+          "18-CobranzaCendoso-25-.xlsx": [
+            "1/12",
+            "2/12",
+            "3/12",
+            "4/12",
+            "5/12",
+            "6/12",
+            "7/12"
+          ],
+          "19-CobranzaCendoso-26-.xlsx": [
+            "1/12",
+            "2/12",
+            "3/12",
+            "4/12",
+            "5/12",
+            "6/12",
+            "7/12",
+            "8/12",
+            "9/12",
+            "10/12",
+            "11/12"
+          ],
+          "21-CobranzaCendoso-24-.xlsx": [
+            "1/12",
+            "2/12",
+            "3/12",
+            "4/12",
+            "5/12",
+            "6/12",
+            "7/12"
+          ]
+        },
+        "collectionFormatCheck": {
+          "workbooksChecked": 5,
+          "bareSeriesRows": 0,
+          "denominatorBarePairs": 0
+        }
+      },
+      "canonicalBlocker": "Need physical receipt IDs, replacement/shadow flags and policy graph from the current canonical store. No deletion is authorized."
+    },
+    {
+      "observationId": "A-09",
+      "classification": "OFFLINE_SOURCE_DEMONSTRATES_EXPEDITION_INCLUDED_IN_EXPORTED_TOTAL_CANONICAL_FORMULA_AUTHORITY_PENDING",
+      "findings": [
+        "The attached Colombian/COP receipt rows expose Monto Expedición explicitly.",
+        "For ordinary examples, receipt total equals net plus expedition plus financing/tax components and exactly matches the policy total for the same policy and vigencia.",
+        "The Chubb 68542 row uses a field labelled Monto Descuento in an additive relationship to the exported total, demonstrating that a generic formula must not be inferred without insurer/product authority."
+      ],
+      "exactEvidence": [
+        {
+          "policy": "1003687",
+          "insurer": "SBS",
+          "currency": "COP",
+          "net": "4907258.00",
+          "expedition": "25000.00",
+          "tax": "933309.66",
+          "receiptTotal": "5865567.66",
+          "policyTotal": "5865567.66"
+        },
+        {
+          "policy": "6213",
+          "insurer": "AXA",
+          "currency": "COP",
+          "net": "1768152.77",
+          "expedition": "20000.00",
+          "tax": "339749.03",
+          "receiptTotal": "2127901.80",
+          "policyTotal": "2127901.80"
+        },
+        {
+          "policy": "PE245145",
+          "insurer": "Equidad",
+          "currency": "COP",
+          "net": "1170189.00",
+          "expedition": "6000.00",
+          "tax": "213757.00",
+          "receiptTotal": "1389946.00",
+          "policyTotal": "1389946.00"
+        },
+        {
+          "policy": "68542",
+          "insurer": "Chubb",
+          "currency": "COP",
+          "net": "29544962.00",
+          "expedition": "12000.00",
+          "labelledDiscount": "16560.00",
+          "tax": "5618969.18",
+          "receiptTotal": "35192491.18",
+          "policyTotal": "35192491.18"
+        }
+      ],
+      "canonicalBlocker": "Need the live insurer/product/currency/tax source fields and importer mapping before changing any formula."
+    },
+    {
+      "observationId": "A-10",
+      "classification": "INSUFFICIENT_OFFLINE_EVIDENCE_EXACT_CANONICAL_ROW_REQUIRED",
+      "findings": [
+        "The value 346080, with or without separators, does not occur in any of the ten attached policy, renewal, collection or receipt-report workbooks.",
+        "No policy or receipt identity can be bound to the UI example Q346,080 from the offline source bundle.",
+        "Responsive clipping can be corrected and proven separately, but the financial amount must remain fail-closed."
+      ],
+      "canonicalBlocker": "Need exact policy ID, receipt IDs, authoritative expected total and viewport reproduction for the observed row."
+    },
+    {
+      "observationId": "A-13",
+      "classification": "OFFLINE_SOURCE_SEMANTICS_SUPPORTED_ACTIVE_ROLE_MATRIX_PENDING",
+      "findings": [
+        "Currency is explicit per policy and receipt row; VA-57280 is GTQ while Colombian examples are COP.",
+        "Collection exports distinguish a payment date from Pendiente and Cancelado in Fecha Real Pagado.",
+        "Frozen business rules require expected receipts to remain obligations and confirmed payments to require real evidence; an expected receipt is not a confirmed collection."
+      ],
+      "canonicalBlocker": "Offline exports do not contain active membership, role-visible actions or current cartera projections. Authenticated role readback remains required."
+    },
+    {
+      "observationId": "A-07",
+      "classification": "CORROBORATING_SOURCE_EVIDENCE_NO_NEW_FINDING",
+      "findings": [
+        "VA-57280 policy total is 1776.32 GTQ.",
+        "Twelve exported receipt totals of 148.03 sum to 1776.36 GTQ.",
+        "The exact aggregate delta is +0.04 GTQ and is consistent with per-installment rounding, not evidence of a duplicate receipt."
+      ]
+    },
+    {
+      "observationIds": [
+        "C-06",
+        "C-07",
+        "D-15",
+        "D-18"
+      ],
+      "classification": "NOT_ADDRESSABLE_FROM_ATTACHED_FINANCIAL_EXPORTS",
+      "canonicalBlocker": "These require current canonical fixture, event provenance, contact mapping or Ops management IDs and active-role readback."
+    }
+  ],
+  "invariants": {
+    "noFindingDeleted": true,
+    "noReceiptDeleted": true,
+    "noAmountChanged": true,
+    "noFormulaChanged": true,
+    "noDataWrite": true,
+    "noReimport": true,
+    "noBuildDispatch": true,
+    "noPreviewMutation": true,
+    "noLiveMutation": true,
+    "logoExcludedFromScope": true
+  },
+  "decision": {
+    "e1OfflinePortionComplete": true,
+    "e1CanonicalPortionComplete": false,
+    "sourceFixAuthorizedByThisReceipt": false,
+    "dataFixAuthorizedByThisReceipt": false,
+    "nextAction": "I6_5_B4_003_UAT3_E1_CANONICAL_ID_GRAPH_AND_ROLE_READBACK"
+  }
+}
