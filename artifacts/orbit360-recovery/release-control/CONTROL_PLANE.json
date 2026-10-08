@@ -752,7 +752,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "I6_5_B4_003_RENEWALS_EXACT_PREVIEW_VISUAL",
+  "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_RENEWALS_PRIORITY_EXACT_PREVIEW",
   "postproductionExitProgress": {
     "formalPercent": 50,
     "frozenMiniGates": 5,
@@ -4863,13 +4863,13 @@
       "b2LedgerSealReconciled": true
     },
     "b4": {
-      "status": "B4_003_RENEWALS_PRIORITY_MACHINE_PASS_PENDING_PAULA_VISUAL",
+      "status": "B4_003_RENEWALS_PRIORITY_EXACT_PREVIEW_AUTHORIZED",
       "entryCondition": "PASS",
       "targetPercent": 100,
       "entryGuardReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_ENTRY_GUARD_PASS_20261002.json",
       "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
       "executionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B4_EXECUTION_LOCK_20261002.json",
-      "executionLockBlobSha": "daf54af15155a37e85c5bc14b88a3da73ceb41dd",
+      "executionLockBlobSha": "f2b70b994493af838a261fc8304ef52aa1dfc005",
       "compositionLockBlobSha": "215e8cd9087addbb49e18f08067b566af7c0f06e",
       "findingLedgerBlobSha": "519a9edb03b6ac88848d90bf427e0dc7c83c60b1",
       "activeFindingId": "B4-003",
@@ -4880,7 +4880,7 @@
       "dataMutationAuthorized": false,
       "reimportAuthorized": false,
       "livePromotionAuthorized": false,
-      "nextAction": "B4_003_RENEWALS_EXACT_PREVIEW_VISUAL",
+      "nextAction": "B4_003_RENEWALS_PRIORITY_EXACT_PREVIEW",
       "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R17_SOURCE_FIX_20261005.json",
       "sourceFixReceiptBlobSha": "ff532a6577e58076821a41fb593da642fd2e7ef7",
       "sourceHeadBeforeGovernanceSeal": "67d8695680556bec1f559a8c4ee650176d400f98",
@@ -5934,6 +5934,12 @@
         "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
         "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_RENEWALS_PRIORITY_MACHINE_PROOF_20261008.json",
         "blobSha": "099d8c8eec2af0f118168a24315c7bb6ee2b3fc8"
+      },
+      "invalidatedRenewalsPriorityMachineProof": {
+        "status": "INVALIDATED_EXACT_RETRY_REQUIRED",
+        "runId": 37839569726,
+        "artifactId": 11576758328,
+        "reason": "RECENT24_UI_ID_HANDOFF_WAS_EMPTY"
       }
     }
   },
@@ -5954,7 +5960,7 @@
     "atomicManifestWithSourceRequired": true,
     "statusEnumMayNotGovernComposition": true,
     "findingLossFailClosed": true,
-    "nextAction": "B4_003_RENEWALS_EXACT_PREVIEW_VISUAL",
+    "nextAction": "B4_003_RENEWALS_PRIORITY_EXACT_PREVIEW",
     "activeFindingId": "B4-003",
     "findingContinuityRegisterBlobSha": "11ffaf6e7c691064be947fdc1af00b08d8fb8f9c",
     "findingContinuityGuardBlobSha": "868a0ba1a492d9adc8d91655f152b6fa7980f499",
@@ -6252,15 +6258,15 @@
     "noReimport": true
   },
   "currentB4": {
-    "status": "B4_003_RENEWALS_PRIORITY_MACHINE_PASS_PENDING_PAULA_VISUAL",
+    "status": "B4_003_RENEWALS_PRIORITY_EXACT_PREVIEW_AUTHORIZED",
     "activeFindingId": "B4-003",
     "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
-    "executionLockBlobSha": "daf54af15155a37e85c5bc14b88a3da73ceb41dd",
+    "executionLockBlobSha": "f2b70b994493af838a261fc8304ef52aa1dfc005",
     "compositionLockBlobSha": "215e8cd9087addbb49e18f08067b566af7c0f06e",
     "findingLedgerBlobSha": "0f2d6916537fb3f69ad4e03b947ccd4e4c5b02f7",
     "noLive": true,
     "noReimport": true,
-    "nextAction": "B4_003_RENEWALS_EXACT_PREVIEW_VISUAL",
+    "nextAction": "B4_003_RENEWALS_PRIORITY_EXACT_PREVIEW",
     "sourceFixReceiptBlobSha": "3f6aa42cc5751a42b3411df9b82aae3fd8f880f0",
     "syntheticQaWritesAuthorized": false,
     "previewDispatchRequest": {
@@ -7540,6 +7546,12 @@
       "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
       "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_RENEWALS_PRIORITY_MACHINE_PROOF_20261008.json",
       "blobSha": "099d8c8eec2af0f118168a24315c7bb6ee2b3fc8"
+    },
+    "invalidatedRenewalsPriorityMachineProof": {
+      "status": "INVALIDATED_EXACT_RETRY_REQUIRED",
+      "runId": 37839569726,
+      "artifactId": 11576758328,
+      "reason": "RECENT24_UI_ID_HANDOFF_WAS_EMPTY"
     }
   },
   "b4VisualAcceptanceControl": {
