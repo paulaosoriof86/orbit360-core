@@ -22,6 +22,7 @@ on:
       - 'tools/gravicentra-i6-5-b4-003-r20-renewability-rule.mjs'
       - 'tools/gravicentra-i6-5-b4-003-r20-country-backfill-dryrun.mjs'
       - 'tools/gravicentra-i6-5-b4-003-r20-renewal-cutoff-dryrun.mjs'
+      - 'tools/gravicentra-i6-5-b4-003-r20-renewal-cutoff-apply.mjs'
       - 'tools/gravicentra-live-preexisting-drift-snapshot.mjs'
       - 'tools/gravicentra-quote-authority-contract-v1.mjs'
       - 'orbit360-platform/core/quote-authority-contract-v1.js'
@@ -137,12 +138,28 @@ jobs:
             && l.boundaries?.dataMutationAuthorized===true
             && l.boundaries?.reimportAuthorized===false
             && l.boundaries?.livePromotionAuthorized===false;
+          const r20c=l.r20RenewalCutoffApplyAuthorization||{};
+          const r20CutoffApply=c.nextAction==='I6_5_FORENSIC_REMEDIATION_B4_003_R20_RENEWAL_CUTOFF_APPLY'
+            && c.currentB4?.status==='B4_003_R20_RENEWAL_CUTOFF_APPLY_AUTHORIZED'
+            && c.i65ForensicRemediationPlan?.b4?.status==='B4_003_R20_RENEWAL_CUTOFF_APPLY_AUTHORIZED'
+            && l.status==='B4_003_R20_RENEWAL_CUTOFF_APPLY_AUTHORIZED'
+            && l.activeFinding?.id==='B4-003'
+            && r20c.status==='AUTHORIZED_PENDING_APPLY'
+            && r20c.ruleId==='PAULA_EXPIRED_CUTOFF_20261007'
+            && r20c.targetDigest==='744f6f26139f272fa3a26ab35e889a9d011833e802d1495286147734ec7b4d1d'
+            && Number(r20c.maxWrites)===583
+            && Number(r20c.recentCount)===24
+            && l.boundaries?.renewalCutoffDataMutationAuthorized===true
+            && l.boundaries?.dataMutationAuthorized===true
+            && l.boundaries?.reimportAuthorized===false
+            && l.boundaries?.livePromotionAuthorized===false;
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'run='+(previewOk?'true':'false')+'\n');
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'apply='+(applyOk?'true':'false')+'\n');
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'r20_dryrun='+(r20DryRun?'true':'false')+'\n');
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'r20_apply='+(r20Apply?'true':'false')+'\n');
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'r20_cutoff_apply='+(r20CutoffApply?'true':'false')+'\n');
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'r20_second_dryrun='+(secondReviewDryRun?'true':'false')+'\n');
-          console.log('B4_003_PREVIEW_MODE='+(previewOk?'RUN':'NOOP')+' APPLY_MODE='+(applyOk?'RUN':'NOOP')+' R20_DRYRUN_MODE='+(r20DryRun?'RUN':'NOOP')+' R20_APPLY_MODE='+(r20Apply?'RUN':'NOOP')+' R20_SECOND_DRYRUN='+(secondReviewDryRun?'RUN':'NOOP'));
+          console.log('B4_003_PREVIEW_MODE='+(previewOk?'RUN':'NOOP')+' APPLY_MODE='+(applyOk?'RUN':'NOOP')+' R20_DRYRUN_MODE='+(r20DryRun?'RUN':'NOOP')+' R20_APPLY_MODE='+(r20Apply?'RUN':'NOOP')+' R20_CUTOFF_APPLY='+(r20CutoffApply?'RUN':'NOOP')+' R20_SECOND_DRYRUN='+(secondReviewDryRun?'RUN':'NOOP'));
           NODE
 
 
@@ -217,6 +234,79 @@ jobs:
             ${{ runner.temp }}/b4-003-r20-live-before.json
             ${{ runner.temp }}/b4-003-r20-live-after.json
           if-no-files-found: error
+          retention-days: 14
+
+      - name: Snapshot preexisting LIVE binding before authorized B-02 cutoff apply
+        if: steps.gate.outputs.r20_cutoff_apply == 'true'
+        env:
+          LIVE_DRIFT_OUT: ${{ runner.temp }}/b4-003-b02-live-before.json
+        run: node tools/gravicentra-live-preexisting-drift-snapshot.mjs --mode=snapshot
+
+      - name: Prepare authorized B-02 renewal cutoff apply
+        if: steps.gate.outputs.r20_cutoff_apply == 'true'
+        run: |
+          set -euo pipefail
+          ROOT="$RUNNER_TEMP/b4-003-b02-cutoff-apply-auth"
+          mkdir -p "$ROOT"
+          export ROOT
+          python3 - <<'PY'
+          import json,os,pathlib
+          rows=[]
+          for i,k in enumerate(['SA_DEFAULT','SA_ORBIT360_LAB','SA_ORBIT_360_LAB']):
+              try:d=json.loads(os.environ.get(k,''))
+              except:continue
+              if d.get('type')=='service_account' and d.get('project_id')=='ays-orbit-360-lab' and d.get('private_key'):
+                  p=pathlib.Path(os.environ['ROOT'])/f'{i}.json'
+                  p.write_text(json.dumps(d));p.chmod(0o600);rows.append(str(p))
+          if not rows:raise SystemExit('B4_003_B02_CUTOFF_APPLY_NO_SERVICE_ACCOUNT')
+          pathlib.Path(os.environ['ROOT']+'/files').write_text('\n'.join(rows)+'\n')
+          PY
+          SEL=$(head -n1 "$ROOT/files")
+          cp "$SEL" "$RUNNER_TEMP/b4-003-b02-cutoff-apply-sa.json"
+          chmod 600 "$RUNNER_TEMP/b4-003-b02-cutoff-apply-sa.json"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/b4-003-b02-cutoff-apply-sa.json" >> "$GITHUB_ENV"
+          npm install --no-save --package-lock=false firebase-admin@13.4.0 >/dev/null
+          node --check tools/gravicentra-i6-5-b4-003-r20-renewal-cutoff-apply.mjs
+
+      - name: Apply exact B-02 historical renewal disposition
+        if: steps.gate.outputs.r20_cutoff_apply == 'true'
+        env:
+          R20_RENEWAL_CUTOFF_APPLY_RESULT: ${{ runner.temp }}/b4-003-b02-renewal-cutoff-apply.json
+          R20_RENEWAL_CUTOFF_ROLLBACK: ${{ runner.temp }}/b4-003-b02-renewal-cutoff-rollback.private.json
+          R20_RENEWAL_CUTOFF_AUTH: artifacts/orbit360-recovery/release-control/I6_5_B4_003_B02_RENEWAL_CUTOFF_APPLY_AUTH_20261008.json
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-i6-5-b4-003-r20-renewal-cutoff-apply.mjs --mode=apply
+
+      - name: Roll back B-02 cutoff disposition on failure
+        if: failure() && steps.gate.outputs.r20_cutoff_apply == 'true'
+        env:
+          R20_RENEWAL_CUTOFF_APPLY_RESULT: ${{ runner.temp }}/b4-003-b02-renewal-cutoff-rollback-result.json
+          R20_RENEWAL_CUTOFF_ROLLBACK: ${{ runner.temp }}/b4-003-b02-renewal-cutoff-rollback.private.json
+        run: |
+          if [ -f "$R20_RENEWAL_CUTOFF_ROLLBACK" ]; then
+            node tools/gravicentra-i6-5-b4-003-r20-renewal-cutoff-apply.mjs --mode=rollback || true
+          fi
+          echo "B4_003_B02_CUTOFF_APPLY_FAILED_FAIL_CLOSED"
+
+      - name: Verify LIVE remained byte-stable during B-02 cutoff apply
+        if: always() && steps.gate.outputs.r20_cutoff_apply == 'true'
+        env:
+          LIVE_DRIFT_BEFORE: ${{ runner.temp }}/b4-003-b02-live-before.json
+          LIVE_DRIFT_OUT: ${{ runner.temp }}/b4-003-b02-live-after.json
+        run: node tools/gravicentra-live-preexisting-drift-snapshot.mjs --mode=compare
+
+      - name: Upload B-02 cutoff apply evidence
+        if: always() && steps.gate.outputs.r20_cutoff_apply == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: b4-003-b02-renewal-cutoff-apply-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/b4-003-b02-renewal-cutoff-apply.json
+            ${{ runner.temp }}/b4-003-b02-renewal-cutoff-rollback-result.json
+            ${{ runner.temp }}/b4-003-b02-live-before.json
+            ${{ runner.temp }}/b4-003-b02-live-after.json
+          if-no-files-found: warn
           retention-days: 14
 
       - name: Assert LIVE unchanged before R20 renewability dry-run
