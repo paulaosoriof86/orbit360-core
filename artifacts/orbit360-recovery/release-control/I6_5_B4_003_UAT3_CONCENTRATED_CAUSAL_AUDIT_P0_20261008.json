@@ -1,0 +1,603 @@
+{
+  "schema": "gravicentra-b4-003-uat3-concentrated-causal-audit-v1",
+  "recordedAt": "2026-10-08T00:00:00Z",
+  "status": "READ_ONLY_CAUSAL_AUDIT_COMPLETE_SOURCE_FIX_NOT_YET_AUTHORIZED",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "headAudited": "b5e6b3fe3a9dc7e6419319284f515c2079098ae4",
+  "authority": {
+    "humanUatAddendumPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_UAT_THREE_BLOCKS_FORENSIC_FREEZE_AND_COMPLEMENT_20261008.md",
+    "humanUatAddendumBlobSha": "79a19a20a3bb2ff11b609990d51836a80a7202c5",
+    "priorityReconciliationPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_UAT3_FINDING_PRIORITY_RECONCILIATION_20261008.json",
+    "priorityReconciliationBlobSha": "97f1a5a49d04b15a265c2c4bcd747d6404439eac"
+  },
+  "boundaries": {
+    "productMutation": false,
+    "dataMutation": false,
+    "buildDispatch": false,
+    "previewMutation": false,
+    "liveMutation": false,
+    "reimport": false,
+    "qaDeletion": false
+  },
+  "auditedFiles": {
+    "orbit360-platform/modules/calidad.js": "f90813a3ba7c249f1b7e3c34ad6e3b5c1279a7bd",
+    "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js": "1b8dceb208b93220ce232037b4d0d394bb022f62",
+    "orbit360-platform/core/ui.js": "702cc1a64bda7a7795930a1ca6d4ca8cca8c04cc",
+    "orbit360-platform/modules/renovaciones.js": "77ce45bbdeb2452c51d8e88c1fa0d13969c549d6",
+    "orbit360-platform/modules/renewals-v1200-operational-bridge.js": "b44695f05170b4406740ed7158b47e6464916d8f",
+    "orbit360-platform/modules/renewals-v1201-issued-filter.js": "ae1df0174121c965f610407ae723094e833ebeaf",
+    "orbit360-platform/core/auth-product-runtime-p0.js": "5299e3397fc4f37488e65e609eb446d27d724128",
+    "orbit360-platform/core/product-app-p0.js": "f85a76eeab1c1ea0854ec91296357b0530020de7",
+    "orbit360-platform/core/backend-product-readonly-bootstrap-p0.js": "1f1da3d54b32d94fe7d7111f318437a48bbf95cd",
+    "orbit360-platform/core/product-hydration-required-optional-p0.js": "21f870d3e0e165487843d1d6efa454474fd73563",
+    "orbit360-platform/core/product-runtime-browser-providers-p0.js": "ad8cfc9fdd3bf3c3ea072246d52afbaf1f854b4c",
+    "orbit360-platform/modules/aseguradoras.js": "c4ef7a28607c38435bf5db243f318885709f237d",
+    "functions/product-insurer-credentials.js": "04e681fdba71ee8438429dda11ae50edf9a40c8e",
+    "orbit360-platform/core/ciclo.js": "76500931f20ad788ad49011ffe1a9719cc9ee754",
+    "functions/product-ops-leads-domain.js": "4ee966743b8aa67ddbd02cbb7d66f0ab97a3f28e",
+    "functions/ops-advisor-inbox.js": "622126d36c6ea5c9d98920f1c5ed9c61b5774aa8",
+    "functions/product-operational-domain.js": "61bbd6d4bc9e687fa698c129e4ffd4fb4fb085b7"
+  },
+  "population": {
+    "uatObservations": 52,
+    "p0Observations": 29,
+    "p1Parallel": 20,
+    "p2Deferred": 1,
+    "preservedPass": 2,
+    "newFindingIds": 0
+  },
+  "diagnosticSummary": {
+    "DEMONSTRATED": 18,
+    "PENDING_CANONICAL_READBACK": 8,
+    "PENDING_RUNTIME_TRACE": 3
+  },
+  "causalMatrix": [
+    {
+      "observationId": "A-07",
+      "priority": "BLOCKING_P0",
+      "findingIds": [
+        "B4-003-R11-09-POLICY-PREMIUM-CALENDAR-MISMATCH"
+      ],
+      "diagnosticClass": "DEMONSTRATED_WITH_RECORD_READBACK",
+      "cluster": "quality_financial_projection",
+      "evidence": "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js::financialIntegrityBatch + orbit360-platform/modules/calidad.js::moneyValue + orbit360-platform/core/ui.js::money",
+      "conclusion": "A delta greater than the 0.02 tolerance is a real issue, but UI.money rounds to integer currency; deltas between 0.02 and 0.49 render as Q 0 while the red issue remains. The exact VA-57280 rows and reason still require canonical readback.",
+      "disposition": "SOURCE_FIX_REQUIRED_AND_CANONICAL_ROW_READBACK"
+    },
+    {
+      "observationId": "A-08",
+      "priority": "BLOCKING_P0",
+      "findingIds": [
+        "B4-003-R16-05-RECEIPT-SHADOW-DUPLICATE-PROJECTION"
+      ],
+      "diagnosticClass": "PENDING_CANONICAL_READBACK",
+      "cluster": "receipt_calendar_projection",
+      "evidence": "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js::receiptCalendarProjection/receiptScheduleFromRows",
+      "conclusion": "Current code excludes legacy undenominated shadows only under explicit denominator/ordinal conditions. Apparent duplicate pairs cannot be called active duplicates or deleted without physical receipt IDs and policy graph.",
+      "disposition": "READ_ONLY_ID_GRAPH_REQUIRED"
+    },
+    {
+      "observationId": "A-09",
+      "priority": "BLOCKING_P0",
+      "findingIds": [
+        "B4-003-R11-09-POLICY-PREMIUM-CALENDAR-MISMATCH",
+        "B4-003-R11-14-INSURER-TARIFF-SOURCE-BACKLOG"
+      ],
+      "diagnosticClass": "PENDING_CANONICAL_READBACK",
+      "cluster": "premium_formula_authority",
+      "evidence": "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js::financialIntegrityBatch",
+      "conclusion": "The comparison uses policy primaTotal/prima against receipt primaTotal. Whether Colombian expedition costs belong in either authority is not demonstrated by source; insurer/product/currency/tax source readback is required.",
+      "disposition": "SOURCE_FORMULA_EVIDENCE_REQUIRED"
+    },
+    {
+      "observationId": "A-10",
+      "priority": "BLOCKING_P0",
+      "findingIds": [
+        "B4-003-R11-09-POLICY-PREMIUM-CALENDAR-MISMATCH",
+        "B4-003-R16-05-RECEIPT-SHADOW-DUPLICATE-PROJECTION",
+        "B4-003-R20-Q01"
+      ],
+      "diagnosticClass": "PENDING_CANONICAL_READBACK",
+      "cluster": "receipt_editor_authority",
+      "evidence": "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js::receiptScheduleFromRows",
+      "conclusion": "Projection exposes current, replaced and review rows, but the Q346,080 example and truncated expected-receipt state require exact policy/receipt IDs before any calculation or mutation.",
+      "disposition": "ROW_AUTHORITY_AND_RESPONSIVE_PROOF_REQUIRED"
+    },
+    {
+      "observationId": "A-11",
+      "priority": "BLOCKING_P0",
+      "findingIds": [
+        "B4-003-R15-02-QUALITY-CLIENT-COMPLETION-DURABILITY",
+        "B4-003-R20-B14"
+      ],
+      "diagnosticClass": "DEMONSTRATED",
+      "cluster": "human_uat_fixture_contract",
+      "evidence": "orbit360-platform/modules/calidad.js + receipt owners",
+      "conclusion": "The current quality/receipt route has no equivalent of the explicit persistent human Preview fixture present in Aseguradoras. Real-record writes remain correctly fail-closed, leaving the human durability path untestable.",
+      "disposition": "NARROW_SYNTHETIC_FIXTURE_CONTRACT_REQUIRED"
+    },
+    {
+      "observationId": "A-13",
+      "priority": "BLOCKING_P0",
+      "findingIds": [
+        "B4-003-R11-09-POLICY-PREMIUM-CALENDAR-MISMATCH",
+        "B4-003-R20-Q01",
+        "B4-003-R20-B14"
+      ],
+      "diagnosticClass": "PENDING_CANONICAL_READBACK",
+      "cluster": "financial_role_semantics",
+      "evidence": "quality + policy receipt owners",
+      "conclusion": "Currency, cartera state, expected receipt versus confirmed payment and per-role actions depend on canonical rows and active membership; source alone cannot certify the observed combinations.",
+      "disposition": "ROLE_DATA_MATRIX_READBACK_REQUIRED"
+    },
+    {
+      "observationId": "B-01",
+      "priority": "BLOCKING_P0",
+      "findingIds": [
+        "B4-003-R14-01-RENEWALS-FIRST-PAINT-READINESS",
+        "B4-003-R20-B12",
+        "B4-003-R13-05-POLICIES-ROUTE-LATENCY-FREEZE"
+      ],
+      "diagnosticClass": "DEMONSTRATED",
+      "cluster": "renewal_readiness",
+      "evidence": "orbit360-platform/modules/renovaciones.js::renewalDataReadiness/render",
+      "conclusion": "Renewals waits for server confirmation of polizas, clientes and aseguradoras and otherwise keeps Cargando cartera. These are optional after route-primary startup and this route has no bounded terminal budget, so one lagging collection can keep the surface loading indefinitely.",
+      "disposition": "SOURCE_FIX_AND_COLD_WARM_TIMING_PROOF_REQUIRED"
+    },
+    {
+      "observationId": "B-02",
+      "priority": "BLOCKING_P0",
+      "findingIds": [
+        "B4-003-R20-B01",
+        "B4-003-R20-V2-15-RENEWAL-CUTOFF-DISPOSITION",
+        "B4-003-R18-10-RENEWAL-UNIVERSE-11-VS-2-DISPOSITION-GAP",
+        "B4-003-R15-07-RENEWALS-BUSINESS-COMPLETENESS"
+      ],
+      "diagnosticClass": "DEMONSTRATED",
+      "cluster": "renewal_disposition",
+      "evidence": "orbit360-platform/modules/renovaciones.js::renewalPipelineCandidate/date45DispositionRows",
+      "conclusion": "The source has no 2026-07-31 disposition cutoff or authoritative persisted outcome fallback. UNKNOWN remains in the operational universe; the 583/24 dry-run remains unapplied and no data write is authorized.",
+      "disposition": "SEPARATE_DATA_AUTHORIZATION_REQUIRED_NO_UI_INFERENCE"
+    },
+    {
+      "observationId": "B-03",
+      "priority": "BLOCKING_P0",
+      "findingIds": [
+        "B4-003-R14-03-POLICY-EXPIRY-KPI-SEMANTICS",
+        "B4-003-R15-07-RENEWALS-BUSINESS-COMPLETENESS"
+      ],
+      "diagnosticClass": "DEMONSTRATED",
+      "cluster": "renewal_state_labels",
+      "evidence": "orbit360-platform/modules/renovaciones.js::expiredRows/card render",
+      "conclusion": "Date-expired rows may retain policy estado Vigente while the bucket is Vencidas; the card does not provide two explicit labels for policy state and renewal state, producing the observed semantic contradiction.",
+      "disposition": "SOURCE_FIX_REQUIRED"
+    },
+    {
+      "observationId": "B-04",
+      "priority": "BLOCKING_P0",
+      "findingIds": [
+        "B4-003-R20-B01",
+        "B4-003-R20-V2-16-TRANSVERSAL-VISUAL-HIERARCHY"
+      ],
+      "diagnosticClass": "DEMONSTRATED",
+      "cluster": "renewal_responsive_layout",
+      "evidence": "orbit360-platform/modules/renovaciones.js::render",
+      "conclusion": "The Kanban uses minmax(220px,1fr), overflow:hidden columns, nowrap ellipses and nested vertical scrolling. This structure can hide business labels/actions at 390/320 and requires a source layout fix plus browser proof.",
+      "disposition": "SOURCE_FIX_AND_VIEWPORT_PROOF_REQUIRED"
+    },
+    {
+      "observationId": "C-06",
+      "priority": "BLOCKING_P0",
+      "findingIds": [
+        "B4-003-R20-B14",
+        "B4-003-R20-B08"
+      ],
+      "diagnosticClass": "PENDING_CANONICAL_READBACK",
+      "cluster": "insurer_human_fixture_lifecycle",
+      "evidence": "orbit360-platform/modules/aseguradoras.js::humanPreviewFixture/openHumanPreviewFixture",
+      "conclusion": "The explicit b4003qa_human_insurer_r20 fixture and visible CTA exist. Persistence owner, preview isolation, attachment ownership and cleanup state require canonical readback; absence must not be claimed.",
+      "disposition": "FIXTURE_ID_READBACK_REQUIRED"
+    },
+    {
+      "observationId": "C-07",
+      "priority": "BLOCKING_P0",
+      "findingIds": [
+        "B4-003-R20-B07",
+        "B4-003-R20-V2-10-INSURER-AUDIT-HUMAN-LANGUAGE",
+        "B4-003-R18-14-INSURER-ACTIVITY-KNOWLEDGE-EVENT-CONVERGENCE"
+      ],
+      "diagnosticClass": "PENDING_CANONICAL_READBACK",
+      "cluster": "insurer_audit_provenance",
+      "evidence": "orbit360-platform/modules/aseguradoras.js::tabActividad/log",
+      "conclusion": "Undated historical events are preserved and sorted after dated rows. The observed sequence is not proof of invented dates; exact new-event actor/createdAt ordering must be checked in canonical audit and activity rows.",
+      "disposition": "EVENT_PROVENANCE_READBACK_REQUIRED"
+    },
+    {
+      "observationId": "C-08",
+      "priority": "BLOCKING_P0",
+      "findingIds": [
+        "B4-003-R20-V2-11-INSURER-SEMANTIC-DIFF",
+        "B4-003-R20-V2-12-INSURER-SAVE-PROGRESS",
+        "B4-003-R20-B08"
+      ],
+      "diagnosticClass": "DEMONSTRATED",
+      "cluster": "insurer_save_transaction",
+      "evidence": "orbit360-platform/modules/aseguradoras.js::guardarDraft/persistSecureCredentialChanges",
+      "conclusion": "Busy state and durable wait exist, but logo upload and secret-vault writes occur before the insurer mutation. Several validation/provider early returns occur before the try/catch resets saving, and a later insurer failure can leave a partial external side effect. One atomic/recoverable commit contract and reload readback are required.",
+      "disposition": "SOURCE_FIX_AND_SERVER_READBACK_REQUIRED"
+    },
+    {
+      "observationId": "C-14",
+      "priority": "BLOCKING_P0",
+      "findingIds": [
+        "B4-003-R20-V2-11-INSURER-SEMANTIC-DIFF",
+        "B4-003-R20-V2-12-INSURER-SAVE-PROGRESS",
+        "B4-003-R20-B08"
+      ],
+      "diagnosticClass": "DEMONSTRATED",
+      "cluster": "insurer_credential_and_logo_routes",
+      "evidence": "orbit360-platform/modules/aseguradoras.js::persistSecureCredentialChanges/guardarDraft + functions/product-insurer-credentials.js",
+      "conclusion": "Portal username/password uses the Secret Manager callable; insurer logo uses the product asset callable. They are distinct routes. The UAT phrase cambio login must be disambiguated to the portal credential path; no login-brand image mutation is evidenced.",
+      "disposition": "CREDENTIAL_ROUTE_FIX_PROOF_LOGO_P1_UNLESS_BLOCKING"
+    },
+    {
+      "observationId": "D-01",
+      "priority": "BLOCKING_P0",
+      "findingIds": [
+        "B4-003-R18-04-OPS-ADVISOR-TYPED-HANDOFF-ACTIVITY",
+        "B4-003-R19-08-OPS-ADVISOR-HANDOFF-NOTIFICATION-GAP",
+        "B4-003-R20-B09",
+        "B4-003-R20-V2-04-COLLAB-UX-COMMIT-SEMANTICS"
+      ],
+      "diagnosticClass": "DEMONSTRATED",
+      "cluster": "collaboration_identity",
+      "evidence": "orbit360-platform/core/ciclo.js::comment save/humanCommentAuthor",
+      "conclusion": "New comments persist user only, using display name with email fallback, but do not persist actorUid or actorName. Later canonical resolution cannot recover a missing human name from UID when the UID was never stored.",
+      "disposition": "SOURCE_FIX_REQUIRED"
+    },
+    {
+      "observationId": "D-02",
+      "priority": "BLOCKING_P0",
+      "findingIds": [
+        "B4-003-R20-B10",
+        "B4-003-R19-08-OPS-ADVISOR-HANDOFF-NOTIFICATION-GAP",
+        "B4-003-R20-B09"
+      ],
+      "diagnosticClass": "PENDING_RUNTIME_TRACE",
+      "cluster": "multirole_recipient_surface",
+      "evidence": "functions/ops-advisor-inbox.js::authorize/recipientMatch",
+      "conclusion": "Operations targets require an active operations role, while advisor targets match advisorId without checking active advisor role. The exact multirole default surface and shared-support behavior require an authenticated role-switch trace before changing scopes.",
+      "disposition": "ROLE_SWITCH_TRACE_AND_SCOPE_LOCK_REQUIRED"
+    },
+    {
+      "observationId": "D-03",
+      "priority": "BLOCKING_P0",
+      "findingIds": [
+        "B4-003-R20-V2-03-CARD-OPEN-LATENCY",
+        "B4-003-R20-B12",
+        "B4-003-R13-07-POLICY-DETAIL-HYDRATION-LATENCY",
+        "B4-003-R13-08-REFRESH-CLIENT-FLICKER"
+      ],
+      "diagnosticClass": "PENDING_RUNTIME_TRACE",
+      "cluster": "auth_and_card_latency",
+      "evidence": "orbit360-platform/core/auth-product-runtime-p0.js + product-app-p0.js + backend-product-readonly-bootstrap-p0.js + product-runtime-browser-providers-p0.js + ciclo.js",
+      "conclusion": "Business opening no longer awaits the catalog, so the former assumed cause is not current. Login/restore/logout still include unbounded provider auth edges and a sequential membership/snapshot activation path; exact 7s and cold/refresh delays require p50/p95 instrumentation.",
+      "disposition": "TIMING_TRACE_REQUIRED_NO_TIMEOUT_INFLATION"
+    },
+    {
+      "observationId": "D-04",
+      "priority": "BLOCKING_P0",
+      "findingIds": [
+        "B4-003-R20-B09",
+        "B4-003-R20-B14",
+        "B4-003-R20-V2-04-COLLAB-UX-COMMIT-SEMANTICS"
+      ],
+      "diagnosticClass": "PENDING_RUNTIME_TRACE",
+      "cluster": "collaboration_upload",
+      "evidence": "orbit360-platform/core/ciclo.js::collaboration attachment path + functions/product-ops-leads-domain.js",
+      "conclusion": "The file is uploaded before the business comment commit; Preview denies mutation of a non-preview business and document guards are separate. The specific failed PDF cannot be attributed without the sanitized provider/callable error and fixture ID.",
+      "disposition": "SANITIZED_ERROR_TRACE_AND_SYNTHETIC_FIXTURE_REQUIRED"
+    },
+    {
+      "observationId": "D-05",
+      "priority": "BLOCKING_P0",
+      "findingIds": [
+        "B4-003-R20-B09",
+        "B4-003-R20-V2-04-COLLAB-UX-COMMIT-SEMANTICS"
+      ],
+      "diagnosticClass": "DEMONSTRATED",
+      "cluster": "collaboration_attachment_control",
+      "evidence": "orbit360-platform/core/ciclo.js::openNegocio collaboration editor",
+      "conclusion": "The editor shows the selected filename but exposes no remove/replace control, collapses upload/write/finalize failures into one generic toast and has no explicit idempotent retry surface.",
+      "disposition": "SOURCE_FIX_REQUIRED"
+    },
+    {
+      "observationId": "D-07",
+      "priority": "BLOCKING_P0",
+      "findingIds": [
+        "B4-003-R20-B11"
+      ],
+      "diagnosticClass": "DEMONSTRATED",
+      "cluster": "cadence_truth",
+      "evidence": "orbit360-platform/core/ciclo.js::cadence render",
+      "conclusion": "The UI marks the first two cadence steps done solely from i<=1 whenever cadenceActiva, without provider acceptance or delivery evidence.",
+      "disposition": "SOURCE_FIX_REQUIRED"
+    },
+    {
+      "observationId": "D-08",
+      "priority": "BLOCKING_P0",
+      "findingIds": [
+        "B4-003-R20-B11"
+      ],
+      "diagnosticClass": "DEMONSTRATED",
+      "cluster": "cadence_state_machine",
+      "evidence": "functions/product-ops-leads-domain.js::runCadenceDue + orbit360-platform/core/ciclo.js",
+      "conclusion": "The scheduler creates an internal management task and an outbox row with pending_provider. Current UI does not distinguish scheduled, task-created, pending provider, sent, delivered and failed states.",
+      "disposition": "SOURCE_FIX_AND_IDEMPOTENCE_TIMEZONE_PROOF_REQUIRED"
+    },
+    {
+      "observationId": "D-11",
+      "priority": "BLOCKING_P0",
+      "findingIds": [
+        "B4-003-R19-08-OPS-ADVISOR-HANDOFF-NOTIFICATION-GAP",
+        "B4-003-R20-B09",
+        "B4-003-R20-V2-05-INBOX-ACTION-FEEDBACK"
+      ],
+      "diagnosticClass": "DEMONSTRATED",
+      "cluster": "inbox_obligation_metadata",
+      "evidence": "functions/ops-advisor-inbox.js::load/updateInboxState",
+      "conclusion": "Inbox projection has event/entity/target data, but acknowledgement state is stored per UID and does not record a global owner/assignee or attendedBy identity for the business obligation.",
+      "disposition": "SHARED_TASK_CONTRACT_REQUIRED"
+    },
+    {
+      "observationId": "D-12",
+      "priority": "BLOCKING_P0",
+      "findingIds": [
+        "B4-003-R20-B09",
+        "B4-003-R20-V2-05-INBOX-ACTION-FEEDBACK",
+        "B4-003-R19-08-OPS-ADVISOR-HANDOFF-NOTIFICATION-GAP"
+      ],
+      "diagnosticClass": "DEMONSTRATED",
+      "cluster": "shared_task_closure",
+      "evidence": "functions/ops-advisor-inbox.js::inboxStateCollection/updateInboxState",
+      "conclusion": "read, attended and archived mutate only tenants/{tenant}/members/{uid}/inboxState. No global shared-task resolution record closes the obligation for assignee and observers.",
+      "disposition": "SOURCE_AND_SERVER_CONTRACT_FIX_REQUIRED"
+    },
+    {
+      "observationId": "D-13",
+      "priority": "BLOCKING_P0",
+      "findingIds": [
+        "B4-003-R20-B09",
+        "B4-003-R19-08-OPS-ADVISOR-HANDOFF-NOTIFICATION-GAP"
+      ],
+      "diagnosticClass": "DEMONSTRATED_WITH_RECORD_READBACK",
+      "cluster": "inbox_dedup",
+      "evidence": "functions/ops-advisor-inbox.js::load",
+      "conclusion": "Deduplication is exact eventId only. Semantically identical messages with different outbox/internal/comment event IDs remain distinct; collaboration fallback IDs also depend on business/index. Exact screenshot pairs still require event-level readback before collapse.",
+      "disposition": "DEDUP_KEY_CONTRACT_AND_EVENT_PAIR_READBACK_REQUIRED"
+    },
+    {
+      "observationId": "D-14",
+      "priority": "BLOCKING_P0",
+      "findingIds": [
+        "B4-003-R18-04-OPS-ADVISOR-TYPED-HANDOFF-ACTIVITY",
+        "B4-003-R20-B09"
+      ],
+      "diagnosticClass": "DEMONSTRATED",
+      "cluster": "new_comment_actor_integrity",
+      "evidence": "orbit360-platform/core/ciclo.js::currentUserName/comment save/humanCommentAuthor",
+      "conclusion": "Historical unknown authors are correctly preserved, but new client-written comments omit actorUid/actorName and may persist email as the durable author.",
+      "disposition": "SOURCE_FIX_REQUIRED_NO_HISTORICAL_INVENTION"
+    },
+    {
+      "observationId": "D-15",
+      "priority": "BLOCKING_P0",
+      "findingIds": [
+        "B4-003-R18-03-COMMERCIAL-IDENTITY-MULTIOPPORTUNITY-MODEL",
+        "B4-003-R20-B09"
+      ],
+      "diagnosticClass": "PENDING_CANONICAL_READBACK",
+      "cluster": "commercial_contact_mapping",
+      "evidence": "ops/leads business and client owners",
+      "conclusion": "The screenshot suggests email/phone cross-mapping, but no source-only conclusion is safe. Business ID, client ID, raw email/telefono fields and capture context must be read together.",
+      "disposition": "BUSINESS_CLIENT_ID_READBACK_REQUIRED"
+    },
+    {
+      "observationId": "D-17",
+      "priority": "BLOCKING_P0",
+      "findingIds": [
+        "B4-003-R20-B10",
+        "B4-003-R19-08-OPS-ADVISOR-HANDOFF-NOTIFICATION-GAP",
+        "B4-003-R20-B09"
+      ],
+      "diagnosticClass": "DEMONSTRATED",
+      "cluster": "active_role_scope",
+      "evidence": "functions/ops-advisor-inbox.js::recipientMatch",
+      "conclusion": "Operations delivery is active-role gated, advisor delivery is not. This asymmetric rule can mix destination surface and active persona for multirole users even though assigned-role validation exists.",
+      "disposition": "SOURCE_FIX_WITH_NO_SCOPE_UNION_REQUIRED"
+    },
+    {
+      "observationId": "D-18",
+      "priority": "BLOCKING_P0",
+      "findingIds": [
+        "B4-003-R18-05-OPS-MANAGEMENT-TYPE-QUEUE-SEMANTICS",
+        "B4-003-R20-B09",
+        "B4-003-R20-B14"
+      ],
+      "diagnosticClass": "PENDING_CANONICAL_READBACK",
+      "cluster": "management_create_update",
+      "evidence": "functions/product-ops-leads-domain.js + orbit360-platform/core/ciclo.js",
+      "conclusion": "The server owner implements transactional create/update and canonical readback. The observed partial success must be proven with one synthetic management create→update→reload across allowed roles; no independent code cause is demonstrated yet.",
+      "disposition": "SYNTHETIC_E2E_READBACK_REQUIRED"
+    },
+    {
+      "observationId": "D-19",
+      "priority": "BLOCKING_P0",
+      "findingIds": [
+        "B4-003-R18-03-COMMERCIAL-IDENTITY-MULTIOPPORTUNITY-MODEL",
+        "B4-003-R18-04-OPS-ADVISOR-TYPED-HANDOFF-ACTIVITY",
+        "B4-003-R20-B14"
+      ],
+      "diagnosticClass": "DEMONSTRATED",
+      "cluster": "lead_conversion_integration",
+      "evidence": "functions/product-ops-leads-domain.js::transition_business emitido",
+      "conclusion": "Emission creates a deterministic client and activity when missing, but does not create/link policy or vehicle and has no cross-opportunity identity dedup transaction. Owners remain separate, so the requested integrated E2E is absent.",
+      "disposition": "SOURCE_CONTRACT_FIX_AND_DEDUP_E2E_REQUIRED"
+    }
+  ],
+  "crossCuttingConclusions": [
+    {
+      "id": "STARTUP_AUTH_BOUNDARY",
+      "status": "DEMONSTRATED_STRUCTURE_PENDING_TIMING",
+      "conclusion": "Product activation waits for authenticated membership and one authoritative route-primary snapshot with an 8s store budget; provider auth readiness/sign-in/sign-out edges have no explicit end-to-end timing budget. Renewals then separately waits for three collections with no bounded terminal state."
+    },
+    {
+      "id": "FINANCIAL_Q0_ALERT",
+      "status": "DEMONSTRATED_UI_DEFECT_PENDING_ROW_READBACK",
+      "conclusion": "The red alert can truthfully be triggered by a delta above tolerance while integer currency formatting displays Q 0. The exact underlying policy/receipt authority remains read-only pending."
+    },
+    {
+      "id": "PREVIEW_FILE_FAILURE",
+      "status": "NOT_CAUSALLY_ATTRIBUTED",
+      "conclusion": "Known guards and upload-before-comment ordering define the failure surface, but the specific failed file requires a sanitized error trace; no speculative fix or real-data test is authorized."
+    },
+    {
+      "id": "SHARED_INBOX_TASK",
+      "status": "DEMONSTRATED_CONTRACT_GAP",
+      "conclusion": "Per-user acknowledgement is not global obligation resolution. A separate assignee/observer/global-resolution contract is required."
+    },
+    {
+      "id": "RENEWAL_CUTOFF",
+      "status": "DEMONSTRATED_MISSING_DISPOSITION",
+      "conclusion": "The source does not materialize the approved cutoff disposition. This is not permission to infer UI defaults or write the 583/24 dry-run."
+    }
+  ],
+  "proposedP0SourceFixScope": [
+    {
+      "order": 1,
+      "group": "truthful_financial_cadence_and_identity",
+      "owners": [
+        "calidad.js",
+        "policy-receipts-v1199-detail-guard.js",
+        "ui.js",
+        "ciclo.js"
+      ],
+      "observations": [
+        "A-07",
+        "D-01",
+        "D-05",
+        "D-07",
+        "D-08",
+        "D-14"
+      ],
+      "preconditions": [
+        "source scope lock",
+        "no data mutation"
+      ]
+    },
+    {
+      "order": 2,
+      "group": "shared_inbox_obligation_and_multirole_routing",
+      "owners": [
+        "functions/ops-advisor-inbox.js",
+        "functions/product-ops-leads-domain.js",
+        "ciclo.js"
+      ],
+      "observations": [
+        "D-02",
+        "D-11",
+        "D-12",
+        "D-13",
+        "D-17"
+      ],
+      "preconditions": [
+        "role/scope invariant lock",
+        "event-pair readback for D-13"
+      ]
+    },
+    {
+      "order": 3,
+      "group": "insurer_p0_save_recoverability",
+      "owners": [
+        "aseguradoras.js",
+        "functions/product-insurer-credentials.js",
+        "functions/product-operational-domain.js"
+      ],
+      "observations": [
+        "C-08",
+        "C-14"
+      ],
+      "preconditions": [
+        "synthetic insurer fixture readback",
+        "no real insurer mutation"
+      ]
+    },
+    {
+      "order": 4,
+      "group": "renewal_readiness_and_labels",
+      "owners": [
+        "renovaciones.js"
+      ],
+      "observations": [
+        "B-01",
+        "B-03",
+        "B-04"
+      ],
+      "preconditions": [
+        "timing instrumentation",
+        "1440/390/320 proof"
+      ],
+      "explicitExclusion": "B-02 data disposition requires separate authorization"
+    },
+    {
+      "order": 5,
+      "group": "commercial_conversion_contract",
+      "owners": [
+        "functions/product-ops-leads-domain.js",
+        "ciclo.js"
+      ],
+      "observations": [
+        "D-19"
+      ],
+      "preconditions": [
+        "identity/dedup contract",
+        "synthetic E2E fixture"
+      ]
+    }
+  ],
+  "deferredEvidenceQueue": [
+    {
+      "type": "CANONICAL_READBACK",
+      "observations": [
+        "A-08",
+        "A-09",
+        "A-10",
+        "A-13",
+        "C-06",
+        "C-07",
+        "D-15",
+        "D-18"
+      ]
+    },
+    {
+      "type": "RUNTIME_TRACE",
+      "observations": [
+        "D-02",
+        "D-03",
+        "D-04"
+      ]
+    }
+  ],
+  "invariants": {
+    "noExistingFindingDeleted": true,
+    "noNewFindingCreated": true,
+    "historicalPassPreserved": true,
+    "hypothesisNotPromotedToFact": true,
+    "renewalsDataUnchanged": true,
+    "b4004Held": true,
+    "b4003Open": true
+  },
+  "decision": "AUDIT_COMPLETE_NEXT_UNIT_IS_NARROW_P0_SOURCE_FIX_SCOPE_LOCK_AND_EVIDENCE_READBACK_PLAN",
+  "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_UAT3_P0_SOURCE_FIX_SCOPE_LOCK"
+}

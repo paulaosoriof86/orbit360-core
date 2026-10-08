@@ -12134,7 +12134,7 @@
     "requiredBeforeAdvance": "B4_003_TARGETED_PAULA_VISUAL_PASS",
     "currentB4003HumanStatus": "REJECTED_R13"
   },
-  "lastUpdatedAt": "2026-10-08T12:20:28-06:00",
+  "lastUpdatedAt": "2026-10-08T00:00:00Z",
   "lastR16SourceFix": {
     "status": "SOURCE_FIXED_R16_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "receiptBlobSha": "dcd545e14795e387a8f67130d5fa51aabfcd63ce",
@@ -12382,5 +12382,20 @@
     "ledgerCardinalityAfter": 282,
     "newFindingIds": [],
     "b4004Held": true
+  },
+  "uat3ConcentratedCausalAudit": {
+    "status": "READ_ONLY_CAUSAL_AUDIT_COMPLETE_SOURCE_FIX_NOT_YET_AUTHORIZED",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_UAT3_CONCENTRATED_CAUSAL_AUDIT_P0_20261008.json",
+    "blobSha": "9860f7d3aaaf8b1bbfdcae57636bb024b71ba33c",
+    "headAudited": "b5e6b3fe3a9dc7e6419319284f515c2079098ae4",
+    "p0Observations": 29,
+    "diagnosticSummary": {
+      "demonstrated": 18,
+      "pendingCanonicalReadback": 8,
+      "pendingRuntimeTrace": 3
+    },
+    "findingCountUnchanged": true,
+    "noNewFindingIds": true,
+    "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_UAT3_P0_SOURCE_FIX_SCOPE_LOCK"
   }
 }

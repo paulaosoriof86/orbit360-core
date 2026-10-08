@@ -1,10 +1,10 @@
 {
   "schema": "GRAVICENTRA_I6_5_OPEN_FINDINGS_CARRY_FORWARD_REGISTER_V1",
-  "recordedAt": "2026-10-08T12:20:28-06:00",
+  "recordedAt": "2026-10-08T00:00:00Z",
   "authority": "FAIL_CLOSED_FINDING_CONTINUITY",
   "sourceLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-  "sourceLedgerPreviousBlobSha": "f2606c6e1a2cf0ebd8330d87b42535fa4a182fc7",
-  "expectedLedgerNextBlobSha": "519a9edb03b6ac88848d90bf427e0dc7c83c60b1",
+  "sourceLedgerPreviousBlobSha": "519a9edb03b6ac88848d90bf427e0dc7c83c60b1",
+  "expectedLedgerNextBlobSha": "0f2d6916537fb3f69ad4e03b947ccd4e4c5b02f7",
   "policy": {
     "allLedgerFindingsMustAppearExactlyOnce": true,
     "newHumanFindingsMustBeIndividualLedgerEntries": true,
@@ -12461,5 +12461,17 @@
       "b4004HeldUntilB4003P0AndHumanAcceptance": true
     },
     "nextAction": "B4_003_UAT3_CONCENTRATED_CAUSAL_AUDIT_P0"
+  },
+  "uat3ConcentratedCausalAudit": {
+    "status": "READ_ONLY_CAUSAL_AUDIT_COMPLETE_SOURCE_FIX_NOT_YET_AUTHORIZED",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_UAT3_CONCENTRATED_CAUSAL_AUDIT_P0_20261008.json",
+    "blobSha": "9860f7d3aaaf8b1bbfdcae57636bb024b71ba33c",
+    "p0Observations": 29,
+    "demonstrated": 18,
+    "pendingCanonicalReadback": 8,
+    "pendingRuntimeTrace": 3,
+    "inventoryCountUnchanged": true,
+    "attentionIdsUnchanged": true,
+    "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_UAT3_P0_SOURCE_FIX_SCOPE_LOCK"
   }
 }
