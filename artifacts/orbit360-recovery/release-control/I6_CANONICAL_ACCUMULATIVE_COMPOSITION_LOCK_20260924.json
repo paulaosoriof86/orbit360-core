@@ -2815,7 +2815,7 @@
   },
   "continuityRegisterBlobSha": "11ffaf6e7c691064be947fdc1af00b08d8fb8f9c",
   "findingContinuityGuardBlobSha": "868a0ba1a492d9adc8d91655f152b6fa7980f499",
-  "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_UAT3_DEFERRED_READBACK_AND_TRACE_PLAN",
+  "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_UAT3_E1_CANONICAL_READONLY_PACK_SCOPE_LOCK",
   "b4003R15VisualReview": {
     "status": "PAULA_VISUAL_PARTIAL_PASS_REMEDIATION_REQUIRED",
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R15_PAULA_VISUAL_PARTIAL_ACCEPTANCE_AND_NEW_FINDINGS_20261004.json",
@@ -3943,7 +3943,7 @@
     "previewMutation": false,
     "liveMutation": false
   },
-  "recordedAt": "2026-10-08T20:24:00Z",
+  "recordedAt": "2026-10-08T20:36:00Z",
   "uat3P0SourceFixBatch2": {
     "status": "SOURCE_FIXED_STATIC_PASS_DEPLOYMENT_NOT_DISPATCHED",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_UAT3_P0_SOURCE_FIX_BATCH_2_SHARED_INBOX_20261008.json",
@@ -4001,5 +4001,35 @@
     "functionDeployment": false,
     "liveMutation": false,
     "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_UAT3_DEFERRED_READBACK_AND_TRACE_PLAN"
+  },
+  "uat3RemainingP0EvidencePlan": {
+    "status": "PLAN_LOCKED_EXECUTION_NOT_AUTHORIZED",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_UAT3_REMAINING_P0_EVIDENCE_PLAN_20261008.json",
+    "blobSha": "2ab259ccb09a7f2aa2030f6bab3e0d9289fa6006",
+    "parentHead": "9f043a779f967f63a142d8dc5ef74583e0e325bc",
+    "uatP0": 29,
+    "sourceAddressedOrInstrumented": 18,
+    "evidenceOrAuthorizationPending": 11,
+    "pendingObservations": [
+      "A-08",
+      "A-09",
+      "A-10",
+      "A-11",
+      "A-13",
+      "B-02",
+      "C-06",
+      "C-07",
+      "D-04",
+      "D-15",
+      "D-18"
+    ],
+    "logoDisposition": "NOT_REPORTED_NOT_A_FINDING_NO_ACTION",
+    "dataMutation": false,
+    "buildDispatch": false,
+    "previewMutation": false,
+    "functionDeployment": false,
+    "liveMutation": false,
+    "reimport": false,
+    "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_UAT3_E1_CANONICAL_READONLY_PACK_SCOPE_LOCK"
   }
 }

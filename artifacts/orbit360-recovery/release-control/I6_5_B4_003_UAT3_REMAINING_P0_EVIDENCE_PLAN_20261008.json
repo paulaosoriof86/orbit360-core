@@ -1,0 +1,136 @@
+{
+  "schema": "gravicentra-b4-003-uat3-remaining-p0-evidence-plan-v1",
+  "recordedAt": "2026-10-08T20:36:00Z",
+  "status": "PLAN_LOCKED_EXECUTION_NOT_AUTHORIZED",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "parentHead": "9f043a779f967f63a142d8dc5ef74583e0e325bc",
+  "population": {
+    "uatP0": 29,
+    "sourceAddressedOrInstrumented": 18,
+    "evidenceOrAuthorizationPending": 11,
+    "arithmeticPass": true
+  },
+  "sourceAddressedObservations": [
+    "A-07",
+    "B-01",
+    "B-03",
+    "B-04",
+    "C-08",
+    "C-14",
+    "D-01",
+    "D-02",
+    "D-03",
+    "D-05",
+    "D-07",
+    "D-08",
+    "D-11",
+    "D-12",
+    "D-13",
+    "D-14",
+    "D-17",
+    "D-19"
+  ],
+  "pendingObservations": [
+    "A-08",
+    "A-09",
+    "A-10",
+    "A-11",
+    "A-13",
+    "B-02",
+    "C-06",
+    "C-07",
+    "D-04",
+    "D-15",
+    "D-18"
+  ],
+  "evidenceUnits": [
+    {
+      "order": 1,
+      "id": "E1_CANONICAL_READONLY_PACK",
+      "observations": [
+        "A-08",
+        "A-09",
+        "A-10",
+        "A-13",
+        "C-06",
+        "C-07",
+        "D-15",
+        "D-18"
+      ],
+      "action": "Read exact canonical IDs, relations, amounts, currencies, provenance and role-visible fields; produce before-state evidence only.",
+      "mutation": false,
+      "exit": "Each observation is classified as demonstrated defect, valid state, historical unknown, or insufficient evidence; no UI screenshot alone may authorize deletion or formula changes."
+    },
+    {
+      "order": 2,
+      "id": "E2_PREVIEW_FIXTURE_CONTRACT",
+      "observations": [
+        "A-11",
+        "D-04"
+      ],
+      "action": "Specify disposable, discoverable Preview-only client/receipt and collaboration-PDF fixtures with deterministic IDs, ownership and mandatory cleanup/readback.",
+      "mutation": false,
+      "note": "This unit defines the contract only. Fixture creation and upload remain unauthorized."
+    },
+    {
+      "order": 3,
+      "id": "E3_RENEWABILITY_DATA_AUTHORIZATION_PACK",
+      "observations": [
+        "B-02"
+      ],
+      "action": "Rebind the existing 583/24 dry-run to exact digests, cutoff and allowed fields; present a separate apply/rollback authorization decision.",
+      "mutation": false,
+      "note": "No 583/24 apply, no UI inference and no reimport are authorized by this plan."
+    },
+    {
+      "order": 4,
+      "id": "E4_SOURCE_BATCHES_PREVIEW_PROOF",
+      "observations": [
+        "A-07",
+        "B-01",
+        "B-03",
+        "B-04",
+        "C-08",
+        "C-14",
+        "D-01",
+        "D-02",
+        "D-03",
+        "D-05",
+        "D-07",
+        "D-08",
+        "D-11",
+        "D-12",
+        "D-13",
+        "D-14",
+        "D-17",
+        "D-19"
+      ],
+      "action": "After separate build, function and Preview authorization, execute authenticated cold/warm, multirole, viewport, retry, two-user shared-task and integrated-emission proofs.",
+      "mutation": false,
+      "note": "Deployment, build dispatch and synthetic writes remain unauthorized in this plan."
+    }
+  ],
+  "nonFindings": [
+    {
+      "item": "Logo Bolita V2025 sin fondo.png",
+      "disposition": "NOT_REPORTED_BY_PAULA_NOT_A_UAT_FINDING_NO_ACTION",
+      "note": "A transient local reader message must not create a product finding, correction task or source mutation."
+    }
+  ],
+  "invariants": {
+    "noFindingDeleted": true,
+    "newFindingIds": [],
+    "logoExcludedFromScope": true,
+    "noDataMutation": true,
+    "noBusinessWrites": true,
+    "noBuildDispatch": true,
+    "noPreviewMutation": true,
+    "noFunctionDeployment": true,
+    "noLiveMutation": true,
+    "noReimport": true,
+    "b4003Open": true,
+    "b4004Held": true
+  },
+  "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_UAT3_E1_CANONICAL_READONLY_PACK_SCOPE_LOCK"
+}
