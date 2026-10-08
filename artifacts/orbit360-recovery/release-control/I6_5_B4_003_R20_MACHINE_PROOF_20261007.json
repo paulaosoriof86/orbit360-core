@@ -1,20 +1,21 @@
 {
   "schema": "GRAVICENTRA_I6_5_B4_003_R20_MACHINE_PROOF_V1",
-  "recordedAt": "2026-10-07T04:03:06.161Z",
+  "recordedAt": "2026-10-08T01:02:18.839Z",
   "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
   "findingId": "B4-003",
-  "sourceSha": "9bc3df4c7701e5aae06df3889bd5cdbc794c560b",
-  "buildId": "gi-i65-b4-9bc3df4c7701-57f234755dc1",
-  "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-37569139879-u2qsc5zp.web.app",
-  "channelId": "gi-i65-b4-37569139879",
-  "runId": 37569139879,
-  "artifactId": 11459473847,
-  "artifactDigest": "e8dc10065822870c8cb47f1e2f620a9e4f17e9418c3145deefc61c552d320dde",
-  "hostedPayloadDigest": "bd53e18384b02de3c00edcf93f1a4462ca7312c8ab8af99812b013768333aaeb",
-  "backendSourceDigest": "7c57531ba2079a285783b2a6dd2ec4edabd98c62d15aa39df8cbdde5aea5f98d",
-  "bundleDigest": "3215291e5925bab756b952276f6b5bdfe629c9ad5cdf0e3c4e1efa8f63ec883c",
+  "sourceSha": "66c3b9b77ef8ffecbe3a26de59897abd55ec677f",
+  "buildId": "gi-i65-b4-66c3b9b77ef8-57f234755dc1",
+  "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-37710305112-ud58tgnd.web.app",
+  "channelId": "gi-i65-b4-37710305112",
+  "runId": 37710305112,
+  "artifactId": 11521347552,
+  "artifactDigest": "341d1cb69e88999f986088567f4aaec4d6744f9e440aacc318f490d400f11981",
+  "hostedPayloadDigest": "1fce5b47ba565c4ab8be9038121c3f55ffb4501accd45440991ff21b7d6a5f1c",
+  "backendSourceDigest": "1fd078f8a1386614b5a8d1d292fe8a502a38c59918b6d0909cd5161fe6e0e23c",
+  "bundleDigest": "bc531dfbf2d99e8ef563c490f2cbd12347bfa39fa801723d4635e8f5c907d7f2",
   "exactHostingReadback": true,
   "assertions": {
+    "handoffActorsDistinct": true,
     "qaResidueReadOnlyAdjudicated": true,
     "cancellationProjectionConsistent": true,
     "realRenewalDistributionReadOnly": true,
@@ -33,6 +34,7 @@
     "insurerTechnicalTermsHumanized": true,
     "insurerKnowledgeCountersCanonical": true,
     "insurerImportScopeBound": true,
+    "insurerKnowledgeDoesNotDuplicateUpload": true,
     "renewabilityTriStateFailClosed": true,
     "renewabilityPendingStaysInKanban": true,
     "cancelSelectedCountryScope": true,
@@ -59,6 +61,9 @@
     "informationHealthFinancialMismatchVisible": true,
     "informationHealthNoInference": true,
     "qualityProvenanceActionable": true,
+    "qualityPhoneFocusedModal": true,
+    "qualityPhoneDefaultCountryCode": true,
+    "qualityTopHorizontalScroll": true,
     "qualityReviewTruthfulAndActionable": true,
     "qualityExactPolicyResolutionPath": true,
     "qualityReceiptsExactContext": true,
@@ -104,19 +109,39 @@
     "cancelationDurableReadback": true,
     "recoveryLinkagePreserved": true,
     "recoveryIdempotentRetry": true,
+    "collaborationUiAttachmentDurable": true,
+    "businessCardOpenUnder2500ms": true,
+    "collaborationVisualHierarchy": true,
+    "currentActionQueueRank": true,
+    "actionRequiredSolidVisual": true,
+    "pendingTaskAdvisorLandingLeads": true,
+    "inboxActionProgressVisible": true,
+    "inboxHumanStateUi": true,
+    "pendingTaskOperationsLandingOps": true,
     "typedHandoffRecipientNoticeDurable": true,
     "typedHandoffDeduplicated": true,
     "typedHandoffSenderExcluded": true,
     "typedHandoffTargetSurfaceCorrect": true,
     "inboxStatePersistent": true,
     "collaborationCanonicalIdentityAndTimestamp": true,
+    "insurerRamoProductPlanMatrix": true,
+    "insurerRamoCatalogMultiselect": true,
+    "insurerCommercialSelectionPersistent": true,
+    "insurerLogoOnlySemanticDiff": true,
+    "insurerSaveProgressImmediate": true,
     "preEmissionCollaborationAttachmentDurable": true,
     "insurerImportTruthfulClassificationStep": true,
+    "insurerImportAnalyzesContent": true,
+    "insurerImportUsesDependentCatalogs": true,
+    "insurerDriveBrowserVisible": true,
+    "insurerDriveBrowserFileOpen": true,
     "insurerDriveE2E": true,
     "insurerDriveReloadPersistence": true,
     "insurerDriveNoAutoEnablement": true,
     "insurerDriveSyntheticRollback": true,
     "insurerDriveFileCleanup": true,
+    "insurerDriveSyntheticPositivePath": true,
+    "insurerDriveRealIsolationDenied": true,
     "previewGeneralWriteIsolation": true,
     "noOperationalRealRowsWritten": true,
     "r19CommercialDependencyClearsStale": true,
@@ -132,25 +157,25 @@
     "route": "renovaciones",
     "records": [
       {
-        "ms": 731,
+        "ms": 805,
         "type": "childList",
         "target": "DIV",
         "added": [],
         "removed": [
-          "🔄 Renovaciones · Pipeline por vencer 90 días·Por urgencia·Gestión Preparar campaña de renovación Vencidas4Recuperar o cerrar gestión≤15 días4Atención prioritaria16–45 días9Planifi"
+          "🔄 Renovaciones · Pipeline por vencer 90 días·Por urgencia·Gestión Preparar campaña de renovación Vencidas5Recuperar o cerrar gestión≤15 días3Atención prioritaria16–45 días9Planifi"
         ]
       },
       {
-        "ms": 732,
+        "ms": 805,
         "type": "childList",
         "target": "DIV",
         "added": [
-          "🔄 Renovaciones · Pipeline por vencer 90 días·Por urgencia·Gestión Preparar campaña de renovación Vencidas4Recuperar o cerrar gestión≤15 días4Atención prioritaria16–45 días9Planifi"
+          "🔄 Renovaciones · Pipeline por vencer 90 días·Por urgencia·Gestión Preparar campaña de renovación Vencidas5Recuperar o cerrar gestión≤15 días3Atención prioritaria16–45 días9Planifi"
         ],
         "removed": []
       },
       {
-        "ms": 732,
+        "ms": 805,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -161,18 +186,18 @@
         ]
       },
       {
-        "ms": 732,
+        "ms": 805,
         "type": "childList",
         "target": "DIV",
         "added": [
-          "4"
+          "5"
         ],
         "removed": [
-          "4"
+          "5"
         ]
       },
       {
-        "ms": 732,
+        "ms": 805,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -183,7 +208,7 @@
         ]
       },
       {
-        "ms": 732,
+        "ms": 805,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -194,18 +219,18 @@
         ]
       },
       {
-        "ms": 732,
+        "ms": 805,
         "type": "childList",
         "target": "DIV",
         "added": [
-          "4"
+          "3"
         ],
         "removed": [
-          "4"
+          "3"
         ]
       },
       {
-        "ms": 732,
+        "ms": 805,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -216,7 +241,7 @@
         ]
       },
       {
-        "ms": 732,
+        "ms": 805,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -227,7 +252,7 @@
         ]
       },
       {
-        "ms": 732,
+        "ms": 805,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -238,7 +263,7 @@
         ]
       },
       {
-        "ms": 732,
+        "ms": 805,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -249,7 +274,7 @@
         ]
       },
       {
-        "ms": 732,
+        "ms": 805,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -260,7 +285,7 @@
         ]
       },
       {
-        "ms": 732,
+        "ms": 805,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -272,7 +297,7 @@
         ]
       },
       {
-        "ms": 732,
+        "ms": 805,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -283,7 +308,7 @@
         ]
       },
       {
-        "ms": 732,
+        "ms": 805,
         "type": "childList",
         "target": "A",
         "added": [
@@ -294,7 +319,7 @@
         ]
       },
       {
-        "ms": 732,
+        "ms": 805,
         "type": "childList",
         "target": "A",
         "added": [
@@ -305,7 +330,7 @@
         ]
       },
       {
-        "ms": 732,
+        "ms": 805,
         "type": "childList",
         "target": "A",
         "added": [
@@ -316,7 +341,7 @@
         ]
       },
       {
-        "ms": 732,
+        "ms": 805,
         "type": "childList",
         "target": "A",
         "added": [
@@ -327,7 +352,7 @@
         ]
       },
       {
-        "ms": 732,
+        "ms": 805,
         "type": "childList",
         "target": "A",
         "added": [
@@ -338,7 +363,7 @@
         ]
       },
       {
-        "ms": 732,
+        "ms": 805,
         "type": "childList",
         "target": "A",
         "added": [
@@ -349,7 +374,7 @@
         ]
       },
       {
-        "ms": 732,
+        "ms": 805,
         "type": "childList",
         "target": "A",
         "added": [
@@ -360,7 +385,7 @@
         ]
       },
       {
-        "ms": 732,
+        "ms": 805,
         "type": "childList",
         "target": "A",
         "added": [
@@ -371,7 +396,7 @@
         ]
       },
       {
-        "ms": 732,
+        "ms": 805,
         "type": "childList",
         "target": "A",
         "added": [
@@ -382,7 +407,7 @@
         ]
       },
       {
-        "ms": 732,
+        "ms": 805,
         "type": "childList",
         "target": "A",
         "added": [
@@ -393,7 +418,7 @@
         ]
       },
       {
-        "ms": 732,
+        "ms": 805,
         "type": "childList",
         "target": "A",
         "added": [
@@ -404,7 +429,7 @@
         ]
       },
       {
-        "ms": 732,
+        "ms": 805,
         "type": "childList",
         "target": "A",
         "added": [
@@ -415,7 +440,7 @@
         ]
       },
       {
-        "ms": 732,
+        "ms": 805,
         "type": "childList",
         "target": "A",
         "added": [
@@ -426,7 +451,7 @@
         ]
       },
       {
-        "ms": 732,
+        "ms": 805,
         "type": "childList",
         "target": "A",
         "added": [
@@ -437,7 +462,7 @@
         ]
       },
       {
-        "ms": 732,
+        "ms": 805,
         "type": "childList",
         "target": "A",
         "added": [
@@ -448,7 +473,7 @@
         ]
       },
       {
-        "ms": 732,
+        "ms": 805,
         "type": "childList",
         "target": "A",
         "added": [
@@ -459,7 +484,7 @@
         ]
       },
       {
-        "ms": 732,
+        "ms": 805,
         "type": "childList",
         "target": "A",
         "added": [
@@ -470,7 +495,7 @@
         ]
       },
       {
-        "ms": 732,
+        "ms": 805,
         "type": "childList",
         "target": "A",
         "added": [
@@ -481,7 +506,7 @@
         ]
       },
       {
-        "ms": 732,
+        "ms": 805,
         "type": "childList",
         "target": "A",
         "added": [
@@ -492,7 +517,7 @@
         ]
       },
       {
-        "ms": 732,
+        "ms": 805,
         "type": "childList",
         "target": "A",
         "added": [
@@ -503,7 +528,7 @@
         ]
       },
       {
-        "ms": 732,
+        "ms": 805,
         "type": "childList",
         "target": "A",
         "added": [
@@ -514,7 +539,7 @@
         ]
       },
       {
-        "ms": 732,
+        "ms": 805,
         "type": "childList",
         "target": "A",
         "added": [
@@ -525,7 +550,7 @@
         ]
       },
       {
-        "ms": 732,
+        "ms": 805,
         "type": "childList",
         "target": "A",
         "added": [
@@ -536,7 +561,7 @@
         ]
       },
       {
-        "ms": 732,
+        "ms": 805,
         "type": "childList",
         "target": "A",
         "added": [
@@ -547,7 +572,7 @@
         ]
       },
       {
-        "ms": 732,
+        "ms": 805,
         "type": "childList",
         "target": "A",
         "added": [
@@ -558,7 +583,7 @@
         ]
       },
       {
-        "ms": 732,
+        "ms": 805,
         "type": "childList",
         "target": "A",
         "added": [
@@ -569,7 +594,7 @@
         ]
       },
       {
-        "ms": 732,
+        "ms": 805,
         "type": "childList",
         "target": "A",
         "added": [
@@ -580,7 +605,7 @@
         ]
       },
       {
-        "ms": 732,
+        "ms": 805,
         "type": "childList",
         "target": "A",
         "added": [
@@ -591,7 +616,7 @@
         ]
       },
       {
-        "ms": 732,
+        "ms": 805,
         "type": "childList",
         "target": "A",
         "added": [
@@ -602,7 +627,7 @@
         ]
       },
       {
-        "ms": 732,
+        "ms": 805,
         "type": "childList",
         "target": "A",
         "added": [
@@ -613,7 +638,7 @@
         ]
       },
       {
-        "ms": 732,
+        "ms": 805,
         "type": "childList",
         "target": "A",
         "added": [
@@ -624,7 +649,7 @@
         ]
       },
       {
-        "ms": 732,
+        "ms": 805,
         "type": "childList",
         "target": "A",
         "added": [
@@ -635,7 +660,7 @@
         ]
       },
       {
-        "ms": 732,
+        "ms": 805,
         "type": "childList",
         "target": "A",
         "added": [
@@ -646,7 +671,7 @@
         ]
       },
       {
-        "ms": 732,
+        "ms": 805,
         "type": "childList",
         "target": "A",
         "added": [
@@ -657,7 +682,7 @@
         ]
       },
       {
-        "ms": 732,
+        "ms": 805,
         "type": "childList",
         "target": "A",
         "added": [
@@ -668,7 +693,7 @@
         ]
       },
       {
-        "ms": 732,
+        "ms": 805,
         "type": "childList",
         "target": "A",
         "added": [
@@ -679,7 +704,7 @@
         ]
       },
       {
-        "ms": 732,
+        "ms": 805,
         "type": "childList",
         "target": "A",
         "added": [
@@ -690,7 +715,7 @@
         ]
       },
       {
-        "ms": 732,
+        "ms": 805,
         "type": "childList",
         "target": "A",
         "added": [
@@ -701,7 +726,7 @@
         ]
       },
       {
-        "ms": 732,
+        "ms": 805,
         "type": "childList",
         "target": "A",
         "added": [
@@ -712,7 +737,7 @@
         ]
       },
       {
-        "ms": 732,
+        "ms": 805,
         "type": "childList",
         "target": "A",
         "added": [
@@ -723,7 +748,7 @@
         ]
       },
       {
-        "ms": 732,
+        "ms": 805,
         "type": "childList",
         "target": "A",
         "added": [
@@ -734,7 +759,7 @@
         ]
       },
       {
-        "ms": 732,
+        "ms": 805,
         "type": "childList",
         "target": "A",
         "added": [
@@ -745,7 +770,7 @@
         ]
       },
       {
-        "ms": 732,
+        "ms": 805,
         "type": "childList",
         "target": "A",
         "added": [
@@ -756,7 +781,7 @@
         ]
       },
       {
-        "ms": 732,
+        "ms": 805,
         "type": "childList",
         "target": "A",
         "added": [
@@ -767,7 +792,7 @@
         ]
       },
       {
-        "ms": 732,
+        "ms": 805,
         "type": "childList",
         "target": "A",
         "added": [
@@ -778,7 +803,7 @@
         ]
       },
       {
-        "ms": 732,
+        "ms": 805,
         "type": "childList",
         "target": "A",
         "added": [
@@ -789,7 +814,7 @@
         ]
       },
       {
-        "ms": 732,
+        "ms": 805,
         "type": "childList",
         "target": "BUTTON",
         "added": [
@@ -800,7 +825,7 @@
         ]
       },
       {
-        "ms": 732,
+        "ms": 806,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -809,7 +834,7 @@
         "removed": []
       },
       {
-        "ms": 732,
+        "ms": 806,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -818,7 +843,7 @@
         "removed": []
       },
       {
-        "ms": 732,
+        "ms": 806,
         "type": "childList",
         "target": "BUTTON",
         "added": [
@@ -829,7 +854,7 @@
         ]
       },
       {
-        "ms": 732,
+        "ms": 806,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -838,7 +863,7 @@
         "removed": []
       },
       {
-        "ms": 732,
+        "ms": 806,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -847,7 +872,7 @@
         "removed": []
       },
       {
-        "ms": 732,
+        "ms": 806,
         "type": "childList",
         "target": "BUTTON",
         "added": [
@@ -858,7 +883,7 @@
         ]
       },
       {
-        "ms": 732,
+        "ms": 806,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -867,7 +892,7 @@
         "removed": []
       },
       {
-        "ms": 732,
+        "ms": 806,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -876,7 +901,7 @@
         "removed": []
       },
       {
-        "ms": 732,
+        "ms": 806,
         "type": "childList",
         "target": "BUTTON",
         "added": [
@@ -887,7 +912,7 @@
         ]
       },
       {
-        "ms": 732,
+        "ms": 806,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -896,7 +921,7 @@
         "removed": []
       },
       {
-        "ms": 732,
+        "ms": 806,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -905,7 +930,7 @@
         "removed": []
       },
       {
-        "ms": 732,
+        "ms": 806,
         "type": "childList",
         "target": "BUTTON",
         "added": [
@@ -916,7 +941,7 @@
         ]
       },
       {
-        "ms": 732,
+        "ms": 806,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -925,7 +950,7 @@
         "removed": []
       },
       {
-        "ms": 732,
+        "ms": 806,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -934,7 +959,7 @@
         "removed": []
       },
       {
-        "ms": 732,
+        "ms": 806,
         "type": "childList",
         "target": "BUTTON",
         "added": [
@@ -945,7 +970,7 @@
         ]
       },
       {
-        "ms": 732,
+        "ms": 806,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -954,7 +979,7 @@
         "removed": []
       },
       {
-        "ms": 732,
+        "ms": 806,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -963,7 +988,7 @@
         "removed": []
       },
       {
-        "ms": 732,
+        "ms": 806,
         "type": "childList",
         "target": "BUTTON",
         "added": [
@@ -974,7 +999,7 @@
         ]
       },
       {
-        "ms": 732,
+        "ms": 806,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -985,67 +1010,67 @@
     ],
     "events": [
       {
-        "ms": 36,
+        "ms": 37,
         "kind": "store",
         "detail": "clientes"
       },
       {
-        "ms": 80,
+        "ms": 86,
         "kind": "store",
         "detail": "vehiculos"
       },
       {
-        "ms": 155,
+        "ms": 165,
         "kind": "store",
         "detail": "recibosEsperados"
       },
       {
-        "ms": 163,
+        "ms": 172,
         "kind": "store",
         "detail": "cancelaciones"
       },
       {
-        "ms": 169,
+        "ms": 178,
         "kind": "store",
         "detail": "negocios"
       },
       {
-        "ms": 175,
+        "ms": 184,
         "kind": "store",
         "detail": "gestiones"
       },
       {
-        "ms": 188,
+        "ms": 200,
         "kind": "store",
         "detail": "aseguradoras"
       },
       {
-        "ms": 194,
+        "ms": 207,
         "kind": "store",
         "detail": "cobros"
       },
       {
-        "ms": 234,
+        "ms": 250,
         "kind": "store",
         "detail": "carteraPrimas"
       },
       {
-        "ms": 239,
+        "ms": 256,
         "kind": "store",
         "detail": "metas"
       },
       {
-        "ms": 788,
+        "ms": 833,
         "kind": "store",
         "detail": "reclamos"
       },
       {
-        "ms": 1047,
+        "ms": 967,
         "kind": "store",
         "detail": "comisiones"
       },
       {
-        "ms": 1055,
+        "ms": 1037,
         "kind": "store",
         "detail": "auditoria"
       }
@@ -1120,29 +1145,69 @@
   "qaResidueDisposition": "NOT_DELETED_FAIL_CLOSED",
   "qaResidueDeletedCount": 0,
   "qaResidueAdjudicationReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R19_B2_QA_RESIDUE_ADJUDICATION_20261005.json",
-  "qaResidueAdjudicationReceiptBlobSha": "76f1fd5cbf5581b36155e297bfaea744b370a867",
+  "qaResidueAdjudicationReceiptBlobSha": "b3d1a0dc8b14afbbe336e5b83199637a7e7cbf7f",
   "syntheticQaWrites": 14,
   "cleanupWrites": 37,
   "syntheticFinalAbsent": true,
   "pageErrors": [],
   "consoleErrors": [
+    "Failed to load resource: the server responded with a status of 403 ()",
+    "Failed to load resource: the server responded with a status of 403 ()",
     "Failed to load resource: the server responded with a status of 403 ()"
   ],
   "httpErrors": [
     {
       "status": 403,
+      "url": "https://us-east1-ays-orbit-360-lab.cloudfunctions.net/orbit360DocumentDriveListFolderPreview",
+      "resourceType": "fetch",
+      "method": "POST",
+      "postData": "{\"data\":{\"tenantId\":\"alianzas-soluciones\",\"activeRole\":\"Dirección\",\"entidad\":\"aseguradora\",\"entidadId\":\"gt-aseguradora-guatemalteca\",\"clienteId\":\"\",\"polizaId\":\"\",\"receiptId\":\"\",\"sourceModule\":\"aseguradoras\",\"documentType\":\"\",\"categoria\":\"\",\"nombre\":\"\",\"folderId\":\"\"}}",
+      "responseBody": "{\"error\":{\"message\":\"Preview documental solo admite expedientes sintéticos autorizados.\",\"status\":\"PERMISSION_DENIED\"}}"
+    },
+    {
+      "status": 403,
+      "url": "https://us-east1-ays-orbit-360-lab.cloudfunctions.net/orbit360DocumentDriveListFolderPreview",
+      "resourceType": "fetch",
+      "method": "POST",
+      "postData": "{\"data\":{\"tenantId\":\"alianzas-soluciones\",\"activeRole\":\"Dirección\",\"entidad\":\"aseguradora\",\"entidadId\":\"gt-aseguradora-guatemalteca\",\"clienteId\":\"\",\"polizaId\":\"\",\"receiptId\":\"\",\"sourceModule\":\"aseguradoras\",\"documentType\":\"\",\"categoria\":\"\",\"nombre\":\"\",\"folderId\":\"\"}}",
+      "responseBody": "{\"error\":{\"message\":\"Preview documental solo admite expedientes sintéticos autorizados.\",\"status\":\"PERMISSION_DENIED\"}}"
+    },
+    {
+      "status": 403,
       "url": "https://us-east1-ays-orbit-360-lab.cloudfunctions.net/orbit360ProductOperationalCommandPreview",
       "resourceType": "fetch",
       "method": "POST",
-      "postData": "{\"data\":{\"tenantId\":\"alianzas-soluciones\",\"activeRole\":\"Dirección\",\"mutations\":[{\"action\":\"insert\",\"collection\":\"actividades\",\"id\":\"secres_muxl0lipx4j4j\",\"payload\":{\"id\":\"secres_muxl0lipx4j4j\",\"tipo\":\"admin\",\"icon\":\"🔐\",\"fecha\":\"2026-10-07\",\"titulo\":\"Acceso a recurso seguro\",\"detalle\":\"document.upload · ok\",\"tenantId\":\"alianzas-soluciones\",\"createdAt\":\"2026-10-07T04:02:43.825Z\",\"updatedAt\":\"2026-10-07T04:02:43.825Z\",\"ownerUid\":\"woJlxR1iFEeiQZvTscPj4qQ5Qc73\",\"ownerEmail\":\"orbit.lab@demo.com\"}}]}}",
+      "postData": "{\"data\":{\"tenantId\":\"alianzas-soluciones\",\"activeRole\":\"Dirección\",\"mutations\":[{\"action\":\"insert\",\"collection\":\"actividades\",\"id\":\"secres_muytzzc3awzna\",\"payload\":{\"id\":\"secres_muytzzc3awzna\",\"tipo\":\"admin\",\"icon\":\"🔐\",\"fecha\":\"2026-10-08\",\"titulo\":\"Acceso a recurso seguro\",\"detalle\":\"document.upload · ok\",\"tenantId\":\"alianzas-soluciones\",\"createdAt\":\"2026-10-08T01:01:57.796Z\",\"updatedAt\":\"2026-10-08T01:01:57.796Z\",\"ownerUid\":\"woJlxR1iFEeiQZvTscPj4qQ5Qc73\",\"ownerEmail\":\"orbit.lab@demo.com\"}}]}}",
       "responseBody": "{\"error\":{\"message\":\"Preview operativo solo admite fixtures sintéticos autorizados B3-004/B4-003.\",\"status\":\"PERMISSION_DENIED\"}}"
     }
   ],
   "expectedIsolationDenials": [
     {
       "status": 403,
+      "url": "https://us-east1-ays-orbit-360-lab.cloudfunctions.net/orbit360DocumentDriveListFolderPreview",
+      "operation": "listFolder",
+      "entity": "aseguradora",
+      "entityId": "gt-aseguradora-guatemalteca",
+      "sourceModule": "aseguradoras",
+      "reason": "DRIVE_REAL_DOSSIER_EXPECTED_ISOLATION_DENIAL",
+      "persisted": false,
+      "persistenceCheck": "NOT_APPLICABLE_READ_ONLY_DENIAL"
+    },
+    {
+      "status": 403,
+      "url": "https://us-east1-ays-orbit-360-lab.cloudfunctions.net/orbit360DocumentDriveListFolderPreview",
+      "operation": "listFolder",
+      "entity": "aseguradora",
+      "entityId": "gt-aseguradora-guatemalteca",
+      "sourceModule": "aseguradoras",
+      "reason": "DRIVE_REAL_DOSSIER_EXPECTED_ISOLATION_DENIAL",
+      "persisted": false,
+      "persistenceCheck": "NOT_APPLICABLE_READ_ONLY_DENIAL"
+    },
+    {
+      "status": 403,
       "url": "https://us-east1-ays-orbit-360-lab.cloudfunctions.net/orbit360ProductOperationalCommandPreview",
-      "id": "secres_muxl0lipx4j4j",
+      "id": "secres_muytzzc3awzna",
       "collection": "actividades",
       "reason": "SECURE_RESOURCE_AUDIT_NON_SYNTHETIC_DENIED_IN_PREVIEW",
       "persisted": false
@@ -1161,20 +1226,20 @@
     "knowledgeProbe": {
       "aseguateId": "gt-aseguradora-guatemalteca",
       "columnaId": "gt-seguros-columna",
-      "count": 32
+      "count": 33
     },
     "aseguate": {
       "sourceBacked": true,
       "issuance": true,
       "installment": true,
       "multiProduct": true,
-      "textSample": "FUENTES RELACIONADAS 6 VALIDADAS 3 REQUIEREN REVISIÓN 3 ARCHIVO FÍSICO EN DRIVE 0 🧠 Tarifas y conocimiento Fuentes, condiciones y reglas comerciales organizadas por producto. La evidencia queda separada de la habilitación del cotizador. 🧠 Tarifas y conocimiento Cómo leer esta sección: una fuente puede estar Clasificada, Validada y, por separado, Habilitada para un cálculo. Cargar o validar un documento nunca activa automáticamente Cotizador ni Comparativo. Ramo Todos Vehículos Automóviles Producto Todos Seguro de vehículo Vehículos Clasificado (3) Validado (3) Productos y ramos cubiertos GT · GTQ · Vehículos · Seguro de vehículo 3 fuente(s) relacionadas Pendiente GT · GTQ · Automóviles · Vehículos 3 fuente(s) relacionadas Pendiente 🧠 Fuentes relacionadas y disponibles Tasas AseGuate.xlsx Conocimiento · GT · GTQ · Vehículos · Seguro de vehículo Clasificado Cotización AseGuate automóvil.pdf Conocimiento · GT · GTQ · Vehículos · Seguro de vehículo Clasificado Cotización AseGuate microbús hasta 9 pasajeros.pdf Conocimiento · GT · GTQ · Vehículos · Seguro de vehículo Clasificado Tasas AseGuate.xlsx Conocimiento · GT · GTQ · Automóviles · Vehículos Validado Cotización AseGuate Auto 2026-09-30 Conocimiento · GT · GTQ · Automóviles · Vehículos Validado Póliza AseGuate AUTO-38594 Conocimiento · GT · GTQ · Automóviles · Vehículos Validado 🧠 Conocimiento vigente y observado · con evidencia Estos datos provienen de tarifarios, cotizadores, pólizas o cotizaciones reales identificadas. Un hecho observado en una muestra se mantiene limitado a ese producto/versión hasta tener autoridad suficiente para generalizarlo. Automóviles · Vehículos GT · GTQ · Fuentes 2026; revisar al recibir versión posterior Con evidencia Plan Premium · tasa 3.20% sobre valor asegurado Plan Premium · prima mínima Q1,800 + asistencia Plan Plus · tasa 4.00% sobre valor asegurado Plan Plus · prima mínima Q1,600 + recargo aplicable + asistencia Plan Plus · recargo por antigüedad 15% según condición del tarifario Plan Básico · prima mínima Q800 + asistencia Asistencia Q350 en los tres planes documentados Gastos de emisión 5% de prima neta Fraccionamiento Hasta 6 pagos al precio de contado; 8 pagos 5.37%; 10 pagos 8.42% sobre prima neta IVA 12%; en la póliza muestra grava prima neta + gastos de emisión + asistencia + financiamiento Visa/Cuotas Cotización muestra 3, 6 y 10 pagos; tratar separado del r"
+      "textSample": "FUENTES RELACIONADAS 6 VALIDADAS 3 REQUIEREN REVISIÓN 3 ARCHIVO FÍSICO EN DRIVE 0 🧠 Tarifas y conocimiento Aquí no se cargan archivos. Esta sección convierte fuentes ya clasificadas en condiciones, reglas y tarifas revisables. Solo lo validado explícitamente puede alimentar Cotizador o Comparativo. 1 · Fuente Se carga y clasifica en Documentos y fuentes. 2 · Conocimiento Aquí se revisan condiciones y hechos extraídos. 3 · Habilitación Una tarifa solo calcula después de validación expresa. Fuentes disponibles 6 evidencia vinculada Fuentes validadas 3 revisión confirmada Ramos listos para cálculo 0 habilitación explícita Ramo Todos Vehículos Automóviles Producto Todos Seguro de vehículo Vehículos COBERTURA DOCUMENTAL Productos con conocimiento disponible Resume qué productos tienen respaldo y cuáles todavía necesitan fuente o validación. GT · GTQ · Vehículos · Seguro de vehículo 3 fuente(s) relacionadas Pendiente GT · GTQ · Automóviles · Vehículos 3 fuente(s) relacionadas Pendiente CONDICIONES CONOCIDAS Reglas, hechos y vigencias Información derivada de fuentes; los vacíos permanecen pendientes en lugar de usar valores genéricos. 🧠 Tarifas y conocimiento Tasas AseGuate.xlsx Conocimiento · GT · GTQ · Vehículos · Seguro de vehículo Clasificado Cotización AseGuate automóvil.pdf Conocimiento · GT · GTQ · Vehículos · Seguro de vehículo Clasificado Cotización AseGuate microbús hasta 9 pasajeros.pdf Conocimiento · GT · GTQ · Vehículos · Seguro de vehículo Clasificado Tasas AseGuate.xlsx Conocimiento · GT · GTQ · Automóviles · Vehículos Validado Cotización AseGuate Auto 2026-09-30 Conocimiento · GT · GTQ · Automóviles · Vehículos Validado Póliza AseGuate AUTO-38594 Conocimiento · GT · GTQ · Automóviles · Vehículos Validado 🧠 Conocimiento vigente y observado · con evidencia Estos datos provienen de tarifarios, cotizadores, pólizas o cotizaciones reales identificadas. Un hecho observado en una muestra se mantiene limitado a ese producto/versión hasta tener autoridad suficiente para generalizarlo. Automóviles · Vehículos GT · GTQ · Fuentes 2026; revisar al recibir versión posterior Con evidencia Plan Premium · tasa 3.20% sobre valor asegurado Plan Premium · prima mínima Q1,800 + asistencia Plan Plus · tasa 4.00% sobre valor asegurado Plan Plus · prima mínima Q1,600 + recargo aplicable + asistencia Plan Plus · recargo por antigüedad 15% según condición del tarifario Pl"
     },
     "columna": {
       "sourceBacked": true,
       "zeroIssuance": true,
       "zeroInstallment": true,
-      "textSample": "FUENTES RELACIONADAS 5 VALIDADAS 4 REQUIEREN REVISIÓN 1 ARCHIVO FÍSICO EN DRIVE 0 🧠 Tarifas y conocimiento Fuentes, condiciones y reglas comerciales organizadas por producto. La evidencia queda separada de la habilitación del cotizador. 🧠 Tarifas y conocimiento Cómo leer esta sección: una fuente puede estar Clasificada, Validada y, por separado, Habilitada para un cálculo. Cargar o validar un documento nunca activa automáticamente Cotizador ni Comparativo. Ramo Todos Vehículos Automóviles Producto Todos Motocicleta Seguro de vehículo Vehículos Requiere validación (1) Validado (4) Productos y ramos cubiertos GT · GTQ · Vehículos · Seguro de vehículo 1 fuente(s) relacionadas Pendiente GT · GTQ · Automóviles · Vehículos 3 fuente(s) relacionadas Pendiente GT · GTQ · Automóviles · Motocicleta 1 fuente(s) relacionadas Pendiente 🧠 Fuentes relacionadas y disponibles Cotizador VA 2026 V1.4.xlsx Conocimiento · GT · GTQ · Vehículos · Seguro de vehículo Requiere validación Cotizador VA 2026 V1.4.xlsx Conocimiento · GT · GTQ · Automóviles · Vehículos Validado Cotización Columna CRV 2026-09-28 Conocimiento · GT · GTQ · Automóviles · Vehículos Validado Cotización Columna Motocicleta 2026-09-28 Conocimiento · GT · GTQ · Automóviles · Motocicleta Validado Póliza Columna VA-41977 Conocimiento · GT · GTQ · Automóviles · Vehículos Validado 🧠 Conocimiento vigente y observado · con evidencia Estos datos provienen de tarifarios, cotizadores, pólizas o cotizaciones reales identificadas. Un hecho observado en una muestra se mantiene limitado a ese producto/versión hasta tener autoridad suficiente para generalizarlo. Automóviles · Vehículos / Motocicleta GT · GTQ · Fuentes 2026; revisar al recibir versión posterior Con evidencia Gastos de emisión 0% en cotizador/pólizas y muestras revisadas de Vehículos Fraccionamiento de aseguradora 0% en póliza muestra de 10 pagos; cotizaciones 2/3/4/5/6/8/10/12 reconstruyen el mismo total IVA 12% sobre la prima neta en las muestras revisadas Pronto pago No es universal: se observó 5% de descuento en una cotización de motocicleta y 0% en otra muestra Visa Cuotas Hasta 12 pagos según cotización; no tratarlo automáticamente como recargo de la aseguradora Fuentes: Cotizador VA 2026 V1.4.xlsx · Cotización Columna CRV 2026-09-28 · Cotización Columna Motocicleta 2026-09-28 · Póliza Columna VA-41977 Las condiciones de pronto pago varían por perfil/pro"
+      "textSample": "FUENTES RELACIONADAS 5 VALIDADAS 4 REQUIEREN REVISIÓN 1 ARCHIVO FÍSICO EN DRIVE 0 🧠 Tarifas y conocimiento Aquí no se cargan archivos. Esta sección convierte fuentes ya clasificadas en condiciones, reglas y tarifas revisables. Solo lo validado explícitamente puede alimentar Cotizador o Comparativo. 1 · Fuente Se carga y clasifica en Documentos y fuentes. 2 · Conocimiento Aquí se revisan condiciones y hechos extraídos. 3 · Habilitación Una tarifa solo calcula después de validación expresa. Fuentes disponibles 5 evidencia vinculada Fuentes validadas 4 revisión confirmada Ramos listos para cálculo 0 habilitación explícita Ramo Todos Vehículos Automóviles Producto Todos Motocicleta Seguro de vehículo Vehículos COBERTURA DOCUMENTAL Productos con conocimiento disponible Resume qué productos tienen respaldo y cuáles todavía necesitan fuente o validación. GT · GTQ · Vehículos · Seguro de vehículo 1 fuente(s) relacionadas Pendiente GT · GTQ · Automóviles · Vehículos 3 fuente(s) relacionadas Pendiente GT · GTQ · Automóviles · Motocicleta 1 fuente(s) relacionadas Pendiente CONDICIONES CONOCIDAS Reglas, hechos y vigencias Información derivada de fuentes; los vacíos permanecen pendientes en lugar de usar valores genéricos. 🧠 Tarifas y conocimiento Cotizador VA 2026 V1.4.xlsx Conocimiento · GT · GTQ · Vehículos · Seguro de vehículo Requiere validación Cotizador VA 2026 V1.4.xlsx Conocimiento · GT · GTQ · Automóviles · Vehículos Validado Cotización Columna CRV 2026-09-28 Conocimiento · GT · GTQ · Automóviles · Vehículos Validado Cotización Columna Motocicleta 2026-09-28 Conocimiento · GT · GTQ · Automóviles · Motocicleta Validado Póliza Columna VA-41977 Conocimiento · GT · GTQ · Automóviles · Vehículos Validado 🧠 Conocimiento vigente y observado · con evidencia Estos datos provienen de tarifarios, cotizadores, pólizas o cotizaciones reales identificadas. Un hecho observado en una muestra se mantiene limitado a ese producto/versión hasta tener autoridad suficiente para generalizarlo. Automóviles · Vehículos / Motocicleta GT · GTQ · Fuentes 2026; revisar al recibir versión posterior Con evidencia Gastos de emisión 0% en cotizador/pólizas y muestras revisadas de Vehículos Fraccionamiento de aseguradora 0% en póliza muestra de 10 pagos; cotizaciones 2/3/4/5/6/8/10/12 reconstruyen el mismo total IVA 12% sobre la prima neta en las muestras revisadas Pronto pago No es universa"
     }
   },
   "r13RenewalDataBlocker": null,
@@ -1218,7 +1283,7 @@
       "Vehículo Pesado"
     ],
     "nativeMultiple": false,
-    "insurerCheckboxes": 15
+    "insurerCheckboxes": 16
   },
   "r18ManagementModal": {
     "typeCount": 12,
@@ -1250,22 +1315,22 @@
     "buckets": [
       {
         "key": "vencidas",
-        "count": 4,
+        "count": 5,
         "ids": [
           "pol_ad0ed5f26dd834d5e1d38f50eb0e",
           "pol_b9a883095c9fae8f7502ce1cb054",
-          "b4003qa_policy_expired_renew_37569139879",
-          "pol_8231bbb8f9b7272c02891f5a4caf"
+          "b4003qa_policy_expired_renew_37710305112",
+          "pol_8231bbb8f9b7272c02891f5a4caf",
+          "pol_df6bf097045762297ec31fd4e5c5"
         ]
       },
       {
         "key": "d15",
-        "count": 4,
+        "count": 3,
         "ids": [
-          "pol_df6bf097045762297ec31fd4e5c5",
-          "b4003qa_policy_renew_37569139879",
-          "b4003qa_policy_renewwrite_37569139879",
-          "b4003qa_policy_unknown_37569139879"
+          "b4003qa_policy_renew_37710305112",
+          "b4003qa_policy_renewwrite_37710305112",
+          "b4003qa_policy_unknown_37710305112"
         ]
       },
       {
@@ -1325,9 +1390,9 @@
     "unknownReview": true,
     "parallelDispositionAbsent": true,
     "date45ExpectedIds": [
-      "b4003qa_policy_renew_37569139879",
-      "b4003qa_policy_renewwrite_37569139879",
-      "b4003qa_policy_unknown_37569139879",
+      "b4003qa_policy_renew_37710305112",
+      "b4003qa_policy_renewwrite_37710305112",
+      "b4003qa_policy_unknown_37710305112",
       "pol_3ddc9e613f40252f02b2e122072d",
       "pol_638e276218baad9e84018415b0ba",
       "pol_7280c9b1a5253a1fe1e463e5993b",
@@ -1336,13 +1401,12 @@
       "pol_b39a58e5c216d8fb0f9fca4da4d6",
       "pol_c23dd5e9d7d5e8056c6dd907c48f",
       "pol_c48c0b1d4e940f80dffacbc37959",
-      "pol_d5e61976a38be76ba5e3c1e12575",
-      "pol_df6bf097045762297ec31fd4e5c5"
+      "pol_d5e61976a38be76ba5e3c1e12575"
     ],
     "date45VisibleIds": [
-      "b4003qa_policy_renew_37569139879",
-      "b4003qa_policy_renewwrite_37569139879",
-      "b4003qa_policy_unknown_37569139879",
+      "b4003qa_policy_renew_37710305112",
+      "b4003qa_policy_renewwrite_37710305112",
+      "b4003qa_policy_unknown_37710305112",
       "pol_3ddc9e613f40252f02b2e122072d",
       "pol_638e276218baad9e84018415b0ba",
       "pol_7280c9b1a5253a1fe1e463e5993b",
@@ -1351,12 +1415,11 @@
       "pol_b39a58e5c216d8fb0f9fca4da4d6",
       "pol_c23dd5e9d7d5e8056c6dd907c48f",
       "pol_c48c0b1d4e940f80dffacbc37959",
-      "pol_d5e61976a38be76ba5e3c1e12575",
-      "pol_df6bf097045762297ec31fd4e5c5"
+      "pol_d5e61976a38be76ba5e3c1e12575"
     ],
-    "expiredPipelineCount": 4,
-    "expiredHistoricalCount": 1158,
-    "noteText": "Pipeline de renovación por fecha\nAquí se muestran pólizas que todavía forman parte del proceso de renovación. 4 están vencidas y renovables dentro del pipeline; existen 1158 pólizas con vigencia pasada en el alcance histórico, de las cuales 101 están marcadas como no renovables y 0 ya tienen resultado terminal. Cada póliza pendiente permanece en su columna por vigencia y se revisa desde allí, sin crear una tabla paralela."
+    "expiredPipelineCount": 5,
+    "expiredHistoricalCount": 1159,
+    "noteText": "Pipeline de renovación por fecha\nAquí se muestran pólizas que todavía forman parte del proceso de renovación. 5 están vencidas y renovables dentro del pipeline; existen 1159 pólizas con vigencia pasada en el alcance histórico, de las cuales 101 están marcadas como no renovables y 0 ya tienen resultado terminal. Cada póliza pendiente permanece en su columna por vigencia y se revisa desde allí, sin crear una tabla paralela."
   },
   "r18PolicyEditionValidation": {
     "rows": [
@@ -1399,15 +1462,16 @@
     "queryResult": true
   },
   "r18RenewalKpiParity": {
-    "inicio": 17,
-    "polizas": 17,
+    "inicio": 16,
+    "polizas": 16,
     "owner": "polizas.policyMetrics.isRenewalWithin45Days"
   },
   "r18InsurerActivity": {
-    "text": "🕒 Actividad y auditoría Historia unificada: combina cambios guardados en la ficha y el ciclo documental visible del Registry. Consultar una fuente no genera actividad; cargar, mapear o validar sí debe quedar trazable. ✏️ Actualización de ficha (contactos) Ficha 7/23/2026, 4:46:56 PM Responsable: Orbit 360 A&S LAB · Dirección Referencia: prueba Ámbito: contactos ✏️ Directorio importado/propuesto Ficha 7/21/2026, 12:00:00 AM Responsable: Orbit 360 A&S LAB 📄 Fuente · Clasificado Documento fecha no registrada Responsable: Registry Referencia: Tasas AseGuate.xlsx Ámbito: Tarifario / Excel cotizador · KNOWLEDGE_REFERENCE 📄 Fuente · Clasificado Documento fecha no registrada Responsable: Registry Referencia: Cotización AseGuate automóvil.pdf Ámbito: Cotización oficial/ejemplo · KNOWLEDGE_REFERENCE 📄 Fuente · Clasificado Documento fecha no registrada Responsable: Registry Referencia: Cotización AseGuate microbús hasta 9 pasajeros.pdf Ámbito: Cotización oficial/ejemplo · KNOWLEDGE_REFERENCE 📄 Fuente · Validado Documento fecha no registrada Responsable: Registry Referencia: Tasas AseGuate.xlsx Ámbito: Tarifario / Excel cotizador · KNOWLEDGE_REFERENCE 📄 Fuente · Validado Documento fecha no registrada Responsable: Registry Referencia: Cotización AseGuate Auto 2026-09-30 Ámbito: Cotización oficial/ejemplo · KNOWLEDGE_REFERENCE 📄 Fuente · Validado Documento fecha no registrada Responsable: Registry Referencia: Póliza AseGuate AUTO-38594 Ámbito: Póliza emitida/ejemplo · KNOWLEDGE_REFERENCE",
+    "text": "🕒 Actividad y auditoría Qué ocurrió y quién lo hizo: aquí se registran cambios de la ficha y acciones documentales que modifican información. Consultar un archivo no crea una actividad nueva. ✏️ Actualización de ficha (contactos) Ficha 23/7/2026, 4:46:56 p. m. Hecho por: Orbit 360 A&S LAB · Dirección Documento / motivo: prueba Se actualizó: contactos ✏️ Directorio importado/propuesto Ficha 21/7/2026, 12:00:00 a. m. Hecho por: Orbit 360 A&S LAB 📄 Documento clasificado Documento Fecha no registrada Hecho por: Sistema documental Documento / motivo: Tasas AseGuate.xlsx Se actualizó: Tarifario / Excel cotizador · GT · Vehículos · Seguro de vehículo 📄 Documento clasificado Documento Fecha no registrada Hecho por: Sistema documental Documento / motivo: Cotización AseGuate automóvil.pdf Se actualizó: Cotización oficial/ejemplo · GT · Vehículos · Seguro de vehículo 📄 Documento clasificado Documento Fecha no registrada Hecho por: Sistema documental Documento / motivo: Cotización AseGuate microbús hasta 9 pasajeros.pdf Se actualizó: Cotización oficial/ejemplo · GT · Vehículos · Seguro de vehículo 📄 Documento validado Documento Fecha no registrada Hecho por: Sistema documental Documento / motivo: Tasas AseGuate.xlsx Se actualizó: Tarifario / Excel cotizador · GT · Automóviles · Vehículos 📄 Documento validado Documento Fecha no registrada Hecho por: Sistema documental Documento / motivo: Cotización AseGuate Auto 2026-09-30 Se actualizó: Cotización oficial/ejemplo · GT · Automóviles · Vehículos 📄 Documento validado Documento Fecha no registrada Hecho por: Sistema documental Documento / motivo: Póliza AseGuate AUTO-38594 Se actualizó: Póliza emitida/ejemplo · GT · Automóviles · Vehículos",
     "rows": 8,
     "documental": 6,
-    "hasUnified": true
+    "hasUnified": true,
+    "technical": false
   },
   "r19CommercialDependency": {
     "ok": true,
@@ -1430,7 +1494,7 @@
     "checkboxUsable": true
   },
   "r19RenewabilityDurable": {
-    "policyId": "b4003qa_policy_renewwrite_37569139879",
+    "policyId": "b4003qa_policy_renewwrite_37710305112",
     "serverValue": true,
     "reloadValue": true
   },
@@ -1439,7 +1503,7 @@
     "error": "Esta Preview protege los registros reales. La persistencia se valida aquí con una póliza sintética equivalente; el cambio real se prueba únicamente en el gate LIVE autorizado."
   },
   "r19InicioReadiness": {
-    "text": "🌅 Buen día · esto es lo importante hoy METAS DEL MES·PRIORIDADES·AVANCE POR ASESOR Abrir Cliente 360 → METAS DEL MES · OCTUBRE 2026 Avance real del mes Quedan 24 días para cerrar el mes. La producción usa la prima neta de pólizas con inicio de vigencia en el mes y el recaudo usa pagos confirmados con fecha efectiva del mes. Si no existe meta configurada, no se inventa un porcentaje. 440 clientes 1425 pólizas 574 registros vencidos en cartera 14% Q11K GTQ Producción neta del mes Meta Q80K 0% Sin movimientos Recaudo confirmado del mes Meta Q50K COBROS CONFIRMADOS Q851K GTQ $205.8M COP 1243 pagos confirmados › PENDIENTE DE COBRO Q 8,741 GTQ $ 0 COP 742 obligaciones · 19 con monto › CARTERA VENCIDA Q 7,591 GTQ $ 0 COP 574 obligaciones · 15 con monto › VENCEN ≤45 D 17 mismo universo de Pólizas › Avance por asesor producción neta del mes vs meta configurada PO Paula Osorio Q11K GTQ 14% BH Braulio Hernández Sin movimientos Meta no configurada — CC Carlos Castro Sin movimientos Meta no configurada — FA Fernando Arias Sin movimientos Meta no configurada — JS Johanna Salgado Sin movimientos Meta no configurada — NC Nicole Castro Sin movimientos Meta no configurada — SD Samuel Daza Sin movimientos Meta no configurada — Prioridades 🔄 NILDA PATRICIA POROJ CARABALLO VEHICULOS · renueva en 0 d 🔄 IMPAGUA, SOCIEDAD ANONIMA DAÑOS · renueva en 4 d 🔄 IMPAGUA, SOCIEDAD ANONIMA DAÑOS · renueva en 4 d 🔄 B4-003 QA Cliente Accidentes · renueva en 10 d ⚠ NORA LUCIA HURTARTE FLORES cuota — vencida · — ⚠ LUIS ESTUARDO PEREZ CIFUENTES cuota — vencida · — ⚠ ERICKA LIZETTE AGUILAR LUNA cuota — vencida · — Seguimientos de hoy sin cadencia automática · gestiona por WhatsApp 🌱 B4-003 QA colaboración · Braulio Hernández · mañana · Nuevo ingreso 🧮 B4-003 QA colaboración pre-emisión · Braulio Hernán",
+    "text": "🌅 Buen día · esto es lo importante hoy METAS DEL MES·PRIORIDADES·AVANCE POR ASESOR Abrir Cliente 360 → METAS DEL MES · OCTUBRE 2026 Avance real del mes Quedan 23 días para cerrar el mes. La producción usa la prima neta de pólizas con inicio de vigencia en el mes y el recaudo usa pagos confirmados con fecha efectiva del mes. Si no existe meta configurada, no se inventa un porcentaje. 440 clientes 1425 pólizas 581 registros vencidos en cartera 14% Q11K GTQ Producción neta del mes Meta Q80K 0% Sin movimientos Recaudo confirmado del mes Meta Q50K COBROS CONFIRMADOS Q851K GTQ $205.8M COP 1243 pagos confirmados › PENDIENTE DE COBRO Q 8,741 GTQ $ 0 COP 735 obligaciones · 19 con monto › CARTERA VENCIDA Q 7,591 GTQ $ 0 COP 581 obligaciones · 15 con monto › VENCEN ≤45 D 16 mismo universo de Pólizas › Avance por asesor producción neta del mes vs meta configurada PO Paula Osorio Q11K GTQ 14% BH Braulio Hernández Sin movimientos Meta no configurada — CC Carlos Castro Sin movimientos Meta no configurada — FA Fernando Arias Sin movimientos Meta no configurada — JS Johanna Salgado Sin movimientos Meta no configurada — NC Nicole Castro Sin movimientos Meta no configurada — SD Samuel Daza Sin movimientos Meta no configurada — Prioridades 🔄 IMPAGUA, SOCIEDAD ANONIMA DAÑOS · renueva en 3 d 🔄 IMPAGUA, SOCIEDAD ANONIMA DAÑOS · renueva en 3 d 🔄 B4-003 QA Cliente Accidentes · renueva en 10 d 🔄 B4-003 QA Cliente Auto · renueva en 10 d ⚠ NORA LUCIA HURTARTE FLORES cuota — vencida · — ⚠ LUIS ESTUARDO PEREZ CIFUENTES cuota — vencida · — ⚠ ERICKA LIZETTE AGUILAR LUNA cuota — vencida · — Seguimientos de hoy sin cadencia automática · gestiona por WhatsApp 🌱 B4-003 QA colaboración · Paula Osorio · mañana · Nuevo ingreso 🧮 B4-003 QA colaboración pre-emisión · Paula Osorio · mañana · Cotizando 🧮",
     "terminal": "ready"
   },
   "r19TypedHandoff": null,
