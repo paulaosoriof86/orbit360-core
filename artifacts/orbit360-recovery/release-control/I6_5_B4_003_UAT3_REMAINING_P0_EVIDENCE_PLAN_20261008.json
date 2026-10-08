@@ -66,7 +66,7 @@
       "offlineClassifications": {
         "A-08": "VALID_SOURCE_SEQUENCE_CANONICAL_ID_GRAPH_PENDING",
         "A-09": "EXPEDITION_INCLUDED_IN_EXPORTED_TOTAL_LIVE_FORMULA_AUTHORITY_PENDING",
-        "A-10": "Q346080_ABSENT_EXACT_CANONICAL_ROW_REQUIRED",
+        "A-10": "RESPONSIVE_SOURCE_FIXED_Q346080_CANONICAL_ROW_PENDING",
         "A-13": "SOURCE_SEMANTICS_SUPPORTED_ACTIVE_ROLE_MATRIX_PENDING",
         "C-06": "CANONICAL_ONLY_PENDING",
         "C-07": "CANONICAL_ONLY_PENDING",
@@ -153,6 +153,15 @@
     "e1OfflineSource": {
       "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_UAT3_E1_OFFLINE_SOURCE_RECONCILIATION_20261008.json",
       "commit": "b84c2daa8b95e83182538aa8aad634591e63dbda"
+    }
+  },
+  "partialSourceFixes": {
+    "A-10": {
+      "responsiveLayout": "SOURCE_FIXED_STATIC_PASS",
+      "financialAuthority": "PENDING_CANONICAL_ID_READBACK",
+      "previewViewportProof": "PENDING_SEPARATE_AUTHORIZATION",
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_UAT3_A10_RESPONSIVE_SOURCE_FIX_RECEIPT_20261008.json",
+      "receiptCommit": "7468a5c3966f55e6119d156568bba0514da68281"
     }
   }
 }
