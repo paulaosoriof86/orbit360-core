@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B4_EXECUTION_LOCK_V1",
-  "recordedAt": "2026-10-08T20:33:25.996Z",
-  "status": "B4_003_RENEWALS_PRIORITY_MACHINE_PASS_PENDING_PAULA_VISUAL",
+  "recordedAt": "2026-10-08T20:35:24.186Z",
+  "status": "B4_003_RENEWALS_PRIORITY_EXACT_PREVIEW_AUTHORIZED",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "block": "B4",
@@ -38,10 +38,10 @@
   "activeFinding": {
     "id": "B4-003",
     "title": "Cumulative B4-003 remediation: Renovaciones, Cancelaciones and source-backed insurer knowledge.",
-    "status": "B4_003_RENEWALS_PRIORITY_MACHINE_PASS_PENDING_PAULA_VISUAL",
+    "status": "B4_003_RENEWALS_PRIORITY_EXACT_PREVIEW_AUTHORIZED",
     "blocking": true,
-    "nextAction": "B4_003_RENEWALS_EXACT_PREVIEW_VISUAL",
-    "humanVisualStatus": "PENDING_RENEWALS_PRIORITY_VISUAL",
+    "nextAction": "B4_003_RENEWALS_PRIORITY_EXACT_PREVIEW",
+    "humanVisualStatus": "MACHINE_PROOF_INVALIDATED_RECENT24_EXACT_RETRY",
     "knowledgePreview": true
   },
   "rules": {
@@ -67,7 +67,7 @@
     "syntheticQaScope": "R20 exact Preview only: disposable insurer/logo/product/plan/requirement/document and Ops/Leads handoff/cadence fixtures; mandatory server commit, readback, reload and cleanup; no real operational row mutation.",
     "paulaVisualAcceptanceRequiredBeforeAdvance": true,
     "cotcompRealTransportAuthorized": false,
-    "providerDeploymentAuthorized": false,
+    "providerDeploymentAuthorized": true,
     "findingContinuityGuardRequired": true,
     "allowedQaFiles": [
       "tools/gravicentra-i6-5-b4-003-contract.mjs",
@@ -85,12 +85,12 @@
     "renewabilityDataMutationAuthorized": false,
     "authorizedDataMutation": "NONE_POST_B02_APPLY_PASS",
     "renewabilityApplyRepeatAuthorized": false,
-    "buildDispatchAuthorized": false,
-    "previewMutationAuthorized": false,
-    "functionDeploymentAuthorized": false,
+    "buildDispatchAuthorized": true,
+    "previewMutationAuthorized": true,
+    "functionDeploymentAuthorized": true,
     "renewalCutoffDataMutationAuthorized": false
   },
-  "nextAction": "B4_003_RENEWALS_EXACT_PREVIEW_VISUAL",
+  "nextAction": "B4_003_RENEWALS_PRIORITY_EXACT_PREVIEW",
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
     "blobSha": "68ffc370fefa5024a1c0a4857b541bdcf12f615e",
@@ -114,6 +114,7 @@
     "receiptBlobSha": "65c5376b8e43e5ecec7bf0217acccbc1fc458ac9"
   },
   "nextRequiredProof": [
+    "B4_003_RENEWALS_PRIORITY_MACHINE_PASS_WITH_EXACT_RECENT24_UI",
     "PAULA_RENEWALS_PRIORITY_VISUAL_PASS"
   ],
   "candidate": {
@@ -1354,7 +1355,7 @@
     "liveUnchanged": true
   },
   "renewalsPriorityPreviewAuthorization": {
-    "status": "EXECUTED_PASS",
+    "status": "AUTHORIZED_PENDING_PREVIEW",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_RENEWALS_EXACT_PREVIEW_AUTH_20261008.json",
     "authorizationBlobSha": "fc12772894e08c80757b53abdcb6cdc31ab7fad8",
     "decisionPackPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_RENEWALS_EXACT_PREVIEW_DECISION_PACK_20261008.json",
@@ -1382,7 +1383,8 @@
     "reimport": false,
     "machineProofPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_RENEWALS_PRIORITY_MACHINE_PROOF_20261008.json",
     "machineProofBlobSha": "099d8c8eec2af0f118168a24315c7bb6ee2b3fc8",
-    "runId": 37839569726
+    "runId": 37839569726,
+    "retryReason": "INVALIDATED_INCOMPLETE_RECENT24_UI_ASSERTION"
   },
   "renewalsPriorityMachineProof": {
     "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
@@ -1394,5 +1396,11 @@
     "runId": 37839569726,
     "artifactId": 11576758328,
     "artifactDigest": "d23f800b1542c25e628295d8a2fef238a1da3411ae3ec62cd9c50870b85dc921"
+  },
+  "invalidatedRenewalsPriorityMachineProof": {
+    "status": "INVALIDATED_EXACT_RETRY_REQUIRED",
+    "runId": 37839569726,
+    "artifactId": 11576758328,
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_RENEWALS_PRIORITY_RECENT24_ASSERTION_INVALIDATION_20261008.json"
   }
 }
