@@ -1,0 +1,68 @@
+{
+  "schema": "gravicentra-b4-003-b02-renewal-cutoff-apply-result-v1",
+  "recordedAt": "2026-10-08T19:59:16Z",
+  "status": "PASS_APPLY",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "sourceHead": "05283fcb741cb4aa6345e4d33c4ef160f41a235e",
+  "workflowRunId": 37835964035,
+  "workflowJobId": 113512942373,
+  "artifactId": 11576385268,
+  "artifactName": "b4-003-b02-renewal-cutoff-apply-37835964035",
+  "artifactDigest": "sha256:5ffd18255959e8dfd1fff777b67a458e18d778f0f22a00ccabad27c145a82f87",
+  "authorityPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_B02_RENEWAL_CUTOFF_APPLY_AUTH_20261008.json",
+  "authorityBlobSha": "28c42196c14c60cdc0632615334e0468a382d49a",
+  "decisionPackPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_B02_RENEWAL_CUTOFF_APPLY_DECISION_PACK_20261008.json",
+  "decisionPackBlobSha": "d9b51a847d0d39bcc8591d9e8ac16e6db52a9ed9",
+  "ruleId": "PAULA_EXPIRED_CUTOFF_20261007",
+  "cutoff": "2026-07-31",
+  "writes": 583,
+  "rollbackExecuted": false,
+  "before": {
+    "policyCount": 1419,
+    "targetCount": 583,
+    "recentCount": 24
+  },
+  "after": {
+    "policyCount": 1419,
+    "targetCount": 0,
+    "recentCount": 24
+  },
+  "digests": {
+    "target": "744f6f26139f272fa3a26ab35e889a9d011833e802d1495286147734ec7b4d1d",
+    "recent": "3512b167cdde30b51f67acc3c77135f2a94df5f133fd2d3b45cde8540938e67a"
+  },
+  "integrity": {
+    "exactTargetCount": true,
+    "exactWrites": true,
+    "allTargetsReadBack": true,
+    "onlyAllowedFieldsChanged": true,
+    "recent24Untouched": true,
+    "noInserts": true,
+    "noDeletes": true,
+    "noReimport": true,
+    "rollbackPrepared": true
+  },
+  "liveSafety": {
+    "status": "PASS_PREEXISTING_DRIFT_UNCHANGED",
+    "beforeFingerprint": "b1d3909e9013d4b166171cedbbdbf44261dc10e5c77af1a4675fa51bf8124082",
+    "afterFingerprint": "b1d3909e9013d4b166171cedbbdbf44261dc10e5c77af1a4675fa51bf8124082",
+    "unchangedDuringOperation": true,
+    "hostingMutation": false,
+    "livePromotion": false
+  },
+  "priorRenewabilityApply": {
+    "status": "PASS_DO_NOT_REPEAT",
+    "writes": 1415,
+    "resultBlobSha": "67d8d480bd85314a01611f5154919c587854af55"
+  },
+  "boundaries": {
+    "productSourceChanged": false,
+    "buildDispatched": false,
+    "previewMutated": false,
+    "functionsDeployed": false,
+    "liveMutated": false,
+    "reimport": false
+  },
+  "nextAction": "I6_5_B4_003_RENEWALS_EXACT_PREVIEW_AUTHORIZATION"
+}
