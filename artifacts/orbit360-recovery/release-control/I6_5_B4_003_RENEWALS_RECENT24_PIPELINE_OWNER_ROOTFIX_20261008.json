@@ -1,0 +1,36 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_RENEWALS_RECENT24_PIPELINE_OWNER_ROOTFIX_V1",
+  "recordedAt": "2026-10-08T20:56:51.437Z",
+  "status": "PIPELINE_OWNER_ROOTFIX_STATIC_PASS_PENDING_EXACT_PREVIEW",
+  "parentHead": "fd0273db643d808b48b1faca5f29d455440f1ae5",
+  "findingId": "B-02",
+  "failedPreview": {
+    "runId": 37842116361,
+    "artifactId": 11577169909,
+    "digest": "sha256:b39d5bd555d75771fc1baf6c4d0aacb1334d4ed59aa23554fe5a6bc2a83adea6"
+  },
+  "rootCause": "The previous narrow patch updated renewalActionable, while the Kanban source owner is renewalPipelineCandidate; the primary pipeline therefore retained the extra expired-policy state allowlist.",
+  "correction": "Apply the already-authorized expired-row parity rule to renewalPipelineCandidate and align the focused Preview oracle to the same canonical exclusions.",
+  "evidence": {
+    "recentCount": 24,
+    "recentStateCounts": {
+      "Renovada": 19,
+      "Vigente": 3,
+      "Histórica": 2
+    },
+    "terminalCount": 583,
+    "oldOpenCount": 0
+  },
+  "productFiles": {
+    "orbit360-platform/modules/renovaciones.js": "8e3bc32aa5ac5f577f545700d39499970c2edeaf"
+  },
+  "qaFiles": {
+    "tools/gravicentra-i6-5-b4-003-renewals-priority-preview-proof.mjs": "4f34ab832ae104f56b215d8c800e88d99dfc4bdb"
+  },
+  "dataMutation": false,
+  "businessWrites": 0,
+  "syntheticQaWrites": 0,
+  "reimport": false,
+  "livePromotion": false,
+  "nextAction": "B4_003_RENEWALS_PRIORITY_EXACT_PREVIEW"
+}

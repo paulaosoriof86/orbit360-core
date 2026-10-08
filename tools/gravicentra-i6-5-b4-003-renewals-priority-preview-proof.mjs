@@ -166,7 +166,7 @@ async function renderCountry(page,country,phase,viewport){
     const selected=p=>country==='TODOS'||policyCountry(p)===country;
     const rstate=p=>{if(!Object.prototype.hasOwnProperty.call(p||{},'renovable')||p.renovable==null||String(p.renovable).trim()==='')return'UNKNOWN';const v=n(p.renovable);if(p.renovable===true||['true','si','renovable'].includes(v))return'YES';if(p.renovable===false||['false','no','norenovable'].includes(v))return'NO';return'UNKNOWN';};
     const terminal=p=>!!p?.renovadaPor||['renovada','norenovada','rechazada','cerrada','cancelada'].includes(n(p?.renovacionEstado));
-    const eligible=p=>{if(!p||rstate(p)==='NO'||!selected(p)||terminal(p))return false;const d=Orbit.ui.daysFromNow(p.vigenciaFin),s=n(p.estado);if(d==null||d>90)return false;return d<0?['vigente','porrenovar','vencida'].includes(s):['vigente','porrenovar'].includes(s);};
+    const eligible=p=>{if(!p||rstate(p)==='NO'||!selected(p)||terminal(p))return false;const d=Orbit.ui.daysFromNow(p.vigenciaFin),s=n(p.estado);if(d==null||d>90)return false;return d<0?!['cancelada','anulada'].includes(s):['vigente','porrenovar'].includes(s);};
     const expected=(store.all('polizas')||[]).filter(eligible).map(p=>p.id).sort();
     const cards=[...h.querySelectorAll('[data-renewal-policy]')],visible=cards.map(x=>x.getAttribute('data-renewal-policy')).sort();
     const buckets=[...h.querySelectorAll('[data-renewal-bucket]')].map(x=>({key:x.dataset.renewalBucket,count:Number(x.dataset.renewalBucketCount||0),visible:x.querySelectorAll('[data-renewal-policy]').length}));
@@ -263,6 +263,7 @@ try{
 }finally{
   try{if(browser)await browser.close();}catch{}
   try{await deleteApp(app);}catch{}
+  delete proof.backend.terminalIds;delete proof.backend.recentIds;
   fs.writeFileSync(outPath,JSON.stringify(proof,null,2)+'\n');
 }
 console.log(JSON.stringify(proof,null,2));
