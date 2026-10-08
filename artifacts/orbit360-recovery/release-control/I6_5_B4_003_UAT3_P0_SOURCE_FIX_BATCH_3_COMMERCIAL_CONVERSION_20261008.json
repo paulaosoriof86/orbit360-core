@@ -1,0 +1,87 @@
+{
+  "schema": "gravicentra-b4-003-uat3-p0-source-fix-batch-3-commercial-conversion-v1",
+  "recordedAt": "2026-10-08T20:24:00Z",
+  "status": "SOURCE_FIXED_STATIC_PASS_DEPLOYMENT_NOT_DISPATCHED",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "parentHead": "6f641ccd7c44ff18a5fb9ef258561dff740de7e1",
+  "scopeLock": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_UAT3_P0_SOURCE_FIX_BATCH_3_COMMERCIAL_CONVERSION_SCOPE_LOCK_20261008.json",
+    "blobSha": "22795c31d6e2131bb867eeb5366b144cfe3d017c"
+  },
+  "observations": [
+    "D-19"
+  ],
+  "productFiles": {
+    "functions/product-ops-leads-domain.js": "9df632ae9eadbec141b6b7d75ba6a0dab98ab038",
+    "orbit360-platform/core/ciclo.js": "a1f5f2e97edecea4a723ccce8024d2c9b564cf9d"
+  },
+  "corrections": [
+    {
+      "change": "The emitted transition now resolves one client by explicit link or stable email/phone identity inside the transaction; ambiguous matches fail closed.",
+      "preserved": "No name-only merge and no silent merge of multiple existing clients."
+    },
+    {
+      "change": "A new policy requires a human-entered policy number and valid start/end dates. Existing policy links may be reused after client/business conflict checks.",
+      "preserved": "No policy identity or coverage date is inferred."
+    },
+    {
+      "change": "Client, policy, optional captured vehicle, activity and business links are committed in the same canonical transaction with deterministic identifiers.",
+      "preserved": "Vehicle creation is omitted when no plate was captured."
+    },
+    {
+      "change": "The UI states that emission links client and policy, gathers the minimum authoritative fields, and surfaces specific conflict/incomplete-data errors."
+    },
+    {
+      "change": "The callable returns exact client/policy/vehicle readback identifiers and fails if required linked records are missing after commit."
+    }
+  ],
+  "staticVerification": {
+    "pass": true,
+    "checks": {
+      "backendSyntax": true,
+      "uiSyntax": true,
+      "stableIdentityKey": true,
+      "ambiguousIdentityFailClosed": true,
+      "deterministicIds": true,
+      "policyDataRequired": true,
+      "policyDateOrderValidated": true,
+      "policyClientConflictBlocked": true,
+      "policyBusinessConflictBlocked": true,
+      "optionalVehicleNoInference": true,
+      "vehicleRelationshipConflictBlocked": true,
+      "transactionalLinkage": true,
+      "canonicalEmissionReadback": true,
+      "truthfulUiCopy": true,
+      "cancelLeavesStageUnchanged": true
+    }
+  },
+  "boundaries": {
+    "dataMutation": false,
+    "businessWrites": false,
+    "syntheticQaWrites": false,
+    "buildDispatch": false,
+    "previewMutation": false,
+    "functionDeployment": false,
+    "liveMutation": false,
+    "reimport": false
+  },
+  "findingDisposition": {
+    "closed": [],
+    "sourceCorrectedPendingSyntheticE2E": [
+      "D-19"
+    ],
+    "newFindingIds": [],
+    "deletedFindingIds": [],
+    "b4003Open": true,
+    "b4004Held": true
+  },
+  "explicitCarry": [
+    "Preview synthetic business emission with two opportunities sharing one identity.",
+    "Create/link/reload proof for client, policy and optional vehicle.",
+    "Ambiguous two-client identity fail-closed proof.",
+    "Function deployment and build remain unauthorized."
+  ],
+  "decision": "BATCH_3_SOURCE_COMPLETE_STATIC_PASS_NO_ENVIRONMENT_MUTATION",
+  "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_UAT3_DEFERRED_READBACK_AND_TRACE_PLAN"
+}

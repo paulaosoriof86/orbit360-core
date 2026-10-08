@@ -156,12 +156,41 @@ Orbit.ciclo = (function () {
   }
   const PROB = { nuevo: 10, contactado: 25, cotizando: 45, propuesta: 65, negociacion: 78, inspeccion: 85, emision: 92, emitido: 100, perdido: 0 };
 
+  function isoDate(value){ return /^\d{4}-\d{2}-\d{2}$/.test(String(value||'').trim()); }
+  function emissionErrorMessage(error){
+    const code=String(error&&(error.code||error.message)||'');
+    if(/EMISSION_CLIENT_IDENTITY_AMBIGUOUS/i.test(code))return'Hay más de un cliente con ese correo o teléfono. Selecciona el cliente correcto antes de emitir.';
+    if(/EMISSION_POLICY_DATA_REQUIRED/i.test(code))return'Para emitir debes registrar número de póliza y fechas de vigencia válidas.';
+    if(/EMISSION_POLICY_DATES_INVALID/i.test(code))return'La vigencia final no puede ser anterior a la vigencia inicial.';
+    if(/EMISSION_POLICY_CLIENT_CONFLICT|EMISSION_POLICY_BUSINESS_CONFLICT/i.test(code))return'La póliza ya está vinculada a otro cliente u oportunidad. Revisa la relación antes de emitir.';
+    if(/EMISSION_VEHICLE_/i.test(code))return'El vehículo ya está vinculado a otra relación. Revisa la placa antes de emitir.';
+    return'No fue posible confirmar la emisión integrada. Ningún cierre parcial debe presentarse como exitoso.';
+  }
+  async function collectEmissionContract(n){
+    if(n&&n.polizaId)return{emissionContract:{policy:{id:n.polizaId}}};
+    const numero=await U.prompt('Número de póliza emitida:',{title:'Confirmar emisión',ok:'Continuar'});if(numero===null)return null;
+    const vigenciaInicio=await U.prompt('Inicio de vigencia (AAAA-MM-DD):',{title:'Confirmar emisión',ok:'Continuar'});if(vigenciaInicio===null)return null;
+    const vigenciaFin=await U.prompt('Fin de vigencia (AAAA-MM-DD):',{title:'Confirmar emisión',ok:'Continuar'});if(vigenciaFin===null)return null;
+    if(!String(numero||'').trim()||!isoDate(vigenciaInicio)||!isoDate(vigenciaFin)||String(vigenciaInicio)>String(vigenciaFin))throw new Error('EMISSION_POLICY_DATA_REQUIRED');
+    let vehicle=null;
+    if(/auto|veh[ií]cul|moto/i.test(String(n&&n.ramo||''))){
+      const placa=await U.prompt('Placa del vehículo (opcional; cancelar u omitir no crea vehículo):',{title:'Vincular vehículo',ok:'Continuar'});
+      if(placa&&String(placa).trim())vehicle={placa:String(placa).trim().toUpperCase()};
+    }
+    return{emissionContract:{policy:{numero:String(numero).trim(),vigenciaInicio:String(vigenciaInicio).trim(),vigenciaFin:String(vigenciaFin).trim(),primaTotal:Number(n&&n.primaEst)||0},vehicle}};
+  }
+
   /** Mueve un negocio a otra etapa y espera commit/readback canónico. */
-  async function setEtapa(id, etapaId) {
+  async function setEtapa(id, etapaId, transitionData) {
     const n = S().get('negocios', id); if (!n || n.etapa === etapaId) return n;
     if (!S().updateDurable) throw new Error('OPS_BUSINESS_DURABLE_WRITE_REQUIRED');
     const de = n.etapa;
-    const patch = { etapa: etapaId, prob: PROB[etapaId], actualizado: today() };
+    const patch = Object.assign({ etapa: etapaId, prob: PROB[etapaId], actualizado: today() },transitionData||{});
+    if(etapaId==='emitido'&&!patch.emissionContract){
+      const emission=await collectEmissionContract(n);
+      if(!emission)return n;
+      Object.assign(patch,emission);
+    }
     if (etapaId === 'propuesta') {
       patch.cadenciaActiva = true;
       patch.cadencia = CADENCIA.slice();
@@ -480,7 +509,7 @@ Orbit.ciclo = (function () {
     back.querySelectorAll('.cstep').forEach(b => b.addEventListener('click', async () => {
       if (b.disabled) return; b.disabled = true;
       try { await setEtapa(id, b.dataset.etapa); refresh(); openNegocio(id); }
-      catch (error) { b.disabled = false; U.toast('No fue posible confirmar el cambio de etapa.'); }
+      catch (error) { b.disabled = false; U.toast(b.dataset.etapa==='emitido'?emissionErrorMessage(error):'No fue posible confirmar el cambio de etapa.'); }
     }));
     // stage actions
     back.querySelectorAll('[data-act]').forEach(b => b.addEventListener('click', async () => {
@@ -493,7 +522,7 @@ Orbit.ciclo = (function () {
         else if (a === 'emis') await decidirCierre(id, 'emision');
         else await setEtapa(id, a);
         refresh(); openNegocio(id);
-      } catch (error) { b.disabled = false; U.toast('No fue posible confirmar la operación.'); }
+      } catch (error) { b.disabled = false; U.toast(a==='emitido'?emissionErrorMessage(error):'No fue posible confirmar la operación.'); }
     }));
     // checklist
     back.querySelectorAll('[data-chk]').forEach(c => c.addEventListener('change', async () => {
@@ -586,7 +615,7 @@ Orbit.ciclo = (function () {
     if (n.etapa === 'perdido') {
       out += btn('contactado', '♻ Reactivar', 'primary');
     } else if (n.etapa === 'emitido') {
-      out += `<div class="cad-on" style="background:var(--ok-soft);color:var(--ok)">🏆 Negocio ganado y emitido.</div>`;
+      out += `<div class="cad-on" style="background:var(--ok-soft);color:var(--ok)">🏆 Negocio ganado: cliente y póliza vinculados.</div>`;
       out += btn('archivar', '📦 Archivar (cierre de mes)');
     } else {
       if (n.etapa === 'nuevo') out += btn('contactado', '📞 Marcar contactado', 'primary');
@@ -595,7 +624,7 @@ Orbit.ciclo = (function () {
       else if (n.etapa === 'propuesta') out += btn('negociacion', '🤝 Pasar a negociación', 'primary');
       else if (n.etapa === 'negociacion') { out += `<div class="muted" style="font-size:12px;margin-bottom:2px">Cierre — ¿qué sigue?</div>`; out += btn('insp', '🔍 Requiere inspección', 'primary') + btn('emis', '📝 Pasar a emisión', 'primary'); }
       else if (n.etapa === 'inspeccion') out += btn('emis', '📝 Inspección lista → emitir', 'primary');
-      else if (n.etapa === 'emision') out += btn('emitido', '🏆 Emitir y crear cliente', 'primary');
+      else if (n.etapa === 'emision') out += btn('emitido', '🏆 Emitir y vincular cliente + póliza', 'primary');
       out += btn('perder', '⛔ Marcar perdido');
     }
     return out;

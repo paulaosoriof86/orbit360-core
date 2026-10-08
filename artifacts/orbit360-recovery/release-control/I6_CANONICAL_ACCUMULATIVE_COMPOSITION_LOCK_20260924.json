@@ -2815,7 +2815,7 @@
   },
   "continuityRegisterBlobSha": "11ffaf6e7c691064be947fdc1af00b08d8fb8f9c",
   "findingContinuityGuardBlobSha": "868a0ba1a492d9adc8d91655f152b6fa7980f499",
-  "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_UAT3_P0_SOURCE_FIX_BATCH_3_SCOPE_LOCK",
+  "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_UAT3_DEFERRED_READBACK_AND_TRACE_PLAN",
   "b4003R15VisualReview": {
     "status": "PAULA_VISUAL_PARTIAL_PASS_REMEDIATION_REQUIRED",
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R15_PAULA_VISUAL_PARTIAL_ACCEPTANCE_AND_NEW_FINDINGS_20261004.json",
@@ -3943,7 +3943,7 @@
     "previewMutation": false,
     "liveMutation": false
   },
-  "recordedAt": "2026-10-08T19:42:00Z",
+  "recordedAt": "2026-10-08T20:24:00Z",
   "uat3P0SourceFixBatch2": {
     "status": "SOURCE_FIXED_STATIC_PASS_DEPLOYMENT_NOT_DISPATCHED",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_UAT3_P0_SOURCE_FIX_BATCH_2_SHARED_INBOX_20261008.json",
@@ -3976,5 +3976,30 @@
     "functionDeployment": false,
     "liveMutation": false,
     "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_UAT3_P0_SOURCE_FIX_BATCH_3_SCOPE_LOCK"
+  },
+  "uat3P0SourceFixBatch3": {
+    "status": "SOURCE_FIXED_STATIC_PASS_DEPLOYMENT_NOT_DISPATCHED",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_UAT3_P0_SOURCE_FIX_BATCH_3_COMMERCIAL_CONVERSION_20261008.json",
+    "blobSha": "8bf578365776f857d7b917e3fe815d3de48691e8",
+    "parentHead": "6f641ccd7c44ff18a5fb9ef258561dff740de7e1",
+    "scopeLockBlobSha": "22795c31d6e2131bb867eeb5366b144cfe3d017c",
+    "observations": [
+      "D-19"
+    ],
+    "productFiles": {
+      "functions/product-ops-leads-domain.js": "9df632ae9eadbec141b6b7d75ba6a0dab98ab038",
+      "orbit360-platform/core/ciclo.js": "a1f5f2e97edecea4a723ccce8024d2c9b564cf9d"
+    },
+    "staticVerification": "PASS",
+    "findingsClosed": [],
+    "sourceCorrectedPendingSyntheticE2E": [
+      "D-19"
+    ],
+    "dataMutation": false,
+    "buildDispatch": false,
+    "previewMutation": false,
+    "functionDeployment": false,
+    "liveMutation": false,
+    "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_UAT3_DEFERRED_READBACK_AND_TRACE_PLAN"
   }
 }

@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B4_EXECUTION_LOCK_V1",
-  "recordedAt": "2026-10-08T19:42:00Z",
-  "status": "B4_003_UAT3_P0_BATCH_2_SOURCE_COMPLETE_BATCH_3_SCOPE_PENDING",
+  "recordedAt": "2026-10-08T20:24:00Z",
+  "status": "B4_003_UAT3_P0_SOURCE_BATCHES_1_3_COMPLETE_EVIDENCE_PENDING",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "block": "B4",
@@ -88,7 +88,7 @@
     "previewMutationAuthorized": false,
     "functionDeploymentAuthorized": false
   },
-  "nextAction": "B4_003_UAT3_P0_SOURCE_FIX_BATCH_3_SCOPE_LOCK",
+  "nextAction": "B4_003_UAT3_DEFERRED_READBACK_AND_TRACE_PLAN",
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
     "blobSha": "68ffc370fefa5024a1c0a4857b541bdcf12f615e",
@@ -1247,5 +1247,30 @@
     "functionDeployment": false,
     "liveMutation": false,
     "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_UAT3_P0_SOURCE_FIX_BATCH_3_SCOPE_LOCK"
+  },
+  "uat3P0SourceFixBatch3": {
+    "status": "SOURCE_FIXED_STATIC_PASS_DEPLOYMENT_NOT_DISPATCHED",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_UAT3_P0_SOURCE_FIX_BATCH_3_COMMERCIAL_CONVERSION_20261008.json",
+    "blobSha": "8bf578365776f857d7b917e3fe815d3de48691e8",
+    "parentHead": "6f641ccd7c44ff18a5fb9ef258561dff740de7e1",
+    "scopeLockBlobSha": "22795c31d6e2131bb867eeb5366b144cfe3d017c",
+    "observations": [
+      "D-19"
+    ],
+    "productFiles": {
+      "functions/product-ops-leads-domain.js": "9df632ae9eadbec141b6b7d75ba6a0dab98ab038",
+      "orbit360-platform/core/ciclo.js": "a1f5f2e97edecea4a723ccce8024d2c9b564cf9d"
+    },
+    "staticVerification": "PASS",
+    "findingsClosed": [],
+    "sourceCorrectedPendingSyntheticE2E": [
+      "D-19"
+    ],
+    "dataMutation": false,
+    "buildDispatch": false,
+    "previewMutation": false,
+    "functionDeployment": false,
+    "liveMutation": false,
+    "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_UAT3_DEFERRED_READBACK_AND_TRACE_PLAN"
   }
 }
