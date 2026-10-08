@@ -1,4 +1,5 @@
 name: Gravicentra B4-003 R20 Exact Preview
+# R20 insurer draft source fix: rerun exact Preview after remote-head freeze lease mismatch.
 # R19 inbox product-canonical read-owner rootfix retrigger.
 # R19 mobile policy-search visibility rootfix retrigger.
 # R19 synthetic-child Preview-write retrigger after fail-closed lineage rootfix.
