@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B4_EXECUTION_LOCK_V1",
   "recordedAt": "2026-10-08T21:43:35.454Z",
-  "status": "B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL",
+  "status": "B4_003_R20_HUMAN_REJECTED_RENEWALS_SOURCE_FIX_AUTHORIZED",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "block": "B4",
@@ -38,10 +38,10 @@
   "activeFinding": {
     "id": "B4-003",
     "title": "Cumulative B4-003 remediation: Renovaciones, Cancelaciones and source-backed insurer knowledge.",
-    "status": "B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL",
+    "status": "PAULA_VISUAL_REJECTED_R20_CAUSAL_REMEDIATION_REQUIRED",
     "blocking": true,
-    "nextAction": "B4_003_R20_TARGETED_PAULA_VISUAL",
-    "humanVisualStatus": "PENDING_R20_TARGETED_VISUAL",
+    "nextAction": "B4_003_R20_RENEWALS_READINESS_SOURCE_FIX",
+    "humanVisualStatus": "REJECTED_R20_20261008",
     "knowledgePreview": true
   },
   "rules": {
@@ -54,18 +54,24 @@
     "productMutationRequiresCausalDefect": true,
     "sourceChangeRequiresNewImmutableCandidate": true,
     "livePromotionForbiddenUntilB4FinalAcceptance": true,
-    "productMutationAuthorized": false,
-    "allowedProductFiles": [],
-    "buildDispatchAuthorized": true,
-    "previewMutationAuthorized": true,
-    "functionDeploymentAuthorized": true
+    "productMutationAuthorized": true,
+    "allowedProductFiles": [
+      "orbit360-platform/modules/renovaciones.js",
+      "orbit360-platform/index.html"
+    ],
+    "buildDispatchAuthorized": false,
+    "previewMutationAuthorized": false,
+    "functionDeploymentAuthorized": false
   },
   "boundaries": {
     "businessWritesAuthorized": false,
     "configWritesAuthorized": false,
     "dataMutationAuthorized": false,
-    "productMutationAuthorized": false,
-    "allowedProductFiles": [],
+    "productMutationAuthorized": true,
+    "allowedProductFiles": [
+      "orbit360-platform/modules/renovaciones.js",
+      "orbit360-platform/index.html"
+    ],
     "reimportAuthorized": false,
     "livePromotionAuthorized": false,
     "syntheticQaWritesAuthorized": false,
@@ -90,12 +96,12 @@
     "renewabilityDataMutationAuthorized": false,
     "authorizedDataMutation": "NONE_POST_B02_APPLY_PASS",
     "renewabilityApplyRepeatAuthorized": false,
-    "buildDispatchAuthorized": true,
-    "previewMutationAuthorized": true,
-    "functionDeploymentAuthorized": true,
+    "buildDispatchAuthorized": false,
+    "previewMutationAuthorized": false,
+    "functionDeploymentAuthorized": false,
     "renewalCutoffDataMutationAuthorized": false
   },
-  "nextAction": "B4_003_R20_TARGETED_PAULA_VISUAL",
+  "nextAction": "B4_003_R20_RENEWALS_READINESS_SOURCE_FIX",
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
     "blobSha": "71e71175036804318fd9278a85ab29e5d57051f9",
@@ -274,7 +280,7 @@
     "livePromotion": false
   },
   "visualAcceptance": {
-    "status": "HUMAN_UAT3_REJECTED",
+    "status": "HUMAN_R20_REJECTED_CAUSAL_SOURCE_FIX_ACTIVE",
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_VISUAL_ACCEPTANCE_GOVERNANCE_REPAIR_20261003.json",
     "receiptBlobSha": "b6c18ae40d86ff0cdc3003e7201ead3de3d7d745",
     "machinePassMayAdvanceFinding": false,
@@ -286,8 +292,8 @@
     "nextFindingHeld": "B4-004",
     "requiredBeforeAdvance": "B4_003_P0_CAUSAL_REMEDIATION_AND_TARGETED_HUMAN_ACCEPTANCE",
     "advanceAuthorized": false,
-    "currentB4003HumanStatus": "REJECTED_UAT3_20261008",
-    "humanVisualStatus": "REJECTED_UAT3_20261008"
+    "currentB4003HumanStatus": "REJECTED_R20_20261008",
+    "humanVisualStatus": "REJECTED_R20_20261008"
   },
   "r7CumulativeFreeze": {
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R7_CUMULATIVE_PLAN_FINDINGS_PREMIUM_AND_MANUAL_ACTION_LOCK_20261003.json",
@@ -566,8 +572,8 @@
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_RENEWAL_KPI_PARITY_CAUSAL_ADDENDUM_20261005.json",
     "blobSha": "87bab7ee2778a0525cdbe81cf4cbf82020bf6139"
   },
-  "findingLedgerBlobSha": "464cbda4b2ac27388e4c181d852339e23befc526",
-  "continuityRegisterBlobSha": "a7991cdcc14a0650c1f608aa970e39b47f956cac",
+  "findingLedgerBlobSha": "6c0b06f23b6fd1e882a4b9b14f03c7dc601fec36",
+  "continuityRegisterBlobSha": "141ad8a0a1572ad0dcec86c95fdcbbcb7ef706bd",
   "compositionLockBlobSha": "215e8cd9087addbb49e18f08067b566af7c0f06e",
   "r18SourceFix": {
     "status": "SOURCE_FIXED_R18_PENDING_CONTRACT_AND_EXACT_PREVIEW",
@@ -640,7 +646,7 @@
     "carryBlobSha": "de9b2d94a70cd580f565b81f2fd03a32241afdec",
     "masterPlanBlobSha": "64f9b11ade950b4c2734265d2c6b3ecfed3a6976"
   },
-  "productMutationAuthorized": false,
+  "productMutationAuthorized": true,
   "dataMutationAuthorized": false,
   "reimportAuthorized": false,
   "livePromotionAuthorized": false,
@@ -684,26 +690,8 @@
     "productSourceChanged": false
   },
   "allowedProductFiles": [
-    "orbit360-platform/core/ciclo.js",
-    "orbit360-platform/modules/calidad.js",
-    "orbit360-platform/modules/polizas.js",
     "orbit360-platform/modules/renovaciones.js",
-    "orbit360-platform/core/policy-receipts-engine.js",
-    "orbit360-platform/modules/aseguradoras.js",
-    "orbit360-platform/styles/infra.css",
-    "orbit360-platform/index.html",
-    "orbit360-platform/modules/inicio.js",
-    "functions/product-ops-leads-domain.js",
-    "functions/ops-advisor-inbox.js",
-    "functions/notification-outbox-processor.js",
-    "orbit360-platform/core/auth-product-runtime-p0.js",
-    "orbit360-platform/core/product-app-p0.js",
-    "orbit360-platform/core/product-hydration-required-optional-p0.js",
-    "orbit360-platform/data/store-firestore-product-readonly-p0.js",
-    "orbit360-platform/core/backend-product-readonly-bootstrap-p0.js",
-    "orbit360-platform/core/product-drive-document-provider-p0.js",
-    "functions/product-operational-domain.js",
-    "functions/document-drive-domain.js"
+    "orbit360-platform/index.html"
   ],
   "r20Diagnostic": {
     "status": "FROZEN_SOURCE_FIX_AUTHORIZED",
@@ -1456,5 +1444,10 @@
     ],
     "dataMutation": false,
     "livePromotion": false
+  },
+  "r20PostMachineUat": {
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_RENEWALS_READINESS_SOURCE_AUTHORIZATION_20261008.json",
+    "receiptBlobSha": "0856ed8c80cdae8ac8e73bb83322dc0e8c41a46e",
+    "approvedNarrowSourceOnly": true
   }
 }

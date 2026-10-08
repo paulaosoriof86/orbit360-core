@@ -1,0 +1,72 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R20_RENEWALS_READINESS_SOURCE_AUTHORIZATION_V1",
+  "date": "2026-10-08",
+  "status": "AUTHORIZED_NARROW_CAUSAL_SOURCE_FIX_ONLY",
+  "authority": "PAULA_CONTINUE_AFTER_HUMAN_R20_REJECTION",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "sourceHeadBefore": "4d7be449476fc6b05fab53dad604e2e948b83ef7",
+  "review": {
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_PAULA_POST_MACHINE_UAT_REJECTION_20261008.json",
+    "receiptBlobSha": "a397e5dd41dddfc695e5e8fcbe15e9eadbff946b",
+    "humanStatus": "REJECTED",
+    "machineProof": {
+      "runId": 37856707824,
+      "sourceSha": "eca954e193d70113735e33884ba18d6de2ad3e52",
+      "status": "MACHINE_PASS_PRESERVED_NOT_HUMAN_APPROVED"
+    }
+  },
+  "historicalPaymentAcceptance": {
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_TARGETED_PAULA_VISUAL_PASS_20261002.json",
+    "receiptBlobSha": "af109989486792a4f5cb1182dbb595b3aca5c8e3",
+    "status": "PASS_PRESERVED",
+    "sourceSha": "dcd2b3f60b98ad96c94933f09da9e8478ea165c3",
+    "paymentProjectionFile": "orbit360-platform/core/queries.js",
+    "acceptedGitBlobSha": "7ff1b3cdf9091ffcab864a247433e19c2f1d06be",
+    "r20GitBlobSha": "7ff1b3cdf9091ffcab864a247433e19c2f1d06be",
+    "adjudication": "NO_SOURCE_REGRESSION_DEMONSTRATED_NO_PAYMENT_REOPEN",
+    "conciliacionesViewFile": "orbit360-platform/modules/conciliaciones.js",
+    "conciliationAcceptedBlobSha": "e0c4ef051fadb033e1a66ac4f0db67a52186ed25",
+    "conciliationR20BlobSha": "e0c4ef051fadb033e1a66ac4f0db67a52186ed25"
+  },
+  "defect": {
+    "findingId": "B4-003-R14-01-RENEWALS-FIRST-PAINT-READINESS",
+    "humanEffect": "Authenticated Dirección user reached terminal Renewals error: Aseguradoras not server confirmed",
+    "sourceFile": "orbit360-platform/modules/renovaciones.js",
+    "sourceBlobSha": "8e3bc32aa5ac5f577f545700d39499970c2edeaf",
+    "rootCause": "RENEWAL_PIPELINE_GATE_UNNECESSARILY_REQUIRES_OPTIONAL_INSURER_DIRECTORY_SERVER_SNAPSHOT_AND_DOES_NOT_RERENDER_WHEN_REQUIRED_COLLECTIONS_LATE_CONFIRM",
+    "scope": "Render only after policies+clients are server-confirmed; insurer directory remains optional read-only enrichment with truthful missing-name label; preserve policy/renewability/terminal dispositions and role/country filters."
+  },
+  "allowedProductFiles": [
+    "orbit360-platform/modules/renovaciones.js",
+    "orbit360-platform/index.html"
+  ],
+  "allowedQaFiles": [
+    "tools/gravicentra-i6-5-b4-003-contract.mjs",
+    "tools/gravicentra-i6-5-b4-003-preview-proof.mjs"
+  ],
+  "businessDataMutation": false,
+  "cobrosWrites": false,
+  "receiptsWrites": false,
+  "policyWrites": false,
+  "reimport": false,
+  "productionPromotion": false,
+  "releaseIdentityRule": "SOURCE_CHANGE_REQUIRES_NEW_IMMUTABLE_PREVIEW_ARTIFACT_AND_EXACT_READBACK",
+  "noNewRepoBranchFirebase": true,
+  "priorB3B4ApprovedEvidencePreservedUnlessCausalProof": true,
+  "requiredStaticTests": [
+    "Policy+Client server-confirmed snapshot required",
+    "Insurer snapshot not a blocking dependency",
+    "Late policy/client confirmation re-renders when route still active",
+    "Unconfirmed policy universe remains fail-closed",
+    "0 changes to financial owner/queries.js and Cobros/Receipts"
+  ],
+  "requiredRuntimeTests": [
+    "Cold/warm Direccion+Operativo+Asesor scope in exact Preview",
+    "TODOS GT CO real policy ID canonical buckets",
+    "No insurer optional source timeout that hides entire pipeline",
+    "viewport 1440/390/320 and no relevant browser errors",
+    "Production unchanged and no real writes"
+  ],
+  "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_R20_SOURCE_FIX"
+}

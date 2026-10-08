@@ -3,8 +3,8 @@
   "recordedAt": "2026-10-08T21:43:35.454Z",
   "authority": "FAIL_CLOSED_FINDING_CONTINUITY",
   "sourceLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-  "sourceLedgerPreviousBlobSha": "519a9edb03b6ac88848d90bf427e0dc7c83c60b1",
-  "expectedLedgerNextBlobSha": "464cbda4b2ac27388e4c181d852339e23befc526",
+  "sourceLedgerPreviousBlobSha": "8efab97941a96f358cebf16bddcfb85a7bba9151",
+  "expectedLedgerNextBlobSha": "6c0b06f23b6fd1e882a4b9b14f03c7dc601fec36",
   "policy": {
     "allLedgerFindingsMustAppearExactlyOnce": true,
     "newHumanFindingsMustBeIndividualLedgerEntries": true,
@@ -2951,7 +2951,7 @@
       "block": "B4",
       "source": "FROZEN_PLAN",
       "finding": "Cumulative B4-003 remediation: lifecycle, premium/source authority, Information Health, insurer knowledge and Gravicentra↔CotComp Quote Authority.",
-      "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
+      "status": "PAULA_VISUAL_REJECTED_R20_CAUSAL_REMEDIATION_REQUIRED",
       "blocking": true,
       "mayDisappearWithoutDisposition": false,
       "humanEvidence": [
@@ -2989,7 +2989,7 @@
         "Exact Preview: Cliente 360 has bidirectional tab navigation.",
         "Exact Preview: Calidad respects global country and synchronous render path is measured under 2500 ms in authenticated harness."
       ],
-      "nextAction": "B4_003_R20_TARGETED_PAULA_VISUAL",
+      "nextAction": "B4_003_R20_RENEWALS_READINESS_SOURCE_FIX",
       "rootCause": "RENEWALS_CANCELATIONS_MULTI_CAUSAL_SOURCE_GAPS_WITH_CANONICAL_POLICY_PROJECTION_GAP",
       "causeClassification": "PRODUCT_LOGIC_DEFECT_DEMONSTRATED",
       "evidence": {
@@ -3040,7 +3040,7 @@
       "sourceFixR4ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CAUSAL_SOURCE_FIX_R4_CANONICAL_POLICY_PROJECTION_20261003.json",
       "sourceFixR4ReceiptBlobSha": "05678425b7b2a0a0c334aac01e429c2c3d6445f0",
       "sourceFixR4SourceHead": "597ac785fa5a7affa128dbb143a6c274f55dba6c",
-      "humanVisualStatus": "PENDING_R20_TARGETED_VISUAL",
+      "humanVisualStatus": "REJECTED_R20_20261008",
       "visualGovernanceRepairPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_VISUAL_ACCEPTANCE_GOVERNANCE_REPAIR_20261003.json",
       "visualGovernanceRepairBlobSha": "b6c18ae40d86ff0cdc3003e7201ead3de3d7d745",
       "machineProofReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_MACHINE_PROOF_20261007.json",
@@ -3241,7 +3241,15 @@
       "r20FollowupSourceFixPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_FOLLOWUP_CUMULATIVE_SOURCE_FIX_20261007.json",
       "r20FollowupSourceFixBlobSha": "360542cca021b187cda638c3742dff8353137416",
       "machineProofStatusPreserved": "MACHINE_PASS_EVIDENCE_FROM_PRIOR_CANDIDATE_ONLY",
-      "secondReviewState": "SOURCE_FIXED_PENDING_NEW_EXACT_PREVIEW"
+      "secondReviewState": "SOURCE_FIXED_PENDING_NEW_EXACT_PREVIEW",
+      "r20PostMachineUat": {
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_RENEWALS_READINESS_SOURCE_AUTHORIZATION_20261008.json",
+        "receiptBlobSha": "0856ed8c80cdae8ac8e73bb83322dc0e8c41a46e",
+        "visual": "REJECTED",
+        "machineProofPreservedRunId": 37856707824,
+        "financialB3PassPreserved": true,
+        "sourceMutationsExecuted": false
+      }
     },
     {
       "id": "B4-004",
@@ -8004,18 +8012,18 @@
         "orbit360-platform/modules/renovaciones.js",
         "orbit360-platform/core/router.js"
       ],
-      "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
+      "status": "PAULA_VISUAL_REJECTED_R20_CAUSAL_REMEDIATION_REQUIRED",
       "blocking": true,
       "targetGate": "B4-003",
       "closureCondition": "Exact Preview first paint shows stable loading until authoritative renewal dependencies are ready, then one coherent populated render.",
       "preLiveRequired": true,
-      "nextAction": "B4_003_TARGETED_PAULA_VISUAL",
+      "nextAction": "B4_003_R20_RENEWALS_READINESS_SOURCE_FIX",
       "classification": "PRODUCT_HYDRATION_PRESENTATION_DEFECT_DEMONSTRATED",
       "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R14_PAULA_VISUAL_REJECTION_AND_CAUSAL_DIAGNOSTIC_20261004.json",
       "diagnosticReceiptBlobSha": "966740ec45a6dda25da0da5f256531ed34ab846b",
       "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R14_NARROW_SOURCE_FIX_20261004.json",
       "sourceFixReceiptBlobSha": "df10f1bc9c5498fd74ab1a5732726813e6cbaea9",
-      "humanVisualStatus": "PENDING_AFTER_MACHINE_PASS",
+      "humanVisualStatus": "REJECTED_R20_20261008",
       "machinePassRunId": 37187722951,
       "machinePassSourceSha": "7aa67243cd0bb26c79cb2e0540f8fbd176321379",
       "r16SourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R16_COMPREHENSIVE_SOURCE_FIX_20261004.json",
@@ -8038,7 +8046,13 @@
         "priorStatusPreserved": true,
         "noAutomaticPass": true
       },
-      "preUat3Blocking": true
+      "preUat3Blocking": true,
+      "r20PostMachineUat": {
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_RENEWALS_READINESS_SOURCE_AUTHORIZATION_20261008.json",
+        "receiptBlobSha": "0856ed8c80cdae8ac8e73bb83322dc0e8c41a46e",
+        "sourceFile": "orbit360-platform/modules/renovaciones.js",
+        "proof": "NOT_YET_RETESTED"
+      }
     },
     {
       "id": "B4-003-R14-02-RENEWALS-EXPIRED-OUTCOME-CONTINUITY",
@@ -12482,5 +12496,11 @@
     "inventoryCountUnchanged": true,
     "attentionIdsUnchanged": true,
     "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_UAT3_P0_SOURCE_FIX_SCOPE_LOCK"
+  },
+  "r20PostMachineUat": {
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_RENEWALS_READINESS_SOURCE_AUTHORIZATION_20261008.json",
+    "receiptBlobSha": "0856ed8c80cdae8ac8e73bb83322dc0e8c41a46e",
+    "exactReconciliation": true,
+    "financialB3PassPreserved": true
   }
 }
