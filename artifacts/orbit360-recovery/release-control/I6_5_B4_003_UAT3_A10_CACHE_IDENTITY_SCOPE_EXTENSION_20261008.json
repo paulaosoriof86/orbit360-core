@@ -1,0 +1,23 @@
+{
+  "schema": "gravicentra-b4-003-uat3-a10-cache-identity-scope-extension-v1",
+  "recordedAt": "2026-10-08",
+  "status": "SOURCE_SCOPE_EXTENSION_LOCKED",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "parentHead": "09236c5c68efca44e26b41dd5eab1bcea23a2f20",
+  "observationId": "A-10",
+  "allowedFiles": [
+    "orbit360-platform/index.html"
+  ],
+  "allowedChange": "Bump only the cache identity of backend-lab-receipts-portfolio-native-bridge-v20260801.js so the responsive source fix is fetched.",
+  "prohibited": [
+    "No script order change",
+    "No other asset version change",
+    "No build, deploy, Preview or LIVE mutation"
+  ],
+  "verification": [
+    "Exact one-file diff",
+    "Physical branch readback"
+  ],
+  "nextAction": "I6_5_B4_003_UAT3_A10_CACHE_IDENTITY_BUMP"
+}
