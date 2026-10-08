@@ -4869,8 +4869,8 @@
       "entryGuardReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_ENTRY_GUARD_PASS_20261002.json",
       "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
       "executionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B4_EXECUTION_LOCK_20261002.json",
-      "executionLockBlobSha": "5038d015295b1c3f096748cc8703d1d6d08666e0",
-      "compositionLockBlobSha": "9daea043563be3cefb9f0e2fba686aad489eb47a",
+      "executionLockBlobSha": "710f22213ff64e785686f8806a56cac9db9dd558",
+      "compositionLockBlobSha": "215e8cd9087addbb49e18f08067b566af7c0f06e",
       "findingLedgerBlobSha": "519a9edb03b6ac88848d90bf427e0dc7c83c60b1",
       "activeFindingId": "B4-003",
       "productSourceSha": "c603fd3561e7229d9359db45495d4cf2d757cd8f",
@@ -6234,8 +6234,8 @@
     "status": "B4_003_R20_RENEWAL_CUTOFF_APPLY_AUTHORIZED",
     "activeFindingId": "B4-003",
     "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
-    "executionLockBlobSha": "5038d015295b1c3f096748cc8703d1d6d08666e0",
-    "compositionLockBlobSha": "087e4ccfdbf17a7a5d67538b1fba796dfa5244e1",
+    "executionLockBlobSha": "710f22213ff64e785686f8806a56cac9db9dd558",
+    "compositionLockBlobSha": "215e8cd9087addbb49e18f08067b566af7c0f06e",
     "findingLedgerBlobSha": "0f2d6916537fb3f69ad4e03b947ccd4e4c5b02f7",
     "noLive": true,
     "noReimport": true,
@@ -7604,7 +7604,7 @@
     "extendsPlanV2": true,
     "conversationDependent": false
   },
-  "compositionLockBlobSha": "087e4ccfdbf17a7a5d67538b1fba796dfa5244e1",
+  "compositionLockBlobSha": "215e8cd9087addbb49e18f08067b566af7c0f06e",
   "findingLedgerBlobSha": "0f2d6916537fb3f69ad4e03b947ccd4e4c5b02f7",
   "continuityRegisterBlobSha": "bbd84d4374160984b1e8840b02df5e0c63ba6c7c",
   "r16PerformanceRegression": {
@@ -8469,6 +8469,13 @@
       "status": "REPAIRED_RETRY_REQUESTED",
       "governanceGuardBlobSha": "35e621e6c25ab7bf2253ea070dff932e84155832",
       "executionLockBlobSha": "5038d015295b1c3f096748cc8703d1d6d08666e0"
+    },
+    "compositionReconciliation": {
+      "status": "PASS_RETRY_REQUESTED",
+      "compositionLockBlobSha": "215e8cd9087addbb49e18f08067b566af7c0f06e",
+      "executionLockBlobSha": "710f22213ff64e785686f8806a56cac9db9dd558",
+      "priorFailedRunId": 37835749538,
+      "priorFailureCode": "I6_CANONICAL_COMPOSITION_BLOB_DRIFT"
     }
   }
 }
