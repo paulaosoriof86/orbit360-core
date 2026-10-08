@@ -1,0 +1,168 @@
+{
+  "schema": "gravicentra-paula-release-priority-freeze-v1",
+  "recordedAt": "2026-10-08T21:15:00Z",
+  "status": "FROZEN_USER_AUTHORITY_ACTIVE",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "purpose": "Physical release scheduling authority independent of conversation memory. It governs execution order without deleting, downgrading or inventing findings.",
+  "authority": {
+    "owner": "Paula",
+    "instruction": "Prioritize Renewals first; then Upsells/Leads/Ops; keep Insurers/knowledge and Quality advancing in parallel without blocking release unless a proven critical condition requires escalation; then exact Preview validation and same-artifact production promotion.",
+    "conversationIsNotOperationalAuthority": true,
+    "thisFileIsOperationalAuthority": true
+  },
+  "executionOrder": [
+    {
+      "order": 1,
+      "id": "RENEWALS_RELEASE_BLOCKING",
+      "blocking": true,
+      "observations": [
+        "B-01",
+        "B-02",
+        "B-03",
+        "B-04"
+      ],
+      "currentState": {
+        "sourceFixedStaticPass": [
+          "B-01",
+          "B-03",
+          "B-04"
+        ],
+        "pending": [
+          "B-02",
+          "EXACT_PREVIEW_FUNCTIONAL_PROOF"
+        ]
+      },
+      "exit": "B-02 receives an evidence-backed disposition and any separately authorized data operation is read back; B-01/B-03/B-04 and B-02 pass authenticated cold/warm and 390/320 viewport proof on the exact Preview artifact."
+    },
+    {
+      "order": 2,
+      "id": "UPSELLS_LEADS_OPS_RELEASE_BLOCKING",
+      "blocking": true,
+      "observations": [
+        "D-01",
+        "D-02",
+        "D-03",
+        "D-04",
+        "D-05",
+        "D-07",
+        "D-08",
+        "D-11",
+        "D-12",
+        "D-13",
+        "D-14",
+        "D-15",
+        "D-17",
+        "D-18",
+        "D-19"
+      ],
+      "currentState": {
+        "sourceFixedStaticPass": [
+          "D-01",
+          "D-02",
+          "D-03",
+          "D-05",
+          "D-07",
+          "D-08",
+          "D-11",
+          "D-12",
+          "D-13",
+          "D-14",
+          "D-17",
+          "D-19"
+        ],
+        "evidenceOrFixturePending": [
+          "D-04",
+          "D-15",
+          "D-18"
+        ],
+        "previewProofPending": true
+      },
+      "exit": "Remaining evidence/fixture decisions are resolved and the full impacted commercial workflow passes authenticated exact-Preview proof."
+    },
+    {
+      "order": 3,
+      "id": "INSURERS_KNOWLEDGE_PARALLEL_NONBLOCKING",
+      "blocking": false,
+      "observations": [
+        "C-06",
+        "C-07",
+        "C-08",
+        "C-14"
+      ],
+      "scope": "Continue accumulating and validating insurer products, tariffs, currencies, taxes, coverage, deductibles, renewal rules, provenance and validity for current insurer surfaces and the future quote engine.",
+      "escalationRule": "May interrupt release order only when evidence proves a critical defect in a calculation or flow currently used in production."
+    },
+    {
+      "order": 4,
+      "id": "QUALITY_PARALLEL_NONBLOCKING",
+      "blocking": false,
+      "observations": [
+        "A-07",
+        "A-08",
+        "A-09",
+        "A-10",
+        "A-11",
+        "A-13"
+      ],
+      "escalationRule": "May interrupt release order only when evidence proves financial corruption, a security defect or a daily-operational blocker."
+    },
+    {
+      "order": 5,
+      "id": "EXACT_PREVIEW_TO_PRODUCTION",
+      "blocking": true,
+      "sequence": [
+        "CUMULATIVE_SOURCE_COMPLETE",
+        "SEPARATELY_AUTHORIZED_BUILD_AND_PREVIEW",
+        "AUTHENTICATED_FUNCTIONAL_TESTS",
+        "PAULA_TARGETED_VISUAL_ACCEPTANCE",
+        "SAME_IMMUTABLE_ARTIFACT_TO_LIVE",
+        "LIVE_READBACK_AND_SMOKE"
+      ],
+      "exit": "Production runs the exact accepted artifact with matching backend lineage and successful readback."
+    }
+  ],
+  "schedulingRules": {
+    "internalSeverityLabelsDoNotOverrideThisOrder": true,
+    "findingsRemainPreserved": true,
+    "priorityDoesNotEqualDeletionOrClosure": true,
+    "noNewMicroBatchesWithoutIndependentCriticalCause": true,
+    "doNotReopenCompletedSourceFixesWithoutContradictoryEvidence": true,
+    "parallelTracksMustNotDelayBlockingTracks": true,
+    "communicateProgressInMeaningfulBusinessBlocks": true
+  },
+  "renewalReconciliation": {
+    "priorRenewabilityApply": {
+      "status": "PASS_APPLY",
+      "writes": 1415,
+      "resultPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_RENEWABILITY_APPLY_RESULT_20261006.json",
+      "note": "Completed classification apply; must not be repeated."
+    },
+    "currentB02": {
+      "status": "SEPARATE_CUTOFF_DISPOSITION_DECISION_PENDING",
+      "dryRunPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_SECOND_REVIEW_DATA_DRYRUNS_20261007.json",
+      "oldExpiredOpenCandidates": 583,
+      "recentExpiredOpenCandidates": 24,
+      "proposedCutoff": "2026-07-31",
+      "note": "This is distinct from the completed 1415-policy renewability classification. No apply is authorized by this freeze."
+    }
+  },
+  "explicitExclusions": [
+    {
+      "item": "Logo Bolita V2025 sin fondo.png",
+      "disposition": "NOT_REPORTED_NOT_A_FINDING_NO_ACTION",
+      "rule": "A transient local reader error must never create work, priority or source mutation."
+    }
+  ],
+  "mutationBoundaries": {
+    "sourceWorkWithinExistingAuthorizedScopes": true,
+    "dataMutationAuthorized": false,
+    "businessWritesAuthorized": false,
+    "buildDispatchAuthorized": false,
+    "previewMutationAuthorized": false,
+    "functionDeploymentAuthorized": false,
+    "livePromotionAuthorized": false,
+    "reimportAuthorized": false
+  },
+  "nextAction": "I6_5_B4_003_RENEWALS_BLOCKING_CLOSEOUT"
+}
