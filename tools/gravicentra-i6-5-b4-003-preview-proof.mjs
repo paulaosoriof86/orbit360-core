@@ -1250,6 +1250,9 @@ try{
  proof.assertions.collaborationCanonicalIdentityAndTimestamp=true;
 
  // R13: controlled insurer Drive E2E on one disposable B4003 QA insurer only.
+ // The ficha owner requires a host established by the module's canonical router.
+ await page.evaluate(()=>{location.hash='#/aseguradoras';});
+ await page.waitForFunction(()=>window.Orbit?.route?.key==='aseguradoras'&&!!document.querySelector('#host .page'),null,{timeout:10000});
  await page.waitForFunction(id=>{
    const st=Orbit.store&&typeof Orbit.store._productStatus==='function'?Orbit.store._productStatus():{};
    return (st.serverConfirmedCollections||[]).includes('aseguradoras')&&!!Orbit.store.get('aseguradoras',id);
