@@ -286,7 +286,9 @@ async function renewalDistributionReadback(){
  ]);
  const now=new Date();now.setHours(0,0,0,0);
  const clientById=new Map(clientSnap.docs.map(d=>[d.id,{id:d.id,...d.data()}]));
- const rows=snap.docs.map(d=>({id:d.id,...d.data()})).filter(x=>!String(x.id).startsWith('b4003qa_')&&!String(x.id).startsWith('b4_')&&x.__syntheticQa!==true&&!r20QaHoldIds.has(String(x.id)));
+ const rawRows=snap.docs.map(d=>({id:d.id,...d.data()}));
+ const excludedSyntheticIds=rawRows.filter(x=>x.__syntheticQa===true).map(x=>String(x.id)).filter(Boolean).sort();
+ const rows=rawRows.filter(x=>!String(x.id).startsWith('b4003qa_')&&!String(x.id).startsWith('b4_')&&x.__syntheticQa!==true&&!r20QaHoldIds.has(String(x.id)));
  const state=p=>{
   if(!Object.prototype.hasOwnProperty.call(p,'renovable')||p.renovable==null||clean(p.renovable)==='')return'UNKNOWN';
   const v=clean(p.renovable).toLowerCase();
@@ -335,7 +337,7 @@ async function renewalDistributionReadback(){
      proposedPatch:{renovable:true,renewabilityProvenance:'source_report',renewabilitySourceSha256:renewalSourceAuthority.sourceSha256}
    });
  });
- proof.realRenewalDistribution={policyCount:rows.length,byState,byCountry,buckets,eligibleCount:eligible.length,eligibleIds:eligible.map(x=>x.id),sample:eligible.slice(0,30),readOnly:true};
+ proof.realRenewalDistribution={policyCount:rows.length,byState,byCountry,buckets,eligibleCount:eligible.length,eligibleIds:eligible.map(x=>x.id),excludedSyntheticIds,excludedQaHoldIds:[...r20QaHoldIds].sort(),sample:eligible.slice(0,30),readOnly:true};
  proof.r13RenewalSourceDryRun={
    source:renewalSourceAuthority,
    matches:sourceMatches,
@@ -1156,7 +1158,8 @@ try{
    return{allIds,realIds,kpis};
  },ids);
  const expectedRenewals=[...(proof.realRenewalDistribution.eligibleIds||[])].sort();
- const visibleRenewals=[...proof.r13RenewalReality.realIds].sort();
+ const excludedRenewalIds=new Set([...(proof.realRenewalDistribution.excludedSyntheticIds||[]),...(proof.realRenewalDistribution.excludedQaHoldIds||[])]);
+ const visibleRenewals=[...proof.r13RenewalReality.realIds].filter(id=>!excludedRenewalIds.has(id)).sort();
  if(proof.realRenewalDistribution.eligibleCount>0){
    need(JSON.stringify(visibleRenewals)===JSON.stringify(expectedRenewals),'B4_003_R13_REAL_RENEWAL_PIPELINE_MISMATCH:'+JSON.stringify({expected:expectedRenewals.length,visible:visibleRenewals.length,expectedSample:expectedRenewals.slice(0,20),visibleSample:visibleRenewals.slice(0,20)}));
    proof.assertions.realRenewalPipelineRepopulated=true;

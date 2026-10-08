@@ -1,0 +1,48 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_REAL_RENEWAL_UNIVERSE_SYNTHETIC_DISCRIMINANT_ROOTFIX_V1",
+  "recordedAt": "2026-10-08T22:12:30Z",
+  "status": "PROOF_ROOTFIXED_PENDING_EXACT_PREVIEW",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "parentHead": "a9b302ec150bff0497783e10c2900e218e357f45",
+  "failedRun": {
+    "id": 37851440378,
+    "jobId": 113565035887,
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-37851440378-92pbbndz.web.app",
+    "error": "B4_003_R13_REAL_RENEWAL_PIPELINE_MISMATCH",
+    "observed": {
+      "expectedReal": 63,
+      "visibleNamedAsReal": 65,
+      "extraVisibleIds": [
+        "pol_7a25801a130c2d459155ff6f278d",
+        "pol_866eebe50ec3ce9463f67cd63a62"
+      ],
+      "extraRowsServerMarkedSynthetic": true,
+      "missingExpected": 0,
+      "cleanupWrites": 18,
+      "syntheticFinalAbsent": true,
+      "liveByteStable": true
+    }
+  },
+  "cause": {
+    "classification": "STALE_ID_PREFIX_ONLY_SYNTHETIC_DISCRIMINANT",
+    "detail": "The browser comparison excluded current b4003qa-prefixed fixtures but classified two older server-marked __syntheticQa rows as real because their generated IDs use the pol_ prefix.",
+    "productRegression": false
+  },
+  "correction": {
+    "path": "tools/gravicentra-i6-5-b4-003-preview-proof.mjs",
+    "previousBlobSha": "7d36ef2cf2cb58c4a49594c91315aa016bf511f0",
+    "correctedBlobSha": "9fe1be5dcf02179ac32d7768b06128bbd1e4d64f",
+    "scope": "Carry server-marked synthetic IDs and known QA holds into the real-universe comparison; do not delete, mutate, or hide any record."
+  },
+  "boundaries": {
+    "productSourceChanged": false,
+    "dataMutation": false,
+    "businessWrites": false,
+    "syntheticQaWritesThisCommit": false,
+    "recordDeletion": false,
+    "livePromotion": false,
+    "reimport": false
+  },
+  "nextAction": "B4_003_R20_CONTRACT_AND_EXACT_PREVIEW"
+}
