@@ -1,0 +1,68 @@
+{
+  "schema": "gravicentra-b4-003-b02-renewal-cutoff-apply-auth-v1",
+  "recordedAt": "2026-10-08T21:38:00Z",
+  "status": "AUTHORIZED_PENDING_APPLY",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "authority": {
+    "owner": "Paula",
+    "decision": "AUTHORIZE_EXACT_583",
+    "capturedAt": "2026-10-08T21:35:00Z",
+    "scope": "Apply No renovada disposition only to the exact 583-policy dry-run target set through 2026-07-31."
+  },
+  "priorityAuthority": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PAULA_RELEASE_PRIORITY_FREEZE_20261008.json",
+    "blobSha": "fab0103ffeb10690160eef276e48bd648db998d7"
+  },
+  "decisionPack": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_B02_RENEWAL_CUTOFF_APPLY_DECISION_PACK_20261008.json",
+    "blobSha": "d9b51a847d0d39bcc8591d9e8ac16e6db52a9ed9",
+    "commit": "fba8af2672b861d84974b730b421c981a8552428"
+  },
+  "dryRun": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_SECOND_REVIEW_DATA_DRYRUNS_20261007.json",
+    "blobSha": "65f48ab5decb113f6551d5b0f68f994ff00fe7a4",
+    "projectId": "ays-orbit-360-lab",
+    "tenantId": "alianzas-soluciones",
+    "cutoff": "2026-07-31",
+    "recentStart": "2026-08-01",
+    "observedThrough": "2026-10-06",
+    "targetCount": 583,
+    "targetDigest": "744f6f26139f272fa3a26ab35e889a9d011833e802d1495286147734ec7b4d1d",
+    "recentCount": 24,
+    "recentDigest": "3512b167cdde30b51f67acc3c77135f2a94df5f133fd2d3b45cde8540938e67a"
+  },
+  "rule": {
+    "ruleId": "PAULA_EXPIRED_CUTOFF_20261007",
+    "patch": {
+      "renovacionEstado": "No renovada",
+      "renewalDispositionRuleId": "PAULA_EXPIRED_CUTOFF_20261007",
+      "renewalDispositionReason": "VIGENCIA_FIN_HASTA_2026_07_31_SIN_RENOVACION_NI_CANCELACION"
+    },
+    "allowedFields": [
+      "renovacionEstado",
+      "renewalDispositionRuleId",
+      "renewalDispositionReason"
+    ]
+  },
+  "authorization": {
+    "maxWrites": 583,
+    "exactTargetDigestRequired": true,
+    "recent24Untouched": true,
+    "prewriteRecomputeRequired": true,
+    "allTargetReadbackRequired": true,
+    "rollbackOnFailureRequired": true,
+    "noInserts": true,
+    "noDeletes": true,
+    "noReimport": true,
+    "noLivePromotion": true,
+    "buildDispatchAuthorized": false,
+    "previewMutationAuthorized": false
+  },
+  "priorRenewabilityApply": {
+    "status": "PASS_DO_NOT_REPEAT",
+    "writes": 1415,
+    "resultBlobSha": "67d8d480bd85314a01611f5154919c587854af55"
+  },
+  "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_R20_RENEWAL_CUTOFF_APPLY"
+}
