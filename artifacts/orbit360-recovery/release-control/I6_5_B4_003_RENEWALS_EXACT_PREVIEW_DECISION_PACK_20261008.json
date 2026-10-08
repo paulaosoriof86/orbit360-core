@@ -1,0 +1,81 @@
+{
+  "schema": "gravicentra-b4-003-renewals-exact-preview-decision-pack-v1",
+  "recordedAt": "2026-10-08T20:09:00Z",
+  "status": "READY_FOR_PAULA_DECISION_NOT_AUTHORIZED",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "priorityAuthority": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PAULA_RELEASE_PRIORITY_FREEZE_20261008.json",
+    "blobSha": "fab0103ffeb10690160eef276e48bd648db998d7"
+  },
+  "renewalScope": {
+    "observations": [
+      "B-01",
+      "B-02",
+      "B-03",
+      "B-04"
+    ],
+    "sourceFixedStaticPass": [
+      "B-01",
+      "B-03",
+      "B-04"
+    ],
+    "b02DataApply": {
+      "status": "PASS_APPLY",
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_B02_RENEWAL_CUTOFF_APPLY_RESULT_20261008.json",
+      "blobSha": "debd50227bca77a04c5e10fb8cb5af178858ce6a",
+      "writes": 583,
+      "recent24Untouched": true
+    },
+    "productCompositionBlobSha": "215e8cd9087addbb49e18f08067b566af7c0f06e"
+  },
+  "requestedAuthorization": {
+    "buildImmutableCumulativeArtifact": true,
+    "deployIsolatedPreviewHosting": true,
+    "deployMatchingPreviewFunctions": true,
+    "authenticatedRenewalsFunctionalProof": true,
+    "disposableSyntheticQaWritesOnlyIfRequired": true,
+    "mandatorySyntheticCleanupAndReadback": true,
+    "realBusinessWrites": false,
+    "additionalDataMutation": false,
+    "livePromotion": false,
+    "reimport": false
+  },
+  "proofMatrix": {
+    "roles": [
+      "DIRECCION",
+      "OPERATIVO"
+    ],
+    "countries": [
+      "TODOS",
+      "GT",
+      "CO"
+    ],
+    "viewports": [
+      "DESKTOP",
+      "390x844",
+      "320x568"
+    ],
+    "scenarios": [
+      "Cold and warm route load reaches ready or bounded terminal state; no indefinite Cargando cartera.",
+      "B-02 readback: exact 583 old expired rows are terminal No renovada and absent from active Vencidas; recent 24 remain in Vencidas.",
+      "Policy state and renewal state are shown as separate, non-contradictory labels.",
+      "Approved date buckets and actions remain visible and usable at 390 and 320 widths.",
+      "KPI, buckets and disposition totals reconcile from one canonical policy universe.",
+      "No relevant page, console or request error."
+    ]
+  },
+  "evaluationRule": "Renewals observations are adjudicated first. Failures in later-priority Upsells, Insurers/knowledge or Quality remain preserved for their own blocks and do not erase a demonstrated Renewals pass unless they causally invalidate the same artifact.",
+  "sameArtifactRule": "The immutable Preview artifact becomes the only candidate for later Upsells proof and production; no rebuild or live promotion is authorized by this decision.",
+  "decisionOptions": [
+    {
+      "id": "AUTHORIZE_RENEWALS_EXACT_PREVIEW",
+      "effect": "Build and deploy an isolated Preview, run the authenticated renewals matrix, and keep LIVE unchanged."
+    },
+    {
+      "id": "HOLD_PREVIEW",
+      "effect": "Do not build or deploy; Renewals remains pending functional proof."
+    }
+  ],
+  "nextAction": "PAULA_DECISION_AUTHORIZE_RENEWALS_EXACT_PREVIEW_OR_HOLD"
+}
