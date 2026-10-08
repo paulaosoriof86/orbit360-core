@@ -1,6 +1,6 @@
 {
   "schema": "GRAVICENTRA_I6_5_B4_003_RENEWALS_PRIORITY_MACHINE_PROOF_V1",
-  "recordedAt": "2026-10-08T20:33:25.965Z",
+  "recordedAt": "2026-10-08T21:01:54.146Z",
   "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
   "findingId": "B4-003",
   "module": "RENOVACIONES",
@@ -10,16 +10,16 @@
     "B-03",
     "B-04"
   ],
-  "sourceSha": "ed2957d60697fce7bc6e015a49eb73ffaf9e8f5e",
-  "buildId": "gi-i65-b4-ed2957d60697-57f234755dc1",
-  "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-37839569726-bstn2wiq.web.app",
-  "channelId": "gi-i65-b4-37839569726",
-  "runId": 37839569726,
-  "artifactId": 11576758328,
-  "artifactDigest": "d23f800b1542c25e628295d8a2fef238a1da3411ae3ec62cd9c50870b85dc921",
-  "hostedPayloadDigest": "f5f807bac226544c981034d0155009c25415e5948adeae3f3f221002171409d8",
+  "sourceSha": "2248d58d51a7ff051a9b3d0a8645e6b7e3b59a90",
+  "buildId": "gi-i65-b4-2248d58d51a7-57f234755dc1",
+  "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-37843233312-5d7ttyop.web.app",
+  "channelId": "gi-i65-b4-37843233312",
+  "runId": 37843233312,
+  "artifactId": 11578259279,
+  "artifactDigest": "d394e69b90469053b8e30b401cbd85e4878b8dbefc7cd750f71274c0f5e3efa2",
+  "hostedPayloadDigest": "dcd823be8de0772c7370279e35021ded337f2933c2ba35adc5a16ba311033635",
   "backendSourceDigest": "778af087e48cf3e74edc8d4d813aa414968709a9e08977ac2a8405c820e50bb4",
-  "bundleDigest": "e3c7a523b1bbe49a0cba3cdcdf80d985e8368855c91f96582c809bea8071a01a",
+  "bundleDigest": "10079bd15991c76c436eaf5b7d89ec66e2b34d6b3b000d1c282d6adbd8d41c1e",
   "exactHostingReadback": true,
   "backend": {
     "policyCount": 1419,
@@ -27,7 +27,19 @@
     "b02TerminalIdDigest": "0043dbf02a26681c7fb1607f1de401ca1c99b36e4ae5e6a3d01551d2ebf9fe65",
     "oldOpenCount": 0,
     "recentCount": 24,
-    "recentDigest": "3512b167cdde30b51f67acc3c77135f2a94df5f133fd2d3b45cde8540938e67a"
+    "recentDigest": "3512b167cdde30b51f67acc3c77135f2a94df5f133fd2d3b45cde8540938e67a",
+    "recentStateCounts": {
+      "Renovada": 19,
+      "Vigente": 3,
+      "Histórica": 2
+    },
+    "recentCountryCounts": {
+      "GT": 22,
+      "CO": 2
+    },
+    "recentRenewabilityCounts": {
+      "YES": 24
+    }
   },
   "assertions": {
     "b02Exact583Terminal": true,
@@ -58,8 +70,8 @@
           "bucketCounts": [
             {
               "key": "vencidas",
-              "count": 4,
-              "visible": 4
+              "count": 25,
+              "visible": 25
             },
             {
               "key": "d15",
@@ -77,22 +89,24 @@
               "visible": 31
             }
           ],
-          "expectedCount": 44,
-          "visibleCount": 44,
+          "expectedCount": 65,
+          "visibleCount": 65,
           "exactCanonicalIds": true,
-          "recentAccessibleCount": 0,
-          "recentVisibleCount": 0,
+          "recentAccessibleCount": 24,
+          "recentVisibleCount": 24,
           "recentExact": true,
           "terminalVisibleCount": 0,
           "labelOk": true,
           "cardsFit": true,
           "actionsFit": true,
           "boardFits": true,
-          "hostText": "🔄\nRenovaciones · Pipeline por vencer\n90 DÍAS·POR URGENCIA·GESTIÓN\nPreparar campaña de renovación\nVENCIDAS\n4\nRecuperar o cerrar gestión\n≤15 DÍAS\n0\nAtención prioritaria\n16–45 DÍAS\n9\nPlanificar gestión\nPRIMA NETA EN GESTIÓN\nCOP 68,627,858\nGTQ 102,825\nSeparada por moneda; horizonte 90 días\nPipeline de renovación por fecha\nAquí se muestran pólizas que todavía forman parte del proceso de renovación. 4 están vencidas y renovables dentro del pipeline; existen 1158 pólizas con vigencia pasada en el alca",
+          "hostText": "🔄\nRenovaciones · Pipeline por vencer\n90 DÍAS·POR URGENCIA·GESTIÓN\nPreparar campaña de renovación\nVENCIDAS\n25\nRecuperar o cerrar gestión\n≤15 DÍAS\n0\nAtención prioritaria\n16–45 DÍAS\n9\nPlanificar gestión\nPRIMA NETA EN GESTIÓN\nGTQ 185,313\nCOP 68,627,858\nSeparada por moneda; horizonte 90 días\nPipeline de renovación por fecha\nAquí se muestran pólizas que todavía forman parte del proceso de renovación. 25 están vencidas y renovables dentro del pipeline; existen 1158 pólizas con vigencia pasada en el al",
           "phase": "cold",
           "country": "TODOS",
           "viewport": "DESKTOP",
-          "readyMs": 4868
+          "readyMs": 2476,
+          "initialTerminal": null,
+          "recovery": null
         },
         {
           "loadingState": "ready",
@@ -105,8 +119,8 @@
           "bucketCounts": [
             {
               "key": "vencidas",
-              "count": 2,
-              "visible": 2
+              "count": 23,
+              "visible": 23
             },
             {
               "key": "d15",
@@ -124,22 +138,24 @@
               "visible": 26
             }
           ],
-          "expectedCount": 36,
-          "visibleCount": 36,
+          "expectedCount": 57,
+          "visibleCount": 57,
           "exactCanonicalIds": true,
-          "recentAccessibleCount": 0,
-          "recentVisibleCount": 0,
+          "recentAccessibleCount": 22,
+          "recentVisibleCount": 22,
           "recentExact": true,
           "terminalVisibleCount": 0,
           "labelOk": true,
           "cardsFit": true,
           "actionsFit": true,
           "boardFits": true,
-          "hostText": "🔄\nRenovaciones · Pipeline por vencer\n90 DÍAS·POR URGENCIA·GESTIÓN\nPreparar campaña de renovación\nVENCIDAS\n2\nRecuperar o cerrar gestión\n≤15 DÍAS\n0\nAtención prioritaria\n16–45 DÍAS\n8\nPlanificar gestión\nPRIMA NETA EN GESTIÓN\nGTQ 102,825\nSeparada por moneda; horizonte 90 días\nPipeline de renovación por fecha\nAquí se muestran pólizas que todavía forman parte del proceso de renovación. 2 están vencidas y renovables dentro del pipeline; existen 1061 pólizas con vigencia pasada en el alcance histórico, ",
+          "hostText": "🔄\nRenovaciones · Pipeline por vencer\n90 DÍAS·POR URGENCIA·GESTIÓN\nPreparar campaña de renovación\nVENCIDAS\n23\nRecuperar o cerrar gestión\n≤15 DÍAS\n0\nAtención prioritaria\n16–45 DÍAS\n8\nPlanificar gestión\nPRIMA NETA EN GESTIÓN\nGTQ 185,313\nSeparada por moneda; horizonte 90 días\nPipeline de renovación por fecha\nAquí se muestran pólizas que todavía forman parte del proceso de renovación. 23 están vencidas y renovables dentro del pipeline; existen 1061 pólizas con vigencia pasada en el alcance histórico",
           "phase": "cold",
           "country": "GT",
           "viewport": "DESKTOP",
-          "readyMs": 2189
+          "readyMs": 2781,
+          "initialTerminal": null,
+          "recovery": null
         },
         {
           "loadingState": "ready",
@@ -174,8 +190,8 @@
           "expectedCount": 8,
           "visibleCount": 8,
           "exactCanonicalIds": true,
-          "recentAccessibleCount": 0,
-          "recentVisibleCount": 0,
+          "recentAccessibleCount": 2,
+          "recentVisibleCount": 2,
           "recentExact": true,
           "terminalVisibleCount": 0,
           "labelOk": true,
@@ -186,7 +202,9 @@
           "phase": "cold",
           "country": "CO",
           "viewport": "DESKTOP",
-          "readyMs": 1817
+          "readyMs": 3133,
+          "initialTerminal": null,
+          "recovery": null
         }
       ],
       "warm": [
@@ -201,8 +219,8 @@
           "bucketCounts": [
             {
               "key": "vencidas",
-              "count": 4,
-              "visible": 4
+              "count": 25,
+              "visible": 25
             },
             {
               "key": "d15",
@@ -220,22 +238,24 @@
               "visible": 31
             }
           ],
-          "expectedCount": 44,
-          "visibleCount": 44,
+          "expectedCount": 65,
+          "visibleCount": 65,
           "exactCanonicalIds": true,
-          "recentAccessibleCount": 0,
-          "recentVisibleCount": 0,
+          "recentAccessibleCount": 24,
+          "recentVisibleCount": 24,
           "recentExact": true,
           "terminalVisibleCount": 0,
           "labelOk": true,
           "cardsFit": true,
           "actionsFit": true,
           "boardFits": true,
-          "hostText": "🔄\nRenovaciones · Pipeline por vencer\n90 DÍAS·POR URGENCIA·GESTIÓN\nPreparar campaña de renovación\nVENCIDAS\n4\nRecuperar o cerrar gestión\n≤15 DÍAS\n0\nAtención prioritaria\n16–45 DÍAS\n9\nPlanificar gestión\nPRIMA NETA EN GESTIÓN\nCOP 68,627,858\nGTQ 102,825\nSeparada por moneda; horizonte 90 días\nPipeline de renovación por fecha\nAquí se muestran pólizas que todavía forman parte del proceso de renovación. 4 están vencidas y renovables dentro del pipeline; existen 1158 pólizas con vigencia pasada en el alca",
+          "hostText": "🔄\nRenovaciones · Pipeline por vencer\n90 DÍAS·POR URGENCIA·GESTIÓN\nPreparar campaña de renovación\nVENCIDAS\n25\nRecuperar o cerrar gestión\n≤15 DÍAS\n0\nAtención prioritaria\n16–45 DÍAS\n9\nPlanificar gestión\nPRIMA NETA EN GESTIÓN\nGTQ 185,313\nCOP 68,627,858\nSeparada por moneda; horizonte 90 días\nPipeline de renovación por fecha\nAquí se muestran pólizas que todavía forman parte del proceso de renovación. 25 están vencidas y renovables dentro del pipeline; existen 1158 pólizas con vigencia pasada en el al",
           "phase": "warm",
           "country": "TODOS",
           "viewport": "DESKTOP",
-          "readyMs": 1089
+          "readyMs": 2986,
+          "initialTerminal": null,
+          "recovery": null
         },
         {
           "loadingState": "ready",
@@ -248,8 +268,8 @@
           "bucketCounts": [
             {
               "key": "vencidas",
-              "count": 2,
-              "visible": 2
+              "count": 23,
+              "visible": 23
             },
             {
               "key": "d15",
@@ -267,22 +287,24 @@
               "visible": 26
             }
           ],
-          "expectedCount": 36,
-          "visibleCount": 36,
+          "expectedCount": 57,
+          "visibleCount": 57,
           "exactCanonicalIds": true,
-          "recentAccessibleCount": 0,
-          "recentVisibleCount": 0,
+          "recentAccessibleCount": 22,
+          "recentVisibleCount": 22,
           "recentExact": true,
           "terminalVisibleCount": 0,
           "labelOk": true,
           "cardsFit": true,
           "actionsFit": true,
           "boardFits": true,
-          "hostText": "🔄\nRenovaciones · Pipeline por vencer\n90 DÍAS·POR URGENCIA·GESTIÓN\nPreparar campaña de renovación\nVENCIDAS\n2\nRecuperar o cerrar gestión\n≤15 DÍAS\n0\nAtención prioritaria\n16–45 DÍAS\n8\nPlanificar gestión\nPRIMA NETA EN GESTIÓN\nGTQ 102,825\nSeparada por moneda; horizonte 90 días\nPipeline de renovación por fecha\nAquí se muestran pólizas que todavía forman parte del proceso de renovación. 2 están vencidas y renovables dentro del pipeline; existen 1061 pólizas con vigencia pasada en el alcance histórico, ",
+          "hostText": "🔄\nRenovaciones · Pipeline por vencer\n90 DÍAS·POR URGENCIA·GESTIÓN\nPreparar campaña de renovación\nVENCIDAS\n23\nRecuperar o cerrar gestión\n≤15 DÍAS\n0\nAtención prioritaria\n16–45 DÍAS\n8\nPlanificar gestión\nPRIMA NETA EN GESTIÓN\nGTQ 185,313\nSeparada por moneda; horizonte 90 días\nPipeline de renovación por fecha\nAquí se muestran pólizas que todavía forman parte del proceso de renovación. 23 están vencidas y renovables dentro del pipeline; existen 1061 pólizas con vigencia pasada en el alcance histórico",
           "phase": "warm",
           "country": "GT",
           "viewport": "DESKTOP",
-          "readyMs": 2103
+          "readyMs": 5383,
+          "initialTerminal": null,
+          "recovery": null
         },
         {
           "loadingState": "ready",
@@ -317,8 +339,8 @@
           "expectedCount": 8,
           "visibleCount": 8,
           "exactCanonicalIds": true,
-          "recentAccessibleCount": 0,
-          "recentVisibleCount": 0,
+          "recentAccessibleCount": 2,
+          "recentVisibleCount": 2,
           "recentExact": true,
           "terminalVisibleCount": 0,
           "labelOk": true,
@@ -329,7 +351,9 @@
           "phase": "warm",
           "country": "CO",
           "viewport": "DESKTOP",
-          "readyMs": 1814
+          "readyMs": 4758,
+          "initialTerminal": null,
+          "recovery": null
         }
       ],
       "mobile": [
@@ -344,8 +368,8 @@
           "bucketCounts": [
             {
               "key": "vencidas",
-              "count": 4,
-              "visible": 4
+              "count": 25,
+              "visible": 25
             },
             {
               "key": "d15",
@@ -363,22 +387,24 @@
               "visible": 31
             }
           ],
-          "expectedCount": 44,
-          "visibleCount": 44,
+          "expectedCount": 65,
+          "visibleCount": 65,
           "exactCanonicalIds": true,
-          "recentAccessibleCount": 0,
-          "recentVisibleCount": 0,
+          "recentAccessibleCount": 24,
+          "recentVisibleCount": 24,
           "recentExact": true,
           "terminalVisibleCount": 0,
           "labelOk": true,
           "cardsFit": true,
           "actionsFit": true,
           "boardFits": true,
-          "hostText": "🔄\nRenovaciones\n· Pipeline por vencer\nPreparar campaña de renovación\nVENCIDAS\n4\nRecuperar o cerrar gestión\n≤15 DÍAS\n0\nAtención prioritaria\n16–45 DÍAS\n9\nPlanificar gestión\nPRIMA NETA EN GESTIÓN\nCOP 68,627,858\nGTQ 102,825\nSeparada por moneda; horizonte 90 días\nPipeline de renovación por fecha\nAquí se muestran pólizas que todavía forman parte del proceso de renovación. 4 están vencidas y renovables dentro del pipeline; existen 1158 pólizas con vigencia pasada en el alcance histórico, de las cuales ",
+          "hostText": "🔄\nRenovaciones\n· Pipeline por vencer\nPreparar campaña de renovación\nVENCIDAS\n25\nRecuperar o cerrar gestión\n≤15 DÍAS\n0\nAtención prioritaria\n16–45 DÍAS\n9\nPlanificar gestión\nPRIMA NETA EN GESTIÓN\nGTQ 185,313\nCOP 68,627,858\nSeparada por moneda; horizonte 90 días\nPipeline de renovación por fecha\nAquí se muestran pólizas que todavía forman parte del proceso de renovación. 25 están vencidas y renovables dentro del pipeline; existen 1158 pólizas con vigencia pasada en el alcance histórico, de las cuale",
           "phase": "warm",
           "country": "TODOS",
           "viewport": "390x844",
-          "readyMs": 269
+          "readyMs": 972,
+          "initialTerminal": null,
+          "recovery": null
         },
         {
           "loadingState": "ready",
@@ -391,8 +417,8 @@
           "bucketCounts": [
             {
               "key": "vencidas",
-              "count": 2,
-              "visible": 2
+              "count": 23,
+              "visible": 23
             },
             {
               "key": "d15",
@@ -410,22 +436,24 @@
               "visible": 26
             }
           ],
-          "expectedCount": 36,
-          "visibleCount": 36,
+          "expectedCount": 57,
+          "visibleCount": 57,
           "exactCanonicalIds": true,
-          "recentAccessibleCount": 0,
-          "recentVisibleCount": 0,
+          "recentAccessibleCount": 22,
+          "recentVisibleCount": 22,
           "recentExact": true,
           "terminalVisibleCount": 0,
           "labelOk": true,
           "cardsFit": true,
           "actionsFit": true,
           "boardFits": true,
-          "hostText": "🔄\nRenovaciones\n· Pipeline por vencer\nPreparar campaña de renovación\nVENCIDAS\n2\nRecuperar o cerrar gestión\n≤15 DÍAS\n0\nAtención prioritaria\n16–45 DÍAS\n8\nPlanificar gestión\nPRIMA NETA EN GESTIÓN\nGTQ 102,825\nSeparada por moneda; horizonte 90 días\nPipeline de renovación por fecha\nAquí se muestran pólizas que todavía forman parte del proceso de renovación. 2 están vencidas y renovables dentro del pipeline; existen 1061 pólizas con vigencia pasada en el alcance histórico, de las cuales 100 están marca",
+          "hostText": "🔄\nRenovaciones\n· Pipeline por vencer\nPreparar campaña de renovación\nVENCIDAS\n23\nRecuperar o cerrar gestión\n≤15 DÍAS\n0\nAtención prioritaria\n16–45 DÍAS\n8\nPlanificar gestión\nPRIMA NETA EN GESTIÓN\nGTQ 185,313\nSeparada por moneda; horizonte 90 días\nPipeline de renovación por fecha\nAquí se muestran pólizas que todavía forman parte del proceso de renovación. 23 están vencidas y renovables dentro del pipeline; existen 1061 pólizas con vigencia pasada en el alcance histórico, de las cuales 100 están mar",
           "phase": "warm",
           "country": "GT",
           "viewport": "390x844",
-          "readyMs": 9088
+          "readyMs": 5700,
+          "initialTerminal": null,
+          "recovery": null
         },
         {
           "loadingState": "ready",
@@ -460,8 +488,8 @@
           "expectedCount": 8,
           "visibleCount": 8,
           "exactCanonicalIds": true,
-          "recentAccessibleCount": 0,
-          "recentVisibleCount": 0,
+          "recentAccessibleCount": 2,
+          "recentVisibleCount": 2,
           "recentExact": true,
           "terminalVisibleCount": 0,
           "labelOk": true,
@@ -472,7 +500,9 @@
           "phase": "warm",
           "country": "CO",
           "viewport": "390x844",
-          "readyMs": 5421
+          "readyMs": 4618,
+          "initialTerminal": null,
+          "recovery": null
         },
         {
           "loadingState": "ready",
@@ -485,8 +515,8 @@
           "bucketCounts": [
             {
               "key": "vencidas",
-              "count": 4,
-              "visible": 4
+              "count": 25,
+              "visible": 25
             },
             {
               "key": "d15",
@@ -504,22 +534,24 @@
               "visible": 31
             }
           ],
-          "expectedCount": 44,
-          "visibleCount": 44,
+          "expectedCount": 65,
+          "visibleCount": 65,
           "exactCanonicalIds": true,
-          "recentAccessibleCount": 0,
-          "recentVisibleCount": 0,
+          "recentAccessibleCount": 24,
+          "recentVisibleCount": 24,
           "recentExact": true,
           "terminalVisibleCount": 0,
           "labelOk": true,
           "cardsFit": true,
           "actionsFit": true,
           "boardFits": true,
-          "hostText": "🔄\nRenovaciones\n· Pipeline por vencer\nPreparar campaña de renovación\nVENCIDAS\n4\nRecuperar o cerrar gestión\n≤15 DÍAS\n0\nAtención prioritaria\n16–45 DÍAS\n9\nPlanificar gestión\nPRIMA NETA EN GESTIÓN\nCOP 68,627,858\nGTQ 102,825\nSeparada por moneda; horizonte 90 días\nPipeline de renovación por fecha\nAquí se muestran pólizas que todavía forman parte del proceso de renovación. 4 están vencidas y renovables dentro del pipeline; existen 1158 pólizas con vigencia pasada en el alcance histórico, de las cuales ",
+          "hostText": "🔄\nRenovaciones\n· Pipeline por vencer\nPreparar campaña de renovación\nVENCIDAS\n25\nRecuperar o cerrar gestión\n≤15 DÍAS\n0\nAtención prioritaria\n16–45 DÍAS\n9\nPlanificar gestión\nPRIMA NETA EN GESTIÓN\nGTQ 185,313\nCOP 68,627,858\nSeparada por moneda; horizonte 90 días\nPipeline de renovación por fecha\nAquí se muestran pólizas que todavía forman parte del proceso de renovación. 25 están vencidas y renovables dentro del pipeline; existen 1158 pólizas con vigencia pasada en el alcance histórico, de las cuale",
           "phase": "warm",
           "country": "TODOS",
           "viewport": "320x568",
-          "readyMs": 414
+          "readyMs": 436,
+          "initialTerminal": null,
+          "recovery": null
         },
         {
           "loadingState": "ready",
@@ -532,8 +564,8 @@
           "bucketCounts": [
             {
               "key": "vencidas",
-              "count": 2,
-              "visible": 2
+              "count": 23,
+              "visible": 23
             },
             {
               "key": "d15",
@@ -551,22 +583,24 @@
               "visible": 26
             }
           ],
-          "expectedCount": 36,
-          "visibleCount": 36,
+          "expectedCount": 57,
+          "visibleCount": 57,
           "exactCanonicalIds": true,
-          "recentAccessibleCount": 0,
-          "recentVisibleCount": 0,
+          "recentAccessibleCount": 22,
+          "recentVisibleCount": 22,
           "recentExact": true,
           "terminalVisibleCount": 0,
           "labelOk": true,
           "cardsFit": true,
           "actionsFit": true,
           "boardFits": true,
-          "hostText": "🔄\nRenovaciones\n· Pipeline por vencer\nPreparar campaña de renovación\nVENCIDAS\n2\nRecuperar o cerrar gestión\n≤15 DÍAS\n0\nAtención prioritaria\n16–45 DÍAS\n8\nPlanificar gestión\nPRIMA NETA EN GESTIÓN\nGTQ 102,825\nSeparada por moneda; horizonte 90 días\nPipeline de renovación por fecha\nAquí se muestran pólizas que todavía forman parte del proceso de renovación. 2 están vencidas y renovables dentro del pipeline; existen 1061 pólizas con vigencia pasada en el alcance histórico, de las cuales 100 están marca",
+          "hostText": "🔄\nRenovaciones\n· Pipeline por vencer\nPreparar campaña de renovación\nVENCIDAS\n23\nRecuperar o cerrar gestión\n≤15 DÍAS\n0\nAtención prioritaria\n16–45 DÍAS\n8\nPlanificar gestión\nPRIMA NETA EN GESTIÓN\nGTQ 185,313\nSeparada por moneda; horizonte 90 días\nPipeline de renovación por fecha\nAquí se muestran pólizas que todavía forman parte del proceso de renovación. 23 están vencidas y renovables dentro del pipeline; existen 1061 pólizas con vigencia pasada en el alcance histórico, de las cuales 100 están mar",
           "phase": "warm",
           "country": "GT",
           "viewport": "320x568",
-          "readyMs": 6356
+          "readyMs": 5527,
+          "initialTerminal": null,
+          "recovery": null
         },
         {
           "loadingState": "ready",
@@ -601,8 +635,8 @@
           "expectedCount": 8,
           "visibleCount": 8,
           "exactCanonicalIds": true,
-          "recentAccessibleCount": 0,
-          "recentVisibleCount": 0,
+          "recentAccessibleCount": 2,
+          "recentVisibleCount": 2,
           "recentExact": true,
           "terminalVisibleCount": 0,
           "labelOk": true,
@@ -613,7 +647,9 @@
           "phase": "warm",
           "country": "CO",
           "viewport": "320x568",
-          "readyMs": 5394
+          "readyMs": 4637,
+          "initialTerminal": null,
+          "recovery": null
         }
       ],
       "firstPaint": {
@@ -636,8 +672,8 @@
           "bucketCounts": [
             {
               "key": "vencidas",
-              "count": 4,
-              "visible": 4
+              "count": 25,
+              "visible": 25
             },
             {
               "key": "d15",
@@ -655,22 +691,24 @@
               "visible": 31
             }
           ],
-          "expectedCount": 44,
-          "visibleCount": 44,
+          "expectedCount": 65,
+          "visibleCount": 65,
           "exactCanonicalIds": true,
-          "recentAccessibleCount": 0,
-          "recentVisibleCount": 0,
+          "recentAccessibleCount": 24,
+          "recentVisibleCount": 24,
           "recentExact": true,
           "terminalVisibleCount": 0,
           "labelOk": true,
           "cardsFit": true,
           "actionsFit": true,
           "boardFits": true,
-          "hostText": "🔄\nRenovaciones · Pipeline por vencer\n90 DÍAS·POR URGENCIA·GESTIÓN\nPreparar campaña de renovación\nVENCIDAS\n4\nRecuperar o cerrar gestión\n≤15 DÍAS\n0\nAtención prioritaria\n16–45 DÍAS\n9\nPlanificar gestión\nPRIMA NETA EN GESTIÓN\nCOP 68,627,858\nGTQ 102,825\nSeparada por moneda; horizonte 90 días\nPipeline de renovación por fecha\nAquí se muestran pólizas que todavía forman parte del proceso de renovación. 4 están vencidas y renovables dentro del pipeline; existen 1158 pólizas con vigencia pasada en el alca",
+          "hostText": "🔄\nRenovaciones · Pipeline por vencer\n90 DÍAS·POR URGENCIA·GESTIÓN\nPreparar campaña de renovación\nVENCIDAS\n25\nRecuperar o cerrar gestión\n≤15 DÍAS\n0\nAtención prioritaria\n16–45 DÍAS\n9\nPlanificar gestión\nPRIMA NETA EN GESTIÓN\nGTQ 185,313\nCOP 68,627,858\nSeparada por moneda; horizonte 90 días\nPipeline de renovación por fecha\nAquí se muestran pólizas que todavía forman parte del proceso de renovación. 25 están vencidas y renovables dentro del pipeline; existen 1158 pólizas con vigencia pasada en el al",
           "phase": "cold",
           "country": "TODOS",
           "viewport": "DESKTOP",
-          "readyMs": 4729
+          "readyMs": 2369,
+          "initialTerminal": null,
+          "recovery": null
         },
         {
           "loadingState": "ready",
@@ -683,8 +721,8 @@
           "bucketCounts": [
             {
               "key": "vencidas",
-              "count": 2,
-              "visible": 2
+              "count": 23,
+              "visible": 23
             },
             {
               "key": "d15",
@@ -702,22 +740,24 @@
               "visible": 26
             }
           ],
-          "expectedCount": 36,
-          "visibleCount": 36,
+          "expectedCount": 57,
+          "visibleCount": 57,
           "exactCanonicalIds": true,
-          "recentAccessibleCount": 0,
-          "recentVisibleCount": 0,
+          "recentAccessibleCount": 22,
+          "recentVisibleCount": 22,
           "recentExact": true,
           "terminalVisibleCount": 0,
           "labelOk": true,
           "cardsFit": true,
           "actionsFit": true,
           "boardFits": true,
-          "hostText": "🔄\nRenovaciones · Pipeline por vencer\n90 DÍAS·POR URGENCIA·GESTIÓN\nPreparar campaña de renovación\nVENCIDAS\n2\nRecuperar o cerrar gestión\n≤15 DÍAS\n0\nAtención prioritaria\n16–45 DÍAS\n8\nPlanificar gestión\nPRIMA NETA EN GESTIÓN\nGTQ 102,825\nSeparada por moneda; horizonte 90 días\nPipeline de renovación por fecha\nAquí se muestran pólizas que todavía forman parte del proceso de renovación. 2 están vencidas y renovables dentro del pipeline; existen 1061 pólizas con vigencia pasada en el alcance histórico, ",
+          "hostText": "🔄\nRenovaciones · Pipeline por vencer\n90 DÍAS·POR URGENCIA·GESTIÓN\nPreparar campaña de renovación\nVENCIDAS\n23\nRecuperar o cerrar gestión\n≤15 DÍAS\n0\nAtención prioritaria\n16–45 DÍAS\n8\nPlanificar gestión\nPRIMA NETA EN GESTIÓN\nGTQ 185,313\nSeparada por moneda; horizonte 90 días\nPipeline de renovación por fecha\nAquí se muestran pólizas que todavía forman parte del proceso de renovación. 23 están vencidas y renovables dentro del pipeline; existen 1061 pólizas con vigencia pasada en el alcance histórico",
           "phase": "cold",
           "country": "GT",
           "viewport": "DESKTOP",
-          "readyMs": 2475
+          "readyMs": 4858,
+          "initialTerminal": null,
+          "recovery": null
         },
         {
           "loadingState": "ready",
@@ -752,8 +792,8 @@
           "expectedCount": 8,
           "visibleCount": 8,
           "exactCanonicalIds": true,
-          "recentAccessibleCount": 0,
-          "recentVisibleCount": 0,
+          "recentAccessibleCount": 2,
+          "recentVisibleCount": 2,
           "recentExact": true,
           "terminalVisibleCount": 0,
           "labelOk": true,
@@ -764,7 +804,9 @@
           "phase": "cold",
           "country": "CO",
           "viewport": "DESKTOP",
-          "readyMs": 2120
+          "readyMs": 1751,
+          "initialTerminal": null,
+          "recovery": null
         }
       ],
       "warm": [
@@ -779,8 +821,8 @@
           "bucketCounts": [
             {
               "key": "vencidas",
-              "count": 4,
-              "visible": 4
+              "count": 25,
+              "visible": 25
             },
             {
               "key": "d15",
@@ -798,22 +840,24 @@
               "visible": 31
             }
           ],
-          "expectedCount": 44,
-          "visibleCount": 44,
+          "expectedCount": 65,
+          "visibleCount": 65,
           "exactCanonicalIds": true,
-          "recentAccessibleCount": 0,
-          "recentVisibleCount": 0,
+          "recentAccessibleCount": 24,
+          "recentVisibleCount": 24,
           "recentExact": true,
           "terminalVisibleCount": 0,
           "labelOk": true,
           "cardsFit": true,
           "actionsFit": true,
           "boardFits": true,
-          "hostText": "🔄\nRenovaciones · Pipeline por vencer\n90 DÍAS·POR URGENCIA·GESTIÓN\nPreparar campaña de renovación\nVENCIDAS\n4\nRecuperar o cerrar gestión\n≤15 DÍAS\n0\nAtención prioritaria\n16–45 DÍAS\n9\nPlanificar gestión\nPRIMA NETA EN GESTIÓN\nCOP 68,627,858\nGTQ 102,825\nSeparada por moneda; horizonte 90 días\nPipeline de renovación por fecha\nAquí se muestran pólizas que todavía forman parte del proceso de renovación. 4 están vencidas y renovables dentro del pipeline; existen 1158 pólizas con vigencia pasada en el alca",
+          "hostText": "🔄\nRenovaciones · Pipeline por vencer\n90 DÍAS·POR URGENCIA·GESTIÓN\nPreparar campaña de renovación\nVENCIDAS\n25\nRecuperar o cerrar gestión\n≤15 DÍAS\n0\nAtención prioritaria\n16–45 DÍAS\n9\nPlanificar gestión\nPRIMA NETA EN GESTIÓN\nGTQ 185,313\nCOP 68,627,858\nSeparada por moneda; horizonte 90 días\nPipeline de renovación por fecha\nAquí se muestran pólizas que todavía forman parte del proceso de renovación. 25 están vencidas y renovables dentro del pipeline; existen 1158 pólizas con vigencia pasada en el al",
           "phase": "warm",
           "country": "TODOS",
           "viewport": "DESKTOP",
-          "readyMs": 1205
+          "readyMs": 1922,
+          "initialTerminal": null,
+          "recovery": null
         },
         {
           "loadingState": "ready",
@@ -826,8 +870,8 @@
           "bucketCounts": [
             {
               "key": "vencidas",
-              "count": 2,
-              "visible": 2
+              "count": 23,
+              "visible": 23
             },
             {
               "key": "d15",
@@ -845,22 +889,24 @@
               "visible": 26
             }
           ],
-          "expectedCount": 36,
-          "visibleCount": 36,
+          "expectedCount": 57,
+          "visibleCount": 57,
           "exactCanonicalIds": true,
-          "recentAccessibleCount": 0,
-          "recentVisibleCount": 0,
+          "recentAccessibleCount": 22,
+          "recentVisibleCount": 22,
           "recentExact": true,
           "terminalVisibleCount": 0,
           "labelOk": true,
           "cardsFit": true,
           "actionsFit": true,
           "boardFits": true,
-          "hostText": "🔄\nRenovaciones · Pipeline por vencer\n90 DÍAS·POR URGENCIA·GESTIÓN\nPreparar campaña de renovación\nVENCIDAS\n2\nRecuperar o cerrar gestión\n≤15 DÍAS\n0\nAtención prioritaria\n16–45 DÍAS\n8\nPlanificar gestión\nPRIMA NETA EN GESTIÓN\nGTQ 102,825\nSeparada por moneda; horizonte 90 días\nPipeline de renovación por fecha\nAquí se muestran pólizas que todavía forman parte del proceso de renovación. 2 están vencidas y renovables dentro del pipeline; existen 1061 pólizas con vigencia pasada en el alcance histórico, ",
+          "hostText": "🔄\nRenovaciones · Pipeline por vencer\n90 DÍAS·POR URGENCIA·GESTIÓN\nPreparar campaña de renovación\nVENCIDAS\n23\nRecuperar o cerrar gestión\n≤15 DÍAS\n0\nAtención prioritaria\n16–45 DÍAS\n8\nPlanificar gestión\nPRIMA NETA EN GESTIÓN\nGTQ 185,313\nSeparada por moneda; horizonte 90 días\nPipeline de renovación por fecha\nAquí se muestran pólizas que todavía forman parte del proceso de renovación. 23 están vencidas y renovables dentro del pipeline; existen 1061 pólizas con vigencia pasada en el alcance histórico",
           "phase": "warm",
           "country": "GT",
           "viewport": "DESKTOP",
-          "readyMs": 2492
+          "readyMs": 1922,
+          "initialTerminal": null,
+          "recovery": null
         },
         {
           "loadingState": "ready",
@@ -895,8 +941,8 @@
           "expectedCount": 8,
           "visibleCount": 8,
           "exactCanonicalIds": true,
-          "recentAccessibleCount": 0,
-          "recentVisibleCount": 0,
+          "recentAccessibleCount": 2,
+          "recentVisibleCount": 2,
           "recentExact": true,
           "terminalVisibleCount": 0,
           "labelOk": true,
@@ -907,7 +953,9 @@
           "phase": "warm",
           "country": "CO",
           "viewport": "DESKTOP",
-          "readyMs": 2089
+          "readyMs": 1731,
+          "initialTerminal": null,
+          "recovery": null
         }
       ],
       "mobile": [
@@ -922,8 +970,8 @@
           "bucketCounts": [
             {
               "key": "vencidas",
-              "count": 4,
-              "visible": 4
+              "count": 25,
+              "visible": 25
             },
             {
               "key": "d15",
@@ -941,22 +989,24 @@
               "visible": 31
             }
           ],
-          "expectedCount": 44,
-          "visibleCount": 44,
+          "expectedCount": 65,
+          "visibleCount": 65,
           "exactCanonicalIds": true,
-          "recentAccessibleCount": 0,
-          "recentVisibleCount": 0,
+          "recentAccessibleCount": 24,
+          "recentVisibleCount": 24,
           "recentExact": true,
           "terminalVisibleCount": 0,
           "labelOk": true,
           "cardsFit": true,
           "actionsFit": true,
           "boardFits": true,
-          "hostText": "🔄\nRenovaciones\n· Pipeline por vencer\nPreparar campaña de renovación\nVENCIDAS\n4\nRecuperar o cerrar gestión\n≤15 DÍAS\n0\nAtención prioritaria\n16–45 DÍAS\n9\nPlanificar gestión\nPRIMA NETA EN GESTIÓN\nCOP 68,627,858\nGTQ 102,825\nSeparada por moneda; horizonte 90 días\nPipeline de renovación por fecha\nAquí se muestran pólizas que todavía forman parte del proceso de renovación. 4 están vencidas y renovables dentro del pipeline; existen 1158 pólizas con vigencia pasada en el alcance histórico, de las cuales ",
+          "hostText": "🔄\nRenovaciones\n· Pipeline por vencer\nPreparar campaña de renovación\nVENCIDAS\n25\nRecuperar o cerrar gestión\n≤15 DÍAS\n0\nAtención prioritaria\n16–45 DÍAS\n9\nPlanificar gestión\nPRIMA NETA EN GESTIÓN\nGTQ 185,313\nCOP 68,627,858\nSeparada por moneda; horizonte 90 días\nPipeline de renovación por fecha\nAquí se muestran pólizas que todavía forman parte del proceso de renovación. 25 están vencidas y renovables dentro del pipeline; existen 1158 pólizas con vigencia pasada en el alcance histórico, de las cuale",
           "phase": "warm",
           "country": "TODOS",
           "viewport": "390x844",
-          "readyMs": 729
+          "readyMs": 590,
+          "initialTerminal": null,
+          "recovery": null
         },
         {
           "loadingState": "ready",
@@ -969,8 +1019,8 @@
           "bucketCounts": [
             {
               "key": "vencidas",
-              "count": 2,
-              "visible": 2
+              "count": 23,
+              "visible": 23
             },
             {
               "key": "d15",
@@ -988,22 +1038,24 @@
               "visible": 26
             }
           ],
-          "expectedCount": 36,
-          "visibleCount": 36,
+          "expectedCount": 57,
+          "visibleCount": 57,
           "exactCanonicalIds": true,
-          "recentAccessibleCount": 0,
-          "recentVisibleCount": 0,
+          "recentAccessibleCount": 22,
+          "recentVisibleCount": 22,
           "recentExact": true,
           "terminalVisibleCount": 0,
           "labelOk": true,
           "cardsFit": true,
           "actionsFit": true,
           "boardFits": true,
-          "hostText": "🔄\nRenovaciones\n· Pipeline por vencer\nPreparar campaña de renovación\nVENCIDAS\n2\nRecuperar o cerrar gestión\n≤15 DÍAS\n0\nAtención prioritaria\n16–45 DÍAS\n8\nPlanificar gestión\nPRIMA NETA EN GESTIÓN\nGTQ 102,825\nSeparada por moneda; horizonte 90 días\nPipeline de renovación por fecha\nAquí se muestran pólizas que todavía forman parte del proceso de renovación. 2 están vencidas y renovables dentro del pipeline; existen 1061 pólizas con vigencia pasada en el alcance histórico, de las cuales 100 están marca",
+          "hostText": "🔄\nRenovaciones\n· Pipeline por vencer\nPreparar campaña de renovación\nVENCIDAS\n23\nRecuperar o cerrar gestión\n≤15 DÍAS\n0\nAtención prioritaria\n16–45 DÍAS\n8\nPlanificar gestión\nPRIMA NETA EN GESTIÓN\nGTQ 185,313\nSeparada por moneda; horizonte 90 días\nPipeline de renovación por fecha\nAquí se muestran pólizas que todavía forman parte del proceso de renovación. 23 están vencidas y renovables dentro del pipeline; existen 1061 pólizas con vigencia pasada en el alcance histórico, de las cuales 100 están mar",
           "phase": "warm",
           "country": "GT",
           "viewport": "390x844",
-          "readyMs": 2462
+          "readyMs": 2154,
+          "initialTerminal": null,
+          "recovery": null
         },
         {
           "loadingState": "ready",
@@ -1038,8 +1090,8 @@
           "expectedCount": 8,
           "visibleCount": 8,
           "exactCanonicalIds": true,
-          "recentAccessibleCount": 0,
-          "recentVisibleCount": 0,
+          "recentAccessibleCount": 2,
+          "recentVisibleCount": 2,
           "recentExact": true,
           "terminalVisibleCount": 0,
           "labelOk": true,
@@ -1050,7 +1102,9 @@
           "phase": "warm",
           "country": "CO",
           "viewport": "390x844",
-          "readyMs": 2041
+          "readyMs": 1697,
+          "initialTerminal": null,
+          "recovery": null
         },
         {
           "loadingState": "ready",
@@ -1063,8 +1117,8 @@
           "bucketCounts": [
             {
               "key": "vencidas",
-              "count": 4,
-              "visible": 4
+              "count": 25,
+              "visible": 25
             },
             {
               "key": "d15",
@@ -1082,22 +1136,24 @@
               "visible": 31
             }
           ],
-          "expectedCount": 44,
-          "visibleCount": 44,
+          "expectedCount": 65,
+          "visibleCount": 65,
           "exactCanonicalIds": true,
-          "recentAccessibleCount": 0,
-          "recentVisibleCount": 0,
+          "recentAccessibleCount": 24,
+          "recentVisibleCount": 24,
           "recentExact": true,
           "terminalVisibleCount": 0,
           "labelOk": true,
           "cardsFit": true,
           "actionsFit": true,
           "boardFits": true,
-          "hostText": "🔄\nRenovaciones\n· Pipeline por vencer\nPreparar campaña de renovación\nVENCIDAS\n4\nRecuperar o cerrar gestión\n≤15 DÍAS\n0\nAtención prioritaria\n16–45 DÍAS\n9\nPlanificar gestión\nPRIMA NETA EN GESTIÓN\nCOP 68,627,858\nGTQ 102,825\nSeparada por moneda; horizonte 90 días\nPipeline de renovación por fecha\nAquí se muestran pólizas que todavía forman parte del proceso de renovación. 4 están vencidas y renovables dentro del pipeline; existen 1158 pólizas con vigencia pasada en el alcance histórico, de las cuales ",
+          "hostText": "🔄\nRenovaciones\n· Pipeline por vencer\nPreparar campaña de renovación\nVENCIDAS\n25\nRecuperar o cerrar gestión\n≤15 DÍAS\n0\nAtención prioritaria\n16–45 DÍAS\n9\nPlanificar gestión\nPRIMA NETA EN GESTIÓN\nGTQ 185,313\nCOP 68,627,858\nSeparada por moneda; horizonte 90 días\nPipeline de renovación por fecha\nAquí se muestran pólizas que todavía forman parte del proceso de renovación. 25 están vencidas y renovables dentro del pipeline; existen 1158 pólizas con vigencia pasada en el alcance histórico, de las cuale",
           "phase": "warm",
           "country": "TODOS",
           "viewport": "320x568",
-          "readyMs": 299
+          "readyMs": 293,
+          "initialTerminal": null,
+          "recovery": null
         },
         {
           "loadingState": "ready",
@@ -1110,8 +1166,8 @@
           "bucketCounts": [
             {
               "key": "vencidas",
-              "count": 2,
-              "visible": 2
+              "count": 23,
+              "visible": 23
             },
             {
               "key": "d15",
@@ -1129,22 +1185,24 @@
               "visible": 26
             }
           ],
-          "expectedCount": 36,
-          "visibleCount": 36,
+          "expectedCount": 57,
+          "visibleCount": 57,
           "exactCanonicalIds": true,
-          "recentAccessibleCount": 0,
-          "recentVisibleCount": 0,
+          "recentAccessibleCount": 22,
+          "recentVisibleCount": 22,
           "recentExact": true,
           "terminalVisibleCount": 0,
           "labelOk": true,
           "cardsFit": true,
           "actionsFit": true,
           "boardFits": true,
-          "hostText": "🔄\nRenovaciones\n· Pipeline por vencer\nPreparar campaña de renovación\nVENCIDAS\n2\nRecuperar o cerrar gestión\n≤15 DÍAS\n0\nAtención prioritaria\n16–45 DÍAS\n8\nPlanificar gestión\nPRIMA NETA EN GESTIÓN\nGTQ 102,825\nSeparada por moneda; horizonte 90 días\nPipeline de renovación por fecha\nAquí se muestran pólizas que todavía forman parte del proceso de renovación. 2 están vencidas y renovables dentro del pipeline; existen 1061 pólizas con vigencia pasada en el alcance histórico, de las cuales 100 están marca",
+          "hostText": "🔄\nRenovaciones\n· Pipeline por vencer\nPreparar campaña de renovación\nVENCIDAS\n23\nRecuperar o cerrar gestión\n≤15 DÍAS\n0\nAtención prioritaria\n16–45 DÍAS\n8\nPlanificar gestión\nPRIMA NETA EN GESTIÓN\nGTQ 185,313\nSeparada por moneda; horizonte 90 días\nPipeline de renovación por fecha\nAquí se muestran pólizas que todavía forman parte del proceso de renovación. 23 están vencidas y renovables dentro del pipeline; existen 1061 pólizas con vigencia pasada en el alcance histórico, de las cuales 100 están mar",
           "phase": "warm",
           "country": "GT",
           "viewport": "320x568",
-          "readyMs": 2439
+          "readyMs": 2034,
+          "initialTerminal": null,
+          "recovery": null
         },
         {
           "loadingState": "ready",
@@ -1179,8 +1237,8 @@
           "expectedCount": 8,
           "visibleCount": 8,
           "exactCanonicalIds": true,
-          "recentAccessibleCount": 0,
-          "recentVisibleCount": 0,
+          "recentAccessibleCount": 2,
+          "recentVisibleCount": 2,
           "recentExact": true,
           "terminalVisibleCount": 0,
           "labelOk": true,
@@ -1191,7 +1249,9 @@
           "phase": "warm",
           "country": "CO",
           "viewport": "320x568",
-          "readyMs": 2049
+          "readyMs": 1687,
+          "initialTerminal": null,
+          "recovery": null
         }
       ],
       "firstPaint": {
