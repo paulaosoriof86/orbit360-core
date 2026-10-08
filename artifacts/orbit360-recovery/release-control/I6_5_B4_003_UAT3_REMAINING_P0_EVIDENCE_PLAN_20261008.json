@@ -1,7 +1,7 @@
 {
   "schema": "gravicentra-b4-003-uat3-remaining-p0-evidence-plan-v1",
-  "recordedAt": "2026-10-08T21:18:00Z",
-  "status": "PRIORITY_FROZEN_RENEWALS_CLOSEOUT_ACTIVE",
+  "recordedAt": "2026-10-08T21:31:00Z",
+  "status": "RENEWALS_B02_DECISION_READY_PAULA_AUTHORIZATION_PENDING",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "parentHead": "9f043a779f967f63a142d8dc5ef74583e0e325bc",
@@ -144,7 +144,7 @@
     "b4003Open": true,
     "b4004Held": true
   },
-  "nextAction": "I6_5_B4_003_RENEWALS_BLOCKING_CLOSEOUT",
+  "nextAction": "PAULA_DECISION_AUTHORIZE_EXACT_583_OR_HOLD",
   "executionReceipts": {
     "e1ScopeLock": {
       "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_UAT3_E1_CANONICAL_READONLY_PACK_SCOPE_LOCK_20261008.json",
@@ -197,6 +197,13 @@
       "applyAuthorized": false,
       "next": "Prepare exact B-02 authorization/readback decision; do not infer in UI."
     },
-    "previewFunctionalProofAuthorized": false
+    "previewFunctionalProofAuthorized": false,
+    "b02DecisionPack": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_B02_RENEWAL_CUTOFF_APPLY_DECISION_PACK_20261008.json",
+      "blobSha": "d9b51a847d0d39bcc8591d9e8ac16e6db52a9ed9",
+      "commit": "fba8af2672b861d84974b730b421c981a8552428",
+      "status": "READY_FOR_PAULA_DECISION_NOT_AUTHORIZED"
+    },
+    "next": "PAULA_DECISION_AUTHORIZE_EXACT_583_OR_HOLD"
   }
 }
