@@ -284,7 +284,7 @@ async function renewalDistributionReadback(){
   tenant.collection('data').doc('polizas').collection('items').get(),
   tenant.collection('data').doc('clientes').collection('items').get()
  ]);
- const now=new Date();now.setHours(0,0,0,0);
+ const now=new Date();
  const clientById=new Map(clientSnap.docs.map(d=>[d.id,{id:d.id,...d.data()}]));
  const rawRows=snap.docs.map(d=>({id:d.id,...d.data()}));
  const excludedSyntheticIds=rawRows.filter(x=>x.__syntheticQa===true).map(x=>String(x.id)).filter(Boolean).sort();
@@ -297,7 +297,7 @@ async function renewalDistributionReadback(){
   return'UNKNOWN';
  };
  const active=p=>['vigente','porrenovar'].includes(norm(p.estado))&&!p.renovadaPor&&norm(p.renovacionEstado)!=='renovada';
- const days=p=>{const raw=clean(p.vigenciaFin);if(!raw)return null;const d=new Date(raw+'T00:00:00');return Number.isFinite(d.getTime())?Math.ceil((d-now)/86400000):null;};
+ const days=p=>{const raw=clean(p.vigenciaFin);if(!raw)return null;const d=new Date(raw+'T00:00:00');return Number.isFinite(d.getTime())?Math.round((d-now)/86400000):null;};
  const policyState=p=>clean(p&&p.estado).toLowerCase().replace(/\s+/g,'');
  const terminalRenewalOutcome=p=>!!(p&&p.renovadaPor)||['renovada','norenovada','rechazada','cerrada','cancelada'].includes(clean(p&&p.renovacionEstado).toLowerCase().replace(/[\s_-]+/g,''));
  const pipelineEligible=(p,d)=>state(p)!=='NO'&&!terminalRenewalOutcome(p)&&d!=null&&d<=90&&(d<0?!['cancelada','anulada'].includes(policyState(p)):['vigente','porrenovar'].includes(policyState(p)));

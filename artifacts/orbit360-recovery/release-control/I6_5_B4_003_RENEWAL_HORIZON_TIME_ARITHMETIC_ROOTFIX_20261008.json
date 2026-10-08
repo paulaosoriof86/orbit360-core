@@ -1,0 +1,46 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_RENEWAL_HORIZON_TIME_ARITHMETIC_ROOTFIX_V1",
+  "recordedAt": "2026-10-08T22:18:30Z",
+  "status": "PROOF_ROOTFIXED_PENDING_EXACT_PREVIEW",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "parentHead": "933793cedc5a801b264d9f5f648f65e9561d8f7d",
+  "failedRun": {
+    "id": 37852345193,
+    "jobId": 113568124238,
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-37852345193-930c2bpo.web.app",
+    "error": "B4_003_R13_REAL_RENEWAL_PIPELINE_MISMATCH",
+    "observed": {
+      "expectedByStaleArithmetic": 63,
+      "visibleCanonical": 65,
+      "extraAtD90Boundary": 2,
+      "missingExpected": 0,
+      "cleanupWrites": 18,
+      "syntheticFinalAbsent": true,
+      "liveByteStable": true
+    }
+  },
+  "cause": {
+    "classification": "QA_DATE_ARITHMETIC_DRIFT",
+    "proofRule": "Midnight anchor plus Math.ceil",
+    "canonicalUiRule": "Current page-load time plus Math.round",
+    "impact": "Two valid policies at the 90-day boundary were classified as day 91 only by the proof.",
+    "productRegression": false
+  },
+  "correction": {
+    "path": "tools/gravicentra-i6-5-b4-003-preview-proof.mjs",
+    "previousBlobSha": "9fe1be5dcf02179ac32d7768b06128bbd1e4d64f",
+    "correctedBlobSha": "b7bb610a322f481b6988141bdf5a6cc999c26ba2",
+    "scope": "Mirror Orbit.ui.daysFromNow temporal semantics in the independent expected-universe calculation."
+  },
+  "boundaries": {
+    "productSourceChanged": false,
+    "dataMutation": false,
+    "businessWrites": false,
+    "syntheticQaWritesThisCommit": false,
+    "recordDeletion": false,
+    "livePromotion": false,
+    "reimport": false
+  },
+  "nextAction": "B4_003_R20_CONTRACT_AND_EXACT_PREVIEW"
+}
