@@ -752,7 +752,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_UAT3_E1_CANONICAL_READONLY_PACK_SCOPE_LOCK",
+  "nextAction": "I6_5_B4_003_UAT3_E1_CANONICAL_ID_GRAPH_AND_ROLE_READBACK",
   "postproductionExitProgress": {
     "formalPercent": 50,
     "frozenMiniGates": 5,
@@ -8386,5 +8386,11 @@
       "reimport": false
     },
     "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_UAT3_E1_CANONICAL_READONLY_PACK_SCOPE_LOCK"
+  },
+  "lastEvidenceReceipt": {
+    "id": "I6_5_B4_003_UAT3_E1_OFFLINE_SOURCE_RECONCILIATION_20261008",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_UAT3_E1_OFFLINE_SOURCE_RECONCILIATION_20261008.json",
+    "commit": "b84c2daa8b95e83182538aa8aad634591e63dbda",
+    "disposition": "OFFLINE_SOURCE_RECONCILIATION_COMPLETE_CANONICAL_READBACK_PENDING"
   }
 }
