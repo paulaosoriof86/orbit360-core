@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_PENDING_CLOSURE_MASTER_PLAN_LOCK_V1",
-  "recordedAt": "2026-10-08T20:36:00Z",
-  "status": "FROZEN_ACTIVE_UAT3_REMAINING_P0_EVIDENCE_PLAN_LOCKED",
+  "recordedAt": "2026-10-08T21:20:00Z",
+  "status": "FROZEN_ACTIVE_PAULA_RELEASE_PRIORITY_RENEWALS",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "purpose": "Single no-loss operational closure plan from B4-003 R16 through remaining Fase A Post-Salida. Conversation/memory are context only; this lock, ledger, carry register, Control Plane and physical evidence govern execution.",
@@ -285,9 +285,9 @@
   },
   "currentState": {
     "gate": "I6.5 / B4-003",
-    "status": "B4_003_UAT3_P0_BATCH_1_SOURCE_COMPLETE_STATIC_PASS",
-    "nextAction": "B4_003_UAT3_P0_SOURCE_FIX_BATCH_2_SHARED_INBOX_SCOPE_LOCK",
-    "why": "Batch 1 corrected demonstrated client-side P0 causes in Calidad, Renovaciones, Aseguradoras and Ops/Leads. Environment proof remains deferred until cumulative source work is complete; no data/build/Preview/LIVE mutation occurred.",
+    "status": "PAULA_RELEASE_PRIORITY_FROZEN_RENEWALS_ACTIVE",
+    "nextAction": "I6_5_B4_003_RENEWALS_BLOCKING_CLOSEOUT",
+    "why": "Paula's release order is now a physical repository authority: Renewals first, then Upsells/Leads/Ops; Insurers/knowledge and Quality continue in parallel and are nonblocking unless a documented critical escalation condition is met.",
     "reviewedSourceSha": "66c3b9b77ef8ffecbe3a26de59897abd55ec677f",
     "reviewedBuildId": "gi-i65-b4-66c3b9b77ef8-57f234755dc1",
     "reviewedPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b4-37710305112-ud58tgnd.web.app",
@@ -14551,7 +14551,15 @@
       "/A&S Transformacion Digital/Conocimiento Aseguradoras/2026-10-03/AYS_GRAVICENTRA_CONOCIMIENTO_NORMALIZADO_CANDIDATO_PASS2_2026-10-04.json"
     ],
     "b4004Held": true,
-    "rule": "Work all independent non-PASS causes in parallel where safe, but do not advance a later blocking gate or mutate the certified B4-003 product artifact before its required visual acceptance."
+    "rule": "Work all independent non-PASS causes in parallel where safe, but do not advance a later blocking gate or mutate the certified B4-003 product artifact before its required visual acceptance.",
+    "schedulingRole": "PARALLEL_NONBLOCKING_BY_PAULA_PRIORITY_FREEZE",
+    "releaseBlocking": false,
+    "escalationOnly": [
+      "PROVEN_CURRENT_CALCULATION_OR_FLOW_CRITICAL_DEFECT",
+      "PROVEN_FINANCIAL_CORRUPTION",
+      "PROVEN_SECURITY_DEFECT",
+      "PROVEN_DAILY_OPERATIONAL_BLOCKER"
+    ]
   },
   "r18VisualRejectionFreeze": {
     "status": "FROZEN",
@@ -15095,7 +15103,7 @@
     "liveMutation": false,
     "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_UAT3_P0_SOURCE_FIX_BATCH_3_SCOPE_LOCK"
   },
-  "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_UAT3_E1_CANONICAL_READONLY_PACK_SCOPE_LOCK",
+  "nextAction": "I6_5_B4_003_RENEWALS_BLOCKING_CLOSEOUT",
   "uat3P0SourceFixBatch3": {
     "status": "SOURCE_FIXED_STATIC_PASS_DEPLOYMENT_NOT_DISPATCHED",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_UAT3_P0_SOURCE_FIX_BATCH_3_COMMERCIAL_CONVERSION_20261008.json",
@@ -15122,9 +15130,9 @@
     "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_UAT3_DEFERRED_READBACK_AND_TRACE_PLAN"
   },
   "uat3RemainingP0EvidencePlan": {
-    "status": "PLAN_LOCKED_EXECUTION_NOT_AUTHORIZED",
+    "status": "PRIORITY_FROZEN_RENEWALS_CLOSEOUT_ACTIVE",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_UAT3_REMAINING_P0_EVIDENCE_PLAN_20261008.json",
-    "blobSha": "2ab259ccb09a7f2aa2030f6bab3e0d9289fa6006",
+    "blobSha": "c9211eeec108ffd14a13e64573cc78d552b110bd",
     "parentHead": "9f043a779f967f63a142d8dc5ef74583e0e325bc",
     "uatP0": 29,
     "sourceAddressedOrInstrumented": 18,
@@ -15149,6 +15157,22 @@
     "functionDeployment": false,
     "liveMutation": false,
     "reimport": false,
-    "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_UAT3_E1_CANONICAL_READONLY_PACK_SCOPE_LOCK"
+    "nextAction": "I6_5_B4_003_RENEWALS_BLOCKING_CLOSEOUT",
+    "priorityAuthorityBlobSha": "fab0103ffeb10690160eef276e48bd648db998d7"
+  },
+  "paulaReleasePriorityFreeze20261008": {
+    "status": "FROZEN_USER_AUTHORITY_ACTIVE",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PAULA_RELEASE_PRIORITY_FREEZE_20261008.json",
+    "blobSha": "fab0103ffeb10690160eef276e48bd648db998d7",
+    "commit": "5fdc54fe14b407edc9a288c4607a32e2ea192a1a",
+    "executionOrder": [
+      "RENEWALS_RELEASE_BLOCKING",
+      "UPSELLS_LEADS_OPS_RELEASE_BLOCKING",
+      "INSURERS_KNOWLEDGE_PARALLEL_NONBLOCKING",
+      "QUALITY_PARALLEL_NONBLOCKING",
+      "EXACT_PREVIEW_TO_PRODUCTION"
+    ],
+    "scopeRule": "Governs scheduling inside the preserved no-loss closure plan. It does not delete findings or authorize data/build/Preview/LIVE mutation.",
+    "nextAction": "I6_5_B4_003_RENEWALS_BLOCKING_CLOSEOUT"
   }
 }
