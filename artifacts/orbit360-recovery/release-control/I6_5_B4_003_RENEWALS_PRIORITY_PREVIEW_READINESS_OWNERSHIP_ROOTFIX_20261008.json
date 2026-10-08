@@ -1,0 +1,24 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_RENEWALS_PRIORITY_PREVIEW_READINESS_OWNERSHIP_ROOTFIX_V1",
+  "recordedAt": "2026-10-08T20:27:12.304Z",
+  "status": "QA_HARNESS_ROOTFIX_READY_FOR_EXACT_RETRY",
+  "failedRunId": 37838915887,
+  "failedJobId": 113523014625,
+  "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-37838915887-jo241s7s.web.app",
+  "failure": "The harness timed out waiting for all Renewals collections before entering the Renewals route for the second role.",
+  "classification": "QA_HARNESS_PRECONDITION_MASKED_PRODUCT_TERMINAL",
+  "evidenceBeforeFailure": {
+    "backendExactReadbackPassed": true,
+    "firstRoleFullMatrixPassed": true,
+    "liveByteStable": true
+  },
+  "rootCause": "The harness owned readiness before route entry, while the product's Renewals module owns required-collection attachment and the bounded ready/unavailable/timed_out terminal.",
+  "correction": "Authenticate and activate the product, then let the canonical Renewals surface request its collections and adjudicate its own bounded terminal. A non-ready terminal remains a real blocking failure with explicit state.",
+  "productSourceChanged": false,
+  "dataMutation": false,
+  "businessWrites": 0,
+  "syntheticQaWrites": 0,
+  "livePromotion": false,
+  "reimport": false,
+  "nextAction": "EXACT_SAME_SCOPE_RETRY"
+}
