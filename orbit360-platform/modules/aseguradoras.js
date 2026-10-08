@@ -1221,7 +1221,21 @@ Orbit.modules.aseguradoras = (function () {
       if (t === 'productos') {
         const ramoBoxes=[...body.querySelectorAll('[data-offer-ramo]')];
         if(ramoBoxes.length)draft.ramos=ramoBoxes.filter(x=>x.checked).map(x=>x.value);
-        body.querySelectorAll('[data-ramopct]').forEach(inp => { draft.comisiones = draft.comisiones || {}; draft.comisiones[inp.dataset.ramopct] = +inp.value || 0; });
+        // Avoid implicit commission overrides when a field only displays a source-backed default.
+        const sourceCommissions=S().get('aseguradoras',id)||{},explicitCommissions=sourceCommissions.comisiones||{};
+        body.querySelectorAll('[data-ramopct]').forEach(inp=>{
+          const ramo=clean(inp.dataset.ramopct),raw=clean(inp.value),next=raw===''?null:Number(raw);
+          if(!ramo||(next!==null&&!Number.isFinite(next)))return;
+          const explicit=Object.prototype.hasOwnProperty.call(explicitCommissions,ramo);
+          const effective=explicit?Number(explicitCommissions[ramo]):(sourceCommissions.comisionDefault!=null?Number(sourceCommissions.comisionDefault):null);
+          if(next===effective||(next===null&&effective===null)){
+            if(explicit){draft.comisiones=draft.comisiones||{};draft.comisiones[ramo]=explicitCommissions[ramo];}
+            else if(draft.comisiones)delete draft.comisiones[ramo];
+            return;
+          }
+          if(next===null&&!explicit)return;
+          draft.comisiones=draft.comisiones||{};draft.comisiones[ramo]=next===null?0:next;
+        });
         (draft.ramos || []).forEach(r => {
           const segEl = body.querySelector(`[data-ramoseg="${CSS.escape(r)}"]`),habEl = body.querySelector(`[data-ramohab="${CSS.escape(r)}"]`);
           const prod=[...body.querySelectorAll(`[data-ramoprod="${CSS.escape(r)}"]:checked`)].map(x=>x.value);
@@ -1230,7 +1244,29 @@ Orbit.modules.aseguradoras = (function () {
           delete draft.ramosDetalle[r].producto; delete draft.ramosDetalle[r].plan;
           draft.ramosHabilitados = draft.ramosHabilitados || {}; draft.ramosHabilitados[r] = Object.assign({}, draft.ramosHabilitados[r], { cotizador: habEl ? habEl.checked : false });
         });
-        draft.docsRequeridos = [...body.querySelectorAll('[data-req]')].map(r => ({ pais:(r.querySelector('[data-rcountry]')||{}).value||draft.pais, ramo:(r.querySelector('[data-rramo]')||{}).value||'', producto:(r.querySelector('[data-rp]')||{}).value||'', plan:(r.querySelector('[data-rplan]')||{}).value||'', tipo:(r.querySelector('[data-rtype]')||{}).value||'Documento', descripcion:(r.querySelector('[data-ri]')||{}).value||'', items:(r.querySelector('[data-ri]')||{}).value||'', estado:(r.querySelector('[data-rstatus]')||{}).value||'Vigente', provenance:(r.querySelector('[data-rprov]')||{}).value||'', fecha:(r.querySelector('[data-rdate]')||{}).value||'', documentRef:(r.querySelector('[data-rattach]')||{}).value||'' }));
+        // The requirement filter only renders a subset; never replace the whole canonical array with that subset.
+        const visibleRequirements=[...body.querySelectorAll('[data-req]')];
+        if(visibleRequirements.length){
+          const retained=Array.isArray(draft.docsRequeridos)?draft.docsRequeridos.slice():[];
+          visibleRequirements.forEach(r=>{
+            const index=Number(r.dataset.req);
+            if(!Number.isInteger(index)||index<0||index>=retained.length)return;
+            retained[index]=Object.assign({},retained[index]||{},{
+              pais:(r.querySelector('[data-rcountry]')||{}).value||draft.pais,
+              ramo:(r.querySelector('[data-rramo]')||{}).value||'',
+              producto:(r.querySelector('[data-rp]')||{}).value||'',
+              plan:(r.querySelector('[data-rplan]')||{}).value||'',
+              tipo:(r.querySelector('[data-rtype]')||{}).value||'Documento',
+              descripcion:(r.querySelector('[data-ri]')||{}).value||'',
+              items:(r.querySelector('[data-ri]')||{}).value||'',
+              estado:(r.querySelector('[data-rstatus]')||{}).value||'Vigente',
+              provenance:(r.querySelector('[data-rprov]')||{}).value||'',
+              fecha:(r.querySelector('[data-rdate]')||{}).value||'',
+              documentRef:(r.querySelector('[data-rattach]')||{}).value||''
+            });
+          });
+          draft.docsRequeridos=retained;
+        }
       }
       if (t === 'documentos') {
         const prevDocs = draft.docs || [];
