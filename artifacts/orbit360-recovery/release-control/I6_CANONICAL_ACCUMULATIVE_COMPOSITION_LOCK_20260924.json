@@ -2165,7 +2165,7 @@
     "operationalBusinessWrites": 0,
     "syntheticFinalAbsent": true
   },
-  "findingLedgerBlobSha": "35105b099e4a33be237149071c2d1e95b3396ff0",
+  "findingLedgerBlobSha": "519a9edb03b6ac88848d90bf427e0dc7c83c60b1",
   "b4002Diagnostic": {
     "status": "CAUSE_DEMONSTRATED_SOURCE_FIX_AUTHORIZED",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_002_POST_COMMIT_NOTIFICATION_DIAGNOSTIC_20261003.json",
@@ -3891,5 +3891,16 @@
       "b4004Held": true
     },
     "nextAction": "B4_003_R20_CONTRACT_AND_EXACT_PREVIEW"
+  },
+  "uat3PriorityReconciliation": {
+    "status": "GOVERNANCE_ONLY_NO_PRODUCT_COMPOSITION_CHANGE",
+    "recordedAt": "2026-10-08T12:20:28-06:00",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_UAT3_FINDING_PRIORITY_RECONCILIATION_20261008.json",
+    "receiptBlobSha": "97f1a5a49d04b15a265c2c4bcd747d6404439eac",
+    "ledgerBlobSha": "519a9edb03b6ac88848d90bf427e0dc7c83c60b1",
+    "carryBlobSha": "ce2a120805a69c72472b07f4a2d34861aff6514f",
+    "productSourceSetChanged": false,
+    "compositionExactSetChanged": false,
+    "nextAction": "B4_003_UAT3_CONCENTRATED_CAUSAL_AUDIT_P0"
   }
 }

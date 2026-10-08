@@ -1,0 +1,2295 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_UAT3_FINDING_PRIORITY_RECONCILIATION_V1",
+  "recordedAt": "2026-10-08T12:20:28-06:00",
+  "status": "PASS_RECONCILIATION_CAUSAL_AUDIT_PENDING",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "headBefore": "7568f87a04469536249491928632849a4899bcf9",
+  "gate": "B4-003",
+  "boundaries": {
+    "productMutation": false,
+    "dataMutation": false,
+    "buildDispatch": false,
+    "previewDispatch": false,
+    "liveMutation": false,
+    "reimport": false
+  },
+  "authorities": {
+    "uat3Path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_UAT_THREE_BLOCKS_FORENSIC_FREEZE_AND_COMPLEMENT_20261008.md",
+    "uat3BlobSha": "79a19a20a3bb2ff11b609990d51836a80a7202c5",
+    "ledgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
+    "ledgerPreviousBlobSha": "f2606c6e1a2cf0ebd8330d87b42535fa4a182fc7",
+    "carryPath": "artifacts/orbit360-recovery/release-control/I6_5_OPEN_FINDINGS_CARRY_FORWARD_REGISTER_20261003.json",
+    "carryPreviousBlobSha": "d633012eab94f526e90fa271f61f1955db0b77a2",
+    "controlPlanePath": "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json",
+    "controlPlanePreviousBlobSha": "f421ac975ee23145a190128d6c78923d1cf6947e",
+    "masterPlanPath": "artifacts/orbit360-recovery/release-control/I6_PENDING_CLOSURE_MASTER_PLAN_LOCK_20261004.json",
+    "masterPlanPreviousBlobSha": "ada9c77a24d421bbe00c9b1e3704361d782c5dc2",
+    "executionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B4_EXECUTION_LOCK_20261002.json",
+    "executionLockPreviousBlobSha": "512156036d7690443b750f5daf6fcbf312efa8bf"
+  },
+  "reconciliation": {
+    "observations": 52,
+    "linkedExistingFindingIds": [
+      "B4-003-R11-09-POLICY-PREMIUM-CALENDAR-MISMATCH",
+      "B4-003-R11-10-INSURER-KNOWLEDGE-INGESTION-CONTRACT",
+      "B4-003-R11-14-INSURER-TARIFF-SOURCE-BACKLOG",
+      "B4-003-R13-05-POLICIES-ROUTE-LATENCY-FREEZE",
+      "B4-003-R13-07-POLICY-DETAIL-HYDRATION-LATENCY",
+      "B4-003-R13-08-REFRESH-CLIENT-FLICKER",
+      "B4-003-R13-10-INSURER-DRIVE-E2E-UPLOAD",
+      "B4-003-R14-01-RENEWALS-FIRST-PAINT-READINESS",
+      "B4-003-R14-03-POLICY-EXPIRY-KPI-SEMANTICS",
+      "B4-003-R14-06-INSURER-IMPORT-STEP-TRUTHFULNESS",
+      "B4-003-R15-02-QUALITY-CLIENT-COMPLETION-DURABILITY",
+      "B4-003-R15-04-QUALITY-COUNTRY-EVIDENCE-SEMANTICS",
+      "B4-003-R15-06-QUALITY-POLICY-MISMATCH-ACTIONABILITY",
+      "B4-003-R15-07-RENEWALS-BUSINESS-COMPLETENESS",
+      "B4-003-R15-08-INSURER-DOCUMENT-TAXONOMY-AND-REGISTRY-CONVERGENCE",
+      "B4-003-R16-04-QUALITY-RESOLUTION-DEEPLINK-MOBILE",
+      "B4-003-R16-05-RECEIPT-SHADOW-DUPLICATE-PROJECTION",
+      "B4-003-R18-02-OPS-LEADS-RAMO-PRODUCT-PLAN-DEPENDENCY",
+      "B4-003-R18-03-COMMERCIAL-IDENTITY-MULTIOPPORTUNITY-MODEL",
+      "B4-003-R18-04-OPS-ADVISOR-TYPED-HANDOFF-ACTIVITY",
+      "B4-003-R18-05-OPS-MANAGEMENT-TYPE-QUEUE-SEMANTICS",
+      "B4-003-R18-06-QUALITY-PROVENANCE-CONFIRMATION-ACTION",
+      "B4-003-R18-07-QUALITY-CHANNEL-ACTION-SEMANTIC-MISMATCH",
+      "B4-003-R18-10-RENEWAL-UNIVERSE-11-VS-2-DISPOSITION-GAP",
+      "B4-003-R18-13-INSURER-KNOWLEDGE-MOBILE-HIERARCHY",
+      "B4-003-R18-14-INSURER-ACTIVITY-KNOWLEDGE-EVENT-CONVERGENCE",
+      "B4-003-R19-02-QUALITY-SEARCH-FILTER-REGRESSION",
+      "B4-003-R19-03-QUALITY-HORIZONTAL-REACHABILITY",
+      "B4-003-R19-04-QUALITY-CONTACT-CHANNEL-ACTION-GAP",
+      "B4-003-R19-08-OPS-ADVISOR-HANDOFF-NOTIFICATION-GAP",
+      "B4-003-R20-B01",
+      "B4-003-R20-B03",
+      "B4-003-R20-B04",
+      "B4-003-R20-B06",
+      "B4-003-R20-B07",
+      "B4-003-R20-B08",
+      "B4-003-R20-B09",
+      "B4-003-R20-B10",
+      "B4-003-R20-B11",
+      "B4-003-R20-B12",
+      "B4-003-R20-B13",
+      "B4-003-R20-B14",
+      "B4-003-R20-Q01",
+      "B4-003-R20-Q02",
+      "B4-003-R20-Q03",
+      "B4-003-R20-Q04",
+      "B4-003-R20-V2-01-ACTION-QUEUE-RANK",
+      "B4-003-R20-V2-02-ACTION-STATE-VISUAL",
+      "B4-003-R20-V2-03-CARD-OPEN-LATENCY",
+      "B4-003-R20-V2-04-COLLAB-UX-COMMIT-SEMANTICS",
+      "B4-003-R20-V2-05-INBOX-ACTION-FEEDBACK",
+      "B4-003-R20-V2-07-BUSINESS-MODAL-VISUAL",
+      "B4-003-R20-V2-08-INSURER-DRIVE-EMBED-RBAC",
+      "B4-003-R20-V2-09-INSURER-IMPORTER-TRUTHFULNESS",
+      "B4-003-R20-V2-10-INSURER-AUDIT-HUMAN-LANGUAGE",
+      "B4-003-R20-V2-11-INSURER-SEMANTIC-DIFF",
+      "B4-003-R20-V2-12-INSURER-SAVE-PROGRESS",
+      "B4-003-R20-V2-14-QUALITY-COUNTRY-DATA-DEBT",
+      "B4-003-R20-V2-15-RENEWAL-CUTOFF-DISPOSITION",
+      "B4-003-R20-V2-16-TRANSVERSAL-VISUAL-HIERARCHY"
+    ],
+    "linkedExistingFindingCount": 60,
+    "newFindingIds": [],
+    "noHistoricalIdDeleted": true,
+    "noPassReopenedWithoutCausalRegression": true,
+    "classifications": {
+      "PARALLEL_NONBLOCKING_P1": 20,
+      "BLOCKING_P0": 29,
+      "PRESERVED_PASS": 2,
+      "DEFERRED_AUTHORIZED_P2": 1
+    },
+    "rows": [
+      {
+        "observationId": "A-01",
+        "sourceSection": "UAT3_ADDENDUM#A-01",
+        "observation": "`B4-003-R19-02` / `R20-Q01` — El campo de búsqueda de expedientes pierde foco tras ~2 caracteres. Causa de código verificada: `calidad.js` programa `render(host)` completo 160ms después de `input` y reemplaza `#q-search`. Prueba: tecleo continuo 20 caracteres sin perder foco, selección/posición y filtros.",
+        "classification": "PARALLEL_NONBLOCKING_P1",
+        "priorityRationale": "Material improvement remains tracked and owned, but it does not block release while it cannot alter critical calculations, security, or P0 operations.",
+        "causeStatus": "DEMONSTRATED_EXISTING_CAUSE",
+        "findingLinks": [
+          {
+            "id": "B4-003-R19-02-QUALITY-SEARCH-FILTER-REGRESSION",
+            "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
+            "blocking": true,
+            "owner": [
+              "orbit360-platform/modules/calidad.js"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Calidad de datos",
+            "preserveExistingDisposition": true
+          }
+        ],
+        "independentCauseDemonstrated": false,
+        "newFindingId": null
+      },
+      {
+        "observationId": "A-02",
+        "sourceSection": "UAT3_ADDENDUM#A-02",
+        "observation": "`R20-Q03/Q05/Q06` — El botón general «Corregir datos» envía `focus:f[0].k`; `editarInline` si `focus==='telefono'` reduce los campos exclusivamente a teléfono. Causa de la aparente existencia de dos formularios según primer faltante. Deben existir acciones generales y focalizadas independientes, no variar silenciosamente.",
+        "classification": "PARALLEL_NONBLOCKING_P1",
+        "priorityRationale": "Material improvement remains tracked and owned, but it does not block release while it cannot alter critical calculations, security, or P0 operations.",
+        "causeStatus": "DEMONSTRATED_EXISTING_CAUSE",
+        "findingLinks": [
+          {
+            "id": "B4-003-R20-Q03",
+            "status": "PAULA_VISUAL_REJECTED_R20_SECOND_REVIEW_REMEDIATION_REQUIRED",
+            "blocking": true,
+            "owner": [
+              "orbit360-platform/modules/calidad.js"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Calidad/Acciones",
+            "preserveExistingDisposition": true
+          },
+          {
+            "id": "B4-003-R18-07-QUALITY-CHANNEL-ACTION-SEMANTIC-MISMATCH",
+            "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
+            "blocking": true,
+            "owner": [
+              "orbit360-platform/modules/calidad.js"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Calidad de datos",
+            "preserveExistingDisposition": true
+          },
+          {
+            "id": "B4-003-R19-04-QUALITY-CONTACT-CHANNEL-ACTION-GAP",
+            "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
+            "blocking": true,
+            "owner": [
+              "orbit360-platform/modules/calidad.js",
+              "client contact schema"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Calidad/Canal",
+            "preserveExistingDisposition": true
+          }
+        ],
+        "independentCauseDemonstrated": false,
+        "newFindingId": null
+      },
+      {
+        "observationId": "A-03",
+        "sourceSection": "UAT3_ADDENDUM#A-03",
+        "observation": "`R20-Q04` — «Confirmar origen del país» abre el formulario general porque `forceProvenance` antepone país sin restringir campos. Debe presentar solo país, departamento/provincia, municipio/ciudad y dirección/origen según contrato aprobado, con confirmación auditable.",
+        "classification": "PARALLEL_NONBLOCKING_P1",
+        "priorityRationale": "Material improvement remains tracked and owned, but it does not block release while it cannot alter critical calculations, security, or P0 operations.",
+        "causeStatus": "DEMONSTRATED_EXISTING_CAUSE",
+        "findingLinks": [
+          {
+            "id": "B4-003-R20-Q04",
+            "status": "PAULA_VISUAL_REJECTED_R20_SECOND_REVIEW_REMEDIATION_REQUIRED",
+            "blocking": true,
+            "owner": [
+              "orbit360-platform/modules/calidad.js",
+              "canonical client/policy/insurer relation owners"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Calidad/País",
+            "preserveExistingDisposition": true
+          },
+          {
+            "id": "B4-003-R18-06-QUALITY-PROVENANCE-CONFIRMATION-ACTION",
+            "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
+            "blocking": true,
+            "owner": [
+              "orbit360-platform/modules/calidad.js",
+              "clientCountryEvidence"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Calidad de datos/País y provenance",
+            "preserveExistingDisposition": true
+          },
+          {
+            "id": "B4-003-R15-04-QUALITY-COUNTRY-EVIDENCE-SEMANTICS",
+            "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
+            "blocking": true,
+            "owner": [
+              "orbit360-platform/modules/calidad.js",
+              "orbit360-platform/modules/cliente360.js"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Calidad de datos",
+            "preserveExistingDisposition": true
+          }
+        ],
+        "independentCauseDemonstrated": false,
+        "newFindingId": null
+      },
+      {
+        "observationId": "A-04",
+        "sourceSection": "UAT3_ADDENDUM#A-04",
+        "observation": "`R20-Q02` — Tabla desktop con barra superior mejorada; en viewport estrecho Paula no puede desplazarla. Prueba de gestos horizontal/teclado/scroll sync a 390/320 sin pérdida de botones.",
+        "classification": "PARALLEL_NONBLOCKING_P1",
+        "priorityRationale": "Material improvement remains tracked and owned, but it does not block release while it cannot alter critical calculations, security, or P0 operations.",
+        "causeStatus": "HUMAN_REPRODUCTION_EXISTING_FINDING",
+        "findingLinks": [
+          {
+            "id": "B4-003-R20-Q02",
+            "status": "PAULA_VISUAL_REJECTED_R20_SECOND_REVIEW_REMEDIATION_REQUIRED",
+            "blocking": true,
+            "owner": [
+              "orbit360-platform/modules/calidad.js",
+              "orbit360-platform/styles/infra.css"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Calidad/Datos personales",
+            "preserveExistingDisposition": true
+          },
+          {
+            "id": "B4-003-R19-03-QUALITY-HORIZONTAL-REACHABILITY",
+            "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
+            "blocking": true,
+            "owner": [
+              "orbit360-platform/modules/calidad.js",
+              "orbit360-platform/styles/infra.css"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Calidad/contact data table",
+            "preserveExistingDisposition": true
+          }
+        ],
+        "independentCauseDemonstrated": false,
+        "newFindingId": null
+      },
+      {
+        "observationId": "A-05",
+        "sourceSection": "UAT3_ADDENDUM#A-05",
+        "observation": "`R20-Q01` / `R15-06` — Bloque financiero «Póliza vs. calendario» carece de filtros/buscador equivalentes a Datos personales; debe permitir póliza/cliente/asesor/país/estado/diferencia y paginación estable, respetando permisos.",
+        "classification": "PARALLEL_NONBLOCKING_P1",
+        "priorityRationale": "Material improvement remains tracked and owned, but it does not block release while it cannot alter critical calculations, security, or P0 operations.",
+        "causeStatus": "EXISTING_GAP",
+        "findingLinks": [
+          {
+            "id": "B4-003-R20-Q01",
+            "status": "PAULA_VISUAL_REJECTED_R20_SECOND_REVIEW_REMEDIATION_REQUIRED",
+            "blocking": true,
+            "owner": [
+              "orbit360-platform/modules/calidad.js"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Calidad/Póliza vs calendario",
+            "preserveExistingDisposition": true
+          },
+          {
+            "id": "B4-003-R15-06-QUALITY-POLICY-MISMATCH-ACTIONABILITY",
+            "status": "CARRY_FORWARD_NON_BLOCKING_BY_PAULA_R20",
+            "blocking": false,
+            "owner": [
+              "orbit360-platform/modules/calidad.js",
+              "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Calidad de datos/Salud póliza vs calendario",
+            "preserveExistingDisposition": true
+          }
+        ],
+        "independentCauseDemonstrated": false,
+        "newFindingId": null
+      },
+      {
+        "observationId": "A-06",
+        "sourceSection": "UAT3_ADDENDUM#A-06",
+        "observation": "`R20-Q01/Q02` — Copia residual en ficha: «El calendario activo suma más que la prima contractual...» pese a lenguaje humanizado principal. Unificar vocabulario de prima en póliza, desglose por recibos y fuente; no usar «calendario» ambiguo.",
+        "classification": "PARALLEL_NONBLOCKING_P1",
+        "priorityRationale": "Material improvement remains tracked and owned, but it does not block release while it cannot alter critical calculations, security, or P0 operations.",
+        "causeStatus": "EXISTING_TERMINOLOGY_GAP",
+        "findingLinks": [
+          {
+            "id": "B4-003-R20-Q01",
+            "status": "PAULA_VISUAL_REJECTED_R20_SECOND_REVIEW_REMEDIATION_REQUIRED",
+            "blocking": true,
+            "owner": [
+              "orbit360-platform/modules/calidad.js"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Calidad/Póliza vs calendario",
+            "preserveExistingDisposition": true
+          },
+          {
+            "id": "B4-003-R16-04-QUALITY-RESOLUTION-DEEPLINK-MOBILE",
+            "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
+            "blocking": true,
+            "owner": [
+              "orbit360-platform/modules/calidad.js"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Calidad de la información",
+            "preserveExistingDisposition": true
+          }
+        ],
+        "independentCauseDemonstrated": false,
+        "newFindingId": null
+      },
+      {
+        "observationId": "A-07",
+        "sourceSection": "UAT3_ADDENDUM#A-07",
+        "observation": "`B4-003-R11-09` / `R15-06` — Captura de póliza VA-57280 muestra Q0 de diferencia pero aviso rojo y texto «suma más». Candidata a falsa alerta/razón desacoplada; antes de cambiar regla, conciliar `financialIntegrityBatch`, razones, delta/tolerancia y filas activas.",
+        "classification": "BLOCKING_P0",
+        "priorityRationale": "Blocks daily operation, financial/data integrity, security/role isolation, release lineage, or the ability to prove a critical write with server readback.",
+        "causeStatus": "CAUSAL_RECONCILIATION_REQUIRED",
+        "findingLinks": [
+          {
+            "id": "B4-003-R11-09-POLICY-PREMIUM-CALENDAR-MISMATCH",
+            "status": "CARRY_FORWARD_NON_BLOCKING_BY_PAULA_R20",
+            "blocking": false,
+            "owner": [
+              "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
+              "orbit360-platform/core/policy-receipts-engine.js",
+              "orbit360-platform/modules/calidad.js"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Póliza/Recibos/Salud de información",
+            "preserveExistingDisposition": true
+          }
+        ],
+        "independentCauseDemonstrated": false,
+        "newFindingId": null
+      },
+      {
+        "observationId": "A-08",
+        "sourceSection": "UAT3_ADDENDUM#A-08",
+        "observation": "`B4-003-R16-05` y B2 `RECEIPT_CALENDAR` — Duplicados activos aparentes `1/12` y `2`, `2/12` y `4`, etc.; filas legadas sin desglose («Pendiente de completar») junto a calendarios `N/N`. Posible regresión de PASS: verificar IDs físicos, exclusión de sombras del total y read-model; no eliminar por UI.",
+        "classification": "BLOCKING_P0",
+        "priorityRationale": "Blocks daily operation, financial/data integrity, security/role isolation, release lineage, or the ability to prove a critical write with server readback.",
+        "causeStatus": "POSSIBLE_REGRESSION_EXISTING_FINDING",
+        "findingLinks": [
+          {
+            "id": "B4-003-R16-05-RECEIPT-SHADOW-DUPLICATE-PROJECTION",
+            "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
+            "blocking": true,
+            "owner": [
+              "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Póliza / Recibos / Calidad financiera",
+            "preserveExistingDisposition": true
+          }
+        ],
+        "independentCauseDemonstrated": false,
+        "newFindingId": null
+      },
+      {
+        "observationId": "A-09",
+        "sourceSection": "UAT3_ADDENDUM#A-09",
+        "observation": "`B4-003-R11-09` — Diferencias de primas en CO quizá derivan de gastos de expedición no contemplados. Hipótesis no demostrada, validar por aseguradora/producto/moneda/impuestos/fuente antes de inferir fórmula o modificar monto.",
+        "classification": "BLOCKING_P0",
+        "priorityRationale": "Blocks daily operation, financial/data integrity, security/role isolation, release lineage, or the ability to prove a critical write with server readback.",
+        "causeStatus": "HYPOTHESIS_NOT_DEMONSTRATED_FAIL_CLOSED",
+        "findingLinks": [
+          {
+            "id": "B4-003-R11-09-POLICY-PREMIUM-CALENDAR-MISMATCH",
+            "status": "CARRY_FORWARD_NON_BLOCKING_BY_PAULA_R20",
+            "blocking": false,
+            "owner": [
+              "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
+              "orbit360-platform/core/policy-receipts-engine.js",
+              "orbit360-platform/modules/calidad.js"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Póliza/Recibos/Salud de información",
+            "preserveExistingDisposition": true
+          },
+          {
+            "id": "B4-003-R11-14-INSURER-TARIFF-SOURCE-BACKLOG",
+            "status": "R16_SOURCE_CONVERGED_PENDING_MACHINE_PROOF_AND_LATER_GATE_DISPOSITION",
+            "blocking": false,
+            "owner": [
+              "INSURER_KNOWLEDGE_SOURCE_BACKLOG",
+              "orbit360-platform/modules/aseguradoras.js"
+            ],
+            "targetGate": "B4-005_AND_EVERGREEN",
+            "surface": "Aseguradoras/Tarifas y conocimiento",
+            "preserveExistingDisposition": true
+          }
+        ],
+        "independentCauseDemonstrated": false,
+        "newFindingId": null
+      },
+      {
+        "observationId": "A-10",
+        "sourceSection": "UAT3_ADDENDUM#A-10",
+        "observation": "— Modal de edición/plan de recibos y detalle contienen columnas y números cortados, «Recibo esperado · —», estados sin fecha concluyente, y un calendario de ejemplo con Q346,080 a conciliar. Evaluar autoridad/suma antes de aprobar.",
+        "classification": "BLOCKING_P0",
+        "priorityRationale": "Blocks daily operation, financial/data integrity, security/role isolation, release lineage, or the ability to prove a critical write with server readback.",
+        "causeStatus": "AUTHORITY_AND_SUM_RECONCILIATION_REQUIRED",
+        "findingLinks": [
+          {
+            "id": "B4-003-R11-09-POLICY-PREMIUM-CALENDAR-MISMATCH",
+            "status": "CARRY_FORWARD_NON_BLOCKING_BY_PAULA_R20",
+            "blocking": false,
+            "owner": [
+              "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
+              "orbit360-platform/core/policy-receipts-engine.js",
+              "orbit360-platform/modules/calidad.js"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Póliza/Recibos/Salud de información",
+            "preserveExistingDisposition": true
+          },
+          {
+            "id": "B4-003-R16-05-RECEIPT-SHADOW-DUPLICATE-PROJECTION",
+            "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
+            "blocking": true,
+            "owner": [
+              "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Póliza / Recibos / Calidad financiera",
+            "preserveExistingDisposition": true
+          },
+          {
+            "id": "B4-003-R20-Q01",
+            "status": "PAULA_VISUAL_REJECTED_R20_SECOND_REVIEW_REMEDIATION_REQUIRED",
+            "blocking": true,
+            "owner": [
+              "orbit360-platform/modules/calidad.js"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Calidad/Póliza vs calendario",
+            "preserveExistingDisposition": true
+          }
+        ],
+        "independentCauseDemonstrated": false,
+        "newFindingId": null
+      },
+      {
+        "observationId": "A-11",
+        "sourceSection": "UAT3_ADDENDUM#A-11",
+        "observation": "`B4-003-R15-02` / `R20-B14` — En Preview un cliente real rechazó el guardado (fail-closed esperado del entorno, no prueba de LIVE); faltan fixtures UAT humanos persistentes, descubribles y desechables para Calidad/recibos. No realizar escrituras reales para probar.",
+        "classification": "BLOCKING_P0",
+        "priorityRationale": "Blocks daily operation, financial/data integrity, security/role isolation, release lineage, or the ability to prove a critical write with server readback.",
+        "causeStatus": "QA_PREREQUISITE_EXISTING_FINDINGS",
+        "findingLinks": [
+          {
+            "id": "B4-003-R15-02-QUALITY-CLIENT-COMPLETION-DURABILITY",
+            "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
+            "blocking": true,
+            "owner": [
+              "orbit360-platform/modules/calidad.js",
+              "orbit360-platform/data/store-firestore-product-operational-p0.js"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Calidad de datos/Completar expediente",
+            "preserveExistingDisposition": true
+          },
+          {
+            "id": "B4-003-R20-B14",
+            "status": "PAULA_VISUAL_REJECTED_R20_SECOND_REVIEW_REMEDIATION_REQUIRED",
+            "blocking": true,
+            "owner": [
+              "orbit360-platform/data/store-firestore-product-operational-p0.js",
+              "functions/product-operational-domain.js",
+              "B4 authenticated QA harness"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Preview write contract",
+            "preserveExistingDisposition": true
+          }
+        ],
+        "independentCauseDemonstrated": false,
+        "newFindingId": null
+      },
+      {
+        "observationId": "A-12",
+        "sourceSection": "UAT3_ADDENDUM#A-12",
+        "observation": "— Países pendientes: dry-run del 2026-10-07 determinó cinco correcciones con evidencia y uno sin evidencia. Las cinco NO se han aplicado; no confundirse con el estado visual de Calidad.",
+        "classification": "PARALLEL_NONBLOCKING_P1",
+        "priorityRationale": "Material improvement remains tracked and owned, but it does not block release while it cannot alter critical calculations, security, or P0 operations.",
+        "causeStatus": "DRY_RUN_PASS_WRITE_NOT_AUTHORIZED",
+        "findingLinks": [
+          {
+            "id": "B4-003-R20-V2-14-QUALITY-COUNTRY-DATA-DEBT",
+            "status": "DRY_RUN_PASS_PENDING_DATA_WRITE_AUTHORIZATION",
+            "blocking": true,
+            "owner": [
+              "DATA_UPDATE",
+              "orbit360-platform/modules/calidad.js"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Calidad · país",
+            "preserveExistingDisposition": true
+          }
+        ],
+        "independentCauseDemonstrated": false,
+        "newFindingId": null
+      },
+      {
+        "observationId": "A-13",
+        "sourceSection": "UAT3_ADDENDUM#A-13",
+        "observation": "— Revisar rótulos y disposición de moneda COP vs GTQ, estado de cartera, recibo esperado vs pago confirmado y visibilidad de acciones por rol.",
+        "classification": "BLOCKING_P0",
+        "priorityRationale": "Blocks daily operation, financial/data integrity, security/role isolation, release lineage, or the ability to prove a critical write with server readback.",
+        "causeStatus": "FINANCIAL_ROLE_SEMANTICS_REQUIRED",
+        "findingLinks": [
+          {
+            "id": "B4-003-R11-09-POLICY-PREMIUM-CALENDAR-MISMATCH",
+            "status": "CARRY_FORWARD_NON_BLOCKING_BY_PAULA_R20",
+            "blocking": false,
+            "owner": [
+              "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
+              "orbit360-platform/core/policy-receipts-engine.js",
+              "orbit360-platform/modules/calidad.js"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Póliza/Recibos/Salud de información",
+            "preserveExistingDisposition": true
+          },
+          {
+            "id": "B4-003-R20-Q01",
+            "status": "PAULA_VISUAL_REJECTED_R20_SECOND_REVIEW_REMEDIATION_REQUIRED",
+            "blocking": true,
+            "owner": [
+              "orbit360-platform/modules/calidad.js"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Calidad/Póliza vs calendario",
+            "preserveExistingDisposition": true
+          },
+          {
+            "id": "B4-003-R20-B14",
+            "status": "PAULA_VISUAL_REJECTED_R20_SECOND_REVIEW_REMEDIATION_REQUIRED",
+            "blocking": true,
+            "owner": [
+              "orbit360-platform/data/store-firestore-product-operational-p0.js",
+              "functions/product-operational-domain.js",
+              "B4 authenticated QA harness"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Preview write contract",
+            "preserveExistingDisposition": true
+          }
+        ],
+        "independentCauseDemonstrated": false,
+        "newFindingId": null
+      },
+      {
+        "observationId": "B-01",
+        "sourceSection": "UAT3_ADDENDUM#B-01",
+        "observation": "`R20-B12` / `R13-05` / `R14-01` — Primera carga «Cargando cartera» puede durar >1 min, refresh posteriores 4–5 s. Analizar readiness de pólizas, clientes, aseguradoras, cache/cold boot, service worker y render, sin ampliar timeouts. Umbral exitoso no admite 30/120 s.",
+        "classification": "BLOCKING_P0",
+        "priorityRationale": "Blocks daily operation, financial/data integrity, security/role isolation, release lineage, or the ability to prove a critical write with server readback.",
+        "causeStatus": "PERFORMANCE_REPRODUCED_EXISTING_FINDINGS",
+        "findingLinks": [
+          {
+            "id": "B4-003-R14-01-RENEWALS-FIRST-PAINT-READINESS",
+            "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
+            "blocking": true,
+            "owner": [
+              "orbit360-platform/modules/renovaciones.js",
+              "orbit360-platform/core/router.js"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Renovaciones",
+            "preserveExistingDisposition": true
+          },
+          {
+            "id": "B4-003-R20-B12",
+            "status": "PAULA_VISUAL_REJECTED_R20_SECOND_REVIEW_REMEDIATION_REQUIRED",
+            "blocking": true,
+            "owner": [
+              "orbit360-platform/core/auth-product-runtime-p0.js",
+              "orbit360-platform/core/product-app-p0.js",
+              "shell/router/history owners"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Sesión/router/startup",
+            "preserveExistingDisposition": true
+          },
+          {
+            "id": "B4-003-R13-05-POLICIES-ROUTE-LATENCY-FREEZE",
+            "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
+            "blocking": true,
+            "owner": [
+              "orbit360-platform/modules/polizas.js",
+              "orbit360-platform/core/router.js"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Pólizas",
+            "preserveExistingDisposition": true
+          }
+        ],
+        "independentCauseDemonstrated": false,
+        "newFindingId": null
+      },
+      {
+        "observationId": "B-02",
+        "sourceSection": "UAT3_ADDENDUM#B-02",
+        "observation": "`R20-B01` / `V2-15` — Screenshot: 4 vencidas, 0 ≤15, 9 de 16–45, 29 de 46–90 y universo histórico ~1,158; conciliar cada ID entre fuente, vigencia, estado, renovabilidad triestado, desenlace terminal, país y cutoff. El dry-run anterior: 583 antiguas candidatas «No renovada» (≤2026-07-31), 24 agosto/octubre sin cierre; sin writes autorizados. 4 no se presume correcto.",
+        "classification": "BLOCKING_P0",
+        "priorityRationale": "Blocks daily operation, financial/data integrity, security/role isolation, release lineage, or the ability to prove a critical write with server readback.",
+        "causeStatus": "UNIVERSE_RECONCILIATION_REQUIRED_NO_WRITE",
+        "findingLinks": [
+          {
+            "id": "B4-003-R20-B01",
+            "status": "PAULA_VISUAL_REJECTED_R20_SECOND_REVIEW_REMEDIATION_REQUIRED",
+            "blocking": true,
+            "owner": [
+              "orbit360-platform/modules/renovaciones.js",
+              "orbit360-platform/modules/renewals-v1200-operational-bridge.js",
+              "orbit360-platform/modules/renewals-v1201-issued-filter.js"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Renovaciones/Kanban",
+            "preserveExistingDisposition": true
+          },
+          {
+            "id": "B4-003-R20-V2-15-RENEWAL-CUTOFF-DISPOSITION",
+            "status": "DRY_RUN_PASS_PENDING_DATA_WRITE_AUTHORIZATION",
+            "blocking": true,
+            "owner": [
+              "DATA_UPDATE",
+              "orbit360-platform/modules/renovaciones.js"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Renovaciones",
+            "preserveExistingDisposition": true
+          },
+          {
+            "id": "B4-003-R18-10-RENEWAL-UNIVERSE-11-VS-2-DISPOSITION-GAP",
+            "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
+            "blocking": true,
+            "owner": [
+              "orbit360-platform/modules/renovaciones.js",
+              "orbit360-platform/modules/polizas.js"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Pólizas/Renovaciones",
+            "preserveExistingDisposition": true
+          },
+          {
+            "id": "B4-003-R15-07-RENEWALS-BUSINESS-COMPLETENESS",
+            "status": "SOURCE_FIXED_R17_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+            "blocking": true,
+            "owner": [
+              "orbit360-platform/modules/renovaciones.js",
+              "orbit360-platform/modules/renewals-v1200-operational-bridge.js",
+              "INSURER_KNOWLEDGE_SOURCE_BACKLOG",
+              "orbit360-platform/modules/policy-receipts-v1199-bridge.js",
+              "orbit360-platform/modules/cliente360.js"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Renovaciones",
+            "preserveExistingDisposition": true
+          }
+        ],
+        "independentCauseDemonstrated": false,
+        "newFindingId": null
+      },
+      {
+        "observationId": "B-03",
+        "sourceSection": "UAT3_ADDENDUM#B-03",
+        "observation": "— Tarjeta vencida muestra «Vigente» a la vez; distinguir estado de póliza y estado de la renovación con terminología inequívoca.",
+        "classification": "BLOCKING_P0",
+        "priorityRationale": "Blocks daily operation, financial/data integrity, security/role isolation, release lineage, or the ability to prove a critical write with server readback.",
+        "causeStatus": "SEMANTIC_CONTRADICTION_EXISTING_FINDINGS",
+        "findingLinks": [
+          {
+            "id": "B4-003-R14-03-POLICY-EXPIRY-KPI-SEMANTICS",
+            "status": "VISUAL_EVIDENCE_PASS_R15_PRESERVE",
+            "blocking": false,
+            "owner": [
+              "orbit360-platform/modules/polizas.js",
+              "orbit360-platform/modules/cliente360.js"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Pólizas / Renovaciones",
+            "preserveExistingDisposition": true
+          },
+          {
+            "id": "B4-003-R15-07-RENEWALS-BUSINESS-COMPLETENESS",
+            "status": "SOURCE_FIXED_R17_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+            "blocking": true,
+            "owner": [
+              "orbit360-platform/modules/renovaciones.js",
+              "orbit360-platform/modules/renewals-v1200-operational-bridge.js",
+              "INSURER_KNOWLEDGE_SOURCE_BACKLOG",
+              "orbit360-platform/modules/policy-receipts-v1199-bridge.js",
+              "orbit360-platform/modules/cliente360.js"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Renovaciones",
+            "preserveExistingDisposition": true
+          }
+        ],
+        "independentCauseDemonstrated": false,
+        "newFindingId": null
+      },
+      {
+        "observationId": "B-04",
+        "sourceSection": "UAT3_ADDENDUM#B-04",
+        "observation": "— Columna Kanban con scroll vertical y horizontal recorta nombre, aseguradora, cantidades y botones; responsive 1440/390/320.",
+        "classification": "BLOCKING_P0",
+        "priorityRationale": "Blocks daily operation, financial/data integrity, security/role isolation, release lineage, or the ability to prove a critical write with server readback.",
+        "causeStatus": "ACTION_REACHABILITY_REQUIRED",
+        "findingLinks": [
+          {
+            "id": "B4-003-R20-B01",
+            "status": "PAULA_VISUAL_REJECTED_R20_SECOND_REVIEW_REMEDIATION_REQUIRED",
+            "blocking": true,
+            "owner": [
+              "orbit360-platform/modules/renovaciones.js",
+              "orbit360-platform/modules/renewals-v1200-operational-bridge.js",
+              "orbit360-platform/modules/renewals-v1201-issued-filter.js"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Renovaciones/Kanban",
+            "preserveExistingDisposition": true
+          },
+          {
+            "id": "B4-003-R20-V2-16-TRANSVERSAL-VISUAL-HIERARCHY",
+            "status": "PAULA_VISUAL_REJECTED_R20_SECOND_REVIEW_REMEDIATION_REQUIRED",
+            "blocking": true,
+            "owner": [
+              "orbit360-platform/styles/infra.css",
+              "orbit360-platform/core/ciclo.js",
+              "orbit360-platform/index.html",
+              "orbit360-platform/modules/aseguradoras.js",
+              "orbit360-platform/modules/calidad.js"
+            ],
+            "targetGate": "B4-003",
+            "surface": "All changed B4-003 surfaces",
+            "preserveExistingDisposition": true
+          }
+        ],
+        "independentCauseDemonstrated": false,
+        "newFindingId": null
+      },
+      {
+        "observationId": "B-05",
+        "sourceSection": "UAT3_ADDENDUM#B-05",
+        "observation": "— Preservar botones aprobados: WhatsApp, propuestas, pedir renovar, cotizar, abrir póliza, registrar desenlace, persistencia, scopes y relaciones; regresiones causales separadas de pendientes de datos.",
+        "classification": "PRESERVED_PASS",
+        "priorityRationale": "The observed behavior is explicitly preserved and does not reopen a previously accepted capability; regression coverage remains mandatory.",
+        "causeStatus": "PRESERVE_APPROVED_ACTIONS_NO_REOPEN",
+        "findingLinks": [
+          {
+            "id": "B4-003-R20-B01",
+            "status": "PAULA_VISUAL_REJECTED_R20_SECOND_REVIEW_REMEDIATION_REQUIRED",
+            "blocking": true,
+            "owner": [
+              "orbit360-platform/modules/renovaciones.js",
+              "orbit360-platform/modules/renewals-v1200-operational-bridge.js",
+              "orbit360-platform/modules/renewals-v1201-issued-filter.js"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Renovaciones/Kanban",
+            "preserveExistingDisposition": true
+          }
+        ],
+        "independentCauseDemonstrated": false,
+        "newFindingId": null
+      },
+      {
+        "observationId": "C-01",
+        "sourceSection": "UAT3_ADDENDUM#C-01",
+        "observation": "`R20-B13/B03/V2-11` — Catálogo incompleto y duplicado semántico `Auto` vs `Automóviles`. Matriz Ramos→Productos→Planes parcialmente progresiva: modo edición permite ramos y productos, pero administración del catálogo, alta «otro» gobernada y planes no son suficientemente completos ni obvios. No hardcodear ni duplicar identidades comerciales.",
+        "classification": "PARALLEL_NONBLOCKING_P1",
+        "priorityRationale": "Material improvement remains tracked and owned, but it does not block release while it cannot alter critical calculations, security, or P0 operations.",
+        "causeStatus": "CATALOG_GOVERNANCE_EXISTING_FINDINGS",
+        "findingLinks": [
+          {
+            "id": "B4-003-R20-B13",
+            "status": "PAULA_VISUAL_REJECTED_R20_SECOND_REVIEW_REMEDIATION_REQUIRED",
+            "blocking": true,
+            "owner": [
+              "Config/Catalog owners",
+              "orbit360-platform/core/ciclo.js",
+              "orbit360-platform/modules/aseguradoras.js"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Catálogos/selects Fase A",
+            "preserveExistingDisposition": true
+          },
+          {
+            "id": "B4-003-R20-B03",
+            "status": "PAULA_VISUAL_REJECTED_R20_SECOND_REVIEW_REMEDIATION_REQUIRED",
+            "blocking": true,
+            "owner": [
+              "orbit360-platform/modules/aseguradoras.js",
+              "insurer knowledge/document registry owner"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Aseguradoras/Requisitos",
+            "preserveExistingDisposition": true
+          },
+          {
+            "id": "B4-003-R20-B06",
+            "status": "PAULA_VISUAL_REJECTED_R20_SECOND_REVIEW_REMEDIATION_REQUIRED",
+            "blocking": true,
+            "owner": [
+              "orbit360-platform/modules/aseguradoras.js",
+              "Config/Catalog owners"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Aseguradoras/Tarifas-conocimiento",
+            "preserveExistingDisposition": true
+          },
+          {
+            "id": "B4-003-R18-02-OPS-LEADS-RAMO-PRODUCT-PLAN-DEPENDENCY",
+            "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
+            "blocking": true,
+            "owner": [
+              "orbit360-platform/core/ciclo.js"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Ops/Leads/Nuevo prospecto",
+            "preserveExistingDisposition": true
+          }
+        ],
+        "independentCauseDemonstrated": false,
+        "newFindingId": null
+      },
+      {
+        "observationId": "C-02",
+        "sourceSection": "UAT3_ADDENDUM#C-02",
+        "observation": "— Productos y planes debe tener punto de carga contextual de materiales comerciales, promociones, producto/plan, presentación y oferta, con enlace al repositorio documental único. No crear una segunda autoridad de archivos.",
+        "classification": "PARALLEL_NONBLOCKING_P1",
+        "priorityRationale": "Material improvement remains tracked and owned, but it does not block release while it cannot alter critical calculations, security, or P0 operations.",
+        "causeStatus": "DOCUMENT_SINGLE_AUTHORITY_DEPENDENCY",
+        "findingLinks": [
+          {
+            "id": "B4-003-R20-B03",
+            "status": "PAULA_VISUAL_REJECTED_R20_SECOND_REVIEW_REMEDIATION_REQUIRED",
+            "blocking": true,
+            "owner": [
+              "orbit360-platform/modules/aseguradoras.js",
+              "insurer knowledge/document registry owner"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Aseguradoras/Requisitos",
+            "preserveExistingDisposition": true
+          },
+          {
+            "id": "B4-003-R20-B04",
+            "status": "PAULA_VISUAL_REJECTED_R20_SECOND_REVIEW_REMEDIATION_REQUIRED",
+            "blocking": true,
+            "owner": [
+              "orbit360-platform/modules/aseguradoras.js",
+              "Drive/documentRef backend owner"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Aseguradoras/Fuentes",
+            "preserveExistingDisposition": true
+          },
+          {
+            "id": "B4-003-R11-10-INSURER-KNOWLEDGE-INGESTION-CONTRACT",
+            "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
+            "blocking": true,
+            "owner": [
+              "orbit360-platform/modules/aseguradoras.js",
+              "orbit360-platform/core/importa.js",
+              "orbit360-platform/core/aseguradoras-knowledge-runtime-p09.js"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Aseguradoras/Tarifas/Documentos",
+            "preserveExistingDisposition": true
+          }
+        ],
+        "independentCauseDemonstrated": false,
+        "newFindingId": null
+      },
+      {
+        "observationId": "C-03",
+        "sourceSection": "UAT3_ADDENDUM#C-03",
+        "observation": "`R20-B03/B04` — Documentos para suscripción clasificados por entidad/país/ramo/producto/plan; asesores pueden consultar solo documentos aprobados para suscripción, no el expediente completo de Drive.",
+        "classification": "PARALLEL_NONBLOCKING_P1",
+        "priorityRationale": "Material improvement remains tracked and owned, but it does not block release while it cannot alter critical calculations, security, or P0 operations.",
+        "causeStatus": "ADVANCED_LIBRARY_P1_RBAC_P0_GUARD",
+        "findingLinks": [
+          {
+            "id": "B4-003-R20-B03",
+            "status": "PAULA_VISUAL_REJECTED_R20_SECOND_REVIEW_REMEDIATION_REQUIRED",
+            "blocking": true,
+            "owner": [
+              "orbit360-platform/modules/aseguradoras.js",
+              "insurer knowledge/document registry owner"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Aseguradoras/Requisitos",
+            "preserveExistingDisposition": true
+          },
+          {
+            "id": "B4-003-R20-V2-08-INSURER-DRIVE-EMBED-RBAC",
+            "status": "PAULA_VISUAL_REJECTED_R20_SECOND_REVIEW_REMEDIATION_REQUIRED",
+            "blocking": true,
+            "owner": [
+              "orbit360-platform/modules/aseguradoras.js",
+              "functions/document-drive-domain.js",
+              "orbit360-platform/core/product-drive-document-provider-p0.js"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Aseguradoras · Documentos y fuentes",
+            "preserveExistingDisposition": true
+          }
+        ],
+        "independentCauseDemonstrated": false,
+        "newFindingId": null
+      },
+      {
+        "observationId": "C-04",
+        "sourceSection": "UAT3_ADDENDUM#C-04",
+        "observation": "`R20-V2-08` — Expediente Drive completo accesible solo a roles aprobados. La carpeta real Aseguradora Guatemalteca da error «no fue posible abrir» en Preview: el backend Preview deniega expedientes reales intencionalmente; distinguir seguridad correcta de onboarding/Drive LIVE que aún requiere prueba. Debe existir administración inequívoca de carpeta/link desde la ficha para roles autorizados.",
+        "classification": "PARALLEL_NONBLOCKING_P1",
+        "priorityRationale": "Material improvement remains tracked and owned, but it does not block release while it cannot alter critical calculations, security, or P0 operations.",
+        "causeStatus": "DRIVE_COMPLETENESS_P1_RBAC_P0_GUARD",
+        "findingLinks": [
+          {
+            "id": "B4-003-R20-V2-08-INSURER-DRIVE-EMBED-RBAC",
+            "status": "PAULA_VISUAL_REJECTED_R20_SECOND_REVIEW_REMEDIATION_REQUIRED",
+            "blocking": true,
+            "owner": [
+              "orbit360-platform/modules/aseguradoras.js",
+              "functions/document-drive-domain.js",
+              "orbit360-platform/core/product-drive-document-provider-p0.js"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Aseguradoras · Documentos y fuentes",
+            "preserveExistingDisposition": true
+          },
+          {
+            "id": "B4-003-R13-10-INSURER-DRIVE-E2E-UPLOAD",
+            "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
+            "blocking": true,
+            "owner": [
+              "orbit360-platform/modules/aseguradoras.js",
+              "orbit360-platform/core/importa.js"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Aseguradoras/Drive",
+            "preserveExistingDisposition": true
+          }
+        ],
+        "independentCauseDemonstrated": false,
+        "newFindingId": null
+      },
+      {
+        "observationId": "C-05",
+        "sourceSection": "UAT3_ADDENDUM#C-05",
+        "observation": "`R20-B06/B08/V2-09` — `Otto Urizar - Universales.pdf` se guardó y clasificó superficialmente como «Otro/requiere clasificación», pese a contener aseguradora, vehículo, coberturas, deducibles, prima, gastos, opciones de pago y requisitos de emisión. El importador debe demostrar extracción real PDF visual/imagen, clasificación basada en evidencia y revisión humana; no prometer mapeo sin extraer.",
+        "classification": "PARALLEL_NONBLOCKING_P1",
+        "priorityRationale": "Material improvement remains tracked and owned, but it does not block release while it cannot alter critical calculations, security, or P0 operations.",
+        "causeStatus": "EXISTING_IMPORT_TRUTHFULNESS_GAP",
+        "findingLinks": [
+          {
+            "id": "B4-003-R20-V2-09-INSURER-IMPORTER-TRUTHFULNESS",
+            "status": "PAULA_VISUAL_REJECTED_R20_SECOND_REVIEW_REMEDIATION_REQUIRED",
+            "blocking": true,
+            "owner": [
+              "orbit360-platform/core/importa.js"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Aseguradoras · Cargar fuente",
+            "preserveExistingDisposition": true
+          },
+          {
+            "id": "B4-003-R14-06-INSURER-IMPORT-STEP-TRUTHFULNESS",
+            "status": "VISUAL_EVIDENCE_PASS_R15_PRESERVE",
+            "blocking": false,
+            "owner": [
+              "orbit360-platform/core/importa.js"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Aseguradoras / Importación",
+            "preserveExistingDisposition": true
+          },
+          {
+            "id": "B4-003-R20-B06",
+            "status": "PAULA_VISUAL_REJECTED_R20_SECOND_REVIEW_REMEDIATION_REQUIRED",
+            "blocking": true,
+            "owner": [
+              "orbit360-platform/modules/aseguradoras.js",
+              "Config/Catalog owners"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Aseguradoras/Tarifas-conocimiento",
+            "preserveExistingDisposition": true
+          },
+          {
+            "id": "B4-003-R20-B08",
+            "status": "PAULA_VISUAL_REJECTED_R20_SECOND_REVIEW_REMEDIATION_REQUIRED",
+            "blocking": true,
+            "owner": [
+              "orbit360-platform/modules/aseguradoras.js",
+              "functions/product-operational-domain.js",
+              "Drive/documentRef backend owner"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Aseguradoras/UAT writes",
+            "preserveExistingDisposition": true
+          }
+        ],
+        "independentCauseDemonstrated": false,
+        "newFindingId": null
+      },
+      {
+        "observationId": "C-06",
+        "sourceSection": "UAT3_ADDENDUM#C-06",
+        "observation": "— Prueba humana con aseguradora sintética `b4003qa_human_insurer_r20` sí aparece en capturas y muestra archivos asociados; por tanto no afirmar que no existe ningún fixture. Su persistencia/propiedad exacta/aislamiento/cleanup están pendientes de lectura canónica. Es distinta de los fixtures temporales de máquina que fueron eliminados. Un attachment de una aseguradora no autoriza editar otras filas reales.",
+        "classification": "BLOCKING_P0",
+        "priorityRationale": "Blocks daily operation, financial/data integrity, security/role isolation, release lineage, or the ability to prove a critical write with server readback.",
+        "causeStatus": "HUMAN_UAT_FIXTURE_LIFECYCLE_REQUIRED",
+        "findingLinks": [
+          {
+            "id": "B4-003-R20-B14",
+            "status": "PAULA_VISUAL_REJECTED_R20_SECOND_REVIEW_REMEDIATION_REQUIRED",
+            "blocking": true,
+            "owner": [
+              "orbit360-platform/data/store-firestore-product-operational-p0.js",
+              "functions/product-operational-domain.js",
+              "B4 authenticated QA harness"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Preview write contract",
+            "preserveExistingDisposition": true
+          },
+          {
+            "id": "B4-003-R20-B08",
+            "status": "PAULA_VISUAL_REJECTED_R20_SECOND_REVIEW_REMEDIATION_REQUIRED",
+            "blocking": true,
+            "owner": [
+              "orbit360-platform/modules/aseguradoras.js",
+              "functions/product-operational-domain.js",
+              "Drive/documentRef backend owner"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Aseguradoras/UAT writes",
+            "preserveExistingDisposition": true
+          }
+        ],
+        "independentCauseDemonstrated": false,
+        "newFindingId": null
+      },
+      {
+        "observationId": "C-07",
+        "sourceSection": "UAT3_ADDENDUM#C-07",
+        "observation": "`R20-B07/V2-10` — Historial ubica eventos fechados julio sobre eventos «Fecha no registrada». No inventar fechas. Recuperar sólo fecha auténtica y para eventos nuevos certificar actor, createdAt, fecha y orden; gris muy claro y texto diminuto dañan contraste.",
+        "classification": "BLOCKING_P0",
+        "priorityRationale": "Blocks daily operation, financial/data integrity, security/role isolation, release lineage, or the ability to prove a critical write with server readback.",
+        "causeStatus": "AUDIT_INTEGRITY_REQUIRED",
+        "findingLinks": [
+          {
+            "id": "B4-003-R20-B07",
+            "status": "PAULA_VISUAL_REJECTED_R20_SECOND_REVIEW_REMEDIATION_REQUIRED",
+            "blocking": true,
+            "owner": [
+              "orbit360-platform/modules/aseguradoras.js",
+              "insurer audit/activity persistence owner"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Aseguradoras/Actividad",
+            "preserveExistingDisposition": true
+          },
+          {
+            "id": "B4-003-R20-V2-10-INSURER-AUDIT-HUMAN-LANGUAGE",
+            "status": "PAULA_VISUAL_REJECTED_R20_SECOND_REVIEW_REMEDIATION_REQUIRED",
+            "blocking": true,
+            "owner": [
+              "orbit360-platform/modules/aseguradoras.js"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Aseguradoras · Actividad",
+            "preserveExistingDisposition": true
+          },
+          {
+            "id": "B4-003-R18-14-INSURER-ACTIVITY-KNOWLEDGE-EVENT-CONVERGENCE",
+            "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
+            "blocking": true,
+            "owner": [
+              "orbit360-platform/modules/aseguradoras.js",
+              "insurer knowledge/source persistence owners"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Aseguradoras/Actividad",
+            "preserveExistingDisposition": true
+          }
+        ],
+        "independentCauseDemonstrated": false,
+        "newFindingId": null
+      },
+      {
+        "observationId": "C-08",
+        "sourceSection": "UAT3_ADDENDUM#C-08",
+        "observation": "`R20-V2-11/V2-12` — Guardar cambios de ramos/productos y logo presenta feedback deficiente o aparentes silencios; algunas selecciones aparecen después en otras pestañas. Debe probarse before→click→busy→commit→server readback→reload, registro de cambios sin falso diff y sin reenviar.",
+        "classification": "BLOCKING_P0",
+        "priorityRationale": "Blocks daily operation, financial/data integrity, security/role isolation, release lineage, or the ability to prove a critical write with server readback.",
+        "causeStatus": "SERVER_READBACK_REQUIRED",
+        "findingLinks": [
+          {
+            "id": "B4-003-R20-V2-11-INSURER-SEMANTIC-DIFF",
+            "status": "PAULA_VISUAL_REJECTED_R20_SECOND_REVIEW_REMEDIATION_REQUIRED",
+            "blocking": true,
+            "owner": [
+              "orbit360-platform/modules/aseguradoras.js"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Aseguradoras · Guardar cambios",
+            "preserveExistingDisposition": true
+          },
+          {
+            "id": "B4-003-R20-V2-12-INSURER-SAVE-PROGRESS",
+            "status": "PAULA_VISUAL_REJECTED_R20_SECOND_REVIEW_REMEDIATION_REQUIRED",
+            "blocking": true,
+            "owner": [
+              "orbit360-platform/modules/aseguradoras.js"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Aseguradoras · Guardar cambios",
+            "preserveExistingDisposition": true
+          },
+          {
+            "id": "B4-003-R20-B08",
+            "status": "PAULA_VISUAL_REJECTED_R20_SECOND_REVIEW_REMEDIATION_REQUIRED",
+            "blocking": true,
+            "owner": [
+              "orbit360-platform/modules/aseguradoras.js",
+              "functions/product-operational-domain.js",
+              "Drive/documentRef backend owner"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Aseguradoras/UAT writes",
+            "preserveExistingDisposition": true
+          }
+        ],
+        "independentCauseDemonstrated": false,
+        "newFindingId": null
+      },
+      {
+        "observationId": "C-09",
+        "sourceSection": "UAT3_ADDENDUM#C-09",
+        "observation": "— Arquitectura informativa aprobable sujeta a reconciliación: (a) Productos/Planes = oferta comercial y accesos a documentos de venta; (b) Documentos/Drive = repositorio original + clasificadas + biblioteca de suscripción visible al asesor; (c) Tarifas/Conocimiento = proyección derivada, condiciones, reglas y cálculos validados, sin carga duplicada. Una fuente puede mostrarse en varias vistas.",
+        "classification": "PARALLEL_NONBLOCKING_P1",
+        "priorityRationale": "Material improvement remains tracked and owned, but it does not block release while it cannot alter critical calculations, security, or P0 operations.",
+        "causeStatus": "INFORMATION_ARCHITECTURE_EXISTING_SCOPE",
+        "findingLinks": [
+          {
+            "id": "B4-003-R11-10-INSURER-KNOWLEDGE-INGESTION-CONTRACT",
+            "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
+            "blocking": true,
+            "owner": [
+              "orbit360-platform/modules/aseguradoras.js",
+              "orbit360-platform/core/importa.js",
+              "orbit360-platform/core/aseguradoras-knowledge-runtime-p09.js"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Aseguradoras/Tarifas/Documentos",
+            "preserveExistingDisposition": true
+          },
+          {
+            "id": "B4-003-R15-08-INSURER-DOCUMENT-TAXONOMY-AND-REGISTRY-CONVERGENCE",
+            "status": "SOURCE_FIXED_R17_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+            "blocking": true,
+            "owner": [
+              "orbit360-platform/core/importa.js",
+              "orbit360-platform/modules/aseguradoras.js",
+              "orbit360-platform/core/aseguradoras-knowledge-runtime-p09.js"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Aseguradoras/Documentos y Drive/Tarifas y conocimiento",
+            "preserveExistingDisposition": true
+          },
+          {
+            "id": "B4-003-R20-B03",
+            "status": "PAULA_VISUAL_REJECTED_R20_SECOND_REVIEW_REMEDIATION_REQUIRED",
+            "blocking": true,
+            "owner": [
+              "orbit360-platform/modules/aseguradoras.js",
+              "insurer knowledge/document registry owner"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Aseguradoras/Requisitos",
+            "preserveExistingDisposition": true
+          },
+          {
+            "id": "B4-003-R20-B04",
+            "status": "PAULA_VISUAL_REJECTED_R20_SECOND_REVIEW_REMEDIATION_REQUIRED",
+            "blocking": true,
+            "owner": [
+              "orbit360-platform/modules/aseguradoras.js",
+              "Drive/documentRef backend owner"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Aseguradoras/Fuentes",
+            "preserveExistingDisposition": true
+          },
+          {
+            "id": "B4-003-R20-B06",
+            "status": "PAULA_VISUAL_REJECTED_R20_SECOND_REVIEW_REMEDIATION_REQUIRED",
+            "blocking": true,
+            "owner": [
+              "orbit360-platform/modules/aseguradoras.js",
+              "Config/Catalog owners"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Aseguradoras/Tarifas-conocimiento",
+            "preserveExistingDisposition": true
+          }
+        ],
+        "independentCauseDemonstrated": false,
+        "newFindingId": null
+      },
+      {
+        "observationId": "C-10",
+        "sourceSection": "UAT3_ADDENDUM#C-10",
+        "observation": "— Tabla de tarifas editable manualmente no sustituye importación/normalización/versionado de XLSX y ejemplos PDF para habilitar cotizador. Solo conocimiento validado puede calcular; no introducir reglas genéricas por intuición.",
+        "classification": "PARALLEL_NONBLOCKING_P1",
+        "priorityRationale": "Material improvement remains tracked and owned, but it does not block release while it cannot alter critical calculations, security, or P0 operations.",
+        "causeStatus": "SOURCE_VALIDATION_REQUIRED_NO_CALCULATION_ENABLEMENT",
+        "findingLinks": [
+          {
+            "id": "B4-003-R11-14-INSURER-TARIFF-SOURCE-BACKLOG",
+            "status": "R16_SOURCE_CONVERGED_PENDING_MACHINE_PROOF_AND_LATER_GATE_DISPOSITION",
+            "blocking": false,
+            "owner": [
+              "INSURER_KNOWLEDGE_SOURCE_BACKLOG",
+              "orbit360-platform/modules/aseguradoras.js"
+            ],
+            "targetGate": "B4-005_AND_EVERGREEN",
+            "surface": "Aseguradoras/Tarifas y conocimiento",
+            "preserveExistingDisposition": true
+          },
+          {
+            "id": "B4-003-R11-10-INSURER-KNOWLEDGE-INGESTION-CONTRACT",
+            "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
+            "blocking": true,
+            "owner": [
+              "orbit360-platform/modules/aseguradoras.js",
+              "orbit360-platform/core/importa.js",
+              "orbit360-platform/core/aseguradoras-knowledge-runtime-p09.js"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Aseguradoras/Tarifas/Documentos",
+            "preserveExistingDisposition": true
+          },
+          {
+            "id": "B4-003-R20-B06",
+            "status": "PAULA_VISUAL_REJECTED_R20_SECOND_REVIEW_REMEDIATION_REQUIRED",
+            "blocking": true,
+            "owner": [
+              "orbit360-platform/modules/aseguradoras.js",
+              "Config/Catalog owners"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Aseguradoras/Tarifas-conocimiento",
+            "preserveExistingDisposition": true
+          }
+        ],
+        "independentCauseDemonstrated": false,
+        "newFindingId": null
+      },
+      {
+        "observationId": "C-11",
+        "sourceSection": "UAT3_ADDENDUM#C-11",
+        "observation": "— Estándar visual bloque 2 sigue incumplido: fondo/carta poco diferenciados, tabla plana, texto gris demasiado claro, botones poco visibles, sin microestados/resumen de fuente adecuados, independencia de roles.",
+        "classification": "PARALLEL_NONBLOCKING_P1",
+        "priorityRationale": "Material improvement remains tracked and owned, but it does not block release while it cannot alter critical calculations, security, or P0 operations.",
+        "causeStatus": "VISUAL_EXISTING_FINDINGS",
+        "findingLinks": [
+          {
+            "id": "B4-003-R20-V2-16-TRANSVERSAL-VISUAL-HIERARCHY",
+            "status": "PAULA_VISUAL_REJECTED_R20_SECOND_REVIEW_REMEDIATION_REQUIRED",
+            "blocking": true,
+            "owner": [
+              "orbit360-platform/styles/infra.css",
+              "orbit360-platform/core/ciclo.js",
+              "orbit360-platform/index.html",
+              "orbit360-platform/modules/aseguradoras.js",
+              "orbit360-platform/modules/calidad.js"
+            ],
+            "targetGate": "B4-003",
+            "surface": "All changed B4-003 surfaces",
+            "preserveExistingDisposition": true
+          },
+          {
+            "id": "B4-003-R18-13-INSURER-KNOWLEDGE-MOBILE-HIERARCHY",
+            "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
+            "blocking": true,
+            "owner": [
+              "orbit360-platform/modules/aseguradoras.js",
+              "orbit360-platform/styles/infra.css"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Aseguradoras/Documentos/Registry/Tarifas y conocimiento",
+            "preserveExistingDisposition": true
+          }
+        ],
+        "independentCauseDemonstrated": false,
+        "newFindingId": null
+      },
+      {
+        "observationId": "C-12",
+        "sourceSection": "UAT3_ADDENDUM#C-12",
+        "observation": "— Inventario de fuentes proporcionadas previamente y custodia. Google Drive conectado permite localizar Tasas AseGuate.xlsx, FV Columna.pdf, Planilla Aseguradora Guatemalteca.pdf, cotizaciones PDF de Universales y documentos de gobierno previos; existencia en Drive conectado ≠ vínculo a carpeta operativa de aseguradora. La referencia del Plan al inventario PASS2 se mantiene como referencia a verificar, sin presumir acceso físico. No exigir re-subida masiva antes de conciliación hash/fuente/tenancy.",
+        "classification": "PARALLEL_NONBLOCKING_P1",
+        "priorityRationale": "Material improvement remains tracked and owned, but it does not block release while it cannot alter critical calculations, security, or P0 operations.",
+        "causeStatus": "SOURCE_INVENTORY_VERIFY_NOT_REUPLOAD",
+        "findingLinks": [
+          {
+            "id": "B4-003-R11-14-INSURER-TARIFF-SOURCE-BACKLOG",
+            "status": "R16_SOURCE_CONVERGED_PENDING_MACHINE_PROOF_AND_LATER_GATE_DISPOSITION",
+            "blocking": false,
+            "owner": [
+              "INSURER_KNOWLEDGE_SOURCE_BACKLOG",
+              "orbit360-platform/modules/aseguradoras.js"
+            ],
+            "targetGate": "B4-005_AND_EVERGREEN",
+            "surface": "Aseguradoras/Tarifas y conocimiento",
+            "preserveExistingDisposition": true
+          },
+          {
+            "id": "B4-003-R15-08-INSURER-DOCUMENT-TAXONOMY-AND-REGISTRY-CONVERGENCE",
+            "status": "SOURCE_FIXED_R17_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+            "blocking": true,
+            "owner": [
+              "orbit360-platform/core/importa.js",
+              "orbit360-platform/modules/aseguradoras.js",
+              "orbit360-platform/core/aseguradoras-knowledge-runtime-p09.js"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Aseguradoras/Documentos y Drive/Tarifas y conocimiento",
+            "preserveExistingDisposition": true
+          }
+        ],
+        "independentCauseDemonstrated": false,
+        "newFindingId": null
+      },
+      {
+        "observationId": "C-13",
+        "sourceSection": "UAT3_ADDENDUM#C-13",
+        "observation": "— Retomar carril en paralelo Columna + Aseguradora Guatemalteca→otras por aseguradora/producto según fuente priorizada, pero no convertirlo en nuevo bloque que retrase P0. No afirmar que ya está completo.",
+        "classification": "PARALLEL_NONBLOCKING_P1",
+        "priorityRationale": "Material improvement remains tracked and owned, but it does not block release while it cannot alter critical calculations, security, or P0 operations.",
+        "causeStatus": "PARALLEL_WORKSTREAM_NO_P0_BLOCK",
+        "findingLinks": [
+          {
+            "id": "B4-003-R11-14-INSURER-TARIFF-SOURCE-BACKLOG",
+            "status": "R16_SOURCE_CONVERGED_PENDING_MACHINE_PROOF_AND_LATER_GATE_DISPOSITION",
+            "blocking": false,
+            "owner": [
+              "INSURER_KNOWLEDGE_SOURCE_BACKLOG",
+              "orbit360-platform/modules/aseguradoras.js"
+            ],
+            "targetGate": "B4-005_AND_EVERGREEN",
+            "surface": "Aseguradoras/Tarifas y conocimiento",
+            "preserveExistingDisposition": true
+          }
+        ],
+        "independentCauseDemonstrated": false,
+        "newFindingId": null
+      },
+      {
+        "observationId": "C-14",
+        "sourceSection": "UAT3_ADDENDUM#C-14",
+        "observation": "— Carga de logo/cambio «login» no confirmado según UAT: desambiguar si refiere a credenciales de portal aseguradora o imagen login; guardar, permisos, credenciales y recarga por ruta respectiva.",
+        "classification": "BLOCKING_P0",
+        "priorityRationale": "Blocks daily operation, financial/data integrity, security/role isolation, release lineage, or the ability to prove a critical write with server readback.",
+        "causeStatus": "CREDENTIAL_ROUTE_P0_LOGO_SUBSCOPE_P1",
+        "findingLinks": [
+          {
+            "id": "B4-003-R20-V2-11-INSURER-SEMANTIC-DIFF",
+            "status": "PAULA_VISUAL_REJECTED_R20_SECOND_REVIEW_REMEDIATION_REQUIRED",
+            "blocking": true,
+            "owner": [
+              "orbit360-platform/modules/aseguradoras.js"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Aseguradoras · Guardar cambios",
+            "preserveExistingDisposition": true
+          },
+          {
+            "id": "B4-003-R20-V2-12-INSURER-SAVE-PROGRESS",
+            "status": "PAULA_VISUAL_REJECTED_R20_SECOND_REVIEW_REMEDIATION_REQUIRED",
+            "blocking": true,
+            "owner": [
+              "orbit360-platform/modules/aseguradoras.js"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Aseguradoras · Guardar cambios",
+            "preserveExistingDisposition": true
+          },
+          {
+            "id": "B4-003-R20-B08",
+            "status": "PAULA_VISUAL_REJECTED_R20_SECOND_REVIEW_REMEDIATION_REQUIRED",
+            "blocking": true,
+            "owner": [
+              "orbit360-platform/modules/aseguradoras.js",
+              "functions/product-operational-domain.js",
+              "Drive/documentRef backend owner"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Aseguradoras/UAT writes",
+            "preserveExistingDisposition": true
+          }
+        ],
+        "independentCauseDemonstrated": false,
+        "newFindingId": null
+      },
+      {
+        "observationId": "D-01",
+        "sourceSection": "UAT3_ADDENDUM#D-01",
+        "observation": "`R20-B09/V2-04` — Solicitud asesor se reflejó inmediatamente, mejor diseño y estado de tarjeta correcto; mantener PASS funcional parcial. El mensaje inicial muestra email en vez del nombre. Encabezado debe mostrar «Enviado por [persona] → Para [asesor/rol]», con responsable operativo inequívoco.",
+        "classification": "BLOCKING_P0",
+        "priorityRationale": "Blocks daily operation, financial/data integrity, security/role isolation, release lineage, or the ability to prove a critical write with server readback.",
+        "causeStatus": "IDENTITY_AND_ROUTING_REQUIRED",
+        "findingLinks": [
+          {
+            "id": "B4-003-R18-04-OPS-ADVISOR-TYPED-HANDOFF-ACTIVITY",
+            "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
+            "blocking": true,
+            "owner": [
+              "orbit360-platform/core/ciclo.js",
+              "negocios activity/bitacora",
+              "Ops/Leads shared projections"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Ops/Leads collaboration",
+            "preserveExistingDisposition": true
+          },
+          {
+            "id": "B4-003-R19-08-OPS-ADVISOR-HANDOFF-NOTIFICATION-GAP",
+            "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
+            "blocking": true,
+            "owner": [
+              "orbit360-platform/core/ciclo.js",
+              "functions/product-ops-leads-domain.js",
+              "functions/ops-advisor-inbox.js"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Ops/Leads collaboration",
+            "preserveExistingDisposition": true
+          },
+          {
+            "id": "B4-003-R20-B09",
+            "status": "PAULA_VISUAL_REJECTED_R20_SECOND_REVIEW_REMEDIATION_REQUIRED",
+            "blocking": true,
+            "owner": [
+              "orbit360-platform/core/ciclo.js",
+              "functions/product-ops-leads-domain.js",
+              "functions/ops-advisor-inbox.js"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Ops/Leads handoff",
+            "preserveExistingDisposition": true
+          },
+          {
+            "id": "B4-003-R20-V2-04-COLLAB-UX-COMMIT-SEMANTICS",
+            "status": "PAULA_VISUAL_REJECTED_R20_SECOND_REVIEW_REMEDIATION_REQUIRED",
+            "blocking": true,
+            "owner": [
+              "orbit360-platform/core/ciclo.js",
+              "orbit360-platform/styles/infra.css"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Business collaboration",
+            "preserveExistingDisposition": true
+          }
+        ],
+        "independentCauseDemonstrated": false,
+        "newFindingId": null
+      },
+      {
+        "observationId": "D-02",
+        "sourceSection": "UAT3_ADDENDUM#D-02",
+        "observation": "— Solicitudes a un asesor multirrol deben priorizar Leads al entrar como Asesor; Operativo puede ver la tarea compartida por apoyo, sin eliminar dueño ni ampliar scopes. El login no debe confundir vista activada por defecto con destinatario de notificación. Validar role switch y autorización.",
+        "classification": "BLOCKING_P0",
+        "priorityRationale": "Blocks daily operation, financial/data integrity, security/role isolation, release lineage, or the ability to prove a critical write with server readback.",
+        "causeStatus": "ROLE_SWITCH_ROUTING_REQUIRED_PRESERVE_SCOPE_PASS",
+        "findingLinks": [
+          {
+            "id": "B4-003-R20-B10",
+            "status": "HUMAN_PASS_R20_ROLE_SCOPE_PRESERVE",
+            "blocking": false,
+            "owner": [
+              "orbit360-platform/core/ciclo.js",
+              "functions/product-ops-leads-domain.js",
+              "role/scope backend owner"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Ops/Leads scopes",
+            "preserveExistingDisposition": true
+          },
+          {
+            "id": "B4-003-R19-08-OPS-ADVISOR-HANDOFF-NOTIFICATION-GAP",
+            "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
+            "blocking": true,
+            "owner": [
+              "orbit360-platform/core/ciclo.js",
+              "functions/product-ops-leads-domain.js",
+              "functions/ops-advisor-inbox.js"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Ops/Leads collaboration",
+            "preserveExistingDisposition": true
+          },
+          {
+            "id": "B4-003-R20-B09",
+            "status": "PAULA_VISUAL_REJECTED_R20_SECOND_REVIEW_REMEDIATION_REQUIRED",
+            "blocking": true,
+            "owner": [
+              "orbit360-platform/core/ciclo.js",
+              "functions/product-ops-leads-domain.js",
+              "functions/ops-advisor-inbox.js"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Ops/Leads handoff",
+            "preserveExistingDisposition": true
+          }
+        ],
+        "independentCauseDemonstrated": false,
+        "newFindingId": null
+      },
+      {
+        "observationId": "D-03",
+        "sourceSection": "UAT3_ADDENDUM#D-03",
+        "observation": "`R20-V2-03/B12` — Apertura de tarjeta medida por Paula ~7s pese a mejora teórica de first paint; refresh, logout y nuevo login también lentos. Medir p50/p95 y cold/warm/role changes; no usar timeout largo como «PASS».",
+        "classification": "BLOCKING_P0",
+        "priorityRationale": "Blocks daily operation, financial/data integrity, security/role isolation, release lineage, or the ability to prove a critical write with server readback.",
+        "causeStatus": "PERFORMANCE_REPRODUCED",
+        "findingLinks": [
+          {
+            "id": "B4-003-R20-V2-03-CARD-OPEN-LATENCY",
+            "status": "PAULA_VISUAL_REJECTED_R20_SECOND_REVIEW_REMEDIATION_REQUIRED",
+            "blocking": true,
+            "owner": [
+              "orbit360-platform/core/ciclo.js"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Ops/Leads business card",
+            "preserveExistingDisposition": true
+          },
+          {
+            "id": "B4-003-R20-B12",
+            "status": "PAULA_VISUAL_REJECTED_R20_SECOND_REVIEW_REMEDIATION_REQUIRED",
+            "blocking": true,
+            "owner": [
+              "orbit360-platform/core/auth-product-runtime-p0.js",
+              "orbit360-platform/core/product-app-p0.js",
+              "shell/router/history owners"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Sesión/router/startup",
+            "preserveExistingDisposition": true
+          },
+          {
+            "id": "B4-003-R13-07-POLICY-DETAIL-HYDRATION-LATENCY",
+            "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
+            "blocking": true,
+            "owner": [
+              "orbit360-platform/modules/polizas.js",
+              "orbit360-platform/modules/cliente360.js",
+              "orbit360-platform/core/router.js"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Pólizas→Cliente360",
+            "preserveExistingDisposition": true
+          },
+          {
+            "id": "B4-003-R13-08-REFRESH-CLIENT-FLICKER",
+            "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
+            "blocking": true,
+            "owner": [
+              "orbit360-platform/core/router.js",
+              "orbit360-platform/data/store-firestore-product-operational-p0.js"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Hydration/relations",
+            "preserveExistingDisposition": true
+          }
+        ],
+        "independentCauseDemonstrated": false,
+        "newFindingId": null
+      },
+      {
+        "observationId": "D-04",
+        "sourceSection": "UAT3_ADDENDUM#D-04",
+        "observation": "`R20-B09/B14` — Respuesta con archivo falló; respuesta sin archivo sí persistió. Código: `ciclo.js` sube el archivo antes de guardar comentario, sin botón para quitar selección; al fallar muestra toast genérico. `product-ops-leads-domain.js` niega updates de negocio real en Preview (`PREVIEW_TEST_RECORD_ONLY`) y backend documental tiene guard sintético. Causa precisa de este archivo específico requiere trace del error; no atribuirlo automáticamente a UI. Probar PDF autorizado con fixture humano, rollback y apertura para receptor.",
+        "classification": "BLOCKING_P0",
+        "priorityRationale": "Blocks daily operation, financial/data integrity, security/role isolation, release lineage, or the ability to prove a critical write with server readback.",
+        "causeStatus": "SPECIFIC_UPLOAD_CAUSE_PENDING_TRACE",
+        "findingLinks": [
+          {
+            "id": "B4-003-R20-B09",
+            "status": "PAULA_VISUAL_REJECTED_R20_SECOND_REVIEW_REMEDIATION_REQUIRED",
+            "blocking": true,
+            "owner": [
+              "orbit360-platform/core/ciclo.js",
+              "functions/product-ops-leads-domain.js",
+              "functions/ops-advisor-inbox.js"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Ops/Leads handoff",
+            "preserveExistingDisposition": true
+          },
+          {
+            "id": "B4-003-R20-B14",
+            "status": "PAULA_VISUAL_REJECTED_R20_SECOND_REVIEW_REMEDIATION_REQUIRED",
+            "blocking": true,
+            "owner": [
+              "orbit360-platform/data/store-firestore-product-operational-p0.js",
+              "functions/product-operational-domain.js",
+              "B4 authenticated QA harness"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Preview write contract",
+            "preserveExistingDisposition": true
+          },
+          {
+            "id": "B4-003-R20-V2-04-COLLAB-UX-COMMIT-SEMANTICS",
+            "status": "PAULA_VISUAL_REJECTED_R20_SECOND_REVIEW_REMEDIATION_REQUIRED",
+            "blocking": true,
+            "owner": [
+              "orbit360-platform/core/ciclo.js",
+              "orbit360-platform/styles/infra.css"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Business collaboration",
+            "preserveExistingDisposition": true
+          }
+        ],
+        "independentCauseDemonstrated": false,
+        "newFindingId": null
+      },
+      {
+        "observationId": "D-05",
+        "sourceSection": "UAT3_ADDENDUM#D-05",
+        "observation": "— «Adjunto seleccionado» en texto gris casi invisible y sin quitar/reemplazar; ofrecer control Quitar y Reemplazar, error específico y retry seguro sin doble comentario.",
+        "classification": "BLOCKING_P0",
+        "priorityRationale": "Blocks daily operation, financial/data integrity, security/role isolation, release lineage, or the ability to prove a critical write with server readback.",
+        "causeStatus": "SAFE_RETRY_AND_ATTACHMENT_CONTROL_REQUIRED",
+        "findingLinks": [
+          {
+            "id": "B4-003-R20-B09",
+            "status": "PAULA_VISUAL_REJECTED_R20_SECOND_REVIEW_REMEDIATION_REQUIRED",
+            "blocking": true,
+            "owner": [
+              "orbit360-platform/core/ciclo.js",
+              "functions/product-ops-leads-domain.js",
+              "functions/ops-advisor-inbox.js"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Ops/Leads handoff",
+            "preserveExistingDisposition": true
+          },
+          {
+            "id": "B4-003-R20-V2-04-COLLAB-UX-COMMIT-SEMANTICS",
+            "status": "PAULA_VISUAL_REJECTED_R20_SECOND_REVIEW_REMEDIATION_REQUIRED",
+            "blocking": true,
+            "owner": [
+              "orbit360-platform/core/ciclo.js",
+              "orbit360-platform/styles/infra.css"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Business collaboration",
+            "preserveExistingDisposition": true
+          }
+        ],
+        "independentCauseDemonstrated": false,
+        "newFindingId": null
+      },
+      {
+        "observationId": "D-06",
+        "sourceSection": "UAT3_ADDENDUM#D-06",
+        "observation": "`R20-V2-07` — Cabecera roja/stepper pegados y scroll interno complejo; mayor contraste de panel de solicitudes y jerarquía; labels «Registrar ahora» vs «Guardar cambios» claros.",
+        "classification": "PARALLEL_NONBLOCKING_P1",
+        "priorityRationale": "Material improvement remains tracked and owned, but it does not block release while it cannot alter critical calculations, security, or P0 operations.",
+        "causeStatus": "VISUAL_DAILY_SURFACE",
+        "findingLinks": [
+          {
+            "id": "B4-003-R20-V2-07-BUSINESS-MODAL-VISUAL",
+            "status": "PAULA_VISUAL_REJECTED_R20_SECOND_REVIEW_REMEDIATION_REQUIRED",
+            "blocking": true,
+            "owner": [
+              "orbit360-platform/core/ciclo.js",
+              "orbit360-platform/styles/infra.css"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Ops/Leads business detail",
+            "preserveExistingDisposition": true
+          },
+          {
+            "id": "B4-003-R20-V2-16-TRANSVERSAL-VISUAL-HIERARCHY",
+            "status": "PAULA_VISUAL_REJECTED_R20_SECOND_REVIEW_REMEDIATION_REQUIRED",
+            "blocking": true,
+            "owner": [
+              "orbit360-platform/styles/infra.css",
+              "orbit360-platform/core/ciclo.js",
+              "orbit360-platform/index.html",
+              "orbit360-platform/modules/aseguradoras.js",
+              "orbit360-platform/modules/calidad.js"
+            ],
+            "targetGate": "B4-003",
+            "surface": "All changed B4-003 surfaces",
+            "preserveExistingDisposition": true
+          }
+        ],
+        "independentCauseDemonstrated": false,
+        "newFindingId": null
+      },
+      {
+        "observationId": "D-07",
+        "sourceSection": "UAT3_ADDENDUM#D-07",
+        "observation": "`R20-B11` — Defecto de negocio demostrado: `ciclo.js` marca Días 1 y 3 como `done` por `i<=1` cuando `cadenciaActiva`, sin demostrar mensajes enviados. `product-ops-leads-domain.js` agenda trabajo interno, no acredita entrega WhatsApp/correo; `notification-outbox-processor.js` distingue canales internos y externos pendientes. Ningún check «enviado» sin provider acceptance/receipt; separar `programado`, `pendiente`, `tarea creada`, `enviado`, `entregado` y `fallido`.",
+        "classification": "BLOCKING_P0",
+        "priorityRationale": "Blocks daily operation, financial/data integrity, security/role isolation, release lineage, or the ability to prove a critical write with server readback.",
+        "causeStatus": "DEMONSTRATED_FALSE_DONE_STATE",
+        "findingLinks": [
+          {
+            "id": "B4-003-R20-B11",
+            "status": "PAULA_VISUAL_REJECTED_R20_SECOND_REVIEW_REMEDIATION_REQUIRED",
+            "blocking": true,
+            "owner": [
+              "Ops/Leads cadence scheduler owner",
+              "functions/product-ops-leads-domain.js"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Ops/Leads cadencias",
+            "preserveExistingDisposition": true
+          }
+        ],
+        "independentCauseDemonstrated": false,
+        "newFindingId": null
+      },
+      {
+        "observationId": "D-08",
+        "sourceSection": "UAT3_ADDENDUM#D-08",
+        "observation": "— Trigger de cadencia en Propuesta, continuidad hasta Negociación, fechamiento y zona horaria America/Guatemala; scheduler cada 60 min, sin ventana de horario laboral demostrada. Comprobar antes/después, idempotencia y hora real; no inferir envío externo. Exponer acción manual para plantilla WhatsApp vinculada cuando canal autorizado, registrando su tipo de confirmación.",
+        "classification": "BLOCKING_P0",
+        "priorityRationale": "Blocks daily operation, financial/data integrity, security/role isolation, release lineage, or the ability to prove a critical write with server readback.",
+        "causeStatus": "INTERNAL_STATE_IDEMPOTENCE_P0_EXTERNAL_DELIVERY_P2",
+        "findingLinks": [
+          {
+            "id": "B4-003-R20-B11",
+            "status": "PAULA_VISUAL_REJECTED_R20_SECOND_REVIEW_REMEDIATION_REQUIRED",
+            "blocking": true,
+            "owner": [
+              "Ops/Leads cadence scheduler owner",
+              "functions/product-ops-leads-domain.js"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Ops/Leads cadencias",
+            "preserveExistingDisposition": true
+          }
+        ],
+        "independentCauseDemonstrated": false,
+        "newFindingId": null
+      },
+      {
+        "observationId": "D-09",
+        "sourceSection": "UAT3_ADDENDUM#D-09",
+        "observation": "— Plantillas de WhatsApp/correo: inventario de owner, CRUD administrable por rol, versionado, asociación a etapa/cadencia/aseguradora/idioma y datos variables, preview, prueba de transporte/confirmación; no prometer envío real desde un CTA `wa.me`.",
+        "classification": "DEFERRED_AUTHORIZED_P2",
+        "priorityRationale": "Authorized for a later gate; current UI must remain truthful and must not claim external delivery or provider acceptance.",
+        "causeStatus": "EXTERNAL_PROVIDER_DELIVERY_DEFERRED_UI_MUST_BE_TRUTHFUL",
+        "findingLinks": [
+          {
+            "id": "B4-003-R20-B11",
+            "status": "PAULA_VISUAL_REJECTED_R20_SECOND_REVIEW_REMEDIATION_REQUIRED",
+            "blocking": true,
+            "owner": [
+              "Ops/Leads cadence scheduler owner",
+              "functions/product-ops-leads-domain.js"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Ops/Leads cadencias",
+            "preserveExistingDisposition": true
+          }
+        ],
+        "independentCauseDemonstrated": false,
+        "newFindingId": null
+      },
+      {
+        "observationId": "D-10",
+        "sourceSection": "UAT3_ADDENDUM#D-10",
+        "observation": "— «Próxima acción» es texto libre/no catálogo de acciones posibles. Preferir catálogo tenant administrable, vinculado a tipo de gestión/etapa con acciones predefinidas y «Otro» gobernado.",
+        "classification": "PARALLEL_NONBLOCKING_P1",
+        "priorityRationale": "Material improvement remains tracked and owned, but it does not block release while it cannot alter critical calculations, security, or P0 operations.",
+        "causeStatus": "TENANT_ACTION_CATALOG",
+        "findingLinks": [
+          {
+            "id": "B4-003-R20-B13",
+            "status": "PAULA_VISUAL_REJECTED_R20_SECOND_REVIEW_REMEDIATION_REQUIRED",
+            "blocking": true,
+            "owner": [
+              "Config/Catalog owners",
+              "orbit360-platform/core/ciclo.js",
+              "orbit360-platform/modules/aseguradoras.js"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Catálogos/selects Fase A",
+            "preserveExistingDisposition": true
+          },
+          {
+            "id": "B4-003-R18-05-OPS-MANAGEMENT-TYPE-QUEUE-SEMANTICS",
+            "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
+            "blocking": true,
+            "owner": [
+              "orbit360-platform/core/ciclo.js",
+              "Ops list/catalog authority"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Ops/Crear gestión",
+            "preserveExistingDisposition": true
+          }
+        ],
+        "independentCauseDemonstrated": false,
+        "newFindingId": null
+      },
+      {
+        "observationId": "D-11",
+        "sourceSection": "UAT3_ADDENDUM#D-11",
+        "observation": "`R20-V2-05/V2-06` — Bandeja exige emisor real, destinatario individual o grupo, dueño, caso, etapa, fecha, estado pendiente/atendido y quien atendió. Hoy 15/47+ avisos en distintas cuentas sin contexto ni asignación clara.",
+        "classification": "BLOCKING_P0",
+        "priorityRationale": "Blocks daily operation, financial/data integrity, security/role isolation, release lineage, or the ability to prove a critical write with server readback.",
+        "causeStatus": "ASSIGNMENT_AND_RECEIPT_STATE_REQUIRED",
+        "findingLinks": [
+          {
+            "id": "B4-003-R19-08-OPS-ADVISOR-HANDOFF-NOTIFICATION-GAP",
+            "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
+            "blocking": true,
+            "owner": [
+              "orbit360-platform/core/ciclo.js",
+              "functions/product-ops-leads-domain.js",
+              "functions/ops-advisor-inbox.js"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Ops/Leads collaboration",
+            "preserveExistingDisposition": true
+          },
+          {
+            "id": "B4-003-R20-B09",
+            "status": "PAULA_VISUAL_REJECTED_R20_SECOND_REVIEW_REMEDIATION_REQUIRED",
+            "blocking": true,
+            "owner": [
+              "orbit360-platform/core/ciclo.js",
+              "functions/product-ops-leads-domain.js",
+              "functions/ops-advisor-inbox.js"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Ops/Leads handoff",
+            "preserveExistingDisposition": true
+          },
+          {
+            "id": "B4-003-R20-V2-05-INBOX-ACTION-FEEDBACK",
+            "status": "PAULA_VISUAL_REJECTED_R20_SECOND_REVIEW_REMEDIATION_REQUIRED",
+            "blocking": true,
+            "owner": [
+              "orbit360-platform/index.html",
+              "functions/ops-advisor-inbox.js"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Tareas y solicitudes",
+            "preserveExistingDisposition": true
+          }
+        ],
+        "independentCauseDemonstrated": false,
+        "newFindingId": null
+      },
+      {
+        "observationId": "D-12",
+        "sourceSection": "UAT3_ADDENDUM#D-12",
+        "observation": "— Riesgo estructural código: `ops-advisor-inbox.js` proyecta `operations` a todos los miembros habilitados y guarda leído/atendido/archivado por UID; no hay contrato demostrado de resolución de la tarea compartida global. «Marcar atendida» de un usuario puede no cerrar obligación operativa para el resto. Separar acuse personal y cierre de tarea, owner/assignee, observadores y trazabilidad.",
+        "classification": "BLOCKING_P0",
+        "priorityRationale": "Blocks daily operation, financial/data integrity, security/role isolation, release lineage, or the ability to prove a critical write with server readback.",
+        "causeStatus": "STRUCTURAL_RISK_CONTRACT_NOT_DEMONSTRATED",
+        "findingLinks": [
+          {
+            "id": "B4-003-R20-B09",
+            "status": "PAULA_VISUAL_REJECTED_R20_SECOND_REVIEW_REMEDIATION_REQUIRED",
+            "blocking": true,
+            "owner": [
+              "orbit360-platform/core/ciclo.js",
+              "functions/product-ops-leads-domain.js",
+              "functions/ops-advisor-inbox.js"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Ops/Leads handoff",
+            "preserveExistingDisposition": true
+          },
+          {
+            "id": "B4-003-R20-V2-05-INBOX-ACTION-FEEDBACK",
+            "status": "PAULA_VISUAL_REJECTED_R20_SECOND_REVIEW_REMEDIATION_REQUIRED",
+            "blocking": true,
+            "owner": [
+              "orbit360-platform/index.html",
+              "functions/ops-advisor-inbox.js"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Tareas y solicitudes",
+            "preserveExistingDisposition": true
+          },
+          {
+            "id": "B4-003-R19-08-OPS-ADVISOR-HANDOFF-NOTIFICATION-GAP",
+            "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
+            "blocking": true,
+            "owner": [
+              "orbit360-platform/core/ciclo.js",
+              "functions/product-ops-leads-domain.js",
+              "functions/ops-advisor-inbox.js"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Ops/Leads collaboration",
+            "preserveExistingDisposition": true
+          }
+        ],
+        "independentCauseDemonstrated": false,
+        "newFindingId": null
+      },
+      {
+        "observationId": "D-13",
+        "sourceSection": "UAT3_ADDENDUM#D-13",
+        "observation": "— Posibles duplicados: capturas muestran títulos/mensajes repetidos «Respuesta del asesor» y «Reenviado a Operaciones». Backend deduplica por `eventId` exacto de tres fuentes (internals/outbox/comentarios); eventos distintos con mensaje idéntico o `collab_<business>_<index>` pueden coexistir. Discriminar pares por eventId, requestId, entityId, receptor y origen antes de borrar o colapsar.",
+        "classification": "BLOCKING_P0",
+        "priorityRationale": "Blocks daily operation, financial/data integrity, security/role isolation, release lineage, or the ability to prove a critical write with server readback.",
+        "causeStatus": "POSSIBLE_DUPLICATES_REQUIRE_EVENT_LEVEL_DISCRIMINATION",
+        "findingLinks": [
+          {
+            "id": "B4-003-R20-B09",
+            "status": "PAULA_VISUAL_REJECTED_R20_SECOND_REVIEW_REMEDIATION_REQUIRED",
+            "blocking": true,
+            "owner": [
+              "orbit360-platform/core/ciclo.js",
+              "functions/product-ops-leads-domain.js",
+              "functions/ops-advisor-inbox.js"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Ops/Leads handoff",
+            "preserveExistingDisposition": true
+          },
+          {
+            "id": "B4-003-R19-08-OPS-ADVISOR-HANDOFF-NOTIFICATION-GAP",
+            "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
+            "blocking": true,
+            "owner": [
+              "orbit360-platform/core/ciclo.js",
+              "functions/product-ops-leads-domain.js",
+              "functions/ops-advisor-inbox.js"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Ops/Leads collaboration",
+            "preserveExistingDisposition": true
+          }
+        ],
+        "independentCauseDemonstrated": false,
+        "newFindingId": null
+      },
+      {
+        "observationId": "D-14",
+        "sourceSection": "UAT3_ADDENDUM#D-14",
+        "observation": "— Históricos «Autor no identificado» se mantienen cuando no hay provenance real. Para nuevos comentarios, usar miembro humano canónico, no email si existe nombre autorizado; no inventar autores antiguos.",
+        "classification": "BLOCKING_P0",
+        "priorityRationale": "Blocks daily operation, financial/data integrity, security/role isolation, release lineage, or the ability to prove a critical write with server readback.",
+        "causeStatus": "NEW_EVENT_ACTOR_INTEGRITY_OLD_UNKNOWN_PRESERVED",
+        "findingLinks": [
+          {
+            "id": "B4-003-R18-04-OPS-ADVISOR-TYPED-HANDOFF-ACTIVITY",
+            "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
+            "blocking": true,
+            "owner": [
+              "orbit360-platform/core/ciclo.js",
+              "negocios activity/bitacora",
+              "Ops/Leads shared projections"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Ops/Leads collaboration",
+            "preserveExistingDisposition": true
+          },
+          {
+            "id": "B4-003-R20-B09",
+            "status": "PAULA_VISUAL_REJECTED_R20_SECOND_REVIEW_REMEDIATION_REQUIRED",
+            "blocking": true,
+            "owner": [
+              "orbit360-platform/core/ciclo.js",
+              "functions/product-ops-leads-domain.js",
+              "functions/ops-advisor-inbox.js"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Ops/Leads handoff",
+            "preserveExistingDisposition": true
+          }
+        ],
+        "independentCauseDemonstrated": false,
+        "newFindingId": null
+      },
+      {
+        "observationId": "D-15",
+        "sourceSection": "UAT3_ADDENDUM#D-15",
+        "observation": "— Captura «Nueva oportunidad misma identidad» muestra teléfono y correo vacíos; otra ficha muestra prefijo +502 en campo Correo mientras Teléfono está vacío. Posible mapeo cruzado/ausencia de copia, NO conclusión hasta readback por id y verificación de captura. Es crítico para identidad comercial, contacto, notificaciones y dedup.",
+        "classification": "BLOCKING_P0",
+        "priorityRationale": "Blocks daily operation, financial/data integrity, security/role isolation, release lineage, or the ability to prove a critical write with server readback.",
+        "causeStatus": "POSSIBLE_CONTACT_MAPPING_DEFECT_PENDING_ID_READBACK",
+        "findingLinks": [
+          {
+            "id": "B4-003-R18-03-COMMERCIAL-IDENTITY-MULTIOPPORTUNITY-MODEL",
+            "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
+            "blocking": true,
+            "owner": [
+              "orbit360-platform/core/ciclo.js",
+              "negocios",
+              "clientes",
+              "Ops/Leads projections"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Leads/Ops/Cliente comercial",
+            "preserveExistingDisposition": true
+          },
+          {
+            "id": "B4-003-R20-B09",
+            "status": "PAULA_VISUAL_REJECTED_R20_SECOND_REVIEW_REMEDIATION_REQUIRED",
+            "blocking": true,
+            "owner": [
+              "orbit360-platform/core/ciclo.js",
+              "functions/product-ops-leads-domain.js",
+              "functions/ops-advisor-inbox.js"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Ops/Leads handoff",
+            "preserveExistingDisposition": true
+          }
+        ],
+        "independentCauseDemonstrated": false,
+        "newFindingId": null
+      },
+      {
+        "observationId": "D-16",
+        "sourceSection": "UAT3_ADDENDUM#D-16",
+        "observation": "— En pantalla pequeña y grande revisar columna de comentarios, acciones, modal y avatar, texto legible, scroll de una sola superficie útil; conservar áreas de éxito parcial.",
+        "classification": "PARALLEL_NONBLOCKING_P1",
+        "priorityRationale": "Material improvement remains tracked and owned, but it does not block release while it cannot alter critical calculations, security, or P0 operations.",
+        "causeStatus": "RESPONSIVE_POLISH_ESCALATES_TO_P0_IF_ACTION_BLOCKED",
+        "findingLinks": [
+          {
+            "id": "B4-003-R20-V2-07-BUSINESS-MODAL-VISUAL",
+            "status": "PAULA_VISUAL_REJECTED_R20_SECOND_REVIEW_REMEDIATION_REQUIRED",
+            "blocking": true,
+            "owner": [
+              "orbit360-platform/core/ciclo.js",
+              "orbit360-platform/styles/infra.css"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Ops/Leads business detail",
+            "preserveExistingDisposition": true
+          },
+          {
+            "id": "B4-003-R20-V2-16-TRANSVERSAL-VISUAL-HIERARCHY",
+            "status": "PAULA_VISUAL_REJECTED_R20_SECOND_REVIEW_REMEDIATION_REQUIRED",
+            "blocking": true,
+            "owner": [
+              "orbit360-platform/styles/infra.css",
+              "orbit360-platform/core/ciclo.js",
+              "orbit360-platform/index.html",
+              "orbit360-platform/modules/aseguradoras.js",
+              "orbit360-platform/modules/calidad.js"
+            ],
+            "targetGate": "B4-003",
+            "surface": "All changed B4-003 surfaces",
+            "preserveExistingDisposition": true
+          }
+        ],
+        "independentCauseDemonstrated": false,
+        "newFindingId": null
+      },
+      {
+        "observationId": "D-17",
+        "sourceSection": "UAT3_ADDENDUM#D-17",
+        "observation": "— Los roles múltiples Dirección/Operativo/Asesor/Administración deben usar alcance activo sin unión indiscriminada. Emisor ≠ receptor, excepto derivación deliberada entre roles del mismo UID con tarea asignada; no enviar alerta propia falsa ni ocultar trabajo legítimo.",
+        "classification": "BLOCKING_P0",
+        "priorityRationale": "Blocks daily operation, financial/data integrity, security/role isolation, release lineage, or the ability to prove a critical write with server readback.",
+        "causeStatus": "ROLE_SCOPE_INVARIANT_PRESERVE_PASS",
+        "findingLinks": [
+          {
+            "id": "B4-003-R20-B10",
+            "status": "HUMAN_PASS_R20_ROLE_SCOPE_PRESERVE",
+            "blocking": false,
+            "owner": [
+              "orbit360-platform/core/ciclo.js",
+              "functions/product-ops-leads-domain.js",
+              "role/scope backend owner"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Ops/Leads scopes",
+            "preserveExistingDisposition": true
+          },
+          {
+            "id": "B4-003-R19-08-OPS-ADVISOR-HANDOFF-NOTIFICATION-GAP",
+            "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
+            "blocking": true,
+            "owner": [
+              "orbit360-platform/core/ciclo.js",
+              "functions/product-ops-leads-domain.js",
+              "functions/ops-advisor-inbox.js"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Ops/Leads collaboration",
+            "preserveExistingDisposition": true
+          },
+          {
+            "id": "B4-003-R20-B09",
+            "status": "PAULA_VISUAL_REJECTED_R20_SECOND_REVIEW_REMEDIATION_REQUIRED",
+            "blocking": true,
+            "owner": [
+              "orbit360-platform/core/ciclo.js",
+              "functions/product-ops-leads-domain.js",
+              "functions/ops-advisor-inbox.js"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Ops/Leads handoff",
+            "preserveExistingDisposition": true
+          }
+        ],
+        "independentCauseDemonstrated": false,
+        "newFindingId": null
+      },
+      {
+        "observationId": "D-18",
+        "sourceSection": "UAT3_ADDENDUM#D-18",
+        "observation": "— Gestión Ops: tipos en listas configurables y destino correcto observados parcialmente; probar creación + update + readback y rol; no confundir tipo, lista, próxima acción y plantilla.",
+        "classification": "BLOCKING_P0",
+        "priorityRationale": "Blocks daily operation, financial/data integrity, security/role isolation, release lineage, or the ability to prove a critical write with server readback.",
+        "causeStatus": "CREATE_UPDATE_READBACK_REQUIRED",
+        "findingLinks": [
+          {
+            "id": "B4-003-R18-05-OPS-MANAGEMENT-TYPE-QUEUE-SEMANTICS",
+            "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
+            "blocking": true,
+            "owner": [
+              "orbit360-platform/core/ciclo.js",
+              "Ops list/catalog authority"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Ops/Crear gestión",
+            "preserveExistingDisposition": true
+          },
+          {
+            "id": "B4-003-R20-B09",
+            "status": "PAULA_VISUAL_REJECTED_R20_SECOND_REVIEW_REMEDIATION_REQUIRED",
+            "blocking": true,
+            "owner": [
+              "orbit360-platform/core/ciclo.js",
+              "functions/product-ops-leads-domain.js",
+              "functions/ops-advisor-inbox.js"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Ops/Leads handoff",
+            "preserveExistingDisposition": true
+          },
+          {
+            "id": "B4-003-R20-B14",
+            "status": "PAULA_VISUAL_REJECTED_R20_SECOND_REVIEW_REMEDIATION_REQUIRED",
+            "blocking": true,
+            "owner": [
+              "orbit360-platform/data/store-firestore-product-operational-p0.js",
+              "functions/product-operational-domain.js",
+              "B4 authenticated QA harness"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Preview write contract",
+            "preserveExistingDisposition": true
+          }
+        ],
+        "independentCauseDemonstrated": false,
+        "newFindingId": null
+      },
+      {
+        "observationId": "D-19",
+        "sourceSection": "UAT3_ADDENDUM#D-19",
+        "observation": "— Conversión de lead en cliente: `transition_business(to='emitido')` crea cliente determinístico desde negocio si no hay cliente, pero NO crea póliza/vehículo automáticamente. Cliente manual/importador, póliza manual/importador, vehículo condicional existen en owners distintos; falta E2E integrado y dedup entre oportunidades. Exigir opciones manual/importar documental reales con revisión y asociación, sin crear clientes/pólizas duplicadas.",
+        "classification": "BLOCKING_P0",
+        "priorityRationale": "Blocks daily operation, financial/data integrity, security/role isolation, release lineage, or the ability to prove a critical write with server readback.",
+        "causeStatus": "E2E_DEDUP_REQUIRED",
+        "findingLinks": [
+          {
+            "id": "B4-003-R18-03-COMMERCIAL-IDENTITY-MULTIOPPORTUNITY-MODEL",
+            "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
+            "blocking": true,
+            "owner": [
+              "orbit360-platform/core/ciclo.js",
+              "negocios",
+              "clientes",
+              "Ops/Leads projections"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Leads/Ops/Cliente comercial",
+            "preserveExistingDisposition": true
+          },
+          {
+            "id": "B4-003-R18-04-OPS-ADVISOR-TYPED-HANDOFF-ACTIVITY",
+            "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
+            "blocking": true,
+            "owner": [
+              "orbit360-platform/core/ciclo.js",
+              "negocios activity/bitacora",
+              "Ops/Leads shared projections"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Ops/Leads collaboration",
+            "preserveExistingDisposition": true
+          },
+          {
+            "id": "B4-003-R20-B14",
+            "status": "PAULA_VISUAL_REJECTED_R20_SECOND_REVIEW_REMEDIATION_REQUIRED",
+            "blocking": true,
+            "owner": [
+              "orbit360-platform/data/store-firestore-product-operational-p0.js",
+              "functions/product-operational-domain.js",
+              "B4 authenticated QA harness"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Preview write contract",
+            "preserveExistingDisposition": true
+          }
+        ],
+        "independentCauseDemonstrated": false,
+        "newFindingId": null
+      },
+      {
+        "observationId": "D-20",
+        "sourceSection": "UAT3_ADDENDUM#D-20",
+        "observation": "— En capturas badge con acciones (número, prioridad, rol) mejora; conservar lo correcto sin declarar módulos PASS completo.",
+        "classification": "PRESERVED_PASS",
+        "priorityRationale": "The observed behavior is explicitly preserved and does not reopen a previously accepted capability; regression coverage remains mandatory.",
+        "causeStatus": "PRESERVE_PARTIAL_VISUAL_IMPROVEMENTS_WITHOUT_CLOSING_OPEN_FINDINGS",
+        "findingLinks": [
+          {
+            "id": "B4-003-R20-V2-01-ACTION-QUEUE-RANK",
+            "status": "PAULA_VISUAL_REJECTED_R20_SECOND_REVIEW_REMEDIATION_REQUIRED",
+            "blocking": true,
+            "owner": [
+              "orbit360-platform/core/ciclo.js",
+              "orbit360-platform/modules/ops.js",
+              "orbit360-platform/modules/leads.js"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Ops/Leads Kanban",
+            "preserveExistingDisposition": true
+          },
+          {
+            "id": "B4-003-R20-V2-02-ACTION-STATE-VISUAL",
+            "status": "PAULA_VISUAL_REJECTED_R20_SECOND_REVIEW_REMEDIATION_REQUIRED",
+            "blocking": true,
+            "owner": [
+              "orbit360-platform/core/ciclo.js",
+              "orbit360-platform/styles/infra.css"
+            ],
+            "targetGate": "B4-003",
+            "surface": "Ops/Leads Kanban",
+            "preserveExistingDisposition": true
+          }
+        ],
+        "independentCauseDemonstrated": false,
+        "newFindingId": null
+      }
+    ]
+  },
+  "decision": {
+    "ledgerCardinalityRemains": 282,
+    "b4003RemainsOpen": true,
+    "b4004Held": true,
+    "nextAction": "B4_003_UAT3_CONCENTRATED_CAUSAL_AUDIT_P0",
+    "sourceFixNotYetAuthorizedByThisReceipt": true,
+    "dataWritesNotAuthorized": true
+  }
+}
