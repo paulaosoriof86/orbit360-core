@@ -214,8 +214,8 @@ try{
     const session={role,actorUidHash:hash(who.uid).slice(0,16),cold:[],warm:[],mobile:[],firstPaint:null};
     session.firstPaint=await firstPaintGuard(page);
     for(const country of proof.countries)session.cold.push(await renderCountry(page,country,'cold','DESKTOP'));
-    await page.reload({waitUntil:'domcontentloaded',timeout:60000});
-    await bootProduct(page,token);await selectRole(page,role);
+    await page.evaluate(()=>{location.hash='#/inicio';});
+    await page.waitForTimeout(250);
     for(const country of proof.countries)session.warm.push(await renderCountry(page,country,'warm','DESKTOP'));
     for(const viewport of proof.viewports.filter(x=>x.name!=='DESKTOP')){
       await page.setViewportSize({width:viewport.width,height:viewport.height});
