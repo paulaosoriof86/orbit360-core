@@ -135,7 +135,7 @@ async function selectRole(page,role){
 async function renderCountry(page,country,phase,viewport){
   const started=Date.now();
   await page.evaluate(country=>{Orbit.pais=country;location.hash='#/renovaciones';const h=document.getElementById('host');if(h&&Orbit.modules?.renovaciones)Orbit.modules.renovaciones.render(h);},country);
-  await page.waitForFunction(()=>Orbit.route?.key==='renovaciones',null,{timeout:10000});
+  await page.waitForFunction(()=>location.hash==='#/renovaciones',null,{timeout:10000});
   await page.waitForFunction(()=>{
     const h=document.getElementById('host');if(!h)return false;
     const terminal=h.querySelector('[data-renewals-loading="timed_out"],[data-renewals-loading="unavailable"]');
