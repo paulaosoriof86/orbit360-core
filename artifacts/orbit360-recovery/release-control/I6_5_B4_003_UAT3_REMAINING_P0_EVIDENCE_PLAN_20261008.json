@@ -1,7 +1,7 @@
 {
   "schema": "gravicentra-b4-003-uat3-remaining-p0-evidence-plan-v1",
-  "recordedAt": "2026-10-08T20:36:00Z",
-  "status": "E1_OFFLINE_SOURCE_RECONCILIATION_COMPLETE_CANONICAL_READBACK_PENDING",
+  "recordedAt": "2026-10-08T21:18:00Z",
+  "status": "PRIORITY_FROZEN_RENEWALS_CLOSEOUT_ACTIVE",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "parentHead": "9f043a779f967f63a142d8dc5ef74583e0e325bc",
@@ -144,7 +144,7 @@
     "b4003Open": true,
     "b4004Held": true
   },
-  "nextAction": "I6_5_B4_003_UAT3_E1_CANONICAL_ID_GRAPH_AND_ROLE_READBACK",
+  "nextAction": "I6_5_B4_003_RENEWALS_BLOCKING_CLOSEOUT",
   "executionReceipts": {
     "e1ScopeLock": {
       "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_UAT3_E1_CANONICAL_READONLY_PACK_SCOPE_LOCK_20261008.json",
@@ -163,5 +163,40 @@
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_UAT3_A10_RESPONSIVE_SOURCE_FIX_RECEIPT_20261008.json",
       "receiptCommit": "7468a5c3966f55e6119d156568bba0514da68281"
     }
+  },
+  "priorityAuthority": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PAULA_RELEASE_PRIORITY_FREEZE_20261008.json",
+    "blobSha": "fab0103ffeb10690160eef276e48bd648db998d7",
+    "commit": "5fdc54fe14b407edc9a288c4607a32e2ea192a1a",
+    "status": "FROZEN_USER_AUTHORITY_ACTIVE",
+    "schedulingRule": "This authority overrides the prior evidence-unit order for scheduling only; it does not delete or reclassify findings."
+  },
+  "priorityExecutionOrder": [
+    "RENEWALS_RELEASE_BLOCKING",
+    "UPSELLS_LEADS_OPS_RELEASE_BLOCKING",
+    "INSURERS_KNOWLEDGE_PARALLEL_NONBLOCKING",
+    "QUALITY_PARALLEL_NONBLOCKING",
+    "EXACT_PREVIEW_TO_PRODUCTION"
+  ],
+  "renewalsCloseout": {
+    "observations": [
+      "B-01",
+      "B-02",
+      "B-03",
+      "B-04"
+    ],
+    "sourceFixedStaticPass": [
+      "B-01",
+      "B-03",
+      "B-04"
+    ],
+    "b02": {
+      "prior1415ClassificationApply": "COMPLETE_DO_NOT_REPEAT",
+      "cutoffDryRun": "583_OLD_EXPIRED_OPEN_PLUS_24_RECENT_EXPIRED_OPEN",
+      "cutoff": "2026-07-31",
+      "applyAuthorized": false,
+      "next": "Prepare exact B-02 authorization/readback decision; do not infer in UI."
+    },
+    "previewFunctionalProofAuthorized": false
   }
 }
