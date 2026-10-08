@@ -138,6 +138,26 @@ async function renderCountry(page,country,phase,viewport){
     if(terminal)return true;
     return !h.querySelector('[data-renewals-loading]')&&h.querySelectorAll('[data-renewal-bucket]').length===4;
   },null,{timeout:15000});
+  const initialTerminal=await page.evaluate(()=>document.querySelector('[data-renewals-loading]')?.getAttribute('data-renewals-loading')||'');
+  let recovery=null;
+  if(initialTerminal){
+    recovery=await page.evaluate(async()=>{
+      const requested=['clientes','polizas','aseguradoras'],started=Date.now(),samples=[];
+      while(Date.now()-started<30000){
+        try{if(Orbit.store&&typeof Orbit.store._ensureCollections==='function')Orbit.store._ensureCollections(requested);}catch{}
+        const s=Orbit.store&&typeof Orbit.store._productStatus==='function'?Orbit.store._productStatus():{};
+        const confirmed=[].concat(s.serverConfirmedCollections||[]),denied=[].concat(s.deniedCollections||[]),errors=s.snapshotErrors||{};
+        samples.push({ms:Date.now()-started,confirmed:confirmed.filter(x=>requested.includes(x)),denied:denied.filter(x=>requested.includes(x)),errors:Object.keys(errors).filter(x=>requested.includes(x))});
+        if(requested.every(x=>confirmed.includes(x)))return{ready:true,ms:Date.now()-started,samples:samples.slice(-6)};
+        if(requested.some(x=>denied.includes(x)||errors[x]))return{ready:false,terminal:'unavailable',ms:Date.now()-started,samples:samples.slice(-6)};
+        await new Promise(resolve=>setTimeout(resolve,750));
+      }
+      return{ready:false,terminal:'timed_out',ms:Date.now()-started,samples:samples.slice(-6)};
+    });
+    need(recovery.ready===true,'B4_003_RENEWALS_RETRY_SERVER_CONFIRMATION_'+String(recovery.terminal||'unknown')+':'+JSON.stringify(recovery.samples));
+    await page.click('[data-renewals-retry]');
+    await page.waitForFunction(()=>!document.querySelector('[data-renewals-loading]')&&document.querySelectorAll('[data-renewal-bucket]').length===4,null,{timeout:15000});
+  }
   const state=await page.evaluate(({country,terminalIds,recentIds})=>{
     const n=v=>String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'');
     const cc=v=>String(v==null?'':v).trim().toUpperCase(),store=Orbit.store,h=document.getElementById('host');
@@ -168,7 +188,7 @@ async function renderCountry(page,country,phase,viewport){
       hostText:String(h.innerText||'').slice(0,500)
     };
   },{country,terminalIds:proof.backend.terminalIds,recentIds:proof.backend.recentIds});
-  state.phase=phase;state.country=country;state.viewport=viewport;state.readyMs=Date.now()-started;
+  state.phase=phase;state.country=country;state.viewport=viewport;state.readyMs=Date.now()-started;state.initialTerminal=initialTerminal||null;state.recovery=recovery;
   need(state.loadingState==='ready','B4_003_RENEWALS_ROUTE_TERMINAL_'+state.loadingState);
   need(JSON.stringify(state.bucketKeys)===JSON.stringify(['vencidas','d15','d45','d90']),'B4_003_RENEWALS_BUCKET_KEYS');
   need(state.exactCanonicalIds&&state.bucketCounts.every(x=>x.count===x.visible)&&state.bucketCounts.reduce((s,x)=>s+x.count,0)===state.visibleCount,'B4_003_RENEWALS_CANONICAL_RECONCILIATION');
