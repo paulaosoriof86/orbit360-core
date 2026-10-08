@@ -1,0 +1,22 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_RENEWALS_PRIORITY_PREVIEW_HARNESS_ROUTE_ROOTFIX_V1",
+  "recordedAt": "2026-10-08T20:16:16.512Z",
+  "status": "QA_HARNESS_ROOTFIX_READY_FOR_EXACT_RETRY",
+  "failedRunId": 37837340561,
+  "failedJobId": 113517641380,
+  "failedArtifactId": 11575993214,
+  "failedArtifactDigest": "sha256:9f3154edc35232591d6ee49a65dbe13e29d7aa8e7c1ca3aef7d869f2a69f8063",
+  "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-37837340561-n69wa6ds.web.app",
+  "failure": "page.waitForFunction at renderCountry route-key assertion timed out after the harness had already set #/renovaciones and directly invoked the canonical Renewals renderer.",
+  "classification": "QA_HARNESS_FALSE_BLOCKER",
+  "rootCause": "The focused harness required the global router bookkeeping field Orbit.route.key to update before accepting the directly rendered Renewals surface. The business proof depends on the canonical renderer and DOM terminal state, not on that incidental bookkeeping field.",
+  "correction": "Wait for the exact location hash and then adjudicate the canonical Renewals terminal DOM. Preserve all data, reconciliation, role, country, viewport, label, responsive and browser-error assertions unchanged.",
+  "productSourceChanged": false,
+  "dataMutation": false,
+  "businessWrites": 0,
+  "syntheticQaWrites": 0,
+  "livePromotion": false,
+  "reimport": false,
+  "liveByteStable": true,
+  "nextAction": "EXACT_SAME_SCOPE_RETRY"
+}
