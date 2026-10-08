@@ -1272,7 +1272,10 @@ try{
 
  await page.evaluate(id=>{document.getElementById('asg-ficha')?.remove();Orbit.modules.aseguradoras.ficha(id);},ids.insurer);
  await page.click('#asg-ficha #af-editar');
- await page.waitForSelector('#asg-ficha #af-logo',{timeout:10000});
+ await page.click('#asg-ficha #af-logo-focus');
+ await page.waitForSelector('#asg-ficha [data-tab="resumen"].active',{timeout:10000});
+ await page.click('#asg-ficha details:has(#af-logo) > summary');
+ await page.waitForSelector('#asg-ficha #af-logo',{timeout:10000,state:'visible'});
  await page.fill('#asg-ficha #af-logo','https://example.invalid/b4-r20-logo-'+run+'.png');
  const diffProbe=await page.evaluate(async()=>{
    const original=Orbit.ui.prompt;let resolvePrompt;window.__b4003PromptText='';window.__b4003PromptResolve=null;
