@@ -1,0 +1,47 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_CUMULATIVE_STALE_CONTRACT_ROOTFIX_V1",
+  "recordedAt": "2026-10-08T21:49:10Z",
+  "status": "CONTRACT_ROOTFIXED_PENDING_EXACT_PREVIEW",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "parentHead": "81188ec29fc925db67f1bf133b200dfa2805719b",
+  "failedRun": {
+    "id": 37849222174,
+    "jobId": 113557685288,
+    "error": "B4_003_R20_RENEWABILITY_INLINE_ACTION_MISSING",
+    "deploymentReached": false,
+    "liveChanged": false
+  },
+  "audit": {
+    "scope": "All 56 assertions after the contract's PASS log were evaluated against the exact current source.",
+    "failuresBefore": 4,
+    "failuresCorrected": [
+      "B4_003_R20_RENEWABILITY_INLINE_ACTION_MISSING",
+      "B4_003_R20_INBOX_DEDUPE_RECIPIENT_STATE_MISSING",
+      "B4_003_R20_INBOX_HUMAN_UI_MISSING",
+      "B4_003_R20_SECOND_REVIEW_STARTUP_PENDING_ROUTING_MISSING"
+    ],
+    "corrections": [
+      "Match the canonical lowercase decision badge: Decisión: renovabilidad pendiente.",
+      "Require personal acknowledgement plus shared resolution state and its tenant task owner.",
+      "Require current human inbox actions: Reconocer para mí, Resolver para todos, Archivar resueltas.",
+      "Preserve neutral Inicio first paint and accept asesor/comercial/asistente recipient-aware Leads routing."
+    ],
+    "productRegression": false
+  },
+  "correction": {
+    "path": "tools/gravicentra-i6-5-b4-003-contract.mjs",
+    "previousBlobSha": "2ef728ba94011f6b2f1a38d7356f41f05d8d230a",
+    "correctedBlobSha": "7ab1cb376e090617aaee6753ba6271aeb18b8fcc"
+  },
+  "boundaries": {
+    "productSourceChanged": false,
+    "dataMutation": false,
+    "businessWrites": false,
+    "syntheticQaWrites": false,
+    "previewDeployment": false,
+    "livePromotion": false,
+    "reimport": false
+  },
+  "nextAction": "B4_003_R20_CONTRACT_AND_EXACT_PREVIEW"
+}
