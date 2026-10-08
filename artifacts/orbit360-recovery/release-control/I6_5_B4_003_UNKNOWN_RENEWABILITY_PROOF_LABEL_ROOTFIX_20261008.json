@@ -1,0 +1,44 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_UNKNOWN_RENEWABILITY_PROOF_LABEL_ROOTFIX_V1",
+  "recordedAt": "2026-10-08T21:55:20Z",
+  "status": "PROOF_ROOTFIXED_PENDING_EXACT_PREVIEW",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "parentHead": "dbfa0d63dd892289bf223716dd25d9df04cfc476",
+  "failedRun": {
+    "id": 37849422372,
+    "jobId": 113558347983,
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-37849422372-hs5wfsvw.web.app",
+    "error": "B4_003_R20_UNKNOWN_RENEWABILITY_MUST_STAY_IN_KANBAN",
+    "observed": {
+      "unknownRenewVisibleGT": true,
+      "unknownRenewReviewAction": true,
+      "unknownRenewPendingBadge": false,
+      "syntheticWrites": 14,
+      "cleanupWrites": 14,
+      "syntheticFinalAbsent": true,
+      "liveByteStable": true
+    }
+  },
+  "cause": {
+    "classification": "STALE_BROWSER_TEXT_ASSERTION",
+    "obsoleteLabel": "Renovabilidad pendiente",
+    "canonicalLabel": "Decisión: renovabilidad pendiente",
+    "productRegression": false
+  },
+  "correction": {
+    "path": "tools/gravicentra-i6-5-b4-003-preview-proof.mjs",
+    "previousBlobSha": "fed7b9b5b0030d08c13de456d363072243cc3f61",
+    "correctedBlobSha": "cfede753e00fc93113a9a9305ae138990f770de2",
+    "scope": "Match the exact canonical pending-decision badge while preserving visibility and action checks."
+  },
+  "boundaries": {
+    "productSourceChanged": false,
+    "dataMutation": false,
+    "businessWrites": false,
+    "syntheticQaWritesThisCommit": false,
+    "livePromotion": false,
+    "reimport": false
+  },
+  "nextAction": "B4_003_R20_CONTRACT_AND_EXACT_PREVIEW"
+}

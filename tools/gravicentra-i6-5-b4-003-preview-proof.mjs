@@ -611,7 +611,7 @@ try{
    const syntheticRenewVisibleGT=!!h.querySelector('[data-renewal-policy="'+ids.renewalPolicy+'"]');
    const unknownCard=h.querySelector('[data-renewal-policy="'+ids.unknownRenewPolicy+'"]');
    const unknownRenewVisibleGT=!!unknownCard;
-   const unknownRenewPendingBadge=Array.from(unknownCard?.querySelectorAll('.badge')||[]).some(x=>String(x.textContent||'').trim()==='Renovabilidad pendiente');
+   const unknownRenewPendingBadge=Array.from(unknownCard?.querySelectorAll('.badge')||[]).some(x=>String(x.textContent||'').trim()==='Decisión: renovabilidad pendiente');
    const unknownRenewReviewAction=!!unknownCard?.querySelector('[data-renewability-review="'+ids.unknownRenewPolicy+'"]');
    const regularCard=h.querySelector('[data-renewal-policy="'+ids.renewalPolicy+'"]');
    const regularActionCount=regularCard?regularCard.querySelectorAll('a.reno-wa,button').length:0;
