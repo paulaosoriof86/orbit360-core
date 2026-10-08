@@ -1,18 +1,18 @@
 {
   "schema": "GRAVICENTRA_I6_5_B4_003_R20_MACHINE_PROOF_V1",
-  "recordedAt": "2026-10-08T01:02:18.839Z",
+  "recordedAt": "2026-10-08T23:05:05.796Z",
   "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
   "findingId": "B4-003",
-  "sourceSha": "66c3b9b77ef8ffecbe3a26de59897abd55ec677f",
-  "buildId": "gi-i65-b4-66c3b9b77ef8-57f234755dc1",
-  "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-37710305112-ud58tgnd.web.app",
-  "channelId": "gi-i65-b4-37710305112",
-  "runId": 37710305112,
-  "artifactId": 11521347552,
-  "artifactDigest": "341d1cb69e88999f986088567f4aaec4d6744f9e440aacc318f490d400f11981",
-  "hostedPayloadDigest": "1fce5b47ba565c4ab8be9038121c3f55ffb4501accd45440991ff21b7d6a5f1c",
-  "backendSourceDigest": "1fd078f8a1386614b5a8d1d292fe8a502a38c59918b6d0909cd5161fe6e0e23c",
-  "bundleDigest": "bc531dfbf2d99e8ef563c490f2cbd12347bfa39fa801723d4635e8f5c907d7f2",
+  "sourceSha": "eca954e193d70113735e33884ba18d6de2ad3e52",
+  "buildId": "gi-i65-b4-eca954e193d7-57f234755dc1",
+  "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-37856707824-zum249wb.web.app",
+  "channelId": "gi-i65-b4-37856707824",
+  "runId": 37856707824,
+  "artifactId": 11584278022,
+  "artifactDigest": "4596b9f7869257410b3af10a9098b27bb6dedca2f96b12d7196d8ed37f2b1c8e",
+  "hostedPayloadDigest": "bab8f80eaebf842a1f5f964fcb01d3bcbbbcc1584dc3e480175357a656c66864",
+  "backendSourceDigest": "778af087e48cf3e74edc8d4d813aa414968709a9e08977ac2a8405c820e50bb4",
+  "bundleDigest": "b019eac425e7b6d1c0f2c73a40876ef0e5cd28cb4bae70dc80ee87250dea1b8c",
   "exactHostingReadback": true,
   "assertions": {
     "handoffActorsDistinct": true,
@@ -152,930 +152,12 @@
     "cleanupComplete": true
   },
   "renewalRenderStability": {
-    "mutationCount": 80,
+    "mutationCount": 0,
     "textStable": true,
     "route": "renovaciones",
-    "records": [
-      {
-        "ms": 805,
-        "type": "childList",
-        "target": "DIV",
-        "added": [],
-        "removed": [
-          "🔄 Renovaciones · Pipeline por vencer 90 días·Por urgencia·Gestión Preparar campaña de renovación Vencidas5Recuperar o cerrar gestión≤15 días3Atención prioritaria16–45 días9Planifi"
-        ]
-      },
-      {
-        "ms": 805,
-        "type": "childList",
-        "target": "DIV",
-        "added": [
-          "🔄 Renovaciones · Pipeline por vencer 90 días·Por urgencia·Gestión Preparar campaña de renovación Vencidas5Recuperar o cerrar gestión≤15 días3Atención prioritaria16–45 días9Planifi"
-        ],
-        "removed": []
-      },
-      {
-        "ms": 805,
-        "type": "childList",
-        "target": "DIV",
-        "added": [
-          "Vencidas"
-        ],
-        "removed": [
-          "Vencidas renovables"
-        ]
-      },
-      {
-        "ms": 805,
-        "type": "childList",
-        "target": "DIV",
-        "added": [
-          "5"
-        ],
-        "removed": [
-          "5"
-        ]
-      },
-      {
-        "ms": 805,
-        "type": "childList",
-        "target": "DIV",
-        "added": [
-          "Recuperar o cerrar gestión"
-        ],
-        "removed": [
-          "en gestión de renovación"
-        ]
-      },
-      {
-        "ms": 805,
-        "type": "childList",
-        "target": "DIV",
-        "added": [
-          "≤15 días"
-        ],
-        "removed": [
-          "≤15 días"
-        ]
-      },
-      {
-        "ms": 805,
-        "type": "childList",
-        "target": "DIV",
-        "added": [
-          "3"
-        ],
-        "removed": [
-          "3"
-        ]
-      },
-      {
-        "ms": 805,
-        "type": "childList",
-        "target": "DIV",
-        "added": [
-          "Atención prioritaria"
-        ],
-        "removed": [
-          "urgente"
-        ]
-      },
-      {
-        "ms": 805,
-        "type": "childList",
-        "target": "DIV",
-        "added": [
-          "16–45 días"
-        ],
-        "removed": [
-          "16–45 días"
-        ]
-      },
-      {
-        "ms": 805,
-        "type": "childList",
-        "target": "DIV",
-        "added": [
-          "9"
-        ],
-        "removed": [
-          "9"
-        ]
-      },
-      {
-        "ms": 805,
-        "type": "childList",
-        "target": "DIV",
-        "added": [
-          "Planificar gestión"
-        ],
-        "removed": [
-          "planificar"
-        ]
-      },
-      {
-        "ms": 805,
-        "type": "childList",
-        "target": "DIV",
-        "added": [
-          "Prima neta en gestión"
-        ],
-        "removed": [
-          "Prima en juego"
-        ]
-      },
-      {
-        "ms": 805,
-        "type": "childList",
-        "target": "DIV",
-        "added": [
-          "COP 68,149,688",
-          "GTQ 103,415"
-        ],
-        "removed": [
-          "Q6K"
-        ]
-      },
-      {
-        "ms": 805,
-        "type": "childList",
-        "target": "DIV",
-        "added": [
-          "Separada por moneda; horizonte 90 días"
-        ],
-        "removed": [
-          "a 90 días"
-        ]
-      },
-      {
-        "ms": 805,
-        "type": "childList",
-        "target": "A",
-        "added": [
-          "Abrir WhatsApp"
-        ],
-        "removed": [
-          "💬 WhatsApp"
-        ]
-      },
-      {
-        "ms": 805,
-        "type": "childList",
-        "target": "A",
-        "added": [
-          "Abrir WhatsApp"
-        ],
-        "removed": [
-          "💬 WhatsApp"
-        ]
-      },
-      {
-        "ms": 805,
-        "type": "childList",
-        "target": "A",
-        "added": [
-          "Abrir WhatsApp"
-        ],
-        "removed": [
-          "💬 WhatsApp"
-        ]
-      },
-      {
-        "ms": 805,
-        "type": "childList",
-        "target": "A",
-        "added": [
-          "Abrir WhatsApp"
-        ],
-        "removed": [
-          "💬 WhatsApp"
-        ]
-      },
-      {
-        "ms": 805,
-        "type": "childList",
-        "target": "A",
-        "added": [
-          "Abrir WhatsApp"
-        ],
-        "removed": [
-          "💬 WhatsApp"
-        ]
-      },
-      {
-        "ms": 805,
-        "type": "childList",
-        "target": "A",
-        "added": [
-          "Abrir WhatsApp"
-        ],
-        "removed": [
-          "💬 WhatsApp"
-        ]
-      },
-      {
-        "ms": 805,
-        "type": "childList",
-        "target": "A",
-        "added": [
-          "Abrir WhatsApp"
-        ],
-        "removed": [
-          "💬 WhatsApp"
-        ]
-      },
-      {
-        "ms": 805,
-        "type": "childList",
-        "target": "A",
-        "added": [
-          "Abrir WhatsApp"
-        ],
-        "removed": [
-          "💬 WhatsApp"
-        ]
-      },
-      {
-        "ms": 805,
-        "type": "childList",
-        "target": "A",
-        "added": [
-          "Abrir WhatsApp"
-        ],
-        "removed": [
-          "💬 WhatsApp"
-        ]
-      },
-      {
-        "ms": 805,
-        "type": "childList",
-        "target": "A",
-        "added": [
-          "Abrir WhatsApp"
-        ],
-        "removed": [
-          "💬 WhatsApp"
-        ]
-      },
-      {
-        "ms": 805,
-        "type": "childList",
-        "target": "A",
-        "added": [
-          "Abrir WhatsApp"
-        ],
-        "removed": [
-          "💬 WhatsApp"
-        ]
-      },
-      {
-        "ms": 805,
-        "type": "childList",
-        "target": "A",
-        "added": [
-          "Abrir WhatsApp"
-        ],
-        "removed": [
-          "💬 WhatsApp"
-        ]
-      },
-      {
-        "ms": 805,
-        "type": "childList",
-        "target": "A",
-        "added": [
-          "Abrir WhatsApp"
-        ],
-        "removed": [
-          "💬 WhatsApp"
-        ]
-      },
-      {
-        "ms": 805,
-        "type": "childList",
-        "target": "A",
-        "added": [
-          "Abrir WhatsApp"
-        ],
-        "removed": [
-          "💬 WhatsApp"
-        ]
-      },
-      {
-        "ms": 805,
-        "type": "childList",
-        "target": "A",
-        "added": [
-          "Abrir WhatsApp"
-        ],
-        "removed": [
-          "💬 WhatsApp"
-        ]
-      },
-      {
-        "ms": 805,
-        "type": "childList",
-        "target": "A",
-        "added": [
-          "Abrir WhatsApp"
-        ],
-        "removed": [
-          "💬 WhatsApp"
-        ]
-      },
-      {
-        "ms": 805,
-        "type": "childList",
-        "target": "A",
-        "added": [
-          "Abrir WhatsApp"
-        ],
-        "removed": [
-          "💬 WhatsApp"
-        ]
-      },
-      {
-        "ms": 805,
-        "type": "childList",
-        "target": "A",
-        "added": [
-          "Abrir WhatsApp"
-        ],
-        "removed": [
-          "💬 WhatsApp"
-        ]
-      },
-      {
-        "ms": 805,
-        "type": "childList",
-        "target": "A",
-        "added": [
-          "Abrir WhatsApp"
-        ],
-        "removed": [
-          "💬 WhatsApp"
-        ]
-      },
-      {
-        "ms": 805,
-        "type": "childList",
-        "target": "A",
-        "added": [
-          "Abrir WhatsApp"
-        ],
-        "removed": [
-          "💬 WhatsApp"
-        ]
-      },
-      {
-        "ms": 805,
-        "type": "childList",
-        "target": "A",
-        "added": [
-          "Abrir WhatsApp"
-        ],
-        "removed": [
-          "💬 WhatsApp"
-        ]
-      },
-      {
-        "ms": 805,
-        "type": "childList",
-        "target": "A",
-        "added": [
-          "Abrir WhatsApp"
-        ],
-        "removed": [
-          "💬 WhatsApp"
-        ]
-      },
-      {
-        "ms": 805,
-        "type": "childList",
-        "target": "A",
-        "added": [
-          "Abrir WhatsApp"
-        ],
-        "removed": [
-          "💬 WhatsApp"
-        ]
-      },
-      {
-        "ms": 805,
-        "type": "childList",
-        "target": "A",
-        "added": [
-          "Abrir WhatsApp"
-        ],
-        "removed": [
-          "💬 WhatsApp"
-        ]
-      },
-      {
-        "ms": 805,
-        "type": "childList",
-        "target": "A",
-        "added": [
-          "Abrir WhatsApp"
-        ],
-        "removed": [
-          "💬 WhatsApp"
-        ]
-      },
-      {
-        "ms": 805,
-        "type": "childList",
-        "target": "A",
-        "added": [
-          "Abrir WhatsApp"
-        ],
-        "removed": [
-          "💬 WhatsApp"
-        ]
-      },
-      {
-        "ms": 805,
-        "type": "childList",
-        "target": "A",
-        "added": [
-          "Abrir WhatsApp"
-        ],
-        "removed": [
-          "💬 WhatsApp"
-        ]
-      },
-      {
-        "ms": 805,
-        "type": "childList",
-        "target": "A",
-        "added": [
-          "Abrir WhatsApp"
-        ],
-        "removed": [
-          "💬 WhatsApp"
-        ]
-      },
-      {
-        "ms": 805,
-        "type": "childList",
-        "target": "A",
-        "added": [
-          "Abrir WhatsApp"
-        ],
-        "removed": [
-          "💬 WhatsApp"
-        ]
-      },
-      {
-        "ms": 805,
-        "type": "childList",
-        "target": "A",
-        "added": [
-          "Abrir WhatsApp"
-        ],
-        "removed": [
-          "💬 WhatsApp"
-        ]
-      },
-      {
-        "ms": 805,
-        "type": "childList",
-        "target": "A",
-        "added": [
-          "Abrir WhatsApp"
-        ],
-        "removed": [
-          "💬 WhatsApp"
-        ]
-      },
-      {
-        "ms": 805,
-        "type": "childList",
-        "target": "A",
-        "added": [
-          "Abrir WhatsApp"
-        ],
-        "removed": [
-          "💬 WhatsApp"
-        ]
-      },
-      {
-        "ms": 805,
-        "type": "childList",
-        "target": "A",
-        "added": [
-          "Abrir WhatsApp"
-        ],
-        "removed": [
-          "💬 WhatsApp"
-        ]
-      },
-      {
-        "ms": 805,
-        "type": "childList",
-        "target": "A",
-        "added": [
-          "Abrir WhatsApp"
-        ],
-        "removed": [
-          "💬 WhatsApp"
-        ]
-      },
-      {
-        "ms": 805,
-        "type": "childList",
-        "target": "A",
-        "added": [
-          "Abrir WhatsApp"
-        ],
-        "removed": [
-          "💬 WhatsApp"
-        ]
-      },
-      {
-        "ms": 805,
-        "type": "childList",
-        "target": "A",
-        "added": [
-          "Abrir WhatsApp"
-        ],
-        "removed": [
-          "💬 WhatsApp"
-        ]
-      },
-      {
-        "ms": 805,
-        "type": "childList",
-        "target": "A",
-        "added": [
-          "Abrir WhatsApp"
-        ],
-        "removed": [
-          "💬 WhatsApp"
-        ]
-      },
-      {
-        "ms": 805,
-        "type": "childList",
-        "target": "A",
-        "added": [
-          "Abrir WhatsApp"
-        ],
-        "removed": [
-          "💬 WhatsApp"
-        ]
-      },
-      {
-        "ms": 805,
-        "type": "childList",
-        "target": "A",
-        "added": [
-          "Abrir WhatsApp"
-        ],
-        "removed": [
-          "💬 WhatsApp"
-        ]
-      },
-      {
-        "ms": 805,
-        "type": "childList",
-        "target": "A",
-        "added": [
-          "Abrir WhatsApp"
-        ],
-        "removed": [
-          "💬 WhatsApp"
-        ]
-      },
-      {
-        "ms": 805,
-        "type": "childList",
-        "target": "A",
-        "added": [
-          "Abrir WhatsApp"
-        ],
-        "removed": [
-          "💬 WhatsApp"
-        ]
-      },
-      {
-        "ms": 805,
-        "type": "childList",
-        "target": "A",
-        "added": [
-          "Abrir WhatsApp"
-        ],
-        "removed": [
-          "💬 WhatsApp"
-        ]
-      },
-      {
-        "ms": 805,
-        "type": "childList",
-        "target": "A",
-        "added": [
-          "Abrir WhatsApp"
-        ],
-        "removed": [
-          "💬 WhatsApp"
-        ]
-      },
-      {
-        "ms": 805,
-        "type": "childList",
-        "target": "A",
-        "added": [
-          "Abrir WhatsApp"
-        ],
-        "removed": [
-          "💬 WhatsApp"
-        ]
-      },
-      {
-        "ms": 805,
-        "type": "childList",
-        "target": "A",
-        "added": [
-          "Abrir WhatsApp"
-        ],
-        "removed": [
-          "💬 WhatsApp"
-        ]
-      },
-      {
-        "ms": 805,
-        "type": "childList",
-        "target": "A",
-        "added": [
-          "Abrir WhatsApp"
-        ],
-        "removed": [
-          "💬 WhatsApp"
-        ]
-      },
-      {
-        "ms": 805,
-        "type": "childList",
-        "target": "BUTTON",
-        "added": [
-          "📋 Propuestas"
-        ],
-        "removed": [
-          "📋 Propuestas"
-        ]
-      },
-      {
-        "ms": 806,
-        "type": "childList",
-        "target": "DIV",
-        "added": [
-          "✅ Pedir renovar"
-        ],
-        "removed": []
-      },
-      {
-        "ms": 806,
-        "type": "childList",
-        "target": "DIV",
-        "added": [
-          "🧮 Cotizar"
-        ],
-        "removed": []
-      },
-      {
-        "ms": 806,
-        "type": "childList",
-        "target": "BUTTON",
-        "added": [
-          "📋 Propuestas"
-        ],
-        "removed": [
-          "📋 Propuestas"
-        ]
-      },
-      {
-        "ms": 806,
-        "type": "childList",
-        "target": "DIV",
-        "added": [
-          "✅ Pedir renovar"
-        ],
-        "removed": []
-      },
-      {
-        "ms": 806,
-        "type": "childList",
-        "target": "DIV",
-        "added": [
-          "🧮 Cotizar"
-        ],
-        "removed": []
-      },
-      {
-        "ms": 806,
-        "type": "childList",
-        "target": "BUTTON",
-        "added": [
-          "📋 Propuestas"
-        ],
-        "removed": [
-          "📋 Propuestas"
-        ]
-      },
-      {
-        "ms": 806,
-        "type": "childList",
-        "target": "DIV",
-        "added": [
-          "✅ Pedir renovar"
-        ],
-        "removed": []
-      },
-      {
-        "ms": 806,
-        "type": "childList",
-        "target": "DIV",
-        "added": [
-          "🧮 Cotizar"
-        ],
-        "removed": []
-      },
-      {
-        "ms": 806,
-        "type": "childList",
-        "target": "BUTTON",
-        "added": [
-          "📋 Propuestas"
-        ],
-        "removed": [
-          "📋 Propuestas"
-        ]
-      },
-      {
-        "ms": 806,
-        "type": "childList",
-        "target": "DIV",
-        "added": [
-          "✅ Pedir renovar"
-        ],
-        "removed": []
-      },
-      {
-        "ms": 806,
-        "type": "childList",
-        "target": "DIV",
-        "added": [
-          "🧮 Cotizar"
-        ],
-        "removed": []
-      },
-      {
-        "ms": 806,
-        "type": "childList",
-        "target": "BUTTON",
-        "added": [
-          "📋 Propuestas"
-        ],
-        "removed": [
-          "📋 Propuestas"
-        ]
-      },
-      {
-        "ms": 806,
-        "type": "childList",
-        "target": "DIV",
-        "added": [
-          "✅ Pedir renovar"
-        ],
-        "removed": []
-      },
-      {
-        "ms": 806,
-        "type": "childList",
-        "target": "DIV",
-        "added": [
-          "🧮 Cotizar"
-        ],
-        "removed": []
-      },
-      {
-        "ms": 806,
-        "type": "childList",
-        "target": "BUTTON",
-        "added": [
-          "📋 Propuestas"
-        ],
-        "removed": [
-          "📋 Propuestas"
-        ]
-      },
-      {
-        "ms": 806,
-        "type": "childList",
-        "target": "DIV",
-        "added": [
-          "✅ Pedir renovar"
-        ],
-        "removed": []
-      },
-      {
-        "ms": 806,
-        "type": "childList",
-        "target": "DIV",
-        "added": [
-          "🧮 Cotizar"
-        ],
-        "removed": []
-      },
-      {
-        "ms": 806,
-        "type": "childList",
-        "target": "BUTTON",
-        "added": [
-          "📋 Propuestas"
-        ],
-        "removed": [
-          "📋 Propuestas"
-        ]
-      },
-      {
-        "ms": 806,
-        "type": "childList",
-        "target": "DIV",
-        "added": [
-          "✅ Pedir renovar"
-        ],
-        "removed": []
-      }
-    ],
-    "events": [
-      {
-        "ms": 37,
-        "kind": "store",
-        "detail": "clientes"
-      },
-      {
-        "ms": 86,
-        "kind": "store",
-        "detail": "vehiculos"
-      },
-      {
-        "ms": 165,
-        "kind": "store",
-        "detail": "recibosEsperados"
-      },
-      {
-        "ms": 172,
-        "kind": "store",
-        "detail": "cancelaciones"
-      },
-      {
-        "ms": 178,
-        "kind": "store",
-        "detail": "negocios"
-      },
-      {
-        "ms": 184,
-        "kind": "store",
-        "detail": "gestiones"
-      },
-      {
-        "ms": 200,
-        "kind": "store",
-        "detail": "aseguradoras"
-      },
-      {
-        "ms": 207,
-        "kind": "store",
-        "detail": "cobros"
-      },
-      {
-        "ms": 250,
-        "kind": "store",
-        "detail": "carteraPrimas"
-      },
-      {
-        "ms": 256,
-        "kind": "store",
-        "detail": "metas"
-      },
-      {
-        "ms": 833,
-        "kind": "store",
-        "detail": "reclamos"
-      },
-      {
-        "ms": 967,
-        "kind": "store",
-        "detail": "comisiones"
-      },
-      {
-        "ms": 1037,
-        "kind": "store",
-        "detail": "auditoria"
-      }
-    ],
-    "canonicalRerenderObserved": true
+    "records": [],
+    "events": [],
+    "canonicalRerenderObserved": false
   },
   "qaResidue": {
     "rows": [
@@ -1145,7 +227,7 @@
   "qaResidueDisposition": "NOT_DELETED_FAIL_CLOSED",
   "qaResidueDeletedCount": 0,
   "qaResidueAdjudicationReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R19_B2_QA_RESIDUE_ADJUDICATION_20261005.json",
-  "qaResidueAdjudicationReceiptBlobSha": "b3d1a0dc8b14afbbe336e5b83199637a7e7cbf7f",
+  "qaResidueAdjudicationReceiptBlobSha": "0eccb9d7193373056215dd044201d9e27a2fb50e",
   "syntheticQaWrites": 14,
   "cleanupWrites": 37,
   "syntheticFinalAbsent": true,
@@ -1177,7 +259,7 @@
       "url": "https://us-east1-ays-orbit-360-lab.cloudfunctions.net/orbit360ProductOperationalCommandPreview",
       "resourceType": "fetch",
       "method": "POST",
-      "postData": "{\"data\":{\"tenantId\":\"alianzas-soluciones\",\"activeRole\":\"Dirección\",\"mutations\":[{\"action\":\"insert\",\"collection\":\"actividades\",\"id\":\"secres_muytzzc3awzna\",\"payload\":{\"id\":\"secres_muytzzc3awzna\",\"tipo\":\"admin\",\"icon\":\"🔐\",\"fecha\":\"2026-10-08\",\"titulo\":\"Acceso a recurso seguro\",\"detalle\":\"document.upload · ok\",\"tenantId\":\"alianzas-soluciones\",\"createdAt\":\"2026-10-08T01:01:57.796Z\",\"updatedAt\":\"2026-10-08T01:01:57.796Z\",\"ownerUid\":\"woJlxR1iFEeiQZvTscPj4qQ5Qc73\",\"ownerEmail\":\"orbit.lab@demo.com\"}}]}}",
+      "postData": "{\"data\":{\"tenantId\":\"alianzas-soluciones\",\"activeRole\":\"Dirección\",\"mutations\":[{\"action\":\"insert\",\"collection\":\"actividades\",\"id\":\"secres_mv0593zw1b5qc\",\"payload\":{\"id\":\"secres_mv0593zw1b5qc\",\"tipo\":\"admin\",\"icon\":\"🔐\",\"fecha\":\"2026-10-08\",\"titulo\":\"Acceso a recurso seguro\",\"detalle\":\"document.upload · ok\",\"tenantId\":\"alianzas-soluciones\",\"createdAt\":\"2026-10-08T23:04:45.692Z\",\"updatedAt\":\"2026-10-08T23:04:45.692Z\",\"ownerUid\":\"woJlxR1iFEeiQZvTscPj4qQ5Qc73\",\"ownerEmail\":\"orbit.lab@demo.com\"}}]}}",
       "responseBody": "{\"error\":{\"message\":\"Preview operativo solo admite fixtures sintéticos autorizados B3-004/B4-003.\",\"status\":\"PERMISSION_DENIED\"}}"
     }
   ],
@@ -1207,7 +289,7 @@
     {
       "status": 403,
       "url": "https://us-east1-ays-orbit-360-lab.cloudfunctions.net/orbit360ProductOperationalCommandPreview",
-      "id": "secres_muytzzc3awzna",
+      "id": "secres_mv0593zw1b5qc",
       "collection": "actividades",
       "reason": "SECURE_RESOURCE_AUDIT_NON_SYNTHETIC_DENIED_IN_PREVIEW",
       "persisted": false
@@ -1315,11 +397,32 @@
     "buckets": [
       {
         "key": "vencidas",
-        "count": 5,
+        "count": 26,
         "ids": [
+          "pol_94cede3cf0431d35f1889d5a9822",
+          "pol_df3e3f44788a005f26a1213fe1ef",
+          "pol_fb16a808c08258c92e6e6c3f7be5",
+          "pol_9220fa6d4f3a49b2307746d1d869",
+          "pol_6d4e0c7223bc376b0844bb5fd540",
+          "pol_be60fdba3a8e370e423a4307783f",
+          "pol_863aa89b0a5ae4f0e369f54b456c",
+          "pol_c6ce5942704776e515cbf9958969",
+          "pol_dbfb466557cfde24955c9b5857c9",
+          "pol_ad1a3d48c5d0c6a703fcc97fd6af",
+          "pol_a2f92f90a31ff5598b2011ed7257",
+          "pol_168b56a1945ee94512a77005a605",
+          "pol_3ded48aaabca518c0b55a0eabe93",
+          "pol_adfc142e568bc3f254410e7c4436",
+          "pol_c8fa469ea0f3386d46a0c1a4c440",
+          "pol_c79d36d3d0d32f11909e5f715309",
+          "pol_00680d20202f3727c939c3a942fc",
+          "pol_4bacbd8cbf402dc988f251245752",
           "pol_ad0ed5f26dd834d5e1d38f50eb0e",
+          "pol_5080266a15e6f2b39f20017d08e4",
           "pol_b9a883095c9fae8f7502ce1cb054",
-          "b4003qa_policy_expired_renew_37710305112",
+          "pol_0f89cc0a12840594abcc60d418b2",
+          "b4003qa_policy_expired_renew_37856707824",
+          "pol_b8b99324d9016269d118d789095a",
           "pol_8231bbb8f9b7272c02891f5a4caf",
           "pol_df6bf097045762297ec31fd4e5c5"
         ]
@@ -1328,9 +431,9 @@
         "key": "d15",
         "count": 3,
         "ids": [
-          "b4003qa_policy_renew_37710305112",
-          "b4003qa_policy_renewwrite_37710305112",
-          "b4003qa_policy_unknown_37710305112"
+          "b4003qa_policy_renew_37856707824",
+          "b4003qa_policy_renewwrite_37856707824",
+          "b4003qa_policy_unknown_37856707824"
         ]
       },
       {
@@ -1350,7 +453,7 @@
       },
       {
         "key": "d90",
-        "count": 29,
+        "count": 31,
         "ids": [
           "pol_ddbb135a5fcd5b9d61dba57f56ec",
           "pol_4221b6ed10faaa92cbbff6a8f4c4",
@@ -1380,7 +483,9 @@
           "pol_d957242209c31974d11137e90dea",
           "pol_f469ee0d2c2830fc4e3ed3aa662b",
           "pol_87b756fc84922f1d44d414c25b87",
-          "pol_8cc90db25206ef599f995f78d83f"
+          "pol_8cc90db25206ef599f995f78d83f",
+          "pol_7a25801a130c2d459155ff6f278d",
+          "pol_866eebe50ec3ce9463f67cd63a62"
         ]
       }
     ],
@@ -1390,9 +495,9 @@
     "unknownReview": true,
     "parallelDispositionAbsent": true,
     "date45ExpectedIds": [
-      "b4003qa_policy_renew_37710305112",
-      "b4003qa_policy_renewwrite_37710305112",
-      "b4003qa_policy_unknown_37710305112",
+      "b4003qa_policy_renew_37856707824",
+      "b4003qa_policy_renewwrite_37856707824",
+      "b4003qa_policy_unknown_37856707824",
       "pol_3ddc9e613f40252f02b2e122072d",
       "pol_638e276218baad9e84018415b0ba",
       "pol_7280c9b1a5253a1fe1e463e5993b",
@@ -1404,9 +509,9 @@
       "pol_d5e61976a38be76ba5e3c1e12575"
     ],
     "date45VisibleIds": [
-      "b4003qa_policy_renew_37710305112",
-      "b4003qa_policy_renewwrite_37710305112",
-      "b4003qa_policy_unknown_37710305112",
+      "b4003qa_policy_renew_37856707824",
+      "b4003qa_policy_renewwrite_37856707824",
+      "b4003qa_policy_unknown_37856707824",
       "pol_3ddc9e613f40252f02b2e122072d",
       "pol_638e276218baad9e84018415b0ba",
       "pol_7280c9b1a5253a1fe1e463e5993b",
@@ -1417,9 +522,9 @@
       "pol_c48c0b1d4e940f80dffacbc37959",
       "pol_d5e61976a38be76ba5e3c1e12575"
     ],
-    "expiredPipelineCount": 5,
+    "expiredPipelineCount": 26,
     "expiredHistoricalCount": 1159,
-    "noteText": "Pipeline de renovación por fecha\nAquí se muestran pólizas que todavía forman parte del proceso de renovación. 5 están vencidas y renovables dentro del pipeline; existen 1159 pólizas con vigencia pasada en el alcance histórico, de las cuales 101 están marcadas como no renovables y 0 ya tienen resultado terminal. Cada póliza pendiente permanece en su columna por vigencia y se revisa desde allí, sin crear una tabla paralela."
+    "noteText": "Pipeline de renovación por fecha\nAquí se muestran pólizas que todavía forman parte del proceso de renovación. 26 están vencidas y renovables dentro del pipeline; existen 1159 pólizas con vigencia pasada en el alcance histórico, de las cuales 101 están marcadas como no renovables y 583 ya tienen resultado terminal. Cada póliza pendiente permanece en su columna por vigencia y se revisa desde allí, sin crear una tabla paralela."
   },
   "r18PolicyEditionValidation": {
     "rows": [
@@ -1494,7 +599,7 @@
     "checkboxUsable": true
   },
   "r19RenewabilityDurable": {
-    "policyId": "b4003qa_policy_renewwrite_37710305112",
+    "policyId": "b4003qa_policy_renewwrite_37856707824",
     "serverValue": true,
     "reloadValue": true
   },
@@ -1503,7 +608,7 @@
     "error": "Esta Preview protege los registros reales. La persistencia se valida aquí con una póliza sintética equivalente; el cambio real se prueba únicamente en el gate LIVE autorizado."
   },
   "r19InicioReadiness": {
-    "text": "🌅 Buen día · esto es lo importante hoy METAS DEL MES·PRIORIDADES·AVANCE POR ASESOR Abrir Cliente 360 → METAS DEL MES · OCTUBRE 2026 Avance real del mes Quedan 23 días para cerrar el mes. La producción usa la prima neta de pólizas con inicio de vigencia en el mes y el recaudo usa pagos confirmados con fecha efectiva del mes. Si no existe meta configurada, no se inventa un porcentaje. 440 clientes 1425 pólizas 581 registros vencidos en cartera 14% Q11K GTQ Producción neta del mes Meta Q80K 0% Sin movimientos Recaudo confirmado del mes Meta Q50K COBROS CONFIRMADOS Q851K GTQ $205.8M COP 1243 pagos confirmados › PENDIENTE DE COBRO Q 8,741 GTQ $ 0 COP 735 obligaciones · 19 con monto › CARTERA VENCIDA Q 7,591 GTQ $ 0 COP 581 obligaciones · 15 con monto › VENCEN ≤45 D 16 mismo universo de Pólizas › Avance por asesor producción neta del mes vs meta configurada PO Paula Osorio Q11K GTQ 14% BH Braulio Hernández Sin movimientos Meta no configurada — CC Carlos Castro Sin movimientos Meta no configurada — FA Fernando Arias Sin movimientos Meta no configurada — JS Johanna Salgado Sin movimientos Meta no configurada — NC Nicole Castro Sin movimientos Meta no configurada — SD Samuel Daza Sin movimientos Meta no configurada — Prioridades 🔄 IMPAGUA, SOCIEDAD ANONIMA DAÑOS · renueva en 3 d 🔄 IMPAGUA, SOCIEDAD ANONIMA DAÑOS · renueva en 3 d 🔄 B4-003 QA Cliente Accidentes · renueva en 10 d 🔄 B4-003 QA Cliente Auto · renueva en 10 d ⚠ NORA LUCIA HURTARTE FLORES cuota — vencida · — ⚠ LUIS ESTUARDO PEREZ CIFUENTES cuota — vencida · — ⚠ ERICKA LIZETTE AGUILAR LUNA cuota — vencida · — Seguimientos de hoy sin cadencia automática · gestiona por WhatsApp 🌱 B4-003 QA colaboración · Paula Osorio · mañana · Nuevo ingreso 🧮 B4-003 QA colaboración pre-emisión · Paula Osorio · mañana · Cotizando 🧮",
+    "text": "🌅 Buen día · esto es lo importante hoy METAS DEL MES·PRIORIDADES·AVANCE POR ASESOR Abrir Cliente 360 → METAS DEL MES · OCTUBRE 2026 Avance real del mes Quedan 23 días para cerrar el mes. La producción usa la prima neta de pólizas con inicio de vigencia en el mes y el recaudo usa pagos confirmados con fecha efectiva del mes. Si no existe meta configurada, no se inventa un porcentaje. 440 clientes 1425 pólizas 584 registros vencidos en cartera 14% Q11K GTQ Producción neta del mes Meta Q80K 0% Sin movimientos Recaudo confirmado del mes Meta Q50K COBROS CONFIRMADOS Q851K GTQ $205.8M COP 1243 pagos confirmados › PENDIENTE DE COBRO Q 8,058 GTQ $ 0 COP 732 obligaciones · 18 con monto › CARTERA VENCIDA Q 8,274 GTQ $ 0 COP 584 obligaciones · 16 con monto › VENCEN ≤45 D 16 mismo universo de Pólizas › Avance por asesor producción neta del mes vs meta configurada PO Paula Osorio Q11K GTQ 14% BH Braulio Hernández Sin movimientos Meta no configurada — CC Carlos Castro Sin movimientos Meta no configurada — FA Fernando Arias Sin movimientos Meta no configurada — JS Johanna Salgado Sin movimientos Meta no configurada — NC Nicole Castro Sin movimientos Meta no configurada — SD Samuel Daza Sin movimientos Meta no configurada — Prioridades 🔄 IMPAGUA, SOCIEDAD ANONIMA DAÑOS · renueva en 2 d 🔄 IMPAGUA, SOCIEDAD ANONIMA DAÑOS · renueva en 2 d 🔄 B4-003 QA Cliente Accidentes · renueva en 9 d 🔄 B4-003 QA Cliente Auto · renueva en 9 d ⚠ NORA LUCIA HURTARTE FLORES cuota — vencida · — ⚠ LUIS ESTUARDO PEREZ CIFUENTES cuota — vencida · — ⚠ ERICKA LIZETTE AGUILAR LUNA cuota — vencida · — Seguimientos de hoy sin cadencia automática · gestiona por WhatsApp 🌱 B4-003 QA colaboración · Paula Osorio · mañana · Nuevo ingreso 🧮 B4-003 QA colaboración pre-emisión · Paula Osorio · mañana · Cotizando 🧮 F",
     "terminal": "ready"
   },
   "r19TypedHandoff": null,
