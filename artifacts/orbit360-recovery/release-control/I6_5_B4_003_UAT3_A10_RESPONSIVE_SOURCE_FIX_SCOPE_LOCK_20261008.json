@@ -1,0 +1,32 @@
+{
+  "schema": "gravicentra-b4-003-uat3-a10-responsive-source-fix-scope-lock-v1",
+  "recordedAt": "2026-10-08",
+  "status": "SOURCE_FIX_SCOPE_LOCKED",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "parentHead": "ff31fcb6185abeef143466db08861f68581e630d",
+  "observationId": "A-10",
+  "findingIds": [
+    "B4-003-R20-Q01",
+    "B4-003-R16-05-RECEIPT-SHADOW-DUPLICATE-PROJECTION"
+  ],
+  "allowedFiles": [
+    "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js"
+  ],
+  "allowedChanges": [
+    "Make receipt detail and individual receipt editor responsive without clipping fields or amounts.",
+    "Replace the ambiguous visual placeholder Recibo esperado · — with the truthful label Numeración pendiente when no ordinal source exists.",
+    "Add stable DOM markers for later viewport proof."
+  ],
+  "prohibited": [
+    "No amount, formula, receipt, portfolio or payment mutation.",
+    "No deletion or duplicate disposition.",
+    "No importer, backend, rules, environment, build, deployment, Preview or LIVE change."
+  ],
+  "verification": [
+    "Exact one-file diff",
+    "JavaScript parse check",
+    "Physical branch readback"
+  ],
+  "nextAction": "I6_5_B4_003_UAT3_A10_RESPONSIVE_SOURCE_FIX"
+}
