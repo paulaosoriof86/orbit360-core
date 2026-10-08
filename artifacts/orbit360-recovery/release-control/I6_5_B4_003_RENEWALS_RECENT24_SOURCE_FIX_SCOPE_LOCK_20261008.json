@@ -1,0 +1,32 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_RENEWALS_RECENT24_SOURCE_FIX_SCOPE_LOCK_V1",
+  "recordedAt": "2026-10-08T20:46:04.630Z",
+  "status": "AUTHORIZED_NARROW_SOURCE_FIX",
+  "authority": "USER_CONTINUE_CORRECTIONS_WITH_FROZEN_RENEWALS_PRIORITY",
+  "findingId": "B-02",
+  "evidence": {
+    "dataApplyResultBlobSha": "debd50227bca77a04c5e10fb8cb5af178858ce6a",
+    "backendRecentCount": 24,
+    "backendRecentDigest": "3512b167cdde30b51f67acc3c77135f2a94df5f133fd2d3b45cde8540938e67a",
+    "failedExactPreviewRunId": 37841233987,
+    "liveByteStable": true
+  },
+  "rootCause": "renewalPipelineCandidate applies a historical policy-state allowlist to expired rows after the canonical B-02 data rule has already established OPEN, renewable/not-NO and not-cancelled eligibility. The extra allowlist removes recent open rows from Vencidas.",
+  "allowedProductFiles": [
+    "orbit360-platform/modules/renovaciones.js"
+  ],
+  "exactChange": "For d<0, preserve the canonical exclusions (NO renovability, terminal renewal outcome, cancelled/annulled policy, country) and do not require the additional vigente/porrenovar/vencida allowlist.",
+  "forbidden": [
+    "data mutation",
+    "additional B-02 apply",
+    "reimport",
+    "LIVE promotion",
+    "other module source changes"
+  ],
+  "buildDispatch": false,
+  "previewMutation": false,
+  "functionDeployment": false,
+  "livePromotion": false,
+  "reimport": false,
+  "nextAction": "ATOMIC_SOURCE_FIX_COMPOSITION_REBIND_AND_EXACT_PREVIEW_REARM"
+}
