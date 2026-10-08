@@ -55,7 +55,7 @@ async function backendReadback(){
   const [ps,cs]=await Promise.all([col('polizas').get(),col('cancelaciones').get()]);
   const rows=ps.docs.map(d=>({id:d.id,p:d.data()||{}})),cancellations=new Set();
   for(const d of cs.docs){const p=d.data()||{},id=clean(p.polizaId||p.policyId);if(id)cancellations.add(id);}
-  const terminal=rows.filter(({p})=>p.renewalDispositionRuleId===RULE_ID);
+  const terminal=rows.filter(({p})=>p.renewalDispositionRuleId===RULE_ID),recentRaw=[];
   need(ps.size===EXPECTED_POLICY_COUNT,'B4_003_RENEWALS_POLICY_COUNT_DRIFT:'+ps.size);
   need(terminal.length===EXPECTED_TERMINAL_COUNT,'B4_003_RENEWALS_B02_TERMINAL_COUNT:'+terminal.length);
   need(terminal.every(({p})=>clean(p.renovacionEstado)==='No renovada'&&clean(p.renewalDispositionReason)===REASON&&validDate(p.vigenciaFin||p.fechaFin||p.endDate)&&clean(p.vigenciaFin||p.fechaFin||p.endDate)<=CUTOFF),'B4_003_RENEWALS_B02_TERMINAL_READBACK');
@@ -67,12 +67,13 @@ async function backendReadback(){
     if(outcome!=='OPEN'||renewability(p)==='NO')continue;
     const item={idHash:hash(id).slice(0,16),numeroHash:hash(clean(p.numero)).slice(0,12),vigenciaFin:end,pais:clean(p.pais),estado:clean(p.estado),renewability:renewability(p)};
     if(end<=CUTOFF)oldOpen.push({...item,currentRenewalOutcome:clean(p.renovacionEstado)});
-    else if(end>=RECENT_START&&end<TODAY)recent.push({...item,expectedBucket:'Vencidas'});
+    else if(end>=RECENT_START&&end<TODAY){recent.push({...item,expectedBucket:'Vencidas'});recentRaw.push({id,p});}
   }
   need(oldOpen.length===0,'B4_003_RENEWALS_OLD_OPEN_REMAIN:'+oldOpen.length);
   need(recent.length===EXPECTED_RECENT_COUNT,'B4_003_RENEWALS_RECENT_COUNT:'+recent.length);
   need(hash(recent)===EXPECTED_RECENT_DIGEST,'B4_003_RENEWALS_RECENT_DIGEST:'+hash(recent));
-  proof.backend={policyCount:ps.size,b02TerminalCount:terminal.length,b02TerminalIdDigest:hash(terminal.map(x=>x.id).sort()),oldOpenCount:0,recentCount:recent.length,recentDigest:hash(recent),terminalIds:terminal.map(x=>x.id),recentIds:recent.map(x=>x.id)};
+  const counts=(items,pick)=>items.reduce((a,x)=>{const k=clean(pick(x))||'VACIO';a[k]=(a[k]||0)+1;return a;},{});
+  proof.backend={policyCount:ps.size,b02TerminalCount:terminal.length,b02TerminalIdDigest:hash(terminal.map(x=>x.id).sort()),oldOpenCount:0,recentCount:recent.length,recentDigest:hash(recent),recentStateCounts:counts(recentRaw,x=>x.p.estado),recentCountryCounts:counts(recentRaw,x=>x.p.pais),recentRenewabilityCounts:counts(recentRaw,x=>renewability(x.p)),terminalIds:terminal.map(x=>x.id),recentIds:recentRaw.map(x=>x.id)};
   proof.assertions.b02Exact583Terminal=true;
   proof.assertions.b02OldOpenZero=true;
   proof.assertions.b02Recent24Untouched=true;
@@ -172,6 +173,7 @@ async function renderCountry(page,country,phase,viewport){
   need(JSON.stringify(state.bucketKeys)===JSON.stringify(['vencidas','d15','d45','d90']),'B4_003_RENEWALS_BUCKET_KEYS');
   need(state.exactCanonicalIds&&state.bucketCounts.every(x=>x.count===x.visible)&&state.bucketCounts.reduce((s,x)=>s+x.count,0)===state.visibleCount,'B4_003_RENEWALS_CANONICAL_RECONCILIATION');
   need(state.recentExact&&state.terminalVisibleCount===0,'B4_003_RENEWALS_B02_UI_RECONCILIATION');
+  need(country!=='TODOS'||(state.recentAccessibleCount===EXPECTED_RECENT_COUNT&&state.recentVisibleCount===EXPECTED_RECENT_COUNT),'B4_003_RENEWALS_RECENT_24_NOT_ALL_IN_VENCIDAS:'+state.recentAccessibleCount+':'+state.recentVisibleCount);
   need(state.labelOk,'B4_003_RENEWALS_POLICY_RENEWAL_LABELS');
   need(state.boardFits&&state.cardsFit&&state.actionsFit,'B4_003_RENEWALS_RESPONSIVE_LAYOUT');
   return state;
