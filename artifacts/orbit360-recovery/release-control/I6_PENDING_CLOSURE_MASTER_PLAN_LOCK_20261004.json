@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_PENDING_CLOSURE_MASTER_PLAN_LOCK_V1",
-  "recordedAt": "2026-10-08T21:32:00Z",
-  "status": "FROZEN_ACTIVE_RENEWALS_B02_DECISION_READY",
+  "recordedAt": "2026-10-08T20:04:00Z",
+  "status": "FROZEN_ACTIVE_RENEWALS_DATA_APPLIED_PREVIEW_AUTH_PENDING",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "purpose": "Single no-loss operational closure plan from B4-003 R16 through remaining Fase A Post-Salida. Conversation/memory are context only; this lock, ledger, carry register, Control Plane and physical evidence govern execution.",
@@ -285,9 +285,9 @@
   },
   "currentState": {
     "gate": "I6.5 / B4-003",
-    "status": "RENEWALS_B02_DECISION_READY_PAULA_AUTHORIZATION_PENDING",
-    "nextAction": "PAULA_DECISION_AUTHORIZE_EXACT_583_OR_HOLD",
-    "why": "Paula's release order is now a physical repository authority: Renewals first, then Upsells/Leads/Ops; Insurers/knowledge and Quality continue in parallel and are nonblocking unless a documented critical escalation condition is met.",
+    "status": "RENEWALS_DATA_APPLIED_PASS_EXACT_PREVIEW_AUTHORIZATION_PENDING",
+    "nextAction": "I6_5_B4_003_RENEWALS_EXACT_PREVIEW_AUTHORIZATION",
+    "why": "B-01/B-03/B-04 are source-fixed; B-02 exact 583 cutoff disposition applied with full readback and recent 24 unchanged. Remaining renewal exit is exact authenticated Preview proof.",
     "reviewedSourceSha": "66c3b9b77ef8ffecbe3a26de59897abd55ec677f",
     "reviewedBuildId": "gi-i65-b4-66c3b9b77ef8-57f234755dc1",
     "reviewedPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b4-37710305112-ud58tgnd.web.app",
@@ -15103,7 +15103,7 @@
     "liveMutation": false,
     "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_UAT3_P0_SOURCE_FIX_BATCH_3_SCOPE_LOCK"
   },
-  "nextAction": "PAULA_DECISION_AUTHORIZE_EXACT_583_OR_HOLD",
+  "nextAction": "I6_5_B4_003_RENEWALS_EXACT_PREVIEW_AUTHORIZATION",
   "uat3P0SourceFixBatch3": {
     "status": "SOURCE_FIXED_STATIC_PASS_DEPLOYMENT_NOT_DISPATCHED",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_UAT3_P0_SOURCE_FIX_BATCH_3_COMMERCIAL_CONVERSION_20261008.json",
@@ -15130,9 +15130,9 @@
     "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_UAT3_DEFERRED_READBACK_AND_TRACE_PLAN"
   },
   "uat3RemainingP0EvidencePlan": {
-    "status": "RENEWALS_B02_DECISION_READY_PAULA_AUTHORIZATION_PENDING",
+    "status": "RENEWALS_DATA_APPLIED_PASS_EXACT_PREVIEW_AUTHORIZATION_PENDING",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_UAT3_REMAINING_P0_EVIDENCE_PLAN_20261008.json",
-    "blobSha": "ce8e43e871df1708b9171f799dad03e4ca3355d0",
+    "blobSha": "d0794dde68f3923359b44774a15cf99f49b0203e",
     "parentHead": "9f043a779f967f63a142d8dc5ef74583e0e325bc",
     "uatP0": 29,
     "sourceAddressedOrInstrumented": 18,
@@ -15157,7 +15157,7 @@
     "functionDeployment": false,
     "liveMutation": false,
     "reimport": false,
-    "nextAction": "PAULA_DECISION_AUTHORIZE_EXACT_583_OR_HOLD",
+    "nextAction": "I6_5_B4_003_RENEWALS_EXACT_PREVIEW_AUTHORIZATION",
     "priorityAuthorityBlobSha": "fab0103ffeb10690160eef276e48bd648db998d7"
   },
   "paulaReleasePriorityFreeze20261008": {
@@ -15176,7 +15176,7 @@
     "nextAction": "I6_5_B4_003_RENEWALS_BLOCKING_CLOSEOUT"
   },
   "renewalsBlockingCloseout20261008": {
-    "status": "B02_DECISION_READY_PAULA_AUTHORIZATION_PENDING",
+    "status": "B01_B02_B03_B04_READY_FOR_EXACT_PREVIEW",
     "observations": [
       "B-01",
       "B-02",
@@ -15196,6 +15196,15 @@
     "prior1415ClassificationApply": "PASS_DO_NOT_REPEAT",
     "dataMutationAuthorized": false,
     "previewFunctionalProofAuthorized": false,
-    "nextAction": "PAULA_DECISION_AUTHORIZE_EXACT_583_OR_HOLD"
+    "nextAction": "I6_5_B4_003_RENEWALS_EXACT_PREVIEW_AUTHORIZATION",
+    "b02Result": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_B02_RENEWAL_CUTOFF_APPLY_RESULT_20261008.json",
+      "blobSha": "debd50227bca77a04c5e10fb8cb5af178858ce6a",
+      "commit": "b7675b541d1db9c4a2293bedd5103e8bb2ada0c8",
+      "workflowRunId": 37835964035,
+      "writes": 583,
+      "recent24Untouched": true,
+      "rollbackExecuted": false
+    }
   }
 }
