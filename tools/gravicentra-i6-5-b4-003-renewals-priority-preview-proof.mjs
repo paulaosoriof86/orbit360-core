@@ -116,11 +116,6 @@ async function bootProduct(page,token){
     return{uid:String(c.auth.currentUser?.uid||''),started:activated?.started===true,trace,lastError};
   },token);
   need(state.uid&&state.started,'B4_003_RENEWALS_PRODUCT_SESSION_NOT_STARTED');
-  await page.waitForFunction(()=>{
-    const s=Orbit.store&&typeof Orbit.store._productStatus==='function'?Orbit.store._productStatus():{};
-    const confirmed=s.serverConfirmedCollections||[];
-    return ['clientes','polizas','aseguradoras'].every(x=>confirmed.includes(x));
-  },null,{timeout:30000});
   return state;
 }
 async function selectRole(page,role){
