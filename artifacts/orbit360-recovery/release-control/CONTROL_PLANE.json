@@ -752,7 +752,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_R20_TARGETED_PAULA_VISUAL",
+  "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_UAT3_FINDING_LEDGER_CARRY_RECONCILIATION",
   "postproductionExitProgress": {
     "formalPercent": 50,
     "frozenMiniGates": 5,
@@ -6230,7 +6230,7 @@
     "noReimport": true
   },
   "currentB4": {
-    "status": "B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL",
+    "status": "B4_003_HUMAN_UAT3_REJECTED_PENDING_LEDGER_CARRY_CAUSAL_RECONCILIATION",
     "activeFindingId": "B4-003",
     "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
     "executionLockBlobSha": "512156036d7690443b750f5daf6fcbf312efa8bf",
@@ -6238,7 +6238,7 @@
     "findingLedgerBlobSha": "f2606c6e1a2cf0ebd8330d87b42535fa4a182fc7",
     "noLive": true,
     "noReimport": true,
-    "nextAction": "B4_003_R20_TARGETED_PAULA_VISUAL",
+    "nextAction": "B4_003_UAT3_FINDING_LEDGER_CARRY_RECONCILIATION",
     "sourceFixReceiptBlobSha": "3f6aa42cc5751a42b3411df9b82aae3fd8f880f0",
     "syntheticQaWritesAuthorized": true,
     "previewDispatchRequest": {
@@ -6516,7 +6516,7 @@
     "compositionExactSetCount": 96,
     "r10RuntimeReachabilityRootFixPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R10_QUOTE_AUTHORITY_RUNTIME_REACHABILITY_ROOTFIX_20261003.json",
     "r10RuntimeReachabilityRootFixBlobSha": "e7fcbadd0ed789db39eac860ab0cd82c269f73ea",
-    "humanVisualStatus": "REJECTED_R20_SECOND_REVIEW",
+    "humanVisualStatus": "REJECTED_UAT3_20261008",
     "continuityRegisterPath": "artifacts/orbit360-recovery/release-control/I6_5_OPEN_FINDINGS_CARRY_FORWARD_REGISTER_20261003.json",
     "continuityRegisterBlobSha": "d633012eab94f526e90fa271f61f1955db0b77a2",
     "continuityGuardPath": "tools/gravicentra-open-findings-continuity-guard-v1.mjs",
@@ -7477,10 +7477,12 @@
       "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW",
       "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_SECOND_REVIEW_INICIO_READINESS_ROOTFIX_20261007.json",
       "blobSha": "d4d6322d665d7c8f699d757656457b2224386d5a"
-    }
+    },
+    "humanReviewPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_UAT_THREE_BLOCKS_FORENSIC_FREEZE_AND_COMPLEMENT_20261008.md",
+    "humanReviewBlobSha": "79a19a20a3bb2ff11b609990d51836a80a7202c5"
   },
   "b4VisualAcceptanceControl": {
-    "status": "R19_MACHINE_PASS_PENDING_TARGETED_PAULA_VISUAL",
+    "status": "HUMAN_UAT3_REJECTED",
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_VISUAL_ACCEPTANCE_GOVERNANCE_REPAIR_20261003.json",
     "receiptBlobSha": "b6c18ae40d86ff0cdc3003e7201ead3de3d7d745",
     "cumulativeReviewThrough": [
@@ -7490,10 +7492,10 @@
     ],
     "b4001HumanVisualStatus": "PENDING_CUMULATIVE_REVIEW",
     "b4002HumanVisualStatus": "PENDING_CUMULATIVE_REVIEW",
-    "b4003HumanVisualStatus": "PENDING_R20_TARGETED_VISUAL",
-    "b4004HeldUntil": "B4_003_R20_TARGETED_PAULA_VISUAL_PASS",
+    "b4003HumanVisualStatus": "REJECTED_UAT3_20261008",
+    "b4004HeldUntil": "B4_003_HUMAN_UAT3_CAUSAL_REMEDIATION_AND_VISUAL_ACCEPTANCE",
     "machinePassDoesNotAdvanceFinding": true,
-    "currentB4003HumanStatus": "PENDING_R20_TARGETED_VISUAL",
+    "currentB4003HumanStatus": "REJECTED_UAT3_20261008",
     "nextFindingHeld": "B4-004",
     "machinePassReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_MACHINE_PASS_20261003.json",
     "machinePassReceiptBlobSha": "ddced2eb79c916c80fd9acd80eeca6b5c9196f09",
@@ -7521,7 +7523,9 @@
     "broadReviewPaused": true,
     "r16FindingId": "B4-003-R16-01-OPERATIVO-ASSIGNABLE-ADVISOR-ROSTER-HYDRATION",
     "masterPendingClosurePlanPath": "artifacts/orbit360-recovery/release-control/I6_PENDING_CLOSURE_MASTER_PLAN_LOCK_20261004.json",
-    "qualityPromotedToBlocking": true
+    "qualityPromotedToBlocking": true,
+    "humanUat3Path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_UAT_THREE_BLOCKS_FORENSIC_FREEZE_AND_COMPLEMENT_20261008.md",
+    "humanUat3BlobSha": "79a19a20a3bb2ff11b609990d51836a80a7202c5"
   },
   "b3FinancialVisualFeedbackCarry": {
     "status": "R8_SYSTEM_FIRST_SOURCE_REUSE_AND_HEALTH_QUEUE",
@@ -8125,5 +8129,19 @@
       "reason": "Normalize ledger blob binding across Windows CRLF and GitHub Linux LF runners.",
       "nextAction": "B4_003_R20_CONTRACT_AND_EXACT_PREVIEW"
     }
+  },
+  "r20ThirdHumanReview": {
+    "status": "REJECTED_UAT3_THREE_BLOCKS_CAUSAL_RECONCILIATION_PENDING",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_UAT_THREE_BLOCKS_FORENSIC_FREEZE_AND_COMPLEMENT_20261008.md",
+    "blobSha": "79a19a20a3bb2ff11b609990d51836a80a7202c5",
+    "date": "2026-10-08",
+    "findingLedgerAndCarryStatus": "PENDING_EXACT_ID_SET_RECONCILIATION_BEFORE_ANY_BUILD",
+    "machineProofPreserved": {
+      "runId": 37710305112,
+      "status": "MACHINE_PASS_PENDING_PAULA_VISUAL"
+    },
+    "noProductionPromotion": true,
+    "noDataWrites": true,
+    "noReimport": true
   }
 }
