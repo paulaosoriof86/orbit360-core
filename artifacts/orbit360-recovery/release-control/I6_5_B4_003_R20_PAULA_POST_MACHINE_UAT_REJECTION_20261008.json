@@ -1,0 +1,260 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R20_POST_MACHINE_HUMAN_UAT_REJECTION_V1",
+  "date": "2026-10-08",
+  "status": "HUMAN_UAT_REJECTED_NEW_REGRESSIONS_AND_OPEN_FINDINGS",
+  "evidenceType": "USER_SCREENSHOT_UAT_PLUS_SOURCE_READ_ONLY_AUDIT_NOT_RELEASE_AUTHORITY",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "gate": "I6.5/B4-003",
+  "reviewedCandidate": {
+    "sourceSha": "eca954e193d70113735e33884ba18d6de2ad3e52",
+    "runId": 37856707824,
+    "artifactId": 11584278022,
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-37856707824-zum249wb.web.app",
+    "machineProofStatus": "MACHINE_PASS_PENDING_PAULA_VISUAL",
+    "humanStatus": "REJECTED"
+  },
+  "sourceAudit": {
+    "branchHead": "808046ed7bcdbe9a64d70b4fe092665649f2f3f6",
+    "headAfterBuildOnlyGovernance": true,
+    "sourceChangedByThisReceipt": false
+  },
+  "humanEvidence": {
+    "origin": "Project Gravicentra Insurance conversation, screenshots and observations on 2026-10-08 about 17:11–17:33 America/Guatemala",
+    "screenshotsObserved": 16,
+    "screenshotsGitHubMaterialized": false,
+    "exactRuntimeLogCapture": false,
+    "realFirestoreReadbackPerformedInThisAudit": false
+  },
+  "priorityAuthority": "I6_5_B4_003_PAULA_RELEASE_PRIORITY_FREEZE_20261008.json",
+  "findings": [
+    {
+      "surface": "Renovaciones",
+      "classification": "BLOCKING_P0",
+      "result": "HUMAN_FAIL",
+      "observation": "Normal signed-in Dirección browser could not load pipeline; terminal message says Aseguradoras not server-confirmed.",
+      "sourceEvidence": {
+        "path": "orbit360-platform/modules/renovaciones.js",
+        "blobSha": "8e3bc32aa5ac5f577f545700d39499970c2edeaf",
+        "lines": "9-34,115-124"
+      },
+      "demonstratedCause": "Readiness requires polizas,clientes,aseguradoras together, while hydration contract defers optional collections; 8-second deadline terminates whole board.",
+      "openDiscriminants": [
+        "same authenticated real role and fresh browser cold/warm",
+        "serverConfirmedCollections versus snapshotErrors and denied",
+        "policy+client authoritative readback",
+        "pipeline exact eligible IDs",
+        "assess retry reattachment and event rerender"
+      ],
+      "noDataFix": true
+    },
+    {
+      "surface": "Cliente360/listado",
+      "classification": "BLOCKING_P0",
+      "result": "HUMAN_FAIL",
+      "observation": "Cartera label says no cartera loaded despite individual client showing 12 receipt obligations, open balance, payment records.",
+      "sourceEvidence": {
+        "path": "orbit360-platform/modules/cliente360.js",
+        "blobSha": "58f9c1469e50b0e27fb0fcea7c8a6d613ce8f320",
+        "lines": "123-126,173-246,256-282"
+      },
+      "demonstratedCause": "List financially depends on deferred carteraPrimas and indexed summary; store event listener suppresses rerender when listWaitingForReady is false.",
+      "openDiscriminants": [
+        "compare list and detail same client canonical IDs after server confirmed",
+        "check late async projection and effective overlays",
+        "confirm served payload bytes"
+      ],
+      "noReimport": true
+    },
+    {
+      "surface": "Cliente360/Cobros y pagos",
+      "classification": "BLOCKING_P0",
+      "result": "SOURCE_RISK_DEMONSTRATED_DATA_OUTCOME_PENDING",
+      "observation": "Future installments displayed Pago registrado en SIGA with missing payment date; collected KPI and reconciliation status require physical proof.",
+      "sourceEvidence": {
+        "path": "orbit360-platform/core/queries.js",
+        "blobSha": "7ff1b3cdf9091ffcab864a247433e19c2f1d06be",
+        "lines": "64-85,218-256"
+      },
+      "demonstratedCause": "realizedPaymentRows() includes source-classified CRM_DIRECT receipts even without receiptHasAppliedPayment; origin alone cannot prove cash realization.",
+      "openDiscriminants": [
+        "read exact client/policy/receipt IDs and payment evidence",
+        "reconcile report source versus source-authority marker",
+        "check dates and future installment statuses",
+        "preserve monetary values and physical source"
+      ],
+      "noDataWrite": true
+    },
+    {
+      "surface": "Conciliaciones/global",
+      "classification": "BLOCKING_P0_VERIFY",
+      "result": "MEANING_AND_READINESS_UNVERIFIED",
+      "observation": "Queue shows zero proposal rows despite payment/receipt screens containing pending-conciliation labels.",
+      "sourceEvidence": {
+        "path": "orbit360-platform/modules/conciliaciones.js",
+        "blobSha": "e0c4ef051fadb033e1a66ac4f0db67a52186ed25",
+        "lines": "16-17,102-106,192-205"
+      },
+      "demonstratedCause": "Screen is proposal browser, not ledger of all paid/reconciled events; however it reports zero without confirmed hydration/proposal readback distinction.",
+      "openDiscriminants": [
+        "server-confirmed rows for conciliaciones and conciliacionesPrimas",
+        "pending client receipt action linkage",
+        "historical reconciled payment listing versus proposal queue"
+      ],
+      "noPaymentApply": true
+    },
+    {
+      "surface": "Historial y actividades",
+      "classification": "BLOCKING_P0_VERIFY",
+      "result": "HUMAN_FAIL_SEMANTICS",
+      "observation": "Displays 0 interactions despite observed collaboration and business changes.",
+      "sourceEvidence": {
+        "path": "orbit360-platform/modules/historial.js",
+        "blobSha": "c003c04e3697518ff92598c4f633a1b1973470a8",
+        "lines": "18-46"
+      },
+      "demonstratedCause": "Global module reads actividades only, does not include bitacora/audit domain events, nor assert confirmed hydration before zero.",
+      "openDiscriminants": [
+        "verify actual actividades readback",
+        "recover approved cross-module audit surface without inventing historical actors/dates"
+      ]
+    },
+    {
+      "surface": "Calidad/busqueda",
+      "classification": "BLOCKING_P0",
+      "result": "HUMAN_FAIL_SOURCE_DEMONSTRATED",
+      "observation": "Input loses focus during continuous typing.",
+      "sourceEvidence": {
+        "path": "orbit360-platform/modules/calidad.js",
+        "blobSha": "9245739d821d357f9486b0541b5128c070797c76",
+        "lines": "190-196"
+      },
+      "demonstratedCause": "Input listener debounces a full render(host) which replaces the focused text input.",
+      "openDiscriminants": [
+        "20-character typing and selection/caret test on exact candidate"
+      ]
+    },
+    {
+      "surface": "Calidad/confirmacion pais",
+      "classification": "BLOCKING_P0",
+      "result": "HUMAN_FAIL_SOURCE_DEMONSTRATED",
+      "observation": "Confirmar origen del país routes to non-focal/general or phone-oriented modal.",
+      "sourceEvidence": {
+        "path": "orbit360-platform/modules/calidad.js",
+        "blobSha": "9245739d821d357f9486b0541b5128c070797c76",
+        "lines": "180-190,214-246"
+      },
+      "demonstratedCause": "forceProvenance prepends pais to ordinary missing fields instead of restricting selection to geo/provenance; general Corregir datos applies focus=f[0], which becomes phone-only when first gap is telefono.",
+      "openDiscriminants": [
+        "focus-specific country fields; phone/general distinct; valid persistence and audit"
+      ],
+      "noCountryInference": true
+    },
+    {
+      "surface": "Calidad/medio de contacto",
+      "classification": "BLOCKING_P0_VERIFY",
+      "result": "HUMAN_UNCLEAR_OPERATION",
+      "observation": "No clear way to change selected contact medium.",
+      "sourceEvidence": {
+        "path": "orbit360-platform/modules/calidad.js",
+        "blobSha": "9245739d821d357f9486b0541b5128c070797c76",
+        "lines": "175-187"
+      },
+      "demonstratedCause": "The visible label is derived from telefono/whatsapp/email. The inline action exposes Add phone only when no phone; there is no separate contact-preference setting in this surface.",
+      "openDiscriminants": [
+        "approved client editor contract and preferred contact medium, if any"
+      ]
+    },
+    {
+      "surface": "Ops/Leads/comentarios adjuntos",
+      "classification": "BLOCKING_P0",
+      "result": "HUMAN_UPLOAD_FAIL",
+      "observation": "Real-business Preview attachment upload fails even though Remove/Replace controls exist.",
+      "sourceEvidence": {
+        "path": "orbit360-platform/core/ciclo.js",
+        "blobSha": "a1f5f2e97edecea4a723ccce8024d2c9b564cf9d",
+        "lines": "545-575"
+      },
+      "demonstratedCause": "File upload occurs before business commit; Preview restricts mutations of non-synthetic records, but exact failing call must be traced before determining backend fault.",
+      "openDiscriminants": [
+        "safe persistent synthetic human-UAT fixture",
+        "upload/finalize/read/download/reload/cleanup",
+        "denial must name actual reason"
+      ],
+      "noRealPreviewWrites": true
+    },
+    {
+      "surface": "Ops/Leads/modal progreso",
+      "classification": "BLOCKING_P0_USABILITY",
+      "result": "HUMAN_VISUAL_FAIL",
+      "observation": "Stage stepper too close to header and partially clipped; inner scroll is fragmented.",
+      "sourceEvidence": {
+        "path": "orbit360-platform/styles/infra.css",
+        "blobSha": "c9b7a21e393fb97b86159034be2618158e63d811",
+        "lines": "586-604,630-644"
+      },
+      "demonstratedCause": "Stepper is a horizontally scrollable strip inside vertically constrained modal with an independently scrolling body; needs measured layout proof.",
+      "openDiscriminants": [
+        "1440/390/320 bounding boxes and route actions reachability"
+      ]
+    },
+    {
+      "surface": "Cancelaciones/motivo",
+      "classification": "BLOCKING_P0_VERIFY",
+      "result": "HUMAN_UNAVAILABLE_EDIT",
+      "observation": "Reason shown as Sin motivo registrado; user cannot find creation or edit action.",
+      "sourceEvidence": {
+        "path": "orbit360-platform/modules/cancelaciones.js",
+        "blobSha": "63f6dd1bb3ffad24cf8452404dfc540f1b92e2b7",
+        "lines": "74-91,224-277"
+      },
+      "demonstratedCause": "Detail renders reason read-only and save patches recuperacion/notaRecuperacion only; policy-derived reason comes from motivoCancelacion/cancellationReason.",
+      "openDiscriminants": [
+        "source of canonical cancel motive and approved write transport",
+        "no invented reason or bulk backfill"
+      ]
+    },
+    {
+      "surface": "Aseguradoras/Conocimiento/Documentos/Planes",
+      "classification": "PARALLEL_NONBLOCKING_P1_WITH_P0_SECURITY_EXCEPTIONS",
+      "result": "HUMAN_DESIGN_UNCHANGED",
+      "observation": "Previously requested information architecture and visual design have not materially changed.",
+      "sourceEvidence": {
+        "path": "orbit360-platform/modules/aseguradoras.js",
+        "blobSha": "28bb3f15a1ca20130b194bb2dd5b1d296984927d"
+      },
+      "openDiscriminants": [
+        "source-backed catalog and document links",
+        "human visual design acceptance",
+        "operational directory/security remain P0"
+      ]
+    }
+  ],
+  "governance": {
+    "existingFindingIdsMustBeReconciled": true,
+    "newLedgerIdsCreated": 0,
+    "originalLedgerExpectedCount": 282,
+    "priorityOrder": [
+      "RENEWALS_RELEASE_BLOCKING",
+      "UPSELLS_LEADS_OPS_RELEASE_BLOCKING",
+      "INSURERS_KNOWLEDGE_PARALLEL_NONBLOCKING",
+      "QUALITY_PARALLEL_NONBLOCKING",
+      "EXACT_PREVIEW_TO_PRODUCTION"
+    ],
+    "reclassifyPaymentProjectionAsCriticalIfPhysicalProofConfirms": true,
+    "doNotAdvanceB4004": true,
+    "noNewRepoBranchFirebase": true,
+    "doNotReopenHistoricalPASSWithoutCausalReproduction": true
+  },
+  "boundaries": {
+    "sourceMutation": false,
+    "build": false,
+    "deploy": false,
+    "dataMutation": false,
+    "realOperationalWrites": false,
+    "reimport": false,
+    "livePromotion": false,
+    "cleanupDelete": false
+  },
+  "nextAction": "B4_003_RECONCILE_R20_HUMAN_REJECTION_TO_CONTROL_PLANE_LEDGER_CARRY_AND_AUTHORIZE_CAUSAL_SOURCE_FIX_WITH_EXACT_OWNERS"
+}
