@@ -1,0 +1,55 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_RENEWALS_EXACT_PREVIEW_AUTH_V1",
+  "recordedAt": "2026-10-08T20:07:26.688Z",
+  "status": "AUTHORIZED_PENDING_PREVIEW",
+  "authority": {
+    "actor": "PAULA",
+    "channel": "CURRENT_CONVERSATION",
+    "decision": "AUTHORIZE_RENEWALS_EXACT_ISOLATED_PREVIEW",
+    "exactSelection": "Autorizar Preview (Recommended)"
+  },
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "priorityAuthority": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PAULA_RELEASE_PRIORITY_FREEZE_20261008.json",
+    "blobSha": "fab0103ffeb10690160eef276e48bd648db998d7"
+  },
+  "decisionPack": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_RENEWALS_EXACT_PREVIEW_DECISION_PACK_20261008.json",
+    "blobSha": "43f2c791861a7f5489e34253728acb60c6313f18"
+  },
+  "scope": {
+    "module": "RENOVACIONES",
+    "observations": [
+      "B-01",
+      "B-02",
+      "B-03",
+      "B-04"
+    ],
+    "immutableCumulativeArtifact": true,
+    "isolatedPreviewHosting": true,
+    "matchingPreviewFunctions": true,
+    "authenticatedRoles": [
+      "DIRECCION",
+      "OPERATIVO"
+    ],
+    "countries": [
+      "TODOS",
+      "GT",
+      "CO"
+    ],
+    "viewports": [
+      "DESKTOP",
+      "390x844",
+      "320x568"
+    ],
+    "realBusinessWrites": false,
+    "syntheticQaWrites": false,
+    "additionalDataMutation": false,
+    "productSourceMutation": false,
+    "livePromotion": false,
+    "reimport": false
+  },
+  "adjudicationRule": "Renewals is adjudicated first. Later-priority modules cannot erase a demonstrated Renewals pass unless they causally invalidate the same immutable artifact.",
+  "postPass": "PAULA_RENEWALS_VISUAL_ACCEPTANCE_ON_EXACT_PREVIEW_BEFORE_ANY_LIVE_PROMOTION"
+}
