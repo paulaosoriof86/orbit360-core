@@ -7,16 +7,31 @@ Orbit.modules = Orbit.modules || {};
 Orbit.modules.renovaciones = (function () {
   const U = Orbit.ui, q = Orbit.q, K = Orbit.kit, S = () => Orbit.store;
   const REQUIRED_DATA = ['polizas', 'clientes', 'aseguradoras'];
+  const READINESS_BUDGET_MS = 8000;
+  let readinessStartedAt = 0, readinessTimer = null;
   function ensureDataCollections() {
     try { const store=S(); if(store&&typeof store._ensureCollections==='function') store._ensureCollections(REQUIRED_DATA); } catch (_) {}
   }
   function renewalDataReadiness() {
     const store=S();
-    if(!store || store.__productReadOnlyP0!==true || typeof store._productStatus!=='function') return 'ready';
-    const ps=store._productStatus()||{},confirmed=[].concat(ps.serverConfirmedCollections||[]),denied=[].concat(ps.deniedCollections||[]);
-    if(REQUIRED_DATA.some(name=>denied.includes(name))) return 'unavailable';
-    return REQUIRED_DATA.every(name=>confirmed.includes(name)) ? 'ready' : 'pending';
+    if(!store || store.__productReadOnlyP0!==true || typeof store._productStatus!=='function') return {state:'ready',missing:[]};
+    const ps=store._productStatus()||{},confirmed=[].concat(ps.serverConfirmedCollections||[]),denied=[].concat(ps.deniedCollections||[]),errors=ps.snapshotErrors||{};
+    const missing=REQUIRED_DATA.filter(name=>!confirmed.includes(name));
+    if(REQUIRED_DATA.some(name=>denied.includes(name)||errors[name])) return {state:'unavailable',missing,denied,errors};
+    if(!missing.length)return {state:'ready',missing:[]};
+    if(!readinessStartedAt)readinessStartedAt=Date.now();
+    return {state:Date.now()-readinessStartedAt>=READINESS_BUDGET_MS?'timed_out':'pending',missing,elapsedMs:Date.now()-readinessStartedAt};
   }
+  function clearReadinessWait(){
+    readinessStartedAt=0;
+    if(readinessTimer){clearTimeout(readinessTimer);readinessTimer=null;}
+  }
+  function scheduleReadinessRecheck(host,readiness){
+    if(readinessTimer||!host||readiness.state!=='pending')return;
+    const remaining=Math.max(0,READINESS_BUDGET_MS-Number(readiness.elapsedMs||0));
+    readinessTimer=setTimeout(()=>{readinessTimer=null;if(host.isConnected)render(host);},remaining+20);
+  }
+  function humanCollection(name){return({polizas:'pólizas',clientes:'clientes',aseguradoras:'aseguradoras'})[name]||name;}
   const countryCode = v => String(v == null ? '' : v).trim().toUpperCase();
   const policyCountry = p => { const cli=p&&p.clienteId?S().get('clientes',p.clienteId):null; return countryCode(p&&p.pais || cli&&cli.pais); };
   const selectedCountry = p => { const wanted=countryCode(Orbit.pais); return !wanted || wanted==='TODOS' || policyCountry(p)===wanted; };
@@ -28,6 +43,8 @@ Orbit.modules.renovaciones = (function () {
     return 'UNKNOWN';
   };
   const policyState = p => String(p&&p.estado||'').trim().toLowerCase().replace(/\s+/g,'');
+  const policyStateLabel = p => String(p&&p.estado||'Pendiente de confirmar').trim()||'Pendiente de confirmar';
+  const renewalStateLabel = (p,d) => d<0?'Vencida · '+(-d)+' día'+((-d)===1?'':'s'):d===0?'Vence hoy':'Vence en '+d+' día'+(d===1?'':'s');
   const terminalRenewalOutcome = p => {
     if(!p) return true;
     if(p.renovadaPor) return true;
@@ -98,10 +115,14 @@ Orbit.modules.renovaciones = (function () {
   function render(host) {
     ensureDataCollections();
     const readiness=renewalDataReadiness();
-    if(readiness!=='ready'){
-      host.innerHTML=`<div class="page" data-renewals-loading="${readiness}">${K.bannerFor('renovaciones','')}<div class="card pad"><b>${readiness==='unavailable'?'No fue posible cargar la cartera de renovaciones.':'Cargando cartera de renovaciones…'}</b><div class="muted" style="margin-top:5px">${readiness==='unavailable'?'La fuente operativa requerida no está disponible para este rol.':'Estamos preparando pólizas, clientes y aseguradoras antes de mostrar resultados.'}</div></div></div>`;
+    if(readiness.state!=='ready'){
+      scheduleReadinessRecheck(host,readiness);
+      const waiting=readiness.state==='pending',missing=readiness.missing.map(humanCollection).join(', ');
+      host.innerHTML=`<div class="page" data-renewals-loading="${readiness.state}">${K.bannerFor('renovaciones','')}<div class="card pad" role="status" aria-live="polite"><b>${waiting?'Cargando cartera de renovaciones…':'No fue posible completar la cartera de renovaciones.'}</b><div class="muted" style="margin-top:5px">${waiting?'Estamos confirmando desde el servidor: '+U.esc(missing)+'.':'Falta confirmar desde el servidor: '+U.esc(missing||'fuentes requeridas')+'. No mostramos conteos parciales como si fueran definitivos.'}</div>${waiting?'':'<button type="button" class="btn ghost sm" data-renewals-retry style="margin-top:10px">Reintentar carga</button>'}</div></div>`;
+      const retry=host.querySelector('[data-renewals-retry]');if(retry)retry.addEventListener('click',()=>{clearReadinessWait();ensureDataCollections();render(host);});
       return;
     }
+    clearReadinessWait();
     const cols = buckets();
     const pendingValidation=S().where('polizas', renewalPendingValidation);
     const dispositionRows45=date45DispositionRows(),disposition45=date45Disposition();
@@ -117,8 +138,15 @@ Orbit.modules.renovaciones = (function () {
         { label: 'Prima en juego', val: U.moneyShort(totalPrima, Orbit.q.monedaPais()), color: 'var(--ok)', foot: 'a 90 días', onclick: "location.hash='#/renovaciones'" }
       ])}
       <div class="cfg-note renewal-pipeline-note" data-renewability-pending-count="${pendingValidation.length}" data-expired-pipeline-count="${expired.pipeline}" data-expired-historical-count="${expired.historicalExpired}" style="margin:0 0 14px"><b>Pipeline de renovación por fecha</b><div class="muted" style="margin-top:5px">Aquí se muestran pólizas que todavía forman parte del proceso de renovación. <b>${expired.pipeline}</b> están vencidas y renovables dentro del pipeline; existen <b>${expired.historicalExpired}</b> pólizas con vigencia pasada en el alcance histórico, de las cuales ${expired.nonrenewable} están marcadas como no renovables y ${expired.terminal} ya tienen resultado terminal. Cada póliza pendiente permanece en su columna por vigencia y se revisa desde allí, sin crear una tabla paralela.</div></div>
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;align-items:start">
-        ${cols.map(c => `<div class="card" data-renewal-bucket="${c.key}" data-renewal-bucket-count="${c.items.length}" style="overflow:hidden">
+      <style>
+        .renewal-board{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:14px;align-items:start}
+        .renewal-bucket,.renewal-policy-card{min-width:0}
+        .renewal-policy-name,.renewal-insurer-name{overflow-wrap:anywhere}
+        .renewal-card-actions>*{flex:1 1 118px;min-width:0;white-space:normal;text-align:center}
+        @media(max-width:480px){.renewal-board{grid-template-columns:minmax(0,1fr)}.renewal-card-actions>*{flex-basis:100%}.renewal-policy-card{padding:12px!important}}
+      </style>
+      <div class="renewal-board">
+        ${cols.map(c => `<div class="card renewal-bucket" data-renewal-bucket="${c.key}" data-renewal-bucket-count="${c.items.length}" style="min-width:0;overflow:visible">
           <div style="padding:12px 14px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;border-top:3px solid ${toneBg[c.tone]}">
             <b style="font-family:var(--f-display);font-size:13px">${c.label}</b>
             <span class="badge ${c.tone === 'info' ? 'info' : c.tone}">${c.items.length}</span>
@@ -128,24 +156,25 @@ Orbit.modules.renovaciones = (function () {
               const cli = S().get('clientes', p.clienteId), asg = q.aseguradora(p.aseguradoraId);
               const wa = (cli && cli.telefono || '').replace(/[^0-9]/g, '');
               const waTxt = encodeURIComponent('Hola ' + (cli ? cli.nombre.split(' ')[0] : '') + ', tu póliza ' + p.ramo + ' (' + p.numero + ') vence el ' + U.fmtDate(p.vigenciaFin) + '. ¿Coordinamos la renovación?');
-              return `<div data-renewal-policy="${U.esc(p.id)}" data-renewal-country="${U.esc(policyCountry(p))}" style="border:1px solid var(--line);border-radius:var(--r-sm);padding:10px 11px;background:var(--card)">
+              return `<div class="renewal-policy-card" data-renewal-policy="${U.esc(p.id)}" data-renewal-country="${U.esc(policyCountry(p))}" style="border:1px solid var(--line);border-radius:var(--r-sm);padding:10px 11px;background:var(--card)">
                 <div class="clickable" onclick="Orbit.modules.cliente360.verPoliza('${p.id}')" style="cursor:pointer">
                   <div style="display:flex;justify-content:space-between;align-items:center;gap:6px">
-                    <b style="font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${U.esc(cli ? cli.nombre : '—')}</b>
+                    <b class="renewal-policy-name" style="font-size:12.5px;min-width:0">${U.esc(cli ? cli.nombre : '—')}</b>
                     <span class="mono" style="font-size:10.5px;color:${d < 0 ? 'var(--danger)' : 'var(--ink-3)'};white-space:nowrap">${d < 0 ? (-d) + 'd vencida' : d + 'd'}</span>
                   </div>
                   <div class="mono" style="font-size:10.5px;margin-top:4px;color:var(--ink-3)">Póliza ${U.esc(p.numero||'—')}</div>
                   <div class="muted" style="font-size:11.5px;margin-top:4px">${U.esc(p.ramo||'—')} · ${U.esc(p.producto||'—')}</div>
                   <div style="display:flex;align-items:center;justify-content:space-between;margin-top:7px;gap:8px">
-                    <span style="display:flex;align-items:center;gap:5px;font-size:11px;min-width:0"><span class="dot-s" style="background:${asg ? asg.color : '#999'}"></span><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${U.esc(asg ? asg.nombre : '—')}</span></span>
+                    <span style="display:flex;align-items:center;gap:5px;font-size:11px;min-width:0"><span class="dot-s" style="background:${asg ? asg.color : '#999'}"></span><span class="renewal-insurer-name" style="min-width:0">${U.esc(asg ? asg.nombre : '—')}</span></span>
                     <span class="mono" style="font-size:11px;font-weight:600;white-space:nowrap">${premiumValue(p)==null?'<span class="badge warn">Prima pendiente de fuente</span>':U.moneyShort(premiumValue(p),p.moneda)}</span>
                   </div>
                   <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:7px">
-                    <span class="badge neutral">${U.esc(p.estado||'Estado pendiente')}</span>
-                    ${renewabilityState(p)==='UNKNOWN'?'<span class="badge warn">Renovabilidad pendiente</span>':'<span class="badge ok">Renovable</span>'}
+                    <span class="badge neutral">Póliza: ${U.esc(policyStateLabel(p))}</span>
+                    <span class="badge ${d<0?'danger':'info'}">Renovación: ${U.esc(renewalStateLabel(p,d))}</span>
+                    ${renewabilityState(p)==='UNKNOWN'?'<span class="badge warn">Decisión: renovabilidad pendiente</span>':'<span class="badge ok">Decisión: renovable</span>'}
                   </div>
                 </div>
-                <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px">
+                <div class="renewal-card-actions" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px">
                   ${renewabilityState(p)==='UNKNOWN'?'<button class="btn ghost sm" data-renewability-review="'+U.esc(p.id)+'" style="flex:1" onclick="event.stopPropagation();Orbit.modules.cliente360.editarPoliza(\''+p.id+'\',\'renovabilidad\')">Revisar renovabilidad</button>':''}
                   <a href="https://wa.me/${wa}?text=${waTxt}" target="_blank" rel="noopener" class="reno-wa" style="flex:1" onclick="event.stopPropagation()">💬 WhatsApp</a>
                   <button class="btn ghost sm" style="flex:1" onclick="event.stopPropagation();Orbit.modules.renovaciones.solicitarPropuestas('${p.id}')">📋 Propuestas</button>

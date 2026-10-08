@@ -690,6 +690,7 @@ Orbit.modules.aseguradoras = (function () {
     const before = S().get('aseguradoras', id); if (!before) {st.saving=false;if(saveButton){saveButton.disabled=false;saveButton.textContent=originalSaveLabel;saveButton.removeAttribute('aria-busy');}return;}
     let logoUrl = clean(st.draft.logo);
     const pendingLogo = st.logoFile || null;
+    const confirmedSideEffects = [];
     let cambios = diffResumen(before, st.draft);
     const secureCount = credentialChanges(st, st.draft).length;
     const pendingLogoCount = pendingLogo ? 1 : 0;
@@ -699,25 +700,25 @@ Orbit.modules.aseguradoras = (function () {
     const motivo = await U.prompt('Cambios detectados: ' + summary.join(', ') + '.\n\nMotivo del cambio:', { title: 'Guardar cambios' });
     if (motivo == null) {st.saving=false;if(saveButton){saveButton.disabled=false;saveButton.textContent=originalSaveLabel;saveButton.removeAttribute('aria-busy');}return;}
     // Confirm intent before any server-side asset or credential side effect.
+    try {
     if (pendingLogo) {
       if(saveButton)saveButton.textContent='Procesando logo…';
       const provider = Orbit.productRuntimeBrowserProvidersP0;
-      if (!provider || typeof provider.callFunction !== 'function') { U.toast('No está disponible el guardado seguro del logo.'); return; }
-      if (pendingLogo.size > 2 * 1024 * 1024) { U.toast('El logo no puede superar 2 MB.'); return; }
+      if (!provider || typeof provider.callFunction !== 'function') throw new Error('INSURER_LOGO_PROVIDER_UNAVAILABLE');
+      if (pendingLogo.size > 2 * 1024 * 1024) throw new Error('INSURER_LOGO_TOO_LARGE');
       const bytes = new Uint8Array(await pendingLogo.arrayBuffer());
       let binary = ''; for (let i=0;i<bytes.length;i+=0x8000) binary += String.fromCharCode.apply(null, bytes.subarray(i,Math.min(i+0x8000,bytes.length)));
       const previewHost = /^ays-orbit-360-lab--gi-i(?:3|61|65-b[1-4])-[a-z0-9-]+\.web\.app$/i.test(String(location && location.hostname || ''));
-      if (previewHost && !/^(?:b2-asg-[a-z0-9-]+|b4003qa_[A-Za-z0-9._:-]+)$/i.test(id)) { U.toast('Preview protege las aseguradoras reales. Usa la ficha de prueba Preview para validar logo y documentos sin tocar datos reales.'); return; }
+      if (previewHost && !/^(?:b2-asg-[a-z0-9-]+|b4003qa_[A-Za-z0-9._:-]+)$/i.test(id)) throw new Error('INSURER_PREVIEW_REAL_RECORD_PROTECTED');
       const assetCallable = previewHost ? 'orbit360ProductAssetUploadPreview' : 'orbit360ProductAssetUpload';
       const assetRegion = previewHost ? 'us-east1' : 'us-central1';
       const uploaded = await provider.callFunction(assetCallable,{tenantId:tenantId(),activeRole:(Orbit.session&&Orbit.session.rol&&Orbit.session.rol())||'',insurerId:id,fileName:pendingLogo.name,mimeType:pendingLogo.type,base64:btoa(binary)},assetRegion);
-      if (!uploaded || uploaded.ok !== true || !uploaded.url || !uploaded.assetRef) { U.toast('No fue posible confirmar el logo en el servidor.'); return; }
-      st.draft.logo = uploaded.url; st.draft.logoAssetRef = uploaded.assetRef; st.logoFile = null; logoUrl = uploaded.url;
+      if (!uploaded || uploaded.ok !== true || !uploaded.url || !uploaded.assetRef) throw new Error('INSURER_LOGO_UPLOAD_NOT_CONFIRMED');
+      st.draft.logo = uploaded.url; st.draft.logoAssetRef = uploaded.assetRef; st.logoFile = null; logoUrl = uploaded.url; confirmedSideEffects.push('logo');
     }
-    if (logoUrl && !/^https:\/\//i.test(logoUrl)) { U.toast('El logo debe usar una referencia HTTPS segura.'); return; }
+    if (logoUrl && !/^https:\/\//i.test(logoUrl)) throw new Error('INSURER_LOGO_HTTPS_REQUIRED');
     if (saveButton) saveButton.textContent = secureCount ? 'Guardando accesos…' : 'Guardando…';
-    try {
-      if (secureCount) await persistSecureCredentialChanges(id, st);
+      if (secureCount) { await persistSecureCredentialChanges(id, st); confirmedSideEffects.push('credenciales'); }
       cambios = diffResumen(before, st.draft);
       if (cambios.length) {
         const patch = Object.assign({}, st.draft, { actividad: log(before, { cambio: 'Actualización de ficha (' + cambios.join(', ') + ')', motivo, camposCambiados: cambios }) });
@@ -739,7 +740,14 @@ Orbit.modules.aseguradoras = (function () {
       st.saving = false;
       if (saveButton) { saveButton.disabled = false; saveButton.textContent = originalSaveLabel; saveButton.removeAttribute('aria-busy'); }
       const code = String(error && (error.code || error.message) || '');
-      U.toast(/CREDENTIAL|SECURE_/i.test(code) ? 'No fue posible guardar la contraseña de forma segura. La edición continúa abierta para reintentar.' : 'No fue posible guardar. La edición continúa abierta para corregir o reintentar.');
+      let message='No fue posible guardar. La edición continúa abierta para corregir o reintentar.';
+      if(/INSURER_LOGO_TOO_LARGE/i.test(code))message='El logo no puede superar 2 MB. La edición continúa abierta.';
+      else if(/INSURER_PREVIEW_REAL_RECORD_PROTECTED/i.test(code))message='Preview protege las aseguradoras reales. Usa únicamente la ficha humana de prueba para validar logo y documentos.';
+      else if(/INSURER_LOGO_HTTPS_REQUIRED/i.test(code))message='El logo debe usar una referencia HTTPS segura. La edición continúa abierta.';
+      else if(/INSURER_LOGO_PROVIDER_UNAVAILABLE|INSURER_LOGO_UPLOAD_NOT_CONFIRMED/i.test(code))message='No fue posible confirmar el logo en el servidor. La edición continúa abierta para reintentar.';
+      else if(/CREDENTIAL|SECURE_/i.test(code))message='No fue posible confirmar la contraseña de forma segura. La edición continúa abierta para reintentar.';
+      if(confirmedSideEffects.length)message='Se confirmó '+confirmedSideEffects.join(' y ')+' en el servidor, pero la ficha aún no terminó de guardar. La edición sigue abierta: vuelve a pulsar “Guardar cambios”; no se volverá a cargar el recurso confirmado.';
+      U.toast(message);
       try { console.warn('[Orbit Aseguradoras] SAVE_FAILED', error && (error.code || error.message) || error); } catch (e) {}
     }
   }

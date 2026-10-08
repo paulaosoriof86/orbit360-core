@@ -2815,7 +2815,7 @@
   },
   "continuityRegisterBlobSha": "11ffaf6e7c691064be947fdc1af00b08d8fb8f9c",
   "findingContinuityGuardBlobSha": "868a0ba1a492d9adc8d91655f152b6fa7980f499",
-  "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_UAT3_P0_SOURCE_FIX_BATCH_1",
+  "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_UAT3_P0_SOURCE_FIX_BATCH_2_SHARED_INBOX_SCOPE_LOCK",
   "b4003R15VisualReview": {
     "status": "PAULA_VISUAL_PARTIAL_PASS_REMEDIATION_REQUIRED",
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R15_PAULA_VISUAL_PARTIAL_ACCEPTANCE_AND_NEW_FINDINGS_20261004.json",
@@ -3922,6 +3922,22 @@
       "orbit360-platform/modules/aseguradoras.js",
       "orbit360-platform/core/ciclo.js"
     ],
+    "dataMutation": false,
+    "buildDispatch": false,
+    "previewMutation": false,
+    "liveMutation": false
+  },
+  "uat3P0SourceFixBatch1": {
+    "status": "SOURCE_FIXED_STATIC_PASS_PREVIEW_NOT_DISPATCHED",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_UAT3_P0_SOURCE_FIX_BATCH_1_20261008.json",
+    "blobSha": "00b430019594da37cddfdbff4ea10822c8797d6a",
+    "parentHead": "27ed491e66edfc66205d2c242d8cc4544ef2d294",
+    "productFiles": {
+      "orbit360-platform/modules/calidad.js": "9245739d821d357f9486b0541b5128c070797c76",
+      "orbit360-platform/modules/renovaciones.js": "9e0d8c236bf31aa99b0df9c7882a128b8550a7d1",
+      "orbit360-platform/modules/aseguradoras.js": "28bb3f15a1ca20130b194bb2dd5b1d296984927d",
+      "orbit360-platform/core/ciclo.js": "8fc028ba7d265843ef38fbc29f07fd841f5bedda"
+    },
     "dataMutation": false,
     "buildDispatch": false,
     "previewMutation": false,

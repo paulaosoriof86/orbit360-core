@@ -77,7 +77,14 @@ Orbit.modules.calidad = (function () {
       <span style="min-width:0"><span style="font-weight:600;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:180px">${U.esc(nombre)}</span>
       <span class="muted" style="font-size:11px">${meta}</span></span></a>`;
   }
-  function moneyValue(n,cur){const v=Math.abs(Number(n)||0)<0.005?0:Number(n||0);return U.money?U.money(v,cur):U.esc((cur?cur+' ':'')+v.toFixed(2));}
+  function moneyValue(n,cur){
+    const raw=Number(n);
+    if(!Number.isFinite(raw))return '—';
+    const v=Math.abs(raw)<0.005?0:raw,sym=cur==='COP'?'$':cur==='USD'?'US$':cur==='GTQ'||!cur?'Q':cur;
+    const decimals=v!==0&&Math.abs(v)<1?2:(Math.abs(v-Math.round(v))>=0.005?2:0);
+    try{return sym+' '+new Intl.NumberFormat('es-GT',{minimumFractionDigits:decimals,maximumFractionDigits:decimals}).format(v);}
+    catch(e){return U.esc(sym+' '+v.toFixed(decimals));}
+  }
   function calendarAuthorityLabel(value){
     const key=clean(value).toUpperCase();
     return ({POLICY_CUOTAS:'Programación según cuotas de la póliza',SINGLE_PHYSICAL_CALENDAR:'Programación de pagos registrada',NO_DENOMINATOR:'Recibos sin numeración confirmada',AMBIGUOUS_FAIL_CLOSED:'Programación de pagos requiere revisión',POLICY_INACTIVE:'Póliza sin pagos pendientes'})[key]||'Programación de pagos pendiente de validar';

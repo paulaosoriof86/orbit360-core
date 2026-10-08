@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_PENDING_CLOSURE_MASTER_PLAN_LOCK_V1",
-  "recordedAt": "2026-10-08T18:52:00Z",
-  "status": "FROZEN_ACTIVE_UAT3_P0_SOURCE_BATCH_1_AUTHORIZED",
+  "recordedAt": "2026-10-08T19:05:00Z",
+  "status": "FROZEN_ACTIVE_UAT3_P0_BATCH_1_SOURCE_COMPLETE_BATCH_2_SCOPE_PENDING",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "purpose": "Single no-loss operational closure plan from B4-003 R16 through remaining Fase A Post-Salida. Conversation/memory are context only; this lock, ledger, carry register, Control Plane and physical evidence govern execution.",
@@ -285,9 +285,9 @@
   },
   "currentState": {
     "gate": "I6.5 / B4-003",
-    "status": "B4_003_UAT3_P0_SOURCE_BATCH_1_AUTHORIZED",
-    "nextAction": "B4_003_UAT3_P0_SOURCE_FIX_BATCH_1",
-    "why": "Paula explicitly instructed to start corrections. Batch 1 is limited to demonstrated source-only P0 causes in four product files; data, build, Preview and LIVE remain locked.",
+    "status": "B4_003_UAT3_P0_BATCH_1_SOURCE_COMPLETE_STATIC_PASS",
+    "nextAction": "B4_003_UAT3_P0_SOURCE_FIX_BATCH_2_SHARED_INBOX_SCOPE_LOCK",
+    "why": "Batch 1 corrected demonstrated client-side P0 causes in Calidad, Renovaciones, Aseguradoras and Ops/Leads. Environment proof remains deferred until cumulative source work is complete; no data/build/Preview/LIVE mutation occurred.",
     "reviewedSourceSha": "66c3b9b77ef8ffecbe3a26de59897abd55ec677f",
     "reviewedBuildId": "gi-i65-b4-66c3b9b77ef8-57f234755dc1",
     "reviewedPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b4-37710305112-ud58tgnd.web.app",
@@ -15032,5 +15032,34 @@
       "reimportAuthorized": false
     },
     "nextAction": "B4_003_UAT3_P0_SOURCE_FIX_BATCH_1"
+  },
+  "uat3P0SourceFixBatch1": {
+    "status": "SOURCE_FIXED_STATIC_PASS_PREVIEW_NOT_DISPATCHED",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_UAT3_P0_SOURCE_FIX_BATCH_1_20261008.json",
+    "blobSha": "00b430019594da37cddfdbff4ea10822c8797d6a",
+    "compositionLockBlobSha": "68ffc370fefa5024a1c0a4857b541bdcf12f615e",
+    "productFiles": {
+      "orbit360-platform/modules/calidad.js": "9245739d821d357f9486b0541b5128c070797c76",
+      "orbit360-platform/modules/renovaciones.js": "9e0d8c236bf31aa99b0df9c7882a128b8550a7d1",
+      "orbit360-platform/modules/aseguradoras.js": "28bb3f15a1ca20130b194bb2dd5b1d296984927d",
+      "orbit360-platform/core/ciclo.js": "8fc028ba7d265843ef38fbc29f07fd841f5bedda"
+    },
+    "observations": [
+      "A-07",
+      "B-01",
+      "B-03",
+      "B-04",
+      "C-08",
+      "C-14",
+      "D-01",
+      "D-03",
+      "D-05",
+      "D-07",
+      "D-08",
+      "D-14"
+    ],
+    "staticVerification": "PASS",
+    "findingsClosed": [],
+    "nextAction": "B4_003_UAT3_P0_SOURCE_FIX_BATCH_2_SHARED_INBOX_SCOPE_LOCK"
   }
 }

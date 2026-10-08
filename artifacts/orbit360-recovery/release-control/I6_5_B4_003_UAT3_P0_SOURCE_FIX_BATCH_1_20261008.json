@@ -1,0 +1,159 @@
+{
+  "schema": "gravicentra-b4-003-uat3-p0-source-fix-batch-1-v1",
+  "recordedAt": "2026-10-08T19:05:00Z",
+  "status": "SOURCE_FIXED_STATIC_PASS_PREVIEW_NOT_DISPATCHED",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "parentHead": "27ed491e66edfc66205d2c242d8cc4544ef2d294",
+  "scopeLock": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_UAT3_P0_SOURCE_FIX_SCOPE_LOCK_20261008.json",
+    "blobSha": "519e9ee48ee85a367150dd816e53f2fadf88ba8d"
+  },
+  "causalAudit": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_UAT3_CONCENTRATED_CAUSAL_AUDIT_P0_20261008.json",
+    "blobSha": "9860f7d3aaaf8b1bbfdcae57636bb024b71ba33c"
+  },
+  "productFiles": {
+    "orbit360-platform/modules/calidad.js": "9245739d821d357f9486b0541b5128c070797c76",
+    "orbit360-platform/modules/renovaciones.js": "9e0d8c236bf31aa99b0df9c7882a128b8550a7d1",
+    "orbit360-platform/modules/aseguradoras.js": "28bb3f15a1ca20130b194bb2dd5b1d296984927d",
+    "orbit360-platform/core/ciclo.js": "8fc028ba7d265843ef38fbc29f07fd841f5bedda"
+  },
+  "corrections": [
+    {
+      "observations": [
+        "A-07"
+      ],
+      "owner": "orbit360-platform/modules/calidad.js",
+      "disposition": "SOURCE_FIXED_PENDING_EXACT_ROW_AND_BROWSER_PROOF",
+      "change": "Financial differences below one currency unit retain two decimals, so a material non-zero delta cannot render as Q 0.",
+      "preserved": "No tolerance, receipt authority, formula or data changed."
+    },
+    {
+      "observations": [
+        "B-01"
+      ],
+      "owner": "orbit360-platform/modules/renovaciones.js",
+      "disposition": "SOURCE_FIXED_PENDING_COLD_WARM_BROWSER_PROOF",
+      "change": "The three-collection barrier now has an 8-second truthful terminal state, names missing sources, hides partial counts and offers retry.",
+      "preserved": "No timeout was enlarged and no partial universe is presented as final."
+    },
+    {
+      "observations": [
+        "B-03"
+      ],
+      "owner": "orbit360-platform/modules/renovaciones.js",
+      "disposition": "SOURCE_FIXED_PENDING_BROWSER_PROOF",
+      "change": "Cards explicitly separate Póliza, Renovación and Decisión labels."
+    },
+    {
+      "observations": [
+        "B-04"
+      ],
+      "owner": "orbit360-platform/modules/renovaciones.js",
+      "disposition": "SOURCE_FIXED_PENDING_1440_390_320_PROOF",
+      "change": "Kanban columns use a zero-safe responsive grid; identity and actions wrap without horizontal clipping."
+    },
+    {
+      "observations": [
+        "C-08",
+        "C-14"
+      ],
+      "owner": "orbit360-platform/modules/aseguradoras.js",
+      "disposition": "SOURCE_FIXED_PENDING_SYNTHETIC_SERVER_READBACK",
+      "change": "All logo/credential failure paths exit busy state with specific messages; confirmed side effects remain recoverable on retry without re-upload."
+    },
+    {
+      "observations": [
+        "D-01",
+        "D-14"
+      ],
+      "owner": "orbit360-platform/core/ciclo.js",
+      "disposition": "SOURCE_FIXED_PENDING_CROSS_ROLE_READBACK",
+      "change": "New collaboration comments and bitácora entries persist actorUid and actorName while historical unknown authors remain untouched."
+    },
+    {
+      "observations": [
+        "D-05"
+      ],
+      "owner": "orbit360-platform/core/ciclo.js",
+      "disposition": "SOURCE_FIXED_PENDING_PDF_FIXTURE_PROOF",
+      "change": "Attachment UI supports Remove and Replace, retains retry context and reports specific provider/Preview failures."
+    },
+    {
+      "observations": [
+        "D-07",
+        "D-08"
+      ],
+      "owner": "orbit360-platform/core/ciclo.js",
+      "disposition": "SOURCE_FIXED_PENDING_SCHEDULER_READBACK",
+      "change": "Cadence state derives from persisted task/business evidence and distinguishes scheduled, task created/attended and external delivery not accredited."
+    },
+    {
+      "observations": [
+        "D-03"
+      ],
+      "owner": "orbit360-platform/core/ciclo.js",
+      "disposition": "INSTRUMENTED_PENDING_P50_P95_TRACE",
+      "change": "Business-card first paint emits an orbit:timing measurement without adding waits."
+    }
+  ],
+  "staticVerification": {
+    "pass": true,
+    "checks": {
+      "syntaxCalidad": true,
+      "syntaxRenovaciones": true,
+      "syntaxAseguradoras": true,
+      "syntaxCiclo": true,
+      "smallDeltaVisible": true,
+      "zeroStable": true,
+      "integerStable": true,
+      "renewalBounded": true,
+      "renewalLabels": true,
+      "renewalResponsive": true,
+      "renewalNoDataInference": true,
+      "renewalActionsPreserved": true,
+      "insurerBusyRecovery": true,
+      "insurerNoProtectedEarlyReturn": true,
+      "insurerRetryNoReupload": true,
+      "actorCanonical": true,
+      "attachmentControls": true,
+      "attachmentSafeFinalize": true,
+      "cadenceTruth": true,
+      "timingInstrumented": true
+    },
+    "formatExamples": {
+      "small": "Q 0.03",
+      "zero": "Q 0",
+      "large": "Q 346,080"
+    }
+  },
+  "boundaries": {
+    "dataMutation": false,
+    "businessWrites": false,
+    "syntheticQaWrites": false,
+    "buildDispatch": false,
+    "previewMutation": false,
+    "functionDeployment": false,
+    "liveMutation": false,
+    "reimport": false
+  },
+  "findingDisposition": {
+    "closed": [],
+    "newFindingIds": [],
+    "deletedFindingIds": [],
+    "b4003Open": true,
+    "b4004Held": true
+  },
+  "explicitCarry": [
+    "A-07 exact VA-57280 row authority readback",
+    "B-01 cold/warm timing proof",
+    "B-04 browser proof at 1440/390/320",
+    "C-08 synthetic before/commit/readback/reload",
+    "D-03 p50/p95 trace",
+    "D-05 exact authorized PDF trace",
+    "D-08 cadence task/outbox idempotence and timezone proof"
+  ],
+  "decision": "BATCH_1_SOURCE_COMPLETE_STATIC_PASS_NO_ENVIRONMENT_MUTATION",
+  "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_UAT3_P0_SOURCE_FIX_BATCH_2_SHARED_INBOX_SCOPE_LOCK"
+}

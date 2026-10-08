@@ -16,15 +16,16 @@ Orbit.ciclo = (function () {
   // Fechas VIVAS (regla Orbit): nada de literales quemados en flujos que crean datos.
   const today = () => (U.today ? U.today() : new Date().toISOString().slice(0, 10));
   const stamp = () => new Date().toISOString();
-  function currentUserName(){
+  function currentUserIdentity(){
     try{
       const p=Orbit.auth&&Orbit.auth.productUser||{},u=Orbit.auth&&typeof Orbit.auth.user==='function'?Orbit.auth.user()||{}:{};
-      const name=String(p.nombre||p.displayName||p.name||u.displayName||u.nombre||u.name||'').trim();
-      if(name)return name;
-      const top=document.querySelector('#tb-user .who b');if(top&&String(top.textContent||'').trim()&&String(top.textContent||'').trim()!=='Usuario')return String(top.textContent||'').trim();
-      return String(p.email||u.email||'Usuario').trim();
-    }catch(e){return'Usuario';}
+      const uid=String(p.uid||u.uid||'').trim(),email=String(p.email||u.email||'').trim();
+      let name=String(p.nombre||p.displayName||p.name||u.displayName||u.nombre||u.name||'').trim();
+      if(!name){const top=document.querySelector('#tb-user .who b');if(top&&String(top.textContent||'').trim()&&String(top.textContent||'').trim()!=='Usuario')name=String(top.textContent||'').trim();}
+      return{uid,name:name||email||'Usuario',email};
+    }catch(e){return{uid:'',name:'Usuario',email:''};}
   }
+  function currentUserName(){return currentUserIdentity().name;}
   function displayStamp(value){
     const raw=String(value||'').trim();if(!raw)return'';
     const d=new Date(raw);if(Number.isNaN(d.getTime()))return raw;
@@ -54,6 +55,29 @@ Orbit.ciclo = (function () {
 
   /* Cadencia = seguimiento por WhatsApp y, en su ausencia, por correo. */
   const CADENCIA = ['Día 1 · WhatsApp de bienvenida', 'Día 3 · WhatsApp de seguimiento', 'Día 7 · correo con propuesta (si no responde WA)', 'Día 14 · WhatsApp de cierre'];
+  function cadenceTask(n,label){
+    try{return(S().all('gestiones')||[]).find(g=>g&&String(g.negocioId||'')===String(n.id||'')&&String(g.origen||'')==='Cadencia automática'&&String(g.titulo||g.proximaAccion||'')===String(label));}catch(e){return null;}
+  }
+  function cadencePanelHtml(n){
+    const hasHistory=Number(n&&n.cadenciaPaso||0)>1||!!(n&&n.cadenciaUltimaAccion),active=!!(n&&n.cadenciaActiva);
+    if(!active&&!hasHistory)return '<div class="muted" style="font-size:12.5px">Se activa al registrar la propuesta. Cada paso mostrará el estado interno real; no se marcará como enviado sin confirmación del proveedor.</div>';
+    const terminal=/atendid|resuelt|cerrad|complet/i;
+    const steps=CADENCIA.map((label,index)=>{
+      const task=cadenceTask(n,label),state=String(task&&task.estado||''),recorded=index<Math.max(0,Number(n.cadenciaPaso||1)-1);
+      let code='scheduled',icon='○',caption='Programado';
+      if(task){code=terminal.test(state)?'task_attended':'task_created';icon='▣';caption=terminal.test(state)?'Tarea atendida · entrega externa no acreditada':'Tarea creada · pendiente de atención';}
+      else if(recorded){code='task_recorded';icon='▣';caption='Tarea registrada · entrega externa no acreditada';}
+      return '<div class="cad-step" data-cadence-state="'+code+'">'+icon+' '+U.esc(label)+'<small class="muted" style="display:block;margin-left:22px">'+U.esc(caption)+'</small></div>';
+    }).join('');
+    return '<div class="cad-on">'+(active?'Cadencia interna activa.':'Cadencia interna finalizada.')+' <b>Ningún paso equivale a mensaje enviado o entregado.</b></div>'+steps;
+  }
+  function collaborationErrorMessage(error){
+    const code=String(error&&(error.code||error.message)||error||'');
+    if(/PREVIEW_TEST_RECORD_ONLY|permission-denied/i.test(code))return'Preview solo permite adjuntos y respuestas sobre el negocio humano de prueba autorizado.';
+    if(/COLLAB_DOCUMENT_PROVIDER_REQUIRED/i.test(code))return'El repositorio documental no está disponible. Quita el archivo o reintenta cuando el servicio esté disponible.';
+    if(/UPLOAD|DOCUMENT.*CONFIRM|mime|size/i.test(code))return'No fue posible confirmar el archivo. Puedes quitarlo, reemplazarlo o reintentar sin crear un comentario duplicado.';
+    return'No fue posible guardar la colaboración. El texto y el archivo seleccionado permanecen disponibles para reintentar.';
+  }
   function tiposGestion() { return Orbit.cat.get('tiposGestion'); }
 
   /* ===================== datos / filtros ===================== */
@@ -318,6 +342,8 @@ Orbit.ciclo = (function () {
 
   /* ===================== ficha de NEGOCIO (rediseñada) ===================== */
   async function openNegocio(id) {
+    const openedAt=window.performance&&typeof performance.now==='function'?performance.now():Date.now(),markId='orbit-business-open-'+String(id||'').replace(/[^A-Za-z0-9_-]/g,'');
+    try{if(window.performance&&performance.mark)performance.mark(markId+'-start');}catch(_e){}
     // First paint must not wait on catalog or roster network hydration.
     if(Orbit.cat&&typeof Orbit.cat.ensure==='function')Orbit.cat.ensure().catch(()=>{});
     const n = S().get('negocios', id); if (!n) return;
@@ -386,7 +412,7 @@ Orbit.ciclo = (function () {
             <div class="ciclo-sec-t ciclo-collab-title"><span>↕ Solicitudes, respuestas y comentarios</span><span class="badge neutral">${(n.comentarios||[]).length}</span></div>
             <div class="ciclo-collab-help">Usa esta sección para devolver, responder o dejar una observación. <b>Registrar guarda la colaboración inmediatamente</b>; no necesitas pulsar “Guardar cambios” después.</div>
             <div id="ng-coms" class="ciclo-collab-thread">${(n.comentarios || []).slice().reverse().map(comRow).join('') || '<div class="muted ciclo-collab-empty">Todavía no hay solicitudes ni comentarios.</div>'}</div>
-            <div class="cadd ciclo-collab-add"><select id="ng-com-type" class="o-sel">${COLLAB_TYPES.map(v=>'<option>'+U.esc(v)+'</option>').join('')}</select><input id="ng-com-new" class="o-sel" placeholder="Escribe qué necesitas o qué respondes…"><label class="btn ghost sm collab-file-btn">📎 Adjuntar<input id="ng-com-file" type="file" hidden></label><button class="btn primary sm" id="ng-com-add">Registrar ahora</button></div><div class="muted" id="ng-com-file-name" style="font-size:11.5px;margin-top:6px">El adjunto se guarda con esta solicitud o respuesta.</div>
+            <div class="cadd ciclo-collab-add"><select id="ng-com-type" class="o-sel">${COLLAB_TYPES.map(v=>'<option>'+U.esc(v)+'</option>').join('')}</select><input id="ng-com-new" class="o-sel" placeholder="Escribe qué necesitas o qué respondes…"><label class="btn ghost sm collab-file-btn"><span data-collab-file-action>📎 Adjuntar</span><input id="ng-com-file" type="file" hidden></label><button type="button" class="btn ghost sm" data-collab-file-remove hidden>Quitar archivo</button><button class="btn primary sm" id="ng-com-add">Registrar ahora</button></div><div class="muted" id="ng-com-file-name" role="status" aria-live="polite" style="font-size:11.5px;margin-top:6px">Puedes adjuntar un documento de respaldo.</div>
           </div>
         </div>
         <aside class="ciclo-aside">
@@ -396,9 +422,7 @@ Orbit.ciclo = (function () {
           </div>
           <div class="ciclo-sec">
             <div class="ciclo-sec-t">🔁 Cadencia automática</div>
-            ${n.cadenciaActiva
-              ? `<div class="cad-on">Activa desde <b>Propuesta</b>.</div>${CADENCIA.map((c, i) => `<div class="cad-step ${i <= 1 ? 'done' : ''}">${i <= 1 ? '✓' : '○'} ${U.esc(c)}</div>`).join('')}`
-              : `<div class="muted" style="font-size:12.5px">Se activa automáticamente al enviar la <b>propuesta</b> (envío de seguimientos por cadencia).</div>`}
+            ${cadencePanelHtml(n)}
           </div>
           <div class="ciclo-sec">
             <div class="ciclo-sec-t">Sincronización</div>
@@ -422,6 +446,7 @@ Orbit.ciclo = (function () {
         </div>
       </div>`;
     const back = modal(html, 980);
+    try{requestAnimationFrame(()=>{const finished=window.performance&&typeof performance.now==='function'?performance.now():Date.now(),duration=Math.max(0,finished-openedAt);back.dataset.firstPaintMs=String(Math.round(duration));if(window.performance&&performance.mark&&performance.measure){performance.mark(markId+'-paint');performance.measure(markId,markId+'-start',markId+'-paint');}document.dispatchEvent(new CustomEvent('orbit:timing',{detail:{surface:'business-card',phase:'first-paint',durationMs:duration}}));});}catch(_e){}
     const countrySelect=back.querySelector('#ng-pais'),insurerSelect=back.querySelector('#ng-asg'),advisorSelect=back.querySelector('#ng-ase'),ramoSelect=back.querySelector('#ng-ramo'),productSelect=back.querySelector('#ng-prod'),planSelect=back.querySelector('#ng-plan');
     // Hydrate the canonical assignable roster after first paint; preserve current selection.
     assignableAdvisors(n.pais).then(rows=>{
@@ -484,16 +509,18 @@ Orbit.ciclo = (function () {
       try { await S().updateDurable('negocios', id, { checklist: n.checklist }); openNegocio(id); }
       catch (error) { n.checklist = prior; cadd.disabled = false; U.toast('No fue posible guardar el checklist.'); }
     });
-    const comFile=back.querySelector('#ng-com-file'),comFileName=back.querySelector('#ng-com-file-name');
-    if(comFile)comFile.addEventListener('change',()=>{const file=comFile.files&&comFile.files[0];if(comFileName)comFileName.textContent=file?('Adjunto seleccionado: '+file.name):'Puedes adjuntar un documento de respaldo a la solicitud o respuesta.';});
+    const comFile=back.querySelector('#ng-com-file'),comFileName=back.querySelector('#ng-com-file-name'),comFileRemove=back.querySelector('[data-collab-file-remove]'),comFileAction=back.querySelector('[data-collab-file-action]');
+    const paintCollabFile=()=>{const file=comFile&&comFile.files&&comFile.files[0];if(comFileName)comFileName.textContent=file?('Adjunto seleccionado: '+file.name+'. Puedes reemplazarlo o quitarlo antes de registrar.'):'Puedes adjuntar un documento de respaldo.';if(comFileAction)comFileAction.textContent=file?'↻ Reemplazar':'📎 Adjuntar';if(comFileRemove)comFileRemove.hidden=!file;};
+    if(comFile)comFile.addEventListener('change',paintCollabFile);
+    if(comFileRemove)comFileRemove.addEventListener('click',()=>{if(comFile)comFile.value='';paintCollabFile();});
     back.querySelectorAll('[data-collab-doc]').forEach(btn=>btn.addEventListener('click',async(e)=>{e.preventDefault();e.stopPropagation();const ref=btn.dataset.collabDoc;if(!ref)return;const provider=Orbit.productDriveDocumentProviderP0;if(!provider||typeof provider.download!=='function')return U.toast('El documento no está disponible en este momento.');btn.disabled=true;try{const out=await provider.download(ref,{entidad:'negocio',entidadId:id,clienteId:n.clienteId,sourceModule:'ops-leads'});if(!out||out.ok!==true)U.toast('No fue posible abrir el documento.');}finally{btn.disabled=false;}}));
     const comadd = back.querySelector('#ng-com-add');
     if (comadd) comadd.addEventListener('click', async () => {
       const v = back.querySelector('#ng-com-new').value.trim(); if (!v) return;
-      const tipo=(back.querySelector('#ng-com-type')||{}).value||'Comentario comercial',actor=currentUserName();
+      const tipo=(back.querySelector('#ng-com-type')||{}).value||'Comentario comercial',actorIdentity=currentUserIdentity(),actor=actorIdentity.name;
       const prior = (n.comentarios || []).slice(),priorBit=(n.bitacora||[]).slice();
       const direction=collaborationDirection(tipo),eventId='collab_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,7),ts=stamp(),file=comFile&&comFile.files&&comFile.files[0]||null;
-      let uploaded=null,attachment=null;
+      let uploaded=null,attachment=null,commentCommitted=false;
       comadd.disabled = true;comadd.dataset.originalLabel=comadd.textContent;comadd.textContent=file?'Subiendo y registrando…':'Registrando…';comadd.setAttribute('aria-busy','true');
       try {
         if(file){
@@ -502,14 +529,17 @@ Orbit.ciclo = (function () {
           if(!uploaded||uploaded.ok!==true||!(uploaded.documentRef||uploaded.driveUrl||uploaded.externalUrl))throw new Error('COLLAB_DOCUMENT_UPLOAD_NOT_CONFIRMED');
           attachment={documentRef:uploaded.documentRef||uploaded.fileId||'',driveUrl:uploaded.driveUrl||uploaded.externalUrl||'',nombre:file.name,mimeType:file.type||'',size:Number(file.size)||0};
         }
-        n.comentarios = prior.concat([{ ts, user: actor, tipo, texto: v, direction, eventId, attachment }]);
-        n.bitacora=priorBit.concat([{ts,user:actor,campo:'Colaboración',de:'',a:tipo,origen:'manual',direction,eventId}]);
+        n.comentarios = prior.concat([{ ts, user: actor, actorUid:actorIdentity.uid, actorName:actorIdentity.name, tipo, texto: v, direction, eventId, attachment }]);
+        n.bitacora=priorBit.concat([{ts,user:actor,actorUid:actorIdentity.uid,actorName:actorIdentity.name,campo:'Colaboración',de:'',a:tipo,origen:'manual',direction,eventId}]);
         await S().updateDurable('negocios', id, { comentarios: n.comentarios,bitacora:n.bitacora,actualizado:today() });
-        if(uploaded&&Orbit.productDriveDocumentProviderP0&&typeof Orbit.productDriveDocumentProviderP0.finalize==='function')await Orbit.productDriveDocumentProviderP0.finalize(uploaded.documentRef||uploaded.fileId||uploaded.driveUrl,{entidad:'negocio',entidadId:id,clienteId:n.clienteId,sourceModule:'ops-leads'});
-        U.toast('Colaboración registrada y confirmada.');openNegocio(id);
+        commentCommitted=true;
+        let finalizeWarning=false;
+        if(uploaded&&Orbit.productDriveDocumentProviderP0&&typeof Orbit.productDriveDocumentProviderP0.finalize==='function'){try{await Orbit.productDriveDocumentProviderP0.finalize(uploaded.documentRef||uploaded.fileId||uploaded.driveUrl,{entidad:'negocio',entidadId:id,clienteId:n.clienteId,sourceModule:'ops-leads'});}catch(_finalizeError){finalizeWarning=true;}}
+        U.toast(finalizeWarning?'La colaboración quedó guardada. El archivo requiere confirmación documental; no vuelvas a registrar el comentario.':'Colaboración registrada y confirmada.');openNegocio(id);
       } catch (error) {
-        if(uploaded&&Orbit.productDriveDocumentProviderP0&&typeof Orbit.productDriveDocumentProviderP0.quarantine==='function')try{await Orbit.productDriveDocumentProviderP0.quarantine(uploaded.documentRef||uploaded.fileId||uploaded.driveUrl,{entidad:'negocio',entidadId:id,clienteId:n.clienteId,sourceModule:'ops-leads'});}catch(_e){}
-        n.comentarios = prior;n.bitacora=priorBit;comadd.disabled = false;comadd.textContent=comadd.dataset.originalLabel||'Registrar';comadd.removeAttribute('aria-busy'); U.toast('No fue posible guardar la colaboración.');
+        if(!commentCommitted&&uploaded&&Orbit.productDriveDocumentProviderP0&&typeof Orbit.productDriveDocumentProviderP0.quarantine==='function')try{await Orbit.productDriveDocumentProviderP0.quarantine(uploaded.documentRef||uploaded.fileId||uploaded.driveUrl,{entidad:'negocio',entidadId:id,clienteId:n.clienteId,sourceModule:'ops-leads'});}catch(_e){}
+        if(!commentCommitted){n.comentarios = prior;n.bitacora=priorBit;comadd.disabled = false;comadd.textContent=comadd.dataset.originalLabel||'Registrar';comadd.removeAttribute('aria-busy');U.toast(collaborationErrorMessage(error));}
+        else{U.toast('La colaboración ya quedó guardada. No la registres de nuevo; revisa únicamente el estado del archivo.');openNegocio(id);}
       }
     });
     const anotherOpportunity=back.querySelector('#ng-new-opportunity');
