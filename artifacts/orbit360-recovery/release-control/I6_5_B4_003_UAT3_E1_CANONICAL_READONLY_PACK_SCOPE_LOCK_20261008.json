@@ -1,0 +1,52 @@
+{
+  "schema": "gravicentra-b4-003-uat3-e1-canonical-readonly-pack-scope-lock-v1",
+  "recordedAt": "2026-10-08",
+  "status": "READ_ONLY_SCOPE_LOCKED",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "parentHead": "53098eab2c7c7c8ae397cba676743803bbf6c866",
+  "observations": [
+    "A-08",
+    "A-09",
+    "A-10",
+    "A-13",
+    "C-06",
+    "C-07",
+    "D-15",
+    "D-18"
+  ],
+  "authorized": {
+    "offlineSourceInspection": true,
+    "canonicalReadOnlyInspection": true,
+    "exactIdAndRelationshipReadback": true,
+    "sourceMutation": false,
+    "dataMutation": false,
+    "deletion": false,
+    "reimport": false,
+    "workflowDispatch": false,
+    "build": false,
+    "deploy": false,
+    "previewMutation": false,
+    "liveMutation": false
+  },
+  "sourceBoundary": {
+    "statement": "Attached XLSX exports and frozen rule documents may narrow hypotheses but do not replace live canonical IDs, relationships, provenance, membership or current state.",
+    "noInferenceFromScreenshots": true,
+    "noDeletionFromApparentDuplicate": true,
+    "noFormulaChangeWithoutAuthority": true
+  },
+  "boundOfflineSources": {
+    "12-Polizas-16-.xlsx": "sha256:e68bfd576b28b01d2839d8c3a22e547d8905f1eaeb84d1d7ffc3a0082960c2a7",
+    "15-CobranzaCendoso-28-.xlsx": "sha256:1dd905a5ff483a905e3f2298efbd8ebb20d9146357e0c5732fd89fdd88ebc8c7",
+    "17-CobranzaCendoso-27-.xlsx": "sha256:f17774ef0f8730a0d35f7300510f5eebc73c4d567ccf3b03bc8917421937f834",
+    "18-CobranzaCendoso-25-.xlsx": "sha256:0cb6af82ebeccc75c9fcf54b2e4e98db28be0b6c64e1cedb69b2b99d0f20cd90",
+    "19-CobranzaCendoso-26-.xlsx": "sha256:8400b6fb3e74b78361870d2eec65822e4dc544511bef90391abb10f0f862ff25",
+    "20-Reporte-2026-09-18-061143.xlsx": "sha256:714407074727167bef52eec34572ea84ee1f6d91da7655572437f03bad7887cd",
+    "21-CobranzaCendoso-24-.xlsx": "sha256:36de3d35055716af4ca85d48719d4ef58154286a3136f41fac35287e740c03db",
+    "23-GRAVICENTRA_MANIFIESTO_FUENTES_PREVALENTES_20260919.md": "sha256:d50c8922b0503f5df61303f99aa43e6ef3d25f7d5435f8bfe223d26a2c8dd351",
+    "24-GRAVICENTRA_REGLAS_CANONICAS_PAGOS_CONCILIACION_INFERENCIA_20260919.md": "sha256:56500d0cbadf147a11966fd8c84f72ae2a3d257a885a0e2e73ee527848731465",
+    "25-GRAVICENTRA_ADDENDUM_PREVALENTE_CIERRE_Y_ANTI_REGRESION_20260919.md": "sha256:a2942d3332effc187e7c419998ae05b2f0ae80d4aed1e2f24201bc17f9ccb180"
+  },
+  "exit": "Classify each observation as demonstrated defect, valid state, historical unknown or insufficient evidence, preserving exact blockers for live canonical readback.",
+  "nextAction": "I6_5_B4_003_UAT3_E1_OFFLINE_SOURCE_RECONCILIATION"
+}
