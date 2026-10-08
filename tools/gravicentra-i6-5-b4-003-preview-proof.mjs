@@ -66,13 +66,13 @@ async function actor(){
  need(candidates.length,'B4_003_PRIVILEGED_ACTOR_NOT_FOUND');
  return candidates.sort((a,b)=>order.indexOf(a.activeRole)-order.indexOf(b.activeRole))[0];
 }
-async function actorForRole(roleWanted){
- const wanted=norm(roleWanted),snap=await tenant.collection('members').get(),candidates=[];
+async function actorForRole(roleWanted,excludedUids=[]){
+ const wanted=norm(roleWanted),excluded=new Set(excludedUids.map(clean).filter(Boolean)),snap=await tenant.collection('members').get(),candidates=[];
  for(const d of snap.docs){
   const m=d.data()||{},state=norm(m.status||m.estado||'active');
   const roles=[m.activeRole,m.rolActivo,m.defaultRole,m.rolDefault,m.rol].concat(m.roles||[],m.assignedRoles||[],m.rolesAsignados||[]).map(norm).filter(Boolean);
   if(m.active===false||m.activo===false||['inactive','inactivo','blocked','bloqueado','suspended','suspendido'].includes(state)||!roles.includes(wanted))continue;
-  try{const u=await auth.getUser(d.id);if(!u.disabled&&u.emailVerified===true)candidates.push({uid:u.uid,email:clean(u.email),emailVerified:true,activeRole:wanted,advisorId:clean(m.advisorId||m.asesorId)});}catch{}
+  try{const u=await auth.getUser(d.id);if(!u.disabled&&u.emailVerified===true&&!excluded.has(u.uid))candidates.push({uid:u.uid,email:clean(u.email),emailVerified:true,activeRole:wanted,advisorId:clean(m.advisorId||m.asesorId)});}catch{}
  }
  need(candidates.length,'B4_003_R20_VERIFIED_ACTOR_FOR_ROLE_NOT_FOUND:'+wanted);
  return candidates.sort((a,b)=>clean(a.email).localeCompare(clean(b.email)))[0];
@@ -381,8 +381,12 @@ let browser,context,page,startMs=Date.now();
 const httpCapturePromises=[];
 try{
  const who=await actor();proof.actor=who;
- const directionActor=await actorForRole('direccion'),operativeActor=await actorForRole('operativo'),advisorActor=await actorForRole('asesor');
+ const directionActor=await actorForRole('direccion');
+ const operativeActor=await actorForRole('operativo',[directionActor.uid]);
+ const advisorActor=await actorForRole('asesor',[directionActor.uid,operativeActor.uid]);
+ need(new Set([directionActor.uid,operativeActor.uid,advisorActor.uid]).size===3,'B4_003_R20_HANDOFF_ACTORS_NOT_DISTINCT');
  proof.r16RosterActors={direction:{uid:directionActor.uid,activeRole:directionActor.activeRole},operative:{uid:operativeActor.uid,activeRole:operativeActor.activeRole},advisor:{uid:advisorActor.uid,activeRole:advisorActor.activeRole}};
+ proof.assertions.handoffActorsDistinct=true;
  need(!!advisorActor.advisorId,'B4_003_R19_ADVISOR_ACTOR_NOT_BOUND');
  await residueReadback();
  await cancellationEvidence();
