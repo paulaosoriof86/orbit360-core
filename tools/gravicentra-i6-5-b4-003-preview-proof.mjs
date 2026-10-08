@@ -179,10 +179,12 @@ async function actionCardUiFor(browser,who,businessId,surface){
  }finally{await ctx.close();}
 }
 
-async function inboxUiFor(browser,who,eventId,expectedSurface,markAttended){
+async function inboxUiFor(browser,who,eventId,expectedSurface,stateAction){
  const token=await auth.createCustomToken(who.uid),ctx=await browser.newContext({ignoreHTTPSErrors:false}),p=await ctx.newPage();
  try{
-  await applyLegal(p,who);await p.goto(target+'/#/inicio',{waitUntil:'domcontentloaded',timeout:60000});await bootProduct(p,token);
+  await applyLegal(p,who);await p.goto(target+'/#/inicio',{waitUntil:'domcontentloaded',timeout:60000});
+  await p.waitForFunction(()=>!!window.Orbit?.productRuntimeBrowserProvidersP0,null,{timeout:30000});
+  await p.evaluate(async token=>{const provider=Orbit.productRuntimeBrowserProvidersP0,c=await provider.initialize();if(!c.auth.currentUser)await c.modules.auth.signInWithCustomToken(c.auth,token);},token);
   const expectedRole=norm(who.activeRole);
   const roleAssigned=await p.waitForFunction(role=>{
     if(!Orbit.session||typeof Orbit.session.allowedRoles!=='function'||typeof Orbit.session.set!=='function')return false;
@@ -192,6 +194,7 @@ async function inboxUiFor(browser,who,eventId,expectedSurface,markAttended){
   need(roleAssigned,'B4_003_INBOX_ROLE_NOT_ASSIGNED_OR_SESSION_NOT_READY:'+expectedRole);
   const roleSelected=await p.evaluate(role=>Orbit.session.set(role)===true,who.activeRole);
   need(roleSelected,'B4_003_INBOX_ROLE_SELECTION_REJECTED:'+expectedRole);
+  await bootProduct(p,token);
   const sessionReady=await p.waitForFunction(role=>{
     const raw=String(Orbit.session&&typeof Orbit.session.rol==='function'?Orbit.session.rol():'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_+|_+$/g,'');
     return raw===role;
@@ -205,11 +208,11 @@ async function inboxUiFor(browser,who,eventId,expectedSurface,markAttended){
   await p.waitForSelector(selector,{timeout:10000});
   const header=await p.evaluate(sel=>{const d=document.getElementById('ops-inbox-drawer'),count=d?.querySelector('.inbox-active-count'),r=count?.getBoundingClientRect();return{countText:String(count?.innerText||'').replace(/\s+/g,' ').trim(),countLeft:r?.left||0,drawerLeft:d?.getBoundingClientRect().left||0,drawerWidth:d?.getBoundingClientRect().width||0};},selector);
   let pendingSeen=false;
-  if(markAttended){
-    const btnSel=selector+' [data-inbox-attend]';
+  if(stateAction){
+    const acknowledge=stateAction==='acknowledge',btnSel=selector+(acknowledge?' [data-inbox-ack]':' [data-inbox-resolve]'),pendingPattern=acknowledge?/Reconociendo/:/Resolviendo/,finalPattern=acknowledge?/Reconocida por ti/:/Resuelta para todos/;
     await p.click(btnSel);
-    pendingSeen=await p.waitForFunction(sel=>/Marcando/.test(String(document.querySelector(sel)?.textContent||'')),btnSel,{timeout:2000}).then(()=>true).catch(()=>false);
-    await p.waitForFunction(id=>{const row=document.querySelector('[data-notice-event="'+id+'"]');return !!row&&/Atendida/.test(String(row.innerText||''));},eventId,{timeout:15000});
+    pendingSeen=await p.waitForFunction(({sel,source,flags})=>new RegExp(source,flags).test(String(document.querySelector(sel)?.textContent||'')),{sel:btnSel,source:pendingPattern.source,flags:pendingPattern.flags},{timeout:2000}).then(()=>true).catch(()=>false);
+    await p.waitForFunction(({id,source,flags})=>{const row=document.querySelector('[data-notice-event="'+id+'"]');return !!row&&new RegExp(source,flags).test(String(row.innerText||''));},{id:eventId,source:finalPattern.source,flags:finalPattern.flags},{timeout:15000});
   }
   const final=await p.evaluate(id=>{const row=document.querySelector('[data-notice-event="'+id+'"]');return{present:!!row,text:String(row?.innerText||'').replace(/\s+/g,' ').trim()};},eventId);
   return{landingHash,expectedSurface,header,pendingSeen,final};
@@ -1228,10 +1231,10 @@ try{
  need(advisorNotice.targetSurface==='leads'&&advisorNotice.targetId===advisorActor.advisorId&&advisorNotice.statusLabel==='Nueva','B4_003_R20_ADVISOR_NOTICE_TARGET_INVALID:'+JSON.stringify(advisorNotice));
  const senderInbox=await inboxProjectionFor(browser,directionActor);
  need(![].concat(senderInbox?.notices||[]).some(x=>x.eventId===requestComment.eventId),'B4_003_R20_SENDER_RECEIVED_OWN_REQUEST:'+JSON.stringify(senderInbox));
- const advisorInboxUi=await inboxUiFor(browser,advisorActor,requestComment.eventId,'leads',true);
- need(advisorInboxUi.landingHash==='#/leads'&&advisorInboxUi.pendingSeen===true&&/Atendida/.test(advisorInboxUi.final.text)&&advisorInboxUi.header.countLeft>=advisorInboxUi.header.drawerLeft,'B4_003_R20_SECOND_REVIEW_ADVISOR_INBOX_UI_FAILED:'+JSON.stringify(advisorInboxUi));
+ const advisorInboxUi=await inboxUiFor(browser,advisorActor,requestComment.eventId,'leads','acknowledge');
+ need(advisorInboxUi.landingHash==='#/leads'&&advisorInboxUi.pendingSeen===true&&/Reconocida por ti/.test(advisorInboxUi.final.text)&&advisorInboxUi.header.countLeft>=advisorInboxUi.header.drawerLeft,'B4_003_R20_SECOND_REVIEW_ADVISOR_INBOX_UI_FAILED:'+JSON.stringify(advisorInboxUi));
  const advisorInboxAfter=await inboxProjectionFor(browser,advisorActor),advisorAfter=[].concat(advisorInboxAfter?.notices||[]).find(x=>x.eventId===requestComment.eventId);
- need(advisorAfter?.attended===true&&advisorAfter?.statusLabel==='Atendida','B4_003_R20_ADVISOR_NOTICE_ATTENDED_READBACK_FAILED:'+JSON.stringify(advisorInboxAfter));
+ need(advisorAfter?.acknowledged===true&&advisorAfter?.globalResolved!==true&&advisorAfter?.statusLabel==='Reconocida por ti','B4_003_R20_ADVISOR_NOTICE_ACKNOWLEDGED_READBACK_FAILED:'+JSON.stringify(advisorInboxAfter));
  proof.r20SecondAdvisorInboxUi=advisorInboxUi;proof.assertions.pendingTaskAdvisorLandingLeads=true;proof.assertions.inboxActionProgressVisible=true;proof.assertions.inboxHumanStateUi=true;
  const advisorResponse=await collaborationCommandFor(browser,advisorActor,ids.collabBusiness,'Reenviado a Operaciones','B4-003 R20 respuesta sintética del asesor','operations');
  const responseRow=(await ref('negocios',ids.collabBusiness).get()).data()||{},responseComment=[].concat(responseRow.comentarios||[]).slice(-1)[0]||{};
@@ -1241,12 +1244,14 @@ try{
  need(opsNotices.length===1,'B4_003_R20_OPERATIONS_NOTICE_NOT_DEDUPED:'+JSON.stringify(opsInbox));
  const opsNotice=opsNotices[0];
  need(opsNotice.targetSurface==='ops'&&opsNotice.statusLabel==='Nueva','B4_003_R20_OPERATIONS_NOTICE_TARGET_INVALID:'+JSON.stringify(opsNotice));
- const opsInboxUi=await inboxUiFor(browser,operativeActor,responseComment.eventId,'ops',false);
- need(opsInboxUi.landingHash==='#/ops'&&opsInboxUi.final.present===true,'B4_003_R20_SECOND_REVIEW_OPERATIONS_LANDING_OR_INBOX_UI_FAILED:'+JSON.stringify(opsInboxUi));
+ const opsInboxUi=await inboxUiFor(browser,operativeActor,responseComment.eventId,'ops','resolve');
+ need(opsInboxUi.landingHash==='#/ops'&&opsInboxUi.pendingSeen===true&&opsInboxUi.final.present===true&&/Resuelta para todos/.test(opsInboxUi.final.text),'B4_003_R20_SECOND_REVIEW_OPERATIONS_LANDING_OR_INBOX_UI_FAILED:'+JSON.stringify(opsInboxUi));
  proof.r20SecondOperationsInboxUi=opsInboxUi;proof.assertions.pendingTaskOperationsLandingOps=true;
  const advisorOwnResponseInbox=await inboxProjectionFor(browser,advisorActor);
  need(![].concat(advisorOwnResponseInbox?.notices||[]).some(x=>x.eventId===responseComment.eventId),'B4_003_R20_ADVISOR_RECEIVED_OWN_RESPONSE:'+JSON.stringify(advisorOwnResponseInbox));
- proof.r20TypedHandoff={requestEventId:requestComment.eventId,advisorNoticeId:advisorNotice.id,responseEventId:responseComment.eventId,operationsNoticeId:opsNotice.id,caseEntityId:ids.collabBusiness,requestTargetSurface:advisorNotice.targetSurface,responseTargetSurface:opsNotice.targetSurface,advisorAttendedPersisted:advisorAfter.attended===true};
+ const opsInboxAfter=await inboxProjectionFor(browser,operativeActor),opsAfter=[].concat(opsInboxAfter?.notices||[]).find(x=>x.eventId===responseComment.eventId);
+ need(opsAfter?.globalResolved===true&&opsAfter?.statusLabel==='Resuelta para todos','B4_003_R20_OPERATIONS_NOTICE_SHARED_RESOLUTION_READBACK_FAILED:'+JSON.stringify(opsInboxAfter));
+ proof.r20TypedHandoff={requestEventId:requestComment.eventId,advisorNoticeId:advisorNotice.id,responseEventId:responseComment.eventId,operationsNoticeId:opsNotice.id,caseEntityId:ids.collabBusiness,requestTargetSurface:advisorNotice.targetSurface,responseTargetSurface:opsNotice.targetSurface,advisorAcknowledgedPersisted:advisorAfter.acknowledged===true,operationsSharedResolutionPersisted:opsAfter.globalResolved===true};
  proof.assertions.typedHandoffRecipientNoticeDurable=true;
  proof.assertions.typedHandoffDeduplicated=true;
  proof.assertions.typedHandoffSenderExcluded=true;

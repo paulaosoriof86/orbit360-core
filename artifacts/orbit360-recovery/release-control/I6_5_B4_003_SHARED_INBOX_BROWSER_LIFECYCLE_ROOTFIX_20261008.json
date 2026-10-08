@@ -1,0 +1,43 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_SHARED_INBOX_BROWSER_LIFECYCLE_ROOTFIX_V1",
+  "recordedAt": "2026-10-08T22:26:00Z",
+  "status": "PROOF_ROOTFIXED_PENDING_EXACT_PREVIEW",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "parentHead": "28ba1fa3b92ba840c427126e358df7b9056b9bca",
+  "failedRun": {
+    "id": 37853014854,
+    "jobId": 113570449630,
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-37853014854-ahynrtdm.web.app",
+    "failure": "inboxUiFor landing timeout",
+    "stage": "Upsells/Leads/Ops shared inbox",
+    "cleanupWrites": 35,
+    "syntheticFinalAbsent": true,
+    "liveByteStable": true
+  },
+  "cause": {
+    "classification": "STALE_QA_SESSION_LIFECYCLE_AND_REMOVED_ATTENDED_STATE",
+    "sessionIssue": "The harness selected the active role after product activation, after the one-time pending-task landing decision.",
+    "stateIssue": "The harness still targeted data-inbox-attend / Marcando / Atendida after the approved split into personal acknowledgement and shared resolution.",
+    "productRegression": false
+  },
+  "correction": {
+    "path": "tools/gravicentra-i6-5-b4-003-preview-proof.mjs",
+    "previousBlobSha": "b7bb610a322f481b6988141bdf5a6cc999c26ba2",
+    "correctedBlobSha": "ba77f1fb667018012edda520595f6e74e619c3e0",
+    "scope": [
+      "Authenticate and select the exact active role before product activation so recipient-aware startup routing is tested canonically.",
+      "Advisor path: Reconociendo -> Reconocida por ti, persisted personally and not globally resolved.",
+      "Operations path: Resolviendo -> Resuelta para todos, persisted as shared event resolution."
+    ]
+  },
+  "boundaries": {
+    "productSourceChanged": false,
+    "dataMutation": false,
+    "businessWrites": false,
+    "syntheticQaWritesThisCommit": false,
+    "livePromotion": false,
+    "reimport": false
+  },
+  "nextAction": "B4_003_R20_CONTRACT_AND_EXACT_PREVIEW"
+}
