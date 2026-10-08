@@ -752,7 +752,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "I6_5_B4_003_RENEWALS_BLOCKING_CLOSEOUT",
+  "nextAction": "PAULA_DECISION_AUTHORIZE_EXACT_583_OR_HOLD",
   "postproductionExitProgress": {
     "formalPercent": 50,
     "frozenMiniGates": 5,
@@ -7594,9 +7594,9 @@
     "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW"
   },
   "pendingClosureMasterPlan": {
-    "status": "FROZEN_ACTIVE_PAULA_RELEASE_PRIORITY_RENEWALS",
+    "status": "FROZEN_ACTIVE_RENEWALS_B02_DECISION_READY",
     "path": "artifacts/orbit360-recovery/release-control/I6_PENDING_CLOSURE_MASTER_PLAN_LOCK_20261004.json",
-    "blobSha": "657ab08f27473eaef2aee73c5e48bb406859ca25",
+    "blobSha": "e930da4296d6cd185c064a1fca222484444d23ba",
     "baselineFindingCount": 282,
     "currentGate": "B4-003",
     "currentRevision": "R20-UAT3",
@@ -8359,9 +8359,9 @@
     "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_UAT3_DEFERRED_READBACK_AND_TRACE_PLAN"
   },
   "uat3RemainingP0EvidencePlan": {
-    "status": "PRIORITY_FROZEN_RENEWALS_CLOSEOUT_ACTIVE",
+    "status": "RENEWALS_B02_DECISION_READY_PAULA_AUTHORIZATION_PENDING",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_UAT3_REMAINING_P0_EVIDENCE_PLAN_20261008.json",
-    "blobSha": "c9211eeec108ffd14a13e64573cc78d552b110bd",
+    "blobSha": "ce8e43e871df1708b9171f799dad03e4ca3355d0",
     "compositionLockBlobSha": "087e4ccfdbf17a7a5d67538b1fba796dfa5244e1",
     "masterPlanBlobSha": "9d7ba423caf0aa09a0e2af4a1ed4713ea867d17a",
     "executionLockBlobSha": "0900b39ec635d12aa36a13a63882eeae262dc441",
@@ -8392,14 +8392,14 @@
       "liveMutation": false,
       "reimport": false
     },
-    "nextAction": "I6_5_B4_003_RENEWALS_BLOCKING_CLOSEOUT",
+    "nextAction": "PAULA_DECISION_AUTHORIZE_EXACT_583_OR_HOLD",
     "priorityAuthorityBlobSha": "fab0103ffeb10690160eef276e48bd648db998d7"
   },
   "lastEvidenceReceipt": {
-    "id": "I6_5_B4_003_UAT3_E1_OFFLINE_SOURCE_RECONCILIATION_20261008",
-    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_UAT3_E1_OFFLINE_SOURCE_RECONCILIATION_20261008.json",
-    "commit": "b84c2daa8b95e83182538aa8aad634591e63dbda",
-    "disposition": "OFFLINE_SOURCE_RECONCILIATION_COMPLETE_CANONICAL_READBACK_PENDING"
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_B02_RENEWAL_CUTOFF_APPLY_DECISION_PACK_20261008.json",
+    "blobSha": "d9b51a847d0d39bcc8591d9e8ac16e6db52a9ed9",
+    "commit": "fba8af2672b861d84974b730b421c981a8552428",
+    "kind": "B02_RENEWAL_CUTOFF_APPLY_DECISION_PACK"
   },
   "lastSourceFixReceipt": {
     "id": "I6_5_B4_003_UAT3_A10_RESPONSIVE_SOURCE_FIX_RECEIPT_20261008",
@@ -8427,5 +8427,35 @@
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PAULA_RELEASE_PRIORITY_FREEZE_20261008.json",
     "blobSha": "fab0103ffeb10690160eef276e48bd648db998d7",
     "commit": "5fdc54fe14b407edc9a288c4607a32e2ea192a1a"
+  },
+  "renewalsBlockingCloseout20261008": {
+    "status": "B02_DECISION_READY_PAULA_AUTHORIZATION_PENDING",
+    "observations": [
+      "B-01",
+      "B-02",
+      "B-03",
+      "B-04"
+    ],
+    "sourceFixedStaticPass": [
+      "B-01",
+      "B-03",
+      "B-04"
+    ],
+    "b02DecisionPack": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_B02_RENEWAL_CUTOFF_APPLY_DECISION_PACK_20261008.json",
+      "blobSha": "d9b51a847d0d39bcc8591d9e8ac16e6db52a9ed9",
+      "commit": "fba8af2672b861d84974b730b421c981a8552428"
+    },
+    "candidateWrites": 583,
+    "recentExpiredRemainInPipeline": 24,
+    "prior1415ClassificationApply": "PASS_DO_NOT_REPEAT",
+    "boundaries": {
+      "dataMutation": false,
+      "buildDispatch": false,
+      "previewMutation": false,
+      "liveMutation": false,
+      "reimport": false
+    },
+    "nextAction": "PAULA_DECISION_AUTHORIZE_EXACT_583_OR_HOLD"
   }
 }
