@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B4_EXECUTION_LOCK_V1",
   "recordedAt": "2026-10-08T20:36:00Z",
-  "status": "B4_003_UAT3_REMAINING_P0_EVIDENCE_PLAN_LOCKED",
+  "status": "B4_003_R20_RENEWAL_CUTOFF_APPLY_AUTHORIZED",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "block": "B4",
@@ -38,9 +38,9 @@
   "activeFinding": {
     "id": "B4-003",
     "title": "Cumulative B4-003 remediation: Renovaciones, Cancelaciones and source-backed insurer knowledge.",
-    "status": "B4_003_HUMAN_UAT3_REJECTED_FINDINGS_RECONCILED_CAUSAL_AUDIT_PENDING",
+    "status": "B4_003_R20_RENEWAL_CUTOFF_APPLY_AUTHORIZED",
     "blocking": true,
-    "nextAction": "B4_003_UAT3_CONCENTRATED_CAUSAL_AUDIT_P0",
+    "nextAction": "B4_003_R20_RENEWAL_CUTOFF_APPLY",
     "humanVisualStatus": "REJECTED_UAT3_20261008",
     "knowledgePreview": true
   },
@@ -56,9 +56,9 @@
     "livePromotionForbiddenUntilB4FinalAcceptance": true
   },
   "boundaries": {
-    "businessWritesAuthorized": false,
+    "businessWritesAuthorized": true,
     "configWritesAuthorized": false,
-    "dataMutationAuthorized": false,
+    "dataMutationAuthorized": true,
     "productMutationAuthorized": false,
     "allowedProductFiles": [],
     "reimportAuthorized": false,
@@ -82,13 +82,14 @@
     "drivePreviewFunctionDeploymentAuthorized": true,
     "drivePreviewProductionFunctionsAuthorized": false,
     "renewabilityDataMutationAuthorized": false,
-    "authorizedDataMutation": "Only exact R20 renewability target set bound to dry-run digests; fields renewable/provenance/rule only; max 1415 writes; automatic rollback on failure.",
+    "authorizedDataMutation": "Only exact 583-policy R20 cutoff-disposition target set bound to digest 744f6f26139f272fa3a26ab35e889a9d011833e802d1495286147734ec7b4d1d; only renovacionEstado, renewalDispositionRuleId and renewalDispositionReason; automatic rollback on failure.",
     "renewabilityApplyRepeatAuthorized": false,
     "buildDispatchAuthorized": false,
     "previewMutationAuthorized": false,
-    "functionDeploymentAuthorized": false
+    "functionDeploymentAuthorized": false,
+    "renewalCutoffDataMutationAuthorized": true
   },
-  "nextAction": "B4_003_UAT3_E1_CANONICAL_READONLY_PACK_SCOPE_LOCK",
+  "nextAction": "B4_003_R20_RENEWAL_CUTOFF_APPLY",
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
     "blobSha": "68ffc370fefa5024a1c0a4857b541bdcf12f615e",
@@ -1302,5 +1303,22 @@
     "liveMutation": false,
     "reimport": false,
     "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_UAT3_E1_CANONICAL_READONLY_PACK_SCOPE_LOCK"
+  },
+  "r20RenewalCutoffApplyAuthorization": {
+    "status": "AUTHORIZED_PENDING_APPLY",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_B02_RENEWAL_CUTOFF_APPLY_AUTH_20261008.json",
+    "blobSha": "28c42196c14c60cdc0632615334e0468a382d49a",
+    "commit": "1fbb186891fdabea90639f8f10ef0f557e6b3758",
+    "ruleId": "PAULA_EXPIRED_CUTOFF_20261007",
+    "cutoff": "2026-07-31",
+    "targetDigest": "744f6f26139f272fa3a26ab35e889a9d011833e802d1495286147734ec7b4d1d",
+    "recentDigest": "3512b167cdde30b51f67acc3c77135f2a94df5f133fd2d3b45cde8540938e67a",
+    "maxWrites": 583,
+    "recentCount": 24,
+    "allowedFields": [
+      "renovacionEstado",
+      "renewalDispositionRuleId",
+      "renewalDispositionReason"
+    ]
   }
 }
