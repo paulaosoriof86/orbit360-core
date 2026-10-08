@@ -238,7 +238,7 @@
     "orbit360-platform/modules/renewals-v1200-operational-bridge.js": "b44695f05170b4406740ed7158b47e6464916d8f",
     "orbit360-platform/modules/renewals-v1200-permission-guard.js": "f3f75e25d32c7e4784a19b089353d9706c98dcda",
     "orbit360-platform/modules/renewals-v1201-issued-filter.js": "ae1df0174121c965f610407ae723094e833ebeaf",
-    "orbit360-platform/modules/renovaciones.js": "9e0d8c236bf31aa99b0df9c7882a128b8550a7d1",
+    "orbit360-platform/modules/renovaciones.js": "f652496dbb2b6b130724b8bf2050428e6a69c16d",
     "orbit360-platform/modules/siniestros.js": "fbea51cf7084b66d9866a3c947c1e7ec3bb4a034",
     "orbit360-platform/product-runtime-config.js": "cce5e1b74b246640297a734871a71364e4209061",
     "orbit360-platform/styles/base.css": "608ef0709144ffcbe748a7bd04e1bd16744def65",
@@ -3943,7 +3943,7 @@
     "previewMutation": false,
     "liveMutation": false
   },
-  "recordedAt": "2026-10-08T21:52:00Z",
+  "recordedAt": "2026-10-08T20:47:09.543Z",
   "uat3P0SourceFixBatch2": {
     "status": "SOURCE_FIXED_STATIC_PASS_DEPLOYMENT_NOT_DISPATCHED",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_UAT3_P0_SOURCE_FIX_BATCH_2_SHARED_INBOX_20261008.json",
@@ -4046,6 +4046,17 @@
       "orbit360-platform/modules/renovaciones.js"
     ],
     "productFileCount": 102,
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false
+  },
+  "renewalsRecent24UiSourceFix": {
+    "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW",
+    "reason": "Align expired Renewals pipeline eligibility with the authorized B-02 open/not-cancelled/renewable rule; remove the extra historical policy-state allowlist for d<0.",
+    "scopeLockPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_RENEWALS_RECENT24_SOURCE_FIX_SCOPE_LOCK_20261008.json",
+    "scopeLockBlobSha": "8fc06b35b49b199158a25ef915729835b8420257",
+    "productFile": "orbit360-platform/modules/renovaciones.js",
+    "productBlobSha": "f652496dbb2b6b130724b8bf2050428e6a69c16d",
     "dataMutation": false,
     "reimport": false,
     "livePromotion": false

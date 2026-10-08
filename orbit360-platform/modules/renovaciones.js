@@ -55,7 +55,7 @@ Orbit.modules.renovaciones = (function () {
     if(!p || renewabilityState(p)!=='YES' || !selectedCountry(p) || terminalRenewalOutcome(p)) return false;
     const d=U.daysFromNow(p.vigenciaFin),state=policyState(p);
     if(d==null) return false;
-    return d<0 ? ['vigente','porrenovar','vencida'].includes(state) : ['vigente','porrenovar'].includes(state);
+    return d<0 ? !['cancelada','anulada'].includes(state) : ['vigente','porrenovar'].includes(state);
   };
   const renewalPendingValidation = p => {
     if(!p || renewabilityState(p)!=='UNKNOWN' || !selectedCountry(p) || terminalRenewalOutcome(p)) return false;

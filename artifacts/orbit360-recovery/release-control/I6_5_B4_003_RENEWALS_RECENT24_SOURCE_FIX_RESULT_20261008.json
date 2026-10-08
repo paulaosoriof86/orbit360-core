@@ -1,0 +1,24 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_RENEWALS_RECENT24_SOURCE_FIX_RESULT_V1",
+  "recordedAt": "2026-10-08T20:47:18.565Z",
+  "status": "SOURCE_FIXED_STATIC_PASS_PENDING_EXACT_PREVIEW",
+  "parentHead": "c29193077bc345f957db010f934dfa40ac6e12fc",
+  "findingId": "B-02",
+  "rootCause": "Expired pipeline candidates were subjected to a policy-state allowlist absent from the exact authorized B-02 rule, excluding recent open expired policies from Vencidas.",
+  "correction": "For expired rows, keep the canonical exclusions for non-renewable, terminal renewal outcome, cancelled/annulled policy and country, without the additional vigente/porrenovar/vencida allowlist.",
+  "productFiles": {
+    "orbit360-platform/modules/renovaciones.js": "f652496dbb2b6b130724b8bf2050428e6a69c16d"
+  },
+  "compositionLockBlobSha": "38fdb6e186585059ec43929c85587c4e35a8c3d7",
+  "verification": {
+    "sourceSyntaxPendingWorkflow": true,
+    "exactRecent24UiPendingPreview": true,
+    "exact583TerminalPreserved": true
+  },
+  "dataMutation": false,
+  "businessWrites": 0,
+  "syntheticQaWrites": 0,
+  "reimport": false,
+  "livePromotion": false,
+  "nextAction": "B4_003_RENEWALS_PRIORITY_EXACT_PREVIEW"
+}
