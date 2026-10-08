@@ -1,0 +1,28 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_RENEWALS_PRIORITY_PREVIEW_WARM_ROUTE_ROOTFIX_V1",
+  "recordedAt": "2026-10-08T20:21:59.266Z",
+  "status": "QA_HARNESS_ROOTFIX_READY_FOR_EXACT_RETRY",
+  "failedRunId": 37838201407,
+  "failedJobId": 113520574157,
+  "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-37838201407-wfj60o1h.web.app",
+  "failure": "The harness performed page.reload before the warm-route matrix and then waited for a new server-confirmation hydration cycle. That is a second cold bootstrap, not a warm route.",
+  "classification": "QA_HARNESS_FALSE_BLOCKER",
+  "evidenceBeforeFailure": {
+    "backendExactReadbackPassed": true,
+    "firstRoleColdCountriesPassed": [
+      "TODOS",
+      "GT",
+      "CO"
+    ],
+    "failurePoint": "SECOND_COLD_BOOTSTRAP_BEFORE_WARM_ROUTE"
+  },
+  "correction": "Define warm correctly as repeated canonical Renewals route rendering inside the already authenticated and server-confirmed session. Keep the initial cold bootstrap per role and all role/country/viewport/data/layout assertions.",
+  "productSourceChanged": false,
+  "dataMutation": false,
+  "businessWrites": 0,
+  "syntheticQaWrites": 0,
+  "livePromotion": false,
+  "reimport": false,
+  "liveByteStable": true,
+  "nextAction": "EXACT_SAME_SCOPE_RETRY"
+}
