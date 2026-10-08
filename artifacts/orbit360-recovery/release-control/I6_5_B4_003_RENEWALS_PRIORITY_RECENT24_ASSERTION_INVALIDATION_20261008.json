@@ -1,0 +1,27 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_RENEWALS_PRIORITY_RECENT24_ASSERTION_INVALIDATION_V1",
+  "recordedAt": "2026-10-08T20:34:57.113Z",
+  "status": "MACHINE_PASS_INVALIDATED_EXACT_RETRY_REQUIRED",
+  "invalidatedRunId": 37839569726,
+  "invalidatedArtifactId": 11576758328,
+  "invalidatedProofPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_RENEWALS_PRIORITY_MACHINE_PROOF_20261008.json",
+  "invalidatedProofBlobSha": "099d8c8eec2af0f118168a24315c7bb6ee2b3fc8",
+  "preservedValidEvidence": {
+    "exact583TerminalBackendReadback": true,
+    "oldOpenCountZero": true,
+    "recent24BackendDigestExact": true,
+    "authenticatedRolesRendered": true,
+    "canonicalVisibleIdsReconciled": true,
+    "responsiveLayout": true,
+    "liveByteStable": true
+  },
+  "invalidReason": "The backend recent array intentionally held only hashed evidence, but the browser handoff incorrectly read x.id from that sanitized array. The UI assertion therefore compared an empty set and did not prove that the exact recent 24 remain in Vencidas.",
+  "correction": "Maintain a private in-process raw ID list solely for browser reconciliation, keep only hashes/counts in persisted evidence, and require exact 24 visible in Vencidas for TODOS for both roles and all three viewports.",
+  "productSourceChanged": false,
+  "dataMutation": false,
+  "businessWrites": 0,
+  "syntheticQaWrites": 0,
+  "livePromotion": false,
+  "reimport": false,
+  "nextAction": "REARM_EXACT_RENEWALS_PRIORITY_PREVIEW"
+}
