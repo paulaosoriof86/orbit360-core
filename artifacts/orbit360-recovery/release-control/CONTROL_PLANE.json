@@ -752,7 +752,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "I6_5_B4_003_UAT3_E1_CANONICAL_ID_GRAPH_AND_ROLE_READBACK",
+  "nextAction": "I6_5_B4_003_RENEWALS_BLOCKING_CLOSEOUT",
   "postproductionExitProgress": {
     "formalPercent": 50,
     "frozenMiniGates": 5,
@@ -7594,9 +7594,9 @@
     "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW"
   },
   "pendingClosureMasterPlan": {
-    "status": "FROZEN_ACTIVE_UAT3_REMAINING_P0_EVIDENCE_PLAN_LOCKED",
+    "status": "FROZEN_ACTIVE_PAULA_RELEASE_PRIORITY_RENEWALS",
     "path": "artifacts/orbit360-recovery/release-control/I6_PENDING_CLOSURE_MASTER_PLAN_LOCK_20261004.json",
-    "blobSha": "9d7ba423caf0aa09a0e2af4a1ed4713ea867d17a",
+    "blobSha": "657ab08f27473eaef2aee73c5e48bb406859ca25",
     "baselineFindingCount": 282,
     "currentGate": "B4-003",
     "currentRevision": "R20-UAT3",
@@ -7746,7 +7746,7 @@
     }
   },
   "parallelNonPassWorkstreams": {
-    "status": "ACTIVE_PARALLEL_NO_PRODUCT_MUTATION",
+    "status": "ACTIVE_PARALLEL_NONBLOCKING_BY_PAULA_PRIORITY",
     "path": "artifacts/orbit360-recovery/release-control/I6_PARALLEL_NONPASS_AND_KNOWLEDGE_WORKSTREAMS_RESUMED_20261005.json",
     "knowledgeInventoryLibraryPath": "/A&S Transformacion Digital/Conocimiento Aseguradoras/2026-10-03/AYS_GRAVICENTRA_CONOCIMIENTO_ASEGURADORAS_INVENTARIO_PASS2_2026-10-04.md",
     "knowledgeNormalizedCandidateLibraryPath": "/A&S Transformacion Digital/Conocimiento Aseguradoras/2026-10-03/AYS_GRAVICENTRA_CONOCIMIENTO_NORMALIZADO_CANDIDATO_PASS2_2026-10-04.json",
@@ -7757,9 +7757,16 @@
     "dataMutation": false,
     "reimport": false,
     "livePromotion": false,
-    "nextAction": "B4_003_TARGETED_PAULA_VISUAL",
+    "nextAction": "CONTINUE_IN_PARALLEL_WITHOUT_DELAYING_RENEWALS_OR_UPSELLS",
     "receiptBlobSha": "039524619c230bfa7ac84af31332db26282675db",
-    "masterPlanBlobSha": "7b1d5f7f8a6e145f0d36dbc89f637c103e06cde9"
+    "masterPlanBlobSha": "7b1d5f7f8a6e145f0d36dbc89f637c103e06cde9",
+    "releaseBlocking": false,
+    "escalationOnly": [
+      "PROVEN_CURRENT_CALCULATION_OR_FLOW_CRITICAL_DEFECT",
+      "PROVEN_FINANCIAL_CORRUPTION",
+      "PROVEN_SECURITY_DEFECT",
+      "PROVEN_DAILY_OPERATIONAL_BLOCKER"
+    ]
   },
   "r18VisualRejectionFreeze": {
     "status": "FROZEN",
@@ -8352,9 +8359,9 @@
     "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_UAT3_DEFERRED_READBACK_AND_TRACE_PLAN"
   },
   "uat3RemainingP0EvidencePlan": {
-    "status": "PLAN_LOCKED_EXECUTION_NOT_AUTHORIZED",
+    "status": "PRIORITY_FROZEN_RENEWALS_CLOSEOUT_ACTIVE",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_UAT3_REMAINING_P0_EVIDENCE_PLAN_20261008.json",
-    "blobSha": "2ab259ccb09a7f2aa2030f6bab3e0d9289fa6006",
+    "blobSha": "c9211eeec108ffd14a13e64573cc78d552b110bd",
     "compositionLockBlobSha": "087e4ccfdbf17a7a5d67538b1fba796dfa5244e1",
     "masterPlanBlobSha": "9d7ba423caf0aa09a0e2af4a1ed4713ea867d17a",
     "executionLockBlobSha": "0900b39ec635d12aa36a13a63882eeae262dc441",
@@ -8385,7 +8392,8 @@
       "liveMutation": false,
       "reimport": false
     },
-    "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_UAT3_E1_CANONICAL_READONLY_PACK_SCOPE_LOCK"
+    "nextAction": "I6_5_B4_003_RENEWALS_BLOCKING_CLOSEOUT",
+    "priorityAuthorityBlobSha": "fab0103ffeb10690160eef276e48bd648db998d7"
   },
   "lastEvidenceReceipt": {
     "id": "I6_5_B4_003_UAT3_E1_OFFLINE_SOURCE_RECONCILIATION_20261008",
@@ -8398,5 +8406,26 @@
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_UAT3_A10_RESPONSIVE_SOURCE_FIX_RECEIPT_20261008.json",
     "commit": "7468a5c3966f55e6119d156568bba0514da68281",
     "disposition": "SOURCE_FIX_COMPLETE_STATIC_PROOF_PASS_PREVIEW_PROOF_PENDING"
+  },
+  "paulaReleasePriorityFreeze20261008": {
+    "status": "FROZEN_USER_AUTHORITY_ACTIVE",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PAULA_RELEASE_PRIORITY_FREEZE_20261008.json",
+    "blobSha": "fab0103ffeb10690160eef276e48bd648db998d7",
+    "commit": "5fdc54fe14b407edc9a288c4607a32e2ea192a1a",
+    "conversationDependent": false,
+    "executionOrder": [
+      "RENEWALS_RELEASE_BLOCKING",
+      "UPSELLS_LEADS_OPS_RELEASE_BLOCKING",
+      "INSURERS_KNOWLEDGE_PARALLEL_NONBLOCKING",
+      "QUALITY_PARALLEL_NONBLOCKING",
+      "EXACT_PREVIEW_TO_PRODUCTION"
+    ],
+    "logoDisposition": "NOT_REPORTED_NOT_A_FINDING_NO_ACTION",
+    "nextAction": "I6_5_B4_003_RENEWALS_BLOCKING_CLOSEOUT"
+  },
+  "lastPriorityReceipt": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PAULA_RELEASE_PRIORITY_FREEZE_20261008.json",
+    "blobSha": "fab0103ffeb10690160eef276e48bd648db998d7",
+    "commit": "5fdc54fe14b407edc9a288c4607a32e2ea192a1a"
   }
 }
