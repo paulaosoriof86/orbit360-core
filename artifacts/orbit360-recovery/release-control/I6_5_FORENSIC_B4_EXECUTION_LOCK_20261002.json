@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B4_EXECUTION_LOCK_V1",
-  "recordedAt": "2026-10-08T21:01:54.176Z",
-  "status": "B4_003_RENEWALS_PRIORITY_MACHINE_PASS_PENDING_PAULA_VISUAL",
+  "recordedAt": "2026-10-08T21:39:22.941Z",
+  "status": "B4_003_SOURCE_FIXED_R20_PENDING_CONTRACT_AND_EXACT_PREVIEW",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "block": "B4",
@@ -38,10 +38,10 @@
   "activeFinding": {
     "id": "B4-003",
     "title": "Cumulative B4-003 remediation: Renovaciones, Cancelaciones and source-backed insurer knowledge.",
-    "status": "B4_003_RENEWALS_PRIORITY_MACHINE_PASS_PENDING_PAULA_VISUAL",
+    "status": "B4_003_SOURCE_FIXED_R20_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "blocking": true,
-    "nextAction": "B4_003_RENEWALS_EXACT_PREVIEW_VISUAL",
-    "humanVisualStatus": "PENDING_RENEWALS_PRIORITY_VISUAL",
+    "nextAction": "B4_003_R20_CONTRACT_AND_EXACT_PREVIEW",
+    "humanVisualStatus": "DEFERRED_TO_CUMULATIVE_EXACT_PREVIEW",
     "knowledgePreview": true
   },
   "rules": {
@@ -68,11 +68,11 @@
     "allowedProductFiles": [],
     "reimportAuthorized": false,
     "livePromotionAuthorized": false,
-    "syntheticQaWritesAuthorized": false,
+    "syntheticQaWritesAuthorized": true,
     "syntheticQaScope": "R20 exact Preview only: disposable insurer/logo/product/plan/requirement/document and Ops/Leads handoff/cadence fixtures; mandatory server commit, readback, reload and cleanup; no real operational row mutation.",
-    "paulaVisualAcceptanceRequiredBeforeAdvance": true,
+    "paulaVisualAcceptanceRequiredBeforeAdvance": false,
     "cotcompRealTransportAuthorized": false,
-    "providerDeploymentAuthorized": false,
+    "providerDeploymentAuthorized": true,
     "findingContinuityGuardRequired": true,
     "allowedQaFiles": [
       "tools/gravicentra-i6-5-b4-003-contract.mjs",
@@ -90,12 +90,12 @@
     "renewabilityDataMutationAuthorized": false,
     "authorizedDataMutation": "NONE_POST_B02_APPLY_PASS",
     "renewabilityApplyRepeatAuthorized": false,
-    "buildDispatchAuthorized": false,
-    "previewMutationAuthorized": false,
-    "functionDeploymentAuthorized": false,
+    "buildDispatchAuthorized": true,
+    "previewMutationAuthorized": true,
+    "functionDeploymentAuthorized": true,
     "renewalCutoffDataMutationAuthorized": false
   },
-  "nextAction": "B4_003_RENEWALS_EXACT_PREVIEW_VISUAL",
+  "nextAction": "B4_003_R20_CONTRACT_AND_EXACT_PREVIEW",
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
     "blobSha": "0fea3c55bc852c8ca69bef9c0f52239ab7ecb823",
@@ -1391,7 +1391,7 @@
     "retryReason": "RECENT24_PIPELINE_OWNER_ROOTFIX_APPLIED"
   },
   "renewalsPriorityMachineProof": {
-    "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
+    "status": "MACHINE_PASS_PRESERVED_IN_CUMULATIVE_PREVIEW",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_RENEWALS_PRIORITY_MACHINE_PROOF_20261008.json",
     "blobSha": "b9576259691b6908dda558b7c02db51e15a75b4f",
     "sourceSha": "2248d58d51a7ff051a9b3d0a8645e6b7e3b59a90",
@@ -1426,5 +1426,14 @@
     "blobSha": "9fa145ea6ed378613cbc4761b3fc0a0fe2bb2336",
     "productBlobSha": "8e3bc32aa5ac5f577f545700d39499970c2edeaf",
     "qaProofBlobSha": "4f34ab832ae104f56b215d8c800e88d99dfc4bdb"
+  },
+  "upsellsLeadsOpsExactPreviewAuthorization": {
+    "status": "AUTHORIZED_PENDING_EXACT_PREVIEW",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_UPSELLS_LEADS_OPS_EXACT_PREVIEW_AUTH_20261008.json",
+    "blobSha": "ab9fb8ef739f0ab700f393b7c6b93630febaa8a9",
+    "syntheticQaWrites": true,
+    "realBusinessWrites": false,
+    "livePromotion": false,
+    "reimport": false
   }
 }

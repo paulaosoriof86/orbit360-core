@@ -1,0 +1,60 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_UPSELLS_LEADS_OPS_EXACT_PREVIEW_AUTH_V1",
+  "recordedAt": "2026-10-08T21:39:22.941Z",
+  "status": "AUTHORIZED_PENDING_EXACT_PREVIEW",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "parentHead": "b92a7d8aacb446af578fde4e4bc7e1d282670506",
+  "authority": {
+    "owner": "Paula",
+    "instruction": "Retoma y agiliza",
+    "interpretation": "Continue the next frozen release-blocking block after Renewals technical PASS; do not promote to production."
+  },
+  "priorityAuthority": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PAULA_RELEASE_PRIORITY_FREEZE_20261008.json",
+    "blobSha": "fab0103ffeb10690160eef276e48bd648db998d7",
+    "order": 2,
+    "id": "UPSELLS_LEADS_OPS_RELEASE_BLOCKING"
+  },
+  "scope": {
+    "observations": [
+      "D-01",
+      "D-02",
+      "D-03",
+      "D-04",
+      "D-05",
+      "D-07",
+      "D-08",
+      "D-11",
+      "D-12",
+      "D-13",
+      "D-14",
+      "D-15",
+      "D-17",
+      "D-18",
+      "D-19"
+    ],
+    "exactCumulativePreview": true,
+    "authenticatedRoles": true,
+    "responsiveViewports": true,
+    "syntheticQaFixturesOnly": true,
+    "mandatoryServerReadback": true,
+    "mandatoryReloadPersistence": true,
+    "mandatoryCleanup": true,
+    "retainRenewalsRegressionProof": true
+  },
+  "boundaries": {
+    "productMutation": false,
+    "realBusinessWrites": false,
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false,
+    "productionFunctionDeployment": false,
+    "previewBuild": true,
+    "isolatedPreviewDeployment": true,
+    "previewFunctionDeployment": true,
+    "syntheticQaWrites": true
+  },
+  "exit": "Commercial workflow passes the existing full B4-003 browser proof with all synthetic fixtures removed and LIVE byte-stable.",
+  "nextAction": "B4_003_R20_CONTRACT_AND_EXACT_PREVIEW"
+}
