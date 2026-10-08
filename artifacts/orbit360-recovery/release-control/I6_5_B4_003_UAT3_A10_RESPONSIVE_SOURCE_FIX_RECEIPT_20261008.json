@@ -1,0 +1,69 @@
+{
+  "schema": "gravicentra-b4-003-uat3-a10-responsive-source-fix-receipt-v1",
+  "recordedAt": "2026-10-08",
+  "status": "SOURCE_FIX_COMPLETE_STATIC_PROOF_PASS_PREVIEW_PROOF_PENDING",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "observationId": "A-10",
+  "scopeLock": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_UAT3_A10_RESPONSIVE_SOURCE_FIX_SCOPE_LOCK_20261008.json",
+    "commit": "b4ac4f7aa6a80e6f50dddfd866185cf11ed40133"
+  },
+  "scopeExtension": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_UAT3_A10_CACHE_IDENTITY_SCOPE_EXTENSION_20261008.json",
+    "commit": "3d250096db30becfa0e0a8cdd9dc0415356320ad"
+  },
+  "commits": {
+    "source": "09236c5c68efca44e26b41dd5eab1bcea23a2f20",
+    "cacheIdentity": "e4fd139be02869503ec56a7eafcc659f397ede3e"
+  },
+  "files": {
+    "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js": {
+      "blob": "60ce88178f48ff5d9b5fd01c1e2d92abe642dac1",
+      "changes": [
+        "Adds scoped responsive styles for the individual receipt editor and receipt detail.",
+        "Collapses the two-column detail layout below 900px and numeric/input grids to one column below 620px.",
+        "Forces receipt inputs to fit their container instead of clipping values.",
+        "Adds stable viewport-proof markers.",
+        "Uses the truthful fallback Numeración pendiente instead of Recibo esperado · —."
+      ]
+    },
+    "orbit360-platform/index.html": {
+      "blob": "df9f820b109be2f709eab73f8bc0ac9dcab2c69b",
+      "change": "Only the receipt bridge cache identity changed to v=20261008-a10r1."
+    }
+  },
+  "verification": {
+    "javascriptParse": "PASS",
+    "sourceCommitDiff": {
+      "filesChanged": 1,
+      "additions": 13,
+      "deletions": 4
+    },
+    "physicalReadback": "PASS",
+    "oldHeroPlaceholderAbsent": true,
+    "financialAmountsChanged": false,
+    "receiptRowsChanged": false,
+    "formulasChanged": false,
+    "backendChanged": false,
+    "dataChanged": false
+  },
+  "remainingA10": [
+    "Bind the Q346,080 UI example to exact canonical policy and receipt IDs; the value is absent from attached sources.",
+    "Prove the responsive behavior in authenticated Preview at desktop, 390px and 320px after separate build/Preview authorization."
+  ],
+  "invariants": {
+    "noDataMutation": true,
+    "noReceiptDeletion": true,
+    "noAmountMutation": true,
+    "noBuildDispatch": true,
+    "noPreviewMutation": true,
+    "noLiveMutation": true
+  },
+  "decision": {
+    "a10ResponsiveSourceAddressed": true,
+    "a10FinancialAuthorityPending": true,
+    "a10PreviewViewportProofPending": true,
+    "nextAction": "I6_5_B4_003_UAT3_E1_CANONICAL_ID_GRAPH_AND_ROLE_READBACK"
+  }
+}
