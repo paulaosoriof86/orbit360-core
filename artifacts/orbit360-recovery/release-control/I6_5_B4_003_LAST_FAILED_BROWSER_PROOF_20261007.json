@@ -1,25 +1,25 @@
 {
   "schema": "GRAVICENTRA_I6_5_B4_003_PREVIEW_PROOF_R19_V1",
   "status": "FAIL",
-  "target": "https://ays-orbit-360-lab--gi-i65-b4-37855140563-q5ldm689.web.app",
+  "target": "https://ays-orbit-360-lab--gi-i65-b4-37855839985-3l1eso47.web.app",
   "ids": {
-    "client": "b4003qa_client_37855140563",
-    "renewalPolicy": "b4003qa_policy_renew_37855140563",
-    "expiredRenewPolicy": "b4003qa_policy_expired_renew_37855140563",
-    "unknownRenewPolicy": "b4003qa_policy_unknown_37855140563",
-    "renewabilityWritePolicy": "b4003qa_policy_renewwrite_37855140563",
-    "cancelPolicy": "b4003qa_policy_cancel_37855140563",
-    "healthPolicy": "b4003qa_policy_health_37855140563",
-    "healthReceipt1": "b4003qa_receipt_health_1_37855140563",
-    "healthReceipt2": "b4003qa_receipt_health_2_37855140563",
-    "healthReceiptShadow": "b4003qa_receipt_health_shadow_37855140563",
-    "cancelation": "b4003qa_cancel_37855140563",
-    "insurer": "b4003qa_insurer_37855140563",
-    "collabBusiness": "b4003qa_business_collab_37855140563",
-    "collabNoClientBusiness": "b4003qa_business_collab_noclient_37855140563",
-    "renewActivity": "act_ren_b4003qa_policy_renew_37855140563_20261008",
-    "cancelActivity": "act_rec_b4003qa_cancel_37855140563",
-    "recoveryBusiness": "neg_rec_b4003qa_cancel_37855140563"
+    "client": "b4003qa_client_37855839985",
+    "renewalPolicy": "b4003qa_policy_renew_37855839985",
+    "expiredRenewPolicy": "b4003qa_policy_expired_renew_37855839985",
+    "unknownRenewPolicy": "b4003qa_policy_unknown_37855839985",
+    "renewabilityWritePolicy": "b4003qa_policy_renewwrite_37855839985",
+    "cancelPolicy": "b4003qa_policy_cancel_37855839985",
+    "healthPolicy": "b4003qa_policy_health_37855839985",
+    "healthReceipt1": "b4003qa_receipt_health_1_37855839985",
+    "healthReceipt2": "b4003qa_receipt_health_2_37855839985",
+    "healthReceiptShadow": "b4003qa_receipt_health_shadow_37855839985",
+    "cancelation": "b4003qa_cancel_37855839985",
+    "insurer": "b4003qa_insurer_37855839985",
+    "collabBusiness": "b4003qa_business_collab_37855839985",
+    "collabNoClientBusiness": "b4003qa_business_collab_noclient_37855839985",
+    "renewActivity": "act_ren_b4003qa_policy_renew_37855839985_20261008",
+    "cancelActivity": "act_rec_b4003qa_cancel_37855839985",
+    "recoveryBusiness": "neg_rec_b4003qa_cancel_37855839985"
   },
   "assertions": {
     "handoffActorsDistinct": true,
@@ -409,7 +409,7 @@
       "visible": true,
       "sampleNumber": "91-59247519",
       "emptyState": false,
-      "textSample": "✕ Cancelaciones · Fuga de cartera MOTIVOS·VALOR PERDIDO·TASA DE FUGA CANCELADAS 490 histórico VALOR PERDIDO GTQ 1,842,217 USD 91,823,506 COP 26,564,526 prima anual · por moneda MOTIVO PRINCIPAL Sin motivo registrado más frecuente CANCELADAS / CARTERA 34% histórico acumulado · no es churn temporal Motivos de cancelación Sin motivo registrado 489 · 100% Prueba sintética B4-003 1 · 0% Motivo Prueba sintética B4-003 Sin motivo registrado Asesor Braulio Hernández Carlos Castro Fernando Arias Johanna Salgado Nicole Castro Paula Osorio Samuel Daza 490 de 490 FECHA CLIENTE PÓLIZA RAMO MOTIVO VALOR PERDIDO ACCIÓN 08 oct 2026 BQ B4-003 QA Cliente Persona · GT B4-003-CAN-37855140563 Auto Prueba sintética B4-003 Q 700 Ver cancelación 16 sept 2026 ML MARÍA LUISA LARIOS CALDERÓN natural · GT 223092797 VEHICULOS Sin motivo registrado Q 2,436 Ver cancelación 14 sept 2026 SK SEON KEUN KIM natural · GT 225121245 VEHICULOS Sin motivo registrado Q 6,250 Ver cancelación 07 sept 2026 JI JHEFRI ISAAC RAMIREZ AGUSTÍN natural · GT AUTO-514726 VEHICULOS Sin motivo registrado Q 25,116 Ver cancelación 07 sept 2026 FA FRANCISCO ANTONIO VÁSQUEZ MARTINEZ natural · GT VA125-00006039 VEHICULOS Sin motivo registrad"
+      "textSample": "✕ Cancelaciones · Fuga de cartera MOTIVOS·VALOR PERDIDO·TASA DE FUGA CANCELADAS 490 histórico VALOR PERDIDO GTQ 1,842,217 USD 91,823,506 COP 26,564,526 prima anual · por moneda MOTIVO PRINCIPAL Sin motivo registrado más frecuente CANCELADAS / CARTERA 34% histórico acumulado · no es churn temporal Motivos de cancelación Sin motivo registrado 489 · 100% Prueba sintética B4-003 1 · 0% Motivo Prueba sintética B4-003 Sin motivo registrado Asesor Braulio Hernández Carlos Castro Fernando Arias Johanna Salgado Nicole Castro Paula Osorio Samuel Daza 490 de 490 FECHA CLIENTE PÓLIZA RAMO MOTIVO VALOR PERDIDO ACCIÓN 08 oct 2026 BQ B4-003 QA Cliente Persona · GT B4-003-CAN-37855839985 Auto Prueba sintética B4-003 Q 700 Ver cancelación 16 sept 2026 ML MARÍA LUISA LARIOS CALDERÓN natural · GT 223092797 VEHICULOS Sin motivo registrado Q 2,436 Ver cancelación 14 sept 2026 SK SEON KEUN KIM natural · GT 225121245 VEHICULOS Sin motivo registrado Q 6,250 Ver cancelación 07 sept 2026 JI JHEFRI ISAAC RAMIREZ AGUSTÍN natural · GT AUTO-514726 VEHICULOS Sin motivo registrado Q 25,116 Ver cancelación 07 sept 2026 FA FRANCISCO ANTONIO VÁSQUEZ MARTINEZ natural · GT VA125-00006039 VEHICULOS Sin motivo registrad"
     }
   },
   "actor": {
@@ -971,13 +971,6 @@
     "cancelSnapshotError": "",
     "cancelAttached": true,
     "optionalMissing": [
-      "estadosCuentaAseguradora",
-      "recibosAseguradora",
-      "conciliacionesPrimas",
-      "conciliaciones",
-      "metas",
-      "reclamos",
-      "comisiones",
       "auditoria"
     ],
     "backendCancelationExists": true,
@@ -1572,8 +1565,8 @@
       "CO",
       "CO"
     ],
-    "cancelGtMs": 76.90000000002328,
-    "cancelCoMs": 40.699999999953434,
+    "cancelGtMs": 108.30000000004657,
+    "cancelCoMs": 56.59999999997672,
     "cancelExplicitTargetsGT": true,
     "cancelExplicitTargetsCO": true,
     "cancelCrossCountryExplicitGT": true,
@@ -1864,7 +1857,7 @@
     "cancelKpiDetailOpen": true
   },
   "r11Browser": {
-    "clientHref": "#/cliente360?c=b4003qa_client_37855140563&t=polizas",
+    "clientHref": "#/cliente360?c=b4003qa_client_37855839985&t=polizas",
     "policyTargetPresent": true,
     "explicitCancelTargetPresent": true,
     "rowMisleadingClickable": false,
@@ -1940,8 +1933,8 @@
       "CO",
       "CO"
     ],
-    "qualityGtMs": 156.30000000004657,
-    "qualityCoMs": 80.40000000002328,
+    "qualityGtMs": 260.0999999999767,
+    "qualityCoMs": 124.79999999998836,
     "qualityGtRows": 50,
     "qualityCoRows": 17,
     "financialGtRows": 72,
@@ -1951,10 +1944,10 @@
   },
   "r1604ConfigFirstPaint": {
     "state": "loading",
-    "syncPaintMs": 0.9000000000232831,
+    "syncPaintMs": 1.7999999999883585,
     "hasVisibleState": true,
     "text": "Confirmando catálogos canónicos… La plataforma está leyendo la configuración protegida del tenant. No se usan valores locales como autoridad.",
-    "canonicalReadyMs": 792,
+    "canonicalReadyMs": 1146,
     "finalState": "ready"
   },
   "r16CatalogAndQuality": {
@@ -1989,7 +1982,7 @@
       "reason": "Se excluyeron 1 registro(s) histórico(s) duplicado(s); el calendario activo aún supera la prima contractual."
     },
     "rowVisible": true,
-    "rowText": "B4-003-HEALTH-378551405632 recibo(s) vigente(s) · 1 legado(s) excluido(s) BQ B4-003 QA Cliente Persona · GuatemalaQ 407.01Póliza · prima totalProgramación según cuotas de la póliza0 fila(s) requieren revisiónQ 542.68Q 135.67Q 0.02Se excluyeron 1 registro(s) histórico(s) duplicado(s); el calendario activo aún supera la prima contractual.Revisar diferenciaVer recibos",
+    "rowText": "B4-003-HEALTH-378558399852 recibo(s) vigente(s) · 1 legado(s) excluido(s) BQ B4-003 QA Cliente Persona · GuatemalaQ 407.01Póliza · prima totalProgramación según cuotas de la póliza0 fila(s) requieren revisiónQ 542.68Q 135.67Q 0.02Se excluyeron 1 registro(s) histórico(s) duplicado(s); el calendario activo aún supera la prima contractual.Revisar diferenciaVer recibos",
     "technicalToken": false,
     "exactAction": true,
     "mobileContract": true
@@ -2028,7 +2021,7 @@
     "technical": false
   },
   "r17QualityReceiptsDeepLink": {
-    "hash": "#/cliente360?c=b4003qa_client_37855140563&p=b4003qa_policy_health_37855140563&t=recibos",
+    "hash": "#/cliente360?c=b4003qa_client_37855839985&p=b4003qa_policy_health_37855839985&t=recibos",
     "receiptsTarget": true
   },
   "policyEditorPreservation": {
@@ -2117,9 +2110,9 @@
   },
   "r18CommercialMobile": {
     "viewport": 390,
-    "cardWidth": 390,
-    "cardScrollWidth": 388,
-    "cardClientWidth": 388,
+    "cardWidth": 388.875,
+    "cardScrollWidth": 387,
+    "cardClientWidth": 387,
     "footerButtons": 2
   },
   "r18ManagementModal": {
@@ -2176,7 +2169,7 @@
           "pol_5080266a15e6f2b39f20017d08e4",
           "pol_b9a883095c9fae8f7502ce1cb054",
           "pol_0f89cc0a12840594abcc60d418b2",
-          "b4003qa_policy_expired_renew_37855140563",
+          "b4003qa_policy_expired_renew_37855839985",
           "pol_b8b99324d9016269d118d789095a",
           "pol_8231bbb8f9b7272c02891f5a4caf",
           "pol_df6bf097045762297ec31fd4e5c5"
@@ -2186,9 +2179,9 @@
         "key": "d15",
         "count": 3,
         "ids": [
-          "b4003qa_policy_renew_37855140563",
-          "b4003qa_policy_renewwrite_37855140563",
-          "b4003qa_policy_unknown_37855140563"
+          "b4003qa_policy_renew_37855839985",
+          "b4003qa_policy_renewwrite_37855839985",
+          "b4003qa_policy_unknown_37855839985"
         ]
       },
       {
@@ -2250,9 +2243,9 @@
     "unknownReview": true,
     "parallelDispositionAbsent": true,
     "date45ExpectedIds": [
-      "b4003qa_policy_renew_37855140563",
-      "b4003qa_policy_renewwrite_37855140563",
-      "b4003qa_policy_unknown_37855140563",
+      "b4003qa_policy_renew_37855839985",
+      "b4003qa_policy_renewwrite_37855839985",
+      "b4003qa_policy_unknown_37855839985",
       "pol_3ddc9e613f40252f02b2e122072d",
       "pol_638e276218baad9e84018415b0ba",
       "pol_7280c9b1a5253a1fe1e463e5993b",
@@ -2264,9 +2257,9 @@
       "pol_d5e61976a38be76ba5e3c1e12575"
     ],
     "date45VisibleIds": [
-      "b4003qa_policy_renew_37855140563",
-      "b4003qa_policy_renewwrite_37855140563",
-      "b4003qa_policy_unknown_37855140563",
+      "b4003qa_policy_renew_37855839985",
+      "b4003qa_policy_renewwrite_37855839985",
+      "b4003qa_policy_unknown_37855839985",
       "pol_3ddc9e613f40252f02b2e122072d",
       "pol_638e276218baad9e84018415b0ba",
       "pol_7280c9b1a5253a1fe1e463e5993b",
@@ -2296,7 +2289,7 @@
     ]
   },
   "r19RenewabilityDurable": {
-    "policyId": "b4003qa_policy_renewwrite_37855140563",
+    "policyId": "b4003qa_policy_renewwrite_37855839985",
     "serverValue": true,
     "reloadValue": true
   },
@@ -2306,10 +2299,10 @@
     "hasPrev": true
   },
   "r13PolicyPerformance": {
-    "routeMs": 455,
-    "searchMs": 248,
-    "detailMs": 374,
-    "searchNumber": "B4-003-REN-37855140563",
+    "routeMs": 251,
+    "searchMs": 233,
+    "detailMs": 359,
+    "searchNumber": "B4-003-REN-37855839985",
     "refreshFlicker": {
       "states": [
         {
@@ -2430,911 +2423,12 @@
     "terminal": "ready"
   },
   "renewalRenderStability": {
-    "mutationCount": 80,
+    "mutationCount": 0,
     "textStable": true,
     "route": "renovaciones",
-    "records": [
-      {
-        "ms": 348,
-        "type": "childList",
-        "target": "DIV",
-        "added": [],
-        "removed": [
-          "🔄 Renovaciones · Pipeline por vencer 90 días·Por urgencia·Gestión Preparar campaña de renovación Vencidas26Recuperar o cerrar gestión≤15 días3Atención prioritaria16–45 días9Planif"
-        ]
-      },
-      {
-        "ms": 348,
-        "type": "childList",
-        "target": "DIV",
-        "added": [
-          "🔄 Renovaciones · Pipeline por vencer 90 días·Por urgencia·Gestión Preparar campaña de renovación Vencidas26Recuperar o cerrar gestión≤15 días3Atención prioritaria16–45 días9Planif"
-        ],
-        "removed": []
-      },
-      {
-        "ms": 348,
-        "type": "childList",
-        "target": "DIV",
-        "added": [
-          "Vencidas"
-        ],
-        "removed": [
-          "Vencidas renovables"
-        ]
-      },
-      {
-        "ms": 348,
-        "type": "childList",
-        "target": "DIV",
-        "added": [
-          "26"
-        ],
-        "removed": [
-          "26"
-        ]
-      },
-      {
-        "ms": 348,
-        "type": "childList",
-        "target": "DIV",
-        "added": [
-          "Recuperar o cerrar gestión"
-        ],
-        "removed": [
-          "en gestión de renovación"
-        ]
-      },
-      {
-        "ms": 348,
-        "type": "childList",
-        "target": "DIV",
-        "added": [
-          "≤15 días"
-        ],
-        "removed": [
-          "≤15 días"
-        ]
-      },
-      {
-        "ms": 348,
-        "type": "childList",
-        "target": "DIV",
-        "added": [
-          "3"
-        ],
-        "removed": [
-          "3"
-        ]
-      },
-      {
-        "ms": 348,
-        "type": "childList",
-        "target": "DIV",
-        "added": [
-          "Atención prioritaria"
-        ],
-        "removed": [
-          "urgente"
-        ]
-      },
-      {
-        "ms": 348,
-        "type": "childList",
-        "target": "DIV",
-        "added": [
-          "16–45 días"
-        ],
-        "removed": [
-          "16–45 días"
-        ]
-      },
-      {
-        "ms": 348,
-        "type": "childList",
-        "target": "DIV",
-        "added": [
-          "9"
-        ],
-        "removed": [
-          "9"
-        ]
-      },
-      {
-        "ms": 348,
-        "type": "childList",
-        "target": "DIV",
-        "added": [
-          "Planificar gestión"
-        ],
-        "removed": [
-          "planificar"
-        ]
-      },
-      {
-        "ms": 348,
-        "type": "childList",
-        "target": "DIV",
-        "added": [
-          "Prima neta en gestión"
-        ],
-        "removed": [
-          "Prima en juego"
-        ]
-      },
-      {
-        "ms": 348,
-        "type": "childList",
-        "target": "DIV",
-        "added": [
-          "GTQ 188,103",
-          "COP 68,627,858"
-        ],
-        "removed": [
-          "Q6K"
-        ]
-      },
-      {
-        "ms": 348,
-        "type": "childList",
-        "target": "DIV",
-        "added": [
-          "Separada por moneda; horizonte 90 días"
-        ],
-        "removed": [
-          "a 90 días"
-        ]
-      },
-      {
-        "ms": 348,
-        "type": "childList",
-        "target": "A",
-        "added": [
-          "Abrir WhatsApp"
-        ],
-        "removed": [
-          "💬 WhatsApp"
-        ]
-      },
-      {
-        "ms": 348,
-        "type": "childList",
-        "target": "A",
-        "added": [
-          "Abrir WhatsApp"
-        ],
-        "removed": [
-          "💬 WhatsApp"
-        ]
-      },
-      {
-        "ms": 348,
-        "type": "childList",
-        "target": "A",
-        "added": [
-          "Abrir WhatsApp"
-        ],
-        "removed": [
-          "💬 WhatsApp"
-        ]
-      },
-      {
-        "ms": 348,
-        "type": "childList",
-        "target": "A",
-        "added": [
-          "Abrir WhatsApp"
-        ],
-        "removed": [
-          "💬 WhatsApp"
-        ]
-      },
-      {
-        "ms": 348,
-        "type": "childList",
-        "target": "A",
-        "added": [
-          "Abrir WhatsApp"
-        ],
-        "removed": [
-          "💬 WhatsApp"
-        ]
-      },
-      {
-        "ms": 348,
-        "type": "childList",
-        "target": "A",
-        "added": [
-          "Abrir WhatsApp"
-        ],
-        "removed": [
-          "💬 WhatsApp"
-        ]
-      },
-      {
-        "ms": 348,
-        "type": "childList",
-        "target": "A",
-        "added": [
-          "Abrir WhatsApp"
-        ],
-        "removed": [
-          "💬 WhatsApp"
-        ]
-      },
-      {
-        "ms": 348,
-        "type": "childList",
-        "target": "A",
-        "added": [
-          "Abrir WhatsApp"
-        ],
-        "removed": [
-          "💬 WhatsApp"
-        ]
-      },
-      {
-        "ms": 348,
-        "type": "childList",
-        "target": "A",
-        "added": [
-          "Abrir WhatsApp"
-        ],
-        "removed": [
-          "💬 WhatsApp"
-        ]
-      },
-      {
-        "ms": 348,
-        "type": "childList",
-        "target": "A",
-        "added": [
-          "Abrir WhatsApp"
-        ],
-        "removed": [
-          "💬 WhatsApp"
-        ]
-      },
-      {
-        "ms": 348,
-        "type": "childList",
-        "target": "A",
-        "added": [
-          "Abrir WhatsApp"
-        ],
-        "removed": [
-          "💬 WhatsApp"
-        ]
-      },
-      {
-        "ms": 348,
-        "type": "childList",
-        "target": "A",
-        "added": [
-          "Abrir WhatsApp"
-        ],
-        "removed": [
-          "💬 WhatsApp"
-        ]
-      },
-      {
-        "ms": 348,
-        "type": "childList",
-        "target": "A",
-        "added": [
-          "Abrir WhatsApp"
-        ],
-        "removed": [
-          "💬 WhatsApp"
-        ]
-      },
-      {
-        "ms": 348,
-        "type": "childList",
-        "target": "A",
-        "added": [
-          "Abrir WhatsApp"
-        ],
-        "removed": [
-          "💬 WhatsApp"
-        ]
-      },
-      {
-        "ms": 348,
-        "type": "childList",
-        "target": "A",
-        "added": [
-          "Abrir WhatsApp"
-        ],
-        "removed": [
-          "💬 WhatsApp"
-        ]
-      },
-      {
-        "ms": 348,
-        "type": "childList",
-        "target": "A",
-        "added": [
-          "Abrir WhatsApp"
-        ],
-        "removed": [
-          "💬 WhatsApp"
-        ]
-      },
-      {
-        "ms": 348,
-        "type": "childList",
-        "target": "A",
-        "added": [
-          "Abrir WhatsApp"
-        ],
-        "removed": [
-          "💬 WhatsApp"
-        ]
-      },
-      {
-        "ms": 348,
-        "type": "childList",
-        "target": "A",
-        "added": [
-          "Abrir WhatsApp"
-        ],
-        "removed": [
-          "💬 WhatsApp"
-        ]
-      },
-      {
-        "ms": 348,
-        "type": "childList",
-        "target": "A",
-        "added": [
-          "Abrir WhatsApp"
-        ],
-        "removed": [
-          "💬 WhatsApp"
-        ]
-      },
-      {
-        "ms": 348,
-        "type": "childList",
-        "target": "A",
-        "added": [
-          "Abrir WhatsApp"
-        ],
-        "removed": [
-          "💬 WhatsApp"
-        ]
-      },
-      {
-        "ms": 348,
-        "type": "childList",
-        "target": "A",
-        "added": [
-          "Abrir WhatsApp"
-        ],
-        "removed": [
-          "💬 WhatsApp"
-        ]
-      },
-      {
-        "ms": 348,
-        "type": "childList",
-        "target": "A",
-        "added": [
-          "Abrir WhatsApp"
-        ],
-        "removed": [
-          "💬 WhatsApp"
-        ]
-      },
-      {
-        "ms": 348,
-        "type": "childList",
-        "target": "A",
-        "added": [
-          "Abrir WhatsApp"
-        ],
-        "removed": [
-          "💬 WhatsApp"
-        ]
-      },
-      {
-        "ms": 348,
-        "type": "childList",
-        "target": "A",
-        "added": [
-          "Abrir WhatsApp"
-        ],
-        "removed": [
-          "💬 WhatsApp"
-        ]
-      },
-      {
-        "ms": 348,
-        "type": "childList",
-        "target": "A",
-        "added": [
-          "Abrir WhatsApp"
-        ],
-        "removed": [
-          "💬 WhatsApp"
-        ]
-      },
-      {
-        "ms": 348,
-        "type": "childList",
-        "target": "A",
-        "added": [
-          "Abrir WhatsApp"
-        ],
-        "removed": [
-          "💬 WhatsApp"
-        ]
-      },
-      {
-        "ms": 348,
-        "type": "childList",
-        "target": "A",
-        "added": [
-          "Abrir WhatsApp"
-        ],
-        "removed": [
-          "💬 WhatsApp"
-        ]
-      },
-      {
-        "ms": 348,
-        "type": "childList",
-        "target": "A",
-        "added": [
-          "Abrir WhatsApp"
-        ],
-        "removed": [
-          "💬 WhatsApp"
-        ]
-      },
-      {
-        "ms": 348,
-        "type": "childList",
-        "target": "A",
-        "added": [
-          "Abrir WhatsApp"
-        ],
-        "removed": [
-          "💬 WhatsApp"
-        ]
-      },
-      {
-        "ms": 348,
-        "type": "childList",
-        "target": "A",
-        "added": [
-          "Abrir WhatsApp"
-        ],
-        "removed": [
-          "💬 WhatsApp"
-        ]
-      },
-      {
-        "ms": 348,
-        "type": "childList",
-        "target": "A",
-        "added": [
-          "Abrir WhatsApp"
-        ],
-        "removed": [
-          "💬 WhatsApp"
-        ]
-      },
-      {
-        "ms": 348,
-        "type": "childList",
-        "target": "A",
-        "added": [
-          "Abrir WhatsApp"
-        ],
-        "removed": [
-          "💬 WhatsApp"
-        ]
-      },
-      {
-        "ms": 348,
-        "type": "childList",
-        "target": "A",
-        "added": [
-          "Abrir WhatsApp"
-        ],
-        "removed": [
-          "💬 WhatsApp"
-        ]
-      },
-      {
-        "ms": 348,
-        "type": "childList",
-        "target": "A",
-        "added": [
-          "Abrir WhatsApp"
-        ],
-        "removed": [
-          "💬 WhatsApp"
-        ]
-      },
-      {
-        "ms": 348,
-        "type": "childList",
-        "target": "A",
-        "added": [
-          "Abrir WhatsApp"
-        ],
-        "removed": [
-          "💬 WhatsApp"
-        ]
-      },
-      {
-        "ms": 348,
-        "type": "childList",
-        "target": "A",
-        "added": [
-          "Abrir WhatsApp"
-        ],
-        "removed": [
-          "💬 WhatsApp"
-        ]
-      },
-      {
-        "ms": 348,
-        "type": "childList",
-        "target": "A",
-        "added": [
-          "Abrir WhatsApp"
-        ],
-        "removed": [
-          "💬 WhatsApp"
-        ]
-      },
-      {
-        "ms": 348,
-        "type": "childList",
-        "target": "A",
-        "added": [
-          "Abrir WhatsApp"
-        ],
-        "removed": [
-          "💬 WhatsApp"
-        ]
-      },
-      {
-        "ms": 348,
-        "type": "childList",
-        "target": "A",
-        "added": [
-          "Abrir WhatsApp"
-        ],
-        "removed": [
-          "💬 WhatsApp"
-        ]
-      },
-      {
-        "ms": 348,
-        "type": "childList",
-        "target": "A",
-        "added": [
-          "Abrir WhatsApp"
-        ],
-        "removed": [
-          "💬 WhatsApp"
-        ]
-      },
-      {
-        "ms": 348,
-        "type": "childList",
-        "target": "A",
-        "added": [
-          "Abrir WhatsApp"
-        ],
-        "removed": [
-          "💬 WhatsApp"
-        ]
-      },
-      {
-        "ms": 348,
-        "type": "childList",
-        "target": "A",
-        "added": [
-          "Abrir WhatsApp"
-        ],
-        "removed": [
-          "💬 WhatsApp"
-        ]
-      },
-      {
-        "ms": 348,
-        "type": "childList",
-        "target": "A",
-        "added": [
-          "Abrir WhatsApp"
-        ],
-        "removed": [
-          "💬 WhatsApp"
-        ]
-      },
-      {
-        "ms": 348,
-        "type": "childList",
-        "target": "A",
-        "added": [
-          "Abrir WhatsApp"
-        ],
-        "removed": [
-          "💬 WhatsApp"
-        ]
-      },
-      {
-        "ms": 348,
-        "type": "childList",
-        "target": "A",
-        "added": [
-          "Abrir WhatsApp"
-        ],
-        "removed": [
-          "💬 WhatsApp"
-        ]
-      },
-      {
-        "ms": 348,
-        "type": "childList",
-        "target": "A",
-        "added": [
-          "Abrir WhatsApp"
-        ],
-        "removed": [
-          "💬 WhatsApp"
-        ]
-      },
-      {
-        "ms": 348,
-        "type": "childList",
-        "target": "A",
-        "added": [
-          "Abrir WhatsApp"
-        ],
-        "removed": [
-          "💬 WhatsApp"
-        ]
-      },
-      {
-        "ms": 348,
-        "type": "childList",
-        "target": "A",
-        "added": [
-          "Abrir WhatsApp"
-        ],
-        "removed": [
-          "💬 WhatsApp"
-        ]
-      },
-      {
-        "ms": 348,
-        "type": "childList",
-        "target": "A",
-        "added": [
-          "Abrir WhatsApp"
-        ],
-        "removed": [
-          "💬 WhatsApp"
-        ]
-      },
-      {
-        "ms": 348,
-        "type": "childList",
-        "target": "A",
-        "added": [
-          "Abrir WhatsApp"
-        ],
-        "removed": [
-          "💬 WhatsApp"
-        ]
-      },
-      {
-        "ms": 348,
-        "type": "childList",
-        "target": "A",
-        "added": [
-          "Abrir WhatsApp"
-        ],
-        "removed": [
-          "💬 WhatsApp"
-        ]
-      },
-      {
-        "ms": 348,
-        "type": "childList",
-        "target": "A",
-        "added": [
-          "Abrir WhatsApp"
-        ],
-        "removed": [
-          "💬 WhatsApp"
-        ]
-      },
-      {
-        "ms": 348,
-        "type": "childList",
-        "target": "A",
-        "added": [
-          "Abrir WhatsApp"
-        ],
-        "removed": [
-          "💬 WhatsApp"
-        ]
-      },
-      {
-        "ms": 348,
-        "type": "childList",
-        "target": "A",
-        "added": [
-          "Abrir WhatsApp"
-        ],
-        "removed": [
-          "💬 WhatsApp"
-        ]
-      },
-      {
-        "ms": 348,
-        "type": "childList",
-        "target": "A",
-        "added": [
-          "Abrir WhatsApp"
-        ],
-        "removed": [
-          "💬 WhatsApp"
-        ]
-      },
-      {
-        "ms": 348,
-        "type": "childList",
-        "target": "A",
-        "added": [
-          "Abrir WhatsApp"
-        ],
-        "removed": [
-          "💬 WhatsApp"
-        ]
-      },
-      {
-        "ms": 348,
-        "type": "childList",
-        "target": "A",
-        "added": [
-          "Abrir WhatsApp"
-        ],
-        "removed": [
-          "💬 WhatsApp"
-        ]
-      },
-      {
-        "ms": 348,
-        "type": "childList",
-        "target": "A",
-        "added": [
-          "Abrir WhatsApp"
-        ],
-        "removed": [
-          "💬 WhatsApp"
-        ]
-      },
-      {
-        "ms": 348,
-        "type": "childList",
-        "target": "A",
-        "added": [
-          "Abrir WhatsApp"
-        ],
-        "removed": [
-          "💬 WhatsApp"
-        ]
-      },
-      {
-        "ms": 348,
-        "type": "childList",
-        "target": "A",
-        "added": [
-          "Abrir WhatsApp"
-        ],
-        "removed": [
-          "💬 WhatsApp"
-        ]
-      },
-      {
-        "ms": 348,
-        "type": "childList",
-        "target": "A",
-        "added": [
-          "Abrir WhatsApp"
-        ],
-        "removed": [
-          "💬 WhatsApp"
-        ]
-      },
-      {
-        "ms": 348,
-        "type": "childList",
-        "target": "A",
-        "added": [
-          "Abrir WhatsApp"
-        ],
-        "removed": [
-          "💬 WhatsApp"
-        ]
-      },
-      {
-        "ms": 348,
-        "type": "childList",
-        "target": "A",
-        "added": [
-          "Abrir WhatsApp"
-        ],
-        "removed": [
-          "💬 WhatsApp"
-        ]
-      },
-      {
-        "ms": 348,
-        "type": "childList",
-        "target": "A",
-        "added": [
-          "Abrir WhatsApp"
-        ],
-        "removed": [
-          "💬 WhatsApp"
-        ]
-      },
-      {
-        "ms": 348,
-        "type": "childList",
-        "target": "A",
-        "added": [
-          "Abrir WhatsApp"
-        ],
-        "removed": [
-          "💬 WhatsApp"
-        ]
-      },
-      {
-        "ms": 348,
-        "type": "childList",
-        "target": "A",
-        "added": [
-          "Abrir WhatsApp"
-        ],
-        "removed": [
-          "💬 WhatsApp"
-        ]
-      }
-    ],
-    "events": [
-      {
-        "ms": 588,
-        "kind": "store",
-        "detail": "metas"
-      },
-      {
-        "ms": 602,
-        "kind": "store",
-        "detail": "reclamos"
-      },
-      {
-        "ms": 685,
-        "kind": "store",
-        "detail": "comisiones"
-      },
-      {
-        "ms": 725,
-        "kind": "store",
-        "detail": "auditoria"
-      }
-    ],
-    "canonicalRerenderObserved": true
+    "records": [],
+    "events": [],
+    "canonicalRerenderObserved": false
   },
   "r14RenewalReadiness": {
     "loading": true,
@@ -3527,13 +2621,13 @@
       "pol_5080266a15e6f2b39f20017d08e4",
       "pol_b9a883095c9fae8f7502ce1cb054",
       "pol_0f89cc0a12840594abcc60d418b2",
-      "b4003qa_policy_expired_renew_37855140563",
+      "b4003qa_policy_expired_renew_37855839985",
       "pol_b8b99324d9016269d118d789095a",
       "pol_8231bbb8f9b7272c02891f5a4caf",
       "pol_df6bf097045762297ec31fd4e5c5",
-      "b4003qa_policy_renew_37855140563",
-      "b4003qa_policy_renewwrite_37855140563",
-      "b4003qa_policy_unknown_37855140563",
+      "b4003qa_policy_renew_37855839985",
+      "b4003qa_policy_renewwrite_37855839985",
+      "b4003qa_policy_unknown_37855839985",
       "pol_638e276218baad9e84018415b0ba",
       "pol_b39a58e5c216d8fb0f9fca4da4d6",
       "pol_7280c9b1a5253a1fe1e463e5993b",
@@ -3667,23 +2761,23 @@
     "committed": 1,
     "lastError": "",
     "comment": {
-      "ts": "2026-10-08T22:46:52.014Z",
+      "ts": "2026-10-08T22:55:03.654Z",
       "user": "Orbit LAB",
       "actorUid": "woJlxR1iFEeiQZvTscPj4qQ5Qc73",
       "actorName": "Orbit LAB",
       "tipo": "Solicitar información al asesor",
       "texto": "B4-003 R20 solicitud sintética al asesor",
       "direction": "advisor",
-      "eventId": "collab_mv04m3ji_f4yjz",
+      "eventId": "collab_mv04wmw6_pcffb",
       "attachment": {
-        "documentRef": "1OePKAC4VPvQrCSBx8a8abmfHWuuViv1h",
-        "driveUrl": "https://drive.google.com/file/d/1OePKAC4VPvQrCSBx8a8abmfHWuuViv1h/view?usp=drivesdk",
-        "nombre": "b4-r20-ui-attachment-37855140563.txt",
+        "documentRef": "1Il6qWTO-M7lsfjhtSqbGcAHbpyyDCOqa",
+        "driveUrl": "https://drive.google.com/file/d/1Il6qWTO-M7lsfjhtSqbGcAHbpyyDCOqa/view?usp=drivesdk",
+        "nombre": "b4-r20-ui-attachment-37855839985.txt",
         "mimeType": "text/plain",
         "size": 36
       }
     },
-    "openMs": 290,
+    "openMs": 488,
     "visual": {
       "panel": true,
       "brandHeader": true,
@@ -3694,27 +2788,27 @@
     "attachmentRead": {
       "ok": true,
       "status": "disponible",
-      "documentRef": "1OePKAC4VPvQrCSBx8a8abmfHWuuViv1h",
-      "fileId": "1OePKAC4VPvQrCSBx8a8abmfHWuuViv1h",
-      "nombre": "b4-r20-ui-attachment-37855140563.txt",
+      "documentRef": "1Il6qWTO-M7lsfjhtSqbGcAHbpyyDCOqa",
+      "fileId": "1Il6qWTO-M7lsfjhtSqbGcAHbpyyDCOqa",
+      "nombre": "b4-r20-ui-attachment-37855839985.txt",
       "mimeType": "text/plain",
       "size": 36,
-      "base64": "QjQtMDAzIFIyMCBVSSBhdHRhY2htZW50IDM3ODU1MTQwNTYz",
+      "base64": "QjQtMDAzIFIyMCBVSSBhdHRhY2htZW50IDM3ODU1ODM5OTg1",
       "previewAvailable": true,
       "downloadAvailable": true,
-      "externalUrl": "https://drive.google.com/file/d/1OePKAC4VPvQrCSBx8a8abmfHWuuViv1h/view?usp=drivesdk",
-      "driveUrl": "https://drive.google.com/file/d/1OePKAC4VPvQrCSBx8a8abmfHWuuViv1h/view?usp=drivesdk",
+      "externalUrl": "https://drive.google.com/file/d/1Il6qWTO-M7lsfjhtSqbGcAHbpyyDCOqa/view?usp=drivesdk",
+      "driveUrl": "https://drive.google.com/file/d/1Il6qWTO-M7lsfjhtSqbGcAHbpyyDCOqa/view?usp=drivesdk",
       "backendPersistent": true,
       "previewIsolated": true
     },
     "attachmentCleanup": {
       "ok": true,
       "status": "deleted_preview_qa",
-      "documentRef": "1OePKAC4VPvQrCSBx8a8abmfHWuuViv1h",
+      "documentRef": "1Il6qWTO-M7lsfjhtSqbGcAHbpyyDCOqa",
       "deleted": true,
       "previewIsolated": true,
       "entityType": "negocio",
-      "entityId": "b4003qa_business_collab_37855140563"
+      "entityId": "b4003qa_business_collab_37855839985"
     }
   },
   "r20SecondAdvisorActionCard": {
