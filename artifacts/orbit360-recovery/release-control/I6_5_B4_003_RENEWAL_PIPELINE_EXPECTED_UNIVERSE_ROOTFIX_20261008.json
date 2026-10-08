@@ -1,0 +1,43 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_RENEWAL_PIPELINE_EXPECTED_UNIVERSE_ROOTFIX_V1",
+  "recordedAt": "2026-10-08T22:07:00Z",
+  "status": "PROOF_ROOTFIXED_PENDING_EXACT_PREVIEW",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "parentHead": "d48fd840ca60cb9e783a9555d4bb6f9c73981c88",
+  "failedRun": {
+    "id": 37850664457,
+    "jobId": 113562485299,
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-37850664457-1bhfewsg.web.app",
+    "error": "B4_003_R13_REAL_RENEWAL_PIPELINE_MISMATCH",
+    "observed": {
+      "expectedByStaleProof": 42,
+      "visibleCanonicalReal": 65,
+      "syntheticExcludedFromComparison": true,
+      "cleanupWrites": 18,
+      "syntheticFinalAbsent": true,
+      "liveByteStable": true
+    }
+  },
+  "cause": {
+    "classification": "STALE_EXPECTED_UNIVERSE_OWNER",
+    "staleRule": "Only Vigente/Por renovar policies were counted, excluding valid expired renewable policies.",
+    "canonicalRule": "renewalPipelineCandidate: explicit NO or terminal outcome excluded; expired policies included unless policy state is cancelled/annulled; future horizon capped at 90 days.",
+    "productRegression": false
+  },
+  "correction": {
+    "path": "tools/gravicentra-i6-5-b4-003-preview-proof.mjs",
+    "previousBlobSha": "a0a7d1100cfac5a6a1af5803e996cc185e57e5aa",
+    "correctedBlobSha": "7d36ef2cf2cb58c4a49594c91315aa016bf511f0",
+    "scope": "Compute the expected real renewal universe independently with the same explicit canonical eligibility semantics; keep source-authority active-policy matching unchanged."
+  },
+  "boundaries": {
+    "productSourceChanged": false,
+    "dataMutation": false,
+    "businessWrites": false,
+    "syntheticQaWritesThisCommit": false,
+    "livePromotion": false,
+    "reimport": false
+  },
+  "nextAction": "B4_003_R20_CONTRACT_AND_EXACT_PREVIEW"
+}

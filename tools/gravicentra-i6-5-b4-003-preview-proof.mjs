@@ -296,6 +296,9 @@ async function renewalDistributionReadback(){
  };
  const active=p=>['vigente','porrenovar'].includes(norm(p.estado))&&!p.renovadaPor&&norm(p.renovacionEstado)!=='renovada';
  const days=p=>{const raw=clean(p.vigenciaFin);if(!raw)return null;const d=new Date(raw+'T00:00:00');return Number.isFinite(d.getTime())?Math.ceil((d-now)/86400000):null;};
+ const policyState=p=>clean(p&&p.estado).toLowerCase().replace(/\s+/g,'');
+ const terminalRenewalOutcome=p=>!!(p&&p.renovadaPor)||['renovada','norenovada','rechazada','cerrada','cancelada'].includes(clean(p&&p.renovacionEstado).toLowerCase().replace(/[\s_-]+/g,''));
+ const pipelineEligible=(p,d)=>state(p)!=='NO'&&!terminalRenewalOutcome(p)&&d!=null&&d<=90&&(d<0?!['cancelada','anulada'].includes(policyState(p)):['vigente','porrenovar'].includes(policyState(p)));
  const byState={YES:0,NO:0,UNKNOWN:0},byCountry={},buckets={vencidas:0,d15:0,d45:0,d90:0},eligible=[];
  rows.forEach(p=>{
   const rs=state(p);byState[rs]=(byState[rs]||0)+1;
@@ -303,8 +306,7 @@ async function renewalDistributionReadback(){
   const country=clean(p.pais||p.country||cli.pais||cli.country||'SIN_PAIS').toUpperCase()||'SIN_PAIS';
   byCountry[country]=byCountry[country]||{YES:0,NO:0,UNKNOWN:0,eligible90:0};
   byCountry[country][rs]=(byCountry[country][rs]||0)+1;
-  if(rs==='NO'||!active(p))return;
-  const d=days(p);if(d==null||d>90)return;
+  const d=days(p);if(!pipelineEligible(p,d))return;
   eligible.push({id:p.id,numero:p.numero||'',pais:country,dias:d,estado:p.estado||'',vigenciaFin:p.vigenciaFin||''});
   byCountry[country].eligible90++;
   if(d<0)buckets.vencidas++;else if(d<=15)buckets.d15++;else if(d<=45)buckets.d45++;else buckets.d90++;
