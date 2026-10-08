@@ -182,9 +182,7 @@ async function actionCardUiFor(browser,who,businessId,surface){
 async function inboxUiFor(browser,who,eventId,expectedSurface,stateAction){
  const token=await auth.createCustomToken(who.uid),ctx=await browser.newContext({ignoreHTTPSErrors:false}),p=await ctx.newPage();
  try{
-  await applyLegal(p,who);await p.goto(target+'/#/inicio',{waitUntil:'domcontentloaded',timeout:60000});
-  await p.waitForFunction(()=>!!window.Orbit?.productRuntimeBrowserProvidersP0,null,{timeout:30000});
-  await p.evaluate(async token=>{const provider=Orbit.productRuntimeBrowserProvidersP0,c=await provider.initialize();if(!c.auth.currentUser)await c.modules.auth.signInWithCustomToken(c.auth,token);},token);
+  await applyLegal(p,who);await p.goto(target+'/#/inicio',{waitUntil:'domcontentloaded',timeout:60000});await bootProduct(p,token);
   const expectedRole=norm(who.activeRole);
   const roleAssigned=await p.waitForFunction(role=>{
     if(!Orbit.session||typeof Orbit.session.allowedRoles!=='function'||typeof Orbit.session.set!=='function')return false;
@@ -194,7 +192,7 @@ async function inboxUiFor(browser,who,eventId,expectedSurface,stateAction){
   need(roleAssigned,'B4_003_INBOX_ROLE_NOT_ASSIGNED_OR_SESSION_NOT_READY:'+expectedRole);
   const roleSelected=await p.evaluate(role=>Orbit.session.set(role)===true,who.activeRole);
   need(roleSelected,'B4_003_INBOX_ROLE_SELECTION_REJECTED:'+expectedRole);
-  await bootProduct(p,token);
+  await p.goto(target+'/#/inicio',{waitUntil:'domcontentloaded',timeout:60000});await bootProduct(p,token);
   const sessionReady=await p.waitForFunction(role=>{
     const raw=String(Orbit.session&&typeof Orbit.session.rol==='function'?Orbit.session.rol():'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_+|_+$/g,'');
     return raw===role;

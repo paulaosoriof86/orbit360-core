@@ -1,0 +1,39 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_SHARED_INBOX_ROLE_RELOAD_LIFECYCLE_ROOTFIX_V1",
+  "recordedAt": "2026-10-08T22:32:00Z",
+  "status": "PROOF_ROOTFIXED_PENDING_EXACT_PREVIEW",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "parentHead": "4e6f8579da823650952cbf47840f6415617cfea0",
+  "failedRun": {
+    "id": 37853808780,
+    "jobId": 113573052115,
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-37853808780-v5tunzoh.web.app",
+    "failure": "B4_003_INBOX_ROLE_NOT_ASSIGNED_OR_SESSION_NOT_READY:asesor",
+    "stage": "Upsells/Leads/Ops shared inbox",
+    "cleanupWrites": 35,
+    "syntheticFinalAbsent": true,
+    "liveByteStable": true
+  },
+  "cause": {
+    "classification": "QA_SESSION_BOOT_ORDER_INVALID",
+    "detail": "Assigned roles become available during product activation. The prior harness attempt waited for them before activation.",
+    "productRegression": false
+  },
+  "correction": {
+    "path": "tools/gravicentra-i6-5-b4-003-preview-proof.mjs",
+    "previousBlobSha": "ba77f1fb667018012edda520595f6e74e619c3e0",
+    "correctedBlobSha": "6424f83c52c10fa655f56f1a64dae0536d1f35e7",
+    "scope": "Activate to hydrate assigned roles, select the exact role through Orbit.session.set, reload Inicio in the same authenticated context, reactivate, and then assert recipient-aware startup landing."
+  },
+  "boundaries": {
+    "productSourceChanged": false,
+    "roleMutation": false,
+    "dataMutation": false,
+    "businessWrites": false,
+    "syntheticQaWritesThisCommit": false,
+    "livePromotion": false,
+    "reimport": false
+  },
+  "nextAction": "B4_003_R20_CONTRACT_AND_EXACT_PREVIEW"
+}
