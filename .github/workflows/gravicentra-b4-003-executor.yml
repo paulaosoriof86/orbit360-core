@@ -16,6 +16,7 @@ on:
     paths:
       - '.github/workflows/gravicentra-b4-003-executor.yml'
       - 'tools/gravicentra-i6-5-b4-003-preview-proof.mjs'
+      - 'tools/gravicentra-i6-5-b4-003-renewals-priority-preview-proof.mjs'
       - 'tools/gravicentra-i6-5-b4-003-contract.mjs'
       - 'tools/gravicentra-i6-5-b4-003-knowledge-contract.mjs'
       - 'tools/gravicentra-i6-5-b4-003-renewal-deterministic-apply.mjs'
@@ -153,13 +154,33 @@ jobs:
             && l.boundaries?.dataMutationAuthorized===true
             && l.boundaries?.reimportAuthorized===false
             && l.boundaries?.livePromotionAuthorized===false;
+          const rp=l.renewalsPriorityPreviewAuthorization||{};
+          const renewalsPreview=c.nextAction==='I6_5_FORENSIC_REMEDIATION_B4_003_RENEWALS_PRIORITY_EXACT_PREVIEW'
+            && c.currentB4?.status==='B4_003_RENEWALS_PRIORITY_EXACT_PREVIEW_AUTHORIZED'
+            && c.i65ForensicRemediationPlan?.b4?.status==='B4_003_RENEWALS_PRIORITY_EXACT_PREVIEW_AUTHORIZED'
+            && l.status==='B4_003_RENEWALS_PRIORITY_EXACT_PREVIEW_AUTHORIZED'
+            && l.activeFinding?.id==='B4-003'
+            && rp.status==='AUTHORIZED_PENDING_PREVIEW'
+            && rp.decisionPackBlobSha==='43f2c791861a7f5489e34253728acb60c6313f18'
+            && rp.authorizationBlobSha==='fc12772894e08c80757b53abdcb6cdc31ab7fad8'
+            && l.boundaries?.productMutationAuthorized===false
+            && l.boundaries?.businessWritesAuthorized===false
+            && l.boundaries?.syntheticQaWritesAuthorized===false
+            && l.boundaries?.dataMutationAuthorized===false
+            && l.boundaries?.buildDispatchAuthorized===true
+            && l.boundaries?.previewMutationAuthorized===true
+            && l.boundaries?.functionDeploymentAuthorized===true
+            && l.boundaries?.providerDeploymentAuthorized===true
+            && l.boundaries?.reimportAuthorized===false
+            && l.boundaries?.livePromotionAuthorized===false;
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'renewals_preview='+(renewalsPreview?'true':'false')+'\n');
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'run='+(previewOk?'true':'false')+'\n');
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'apply='+(applyOk?'true':'false')+'\n');
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'r20_dryrun='+(r20DryRun?'true':'false')+'\n');
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'r20_apply='+(r20Apply?'true':'false')+'\n');
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'r20_cutoff_apply='+(r20CutoffApply?'true':'false')+'\n');
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'r20_second_dryrun='+(secondReviewDryRun?'true':'false')+'\n');
-          console.log('B4_003_PREVIEW_MODE='+(previewOk?'RUN':'NOOP')+' APPLY_MODE='+(applyOk?'RUN':'NOOP')+' R20_DRYRUN_MODE='+(r20DryRun?'RUN':'NOOP')+' R20_APPLY_MODE='+(r20Apply?'RUN':'NOOP')+' R20_CUTOFF_APPLY='+(r20CutoffApply?'RUN':'NOOP')+' R20_SECOND_DRYRUN='+(secondReviewDryRun?'RUN':'NOOP'));
+          console.log('B4_003_PREVIEW_MODE='+(previewOk?'RUN':'NOOP')+' RENEWALS_PRIORITY_PREVIEW='+(renewalsPreview?'RUN':'NOOP')+' APPLY_MODE='+(applyOk?'RUN':'NOOP')+' R20_DRYRUN_MODE='+(r20DryRun?'RUN':'NOOP')+' R20_APPLY_MODE='+(r20Apply?'RUN':'NOOP')+' R20_CUTOFF_APPLY='+(r20CutoffApply?'RUN':'NOOP')+' R20_SECOND_DRYRUN='+(secondReviewDryRun?'RUN':'NOOP'));
           NODE
 
 
@@ -531,7 +552,7 @@ jobs:
           git push origin "HEAD:$GITHUB_REF_NAME"
 
       - name: Snapshot preexisting LIVE binding before exact Preview
-        if: steps.gate.outputs.run == 'true'
+        if: steps.gate.outputs.run == 'true' || steps.gate.outputs.renewals_preview == 'true'
         env:
           LIVE_DRIFT_OUT: ${{ runner.temp }}/b4-003-preview-live-before.json
         run: node tools/gravicentra-live-preexisting-drift-snapshot.mjs --mode=snapshot
@@ -576,8 +597,18 @@ jobs:
           node tools/gravicentra-i6-5-b4-003-knowledge-contract.mjs | tee "$RUNNER_TEMP/b4-003-knowledge-contract.json"
           node tools/gravicentra-quote-authority-contract-v1.mjs | tee "$RUNNER_TEMP/b4-003-quote-authority-contract.json"
 
+      - name: Validate focused Renewals priority proof
+        if: steps.gate.outputs.renewals_preview == 'true'
+        run: |
+          set -euo pipefail
+          node --check tools/gravicentra-i6-5-b4-003-renewals-priority-preview-proof.mjs
+          node --check orbit360-platform/modules/renovaciones.js
+          node --check orbit360-platform/modules/renewals-v1200-operational-bridge.js
+          node --check orbit360-platform/modules/renewals-v1200-permission-guard.js
+          node --check orbit360-platform/modules/renewals-v1201-issued-filter.js
+
       - name: Prepare Firebase and browser dependencies
-        if: steps.gate.outputs.run == 'true'
+        if: steps.gate.outputs.run == 'true' || steps.gate.outputs.renewals_preview == 'true'
         run: |
           set -euo pipefail
           ROOT="$RUNNER_TEMP/b4-003-auth"
@@ -625,7 +656,7 @@ jobs:
           retry_bounded 600 npx playwright install --with-deps chromium
 
       - name: Resolve public web config
-        if: steps.gate.outputs.run == 'true'
+        if: steps.gate.outputs.run == 'true' || steps.gate.outputs.renewals_preview == 'true'
         run: |
           set -euo pipefail
           node "$FIREBASE_CLI_BIN" apps:list WEB --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/apps-b4-003.json"
@@ -642,7 +673,7 @@ jobs:
           echo "PUBLIC_CONFIG_FILE=$RUNNER_TEMP/public-config-b4-003.json" >> "$GITHUB_ENV"
 
       - name: Materialize immutable B4-003 package
-        if: steps.gate.outputs.run == 'true'
+        if: steps.gate.outputs.run == 'true' || steps.gate.outputs.renewals_preview == 'true'
         id: build
         run: |
           set -euo pipefail
@@ -659,7 +690,7 @@ jobs:
           NODE
 
       - name: Deploy exact B4-003 Preview write backends
-        if: steps.gate.outputs.run == 'true'
+        if: steps.gate.outputs.run == 'true' || steps.gate.outputs.renewals_preview == 'true'
         run: |
           set -euo pipefail
           FROOT="$RUNNER_TEMP/b4-003-functions"
@@ -671,7 +702,7 @@ jobs:
           printf '{"status":"DEPLOYED_EXACT_PREVIEW_ONLY","sourceSha":"%s","backendSourceDigest":"%s","functions":["orbit360ProductOperationalCommandPreview","orbit360ProductAssetUploadPreview","orbit360ProductAssetReadPreview","orbit360OpsLeadsCommandPreview","orbit360DocumentDriveStatusPreview","orbit360DocumentDriveUploadPreview","orbit360DocumentDriveListFolderPreview","orbit360DocumentDriveReadDossierPreview","orbit360DocumentDriveReadPreview","orbit360DocumentDriveDownloadPreview","orbit360DocumentDriveFinalizePreview","orbit360DocumentDriveQuarantinePreview","orbit360DocumentDriveBootstrapPreview","orbit360DocumentDriveCleanupPreview","orbit360TenantDomainConfigPreview","orbit360AssignableAdvisorRosterPreview","orbit360GetAdvisorOpsInboxPreview","orbit360UpdateAdvisorOpsInboxStatePreview"],"productionFunctionsDeployed":false,"realBusinessWritesAuthorized":false}\n' "$CANDIDATE_SOURCE_SHA" "${{ steps.build.outputs.backend_source_digest }}" > "$RUNNER_TEMP/b4-003-package/evidence/b4-003-preview-backend-binding.json"
 
       - name: Deploy exact package to isolated Preview
-        if: steps.gate.outputs.run == 'true'
+        if: steps.gate.outputs.run == 'true' || steps.gate.outputs.renewals_preview == 'true'
         id: preview
         run: |
           set -euo pipefail
@@ -701,7 +732,7 @@ jobs:
           echo "preview_url=$PREVIEW_URL" >> "$GITHUB_OUTPUT"
 
       - name: Exact Hosting Preview readback
-        if: steps.gate.outputs.run == 'true'
+        if: steps.gate.outputs.run == 'true' || steps.gate.outputs.renewals_preview == 'true'
         env:
           TARGET_URL: ${{ steps.preview.outputs.preview_url }}
           EXPECTED_BUILD_ID: ${{ steps.build.outputs.build_id }}
@@ -737,6 +768,16 @@ jobs:
           node tools/gravicentra-i6-5-b4-003-preview-proof.mjs
           node -e "const x=require(process.env.B4_003_PROOF_OUT),a=x.assertions||{},b=x.r13RenewalDataBlocker||{},blocked=x.status==='PASS_EXCEPT_EXPLICIT_RENEWAL_DATA_BLOCKER'&&b.blocking===true&&['REAL_RENEWABILITY_SOURCE_CONFLICT_OR_APPLY_REQUIRED','REAL_RENEWABILITY_FIELDS_UNCLASSIFIED_SOURCE_BACKED_APPLY_REQUIRED'].includes(b.code),full=x.status==='PASS',renewalOk=blocked||(a.realRenewalPipelineRepopulated===true&&a.realRenewalPipelineMatchesCanonicalEligibility===true),browserOk=(x.pageErrors||[]).length===0&&(x.unexpectedConsoleErrors||[]).length===0&&(x.unexpectedHttpErrors||[]).length===0&&a.previewGeneralWriteIsolation===true,r18Ok=['commercialDefaultNew','commercialRamoProductPlanDependent','commercialMobileResponsive','managementTypeDrivesQueue','qualityProvenanceActionable','qualityReviewTruthfulAndActionable','renewalDate45UniverseReconciled','policyEditionAwareValidation','policyMobileSearchVisible','inicioPolizasRenewalKpiParity','insurerRegistryProvenanceHuman','insurerKnowledgeActivityConverged','insurerKnowledgeMobileResponsive'].every(k=>a[k]===true),secondOk=['qualityPhoneFocusedModal','qualityPhoneDefaultCountryCode','qualityTopHorizontalScroll','collaborationUiAttachmentDurable','businessCardOpenUnder2500ms','collaborationVisualHierarchy','currentActionQueueRank','actionRequiredSolidVisual','pendingTaskAdvisorLandingLeads','inboxActionProgressVisible','inboxHumanStateUi','pendingTaskOperationsLandingOps','inboxStatePersistent','collaborationCanonicalIdentityAndTimestamp','insurerRamoProductPlanMatrix','insurerRamoCatalogMultiselect','insurerCommercialSelectionPersistent','insurerLogoOnlySemanticDiff','insurerSaveProgressImmediate','preEmissionCollaborationAttachmentDurable','insurerImportTruthfulClassificationStep','insurerImportAnalyzesContent','insurerImportUsesDependentCatalogs','insurerDriveBrowserVisible','insurerDriveBrowserFileOpen'].every(k=>a[k]===true);if((!full&&!blocked)||!browserOk||!r18Ok||!secondOk||a.quoteAuthorityContractHosted!==true||a.manualFinancialInferenceRemoved!==true||a.insurerKnowledgeVisible!==true||a.multiProductKnowledgeRoadmapVisible!==true||a.noDelayedRenewalRenderMutation!==true||a.renewalCampaignDurableReadback!==true||a.cancelationDurableReadback!==true||a.recoveryLinkagePreserved!==true||a.recoveryIdempotentRetry!==true||a.previewGeneralWriteIsolation!==true||a.cancellationProjectionConsistent!==true||a.qaResidueReadOnlyAdjudicated!==true||a.cancelCountrySwitchUnder2500ms!==true||a.cancelExplicitCanonicalTargets!==true||a.cancelCrossCountryIdentityExplicit!==true||a.policyRouteUnder2500ms!==true||a.policySearchUnder2500ms!==true||a.policyDetailUnder2500ms!==true||a.policyRefreshCoherentHydration!==true||!renewalOk||a.insurerDriveE2E!==true||a.insurerDriveReloadPersistence!==true||a.insurerDriveNoAutoEnablement!==true||a.insurerDriveSyntheticRollback!==true||a.insurerDriveFileCleanup!==true||a.cleanupComplete!==true||x.syntheticFinalAbsent!==true)process.exit(1);console.log(blocked?'B4_003_PREVIEW_PROOF=PASS_EXCEPT_EXPLICIT_RENEWAL_DATA_BLOCKER':'B4_003_PREVIEW_PROOF=PASS')"
 
+      - name: Authenticated focused Renewals priority browser proof
+        if: steps.gate.outputs.renewals_preview == 'true'
+        env:
+          B4_RENEWALS_PROOF_OUT: ${{ runner.temp }}/b4-003-renewals-priority-preview-proof.json
+          B4_PREVIEW_URL: ${{ steps.preview.outputs.preview_url }}
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-i6-5-b4-003-renewals-priority-preview-proof.mjs
+          node -e "const x=require(process.env.B4_RENEWALS_PROOF_OUT),a=x.assertions||{};const required=['b02Exact583Terminal','b02OldOpenZero','b02Recent24Untouched','authenticatedDirectionAndOperativo','coldAndWarmBounded','countriesTodosGtCo','desktop390And320','firstPaintNoPartialLeak','policyAndRenewalLabelsSeparate','kpiBucketsCanonical','noRelevantBrowserErrors'];if(x.status!=='PASS'||required.some(k=>a[k]!==true)||(x.pageErrors||[]).length||(x.consoleErrors||[]).length||(x.httpErrors||[]).length||x.writes?.realBusiness!==0||x.writes?.syntheticQa!==0||x.livePromotion!==false||x.reimport!==false)process.exit(1);console.log('B4_003_RENEWALS_PRIORITY_PREVIEW_PROOF=PASS')"
+
       - name: Freeze failed browser proof for fail-closed diagnosis
         if: failure() && steps.gate.outputs.run == 'true'
         env:
@@ -753,7 +794,7 @@ jobs:
           git push origin "HEAD:$GITHUB_REF_NAME"
 
       - name: Verify LIVE remained byte-stable during exact Preview
-        if: steps.gate.outputs.run == 'true'
+        if: always() && (steps.gate.outputs.run == 'true' || steps.gate.outputs.renewals_preview == 'true')
         env:
           LIVE_DRIFT_BEFORE: ${{ runner.temp }}/b4-003-preview-live-before.json
           LIVE_DRIFT_OUT: ${{ runner.temp }}/b4-003-preview-live-after.json
@@ -795,6 +836,22 @@ jobs:
           })().catch(e=>{console.error(e&&e.stack||e);process.exit(1);});
           NODE
 
+      - name: Upload focused Renewals immutable package and proof
+        if: always() && steps.gate.outputs.renewals_preview == 'true'
+        id: renewals_artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: gravicentra-i6-5-b4-003-renewals-priority-preview-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/b4-003-package
+            ${{ runner.temp }}/b4-003-renewals-priority-preview-proof.json
+            ${{ runner.temp }}/b4-003-preview-live-before.json
+            ${{ runner.temp }}/b4-003-preview-live-after.json
+          include-hidden-files: true
+          compression-level: 0
+          if-no-files-found: warn
+          retention-days: 30
+
       - name: Upload immutable package and proof
         if: steps.gate.outputs.run == 'true'
         id: artifact
@@ -812,6 +869,60 @@ jobs:
           compression-level: 0
           if-no-files-found: error
           retention-days: 30
+
+      - name: Freeze Renewals priority machine pass pending Paula visual
+        if: steps.gate.outputs.renewals_preview == 'true'
+        env:
+          B4_BUILD_ID: ${{ steps.build.outputs.build_id }}
+          B4_PREVIEW_URL: ${{ steps.preview.outputs.preview_url }}
+          B4_CHANNEL_ID: ${{ steps.preview.outputs.channel_id }}
+          B4_ARTIFACT_ID: ${{ steps.renewals_artifact.outputs.artifact-id }}
+          B4_ARTIFACT_DIGEST: ${{ steps.renewals_artifact.outputs.artifact-digest }}
+          B4_HOSTED_PAYLOAD_DIGEST: ${{ steps.build.outputs.hosted_payload_digest }}
+          B4_BACKEND_SOURCE_DIGEST: ${{ steps.build.outputs.backend_source_digest }}
+          B4_BUNDLE_DIGEST: ${{ steps.build.outputs.bundle_digest }}
+          B4_RENEWALS_PROOF: ${{ runner.temp }}/b4-003-renewals-priority-preview-proof.json
+        run: |
+          set -euo pipefail
+          RECEIPT="artifacts/orbit360-recovery/release-control/I6_5_B4_003_RENEWALS_PRIORITY_MACHINE_PROOF_20261008.json"
+          export RECEIPT
+          REMOTE=$(git ls-remote origin "refs/heads/$GITHUB_REF_NAME" | awk '{print $1}')
+          test "$REMOTE" = "$CANDIDATE_SOURCE_SHA"
+          node - <<'NODE'
+          const fs=require('node:fs'),p=JSON.parse(fs.readFileSync(process.env.B4_RENEWALS_PROOF,'utf8'));
+          if(p.status!=='PASS'||p.writes?.realBusiness!==0||p.writes?.syntheticQa!==0||p.livePromotion!==false||p.reimport!==false)throw Error('B4_003_RENEWALS_PRIORITY_PROOF_NOT_ACCEPTABLE');
+          const r={schema:'GRAVICENTRA_I6_5_B4_003_RENEWALS_PRIORITY_MACHINE_PROOF_V1',recordedAt:new Date().toISOString(),status:'MACHINE_PASS_PENDING_PAULA_VISUAL',findingId:'B4-003',module:'RENOVACIONES',observations:['B-01','B-02','B-03','B-04'],sourceSha:process.env.CANDIDATE_SOURCE_SHA,buildId:process.env.B4_BUILD_ID,previewUrl:process.env.B4_PREVIEW_URL,channelId:process.env.B4_CHANNEL_ID,runId:Number(process.env.GITHUB_RUN_ID),artifactId:Number(process.env.B4_ARTIFACT_ID),artifactDigest:process.env.B4_ARTIFACT_DIGEST||'',hostedPayloadDigest:process.env.B4_HOSTED_PAYLOAD_DIGEST||'',backendSourceDigest:process.env.B4_BACKEND_SOURCE_DIGEST||'',bundleDigest:process.env.B4_BUNDLE_DIGEST||'',exactHostingReadback:true,backend:p.backend,assertions:p.assertions,sessions:p.sessions,pageErrors:p.pageErrors||[],consoleErrors:p.consoleErrors||[],httpErrors:p.httpErrors||[],operationalBusinessWrites:0,syntheticQaWrites:0,additionalDataMutation:false,reimport:false,livePromoted:false,priorityRule:'RENEWALS_ADJUDICATED_FIRST_LATER_MODULE_FAILURES_DO_NOT_ERASE_PASS_UNLESS_CAUSAL',nextAction:'B4_003_RENEWALS_EXACT_PREVIEW_VISUAL'};
+          fs.writeFileSync(process.env.RECEIPT,JSON.stringify(r,null,2)+'\n');
+          NODE
+          RECEIPT_BLOB=$(git hash-object "$RECEIPT"); export RECEIPT_BLOB
+          node - <<'NODE'
+          const fs=require('node:fs'),p=process.env.B4_LOCK,o=JSON.parse(fs.readFileSync(p,'utf8'));
+          o.recordedAt=new Date().toISOString();
+          o.status='B4_003_RENEWALS_PRIORITY_MACHINE_PASS_PENDING_PAULA_VISUAL';
+          o.activeFinding={...(o.activeFinding||{}),id:'B4-003',status:o.status,blocking:true,nextAction:'B4_003_RENEWALS_EXACT_PREVIEW_VISUAL',humanVisualStatus:'PENDING_RENEWALS_PRIORITY_VISUAL'};
+          o.nextAction='B4_003_RENEWALS_EXACT_PREVIEW_VISUAL';
+          o.nextRequiredProof=['PAULA_RENEWALS_PRIORITY_VISUAL_PASS'];
+          o.renewalsPriorityPreviewAuthorization={...(o.renewalsPriorityPreviewAuthorization||{}),status:'EXECUTED_PASS',machineProofPath:process.env.RECEIPT,machineProofBlobSha:process.env.RECEIPT_BLOB,runId:Number(process.env.GITHUB_RUN_ID)};
+          o.renewalsPriorityMachineProof={status:'MACHINE_PASS_PENDING_PAULA_VISUAL',path:process.env.RECEIPT,blobSha:process.env.RECEIPT_BLOB,sourceSha:process.env.CANDIDATE_SOURCE_SHA,buildId:process.env.B4_BUILD_ID,previewUrl:process.env.B4_PREVIEW_URL,runId:Number(process.env.GITHUB_RUN_ID),artifactId:Number(process.env.B4_ARTIFACT_ID),artifactDigest:process.env.B4_ARTIFACT_DIGEST||''};
+          o.candidate={sourceSha:process.env.CANDIDATE_SOURCE_SHA,buildId:process.env.B4_BUILD_ID,previewUrl:process.env.B4_PREVIEW_URL,channelId:process.env.B4_CHANNEL_ID,runId:Number(process.env.GITHUB_RUN_ID),artifactId:Number(process.env.B4_ARTIFACT_ID),artifactDigest:process.env.B4_ARTIFACT_DIGEST||'',hostedPayloadDigest:process.env.B4_HOSTED_PAYLOAD_DIGEST||'',backendSourceDigest:process.env.B4_BACKEND_SOURCE_DIGEST||'',bundleDigest:process.env.B4_BUNDLE_DIGEST||'',exactReadback:true};
+          o.boundaries={...(o.boundaries||{}),businessWritesAuthorized:false,syntheticQaWritesAuthorized:false,productMutationAuthorized:false,dataMutationAuthorized:false,buildDispatchAuthorized:false,previewMutationAuthorized:false,functionDeploymentAuthorized:false,providerDeploymentAuthorized:false,reimportAuthorized:false,livePromotionAuthorized:false};
+          fs.writeFileSync(p,JSON.stringify(o,null,2)+'\n');
+          NODE
+          LOCK_BLOB=$(git hash-object "$B4_LOCK"); export LOCK_BLOB
+          node - <<'NODE'
+          const fs=require('node:fs'),p=process.env.CONTROL,o=JSON.parse(fs.readFileSync(p,'utf8')),b=o.i65ForensicRemediationPlan.b4;
+          const patch={status:'B4_003_RENEWALS_PRIORITY_MACHINE_PASS_PENDING_PAULA_VISUAL',activeFindingId:'B4-003',executionLockBlobSha:process.env.LOCK_BLOB,sourceSha:process.env.CANDIDATE_SOURCE_SHA,buildId:process.env.B4_BUILD_ID,previewUrl:process.env.B4_PREVIEW_URL,channelId:process.env.B4_CHANNEL_ID,runId:Number(process.env.GITHUB_RUN_ID),artifactId:Number(process.env.B4_ARTIFACT_ID),artifactDigest:process.env.B4_ARTIFACT_DIGEST||'',hostedPayloadDigest:process.env.B4_HOSTED_PAYLOAD_DIGEST||'',backendSourceDigest:process.env.B4_BACKEND_SOURCE_DIGEST||'',bundleDigest:process.env.B4_BUNDLE_DIGEST||'',exactReadback:true,productMutationAuthorized:false,dataMutationAuthorized:false,syntheticQaWritesAuthorized:false,reimportAuthorized:false,livePromotionAuthorized:false,nextAction:'B4_003_RENEWALS_EXACT_PREVIEW_VISUAL',renewalsPriorityMachineProof:{status:'MACHINE_PASS_PENDING_PAULA_VISUAL',path:process.env.RECEIPT,blobSha:process.env.RECEIPT_BLOB}};
+          Object.assign(b,patch);
+          o.currentB4={...(o.currentB4||{}),...patch,noLive:true,noReimport:true};
+          o.nextAction='I6_5_B4_003_RENEWALS_EXACT_PREVIEW_VISUAL';
+          o.canonicalAccumulationControl={...(o.canonicalAccumulationControl||{}),activeBlock:'B4',activeFindingId:'B4-003',nextAction:'B4_003_RENEWALS_EXACT_PREVIEW_VISUAL'};
+          fs.writeFileSync(p,JSON.stringify(o,null,2)+'\n');
+          NODE
+          git add "$RECEIPT" "$B4_LOCK" "$CONTROL"
+          git config user.name gravicentra-recovery-bot
+          git config user.email gravicentra-recovery-bot@users.noreply.github.com
+          git commit -m "hold(i6.5 B4-003): freeze renewals priority Preview proof"
+          git push origin "HEAD:$GITHUB_REF_NAME"
 
       - name: Freeze B4-003 machine pass pending Paula visual
         if: steps.gate.outputs.run == 'true'
@@ -907,6 +1018,6 @@ jobs:
           git push origin "HEAD:$GITHUB_REF_NAME"
 
       - name: Fail closed
-        if: failure() && steps.gate.outputs.run == 'true'
+        if: failure() && (steps.gate.outputs.run == 'true' || steps.gate.outputs.renewals_preview == 'true')
         run: echo "B4_003_FAILED_NO_REIMPORT_NO_LIVE"
 # R12 contract harness rootfix trigger 2026-10-03
