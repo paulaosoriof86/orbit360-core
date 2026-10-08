@@ -122,8 +122,8 @@ async function bootProduct(page,token){
      }catch(error){forced.error=String(error&&error.message||error);}
    };
    window.addEventListener('orbit:product-readonly-bootstrap',forceCollections);
-   const s=Orbit.productAppP0.status?.();
-   let activated=s?.started?s:null,lastActivationError='';
+   const s=Orbit.productAppP0.status?.(),preStarted=s?.started===true;
+   let activated=preStarted?s:null,lastActivationError='';
    try{
      for(let attempt=1;attempt<=6&&!activated?.started;attempt++){
        try{
@@ -140,10 +140,10 @@ async function bootProduct(page,token){
    }finally{
      window.removeEventListener('orbit:product-readonly-bootstrap',forceCollections);
    }
-   return{uid:String(c.auth.currentUser?.uid||''),started:activated?.started===true,forced,lastActivationError};
+   return{uid:String(c.auth.currentUser?.uid||''),started:activated?.started===true,preStarted,forced,lastActivationError};
  },token);
  need(state.uid&&state.started,'B4_003_PRODUCT_SESSION_NOT_STARTED');
- need(state.forced&&state.forced.called===true,'B4_003_READONLY_COLLECTION_FORCE_NOT_REACHED');
+ need(state.preStarted===true||(state.forced&&state.forced.called===true),'B4_003_READONLY_COLLECTION_FORCE_NOT_REACHED');
  return state;
 }
 async function rosterProjectionFor(browser,who,country){

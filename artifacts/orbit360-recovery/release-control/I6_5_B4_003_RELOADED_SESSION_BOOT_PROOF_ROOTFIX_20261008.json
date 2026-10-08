@@ -1,0 +1,38 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_RELOADED_SESSION_BOOT_PROOF_ROOTFIX_V1",
+  "recordedAt": "2026-10-08T22:38:00Z",
+  "status": "PROOF_ROOTFIXED_PENDING_EXACT_PREVIEW",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "parentHead": "5d456878f51021e651956e60dbbc558bea64a71f",
+  "failedRun": {
+    "id": 37854435972,
+    "jobId": 113575107229,
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-37854435972-q5fdof4g.web.app",
+    "failure": "B4_003_READONLY_COLLECTION_FORCE_NOT_REACHED",
+    "stage": "second authenticated boot after exact role reload",
+    "cleanupWrites": 35,
+    "syntheticFinalAbsent": true,
+    "liveByteStable": true
+  },
+  "cause": {
+    "classification": "QA_IDEMPOTENT_RELOAD_PRECONDITION",
+    "detail": "The second boot found productApp already started, so no new collection-force event was necessary or emitted.",
+    "productRegression": false
+  },
+  "correction": {
+    "path": "tools/gravicentra-i6-5-b4-003-preview-proof.mjs",
+    "previousBlobSha": "6424f83c52c10fa655f56f1a64dae0536d1f35e7",
+    "correctedBlobSha": "758afe01ff5631c2663d6cf7ddd42363b1c45504",
+    "scope": "Keep collection-force mandatory for first activation; accept an already-started product session on authenticated reload."
+  },
+  "boundaries": {
+    "productSourceChanged": false,
+    "dataMutation": false,
+    "businessWrites": false,
+    "syntheticQaWritesThisCommit": false,
+    "livePromotion": false,
+    "reimport": false
+  },
+  "nextAction": "B4_003_R20_CONTRACT_AND_EXACT_PREVIEW"
+}
