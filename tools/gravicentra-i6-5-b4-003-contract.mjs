@@ -245,7 +245,7 @@ need(/GENERAL_PREVIEW_COMMAND='orbit360ProductOperationalCommandPreview'/.test(s
 need(/previewGeneral\?GENERAL_PREVIEW_COMMAND:GENERAL_COMMAND/.test(store),'B4_003_GENERAL_PREVIEW_ROUTING_MISSING');
 need(/previewGeneral\?'us-east1':'us-central1'/.test(store),'B4_003_GENERAL_PREVIEW_REGION_MISSING');
 need(/b4003qa/.test(opBackend)&&/__syntheticQa/.test(opBackend),'B4_003_PREVIEW_SYNTHETIC_GUARD_MISSING');
-need(/modules\/renovaciones\.js\?v=20261007-r20f1/.test(index),'B4_003_BASE_CACHE_BINDING_MISSING');
+need(/modules\/renovaciones\.js\?v=20261008-r20-uat-recovery/.test(index),'B4_003_BASE_CACHE_BINDING_MISSING');
 need(/renewals-v1200-operational-bridge\.js\?v=20261005-r17/.test(index),'B4_003_BRIDGE_CACHE_BINDING_MISSING');
 need(/renewals-v1200-permission-guard\.js\?v=20261003-b4003r2/.test(index),'B4_003_PERMISSION_CACHE_BINDING_MISSING');
 need(/renewals-v1201-issued-filter\.js\?v=20261003-b4003r2/.test(index),'B4_003_ISSUED_CACHE_BINDING_MISSING');
