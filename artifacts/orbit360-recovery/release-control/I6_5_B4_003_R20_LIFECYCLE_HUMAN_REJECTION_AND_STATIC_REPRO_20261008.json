@@ -1,0 +1,101 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R20_RENEWAL_LIFECYCLE_HUMAN_REJECTION_STATIC_REPRO_V1",
+  "date": "2026-10-08",
+  "status": "HUMAN_BUSINESS_LOGIC_REJECTED_SOURCE_CAUSE_REPRODUCED_PENDING_CANONICAL_LIVE_READONLY_LINEAGE",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "observedHead": "3a7f40a6999e6689206347986194f2952b96732b",
+  "gate": "I6.5/B4-003",
+  "existingFindingIds": [
+    "B4-003",
+    "B4-003-R15-07-RENEWALS-BUSINESS-COMPLETENESS"
+  ],
+  "newFindingIdsCreated": 0,
+  "humanDecision": "RENEWALS_LOAD_PASS / BUSINESS_LOGIC_FAIL / HUMAN_ACCEPTANCE_PENDING",
+  "priorMachineProof": {
+    "runId": 37869818151,
+    "sourceSha": "90ff0354e936bbaedc921c82408d3b37e9688909",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_MACHINE_PROOF_20261007.json",
+    "machinePassIsNotHumanAcceptance": true
+  },
+  "businessPriorityLock": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PAULA_RELEASE_PRIORITY_FREEZE_20261008.json",
+  "sourceReproduction": {
+    "sourcePath": "orbit360-platform/modules/renovaciones.js",
+    "gitBlobSha": "de7451777a800374c806ab027cad05e92946fd57",
+    "rootCause": "renewalPipelineCandidate on expired policies accepts all states except cancelada/anulada when renovadaPor/renovacionEstado terminal linkage is absent; thus old Renovada/Histórica editions may be shown as overdue pending commercial renewals.",
+    "syntheticFixtureDate": "2026-10-08",
+    "actualProductionSourceFunctionExecuted": true,
+    "realFirestoreReadInThisDiagnostic": false,
+    "syntheticIncorrectlyIncludedIds": [
+      "70682-2025",
+      "91-2025",
+      "10738-2025"
+    ],
+    "historicalUnverifiedIncludedId": "401-historical",
+    "expiredPersistedVigenteIncludedIds": [
+      "AUTO-Oct6",
+      "AUTO-Oct7"
+    ],
+    "explicitCancelExcluded": true,
+    "limitation": "Synthesized same-number successor editions are NOT proof of actual canonical linked Firestore identities; no policy is classified renewed solely from number/status."
+  },
+  "secondaryCausalSourceFindings": [
+    {
+      "path": "orbit360-platform/modules/renewals-v1200-operational-bridge.js",
+      "gitBlobSha": "b44695f05170b4406740ed7158b47e6464916d8f",
+      "finding": "Operational active() uses restrictive expired status criteria unlike Kanban, and cotizarDirecto lacks active() guard."
+    },
+    {
+      "path": "orbit360-platform/modules/cliente360.js",
+      "gitBlobSha": "58f9c1469e50b0e27fb0fcea7c8a6d613ce8f320",
+      "finding": "tabPolizas raw p.forma interpolation displays undefined when absent; formaPago/frecuencia must be projected semantically without invented payment values."
+    },
+    {
+      "path": "orbit360-platform/modules/cancelaciones.js",
+      "gitBlobSha": "2aa1a3bedd835bb3d09313a6d8de46f210b60796",
+      "finding": "Sin motivo registrado is currently included as principal cancellation reason; must be treated as missing historical evidence, not a business cause. Preserve reason editing and WhatsApp draft UI."
+    }
+  ],
+  "requiredRealRecordCases": [
+    "70682",
+    "91-0169567",
+    "401011234470",
+    "10738",
+    "AUTO-1000000334",
+    "AUTO38446"
+  ],
+  "autoRenewalFinding": "INCONCLUSIVE",
+  "autoRenewalLimit": "No read-only audit of actual Firestore creation actors/timestamps/workflows in this receipt; previous 1415 classification and 583 cutoff dispositions do not imply renewal creation.",
+  "pastDataMutationReceiptsPreserved": {
+    "renewabilityClassificationWrites": 1415,
+    "expiredCutoffDispositionWrites": 583,
+    "repeatAuthorized": false
+  },
+  "preserveKanban": [
+    "Vencidas",
+    "Esta quincena 0-15 días",
+    "Próximas 16-45 días",
+    "Horizonte 46-90 días"
+  ],
+  "preserveCancellations": {
+    "historicalMissingReasonCountObserved": 489,
+    "noHistoricalBackfill": true,
+    "noWhatsAppDeliveryAssumption": true
+  },
+  "authorityReconciliation": {
+    "controlPlaneReportedHumanStatus": "PENDING_R20_TARGETED_VISUAL",
+    "updatedHumanDecision": "REJECTED_BUSINESS_LOGIC",
+    "mismatch": "This receipt freezes supplementary evidence only; Control Plane, ledger and carry-forward have NOT yet been reconciled/closed.",
+    "productMutationAuthorizedAtObservedHead": false,
+    "authorizationRule": "No product source edit, build/deploy, real operational write or LIVE promotion until physical gate/lock authorization and read-only lineage proof."
+  },
+  "boundaries": {
+    "productSourceChanged": false,
+    "controlPlaneChanged": false,
+    "operationalDataWrites": 0,
+    "deploys": 0,
+    "reimports": 0,
+    "livePromotion": false
+  },
+  "nextAction": "Reconcile Control Plane/ledger/carry-forward and freeze an authorized read-only per-policy lineage/auto-renew audit inside B4-003; then authorize minimal causal source fix and exact synthetic QA/Preview."
+}
