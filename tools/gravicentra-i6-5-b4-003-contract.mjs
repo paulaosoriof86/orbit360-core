@@ -437,6 +437,8 @@ need(comp.r20CumulativeSourceFix?.status==='SOURCE_FIXED_R20_PENDING_CONTRACT_AN
 need(index.includes('modules/polizas.js?v=20261004-b4003r14-i65-20261008-lineage-r20-perf-role-scope-20261008')
   &&index.includes('modules/renovaciones.js?v=20261008-r20-uat-recovery-i65-20261008-lineage-p1-r20-perf-role-scope-20261008'),
   'B4_003_R20_POLICY_AND_RENEWALS_CACHE_BUST_BINDING_MISSING');
+need(base.includes('data-renewal-search-input')&&base.includes('data-renewal-search-state')&&base.includes('visibleCols.map')&&previewProof.includes('renewalSearchKanbanPositiveNegativeClear'),'B4_003_RENEWAL_SEARCH_EXACT_KANBAN_CONTRACT_MISSING');
+need(index.includes('refreshFlight')&&index.includes('inboxScope()')&&index.includes('data-inbox-render-count')&&previewProof.includes('B4_003_INBOX_AUTHENTICATED_CARD_NOT_VISIBLE'),'B4_003_INBOX_STALE_REFRESH_DISCRIMINANT_MISSING');
 need(index.includes('class="inbox-toolbar" style="flex-wrap:wrap')&&index.includes('class="inbox-card-actions" style="flex-wrap:wrap"'),
  'B4_003_INBOX_320_VIEWPORT_FLEX_WRAP_MISSING');
 

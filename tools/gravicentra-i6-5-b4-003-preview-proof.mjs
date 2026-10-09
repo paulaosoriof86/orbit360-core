@@ -206,7 +206,13 @@ async function inboxUiFor(browser,who,eventId,expectedSurface,stateAction){
   await p.click('#ops-inbox-bell');
   await p.waitForSelector('#ops-inbox-drawer.open',{timeout:10000});
   const selector='[data-notice-event="'+eventId.replace(/"/g,'')+'"]';
-  await p.waitForSelector(selector,{timeout:10000});
+  try{await p.waitForSelector(selector,{timeout:10000});}catch(error){
+   const diagnostics=await p.evaluate(id=>{
+     const d=document.getElementById('ops-inbox-drawer'),cards=Array.from(d?.querySelectorAll('[data-notice-event]')||[]),el=cards.find(x=>x.getAttribute('data-notice-event')===id),style=el?getComputedStyle(el):null;
+     return{route:String(location.hash||''),role:String(Orbit.session?.rol?.()||''),drawerOpen:!!d?.classList.contains('open'),count:String(d?.querySelector('.inbox-active-count')?.innerText||''),renderCount:d?.querySelector('[data-inbox-render-count]')?.dataset.inboxRenderCount||'',visibleIds:cards.map(x=>x.dataset.noticeEvent).slice(0,30),cardFound:!!el,cardCssDisplay:style?.display||'',cardVisibility:style?.visibility||'',drawerHeight:d?.clientHeight||0,scrollHeight:d?.scrollHeight||0,message:String(d?.querySelector('.empty')?.innerText||'')};
+   },eventId);
+   throw new Error('B4_003_INBOX_AUTHENTICATED_CARD_NOT_VISIBLE:'+JSON.stringify(diagnostics)+'|'+String(error.message||error));
+ }
   const header=await p.evaluate(sel=>{const d=document.getElementById('ops-inbox-drawer'),count=d?.querySelector('.inbox-active-count'),r=count?.getBoundingClientRect();return{countText:String(count?.innerText||'').replace(/\s+/g,' ').trim(),countLeft:r?.left||0,drawerLeft:d?.getBoundingClientRect().left||0,drawerWidth:d?.getBoundingClientRect().width||0};},selector);
   let pendingSeen=false;
   if(stateAction){
@@ -918,6 +924,21 @@ try{
  },ids);
  need(JSON.stringify(proof.r18RenewalDisposition.approvedBuckets)===JSON.stringify(['vencidas','d15','d45','d90'])&&proof.r18RenewalDisposition.parallelDispositionAbsent===true&&proof.r18RenewalDisposition.pending>=1&&proof.r18RenewalDisposition.unknownInKanban===true&&proof.r18RenewalDisposition.unknownBadge===true&&proof.r18RenewalDisposition.unknownReview===true&&JSON.stringify(proof.r18RenewalDisposition.date45VisibleIds)===JSON.stringify(proof.r18RenewalDisposition.date45ExpectedIds),'B4_003_R20_RENEWAL_KANBAN_RECONCILIATION_FAILED:'+JSON.stringify(proof.r18RenewalDisposition));
  need(proof.r18RenewalDisposition.expiredPipelineCount===proof.r18RenewalDisposition.buckets.find(x=>x.key==='vencidas').count&&proof.r18RenewalDisposition.expiredHistoricalCount>=proof.r18RenewalDisposition.expiredPipelineCount&&/vigencias vencidas[\s\S]*Kanban/i.test(proof.r18RenewalDisposition.noteText),'B4_003_R20_RENEWAL_EXPIRED_KPI_SEMANTICS_FAILED:'+JSON.stringify(proof.r18RenewalDisposition));
+ // B4-003: functional renewal search in the approved four-column Kanban.
+ const searchNumber=await page.evaluate(id=>String(Orbit.store?.get?.('polizas',id)?.numero||''),ids.unknownRenewPolicy);
+ need(searchNumber.length>0,'B4_003_RENEWAL_SEARCH_SOURCE_ROW_MISSING');
+ await page.fill('[data-renewal-search-input]',searchNumber);
+ await page.waitForFunction(id=>!!document.querySelector('[data-renewal-search-state="ready"]')&&!!document.querySelector('[data-renewal-policy="'+id+'"]'),ids.unknownRenewPolicy,{timeout:15000});
+ const renewalSearchPositive=await page.evaluate(()=>({columns:document.querySelectorAll('[data-renewal-bucket]').length,shown:Number(document.querySelector('[data-renewal-search-shown]')?.dataset.renewalSearchShown),total:Number(document.querySelector('[data-renewal-search-total]')?.dataset.renewalSearchTotal),cards:document.querySelectorAll('[data-renewal-policy]').length}));
+ need(renewalSearchPositive.columns===4&&renewalSearchPositive.cards===renewalSearchPositive.shown&&renewalSearchPositive.shown>=1,'B4_003_RENEWAL_SEARCH_POSITIVE_OR_COLUMN_DRIFT:'+JSON.stringify(renewalSearchPositive));
+ await page.fill('[data-renewal-search-input]','B4003-NOMATCH-SEARCH-TEST-20261009');
+ await page.waitForFunction(()=>!!document.querySelector('[data-renewal-search-state="ready"]')&&document.querySelectorAll('[data-renewal-policy]').length===0,null,{timeout:15000});
+ const renewalSearchNegative=await page.evaluate(()=>({columns:document.querySelectorAll('[data-renewal-bucket]').length,message:String(document.querySelector('[data-renewal-search-state="ready"]')?.innerText||'')}));
+ need(renewalSearchNegative.columns===4&&/Mostrando 0 de/.test(renewalSearchNegative.message),'B4_003_RENEWAL_SEARCH_NEGATIVE_NOT_EXPLAINED:'+JSON.stringify(renewalSearchNegative));
+ await page.click('[data-renewal-search-clear]');
+ await page.waitForFunction(id=>!!document.querySelector('[data-renewal-search-state="idle"]')&&!!document.querySelector('[data-renewal-policy="'+id+'"]'),ids.unknownRenewPolicy,{timeout:12000});
+ proof.r20RenewalSearch={positive:renewalSearchPositive,negative:renewalSearchNegative,cleared:true};
+ proof.assertions.renewalSearchKanbanPositiveNegativeClear=true;
  proof.assertions.renewalExpiredKpiSemanticsHuman=true;
  proof.assertions.renewalDate45UniverseReconciled=true;
  proof.r1604RenewabilityWorkflow=await page.evaluate(ids=>{const note=document.querySelector('[data-renewability-pending-count]'),button=document.querySelector('[data-renewability-review="'+ids.unknownRenewPolicy+'"]');return{instruction:/permanece en su columna/i.test(note?.innerText||'')&&/desde allí/i.test(note?.innerText||''),buttonLabel:String(button?.innerText||''),buttonPresent:!!button};},ids);

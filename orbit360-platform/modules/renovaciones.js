@@ -8,10 +8,12 @@ Orbit.modules.renovaciones = (function () {
   const U = Orbit.ui, q = Orbit.q, K = Orbit.kit, S = () => Orbit.store;
   const REQUIRED_DATA = ['polizas', 'clientes'];
   const OPTIONAL_ENRICHMENT_DATA = ['aseguradoras'];
+  const SEARCH_ENRICHMENT_DATA = ['aseguradoras', 'asesores', 'vehiculos'];
+  let searchText = '', searchTimer = null;
   const READINESS_BUDGET_MS = 8000;
   let readinessStartedAt = 0, readinessTimer = null, activeHost = null, refreshTimer = null;
   function ensureDataCollections() {
-    try { const store=S(); if(store&&typeof store._ensureCollections==='function') store._ensureCollections(REQUIRED_DATA.concat(OPTIONAL_ENRICHMENT_DATA)); } catch (_) {}
+    try { const store=S(); if(store&&typeof store._ensureCollections==='function') store._ensureCollections(REQUIRED_DATA.concat(OPTIONAL_ENRICHMENT_DATA, searchText.trim() ? SEARCH_ENRICHMENT_DATA : [])); } catch (_) {}
   }
   function renewalDataReadiness() {
     const store=S();
@@ -33,6 +35,28 @@ Orbit.modules.renovaciones = (function () {
     readinessTimer=setTimeout(()=>{readinessTimer=null;if(host.isConnected)render(host);},remaining+20);
   }
   function humanCollection(name){return({polizas:'pólizas',clientes:'clientes',aseguradoras:'aseguradoras'})[name]||name;}
+  /* B4-003: nunca presentar como completa una búsqueda con datos sin hidratar. */
+  const foldSearch=value=>String(value==null?'':value).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/\s+/g,' ').trim();
+  function searchHydration(){
+    if(!searchText.trim())return {state:'ready',missing:[]};
+    const store=S();if(!store||store.__productReadOnlyP0!==true||typeof store._productStatus!=='function')return {state:'ready',missing:[]};
+    const status=store._productStatus()||{},confirmed=[].concat(status.serverConfirmedCollections||[]),denied=[].concat(status.deniedCollections||[]),errors=status.snapshotErrors||{};
+    const missing=SEARCH_ENRICHMENT_DATA.filter(n=>!confirmed.includes(n));
+    if(missing.some(n=>denied.includes(n)||errors[n]))return {state:'unavailable',missing};
+    return {state:missing.length?'pending':'ready',missing};
+  }
+  function searchIndex(rows){
+    const store=S(),byId=c=>new Map((store.all(c)||[]).filter(r=>r&&r.id!=null).map(r=>[String(r.id),r]));
+    const clients=byId('clientes'),insurers=byId('aseguradoras'),advisors=byId('asesores'),vehiclesByPolicy=new Map();
+    (store.all('vehiculos')||[]).forEach(v=>{if(!v||!v.polizaId)return;const k=String(v.polizaId),a=vehiclesByPolicy.get(k)||[];a.push(v);vehiclesByPolicy.set(k,a);});
+    const index=new Map();rows.forEach(p=>{
+      const c=clients.get(String(p.clienteId||''))||{},ins=insurers.get(String(p.aseguradoraId||''))||{},advisor=advisors.get(String(p.asesorId||''))||{};
+      const vehicles=vehiclesByPolicy.get(String(p.id))||[],linked=p.vehiculoId?vehicles.find(v=>String(v.id)===String(p.vehiculoId)):null;
+      const terms=[p.numero,c.nombre,c.identificacion,ins.nombre,ins.displayName,p.ramo,p.producto,p.subramo,advisor.nombre,p.asesorNombre,p.responsableNombre,p.placa];
+      (linked?[linked]:vehicles).forEach(v=>terms.push(v.placa,v.placaNormalizada,v.placaFuente,v.identificacionRiesgo,v.marca,v.linea,v.modelo,v.anio));
+      index.set(String(p.id),foldSearch(terms.filter(Boolean).join(' ')));
+    });return index;
+  }
   const countryCode = v => String(v == null ? '' : v).trim().toUpperCase();
   const policyCountry = p => { const own=countryCode(p&&p.pais);if(own)return own;const cli=p&&p.clienteId?S().get('clientes',p.clienteId):null;return countryCode(cli&&cli.pais); };
   const selectedCountry = p => { const wanted=countryCode(Orbit.pais); return !wanted || wanted==='TODOS' || policyCountry(p)===wanted; };
@@ -181,6 +205,12 @@ Orbit.modules.renovaciones = (function () {
     clearReadinessWait();
     activeLifecycle=Orbit.renewalLifecycle.snapshot();
     const cols = buckets();
+    const searchQuery=foldSearch(searchText),searchState=searchHydration(),searchApplied=!!searchQuery&&searchState.state==='ready';
+    const searchTokens=searchQuery.split(/\s+/).filter(Boolean),searchRows=cols.flatMap(c=>c.items.map(it=>it.p));
+    const index=searchApplied?searchIndex(searchRows):null;
+    const visibleCols=cols.map(c=>({key:c.key,label:c.label,tone:c.tone,total:c.items.length,items:searchApplied?c.items.filter(it=>searchTokens.every(token=>(index.get(String(it.p.id))||'').includes(token))):c.items}));
+    const shown=visibleCols.reduce((n,c)=>n+c.items.length,0),totalResults=cols.reduce((n,c)=>n+c.items.length,0);
+    const searchHint=!searchQuery?'Escribe para buscar por póliza, cliente, aseguradora, ramo, producto, asesor o placa.':searchState.state==='pending'?'Preparando datos para buscar en todos los campos. El filtro aún no se aplicó.':searchState.state==='unavailable'?'Búsqueda completa no disponible; las tarjetas originales siguen sin filtrar.':'Mostrando '+shown+' de '+totalResults+' renovaciones en el Kanban.';
     const pendingValidation=S().where('polizas', renewalPendingValidation);
     const dispositionRows45=date45DispositionRows(),disposition45=date45Disposition();
     const totalPrima = cols.reduce((s, c) => s + c.items.filter(it=>lifecycleOf(it.p).actionable).reduce((ss, it) => ss + q.norm(it.p.prima, it.p.moneda), 0), 0),expired=expiredContext();
@@ -197,6 +227,19 @@ Orbit.modules.renovaciones = (function () {
         { label: 'Prima en juego', val: U.moneyShort(totalPrima, Orbit.q.monedaPais()), color: 'var(--ok)', foot: 'a 90 días', onclick: "location.hash='#/renovaciones'" }
       ])}
       <div class="cfg-note renewal-pipeline-note" data-renewability-pending-count="${pendingValidation.length}" data-expired-pipeline-count="${expired.pipeline}" data-expired-historical-count="${expired.historicalExpired}" style="margin:0 0 14px"><b>Pipeline de renovación por fecha</b><div class="muted" style="margin-top:5px"><b>${expired.pipeline}</b> vigencias vencidas están en el Kanban, de las cuales <b>${reviewCount}</b> tarjetas requieren verificar su estado y no permiten renovar automáticamente. <b>${unlinkedHistorical}</b> ediciones históricas tienen sucesoras posibles sin enlace formal; no se cuentan como deuda comercial ni como renovación certificada. Existen <b>${expired.historicalExpired}</b> ediciones históricas vencidas; ${expired.nonrenewable} son no renovables y ${expired.terminal} tienen disposición terminal registrada. Cada póliza pendiente permanece en su columna por vigencia y se revisa desde allí, sin crear una tabla paralela.</div></div>
+      <div class="renewal-searchbar" role="search" aria-label="Buscar renovaciones">
+        <label for="renewal-search" class="renewal-search-label">Buscar renovaciones</label>
+        <div class="renewal-search-controls"><input type="search" id="renewal-search" data-renewal-search-input aria-label="Buscar póliza, cliente, aseguradora, ramo, producto, asesor o placa" autocomplete="off" placeholder="Póliza, cliente, aseguradora, placa…" value="${U.esc(searchText)}"><button type="button" class="btn ghost sm" data-renewal-search-clear ${!searchText?'disabled':''}>Limpiar</button></div>
+        <div class="muted renewal-search-feedback" role="status" aria-live="polite" data-renewal-search-state="${!searchQuery?'idle':searchState.state}" data-renewal-search-shown="${searchApplied?shown:''}" data-renewal-search-total="${totalResults}">${U.esc(searchHint)}</div>
+      </div>
+      <style>
+        .renewal-searchbar{display:grid;gap:7px;margin-bottom:14px;padding:15px;border:1px solid var(--line);border-radius:var(--r-sm);background:var(--card)}
+        .renewal-search-label{font-weight:800;font-family:var(--f-display);font-size:13px}
+        .renewal-search-controls{display:flex;gap:9px;flex-wrap:wrap;align-items:center}
+        .renewal-search-controls input{flex:1 1 260px;min-width:0;max-width:100%;border:1px solid var(--line);border-radius:9px;padding:10px 12px;background:var(--surface);color:var(--ink);font:inherit}
+        .renewal-search-feedback{font-size:12px;overflow-wrap:anywhere}
+        @media(max-width:390px){.renewal-search-controls{align-items:stretch}.renewal-search-controls input{flex-basis:100%}.renewal-search-controls button{width:100%}}
+      </style>
       <style>
         .renewal-board{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:14px;align-items:start}
         .renewal-bucket,.renewal-policy-card{min-width:0}
@@ -205,10 +248,10 @@ Orbit.modules.renovaciones = (function () {
         @media(max-width:480px){.renewal-board{grid-template-columns:minmax(0,1fr)}.renewal-card-actions>*{flex-basis:100%}.renewal-policy-card{padding:12px!important}}
       </style>
       <div class="renewal-board">
-        ${cols.map(c => `<div class="card renewal-bucket" data-renewal-bucket="${c.key}" data-renewal-bucket-count="${c.items.length}" style="min-width:0;overflow:visible">
+        ${visibleCols.map(c => `<div class="card renewal-bucket" data-renewal-bucket="${c.key}" data-renewal-bucket-count="${c.items.length}" data-renewal-bucket-total="${c.total}" style="min-width:0;overflow:visible">
           <div style="padding:12px 14px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;border-top:3px solid ${toneBg[c.tone]}">
             <b style="font-family:var(--f-display);font-size:13px">${c.label}</b>
-            <span class="badge ${c.tone === 'info' ? 'info' : c.tone}">${c.items.length}</span>
+            <span class="badge ${c.tone === 'info' ? 'info' : c.tone}">${c.items.length}${searchApplied?" de "+c.total:""}</span>
           </div>
           <div style="padding:10px;display:grid;gap:9px;max-height:560px;overflow-y:auto">
             ${c.items.map(({ p, d }) => {
@@ -242,6 +285,17 @@ Orbit.modules.renovaciones = (function () {
           </div>
         </div>`).join('')}
       </div></div>`;
+    const box=host.querySelector('[data-renewal-search-input]');
+    if(box)box.addEventListener('input',event=>{
+      searchText=event.target.value;clearTimeout(searchTimer);
+      searchTimer=setTimeout(()=>{
+        if(!activeHost||!activeHost.isConnected||!String(location.hash||'').startsWith('#/renovaciones'))return;
+        const pos=box.selectionStart;render(activeHost);
+        const input=activeHost.querySelector('[data-renewal-search-input]');if(input){input.focus();try{input.setSelectionRange(pos,pos);}catch(_){}}
+      },180);
+    });
+    const clear=host.querySelector('[data-renewal-search-clear]');
+    if(clear)clear.addEventListener('click',()=>{searchText='';clearTimeout(searchTimer);render(host);host.querySelector('[data-renewal-search-input]')?.focus();});
   }
   /* Policies + clients determine readiness; insurer directory enriches names only.
      Never publish partial policy counts while required snapshots are missing.
@@ -249,10 +303,10 @@ Orbit.modules.renovaciones = (function () {
   window.addEventListener('orbit:store:emit', event => {
     const collection = event && event.detail && event.detail.collection || '*';
     if(collection==='*'||collection==='polizas'||collection==='clientes')Orbit.renewalLifecycle.invalidate();
-    if (collection !== '*' && !REQUIRED_DATA.includes(collection) && collection !== 'aseguradoras') return;
+    if (collection !== '*' && !REQUIRED_DATA.includes(collection) && collection !== 'aseguradoras' && !(searchText.trim() && SEARCH_ENRICHMENT_DATA.includes(collection))) return;
     if (!activeHost || !activeHost.isConnected || !String(location.hash || '').startsWith('#/renovaciones')) return;
     const busy = activeHost.querySelector('[data-renewals-loading]');
-    if (!busy && collection !== 'aseguradoras') return;
+    if (!busy && collection !== 'aseguradoras' && !searchText.trim()) return;
     if (refreshTimer) return;
     refreshTimer = setTimeout(() => {
       refreshTimer = null;

@@ -1,0 +1,45 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R20_SEARCH_INBOX_ROOTFIX_V1",
+  "recordedAt": "2026-10-09",
+  "branch": "recovery/fase-a-clean-20260831",
+  "headAtStaging": "3c7658976904e9abe0d106321cafdbf1dca723e4",
+  "gate": "I6.5/B4-003",
+  "status": "SOURCE_STAGED_STATIC_SYNTAX_PASS_AUTHENTICATED_PREVIEW_PENDING",
+  "previousFailedRunId": 37942940185,
+  "failure": "collab_mv121rbm_7r4a6 backend advisor projection success, but drawer card not visible after separate authenticated reload",
+  "demonstratedSourceDefects": [
+    "UI discarded or deferred a refresh during an inflight request; drawer did not repaint on response",
+    "active count was all unarchived including globally resolved tasks",
+    "Renewals had no visible scoped Kanban search"
+  ],
+  "correctedOwners": {
+    "orbit360-platform/index.html": "a7313de2db58b16bc1c3948dca06f0703ac31c37",
+    "orbit360-platform/modules/renovaciones.js": "dbfdf054ee7b66bb51d2815039941ff2a5e58850"
+  },
+  "qaFiles": {
+    "tools/gravicentra-i6-5-b4-003-preview-proof.mjs": "9831a674e512bf7396ce0706d0950d9c4f2119d2",
+    "tools/gravicentra-i6-5-b4-003-contract.mjs": "bddce5dcd0d39ebede430c364dc8976f3c786589"
+  },
+  "compositionBlobSha": "3330c9c4075b0d59bdb6445550b264a228f74ac0",
+  "existingFindingLinks": [
+    "B4-003-R20-B01",
+    "B4-003-R19-08-OPS-ADVISOR-HANDOFF-NOTIFICATION-GAP",
+    "B4-003-R20-V2-05-INBOX-ACTION-FEEDBACK",
+    "B4-003-R20-V2-06-INBOX-HEADER-ALIGNMENT"
+  ],
+  "renewalSearchSpec": "Number, client, insurer, ramo/product, advisor, linked vehicle risk, canonical country/role scope, 4 approved date buckets, filter clear and explicit pending/unavailable full hydration",
+  "requiredRemainingProof": [
+    "central governance guard",
+    "exact static B4-003 contract",
+    "authenticated event card render, ack/resolve reload persistence and scope",
+    "renewal search positive/negative/combined, role/country/reload/mobile",
+    "six historical policy lifecycle UAT",
+    "same immutably built Preview",
+    "Paula human visual acceptance",
+    "LIVE drift lineage remediation before any production promotion"
+  ],
+  "previouslyAcceptedEvidencePreserved": true,
+  "operationalWrites": 0,
+  "livePromotionAuthorized": false,
+  "dataImportAuthorized": false
+}
