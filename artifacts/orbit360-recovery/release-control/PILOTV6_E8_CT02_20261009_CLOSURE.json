@@ -1,0 +1,55 @@
+{
+  "schema": "GRAVICENTRA_PILOT_V6_E8_CLOSURE_V1",
+  "recordedAt": "2026-10-09T09:20:00-06:00",
+  "scenario": "E8 Calidad / Búsqueda",
+  "participant": "CT02",
+  "role": "Operativo",
+  "status": "PASS_WITH_OBSERVATIONS",
+  "exactPreview": {
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-37935549889-oji84a6s.web.app",
+    "sourceSha": "99c4a81d59c28550be4c318fc2b7600bdd43d832",
+    "buildId": "gi-i65-b4-99c4a81d59c2-57f234755dc1",
+    "runId": 37935549889
+  },
+  "humanObserved": {
+    "accessGranted": true,
+    "qualityKpisVisible": true,
+    "incompleteRecordsVisible": true,
+    "countryToValidateVisible": true,
+    "suggestedCountryWithLinkedEvidenceVisible": true,
+    "financialIntegrityComparisonVisible": true,
+    "focusedCountryCompletionFormVisible": true,
+    "focusedPhoneWhatsappFormVisible": true,
+    "sourceReasonRequiredBeforeSave": true,
+    "writeExecuted": false
+  },
+  "adjudication": {
+    "demonstrated": [
+      "detección de faltantes e inconsistencias",
+      "búsqueda y filtrado del workbench de calidad",
+      "sugerencia de país con procedencia visible",
+      "comparación prima vs calendario de cobro",
+      "rutas focales de corrección con motivo/fuente",
+      "separación entre detectar y corregir"
+    ],
+    "observations": [
+      "Las cifras globales de calidad son descriptivas del alcance visible y no se interpretan como calidad global de la empresa.",
+      "No se ejecutó ninguna corrección sobre datos reales durante el piloto.",
+      "Las diferencias prima/recibos requieren validación de la fuente propietaria antes de cualquier ajuste."
+    ],
+    "notDemonstrated": [
+      "mejora global de calidad",
+      "reducción sostenida de errores",
+      "ahorro de tiempo",
+      "efectividad de campañas de actualización"
+    ]
+  },
+  "cleanup": {
+    "required": false,
+    "writes": 0
+  },
+  "forwardOnly": {
+    "nextScenario": "E9 Portal / recursos cliente",
+    "priorScenariosReopened": false
+  }
+}
