@@ -1,0 +1,43 @@
+{
+  "schema": "GRAVICENTRA_B4_003_HUMAN_UAT_V4",
+  "date": "2026-10-08",
+  "status": "PARTIAL_ACCEPTANCE_RENEWALS_LOADING_ONLY_CANCELATIONS_OPEN",
+  "gate": "I6.5/B4-003",
+  "preview": {
+    "runId": 37862194962,
+    "sourceSha": "5f0bde5d371a9e64498e6f9e4ba18de32c557"
+  },
+  "findings": [
+    {
+      "area": "Renovaciones",
+      "result": "LOAD_VISUAL_PASS",
+      "observed": {
+        "expired": 25,
+        "d0to15": 0,
+        "d16to45": 9,
+        "d46to90": 31
+      },
+      "pending": "Verify policies labeled Renovada or Histórica still offering renewal actions against canonical renewal outcome."
+    },
+    {
+      "area": "Cancelaciones",
+      "result": "OPEN",
+      "observed": "489 cancellation rows; 489 missing reasons; reason editor absent",
+      "required": "Durable authorized reason entry and edit without inferring historical data."
+    },
+    {
+      "area": "Cancelaciones",
+      "result": "OPEN",
+      "observed": "Retention detail has no WhatsApp preparation and listing lacks multi-selection.",
+      "required": "Allow individual draft and user-controlled selection of recipients, template, editable text and manual external WhatsApp confirmation without automatic delivery claims."
+    }
+  ],
+  "guardrails": {
+    "noDataMutations": true,
+    "noReimport": true,
+    "noProduction": true,
+    "preserveB3PaymentPass": true,
+    "preserve282FindingIds": true
+  },
+  "nextAction": "B4_003_RECONCILE_UAT_AND_NARROW_SOURCE_FIX"
+}
