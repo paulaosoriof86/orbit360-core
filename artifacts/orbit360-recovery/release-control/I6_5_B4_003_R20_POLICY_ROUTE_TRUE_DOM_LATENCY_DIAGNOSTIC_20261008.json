@@ -1,0 +1,27 @@
+{
+  "schema": "GRAVICENTRA_B4_003_PERFORMANCE_DISCRIMINANT_V1",
+  "gate": "I6.5/B4-003",
+  "branch": "recovery/fase-a-clean-20260831",
+  "fromHead": "f6dc231952d25e5ed3039dbf77118f056f3bb419",
+  "failedRun": 37880581177,
+  "failedCode": "B4_003_R13_POLICY_ROUTE_TOO_SLOW:6167",
+  "rootCauseClassification": "INCONCLUSIVE_PENDING_IN_BROWSER_DOM_TIMING",
+  "analysis": "Previous assertion measured Date.now before cross-process page.evaluate and after Playwright waitForFunction/waitForSelector, which conflates actual Chrome route render latency with test harness call scheduling. Synthetic render of 1419 policies did not reproduce 6s (110ms under isolated lightweight store), but authenticated browser still must be measured.",
+  "qaPath": "tools/gravicentra-i6-5-b4-003-preview-proof.mjs",
+  "qaBlob": "77d376e6115a84abb535c54c09372a9e3c846951",
+  "changes": [
+    "Start performance.now and MutationObserver in Chrome before setting hash",
+    "Record first actual .page[data-polizas-kpi-ready] .tbl DOM insertion timestamp",
+    "Capture Chrome DOM time and external wall separately",
+    "Keep strict <2500ms for actual DOM; FAIL on missing marker, wrong route, or slow app"
+  ],
+  "boundaries": {
+    "productSourceChanged": false,
+    "controlPlaneChanged": false,
+    "firestoreWrites": 0,
+    "reimport": false,
+    "livePromotion": false,
+    "previousHumanRejectionPreserved": true
+  },
+  "nextAction": "EXACT_PREVIEW_BROWSER_QA_RETEST_IN_SAME_B4_003"
+}

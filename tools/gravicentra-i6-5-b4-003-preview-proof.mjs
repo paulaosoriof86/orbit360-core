@@ -961,12 +961,38 @@ try{
    return ['clientes','polizas','vehiculos'].every(x=>confirmed.includes(x));
  },null,{timeout:30000});
  await page.evaluate(()=>{Orbit.pais='TODOS';});
+ /* Measure first correct table paint INSIDE Chrome, preserving 2500ms.
+    The previous wall-clock number included remote Playwright scheduling latency. */
  const policyRouteStarted=Date.now();
- await page.evaluate(()=>{location.hash='#/polizas';});
+ await page.evaluate(()=>{
+   const host=document.getElementById('host');
+   if(!host)throw new Error('B4_003_POLICY_ROUTE_HOST_NOT_FOUND');
+   const marker={start:performance.now(),routeAt:null,tableAt:null,mutationCount:0};
+   window.__b4003PolicyRoutePerformance=marker;
+   const observer=new MutationObserver(()=>{
+     marker.mutationCount++;
+     if(window.Orbit?.route?.key==='polizas'&&marker.routeAt==null)marker.routeAt=performance.now();
+     if(host.querySelector('.page[data-polizas-kpi-ready="1"] .tbl')){
+       if(marker.tableAt==null)marker.tableAt=performance.now();
+       observer.disconnect();
+     }
+   });
+   observer.observe(host,{subtree:true,childList:true});
+   location.hash='#/polizas';
+ });
  await page.waitForFunction(()=>Orbit.route&&Orbit.route.key==='polizas',null,{timeout:10000});
- await page.waitForSelector('#host .tbl',{timeout:10000});
+ await page.waitForSelector('#host .page[data-polizas-kpi-ready="1"] .tbl',{timeout:10000});
  const policyRouteMs=Date.now()-policyRouteStarted;
- need(policyRouteMs<2500,'B4_003_R13_POLICY_ROUTE_TOO_SLOW:'+policyRouteMs);
+ const policyRouteBrowser=await page.evaluate(()=>{
+   const p=window.__b4003PolicyRoutePerformance||{};
+   return{domPaintMs:p.tableAt==null||p.start==null?null:Math.round(p.tableAt-p.start),
+     routeOwnerMs:p.routeAt==null||p.start==null?null:Math.round(p.routeAt-p.start),
+     mutationCount:Number(p.mutationCount||0),route:window.Orbit?.route?.key||'',
+     tableReady:!!document.querySelector('#host .page[data-polizas-kpi-ready="1"] .tbl')};
+ });
+ proof.r13PolicyRouteTiming={wallMs:policyRouteMs,browser:policyRouteBrowser,measurement:'Chrome performance.now to canonical table DOM mutation'};
+ need(policyRouteBrowser.tableReady&&policyRouteBrowser.route==='polizas'&&policyRouteBrowser.domPaintMs!=null,'B4_003_R13_POLICY_ROUTE_BROWSER_METRIC_MISSING:'+JSON.stringify(proof.r13PolicyRouteTiming));
+ need(policyRouteBrowser.domPaintMs<2500,'B4_003_R13_POLICY_ROUTE_DOM_TOO_SLOW:'+JSON.stringify(proof.r13PolicyRouteTiming));
  need((await page.locator('[data-polizas-relations-loading]').count())===0,'B4_003_R13_POLICY_ROUTE_STUCK_LOADING');
  const policySearchNumber='B4-003-REN-'+run;
  const policySearchStarted=Date.now();
