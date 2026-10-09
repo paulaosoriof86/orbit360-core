@@ -580,7 +580,7 @@
   },
   "findingLedgerBlobSha": "cd3e76daeb3ea79d081a00726a2ac9522ecf67b2",
   "continuityRegisterBlobSha": "af0dfa30b9c550a7e964479760978bfab4cc77c6",
-  "compositionLockBlobSha": "e4f2b63104682d8acd55dd72a9a3ff59b9a5ecb3",
+  "compositionLockBlobSha": "14738484ca1061f788b06cf0055f2bbd7accf97c",
   "r18SourceFix": {
     "status": "SOURCE_FIXED_R18_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_SOURCE_FIX_20261005.json",
@@ -1484,5 +1484,10 @@
     "cancelationsMotiveEditorMissing": true,
     "whatsappDraftsMissing": true,
     "renewalsLifecycleVerificationPending": true
+  },
+  "r20CancelationMotiveFix": {
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CANCELATIONS_MOTIVE_SOURCE_FIX_20261008.json",
+    "blobSha": "2b7af26cffa424394a237065e1e9bd7066d70841",
+    "status": "SOURCE_FIXED_PENDING_FULL_WHATSAPP_AND_EXACT_PREVIEW"
   }
 }

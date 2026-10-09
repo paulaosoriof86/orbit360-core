@@ -208,12 +208,12 @@
     "orbit360-platform/data/tenant-alianzas-soluciones-insurers-p10.js": "41d2e31a42dac73eb68af304d5f532897210d0ee",
     "orbit360-platform/data/tenant-config/alianzas-soluciones.aseguradoras-knowledge-summary-v20261003.js": "2000d9ea8ab67bdd37d8bf404a29a405fa6374dd",
     "orbit360-platform/data/tenant-public-branding-index.js": "dc543c463f5ecd8ea44e49156d6282113bd95db6",
-    "orbit360-platform/index.html": "b766f7513c0193b526e74b3c673161628dd84881",
+    "orbit360-platform/index.html": "424619d884e7ded826a398fedf38286a840c38c9",
     "orbit360-platform/modules/academia.js": "d27aa080eac091057310aa7c952d3093677b50f0",
     "orbit360-platform/modules/aseguradoras-v1202-import-bridge.js": "db5f012abe505c2dd27d77a47d0694868bee5348",
     "orbit360-platform/modules/aseguradoras.js": "28bb3f15a1ca20130b194bb2dd5b1d296984927d",
     "orbit360-platform/modules/calidad.js": "9245739d821d357f9486b0541b5128c070797c76",
-    "orbit360-platform/modules/cancelaciones.js": "63f6dd1bb3ffad24cf8452404dfc540f1b92e2b7",
+    "orbit360-platform/modules/cancelaciones.js": "0b27bafa4ec381bb8a409e1a2a79b198f720b803",
     "orbit360-platform/modules/cliente360.js": "58f9c1469e50b0e27fb0fcea7c8a6d613ce8f320",
     "orbit360-platform/modules/cobros-cartera-i65-closure-bridge.js": "45e95a42596a27008e67a3cd6cd4601ea8ca6cb8",
     "orbit360-platform/modules/cobros.js": "866570f35d87f8d4d7709736058831a218cb461e",
@@ -4111,5 +4111,10 @@
     "sourceSha": "5f0bde5d371a9e64498e6f9e4ba0ad08fe32c557",
     "runId": 37862194962,
     "productSourceUnchanged": true
+  },
+  "r20CancelationMotiveFix": {
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CANCELATIONS_MOTIVE_SOURCE_FIX_20261008.json",
+    "blobSha": "2b7af26cffa424394a237065e1e9bd7066d70841",
+    "status": "SOURCE_FIXED_PENDING_FULL_WHATSAPP_AND_EXACT_PREVIEW"
   }
 }

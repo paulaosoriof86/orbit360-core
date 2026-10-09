@@ -1,0 +1,16 @@
+{
+  "schema": "GRAVICENTRA_B4_003_CANCELATION_MOTIVE_SOURCE_FIX_V1",
+  "date": "2026-10-08",
+  "status": "SOURCE_FIXED_PENDING_FULL_WHATSAPP_AND_EXACT_PREVIEW",
+  "previousHead": "1ed293feb0267d1d0980e094d1f5e0b032f90811",
+  "productBlobs": {
+    "orbit360-platform/modules/cancelaciones.js": "0b27bafa4ec381bb8a409e1a2a79b198f720b803",
+    "orbit360-platform/index.html": "424619d884e7ded826a398fedf38286a840c38c9"
+  },
+  "syntax": "PASS",
+  "behavior": "Edit confirmed cancellation reason separately from recovery action with product operational durable server write; forbid real Preview writes; no inference/backfill.",
+  "qaPending": true,
+  "realDataWrites": 0,
+  "reimport": false,
+  "livePromotion": false
+}

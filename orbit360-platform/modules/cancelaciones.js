@@ -234,6 +234,14 @@ Orbit.modules.cancelaciones = (function () {
           <div class="vp-row"><span class="vp-l">Inicio de vigencia</span><span class="vp-v">${U.fmtDate(ini)}</span></div>
           <div class="vp-row"><span class="vp-l">Fecha de cancelación</span><span class="vp-v">${U.fmtDate(c.fecha)}</span></div>
         </div>
+        <div class="vp-pay" data-cancel-reason-editor="1">
+          <div class="vp-sec-t">Motivo de cancelación</div>
+          <label class="ce-l">Registrar o editar el motivo confirmado
+            <input id="cx-motivo" class="o-sel" maxlength="240" value="${U.esc(c.motivo === 'Sin motivo registrado' ? '' : (c.motivo || ''))}" placeholder="Motivo comunicado o respaldado por la fuente">
+          </label>
+          <div class="muted" style="font-size:12px;margin:7px 0">No se completa automáticamente. Guardar el motivo no cambia la acción de recuperación ni genera una gestión.</div>
+          <button class="btn ghost sm" id="cx-save-motivo" type="button">Guardar motivo</button>
+        </div>
         <div class="vp-pay">
           <div class="vp-sec-t">♻ Acción de recuperación</div>
           <select id="cx-rec" class="o-sel">${recOpts.map(o => `<option ${o === (c.recuperacion || 'Pendiente de contacto') ? 'selected' : ''}>${o}</option>`).join('')}</select>
@@ -266,6 +274,28 @@ Orbit.modules.cancelaciones = (function () {
         U.toast('No fue posible confirmar la eliminación de la cancelación.');
       }
       del.disabled = false;
+    });
+    const motivoBtn=back.querySelector('#cx-save-motivo');
+    if(motivoBtn)motivoBtn.addEventListener('click',async()=>{
+      if(motivoBtn.disabled)return;
+      if(!Orbit.access||typeof Orbit.access.can!=='function'||!Orbit.access.can('cancelaciones','edit'))return U.toast('Tu rol activo no tiene permiso para editar cancelaciones.');
+      const nuevo=String(back.querySelector('#cx-motivo').value||'').trim();
+      if(!nuevo||nuevo.length>240)return U.toast('Escribe un motivo confirmado (máximo 240 caracteres).');
+      if(nuevo===String(c.motivo||'').trim())return U.toast('El motivo no tiene cambios.');
+      if(/--/.test(location.hostname)&&!/^b4003qa_[A-Za-z0-9._:-]+$/.test(String(c.id||'')))return U.toast('Preview: cancelaciones reales protegidas. Solo se prueban registros sintéticos.');
+      if(!S().updateDurable||!S().insertDurable)return U.toast('Persistencia canónica no disponible.');
+      const old=motivoBtn.textContent;motivoBtn.disabled=true;motivoBtn.textContent='Confirmando…';
+      try{
+        if(c.__policyCancellationProjection===true){
+          const explicit=Object.assign({},c,{motivo:nuevo});
+          delete explicit.__policyCancellationProjection;
+          await S().insertDurable('cancelaciones',explicit);
+        }else await S().updateDurable('cancelaciones',c.id,{motivo:nuevo});
+        const visible=document.getElementById('host');
+        close();
+        if(visible&&Orbit.route&&Orbit.route.key==='cancelaciones')render(visible);
+        U.toast('Motivo confirmado y guardado. La recuperación no fue modificada.');
+      }catch(_e){motivoBtn.disabled=false;motivoBtn.textContent=old;U.toast('No se confirmó el motivo en el servidor; no se registró éxito.');}
     });
     back.querySelector('#cx-save').addEventListener('click', async () => {
       const save = back.querySelector('#cx-save');
