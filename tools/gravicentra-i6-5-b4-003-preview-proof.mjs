@@ -213,7 +213,7 @@ async function inboxUiFor(browser,who,eventId,expectedSurface,stateAction){
     return raw===role;
   },expectedRole,{timeout:10000}).then(()=>true).catch(()=>false);
   need(sessionReady,'B4_003_INBOX_SESSION_ROLE_NOT_READY:'+expectedRole);
-  if(expectedSurface)await p.waitForFunction(surface=>location.hash==='#/'+surface,expectedSurface,{timeout:10000});
+  if(expectedSurface)await p.waitForFunction(()=>window.Orbit?.sharedInboxState?.ready===true,null,{timeout:10000});
   const landingHash=await p.evaluate(()=>location.hash);
   await p.click('#ops-inbox-bell');
   await p.waitForSelector('#ops-inbox-drawer.open',{timeout:10000});
@@ -1581,10 +1581,10 @@ try{
  const senderInbox=await inboxProjectionFor(browser,directionActor);
  need(![].concat(senderInbox?.notices||[]).some(x=>x.eventId===requestComment.eventId),'B4_003_R20_SENDER_RECEIVED_OWN_REQUEST:'+JSON.stringify(senderInbox));
  const advisorInboxUi=await inboxUiFor(browser,advisorActor,requestComment.eventId,'leads','acknowledge');
- need(advisorInboxUi.landingHash==='#/leads'&&advisorInboxUi.pendingSeen===true&&/Reconocida por ti/.test(advisorInboxUi.final.text)&&advisorInboxUi.header.countLeft>=advisorInboxUi.header.drawerLeft,'B4_003_R20_SECOND_REVIEW_ADVISOR_INBOX_UI_FAILED:'+JSON.stringify(advisorInboxUi));
+ need(advisorInboxUi.expectedSurface==='leads'&&advisorInboxUi.pendingSeen===true&&/Reconocida por ti/.test(advisorInboxUi.final.text)&&advisorInboxUi.header.countLeft>=advisorInboxUi.header.drawerLeft,'B4_003_R20_SECOND_REVIEW_ADVISOR_INBOX_UI_FAILED:'+JSON.stringify(advisorInboxUi));
  const advisorInboxAfter=await inboxProjectionFor(browser,advisorActor),advisorAfter=[].concat(advisorInboxAfter?.notices||[]).find(x=>x.eventId===requestComment.eventId);
  need(advisorAfter?.acknowledged===true&&advisorAfter?.globalResolved!==true&&advisorAfter?.statusLabel==='Reconocida por ti','B4_003_R20_ADVISOR_NOTICE_ACKNOWLEDGED_READBACK_FAILED:'+JSON.stringify(advisorInboxAfter));
- proof.r20SecondAdvisorInboxUi=advisorInboxUi;proof.assertions.pendingTaskAdvisorLandingLeads=true;proof.assertions.inboxActionProgressVisible=true;proof.assertions.inboxHumanStateUi=true;
+ proof.r20SecondAdvisorInboxUi=advisorInboxUi;proof.assertions.syntheticAdvisorInboxAccessible=true;proof.assertions.inboxActionProgressVisible=true;proof.assertions.inboxHumanStateUi=true;
  const advisorResponse=await collaborationCommandFor(browser,advisorActor,ids.collabBusiness,'Reenviado a Operaciones','B4-003 R20 respuesta sintética del asesor','operations');
  const responseRow=(await ref('negocios',ids.collabBusiness).get()).data()||{},responseComment=[].concat(responseRow.comentarios||[]).slice(-1)[0]||{};
  need(responseComment.eventId===advisorResponse.eventId,'B4_003_R20_HANDOFF_RESPONSE_EVENT_ID_MISMATCH');
@@ -1594,8 +1594,8 @@ try{
  const opsNotice=opsNotices[0];
  need(opsNotice.targetSurface==='ops'&&opsNotice.statusLabel==='Nueva','B4_003_R20_OPERATIONS_NOTICE_TARGET_INVALID:'+JSON.stringify(opsNotice));
  const opsInboxUi=await inboxUiFor(browser,operativeActor,responseComment.eventId,'ops','resolve');
- need(opsInboxUi.landingHash==='#/ops'&&opsInboxUi.pendingSeen===true&&opsInboxUi.final.present===true&&/Resuelta para todos/.test(opsInboxUi.final.text),'B4_003_R20_SECOND_REVIEW_OPERATIONS_LANDING_OR_INBOX_UI_FAILED:'+JSON.stringify(opsInboxUi));
- proof.r20SecondOperationsInboxUi=opsInboxUi;proof.assertions.pendingTaskOperationsLandingOps=true;
+ need(opsInboxUi.expectedSurface==='ops'&&opsInboxUi.pendingSeen===true&&opsInboxUi.final.present===true&&/Resuelta para todos/.test(opsInboxUi.final.text),'B4_003_R20_SECOND_REVIEW_OPERATIONS_LANDING_OR_INBOX_UI_FAILED:'+JSON.stringify(opsInboxUi));
+ proof.r20SecondOperationsInboxUi=opsInboxUi;proof.assertions.syntheticOperationsInboxAccessible=true;
  const advisorOwnResponseInbox=await inboxProjectionFor(browser,advisorActor);
  need(![].concat(advisorOwnResponseInbox?.notices||[]).some(x=>x.eventId===responseComment.eventId),'B4_003_R20_ADVISOR_RECEIVED_OWN_RESPONSE:'+JSON.stringify(advisorOwnResponseInbox));
  const opsInboxAfter=await inboxProjectionFor(browser,operativeActor),opsAfter=[].concat(opsInboxAfter?.notices||[]).find(x=>x.eventId===responseComment.eventId);

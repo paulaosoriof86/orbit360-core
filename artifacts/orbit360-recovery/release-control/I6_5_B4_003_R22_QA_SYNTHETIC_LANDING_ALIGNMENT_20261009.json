@@ -1,0 +1,29 @@
+{
+  "schema": "GRAVICENTRA_B4_003_R22_QA_SYNTHETIC_LANDING_ALIGNMENT_V1",
+  "recordedAt": "2026-10-09",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "gate": "I6.5/B4-003",
+  "previousFailureRun": 37997046948,
+  "previousFailedProofPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_LAST_FAILED_BROWSER_PROOF_20261007.json",
+  "classification": "QA_EXPECTATION_MISMATCH_AFTER_AUTHORIZED_PRODUCT_CHANGE",
+  "rootCause": "Browser proof required synthetic QA notice to auto-redirect to Leads/Ops, conflicting with isolation of QA-only notices. It timed out in inboxUiFor before testing durable inbox actions.",
+  "qaBlobs": {
+    "tools/gravicentra-i6-5-b4-003-preview-proof.mjs": "8f6ec8f54eabe8118b1972a2b75398ed6ef24f06",
+    "tools/gravicentra-i6-5-b4-003-contract.mjs": "9db87c5c4796808358aed96ef169170470f452a1",
+    ".github/workflows/gravicentra-b4-003-executor.yml": "3adef06c4f405b7bff5f1e70fc5fbbafac2a5932"
+  },
+  "productSourceUnchanged": true,
+  "certifiedArtifactNotPatched": true,
+  "correctedSemantics": [
+    "Synthetic notices remain visible and actionable in the inbox",
+    "Synthetic notices do not automatically redirect an operator or advisor",
+    "Real new unread notifications retain their existing navigation contract",
+    "Recipient event target, recognition persistence, shared resolution and business card convergence remain mandatory"
+  ],
+  "testState": "STATIC_AND_AUTHENTICATED_PREVIEW_PENDING",
+  "humanAccepted": false,
+  "livePromoted": false,
+  "operationalWrites": 0,
+  "reimport": false
+}

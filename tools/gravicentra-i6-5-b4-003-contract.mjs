@@ -306,10 +306,12 @@ need(index.includes('Reconociendo…')&&index.includes('Resolviendo…')&&index.
   ['PERSONALLY_ARCHIVED','Dirección','#/inicio',{targetSurface:'ops',archived:true},'#/inicio'],
   ['EXPLICIT_DEEP_LINK','Dirección','#/polizas',{targetSurface:'ops'},'#/polizas'],
   ['NEW_ADVISOR','Asesor','#/inicio',{targetSurface:'leads'},'#/leads'],
+  ['QA_SYNTHETIC_OPERATIONS_NO_AUTOLAND','Operativo','#/inicio',{targetSurface:'ops',entityId:'b4003qa_business_01',message:'B4-003 R20 respuesta sintética del asesor'},'#/inicio'],
+  ['QA_SYNTHETIC_ADVISOR_NO_AUTOLAND','Asesor','#/inicio',{targetSurface:'leads',entityId:'b4003qa_business_01',message:'B4-003 R20 solicitud sintética'},'#/inicio'],
   ['WRONG_RECIPIENT','Asesor','#/inicio',{targetSurface:'ops'},'#/inicio']
  ];
  for(const [label,role,hash,row,expected] of cases){
-  const context={rows:[row],location:{hash},activeRole:()=>role,startupLandingDone:false,autoLandingSurface:''};
+  const context={rows:[row],location:{hash,hostname:'ays-orbit-360-lab--gi-test-preview.web.app'},activeRole:()=>role,startupLandingDone:false,autoLandingSurface:''};
   vm.runInNewContext(source+'; maybePendingLanding();',context,{timeout:1000});
   need(context.location.hash===expected,'B4_003_INBOX_LANDING_DISCRIMINANT_'+label+':'+context.location.hash);
   if(label==='NEW_OPERATIONS'){

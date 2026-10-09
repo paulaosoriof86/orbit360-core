@@ -9007,5 +9007,19 @@
     "sourceCandidateStillNeedsExactPreview": true,
     "priorMachineEvidenceNotHumanAcceptance": true,
     "noProductChange": true
+  },
+  "r22QaSyntheticLandingAlignment": {
+    "status": "QA_ONLY_FIXED_EXACT_PREVIEW_RETRY_REQUIRED",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R22_QA_SYNTHETIC_LANDING_ALIGNMENT_20261009.json",
+    "blobSha": "499343b1a15bc13cb9508f3391e2b10650dfe062",
+    "qaBlobs": {
+      "tools/gravicentra-i6-5-b4-003-preview-proof.mjs": "8f6ec8f54eabe8118b1972a2b75398ed6ef24f06",
+      "tools/gravicentra-i6-5-b4-003-contract.mjs": "9db87c5c4796808358aed96ef169170470f452a1",
+      ".github/workflows/gravicentra-b4-003-executor.yml": "3adef06c4f405b7bff5f1e70fc5fbbafac2a5932"
+    },
+    "previousFailureRunId": 37997046948,
+    "productSourceChanged": false,
+    "noLive": true,
+    "noReimport": true
   }
 }
