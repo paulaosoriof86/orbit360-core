@@ -91,9 +91,17 @@ Orbit.modules.renovaciones = (function () {
     }
     return{assess,rows};
   }
-  let cachedLifecycle=null,lastLifecycleSnapshotAt=0;
-  const sharedLifecycle=()=>{if(!cachedLifecycle||Date.now()-lastLifecycleSnapshotAt>1000){cachedLifecycle=renewalLifecycleSnapshot();lastLifecycleSnapshotAt=Date.now();}return cachedLifecycle;};
-  Orbit.renewalLifecycle={snapshot:sharedLifecycle,evaluate:p=>sharedLifecycle().assess(p),invalidate:()=>{cachedLifecycle=null;lastLifecycleSnapshotAt=0;}};
+  let cachedLifecycle=null,lastLifecycleSnapshotAt=0,lastLifecycleScopeKey='';
+  const sharedLifecycle=()=>{
+    const store=S(),user=Orbit.auth&&Orbit.auth.productUser||{};
+    const role=Orbit.session&&typeof Orbit.session.rol==='function'?Orbit.session.rol():'';
+    const key=[String(user.uid||''),String(role||''),String(Orbit.pais||''),String(store&&store._scopedFor||'')].join('|');
+    if(!cachedLifecycle||lastLifecycleScopeKey!==key||Date.now()-lastLifecycleSnapshotAt>1000){
+      cachedLifecycle=renewalLifecycleSnapshot();lastLifecycleSnapshotAt=Date.now();lastLifecycleScopeKey=key;
+    }
+    return cachedLifecycle;
+  };
+  Orbit.renewalLifecycle={snapshot:sharedLifecycle,evaluate:p=>sharedLifecycle().assess(p),invalidate:()=>{cachedLifecycle=null;lastLifecycleSnapshotAt=0;lastLifecycleScopeKey='';}};
   const lifecycleOf=p=>(activeLifecycle||renewalLifecycleSnapshot()).assess(p);
   const terminalRenewalOutcome = p => {
     if(!p) return true;

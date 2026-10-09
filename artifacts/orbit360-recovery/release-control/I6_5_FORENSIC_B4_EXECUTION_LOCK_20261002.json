@@ -585,7 +585,7 @@
   },
   "findingLedgerBlobSha": "1c8fdcf3d9d7a4fddb9defa01ea582cdba32c156",
   "continuityRegisterBlobSha": "48d945e51e5a10ec74dc925313b720a121ba7086",
-  "compositionLockBlobSha": "2af67aea759929ed6f72a14b85c7f0d27a802a17",
+  "compositionLockBlobSha": "60d4517687fc431f62ba8c3a1a4e22443dea6b3b",
   "r18SourceFix": {
     "status": "SOURCE_FIXED_R18_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_SOURCE_FIX_20261005.json",
@@ -1543,5 +1543,12 @@
     "visualQueuePath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PAULA_PENDING_VISUAL_REVIEW_QUEUE_20261008.json",
     "visualQueueBlobSha": "23e09e25effee711a3a1b00a4e5881482823e3ce",
     "noRealBusinessWrites": true
+  },
+  "r20ScopeAndPerformanceRootfix": {
+    "status": "SOURCE_STATIC_PASS_EXACT_CHROME_PROOF_PENDING",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_PERFORMANCE_ROLE_RESPONSIVE_CAUSAL_FIX_20261008.json",
+    "receiptBlobSha": "a95c0f0438c018051b89a648d35147a81e8b0445",
+    "qaSha": "73e60154e4c0fa6ed48e42dd27245c8102edb3a4",
+    "visualQueueBlobSha": "6126dc7c0eb239c2f4c2fb9df3057010ac2bb2eb"
   }
 }

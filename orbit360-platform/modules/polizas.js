@@ -44,9 +44,14 @@ Orbit.modules.polizas = (function () {
     return 'UNKNOWN';
   };
   const isRenewalWithin45Days = p => {
+    /* Evaluate the expensive policy-edition lineage ONLY for a real candidate.
+       Previous order rebuilt/consulted the scope-aware lifecycle for every one
+       of the 1,419 policies before rejecting historical/out-of-window rows. */
+    if (!isActivePolicy(p)) return false;
     const d = U.daysFromNow(p && (p.vigenciaFin || p.fechaFin || p.fechaVencimiento || p.finVigencia));
+    if (d == null || d < 0 || d > 45) return false;
     const lifecycle=Orbit.renewalLifecycle&&Orbit.renewalLifecycle.evaluate(p);
-    return isActivePolicy(p) && d != null && d >= 0 && d <= 45 && (!lifecycle||lifecycle.actionable||lifecycle.reviewOnly);
+    return !lifecycle || lifecycle.actionable || lifecycle.reviewOnly;
   };
   const premiumByCurrency = (policies, I) => {
     const out = {};

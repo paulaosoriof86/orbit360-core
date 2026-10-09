@@ -1,0 +1,63 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R20_POLICY_PERFORMANCE_ROLE_RESPONSIVE_CAUSAL_FIX_V1",
+  "date": "2026-10-08",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "baselineHead": "c08dfff7caecf4f6f6696656c5b490c922744cac",
+  "gate": "I6.5/B4-003",
+  "previousPreviewRunId": 37886552541,
+  "previousFailure": "B4_003_R13_POLICY_ROUTE_DOM_TOO_SLOW",
+  "evidence": {
+    "measuredBrowserDomPaintMs": 3745,
+    "approvedMaxDomPaintMsExclusive": 2500,
+    "measuredExternalWallMs": 4079,
+    "pageErrors": 0,
+    "syntheticFinalAbsent": true,
+    "readbackPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_LAST_FAILED_BROWSER_PROOF_20261007.json"
+  },
+  "demonstratedCauses": [
+    "polizas.policyMetrics.isRenewalWithin45Days unconditionally called Orbit.renewalLifecycle.evaluate before fast status/date rejection; across 1419 input policies only 17 example policies qualified, causing unnecessary expensive scoped historical lineage calculations.",
+    "Renewal lifecycle memoization stored the projection for 1s but did not include active role, user, country or module scope; synthetic role switch reproduced stale Dirección-visible rows in Asesor.",
+    "Inbox toolbar/card action buttons had no flex wrapping on narrow viewports after adding Ir a Inicio."
+  ],
+  "causalCorrections": [
+    "Fast-return on inactive or out-of-45-day policies, then evaluate lifecycle ONLY for candidates; preserves exact eligible set in 1419-row controlled test.",
+    "Scope renewal lifecycle cache by actor UID, role, country and store scope and invalidate on emissions.",
+    "Inline flex-wrap on the existing approved inbox toolbar and action grammar at narrow viewports; no new global design system."
+  ],
+  "productBlobs": {
+    "orbit360-platform/index.html": "f931dcb3d903a94cf4523f7ec8c620e9e90475fb",
+    "orbit360-platform/modules/polizas.js": "e52869f5c7b3c219a6d80f39a100827e3ad4b599",
+    "orbit360-platform/modules/renovaciones.js": "59005f74098739a37d89738ce0e5b932f5a2b832"
+  },
+  "qaBlobs": {
+    "tools/gravicentra-i6-5-b4-003-contract.mjs": "73e60154e4c0fa6ed48e42dd27245c8102edb3a4"
+  },
+  "staticTests": {
+    "policyCandidateSelectionUnchanged": true,
+    "priorLifeEvaluations": 1419,
+    "newLifeEvaluations": 17,
+    "readAmplificationReductionFactor": "83.5x",
+    "roleChangeSnapshotIsolation": "PASS",
+    "countryChangeSnapshotIsolation": "PASS",
+    "inboxLandingCases": 9,
+    "serverReadbackPositiveNegativeCases": 7,
+    "scriptsParse": "PASS"
+  },
+  "runtimeTests": {
+    "priorPreview": "FAIL_3745MS_REAL_DOM",
+    "successorExactPreview": "PENDING",
+    "humanVisual": "PENDING",
+    "production": "UNCHANGED"
+  },
+  "scope": {
+    "noOperationalDataWrites": true,
+    "noReimport": true,
+    "noHostingLive": true,
+    "noNewProject": true,
+    "noBranchChange": true,
+    "noExtraIterations": true,
+    "filesInCurrentCanonical102": true
+  },
+  "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_R20_CONTRACT_AND_EXACT_PREVIEW"
+}

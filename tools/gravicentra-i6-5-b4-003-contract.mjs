@@ -399,6 +399,44 @@ need(comp.r20CumulativeSourceFix?.status==='SOURCE_FIXED_R20_PENDING_CONTRACT_AN
  need(lifecycle.snapshot()===assessment,'B4_003_R20_LIFECYCLE_SNAPSHOT_REBUILT_PER_ROW');
 }
 
+/* R20 cumulative performance+role regression: do not repeatedly hydrate entire
+   renewal lineage from an unrelated Pólizas KPI or leak a scoped snapshot across roles. */
+{
+ const rows=Array.from({length:1419},(_,i)=>({
+   id:'perf_'+i,estado:i<17?'Vigente':(i%2?'Renovada':'Vigente'),
+   vigenciaFin:i<17?'2026-10-28':'2027-10-28'
+ }));
+ let lineageCalls=0;
+ const orbit={modules:{},store:{},kit:{},q:{},ui:{daysFromNow:d=>d==='2026-10-28'?20:385},
+   renewalLifecycle:{evaluate:()=>{lineageCalls++;return{actionable:true,reviewOnly:false};}}};
+ const context={Orbit:orbit,window:{Orbit:orbit,addEventListener:()=>{}},document:{addEventListener:()=>{}}};
+ vm.runInNewContext(policy,context,{timeout:1500});
+ const metric=orbit.modules?.polizas?.policyMetrics?.isRenewalWithin45Days;
+ need(typeof metric==='function','B4_003_POLICIES_KPI_OWNER_MISSING');
+ const eligible=rows.filter(p=>metric(p)).map(p=>p.id);
+ need(eligible.length===17&&lineageCalls===17,'B4_003_POLICY_KPI_LIFECYCLE_READ_AMPLIFICATION:'+lineageCalls);
+ need(eligible.every(id=>Number(id.slice(5))<17),'B4_003_POLICY_KPI_FAST_PRUNE_CHANGED_BUSINESS_SET');
+}
+{
+ let activeRole='direccion';
+ const baseRows=[
+  {id:'direction',numero:'D-1',clienteId:'c1',aseguradoraId:'as',pais:'GT',ramo:'VIDA',estado:'Vigente',renovable:true,vigenciaInicio:'2025-09-01',vigenciaFin:'2026-10-08'},
+  {id:'advisor',numero:'A-1',clienteId:'c1',aseguradoraId:'as',pais:'GT',ramo:'VIDA',estado:'Vigente',renovable:true,vigenciaInicio:'2025-09-01',vigenciaFin:'2026-10-08'}
+ ];
+ const store={all:col=>col==='polizas'?(activeRole==='direccion'?baseRows:baseRows.slice(1)):[],get:()=>({pais:'GT'})};
+ const orbit={pais:'GT',session:{rol:()=>activeRole},store,modules:{},kit:{},q:{},ui:{daysFromNow:()=>0}};
+ vm.runInNewContext(base,{Orbit:orbit,window:{Orbit:orbit,addEventListener:()=>{}}},{timeout:1500});
+ const direction=orbit.renewalLifecycle.snapshot();
+ activeRole='asesor';
+ const advisor=orbit.renewalLifecycle.snapshot();
+ need(direction.rows.length===2&&advisor.rows.length===1&&advisor.rows[0].id==='advisor'&&direction!==advisor,
+   'B4_003_RENEWAL_LIFECYCLE_CROSS_ROLE_CACHE_LEAK');
+ orbit.pais='CO';
+ need(orbit.renewalLifecycle.snapshot()!==advisor,'B4_003_RENEWAL_LIFECYCLE_COUNTRY_CACHE_LEAK');
+}
+need(index.includes('class="inbox-toolbar" style="flex-wrap:wrap')&&index.includes('class="inbox-card-actions" style="flex-wrap:wrap"'),
+ 'B4_003_INBOX_320_VIEWPORT_FLEX_WRAP_MISSING');
+
 need(lock.boundaries?.businessWritesAuthorized===false&&lock.boundaries?.dataMutationAuthorized===false&&lock.boundaries?.reimportAuthorized===false&&lock.boundaries?.livePromotionAuthorized===false,'B4_003_BOUNDARY_INVALID');
 need(lock.boundaries?.syntheticQaWritesAuthorized===true,'B4_003_SYNTHETIC_QA_NOT_AUTHORIZED');
 
