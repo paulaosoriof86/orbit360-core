@@ -1,0 +1,35 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R20_151_VS_56_READONLY_DISCRIMINANT_V1",
+  "date": "2026-10-09",
+  "branch": "recovery/fase-a-clean-20260831",
+  "headBefore": "c4ca0d44e850196edc1706c304a03ae770ae25ef",
+  "gate": "I6.5/B4-003",
+  "previousRun": 37936867064,
+  "previousFailure": "B4_003_R13_REAL_RENEWAL_PIPELINE_MISMATCH expected=151 visible=56",
+  "confirmedResults": {
+    "browserRouteMs": 151,
+    "browserSearchMs": 217,
+    "browserPolicyDetailMs": 149,
+    "expectedOnly": 95,
+    "visibleOnly": 0,
+    "excludedEntriesStatus": "predominantly Renovada or Histórica on past end dates",
+    "realDataWrites": 0
+  },
+  "causalUnknown": "Need distinguish data visibility/role scope, canonical terminal outcome, incomplete formal successor linkage, and independent validator mismatch. Cannot reclassify 95 prior editions by number or inferred status.",
+  "diagnosticScope": "During authorized B4 exact authenticated proof when actual and expected ids differ, record sanitized aggregates: role, selected country, scoped store cardinality, raw store cardinality, lifecycle snapshot cardinality, reasons, terminal outcomes and up to 15 safe per-ID sample summaries. Fail closed and preserve receipt.",
+  "qaFile": "tools/gravicentra-i6-5-b4-003-preview-proof.mjs",
+  "qaBlobSha": "f861878dd441f0b46d52a1a98c086ef85dec8bd8",
+  "productSourceChanged": false,
+  "controlPlaneChanged": false,
+  "previewRetestRequired": true,
+  "boundaries": {
+    "operationalWrites": 0,
+    "livePromotion": false,
+    "reimport": false,
+    "sourceMutation": false,
+    "newRepo": false,
+    "newBranch": false,
+    "noNewWorkflow": true
+  },
+  "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_R20_CONTRACT_AND_EXACT_PREVIEW"
+}

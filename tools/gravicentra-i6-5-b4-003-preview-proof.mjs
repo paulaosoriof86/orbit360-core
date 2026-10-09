@@ -1281,7 +1281,48 @@ try{
  const excludedRenewalIds=new Set([...(proof.realRenewalDistribution.excludedSyntheticIds||[]),...(proof.realRenewalDistribution.excludedQaHoldIds||[])]);
  const visibleRenewals=[...proof.r13RenewalReality.realIds].filter(id=>!excludedRenewalIds.has(id)).sort();
  if(proof.realRenewalDistribution.eligibleCount>0){
-   need(JSON.stringify(visibleRenewals)===JSON.stringify(expectedRenewals),'B4_003_R13_REAL_RENEWAL_PIPELINE_MISMATCH:'+JSON.stringify({expected:expectedRenewals.length,visible:visibleRenewals.length,expectedSample:expectedRenewals.slice(0,20),visibleSample:visibleRenewals.slice(0,20)}));
+   if(JSON.stringify(visibleRenewals)!==JSON.stringify(expectedRenewals)){
+     const visibleSet=new Set(visibleRenewals),expectedSet=new Set(expectedRenewals);
+     const expectedOnly=expectedRenewals.filter(id=>!visibleSet.has(id));
+     const visibleOnly=visibleRenewals.filter(id=>!expectedSet.has(id));
+     const diag=await page.evaluate(ids=>{
+       const all=Orbit.store?.all?.('polizas')||[],source=new Map(all.map(p=>[String(p.id||''),p]));
+       const scoped=Orbit.access&&typeof Orbit.access.scopedStore==='function'
+         ? Orbit.access.scopedStore('renovaciones').all('polizas')||[] : [];
+       const scopedIds=new Set(scoped.map(p=>String(p.id||'')));
+       const projection=Orbit.renewalLifecycle?.snapshot?.();
+       const byStatus={},byRenewalOutcome={},byProjectionReason={},missingFromStore=[];
+       const samples=[];
+       for(const id of ids){
+         const p=source.get(id);
+         if(!p){missingFromStore.push(id);continue;}
+         const stage=String(p.estado||'SIN_ESTADO'),outcome=String(p.renovacionEstado||'SIN_DISPOSICION');
+         const life=projection?.assess?.(p)||{};
+         byStatus[stage]=(byStatus[stage]||0)+1;
+         byRenewalOutcome[outcome]=(byRenewalOutcome[outcome]||0)+1;
+         byProjectionReason[life.reason||'NO_PROJECTOR']=(byProjectionReason[life.reason||'NO_PROJECTOR']||0)+1;
+         if(samples.length<15)samples.push({id,estado:stage,resultado:outcome,
+           renovable:p.renovable==null?null:p.renovable,vigenciaFin:String(p.vigenciaFin||''),
+           forwardReferencePresent:!!p.renovadaPor,reverseReferencePresent:!!p.renuevaDe,
+           scopeVisible:scopedIds.has(id),sourceActionable:life.actionable===true,
+           sourceBucketEligible:life.bucketEligible===true,sourceReason:life.reason||''});
+       }
+       return{role:Orbit.session?.rol?.()||'',country:String(Orbit.pais||''),scope:String(Orbit.access?.dataScope?.('renovaciones')||''),storeScopedFor:String(Orbit.store?._scopedFor||''),
+         productStorePolicyCount:all.length,renewalScopedPolicyCount:scoped.length,
+         projectionSnapshotCount:projection?.rows?.length||0,
+         missingFromProductStoreCount:missingFromStore.length,missingFromProductStoreIds:missingFromStore.slice(0,12),
+         byStatus,byRenewalOutcome,byProjectionReason,samples};
+     },expectedOnly);
+     proof.r13RenewalParityDiagnostic={expectedCount:expectedRenewals.length,visibleCount:visibleRenewals.length,
+       expectedOnlyCount:expectedOnly.length,visibleOnlyCount:visibleOnly.length,
+       expectedOnlyIdDigest:hash(expectedOnly),visibleOnlyIdDigest:hash(visibleOnly),browser:diag,
+       classification:'BLOCKING_UNTIL_PHYSICAL_LINEAGE_AND_SCOPE_ADJUDICATION'};
+     throw new Error('B4_003_R13_REAL_RENEWAL_PIPELINE_MISMATCH:'+JSON.stringify({
+       expected:expectedRenewals.length,visible:visibleRenewals.length,missing:expectedOnly.length,
+       extra:visibleOnly.length,reasonCounts:diag.byProjectionReason,
+       outcomeCounts:diag.byRenewalOutcome,store:diag.productStorePolicyCount,scoped:diag.renewalScopedPolicyCount,
+       snapshot:diag.projectionSnapshotCount,sample:diag.samples.slice(0,5)}));
+   }
    proof.assertions.realRenewalPipelineRepopulated=true;
    proof.assertions.realRenewalPipelineMatchesCanonicalEligibility=true;
  }else{
