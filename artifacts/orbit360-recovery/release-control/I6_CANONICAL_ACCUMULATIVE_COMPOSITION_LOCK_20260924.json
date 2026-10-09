@@ -208,7 +208,7 @@
     "orbit360-platform/data/tenant-alianzas-soluciones-insurers-p10.js": "41d2e31a42dac73eb68af304d5f532897210d0ee",
     "orbit360-platform/data/tenant-config/alianzas-soluciones.aseguradoras-knowledge-summary-v20261003.js": "2000d9ea8ab67bdd37d8bf404a29a405fa6374dd",
     "orbit360-platform/data/tenant-public-branding-index.js": "dc543c463f5ecd8ea44e49156d6282113bd95db6",
-    "orbit360-platform/index.html": "a7313de2db58b16bc1c3948dca06f0703ac31c37",
+    "orbit360-platform/index.html": "e6f2f8fc74be947effa0505881257adff77595df",
     "orbit360-platform/modules/academia.js": "d27aa080eac091057310aa7c952d3093677b50f0",
     "orbit360-platform/modules/aseguradoras-v1202-import-bridge.js": "db5f012abe505c2dd27d77a47d0694868bee5348",
     "orbit360-platform/modules/aseguradoras.js": "28bb3f15a1ca20130b194bb2dd5b1d296984927d",
@@ -4210,11 +4210,11 @@
     "status": "SOURCE_STAGED_STATIC_SYNTAX_PASS_EXACT_PREVIEW_PENDING",
     "date": "2026-10-09",
     "sourceOwners": {
-      "orbit360-platform/index.html": "a7313de2db58b16bc1c3948dca06f0703ac31c37",
+      "orbit360-platform/index.html": "e6f2f8fc74be947effa0505881257adff77595df",
       "orbit360-platform/modules/renovaciones.js": "0823cffa952a65d741dea4a20d24ceabb3eda67b"
     },
     "qaProofBlobSha": "2ac73486128b6597a3da00b12e2fdce00133b9ad",
-    "qaContractBlobSha": "0324243f6c74116b0a1f8dd1c37a05d639264a45",
+    "qaContractBlobSha": "ef45c394e9b5c07a138ea15ecc2bd3d508170205",
     "findingsLinked": [
       "B4-003-R20-B01",
       "B4-003-R19-08-OPS-ADVISOR-HANDOFF-NOTIFICATION-GAP",
@@ -4239,5 +4239,16 @@
     "finding": "RENEWALS_SEARCH_WITHIN_B4_003",
     "dataMutation": false,
     "livePromotion": false
+  },
+  "b4003R20InboxBodyRootfix": {
+    "status": "CAUSAL_TEMPLATE_SOURCE_FIXED_SYNTHETIC_DOM_DISCRIMINANT_PASS_EXACT_PREVIEW_PENDING",
+    "file": "orbit360-platform/index.html",
+    "blobSha": "e6f2f8fc74be947effa0505881257adff77595df",
+    "previousFailedRun": 37949671159,
+    "syntheticCard": true,
+    "qaContractBlobSha": "ef45c394e9b5c07a138ea15ecc2bd3d508170205",
+    "dataMutation": false,
+    "liveMutation": false,
+    "reimport": false
   }
 }

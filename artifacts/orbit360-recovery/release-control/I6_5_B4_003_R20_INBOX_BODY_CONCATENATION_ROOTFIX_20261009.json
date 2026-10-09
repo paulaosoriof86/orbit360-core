@@ -1,0 +1,36 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R20_INBOX_DOM_COMPOSITION_ROOTFIX_V1",
+  "date": "2026-10-09",
+  "headAtRootProof": "cfebc0cab12491ba41a33649d0081524e1cfa5df",
+  "branch": "recovery/fase-a-clean-20260831",
+  "gate": "I6.5/B4-003",
+  "status": "CAUSE_PROVEN_SOURCE_STAGED_STATIC_PASS_AUTHENTICATED_BROWSER_PENDING",
+  "failedRunId": 37949671159,
+  "evidence": {
+    "drawerActiveCount": 72,
+    "renderedNoticeCount": 0,
+    "eventId": "collab_mv13wkji_gphde",
+    "pageErrorsBeforeFailure": 0,
+    "sourceStaticReproduction": "Original dr.innerHTML contained header but no .inbox-list or cards even with synthetic active event.",
+    "rootCause": "MISSING_PLUS_BETWEEN_INBOX_HEADER_AND_IMP_BODY_STRING_EXPRESSION"
+  },
+  "causeLayer": "orbit360-platform/index.html",
+  "productBlobSha": "e6f2f8fc74be947effa0505881257adff77595df",
+  "contractBlobSha": "ef45c394e9b5c07a138ea15ecc2bd3d508170205",
+  "browserProofBlobSha": "2ac73486128b6597a3da00b12e2fdce00133b9ad",
+  "compositionBlobSha": "ac7477739403d0317245e23611b777e9b5e9146b",
+  "searchAlreadyAuthenticatedPassFromPriorRun": {
+    "positive": true,
+    "negative": true,
+    "clear": true
+  },
+  "noSourceDataWrites": true,
+  "productionUnchanged": true,
+  "priorApprovedWorkPreserved": true,
+  "existingFindings": [
+    "B4-003-R19-08-OPS-ADVISOR-HANDOFF-NOTIFICATION-GAP",
+    "B4-003-R20-V2-05-INBOX-ACTION-FEEDBACK",
+    "B4-003-R20-V2-06-INBOX-HEADER-ALIGNMENT"
+  ],
+  "nextRequired": "Exact Preview must show event card, acknowledge and resolve with backend readback, reload and cross-role status convergence; preserve B4-003 human acceptance gate."
+}

@@ -440,6 +440,20 @@ need(index.includes('modules/polizas.js?v=20261004-b4003r14-i65-20261008-lineage
 need(base.includes('advisorProjectionReady=')&&base.includes("n!=='asesores'||!advisorProjectionReady")&&previewProof.includes('B4_003_RENEWAL_SEARCH_TARGET_NOT_READY_OR_NOT_VISIBLE'),'B4_003_RENEWAL_SEARCH_ADVISOR_PROJECTION_READINESS_GUARD_MISSING');
 need(base.includes('data-renewal-search-input')&&base.includes('data-renewal-search-state')&&base.includes('visibleCols.map')&&previewProof.includes('renewalSearchKanbanPositiveNegativeClear'),'B4_003_RENEWAL_SEARCH_EXACT_KANBAN_CONTRACT_MISSING');
 need(index.includes('refreshFlight')&&index.includes('inboxScope()')&&index.includes('data-inbox-render-count')&&previewProof.includes('B4_003_INBOX_AUTHENTICATED_CARD_NOT_VISIBLE'),'B4_003_INBOX_STALE_REFRESH_DISCRIMINANT_MISSING');
+/* R20: Reproduce the actual string-composition failure: header count previously
+   rendered without any body/cards. Execute the source's real HTML expression. */
+{
+ const start=index.indexOf('var esc=Orbit.ui.esc,active=');
+ const end=index.indexOf("dr.querySelector('#ops-inbox-x').onclick",start);
+ need(start>=0&&end>start,'B4_003_INBOX_EFFECTIVE_TEMPLATE_OWNER_NOT_FOUND');
+ const owner=index.slice(start,end);
+ for(const [resolved,expectedActive] of [[false,1],[true,0]]){
+  const eventId='qa_inbox_card_'+(resolved?'resolved':'active');
+  const context={Orbit:{ui:{esc:value=>String(value)}},rows:[{eventId,title:'Solicitud',message:'Atención',targetType:'advisor',targetId:'qa',archived:false,globalResolved:resolved}],refreshState:'ready'};
+  vm.runInNewContext("var dr={innerHTML:''};"+owner+"; renderedHtml=dr.innerHTML;",context,{timeout:1300});
+  need(context.renderedHtml.includes('data-notice-event="'+eventId+'"')&&context.renderedHtml.includes('inbox-list')&&context.renderedHtml.includes('<b>'+expectedActive+'</b><span>activas</span>'),'B4_003_INBOX_RENDERED_BODY_MISSING_WHEN_COUNTER_PRESENT:'+eventId);
+ }
+}
 need(index.includes('class="inbox-toolbar" style="flex-wrap:wrap')&&index.includes('class="inbox-card-actions" style="flex-wrap:wrap"'),
  'B4_003_INBOX_320_VIEWPORT_FLEX_WRAP_MISSING');
 

@@ -15,26 +15,30 @@
       "id": "INBOX_HOME_AND_ATTENDANCE",
       "surface": "Tareas compartidas / Inicio",
       "route": "#/inicio",
-      "state": "SOURCE_STAGED_AUTHENTICATED_CARD_AND_STATE_RETEST_PENDING",
+      "state": "CAUSAL_INBOX_BODY_SOURCE_FIXED_SYNTHETIC_PASS_AUTHENTICATED_PREVIEW_PENDING",
       "source": "orbit360-platform/index.html",
       "blobSha": "477b9262852a3780bea5d744f748734c93695a8b",
       "whatChanged": "Only new/unread actionable items may cause the initial Ops/Leads landing; read/acknowledged/resolved/archived do not. Confirm server state before success. Show Ir a Inicio. Return to Inicio when auto-landed task queue is acknowledged/resolved. Narrow layouts wrap toolbar and action buttons instead of overflowing.",
-      "whatToVisualize": "7-count inbox icon, Reconocer para mí, Resolver para todos, Archivar para mí, Ir a Inicio; refresh and sign-in landing with new vs acknowledged notices; Direccion and Asesor.",
-      "notProven": "Rendered card, persisted acknowledgment/resolve/archive, reload and receiver roles in exact Preview not yet proven.",
+      "whatToVisualize": "Tareas compartidas: el contador de activas debe corresponder a tarjetas visibles, permitir Reconocer, Resolver y Archivar con cambios persistidos; verificar Ops y Leads después de recarga.",
+      "notProven": "Exact Preview authenticated drawer body/card rendering and acknowledgement, global resolution and reload still pending.",
       "causalReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_INBOX_AND_RENEWALS_SEARCH_ROOTFIX_20261009.json",
-      "causalReceiptBlobSha": "8b935da6307fb7c04b50404d46cad636444d4bb6"
+      "causalReceiptBlobSha": "8b935da6307fb7c04b50404d46cad636444d4bb6",
+      "causalHtmlReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_INBOX_BODY_CONCATENATION_ROOTFIX_20261009.json",
+      "causalHtmlReceiptBlobSha": "c0a7ae4c1ff1b88f628604384169036007d2c82b"
     },
     {
       "id": "OPS_LEADS_COLLABORATION_ACTION",
       "surface": "Ops y Leads",
       "route": "#/ops",
-      "state": "SOURCE_STAGED_AUTHENTICATED_CARD_AND_STATE_RETEST_PENDING",
+      "state": "CAUSAL_INBOX_BODY_SOURCE_FIXED_SYNTHETIC_PASS_AUTHENTICATED_PREVIEW_PENDING",
       "source": "orbit360-platform/core/ciclo.js",
       "whatChanged": "Existing Acción requerida (#) uses last collaboration direction; it is independent from personal inbox read acknowledgment.",
-      "whatToVisualize": "Opportunity card → open real work flow → record response/state transition → assess red action badge, cross-role inbox and reload.",
-      "notProven": "Rendered card, persisted acknowledgment/resolve/archive, reload and receiver roles in exact Preview not yet proven.",
+      "whatToVisualize": "Tareas compartidas: el contador de activas debe corresponder a tarjetas visibles, permitir Reconocer, Resolver y Archivar con cambios persistidos; verificar Ops y Leads después de recarga.",
+      "notProven": "Exact Preview authenticated drawer body/card rendering and acknowledgement, global resolution and reload still pending.",
       "causalReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_INBOX_AND_RENEWALS_SEARCH_ROOTFIX_20261009.json",
-      "causalReceiptBlobSha": "8b935da6307fb7c04b50404d46cad636444d4bb6"
+      "causalReceiptBlobSha": "8b935da6307fb7c04b50404d46cad636444d4bb6",
+      "causalHtmlReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_INBOX_BODY_CONCATENATION_ROOTFIX_20261009.json",
+      "causalHtmlReceiptBlobSha": "c0a7ae4c1ff1b88f628604384169036007d2c82b"
     },
     {
       "id": "RENEWAL_LIFECYCLE",
@@ -120,5 +124,12 @@
     "receiptBlobSha": "843bbc607b60247f2c3ef663faa4c56bd890619e",
     "sourceBlobSha": "0823cffa952a65d741dea4a20d24ceabb3eda67b",
     "noHumanApproval": true
+  },
+  "r20InboxBodyRootfix": {
+    "status": "SYNTHETIC_DOM_PASS_BROWSER_PENDING",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_INBOX_BODY_CONCATENATION_ROOTFIX_20261009.json",
+    "receiptBlobSha": "c0a7ae4c1ff1b88f628604384169036007d2c82b",
+    "sourceBlobSha": "e6f2f8fc74be947effa0505881257adff77595df",
+    "visualUatRequired": true
   }
 }
