@@ -1,6 +1,6 @@
 {
   "schema": "GRAVICENTRA_PILOT_VISUAL_EVIDENCE_INTAKE_V1",
-  "recordedAt": "2026-10-09T14:27:00-06:00",
+  "recordedAt": "2026-10-09T16:00:00-06:00",
   "purpose": "Prevent loss between pilot captures and the next synchronized Word-document update. This manifest is an intake register; restricted originals remain in the conversation evidence surface and thesis/public use requires sanitization.",
   "accumulationRule": "APPEND_ONLY / NO_DELETE / FORWARD_ONLY",
   "priorCanonicalLibrary": "BIBLIOTECA_CONOCIMIENTO_CANONICA_PILOTO_GRAVICENTRA_CURRENT_R21_UAT3_PRE_S5.docx",
@@ -343,7 +343,7 @@
     },
     {
       "scenario": "E1",
-      "status": "IN_PROGRESS_EVIDENCE_CAPTURED_WITH_NONCAUSAL_INBOX_FINDING",
+      "status": "PASS_WITH_OBSERVATIONS_MANUALS_SUBCAPABILITY_FAIL",
       "images": [
         {
           "fileId": "file_00000000e23c8230b5dc1f90e9860a0c",
@@ -404,6 +404,18 @@
           "name": "image(20261009-202554).png",
           "sha256": "f35ce17bba58bcbcc4a2eb0083d0ac01365c3230f8bc21a6e11b066f57716d29",
           "scope": "E1 induction quiz visible without answers"
+        },
+        {
+          "fileId": "file_00000000e86881f5b7ad4af485bd4de2",
+          "name": "image(20261009-215511).png",
+          "sha256": "dcdac4f978fd28002aa4d4d59a0fcb184396a3c431ec0a3396bb53813288a363",
+          "scope": "E1 Manuals list filtered for Operativo; Capacitación CRM visible"
+        },
+        {
+          "fileId": "file_00000000673881f584c2c745bb287894",
+          "name": "image(20261009-215605).png",
+          "sha256": "99d1a84c1fa16fb0bac8d320c1ca6cee68e9f1ea922a89742ab917e29001f3e8",
+          "scope": "E1 causal failure: CRM manual iframe loads raw SPA/login fallback instead of manual"
         }
       ]
     }
@@ -418,7 +430,8 @@
     "E9 portal request forms route conceptually toward Ops; external WhatsApp/email remain dependent on connected channels; document upload explicitly declares Storage/backend dependency.",
     "Insights is analytically richer than Reportes and provides managerial views, but its figures remain supplemental until source/universe reconciliations are completed; it does not cure the E4 Reportes causal findings.",
     "E1 Academia: Operativo can access a 25-course catalog and a 25-item role route; existing induction lessons and quiz are visible without requiring content edits.",
-    "E1 incidental finding: shared inbox resolution is eventId-scoped while semantic duplicates remain distinct; repeated B4-003 synthetic tasks can remain active and trigger Ops auto-landing even after a prior Resolve for all on another event."
+    "E1 incidental finding: shared inbox resolution is eventId-scoped while semantic duplicates remain distinct; repeated B4-003 synthetic tasks can remain active and trigger Ops auto-landing even after a prior Resolve for all on another event.",
+    "E1 Manuals root cause proven: the exact preview artifact omits docs/capacitacion-crm.html, so the iframe request falls through Hosting SPA rewrite to index.html and displays raw app/login markup."
   ],
   "nextSyncRule": {
     "immediate": "Block E in progress. Append E1/E3/E5/E6/E7 evidence; next synchronized Word update at Block E checkpoint before E2, unless a methodological/canonical status change requires earlier sync.",
@@ -426,7 +439,7 @@
     "exception": "If a causal finding changes methodology or evidence status before E9 closes, perform an earlier synchronized update."
   },
   "localHashInventory": {
-    "count": 60,
+    "count": 62,
     "algorithm": "sha256",
     "files": {
       "image(20261009-033223).png": "2cc4de5890c5a1ab432adbefb693afbdf1b3d7d96d6dcafedf29e15a0dd0ce1e",
@@ -488,11 +501,13 @@
       "image(20261009-202444).png": "c30714f8b15166e2a03feb72651e1fbd93188bc2611cf6d01cb7e237dbf619b4",
       "image(20261009-202504).png": "5ab17d53608486954b42f88ee4687583dce9a3064f3d7a661da14055da4b5942",
       "image(20261009-202533).png": "0d21d70389ade81cac33fe2faf10e1720477506c72daa3f267511e0072191e6d",
-      "image(20261009-202554).png": "f35ce17bba58bcbcc4a2eb0083d0ac01365c3230f8bc21a6e11b066f57716d29"
+      "image(20261009-202554).png": "f35ce17bba58bcbcc4a2eb0083d0ac01365c3230f8bc21a6e11b066f57716d29",
+      "image(20261009-215511).png": "dcdac4f978fd28002aa4d4d59a0fcb184396a3c431ec0a3396bb53813288a363",
+      "image(20261009-215605).png": "99d1a84c1fa16fb0bac8d320c1ca6cee68e9f1ea922a89742ab917e29001f3e8"
     }
   },
   "assurance": {
-    "newPilotImagesPhysicallyEnumeratedAndHashed": 60,
+    "newPilotImagesPhysicallyEnumeratedAndHashed": 62,
     "scenariosCovered": [
       "S5",
       "S6",
