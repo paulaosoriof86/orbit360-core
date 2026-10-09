@@ -94,7 +94,7 @@ async function seed(who,fixtureAdvisorId,collabAdvisorId){
  await ref('recibosEsperados',ids.healthReceiptShadow).set({...common,id:ids.healthReceiptShadow,clienteId:ids.client,polizaId:ids.healthPolicy,asesorId:fixtureAdvisorId||who.advisorId||'qa',pais:'GT',moneda:'GTQ',cuota:'1',serie:'1',fechaLimite:startS,primaTotal:271.34,montoTotal:271.34,monto:271.34,estado:'Pendiente'},{merge:false});proof.syntheticWrites++;
  await ref('cancelaciones',ids.cancelation).set({...common,id:ids.cancelation,clienteId:ids.client,polizaId:ids.cancelPolicy,asesorId:fixtureAdvisorId||who.advisorId||'qa',pais:'GT',moneda:'GTQ',fecha:startS,motivo:'Prueba sintética B4-003',valorPerdido:700,recuperacion:'Pendiente de contacto',recuperada:false},{merge:false});proof.syntheticWrites++;
  await ref('aseguradoras',ids.insurer).set({...common,id:ids.insurer,nombre:'B4 R20 Aseguradora QA',canonicalName:'B4 R20 Aseguradora QA',displayName:'B4 R20 Aseguradora QA',pais:'GT',moneda:'GTQ',activo:true,estado:'Activa',ramos:['Automóviles'],ramosDetalle:{'Automóviles':{productos:['Vehículo Liviano'],planes:[],segmento:'Estándar'}},ramosHabilitados:{'Automóviles':{cotizador:false}},docs:[],cotTasas:{},cotTasasValidadas:{},cotizadorHabilitado:false,comparativoHabilitado:false,iaHabilitada:false},{merge:false});proof.syntheticWrites++;
- await ref('negocios',ids.collabBusiness).set({...common,id:ids.collabBusiness,clienteId:ids.client,asesorId:collabAdvisorId||fixtureAdvisorId||who.advisorId||'qa',pais:'GT',moneda:'GTQ',titulo:'B4-003 QA colaboración',nombre:'B4-003 QA colaboración',etapa:'nuevo',estado:'Nuevo',origen:'Ops',comentarios:[],bitacora:[],archivado:false,previewWrite:true,previewSource:'b4003qa-harness'},{merge:false});proof.syntheticWrites++;
+ await ref('negocios',ids.collabBusiness).set({...common,id:ids.collabBusiness,clienteId:ids.client,asesorId:collabAdvisorId||fixtureAdvisorId||who.advisorId||'qa',pais:'GT',moneda:'GTQ',titulo:'B4-003 QA colaboración',nombre:'B4-003 QA colaboración',etapa:'cotizando',estado:'Cotizando',origen:'Ops',comentarios:[],bitacora:[],archivado:false,previewWrite:true,previewSource:'b4003qa-harness'},{merge:false});proof.syntheticWrites++;
  await ref('negocios',ids.collabNoClientBusiness).set({...common,id:ids.collabNoClientBusiness,asesorId:collabAdvisorId||fixtureAdvisorId||who.advisorId||'qa',pais:'GT',moneda:'GTQ',titulo:'B4-003 QA colaboración pre-emisión',nombre:'B4-003 QA colaboración pre-emisión',etapa:'cotizando',estado:'Cotizando',origen:'Leads',comentarios:[],bitacora:[],archivado:false,previewWrite:true,previewSource:'b4003qa-harness'},{merge:false});proof.syntheticWrites++;
 }
 async function applyLegal(page,who){
@@ -181,7 +181,8 @@ async function actionCardUiFor(browser,who,businessId,surface){
   }catch(error){
     const diagnostic=await p.evaluate(({businessId,surface})=>{
       const h=document.getElementById('host'),card=h?.querySelector('[data-neg="'+businessId+'"]'),app=Orbit.productAppP0?.status?.()||{},store=Orbit.store?._productStatus?.()||{},inbox=Orbit.sharedInboxState||{};
-      return{route:String(location.hash||''),wantedSurface:surface,cardPresent:!!card,kanbanCardCount:h?.querySelectorAll('[data-neg]').length||0,sharedInboxReady:inbox.ready===true,sharedInboxPublished:!!inbox.lookup,inboxScopePresent:!!inbox.scope,authenticatedMembershipReady:!!Orbit.auth?.productUser?.uid,role:String(Orbit.session?.rol?.()||''),productStarted:Orbit.productAppP0?.isStarted?.()===true,productReady:app.started===true,storeReady:store.ready===true,storeStatus:String(store.status||''),inboxBellPresent:!!document.getElementById('ops-inbox-bell')};
+      const business=Orbit.store?.get?.('negocios',businessId),st=business?.etapa||'',ops=Orbit.ciclo?.E?.[st]?.ops||null;
+       return{route:String(location.hash||''),wantedSurface:surface,businessInStore:!!business,businessStage:st,stageOpsSurface:ops,cardPresent:!!card,kanbanCardCount:h?.querySelectorAll('[data-neg]').length||0,sharedInboxReady:inbox.ready===true,sharedInboxPublished:!!inbox.lookup,inboxScopePresent:!!inbox.scope,authenticatedMembershipReady:!!Orbit.auth?.productUser?.uid,role:String(Orbit.session?.rol?.()||''),productStarted:Orbit.productAppP0?.isStarted?.()===true,productReady:app.started===true,storeReady:store.ready===true,storeStatus:String(store.status||''),inboxBellPresent:!!document.getElementById('ops-inbox-bell')};
     },{businessId,surface});
     throw new Error('B4_003_R21_ACTION_CARD_INBOX_STARTUP_READINESS_NOT_CONFIRMED:'+JSON.stringify(diagnostic)+'|'+String(error.message||error));
   }
@@ -1605,10 +1606,13 @@ try{
  proof.assertions.typedHandoffSenderExcluded=true;
  proof.assertions.typedHandoffTargetSurfaceCorrect=true;
  proof.assertions.inboxStatePersistent=true;
- const opsResolvedActionCard=await actionCardUiFor(browser,operativeActor,ids.collabBusiness,'ops');
+ /* The response is resolved by Operativo, but its dataScope may be own/team.
+    Inspect the same synthetic business through Dirección's authorized Ops view,
+    instead of treating a hidden, out-of-scope card as a product defect. */
+ const opsResolvedActionCard=await actionCardUiFor(browser,directionActor,ids.collabBusiness,'ops');
  need(opsResolvedActionCard.present===true&&opsResolvedActionCard.badge===false&&opsResolvedActionCard.expectedRank===0,
     'B4_003_R21_RESOLVED_SHARED_TASK_STILL_DISPLAYS_ACTION_REQUIRED:'+JSON.stringify(opsResolvedActionCard));
- proof.r21ResolvedOperationsCard=opsResolvedActionCard;
+ proof.r21ResolvedOperationsCard={...opsResolvedActionCard,viewerRole:'direccion',actualResolutionActorRole:'operativo',fixtureStage:'cotizando'};
  proof.assertions.sharedInboxResolutionConvergesOpsActionBadge=true;
  proof.assertions.collaborationCanonicalIdentityAndTimestamp=true;
 

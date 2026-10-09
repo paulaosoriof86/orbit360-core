@@ -1728,5 +1728,19 @@
     "productFileCountPreserved": 102,
     "productionPromotion": false,
     "dataWrites": 0
+  },
+  "r21E2OpsFixtureQaOnlyFix": {
+    "status": "QA_ONLY_FIXED_PENDING_EXACT_PREVIEW",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R21_E2_OPS_FIXTURE_QA_ONLY_FIX_20261009.json",
+    "receiptBlobSha": "69b4ac31fcacc06723f7c07f453181bc5adf07a9",
+    "qaProofBlobSha": "0b22d9fa01b6d29f05c868bbbbdb9a4e32f7700f",
+    "qaContractBlobSha": "66532c3d3fcd41ed881a367ccbf52912397ec042",
+    "previousFailedRun": 37974443056,
+    "compositionSha": "a8e6aec410c2f6f1c06b5207d8efb2f3fd1a3038",
+    "productMutation": false,
+    "dataMutation": false,
+    "livePromotion": false,
+    "humanVisualAcceptance": "PENDING",
+    "priorCertifiedProofPreserved": true
   }
 }

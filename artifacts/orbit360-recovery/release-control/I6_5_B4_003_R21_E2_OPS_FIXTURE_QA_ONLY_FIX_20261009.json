@@ -1,0 +1,50 @@
+{
+  "schema": "GRAVICENTRA_I65_B4_003_R21_E2_QA_ONLY_CAUSAL_FIX_V1",
+  "recordedAt": "2026-10-09",
+  "headAtDiagnosis": "5009b784fadefc628a61f7a75432296529379185",
+  "branch": "recovery/fase-a-clean-20260831",
+  "gate": "I6.5/B4-003",
+  "status": "QA_ONLY_SOURCE_FIXED_STATIC_PARSE_PASS_EXACT_PREVIEW_PENDING",
+  "failedRun": 37974443056,
+  "failedProof": "I6_5_B4_003_LAST_FAILED_BROWSER_PROOF_20261007.json",
+  "failedProofBlobSha": "8daa4f823b50b1c9b5ca2fd4befb9ecf8902bfe0",
+  "failure": "B4_003_R21_ACTION_CARD_INBOX_STARTUP_READINESS_NOT_CONFIRMED after backend-confirmed operations shared resolution; browser route #/ops fully ready with one unrelated card; fixture card absent",
+  "confirmedCause": "Synthetic business was created at etapa='nuevo', intentionally not included by OpsBoard (Cotizando/Inspecciones/Emisiones). Additionally recipient Operativo can have advisor-scoped Ops visibility and cannot be forced to see another advisor business.",
+  "qaCorrection": {
+    "source": "tools/gravicentra-i6-5-b4-003-preview-proof.mjs",
+    "sourceSha": "0b22d9fa01b6d29f05c868bbbbdb9a4e32f7700f",
+    "from": "etapa nuevo; Operativo reviewer regardless own scope",
+    "to": "etapa cotizando; Dirección authorized Ops viewer, resolution remains executed by different Operativo actor"
+  },
+  "contract": {
+    "path": "tools/gravicentra-i6-5-b4-003-contract.mjs",
+    "blobSha": "66532c3d3fcd41ed881a367ccbf52912397ec042",
+    "newAssertion": "B4_003_R21_OPS_CARD_FIXTURE_OUTSIDE_VISIBLE_SCOPE_OR_STAGE",
+    "oldAssertionsRetained": true
+  },
+  "proofAlreadyDemonstrated": {
+    "authentication": true,
+    "storeReady": true,
+    "inboxReady": true,
+    "advisorNoticeVisibleAndAcknowledged": true,
+    "operationsNoticeResolvedPersisted": true,
+    "sourceLineageQA_P0": "Earlier checks passed until this fixture error",
+    "realRenewalSourceDryRunReady": false
+  },
+  "newFunctionalPass": false,
+  "sourceProductMutation": false,
+  "firestoreBusinessWrites": 0,
+  "productionWrites": 0,
+  "dataReimport": false,
+  "previewDeploy": false,
+  "retainsSourceOwners": [
+    "orbit360-platform/index.html",
+    "orbit360-platform/modules/renovaciones.js",
+    "orbit360-platform/core/ciclo.js",
+    "orbit360-platform/modules/ops.js",
+    "orbit360-platform/modules/leads.js",
+    "orbit360-platform/data/store-firestore-product-operational-p0.js"
+  ],
+  "humanUAT": "PENDING",
+  "nextAction": "RETRY_EXACT_B4_003_PREVIEW_ON_NEW_QA_PROOF_UNMODIFIED_PRODUCT"
+}
