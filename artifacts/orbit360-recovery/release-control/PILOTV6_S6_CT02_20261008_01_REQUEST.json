@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_PILOT_V6_S6_FIXTURE_REQUEST_V1",
   "recordedAt": "2026-10-08T23:00:00-06:00",
-  "status": "REQUESTED",
+  "status": "CLOSED_CLEANED",
   "mode": "cleanup",
   "scenarioId": "PILOTV6_S6_CT02_20261008_01",
   "participant": "CT02",
@@ -25,5 +25,10 @@
     "batch reconciliation of real records"
   ],
   "cleanupRequestedAt": "2026-10-09T07:20:00-06:00",
-  "cleanupReason": "S6 human before/after evidence complete: payment registered on synthetic receipt only; reconciliation intentionally not executed."
+  "cleanupReason": "S6 human before/after evidence complete: payment registered on synthetic receipt only; reconciliation intentionally not executed.",
+  "closedAt": "2026-10-09T07:21:35-06:00",
+  "cleanupRunId": 37936242836,
+  "cleanupArtifactId": 11617594415,
+  "cleanupArtifactDigest": "sha256:d553e78b921679edcd6f79b5164df561afd32cbfce4c1bc60a2b221ce6b2ad73",
+  "syntheticFinalAbsent": true
 }
