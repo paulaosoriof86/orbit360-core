@@ -2815,7 +2815,7 @@
   },
   "continuityRegisterBlobSha": "11ffaf6e7c691064be947fdc1af00b08d8fb8f9c",
   "findingContinuityGuardBlobSha": "868a0ba1a492d9adc8d91655f152b6fa7980f499",
-  "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_R20_CONTRACT_AND_EXACT_PREVIEW",
+  "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_R20_TARGETED_PAULA_VISUAL",
   "b4003R15VisualReview": {
     "status": "PAULA_VISUAL_PARTIAL_PASS_REMEDIATION_REQUIRED",
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R15_PAULA_VISUAL_PARTIAL_ACCEPTANCE_AND_NEW_FINDINGS_20261004.json",
@@ -4103,5 +4103,13 @@
       }
     },
     "doesNotReopenPayments": true
+  },
+  "r20PostProofConvergence": {
+    "status": "MACHINE_PASS_RECONCILED_HUMAN_PREVIEW_UAT_PENDING",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_POST_PROOF_CONTROL_CONVERGENCE_20261008.json",
+    "blobSha": "d4dd3d5872820d1295360650c3b5f272708eddb5",
+    "sourceSha": "5f0bde5d371a9e64498e6f9e4ba0ad08fe32c557",
+    "runId": 37862194962,
+    "productSourceUnchanged": true
   }
 }

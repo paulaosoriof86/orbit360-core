@@ -1,0 +1,53 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_POST_PROOF_CONTINUITY_RECONCILIATION_V1",
+  "date": "2026-10-08",
+  "status": "MACHINE_PASS_RECONCILED_HUMAN_PREVIEW_UAT_PENDING",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "baselineHead": "2825cd2b392ff83a019d91a64b1f2c13cc35219f",
+  "proofPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_MACHINE_PROOF_20261007.json",
+  "proofBlobSha": "c45e546c74a4b234efa8cf34eb5095d705275ec5",
+  "proofSourceSha": "5f0bde5d371a9e64498e6f9e4ba0ad08fe32c557",
+  "proofBuildId": "gi-i65-b4-5f0bde5d371a-57f234755dc1",
+  "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-37862194962-g16j773a.web.app",
+  "runId": 37862194962,
+  "artifactId": 11587665409,
+  "artifactDigest": "bd030dd37a2a02418e3dcdddd4d46a4c360d3cbe32baa9e42d92947c96801400",
+  "sourceChange": false,
+  "operationalBusinessWrites": 0,
+  "syntheticFinalAbsent": true,
+  "previousCandidateHumanRejectionPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_PAULA_POST_MACHINE_UAT_REJECTION_20261008.json",
+  "previousCandidateHumanRejectionPreserved": true,
+  "oldParentStatuses": {
+    "ledger": "MACHINE_PASS_PENDING_PAULA_VISUAL",
+    "carry": "PAULA_VISUAL_REJECTED_R20_CAUSAL_REMEDIATION_REQUIRED",
+    "control": "PAULA_VISUAL_REJECTED_R20_CAUSAL_REMEDIATION_REQUIRED"
+  },
+  "newStatus": {
+    "parent": "MACHINE_PASS_PENDING_PAULA_VISUAL",
+    "newCandidateHuman": "PENDING_R20_NEW_PREVIEW_TARGETED_PAULA_VISUAL",
+    "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_R20_TARGETED_PAULA_VISUAL"
+  },
+  "observedDrift": {
+    "registerLedgerBlob": "6c0b06f23b6fd1e882a4b9b14f03c7dc601fec36",
+    "actualLedgerBlob": "4114887cfe67b1cb60cf1b7da4671e359a7a709c",
+    "compositionNextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_R20_CONTRACT_AND_EXACT_PREVIEW",
+    "staleControlHuman": "REJECTED_UAT3_20261008",
+    "staleMachineProofRetestRequired": true
+  },
+  "allowedEdits": [
+    "control plane",
+    "continuity register",
+    "composition lock",
+    "B4 execution lock",
+    "this receipt"
+  ],
+  "noReimport": true,
+  "noLive": true,
+  "noDataWrites": true,
+  "oldB2QaResiduePreserved": true,
+  "financeB3PassPreserved": true,
+  "ledgerIdSetUntouched": true,
+  "productionAcceptance": false,
+  "b4004Held": true
+}
