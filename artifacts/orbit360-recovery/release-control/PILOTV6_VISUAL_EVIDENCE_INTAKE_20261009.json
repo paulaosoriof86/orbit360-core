@@ -1,6 +1,6 @@
 {
   "schema": "GRAVICENTRA_PILOT_VISUAL_EVIDENCE_INTAKE_V1",
-  "recordedAt": "2026-10-09T09:30:00-06:00",
+  "recordedAt": "2026-10-09T14:27:00-06:00",
   "purpose": "Prevent loss between pilot captures and the next synchronized Word-document update. This manifest is an intake register; restricted originals remain in the conversation evidence surface and thesis/public use requires sanitization.",
   "accumulationRule": "APPEND_ONLY / NO_DELETE / FORWARD_ONLY",
   "priorCanonicalLibrary": "BIBLIOTECA_CONOCIMIENTO_CANONICA_PILOTO_GRAVICENTRA_CURRENT_R21_UAT3_PRE_S5.docx",
@@ -340,6 +340,72 @@
           "sha256": "6d2a5d25ebcb3182c2579f159b04146c237d3ed0b1b6a46c71ac6410e591cb3a"
         }
       ]
+    },
+    {
+      "scenario": "E1",
+      "status": "IN_PROGRESS_EVIDENCE_CAPTURED_WITH_NONCAUSAL_INBOX_FINDING",
+      "images": [
+        {
+          "fileId": "file_00000000e23c8230b5dc1f90e9860a0c",
+          "name": "image(20261009-201645).png",
+          "sha256": "0b40b55281eb6d690734938b836f014eef5cef9d538e480b183ebc58c2b8ab0a",
+          "scope": "E1 incidental finding: repeated synthetic shared tasks and Ops interruption"
+        },
+        {
+          "fileId": "file_000000005a5081f5b7e19f4e5604cf9c",
+          "name": "image(20261009-202057).png",
+          "sha256": "bfe3918b784d27a9e97c12008cb06d5c5341bf8d5dd9c8f2f41c493d7ea62df5",
+          "scope": "E1 Academia catalog, KPIs and Operativo access"
+        },
+        {
+          "fileId": "file_000000006ff881f5a121b2ccad44efee",
+          "name": "image(20261009-202124).png",
+          "sha256": "efabf3224c07254e1b4b51b9303c27ae1f293eccbfc86a7670d99e94f1f38e00",
+          "scope": "E1 Academia catalog continuation and course breadth"
+        },
+        {
+          "fileId": "file_00000000be6082309202645023180bec",
+          "name": "image(20261009-202205).png",
+          "sha256": "602dd93e6c5f1def9538122caea6f61bc23b3c50acd4c998287790a13de35455",
+          "scope": "E1 role learning route Operativo top"
+        },
+        {
+          "fileId": "file_00000000a89c82308306427e553c53f7",
+          "name": "image(20261009-202227).png",
+          "sha256": "f1f439fbda8adfdb44ab55bf54f8ad981955e2a11d1ca6dc40a465a521630cb1",
+          "scope": "E1 role learning route Operativo middle"
+        },
+        {
+          "fileId": "file_000000008c288230bd7946746fb9c96a",
+          "name": "image(20261009-202343).png",
+          "sha256": "7ce160a0b0aaaa51527ec48dcca2663810a95a656d4e07cea7c2aec0cad01b57",
+          "scope": "E1 role learning route Operativo lower / 25-course route"
+        },
+        {
+          "fileId": "file_00000000a2d081f5bdb4f77c27daee80",
+          "name": "image(20261009-202444).png",
+          "sha256": "c30714f8b15166e2a03feb72651e1fbd93188bc2611cf6d01cb7e237dbf619b4",
+          "scope": "E1 induction lesson 1 visible"
+        },
+        {
+          "fileId": "file_00000000e890820d8767feeb988ed75f",
+          "name": "image(20261009-202504).png",
+          "sha256": "5ab17d53608486954b42f88ee4687583dce9a3064f3d7a661da14055da4b5942",
+          "scope": "E1 induction lesson 2 visible"
+        },
+        {
+          "fileId": "file_00000000a50481f590aa0cfe97776195",
+          "name": "image(20261009-202533).png",
+          "sha256": "0d21d70389ade81cac33fe2faf10e1720477506c72daa3f267511e0072191e6d",
+          "scope": "E1 induction lesson 3 visible"
+        },
+        {
+          "fileId": "file_00000000c1b881f5bb80896e024ac494",
+          "name": "image(20261009-202554).png",
+          "sha256": "f35ce17bba58bcbcc4a2eb0083d0ac01365c3230f8bc21a6e11b066f57716d29",
+          "scope": "E1 induction quiz visible without answers"
+        }
+      ]
     }
   ],
   "knowledgeCaptured": [
@@ -350,15 +416,17 @@
     "E8 current observations: Operativo can access Calidad; missing-data detection, country suggestions with provenance, financial-integrity review, and focused completion forms are observable; no write has been executed in E8.",
     "E9 controlled portal preview: legal gate, policies, payments, claims, documents, learning resources and notification surfaces are executable internally; no real external-client participant was used.",
     "E9 portal request forms route conceptually toward Ops; external WhatsApp/email remain dependent on connected channels; document upload explicitly declares Storage/backend dependency.",
-    "Insights is analytically richer than Reportes and provides managerial views, but its figures remain supplemental until source/universe reconciliations are completed; it does not cure the E4 Reportes causal findings."
+    "Insights is analytically richer than Reportes and provides managerial views, but its figures remain supplemental until source/universe reconciliations are completed; it does not cure the E4 Reportes causal findings.",
+    "E1 Academia: Operativo can access a 25-course catalog and a 25-item role route; existing induction lessons and quiz are visible without requiring content edits.",
+    "E1 incidental finding: shared inbox resolution is eventId-scoped while semantic duplicates remain distinct; repeated B4-003 synthetic tasks can remain active and trigger Ops auto-landing even after a prior Resolve for all on another event."
   ],
   "nextSyncRule": {
-    "immediate": "BLOCK D CLOSED. Execute full cross-project audit and synchronized Word update before Block E.",
+    "immediate": "Block E in progress. Append E1/E3/E5/E6/E7 evidence; next synchronized Word update at Block E checkpoint before E2, unless a methodological/canonical status change requires earlier sync.",
     "synchronizedWordUpdate": "At closure of Block D (E4 + E8 + E9), update Biblioteca de Conocimiento, Índice Biblioteca Visual, Matriz Académica, Matriz Participante×Escenario×Evidencia, Plan Operativo, Documento Maestro Técnico, Plan Maestro de Mejoras and Tesis in one synchronized package.",
     "exception": "If a causal finding changes methodology or evidence status before E9 closes, perform an earlier synchronized update."
   },
   "localHashInventory": {
-    "count": 50,
+    "count": 60,
     "algorithm": "sha256",
     "files": {
       "image(20261009-033223).png": "2cc4de5890c5a1ab432adbefb693afbdf1b3d7d96d6dcafedf29e15a0dd0ce1e",
@@ -410,11 +478,21 @@
       "image(20261009-151356).png": "e7e52b991cd0046ed1dd33039c60ac0f6aed89862b640779dd9ca52aafc0ef21",
       "image(20261009-151408).png": "279b11110d9fcb50388f3fb94d0d02aa4ada4d74b4d3db0dabb299d1fa969c47",
       "image(20261009-151423).png": "3523628eca30bb7ac0a4e51354a66aefa45e76d6eba612854147df266f5a22f9",
-      "image(20261009-151500).png": "6d2a5d25ebcb3182c2579f159b04146c237d3ed0b1b6a46c71ac6410e591cb3a"
+      "image(20261009-151500).png": "6d2a5d25ebcb3182c2579f159b04146c237d3ed0b1b6a46c71ac6410e591cb3a",
+      "image(20261009-201645).png": "0b40b55281eb6d690734938b836f014eef5cef9d538e480b183ebc58c2b8ab0a",
+      "image(20261009-202057).png": "bfe3918b784d27a9e97c12008cb06d5c5341bf8d5dd9c8f2f41c493d7ea62df5",
+      "image(20261009-202124).png": "efabf3224c07254e1b4b51b9303c27ae1f293eccbfc86a7670d99e94f1f38e00",
+      "image(20261009-202205).png": "602dd93e6c5f1def9538122caea6f61bc23b3c50acd4c998287790a13de35455",
+      "image(20261009-202227).png": "f1f439fbda8adfdb44ab55bf54f8ad981955e2a11d1ca6dc40a465a521630cb1",
+      "image(20261009-202343).png": "7ce160a0b0aaaa51527ec48dcca2663810a95a656d4e07cea7c2aec0cad01b57",
+      "image(20261009-202444).png": "c30714f8b15166e2a03feb72651e1fbd93188bc2611cf6d01cb7e237dbf619b4",
+      "image(20261009-202504).png": "5ab17d53608486954b42f88ee4687583dce9a3064f3d7a661da14055da4b5942",
+      "image(20261009-202533).png": "0d21d70389ade81cac33fe2faf10e1720477506c72daa3f267511e0072191e6d",
+      "image(20261009-202554).png": "f35ce17bba58bcbcc4a2eb0083d0ac01365c3230f8bc21a6e11b066f57716d29"
     }
   },
   "assurance": {
-    "newPilotImagesPhysicallyEnumeratedAndHashed": 50,
+    "newPilotImagesPhysicallyEnumeratedAndHashed": 60,
     "scenariosCovered": [
       "S5",
       "S6",
@@ -422,7 +500,8 @@
       "E4",
       "E8",
       "E9",
-      "E4_SUPPLEMENT_INSIGHTS"
+      "E4_SUPPLEMENT_INSIGHTS",
+      "E1"
     ],
     "e8StillOpen": false,
     "note": "This register prevents loss before the synchronized Word update; it does not claim the Word documents already contain these 33 images.",
