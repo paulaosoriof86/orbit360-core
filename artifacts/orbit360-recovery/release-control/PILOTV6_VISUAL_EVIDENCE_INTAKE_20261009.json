@@ -1,6 +1,6 @@
 {
   "schema": "GRAVICENTRA_PILOT_VISUAL_EVIDENCE_INTAKE_V1",
-  "recordedAt": "2026-10-09T08:36:00-06:00",
+  "recordedAt": "2026-10-09T09:30:00-06:00",
   "purpose": "Prevent loss between pilot captures and the next synchronized Word-document update. This manifest is an intake register; restricted originals remain in the conversation evidence surface and thesis/public use requires sanitization.",
   "accumulationRule": "APPEND_ONLY / NO_DELETE / FORWARD_ONLY",
   "priorCanonicalLibrary": "BIBLIOTECA_CONOCIMIENTO_CANONICA_PILOTO_GRAVICENTRA_CURRENT_R21_UAT3_PRE_S5.docx",
@@ -226,6 +226,120 @@
           "sha256": "8e3e7e9b8fc8b18445c8b8c5c7231014f1db4d1bf094ea5d8e03b74d56e71b6a"
         }
       ]
+    },
+    {
+      "scenario": "E4_SUPPLEMENT_INSIGHTS",
+      "status": "SUPPLEMENTAL_READONLY_EVIDENCE_NOT_A_REPLACEMENT_FOR_E4_REPORTES_FAIL",
+      "images": [
+        {
+          "fileId": "file_00000000432881f7b7724b5920c9b421",
+          "name": "image(20261009-150856).png",
+          "scope": "Insights resumen: prima, recaudo, por cobrar, nuevas vs renovadas",
+          "sha256": "2723d44223eec319fdc2b284845e0d49fc1d351e1f9c65875f343341f746068e"
+        },
+        {
+          "fileId": "file_00000000904881f4bffb6c51c3b0d73d",
+          "name": "image(20261009-150935).png",
+          "scope": "Insights producción por ramo/producto y asesor-aseguradora",
+          "sha256": "ed130afd90b64e3f504de03057f23cf33bc65122c621906a4ceac6def38332e9"
+        },
+        {
+          "fileId": "file_00000000512881fab63f96e507970df7",
+          "name": "image(20261009-151021).png",
+          "scope": "Insights renovaciones",
+          "sha256": "35693a52e772ebbb48a68edf69f9bb3c10925f81a2dd7ae0f3dcd3017500d3f4"
+        },
+        {
+          "fileId": "file_00000000c07882309c721dfae743a4c7",
+          "name": "image(20261009-151044).png",
+          "scope": "Insights análisis crítico y recomendaciones",
+          "sha256": "0647a5f67bec9d0e9708d5128ce35c631f98ce03d47c262227cf3c9312087e36"
+        }
+      ]
+    },
+    {
+      "scenario": "E9",
+      "status": "CLOSED_PASS_WITH_OBSERVATIONS",
+      "images": [
+        {
+          "fileId": "file_00000000717481f590d60450d3b57676",
+          "name": "image(20261009-151111).png",
+          "scope": "Portal legal agreements gate",
+          "sha256": "7251c40dfbf68462e9ec68c40660f54b3b0067f8f6eee287bdf9b0fb67a66f00"
+        },
+        {
+          "fileId": "file_00000000f120820da14e04dcab7a4b66",
+          "name": "image(20261009-151130).png",
+          "scope": "Portal home and controlled customer preview",
+          "sha256": "acaae4359d5035dbac5a39f2aa7648119bd90539249ac05cad85608aeba2c1b5"
+        },
+        {
+          "fileId": "file_0000000087bc81f69ef20768be322844",
+          "name": "image(20261009-151148).png",
+          "scope": "Portal request-management form",
+          "sha256": "ded5260c6f0d1dd785cf346753d7bcb43011a9bc731371cb13fc6dec6342d703"
+        },
+        {
+          "fileId": "file_00000000e3b4820ebd5cc62ea81c7e07",
+          "name": "image(20261009-151208).png",
+          "scope": "Portal add-document form and backend/storage boundary",
+          "sha256": "09876e27d5ca9798789ac73dd93002d2203ff495cea6fcf6482b9b104d05f8c9"
+        },
+        {
+          "fileId": "file_000000002ee481f5b4427c04f066b061",
+          "name": "image(20261009-151223).png",
+          "scope": "Portal documents tab",
+          "sha256": "51bd23d95c86d77803d12d83d3c778c1e5d3c38f3204284b6313f534c2c691cb"
+        },
+        {
+          "fileId": "file_00000000ab6481f9b06203ef8e376e13",
+          "name": "image(20261009-151243).png",
+          "scope": "Portal policies tab",
+          "sha256": "736d89a5dbb7e8bf9852a009525b729d8ef0cc0459a3fe09809e34797c6a3dd9"
+        },
+        {
+          "fileId": "file_00000000ef40820da10ba6b46a6b8cae",
+          "name": "image(20261009-151257).png",
+          "scope": "Portal policy detail",
+          "sha256": "a556f61d97586080e2e23d91040fd08f4d85f3be8de48f542431910b2d7e7b92"
+        },
+        {
+          "fileId": "file_00000000591c81f599087a4e38dbe2ef",
+          "name": "image(20261009-151328).png",
+          "scope": "Portal payments tab",
+          "sha256": "f960c0a243cb5d35ee35d09fc7bf3ad11e6413580a7535947ae0229754ddbacf"
+        },
+        {
+          "fileId": "file_000000006a94820e90514f7681edf713",
+          "name": "image(20261009-151340).png",
+          "scope": "Portal payment detail with reconciliation pending",
+          "sha256": "c21af5e5e8cb33b194a1ac4379533d27ae9084402fd35b9d8b223adee6faf8e6"
+        },
+        {
+          "fileId": "file_000000005ff0820ea55b7304a08633f1",
+          "name": "image(20261009-151356).png",
+          "scope": "Portal claim/service request form",
+          "sha256": "e7e52b991cd0046ed1dd33039c60ac0f6aed89862b640779dd9ca52aafc0ef21"
+        },
+        {
+          "fileId": "file_00000000175c81f585da7f2b17972729",
+          "name": "image(20261009-151408).png",
+          "scope": "Portal claims tab",
+          "sha256": "279b11110d9fcb50388f3fb94d0d02aa4ada4d74b4d3db0dabb299d1fa969c47"
+        },
+        {
+          "fileId": "file_000000006988820e823d2f3f24bb7896",
+          "name": "image(20261009-151423).png",
+          "scope": "Portal learning/resources tab",
+          "sha256": "3523628eca30bb7ac0a4e51354a66aefa45e76d6eba612854147df266f5a22f9"
+        },
+        {
+          "fileId": "file_00000000007081f58e504f542fdc1c2a",
+          "name": "image(20261009-151500).png",
+          "scope": "Portal notifications center",
+          "sha256": "6d2a5d25ebcb3182c2579f159b04146c237d3ed0b1b6a46c71ac6410e591cb3a"
+        }
+      ]
     }
   ],
   "knowledgeCaptured": [
@@ -233,15 +347,18 @@
     "S6 synthetic controlled payment proved before/after and zero-residue cleanup.",
     "S7 renewal continuity distinguishes actionable renewable cases from historical review-only editions.",
     "E4 defects: year filter searches visible cell text; insurer-country segmentation uses client country; generic numeric aggregation sums policy identifiers; Mapfre cross-country mixing remains plausible but not yet proven.",
-    "E8 current observations: Operativo can access Calidad; missing-data detection, country suggestions with provenance, financial-integrity review, and focused completion forms are observable; no write has been executed in E8."
+    "E8 current observations: Operativo can access Calidad; missing-data detection, country suggestions with provenance, financial-integrity review, and focused completion forms are observable; no write has been executed in E8.",
+    "E9 controlled portal preview: legal gate, policies, payments, claims, documents, learning resources and notification surfaces are executable internally; no real external-client participant was used.",
+    "E9 portal request forms route conceptually toward Ops; external WhatsApp/email remain dependent on connected channels; document upload explicitly declares Storage/backend dependency.",
+    "Insights is analytically richer than Reportes and provides managerial views, but its figures remain supplemental until source/universe reconciliations are completed; it does not cure the E4 Reportes causal findings."
   ],
   "nextSyncRule": {
-    "immediate": "Keep this manifest append-only while E8/E9 are still running.",
+    "immediate": "BLOCK D CLOSED. Execute full cross-project audit and synchronized Word update before Block E.",
     "synchronizedWordUpdate": "At closure of Block D (E4 + E8 + E9), update Biblioteca de Conocimiento, Índice Biblioteca Visual, Matriz Académica, Matriz Participante×Escenario×Evidencia, Plan Operativo, Documento Maestro Técnico, Plan Maestro de Mejoras and Tesis in one synchronized package.",
     "exception": "If a causal finding changes methodology or evidence status before E9 closes, perform an earlier synchronized update."
   },
   "localHashInventory": {
-    "count": 33,
+    "count": 50,
     "algorithm": "sha256",
     "files": {
       "image(20261009-033223).png": "2cc4de5890c5a1ab432adbefb693afbdf1b3d7d96d6dcafedf29e15a0dd0ce1e",
@@ -276,19 +393,39 @@
       "image(20261009-143133).png": "e713fc521a18d7edccff2b7cc73b4511b67f2dc451b16efbb814e2b164c8b67a",
       "image(20261009-143149).png": "d9188394d1d2711a11a2264d1584c80125007841fdd5ddf0aba8cf58cfff55f3",
       "image(20261009-143245).png": "b16492bb7dbb87ecaf59cdc5766e8f083869c3ef9b099ad82475fd4361b702db",
-      "image(20261009-143301).png": "8e3e7e9b8fc8b18445c8b8c5c7231014f1db4d1bf094ea5d8e03b74d56e71b6a"
+      "image(20261009-143301).png": "8e3e7e9b8fc8b18445c8b8c5c7231014f1db4d1bf094ea5d8e03b74d56e71b6a",
+      "image(20261009-150856).png": "2723d44223eec319fdc2b284845e0d49fc1d351e1f9c65875f343341f746068e",
+      "image(20261009-150935).png": "ed130afd90b64e3f504de03057f23cf33bc65122c621906a4ceac6def38332e9",
+      "image(20261009-151021).png": "35693a52e772ebbb48a68edf69f9bb3c10925f81a2dd7ae0f3dcd3017500d3f4",
+      "image(20261009-151044).png": "0647a5f67bec9d0e9708d5128ce35c631f98ce03d47c262227cf3c9312087e36",
+      "image(20261009-151111).png": "7251c40dfbf68462e9ec68c40660f54b3b0067f8f6eee287bdf9b0fb67a66f00",
+      "image(20261009-151130).png": "acaae4359d5035dbac5a39f2aa7648119bd90539249ac05cad85608aeba2c1b5",
+      "image(20261009-151148).png": "ded5260c6f0d1dd785cf346753d7bcb43011a9bc731371cb13fc6dec6342d703",
+      "image(20261009-151208).png": "09876e27d5ca9798789ac73dd93002d2203ff495cea6fcf6482b9b104d05f8c9",
+      "image(20261009-151223).png": "51bd23d95c86d77803d12d83d3c778c1e5d3c38f3204284b6313f534c2c691cb",
+      "image(20261009-151243).png": "736d89a5dbb7e8bf9852a009525b729d8ef0cc0459a3fe09809e34797c6a3dd9",
+      "image(20261009-151257).png": "a556f61d97586080e2e23d91040fd08f4d85f3be8de48f542431910b2d7e7b92",
+      "image(20261009-151328).png": "f960c0a243cb5d35ee35d09fc7bf3ad11e6413580a7535947ae0229754ddbacf",
+      "image(20261009-151340).png": "c21af5e5e8cb33b194a1ac4379533d27ae9084402fd35b9d8b223adee6faf8e6",
+      "image(20261009-151356).png": "e7e52b991cd0046ed1dd33039c60ac0f6aed89862b640779dd9ca52aafc0ef21",
+      "image(20261009-151408).png": "279b11110d9fcb50388f3fb94d0d02aa4ada4d74b4d3db0dabb299d1fa969c47",
+      "image(20261009-151423).png": "3523628eca30bb7ac0a4e51354a66aefa45e76d6eba612854147df266f5a22f9",
+      "image(20261009-151500).png": "6d2a5d25ebcb3182c2579f159b04146c237d3ed0b1b6a46c71ac6410e591cb3a"
     }
   },
   "assurance": {
-    "newPilotImagesPhysicallyEnumeratedAndHashed": 33,
+    "newPilotImagesPhysicallyEnumeratedAndHashed": 50,
     "scenariosCovered": [
       "S5",
       "S6",
       "S7",
       "E4",
-      "E8"
+      "E8",
+      "E9",
+      "E4_SUPPLEMENT_INSIGHTS"
     ],
-    "e8StillOpen": true,
-    "note": "This register prevents loss before the synchronized Word update; it does not claim the Word documents already contain these 33 images."
+    "e8StillOpen": false,
+    "note": "This register prevents loss before the synchronized Word update; it does not claim the Word documents already contain these 33 images.",
+    "blockDClosed": true
   }
 }
