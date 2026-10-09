@@ -1,0 +1,76 @@
+{
+  "schema": "GRAVICENTRA_PILOT_V6_E4_CLOSURE_V1",
+  "recordedAt": "2026-10-09T08:20:00-06:00",
+  "scenario": "E4 Insights / Reportes",
+  "layer": "EXTENSION",
+  "status": "FAIL_CAUSAL_EXTENSION_ONLY_CONTINUE_FORWARD",
+  "pilotImpact": "NONBLOCKING_CORE_AND_NONBLOCKING_NEXT_EXTENSIONS",
+  "participants": [
+    {
+      "code": "CT02",
+      "role": "Operativo",
+      "result": "ACCESS_DENIED_BY_ROLE_SCOPE",
+      "interpretation": "Valid role/scope evidence; permissions were not altered for the pilot."
+    },
+    {
+      "code": "CT01",
+      "role": "Dirección",
+      "result": "ACCESS_GRANTED_READONLY"
+    }
+  ],
+  "exactPreview": {
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-37935549889-oji84a6s.web.app",
+    "sourceSha": "99c4a81d59c28550be4c318fc2b7600bdd43d832",
+    "buildId": "gi-i65-b4-99c4a81d59c2-57f234755dc1",
+    "runId": 37935549889
+  },
+  "humanObserved": {
+    "allCountriesProductionRecords": 1419,
+    "year2026GroupedByInsurer": {
+      "records": 0,
+      "groups": 0
+    },
+    "guatemalaAllYearsGroupedByInsurer": {
+      "records": 1331,
+      "groups": 22
+    },
+    "visibleCountryDimensionAnomalies": [
+      "SBS Seguros Colombia visible under Guatemala filter",
+      "AXA Colpatria Seguros visible under Guatemala filter",
+      "Seguros Bolívar visible under Guatemala filter",
+      "Previsora visible under Guatemala filter"
+    ],
+    "groupingOutputAnomaly": "Summary includes Σ Póliza and numerically sums policy identifiers; this output is not a valid business KPI.",
+    "mapfreObservation": "MAPFRE SEGUROS and Mapfre appear as separate labels. Cross-country identity mixing is plausible but not proven by screenshots alone and requires insurer-id/country lineage readback."
+  },
+  "sourceRootCauseReadback": {
+    "reportModule": "orbit360-platform/modules/reportes.js",
+    "yearFilter": "Filters rendered cell text for the selected year; Production rows contain no date/year cell, therefore 2026 returns zero records.",
+    "countryFilter": "paisOK resolves country from clientId/client.pais, not insurer country; insurer dimension can therefore display foreign insurer identities inside a Guatemala-filtered report.",
+    "numericAggregation": "Generic parseNum is applied to every numeric-looking column except the grouping field; policy numbers are incorrectly treated as summable monetary/numeric measures.",
+    "reportesChangedAfterCandidate": false
+  },
+  "academicAdjudication": {
+    "demonstrated": [
+      "Reportes module is executable under Dirección role",
+      "role-based access restriction is observable",
+      "country selector and grouping UI execute",
+      "report structure and record-level table are visible"
+    ],
+    "notDemonstrated": [
+      "valid KPI reconciliation by year",
+      "valid insurer-country segmentation",
+      "valid grouped totals for all numeric-looking columns",
+      "better managerial decisions or business impact"
+    ],
+    "i4Eligible": false,
+    "i4Reason": "Source, universe and period are not sufficiently reconciled for quantitative use in this E4 run."
+  },
+  "forwardOnly": {
+    "fixDuringPilot": false,
+    "repeatCore": false,
+    "repeatPriorExtensions": false,
+    "rerunOnlyE4AfterFix": true,
+    "nextScenario": "E8 Calidad / Búsqueda"
+  }
+}
