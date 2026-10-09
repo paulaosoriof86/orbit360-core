@@ -2,7 +2,7 @@
   "schema": "GRAVICENTRA_PILOT_V6_S6_FIXTURE_REQUEST_V1",
   "recordedAt": "2026-10-08T23:00:00-06:00",
   "status": "REQUESTED",
-  "mode": "create",
+  "mode": "cleanup",
   "scenarioId": "PILOTV6_S6_CT02_20261008_01",
   "participant": "CT02",
   "role": "Operativo",
@@ -23,5 +23,7 @@
     "reimport",
     "external communication",
     "batch reconciliation of real records"
-  ]
+  ],
+  "cleanupRequestedAt": "2026-10-09T07:20:00-06:00",
+  "cleanupReason": "S6 human before/after evidence complete: payment registered on synthetic receipt only; reconciliation intentionally not executed."
 }
