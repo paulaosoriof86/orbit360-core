@@ -1,0 +1,18 @@
+{
+  "schema": "GRAVICENTRA_I65_B4_003_R21_QA_FIX_V1",
+  "date": "2026-10-09",
+  "status": "QA_FIXTURE_CANONICAL_FIELD_CORRECTED_PENDING_EXACT_PREVIEW",
+  "failedRunId": 37963031278,
+  "failedCode": "B4_003_R21_UNPROVEN_RENEWAL_WRONGLY_HIDDEN",
+  "cause": "Synthetic test declared a successor with tipoEmisionFuente='Póliza Renovada' then overrode unrelated tipoEmision='Póliza Nueva'; canonical issuer evidence was still renewal.",
+  "correction": "Override tipoEmisionFuente in synthetic negative case. Keep source interpretation and same strong evidence gates unchanged.",
+  "beforeContractBlob": "0f73c9f2b6b30e33b2720f093a20fbc7564db1cc",
+  "afterContractBlob": "0210be15d02c2e39a815466a22fe59951e19e2c3",
+  "productBlobUnchanged": "a3a582b3d72e036abd5fcf00e3e72b687c454fa3",
+  "productionWrites": 0,
+  "operationalWrites": 0,
+  "prevMachineProofPreserved": true,
+  "humanUatPending": true,
+  "gate": "B4-003",
+  "noNewFindingIds": true
+}

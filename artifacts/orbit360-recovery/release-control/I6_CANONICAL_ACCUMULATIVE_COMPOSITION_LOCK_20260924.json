@@ -4283,7 +4283,7 @@
       "orbit360-platform/modules/leads.js": "b4dfdbcdb8d255329e3fbae8df59ffde96f05146"
     },
     "proofOwners": {
-      "tools/gravicentra-i6-5-b4-003-contract.mjs": "0f73c9f2b6b30e33b2720f093a20fbc7564db1cc",
+      "tools/gravicentra-i6-5-b4-003-contract.mjs": "0210be15d02c2e39a815466a22fe59951e19e2c3",
       "tools/gravicentra-i6-5-b4-003-preview-proof.mjs": "f24f2d76af5995097b6d349084d186bee5c99741"
     },
     "retainedCertifiedMachinePass": {
@@ -4312,5 +4312,13 @@
     "sourceSha": "a3a582b3d72e036abd5fcf00e3e72b687c454fa3",
     "qaContractSha": "0f73c9f2b6b30e33b2720f093a20fbc7564db1cc",
     "noDataMutation": true
+  },
+  "b4003R21QaFixtureFieldCorrection": {
+    "status": "QA_ONLY_CORRECTED_EXACT_PREVIEW_REQUIRED",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R21_QA_DISCRIMINANT_FIELD_FIX_20261009.json",
+    "receiptSha": "b460062aa065d2cdef9e77b5e3316201ea68f212",
+    "qaContractSha": "0210be15d02c2e39a815466a22fe59951e19e2c3",
+    "productCodeChanged": false,
+    "priorTestRunId": 37963031278
   }
 }

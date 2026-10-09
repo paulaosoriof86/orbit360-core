@@ -472,7 +472,7 @@ need(index.includes('refreshFlight')&&index.includes('inboxScope()')&&index.incl
  const source=classify([original,successor]);
  need(base.includes('q.tipoEmisionFuente||q.tipoEmision'),'B4_003_R21_CANONICAL_ISSUANCE_FIELD_READ_OWNER_MISSING');
  need(source.reason==='SUCESORA_DE_FUENTE_PENDIENTE_ENLACE'&&!source.bucketEligible&&source.sourceBackedSuccessorId==='new'&&!source.terminal,'B4_003_R21_SOURCE_SUCCESSOR_NOT_CAUSALLY_SEPARATED');
- const unproved=classify([original,{...successor,tipoEmision:'Póliza Nueva'}]);
+ const unproved=classify([original,{...successor,tipoEmisionFuente:'Póliza Nueva'}]);
  need(unproved.bucketEligible&&unproved.reviewOnly&&!unproved.terminal,'B4_003_R21_UNPROVEN_RENEWAL_WRONGLY_HIDDEN');
  const crossed=classify([original,{...successor,placa:'P-111ABC'}]);
  need(crossed.bucketEligible&&!crossed.sourceBackedSuccessorId,'B4_003_R21_DIFFERENT_VEHICLE_FALSE_SUCCESSOR');
