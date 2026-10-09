@@ -8994,7 +8994,7 @@
         "authorizationBlobSha": "4c773eae63c70c51c7e3575c3fd74c42184053c8"
       },
       "machineProofReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_MACHINE_PROOF_20261007.json",
-      "machineProofReceiptBlobSha": "e5901ae5e24933093ec7445dbc9404ddf3f4c32e",
+      "machineProofReceiptBlobSha": "a5b334be0a3a0d66c9b5722929a71860a51a3dab",
       "closureProof": "Paula R18 visual review proved new lead starts in Nuevo and persisted transition Nuevo→Contactado.",
       "lastReviewedAt": "2026-10-05T14:50:00-06:00",
       "lastReviewOrigin": "PAULA_R18_TARGETED_VISUAL_20261005"
@@ -9020,7 +9020,7 @@
         "blobSha": "4e03b16f56b174f66f5093d1c6e253675770fca1"
       },
       "machineProofReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_MACHINE_PROOF_20261007.json",
-      "machineProofReceiptBlobSha": "e5901ae5e24933093ec7445dbc9404ddf3f4c32e",
+      "machineProofReceiptBlobSha": "a5b334be0a3a0d66c9b5722929a71860a51a3dab",
       "lastReviewedAt": "2026-10-05T14:50:00-06:00",
       "lastReviewOrigin": "PAULA_R18_TARGETED_VISUAL_20261005",
       "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R19_SINGLE_CUMULATIVE_SOURCE_FIX_20261005.json",
@@ -9070,7 +9070,7 @@
         "authorizationBlobSha": "4c773eae63c70c51c7e3575c3fd74c42184053c8"
       },
       "machineProofReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_MACHINE_PROOF_20261007.json",
-      "machineProofReceiptBlobSha": "e5901ae5e24933093ec7445dbc9404ddf3f4c32e",
+      "machineProofReceiptBlobSha": "a5b334be0a3a0d66c9b5722929a71860a51a3dab",
       "uat3Reconciliation": {
         "classification": "BLOCKING_P0",
         "observationIds": [
@@ -9118,7 +9118,7 @@
         "authorizationBlobSha": "4c773eae63c70c51c7e3575c3fd74c42184053c8"
       },
       "machineProofReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_MACHINE_PROOF_20261007.json",
-      "machineProofReceiptBlobSha": "e5901ae5e24933093ec7445dbc9404ddf3f4c32e",
+      "machineProofReceiptBlobSha": "a5b334be0a3a0d66c9b5722929a71860a51a3dab",
       "closureProof": "Typed operational observation persists in activity/bitácora; user notification/attention mechanism not proven.",
       "lastReviewedAt": "2026-10-05T14:50:00-06:00",
       "lastReviewOrigin": "PAULA_R18_TARGETED_VISUAL_20261005",
@@ -9171,7 +9171,7 @@
         "authorizationBlobSha": "4c773eae63c70c51c7e3575c3fd74c42184053c8"
       },
       "machineProofReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_MACHINE_PROOF_20261007.json",
-      "machineProofReceiptBlobSha": "e5901ae5e24933093ec7445dbc9404ddf3f4c32e",
+      "machineProofReceiptBlobSha": "a5b334be0a3a0d66c9b5722929a71860a51a3dab",
       "uat3Reconciliation": {
         "classification": "BLOCKING_P0",
         "observationIds": [
@@ -9219,7 +9219,7 @@
         "authorizationBlobSha": "4c773eae63c70c51c7e3575c3fd74c42184053c8"
       },
       "machineProofReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_MACHINE_PROOF_20261007.json",
-      "machineProofReceiptBlobSha": "e5901ae5e24933093ec7445dbc9404ddf3f4c32e",
+      "machineProofReceiptBlobSha": "a5b334be0a3a0d66c9b5722929a71860a51a3dab",
       "closureProof": "R18 visual shows current country/evidence separated and completion form exposes evidence plus governed confirmation path.",
       "lastReviewedAt": "2026-10-05T14:50:00-06:00",
       "lastReviewOrigin": "PAULA_R18_TARGETED_VISUAL_20261005",
@@ -9266,7 +9266,7 @@
         "authorizationBlobSha": "4c773eae63c70c51c7e3575c3fd74c42184053c8"
       },
       "machineProofReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_MACHINE_PROOF_20261007.json",
-      "machineProofReceiptBlobSha": "e5901ae5e24933093ec7445dbc9404ddf3f4c32e",
+      "machineProofReceiptBlobSha": "a5b334be0a3a0d66c9b5722929a71860a51a3dab",
       "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R19_SINGLE_CUMULATIVE_SOURCE_FIX_20261005.json",
       "uat3Reconciliation": {
         "classification": "PARALLEL_NONBLOCKING_P1",
@@ -9312,7 +9312,7 @@
         "authorizationBlobSha": "4c773eae63c70c51c7e3575c3fd74c42184053c8"
       },
       "machineProofReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_MACHINE_PROOF_20261007.json",
-      "machineProofReceiptBlobSha": "e5901ae5e24933093ec7445dbc9404ddf3f4c32e",
+      "machineProofReceiptBlobSha": "a5b334be0a3a0d66c9b5722929a71860a51a3dab",
       "closureProof": "R18 visual shows human financial comparison and distinct Revisar recibos / Corregir en póliza actions.",
       "lastReviewedAt": "2026-10-05T14:50:00-06:00",
       "lastReviewOrigin": "PAULA_R18_TARGETED_VISUAL_20261005"
@@ -9340,7 +9340,7 @@
         "blobSha": "4e03b16f56b174f66f5093d1c6e253675770fca1"
       },
       "machineProofReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_MACHINE_PROOF_20261007.json",
-      "machineProofReceiptBlobSha": "e5901ae5e24933093ec7445dbc9404ddf3f4c32e",
+      "machineProofReceiptBlobSha": "a5b334be0a3a0d66c9b5722929a71860a51a3dab",
       "lastReviewedAt": "2026-10-05T14:50:00-06:00",
       "lastReviewOrigin": "PAULA_R18_TARGETED_VISUAL_20261005",
       "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R19_SINGLE_CUMULATIVE_SOURCE_FIX_20261005.json"
@@ -9367,7 +9367,7 @@
         "blobSha": "4e03b16f56b174f66f5093d1c6e253675770fca1"
       },
       "machineProofReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_MACHINE_PROOF_20261007.json",
-      "machineProofReceiptBlobSha": "e5901ae5e24933093ec7445dbc9404ddf3f4c32e",
+      "machineProofReceiptBlobSha": "a5b334be0a3a0d66c9b5722929a71860a51a3dab",
       "lastReviewedAt": "2026-10-05T14:50:00-06:00",
       "lastReviewOrigin": "PAULA_R18_TARGETED_VISUAL_20261005",
       "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R19_SINGLE_CUMULATIVE_SOURCE_FIX_20261005.json",
@@ -9415,7 +9415,7 @@
         "authorizationBlobSha": "4c773eae63c70c51c7e3575c3fd74c42184053c8"
       },
       "machineProofReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_MACHINE_PROOF_20261007.json",
-      "machineProofReceiptBlobSha": "e5901ae5e24933093ec7445dbc9404ddf3f4c32e",
+      "machineProofReceiptBlobSha": "a5b334be0a3a0d66c9b5722929a71860a51a3dab",
       "lastReviewedAt": "2026-10-05T14:50:00-06:00",
       "lastReviewOrigin": "PAULA_R18_TARGETED_VISUAL_20261005",
       "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R19_SINGLE_CUMULATIVE_SOURCE_FIX_20261005.json"
@@ -9444,7 +9444,7 @@
         "authorizationBlobSha": "4c773eae63c70c51c7e3575c3fd74c42184053c8"
       },
       "machineProofReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_MACHINE_PROOF_20261007.json",
-      "machineProofReceiptBlobSha": "e5901ae5e24933093ec7445dbc9404ddf3f4c32e"
+      "machineProofReceiptBlobSha": "a5b334be0a3a0d66c9b5722929a71860a51a3dab"
     },
     {
       "id": "B4-003-R18-13-INSURER-KNOWLEDGE-MOBILE-HIERARCHY",
@@ -9468,7 +9468,7 @@
         "blobSha": "4e03b16f56b174f66f5093d1c6e253675770fca1"
       },
       "machineProofReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_MACHINE_PROOF_20261007.json",
-      "machineProofReceiptBlobSha": "e5901ae5e24933093ec7445dbc9404ddf3f4c32e",
+      "machineProofReceiptBlobSha": "a5b334be0a3a0d66c9b5722929a71860a51a3dab",
       "lastReviewedAt": "2026-10-05T14:50:00-06:00",
       "lastReviewOrigin": "PAULA_R18_TARGETED_VISUAL_20261005",
       "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R19_SINGLE_CUMULATIVE_SOURCE_FIX_20261005.json",
@@ -9516,7 +9516,7 @@
         "authorizationBlobSha": "4c773eae63c70c51c7e3575c3fd74c42184053c8"
       },
       "machineProofReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_MACHINE_PROOF_20261007.json",
-      "machineProofReceiptBlobSha": "e5901ae5e24933093ec7445dbc9404ddf3f4c32e",
+      "machineProofReceiptBlobSha": "a5b334be0a3a0d66c9b5722929a71860a51a3dab",
       "uat3Reconciliation": {
         "classification": "BLOCKING_P0",
         "observationIds": [
@@ -9561,7 +9561,7 @@
         "authorizationBlobSha": "4c773eae63c70c51c7e3575c3fd74c42184053c8"
       },
       "machineProofReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_MACHINE_PROOF_20261007.json",
-      "machineProofReceiptBlobSha": "e5901ae5e24933093ec7445dbc9404ddf3f4c32e",
+      "machineProofReceiptBlobSha": "a5b334be0a3a0d66c9b5722929a71860a51a3dab",
       "lastReviewedAt": "2026-10-05T14:50:00-06:00",
       "lastReviewOrigin": "PAULA_R18_TARGETED_VISUAL_20261005",
       "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R19_SINGLE_CUMULATIVE_SOURCE_FIX_20261005.json"
@@ -9606,7 +9606,7 @@
       "mayDisappearWithoutDisposition": false,
       "nextAction": "B4_003_R20_TARGETED_PAULA_VISUAL",
       "machineProofReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_MACHINE_PROOF_20261007.json",
-      "machineProofReceiptBlobSha": "e5901ae5e24933093ec7445dbc9404ddf3f4c32e",
+      "machineProofReceiptBlobSha": "a5b334be0a3a0d66c9b5722929a71860a51a3dab",
       "closureProof": "Inicio and Renovaciones show 14 for same <=45 universe in R18 visual. Renewal completeness remains separately open.",
       "lastReviewedAt": "2026-10-05T14:50:00-06:00",
       "lastReviewOrigin": "PAULA_R18_TARGETED_VISUAL_20261005",
@@ -9635,7 +9635,7 @@
       "mayDisappearWithoutDisposition": false,
       "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R19_SINGLE_CUMULATIVE_SOURCE_FIX_20261005.json",
       "machineProofReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_MACHINE_PROOF_20261007.json",
-      "machineProofReceiptBlobSha": "e5901ae5e24933093ec7445dbc9404ddf3f4c32e"
+      "machineProofReceiptBlobSha": "a5b334be0a3a0d66c9b5722929a71860a51a3dab"
     },
     {
       "id": "B4-003-R19-02-QUALITY-SEARCH-FILTER-REGRESSION",
@@ -9659,7 +9659,7 @@
       "mayDisappearWithoutDisposition": false,
       "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R19_SINGLE_CUMULATIVE_SOURCE_FIX_20261005.json",
       "machineProofReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_MACHINE_PROOF_20261007.json",
-      "machineProofReceiptBlobSha": "e5901ae5e24933093ec7445dbc9404ddf3f4c32e",
+      "machineProofReceiptBlobSha": "a5b334be0a3a0d66c9b5722929a71860a51a3dab",
       "uat3Reconciliation": {
         "classification": "PARALLEL_NONBLOCKING_P1",
         "observationIds": [
@@ -9703,7 +9703,7 @@
       "mayDisappearWithoutDisposition": false,
       "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R19_SINGLE_CUMULATIVE_SOURCE_FIX_20261005.json",
       "machineProofReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_MACHINE_PROOF_20261007.json",
-      "machineProofReceiptBlobSha": "e5901ae5e24933093ec7445dbc9404ddf3f4c32e",
+      "machineProofReceiptBlobSha": "a5b334be0a3a0d66c9b5722929a71860a51a3dab",
       "uat3Reconciliation": {
         "classification": "PARALLEL_NONBLOCKING_P1",
         "observationIds": [
@@ -9747,7 +9747,7 @@
       "mayDisappearWithoutDisposition": false,
       "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R19_SINGLE_CUMULATIVE_SOURCE_FIX_20261005.json",
       "machineProofReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_MACHINE_PROOF_20261007.json",
-      "machineProofReceiptBlobSha": "e5901ae5e24933093ec7445dbc9404ddf3f4c32e",
+      "machineProofReceiptBlobSha": "a5b334be0a3a0d66c9b5722929a71860a51a3dab",
       "uat3Reconciliation": {
         "classification": "PARALLEL_NONBLOCKING_P1",
         "observationIds": [
@@ -9791,7 +9791,7 @@
       "mayDisappearWithoutDisposition": false,
       "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R19_SINGLE_CUMULATIVE_SOURCE_FIX_20261005.json",
       "machineProofReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_MACHINE_PROOF_20261007.json",
-      "machineProofReceiptBlobSha": "e5901ae5e24933093ec7445dbc9404ddf3f4c32e"
+      "machineProofReceiptBlobSha": "a5b334be0a3a0d66c9b5722929a71860a51a3dab"
     },
     {
       "id": "B4-003-R19-06-RENEWABILITY-DURABLE-ATOMIC-SAVE-FAILURE",
@@ -9818,13 +9818,13 @@
       "mayDisappearWithoutDisposition": false,
       "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R19_SINGLE_CUMULATIVE_SOURCE_FIX_20261005.json",
       "machineProofReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_MACHINE_PROOF_20261007.json",
-      "machineProofReceiptBlobSha": "e5901ae5e24933093ec7445dbc9404ddf3f4c32e"
+      "machineProofReceiptBlobSha": "a5b334be0a3a0d66c9b5722929a71860a51a3dab"
     },
     {
       "id": "B4-003-R19-07-INICIO-MONTHLY-ADVISOR-READINESS-REGRESSION",
       "block": "B4",
       "targetGate": "B4-003",
-      "status": "R22_SOURCE_PATCH_PENDING_EXACT_PREVIEW_AND_PAULA_UAT",
+      "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
       "blocking": true,
       "surface": "Inicio",
       "finding": "Monthly target dials and advisor progress remain in 'Actualizando...' / empty state in R18 visual review.",
@@ -9843,7 +9843,7 @@
       "mayDisappearWithoutDisposition": false,
       "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R19_SINGLE_CUMULATIVE_SOURCE_FIX_20261005.json",
       "machineProofReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_MACHINE_PROOF_20261007.json",
-      "machineProofReceiptBlobSha": "e5901ae5e24933093ec7445dbc9404ddf3f4c32e",
+      "machineProofReceiptBlobSha": "a5b334be0a3a0d66c9b5722929a71860a51a3dab",
       "r20PriorStatus": "MACHINE_PASS_PENDING_PAULA_VISUAL",
       "r20Disposition": "PRIOR_PASS_PRESERVED",
       "r20Freeze": {
@@ -9855,7 +9855,7 @@
       "id": "B4-003-R19-08-OPS-ADVISOR-HANDOFF-NOTIFICATION-GAP",
       "block": "B4",
       "targetGate": "B4-003",
-      "status": "R22_SOURCE_PATCH_PENDING_EXACT_PREVIEW_AND_PAULA_UAT",
+      "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
       "blocking": true,
       "surface": "Ops/Leads collaboration",
       "finding": "Typed handoff events persist, but it is not proven how the receiving advisor/operational user is notified or sees required action.",
@@ -9875,7 +9875,7 @@
       "mayDisappearWithoutDisposition": false,
       "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R19_SINGLE_CUMULATIVE_SOURCE_FIX_20261005.json",
       "machineProofReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_MACHINE_PROOF_20261007.json",
-      "machineProofReceiptBlobSha": "e5901ae5e24933093ec7445dbc9404ddf3f4c32e",
+      "machineProofReceiptBlobSha": "a5b334be0a3a0d66c9b5722929a71860a51a3dab",
       "uat3Reconciliation": {
         "classification": "BLOCKING_P0",
         "observationIds": [
@@ -12022,7 +12022,7 @@
   "r13PolicyRouteRuntimeRootFixBlobSha": "ff2e348845dbd76762e1c0b65f7432bc6a7f3fad",
   "r13PolicyRuntimeP3RootFixPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_POLICY_ROUTE_RUNTIME_P3_ROOTFIX_20261003.json",
   "machineProofReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_MACHINE_PROOF_20261007.json",
-  "machineProofReceiptBlobSha": "e5901ae5e24933093ec7445dbc9404ddf3f4c32e",
+  "machineProofReceiptBlobSha": "a5b334be0a3a0d66c9b5722929a71860a51a3dab",
   "renewalDeterministicApplyAuthPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_RENEWAL_DETERMINISTIC_APPLY_AUTH_20261004.json",
   "renewalDeterministicApplyAuthBlobSha": "b7b47af69634a093a1bf79be3adb46d4ebeb701b",
   "renewalDeterministicApplyReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R13_RENEWAL_DETERMINISTIC_APPLY_RESULT_20261004.json",

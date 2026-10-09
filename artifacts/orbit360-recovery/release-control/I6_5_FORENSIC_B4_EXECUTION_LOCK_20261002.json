@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B4_EXECUTION_LOCK_V1",
   "recordedAt": "2026-10-08T21:43:35.454Z",
-  "status": "B4_003_SOURCE_FIXED_R20_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+  "status": "B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "block": "B4",
@@ -38,10 +38,10 @@
   "activeFinding": {
     "id": "B4-003",
     "title": "Cumulative B4-003 remediation: Renovaciones, Cancelaciones and source-backed insurer knowledge.",
-    "status": "B4_003_SOURCE_FIXED_R20_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+    "status": "B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL",
     "blocking": true,
-    "nextAction": "B4_003_R22_EXACT_PREVIEW",
-    "humanVisualStatus": "PENDING_R22_EXACT_PREVIEW",
+    "nextAction": "B4_003_R20_TARGETED_PAULA_VISUAL",
+    "humanVisualStatus": "PENDING_R20_TARGETED_VISUAL",
     "knowledgePreview": true
   },
   "rules": {
@@ -88,7 +88,7 @@
     ],
     "reimportAuthorized": false,
     "livePromotionAuthorized": false,
-    "syntheticQaWritesAuthorized": true,
+    "syntheticQaWritesAuthorized": false,
     "syntheticQaScope": "R20 exact Preview only: disposable insurer/logo/product/plan/requirement/document and Ops/Leads handoff/cadence fixtures; mandatory server commit, readback, reload and cleanup; no real operational row mutation.",
     "paulaVisualAcceptanceRequiredBeforeAdvance": true,
     "cotcompRealTransportAuthorized": false,
@@ -116,15 +116,15 @@
     "renewalCutoffDataMutationAuthorized": false,
     "realOperationalWritesAuthorized": false
   },
-  "nextAction": "B4_003_R22_EXACT_PREVIEW",
+  "nextAction": "B4_003_R20_TARGETED_PAULA_VISUAL",
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "blobSha": "15e910b579130d1a7cd59184b918c0c09745f3c0",
+    "blobSha": "ba6922067abdaadaee29f6dec5eb8c182d080dc8",
     "status": "FROZEN_ACTIVE_UAT3_P0_BATCH_1_SOURCE_COMPLETE"
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "blobSha": "dc8a16fe440a0318ec7e03ab17f9cfaf878a46d1",
+    "blobSha": "ee4ccb3f57a5a09696cbe6f2112ea3be6197a809",
     "count": 282
   },
   "sourceFix": {
@@ -140,19 +140,18 @@
     "receiptBlobSha": "65c5376b8e43e5ecec7bf0217acccbc1fc458ac9"
   },
   "nextRequiredProof": [
-    "B4_003_R22_EXACT_AUTHENTICATED_PREVIEW",
-    "B4_003_R22_TARGETED_PAULA_VISUAL_PASS"
+    "B4_003_R20_TARGETED_PAULA_VISUAL_PASS"
   ],
   "candidate": {
-    "sourceSha": "babea00bf459dfcde611e35ea9413f70f901d043",
-    "buildId": "gi-i65-b4-babea00bf459-57f234755dc1",
-    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-37982729451-pvjxtc0j.web.app",
-    "runId": 37982729451,
-    "artifactId": 11641957470,
-    "artifactDigest": "9c7d79f21f9cbdd76e84b37981a273ddff31f5f6b293d2504c12ed55156c3502",
-    "hostedPayloadDigest": "db1e162793527cf7c55bf94627666a57758ccd6883da9e177e38c0c5b59d5528",
+    "sourceSha": "3a5e2c8df824dab8feca682ee4a2fe63d03c4ed6",
+    "buildId": "gi-i65-b4-3a5e2c8df824-57f234755dc1",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-37997959332-8tdu4lve.web.app",
+    "runId": 37997959332,
+    "artifactId": 11648431358,
+    "artifactDigest": "d84015ea75651df369b718fc793f7b6a130673767c9132ba874a7f57596558a7",
+    "hostedPayloadDigest": "0c9bf51d628b3617b2713cb3521ed307bbe3d31a18fcbc141ecea7bad93e458e",
     "backendSourceDigest": "778af087e48cf3e74edc8d4d813aa414968709a9e08977ac2a8405c820e50bb4",
-    "bundleDigest": "c940d3d8328defbc249f5f1901c693c921779d8a542b55a50d9a90e6123908e1",
+    "bundleDigest": "ebf59113478e1870e06e51d22ee0fdf97e4bbc88e73448bc79cd321a5c3900f3",
     "exactReadback": true
   },
   "b4002Diagnostic": {
@@ -416,7 +415,7 @@
   },
   "continuityRegister": {
     "path": "artifacts/orbit360-recovery/release-control/I6_5_OPEN_FINDINGS_CARRY_FORWARD_REGISTER_20261003.json",
-    "blobSha": "836effdd02c7f4723a369aa36cf829447dc08bdd",
+    "blobSha": "8cbbced4fe738245ecc50a6bec55d110f40ff37d",
     "inventoryCount": 282,
     "attentionCount": 155,
     "guardPath": "tools/gravicentra-open-findings-continuity-guard-v1.mjs",
