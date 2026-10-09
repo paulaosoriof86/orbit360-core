@@ -1,25 +1,25 @@
 {
   "schema": "GRAVICENTRA_I6_5_B4_003_PREVIEW_PROOF_R19_V1",
   "status": "FAIL",
-  "target": "https://ays-orbit-360-lab--gi-i65-b4-37936867064-r0ye6udx.web.app",
+  "target": "https://ays-orbit-360-lab--gi-i65-b4-37938353157-nhdh6uap.web.app",
   "ids": {
-    "client": "b4003qa_client_37936867064",
-    "renewalPolicy": "b4003qa_policy_renew_37936867064",
-    "expiredRenewPolicy": "b4003qa_policy_expired_renew_37936867064",
-    "unknownRenewPolicy": "b4003qa_policy_unknown_37936867064",
-    "renewabilityWritePolicy": "b4003qa_policy_renewwrite_37936867064",
-    "cancelPolicy": "b4003qa_policy_cancel_37936867064",
-    "healthPolicy": "b4003qa_policy_health_37936867064",
-    "healthReceipt1": "b4003qa_receipt_health_1_37936867064",
-    "healthReceipt2": "b4003qa_receipt_health_2_37936867064",
-    "healthReceiptShadow": "b4003qa_receipt_health_shadow_37936867064",
-    "cancelation": "b4003qa_cancel_37936867064",
-    "insurer": "b4003qa_insurer_37936867064",
-    "collabBusiness": "b4003qa_business_collab_37936867064",
-    "collabNoClientBusiness": "b4003qa_business_collab_noclient_37936867064",
-    "renewActivity": "act_ren_b4003qa_policy_renew_37936867064_20261009",
-    "cancelActivity": "act_rec_b4003qa_cancel_37936867064",
-    "recoveryBusiness": "neg_rec_b4003qa_cancel_37936867064"
+    "client": "b4003qa_client_37938353157",
+    "renewalPolicy": "b4003qa_policy_renew_37938353157",
+    "expiredRenewPolicy": "b4003qa_policy_expired_renew_37938353157",
+    "unknownRenewPolicy": "b4003qa_policy_unknown_37938353157",
+    "renewabilityWritePolicy": "b4003qa_policy_renewwrite_37938353157",
+    "cancelPolicy": "b4003qa_policy_cancel_37938353157",
+    "healthPolicy": "b4003qa_policy_health_37938353157",
+    "healthReceipt1": "b4003qa_receipt_health_1_37938353157",
+    "healthReceipt2": "b4003qa_receipt_health_2_37938353157",
+    "healthReceiptShadow": "b4003qa_receipt_health_shadow_37938353157",
+    "cancelation": "b4003qa_cancel_37938353157",
+    "insurer": "b4003qa_insurer_37938353157",
+    "collabBusiness": "b4003qa_business_collab_37938353157",
+    "collabNoClientBusiness": "b4003qa_business_collab_noclient_37938353157",
+    "renewActivity": "act_ren_b4003qa_policy_renew_37938353157_20261009",
+    "cancelActivity": "act_rec_b4003qa_cancel_37938353157",
+    "recoveryBusiness": "neg_rec_b4003qa_cancel_37938353157"
   },
   "assertions": {
     "handoffActorsDistinct": true,
@@ -399,7 +399,7 @@
       "visible": true,
       "sampleNumber": "91-59247519",
       "emptyState": false,
-      "textSample": "✕ Cancelaciones · Fuga de cartera MOTIVOS·VALOR PERDIDO·TASA DE FUGA CANCELADAS 490 histórico VALOR PERDIDO GTQ 1,842,217 USD 91,823,506 COP 26,564,526 prima anual · por moneda MOTIVO PRINCIPAL Prueba sintética B4-003 más frecuente CANCELADAS / CARTERA 34% histórico acumulado · no es churn temporal Motivos documentados de cancelación 489 registros sin causa documentada; no se inventa el histórico ni se cuenta como causa. Prueba sintética B4-003 1 · 0% Motivo documentado Prueba sintética B4-003 Asesor Braulio Hernández Carlos Castro Fernando Arias Johanna Salgado Nicole Castro Paula Osorio Samuel Daza 490 de 490 Seleccionar visibles 0 seleccionadas Limpiar Preparar WhatsApp (0) SEL. FECHA CLIENTE PÓLIZA RAMO MOTIVO VALOR PERDIDO ACCIÓN 09 oct 2026 BQ B4-003 QA Cliente Persona · GT B4-003-CAN-37936867064 Auto Prueba sintética B4-003 Q 700 Ver cancelación 16 sept 2026 ML MARÍA LUISA LARIOS CALDERÓN natural · GT 223092797 VEHICULOS Motivo histórico no disponible Q 2,436 Ver cancelación 14 sept 2026 SK SEON KEUN KIM natural · GT 225121245 VEHICULOS Motivo histórico no disponible Q 6,250 Ver cancelación 07 sept 2026 JI JHEFRI ISAAC RAMIREZ AGUSTÍN natural · GT AUTO-514726 VEHICULOS Motiv"
+      "textSample": "✕ Cancelaciones · Fuga de cartera MOTIVOS·VALOR PERDIDO·TASA DE FUGA CANCELADAS 490 histórico VALOR PERDIDO GTQ 1,842,217 USD 91,823,506 COP 26,564,526 prima anual · por moneda MOTIVO PRINCIPAL Prueba sintética B4-003 más frecuente CANCELADAS / CARTERA 34% histórico acumulado · no es churn temporal Motivos documentados de cancelación 489 registros sin causa documentada; no se inventa el histórico ni se cuenta como causa. Prueba sintética B4-003 1 · 0% Motivo documentado Prueba sintética B4-003 Asesor Braulio Hernández Carlos Castro Fernando Arias Johanna Salgado Nicole Castro Paula Osorio Samuel Daza 490 de 490 Seleccionar visibles 0 seleccionadas Limpiar Preparar WhatsApp (0) SEL. FECHA CLIENTE PÓLIZA RAMO MOTIVO VALOR PERDIDO ACCIÓN 09 oct 2026 BQ B4-003 QA Cliente Persona · GT B4-003-CAN-37938353157 Auto Prueba sintética B4-003 Q 700 Ver cancelación 16 sept 2026 ML MARÍA LUISA LARIOS CALDERÓN natural · GT 223092797 VEHICULOS Motivo histórico no disponible Q 2,436 Ver cancelación 14 sept 2026 SK SEON KEUN KIM natural · GT 225121245 VEHICULOS Motivo histórico no disponible Q 6,250 Ver cancelación 07 sept 2026 JI JHEFRI ISAAC RAMIREZ AGUSTÍN natural · GT AUTO-514726 VEHICULOS Motiv"
     }
   },
   "actor": {
@@ -1047,7 +1047,6 @@
     "cancelSnapshotError": "",
     "cancelAttached": true,
     "optionalMissing": [
-      "recibosAseguradora",
       "conciliacionesPrimas",
       "conciliaciones",
       "metas",
@@ -1647,8 +1646,8 @@
       "CO",
       "CO"
     ],
-    "cancelGtMs": 83.09999999997672,
-    "cancelCoMs": 37.70000000006985,
+    "cancelGtMs": 107.10000000003492,
+    "cancelCoMs": 45,
     "cancelExplicitTargetsGT": true,
     "cancelExplicitTargetsCO": true,
     "cancelCrossCountryExplicitGT": true,
@@ -1930,7 +1929,7 @@
     "cancelKpiDetailOpen": true
   },
   "r11Browser": {
-    "clientHref": "#/cliente360?c=b4003qa_client_37936867064&t=polizas",
+    "clientHref": "#/cliente360?c=b4003qa_client_37938353157&t=polizas",
     "policyTargetPresent": true,
     "explicitCancelTargetPresent": true,
     "rowMisleadingClickable": false,
@@ -2006,8 +2005,8 @@
       "CO",
       "CO"
     ],
-    "qualityGtMs": 156.90000000002328,
-    "qualityCoMs": 78.90000000002328,
+    "qualityGtMs": 213.39999999996508,
+    "qualityCoMs": 109.29999999998836,
     "qualityGtRows": 50,
     "qualityCoRows": 17,
     "financialGtRows": 72,
@@ -2020,7 +2019,7 @@
     "syncPaintMs": 1,
     "hasVisibleState": true,
     "text": "Confirmando catálogos canónicos… La plataforma está leyendo la configuración protegida del tenant. No se usan valores locales como autoridad.",
-    "canonicalReadyMs": 797,
+    "canonicalReadyMs": 791,
     "finalState": "ready"
   },
   "r16CatalogAndQuality": {
@@ -2055,7 +2054,7 @@
       "reason": "Se excluyeron 1 registro(s) histórico(s) duplicado(s); el calendario activo aún supera la prima contractual."
     },
     "rowVisible": true,
-    "rowText": "B4-003-HEALTH-379368670642 recibo(s) vigente(s) · 1 legado(s) excluido(s) BQ B4-003 QA Cliente Persona · GuatemalaQ 407.01Póliza · prima totalProgramación según cuotas de la póliza0 fila(s) requieren revisiónQ 542.68Q 135.67Q 0.02Se excluyeron 1 registro(s) histórico(s) duplicado(s); el calendario activo aún supera la prima contractual.Revisar diferenciaVer recibos",
+    "rowText": "B4-003-HEALTH-379383531572 recibo(s) vigente(s) · 1 legado(s) excluido(s) BQ B4-003 QA Cliente Persona · GuatemalaQ 407.01Póliza · prima totalProgramación según cuotas de la póliza0 fila(s) requieren revisiónQ 542.68Q 135.67Q 0.02Se excluyeron 1 registro(s) histórico(s) duplicado(s); el calendario activo aún supera la prima contractual.Revisar diferenciaVer recibos",
     "technicalToken": false,
     "exactAction": true,
     "mobileContract": true
@@ -2094,7 +2093,7 @@
     "technical": false
   },
   "r17QualityReceiptsDeepLink": {
-    "hash": "#/cliente360?c=b4003qa_client_37936867064&p=b4003qa_policy_health_37936867064&t=recibos",
+    "hash": "#/cliente360?c=b4003qa_client_37938353157&p=b4003qa_policy_health_37938353157&t=recibos",
     "receiptsTarget": true
   },
   "policyEditorPreservation": {
@@ -2183,9 +2182,9 @@
   },
   "r18CommercialMobile": {
     "viewport": 390,
-    "cardWidth": 390,
-    "cardScrollWidth": 388,
-    "cardClientWidth": 388,
+    "cardWidth": 386.5,
+    "cardScrollWidth": 385,
+    "cardClientWidth": 385,
     "footerButtons": 2
   },
   "r18ManagementModal": {
@@ -2230,7 +2229,7 @@
           "pol_b9a883095c9fae8f7502ce1cb054",
           "pol_0f89cc0a12840594abcc60d418b2",
           "pol_b8b99324d9016269d118d789095a",
-          "b4003qa_policy_expired_renew_37936867064",
+          "b4003qa_policy_expired_renew_37938353157",
           "pol_8231bbb8f9b7272c02891f5a4caf",
           "pol_df6bf097045762297ec31fd4e5c5"
         ]
@@ -2239,9 +2238,9 @@
         "key": "d15",
         "count": 3,
         "ids": [
-          "b4003qa_policy_renew_37936867064",
-          "b4003qa_policy_renewwrite_37936867064",
-          "b4003qa_policy_unknown_37936867064"
+          "b4003qa_policy_renew_37938353157",
+          "b4003qa_policy_renewwrite_37938353157",
+          "b4003qa_policy_unknown_37938353157"
         ]
       },
       {
@@ -2307,9 +2306,9 @@
     "unknownReview": true,
     "parallelDispositionAbsent": true,
     "date45ExpectedIds": [
-      "b4003qa_policy_renew_37936867064",
-      "b4003qa_policy_renewwrite_37936867064",
-      "b4003qa_policy_unknown_37936867064",
+      "b4003qa_policy_renew_37938353157",
+      "b4003qa_policy_renewwrite_37938353157",
+      "b4003qa_policy_unknown_37938353157",
       "pol_3ddc9e613f40252f02b2e122072d",
       "pol_638e276218baad9e84018415b0ba",
       "pol_7280c9b1a5253a1fe1e463e5993b",
@@ -2321,9 +2320,9 @@
       "pol_d5e61976a38be76ba5e3c1e12575"
     ],
     "date45VisibleIds": [
-      "b4003qa_policy_renew_37936867064",
-      "b4003qa_policy_renewwrite_37936867064",
-      "b4003qa_policy_unknown_37936867064",
+      "b4003qa_policy_renew_37938353157",
+      "b4003qa_policy_renewwrite_37938353157",
+      "b4003qa_policy_unknown_37938353157",
       "pol_3ddc9e613f40252f02b2e122072d",
       "pol_638e276218baad9e84018415b0ba",
       "pol_7280c9b1a5253a1fe1e463e5993b",
@@ -2353,7 +2352,7 @@
     ]
   },
   "r19RenewabilityDurable": {
-    "policyId": "b4003qa_policy_renewwrite_37936867064",
+    "policyId": "b4003qa_policy_renewwrite_37938353157",
     "serverValue": true,
     "reloadValue": true
   },
@@ -2363,10 +2362,10 @@
     "hasPrev": true
   },
   "r13PolicyRouteTiming": {
-    "wallMs": 477,
+    "wallMs": 462,
     "browser": {
-      "domPaintMs": 151,
-      "routeOwnerMs": 151,
+      "domPaintMs": 83,
+      "routeOwnerMs": 83,
       "mutationCount": 1,
       "route": "polizas",
       "tableReady": true
@@ -2374,31 +2373,31 @@
     "measurement": "Chrome performance.now to canonical table DOM mutation"
   },
   "r13PolicySearchTiming": {
-    "wallMs": 226,
+    "wallMs": 380,
     "browser": {
-      "inputToCorrectDomMs": 217,
+      "inputToCorrectDomMs": 284,
       "mutationCount": 1,
       "inputPresent": true
     },
     "measurement": "Chrome input event to exact filtered DOM"
   },
   "r13PolicyDetailTiming": {
-    "wallMs": 350,
+    "wallMs": 2077,
     "browser": {
-      "clickToFullDetailDomMs": 149,
+      "clickToFullDetailDomMs": 190,
       "mutationCount": 1,
       "detailVisible": true
     },
     "measurement": "Chrome click to full detail DOM"
   },
   "r13PolicyPerformance": {
-    "routeWallMs": 477,
-    "routeChromeMs": 151,
-    "searchWallMs": 226,
-    "searchChromeMs": 217,
-    "detailWallMs": 350,
-    "detailChromeMs": 149,
-    "searchNumber": "B4-003-REN-37936867064",
+    "routeWallMs": 462,
+    "routeChromeMs": 83,
+    "searchWallMs": 380,
+    "searchChromeMs": 284,
+    "detailWallMs": 2077,
+    "detailChromeMs": 190,
+    "searchNumber": "B4-003-REN-37938353157",
     "refreshFlicker": {
       "states": [
         {
@@ -2515,8 +2514,8 @@
     "owner": "polizas.policyMetrics.isRenewalWithin45Days"
   },
   "r19InicioReadiness": {
-    "text": "🌅 Buen día · esto es lo importante hoy METAS DEL MES·PRIORIDADES·AVANCE POR ASESOR Abrir Cliente 360 → METAS DEL MES · OCTUBRE 2026 Avance real del mes Quedan 22 días para cerrar el mes. La producción usa la prima neta de pólizas con inicio de vigencia en el mes y el recaudo usa pagos confirmados con fecha efectiva del mes. Si no existe meta configurada, no se inventa un porcentaje. 440 clientes 1425 pólizas 588 registros vencidos en cartera — Q11K GTQ Producción neta del mes Meta no disponible para este alcance — Sin movimientos Recaudo confirmado del mes Meta no disponible para este alcance COBROS CONFIRMADOS Q851K GTQ $205.8M COP 1243 pagos confirmados › PENDIENTE DE COBRO Q 8,058 GTQ $ 0 COP 728 obligaciones · 18 con monto › CARTERA VENCIDA Q 8,274 GTQ $ 0 COP 588 obligaciones · 16 con monto › VENCEN ≤45 D 13 mismo universo de Pólizas › Avance por asesor producción neta del mes vs meta configurada Avance por asesor no disponible. Producción o metas no están disponibles para este rol/alcance; no se mantiene un estado de carga indefinido. Prioridades 🔄 CASSIDY ISABEL RIOS MELÉNDEZ VEHICULOS · renueva en 8 d 🔄 B4-003 QA Cliente Auto · renueva en 9 d 🔄 B4-003 QA Cliente Auto · renueva en 9 d 🔄 B4-003 QA Cliente ACCIDENTES QA FUENTE · renueva en 9 d ⚠ NORA LUCIA HURTARTE FLORES cuota — vencida · — ⚠ LUIS ESTUARDO PEREZ CIFUENTES cuota — vencida · — ⚠ ERICKA LIZETTE AGUILAR LUNA cuota — vencida · — Seguimientos de hoy sin cadencia automática · gestiona por WhatsApp 🌱 B4-003 QA colaboración · Paula Osorio · mañana · Nuevo ingreso 🧮 B4-003 QA colaboración pre-emisión · Paula Osorio · mañana · Cotizando 🧮 Fernando Arias · Salud Familiar Carlos Castro · vencido · Cotizando Al activar la cadencia automática (al enviar propuesta) los toques se programan solos; aquí solo",
-    "terminal": "unavailable"
+    "text": "🌅 Buen día · esto es lo importante hoy METAS DEL MES·PRIORIDADES·AVANCE POR ASESOR Abrir Cliente 360 → METAS DEL MES · OCTUBRE 2026 Avance real del mes Quedan 22 días para cerrar el mes. La producción usa la prima neta de pólizas con inicio de vigencia en el mes y el recaudo usa pagos confirmados con fecha efectiva del mes. Si no existe meta configurada, no se inventa un porcentaje. 440 clientes 1425 pólizas 588 registros vencidos en cartera 14% Q11K GTQ Producción neta del mes Meta Q80K 0% Sin movimientos Recaudo confirmado del mes Meta Q50K COBROS CONFIRMADOS Q851K GTQ $205.8M COP 1243 pagos confirmados › PENDIENTE DE COBRO Q 8,058 GTQ $ 0 COP 728 obligaciones · 18 con monto › CARTERA VENCIDA Q 8,274 GTQ $ 0 COP 588 obligaciones · 16 con monto › VENCEN ≤45 D 13 mismo universo de Pólizas › Avance por asesor producción neta del mes vs meta configurada PO Paula Osorio Q11K GTQ 14% BH Braulio Hernández Sin movimientos Meta no configurada — CC Carlos Castro Sin movimientos Meta no configurada — FA Fernando Arias Sin movimientos Meta no configurada — JS Johanna Salgado Sin movimientos Meta no configurada — NC Nicole Castro Sin movimientos Meta no configurada — SD Samuel Daza Sin movimientos Meta no configurada — Prioridades 🔄 CASSIDY ISABEL RIOS MELÉNDEZ VEHICULOS · renueva en 8 d 🔄 B4-003 QA Cliente Auto · renueva en 9 d 🔄 B4-003 QA Cliente Auto · renueva en 9 d 🔄 B4-003 QA Cliente ACCIDENTES QA FUENTE · renueva en 9 d ⚠ NORA LUCIA HURTARTE FLORES cuota — vencida · — ⚠ LUIS ESTUARDO PEREZ CIFUENTES cuota — vencida · — ⚠ ERICKA LIZETTE AGUILAR LUNA cuota — vencida · — Seguimientos de hoy sin cadencia automática · gestiona por WhatsApp 🌱 B4-003 QA colaboración · Paula Osorio · mañana · Nuevo ingreso 🧮 B4-003 QA colaboración pre-emisión · Paula Osorio · mañana · Cotiza",
+    "terminal": "ready"
   },
   "renewalRenderStability": {
     "mutationCount": 80,
@@ -2524,7 +2523,7 @@
     "route": "renovaciones",
     "records": [
       {
-        "ms": 406,
+        "ms": 508,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -2535,7 +2534,7 @@
         ]
       },
       {
-        "ms": 643,
+        "ms": 889,
         "type": "childList",
         "target": "DIV",
         "added": [],
@@ -2544,7 +2543,7 @@
         ]
       },
       {
-        "ms": 644,
+        "ms": 889,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -2553,7 +2552,7 @@
         "removed": []
       },
       {
-        "ms": 644,
+        "ms": 889,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -2564,7 +2563,7 @@
         ]
       },
       {
-        "ms": 644,
+        "ms": 889,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -2575,7 +2574,7 @@
         ]
       },
       {
-        "ms": 644,
+        "ms": 889,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -2586,7 +2585,7 @@
         ]
       },
       {
-        "ms": 644,
+        "ms": 889,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -2597,7 +2596,7 @@
         ]
       },
       {
-        "ms": 644,
+        "ms": 889,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -2608,7 +2607,7 @@
         ]
       },
       {
-        "ms": 644,
+        "ms": 889,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -2619,7 +2618,7 @@
         ]
       },
       {
-        "ms": 644,
+        "ms": 889,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -2630,7 +2629,7 @@
         ]
       },
       {
-        "ms": 644,
+        "ms": 889,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -2641,7 +2640,7 @@
         ]
       },
       {
-        "ms": 644,
+        "ms": 889,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -2652,7 +2651,7 @@
         ]
       },
       {
-        "ms": 644,
+        "ms": 889,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -2663,7 +2662,7 @@
         ]
       },
       {
-        "ms": 644,
+        "ms": 889,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -2675,7 +2674,7 @@
         ]
       },
       {
-        "ms": 644,
+        "ms": 889,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -2686,7 +2685,7 @@
         ]
       },
       {
-        "ms": 644,
+        "ms": 889,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2697,7 +2696,7 @@
         ]
       },
       {
-        "ms": 644,
+        "ms": 889,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2708,7 +2707,7 @@
         ]
       },
       {
-        "ms": 644,
+        "ms": 889,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2719,7 +2718,7 @@
         ]
       },
       {
-        "ms": 644,
+        "ms": 889,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2730,7 +2729,7 @@
         ]
       },
       {
-        "ms": 644,
+        "ms": 889,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2741,7 +2740,7 @@
         ]
       },
       {
-        "ms": 644,
+        "ms": 889,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2752,7 +2751,7 @@
         ]
       },
       {
-        "ms": 644,
+        "ms": 889,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2763,7 +2762,7 @@
         ]
       },
       {
-        "ms": 644,
+        "ms": 889,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2774,7 +2773,7 @@
         ]
       },
       {
-        "ms": 644,
+        "ms": 889,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2785,7 +2784,7 @@
         ]
       },
       {
-        "ms": 644,
+        "ms": 889,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2796,7 +2795,7 @@
         ]
       },
       {
-        "ms": 644,
+        "ms": 889,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2807,7 +2806,7 @@
         ]
       },
       {
-        "ms": 644,
+        "ms": 889,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2818,7 +2817,7 @@
         ]
       },
       {
-        "ms": 644,
+        "ms": 889,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2829,7 +2828,7 @@
         ]
       },
       {
-        "ms": 644,
+        "ms": 889,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2840,7 +2839,7 @@
         ]
       },
       {
-        "ms": 644,
+        "ms": 889,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2851,7 +2850,7 @@
         ]
       },
       {
-        "ms": 644,
+        "ms": 889,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2862,7 +2861,7 @@
         ]
       },
       {
-        "ms": 644,
+        "ms": 889,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2873,7 +2872,7 @@
         ]
       },
       {
-        "ms": 644,
+        "ms": 889,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2884,7 +2883,7 @@
         ]
       },
       {
-        "ms": 644,
+        "ms": 889,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2895,7 +2894,7 @@
         ]
       },
       {
-        "ms": 644,
+        "ms": 889,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2906,7 +2905,7 @@
         ]
       },
       {
-        "ms": 644,
+        "ms": 889,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2917,7 +2916,7 @@
         ]
       },
       {
-        "ms": 644,
+        "ms": 889,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2928,7 +2927,7 @@
         ]
       },
       {
-        "ms": 644,
+        "ms": 889,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2939,7 +2938,7 @@
         ]
       },
       {
-        "ms": 644,
+        "ms": 889,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2950,7 +2949,7 @@
         ]
       },
       {
-        "ms": 644,
+        "ms": 889,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2961,7 +2960,7 @@
         ]
       },
       {
-        "ms": 644,
+        "ms": 889,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2972,7 +2971,7 @@
         ]
       },
       {
-        "ms": 644,
+        "ms": 889,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2983,7 +2982,7 @@
         ]
       },
       {
-        "ms": 644,
+        "ms": 889,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2994,7 +2993,7 @@
         ]
       },
       {
-        "ms": 644,
+        "ms": 889,
         "type": "childList",
         "target": "A",
         "added": [
@@ -3005,7 +3004,7 @@
         ]
       },
       {
-        "ms": 644,
+        "ms": 889,
         "type": "childList",
         "target": "A",
         "added": [
@@ -3016,7 +3015,7 @@
         ]
       },
       {
-        "ms": 644,
+        "ms": 889,
         "type": "childList",
         "target": "A",
         "added": [
@@ -3027,7 +3026,7 @@
         ]
       },
       {
-        "ms": 644,
+        "ms": 889,
         "type": "childList",
         "target": "A",
         "added": [
@@ -3038,7 +3037,7 @@
         ]
       },
       {
-        "ms": 644,
+        "ms": 889,
         "type": "childList",
         "target": "A",
         "added": [
@@ -3049,7 +3048,7 @@
         ]
       },
       {
-        "ms": 644,
+        "ms": 889,
         "type": "childList",
         "target": "A",
         "added": [
@@ -3060,7 +3059,7 @@
         ]
       },
       {
-        "ms": 644,
+        "ms": 889,
         "type": "childList",
         "target": "A",
         "added": [
@@ -3071,7 +3070,7 @@
         ]
       },
       {
-        "ms": 644,
+        "ms": 889,
         "type": "childList",
         "target": "A",
         "added": [
@@ -3082,7 +3081,7 @@
         ]
       },
       {
-        "ms": 644,
+        "ms": 889,
         "type": "childList",
         "target": "A",
         "added": [
@@ -3093,7 +3092,7 @@
         ]
       },
       {
-        "ms": 644,
+        "ms": 889,
         "type": "childList",
         "target": "A",
         "added": [
@@ -3104,7 +3103,7 @@
         ]
       },
       {
-        "ms": 644,
+        "ms": 889,
         "type": "childList",
         "target": "A",
         "added": [
@@ -3115,7 +3114,7 @@
         ]
       },
       {
-        "ms": 644,
+        "ms": 889,
         "type": "childList",
         "target": "A",
         "added": [
@@ -3126,7 +3125,7 @@
         ]
       },
       {
-        "ms": 644,
+        "ms": 889,
         "type": "childList",
         "target": "A",
         "added": [
@@ -3137,7 +3136,7 @@
         ]
       },
       {
-        "ms": 644,
+        "ms": 889,
         "type": "childList",
         "target": "A",
         "added": [
@@ -3148,7 +3147,7 @@
         ]
       },
       {
-        "ms": 644,
+        "ms": 889,
         "type": "childList",
         "target": "A",
         "added": [
@@ -3159,7 +3158,7 @@
         ]
       },
       {
-        "ms": 644,
+        "ms": 889,
         "type": "childList",
         "target": "A",
         "added": [
@@ -3170,7 +3169,7 @@
         ]
       },
       {
-        "ms": 644,
+        "ms": 889,
         "type": "childList",
         "target": "A",
         "added": [
@@ -3181,7 +3180,7 @@
         ]
       },
       {
-        "ms": 644,
+        "ms": 889,
         "type": "childList",
         "target": "A",
         "added": [
@@ -3192,7 +3191,7 @@
         ]
       },
       {
-        "ms": 644,
+        "ms": 889,
         "type": "childList",
         "target": "A",
         "added": [
@@ -3203,7 +3202,7 @@
         ]
       },
       {
-        "ms": 644,
+        "ms": 889,
         "type": "childList",
         "target": "A",
         "added": [
@@ -3214,7 +3213,7 @@
         ]
       },
       {
-        "ms": 644,
+        "ms": 889,
         "type": "childList",
         "target": "A",
         "added": [
@@ -3225,7 +3224,7 @@
         ]
       },
       {
-        "ms": 644,
+        "ms": 889,
         "type": "childList",
         "target": "A",
         "added": [
@@ -3236,7 +3235,7 @@
         ]
       },
       {
-        "ms": 644,
+        "ms": 889,
         "type": "childList",
         "target": "A",
         "added": [
@@ -3247,7 +3246,7 @@
         ]
       },
       {
-        "ms": 644,
+        "ms": 889,
         "type": "childList",
         "target": "BUTTON",
         "added": [
@@ -3258,7 +3257,7 @@
         ]
       },
       {
-        "ms": 644,
+        "ms": 889,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -3267,7 +3266,7 @@
         "removed": []
       },
       {
-        "ms": 644,
+        "ms": 889,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -3276,7 +3275,7 @@
         "removed": []
       },
       {
-        "ms": 644,
+        "ms": 889,
         "type": "childList",
         "target": "BUTTON",
         "added": [
@@ -3287,7 +3286,7 @@
         ]
       },
       {
-        "ms": 644,
+        "ms": 889,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -3296,7 +3295,7 @@
         "removed": []
       },
       {
-        "ms": 644,
+        "ms": 889,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -3305,7 +3304,7 @@
         "removed": []
       },
       {
-        "ms": 644,
+        "ms": 889,
         "type": "childList",
         "target": "BUTTON",
         "added": [
@@ -3316,7 +3315,7 @@
         ]
       },
       {
-        "ms": 644,
+        "ms": 889,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -3325,7 +3324,7 @@
         "removed": []
       },
       {
-        "ms": 644,
+        "ms": 889,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -3334,7 +3333,7 @@
         "removed": []
       },
       {
-        "ms": 644,
+        "ms": 889,
         "type": "childList",
         "target": "BUTTON",
         "added": [
@@ -3345,7 +3344,7 @@
         ]
       },
       {
-        "ms": 644,
+        "ms": 889,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -3354,7 +3353,7 @@
         "removed": []
       },
       {
-        "ms": 644,
+        "ms": 889,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -3363,7 +3362,7 @@
         "removed": []
       },
       {
-        "ms": 644,
+        "ms": 889,
         "type": "childList",
         "target": "BUTTON",
         "added": [
@@ -3374,7 +3373,7 @@
         ]
       },
       {
-        "ms": 644,
+        "ms": 889,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -3385,69 +3384,64 @@
     ],
     "events": [
       {
-        "ms": 24,
+        "ms": 32,
         "kind": "store",
         "detail": "clientes"
       },
       {
-        "ms": 53,
+        "ms": 71,
         "kind": "store",
         "detail": "vehiculos"
       },
       {
-        "ms": 102,
+        "ms": 139,
         "kind": "store",
         "detail": "recibosEsperados"
       },
       {
-        "ms": 107,
+        "ms": 144,
         "kind": "store",
         "detail": "cancelaciones"
       },
       {
-        "ms": 111,
+        "ms": 150,
         "kind": "store",
         "detail": "negocios"
       },
       {
-        "ms": 114,
+        "ms": 155,
         "kind": "store",
         "detail": "gestiones"
       },
       {
-        "ms": 122,
+        "ms": 167,
         "kind": "store",
         "detail": "aseguradoras"
       },
       {
-        "ms": 126,
+        "ms": 172,
         "kind": "store",
         "detail": "cobros"
       },
       {
-        "ms": 152,
+        "ms": 210,
         "kind": "store",
         "detail": "carteraPrimas"
       },
       {
-        "ms": 156,
+        "ms": 215,
         "kind": "store",
         "detail": "metas"
       },
       {
-        "ms": 666,
+        "ms": 223,
         "kind": "store",
         "detail": "reclamos"
       },
       {
-        "ms": 670,
+        "ms": 918,
         "kind": "store",
         "detail": "comisiones"
-      },
-      {
-        "ms": 803,
-        "kind": "store",
-        "detail": "auditoria"
       }
     ],
     "canonicalRerenderObserved": true
@@ -3635,12 +3629,12 @@
       "pol_b9a883095c9fae8f7502ce1cb054",
       "pol_0f89cc0a12840594abcc60d418b2",
       "pol_b8b99324d9016269d118d789095a",
-      "b4003qa_policy_expired_renew_37936867064",
+      "b4003qa_policy_expired_renew_37938353157",
       "pol_8231bbb8f9b7272c02891f5a4caf",
       "pol_df6bf097045762297ec31fd4e5c5",
-      "b4003qa_policy_renew_37936867064",
-      "b4003qa_policy_renewwrite_37936867064",
-      "b4003qa_policy_unknown_37936867064",
+      "b4003qa_policy_renew_37938353157",
+      "b4003qa_policy_renewwrite_37938353157",
+      "b4003qa_policy_unknown_37938353157",
       "pol_638e276218baad9e84018415b0ba",
       "pol_b39a58e5c216d8fb0f9fca4da4d6",
       "pol_7280c9b1a5253a1fe1e463e5993b",
@@ -3764,7 +3758,7 @@
     ]
   },
   "failure": {
-    "message": "B4_003_R13_REAL_RENEWAL_PIPELINE_MISMATCH:{\"expected\":151,\"visible\":56,\"expectedSample\":[\"pol_00680d20202f3727c939c3a942fc\",\"pol_008da5b609d517ac0a4405f3c06c\",\"pol_00dc40cbd7a843e7e5761b2de1d1\",\"pol_00fbbb55effae10376c8e6017168\",\"pol_0281e18f7868b87f38b8cb02aaad\",\"pol_0607298b04e49a0d9d2e78777036\",\"pol_0d55730beb919d62694c782028dd\",\"pol_0d55a6a6680e83cc9b26c7a23b8e\",\"pol_0e45e58cef38d738a207493f13bc\",\"pol_0f89cc0a12840594abcc60d418b2\",\"pol_118e1cd83b62d236e67454401b01\",\"pol_1200a1a3839beabd35a694b31936\",\"pol_164390f8ba3ece8eb899c8002378\",\"pol_168b56a1945ee94512a77005a605\",\"pol_19d1a75c08dceffd17674a546a83\",\"pol_2135cbb5d44d6fd983db5b5a606b\",\"pol_228c609da2a78700fcb839218110\",\"pol_26a4b39141356091f39b2f7ebef2\",\"pol_2adfd47653bc9e41cd8a2960f973\",\"pol_2c2a9af653ab7919cd6587028c72\"],\"visibleSample\":[\"pol_00680d20202f3727c939c3a942fc\",\"pol_00dc40cbd7a843e7e5761b2de1d1\",\"pol_0f89cc0a12840594abcc60d418b2\",\"pol_168b56a1945ee94512a77005a605\",\"pol_2adfd47653bc9e41cd8a2960f973\",\"pol_2d55dc4903c785fff60d06547cad\",\"pol_3156b732e602108afe817cdd10d3\",\"pol_3ddc9e613f40252f02b2e122072d\",\"pol_4029e754deba8638d9faa5819f49\",\"pol_4221b6ed10faaa92cbbff6a8f4c4\",\"pol_44c2ff4c23ecea8f3d706275174a\",\"pol_4773480dde15659f114b5f53875a\",\"pol_4a97836eea4c3d707d714f80c86b\",\"pol_4bacbd8cbf402dc988f251245752\",\"pol_4ec31907ccbd8821ab4e7da18cd7\",\"pol_5080266a15e6f2b39f20017d08e4\",\"pol_638e276218baad9e84018415b0ba\",\"pol_6afc26e7eba0f78901968c6772a2\",\"pol_6b2035cd7636a5bd2156878fcfa7\",\"pol_6e62faaefa973c666a5fc797ebf3\"]}",
-    "stack": "Error: B4_003_R13_REAL_RENEWAL_PIPELINE_MISMATCH:{\"expected\":151,\"visible\":56,\"expectedSample\":[\"pol_00680d20202f3727c939c3a942fc\",\"pol_008da5b609d517ac0a4405f3c06c\",\"pol_00dc40cbd7a843e7e5761b2de1d1\",\"pol_00fbbb55effae10376c8e6017168\",\"pol_0281e18f7868b87f38b8cb02aaad\",\"pol_0607298b04e49a0d9d2e78777036\",\"pol_0d55730beb919d62694c782028dd\",\"pol_0d55a6a6680e83cc9b26c7a23b8e\",\"pol_0e45e58cef38d738a207493f13bc\",\"pol_0f89cc0a12840594abcc60d418b2\",\"pol_118e1cd83b62d236e67454401b01\",\"pol_1200a1a3839beabd35a694b31936\",\"pol_164390f8ba3ece8eb899c8002378\",\"pol_168b56a1945ee94512a77005a605\",\"pol_19d1a75c08dceffd17674a546a83\",\"pol_2135cbb5d44d6fd983db5b5a606b\",\"pol_228c609da2a78700fcb839218110\",\"pol_26a4b39141356091f39b2f7ebef2\",\"pol_2adfd47653bc9e41cd8a2960f973\",\"pol_2c2a9af653ab7919cd6587028c72\"],\"visibleSample\":[\"pol_00680d20202f3727c939c3a942fc\",\"pol_00dc40cbd7a843e7e5761b2de1d1\",\"pol_0f89cc0a12840594abcc60d418b2\",\"pol_168b56a1945ee94512a77005a605\",\"pol_2adfd47653bc9e41cd8a2960f973\",\"pol_2d55dc4903c785fff60d06547cad\",\"pol_3156b732e602108afe817cdd10d3\",\"pol_3ddc9e613f40252f02b2e122072d\",\"pol_4029e754deba8638d9faa5819f49\",\"pol_4221b6ed10faaa92cbbff6a8f4c4\",\"pol_44c2ff4c23ecea8f3d706275174a\",\"pol_4773480dde15659f114b5f53875a\",\"pol_4a97836eea4c3d707d714f80c86b\",\"pol_4bacbd8cbf402dc988f251245752\",\"pol_4ec31907ccbd8821ab4e7da18cd7\",\"pol_5080266a15e6f2b39f20017d08e4\",\"pol_638e276218baad9e84018415b0ba\",\"pol_6afc26e7eba0f78901968c6772a2\",\"pol_6b2035cd7636a5bd2156878fcfa7\",\"pol_6e62faaefa973c666a5fc797ebf3\"]}\n    at need (file:///home/runner/work/orbit360-core/orbit360-core/tools/gravicentra-i6-5-b4-003-preview-proof.mjs:12:32)\n    at file:///home/runner/work/orbit360-core/orbit360-core/tools/gravicentra-i6-5-b4-003-preview-proof.mjs:1284:4"
+    "message": "hash is not defined",
+    "stack": "ReferenceError: hash is not defined\n    at file:///home/runner/work/orbit360-core/orbit360-core/tools/gravicentra-i6-5-b4-003-preview-proof.mjs:1318:29"
   }
 }
