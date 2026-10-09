@@ -1,0 +1,44 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R21_COLD_INBOX_BOOTSTRAP_EVENT_ROOTFIX_V1",
+  "date": "2026-10-09",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "baseHead": "525777e230be2bd9594cd2c38910ddd384c4a3b8",
+  "gate": "I6.5/B4-003",
+  "status": "SOURCE_AND_DISCRIMINANT_STAGED_EXACT_PREVIEW_PENDING",
+  "precedingFailedRun": 37973018063,
+  "failureCode": "page.waitForFunction timed out after 22000ms at actionCardUiFor: requires Ops/Leads card + authenticated shared inbox ready",
+  "precedingProofSha": "c2f61f6c56cfbadfdd04de4bf0abd5c6734e0a1f",
+  "observedProof": "Previous run passed authenticated Preview negative attachment scenario with no operational writes; 116 assertions positive before action-card readiness timeout.",
+  "causalEvidence": [
+    "core/product-app-p0.js emits document orbit:auth after product activation and authenticated membership",
+    "index.html inbox listened to orbit:session/ciclo and bootstrap but not orbit:auth",
+    "initial 1200-ms refresh can run before auth and fail, leaving sharedInboxState.ready=false until a manual interaction or later interval",
+    "Ops/Leads action-card reader must receive a confirmed inbox projection to clear resolved labels"
+  ],
+  "sourceFix": {
+    "orbit360-platform/index.html": "34154d820d0432c05a91244fce5014d2800b5b97"
+  },
+  "qaFix": {
+    "tools/gravicentra-i6-5-b4-003-preview-proof.mjs": "350e1669419ed7fff0cdd54bab56a88bcf9df498",
+    "tools/gravicentra-i6-5-b4-003-contract.mjs": "f390d412de153d6b447ddb4df7ecfd0ccc153df3"
+  },
+  "guarantees": [
+    "No inbox call before auth readiness",
+    "Re-query after orbit:auth event using source-provided active role",
+    "Do not block first paint or service-worker startup",
+    "Use exact authenticated broker readback for resolution instead of optimistic UI state",
+    "Preserve role/country scopes, synthetic QA-only writes and existing 282 finding identities"
+  ],
+  "boundaries": {
+    "backendChanged": false,
+    "firestoreWrites": 0,
+    "productionDeploy": false,
+    "productionAccepted": false,
+    "previewQaRequired": true,
+    "humanAcceptanceRequired": true,
+    "newArtifactDigestRequired": true,
+    "reimport": false
+  },
+  "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_R20_CONTRACT_AND_EXACT_PREVIEW"
+}

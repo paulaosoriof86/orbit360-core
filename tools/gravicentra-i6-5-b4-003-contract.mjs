@@ -441,6 +441,7 @@ need(index.includes('modules/polizas.js?v=20261004-b4003r14-i65-20261008-lineage
   'B4_003_R20_POLICY_AND_RENEWALS_CACHE_BUST_BINDING_MISSING');
 need(base.includes('advisorProjectionReady=')&&base.includes("n!=='asesores'||!advisorProjectionReady")&&previewProof.includes('B4_003_RENEWAL_SEARCH_TARGET_NOT_READY_OR_NOT_VISIBLE'),'B4_003_RENEWAL_SEARCH_ADVISOR_PROJECTION_READINESS_GUARD_MISSING');
 need(base.includes('data-renewal-search-input')&&base.includes('data-renewal-search-state')&&base.includes('visibleCols.map')&&previewProof.includes('renewalSearchKanbanPositiveNegativeClear'),'B4_003_RENEWAL_SEARCH_EXACT_KANBAN_CONTRACT_MISSING');
+need(index.includes("document.addEventListener('orbit:auth'")&&index.includes('!Orbit.auth?.productUser?.uid||!activeRole()')&&previewProof.includes('B4_003_R21_ACTION_CARD_INBOX_STARTUP_READINESS_NOT_CONFIRMED'),'B4_003_R21_COLD_LOGIN_INBOX_AUTH_HANDOFF_REGRESSION');
 need(index.includes('refreshFlight')&&index.includes('inboxScope()')&&index.includes('data-inbox-render-count')&&previewProof.includes('B4_003_INBOX_AUTHENTICATED_CARD_NOT_VISIBLE'),'B4_003_INBOX_STALE_REFRESH_DISCRIMINANT_MISSING');
 /* R20: Reproduce the actual string-composition failure: header count previously
    rendered without any body/cards. Execute the source's real HTML expression. */

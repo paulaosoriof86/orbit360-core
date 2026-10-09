@@ -140,6 +140,9 @@
       function inboxScope(){var auth=Orbit.auth&&Orbit.auth.productUser||{};return [tenant(),String(auth.uid||''),activeRole()].join('|');}
       function refresh(force){
         if(!tenant())return Promise.resolve(rows);
+        /* Session activation is the read authority. Never launch an unauthenticated
+           inbox call during fast first paint; orbit:auth retries after bootstrap. */
+        if(!Orbit.auth?.productUser?.uid||!activeRole())return Promise.resolve(rows);
         var key=inboxScope();
         if(!force&&refreshFlight&&refreshKey===key)return refreshFlight;
         if(key!==lastRenderedScope){rows=[];lastRenderedScope=key;refreshState='loading';paint();var d=document.getElementById('ops-inbox-drawer');if(d?.classList.contains('open'))open();}
@@ -215,6 +218,9 @@
       }
       if(bell)bell.addEventListener('click',function(){refresh().then(open);});
       document.addEventListener('orbit:session',function(){setTimeout(refresh,80);});
+      /* Fired AFTER productApp activates router, membership and user auth.
+         This closes the cold-login race without waiting for inbox before first render. */
+      document.addEventListener('orbit:auth',function(){setTimeout(function(){refresh(true);},80);});
       document.addEventListener('orbit:ciclo',function(){setTimeout(refresh,80);});
       window.addEventListener('orbit:product-readonly-bootstrap',function(e){if(e&&e.detail&&e.detail.ready===true)setTimeout(refresh,100);});
       setTimeout(refresh,1200);setInterval(refresh,60000);

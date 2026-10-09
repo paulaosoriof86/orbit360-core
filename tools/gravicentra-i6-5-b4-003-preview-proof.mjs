@@ -173,7 +173,18 @@ async function actionCardUiFor(browser,who,businessId,surface){
  const token=await auth.createCustomToken(who.uid),ctx=await browser.newContext({ignoreHTTPSErrors:false}),p=await ctx.newPage();
  try{
   await applyLegal(p,who);await p.goto(target+'/#/'+surface,{waitUntil:'domcontentloaded',timeout:60000});await bootProduct(p,token);
-  await p.waitForFunction(({businessId,surface})=>{const h=document.getElementById('host');if(!h)return false;const card=h.querySelector('[data-neg="'+businessId+'"]');return !!card&&location.hash==='#/'+surface&&Orbit.sharedInboxState?.ready===true;},{businessId,surface},{timeout:22000});
+  try{
+    await p.waitForFunction(({businessId,surface})=>{
+      const h=document.getElementById('host'),card=h?.querySelector('[data-neg="'+businessId+'"]');
+      return !!card&&location.hash==='#/'+surface&&Orbit.sharedInboxState?.ready===true;
+    },{businessId,surface},{timeout:22000});
+  }catch(error){
+    const diagnostic=await p.evaluate(({businessId,surface})=>{
+      const h=document.getElementById('host'),card=h?.querySelector('[data-neg="'+businessId+'"]'),app=Orbit.productAppP0?.status?.()||{},store=Orbit.store?._productStatus?.()||{},inbox=Orbit.sharedInboxState||{};
+      return{route:String(location.hash||''),wantedSurface:surface,cardPresent:!!card,kanbanCardCount:h?.querySelectorAll('[data-neg]').length||0,sharedInboxReady:inbox.ready===true,sharedInboxPublished:!!inbox.lookup,inboxScopePresent:!!inbox.scope,authenticatedMembershipReady:!!Orbit.auth?.productUser?.uid,role:String(Orbit.session?.rol?.()||''),productStarted:Orbit.productAppP0?.isStarted?.()===true,productReady:app.started===true,storeReady:store.ready===true,storeStatus:String(store.status||''),inboxBellPresent:!!document.getElementById('ops-inbox-bell')};
+    },{businessId,surface});
+    throw new Error('B4_003_R21_ACTION_CARD_INBOX_STARTUP_READINESS_NOT_CONFIRMED:'+JSON.stringify(diagnostic)+'|'+String(error.message||error));
+  }
   return await p.evaluate(({businessId,surface})=>{
     const card=document.querySelector('[data-neg="'+businessId+'"]'),badge=card?.querySelector('.collab-action'),ranks=Orbit.ciclo?.actionQueueRanks?.(surface)||{},expected=Number(ranks[businessId]||0),actual=Number(badge?.dataset.collabRank||0),css=badge?getComputedStyle(badge):null;
     return{present:!!card,badge:!!badge,label:String(badge?.innerText||''),expectedRank:expected,actualRank:actual,background:css?.backgroundColor||'',color:css?.color||'',priorityText:String(card?.querySelector('.badge.danger,.badge.warn,.badge.neutral')?.innerText||'')};
