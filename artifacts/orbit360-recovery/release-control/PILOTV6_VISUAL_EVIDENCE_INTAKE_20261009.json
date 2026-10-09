@@ -1,6 +1,6 @@
 {
   "schema": "GRAVICENTRA_PILOT_VISUAL_EVIDENCE_INTAKE_V1",
-  "recordedAt": "2026-10-09T08:33:00-06:00",
+  "recordedAt": "2026-10-09T08:36:00-06:00",
   "purpose": "Prevent loss between pilot captures and the next synchronized Word-document update. This manifest is an intake register; restricted originals remain in the conversation evidence surface and thesis/public use requires sanitization.",
   "accumulationRule": "APPEND_ONLY / NO_DELETE / FORWARD_ONLY",
   "priorCanonicalLibrary": "BIBLIOTECA_CONOCIMIENTO_CANONICA_PILOTO_GRAVICENTRA_CURRENT_R21_UAT3_PRE_S5.docx",
@@ -8,28 +8,78 @@
   "currentWordDocsStatus": "NOT_YET_SYNCHRONIZED_WITH_ALL_2026-10-09_PILOT_CAPTURES",
   "currentPilotEvidence": [
     {
+      "scenario": "S5",
+      "status": "CLOSED_PASS_WITH_OBSERVATIONS",
+      "images": [
+        {
+          "name": "image(20261009-033223).png",
+          "scope": "Cobros/cartera overview and safe read-only state",
+          "sha256": "2cc4de5890c5a1ab432adbefb693afbdf1b3d7d96d6dcafedf29e15a0dd0ce1e"
+        },
+        {
+          "name": "image(20261009-033245).png",
+          "scope": "Cobros/cartera list with payment/reconciliation states",
+          "sha256": "fe945de732252d09d2aa56625286be88153b8b6e796347e29867d71638238b11"
+        },
+        {
+          "name": "image(20261009-033324).png",
+          "scope": "AUTO39012 filtered rows across obligations/payment evidence",
+          "sha256": "1df17b75fa739b43458f96155885b6aa0b377000fbdea3195027a9cc32948e8f"
+        },
+        {
+          "name": "image(20261009-033421).png",
+          "scope": "Cliente360 receipts/payment context",
+          "sha256": "e93dd16a62bcc9a8fd28d684e8b179b62de6b85580adda2e22857d31a4ba3fd3"
+        },
+        {
+          "name": "image(20261009-033448).png",
+          "scope": "AUTO39012 receipt schedule",
+          "sha256": "c501a3c38eb9347aadb3e64dc39eff11699281bee776217e1080bb8942467b31"
+        },
+        {
+          "name": "image(20261009-033512).png",
+          "scope": "Receipt detail and payment/application fields",
+          "sha256": "54c54e5d574887171fbc55676017656bbf8a53ab09d34b07f86f0b6d8a1fa8cf"
+        },
+        {
+          "name": "image(20261009-033619).png",
+          "scope": "Cobros and payment evidence table",
+          "sha256": "bf54c525e868a11c0fd89fcc6838cf6eaf97855e5298ea26e6bfee817f0aff5c"
+        },
+        {
+          "name": "image(20261009-034232).png",
+          "scope": "AUTO39012 Cobros filter with no evidence/payment for exact policy",
+          "sha256": "aa51086fa34552192efa44a1156b60da200f4906935333017b1eebb6d112f5d5"
+        }
+      ]
+    },
+    {
       "scenario": "S6",
       "status": "CLOSED_PASS_WITH_OBSERVATIONS",
       "images": [
         {
           "fileId": "file_000000005b6881f8b97aafac5afae9de",
           "name": "image(20261009-131832).png",
-          "scope": "synthetic S6 client/receipt before-state"
+          "scope": "synthetic S6 client/receipt before-state",
+          "sha256": "10b00672ebbf2abb30e4aa3d34cb88347eaf386af9fe2cdc1037cc9ef8b42219"
         },
         {
           "fileId": "file_000000008e8481f5be8a23f7b0051075",
           "name": "image(20261009-131857).png",
-          "scope": "synthetic S6 receipt detail before-state"
+          "scope": "synthetic S6 receipt detail before-state",
+          "sha256": "86abe2800e3e917583b07701162d13c7623adc576e8e2a7074011b7cb5bf4bc6"
         },
         {
           "fileId": "file_0000000056b081f696601da38c5eb2b4",
           "name": "image(20261009-132017).png",
-          "scope": "S6 controlled payment form"
+          "scope": "S6 controlled payment form",
+          "sha256": "85f2ddbf81a9f9859b27396039e4a01b463e7d73150b25ee5cb5077c8d868184"
         },
         {
           "fileId": "file_00000000327482308a4b549bcda93f91",
           "name": "image(20261009-132037).png",
-          "scope": "S6 after-state: pago confirmado / conciliación pendiente"
+          "scope": "S6 after-state: pago confirmado / conciliación pendiente",
+          "sha256": "33f08f0205a2b99a617fda9774be9d8864ac8daddb6ac79a946880d289039790"
         }
       ]
     },
@@ -40,32 +90,38 @@
         {
           "fileId": "file_00000000128c81f580e01b53d09d73b1",
           "name": "image(20261009-135428).png",
-          "scope": "renewals overview and KPI summary"
+          "scope": "renewals overview and KPI summary",
+          "sha256": "194ee5e36be9ec3dc0ae1cd35e0627360c537e0c8bac0cdd9090ac1e3f0548be"
         },
         {
           "fileId": "file_00000000f32481f5a94bc0e23e1bb15e",
           "name": "image(20261009-135446).png",
-          "scope": "renewals kanban states"
+          "scope": "renewals kanban states",
+          "sha256": "ef06f2f1943edf4d2949e2f59a33a1b7434024d10f88ac45fa2cc2b6826717a2"
         },
         {
           "fileId": "file_00000000a89481f5b6bdd70f9e2978ed",
           "name": "image(20261009-135642).png",
-          "scope": "AUTO38446 actionable renewable card"
+          "scope": "AUTO38446 actionable renewable card",
+          "sha256": "bf9ac7ba27d50be9442d4d37d8d9ada08af98b285f2885fc22b39df4ae706ed4"
         },
         {
           "fileId": "file_000000005fd481fdb05ccc37f8f79819",
           "name": "image(20261009-135702).png",
-          "scope": "AUTO38446 policy detail"
+          "scope": "AUTO38446 policy detail",
+          "sha256": "1d2d045d71dcb4a69584d3bc709b6e77e032f672e5579c8efb7bf4c61facea65"
         },
         {
           "fileId": "file_000000001bb482308e6a2882dab2dd17",
           "name": "image(20261009-135807).png",
-          "scope": "401011234470 historical review-only card"
+          "scope": "401011234470 historical review-only card",
+          "sha256": "8bd3a72ffc5521aa4531c5bb51f68e5c2b6125a918fff35f6d3ee85888c06896"
         },
         {
           "fileId": "file_00000000535c81f68fbc564c62b8d615",
           "name": "image(20261009-135826).png",
-          "scope": "401011234470 historical policy detail"
+          "scope": "401011234470 historical policy detail",
+          "sha256": "85c9f0a3d2a33a5030dad0bb12a064e5efa44a0b94fa59b3e70a518e8c3e038e"
         }
       ]
     },
@@ -76,32 +132,38 @@
         {
           "fileId": "file_00000000c0cc81f581c44c5d9d7fc6e1",
           "name": "image(20261009-141317).png",
-          "scope": "Carlos/Operativo reportes access denied"
+          "scope": "Carlos/Operativo reportes access denied",
+          "sha256": "2fe71d140c913efdd0da2b9397f68c47929a6a12908a0bb2a831e62ac3ff7900"
         },
         {
           "fileId": "file_00000000aa5c81f4bce510431f02fab9",
           "name": "image(20261009-141523).png",
-          "scope": "Paula/Dirección reportes production all countries"
+          "scope": "Paula/Dirección reportes production all countries",
+          "sha256": "748891315c9f2d7552494cea8ba45f079094872cafc3f8e4f6dfcbc2ed780224"
         },
         {
           "fileId": "file_00000000119c81f5831605a6dae5b3",
           "name": "image(20261009-141626).png",
-          "scope": "year 2026 grouping returns zero records"
+          "scope": "year 2026 grouping returns zero records",
+          "sha256": "8255089cd7391102ccc138eac836e3ff8f80bd70c79362c2d49a5e9c5f8793b3"
         },
         {
           "fileId": "file_00000000cf1881f5bc9563715381aac7",
           "name": "image(20261009-141744).png",
-          "scope": "Guatemala grouped-by-insurer output with invalid numeric aggregations"
+          "scope": "Guatemala grouped-by-insurer output with invalid numeric aggregations",
+          "sha256": "9bd0c2286260acc1d81af1ab01885da6e6f2a94a50b7deb1e0a3a2a02a6c2d79"
         },
         {
           "fileId": "file_00000000b81881f5bda158c3fb7fef92",
           "name": "image(20261009-141824).png",
-          "scope": "country-dimension anomalies and insurer aliases"
+          "scope": "country-dimension anomalies and insurer aliases",
+          "sha256": "ef469f7f9e064f959592e6786602c52d7a760f563aff1db05e724d600632fe67"
         },
         {
           "fileId": "file_00000000786481f5a4408155f7bc78b8",
           "name": "image(20261009-141859).png",
-          "scope": "record-level production table under Guatemala filter"
+          "scope": "record-level production table under Guatemala filter",
+          "sha256": "306d40a15c85a2edd6545901dbdfb4fde5880dd36a775c8e0000f1a465503c9b"
         }
       ]
     },
@@ -112,47 +174,56 @@
         {
           "fileId": "file_00000000ab5c8230a7ac7afda29b5fe2",
           "name": "image(20261009-142959).png",
-          "scope": "Calidad de datos KPIs under Operativo"
+          "scope": "Calidad de datos KPIs under Operativo",
+          "sha256": "2b4be659cf716aac1cef5249b039b45e75f5b7715b6ea9f0e7ddfa71f6e16edd"
         },
         {
           "fileId": "file_000000009f508246b2facdd1d2c03fa7",
           "name": "image(20261009-143013).png",
-          "scope": "financial-integrity mismatches top examples"
+          "scope": "financial-integrity mismatches top examples",
+          "sha256": "62cceaeea4bb32ece9b197ff28d22991b7243cedcb42dcda91d80df54eeb86a1"
         },
         {
           "fileId": "file_00000000fd1c81f5b682d04c125abe19",
           "name": "image(20261009-143025).png",
-          "scope": "financial mismatch review modal"
+          "scope": "financial mismatch review modal",
+          "sha256": "aaca769cebb6a3b076965d4a4b4c1a96a71946d9cee8f1a758028ad374eab9a3"
         },
         {
           "fileId": "file_00000000fed881f9be984280643aa305",
           "name": "image(20261009-143037).png",
-          "scope": "policy edit identity/responsibility context"
+          "scope": "policy edit identity/responsibility context",
+          "sha256": "d6e745475cea9f070c66199d6db2ae9514e8bcdd24855768f2d41d17e80bb2cb"
         },
         {
           "fileId": "file_00000000bd4c82309e51a1e78b8cad3e",
           "name": "image(20261009-143052).png",
-          "scope": "policy payment-plan and premium fields"
+          "scope": "policy payment-plan and premium fields",
+          "sha256": "2b3e5ff8a83ee5c3ec680a8a83c51c98ef167a1cb73ec5d55be902e3b27c4390"
         },
         {
           "fileId": "file_00000000617481f59f37b7e023600ff6",
           "name": "image(20261009-143133).png",
-          "scope": "quality operational workbench with country suggestions"
+          "scope": "quality operational workbench with country suggestions",
+          "sha256": "e713fc521a18d7edccff2b7cc73b4511b67f2dc451b16efbb814e2b164c8b67a"
         },
         {
           "fileId": "file_00000000b3008243a1ac72c29490ccec",
           "name": "image(20261009-143149).png",
-          "scope": "quality table actions and missing-data categories"
+          "scope": "quality table actions and missing-data categories",
+          "sha256": "d9188394d1d2711a11a2264d1584c80125007841fdd5ddf0aba8cf58cfff55f3"
         },
         {
           "fileId": "file_00000000fde481f58c96796bd54fac8c",
           "name": "image(20261009-143245).png",
-          "scope": "country-confirmation modal with evidence suggestion"
+          "scope": "country-confirmation modal with evidence suggestion",
+          "sha256": "b16492bb7dbb87ecaf59cdc5766e8f083869c3ef9b099ad82475fd4361b702db"
         },
         {
           "fileId": "file_00000000467c81f5baf57835ffb3c89d",
           "name": "image(20261009-143301).png",
-          "scope": "phone/WhatsApp focused completion modal"
+          "scope": "phone/WhatsApp focused completion modal",
+          "sha256": "8e3e7e9b8fc8b18445c8b8c5c7231014f1db4d1bf094ea5d8e03b74d56e71b6a"
         }
       ]
     }
@@ -168,5 +239,56 @@
     "immediate": "Keep this manifest append-only while E8/E9 are still running.",
     "synchronizedWordUpdate": "At closure of Block D (E4 + E8 + E9), update Biblioteca de Conocimiento, Índice Biblioteca Visual, Matriz Académica, Matriz Participante×Escenario×Evidencia, Plan Operativo, Documento Maestro Técnico, Plan Maestro de Mejoras and Tesis in one synchronized package.",
     "exception": "If a causal finding changes methodology or evidence status before E9 closes, perform an earlier synchronized update."
+  },
+  "localHashInventory": {
+    "count": 33,
+    "algorithm": "sha256",
+    "files": {
+      "image(20261009-033223).png": "2cc4de5890c5a1ab432adbefb693afbdf1b3d7d96d6dcafedf29e15a0dd0ce1e",
+      "image(20261009-033245).png": "fe945de732252d09d2aa56625286be88153b8b6e796347e29867d71638238b11",
+      "image(20261009-033324).png": "1df17b75fa739b43458f96155885b6aa0b377000fbdea3195027a9cc32948e8f",
+      "image(20261009-033421).png": "e93dd16a62bcc9a8fd28d684e8b179b62de6b85580adda2e22857d31a4ba3fd3",
+      "image(20261009-033448).png": "c501a3c38eb9347aadb3e64dc39eff11699281bee776217e1080bb8942467b31",
+      "image(20261009-033512).png": "54c54e5d574887171fbc55676017656bbf8a53ab09d34b07f86f0b6d8a1fa8cf",
+      "image(20261009-033619).png": "bf54c525e868a11c0fd89fcc6838cf6eaf97855e5298ea26e6bfee817f0aff5c",
+      "image(20261009-034232).png": "aa51086fa34552192efa44a1156b60da200f4906935333017b1eebb6d112f5d5",
+      "image(20261009-131832).png": "10b00672ebbf2abb30e4aa3d34cb88347eaf386af9fe2cdc1037cc9ef8b42219",
+      "image(20261009-131857).png": "86abe2800e3e917583b07701162d13c7623adc576e8e2a7074011b7cb5bf4bc6",
+      "image(20261009-132017).png": "85f2ddbf81a9f9859b27396039e4a01b463e7d73150b25ee5cb5077c8d868184",
+      "image(20261009-132037).png": "33f08f0205a2b99a617fda9774be9d8864ac8daddb6ac79a946880d289039790",
+      "image(20261009-135428).png": "194ee5e36be9ec3dc0ae1cd35e0627360c537e0c8bac0cdd9090ac1e3f0548be",
+      "image(20261009-135446).png": "ef06f2f1943edf4d2949e2f59a33a1b7434024d10f88ac45fa2cc2b6826717a2",
+      "image(20261009-135642).png": "bf9ac7ba27d50be9442d4d37d8d9ada08af98b285f2885fc22b39df4ae706ed4",
+      "image(20261009-135702).png": "1d2d045d71dcb4a69584d3bc709b6e77e032f672e5579c8efb7bf4c61facea65",
+      "image(20261009-135807).png": "8bd3a72ffc5521aa4531c5bb51f68e5c2b6125a918fff35f6d3ee85888c06896",
+      "image(20261009-135826).png": "85c9f0a3d2a33a5030dad0bb12a064e5efa44a0b94fa59b3e70a518e8c3e038e",
+      "image(20261009-141317).png": "2fe71d140c913efdd0da2b9397f68c47929a6a12908a0bb2a831e62ac3ff7900",
+      "image(20261009-141523).png": "748891315c9f2d7552494cea8ba45f079094872cafc3f8e4f6dfcbc2ed780224",
+      "image(20261009-141626).png": "8255089cd7391102ccc138eac836e3ff8f80bd70c79362c2d49a5e9c5f8793b3",
+      "image(20261009-141744).png": "9bd0c2286260acc1d81af1ab01885da6e6f2a94a50b7deb1e0a3a2a02a6c2d79",
+      "image(20261009-141824).png": "ef469f7f9e064f959592e6786602c52d7a760f563aff1db05e724d600632fe67",
+      "image(20261009-141859).png": "306d40a15c85a2edd6545901dbdfb4fde5880dd36a775c8e0000f1a465503c9b",
+      "image(20261009-142959).png": "2b4be659cf716aac1cef5249b039b45e75f5b7715b6ea9f0e7ddfa71f6e16edd",
+      "image(20261009-143013).png": "62cceaeea4bb32ece9b197ff28d22991b7243cedcb42dcda91d80df54eeb86a1",
+      "image(20261009-143025).png": "aaca769cebb6a3b076965d4a4b4c1a96a71946d9cee8f1a758028ad374eab9a3",
+      "image(20261009-143037).png": "d6e745475cea9f070c66199d6db2ae9514e8bcdd24855768f2d41d17e80bb2cb",
+      "image(20261009-143052).png": "2b3e5ff8a83ee5c3ec680a8a83c51c98ef167a1cb73ec5d55be902e3b27c4390",
+      "image(20261009-143133).png": "e713fc521a18d7edccff2b7cc73b4511b67f2dc451b16efbb814e2b164c8b67a",
+      "image(20261009-143149).png": "d9188394d1d2711a11a2264d1584c80125007841fdd5ddf0aba8cf58cfff55f3",
+      "image(20261009-143245).png": "b16492bb7dbb87ecaf59cdc5766e8f083869c3ef9b099ad82475fd4361b702db",
+      "image(20261009-143301).png": "8e3e7e9b8fc8b18445c8b8c5c7231014f1db4d1bf094ea5d8e03b74d56e71b6a"
+    }
+  },
+  "assurance": {
+    "newPilotImagesPhysicallyEnumeratedAndHashed": 33,
+    "scenariosCovered": [
+      "S5",
+      "S6",
+      "S7",
+      "E4",
+      "E8"
+    ],
+    "e8StillOpen": true,
+    "note": "This register prevents loss before the synchronized Word update; it does not claim the Word documents already contain these 33 images."
   }
 }
