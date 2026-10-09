@@ -5688,7 +5688,7 @@
         "livePromotion": false,
         "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW"
       },
-      "findingStatus": "R21_CAUSAL_SOURCE_FIXED_EXACT_PREVIEW_PENDING",
+      "findingStatus": "MACHINE_PASS_PENDING_PAULA_VISUAL",
       "r15VisualReview": {
         "status": "PARTIAL_PASS_REMEDIATION_REQUIRED",
         "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R15_PAULA_VISUAL_PARTIAL_ACCEPTANCE_AND_NEW_FINDINGS_20261004.json",
@@ -7104,7 +7104,7 @@
       "livePromotion": false,
       "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW"
     },
-    "findingStatus": "R21_CAUSAL_SOURCE_FIXED_EXACT_PREVIEW_PENDING",
+    "findingStatus": "MACHINE_PASS_PENDING_PAULA_VISUAL",
     "r15VisualReview": {
       "status": "PARTIAL_PASS_REMEDIATION_REQUIRED",
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R15_PAULA_VISUAL_PARTIAL_ACCEPTANCE_AND_NEW_FINDINGS_20261004.json",
@@ -9000,5 +9000,12 @@
     "carryBlob": "836effdd02c7f4723a369aa36cf829447dc08bdd",
     "lockBlob": "8b522bf29d9066a8466355deb85ef4b8436441ad",
     "productionUnchanged": true
+  },
+  "r22ParentFindingStatusBinding": {
+    "status": "QA_ONLY_BOUND_TO_CURRENT_LEDGER",
+    "ledgerStatus": "MACHINE_PASS_PENDING_PAULA_VISUAL",
+    "sourceCandidateStillNeedsExactPreview": true,
+    "priorMachineEvidenceNotHumanAcceptance": true,
+    "noProductChange": true
   }
 }
