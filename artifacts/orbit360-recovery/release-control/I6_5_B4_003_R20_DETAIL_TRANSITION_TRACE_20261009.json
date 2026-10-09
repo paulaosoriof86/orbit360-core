@@ -1,0 +1,20 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R20_DETAIL_TRANSITION_TRACE_V1",
+  "date": "2026-10-09",
+  "parentHead": "231e502f743e5b223ab4b6ff9ea8ecba36a48079",
+  "gate": "I6.5/B4-003",
+  "previousFailedRun": 37941663934,
+  "observation": "Chrome detail initially rendered in 166 ms but was no longer visible at subsequent DOM inspection. Exact product source blobs across previous passing detail run and failing run were identical.",
+  "rootCause": "INCONCLUSIVE_UNTIL_EXACT_BROWSER_ROUTE_AND_DOM_TRANSITIONS_READBACK",
+  "diagnosticFix": "Trace hashchange, route-ready, and fullpage DOM present/absent transitions, plus active route/hash and collection readiness; preserve hard FAIL on disappearing fullpage or >=2500ms initial paint.",
+  "qaPath": "tools/gravicentra-i6-5-b4-003-preview-proof.mjs",
+  "qaBlobSha": "874e0d84024c83b6bb915b69e07367abcfa0af68",
+  "boundaries": {
+    "productChanged": false,
+    "dataWrites": 0,
+    "noReimport": true,
+    "livePromotion": false,
+    "gateUnchanged": true
+  },
+  "nextAction": "RUN_EXACT_PREVIEW_READBACK_AND_CAUSAL_TRACE"
+}

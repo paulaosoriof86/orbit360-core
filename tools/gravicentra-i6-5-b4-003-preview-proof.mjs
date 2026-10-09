@@ -1037,14 +1037,17 @@ try{
  await page.evaluate(num=>{
    const row=Array.from(document.querySelectorAll('#host .tbl tbody tr')).find(x=>String(x.textContent||'').includes(num));
    if(!row)throw Error('B4_003_POLICY_DETAIL_ROW_MISSING');
-   const stamp={clickAt:null,readyAt:null,mutations:0};
+   const stamp={clickAt:null,readyAt:null,mutations:0,events:[],wasVisible:false};
+   const trace=kind=>{if(stamp.events.length<40)stamp.events.push({kind,at:Math.round(performance.now()-(stamp.clickAt||performance.now())),hash:String(location.hash||''),route:String(Orbit.route?.key||'')});};
+   window.addEventListener('hashchange',()=>trace('hashchange'));
+   document.addEventListener('orbit:route-ready',()=>trace('route-ready'));
    window.__b4003PolicyDetailPerformance=stamp;
    document.addEventListener('click',e=>{if(stamp.clickAt==null&&e.target.closest('tr')===row)stamp.clickAt=performance.now();},{capture:true,once:true});
    const observer=new MutationObserver(()=>{
      stamp.mutations++;
-     if(stamp.clickAt!=null&&document.querySelector('[data-policy-fullpage="1"]')){
-       stamp.readyAt=performance.now();observer.disconnect();
-     }
+     const present=!!document.querySelector('[data-policy-fullpage="1"]');
+     if(present!==stamp.wasVisible){stamp.wasVisible=present;trace(present?'detail-present':'detail-absent');}
+     if(present&&stamp.clickAt!=null&&stamp.readyAt==null)stamp.readyAt=performance.now();
    });
    observer.observe(document.body,{subtree:true,childList:true});
  },policySearchNumber);
@@ -1054,13 +1057,18 @@ try{
  await page.waitForSelector('[data-policy-fullpage="1"]',{timeout:10000});
  const policyDetailMs=Date.now()-policyDetailStarted;
  const detailChrome=await page.evaluate(()=>{
-   const p=window.__b4003PolicyDetailPerformance||{};
+   const p=window.__b4003PolicyDetailPerformance||{},h=document.getElementById('host');
+   const status=Orbit.store?._productStatus?.()||{};
    return{clickToFullDetailDomMs:p.clickAt!=null&&p.readyAt!=null?Math.round(p.readyAt-p.clickAt):null,
-     mutationCount:Number(p.mutations||0),detailVisible:!!document.querySelector('[data-policy-fullpage="1"]')};
+     mutationCount:Number(p.mutations||0),detailVisible:!!document.querySelector('[data-policy-fullpage="1"]'),
+     events:(p.events||[]).slice(0,40),route:String(Orbit.route?.key||''),hash:String(location.hash||''),
+     loadingReason:h?.querySelector('[data-policy-detail-loading]')?.getAttribute('data-policy-detail-loading')||'',
+     hostBlank:!(h?.textContent||'').trim(),
+     serverConfirmed:(status.serverConfirmedCollections||[]).filter(x=>['clientes','polizas','vehiculos','recibosEsperados'].includes(x))};
  });
  proof.r13PolicyDetailTiming={wallMs:policyDetailMs,browser:detailChrome,measurement:'Chrome click to full detail DOM'};
- need(detailChrome.detailVisible&&detailChrome.clickToFullDetailDomMs!=null,
-    'B4_003_R13_POLICY_DETAIL_DOM_METRIC_MISSING:'+JSON.stringify(proof.r13PolicyDetailTiming));
+ need(detailChrome.detailVisible&&detailChrome.clickToFullDetailDomMs!=null&&!detailChrome.events.some(x=>x.kind==='detail-absent'),
+    'B4_003_R13_POLICY_DETAIL_UNSTABLE_OR_MISSING:'+JSON.stringify(proof.r13PolicyDetailTiming));
  need(detailChrome.clickToFullDetailDomMs<2500,
     'B4_003_R13_POLICY_DETAIL_DOM_TOO_SLOW:'+JSON.stringify(proof.r13PolicyDetailTiming));
  proof.r13PolicyPerformance={routeWallMs:policyRouteMs,routeChromeMs:policyRouteBrowser.domPaintMs,searchWallMs:policySearchMs,searchChromeMs:searchChrome.inputToCorrectDomMs,detailWallMs:policyDetailMs,detailChromeMs:detailChrome.clickToFullDetailDomMs,searchNumber:policySearchNumber};
