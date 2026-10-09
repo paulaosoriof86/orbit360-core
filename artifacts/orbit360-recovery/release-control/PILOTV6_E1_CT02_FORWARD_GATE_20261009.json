@@ -1,0 +1,50 @@
+{
+  "schema": "GRAVICENTRA_PILOT_V6_E1_FORWARD_GATE_V1",
+  "recordedAt": "2026-10-09T14:10:00-06:00",
+  "scenario": "E1 Academia",
+  "participant": "CT02",
+  "role": "Operativo",
+  "status": "ELIGIBLE_FOR_TARGETED_HUMAN_READONLY_PILOT",
+  "exactPreview": {
+    "sourceSha": "babea00bf459dfcde611e35ea9413f70f901d043",
+    "buildId": "gi-i65-b4-babea00bf459-57f234755dc1",
+    "runId": 37982729451,
+    "artifactId": 11641957470,
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-37982729451-pvjxtc0j.web.app",
+    "workflowConclusion": "SUCCESS"
+  },
+  "causalReadback": {
+    "academiaModuleChangedSincePriorPilotCandidate": false,
+    "priorPilotSource": "99c4a81d59c28550be4c318fc2b7600bdd43d832",
+    "note": "No academia module delta detected between prior pilot candidate and current exact preview. Shared product files changed in other domains, so E1 is limited to read-only causal smoke."
+  },
+  "sourceBehavior": {
+    "safeReadOnlyActions": [
+      "open Academia",
+      "switch Catálogo/Ruta por rol",
+      "open an existing course",
+      "navigate directly to an existing lesson using sidebar",
+      "open role-appropriate manuals"
+    ],
+    "writeRiskActions": [
+      "Siguiente/Finalizar curso (updates progress)",
+      "answer/submit quiz if it persists progress",
+      "create/edit/delete course or lesson",
+      "upload resource",
+      "create category"
+    ]
+  },
+  "humanTask": {
+    "objective": "Observe role-appropriate learning route, existing course/lesson access, visible progress and help/manual availability without modifying progress or content.",
+    "stopIf": [
+      "Academia access denied unexpectedly for Operativo",
+      "opening a course mutates progress before any explicit advance",
+      "role route exposes admin-only content",
+      "candidate URL/build changes"
+    ]
+  },
+  "forwardOnly": {
+    "priorScenariosReopened": false,
+    "nextAfterE1": "E3 Cronograma if focal technical gate is eligible; otherwise continue to next eligible Block E extension."
+  }
+}
