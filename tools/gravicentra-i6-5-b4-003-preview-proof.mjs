@@ -995,22 +995,73 @@ try{
  need(policyRouteBrowser.domPaintMs<2500,'B4_003_R13_POLICY_ROUTE_DOM_TOO_SLOW:'+JSON.stringify(proof.r13PolicyRouteTiming));
  need((await page.locator('[data-polizas-relations-loading]').count())===0,'B4_003_R13_POLICY_ROUTE_STUCK_LOADING');
  const policySearchNumber='B4-003-REN-'+run;
+ /* Browser-native input-to-verified-result timing avoids conflating test RPC
+    scheduling with real search latency. Keep the contractual <2500ms limit. */
+ await page.evaluate(num=>{
+   const host=document.getElementById('host'),input=document.getElementById('fq');
+   if(!host||!input)throw Error('B4_003_POLICY_SEARCH_OBSERVER_MISSING');
+   const stamp={inputAt:null,verifiedAt:null,mutations:0};
+   window.__b4003PolicySearchPerformance=stamp;
+   input.addEventListener('input',()=>{if(stamp.inputAt==null)stamp.inputAt=performance.now();},{capture:true,once:true});
+   const observer=new MutationObserver(()=>{
+     stamp.mutations++;
+     const count=String(document.getElementById('fb-count')?.textContent||'').trim();
+     const visible=Array.from(host.querySelectorAll('.tbl tbody tr')).filter(row=>String(row.textContent||'').includes(num));
+     if(stamp.inputAt!=null&&document.getElementById('fq')?.value===num&&/^1\s+de\s+/i.test(count)&&visible.length===1){
+       stamp.verifiedAt=performance.now();observer.disconnect();
+     }
+   });
+   observer.observe(host,{subtree:true,childList:true});
+ },policySearchNumber);
  const policySearchStarted=Date.now();
  await page.fill('#fq',policySearchNumber);
  await page.waitForFunction(num=>{
    const count=String(document.getElementById('fb-count')?.textContent||'').trim();
-   const rows=Array.from(document.querySelectorAll('#host .tbl tbody tr')).filter(r=>String(r.innerText||'').includes(num));
+   const rows=Array.from(document.querySelectorAll('#host .tbl tbody tr')).filter(row=>String(row.textContent||'').includes(num));
    return document.getElementById('fq')?.value===num&&/^1\s+de\s+/i.test(count)&&rows.length===1;
  },policySearchNumber,{timeout:10000});
  const policySearchMs=Date.now()-policySearchStarted;
- need(policySearchMs<2500,'B4_003_R13_POLICY_SEARCH_TOO_SLOW:'+policySearchMs);
+ const searchChrome=await page.evaluate(()=>{
+   const p=window.__b4003PolicySearchPerformance||{};
+   return{inputToCorrectDomMs:p.inputAt!=null&&p.verifiedAt!=null?Math.round(p.verifiedAt-p.inputAt):null,
+      mutationCount:Number(p.mutations||0),inputPresent:!!document.getElementById('fq')};
+ });
+ proof.r13PolicySearchTiming={wallMs:policySearchMs,browser:searchChrome,measurement:'Chrome input event to exact filtered DOM'};
+ need(searchChrome.inputToCorrectDomMs!=null,
+   'B4_003_R13_POLICY_SEARCH_DOM_METRIC_MISSING:'+JSON.stringify(proof.r13PolicySearchTiming));
+ need(searchChrome.inputToCorrectDomMs<2500,
+   'B4_003_R13_POLICY_SEARCH_DOM_TOO_SLOW:'+JSON.stringify(proof.r13PolicySearchTiming));
+ /* Browser-native row-click to full detail paint, fail closed at <2500ms. */
+ await page.evaluate(num=>{
+   const row=Array.from(document.querySelectorAll('#host .tbl tbody tr')).find(x=>String(x.textContent||'').includes(num));
+   if(!row)throw Error('B4_003_POLICY_DETAIL_ROW_MISSING');
+   const stamp={clickAt:null,readyAt:null,mutations:0};
+   window.__b4003PolicyDetailPerformance=stamp;
+   document.addEventListener('click',e=>{if(stamp.clickAt==null&&e.target.closest('tr')===row)stamp.clickAt=performance.now();},{capture:true,once:true});
+   const observer=new MutationObserver(()=>{
+     stamp.mutations++;
+     if(stamp.clickAt!=null&&document.querySelector('[data-policy-fullpage="1"]')){
+       stamp.readyAt=performance.now();observer.disconnect();
+     }
+   });
+   observer.observe(document.body,{subtree:true,childList:true});
+ },policySearchNumber);
  const policyDetailStarted=Date.now();
  const searchRow=page.locator('#host .tbl tbody tr').filter({hasText:policySearchNumber}).first();
  await searchRow.click();
  await page.waitForSelector('[data-policy-fullpage="1"]',{timeout:10000});
  const policyDetailMs=Date.now()-policyDetailStarted;
- need(policyDetailMs<2500,'B4_003_R13_POLICY_DETAIL_TOO_SLOW:'+policyDetailMs);
- proof.r13PolicyPerformance={routeMs:policyRouteMs,searchMs:policySearchMs,detailMs:policyDetailMs,searchNumber:policySearchNumber};
+ const detailChrome=await page.evaluate(()=>{
+   const p=window.__b4003PolicyDetailPerformance||{};
+   return{clickToFullDetailDomMs:p.clickAt!=null&&p.readyAt!=null?Math.round(p.readyAt-p.clickAt):null,
+     mutationCount:Number(p.mutations||0),detailVisible:!!document.querySelector('[data-policy-fullpage="1"]')};
+ });
+ proof.r13PolicyDetailTiming={wallMs:policyDetailMs,browser:detailChrome,measurement:'Chrome click to full detail DOM'};
+ need(detailChrome.detailVisible&&detailChrome.clickToFullDetailDomMs!=null,
+    'B4_003_R13_POLICY_DETAIL_DOM_METRIC_MISSING:'+JSON.stringify(proof.r13PolicyDetailTiming));
+ need(detailChrome.clickToFullDetailDomMs<2500,
+    'B4_003_R13_POLICY_DETAIL_DOM_TOO_SLOW:'+JSON.stringify(proof.r13PolicyDetailTiming));
+ proof.r13PolicyPerformance={routeWallMs:policyRouteMs,routeChromeMs:policyRouteBrowser.domPaintMs,searchWallMs:policySearchMs,searchChromeMs:searchChrome.inputToCorrectDomMs,detailWallMs:policyDetailMs,detailChromeMs:detailChrome.clickToFullDetailDomMs,searchNumber:policySearchNumber};
  proof.assertions.policyRouteUnder2500ms=true;
  proof.assertions.policySearchUnder2500ms=true;
  proof.assertions.policyDetailUnder2500ms=true;

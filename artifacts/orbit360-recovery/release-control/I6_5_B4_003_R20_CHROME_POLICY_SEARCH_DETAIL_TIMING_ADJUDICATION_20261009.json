@@ -1,0 +1,38 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R20_CHROME_TIMING_ADJUDICATION_V1",
+  "date": "2026-10-09",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "baseHead": "e95dd0095f6c401ce824360bbefea00d634d6313",
+  "gate": "I6.5/B4-003",
+  "trigger": "Latest B4-003 exact authenticated preview FAIL due to POLICY_SEARCH_TOO_SLOW:4036 (Playwright wall-clock), although previous browser proof recorded route 1491ms, search 243ms and detail 256ms. Need discriminate real application latency from remote test command scheduling, as already done for route.",
+  "causalQuestion": "Does actual Chrome DOM input-to-filter and click-to-detail exceed 2500ms, or did the Playwright wall-clock artificially inflate it?",
+  "qaOwner": "tools/gravicentra-i6-5-b4-003-preview-proof.mjs",
+  "qaBlobSha": "9998f002952684983bdca736b0c963b240888ca7",
+  "sourceChangeCount": 0,
+  "measurement": {
+    "route": "Chrome performance.now to first canonical policies table paint",
+    "search": "Capture input event performance.now; MutationObserver captures first exact single policy matching DOM",
+    "detail": "Capture true row click performance.now; MutationObserver captures full detail DOM",
+    "maxAppLatencyMsExclusive": 2500,
+    "wallTime": "Observed independently and logged, not accepted as a substitute for DOM time",
+    "onMissingMarker": "FAIL_CLOSED"
+  },
+  "proofs": {
+    "javascriptSyntax": "PENDING_CI",
+    "physicalAuthenticatedPreview": "PENDING_CI",
+    "productionAccepted": false,
+    "priorHumanRenewalRejectionUnchanged": true
+  },
+  "bounds": {
+    "realBusinessWrites": 0,
+    "reimport": false,
+    "livePromotion": false,
+    "gateChange": false,
+    "sourceMutation": false,
+    "artifactMutation": false,
+    "previewOnly": true,
+    "noNewWorkflow": true
+  },
+  "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_R20_CONTRACT_AND_EXACT_PREVIEW"
+}
