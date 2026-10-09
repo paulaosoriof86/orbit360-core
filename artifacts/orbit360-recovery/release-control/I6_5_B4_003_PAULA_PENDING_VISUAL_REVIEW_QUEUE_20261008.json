@@ -22,7 +22,7 @@
       "whatToVisualize": "7-count inbox icon, Reconocer para mí, Resolver para todos, Archivar para mí, Ir a Inicio; refresh and sign-in landing with new vs acknowledged notices; Direccion and Asesor.",
       "notProven": "Rendered card, persisted acknowledgment/resolve/archive, reload and receiver roles in exact Preview not yet proven.",
       "causalReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_INBOX_AND_RENEWALS_SEARCH_ROOTFIX_20261009.json",
-      "causalReceiptBlobSha": "76c854abdc012d3a0e1d673fff831b816870e418"
+      "causalReceiptBlobSha": "8b935da6307fb7c04b50404d46cad636444d4bb6"
     },
     {
       "id": "OPS_LEADS_COLLABORATION_ACTION",
@@ -34,7 +34,7 @@
       "whatToVisualize": "Opportunity card → open real work flow → record response/state transition → assess red action badge, cross-role inbox and reload.",
       "notProven": "Rendered card, persisted acknowledgment/resolve/archive, reload and receiver roles in exact Preview not yet proven.",
       "causalReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_INBOX_AND_RENEWALS_SEARCH_ROOTFIX_20261009.json",
-      "causalReceiptBlobSha": "76c854abdc012d3a0e1d673fff831b816870e418"
+      "causalReceiptBlobSha": "8b935da6307fb7c04b50404d46cad636444d4bb6"
     },
     {
       "id": "RENEWAL_LIFECYCLE",
@@ -47,7 +47,7 @@
       "whatToVisualize": "Four-column Kanban search positive/negative/clear by client, policy, insurer, ramo/product, advisor and linked plate, then six historical policy numbers, country/role and reload.",
       "notProven": "New search authenticated browser, country/role, 1440/390/320 and lifecycle human UAT pending.",
       "causalReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_INBOX_AND_RENEWALS_SEARCH_ROOTFIX_20261009.json",
-      "causalReceiptBlobSha": "76c854abdc012d3a0e1d673fff831b816870e418"
+      "causalReceiptBlobSha": "8b935da6307fb7c04b50404d46cad636444d4bb6"
     },
     {
       "id": "CLIENT360",
@@ -105,9 +105,10 @@
   },
   "r20SearchInboxRootfix": {
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_INBOX_AND_RENEWALS_SEARCH_ROOTFIX_20261009.json",
-    "receiptBlobSha": "76c854abdc012d3a0e1d673fff831b816870e418",
+    "receiptBlobSha": "8b935da6307fb7c04b50404d46cad636444d4bb6",
     "sourceStaged": true,
     "exactPreviewQaPending": true,
-    "sourceAndUiNotYetHumanApproved": true
+    "sourceAndUiNotYetHumanApproved": true,
+    "qaRevision": "EXACT_STATIC_CONTRACT_RETRY_AFTER_EXPECTATION_DELIMITER_REPAIR"
   }
 }

@@ -1567,13 +1567,14 @@
   "r20InboxAndRenewalSearch": {
     "status": "SOURCE_STAGED_EXACT_PREVIEW_REQUIRED",
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_INBOX_AND_RENEWALS_SEARCH_ROOTFIX_20261009.json",
-    "receiptBlobSha": "76c854abdc012d3a0e1d673fff831b816870e418",
+    "receiptBlobSha": "8b935da6307fb7c04b50404d46cad636444d4bb6",
     "sourceIndexBlobSha": "a7313de2db58b16bc1c3948dca06f0703ac31c37",
     "sourceRenewalsBlobSha": "dbfdf054ee7b66bb51d2815039941ff2a5e58850",
     "qaProofBlobSha": "9831a674e512bf7396ce0706d0950d9c4f2119d2",
-    "qaContractBlobSha": "bddce5dcd0d39ebede430c364dc8976f3c786589",
+    "qaContractBlobSha": "ed523b21c3d77f9e66ac327bc251ce5331ac502d",
     "activeFinding": "B4-003",
     "noProductionOrDataMutation": true,
-    "doesNotCloseGate": true
+    "doesNotCloseGate": true,
+    "qaRevision": "OBSOLETE_REFRESH_SIGNATURE_QA_ONLY"
   }
 }

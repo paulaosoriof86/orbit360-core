@@ -293,7 +293,7 @@ need(index.includes('Reconociendo…')&&index.includes('Resolviendo…')&&index.
    Regression proof uses the exact inline source and no Firestore or session write. */
 {
  const begin=index.indexOf('function newHandoffForSurface(r,surface)');
- const end=index.indexOf('function refresh(){',begin);
+ const end=index.indexOf('function refresh(force){',begin);
  need(begin>=0&&end>begin,'B4_003_INBOX_LANDING_SOURCE_NOT_FOUND');
  const source=index.slice(begin,end);
  const cases=[

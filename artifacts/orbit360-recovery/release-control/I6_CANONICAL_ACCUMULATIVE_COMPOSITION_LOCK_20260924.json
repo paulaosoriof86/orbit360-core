@@ -4214,7 +4214,7 @@
       "orbit360-platform/modules/renovaciones.js": "dbfdf054ee7b66bb51d2815039941ff2a5e58850"
     },
     "qaProofBlobSha": "9831a674e512bf7396ce0706d0950d9c4f2119d2",
-    "qaContractBlobSha": "bddce5dcd0d39ebede430c364dc8976f3c786589",
+    "qaContractBlobSha": "ed523b21c3d77f9e66ac327bc251ce5331ac502d",
     "findingsLinked": [
       "B4-003-R20-B01",
       "B4-003-R19-08-OPS-ADVISOR-HANDOFF-NOTIFICATION-GAP",
@@ -4226,6 +4226,7 @@
     "dataMutation": false,
     "reimport": false,
     "livePromotion": false,
-    "needAuthenticatedProof": true
+    "needAuthenticatedProof": true,
+    "qaAdjudicatorFix": "B4_003_INBOX_LANDING_BOUNDARY_SIGNATURE_REFRESH_FORCE"
   }
 }

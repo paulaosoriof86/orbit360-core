@@ -18,9 +18,9 @@
   },
   "qaFiles": {
     "tools/gravicentra-i6-5-b4-003-preview-proof.mjs": "9831a674e512bf7396ce0706d0950d9c4f2119d2",
-    "tools/gravicentra-i6-5-b4-003-contract.mjs": "bddce5dcd0d39ebede430c364dc8976f3c786589"
+    "tools/gravicentra-i6-5-b4-003-contract.mjs": "ed523b21c3d77f9e66ac327bc251ce5331ac502d"
   },
-  "compositionBlobSha": "3330c9c4075b0d59bdb6445550b264a228f74ac0",
+  "compositionBlobSha": "3f1b6ff8f928b45d39a73ac6c97e9ec6071ca605",
   "existingFindingLinks": [
     "B4-003-R20-B01",
     "B4-003-R19-08-OPS-ADVISOR-HANDOFF-NOTIFICATION-GAP",
@@ -41,5 +41,10 @@
   "previouslyAcceptedEvidencePreserved": true,
   "operationalWrites": 0,
   "livePromotionAuthorized": false,
-  "dataImportAuthorized": false
+  "dataImportAuthorized": false,
+  "qa": {
+    "adjudicatorFix": "Retired refresh() delimiter replaced with effective refresh(force) for original discriminant; product unchanged.",
+    "lastStaticContractRunId": 37947707992,
+    "lastStaticContractDisposition": "FAIL_OBSOLETE_QA_SIGNATURE_RETEST_REQUIRED"
+  }
 }
