@@ -1206,6 +1206,41 @@ try{
  need((await ref('actividades',ids.renewActivity).get()).exists,'B4_003_RENEWAL_ACTIVITY_READBACK_FAILED');
  proof.assertions.renewalCampaignDurableReadback=true;
 
+ // UAT4: reason edits commit to canonical cancellation data without creating recovery work.
+ await page.evaluate(id=>{Orbit.pais='GT';const h=document.getElementById('host');Orbit.modules.cancelaciones.render(h);Orbit.modules.cancelaciones.detalle(id);},ids.cancelation);
+ await page.waitForSelector('#cx-save-motivo',{timeout:10000});
+ const priorRecovery=(await ref('negocios',ids.recoveryBusiness).get()).exists;
+ await page.fill('#cx-motivo','B4-003 QA motivo confirmado');
+ await page.click('#cx-save-motivo');
+ await page.waitForFunction(()=>!document.getElementById('c360-edit'),null,{timeout:30000});
+ const savedReason=(await ref('cancelaciones',ids.cancelation).get()).data()||{};
+ const postRecovery=(await ref('negocios',ids.recoveryBusiness).get()).exists;
+ need(savedReason.motivo==='B4-003 QA motivo confirmado'&&priorRecovery===postRecovery,'B4_003_R20_CANCEL_REASON_SAVE_OR_RECOVERY_SIDE_EFFECT');
+ proof.assertions.cancelReasonDurableNoRecoverySideEffect=true;
+
+ // UAT4: individual and selected-list draft controls are visible and no real chat opens from Preview.
+ await page.evaluate(id=>{Orbit.modules.cancelaciones.detalle(id);},ids.cancelation);
+ await page.waitForSelector('#cx-wa',{timeout:10000});
+ await page.click('#cx-wa');
+ await page.waitForSelector('#cancel-wa-drafts [data-wa-template]',{timeout:10000});
+ const single=await page.evaluate(()=>({count:document.querySelector('#cancel-wa-drafts')?.innerText.includes('Preparar WhatsApp (1)'),phone:!!document.querySelector('#cancel-wa-drafts [data-wa-phone]'),message:!!document.querySelector('#cancel-wa-drafts [data-wa-message]')}));
+ need(single.count&&single.phone&&single.message,'B4_003_R20_CANCEL_SINGLE_WA_DRAFT');
+ await page.selectOption('#cancel-wa-drafts [data-wa-template]','alternativas');
+ await page.fill('#cancel-wa-drafts [data-wa-message]','QA: mensaje puntual editable');
+ const custom=await page.locator('#cancel-wa-drafts [data-wa-message]').inputValue();
+ need(custom==='QA: mensaje puntual editable','B4_003_R20_CANCEL_WA_EDITABLE_TEXT');
+ await page.click('#cancel-wa-drafts [data-wa-close]');
+ await page.evaluate(()=>{document.getElementById('c360-edit')?.remove();const h=document.getElementById('host');Orbit.modules.cancelaciones.render(h);});
+ await page.locator('[data-cancel-select="'+ids.cancelation+'"]').check();
+ await page.waitForFunction(()=>!!document.querySelector('[data-cancel-wa-bulk]')&&!document.querySelector('[data-cancel-wa-bulk]').disabled,null,{timeout:10000});
+ await page.click('[data-cancel-wa-bulk]');
+ await page.waitForSelector('#cancel-wa-drafts [data-wa-progress]',{timeout:10000});
+ const selected=await page.evaluate(()=>({count:document.querySelector('#cancel-wa-drafts [data-wa-progress]')?.textContent,hasTemplates:!!document.querySelector('#cancel-wa-drafts [data-wa-template]'),hasOpen:!!document.querySelector('#cancel-wa-drafts [data-wa-open]')}));
+ need(selected.count==='1 de 1'&&selected.hasTemplates&&selected.hasOpen,'B4_003_R20_CANCEL_MULTISELECT_WA_COMPOSER');
+ await page.click('#cancel-wa-drafts [data-wa-close]');
+ proof.assertions.cancelWhatsAppDraftIndividualAndSelected=true;
+ proof.assertions.cancelWhatsAppNoAutomaticDelivery=true;
+
  async function saveRecovery(){
    await page.evaluate(id=>{const h=document.getElementById('host');Orbit.modules.cancelaciones.render(h);Orbit.modules.cancelaciones.detalle(id);},ids.cancelation);
    await page.waitForSelector('#cx-save',{timeout:10000});

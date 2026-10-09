@@ -178,6 +178,10 @@ need(/detalleKpi/.test(cancel)&&/cancelation-kpi-detail/.test(cancel),'B4_003_CA
 need(cancel.includes('function cancellationById(id, policyId)')&&cancel.includes("String(c&&c.polizaId||'')===wanted"),'B4_003_CANCEL_POLICY_IDENTITY_FALLBACK_MISSING');
 need(cancel.includes('data-cancel-client-link')&&cancel.includes('&t=polizas'),'B4_003_CANCEL_CLIENT_POLICY_DEEPLINK_MISSING');
 need(cancel.includes('no es churn temporal')&&cancel.includes('Relación canceladas / cartera'),'B4_003_CANCEL_HISTORICAL_RATIO_LABEL_MISSING');
+need(cancel.includes('data-cancel-reason-editor="1"')&&cancel.includes("id=\"cx-save-motivo\"")&&cancel.includes("await S().updateDurable('cancelaciones',c.id,{motivo:nuevo})")&&cancel.includes('Motivo confirmado y guardado'),'B4_003_R20_CANCEL_REASON_EDIT_DURABLE_MISSING');
+need(cancel.includes('function prepararWhatsApp(rows)')&&cancel.includes('data-cancel-wa-bulk')&&cancel.includes('data-cancel-select-all')&&cancel.includes('data-wa-template')&&cancel.includes('data-wa-message')&&cancel.includes("id=\"cx-wa\""),'B4_003_R20_CANCEL_WHATSAPP_INDIVIDUAL_MULTI_TEMPLATE_MISSING');
+need(cancel.includes("if(/--/.test(location.hostname))return U.toast('Preview protegida")&&cancel.includes("window.open('https://wa.me/'+phone")&&cancel.includes('Ningún chat abierto equivale a mensaje entregado'),'B4_003_R20_CANCEL_WHATSAPP_PREVIEW_ISOLATION_MISSING');
+
 need(policyBridge.includes('!rs.includes(initialRamo)')&&policyBridge.includes('!initialSubs.includes(initialProduct)'),'B4_003_POLICY_EDITOR_SOURCE_TAXONOMY_PRESERVATION_MISSING');
 need(policyBridge.includes('data-renewable')&&policyBridge.includes("renovable: $('[data-renewable]').value==='yes'"),'B4_003_POLICY_EDITOR_RENEWABILITY_TRISTATE_MISSING');
 need(/function\s+relationDataReady\s*\(/.test(policy)&&/data-polizas-relations-loading="1"/.test(policy),'B4_003_R13_POLICY_RELATION_READINESS_MISSING');
@@ -249,7 +253,7 @@ need(/modules\/renovaciones\.js\?v=20261008-r20-uat-recovery/.test(index),'B4_00
 need(/renewals-v1200-operational-bridge\.js\?v=20261005-r17/.test(index),'B4_003_BRIDGE_CACHE_BINDING_MISSING');
 need(/renewals-v1200-permission-guard\.js\?v=20261003-b4003r2/.test(index),'B4_003_PERMISSION_CACHE_BINDING_MISSING');
 need(/renewals-v1201-issued-filter\.js\?v=20261003-b4003r2/.test(index),'B4_003_ISSUED_CACHE_BINDING_MISSING');
-need(/cancelaciones\.js\?v=20261003-b4003r13/.test(index),'B4_003_CANCEL_R13_CACHE_BINDING_MISSING');
+need(/cancelaciones\.js\?v=20261008-r20-uat4-motivo-wa/.test(index),'B4_003_CANCEL_R13_CACHE_BINDING_MISSING');
 need(/modules\/polizas\.js\?v=20261004-b4003r14/.test(index),'B4_003_POLICY_R13_CACHE_BINDING_MISSING');
 need(/core\/access-scope\.js\?v=20261003-b4003r5/.test(index),'B4_003_ACCESS_SCOPE_CACHE_BINDING_MISSING');
 need(/core\/router\.js\?v=20261007-r20f1/.test(index),'B4_003_R14_ROUTER_CACHE_BINDING_MISSING');

@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B4_EXECUTION_LOCK_V1",
   "recordedAt": "2026-10-08T21:43:35.454Z",
-  "status": "B4_003_R20_CANCELATIONS_SOURCE_FIX_AUTHORIZED",
+  "status": "B4_003_SOURCE_FIXED_R20_PENDING_CONTRACT_AND_EXACT_PREVIEW",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "block": "B4",
@@ -40,7 +40,7 @@
     "title": "Cumulative B4-003 remediation: Renovaciones, Cancelaciones and source-backed insurer knowledge.",
     "status": "PAULA_VISUAL_PARTIAL_R20_CANCELATIONS_REMEDIATION_REQUIRED",
     "blocking": true,
-    "nextAction": "B4_003_R20_CANCELATIONS_SOURCE_FIX",
+    "nextAction": "B4_003_R20_CONTRACT_AND_EXACT_PREVIEW",
     "humanVisualStatus": "RENEWALS_LOADING_ONLY_PASS_CANCELATIONS_OPEN",
     "knowledgePreview": true
   },
@@ -54,12 +54,12 @@
     "productMutationRequiresCausalDefect": true,
     "sourceChangeRequiresNewImmutableCandidate": true,
     "livePromotionForbiddenUntilB4FinalAcceptance": true,
-    "productMutationAuthorized": true,
+    "productMutationAuthorized": false,
     "allowedProductFiles": [
       "orbit360-platform/modules/cancelaciones.js",
       "orbit360-platform/index.html"
     ],
-    "buildDispatchAuthorized": false,
+    "buildDispatchAuthorized": true,
     "previewMutationAuthorized": true,
     "functionDeploymentAuthorized": true,
     "allowedQaFiles": [
@@ -72,14 +72,14 @@
     "businessWritesAuthorized": false,
     "configWritesAuthorized": false,
     "dataMutationAuthorized": false,
-    "productMutationAuthorized": true,
+    "productMutationAuthorized": false,
     "allowedProductFiles": [
       "orbit360-platform/modules/cancelaciones.js",
       "orbit360-platform/index.html"
     ],
     "reimportAuthorized": false,
     "livePromotionAuthorized": false,
-    "syntheticQaWritesAuthorized": false,
+    "syntheticQaWritesAuthorized": true,
     "syntheticQaScope": "R20 exact Preview only: disposable insurer/logo/product/plan/requirement/document and Ops/Leads handoff/cadence fixtures; mandatory server commit, readback, reload and cleanup; no real operational row mutation.",
     "paulaVisualAcceptanceRequiredBeforeAdvance": false,
     "cotcompRealTransportAuthorized": false,
@@ -101,13 +101,13 @@
     "renewabilityDataMutationAuthorized": false,
     "authorizedDataMutation": "NONE_POST_B02_APPLY_PASS",
     "renewabilityApplyRepeatAuthorized": false,
-    "buildDispatchAuthorized": false,
-    "previewMutationAuthorized": false,
+    "buildDispatchAuthorized": true,
+    "previewMutationAuthorized": true,
     "functionDeploymentAuthorized": true,
     "renewalCutoffDataMutationAuthorized": false,
     "realOperationalWritesAuthorized": false
   },
-  "nextAction": "B4_003_R20_CANCELATIONS_SOURCE_FIX",
+  "nextAction": "B4_003_R20_CONTRACT_AND_EXACT_PREVIEW",
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
     "blobSha": "96a397b330441d71713cb635cc42c1cadbfa42a9",
@@ -652,7 +652,7 @@
     "carryBlobSha": "de9b2d94a70cd580f565b81f2fd03a32241afdec",
     "masterPlanBlobSha": "64f9b11ade950b4c2734265d2c6b3ecfed3a6976"
   },
-  "productMutationAuthorized": true,
+  "productMutationAuthorized": false,
   "dataMutationAuthorized": false,
   "reimportAuthorized": false,
   "livePromotionAuthorized": false,
@@ -1494,5 +1494,10 @@
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CANCELATIONS_WHATSAPP_SOURCE_FIX_20261008.json",
     "blobSha": "cb889860998961cdf64daead181a291b1af757b8",
     "status": "SOURCE_FIXED_PENDING_QA_AND_EXACT_PREVIEW"
+  },
+  "r20Uat4PreviewAuth": {
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_CANCELATIONS_EXACT_PREVIEW_AUTH_20261008.json",
+    "blobSha": "7bce168a6eba72a77307b5db12f7dc1ce1de7e77",
+    "status": "EXACT_PREVIEW_AUTHORIZED"
   }
 }

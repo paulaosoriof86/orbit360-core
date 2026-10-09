@@ -1,0 +1,35 @@
+{
+  "schema": "GRAVICENTRA_B4_003_R20_CANCELATIONS_EXACT_PREVIEW_V1",
+  "date": "2026-10-08",
+  "status": "EXACT_PREVIEW_AUTHORIZED",
+  "sourceShaBefore": "5b122a9b39210ad28a0ea9d9a624a29511d7325b",
+  "qaBlobs": [
+    {
+      "path": "tools/gravicentra-i6-5-b4-003-contract.mjs",
+      "sha": "0f541544cebe6b64c0293879860b102b3f4e4da1"
+    },
+    {
+      "path": "tools/gravicentra-i6-5-b4-003-preview-proof.mjs",
+      "sha": "fedba9529583dd93230934ae4328238f0db1eae2"
+    }
+  ],
+  "scope": "Same canonical B4-003, cancellation motive and user-controlled WhatsApp drafts, historical B3 PASS preserved",
+  "requiredProof": [
+    "durable synthetic reason after server readback",
+    "no recovery mutation when editing only reason",
+    "individual template and editable text",
+    "selected-list composer without automatic messages",
+    "no real customer write or send from Preview",
+    "same artifact exact readback",
+    "Renewals regression suite"
+  ],
+  "authorization": {
+    "build": true,
+    "isolatedPreview": true,
+    "syntheticQA": true,
+    "prod": false,
+    "reimport": false,
+    "liveWrites": false
+  },
+  "priorUat": "PARTIAL_RENEWALS_LOADING_ACCEPTANCE_ONLY"
+}
