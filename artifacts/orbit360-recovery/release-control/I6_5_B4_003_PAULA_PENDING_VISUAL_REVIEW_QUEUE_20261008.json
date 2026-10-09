@@ -70,12 +70,12 @@
       "id": "RENEWAL_LIFECYCLE",
       "surface": "Renovaciones",
       "route": "#/renovaciones",
-      "state": "R21_CAUSAL_SOURCE_STAGED_EXACT_PREVIEW_RETEST_REQUIRED",
+      "state": "R21_READ_ONLY_FACADE_SOURCE_FIXED_EXACT_AUTHENTICATED_PROOF_PENDING",
       "source": "orbit360-platform/modules/renovaciones.js",
       "blobSha": "011a633f57b826421d37c80a34c9a6406e9ca5fd",
       "whatChanged": "Same-source Kanban owner distinguishes historic unlinked editions from overdue actionable coverage and protects CTA. Role/user/country/scope-specific lifecycle cache, no cross-role snapshot reuse. Policy country uses canonical row first, client fallback only if country missing; no historical data rewrite.",
       "whatToVisualize": "Four-column Kanban search positive/negative/clear by client, policy, insurer, ramo/product, advisor and linked plate, then six historical policy numbers, country/role and reload.",
-      "notProven": "Cross-number successor/vehicle evidence under each role, expired older cutoff preservation, live source mapping and reduced note; no writes.",
+      "notProven": "Authenticated search complete advisor names, relation-source parity, four buckets by scope, and Paula human acceptance remain pending.",
       "causalReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_INBOX_AND_RENEWALS_SEARCH_ROOTFIX_20261009.json",
       "causalReceiptBlobSha": "8b935da6307fb7c04b50404d46cad636444d4bb6",
       "searchDiagnostic": "2026-10-09 authenticated QA showed asesores optional missing; canonical advisor projection is available but was blocked by extra snapshot requirement.",
@@ -92,7 +92,8 @@
       "latestUserVisualObservation": "Correct renewal source-verified predecessor/successor matching across changed numbers, expired effective status and remove dense mixed diagnostic note.",
       "visualFeedbackReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PAULA_CRITICAL_VISUAL_FEEDBACK_20261009.json",
       "visualFeedbackReceiptBlobSha": "cc908285b2e86ecdde4acb99bac3843f221e2185",
-      "r21OldReviewStatus": "R20_USER_SEARCH_PASS_LIFECYCLE_CAUSAL_REMEDIATION_REQUIRED"
+      "r21OldReviewStatus": "R20_USER_SEARCH_PASS_LIFECYCLE_CAUSAL_REMEDIATION_REQUIRED",
+      "causalHydrationReceipt": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R21_OPERATIONAL_STORE_HYDRATION_FACADE_ROOTFIX_20261009.json"
     },
     {
       "id": "CLIENT360",
@@ -223,5 +224,10 @@
     "receiptBlobSha": "ba6c57c5b703329eea92be8d04b8e5074e7aae50",
     "newSourceRequiresNewArtifact": true,
     "historicalMachineProofPreserved": true
+  },
+  "r21HydrationFacadeRootfix": {
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R21_OPERATIONAL_STORE_HYDRATION_FACADE_ROOTFIX_20261009.json",
+    "receiptBlobSha": "1fe4ceb3372dfcd9295983d62d371c66989a5ada",
+    "status": "SOURCE_FIXED_NEEDS_EXACT_PREVIEW"
   }
 }

@@ -368,6 +368,8 @@
       raw:function(){var out=base.raw?base.raw():{};out.__operationalWrite=status();return out;},
       _productStatus:function(){var out=base._productStatus();out.operationalWriteAdapter=true;out.operationalWriteReady=true;out.workflowSemanticOwner=true;return out;},
       _operationalWriteStatus:status,
+      _ensureCollections:function(names){if(typeof base._ensureCollections!=='function')error('PRODUCT_READ_HYDRATION_ENSURE_MISSING');return base._ensureCollections(names);},
+      __productHydrationRequiredOptionalP0:base.__productHydrationRequiredOptionalP0||null,
       _detachSnapshots:base._detachSnapshots?base._detachSnapshots.bind(base):function(){},
       __productReadOnlyP0:true,
       __productOperationalWriteP0:true

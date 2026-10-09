@@ -945,6 +945,19 @@ try{
  await page.click('[data-renewal-search-clear]');
  await page.waitForFunction(id=>!!document.querySelector('[data-renewal-search-state="idle"]')&&!!document.querySelector('[data-renewal-policy="'+id+'"]'),ids.unknownRenewPolicy,{timeout:12000});
  proof.r20RenewalSearch={positive:renewalSearchPositive,negative:renewalSearchNegative,cleared:true};
+ const readFacadeR21=await page.evaluate(()=>{
+   const store=Orbit.store,hydration=store?.__productHydrationRequiredOptionalP0||null,status=store?._productStatus?.()||{};
+   return{readOnly:store?.__productReadOnlyP0===true,operationalFacade:store?.__productOperationalWriteP0===true,
+     ensureCollections:typeof store?._ensureCollections==='function',
+     advisorProjectionMemoized:hydration?.advisorProjectionMemoized===true,
+     readyAuthority:String(status.requiredReadinessAuthority||''),
+     confirmed:[].concat(status.serverConfirmedCollections||[]).filter(v=>['clientes','polizas','vehiculos','aseguradoras'].includes(v))};
+ });
+ need(readFacadeR21.readOnly&&readFacadeR21.operationalFacade&&readFacadeR21.ensureCollections&&readFacadeR21.advisorProjectionMemoized&&
+   readFacadeR21.confirmed.includes('polizas')&&readFacadeR21.confirmed.includes('clientes'),
+  'B4_003_R21_OPERATIONAL_FACADE_READ_HYDRATION_FORWARDER_MISSING:'+JSON.stringify(readFacadeR21));
+ proof.r21ReadOnlyFacadeHydration=readFacadeR21;
+ proof.assertions.readOnlyOperationalFacadeHydrationForwarded=true;
  proof.assertions.renewalSearchKanbanPositiveNegativeClear=true;
  proof.assertions.renewalExpiredKpiSemanticsHuman=true;
  proof.assertions.renewalDate45UniverseReconciled=true;

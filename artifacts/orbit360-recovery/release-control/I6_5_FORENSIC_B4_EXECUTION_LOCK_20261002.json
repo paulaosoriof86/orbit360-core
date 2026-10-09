@@ -82,7 +82,8 @@
       "orbit360-platform/index.html",
       "orbit360-platform/core/ciclo.js",
       "orbit360-platform/modules/ops.js",
-      "orbit360-platform/modules/leads.js"
+      "orbit360-platform/modules/leads.js",
+      "orbit360-platform/data/store-firestore-product-operational-p0.js"
     ],
     "reimportAuthorized": false,
     "livePromotionAuthorized": false,
@@ -1680,5 +1681,18 @@
     "qaChangesOnly": true,
     "productionMutation": false,
     "dataMutation": false
+  },
+  "r21HydrationFacadeRootfix": {
+    "status": "SOURCE_STAGED_EXACT_PREVIEW_REQUIRED",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R21_OPERATIONAL_STORE_HYDRATION_FACADE_ROOTFIX_20261009.json",
+    "receiptBlobSha": "1fe4ceb3372dfcd9295983d62d371c66989a5ada",
+    "allowedOwner": "orbit360-platform/data/store-firestore-product-operational-p0.js",
+    "causalProof": "OPERATIONAL_FACADE_STRIPPED_READONLY_HYDRATION_META_AND_ENSURE_COLLECTIONS",
+    "indexBlobSha": "93f40bb8a0e302502f92d4b48b926cd86b1c4ab4",
+    "sourceBlobSha": "7738314b843253c92be008dc0b812d035b377d43",
+    "qaProofBlobSha": "b326a4fe7ab30b6aef8fb4ce1cedff0ee69f6022",
+    "qaContractBlobSha": "ee4aab05a79b4f6468cd125ff9d49a0f7ab564bb",
+    "noProductionMutation": true,
+    "noBusinessWrites": true
   }
 }
