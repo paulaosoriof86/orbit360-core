@@ -40,14 +40,17 @@
       "id": "RENEWAL_LIFECYCLE",
       "surface": "Renovaciones",
       "route": "#/renovaciones",
-      "state": "LIFECYCLE_AND_SEARCH_SOURCE_STAGED_PREVIEW_UAT_PENDING",
+      "state": "ADVISOR_PROJECTION_CAUSAL_SOURCE_FIXED_EXACT_BROWSER_RETEST_PENDING",
       "source": "orbit360-platform/modules/renovaciones.js",
       "blobSha": "011a633f57b826421d37c80a34c9a6406e9ca5fd",
       "whatChanged": "Same-source Kanban owner distinguishes historic unlinked editions from overdue actionable coverage and protects CTA. Role/user/country/scope-specific lifecycle cache, no cross-role snapshot reuse. Policy country uses canonical row first, client fallback only if country missing; no historical data rewrite.",
       "whatToVisualize": "Four-column Kanban search positive/negative/clear by client, policy, insurer, ramo/product, advisor and linked plate, then six historical policy numbers, country/role and reload.",
-      "notProven": "New search authenticated browser, country/role, 1440/390/320 and lifecycle human UAT pending.",
+      "notProven": "Search positive/negative/clear and country/role/mobile live browser after projection fix, historical lifecycle and Paula human UAT remain pending.",
       "causalReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_INBOX_AND_RENEWALS_SEARCH_ROOTFIX_20261009.json",
-      "causalReceiptBlobSha": "8b935da6307fb7c04b50404d46cad636444d4bb6"
+      "causalReceiptBlobSha": "8b935da6307fb7c04b50404d46cad636444d4bb6",
+      "searchDiagnostic": "2026-10-09 authenticated QA showed asesores optional missing; canonical advisor projection is available but was blocked by extra snapshot requirement.",
+      "causalSearchReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_RENEWAL_SEARCH_ADVISOR_PROJECTION_ROOTFIX_20261009.json",
+      "causalSearchReceiptBlobSha": "843bbc607b60247f2c3ef663faa4c56bd890619e"
     },
     {
       "id": "CLIENT360",
@@ -110,5 +113,12 @@
     "exactPreviewQaPending": true,
     "sourceAndUiNotYetHumanApproved": true,
     "qaRevision": "EXACT_STATIC_CONTRACT_RETRY_AFTER_EXPECTATION_DELIMITER_REPAIR"
+  },
+  "r20SearchAdvisorProjectionFix": {
+    "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_RENEWAL_SEARCH_ADVISOR_PROJECTION_ROOTFIX_20261009.json",
+    "receiptBlobSha": "843bbc607b60247f2c3ef663faa4c56bd890619e",
+    "sourceBlobSha": "0823cffa952a65d741dea4a20d24ceabb3eda67b",
+    "noHumanApproval": true
   }
 }

@@ -1569,12 +1569,23 @@
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_INBOX_AND_RENEWALS_SEARCH_ROOTFIX_20261009.json",
     "receiptBlobSha": "8b935da6307fb7c04b50404d46cad636444d4bb6",
     "sourceIndexBlobSha": "a7313de2db58b16bc1c3948dca06f0703ac31c37",
-    "sourceRenewalsBlobSha": "dbfdf054ee7b66bb51d2815039941ff2a5e58850",
+    "sourceRenewalsBlobSha": "0823cffa952a65d741dea4a20d24ceabb3eda67b",
     "qaProofBlobSha": "9831a674e512bf7396ce0706d0950d9c4f2119d2",
-    "qaContractBlobSha": "ed523b21c3d77f9e66ac327bc251ce5331ac502d",
+    "qaContractBlobSha": "0324243f6c74116b0a1f8dd1c37a05d639264a45",
     "activeFinding": "B4-003",
     "noProductionOrDataMutation": true,
     "doesNotCloseGate": true,
-    "qaRevision": "OBSOLETE_REFRESH_SIGNATURE_QA_ONLY"
+    "qaRevision": "OBSOLETE_REFRESH_SIGNATURE_QA_ONLY",
+    "proofBlobSha": "2ac73486128b6597a3da00b12e2fdce00133b9ad"
+  },
+  "r20SearchAdvisorProjectionFix": {
+    "status": "CAUSAL_FIX_STAGED_EXACT_PREVIEW_REQUIRED",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_RENEWAL_SEARCH_ADVISOR_PROJECTION_ROOTFIX_20261009.json",
+    "receiptBlobSha": "843bbc607b60247f2c3ef663faa4c56bd890619e",
+    "sourceBlobSha": "0823cffa952a65d741dea4a20d24ceabb3eda67b",
+    "qaProofBlobSha": "2ac73486128b6597a3da00b12e2fdce00133b9ad",
+    "qaContractBlobSha": "0324243f6c74116b0a1f8dd1c37a05d639264a45",
+    "productionMutation": false,
+    "dataMutation": false
   }
 }

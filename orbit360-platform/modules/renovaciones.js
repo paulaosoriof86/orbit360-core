@@ -41,7 +41,8 @@ Orbit.modules.renovaciones = (function () {
     if(!searchText.trim())return {state:'ready',missing:[]};
     const store=S();if(!store||store.__productReadOnlyP0!==true||typeof store._productStatus!=='function')return {state:'ready',missing:[]};
     const status=store._productStatus()||{},confirmed=[].concat(status.serverConfirmedCollections||[]),denied=[].concat(status.deniedCollections||[]),errors=status.snapshotErrors||{};
-    const missing=SEARCH_ENRICHMENT_DATA.filter(n=>!confirmed.includes(n));
+    const advisorProjectionReady=store.__productHydrationRequiredOptionalP0?.advisorProjectionMemoized===true;
+    const missing=SEARCH_ENRICHMENT_DATA.filter(n=>!confirmed.includes(n)&&(n!=='asesores'||!advisorProjectionReady));
     if(missing.some(n=>denied.includes(n)||errors[n]))return {state:'unavailable',missing};
     return {state:missing.length?'pending':'ready',missing};
   }

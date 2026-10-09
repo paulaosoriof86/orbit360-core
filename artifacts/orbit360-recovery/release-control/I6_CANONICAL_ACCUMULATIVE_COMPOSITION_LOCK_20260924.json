@@ -238,7 +238,7 @@
     "orbit360-platform/modules/renewals-v1200-operational-bridge.js": "c3bdbbf5ddb5d11f5690649054ea069f67c3afa7",
     "orbit360-platform/modules/renewals-v1200-permission-guard.js": "f3f75e25d32c7e4784a19b089353d9706c98dcda",
     "orbit360-platform/modules/renewals-v1201-issued-filter.js": "ae1df0174121c965f610407ae723094e833ebeaf",
-    "orbit360-platform/modules/renovaciones.js": "dbfdf054ee7b66bb51d2815039941ff2a5e58850",
+    "orbit360-platform/modules/renovaciones.js": "0823cffa952a65d741dea4a20d24ceabb3eda67b",
     "orbit360-platform/modules/siniestros.js": "fbea51cf7084b66d9866a3c947c1e7ec3bb4a034",
     "orbit360-platform/product-runtime-config.js": "cce5e1b74b246640297a734871a71364e4209061",
     "orbit360-platform/styles/base.css": "608ef0709144ffcbe748a7bd04e1bd16744def65",
@@ -4211,10 +4211,10 @@
     "date": "2026-10-09",
     "sourceOwners": {
       "orbit360-platform/index.html": "a7313de2db58b16bc1c3948dca06f0703ac31c37",
-      "orbit360-platform/modules/renovaciones.js": "dbfdf054ee7b66bb51d2815039941ff2a5e58850"
+      "orbit360-platform/modules/renovaciones.js": "0823cffa952a65d741dea4a20d24ceabb3eda67b"
     },
-    "qaProofBlobSha": "9831a674e512bf7396ce0706d0950d9c4f2119d2",
-    "qaContractBlobSha": "ed523b21c3d77f9e66ac327bc251ce5331ac502d",
+    "qaProofBlobSha": "2ac73486128b6597a3da00b12e2fdce00133b9ad",
+    "qaContractBlobSha": "0324243f6c74116b0a1f8dd1c37a05d639264a45",
     "findingsLinked": [
       "B4-003-R20-B01",
       "B4-003-R19-08-OPS-ADVISOR-HANDOFF-NOTIFICATION-GAP",
@@ -4228,5 +4228,16 @@
     "livePromotion": false,
     "needAuthenticatedProof": true,
     "qaAdjudicatorFix": "B4_003_INBOX_LANDING_BOUNDARY_SIGNATURE_REFRESH_FORCE"
+  },
+  "b4003R20SearchAdvisorProjectionFix": {
+    "status": "ROOT_CAUSE_SOURCE_STAGED_PENDING_EXACT_BROWSER_PROOF",
+    "failureRun": 37948198617,
+    "qaFailureLine": 931,
+    "source": "orbit360-platform/modules/renovaciones.js",
+    "sourceBlobSha": "0823cffa952a65d741dea4a20d24ceabb3eda67b",
+    "hydrationContract": "PRODUCT_HYDRATION_AUTHORITATIVE_REQUIRED_OPTIONAL_P0",
+    "finding": "RENEWALS_SEARCH_WITHIN_B4_003",
+    "dataMutation": false,
+    "livePromotion": false
   }
 }

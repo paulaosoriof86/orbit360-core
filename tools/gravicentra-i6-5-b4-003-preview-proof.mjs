@@ -928,7 +928,14 @@ try{
  const searchNumber=await page.evaluate(id=>String(Orbit.store?.get?.('polizas',id)?.numero||''),ids.unknownRenewPolicy);
  need(searchNumber.length>0,'B4_003_RENEWAL_SEARCH_SOURCE_ROW_MISSING');
  await page.fill('[data-renewal-search-input]',searchNumber);
- await page.waitForFunction(id=>!!document.querySelector('[data-renewal-search-state="ready"]')&&!!document.querySelector('[data-renewal-policy="'+id+'"]'),ids.unknownRenewPolicy,{timeout:15000});
+ try{await page.waitForFunction(id=>!!document.querySelector('[data-renewal-search-state="ready"]')&&!!document.querySelector('[data-renewal-policy="'+id+'"]'),ids.unknownRenewPolicy,{timeout:15000});}catch(error){
+   const state=await page.evaluate(id=>{
+     const ui=document.querySelector('[data-renewal-search-state]'),store=Orbit.store,status=store&&store._productStatus?.()||{};
+     const allowed=['clientes','polizas','asesores','aseguradoras','vehiculos'];
+     return{route:String(location.hash||''),searchState:ui?.dataset.renewalSearchState||'',hint:String(ui?.textContent||''),cards:document.querySelectorAll('[data-renewal-policy]').length,targetVisible:!!document.querySelector('[data-renewal-policy="'+id+'"]'),confirmed:(status.serverConfirmedCollections||[]).filter(x=>allowed.includes(x)),optionalMissing:(status.optionalMissing||[]).filter(x=>allowed.includes(x)),denied:(status.deniedCollections||[]).filter(x=>allowed.includes(x)),projectionAvailable:store?.__productHydrationRequiredOptionalP0?.advisorProjectionMemoized===true};
+   },ids.unknownRenewPolicy);
+   throw new Error('B4_003_RENEWAL_SEARCH_TARGET_NOT_READY_OR_NOT_VISIBLE:'+JSON.stringify(state)+'|'+String(error.message||error));
+ }
  const renewalSearchPositive=await page.evaluate(()=>({columns:document.querySelectorAll('[data-renewal-bucket]').length,shown:Number(document.querySelector('[data-renewal-search-shown]')?.dataset.renewalSearchShown),total:Number(document.querySelector('[data-renewal-search-total]')?.dataset.renewalSearchTotal),cards:document.querySelectorAll('[data-renewal-policy]').length}));
  need(renewalSearchPositive.columns===4&&renewalSearchPositive.cards===renewalSearchPositive.shown&&renewalSearchPositive.shown>=1,'B4_003_RENEWAL_SEARCH_POSITIVE_OR_COLUMN_DRIFT:'+JSON.stringify(renewalSearchPositive));
  await page.fill('[data-renewal-search-input]','B4003-NOMATCH-SEARCH-TEST-20261009');

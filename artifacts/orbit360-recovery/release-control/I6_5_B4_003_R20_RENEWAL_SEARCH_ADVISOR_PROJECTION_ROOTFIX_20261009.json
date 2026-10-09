@@ -1,0 +1,34 @@
+{
+  "schema": "GRAVICENTRA_I65_B4_003_RENEWAL_SEARCH_PROJECTION_CAUSAL_ROOTFIX_V1",
+  "date": "2026-10-09",
+  "branch": "recovery/fase-a-clean-20260831",
+  "headAtDiagnosis": "c5b2ed59a82f27ee07719acef0212b053a2c53c8",
+  "gate": "I6.5/B4-003",
+  "status": "SOURCE_STAGED_STATIC_SYNTAX_PASS_EXACT_PREVIEW_NOT_YET_PASSED",
+  "failureRun": 37948198617,
+  "failure": "Renewal search positive browser wait never reached ready and visible target; 15 s timeout at proof line 931",
+  "physicalEvidence": {
+    "proofPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_LAST_FAILED_BROWSER_PROOF_20261007.json",
+    "hydrationDiagnosticOptionalMissingIncludes": "asesores",
+    "hydrationSource": "orbit360-platform/core/product-hydration-required-optional-p0.js",
+    "hydrationAdvisorProjectionMarker": "advisorProjectionMemoized",
+    "remainingRequiredAuxiliaries": [
+      "aseguradoras",
+      "vehiculos"
+    ]
+  },
+  "rootCause": "SEARCH_READINESS_WAITED_FOR_AUTHORITATIVE_ASESORES_SNAPSHOT_WHEN_APPROVED_SCOPED_ADVISOR_PROJECTION_ALREADY_AVAILABLE",
+  "owner": "orbit360-platform/modules/renovaciones.js",
+  "newSourceBlobSha": "0823cffa952a65d741dea4a20d24ceabb3eda67b",
+  "newQaProofSha": "2ac73486128b6597a3da00b12e2fdce00133b9ad",
+  "newQaContractSha": "0324243f6c74116b0a1f8dd1c37a05d639264a45",
+  "compositionBlobSha": "912b07cdbe2840ee647b0fc3629cc1df69d7bde3",
+  "existingFindingId": "B4-003-R20-B01",
+  "dataWrites": 0,
+  "reimport": false,
+  "newArtifactRequired": true,
+  "previewMustPass": true,
+  "paulaVisualRequired": true,
+  "liveUnchanged": true,
+  "priorPassEvidencePreserved": true
+}
