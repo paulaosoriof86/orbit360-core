@@ -1,0 +1,44 @@
+{
+  "schema": "GRAVICENTRA_PILOT_V6_E1_MANUALS_ARTIFACT_OMISSION_FINDING_V1",
+  "recordedAt": "2026-10-09T15:58:00-06:00",
+  "scenario": "E1 Academia",
+  "participant": "CT02",
+  "role": "Operativo",
+  "exactPreview": {
+    "sourceSha": "babea00bf459dfcde611e35ea9413f70f901d043",
+    "runId": 37982729451,
+    "artifactId": 11641957470,
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-37982729451-pvjxtc0j.web.app"
+  },
+  "humanObserved": {
+    "manualsListLoads": true,
+    "roleFilter": "Operativo",
+    "visibleManuals": [
+      "Capacitación CRM"
+    ],
+    "openManualResult": "BROKEN",
+    "symptom": "Iframe shows raw/main app login markup instead of the CRM manual."
+  },
+  "forensicProof": {
+    "sourceManualExists": "orbit360-platform/docs/capacitacion-crm.html",
+    "sourceManualValidHtml": true,
+    "exactPreviewArtifactChecked": true,
+    "exactPreviewArtifactFileCount": 257,
+    "exactPreviewArtifactContainsDocsCapacitacionCrm": false,
+    "rootCause": "The exact preview artifact omits docs/capacitacion-crm.html. Academia iframe requests docs/capacitacion-crm.html; Hosting SPA fallback serves index.html, producing the visible raw app/login markup inside the iframe."
+  },
+  "classification": {
+    "finding": "CONFIRMED_CAUSAL_SUBCAPABILITY_FAILURE",
+    "affectedSubcapability": "Academia manuals/help resources",
+    "e1Overall": "PASS_WITH_OBSERVATIONS",
+    "pilotImpact": "NONBLOCKING_TO_BLOCK_E; do not repeat prior scenarios",
+    "interpretation": "Academia route/course/lesson/quiz access is executable; manual resource delivery is not."
+  },
+  "requiredFollowup": [
+    "Include required docs/manual HTML assets in exact preview artifact or serve them from an explicit static/manuals path that bypasses SPA fallback.",
+    "Add build contract asserting existence and content-type/HTTP 200 for every role-visible manual path.",
+    "Retest CRM manual in iframe and open-apart path on the exact successor preview.",
+    "Preserve role filtering; do not expose admin-only manuals to Operativo."
+  ],
+  "writesDuringPilot": 0
+}
