@@ -1,0 +1,89 @@
+{
+  "schema": "GRAVICENTRA_PILOT_V6_S6_CLOSURE_V1",
+  "recordedAt": "2026-10-09T07:22:00-06:00",
+  "scenarioId": "PILOTV6_S6_CT02_20261008_01",
+  "participant": "CT02",
+  "role": "Operativo",
+  "scenario": "S6 Cobro controlado",
+  "status": "PASS_WITH_OBSERVATIONS",
+  "exactPreview": {
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-37869818151-sonljpam.web.app",
+    "sourceSha": "90ff0354e936bbaedc921c82408d3b37e9688909",
+    "buildId": "gi-i65-b4-90ff0354e936-57f234755dc1",
+    "runId": 37869818151,
+    "artifactId": 11589203939
+  },
+  "syntheticFixture": {
+    "policyNumber": "PILOTV6-S6-CT02-20261008-01",
+    "amount": 123.45,
+    "currency": "GTQ",
+    "pii": false,
+    "realCustomer": false
+  },
+  "humanObserved": {
+    "before": {
+      "state": "Por vencer",
+      "amount": "Q 123.45",
+      "paidDate": "No informada",
+      "applicationDate": "Pendiente / no informada",
+      "paymentSupport": "No adjunto",
+      "invoiceSupport": "No adjunto"
+    },
+    "action": {
+      "operation": "Aplicar pago / Registrar pago",
+      "paidDate": "2026-10-08",
+      "paymentMethod": "Transferencia bancaria",
+      "paymentSupportAttached": false,
+      "insurerApplicationDateProvided": false,
+      "invoiceNumberProvided": false,
+      "insurerApplicationSupportAttached": false,
+      "notifyClient": false
+    },
+    "after": {
+      "state": "Pago confirmado",
+      "reconciliationState": "Pendiente de conciliación",
+      "paidDate": "2026-10-08",
+      "applicationDate": "Pendiente / no informada",
+      "editBlockedBecausePaymentEvidence": true,
+      "deleteBlockedBecausePaymentEvidence": true,
+      "reconciliationAvailableAsSeparateAction": true
+    }
+  },
+  "adjudication": {
+    "purposeDemonstrated": [
+      "registro explícito de pago sintético",
+      "persistencia visible del cambio de estado",
+      "fecha real de pago separada de fecha de aplicación",
+      "pago confirmado separado de conciliación",
+      "protección contra edición/eliminación del recibo una vez existe evidencia de pago"
+    ],
+    "notDemonstrated": [
+      "mejora financiera",
+      "reducción de mora",
+      "conciliación real con aseguradora",
+      "efectividad de comunicación externa"
+    ],
+    "observations": [
+      "La conciliación quedó deliberadamente pendiente; no era necesaria para cerrar S6.",
+      "El pago se ejecutó únicamente sobre fixture sintético del piloto."
+    ]
+  },
+  "cleanup": {
+    "status": "PASS_ZERO_RESIDUE",
+    "runId": 37936242836,
+    "artifactId": 11617594415,
+    "artifactDigest": "sha256:d553e78b921679edcd6f79b5164df561afd32cbfce4c1bc60a2b221ce6b2ad73",
+    "deletedCobros": 1,
+    "deletedReconciliationRequests": 1,
+    "deletedReconciliationEvents": 1,
+    "deletedOperationalRequests": 0,
+    "deletedOperationalEvents": 0,
+    "syntheticFinalAbsent": true
+  },
+  "forwardOnly": {
+    "s0ThroughS5Preserved": true,
+    "reopenPriorScenario": false,
+    "nextScenario": "S7 Renovaciones / continuidad",
+    "s7Rule": "Proceed only on a product candidate whose S7-specific renewal logic is current; unrelated noncausal findings do not reopen prior scenarios."
+  }
+}
