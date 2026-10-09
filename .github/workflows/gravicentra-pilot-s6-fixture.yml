@@ -21,7 +21,6 @@ env:
   PROJECT_ID: ays-orbit-360-lab
   TENANT_HINT: alianzas-soluciones
   S6_REQUEST: artifacts/orbit360-recovery/release-control/PILOTV6_S6_CT02_20261008_01_REQUEST.json
-  S6_OUT: ${{ runner.temp }}/pilot-s6-fixture-result.json
 
 jobs:
   pilot-s6-fixture:
@@ -95,6 +94,7 @@ jobs:
         if: steps.gate.outputs.run == 'true'
         run: |
           set -euo pipefail
+          export S6_OUT="$RUNNER_TEMP/pilot-s6-fixture-result.json"
           node tools/gravicentra-pilot-s6-fixture.mjs "$S6_REQUEST" "$S6_OUT"
           node - <<'NODE'
           const fs=require('node:fs'),r=JSON.parse(fs.readFileSync(process.env.S6_OUT,'utf8'));
