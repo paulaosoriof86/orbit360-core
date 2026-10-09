@@ -791,6 +791,14 @@ jobs:
           git config user.name gravicentra-recovery-bot
           git config user.email gravicentra-recovery-bot@users.noreply.github.com
           git commit -m "test(b4-003): freeze failed browser proof for diagnosis"
+          test "$(git diff-tree --no-commit-id --name-only -r HEAD)" = "$RECEIPT"
+          # Only rebase the evidence receipt across nonconflicting branch activity.
+          git fetch origin "$GITHUB_REF_NAME"
+          if ! git rebase "origin/$GITHUB_REF_NAME"; then
+            git rebase --abort || true
+            echo "B4_003_FAIL_RECEIPT_CONCURRENT_CONFLICT"
+            exit 1
+          fi
           git push origin "HEAD:$GITHUB_REF_NAME"
 
       - name: Verify LIVE remained byte-stable during exact Preview

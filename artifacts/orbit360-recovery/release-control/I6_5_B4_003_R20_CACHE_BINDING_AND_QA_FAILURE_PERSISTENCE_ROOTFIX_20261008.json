@@ -1,0 +1,51 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R20_CACHE_QA_EVIDENCE_ROOTFIX_V1",
+  "date": "2026-10-08",
+  "branch": "recovery/fase-a-clean-20260831",
+  "predecessorHead": "74a8a4f221f5851e53fcab07c790a248b2e11153",
+  "gate": "I6.5/B4-003",
+  "failureEvidence": {
+    "runId": 37887190747,
+    "conclusion": "FAIL",
+    "verifiedChromeRouteMs": 1491,
+    "verifiedSearchMs": 243,
+    "verifiedDetailMs": 256,
+    "legacyApprovedMaxMsExclusive": 2500,
+    "backendPreviewDeploy": "PASS",
+    "exactHostingReadback": "PASS",
+    "browserFailure": "AFTER_R13_POLICY_PERF_OTHER_UNDETERMINED_CAUSE",
+    "reasonFullReceiptNotPersisted": "Another concurrent authorized S6 pilot commit advanced the same branch, and the failed-proof bot git push was rejected non-fast-forward. Do not misattribute to previous browser failure."
+  },
+  "sourceCorrection": {
+    "path": "orbit360-platform/index.html",
+    "blobSha": "477b9262852a3780bea5d744f748734c93695a8b",
+    "purpose": "Bind current Renova+Polizas source with changed cache tokens so browser never loads previous script versions after a certified build.",
+    "otherProductChanges": 0
+  },
+  "qaCorrections": [
+    {
+      "path": "tools/gravicentra-i6-5-b4-003-contract.mjs",
+      "blobSha": "ccb7286e81ad931452d874697e9f119bec8f4d30",
+      "purpose": "Assert exact new query-version strings."
+    },
+    {
+      "path": "tools/gravicentra-i6-5-b4-003-preview-proof.mjs",
+      "blobSha": "1c020689de93aebc5678b8a78626f01bf613c9b2",
+      "purpose": "Print minimal failure code and source line to CI logs even if receipt push cannot complete; no customer PII in that log marker."
+    },
+    {
+      "path": ".github/workflows/gravicentra-b4-003-executor.yml",
+      "blobSha": "cd073f5c92e4d308418769af697830f16424da5e",
+      "purpose": "Rebase only exact proof-receipt commit after concurrent branch progress; abort if conflict, never discard incoming commits."
+    }
+  ],
+  "boundaries": {
+    "noRealOperationalWrites": true,
+    "noReimport": true,
+    "noLivePromotion": true,
+    "productFileCount": 102,
+    "b4_004Held": true,
+    "previousHumanRejectionPreserved": true
+  },
+  "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_R20_CONTRACT_AND_EXACT_PREVIEW"
+}

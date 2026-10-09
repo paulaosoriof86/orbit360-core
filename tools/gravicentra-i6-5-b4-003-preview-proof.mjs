@@ -1618,6 +1618,10 @@ try{
 } catch(error) {
  proof.status='FAIL';
  proof.failure={message:clean(error&&error.message||error),stack:clean(error&&error.stack||error).slice(0,8000)};
+ const causeCode=clean(error&&error.message||error).split(':')[0].replace(/[^A-Za-z0-9_.-]/g,'').slice(0,140);
+ const frame=clean(error&&error.stack||'').match(/gravicentra-i6-5-b4-003-preview-proof\.mjs:\d+:\d+/);
+ console.error('B4_003_BROWSER_PROOF_FAILURE_CODE='+causeCode);
+ console.error('B4_003_BROWSER_PROOF_FAILURE_FRAME='+(frame?frame[0]:'NOT_FOUND'));
 } finally {
  if(page)await page.close().catch(()=>{});
  if(context)await context.close().catch(()=>{});

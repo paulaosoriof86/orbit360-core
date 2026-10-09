@@ -434,6 +434,9 @@ need(comp.r20CumulativeSourceFix?.status==='SOURCE_FIXED_R20_PENDING_CONTRACT_AN
  orbit.pais='CO';
  need(orbit.renewalLifecycle.snapshot()!==advisor,'B4_003_RENEWAL_LIFECYCLE_COUNTRY_CACHE_LEAK');
 }
+need(index.includes('modules/polizas.js?v=20261004-b4003r14-i65-20261008-lineage-r20-perf-role-scope-20261008')
+  &&index.includes('modules/renovaciones.js?v=20261008-r20-uat-recovery-i65-20261008-lineage-p1-r20-perf-role-scope-20261008'),
+  'B4_003_R20_POLICY_AND_RENEWALS_CACHE_BUST_BINDING_MISSING');
 need(index.includes('class="inbox-toolbar" style="flex-wrap:wrap')&&index.includes('class="inbox-card-actions" style="flex-wrap:wrap"'),
  'B4_003_INBOX_320_VIEWPORT_FLEX_WRAP_MISSING');
 

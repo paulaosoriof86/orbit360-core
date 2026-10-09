@@ -17,10 +17,10 @@
       "route": "#/inicio",
       "state": "SOURCE_STATIC_AND_RESPONSIVE_CONTRACT_PASS_EXACT_PREVIEW_PENDING",
       "source": "orbit360-platform/index.html",
-      "blobSha": "f931dcb3d903a94cf4523f7ec8c620e9e90475fb",
+      "blobSha": "477b9262852a3780bea5d744f748734c93695a8b",
       "whatChanged": "Only new/unread actionable items may cause the initial Ops/Leads landing; read/acknowledged/resolved/archived do not. Confirm server state before success. Show Ir a Inicio. Return to Inicio when auto-landed task queue is acknowledged/resolved. Narrow layouts wrap toolbar and action buttons instead of overflowing.",
       "whatToVisualize": "7-count inbox icon, Reconocer para mí, Resolver para todos, Archivar para mí, Ir a Inicio; refresh and sign-in landing with new vs acknowledged notices; Direccion and Asesor.",
-      "notProven": "Authenticated fresh-login test and persisted member state readback in exact successor Preview."
+      "notProven": "Source and synthetic branch tests PASS; authenticated first-login/read/ack/relogin still pending. Explicit /#/ops always respected."
     },
     {
       "id": "OPS_LEADS_COLLABORATION_ACTION",
@@ -41,7 +41,7 @@
       "blobSha": "59005f74098739a37d89738ce0e5b932f5a2b832",
       "whatChanged": "Same-source Kanban owner distinguishes historic unlinked editions from overdue actionable coverage and protects CTA. Role/user/country/scope-specific lifecycle cache, no cross-role snapshot reuse.",
       "whatToVisualize": "Six inspected policy numbers and four Kanban columns, prior year vs current, review-only vs proposal/quote, roles and countries.",
-      "notProven": "Complete authenticated visual acceptance and all relation lineage writes; no synthetic new policy records."
+      "notProven": "No authenticated final R20 business UAT PASS. The current source query-version is fixed in new index."
     },
     {
       "id": "CLIENT360",
@@ -69,12 +69,12 @@
       "id": "POLICY_NAVIGATION_PERFORMANCE",
       "surface": "Pólizas / Cliente 360 cross-routing",
       "route": "#/polizas",
-      "state": "SOURCE_STATIC_PERFORMANCE_FIX_PENDING_CHROME_PROOF",
+      "state": "CHROME_ROUTE_PERFORMANCE_PASS_FULL_PREVIEW_STILL_FAIL",
       "source": "orbit360-platform/modules/polizas.js",
       "blobSha": "e52869f5c7b3c219a6d80f39a100827e3ad4b599",
       "whatChanged": "Indexed policy search and on-demand detail preserved; browser route contract still intermittently failed. Expensive lifecycle only assessed after 0–45-day fast filter; 1419-to-17 static test call reduction.",
-      "whatToVisualize": "Route first paint <2500ms, search and detail, desktop/mobile, cold navigation.",
-      "notProven": "Previous Chrome first table paint 3745ms (FAIL); successor exact browser performance retest required."
+      "whatToVisualize": "Route first paint <2500ms, search and detail, desktop/mobile, cold navigation. · Last Chrome run Pólizas route 1491ms, search 243ms, detail 256ms",
+      "notProven": "Full B4-003 browser proof failed later, exact cause awaiting discriminant logs; must not mark full module accepted."
     },
     {
       "id": "INSURERS_QUALITY_DESIGN",
@@ -90,7 +90,7 @@
   "readyToInvitePaula": false,
   "rule": "When an exact Preview truly passes, present this full list and explicitly mark only the tested delta plus its unviewed fields; never ask Paula to approve an old artifact.",
   "lastSourceFixReceipt": {
-    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_PERFORMANCE_ROLE_RESPONSIVE_CAUSAL_FIX_20261008.json",
-    "blobSha": "a95c0f0438c018051b89a648d35147a81e8b0445"
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_CACHE_BINDING_AND_QA_FAILURE_PERSISTENCE_ROOTFIX_20261008.json",
+    "blobSha": "44bf410b5af12efb6f9549307a052bb66e7b9590"
   }
 }
