@@ -1,0 +1,172 @@
+{
+  "schema": "GRAVICENTRA_PILOT_VISUAL_EVIDENCE_INTAKE_V1",
+  "recordedAt": "2026-10-09T08:33:00-06:00",
+  "purpose": "Prevent loss between pilot captures and the next synchronized Word-document update. This manifest is an intake register; restricted originals remain in the conversation evidence surface and thesis/public use requires sanitization.",
+  "accumulationRule": "APPEND_ONLY / NO_DELETE / FORWARD_ONLY",
+  "priorCanonicalLibrary": "BIBLIOTECA_CONOCIMIENTO_CANONICA_PILOTO_GRAVICENTRA_CURRENT_R21_UAT3_PRE_S5.docx",
+  "priorVisualIndex": "INDICE_BIBLIOTECA_VISUAL_R20_AUDIT_PRE_S5_2026-10-07.docx plus later R21 updates",
+  "currentWordDocsStatus": "NOT_YET_SYNCHRONIZED_WITH_ALL_2026-10-09_PILOT_CAPTURES",
+  "currentPilotEvidence": [
+    {
+      "scenario": "S6",
+      "status": "CLOSED_PASS_WITH_OBSERVATIONS",
+      "images": [
+        {
+          "fileId": "file_000000005b6881f8b97aafac5afae9de",
+          "name": "image(20261009-131832).png",
+          "scope": "synthetic S6 client/receipt before-state"
+        },
+        {
+          "fileId": "file_000000008e8481f5be8a23f7b0051075",
+          "name": "image(20261009-131857).png",
+          "scope": "synthetic S6 receipt detail before-state"
+        },
+        {
+          "fileId": "file_0000000056b081f696601da38c5eb2b4",
+          "name": "image(20261009-132017).png",
+          "scope": "S6 controlled payment form"
+        },
+        {
+          "fileId": "file_00000000327482308a4b549bcda93f91",
+          "name": "image(20261009-132037).png",
+          "scope": "S6 after-state: pago confirmado / conciliación pendiente"
+        }
+      ]
+    },
+    {
+      "scenario": "S7",
+      "status": "CLOSED_PASS_WITH_OBSERVATIONS",
+      "images": [
+        {
+          "fileId": "file_00000000128c81f580e01b53d09d73b1",
+          "name": "image(20261009-135428).png",
+          "scope": "renewals overview and KPI summary"
+        },
+        {
+          "fileId": "file_00000000f32481f5a94bc0e23e1bb15e",
+          "name": "image(20261009-135446).png",
+          "scope": "renewals kanban states"
+        },
+        {
+          "fileId": "file_00000000a89481f5b6bdd70f9e2978ed",
+          "name": "image(20261009-135642).png",
+          "scope": "AUTO38446 actionable renewable card"
+        },
+        {
+          "fileId": "file_000000005fd481fdb05ccc37f8f79819",
+          "name": "image(20261009-135702).png",
+          "scope": "AUTO38446 policy detail"
+        },
+        {
+          "fileId": "file_000000001bb482308e6a2882dab2dd17",
+          "name": "image(20261009-135807).png",
+          "scope": "401011234470 historical review-only card"
+        },
+        {
+          "fileId": "file_00000000535c81f68fbc564c62b8d615",
+          "name": "image(20261009-135826).png",
+          "scope": "401011234470 historical policy detail"
+        }
+      ]
+    },
+    {
+      "scenario": "E4",
+      "status": "CLOSED_EXTENSION_FAIL_CAUSAL_CONTINUE_FORWARD",
+      "images": [
+        {
+          "fileId": "file_00000000c0cc81f581c44c5d9d7fc6e1",
+          "name": "image(20261009-141317).png",
+          "scope": "Carlos/Operativo reportes access denied"
+        },
+        {
+          "fileId": "file_00000000aa5c81f4bce510431f02fab9",
+          "name": "image(20261009-141523).png",
+          "scope": "Paula/Dirección reportes production all countries"
+        },
+        {
+          "fileId": "file_00000000119c81f5831605a6dae5b3",
+          "name": "image(20261009-141626).png",
+          "scope": "year 2026 grouping returns zero records"
+        },
+        {
+          "fileId": "file_00000000cf1881f5bc9563715381aac7",
+          "name": "image(20261009-141744).png",
+          "scope": "Guatemala grouped-by-insurer output with invalid numeric aggregations"
+        },
+        {
+          "fileId": "file_00000000b81881f5bda158c3fb7fef92",
+          "name": "image(20261009-141824).png",
+          "scope": "country-dimension anomalies and insurer aliases"
+        },
+        {
+          "fileId": "file_00000000786481f5a4408155f7bc78b8",
+          "name": "image(20261009-141859).png",
+          "scope": "record-level production table under Guatemala filter"
+        }
+      ]
+    },
+    {
+      "scenario": "E8",
+      "status": "IN_PROGRESS_EVIDENCE_CAPTURED",
+      "images": [
+        {
+          "fileId": "file_00000000ab5c8230a7ac7afda29b5fe2",
+          "name": "image(20261009-142959).png",
+          "scope": "Calidad de datos KPIs under Operativo"
+        },
+        {
+          "fileId": "file_000000009f508246b2facdd1d2c03fa7",
+          "name": "image(20261009-143013).png",
+          "scope": "financial-integrity mismatches top examples"
+        },
+        {
+          "fileId": "file_00000000fd1c81f5b682d04c125abe19",
+          "name": "image(20261009-143025).png",
+          "scope": "financial mismatch review modal"
+        },
+        {
+          "fileId": "file_00000000fed881f9be984280643aa305",
+          "name": "image(20261009-143037).png",
+          "scope": "policy edit identity/responsibility context"
+        },
+        {
+          "fileId": "file_00000000bd4c82309e51a1e78b8cad3e",
+          "name": "image(20261009-143052).png",
+          "scope": "policy payment-plan and premium fields"
+        },
+        {
+          "fileId": "file_00000000617481f59f37b7e023600ff6",
+          "name": "image(20261009-143133).png",
+          "scope": "quality operational workbench with country suggestions"
+        },
+        {
+          "fileId": "file_00000000b3008243a1ac72c29490ccec",
+          "name": "image(20261009-143149).png",
+          "scope": "quality table actions and missing-data categories"
+        },
+        {
+          "fileId": "file_00000000fde481f58c96796bd54fac8c",
+          "name": "image(20261009-143245).png",
+          "scope": "country-confirmation modal with evidence suggestion"
+        },
+        {
+          "fileId": "file_00000000467c81f5baf57835ffb3c89d",
+          "name": "image(20261009-143301).png",
+          "scope": "phone/WhatsApp focused completion modal"
+        }
+      ]
+    }
+  ],
+  "knowledgeCaptured": [
+    "S5 business rule: obligation, payment evidence/payment confirmation and reconciliation are distinct states.",
+    "S6 synthetic controlled payment proved before/after and zero-residue cleanup.",
+    "S7 renewal continuity distinguishes actionable renewable cases from historical review-only editions.",
+    "E4 defects: year filter searches visible cell text; insurer-country segmentation uses client country; generic numeric aggregation sums policy identifiers; Mapfre cross-country mixing remains plausible but not yet proven.",
+    "E8 current observations: Operativo can access Calidad; missing-data detection, country suggestions with provenance, financial-integrity review, and focused completion forms are observable; no write has been executed in E8."
+  ],
+  "nextSyncRule": {
+    "immediate": "Keep this manifest append-only while E8/E9 are still running.",
+    "synchronizedWordUpdate": "At closure of Block D (E4 + E8 + E9), update Biblioteca de Conocimiento, Índice Biblioteca Visual, Matriz Académica, Matriz Participante×Escenario×Evidencia, Plan Operativo, Documento Maestro Técnico, Plan Maestro de Mejoras and Tesis in one synchronized package.",
+    "exception": "If a causal finding changes methodology or evidence status before E9 closes, perform an earlier synchronized update."
+  }
+}
