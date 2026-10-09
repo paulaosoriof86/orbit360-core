@@ -36,15 +36,17 @@ Orbit.modules = Orbit.modules || {};
     const state=String(p.renovacionEstado||'').trim().toLowerCase().replace(/[\s_-]+/g,'');
     return ['renovada','norenovada','rechazada','cerrada','cancelada'].includes(state);
   }
-  function active(p) {
+  function active(p,projection) {
     if(!p || renewabilityState(p)!=='YES' || terminalRenewalOutcome(p)) return false;
     const d=daysUntil(p.vigenciaFin),state=norm(p.estado).replace(/\s+/g,'');
-    if(d==null) return false;
-    return d<0 ? ['vigente','porrenovar','vencida'].includes(state) : ['vigente','porrenovar'].includes(state);
+    if(d==null || !['vigente','porrenovar','vencida'].includes(state))return false;
+    const life=projection||(Orbit.renewalLifecycle&&Orbit.renewalLifecycle.snapshot());
+    return life?life.assess(p).actionable:(d<0||['vigente','porrenovar'].includes(state));
   }
   function policies(limit) {
+    const lifecycle=Orbit.renewalLifecycle&&Orbit.renewalLifecycle.snapshot();
     return A.filter('polizas', S().all('polizas') || [], 'renovaciones').filter(p => {
-      if (!active(p) || !selectedCountry(p)) return false;
+      if (!active(p,lifecycle) || !selectedCountry(p)) return false;
       const d=daysUntil(p.vigenciaFin);
       return d != null && d <= (limit == null ? 90 : limit);
     }).sort((a,b)=>String(a.vigenciaFin||'').localeCompare(String(b.vigenciaFin||'')));
@@ -69,7 +71,8 @@ Orbit.modules = Orbit.modules || {};
     const bucket=key=>Array.from(host.querySelectorAll('[data-renewal-bucket="'+key+'"] [data-renewal-policy]')).map(el=>S().get('polizas',el.getAttribute('data-renewal-policy'))).filter(Boolean);
     const venc=bucket('vencidas'),d15=bucket('d15'),d45=bucket('d45'),d90=bucket('d90');
     const seen=new Set(),all=[...venc,...d15,...d45,...d90].filter(p=>p&&p.id&&!seen.has(p.id)&&seen.add(p.id));
-    const premium=moneyMap(all);
+    const lifecycle=Orbit.renewalLifecycle&&Orbit.renewalLifecycle.snapshot();
+    const premium=moneyMap(all.filter(p=>!lifecycle||lifecycle.assess(p).actionable));
     const defs=[
       ['Vencidas',String(venc.length),'Recuperar o cerrar gestión',()=>detail('Pólizas vencidas',venc)],
       ['≤15 días',String(d15.length),'Atención prioritaria',()=>detail('Renovaciones ≤15 días',d15)],
@@ -158,6 +161,7 @@ Orbit.modules = Orbit.modules || {};
   function cotizarDirecto(policyId) {
     const p=S().get('polizas',policyId);if(!p||!A.canView('polizas',p,'renovaciones'))return U.toast('Póliza fuera de tu alcance');
     if(!canDirectQuote())return U.toast('Tu rol activo debe solicitar propuestas mediante Ops.');
+    if(!active(p))return U.toast('Esta edición no está habilitada para cotización directa: revisa su vigencia, resultado y sucesora.');
     window.__orbitRenewalContext=renewalContext(p,null);
     location.hash='#/cotizador?renueva='+encodeURIComponent(p.id);
   }
@@ -228,7 +232,7 @@ Orbit.modules = Orbit.modules || {};
       try{
         const mutations=[];
         ids.forEach(id=>{
-          const p=S().get('polizas',id),c=p&&S().get('clientes',p.clienteId);if(!p)return;
+          const p=S().get('polizas',id),c=p&&S().get('clientes',p.clienteId);if(!p||!active(p))throw new Error('RENEWAL_CAMPAIGN_SOURCE_NO_LONGER_ACTIONABLE');
           mutations.push({action:'update',collection:'polizas',id:p.id,payload:{renovacionSeguimientoPreparado:date,renovacionCanalEstado:'pendiente_conexion'}});
           const activityId='act_ren_'+String(p.id).replace(/[^A-Za-z0-9._:-]/g,'_')+'_'+date.replace(/-/g,'');
           const activity={id:activityId,tenantId:p.tenantId,clienteId:p.clienteId,asesorId:p.asesorId,tipo:'renovacion',icon:'📤',fecha:date,titulo:'Seguimiento de renovación preparado',detalle:'Pendiente de canal conectado · '+p.numero+' · '+(c&&c.nombre||''),__syntheticQa:p.__syntheticQa===true};

@@ -1,0 +1,63 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R20_CAUSAL_SOURCE_FIX_AND_AUTHORITY_RECONCILIATION_V1",
+  "date": "2026-10-08",
+  "gate": "I6.5/B4-003",
+  "authority": {
+    "type": "USER_DIRECTED_CAUSAL_FIX_AND_DESYNC_REPAIR",
+    "repository": "paulaosoriof86/orbit360-core",
+    "branch": "recovery/fase-a-clean-20260831",
+    "predecessorHead": "3afa46ca0cb0f21afbe4c54d3e06318d20212070",
+    "priorityFreezePath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PAULA_RELEASE_PRIORITY_FREEZE_20261008.json",
+    "businessRejectionPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_LIFECYCLE_HUMAN_REJECTION_AND_STATIC_REPRO_20261008.json",
+    "readOnlyAuditPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_LINEAGE_AUDIT_READONLY_20261008.json",
+    "scope": "RENEWALS_LINEAGE_AND_EFFECTIVE_ACTION_OWNER; CLIENT360_FORMA_DISPLAY; CANCELLATIONS_HISTORIC_MOTIVE_SEMANTIC"
+  },
+  "cause": "B4-003 parent status machine pass despite later human failure, carry vs ledger parent mismatch, and Renewals Kanban expired-state predicate admitted prior Renovada/Histórica with absent explicit lineage; operational bridge action predicate diverged.",
+  "productBlobChanges": {
+    "orbit360-platform/modules/renovaciones.js": "93a66f982cd26f3ccfae14772fab6c90534388a0",
+    "orbit360-platform/modules/renewals-v1200-operational-bridge.js": "c3bdbbf5ddb5d11f5690649054ea069f67c3afa7",
+    "orbit360-platform/modules/polizas.js": "8c263c62911b2389168793f025b6f5fa14c1ead0",
+    "orbit360-platform/modules/cliente360.js": "5250cd40950cc58106df2915f0605b38a566524a",
+    "orbit360-platform/modules/cancelaciones.js": "f14842484b464da6296a10459eb523d2b056ed98",
+    "orbit360-platform/index.html": "2c9af6183ccf000bf8a1bc9d9d8901f6293d6159"
+  },
+  "qaBlob": {
+    "tools/gravicentra-i6-5-b4-003-contract.mjs": "7dbd04b28204be6279b2d8bd504beba78bce4dd1"
+  },
+  "businessRules": [
+    "Renovada with later compatible but unlinked edition is review-only lineage, not commercial renewal debt nor proven issuance.",
+    "Histórica expired without successor remains visible as REVIEW_ONLY, never automatic CTA.",
+    "Expired vigente with no terminal outcome remains actionable.",
+    "No-renewed/cancelled explicit terminal excluded.",
+    "Unknown renewability cannot launch commercial CTA.",
+    "One canonical lifecycle projection shared by Kanban, operational actions and Pólizas/Inicio KPI.",
+    "Do not treat missing historical cancellation reason as a real cancellation cause.",
+    "No undefined payment form in Cliente 360."
+  ],
+  "proofs": {
+    "staticJavaScriptSyntax": "PASS_FOR_STAGED_FILES",
+    "syntheticFixtureCount": 8,
+    "physicalSampleRendering": "PASS_16_CASES_FROM_READONLY_POLICY_AUDIT",
+    "authenticatedExactPreview": "PENDING",
+    "humanVisual": "REJECTED_PREVIOUS_CANDIDATE_RETEST_REQUIRED",
+    "live": "NOT_PROMOTED"
+  },
+  "noLoss": {
+    "findingIdCount": 282,
+    "noNewFindingIds": true,
+    "oldPassEvidencePreserved": true,
+    "previousMachineProofPreserved": true,
+    "previous1415RenewabilityWritesNotRepeated": true,
+    "previous583CutoffWritesNotRepeated": true
+  },
+  "boundaries": {
+    "realPolicyWrites": 0,
+    "operationalBusinessWrites": 0,
+    "firestoreWrites": 0,
+    "reimport": false,
+    "productionHostingTouched": false,
+    "livePromotion": false,
+    "productSourceFiles": 6
+  },
+  "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_R20_CONTRACT_AND_EXACT_PREVIEW"
+}

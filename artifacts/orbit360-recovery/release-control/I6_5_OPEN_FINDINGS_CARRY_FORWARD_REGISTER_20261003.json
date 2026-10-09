@@ -1,10 +1,10 @@
 {
   "schema": "GRAVICENTRA_I6_5_OPEN_FINDINGS_CARRY_FORWARD_REGISTER_V1",
-  "recordedAt": "2026-10-08T21:43:35.454Z",
+  "recordedAt": "2026-10-08T21:00:00-06:00",
   "authority": "FAIL_CLOSED_FINDING_CONTINUITY",
   "sourceLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-  "sourceLedgerPreviousBlobSha": "4114887cfe67b1cb60cf1b7da4671e359a7a709c",
-  "expectedLedgerNextBlobSha": "cd3e76daeb3ea79d081a00726a2ac9522ecf67b2",
+  "sourceLedgerPreviousBlobSha": "fc1abaf7c3cbefb99023be5f217c65ab45df5c1f",
+  "expectedLedgerNextBlobSha": "1c8fdcf3d9d7a4fddb9defa01ea582cdba32c156",
   "policy": {
     "allLedgerFindingsMustAppearExactlyOnce": true,
     "newHumanFindingsMustBeIndividualLedgerEntries": true,
@@ -2951,7 +2951,7 @@
       "block": "B4",
       "source": "FROZEN_PLAN",
       "finding": "Cumulative B4-003 remediation: lifecycle, premium/source authority, Information Health, insurer knowledge and Gravicentra↔CotComp Quote Authority.",
-      "status": "PAULA_VISUAL_PARTIAL_R20_CANCELATIONS_REMEDIATION_REQUIRED",
+      "status": "REJECTED_R20_BUSINESS_LOGIC_CAUSAL_SOURCE_FIXED_PREVIEW_RETEST_REQUIRED",
       "blocking": true,
       "mayDisappearWithoutDisposition": false,
       "humanEvidence": [
@@ -2989,7 +2989,7 @@
         "Exact Preview: Cliente 360 has bidirectional tab navigation.",
         "Exact Preview: Calidad respects global country and synchronous render path is measured under 2500 ms in authenticated harness."
       ],
-      "nextAction": "B4_003_R20_CANCELATIONS_SOURCE_FIX",
+      "nextAction": "B4_003_R20_CONTRACT_AND_EXACT_PREVIEW",
       "rootCause": "RENEWALS_CANCELATIONS_MULTI_CAUSAL_SOURCE_GAPS_WITH_CANONICAL_POLICY_PROJECTION_GAP",
       "causeClassification": "PRODUCT_LOGIC_DEFECT_DEMONSTRATED",
       "evidence": {
@@ -3263,7 +3263,9 @@
         "cancelationsMotiveEditorMissing": true,
         "whatsappDraftsMissing": true,
         "renewalsLifecycleVerificationPending": true
-      }
+      },
+      "newCausalProofPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_RENEWALS_LIFECYCLE_CAUSAL_FIX_AND_GOVERNANCE_RECONCILIATION_20261008.json",
+      "newCausalProofBlobSha": "00bc96d3bd14998bafbe851eeccb506ec88cc25b"
     },
     {
       "id": "B4-004",
@@ -8521,7 +8523,7 @@
       ],
       "rootCause": "Most policies still lack authoritative renovable YES/NO and some renewal financial fields remain source-incomplete; current product correctly refuses to infer them.",
       "requiredFix": "Open exact policy editor focused on tri-state Renovabilidad with source-safe options; keep UNKNOWN fail-closed; derive KPI and columns from the same immutable bucket snapshot and prove equality.",
-      "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
+      "status": "REJECTED_R20_LIFECYCLE_RETEST_PENDING",
       "blocking": true,
       "targetGate": "B4-003",
       "closureCondition": "Resolve renewability/financial completeness from source-backed policy/insurer evidence and visible validation workflow; do not auto-promote UNKNOWN.",
@@ -12526,5 +12528,13 @@
   "r20FourthUat": {
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_FOURTH_HUMAN_UAT_20261008.json",
     "status": "PAULA_VISUAL_PARTIAL_R20_CANCELATIONS_REMEDIATION_REQUIRED"
+  },
+  "r20LifecycleReconciliation": {
+    "status": "NO_LOSS_RECONCILED",
+    "idCount": 282,
+    "changedStatuses": 2,
+    "sourceReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_RENEWALS_LIFECYCLE_CAUSAL_FIX_AND_GOVERNANCE_RECONCILIATION_20261008.json",
+    "receiptBlobSha": "00bc96d3bd14998bafbe851eeccb506ec88cc25b",
+    "expectedLedgerNextBlobSha": "1c8fdcf3d9d7a4fddb9defa01ea582cdba32c156"
   }
 }

@@ -2969,7 +2969,7 @@
       "block": "B4",
       "source": "FROZEN_PLAN",
       "finding": "Cumulative B4-003 remediation: lifecycle, premium/source authority, Information Health, insurer knowledge and Gravicentra↔CotComp Quote Authority.",
-      "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
+      "status": "REJECTED_R20_BUSINESS_LOGIC_CAUSAL_SOURCE_FIXED_PREVIEW_RETEST_REQUIRED",
       "blocking": true,
       "mayDisappearWithoutDisposition": false,
       "humanEvidence": [
@@ -3007,7 +3007,7 @@
         "Exact Preview: Cliente 360 has bidirectional tab navigation.",
         "Exact Preview: Calidad respects global country and synchronous render path is measured under 2500 ms in authenticated harness."
       ],
-      "nextAction": "B4_003_R20_TARGETED_PAULA_VISUAL",
+      "nextAction": "B4_003_R20_CONTRACT_AND_EXACT_PREVIEW",
       "rootCause": "RENEWALS_CANCELATIONS_MULTI_CAUSAL_SOURCE_GAPS_WITH_CANONICAL_POLICY_PROJECTION_GAP",
       "causeClassification": "PRODUCT_LOGIC_DEFECT_DEMONSTRATED",
       "evidence": {
@@ -3275,7 +3275,11 @@
         "cancelationsMotiveEditorMissing": true,
         "whatsappDraftsMissing": true,
         "renewalsLifecycleVerificationPending": true
-      }
+      },
+      "currentHumanDisposition": "REJECTED_RENEWALS_BUSINESS_LOGIC",
+      "newCausalProofPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_RENEWALS_LIFECYCLE_CAUSAL_FIX_AND_GOVERNANCE_RECONCILIATION_20261008.json",
+      "newCausalProofBlobSha": "00bc96d3bd14998bafbe851eeccb506ec88cc25b",
+      "newCausalDetail": "Live policy lineage has 0 explicitly validated old-to-new successors among 682 historic expired editions; source fixture and physical sample discriminate actionable vs review vs prior-renewed."
     },
     {
       "id": "B4-004",
@@ -8533,7 +8537,7 @@
       ],
       "rootCause": "Most policies still lack authoritative renovable YES/NO and some renewal financial fields remain source-incomplete; current product correctly refuses to infer them.",
       "requiredFix": "Open exact policy editor focused on tri-state Renovabilidad with source-safe options; keep UNKNOWN fail-closed; derive KPI and columns from the same immutable bucket snapshot and prove equality.",
-      "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
+      "status": "REJECTED_R20_LIFECYCLE_RETEST_PENDING",
       "blocking": true,
       "targetGate": "B4-003",
       "closureCondition": "Resolve renewability/financial completeness from source-backed policy/insurer evidence and visible validation workflow; do not auto-promote UNKNOWN.",
@@ -8578,7 +8582,9 @@
         "sourceSha": "2248d58d51a7ff051a9b3d0a8645e6b7e3b59a90",
         "recent24Visible": true,
         "terminal583Absent": true
-      }
+      },
+      "newCausalProofPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_RENEWALS_LIFECYCLE_CAUSAL_FIX_AND_GOVERNANCE_RECONCILIATION_20261008.json",
+      "newCausalProofBlobSha": "00bc96d3bd14998bafbe851eeccb506ec88cc25b"
     },
     {
       "id": "B4-003-R15-08-INSURER-DOCUMENT-TAXONOMY-AND-REGISTRY-CONVERGENCE",
@@ -12122,7 +12128,9 @@
   "currentB4": {
     "status": "B4_003_SOURCE_FIXED_R20_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "nextAction": "B4_003_R20_CONTRACT_AND_EXACT_PREVIEW",
-    "humanVisualStatus": "REJECTED_R20_SECOND_REVIEW"
+    "humanVisualStatus": "REJECTED_R20_RENEWAL_LIFECYCLE",
+    "newSourceReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_RENEWALS_LIFECYCLE_CAUSAL_FIX_AND_GOVERNANCE_RECONCILIATION_20261008.json",
+    "newSourceReceiptBlobSha": "00bc96d3bd14998bafbe851eeccb506ec88cc25b"
   },
   "b4003QaResidueCarry": {
     "status": "UNRESOLVED_EXACT_QA_RESIDUE_REQUIRES_SEPARATE_ADJUDICATION_BEFORE_B4_003_CLOSE",
@@ -12159,7 +12167,7 @@
     "requiredBeforeAdvance": "B4_003_TARGETED_PAULA_VISUAL_PASS",
     "currentB4003HumanStatus": "REJECTED_R13"
   },
-  "lastUpdatedAt": "2026-10-08T00:00:00Z",
+  "lastUpdatedAt": "2026-10-08",
   "lastR16SourceFix": {
     "status": "SOURCE_FIXED_R16_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "receiptBlobSha": "dcd545e14795e387a8f67130d5fa51aabfcd63ce",
@@ -12423,5 +12431,5 @@
     "noNewFindingIds": true,
     "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_UAT3_P0_SOURCE_FIX_SCOPE_LOCK"
   },
-  "recordedAt": "2026-10-08T21:43:35.454Z"
+  "recordedAt": "2026-10-08T21:00:00-06:00"
 }

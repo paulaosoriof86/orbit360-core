@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_PENDING_CLOSURE_MASTER_PLAN_LOCK_V1",
   "recordedAt": "2026-10-08T21:43:35.454Z",
-  "status": "FROZEN_ACTIVE_RENEWALS_DATA_APPLIED_PREVIEW_AUTH_PENDING",
+  "status": "FROZEN_ACTIVE_B4_003_R20_SOURCE_FIXED_PREVIEW_RETEST_PENDING",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "purpose": "Single no-loss operational closure plan from B4-003 R16 through remaining Fase A Post-Salida. Conversation/memory are context only; this lock, ledger, carry register, Control Plane and physical evidence govern execution.",
@@ -285,15 +285,17 @@
   },
   "currentState": {
     "gate": "I6.5 / B4-003",
-    "status": "RENEWALS_DATA_APPLIED_PASS_EXACT_PREVIEW_AUTHORIZATION_PENDING",
-    "nextAction": "I6_5_B4_003_RENEWALS_EXACT_PREVIEW_AUTHORIZATION",
+    "status": "B4_003_SOURCE_FIXED_R20_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+    "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_R20_CONTRACT_AND_EXACT_PREVIEW",
     "why": "B-01/B-03/B-04 are source-fixed; B-02 exact 583 cutoff disposition applied with full readback and recent 24 unchanged. Remaining renewal exit is exact authenticated Preview proof.",
     "reviewedSourceSha": "66c3b9b77ef8ffecbe3a26de59897abd55ec677f",
     "reviewedBuildId": "gi-i65-b4-66c3b9b77ef8-57f234755dc1",
     "reviewedPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b4-37710305112-ud58tgnd.web.app",
     "reviewedMachineProofRunId": 37710305112,
-    "humanStatus": "REJECTED_UAT3_20261008",
-    "b4004Held": true
+    "humanStatus": "REJECTED_RENEWALS_BUSINESS_LOGIC_PENDING_NEW_EXACT_PREVIEW",
+    "b4004Held": true,
+    "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_RENEWALS_LIFECYCLE_CAUSAL_FIX_AND_GOVERNANCE_RECONCILIATION_20261008.json",
+    "sourceFixReceiptBlobSha": "00bc96d3bd14998bafbe851eeccb506ec88cc25b"
   },
   "frozenExecutionSequence": [
     {
@@ -14518,14 +14520,14 @@
     "recordedAt": "2026-10-08T12:20:28-06:00"
   },
   "carryForwardIntegrity": {
-    "status": "PASS_UAT3_CAUSAL_AUDIT",
+    "status": "PASS_R20_EXACT_LEDGER_CARRY_RECONCILIATION",
     "ledgerCount": 282,
     "carryCount": 282,
     "exactIdSet": true,
     "newFindingIds": [],
     "deletedFindingIds": [],
-    "ledgerBlobSha": "464cbda4b2ac27388e4c181d852339e23befc526",
-    "carryBlobSha": "a7991cdcc14a0650c1f608aa970e39b47f956cac",
+    "ledgerBlobSha": "1c8fdcf3d9d7a4fddb9defa01ea582cdba32c156",
+    "carryBlobSha": "48d945e51e5a10ec74dc925313b720a121ba7086",
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_UAT3_FINDING_PRIORITY_RECONCILIATION_20261008.json",
     "receiptBlobSha": "97f1a5a49d04b15a265c2c4bcd747d6404439eac"
   },
@@ -15103,7 +15105,7 @@
     "liveMutation": false,
     "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_UAT3_P0_SOURCE_FIX_BATCH_3_SCOPE_LOCK"
   },
-  "nextAction": "I6_5_B4_003_RENEWALS_EXACT_PREVIEW_AUTHORIZATION",
+  "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_R20_CONTRACT_AND_EXACT_PREVIEW",
   "uat3P0SourceFixBatch3": {
     "status": "SOURCE_FIXED_STATIC_PASS_DEPLOYMENT_NOT_DISPATCHED",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_UAT3_P0_SOURCE_FIX_BATCH_3_COMMERCIAL_CONVERSION_20261008.json",
@@ -15216,5 +15218,13 @@
     "productSourceChanged": false,
     "dataMutation": false,
     "livePromotion": false
+  },
+  "r20LifecycleRootfix": {
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_RENEWALS_LIFECYCLE_CAUSAL_FIX_AND_GOVERNANCE_RECONCILIATION_20261008.json",
+    "receiptBlobSha": "00bc96d3bd14998bafbe851eeccb506ec88cc25b",
+    "readOnlyAuditPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_LINEAGE_AUDIT_READONLY_20261008.json",
+    "physicalSamplesPassed": 16,
+    "readOnlyOnly": true,
+    "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_R20_CONTRACT_AND_EXACT_PREVIEW"
   }
 }

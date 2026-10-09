@@ -45,7 +45,8 @@ Orbit.modules.polizas = (function () {
   };
   const isRenewalWithin45Days = p => {
     const d = U.daysFromNow(p && (p.vigenciaFin || p.fechaFin || p.fechaVencimiento || p.finVigencia));
-    return isActivePolicy(p) && d != null && d >= 0 && d <= 45;
+    const lifecycle=Orbit.renewalLifecycle&&Orbit.renewalLifecycle.evaluate(p);
+    return isActivePolicy(p) && d != null && d >= 0 && d <= 45 && (!lifecycle||lifecycle.actionable||lifecycle.reviewOnly);
   };
   const premiumByCurrency = (policies, I) => {
     const out = {};

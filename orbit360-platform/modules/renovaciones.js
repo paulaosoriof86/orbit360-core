@@ -43,9 +43,57 @@ Orbit.modules.renovaciones = (function () {
     if(p.renovable===false || ['false','no','no renovable'].includes(v)) return 'NO';
     return 'UNKNOWN';
   };
-  const policyState = p => String(p&&p.estado||'').trim().toLowerCase().replace(/\s+/g,'');
+  const policyState = p => String(p&&p.estado||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().toLowerCase().replace(/\s+/g,'');
   const policyStateLabel = p => String(p&&p.estado||'Pendiente de confirmar').trim()||'Pendiente de confirmar';
   const renewalStateLabel = (p,d) => d<0?'Vencida · '+(-d)+' día'+((-d)===1?'':'s'):d===0?'Vence hoy':'Vence en '+d+' día'+(d===1?'':'s');
+
+  /* R20: authoritative read-only lifecycle projection. Administrative state,
+     effective vigencia and verified issuance are separate dimensions. */
+  let activeLifecycle=null;
+  function renewalLifecycleSnapshot(){
+    const rows=(S().all('polizas')||[]).filter(p=>p&&p.id);
+    const norm=v=>String(v==null?'':v).trim().normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase().replace(/[^A-Z0-9]/g,'');
+    const familyKey=p=>[p.tenantId||'',policyCountry(p),p.clienteId||'',p.aseguradoraId||'',p.ramo||'',p.numero||''].map(norm).join('|');
+    const groups=new Map(),byId=new Map(),reverse=new Map(),cache=new Map();
+    for(const p of rows){byId.set(String(p.id),p);const key=familyKey(p);if(!groups.has(key))groups.set(key,[]);groups.get(key).push(p);
+      if(p.renuevaDe){const parent=String(p.renuevaDe);if(!reverse.has(parent))reverse.set(parent,[]);reverse.get(parent).push(p);}}
+    const later=(p,q)=>!!(p.vigenciaInicio&&p.vigenciaFin&&q.vigenciaInicio&&q.vigenciaFin&&String(q.vigenciaInicio)>String(p.vigenciaInicio)&&String(q.vigenciaFin)>String(p.vigenciaFin));
+    function assess(p){
+      if(!p)return{bucketEligible:false,actionable:false,reviewOnly:false,terminal:true,reason:'POLIZA_AUSENTE'};
+      const id=String(p.id||''),prior=cache.get(id);if(prior)return prior;
+      const state=policyState(p),renewable=renewabilityState(p),d=U.daysFromNow(p.vigenciaFin);
+      const newer=(groups.get(familyKey(p))||[]).filter(q=>q.id!==p.id&&later(p,q));
+      const forward=p.renovadaPor?byId.get(String(p.renovadaPor)):null,back=(reverse.get(id)||[]).filter(q=>q.id!==p.id);
+      const explicit=[...(forward?[forward]:[]),...back].filter((q,i,a)=>a.findIndex(x=>x.id===q.id)===i);
+      const valid=explicit.filter(q=>familyKey(q)===familyKey(p)&&later(p,q));
+      const broken=!!p.renovadaPor&&!forward||explicit.some(q=>!valid.some(v=>v.id===q.id));
+      const potential=newer.some(q=>!valid.some(v=>v.id===q.id));
+      const renewalState=String(p.renovacionEstado||'').trim().toLowerCase().replace(/[\s_-]+/g,'');
+      const cancelled=['cancelada','anulada','cancelado','anulado'].includes(state)||renewalState==='cancelada';
+      const closed=['norenovada','rechazada','cerrada'].includes(renewalState)||['norenovada','rechazada','reexpedida'].includes(state);
+      const historical=['renovada','historica','historico'].includes(state);
+      let reason='FUERA_DE_HORIZONTE',terminal=false,actionable=false,reviewOnly=false,bucketEligible=false;
+      if(cancelled){terminal=true;reason='CANCELADA';}
+      else if(valid.length===1){terminal=true;reason='RENOVACION_VINCULADA';}
+      else if(valid.length>1||broken){reason='LINEAGE_CONFLICTO';reviewOnly=true;bucketEligible=d!=null&&d<0;}
+      else if(historical&&potential){reason=closed?'ESTADO_CONTRADICTORIO_SUCESORA_SIN_VINCULO':'EDICION_POSTERIOR_SIN_VINCULO';reviewOnly=true;}
+      else if(closed){reason='NO_RENOVADA_CERRADA';terminal=true;}
+      else if(historical){reason='HISTORICA_SIN_SUCESORA_ACREDITADA';reviewOnly=true;bucketEligible=d!=null&&d<0&&renewable!=='NO';}
+      else if(renewable==='NO'){reason='NO_RENOVABLE';terminal=true;}
+      else if(d!=null&&d<=90&&['vigente','porrenovar','vencida'].includes(state)){
+        bucketEligible=d<0||['vigente','porrenovar'].includes(state);
+        reviewOnly=renewable==='UNKNOWN';actionable=bucketEligible&&!reviewOnly;
+        reason=reviewOnly?'RENOVABILIDAD_SIN_CONFIRMAR':d<0?'VENCIDA_POR_GESTIONAR':'PROXIMA_POR_GESTIONAR';
+      }else reason=d==null?'VIGENCIA_NO_CONFIRMADA':'ESTADO_NO_APTO';
+      const value={id,days:d,reason,terminal,actionable,reviewOnly,bucketEligible,potentialSuccessor:potential,verifiedSuccessorId:valid.length===1?valid[0].id:'',effectiveCoverage:d==null?'DESCONOCIDA':d<0?'VENCIDA':d===0?'VENCE_HOY':'NO_VENCIDA',adminState:policyStateLabel(p)};
+      if(id)cache.set(id,value);return value;
+    }
+    return{assess,rows};
+  }
+  let cachedLifecycle=null,lastLifecycleSnapshotAt=0;
+  const sharedLifecycle=()=>{if(!cachedLifecycle||Date.now()-lastLifecycleSnapshotAt>1000){cachedLifecycle=renewalLifecycleSnapshot();lastLifecycleSnapshotAt=Date.now();}return cachedLifecycle;};
+  Orbit.renewalLifecycle={snapshot:sharedLifecycle,evaluate:p=>sharedLifecycle().assess(p),invalidate:()=>{cachedLifecycle=null;lastLifecycleSnapshotAt=0;}};
+  const lifecycleOf=p=>(activeLifecycle||renewalLifecycleSnapshot()).assess(p);
   const terminalRenewalOutcome = p => {
     if(!p) return true;
     if(p.renovadaPor) return true;
@@ -53,10 +101,8 @@ Orbit.modules.renovaciones = (function () {
     return ['renovada','norenovada','rechazada','cerrada','cancelada'].includes(state);
   };
   const renewalActionable = p => {
-    if(!p || renewabilityState(p)!=='YES' || !selectedCountry(p) || terminalRenewalOutcome(p)) return false;
-    const d=U.daysFromNow(p.vigenciaFin),state=policyState(p);
-    if(d==null) return false;
-    return d<0 ? !['cancelada','anulada'].includes(state) : ['vigente','porrenovar'].includes(state);
+    if(!p || renewabilityState(p)!=='YES' || !selectedCountry(p)) return false;
+    return lifecycleOf(p).actionable;
   };
   const renewalPendingValidation = p => {
     if(!p || renewabilityState(p)!=='UNKNOWN' || !selectedCountry(p) || terminalRenewalOutcome(p)) return false;
@@ -67,10 +113,8 @@ Orbit.modules.renovaciones = (function () {
      pendiente no puede sacar la póliza del bucket de fecha; NO explícito y
      outcomes terminales sí quedan fuera. */
   const renewalPipelineCandidate = p => {
-    if(!p || renewabilityState(p)==='NO' || !selectedCountry(p) || terminalRenewalOutcome(p)) return false;
-    const state=policyState(p),d=U.daysFromNow(p.vigenciaFin);
-    if(d==null) return false;
-    return d<0 ? !['cancelada','anulada'].includes(state) : ['vigente','porrenovar'].includes(state);
+    if(!p || renewabilityState(p)==='NO' || !selectedCountry(p)) return false;
+    return lifecycleOf(p).bucketEligible;
   };
   const renewalDate45Universe = p => {
     if(!p || !selectedCountry(p)) return false;
@@ -78,8 +122,8 @@ Orbit.modules.renovaciones = (function () {
     return d!=null && d>=0 && d<=45 && ['vigente','porrenovar'].includes(state);
   };
   function dispositionOf(p){
-    if(terminalRenewalOutcome(p))return 'Resultado de renovación registrado';
-    const r=renewabilityState(p);if(r==='NO')return 'No renovable confirmado';if(r==='UNKNOWN')return 'Pendiente de clasificar';if(renewalActionable(p))return 'En gestión';return 'Conflicto explícito';
+    if(lifecycleOf(p).terminal||terminalRenewalOutcome(p))return 'Resultado de renovación registrado';
+    const r=renewabilityState(p);if(r==='NO')return 'No renovable confirmado';if(r==='UNKNOWN'||lifecycleOf(p).reviewOnly)return 'Pendiente de clasificar';if(renewalActionable(p))return 'En gestión';return 'Conflicto explícito';
   }
   function date45DispositionRows(){return S().where('polizas',renewalDate45Universe).map(p=>({p,disposition:dispositionOf(p),days:U.daysFromNow(p.vigenciaFin)})).sort((a,b)=>(a.days??999)-(b.days??999));}
   function date45Disposition(){
@@ -115,6 +159,7 @@ Orbit.modules.renovaciones = (function () {
 
   function render(host) {
     activeHost = host;
+    activeLifecycle=null;
     ensureDataCollections();
     const readiness=renewalDataReadiness();
     if(readiness.state!=='ready'){
@@ -125,21 +170,24 @@ Orbit.modules.renovaciones = (function () {
       return;
     }
     clearReadinessWait();
+    activeLifecycle=Orbit.renewalLifecycle.snapshot();
     const cols = buckets();
     const pendingValidation=S().where('polizas', renewalPendingValidation);
     const dispositionRows45=date45DispositionRows(),disposition45=date45Disposition();
-    const totalPrima = cols.reduce((s, c) => s + c.items.reduce((ss, it) => ss + q.norm(it.p.prima, it.p.moneda), 0), 0),expired=expiredContext();
+    const totalPrima = cols.reduce((s, c) => s + c.items.filter(it=>lifecycleOf(it.p).actionable).reduce((ss, it) => ss + q.norm(it.p.prima, it.p.moneda), 0), 0),expired=expiredContext();
+    const reviewCount=cols.reduce((n,c)=>n+c.items.filter(it=>lifecycleOf(it.p).reviewOnly).length,0);
+    const unlinkedHistorical=activeLifecycle.rows.filter(p=>selectedCountry(p)&&['EDICION_POSTERIOR_SIN_VINCULO','ESTADO_CONTRADICTORIO_SUCESORA_SIN_VINCULO'].includes(lifecycleOf(p).reason)).length;
     const toneBg = { danger: 'var(--danger)', warn: 'var(--warn)', info: 'var(--info)' };
 
     host.innerHTML = `<div class="page">
       ${K.bannerFor('renovaciones', `<button class="btn primary" onclick="Orbit.modules.renovaciones.campana()">📤 Campaña de renovación</button>`)}
       ${K.kpis([
-        { label: 'Vencidas renovables', val: cols[0].items.length, color: 'var(--danger)', foot: 'en gestión de renovación', footTone: 'down', onclick: "location.hash='#/renovaciones'" },
+        { label: 'Vencidas: gestión / revisión', val: cols[0].items.length, color: 'var(--danger)', foot: 'acciones protegidas según estado', footTone: 'down', onclick: "location.hash='#/renovaciones'" },
         { label: '≤15 días', val: cols[1].items.length, color: 'var(--danger)', foot: 'urgente', onclick: "location.hash='#/renovaciones'" },
         { label: '16–45 días', val: cols[2].items.length, color: 'var(--warn)', foot: 'planificar', onclick: "location.hash='#/renovaciones'" },
         { label: 'Prima en juego', val: U.moneyShort(totalPrima, Orbit.q.monedaPais()), color: 'var(--ok)', foot: 'a 90 días', onclick: "location.hash='#/renovaciones'" }
       ])}
-      <div class="cfg-note renewal-pipeline-note" data-renewability-pending-count="${pendingValidation.length}" data-expired-pipeline-count="${expired.pipeline}" data-expired-historical-count="${expired.historicalExpired}" style="margin:0 0 14px"><b>Pipeline de renovación por fecha</b><div class="muted" style="margin-top:5px">Aquí se muestran pólizas que todavía forman parte del proceso de renovación. <b>${expired.pipeline}</b> están vencidas y renovables dentro del pipeline; existen <b>${expired.historicalExpired}</b> pólizas con vigencia pasada en el alcance histórico, de las cuales ${expired.nonrenewable} están marcadas como no renovables y ${expired.terminal} ya tienen resultado terminal. Cada póliza pendiente permanece en su columna por vigencia y se revisa desde allí, sin crear una tabla paralela.</div></div>
+      <div class="cfg-note renewal-pipeline-note" data-renewability-pending-count="${pendingValidation.length}" data-expired-pipeline-count="${expired.pipeline}" data-expired-historical-count="${expired.historicalExpired}" style="margin:0 0 14px"><b>Pipeline de renovación por fecha</b><div class="muted" style="margin-top:5px"><b>${expired.pipeline}</b> vigencias vencidas están en el Kanban, de las cuales <b>${reviewCount}</b> tarjetas requieren verificar su estado y no permiten renovar automáticamente. <b>${unlinkedHistorical}</b> ediciones históricas tienen sucesoras posibles sin enlace formal; no se cuentan como deuda comercial ni como renovación certificada. Existen <b>${expired.historicalExpired}</b> ediciones históricas vencidas; ${expired.nonrenewable} son no renovables y ${expired.terminal} tienen disposición terminal registrada. Cada póliza pendiente permanece en su columna por vigencia y se revisa desde allí, sin crear una tabla paralela.</div></div>
       <style>
         .renewal-board{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:14px;align-items:start}
         .renewal-bucket,.renewal-policy-card{min-width:0}
@@ -155,7 +203,7 @@ Orbit.modules.renovaciones = (function () {
           </div>
           <div style="padding:10px;display:grid;gap:9px;max-height:560px;overflow-y:auto">
             ${c.items.map(({ p, d }) => {
-              const cli = S().get('clientes', p.clienteId), asg = q.aseguradora(p.aseguradoraId);
+              const cli = S().get('clientes', p.clienteId), asg = q.aseguradora(p.aseguradoraId), life=lifecycleOf(p);
               const wa = (cli && cli.telefono || '').replace(/[^0-9]/g, '');
               const waTxt = encodeURIComponent('Hola ' + (cli ? cli.nombre.split(' ')[0] : '') + ', tu póliza ' + p.ramo + ' (' + p.numero + ') vence el ' + U.fmtDate(p.vigenciaFin) + '. ¿Coordinamos la renovación?');
               return `<div class="renewal-policy-card" data-renewal-policy="${U.esc(p.id)}" data-renewal-country="${U.esc(policyCountry(p))}" style="border:1px solid var(--line);border-radius:var(--r-sm);padding:10px 11px;background:var(--card)">
@@ -172,14 +220,13 @@ Orbit.modules.renovaciones = (function () {
                   </div>
                   <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:7px">
                     <span class="badge neutral">Póliza: ${U.esc(policyStateLabel(p))}</span>
-                    <span class="badge ${d<0?'danger':'info'}">Renovación: ${U.esc(renewalStateLabel(p,d))}</span>
-                    ${renewabilityState(p)==='UNKNOWN'?'<span class="badge warn">Decisión: renovabilidad pendiente</span>':'<span class="badge ok">Decisión: renovable</span>'}
+                    <span class="badge ${d<0?'danger':'info'}">Vigencia calculada: ${U.esc(renewalStateLabel(p,d))}</span>
+                    ${life.reviewOnly?'<span class="badge warn">Revisión necesaria · renovación bloqueada</span>':renewabilityState(p)==='UNKNOWN'?'<span class="badge warn">Decisión: renovabilidad pendiente</span>':'<span class="badge ok">Decisión: renovable</span>'}
                   </div>
                 </div>
                 <div class="renewal-card-actions" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px">
                   ${renewabilityState(p)==='UNKNOWN'?'<button class="btn ghost sm" data-renewability-review="'+U.esc(p.id)+'" style="flex:1" onclick="event.stopPropagation();Orbit.modules.cliente360.editarPoliza(\''+p.id+'\',\'renovabilidad\')">Revisar renovabilidad</button>':''}
-                  <a href="https://wa.me/${wa}?text=${waTxt}" target="_blank" rel="noopener" class="reno-wa" style="flex:1" onclick="event.stopPropagation()">💬 WhatsApp</a>
-                  <button class="btn ghost sm" style="flex:1" onclick="event.stopPropagation();Orbit.modules.renovaciones.solicitarPropuestas('${p.id}')">📋 Propuestas</button>
+                  ${life.actionable?'<a href="https://wa.me/'+wa+'?text='+waTxt+'" target="_blank" rel="noopener" class="reno-wa" style="flex:1" onclick="event.stopPropagation()">💬 WhatsApp</a><button class="btn ghost sm" style="flex:1" onclick="event.stopPropagation();Orbit.modules.renovaciones.solicitarPropuestas(\''+U.esc(p.id)+'\')">📋 Propuestas</button>':'<button class="btn ghost sm" style="flex:1" onclick="event.stopPropagation();Orbit.modules.cliente360.verPoliza(\''+U.esc(p.id)+'\')">Revisar situación de póliza</button>'}
                 </div>
               </div>`;
             }).join('') || `<div class="muted" style="text-align:center;padding:24px 8px;font-size:12.5px">Sin pólizas en este tramo.</div>`}
@@ -192,6 +239,7 @@ Orbit.modules.renovaciones = (function () {
      Late authoritative data refreshes the same active route without blocking on insurers. */
   window.addEventListener('orbit:store:emit', event => {
     const collection = event && event.detail && event.detail.collection || '*';
+    if(collection==='*'||collection==='polizas'||collection==='clientes')Orbit.renewalLifecycle.invalidate();
     if (collection !== '*' && !REQUIRED_DATA.includes(collection) && collection !== 'aseguradoras') return;
     if (!activeHost || !activeHost.isConnected || !String(location.hash || '').startsWith('#/renovaciones')) return;
     const busy = activeHost.querySelector('[data-renewals-loading]');

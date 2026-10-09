@@ -615,17 +615,19 @@ Orbit.modules.cliente360 = (function () {
     });
   }
 
+  /* Forma de pago no equivale a frecuencia/cuota (legacy p.forma). */
+  function policyPaymentMethod(p){const method=String(p&&p.formaPago||p&&p.metodoPago||'').trim();return method&&!/^(undefined|null)$/i.test(method)?method:'No informada';}
   /* ---- Pólizas ---- */
   function tabPolizas(cid, r) {
     return `<div class="card" style="overflow:hidden"><div style="overflow-x:auto"><table class="tbl">
-      <thead><tr><th>Póliza</th><th>Ramo / Producto</th><th>Aseguradora</th><th>Forma</th><th class="num">Prima</th><th>Vigencia</th><th>Estado</th><th></th></tr></thead>
+      <thead><tr><th>Póliza</th><th>Ramo / Producto</th><th>Aseguradora</th><th>Forma de pago</th><th class="num">Prima</th><th>Vigencia</th><th>Estado</th><th></th></tr></thead>
       <tbody>${orderedClientPolicies(r.pol).map(p => {
         const asg = q.aseguradora(p.aseguradoraId);
         return `<tr class="clickable" data-client-policy-row="1" data-policy-id="${U.esc(String(p.id||''))}" onclick="Orbit.modules.cliente360.verPoliza('${p.id}')">
           <td><span class="mono" style="font-size:12.5px;font-weight:600">${p.numero}</span></td>
           <td><b>${p.ramo}</b><div class="muted" style="font-size:12px">${p.producto}</div></td>
           <td><span style="display:flex;align-items:center;gap:7px"><span class="dot-s" style="background:${asg ? asg.color : '#999'}"></span>${U.esc(asg ? asg.nombre : '—')}</span></td>
-          <td>${p.forma}</td>
+          <td>${U.esc(policyPaymentMethod(p))}</td>
           <td class="num">${policyTotal(p) == null ? 'Pendiente de completar' : U.money(policyTotal(p), p.moneda)}</td>
           <td style="font-size:12.5px">${U.fmtDate(p.vigenciaInicio)}<div class="muted">→ ${U.fmtDate(p.vigenciaFin)}</div></td>
           <td>${U.estadoBadge(p.estado)}</td>
@@ -1011,14 +1013,14 @@ Orbit.modules.cliente360 = (function () {
           <select id="rec-pol-filtro" class="o-sel" style="min-width:240px;padding:6px 10px">${opts}</select></label>
       </div>
       <div style="overflow-x:auto"><table class="tbl">
-        <thead><tr><th>Recibo</th><th>Póliza</th><th>Forma</th><th>Cuota</th><th class="num">Monto</th><th>Vence</th><th>Estado</th><th></th></tr></thead>
+        <thead><tr><th>Recibo</th><th>Póliza</th><th>Forma de pago</th><th>Cuota</th><th class="num">Monto</th><th>Vence</th><th>Estado</th><th></th></tr></thead>
         <tbody>${cob.map(c => {
           const p = S().get('polizas', c.polizaId);
           const aplicable = c.estado === 'Pendiente' || c.estado === 'Vencido';
           return `<tr class="clickable" onclick="Orbit.modules.cobros.detalle('${c.id}')">
             <td class="mono" style="font-size:12px">REC-${c.id.slice(-5).toUpperCase()}</td>
             <td class="mono" style="font-size:12px">${p ? p.numero : '—'}</td>
-            <td>${p ? p.forma : '—'}</td>
+            <td>${p ? U.esc(policyPaymentMethod(p)) : '—'}</td>
             <td>${c.cuota}</td>
             <td class="num">${U.money(c.monto, c.moneda)}</td>
             <td style="font-size:12.5px">${U.fmtDate(c.vence)}</td>
@@ -1377,8 +1379,8 @@ Orbit.modules.cliente360 = (function () {
         <div class="vp-pay">
           <div class="vp-sec-t">💳 Conducto de pago</div>
           <div class="vp-grid">
-            ${vrow('Frecuencia', p.frecuencia + ' (' + (cob.length) + (cob.length === 1 ? ' recibo)' : ' recibos)'))}
-            ${vrow('Forma de pago', p.formaPago + (p.tarjeta ? ' · ' + p.tarjeta : ''))}
+            ${vrow('Frecuencia', (p.frecuencia || 'No informada') + ' (' + (cob.length) + (cob.length === 1 ? ' recibo)' : ' recibos)'))}
+            ${vrow('Forma de pago', policyPaymentMethod(p) + (p.tarjeta ? ' · ' + p.tarjeta : ''))}
             ${vrow('Conducto', p.conducto || '—')}
             ${vrow('Recargo financiero', (p.gastosFinan > 0 ? p.recargoFinPct + '% · ' + m2(p.gastosFinan) : 'No aplica (contado)'))}
           </div>

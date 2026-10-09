@@ -10,6 +10,8 @@ Orbit.modules.cancelaciones = (function () {
   const hoy = () => (Orbit.ui && Orbit.ui.today ? Orbit.ui.today() : new Date().toISOString().slice(0, 10));
   const ACTIVAS = ['Pendiente de contacto', 'Llamada de retención agendada', 'Oferta de mejora enviada', 'En negociación'];
   const FINALES = ['Recuperada', 'No recuperable'];
+  const documentedReason=c=>{const r=String(c&&c.motivo||'').trim();return r&&!['sin motivo registrado','motivo histórico no disponible','motivo historico no disponible'].includes(r.toLowerCase())?r:'';};
+  const reasonLabel=c=>documentedReason(c)||(String(c&&c.fecha||'')>='2026-10-08'?'Motivo pendiente de registrar':'Motivo histórico no disponible');
 
   function allSafe(col) { try { return S().all(col) || []; } catch (e) { return []; } }
   function countryCode(value) { return String(value == null ? '' : value).trim().toUpperCase(); }
@@ -199,7 +201,7 @@ Orbit.modules.cancelaciones = (function () {
   }
 
   const FDEFS = rows => [
-    { id: 'fmot', type: 'select', ph: 'Motivo', options: [...new Set((rows||[]).map(c => c.motivo).filter(Boolean))].map(v => ({ v, t: v })) },
+    { id: 'fmot', type: 'select', ph: 'Motivo documentado', options: [...new Set((rows||[]).map(documentedReason).filter(Boolean))].map(v => ({ v, t: v })) },
     { id: 'fase', type: 'select', ph: 'Asesor', options: K.asesorOptions() }
   ];
   function findNegocio(c) {
@@ -213,7 +215,8 @@ Orbit.modules.cancelaciones = (function () {
     const I = relationIndex();
     const all = effectiveCancelations(I);
     const porMotivo = {};
-    all.forEach(c => { porMotivo[c.motivo] = (porMotivo[c.motivo] || 0) + 1; });
+    all.forEach(c => { const motivo=documentedReason(c);if(motivo)porMotivo[motivo]=(porMotivo[motivo]||0)+1; });
+    const withoutDocumentedReason=all.filter(c=>!documentedReason(c)).length;
     const motTot = all.length || 1;
     const perdidoPorMoneda = lostByCurrency(all,I);
     const polizasBase = I.policies.filter(p => policyInActiveCountry(p,I));
@@ -222,7 +225,7 @@ Orbit.modules.cancelaciones = (function () {
 
     const rows = all.filter(c => {
       const p = linkedPolicy(c,I);
-      return (!st.fmot || c.motivo === st.fmot) && (!st.fase || (p && p.asesorId === st.fase));
+      return (!st.fmot || documentedReason(c) === st.fmot) && (!st.fase || (p && p.asesorId === st.fase));
     }).sort((a, b) => String(b.fecha || '').localeCompare(String(a.fecha || '')));
     st.__count = rows.length + ' de ' + all.length;
     const scopeKey=activeCountry()+'|'+String(Orbit.session&&Orbit.session.rol&&Orbit.session.rol()||'');
@@ -235,11 +238,11 @@ Orbit.modules.cancelaciones = (function () {
       ${K.kpis([
         { label: 'Canceladas', onclick: "Orbit.modules.cancelaciones.detalleKpi('canceladas')", val: all.length, color: 'var(--danger)', foot: 'histórico' },
         { label: 'Valor perdido', onclick: "Orbit.modules.cancelaciones.detalleKpi('valor')", val: moneyMapHtml(perdidoPorMoneda), color: 'var(--danger)', foot: 'prima anual · por moneda', footTone: 'down' },
-        { label: 'Motivo principal', onclick: "Orbit.modules.cancelaciones.detalleKpi('motivo')", val: '<span style="font-size:16px">' + (Object.entries(porMotivo).sort((a, b) => b[1] - a[1])[0] || ['—'])[0] + '</span>', color: 'var(--warn)', foot: 'más frecuente' },
+        { label: 'Motivo principal', onclick: "Orbit.modules.cancelaciones.detalleKpi('motivo')", val: '<span style="font-size:16px">' + (Object.entries(porMotivo).sort((a, b) => b[1] - a[1])[0] || ['Sin motivos documentados'])[0] + '</span>', color: 'var(--warn)', foot: 'más frecuente' },
         { label: 'Canceladas / cartera', onclick: "Orbit.modules.cancelaciones.detalleKpi('tasa')", val: Math.round(all.length / (polizasBase.length || 1) * 100) + '%', color: 'var(--info)', foot: 'histórico acumulado · no es churn temporal' }
       ])}
       <div class="card pad" style="margin-bottom:16px">
-        <b style="font-family:var(--f-display);font-size:15px">Motivos de cancelación</b>
+        <b style="font-family:var(--f-display);font-size:15px">Motivos documentados de cancelación</b><div class="muted" data-cancel-historical-missing-reasons="${withoutDocumentedReason}" style="font-size:12px;margin-top:6px">${withoutDocumentedReason} registros sin causa documentada; no se inventa el histórico ni se cuenta como causa.</div>
         <div style="margin-top:14px;display:grid;gap:10px">
           ${Object.entries(porMotivo).sort((a, b) => b[1] - a[1]).map(([m, n], i) => `
             <div style="display:flex;align-items:center;gap:12px;cursor:pointer" onclick="Orbit.modules.cancelaciones.filtrarMotivo('${U.esc(m).replace(/'/g, '')}')" title="Ver solo estas cancelaciones">
@@ -268,7 +271,7 @@ Orbit.modules.cancelaciones = (function () {
               <td>${clientPolicyCell(c,I)}</td>
               <td>${p ? `<button type="button" data-cancel-policy-link="${U.esc(String(p.id||''))}" class="mono" style="font-size:12px;font-weight:600;border:0;background:none;color:var(--ink);padding:0;cursor:pointer;text-decoration:underline;text-underline-offset:2px">${U.esc(p.numero||'—')}</button>` : '—'}</td>
               <td>${p ? U.esc(p.ramo||'—') : '—'}</td>
-              <td><span class="badge danger">${U.esc(c.motivo)}</span></td>
+              <td><span class="badge ${documentedReason(c)?'danger':'neutral'}">${U.esc(reasonLabel(c))}</span></td>
               <td class="num">${U.money(c.valorPerdido, recordCurrency(c,I))}</td>
               <td><button type="button" class="btn ghost sm" data-cancel-open="${U.esc(String(c.id||''))}" data-cancel-open-policy="${U.esc(String(c.polizaId||''))}">Ver cancelación</button></td>
             </tr>`;
@@ -299,13 +302,13 @@ Orbit.modules.cancelaciones = (function () {
   }
 
   function detalleKpi(kind) {
-    const all=effectiveCancelations(), byMotivo={}; all.forEach(c=>{byMotivo[c.motivo]=(byMotivo[c.motivo]||0)+1;});
+    const all=effectiveCancelations(), byMotivo={}; all.forEach(c=>{const reason=documentedReason(c);if(reason)byMotivo[reason]=(byMotivo[reason]||0)+1;});
     const top=(Object.entries(byMotivo).sort((a,b)=>b[1]-a[1])[0]||['—',0]), currencies=lostByCurrency(all), pols=allSafe('polizas').filter(policyInActiveCountry);
     let body='';
     if(kind==='valor') body=Object.keys(currencies).sort().map(cur=>'<div class="asg197-detail-row"><span><b>'+U.esc(cur)+'</b><small>'+all.filter(c=>recordCurrency(c)===cur).length+' cancelación(es)</small></span><span>'+U.money(currencies[cur],cur)+'</span></div>').join('')||'<div class="empty">Sin valor perdido para este alcance.</div>';
     else if(kind==='motivo') body='<div class="asg197-detail-row"><span><b>'+U.esc(top[0])+'</b><small>Motivo más frecuente en el país seleccionado</small></span><span>'+top[1]+'</span></div>';
     else if(kind==='tasa') body='<div class="asg197-detail-row"><span><b>'+all.length+' canceladas / '+pols.length+' pólizas</b><small>Relación histórica acumulada; respeta país y alcance, pero no representa una tasa temporal de fuga.</small></span><span>'+Math.round(all.length/(pols.length||1)*100)+'%</span></div>';
-    else body=all.slice(0,100).map(c=>{const p=linkedPolicy(c)||{},cli=linkedClient(c,p)||{};return '<button class="asg197-detail-row" data-cancel-open="'+U.esc(c.id)+'"><span><b>'+U.esc(cli.nombre||'Cliente')+' · '+U.esc(p.numero||'Póliza')+'</b><small>'+U.esc(recordCountry(c))+' · '+U.esc(c.motivo||'Sin motivo registrado')+'</small></span><span>'+U.money(c.valorPerdido,recordCurrency(c))+'</span></button>';}).join('')||'<div class="empty">Sin cancelaciones para este alcance.</div>';
+    else body=all.slice(0,100).map(c=>{const p=linkedPolicy(c)||{},cli=linkedClient(c,p)||{};return '<button class="asg197-detail-row" data-cancel-open="'+U.esc(c.id)+'"><span><b>'+U.esc(cli.nombre||'Cliente')+' · '+U.esc(p.numero||'Póliza')+'</b><small>'+U.esc(recordCountry(c))+' · '+U.esc(reasonLabel(c))+'</small></span><span>'+U.money(c.valorPerdido,recordCurrency(c))+'</span></button>';}).join('')||'<div class="empty">Sin cancelaciones para este alcance.</div>';
     let back=document.getElementById('cancelation-kpi-detail'); if(back)back.remove(); back=document.createElement('div');back.id='cancelation-kpi-detail';back.className='drawer-back open';back.style.cssText='display:grid;place-items:center;z-index:230';
     const titles={canceladas:'Cancelaciones del alcance',valor:'Valor perdido por moneda',motivo:'Motivo principal',tasa:'Relación canceladas / cartera'};
     back.innerHTML='<div class="card" style="width:min(760px,96vw);max-height:90vh;display:flex;flex-direction:column;padding:0"><div style="padding:16px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:12px"><div><small class="muted">Cancelaciones</small><b style="display:block;font-family:var(--f-display);font-size:17px">'+U.esc(titles[kind]||'Detalle')+'</b></div><button class="imp-x" data-close>✕</button></div><div style="padding:12px 18px 18px;overflow:auto;flex:1">'+body+'</div><div style="padding:12px 18px;border-top:1px solid var(--line);display:flex;justify-content:flex-end"><button class="btn ghost" data-close>Cerrar</button></div></div>';
@@ -341,7 +344,7 @@ Orbit.modules.cancelaciones = (function () {
         <div class="vp-grid">
           <div class="vp-row"><span class="vp-l">Aseguradora</span><span class="vp-v">${asg ? U.esc(asg.nombre) : '—'}</span></div>
           <div class="vp-row"><span class="vp-l">Asesor</span><span class="vp-v">${ase ? U.esc(ase.nombre) : '—'}</span></div>
-          <div class="vp-row"><span class="vp-l">Motivo</span><span class="vp-v"><span class="badge danger">${U.esc(c.motivo)}</span></span></div>
+          <div class="vp-row"><span class="vp-l">Motivo</span><span class="vp-v"><span class="badge ${documentedReason(c)?'danger':'neutral'}">${U.esc(reasonLabel(c))}</span></span></div>
           <div class="vp-row"><span class="vp-l">Estado de póliza</span><span class="vp-v">${p ? p.estado : '—'}</span></div>
           <div class="vp-row"><span class="vp-l">Inicio de vigencia</span><span class="vp-v">${U.fmtDate(ini)}</span></div>
           <div class="vp-row"><span class="vp-l">Fecha de cancelación</span><span class="vp-v">${U.fmtDate(c.fecha)}</span></div>
@@ -349,7 +352,7 @@ Orbit.modules.cancelaciones = (function () {
         <div class="vp-pay" data-cancel-reason-editor="1">
           <div class="vp-sec-t">Motivo de cancelación</div>
           <label class="ce-l">Registrar o editar el motivo confirmado
-            <input id="cx-motivo" class="o-sel" maxlength="240" value="${U.esc(c.motivo === 'Sin motivo registrado' ? '' : (c.motivo || ''))}" placeholder="Motivo comunicado o respaldado por la fuente">
+            <input id="cx-motivo" class="o-sel" maxlength="240" value="${U.esc(documentedReason(c) || '')}" placeholder="Motivo comunicado o respaldado por la fuente">
           </label>
           <div class="muted" style="font-size:12px;margin:7px 0">No se completa automáticamente. Guardar el motivo no cambia la acción de recuperación ni genera una gestión.</div>
           <button class="btn ghost sm" id="cx-save-motivo" type="button">Guardar motivo</button>
