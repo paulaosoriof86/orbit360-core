@@ -2969,7 +2969,7 @@
       "block": "B4",
       "source": "FROZEN_PLAN",
       "finding": "Cumulative B4-003 remediation: lifecycle, premium/source authority, Information Health, insurer knowledge and Gravicentra↔CotComp Quote Authority.",
-      "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
+      "status": "PAULA_VISUAL_PARTIAL_R20_CANCELATIONS_REMEDIATION_REQUIRED",
       "blocking": true,
       "mayDisappearWithoutDisposition": false,
       "humanEvidence": [
@@ -3007,7 +3007,7 @@
         "Exact Preview: Cliente 360 has bidirectional tab navigation.",
         "Exact Preview: Calidad respects global country and synchronous render path is measured under 2500 ms in authenticated harness."
       ],
-      "nextAction": "B4_003_R20_TARGETED_PAULA_VISUAL",
+      "nextAction": "B4_003_R20_CANCELATIONS_SOURCE_FIX",
       "rootCause": "RENEWALS_CANCELATIONS_MULTI_CAUSAL_SOURCE_GAPS_WITH_CANONICAL_POLICY_PROJECTION_GAP",
       "causeClassification": "PRODUCT_LOGIC_DEFECT_DEMONSTRATED",
       "evidence": {
@@ -3058,7 +3058,7 @@
       "sourceFixR4ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CAUSAL_SOURCE_FIX_R4_CANONICAL_POLICY_PROJECTION_20261003.json",
       "sourceFixR4ReceiptBlobSha": "05678425b7b2a0a0c334aac01e429c2c3d6445f0",
       "sourceFixR4SourceHead": "597ac785fa5a7affa128dbb143a6c274f55dba6c",
-      "humanVisualStatus": "PENDING_R20_TARGETED_VISUAL",
+      "humanVisualStatus": "RENEWALS_LOADING_ONLY_PASS_CANCELATIONS_OPEN",
       "visualGovernanceRepairPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_VISUAL_ACCEPTANCE_GOVERNANCE_REPAIR_20261003.json",
       "visualGovernanceRepairBlobSha": "b6c18ae40d86ff0cdc3003e7201ead3de3d7d745",
       "machineProofReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_MACHINE_PROOF_20261007.json",
@@ -3267,6 +3267,14 @@
         "machineProofPreservedRunId": 37856707824,
         "financialB3PassPreserved": true,
         "sourceMutationsExecuted": false
+      },
+      "r20FourthUat": {
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_FOURTH_HUMAN_UAT_20261008.json",
+        "humanDecision": "PARTIAL",
+        "renewalsLoadVisualPass": true,
+        "cancelationsMotiveEditorMissing": true,
+        "whatsappDraftsMissing": true,
+        "renewalsLifecycleVerificationPending": true
       }
     },
     {
