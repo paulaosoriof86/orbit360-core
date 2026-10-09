@@ -7,7 +7,9 @@
     "gate": "I6.5/B4-003",
     "headBefore": "a0c8d098ba14ce72a525127dbc792941e05d22f0",
     "notProductionAccepted": true,
-    "humanUatRequired": true
+    "humanUatRequired": true,
+    "headAtExactPreview": "511e9009575b5a77fcb2f2bd2c3ac01227e7b622",
+    "reviewCandidateBuildId": "gi-i65-b4-511e9009575b-57f234755dc1"
   },
   "purpose": "Before each requested visual check explicitly distinguish source-staged from exact-preview-tested and already user-reviewed. No automatic PASS by opening a route.",
   "items": [
@@ -15,46 +17,70 @@
       "id": "INBOX_HOME_AND_ATTENDANCE",
       "surface": "Tareas compartidas / Inicio",
       "route": "#/inicio",
-      "state": "CAUSAL_INBOX_BODY_SOURCE_FIXED_SYNTHETIC_PASS_AUTHENTICATED_PREVIEW_PENDING",
+      "state": "CORREGIDO_Y_PROBADO_EN_PREVIEW_PENDIENTE_REVISION_VISUAL",
       "source": "orbit360-platform/index.html",
       "blobSha": "477b9262852a3780bea5d744f748734c93695a8b",
       "whatChanged": "Only new/unread actionable items may cause the initial Ops/Leads landing; read/acknowledged/resolved/archived do not. Confirm server state before success. Show Ir a Inicio. Return to Inicio when auto-landed task queue is acknowledged/resolved. Narrow layouts wrap toolbar and action buttons instead of overflowing.",
       "whatToVisualize": "Tareas compartidas: el contador de activas debe corresponder a tarjetas visibles, permitir Reconocer, Resolver y Archivar con cambios persistidos; verificar Ops y Leads después de recarga.",
-      "notProven": "Exact Preview authenticated drawer body/card rendering and acknowledgement, global resolution and reload still pending.",
+      "notProven": "Paula must visually accept exact candidate at 1440/390/320; no LIVE pass.",
       "causalReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_INBOX_AND_RENEWALS_SEARCH_ROOTFIX_20261009.json",
       "causalReceiptBlobSha": "8b935da6307fb7c04b50404d46cad636444d4bb6",
       "causalHtmlReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_INBOX_BODY_CONCATENATION_ROOTFIX_20261009.json",
-      "causalHtmlReceiptBlobSha": "c0a7ae4c1ff1b88f628604384169036007d2c82b"
+      "causalHtmlReceiptBlobSha": "c0a7ae4c1ff1b88f628604384169036007d2c82b",
+      "authenticatedEvidence": "Run 37950852293 PASS: Advisor 74 activas, visible card, Reconocer para mí then readback; Operativo 15 activas, visible card, Resolver para todos and durable state; empty drawer cause fixed.",
+      "latestExactPreviewMachineProof": {
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_MACHINE_PROOF_37950852293_20261009.json",
+        "receiptBlobSha": "d7972f44ce7f81587fe5d51cb6d0942e12ee7f6f",
+        "runId": 37950852293,
+        "sourceSha": "511e9009575b5a77fcb2f2bd2c3ac01227e7b622",
+        "proofStatus": "MACHINE_PASS_PENDING_PAULA_VISUAL"
+      }
     },
     {
       "id": "OPS_LEADS_COLLABORATION_ACTION",
       "surface": "Ops y Leads",
       "route": "#/ops",
-      "state": "CAUSAL_INBOX_BODY_SOURCE_FIXED_SYNTHETIC_PASS_AUTHENTICATED_PREVIEW_PENDING",
+      "state": "COLLABORATION_INBOX_AUTHENTICATED_PASS_OTHER_P0_REMAIN",
       "source": "orbit360-platform/core/ciclo.js",
       "whatChanged": "Existing Acción requerida (#) uses last collaboration direction; it is independent from personal inbox read acknowledgment.",
       "whatToVisualize": "Tareas compartidas: el contador de activas debe corresponder a tarjetas visibles, permitir Reconocer, Resolver y Archivar con cambios persistidos; verificar Ops y Leads después de recarga.",
-      "notProven": "Exact Preview authenticated drawer body/card rendering and acknowledgement, global resolution and reload still pending.",
+      "notProven": "Other Upsells/Leads/Ops P0 and human UI acceptance remain open; no broad module PASS.",
       "causalReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_INBOX_AND_RENEWALS_SEARCH_ROOTFIX_20261009.json",
       "causalReceiptBlobSha": "8b935da6307fb7c04b50404d46cad636444d4bb6",
       "causalHtmlReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_INBOX_BODY_CONCATENATION_ROOTFIX_20261009.json",
-      "causalHtmlReceiptBlobSha": "c0a7ae4c1ff1b88f628604384169036007d2c82b"
+      "causalHtmlReceiptBlobSha": "c0a7ae4c1ff1b88f628604384169036007d2c82b",
+      "authenticatedEvidence": "Typed request→advisor→acknowledge→response to operations→shared resolve, cross-role persistence, dedupe/sender exclusion PASS on synthetic Preview.",
+      "latestExactPreviewMachineProof": {
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_MACHINE_PROOF_37950852293_20261009.json",
+        "receiptBlobSha": "d7972f44ce7f81587fe5d51cb6d0942e12ee7f6f",
+        "runId": 37950852293,
+        "sourceSha": "511e9009575b5a77fcb2f2bd2c3ac01227e7b622",
+        "proofStatus": "MACHINE_PASS_PENDING_PAULA_VISUAL"
+      }
     },
     {
       "id": "RENEWAL_LIFECYCLE",
       "surface": "Renovaciones",
       "route": "#/renovaciones",
-      "state": "ADVISOR_PROJECTION_CAUSAL_SOURCE_FIXED_EXACT_BROWSER_RETEST_PENDING",
+      "state": "SEARCH_AUTHENTICATED_PREVIEW_PASS_LIFECYCLE_HUMAN_RETEST_PENDING",
       "source": "orbit360-platform/modules/renovaciones.js",
       "blobSha": "011a633f57b826421d37c80a34c9a6406e9ca5fd",
       "whatChanged": "Same-source Kanban owner distinguishes historic unlinked editions from overdue actionable coverage and protects CTA. Role/user/country/scope-specific lifecycle cache, no cross-role snapshot reuse. Policy country uses canonical row first, client fallback only if country missing; no historical data rewrite.",
       "whatToVisualize": "Four-column Kanban search positive/negative/clear by client, policy, insurer, ramo/product, advisor and linked plate, then six historical policy numbers, country/role and reload.",
-      "notProven": "Search positive/negative/clear and country/role/mobile live browser after projection fix, historical lifecycle and Paula human UAT remain pending.",
+      "notProven": "Six real historical policies, search by all terms across roles, responsive 1440/390/320 and Paula visual approval remain pending.",
       "causalReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_INBOX_AND_RENEWALS_SEARCH_ROOTFIX_20261009.json",
       "causalReceiptBlobSha": "8b935da6307fb7c04b50404d46cad636444d4bb6",
       "searchDiagnostic": "2026-10-09 authenticated QA showed asesores optional missing; canonical advisor projection is available but was blocked by extra snapshot requirement.",
       "causalSearchReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_RENEWAL_SEARCH_ADVISOR_PROJECTION_ROOTFIX_20261009.json",
-      "causalSearchReceiptBlobSha": "843bbc607b60247f2c3ef663faa4c56bd890619e"
+      "causalSearchReceiptBlobSha": "843bbc607b60247f2c3ef663faa4c56bd890619e",
+      "authenticatedEvidence": "Kanban 4 columns; search positive 1/60, negative 0/60, clear restores, role/country/readiness/synthetic source persisted; full business UAT remains pending.",
+      "latestExactPreviewMachineProof": {
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_MACHINE_PROOF_37950852293_20261009.json",
+        "receiptBlobSha": "d7972f44ce7f81587fe5d51cb6d0942e12ee7f6f",
+        "runId": 37950852293,
+        "sourceSha": "511e9009575b5a77fcb2f2bd2c3ac01227e7b622",
+        "proofStatus": "MACHINE_PASS_PENDING_PAULA_VISUAL"
+      }
     },
     {
       "id": "CLIENT360",
@@ -65,7 +91,14 @@
       "blobSha": "5250cd40950cc58106df2915f0605b38a566524a",
       "whatChanged": "Use sourced formaPago/método de pago instead of raw undefined, separate installment frequency.",
       "whatToVisualize": "Pólizas list, payment form, receipts, policy detail, GT/CO, responsive and reload.",
-      "notProven": "Production visible PASS."
+      "notProven": "Production visible PASS.",
+      "latestExactPreviewMachineProof": {
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_MACHINE_PROOF_37950852293_20261009.json",
+        "receiptBlobSha": "d7972f44ce7f81587fe5d51cb6d0942e12ee7f6f",
+        "runId": 37950852293,
+        "sourceSha": "511e9009575b5a77fcb2f2bd2c3ac01227e7b622",
+        "proofStatus": "MACHINE_PASS_PENDING_PAULA_VISUAL"
+      }
     },
     {
       "id": "CANCELATIONS",
@@ -76,7 +109,15 @@
       "blobSha": "f14842484b464da6296a10459eb523d2b056ed98",
       "whatChanged": "Historical missing motive not counted as cancellation cause; preserve reason editor and manual WhatsApp preparation.",
       "whatToVisualize": "Motivo principal, 489 status-sourced rows, historic unknown vs documented reasons, individual and bulk WhatsApp, persistence on synthetic records.",
-      "notProven": "Exact Preview E2E acceptance of edits/WhatsApp."
+      "notProven": "Exact human visual check of canceled rows, reason editor and WhatsApp remains pending.",
+      "authenticatedEvidence": "Run 37950852293: cancellation reason durable, WhatsApp individual/multiselected draft semantics and cancellation readback PASS, no claim of message delivery.",
+      "latestExactPreviewMachineProof": {
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_MACHINE_PROOF_37950852293_20261009.json",
+        "receiptBlobSha": "d7972f44ce7f81587fe5d51cb6d0942e12ee7f6f",
+        "runId": 37950852293,
+        "sourceSha": "511e9009575b5a77fcb2f2bd2c3ac01227e7b622",
+        "proofStatus": "MACHINE_PASS_PENDING_PAULA_VISUAL"
+      }
     },
     {
       "id": "POLICY_NAVIGATION_PERFORMANCE",
@@ -87,7 +128,15 @@
       "blobSha": "e52869f5c7b3c219a6d80f39a100827e3ad4b599",
       "whatChanged": "Indexed policy search and on-demand detail preserved; browser route contract still intermittently failed. Expensive lifecycle only assessed after 0–45-day fast filter; 1419-to-17 static test call reduction. Avoid unconditional scoped client gets while classifying 1419 policy edition lineage: synthetic 2838→1, retained 30-case semantic selection.",
       "whatToVisualize": "Route first paint <2500ms, search and detail, desktop/mobile, cold navigation. · Last Chrome run Pólizas route 1491ms, search 243ms, detail 256ms",
-      "notProven": "Most recent true Chrome route render 2881ms >2500ms; retest required."
+      "notProven": "Cold/repeated measurements, role/country and Paula viewport acceptance; a single passing timing does not close performance.",
+      "authenticatedEvidence": "Single authenticated Chrome run: route wall 508 ms; search wall 394 ms; detail wall 1925 ms (<2500 each).",
+      "latestExactPreviewMachineProof": {
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_MACHINE_PROOF_37950852293_20261009.json",
+        "receiptBlobSha": "d7972f44ce7f81587fe5d51cb6d0942e12ee7f6f",
+        "runId": 37950852293,
+        "sourceSha": "511e9009575b5a77fcb2f2bd2c3ac01227e7b622",
+        "proofStatus": "MACHINE_PASS_PENDING_PAULA_VISUAL"
+      }
     },
     {
       "id": "INSURERS_QUALITY_DESIGN",
@@ -97,10 +146,17 @@
       "source": "orbit360-platform/styles/infra.css",
       "whatChanged": "Existing R20 transversal visual CSS grammar and insurer/quality improvements preserved, not silently reauthored in this source fix.",
       "whatToVisualize": "Contrast, hierarchy, compactness, country/role responsive at 1440,390,320; insurer directory sources and quality drill-down.",
-      "notProven": "Cross-module approved-front-end visual parity."
+      "notProven": "Cross-module approved-front-end visual parity.",
+      "latestExactPreviewMachineProof": {
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_MACHINE_PROOF_37950852293_20261009.json",
+        "receiptBlobSha": "d7972f44ce7f81587fe5d51cb6d0942e12ee7f6f",
+        "runId": 37950852293,
+        "sourceSha": "511e9009575b5a77fcb2f2bd2c3ac01227e7b622",
+        "proofStatus": "MACHINE_PASS_PENDING_PAULA_VISUAL"
+      }
     }
   ],
-  "readyToInvitePaula": false,
+  "readyToInvitePaula": true,
   "rule": "When an exact Preview truly passes, present this full list and explicitly mark only the tested delta plus its unviewed fields; never ask Paula to approve an old artifact.",
   "lastSourceFixReceipt": {
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_CACHE_BINDING_AND_QA_FAILURE_PERSISTENCE_ROOTFIX_20261008.json",
@@ -131,5 +187,14 @@
     "receiptBlobSha": "c0a7ae4c1ff1b88f628604384169036007d2c82b",
     "sourceBlobSha": "e6f2f8fc74be947effa0505881257adff77595df",
     "visualUatRequired": true
+  },
+  "readyToInviteScope": "TARGETED_B4_003_VISUAL_ONLY_NOT_FINAL_ACCEPTANCE_OR_B4_004",
+  "r20ExactPreviewMachineProof": {
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_MACHINE_PROOF_37950852293_20261009.json",
+    "receiptBlobSha": "d7972f44ce7f81587fe5d51cb6d0942e12ee7f6f",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-37950852293-6lfr0q45.web.app",
+    "runId": 37950852293,
+    "artifactId": 11626545264,
+    "remaining": "HUMAN_VISUAL_UAT"
   }
 }

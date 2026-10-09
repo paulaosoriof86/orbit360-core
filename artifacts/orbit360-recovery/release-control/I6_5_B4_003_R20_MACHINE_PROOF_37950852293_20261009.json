@@ -1,0 +1,100 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R20_EXACT_BROWSER_MACHINE_PROOF_EVIDENCE_V1",
+  "recordedAt": "2026-10-09",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "sourceSha": "511e9009575b5a77fcb2f2bd2c3ac01227e7b622",
+  "sourceAncestorOfCurrentHead": true,
+  "headAtReconciliation": "8bfe665f8da808ab70e3ee5fa65ff46e604cedb7",
+  "postCandidateCommitPaths": [
+    "artifacts/orbit360-recovery/release-control/PILOTV6_E8_CT02_20261009_CLOSURE.json",
+    "artifacts/orbit360-recovery/release-control/PILOTV6_E9_CT01_20261009_CLOSURE.json",
+    "artifacts/orbit360-recovery/release-control/PILOTV6_VISUAL_EVIDENCE_INTAKE_20261009.json"
+  ],
+  "currentGate": "I6.5/B4-003",
+  "findingId": "B4-003",
+  "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
+  "humanAcceptance": "PENDING_NOT_AUTO_APPROVED",
+  "releasePromotionAuthorized": false,
+  "originalRun": {
+    "runId": 37950852293,
+    "runConclusion": "failure",
+    "browserStep": "success",
+    "exactHostingReadbackStep": "success",
+    "artifactUploadStep": "success",
+    "freezeStep": "failure",
+    "freezeFailureCode": "HEAD_ADVANCED_BY_NONPRODUCT_EVIDENCE_ONLY",
+    "freezeFailureCommand": "test REMOTE = CANDIDATE_SOURCE_SHA"
+  },
+  "releaseIdentity": {
+    "buildId": "gi-i65-b4-511e9009575b-57f234755dc1",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-37950852293-6lfr0q45.web.app",
+    "previewChannel": "gi-i65-b4-37950852293",
+    "artifactId": 11626545264,
+    "artifactName": "gravicentra-i6-5-b4-003-preview-37950852293",
+    "artifactArchiveSha256": "db8681d984b93c1b950de249b64df5c6795d89daae5f67816d7d521f3c4da0db",
+    "hostedPayloadSha256": "d6c3e3961d803e031a5d8aa2c8031013a5d07b83f18aceeb7a474ea8c2b0389d",
+    "backendSourceSha256": "778af087e48cf3e74edc8d4d813aa414968709a9e08977ac2a8405c820e50bb4",
+    "bundleSha256": "a4f8a63162319f553290047965247f7986b2467eae93f0c289938e63acf85b0c"
+  },
+  "physicalBrowserProof": {
+    "artifactMember": "b4-003-preview-proof.json",
+    "sha256": "8c1775bf61f2eda5d1b1a933d6d39ea96c9ff42cc3995ebd2eec347768542845",
+    "bytes": 100047,
+    "status": "PASS",
+    "recordedAssertionCount": 140,
+    "trueCount": 139,
+    "falseCount": 1,
+    "falseKeys": [
+      "realRenewalSourceDryRunReady"
+    ],
+    "syntheticFinalAbsent": true,
+    "pageErrorCount": 0,
+    "unexpectedConsoleErrorCount": 0,
+    "unexpectedHttpErrorCount": 0,
+    "syntheticWrites": 14,
+    "cleanupWrites": 39,
+    "operationalBusinessWrites": 0
+  },
+  "qaResidue": {
+    "artifactMember": "b4-003-qa-residue-cleanup.json",
+    "sha256": "ef91aa0762898c798deebb593ee43119f87a6c60523184d35318974c6e36c06a",
+    "bytes": 1950,
+    "status": "NOT_DELETED_FAIL_CLOSED",
+    "classification": "AMBIGUOUS_FAIL_CLOSED",
+    "deletedCount": 0,
+    "keepAsReviewOnly": true
+  },
+  "criticalAuthenticatedPass": {
+    "renewalSearchKanbanPositiveNegativeClear": true,
+    "searchPositive": {
+      "matchingCards": 1,
+      "columnCount": 4,
+      "authorizedUniverseCount": 60
+    },
+    "searchNegative": {
+      "matchingCards": 0,
+      "explanatoryEmptyState": true
+    },
+    "searchClear": true,
+    "typedHandoffCommitToAdvisorInbox": true,
+    "advisorRoleLanding": "leads",
+    "advisorInboxNoticeVisible": true,
+    "advisorAcknowledgedPersisted": true,
+    "typedHandoffResponseToOperations": true,
+    "operationsRoleLanding": "ops",
+    "operationsInboxNoticeVisible": true,
+    "operationsGlobalResolvedPersisted": true,
+    "deduplication": true,
+    "senderExclusion": true,
+    "roleScope": true,
+    "syntheticCleanupVerified": true
+  },
+  "priorAcceptedSourceAndHumanReviewNotOverwritten": true,
+  "lastHumanDecision": "REJECTED_PRIOR_CANDIDATE_RETEST_REQUIRED",
+  "nextAction": "B4_003_R20_TARGETED_PAULA_VISUAL",
+  "noReimport": true,
+  "noLivePromotion": true,
+  "acceptedBrowserProofIsNotFullGateClosure": true,
+  "readbackSourceEvidence": "GitHub Actions artifact id 11626545264, run 37950852293, original archive digest and member hashes verified"
+}

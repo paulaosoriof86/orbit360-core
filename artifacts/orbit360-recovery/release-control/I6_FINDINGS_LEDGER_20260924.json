@@ -2969,7 +2969,7 @@
       "block": "B4",
       "source": "FROZEN_PLAN",
       "finding": "Cumulative B4-003 remediation: lifecycle, premium/source authority, Information Health, insurer knowledge and Gravicentra↔CotComp Quote Authority.",
-      "status": "REJECTED_R20_BUSINESS_LOGIC_CAUSAL_SOURCE_FIXED_PREVIEW_RETEST_REQUIRED",
+      "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
       "blocking": true,
       "mayDisappearWithoutDisposition": false,
       "humanEvidence": [
@@ -3007,7 +3007,7 @@
         "Exact Preview: Cliente 360 has bidirectional tab navigation.",
         "Exact Preview: Calidad respects global country and synchronous render path is measured under 2500 ms in authenticated harness."
       ],
-      "nextAction": "B4_003_R20_CONTRACT_AND_EXACT_PREVIEW",
+      "nextAction": "B4_003_R20_TARGETED_PAULA_VISUAL",
       "rootCause": "RENEWALS_CANCELATIONS_MULTI_CAUSAL_SOURCE_GAPS_WITH_CANONICAL_POLICY_PROJECTION_GAP",
       "causeClassification": "PRODUCT_LOGIC_DEFECT_DEMONSTRATED",
       "evidence": {
@@ -3279,7 +3279,17 @@
       "currentHumanDisposition": "REJECTED_RENEWALS_BUSINESS_LOGIC",
       "newCausalProofPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_RENEWALS_LIFECYCLE_CAUSAL_FIX_AND_GOVERNANCE_RECONCILIATION_20261008.json",
       "newCausalProofBlobSha": "00bc96d3bd14998bafbe851eeccb506ec88cc25b",
-      "newCausalDetail": "Live policy lineage has 0 explicitly validated old-to-new successors among 682 historic expired editions; source fixture and physical sample discriminate actionable vs review vs prior-renewed."
+      "newCausalDetail": "Live policy lineage has 0 explicitly validated old-to-new successors among 682 historic expired editions; source fixture and physical sample discriminate actionable vs review vs prior-renewed.",
+      "previousHumanRejectionStatus": "REJECTED_R20_BUSINESS_LOGIC_CAUSAL_SOURCE_FIXED_PREVIEW_RETEST_REQUIRED",
+      "latestExactAuthenticatedProof": {
+        "status": "PASS",
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_MACHINE_PROOF_37950852293_20261009.json",
+        "receiptBlobSha": "d7972f44ce7f81587fe5d51cb6d0942e12ee7f6f",
+        "runId": 37950852293,
+        "sourceSha": "511e9009575b5a77fcb2f2bd2c3ac01227e7b622",
+        "humanApproval": false,
+        "priorRejectionNotDeleted": true
+      }
     },
     {
       "id": "B4-004",
@@ -12056,7 +12066,15 @@
       "sourceCandidateSha": "8af4f889175b6c59770b6f4626607af629b1470e"
     },
     "r20HumanUatStatus": "REJECTED",
-    "machineProofPreserved": true
+    "machineProofPreserved": true,
+    "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_MACHINE_PROOF_37950852293_20261009.json",
+    "receiptBlobSha": "d7972f44ce7f81587fe5d51cb6d0942e12ee7f6f",
+    "runId": 37950852293,
+    "sourceSha": "511e9009575b5a77fcb2f2bd2c3ac01227e7b622",
+    "humanVisualStatus": "PENDING",
+    "b4004Blocked": true,
+    "preventFalsePass": true
   },
   "currentB3": {
     "status": "B3_PASS_PENDING_B4_ENTRY_GUARD",
@@ -12167,7 +12185,7 @@
     "requiredBeforeAdvance": "B4_003_TARGETED_PAULA_VISUAL_PASS",
     "currentB4003HumanStatus": "REJECTED_R13"
   },
-  "lastUpdatedAt": "2026-10-08",
+  "lastUpdatedAt": "2026-10-09",
   "lastR16SourceFix": {
     "status": "SOURCE_FIXED_R16_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "receiptBlobSha": "dcd545e14795e387a8f67130d5fa51aabfcd63ce",
