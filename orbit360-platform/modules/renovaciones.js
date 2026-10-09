@@ -53,7 +53,7 @@ Orbit.modules.renovaciones = (function () {
   function renewalLifecycleSnapshot(){
     const rows=(S().all('polizas')||[]).filter(p=>p&&p.id);
     const norm=v=>String(v==null?'':v).trim().normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase().replace(/[^A-Z0-9]/g,'');
-    const familyKey=p=>[p.tenantId||'',policyCountry(p),p.clienteId||'',p.aseguradoraId||'',p.ramo||'',p.numero||''].map(norm).join('|');
+    const familyKey=p=>{if(!p.numero||!p.clienteId||!p.aseguradoraId||!policyCountry(p))return 'IDENTIDAD_INCOMPLETA|'+String(p.id||'');return [p.tenantId||'',policyCountry(p),p.clienteId||'',p.aseguradoraId||'',p.ramo||'',p.numero||''].map(norm).join('|');};
     const groups=new Map(),byId=new Map(),reverse=new Map(),cache=new Map();
     for(const p of rows){byId.set(String(p.id),p);const key=familyKey(p);if(!groups.has(key))groups.set(key,[]);groups.get(key).push(p);
       if(p.renuevaDe){const parent=String(p.renuevaDe);if(!reverse.has(parent))reverse.set(parent,[]);reverse.get(parent).push(p);}}
@@ -77,6 +77,7 @@ Orbit.modules.renovaciones = (function () {
       else if(valid.length===1){terminal=true;reason='RENOVACION_VINCULADA';}
       else if(valid.length>1||broken){reason='LINEAGE_CONFLICTO';reviewOnly=true;bucketEligible=d!=null&&d<0;}
       else if(historical&&potential){reason=closed?'ESTADO_CONTRADICTORIO_SUCESORA_SIN_VINCULO':'EDICION_POSTERIOR_SIN_VINCULO';reviewOnly=true;}
+      else if(renewalState==='renovada'){reason='RENOVADA_DECLARADA_SIN_SUCESORA_VERIFICADA';reviewOnly=true;bucketEligible=d!=null&&d<0&&renewable!=='NO';}
       else if(closed){reason='NO_RENOVADA_CERRADA';terminal=true;}
       else if(historical){reason='HISTORICA_SIN_SUCESORA_ACREDITADA';reviewOnly=true;bucketEligible=d!=null&&d<0&&renewable!=='NO';}
       else if(renewable==='NO'){reason='NO_RENOVABLE';terminal=true;}

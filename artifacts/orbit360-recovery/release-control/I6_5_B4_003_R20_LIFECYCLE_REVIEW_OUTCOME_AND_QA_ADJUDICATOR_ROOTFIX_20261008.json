@@ -1,0 +1,34 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R20_SOURCE_AND_QA_ADJUDICATOR_ROOTFIX_V1",
+  "date": "2026-10-08",
+  "parentHead": "9e5ab694056919dbcdc5c38eb21e097f7d6851f7",
+  "gate": "I6.5/B4-003",
+  "previousFailedProofRun": 37880060269,
+  "previousFailedReason": "B4_003_R20_UNKNOWN_RENEWABILITY_MUST_STAY_IN_KANBAN: stale exact-badge QA asserted old label, although new UI requires a review-only, non-actionable card.",
+  "causalSourceChecks": [
+    "Outcome renovacionEstado=Renovada without an actual verified successor cannot be actionable.",
+    "Missing canonical policy identity cannot infer a same-number successor.",
+    "Expired historic with no successor remains review-only and visible."
+  ],
+  "qaCorrections": [
+    "Use independent Firestore lineage adjudicator for browser vs data comparison instead of old expired any-not-cancelled predicate.",
+    "Check protected review badge semantics instead of an exact prior label.",
+    "Verify new honest Kanban expired context, preserve four columns, require unknown review action.",
+    "Add synthetic negative QA cases for incomplete identity and renewal outcome without successor."
+  ],
+  "sourceBlobs": {
+    "orbit360-platform/modules/renovaciones.js": "3bc8160255e026334cb1e691482b02b193e42f91",
+    "orbit360-platform/index.html": "e0e5a4e975173dae4626b1150ca16820848e8918"
+  },
+  "qaBlobs": {
+    "tools/gravicentra-i6-5-b4-003-contract.mjs": "2812e4d11ea80f6313962d16b02671c89a15d8f3",
+    "tools/gravicentra-i6-5-b4-003-preview-proof.mjs": "70f1c088a2a3c64fd48c46be893e5c378597fd9d"
+  },
+  "humanAcceptance": "REJECTED_OLD_PREVIEW_PENDING_NEW_TARGETED_VISUAL",
+  "physicalReadOnlyAuditPreserved": true,
+  "businessWrites": 0,
+  "operationalDataMutation": false,
+  "noReimport": true,
+  "livePromotion": false,
+  "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_R20_CONTRACT_AND_EXACT_PREVIEW"
+}

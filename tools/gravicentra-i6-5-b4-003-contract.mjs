@@ -338,7 +338,10 @@ need(comp.r20CumulativeSourceFix?.status==='SOURCE_FIXED_R20_PENDING_CONTRACT_AN
   {id:'linked',numero:'L',clienteId:'cli6',aseguradoraId:'asg3',pais:'GT',ramo:'VEHICULOS',vigenciaInicio:'2025-09-01',vigenciaFin:'2026-09-01',estado:'Renovada',renovable:true,renovadaPor:'linkedNext'},
   {id:'linkedNext',numero:'L',clienteId:'cli6',aseguradoraId:'asg3',pais:'GT',ramo:'VEHICULOS',vigenciaInicio:'2026-09-01',vigenciaFin:'2027-09-01',estado:'Vigente',renovable:true,renuevaDe:'linked'},
   {id:'coCurrent',numero:'C',clienteId:'cli7',aseguradoraId:'asg7',pais:'CO',ramo:'VIDA',vigenciaInicio:'2025-09-01',vigenciaFin:'2026-10-10',estado:'Vigente',renovable:true},
-  {id:'nonrenewable',numero:'NR',clienteId:'cli8',aseguradoraId:'asg3',pais:'GT',ramo:'VIDA',vigenciaInicio:'2025-09-01',vigenciaFin:'2026-09-01',estado:'Vigente',renovable:false}
+  {id:'nonrenewable',numero:'NR',clienteId:'cli8',aseguradoraId:'asg3',pais:'GT',ramo:'VIDA',vigenciaInicio:'2025-09-01',vigenciaFin:'2026-09-01',estado:'Vigente',renovable:false},
+  {id:'declaredRenewedWithoutSuccessor',numero:'D',clienteId:'cli9',aseguradoraId:'asg3',pais:'GT',ramo:'VIDA',vigenciaInicio:'2025-09-01',vigenciaFin:'2026-09-01',estado:'Vigente',renovable:true,renovacionEstado:'Renovada'},
+  {id:'unidentifiedHistorical',numero:'',clienteId:'cli10',aseguradoraId:'asg3',pais:'GT',ramo:'VIDA',vigenciaInicio:'2025-09-01',vigenciaFin:'2026-09-01',estado:'Histórica',renovable:true},
+  {id:'unidentifiedOther',numero:'',clienteId:'cli10',aseguradoraId:'asg3',pais:'GT',ramo:'VIDA',vigenciaInicio:'2026-09-01',vigenciaFin:'2027-09-01',estado:'Vigente',renovable:true}
  ];
  const store={all:col=>col==='polizas'?pol:[],get:(col,id)=>col==='clientes'?{id,pais:'GT'}:null};
  const Orbit={pais:'GT',store,modules:{},ui:{daysFromNow:date},q:{},kit:{}};
@@ -355,6 +358,8 @@ need(comp.r20CumulativeSourceFix?.status==='SOURCE_FIXED_R20_PENDING_CONTRACT_AN
  need(get('linked').terminal&&!get('linked').bucketEligible,'B4_003_R20_LINKED_RENEWED_WAS_ACTIONABLE');
  need(get('coCurrent').actionable,'B4_003_R20_CO_PROJECTION_MISSING');
  need(get('nonrenewable').terminal&&!get('nonrenewable').bucketEligible,'B4_003_R20_NO_RENEWABLE_VISIBLE');
+ need(get('declaredRenewedWithoutSuccessor').reviewOnly&&!get('declaredRenewedWithoutSuccessor').actionable,'B4_003_R20_RENEWAL_OUTCOME_WITHOUT_SUCCESSOR_NOT_HELD');
+ need(get('unidentifiedHistorical').reviewOnly&&!get('unidentifiedHistorical').potentialSuccessor,'B4_003_R20_INCOMPLETE_IDENTITY_FALSE_SUCCESSOR');
  need(lifecycle.snapshot()===assessment,'B4_003_R20_LIFECYCLE_SNAPSHOT_REBUILT_PER_ROW');
 }
 

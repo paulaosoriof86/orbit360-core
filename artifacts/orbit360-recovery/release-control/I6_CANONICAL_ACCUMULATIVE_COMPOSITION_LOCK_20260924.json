@@ -208,7 +208,7 @@
     "orbit360-platform/data/tenant-alianzas-soluciones-insurers-p10.js": "41d2e31a42dac73eb68af304d5f532897210d0ee",
     "orbit360-platform/data/tenant-config/alianzas-soluciones.aseguradoras-knowledge-summary-v20261003.js": "2000d9ea8ab67bdd37d8bf404a29a405fa6374dd",
     "orbit360-platform/data/tenant-public-branding-index.js": "dc543c463f5ecd8ea44e49156d6282113bd95db6",
-    "orbit360-platform/index.html": "2c9af6183ccf000bf8a1bc9d9d8901f6293d6159",
+    "orbit360-platform/index.html": "e0e5a4e975173dae4626b1150ca16820848e8918",
     "orbit360-platform/modules/academia.js": "d27aa080eac091057310aa7c952d3093677b50f0",
     "orbit360-platform/modules/aseguradoras-v1202-import-bridge.js": "db5f012abe505c2dd27d77a47d0694868bee5348",
     "orbit360-platform/modules/aseguradoras.js": "28bb3f15a1ca20130b194bb2dd5b1d296984927d",
@@ -238,7 +238,7 @@
     "orbit360-platform/modules/renewals-v1200-operational-bridge.js": "c3bdbbf5ddb5d11f5690649054ea069f67c3afa7",
     "orbit360-platform/modules/renewals-v1200-permission-guard.js": "f3f75e25d32c7e4784a19b089353d9706c98dcda",
     "orbit360-platform/modules/renewals-v1201-issued-filter.js": "ae1df0174121c965f610407ae723094e833ebeaf",
-    "orbit360-platform/modules/renovaciones.js": "93a66f982cd26f3ccfae14772fab6c90534388a0",
+    "orbit360-platform/modules/renovaciones.js": "3bc8160255e026334cb1e691482b02b193e42f91",
     "orbit360-platform/modules/siniestros.js": "fbea51cf7084b66d9866a3c947c1e7ec3bb4a034",
     "orbit360-platform/product-runtime-config.js": "cce5e1b74b246640297a734871a71364e4209061",
     "orbit360-platform/styles/base.css": "608ef0709144ffcbe748a7bd04e1bd16744def65",
@@ -4145,5 +4145,21 @@
     "syntheticDiscriminantsPass": 8,
     "firestorePhysicalSampleChecksPass": 16,
     "live": false
+  },
+  "r20LifecycleQaRootfix": {
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_LIFECYCLE_REVIEW_OUTCOME_AND_QA_ADJUDICATOR_ROOTFIX_20261008.json",
+    "receiptSha": "82ed91f1e63f326537703cacfde181c03e2518d8",
+    "sourceBlobs": {
+      "orbit360-platform/modules/renovaciones.js": "3bc8160255e026334cb1e691482b02b193e42f91",
+      "orbit360-platform/index.html": "e0e5a4e975173dae4626b1150ca16820848e8918"
+    },
+    "qaBlobs": {
+      "tools/gravicentra-i6-5-b4-003-contract.mjs": "2812e4d11ea80f6313962d16b02671c89a15d8f3",
+      "tools/gravicentra-i6-5-b4-003-preview-proof.mjs": "70f1c088a2a3c64fd48c46be893e5c378597fd9d"
+    },
+    "status": "SOURCE_FIXED_PENDING_NEW_EXACT_PREVIEW",
+    "priorMachinePassHumanInvalidated": true,
+    "dataMutation": false,
+    "livePromotion": false
   }
 }

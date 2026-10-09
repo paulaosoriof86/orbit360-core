@@ -585,7 +585,7 @@
   },
   "findingLedgerBlobSha": "1c8fdcf3d9d7a4fddb9defa01ea582cdba32c156",
   "continuityRegisterBlobSha": "48d945e51e5a10ec74dc925313b720a121ba7086",
-  "compositionLockBlobSha": "eef5678a201c845168dc0664fd1d9ae65bb5e7d9",
+  "compositionLockBlobSha": "bec1d20d820b1fd76daedaba1d7da6417e64a71e",
   "r18SourceFix": {
     "status": "SOURCE_FIXED_R18_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_SOURCE_FIX_20261005.json",
@@ -1521,5 +1521,19 @@
     "qaPath": "tools/gravicentra-i6-5-b4-003-contract.mjs",
     "qaSha": "7dbd04b28204be6279b2d8bd504beba78bce4dd1",
     "latestHumanAcceptance": "REJECTED_PENDING_NEW_PREVIEW"
+  },
+  "r20LifecycleQaRootfix": {
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_LIFECYCLE_REVIEW_OUTCOME_AND_QA_ADJUDICATOR_ROOTFIX_20261008.json",
+    "receiptBlobSha": "82ed91f1e63f326537703cacfde181c03e2518d8",
+    "qaFiles": [
+      "tools/gravicentra-i6-5-b4-003-contract.mjs",
+      "tools/gravicentra-i6-5-b4-003-preview-proof.mjs"
+    ],
+    "sourceBlobs": {
+      "orbit360-platform/modules/renovaciones.js": "3bc8160255e026334cb1e691482b02b193e42f91",
+      "orbit360-platform/index.html": "e0e5a4e975173dae4626b1150ca16820848e8918"
+    },
+    "exactPreviewRetestRequired": true,
+    "oldCandidateRejected": true
   }
 }
