@@ -81,8 +81,8 @@ async function create(){
   const amount=123.45;
   batch.set(refs.client,{...common,id:ids.client,nombre:'PILOTO S6 CT02 · NO ES CLIENTE REAL',tipoPersona:'Persona',estado:'Activo',segmento:'Piloto',asesorId:advisorId});
   batch.set(refs.policy,{...common,id:ids.policy,clienteId:ids.client,numero:'PILOTV6-S6-CT02-20261008-01',aseguradoraId:'gt-aseguradora-guatemalteca',ramo:'AUTOMOVILES',producto:'PILOTO CONTROLADO',moneda:'GTQ',estado:'Vigente',vigenciaInicio:'2026-10-01',vigenciaFin:'2027-09-30',primaTotal:amount,cuotas:1,formaPago:'Pago único',asesorId:advisorId});
-  batch.set(refs.receipt,{...common,id:ids.receipt,polizaId:ids.policy,clienteId:ids.client,asesorId,moneda:'GTQ',cuota:'1/1',serie:'PILOT-S6-1',fechaLimite:'2026-10-31',vence:'2026-10-31',monto:amount,primaTotal:amount,estado:'Pendiente',estadoOperativo:'pendiente_vence_corte',conciliado:false});
-  batch.set(refs.portfolio,{...common,id:ids.portfolio,reciboId:ids.receipt,polizaId:ids.policy,clienteId:ids.client,asesorId,moneda:'GTQ',monto:amount,fechaLimite:'2026-10-31',estado:'Pendiente',estadoCartera:'Pendiente',carteraActiva:true});
+  batch.set(refs.receipt,{...common,id:ids.receipt,polizaId:ids.policy,clienteId:ids.client,asesorId:advisorId,moneda:'GTQ',cuota:'1/1',serie:'PILOT-S6-1',fechaLimite:'2026-10-31',vence:'2026-10-31',monto:amount,primaTotal:amount,estado:'Pendiente',estadoOperativo:'pendiente_vence_corte',conciliado:false});
+  batch.set(refs.portfolio,{...common,id:ids.portfolio,reciboId:ids.receipt,polizaId:ids.policy,clienteId:ids.client,asesorId:advisorId,moneda:'GTQ',monto:amount,fechaLimite:'2026-10-31',estado:'Pendiente',estadoCartera:'Pendiente',carteraActiva:true});
   await batch.commit();
   const verify=await Promise.all([refs.client.get(),refs.policy.get(),refs.receipt.get(),refs.portfolio.get()]);
   if(!verify.every(x=>x.exists)) throw new Error('PILOT_S6_FIXTURE_READBACK_FAIL');
