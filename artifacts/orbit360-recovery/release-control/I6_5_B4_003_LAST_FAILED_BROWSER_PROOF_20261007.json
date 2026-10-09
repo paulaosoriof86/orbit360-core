@@ -1,25 +1,25 @@
 {
   "schema": "GRAVICENTRA_I6_5_B4_003_PREVIEW_PROOF_R19_V1",
   "status": "FAIL",
-  "target": "https://ays-orbit-360-lab--gi-i65-b4-37970247957-6nyxj7ab.web.app",
+  "target": "https://ays-orbit-360-lab--gi-i65-b4-37973018063-l54dnyt1.web.app",
   "ids": {
-    "client": "b4003qa_client_37970247957",
-    "renewalPolicy": "b4003qa_policy_renew_37970247957",
-    "expiredRenewPolicy": "b4003qa_policy_expired_renew_37970247957",
-    "unknownRenewPolicy": "b4003qa_policy_unknown_37970247957",
-    "renewabilityWritePolicy": "b4003qa_policy_renewwrite_37970247957",
-    "cancelPolicy": "b4003qa_policy_cancel_37970247957",
-    "healthPolicy": "b4003qa_policy_health_37970247957",
-    "healthReceipt1": "b4003qa_receipt_health_1_37970247957",
-    "healthReceipt2": "b4003qa_receipt_health_2_37970247957",
-    "healthReceiptShadow": "b4003qa_receipt_health_shadow_37970247957",
-    "cancelation": "b4003qa_cancel_37970247957",
-    "insurer": "b4003qa_insurer_37970247957",
-    "collabBusiness": "b4003qa_business_collab_37970247957",
-    "collabNoClientBusiness": "b4003qa_business_collab_noclient_37970247957",
-    "renewActivity": "act_ren_b4003qa_policy_renew_37970247957_20261009",
-    "cancelActivity": "act_rec_b4003qa_cancel_37970247957",
-    "recoveryBusiness": "neg_rec_b4003qa_cancel_37970247957"
+    "client": "b4003qa_client_37973018063",
+    "renewalPolicy": "b4003qa_policy_renew_37973018063",
+    "expiredRenewPolicy": "b4003qa_policy_expired_renew_37973018063",
+    "unknownRenewPolicy": "b4003qa_policy_unknown_37973018063",
+    "renewabilityWritePolicy": "b4003qa_policy_renewwrite_37973018063",
+    "cancelPolicy": "b4003qa_policy_cancel_37973018063",
+    "healthPolicy": "b4003qa_policy_health_37973018063",
+    "healthReceipt1": "b4003qa_receipt_health_1_37973018063",
+    "healthReceipt2": "b4003qa_receipt_health_2_37973018063",
+    "healthReceiptShadow": "b4003qa_receipt_health_shadow_37973018063",
+    "cancelation": "b4003qa_cancel_37973018063",
+    "insurer": "b4003qa_insurer_37973018063",
+    "collabBusiness": "b4003qa_business_collab_37973018063",
+    "collabNoClientBusiness": "b4003qa_business_collab_noclient_37973018063",
+    "renewActivity": "act_ren_b4003qa_policy_renew_37973018063_20261009",
+    "cancelActivity": "act_rec_b4003qa_cancel_37973018063",
+    "recoveryBusiness": "neg_rec_b4003qa_cancel_37973018063"
   },
   "assertions": {
     "handoffActorsDistinct": true,
@@ -123,6 +123,21 @@
     "cancelationDurableReadback": true,
     "recoveryLinkagePreserved": true,
     "recoveryIdempotentRetry": true,
+    "previewRealBusinessAttachmentPreflightTruthful": true,
+    "collaborationUiAttachmentDurable": true,
+    "businessCardOpenUnder2500ms": true,
+    "collaborationVisualHierarchy": true,
+    "currentActionQueueRank": true,
+    "actionRequiredSolidVisual": true,
+    "pendingTaskAdvisorLandingLeads": true,
+    "inboxActionProgressVisible": true,
+    "inboxHumanStateUi": true,
+    "pendingTaskOperationsLandingOps": true,
+    "typedHandoffRecipientNoticeDurable": true,
+    "typedHandoffDeduplicated": true,
+    "typedHandoffSenderExcluded": true,
+    "typedHandoffTargetSurfaceCorrect": true,
+    "inboxStatePersistent": true,
     "cleanupComplete": true
   },
   "syntheticWrites": 14,
@@ -411,7 +426,7 @@
       "visible": true,
       "sampleNumber": "91-59247519",
       "emptyState": false,
-      "textSample": "✕ Cancelaciones · Fuga de cartera MOTIVOS·VALOR PERDIDO·TASA DE FUGA CANCELADAS 490 histórico VALOR PERDIDO GTQ 1,842,217 USD 91,823,506 COP 26,564,526 prima anual · por moneda MOTIVO PRINCIPAL Prueba sintética B4-003 más frecuente CANCELADAS / CARTERA 34% histórico acumulado · no es churn temporal Motivos documentados de cancelación 489 registros sin causa documentada; no se inventa el histórico ni se cuenta como causa. Prueba sintética B4-003 1 · 0% Motivo documentado Prueba sintética B4-003 Asesor Braulio Hernández Carlos Castro Fernando Arias Johanna Salgado Nicole Castro Paula Osorio Samuel Daza 490 de 490 Seleccionar visibles 0 seleccionadas Limpiar Preparar WhatsApp (0) SEL. FECHA CLIENTE PÓLIZA RAMO MOTIVO VALOR PERDIDO ACCIÓN 09 oct 2026 BQ B4-003 QA Cliente Persona · GT B4-003-CAN-37970247957 Auto Prueba sintética B4-003 Q 700 Ver cancelación 16 sept 2026 ML MARÍA LUISA LARIOS CALDERÓN natural · GT 223092797 VEHICULOS Motivo histórico no disponible Q 2,436 Ver cancelación 14 sept 2026 SK SEON KEUN KIM natural · GT 225121245 VEHICULOS Motivo histórico no disponible Q 6,250 Ver cancelación 07 sept 2026 JI JHEFRI ISAAC RAMIREZ AGUSTÍN natural · GT AUTO-514726 VEHICULOS Motiv"
+      "textSample": "✕ Cancelaciones · Fuga de cartera MOTIVOS·VALOR PERDIDO·TASA DE FUGA CANCELADAS 490 histórico VALOR PERDIDO GTQ 1,842,217 USD 91,823,506 COP 26,564,526 prima anual · por moneda MOTIVO PRINCIPAL Prueba sintética B4-003 más frecuente CANCELADAS / CARTERA 34% histórico acumulado · no es churn temporal Motivos documentados de cancelación 489 registros sin causa documentada; no se inventa el histórico ni se cuenta como causa. Prueba sintética B4-003 1 · 0% Motivo documentado Prueba sintética B4-003 Asesor Braulio Hernández Carlos Castro Fernando Arias Johanna Salgado Nicole Castro Paula Osorio Samuel Daza 490 de 490 Seleccionar visibles 0 seleccionadas Limpiar Preparar WhatsApp (0) SEL. FECHA CLIENTE PÓLIZA RAMO MOTIVO VALOR PERDIDO ACCIÓN 09 oct 2026 BQ B4-003 QA Cliente Persona · GT B4-003-CAN-37973018063 Auto Prueba sintética B4-003 Q 700 Ver cancelación 16 sept 2026 ML MARÍA LUISA LARIOS CALDERÓN natural · GT 223092797 VEHICULOS Motivo histórico no disponible Q 2,436 Ver cancelación 14 sept 2026 SK SEON KEUN KIM natural · GT 225121245 VEHICULOS Motivo histórico no disponible Q 6,250 Ver cancelación 07 sept 2026 JI JHEFRI ISAAC RAMIREZ AGUSTÍN natural · GT AUTO-514726 VEHICULOS Motiv"
     }
   },
   "actor": {
@@ -1556,8 +1571,8 @@
       "CO",
       "CO"
     ],
-    "cancelGtMs": 54.40000000002328,
-    "cancelCoMs": 36.09999999997672,
+    "cancelGtMs": 103.09999999997672,
+    "cancelCoMs": 61.09999999997672,
     "cancelExplicitTargetsGT": true,
     "cancelExplicitTargetsCO": true,
     "cancelCrossCountryExplicitGT": true,
@@ -1840,7 +1855,7 @@
     "cancelKpiDetailOpen": true
   },
   "r11Browser": {
-    "clientHref": "#/cliente360?c=b4003qa_client_37970247957&t=polizas",
+    "clientHref": "#/cliente360?c=b4003qa_client_37973018063&t=polizas",
     "policyTargetPresent": true,
     "explicitCancelTargetPresent": true,
     "rowMisleadingClickable": false,
@@ -1916,8 +1931,8 @@
       "CO",
       "CO"
     ],
-    "qualityGtMs": 169.60000000003492,
-    "qualityCoMs": 86.70000000001164,
+    "qualityGtMs": 274.5999999999767,
+    "qualityCoMs": 128.5,
     "qualityGtRows": 50,
     "qualityCoRows": 17,
     "financialGtRows": 72,
@@ -1927,10 +1942,10 @@
   },
   "r1604ConfigFirstPaint": {
     "state": "loading",
-    "syncPaintMs": 1,
+    "syncPaintMs": 1.2000000000116415,
     "hasVisibleState": true,
     "text": "Confirmando catálogos canónicos… La plataforma está leyendo la configuración protegida del tenant. No se usan valores locales como autoridad.",
-    "canonicalReadyMs": 795,
+    "canonicalReadyMs": 794,
     "finalState": "ready"
   },
   "r16CatalogAndQuality": {
@@ -1965,7 +1980,7 @@
       "reason": "Se excluyeron 1 registro(s) histórico(s) duplicado(s); el calendario activo aún supera la prima contractual."
     },
     "rowVisible": true,
-    "rowText": "B4-003-HEALTH-379702479572 recibo(s) vigente(s) · 1 legado(s) excluido(s) BQ B4-003 QA Cliente Persona · GuatemalaQ 407.01Póliza · prima totalProgramación según cuotas de la póliza0 fila(s) requieren revisiónQ 542.68Q 135.67Q 0.02Se excluyeron 1 registro(s) histórico(s) duplicado(s); el calendario activo aún supera la prima contractual.Revisar diferenciaVer recibos",
+    "rowText": "B4-003-HEALTH-379730180632 recibo(s) vigente(s) · 1 legado(s) excluido(s) BQ B4-003 QA Cliente Persona · GuatemalaQ 407.01Póliza · prima totalProgramación según cuotas de la póliza0 fila(s) requieren revisiónQ 542.68Q 135.67Q 0.02Se excluyeron 1 registro(s) histórico(s) duplicado(s); el calendario activo aún supera la prima contractual.Revisar diferenciaVer recibos",
     "technicalToken": false,
     "exactAction": true,
     "mobileContract": true
@@ -2004,7 +2019,7 @@
     "technical": false
   },
   "r17QualityReceiptsDeepLink": {
-    "hash": "#/cliente360?c=b4003qa_client_37970247957&p=b4003qa_policy_health_37970247957&t=recibos",
+    "hash": "#/cliente360?c=b4003qa_client_37973018063&p=b4003qa_policy_health_37973018063&t=recibos",
     "receiptsTarget": true
   },
   "policyEditorPreservation": {
@@ -2093,9 +2108,9 @@
   },
   "r18CommercialMobile": {
     "viewport": 390,
-    "cardWidth": 390,
-    "cardScrollWidth": 388,
-    "cardClientWidth": 388,
+    "cardWidth": 386.5,
+    "cardScrollWidth": 385,
+    "cardClientWidth": 385,
     "footerButtons": 2
   },
   "r18ManagementModal": {
@@ -2141,7 +2156,7 @@
           "pol_b9a883095c9fae8f7502ce1cb054",
           "pol_0f89cc0a12840594abcc60d418b2",
           "pol_b8b99324d9016269d118d789095a",
-          "b4003qa_policy_expired_renew_37970247957",
+          "b4003qa_policy_expired_renew_37973018063",
           "pol_8231bbb8f9b7272c02891f5a4caf",
           "pol_df6bf097045762297ec31fd4e5c5"
         ]
@@ -2150,9 +2165,9 @@
         "key": "d15",
         "count": 3,
         "ids": [
-          "b4003qa_policy_renew_37970247957",
-          "b4003qa_policy_renewwrite_37970247957",
-          "b4003qa_policy_unknown_37970247957"
+          "b4003qa_policy_renew_37973018063",
+          "b4003qa_policy_renewwrite_37973018063",
+          "b4003qa_policy_unknown_37973018063"
         ]
       },
       {
@@ -2218,9 +2233,9 @@
     "unknownReview": true,
     "parallelDispositionAbsent": true,
     "date45ExpectedIds": [
-      "b4003qa_policy_renew_37970247957",
-      "b4003qa_policy_renewwrite_37970247957",
-      "b4003qa_policy_unknown_37970247957",
+      "b4003qa_policy_renew_37973018063",
+      "b4003qa_policy_renewwrite_37973018063",
+      "b4003qa_policy_unknown_37973018063",
       "pol_3ddc9e613f40252f02b2e122072d",
       "pol_638e276218baad9e84018415b0ba",
       "pol_7280c9b1a5253a1fe1e463e5993b",
@@ -2232,9 +2247,9 @@
       "pol_d5e61976a38be76ba5e3c1e12575"
     ],
     "date45VisibleIds": [
-      "b4003qa_policy_renew_37970247957",
-      "b4003qa_policy_renewwrite_37970247957",
-      "b4003qa_policy_unknown_37970247957",
+      "b4003qa_policy_renew_37973018063",
+      "b4003qa_policy_renewwrite_37973018063",
+      "b4003qa_policy_unknown_37973018063",
       "pol_3ddc9e613f40252f02b2e122072d",
       "pol_638e276218baad9e84018415b0ba",
       "pol_7280c9b1a5253a1fe1e463e5993b",
@@ -2290,7 +2305,7 @@
     ]
   },
   "r19RenewabilityDurable": {
-    "policyId": "b4003qa_policy_renewwrite_37970247957",
+    "policyId": "b4003qa_policy_renewwrite_37973018063",
     "serverValue": true,
     "reloadValue": true
   },
@@ -2300,10 +2315,10 @@
     "hasPrev": true
   },
   "r13PolicyRouteTiming": {
-    "wallMs": 255,
+    "wallMs": 325,
     "browser": {
-      "domPaintMs": 106,
-      "routeOwnerMs": 106,
+      "domPaintMs": 132,
+      "routeOwnerMs": 132,
       "mutationCount": 1,
       "route": "polizas",
       "tableReady": true
@@ -2311,42 +2326,42 @@
     "measurement": "Chrome performance.now to canonical table DOM mutation"
   },
   "r13PolicySearchTiming": {
-    "wallMs": 208,
+    "wallMs": 220,
     "browser": {
-      "inputToCorrectDomMs": 204,
+      "inputToCorrectDomMs": 213,
       "mutationCount": 1,
       "inputPresent": true
     },
     "measurement": "Chrome input event to exact filtered DOM"
   },
   "r13PolicyDetailTiming": {
-    "wallMs": 265,
+    "wallMs": 374,
     "browser": {
-      "clickToFullDetailDomMs": 117,
+      "clickToFullDetailDomMs": 173,
       "mutationCount": 1,
       "detailVisible": true,
       "events": [
         {
           "kind": "route-ready",
-          "at": 116,
-          "hash": "#/cliente360?c=b4003qa_client_37970247957&p=b4003qa_policy_renew_37970247957",
+          "at": 173,
+          "hash": "#/cliente360?c=b4003qa_client_37973018063&p=b4003qa_policy_renew_37973018063",
           "route": "cliente360"
         },
         {
           "kind": "detail-present",
-          "at": 117,
-          "hash": "#/cliente360?c=b4003qa_client_37970247957&p=b4003qa_policy_renew_37970247957",
+          "at": 173,
+          "hash": "#/cliente360?c=b4003qa_client_37973018063&p=b4003qa_policy_renew_37973018063",
           "route": "cliente360"
         },
         {
           "kind": "hashchange",
-          "at": 117,
-          "hash": "#/cliente360?c=b4003qa_client_37970247957&p=b4003qa_policy_renew_37970247957",
+          "at": 173,
+          "hash": "#/cliente360?c=b4003qa_client_37973018063&p=b4003qa_policy_renew_37973018063",
           "route": "cliente360"
         }
       ],
       "route": "cliente360",
-      "hash": "#/cliente360?c=b4003qa_client_37970247957&p=b4003qa_policy_renew_37970247957",
+      "hash": "#/cliente360?c=b4003qa_client_37973018063&p=b4003qa_policy_renew_37973018063",
       "loadingReason": "",
       "hostBlank": false,
       "serverConfirmed": [
@@ -2359,13 +2374,13 @@
     "measurement": "Chrome click to full detail DOM"
   },
   "r13PolicyPerformance": {
-    "routeWallMs": 255,
-    "routeChromeMs": 106,
-    "searchWallMs": 208,
-    "searchChromeMs": 204,
-    "detailWallMs": 265,
-    "detailChromeMs": 117,
-    "searchNumber": "B4-003-REN-37970247957",
+    "routeWallMs": 325,
+    "routeChromeMs": 132,
+    "searchWallMs": 220,
+    "searchChromeMs": 213,
+    "detailWallMs": 374,
+    "detailChromeMs": 173,
+    "searchNumber": "B4-003-REN-37973018063",
     "refreshFlicker": {
       "states": [
         {
@@ -2491,7 +2506,7 @@
     "route": "renovaciones",
     "records": [
       {
-        "ms": 470,
+        "ms": 672,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -2502,7 +2517,7 @@
         ]
       },
       {
-        "ms": 768,
+        "ms": 1157,
         "type": "childList",
         "target": "DIV",
         "added": [],
@@ -2511,7 +2526,7 @@
         ]
       },
       {
-        "ms": 769,
+        "ms": 1157,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -2520,7 +2535,7 @@
         "removed": []
       },
       {
-        "ms": 769,
+        "ms": 1157,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -2531,7 +2546,7 @@
         ]
       },
       {
-        "ms": 769,
+        "ms": 1157,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -2542,7 +2557,7 @@
         ]
       },
       {
-        "ms": 769,
+        "ms": 1157,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -2553,7 +2568,7 @@
         ]
       },
       {
-        "ms": 769,
+        "ms": 1157,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -2564,7 +2579,7 @@
         ]
       },
       {
-        "ms": 769,
+        "ms": 1157,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -2575,7 +2590,7 @@
         ]
       },
       {
-        "ms": 769,
+        "ms": 1157,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -2586,7 +2601,7 @@
         ]
       },
       {
-        "ms": 769,
+        "ms": 1157,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -2597,7 +2612,7 @@
         ]
       },
       {
-        "ms": 769,
+        "ms": 1157,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -2608,7 +2623,7 @@
         ]
       },
       {
-        "ms": 769,
+        "ms": 1157,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -2619,7 +2634,7 @@
         ]
       },
       {
-        "ms": 769,
+        "ms": 1157,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -2630,7 +2645,7 @@
         ]
       },
       {
-        "ms": 769,
+        "ms": 1157,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -2642,7 +2657,7 @@
         ]
       },
       {
-        "ms": 769,
+        "ms": 1157,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -2653,7 +2668,7 @@
         ]
       },
       {
-        "ms": 769,
+        "ms": 1157,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2664,7 +2679,7 @@
         ]
       },
       {
-        "ms": 769,
+        "ms": 1157,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2675,7 +2690,7 @@
         ]
       },
       {
-        "ms": 769,
+        "ms": 1157,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2686,7 +2701,7 @@
         ]
       },
       {
-        "ms": 769,
+        "ms": 1157,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2697,7 +2712,7 @@
         ]
       },
       {
-        "ms": 769,
+        "ms": 1157,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2708,7 +2723,7 @@
         ]
       },
       {
-        "ms": 769,
+        "ms": 1157,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2719,7 +2734,7 @@
         ]
       },
       {
-        "ms": 769,
+        "ms": 1157,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2730,7 +2745,7 @@
         ]
       },
       {
-        "ms": 769,
+        "ms": 1157,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2741,7 +2756,7 @@
         ]
       },
       {
-        "ms": 769,
+        "ms": 1157,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2752,7 +2767,7 @@
         ]
       },
       {
-        "ms": 769,
+        "ms": 1157,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2763,7 +2778,7 @@
         ]
       },
       {
-        "ms": 769,
+        "ms": 1157,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2774,7 +2789,7 @@
         ]
       },
       {
-        "ms": 769,
+        "ms": 1157,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2785,7 +2800,7 @@
         ]
       },
       {
-        "ms": 769,
+        "ms": 1157,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2796,7 +2811,7 @@
         ]
       },
       {
-        "ms": 769,
+        "ms": 1157,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2807,7 +2822,7 @@
         ]
       },
       {
-        "ms": 769,
+        "ms": 1157,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2818,7 +2833,7 @@
         ]
       },
       {
-        "ms": 769,
+        "ms": 1157,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2829,7 +2844,7 @@
         ]
       },
       {
-        "ms": 769,
+        "ms": 1157,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2840,7 +2855,7 @@
         ]
       },
       {
-        "ms": 769,
+        "ms": 1157,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2851,7 +2866,7 @@
         ]
       },
       {
-        "ms": 769,
+        "ms": 1157,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2862,7 +2877,7 @@
         ]
       },
       {
-        "ms": 769,
+        "ms": 1157,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2873,7 +2888,7 @@
         ]
       },
       {
-        "ms": 769,
+        "ms": 1157,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2884,7 +2899,7 @@
         ]
       },
       {
-        "ms": 769,
+        "ms": 1157,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2895,7 +2910,7 @@
         ]
       },
       {
-        "ms": 769,
+        "ms": 1157,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2906,7 +2921,7 @@
         ]
       },
       {
-        "ms": 769,
+        "ms": 1157,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2917,7 +2932,7 @@
         ]
       },
       {
-        "ms": 769,
+        "ms": 1157,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2928,7 +2943,7 @@
         ]
       },
       {
-        "ms": 769,
+        "ms": 1157,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2939,7 +2954,7 @@
         ]
       },
       {
-        "ms": 769,
+        "ms": 1157,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2950,7 +2965,7 @@
         ]
       },
       {
-        "ms": 769,
+        "ms": 1157,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2961,7 +2976,7 @@
         ]
       },
       {
-        "ms": 769,
+        "ms": 1157,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2972,7 +2987,7 @@
         ]
       },
       {
-        "ms": 769,
+        "ms": 1157,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2983,7 +2998,7 @@
         ]
       },
       {
-        "ms": 769,
+        "ms": 1157,
         "type": "childList",
         "target": "A",
         "added": [
@@ -2994,7 +3009,7 @@
         ]
       },
       {
-        "ms": 769,
+        "ms": 1157,
         "type": "childList",
         "target": "A",
         "added": [
@@ -3005,7 +3020,7 @@
         ]
       },
       {
-        "ms": 769,
+        "ms": 1157,
         "type": "childList",
         "target": "A",
         "added": [
@@ -3016,7 +3031,7 @@
         ]
       },
       {
-        "ms": 769,
+        "ms": 1157,
         "type": "childList",
         "target": "A",
         "added": [
@@ -3027,7 +3042,7 @@
         ]
       },
       {
-        "ms": 769,
+        "ms": 1157,
         "type": "childList",
         "target": "A",
         "added": [
@@ -3038,7 +3053,7 @@
         ]
       },
       {
-        "ms": 769,
+        "ms": 1157,
         "type": "childList",
         "target": "A",
         "added": [
@@ -3049,7 +3064,7 @@
         ]
       },
       {
-        "ms": 769,
+        "ms": 1157,
         "type": "childList",
         "target": "A",
         "added": [
@@ -3060,7 +3075,7 @@
         ]
       },
       {
-        "ms": 769,
+        "ms": 1157,
         "type": "childList",
         "target": "A",
         "added": [
@@ -3071,7 +3086,7 @@
         ]
       },
       {
-        "ms": 769,
+        "ms": 1157,
         "type": "childList",
         "target": "A",
         "added": [
@@ -3082,7 +3097,7 @@
         ]
       },
       {
-        "ms": 769,
+        "ms": 1157,
         "type": "childList",
         "target": "A",
         "added": [
@@ -3093,7 +3108,7 @@
         ]
       },
       {
-        "ms": 769,
+        "ms": 1157,
         "type": "childList",
         "target": "A",
         "added": [
@@ -3104,7 +3119,7 @@
         ]
       },
       {
-        "ms": 769,
+        "ms": 1157,
         "type": "childList",
         "target": "A",
         "added": [
@@ -3115,7 +3130,7 @@
         ]
       },
       {
-        "ms": 769,
+        "ms": 1157,
         "type": "childList",
         "target": "A",
         "added": [
@@ -3126,7 +3141,7 @@
         ]
       },
       {
-        "ms": 769,
+        "ms": 1157,
         "type": "childList",
         "target": "A",
         "added": [
@@ -3137,7 +3152,7 @@
         ]
       },
       {
-        "ms": 769,
+        "ms": 1157,
         "type": "childList",
         "target": "A",
         "added": [
@@ -3148,7 +3163,7 @@
         ]
       },
       {
-        "ms": 769,
+        "ms": 1157,
         "type": "childList",
         "target": "A",
         "added": [
@@ -3159,7 +3174,7 @@
         ]
       },
       {
-        "ms": 769,
+        "ms": 1157,
         "type": "childList",
         "target": "A",
         "added": [
@@ -3170,7 +3185,7 @@
         ]
       },
       {
-        "ms": 769,
+        "ms": 1157,
         "type": "childList",
         "target": "A",
         "added": [
@@ -3181,7 +3196,7 @@
         ]
       },
       {
-        "ms": 769,
+        "ms": 1157,
         "type": "childList",
         "target": "A",
         "added": [
@@ -3192,7 +3207,7 @@
         ]
       },
       {
-        "ms": 769,
+        "ms": 1157,
         "type": "childList",
         "target": "A",
         "added": [
@@ -3203,7 +3218,7 @@
         ]
       },
       {
-        "ms": 769,
+        "ms": 1157,
         "type": "childList",
         "target": "A",
         "added": [
@@ -3214,7 +3229,7 @@
         ]
       },
       {
-        "ms": 769,
+        "ms": 1157,
         "type": "childList",
         "target": "BUTTON",
         "added": [
@@ -3225,7 +3240,7 @@
         ]
       },
       {
-        "ms": 769,
+        "ms": 1157,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -3234,7 +3249,7 @@
         "removed": []
       },
       {
-        "ms": 769,
+        "ms": 1157,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -3243,7 +3258,7 @@
         "removed": []
       },
       {
-        "ms": 769,
+        "ms": 1157,
         "type": "childList",
         "target": "BUTTON",
         "added": [
@@ -3254,7 +3269,7 @@
         ]
       },
       {
-        "ms": 769,
+        "ms": 1157,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -3263,7 +3278,7 @@
         "removed": []
       },
       {
-        "ms": 769,
+        "ms": 1157,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -3272,7 +3287,7 @@
         "removed": []
       },
       {
-        "ms": 769,
+        "ms": 1157,
         "type": "childList",
         "target": "BUTTON",
         "added": [
@@ -3283,7 +3298,7 @@
         ]
       },
       {
-        "ms": 769,
+        "ms": 1157,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -3292,7 +3307,7 @@
         "removed": []
       },
       {
-        "ms": 769,
+        "ms": 1157,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -3301,7 +3316,7 @@
         "removed": []
       },
       {
-        "ms": 769,
+        "ms": 1157,
         "type": "childList",
         "target": "BUTTON",
         "added": [
@@ -3312,7 +3327,7 @@
         ]
       },
       {
-        "ms": 769,
+        "ms": 1157,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -3321,7 +3336,7 @@
         "removed": []
       },
       {
-        "ms": 769,
+        "ms": 1157,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -3330,7 +3345,7 @@
         "removed": []
       },
       {
-        "ms": 769,
+        "ms": 1157,
         "type": "childList",
         "target": "BUTTON",
         "added": [
@@ -3341,7 +3356,7 @@
         ]
       },
       {
-        "ms": 769,
+        "ms": 1157,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -3352,57 +3367,57 @@
     ],
     "events": [
       {
-        "ms": 26,
+        "ms": 38,
         "kind": "store",
         "detail": "clientes"
       },
       {
-        "ms": 61,
+        "ms": 85,
         "kind": "store",
         "detail": "vehiculos"
       },
       {
-        "ms": 116,
+        "ms": 166,
         "kind": "store",
         "detail": "recibosEsperados"
       },
       {
-        "ms": 120,
+        "ms": 174,
         "kind": "store",
         "detail": "cancelaciones"
       },
       {
-        "ms": 124,
+        "ms": 181,
         "kind": "store",
         "detail": "negocios"
       },
       {
-        "ms": 128,
+        "ms": 187,
         "kind": "store",
         "detail": "gestiones"
       },
       {
-        "ms": 140,
+        "ms": 201,
         "kind": "store",
         "detail": "aseguradoras"
       },
       {
-        "ms": 144,
+        "ms": 207,
         "kind": "store",
         "detail": "cobros"
       },
       {
-        "ms": 174,
+        "ms": 250,
         "kind": "store",
         "detail": "carteraPrimas"
       },
       {
-        "ms": 178,
+        "ms": 256,
         "kind": "store",
         "detail": "metas"
       },
       {
-        "ms": 183,
+        "ms": 264,
         "kind": "store",
         "detail": "auditoria"
       }
@@ -3593,12 +3608,12 @@
       "pol_b9a883095c9fae8f7502ce1cb054",
       "pol_0f89cc0a12840594abcc60d418b2",
       "pol_b8b99324d9016269d118d789095a",
-      "b4003qa_policy_expired_renew_37970247957",
+      "b4003qa_policy_expired_renew_37973018063",
       "pol_8231bbb8f9b7272c02891f5a4caf",
       "pol_df6bf097045762297ec31fd4e5c5",
-      "b4003qa_policy_renew_37970247957",
-      "b4003qa_policy_renewwrite_37970247957",
-      "b4003qa_policy_unknown_37970247957",
+      "b4003qa_policy_renew_37973018063",
+      "b4003qa_policy_renewwrite_37973018063",
+      "b4003qa_policy_unknown_37973018063",
       "pol_638e276218baad9e84018415b0ba",
       "pol_b39a58e5c216d8fb0f9fca4da4d6",
       "pol_7280c9b1a5253a1fe1e463e5993b",
@@ -3813,13 +3828,132 @@
       "pass": true,
       "readonly": true,
       "sourcePolicyCount": 1425,
-      "sourceVehicleCount": 1121,
+      "sourceVehicleCount": 1122,
       "scopeRole": "Dirección",
       "scopeCountry": "TODOS"
     }
   },
+  "r21RealPreviewAttachment": {
+    "probeMode": "ephemeral_synthetic_negative_readmodel",
+    "realPresent": false,
+    "sourceFixtureId": "b4003qa_business_collab_37973018063",
+    "modalPresent": true,
+    "disabled": true,
+    "hint": "Esta Preview protege los archivos de negocios reales. La carga se comprueba con expedientes de prueba autorizados; en producción requiere validación LIVE.",
+    "guardPresent": true,
+    "readModelRestored": true,
+    "writeCountUnchanged": true,
+    "noOperationalWrites": true
+  },
+  "r20SecondCollaborationUi": {
+    "pending": 0,
+    "failed": 0,
+    "committed": 1,
+    "lastError": "",
+    "comment": {
+      "ts": "2026-10-09T18:29:48.702Z",
+      "user": "Orbit LAB",
+      "actorUid": "woJlxR1iFEeiQZvTscPj4qQ5Qc73",
+      "actorName": "Orbit LAB",
+      "tipo": "Solicitar información al asesor",
+      "texto": "B4-003 R20 solicitud sintética al asesor",
+      "direction": "advisor",
+      "eventId": "collab_mv1avdi6_i2iwa",
+      "attachment": {
+        "documentRef": "14VqthMFXauPlwPNVDmddtqZZFtS7KSlk",
+        "driveUrl": "https://drive.google.com/file/d/14VqthMFXauPlwPNVDmddtqZZFtS7KSlk/view?usp=drivesdk",
+        "nombre": "b4-r20-ui-attachment-37973018063.txt",
+        "mimeType": "text/plain",
+        "size": 36
+      }
+    },
+    "openMs": 144,
+    "visual": {
+      "panel": true,
+      "brandHeader": true,
+      "helpImmediate": true,
+      "panelBackground": "rgb(255, 255, 255)",
+      "panelBorder": "color(srgb 0.768 0.763922 0.747294)"
+    },
+    "attachmentRead": {
+      "ok": true,
+      "status": "disponible",
+      "documentRef": "14VqthMFXauPlwPNVDmddtqZZFtS7KSlk",
+      "fileId": "14VqthMFXauPlwPNVDmddtqZZFtS7KSlk",
+      "nombre": "b4-r20-ui-attachment-37973018063.txt",
+      "mimeType": "text/plain",
+      "size": 36,
+      "base64": "QjQtMDAzIFIyMCBVSSBhdHRhY2htZW50IDM3OTczMDE4MDYz",
+      "previewAvailable": true,
+      "downloadAvailable": true,
+      "externalUrl": "https://drive.google.com/file/d/14VqthMFXauPlwPNVDmddtqZZFtS7KSlk/view?usp=drivesdk",
+      "driveUrl": "https://drive.google.com/file/d/14VqthMFXauPlwPNVDmddtqZZFtS7KSlk/view?usp=drivesdk",
+      "backendPersistent": true,
+      "previewIsolated": true
+    },
+    "attachmentCleanup": {
+      "ok": true,
+      "status": "deleted_preview_qa",
+      "documentRef": "14VqthMFXauPlwPNVDmddtqZZFtS7KSlk",
+      "deleted": true,
+      "previewIsolated": true,
+      "entityType": "negocio",
+      "entityId": "b4003qa_business_collab_37973018063"
+    }
+  },
+  "r20SecondAdvisorActionCard": {
+    "present": true,
+    "badge": true,
+    "label": "↔ Acción requerida · #1",
+    "expectedRank": 1,
+    "actualRank": 1,
+    "background": "rgb(197, 22, 46)",
+    "color": "rgb(255, 255, 255)",
+    "priorityText": "Sin prioridad"
+  },
+  "r20SecondAdvisorInboxUi": {
+    "landingHash": "#/leads",
+    "expectedSurface": "leads",
+    "header": {
+      "countText": "76 activas",
+      "countLeft": 736,
+      "drawerLeft": 720,
+      "drawerWidth": 560
+    },
+    "pendingSeen": true,
+    "final": {
+      "present": true,
+      "text": "Solicitar información al asesor Reconocida por ti B4-003 R20 solicitud sintética al asesor Autor: Orbit LAB · Destinatario: advisor: ase-paula-osorio · Responsable: advisor: ase-paula-osorio ✓ Reconocida Resolver para todos Archivar para mí"
+    }
+  },
+  "r20SecondOperationsInboxUi": {
+    "landingHash": "#/ops",
+    "expectedSurface": "ops",
+    "header": {
+      "countText": "12 activas",
+      "countLeft": 736,
+      "drawerLeft": 720,
+      "drawerWidth": 560
+    },
+    "pendingSeen": true,
+    "final": {
+      "present": true,
+      "text": "Reenviado a Operaciones Resuelta para todos B4-003 R20 respuesta sintética del asesor Autor: Paula Osorio · Destinatario: role: operations · Responsable: role: operations Resuelta por Usuario autenticado. Reconocer para mí ✓ Resuelta para todos Archivar para mí"
+    }
+  },
+  "r20TypedHandoff": {
+    "requestEventId": "collab_mv1avdi6_i2iwa",
+    "advisorNoticeId": "collab_mv1avdi6_i2iwa",
+    "responseEventId": "collab_mv1aw3lp_znprt",
+    "operationsNoticeId": "collab_mv1aw3lp_znprt",
+    "caseEntityId": "b4003qa_business_collab_37973018063",
+    "requestTargetSurface": "leads",
+    "responseTargetSurface": "ops",
+    "advisorAcknowledgedPersisted": true,
+    "operationsSharedResolutionPersisted": true
+  },
   "failure": {
-    "message": "B4_003_R21_REAL_PREVIEW_ATTACHMENT_DENIAL_NOT_VISIBLE_BEFORE_PICKER:{\"realPresent\":false}",
-    "stack": "Error: B4_003_R21_REAL_PREVIEW_ATTACHMENT_DENIAL_NOT_VISIBLE_BEFORE_PICKER:{\"realPresent\":false}\n    at need (file:///home/runner/work/orbit360-core/orbit360-core/tools/gravicentra-i6-5-b4-003-preview-proof.mjs:13:32)\n    at file:///home/runner/work/orbit360-core/orbit360-core/tools/gravicentra-i6-5-b4-003-preview-proof.mjs:1528:2"
+    "message": "page.waitForFunction: Timeout 22000ms exceeded.",
+    "stack": "page.waitForFunction: Timeout 22000ms exceeded.\n    at actionCardUiFor (/home/runner/work/orbit360-core/orbit360-core/tools/gravicentra-i6-5-b4-003-preview-proof.mjs:176:11)\n    at async file:///home/runner/work/orbit360-core/orbit360-core/tools/gravicentra-i6-5-b4-003-preview-proof.mjs:1597:30"
   }
 }
