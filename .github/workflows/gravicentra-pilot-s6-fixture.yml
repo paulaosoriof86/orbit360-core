@@ -1,0 +1,115 @@
+name: Gravicentra Pilot S6 Synthetic Fixture
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - recovery/fase-a-clean-20260831
+    paths:
+      - 'artifacts/orbit360-recovery/release-control/PILOTV6_S6_CT02_20261008_01_REQUEST.json'
+      - 'tools/gravicentra-pilot-s6-fixture.mjs'
+      - '.github/workflows/gravicentra-pilot-s6-fixture.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: gravicentra-pilot-s6-fixture
+  cancel-in-progress: false
+
+env:
+  PROJECT_ID: ays-orbit-360-lab
+  TENANT_HINT: alianzas-soluciones
+  S6_REQUEST: artifacts/orbit360-recovery/release-control/PILOTV6_S6_CT02_20261008_01_REQUEST.json
+  S6_OUT: ${{ runner.temp }}/pilot-s6-fixture-result.json
+
+jobs:
+  pilot-s6-fixture:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    env:
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 1
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Gate exact S6 request
+        id: gate
+        run: |
+          set -euo pipefail
+          if [ ! -f "$S6_REQUEST" ]; then
+            echo "run=false" >> "$GITHUB_OUTPUT"
+            echo "PILOT_S6_REQUEST=ABSENT_NOOP"
+            exit 0
+          fi
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const p=process.env.S6_REQUEST;
+          const r=JSON.parse(fs.readFileSync(p,'utf8'));
+          const ok=r.status==='REQUESTED' &&
+            ['create','cleanup'].includes(String(r.mode||'').toLowerCase()) &&
+            r.scenarioId==='PILOTV6_S6_CT02_20261008_01' &&
+            r.previewUrl==='https://ays-orbit-360-lab--gi-i65-b4-37869818151-sonljpam.web.app' &&
+            r.sourceSha==='90ff0354e936bbaedc921c82408d3b37e9688909' &&
+            Number(r.runId)===37869818151 &&
+            Number(r.artifactId)===11589203939 &&
+            r.production===false &&
+            r.realBusinessWrites===false;
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'run='+(ok?'true':'false')+'\n');
+          console.log('PILOT_S6_GATE='+(ok?'RUN':'NOOP'));
+          if(r.status==='REQUESTED'&&!ok)process.exit(42);
+          NODE
+
+      - name: Prepare isolated Firebase authority
+        if: steps.gate.outputs.run == 'true'
+        run: |
+          set -euo pipefail
+          ROOT="$RUNNER_TEMP/pilot-s6-auth"; mkdir -p "$ROOT"; export ROOT
+          python3 - <<'PY'
+          import json,os,pathlib
+          rows=[]
+          for i,k in enumerate(['SA_DEFAULT','SA_ORBIT360_LAB','SA_ORBIT_360_LAB']):
+              try:d=json.loads(os.environ.get(k,''))
+              except:continue
+              if d.get('type')=='service_account' and d.get('project_id')=='ays-orbit-360-lab' and d.get('private_key') and d.get('client_email'):
+                  p=pathlib.Path(os.environ['ROOT'])/f'{i}.json';p.write_text(json.dumps(d));p.chmod(0o600);rows.append(str(p))
+          if not rows:raise SystemExit('PILOT_S6_NO_LAB_SERVICE_ACCOUNT')
+          pathlib.Path(os.environ['ROOT']+'/selected').write_text(rows[0])
+          PY
+          SEL=$(cat "$ROOT/selected")
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$SEL" >> "$GITHUB_ENV"
+
+      - name: Install fixture dependency
+        if: steps.gate.outputs.run == 'true'
+        run: npm install --no-save --package-lock=false firebase-admin@13.4.0 >/dev/null
+
+      - name: Create or cleanup isolated S6 fixture
+        if: steps.gate.outputs.run == 'true'
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-pilot-s6-fixture.mjs "$S6_REQUEST" "$S6_OUT"
+          node - <<'NODE'
+          const fs=require('node:fs'),r=JSON.parse(fs.readFileSync(process.env.S6_OUT,'utf8'));
+          const req=JSON.parse(fs.readFileSync(process.env.S6_REQUEST,'utf8'));
+          if(req.mode==='create' && (r.status!=='READY'||r.synthetic!==true||r.realCustomer!==false||r.cleanupRequired!==true)) process.exit(1);
+          if(req.mode==='cleanup' && (r.status!=='CLEANED'||r.syntheticFinalAbsent!==true)) process.exit(1);
+          console.log('PILOT_S6_RESULT='+r.status);
+          NODE
+
+      - name: Upload S6 fixture evidence
+        if: always() && steps.gate.outputs.run == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: gravicentra-pilot-s6-fixture-${{ github.run_id }}
+          path: ${{ runner.temp }}/pilot-s6-fixture-result.json
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 14
