@@ -416,7 +416,7 @@
   },
   "continuityRegister": {
     "path": "artifacts/orbit360-recovery/release-control/I6_5_OPEN_FINDINGS_CARRY_FORWARD_REGISTER_20261003.json",
-    "blobSha": "74627cd00acb0c9c6d44e338f797ce9355d5272a",
+    "blobSha": "836effdd02c7f4723a369aa36cf829447dc08bdd",
     "inventoryCount": 282,
     "attentionCount": 155,
     "guardPath": "tools/gravicentra-open-findings-continuity-guard-v1.mjs",
@@ -1754,5 +1754,10 @@
     "oldArtifactPreserved": true,
     "realBusinessWrites": 0,
     "liveTouched": false
+  },
+  "r22ParentStatusQaOnlyRepair": {
+    "status": "QA_CONSISTENCY_REPAIRED_PREVIEW_PENDING",
+    "ledgerParentStatus": "MACHINE_PASS_PENDING_PAULA_VISUAL",
+    "reason": "Stale carry label was not synchronized with preserved historical machine receipt"
   }
 }

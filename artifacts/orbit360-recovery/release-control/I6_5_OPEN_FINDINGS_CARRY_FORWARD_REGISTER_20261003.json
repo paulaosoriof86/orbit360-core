@@ -2951,7 +2951,7 @@
       "block": "B4",
       "source": "FROZEN_PLAN",
       "finding": "Cumulative B4-003 remediation: lifecycle, premium/source authority, Information Health, insurer knowledge and Gravicentra↔CotComp Quote Authority.",
-      "status": "R21_CAUSAL_SOURCE_FIXED_EXACT_PREVIEW_PENDING",
+      "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
       "blocking": true,
       "mayDisappearWithoutDisposition": false,
       "humanEvidence": [
@@ -12577,5 +12577,11 @@
       "B4-003-R20-V2-04-COLLAB-UX-COMMIT-SEMANTICS",
       "B4-003-R19-08-OPS-ADVISOR-HANDOFF-NOTIFICATION-GAP"
     ]
+  },
+  "r22ParentStatusConsistency": {
+    "status": "LEDGER_STATUS_RECONCILED_QA_ONLY",
+    "reason": "R21 stale carry parent label drift; prior machine evidence remains historical and R22 source still requires exact Preview",
+    "dataMutation": false,
+    "productMutation": false
   }
 }
