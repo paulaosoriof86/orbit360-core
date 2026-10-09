@@ -1517,15 +1517,42 @@ try{
  const dup=await tenant.collection('data').doc('negocios').collection('items').where('cancelacionId','==',ids.cancelation).get();
  need(dup.size===1,'B4_003_RECOVERY_DUPLICATE_CREATED');
  proof.assertions.recoveryIdempotentRetry=true;
- const realPreviewAttachment=await page.evaluate(async()=>{
-   const real=(Orbit.store?.all?.('negocios')||[]).find(n=>n&&n.previewWrite!==true&&n.id);
-   if(!real)return{realPresent:false};
-   await Orbit.ciclo.openNegocio(real.id);
-   const m=document.getElementById('ciclo-modal'),file=m?.querySelector('#ng-com-file'),hint=m?.querySelector('#ng-com-file-name');
-   const result={realPresent:true,disabled:file?.disabled===true,hint:String(hint?.textContent||''),guardPresent:!!m?.querySelector('.collab-file-btn[aria-disabled="true"]')};
-   m?.remove();return result;
- });
- need(realPreviewAttachment.realPresent&&realPreviewAttachment.disabled&&realPreviewAttachment.guardPresent&&/Preview protege los archivos/.test(realPreviewAttachment.hint),'B4_003_R21_REAL_PREVIEW_ATTACHMENT_DENIAL_NOT_VISIBLE_BEFORE_PICKER:'+JSON.stringify(realPreviewAttachment));
+ /* R21: A session may authorize only synthetic businesses. Probe the
+    real-business guard in its actual browser renderer without requiring
+    access to any real operational row. The fallback is a temporary cloned
+    read-model fixture, never a Firestore/Auth/tenant mutation. */
+ const r21SyntheticBusinessSnap=await ref('negocios',ids.collabBusiness).get();
+ need(r21SyntheticBusinessSnap.exists&&r21SyntheticBusinessSnap.data()?.previewWrite===true,'B4_003_R21_ATTACHMENT_NEGATIVE_PROBE_SOURCE_FIXTURE_INVALID');
+ const r21SyntheticBusiness=r21SyntheticBusinessSnap.data()||{};
+ const realPreviewAttachment=await page.evaluate(async({id,fixture})=>{
+   const store=Orbit.store,originalGet=store&&store.get;
+   if(!store||typeof originalGet!=='function')return{probeFailed:'read_model_unavailable'};
+   const visibleReal=(store.all?.('negocios')||[]).find(n=>n&&n.previewWrite!==true&&n.id);
+   const probeMode=visibleReal?'actual_authorized_business_readmodel':'ephemeral_synthetic_negative_readmodel';
+   const probeId=visibleReal?.id||'r21-preflight-readonly-mock';
+   const negative=visibleReal||Object.assign({},fixture,{id:probeId,previewWrite:false});
+   const before=Orbit.productOperationalWriteP0?.status?.()||{};
+   if(!visibleReal)store.get=function(collection,requestedId){
+     if(collection==='negocios'&&String(requestedId)===probeId)return negative;
+     return originalGet.apply(store,arguments);
+   };
+   let m=null,result={probeMode,realPresent:!!visibleReal,sourceFixtureId:id};
+   try{
+     await Orbit.ciclo.openNegocio(probeId);
+     m=document.getElementById('ciclo-modal');
+     const file=m?.querySelector('#ng-com-file'),hint=m?.querySelector('#ng-com-file-name');
+     result={...result,modalPresent:!!m,disabled:file?.disabled===true,hint:String(hint?.textContent||''),guardPresent:!!m?.querySelector('.collab-file-btn[aria-disabled="true"]')};
+   }finally{
+     if(!visibleReal)store.get=originalGet;
+     document.getElementById('ciclo-modal')?.remove();
+   }
+   const after=Orbit.productOperationalWriteP0?.status?.()||{};
+   return{...result,readModelRestored:store.get===originalGet,writeCountUnchanged:Number(before.committed||0)===Number(after.committed||0),noOperationalWrites:true};
+ },{id:ids.collabBusiness,fixture:r21SyntheticBusiness});
+ need(realPreviewAttachment.modalPresent&&realPreviewAttachment.disabled&&realPreviewAttachment.guardPresent&&
+      realPreviewAttachment.readModelRestored&&realPreviewAttachment.writeCountUnchanged&&
+      /Preview protege los archivos/.test(realPreviewAttachment.hint),
+      'B4_003_R21_REAL_PREVIEW_ATTACHMENT_DENIAL_NOT_VISIBLE_BEFORE_PICKER:'+JSON.stringify(realPreviewAttachment));
  proof.r21RealPreviewAttachment=realPreviewAttachment;
  proof.assertions.previewRealBusinessAttachmentPreflightTruthful=true;
  const collabUi=await collaborationFor(browser,directionActor,ids.collabBusiness,'Solicitar información al asesor','B4-003 R20 solicitud sintética al asesor',true);proof.r20SecondCollaborationUi=collabUi;proof.assertions.collaborationUiAttachmentDurable=true;proof.assertions.businessCardOpenUnder2500ms=true;proof.assertions.collaborationVisualHierarchy=true;

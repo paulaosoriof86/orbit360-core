@@ -1,0 +1,38 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R21_PREVIEW_ATTACHMENT_NEGATIVE_FIXTURE_QA_V1",
+  "recordedAt": "2026-10-09",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "parentAtPreparation": "dafd846c4b343aada76a904cc325f76c77d3c401",
+  "gate": "I6.5/B4-003",
+  "lastFailedRunId": 37970247957,
+  "sourceFailure": "B4_003_R21_REAL_PREVIEW_ATTACHMENT_DENIAL_NOT_VISIBLE_BEFORE_PICKER: {realPresent:false}",
+  "rootCause": "Authenticated synthetic-only Preview scope contains zero non-QA real businesses; the harness incorrectly required access to a real operating business to test its blocked file chooser.",
+  "changeDisposition": "QA_ONLY_FIX_STAGED_NEW_EXACT_PREVIEW_REQUIRED",
+  "oldFiles": {
+    "tools/gravicentra-i6-5-b4-003-preview-proof.mjs": "b326a4fe7ab30b6aef8fb4ce1cedff0ee69f6022",
+    "tools/gravicentra-i6-5-b4-003-contract.mjs": "48835eda83f21161d839112241745e6a8f9291d8"
+  },
+  "updatedFiles": {
+    "tools/gravicentra-i6-5-b4-003-preview-proof.mjs": "ec1d85f0413a8b491d627dfcc7927094a645efc6",
+    "tools/gravicentra-i6-5-b4-003-contract.mjs": "e4bee82315b2d53d7acc39467c79f033f27e430a"
+  },
+  "proofProtocol": [
+    "Prefer actual business authorized in read model, if present",
+    "Otherwise use the source QA business cloned to ephemeral negative read-model with previewWrite=false",
+    "Patch ONLY the in-browser get method during presentation, restore within finally and remove modal",
+    "Require actual disabled file input, aria-disabled UI and explanatory text",
+    "Require before/after operational write counts unchanged; never change Auth/Firestore/tenant",
+    "Retain real backend Preview synthetic-only authorization and synthetic upload/readback/finalize/cleanup affirmative tests"
+  ],
+  "productFilesChanged": false,
+  "productFileCountPreserved": 102,
+  "operationalWrites": 0,
+  "firestoreWrites": 0,
+  "reimport": false,
+  "productionDeploy": false,
+  "priorArtifactNotCertifyingUpdatedQa": true,
+  "status": "STATIC_JS_SYNTAX_PASS_EXACT_AUTHENTICATED_PREVIEW_PENDING",
+  "noHumanPass": true,
+  "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_R20_CONTRACT_AND_EXACT_PREVIEW"
+}

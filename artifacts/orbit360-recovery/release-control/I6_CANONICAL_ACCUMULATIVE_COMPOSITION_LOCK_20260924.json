@@ -4354,5 +4354,19 @@
       "contractBlobSha": "48835eda83f21161d839112241745e6a8f9291d8",
       "productSourceChanged": false
     }
+  },
+  "b4003R21AttachmentNegativeProbeQaFix": {
+    "status": "QA_ONLY_CAUSAL_FIX_STAGED_EXACT_PREVIEW_PENDING",
+    "lastFailedRunId": 37970247957,
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R21_ATTACHMENT_PREVIEW_NEGATIVE_PROBE_QA_ROOTFIX_20261009.json",
+    "receiptBlobSha": "a532a3a3d72d026411c255ca721542f00cbc823e",
+    "qaOwners": {
+      "tools/gravicentra-i6-5-b4-003-preview-proof.mjs": "ec1d85f0413a8b491d627dfcc7927094a645efc6",
+      "tools/gravicentra-i6-5-b4-003-contract.mjs": "e4bee82315b2d53d7acc39467c79f033f27e430a"
+    },
+    "productSourceChanged": false,
+    "oldImmutableProofPreserved": true,
+    "neverRealBusinessWrite": true,
+    "latestHumanApproval": false
   }
 }

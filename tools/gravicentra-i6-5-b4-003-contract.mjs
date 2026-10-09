@@ -500,6 +500,7 @@ need(index.includes('refreshFlight')&&index.includes('inboxScope()')&&index.incl
  ops.includes('orbit:inbox-state')&&leads.includes('orbit:inbox-state'),'B4_003_R21_RESOLVED_EVENT_HYDRATION_OR_BOARD_REFRESH_MISSING');
  need(cycle.includes('previewProtectedUpload')&&cycle.includes('type="file" ${previewProtectedUpload?\'disabled\':\'\'}')&&cycle.includes('Preview protege los archivos de negocios reales')&&
  driveBackend.includes('previewSyntheticTarget(target)'),'B4_003_R21_PREVIEW_ATTACHMENT_DENIAL_NOT_EARLY_OR_BOUNDARY_WEAKENED');
+ need(previewProof.includes('ephemeral_synthetic_negative_readmodel')&&previewProof.includes('r21SyntheticBusinessSnap.exists')&&previewProof.includes('readModelRestored')&&previewProof.includes('writeCountUnchanged')&&!previewProof.includes('if(!real)return{realPresent:false}'),'B4_003_R21_SCOPE_SAFE_PREVIEW_ATTACHMENT_NEGATIVE_PROBE_MISSING');
  need(index.includes('modules/renovaciones.js?v=')&&index.includes('b4003r21')&&index.includes('core/ciclo.js?v=20261007-r20f2-b4003r21'),'B4_003_R21_CACHE_BUST_REAL_RUNTIME_MISSING');
 }
 need(index.includes('class="inbox-toolbar" style="flex-wrap:wrap')&&index.includes('class="inbox-card-actions" style="flex-wrap:wrap"'),
