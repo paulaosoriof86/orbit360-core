@@ -1,0 +1,27 @@
+{
+  "schema": "GRAVICENTRA_PILOT_V6_S6_FIXTURE_REQUEST_V1",
+  "recordedAt": "2026-10-08T23:00:00-06:00",
+  "status": "REQUESTED",
+  "mode": "create",
+  "scenarioId": "PILOTV6_S6_CT02_20261008_01",
+  "participant": "CT02",
+  "role": "Operativo",
+  "purpose": "Create one isolated synthetic payment obligation for S6 controlled pilot; no real customer data.",
+  "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-37869818151-sonljpam.web.app",
+  "sourceSha": "90ff0354e936bbaedc921c82408d3b37e9688909",
+  "buildId": "gi-i65-b4-90ff0354e936-57f234755dc1",
+  "runId": 37869818151,
+  "artifactId": 11589203939,
+  "production": false,
+  "realBusinessWrites": false,
+  "syntheticOnly": true,
+  "cleanupRequired": true,
+  "allowedEffect": "Create and later delete only the dedicated PILOTV6_S6 synthetic fixture and its direct payment/reconciliation evidence.",
+  "forbidden": [
+    "production promotion",
+    "real customer or policy mutation",
+    "reimport",
+    "external communication",
+    "batch reconciliation of real records"
+  ]
+}
