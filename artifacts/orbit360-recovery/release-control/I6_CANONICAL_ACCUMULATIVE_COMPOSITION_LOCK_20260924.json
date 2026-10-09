@@ -4285,7 +4285,7 @@
       "orbit360-platform/data/store-firestore-product-operational-p0.js": "112891368bcf4f9c2dc7c94abdb7e7c1bebff32a"
     },
     "proofOwners": {
-      "tools/gravicentra-i6-5-b4-003-contract.mjs": "ee4aab05a79b4f6468cd125ff9d49a0f7ab564bb",
+      "tools/gravicentra-i6-5-b4-003-contract.mjs": "48835eda83f21161d839112241745e6a8f9291d8",
       "tools/gravicentra-i6-5-b4-003-preview-proof.mjs": "b326a4fe7ab30b6aef8fb4ce1cedff0ee69f6022"
     },
     "retainedCertifiedMachinePass": {
@@ -4331,7 +4331,7 @@
     "productSourceUnchanged": true,
     "sourceBlobSha": "a3a582b3d72e036abd5fcf00e3e72b687c454fa3",
     "browserQaBlobSha": "b326a4fe7ab30b6aef8fb4ce1cedff0ee69f6022",
-    "contractBlobSha": "ee4aab05a79b4f6468cd125ff9d49a0f7ab564bb"
+    "contractBlobSha": "48835eda83f21161d839112241745e6a8f9291d8"
   },
   "b4003R21HydrationFacadeRootfix": {
     "status": "SOURCE_FIXED_EXACT_BROWSER_RETEST_PENDING",
@@ -4342,10 +4342,17 @@
       "orbit360-platform/data/store-firestore-product-operational-p0.js": "7738314b843253c92be008dc0b812d035b377d43"
     },
     "qaBlobShas": {
-      "tools/gravicentra-i6-5-b4-003-contract.mjs": "ee4aab05a79b4f6468cd125ff9d49a0f7ab564bb",
+      "tools/gravicentra-i6-5-b4-003-contract.mjs": "48835eda83f21161d839112241745e6a8f9291d8",
       "tools/gravicentra-i6-5-b4-003-preview-proof.mjs": "b326a4fe7ab30b6aef8fb4ce1cedff0ee69f6022"
     },
     "noDataWrites": true,
-    "liveUnchanged": true
+    "liveUnchanged": true,
+    "staticQaCacheCorrection": {
+      "previousFailRun": 37969885010,
+      "reason": "OBSOLETE_SCRIPT_CACHE_BINDING_PATTERN",
+      "status": "QA_ONLY_FIXED_PENDING_RETRY",
+      "contractBlobSha": "48835eda83f21161d839112241745e6a8f9291d8",
+      "productSourceChanged": false
+    }
   }
 }
