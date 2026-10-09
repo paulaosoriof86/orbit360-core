@@ -34,7 +34,7 @@ Orbit.modules.renovaciones = (function () {
   }
   function humanCollection(name){return({polizas:'pólizas',clientes:'clientes',aseguradoras:'aseguradoras'})[name]||name;}
   const countryCode = v => String(v == null ? '' : v).trim().toUpperCase();
-  const policyCountry = p => { const cli=p&&p.clienteId?S().get('clientes',p.clienteId):null; return countryCode(p&&p.pais || cli&&cli.pais); };
+  const policyCountry = p => { const own=countryCode(p&&p.pais);if(own)return own;const cli=p&&p.clienteId?S().get('clientes',p.clienteId):null;return countryCode(cli&&cli.pais); };
   const selectedCountry = p => { const wanted=countryCode(Orbit.pais); return !wanted || wanted==='TODOS' || policyCountry(p)===wanted; };
   const renewabilityState = p => {
     if(!p || !Object.prototype.hasOwnProperty.call(p,'renovable') || p.renovable==null || String(p.renovable).trim()==='') return 'UNKNOWN';
@@ -53,7 +53,7 @@ Orbit.modules.renovaciones = (function () {
   function renewalLifecycleSnapshot(){
     const rows=(S().all('polizas')||[]).filter(p=>p&&p.id);
     const norm=v=>String(v==null?'':v).trim().normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase().replace(/[^A-Z0-9]/g,'');
-    const familyKey=p=>{if(!p.numero||!p.clienteId||!p.aseguradoraId||!policyCountry(p))return 'IDENTIDAD_INCOMPLETA|'+String(p.id||'');return [p.tenantId||'',policyCountry(p),p.clienteId||'',p.aseguradoraId||'',p.ramo||'',p.numero||''].map(norm).join('|');};
+    const familyKey=p=>{const pais=policyCountry(p);if(!p.numero||!p.clienteId||!p.aseguradoraId||!pais)return 'IDENTIDAD_INCOMPLETA|'+String(p.id||'');return [p.tenantId||'',pais,p.clienteId||'',p.aseguradoraId||'',p.ramo||'',p.numero||''].map(norm).join('|');};
     const groups=new Map(),byId=new Map(),reverse=new Map(),cache=new Map();
     for(const p of rows){byId.set(String(p.id),p);const key=familyKey(p);if(!groups.has(key))groups.set(key,[]);groups.get(key).push(p);
       if(p.renuevaDe){const parent=String(p.renuevaDe);if(!reverse.has(parent))reverse.set(parent,[]);reverse.get(parent).push(p);}}

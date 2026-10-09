@@ -585,7 +585,7 @@
   },
   "findingLedgerBlobSha": "1c8fdcf3d9d7a4fddb9defa01ea582cdba32c156",
   "continuityRegisterBlobSha": "48d945e51e5a10ec74dc925313b720a121ba7086",
-  "compositionLockBlobSha": "170f48612f0ce657f34f58fb5fba62fe3e44a4bd",
+  "compositionLockBlobSha": "534559b1b23ee57be455460b9957c08f80ecdae3",
   "r18SourceFix": {
     "status": "SOURCE_FIXED_R18_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_SOURCE_FIX_20261005.json",
@@ -1557,5 +1557,11 @@
     "receiptBlobSha": "44bf410b5af12efb6f9549307a052bb66e7b9590",
     "noBusinessWrites": true,
     "failedRunId": 37887190747
+  },
+  "r20PolicyCountryReadAmplificationRootfix": {
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_POLICY_COUNTRY_READ_AMPLIFICATION_ROOTFIX_20261009.json",
+    "receiptBlobSha": "af7bcb306e782c58428504f995ac35f3a28713a8",
+    "status": "STATIC_CAUSAL_PASS_BROWSER_REQUIRED",
+    "noLive": true
   }
 }

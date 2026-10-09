@@ -1,0 +1,48 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R20_POLICY_COUNTRY_READ_AMPLIFICATION_ROOTFIX_V1",
+  "date": "2026-10-09",
+  "branch": "recovery/fase-a-clean-20260831",
+  "headBefore": "fd26725949e26b3e02030f3d995518eb343986e0",
+  "gate": "I6.5/B4-003",
+  "previousFailedPreviewRun": 37935549889,
+  "runtimeProof": {
+    "routeDomPaintMs": 2881,
+    "routeThresholdExclusive": 2500,
+    "lastOutcome": "FAIL",
+    "syntheticWritesCleanupComplete": true
+  },
+  "rootCause": "Source inspection shows renewalLifecycleSnapshot.familyKey invokes policyCountry twice per policy. policyCountry read scoped client regardless of already populated country. A full 1419-edition snapshot repeatedly reads unnecessary client records on a Pólizas KPI path.",
+  "rootFix": "Return populated policy country without a client store read, falling back to client country only if the policy's own country is absent. Compute country once per familyKey. Source country precedence and lineage business dispositions unchanged.",
+  "staticProof": {
+    "policies": 1419,
+    "beforeClientLookups": 2838,
+    "afterClientLookups": 1,
+    "selected30DispositionsEqual": true,
+    "syntax": "PASS",
+    "browserSpeed": "PENDING_EXACT_CHROME_AUTHENTICATED_PROOF"
+  },
+  "blobs": {
+    "product": {
+      "orbit360-platform/modules/renovaciones.js": "011a633f57b826421d37c80a34c9a6406e9ca5fd",
+      "orbit360-platform/index.html": "6e90a984ce51b1c7aba8b1f7c318a3305cc86c06"
+    },
+    "qa": {
+      "tools/gravicentra-i6-5-b4-003-contract.mjs": "cc5f7b0f7ca9ed142923867e06ffe02ddfaa0286"
+    }
+  },
+  "noLoss": {
+    "compositionOwners": 102,
+    "existingFindings": 282,
+    "priorHumanReviewPreserved": true,
+    "upstreamPaymentS6Untouched": true
+  },
+  "boundaries": {
+    "operationalDataWrites": 0,
+    "reimports": 0,
+    "newRepo": false,
+    "newBranch": false,
+    "livePromotion": false,
+    "previewOnly": true
+  },
+  "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_R20_CONTRACT_AND_EXACT_PREVIEW"
+}

@@ -440,6 +440,27 @@ need(index.includes('modules/polizas.js?v=20261004-b4003r14-i65-20261008-lineage
 need(index.includes('class="inbox-toolbar" style="flex-wrap:wrap')&&index.includes('class="inbox-card-actions" style="flex-wrap:wrap"'),
  'B4_003_INBOX_320_VIEWPORT_FLEX_WRAP_MISSING');
 
+/* B4-003 R20: Policy country is already on the canonical row for nearly all editions.
+   An unconditional scoped client lookup for each edition multiplied first paint cost.
+   Assert semantics and that at most two lookups occur across 1419 synthetic rows,
+   including one with missing country that MUST still use the client fallback. */
+{
+ const records=Array.from({length:1419},(_,i)=>({
+   id:'perf_'+i,numero:'P'+Math.floor(i/4),clienteId:'client_'+i,
+   aseguradoraId:'ins',ramo:'Vehiculos',
+   pais:i===0?'':i%2?'GT':'CO',estado:'Vigente',renovable:true,
+   vigenciaInicio:'2025-08-04',vigenciaFin:'2026-10-07'
+ }));
+ let clientGets=0;
+ const store={all:kind=>kind==='polizas'?records:[],
+   get:(kind,id)=>{clientGets++;return kind==='clientes'?{id,pais:'GT'}:null;}};
+ const orbit={pais:'TODOS',store,modules:{},q:{},kit:{},ui:{daysFromNow:()=>-2},session:{rol:()=>'direccion'}};
+ vm.runInNewContext(base,{window:{Orbit:orbit,addEventListener:()=>{}},Orbit:orbit},{timeout:1500});
+ const snap=orbit.renewalLifecycle.snapshot();
+ need(snap.rows.length===1419,'B4_003_R20_POLICY_COUNTRY_READMODEL_SET_CHANGED');
+ need(snap.assess(records[0]).actionable===true,'B4_003_R20_POLICY_COUNTRY_FALLBACK_LOST');
+ need(clientGets<=5,'B4_003_R20_POLICY_COUNTRY_EXTRA_CLIENT_READ_AMPLIFICATION:'+clientGets);
+}
 need(lock.boundaries?.businessWritesAuthorized===false&&lock.boundaries?.dataMutationAuthorized===false&&lock.boundaries?.reimportAuthorized===false&&lock.boundaries?.livePromotionAuthorized===false,'B4_003_BOUNDARY_INVALID');
 need(lock.boundaries?.syntheticQaWritesAuthorized===true,'B4_003_SYNTHETIC_QA_NOT_AUTHORIZED');
 

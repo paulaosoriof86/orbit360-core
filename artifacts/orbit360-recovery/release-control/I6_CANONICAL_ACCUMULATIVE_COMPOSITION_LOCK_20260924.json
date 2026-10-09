@@ -208,7 +208,7 @@
     "orbit360-platform/data/tenant-alianzas-soluciones-insurers-p10.js": "41d2e31a42dac73eb68af304d5f532897210d0ee",
     "orbit360-platform/data/tenant-config/alianzas-soluciones.aseguradoras-knowledge-summary-v20261003.js": "2000d9ea8ab67bdd37d8bf404a29a405fa6374dd",
     "orbit360-platform/data/tenant-public-branding-index.js": "dc543c463f5ecd8ea44e49156d6282113bd95db6",
-    "orbit360-platform/index.html": "477b9262852a3780bea5d744f748734c93695a8b",
+    "orbit360-platform/index.html": "6e90a984ce51b1c7aba8b1f7c318a3305cc86c06",
     "orbit360-platform/modules/academia.js": "d27aa080eac091057310aa7c952d3093677b50f0",
     "orbit360-platform/modules/aseguradoras-v1202-import-bridge.js": "db5f012abe505c2dd27d77a47d0694868bee5348",
     "orbit360-platform/modules/aseguradoras.js": "28bb3f15a1ca20130b194bb2dd5b1d296984927d",
@@ -238,7 +238,7 @@
     "orbit360-platform/modules/renewals-v1200-operational-bridge.js": "c3bdbbf5ddb5d11f5690649054ea069f67c3afa7",
     "orbit360-platform/modules/renewals-v1200-permission-guard.js": "f3f75e25d32c7e4784a19b089353d9706c98dcda",
     "orbit360-platform/modules/renewals-v1201-issued-filter.js": "ae1df0174121c965f610407ae723094e833ebeaf",
-    "orbit360-platform/modules/renovaciones.js": "59005f74098739a37d89738ce0e5b932f5a2b832",
+    "orbit360-platform/modules/renovaciones.js": "011a633f57b826421d37c80a34c9a6406e9ca5fd",
     "orbit360-platform/modules/siniestros.js": "fbea51cf7084b66d9866a3c947c1e7ec3bb4a034",
     "orbit360-platform/product-runtime-config.js": "cce5e1b74b246640297a734871a71364e4209061",
     "orbit360-platform/styles/base.css": "608ef0709144ffcbe748a7bd04e1bd16744def65",
@@ -4195,5 +4195,15 @@
     "qaPreviewBlob": "1c020689de93aebc5678b8a78626f01bf613c9b2",
     "flowBlob": "cd073f5c92e4d308418769af697830f16424da5e",
     "visualQueueBlob": "622b40259b8264035c8d8b34a6e380d711b8901b"
+  },
+  "r20PolicyCountryReadAmplificationRootfix": {
+    "status": "SOURCE_STATIC_PASS_EXACT_PREVIEW_REQUIRED",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_POLICY_COUNTRY_READ_AMPLIFICATION_ROOTFIX_20261009.json",
+    "blobSha": "af7bcb306e782c58428504f995ac35f3a28713a8",
+    "changedProductBlobs": {
+      "orbit360-platform/modules/renovaciones.js": "011a633f57b826421d37c80a34c9a6406e9ca5fd",
+      "orbit360-platform/index.html": "6e90a984ce51b1c7aba8b1f7c318a3305cc86c06"
+    },
+    "qaBlobSha": "cc5f7b0f7ca9ed142923867e06ffe02ddfaa0286"
   }
 }

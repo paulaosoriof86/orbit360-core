@@ -38,8 +38,8 @@
       "route": "#/renovaciones",
       "state": "SOURCE_FIXED_SYNTHETIC_PASS_BROWSER_PREVIEW_NOT_ACCEPTED",
       "source": "orbit360-platform/modules/renovaciones.js",
-      "blobSha": "59005f74098739a37d89738ce0e5b932f5a2b832",
-      "whatChanged": "Same-source Kanban owner distinguishes historic unlinked editions from overdue actionable coverage and protects CTA. Role/user/country/scope-specific lifecycle cache, no cross-role snapshot reuse.",
+      "blobSha": "011a633f57b826421d37c80a34c9a6406e9ca5fd",
+      "whatChanged": "Same-source Kanban owner distinguishes historic unlinked editions from overdue actionable coverage and protects CTA. Role/user/country/scope-specific lifecycle cache, no cross-role snapshot reuse. Policy country uses canonical row first, client fallback only if country missing; no historical data rewrite.",
       "whatToVisualize": "Six inspected policy numbers and four Kanban columns, prior year vs current, review-only vs proposal/quote, roles and countries.",
       "notProven": "No authenticated final R20 business UAT PASS. The current source query-version is fixed in new index."
     },
@@ -69,12 +69,12 @@
       "id": "POLICY_NAVIGATION_PERFORMANCE",
       "surface": "Pólizas / Cliente 360 cross-routing",
       "route": "#/polizas",
-      "state": "CHROME_ROUTE_PERFORMANCE_PASS_FULL_PREVIEW_STILL_FAIL",
+      "state": "SOURCE_STATIC_READ_AMPLIFICATION_FIXED_EXACT_BROWSER_NOT_PASSED",
       "source": "orbit360-platform/modules/polizas.js",
       "blobSha": "e52869f5c7b3c219a6d80f39a100827e3ad4b599",
-      "whatChanged": "Indexed policy search and on-demand detail preserved; browser route contract still intermittently failed. Expensive lifecycle only assessed after 0–45-day fast filter; 1419-to-17 static test call reduction.",
+      "whatChanged": "Indexed policy search and on-demand detail preserved; browser route contract still intermittently failed. Expensive lifecycle only assessed after 0–45-day fast filter; 1419-to-17 static test call reduction. Avoid unconditional scoped client gets while classifying 1419 policy edition lineage: synthetic 2838→1, retained 30-case semantic selection.",
       "whatToVisualize": "Route first paint <2500ms, search and detail, desktop/mobile, cold navigation. · Last Chrome run Pólizas route 1491ms, search 243ms, detail 256ms",
-      "notProven": "Full B4-003 browser proof failed later, exact cause awaiting discriminant logs; must not mark full module accepted."
+      "notProven": "Most recent true Chrome route render 2881ms >2500ms; retest required."
     },
     {
       "id": "INSURERS_QUALITY_DESIGN",
@@ -92,5 +92,9 @@
   "lastSourceFixReceipt": {
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_CACHE_BINDING_AND_QA_FAILURE_PERSISTENCE_ROOTFIX_20261008.json",
     "blobSha": "44bf410b5af12efb6f9549307a052bb66e7b9590"
+  },
+  "currentRootfix": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_POLICY_COUNTRY_READ_AMPLIFICATION_ROOTFIX_20261009.json",
+    "blobSha": "af7bcb306e782c58428504f995ac35f3a28713a8"
   }
 }
