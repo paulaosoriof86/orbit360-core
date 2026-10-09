@@ -115,7 +115,7 @@ Orbit.modules.renovaciones = (function () {
     };
     const sameCore=(p,q)=>coreKey(p)===coreKey(q)&&!coreKey(p).startsWith('INCOMPLETE|')&&riskCompatible(p,q);
     const later=(p,q)=>!!(p.vigenciaInicio&&p.vigenciaFin&&q.vigenciaInicio&&q.vigenciaFin&&String(q.vigenciaInicio)>String(p.vigenciaInicio)&&String(q.vigenciaFin)>String(p.vigenciaFin));
-    const sourceRenewal=q=>/RENOVAD/.test(norm(q&&(q.tipoEmision||q.tipoDeEmision||q.tipo_emision||q.emisionTipo||q.tipoEmisionPoliza||'')));
+    const sourceRenewal=q=>/RENOVAD/.test(norm(q&&(q.tipoEmisionFuente||q.tipoEmision||q.tipoDeEmision||q.tipo_emision||q.emisionTipo||q.tipoEmisionPoliza||'')));
     const consecutive=(p,q)=>{
       const end=Date.parse(String(p.vigenciaFin||'')+'T00:00:00Z'),start=Date.parse(String(q.vigenciaInicio||'')+'T00:00:00Z');
       return Number.isFinite(end)&&Number.isFinite(start)&&Math.abs(start-end)<=31*86400000;

@@ -238,7 +238,7 @@
     "orbit360-platform/modules/renewals-v1200-operational-bridge.js": "c3bdbbf5ddb5d11f5690649054ea069f67c3afa7",
     "orbit360-platform/modules/renewals-v1200-permission-guard.js": "f3f75e25d32c7e4784a19b089353d9706c98dcda",
     "orbit360-platform/modules/renewals-v1201-issued-filter.js": "ae1df0174121c965f610407ae723094e833ebeaf",
-    "orbit360-platform/modules/renovaciones.js": "73fb1ba31a9cb41df60d32dd40a5cfc5c881b6f5",
+    "orbit360-platform/modules/renovaciones.js": "a3a582b3d72e036abd5fcf00e3e72b687c454fa3",
     "orbit360-platform/modules/siniestros.js": "fbea51cf7084b66d9866a3c947c1e7ec3bb4a034",
     "orbit360-platform/product-runtime-config.js": "cce5e1b74b246640297a734871a71364e4209061",
     "orbit360-platform/styles/base.css": "608ef0709144ffcbe748a7bd04e1bd16744def65",
@@ -4269,7 +4269,7 @@
     "authority": "PAULA_CONTINUE_EXISTING_B4_003_P0_20261009",
     "sourceBaseHead": "466032ac7fed382bd16469bf5427e694c78f8805",
     "sourceOwners": {
-      "orbit360-platform/modules/renovaciones.js": "73fb1ba31a9cb41df60d32dd40a5cfc5c881b6f5",
+      "orbit360-platform/modules/renovaciones.js": "a3a582b3d72e036abd5fcf00e3e72b687c454fa3",
       "orbit360-platform/core/ciclo.js": "1d2d3c0b4e1ae1231b7b90c180f73079db79fab3",
       "orbit360-platform/index.html": "0de5cfe914712563ec6e67b1950f708432139126",
       "orbit360-platform/modules/ops.js": "a4ca3dbb4613d541af411f12fce9773a072b0d41",
@@ -4283,7 +4283,7 @@
       "orbit360-platform/modules/leads.js": "b4dfdbcdb8d255329e3fbae8df59ffde96f05146"
     },
     "proofOwners": {
-      "tools/gravicentra-i6-5-b4-003-contract.mjs": "9b0c519940247caf002b385fbae566cc93d92a0e",
+      "tools/gravicentra-i6-5-b4-003-contract.mjs": "0f73c9f2b6b30e33b2720f093a20fbc7564db1cc",
       "tools/gravicentra-i6-5-b4-003-preview-proof.mjs": "f24f2d76af5995097b6d349084d186bee5c99741"
     },
     "retainedCertifiedMachinePass": {
@@ -4304,5 +4304,13 @@
     "noReimport": true,
     "productionUnchanged": true,
     "noNewFindingIds": true
+  },
+  "b4003R21IssuanceSchemaFix": {
+    "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R21_ISSUANCE_SCHEMA_FIELD_CAUSAL_CORRECTION_20261009.json",
+    "receiptBlobSha": "301fdc2c7fe182f49e98b2fc51eb8a6767e602aa",
+    "sourceSha": "a3a582b3d72e036abd5fcf00e3e72b687c454fa3",
+    "qaContractSha": "0f73c9f2b6b30e33b2720f093a20fbc7564db1cc",
+    "noDataMutation": true
   }
 }

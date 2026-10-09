@@ -462,7 +462,7 @@ need(index.includes('refreshFlight')&&index.includes('inboxScope()')&&index.incl
 {
  const date=s=>s?Math.round((Date.parse(s+'T00:00:00Z')-Date.parse('2026-10-09T00:00:00Z'))/86400000):null;
  const original={id:'old',tenantId:'t',pais:'GT',numero:'02-01-488-5659-0',clienteId:'c',aseguradoraId:'a',ramo:'VEHICULOS',producto:'Auto Individual',placa:'P-728JPL',vigenciaInicio:'2025-09-08',vigenciaFin:'2026-09-08',estado:'Renovada',renovable:true};
- const successor={...original,id:'new',numero:'02-01-488-5659-1',vigenciaInicio:'2026-09-08',vigenciaFin:'2027-09-08',estado:'Vigente',tipoEmision:'Póliza Renovada'};
+ const successor={...original,id:'new',numero:'02-01-488-5659-1',vigenciaInicio:'2026-09-08',vigenciaFin:'2027-09-08',estado:'Vigente',tipoEmisionFuente:'Póliza Renovada'};
  function classify(rows){
   const store={all:k=>k==='polizas'?rows:[],get:()=>null,where:(k,test)=>rows.filter(test)};
   const orbit={pais:'GT',auth:{productUser:{uid:'qa'}},session:{rol:()=> 'Dirección'},store,modules:{},kit:{},q:{},ui:{daysFromNow:date}};
@@ -470,6 +470,7 @@ need(index.includes('refreshFlight')&&index.includes('inboxScope()')&&index.incl
   return orbit.renewalLifecycle.snapshot().assess(rows[0]);
  }
  const source=classify([original,successor]);
+ need(base.includes('q.tipoEmisionFuente||q.tipoEmision'),'B4_003_R21_CANONICAL_ISSUANCE_FIELD_READ_OWNER_MISSING');
  need(source.reason==='SUCESORA_DE_FUENTE_PENDIENTE_ENLACE'&&!source.bucketEligible&&source.sourceBackedSuccessorId==='new'&&!source.terminal,'B4_003_R21_SOURCE_SUCCESSOR_NOT_CAUSALLY_SEPARATED');
  const unproved=classify([original,{...successor,tipoEmision:'Póliza Nueva'}]);
  need(unproved.bucketEligible&&unproved.reviewOnly&&!unproved.terminal,'B4_003_R21_UNPROVEN_RENEWAL_WRONGLY_HIDDEN');

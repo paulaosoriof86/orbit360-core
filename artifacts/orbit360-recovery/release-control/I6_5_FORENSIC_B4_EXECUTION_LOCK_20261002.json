@@ -117,7 +117,7 @@
   "nextAction": "B4_003_R20_CONTRACT_AND_EXACT_PREVIEW",
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "blobSha": "9fcdeb60ca6af103031aa9c8eab161dcc11da047",
+    "blobSha": "30bbf3cf5fae138a5da9c3adf1a5c49fe508ac33",
     "status": "FROZEN_ACTIVE_UAT3_P0_BATCH_1_SOURCE_COMPLETE"
   },
   "findingLedger": {
@@ -1643,7 +1643,7 @@
     "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R21_BUSINESS_LINEAGE_ATTACHMENTS_INBOX_SOURCE_FIX_20261009.json",
     "blobSha": "ba6c57c5b703329eea92be8d04b8e5074e7aae50",
-    "compositionSha": "9fcdeb60ca6af103031aa9c8eab161dcc11da047",
+    "compositionSha": "30bbf3cf5fae138a5da9c3adf1a5c49fe508ac33",
     "lastMachinePass": {
       "sourceSha": "511e9009575b5a77fcb2f2bd2c3ac01227e7b622",
       "runId": 37950852293
@@ -1653,5 +1653,13 @@
     "sourceOwnerCount": 5,
     "previewArtifactNewRequired": true,
     "liveBlocked": true
+  },
+  "r21IssuanceSchemaFix": {
+    "status": "SOURCE_FIXED_EXACT_PREVIEW_REQUIRED",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R21_ISSUANCE_SCHEMA_FIELD_CAUSAL_CORRECTION_20261009.json",
+    "receiptBlobSha": "301fdc2c7fe182f49e98b2fc51eb8a6767e602aa",
+    "productBlobSha": "a3a582b3d72e036abd5fcf00e3e72b687c454fa3",
+    "qaContractBlobSha": "0f73c9f2b6b30e33b2720f093a20fbc7564db1cc",
+    "sourceChanged": true
   }
 }

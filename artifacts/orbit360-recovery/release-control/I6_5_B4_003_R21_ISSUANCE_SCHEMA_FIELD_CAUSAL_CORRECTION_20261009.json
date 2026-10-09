@@ -1,0 +1,28 @@
+{
+  "schema": "GRAVICENTRA_I65_B4_003_R21_SOURCE_SCHEMA_READBACK_FIX_V1",
+  "date": "2026-10-09",
+  "status": "SCHEMA_FIELD_CAUSAL_SOURCE_FIXED_EXACT_PREVIEW_PENDING",
+  "sourceAuthority": "tools/gravicentra-i6-4-diff-snapshot.mjs canonical policy read model",
+  "authorityField": "tipoEmisionFuente",
+  "fallbackField": "tipoEmision",
+  "issue": "R21 first candidate depended on tipoEmision while I6.4 canonical import stores tipoEmisionFuente; source-backed successor matching would fail for physical rows.",
+  "previousR21Source": "73fb1ba31a9cb41df60d32dd40a5cfc5c881b6f5",
+  "correctedR21Source": "a3a582b3d72e036abd5fcf00e3e72b687c454fa3",
+  "previousQAContract": "9b0c519940247caf002b385fbae566cc93d92a0e",
+  "correctedQAContract": "0f73c9f2b6b30e33b2720f093a20fbc7564db1cc",
+  "discriminant": {
+    "old": "02-01-488-5659-0",
+    "new": "02-01-488-5659-1",
+    "sourceIssuance": "Póliza Renovada",
+    "sourceField": "tipoEmisionFuente",
+    "result": "source-backed successor unlinked; excluded from expired commercial action but not persisted renewed",
+    "status": "PASS_STATIC_READ_MODEL"
+  },
+  "gate": "B4-003",
+  "newDataWrites": 0,
+  "prodWrites": 0,
+  "noReimport": true,
+  "sourceMutationRequiresNewPreview": true,
+  "previousMachinePass": "PRESERVED_PRIOR_ARTIFACT_ONLY",
+  "acceptancePending": true
+}
