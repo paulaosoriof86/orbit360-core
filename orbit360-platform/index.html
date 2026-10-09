@@ -116,7 +116,11 @@
       /* New and still-unread handoffs alone can determine a one-time landing.
          Previously ACKNOWLEDGED tasks must never force Ops/Leads on the next login. */
       function newHandoffForSurface(r,surface){
-        return !!(r&&surface&&!r.archived&&!r.globalResolved&&!r.acknowledged&&!r.read
+        // Synthetic Preview QA notices stay visible but cannot redirect an operational session.
+        const qaOnly=/--/.test(String(location.hostname||'')) &&
+          (/^b4003qa[_:-]/i.test(String(r&&r.entityId||'')) ||
+           /^B4-003 R\d+\b/i.test(String(r&&r.message||'')));
+        return !!(r&&surface&&!qaOnly&&!r.archived&&!r.globalResolved&&!r.acknowledged&&!r.read
           &&(r.targetSurface||(r.direction==='operations'?'ops':'leads'))===surface);
       }
       function maybePendingLanding(){

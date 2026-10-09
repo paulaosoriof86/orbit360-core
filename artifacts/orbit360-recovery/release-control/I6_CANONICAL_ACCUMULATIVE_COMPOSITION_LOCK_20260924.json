@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_V1",
   "status": "FROZEN_ACTIVE",
-  "date": "2026-10-08",
+  "date": "2026-10-09",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "purpose": "Make the single accumulative incremental candidate a physical machine-enforced authority rather than a rule distributed across block locks and guard status enums.",
@@ -172,7 +172,7 @@
     "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js": "60ce88178f48ff5d9b5fd01c1e2d92abe642dac1",
     "orbit360-platform/core/backend-product-readonly-bootstrap-p0.js": "1f1da3d54b32d94fe7d7111f318437a48bbf95cd",
     "orbit360-platform/core/backend-resource-contracts.js": "826364d2a394d0bfe75d9f0ccdc5dd8905d2b3f0",
-    "orbit360-platform/core/ciclo.js": "1d2d3c0b4e1ae1231b7b90c180f73079db79fab3",
+    "orbit360-platform/core/ciclo.js": "2f63c0aed8a8aa1ac4fa1e807b8a94671086e65f",
     "orbit360-platform/core/client-insurer-visual-contract-v20260720.js": "5025ee88abaed8be499d2bacf57796cc77a5736f",
     "orbit360-platform/core/cobros-reconciliation-domain-client.js": "7f00ced68ad64dd1ff4b9c0eff85f1f959dc6d68",
     "orbit360-platform/core/comisiones-eng.js": "f1aa5dfc3b8191944023b581abdcff27adf0dba3",
@@ -208,7 +208,7 @@
     "orbit360-platform/data/tenant-alianzas-soluciones-insurers-p10.js": "41d2e31a42dac73eb68af304d5f532897210d0ee",
     "orbit360-platform/data/tenant-config/alianzas-soluciones.aseguradoras-knowledge-summary-v20261003.js": "2000d9ea8ab67bdd37d8bf404a29a405fa6374dd",
     "orbit360-platform/data/tenant-public-branding-index.js": "dc543c463f5ecd8ea44e49156d6282113bd95db6",
-    "orbit360-platform/index.html": "34154d820d0432c05a91244fce5014d2800b5b97",
+    "orbit360-platform/index.html": "93d1501255d7caa53c52df4e800a17392e900415",
     "orbit360-platform/modules/academia.js": "d27aa080eac091057310aa7c952d3093677b50f0",
     "orbit360-platform/modules/aseguradoras-v1202-import-bridge.js": "db5f012abe505c2dd27d77a47d0694868bee5348",
     "orbit360-platform/modules/aseguradoras.js": "28bb3f15a1ca20130b194bb2dd5b1d296984927d",
@@ -226,7 +226,7 @@
     "orbit360-platform/modules/equipo-credential-admin-v20260805-bridge.js": "7432bc05938469187fdd120a5bc023c53a000ab9",
     "orbit360-platform/modules/equipo-onboarding-v20260804-bridge.js": "1da619d8abd676d31d69a038d4770463ca67fdc5",
     "orbit360-platform/modules/equipo.js": "b0736237ee18ef45abbae1c13f5c94781178344e",
-    "orbit360-platform/modules/inicio.js": "f1a33a848eef1d543703cb1715f6572c0fceeeeb",
+    "orbit360-platform/modules/inicio.js": "c0f861cac33bf60064e2c150f500d695de736b29",
     "orbit360-platform/modules/issuance-endosos-v1201-bridge.js": "43e14e5dc03a296b9fd461bec2ecc3052d6cbce0",
     "orbit360-platform/modules/leads.js": "4e12e604382f2731a03d29cf00db3c086d77ebc1",
     "orbit360-platform/modules/ops.js": "a4ca3dbb4613d541af411f12fce9773a072b0d41",
@@ -4537,5 +4537,16 @@
     "priorFailRun": 37974443056,
     "productFileBlobsUnchanged": true,
     "noDataWrites": true
+  },
+  "r22SourcePatch": {
+    "status": "SOURCE_PATCH_PENDING_EXACT_PREVIEW",
+    "sourceBlobs": {
+      "orbit360-platform/index.html": "93d1501255d7caa53c52df4e800a17392e900415",
+      "orbit360-platform/core/ciclo.js": "2f63c0aed8a8aa1ac4fa1e807b8a94671086e65f",
+      "orbit360-platform/modules/inicio.js": "c0f861cac33bf60064e2c150f500d695de736b29"
+    },
+    "rolePermissionsUnchanged": true,
+    "productionUnchanged": true,
+    "priorCertifiedMachineProofPreserved": true
   }
 }

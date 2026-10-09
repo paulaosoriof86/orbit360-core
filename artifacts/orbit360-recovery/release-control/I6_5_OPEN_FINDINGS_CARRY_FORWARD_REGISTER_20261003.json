@@ -3,8 +3,8 @@
   "recordedAt": "2026-10-09",
   "authority": "FAIL_CLOSED_FINDING_CONTINUITY",
   "sourceLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-  "sourceLedgerPreviousBlobSha": "b0d3af2b0d628c013ade239df053e1f8fcf8bbc9",
-  "expectedLedgerNextBlobSha": "bb2a59c1cb355800351693d73c67a7522f684401",
+  "sourceLedgerPreviousBlobSha": "0cdb33f6b47a62426c7ce5c1d10ecfc2d69b3b74",
+  "expectedLedgerNextBlobSha": "dc8a16fe440a0318ec7e03ab17f9cfaf878a46d1",
   "policy": {
     "allLedgerFindingsMustAppearExactlyOnce": true,
     "newHumanFindingsMustBeIndividualLedgerEntries": true,
@@ -9824,7 +9824,7 @@
       "id": "B4-003-R19-07-INICIO-MONTHLY-ADVISOR-READINESS-REGRESSION",
       "block": "B4",
       "targetGate": "B4-003",
-      "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
+      "status": "R22_SOURCE_PATCH_PENDING_EXACT_PREVIEW_AND_PAULA_UAT",
       "blocking": true,
       "surface": "Inicio",
       "finding": "Monthly target dials and advisor progress remain in 'Actualizando...' / empty state in R18 visual review.",
@@ -9855,7 +9855,7 @@
       "id": "B4-003-R19-08-OPS-ADVISOR-HANDOFF-NOTIFICATION-GAP",
       "block": "B4",
       "targetGate": "B4-003",
-      "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
+      "status": "R22_SOURCE_PATCH_PENDING_EXACT_PREVIEW_AND_PAULA_UAT",
       "blocking": true,
       "surface": "Ops/Leads collaboration",
       "finding": "Typed handoff events persist, but it is not proven how the receiving advisor/operational user is notified or sees required action.",
@@ -11233,7 +11233,7 @@
       ],
       "block": "B4",
       "targetGate": "B4-003",
-      "status": "R21_SOURCE_FIXED_EXACT_PREVIEW_AND_HUMAN_UAT_PENDING",
+      "status": "R22_SOURCE_PATCH_PENDING_EXACT_PREVIEW_AND_PAULA_UAT",
       "blocking": true,
       "rootCause": "PENDING_CAUSAL_DIAGNOSTIC",
       "remediation": "Diagnose effective runtime owner and correct within B4-003 without invalidating preserved PASS.",
@@ -12569,5 +12569,13 @@
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R21_BUSINESS_LINEAGE_ATTACHMENTS_INBOX_SOURCE_FIX_20261009.json",
     "receiptBlobSha": "ba6c57c5b703329eea92be8d04b8e5074e7aae50",
     "noNewFindingIds": true
+  },
+  "r22SourcePatch": {
+    "status": "SOURCE_ONLY_PENDING_AUTHENTICATED_PREVIEW",
+    "findingIds": [
+      "B4-003-R19-07-INICIO-MONTHLY-ADVISOR-READINESS-REGRESSION",
+      "B4-003-R20-V2-04-COLLAB-UX-COMMIT-SEMANTICS",
+      "B4-003-R19-08-OPS-ADVISOR-HANDOFF-NOTIFICATION-GAP"
+    ]
   }
 }

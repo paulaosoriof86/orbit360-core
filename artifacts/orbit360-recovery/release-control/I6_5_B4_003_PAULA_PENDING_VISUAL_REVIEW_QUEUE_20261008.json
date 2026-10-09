@@ -201,7 +201,7 @@
     "sourceBlobSha": "e6f2f8fc74be947effa0505881257adff77595df",
     "visualUatRequired": true
   },
-  "readyToInviteScope": "R21_EXACT_PREVIEW_REQUIRED_FIRST",
+  "readyToInviteScope": "R22_EXACT_PREVIEW_REQUIRED_FIRST",
   "r20ExactPreviewMachineProof": {
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_MACHINE_PROOF_37950852293_20261009.json",
     "receiptBlobSha": "d7972f44ce7f81587fe5d51cb6d0942e12ee7f6f",
@@ -229,5 +229,14 @@
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R21_OPERATIONAL_STORE_HYDRATION_FACADE_ROOTFIX_20261009.json",
     "receiptBlobSha": "1fe4ceb3372dfcd9295983d62d371c66989a5ada",
     "status": "SOURCE_FIXED_NEEDS_EXACT_PREVIEW"
+  },
+  "status": "R22_SOURCE_PATCH_PENDING_EXACT_PREVIEW",
+  "r22SourcePatch": {
+    "status": "EXACT_AUTHENTICATED_PREVIEW_PENDING",
+    "sourceBlobs": {
+      "orbit360-platform/index.html": "93d1501255d7caa53c52df4e800a17392e900415",
+      "orbit360-platform/core/ciclo.js": "2f63c0aed8a8aa1ac4fa1e807b8a94671086e65f",
+      "orbit360-platform/modules/inicio.js": "c0f861cac33bf60064e2c150f500d695de736b29"
+    }
   }
 }

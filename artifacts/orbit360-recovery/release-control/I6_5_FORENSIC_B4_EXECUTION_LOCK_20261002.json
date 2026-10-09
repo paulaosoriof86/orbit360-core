@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B4_EXECUTION_LOCK_V1",
   "recordedAt": "2026-10-08T21:43:35.454Z",
-  "status": "B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL",
+  "status": "B4_003_SOURCE_FIXED_R20_PENDING_CONTRACT_AND_EXACT_PREVIEW",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "block": "B4",
@@ -38,10 +38,10 @@
   "activeFinding": {
     "id": "B4-003",
     "title": "Cumulative B4-003 remediation: Renovaciones, Cancelaciones and source-backed insurer knowledge.",
-    "status": "B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL",
+    "status": "B4_003_SOURCE_FIXED_R20_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "blocking": true,
-    "nextAction": "B4_003_R20_TARGETED_PAULA_VISUAL",
-    "humanVisualStatus": "PENDING_R20_TARGETED_VISUAL",
+    "nextAction": "B4_003_R22_EXACT_PREVIEW",
+    "humanVisualStatus": "PENDING_R22_EXACT_PREVIEW",
     "knowledgePreview": true
   },
   "rules": {
@@ -83,11 +83,12 @@
       "orbit360-platform/core/ciclo.js",
       "orbit360-platform/modules/ops.js",
       "orbit360-platform/modules/leads.js",
-      "orbit360-platform/data/store-firestore-product-operational-p0.js"
+      "orbit360-platform/data/store-firestore-product-operational-p0.js",
+      "orbit360-platform/modules/inicio.js"
     ],
     "reimportAuthorized": false,
     "livePromotionAuthorized": false,
-    "syntheticQaWritesAuthorized": false,
+    "syntheticQaWritesAuthorized": true,
     "syntheticQaScope": "R20 exact Preview only: disposable insurer/logo/product/plan/requirement/document and Ops/Leads handoff/cadence fixtures; mandatory server commit, readback, reload and cleanup; no real operational row mutation.",
     "paulaVisualAcceptanceRequiredBeforeAdvance": true,
     "cotcompRealTransportAuthorized": false,
@@ -115,15 +116,15 @@
     "renewalCutoffDataMutationAuthorized": false,
     "realOperationalWritesAuthorized": false
   },
-  "nextAction": "B4_003_R20_TARGETED_PAULA_VISUAL",
+  "nextAction": "B4_003_R22_EXACT_PREVIEW",
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "blobSha": "d793d1a4c00993258b187ad3f6dfa18dbce889c9",
+    "blobSha": "15e910b579130d1a7cd59184b918c0c09745f3c0",
     "status": "FROZEN_ACTIVE_UAT3_P0_BATCH_1_SOURCE_COMPLETE"
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "blobSha": "0cdb33f6b47a62426c7ce5c1d10ecfc2d69b3b74",
+    "blobSha": "dc8a16fe440a0318ec7e03ab17f9cfaf878a46d1",
     "count": 282
   },
   "sourceFix": {
@@ -139,7 +140,8 @@
     "receiptBlobSha": "65c5376b8e43e5ecec7bf0217acccbc1fc458ac9"
   },
   "nextRequiredProof": [
-    "B4_003_R20_TARGETED_PAULA_VISUAL_PASS"
+    "B4_003_R22_EXACT_AUTHENTICATED_PREVIEW",
+    "B4_003_R22_TARGETED_PAULA_VISUAL_PASS"
   ],
   "candidate": {
     "sourceSha": "babea00bf459dfcde611e35ea9413f70f901d043",
@@ -414,7 +416,7 @@
   },
   "continuityRegister": {
     "path": "artifacts/orbit360-recovery/release-control/I6_5_OPEN_FINDINGS_CARRY_FORWARD_REGISTER_20261003.json",
-    "blobSha": "09ce2e70f3b4648bdbc6904e73c1f4fc76ca9afc",
+    "blobSha": "74627cd00acb0c9c6d44e338f797ce9355d5272a",
     "inventoryCount": 282,
     "attentionCount": 155,
     "guardPath": "tools/gravicentra-open-findings-continuity-guard-v1.mjs",
@@ -1739,5 +1741,18 @@
     "livePromotion": false,
     "humanVisualAcceptance": "PENDING",
     "priorCertifiedProofPreserved": true
+  },
+  "r22FocusedSourceFix": {
+    "status": "SOURCE_FIXED_EXACT_PREVIEW_REQUIRED",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R22_TARGETED_CAUSAL_SOURCE_PATCH_20261009.json",
+    "blobSha": "386d6cd23d31738a6e690512726936815343ccd9",
+    "sourceBlobs": {
+      "orbit360-platform/index.html": "93d1501255d7caa53c52df4e800a17392e900415",
+      "orbit360-platform/core/ciclo.js": "2f63c0aed8a8aa1ac4fa1e807b8a94671086e65f",
+      "orbit360-platform/modules/inicio.js": "c0f861cac33bf60064e2c150f500d695de736b29"
+    },
+    "oldArtifactPreserved": true,
+    "realBusinessWrites": 0,
+    "liveTouched": false
   }
 }

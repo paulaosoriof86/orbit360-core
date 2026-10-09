@@ -292,14 +292,23 @@ Orbit.ciclo = (function () {
   /* ===================== tarjetas ===================== */
   function collaborationState(n,board){
     const comments=[].concat(n&&n.comentarios||[]),last=comments.length?comments[comments.length-1]:null,direction=last&&last.direction||'';
-    const noticeId=String(last&&last.eventId||''),state=noticeId&&Orbit.sharedInboxState?.lookup?Orbit.sharedInboxState.lookup(noticeId):null;
-    /* El reconocimiento es personal; solo una resolución compartida confirmada
-       puede retirar la etiqueta Acción requerida en Ops/Leads. */
-    const sharedResolved=!!(state&&state.known===true&&state.globalResolved===true);
-    const needsAction=!sharedResolved&&((board==='ops'&&direction==='operations')||(board==='leads'&&direction==='advisor'));
-    return{last,direction,needsAction,sharedResolved,noticeKnown:!!(state&&state.known),ts:String(last&&last.ts||n&&n.actualizado||n&&n.creado||'')};
+    const needed=board==='ops'?'operations':board==='leads'?'advisor':'';
+    const directed=needed?comments.filter(c=>c&&c.direction===needed):[];
+    const lookup=Orbit.sharedInboxState&&Orbit.sharedInboxState.lookup;
+    const states=directed.map(c=>{
+      const id=String(c.eventId||'').trim();
+      const state=id&&typeof lookup==='function'?lookup(id):null;
+      return {known:!!(state&&state.known===true),resolved:!!(state&&state.known===true&&state.globalResolved===true)};
+    });
+    // Personal acknowledgment and archiving do not resolve shared tasks.
+    // Clear the action badge only after all directed events resolve on the server.
+    const needsAction=states.some(x=>!x.resolved);
+    const sharedResolved=states.length>0&&!needsAction;
+    const noticeKnown=states.length>0&&states.every(x=>x.known);
+    const lastDirected=directed.length?directed[directed.length-1]:last;
+    return{last,direction,needsAction,sharedResolved,noticeKnown,ts:String(lastDirected&&lastDirected.ts||n&&n.actualizado||n&&n.creado||'')};
   }
-  function actionQueueRanks(board){
+    function actionQueueRanks(board){
     const rows=negocios({surface:board}).map(n=>({n,state:collaborationState(n,board)})).filter(x=>x.state.needsAction);
     rows.sort((a,b)=>String(a.state.ts||'').localeCompare(String(b.state.ts||''))||String(a.n.id||'').localeCompare(String(b.n.id||'')));
     const out={};rows.forEach((x,i)=>{out[x.n.id]=i+1;});return out;

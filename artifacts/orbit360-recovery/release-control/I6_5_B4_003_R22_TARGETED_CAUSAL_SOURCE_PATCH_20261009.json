@@ -1,0 +1,42 @@
+{
+  "schema": "GRAVICENTRA_B4_003_R22_TARGETED_CAUSAL_PATCH_V1",
+  "recordedAt": "2026-10-09",
+  "repo": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "parentHead": "e930fdfd777013d7142afcf917339045f61ee68f",
+  "gate": "I6.5/B4-003",
+  "authorization": "PAULA_CONTINUE_B4_003_BLOCKING_P0_EXISTING_GATE_NO_PRODUCTION_NO_DATA",
+  "sourceBlobs": {
+    "orbit360-platform/index.html": "93d1501255d7caa53c52df4e800a17392e900415",
+    "orbit360-platform/core/ciclo.js": "2f63c0aed8a8aa1ac4fa1e807b8a94671086e65f",
+    "orbit360-platform/modules/inicio.js": "c0f861cac33bf60064e2c150f500d695de736b29"
+  },
+  "causes": [
+    "QA synthetic inbox can automatically route operator away from active review",
+    "Ops action badge previously checked only last comment rather than all relevant directed tasks",
+    "Dashboard advisor production depended on optional metas collection"
+  ],
+  "test": {
+    "syntax": "STATIC_JS_PASS",
+    "exactPreview": "PENDING",
+    "humanAcceptance": "PENDING",
+    "serverReadScope": "PENDING_AUTHENTICATED_CHECK"
+  },
+  "affectedFindingIds": [
+    "B4-003-R19-07-INICIO-MONTHLY-ADVISOR-READINESS-REGRESSION",
+    "B4-003-R20-V2-04-COLLAB-UX-COMMIT-SEMANTICS",
+    "B4-003-R19-08-OPS-ADVISOR-HANDOFF-NOTIFICATION-GAP"
+  ],
+  "unaffectedPassPreserved": true,
+  "oldArtifactId": 11641957470,
+  "oldArtifactSha": "9c7d79f21f9cbdd76e84b37981a273ddff31f5f6b293d2504c12ed55156c3502",
+  "newArtifactRequired": true,
+  "realBusinessWrites": 0,
+  "reimport": false,
+  "livePromotion": false,
+  "knownOpen": [
+    "Potential legacy or absent server metas/asesores grants; no access widened",
+    "Preview QA semantic duplicates not deleted without ID-backed proof",
+    "Renewal physical edition lineage and LIVE lineage not accepted"
+  ]
+}

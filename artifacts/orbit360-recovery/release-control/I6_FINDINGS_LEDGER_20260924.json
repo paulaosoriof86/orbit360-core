@@ -9849,7 +9849,7 @@
       "id": "B4-003-R19-07-INICIO-MONTHLY-ADVISOR-READINESS-REGRESSION",
       "block": "B4",
       "targetGate": "B4-003",
-      "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
+      "status": "R22_SOURCE_PATCH_PENDING_EXACT_PREVIEW_AND_PAULA_UAT",
       "blocking": true,
       "surface": "Inicio",
       "finding": "Monthly target dials and advisor progress remain in 'Actualizando...' / empty state in R18 visual review.",
@@ -9880,7 +9880,7 @@
       "id": "B4-003-R19-08-OPS-ADVISOR-HANDOFF-NOTIFICATION-GAP",
       "block": "B4",
       "targetGate": "B4-003",
-      "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
+      "status": "R22_SOURCE_PATCH_PENDING_EXACT_PREVIEW_AND_PAULA_UAT",
       "blocking": true,
       "surface": "Ops/Leads collaboration",
       "finding": "Typed handoff events persist, but it is not proven how the receiving advisor/operational user is notified or sees required action.",
@@ -11258,7 +11258,7 @@
       ],
       "block": "B4",
       "targetGate": "B4-003",
-      "status": "R21_SOURCE_FIXED_EXACT_PREVIEW_AND_HUMAN_UAT_PENDING",
+      "status": "R22_SOURCE_PATCH_PENDING_EXACT_PREVIEW_AND_PAULA_UAT",
       "blocking": true,
       "rootCause": "PENDING_CAUSAL_DIAGNOSTIC",
       "remediation": "Diagnose effective runtime owner and correct within B4-003 without invalidating preserved PASS.",
@@ -12489,5 +12489,14 @@
     },
     "all282FindingIdsPreserved": true,
     "previousHumanReviewNotAutoAccepted": true
+  },
+  "r22SourcePatch": {
+    "status": "SOURCE_ONLY_PENDING_AUTHENTICATED_PREVIEW",
+    "findingIds": [
+      "B4-003-R19-07-INICIO-MONTHLY-ADVISOR-READINESS-REGRESSION",
+      "B4-003-R20-V2-04-COLLAB-UX-COMMIT-SEMANTICS",
+      "B4-003-R19-08-OPS-ADVISOR-HANDOFF-NOTIFICATION-GAP"
+    ],
+    "allOtherFindingsPreserved": true
   }
 }
