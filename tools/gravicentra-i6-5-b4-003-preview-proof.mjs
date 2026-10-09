@@ -1,4 +1,5 @@
 import fs from 'node:fs';
+import { createHash } from 'node:crypto';
 import { chromium } from 'playwright';
 import { initializeApp, applicationDefault, getApps } from 'firebase-admin/app';
 import { getFirestore, FieldValue, Timestamp } from 'firebase-admin/firestore';
@@ -10,6 +11,7 @@ const target=String(process.env.B4_PREVIEW_URL||'').replace(/\/$/,'');
 const outPath=process.env.B4_003_PROOF_OUT||'/tmp/b4-003-preview-proof.json';
 const run=String(process.env.GITHUB_RUN_ID||Date.now());
 const need=(v,c)=>{if(!v)throw new Error(c);};
+const hash=value=>createHash('sha256').update(JSON.stringify(value)).digest('hex');
 const clean=v=>String(v==null?'':v).trim();
 const norm=v=>clean(v).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_+|_+$/g,'');
 need(target,'B4_003_PREVIEW_URL_MISSING');
@@ -318,7 +320,7 @@ async function renewalDistributionReadback(){
     of a materialized renewal; historical unresolved remains for review. */
  const pipelineEligible=(p,d)=>{
   if(state(p)==='NO'||d==null||d>90)return false;
-  const past=d<0,ps=norm(p.estado),rs=norm(p.renovacionEstado);
+  const past=d<0,ps=norm(p.estado).replace(/_/g,''),rs=norm(p.renovacionEstado).replace(/_/g,'');
   if(['cancelada','anulada','cancelado','anulado'].includes(ps)||rs==='cancelada')return false;
   const same=(byFamily.get(familyKey(p))||[]).filter(q=>q.id!==p.id&&later(p,q));
   const from=p.renovadaPor?byId.get(String(p.renovadaPor)):null,back=(byReverse.get(String(p.id))||[]).filter(q=>q.id!==p.id);

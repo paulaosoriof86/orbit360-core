@@ -461,6 +461,22 @@ need(index.includes('class="inbox-toolbar" style="flex-wrap:wrap')&&index.includ
  need(snap.assess(records[0]).actionable===true,'B4_003_R20_POLICY_COUNTRY_FALLBACK_LOST');
  need(clientGets<=5,'B4_003_R20_POLICY_COUNTRY_EXTRA_CLIENT_READ_AMPLIFICATION:'+clientGets);
 }
+/* Independent renewals QA is itself regression tested against meaningful statuses.
+   This prevents false PASS/FAIL caused by "No renovada" and "Por renovar" spacing. */
+{
+ const start=previewProof.indexOf(' const normIdentity=v=>'),end=previewProof.indexOf(' const byState={',start);
+ need(start>=0&&end>start,'B4_003_RENEWAL_QA_CLASSIFIER_UNAVAILABLE');
+ const rows=[
+  {id:'terminal',numero:'X',clienteId:'c1',aseguradoraId:'a',pais:'GT',ramo:'VIDA',estado:'Vigente',renovable:true,renovacionEstado:'No renovada',vigenciaInicio:'2025-01-01',vigenciaFin:'2026-09-01'},
+  {id:'dueSoon',numero:'Y',clienteId:'c2',aseguradoraId:'a',pais:'GT',ramo:'VIDA',estado:'Por renovar',renovable:true,vigenciaInicio:'2025-11-01',vigenciaFin:'2026-10-20'},
+  {id:'expired',numero:'Z',clienteId:'c3',aseguradoraId:'a',pais:'GT',ramo:'AUTO',estado:'Vigente',renovable:true,vigenciaInicio:'2025-10-06',vigenciaFin:'2026-10-06'}
+ ];
+ const ctx={rows,clientById:new Map(),clean:v=>String(v==null?'':v).trim(),norm:v=>String(v==null?'':v).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_+|_+$/g,''),state:()=>'YES'};
+ const computed=vm.runInNewContext(previewProof.slice(start,end)+";[pipelineEligible(rows[0],-20),pipelineEligible(rows[1],11),pipelineEligible(rows[2],-3)]",ctx,{timeout:1500});
+ need(computed[0]===false&&computed[1]===true&&computed[2]===true,'B4_003_RENEWAL_QA_DISCRIMINANT_FAILED');
+ need(previewProof.includes("const hash=value=>createHash('sha256')"),'B4_003_RENEWAL_QA_DIAGNOSTIC_HASH_UNBOUND');
+}
+
 need(lock.boundaries?.businessWritesAuthorized===false&&lock.boundaries?.dataMutationAuthorized===false&&lock.boundaries?.reimportAuthorized===false&&lock.boundaries?.livePromotionAuthorized===false,'B4_003_BOUNDARY_INVALID');
 need(lock.boundaries?.syntheticQaWritesAuthorized===true,'B4_003_SYNTHETIC_QA_NOT_AUTHORIZED');
 

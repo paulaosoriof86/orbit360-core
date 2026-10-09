@@ -1,0 +1,38 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R20_PREVIEW_PARITY_HARNESS_ROOTFIX_V1",
+  "date": "2026-10-09",
+  "gate": "I6.5/B4-003",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "baselineHead": "18fa8f61b4f71202f90b0c3ecaa01adf483cd2ca",
+  "previousFailedRunId": 37938353157,
+  "demonstratedRootCauses": [
+    "QA tried to call hash(expectedOnly) at renewal mismatch reconciliation without ever defining hash (ReferenceError).",
+    "Independent QA norm returned underscores in 'No renovada'/'Por renovar' and the old comparator expected compact tokens, overcounting closed policies and missing current due ones."
+  ],
+  "fixes": [
+    "Define deterministic SHA-256 diagnostic digest for ID differences.",
+    "Normalize independent state and renewal outcome tokens compactly, consistent with business status semantics.",
+    "Add executable negative and positive regression fixtures to the existing B4-003 contract; do not waive mismatch and retain physical policy ID parity comparison."
+  ],
+  "test": {
+    "syntax": "PASS_V8",
+    "noRenovadaShouldExclude": true,
+    "porRenovarShouldInclude": true,
+    "previousPerformanceChromeMs": {
+      "open": 83,
+      "search": 284,
+      "detail": 190
+    }
+  },
+  "scope": {
+    "qaOnly": true,
+    "productSourceChanged": false,
+    "controlPlaneUntouched": true,
+    "firestoreWrites": 0,
+    "reimports": 0,
+    "liveDeploy": false,
+    "previousHumanRejectionRetained": true
+  },
+  "nextAction": "EXACT_PREVIEW_R20_REPEAT_WITH_CORRECTED_INDEPENDENT_VALIDATOR"
+}
