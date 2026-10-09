@@ -1437,8 +1437,36 @@ try{
  await page.waitForFunction(name=>Array.from(document.querySelectorAll('#asg-ficha [data-drive-file]')).some(x=>String(x.innerText||'').includes(name)),driveFileName,{timeout:15000});
  proof.r20SecondDriveBrowser=await page.evaluate(name=>{const panel=document.querySelector('#asg-ficha [data-drive-browser="1"]'),file=Array.from(panel?.querySelectorAll('[data-drive-file]')||[]).find(x=>String(x.innerText||'').includes(name)),path=String(panel?.querySelector('[data-drive-path]')?.innerText||'');return{panel:!!panel,filePresent:!!file,path,rootButton:!!panel?.querySelector('[data-drive-root]')};},driveFileName);
  need(proof.r20SecondDriveBrowser.panel&&proof.r20SecondDriveBrowser.filePresent&&proof.r20SecondDriveBrowser.rootButton,'B4_003_R20_SECOND_REVIEW_INSURER_DRIVE_BROWSER_UI_MISSING:'+JSON.stringify(proof.r20SecondDriveBrowser));
- await page.evaluate(name=>Array.from(document.querySelectorAll('#asg-ficha [data-drive-file]')).find(x=>String(x.innerText||'').includes(name))?.click(),driveFileName);
- await page.waitForFunction(()=>{const p=document.querySelector('#asg-ficha [data-drive-preview]');return !!p&&!p.hidden&&String(p.innerText||'').length>0;},null,{timeout:15000});
+ // R20 UAT4: discriminate a missing click handler from an unavailable Drive read.
+ // The same protected synthetic dossier remains authoritative; do not fake a preview.
+ const dossierHttpTrace=[];
+ const observeDossierHttp=async response=>{
+   if(!/orbit360DocumentDriveReadDossierPreview/.test(response.url()))return;
+   const entry={status:response.status(),urlSuffix:'orbit360DocumentDriveReadDossierPreview'};
+   try{if(response.status()!==200)entry.error=String((await response.text())||'').slice(0,380);}catch(_e){}
+   dossierHttpTrace.push(entry);
+ };
+ page.on('response',observeDossierHttp);
+ const clickAttempt=await page.evaluate(name=>{
+   const file=Array.from(document.querySelectorAll('#asg-ficha [data-drive-file]')).find(x=>String(x.innerText||'').includes(name));
+   if(!file)return{found:false};
+   const ref=String(file.getAttribute('data-drive-file')||'');
+   file.click();return{found:true,referenceValid:/^[A-Za-z0-9_-]{20,}$/.test(ref),disabledAfterClick:file.disabled};
+ },driveFileName);
+ need(clickAttempt.found&&clickAttempt.referenceValid,'B4_003_R20_INSURER_DRIVE_FILE_CLICK_TARGET_INVALID:'+JSON.stringify(clickAttempt));
+ try{
+   await page.waitForFunction(()=>{const p=document.querySelector('#asg-ficha [data-drive-preview]');return !!p&&!p.hidden&&String(p.innerText||'').length>0;},null,{timeout:15000});
+ }catch(error){
+   const state=await page.evaluate(name=>{
+     const p=document.querySelector('#asg-ficha [data-drive-preview]'),btn=Array.from(document.querySelectorAll('#asg-ficha [data-drive-file]')).find(x=>String(x.innerText||'').includes(name));
+     const toasts=Array.from(document.querySelectorAll('.ciclo-toast,[role="alert"]')).map(el=>String(el.textContent||'').trim().slice(0,160)).filter(Boolean);
+     return{buttonPresent:!!btn,buttonDisabled:!!btn?.disabled,previewPresent:!!p,previewHidden:p?.hidden,previewTextLength:String(p?.innerText||'').length,toastMessages:toasts.slice(-3)};
+   },driveFileName);
+   proof.r20SecondDriveBrowserOpenDiagnostic={state,dossierHttpTrace,clickAttempt,errorName:String(error?.name||'TimeoutError')};
+   console.log('B4_003_DRIVE_BROWSER_OPEN_CAUSAL_DIAGNOSTIC='+JSON.stringify(proof.r20SecondDriveBrowserOpenDiagnostic));
+   throw new Error('B4_003_DRIVE_BROWSER_OPEN_NOT_CONFIRMED:'+JSON.stringify(proof.r20SecondDriveBrowserOpenDiagnostic));
+ }finally{page.off('response',observeDossierHttp);}
+
  proof.r20SecondDrivePreview=await page.evaluate(()=>{const p=document.querySelector('#asg-ficha [data-drive-preview]');return{visible:!!p&&!p.hidden,text:String(p?.innerText||'').replace(/\s+/g,' ').trim().slice(0,800),iframe:!!p?.querySelector('iframe'),image:!!p?.querySelector('img'),download:!!p?.querySelector('[data-dossier-download]')};});
  need(proof.r20SecondDrivePreview.visible&&(proof.r20SecondDrivePreview.iframe||proof.r20SecondDrivePreview.image||proof.r20SecondDrivePreview.download),'B4_003_R20_SECOND_REVIEW_INSURER_DRIVE_PREVIEW_FAILED:'+JSON.stringify(proof.r20SecondDrivePreview));
  proof.assertions.insurerDriveBrowserVisible=true;proof.assertions.insurerDriveBrowserFileOpen=true;
