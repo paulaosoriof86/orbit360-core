@@ -1,25 +1,25 @@
 {
   "schema": "GRAVICENTRA_I6_5_B4_003_PREVIEW_PROOF_R19_V1",
   "status": "FAIL",
-  "target": "https://ays-orbit-360-lab--gi-i65-b4-37948198617-6sv2h5u7.web.app",
+  "target": "https://ays-orbit-360-lab--gi-i65-b4-37949671159-hubmxmj1.web.app",
   "ids": {
-    "client": "b4003qa_client_37948198617",
-    "renewalPolicy": "b4003qa_policy_renew_37948198617",
-    "expiredRenewPolicy": "b4003qa_policy_expired_renew_37948198617",
-    "unknownRenewPolicy": "b4003qa_policy_unknown_37948198617",
-    "renewabilityWritePolicy": "b4003qa_policy_renewwrite_37948198617",
-    "cancelPolicy": "b4003qa_policy_cancel_37948198617",
-    "healthPolicy": "b4003qa_policy_health_37948198617",
-    "healthReceipt1": "b4003qa_receipt_health_1_37948198617",
-    "healthReceipt2": "b4003qa_receipt_health_2_37948198617",
-    "healthReceiptShadow": "b4003qa_receipt_health_shadow_37948198617",
-    "cancelation": "b4003qa_cancel_37948198617",
-    "insurer": "b4003qa_insurer_37948198617",
-    "collabBusiness": "b4003qa_business_collab_37948198617",
-    "collabNoClientBusiness": "b4003qa_business_collab_noclient_37948198617",
-    "renewActivity": "act_ren_b4003qa_policy_renew_37948198617_20261009",
-    "cancelActivity": "act_rec_b4003qa_cancel_37948198617",
-    "recoveryBusiness": "neg_rec_b4003qa_cancel_37948198617"
+    "client": "b4003qa_client_37949671159",
+    "renewalPolicy": "b4003qa_policy_renew_37949671159",
+    "expiredRenewPolicy": "b4003qa_policy_expired_renew_37949671159",
+    "unknownRenewPolicy": "b4003qa_policy_unknown_37949671159",
+    "renewabilityWritePolicy": "b4003qa_policy_renewwrite_37949671159",
+    "cancelPolicy": "b4003qa_policy_cancel_37949671159",
+    "healthPolicy": "b4003qa_policy_health_37949671159",
+    "healthReceipt1": "b4003qa_receipt_health_1_37949671159",
+    "healthReceipt2": "b4003qa_receipt_health_2_37949671159",
+    "healthReceiptShadow": "b4003qa_receipt_health_shadow_37949671159",
+    "cancelation": "b4003qa_cancel_37949671159",
+    "insurer": "b4003qa_insurer_37949671159",
+    "collabBusiness": "b4003qa_business_collab_37949671159",
+    "collabNoClientBusiness": "b4003qa_business_collab_noclient_37949671159",
+    "renewActivity": "act_ren_b4003qa_policy_renew_37949671159_20261009",
+    "cancelActivity": "act_rec_b4003qa_cancel_37949671159",
+    "recoveryBusiness": "neg_rec_b4003qa_cancel_37949671159"
   },
   "assertions": {
     "handoffActorsDistinct": true,
@@ -84,10 +84,52 @@
     "commercialRamoProductPlanDependent": true,
     "commercialMobileResponsive": true,
     "managementTypeDrivesQueue": true,
+    "renewalSearchKanbanPositiveNegativeClear": true,
+    "renewalExpiredKpiSemanticsHuman": true,
+    "renewalDate45UniverseReconciled": true,
+    "renewabilityReviewWorkflowActionable": true,
+    "renewabilityReviewOpensFocusedTriState": true,
+    "renewabilitySyntheticServerCommitReload": true,
+    "client360BidirectionalTabs": true,
+    "policyRouteUnder2500ms": true,
+    "policySearchUnder2500ms": true,
+    "policyDetailUnder2500ms": true,
+    "policyEditionAwareValidation": true,
+    "previewRealPolicyProtectedHumanMessage": true,
+    "policyMobileSearchVisible": true,
+    "policyMobileSearchTypedQuery": true,
+    "inicioPolizasRenewalKpiParity": true,
+    "inicioReadinessTerminal": true,
+    "policyRefreshCoherentHydration": true,
+    "noDelayedRenewalRenderMutation": true,
+    "renewalInsurerDirectoryOptionalNonblocking": true,
+    "renewalFirstPaintReadiness": true,
+    "expiredRenewalOutcomeContinuity": true,
+    "unknownRenewabilityDebtVisibleFailClosed": true,
+    "client360AuthoritativeList": true,
+    "qualityCanonicalGrammar": true,
+    "qualityCompletenessExplicit": true,
+    "assignableAdvisorRosterRoleParity": true,
+    "assignableAdvisorRosterMinimalProjection": true,
+    "assignableAdvisorRosterDeduplicated": true,
+    "realRenewalPipelineRepopulated": true,
+    "realRenewalPipelineMatchesCanonicalEligibility": true,
+    "renewalCampaignDurableReadback": true,
+    "cancelReasonDurableNoRecoverySideEffect": true,
+    "cancelWhatsAppDraftIndividualAndSelected": true,
+    "cancelWhatsAppNoAutomaticDelivery": true,
+    "cancelationDurableReadback": true,
+    "recoveryLinkagePreserved": true,
+    "recoveryIdempotentRetry": true,
+    "collaborationUiAttachmentDurable": true,
+    "businessCardOpenUnder2500ms": true,
+    "collaborationVisualHierarchy": true,
+    "currentActionQueueRank": true,
+    "actionRequiredSolidVisual": true,
     "cleanupComplete": true
   },
   "syntheticWrites": 14,
-  "cleanupWrites": 14,
+  "cleanupWrites": 37,
   "pageErrors": [],
   "consoleErrors": [
     "Failed to load resource: the server responded with a status of 403 ()",
@@ -372,7 +414,7 @@
       "visible": true,
       "sampleNumber": "91-59247519",
       "emptyState": false,
-      "textSample": "✕ Cancelaciones · Fuga de cartera MOTIVOS·VALOR PERDIDO·TASA DE FUGA CANCELADAS 490 histórico VALOR PERDIDO GTQ 1,842,217 USD 91,823,506 COP 26,564,526 prima anual · por moneda MOTIVO PRINCIPAL Prueba sintética B4-003 más frecuente CANCELADAS / CARTERA 34% histórico acumulado · no es churn temporal Motivos documentados de cancelación 489 registros sin causa documentada; no se inventa el histórico ni se cuenta como causa. Prueba sintética B4-003 1 · 0% Motivo documentado Prueba sintética B4-003 Asesor Braulio Hernández Carlos Castro Fernando Arias Johanna Salgado Nicole Castro Paula Osorio Samuel Daza 490 de 490 Seleccionar visibles 0 seleccionadas Limpiar Preparar WhatsApp (0) SEL. FECHA CLIENTE PÓLIZA RAMO MOTIVO VALOR PERDIDO ACCIÓN 09 oct 2026 BQ B4-003 QA Cliente Persona · GT B4-003-CAN-37948198617 Auto Prueba sintética B4-003 Q 700 Ver cancelación 16 sept 2026 ML MARÍA LUISA LARIOS CALDERÓN natural · GT 223092797 VEHICULOS Motivo histórico no disponible Q 2,436 Ver cancelación 14 sept 2026 SK SEON KEUN KIM natural · GT 225121245 VEHICULOS Motivo histórico no disponible Q 6,250 Ver cancelación 07 sept 2026 JI JHEFRI ISAAC RAMIREZ AGUSTÍN natural · GT AUTO-514726 VEHICULOS Motiv"
+      "textSample": "✕ Cancelaciones · Fuga de cartera MOTIVOS·VALOR PERDIDO·TASA DE FUGA CANCELADAS 490 histórico VALOR PERDIDO GTQ 1,842,217 USD 91,823,506 COP 26,564,526 prima anual · por moneda MOTIVO PRINCIPAL Prueba sintética B4-003 más frecuente CANCELADAS / CARTERA 34% histórico acumulado · no es churn temporal Motivos documentados de cancelación 489 registros sin causa documentada; no se inventa el histórico ni se cuenta como causa. Prueba sintética B4-003 1 · 0% Motivo documentado Prueba sintética B4-003 Asesor Braulio Hernández Carlos Castro Fernando Arias Johanna Salgado Nicole Castro Paula Osorio Samuel Daza 490 de 490 Seleccionar visibles 0 seleccionadas Limpiar Preparar WhatsApp (0) SEL. FECHA CLIENTE PÓLIZA RAMO MOTIVO VALOR PERDIDO ACCIÓN 09 oct 2026 BQ B4-003 QA Cliente Persona · GT B4-003-CAN-37949671159 Auto Prueba sintética B4-003 Q 700 Ver cancelación 16 sept 2026 ML MARÍA LUISA LARIOS CALDERÓN natural · GT 223092797 VEHICULOS Motivo histórico no disponible Q 2,436 Ver cancelación 14 sept 2026 SK SEON KEUN KIM natural · GT 225121245 VEHICULOS Motivo histórico no disponible Q 6,250 Ver cancelación 07 sept 2026 JI JHEFRI ISAAC RAMIREZ AGUSTÍN natural · GT AUTO-514726 VEHICULOS Motiv"
     }
   },
   "actor": {
@@ -925,9 +967,6 @@
     "cancelSnapshotError": "",
     "cancelAttached": true,
     "optionalMissing": [
-      "asesores",
-      "recibosAseguradora",
-      "conciliacionesPrimas",
       "conciliaciones",
       "metas",
       "reclamos",
@@ -1526,8 +1565,8 @@
       "CO",
       "CO"
     ],
-    "cancelGtMs": 103.40000000002328,
-    "cancelCoMs": 46.70000000001164,
+    "cancelGtMs": 93.30000000001746,
+    "cancelCoMs": 42.10000000000582,
     "cancelExplicitTargetsGT": true,
     "cancelExplicitTargetsCO": true,
     "cancelCrossCountryExplicitGT": true,
@@ -1809,7 +1848,7 @@
     "cancelKpiDetailOpen": true
   },
   "r11Browser": {
-    "clientHref": "#/cliente360?c=b4003qa_client_37948198617&t=polizas",
+    "clientHref": "#/cliente360?c=b4003qa_client_37949671159&t=polizas",
     "policyTargetPresent": true,
     "explicitCancelTargetPresent": true,
     "rowMisleadingClickable": false,
@@ -1885,8 +1924,8 @@
       "CO",
       "CO"
     ],
-    "qualityGtMs": 215,
-    "qualityCoMs": 109.60000000003492,
+    "qualityGtMs": 190.39999999999418,
+    "qualityCoMs": 107.29999999998836,
     "qualityGtRows": 50,
     "qualityCoRows": 17,
     "financialGtRows": 72,
@@ -1896,10 +1935,10 @@
   },
   "r1604ConfigFirstPaint": {
     "state": "loading",
-    "syncPaintMs": 1.099999999976717,
+    "syncPaintMs": 1.1000000000058208,
     "hasVisibleState": true,
     "text": "Confirmando catálogos canónicos… La plataforma está leyendo la configuración protegida del tenant. No se usan valores locales como autoridad.",
-    "canonicalReadyMs": 807,
+    "canonicalReadyMs": 791,
     "finalState": "ready"
   },
   "r16CatalogAndQuality": {
@@ -1934,7 +1973,7 @@
       "reason": "Se excluyeron 1 registro(s) histórico(s) duplicado(s); el calendario activo aún supera la prima contractual."
     },
     "rowVisible": true,
-    "rowText": "B4-003-HEALTH-379481986172 recibo(s) vigente(s) · 1 legado(s) excluido(s) BQ B4-003 QA Cliente Persona · GuatemalaQ 407.01Póliza · prima totalProgramación según cuotas de la póliza0 fila(s) requieren revisiónQ 542.68Q 135.67Q 0.02Se excluyeron 1 registro(s) histórico(s) duplicado(s); el calendario activo aún supera la prima contractual.Revisar diferenciaVer recibos",
+    "rowText": "B4-003-HEALTH-379496711592 recibo(s) vigente(s) · 1 legado(s) excluido(s) BQ B4-003 QA Cliente Persona · GuatemalaQ 407.01Póliza · prima totalProgramación según cuotas de la póliza0 fila(s) requieren revisiónQ 542.68Q 135.67Q 0.02Se excluyeron 1 registro(s) histórico(s) duplicado(s); el calendario activo aún supera la prima contractual.Revisar diferenciaVer recibos",
     "technicalToken": false,
     "exactAction": true,
     "mobileContract": true
@@ -1973,7 +2012,7 @@
     "technical": false
   },
   "r17QualityReceiptsDeepLink": {
-    "hash": "#/cliente360?c=b4003qa_client_37948198617&p=b4003qa_policy_health_37948198617&t=recibos",
+    "hash": "#/cliente360?c=b4003qa_client_37949671159&p=b4003qa_policy_health_37949671159&t=recibos",
     "receiptsTarget": true
   },
   "policyEditorPreservation": {
@@ -2109,7 +2148,7 @@
           "pol_b9a883095c9fae8f7502ce1cb054",
           "pol_0f89cc0a12840594abcc60d418b2",
           "pol_b8b99324d9016269d118d789095a",
-          "b4003qa_policy_expired_renew_37948198617",
+          "b4003qa_policy_expired_renew_37949671159",
           "pol_8231bbb8f9b7272c02891f5a4caf",
           "pol_df6bf097045762297ec31fd4e5c5"
         ]
@@ -2118,9 +2157,9 @@
         "key": "d15",
         "count": 3,
         "ids": [
-          "b4003qa_policy_renew_37948198617",
-          "b4003qa_policy_renewwrite_37948198617",
-          "b4003qa_policy_unknown_37948198617"
+          "b4003qa_policy_renew_37949671159",
+          "b4003qa_policy_renewwrite_37949671159",
+          "b4003qa_policy_unknown_37949671159"
         ]
       },
       {
@@ -2186,9 +2225,9 @@
     "unknownReview": true,
     "parallelDispositionAbsent": true,
     "date45ExpectedIds": [
-      "b4003qa_policy_renew_37948198617",
-      "b4003qa_policy_renewwrite_37948198617",
-      "b4003qa_policy_unknown_37948198617",
+      "b4003qa_policy_renew_37949671159",
+      "b4003qa_policy_renewwrite_37949671159",
+      "b4003qa_policy_unknown_37949671159",
       "pol_3ddc9e613f40252f02b2e122072d",
       "pol_638e276218baad9e84018415b0ba",
       "pol_7280c9b1a5253a1fe1e463e5993b",
@@ -2200,9 +2239,9 @@
       "pol_d5e61976a38be76ba5e3c1e12575"
     ],
     "date45VisibleIds": [
-      "b4003qa_policy_renew_37948198617",
-      "b4003qa_policy_renewwrite_37948198617",
-      "b4003qa_policy_unknown_37948198617",
+      "b4003qa_policy_renew_37949671159",
+      "b4003qa_policy_renewwrite_37949671159",
+      "b4003qa_policy_unknown_37949671159",
       "pol_3ddc9e613f40252f02b2e122072d",
       "pol_638e276218baad9e84018415b0ba",
       "pol_7280c9b1a5253a1fe1e463e5993b",
@@ -2217,8 +2256,1542 @@
     "expiredHistoricalCount": 1159,
     "noteText": "Pipeline de renovación por fecha\n13 vigencias vencidas están en el Kanban, de las cuales 10 tarjetas requieren verificar su estado y no permiten renovar automáticamente. 493 ediciones históricas tienen sucesoras posibles sin enlace formal; no se cuentan como deuda comercial ni como renovación certificada. Existen 1159 ediciones históricas vencidas; 101 son no renovables y 583 tienen disposición terminal registrada. Cada póliza pendiente permanece en su columna por vigencia y se revisa desde allí, sin crear una tabla paralela."
   },
+  "r20RenewalSearch": {
+    "positive": {
+      "columns": 4,
+      "shown": 1,
+      "total": 60,
+      "cards": 1
+    },
+    "negative": {
+      "columns": 4,
+      "message": "Mostrando 0 de 60 renovaciones en el Kanban."
+    },
+    "cleared": true
+  },
+  "r1604RenewabilityWorkflow": {
+    "instruction": true,
+    "buttonLabel": "Revisar renovabilidad",
+    "buttonPresent": true
+  },
+  "r17RenewabilityFocusedEditor": {
+    "value": "",
+    "focused": true,
+    "options": [
+      "Pendiente de validar",
+      "Renovable",
+      "No renovable"
+    ]
+  },
+  "r19RenewabilityDurable": {
+    "policyId": "b4003qa_policy_renewwrite_37949671159",
+    "serverValue": true,
+    "reloadValue": true
+  },
+  "clientTabs": {
+    "prevExists": true,
+    "maxScroll": 420,
+    "hasPrev": true
+  },
+  "r13PolicyRouteTiming": {
+    "wallMs": 385,
+    "browser": {
+      "domPaintMs": 146,
+      "routeOwnerMs": 146,
+      "mutationCount": 1,
+      "route": "polizas",
+      "tableReady": true
+    },
+    "measurement": "Chrome performance.now to canonical table DOM mutation"
+  },
+  "r13PolicySearchTiming": {
+    "wallMs": 264,
+    "browser": {
+      "inputToCorrectDomMs": 255,
+      "mutationCount": 1,
+      "inputPresent": true
+    },
+    "measurement": "Chrome input event to exact filtered DOM"
+  },
+  "r13PolicyDetailTiming": {
+    "wallMs": 412,
+    "browser": {
+      "clickToFullDetailDomMs": 132,
+      "mutationCount": 1,
+      "detailVisible": true,
+      "events": [
+        {
+          "kind": "route-ready",
+          "at": 132,
+          "hash": "#/cliente360?c=b4003qa_client_37949671159&p=b4003qa_policy_renew_37949671159",
+          "route": "cliente360"
+        },
+        {
+          "kind": "detail-present",
+          "at": 132,
+          "hash": "#/cliente360?c=b4003qa_client_37949671159&p=b4003qa_policy_renew_37949671159",
+          "route": "cliente360"
+        },
+        {
+          "kind": "hashchange",
+          "at": 132,
+          "hash": "#/cliente360?c=b4003qa_client_37949671159&p=b4003qa_policy_renew_37949671159",
+          "route": "cliente360"
+        }
+      ],
+      "route": "cliente360",
+      "hash": "#/cliente360?c=b4003qa_client_37949671159&p=b4003qa_policy_renew_37949671159",
+      "loadingReason": "",
+      "hostBlank": false,
+      "serverConfirmed": [
+        "clientes",
+        "polizas",
+        "vehiculos",
+        "recibosEsperados"
+      ]
+    },
+    "measurement": "Chrome click to full detail DOM"
+  },
+  "r13PolicyPerformance": {
+    "routeWallMs": 385,
+    "routeChromeMs": 146,
+    "searchWallMs": 264,
+    "searchChromeMs": 255,
+    "detailWallMs": 412,
+    "detailChromeMs": 132,
+    "searchNumber": "B4-003-REN-37949671159",
+    "refreshFlicker": {
+      "states": [
+        {
+          "loading": false,
+          "hasPolicy": false,
+          "hasClient": false,
+          "route": "#/polizas"
+        },
+        {
+          "loading": false,
+          "hasPolicy": false,
+          "hasClient": false,
+          "route": "#/polizas"
+        },
+        {
+          "loading": true,
+          "hasPolicy": false,
+          "hasClient": false,
+          "route": "#/polizas"
+        },
+        {
+          "loading": true,
+          "hasPolicy": false,
+          "hasClient": false,
+          "route": "#/polizas"
+        },
+        {
+          "loading": true,
+          "hasPolicy": false,
+          "hasClient": false,
+          "route": "#/polizas"
+        },
+        {
+          "loading": true,
+          "hasPolicy": false,
+          "hasClient": false,
+          "route": "#/polizas"
+        },
+        {
+          "loading": true,
+          "hasPolicy": false,
+          "hasClient": false,
+          "route": "#/polizas"
+        },
+        {
+          "loading": true,
+          "hasPolicy": false,
+          "hasClient": false,
+          "route": "#/polizas"
+        },
+        {
+          "loading": true,
+          "hasPolicy": false,
+          "hasClient": false,
+          "route": "#/polizas"
+        },
+        {
+          "loading": false,
+          "hasPolicy": false,
+          "hasClient": false,
+          "route": "#/polizas"
+        }
+      ],
+      "destructive": false
+    }
+  },
+  "r18PolicyEditionValidation": {
+    "rows": [
+      {
+        "id": "pol_6166192b984a88f945425c47c091",
+        "inicio": "2024-01-01",
+        "fin": "2025-01-01",
+        "estado": "Renovada"
+      },
+      {
+        "id": "pol_301fb3a656467b913cbbf40fb649",
+        "inicio": "2025-01-01",
+        "fin": "2026-01-01",
+        "estado": "Renovada"
+      },
+      {
+        "id": "pol_2d55dc4903c785fff60d06547cad",
+        "inicio": "2026-01-01",
+        "fin": "2027-01-01",
+        "estado": "Vigente"
+      }
+    ],
+    "currentId": "pol_2d55dc4903c785fff60d06547cad",
+    "errors": [],
+    "warnings": [
+      "lineage_ediciones_sin_vinculo",
+      "conducto_requiere_validacion"
+    ]
+  },
+  "r19RealPolicyPreviewProtection": {
+    "modalPresent": true,
+    "error": "Esta Preview protege los registros reales. La persistencia se valida aquí con una póliza sintética equivalente; el cambio real se prueba únicamente en el gate LIVE autorizado."
+  },
+  "r18MobilePolicySearch": {
+    "present": true,
+    "inputDisplay": "block",
+    "parentDisplay": "flex",
+    "width": 312,
+    "top": 176,
+    "bottom": 214,
+    "viewport": 390,
+    "viewportHeight": 844,
+    "selector": "#fq",
+    "queryResult": true
+  },
+  "r18RenewalKpiParity": {
+    "inicio": 13,
+    "polizas": 13,
+    "owner": "polizas.policyMetrics.isRenewalWithin45Days"
+  },
+  "r19InicioReadiness": {
+    "text": "🌅 Buen día · esto es lo importante hoy METAS DEL MES·PRIORIDADES·AVANCE POR ASESOR Abrir Cliente 360 → METAS DEL MES · OCTUBRE 2026 Avance real del mes Quedan 22 días para cerrar el mes. La producción usa la prima neta de pólizas con inicio de vigencia en el mes y el recaudo usa pagos confirmados con fecha efectiva del mes. Si no existe meta configurada, no se inventa un porcentaje. 440 clientes 1425 pólizas 588 registros vencidos en cartera 14% Q11K GTQ Producción neta del mes Meta Q80K 0% Sin movimientos Recaudo confirmado del mes Meta Q50K COBROS CONFIRMADOS Q851K GTQ $205.8M COP 1243 pagos confirmados › PENDIENTE DE COBRO Q 8,058 GTQ $ 0 COP 728 obligaciones · 18 con monto › CARTERA VENCIDA Q 8,274 GTQ $ 0 COP 588 obligaciones · 16 con monto › VENCEN ≤45 D 13 mismo universo de Pólizas › Avance por asesor producción neta del mes vs meta configurada PO Paula Osorio Q11K GTQ 14% BH Braulio Hernández Sin movimientos Meta no configurada — CC Carlos Castro Sin movimientos Meta no configurada — FA Fernando Arias Sin movimientos Meta no configurada — JS Johanna Salgado Sin movimientos Meta no configurada — NC Nicole Castro Sin movimientos Meta no configurada — SD Samuel Daza Sin movimientos Meta no configurada — Prioridades 🔄 CASSIDY ISABEL RIOS MELÉNDEZ VEHICULOS · renueva en 8 d 🔄 B4-003 QA Cliente Auto · renueva en 9 d 🔄 B4-003 QA Cliente Auto · renueva en 9 d 🔄 B4-003 QA Cliente ACCIDENTES QA FUENTE · renueva en 9 d ⚠ NORA LUCIA HURTARTE FLORES cuota — vencida · — ⚠ LUIS ESTUARDO PEREZ CIFUENTES cuota — vencida · — ⚠ ERICKA LIZETTE AGUILAR LUNA cuota — vencida · — Seguimientos de hoy sin cadencia automática · gestiona por WhatsApp 🌱 B4-003 QA colaboración · Paula Osorio · mañana · Nuevo ingreso 🧮 B4-003 QA colaboración pre-emisión · Paula Osorio · mañana · Cotiza",
+    "terminal": "ready"
+  },
+  "renewalRenderStability": {
+    "mutationCount": 80,
+    "textStable": true,
+    "route": "renovaciones",
+    "records": [
+      {
+        "ms": 446,
+        "type": "childList",
+        "target": "DIV",
+        "added": [
+          "🔄 Renovaciones · Pipeline por vencer 90 días·Por urgencia·Gestión 📤 Campaña de renovación Vencidas: gestión / revisión13acciones protegidas según estado≤15 días3urgente16–45 días"
+        ],
+        "removed": [
+          "🔄 Renovaciones · Pipeline por vencer 90 días·Por urgencia·Gestión Preparar campaña de renovación Vencidas13Recuperar o cerrar gestión≤15 días3Atención prioritaria16–45 días9Planif"
+        ]
+      },
+      {
+        "ms": 737,
+        "type": "childList",
+        "target": "DIV",
+        "added": [],
+        "removed": [
+          "🔄 Renovaciones · Pipeline por vencer 90 días·Por urgencia·Gestión 📤 Campaña de renovación Vencidas: gestión / revisión13acciones protegidas según estado≤15 días3urgente16–45 días"
+        ]
+      },
+      {
+        "ms": 737,
+        "type": "childList",
+        "target": "DIV",
+        "added": [
+          "🔄 Renovaciones · Pipeline por vencer 90 días·Por urgencia·Gestión Preparar campaña de renovación Vencidas13Recuperar o cerrar gestión≤15 días3Atención prioritaria16–45 días9Planif"
+        ],
+        "removed": []
+      },
+      {
+        "ms": 737,
+        "type": "childList",
+        "target": "DIV",
+        "added": [
+          "Vencidas"
+        ],
+        "removed": [
+          "Vencidas: gestión / revisión"
+        ]
+      },
+      {
+        "ms": 737,
+        "type": "childList",
+        "target": "DIV",
+        "added": [
+          "13"
+        ],
+        "removed": [
+          "13"
+        ]
+      },
+      {
+        "ms": 737,
+        "type": "childList",
+        "target": "DIV",
+        "added": [
+          "Recuperar o cerrar gestión"
+        ],
+        "removed": [
+          "acciones protegidas según estado"
+        ]
+      },
+      {
+        "ms": 737,
+        "type": "childList",
+        "target": "DIV",
+        "added": [
+          "≤15 días"
+        ],
+        "removed": [
+          "≤15 días"
+        ]
+      },
+      {
+        "ms": 737,
+        "type": "childList",
+        "target": "DIV",
+        "added": [
+          "3"
+        ],
+        "removed": [
+          "3"
+        ]
+      },
+      {
+        "ms": 737,
+        "type": "childList",
+        "target": "DIV",
+        "added": [
+          "Atención prioritaria"
+        ],
+        "removed": [
+          "urgente"
+        ]
+      },
+      {
+        "ms": 737,
+        "type": "childList",
+        "target": "DIV",
+        "added": [
+          "16–45 días"
+        ],
+        "removed": [
+          "16–45 días"
+        ]
+      },
+      {
+        "ms": 737,
+        "type": "childList",
+        "target": "DIV",
+        "added": [
+          "9"
+        ],
+        "removed": [
+          "9"
+        ]
+      },
+      {
+        "ms": 737,
+        "type": "childList",
+        "target": "DIV",
+        "added": [
+          "Planificar gestión"
+        ],
+        "removed": [
+          "planificar"
+        ]
+      },
+      {
+        "ms": 737,
+        "type": "childList",
+        "target": "DIV",
+        "added": [
+          "Prima neta en gestión"
+        ],
+        "removed": [
+          "Prima en juego"
+        ]
+      },
+      {
+        "ms": 737,
+        "type": "childList",
+        "target": "DIV",
+        "added": [
+          "COP 68,945,458",
+          "GTQ 113,686"
+        ],
+        "removed": [
+          "Q5K"
+        ]
+      },
+      {
+        "ms": 737,
+        "type": "childList",
+        "target": "DIV",
+        "added": [
+          "Separada por moneda; horizonte 90 días"
+        ],
+        "removed": [
+          "a 90 días"
+        ]
+      },
+      {
+        "ms": 737,
+        "type": "childList",
+        "target": "A",
+        "added": [
+          "Abrir WhatsApp"
+        ],
+        "removed": [
+          "💬 WhatsApp"
+        ]
+      },
+      {
+        "ms": 737,
+        "type": "childList",
+        "target": "A",
+        "added": [
+          "Abrir WhatsApp"
+        ],
+        "removed": [
+          "💬 WhatsApp"
+        ]
+      },
+      {
+        "ms": 737,
+        "type": "childList",
+        "target": "A",
+        "added": [
+          "Abrir WhatsApp"
+        ],
+        "removed": [
+          "💬 WhatsApp"
+        ]
+      },
+      {
+        "ms": 737,
+        "type": "childList",
+        "target": "A",
+        "added": [
+          "Abrir WhatsApp"
+        ],
+        "removed": [
+          "💬 WhatsApp"
+        ]
+      },
+      {
+        "ms": 737,
+        "type": "childList",
+        "target": "A",
+        "added": [
+          "Abrir WhatsApp"
+        ],
+        "removed": [
+          "💬 WhatsApp"
+        ]
+      },
+      {
+        "ms": 737,
+        "type": "childList",
+        "target": "A",
+        "added": [
+          "Abrir WhatsApp"
+        ],
+        "removed": [
+          "💬 WhatsApp"
+        ]
+      },
+      {
+        "ms": 737,
+        "type": "childList",
+        "target": "A",
+        "added": [
+          "Abrir WhatsApp"
+        ],
+        "removed": [
+          "💬 WhatsApp"
+        ]
+      },
+      {
+        "ms": 737,
+        "type": "childList",
+        "target": "A",
+        "added": [
+          "Abrir WhatsApp"
+        ],
+        "removed": [
+          "💬 WhatsApp"
+        ]
+      },
+      {
+        "ms": 737,
+        "type": "childList",
+        "target": "A",
+        "added": [
+          "Abrir WhatsApp"
+        ],
+        "removed": [
+          "💬 WhatsApp"
+        ]
+      },
+      {
+        "ms": 737,
+        "type": "childList",
+        "target": "A",
+        "added": [
+          "Abrir WhatsApp"
+        ],
+        "removed": [
+          "💬 WhatsApp"
+        ]
+      },
+      {
+        "ms": 737,
+        "type": "childList",
+        "target": "A",
+        "added": [
+          "Abrir WhatsApp"
+        ],
+        "removed": [
+          "💬 WhatsApp"
+        ]
+      },
+      {
+        "ms": 737,
+        "type": "childList",
+        "target": "A",
+        "added": [
+          "Abrir WhatsApp"
+        ],
+        "removed": [
+          "💬 WhatsApp"
+        ]
+      },
+      {
+        "ms": 737,
+        "type": "childList",
+        "target": "A",
+        "added": [
+          "Abrir WhatsApp"
+        ],
+        "removed": [
+          "💬 WhatsApp"
+        ]
+      },
+      {
+        "ms": 737,
+        "type": "childList",
+        "target": "A",
+        "added": [
+          "Abrir WhatsApp"
+        ],
+        "removed": [
+          "💬 WhatsApp"
+        ]
+      },
+      {
+        "ms": 737,
+        "type": "childList",
+        "target": "A",
+        "added": [
+          "Abrir WhatsApp"
+        ],
+        "removed": [
+          "💬 WhatsApp"
+        ]
+      },
+      {
+        "ms": 737,
+        "type": "childList",
+        "target": "A",
+        "added": [
+          "Abrir WhatsApp"
+        ],
+        "removed": [
+          "💬 WhatsApp"
+        ]
+      },
+      {
+        "ms": 737,
+        "type": "childList",
+        "target": "A",
+        "added": [
+          "Abrir WhatsApp"
+        ],
+        "removed": [
+          "💬 WhatsApp"
+        ]
+      },
+      {
+        "ms": 737,
+        "type": "childList",
+        "target": "A",
+        "added": [
+          "Abrir WhatsApp"
+        ],
+        "removed": [
+          "💬 WhatsApp"
+        ]
+      },
+      {
+        "ms": 737,
+        "type": "childList",
+        "target": "A",
+        "added": [
+          "Abrir WhatsApp"
+        ],
+        "removed": [
+          "💬 WhatsApp"
+        ]
+      },
+      {
+        "ms": 737,
+        "type": "childList",
+        "target": "A",
+        "added": [
+          "Abrir WhatsApp"
+        ],
+        "removed": [
+          "💬 WhatsApp"
+        ]
+      },
+      {
+        "ms": 737,
+        "type": "childList",
+        "target": "A",
+        "added": [
+          "Abrir WhatsApp"
+        ],
+        "removed": [
+          "💬 WhatsApp"
+        ]
+      },
+      {
+        "ms": 737,
+        "type": "childList",
+        "target": "A",
+        "added": [
+          "Abrir WhatsApp"
+        ],
+        "removed": [
+          "💬 WhatsApp"
+        ]
+      },
+      {
+        "ms": 737,
+        "type": "childList",
+        "target": "A",
+        "added": [
+          "Abrir WhatsApp"
+        ],
+        "removed": [
+          "💬 WhatsApp"
+        ]
+      },
+      {
+        "ms": 737,
+        "type": "childList",
+        "target": "A",
+        "added": [
+          "Abrir WhatsApp"
+        ],
+        "removed": [
+          "💬 WhatsApp"
+        ]
+      },
+      {
+        "ms": 737,
+        "type": "childList",
+        "target": "A",
+        "added": [
+          "Abrir WhatsApp"
+        ],
+        "removed": [
+          "💬 WhatsApp"
+        ]
+      },
+      {
+        "ms": 737,
+        "type": "childList",
+        "target": "A",
+        "added": [
+          "Abrir WhatsApp"
+        ],
+        "removed": [
+          "💬 WhatsApp"
+        ]
+      },
+      {
+        "ms": 737,
+        "type": "childList",
+        "target": "A",
+        "added": [
+          "Abrir WhatsApp"
+        ],
+        "removed": [
+          "💬 WhatsApp"
+        ]
+      },
+      {
+        "ms": 737,
+        "type": "childList",
+        "target": "A",
+        "added": [
+          "Abrir WhatsApp"
+        ],
+        "removed": [
+          "💬 WhatsApp"
+        ]
+      },
+      {
+        "ms": 737,
+        "type": "childList",
+        "target": "A",
+        "added": [
+          "Abrir WhatsApp"
+        ],
+        "removed": [
+          "💬 WhatsApp"
+        ]
+      },
+      {
+        "ms": 737,
+        "type": "childList",
+        "target": "A",
+        "added": [
+          "Abrir WhatsApp"
+        ],
+        "removed": [
+          "💬 WhatsApp"
+        ]
+      },
+      {
+        "ms": 737,
+        "type": "childList",
+        "target": "A",
+        "added": [
+          "Abrir WhatsApp"
+        ],
+        "removed": [
+          "💬 WhatsApp"
+        ]
+      },
+      {
+        "ms": 737,
+        "type": "childList",
+        "target": "A",
+        "added": [
+          "Abrir WhatsApp"
+        ],
+        "removed": [
+          "💬 WhatsApp"
+        ]
+      },
+      {
+        "ms": 737,
+        "type": "childList",
+        "target": "A",
+        "added": [
+          "Abrir WhatsApp"
+        ],
+        "removed": [
+          "💬 WhatsApp"
+        ]
+      },
+      {
+        "ms": 737,
+        "type": "childList",
+        "target": "A",
+        "added": [
+          "Abrir WhatsApp"
+        ],
+        "removed": [
+          "💬 WhatsApp"
+        ]
+      },
+      {
+        "ms": 737,
+        "type": "childList",
+        "target": "A",
+        "added": [
+          "Abrir WhatsApp"
+        ],
+        "removed": [
+          "💬 WhatsApp"
+        ]
+      },
+      {
+        "ms": 737,
+        "type": "childList",
+        "target": "A",
+        "added": [
+          "Abrir WhatsApp"
+        ],
+        "removed": [
+          "💬 WhatsApp"
+        ]
+      },
+      {
+        "ms": 737,
+        "type": "childList",
+        "target": "A",
+        "added": [
+          "Abrir WhatsApp"
+        ],
+        "removed": [
+          "💬 WhatsApp"
+        ]
+      },
+      {
+        "ms": 737,
+        "type": "childList",
+        "target": "A",
+        "added": [
+          "Abrir WhatsApp"
+        ],
+        "removed": [
+          "💬 WhatsApp"
+        ]
+      },
+      {
+        "ms": 737,
+        "type": "childList",
+        "target": "A",
+        "added": [
+          "Abrir WhatsApp"
+        ],
+        "removed": [
+          "💬 WhatsApp"
+        ]
+      },
+      {
+        "ms": 737,
+        "type": "childList",
+        "target": "A",
+        "added": [
+          "Abrir WhatsApp"
+        ],
+        "removed": [
+          "💬 WhatsApp"
+        ]
+      },
+      {
+        "ms": 737,
+        "type": "childList",
+        "target": "A",
+        "added": [
+          "Abrir WhatsApp"
+        ],
+        "removed": [
+          "💬 WhatsApp"
+        ]
+      },
+      {
+        "ms": 737,
+        "type": "childList",
+        "target": "A",
+        "added": [
+          "Abrir WhatsApp"
+        ],
+        "removed": [
+          "💬 WhatsApp"
+        ]
+      },
+      {
+        "ms": 737,
+        "type": "childList",
+        "target": "A",
+        "added": [
+          "Abrir WhatsApp"
+        ],
+        "removed": [
+          "💬 WhatsApp"
+        ]
+      },
+      {
+        "ms": 737,
+        "type": "childList",
+        "target": "A",
+        "added": [
+          "Abrir WhatsApp"
+        ],
+        "removed": [
+          "💬 WhatsApp"
+        ]
+      },
+      {
+        "ms": 737,
+        "type": "childList",
+        "target": "A",
+        "added": [
+          "Abrir WhatsApp"
+        ],
+        "removed": [
+          "💬 WhatsApp"
+        ]
+      },
+      {
+        "ms": 737,
+        "type": "childList",
+        "target": "A",
+        "added": [
+          "Abrir WhatsApp"
+        ],
+        "removed": [
+          "💬 WhatsApp"
+        ]
+      },
+      {
+        "ms": 737,
+        "type": "childList",
+        "target": "A",
+        "added": [
+          "Abrir WhatsApp"
+        ],
+        "removed": [
+          "💬 WhatsApp"
+        ]
+      },
+      {
+        "ms": 737,
+        "type": "childList",
+        "target": "A",
+        "added": [
+          "Abrir WhatsApp"
+        ],
+        "removed": [
+          "💬 WhatsApp"
+        ]
+      },
+      {
+        "ms": 737,
+        "type": "childList",
+        "target": "A",
+        "added": [
+          "Abrir WhatsApp"
+        ],
+        "removed": [
+          "💬 WhatsApp"
+        ]
+      },
+      {
+        "ms": 737,
+        "type": "childList",
+        "target": "A",
+        "added": [
+          "Abrir WhatsApp"
+        ],
+        "removed": [
+          "💬 WhatsApp"
+        ]
+      },
+      {
+        "ms": 737,
+        "type": "childList",
+        "target": "A",
+        "added": [
+          "Abrir WhatsApp"
+        ],
+        "removed": [
+          "💬 WhatsApp"
+        ]
+      },
+      {
+        "ms": 737,
+        "type": "childList",
+        "target": "BUTTON",
+        "added": [
+          "📋 Propuestas"
+        ],
+        "removed": [
+          "📋 Propuestas"
+        ]
+      },
+      {
+        "ms": 737,
+        "type": "childList",
+        "target": "DIV",
+        "added": [
+          "✅ Pedir renovar"
+        ],
+        "removed": []
+      },
+      {
+        "ms": 737,
+        "type": "childList",
+        "target": "DIV",
+        "added": [
+          "🧮 Cotizar"
+        ],
+        "removed": []
+      },
+      {
+        "ms": 737,
+        "type": "childList",
+        "target": "BUTTON",
+        "added": [
+          "📋 Propuestas"
+        ],
+        "removed": [
+          "📋 Propuestas"
+        ]
+      },
+      {
+        "ms": 737,
+        "type": "childList",
+        "target": "DIV",
+        "added": [
+          "✅ Pedir renovar"
+        ],
+        "removed": []
+      },
+      {
+        "ms": 737,
+        "type": "childList",
+        "target": "DIV",
+        "added": [
+          "🧮 Cotizar"
+        ],
+        "removed": []
+      },
+      {
+        "ms": 737,
+        "type": "childList",
+        "target": "BUTTON",
+        "added": [
+          "📋 Propuestas"
+        ],
+        "removed": [
+          "📋 Propuestas"
+        ]
+      },
+      {
+        "ms": 737,
+        "type": "childList",
+        "target": "DIV",
+        "added": [
+          "✅ Pedir renovar"
+        ],
+        "removed": []
+      },
+      {
+        "ms": 737,
+        "type": "childList",
+        "target": "DIV",
+        "added": [
+          "🧮 Cotizar"
+        ],
+        "removed": []
+      },
+      {
+        "ms": 737,
+        "type": "childList",
+        "target": "BUTTON",
+        "added": [
+          "📋 Propuestas"
+        ],
+        "removed": [
+          "📋 Propuestas"
+        ]
+      },
+      {
+        "ms": 737,
+        "type": "childList",
+        "target": "DIV",
+        "added": [
+          "✅ Pedir renovar"
+        ],
+        "removed": []
+      },
+      {
+        "ms": 737,
+        "type": "childList",
+        "target": "DIV",
+        "added": [
+          "🧮 Cotizar"
+        ],
+        "removed": []
+      },
+      {
+        "ms": 737,
+        "type": "childList",
+        "target": "BUTTON",
+        "added": [
+          "📋 Propuestas"
+        ],
+        "removed": [
+          "📋 Propuestas"
+        ]
+      },
+      {
+        "ms": 737,
+        "type": "childList",
+        "target": "DIV",
+        "added": [
+          "✅ Pedir renovar"
+        ],
+        "removed": []
+      }
+    ],
+    "events": [
+      {
+        "ms": 27,
+        "kind": "store",
+        "detail": "clientes"
+      },
+      {
+        "ms": 61,
+        "kind": "store",
+        "detail": "vehiculos"
+      },
+      {
+        "ms": 120,
+        "kind": "store",
+        "detail": "recibosEsperados"
+      },
+      {
+        "ms": 124,
+        "kind": "store",
+        "detail": "cancelaciones"
+      },
+      {
+        "ms": 129,
+        "kind": "store",
+        "detail": "negocios"
+      },
+      {
+        "ms": 134,
+        "kind": "store",
+        "detail": "gestiones"
+      },
+      {
+        "ms": 144,
+        "kind": "store",
+        "detail": "aseguradoras"
+      },
+      {
+        "ms": 149,
+        "kind": "store",
+        "detail": "cobros"
+      },
+      {
+        "ms": 182,
+        "kind": "store",
+        "detail": "carteraPrimas"
+      },
+      {
+        "ms": 933,
+        "kind": "store",
+        "detail": "metas"
+      },
+      {
+        "ms": 965,
+        "kind": "store",
+        "detail": "reclamos"
+      },
+      {
+        "ms": 970,
+        "kind": "store",
+        "detail": "comisiones"
+      },
+      {
+        "ms": 1045,
+        "kind": "store",
+        "detail": "auditoria"
+      }
+    ],
+    "canonicalRerenderObserved": true
+  },
+  "r14RenewalReadiness": {
+    "loading": true,
+    "leakedRows": 0,
+    "readyExpired": true,
+    "unknownVisible": true,
+    "unknownReview": true,
+    "pendingCount": 1,
+    "placeholderClient": false
+  },
+  "r20InsurerOptionalReadiness": {
+    "loading": false,
+    "buckets": 4
+  },
+  "r14Client360Authority": {
+    "authority": "server-confirmed-store",
+    "storeHasSynthetic": true,
+    "authoritativeGtCount": 417,
+    "uiUniverseCount": 417,
+    "syntheticSearchVisible": false,
+    "pageSize": 40,
+    "renderedRows": 40,
+    "filteredRows": 417,
+    "totalRows": 417
+  },
+  "r14QualityGrammar": {
+    "grammar": 2,
+    "hasCompleteLabel": true,
+    "hasDecimal": true
+  },
+  "r16AssignableAdvisorRoster": {
+    "direction": {
+      "scope": "full",
+      "count": 6,
+      "rows": [
+        {
+          "id": "ase-braulio-hernandez",
+          "nombre": "Braulio Hernández",
+          "activo": true,
+          "assignable": true,
+          "roleEligible": true,
+          "paises": [
+            "GT"
+          ]
+        },
+        {
+          "id": "ase-carlos-castro",
+          "nombre": "Carlos Castro",
+          "activo": true,
+          "assignable": true,
+          "roleEligible": true,
+          "paises": [
+            "CO",
+            "GT"
+          ]
+        },
+        {
+          "id": "ase-fernando-arias",
+          "nombre": "Fernando Arias",
+          "activo": true,
+          "assignable": true,
+          "roleEligible": true,
+          "paises": [
+            "GT"
+          ]
+        },
+        {
+          "id": "ase-johanna-salgado",
+          "nombre": "Johanna Salgado",
+          "activo": true,
+          "assignable": true,
+          "roleEligible": true,
+          "paises": [
+            "GT"
+          ]
+        },
+        {
+          "id": "ase-paula-osorio",
+          "nombre": "Paula Osorio",
+          "activo": true,
+          "assignable": true,
+          "roleEligible": true,
+          "paises": [
+            "CO",
+            "GT"
+          ]
+        },
+        {
+          "id": "ase-samuel-daza",
+          "nombre": "Samuel Daza",
+          "activo": true,
+          "assignable": true,
+          "roleEligible": true,
+          "paises": [
+            "CO",
+            "GT"
+          ]
+        }
+      ]
+    },
+    "operative": {
+      "scope": "full",
+      "count": 6,
+      "rows": [
+        {
+          "id": "ase-braulio-hernandez",
+          "nombre": "Braulio Hernández",
+          "activo": true,
+          "assignable": true,
+          "roleEligible": true,
+          "paises": [
+            "GT"
+          ]
+        },
+        {
+          "id": "ase-carlos-castro",
+          "nombre": "Carlos Castro",
+          "activo": true,
+          "assignable": true,
+          "roleEligible": true,
+          "paises": [
+            "CO",
+            "GT"
+          ]
+        },
+        {
+          "id": "ase-fernando-arias",
+          "nombre": "Fernando Arias",
+          "activo": true,
+          "assignable": true,
+          "roleEligible": true,
+          "paises": [
+            "GT"
+          ]
+        },
+        {
+          "id": "ase-johanna-salgado",
+          "nombre": "Johanna Salgado",
+          "activo": true,
+          "assignable": true,
+          "roleEligible": true,
+          "paises": [
+            "GT"
+          ]
+        },
+        {
+          "id": "ase-paula-osorio",
+          "nombre": "Paula Osorio",
+          "activo": true,
+          "assignable": true,
+          "roleEligible": true,
+          "paises": [
+            "CO",
+            "GT"
+          ]
+        },
+        {
+          "id": "ase-samuel-daza",
+          "nombre": "Samuel Daza",
+          "activo": true,
+          "assignable": true,
+          "roleEligible": true,
+          "paises": [
+            "CO",
+            "GT"
+          ]
+        }
+      ]
+    },
+    "sameCountry": "GT",
+    "minimalFields": true
+  },
+  "r13RenewalReality": {
+    "allIds": [
+      "pol_be60fdba3a8e370e423a4307783f",
+      "pol_dbfb466557cfde24955c9b5857c9",
+      "pol_168b56a1945ee94512a77005a605",
+      "pol_00680d20202f3727c939c3a942fc",
+      "pol_4bacbd8cbf402dc988f251245752",
+      "pol_ad0ed5f26dd834d5e1d38f50eb0e",
+      "pol_5080266a15e6f2b39f20017d08e4",
+      "pol_b9a883095c9fae8f7502ce1cb054",
+      "pol_0f89cc0a12840594abcc60d418b2",
+      "pol_b8b99324d9016269d118d789095a",
+      "b4003qa_policy_expired_renew_37949671159",
+      "pol_8231bbb8f9b7272c02891f5a4caf",
+      "pol_df6bf097045762297ec31fd4e5c5",
+      "b4003qa_policy_renew_37949671159",
+      "b4003qa_policy_renewwrite_37949671159",
+      "b4003qa_policy_unknown_37949671159",
+      "pol_638e276218baad9e84018415b0ba",
+      "pol_b39a58e5c216d8fb0f9fca4da4d6",
+      "pol_7280c9b1a5253a1fe1e463e5993b",
+      "pol_d5e61976a38be76ba5e3c1e12575",
+      "pol_3ddc9e613f40252f02b2e122072d",
+      "pol_c23dd5e9d7d5e8056c6dd907c48f",
+      "pol_9216bfdadaec20d1075f1b4008dd",
+      "pol_9f021892163a17c016ea3c28c779",
+      "pol_c48c0b1d4e940f80dffacbc37959",
+      "pol_ddbb135a5fcd5b9d61dba57f56ec",
+      "pol_4221b6ed10faaa92cbbff6a8f4c4",
+      "pol_6b2035cd7636a5bd2156878fcfa7",
+      "pol_f86bac81b0079a6b0e2730f2f031",
+      "pol_992a0c4f565a1e0e22d69e68cd53",
+      "pol_99a22c31d8f39a6b111040fdea36",
+      "pol_9730eabfd067187a471e50b21016",
+      "pol_ded51ce85b30b3a28311ffdc8ad6",
+      "pol_7b6a7b8364d01dc368d458908907",
+      "pol_4029e754deba8638d9faa5819f49",
+      "pol_6e62faaefa973c666a5fc797ebf3",
+      "pol_7fc813836507730a15ed7523eebf",
+      "pol_cdc32b549eb7c0732a9ef8b1626e",
+      "pol_4773480dde15659f114b5f53875a",
+      "pol_bdeedb1540df4f7a82d282a3d41e",
+      "pol_d05dcd59afc8e286210bb213ad7a",
+      "pol_6fc005003a2ba6d52bdba67188ed",
+      "pol_3156b732e602108afe817cdd10d3",
+      "pol_6afc26e7eba0f78901968c6772a2",
+      "pol_841e35aca5a66214ceaeeb4e3da9",
+      "pol_44c2ff4c23ecea8f3d706275174a",
+      "pol_7de2c306154a64953734ede4b8fa",
+      "pol_2d55dc4903c785fff60d06547cad",
+      "pol_4a97836eea4c3d707d714f80c86b",
+      "pol_4ec31907ccbd8821ab4e7da18cd7",
+      "pol_d957242209c31974d11137e90dea",
+      "pol_f469ee0d2c2830fc4e3ed3aa662b",
+      "pol_87b756fc84922f1d44d414c25b87",
+      "pol_8cc90db25206ef599f995f78d83f",
+      "pol_7a25801a130c2d459155ff6f278d",
+      "pol_866eebe50ec3ce9463f67cd63a62",
+      "pol_00dc40cbd7a843e7e5761b2de1d1",
+      "pol_2adfd47653bc9e41cd8a2960f973",
+      "pol_babc62d559ec8e1518be49e88574",
+      "pol_e3992eb3b8dcef6fc474eaaa5a37"
+    ],
+    "realIds": [
+      "pol_be60fdba3a8e370e423a4307783f",
+      "pol_dbfb466557cfde24955c9b5857c9",
+      "pol_168b56a1945ee94512a77005a605",
+      "pol_00680d20202f3727c939c3a942fc",
+      "pol_4bacbd8cbf402dc988f251245752",
+      "pol_ad0ed5f26dd834d5e1d38f50eb0e",
+      "pol_5080266a15e6f2b39f20017d08e4",
+      "pol_b9a883095c9fae8f7502ce1cb054",
+      "pol_0f89cc0a12840594abcc60d418b2",
+      "pol_b8b99324d9016269d118d789095a",
+      "pol_8231bbb8f9b7272c02891f5a4caf",
+      "pol_df6bf097045762297ec31fd4e5c5",
+      "pol_638e276218baad9e84018415b0ba",
+      "pol_b39a58e5c216d8fb0f9fca4da4d6",
+      "pol_7280c9b1a5253a1fe1e463e5993b",
+      "pol_d5e61976a38be76ba5e3c1e12575",
+      "pol_3ddc9e613f40252f02b2e122072d",
+      "pol_c23dd5e9d7d5e8056c6dd907c48f",
+      "pol_9216bfdadaec20d1075f1b4008dd",
+      "pol_9f021892163a17c016ea3c28c779",
+      "pol_c48c0b1d4e940f80dffacbc37959",
+      "pol_ddbb135a5fcd5b9d61dba57f56ec",
+      "pol_4221b6ed10faaa92cbbff6a8f4c4",
+      "pol_6b2035cd7636a5bd2156878fcfa7",
+      "pol_f86bac81b0079a6b0e2730f2f031",
+      "pol_992a0c4f565a1e0e22d69e68cd53",
+      "pol_99a22c31d8f39a6b111040fdea36",
+      "pol_9730eabfd067187a471e50b21016",
+      "pol_ded51ce85b30b3a28311ffdc8ad6",
+      "pol_7b6a7b8364d01dc368d458908907",
+      "pol_4029e754deba8638d9faa5819f49",
+      "pol_6e62faaefa973c666a5fc797ebf3",
+      "pol_7fc813836507730a15ed7523eebf",
+      "pol_cdc32b549eb7c0732a9ef8b1626e",
+      "pol_4773480dde15659f114b5f53875a",
+      "pol_bdeedb1540df4f7a82d282a3d41e",
+      "pol_d05dcd59afc8e286210bb213ad7a",
+      "pol_6fc005003a2ba6d52bdba67188ed",
+      "pol_3156b732e602108afe817cdd10d3",
+      "pol_6afc26e7eba0f78901968c6772a2",
+      "pol_841e35aca5a66214ceaeeb4e3da9",
+      "pol_44c2ff4c23ecea8f3d706275174a",
+      "pol_7de2c306154a64953734ede4b8fa",
+      "pol_2d55dc4903c785fff60d06547cad",
+      "pol_4a97836eea4c3d707d714f80c86b",
+      "pol_4ec31907ccbd8821ab4e7da18cd7",
+      "pol_d957242209c31974d11137e90dea",
+      "pol_f469ee0d2c2830fc4e3ed3aa662b",
+      "pol_87b756fc84922f1d44d414c25b87",
+      "pol_8cc90db25206ef599f995f78d83f",
+      "pol_7a25801a130c2d459155ff6f278d",
+      "pol_866eebe50ec3ce9463f67cd63a62",
+      "pol_00dc40cbd7a843e7e5761b2de1d1",
+      "pol_2adfd47653bc9e41cd8a2960f973",
+      "pol_babc62d559ec8e1518be49e88574",
+      "pol_e3992eb3b8dcef6fc474eaaa5a37"
+    ],
+    "kpis": [
+      {
+        "label": "Vencidas",
+        "value": "13"
+      },
+      {
+        "label": "≤15 días",
+        "value": "3"
+      },
+      {
+        "label": "16–45 días",
+        "value": "9"
+      },
+      {
+        "label": "Prima neta en gestión",
+        "value": "COP 68,945,458GTQ 113,686"
+      }
+    ]
+  },
+  "r20SecondCollaborationUi": {
+    "pending": 0,
+    "failed": 0,
+    "committed": 1,
+    "lastError": "",
+    "comment": {
+      "ts": "2026-10-09T15:14:47.166Z",
+      "user": "Orbit LAB",
+      "actorUid": "woJlxR1iFEeiQZvTscPj4qQ5Qc73",
+      "actorName": "Orbit LAB",
+      "tipo": "Solicitar información al asesor",
+      "texto": "B4-003 R20 solicitud sintética al asesor",
+      "direction": "advisor",
+      "eventId": "collab_mv13wkji_gphde",
+      "attachment": {
+        "documentRef": "1RUOPKbAg7A3sN4yJEbgUvaMzQiChzbcl",
+        "driveUrl": "https://drive.google.com/file/d/1RUOPKbAg7A3sN4yJEbgUvaMzQiChzbcl/view?usp=drivesdk",
+        "nombre": "b4-r20-ui-attachment-37949671159.txt",
+        "mimeType": "text/plain",
+        "size": 36
+      }
+    },
+    "openMs": 329,
+    "visual": {
+      "panel": true,
+      "brandHeader": true,
+      "helpImmediate": true,
+      "panelBackground": "rgb(255, 255, 255)",
+      "panelBorder": "color(srgb 0.768 0.763922 0.747294)"
+    },
+    "attachmentRead": {
+      "ok": true,
+      "status": "disponible",
+      "documentRef": "1RUOPKbAg7A3sN4yJEbgUvaMzQiChzbcl",
+      "fileId": "1RUOPKbAg7A3sN4yJEbgUvaMzQiChzbcl",
+      "nombre": "b4-r20-ui-attachment-37949671159.txt",
+      "mimeType": "text/plain",
+      "size": 36,
+      "base64": "QjQtMDAzIFIyMCBVSSBhdHRhY2htZW50IDM3OTQ5NjcxMTU5",
+      "previewAvailable": true,
+      "downloadAvailable": true,
+      "externalUrl": "https://drive.google.com/file/d/1RUOPKbAg7A3sN4yJEbgUvaMzQiChzbcl/view?usp=drivesdk",
+      "driveUrl": "https://drive.google.com/file/d/1RUOPKbAg7A3sN4yJEbgUvaMzQiChzbcl/view?usp=drivesdk",
+      "backendPersistent": true,
+      "previewIsolated": true
+    },
+    "attachmentCleanup": {
+      "ok": true,
+      "status": "deleted_preview_qa",
+      "documentRef": "1RUOPKbAg7A3sN4yJEbgUvaMzQiChzbcl",
+      "deleted": true,
+      "previewIsolated": true,
+      "entityType": "negocio",
+      "entityId": "b4003qa_business_collab_37949671159"
+    }
+  },
+  "r20SecondAdvisorActionCard": {
+    "present": true,
+    "badge": true,
+    "label": "↔ Acción requerida · #1",
+    "expectedRank": 1,
+    "actualRank": 1,
+    "background": "rgb(197, 22, 46)",
+    "color": "rgb(255, 255, 255)",
+    "priorityText": "Sin prioridad"
+  },
   "failure": {
-    "message": "page.waitForFunction: Timeout 15000ms exceeded.",
-    "stack": "page.waitForFunction: Timeout 15000ms exceeded.\n    at /home/runner/work/orbit360-core/orbit360-core/tools/gravicentra-i6-5-b4-003-preview-proof.mjs:931:13"
+    "message": "B4_003_INBOX_AUTHENTICATED_CARD_NOT_VISIBLE:{\"route\":\"#/leads\",\"role\":\"Asesor\",\"drawerOpen\":true,\"count\":\"72\\nactivas\",\"renderCount\":\"\",\"visibleIds\":[],\"cardFound\":false,\"cardCssDisplay\":\"\",\"cardVisibility\":\"\",\"drawerHeight\":720,\"scrollHeight\":720,\"message\":\"\"}|page.waitForSelector: Timeout 10000ms exceeded.\nCall log:\n  - waiting for locator('[data-notice-event=\"collab_mv13wkji_gphde\"]') to be visible",
+    "stack": "Error: B4_003_INBOX_AUTHENTICATED_CARD_NOT_VISIBLE:{\"route\":\"#/leads\",\"role\":\"Asesor\",\"drawerOpen\":true,\"count\":\"72\\nactivas\",\"renderCount\":\"\",\"visibleIds\":[],\"cardFound\":false,\"cardCssDisplay\":\"\",\"cardVisibility\":\"\",\"drawerHeight\":720,\"scrollHeight\":720,\"message\":\"\"}|page.waitForSelector: Timeout 10000ms exceeded.\nCall log:\n  - waiting for locator('[data-notice-event=\"collab_mv13wkji_gphde\"]') to be visible\n\n    at inboxUiFor (file:///home/runner/work/orbit360-core/orbit360-core/tools/gravicentra-i6-5-b4-003-preview-proof.mjs:214:10)\n    at async file:///home/runner/work/orbit360-core/orbit360-core/tools/gravicentra-i6-5-b4-003-preview-proof.mjs:1465:23"
   }
 }
