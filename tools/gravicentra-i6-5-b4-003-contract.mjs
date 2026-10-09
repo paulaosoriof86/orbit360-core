@@ -289,6 +289,42 @@ need(index.includes('modules/inicio.js?v=20261005-r19')&&index.includes('core/po
 
 need(cycle.includes('function actionQueueRanks')&&cycle.includes('Acción requerida · #')&&cycle.includes('Registrar guarda la colaboración inmediatamente')&&cycle.includes('humanCommentAuthor')&&cycle.includes('assignableAdvisors(n.pais).then'),'B4_003_R20_SECOND_REVIEW_OPS_LEADS_USABILITY_MISSING');
 need(index.includes('Reconociendo…')&&index.includes('Resolviendo…')&&index.includes('Archivando…')&&index.includes('inbox-active-count')&&index.includes('maybePendingLanding'),'B4_003_R20_SECOND_REVIEW_INBOX_FEEDBACK_MISSING');
+/* B4-003 · Inbox landing: derived from effective user+event state, not an open task alone.
+   Regression proof uses the exact inline source and no Firestore or session write. */
+{
+ const begin=index.indexOf('function newHandoffForSurface(r,surface)');
+ const end=index.indexOf('function refresh(){',begin);
+ need(begin>=0&&end>begin,'B4_003_INBOX_LANDING_SOURCE_NOT_FOUND');
+ const source=index.slice(begin,end);
+ const cases=[
+  ['NEW_OPERATIONS','Dirección','#/inicio',{targetSurface:'ops',read:false,acknowledged:false,archived:false,globalResolved:false},'#/ops'],
+  ['ACKNOWLEDGED','Dirección','#/inicio',{targetSurface:'ops',read:true,acknowledged:true},'#/inicio'],
+  ['READ_ONLY','Dirección','#/inicio',{targetSurface:'ops',read:true,acknowledged:false},'#/inicio'],
+  ['SHARED_RESOLVED','Dirección','#/inicio',{targetSurface:'ops',read:true,globalResolved:true},'#/inicio'],
+  ['PERSONALLY_ARCHIVED','Dirección','#/inicio',{targetSurface:'ops',archived:true},'#/inicio'],
+  ['EXPLICIT_DEEP_LINK','Dirección','#/polizas',{targetSurface:'ops'},'#/polizas'],
+  ['NEW_ADVISOR','Asesor','#/inicio',{targetSurface:'leads'},'#/leads'],
+  ['WRONG_RECIPIENT','Asesor','#/inicio',{targetSurface:'ops'},'#/inicio']
+ ];
+ for(const [label,role,hash,row,expected] of cases){
+  const context={rows:[row],location:{hash},activeRole:()=>role,startupLandingDone:false,autoLandingSurface:''};
+  vm.runInNewContext(source+'; maybePendingLanding();',context,{timeout:1000});
+  need(context.location.hash===expected,'B4_003_INBOX_LANDING_DISCRIMINANT_'+label+':'+context.location.hash);
+  if(label==='NEW_OPERATIONS'){
+   context.rows[0].read=true;
+   vm.runInNewContext(source+'; returnHomeIfAutoLandingComplete();',context,{timeout:1000});
+   need(context.location.hash==='#/inicio','B4_003_INBOX_ACKNOWLEDGED_AUTO_LANDING_NOT_CLEARED');
+  }
+ }
+ const context={rows:[],location:{hash:'#/inicio'},activeRole:()=>'Operativo',startupLandingDone:false,autoLandingSurface:''};
+ vm.runInNewContext(source+'; maybePendingLanding();',context,{timeout:1000});
+ context.rows.push({targetSurface:'ops',read:false});
+ vm.runInNewContext(source+'; maybePendingLanding();',context,{timeout:1000});
+ need(context.location.hash==='#/inicio','B4_003_INBOX_NEW_NOTICE_INTERRUPTS_ACTIVE_SESSION');
+ need(index.includes('id="ops-inbox-home"')&&index.includes("location.hash='#/inicio'")&&index.includes('INBOX_SERVER_READBACK_INCOMPLETE')&&index.includes("out.acknowledged===true")
+   &&index.includes("out.globalResolved===true")&&!index.includes("updateState(row,'read').catch(function(){}).finally"),
+   'B4_003_INBOX_READBACK_FAIL_CLOSED_MISSING');
+}
 need(insurer.includes('sourceCommissions=S().get')&&insurer.includes('visibleRequirements=[...body.querySelectorAll')&&insurer.includes('draft.docsRequeridos=retained'),'B4_003_R20_INSURER_DRAFT_SOURCE_PRESERVATION_MISSING');
 need(insurer.includes('function semanticValue')&&insurer.includes('Cambios detectados:')&&insurer.includes('Revisando cambios…')&&insurer.includes('Procesando logo…'),'B4_003_R20_SECOND_REVIEW_INSURER_SEMANTIC_DIFF_OR_PROGRESS_MISSING');
 need(importer.includes('analyzeInsurerSourceText')&&importer.includes('Analizar y clasificar')&&importer.includes('insurer-source-classifier')&&importer.includes('Cómo se analizó')&&importer.includes('id="imp-insurer-ramo"')&&importer.includes('id="imp-insurer-producto"')&&importer.includes('id="imp-insurer-plan"'),'B4_003_R20_SECOND_REVIEW_INSURER_IMPORTER_INTELLIGENCE_MISSING');

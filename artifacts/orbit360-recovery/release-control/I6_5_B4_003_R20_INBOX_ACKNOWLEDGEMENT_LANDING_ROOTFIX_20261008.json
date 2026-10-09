@@ -1,0 +1,42 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R20_INBOX_ACKNOWLEDGEMENT_LANDING_ROOTFIX_V1",
+  "date": "2026-10-08",
+  "gate": "I6.5/B4-003",
+  "repo": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "parentHead": "a0c8d098ba14ce72a525127dbc792941e05d22f0",
+  "cause": "Inbox startup route selected ANY shared open event regardless of readAt/acknowledgedAt, and kept reevaluating initial landing on later background refresh and active-role changes. Read-click swallowed server failure. Persisted hash deliberately acts as an explicit route/deep link.",
+  "fix": "Only new unread and unacknowledged/unresolved/unarchived notices may trigger one initial landing. Returning to Inicio follows successful readback of auto-landed acknowledge/resolve when none unseen remain. Preserves explicit deep links and later notifications as badge without interrupting navigation. Offers Ir a Inicio.",
+  "sourceChanges": {
+    "orbit360-platform/index.html": "b3fcb1c8c80c6d03baa8f96132d12a3216faa6b2"
+  },
+  "qaChanges": {
+    "tools/gravicentra-i6-5-b4-003-contract.mjs": "7131107f6f78565e0d0c7bd8af12acb0809a79e1"
+  },
+  "backend": "Existing persisted user inboxState read/ack and shared inboxTasks resolve; no backend data change.",
+  "tests": {
+    "inlineScriptSyntax": "PASS",
+    "landingScenarios": 9,
+    "autoHomeAfterAcknowledgement": "PASS",
+    "serverReadbackSuccessAndNegativeCases": 7,
+    "authenticatedPreview": "PENDING",
+    "productCodeAuthorizedScope": "index.html already in canonical 102 owners"
+  },
+  "boundaries": {
+    "noDataWrites": true,
+    "noBusinessStatusFaking": true,
+    "noReimport": true,
+    "noLivePromotion": true,
+    "sourceOnly": true,
+    "b4004Held": true
+  },
+  "userUXNotes": [
+    "Opening a request marks READ, not RESOLVED.",
+    "Recognize is personal and does not close work for the team.",
+    "Resolve for all changes shared inbox state, not underlying workflow/business status.",
+    "The red Acción requerida #2 card represents the collaboration direction independently of the unread badge; a separate workflow response is required.",
+    "Opening an explicit URL ending /#/ops navigates to Ops by design."
+  ],
+  "visualQueuePath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PAULA_PENDING_VISUAL_REVIEW_QUEUE_20261008.json",
+  "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_R20_CONTRACT_AND_EXACT_PREVIEW"
+}

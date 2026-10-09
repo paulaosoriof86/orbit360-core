@@ -96,23 +96,60 @@
     (function(){var sw=document.getElementById('lg-sw');if(sw)sw.innerHTML=Orbit.theme.PALETTES.slice(0,6).map(function(p){return '<button title="'+p.name+'" data-p="'+p.id+'" style="background:'+p.primary+'"></button>';}).join('');sw&&sw.querySelectorAll('button').forEach(function(b){b.addEventListener('click',function(){Orbit.theme.apply(b.dataset.p);});});})();
     (function(){var sel=document.getElementById('rol-sel'),lbl=document.getElementById('tb-rol-lbl');function roles(){return Orbit.session&&Orbit.session.allowedRoles?Orbit.session.allowedRoles():[];}function label(r){return Orbit.session&&Orbit.session.roleLabel?Orbit.session.roleLabel(r):r;}function rebuild(){if(Orbit.router&&Orbit.router.rebuildSidebar)Orbit.router.rebuildSidebar();try{window.dispatchEvent(new HashChangeEvent('hashchange'));}catch(e){window.dispatchEvent(new Event('hashchange'));}}function paint(){var list=roles(),active=Orbit.session&&Orbit.session.rol?Orbit.session.rol():'';if(!list.length){sel.innerHTML='<option value="">Acceso en validación</option>';sel.disabled=true;if(lbl)lbl.textContent='Acceso en validación · salir';return;}sel.disabled=false;sel.innerHTML=list.map(function(r){return '<option value="'+r+'">'+label(r)+'</option>';}).join('');if(active&&list.indexOf(active)>=0)sel.value=active;else sel.value=list[0];if(lbl)lbl.textContent=label(active&&list.indexOf(active)>=0?active:list[0])+' · salir';}paint();sel.addEventListener('change',function(e){e.stopPropagation();var ok=Orbit.session&&Orbit.session.set?Orbit.session.set(sel.value):false;if(ok===false)paint();});document.addEventListener('orbit:session',function(){paint();rebuild();});document.addEventListener('orbit:session:blocked',paint);window.addEventListener('orbit:product-readonly-bootstrap',function(e){if(e&&e.detail&&e.detail.ready===true){if(Orbit.session&&Orbit.session.syncFromAuth)Orbit.session.syncFromAuth();else paint();}});})();
     (function(){
-      var bell=document.getElementById('ops-inbox-bell'),cnt=document.getElementById('ops-inbox-count'),rows=[],busy=false,startupLandingDone=false;
+      var bell=document.getElementById('ops-inbox-bell'),cnt=document.getElementById('ops-inbox-count'),rows=[],busy=false,startupLandingDone=false,autoLandingSurface='';
       function tenant(){var x=window.__ORBIT360_PRODUCT_PUBLIC_CONFIG__||{};return String(x.tenantHint||'').trim();}
       function preview(){return /--/.test(String(location.hostname||''));}
       function activeRole(){try{return Orbit.session&&Orbit.session.rol?Orbit.session.rol():'';}catch(e){return'';}}
       function provider(){return Orbit.productRuntimeBrowserProvidersP0;}
       function call(name,args){var p=provider();if(!p||typeof p.callFunction!=='function')return Promise.reject(new Error('INBOX_PROVIDER_NOT_READY'));return p.callFunction(name,args,preview()?'us-east1':'us-central1');}
       function paint(){var n=rows.filter(function(r){return !r.archived&&!r.globalResolved&&!r.read;}).length;if(cnt){cnt.textContent=n||'';cnt.style.display=n?'grid':'none';}if(bell)bell.title=n?'Tareas compartidas nuevas · '+n:'Tareas y solicitudes compartidas';}
-      function maybePendingLanding(){if(startupLandingDone)return;var role=String(activeRole()||'').toLowerCase(),surface=/operativo|admin|direcci[oó]n|superadmin/.test(role)?'ops':/asesor|comercial|asistente/.test(role)?'leads':'';if(!surface)return;var current=String(location.hash||'');if(current&&current!=='#/inicio'){startupLandingDone=true;return;}var actionable=rows.find(function(r){return !r.archived&&!r.globalResolved&&(r.targetSurface||(r.direction==='operations'?'ops':'leads'))===surface;});if(actionable){startupLandingDone=true;location.hash='#/'+surface;}}
+      /* New and still-unread handoffs alone can determine a one-time landing.
+         Previously ACKNOWLEDGED tasks must never force Ops/Leads on the next login. */
+      function newHandoffForSurface(r,surface){
+        return !!(r&&surface&&!r.archived&&!r.globalResolved&&!r.acknowledged&&!r.read
+          &&(r.targetSurface||(r.direction==='operations'?'ops':'leads'))===surface);
+      }
+      function maybePendingLanding(){
+        if(startupLandingDone)return;
+        var role=String(activeRole()||'').toLowerCase(),surface=/operativo|admin|direcci[oó]n|superadmin/.test(role)?'ops':/asesor|comercial|asistente/.test(role)?'leads':'';
+        if(!surface)return;
+        startupLandingDone=true; // never interrupt a working session after initial inbox hydration
+        var current=String(location.hash||'');
+        if(current&&current!=='#/inicio')return; // explicit deep links stay authoritative
+        if(rows.some(function(r){return newHandoffForSurface(r,surface);})){
+          autoLandingSurface=surface;
+          location.hash='#/'+surface;
+        }
+      }
+      function returnHomeIfAutoLandingComplete(){
+        if(!autoLandingSurface||String(location.hash||'')!=='#/'+autoLandingSurface)return;
+        if(rows.some(function(r){return newHandoffForSurface(r,autoLandingSurface);} ))return;
+        autoLandingSurface='';
+        location.hash='#/inicio';
+      }
       function refresh(){if(busy||!tenant())return Promise.resolve(rows);busy=true;return call(preview()?'orbit360GetAdvisorOpsInboxPreview':'orbit360GetAdvisorOpsInbox',{tenantId:tenant(),activeRole:activeRole(),limit:100}).then(function(out){rows=[].concat(out&&out.notices||[]);paint();maybePendingLanding();return rows;}).catch(function(e){try{console.warn('[Gravicentra Inbox]',e&&e.message||e);}catch(x){}return rows;}).finally(function(){busy=false;});}
-      function updateState(row,action){if(!row||!row.eventId)return Promise.resolve();return call(preview()?'orbit360UpdateAdvisorOpsInboxStatePreview':'orbit360UpdateAdvisorOpsInboxState',{tenantId:tenant(),activeRole:activeRole(),noticeId:row.eventId,action:action});}
+      function updateState(row,action){
+        if(!row||!row.eventId)return Promise.reject(new Error('INBOX_NOTICE_NOT_SELECTED'));
+        return call(preview()?'orbit360UpdateAdvisorOpsInboxStatePreview':'orbit360UpdateAdvisorOpsInboxState',
+          {tenantId:tenant(),activeRole:activeRole(),noticeId:row.eventId,action:action}).then(function(out){
+            var correct=out&&out.ok===true&&String(out.noticeId||'')===String(row.eventId);
+            if(action==='read')correct=correct&&out.read===true;
+            if(action==='acknowledge')correct=correct&&out.acknowledged===true;
+            if(action==='resolve')correct=correct&&out.globalResolved===true;
+            if(action==='archive')correct=correct&&out.archived===true;
+            if(!correct)throw new Error('INBOX_SERVER_READBACK_INCOMPLETE');
+            row.read=!!out.read;row.acknowledged=!!out.acknowledged;
+            row.globalResolved=!!out.globalResolved;row.archived=!!out.archived;
+            paint();return out;
+          });
+      }
       function routeRow(row){if(!row)return;var id=row.entityId||'',type=row.entityType||'',surface=row.targetSurface||(row.direction==='operations'?'ops':'leads');if(type==='negocios'){location.hash=surface==='ops'?'#/ops':'#/leads';setTimeout(function(){Orbit.ciclo&&Orbit.ciclo.openNegocio&&Orbit.ciclo.openNegocio(id);},160);}else{location.hash='#/ops';setTimeout(function(){Orbit.ciclo&&Orbit.ciclo.openGestion&&Orbit.ciclo.openGestion(id);},160);}}
       function open(){
         var back=document.getElementById('ops-inbox-back'),dr=document.getElementById('ops-inbox-drawer');
         if(!back){back=document.createElement('div');back.id='ops-inbox-back';back.className='drawer-back';dr=document.createElement('div');dr.id='ops-inbox-drawer';dr.className='drawer';document.body.appendChild(back);document.body.appendChild(dr);back.addEventListener('click',function(){back.classList.remove('open');dr.classList.remove('open');});}
         var esc=Orbit.ui.esc,active=rows.filter(function(r){return !r.archived;});
         dr.innerHTML='<div class="imp-head"><div><div class="imp-eyebrow">Colaboración interna</div><div class="imp-title">📥 Tareas compartidas</div></div><button class="imp-x" id="ops-inbox-x">✕</button></div>'+
-          '<div class="inbox-toolbar"><span class="inbox-active-count"><b>'+active.length+'</b><span>activas</span></span><button class="btn ghost sm" id="ops-inbox-archive-resolved">Archivar resueltas</button></div>'+
+          '<div class="inbox-toolbar"><span class="inbox-active-count"><b>'+active.length+'</b><span>activas</span></span><button class="btn ghost sm" id="ops-inbox-home" type="button">Ir a Inicio</button><button class="btn ghost sm" id="ops-inbox-archive-resolved">Archivar resueltas</button></div>'
           '<div class="imp-body"><div class="cfg-note" style="margin-bottom:10px"><b>Estados separados:</b> “Reconocida por ti” es personal. “Resuelta para todos” cierra la tarea compartida para sus destinatarios.</div><div class="inbox-list">'+(active.length?active.map(function(n){
             var resolved=!!n.globalResolved,cls=resolved?'inbox-attended':n.acknowledged?'inbox-read':n.read?'inbox-read':'inbox-new',status=n.statusLabel||resolved&&'Resuelta para todos'||n.acknowledged&&'Reconocida por ti'||n.read&&'Vista por ti'||'Nueva';
             var actor=n.actorName||n.actorUid||'Autor no informado',recipient=(n.targetType||'destino')+': '+(n.targetId||'no informado'),owner=(n.ownerType||n.assigneeType||n.targetType||'responsable')+': '+(n.ownerId||n.assigneeId||n.targetId||'no informado');
@@ -121,9 +158,27 @@
             return '<article class="card pad inbox-card '+cls+'" data-notice-event="'+esc(n.eventId||'')+'"><button type="button" class="inbox-open" data-inbox-event="'+esc(n.eventId||'')+'"><div class="inbox-card-head"><b>'+esc(n.title||'Actualización')+'</b><span class="badge '+(resolved?'ok':n.acknowledged?'info':n.read?'neutral':'danger')+'">'+esc(status)+'</span></div><div class="inbox-message">'+esc(n.message||'')+'</div><div class="muted" style="font-size:11px;margin-top:7px">Autor: '+esc(actor)+' · Destinatario: '+esc(recipient)+' · Responsable: '+esc(owner)+'</div>'+resolvedBy+'<div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:7px">'+duplicate+'</div></button><div class="inbox-card-actions"><button class="btn ghost sm" data-inbox-ack="'+esc(n.eventId||'')+'" '+(n.acknowledged?'disabled':'')+'>'+(n.acknowledged?'✓ Reconocida':'Reconocer para mí')+'</button><button class="btn ghost sm" data-inbox-resolve="'+esc(n.eventId||'')+'" '+(resolved?'disabled':'')+'>'+(resolved?'✓ Resuelta para todos':'Resolver para todos')+'</button><button class="btn ghost sm" data-inbox-archive="'+esc(n.eventId||'')+'">Archivar para mí</button></div></article>';
           }).join(''):'<div class="empty">No tienes solicitudes internas pendientes.</div>')+'</div></div>';
         dr.querySelector('#ops-inbox-x').onclick=function(){back.classList.remove('open');dr.classList.remove('open');};
+        dr.querySelector('#ops-inbox-home').onclick=function(){back.classList.remove('open');dr.classList.remove('open');location.hash='#/inicio';};
         function byEvent(id){return rows.find(function(r){return String(r.eventId||'')===String(id||'');});}
-        dr.querySelectorAll('[data-inbox-event]').forEach(function(b){b.onclick=function(){var row=byEvent(b.dataset.inboxEvent);back.classList.remove('open');dr.classList.remove('open');updateState(row,'read').catch(function(){}).finally(function(){routeRow(row);});};});
-        function runStateButton(b,row,action,pendingText,successText){if(!b||b.disabled)return;var old=b.textContent;b.disabled=true;b.textContent=pendingText;b.setAttribute('aria-busy','true');updateState(row,action).then(refresh).then(function(){if(Orbit.ui&&Orbit.ui.toast)Orbit.ui.toast(successText);open();}).catch(function(){b.disabled=false;b.textContent=old;b.removeAttribute('aria-busy');if(Orbit.ui&&Orbit.ui.toast)Orbit.ui.toast('No fue posible confirmar la acción.');});}
+        dr.querySelectorAll('[data-inbox-event]').forEach(function(b){b.onclick=function(){
+          var row=byEvent(b.dataset.inboxEvent);
+          back.classList.remove('open');dr.classList.remove('open');
+          updateState(row,'read').then(refresh).catch(function(){
+            if(Orbit.ui&&Orbit.ui.toast)Orbit.ui.toast('No se confirmó como vista; la gestión se abrirá sin registrar lectura.');
+          }).finally(function(){routeRow(row);});
+        };});
+        function runStateButton(b,row,action,pendingText,successText){
+          if(!b||b.disabled)return;
+          var old=b.textContent;b.disabled=true;b.textContent=pendingText;b.setAttribute('aria-busy','true');
+          updateState(row,action).then(refresh).then(function(){
+            if(Orbit.ui&&Orbit.ui.toast)Orbit.ui.toast(successText);
+            if(action==='acknowledge'||action==='resolve')returnHomeIfAutoLandingComplete();
+            open();
+          }).catch(function(){
+            b.disabled=false;b.textContent=old;b.removeAttribute('aria-busy');
+            if(Orbit.ui&&Orbit.ui.toast)Orbit.ui.toast('No fue posible confirmar la acción en el servidor.');
+          });
+        }
         dr.querySelectorAll('[data-inbox-ack]').forEach(function(b){b.onclick=function(){runStateButton(b,byEvent(b.dataset.inboxAck),'acknowledge','Reconociendo…','La solicitud quedó reconocida para ti; sigue abierta para el equipo.');};});
         dr.querySelectorAll('[data-inbox-resolve]').forEach(function(b){b.onclick=function(){runStateButton(b,byEvent(b.dataset.inboxResolve),'resolve','Resolviendo…','La tarea quedó resuelta para todos sus destinatarios.');};});
         dr.querySelectorAll('[data-inbox-archive]').forEach(function(b){b.onclick=function(){runStateButton(b,byEvent(b.dataset.inboxArchive),'archive','Archivando…','La solicitud quedó archivada solo para ti.');};});
@@ -131,7 +186,7 @@
         back.classList.add('open');dr.classList.add('open');
       }
       if(bell)bell.addEventListener('click',function(){refresh().then(open);});
-      document.addEventListener('orbit:session',function(){startupLandingDone=false;setTimeout(refresh,80);});
+      document.addEventListener('orbit:session',function(){setTimeout(refresh,80);});
       document.addEventListener('orbit:ciclo',function(){setTimeout(refresh,80);});
       window.addEventListener('orbit:product-readonly-bootstrap',function(e){if(e&&e.detail&&e.detail.ready===true)setTimeout(refresh,100);});
       setTimeout(refresh,1200);setInterval(refresh,60000);

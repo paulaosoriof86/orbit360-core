@@ -585,7 +585,7 @@
   },
   "findingLedgerBlobSha": "1c8fdcf3d9d7a4fddb9defa01ea582cdba32c156",
   "continuityRegisterBlobSha": "48d945e51e5a10ec74dc925313b720a121ba7086",
-  "compositionLockBlobSha": "bec1d20d820b1fd76daedaba1d7da6417e64a71e",
+  "compositionLockBlobSha": "2af67aea759929ed6f72a14b85c7f0d27a802a17",
   "r18SourceFix": {
     "status": "SOURCE_FIXED_R18_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_SOURCE_FIX_20261005.json",
@@ -1535,5 +1535,13 @@
     },
     "exactPreviewRetestRequired": true,
     "oldCandidateRejected": true
+  },
+  "r20InboxLandingRootfix": {
+    "status": "SOURCE_STATIC_PASS_PREVIEW_PENDING",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_INBOX_ACKNOWLEDGEMENT_LANDING_ROOTFIX_20261008.json",
+    "receiptBlobSha": "e09c2c7f2ed4df29454ba8b28e1b2fc593174bad",
+    "visualQueuePath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PAULA_PENDING_VISUAL_REVIEW_QUEUE_20261008.json",
+    "visualQueueBlobSha": "23e09e25effee711a3a1b00a4e5881482823e3ce",
+    "noRealBusinessWrites": true
   }
 }

@@ -1,0 +1,92 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_PAULA_PENDING_VISUAL_DELTA_V1",
+  "date": "2026-10-08",
+  "authority": {
+    "repository": "paulaosoriof86/orbit360-core",
+    "branch": "recovery/fase-a-clean-20260831",
+    "gate": "I6.5/B4-003",
+    "headBefore": "a0c8d098ba14ce72a525127dbc792941e05d22f0",
+    "notProductionAccepted": true,
+    "humanUatRequired": true
+  },
+  "purpose": "Before each requested visual check explicitly distinguish source-staged from exact-preview-tested and already user-reviewed. No automatic PASS by opening a route.",
+  "items": [
+    {
+      "id": "INBOX_HOME_AND_ATTENDANCE",
+      "surface": "Tareas compartidas / Inicio",
+      "route": "#/inicio",
+      "state": "SOURCE_STATIC_PASS_PREVIEW_AND_PAULA_VISUAL_PENDING",
+      "source": "orbit360-platform/index.html",
+      "blobSha": "b3fcb1c8c80c6d03baa8f96132d12a3216faa6b2",
+      "whatChanged": "Only new/unread actionable items may cause the initial Ops/Leads landing; read/acknowledged/resolved/archived do not. Confirm server state before success. Show Ir a Inicio. Return to Inicio when auto-landed task queue is acknowledged/resolved.",
+      "whatToVisualize": "7-count inbox icon, Reconocer para mí, Resolver para todos, Archivar para mí, Ir a Inicio; refresh and sign-in landing with new vs acknowledged notices; Direccion and Asesor.",
+      "notProven": "Authenticated fresh-login test and persisted member state readback in exact successor Preview."
+    },
+    {
+      "id": "OPS_LEADS_COLLABORATION_ACTION",
+      "surface": "Ops y Leads",
+      "route": "#/ops",
+      "state": "PARTIALLY_VISIBLE_USER_SCREENSHOT_OTHER_P0_OPEN",
+      "source": "orbit360-platform/core/ciclo.js",
+      "whatChanged": "Existing Acción requerida (#) uses last collaboration direction; it is independent from personal inbox read acknowledgment.",
+      "whatToVisualize": "Opportunity card → open real work flow → record response/state transition → assess red action badge, cross-role inbox and reload.",
+      "notProven": "Badge to globally-resolved task convergence and durable closure across roles."
+    },
+    {
+      "id": "RENEWAL_LIFECYCLE",
+      "surface": "Renovaciones",
+      "route": "#/renovaciones",
+      "state": "SOURCE_FIXED_SYNTHETIC_PASS_BROWSER_PREVIEW_NOT_ACCEPTED",
+      "source": "orbit360-platform/modules/renovaciones.js",
+      "blobSha": "3bc8160255e026334cb1e691482b02b193e42f91",
+      "whatChanged": "Same-source Kanban owner distinguishes historic unlinked editions from overdue actionable coverage and protects CTA.",
+      "whatToVisualize": "Six inspected policy numbers and four Kanban columns, prior year vs current, review-only vs proposal/quote, roles and countries.",
+      "notProven": "Complete authenticated visual acceptance and all relation lineage writes; no synthetic new policy records."
+    },
+    {
+      "id": "CLIENT360",
+      "surface": "Cliente 360",
+      "route": "#/cliente360",
+      "state": "SOURCE_FIXED_PREVIEW_UAT_PENDING",
+      "source": "orbit360-platform/modules/cliente360.js",
+      "blobSha": "5250cd40950cc58106df2915f0605b38a566524a",
+      "whatChanged": "Use sourced formaPago/método de pago instead of raw undefined, separate installment frequency.",
+      "whatToVisualize": "Pólizas list, payment form, receipts, policy detail, GT/CO, responsive and reload.",
+      "notProven": "Production visible PASS."
+    },
+    {
+      "id": "CANCELATIONS",
+      "surface": "Cancelaciones",
+      "route": "#/cancelaciones",
+      "state": "SOURCE_FIXED_SYNTHETIC_PASS_EXACT_UAT_PENDING",
+      "source": "orbit360-platform/modules/cancelaciones.js",
+      "blobSha": "f14842484b464da6296a10459eb523d2b056ed98",
+      "whatChanged": "Historical missing motive not counted as cancellation cause; preserve reason editor and manual WhatsApp preparation.",
+      "whatToVisualize": "Motivo principal, 489 status-sourced rows, historic unknown vs documented reasons, individual and bulk WhatsApp, persistence on synthetic records.",
+      "notProven": "Exact Preview E2E acceptance of edits/WhatsApp."
+    },
+    {
+      "id": "POLICY_NAVIGATION_PERFORMANCE",
+      "surface": "Pólizas / Cliente 360 cross-routing",
+      "route": "#/polizas",
+      "state": "BLOCKING_PREVIEW_FAILURE",
+      "source": "orbit360-platform/modules/polizas.js",
+      "blobSha": "8c263c62911b2389168793f025b6f5fa14c1ead0",
+      "whatChanged": "Indexed policy search and on-demand detail preserved; browser route contract still intermittently failed.",
+      "whatToVisualize": "Route first paint <2500ms, search and detail, desktop/mobile, cold navigation.",
+      "notProven": "R20 full proof failed 6167ms wall / hash transition timeout; no PASS."
+    },
+    {
+      "id": "INSURERS_QUALITY_DESIGN",
+      "surface": "Aseguradoras / Calidad / diseño transversal",
+      "route": "#/aseguradoras",
+      "state": "PARALLEL_VISUAL_REVIEW_NOT_FULLY_ACCEPTED",
+      "source": "orbit360-platform/styles/infra.css",
+      "whatChanged": "Existing R20 transversal visual CSS grammar and insurer/quality improvements preserved, not silently reauthored in this source fix.",
+      "whatToVisualize": "Contrast, hierarchy, compactness, country/role responsive at 1440,390,320; insurer directory sources and quality drill-down.",
+      "notProven": "Cross-module approved-front-end visual parity."
+    }
+  ],
+  "readyToInvitePaula": false,
+  "rule": "When an exact Preview truly passes, present this full list and explicitly mark only the tested delta plus its unviewed fields; never ask Paula to approve an old artifact."
+}

@@ -208,7 +208,7 @@
     "orbit360-platform/data/tenant-alianzas-soluciones-insurers-p10.js": "41d2e31a42dac73eb68af304d5f532897210d0ee",
     "orbit360-platform/data/tenant-config/alianzas-soluciones.aseguradoras-knowledge-summary-v20261003.js": "2000d9ea8ab67bdd37d8bf404a29a405fa6374dd",
     "orbit360-platform/data/tenant-public-branding-index.js": "dc543c463f5ecd8ea44e49156d6282113bd95db6",
-    "orbit360-platform/index.html": "e0e5a4e975173dae4626b1150ca16820848e8918",
+    "orbit360-platform/index.html": "b3fcb1c8c80c6d03baa8f96132d12a3216faa6b2",
     "orbit360-platform/modules/academia.js": "d27aa080eac091057310aa7c952d3093677b50f0",
     "orbit360-platform/modules/aseguradoras-v1202-import-bridge.js": "db5f012abe505c2dd27d77a47d0694868bee5348",
     "orbit360-platform/modules/aseguradoras.js": "28bb3f15a1ca20130b194bb2dd5b1d296984927d",
@@ -4161,5 +4161,17 @@
     "priorMachinePassHumanInvalidated": true,
     "dataMutation": false,
     "livePromotion": false
+  },
+  "r20InboxLandingRootfix": {
+    "status": "SOURCE_STATIC_PASS_PREVIEW_PENDING",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_INBOX_ACKNOWLEDGEMENT_LANDING_ROOTFIX_20261008.json",
+    "receiptBlobSha": "e09c2c7f2ed4df29454ba8b28e1b2fc593174bad",
+    "visualQueuePath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PAULA_PENDING_VISUAL_REVIEW_QUEUE_20261008.json",
+    "visualQueueBlobSha": "23e09e25effee711a3a1b00a4e5881482823e3ce",
+    "changedSource": {
+      "orbit360-platform/index.html": "b3fcb1c8c80c6d03baa8f96132d12a3216faa6b2"
+    },
+    "qaContractBlobSha": "7131107f6f78565e0d0c7bd8af12acb0809a79e1",
+    "requireExactPreview": true
   }
 }
