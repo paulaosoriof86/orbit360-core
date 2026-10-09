@@ -1,0 +1,62 @@
+{
+  "schema": "GRAVICENTRA_PILOT_V6_S7_FORWARD_GATE_V1",
+  "recordedAt": "2026-10-09T07:24:30-06:00",
+  "scenario": "S7 Renovaciones / continuidad",
+  "participant": "CT02",
+  "role": "Operativo",
+  "status": "ELIGIBLE_FOR_TARGETED_HUMAN_READONLY_PILOT",
+  "principle": "FORWARD_ONLY_NONCAUSAL_RELEASE_FAILURE_DOES_NOT_REOPEN_PRIOR_PILOT",
+  "candidate": {
+    "sourceSha": "99c4a81d59c28550be4c318fc2b7600bdd43d832",
+    "buildId": "gi-i65-b4-99c4a81d59c2-57f234755dc1",
+    "runId": 37935549889,
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-37935549889-oji84a6s.web.app",
+    "exactHostingReadback": "PASS",
+    "artifactId": null,
+    "releaseWorkflowConclusion": "FAIL"
+  },
+  "releaseFailure": {
+    "code": "B4_003_R13_POLICY_ROUTE_DOM_TOO_SLOW",
+    "measuredWallMs": 3190,
+    "browserDomPaintMs": 2881,
+    "thresholdMs": 2500,
+    "affectedRoute": "polizas",
+    "classificationForS7": "NONCAUSAL_TO_RENEWALS_READONLY_SCENARIO"
+  },
+  "s7SpecificMachineEvidence": {
+    "realRenewalDistributionReadOnly": true,
+    "renewabilityTriStateFailClosed": true,
+    "renewabilityPendingStaysInKanban": true,
+    "renewalSelectedCountryScope": true,
+    "renewalCompactActions": true,
+    "renewalExpiredKpiSemanticsHuman": true,
+    "renewalDate45UniverseReconciled": true,
+    "renewabilityReviewWorkflowActionable": true,
+    "renewabilityReviewOpensFocusedTriState": true,
+    "renewabilitySyntheticServerCommitReload": true,
+    "noDelayedRenewalRenderMutation": true,
+    "renewalCampaignDurableReadback": true
+  },
+  "caveats": {
+    "realRenewalSourceDryRunReady": false,
+    "writesAuthorized": false,
+    "humanReadOnlyOnly": true,
+    "noProductionPromotion": true,
+    "noReimport": true,
+    "noPriorScenarioReopen": true
+  },
+  "sourceStability": {
+    "productSourceAfterCandidateChanged": false,
+    "note": "Commits after 99c4 only changed failed-proof evidence and S6 pilot control/evidence; no product files changed before this gate."
+  },
+  "humanTask": {
+    "objective": "Observe continuity, vencimiento, next action and responsible without executing renewal.",
+    "stopIf": [
+      "policy shown as actionable despite clearly terminal renewed/cancelled outcome",
+      "renewability unknown enables commercial CTA",
+      "role/scope incorrect",
+      "write required to inspect",
+      "candidate URL/build changes"
+    ]
+  }
+}
