@@ -26,7 +26,8 @@ Orbit.modules.ops = (function () {
       document.addEventListener('orbit:ciclo', f);
       document.addEventListener('orbit:pais', f);
       document.addEventListener('orbit:session', f);
-      unsub = () => { u1(); document.removeEventListener('orbit:ciclo', f); document.removeEventListener('orbit:pais', f); document.removeEventListener('orbit:session', f); };
+       document.addEventListener('orbit:inbox-state', f);
+      unsub = () => { u1(); document.removeEventListener('orbit:ciclo', f); document.removeEventListener('orbit:pais', f); document.removeEventListener('orbit:session', f); document.removeEventListener('orbit:inbox-state', f); };
     }
   }
 

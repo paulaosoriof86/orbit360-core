@@ -292,8 +292,12 @@ Orbit.ciclo = (function () {
   /* ===================== tarjetas ===================== */
   function collaborationState(n,board){
     const comments=[].concat(n&&n.comentarios||[]),last=comments.length?comments[comments.length-1]:null,direction=last&&last.direction||'';
-    const needsAction=(board==='ops'&&direction==='operations')||(board==='leads'&&direction==='advisor');
-    return{last,direction,needsAction,ts:String(last&&last.ts||n&&n.actualizado||n&&n.creado||'')};
+    const noticeId=String(last&&last.eventId||''),state=noticeId&&Orbit.sharedInboxState?.lookup?Orbit.sharedInboxState.lookup(noticeId):null;
+    /* El reconocimiento es personal; solo una resolución compartida confirmada
+       puede retirar la etiqueta Acción requerida en Ops/Leads. */
+    const sharedResolved=!!(state&&state.known===true&&state.globalResolved===true);
+    const needsAction=!sharedResolved&&((board==='ops'&&direction==='operations')||(board==='leads'&&direction==='advisor'));
+    return{last,direction,needsAction,sharedResolved,noticeKnown:!!(state&&state.known),ts:String(last&&last.ts||n&&n.actualizado||n&&n.creado||'')};
   }
   function actionQueueRanks(board){
     const rows=negocios({surface:board}).map(n=>({n,state:collaborationState(n,board)})).filter(x=>x.state.needsAction);
@@ -380,6 +384,7 @@ Orbit.ciclo = (function () {
     let asesores = ase&&ase.id?[ase]:[], asgs = insurersForCountry(n.pais);
     let selectedInsurerIds=[...new Set([].concat(n.aseguradoraIds||[],n.aseguradoraId||[]).filter(Boolean))].filter(id=>asgs.some(a=>a.id===id));
     const enOps = !!ei.ops;
+    const previewProtectedUpload=/--/.test(String(location.hostname||''))&&!(n.previewWrite===true&&/^b4003qa[_:-]/i.test(String(n.id||id)));
     // stepper
     const stepper = FLUJO.map((sid, i) => {
       const s = E[sid]; const idx = FLUJO.indexOf(n.etapa);
@@ -441,7 +446,7 @@ Orbit.ciclo = (function () {
             <div class="ciclo-sec-t ciclo-collab-title"><span>↕ Solicitudes, respuestas y comentarios</span><span class="badge neutral">${(n.comentarios||[]).length}</span></div>
             <div class="ciclo-collab-help">Usa esta sección para devolver, responder o dejar una observación. <b>Registrar guarda la colaboración inmediatamente</b>; no necesitas pulsar “Guardar cambios” después.</div>
             <div id="ng-coms" class="ciclo-collab-thread">${(n.comentarios || []).slice().reverse().map(comRow).join('') || '<div class="muted ciclo-collab-empty">Todavía no hay solicitudes ni comentarios.</div>'}</div>
-            <div class="cadd ciclo-collab-add"><select id="ng-com-type" class="o-sel">${COLLAB_TYPES.map(v=>'<option>'+U.esc(v)+'</option>').join('')}</select><input id="ng-com-new" class="o-sel" placeholder="Escribe qué necesitas o qué respondes…"><label class="btn ghost sm collab-file-btn"><span data-collab-file-action>📎 Adjuntar</span><input id="ng-com-file" type="file" hidden></label><button type="button" class="btn ghost sm" data-collab-file-remove hidden>Quitar archivo</button><button class="btn primary sm" id="ng-com-add">Registrar ahora</button></div><div class="muted" id="ng-com-file-name" role="status" aria-live="polite" style="font-size:11.5px;margin-top:6px">Puedes adjuntar un documento de respaldo.</div>
+            <div class="cadd ciclo-collab-add"><select id="ng-com-type" class="o-sel">${COLLAB_TYPES.map(v=>'<option>'+U.esc(v)+'</option>').join('')}</select><input id="ng-com-new" class="o-sel" placeholder="Escribe qué necesitas o qué respondes…"><label class="btn ghost sm collab-file-btn" ${previewProtectedUpload?'aria-disabled="true" title="Preview: documentos de negocios reales protegidos" style="opacity:.55;cursor:not-allowed"':''}><span data-collab-file-action>📎 ${previewProtectedUpload?'Carga protegida':'Adjuntar'}</span><input id="ng-com-file" type="file" ${previewProtectedUpload?'disabled':''} hidden></label><button type="button" class="btn ghost sm" data-collab-file-remove hidden>Quitar archivo</button><button class="btn primary sm" id="ng-com-add">Registrar ahora</button></div><div class="muted" id="ng-com-file-name" role="status" aria-live="polite" style="font-size:11.5px;margin-top:6px">${previewProtectedUpload?'Esta Preview protege los archivos de negocios reales. La carga se comprueba con expedientes de prueba autorizados; en producción requiere validación LIVE.':'Puedes adjuntar un documento de respaldo.'}</div>
           </div>
         </div>
         <aside class="ciclo-aside">
@@ -550,6 +555,7 @@ Orbit.ciclo = (function () {
       const prior = (n.comentarios || []).slice(),priorBit=(n.bitacora||[]).slice();
       const direction=collaborationDirection(tipo),eventId='collab_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,7),ts=stamp(),file=comFile&&comFile.files&&comFile.files[0]||null;
       let uploaded=null,attachment=null,commentCommitted=false;
+      if(file&&previewProtectedUpload){U.toast('Esta Preview protege el expediente real. No se intentó subir el archivo ni registrar un comentario.');return;}
       comadd.disabled = true;comadd.dataset.originalLabel=comadd.textContent;comadd.textContent=file?'Subiendo y registrando…':'Registrando…';comadd.setAttribute('aria-busy','true');
       try {
         if(file){

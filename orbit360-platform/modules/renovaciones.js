@@ -13,7 +13,7 @@ Orbit.modules.renovaciones = (function () {
   const READINESS_BUDGET_MS = 8000;
   let readinessStartedAt = 0, readinessTimer = null, activeHost = null, refreshTimer = null;
   function ensureDataCollections() {
-    try { const store=S(); if(store&&typeof store._ensureCollections==='function') store._ensureCollections(REQUIRED_DATA.concat(OPTIONAL_ENRICHMENT_DATA, searchText.trim() ? SEARCH_ENRICHMENT_DATA : [])); } catch (_) {}
+    try { const store=S(); if(store&&typeof store._ensureCollections==='function') store._ensureCollections(REQUIRED_DATA.concat(OPTIONAL_ENRICHMENT_DATA, ['vehiculos'], searchText.trim() ? SEARCH_ENRICHMENT_DATA : [])); } catch (_) {}
   }
   function renewalDataReadiness() {
     const store=S();
@@ -75,47 +75,91 @@ Orbit.modules.renovaciones = (function () {
   /* R20: authoritative read-only lifecycle projection. Administrative state,
      effective vigencia and verified issuance are separate dimensions. */
   let activeLifecycle=null;
+
+  /* B4-003: la vigencia y el estado fuente no acreditan por si solos
+     una renovacion. La continuidad puede cambiar de numero de poliza.
+     Toda proyeccion es read-only, nunca escribe renuevaDe/renovadaPor. */
   function renewalLifecycleSnapshot(){
-    const rows=(S().all('polizas')||[]).filter(p=>p&&p.id);
+    const store=S(),rows=(store.all('polizas')||[]).filter(p=>p&&p.id);
     const norm=v=>String(v==null?'':v).trim().normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase().replace(/[^A-Z0-9]/g,'');
-    const familyKey=p=>{const pais=policyCountry(p);if(!p.numero||!p.clienteId||!p.aseguradoraId||!pais)return 'IDENTIDAD_INCOMPLETA|'+String(p.id||'');return [p.tenantId||'',pais,p.clienteId||'',p.aseguradoraId||'',p.ramo||'',p.numero||''].map(norm).join('|');};
-    const groups=new Map(),byId=new Map(),reverse=new Map(),cache=new Map();
-    for(const p of rows){byId.set(String(p.id),p);const key=familyKey(p);if(!groups.has(key))groups.set(key,[]);groups.get(key).push(p);
-      if(p.renuevaDe){const parent=String(p.renuevaDe);if(!reverse.has(parent))reverse.set(parent,[]);reverse.get(parent).push(p);}}
+    const byId=new Map(rows.map(p=>[String(p.id),p])),reverse=new Map(),byCore=new Map(),cache=new Map(),plates=new Map();
+    const coreKey=p=>{
+      const tenant=norm(p&&p.tenantId),pais=norm(policyCountry(p)),client=norm(p&&p.clienteId),insurer=norm(p&&p.aseguradoraId),ramo=norm(p&&p.ramo);
+      return !pais||!client||!insurer||!ramo?'INCOMPLETE|'+String(p&&p.id||''):[tenant,pais,client,insurer,ramo].join('|');
+    };
+    function plate(p){
+      const direct=norm(p&& (p.placa||p.placaNormalizada||p.placaFuente||''));
+      if(direct)return direct;
+      const text=String(p&&(p.bienAsegurado||p.descripcionRiesgo||p.riesgoDescripcion)||'');
+      const match=text.match(/placas?\s*[:\-]?\s*([A-Za-z0-9\-–— ]{4,18})/i);
+      return match?norm(match[1]):'';
+    }
+    for(const v of (store.all('vehiculos')||[])){
+      const id=String(v&&v.polizaId||''),number=norm(v&&(v.placa||v.placaNormalizada||v.placaFuente)||'');
+      if(id&&number){const values=plates.get(id)||new Set();values.add(number);plates.set(id,values);}
+    }
+    for(const p of rows){
+      const key=coreKey(p);if(!byCore.has(key))byCore.set(key,[]);byCore.get(key).push(p);
+      if(p.renuevaDe){const parent=String(p.renuevaDe);if(!reverse.has(parent))reverse.set(parent,[]);reverse.get(parent).push(p);}
+    }
+    const riskSet=p=>{
+      const values=new Set(plates.get(String(p.id))||[]),own=plate(p);if(own)values.add(own);return values;
+    };
+    const riskCompatible=(p,q)=>{
+      const left=riskSet(p),right=riskSet(q);
+      return !left.size||!right.size||[...left].some(x=>right.has(x));
+    };
+    const strictSameRisk=(p,q)=>{
+      const left=riskSet(p),right=riskSet(q);
+      return left.size>0&&right.size>0&&[...left].some(x=>right.has(x));
+    };
+    const sameCore=(p,q)=>coreKey(p)===coreKey(q)&&!coreKey(p).startsWith('INCOMPLETE|')&&riskCompatible(p,q);
     const later=(p,q)=>!!(p.vigenciaInicio&&p.vigenciaFin&&q.vigenciaInicio&&q.vigenciaFin&&String(q.vigenciaInicio)>String(p.vigenciaInicio)&&String(q.vigenciaFin)>String(p.vigenciaFin));
+    const sourceRenewal=q=>/RENOVAD/.test(norm(q&&(q.tipoEmision||q.tipoDeEmision||q.tipo_emision||q.emisionTipo||q.tipoEmisionPoliza||'')));
+    const consecutive=(p,q)=>{
+      const end=Date.parse(String(p.vigenciaFin||'')+'T00:00:00Z'),start=Date.parse(String(q.vigenciaInicio||'')+'T00:00:00Z');
+      return Number.isFinite(end)&&Number.isFinite(start)&&Math.abs(start-end)<=31*86400000;
+    };
     function assess(p){
       if(!p)return{bucketEligible:false,actionable:false,reviewOnly:false,terminal:true,reason:'POLIZA_AUSENTE'};
       const id=String(p.id||''),prior=cache.get(id);if(prior)return prior;
-      const state=policyState(p),renewable=renewabilityState(p),d=U.daysFromNow(p.vigenciaFin);
-      const newer=(groups.get(familyKey(p))||[]).filter(q=>q.id!==p.id&&later(p,q));
-      const forward=p.renovadaPor?byId.get(String(p.renovadaPor)):null,back=(reverse.get(id)||[]).filter(q=>q.id!==p.id);
+      const state=policyState(p),renewable=renewabilityState(p),d=U.daysFromNow(p.vigenciaFin),key=coreKey(p);
+      const sameGroup=(p.numero?(byCore.get(key)||[]):[]).filter(q=>q.id!==p.id&&q.numero&&later(p,q)&&sameCore(p,q));
+      const forward=p.renovadaPor?byId.get(String(p.renovadaPor)):null;
+      const back=(reverse.get(id)||[]).filter(q=>q.id!==p.id);
       const explicit=[...(forward?[forward]:[]),...back].filter((q,i,a)=>a.findIndex(x=>x.id===q.id)===i);
-      const valid=explicit.filter(q=>familyKey(q)===familyKey(p)&&later(p,q));
-      const broken=!!p.renovadaPor&&!forward||explicit.some(q=>!valid.some(v=>v.id===q.id));
-      const potential=newer.some(q=>!valid.some(v=>v.id===q.id));
+      const verified=explicit.filter(q=>later(p,q)&&sameCore(p,q)&&(!q.renuevaDe||String(q.renuevaDe)===id)&&(!p.renovadaPor||String(p.renovadaPor)===String(q.id)));
+      const broken=!!p.renovadaPor&&!forward||explicit.some(q=>!verified.some(v=>v.id===q.id));
+      const sourceCandidates=sameGroup.filter(q=>
+        strictSameRisk(p,q)&&consecutive(p,q)&&sourceRenewal(q)&&
+        ['vigente','porrenovar'].includes(policyState(q)));
+      const sourceBacked=sourceCandidates.length===1?sourceCandidates[0]:null;
+      const possible=sameGroup.length>0;
       const renewalState=String(p.renovacionEstado||'').trim().toLowerCase().replace(/[\s_-]+/g,'');
       const cancelled=['cancelada','anulada','cancelado','anulado'].includes(state)||renewalState==='cancelada';
       const closed=['norenovada','rechazada','cerrada'].includes(renewalState)||['norenovada','rechazada','reexpedida'].includes(state);
       const historical=['renovada','historica','historico'].includes(state);
       let reason='FUERA_DE_HORIZONTE',terminal=false,actionable=false,reviewOnly=false,bucketEligible=false;
       if(cancelled){terminal=true;reason='CANCELADA';}
-      else if(valid.length===1){terminal=true;reason='RENOVACION_VINCULADA';}
-      else if(valid.length>1||broken){reason='LINEAGE_CONFLICTO';reviewOnly=true;bucketEligible=d!=null&&d<0;}
-      else if(historical&&potential){reason=closed?'ESTADO_CONTRADICTORIO_SUCESORA_SIN_VINCULO':'EDICION_POSTERIOR_SIN_VINCULO';reviewOnly=true;}
-      else if(renewalState==='renovada'){reason='RENOVADA_DECLARADA_SIN_SUCESORA_VERIFICADA';reviewOnly=true;bucketEligible=d!=null&&d<0&&renewable!=='NO';}
+      else if(verified.length===1&&!broken){terminal=true;reason='RENOVACION_VINCULADA';}
+      else if(verified.length>1||broken){reason='LINEAGE_CONFLICTO';reviewOnly=true;bucketEligible=d!=null&&d<0&&renewable!=='NO';}
       else if(closed){reason='NO_RENOVADA_CERRADA';terminal=true;}
-      else if(historical){reason='HISTORICA_SIN_SUCESORA_ACREDITADA';reviewOnly=true;bucketEligible=d!=null&&d<0&&renewable!=='NO';}
+      else if(sourceBacked){
+        reason='SUCESORA_DE_FUENTE_PENDIENTE_ENLACE';reviewOnly=true;bucketEligible=false;
+      }
+      else if(renewalState==='renovada'){reason='RENOVADA_DECLARADA_SIN_SUCESORA_VERIFICADA';reviewOnly=true;bucketEligible=d!=null&&d<0&&renewable!=='NO';}
+      else if(historical){reason=possible?'POSIBLE_SUCESORA_SIN_PRUEBA_SUFICIENTE':'HISTORICA_SIN_SUCESORA_ACREDITADA';reviewOnly=true;bucketEligible=d!=null&&d<0&&renewable!=='NO';}
       else if(renewable==='NO'){reason='NO_RENOVABLE';terminal=true;}
       else if(d!=null&&d<=90&&['vigente','porrenovar','vencida'].includes(state)){
-        bucketEligible=d<0||['vigente','porrenovar'].includes(state);
-        reviewOnly=renewable==='UNKNOWN';actionable=bucketEligible&&!reviewOnly;
+        bucketEligible=d<0||['vigente','porrenovar'].includes(state);reviewOnly=renewable==='UNKNOWN';actionable=bucketEligible&&!reviewOnly;
         reason=reviewOnly?'RENOVABILIDAD_SIN_CONFIRMAR':d<0?'VENCIDA_POR_GESTIONAR':'PROXIMA_POR_GESTIONAR';
       }else reason=d==null?'VIGENCIA_NO_CONFIRMADA':'ESTADO_NO_APTO';
-      const value={id,days:d,reason,terminal,actionable,reviewOnly,bucketEligible,potentialSuccessor:potential,verifiedSuccessorId:valid.length===1?valid[0].id:'',effectiveCoverage:d==null?'DESCONOCIDA':d<0?'VENCIDA':d===0?'VENCE_HOY':'NO_VENCIDA',adminState:policyStateLabel(p)};
+      const value={id,days:d,reason,terminal,actionable,reviewOnly,bucketEligible,potentialSuccessor:possible,verifiedSuccessorId:verified.length===1&&!broken?String(verified[0].id):'',sourceBackedSuccessorId:sourceBacked?String(sourceBacked.id):'',effectiveCoverage:d==null?'DESCONOCIDA':d<0?'VENCIDA':d===0?'VENCE_HOY':'NO_VENCIDA',adminState:policyStateLabel(p)};
       if(id)cache.set(id,value);return value;
     }
     return{assess,rows};
   }
+
   let cachedLifecycle=null,lastLifecycleSnapshotAt=0,lastLifecycleScopeKey='';
   const sharedLifecycle=()=>{
     const store=S(),user=Orbit.auth&&Orbit.auth.productUser||{};
@@ -216,7 +260,11 @@ Orbit.modules.renovaciones = (function () {
     const dispositionRows45=date45DispositionRows(),disposition45=date45Disposition();
     const totalPrima = cols.reduce((s, c) => s + c.items.filter(it=>lifecycleOf(it.p).actionable).reduce((ss, it) => ss + q.norm(it.p.prima, it.p.moneda), 0), 0),expired=expiredContext();
     const reviewCount=cols.reduce((n,c)=>n+c.items.filter(it=>lifecycleOf(it.p).reviewOnly).length,0);
-    const unlinkedHistorical=activeLifecycle.rows.filter(p=>selectedCountry(p)&&['EDICION_POSTERIOR_SIN_VINCULO','ESTADO_CONTRADICTORIO_SUCESORA_SIN_VINCULO'].includes(lifecycleOf(p).reason)).length;
+    const unlinkedHistorical=activeLifecycle.rows.filter(p=>selectedCountry(p)&&lifecycleOf(p).reason==='SUCESORA_DE_FUENTE_PENDIENTE_ENLACE').length;
+    const unlinkedCases=activeLifecycle.rows.filter(p=>selectedCountry(p)&&lifecycleOf(p).sourceBackedSuccessorId);
+    const effectiveBadge=(p,life,d)=>d<0
+      ?life.reviewOnly?'Vencida · resultado por verificar':'Vencida'
+      :life.reviewOnly?'Vigencia en revisión':'Vigente';
     const toneBg = { danger: 'var(--danger)', warn: 'var(--warn)', info: 'var(--info)' };
 
     host.innerHTML = `<div class="page">
@@ -227,7 +275,14 @@ Orbit.modules.renovaciones = (function () {
         { label: '16–45 días', val: cols[2].items.length, color: 'var(--warn)', foot: 'planificar', onclick: "location.hash='#/renovaciones'" },
         { label: 'Prima en juego', val: U.moneyShort(totalPrima, Orbit.q.monedaPais()), color: 'var(--ok)', foot: 'a 90 días', onclick: "location.hash='#/renovaciones'" }
       ])}
-      <div class="cfg-note renewal-pipeline-note" data-renewability-pending-count="${pendingValidation.length}" data-expired-pipeline-count="${expired.pipeline}" data-expired-historical-count="${expired.historicalExpired}" style="margin:0 0 14px"><b>Pipeline de renovación por fecha</b><div class="muted" style="margin-top:5px"><b>${expired.pipeline}</b> vigencias vencidas están en el Kanban, de las cuales <b>${reviewCount}</b> tarjetas requieren verificar su estado y no permiten renovar automáticamente. <b>${unlinkedHistorical}</b> ediciones históricas tienen sucesoras posibles sin enlace formal; no se cuentan como deuda comercial ni como renovación certificada. Existen <b>${expired.historicalExpired}</b> ediciones históricas vencidas; ${expired.nonrenewable} son no renovables y ${expired.terminal} tienen disposición terminal registrada. Cada póliza pendiente permanece en su columna por vigencia y se revisa desde allí, sin crear una tabla paralela.</div></div>
+      <details class="renewal-pipeline-note" data-renewability-pending-count="${pendingValidation.length}" data-expired-pipeline-count="${expired.pipeline}" data-expired-historical-count="${expired.historicalExpired}" data-source-link-review-count="${unlinkedHistorical}" style="margin:0 0 12px;font-size:12px">
+        <summary style="cursor:pointer;color:var(--ink-3)">${unlinkedHistorical+reviewCount} situaciones para revisar · Ver información</summary>
+        <div class="cfg-note" style="margin-top:8px">
+          <b>Revisión de información</b>
+          <p>${reviewCount} vencidas requieren validar su estado antes de una acción automática. ${unlinkedHistorical} ediciones anteriores tienen una nueva vigencia con evidencia de origen, pero su vínculo todavía no está registrado. No se consideran renovaciones acreditadas ni se envían a campaña mientras se verifica esa relación.</p>
+          ${unlinkedCases.slice(0,20).map(p=>'<button type="button" class="btn ghost sm" data-unlinked-review="'+U.esc(p.id)+'">Revisar relación: '+U.esc(p.numero||'Sin número')+'</button>').join('')}
+        </div>
+      </details>
       <div class="renewal-searchbar" role="search" aria-label="Buscar renovaciones">
         <label for="renewal-search" class="renewal-search-label">Buscar renovaciones</label>
         <div class="renewal-search-controls"><input type="search" id="renewal-search" data-renewal-search-input aria-label="Buscar póliza, cliente, aseguradora, ramo, producto, asesor o placa" autocomplete="off" placeholder="Póliza, cliente, aseguradora, placa…" value="${U.esc(searchText)}"><button type="button" class="btn ghost sm" data-renewal-search-clear ${!searchText?'disabled':''}>Limpiar</button></div>
@@ -272,7 +327,7 @@ Orbit.modules.renovaciones = (function () {
                     <span class="mono" style="font-size:11px;font-weight:600;white-space:nowrap">${premiumValue(p)==null?'<span class="badge warn">Prima pendiente de fuente</span>':U.moneyShort(premiumValue(p),p.moneda)}</span>
                   </div>
                   <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:7px">
-                    <span class="badge neutral">Póliza: ${U.esc(policyStateLabel(p))}</span>
+                    <span class="badge neutral" data-renewal-effective-status="${U.esc(life.reason)}" title="Estado de origen: ${U.esc(policyStateLabel(p))}">${U.esc(effectiveBadge(p,life,d))}</span>
                     <span class="badge ${d<0?'danger':'info'}">Vigencia calculada: ${U.esc(renewalStateLabel(p,d))}</span>
                     ${life.reviewOnly?'<span class="badge warn">Revisión necesaria · renovación bloqueada</span>':renewabilityState(p)==='UNKNOWN'?'<span class="badge warn">Decisión: renovabilidad pendiente</span>':'<span class="badge ok">Decisión: renovable</span>'}
                   </div>
@@ -286,6 +341,7 @@ Orbit.modules.renovaciones = (function () {
           </div>
         </div>`).join('')}
       </div></div>`;
+    host.querySelectorAll('[data-unlinked-review]').forEach(button=>button.addEventListener('click',()=>Orbit.modules.cliente360.verPoliza(button.dataset.unlinkedReview)));
     const box=host.querySelector('[data-renewal-search-input]');
     if(box)box.addEventListener('input',event=>{
       searchText=event.target.value;clearTimeout(searchTimer);
@@ -307,7 +363,7 @@ Orbit.modules.renovaciones = (function () {
     if (collection !== '*' && !REQUIRED_DATA.includes(collection) && collection !== 'aseguradoras' && !(searchText.trim() && SEARCH_ENRICHMENT_DATA.includes(collection))) return;
     if (!activeHost || !activeHost.isConnected || !String(location.hash || '').startsWith('#/renovaciones')) return;
     const busy = activeHost.querySelector('[data-renewals-loading]');
-    if (!busy && collection !== 'aseguradoras' && !searchText.trim()) return;
+    if (!busy && collection !== 'aseguradoras' && collection !== 'vehiculos' && !searchText.trim()) return;
     if (refreshTimer) return;
     refreshTimer = setTimeout(() => {
       refreshTimer = null;

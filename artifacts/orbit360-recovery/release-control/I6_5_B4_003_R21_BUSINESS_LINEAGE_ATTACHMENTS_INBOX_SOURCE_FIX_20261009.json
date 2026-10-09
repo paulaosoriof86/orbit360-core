@@ -1,0 +1,80 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R21_CAUSAL_SOURCE_FIX_V1",
+  "date": "2026-10-09",
+  "status": "SOURCE_FIXED_R21_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+  "authority": {
+    "userDirective": "CONTINUE_WITHIN_EXISTING_B4_003_BLOCKING_P0",
+    "previousVisualFeedbackPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PAULA_CRITICAL_VISUAL_FEEDBACK_20261009.json",
+    "previousVisualFeedbackBlobSha": "cc908285b2e86ecdde4acb99bac3843f221e2185",
+    "noRebuild": true,
+    "noParallelBranch": true,
+    "governanceApproval": "SOURCE_ONLY_AND_EXACT_SYNTHETIC_PREVIEW_NO_LIVE_NO_DATA"
+  },
+  "repo": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "sourceBaseHead": "466032ac7fed382bd16469bf5427e694c78f8805",
+  "activeGate": "I6.5/B4-003",
+  "previousGateStatus": "B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL",
+  "defectOwners": {
+    "renewals": "familyKey previously included policy number and rejected changed-number successors, while rendering administrative historical/renewed labels as effective commercial status",
+    "documents": "Preview real business upload was rejected server-side after allowing file selection, with misleading generic error",
+    "collaboration": "Ops/Leads action badge used last typed comment direction but ignored shared resolution stored in authenticated inbox tasks"
+  },
+  "changes": {
+    "orbit360-platform/modules/renovaciones.js": "73fb1ba31a9cb41df60d32dd40a5cfc5c881b6f5",
+    "orbit360-platform/core/ciclo.js": "1d2d3c0b4e1ae1231b7b90c180f73079db79fab3",
+    "orbit360-platform/index.html": "0de5cfe914712563ec6e67b1950f708432139126",
+    "orbit360-platform/modules/ops.js": "a4ca3dbb4613d541af411f12fce9773a072b0d41",
+    "orbit360-platform/modules/leads.js": "4e12e604382f2731a03d29cf00db3c086d77ebc1"
+  },
+  "qaOwners": {
+    "tools/gravicentra-i6-5-b4-003-contract.mjs": "9b0c519940247caf002b385fbae566cc93d92a0e",
+    "tools/gravicentra-i6-5-b4-003-preview-proof.mjs": "f24f2d76af5995097b6d349084d186bee5c99741"
+  },
+  "canonicalCompositionBlobSha": "9fcdeb60ca6af103031aa9c8eab161dcc11da047",
+  "sourceEvidence": {
+    "changedNumberIssuedRenewal": {
+      "priorNumber": "02-01-488-5659-0",
+      "newNumber": "02-01-488-5659-1",
+      "sameSourceVehicle": "P-728JPL",
+      "policySource": "Polizas (16).xlsx",
+      "renewalIssuanceStatus": "Póliza Renovada",
+      "interpretation": "Read-only strong candidate, not persisted formal link"
+    },
+    "unverifiedStatus": {
+      "policyNumber": "1000000181",
+      "sourceStatus": "Renovada",
+      "noSuccessorInSuppliedPolicyExport": true,
+      "decision": "Remain expired under protected review unless supported"
+    },
+    "historicCutoff": {
+      "cutoffDate": "2026-07-31",
+      "appliedWrites": 583,
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_B02_RENEWAL_CUTOFF_APPLY_RESULT_20261008.json",
+      "receiptBlobSha": "debd50227bca77a04c5e10fb8cb5af178858ce6a",
+      "authorizedRepeat": false
+    }
+  },
+  "invariant": "No risk mismatch, different client, missing number, ambiguous or unproved successor may be auto-closed. Unique source-backed unlinked candidate is removed from commercial campaign but remains visible in collapsed reconciliation and retains no persisted renewed status.",
+  "attachmentBoundary": "Real operational business in Preview never uploads; synthetic b4003qa previewWrite allows full upload/readback/finalize; production document path untouched and LIVE acceptance pending.",
+  "inboxBoundary": "Personal acknowledgment retains task; global shared resolve clears action badge only after server-confirmed inbox projection and across authorized role scopes; archive never implies resolve.",
+  "tests": {
+    "staticSourceSyntax": "PASS_FOR_ALL_STAGED_JS",
+    "focusedRenewalEightCases": "PASS",
+    "authenticatedBrowser": "PENDING",
+    "persistenceReload": "PENDING",
+    "humanVisual": "PENDING"
+  },
+  "sourceMutationAuthorized": true,
+  "operationalBusinessWrites": 0,
+  "dataMutationAuthorized": false,
+  "reimportAuthorized": false,
+  "livePromotionAuthorized": false,
+  "priorMachineProof": {
+    "sourceSha": "511e9009575b5a77fcb2f2bd2c3ac01227e7b622",
+    "runId": 37950852293,
+    "artifactId": 11626545264,
+    "status": "PRESERVED_BUT_INVALID_FOR_CHANGED_SOURCE"
+  },
+  "nextAction": "B4_003_R21_EXACT_CONTRACT_AND_PREVIEW"
+}

@@ -2969,7 +2969,7 @@
       "block": "B4",
       "source": "FROZEN_PLAN",
       "finding": "Cumulative B4-003 remediation: lifecycle, premium/source authority, Information Health, insurer knowledge and Gravicentra↔CotComp Quote Authority.",
-      "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
+      "status": "R21_CAUSAL_SOURCE_FIXED_EXACT_PREVIEW_PENDING",
       "blocking": true,
       "mayDisappearWithoutDisposition": false,
       "humanEvidence": [
@@ -3007,7 +3007,7 @@
         "Exact Preview: Cliente 360 has bidirectional tab navigation.",
         "Exact Preview: Calidad respects global country and synchronous render path is measured under 2500 ms in authenticated harness."
       ],
-      "nextAction": "B4_003_R20_TARGETED_PAULA_VISUAL",
+      "nextAction": "B4_003_R21_EXACT_CONTRACT_AND_PREVIEW",
       "rootCause": "RENEWALS_CANCELATIONS_MULTI_CAUSAL_SOURCE_GAPS_WITH_CANONICAL_POLICY_PROJECTION_GAP",
       "causeClassification": "PRODUCT_LOGIC_DEFECT_DEMONSTRATED",
       "evidence": {
@@ -3058,7 +3058,7 @@
       "sourceFixR4ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CAUSAL_SOURCE_FIX_R4_CANONICAL_POLICY_PROJECTION_20261003.json",
       "sourceFixR4ReceiptBlobSha": "05678425b7b2a0a0c334aac01e429c2c3d6445f0",
       "sourceFixR4SourceHead": "597ac785fa5a7affa128dbb143a6c274f55dba6c",
-      "humanVisualStatus": "PENDING_R20_TARGETED_VISUAL",
+      "humanVisualStatus": "R20_TARGETED_VISUAL_NOT_ACCEPTED_R21_RETEST_REQUIRED",
       "visualGovernanceRepairPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_VISUAL_ACCEPTANCE_GOVERNANCE_REPAIR_20261003.json",
       "visualGovernanceRepairBlobSha": "b6c18ae40d86ff0cdc3003e7201ead3de3d7d745",
       "machineProofReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_MACHINE_PROOF_20261007.json",
@@ -3289,7 +3289,10 @@
         "sourceSha": "511e9009575b5a77fcb2f2bd2c3ac01227e7b622",
         "humanApproval": false,
         "priorRejectionNotDeleted": true
-      }
+      },
+      "r21PriorStatus": "MACHINE_PASS_PENDING_PAULA_VISUAL",
+      "r21SourceReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R21_BUSINESS_LINEAGE_ATTACHMENTS_INBOX_SOURCE_FIX_20261009.json",
+      "r21SourceReceiptBlobSha": "ba6c57c5b703329eea92be8d04b8e5074e7aae50"
     },
     {
       "id": "B4-004",
@@ -8547,7 +8550,7 @@
       ],
       "rootCause": "Most policies still lack authoritative renovable YES/NO and some renewal financial fields remain source-incomplete; current product correctly refuses to infer them.",
       "requiredFix": "Open exact policy editor focused on tri-state Renovabilidad with source-safe options; keep UNKNOWN fail-closed; derive KPI and columns from the same immutable bucket snapshot and prove equality.",
-      "status": "REJECTED_R20_LIFECYCLE_RETEST_PENDING",
+      "status": "R21_SOURCE_FIXED_EXACT_PREVIEW_AND_HUMAN_UAT_PENDING",
       "blocking": true,
       "targetGate": "B4-003",
       "closureCondition": "Resolve renewability/financial completeness from source-backed policy/insurer evidence and visible validation workflow; do not auto-promote UNKNOWN.",
@@ -8556,7 +8559,7 @@
       "receiptBlobSha": "afe6193dc1ff4151e94777a276296f9df0ed17a3",
       "noLive": true,
       "noReimport": true,
-      "nextAction": "B4_003_RENEWALS_TARGETED_PAULA_VISUAL",
+      "nextAction": "B4_003_R21_EXACT_CONTRACT_AND_PREVIEW",
       "r16SourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R16_COMPREHENSIVE_SOURCE_FIX_20261004.json",
       "r16SourceFixReceiptBlobSha": "dcd545e14795e387a8f67130d5fa51aabfcd63ce",
       "humanVisualStatus": "PENDING_RENEWALS_PRIORITY_VISUAL",
@@ -8594,7 +8597,10 @@
         "terminal583Absent": true
       },
       "newCausalProofPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_RENEWALS_LIFECYCLE_CAUSAL_FIX_AND_GOVERNANCE_RECONCILIATION_20261008.json",
-      "newCausalProofBlobSha": "00bc96d3bd14998bafbe851eeccb506ec88cc25b"
+      "newCausalProofBlobSha": "00bc96d3bd14998bafbe851eeccb506ec88cc25b",
+      "r21PriorStatus": "REJECTED_R20_LIFECYCLE_RETEST_PENDING",
+      "r21SourceReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R21_BUSINESS_LINEAGE_ATTACHMENTS_INBOX_SOURCE_FIX_20261009.json",
+      "r21SourceReceiptBlobSha": "ba6c57c5b703329eea92be8d04b8e5074e7aae50"
     },
     {
       "id": "B4-003-R15-08-INSURER-DOCUMENT-TAXONOMY-AND-REGISTRY-CONVERGENCE",
@@ -9874,7 +9880,7 @@
       "id": "B4-003-R19-08-OPS-ADVISOR-HANDOFF-NOTIFICATION-GAP",
       "block": "B4",
       "targetGate": "B4-003",
-      "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
+      "status": "R21_SOURCE_FIXED_EXACT_PREVIEW_AND_HUMAN_UAT_PENDING",
       "blocking": true,
       "surface": "Ops/Leads collaboration",
       "finding": "Typed handoff events persist, but it is not proven how the receiving advisor/operational user is notified or sees required action.",
@@ -9886,7 +9892,7 @@
       ],
       "remediation": "Reuse the existing canonical workflow/outbox/inbox. Add an explicit typed collaboration event/direction contract and internal recipient semantics after canonical commit; keep external email delivery as separate debt.",
       "closureCondition": "Synthetic Preview path proves commit then durable internal notice for request→advisor, response→operations, recipient inbox/badge, case navigation and reload; no external-delivery claim.",
-      "nextAction": "B4_003_R20_TARGETED_PAULA_VISUAL",
+      "nextAction": "B4_003_R21_EXACT_CONTRACT_AND_PREVIEW",
       "causalAuthority": {
         "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R19_CAUSAL_DIAGNOSTIC_AND_SOURCE_FIX_AUTHORIZATION_20261005.json",
         "blobSha": "4e03b16f56b174f66f5093d1c6e253675770fca1"
@@ -9923,7 +9929,10 @@
         "priorStatusPreserved": true,
         "noAutomaticPass": true
       },
-      "preUat3Blocking": true
+      "preUat3Blocking": true,
+      "r21PriorStatus": "MACHINE_PASS_PENDING_PAULA_VISUAL",
+      "r21SourceReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R21_BUSINESS_LINEAGE_ATTACHMENTS_INBOX_SOURCE_FIX_20261009.json",
+      "r21SourceReceiptBlobSha": "ba6c57c5b703329eea92be8d04b8e5074e7aae50"
     },
     {
       "id": "B4-003-R20-Q01",
@@ -10227,7 +10236,7 @@
       "id": "B4-003-R20-B01",
       "block": "B4",
       "targetGate": "B4-003",
-      "status": "PAULA_VISUAL_REJECTED_R20_SECOND_REVIEW_REMEDIATION_REQUIRED",
+      "status": "R21_SOURCE_FIXED_EXACT_PREVIEW_AND_HUMAN_UAT_PENDING",
       "blocking": true,
       "surface": "Renovaciones/Kanban",
       "finding": "Eliminar la tabla paralela como solución principal. Mantener columnas aprobadas Vencidas, Esta quincena 0-15, Próximas 16-45, Horizonte 46-90; vencida sin sucesora/terminal permanece Vencidas sin límite; renovabilidad pendiente no desaparece; renovada sale solo con cierre causal.",
@@ -10244,7 +10253,7 @@
         "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_PAULA_VISUAL_REVIEW_NOLOSS_FREEZE_20261006.json",
         "blobSha": "1878ce320f14a02b9ff09e9bc377e149b334f856"
       },
-      "nextAction": "B4_003_R20_SECOND_REVIEW_CAUSAL_REMEDIATION",
+      "nextAction": "B4_003_R21_EXACT_CONTRACT_AND_PREVIEW",
       "causeStatus": "CAUSE_DEMONSTRATED",
       "diagnosedOwners": [
         "renewalsUi"
@@ -10285,7 +10294,10 @@
         "priorStatusPreserved": true,
         "noAutomaticPass": true
       },
-      "preUat3Blocking": true
+      "preUat3Blocking": true,
+      "r21PriorStatus": "PAULA_VISUAL_REJECTED_R20_SECOND_REVIEW_REMEDIATION_REQUIRED",
+      "r21SourceReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R21_BUSINESS_LINEAGE_ATTACHMENTS_INBOX_SOURCE_FIX_20261009.json",
+      "r21SourceReceiptBlobSha": "ba6c57c5b703329eea92be8d04b8e5074e7aae50"
     },
     {
       "id": "B4-003-R20-B02",
@@ -11046,7 +11058,7 @@
       "id": "B4-003-R20-B14",
       "block": "B4",
       "targetGate": "B4-003",
-      "status": "PAULA_VISUAL_REJECTED_R20_SECOND_REVIEW_REMEDIATION_REQUIRED",
+      "status": "R21_SOURCE_FIXED_EXACT_PREVIEW_AND_HUMAN_UAT_PENDING",
       "blocking": true,
       "surface": "Preview write contract",
       "finding": "Paula necesita E2E writes sin tocar registros reales: fixtures UAT aislados/deshechables equivalentes, misma UI que LIVE, commit/readback/reload/cleanup.",
@@ -11063,7 +11075,7 @@
         "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_PAULA_VISUAL_REVIEW_NOLOSS_FREEZE_20261006.json",
         "blobSha": "1878ce320f14a02b9ff09e9bc377e149b334f856"
       },
-      "nextAction": "B4_003_R20_SECOND_REVIEW_CAUSAL_REMEDIATION",
+      "nextAction": "B4_003_R21_EXACT_CONTRACT_AND_PREVIEW",
       "causeStatus": "CAUSE_DEMONSTRATED_UAT_FIXTURE_GAP_NOT_ISOLATION_DEFECT",
       "diagnosedOwners": [
         "previewStore",
@@ -11111,7 +11123,10 @@
         "priorStatusPreserved": true,
         "noAutomaticPass": true
       },
-      "preUat3Blocking": true
+      "preUat3Blocking": true,
+      "r21PriorStatus": "PAULA_VISUAL_REJECTED_R20_SECOND_REVIEW_REMEDIATION_REQUIRED",
+      "r21SourceReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R21_BUSINESS_LINEAGE_ATTACHMENTS_INBOX_SOURCE_FIX_20261009.json",
+      "r21SourceReceiptBlobSha": "ba6c57c5b703329eea92be8d04b8e5074e7aae50"
     },
     {
       "id": "B4-003-R20-V2-01-ACTION-QUEUE-RANK",
@@ -11243,7 +11258,7 @@
       ],
       "block": "B4",
       "targetGate": "B4-003",
-      "status": "PAULA_VISUAL_REJECTED_R20_SECOND_REVIEW_REMEDIATION_REQUIRED",
+      "status": "R21_SOURCE_FIXED_EXACT_PREVIEW_AND_HUMAN_UAT_PENDING",
       "blocking": true,
       "rootCause": "PENDING_CAUSAL_DIAGNOSTIC",
       "remediation": "Diagnose effective runtime owner and correct within B4-003 without invalidating preserved PASS.",
@@ -11252,7 +11267,7 @@
       "humanVisualStatus": "REJECTED_R20_SECOND_REVIEW",
       "r20SecondHumanReviewPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_SECOND_PAULA_VISUAL_REJECTION_NOLOSS_20261007.json",
       "r20SecondHumanReviewBlobSha": "2767c83eed40b42a1445b2d6c512b3284a1c9c31",
-      "nextAction": "B4_003_R20_SECOND_REVIEW_CAUSAL_REMEDIATION",
+      "nextAction": "B4_003_R21_EXACT_CONTRACT_AND_PREVIEW",
       "uat3Reconciliation": {
         "classification": "BLOCKING_P0",
         "observationIds": [
@@ -11275,7 +11290,10 @@
         "priorStatusPreserved": true,
         "noAutomaticPass": true
       },
-      "preUat3Blocking": true
+      "preUat3Blocking": true,
+      "r21PriorStatus": "PAULA_VISUAL_REJECTED_R20_SECOND_REVIEW_REMEDIATION_REQUIRED",
+      "r21SourceReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R21_BUSINESS_LINEAGE_ATTACHMENTS_INBOX_SOURCE_FIX_20261009.json",
+      "r21SourceReceiptBlobSha": "ba6c57c5b703329eea92be8d04b8e5074e7aae50"
     },
     {
       "id": "B4-003-R20-V2-05-INBOX-ACTION-FEEDBACK",
@@ -11287,7 +11305,7 @@
       ],
       "block": "B4",
       "targetGate": "B4-003",
-      "status": "PAULA_VISUAL_REJECTED_R20_SECOND_REVIEW_REMEDIATION_REQUIRED",
+      "status": "R21_SOURCE_FIXED_EXACT_PREVIEW_AND_HUMAN_UAT_PENDING",
       "blocking": true,
       "rootCause": "PENDING_CAUSAL_DIAGNOSTIC",
       "remediation": "Diagnose effective runtime owner and correct within B4-003 without invalidating preserved PASS.",
@@ -11296,7 +11314,7 @@
       "humanVisualStatus": "REJECTED_R20_SECOND_REVIEW",
       "r20SecondHumanReviewPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_SECOND_PAULA_VISUAL_REJECTION_NOLOSS_20261007.json",
       "r20SecondHumanReviewBlobSha": "2767c83eed40b42a1445b2d6c512b3284a1c9c31",
-      "nextAction": "B4_003_R20_SECOND_REVIEW_CAUSAL_REMEDIATION",
+      "nextAction": "B4_003_R21_EXACT_CONTRACT_AND_PREVIEW",
       "uat3Reconciliation": {
         "classification": "BLOCKING_P0",
         "observationIds": [
@@ -11317,7 +11335,10 @@
         "priorStatusPreserved": true,
         "noAutomaticPass": true
       },
-      "preUat3Blocking": true
+      "preUat3Blocking": true,
+      "r21PriorStatus": "PAULA_VISUAL_REJECTED_R20_SECOND_REVIEW_REMEDIATION_REQUIRED",
+      "r21SourceReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R21_BUSINESS_LINEAGE_ATTACHMENTS_INBOX_SOURCE_FIX_20261009.json",
+      "r21SourceReceiptBlobSha": "ba6c57c5b703329eea92be8d04b8e5074e7aae50"
     },
     {
       "id": "B4-003-R20-V2-06-INBOX-HEADER-ALIGNMENT",
@@ -11663,7 +11684,7 @@
       ],
       "block": "B4",
       "targetGate": "B4-003",
-      "status": "DRY_RUN_PASS_PENDING_DATA_WRITE_AUTHORIZATION",
+      "status": "R21_SOURCE_FIXED_EXACT_PREVIEW_AND_HUMAN_UAT_PENDING",
       "blocking": true,
       "rootCause": "PENDING_CAUSAL_DIAGNOSTIC",
       "remediation": "Diagnose effective runtime owner and correct within B4-003 without invalidating preserved PASS.",
@@ -11672,7 +11693,7 @@
       "humanVisualStatus": "REJECTED_R20_SECOND_REVIEW",
       "r20SecondHumanReviewPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_SECOND_PAULA_VISUAL_REJECTION_NOLOSS_20261007.json",
       "r20SecondHumanReviewBlobSha": "2767c83eed40b42a1445b2d6c512b3284a1c9c31",
-      "nextAction": "AUTHORIZE_EXACT_583_RENEWAL_DISPOSITION_WRITES_OR_HOLD",
+      "nextAction": "B4_003_R21_EXACT_CONTRACT_AND_PREVIEW",
       "dataDryRunReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_SECOND_REVIEW_DATA_DRYRUNS_20261007.json",
       "dataDryRunReceiptBlobSha": "65f48ab5decb113f6551d5b0f68f994ff00fe7a4",
       "dryRun": {
@@ -11703,7 +11724,15 @@
         "priorStatusPreserved": true,
         "noAutomaticPass": true
       },
-      "preUat3Blocking": true
+      "preUat3Blocking": true,
+      "r21PriorStatus": "DRY_RUN_PASS_PENDING_DATA_WRITE_AUTHORIZATION",
+      "r21SourceReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R21_BUSINESS_LINEAGE_ATTACHMENTS_INBOX_SOURCE_FIX_20261009.json",
+      "r21SourceReceiptBlobSha": "ba6c57c5b703329eea92be8d04b8e5074e7aae50",
+      "canonicalApplyAlreadyCompleted": {
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_B02_RENEWAL_CUTOFF_APPLY_RESULT_20261008.json",
+        "writes": 583,
+        "repeatAuthorized": false
+      }
     },
     {
       "id": "B4-003-R20-V2-16-TRANSVERSAL-VISUAL-HIERARCHY",
@@ -12449,5 +12478,16 @@
     "noNewFindingIds": true,
     "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_UAT3_P0_SOURCE_FIX_SCOPE_LOCK"
   },
-  "recordedAt": "2026-10-08T21:00:00-06:00"
+  "recordedAt": "2026-10-08T21:00:00-06:00",
+  "r21SourceFix": {
+    "status": "SOURCE_FIXED_R21_PENDING_EXACT_PREVIEW",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R21_BUSINESS_LINEAGE_ATTACHMENTS_INBOX_SOURCE_FIX_20261009.json",
+    "receiptBlobSha": "ba6c57c5b703329eea92be8d04b8e5074e7aae50",
+    "priorMachineProof": {
+      "runId": 37950852293,
+      "artifactId": 11626545264
+    },
+    "all282FindingIdsPreserved": true,
+    "previousHumanReviewNotAutoAccepted": true
+  }
 }

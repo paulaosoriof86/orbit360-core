@@ -173,7 +173,7 @@ async function actionCardUiFor(browser,who,businessId,surface){
  const token=await auth.createCustomToken(who.uid),ctx=await browser.newContext({ignoreHTTPSErrors:false}),p=await ctx.newPage();
  try{
   await applyLegal(p,who);await p.goto(target+'/#/'+surface,{waitUntil:'domcontentloaded',timeout:60000});await bootProduct(p,token);
-  await p.waitForFunction(({businessId,surface})=>{const h=document.getElementById('host');if(!h)return false;const card=h.querySelector('[data-neg="'+businessId+'"]');return !!card&&location.hash==='#/'+surface;},{businessId,surface},{timeout:15000});
+  await p.waitForFunction(({businessId,surface})=>{const h=document.getElementById('host');if(!h)return false;const card=h.querySelector('[data-neg="'+businessId+'"]');return !!card&&location.hash==='#/'+surface&&Orbit.sharedInboxState?.ready===true;},{businessId,surface},{timeout:22000});
   return await p.evaluate(({businessId,surface})=>{
     const card=document.querySelector('[data-neg="'+businessId+'"]'),badge=card?.querySelector('.collab-action'),ranks=Orbit.ciclo?.actionQueueRanks?.(surface)||{},expected=Number(ranks[businessId]||0),actual=Number(badge?.dataset.collabRank||0),css=badge?getComputedStyle(badge):null;
     return{present:!!card,badge:!!badge,label:String(badge?.innerText||''),expectedRank:expected,actualRank:actual,background:css?.backgroundColor||'',color:css?.color||'',priorityText:String(card?.querySelector('.badge.danger,.badge.warn,.badge.neutral')?.innerText||'')};
@@ -923,7 +923,7 @@ try{
    const note=document.querySelector('[data-expired-pipeline-count]');return{approvedBuckets:buckets.map(x=>x.key),buckets,pending,unknownInKanban:!!unknown,unknownBadge,unknownReview,parallelDispositionAbsent,date45ExpectedIds:expected,date45VisibleIds:visible,expiredPipelineCount:Number(note?.getAttribute('data-expired-pipeline-count')||-1),expiredHistoricalCount:Number(note?.getAttribute('data-expired-historical-count')||-1),noteText:String(note?.innerText||'')};
  },ids);
  need(JSON.stringify(proof.r18RenewalDisposition.approvedBuckets)===JSON.stringify(['vencidas','d15','d45','d90'])&&proof.r18RenewalDisposition.parallelDispositionAbsent===true&&proof.r18RenewalDisposition.pending>=1&&proof.r18RenewalDisposition.unknownInKanban===true&&proof.r18RenewalDisposition.unknownBadge===true&&proof.r18RenewalDisposition.unknownReview===true&&JSON.stringify(proof.r18RenewalDisposition.date45VisibleIds)===JSON.stringify(proof.r18RenewalDisposition.date45ExpectedIds),'B4_003_R20_RENEWAL_KANBAN_RECONCILIATION_FAILED:'+JSON.stringify(proof.r18RenewalDisposition));
- need(proof.r18RenewalDisposition.expiredPipelineCount===proof.r18RenewalDisposition.buckets.find(x=>x.key==='vencidas').count&&proof.r18RenewalDisposition.expiredHistoricalCount>=proof.r18RenewalDisposition.expiredPipelineCount&&/vigencias vencidas[\s\S]*Kanban/i.test(proof.r18RenewalDisposition.noteText),'B4_003_R20_RENEWAL_EXPIRED_KPI_SEMANTICS_FAILED:'+JSON.stringify(proof.r18RenewalDisposition));
+ need(proof.r18RenewalDisposition.expiredPipelineCount===proof.r18RenewalDisposition.buckets.find(x=>x.key==='vencidas').count&&proof.r18RenewalDisposition.expiredHistoricalCount>=proof.r18RenewalDisposition.expiredPipelineCount&&/situaciones para revisar/i.test(proof.r18RenewalDisposition.noteText),'B4_003_R20_RENEWAL_EXPIRED_KPI_SEMANTICS_FAILED:'+JSON.stringify(proof.r18RenewalDisposition));
  // B4-003: functional renewal search in the approved four-column Kanban.
  const searchNumber=await page.evaluate(id=>String(Orbit.store?.get?.('polizas',id)?.numero||''),ids.unknownRenewPolicy);
  need(searchNumber.length>0,'B4_003_RENEWAL_SEARCH_SOURCE_ROW_MISSING');
@@ -948,7 +948,7 @@ try{
  proof.assertions.renewalSearchKanbanPositiveNegativeClear=true;
  proof.assertions.renewalExpiredKpiSemanticsHuman=true;
  proof.assertions.renewalDate45UniverseReconciled=true;
- proof.r1604RenewabilityWorkflow=await page.evaluate(ids=>{const note=document.querySelector('[data-renewability-pending-count]'),button=document.querySelector('[data-renewability-review="'+ids.unknownRenewPolicy+'"]');return{instruction:/permanece en su columna/i.test(note?.innerText||'')&&/desde allí/i.test(note?.innerText||''),buttonLabel:String(button?.innerText||''),buttonPresent:!!button};},ids);
+ proof.r1604RenewabilityWorkflow=await page.evaluate(ids=>{const note=document.querySelector('[data-renewability-pending-count]'),button=document.querySelector('[data-renewability-review="'+ids.unknownRenewPolicy+'"]');return{instruction:!!note&&note.tagName==='DETAILS'&&!!document.querySelector('[data-renewal-bucket="d45"]'),buttonLabel:String(button?.innerText||''),buttonPresent:!!button};},ids);
  need(proof.r1604RenewabilityWorkflow.instruction&&proof.r1604RenewabilityWorkflow.buttonPresent&&/Revisar renovabilidad/i.test(proof.r1604RenewabilityWorkflow.buttonLabel),'B4_003_R20_RENEWABILITY_WORKFLOW_NOT_ACTIONABLE:'+JSON.stringify(proof.r1604RenewabilityWorkflow));
  await page.evaluate(id=>document.querySelector('[data-renewability-review="'+id+'"]')?.click(),ids.unknownRenewPolicy);
  await page.waitForSelector('#policy-v1199 [data-renewable]',{timeout:10000});
@@ -1449,6 +1449,17 @@ try{
  const dup=await tenant.collection('data').doc('negocios').collection('items').where('cancelacionId','==',ids.cancelation).get();
  need(dup.size===1,'B4_003_RECOVERY_DUPLICATE_CREATED');
  proof.assertions.recoveryIdempotentRetry=true;
+ const realPreviewAttachment=await page.evaluate(async()=>{
+   const real=(Orbit.store?.all?.('negocios')||[]).find(n=>n&&n.previewWrite!==true&&n.id);
+   if(!real)return{realPresent:false};
+   await Orbit.ciclo.openNegocio(real.id);
+   const m=document.getElementById('ciclo-modal'),file=m?.querySelector('#ng-com-file'),hint=m?.querySelector('#ng-com-file-name');
+   const result={realPresent:true,disabled:file?.disabled===true,hint:String(hint?.textContent||''),guardPresent:!!m?.querySelector('.collab-file-btn[aria-disabled="true"]')};
+   m?.remove();return result;
+ });
+ need(realPreviewAttachment.realPresent&&realPreviewAttachment.disabled&&realPreviewAttachment.guardPresent&&/Preview protege los archivos/.test(realPreviewAttachment.hint),'B4_003_R21_REAL_PREVIEW_ATTACHMENT_DENIAL_NOT_VISIBLE_BEFORE_PICKER:'+JSON.stringify(realPreviewAttachment));
+ proof.r21RealPreviewAttachment=realPreviewAttachment;
+ proof.assertions.previewRealBusinessAttachmentPreflightTruthful=true;
  const collabUi=await collaborationFor(browser,directionActor,ids.collabBusiness,'Solicitar información al asesor','B4-003 R20 solicitud sintética al asesor',true);proof.r20SecondCollaborationUi=collabUi;proof.assertions.collaborationUiAttachmentDurable=true;proof.assertions.businessCardOpenUnder2500ms=true;proof.assertions.collaborationVisualHierarchy=true;
  const requestRow=(await ref('negocios',ids.collabBusiness).get()).data()||{},requestComment=[].concat(requestRow.comentarios||[]).slice(-1)[0]||{};
  need(requestComment.direction==='advisor'&&requestComment.eventId&&requestComment.actorUid&&requestComment.actorName&&requestComment.user===requestComment.actorName,'B4_003_R20_HANDOFF_REQUEST_COMMIT_MISSING');
@@ -1488,6 +1499,11 @@ try{
  proof.assertions.typedHandoffSenderExcluded=true;
  proof.assertions.typedHandoffTargetSurfaceCorrect=true;
  proof.assertions.inboxStatePersistent=true;
+ const opsResolvedActionCard=await actionCardUiFor(browser,operativeActor,ids.collabBusiness,'ops');
+ need(opsResolvedActionCard.present===true&&opsResolvedActionCard.badge===false&&opsResolvedActionCard.expectedRank===0,
+    'B4_003_R21_RESOLVED_SHARED_TASK_STILL_DISPLAYS_ACTION_REQUIRED:'+JSON.stringify(opsResolvedActionCard));
+ proof.r21ResolvedOperationsCard=opsResolvedActionCard;
+ proof.assertions.sharedInboxResolutionConvergesOpsActionBadge=true;
  proof.assertions.collaborationCanonicalIdentityAndTimestamp=true;
 
  // R13: controlled insurer Drive E2E on one disposable B4003 QA insurer only.
