@@ -1,0 +1,43 @@
+{
+  "schema": "GRAVICENTRA_PILOT_V6_E1_SHARED_INBOX_INTERRUPTION_FINDING_V1",
+  "recordedAt": "2026-10-09T14:25:00-06:00",
+  "scenario": "E1 Academia",
+  "participant": "CT02",
+  "role": "Operativo",
+  "exactPreview": {
+    "sourceSha": "babea00bf459dfcde611e35ea9413f70f901d043",
+    "runId": 37982729451,
+    "artifactId": 11641957470,
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-37982729451-pvjxtc0j.web.app"
+  },
+  "humanObserved": {
+    "startupOrNavigationInterruptedByOps": true,
+    "inboxActiveCount": 13,
+    "repeatedSyntheticTitle": "Reenviado a Operaciones",
+    "repeatedSyntheticMessage": "B4-003 R20 respuesta sintética del asesor",
+    "userPreviouslyUsedResolveForAll": true,
+    "issue": "Same/similar synthetic shared tasks reappeared for Carlos and Ops opened again."
+  },
+  "sourceReadback": {
+    "uiOwner": "orbit360-platform/index.html",
+    "backendOwner": "functions/ops-advisor-inbox.js",
+    "resolutionKey": "noticeId/eventId",
+    "sharedTaskStatePath": "previewInboxTasks/{eventId}",
+    "semanticGrouping": "semanticKey groups duplicates only for candidate marking; exact rows remain distinct event IDs.",
+    "criticalBehavior": "Resolving one event marks only that event globalResolved. Other semantically duplicate event IDs remain open/new and may still satisfy newHandoffForSurface(), which can auto-land Operativo in Ops.",
+    "previousRootfixBoundary": "Prior rootfix prevents acknowledged/resolved event from re-landing, but does not collapse or globally resolve semantically duplicate event IDs."
+  },
+  "classification": {
+    "finding": "CONFIRMED_SOURCE_CAUSAL_SHARED_INBOX_DUPLICATE_EVENT_RESOLUTION_GAP",
+    "scenarioImpact": "NONCAUSAL_TO_ACADEMIA_CONTENT_ACCESS_BUT_CAUSAL_TO_INTERRUPTION/USABILITY",
+    "pilotDecision": "DO_NOT_REOPEN_PRIOR_SCENARIOS; continue E1 after recording finding.",
+    "dataInterpretation": "The visible B4-003 synthetic labels indicate QA/synthetic task residue is exposed in the human Preview. Do not treat these tasks as business activity."
+  },
+  "requiredProductFollowup": [
+    "Reconcile duplicate semantic task events to a canonical shared task identity or propagate shared resolution across the semantic duplicate group when it is provably the same task.",
+    "Prevent synthetic B4-003 proof residue from remaining visible to human pilot users after cleanup.",
+    "Retest login/startup with resolved semantic duplicate group: no badge regeneration and no auto-landing to Ops.",
+    "Retain event history for audit without presenting resolved QA duplicates as active business work."
+  ],
+  "writesDuringPilot": 0
+}
