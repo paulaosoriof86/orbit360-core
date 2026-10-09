@@ -47,11 +47,22 @@ jobs:
           node - <<'NODE'
           const fs=require('node:fs');
           const c=JSON.parse(fs.readFileSync(process.env.CONTROL,'utf8'));
-          const run=c.nextAction==='I6_5_FORENSIC_REMEDIATION_B4_003_DIAGNOSTIC'
+          const legacyRun=c.nextAction==='I6_5_FORENSIC_REMEDIATION_B4_003_DIAGNOSTIC'
             && c.currentB4?.status==='B4_ACTIVE_B4_003_READONLY_DIAGNOSTIC'
             && c.currentB4?.activeFindingId==='B4-003'
             && c.currentB4?.noLive===true
             && c.currentB4?.noReimport===true;
+          const followup=c.nextAction==='I6_5_FORENSIC_REMEDIATION_B4_003_R20_TARGETED_PAULA_VISUAL'
+            && c.currentB4?.status==='B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL'
+            && c.currentB4?.activeFindingId==='B4-003'
+            && c.currentB4?.noLive===true&&c.currentB4?.noReimport===true
+            && c.currentB4?.productMutationAuthorized===false&&c.currentB4?.dataMutationAuthorized===false
+            && c.currentB4?.livePromotionAuthorized===false
+            && fs.existsSync('artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_LIFECYCLE_HUMAN_REJECTION_AND_STATIC_REPRO_20261008.json');
+          const run=legacyRun||followup;
+          const receiptPath=followup?'artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_LINEAGE_AUDIT_READONLY_20261008.json':process.env.RECEIPT;
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'followup='+(followup?'true':'false')+'\n');
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'receipt_path='+receiptPath+'\n');
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'run='+(run?'true':'false')+'\n');
           console.log('B4_003_DIAGNOSTIC_MODE='+(run?'RUN':'NOOP'));
           NODE
@@ -99,6 +110,7 @@ jobs:
         if: steps.mode.outputs.run == 'true'
         env:
           B4_003_DIAGNOSTIC_OUT: ${{ runner.temp }}/b4-003-renewals-cancelations-diagnostic.json
+          B4_003_RENEWAL_LINEAGE_FOLLOWUP: ${{ steps.mode.outputs.followup }}
         run: |
           set -euo pipefail
           node tools/gravicentra-i6-5-b4-003-renewals-cancelations-diagnostic.cjs
@@ -119,10 +131,10 @@ jobs:
           B4_003_DIAGNOSTIC_OUT: ${{ runner.temp }}/b4-003-renewals-cancelations-diagnostic.json
         run: |
           set -euo pipefail
-          cp "$B4_003_DIAGNOSTIC_OUT" "$RECEIPT"
+          cp "$B4_003_DIAGNOSTIC_OUT" "${{ steps.mode.outputs.receipt_path }}"
           git config user.name "gravicentra-release-bot"
           git config user.email "gravicentra-release-bot@users.noreply.github.com"
-          git add "$RECEIPT"
+          git add "${{ steps.mode.outputs.receipt_path }}"
           if git diff --cached --quiet; then
             echo "B4_003_RECEIPT_UNCHANGED"
             exit 0
