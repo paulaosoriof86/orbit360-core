@@ -1,0 +1,113 @@
+{
+  "schema": "GRAVICENTRA_PILOT_V6_S7_CLOSURE_V1",
+  "recordedAt": "2026-10-09T07:58:00-06:00",
+  "scenario": "S7 Renovaciones / continuidad",
+  "participant": "CT02",
+  "role": "Operativo",
+  "status": "PASS_WITH_OBSERVATIONS",
+  "exactPreview": {
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-37935549889-oji84a6s.web.app",
+    "sourceSha": "99c4a81d59c28550be4c318fc2b7600bdd43d832",
+    "buildId": "gi-i65-b4-99c4a81d59c2-57f234755dc1",
+    "runId": 37935549889,
+    "exactHostingReadback": "PASS"
+  },
+  "humanEvidence": [
+    {
+      "id": "PZ-S7-001",
+      "scope": "renewals overview",
+      "privacy": "RESTRICTED_ORIGINAL"
+    },
+    {
+      "id": "PZ-S7-002",
+      "scope": "renewals kanban current states",
+      "privacy": "RESTRICTED_ORIGINAL"
+    },
+    {
+      "id": "PZ-S7-003",
+      "scope": "expired actionable renewable card",
+      "privacy": "RESTRICTED_ORIGINAL"
+    },
+    {
+      "id": "PZ-S7-004",
+      "scope": "expired actionable policy detail",
+      "privacy": "RESTRICTED_ORIGINAL"
+    },
+    {
+      "id": "PZ-S7-005",
+      "scope": "historical expired review-only card",
+      "privacy": "RESTRICTED_ORIGINAL"
+    },
+    {
+      "id": "PZ-S7-006",
+      "scope": "historical expired policy detail",
+      "privacy": "RESTRICTED_ORIGINAL"
+    }
+  ],
+  "observations": {
+    "overview": {
+      "overdueCount": 12,
+      "dueWithin15Days": 0,
+      "due16To45Days": 9,
+      "historicalPossibleSuccessorsWithoutFormalLineage": 493,
+      "expiredHistoricalEditions": 1158,
+      "nonRenewableHistorical": 101,
+      "terminalDispositionHistorical": 583,
+      "reviewBlockedCardsWithinExpired": 8
+    },
+    "positiveCase": {
+      "persistedState": "Vigente",
+      "calculatedState": "Vencida",
+      "daysExpired": 3,
+      "renewability": "Renovable",
+      "commercialDecision": "Renovable",
+      "actionsVisible": [
+        "Abrir WhatsApp",
+        "Propuestas",
+        "Pedir renovar",
+        "Cotizar"
+      ],
+      "interpretation": "Actionable renewal case"
+    },
+    "negativeCase": {
+      "persistedState": "Histórica",
+      "calculatedState": "Vencida",
+      "daysExpired": 51,
+      "policyRenewabilityField": "Renovable",
+      "kanbanDecision": "Revisión necesaria · renovación bloqueada",
+      "actionVisible": "Revisar situación de póliza",
+      "automaticCommercialRenewalBlocked": true,
+      "interpretation": "Historical edition remains review-only despite renewable attribute"
+    }
+  },
+  "adjudication": {
+    "demonstrated": [
+      "continuidad por vigencia",
+      "separación de caso renovable accionable frente a edición histórica bloqueada",
+      "siguiente acción visible",
+      "clasificación fail-closed ante historial no enlazado",
+      "rol Operativo puede consultar el pipeline"
+    ],
+    "notDemonstrated": [
+      "retención de clientes",
+      "tasa real de renovación",
+      "reducción de cancelaciones",
+      "impacto comercial o financiero",
+      "ejecución efectiva de una renovación"
+    ],
+    "observations": [
+      "La ficha histórica puede conservar Renovación=Renovable como atributo de producto, pero el pipeline la bloquea comercialmente por su estado histórico; la combinación es válida si se mantiene esta prioridad semántica.",
+      "No se ejecutaron CTA, WhatsApp, cotización, propuesta ni gestión."
+    ]
+  },
+  "cleanup": {
+    "required": false,
+    "writes": 0
+  },
+  "forwardOnly": {
+    "coreS0S7Complete": true,
+    "nextBlock": "OLA 2 · D — Extensiones read-only/consulta",
+    "nextScenario": "E4 Insights / Reportes",
+    "priorScenariosReopened": false
+  }
+}
