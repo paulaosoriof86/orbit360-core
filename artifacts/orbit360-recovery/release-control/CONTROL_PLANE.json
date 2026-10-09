@@ -4869,8 +4869,8 @@
       "entryGuardReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_ENTRY_GUARD_PASS_20261002.json",
       "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
       "executionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B4_EXECUTION_LOCK_20261002.json",
-      "executionLockBlobSha": "a9e5f422f23d8d9257affa018766508bec0a5d30",
-      "compositionLockBlobSha": "14738484ca1061f788b06cf0055f2bbd7accf97c",
+      "executionLockBlobSha": "3b6fae250f899e29595a6fb6379edc4c42d85510",
+      "compositionLockBlobSha": "4bf4f06b82d15e0ec0c5aecdc2aba1ec0bd98a48",
       "findingLedgerBlobSha": "cd3e76daeb3ea79d081a00726a2ac9522ecf67b2",
       "activeFindingId": "B4-003",
       "productSourceSha": "c603fd3561e7229d9359db45495d4cf2d757cd8f",
@@ -5968,7 +5968,7 @@
   "canonicalAccumulationControl": {
     "status": "FROZEN_ACTIVE",
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "compositionLockBlobSha": "14738484ca1061f788b06cf0055f2bbd7accf97c",
+    "compositionLockBlobSha": "4bf4f06b82d15e0ec0c5aecdc2aba1ec0bd98a48",
     "findingLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
     "findingLedgerBlobSha": "cd3e76daeb3ea79d081a00726a2ac9522ecf67b2",
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
@@ -6283,8 +6283,8 @@
     "status": "B4_003_R20_CANCELATIONS_SOURCE_FIX_AUTHORIZED",
     "activeFindingId": "B4-003",
     "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
-    "executionLockBlobSha": "a9e5f422f23d8d9257affa018766508bec0a5d30",
-    "compositionLockBlobSha": "14738484ca1061f788b06cf0055f2bbd7accf97c",
+    "executionLockBlobSha": "3b6fae250f899e29595a6fb6379edc4c42d85510",
+    "compositionLockBlobSha": "4bf4f06b82d15e0ec0c5aecdc2aba1ec0bd98a48",
     "findingLedgerBlobSha": "cd3e76daeb3ea79d081a00726a2ac9522ecf67b2",
     "noLive": true,
     "noReimport": true,
@@ -7707,7 +7707,7 @@
     "extendsPlanV2": true,
     "conversationDependent": false
   },
-  "compositionLockBlobSha": "14738484ca1061f788b06cf0055f2bbd7accf97c",
+  "compositionLockBlobSha": "4bf4f06b82d15e0ec0c5aecdc2aba1ec0bd98a48",
   "findingLedgerBlobSha": "cd3e76daeb3ea79d081a00726a2ac9522ecf67b2",
   "continuityRegisterBlobSha": "af0dfa30b9c550a7e964479760978bfab4cc77c6",
   "r16PerformanceRegression": {
@@ -8676,5 +8676,10 @@
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CANCELATIONS_MOTIVE_SOURCE_FIX_20261008.json",
     "blobSha": "2b7af26cffa424394a237065e1e9bd7066d70841",
     "status": "SOURCE_FIXED_PENDING_FULL_WHATSAPP_AND_EXACT_PREVIEW"
+  },
+  "r20CancelationWhatsappFix": {
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CANCELATIONS_WHATSAPP_SOURCE_FIX_20261008.json",
+    "blobSha": "cb889860998961cdf64daead181a291b1af757b8",
+    "status": "SOURCE_FIXED_PENDING_QA_AND_EXACT_PREVIEW"
   }
 }

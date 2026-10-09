@@ -108,6 +108,96 @@ Orbit.modules.cancelaciones = (function () {
     return wanted ? (all.find(c => String(c&&c.polizaId||'')===wanted) || null) : null;
   }
 
+
+  /* WhatsApp preparation is manual and scoped. Opening a chat never means delivered. */
+  const waSelected=new Set();
+  let waContext='';
+  const waTemplates=()=>{
+    const base=[
+      {id:'recuperacion',nombre:'Contacto de recuperación',texto:'Hola {nombre}, te contactamos de tu corredor de seguros para revisar alternativas relacionadas con tu póliza {poliza} de {ramo}. ¿Podemos coordinar una conversación?'},
+      {id:'alternativas',nombre:'Revisión de alternativas',texto:'Hola {nombre}, queremos conocer si te interesa revisar nuevas alternativas de seguro para {ramo}. Podemos coordinar una llamada sobre tu póliza {poliza}. ¿Qué horario te conviene?'}
+    ];
+    const extra=allSafe('plantillas').filter(p=>p&&p.texto&&['whatsapp','ambos'].includes(String(p.canal||'').toLowerCase())).map(p=>({id:'guardada-'+p.id,nombre:String(p.nombre||'Plantilla guardada'),texto:String(p.texto)}));
+    return base.concat(extra);
+  };
+  function canWaView(c){
+    try{return !!(Orbit.access&&typeof Orbit.access.canView==='function'&&Orbit.access.canView('cancelaciones',c,'cancelaciones'));}catch(_e){return false;}
+  }
+  function waPhone(raw,country){
+    let digits=String(raw||'').replace(/[^0-9]/g,'');
+    if(digits.startsWith('00'))digits=digits.slice(2);
+    if(digits.length===8&&country==='GT')digits='502'+digits;
+    else if(digits.length===10&&country==='CO')digits='57'+digits;
+    return digits.length>=10&&digits.length<=15&&digits[0]!=='0'?digits:'';
+  }
+  function waText(template,c){
+    const p=linkedPolicy(c)||{},cli=linkedClient(c,p)||{},asg=p.aseguradoraId?S().get('aseguradoras',p.aseguradoraId):null,ase=p.asesorId?S().get('asesores',p.asesorId):null;
+    const values={nombre:cli.nombre||'',poliza:p.numero||'',ramo:p.ramo||'',aseguradora:asg&&asg.nombre||'',asesor:ase&&ase.nombre||'',motivo:c.motivo&&c.motivo!=='Sin motivo registrado'?c.motivo:''};
+    return String(template||'').replace(/\{([a-z]+)\}/gi,(token,key)=>Object.prototype.hasOwnProperty.call(values,key)?String(values[key]):token);
+  }
+  function prepararWhatsApp(rows){
+    const candidates=(rows||[]).filter(c=>c&&c.id&&canWaView(c)&&inActiveCountry(c));
+    const uniq=[],seen=new Set();
+    candidates.forEach(c=>{if(!seen.has(c.id)){seen.add(c.id);uniq.push(c);}});
+    if(!uniq.length)return U.toast('No hay cancelaciones autorizadas seleccionadas.');
+    if(uniq.length>50)return U.toast('Selecciona como máximo 50 registros por preparación. No se envían mensajes automáticamente.');
+    const tpl=waTemplates();let template=tpl[0],at=0;
+    const drafts=uniq.map(c=>{
+      const p=linkedPolicy(c)||{},cli=linkedClient(c,p)||{};
+      return {c,cliente:cli.nombre||'Cliente sin nombre',poliza:p.numero||'—',pais:recordCountry(c),phone:waPhone(cli.whatsapp||cli.telefono,recordCountry(c)),message:waText(template.texto,c),opened:false,edited:false};
+    });
+    let back=document.getElementById('cancel-wa-drafts');if(back)back.remove();
+    back=document.createElement('div');back.id='cancel-wa-drafts';back.className='drawer-back open';
+    back.style.cssText='display:grid;place-items:center;z-index:250;padding:10px;box-sizing:border-box';
+    back.innerHTML='<div class="card" style="width:min(720px,96vw);max-height:94dvh;display:flex;flex-direction:column;overflow:hidden;padding:0">'
+      +'<div style="padding:15px 18px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:10px"><div><small class="muted">Cancelaciones · recuperación</small><b style="display:block;font-size:18px">Preparar WhatsApp ('+drafts.length+')</b></div><button type="button" class="imp-x" data-wa-close aria-label="Cerrar">✕</button></div>'
+      +'<div style="overflow:auto;flex:1;padding:16px 18px;display:grid;gap:12px">'
+      +'<div class="cfg-note">Se prepara un borrador por cliente. Debes abrir y confirmar cada envío en WhatsApp. Ningún chat abierto equivale a mensaje entregado.</div>'
+      +'<label class="ce-l">Plantilla<select class="o-sel" data-wa-template>'+tpl.map(t=>'<option value="'+U.esc(t.id)+'">'+U.esc(t.nombre)+'</option>').join('')+'</select></label>'
+      +'<div style="display:flex;justify-content:space-between;gap:10px;align-items:center"><b data-wa-recipient-name></b><span class="muted" data-wa-progress></span></div>'
+      +'<div class="muted" data-wa-policy></div>'
+      +'<label class="ce-l">WhatsApp del destinatario (puedes corregirlo solo para este borrador)<input class="o-sel" type="tel" data-wa-phone inputmode="tel" placeholder="Código de país y teléfono"></label>'
+      +'<label class="ce-l">Texto para este destinatario<textarea class="o-sel" data-wa-message rows="5" style="width:100%;min-height:132px;resize:vertical"></textarea></label>'
+      +'<span class="muted" data-wa-status></span>'
+      +'</div><div style="padding:12px 18px;border-top:1px solid var(--line);display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end">'
+      +'<button type="button" class="btn ghost" data-wa-prev>Anterior</button><button type="button" class="btn ghost" data-wa-next>Siguiente</button><button type="button" class="btn primary" data-wa-open>Abrir chat individual</button></div></div>';
+    document.body.appendChild(back);
+    const el=sel=>back.querySelector(sel),close=()=>back.remove();
+    el('[data-wa-close]').addEventListener('click',close);
+    back.addEventListener('click',e=>{if(e.target===back)close();});
+    function storeCurrent(){
+      const d=drafts[at];d.phone=el('[data-wa-phone]').value.trim();d.message=el('[data-wa-message]').value;
+    }
+    function paint(){
+      const d=drafts[at];el('[data-wa-recipient-name]').textContent=d.cliente;
+      el('[data-wa-progress]').textContent=(at+1)+' de '+drafts.length;
+      el('[data-wa-policy]').textContent='Póliza '+d.poliza+' · '+d.pais;
+      el('[data-wa-phone]').value=d.phone;el('[data-wa-message]').value=d.message;
+      el('[data-wa-status]').textContent=d.opened?'Chat preparado anteriormente; envío no confirmado.':'Pendiente de abrir. Sin envío automático.';
+      el('[data-wa-prev]').disabled=at===0;el('[data-wa-next]').disabled=at===drafts.length-1;
+    }
+    el('[data-wa-message]').addEventListener('input',()=>{drafts[at].edited=true;storeCurrent();});
+    el('[data-wa-phone]').addEventListener('input',storeCurrent);
+    el('[data-wa-prev]').addEventListener('click',()=>{storeCurrent();if(at>0)at--;paint();});
+    el('[data-wa-next]').addEventListener('click',()=>{storeCurrent();if(at+1<drafts.length)at++;paint();});
+    el('[data-wa-template]').addEventListener('change',()=>{
+      const selected=tpl.find(t=>t.id===el('[data-wa-template]').value)||tpl[0];
+      if(drafts.some(d=>d.edited)&&!window.confirm('Cambiar la plantilla reemplazará los textos editados de este lote. ¿Continuar?')){el('[data-wa-template]').value=template.id;return;}
+      template=selected;drafts.forEach(d=>{d.message=waText(template.texto,d.c);d.edited=false;});paint();
+    });
+    el('[data-wa-open]').addEventListener('click',()=>{
+      storeCurrent();
+      const d=drafts[at],phone=waPhone(d.phone,d.pais),msg=String(d.message||'').trim();
+      if(!phone)return U.toast('Número inválido o incompleto: revisa el código de país. No se abrió el chat.');
+      if(!msg||/\{[a-z]+\}/i.test(msg))return U.toast('Completa el texto y las variables pendientes antes de abrir.');
+      if(/--/.test(location.hostname))return U.toast('Preview protegida: no se abren conversaciones reales. Usa esta vista para revisar el borrador.');
+      window.open('https://wa.me/'+phone+'?text='+encodeURIComponent(msg),'_blank','noopener,noreferrer');
+      d.opened=true;paint();
+      U.toast('WhatsApp preparado. Confirma el envío allí; no se registra como enviado.');
+    });
+    paint();
+  }
+
   const FDEFS = rows => [
     { id: 'fmot', type: 'select', ph: 'Motivo', options: [...new Set((rows||[]).map(c => c.motivo).filter(Boolean))].map(v => ({ v, t: v })) },
     { id: 'fase', type: 'select', ph: 'Asesor', options: K.asesorOptions() }
@@ -135,6 +225,10 @@ Orbit.modules.cancelaciones = (function () {
       return (!st.fmot || c.motivo === st.fmot) && (!st.fase || (p && p.asesorId === st.fase));
     }).sort((a, b) => String(b.fecha || '').localeCompare(String(a.fecha || '')));
     st.__count = rows.length + ' de ' + all.length;
+    const scopeKey=activeCountry()+'|'+String(Orbit.session&&Orbit.session.rol&&Orbit.session.rol()||'');
+    if(waContext!==scopeKey){waSelected.clear();waContext=scopeKey;}
+    const visibleIds=new Set(rows.map(c=>String(c.id||'')));
+    Array.from(waSelected).forEach(id=>{if(!visibleIds.has(id))waSelected.delete(id);});
 
     host.innerHTML = `<div class="page" data-cancel-indexed-relations="1">
       ${K.bannerFor('cancelaciones', '')}
@@ -157,12 +251,19 @@ Orbit.modules.cancelaciones = (function () {
       </div>
       <div class="card" style="overflow:hidden">
         ${K.filterBar(defs, st)}
+        <div class="card pad" data-cancel-wa-toolbar="1" style="margin:8px 12px;display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+          <label style="display:flex;align-items:center;gap:6px"><input type="checkbox" data-cancel-select-all> Seleccionar visibles</label>
+          <span class="muted" data-cancel-selection-count>${waSelected.size} seleccionadas</span>
+          <button class="btn ghost sm" type="button" data-cancel-selection-clear>Limpiar</button>
+          <button class="btn primary sm" type="button" data-cancel-wa-bulk ${waSelected.size?'':'disabled'}>Preparar WhatsApp (${waSelected.size})</button>
+        </div>
         <div style="overflow-x:auto"><table class="tbl">
-          <thead><tr><th>Fecha</th><th>Cliente</th><th>Póliza</th><th>Ramo</th><th>Motivo</th><th class="num">Valor perdido</th><th>Acción</th></tr></thead>
+          <thead><tr><th>Sel.</th><th>Fecha</th><th>Cliente</th><th>Póliza</th><th>Ramo</th><th>Motivo</th><th class="num">Valor perdido</th><th>Acción</th></tr></thead>
           <tbody>${rows.map(c => {
             const p = linkedPolicy(c,I);
             const opCountry=recordCountry(c,I);
             return `<tr data-cancel-country="${U.esc(opCountry)}" data-cancel-policy="${U.esc(c.polizaId||'')}">
+              <td><input type="checkbox" data-cancel-select="${U.esc(String(c.id||''))}" aria-label="Seleccionar cancelación" ${waSelected.has(String(c.id||''))?'checked':''}></td>
               <td style="font-size:12.5px">${U.fmtDate(c.fecha)}</td>
               <td>${clientPolicyCell(c,I)}</td>
               <td>${p ? `<button type="button" data-cancel-policy-link="${U.esc(String(p.id||''))}" class="mono" style="font-size:12px;font-weight:600;border:0;background:none;color:var(--ink);padding:0;cursor:pointer;text-decoration:underline;text-underline-offset:2px">${U.esc(p.numero||'—')}</button>` : '—'}</td>
@@ -171,10 +272,21 @@ Orbit.modules.cancelaciones = (function () {
               <td class="num">${U.money(c.valorPerdido, recordCurrency(c,I))}</td>
               <td><button type="button" class="btn ghost sm" data-cancel-open="${U.esc(String(c.id||''))}" data-cancel-open-policy="${U.esc(String(c.polizaId||''))}">Ver cancelación</button></td>
             </tr>`;
-          }).join('') || `<tr><td colspan="7" class="muted" style="text-align:center;padding:30px">Sin cancelaciones.</td></tr>`}</tbody>
+          }).join('') || `<tr><td colspan="8" class="muted" style="text-align:center;padding:30px">Sin cancelaciones.</td></tr>`}</tbody>
         </table></div>
       </div></div>`;
     K.wireFilters(defs, st, () => render(host));
+    const selectionCount=host.querySelector('[data-cancel-selection-count]'),bulkBtn=host.querySelector('[data-cancel-wa-bulk]'),selectAll=host.querySelector('[data-cancel-select-all]');
+    const syncSelection=()=>{
+      if(selectionCount)selectionCount.textContent=waSelected.size+' seleccionadas';
+      if(bulkBtn){bulkBtn.disabled=!waSelected.size;bulkBtn.textContent='Preparar WhatsApp ('+waSelected.size+')';}
+      if(selectAll){selectAll.checked=rows.length>0&&rows.every(c=>waSelected.has(String(c.id)));selectAll.indeterminate=rows.some(c=>waSelected.has(String(c.id)))&&!selectAll.checked;}
+    };
+    host.querySelectorAll('[data-cancel-select]').forEach(input=>input.addEventListener('change',()=>{if(input.checked)waSelected.add(input.dataset.cancelSelect);else waSelected.delete(input.dataset.cancelSelect);syncSelection();}));
+    if(selectAll)selectAll.addEventListener('change',()=>{rows.forEach(c=>{if(selectAll.checked)waSelected.add(String(c.id));else waSelected.delete(String(c.id));});host.querySelectorAll('[data-cancel-select]').forEach(el=>el.checked=selectAll.checked);syncSelection();});
+    const clear=host.querySelector('[data-cancel-selection-clear]');if(clear)clear.addEventListener('click',()=>{waSelected.clear();host.querySelectorAll('[data-cancel-select]').forEach(el=>el.checked=false);syncSelection();});
+    if(bulkBtn)bulkBtn.addEventListener('click',()=>prepararWhatsApp(rows.filter(c=>waSelected.has(String(c.id||'')))));
+    syncSelection();
     host.querySelectorAll('[data-cancel-open]').forEach(btn => btn.addEventListener('click', () => detalle(btn.dataset.cancelOpen, btn.dataset.cancelOpenPolicy)));
     host.querySelectorAll('[data-cancel-policy-link]').forEach(btn => btn.addEventListener('click', () => {
       const pid=btn.dataset.cancelPolicyLink;
@@ -251,6 +363,7 @@ Orbit.modules.cancelaciones = (function () {
       <div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap">
         ${c.__policyCancellationProjection ? '' : '<button class="btn ghost" id="cx-delete" style="margin-right:auto;color:var(--danger,var(--red))">Eliminar</button>'}
         ${p ? `<button class="btn ghost" onclick="Orbit.modules.cliente360.verPoliza('${c.polizaId}')">📑 Ver póliza</button>` : ''}
+        <button type="button" class="btn ghost" id="cx-wa">Preparar WhatsApp</button>
         <button class="btn primary" id="cx-save">Guardar</button>
       </div>
     </div>`;
@@ -258,6 +371,7 @@ Orbit.modules.cancelaciones = (function () {
     const close = () => back.remove();
     back.addEventListener('click', e => { if (e.target === back) close(); });
     back.querySelector('#cx-x').addEventListener('click', close);
+    const waSingle=back.querySelector('#cx-wa');if(waSingle)waSingle.addEventListener('click',()=>prepararWhatsApp([c]));
     const del = back.querySelector('#cx-delete');
     if (del) del.addEventListener('click', async () => {
       if (!Orbit.recordDelete) return U.toast('Eliminación canónica no disponible.');

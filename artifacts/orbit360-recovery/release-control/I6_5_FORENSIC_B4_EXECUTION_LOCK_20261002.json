@@ -580,7 +580,7 @@
   },
   "findingLedgerBlobSha": "cd3e76daeb3ea79d081a00726a2ac9522ecf67b2",
   "continuityRegisterBlobSha": "af0dfa30b9c550a7e964479760978bfab4cc77c6",
-  "compositionLockBlobSha": "14738484ca1061f788b06cf0055f2bbd7accf97c",
+  "compositionLockBlobSha": "4bf4f06b82d15e0ec0c5aecdc2aba1ec0bd98a48",
   "r18SourceFix": {
     "status": "SOURCE_FIXED_R18_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_SOURCE_FIX_20261005.json",
@@ -1489,5 +1489,10 @@
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CANCELATIONS_MOTIVE_SOURCE_FIX_20261008.json",
     "blobSha": "2b7af26cffa424394a237065e1e9bd7066d70841",
     "status": "SOURCE_FIXED_PENDING_FULL_WHATSAPP_AND_EXACT_PREVIEW"
+  },
+  "r20CancelationWhatsappFix": {
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CANCELATIONS_WHATSAPP_SOURCE_FIX_20261008.json",
+    "blobSha": "cb889860998961cdf64daead181a291b1af757b8",
+    "status": "SOURCE_FIXED_PENDING_QA_AND_EXACT_PREVIEW"
   }
 }

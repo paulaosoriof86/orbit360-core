@@ -1,0 +1,21 @@
+{
+  "schema": "GRAVICENTRA_B4_003_CANCELATIONS_MANUAL_WA_SOURCE_FIX_V1",
+  "date": "2026-10-08",
+  "status": "SOURCE_FIXED_PENDING_QA_AND_EXACT_PREVIEW",
+  "productBlobs": {
+    "orbit360-platform/modules/cancelaciones.js": "2aa1a3bedd835bb3d09313a6d8de46f210b60796",
+    "orbit360-platform/index.html": "d40e9ef96325d0091883b7b525447706bb9e8b62"
+  },
+  "sourceHeadBefore": "c58dc969ccd28922cc74d1ebff6eb1591e3669d0",
+  "syntax": "PASS",
+  "manualDraftOnly": true,
+  "openEachConversationUserAction": true,
+  "templatesReadableNotWritten": true,
+  "individualAndMultiSelect": true,
+  "noAutomaticMessages": true,
+  "noSendStatus": true,
+  "previewRealChatsBlocked": true,
+  "sourceFinancialOwnersUnchanged": true,
+  "operationalWrites": 0,
+  "livePromoted": false
+}
