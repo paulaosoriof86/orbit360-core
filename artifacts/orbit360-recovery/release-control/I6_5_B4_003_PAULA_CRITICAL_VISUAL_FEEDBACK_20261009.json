@@ -1,0 +1,80 @@
+{
+  "schema": "GRAVICENTRA_I65_B4_003_R20_USER_VISUAL_FEEDBACK_V1",
+  "date": "2026-10-09",
+  "sourceHead": "8cd736a0a1adb54d58af6eb11b4092091cb93683",
+  "gate": "I6.5/B4-003",
+  "disposition": "TARGETED_VISUAL_PARTIAL_PASS_WITH_BLOCKING_BUSINESS_FINDINGS",
+  "notAnApproval": true,
+  "noNewFindingIds": true,
+  "userObserved": {
+    "renewalSearch": "PASS_HUMAN_OBSERVED_FILTER_NAME_AND_RESET",
+    "inbox": "PARTIAL_PASS_HUMAN_OBSERVED_ACTIVE_COUNTS_AND_RETURN_HOME_AFTER_CLEAR",
+    "attachments": "FAIL_HUMAN_OBSERVED_ON_REAL_BUSINESS_PREVIEW",
+    "renewalLifecycle": "REJECTED_PENDING_SOURCE_LINEAGE_AND_DISPLAY_CORRECTION",
+    "contextualNote": "USER_RECOMMENDS_REMOVAL_FROM_PRIMARY_KANBAN"
+  },
+  "sourceProven": {
+    "renewalUi": "orbit360-platform/modules/renovaciones.js@0823cffa952a65d741dea4a20d24ceabb3eda67b",
+    "strongDefect": "renewalLifecycleSnapshot.familyKey includes policy.numero; changed policy number fails candidate/successor matching and even rejects an explicitly linked successor.",
+    "historicalLabel": "Policy badge renders raw policy.estado rather than derived effective renewal business status.",
+    "exampleRenewedSourcePair": {
+      "oldNumber": "02-01-488-5659-0",
+      "oldVigenciaFin": "2026-09-08",
+      "oldSourceStatus": "Renovada",
+      "newNumber": "02-01-488-5659-1",
+      "newVigenciaInicio": "2026-09-08",
+      "newSourceStatus": "Vigente",
+      "source": "Polizas (16).xlsx rows 230 and 531",
+      "note": "Source evidence of strong successor candidate, not live Firestore proof; requires matching of risk/insurer and explicit canonical linkage."
+    },
+    "exampleUnprovenRenewal": {
+      "number": "1000000181",
+      "oldSourceStatus": "Renovada",
+      "noSuccessorInSuppliedPolicyExport": true,
+      "note": "Do not change data without authoritative firm-renewal evidence."
+    },
+    "sourceStatusNotAutomatic": "Polizas (16).xlsx contains source status Renovada; no evidence automatic renewal triggered solely by expiry.",
+    "expiryReportLimit": "Renovaciones (13).xlsx is Renovaciones por rango de fechas; not authoritative issued-renewals list.",
+    "cutoff": "Receipt I6_5_B4_003_B02_RENEWAL_CUTOFF_APPLY_RESULT_20261008.json PASS_APPLY 583 old policies through 2026-07-31; 24 recent Aug-Oct untouched; do not repeat.",
+    "note": "ExpiredContext() computes counts from date; hard-coded prose misuses historicalExpired for all expired policies; remove dense diagnostic text from operational Kanban.",
+    "attachment": "functions/document-drive-domain.js previewOnly upload authorizes only synthetic b4003qa_ business with previewWrite=true. Real business preview upload denied by design; core/ciclo.js offers picker regardless and masks failure into generic COLLAB_DOCUMENT_UPLOAD_NOT_CONFIRMED.",
+    "opsActionBadgeRisk": "core/ciclo.js collaborationState() reads last comment.direction, independent of inbox acknowledgement/global resolution; can retain Acción requerida after resolving inbox."
+  },
+  "classification": [
+    {
+      "surface": "Renovaciones",
+      "existingFindingIds": [
+        "B4-003-R20-B01",
+        "B4-003-R15-07-RENEWALS-BUSINESS-COMPLETENESS",
+        "B4-003-R20-V2-15-RENEWAL-CUTOFF-DISPOSITION"
+      ],
+      "priority": "BLOCKING_P0",
+      "acceptance": "No renewed predecessor in expired active bucket after source-backed successor linkage; recent expired only when renewal not evidenced; cutoff old preserved; no auto-renewal inference."
+    },
+    {
+      "surface": "Ops/Leads documents and task status",
+      "existingFindingIds": [
+        "B4-003-R20-V2-04-COLLAB-UX-COMMIT-SEMANTICS",
+        "B4-003-R20-V2-05-INBOX-ACTION-FEEDBACK",
+        "B4-003-R19-08-OPS-ADVISOR-HANDOFF-NOTIFICATION-GAP",
+        "B4-003-R20-B14"
+      ],
+      "priority": "BLOCKING_P0",
+      "acceptance": "Preview real-expedient binary upload explicitly blocked before selection with plain-language explanation; synthetic authorized equivalent upload+readback+reload; validate separate business action badge after global resolution."
+    }
+  ],
+  "nextRequired": "B4-003 existing gate: reproduce source-to-Firestore lineage, source-only business projection rootfix, exact Preview per role, Paula visual acceptance. No data write or reimport.",
+  "preserveMachineProof": {
+    "runId": 37950852293,
+    "artifactId": 11626545264,
+    "sourceSha": "511e9009575b5a77fcb2f2bd2c3ac01227e7b622",
+    "status": "PASS_FOR_PRIOR_CANDIDATE_NOT_HUMAN_PASS"
+  },
+  "mutationRules": {
+    "productSourceChanged": false,
+    "firestoreWrites": 0,
+    "productionDeploy": false,
+    "reimport": false,
+    "canAdvanceB4004": false
+  }
+}
