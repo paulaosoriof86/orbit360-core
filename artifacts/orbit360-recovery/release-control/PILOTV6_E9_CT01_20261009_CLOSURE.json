@@ -1,0 +1,69 @@
+{
+  "schema": "GRAVICENTRA_PILOT_V6_E9_CLOSURE_V1",
+  "recordedAt": "2026-10-09T09:25:00-06:00",
+  "scenario": "E9 Portal / recursos al cliente",
+  "participant": "CT01",
+  "role": "Dirección",
+  "status": "PASS_WITH_OBSERVATIONS",
+  "exactPreview": {
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-37935549889-oji84a6s.web.app",
+    "sourceSha": "99c4a81d59c28550be4c318fc2b7600bdd43d832",
+    "buildId": "gi-i65-b4-99c4a81d59c2-57f234755dc1",
+    "runId": 37935549889
+  },
+  "humanObserved": {
+    "internalPreview": true,
+    "legalGateVisible": true,
+    "customerSelectorVisible": true,
+    "responsiveStatementVisible": true,
+    "tabs": [
+      "Inicio",
+      "Pólizas",
+      "Pagos",
+      "Siniestros",
+      "Documentos",
+      "Aprende"
+    ],
+    "policyDetailVisible": true,
+    "paymentDetailVisible": true,
+    "claimRequestFormVisible": true,
+    "genericManagementRequestFormVisible": true,
+    "documentUploadFormVisible": true,
+    "learningResourcesVisible": true,
+    "notificationCenterVisible": true,
+    "externalClientParticipantUsed": false,
+    "writeExecuted": false
+  },
+  "sourceReadback": {
+    "portalOwner": "orbit360-platform/modules/portal.js",
+    "customerAuthority": "Portal preview reads customer, policy, payment, claim and document data from Gravicentra store/query surfaces.",
+    "workflowIntent": "Management requests are designed to create durable internal Ops workflow; external WhatsApp/email remain pending connected channel.",
+    "documentBoundary": "UI explicitly states real file upload requires Storage/backend connected."
+  },
+  "observations": [
+    "E9 was observed as an internal controlled preview, not as a real external-client experience.",
+    "A payment detail shows payment state and pending review/reconciliation as distinct concepts.",
+    "Document upload was not executed because the UI itself declares a Storage/backend dependency.",
+    "The payment detail displayed the same explanatory reconciliation message twice; this is a noncausal UI duplication finding.",
+    "Some policy fields in the preview are incomplete/zero; no business conclusion is drawn from those values."
+  ],
+  "notDemonstrated": [
+    "customer satisfaction",
+    "ease of use for real customers",
+    "adoption",
+    "reduction in service contacts",
+    "retention",
+    "cross-sell",
+    "external delivery of notifications",
+    "real document upload"
+  ],
+  "cleanup": {
+    "required": false,
+    "writes": 0
+  },
+  "forwardOnly": {
+    "blockDClosed": true,
+    "pausePoint": "AUDIT_ALL_PROJECTS_AND_SYNCHRONIZE_DOCUMENTS_BEFORE_BLOCK_E",
+    "priorScenariosReopened": false
+  }
+}
