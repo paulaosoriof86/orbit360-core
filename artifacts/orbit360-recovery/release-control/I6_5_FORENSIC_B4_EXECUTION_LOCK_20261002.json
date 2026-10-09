@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B4_EXECUTION_LOCK_V1",
   "recordedAt": "2026-10-08T21:43:35.454Z",
-  "status": "B4_003_SOURCE_FIXED_R20_PENDING_CONTRACT_AND_EXACT_PREVIEW",
+  "status": "B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "block": "B4",
@@ -38,10 +38,10 @@
   "activeFinding": {
     "id": "B4-003",
     "title": "Cumulative B4-003 remediation: Renovaciones, Cancelaciones and source-backed insurer knowledge.",
-    "status": "PAULA_VISUAL_PARTIAL_R20_CANCELATIONS_REMEDIATION_REQUIRED",
+    "status": "B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL",
     "blocking": true,
-    "nextAction": "B4_003_R20_CONTRACT_AND_EXACT_PREVIEW",
-    "humanVisualStatus": "RENEWALS_LOADING_ONLY_PASS_CANCELATIONS_OPEN",
+    "nextAction": "B4_003_R20_TARGETED_PAULA_VISUAL",
+    "humanVisualStatus": "PENDING_R20_TARGETED_VISUAL",
     "knowledgePreview": true
   },
   "rules": {
@@ -79,7 +79,7 @@
     ],
     "reimportAuthorized": false,
     "livePromotionAuthorized": false,
-    "syntheticQaWritesAuthorized": true,
+    "syntheticQaWritesAuthorized": false,
     "syntheticQaScope": "R20 exact Preview only: disposable insurer/logo/product/plan/requirement/document and Ops/Leads handoff/cadence fixtures; mandatory server commit, readback, reload and cleanup; no real operational row mutation.",
     "paulaVisualAcceptanceRequiredBeforeAdvance": false,
     "cotcompRealTransportAuthorized": false,
@@ -107,15 +107,15 @@
     "renewalCutoffDataMutationAuthorized": false,
     "realOperationalWritesAuthorized": false
   },
-  "nextAction": "B4_003_R20_CONTRACT_AND_EXACT_PREVIEW",
+  "nextAction": "B4_003_R20_TARGETED_PAULA_VISUAL",
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "blobSha": "96a397b330441d71713cb635cc42c1cadbfa42a9",
+    "blobSha": "299701de04a534124c2415b71de4c2da406f899f",
     "status": "FROZEN_ACTIVE_UAT3_P0_BATCH_1_SOURCE_COMPLETE"
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "blobSha": "4114887cfe67b1cb60cf1b7da4671e359a7a709c",
+    "blobSha": "fc1abaf7c3cbefb99023be5f217c65ab45df5c1f",
     "count": 282
   },
   "sourceFix": {
@@ -134,15 +134,15 @@
     "B4_003_R20_TARGETED_PAULA_VISUAL_PASS"
   ],
   "candidate": {
-    "sourceSha": "5f0bde5d371a9e64498e6f9e4ba0ad08fe32c557",
-    "buildId": "gi-i65-b4-5f0bde5d371a-57f234755dc1",
-    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-37862194962-g16j773a.web.app",
-    "runId": 37862194962,
-    "artifactId": 11587665409,
-    "artifactDigest": "bd030dd37a2a02418e3dcdddd4d46a4c360d3cbe32baa9e42d92947c96801400",
-    "hostedPayloadDigest": "7114263e8c834d16d5d42eb608299f51cc3228845a531d40734f6b8ca98ad09f",
+    "sourceSha": "90ff0354e936bbaedc921c82408d3b37e9688909",
+    "buildId": "gi-i65-b4-90ff0354e936-57f234755dc1",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-37869818151-sonljpam.web.app",
+    "runId": 37869818151,
+    "artifactId": 11589203939,
+    "artifactDigest": "29b640af9ac8469b4e8f4c2322febebe949e29589ce2f790eac5b9b7458efc31",
+    "hostedPayloadDigest": "8a3e598db87b3d76dfa8db1c26010d4831b23340c9ed8e60d5d398375b681ca8",
     "backendSourceDigest": "778af087e48cf3e74edc8d4d813aa414968709a9e08977ac2a8405c820e50bb4",
-    "bundleDigest": "bd6692642aacd92fe63c255d1d13b2e0e8b7f165b269c277bf5d918386907f25",
+    "bundleDigest": "8e2554a30263976b2887a98e83dff62aec58d325b823b23d5388b7d543cd2205",
     "exactReadback": true
   },
   "b4002Diagnostic": {
@@ -406,7 +406,7 @@
   },
   "continuityRegister": {
     "path": "artifacts/orbit360-recovery/release-control/I6_5_OPEN_FINDINGS_CARRY_FORWARD_REGISTER_20261003.json",
-    "blobSha": "28e0ff81cb39b2e2fe67976e36a73008fae27ac6",
+    "blobSha": "0e7c74f56c63f3bba4afc0cc66ee93ca728c5cea",
     "inventoryCount": 282,
     "attentionCount": 155,
     "guardPath": "tools/gravicentra-open-findings-continuity-guard-v1.mjs",
