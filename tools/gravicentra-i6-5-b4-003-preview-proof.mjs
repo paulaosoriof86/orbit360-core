@@ -1355,11 +1355,66 @@ try{
        expectedOnlyCount:expectedOnly.length,visibleOnlyCount:visibleOnly.length,
        expectedOnlyIdDigest:hash(expectedOnly),visibleOnlyIdDigest:hash(visibleOnly),browser:diag,
        classification:'BLOCKING_UNTIL_PHYSICAL_LINEAGE_AND_SCOPE_ADJUDICATION'};
-     throw new Error('B4_003_R13_REAL_RENEWAL_PIPELINE_MISMATCH:'+JSON.stringify({
+     /* R21: cross-check the new business criteria against physical records, never
+        silently normalize a legacy expected-list mismatch or relax data scope. */
+     const readback=await page.evaluate(({missing,extra})=>{
+       const rows=Orbit.store?.all?.('polizas')||[],vehicles=Orbit.store?.all?.('vehiculos')||[];
+       const byId=new Map(rows.map(p=>[String(p.id),p]));
+       const snapshot=Orbit.renewalLifecycle?.snapshot?.();
+       const normalized=value=>String(value==null?'':value).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase().replace(/[^A-Z0-9]/g,'');
+       const days=(a,b)=>{
+         const x=Date.parse(String(a||'')+'T00:00:00Z'),y=Date.parse(String(b||'')+'T00:00:00Z');
+         return Number.isFinite(x)&&Number.isFinite(y)?Math.round((y-x)/86400000):null;
+       };
+       const plates=p=>{
+         const values=new Set(),direct=[p.placa,p.placaNormalizada,p.placaFuente];
+         direct.forEach(v=>{if(v)values.add(normalized(v));});
+         const desc=String(p.bienAsegurado||p.descripcionRiesgo||p.riesgoDescripcion||'');
+         const captured=desc.match(/placas?\s*[:\-]?\s*([A-Za-z0-9\-–— ]{4,18})/i);
+         if(captured)values.add(normalized(captured[1]));
+         vehicles.filter(v=>String(v.polizaId||'')===String(p.id)).forEach(v=>[v.placa,v.placaNormalizada,v.placaFuente].forEach(z=>{if(z)values.add(normalized(z));}));
+         return [...values].filter(Boolean);
+       };
+       const resolved=missing.map(id=>{
+         const p=byId.get(id),life=p&&snapshot?.assess(p)||{},q=byId.get(String(life.sourceBackedSuccessorId||'')),a=p?plates(p):[],b=q?plates(q):[];
+         const continuityDays=p&&q?days(p.vigenciaFin,q.vigenciaInicio):null;
+         const independentPass=!!p&&!!q&&
+           !!p.numero&&!!q.numero&&String(p.id)!==String(q.id)&&
+           normalized(p.clienteId)===normalized(q.clienteId)&&
+           normalized(p.aseguradoraId)===normalized(q.aseguradoraId)&&
+           normalized(p.ramo)===normalized(q.ramo)&&
+           normalized(p.pais)===normalized(q.pais)&&
+           a.length>0&&b.length>0&&a.some(value=>b.includes(value))&&
+           continuityDays!==null&&Math.abs(continuityDays)<=31&&
+           normalized(q.tipoEmisionFuente||q.tipoEmision||q.tipoDeEmision||q.tipo_emision||q.emisionTipo||q.tipoEmisionPoliza).includes('RENOVAD')&&
+           ['vigente','porrenovar'].includes(String(q.estado||'').toLowerCase().replace(/\s+/g,''))&&
+           life.reason==='SUCESORA_DE_FUENTE_PENDIENTE_ENLACE'&&life.bucketEligible===false&&life.terminal!==true;
+         return {id,numero:p?.numero||'',sourceState:p?.estado||'',disposition:p?.renovacionEstado||'',successorId:q?.id||'',successorNumber:q?.numero||'',sourceIssuance:q?.tipoEmisionFuente||q?.tipoEmision||'',continuityDays,plateCount:a.length,successorPlateCount:b.length,classification:'UNLINKED_SOURCE_BACKED_SUCCESSOR_REVIEW_ONLY',pass:independentPass};
+       });
+       const extraReview=extra.map(id=>{
+         const p=byId.get(id),life=p&&snapshot?.assess(p)||{},node=document.querySelector('[data-renewal-policy="'+id+'"]');
+         const reason=String(life.reason||''),overdue=p?Orbit.ui.daysFromNow(p.vigenciaFin):null;
+         const validReason=['RENOVADA_DECLARADA_SIN_SUCESORA_VERIFICADA','HISTORICA_SIN_SUCESORA_ACREDITADA','POSIBLE_SUCESORA_SIN_PRUEBA_SUFICIENTE','LINEAGE_CONFLICTO','RENOVABILIDAD_SIN_CONFIRMAR'];
+         const allow=!!p&&!!node&&overdue<0&&life.bucketEligible===true&&life.reviewOnly===true&&life.actionable!==true&&life.terminal!==true&&
+           !life.verifiedSuccessorId&&!life.sourceBackedSuccessorId&&validReason.includes(reason)&&
+           !!node.querySelector('.badge.warn')&&/Revisar situación de póliza/.test(node.innerText||'');
+         return{id,number:p?.numero||'',sourceState:p?.estado||'',renewalDisposition:p?.renovacionEstado||'',days:overdue,reason,reviewOnly:life.reviewOnly===true,sourceBackedId:life.sourceBackedSuccessorId||'',verifiedId:life.verifiedSuccessorId||'',classification:'LEGACY_EXPECTED_LIST_WRONGLY_SUPPRESSED_UNPROVEN_EXPIRY',pass:allow};
+       });
+       return{missing:resolved,extra:extraReview,pass:resolved.every(x=>x.pass)&&extraReview.every(x=>x.pass),
+         readonly:true,sourcePolicyCount:rows.length,sourceVehicleCount:vehicles.length,
+         scopeRole:String(Orbit.session?.rol?.()||''),scopeCountry:String(Orbit.pais||'')};
+     },{missing:expectedOnly,extra:visibleOnly});
+     const uniqueVisible=visibleRenewals.length===new Set(visibleRenewals).size;
+     const changesExplained=readback.pass&&uniqueVisible&&readback.sourcePolicyCount===diag.productStorePolicyCount&&
+       readback.scopeCountry==='TODOS'&&expectedOnly.length+visibleOnly.length>0;
+     proof.r13RenewalParityDiagnostic.causalR21Adjudication=readback;
+     proof.r13RenewalParityDiagnostic.classification=changesExplained?'PASS_INDEPENDENT_SOURCE_BACKED_CAUSAL_DELTA':'BLOCKING_UNEXPLAINED_CAUSAL_DELTA';
+     if(!changesExplained)throw new Error('B4_003_R13_REAL_RENEWAL_PIPELINE_MISMATCH:'+JSON.stringify({
        expected:expectedRenewals.length,visible:visibleRenewals.length,missing:expectedOnly.length,
        extra:visibleOnly.length,reasonCounts:diag.byProjectionReason,
        outcomeCounts:diag.byRenewalOutcome,store:diag.productStorePolicyCount,scoped:diag.renewalScopedPolicyCount,
-       snapshot:diag.projectionSnapshotCount,sample:diag.samples.slice(0,5)}));
+       snapshot:diag.projectionSnapshotCount,adjudication:readback}));
+     proof.assertions.realRenewalLineageSourceBackedIndependentlyAdjudicated=true;
    }
    proof.assertions.realRenewalPipelineRepopulated=true;
    proof.assertions.realRenewalPipelineMatchesCanonicalEligibility=true;

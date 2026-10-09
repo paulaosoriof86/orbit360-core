@@ -471,6 +471,7 @@ need(index.includes('refreshFlight')&&index.includes('inboxScope()')&&index.incl
  }
  const source=classify([original,successor]);
  need(base.includes('q.tipoEmisionFuente||q.tipoEmision'),'B4_003_R21_CANONICAL_ISSUANCE_FIELD_READ_OWNER_MISSING');
+ need(previewProof.includes('const readback=await page.evaluate(({missing,extra})=>')&&previewProof.includes('B4_003_R13_REAL_RENEWAL_PIPELINE_MISMATCH')&&previewProof.includes('readback.pass&&uniqueVisible')&&previewProof.includes('if(!changesExplained)throw new Error')&&previewProof.includes('realRenewalLineageSourceBackedIndependentlyAdjudicated'), 'B4_003_R21_INDEPENDENT_REAL_DELTA_ADJUDICATOR_NOT_BOUND');
  need(source.reason==='SUCESORA_DE_FUENTE_PENDIENTE_ENLACE'&&!source.bucketEligible&&source.sourceBackedSuccessorId==='new'&&!source.terminal,'B4_003_R21_SOURCE_SUCCESSOR_NOT_CAUSALLY_SEPARATED');
  const unproved=classify([original,{...successor,tipoEmisionFuente:'Póliza Nueva'}]);
  need(unproved.bucketEligible&&unproved.reviewOnly&&!unproved.terminal,'B4_003_R21_UNPROVEN_RENEWAL_WRONGLY_HIDDEN');

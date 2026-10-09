@@ -1,0 +1,71 @@
+{
+  "schema": "GRAVICENTRA_I65_B4_003_R21_INDEPENDENT_PARITY_QA_FIX_V1",
+  "recordedDate": "2026-10-09",
+  "gate": "I6.5/B4-003",
+  "physicalHeadAtDiagnosis": "4bbd300f3019202bc57b363375596346d33fefb9",
+  "previousRunId": 37963678293,
+  "previousRunConclusion": "FAIL",
+  "previousStaticGuardRunId": 37963678311,
+  "disposition": "QA_ADJUDICATOR_UPDATED_SOURCE_UNCHANGED_EXACT_PREVIEW_REQUIRED",
+  "originalFailure": "B4_003_R13_REAL_RENEWAL_PIPELINE_MISMATCH",
+  "originalComparison": {
+    "legacyExpectedCount": 56,
+    "currentVisibleCount": 57,
+    "expectedOnly": [
+      {
+        "id": "pol_168b56a1945ee94512a77005a605",
+        "numero": "02-01-488-5659-0",
+        "businessReason": "SUCESORA_DE_FUENTE_PENDIENTE_ENLACE",
+        "proofDisposition": "REQUIRES_VERIFICACION_INDEPENDIENTE_DE_SUCESEORA"
+      }
+    ],
+    "visibleOnly": [
+      {
+        "id": "pol_9220fa6d4f3a49b2307746d1d869",
+        "proofDisposition": "REQUIERE_VERIFICACION_DEL_ESTADO_ORIGEN_Y_REVIEW_ONLY"
+      },
+      {
+        "id": "pol_c79d36d3d0d32f11909e5f715309",
+        "proofDisposition": "REQUIERE_VERIFICACION_DEL_ESTADO_ORIGEN_Y_REVIEW_ONLY"
+      }
+    ]
+  },
+  "primaryRootCause": "OLD_INDEPENDENT_ADJUDICATOR_INCORRECTLY_TREATED_SAME_NUMBER_AS_SUFFICIENT_AND_LACKED_PHYSICAL_RISK_ISSUANCE_CONTINUITY",
+  "correctedQA": {
+    "browserProofPath": "tools/gravicentra-i6-5-b4-003-preview-proof.mjs",
+    "blobSha": "3acd0faafc41a9ef8d1c23d1b7a0b967b936b3fd",
+    "staticContractPath": "tools/gravicentra-i6-5-b4-003-contract.mjs",
+    "failedIfUnproved": true,
+    "requiredMissingChecks": [
+      "policy and successor different ids and valid numbers",
+      "same client insurer ramo country",
+      "matching nonempty risk plates",
+      "issuance marked renewal in canonical source",
+      "consecutive dates within 31 days",
+      "old stays reviewOnly and nonterminal with sourceBacked id"
+    ],
+    "requiredExtraChecks": [
+      "expiry date past",
+      "visible in Kanban",
+      "status reviewOnly true actionable false terminal false",
+      "no linked or source backed successor",
+      "review button and warning are present",
+      "reason is in strictly approved reconciliation categories"
+    ],
+    "crossScopeProof": [
+      "source physically read from current Orbit.store",
+      "no duplicate visible ids",
+      "country TODOS",
+      "same source universe size"
+    ],
+    "sourceWriteOperations": 0
+  },
+  "currentProductSourceSha": "a3a582b3d72e036abd5fcf00e3e72b687c454fa3",
+  "otherProductSourcesUnchanged": true,
+  "sourceChanges": false,
+  "operationalDataWrites": 0,
+  "productionDeploy": false,
+  "reimport": false,
+  "priorApprovedProof": "37950852293 (earlier immutable source, never reused as R21 PASS)",
+  "nextAction": "R21_EXACT_PREVIEW_AUTHENTICATED_PROOF"
+}

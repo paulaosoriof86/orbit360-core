@@ -1668,5 +1668,17 @@
     "receiptSha": "b460062aa065d2cdef9e77b5e3316201ea68f212",
     "newQAContractSha": "0210be15d02c2e39a815466a22fe59951e19e2c3",
     "productSourceUnchanged": true
+  },
+  "r21ParityQAFix": {
+    "status": "PENDING_CONTRACT_AND_EXACT_AUTHENTICATED_PREVIEW",
+    "previousBrowserFailure": 37963678293,
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R21_REAL_PIPELINE_DELTA_INDEPENDENT_QA_FIX_20261009.json",
+    "receiptBlobSha": "693a2542058aad6a0d2654cc907c77dd056d6a11",
+    "proofSourceBlobSha": "d23918fcfaf0153419b3cbb707982100f967bcdc",
+    "contractSourceBlobSha": "3acd0faafc41a9ef8d1c23d1b7a0b967b936b3fd",
+    "productSourceChanged": false,
+    "qaChangesOnly": true,
+    "productionMutation": false,
+    "dataMutation": false
   }
 }

@@ -4283,8 +4283,8 @@
       "orbit360-platform/modules/leads.js": "b4dfdbcdb8d255329e3fbae8df59ffde96f05146"
     },
     "proofOwners": {
-      "tools/gravicentra-i6-5-b4-003-contract.mjs": "0210be15d02c2e39a815466a22fe59951e19e2c3",
-      "tools/gravicentra-i6-5-b4-003-preview-proof.mjs": "f24f2d76af5995097b6d349084d186bee5c99741"
+      "tools/gravicentra-i6-5-b4-003-contract.mjs": "3acd0faafc41a9ef8d1c23d1b7a0b967b936b3fd",
+      "tools/gravicentra-i6-5-b4-003-preview-proof.mjs": "d23918fcfaf0153419b3cbb707982100f967bcdc"
     },
     "retainedCertifiedMachinePass": {
       "sourceSha": "511e9009575b5a77fcb2f2bd2c3ac01227e7b622",
@@ -4320,5 +4320,15 @@
     "qaContractSha": "0210be15d02c2e39a815466a22fe59951e19e2c3",
     "productCodeChanged": false,
     "priorTestRunId": 37963031278
+  },
+  "b4003R21IndependentParityQa": {
+    "status": "VALIDATOR_SOURCE_STAGED_EXACT_AUTHENTICATED_PREVIEW_PENDING",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R21_REAL_PIPELINE_DELTA_INDEPENDENT_QA_FIX_20261009.json",
+    "receiptBlobSha": "693a2542058aad6a0d2654cc907c77dd056d6a11",
+    "priorFailureRun": 37963678293,
+    "productSourceUnchanged": true,
+    "sourceBlobSha": "a3a582b3d72e036abd5fcf00e3e72b687c454fa3",
+    "browserQaBlobSha": "d23918fcfaf0153419b3cbb707982100f967bcdc",
+    "contractBlobSha": "3acd0faafc41a9ef8d1c23d1b7a0b967b936b3fd"
   }
 }
