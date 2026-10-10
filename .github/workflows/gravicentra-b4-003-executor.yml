@@ -90,7 +90,13 @@ jobs:
             && sourceFixed(c.currentB4?.status)&&sourceFixed(c.i65ForensicRemediationPlan?.b4?.status)&&sourceFixed(l.status);
           const r20Preview=c.nextAction==='I6_5_FORENSIC_REMEDIATION_B4_003_R20_CONTRACT_AND_EXACT_PREVIEW'
             && sourceFixedR20(c.currentB4?.status)&&sourceFixedR20(c.i65ForensicRemediationPlan?.b4?.status)&&sourceFixedR20(l.status);
-          const previewOk=(r19Preview||r20Preview)
+          const r23Preview=c.nextAction==='I6_5_FORENSIC_REMEDIATION_B4_003_R23_CONTRACT_AND_EXACT_PREVIEW'
+            && c.currentB4?.status==='B4_003_R23_SOURCE_STAGED_PENDING_PREVIEW'
+            && c.i65ForensicRemediationPlan?.b4?.status==='B4_003_R23_SOURCE_STAGED_PENDING_PREVIEW'
+            && l.status==='B4_003_R23_SOURCE_STAGED_PENDING_PREVIEW'
+            && l.r23CausalAuthorization?.status==='SCOPED_R23_SOURCE_MUTATION_APPROVED_WITHIN_B4_003'
+            && l.r23InicioProgress?.authProofExecuted===false;
+          const previewOk=(r19Preview||r20Preview||r23Preview)
             && l.activeFinding?.id==='B4-003'
             && l.boundaries?.businessWritesAuthorized===false
             && l.boundaries?.syntheticQaWritesAuthorized===true

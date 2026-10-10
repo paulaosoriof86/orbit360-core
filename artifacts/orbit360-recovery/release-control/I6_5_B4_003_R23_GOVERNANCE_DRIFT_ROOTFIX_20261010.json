@@ -1,0 +1,19 @@
+{
+  "schema": "GRAVICENTRA_R23_GOVERNANCE_DRIFT_ROOTFIX",
+  "date": "2026-10-10",
+  "priorRun": 38059462129,
+  "priorGuardRun": 38059462124,
+  "rootCause": "FR.b4.executionLockBlobSha still referenced R22, guard and executor supported only R19/R20 transitions",
+  "changes": [
+    "FR.b4 lock, composition, ledger bindings",
+    "guard recognizes R23 nextAction",
+    "B4 executor recognizes R23 nextAction",
+    "synthetic QA fixtures only for isolated Preview with cleanup"
+  ],
+  "gatesPreserved": true,
+  "sourceProductUnchangedSinceR23Commit": true,
+  "liveUnchanged": true,
+  "operationalRealWrites": 0,
+  "noHumanOrFunctionalPassClaim": true,
+  "previewRequired": true
+}

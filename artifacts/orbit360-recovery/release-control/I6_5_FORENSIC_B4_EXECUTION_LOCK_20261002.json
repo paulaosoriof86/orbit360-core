@@ -88,7 +88,7 @@
     ],
     "reimportAuthorized": false,
     "livePromotionAuthorized": false,
-    "syntheticQaWritesAuthorized": false,
+    "syntheticQaWritesAuthorized": true,
     "syntheticQaScope": "R20 exact Preview only: disposable insurer/logo/product/plan/requirement/document and Ops/Leads handoff/cadence fixtures; mandatory server commit, readback, reload and cleanup; no real operational row mutation.",
     "paulaVisualAcceptanceRequiredBeforeAdvance": true,
     "cotcompRealTransportAuthorized": false,
@@ -1773,10 +1773,13 @@
       "tools/gravicentra-i6-5-b4-003-preview-proof.mjs"
     ],
     "noNewTeamAdminRights": true,
-    "productionForbidden": true
+    "productionForbidden": true,
+    "syntheticFixturesAuthorizedOnlyWithinIsolatedPreview": true,
+    "syntheticCleanupRequired": true,
+    "realBusinessWritesForbidden": true
   },
   "r23InicioProgress": {
-    "status": "R23_SOURCE_STAGED_PENDING_AUTHENTICATED_EXACT_PREVIEW",
+    "status": "R23_GOVERNANCE_RECONCILED_EXACT_PREVIEW_REQUIRED",
     "finding": "B4-003-R19-07-INICIO-MONTHLY-ADVISOR-READINESS-REGRESSION",
     "rootCause": "Inicio uses Equipo-protected asesores/metas and assignment roster omits nonassignable advisors.",
     "scope": "Dedicated Inicio-only projection with member/country/dataScope/activeRole authorization, no Equipo admin grant.",
