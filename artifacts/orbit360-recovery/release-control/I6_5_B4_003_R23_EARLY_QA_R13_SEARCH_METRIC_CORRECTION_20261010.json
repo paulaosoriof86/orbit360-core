@@ -1,0 +1,16 @@
+{
+  "schema": "GRAVICENTRA_B4_003_R23_CAUSAL_QA_CORRECTION_V1",
+  "date": "2026-10-10",
+  "priorFailRunId": 38060653254,
+  "priorFailure": "B4_003_R13_POLICY_SEARCH_DOM_METRIC_MISSING",
+  "rootCause": "DOM already met exact filter condition but MutationObserver metric was not verified at the browser input frame; 773ms successful end-to-end behavior is not sufficient to certify browser-native 2500ms invariant.",
+  "change": "Verify independently from input event's next animation frame and MutationObserver; retain <2500ms and canonical row conditions. Move R23 authenticated check earlier in same harness.",
+  "oldQaBlob": "5a1f64f984a6caf5e6cc6066ac6dd11a5235b9eb",
+  "newQaBlob": "9c6ac44de6a6429fac25987185b617ef69198204",
+  "scope": "QA only, no product source, no data, no production",
+  "originalAssertionsPreserved": true,
+  "priorQAReceiptsPreserved": true,
+  "realRenewalSourceDryRunReady": false,
+  "liveLineageUnresolved": true,
+  "status": "QA_ONLY_SOURCE_FIXED_EXACT_PREVIEW_PENDING"
+}

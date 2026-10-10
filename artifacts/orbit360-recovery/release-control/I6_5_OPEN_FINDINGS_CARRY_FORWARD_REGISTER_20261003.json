@@ -4,7 +4,7 @@
   "authority": "FAIL_CLOSED_FINDING_CONTINUITY",
   "sourceLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
   "sourceLedgerPreviousBlobSha": "0cdb33f6b47a62426c7ce5c1d10ecfc2d69b3b74",
-  "expectedLedgerNextBlobSha": "2886b5a87a5323ab91b88444d4e81f183292a43f",
+  "expectedLedgerNextBlobSha": "1235941d6afe4c4fb80f62df645618398389f9d8",
   "policy": {
     "allLedgerFindingsMustAppearExactlyOnce": true,
     "newHumanFindingsMustBeIndividualLedgerEntries": true,
@@ -12620,5 +12620,15 @@
     "status": "QA_ONLY_RECONCILED",
     "ledgerBlobSha": "2886b5a87a5323ab91b88444d4e81f183292a43f",
     "receiptBlobSha": "9f72ad886a0e12cf422518380da366eb001f8ce2"
+  },
+  "r23EarlyQaAndSearchMetric": {
+    "status": "QA_ONLY_SOURCE_FIXED_EXACT_PREVIEW_PENDING",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R23_EARLY_QA_R13_SEARCH_METRIC_CORRECTION_20261010.json",
+    "receiptBlobSha": "7c5f73fea7ae4838d83e597827d796402df475fc",
+    "qaBlobSha": "9c6ac44de6a6429fac25987185b617ef69198204",
+    "oldQaBlobSha": "5a1f64f984a6caf5e6cc6066ac6dd11a5235b9eb",
+    "sourceProductUnchanged": true,
+    "liveUnchanged": true,
+    "ledgerBlobSha": "1235941d6afe4c4fb80f62df645618398389f9d8"
   }
 }
