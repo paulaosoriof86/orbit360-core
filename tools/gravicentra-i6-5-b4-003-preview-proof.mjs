@@ -338,7 +338,13 @@ async function collaborationFor(browser,who,businessId,type,message,withAttachme
   await p.waitForFunction(id=>!!Orbit.store?.get('negocios',id),businessId,{timeout:30000});
   const before=await p.evaluate(()=>{const s=Orbit.productOperationalWriteP0?.status?.()||{};return{pending:Number(s.pending||0),failed:Number(s.failed||0),committed:Number(s.committed||0),lastError:String(s.lastError||'')};});
   const openStarted=Date.now();await p.evaluate(id=>Orbit.ciclo.openNegocio(id),businessId);await p.waitForSelector('#ciclo-modal #ng-com-type',{timeout:10000});const openMs=Date.now()-openStarted;
+  const measureModal=()=>p.evaluate(()=>{const m=document.getElementById('ciclo-modal'),st=m?.querySelector('.ciclo-stepper'),body=m?.querySelector('.ciclo-body'),sr=st?.getBoundingClientRect(),br=body?.getBoundingClientRect(),labels=[...(st?.querySelectorAll('.cstep-l')||[])];return{viewport:innerWidth,stepperHeight:Math.round(sr?.height||0),labels:labels.length,labelsVerticallyVisible:!!sr&&labels.length>=7&&labels.every(l=>{const q=l.getBoundingClientRect();return q.top>=sr.top-2&&q.bottom<=sr.bottom+2;}),bodyBelowProgress:!!br&&!!sr&&br.top>=sr.bottom-2,documentOverflow:document.documentElement.scrollWidth>innerWidth+2};});
+  const geometry=[];
+  for(const [width,height] of [[1440,900],[390,844],[320,700]]){await p.setViewportSize({width,height});geometry.push(await measureModal());}
+  await p.setViewportSize({width:1280,height:720});
   const visual=await p.evaluate(()=>{const m=document.getElementById('ciclo-modal'),panel=m?.querySelector('.ciclo-collab-panel'),header=m?.querySelector('.ciclo-h-brand'),help=String(panel?.innerText||'');const css=panel?getComputedStyle(panel):null;return{panel:!!panel,brandHeader:!!header,helpImmediate:/Registrar guarda la colaboración inmediatamente/.test(help),panelBackground:css?.backgroundColor||'',panelBorder:css?.borderColor||''};});
+  visual.progressGeometry=geometry;
+  need(geometry.every(x=>x.stepperHeight>=72&&x.labelsVerticallyVisible&&x.bodyBelowProgress&&!x.documentOverflow),'B4_003_PAULA_CICLO_PROGRESS_CLIPPED:'+JSON.stringify(geometry));
   await p.selectOption('#ciclo-modal #ng-com-type',{label:type});await p.fill('#ciclo-modal #ng-com-new',message);
   if(withAttachment)await p.setInputFiles('#ciclo-modal #ng-com-file',{name:'b4-r20-ui-attachment-'+run+'.txt',mimeType:'text/plain',buffer:Buffer.from('B4-003 R20 UI attachment '+run,'utf8')});
   await p.click('#ciclo-modal #ng-com-add');

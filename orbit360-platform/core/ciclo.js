@@ -455,7 +455,7 @@ Orbit.ciclo = (function () {
             <div class="ciclo-sec-t ciclo-collab-title"><span>↕ Solicitudes, respuestas y comentarios</span><span class="badge neutral">${(n.comentarios||[]).length}</span></div>
             <div class="ciclo-collab-help">Usa esta sección para devolver, responder o dejar una observación. <b>Registrar guarda la colaboración inmediatamente</b>; no necesitas pulsar “Guardar cambios” después.</div>
             <div id="ng-coms" class="ciclo-collab-thread">${(n.comentarios || []).slice().reverse().map(comRow).join('') || '<div class="muted ciclo-collab-empty">Todavía no hay solicitudes ni comentarios.</div>'}</div>
-            <div class="cadd ciclo-collab-add"><select id="ng-com-type" class="o-sel">${COLLAB_TYPES.map(v=>'<option>'+U.esc(v)+'</option>').join('')}</select><input id="ng-com-new" class="o-sel" placeholder="Escribe qué necesitas o qué respondes…"><label class="btn ghost sm collab-file-btn" ${previewProtectedUpload?'aria-disabled="true" title="Preview: documentos de negocios reales protegidos" style="opacity:.55;cursor:not-allowed"':''}><span data-collab-file-action>📎 ${previewProtectedUpload?'Carga protegida':'Adjuntar'}</span><input id="ng-com-file" type="file" ${previewProtectedUpload?'disabled':''} hidden></label><button type="button" class="btn ghost sm" data-collab-file-remove hidden>Quitar archivo</button><button class="btn primary sm" id="ng-com-add">Registrar ahora</button></div><div class="muted" id="ng-com-file-name" role="status" aria-live="polite" style="font-size:11.5px;margin-top:6px">${previewProtectedUpload?'Esta Preview protege los archivos de negocios reales. La carga se comprueba con expedientes de prueba autorizados; en producción requiere validación LIVE.':'Puedes adjuntar un documento de respaldo.'}</div>
+            <div class="cadd ciclo-collab-add"><select id="ng-com-type" class="o-sel">${COLLAB_TYPES.map(v=>'<option>'+U.esc(v)+'</option>').join('')}</select><input id="ng-com-new" class="o-sel" placeholder="Escribe qué necesitas o qué respondes…"><label class="btn ghost sm collab-file-btn" ${previewProtectedUpload?'aria-disabled="true" title="Preview: documentos de negocios reales protegidos" style="opacity:.55;cursor:not-allowed"':''}><span data-collab-file-action>📎 ${previewProtectedUpload?'Solo en LIVE':'Adjuntar'}</span><input id="ng-com-file" type="file" ${previewProtectedUpload?'disabled':''} hidden></label><button type="button" class="btn ghost sm" data-collab-file-remove hidden>Quitar archivo</button><button class="btn primary sm" id="ng-com-add">Registrar ahora</button></div><div class="muted" id="ng-com-file-name" role="status" aria-live="polite" style="font-size:11.5px;margin-top:6px">${previewProtectedUpload?'Esta Preview protege los archivos de negocios reales: no permite adjuntar aquí. Los adjuntos se prueban con expedientes sintéticos autorizados; en LIVE requieren prueba de lectura, persistencia y recarga.':'Puedes adjuntar un documento de respaldo.'}</div>
           </div>
         </div>
         <aside class="ciclo-aside">
@@ -469,8 +469,8 @@ Orbit.ciclo = (function () {
           </div>
           <div class="ciclo-sec">
             <div class="ciclo-sec-t">Sincronización</div>
-            <div class="sync-row"><span>🎯 Orbit Leads</span><b>${ei.leads}</b></div>
-            <div class="sync-row"><span>🗂 Orbit Ops</span><b>${enOps ? ei.ops : '—'}</b></div>
+            <div class="sync-row"><span>🎯 Leads</span><b>${ei.leads}</b></div>
+            <div class="sync-row"><span>🗂 Ops</span><b>${enOps ? ei.ops : '—'}</b></div>
             <div class="muted" style="font-size:11.5px;margin-top:6px">El asesor da seguimiento en Leads; el equipo ejecuta lo operativo en Ops. Un mismo negocio, sincronizado en vivo.</div>
           </div>
           <div class="ciclo-sec">
@@ -578,7 +578,7 @@ Orbit.ciclo = (function () {
         await S().updateDurable('negocios', id, { comentarios: n.comentarios,bitacora:n.bitacora,actualizado:today() });
         commentCommitted=true;
         let finalizeWarning=false;
-        if(uploaded&&Orbit.productDriveDocumentProviderP0&&typeof Orbit.productDriveDocumentProviderP0.finalize==='function'){try{await Orbit.productDriveDocumentProviderP0.finalize(uploaded.documentRef||uploaded.fileId||uploaded.driveUrl,{entidad:'negocio',entidadId:id,clienteId:n.clienteId,sourceModule:'ops-leads'});}catch(_finalizeError){finalizeWarning=true;}}
+        if(uploaded&&Orbit.productDriveDocumentProviderP0&&typeof Orbit.productDriveDocumentProviderP0.finalize==='function'){try{const finalized=await Orbit.productDriveDocumentProviderP0.finalize(uploaded.documentRef||uploaded.fileId||uploaded.driveUrl,{entidad:'negocio',entidadId:id,clienteId:n.clienteId,sourceModule:'ops-leads'});if(!finalized||finalized.ok!==true)finalizeWarning=true;}catch(_finalizeError){finalizeWarning=true;}}
         U.toast(finalizeWarning?'La colaboración quedó guardada. El archivo requiere confirmación documental; no vuelvas a registrar el comentario.':'Colaboración registrada y confirmada.');openNegocio(id);
       } catch (error) {
         if(!commentCommitted&&uploaded&&Orbit.productDriveDocumentProviderP0&&typeof Orbit.productDriveDocumentProviderP0.quarantine==='function')try{await Orbit.productDriveDocumentProviderP0.quarantine(uploaded.documentRef||uploaded.fileId||uploaded.driveUrl,{entidad:'negocio',entidadId:id,clienteId:n.clienteId,sourceModule:'ops-leads'});}catch(_e){}

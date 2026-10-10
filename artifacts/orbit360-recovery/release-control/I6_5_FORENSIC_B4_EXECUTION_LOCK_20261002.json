@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B4_EXECUTION_LOCK_V1",
   "recordedAt": "2026-10-08T21:43:35.454Z",
-  "status": "B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL",
+  "status": "B4_003_R23_SOURCE_STAGED_PENDING_PREVIEW",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "block": "B4",
@@ -38,10 +38,10 @@
   "activeFinding": {
     "id": "B4-003",
     "title": "Cumulative B4-003 remediation: Renovaciones, Cancelaciones and source-backed insurer knowledge.",
-    "status": "B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL",
+    "status": "B4_003_R23_SOURCE_STAGED_PENDING_PREVIEW",
     "blocking": true,
-    "nextAction": "B4_003_R20_TARGETED_PAULA_VISUAL",
-    "humanVisualStatus": "PENDING_R20_TARGETED_VISUAL",
+    "nextAction": "R23_CONTRACT_AND_EXACT_PREVIEW",
+    "humanVisualStatus": "PAULA_REJECTED_20261010",
     "knowledgePreview": true
   },
   "rules": {
@@ -84,7 +84,8 @@
       "orbit360-platform/modules/ops.js",
       "orbit360-platform/modules/leads.js",
       "orbit360-platform/data/store-firestore-product-operational-p0.js",
-      "orbit360-platform/modules/inicio.js"
+      "orbit360-platform/modules/inicio.js",
+      "orbit360-platform/styles/infra.css"
     ],
     "reimportAuthorized": false,
     "livePromotionAuthorized": false,
@@ -116,7 +117,7 @@
     "renewalCutoffDataMutationAuthorized": false,
     "realOperationalWritesAuthorized": false
   },
-  "nextAction": "B4_003_R20_TARGETED_PAULA_VISUAL",
+  "nextAction": "R23_CONTRACT_AND_EXACT_PREVIEW",
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
     "blobSha": "42ca7614694e04b6ec459a61c58c879c439c2cc6",
@@ -587,9 +588,9 @@
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_RENEWAL_KPI_PARITY_CAUSAL_ADDENDUM_20261005.json",
     "blobSha": "87bab7ee2778a0525cdbe81cf4cbf82020bf6139"
   },
-  "findingLedgerBlobSha": "1d2938b4bbcf61a1280480c700177583a520b312",
-  "continuityRegisterBlobSha": "0a7d5b89651615c0e7cda3429e404d622cba9d9b",
-  "compositionLockBlobSha": "9d541d0e934e7f429b7ea6eba5ed11a4ed521c00",
+  "findingLedgerBlobSha": "2022d17bad1ed9081b7b95f30571461ca945216b",
+  "continuityRegisterBlobSha": "c1f63f6fce7ddaa4649ce422c4ff4820d85d1284",
+  "compositionLockBlobSha": "d67fb30e2e807fed42716d611bf7c6fb7bfb53fd",
   "r18SourceFix": {
     "status": "SOURCE_FIXED_R18_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_SOURCE_FIX_20261005.json",
@@ -1958,5 +1959,39 @@
     "dataMutation": false,
     "previewRetestRequired": true,
     "passClaim": false
+  },
+  "r23PaulaVisualSourceFix20261010": {
+    "status": "PAULA_VISUAL_REJECTED_20261010_SOURCE_FIXED_EXACT_PREVIEW_REQUIRED",
+    "gate": "I6.5/B4-003",
+    "priorMachineRun": 38080066957,
+    "priorMachineBuild": "gi-i65-b4-2eba5c2ca4dd-57f234755dc1",
+    "existingFindingIds": [
+      "B4-003-R19-07-INICIO-MONTHLY-ADVISOR-READINESS-REGRESSION",
+      "B4-003-R20-V2-16-SURFACE-HIERARCHY",
+      "B4-003-R20-V2-04-COLLAB-UX-COMMIT-SEMANTICS"
+    ],
+    "productOwnerBlobs": {
+      "orbit360-platform/core/ciclo.js": "3ab7c7f187933e295fbd19648d5c2d22f7d8a9ee",
+      "orbit360-platform/styles/infra.css": "ab7a8d93e81db9259b6673cb31a3ddc989985282",
+      "orbit360-platform/modules/inicio.js": "ac06a355e397b0f4e7f67d5ae80a2a46d94de9c3"
+    },
+    "qaBlob": "5b1c44c59e33519bfa344036f71d04f0ad5e3b27",
+    "reauthorization": "Paula reported visual and collaboration regression on exact B4-003 Preview",
+    "attachments": "Real-business Preview uploads remain blocked by server isolation; synthetic upload positive path requires QA, production functional acceptance still HOLD",
+    "sourceChanged": true,
+    "previewHumanReviewRequired": true,
+    "realWrites": 0,
+    "productionTouched": false
+  },
+  "r23PaulaVisualSourceFixAuthorization": {
+    "status": "SCOPED_R23_SOURCE_MUTATION_APPROVED_WITHIN_B4_003",
+    "files": [
+      "orbit360-platform/core/ciclo.js",
+      "orbit360-platform/styles/infra.css",
+      "orbit360-platform/modules/inicio.js"
+    ],
+    "qaOwner": "tools/gravicentra-i6-5-b4-003-preview-proof.mjs",
+    "noLive": true,
+    "noRealDataMutation": true
   }
 }

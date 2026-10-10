@@ -1039,6 +1039,14 @@ a.fh-chip:hover{border-color:var(--red);color:var(--red)}
 .ciclo-stage-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:6px;box-shadow:0 0 0 2px rgba(255,255,255,.35)}
 .ciclo-card{max-height:min(92vh,900px)}
 .ciclo-stepper{scrollbar-width:none}.ciclo-stepper::-webkit-scrollbar{display:none}
+/* B4-003: avoid flex shrink/clipped Ops-Leads progress labels. */
+#ciclo-modal>.ciclo-card{min-height:0}
+#ciclo-modal .ciclo-h,#ciclo-modal .ciclo-foot{flex-shrink:0}
+#ciclo-modal .ciclo-stepper{flex:0 0 auto;min-height:82px;box-sizing:border-box;position:relative;z-index:1;overflow-x:auto;overflow-y:hidden;scrollbar-width:thin}
+#ciclo-modal .ciclo-stepper::-webkit-scrollbar{display:block;height:5px}
+#ciclo-modal .ciclo-stepper::-webkit-scrollbar-thumb{background:var(--ink-3);border-radius:5px}
+#ciclo-modal .ciclo-body{flex:1 1 auto;min-height:0;overscroll-behavior:contain}
+
 .ciclo-collab-panel{border:1px solid var(--red-line);border-radius:14px;background:var(--card);padding:14px;box-shadow:var(--sh-1)}
 .ciclo-collab-title{display:flex;justify-content:space-between;align-items:center;gap:12px;font-size:15px}
 .ciclo-collab-help{font-size:12px;line-height:1.45;color:var(--ink-2);background:var(--card-2);border-radius:10px;padding:9px 11px;margin:-2px 0 12px}

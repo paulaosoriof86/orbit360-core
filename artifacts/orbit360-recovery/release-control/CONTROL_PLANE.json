@@ -752,7 +752,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_R20_TARGETED_PAULA_VISUAL",
+  "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_R23_CONTRACT_AND_EXACT_PREVIEW",
   "postproductionExitProgress": {
     "formalPercent": 50,
     "frozenMiniGates": 5,
@@ -4863,15 +4863,15 @@
       "b2LedgerSealReconciled": true
     },
     "b4": {
-      "status": "B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL",
+      "status": "B4_003_R23_SOURCE_STAGED_PENDING_PREVIEW",
       "entryCondition": "PASS",
       "targetPercent": 100,
       "entryGuardReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_ENTRY_GUARD_PASS_20261002.json",
       "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
       "executionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B4_EXECUTION_LOCK_20261002.json",
-      "executionLockBlobSha": "5ae63264669a6ea3a8657d604ef18da76930c837",
-      "compositionLockBlobSha": "42ca7614694e04b6ec459a61c58c879c439c2cc6",
-      "findingLedgerBlobSha": "66e8ef9dd12a655bb33b929ec463eef50c24fe38",
+      "executionLockBlobSha": "fd606c686aec82afcbd2723be28a72ae266369ef",
+      "compositionLockBlobSha": "d67fb30e2e807fed42716d611bf7c6fb7bfb53fd",
+      "findingLedgerBlobSha": "2022d17bad1ed9081b7b95f30571461ca945216b",
       "activeFindingId": "B4-003",
       "productSourceSha": "c603fd3561e7229d9359db45495d4cf2d757cd8f",
       "baselineBuildId": "gi-i65-b3-dcd2b3f60b98-57f234755dc1",
@@ -4880,7 +4880,7 @@
       "dataMutationAuthorized": false,
       "reimportAuthorized": false,
       "livePromotionAuthorized": false,
-      "nextAction": "B4_003_R20_TARGETED_PAULA_VISUAL",
+      "nextAction": "R23_CONTRACT_AND_EXACT_PREVIEW",
       "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R17_SOURCE_FIX_20261005.json",
       "sourceFixReceiptBlobSha": "ff532a6577e58076821a41fb593da642fd2e7ef7",
       "sourceHeadBeforeGovernanceSeal": "67d8695680556bec1f559a8c4ee650176d400f98",
@@ -5966,15 +5966,38 @@
       "r20LifecycleRootfixPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_RENEWALS_LIFECYCLE_CAUSAL_FIX_AND_GOVERNANCE_RECONCILIATION_20261008.json",
       "r20LifecycleRootfixBlobSha": "00bc96d3bd14998bafbe851eeccb506ec88cc25b",
       "machineProofReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_MACHINE_PROOF_37950852293_20261009.json",
-      "machineProofReceiptBlobSha": "d7972f44ce7f81587fe5d51cb6d0942e12ee7f6f"
+      "machineProofReceiptBlobSha": "d7972f44ce7f81587fe5d51cb6d0942e12ee7f6f",
+      "r23PaulaVisualSourceFix20261010": {
+        "status": "PAULA_VISUAL_REJECTED_20261010_SOURCE_FIXED_EXACT_PREVIEW_REQUIRED",
+        "gate": "I6.5/B4-003",
+        "priorMachineRun": 38080066957,
+        "priorMachineBuild": "gi-i65-b4-2eba5c2ca4dd-57f234755dc1",
+        "existingFindingIds": [
+          "B4-003-R19-07-INICIO-MONTHLY-ADVISOR-READINESS-REGRESSION",
+          "B4-003-R20-V2-16-SURFACE-HIERARCHY",
+          "B4-003-R20-V2-04-COLLAB-UX-COMMIT-SEMANTICS"
+        ],
+        "productOwnerBlobs": {
+          "orbit360-platform/core/ciclo.js": "3ab7c7f187933e295fbd19648d5c2d22f7d8a9ee",
+          "orbit360-platform/styles/infra.css": "ab7a8d93e81db9259b6673cb31a3ddc989985282",
+          "orbit360-platform/modules/inicio.js": "ac06a355e397b0f4e7f67d5ae80a2a46d94de9c3"
+        },
+        "qaBlob": "5b1c44c59e33519bfa344036f71d04f0ad5e3b27",
+        "reauthorization": "Paula reported visual and collaboration regression on exact B4-003 Preview",
+        "attachments": "Real-business Preview uploads remain blocked by server isolation; synthetic upload positive path requires QA, production functional acceptance still HOLD",
+        "sourceChanged": true,
+        "previewHumanReviewRequired": true,
+        "realWrites": 0,
+        "productionTouched": false
+      }
     }
   },
   "canonicalAccumulationControl": {
     "status": "FROZEN_ACTIVE",
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "compositionLockBlobSha": "42ca7614694e04b6ec459a61c58c879c439c2cc6",
+    "compositionLockBlobSha": "d67fb30e2e807fed42716d611bf7c6fb7bfb53fd",
     "findingLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "findingLedgerBlobSha": "66e8ef9dd12a655bb33b929ec463eef50c24fe38",
+    "findingLedgerBlobSha": "2022d17bad1ed9081b7b95f30571461ca945216b",
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
     "activePlanBlobSha": "76a275e511c3bd580496c07de93c2bfb2eace269",
     "activeBlock": "B4",
@@ -5990,7 +6013,7 @@
     "activeFindingId": "B4-003",
     "findingContinuityRegisterBlobSha": "11ffaf6e7c691064be947fdc1af00b08d8fb8f9c",
     "findingContinuityGuardBlobSha": "868a0ba1a492d9adc8d91655f152b6fa7980f499",
-    "continuityRegisterBlobSha": "bc9107e2bdfca30edfbbdc5ea60d145bf9253e1a",
+    "continuityRegisterBlobSha": "c1f63f6fce7ddaa4649ce422c4ff4820d85d1284",
     "masterPendingClosurePlanPath": "artifacts/orbit360-recovery/release-control/I6_PENDING_CLOSURE_MASTER_PLAN_LOCK_20261004.json",
     "masterPendingClosurePlanBlobSha": "9d7ba423caf0aa09a0e2af4a1ed4713ea867d17a",
     "listingHumanProofStillRequired": true
@@ -6285,15 +6308,15 @@
     "noReimport": true
   },
   "currentB4": {
-    "status": "B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL",
+    "status": "B4_003_R23_SOURCE_STAGED_PENDING_PREVIEW",
     "activeFindingId": "B4-003",
     "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
-    "executionLockBlobSha": "5ae63264669a6ea3a8657d604ef18da76930c837",
-    "compositionLockBlobSha": "42ca7614694e04b6ec459a61c58c879c439c2cc6",
-    "findingLedgerBlobSha": "66e8ef9dd12a655bb33b929ec463eef50c24fe38",
+    "executionLockBlobSha": "fd606c686aec82afcbd2723be28a72ae266369ef",
+    "compositionLockBlobSha": "d67fb30e2e807fed42716d611bf7c6fb7bfb53fd",
+    "findingLedgerBlobSha": "2022d17bad1ed9081b7b95f30571461ca945216b",
     "noLive": true,
     "noReimport": true,
-    "nextAction": "B4_003_R20_TARGETED_PAULA_VISUAL",
+    "nextAction": "R23_CONTRACT_AND_EXACT_PREVIEW",
     "sourceFixReceiptBlobSha": "dc0b48c41b6e50a62a8a4e27b14aa891a731adca",
     "syntheticQaWritesAuthorized": true,
     "previewDispatchRequest": {
@@ -7648,7 +7671,30 @@
     "machineProofReceiptBlobSha": "d7972f44ce7f81587fe5d51cb6d0942e12ee7f6f",
     "visualFeedbackReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PAULA_CRITICAL_VISUAL_FEEDBACK_20261009.json",
     "visualFeedbackReceiptBlobSha": "cc908285b2e86ecdde4acb99bac3843f221e2185",
-    "priorMachineArtifactPreserved": true
+    "priorMachineArtifactPreserved": true,
+    "r23PaulaVisualSourceFix20261010": {
+      "status": "PAULA_VISUAL_REJECTED_20261010_SOURCE_FIXED_EXACT_PREVIEW_REQUIRED",
+      "gate": "I6.5/B4-003",
+      "priorMachineRun": 38080066957,
+      "priorMachineBuild": "gi-i65-b4-2eba5c2ca4dd-57f234755dc1",
+      "existingFindingIds": [
+        "B4-003-R19-07-INICIO-MONTHLY-ADVISOR-READINESS-REGRESSION",
+        "B4-003-R20-V2-16-SURFACE-HIERARCHY",
+        "B4-003-R20-V2-04-COLLAB-UX-COMMIT-SEMANTICS"
+      ],
+      "productOwnerBlobs": {
+        "orbit360-platform/core/ciclo.js": "3ab7c7f187933e295fbd19648d5c2d22f7d8a9ee",
+        "orbit360-platform/styles/infra.css": "ab7a8d93e81db9259b6673cb31a3ddc989985282",
+        "orbit360-platform/modules/inicio.js": "ac06a355e397b0f4e7f67d5ae80a2a46d94de9c3"
+      },
+      "qaBlob": "5b1c44c59e33519bfa344036f71d04f0ad5e3b27",
+      "reauthorization": "Paula reported visual and collaboration regression on exact B4-003 Preview",
+      "attachments": "Real-business Preview uploads remain blocked by server isolation; synthetic upload positive path requires QA, production functional acceptance still HOLD",
+      "sourceChanged": true,
+      "previewHumanReviewRequired": true,
+      "realWrites": 0,
+      "productionTouched": false
+    }
   },
   "b4VisualAcceptanceControl": {
     "status": "R19_MACHINE_PASS_PENDING_TARGETED_PAULA_VISUAL",
@@ -7758,7 +7804,7 @@
     "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_R20_CONTRACT_AND_EXACT_PREVIEW"
   },
   "compositionLockBlobSha": "534559b1b23ee57be455460b9957c08f80ecdae3",
-  "findingLedgerBlobSha": "1d2938b4bbcf61a1280480c700177583a520b312",
+  "findingLedgerBlobSha": "2022d17bad1ed9081b7b95f30571461ca945216b",
   "continuityRegisterBlobSha": "48d945e51e5a10ec74dc925313b720a121ba7086",
   "r16PerformanceRegression": {
     "status": "CLOSED_PASS",
@@ -9222,5 +9268,28 @@
     "dataMutation": false,
     "previewRetestRequired": true,
     "passClaim": false
+  },
+  "r23PaulaVisualSourceFix20261010": {
+    "status": "PAULA_VISUAL_REJECTED_20261010_SOURCE_FIXED_EXACT_PREVIEW_REQUIRED",
+    "gate": "I6.5/B4-003",
+    "priorMachineRun": 38080066957,
+    "priorMachineBuild": "gi-i65-b4-2eba5c2ca4dd-57f234755dc1",
+    "existingFindingIds": [
+      "B4-003-R19-07-INICIO-MONTHLY-ADVISOR-READINESS-REGRESSION",
+      "B4-003-R20-V2-16-SURFACE-HIERARCHY",
+      "B4-003-R20-V2-04-COLLAB-UX-COMMIT-SEMANTICS"
+    ],
+    "productOwnerBlobs": {
+      "orbit360-platform/core/ciclo.js": "3ab7c7f187933e295fbd19648d5c2d22f7d8a9ee",
+      "orbit360-platform/styles/infra.css": "ab7a8d93e81db9259b6673cb31a3ddc989985282",
+      "orbit360-platform/modules/inicio.js": "ac06a355e397b0f4e7f67d5ae80a2a46d94de9c3"
+    },
+    "qaBlob": "5b1c44c59e33519bfa344036f71d04f0ad5e3b27",
+    "reauthorization": "Paula reported visual and collaboration regression on exact B4-003 Preview",
+    "attachments": "Real-business Preview uploads remain blocked by server isolation; synthetic upload positive path requires QA, production functional acceptance still HOLD",
+    "sourceChanged": true,
+    "previewHumanReviewRequired": true,
+    "realWrites": 0,
+    "productionTouched": false
   }
 }
