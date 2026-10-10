@@ -1,0 +1,48 @@
+{
+  "schema": "GRAVICENTRA_PILOT_V6_E1_CLOSURE_V1",
+  "recordedAt": "2026-10-10T08:42:00-06:00",
+  "scenario": "E1 Academia",
+  "participant": "CT02",
+  "role": "Operativo",
+  "status": "PASS_WITH_NONCAUSAL_FINDINGS",
+  "exactPreview": {
+    "sourceSha": "babea00bf459dfcde611e35ea9413f70f901d043",
+    "runId": 37982729451,
+    "artifactId": 11641957470,
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-37982729451-pvjxtc0j.web.app"
+  },
+  "demonstrated": [
+    "Acceso ordinario de Operativo a Academia",
+    "Catálogo visible con 25 cursos y 90 lecciones",
+    "Ruta por rol Operativo con 25 cursos ordenados",
+    "Apertura de curso existente",
+    "Navegación directa por lecciones sin necesidad de editar contenido",
+    "Quiz visible sin responderlo",
+    "Manual Capacitación CRM visible como recurso asignado al rol"
+  ],
+  "causalSubcapabilityFailure": {
+    "manuals": "FAIL_CAUSAL",
+    "rootCause": "Exact preview artifact omits docs/capacitacion-crm.html; iframe falls through SPA rewrite to index.html.",
+    "rerunScope": "Only Manuals/help resource delivery after artifact fix."
+  },
+  "noncausalFinding": {
+    "sharedInbox": "Repeated synthetic B4-003 shared tasks can reappear/auto-land Ops because shared resolution is eventId-scoped while semantic duplicates remain separate events.",
+    "rerunScope": "Inbox duplicate-resolution/startup landing only; does not reopen E1."
+  },
+  "notDemonstrated": [
+    "aprendizaje efectivo",
+    "competencia",
+    "retención de conocimiento",
+    "reducción de curva de aprendizaje",
+    "productividad"
+  ],
+  "writesDuringPilot": 0,
+  "cleanup": {
+    "required": false
+  },
+  "forwardOnly": {
+    "priorScenariosReopened": false,
+    "e3Status": "HOLD_TECHNICAL_FOCAL",
+    "nextScenario": "E5 Marketing"
+  }
+}
