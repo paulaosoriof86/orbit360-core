@@ -1,0 +1,25 @@
+{
+  "schema": "GRAVICENTRA_B4_003_R23_DELEGATED_POLICY_CLICK_QA_REPAIR",
+  "date": "2026-10-10",
+  "gate": "I6.5/B4-003/R23",
+  "priorHead": "56523b5dea05bb3d267e03aefc69d3b71fa98bba",
+  "failedRun": 38074786096,
+  "failedProofBlob": "f76710b3904ba73c3e25c6206f5e68a313022d11",
+  "failure": "B4_003_R13_POLICY_DETAIL_UNSTABLE_OR_MISSING",
+  "rootCause": "QA once-bound click listener on the originally found TR is lost when a store hydration/render replaces the TR before the Playwright click; browser renders detail but captured clickAt remains null.",
+  "remediation": "Keep document-level capture listener until it receives a click on the exact matching #host policy row, ignoring other clicks; no once on document, no binding to transient row. Preserve wall/browser metric and strict <2500ms assertion.",
+  "qaBlobBefore": "ac173f9a2f3e6edb84effe5e1f4d467cf34e6c39",
+  "qaBlobAfter": "5e4d0c3d269b41eeb5f4b9403b1b7784fd935b9f",
+  "productSourceChanged": false,
+  "productionChanged": false,
+  "dataMutation": false,
+  "previewRetestRequired": true,
+  "passClaim": false,
+  "authorityBlobs": {
+    "composition": "9d541d0e934e7f429b7ea6eba5ed11a4ed521c00",
+    "ledger": "1d2938b4bbcf61a1280480c700177583a520b312",
+    "carry": "0a7d5b89651615c0e7cda3429e404d622cba9d9b",
+    "b4": "959d416cde3622cc3775141da7b99e8aa0fcf661",
+    "control": "f2408bf5c5e28ca3c6c2da1946c78f3af62a3755"
+  }
+}

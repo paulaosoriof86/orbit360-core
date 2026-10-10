@@ -1230,7 +1230,14 @@ try{
    window.addEventListener('hashchange',()=>trace('hashchange'));
    document.addEventListener('orbit:route-ready',()=>trace('route-ready'));
    window.__b4003PolicyDetailPerformance=stamp;
-   row.addEventListener('click',()=>{if(stamp.clickAt==null){stamp.clickAt=performance.now();trace('row-click');}},{capture:true,once:true});
+   const onExactPolicyClick=e=>{
+     const targetRow=e.target&&e.target.closest?e.target.closest('#host .tbl tbody tr'):null;
+     if(!targetRow||!String(targetRow.textContent||'').includes(num))return;
+     stamp.clickAt=performance.now();
+     trace('exact-row-click');
+     document.removeEventListener('click',onExactPolicyClick,true);
+   };
+   document.addEventListener('click',onExactPolicyClick,true);
    const observer=new MutationObserver(()=>{
      stamp.mutations++;
      const present=!!document.querySelector('[data-policy-fullpage="1"]');
