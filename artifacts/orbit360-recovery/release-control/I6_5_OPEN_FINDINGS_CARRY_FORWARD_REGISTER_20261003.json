@@ -4,7 +4,7 @@
   "authority": "FAIL_CLOSED_FINDING_CONTINUITY",
   "sourceLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
   "sourceLedgerPreviousBlobSha": "0cdb33f6b47a62426c7ce5c1d10ecfc2d69b3b74",
-  "expectedLedgerNextBlobSha": "27a845053f4a87c484408577a9fb80b73713576c",
+  "expectedLedgerNextBlobSha": "976905ff4544d71bfc8597a1ece9f5ad14811145",
   "policy": {
     "allLedgerFindingsMustAppearExactlyOnce": true,
     "newHumanFindingsMustBeIndividualLedgerEntries": true,
@@ -12658,5 +12658,19 @@
     "contractAfter": "c9e7c97f2dcc126677a6f0d8a5dc65575732470f",
     "sourceProductUnchanged": true,
     "ledgerSha": "27a845053f4a87c484408577a9fb80b73713576c"
+  },
+  "r23AcademiaManualsSecureRemediation": {
+    "status": "SOURCE_FIXED_EXACT_AUTHENTICATED_PREVIEW_REQUIRED",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_ACADEMIA_MANUALES_SECURE_CAUSAL_SOURCE_FIX_20261010.json",
+    "receiptBlobSha": "53580d0cebff852f2c9aaf2129b926dfc5139e22",
+    "privateManuals": 5,
+    "sourceOwners": [
+      "functions/tenant-domain-config.js",
+      "orbit360-platform/modules/academia.js",
+      "orbit360-platform/index.html"
+    ],
+    "qaProofBlobSha": "18cfe626df8c0d11f558387a8959d1aa6ad08af0",
+    "visualPending": true,
+    "ledgerBlobSha": "976905ff4544d71bfc8597a1ece9f5ad14811145"
   }
 }

@@ -256,5 +256,19 @@
     "productionUntouched": true,
     "exactNewPreviewRequired": true,
     "priorR22AndR23PreviewNotVisualAcceptance": true
+  },
+  "r23AcademiaManualsSecureRemediation": {
+    "status": "SOURCE_FIXED_EXACT_AUTHENTICATED_PREVIEW_REQUIRED",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_ACADEMIA_MANUALES_SECURE_CAUSAL_SOURCE_FIX_20261010.json",
+    "receiptBlobSha": "53580d0cebff852f2c9aaf2129b926dfc5139e22",
+    "privateManuals": 5,
+    "sourceOwners": [
+      "functions/tenant-domain-config.js",
+      "orbit360-platform/modules/academia.js",
+      "orbit360-platform/index.html"
+    ],
+    "qaProofBlobSha": "18cfe626df8c0d11f558387a8959d1aa6ad08af0",
+    "visualPending": true,
+    "exactVisualScope": "Authenticated five manuals, CRM allowed to Operativo, master forbidden, no public static copy, responsive and refresh"
   }
 }

@@ -534,6 +534,10 @@ need(lock.boundaries?.businessWritesAuthorized===false&&lock.boundaries?.dataMut
 need(lock.boundaries?.syntheticQaWritesAuthorized===true,'B4_003_SYNTHETIC_QA_NOT_AUTHORIZED');
 
 if(control.nextAction==='I6_5_FORENSIC_REMEDIATION_B4_003_R23_CONTRACT_AND_EXACT_PREVIEW'){
+ need(!index.includes("src: 'docs/manual-")&&index.includes('modules/academia.js?v=20261010-b4-manual-secure'),'B4_003_ACADEMIA_STATIC_PUBLIC_MANUAL_LINK_REMAINS');
+ need(read('functions/tenant-domain-config.js').includes('orbit360AcademiaManualReadPreview')&&read('functions/tenant-domain-config.js').includes('resolveAcademyRole')&&read('functions/tenant-domain-config.js').includes("member.tenantId,160)!==tenantId"),'B4_003_ACADEMIA_AUTHORIZED_SERVER_OWNER_MISSING');
+ need(read('tools/gravicentra-i6-1-preview-package.mjs').includes("secure-academia-manuals")&&executorWorkflow.includes('functions:orbit360AcademiaManualReadPreview'),'B4_003_ACADEMIA_PRIVATE_PACKAGING_OR_DEPLOY_BINDING_MISSING');
+
  need(!index.includes('maybePendingLanding()')&&!index.includes('autoLandingSurface')&&!index.includes('returnHomeIfAutoLandingComplete()')&&index.includes('function routeRow(row)'),'B4_003_R23_INBOX_AUTOROUTE_NOT_REMOVED');
  need(previewProof.includes('B4_003_R23_INBOX_UNAUTHORIZED_NAVIGATOR_RELOAD'),'B4_003_R23_INBOX_NAVIGATION_AUTHENTICATED_GUARD_MISSING');
  need(lock.r23CausalAuthorization?.status==='SCOPED_R23_SOURCE_MUTATION_APPROVED_WITHIN_B4_003'&&control.r23InicioProgress?.liveLineageUnresolved===true,'B4_003_R23_AUTHORITY_NOT_FROZEN');
@@ -574,7 +578,7 @@ need(opsInbox.includes('const deduped=new Map()')&&opsInbox.includes('updateInbo
 need(notificationProcessor.includes('targetSurface')&&notificationProcessor.includes('actorUid')&&notificationProcessor.includes('actorName'),'B4_003_R20_NOTIFICATION_RECIPIENT_PROJECTION_MISSING');
 need(index.includes('Reconocer para mí')&&index.includes('Resolver para todos')&&index.includes('Archivar resueltas')&&index.includes('targetSurface')&&!index.includes("n.status||'pendiente'"),'B4_003_R20_INBOX_HUMAN_UI_MISSING');
 need(authRuntime.includes("setRestoring('Acceso confirmado · preparando tus datos…')")&&!authRuntime.includes("if(!validRequestedRoute())location.hash='#/inicio'"),'B4_003_R20_AUTH_PROGRESS_OR_FORCED_INICIO_REMAINS');
-need(productApp.includes('hydration.required.slice()')&&productApp.includes("function preferredLanding()")&&productApp.includes("return'inicio'")&&!productApp.includes("if(advisor)return'leads'")&&index.includes('maybePendingLanding')&&index.includes("surface=/operativo|admin|direcci[oó]n|superadmin/.test(role)?'ops':/asesor|comercial|asistente/.test(role)?'leads':''"),'B4_003_R20_SECOND_REVIEW_STARTUP_PENDING_ROUTING_MISSING');
+need(productApp.includes('hydration.required.slice()')&&productApp.includes("function preferredLanding()")&&productApp.includes("return'inicio'")&&!productApp.includes("if(advisor)return'leads'")&&!index.includes('maybePendingLanding')&&index.includes('function routeRow(row)'),'B4_003_R20_SECOND_REVIEW_STARTUP_PENDING_ROUTING_MISSING');
 need(previewProof.includes("'|BOOTSTRAP_TRACE='")&&previewProof.includes('bootstrapTrace.length>16'),'B4_003_R20_ADVISOR_BOOTSTRAP_SANITIZED_TRACE_MISSING');
 need(previewProof.includes('u.emailVerified===true')&&previewProof.includes('B4_003_R20_VERIFIED_ACTOR_FOR_ROLE_NOT_FOUND'),'B4_003_R20_VERIFIED_CROSS_ROLE_ACTOR_SELECTION_MISSING');
 need(router.includes("orbit:route-ready"),'B4_003_R20_ROUTE_READY_SIGNAL_MISSING');

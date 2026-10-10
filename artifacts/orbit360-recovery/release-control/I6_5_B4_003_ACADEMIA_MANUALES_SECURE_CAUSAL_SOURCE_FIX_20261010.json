@@ -1,0 +1,46 @@
+{
+  "schema": "GRAVICENTRA_B4_003_ACADEMIA_SECURE_MANUALS_CAUSAL_SOURCE",
+  "recordedDate": "2026-10-10",
+  "status": "SOURCE_FIXED_EXACT_AUTHENTICATED_PREVIEW_REQUIRED",
+  "context": "CURRENT_B4_003_NO_NEW_GATE",
+  "rootCause": "Manual links reference docs/*.html outside product reachable closure. Role-restricted material cannot be published publicly.",
+  "manualSourceBlobs": {
+    "manual-maestro.html": "354aa8fa77ad8665d19cd8b553f9207fce6f4abc",
+    "capacitacion-tecnica-interna.html": "ae6f9b9fedb331dd97b36e3fda5ddaf0a8ca1b64",
+    "capacitacion-crm.html": "9654483b800baf6567761c7c09debd9f2aedbcba",
+    "manual-integraciones.html": "b20550b9200cde233f99d0f5f9ce29b4556fe09e",
+    "comparativa-ia.html": "dd23e81aabedbf5fb9845b3acbc3050c14e0bbdf"
+  },
+  "sourceBlobs": {
+    "functions/tenant-domain-config.js": "c9f2bd7234252ee7281e5aca2b20601fcf8d77e3",
+    "orbit360-platform/modules/academia.js": "4d48ee3edbc6afc4163bf6365a80bbcb680b1852",
+    "orbit360-platform/index.html": "ef2f5dc58618fc273fc6d2985e074ae5f0d786b6",
+    "tools/gravicentra-i6-1-preview-package.mjs": "42617a92fbe8d6f803afe98a4d11de8154ef61c6",
+    ".github/workflows/gravicentra-b4-003-executor.yml": "4d12b7cee94449bc672af48ddcf03f4dc645f4c2",
+    "tools/gravicentra-i6-5-b4-003-contract.mjs": "849ee6104757b7e8cde3d1ec6e1e6689fe88bd10",
+    "tools/gravicentra-i6-5-b4-003-preview-proof.mjs": "18cfe626df8c0d11f558387a8959d1aa6ad08af0"
+  },
+  "security": {
+    "privateBackendOnly": true,
+    "noStaticHostingManuals": true,
+    "serverRoleAuthorization": true,
+    "sandboxedIframe": true,
+    "negativeRoleTestRequired": true
+  },
+  "qa": {
+    "sevenSimulatedRoleCasesPassed": true,
+    "sourceSyntaxPassed": true,
+    "liveAuthenticatedProof": false
+  },
+  "openFindings": [
+    "course progress has session-only overlay; durable persistence not proven",
+    "documents lacking URLs show placeholders",
+    "legacy manual content needs semantic modernization"
+  ],
+  "r23InboxFixPreserved": true,
+  "renewalSourceDryRunStillOpen": true,
+  "liveLineageUnresolved": true,
+  "productionTouched": false,
+  "operationalWrites": 0,
+  "noPassClaim": true
+}

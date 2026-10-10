@@ -61,6 +61,20 @@ fs.writeFileSync(path.join(EVIDENCE,'reachable-files.txt'),[...seen].sort().join
 
 function copyTree(src,dst){for(const e of fs.readdirSync(src,{withFileTypes:true})){if(e.name==='node_modules'||e.name==='.git'||e.name.endsWith('.local'))continue;const a=path.join(src,e.name),b=path.join(dst,e.name);if(e.isDirectory()){fs.mkdirSync(b,{recursive:true});copyTree(a,b);}else if(e.isFile()){fs.mkdirSync(path.dirname(b),{recursive:true});fs.copyFileSync(a,b);}}}
 copyTree(FUNCTIONS_SRC,BACKEND);
+
+/* Private, five-file allowlist. Never serve role-restricted HTML from Hosting. */
+const academyFiles=['manual-maestro.html','capacitacion-tecnica-interna.html','capacitacion-crm.html','manual-integraciones.html','comparativa-ia.html'];
+const academySource=path.join(SRC,'docs'),academyPrivate=path.join(BACKEND,'secure-academia-manuals');
+fs.mkdirSync(academyPrivate,{recursive:true});
+for(const file of academyFiles){
+ const input=path.join(academySource,file),out=path.join(academyPrivate,file);
+ if(!fs.existsSync(input)||!fs.statSync(input).isFile()||fs.lstatSync(input).isSymbolicLink())throw new Error('ACADEMIA_MANUAL_SOURCE_MISSING_OR_UNSAFE:'+file);
+ const html=fs.readFileSync(input,'utf8');
+ if(!/^<!DOCTYPE html>/i.test(html)||!/<\/html>\s*$/i.test(html))throw new Error('ACADEMIA_MANUAL_INVALID:'+file);
+ fs.copyFileSync(input,out);
+ if(fs.existsSync(path.join(SITE,'docs',file)))throw new Error('ACADEMIA_ROLE_RESTRICTED_MANUAL_PUBLICLY_EXPOSED:'+file);
+}
+
 const TENANT_ASSETS=path.join(SRC,'assets','tenant');
 if(fs.existsSync(TENANT_ASSETS)) copyTree(TENANT_ASSETS,path.join(SITE,'assets','tenant'));
 for(const p of ['package.json','package-lock.json','bootstrap.js','product-active-role-contract.js','product-insurer-credentials.js']) if(!fs.existsSync(path.join(BACKEND,p)))throw new Error('BACKEND_REQUIRED_FILE_MISSING:'+p);

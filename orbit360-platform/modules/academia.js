@@ -142,24 +142,45 @@ Orbit.modules.academia = (function () {
   function verManuales() {
     const rol = activeRole();
     const manuales = [
-      { t: 'Manual maestro (todos los módulos)', src: 'docs/manual-maestro.html', ico: '📘', sub: 'Super Admin · visión completa', roles: ['Dirección', 'Admin'] },
-      { t: 'Capacitación técnica interna', src: 'docs/capacitacion-tecnica-interna.html', ico: '🛠', sub: 'Demo, backend, migración, soporte', roles: ['Dirección', 'Admin'] },
-      { t: 'Capacitación CRM', src: 'docs/capacitacion-crm.html', ico: '🎯', sub: 'Operación diaria del CRM', roles: ['Dirección', 'Admin', 'Operativo', 'Asesor', 'Comercial'] },
-      { t: 'Manual de integraciones', src: 'docs/manual-integraciones.html', ico: '🔌', sub: 'Configuración, utilidad y valor de cada integración', roles: ['Dirección', 'Admin'] },
-      { t: 'Comparativa de motores de IA', src: 'docs/comparativa-ia.html', ico: '🤖', sub: 'Gemini / ChatGPT / Claude — costo y calidad', roles: ['Dirección', 'Admin'] }
+      { t: 'Manual maestro (todos los módulos)', id: 'manual-maestro', ico: '📘', sub: 'Super Admin · visión completa', roles: ['Dirección', 'Admin'] },
+      { t: 'Capacitación técnica interna', id: 'capacitacion-tecnica-interna', ico: '🛠', sub: 'Demo, backend, migración, soporte', roles: ['Dirección', 'Admin'] },
+      { t: 'Capacitación CRM', id: 'capacitacion-crm', ico: '🎯', sub: 'Operación diaria del CRM', roles: ['Dirección', 'Admin', 'Operativo', 'Asesor', 'Comercial'] },
+      { t: 'Manual de integraciones', id: 'manual-integraciones', ico: '🔌', sub: 'Configuración, utilidad y valor de cada integración', roles: ['Dirección', 'Admin'] },
+      { t: 'Comparativa de motores de IA', id: 'comparativa-ia', ico: '🤖', sub: 'Gemini / ChatGPT / Claude — costo y calidad', roles: ['Dirección', 'Admin'] }
     ];
-    const visibles = manuales.filter(m => !m.roles || m.roles.indexOf(rol) >= 0 || rol === 'Dirección');
+    const visibles = manuales.filter(m => !m.roles || m.roles.indexOf(rol) >= 0 || ['Dirección','SuperAdmin','AdminTenant','Admin'].includes(rol));
     let back = document.getElementById('ac-man-v'); if (back) back.remove();
     back = document.createElement('div'); back.id = 'ac-man-v';
     back.style.cssText = 'position:fixed;inset:0;z-index:210;background:var(--surface);display:flex;flex-direction:column';
-    const open = (m) => {
-      body.innerHTML = '<div style="display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid var(--line);background:var(--card)">'
-        + '<button class="btn ghost sm" id="mv-back">← Manuales</button>'
-        + '<b style="font-family:var(--f-display);font-size:14px">' + m.ico + ' ' + U.esc(m.t) + '</b>'
-        + '<a class="btn ghost sm" href="' + m.src + '" target="_blank" style="margin-left:auto">↗ Abrir aparte / imprimir</a></div>'
-        + '<iframe src="' + m.src + '" style="flex:1;width:100%;border:0;background:#fff"></iframe>';
-      body.style.cssText = 'flex:1;display:flex;flex-direction:column;min-height:0';
-      body.querySelector('#mv-back').onclick = lista;
+    const open = async (m) => {
+      body.style.cssText='flex:1;display:flex;flex-direction:column;min-height:0';
+      body.innerHTML='<div style="display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid var(--line);background:var(--card)">'
+        +'<button class="btn ghost sm" id="mv-back">← Manuales</button>'
+        +'<b style="font-family:var(--f-display);font-size:14px">'+m.ico+' '+U.esc(m.t)+'</b></div>'
+        +'<div id="mv-content" role="status" style="padding:24px">Abriendo documento autorizado…</div>';
+      body.querySelector('#mv-back').onclick=lista;
+      const outlet=body.querySelector('#mv-content'),provider=Orbit.productRuntimeBrowserProvidersP0;
+      if(!provider||typeof provider.callFunction!=='function'){
+        outlet.textContent='No está disponible el lector seguro de manuales.';return;
+      }
+      const isPreview=/--/.test(String(location.hostname||'')),tenantId=String(window.__ORBIT360_PRODUCT_PUBLIC_CONFIG__?.tenantHint||'').trim();
+      try{
+        const result=await provider.callFunction(isPreview?'orbit360AcademiaManualReadPreview':'orbit360AcademiaManualRead',
+          {tenantId,activeRole:activeRole(),manualId:m.id},isPreview?'us-east1':'us-central1');
+        if(!result||result.ok!==true||result.manualId!==m.id||typeof result.html!=='string'||!result.html.startsWith('<!DOCTYPE html>'))throw Error('ACADEMIA_MANUAL_CANONICAL_READBACK_REQUIRED');
+        if(!outlet.isConnected)return;
+        outlet.style.cssText='flex:1;min-height:0;padding:0';
+        outlet.textContent='';
+        const iframe=document.createElement('iframe');
+        iframe.setAttribute('sandbox','allow-scripts');
+        iframe.setAttribute('referrerpolicy','no-referrer');
+        iframe.setAttribute('title',m.t);
+        iframe.style.cssText='width:100%;height:100%;border:0;background:#fff';
+        iframe.srcdoc=result.html;
+        outlet.appendChild(iframe);
+      }catch(err){
+        if(outlet.isConnected)outlet.textContent='No fue posible abrir este manual con tu acceso actual. Vuelve a intentarlo o consulta con Administración.';
+      }
     };
     const lista = () => {
       body.style.cssText = 'flex:1;overflow:auto;padding:24px';

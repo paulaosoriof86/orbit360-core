@@ -273,3 +273,37 @@ exports.orbit360TenantDomainConfig = onCall({ region: REGION, cors: true }, exec
 exports.orbit360TenantDomainConfigPreview = onCall({ region: PREVIEW_REGION, cors: true }, executePreview);
 exports.__tenantDomainConfig = Object.freeze({ VERSION, PREVIEW_VERSION, DOMAINS, validateReconciliation, validateCatalogs, normalizeInsurerPaymentPlans });
 
+
+
+/* B4-003 Academia manuals: server-owned, read-only, authenticated documents.
+   The five HTML manuals must never enter public Firebase Hosting. */
+const academyFs=require('node:fs'),academyPath=require('node:path');
+const academyCrypto=require('node:crypto');
+const {resolveProductActiveRole:resolveAcademyRole}=require('./product-active-role-contract');
+const ACADEMIA_DOCS=Object.freeze({
+ 'manual-maestro':{file:'manual-maestro.html',roles:['direccion','superadmin','super_admin','admin','admintenant','admin_tenant']},
+ 'capacitacion-tecnica-interna':{file:'capacitacion-tecnica-interna.html',roles:['direccion','superadmin','super_admin','admin','admintenant','admin_tenant']},
+ 'capacitacion-crm':{file:'capacitacion-crm.html',roles:['direccion','superadmin','super_admin','admin','admintenant','admin_tenant','operativo','asesor','comercial']},
+ 'manual-integraciones':{file:'manual-integraciones.html',roles:['direccion','superadmin','super_admin','admin','admintenant','admin_tenant']},
+ 'comparativa-ia':{file:'comparativa-ia.html',roles:['direccion','superadmin','super_admin','admin','admintenant','admin_tenant']}
+});
+async function academyManualRead(request){
+ if(!request.auth?.uid)throw new HttpsError('unauthenticated','Necesitas iniciar sesión.');
+ const tenantId=id(request.data?.tenantId,'tenantId');
+ const key=text(request.data?.manualId,100),manual=Object.prototype.hasOwnProperty.call(ACADEMIA_DOCS,key)?ACADEMIA_DOCS[key]:null;
+ if(!manual)throw new HttpsError('not-found','Manual no encontrado.');
+ const snap=await memberRef(tenantId,request.auth.uid).get(),member=snap.exists?snap.data():null;
+ if(!active(member)||text(member.tenantId,160)!==tenantId)throw new HttpsError('permission-denied','Membresía no autorizada.');
+ let role;
+ try{role=resolveAcademyRole(member,request.data?.activeRole).activeRole;}
+ catch(e){throw new HttpsError('permission-denied','El rol solicitado no está asignado.');}
+ if(!manual.roles.includes(role))throw new HttpsError('permission-denied','Este manual no está disponible para tu rol activo.');
+ const file=academyPath.join(__dirname,'secure-academia-manuals',manual.file);
+ let html;try{html=academyFs.readFileSync(file,'utf8');}
+ catch(e){throw new HttpsError('unavailable','El manual aún no se encuentra disponible.');}
+ if(!html.startsWith('<!DOCTYPE html>')||!html.includes('</html>'))throw new HttpsError('failed-precondition','Documento no válido.');
+ return{ok:true,schemaVersion:'gravicentra-academia-manuals-v1',manualId:key,html,
+         sha256:academyCrypto.createHash('sha256').update(html).digest('hex')};
+}
+exports.orbit360AcademiaManualRead=onCall({region:REGION,cors:true,timeoutSeconds:25},academyManualRead);
+exports.orbit360AcademiaManualReadPreview=onCall({region:PREVIEW_REGION,cors:true,timeoutSeconds:25},academyManualRead);

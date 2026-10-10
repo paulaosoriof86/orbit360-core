@@ -162,6 +162,50 @@ async function rosterProjectionFor(browser,who,country){
  }finally{await ctx.close();}
 } 
 
+
+/* B4-003 Academia: real authenticated document delivery, UI and negative scope. */
+async function academiaManualsPreviewProof(browser,directionActor,operativeActor){
+ const actor=directionActor,token=await auth.createCustomToken(actor.uid),ctx=await browser.newContext({viewport:{width:390,height:844},ignoreHTTPSErrors:false}),p=await ctx.newPage();
+ try{
+  await applyLegal(p,actor);
+  await p.goto(target+'/#/academia',{waitUntil:'domcontentloaded',timeout:60000});
+  await bootProduct(p,token);
+  await p.evaluate(()=>{location.hash='#/academia';});
+  await p.waitForSelector('#ac-man',{timeout:15000});
+  await p.click('#ac-man');
+  const titles=await p.locator('#ac-man-v [data-m]').count();
+  need(titles===5,'B4_003_ACADEMIA_MANUAL_LIST_CARDINALITY_INVALID:'+titles);
+  const ids=['manual-maestro','capacitacion-tecnica-interna','capacitacion-crm','manual-integraciones','comparativa-ia'];
+  const delivered=[];
+  for(let i=0;i<ids.length;i++){
+   await p.click('#ac-man-v [data-m="'+i+'"]');
+   await p.waitForFunction(()=>!!document.querySelector('#mv-content iframe[srcdoc]')||/No fue posible abrir este manual/.test(document.querySelector('#mv-content')?.textContent||''),null,{timeout:12000});
+   const visible=await p.evaluate(()=>{const iframe=document.querySelector('#mv-content iframe');return {present:!!iframe,srcdoc:iframe?.srcdoc||'',sandbox:iframe?.getAttribute('sandbox')||'',url:location.pathname,overflow:document.documentElement.scrollWidth>innerWidth+2};});
+   need(visible.present&&visible.srcdoc.startsWith('<!DOCTYPE html>')&&visible.srcdoc.includes('</html>')&&visible.sandbox==='allow-scripts'&&!visible.overflow,'B4_003_ACADEMIA_MANUAL_NOT_RENDERED_SECURELY:'+ids[i]);
+   delivered.push({id:ids[i],rendered:true,privateIframe:true,bytes:visible.srcdoc.length});
+   await p.click('#mv-back');
+  }
+  const unprotected=await p.evaluate(async()=>{const r=await fetch('/docs/manual-maestro.html',{cache:'no-store'}),text=await r.text();return{status:r.status,publicManualExposed:/Manual Maestro · Orbit 360/.test(text)};});
+  need(unprotected.publicManualExposed===false,'B4_003_ACADEMIA_RESTRICTED_MANUAL_PUBLIC_IN_HOSTING');
+  return{status:'PASS',manuals:delivered,publicManualExposed:false};
+ }finally{await ctx.close();}
+}
+async function academiaManualsScopeProof(browser,operativeActor){
+ const token=await auth.createCustomToken(operativeActor.uid),ctx=await browser.newContext({ignoreHTTPSErrors:false}),p=await ctx.newPage();
+ try{
+  await applyLegal(p,operativeActor);await p.goto(target+'/#/academia',{waitUntil:'domcontentloaded',timeout:60000});await bootProduct(p,token);
+  const result=await p.evaluate(async({tenantId,activeRole})=>{
+   const provider=Orbit.productRuntimeBrowserProvidersP0;
+   const call=manualId=>provider.callFunction('orbit360AcademiaManualReadPreview',{tenantId,activeRole,manualId},'us-east1');
+   const crm=await call('capacitacion-crm');
+   let denied=false;try{await call('manual-maestro');}catch(e){denied=/permission|denied|autorizad|rol/i.test(String(e?.code||'')+' '+String(e?.message||''));}
+   return{crm:crm?.ok===true&&crm.manualId==='capacitacion-crm'&&crm.html?.startsWith('<!DOCTYPE html>'),restrictedDenied:denied};
+  },{tenantId,activeRole:operativeActor.activeRole});
+  need(result.crm===true&&result.restrictedDenied===true,'B4_003_ACADEMIA_MANUAL_ROLE_SCOPE_NOT_ENFORCED');
+  return result;
+ }finally{await ctx.close();}
+}
+
 async function r23ProofSnapshot(browser,who,country,month){
  const token=await auth.createCustomToken(who.uid),ctx=await browser.newContext({ignoreHTTPSErrors:false,viewport:{width:390,height:844}}),p=await ctx.newPage();
  try{await applyLegal(p,who);await p.goto(target+'/#/inicio',{waitUntil:'domcontentloaded',timeout:60000});await bootProduct(p,token);
@@ -501,6 +545,10 @@ try{
  await bootProduct(page,token);
 
   // R23 authenticated Inicio parity, GT and CO separately.
+  proof.academiaManuals=await academiaManualsPreviewProof(browser,directionActor,operativeActor);
+  proof.academiaRoleScope=await academiaManualsScopeProof(browser,operativeActor);
+  proof.assertions.academiaFiveManualsPrivateAuthenticatedUi=true;
+  proof.assertions.academiaOperativoCrmManualAllowedRestrictedDenied=true;
   const r23Month=new Date().toISOString().slice(0,7);
   const r23OpMember=(await tenant.collection('members').doc(operativeActor.uid).get()).data()||{},r23Countries=[].concat(r23OpMember.countries||r23OpMember.paises||[]).map(x=>clean(x).toUpperCase());
   const r23Jobs=[r23ProofSnapshot(browser,operativeActor,'GT',r23Month),r23ProofSnapshot(browser,directionActor,'GT',r23Month)];

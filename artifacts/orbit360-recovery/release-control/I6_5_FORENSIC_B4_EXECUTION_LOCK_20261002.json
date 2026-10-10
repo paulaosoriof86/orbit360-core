@@ -587,9 +587,9 @@
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_RENEWAL_KPI_PARITY_CAUSAL_ADDENDUM_20261005.json",
     "blobSha": "87bab7ee2778a0525cdbe81cf4cbf82020bf6139"
   },
-  "findingLedgerBlobSha": "27a845053f4a87c484408577a9fb80b73713576c",
-  "continuityRegisterBlobSha": "bd72470156ea77e8dae9cd21e269663264b27e63",
-  "compositionLockBlobSha": "6ad2e940f8c2fc7d60cd96696e903ec01b40f979",
+  "findingLedgerBlobSha": "976905ff4544d71bfc8597a1ece9f5ad14811145",
+  "continuityRegisterBlobSha": "599c7e9079369ede2cd2237fdd0ffe952dee4cdc",
+  "compositionLockBlobSha": "7ada2c3d9b3bd82158f86a424ab9fca5573c8423",
   "r18SourceFix": {
     "status": "SOURCE_FIXED_R18_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_SOURCE_FIX_20261005.json",
@@ -1865,5 +1865,18 @@
     "sourceProductUnchanged": true,
     "ledgerSha": "27a845053f4a87c484408577a9fb80b73713576c",
     "carrySha": "bd72470156ea77e8dae9cd21e269663264b27e63"
+  },
+  "r23AcademiaManualsSecureRemediation": {
+    "status": "SOURCE_FIXED_EXACT_AUTHENTICATED_PREVIEW_REQUIRED",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_ACADEMIA_MANUALES_SECURE_CAUSAL_SOURCE_FIX_20261010.json",
+    "receiptBlobSha": "53580d0cebff852f2c9aaf2129b926dfc5139e22",
+    "compositionBlobSha": "7ada2c3d9b3bd82158f86a424ab9fca5573c8423",
+    "ledgerBlobSha": "976905ff4544d71bfc8597a1ece9f5ad14811145",
+    "carryBlobSha": "599c7e9079369ede2cd2237fdd0ffe952dee4cdc",
+    "queueBlobSha": "43e0855d61b9e77ecd9b509b02d9975388e1543e",
+    "productSourceChanged": true,
+    "newArtifactRequired": true,
+    "productionUntouched": true,
+    "realDataWrites": 0
   }
 }
