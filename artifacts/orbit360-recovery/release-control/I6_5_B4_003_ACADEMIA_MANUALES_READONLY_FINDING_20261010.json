@@ -1,0 +1,59 @@
+{
+  "schema": "GRAVICENTRA_B4_003_ACADEMIA_MANUALES_READONLY_FINDING_V1",
+  "recordedAt": "2026-10-10",
+  "authority": "GitHub Control Plane and canonical lineage remain authoritative",
+  "verifiedHead": "b3e680cab032901f62086f8a4b82316d0e87678a",
+  "reportedByUser": "Academia y Manuales no abren; revisar y corregir sin descarrilar B4-003",
+  "classification": "P0_FUNCTIONAL_REGRESSION_CANDIDATE_READONLY_DIAGNOSTIC",
+  "gate": "I6.5 B4-003; no new gate created",
+  "findings": [
+    {
+      "id": "ACADEMIA-MANUALES-01",
+      "statement": "Academia viewer references five docs/*.html URLs which exist in source; product packaging uses reachable asset closure and rejects docs/ as non-product tree, so manuals cannot be assumed shipped as static Hosting assets.",
+      "paths": [
+        "orbit360-platform/modules/academia.js",
+        "tools/gravicentra-i6-1-preview-package.mjs",
+        "orbit360-platform/docs/manual-maestro.html",
+        "orbit360-platform/docs/capacitacion-tecnica-interna.html",
+        "orbit360-platform/docs/capacitacion-crm.html",
+        "orbit360-platform/docs/manual-integraciones.html",
+        "orbit360-platform/docs/comparativa-ia.html"
+      ],
+      "status": "CAUSAL_SOURCE_GAP_DEMONSTRATED_RUNTIME_NOT_YET_REPRODUCED"
+    },
+    {
+      "id": "ACADEMIA-MANUALES-02",
+      "statement": "Academia resource viewer displays placeholders for PDF/image records lacking durable document URL rather than opening documents.",
+      "path": "orbit360-platform/modules/academia.js",
+      "status": "SOURCE_CONFIRMED"
+    },
+    {
+      "id": "ACADEMIA-MANUALES-03",
+      "statement": "Product Academia progress update mutates only sessionProgress and reports existing_durable_read_plus_session_overlay; no durable write acceptance demonstrated for progress or certification.",
+      "path": "orbit360-platform/core/academia-product-catalog-p0.js",
+      "status": "SOURCE_CONFIRMED"
+    },
+    {
+      "id": "ACADEMIA-MANUALES-04",
+      "statement": "Legacy HTML manuals display Orbit 360 and include historical flows that must be reconciled to current Gravicentra business rules before acceptance.",
+      "status": "REVIEW_REQUIRED"
+    }
+  ],
+  "securityBoundary": "Never expose role-restricted manuals as unauthenticated public Hosting documents. Validate authorized server-side manual delivery, real document existence, role/country scopes and browser reload.",
+  "qaObligations": [
+    "Academia route reachable by authorized role",
+    "course list + open lesson + navigation",
+    "manual read exact content with authorized role; unauthorized forbidden",
+    "document open is real or clearly unavailable; no misleading placeholder",
+    "progress persistence/refresh and certificate accuracy",
+    "responsive 1440/390/320",
+    "zero relevant page/console/HTTP errors",
+    "same Preview artifact and visual approval before production"
+  ],
+  "priorityRule": "Keep current B4-003/R23 as first active gate; audit and close academia regression within same authorized B4 cumulative candidate after no-loss classification; no historical reimport.",
+  "releaseMutation": false,
+  "productSourceChanged": false,
+  "operationalWrites": 0,
+  "productionPromotion": false,
+  "noPassClaim": true
+}
