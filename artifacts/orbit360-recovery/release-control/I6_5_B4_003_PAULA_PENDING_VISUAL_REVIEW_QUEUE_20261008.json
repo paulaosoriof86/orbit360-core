@@ -238,5 +238,12 @@
       "orbit360-platform/core/ciclo.js": "2f63c0aed8a8aa1ac4fa1e807b8a94671086e65f",
       "orbit360-platform/modules/inicio.js": "c0f861cac33bf60064e2c150f500d695de736b29"
     }
+  },
+  "r23InicioProgress": {
+    "status": "SOURCE_STAGED_EXACT_PREVIEW_PENDING",
+    "finding": "B4-003-R19-07-INICIO-MONTHLY-ADVISOR-READINESS-REGRESSION",
+    "priorR22VisualAcceptanceInvalidatedForChangedInicio": true,
+    "exactPaulaVisualRequired": true,
+    "sourceShaPendingCommit": true
   }
 }

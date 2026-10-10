@@ -12498,5 +12498,28 @@
       "B4-003-R19-08-OPS-ADVISOR-HANDOFF-NOTIFICATION-GAP"
     ],
     "allOtherFindingsPreserved": true
+  },
+  "r23InicioProgress": {
+    "status": "R23_SOURCE_STAGED_AUTHENTICATED_PREVIEW_PENDING",
+    "gate": "I6.5/B4-003",
+    "finding": "B4-003-R19-07-INICIO-MONTHLY-ADVISOR-READINESS-REGRESSION",
+    "sourceOwnerBlobs": {
+      "functions/assignable-advisor-roster.js": "1761a37806d8aa702f76f680dffcc473fb88d36c",
+      "orbit360-platform/core/assignable-advisor-roster-client.js": "b70c0f0355a6284fcb8b586cfc9c02aad0b2b97f",
+      "orbit360-platform/modules/inicio.js": "8df1c5f2b1907adab135e23e52b4193f4e623667",
+      "orbit360-platform/index.html": "0915d7c9b168f51adfa91c895f1842ea3087306c"
+    },
+    "qaOwner": "tools/gravicentra-i6-5-b4-003-preview-proof.mjs",
+    "qaBlob": "aac870e756c5bdf6ab29a66e6afbafeb7177b6f7",
+    "priorHead": "25c4d44f7da43e85a5d76ccba05398955e63a574",
+    "priorR22MachineAcceptedAsHistorical": true,
+    "sourceChanged": true,
+    "newArtifactRequired": true,
+    "authenticatedR23Pass": false,
+    "realRenewalSourceDryRunReady": false,
+    "liveLineageUnresolved": true,
+    "productionMutation": false,
+    "operationalWrites": 0,
+    "retainedFindingCount": 282
   }
 }

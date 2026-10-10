@@ -161,6 +161,20 @@ async function rosterProjectionFor(browser,who,country){
   },{token,tenantId,activeRole:who.activeRole,country});
  }finally{await ctx.close();}
 } 
+
+async function r23ProofSnapshot(browser,who,country,month){
+ const token=await auth.createCustomToken(who.uid),ctx=await browser.newContext({ignoreHTTPSErrors:false,viewport:{width:390,height:844}}),p=await ctx.newPage();
+ try{await applyLegal(p,who);await p.goto(target+'/#/inicio',{waitUntil:'domcontentloaded',timeout:60000});await bootProduct(p,token);
+  const api=await p.evaluate(async({tenantId,role,country,month})=>Orbit.productRuntimeBrowserProvidersP0.callFunction('orbit360AssignableAdvisorRosterPreview',{tenantId,activeRole:role,country,month,purpose:'inicio'},'us-east1'),{tenantId,role:who.activeRole,country,month});
+  await p.evaluate(c=>{Orbit.pais=c;Orbit.modules.inicio.render(document.getElementById('host'));},country);
+  await p.waitForFunction(()=>document.querySelector('[data-inicio-advisor-id]')||document.querySelector('[data-inicio-advisor-readiness="ready-empty"]'),null,{timeout:20000});
+  const ui=await p.evaluate(()=>({ids:[...new Set([...document.querySelectorAll('[data-inicio-advisor-id]')].map(e=>e.getAttribute('data-inicio-advisor-id')))].sort(),overflow:document.documentElement.scrollWidth>innerWidth+2}));
+  await p.reload({waitUntil:'domcontentloaded'});await bootProduct(p,token);await p.evaluate(c=>{Orbit.pais=c;Orbit.modules.inicio.render(document.getElementById('host'));},country);
+  await p.waitForFunction(()=>document.querySelector('[data-inicio-advisor-id]')||document.querySelector('[data-inicio-advisor-readiness="ready-empty"]'),null,{timeout:20000});
+  ui.reloaded=await p.evaluate(()=>[...new Set([...document.querySelectorAll('[data-inicio-advisor-id]')].map(e=>e.getAttribute('data-inicio-advisor-id')))].sort());
+  return{api,ui};
+ }finally{await ctx.close();}
+}
 async function inboxProjectionFor(browser,who){
  const token=await auth.createCustomToken(who.uid),ctx=await browser.newContext({ignoreHTTPSErrors:false}),p=await ctx.newPage();
  try{await applyLegal(p,who);await p.goto(target+'/#/inicio',{waitUntil:'domcontentloaded',timeout:60000});await p.waitForFunction(()=>!!window.Orbit?.productRuntimeBrowserProvidersP0,null,{timeout:30000});return await p.evaluate(async({token,tenantId,activeRole})=>{const provider=Orbit.productRuntimeBrowserProvidersP0,c=await provider.initialize();if(!c.auth.currentUser)await c.modules.auth.signInWithCustomToken(c.auth,token);return await provider.callFunction('orbit360GetAdvisorOpsInboxPreview',{tenantId,activeRole,limit:100},'us-east1');},{token,tenantId,activeRole:who.activeRole});}finally{await ctx.close();}
@@ -1330,7 +1344,35 @@ try{
  proof.assertions.assignableAdvisorRosterMinimalProjection=true;
  proof.assertions.assignableAdvisorRosterDeduplicated=true;
 
- // R20: reconcile the real, non-QA renewal universe against the canonical date-bucket pipeline (YES plus unresolved UNKNOWN debt, never explicit NO).
+ 
+  // R23 authenticated Inicio parity, GT and CO separately.
+  const r23Month=new Date().toISOString().slice(0,7);
+  const r23OpMember=(await tenant.collection('members').doc(operativeActor.uid).get()).data()||{},r23Countries=[].concat(r23OpMember.countries||r23OpMember.paises||[]).map(x=>clean(x).toUpperCase());
+  const r23Jobs=[r23ProofSnapshot(browser,operativeActor,'GT',r23Month),r23ProofSnapshot(browser,directionActor,'GT',r23Month)];
+  if(!r23Countries.length||r23Countries.includes('CO'))r23Jobs.push(r23ProofSnapshot(browser,operativeActor,'CO',r23Month));
+  const r23Cases=await Promise.all(r23Jobs);
+  for(const item of r23Cases){
+   need(item.api?.ok===true&&item.api.month===r23Month,'B4_003_R23_BACKEND_CONFIRMATION_REQUIRED');
+   const expected=item.api.rows.map(r=>clean(r.id)).sort();
+   need(JSON.stringify(expected)===JSON.stringify(item.ui.ids)&&JSON.stringify(expected)===JSON.stringify(item.ui.reloaded),'B4_003_R23_BACKEND_UI_RELOAD_MISMATCH');
+   need(item.ui.overflow!==true,'B4_003_R23_MOBILE_OVERFLOW');
+   need(item.api.rows.every(r=>Object.keys(r).every(k=>['id','nombre','activo','paises','metas','metaPrima'].includes(k))&&r.paises.every(c=>c===item.api.country)&&Object.keys(r.metas||{}).every(c=>c===item.api.country)),'B4_003_R23_UNAUTHORIZED_SCOPE_LEAK');
+  }
+  const r23Metas=await tenant.collection('data').doc('metas').collection('items').get(),r23Goals=new Map();
+  for(const d of r23Metas.docs){
+   const m=d.data()||{},country=clean(m.pais).toUpperCase()||(clean(m.moneda).toUpperCase()==='GTQ'?'GT':clean(m.moneda).toUpperCase()==='COP'?'CO':''),id=clean(m.asesorId||m.advisorId),type=clean(m.tipo).toLowerCase(),amount=Number(m.valor);
+   if(!id||!['GT','CO'].includes(country)||!['nueva','renovada','recaudo'].includes(type)||String(m.mes||m.periodo||'').slice(0,7)!==r23Month||m.valor==null||m.valor===''||!Number.isFinite(amount)||amount<0)continue;
+   const key=id+'|'+country,old=r23Goals.get(key)||{nueva:0,renovada:0,recaudo:0};old[type]+=amount;r23Goals.set(key,old);
+  }
+  for(const item of r23Cases)for(const row of item.api.rows){
+   const goal=r23Goals.get(clean(row.id)+'|'+item.api.country);
+   if(goal){need(row.metas[item.api.country]?.explicit===true,'B4_003_R23_SOURCE_GOAL_MISSING:'+row.id);for(const f of ['nueva','renovada','recaudo'])need(Math.abs(Number(row.metas[item.api.country][f])-goal[f])<0.001,'B4_003_R23_CANONICAL_GOAL_MISMATCH:'+f+':'+row.id);}
+  }
+  proof.assertions.r23InicioCanonicalGoalValueParity=true;
+  proof.r23Inicio=r23Cases.map(x=>({country:x.api.country,scope:x.api.scope,rows:x.api.rows.length,reloaded:true}));
+  proof.assertions.r23InicioRoleCountryScopedBackendUiParity=true;
+  proof.assertions.r23InicioOperativoDireccionMobileReload=true;
+// R20: reconcile the real, non-QA renewal universe against the canonical date-bucket pipeline (YES plus unresolved UNKNOWN debt, never explicit NO).
  proof.r13RenewalReality=await page.evaluate(ids=>{
    const h=document.getElementById('host'),previous=Orbit.pais||'TODOS';
    Orbit.pais='TODOS';Orbit.modules.renovaciones.render(h);

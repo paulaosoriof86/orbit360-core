@@ -144,7 +144,7 @@
   "productFileBlobs": {
     ".github/workflows/cotcomp-workflow-s419-source-qa.yml": "1123c1bd7848433ce51c24586e9fedbbbd581dff",
     "docs/ays/GRAVICENTRA_QUOTE_AUTHORITY_CONTRACT_v1_20261003.md": "ad1abea0181c350a0effd819cbff483673eb24dd",
-    "functions/assignable-advisor-roster.js": "88a7cc53f044ae6d86338e451cb56abfed4d4b6a",
+    "functions/assignable-advisor-roster.js": "1761a37806d8aa702f76f680dffcc473fb88d36c",
     "functions/bootstrap.js": "42fd05b81a02d428e590c36e3feb32be202f4965",
     "functions/cobros-reconciliation-domain.js": "5b27038d1c8380e4d2d0ed044996c1570d8c3767",
     "functions/cotcomp-workflow-owner-patch.test.js": "f09315b416e95415ade2d811c4d7e52baba8904d",
@@ -166,7 +166,7 @@
     "orbit360-platform/core/academia-product-catalog-p0.js": "c4974b8734dbe384d4fe4b53394d015ec24e36da",
     "orbit360-platform/core/access-role-session-owner-v20260728.js": "eee3eb184f1b4d7219d455d6a15b7d579979d7f5",
     "orbit360-platform/core/access-scope.js": "5fd5aabdbe0e7b613ae55161be01aa17b5174769",
-    "orbit360-platform/core/assignable-advisor-roster-client.js": "02bda0f10b94849cef6f4222be6e53e9c7de9606",
+    "orbit360-platform/core/assignable-advisor-roster-client.js": "b70c0f0355a6284fcb8b586cfc9c02aad0b2b97f",
     "orbit360-platform/core/auth-password-change-v20260805.js": "873b484d42825db2fa31e0ae90c9ec78598728f4",
     "orbit360-platform/core/auth-product-runtime-p0.js": "5299e3397fc4f37488e65e609eb446d27d724128",
     "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js": "60ce88178f48ff5d9b5fd01c1e2d92abe642dac1",
@@ -208,7 +208,7 @@
     "orbit360-platform/data/tenant-alianzas-soluciones-insurers-p10.js": "41d2e31a42dac73eb68af304d5f532897210d0ee",
     "orbit360-platform/data/tenant-config/alianzas-soluciones.aseguradoras-knowledge-summary-v20261003.js": "2000d9ea8ab67bdd37d8bf404a29a405fa6374dd",
     "orbit360-platform/data/tenant-public-branding-index.js": "dc543c463f5ecd8ea44e49156d6282113bd95db6",
-    "orbit360-platform/index.html": "93d1501255d7caa53c52df4e800a17392e900415",
+    "orbit360-platform/index.html": "0915d7c9b168f51adfa91c895f1842ea3087306c",
     "orbit360-platform/modules/academia.js": "d27aa080eac091057310aa7c952d3093677b50f0",
     "orbit360-platform/modules/aseguradoras-v1202-import-bridge.js": "db5f012abe505c2dd27d77a47d0694868bee5348",
     "orbit360-platform/modules/aseguradoras.js": "28bb3f15a1ca20130b194bb2dd5b1d296984927d",
@@ -226,7 +226,7 @@
     "orbit360-platform/modules/equipo-credential-admin-v20260805-bridge.js": "7432bc05938469187fdd120a5bc023c53a000ab9",
     "orbit360-platform/modules/equipo-onboarding-v20260804-bridge.js": "1da619d8abd676d31d69a038d4770463ca67fdc5",
     "orbit360-platform/modules/equipo.js": "b0736237ee18ef45abbae1c13f5c94781178344e",
-    "orbit360-platform/modules/inicio.js": "c0f861cac33bf60064e2c150f500d695de736b29",
+    "orbit360-platform/modules/inicio.js": "8df1c5f2b1907adab135e23e52b4193f4e623667",
     "orbit360-platform/modules/issuance-endosos-v1201-bridge.js": "43e14e5dc03a296b9fd461bec2ecc3052d6cbce0",
     "orbit360-platform/modules/leads.js": "4e12e604382f2731a03d29cf00db3c086d77ebc1",
     "orbit360-platform/modules/ops.js": "a4ca3dbb4613d541af411f12fce9773a072b0d41",
@@ -4548,5 +4548,27 @@
     "rolePermissionsUnchanged": true,
     "productionUnchanged": true,
     "priorCertifiedMachineProofPreserved": true
+  },
+  "r23InicioProgress": {
+    "status": "R23_SOURCE_STAGED_AUTHENTICATED_PREVIEW_PENDING",
+    "gate": "I6.5/B4-003",
+    "finding": "B4-003-R19-07-INICIO-MONTHLY-ADVISOR-READINESS-REGRESSION",
+    "sourceOwnerBlobs": {
+      "functions/assignable-advisor-roster.js": "1761a37806d8aa702f76f680dffcc473fb88d36c",
+      "orbit360-platform/core/assignable-advisor-roster-client.js": "b70c0f0355a6284fcb8b586cfc9c02aad0b2b97f",
+      "orbit360-platform/modules/inicio.js": "8df1c5f2b1907adab135e23e52b4193f4e623667",
+      "orbit360-platform/index.html": "0915d7c9b168f51adfa91c895f1842ea3087306c"
+    },
+    "qaOwner": "tools/gravicentra-i6-5-b4-003-preview-proof.mjs",
+    "qaBlob": "aac870e756c5bdf6ab29a66e6afbafeb7177b6f7",
+    "priorHead": "25c4d44f7da43e85a5d76ccba05398955e63a574",
+    "priorR22MachineAcceptedAsHistorical": true,
+    "sourceChanged": true,
+    "newArtifactRequired": true,
+    "authenticatedR23Pass": false,
+    "realRenewalSourceDryRunReady": false,
+    "liveLineageUnresolved": true,
+    "productionMutation": false,
+    "operationalWrites": 0
   }
 }

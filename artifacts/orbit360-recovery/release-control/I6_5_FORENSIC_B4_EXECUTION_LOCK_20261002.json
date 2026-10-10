@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B4_EXECUTION_LOCK_V1",
   "recordedAt": "2026-10-08T21:43:35.454Z",
-  "status": "B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL",
+  "status": "B4_003_R23_SOURCE_STAGED_PENDING_PREVIEW",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "block": "B4",
@@ -38,9 +38,9 @@
   "activeFinding": {
     "id": "B4-003",
     "title": "Cumulative B4-003 remediation: Renovaciones, Cancelaciones and source-backed insurer knowledge.",
-    "status": "B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL",
+    "status": "B4_003_R23_SOURCE_STAGED_PENDING_PREVIEW",
     "blocking": true,
-    "nextAction": "B4_003_R20_TARGETED_PAULA_VISUAL",
+    "nextAction": "R23_AUTHENTICATED_EXACT_PREVIEW",
     "humanVisualStatus": "PENDING_R20_TARGETED_VISUAL",
     "knowledgePreview": true
   },
@@ -587,9 +587,9 @@
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_RENEWAL_KPI_PARITY_CAUSAL_ADDENDUM_20261005.json",
     "blobSha": "87bab7ee2778a0525cdbe81cf4cbf82020bf6139"
   },
-  "findingLedgerBlobSha": "1c8fdcf3d9d7a4fddb9defa01ea582cdba32c156",
-  "continuityRegisterBlobSha": "48d945e51e5a10ec74dc925313b720a121ba7086",
-  "compositionLockBlobSha": "534559b1b23ee57be455460b9957c08f80ecdae3",
+  "findingLedgerBlobSha": "ccc5fa4fabf03bb44d2954e1db37135ad0c8ea9f",
+  "continuityRegisterBlobSha": "cf92e763015b1abc04b7ced23d86cf5b370950ad",
+  "compositionLockBlobSha": "2cd985e5ffc848f4417042b5ef34bb7f05db240f",
   "r18SourceFix": {
     "status": "SOURCE_FIXED_R18_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_SOURCE_FIX_20261005.json",
@@ -1758,5 +1758,48 @@
     "status": "QA_CONSISTENCY_REPAIRED_PREVIEW_PENDING",
     "ledgerParentStatus": "MACHINE_PASS_PENDING_PAULA_VISUAL",
     "reason": "Stale carry label was not synchronized with preserved historical machine receipt"
+  },
+  "r23CausalAuthorization": {
+    "status": "SCOPED_R23_SOURCE_MUTATION_APPROVED_WITHIN_B4_003",
+    "authority": "User 2026-10-10 explicit R23 continuation",
+    "cause": "Inicio uses Equipo-protected asesores/metas and assignment roster omits nonassignable advisors.",
+    "allowedProductFiles": [
+      "functions/assignable-advisor-roster.js",
+      "orbit360-platform/core/assignable-advisor-roster-client.js",
+      "orbit360-platform/modules/inicio.js",
+      "orbit360-platform/index.html"
+    ],
+    "allowedQaFiles": [
+      "tools/gravicentra-i6-5-b4-003-preview-proof.mjs"
+    ],
+    "noNewTeamAdminRights": true,
+    "productionForbidden": true
+  },
+  "r23InicioProgress": {
+    "status": "R23_SOURCE_STAGED_PENDING_AUTHENTICATED_EXACT_PREVIEW",
+    "finding": "B4-003-R19-07-INICIO-MONTHLY-ADVISOR-READINESS-REGRESSION",
+    "rootCause": "Inicio uses Equipo-protected asesores/metas and assignment roster omits nonassignable advisors.",
+    "scope": "Dedicated Inicio-only projection with member/country/dataScope/activeRole authorization, no Equipo admin grant.",
+    "files": {
+      "backend": "1761a37806d8aa702f76f680dffcc473fb88d36c",
+      "client": "b70c0f0355a6284fcb8b586cfc9c02aad0b2b97f",
+      "inicio": "8df1c5f2b1907adab135e23e52b4193f4e623667",
+      "index": "0915d7c9b168f51adfa91c895f1842ea3087306c",
+      "qa": "aac870e756c5bdf6ab29a66e6afbafeb7177b6f7"
+    },
+    "compositionBlobSha": "2cd985e5ffc848f4417042b5ef34bb7f05db240f",
+    "findingLedgerBlobSha": "ccc5fa4fabf03bb44d2954e1db37135ad0c8ea9f",
+    "carryBlobSha": "cf92e763015b1abc04b7ced23d86cf5b370950ad",
+    "visualQueueBlobSha": "c131c13ca457cf65e6ab19fadb2c1ce81ba8191e",
+    "priorSourceSha": "3a5e2c8df824dab8feca682ee4a2fe63d03c4ed6",
+    "sourceChange": true,
+    "syntaxChecked": true,
+    "authProofExecuted": false,
+    "previewBuilt": false,
+    "previewAccepted": false,
+    "productionChanged": false,
+    "realDataWrites": 0,
+    "renewalSourceDryRunReady": false,
+    "liveLineageUnresolved": true
   }
 }

@@ -752,7 +752,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_R20_TARGETED_PAULA_VISUAL",
+  "nextAction": "I6_5_B4_003_R23_AUTHENTICATED_EXACT_PREVIEW",
   "postproductionExitProgress": {
     "formalPercent": 50,
     "frozenMiniGates": 5,
@@ -6285,15 +6285,15 @@
     "noReimport": true
   },
   "currentB4": {
-    "status": "B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL",
+    "status": "B4_003_R23_SOURCE_STAGED_PENDING_PREVIEW",
     "activeFindingId": "B4-003",
     "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
-    "executionLockBlobSha": "506fc7ca44b75a57d0f4df607ae7829e435d1f2e",
-    "compositionLockBlobSha": "ba6922067abdaadaee29f6dec5eb8c182d080dc8",
-    "findingLedgerBlobSha": "ee4ccb3f57a5a09696cbe6f2112ea3be6197a809",
+    "executionLockBlobSha": "ef96c5d4118476060fc9f89a698ca9d485b97b62",
+    "compositionLockBlobSha": "2cd985e5ffc848f4417042b5ef34bb7f05db240f",
+    "findingLedgerBlobSha": "ccc5fa4fabf03bb44d2954e1db37135ad0c8ea9f",
     "noLive": true,
     "noReimport": true,
-    "nextAction": "B4_003_R20_TARGETED_PAULA_VISUAL",
+    "nextAction": "B4_003_R23_AUTHENTICATED_EXACT_PREVIEW",
     "sourceFixReceiptBlobSha": "dc0b48c41b6e50a62a8a4e27b14aa891a731adca",
     "syntheticQaWritesAuthorized": true,
     "previewDispatchRequest": {
@@ -7758,7 +7758,7 @@
     "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_R20_CONTRACT_AND_EXACT_PREVIEW"
   },
   "compositionLockBlobSha": "534559b1b23ee57be455460b9957c08f80ecdae3",
-  "findingLedgerBlobSha": "1c8fdcf3d9d7a4fddb9defa01ea582cdba32c156",
+  "findingLedgerBlobSha": "ccc5fa4fabf03bb44d2954e1db37135ad0c8ea9f",
   "continuityRegisterBlobSha": "48d945e51e5a10ec74dc925313b720a121ba7086",
   "r16PerformanceRegression": {
     "status": "CLOSED_PASS",
@@ -8756,9 +8756,9 @@
     "oldMachinePassNotHumanAcceptance": true
   },
   "visualPendingReviewQueue": {
-    "status": "R22_SOURCE_PATCH_PENDING_EXACT_PREVIEW",
+    "status": "R23_SOURCE_STAGED_EXACT_PREVIEW_PENDING",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PAULA_PENDING_VISUAL_REVIEW_QUEUE_20261008.json",
-    "blobSha": "9cfe567ec33b576d2d4c083286237ef9e70072f3",
+    "blobSha": "c131c13ca457cf65e6ab19fadb2c1ce81ba8191e",
     "userMustReceiveExactUnseenDeltaBeforeVisualUAT": true
   },
   "r20InboxAndRenewalSearch": {
@@ -9021,5 +9021,35 @@
     "productSourceChanged": false,
     "noLive": true,
     "noReimport": true
+  },
+  "r23InicioProgress": {
+    "status": "R23_SOURCE_STAGED_PENDING_AUTHENTICATED_EXACT_PREVIEW",
+    "finding": "B4-003-R19-07-INICIO-MONTHLY-ADVISOR-READINESS-REGRESSION",
+    "rootCause": "Inicio uses Equipo-protected asesores/metas and assignment roster omits nonassignable advisors.",
+    "scope": "Dedicated Inicio-only projection with member/country/dataScope/activeRole authorization, no Equipo admin grant.",
+    "files": {
+      "backend": "1761a37806d8aa702f76f680dffcc473fb88d36c",
+      "client": "b70c0f0355a6284fcb8b586cfc9c02aad0b2b97f",
+      "inicio": "8df1c5f2b1907adab135e23e52b4193f4e623667",
+      "index": "0915d7c9b168f51adfa91c895f1842ea3087306c",
+      "qa": "aac870e756c5bdf6ab29a66e6afbafeb7177b6f7"
+    },
+    "compositionBlobSha": "2cd985e5ffc848f4417042b5ef34bb7f05db240f",
+    "findingLedgerBlobSha": "ccc5fa4fabf03bb44d2954e1db37135ad0c8ea9f",
+    "carryBlobSha": "cf92e763015b1abc04b7ced23d86cf5b370950ad",
+    "visualQueueBlobSha": "c131c13ca457cf65e6ab19fadb2c1ce81ba8191e",
+    "priorSourceSha": "3a5e2c8df824dab8feca682ee4a2fe63d03c4ed6",
+    "sourceChange": true,
+    "syntaxChecked": true,
+    "authProofExecuted": false,
+    "previewBuilt": false,
+    "previewAccepted": false,
+    "productionChanged": false,
+    "realDataWrites": 0,
+    "renewalSourceDryRunReady": false,
+    "liveLineageUnresolved": true,
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R23_INICIO_ADVISOR_PROGRESS_SOURCE_FIX_20261010.json",
+    "receiptBlobSha": "543429710a9a6ed78eaefbb48367508d4586407a",
+    "executionLockBlobSha": "ef96c5d4118476060fc9f89a698ca9d485b97b62"
   }
 }
