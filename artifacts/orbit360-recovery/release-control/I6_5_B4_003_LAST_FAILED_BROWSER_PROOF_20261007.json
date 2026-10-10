@@ -1,25 +1,25 @@
 {
   "schema": "GRAVICENTRA_I6_5_B4_003_PREVIEW_PROOF_R19_V1",
   "status": "FAIL",
-  "target": "https://ays-orbit-360-lab--gi-i65-b4-38061717269-7nwfb516.web.app",
+  "target": "https://ays-orbit-360-lab--gi-i65-b4-38066486125-959dxy94.web.app",
   "ids": {
-    "client": "b4003qa_client_38061717269",
-    "renewalPolicy": "b4003qa_policy_renew_38061717269",
-    "expiredRenewPolicy": "b4003qa_policy_expired_renew_38061717269",
-    "unknownRenewPolicy": "b4003qa_policy_unknown_38061717269",
-    "renewabilityWritePolicy": "b4003qa_policy_renewwrite_38061717269",
-    "cancelPolicy": "b4003qa_policy_cancel_38061717269",
-    "healthPolicy": "b4003qa_policy_health_38061717269",
-    "healthReceipt1": "b4003qa_receipt_health_1_38061717269",
-    "healthReceipt2": "b4003qa_receipt_health_2_38061717269",
-    "healthReceiptShadow": "b4003qa_receipt_health_shadow_38061717269",
-    "cancelation": "b4003qa_cancel_38061717269",
-    "insurer": "b4003qa_insurer_38061717269",
-    "collabBusiness": "b4003qa_business_collab_38061717269",
-    "collabNoClientBusiness": "b4003qa_business_collab_noclient_38061717269",
-    "renewActivity": "act_ren_b4003qa_policy_renew_38061717269_20261010",
-    "cancelActivity": "act_rec_b4003qa_cancel_38061717269",
-    "recoveryBusiness": "neg_rec_b4003qa_cancel_38061717269"
+    "client": "b4003qa_client_38066486125",
+    "renewalPolicy": "b4003qa_policy_renew_38066486125",
+    "expiredRenewPolicy": "b4003qa_policy_expired_renew_38066486125",
+    "unknownRenewPolicy": "b4003qa_policy_unknown_38066486125",
+    "renewabilityWritePolicy": "b4003qa_policy_renewwrite_38066486125",
+    "cancelPolicy": "b4003qa_policy_cancel_38066486125",
+    "healthPolicy": "b4003qa_policy_health_38066486125",
+    "healthReceipt1": "b4003qa_receipt_health_1_38066486125",
+    "healthReceipt2": "b4003qa_receipt_health_2_38066486125",
+    "healthReceiptShadow": "b4003qa_receipt_health_shadow_38066486125",
+    "cancelation": "b4003qa_cancel_38066486125",
+    "insurer": "b4003qa_insurer_38066486125",
+    "collabBusiness": "b4003qa_business_collab_38066486125",
+    "collabNoClientBusiness": "b4003qa_business_collab_noclient_38066486125",
+    "renewActivity": "act_ren_b4003qa_policy_renew_38066486125_20261010",
+    "cancelActivity": "act_rec_b4003qa_cancel_38066486125",
+    "recoveryBusiness": "neg_rec_b4003qa_cancel_38066486125"
   },
   "assertions": {
     "handoffActorsDistinct": true,
@@ -27,6 +27,8 @@
     "cancellationProjectionConsistent": false,
     "realRenewalDistributionReadOnly": true,
     "realRenewalSourceDryRunReady": false,
+    "academiaFiveManualsPrivateAuthenticatedUi": true,
+    "academiaOperativoCrmManualAllowedRestrictedDenied": true,
     "cleanupComplete": true
   },
   "syntheticWrites": 14,
@@ -766,8 +768,48 @@
     "writeExecuted": false,
     "authorizationRequiredBeforeApply": true
   },
+  "academiaManuals": {
+    "status": "PASS",
+    "manuals": [
+      {
+        "id": "manual-maestro",
+        "rendered": true,
+        "privateIframe": true,
+        "bytes": 27082
+      },
+      {
+        "id": "capacitacion-tecnica-interna",
+        "rendered": true,
+        "privateIframe": true,
+        "bytes": 9936
+      },
+      {
+        "id": "capacitacion-crm",
+        "rendered": true,
+        "privateIframe": true,
+        "bytes": 28841
+      },
+      {
+        "id": "manual-integraciones",
+        "rendered": true,
+        "privateIframe": true,
+        "bytes": 7870
+      },
+      {
+        "id": "comparativa-ia",
+        "rendered": true,
+        "privateIframe": true,
+        "bytes": 6511
+      }
+    ],
+    "publicManualExposed": false
+  },
+  "academiaRoleScope": {
+    "crm": true,
+    "restrictedDenied": true
+  },
   "failure": {
-    "message": "B4_003_R23_UI_NOT_MATERIALIZED:{\"actor\":\"woJlxR1iFEeiQZvTscPj4qQ5Qc73\",\"activeRole\":\"direccion\",\"country\":\"GT\",\"month\":\"2026-10\",\"backend\":{\"scope\":\"all\",\"count\":6,\"ids\":[\"ase-braulio-hernandez\",\"ase-carlos-castro\",\"ase-fernando-arias\",\"ase-johanna-salgado\",\"ase-paula-osorio\",\"ase-samuel-daza\"]},\"diagnostics\":{\"hash\":\"#/ops\",\"route\":\"ops\",\"role\":\"Dirección\",\"authUid\":\"woJlxR1iFEeiQZvTscPj4qQ5Qc73\",\"country\":\"GT\",\"month\":\"2026-10\",\"hostText\":\"🗂\\nOps\\n· Gestiones operativas\\n⚙ Listas\\n+ Gestión\\n+ Nuevo ingreso\\nTodas las aseguradoras\\nPRUEBA PREVIEW · Aseguradora\\nB4 R20 Aseguradora QA\\nAseguradora Solidaria de Colombia\\nAXA Colpatria Seguros\\nChubb\\nEquidad Seguros\\nHDI Seguros\\nMapfre\\nPrevisora\\nQualitas\\nSBS Seguros Colombia\\nSeguros Bolívar\\nSeguros del Estado\\nSeguros Médicos Internacionales\\nZurich\\nASEGURADORA GENERAL\\nASEGURADORA GUATEMALTECA\\nASEGURADORA LA CEIBA\\nASEGURADORA RURAL\\nG&T SEGUROS\\nMAPFRE SEGUROS\\nSEGUROS BAM\\nSEGUROS BANTRAB\\nSEGUROS COLUMNA\\nSEGUROS EL ROBLE\\nSEGUROS FICOHSA\\nSEGUROS ÓLE\\nSEGUROS PRIVANZA\\nSEGUROS UNIVERSALES\\nTodos los responsables\\nBraulio Hernández\\nCarlos Castro\\nFernando Arias\\nJohanna Salgado\\nNicole Castro\\nPaula Osorio\\nSamuel Daza\\nTablero operativo en vivo · 2 negocios en flujo · 0 gestiones\\n🔁 Sincronizado con Orbit Leads\\n🗂\\nGestiones Admin\\n0\\nSin tarjetas\\n+ Gestión\\n🧮\\nCotizaciones\\n2\\nSin prioridad\\nSin ramo\\n🇬🇹\\n🗂 Ops\\nB4-003 QA colaboración\\n· —\\n🧮 Cotizando · —\\nPO\\n—\\nSin prioridad\\nSin ramo\\n🇬🇹\\n🎯 Leads\\nB4-003 QA colaboración pre-emisión\\n· —\\n🧮 Cotizando · —\\nPO\\n—\\n+ Ingreso\\n🔍\\nInspecciones\\n0\\nSin tarjetas\\n+ Ingreso\\n📝\\nEmisiones\\n0\\nSin tarjetas\\n+ Ingreso\\n🔄\\nRenovaciones / Modif.\\n0\\nSin tarjetas\\n+ Gestión\",\"advisorReadiness\":\"\",\"advisorRendered\":0,\"store\":{\"ready\":true,\"status\":\"ready-read-only\",\"serverConfirmed\":[\"clientes\",\"polizas\",\"vehiculos\",\"recibosEsperados\",\"cancelaciones\",\"negocios\",\"gestiones\",\"aseguradoras\",\"cobros\",\"carteraPrimas\",\"asesores\",\"metas\",\"reclamos\",\"comisiones\",\"auditoria\"],\"denied\":[],\"snapshotErrors\":{\"estadosCuentaAseguradora\":\"politica_no_autoriza_consulta\",\"recibosAseguradora\":\"politica_no_autoriza_consulta\",\"conciliacionesPrimas\":\"politica_no_autoriza_consulta\",\"conciliaciones\":\"politica_no_autoriza_consulta\"},\"optional\":[\"polizas\",\"cobros\",\"aseguradoras\",\"vehiculos\",\"recibosEsperados\",\"carteraPrimas\",\"asesores\",\"estadosCuentaAseguradora\",\"recibosAseguradora\",\"conciliacionesPrimas\",\"conciliaciones\",\"metas\",\"negocios\",\"gestiones\",\"reclamos\",\"comisiones\",\"cancelaciones\",\"auditoria\"]},\"clientStatus\":{\"entries\":[]},\"clientAvailable\":true,\"queriedCountry\":\"GT\"},\"clientCall\":{\"count\":6,\"ids\":[\"ase-braulio-hernandez\",\"ase-carlos-castro\",\"ase-fernando-arias\",\"ase-johanna-salgado\",\"ase-paula-osorio\",\"ase-samuel-daza\"]}}|page.waitForFunction: Timeout 12000ms exceeded.",
-    "stack": "Error: B4_003_R23_UI_NOT_MATERIALIZED:{\"actor\":\"woJlxR1iFEeiQZvTscPj4qQ5Qc73\",\"activeRole\":\"direccion\",\"country\":\"GT\",\"month\":\"2026-10\",\"backend\":{\"scope\":\"all\",\"count\":6,\"ids\":[\"ase-braulio-hernandez\",\"ase-carlos-castro\",\"ase-fernando-arias\",\"ase-johanna-salgado\",\"ase-paula-osorio\",\"ase-samuel-daza\"]},\"diagnostics\":{\"hash\":\"#/ops\",\"route\":\"ops\",\"role\":\"Dirección\",\"authUid\":\"woJlxR1iFEeiQZvTscPj4qQ5Qc73\",\"country\":\"GT\",\"month\":\"2026-10\",\"hostText\":\"🗂\\nOps\\n· Gestiones operativas\\n⚙ Listas\\n+ Gestión\\n+ Nuevo ingreso\\nTodas las aseguradoras\\nPRUEBA PREVIEW · Aseguradora\\nB4 R20 Aseguradora QA\\nAseguradora Solidaria de Colombia\\nAXA Colpatria Seguros\\nChubb\\nEquidad Seguros\\nHDI Seguros\\nMapfre\\nPrevisora\\nQualitas\\nSBS Seguros Colombia\\nSeguros Bolívar\\nSeguros del Estado\\nSeguros Médicos Internacionales\\nZurich\\nASEGURADORA GENERAL\\nASEGURADORA GUATEMALTECA\\nASEGURADORA LA CEIBA\\nASEGURADORA RURAL\\nG&T SEGUROS\\nMAPFRE SEGUROS\\nSEGUROS BAM\\nSEGUROS BANTRAB\\nSEGUROS COLUMNA\\nSEGUROS EL ROBLE\\nSEGUROS FICOHSA\\nSEGUROS ÓLE\\nSEGUROS PRIVANZA\\nSEGUROS UNIVERSALES\\nTodos los responsables\\nBraulio Hernández\\nCarlos Castro\\nFernando Arias\\nJohanna Salgado\\nNicole Castro\\nPaula Osorio\\nSamuel Daza\\nTablero operativo en vivo · 2 negocios en flujo · 0 gestiones\\n🔁 Sincronizado con Orbit Leads\\n🗂\\nGestiones Admin\\n0\\nSin tarjetas\\n+ Gestión\\n🧮\\nCotizaciones\\n2\\nSin prioridad\\nSin ramo\\n🇬🇹\\n🗂 Ops\\nB4-003 QA colaboración\\n· —\\n🧮 Cotizando · —\\nPO\\n—\\nSin prioridad\\nSin ramo\\n🇬🇹\\n🎯 Leads\\nB4-003 QA colaboración pre-emisión\\n· —\\n🧮 Cotizando · —\\nPO\\n—\\n+ Ingreso\\n🔍\\nInspecciones\\n0\\nSin tarjetas\\n+ Ingreso\\n📝\\nEmisiones\\n0\\nSin tarjetas\\n+ Ingreso\\n🔄\\nRenovaciones / Modif.\\n0\\nSin tarjetas\\n+ Gestión\",\"advisorReadiness\":\"\",\"advisorRendered\":0,\"store\":{\"ready\":true,\"status\":\"ready-read-only\",\"serverConfirmed\":[\"clientes\",\"polizas\",\"vehiculos\",\"recibosEsperados\",\"cancelaciones\",\"negocios\",\"gestiones\",\"aseguradoras\",\"cobros\",\"carteraPrimas\",\"asesores\",\"metas\",\"reclamos\",\"comisiones\",\"auditoria\"],\"denied\":[],\"snapshotErrors\":{\"estadosCuentaAseguradora\":\"politica_no_autoriza_consulta\",\"recibosAseguradora\":\"politica_no_autoriza_consulta\",\"conciliacionesPrimas\":\"politica_no_autoriza_consulta\",\"conciliaciones\":\"politica_no_autoriza_consulta\"},\"optional\":[\"polizas\",\"cobros\",\"aseguradoras\",\"vehiculos\",\"recibosEsperados\",\"carteraPrimas\",\"asesores\",\"estadosCuentaAseguradora\",\"recibosAseguradora\",\"conciliacionesPrimas\",\"conciliaciones\",\"metas\",\"negocios\",\"gestiones\",\"reclamos\",\"comisiones\",\"cancelaciones\",\"auditoria\"]},\"clientStatus\":{\"entries\":[]},\"clientAvailable\":true,\"queriedCountry\":\"GT\"},\"clientCall\":{\"count\":6,\"ids\":[\"ase-braulio-hernandez\",\"ase-carlos-castro\",\"ase-fernando-arias\",\"ase-johanna-salgado\",\"ase-paula-osorio\",\"ase-samuel-daza\"]}}|page.waitForFunction: Timeout 12000ms exceeded.\n    at r23ProofSnapshot (file:///home/runner/work/orbit360-core/orbit360-core/tools/gravicentra-i6-5-b4-003-preview-proof.mjs:180:10)\n    at async Promise.all (index 1)\n    at async file:///home/runner/work/orbit360-core/orbit360-core/tools/gravicentra-i6-5-b4-003-preview-proof.mjs:505:18"
+    "message": "B4_003_R23_BACKEND_UI_RELOAD_MISMATCH",
+    "stack": "Error: B4_003_R23_BACKEND_UI_RELOAD_MISMATCH\n    at need (file:///home/runner/work/orbit360-core/orbit360-core/tools/gravicentra-i6-5-b4-003-preview-proof.mjs:13:32)\n    at file:///home/runner/work/orbit360-core/orbit360-core/tools/gravicentra-i6-5-b4-003-preview-proof.mjs:560:4"
   }
 }
