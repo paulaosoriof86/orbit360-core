@@ -1,25 +1,25 @@
 {
   "schema": "GRAVICENTRA_I6_5_B4_003_PREVIEW_PROOF_R19_V1",
   "status": "FAIL",
-  "target": "https://ays-orbit-360-lab--gi-i65-b4-38059853721-quno7qoh.web.app",
+  "target": "https://ays-orbit-360-lab--gi-i65-b4-38060653254-3hp18vky.web.app",
   "ids": {
-    "client": "b4003qa_client_38059853721",
-    "renewalPolicy": "b4003qa_policy_renew_38059853721",
-    "expiredRenewPolicy": "b4003qa_policy_expired_renew_38059853721",
-    "unknownRenewPolicy": "b4003qa_policy_unknown_38059853721",
-    "renewabilityWritePolicy": "b4003qa_policy_renewwrite_38059853721",
-    "cancelPolicy": "b4003qa_policy_cancel_38059853721",
-    "healthPolicy": "b4003qa_policy_health_38059853721",
-    "healthReceipt1": "b4003qa_receipt_health_1_38059853721",
-    "healthReceipt2": "b4003qa_receipt_health_2_38059853721",
-    "healthReceiptShadow": "b4003qa_receipt_health_shadow_38059853721",
-    "cancelation": "b4003qa_cancel_38059853721",
-    "insurer": "b4003qa_insurer_38059853721",
-    "collabBusiness": "b4003qa_business_collab_38059853721",
-    "collabNoClientBusiness": "b4003qa_business_collab_noclient_38059853721",
-    "renewActivity": "act_ren_b4003qa_policy_renew_38059853721_20261010",
-    "cancelActivity": "act_rec_b4003qa_cancel_38059853721",
-    "recoveryBusiness": "neg_rec_b4003qa_cancel_38059853721"
+    "client": "b4003qa_client_38060653254",
+    "renewalPolicy": "b4003qa_policy_renew_38060653254",
+    "expiredRenewPolicy": "b4003qa_policy_expired_renew_38060653254",
+    "unknownRenewPolicy": "b4003qa_policy_unknown_38060653254",
+    "renewabilityWritePolicy": "b4003qa_policy_renewwrite_38060653254",
+    "cancelPolicy": "b4003qa_policy_cancel_38060653254",
+    "healthPolicy": "b4003qa_policy_health_38060653254",
+    "healthReceipt1": "b4003qa_receipt_health_1_38060653254",
+    "healthReceipt2": "b4003qa_receipt_health_2_38060653254",
+    "healthReceiptShadow": "b4003qa_receipt_health_shadow_38060653254",
+    "cancelation": "b4003qa_cancel_38060653254",
+    "insurer": "b4003qa_insurer_38060653254",
+    "collabBusiness": "b4003qa_business_collab_38060653254",
+    "collabNoClientBusiness": "b4003qa_business_collab_noclient_38060653254",
+    "renewActivity": "act_ren_b4003qa_policy_renew_38060653254_20261010",
+    "cancelActivity": "act_rec_b4003qa_cancel_38060653254",
+    "recoveryBusiness": "neg_rec_b4003qa_cancel_38060653254"
   },
   "assertions": {
     "handoffActorsDistinct": true,
@@ -92,27 +92,6 @@
     "renewabilityReviewOpensFocusedTriState": true,
     "renewabilitySyntheticServerCommitReload": true,
     "client360BidirectionalTabs": true,
-    "policyRouteUnder2500ms": true,
-    "policySearchUnder2500ms": true,
-    "policyDetailUnder2500ms": true,
-    "policyEditionAwareValidation": true,
-    "previewRealPolicyProtectedHumanMessage": true,
-    "policyMobileSearchVisible": true,
-    "policyMobileSearchTypedQuery": true,
-    "inicioPolizasRenewalKpiParity": true,
-    "inicioReadinessTerminal": true,
-    "policyRefreshCoherentHydration": true,
-    "noDelayedRenewalRenderMutation": true,
-    "renewalInsurerDirectoryOptionalNonblocking": true,
-    "renewalFirstPaintReadiness": true,
-    "expiredRenewalOutcomeContinuity": true,
-    "unknownRenewabilityDebtVisibleFailClosed": true,
-    "client360AuthoritativeList": true,
-    "qualityCanonicalGrammar": true,
-    "qualityCompletenessExplicit": true,
-    "assignableAdvisorRosterRoleParity": true,
-    "assignableAdvisorRosterMinimalProjection": true,
-    "assignableAdvisorRosterDeduplicated": true,
     "cleanupComplete": true
   },
   "syntheticWrites": 14,
@@ -401,7 +380,7 @@
       "visible": true,
       "sampleNumber": "91-59247519",
       "emptyState": false,
-      "textSample": "✕ Cancelaciones · Fuga de cartera MOTIVOS·VALOR PERDIDO·TASA DE FUGA CANCELADAS 490 histórico VALOR PERDIDO GTQ 1,842,217 USD 91,823,506 COP 26,564,526 prima anual · por moneda MOTIVO PRINCIPAL Prueba sintética B4-003 más frecuente CANCELADAS / CARTERA 34% histórico acumulado · no es churn temporal Motivos documentados de cancelación 489 registros sin causa documentada; no se inventa el histórico ni se cuenta como causa. Prueba sintética B4-003 1 · 0% Motivo documentado Prueba sintética B4-003 Asesor Braulio Hernández Carlos Castro Fernando Arias Johanna Salgado Nicole Castro Paula Osorio Samuel Daza 490 de 490 Seleccionar visibles 0 seleccionadas Limpiar Preparar WhatsApp (0) SEL. FECHA CLIENTE PÓLIZA RAMO MOTIVO VALOR PERDIDO ACCIÓN 10 oct 2026 BQ B4-003 QA Cliente Persona · GT B4-003-CAN-38059853721 Auto Prueba sintética B4-003 Q 700 Ver cancelación 16 sept 2026 ML MARÍA LUISA LARIOS CALDERÓN natural · GT 223092797 VEHICULOS Motivo histórico no disponible Q 2,436 Ver cancelación 14 sept 2026 SK SEON KEUN KIM natural · GT 225121245 VEHICULOS Motivo histórico no disponible Q 6,250 Ver cancelación 07 sept 2026 JI JHEFRI ISAAC RAMIREZ AGUSTÍN natural · GT AUTO-514726 VEHICULOS Motiv"
+      "textSample": "✕ Cancelaciones · Fuga de cartera MOTIVOS·VALOR PERDIDO·TASA DE FUGA CANCELADAS 490 histórico VALOR PERDIDO GTQ 1,842,217 USD 91,823,506 COP 26,564,526 prima anual · por moneda MOTIVO PRINCIPAL Prueba sintética B4-003 más frecuente CANCELADAS / CARTERA 34% histórico acumulado · no es churn temporal Motivos documentados de cancelación 489 registros sin causa documentada; no se inventa el histórico ni se cuenta como causa. Prueba sintética B4-003 1 · 0% Motivo documentado Prueba sintética B4-003 Asesor Braulio Hernández Carlos Castro Fernando Arias Johanna Salgado Nicole Castro Paula Osorio Samuel Daza 490 de 490 Seleccionar visibles 0 seleccionadas Limpiar Preparar WhatsApp (0) SEL. FECHA CLIENTE PÓLIZA RAMO MOTIVO VALOR PERDIDO ACCIÓN 10 oct 2026 BQ B4-003 QA Cliente Persona · GT B4-003-CAN-38060653254 Auto Prueba sintética B4-003 Q 700 Ver cancelación 16 sept 2026 ML MARÍA LUISA LARIOS CALDERÓN natural · GT 223092797 VEHICULOS Motivo histórico no disponible Q 2,436 Ver cancelación 14 sept 2026 SK SEON KEUN KIM natural · GT 225121245 VEHICULOS Motivo histórico no disponible Q 6,250 Ver cancelación 07 sept 2026 JI JHEFRI ISAAC RAMIREZ AGUSTÍN natural · GT AUTO-514726 VEHICULOS Motiv"
     }
   },
   "actor": {
@@ -1546,8 +1525,8 @@
       "CO",
       "CO"
     ],
-    "cancelGtMs": 87.29999999998836,
-    "cancelCoMs": 54.29999999998836,
+    "cancelGtMs": 99.5,
+    "cancelCoMs": 53,
     "cancelExplicitTargetsGT": true,
     "cancelExplicitTargetsCO": true,
     "cancelCrossCountryExplicitGT": true,
@@ -1830,7 +1809,7 @@
     "cancelKpiDetailOpen": true
   },
   "r11Browser": {
-    "clientHref": "#/cliente360?c=b4003qa_client_38059853721&t=polizas",
+    "clientHref": "#/cliente360?c=b4003qa_client_38060653254&t=polizas",
     "policyTargetPresent": true,
     "explicitCancelTargetPresent": true,
     "rowMisleadingClickable": false,
@@ -1906,8 +1885,8 @@
       "CO",
       "CO"
     ],
-    "qualityGtMs": 247.80000000004657,
-    "qualityCoMs": 129.5,
+    "qualityGtMs": 253.79999999998836,
+    "qualityCoMs": 126.79999999998836,
     "qualityGtRows": 50,
     "qualityCoRows": 17,
     "financialGtRows": 72,
@@ -1917,10 +1896,10 @@
   },
   "r1604ConfigFirstPaint": {
     "state": "loading",
-    "syncPaintMs": 1.3000000000465661,
+    "syncPaintMs": 1.3999999999650754,
     "hasVisibleState": true,
     "text": "Confirmando catálogos canónicos… La plataforma está leyendo la configuración protegida del tenant. No se usan valores locales como autoridad.",
-    "canonicalReadyMs": 794,
+    "canonicalReadyMs": 792,
     "finalState": "ready"
   },
   "r16CatalogAndQuality": {
@@ -1955,7 +1934,7 @@
       "reason": "Se excluyeron 1 registro(s) histórico(s) duplicado(s); el calendario activo aún supera la prima contractual."
     },
     "rowVisible": true,
-    "rowText": "B4-003-HEALTH-380598537212 recibo(s) vigente(s) · 1 legado(s) excluido(s) BQ B4-003 QA Cliente Persona · GuatemalaQ 407.01Póliza · prima totalProgramación según cuotas de la póliza0 fila(s) requieren revisiónQ 542.68Q 135.67Q 0.02Se excluyeron 1 registro(s) histórico(s) duplicado(s); el calendario activo aún supera la prima contractual.Revisar diferenciaVer recibos",
+    "rowText": "B4-003-HEALTH-380606532542 recibo(s) vigente(s) · 1 legado(s) excluido(s) BQ B4-003 QA Cliente Persona · GuatemalaQ 407.01Póliza · prima totalProgramación según cuotas de la póliza0 fila(s) requieren revisiónQ 542.68Q 135.67Q 0.02Se excluyeron 1 registro(s) histórico(s) duplicado(s); el calendario activo aún supera la prima contractual.Revisar diferenciaVer recibos",
     "technicalToken": false,
     "exactAction": true,
     "mobileContract": true
@@ -1994,7 +1973,7 @@
     "technical": false
   },
   "r17QualityReceiptsDeepLink": {
-    "hash": "#/cliente360?c=b4003qa_client_38059853721&p=b4003qa_policy_health_38059853721&t=recibos",
+    "hash": "#/cliente360?c=b4003qa_client_38060653254&p=b4003qa_policy_health_38060653254&t=recibos",
     "receiptsTarget": true
   },
   "policyEditorPreservation": {
@@ -2083,9 +2062,9 @@
   },
   "r18CommercialMobile": {
     "viewport": 390,
-    "cardWidth": 383.46875,
-    "cardScrollWidth": 381,
-    "cardClientWidth": 381,
+    "cardWidth": 386.5,
+    "cardScrollWidth": 385,
+    "cardClientWidth": 385,
     "footerButtons": 2
   },
   "r18ManagementModal": {
@@ -2132,7 +2111,7 @@
           "pol_0f89cc0a12840594abcc60d418b2",
           "pol_b8b99324d9016269d118d789095a",
           "pol_8231bbb8f9b7272c02891f5a4caf",
-          "b4003qa_policy_expired_renew_38059853721",
+          "b4003qa_policy_expired_renew_38060653254",
           "pol_df6bf097045762297ec31fd4e5c5"
         ]
       },
@@ -2140,9 +2119,9 @@
         "key": "d15",
         "count": 3,
         "ids": [
-          "b4003qa_policy_renew_38059853721",
-          "b4003qa_policy_renewwrite_38059853721",
-          "b4003qa_policy_unknown_38059853721"
+          "b4003qa_policy_renew_38060653254",
+          "b4003qa_policy_renewwrite_38060653254",
+          "b4003qa_policy_unknown_38060653254"
         ]
       },
       {
@@ -2208,9 +2187,9 @@
     "unknownReview": true,
     "parallelDispositionAbsent": true,
     "date45ExpectedIds": [
-      "b4003qa_policy_renew_38059853721",
-      "b4003qa_policy_renewwrite_38059853721",
-      "b4003qa_policy_unknown_38059853721",
+      "b4003qa_policy_renew_38060653254",
+      "b4003qa_policy_renewwrite_38060653254",
+      "b4003qa_policy_unknown_38060653254",
       "pol_3ddc9e613f40252f02b2e122072d",
       "pol_638e276218baad9e84018415b0ba",
       "pol_7280c9b1a5253a1fe1e463e5993b",
@@ -2223,9 +2202,9 @@
       "pol_ddbb135a5fcd5b9d61dba57f56ec"
     ],
     "date45VisibleIds": [
-      "b4003qa_policy_renew_38059853721",
-      "b4003qa_policy_renewwrite_38059853721",
-      "b4003qa_policy_unknown_38059853721",
+      "b4003qa_policy_renew_38060653254",
+      "b4003qa_policy_renewwrite_38060653254",
+      "b4003qa_policy_unknown_38060653254",
       "pol_3ddc9e613f40252f02b2e122072d",
       "pol_638e276218baad9e84018415b0ba",
       "pol_7280c9b1a5253a1fe1e463e5993b",
@@ -2282,7 +2261,7 @@
     ]
   },
   "r19RenewabilityDurable": {
-    "policyId": "b4003qa_policy_renewwrite_38059853721",
+    "policyId": "b4003qa_policy_renewwrite_38060653254",
     "serverValue": true,
     "reloadValue": true
   },
@@ -2292,10 +2271,10 @@
     "hasPrev": true
   },
   "r13PolicyRouteTiming": {
-    "wallMs": 332,
+    "wallMs": 575,
     "browser": {
-      "domPaintMs": 130,
-      "routeOwnerMs": 130,
+      "domPaintMs": 128,
+      "routeOwnerMs": 128,
       "mutationCount": 1,
       "route": "polizas",
       "tableReady": true
@@ -2303,361 +2282,16 @@
     "measurement": "Chrome performance.now to canonical table DOM mutation"
   },
   "r13PolicySearchTiming": {
-    "wallMs": 221,
+    "wallMs": 773,
     "browser": {
-      "inputToCorrectDomMs": 214,
-      "mutationCount": 1,
+      "inputToCorrectDomMs": null,
+      "mutationCount": 2,
       "inputPresent": true
     },
     "measurement": "Chrome input event to exact filtered DOM"
   },
-  "r13PolicyDetailTiming": {
-    "wallMs": 403,
-    "browser": {
-      "clickToFullDetailDomMs": 176,
-      "mutationCount": 1,
-      "detailVisible": true,
-      "events": [
-        {
-          "kind": "route-ready",
-          "at": 176,
-          "hash": "#/cliente360?c=b4003qa_client_38059853721&p=b4003qa_policy_renew_38059853721",
-          "route": "cliente360"
-        },
-        {
-          "kind": "detail-present",
-          "at": 176,
-          "hash": "#/cliente360?c=b4003qa_client_38059853721&p=b4003qa_policy_renew_38059853721",
-          "route": "cliente360"
-        },
-        {
-          "kind": "hashchange",
-          "at": 176,
-          "hash": "#/cliente360?c=b4003qa_client_38059853721&p=b4003qa_policy_renew_38059853721",
-          "route": "cliente360"
-        }
-      ],
-      "route": "cliente360",
-      "hash": "#/cliente360?c=b4003qa_client_38059853721&p=b4003qa_policy_renew_38059853721",
-      "loadingReason": "",
-      "hostBlank": false,
-      "serverConfirmed": [
-        "clientes",
-        "polizas",
-        "vehiculos",
-        "recibosEsperados"
-      ]
-    },
-    "measurement": "Chrome click to full detail DOM"
-  },
-  "r13PolicyPerformance": {
-    "routeWallMs": 332,
-    "routeChromeMs": 130,
-    "searchWallMs": 221,
-    "searchChromeMs": 214,
-    "detailWallMs": 403,
-    "detailChromeMs": 176,
-    "searchNumber": "B4-003-REN-38059853721",
-    "refreshFlicker": {
-      "states": [
-        {
-          "loading": false,
-          "hasPolicy": false,
-          "hasClient": false,
-          "route": "#/polizas"
-        },
-        {
-          "loading": false,
-          "hasPolicy": false,
-          "hasClient": false,
-          "route": "#/polizas"
-        },
-        {
-          "loading": true,
-          "hasPolicy": false,
-          "hasClient": false,
-          "route": "#/polizas"
-        },
-        {
-          "loading": true,
-          "hasPolicy": false,
-          "hasClient": false,
-          "route": "#/polizas"
-        },
-        {
-          "loading": true,
-          "hasPolicy": false,
-          "hasClient": false,
-          "route": "#/polizas"
-        },
-        {
-          "loading": true,
-          "hasPolicy": false,
-          "hasClient": false,
-          "route": "#/polizas"
-        },
-        {
-          "loading": true,
-          "hasPolicy": false,
-          "hasClient": false,
-          "route": "#/polizas"
-        },
-        {
-          "loading": true,
-          "hasPolicy": false,
-          "hasClient": false,
-          "route": "#/polizas"
-        },
-        {
-          "loading": true,
-          "hasPolicy": false,
-          "hasClient": false,
-          "route": "#/polizas"
-        },
-        {
-          "loading": false,
-          "hasPolicy": false,
-          "hasClient": false,
-          "route": "#/polizas"
-        }
-      ],
-      "destructive": false
-    }
-  },
-  "r18PolicyEditionValidation": {
-    "rows": [
-      {
-        "id": "pol_6166192b984a88f945425c47c091",
-        "inicio": "2024-01-01",
-        "fin": "2025-01-01",
-        "estado": "Renovada"
-      },
-      {
-        "id": "pol_301fb3a656467b913cbbf40fb649",
-        "inicio": "2025-01-01",
-        "fin": "2026-01-01",
-        "estado": "Renovada"
-      },
-      {
-        "id": "pol_2d55dc4903c785fff60d06547cad",
-        "inicio": "2026-01-01",
-        "fin": "2027-01-01",
-        "estado": "Vigente"
-      }
-    ],
-    "currentId": "pol_2d55dc4903c785fff60d06547cad",
-    "errors": [],
-    "warnings": [
-      "lineage_ediciones_sin_vinculo",
-      "conducto_requiere_validacion"
-    ]
-  },
-  "r19RealPolicyPreviewProtection": {
-    "modalPresent": true,
-    "error": "Esta Preview protege los registros reales. La persistencia se valida aquí con una póliza sintética equivalente; el cambio real se prueba únicamente en el gate LIVE autorizado."
-  },
-  "r18MobilePolicySearch": {
-    "present": true,
-    "inputDisplay": "block",
-    "parentDisplay": "flex",
-    "width": 312,
-    "top": 176,
-    "bottom": 214,
-    "viewport": 390,
-    "viewportHeight": 844,
-    "selector": "#fq",
-    "queryResult": true
-  },
-  "r18RenewalKpiParity": {
-    "inicio": 13,
-    "polizas": 13,
-    "owner": "polizas.policyMetrics.isRenewalWithin45Days"
-  },
-  "r19InicioReadiness": {
-    "text": "🌅 Buen día · esto es lo importante hoy METAS DEL MES·PRIORIDADES·AVANCE POR ASESOR Abrir Cliente 360 → METAS DEL MES · OCTUBRE 2026 Avance real del mes Quedan 21 días para cerrar el mes. La producción usa la prima neta de pólizas con inicio de vigencia en el mes y el recaudo usa pagos confirmados con fecha efectiva del mes. Si no existe meta configurada, no se inventa un porcentaje. 440 clientes 1425 pólizas 594 registros vencidos en cartera 14% Q11K GTQ Producción neta del mes Meta Q80K 0% Sin movimientos Recaudo confirmado del mes Meta Q50K COBROS CONFIRMADOS Q851K GTQ $205.8M COP 1243 pagos confirmados › PENDIENTE DE COBRO Q 8,058 GTQ $ 0 COP 722 obligaciones · 18 con monto › CARTERA VENCIDA Q 8,274 GTQ $ 0 COP 594 obligaciones · 16 con monto › VENCEN ≤45 D 13 mismo universo de Pólizas › Avance por asesor producción neta del mes vs meta configurada PO Paula Osorio Q11K GTQ 14% BH Braulio Hernández Sin movimientos Meta no configurada — CC Carlos Castro Sin movimientos Meta no configurada — FA Fernando Arias Sin movimientos Meta no configurada — JS Johanna Salgado Sin movimientos Meta no configurada — NC Nicole Castro Sin movimientos Meta no configurada — SD Samuel Daza Sin movimientos Meta no configurada — Prioridades 🔄 B4-003 QA Cliente Auto · renueva en 9 d 🔄 B4-003 QA Cliente Auto · renueva en 9 d 🔄 B4-003 QA Cliente ACCIDENTES QA FUENTE · renueva en 9 d 🔄 MARÍA DE JESÚS LÓPEZ GARZÓN ACCIDENTES Y ENFERMEDADES · renueva en 16 d ⚠ NORA LUCIA HURTARTE FLORES cuota — vencida · — ⚠ LUIS ESTUARDO PEREZ CIFUENTES cuota — vencida · — ⚠ ERICKA LIZETTE AGUILAR LUNA cuota — vencida · — Seguimientos de hoy sin cadencia automática · gestiona por WhatsApp 🧮 B4-003 QA colaboración · Paula Osorio · mañana · Cotizando 🧮 B4-003 QA colaboración pre-emisión · Paula Osorio · mañ",
-    "terminal": "ready"
-  },
-  "renewalRenderStability": {
-    "mutationCount": 0,
-    "textStable": true,
-    "route": "renovaciones",
-    "records": [],
-    "events": [],
-    "canonicalRerenderObserved": false
-  },
-  "r14RenewalReadiness": {
-    "loading": true,
-    "leakedRows": 0,
-    "readyExpired": true,
-    "unknownVisible": true,
-    "unknownReview": true,
-    "pendingCount": 1,
-    "placeholderClient": false
-  },
-  "r20InsurerOptionalReadiness": {
-    "loading": false,
-    "buckets": 4
-  },
-  "r14Client360Authority": {
-    "authority": "server-confirmed-store",
-    "storeHasSynthetic": true,
-    "authoritativeGtCount": 417,
-    "uiUniverseCount": 417,
-    "syntheticSearchVisible": false,
-    "pageSize": 40,
-    "renderedRows": 40,
-    "filteredRows": 417,
-    "totalRows": 417
-  },
-  "r14QualityGrammar": {
-    "grammar": 2,
-    "hasCompleteLabel": true,
-    "hasDecimal": true
-  },
-  "r16AssignableAdvisorRoster": {
-    "direction": {
-      "scope": "full",
-      "count": 6,
-      "rows": [
-        {
-          "id": "ase-braulio-hernandez",
-          "nombre": "Braulio Hernández",
-          "activo": true,
-          "assignable": true,
-          "roleEligible": true,
-          "paises": [
-            "GT"
-          ]
-        },
-        {
-          "id": "ase-carlos-castro",
-          "nombre": "Carlos Castro",
-          "activo": true,
-          "assignable": true,
-          "roleEligible": true,
-          "paises": [
-            "CO",
-            "GT"
-          ]
-        },
-        {
-          "id": "ase-fernando-arias",
-          "nombre": "Fernando Arias",
-          "activo": true,
-          "assignable": true,
-          "roleEligible": true,
-          "paises": [
-            "GT"
-          ]
-        },
-        {
-          "id": "ase-johanna-salgado",
-          "nombre": "Johanna Salgado",
-          "activo": true,
-          "assignable": true,
-          "roleEligible": true,
-          "paises": [
-            "GT"
-          ]
-        },
-        {
-          "id": "ase-paula-osorio",
-          "nombre": "Paula Osorio",
-          "activo": true,
-          "assignable": true,
-          "roleEligible": true,
-          "paises": [
-            "CO",
-            "GT"
-          ]
-        },
-        {
-          "id": "ase-samuel-daza",
-          "nombre": "Samuel Daza",
-          "activo": true,
-          "assignable": true,
-          "roleEligible": true,
-          "paises": [
-            "CO",
-            "GT"
-          ]
-        }
-      ]
-    },
-    "operative": {
-      "scope": "full",
-      "count": 6,
-      "rows": [
-        {
-          "id": "ase-braulio-hernandez",
-          "nombre": "Braulio Hernández",
-          "activo": true,
-          "assignable": true,
-          "roleEligible": true,
-          "paises": [
-            "GT"
-          ]
-        },
-        {
-          "id": "ase-carlos-castro",
-          "nombre": "Carlos Castro",
-          "activo": true,
-          "assignable": true,
-          "roleEligible": true,
-          "paises": [
-            "CO",
-            "GT"
-          ]
-        },
-        {
-          "id": "ase-fernando-arias",
-          "nombre": "Fernando Arias",
-          "activo": true,
-          "assignable": true,
-          "roleEligible": true,
-          "paises": [
-            "GT"
-          ]
-        },
-        {
-          "id": "ase-johanna-salgado",
-          "nombre": "Johanna Salgado",
-          "activo": true,
-          "assignable": true,
-          "roleEligible": true,
-          "paises": [
-            "GT"
-          ]
-        },
-        {
-          "id": "ase-paula-osorio",
-          "nombre": "Paula Osorio",
-          "activo": true,
-          "assignable": true,
-          "roleEligible": true,
-          "paises": [
-            "CO",
-            "GT"
-          ]
-        },
-        {
-          "id": "ase-samuel-daza",
-          "nombre": "Samuel Daza",
-          "activo": true,
-          "assignable": true,
-          "roleEligible": true,
-          "paises": [
-            "CO",
-            "GT"
-          ]
-        }
-      ]
-    },
-    "sameCountry": "GT",
-    "minimalFields": true
-  },
   "failure": {
-    "message": "page.waitForFunction: Timeout 20000ms exceeded.",
-    "stack": "page.waitForFunction: Timeout 20000ms exceeded.\n    at r23ProofSnapshot (/home/runner/work/orbit360-core/orbit360-core/tools/gravicentra-i6-5-b4-003-preview-proof.mjs:170:11)\n    at async file:///home/runner/work/orbit360-core/orbit360-core/tools/gravicentra-i6-5-b4-003-preview-proof.mjs:1353:18"
+    "message": "B4_003_R13_POLICY_SEARCH_DOM_METRIC_MISSING:{\"wallMs\":773,\"browser\":{\"inputToCorrectDomMs\":null,\"mutationCount\":2,\"inputPresent\":true},\"measurement\":\"Chrome input event to exact filtered DOM\"}",
+    "stack": "Error: B4_003_R13_POLICY_SEARCH_DOM_METRIC_MISSING:{\"wallMs\":773,\"browser\":{\"inputToCorrectDomMs\":null,\"mutationCount\":2,\"inputPresent\":true},\"measurement\":\"Chrome input event to exact filtered DOM\"}\n    at need (file:///home/runner/work/orbit360-core/orbit360-core/tools/gravicentra-i6-5-b4-003-preview-proof.mjs:13:32)\n    at file:///home/runner/work/orbit360-core/orbit360-core/tools/gravicentra-i6-5-b4-003-preview-proof.mjs:1110:2"
   }
 }
