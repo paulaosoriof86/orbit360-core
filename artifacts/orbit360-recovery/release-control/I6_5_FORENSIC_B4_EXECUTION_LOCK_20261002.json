@@ -589,7 +589,7 @@
     "blobSha": "87bab7ee2778a0525cdbe81cf4cbf82020bf6139"
   },
   "findingLedgerBlobSha": "2022d17bad1ed9081b7b95f30571461ca945216b",
-  "continuityRegisterBlobSha": "c1f63f6fce7ddaa4649ce422c4ff4820d85d1284",
+  "continuityRegisterBlobSha": "dad3cec5579d9e1dea5175397456c3fc650ee87b",
   "compositionLockBlobSha": "d67fb30e2e807fed42716d611bf7c6fb7bfb53fd",
   "r18SourceFix": {
     "status": "SOURCE_FIXED_R18_PENDING_CONTRACT_AND_EXACT_PREVIEW",
@@ -2001,5 +2001,27 @@
     "noRealRows": true,
     "mandatoryCleanup": true,
     "noLive": true
+  },
+  "paulaVisualStatusBindingRootfix": {
+    "status": "EXACT_THREE_FINDING_STATUS_ALIGNMENT",
+    "diffs": [
+      {
+        "id": "B4-003-R19-07-INICIO-MONTHLY-ADVISOR-READINESS-REGRESSION",
+        "old": "MACHINE_PASS_PENDING_PAULA_VISUAL",
+        "new": "PAULA_VISUAL_REJECTED_20261010_SOURCE_FIXED_PREVIEW_REQUIRED"
+      },
+      {
+        "id": "B4-003-R20-V2-04-COLLAB-UX-COMMIT-SEMANTICS",
+        "old": "R22_SOURCE_PATCH_PENDING_EXACT_PREVIEW_AND_PAULA_UAT",
+        "new": "PAULA_VISUAL_REJECTED_20261010_SOURCE_FIXED_PREVIEW_REQUIRED"
+      },
+      {
+        "id": "B4-003-R20-V2-16-SURFACE-HIERARCHY",
+        "old": "SOURCE_FIX_IN_PROGRESS_PENDING_EXACT_PREVIEW_AND_PAULA_UAT",
+        "new": "PAULA_VISUAL_REJECTED_20261010_SOURCE_FIXED_PREVIEW_REQUIRED"
+      }
+    ],
+    "productChanged": false,
+    "realWrites": 0
   }
 }

@@ -1,0 +1,29 @@
+{
+  "schema": "GRAVICENTRA_B4_003_EXACT_CONTINUITY_ALIGNMENT_20261010",
+  "beforeHead": "81b4ac22eb5bda52609988853362731b15589c8c",
+  "ledgerSha": "2022d17bad1ed9081b7b95f30571461ca945216b",
+  "carrySha": "dad3cec5579d9e1dea5175397456c3fc650ee87b",
+  "b4Sha": "c2bfccc1645f193251c17c208f36340d1f457567",
+  "controlSha": "1a5bf8ec3ce1894f347fb32a5bac81794a7bbf5d",
+  "diffs": [
+    {
+      "id": "B4-003-R19-07-INICIO-MONTHLY-ADVISOR-READINESS-REGRESSION",
+      "old": "MACHINE_PASS_PENDING_PAULA_VISUAL",
+      "new": "PAULA_VISUAL_REJECTED_20261010_SOURCE_FIXED_PREVIEW_REQUIRED"
+    },
+    {
+      "id": "B4-003-R20-V2-04-COLLAB-UX-COMMIT-SEMANTICS",
+      "old": "R22_SOURCE_PATCH_PENDING_EXACT_PREVIEW_AND_PAULA_UAT",
+      "new": "PAULA_VISUAL_REJECTED_20261010_SOURCE_FIXED_PREVIEW_REQUIRED"
+    },
+    {
+      "id": "B4-003-R20-V2-16-SURFACE-HIERARCHY",
+      "old": "SOURCE_FIX_IN_PROGRESS_PENDING_EXACT_PREVIEW_AND_PAULA_UAT",
+      "new": "PAULA_VISUAL_REJECTED_20261010_SOURCE_FIXED_PREVIEW_REQUIRED"
+    }
+  ],
+  "productSourceChanged": false,
+  "realBusinessWrites": 0,
+  "productionTouched": false,
+  "previewRequired": true
+}

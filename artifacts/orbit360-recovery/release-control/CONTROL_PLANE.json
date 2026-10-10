@@ -4869,7 +4869,7 @@
       "entryGuardReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_ENTRY_GUARD_PASS_20261002.json",
       "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
       "executionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B4_EXECUTION_LOCK_20261002.json",
-      "executionLockBlobSha": "402b571d1705eaf31b10b14c49374a3dd404a2f0",
+      "executionLockBlobSha": "c2bfccc1645f193251c17c208f36340d1f457567",
       "compositionLockBlobSha": "d67fb30e2e807fed42716d611bf7c6fb7bfb53fd",
       "findingLedgerBlobSha": "2022d17bad1ed9081b7b95f30571461ca945216b",
       "activeFindingId": "B4-003",
@@ -6013,7 +6013,7 @@
     "activeFindingId": "B4-003",
     "findingContinuityRegisterBlobSha": "11ffaf6e7c691064be947fdc1af00b08d8fb8f9c",
     "findingContinuityGuardBlobSha": "868a0ba1a492d9adc8d91655f152b6fa7980f499",
-    "continuityRegisterBlobSha": "c1f63f6fce7ddaa4649ce422c4ff4820d85d1284",
+    "continuityRegisterBlobSha": "dad3cec5579d9e1dea5175397456c3fc650ee87b",
     "masterPendingClosurePlanPath": "artifacts/orbit360-recovery/release-control/I6_PENDING_CLOSURE_MASTER_PLAN_LOCK_20261004.json",
     "masterPendingClosurePlanBlobSha": "9d7ba423caf0aa09a0e2af4a1ed4713ea867d17a",
     "listingHumanProofStillRequired": true
@@ -6311,7 +6311,7 @@
     "status": "B4_003_R23_SOURCE_STAGED_PENDING_PREVIEW",
     "activeFindingId": "B4-003",
     "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
-    "executionLockBlobSha": "402b571d1705eaf31b10b14c49374a3dd404a2f0",
+    "executionLockBlobSha": "c2bfccc1645f193251c17c208f36340d1f457567",
     "compositionLockBlobSha": "d67fb30e2e807fed42716d611bf7c6fb7bfb53fd",
     "findingLedgerBlobSha": "2022d17bad1ed9081b7b95f30571461ca945216b",
     "noLive": true,
@@ -9299,5 +9299,27 @@
     "noRealRows": true,
     "mandatoryCleanup": true,
     "noLive": true
+  },
+  "paulaVisualStatusBindingRootfix": {
+    "status": "EXACT_THREE_FINDING_STATUS_ALIGNMENT",
+    "diffs": [
+      {
+        "id": "B4-003-R19-07-INICIO-MONTHLY-ADVISOR-READINESS-REGRESSION",
+        "old": "MACHINE_PASS_PENDING_PAULA_VISUAL",
+        "new": "PAULA_VISUAL_REJECTED_20261010_SOURCE_FIXED_PREVIEW_REQUIRED"
+      },
+      {
+        "id": "B4-003-R20-V2-04-COLLAB-UX-COMMIT-SEMANTICS",
+        "old": "R22_SOURCE_PATCH_PENDING_EXACT_PREVIEW_AND_PAULA_UAT",
+        "new": "PAULA_VISUAL_REJECTED_20261010_SOURCE_FIXED_PREVIEW_REQUIRED"
+      },
+      {
+        "id": "B4-003-R20-V2-16-SURFACE-HIERARCHY",
+        "old": "SOURCE_FIX_IN_PROGRESS_PENDING_EXACT_PREVIEW_AND_PAULA_UAT",
+        "new": "PAULA_VISUAL_REJECTED_20261010_SOURCE_FIXED_PREVIEW_REQUIRED"
+      }
+    ],
+    "productChanged": false,
+    "realWrites": 0
   }
 }
