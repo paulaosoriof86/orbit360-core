@@ -89,7 +89,7 @@
     ],
     "reimportAuthorized": false,
     "livePromotionAuthorized": false,
-    "syntheticQaWritesAuthorized": false,
+    "syntheticQaWritesAuthorized": true,
     "syntheticQaScope": "R20 exact Preview only: disposable insurer/logo/product/plan/requirement/document and Ops/Leads handoff/cadence fixtures; mandatory server commit, readback, reload and cleanup; no real operational row mutation.",
     "paulaVisualAcceptanceRequiredBeforeAdvance": true,
     "cotcompRealTransportAuthorized": false,
@@ -1993,5 +1993,13 @@
     "qaOwner": "tools/gravicentra-i6-5-b4-003-preview-proof.mjs",
     "noLive": true,
     "noRealDataMutation": true
+  },
+  "r23PaulaVisualQaGateFixtureReopen": {
+    "status": "SYNTHETIC_QA_ONLY_REOPENED",
+    "reason": "Exact Preview executor R23 requires synthetic fixture writes for authenticated document and collaboration proof; previous machine-sealed false skipped the runtime proof",
+    "scope": "Exact B4-003 isolated Preview only",
+    "noRealRows": true,
+    "mandatoryCleanup": true,
+    "noLive": true
   }
 }

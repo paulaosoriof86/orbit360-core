@@ -1,0 +1,12 @@
+{
+  "schema": "GRAVICENTRA_B4_003_R23_SYNTHETIC_QA_GATE_REOPEN_20261010",
+  "before": "0bbe697b7f5c7529d1b401c5c9d19a4e4049dd48",
+  "lockBlob": "402b571d1705eaf31b10b14c49374a3dd404a2f0",
+  "controlBlob": "8accacda263a27c2605b3de7ce1026eaf1d0a89c",
+  "flag": true,
+  "syntheticOnly": true,
+  "businessWrites": false,
+  "productionTouched": false,
+  "reason": "Exact Preview executor R23 requires synthetic fixture writes for authenticated document and collaboration proof; previous machine-sealed false skipped the runtime proof",
+  "expect": "R23_CONTRACT_AND_EXACT_PREVIEW"
+}
