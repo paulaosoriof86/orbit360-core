@@ -12606,5 +12606,14 @@
     "productionMutation": false,
     "operationalWrites": 0,
     "expectedLedgerSha": "ccc5fa4fabf03bb44d2954e1db37135ad0c8ea9f"
+  },
+  "r23QaRenderDiagnostic": {
+    "status": "QA_ONLY_ROOT_CAUSE_DIAGNOSTIC_STAGED_PREVIEW_RETRY_REQUIRED",
+    "qaBlobSha": "5a1f64f984a6caf5e6cc6066ac6dd11a5235b9eb",
+    "previousQaBlobSha": "aac870e756c5bdf6ab29a66e6afbafeb7177b6f7",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R23_RENDER_DIAGNOSTIC_QA_ONLY_20261010.json",
+    "receiptBlobSha": "12d1001b7bb7737eb77b084b27d0b6becc02777b",
+    "realWrites": 0,
+    "productChanged": false
   }
 }

@@ -167,7 +167,18 @@ async function r23ProofSnapshot(browser,who,country,month){
  try{await applyLegal(p,who);await p.goto(target+'/#/inicio',{waitUntil:'domcontentloaded',timeout:60000});await bootProduct(p,token);
   const api=await p.evaluate(async({tenantId,role,country,month})=>Orbit.productRuntimeBrowserProvidersP0.callFunction('orbit360AssignableAdvisorRosterPreview',{tenantId,activeRole:role,country,month,purpose:'inicio'},'us-east1'),{tenantId,role:who.activeRole,country,month});
   await p.evaluate(c=>{Orbit.pais=c;Orbit.modules.inicio.render(document.getElementById('host'));},country);
-  await p.waitForFunction(()=>document.querySelector('[data-inicio-advisor-id]')||document.querySelector('[data-inicio-advisor-readiness="ready-empty"]'),null,{timeout:20000});
+  try{
+   await p.waitForFunction(()=>document.querySelector('[data-inicio-advisor-id]')||document.querySelector('[data-inicio-advisor-readiness="ready-empty"]'),null,{timeout:12000});
+  }catch(error){
+   const diagnostics=await p.evaluate(({country,month})=>{
+    const st=Orbit.store?._productStatus?.()||{},roster=Orbit.assignableAdvisorRoster;
+    return{hash:String(location.hash||''),route:Orbit.route?.key||'',role:String(Orbit.session?.rol?.()||''),authUid:String(Orbit.auth?.productUser?.uid||''),country:Orbit.pais||'',month,hostText:String(document.getElementById('host')?.innerText||'').slice(0,1400),advisorReadiness:document.querySelector('[data-inicio-advisor-readiness]')?.getAttribute('data-inicio-advisor-readiness')||'',advisorRendered:document.querySelectorAll('[data-inicio-advisor-id]').length,store:{ready:st.ready,status:st.status,serverConfirmed:st.serverConfirmedCollections,denied:st.deniedCollections,snapshotErrors:st.snapshotErrors,optional:st.optionalCollections},clientStatus:roster?.dashboardStatus?.(),clientAvailable:typeof roster?.dashboardList==='function',queriedCountry:country};
+   },{country,month});
+   let clientCall;
+   try{clientCall=await p.evaluate(async({country,month})=>{const v=await Orbit.assignableAdvisorRoster.dashboardList(country,month);return{count:v.length,ids:v.map(x=>x.id).slice(0,20)};},{country,month});}
+   catch(e){clientCall={error:String(e&&e.message||e)};}
+   throw new Error('B4_003_R23_UI_NOT_MATERIALIZED:'+JSON.stringify({actor:who.uid,activeRole:who.activeRole,country,month,backend:{scope:api?.scope,count:api?.rows?.length,ids:(api?.rows||[]).map(x=>x.id).slice(0,20)},diagnostics,clientCall})+'|'+String(error?.message||error));
+  }
   const ui=await p.evaluate(()=>({ids:[...new Set([...document.querySelectorAll('[data-inicio-advisor-id]')].map(e=>e.getAttribute('data-inicio-advisor-id')))].sort(),overflow:document.documentElement.scrollWidth>innerWidth+2}));
   await p.reload({waitUntil:'domcontentloaded'});await bootProduct(p,token);await p.evaluate(c=>{Orbit.pais=c;Orbit.modules.inicio.render(document.getElementById('host'));},country);
   await p.waitForFunction(()=>document.querySelector('[data-inicio-advisor-id]')||document.querySelector('[data-inicio-advisor-readiness="ready-empty"]'),null,{timeout:20000});

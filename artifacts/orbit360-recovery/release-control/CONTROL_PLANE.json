@@ -9023,7 +9023,7 @@
     "noReimport": true
   },
   "r23InicioProgress": {
-    "status": "R23_GOVERNANCE_DRIFT_ROOTFIX_PREVIEW_DISPATCH_READY",
+    "status": "R23_QA_DIAGNOSTIC_RETRY_REQUIRED",
     "finding": "B4-003-R19-07-INICIO-MONTHLY-ADVISOR-READINESS-REGRESSION",
     "rootCause": "Inicio uses Equipo-protected asesores/metas and assignment roster omits nonassignable advisors.",
     "scope": "Dedicated Inicio-only projection with member/country/dataScope/activeRole authorization, no Equipo admin grant.",
@@ -9032,7 +9032,7 @@
       "client": "b70c0f0355a6284fcb8b586cfc9c02aad0b2b97f",
       "inicio": "8df1c5f2b1907adab135e23e52b4193f4e623667",
       "index": "0915d7c9b168f51adfa91c895f1842ea3087306c",
-      "qa": "aac870e756c5bdf6ab29a66e6afbafeb7177b6f7"
+      "qa": "5a1f64f984a6caf5e6cc6066ac6dd11a5235b9eb"
     },
     "compositionBlobSha": "2cd985e5ffc848f4417042b5ef34bb7f05db240f",
     "findingLedgerBlobSha": "ccc5fa4fabf03bb44d2954e1db37135ad0c8ea9f",
@@ -9062,5 +9062,14 @@
     "noProductSourceChange": true,
     "noLive": true,
     "noBusinessWrites": true
+  },
+  "r23QaRenderDiagnostic": {
+    "status": "QA_ONLY_ROOT_CAUSE_DIAGNOSTIC_STAGED_PREVIEW_RETRY_REQUIRED",
+    "qaBlobSha": "5a1f64f984a6caf5e6cc6066ac6dd11a5235b9eb",
+    "previousQaBlobSha": "aac870e756c5bdf6ab29a66e6afbafeb7177b6f7",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R23_RENDER_DIAGNOSTIC_QA_ONLY_20261010.json",
+    "receiptBlobSha": "12d1001b7bb7737eb77b084b27d0b6becc02777b",
+    "realWrites": 0,
+    "productChanged": false
   }
 }

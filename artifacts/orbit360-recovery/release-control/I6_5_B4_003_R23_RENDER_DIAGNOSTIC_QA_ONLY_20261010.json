@@ -1,0 +1,15 @@
+{
+  "schema": "GRAVICENTRA_B4_003_R23_QA_DIAGNOSTIC",
+  "status": "QA_ONLY_ROOT_CAUSE_DIAGNOSTIC_STAGED_PREVIEW_RETRY_REQUIRED",
+  "priorFailRun": 38059853721,
+  "priorFailReceiptBlobSha": "e898eb953c4e967f3fd05755bd7568b3943ad234",
+  "priorFailure": "R23 waitForFunction missing visible adviser rows or ready-empty within 20s",
+  "improvement": "Captures authenticated role, route, store hydration, backend rows, client dashboardList and UI after bounded wait",
+  "oldQaBlobSha": "aac870e756c5bdf6ab29a66e6afbafeb7177b6f7",
+  "newQaBlobSha": "5a1f64f984a6caf5e6cc6066ac6dd11a5235b9eb",
+  "noProductSourceChange": true,
+  "noProductionChange": true,
+  "noRealDataWrites": true,
+  "renewalDryRunExceptionOpen": true,
+  "liveLineageUnresolved": true
+}
