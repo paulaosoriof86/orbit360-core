@@ -245,5 +245,16 @@
     "priorR22VisualAcceptanceInvalidatedForChangedInicio": true,
     "exactPaulaVisualRequired": true,
     "sourceShaPendingCommit": true
+  },
+  "r23InboxAutoNavigationRootFix": {
+    "status": "CAUSAL_PRODUCT_SOURCE_FIXED_AUTHENTICATED_PREVIEW_REQUIRED",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R23_INBOX_AUTONAV_ROOT_CAUSE_FIX_20261010.json",
+    "receiptBlobSha": "ffce7c45582fc0c03fc9091bf7fd1a455ea41241",
+    "newIndexBlobSha": "c92ac86d311f0d3349a98e21e0c6acd3d2b15fdc",
+    "newQaBlobSha": "8c4326ed108af13a2b61f81d72c0ecaa11a8b0c8",
+    "newContractBlobSha": "a34f44d0885b13be6fd163ddbbfcedca20c46727",
+    "productionUntouched": true,
+    "exactNewPreviewRequired": true,
+    "priorR22AndR23PreviewNotVisualAcceptance": true
   }
 }

@@ -1,0 +1,46 @@
+{
+  "schema": "GRAVICENTRA_B4_003_R23_INBOX_AUTONAV_ROOTFIX",
+  "date": "2026-10-10",
+  "failedAuthenticatedRunId": 38061717269,
+  "failedProofBlobSha": "b0fb23974a6eb5f773ba1bab0eb7b5016ea57d83",
+  "rootCause": "index.html inbox maybePendingLanding automatically navigated to Ops or Leads on unread real handoff while the user was working in Inicio; synthetic notices had been excluded by R22, leaving real inbox auto-navigation.",
+  "causeDemonstratedBy": {
+    "expected": "#/inicio",
+    "actual": "#/ops",
+    "actorRole": "direccion",
+    "backendAuthorizedGTAdvisors": 6,
+    "authUidPresent": true,
+    "firestoreConfirmed": true
+  },
+  "sourceScope": [
+    "orbit360-platform/index.html"
+  ],
+  "removedBehaviors": [
+    "automatic unread-notice route hijack",
+    "automatic return-home route after notice resolution"
+  ],
+  "preservedBehaviors": [
+    "inbox notices and counters",
+    "explicit user-click routeRow",
+    "acknowledge and resolve actions",
+    "authenticated/role-scoped backend and persistence"
+  ],
+  "sourceBefore": {
+    "orbit360-platform/index.html": "0915d7c9b168f51adfa91c895f1842ea3087306c"
+  },
+  "sourceAfter": {
+    "orbit360-platform/index.html": "c92ac86d311f0d3349a98e21e0c6acd3d2b15fdc"
+  },
+  "qaBlobs": {
+    "preview": "8c4326ed108af13a2b61f81d72c0ecaa11a8b0c8",
+    "contract": "a34f44d0885b13be6fd163ddbbfcedca20c46727"
+  },
+  "codeChanged": true,
+  "newImmutableArtifactRequired": true,
+  "operationalWrites": 0,
+  "productionDeployment": false,
+  "previewAcceptance": false,
+  "renewalDryRunOpen": true,
+  "liveLineageUnresolved": true,
+  "status": "CAUSAL_PRODUCT_SOURCE_FIXED_AUTHENTICATED_PREVIEW_REQUIRED"
+}

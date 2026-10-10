@@ -96,7 +96,7 @@
     (function(){var sw=document.getElementById('lg-sw');if(sw)sw.innerHTML=Orbit.theme.PALETTES.slice(0,6).map(function(p){return '<button title="'+p.name+'" data-p="'+p.id+'" style="background:'+p.primary+'"></button>';}).join('');sw&&sw.querySelectorAll('button').forEach(function(b){b.addEventListener('click',function(){Orbit.theme.apply(b.dataset.p);});});})();
     (function(){var sel=document.getElementById('rol-sel'),lbl=document.getElementById('tb-rol-lbl');function roles(){return Orbit.session&&Orbit.session.allowedRoles?Orbit.session.allowedRoles():[];}function label(r){return Orbit.session&&Orbit.session.roleLabel?Orbit.session.roleLabel(r):r;}function rebuild(){if(Orbit.router&&Orbit.router.rebuildSidebar)Orbit.router.rebuildSidebar();try{window.dispatchEvent(new HashChangeEvent('hashchange'));}catch(e){window.dispatchEvent(new Event('hashchange'));}}function paint(){var list=roles(),active=Orbit.session&&Orbit.session.rol?Orbit.session.rol():'';if(!list.length){sel.innerHTML='<option value="">Acceso en validación</option>';sel.disabled=true;if(lbl)lbl.textContent='Acceso en validación · salir';return;}sel.disabled=false;sel.innerHTML=list.map(function(r){return '<option value="'+r+'">'+label(r)+'</option>';}).join('');if(active&&list.indexOf(active)>=0)sel.value=active;else sel.value=list[0];if(lbl)lbl.textContent=label(active&&list.indexOf(active)>=0?active:list[0])+' · salir';}paint();sel.addEventListener('change',function(e){e.stopPropagation();var ok=Orbit.session&&Orbit.session.set?Orbit.session.set(sel.value):false;if(ok===false)paint();});document.addEventListener('orbit:session',function(){paint();rebuild();});document.addEventListener('orbit:session:blocked',paint);window.addEventListener('orbit:product-readonly-bootstrap',function(e){if(e&&e.detail&&e.detail.ready===true){if(Orbit.session&&Orbit.session.syncFromAuth)Orbit.session.syncFromAuth();else paint();}});})();
     (function(){
-      var bell=document.getElementById('ops-inbox-bell'),cnt=document.getElementById('ops-inbox-count'),rows=[],refreshFlight=null,refreshKey='',refreshSequence=0,lastRenderedScope='',refreshState='idle',lastPublishedInboxSignature='',startupLandingDone=false,autoLandingSurface='';
+      var bell=document.getElementById('ops-inbox-bell'),cnt=document.getElementById('ops-inbox-count'),rows=[],refreshFlight=null,refreshKey='',refreshSequence=0,lastRenderedScope='',refreshState='idle',lastPublishedInboxSignature='';
       function tenant(){var x=window.__ORBIT360_PRODUCT_PUBLIC_CONFIG__||{};return String(x.tenantHint||'').trim();}
       function preview(){return /--/.test(String(location.hostname||''));}
       function activeRole(){try{return Orbit.session&&Orbit.session.rol?Orbit.session.rol():'';}catch(e){return'';}}
@@ -115,32 +115,7 @@
       function paint(){var n=rows.filter(function(r){return !r.archived&&!r.globalResolved&&!r.read&&!r.acknowledged;}).length;if(cnt){cnt.textContent=n||'';cnt.style.display=n?'grid':'none';}if(bell)bell.title=n?'Tareas compartidas nuevas · '+n:'Tareas y solicitudes compartidas';publishInboxProjection();}
       /* New and still-unread handoffs alone can determine a one-time landing.
          Previously ACKNOWLEDGED tasks must never force Ops/Leads on the next login. */
-      function newHandoffForSurface(r,surface){
-        // Synthetic Preview QA notices stay visible but cannot redirect an operational session.
-        const qaOnly=/--/.test(String(location.hostname||'')) &&
-          (/^b4003qa[_:-]/i.test(String(r&&r.entityId||'')) ||
-           /^B4-003 R\d+\b/i.test(String(r&&r.message||'')));
-        return !!(r&&surface&&!qaOnly&&!r.archived&&!r.globalResolved&&!r.acknowledged&&!r.read
-          &&(r.targetSurface||(r.direction==='operations'?'ops':'leads'))===surface);
-      }
-      function maybePendingLanding(){
-        if(startupLandingDone)return;
-        var role=String(activeRole()||'').toLowerCase(),surface=/operativo|admin|direcci[oó]n|superadmin/.test(role)?'ops':/asesor|comercial|asistente/.test(role)?'leads':'';
-        if(!surface)return;
-        startupLandingDone=true; // never interrupt a working session after initial inbox hydration
-        var current=String(location.hash||'');
-        if(current&&current!=='#/inicio')return; // explicit deep links stay authoritative
-        if(rows.some(function(r){return newHandoffForSurface(r,surface);})){
-          autoLandingSurface=surface;
-          location.hash='#/'+surface;
-        }
-      }
-      function returnHomeIfAutoLandingComplete(){
-        if(!autoLandingSurface||String(location.hash||'')!=='#/'+autoLandingSurface)return;
-        if(rows.some(function(r){return newHandoffForSurface(r,autoLandingSurface);} ))return;
-        autoLandingSurface='';
-        location.hash='#/inicio';
-      }
+      // R23: inbox is a notification surface, never an automatic navigation owner.
       function inboxScope(){var auth=Orbit.auth&&Orbit.auth.productUser||{};return [tenant(),String(auth.uid||''),activeRole()].join('|');}
       function refresh(force){
         if(!tenant())return Promise.resolve(rows);
@@ -154,7 +129,7 @@
         var flight=call(preview()?'orbit360GetAdvisorOpsInboxPreview':'orbit360GetAdvisorOpsInbox',{tenantId:tenant(),activeRole:role,limit:100,includeArchived:true})
           .then(function(out){
             if(seq!==refreshSequence||key!==inboxScope())return rows;
-            rows=[].concat(out&&out.notices||[]);refreshState='ready';paint();maybePendingLanding();
+            rows=[].concat(out&&out.notices||[]);refreshState='ready';paint();
             var dr=document.getElementById('ops-inbox-drawer');if(dr?.classList.contains('open'))open();
             return rows;
           }).catch(function(e){
@@ -207,7 +182,7 @@
           var old=b.textContent;b.disabled=true;b.textContent=pendingText;b.setAttribute('aria-busy','true');
           updateState(row,action).then(function(){return refresh(true);}).then(function(){
             if(Orbit.ui&&Orbit.ui.toast)Orbit.ui.toast(successText);
-            if(action==='acknowledge'||action==='resolve')returnHomeIfAutoLandingComplete();
+            
             open();
           }).catch(function(){
             b.disabled=false;b.textContent=old;b.removeAttribute('aria-busy');

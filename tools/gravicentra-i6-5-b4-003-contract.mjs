@@ -553,6 +553,8 @@ need(lock.boundaries?.businessWritesAuthorized===false&&lock.boundaries?.dataMut
 need(lock.boundaries?.syntheticQaWritesAuthorized===true,'B4_003_SYNTHETIC_QA_NOT_AUTHORIZED');
 
 if(control.nextAction==='I6_5_FORENSIC_REMEDIATION_B4_003_R23_CONTRACT_AND_EXACT_PREVIEW'){
+ need(!index.includes('maybePendingLanding()')&&!index.includes('autoLandingSurface')&&!index.includes('returnHomeIfAutoLandingComplete()')&&index.includes('function routeRow(row)'),'B4_003_R23_INBOX_AUTOROUTE_NOT_REMOVED');
+ need(previewProof.includes('B4_003_R23_INBOX_UNAUTHORIZED_NAVIGATOR_RELOAD'),'B4_003_R23_INBOX_NAVIGATION_AUTHENTICATED_GUARD_MISSING');
  need(lock.r23CausalAuthorization?.status==='SCOPED_R23_SOURCE_MUTATION_APPROVED_WITHIN_B4_003'&&control.r23InicioProgress?.liveLineageUnresolved===true,'B4_003_R23_AUTHORITY_NOT_FROZEN');
  need(rosterBackend.includes('async function r23Dashboard(request)')&&rosterBackend.includes("request.data?.purpose==='inicio'")&&rosterBackend.includes("country,month,scope,rows"),'B4_003_R23_SECURE_BACKEND_PROJECTION_MISSING');
  need(rosterClient.includes('dashboardList,dashboardPeek,dashboardStatus')&&inicio.includes('api.dashboardList(country,month)')&&index.includes('modules/inicio.js?v=20261010-r23'),'B4_003_R23_PRODUCT_CLIENT_INICIO_NOT_BOUND');
