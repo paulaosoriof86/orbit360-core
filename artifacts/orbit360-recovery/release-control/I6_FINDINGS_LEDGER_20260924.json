@@ -12510,7 +12510,7 @@
       "orbit360-platform/index.html": "0915d7c9b168f51adfa91c895f1842ea3087306c"
     },
     "qaOwner": "tools/gravicentra-i6-5-b4-003-preview-proof.mjs",
-    "qaBlob": "874ac2e82662bb04bb6ad7e74d748d26ec85ae71",
+    "qaBlob": "ac173f9a2f3e6edb84effe5e1f4d467cf34e6c39",
     "priorHead": "25c4d44f7da43e85a5d76ccba05398955e63a574",
     "priorR22MachineAcceptedAsHistorical": true,
     "sourceChanged": true,
@@ -12584,7 +12584,7 @@
     "sourceOwner": "orbit360-platform/modules/inicio.js",
     "sourceBlobSha": "c2f346b4feece309c1c19e307f5b7b841fbd5119",
     "qaOwner": "tools/gravicentra-i6-5-b4-003-preview-proof.mjs",
-    "qaBlobSha": "874ac2e82662bb04bb6ad7e74d748d26ec85ae71",
+    "qaBlobSha": "ac173f9a2f3e6edb84effe5e1f4d467cf34e6c39",
     "rootCause": "Inicio was using canonical role-scoped backend projection only in Operativo, but non-Operativo roles used unrelated store/leaderboard data; UI parity against the same backend could not hold.",
     "remediation": "Use R23 backend scoped advisor and goals projection for all authorized active roles; remove direct asesores/metas readiness for this board; retain GTQ/COP separation; select active role explicitly in authenticated QA and record IDs first paint/reload.",
     "proof": "PENDING_NEW_IMMUTABLE_PREVIEW_AND_AUTHENTICATED_E2E",
@@ -12611,5 +12611,23 @@
     "previewRequired": true,
     "liveTouched": false,
     "operationalWrites": 0
+  },
+  "r23InsurerDriveViewerSourceFix": {
+    "status": "SOURCE_FIXED_EXACT_AUTHENTICATED_PREVIEW_REQUIRED",
+    "finding": "B4-003-R20-V2-08-INSURER-DRIVE-EMBED-RBAC",
+    "gate": "I6.5/B4-003",
+    "previousFailedRun": 38073899886,
+    "previousFailure": "B4_003_DRIVE_BROWSER_OPEN_NOT_CONFIRMED",
+    "cause": "Asynchronous insurer Drive viewer retained old panel reference across potential re-render and concealed read failures in a transient toast; backend HTTP200 alone does not prove usable document bytes.",
+    "owner": "orbit360-platform/modules/aseguradoras.js",
+    "ownerBlobBefore": "28bb3f15a1ca20130b194bb2dd5b1d296984927d",
+    "ownerBlobAfter": "9e56c296b55da499b52f42c462c668aa2f32eba7",
+    "qaBlobSha": "ac173f9a2f3e6edb84effe5e1f4d467cf34e6c39",
+    "fix": "Reacquire current connected panel after awaited secure provider read; show explicit document error when unavailable; separately assert protected read with sanitized response metadata.",
+    "noNewPermissions": true,
+    "productionTouched": false,
+    "realBusinessWrites": 0,
+    "passClaim": false,
+    "liveLineageUnresolved": true
   }
 }

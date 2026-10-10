@@ -1,0 +1,37 @@
+{
+  "schema": "GRAVICENTRA_B4_003_R23_DRIVE_VIEWER_SOURCE_FIX",
+  "date": "2026-10-10",
+  "headBefore": "54b4c3a5ae1b2c860e2c58fb8e8b421d98a5d2d8",
+  "findingsCount": 282,
+  "fix": {
+    "status": "SOURCE_FIXED_EXACT_AUTHENTICATED_PREVIEW_REQUIRED",
+    "finding": "B4-003-R20-V2-08-INSURER-DRIVE-EMBED-RBAC",
+    "gate": "I6.5/B4-003",
+    "previousFailedRun": 38073899886,
+    "previousFailure": "B4_003_DRIVE_BROWSER_OPEN_NOT_CONFIRMED",
+    "cause": "Asynchronous insurer Drive viewer retained old panel reference across potential re-render and concealed read failures in a transient toast; backend HTTP200 alone does not prove usable document bytes.",
+    "owner": "orbit360-platform/modules/aseguradoras.js",
+    "ownerBlobBefore": "28bb3f15a1ca20130b194bb2dd5b1d296984927d",
+    "ownerBlobAfter": "9e56c296b55da499b52f42c462c668aa2f32eba7",
+    "qaBlobSha": "ac173f9a2f3e6edb84effe5e1f4d467cf34e6c39",
+    "fix": "Reacquire current connected panel after awaited secure provider read; show explicit document error when unavailable; separately assert protected read with sanitized response metadata.",
+    "noNewPermissions": true,
+    "productionTouched": false,
+    "realBusinessWrites": 0,
+    "passClaim": false,
+    "liveLineageUnresolved": true
+  },
+  "blobs": {
+    "insurer": "9e56c296b55da499b52f42c462c668aa2f32eba7",
+    "qa": "ac173f9a2f3e6edb84effe5e1f4d467cf34e6c39",
+    "composition": "a45a9ef3cef3aee00e787ed8582d74ed16ab1a5a",
+    "ledger": "ac41f8788884af757aeb845dc06aa3505bbcbdb3",
+    "carry": "9bef8102f62d51b2c883d54b0c5a368565170202",
+    "b4": "a74c72e037571f5298f8aca8b8a6b87a1ae078ea",
+    "control": "d090485dcc711e8fc26f1805a6bc3ac325d97367"
+  },
+  "test": "PENDING_EXACT_AUTHENTICATED_PREVIEW",
+  "prodChanged": false,
+  "operationalWrites": 0,
+  "productionPromotionForbidden": true
+}

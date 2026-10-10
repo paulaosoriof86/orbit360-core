@@ -1887,7 +1887,13 @@ try{
  await page.waitForFunction(name=>Array.from(document.querySelectorAll('#asg-ficha [data-drive-file]')).some(x=>String(x.innerText||'').includes(name)),driveFileName,{timeout:15000});
  proof.r20SecondDriveBrowser=await page.evaluate(name=>{const panel=document.querySelector('#asg-ficha [data-drive-browser="1"]'),file=Array.from(panel?.querySelectorAll('[data-drive-file]')||[]).find(x=>String(x.innerText||'').includes(name)),path=String(panel?.querySelector('[data-drive-path]')?.innerText||'');return{panel:!!panel,filePresent:!!file,path,rootButton:!!panel?.querySelector('[data-drive-root]')};},driveFileName);
  need(proof.r20SecondDriveBrowser.panel&&proof.r20SecondDriveBrowser.filePresent&&proof.r20SecondDriveBrowser.rootButton,'B4_003_R20_SECOND_REVIEW_INSURER_DRIVE_BROWSER_UI_MISSING:'+JSON.stringify(proof.r20SecondDriveBrowser));
- // R20 UAT4: discriminate a missing click handler from an unavailable Drive read.
+ // R20 UAT4: independently confirm a real dossier read without logging document content.
+ const directDossierRead=await page.evaluate(async ({documentRef,insurerId})=>{
+   const out=await Orbit.productDriveDocumentProviderP0.resolveDossier(documentRef,{entidad:'aseguradora',entidadId:insurerId,insurerId,sourceModule:'aseguradoras'});
+   return{ok:out?.ok===true,status:String(out?.status||''),mimeType:String(out?.mimeType||''),previewAvailable:out?.previewAvailable===true,downloadAvailable:out?.downloadAvailable===true,hasBlobUrl:/^blob:/.test(String(out?.previewUrl||out?.downloadUrl||'')),size:Number(out?.size||0)};
+ },{documentRef:driveDoc.documentRef,insurerId:ids.insurer});
+ proof.r20SecondDriveDossierRead=directDossierRead;
+ need(directDossierRead.ok&&directDossierRead.hasBlobUrl&&directDossierRead.downloadAvailable,'B4_003_DRIVE_DOSSIER_READBACK_NOT_USABLE:'+JSON.stringify(directDossierRead));
  // The same protected synthetic dossier remains authoritative; do not fake a preview.
  const dossierHttpTrace=[];
  const observeDossierHttp=async response=>{
@@ -1910,7 +1916,7 @@ try{
    const state=await page.evaluate(name=>{
      const p=document.querySelector('#asg-ficha [data-drive-preview]'),btn=Array.from(document.querySelectorAll('#asg-ficha [data-drive-file]')).find(x=>String(x.innerText||'').includes(name));
      const toasts=Array.from(document.querySelectorAll('.ciclo-toast,[role="alert"]')).map(el=>String(el.textContent||'').trim().slice(0,160)).filter(Boolean);
-     return{buttonPresent:!!btn,buttonDisabled:!!btn?.disabled,previewPresent:!!p,previewHidden:p?.hidden,previewTextLength:String(p?.innerText||'').length,toastMessages:toasts.slice(-3)};
+     return{buttonPresent:!!btn,buttonDisabled:!!btn?.disabled,buttonConnected:btn?.isConnected===true,previewPresent:!!p,previewConnected:p?.isConnected===true,previewHidden:p?.hidden,previewTextLength:String(p?.innerText||'').length,previewFailure:String(p?.querySelector('[data-dossier-read-status]')?.getAttribute('data-dossier-read-status')||''),toastMessages:toasts.slice(-3)};
    },driveFileName);
    proof.r20SecondDriveBrowserOpenDiagnostic={state,dossierHttpTrace,clickAttempt,errorName:String(error?.name||'TimeoutError')};
    console.log('B4_003_DRIVE_BROWSER_OPEN_CAUSAL_DIAGNOSTIC='+JSON.stringify(proof.r20SecondDriveBrowserOpenDiagnostic));

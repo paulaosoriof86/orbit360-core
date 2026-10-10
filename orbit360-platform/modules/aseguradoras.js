@@ -1160,7 +1160,30 @@ Orbit.modules.aseguradoras = (function () {
         rootFolder=out.rootFolderId||rootFolder;pathHost.textContent='Carpeta: '+(out.folderName||'Expediente');if(rootBtn){rootBtn.disabled=!rootFolder||out.currentFolderId===rootFolder;rootBtn.onclick=()=>renderFolder(rootFolder);}
         const rows=[].concat(out.items||[]);itemsHost.innerHTML=rows.length?rows.map(x=>'<button type="button" class="insurer-drive-item '+(x.kind==='folder'?'folder':'file')+'" '+(x.kind==='folder'?'data-drive-folder="'+esc(x.folderId||x.id)+'"':'data-drive-file="'+esc(x.documentRef||x.id)+'"')+'><span class="insurer-drive-item-icon">'+(x.kind==='folder'?'📁':'📄')+'</span><span><b>'+esc(x.name||'Documento')+'</b><small>'+esc(x.kind==='folder'?'Carpeta':x.mimeType||'Archivo')+'</small></span><span>›</span></button>').join(''):'<div class="muted">La carpeta está vacía.</div>';
         itemsHost.querySelectorAll('[data-drive-folder]').forEach(btn=>btn.onclick=()=>renderFolder(btn.dataset.driveFolder));
-        itemsHost.querySelectorAll('[data-drive-file]').forEach(btn=>btn.onclick=async()=>{btn.disabled=true;const outFile=await provider.resolveDossier(btn.dataset.driveFile,{entidad:'aseguradora',entidadId:id,insurerId:id,sourceModule:'aseguradoras'});btn.disabled=false;if(!outFile||outFile.ok!==true)return U.toast('No fue posible abrir el documento.');previewHost.hidden=false;const name=esc(outFile.nombre||'Documento');if(outFile.previewUrl){previewHost.innerHTML='<div class="insurer-drive-preview-head"><b>'+name+'</b><button type="button" class="btn ghost sm" data-close-preview>Cerrar vista</button></div>'+(String(outFile.mimeType||'').startsWith('image/')?'<img src="'+outFile.previewUrl+'" alt="'+name+'">':'<iframe src="'+outFile.previewUrl+'" title="'+name+'"></iframe>');}else{previewHost.innerHTML='<div class="insurer-drive-preview-head"><b>'+name+'</b></div><div class="cfg-note">Este formato no tiene vista previa integrada.<br><a class="btn ghost sm" data-dossier-download href="'+esc(outFile.downloadUrl||'')+'" download="'+name+'">Descargar archivo</a></div>';}const close=previewHost.querySelector('[data-close-preview]');if(close)close.onclick=()=>{previewHost.hidden=true;previewHost.innerHTML='';};previewHost.scrollIntoView({behavior:'smooth',block:'nearest'});});
+        itemsHost.querySelectorAll('[data-drive-file]').forEach(btn=>btn.onclick=async()=>{
+          btn.disabled=true;
+          let file=null;
+          try{file=await provider.resolveDossier(btn.dataset.driveFile,{entidad:'aseguradora',entidadId:id,insurerId:id,sourceModule:'aseguradoras'});}
+          catch(_error){file={ok:false,status:'no_disponible',message:'No fue posible recuperar el documento del expediente.'};}
+          finally{if(btn.isConnected)btn.disabled=false;}
+          // The fiche may re-render while Drive responds. Render only into the current connected panel.
+          const panel=document.querySelector('#asg-ficha [data-drive-preview]')||previewHost;
+          if(!panel||!panel.isConnected)return;
+          panel.hidden=false;
+          if(!file||file.ok!==true){
+            panel.innerHTML='<div class="cfg-note" data-dossier-read-status="'+esc(file&&file.status||'no_disponible')+'"><b>No fue posible abrir el documento.</b><div class="muted">'+esc(file&&file.message||'Comprueba tu acceso al expediente o intenta nuevamente.')+'</div></div>';
+            return;
+          }
+          const name=esc(file.nombre||'Documento');
+          if(file.previewUrl){
+            panel.innerHTML='<div class="insurer-drive-preview-head"><b>'+name+'</b><button type="button" class="btn ghost sm" data-close-preview>Cerrar vista</button></div>'+(String(file.mimeType||'').startsWith('image/')?'<img src="'+esc(file.previewUrl)+'" alt="'+name+'">':'<iframe src="'+esc(file.previewUrl)+'" title="'+name+'"></iframe>');
+          }else{
+            panel.innerHTML='<div class="insurer-drive-preview-head"><b>'+name+'</b></div><div class="cfg-note">Este formato no tiene vista previa integrada.<div><a class="btn ghost sm" data-dossier-download href="'+esc(file.downloadUrl||'')+'" download="'+name+'">Descargar archivo</a></div></div>';
+          }
+          const close=panel.querySelector('[data-close-preview]');
+          if(close)close.onclick=()=>{panel.hidden=true;panel.innerHTML='';};
+          panel.scrollIntoView({behavior:'smooth',block:'nearest'});
+        });
       };
       renderFolder('').catch(()=>{itemsHost.innerHTML='<div class="cfg-note">No fue posible consultar Drive.</div>';});
     }
