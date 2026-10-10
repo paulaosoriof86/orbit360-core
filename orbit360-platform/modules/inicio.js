@@ -9,16 +9,18 @@ Orbit.modules = Orbit.modules || {};
 Orbit.modules.inicio = (function () {
   const U = Orbit.ui, q = Orbit.q;
   const rosterRequested = new Set(), rosterFailures = new Set();
-  function operativeRosterRole() {
-    try { return String(Orbit.session&&Orbit.session.rol?Orbit.session.rol():'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase()==='operativo'; }
-    catch (_) { return false; }
+  function secureDashboardRosterRole() {
+    try {
+      const role=String(Orbit.session&&Orbit.session.rol?Orbit.session.rol():'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'_');
+      return ['operativo','direccion','superadmin','super_admin','superadministrador','admintenant','admin_tenant','admin','asesor','comercial'].includes(role);
+    } catch (_) { return false; }
   }
   function rosterKey(country) {
     const id=Orbit.auth&&Orbit.auth.productUser&&Orbit.auth.productUser.uid||'';
     return String(id)+'|'+String(Orbit.session?.rol?.()||'')+'|'+String(country||'TODOS').toUpperCase();
   }
   function rosterReadiness(host,country) {
-    if(!operativeRosterRole())return{status:dataReadiness(['asesores'],{optionalTerminal:true}),rows:[]};
+    if(!secureDashboardRosterRole())return{status:'unavailable',rows:[]};
     const month=q.currentMonthKey?q.currentMonthKey():U.monthKey(),api=Orbit.assignableAdvisorRoster,key=rosterKey(country)+'|'+month;
     if(!api||typeof api.dashboardList!=='function'||typeof api.dashboardPeek!=='function')return{status:'unavailable',rows:[]};
     const cacheKey=String(Orbit.auth?.productUser?.uid||'')+'|'+String(Orbit.session?.rol?.()||'').toLowerCase()+'|'+country+'|'+month;
@@ -132,27 +134,36 @@ Orbit.modules.inicio = (function () {
   }
 
   function render(host) {
-    try { if (Orbit.store && typeof Orbit.store._ensureCollections === 'function') Orbit.store._ensureCollections(operativeRosterRole()?['clientes','polizas','metas','cobros','recibosEsperados','carteraPrimas']:['clientes','polizas','asesores','metas','cobros','recibosEsperados','carteraPrimas']); } catch (_) {}
+    try { if (Orbit.store && typeof Orbit.store._ensureCollections === 'function') Orbit.store._ensureCollections(['clientes','polizas','cobros','recibosEsperados','carteraPrimas']); } catch (_) {}
     const activeCountry=String(Orbit.pais||'TODOS').toUpperCase();
     const secureRoster=rosterReadiness(host,activeCountry);
-    const clientReadiness=dataReadiness(['clientes']), policyReadiness=dataReadiness(['clientes','polizas']), productionReadiness=dataReadiness(['clientes','polizas']), advisorReadiness=secureRoster.status, metaReadiness=operativeRosterRole()?secureRoster.status:dataReadiness(['metas'],{optionalTerminal:true}), paymentReadiness=dataReadiness(['clientes','polizas','cobros','recibosEsperados','carteraPrimas']), portfolioReadiness=dataReadiness(['clientes','polizas','carteraPrimas']);
+    const clientReadiness=dataReadiness(['clientes']), policyReadiness=dataReadiness(['clientes','polizas']), productionReadiness=dataReadiness(['clientes','polizas']), advisorReadiness=secureRoster.status, metaReadiness=secureRoster.status, paymentReadiness=dataReadiness(['clientes','polizas','cobros','recibosEsperados','carteraPrimas']), portfolioReadiness=dataReadiness(['clientes','polizas','carteraPrimas']);
     const mesKey=q.currentMonthKey?q.currentMonthKey():U.monthKey();
     const production=productionReadiness==='ready'&&q.produccionMesPorMoneda?q.produccionMesPorMoneda(mesKey):{};
     const recaudoMes=paymentReadiness==='ready'&&q.recaudoMesPorMoneda?q.recaudoMesPorMoneda(mesKey):{};
     const cart=paymentReadiness==='ready'&&q.carteraGlobalPorMoneda?q.carteraGlobalPorMoneda():{byCurrency:{},currencies:[]};
     const renov=policyReadiness==='ready'?renewalRows45():[], venc=portfolioReadiness==='ready'&&q.carteraVencidaRows?q.carteraVencidaRows():[];
     const board=productionReadiness==='ready'&&advisorReadiness==='ready'
-      ?(operativeRosterRole()?secureRoster.rows.flatMap(a=>{const totals=q.produccionMesPorMoneda?q.produccionMesPorMoneda(mesKey,a.id):{};return a.paises.map(c=>{const currency=c==='GT'?'GTQ':'COP',g=a.metas?.[c],goal=g?.explicit===true?(U.finiteNumber(g.produccion)>0?g.produccion:null):(a.paises.length===1&&U.finiteNumber(a.metaPrima)>0?a.metaPrima:null),actual=U.finiteNumber(totals[currency]);return{asesor:{...a,nombre:a.nombre+(a.paises.length>1?' · '+c:'')},byCurrency:{[currency]:totals[currency]||0},pct:goal==null?null:Math.max(0,Math.min(140,Math.round((actual==null?0:actual)/goal*100))),metaDisponible:goal!=null,pais:c};});}):q.leaderboardMes?q.leaderboardMes(mesKey):[]):[];
+      ?(secureRoster.rows.flatMap(a=>{const totals=q.produccionMesPorMoneda?q.produccionMesPorMoneda(mesKey,a.id):{};return a.paises.map(c=>{const currency=c==='GT'?'GTQ':'COP',g=a.metas?.[c],goal=g?.explicit===true?(U.finiteNumber(g.produccion)>0?g.produccion:null):(a.paises.length===1&&U.finiteNumber(a.metaPrima)>0?a.metaPrima:null),actual=U.finiteNumber(totals[currency]);return{asesor:{...a,nombre:a.nombre+(a.paises.length>1?' · '+c:'')},byCurrency:{[currency]:totals[currency]||0},pct:goal==null?null:Math.max(0,Math.min(140,Math.round((actual==null?0:actual)/goal*100))),metaDisponible:goal!=null,pais:c};});}) ):[];
     const clientes=q.clientesScoped?q.clientesScoped():Orbit.store.all('clientes'), polizas=q.polizasScoped?q.polizasScoped():Orbit.store.all('polizas');
-    const metasMes=(operativeRosterRole()?[]:(Orbit.store.all('metas')||[])).filter(m=>String(m&&m.mes||'').slice(0,7)===mesKey);
-    const advisors=operativeRosterRole()?secureRoster.rows:(Orbit.store.all('asesores')||[]).filter(a=>activeCountry==='TODOS'||String(a&&a.pais||'').toUpperCase()===activeCountry);
+    const metasMes=[]; // Inicio metas originate only from the authorized server projection.
+    const advisors=secureRoster.rows;
     const mapKeys=map=>Object.keys(map||{}).filter(cur=>Math.abs(Number(map[cur])||0)>0), singleCurrency=map=>{const k=mapKeys(map);return k.length===1?k[0]:'';};
     const activeCurrency=activeCountry==='CO'?'COP':activeCountry==='GT'?'GTQ':(singleCurrency(production)||singleCurrency(recaudoMes));
     const escAttr=value=>U.esc(encodeURIComponent(JSON.stringify(value||{})));
     const moneyMap=map=>{const keys=Object.keys(map||{}).sort((a,b)=>(a==='GTQ'?0:a==='COP'?1:2)-(b==='GTQ'?0:b==='COP'?1:2)||a.localeCompare(b));if(!keys.length)return'Sin movimientos';return keys.map(cur=>'<span style="display:block;white-space:nowrap">'+U.esc(U.moneyShort(map[cur]||0,cur))+' '+U.esc(cur)+'</span>').join('');};
     const financialMoneyMap=map=>{const keys=Object.keys(map||{}).sort((a,b)=>(a==='GTQ'?0:a==='COP'?1:2)-(b==='GTQ'?0:b==='COP'?1:2)||a.localeCompare(b));if(!keys.length)return'Sin movimientos';return keys.map(cur=>{const n=Number(map[cur]||0),shown=Math.abs(n)<100000?U.money(n,cur):U.moneyShort(n,cur);return '<span style="display:block;white-space:nowrap">'+U.esc(shown)+' '+U.esc(cur)+'</span>';}).join('');};
     const metricMap=field=>{const out={};Object.keys(cart.byCurrency||{}).forEach(cur=>{out[cur]=Number(cart.byCurrency[cur]&&cart.byCurrency[cur][field]||0);});return out;};
-    const configuredMeta=tipo=>{if(metaReadiness!=='ready'||!activeCurrency)return null;if(operativeRosterRole()){if(activeCountry==='TODOS')return null;const c=activeCurrency==='GTQ'?'GT':activeCurrency==='COP'?'CO':'';const values=secureRoster.rows.filter(a=>a.paises.includes(c)).map(a=>{const t=a.metas?.[c];if(tipo==='recaudo')return t?.explicit===true?U.finiteNumber(t.recaudo):null;return t?.explicit===true?(t.produccion>0?t.produccion:null):(a.paises.length===1?U.finiteNumber(a.metaPrima):null);});return values.length&&values.every(v=>v!=null&&v>0)?values.reduce((s,v)=>s+v,0):null;}const curOf=m=>String(m&&m.moneda||'').toUpperCase()||(String(m&&m.pais||'').toUpperCase()==='CO'?'COP':String(m&&m.pais||'').toUpperCase()==='GT'?'GTQ':'');const advisorIds=new Set(advisors.map(a=>String(a&&a.id||'')).filter(Boolean));const scoped=metasMes.filter(m=>m&&m.asesorId&&advisorIds.has(String(m.asesorId))&&curOf(m)===activeCurrency);if(tipo==='prima'){let total=0,participants=0;advisors.forEach(a=>{const aid=String(a&&a.id||'');const rows=scoped.filter(m=>String(m.asesorId)===aid);const explicit=rows.some(m=>['nueva','renovada','recaudo'].includes(String(m.tipo||'')));const prod=rows.filter(m=>['nueva','renovada'].includes(String(m.tipo||''))).reduce((s,m)=>s+(U.finiteNumber(m.valor)||0),0);if(explicit){if(prod>0){total+=prod;participants++;}}else{const legacy=U.finiteNumber(a&&a.metaPrima);if(legacy!=null&&legacy>0){total+=legacy;participants++;}}});if(participants>0)return total;}if(tipo==='recaudo'){const vals=scoped.filter(m=>String(m.tipo||'')==='recaudo').map(m=>U.finiteNumber(m.valor)).filter(v=>v!=null&&v>0);if(vals.length)return vals.reduce((s,v)=>s+v,0);}const exact=metasMes.find(m=>m&&m.tipo===tipo&&!m.asesorId&&curOf(m)===activeCurrency);const n=U.finiteNumber(exact&&exact.valor);return n!=null&&n>0?n:null;};
+    const configuredMeta=tipo=>{
+      if(metaReadiness!=='ready'||!activeCurrency||activeCountry==='TODOS')return null;
+      const c=activeCurrency==='GTQ'?'GT':activeCurrency==='COP'?'CO':'';
+      const values=secureRoster.rows.filter(a=>a.paises.includes(c)).map(a=>{
+        const t=a.metas?.[c];
+        if(tipo==='recaudo')return t?.explicit===true?U.finiteNumber(t.recaudo):null;
+        return t?.explicit===true?(t.produccion>0?t.produccion:null):(a.paises.length===1?U.finiteNumber(a.metaPrima):null);
+      });
+      return values.length&&values.every(v=>v!=null&&v>0)?values.reduce((sum,v)=>sum+v,0):null;
+    };
     const metaPrima=configuredMeta('prima'),metaRec=configuredMeta('recaudo'),prodValue=activeCurrency?Number(production[activeCurrency]||0):null,recValue=activeCurrency?Number(recaudoMes[activeCurrency]||0):null;
     const pctPrima=metaPrima&&prodValue!=null?Math.max(0,Math.min(140,Math.round(prodValue/metaPrima*100))):null,pctRec=metaRec&&recValue!=null?Math.max(0,Math.min(140,Math.round(recValue/metaRec*100))):null;
     const targetDial=(kind,label,map,pct,meta)=>{const state=!activeCurrency?'currency-required':metaReadiness==='unavailable'?'unavailable':metaReadiness!=='ready'?'loading':meta?'configured':'missing',pctText=pct==null?'—':pct+'%',deg=pct==null?0:Math.max(0,Math.min(100,pct))*3.6,note=state==='currency-required'?'Selecciona un país para comparar con meta':state==='unavailable'?'Meta no disponible para este alcance':state==='loading'?'Actualizando meta':state==='missing'?'Meta no configurada':'Meta '+U.moneyShort(meta,activeCurrency);return '<div data-inicio-monthly="'+kind+'" data-values="'+escAttr(map)+'" data-meta-state="'+state+'" data-meta-value="'+(meta==null?'':meta)+'" data-pct="'+(pct==null?'':pct)+'" style="display:flex;flex-direction:column;align-items:center;gap:8px"><div style="width:118px;height:118px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(var(--red) '+deg+'deg,var(--line) '+deg+'deg)"><div style="width:90px;height:90px;border-radius:50%;background:var(--card);display:grid;place-items:center;text-align:center;box-shadow:inset 0 0 0 1px var(--line)"><div><div style="font-family:var(--f-display);font-weight:800;font-size:24px;color:var(--ink)">'+pctText+'</div><div style="font-size:10px;color:var(--ink-3);font-family:var(--f-mono)">'+moneyMap(map)+'</div></div></div></div><div style="font-size:12px;color:var(--ink-2);font-weight:600">'+label+'</div><div class="muted" style="font-size:10.5px;text-align:center;max-width:150px">'+note+'</div></div>';};

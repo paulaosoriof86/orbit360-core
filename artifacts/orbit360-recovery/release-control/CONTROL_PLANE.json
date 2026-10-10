@@ -4869,9 +4869,9 @@
       "entryGuardReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_ENTRY_GUARD_PASS_20261002.json",
       "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
       "executionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B4_EXECUTION_LOCK_20261002.json",
-      "executionLockBlobSha": "fe921b70c5d2209783677b07938fbcad0c7d62ef",
-      "compositionLockBlobSha": "7ada2c3d9b3bd82158f86a424ab9fca5573c8423",
-      "findingLedgerBlobSha": "976905ff4544d71bfc8597a1ece9f5ad14811145",
+      "executionLockBlobSha": "142cea7ff2b69aee4ade75a307bc3fd2aa67afce",
+      "compositionLockBlobSha": "a37885fa7e4b3d82e7edc621f5d9ffe72857f268",
+      "findingLedgerBlobSha": "bdd89d25b69013feac305142741e5e0faae60390",
       "activeFindingId": "B4-003",
       "productSourceSha": "c603fd3561e7229d9359db45495d4cf2d757cd8f",
       "baselineBuildId": "gi-i65-b3-dcd2b3f60b98-57f234755dc1",
@@ -5972,9 +5972,9 @@
   "canonicalAccumulationControl": {
     "status": "FROZEN_ACTIVE",
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "compositionLockBlobSha": "7ada2c3d9b3bd82158f86a424ab9fca5573c8423",
+    "compositionLockBlobSha": "a37885fa7e4b3d82e7edc621f5d9ffe72857f268",
     "findingLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "findingLedgerBlobSha": "976905ff4544d71bfc8597a1ece9f5ad14811145",
+    "findingLedgerBlobSha": "bdd89d25b69013feac305142741e5e0faae60390",
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
     "activePlanBlobSha": "76a275e511c3bd580496c07de93c2bfb2eace269",
     "activeBlock": "B4",
@@ -5990,7 +5990,7 @@
     "activeFindingId": "B4-003",
     "findingContinuityRegisterBlobSha": "11ffaf6e7c691064be947fdc1af00b08d8fb8f9c",
     "findingContinuityGuardBlobSha": "868a0ba1a492d9adc8d91655f152b6fa7980f499",
-    "continuityRegisterBlobSha": "599c7e9079369ede2cd2237fdd0ffe952dee4cdc",
+    "continuityRegisterBlobSha": "bb374c20f58721023293955defa982b582ee1dc5",
     "masterPendingClosurePlanPath": "artifacts/orbit360-recovery/release-control/I6_PENDING_CLOSURE_MASTER_PLAN_LOCK_20261004.json",
     "masterPendingClosurePlanBlobSha": "9d7ba423caf0aa09a0e2af4a1ed4713ea867d17a",
     "listingHumanProofStillRequired": true
@@ -6288,9 +6288,9 @@
     "status": "B4_003_R23_SOURCE_STAGED_PENDING_PREVIEW",
     "activeFindingId": "B4-003",
     "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
-    "executionLockBlobSha": "fe921b70c5d2209783677b07938fbcad0c7d62ef",
-    "compositionLockBlobSha": "7ada2c3d9b3bd82158f86a424ab9fca5573c8423",
-    "findingLedgerBlobSha": "976905ff4544d71bfc8597a1ece9f5ad14811145",
+    "executionLockBlobSha": "142cea7ff2b69aee4ade75a307bc3fd2aa67afce",
+    "compositionLockBlobSha": "a37885fa7e4b3d82e7edc621f5d9ffe72857f268",
+    "findingLedgerBlobSha": "bdd89d25b69013feac305142741e5e0faae60390",
     "noLive": true,
     "noReimport": true,
     "nextAction": "R23_CONTRACT_AND_EXACT_PREVIEW",
@@ -7758,7 +7758,7 @@
     "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_R20_CONTRACT_AND_EXACT_PREVIEW"
   },
   "compositionLockBlobSha": "534559b1b23ee57be455460b9957c08f80ecdae3",
-  "findingLedgerBlobSha": "976905ff4544d71bfc8597a1ece9f5ad14811145",
+  "findingLedgerBlobSha": "bdd89d25b69013feac305142741e5e0faae60390",
   "continuityRegisterBlobSha": "48d945e51e5a10ec74dc925313b720a121ba7086",
   "r16PerformanceRegression": {
     "status": "CLOSED_PASS",
@@ -9023,16 +9023,16 @@
     "noReimport": true
   },
   "r23InicioProgress": {
-    "status": "R23_INBOX_ROOTFIX_PREVIEW_RETEST_REQUIRED",
+    "status": "R23_UNIFIED_PROJECTION_SOURCE_FIXED_PREVIEW_REQUIRED",
     "finding": "B4-003-R19-07-INICIO-MONTHLY-ADVISOR-READINESS-REGRESSION",
     "rootCause": "Inicio uses Equipo-protected asesores/metas and assignment roster omits nonassignable advisors.",
     "scope": "Dedicated Inicio-only projection with member/country/dataScope/activeRole authorization, no Equipo admin grant.",
     "files": {
       "backend": "1761a37806d8aa702f76f680dffcc473fb88d36c",
       "client": "b70c0f0355a6284fcb8b586cfc9c02aad0b2b97f",
-      "inicio": "8df1c5f2b1907adab135e23e52b4193f4e623667",
+      "inicio": "c2f346b4feece309c1c19e307f5b7b841fbd5119",
       "index": "c92ac86d311f0d3349a98e21e0c6acd3d2b15fdc",
-      "qa": "8c4326ed108af13a2b61f81d72c0ecaa11a8b0c8"
+      "qa": "4ef5e73c1df2697c10e128c08c07d5660f16bbc8"
     },
     "compositionBlobSha": "2cd985e5ffc848f4417042b5ef34bb7f05db240f",
     "findingLedgerBlobSha": "ccc5fa4fabf03bb44d2954e1db37135ad0c8ea9f",
@@ -9142,5 +9142,21 @@
     "productionUntouched": true,
     "realDataWrites": 0,
     "lockBlobSha": "fe921b70c5d2209783677b07938fbcad0c7d62ef"
+  },
+  "r23InicioUnifiedProjectionSourceFix": {
+    "status": "R23_UNIFIED_AUTHORIZED_SOURCE_FIXED_EXACT_PREVIEW_REQUIRED",
+    "finding": "B4-003-R19-07-INICIO-MONTHLY-ADVISOR-READINESS-REGRESSION",
+    "sourceOwner": "orbit360-platform/modules/inicio.js",
+    "sourceBlobSha": "c2f346b4feece309c1c19e307f5b7b841fbd5119",
+    "qaOwner": "tools/gravicentra-i6-5-b4-003-preview-proof.mjs",
+    "qaBlobSha": "4ef5e73c1df2697c10e128c08c07d5660f16bbc8",
+    "rootCause": "Inicio was using canonical role-scoped backend projection only in Operativo, but non-Operativo roles used unrelated store/leaderboard data; UI parity against the same backend could not hold.",
+    "remediation": "Use R23 backend scoped advisor and goals projection for all authorized active roles; remove direct asesores/metas readiness for this board; retain GTQ/COP separation; select active role explicitly in authenticated QA and record IDs first paint/reload.",
+    "proof": "PENDING_NEW_IMMUTABLE_PREVIEW_AND_AUTHENTICATED_E2E",
+    "noProductionChanges": true,
+    "noOperationalWrites": true,
+    "priorFailedRunId": 38066486125,
+    "liveLineageUnresolved": true,
+    "renewalsConflictUnchanged": true
   }
 }

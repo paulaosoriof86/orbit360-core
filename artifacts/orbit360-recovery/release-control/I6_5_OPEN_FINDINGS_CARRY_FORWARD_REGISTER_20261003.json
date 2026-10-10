@@ -4,7 +4,7 @@
   "authority": "FAIL_CLOSED_FINDING_CONTINUITY",
   "sourceLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
   "sourceLedgerPreviousBlobSha": "0cdb33f6b47a62426c7ce5c1d10ecfc2d69b3b74",
-  "expectedLedgerNextBlobSha": "976905ff4544d71bfc8597a1ece9f5ad14811145",
+  "expectedLedgerNextBlobSha": "bdd89d25b69013feac305142741e5e0faae60390",
   "policy": {
     "allLedgerFindingsMustAppearExactlyOnce": true,
     "newHumanFindingsMustBeIndividualLedgerEntries": true,
@@ -12591,11 +12591,11 @@
     "sourceOwnerBlobs": {
       "functions/assignable-advisor-roster.js": "1761a37806d8aa702f76f680dffcc473fb88d36c",
       "orbit360-platform/core/assignable-advisor-roster-client.js": "b70c0f0355a6284fcb8b586cfc9c02aad0b2b97f",
-      "orbit360-platform/modules/inicio.js": "8df1c5f2b1907adab135e23e52b4193f4e623667",
+      "orbit360-platform/modules/inicio.js": "c2f346b4feece309c1c19e307f5b7b841fbd5119",
       "orbit360-platform/index.html": "0915d7c9b168f51adfa91c895f1842ea3087306c"
     },
     "qaOwner": "tools/gravicentra-i6-5-b4-003-preview-proof.mjs",
-    "qaBlob": "aac870e756c5bdf6ab29a66e6afbafeb7177b6f7",
+    "qaBlob": "4ef5e73c1df2697c10e128c08c07d5660f16bbc8",
     "priorHead": "25c4d44f7da43e85a5d76ccba05398955e63a574",
     "priorR22MachineAcceptedAsHistorical": true,
     "sourceChanged": true,
@@ -12605,7 +12605,7 @@
     "liveLineageUnresolved": true,
     "productionMutation": false,
     "operationalWrites": 0,
-    "expectedLedgerSha": "ccc5fa4fabf03bb44d2954e1db37135ad0c8ea9f"
+    "expectedLedgerSha": "bdd89d25b69013feac305142741e5e0faae60390"
   },
   "r23QaRenderDiagnostic": {
     "status": "QA_ONLY_ROOT_CAUSE_DIAGNOSTIC_STAGED_PREVIEW_RETRY_REQUIRED",
@@ -12672,5 +12672,21 @@
     "qaProofBlobSha": "18cfe626df8c0d11f558387a8959d1aa6ad08af0",
     "visualPending": true,
     "ledgerBlobSha": "976905ff4544d71bfc8597a1ece9f5ad14811145"
+  },
+  "r23InicioUnifiedProjectionSourceFix": {
+    "status": "R23_UNIFIED_AUTHORIZED_SOURCE_FIXED_EXACT_PREVIEW_REQUIRED",
+    "finding": "B4-003-R19-07-INICIO-MONTHLY-ADVISOR-READINESS-REGRESSION",
+    "sourceOwner": "orbit360-platform/modules/inicio.js",
+    "sourceBlobSha": "c2f346b4feece309c1c19e307f5b7b841fbd5119",
+    "qaOwner": "tools/gravicentra-i6-5-b4-003-preview-proof.mjs",
+    "qaBlobSha": "4ef5e73c1df2697c10e128c08c07d5660f16bbc8",
+    "rootCause": "Inicio was using canonical role-scoped backend projection only in Operativo, but non-Operativo roles used unrelated store/leaderboard data; UI parity against the same backend could not hold.",
+    "remediation": "Use R23 backend scoped advisor and goals projection for all authorized active roles; remove direct asesores/metas readiness for this board; retain GTQ/COP separation; select active role explicitly in authenticated QA and record IDs first paint/reload.",
+    "proof": "PENDING_NEW_IMMUTABLE_PREVIEW_AND_AUTHENTICATED_E2E",
+    "noProductionChanges": true,
+    "noOperationalWrites": true,
+    "priorFailedRunId": 38066486125,
+    "liveLineageUnresolved": true,
+    "renewalsConflictUnchanged": true
   }
 }

@@ -1,0 +1,33 @@
+{
+  "schema": "GRAVICENTRA_B4_003_R23_UNIFIED_INICIO_SOURCE_FIX_V1",
+  "recordedDate": "2026-10-10",
+  "gate": "I6.5/B4-003/R23",
+  "status": "SOURCE_FIXED_AUTHENTICATED_EXACT_PREVIEW_PENDING",
+  "headBefore": "d986e21e0eda16747ec4a4043e3bcf5bb1407ff7",
+  "finding": "B4-003-R19-07-INICIO-MONTHLY-ADVISOR-READINESS-REGRESSION",
+  "rootCause": "Inicio was using canonical role-scoped backend projection only in Operativo, but non-Operativo roles used unrelated store/leaderboard data; UI parity against the same backend could not hold.",
+  "details": "Use R23 backend scoped advisor and goals projection for all authorized active roles; remove direct asesores/metas readiness for this board; retain GTQ/COP separation; select active role explicitly in authenticated QA and record IDs first paint/reload.",
+  "sourceFiles": {
+    "orbit360-platform/modules/inicio.js": "c2f346b4feece309c1c19e307f5b7b841fbd5119",
+    "tools/gravicentra-i6-5-b4-003-preview-proof.mjs": "4ef5e73c1df2697c10e128c08c07d5660f16bbc8"
+  },
+  "authorityBlobs": {
+    "composition": "a37885fa7e4b3d82e7edc621f5d9ffe72857f268",
+    "ledger": "bdd89d25b69013feac305142741e5e0faae60390",
+    "carry": "bb374c20f58721023293955defa982b582ee1dc5",
+    "b4": "142cea7ff2b69aee4ade75a307bc3fd2aa67afce",
+    "control": "8075acb985c667de313548c6db41cb6196610c91"
+  },
+  "lastFailedRunId": 38066486125,
+  "unresolved": [
+    "R23 authenticated Preview + reload GT/CO by role",
+    "Academia persistence and content modernization",
+    "Renewal VA-43685 unresolved",
+    "Cancelations projection reconciliation",
+    "LIVE_LINEAGE_UNRESOLVED"
+  ],
+  "productionTouched": false,
+  "realBusinessWrites": 0,
+  "syntheticWrites": 0,
+  "acceptanceClaim": false
+}

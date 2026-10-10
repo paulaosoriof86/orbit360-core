@@ -209,6 +209,12 @@ async function academiaManualsScopeProof(browser,operativeActor){
 async function r23ProofSnapshot(browser,who,country,month){
  const token=await auth.createCustomToken(who.uid),ctx=await browser.newContext({ignoreHTTPSErrors:false,viewport:{width:390,height:844}}),p=await ctx.newPage();
  try{await applyLegal(p,who);await p.goto(target+'/#/inicio',{waitUntil:'domcontentloaded',timeout:60000});await bootProduct(p,token);
+  const selectedRole=await p.evaluate(role=>{
+    const normRole=value=>String(value||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'_');
+    if(normRole(Orbit.session?.rol?.())===normRole(role))return true;
+    return Orbit.session?.set?.(role)===true&&normRole(Orbit.session?.rol?.())===normRole(role);
+  },who.activeRole);
+  need(selectedRole,'B4_003_R23_TEST_ACTIVE_ROLE_NOT_SELECTED:'+who.activeRole);
   const api=await p.evaluate(async({tenantId,role,country,month})=>Orbit.productRuntimeBrowserProvidersP0.callFunction('orbit360AssignableAdvisorRosterPreview',{tenantId,activeRole:role,country,month,purpose:'inicio'},'us-east1'),{tenantId,role:who.activeRole,country,month});
   await p.evaluate(c=>{Orbit.pais=c;Orbit.modules.inicio.render(document.getElementById('host'));},country);
   try{
@@ -225,7 +231,10 @@ async function r23ProofSnapshot(browser,who,country,month){
   }
   const ui=await p.evaluate(()=>({ids:[...new Set([...document.querySelectorAll('[data-inicio-advisor-id]')].map(e=>e.getAttribute('data-inicio-advisor-id')))].sort(),overflow:document.documentElement.scrollWidth>innerWidth+2,route:Orbit.route?.key||'',hash:location.hash}));
   need(ui.route==='inicio'&&ui.hash==='#/inicio','B4_003_R23_INBOX_UNAUTHORIZED_NAVIGATOR_FIRST_PAINT:'+JSON.stringify({role:who.activeRole,country,route:ui.route,hash:ui.hash}));
-  await p.reload({waitUntil:'domcontentloaded'});await bootProduct(p,token);await p.evaluate(c=>{Orbit.pais=c;Orbit.modules.inicio.render(document.getElementById('host'));},country);
+  await p.reload({waitUntil:'domcontentloaded'});await bootProduct(p,token);
+  const reloadedRole=await p.evaluate(role=>String(Orbit.session?.rol?.()||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase()===String(role||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase(),who.activeRole);
+  need(reloadedRole,'B4_003_R23_ACTIVE_ROLE_NOT_PERSISTED_AFTER_RELOAD:'+who.activeRole);
+  await p.evaluate(c=>{Orbit.pais=c;Orbit.modules.inicio.render(document.getElementById('host'));},country);
   try{
     await p.waitForFunction(()=>document.querySelector('[data-inicio-advisor-id]')||document.querySelector('[data-inicio-advisor-readiness="ready-empty"]'),null,{timeout:12000});
   }catch(error){
@@ -239,6 +248,7 @@ async function r23ProofSnapshot(browser,who,country,month){
     throw new Error('B4_003_R23_POST_RELOAD_READINESS_NOT_RESTORED:'+JSON.stringify({actor:who.uid,actorRole:who.activeRole,country,month,beforeReload:ui,state,clientCall})+'|'+String(error?.message||error));
   }
   ui.reloaded=await p.evaluate(()=>[...new Set([...document.querySelectorAll('[data-inicio-advisor-id]')].map(e=>e.getAttribute('data-inicio-advisor-id')))].sort());
+  ui.role=await p.evaluate(()=>String(Orbit.session?.rol?.()||''));
   ui.reloadRoute=await p.evaluate(()=>({hash:location.hash,route:Orbit.route?.key||''}));
   need(ui.reloadRoute.route==='inicio'&&ui.reloadRoute.hash==='#/inicio','B4_003_R23_INBOX_UNAUTHORIZED_NAVIGATOR_RELOAD:'+JSON.stringify({role:who.activeRole,country,...ui.reloadRoute}));
   return{api,ui};
@@ -557,7 +567,9 @@ try{
   for(const item of r23Cases){
    need(item.api?.ok===true&&item.api.month===r23Month,'B4_003_R23_BACKEND_CONFIRMATION_REQUIRED');
    const expected=item.api.rows.map(r=>clean(r.id)).sort();
-   need(JSON.stringify(expected)===JSON.stringify(item.ui.ids)&&JSON.stringify(expected)===JSON.stringify(item.ui.reloaded),'B4_003_R23_BACKEND_UI_RELOAD_MISMATCH');
+   const parityTrace={country:item.api.country,scope:item.api.scope,role:item.ui.role||'',backendIds:expected,firstPaintIds:item.ui.ids,reloadedIds:item.ui.reloaded,firstPaintMatches:JSON.stringify(expected)===JSON.stringify(item.ui.ids),reloadMatches:JSON.stringify(expected)===JSON.stringify(item.ui.reloaded)};
+   proof.r23ParityTrace=(proof.r23ParityTrace||[]).concat([parityTrace]);
+   need(parityTrace.firstPaintMatches&&parityTrace.reloadMatches,'B4_003_R23_BACKEND_UI_RELOAD_MISMATCH:'+JSON.stringify(parityTrace));
    need(item.ui.overflow!==true,'B4_003_R23_MOBILE_OVERFLOW');
    need(item.api.rows.every(r=>Object.keys(r).every(k=>['id','nombre','activo','paises','metas','metaPrima'].includes(k))&&r.paises.every(c=>c===item.api.country)&&Object.keys(r.metas||{}).every(c=>c===item.api.country)),'B4_003_R23_UNAUTHORIZED_SCOPE_LEAK');
   }
