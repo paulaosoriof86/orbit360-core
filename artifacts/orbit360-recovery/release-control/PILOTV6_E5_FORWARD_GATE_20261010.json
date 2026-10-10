@@ -1,0 +1,51 @@
+{
+  "schema": "GRAVICENTRA_PILOT_V6_E5_FORWARD_GATE_V1",
+  "recordedAt": "2026-10-10T08:44:00-06:00",
+  "scenario": "E5 Marketing",
+  "status": "ELIGIBLE_FOR_TARGETED_READONLY_PILOT",
+  "preferredParticipant": "CT01",
+  "preferredRole": "Dirección",
+  "fallbackParticipant": "CT02",
+  "fallbackRole": "Operativo_if_access_is_legitimate",
+  "exactPreview": {
+    "sourceSha": "3a5e2c8df824dab8feca682ee4a2fe63d03c4ed6",
+    "buildId": "gi-i65-b4-3a5e2c8df824-57f234755dc1",
+    "runId": 37997959332,
+    "artifactId": 11648431358,
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-37997959332-8tdu4lve.web.app",
+    "workflowConclusion": "SUCCESS"
+  },
+  "causalReadback": {
+    "marketingModuleChangedSinceE1Preview": false,
+    "cronogramaStillHeld": true,
+    "reasonForSkippingE3": "E3 retains prior focal technical dependency and source includes write-capable task toggles/new-task actions; continue forward to next eligible extension rather than block Block E."
+  },
+  "safeReadOnlyActions": [
+    "open Marketing",
+    "navigate previous/next month",
+    "open an existing content card and inspect fields without saving",
+    "observe channel, type, focus, state, responsible, approver, CTA, hashtags and any recorded stats/history"
+  ],
+  "prohibitedActions": [
+    "Importar calendario",
+    "+ Contenido",
+    "Generar mes con IA",
+    "Reprogramar atrasados",
+    "Guardar",
+    "Eliminar",
+    "Crear pieza (Canva)",
+    "Programar (Metricool)",
+    "any external publication or message"
+  ],
+  "objective": "Observe planning structure, channel, CTA, responsibility and status without creating, publishing or attributing leads/sales.",
+  "stopIf": [
+    "module access is denied for the ordinary role",
+    "opening an existing card mutates state",
+    "no existing content is available and observation would require creating data",
+    "preview/source changes"
+  ],
+  "forwardOnly": {
+    "priorScenariosReopened": false,
+    "nextAfterE5": "E6 Plantillas/Notificaciones"
+  }
+}
