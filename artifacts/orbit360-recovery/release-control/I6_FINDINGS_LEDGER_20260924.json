@@ -12510,7 +12510,7 @@
       "orbit360-platform/index.html": "0915d7c9b168f51adfa91c895f1842ea3087306c"
     },
     "qaOwner": "tools/gravicentra-i6-5-b4-003-preview-proof.mjs",
-    "qaBlob": "4ef5e73c1df2697c10e128c08c07d5660f16bbc8",
+    "qaBlob": "874ac2e82662bb04bb6ad7e74d748d26ec85ae71",
     "priorHead": "25c4d44f7da43e85a5d76ccba05398955e63a574",
     "priorR22MachineAcceptedAsHistorical": true,
     "sourceChanged": true,
@@ -12584,7 +12584,7 @@
     "sourceOwner": "orbit360-platform/modules/inicio.js",
     "sourceBlobSha": "c2f346b4feece309c1c19e307f5b7b841fbd5119",
     "qaOwner": "tools/gravicentra-i6-5-b4-003-preview-proof.mjs",
-    "qaBlobSha": "4ef5e73c1df2697c10e128c08c07d5660f16bbc8",
+    "qaBlobSha": "874ac2e82662bb04bb6ad7e74d748d26ec85ae71",
     "rootCause": "Inicio was using canonical role-scoped backend projection only in Operativo, but non-Operativo roles used unrelated store/leaderboard data; UI parity against the same backend could not hold.",
     "remediation": "Use R23 backend scoped advisor and goals projection for all authorized active roles; remove direct asesores/metas readiness for this board; retain GTQ/COP separation; select active role explicitly in authenticated QA and record IDs first paint/reload.",
     "proof": "PENDING_NEW_IMMUTABLE_PREVIEW_AND_AUTHENTICATED_E2E",
@@ -12593,5 +12593,23 @@
     "priorFailedRunId": 38066486125,
     "liveLineageUnresolved": true,
     "renewalsConflictUnchanged": true
+  },
+  "r23PolicyDetailQaInstrumentationFix": {
+    "status": "QA_ONLY_INSTRUMENTATION_FIXED_PREVIEW_RETEST_REQUIRED",
+    "failedRunId": 38073421758,
+    "failedSourceHead": "26764be11e201b606603f2dc830bd8465f1dff24",
+    "failureCode": "B4_003_R13_POLICY_DETAIL_UNSTABLE_OR_MISSING",
+    "finding": "B4-003-R13-09-POLICY-LIST-VISUAL-REGRESSION",
+    "evidence": "Authenticated browser saw detailVisible=true, route=cliente360, 2 body mutations, server-confirmed source and wallMs=1258, but the metric clickAt/readyAt pair was not recorded. The document-wide once:true click observer can be consumed by an unrelated click before the target row; attach once:true directly to the exact target row and expose booleans for both event timestamps.",
+    "fix": "Attach capture listener to exact policy search result row; keep <2500ms Chrome performance contract and unchanged full detail stability assertions.",
+    "qaBlobBefore": "4ef5e73c1df2697c10e128c08c07d5660f16bbc8",
+    "qaBlobAfter": "874ac2e82662bb04bb6ad7e74d748d26ec85ae71",
+    "productSourceChanged": false,
+    "policyProductSourceBlob": "c2f346b4feece309c1c19e307f5b7b841fbd5119",
+    "regressionNotYetClosed": true,
+    "renewalDryRunUnchanged": true,
+    "previewRequired": true,
+    "liveTouched": false,
+    "operationalWrites": 0
   }
 }

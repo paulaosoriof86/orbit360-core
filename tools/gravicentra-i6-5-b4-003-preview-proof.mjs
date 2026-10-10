@@ -1230,7 +1230,7 @@ try{
    window.addEventListener('hashchange',()=>trace('hashchange'));
    document.addEventListener('orbit:route-ready',()=>trace('route-ready'));
    window.__b4003PolicyDetailPerformance=stamp;
-   document.addEventListener('click',e=>{if(stamp.clickAt==null&&e.target.closest('tr')===row)stamp.clickAt=performance.now();},{capture:true,once:true});
+   row.addEventListener('click',()=>{if(stamp.clickAt==null){stamp.clickAt=performance.now();trace('row-click');}},{capture:true,once:true});
    const observer=new MutationObserver(()=>{
      stamp.mutations++;
      const present=!!document.querySelector('[data-policy-fullpage="1"]');
@@ -1248,6 +1248,7 @@ try{
    const p=window.__b4003PolicyDetailPerformance||{},h=document.getElementById('host');
    const status=Orbit.store?._productStatus?.()||{};
    return{clickToFullDetailDomMs:p.clickAt!=null&&p.readyAt!=null?Math.round(p.readyAt-p.clickAt):null,
+     clickAtCaptured:p.clickAt!=null,detailAtCaptured:p.readyAt!=null,
      mutationCount:Number(p.mutations||0),detailVisible:!!document.querySelector('[data-policy-fullpage="1"]'),
      events:(p.events||[]).slice(0,40),route:String(Orbit.route?.key||''),hash:String(location.hash||''),
      loadingReason:h?.querySelector('[data-policy-detail-loading]')?.getAttribute('data-policy-detail-loading')||'',

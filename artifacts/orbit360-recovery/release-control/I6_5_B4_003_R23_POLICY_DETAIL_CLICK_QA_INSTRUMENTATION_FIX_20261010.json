@@ -1,0 +1,18 @@
+{
+  "schema": "GRAVICENTRA_B4_003_R23_POLICY_DETAIL_QA_ONLY_INSTRUMENTATION_V1",
+  "date": "2026-10-10",
+  "gate": "I6.5/B4-003/R23",
+  "status": "QA_ONLY_INSTRUMENTATION_FIXED_PREVIEW_RETEST_REQUIRED",
+  "failedProofRunId": 38073421758,
+  "failedReceiptBlobSha": "a16cd67f325ff45978692a2be5f47b8a50ffd051",
+  "rootCauseBoundary": "Browser visible policy detail with nullable Chrome timestamp due to incorrect document-level once-only capture listener; do not claim product failure from null metric without discriminating click hook.",
+  "qaChange": "capture policy click on actual TR; preserve <2500ms assertion; expose clickAtCaptured/detailAtCaptured",
+  "beforeQaSha": "4ef5e73c1df2697c10e128c08c07d5660f16bbc8",
+  "afterQaSha": "874ac2e82662bb04bb6ad7e74d748d26ec85ae71",
+  "sourceOwnerBlobPreserved": "c2f346b4feece309c1c19e307f5b7b841fbd5119",
+  "r23ExistingParity": "GT operative, GT direction, CO operative backend/UI/reload were PASS in preceding failed run",
+  "expectedNext": "B4_003_R23_EXACT_AUTHENTICATED_PREVIEW_RETEST",
+  "productionTouched": false,
+  "businessWrites": 0,
+  "passClaim": false
+}
