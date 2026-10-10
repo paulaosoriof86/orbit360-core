@@ -1,0 +1,18 @@
+{
+  "schema": "GRAVICENTRA_R23_QA_BINDING_ONLY",
+  "failedRunId": 38060574336,
+  "oldBindings": {
+    "C": "e63bab6ac9567048c088faec02df2683ff767329",
+    "L": "974fb26de0eeac998ab96f2f4189574c8eed87be",
+    "D": "2886b5a87a5323ab91b88444d4e81f183292a43f",
+    "K": "f47fe2d9f2112d7ac100c2df525a595afebe869b"
+  },
+  "canonicalProductBlobsUnchanged": true,
+  "concurrentPilotCommitsPreserved": true,
+  "restoresExactGitBlobHashBindings": true,
+  "sourceFilesChanged": false,
+  "deployToProduction": false,
+  "operationalWrites": 0,
+  "repairScope": "Control Plane -> B4 lock and ledger -> carry; no product source",
+  "date": "2026-10-10"
+}

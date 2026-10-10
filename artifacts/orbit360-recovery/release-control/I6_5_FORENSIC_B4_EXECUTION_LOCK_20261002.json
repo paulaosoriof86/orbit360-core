@@ -587,8 +587,8 @@
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_RENEWAL_KPI_PARITY_CAUSAL_ADDENDUM_20261005.json",
     "blobSha": "87bab7ee2778a0525cdbe81cf4cbf82020bf6139"
   },
-  "findingLedgerBlobSha": "ccc5fa4fabf03bb44d2954e1db37135ad0c8ea9f",
-  "continuityRegisterBlobSha": "cf92e763015b1abc04b7ced23d86cf5b370950ad",
+  "findingLedgerBlobSha": "2886b5a87a5323ab91b88444d4e81f183292a43f",
+  "continuityRegisterBlobSha": "9f401d0ce6fbee7b35ce19d0b4546970ac63b30a",
   "compositionLockBlobSha": "2cd985e5ffc848f4417042b5ef34bb7f05db240f",
   "r18SourceFix": {
     "status": "SOURCE_FIXED_R18_PENDING_CONTRACT_AND_EXACT_PREVIEW",
@@ -1812,6 +1812,13 @@
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R23_RENDER_DIAGNOSTIC_QA_ONLY_20261010.json",
     "receiptBlobSha": "12d1001b7bb7737eb77b084b27d0b6becc02777b",
     "realWrites": 0,
+    "productChanged": false
+  },
+  "r23QaLockBinding": {
+    "status": "QA_ONLY_RECONCILED",
+    "ledgerBlobSha": "2886b5a87a5323ab91b88444d4e81f183292a43f",
+    "carryBlobSha": "9f401d0ce6fbee7b35ce19d0b4546970ac63b30a",
+    "receiptBlobSha": "9f72ad886a0e12cf422518380da366eb001f8ce2",
     "productChanged": false
   }
 }
