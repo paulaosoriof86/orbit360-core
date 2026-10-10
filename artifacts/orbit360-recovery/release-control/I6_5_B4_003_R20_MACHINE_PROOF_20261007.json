@@ -1,18 +1,18 @@
 {
   "schema": "GRAVICENTRA_I6_5_B4_003_R20_MACHINE_PROOF_V1",
-  "recordedAt": "2026-10-09T22:19:29.792Z",
+  "recordedAt": "2026-10-10T19:38:13.306Z",
   "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
   "findingId": "B4-003",
-  "sourceSha": "3a5e2c8df824dab8feca682ee4a2fe63d03c4ed6",
-  "buildId": "gi-i65-b4-3a5e2c8df824-57f234755dc1",
-  "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-37997959332-8tdu4lve.web.app",
-  "channelId": "gi-i65-b4-37997959332",
-  "runId": 37997959332,
-  "artifactId": 11648431358,
-  "artifactDigest": "d84015ea75651df369b718fc793f7b6a130673767c9132ba874a7f57596558a7",
-  "hostedPayloadDigest": "0c9bf51d628b3617b2713cb3521ed307bbe3d31a18fcbc141ecea7bad93e458e",
-  "backendSourceDigest": "778af087e48cf3e74edc8d4d813aa414968709a9e08977ac2a8405c820e50bb4",
-  "bundleDigest": "ebf59113478e1870e06e51d22ee0fdf97e4bbc88e73448bc79cd321a5c3900f3",
+  "sourceSha": "2eba5c2ca4dd68c99ffb647af7bae3a7867f7fa4",
+  "buildId": "gi-i65-b4-2eba5c2ca4dd-57f234755dc1",
+  "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-38080066957-wl3wf0mb.web.app",
+  "channelId": "gi-i65-b4-38080066957",
+  "runId": 38080066957,
+  "artifactId": 11679713573,
+  "artifactDigest": "85735463159c5385d6b1dee99be1e4a0a916b7af19506e830c620f76cbdfd89b",
+  "hostedPayloadDigest": "5cb9f3ad7e033babd377ecd597d3b9e2a8304b3fbeb23ca04f2f4947d784a53c",
+  "backendSourceDigest": "98931e5b672e4735a3a0e5d2896e7e18797911b03ffcb71e6f0da5a0f7c70081",
+  "bundleDigest": "6745f5c073b9e45a51808ecc3334c4f91adb165c75231cfd3f0f54af6aa43c00",
   "exactHostingReadback": true,
   "assertions": {
     "handoffActorsDistinct": true,
@@ -20,6 +20,11 @@
     "cancellationProjectionConsistent": true,
     "realRenewalDistributionReadOnly": true,
     "realRenewalSourceDryRunReady": false,
+    "academiaFiveManualsPrivateAuthenticatedUi": true,
+    "academiaOperativoCrmManualAllowedRestrictedDenied": true,
+    "r23InicioCanonicalGoalValueParity": true,
+    "r23InicioRoleCountryScopedBackendUiParity": true,
+    "r23InicioOperativoDireccionMobileReload": true,
     "quoteAuthorityContractHosted": true,
     "manualFinancialInferenceRemoved": true,
     "authenticatedHydration": true,
@@ -236,7 +241,7 @@
   "qaResidueDisposition": "NOT_DELETED_FAIL_CLOSED",
   "qaResidueDeletedCount": 0,
   "qaResidueAdjudicationReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R19_B2_QA_RESIDUE_ADJUDICATION_20261005.json",
-  "qaResidueAdjudicationReceiptBlobSha": "cb6d87a8b72bb7fc437f744510c6bad4a96269cc",
+  "qaResidueAdjudicationReceiptBlobSha": "54a3f44ad9f1c3e31e8fcbf5071192c0f1c9a053",
   "syntheticQaWrites": 14,
   "cleanupWrites": 39,
   "syntheticFinalAbsent": true,
@@ -268,7 +273,7 @@
       "url": "https://us-east1-ays-orbit-360-lab.cloudfunctions.net/orbit360ProductOperationalCommandPreview",
       "resourceType": "fetch",
       "method": "POST",
-      "postData": "{\"data\":{\"tenantId\":\"alianzas-soluciones\",\"activeRole\":\"Dirección\",\"mutations\":[{\"action\":\"insert\",\"collection\":\"actividades\",\"id\":\"secres_mv1j28iv82eid\",\"payload\":{\"id\":\"secres_mv1j28iv82eid\",\"tipo\":\"admin\",\"icon\":\"🔐\",\"fecha\":\"2026-10-09\",\"titulo\":\"Acceso a recurso seguro\",\"detalle\":\"document.upload · ok\",\"tenantId\":\"alianzas-soluciones\",\"createdAt\":\"2026-10-09T22:19:05.768Z\",\"updatedAt\":\"2026-10-09T22:19:05.768Z\",\"ownerUid\":\"woJlxR1iFEeiQZvTscPj4qQ5Qc73\",\"ownerEmail\":\"orbit.lab@demo.com\"}}]}}",
+      "postData": "{\"data\":{\"tenantId\":\"alianzas-soluciones\",\"activeRole\":\"Dirección\",\"mutations\":[{\"action\":\"insert\",\"collection\":\"actividades\",\"id\":\"secres_mv2sqqhdqf36e\",\"payload\":{\"id\":\"secres_mv2sqqhdqf36e\",\"tipo\":\"admin\",\"icon\":\"🔐\",\"fecha\":\"2026-10-10\",\"titulo\":\"Acceso a recurso seguro\",\"detalle\":\"document.upload · ok\",\"tenantId\":\"alianzas-soluciones\",\"createdAt\":\"2026-10-10T19:37:51.506Z\",\"updatedAt\":\"2026-10-10T19:37:51.506Z\",\"ownerUid\":\"woJlxR1iFEeiQZvTscPj4qQ5Qc73\",\"ownerEmail\":\"orbit.lab@demo.com\"}}]}}",
       "responseBody": "{\"error\":{\"message\":\"Preview operativo solo admite fixtures sintéticos autorizados B3-004/B4-003.\",\"status\":\"PERMISSION_DENIED\"}}"
     }
   ],
@@ -298,7 +303,7 @@
     {
       "status": 403,
       "url": "https://us-east1-ays-orbit-360-lab.cloudfunctions.net/orbit360ProductOperationalCommandPreview",
-      "id": "secres_mv1j28iv82eid",
+      "id": "secres_mv2sqqhdqf36e",
       "collection": "actividades",
       "reason": "SECURE_RESOURCE_AUDIT_NON_SYNTHETIC_DENIED_IN_PREVIEW",
       "persisted": false
@@ -419,8 +424,8 @@
           "pol_b9a883095c9fae8f7502ce1cb054",
           "pol_0f89cc0a12840594abcc60d418b2",
           "pol_b8b99324d9016269d118d789095a",
-          "b4003qa_policy_expired_renew_37997959332",
           "pol_8231bbb8f9b7272c02891f5a4caf",
+          "b4003qa_policy_expired_renew_38080066957",
           "pol_df6bf097045762297ec31fd4e5c5"
         ]
       },
@@ -428,14 +433,14 @@
         "key": "d15",
         "count": 3,
         "ids": [
-          "b4003qa_policy_renew_37997959332",
-          "b4003qa_policy_renewwrite_37997959332",
-          "b4003qa_policy_unknown_37997959332"
+          "b4003qa_policy_renew_38080066957",
+          "b4003qa_policy_renewwrite_38080066957",
+          "b4003qa_policy_unknown_38080066957"
         ]
       },
       {
         "key": "d45",
-        "count": 9,
+        "count": 10,
         "ids": [
           "pol_638e276218baad9e84018415b0ba",
           "pol_b39a58e5c216d8fb0f9fca4da4d6",
@@ -445,14 +450,14 @@
           "pol_c23dd5e9d7d5e8056c6dd907c48f",
           "pol_9216bfdadaec20d1075f1b4008dd",
           "pol_9f021892163a17c016ea3c28c779",
-          "pol_c48c0b1d4e940f80dffacbc37959"
+          "pol_c48c0b1d4e940f80dffacbc37959",
+          "pol_ddbb135a5fcd5b9d61dba57f56ec"
         ]
       },
       {
         "key": "d90",
-        "count": 35,
+        "count": 34,
         "ids": [
-          "pol_ddbb135a5fcd5b9d61dba57f56ec",
           "pol_4221b6ed10faaa92cbbff6a8f4c4",
           "pol_6b2035cd7636a5bd2156878fcfa7",
           "pol_f86bac81b0079a6b0e2730f2f031",
@@ -496,9 +501,9 @@
     "unknownReview": true,
     "parallelDispositionAbsent": true,
     "date45ExpectedIds": [
-      "b4003qa_policy_renew_37997959332",
-      "b4003qa_policy_renewwrite_37997959332",
-      "b4003qa_policy_unknown_37997959332",
+      "b4003qa_policy_renew_38080066957",
+      "b4003qa_policy_renewwrite_38080066957",
+      "b4003qa_policy_unknown_38080066957",
       "pol_3ddc9e613f40252f02b2e122072d",
       "pol_638e276218baad9e84018415b0ba",
       "pol_7280c9b1a5253a1fe1e463e5993b",
@@ -507,12 +512,13 @@
       "pol_b39a58e5c216d8fb0f9fca4da4d6",
       "pol_c23dd5e9d7d5e8056c6dd907c48f",
       "pol_c48c0b1d4e940f80dffacbc37959",
-      "pol_d5e61976a38be76ba5e3c1e12575"
+      "pol_d5e61976a38be76ba5e3c1e12575",
+      "pol_ddbb135a5fcd5b9d61dba57f56ec"
     ],
     "date45VisibleIds": [
-      "b4003qa_policy_renew_37997959332",
-      "b4003qa_policy_renewwrite_37997959332",
-      "b4003qa_policy_unknown_37997959332",
+      "b4003qa_policy_renew_38080066957",
+      "b4003qa_policy_renewwrite_38080066957",
+      "b4003qa_policy_unknown_38080066957",
       "pol_3ddc9e613f40252f02b2e122072d",
       "pol_638e276218baad9e84018415b0ba",
       "pol_7280c9b1a5253a1fe1e463e5993b",
@@ -521,7 +527,8 @@
       "pol_b39a58e5c216d8fb0f9fca4da4d6",
       "pol_c23dd5e9d7d5e8056c6dd907c48f",
       "pol_c48c0b1d4e940f80dffacbc37959",
-      "pol_d5e61976a38be76ba5e3c1e12575"
+      "pol_d5e61976a38be76ba5e3c1e12575",
+      "pol_ddbb135a5fcd5b9d61dba57f56ec"
     ],
     "expiredPipelineCount": 14,
     "expiredHistoricalCount": 1159,
@@ -568,8 +575,8 @@
     "queryResult": true
   },
   "r18RenewalKpiParity": {
-    "inicio": 12,
-    "polizas": 12,
+    "inicio": 13,
+    "polizas": 13,
     "owner": "polizas.policyMetrics.isRenewalWithin45Days"
   },
   "r18InsurerActivity": {
@@ -600,7 +607,7 @@
     "checkboxUsable": true
   },
   "r19RenewabilityDurable": {
-    "policyId": "b4003qa_policy_renewwrite_37997959332",
+    "policyId": "b4003qa_policy_renewwrite_38080066957",
     "serverValue": true,
     "reloadValue": true
   },
@@ -609,7 +616,7 @@
     "error": "Esta Preview protege los registros reales. La persistencia se valida aquí con una póliza sintética equivalente; el cambio real se prueba únicamente en el gate LIVE autorizado."
   },
   "r19InicioReadiness": {
-    "text": "🌅 Buen día · esto es lo importante hoy METAS DEL MES·PRIORIDADES·AVANCE POR ASESOR Abrir Cliente 360 → METAS DEL MES · OCTUBRE 2026 Avance real del mes Quedan 22 días para cerrar el mes. La producción usa la prima neta de pólizas con inicio de vigencia en el mes y el recaudo usa pagos confirmados con fecha efectiva del mes. Si no existe meta configurada, no se inventa un porcentaje. 440 clientes 1425 pólizas 588 registros vencidos en cartera 14% Q11K GTQ Producción neta del mes Meta Q80K 0% Sin movimientos Recaudo confirmado del mes Meta Q50K COBROS CONFIRMADOS Q851K GTQ $205.8M COP 1243 pagos confirmados › PENDIENTE DE COBRO Q 8,058 GTQ $ 0 COP 728 obligaciones · 18 con monto › CARTERA VENCIDA Q 8,274 GTQ $ 0 COP 588 obligaciones · 16 con monto › VENCEN ≤45 D 12 mismo universo de Pólizas › Avance por asesor producción neta del mes vs meta configurada PO Paula Osorio Q11K GTQ 14% BH Braulio Hernández Sin movimientos Meta no configurada — CC Carlos Castro Sin movimientos Meta no configurada — FA Fernando Arias Sin movimientos Meta no configurada — JS Johanna Salgado Sin movimientos Meta no configurada — NC Nicole Castro Sin movimientos Meta no configurada — SD Samuel Daza Sin movimientos Meta no configurada — Prioridades 🔄 B4-003 QA Cliente Auto · renueva en 9 d 🔄 B4-003 QA Cliente Auto · renueva en 9 d 🔄 B4-003 QA Cliente ACCIDENTES QA FUENTE · renueva en 9 d 🔄 MARÍA DE JESÚS LÓPEZ GARZÓN ACCIDENTES Y ENFERMEDADES · renueva en 17 d ⚠ NORA LUCIA HURTARTE FLORES cuota — vencida · — ⚠ LUIS ESTUARDO PEREZ CIFUENTES cuota — vencida · — ⚠ ERICKA LIZETTE AGUILAR LUNA cuota — vencida · — Seguimientos de hoy sin cadencia automática · gestiona por WhatsApp 🧮 B4-003 QA colaboración · Paula Osorio · mañana · Cotizando 🧮 B4-003 QA colaboración pre-emisión · Paula Osorio · mañ",
+    "text": "🌅 Buen día · esto es lo importante hoy METAS DEL MES·PRIORIDADES·AVANCE POR ASESOR Abrir Cliente 360 → METAS DEL MES · OCTUBRE 2026 Avance real del mes Quedan 21 días para cerrar el mes. La producción usa la prima neta de pólizas con inicio de vigencia en el mes y el recaudo usa pagos confirmados con fecha efectiva del mes. Si no existe meta configurada, no se inventa un porcentaje. 443 clientes 1425 pólizas 594 registros vencidos en cartera — Q11K GTQ Producción neta del mes Meta no configurada — Sin movimientos Recaudo confirmado del mes Meta no configurada COBROS CONFIRMADOS Q851K GTQ $205.8M COP 1243 pagos confirmados › PENDIENTE DE COBRO Q 8,058 GTQ $ 0 COP 722 obligaciones · 18 con monto › CARTERA VENCIDA Q 8,274 GTQ $ 0 COP 594 obligaciones · 16 con monto › VENCEN ≤45 D 13 mismo universo de Pólizas › Avance por asesor producción neta del mes vs meta configurada BH Braulio Hernández Q0 GTQ Meta no configurada — CC Carlos Castro · CO $0 COP Meta no configurada — CC Carlos Castro · GT Q0 GTQ Meta no configurada — FA Fernando Arias Q0 GTQ Meta no configurada — JS Johanna Salgado Q0 GTQ Meta no configurada — NC Nicole Castro $0 COP Meta no configurada — PO Paula Osorio · GT Q11K GTQ 14% PO Paula Osorio · CO $0 COP Meta no configurada — SD Samuel Daza · GT Q0 GTQ Meta no configurada — SD Samuel Daza · CO $0 COP Meta no configurada — Prioridades 🔄 B4-003 QA Cliente Auto · renueva en 9 d 🔄 B4-003 QA Cliente Auto · renueva en 9 d 🔄 B4-003 QA Cliente ACCIDENTES QA FUENTE · renueva en 9 d 🔄 MARÍA DE JESÚS LÓPEZ GARZÓN ACCIDENTES Y ENFERMEDADES · renueva en 16 d ⚠ NORA LUCIA HURTARTE FLORES cuota — vencida · — ⚠ LUIS ESTUARDO PEREZ CIFUENTES cuota — vencida · — ⚠ ERICKA LIZETTE AGUILAR LUNA cuota — vencida · — Seguimientos de hoy sin cadencia automática · gestiona por W",
     "terminal": "ready"
   },
   "r19TypedHandoff": null,
