@@ -12556,5 +12556,13 @@
     "newQaBlobSha": "8c4326ed108af13a2b61f81d72c0ecaa11a8b0c8",
     "newContractBlobSha": "a34f44d0885b13be6fd163ddbbfcedca20c46727",
     "productionUntouched": true
+  },
+  "r23NoAutoRouteContract": {
+    "status": "QA_ONLY_CONTRACT_ALIGNED_EXACT_PREVIEW_PENDING",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R23_SUPERSEDE_R20_INBOX_AUTOROUTE_CONTRACT_20261010.json",
+    "receiptBlobSha": "fb7c2eda9a01ef60187439d62caed4b8e8489369",
+    "contractBefore": "a34f44d0885b13be6fd163ddbbfcedca20c46727",
+    "contractAfter": "c9e7c97f2dcc126677a6f0d8a5dc65575732470f",
+    "sourceProductUnchanged": true
   }
 }

@@ -587,8 +587,8 @@
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_RENEWAL_KPI_PARITY_CAUSAL_ADDENDUM_20261005.json",
     "blobSha": "87bab7ee2778a0525cdbe81cf4cbf82020bf6139"
   },
-  "findingLedgerBlobSha": "ea4c91a7a2412345a84dc67deefe8f0bb43a4312",
-  "continuityRegisterBlobSha": "2b1f957156cd42994dd2678d4d46f003695df4f6",
+  "findingLedgerBlobSha": "27a845053f4a87c484408577a9fb80b73713576c",
+  "continuityRegisterBlobSha": "bd72470156ea77e8dae9cd21e269663264b27e63",
   "compositionLockBlobSha": "6ad2e940f8c2fc7d60cd96696e903ec01b40f979",
   "r18SourceFix": {
     "status": "SOURCE_FIXED_R18_PENDING_CONTRACT_AND_EXACT_PREVIEW",
@@ -1849,11 +1849,21 @@
     "receiptBlobSha": "ffce7c45582fc0c03fc9091bf7fd1a455ea41241",
     "newIndexBlobSha": "c92ac86d311f0d3349a98e21e0c6acd3d2b15fdc",
     "newQaBlobSha": "8c4326ed108af13a2b61f81d72c0ecaa11a8b0c8",
-    "newContractBlobSha": "a34f44d0885b13be6fd163ddbbfcedca20c46727",
+    "newContractBlobSha": "c9e7c97f2dcc126677a6f0d8a5dc65575732470f",
     "productionUntouched": true,
     "compositionBlobSha": "6ad2e940f8c2fc7d60cd96696e903ec01b40f979",
     "ledgerBlobSha": "ea4c91a7a2412345a84dc67deefe8f0bb43a4312",
     "carryBlobSha": "2b1f957156cd42994dd2678d4d46f003695df4f6",
     "queueBlobSha": "69764131009b7e80cb0a1ade6227f5abf980319c"
+  },
+  "r23NoAutoRouteContract": {
+    "status": "QA_ONLY_CONTRACT_ALIGNED_EXACT_PREVIEW_PENDING",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R23_SUPERSEDE_R20_INBOX_AUTOROUTE_CONTRACT_20261010.json",
+    "receiptBlobSha": "fb7c2eda9a01ef60187439d62caed4b8e8489369",
+    "contractBefore": "a34f44d0885b13be6fd163ddbbfcedca20c46727",
+    "contractAfter": "c9e7c97f2dcc126677a6f0d8a5dc65575732470f",
+    "sourceProductUnchanged": true,
+    "ledgerSha": "27a845053f4a87c484408577a9fb80b73713576c",
+    "carrySha": "bd72470156ea77e8dae9cd21e269663264b27e63"
   }
 }

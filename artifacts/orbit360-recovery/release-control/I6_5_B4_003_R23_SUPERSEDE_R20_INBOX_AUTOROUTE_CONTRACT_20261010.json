@@ -1,0 +1,16 @@
+{
+  "schema": "GRAVICENTRA_B4_003_R23_SUPERSEDED_AUTOROUTE_QA_CONTRACT",
+  "priorFailedRunId": 38062265608,
+  "failedCode": "B4_003_R20_SECOND_REVIEW_INBOX_FEEDBACK_MISSING",
+  "cause": "R20 QA contract required automatic route to Ops/Leads for real unread notices despite later R23 demonstrated unwanted route hijack of Inicio",
+  "supersededOnly": "R20 inbox auto-landing expected behavior, not notification actions or historical machine evidence",
+  "newRule": "Never auto-route from unread inbox or background state; routeRow on explicit user click remains authorized",
+  "before": "a34f44d0885b13be6fd163ddbbfcedca20c46727",
+  "after": "c9e7c97f2dcc126677a6f0d8a5dc65575732470f",
+  "sourceProductUnchanged": true,
+  "qaOnly": true,
+  "preservedFindings": 282,
+  "operationalWrites": 0,
+  "productionChanged": false,
+  "status": "QA_ONLY_CONTRACT_ALIGNED_EXACT_PREVIEW_PENDING"
+}
