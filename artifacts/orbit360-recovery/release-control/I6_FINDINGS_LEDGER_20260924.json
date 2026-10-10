@@ -12539,5 +12539,13 @@
     "oldQaBlobSha": "5a1f64f984a6caf5e6cc6066ac6dd11a5235b9eb",
     "sourceProductUnchanged": true,
     "liveUnchanged": true
+  },
+  "r23PostReloadDiagnostic": {
+    "status": "QA_ONLY_DIAGNOSTIC_PENDING_AUTHENTICATED_PREVIEW",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R23_POST_RELOAD_DIAGNOSTIC_QA_20261010.json",
+    "receiptBlobSha": "83fd34b3f351e2533efacfebdbe194ab1f2325c6",
+    "qaBlobSha": "483659a4d5dd4ad252b7b6a2f2bf32159c3ba70f",
+    "oldQaBlobSha": "9c6ac44de6a6429fac25987185b617ef69198204",
+    "sourceProductUnchanged": true
   }
 }

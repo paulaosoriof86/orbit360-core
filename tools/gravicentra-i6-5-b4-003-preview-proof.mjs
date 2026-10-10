@@ -181,7 +181,18 @@ async function r23ProofSnapshot(browser,who,country,month){
   }
   const ui=await p.evaluate(()=>({ids:[...new Set([...document.querySelectorAll('[data-inicio-advisor-id]')].map(e=>e.getAttribute('data-inicio-advisor-id')))].sort(),overflow:document.documentElement.scrollWidth>innerWidth+2}));
   await p.reload({waitUntil:'domcontentloaded'});await bootProduct(p,token);await p.evaluate(c=>{Orbit.pais=c;Orbit.modules.inicio.render(document.getElementById('host'));},country);
-  await p.waitForFunction(()=>document.querySelector('[data-inicio-advisor-id]')||document.querySelector('[data-inicio-advisor-readiness="ready-empty"]'),null,{timeout:20000});
+  try{
+    await p.waitForFunction(()=>document.querySelector('[data-inicio-advisor-id]')||document.querySelector('[data-inicio-advisor-readiness="ready-empty"]'),null,{timeout:12000});
+  }catch(error){
+    const state=await p.evaluate(({country,month})=>{
+      const st=Orbit.store?._productStatus?.()||{},api=Orbit.assignableAdvisorRoster,host=document.getElementById('host');
+      return{url:location.href,route:Orbit.route?.key||'',role:String(Orbit.session?.rol?.()||''),user:String(Orbit.auth?.productUser?.uid||''),country:Orbit.pais||'',month,hostPresent:!!host,hostText:String(host?.innerText||'').slice(0,1700),advisorReadiness:host?.querySelector('[data-inicio-advisor-readiness]')?.getAttribute('data-inicio-advisor-readiness')||'',advisorRendered:host?.querySelectorAll('[data-inicio-advisor-id]').length||0,backendClient:api?.dashboardStatus?.(),rosterApiPresent:typeof api?.dashboardList==='function',store:{ready:st.ready,status:st.status,confirmed:st.serverConfirmedCollections,denied:st.deniedCollections,errors:st.snapshotErrors,optional:st.optionalCollections},appStarted:Orbit.productAppP0?.status?.().started===true};
+    },{country,month});
+    let clientCall;
+    try{clientCall=await p.evaluate(async({country,month})=>{const rows=await Orbit.assignableAdvisorRoster.dashboardList(country,month);return{count:rows.length,ids:rows.map(r=>r.id).slice(0,30)};},{country,month});}
+    catch(e){clientCall={error:String(e?.message||e)};}
+    throw new Error('B4_003_R23_POST_RELOAD_READINESS_NOT_RESTORED:'+JSON.stringify({actor:who.uid,actorRole:who.activeRole,country,month,beforeReload:ui,state,clientCall})+'|'+String(error?.message||error));
+  }
   ui.reloaded=await p.evaluate(()=>[...new Set([...document.querySelectorAll('[data-inicio-advisor-id]')].map(e=>e.getAttribute('data-inicio-advisor-id')))].sort());
   return{api,ui};
  }finally{await ctx.close();}

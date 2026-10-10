@@ -1,0 +1,15 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R23_POST_RELOAD_CAUSAL_DIAGNOSTIC",
+  "previousRunId": 38061226648,
+  "failedHead": "018ee23aa326319133b07ca69d373fa4a1496c4b",
+  "failure": "R23 first render reached, second wait after browser reload 20s exceeded",
+  "previousFailedProofSha": "07e5e78638376eb89fa70aef71af963022037435",
+  "change": "capture server and client roster projections, route, session, scope, hydration, first vs second UI on reload; keep fail closed",
+  "qaBefore": "9c6ac44de6a6429fac25987185b617ef69198204",
+  "qaAfter": "483659a4d5dd4ad252b7b6a2f2bf32159c3ba70f",
+  "productChanged": false,
+  "productionChanged": false,
+  "realDataWrites": 0,
+  "priorEvidencePreserved": true,
+  "status": "QA_ONLY_DIAGNOSTIC_PENDING_AUTHENTICATED_PREVIEW"
+}
