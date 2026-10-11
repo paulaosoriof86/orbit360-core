@@ -91,8 +91,8 @@
     ],
     "reimportAuthorized": false,
     "livePromotionAuthorized": false,
-    "syntheticQaWritesAuthorized": false,
-    "syntheticQaScope": "R23 exact isolated Preview fixtures only; mandatory before/after, server readback and cleanup; never real records.",
+    "syntheticQaWritesAuthorized": true,
+    "syntheticQaScope": "B4-003 R23 exact isolated Preview only; authorized synthetic fixture creation and cleanup; no real data, no LIVE, no reimport",
     "paulaVisualAcceptanceRequiredBeforeAdvance": true,
     "cotcompRealTransportAuthorized": false,
     "providerDeploymentAuthorized": true,
@@ -2193,7 +2193,9 @@
     },
     "qaScope": "Existing R23 source-backed Inicio/roles/GT-CO/mobile/reload; R20 B4-003 E2E remains required",
     "realBusinessWrites": 0,
-    "noLive": true
+    "noLive": true,
+    "boundaryReconciliation": "R23_PREEXISTING_SYNTHETIC_AUTH_REAPPLIED_ONLY_TO_EXACT_PREVIEW",
+    "syntheticWritesScoped": true
   },
   "paulaHumanActorSourceFix20261011": {
     "status": "SOURCE_STAGED_EXACT_PREVIEW_REQUIRED",
