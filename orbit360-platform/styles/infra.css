@@ -1175,3 +1175,135 @@ a.fh-chip:hover{border-color:var(--red);color:var(--red)}
   border-color:color-mix(in srgb,var(--ink) 13%,var(--line));
 }
 .quality-fin-mobile .card{border-left-color:var(--red)}
+/* B4-003 · Inicio premium contrast · Paula UAT 2026-10-11; only dashboard */
+[data-inicio-premium="20261011"]{
+ background:linear-gradient(135deg,#f7f8fa 0%,#edf0f4 100%)!important;
+ border:1px solid #c4cad2!important;border-top:4px solid #c51635!important;
+ border-radius:19px!important;padding:17px!important;gap:14px!important;
+ box-shadow:0 16px 36px -24px rgba(15,20,28,.55),0 3px 12px rgba(15,20,28,.08)!important;
+}
+[data-inicio-premium="20261011"]>div:first-child{
+ background:linear-gradient(155deg,#343c47,#1d232b 72%,#151b23)!important;
+ color:#fff!important;border-radius:16px!important;border-left:4px solid #e01d42;
+ padding:19px 17px!important;flex:0 1 210px!important;min-width:175px!important;
+ display:flex;flex-direction:column;box-shadow:0 8px 22px rgba(20,25,32,.14);
+}
+[data-inicio-premium="20261011"]>div:first-child>div:first-child{
+ color:#d1d9e3!important;font-size:11px!important;letter-spacing:.13em!important;
+}
+[data-inicio-premium="20261011"]>div:first-child>div:nth-child(2){
+ color:#fff!important;font-family:var(--f-display),sans-serif;
+ font-size:23px!important;line-height:1.18!important;letter-spacing:-.02em;margin-top:12px!important;
+}
+[data-inicio-premium="20261011"]>div:first-child>div:nth-child(3){
+ color:#e6eaf0!important;font-size:13px!important;line-height:1.65!important;margin-top:14px!important;
+}
+[data-inicio-premium="20261011"]>div:first-child>div:nth-child(3) b{color:#fff!important}
+[data-inicio-premium="20261011"]>div:first-child>div:last-child{
+ margin-top:auto!important;padding-top:20px;gap:7px!important;
+}
+[data-inicio-premium="20261011"]>div:first-child .badge{
+ border:1px solid rgba(255,255,255,.25)!important;
+ background:rgba(255,255,255,.15)!important;color:#fff!important;
+ font-size:11px!important;font-weight:700!important;
+}
+[data-inicio-premium="20261011"]>div:first-child .badge.danger{
+ background:rgba(214,25,59,.35)!important;border-color:rgba(255,171,184,.6)!important;
+}
+[data-inicio-premium="20261011"]>[data-inicio-monthly]{
+ background:linear-gradient(165deg,#fdfdfe,#edf0f3)!important;
+ border:1px solid #c8ced6;border-radius:16px;padding:13px!important;
+ min-width:315px!important;flex:1 1 355px!important;gap:12px!important;
+}
+[data-inicio-premium="20261011"]>[data-inicio-monthly="production"]{border-top:3px solid #c51635}
+[data-inicio-premium="20261011"]>[data-inicio-monthly="recaudo"]{border-top:3px solid #343b45}
+[data-inicio-premium="20261011"]>[data-inicio-monthly]>b{
+ color:#1e252d!important;font-family:var(--f-display),sans-serif;
+ font-size:14px!important;line-height:1.4;letter-spacing:-.01em;
+}
+[data-inicio-premium="20261011"]>[data-inicio-monthly]>div{gap:10px!important;align-items:stretch!important}
+[data-inicio-premium="20261011"] [data-inicio-country]{
+ min-width:145px!important;max-width:none!important;flex:1 1 145px!important;
+ border:1px solid #b9c2cc!important;border-top:4px solid #c51635!important;
+ border-radius:15px!important;padding:15px 9px 14px!important;gap:9px!important;
+ background:#fff!important;box-shadow:0 7px 15px rgba(18,25,35,.11)!important;
+ transition:box-shadow .18s ease,transform .18s ease;
+}
+[data-inicio-premium="20261011"] [data-inicio-country]::before{
+ content:"META DEL EQUIPO";align-self:center;font-size:9px;font-weight:800;
+ letter-spacing:.1em;color:#565f6b;
+}
+[data-inicio-premium="20261011"] [data-inicio-country][data-goal-source="personal"]::before{
+ content:"META PERSONAL";color:#a60e2c;
+}
+[data-inicio-premium="20261011"] [data-inicio-country][data-goal-source="team-pending"]::before{
+ content:"META DE EQUIPO PENDIENTE";color:#495461;
+}
+[data-inicio-premium="20261011"] [data-inicio-country][data-goal-source="loading"]::before{
+ content:"CONSULTANDO META";color:#495461;
+}
+[data-inicio-premium="20261011"] [data-inicio-country]>b{
+ font-family:var(--f-display),sans-serif;color:#1c242e!important;
+ font-size:12.5px!important;letter-spacing:.015em;
+}
+[data-inicio-premium="20261011"] [data-inicio-country]>div:nth-of-type(1){
+ width:142px!important;height:142px!important;padding:15px!important;
+ background:conic-gradient(from 225deg,#d01535 0deg,#d01535 var(--gi-inicio-sweep,0deg),#acb5c1 var(--gi-inicio-sweep,0deg),#acb5c1 270deg,transparent 270deg 360deg)!important;
+ filter:drop-shadow(0 5px 8px rgba(34,42,54,.12));
+}
+[data-inicio-premium="20261011"] [data-inicio-country]>div:nth-of-type(1)>div{
+ background:#fff!important;box-shadow:0 0 0 1px #e3e6eb,0 3px 9px rgba(19,25,33,.065)!important;
+}
+[data-inicio-premium="20261011"] [data-inicio-country]>div:nth-of-type(1)>div>strong{
+ color:#161e29!important;font-family:var(--f-display),sans-serif!important;
+ font-size:31px!important;font-weight:800!important;line-height:1.08;font-variant-numeric:tabular-nums;
+}
+[data-inicio-premium="20261011"] [data-inicio-country]>div:nth-of-type(1)>div>small{
+ color:#465363!important;font-size:10.5px!important;font-weight:800;letter-spacing:.04em;
+}
+[data-inicio-premium="20261011"] [data-inicio-country]>strong{
+ font-family:var(--f-display),sans-serif;font-size:21px!important;line-height:1.2;
+ font-weight:800;color:#151c25!important;font-variant-numeric:tabular-nums;
+}
+[data-inicio-premium="20261011"] [data-inicio-country]>small{
+ color:#3e4b58!important;font-size:11.5px!important;line-height:1.5!important;
+}
+[data-inicio-premium="20261011"] [data-inicio-country]>small:last-child{color:#505c69!important}
+[data-inicio-premium="20261011"] [data-inicio-country][data-goal-source="team-pending"],
+[data-inicio-premium="20261011"] [data-inicio-country][data-goal-source="loading"]{
+ background:#f2f4f7!important;border-color:#b6bec9!important;
+ border-top-color:#646e7b!important;border-top-width:4px!important;
+}
+[data-inicio-premium="20261011"] [data-inicio-country][data-goal-source="team-pending"]>div:nth-of-type(1),
+[data-inicio-premium="20261011"] [data-inicio-country][data-goal-source="loading"]>div:nth-of-type(1){
+ background:conic-gradient(from 225deg,#9ca6b3 0deg,#9ca6b3 270deg,transparent 270deg 360deg)!important;filter:none;
+}
+@media(hover:hover){
+ [data-inicio-premium="20261011"] [data-inicio-country]:hover{
+  transform:translateY(-2px);box-shadow:0 11px 24px rgba(18,25,35,.16)!important;
+ }
+}
+@media(max-width:1160px){
+ [data-inicio-premium="20261011"]>div:first-child{flex:1 1 100%!important;min-width:0!important}
+ [data-inicio-premium="20261011"]>[data-inicio-monthly]{min-width:300px!important}
+}
+@media(max-width:700px){
+ [data-inicio-premium="20261011"]{padding:12px!important;gap:12px!important}
+ [data-inicio-premium="20261011"]>[data-inicio-monthly]{
+  flex:1 1 100%!important;min-width:0!important;padding:11px!important;
+ }
+ [data-inicio-premium="20261011"] [data-inicio-country]{
+  min-width:132px!important;flex:1 1 132px!important;padding:13px 7px!important;
+ }
+ [data-inicio-premium="20261011"] [data-inicio-country]>div:nth-of-type(1){
+  width:120px!important;height:120px!important;padding:13px!important;
+ }
+ [data-inicio-premium="20261011"] [data-inicio-country]>div:nth-of-type(1)>div>strong{font-size:26px!important}
+}
+@media(max-width:360px){
+ [data-inicio-premium="20261011"] [data-inicio-country]{flex-basis:100%!important}
+}
+@media(prefers-reduced-motion:reduce){
+ [data-inicio-premium="20261011"] [data-inicio-country]{transition:none}
+}
+
