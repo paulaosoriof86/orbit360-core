@@ -2165,7 +2165,7 @@
     "operationalBusinessWrites": 0,
     "syntheticFinalAbsent": true
   },
-  "findingLedgerBlobSha": "b0d3af2b0d628c013ade239df053e1f8fcf8bbc9",
+  "findingLedgerBlobSha": "d41d2dc19af7f66a0b7a05d7ca8da53b1a648160",
   "b4002Diagnostic": {
     "status": "CAUSE_DEMONSTRATED_SOURCE_FIX_AUTHORIZED",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_002_POST_COMMIT_NOTIFICATION_DIAGNOSTIC_20261003.json",
@@ -2813,7 +2813,7 @@
     "livePromotion": false,
     "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW"
   },
-  "continuityRegisterBlobSha": "d34012ded7820c5ca9e74a395db62b458de59c81",
+  "continuityRegisterBlobSha": "f3649634e1bc208582262207e4e0819437c11925",
   "findingContinuityGuardBlobSha": "868a0ba1a492d9adc8d91655f152b6fa7980f499",
   "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_R20_CONTRACT_AND_EXACT_PREVIEW",
   "b4003R15VisualReview": {
@@ -4905,5 +4905,11 @@
     "oldSha": "1796343e19f99c0028e3ee324db3ce8888caddf9",
     "preciseRule": "Preserve advisor handoff condition and separately allow OPS-stage privileged edits with opsScope",
     "noRealDataMutation": true
+  },
+  "paulaInicioPremiumContinuity20261011": {
+    "status": "GOVERNANCE_ONLY_BINDING_RECONCILED",
+    "findingLedgerBlobSha": "d41d2dc19af7f66a0b7a05d7ca8da53b1a648160",
+    "continuityRegisterBlobSha": "f3649634e1bc208582262207e4e0819437c11925",
+    "productBlobsUntouched": true
   }
 }
