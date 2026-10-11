@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B4_EXECUTION_LOCK_V1",
   "recordedAt": "2026-10-08T21:43:35.454Z",
-  "status": "B4_003_R23_SOURCE_STAGED_PENDING_PREVIEW",
+  "status": "B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "block": "B4",
@@ -38,10 +38,10 @@
   "activeFinding": {
     "id": "B4-003",
     "title": "Cumulative B4-003 remediation: Renovaciones, Cancelaciones and source-backed insurer knowledge.",
-    "status": "B4_003_R23_SOURCE_STAGED_PENDING_PREVIEW",
+    "status": "B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL",
     "blocking": true,
-    "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_R23_CONTRACT_AND_EXACT_PREVIEW",
-    "humanVisualStatus": "PAULA_20261011_INICIO_REJECTED_PENDING_EXACT_PREVIEW",
+    "nextAction": "B4_003_R20_TARGETED_PAULA_VISUAL",
+    "humanVisualStatus": "PENDING_R20_TARGETED_VISUAL",
     "knowledgePreview": true
   },
   "rules": {
@@ -91,7 +91,7 @@
     ],
     "reimportAuthorized": false,
     "livePromotionAuthorized": false,
-    "syntheticQaWritesAuthorized": true,
+    "syntheticQaWritesAuthorized": false,
     "syntheticQaScope": "B4-003 R23 exact isolated Preview only; authorized synthetic fixture creation and cleanup; no real data, no LIVE, no reimport",
     "paulaVisualAcceptanceRequiredBeforeAdvance": true,
     "cotcompRealTransportAuthorized": false,
@@ -119,15 +119,15 @@
     "renewalCutoffDataMutationAuthorized": false,
     "realOperationalWritesAuthorized": false
   },
-  "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_R23_CONTRACT_AND_EXACT_PREVIEW",
+  "nextAction": "B4_003_R20_TARGETED_PAULA_VISUAL",
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "blobSha": "c9b8a3f6612adfc727175889f409aad6d4411e4a",
+    "blobSha": "6c1f48919a312343f4442c506ad11ba59d1089af",
     "status": "FROZEN_ACTIVE_UAT3_P0_BATCH_1_SOURCE_COMPLETE"
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "blobSha": "d41d2dc19af7f66a0b7a05d7ca8da53b1a648160",
+    "blobSha": "c42ae7dca4f7d8b52d09c330d6390c02cb770cd3",
     "count": 282
   },
   "sourceFix": {
@@ -146,15 +146,15 @@
     "B4_003_R20_TARGETED_PAULA_VISUAL_PASS"
   ],
   "candidate": {
-    "sourceSha": "ca8334b8a20351397f18ea83cdf14a2b1b9fc2b4",
-    "buildId": "gi-i65-b4-ca8334b8a203-57f234755dc1",
-    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-38156261971-8y3l64f1.web.app",
-    "runId": 38156261971,
-    "artifactId": 11708454482,
-    "artifactDigest": "e5b1fa47c8d3509ec5c422a6ad4024e0ad11e4a17b410cce4a5e9b6791d9be27",
-    "hostedPayloadDigest": "277c312f6437484e540a5f21290f2df53b6da6fd757fd5b9eca47f3a92b71926",
-    "backendSourceDigest": "ea85ddc7462a689cbf6c915497f08fa0561406dc3657864aa1908160041b547c",
-    "bundleDigest": "7e9de274a52243a3b02dcf200d9083a09be13102c36bd276885bb9edc806d7c8",
+    "sourceSha": "a880d9b662d22b1094cfcfac476923a19784ecbf",
+    "buildId": "gi-i65-b4-a880d9b662d2-57f234755dc1",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-38179062290-30sm1ros.web.app",
+    "runId": 38179062290,
+    "artifactId": 11716453582,
+    "artifactDigest": "f6e6e6484fdd0bd0d95c8d9bebc22e5c1131b73d2c2e1b821d4d054a1bea797b",
+    "hostedPayloadDigest": "246711e9f0f4547c12001e66d04bfaa24ada96330e359bf7323f0f1092a485b7",
+    "backendSourceDigest": "46bfa1b16c79227e40252d9eeef3fc058c3b1de9390f5ce9fb7fda42e7caaf68",
+    "bundleDigest": "2a11511617fd030c82fb86b5bfe0462a5e32fd83e8d5163fb44864f8ff9a9d9a",
     "exactReadback": true
   },
   "b4002Diagnostic": {
@@ -418,7 +418,7 @@
   },
   "continuityRegister": {
     "path": "artifacts/orbit360-recovery/release-control/I6_5_OPEN_FINDINGS_CARRY_FORWARD_REGISTER_20261003.json",
-    "blobSha": "2e5e47fd36ccdd44093eaa1ec3cd2319406c21cf",
+    "blobSha": "3c0e89ff46df4778aa10d49bdfd13eded5ea4ad3",
     "inventoryCount": 282,
     "attentionCount": 155,
     "guardPath": "tools/gravicentra-open-findings-continuity-guard-v1.mjs",

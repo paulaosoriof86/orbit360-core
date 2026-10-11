@@ -1,18 +1,18 @@
 {
   "schema": "GRAVICENTRA_I6_5_B4_003_R20_MACHINE_PROOF_V1",
-  "recordedAt": "2026-10-11T16:45:37.867Z",
+  "recordedAt": "2026-10-11T22:13:58.329Z",
   "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
   "findingId": "B4-003",
-  "sourceSha": "ca8334b8a20351397f18ea83cdf14a2b1b9fc2b4",
-  "buildId": "gi-i65-b4-ca8334b8a203-57f234755dc1",
-  "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-38156261971-8y3l64f1.web.app",
-  "channelId": "gi-i65-b4-38156261971",
-  "runId": 38156261971,
-  "artifactId": 11708454482,
-  "artifactDigest": "e5b1fa47c8d3509ec5c422a6ad4024e0ad11e4a17b410cce4a5e9b6791d9be27",
-  "hostedPayloadDigest": "277c312f6437484e540a5f21290f2df53b6da6fd757fd5b9eca47f3a92b71926",
-  "backendSourceDigest": "ea85ddc7462a689cbf6c915497f08fa0561406dc3657864aa1908160041b547c",
-  "bundleDigest": "7e9de274a52243a3b02dcf200d9083a09be13102c36bd276885bb9edc806d7c8",
+  "sourceSha": "a880d9b662d22b1094cfcfac476923a19784ecbf",
+  "buildId": "gi-i65-b4-a880d9b662d2-57f234755dc1",
+  "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-38179062290-30sm1ros.web.app",
+  "channelId": "gi-i65-b4-38179062290",
+  "runId": 38179062290,
+  "artifactId": 11716453582,
+  "artifactDigest": "f6e6e6484fdd0bd0d95c8d9bebc22e5c1131b73d2c2e1b821d4d054a1bea797b",
+  "hostedPayloadDigest": "246711e9f0f4547c12001e66d04bfaa24ada96330e359bf7323f0f1092a485b7",
+  "backendSourceDigest": "46bfa1b16c79227e40252d9eeef3fc058c3b1de9390f5ce9fb7fda42e7caaf68",
+  "bundleDigest": "2a11511617fd030c82fb86b5bfe0462a5e32fd83e8d5163fb44864f8ff9a9d9a",
   "exactHostingReadback": true,
   "assertions": {
     "handoffActorsDistinct": true,
@@ -175,7 +175,7 @@
     "route": "renovaciones",
     "records": [
       {
-        "ms": 669,
+        "ms": 667,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -186,7 +186,7 @@
         ]
       },
       {
-        "ms": 1179,
+        "ms": 1173,
         "type": "childList",
         "target": "DIV",
         "added": [],
@@ -195,7 +195,7 @@
         ]
       },
       {
-        "ms": 1180,
+        "ms": 1173,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -204,7 +204,7 @@
         "removed": []
       },
       {
-        "ms": 1180,
+        "ms": 1173,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -215,7 +215,7 @@
         ]
       },
       {
-        "ms": 1180,
+        "ms": 1173,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -226,7 +226,7 @@
         ]
       },
       {
-        "ms": 1180,
+        "ms": 1173,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -237,7 +237,7 @@
         ]
       },
       {
-        "ms": 1180,
+        "ms": 1173,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -248,7 +248,7 @@
         ]
       },
       {
-        "ms": 1180,
+        "ms": 1173,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -259,7 +259,7 @@
         ]
       },
       {
-        "ms": 1180,
+        "ms": 1173,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -270,7 +270,7 @@
         ]
       },
       {
-        "ms": 1180,
+        "ms": 1173,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -281,7 +281,7 @@
         ]
       },
       {
-        "ms": 1180,
+        "ms": 1174,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -292,7 +292,7 @@
         ]
       },
       {
-        "ms": 1180,
+        "ms": 1174,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -303,7 +303,7 @@
         ]
       },
       {
-        "ms": 1180,
+        "ms": 1174,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -314,7 +314,7 @@
         ]
       },
       {
-        "ms": 1180,
+        "ms": 1174,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -326,7 +326,7 @@
         ]
       },
       {
-        "ms": 1180,
+        "ms": 1174,
         "type": "childList",
         "target": "DIV",
         "added": [
@@ -337,7 +337,7 @@
         ]
       },
       {
-        "ms": 1180,
+        "ms": 1174,
         "type": "childList",
         "target": "A",
         "added": [
@@ -348,7 +348,7 @@
         ]
       },
       {
-        "ms": 1180,
+        "ms": 1174,
         "type": "childList",
         "target": "A",
         "added": [
@@ -359,7 +359,7 @@
         ]
       },
       {
-        "ms": 1180,
+        "ms": 1174,
         "type": "childList",
         "target": "A",
         "added": [
@@ -370,7 +370,7 @@
         ]
       },
       {
-        "ms": 1180,
+        "ms": 1174,
         "type": "childList",
         "target": "A",
         "added": [
@@ -381,7 +381,7 @@
         ]
       },
       {
-        "ms": 1180,
+        "ms": 1174,
         "type": "childList",
         "target": "A",
         "added": [
@@ -392,7 +392,7 @@
         ]
       },
       {
-        "ms": 1180,
+        "ms": 1174,
         "type": "childList",
         "target": "A",
         "added": [
@@ -403,7 +403,7 @@
         ]
       },
       {
-        "ms": 1180,
+        "ms": 1174,
         "type": "childList",
         "target": "A",
         "added": [
@@ -414,7 +414,7 @@
         ]
       },
       {
-        "ms": 1180,
+        "ms": 1174,
         "type": "childList",
         "target": "A",
         "added": [
@@ -425,7 +425,7 @@
         ]
       },
       {
-        "ms": 1180,
+        "ms": 1174,
         "type": "childList",
         "target": "A",
         "added": [
@@ -436,7 +436,7 @@
         ]
       },
       {
-        "ms": 1180,
+        "ms": 1174,
         "type": "childList",
         "target": "A",
         "added": [
@@ -447,7 +447,7 @@
         ]
       },
       {
-        "ms": 1180,
+        "ms": 1174,
         "type": "childList",
         "target": "A",
         "added": [
@@ -458,7 +458,7 @@
         ]
       },
       {
-        "ms": 1180,
+        "ms": 1174,
         "type": "childList",
         "target": "A",
         "added": [
@@ -469,7 +469,7 @@
         ]
       },
       {
-        "ms": 1180,
+        "ms": 1174,
         "type": "childList",
         "target": "A",
         "added": [
@@ -480,7 +480,7 @@
         ]
       },
       {
-        "ms": 1180,
+        "ms": 1174,
         "type": "childList",
         "target": "A",
         "added": [
@@ -491,7 +491,7 @@
         ]
       },
       {
-        "ms": 1180,
+        "ms": 1174,
         "type": "childList",
         "target": "A",
         "added": [
@@ -502,7 +502,7 @@
         ]
       },
       {
-        "ms": 1180,
+        "ms": 1174,
         "type": "childList",
         "target": "A",
         "added": [
@@ -513,7 +513,7 @@
         ]
       },
       {
-        "ms": 1180,
+        "ms": 1174,
         "type": "childList",
         "target": "A",
         "added": [
@@ -524,7 +524,7 @@
         ]
       },
       {
-        "ms": 1180,
+        "ms": 1174,
         "type": "childList",
         "target": "A",
         "added": [
@@ -535,7 +535,7 @@
         ]
       },
       {
-        "ms": 1180,
+        "ms": 1174,
         "type": "childList",
         "target": "A",
         "added": [
@@ -546,7 +546,7 @@
         ]
       },
       {
-        "ms": 1180,
+        "ms": 1174,
         "type": "childList",
         "target": "A",
         "added": [
@@ -557,7 +557,7 @@
         ]
       },
       {
-        "ms": 1180,
+        "ms": 1174,
         "type": "childList",
         "target": "A",
         "added": [
@@ -568,7 +568,7 @@
         ]
       },
       {
-        "ms": 1180,
+        "ms": 1174,
         "type": "childList",
         "target": "A",
         "added": [
@@ -579,7 +579,7 @@
         ]
       },
       {
-        "ms": 1180,
+        "ms": 1174,
         "type": "childList",
         "target": "A",
         "added": [
@@ -590,7 +590,7 @@
         ]
       },
       {
-        "ms": 1180,
+        "ms": 1174,
         "type": "childList",
         "target": "A",
         "added": [
@@ -601,7 +601,7 @@
         ]
       },
       {
-        "ms": 1180,
+        "ms": 1174,
         "type": "childList",
         "target": "A",
         "added": [
@@ -612,7 +612,7 @@
         ]
       },
       {
-        "ms": 1180,
+        "ms": 1174,
         "type": "childList",
         "target": "A",
         "added": [
@@ -623,7 +623,7 @@
         ]
       },
       {
-        "ms": 1180,
+        "ms": 1174,
         "type": "childList",
         "target": "A",
         "added": [
@@ -634,7 +634,7 @@
         ]
       },
       {
-        "ms": 1180,
+        "ms": 1174,
         "type": "childList",
         "target": "A",
         "added": [
@@ -645,7 +645,7 @@
         ]
       },
       {
-        "ms": 1180,
+        "ms": 1174,
         "type": "childList",
         "target": "A",
         "added": [
@@ -656,7 +656,7 @@
         ]
       },
       {
-        "ms": 1180,
+        "ms": 1174,
         "type": "childList",
         "target": "A",
         "added": [
@@ -667,7 +667,7 @@
         ]
       },
       {
-        "ms": 1180,
+        "ms": 1174,
         "type": "childList",
         "target": "A",
         "added": [
@@ -678,7 +678,7 @@
         ]
       },
       {
-        "ms": 1180,
+        "ms": 1174,
         "type": "childList",
         "target": "A",
         "added": [
@@ -689,7 +689,7 @@
         ]
       },
       {
-        "ms": 1180,
+        "ms": 1174,
         "type": "childList",
         "target": "A",
         "added": [
@@ -700,7 +700,7 @@
         ]
       },
       {
-        "ms": 1180,
+        "ms": 1174,
         "type": "childList",
         "target": "A",
         "added": [
@@ -711,7 +711,7 @@
         ]
       },
       {
-        "ms": 1180,
+        "ms": 1174,
         "type": "childList",
         "target": "A",
         "added": [
@@ -722,7 +722,7 @@
         ]
       },
       {
-        "ms": 1180,
+        "ms": 1174,
         "type": "childList",
         "target": "A",
         "added": [
@@ -733,7 +733,7 @@
         ]
       },
       {
-        "ms": 1180,
+        "ms": 1174,
         "type": "childList",
         "target": "A",
         "added": [
@@ -744,7 +744,7 @@
         ]
       },
       {
-        "ms": 1180,
+        "ms": 1174,
         "type": "childList",
         "target": "A",
         "added": [
@@ -755,7 +755,7 @@
         ]
       },
       {
-        "ms": 1180,
+        "ms": 1174,
         "type": "childList",
         "target": "A",
         "added": [
@@ -766,7 +766,7 @@
         ]
       },
       {
-        "ms": 1180,
+        "ms": 1174,
         "type": "childList",
         "target": "A",
         "added": [
@@ -777,7 +777,7 @@
         ]
       },
       {
-        "ms": 1180,
+        "ms": 1174,
         "type": "childList",
         "target": "A",
         "added": [
@@ -788,7 +788,7 @@
         ]
       },
       {
-        "ms": 1180,
+        "ms": 1174,
         "type": "childList",
         "target": "A",
         "added": [
@@ -799,7 +799,7 @@
         ]
       },
       {
-        "ms": 1180,
+        "ms": 1174,
         "type": "childList",
         "target": "A",
         "added": [
@@ -810,7 +810,7 @@
         ]
       },
       {
-        "ms": 1180,
+        "ms": 1174,
         "type": "childList",
         "target": "A",
         "added": [
@@ -821,7 +821,7 @@
         ]
       },
       {
-        "ms": 1180,
+        "ms": 1174,
         "type": "childList",
         "target": "A",
         "added": [
@@ -832,7 +832,7 @@
         ]
       },
       {
-        "ms": 1180,
+        "ms": 1174,
         "type": "childList",
         "target": "A",
         "added": [
@@ -843,7 +843,7 @@
         ]
       },
       {
-        "ms": 1180,
+        "ms": 1174,
         "type": "childList",
         "target": "A",
         "added": [
@@ -854,7 +854,7 @@
         ]
       },
       {
-        "ms": 1180,
+        "ms": 1174,
         "type": "childList",
         "target": "A",
         "added": [
@@ -865,7 +865,7 @@
         ]
       },
       {
-        "ms": 1180,
+        "ms": 1174,
         "type": "childList",
         "target": "A",
         "added": [
@@ -876,7 +876,7 @@
         ]
       },
       {
-        "ms": 1180,
+        "ms": 1174,
         "type": "childList",
         "target": "A",
         "added": [
@@ -887,7 +887,7 @@
         ]
       },
       {
-        "ms": 1180,
+        "ms": 1174,
         "type": "childList",
         "target": "A",
         "added": [
@@ -898,7 +898,7 @@
         ]
       },
       {
-        "ms": 1180,
+        "ms": 1174,
         "type": "childList",
         "target": "A",
         "added": [
@@ -909,7 +909,7 @@
         ]
       },
       {
-        "ms": 1180,
+        "ms": 1174,
         "type": "childList",
         "target": "A",
         "added": [
@@ -920,7 +920,7 @@
         ]
       },
       {
-        "ms": 1180,
+        "ms": 1174,
         "type": "childList",
         "target": "A",
         "added": [
@@ -931,7 +931,7 @@
         ]
       },
       {
-        "ms": 1180,
+        "ms": 1174,
         "type": "childList",
         "target": "A",
         "added": [
@@ -942,7 +942,7 @@
         ]
       },
       {
-        "ms": 1180,
+        "ms": 1174,
         "type": "childList",
         "target": "A",
         "added": [
@@ -953,7 +953,7 @@
         ]
       },
       {
-        "ms": 1180,
+        "ms": 1174,
         "type": "childList",
         "target": "A",
         "added": [
@@ -964,7 +964,7 @@
         ]
       },
       {
-        "ms": 1180,
+        "ms": 1174,
         "type": "childList",
         "target": "A",
         "added": [
@@ -975,7 +975,7 @@
         ]
       },
       {
-        "ms": 1180,
+        "ms": 1174,
         "type": "childList",
         "target": "A",
         "added": [
@@ -986,7 +986,7 @@
         ]
       },
       {
-        "ms": 1180,
+        "ms": 1174,
         "type": "childList",
         "target": "A",
         "added": [
@@ -997,7 +997,7 @@
         ]
       },
       {
-        "ms": 1180,
+        "ms": 1174,
         "type": "childList",
         "target": "A",
         "added": [
@@ -1008,7 +1008,7 @@
         ]
       },
       {
-        "ms": 1180,
+        "ms": 1174,
         "type": "childList",
         "target": "A",
         "added": [
@@ -1019,7 +1019,7 @@
         ]
       },
       {
-        "ms": 1180,
+        "ms": 1174,
         "type": "childList",
         "target": "A",
         "added": [
@@ -1030,7 +1030,7 @@
         ]
       },
       {
-        "ms": 1180,
+        "ms": 1174,
         "type": "childList",
         "target": "A",
         "added": [
@@ -1041,7 +1041,7 @@
         ]
       },
       {
-        "ms": 1180,
+        "ms": 1174,
         "type": "childList",
         "target": "BUTTON",
         "added": [
@@ -1059,17 +1059,17 @@
         "detail": "clientes"
       },
       {
-        "ms": 86,
+        "ms": 84,
         "kind": "store",
         "detail": "vehiculos"
       },
       {
-        "ms": 166,
+        "ms": 167,
         "kind": "store",
         "detail": "recibosEsperados"
       },
       {
-        "ms": 172,
+        "ms": 173,
         "kind": "store",
         "detail": "cancelaciones"
       },
@@ -1084,27 +1084,27 @@
         "detail": "gestiones"
       },
       {
-        "ms": 200,
+        "ms": 199,
         "kind": "store",
         "detail": "aseguradoras"
       },
       {
-        "ms": 206,
+        "ms": 205,
         "kind": "store",
         "detail": "cobros"
       },
       {
-        "ms": 252,
+        "ms": 249,
         "kind": "store",
         "detail": "carteraPrimas"
       },
       {
-        "ms": 258,
+        "ms": 255,
         "kind": "store",
         "detail": "metas"
       },
       {
-        "ms": 266,
+        "ms": 265,
         "kind": "store",
         "detail": "auditoria"
       }
@@ -1179,7 +1179,7 @@
   "qaResidueDisposition": "NOT_DELETED_FAIL_CLOSED",
   "qaResidueDeletedCount": 0,
   "qaResidueAdjudicationReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R19_B2_QA_RESIDUE_ADJUDICATION_20261005.json",
-  "qaResidueAdjudicationReceiptBlobSha": "ad8351a14fd706f853f3bf6476bc3f76f62b3e53",
+  "qaResidueAdjudicationReceiptBlobSha": "5143a7b5a468ab18b2c2f0d9329a2b183e75f8d3",
   "syntheticQaWrites": 14,
   "cleanupWrites": 39,
   "syntheticFinalAbsent": true,
@@ -1211,7 +1211,7 @@
       "url": "https://us-east1-ays-orbit-360-lab.cloudfunctions.net/orbit360ProductOperationalCommandPreview",
       "resourceType": "fetch",
       "method": "POST",
-      "postData": "{\"data\":{\"tenantId\":\"alianzas-soluciones\",\"activeRole\":\"Dirección\",\"mutations\":[{\"action\":\"insert\",\"collection\":\"actividades\",\"id\":\"secres_mv420iu0i7jln\",\"payload\":{\"id\":\"secres_mv420iu0i7jln\",\"tipo\":\"admin\",\"icon\":\"🔐\",\"fecha\":\"2026-10-11\",\"titulo\":\"Acceso a recurso seguro\",\"detalle\":\"document.upload · ok\",\"tenantId\":\"alianzas-soluciones\",\"createdAt\":\"2026-10-11T16:45:10.872Z\",\"updatedAt\":\"2026-10-11T16:45:10.872Z\",\"ownerUid\":\"woJlxR1iFEeiQZvTscPj4qQ5Qc73\",\"ownerEmail\":\"orbit.lab@demo.com\"}}]}}",
+      "postData": "{\"data\":{\"tenantId\":\"alianzas-soluciones\",\"activeRole\":\"Dirección\",\"mutations\":[{\"action\":\"insert\",\"collection\":\"actividades\",\"id\":\"secres_mv4dqtejlteyb\",\"payload\":{\"id\":\"secres_mv4dqtejlteyb\",\"tipo\":\"admin\",\"icon\":\"🔐\",\"fecha\":\"2026-10-11\",\"titulo\":\"Acceso a recurso seguro\",\"detalle\":\"document.upload · ok\",\"tenantId\":\"alianzas-soluciones\",\"createdAt\":\"2026-10-11T22:13:33.404Z\",\"updatedAt\":\"2026-10-11T22:13:33.404Z\",\"ownerUid\":\"woJlxR1iFEeiQZvTscPj4qQ5Qc73\",\"ownerEmail\":\"orbit.lab@demo.com\"}}]}}",
       "responseBody": "{\"error\":{\"message\":\"Preview operativo solo admite fixtures sintéticos autorizados B3-004/B4-003.\",\"status\":\"PERMISSION_DENIED\"}}"
     }
   ],
@@ -1241,7 +1241,7 @@
     {
       "status": 403,
       "url": "https://us-east1-ays-orbit-360-lab.cloudfunctions.net/orbit360ProductOperationalCommandPreview",
-      "id": "secres_mv420iu0i7jln",
+      "id": "secres_mv4dqtejlteyb",
       "collection": "actividades",
       "reason": "SECURE_RESOURCE_AUDIT_NON_SYNTHETIC_DENIED_IN_PREVIEW",
       "persisted": false
@@ -1365,7 +1365,7 @@
           "pol_8231bbb8f9b7272c02891f5a4caf",
           "pol_df6bf097045762297ec31fd4e5c5",
           "b4003qa_policy_expired_renew_38102224750",
-          "b4003qa_policy_expired_renew_38156261971",
+          "b4003qa_policy_expired_renew_38179062290",
           "pol_6e557c18fc77e18c06bb63a46b7b"
         ]
       },
@@ -1374,11 +1374,11 @@
         "count": 8,
         "ids": [
           "b4003qa_policy_renew_38102224750",
-          "b4003qa_policy_renew_38156261971",
+          "b4003qa_policy_renew_38179062290",
           "b4003qa_policy_renewwrite_38102224750",
-          "b4003qa_policy_renewwrite_38156261971",
+          "b4003qa_policy_renewwrite_38179062290",
           "b4003qa_policy_unknown_38102224750",
-          "b4003qa_policy_unknown_38156261971",
+          "b4003qa_policy_unknown_38179062290",
           "pol_638e276218baad9e84018415b0ba",
           "pol_b39a58e5c216d8fb0f9fca4da4d6"
         ]
@@ -1445,11 +1445,11 @@
     "parallelDispositionAbsent": true,
     "date45ExpectedIds": [
       "b4003qa_policy_renew_38102224750",
-      "b4003qa_policy_renew_38156261971",
+      "b4003qa_policy_renew_38179062290",
       "b4003qa_policy_renewwrite_38102224750",
-      "b4003qa_policy_renewwrite_38156261971",
+      "b4003qa_policy_renewwrite_38179062290",
       "b4003qa_policy_unknown_38102224750",
-      "b4003qa_policy_unknown_38156261971",
+      "b4003qa_policy_unknown_38179062290",
       "pol_3ddc9e613f40252f02b2e122072d",
       "pol_638e276218baad9e84018415b0ba",
       "pol_7280c9b1a5253a1fe1e463e5993b",
@@ -1463,11 +1463,11 @@
     ],
     "date45VisibleIds": [
       "b4003qa_policy_renew_38102224750",
-      "b4003qa_policy_renew_38156261971",
+      "b4003qa_policy_renew_38179062290",
       "b4003qa_policy_renewwrite_38102224750",
-      "b4003qa_policy_renewwrite_38156261971",
+      "b4003qa_policy_renewwrite_38179062290",
       "b4003qa_policy_unknown_38102224750",
-      "b4003qa_policy_unknown_38156261971",
+      "b4003qa_policy_unknown_38179062290",
       "pol_3ddc9e613f40252f02b2e122072d",
       "pol_638e276218baad9e84018415b0ba",
       "pol_7280c9b1a5253a1fe1e463e5993b",
@@ -1556,7 +1556,7 @@
     "checkboxUsable": true
   },
   "r19RenewabilityDurable": {
-    "policyId": "b4003qa_policy_renewwrite_38156261971",
+    "policyId": "b4003qa_policy_renewwrite_38179062290",
     "serverValue": true,
     "reloadValue": true
   },
@@ -1565,7 +1565,7 @@
     "error": "Esta Preview protege los registros reales. La persistencia se valida aquí con una póliza sintética equivalente; el cambio real se prueba únicamente en el gate LIVE autorizado."
   },
   "r19InicioReadiness": {
-    "text": "🌅 Buen día · esto es lo importante hoy METAS DEL MES·PRIORIDADES·AVANCE POR ASESOR Abrir Cliente 360 → METAS DEL MES · OCTUBRE 2026 Avance real del mes Quedan 20 días para cerrar el mes. La producción usa la prima neta de pólizas con inicio de vigencia en el mes y el recaudo usa pagos confirmados con fecha efectiva del mes. Los importes se separan por moneda: selecciona Guatemala o Colombia para comparar con metas sin sumar GTQ y COP. Si faltan metas fuente, no se inventa un porcentaje. 444 clientes 1431 pólizas 598 registros vencidos en cartera Producción neta del mes GT · GTQ — Q14K Meta institucional no acreditada; revisa metas por asesor CO · COP — $0 Meta institucional no acreditada; revisa metas por asesor Recaudo confirmado del mes GT · GTQ — Q0 Meta institucional no acreditada; revisa metas por asesor CO · COP — $0 Meta institucional no acreditada; revisa metas por asesor COBROS CONFIRMADOS Q851K GTQ $205.8M COP 1243 pagos confirmados › PENDIENTE DE COBRO Q 8,058 GTQ $ 0 COP 719 obligaciones · 18 con monto › CARTERA VENCIDA Q 8,957 GTQ $ 0 COP 598 obligaciones · 17 con monto › VENCEN ≤45 D 16 mismo universo de Pólizas › Avance por asesor producción neta del mes vs meta configurada BH Braulio Hernández Q0 GTQ Meta no configurada — CC Carlos Castro · CO $0 COP Meta no configurada — CC Carlos Castro · GT Q0 GTQ Meta no configurada — FA Fernando Arias Q0 GTQ Meta no configurada — JS Johanna Salgado Q0 GTQ Meta no configurada — NC Nicole Castro $0 COP Meta no configurada — PO Paula Osorio · GT Q14K GTQ 18% PO Paula Osorio · CO $0 COP Meta no configurada — SD Samuel Daza · GT Q0 GTQ Meta no configurada — SD Samuel Daza · CO $0 COP Meta no configurada — Prioridades 🔄 B4-003 QA Cliente Auto · renueva en 9 d 🔄 B4-003 QA Cliente Auto · renueva en 9 d 🔄 B4-003 QA Clien",
+    "text": "🌅 Buen día · esto es lo importante hoy METAS DEL MES·PRIORIDADES·AVANCE POR ASESOR Abrir Cliente 360 → METAS DEL MES · OCTUBRE 2026 Avance real del mes Quedan 20 días para cerrar el mes. Metas personales y de equipo separadas. Valores en GTQ y COP, sin inventar porcentajes. 444 clientes 1431 pólizas 598 registros vencidos en cartera Producción neta del mes GT · GTQ 18% MI AVANCE Q14K Mi meta: Q80K Total país: Q14K CO · COP — AVANCE $0 Meta del equipo por confirmar Metas personales en Avance por asesor Recaudo confirmado del mes GT · GTQ — AVANCE Q0 Meta del equipo por confirmar Mi meta individual: Q50K CO · COP — AVANCE $0 Meta del equipo por confirmar Metas personales en Avance por asesor COBROS CONFIRMADOS Q851K GTQ $205.8M COP 1243 pagos confirmados › PENDIENTE DE COBRO Q 8,058 GTQ $ 0 COP 719 obligaciones · 18 con monto › CARTERA VENCIDA Q 8,957 GTQ $ 0 COP 598 obligaciones · 17 con monto › VENCEN ≤45 D 16 mismo universo de Pólizas › Avance por asesor producción neta del mes vs meta configurada BH Braulio Hernández Q0 GTQ Meta no configurada — CC Carlos Castro · CO $0 COP Meta no configurada — CC Carlos Castro · GT Q0 GTQ Meta no configurada — FA Fernando Arias Q0 GTQ Meta no configurada — JS Johanna Salgado Q0 GTQ Meta no configurada — NC Nicole Castro $0 COP Meta no configurada — PO Paula Osorio · GT Q14K GTQ 18% PO Paula Osorio · CO $0 COP Meta no configurada — SD Samuel Daza · GT Q0 GTQ Meta no configurada — SD Samuel Daza · CO $0 COP Meta no configurada — Prioridades 🔄 B4-003 QA Cliente Auto · renueva en 9 d 🔄 B4-003 QA Cliente Auto · renueva en 9 d 🔄 B4-003 QA Cliente Auto · renueva en 9 d 🔄 B4-003 QA Cliente Auto · renueva en 9 d ⚠ NORA LUCIA HURTARTE FLORES cuota — vencida · — ⚠ LUIS ESTUARDO PEREZ CIFUENTES cuota — vencida · — ⚠ ERICKA LIZETTE AGUILAR ",
     "terminal": "ready"
   },
   "r19TypedHandoff": null,
