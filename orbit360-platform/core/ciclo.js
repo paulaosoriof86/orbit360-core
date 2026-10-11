@@ -1338,16 +1338,18 @@ Orbit.ciclo = (function () {
   }
   function chkRow(ns, i, c) { return `<label class="chk-row"><input type="checkbox" data-chk="${i}" ${c.done ? 'checked' : ''}><span class="${c.done ? 'done' : ''}">${U.esc(c.t)}</span></label>`; }
   function humanCommentAuthor(c){
-    const raw=String(c&&((c.actorName||c.user)||'')||'').trim(),role=/^(AdminTenant|SuperAdmin|Direcci[oó]n|Operativo|Asesor|Comercial|Admin)$/i;
-    if(raw&&!role.test(raw))return raw;
-    if(c&&c.actorUid){
-      const candidates=['usuarios','users','members','asesores'];
-      for(const coll of candidates){try{const u=S().get(coll,c.actorUid);const name=u&&String(u.nombre||u.displayName||u.name||'').trim();if(name)return name;}catch(_e){}}
+    const raw=String(c&&(c.actorName||c.user)||'').trim(),uid=String(c&&c.actorUid||'').trim();
+    const validName=n=>{const x=String(n||'').trim();return x&&!x.includes('@')&&!/^(AdminTenant|SuperAdmin|Direcci[oó]n|Operativo|Asesor|Comercial|Admin|unknown|undefined)$/i.test(x)&&!/^uid[:_-]/i.test(x);};
+    if(uid){try{const me=currentUserIdentity();if(me.uid===uid&&validName(me.name))return me.name;}catch(_){}}
+    for(const coll of ['usuarios','users','members','asesores']){
+      try{const u=uid?S().get(coll,uid):null;const direct=u&&(u.nombre||u.displayName||u.name);if(validName(direct))return String(direct).trim();
+        if(raw.includes('@')){const a=(S().all(coll)||[]).find(x=>x&&String(x.email||x.correo||'').toLowerCase()===raw.toLowerCase());const n=a&&(a.nombre||a.displayName||a.name);if(validName(n))return String(n).trim();}
+      }catch(_){}
     }
-    return raw&&role.test(raw)?'Autor no identificado · registro anterior':'Usuario';
+    return validName(raw)?raw:'Usuario del equipo';
   }
   function comRow(c) { const a=c&&c.attachment||{},ref=a.documentRef||a.driveUrl||'',direction=String(c&&c.direction||''),stateClass=direction?' collab-'+direction:'';return `<div class="com-row${stateClass}"><div class="com-h"><b>${U.esc(humanCommentAuthor(c))}</b><span class="muted">${U.esc(displayStamp(c.ts))}</span></div>${c.tipo?'<span class="badge info collab-type" style="font-size:10px;margin-bottom:5px">'+U.esc(c.tipo)+'</span>':''}<div class="collab-message">${U.esc(c.texto)}</div>${ref?'<button type="button" class="btn ghost sm collab-doc" data-collab-doc="'+U.esc(ref)+'" style="margin-top:7px">📎 '+U.esc(a.nombre||'Abrir adjunto')+'</button>':''}</div>`; }
-  function bitRow(b) { return `<div class="bit-row"><span class="bit-dot ${b.origen === 'auto' ? 'auto' : ''}"></span><div><div class="bit-t"><b>${U.esc(b.campo)}</b> ${b.de ? '· ' + U.esc(b.de) + ' → ' : ''}${U.esc(b.a)}</div><div class="muted" style="font-size:10.5px">${U.esc(displayStamp(b.ts))} · ${U.esc(b.actorName||b.user||'Usuario')}${b.origen === 'auto' ? ' · automático' : ''}</div></div></div>`; }
+  function bitRow(b) { return `<div class="bit-row"><span class="bit-dot ${b.origen === 'auto' ? 'auto' : ''}"></span><div><div class="bit-t"><b>${U.esc(b.campo)}</b> ${b.de ? '· ' + U.esc(b.de) + ' → ' : ''}${U.esc(b.a)}</div><div class="muted" style="font-size:10.5px">${U.esc(displayStamp(b.ts))} · ${U.esc(humanCommentAuthor(b))}${b.origen === 'auto' ? ' · automático' : ''}</div></div></div>`; }
 
   return {
     ETAPAS, E, FLUJO, opsListas, leadsListas, etapaInfo, flag,

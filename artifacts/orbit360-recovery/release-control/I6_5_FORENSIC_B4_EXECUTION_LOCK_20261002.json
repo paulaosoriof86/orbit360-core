@@ -120,7 +120,7 @@
   "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_R23_CONTRACT_AND_EXACT_PREVIEW",
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "blobSha": "f73aad285661036ad190bba7863de8e661f13620",
+    "blobSha": "926add224bf16ab473e9a291218847462382e4eb",
     "status": "FROZEN_ACTIVE_UAT3_P0_BATCH_1_SOURCE_COMPLETE"
   },
   "findingLedger": {
@@ -590,7 +590,7 @@
   },
   "findingLedgerBlobSha": "6d2d471056f129713edab6483c5089202f421549",
   "continuityRegisterBlobSha": "19fd55ad6cbb203b205b5ad9b11554c864e06e73",
-  "compositionLockBlobSha": "f73aad285661036ad190bba7863de8e661f13620",
+  "compositionLockBlobSha": "926add224bf16ab473e9a291218847462382e4eb",
   "r18SourceFix": {
     "status": "SOURCE_FIXED_R18_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_SOURCE_FIX_20261005.json",
@@ -2185,5 +2185,14 @@
     "sourceBlobSha": "37210ab93d1aba4795109fa068af47b1f8f8ccb2",
     "verifiedInBrowser": false,
     "productionTouched": false
+  },
+  "paulaHumanActorSourceFix20261011": {
+    "status": "SOURCE_STAGED_EXACT_PREVIEW_REQUIRED",
+    "files": [
+      "orbit360-platform/core/ciclo.js",
+      "orbit360-platform/index.html"
+    ],
+    "noDataWrites": true,
+    "liveTouched": false
   }
 }

@@ -172,7 +172,7 @@
     "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js": "60ce88178f48ff5d9b5fd01c1e2d92abe642dac1",
     "orbit360-platform/core/backend-product-readonly-bootstrap-p0.js": "1f1da3d54b32d94fe7d7111f318437a48bbf95cd",
     "orbit360-platform/core/backend-resource-contracts.js": "826364d2a394d0bfe75d9f0ccdc5dd8905d2b3f0",
-    "orbit360-platform/core/ciclo.js": "dbd828018c9323d712aa85d86f4397bda15e870f",
+    "orbit360-platform/core/ciclo.js": "2e288b4317af9ec7f9dc32d9d211a4c9ee26b0af",
     "orbit360-platform/core/client-insurer-visual-contract-v20260720.js": "3fd89167a5a36662072dbdc3e970b48f61158343",
     "orbit360-platform/core/cobros-reconciliation-domain-client.js": "7f00ced68ad64dd1ff4b9c0eff85f1f959dc6d68",
     "orbit360-platform/core/comisiones-eng.js": "f1aa5dfc3b8191944023b581abdcff27adf0dba3",
@@ -208,7 +208,7 @@
     "orbit360-platform/data/tenant-alianzas-soluciones-insurers-p10.js": "41d2e31a42dac73eb68af304d5f532897210d0ee",
     "orbit360-platform/data/tenant-config/alianzas-soluciones.aseguradoras-knowledge-summary-v20261003.js": "2000d9ea8ab67bdd37d8bf404a29a405fa6374dd",
     "orbit360-platform/data/tenant-public-branding-index.js": "dc543c463f5ecd8ea44e49156d6282113bd95db6",
-    "orbit360-platform/index.html": "9f39fe08dffde0b6645fee6ee78729b2d690c98d",
+    "orbit360-platform/index.html": "0db979357fd4435bcbf27498301df59a99b3bb97",
     "orbit360-platform/modules/academia.js": "4d48ee3edbc6afc4163bf6365a80bbcb680b1852",
     "orbit360-platform/modules/aseguradoras-v1202-import-bridge.js": "db5f012abe505c2dd27d77a47d0694868bee5348",
     "orbit360-platform/modules/aseguradoras.js": "9e56c296b55da499b52f42c462c668aa2f32eba7",
@@ -4850,5 +4850,19 @@
     "causalFix": "Restored centered circular KPIs with per-country source-bound metas; no false individual meta absent claims.",
     "sourceTouched": true,
     "noRealDataWrites": true
+  },
+  "paulaHumanActorSourceFix20261011": {
+    "status": "SOURCE_STAGED_EXACT_PREVIEW_REQUIRED",
+    "files": [
+      "orbit360-platform/core/ciclo.js",
+      "orbit360-platform/index.html"
+    ],
+    "sha": {
+      "orbit360-platform/core/ciclo.js": "2e288b4317af9ec7f9dc32d9d211a4c9ee26b0af",
+      "orbit360-platform/index.html": "0db979357fd4435bcbf27498301df59a99b3bb97"
+    },
+    "reason": "UI actorName/email fallback and technical recipient IDs",
+    "noBackendDataWrites": true,
+    "notAProvenDeliveryFix": true
   }
 }

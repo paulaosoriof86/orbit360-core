@@ -1,0 +1,23 @@
+{
+  "schema": "GRAVICENTRA_B4_003_UAT_ACTOR_PRESENTATION_SOURCE_FIX",
+  "date": "2026-10-11",
+  "status": "SOURCE_FIXED_EXACT_PREVIEW_PENDING",
+  "affected": [
+    "B4-003-UAT-20261011-03"
+  ],
+  "before": {
+    "cycle": "dbd828018c9323d712aa85d86f4397bda15e870f",
+    "index": "9f39fe08dffde0b6645fee6ee78729b2d690c98d"
+  },
+  "after": {
+    "cycle": "2e288b4317af9ec7f9dc32d9d211a4c9ee26b0af",
+    "index": "0db979357fd4435bcbf27498301df59a99b3bb97"
+  },
+  "scope": "UI actor identity display, no expose email or technical recipient/owner IDs, safe fallback",
+  "actorUidStillStoredForAudit": true,
+  "notificationFanoutUnmodified": true,
+  "rolesAndRecipientDeliveryStillNeedDistinctUidE2E": true,
+  "productionTouched": false,
+  "realWrites": 0,
+  "passClaim": false
+}
