@@ -1589,7 +1589,12 @@ try{
          const validReason=['RENOVADA_DECLARADA_SIN_SUCESORA_VERIFICADA','HISTORICA_SIN_SUCESORA_ACREDITADA','POSIBLE_SUCESORA_SIN_PRUEBA_SUFICIENTE','LINEAGE_CONFLICTO','RENOVABILIDAD_SIN_CONFIRMAR'];
          const allow=!!p&&!!node&&overdue<0&&life.bucketEligible===true&&life.reviewOnly===true&&life.actionable!==true&&life.terminal!==true&&
            !life.verifiedSuccessorId&&!life.sourceBackedSuccessorId&&validReason.includes(reason)&&
-           !!node.querySelector('.badge.warn')&&/Revisar situación de póliza/.test(node.innerText||'');
+           !!node.querySelector('.badge.warn')&&
+            !!node.querySelector('.reno-wa')&&
+            !!node.querySelector('button[onclick*="solicitarPropuestas"]')&&
+            [...node.querySelectorAll('button')].some(b=>/Pedir renovar/.test(b.textContent||''))&&
+            [...node.querySelectorAll('button')].some(b=>/Cotizar/.test(b.textContent||''))&&
+            !/Revisar situación de póliza/.test(node.innerText||'');
          return{id,number:p?.numero||'',sourceState:p?.estado||'',renewalDisposition:p?.renovacionEstado||'',days:overdue,reason,reviewOnly:life.reviewOnly===true,sourceBackedId:life.sourceBackedSuccessorId||'',verifiedId:life.verifiedSuccessorId||'',classification:'LEGACY_EXPECTED_LIST_WRONGLY_SUPPRESSED_UNPROVEN_EXPIRY',pass:allow};
        });
        return{missing:resolved,extra:extraReview,pass:resolved.every(x=>x.pass)&&extraReview.every(x=>x.pass),

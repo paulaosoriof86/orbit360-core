@@ -1,0 +1,21 @@
+{
+  "schema": "GRAVICENTRA_B4_003_R23_POLICY_FOLLOWUP_QA_CONTRACT_REALIGNMENT_V1",
+  "fix": {
+    "status": "QA_EXPECTATION_FIXED_SOURCE_UNCHANGED_PREVIEW_RETEST",
+    "failedRunId": 38101751922,
+    "oldQa": "6a3e3795e5db58eae38a66bf1196ecb77a2a6c31",
+    "newQa": "923e570192c6812b4c6186c2a650250fcffb7c23",
+    "upheldIndependentPolicyChecks": true,
+    "noNewProductChanges": true
+  },
+  "bindings": {
+    "composition": "444b5547b3f6e4c3f4522706aab635f59259e17a",
+    "ledger": "9894d4a76853319a54aed34c80090defeb02b122",
+    "carry": "be8c0fdb2a4b90b79f79aecb846372367880b1a4",
+    "b4": "f716942036280803315068571181482214a6a824",
+    "control": "dc6ace3e18aec9122367bcb80b0dafe1fd810e54"
+  },
+  "releaseStillPending": true,
+  "productionTouched": false,
+  "realDataWrites": 0
+}
