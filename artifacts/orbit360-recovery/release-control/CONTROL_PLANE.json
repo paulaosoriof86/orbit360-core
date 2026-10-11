@@ -4869,8 +4869,8 @@
       "entryGuardReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_ENTRY_GUARD_PASS_20261002.json",
       "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
       "executionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B4_EXECUTION_LOCK_20261002.json",
-      "executionLockBlobSha": "ca4ce99c891f891ee1dc9410be81f2c75dad29fe",
-      "compositionLockBlobSha": "c6c49b010ad764f81eaffbbbc0afa68738667853",
+      "executionLockBlobSha": "1123e5930efe57c95c1d92bfc85f5e2a27b5606e",
+      "compositionLockBlobSha": "ad373ede971cc3414e4b0512a753bf11262a2b66",
       "findingLedgerBlobSha": "0bfa23823338cc55235646e8a23bd1207ebee7a7",
       "activeFindingId": "B4-003",
       "productSourceSha": "c603fd3561e7229d9359db45495d4cf2d757cd8f",
@@ -5995,7 +5995,7 @@
   "canonicalAccumulationControl": {
     "status": "FROZEN_ACTIVE",
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "compositionLockBlobSha": "c6c49b010ad764f81eaffbbbc0afa68738667853",
+    "compositionLockBlobSha": "ad373ede971cc3414e4b0512a753bf11262a2b66",
     "findingLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
     "findingLedgerBlobSha": "0bfa23823338cc55235646e8a23bd1207ebee7a7",
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
@@ -6311,8 +6311,8 @@
     "status": "B4_003_R23_SOURCE_STAGED_PENDING_PREVIEW",
     "activeFindingId": "B4-003",
     "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
-    "executionLockBlobSha": "ca4ce99c891f891ee1dc9410be81f2c75dad29fe",
-    "compositionLockBlobSha": "c6c49b010ad764f81eaffbbbc0afa68738667853",
+    "executionLockBlobSha": "1123e5930efe57c95c1d92bfc85f5e2a27b5606e",
+    "compositionLockBlobSha": "ad373ede971cc3414e4b0512a753bf11262a2b66",
     "findingLedgerBlobSha": "0bfa23823338cc55235646e8a23bd1207ebee7a7",
     "noLive": true,
     "noReimport": true,
@@ -7260,7 +7260,7 @@
     "r17SourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R17_SOURCE_FIX_20261005.json",
     "r17SourceFixReceiptBlobSha": "ff532a6577e58076821a41fb593da642fd2e7ef7",
     "findingCount": 282,
-    "productSourceSha": "276dba0572a3adba4144c9765f3352cba086d498",
+    "productSourceSha": "97cf1680e22a1c1216879b2733cb7ba984e40479",
     "r18NoLossFreeze": {
       "status": "FROZEN",
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_PAULA_VISUAL_REJECTION_DECISION_AND_NOLOSS_FREEZE_20261005.json",
@@ -9563,12 +9563,12 @@
     "productionUntouched": true
   },
   "paulaInicioContrast20261011": {
-    "status": "SOURCE_STAGED_EXACT_PREVIEW_PENDING",
-    "sourceHead": "276dba0572a3adba4144c9765f3352cba086d498",
+    "status": "SOURCE_RESTAGED_EXACT_PREVIEW_PENDING",
+    "sourceHead": "97cf1680e22a1c1216879b2733cb7ba984e40479",
     "sourceBlobs": {
       "orbit360-platform/styles/infra.css": "d6fe258364c4e11daad21848a40fbb121c36e4a8",
       "orbit360-platform/modules/inicio.js": "3bfac3ae73b5b954303a30eb683ffe8deac1ce84",
-      "orbit360-platform/index.html": "21ef7de672da7eb7b2d8e1043368e03f6f9d9031"
+      "orbit360-platform/index.html": "f6edee8066d41b653503bbbe11017cb270ca4c72"
     },
     "specificIssue": "B4-003-UAT-20261011-01",
     "prevMachinePassPreserved": true,
@@ -9578,7 +9578,12 @@
     "realOperationalWrites": 0,
     "ledgerBlobSha": "0bfa23823338cc55235646e8a23bd1207ebee7a7",
     "carryBlobSha": "05e007d18542e553cb89af3f6a48e499605c0084",
-    "compositionLockBlobSha": "c6c49b010ad764f81eaffbbbc0afa68738667853",
-    "executionLockBlobSha": "ca4ce99c891f891ee1dc9410be81f2c75dad29fe"
+    "compositionLockBlobSha": "ad373ede971cc3414e4b0512a753bf11262a2b66",
+    "executionLockBlobSha": "1123e5930efe57c95c1d92bfc85f5e2a27b5606e",
+    "lastFailedRunId": 38184284732,
+    "lastFailedCode": "B4_003_INFRA_R20_SECOND_REVIEW_CACHE_BINDING_MISSING",
+    "fix": "Preserved the required 20261007-r20f2 version prefix while incrementing the cache suffix",
+    "productionChanged": false,
+    "operationalWrites": 0
   }
 }
