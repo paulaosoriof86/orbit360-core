@@ -1,0 +1,22 @@
+{
+  "schema": "GRAVICENTRA_B4_003_R24_NOOP_GATE_CLOSURE",
+  "recordedAt": "2026-10-11",
+  "note": {
+    "status": "NOOP_RELEASE_GATE_ROOT_CAUSE_RECONCILED_R23_EXACT_PREVIEW_REQUIRED",
+    "detectedRun": 38147125724,
+    "reason": "Workflow gate checks exactly B4_003_R23_SOURCE_STAGED_PENDING_PREVIEW. Previous R24 status permitted successful NOOP with no preview or browser proof.",
+    "fix": "Rebind existing R23 gate exact recognized status and r23InicioProgress.authProofExecuted=false. Source and QA unchanged.",
+    "sourceHeadBefore": "9bdce728970a3e181bd083d49c90bb77baa6f01a",
+    "productionTouched": false,
+    "dataWrites": 0,
+    "passClaim": false
+  },
+  "blobs": {
+    "comp": "72f8e6b1e0d2e7d34578cc5366f67f7fad4c7772",
+    "ledger": "08b6a9def029a628cbb94a75e42c6bcb6879a447",
+    "carry": "d3d4872302c114bfe4e27616ea77a3cb6d774f65",
+    "b4": "d48d6802a8ada07641cc28f19701349aabc3663d",
+    "control": "2fdd9500e578f4dd4f162d1cf408ea590d6f9a4d"
+  },
+  "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_R23_CONTRACT_AND_EXACT_PREVIEW"
+}

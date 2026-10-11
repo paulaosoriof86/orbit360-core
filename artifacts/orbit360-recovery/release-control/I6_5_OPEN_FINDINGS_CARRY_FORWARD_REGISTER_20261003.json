@@ -4,7 +4,7 @@
   "authority": "FAIL_CLOSED_FINDING_CONTINUITY",
   "sourceLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
   "sourceLedgerPreviousBlobSha": "0cdb33f6b47a62426c7ce5c1d10ecfc2d69b3b74",
-  "expectedLedgerNextBlobSha": "0b1a826ee0ea674862ff07856ce9d3cefdf87fb1",
+  "expectedLedgerNextBlobSha": "08b6a9def029a628cbb94a75e42c6bcb6879a447",
   "policy": {
     "allLedgerFindingsMustAppearExactlyOnce": true,
     "newHumanFindingsMustBeIndividualLedgerEntries": true,
@@ -12903,5 +12903,15 @@
     "productionChanged": false,
     "realWrites": 0,
     "reason": "Replace escaped literal newline with actual newline before function closing brace; preserve approved Client360 canonical financial owner."
+  },
+  "r24NoopGateRootfix": {
+    "status": "NOOP_RELEASE_GATE_ROOT_CAUSE_RECONCILED_R23_EXACT_PREVIEW_REQUIRED",
+    "detectedRun": 38147125724,
+    "reason": "Workflow gate checks exactly B4_003_R23_SOURCE_STAGED_PENDING_PREVIEW. Previous R24 status permitted successful NOOP with no preview or browser proof.",
+    "fix": "Rebind existing R23 gate exact recognized status and r23InicioProgress.authProofExecuted=false. Source and QA unchanged.",
+    "sourceHeadBefore": "9bdce728970a3e181bd083d49c90bb77baa6f01a",
+    "productionTouched": false,
+    "dataWrites": 0,
+    "passClaim": false
   }
 }

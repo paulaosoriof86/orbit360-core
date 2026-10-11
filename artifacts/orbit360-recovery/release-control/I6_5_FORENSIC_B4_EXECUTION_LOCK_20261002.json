@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B4_EXECUTION_LOCK_V1",
   "recordedAt": "2026-10-08T21:43:35.454Z",
-  "status": "B4_003_R24_SOURCE_STAGED_PENDING_PREVIEW",
+  "status": "B4_003_R23_SOURCE_STAGED_PENDING_PREVIEW",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "block": "B4",
@@ -38,7 +38,7 @@
   "activeFinding": {
     "id": "B4-003",
     "title": "Cumulative B4-003 remediation: Renovaciones, Cancelaciones and source-backed insurer knowledge.",
-    "status": "B4_003_R24_SOURCE_STAGED_PENDING_PREVIEW",
+    "status": "B4_003_R23_SOURCE_STAGED_PENDING_PREVIEW",
     "blocking": true,
     "nextAction": "R23_CONTRACT_AND_EXACT_PREVIEW",
     "humanVisualStatus": "REJECTED_20261011_CLIENT360_REGRESSION",
@@ -588,9 +588,9 @@
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_RENEWAL_KPI_PARITY_CAUSAL_ADDENDUM_20261005.json",
     "blobSha": "87bab7ee2778a0525cdbe81cf4cbf82020bf6139"
   },
-  "findingLedgerBlobSha": "0b1a826ee0ea674862ff07856ce9d3cefdf87fb1",
-  "continuityRegisterBlobSha": "c841a61b1df22c74afa11d196ba7e8823fd477bd",
-  "compositionLockBlobSha": "b598ca65956d7b39cbad4107a44fed74479e6b21",
+  "findingLedgerBlobSha": "08b6a9def029a628cbb94a75e42c6bcb6879a447",
+  "continuityRegisterBlobSha": "d3d4872302c114bfe4e27616ea77a3cb6d774f65",
+  "compositionLockBlobSha": "72f8e6b1e0d2e7d34578cc5366f67f7fad4c7772",
   "r18SourceFix": {
     "status": "SOURCE_FIXED_R18_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_SOURCE_FIX_20261005.json",
@@ -2131,5 +2131,15 @@
     "productionChanged": false,
     "realWrites": 0,
     "reason": "Replace escaped literal newline with actual newline before function closing brace; preserve approved Client360 canonical financial owner."
+  },
+  "r24NoopGateRootfix": {
+    "status": "NOOP_RELEASE_GATE_ROOT_CAUSE_RECONCILED_R23_EXACT_PREVIEW_REQUIRED",
+    "detectedRun": 38147125724,
+    "reason": "Workflow gate checks exactly B4_003_R23_SOURCE_STAGED_PENDING_PREVIEW. Previous R24 status permitted successful NOOP with no preview or browser proof.",
+    "fix": "Rebind existing R23 gate exact recognized status and r23InicioProgress.authProofExecuted=false. Source and QA unchanged.",
+    "sourceHeadBefore": "9bdce728970a3e181bd083d49c90bb77baa6f01a",
+    "productionTouched": false,
+    "dataWrites": 0,
+    "passClaim": false
   }
 }
