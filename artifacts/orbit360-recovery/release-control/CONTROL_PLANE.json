@@ -752,7 +752,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_R20_TARGETED_PAULA_VISUAL",
+  "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_R23_CONTRACT_AND_EXACT_PREVIEW",
   "postproductionExitProgress": {
     "formalPercent": 50,
     "frozenMiniGates": 5,
@@ -4863,14 +4863,14 @@
       "b2LedgerSealReconciled": true
     },
     "b4": {
-      "status": "B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL",
+      "status": "B4_003_R23_SOURCE_STAGED_PENDING_PREVIEW",
       "entryCondition": "PASS",
       "targetPercent": 100,
       "entryGuardReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_ENTRY_GUARD_PASS_20261002.json",
       "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
       "executionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B4_EXECUTION_LOCK_20261002.json",
-      "executionLockBlobSha": "77895804fc8dc7f58006b71338156e79684b3973",
-      "compositionLockBlobSha": "21b17acbda0e5ab523d4ce564cdf37d92ae5fa89",
+      "executionLockBlobSha": "e7b04c0b17a4cf23d4e192f2facfebebd4731d7f",
+      "compositionLockBlobSha": "f2abbeb90b8d38f41376ac60dbdeb3a366a64b72",
       "findingLedgerBlobSha": "9da4116ca9e7d2dd71706ffe5e37f0fed673d93b",
       "activeFindingId": "B4-003",
       "productSourceSha": "c603fd3561e7229d9359db45495d4cf2d757cd8f",
@@ -4880,7 +4880,7 @@
       "dataMutationAuthorized": false,
       "reimportAuthorized": false,
       "livePromotionAuthorized": false,
-      "nextAction": "B4_003_R20_TARGETED_PAULA_VISUAL",
+      "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_R23_CONTRACT_AND_EXACT_PREVIEW",
       "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R17_SOURCE_FIX_20261005.json",
       "sourceFixReceiptBlobSha": "ff532a6577e58076821a41fb593da642fd2e7ef7",
       "sourceHeadBeforeGovernanceSeal": "67d8695680556bec1f559a8c4ee650176d400f98",
@@ -5995,7 +5995,7 @@
   "canonicalAccumulationControl": {
     "status": "FROZEN_ACTIVE",
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "compositionLockBlobSha": "21b17acbda0e5ab523d4ce564cdf37d92ae5fa89",
+    "compositionLockBlobSha": "f2abbeb90b8d38f41376ac60dbdeb3a366a64b72",
     "findingLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
     "findingLedgerBlobSha": "9da4116ca9e7d2dd71706ffe5e37f0fed673d93b",
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
@@ -6308,15 +6308,15 @@
     "noReimport": true
   },
   "currentB4": {
-    "status": "B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL",
+    "status": "B4_003_R23_SOURCE_STAGED_PENDING_PREVIEW",
     "activeFindingId": "B4-003",
     "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
-    "executionLockBlobSha": "77895804fc8dc7f58006b71338156e79684b3973",
-    "compositionLockBlobSha": "21b17acbda0e5ab523d4ce564cdf37d92ae5fa89",
+    "executionLockBlobSha": "e7b04c0b17a4cf23d4e192f2facfebebd4731d7f",
+    "compositionLockBlobSha": "f2abbeb90b8d38f41376ac60dbdeb3a366a64b72",
     "findingLedgerBlobSha": "9da4116ca9e7d2dd71706ffe5e37f0fed673d93b",
     "noLive": true,
     "noReimport": true,
-    "nextAction": "B4_003_R20_TARGETED_PAULA_VISUAL",
+    "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_R23_CONTRACT_AND_EXACT_PREVIEW",
     "sourceFixReceiptBlobSha": "dc0b48c41b6e50a62a8a4e27b14aa891a731adca",
     "syntheticQaWritesAuthorized": true,
     "previewDispatchRequest": {
@@ -7260,7 +7260,7 @@
     "r17SourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R17_SOURCE_FIX_20261005.json",
     "r17SourceFixReceiptBlobSha": "ff532a6577e58076821a41fb593da642fd2e7ef7",
     "findingCount": 282,
-    "productSourceSha": "c603fd3561e7229d9359db45495d4cf2d757cd8f",
+    "productSourceSha": "c98e8ee49138b63759a602f4011916cda7663184",
     "r18NoLossFreeze": {
       "status": "FROZEN",
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_PAULA_VISUAL_REJECTION_DECISION_AND_NOLOSS_FREEZE_20261005.json",
@@ -7792,7 +7792,7 @@
     "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW"
   },
   "pendingClosureMasterPlan": {
-    "status": "FROZEN_ACTIVE_B4_003_R20_SOURCE_FIXED_PREVIEW_RETEST_PENDING",
+    "status": "FROZEN_ACTIVE_B4_003_R23_INICIO_VISUAL_RETEST_PENDING",
     "path": "artifacts/orbit360-recovery/release-control/I6_PENDING_CLOSURE_MASTER_PLAN_LOCK_20261004.json",
     "blobSha": "71eba786de1236533e0339ae5cb79eeabed8ebaf",
     "baselineFindingCount": 282,
@@ -7801,7 +7801,7 @@
     "b4004Held": true,
     "extendsPlanV2": true,
     "conversationDependent": false,
-    "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_R20_CONTRACT_AND_EXACT_PREVIEW"
+    "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_R23_CONTRACT_AND_EXACT_PREVIEW"
   },
   "compositionLockBlobSha": "97f02369af61a8e78e9418defaad894f33cc2bb4",
   "findingLedgerBlobSha": "162ffe903814dd5016f22475843678e01b8ce818",
@@ -9498,14 +9498,25 @@
     ]
   },
   "paulaInicioPremium20261011": {
-    "status": "SOURCE_CHANGED_PENDING_EXACT_PREVIEW",
-    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_INICIO_PREMIUM_META_VISUAL_CAUSAL_FIX_20261011.json",
-    "receiptBlobSha": "d7f48a7ee5e460be749c9160faad8325f7a0533b",
-    "sourceSha": "37210ab93d1aba4795109fa068af47b1f8f8ccb2",
-    "previewAccepted": false,
-    "realWrites": 0,
-    "productionTouched": false,
-    "otherFiveP0Unresolved": true
+    "status": "SOURCE_STAGED_EXACT_PREVIEW_PENDING",
+    "sourceHead": "c98e8ee49138b63759a602f4011916cda7663184",
+    "sourceBlobs": {
+      "functions/assignable-advisor-roster.js": "b8b485765707eeafae9e1299614cc92f69a0aee3",
+      "orbit360-platform/core/assignable-advisor-roster-client.js": "c04a4b35267e77d4353fa131331d4a7549255edc",
+      "orbit360-platform/modules/inicio.js": "6540788ac73ce4d5ee1606260063d3830ef4c3ae",
+      "orbit360-platform/index.html": "b2e2f6d3782b5e4c8254e578685dc2621aa3937d"
+    },
+    "compositionLockBlobSha": "f2abbeb90b8d38f41376ac60dbdeb3a366a64b72",
+    "executionLockBlobSha": "e7b04c0b17a4cf23d4e192f2facfebebd4731d7f",
+    "priorMachinePassPreserved": true,
+    "priorHumanPassPreserved": [
+      "Cliente 360",
+      "Renovaciones"
+    ],
+    "productSourceChanged": true,
+    "productionChanged": false,
+    "operationalWrites": 0,
+    "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_R23_CONTRACT_AND_EXACT_PREVIEW"
   },
   "paulaHumanActorSourceFix20261011": {
     "status": "SOURCE_STAGED_PREVIEW_REQUIRED",
