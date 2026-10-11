@@ -4816,5 +4816,21 @@
     "productionTouched": false,
     "dataWrites": 0,
     "passClaim": false
+  },
+  "r24NoopGateFailClosedFix": {
+    "schema": "GRAVICENTRA_B4_003_R23_NOOP_IS_FAIL_V1",
+    "status": "R23_AUTHORIZED_SYNTHETIC_PREVIEW_RETEST_REQUIRED",
+    "date": "2026-10-11",
+    "failedNoopRun": 38147322373,
+    "rootCause": "B4 lock inherited syntheticQaWritesAuthorized=false after machine pass; the gate silently skipped E2E and returned success.",
+    "mutation": "Restore isolated synthetic fixtures only in B4-003 Preview with readback/cleanup; fail R23 workflow on NOOP.",
+    "workflow": {
+      "before": "4d12b7cee94449bc672af48ddcf03f4dc645f4c2",
+      "after": "5ea86cd55653b4ba5f53743a7ff59f1b0c5f8f2e"
+    },
+    "sourceProductUnchanged": true,
+    "realBusinessWritesForbidden": true,
+    "productionUntouched": true,
+    "noPassClaim": true
   }
 }

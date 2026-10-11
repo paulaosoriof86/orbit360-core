@@ -103,6 +103,10 @@ jobs:
             && l.boundaries?.dataMutationAuthorized===false
             && l.boundaries?.reimportAuthorized===false
             && l.boundaries?.livePromotionAuthorized===false;
+          if(c.nextAction==='I6_5_FORENSIC_REMEDIATION_B4_003_R23_CONTRACT_AND_EXACT_PREVIEW'&&!previewOk){
+            console.error('B4_003_R23_PREVIEW_EXPECTED_BUT_GATE_NOOP_FAIL_CLOSED');
+            process.exit(1);
+          }
           const secondReviewDryRun=c.nextAction==='I6_5_FORENSIC_REMEDIATION_B4_003_R20_SECOND_REVIEW_SINGLE_CUMULATIVE_SOURCE_FIX'
             && c.currentB4?.status==='B4_003_R20_SECOND_REVIEW_CAUSES_DEMONSTRATED_SOURCE_FIX_AUTHORIZED'
             && c.i65ForensicRemediationPlan?.b4?.status==='B4_003_R20_SECOND_REVIEW_CAUSES_DEMONSTRATED_SOURCE_FIX_AUTHORIZED'

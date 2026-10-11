@@ -4869,9 +4869,9 @@
       "entryGuardReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_ENTRY_GUARD_PASS_20261002.json",
       "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
       "executionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B4_EXECUTION_LOCK_20261002.json",
-      "executionLockBlobSha": "d48d6802a8ada07641cc28f19701349aabc3663d",
-      "compositionLockBlobSha": "72f8e6b1e0d2e7d34578cc5366f67f7fad4c7772",
-      "findingLedgerBlobSha": "08b6a9def029a628cbb94a75e42c6bcb6879a447",
+      "executionLockBlobSha": "e1d66b1cb7066acbe129a95bb131aa3ca10ce671",
+      "compositionLockBlobSha": "38aa6eb3e9e4eac139528e71ccc8123df43ee75d",
+      "findingLedgerBlobSha": "162ffe903814dd5016f22475843678e01b8ce818",
       "activeFindingId": "B4-003",
       "productSourceSha": "c603fd3561e7229d9359db45495d4cf2d757cd8f",
       "baselineBuildId": "gi-i65-b3-dcd2b3f60b98-57f234755dc1",
@@ -5995,9 +5995,9 @@
   "canonicalAccumulationControl": {
     "status": "FROZEN_ACTIVE",
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "compositionLockBlobSha": "72f8e6b1e0d2e7d34578cc5366f67f7fad4c7772",
+    "compositionLockBlobSha": "38aa6eb3e9e4eac139528e71ccc8123df43ee75d",
     "findingLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "findingLedgerBlobSha": "08b6a9def029a628cbb94a75e42c6bcb6879a447",
+    "findingLedgerBlobSha": "162ffe903814dd5016f22475843678e01b8ce818",
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
     "activePlanBlobSha": "76a275e511c3bd580496c07de93c2bfb2eace269",
     "activeBlock": "B4",
@@ -6013,7 +6013,7 @@
     "activeFindingId": "B4-003",
     "findingContinuityRegisterBlobSha": "11ffaf6e7c691064be947fdc1af00b08d8fb8f9c",
     "findingContinuityGuardBlobSha": "868a0ba1a492d9adc8d91655f152b6fa7980f499",
-    "continuityRegisterBlobSha": "d3d4872302c114bfe4e27616ea77a3cb6d774f65",
+    "continuityRegisterBlobSha": "d0c9adb68e73be7349db546d821c088aa28f5b01",
     "masterPendingClosurePlanPath": "artifacts/orbit360-recovery/release-control/I6_PENDING_CLOSURE_MASTER_PLAN_LOCK_20261004.json",
     "masterPendingClosurePlanBlobSha": "9d7ba423caf0aa09a0e2af4a1ed4713ea867d17a",
     "listingHumanProofStillRequired": true
@@ -6311,9 +6311,9 @@
     "status": "B4_003_R23_SOURCE_STAGED_PENDING_PREVIEW",
     "activeFindingId": "B4-003",
     "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
-    "executionLockBlobSha": "d48d6802a8ada07641cc28f19701349aabc3663d",
-    "compositionLockBlobSha": "72f8e6b1e0d2e7d34578cc5366f67f7fad4c7772",
-    "findingLedgerBlobSha": "08b6a9def029a628cbb94a75e42c6bcb6879a447",
+    "executionLockBlobSha": "e1d66b1cb7066acbe129a95bb131aa3ca10ce671",
+    "compositionLockBlobSha": "38aa6eb3e9e4eac139528e71ccc8123df43ee75d",
+    "findingLedgerBlobSha": "162ffe903814dd5016f22475843678e01b8ce818",
     "noLive": true,
     "noReimport": true,
     "nextAction": "R23_CONTRACT_AND_EXACT_PREVIEW",
@@ -7804,7 +7804,7 @@
     "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_R20_CONTRACT_AND_EXACT_PREVIEW"
   },
   "compositionLockBlobSha": "534559b1b23ee57be455460b9957c08f80ecdae3",
-  "findingLedgerBlobSha": "08b6a9def029a628cbb94a75e42c6bcb6879a447",
+  "findingLedgerBlobSha": "162ffe903814dd5016f22475843678e01b8ce818",
   "continuityRegisterBlobSha": "48d945e51e5a10ec74dc925313b720a121ba7086",
   "r16PerformanceRegression": {
     "status": "CLOSED_PASS",
@@ -9430,5 +9430,21 @@
     "productionTouched": false,
     "dataWrites": 0,
     "passClaim": false
+  },
+  "r24NoopGateFailClosedFix": {
+    "schema": "GRAVICENTRA_B4_003_R23_NOOP_IS_FAIL_V1",
+    "status": "R23_AUTHORIZED_SYNTHETIC_PREVIEW_RETEST_REQUIRED",
+    "date": "2026-10-11",
+    "failedNoopRun": 38147322373,
+    "rootCause": "B4 lock inherited syntheticQaWritesAuthorized=false after machine pass; the gate silently skipped E2E and returned success.",
+    "mutation": "Restore isolated synthetic fixtures only in B4-003 Preview with readback/cleanup; fail R23 workflow on NOOP.",
+    "workflow": {
+      "before": "4d12b7cee94449bc672af48ddcf03f4dc645f4c2",
+      "after": "5ea86cd55653b4ba5f53743a7ff59f1b0c5f8f2e"
+    },
+    "sourceProductUnchanged": true,
+    "realBusinessWritesForbidden": true,
+    "productionUntouched": true,
+    "noPassClaim": true
   }
 }

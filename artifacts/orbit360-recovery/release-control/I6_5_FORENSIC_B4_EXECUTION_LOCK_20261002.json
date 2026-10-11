@@ -89,8 +89,8 @@
     ],
     "reimportAuthorized": false,
     "livePromotionAuthorized": false,
-    "syntheticQaWritesAuthorized": false,
-    "syntheticQaScope": "R20 exact Preview only: disposable insurer/logo/product/plan/requirement/document and Ops/Leads handoff/cadence fixtures; mandatory server commit, readback, reload and cleanup; no real operational row mutation.",
+    "syntheticQaWritesAuthorized": true,
+    "syntheticQaScope": "R23 exact isolated Preview fixtures only; mandatory before/after, server readback and cleanup; never real records.",
     "paulaVisualAcceptanceRequiredBeforeAdvance": true,
     "cotcompRealTransportAuthorized": false,
     "providerDeploymentAuthorized": true,
@@ -588,9 +588,9 @@
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_RENEWAL_KPI_PARITY_CAUSAL_ADDENDUM_20261005.json",
     "blobSha": "87bab7ee2778a0525cdbe81cf4cbf82020bf6139"
   },
-  "findingLedgerBlobSha": "08b6a9def029a628cbb94a75e42c6bcb6879a447",
-  "continuityRegisterBlobSha": "d3d4872302c114bfe4e27616ea77a3cb6d774f65",
-  "compositionLockBlobSha": "72f8e6b1e0d2e7d34578cc5366f67f7fad4c7772",
+  "findingLedgerBlobSha": "162ffe903814dd5016f22475843678e01b8ce818",
+  "continuityRegisterBlobSha": "d0c9adb68e73be7349db546d821c088aa28f5b01",
+  "compositionLockBlobSha": "38aa6eb3e9e4eac139528e71ccc8123df43ee75d",
   "r18SourceFix": {
     "status": "SOURCE_FIXED_R18_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_SOURCE_FIX_20261005.json",
@@ -2141,5 +2141,21 @@
     "productionTouched": false,
     "dataWrites": 0,
     "passClaim": false
+  },
+  "r24NoopGateFailClosedFix": {
+    "schema": "GRAVICENTRA_B4_003_R23_NOOP_IS_FAIL_V1",
+    "status": "R23_AUTHORIZED_SYNTHETIC_PREVIEW_RETEST_REQUIRED",
+    "date": "2026-10-11",
+    "failedNoopRun": 38147322373,
+    "rootCause": "B4 lock inherited syntheticQaWritesAuthorized=false after machine pass; the gate silently skipped E2E and returned success.",
+    "mutation": "Restore isolated synthetic fixtures only in B4-003 Preview with readback/cleanup; fail R23 workflow on NOOP.",
+    "workflow": {
+      "before": "4d12b7cee94449bc672af48ddcf03f4dc645f4c2",
+      "after": "5ea86cd55653b4ba5f53743a7ff59f1b0c5f8f2e"
+    },
+    "sourceProductUnchanged": true,
+    "realBusinessWritesForbidden": true,
+    "productionUntouched": true,
+    "noPassClaim": true
   }
 }
