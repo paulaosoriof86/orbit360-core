@@ -1,18 +1,18 @@
 {
   "schema": "GRAVICENTRA_I6_5_B4_003_R20_MACHINE_PROOF_V1",
-  "recordedAt": "2026-10-11T14:13:04.563Z",
+  "recordedAt": "2026-10-11T14:43:49.148Z",
   "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
   "findingId": "B4-003",
-  "sourceSha": "1407ce7f8b67152e4301053f587bcf66a0f09ebe",
-  "buildId": "gi-i65-b4-1407ce7f8b67-57f234755dc1",
-  "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-38145751742-zymi26sa.web.app",
-  "channelId": "gi-i65-b4-38145751742",
-  "runId": 38145751742,
-  "artifactId": 11705146696,
-  "artifactDigest": "7b5faaf7e24b81d6be664ad7e997e72d419de371ddc40ac5defb1871fa53f734",
-  "hostedPayloadDigest": "63b0d04b87db3a2dd0abb8534f5a54fdce8ff738ddc8bad652c50e5e7dfa8fcc",
+  "sourceSha": "b67cb2424c83910250874924c998976c0fa148ca",
+  "buildId": "gi-i65-b4-b67cb2424c83-57f234755dc1",
+  "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-38147642372-z2t7eolh.web.app",
+  "channelId": "gi-i65-b4-38147642372",
+  "runId": 38147642372,
+  "artifactId": 11706035405,
+  "artifactDigest": "9f39bc9ef61028bde573de086cefe531ff0612cd79c717855f14681a2a901229",
+  "hostedPayloadDigest": "cfa0bbb4bd0a9a35b19f9b80401844f9812d29d0d12de5f931e07ef92ad41929",
   "backendSourceDigest": "0291dbfadd1869d6ec8506e97cd96e8a7d01afdc1ecb35752a6abf2c3f1ac49c",
-  "bundleDigest": "7e77c01bb9af82d8424e5a6182cd07df04757982424a216652cbad2a3f0e068a",
+  "bundleDigest": "ff561028cea76ef01ab43f12a74ce16d8995b04968bade7bbc285f93f828689b",
   "exactHostingReadback": true,
   "assertions": {
     "handoffActorsDistinct": true,
@@ -109,6 +109,7 @@
     "expiredRenewalOutcomeContinuity": true,
     "unknownRenewabilityDebtVisibleFailClosed": true,
     "client360AuthoritativeList": true,
+    "client360CanonicalHealthAndPortfolioNotOverwritten": true,
     "qualityCanonicalGrammar": true,
     "qualityCompletenessExplicit": true,
     "assignableAdvisorRosterRoleParity": true,
@@ -244,7 +245,7 @@
   "qaResidueDisposition": "NOT_DELETED_FAIL_CLOSED",
   "qaResidueDeletedCount": 0,
   "qaResidueAdjudicationReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R19_B2_QA_RESIDUE_ADJUDICATION_20261005.json",
-  "qaResidueAdjudicationReceiptBlobSha": "d7b8133c9c8a246254d8500f65a4739722ae7b56",
+  "qaResidueAdjudicationReceiptBlobSha": "fdfa57180b0fda6ad3bcc3324fc03e7a049a3784",
   "syntheticQaWrites": 14,
   "cleanupWrites": 39,
   "syntheticFinalAbsent": true,
@@ -276,7 +277,7 @@
       "url": "https://us-east1-ays-orbit-360-lab.cloudfunctions.net/orbit360ProductOperationalCommandPreview",
       "resourceType": "fetch",
       "method": "POST",
-      "postData": "{\"data\":{\"tenantId\":\"alianzas-soluciones\",\"activeRole\":\"Dirección\",\"mutations\":[{\"action\":\"insert\",\"collection\":\"actividades\",\"id\":\"secres_mv3wkee778dmu\",\"payload\":{\"id\":\"secres_mv3wkee778dmu\",\"tipo\":\"admin\",\"icon\":\"🔐\",\"fecha\":\"2026-10-11\",\"titulo\":\"Acceso a recurso seguro\",\"detalle\":\"document.upload · ok\",\"tenantId\":\"alianzas-soluciones\",\"createdAt\":\"2026-10-11T14:12:40.544Z\",\"updatedAt\":\"2026-10-11T14:12:40.544Z\",\"ownerUid\":\"woJlxR1iFEeiQZvTscPj4qQ5Qc73\",\"ownerEmail\":\"orbit.lab@demo.com\"}}]}}",
+      "postData": "{\"data\":{\"tenantId\":\"alianzas-soluciones\",\"activeRole\":\"Dirección\",\"mutations\":[{\"action\":\"insert\",\"collection\":\"actividades\",\"id\":\"secres_mv3xnyyjjd5er\",\"payload\":{\"id\":\"secres_mv3xnyyjjd5er\",\"tipo\":\"admin\",\"icon\":\"🔐\",\"fecha\":\"2026-10-11\",\"titulo\":\"Acceso a recurso seguro\",\"detalle\":\"document.upload · ok\",\"tenantId\":\"alianzas-soluciones\",\"createdAt\":\"2026-10-11T14:43:26.780Z\",\"updatedAt\":\"2026-10-11T14:43:26.780Z\",\"ownerUid\":\"woJlxR1iFEeiQZvTscPj4qQ5Qc73\",\"ownerEmail\":\"orbit.lab@demo.com\"}}]}}",
       "responseBody": "{\"error\":{\"message\":\"Preview operativo solo admite fixtures sintéticos autorizados B3-004/B4-003.\",\"status\":\"PERMISSION_DENIED\"}}"
     }
   ],
@@ -306,7 +307,7 @@
     {
       "status": 403,
       "url": "https://us-east1-ays-orbit-360-lab.cloudfunctions.net/orbit360ProductOperationalCommandPreview",
-      "id": "secres_mv3wkee778dmu",
+      "id": "secres_mv3xnyyjjd5er",
       "collection": "actividades",
       "reason": "SECURE_RESOURCE_AUDIT_NON_SYNTHETIC_DENIED_IN_PREVIEW",
       "persisted": false
@@ -430,7 +431,7 @@
           "pol_8231bbb8f9b7272c02891f5a4caf",
           "pol_df6bf097045762297ec31fd4e5c5",
           "b4003qa_policy_expired_renew_38102224750",
-          "b4003qa_policy_expired_renew_38145751742",
+          "b4003qa_policy_expired_renew_38147642372",
           "pol_6e557c18fc77e18c06bb63a46b7b"
         ]
       },
@@ -439,11 +440,11 @@
         "count": 8,
         "ids": [
           "b4003qa_policy_renew_38102224750",
-          "b4003qa_policy_renew_38145751742",
+          "b4003qa_policy_renew_38147642372",
           "b4003qa_policy_renewwrite_38102224750",
-          "b4003qa_policy_renewwrite_38145751742",
+          "b4003qa_policy_renewwrite_38147642372",
           "b4003qa_policy_unknown_38102224750",
-          "b4003qa_policy_unknown_38145751742",
+          "b4003qa_policy_unknown_38147642372",
           "pol_638e276218baad9e84018415b0ba",
           "pol_b39a58e5c216d8fb0f9fca4da4d6"
         ]
@@ -510,11 +511,11 @@
     "parallelDispositionAbsent": true,
     "date45ExpectedIds": [
       "b4003qa_policy_renew_38102224750",
-      "b4003qa_policy_renew_38145751742",
+      "b4003qa_policy_renew_38147642372",
       "b4003qa_policy_renewwrite_38102224750",
-      "b4003qa_policy_renewwrite_38145751742",
+      "b4003qa_policy_renewwrite_38147642372",
       "b4003qa_policy_unknown_38102224750",
-      "b4003qa_policy_unknown_38145751742",
+      "b4003qa_policy_unknown_38147642372",
       "pol_3ddc9e613f40252f02b2e122072d",
       "pol_638e276218baad9e84018415b0ba",
       "pol_7280c9b1a5253a1fe1e463e5993b",
@@ -528,11 +529,11 @@
     ],
     "date45VisibleIds": [
       "b4003qa_policy_renew_38102224750",
-      "b4003qa_policy_renew_38145751742",
+      "b4003qa_policy_renew_38147642372",
       "b4003qa_policy_renewwrite_38102224750",
-      "b4003qa_policy_renewwrite_38145751742",
+      "b4003qa_policy_renewwrite_38147642372",
       "b4003qa_policy_unknown_38102224750",
-      "b4003qa_policy_unknown_38145751742",
+      "b4003qa_policy_unknown_38147642372",
       "pol_3ddc9e613f40252f02b2e122072d",
       "pol_638e276218baad9e84018415b0ba",
       "pol_7280c9b1a5253a1fe1e463e5993b",
@@ -621,7 +622,7 @@
     "checkboxUsable": true
   },
   "r19RenewabilityDurable": {
-    "policyId": "b4003qa_policy_renewwrite_38145751742",
+    "policyId": "b4003qa_policy_renewwrite_38147642372",
     "serverValue": true,
     "reloadValue": true
   },
