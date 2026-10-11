@@ -208,7 +208,7 @@
     "orbit360-platform/data/tenant-alianzas-soluciones-insurers-p10.js": "41d2e31a42dac73eb68af304d5f532897210d0ee",
     "orbit360-platform/data/tenant-config/alianzas-soluciones.aseguradoras-knowledge-summary-v20261003.js": "2000d9ea8ab67bdd37d8bf404a29a405fa6374dd",
     "orbit360-platform/data/tenant-public-branding-index.js": "dc543c463f5ecd8ea44e49156d6282113bd95db6",
-    "orbit360-platform/index.html": "b2e2f6d3782b5e4c8254e578685dc2621aa3937d",
+    "orbit360-platform/index.html": "21ef7de672da7eb7b2d8e1043368e03f6f9d9031",
     "orbit360-platform/modules/academia.js": "4d48ee3edbc6afc4163bf6365a80bbcb680b1852",
     "orbit360-platform/modules/aseguradoras-v1202-import-bridge.js": "db5f012abe505c2dd27d77a47d0694868bee5348",
     "orbit360-platform/modules/aseguradoras.js": "9e56c296b55da499b52f42c462c668aa2f32eba7",
@@ -226,7 +226,7 @@
     "orbit360-platform/modules/equipo-credential-admin-v20260805-bridge.js": "7432bc05938469187fdd120a5bc023c53a000ab9",
     "orbit360-platform/modules/equipo-onboarding-v20260804-bridge.js": "1da619d8abd676d31d69a038d4770463ca67fdc5",
     "orbit360-platform/modules/equipo.js": "b0736237ee18ef45abbae1c13f5c94781178344e",
-    "orbit360-platform/modules/inicio.js": "6540788ac73ce4d5ee1606260063d3830ef4c3ae",
+    "orbit360-platform/modules/inicio.js": "3bfac3ae73b5b954303a30eb683ffe8deac1ce84",
     "orbit360-platform/modules/issuance-endosos-v1201-bridge.js": "43e14e5dc03a296b9fd461bec2ecc3052d6cbce0",
     "orbit360-platform/modules/leads.js": "4e12e604382f2731a03d29cf00db3c086d77ebc1",
     "orbit360-platform/modules/ops.js": "a4ca3dbb4613d541af411f12fce9773a072b0d41",
@@ -242,7 +242,7 @@
     "orbit360-platform/modules/siniestros.js": "fbea51cf7084b66d9866a3c947c1e7ec3bb4a034",
     "orbit360-platform/product-runtime-config.js": "cce5e1b74b246640297a734871a71364e4209061",
     "orbit360-platform/styles/base.css": "608ef0709144ffcbe748a7bd04e1bd16744def65",
-    "orbit360-platform/styles/infra.css": "ab7a8d93e81db9259b6673cb31a3ddc989985282",
+    "orbit360-platform/styles/infra.css": "d6fe258364c4e11daad21848a40fbb121c36e4a8",
     "orbit360-platform/sw.js": "87412e7c4ef1030e2a3389cfd709f0c287ab336b"
   },
   "evidence": {
@@ -2165,7 +2165,7 @@
     "operationalBusinessWrites": 0,
     "syntheticFinalAbsent": true
   },
-  "findingLedgerBlobSha": "d41d2dc19af7f66a0b7a05d7ca8da53b1a648160",
+  "findingLedgerBlobSha": "0bfa23823338cc55235646e8a23bd1207ebee7a7",
   "b4002Diagnostic": {
     "status": "CAUSE_DEMONSTRATED_SOURCE_FIX_AUTHORIZED",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_002_POST_COMMIT_NOTIFICATION_DIAGNOSTIC_20261003.json",
@@ -2813,7 +2813,7 @@
     "livePromotion": false,
     "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW"
   },
-  "continuityRegisterBlobSha": "f3649634e1bc208582262207e4e0819437c11925",
+  "continuityRegisterBlobSha": "05e007d18542e553cb89af3f6a48e499605c0084",
   "findingContinuityGuardBlobSha": "868a0ba1a492d9adc8d91655f152b6fa7980f499",
   "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_R20_CONTRACT_AND_EXACT_PREVIEW",
   "b4003R15VisualReview": {
@@ -4911,5 +4911,23 @@
     "findingLedgerBlobSha": "d41d2dc19af7f66a0b7a05d7ca8da53b1a648160",
     "continuityRegisterBlobSha": "f3649634e1bc208582262207e4e0819437c11925",
     "productBlobsUntouched": true
+  },
+  "paulaInicioContrast20261011": {
+    "status": "VISUAL_ONLY_SOURCE_STAGED_PREVIEW_REQUIRED",
+    "gate": "I6.5/B4-003",
+    "sourceHead": "276dba0572a3adba4144c9765f3352cba086d498",
+    "owners": {
+      "orbit360-platform/styles/infra.css": "d6fe258364c4e11daad21848a40fbb121c36e4a8",
+      "orbit360-platform/modules/inicio.js": "3bfac3ae73b5b954303a30eb683ffe8deac1ce84",
+      "orbit360-platform/index.html": "21ef7de672da7eb7b2d8e1043368e03f6f9d9031"
+    },
+    "contract": "Preserve certified numbers, goals, scopes, currencies; improve contrast and premium hierarchy only",
+    "previousUat": "INICIO_VISUAL_REJECTED",
+    "productionTouched": false,
+    "realDataWrites": 0
+  },
+  "inicioContrastEvidenceBinding20261011": {
+    "ledger": "0bfa23823338cc55235646e8a23bd1207ebee7a7",
+    "carry": "05e007d18542e553cb89af3f6a48e499605c0084"
   }
 }
