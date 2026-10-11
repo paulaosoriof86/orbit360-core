@@ -2969,7 +2969,7 @@
       "block": "B4",
       "source": "FROZEN_PLAN",
       "finding": "Cumulative B4-003 remediation: lifecycle, premium/source authority, Information Health, insurer knowledge and Gravicentra↔CotComp Quote Authority.",
-      "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
+      "status": "PAULA_VISUAL_PARTIAL_PASS_BLOCKING_20261011",
       "blocking": true,
       "mayDisappearWithoutDisposition": false,
       "humanEvidence": [
@@ -3294,7 +3294,13 @@
       },
       "r21PriorStatus": "MACHINE_PASS_PENDING_PAULA_VISUAL",
       "r21SourceReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R21_BUSINESS_LINEAGE_ATTACHMENTS_INBOX_SOURCE_FIX_20261009.json",
-      "r21SourceReceiptBlobSha": "ba6c57c5b703329eea92be8d04b8e5074e7aae50"
+      "r21SourceReceiptBlobSha": "ba6c57c5b703329eea92be8d04b8e5074e7aae50",
+      "inicioPremiumRetry": {
+        "status": "SOURCE_STAGED_PREVIEW_REQUIRED",
+        "priorMachineProofPreserved": true,
+        "paulaRejectNotOverridden": true,
+        "gate": "B4-003"
+      }
     },
     {
       "id": "B4-004",
