@@ -2969,7 +2969,7 @@
       "block": "B4",
       "source": "FROZEN_PLAN",
       "finding": "Cumulative B4-003 remediation: lifecycle, premium/source authority, Information Health, insurer knowledge and Gravicentra↔CotComp Quote Authority.",
-      "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
+      "status": "PAULA_VISUAL_PARTIAL_PASS_BLOCKING_20261011",
       "blocking": true,
       "mayDisappearWithoutDisposition": false,
       "humanEvidence": [
@@ -11862,7 +11862,13 @@
       "status": "OPEN_PAULA_20261011_CAUSAL_FIX_REQUIRED",
       "mayDisappearWithoutDisposition": false,
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PAULA_UAT_DECISIONS_AND_RECOVERY_20261011.json",
-      "receiptBlobSha": "abff2437533e1f9cab127acf0e5c98d1b024e37c"
+      "receiptBlobSha": "abff2437533e1f9cab127acf0e5c98d1b024e37c",
+      "contrastFollowup20261011": {
+        "status": "SOURCE_FIXED_PENDING_EXACT_PREVIEW_AND_PAULA_VISUAL",
+        "cause": "Gauge function restored but light gray-on-white contrast, hierarchy, surface separation remained visually rejected in Paula screenshot",
+        "scope": "VISUAL_ONLY",
+        "noFunctionalReopen": true
+      }
     },
     {
       "id": "B4-003-UAT-20261011-02",
