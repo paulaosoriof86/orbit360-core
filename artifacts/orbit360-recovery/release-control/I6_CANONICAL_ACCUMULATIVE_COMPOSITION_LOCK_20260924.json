@@ -173,7 +173,7 @@
     "orbit360-platform/core/backend-product-readonly-bootstrap-p0.js": "1f1da3d54b32d94fe7d7111f318437a48bbf95cd",
     "orbit360-platform/core/backend-resource-contracts.js": "826364d2a394d0bfe75d9f0ccdc5dd8905d2b3f0",
     "orbit360-platform/core/ciclo.js": "dbd828018c9323d712aa85d86f4397bda15e870f",
-    "orbit360-platform/core/client-insurer-visual-contract-v20260720.js": "3cc80638704d728bb23510ec577a921d358b44e1",
+    "orbit360-platform/core/client-insurer-visual-contract-v20260720.js": "3fd89167a5a36662072dbdc3e970b48f61158343",
     "orbit360-platform/core/cobros-reconciliation-domain-client.js": "7f00ced68ad64dd1ff4b9c0eff85f1f959dc6d68",
     "orbit360-platform/core/comisiones-eng.js": "f1aa5dfc3b8191944023b581abdcff27adf0dba3",
     "orbit360-platform/core/config.js": "5245748330e410a1acf5749955f908aff30fcdcd",
@@ -4782,7 +4782,7 @@
     "userReport": "PAULA_CLIENT360_PREVIOUSLY_APPROVED_HEALTH_AND_PORTFOLIO_REGRESSION",
     "confirmedCause": "M1 client-insurer visual enhancer replaced canonical Client 360 financial and health DOM cells whenever a separate policy index lacked a linked client; absence of a policy is not absence of Cartera or Salud.",
     "before": "5025ee88abaed8be499d2bacf57796cc77a5736f",
-    "after": "3cc80638704d728bb23510ec577a921d358b44e1",
+    "after": "3fd89167a5a36662072dbdc3e970b48f61158343",
     "qa": "21436d0dbd081098c091516721179480f4938420",
     "remediation": "Remove visual enhancer financial-cell writes; leave country validation and segmentation enhancements and canonical summary engine unchanged.",
     "antiRegression": "Authenticated 30-row UI cell preservation probe before/after M1 enhancer; no synthetic values injected.",
@@ -4795,5 +4795,16 @@
     "passClaim": false,
     "previewRequired": true,
     "caveat": "Client type-count literal equality and portfolio hydration need independent reconciliation; this fixes demonstrated DOM shadow, not every historical data quality issue."
+  },
+  "r24Client360SourceSyntaxPreflight": {
+    "status": "SOURCE_SYNTAX_REPAIRED_PENDING_GUARD_AND_PREVIEW",
+    "sourceOwner": "orbit360-platform/core/client-insurer-visual-contract-v20260720.js",
+    "previousBlob": "3cc80638704d728bb23510ec577a921d358b44e1",
+    "newBlob": "3fd89167a5a36662072dbdc3e970b48f61158343",
+    "sourceChanged": true,
+    "previewRetestRequired": true,
+    "productionChanged": false,
+    "realWrites": 0,
+    "reason": "Replace escaped literal newline with actual newline before function closing brace; preserve approved Client360 canonical financial owner."
   }
 }

@@ -588,9 +588,9 @@
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_RENEWAL_KPI_PARITY_CAUSAL_ADDENDUM_20261005.json",
     "blobSha": "87bab7ee2778a0525cdbe81cf4cbf82020bf6139"
   },
-  "findingLedgerBlobSha": "12e16d8336ca5a06b38ba408352af22d97d89070",
-  "continuityRegisterBlobSha": "53f171df7ad229d3781e7614c48876ee37a3fb17",
-  "compositionLockBlobSha": "7cdaef7f01f2ab0197890b8cbb9a19c84f4d535e",
+  "findingLedgerBlobSha": "0b1a826ee0ea674862ff07856ce9d3cefdf87fb1",
+  "continuityRegisterBlobSha": "c841a61b1df22c74afa11d196ba7e8823fd477bd",
+  "compositionLockBlobSha": "b598ca65956d7b39cbad4107a44fed74479e6b21",
   "r18SourceFix": {
     "status": "SOURCE_FIXED_R18_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_SOURCE_FIX_20261005.json",
@@ -2098,7 +2098,7 @@
     "userReport": "PAULA_CLIENT360_PREVIOUSLY_APPROVED_HEALTH_AND_PORTFOLIO_REGRESSION",
     "confirmedCause": "M1 client-insurer visual enhancer replaced canonical Client 360 financial and health DOM cells whenever a separate policy index lacked a linked client; absence of a policy is not absence of Cartera or Salud.",
     "before": "5025ee88abaed8be499d2bacf57796cc77a5736f",
-    "after": "3cc80638704d728bb23510ec577a921d358b44e1",
+    "after": "3fd89167a5a36662072dbdc3e970b48f61158343",
     "qa": "21436d0dbd081098c091516721179480f4938420",
     "remediation": "Remove visual enhancer financial-cell writes; leave country validation and segmentation enhancements and canonical summary engine unchanged.",
     "antiRegression": "Authenticated 30-row UI cell preservation probe before/after M1 enhancer; no synthetic values injected.",
@@ -2120,5 +2120,16 @@
     "priorApprovedB3Preserved": true,
     "productionForbidden": true,
     "realWritesForbidden": true
+  },
+  "r24Client360SourceSyntaxPreflight": {
+    "status": "SOURCE_SYNTAX_REPAIRED_PENDING_GUARD_AND_PREVIEW",
+    "sourceOwner": "orbit360-platform/core/client-insurer-visual-contract-v20260720.js",
+    "previousBlob": "3cc80638704d728bb23510ec577a921d358b44e1",
+    "newBlob": "3fd89167a5a36662072dbdc3e970b48f61158343",
+    "sourceChanged": true,
+    "previewRetestRequired": true,
+    "productionChanged": false,
+    "realWrites": 0,
+    "reason": "Replace escaped literal newline with actual newline before function closing brace; preserve approved Client360 canonical financial owner."
   }
 }

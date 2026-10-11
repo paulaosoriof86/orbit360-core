@@ -4869,9 +4869,9 @@
       "entryGuardReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_ENTRY_GUARD_PASS_20261002.json",
       "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
       "executionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B4_EXECUTION_LOCK_20261002.json",
-      "executionLockBlobSha": "18ffed6c5205544a125ffebe59689fef4af30dc0",
-      "compositionLockBlobSha": "7cdaef7f01f2ab0197890b8cbb9a19c84f4d535e",
-      "findingLedgerBlobSha": "12e16d8336ca5a06b38ba408352af22d97d89070",
+      "executionLockBlobSha": "d31893add8266a4d3b3ba98dd0934a5a1c530877",
+      "compositionLockBlobSha": "b598ca65956d7b39cbad4107a44fed74479e6b21",
+      "findingLedgerBlobSha": "0b1a826ee0ea674862ff07856ce9d3cefdf87fb1",
       "activeFindingId": "B4-003",
       "productSourceSha": "c603fd3561e7229d9359db45495d4cf2d757cd8f",
       "baselineBuildId": "gi-i65-b3-dcd2b3f60b98-57f234755dc1",
@@ -5995,9 +5995,9 @@
   "canonicalAccumulationControl": {
     "status": "FROZEN_ACTIVE",
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "compositionLockBlobSha": "7cdaef7f01f2ab0197890b8cbb9a19c84f4d535e",
+    "compositionLockBlobSha": "b598ca65956d7b39cbad4107a44fed74479e6b21",
     "findingLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "findingLedgerBlobSha": "12e16d8336ca5a06b38ba408352af22d97d89070",
+    "findingLedgerBlobSha": "0b1a826ee0ea674862ff07856ce9d3cefdf87fb1",
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
     "activePlanBlobSha": "76a275e511c3bd580496c07de93c2bfb2eace269",
     "activeBlock": "B4",
@@ -6013,7 +6013,7 @@
     "activeFindingId": "B4-003",
     "findingContinuityRegisterBlobSha": "11ffaf6e7c691064be947fdc1af00b08d8fb8f9c",
     "findingContinuityGuardBlobSha": "868a0ba1a492d9adc8d91655f152b6fa7980f499",
-    "continuityRegisterBlobSha": "53f171df7ad229d3781e7614c48876ee37a3fb17",
+    "continuityRegisterBlobSha": "c841a61b1df22c74afa11d196ba7e8823fd477bd",
     "masterPendingClosurePlanPath": "artifacts/orbit360-recovery/release-control/I6_PENDING_CLOSURE_MASTER_PLAN_LOCK_20261004.json",
     "masterPendingClosurePlanBlobSha": "9d7ba423caf0aa09a0e2af4a1ed4713ea867d17a",
     "listingHumanProofStillRequired": true
@@ -6311,9 +6311,9 @@
     "status": "B4_003_R24_SOURCE_STAGED_PENDING_PREVIEW",
     "activeFindingId": "B4-003",
     "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
-    "executionLockBlobSha": "18ffed6c5205544a125ffebe59689fef4af30dc0",
-    "compositionLockBlobSha": "7cdaef7f01f2ab0197890b8cbb9a19c84f4d535e",
-    "findingLedgerBlobSha": "12e16d8336ca5a06b38ba408352af22d97d89070",
+    "executionLockBlobSha": "d31893add8266a4d3b3ba98dd0934a5a1c530877",
+    "compositionLockBlobSha": "b598ca65956d7b39cbad4107a44fed74479e6b21",
+    "findingLedgerBlobSha": "0b1a826ee0ea674862ff07856ce9d3cefdf87fb1",
     "noLive": true,
     "noReimport": true,
     "nextAction": "R23_CONTRACT_AND_EXACT_PREVIEW",
@@ -7804,7 +7804,7 @@
     "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_R20_CONTRACT_AND_EXACT_PREVIEW"
   },
   "compositionLockBlobSha": "534559b1b23ee57be455460b9957c08f80ecdae3",
-  "findingLedgerBlobSha": "12e16d8336ca5a06b38ba408352af22d97d89070",
+  "findingLedgerBlobSha": "0b1a826ee0ea674862ff07856ce9d3cefdf87fb1",
   "continuityRegisterBlobSha": "48d945e51e5a10ec74dc925313b720a121ba7086",
   "r16PerformanceRegression": {
     "status": "CLOSED_PASS",
@@ -9396,7 +9396,7 @@
     "userReport": "PAULA_CLIENT360_PREVIOUSLY_APPROVED_HEALTH_AND_PORTFOLIO_REGRESSION",
     "confirmedCause": "M1 client-insurer visual enhancer replaced canonical Client 360 financial and health DOM cells whenever a separate policy index lacked a linked client; absence of a policy is not absence of Cartera or Salud.",
     "before": "5025ee88abaed8be499d2bacf57796cc77a5736f",
-    "after": "3cc80638704d728bb23510ec577a921d358b44e1",
+    "after": "3fd89167a5a36662072dbdc3e970b48f61158343",
     "qa": "21436d0dbd081098c091516721179480f4938420",
     "remediation": "Remove visual enhancer financial-cell writes; leave country validation and segmentation enhancements and canonical summary engine unchanged.",
     "antiRegression": "Authenticated 30-row UI cell preservation probe before/after M1 enhancer; no synthetic values injected.",
@@ -9409,5 +9409,16 @@
     "passClaim": false,
     "previewRequired": true,
     "caveat": "Client type-count literal equality and portfolio hydration need independent reconciliation; this fixes demonstrated DOM shadow, not every historical data quality issue."
+  },
+  "r24Client360SourceSyntaxPreflight": {
+    "status": "SOURCE_SYNTAX_REPAIRED_PENDING_GUARD_AND_PREVIEW",
+    "sourceOwner": "orbit360-platform/core/client-insurer-visual-contract-v20260720.js",
+    "previousBlob": "3cc80638704d728bb23510ec577a921d358b44e1",
+    "newBlob": "3fd89167a5a36662072dbdc3e970b48f61158343",
+    "sourceChanged": true,
+    "previewRetestRequired": true,
+    "productionChanged": false,
+    "realWrites": 0,
+    "reason": "Replace escaped literal newline with actual newline before function closing brace; preserve approved Client360 canonical financial owner."
   }
 }

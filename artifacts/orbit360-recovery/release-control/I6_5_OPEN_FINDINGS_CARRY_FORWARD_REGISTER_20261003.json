@@ -4,7 +4,7 @@
   "authority": "FAIL_CLOSED_FINDING_CONTINUITY",
   "sourceLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
   "sourceLedgerPreviousBlobSha": "0cdb33f6b47a62426c7ce5c1d10ecfc2d69b3b74",
-  "expectedLedgerNextBlobSha": "12e16d8336ca5a06b38ba408352af22d97d89070",
+  "expectedLedgerNextBlobSha": "0b1a826ee0ea674862ff07856ce9d3cefdf87fb1",
   "policy": {
     "allLedgerFindingsMustAppearExactlyOnce": true,
     "newHumanFindingsMustBeIndividualLedgerEntries": true,
@@ -12879,7 +12879,7 @@
     "userReport": "PAULA_CLIENT360_PREVIOUSLY_APPROVED_HEALTH_AND_PORTFOLIO_REGRESSION",
     "confirmedCause": "M1 client-insurer visual enhancer replaced canonical Client 360 financial and health DOM cells whenever a separate policy index lacked a linked client; absence of a policy is not absence of Cartera or Salud.",
     "before": "5025ee88abaed8be499d2bacf57796cc77a5736f",
-    "after": "3cc80638704d728bb23510ec577a921d358b44e1",
+    "after": "3fd89167a5a36662072dbdc3e970b48f61158343",
     "qa": "21436d0dbd081098c091516721179480f4938420",
     "remediation": "Remove visual enhancer financial-cell writes; leave country validation and segmentation enhancements and canonical summary engine unchanged.",
     "antiRegression": "Authenticated 30-row UI cell preservation probe before/after M1 enhancer; no synthetic values injected.",
@@ -12892,5 +12892,16 @@
     "passClaim": false,
     "previewRequired": true,
     "caveat": "Client type-count literal equality and portfolio hydration need independent reconciliation; this fixes demonstrated DOM shadow, not every historical data quality issue."
+  },
+  "r24Client360SourceSyntaxPreflight": {
+    "status": "SOURCE_SYNTAX_REPAIRED_PENDING_GUARD_AND_PREVIEW",
+    "sourceOwner": "orbit360-platform/core/client-insurer-visual-contract-v20260720.js",
+    "previousBlob": "3cc80638704d728bb23510ec577a921d358b44e1",
+    "newBlob": "3fd89167a5a36662072dbdc3e970b48f61158343",
+    "sourceChanged": true,
+    "previewRetestRequired": true,
+    "productionChanged": false,
+    "realWrites": 0,
+    "reason": "Replace escaped literal newline with actual newline before function closing brace; preserve approved Client360 canonical financial owner."
   }
 }

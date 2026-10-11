@@ -1,0 +1,25 @@
+{
+  "schema": "GRAVICENTRA_I65_B4_003_CLIENT360_PREFLIGHT_SYNTAX_FIX_V1",
+  "date": "2026-10-11",
+  "before": "0ee0b9c7d0cb352df513da02b82ca0f46835c946",
+  "obj": {
+    "status": "SOURCE_SYNTAX_REPAIRED_PENDING_GUARD_AND_PREVIEW",
+    "sourceOwner": "orbit360-platform/core/client-insurer-visual-contract-v20260720.js",
+    "previousBlob": "3cc80638704d728bb23510ec577a921d358b44e1",
+    "newBlob": "3fd89167a5a36662072dbdc3e970b48f61158343",
+    "sourceChanged": true,
+    "previewRetestRequired": true,
+    "productionChanged": false,
+    "realWrites": 0,
+    "reason": "Replace escaped literal newline with actual newline before function closing brace; preserve approved Client360 canonical financial owner."
+  },
+  "authority": {
+    "composition": "b598ca65956d7b39cbad4107a44fed74479e6b21",
+    "ledger": "0b1a826ee0ea674862ff07856ce9d3cefdf87fb1",
+    "carry": "c841a61b1df22c74afa11d196ba7e8823fd477bd",
+    "b4": "d31893add8266a4d3b3ba98dd0934a5a1c530877",
+    "control": "6957d6c6232eae3d48d0750bfae46c5682d8f955"
+  },
+  "previewPass": false,
+  "productionChange": false
+}
