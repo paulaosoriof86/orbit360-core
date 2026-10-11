@@ -120,7 +120,7 @@
   "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_R20_SECOND_REVIEW_SINGLE_CUMULATIVE_SOURCE_FIX",
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "blobSha": "554b347a6b484bc291a6cc4761f0d2da815a7802",
+    "blobSha": "a20fcfdc3e4c159b56c02bb9dfc5ca7cd26341f4",
     "status": "FROZEN_ACTIVE_UAT3_P0_BATCH_1_SOURCE_COMPLETE"
   },
   "findingLedger": {
@@ -590,7 +590,7 @@
   },
   "findingLedgerBlobSha": "6d2d471056f129713edab6483c5089202f421549",
   "continuityRegisterBlobSha": "19fd55ad6cbb203b205b5ad9b11554c864e06e73",
-  "compositionLockBlobSha": "38aa6eb3e9e4eac139528e71ccc8123df43ee75d",
+  "compositionLockBlobSha": "a20fcfdc3e4c159b56c02bb9dfc5ca7cd26341f4",
   "r18SourceFix": {
     "status": "SOURCE_FIXED_R18_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_SOURCE_FIX_20261005.json",
@@ -616,7 +616,7 @@
     "ledgerBlobSha": "4c0834cc86c6c5db466a2d8b9aff2f4d46a067af",
     "carryBlobSha": "7c428e7f808c39032f579a44822b24d89b03feb7"
   },
-  "masterPlanBlobSha": "ea776f11244d8df73d01240407be85861e87beda",
+  "masterPlanBlobSha": "71eba786de1236533e0339ae5cb79eeabed8ebaf",
   "r19NoLossFreeze": {
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_PAULA_VISUAL_REJECTION_R19_NOLOSS_FREEZE_20261005.json",
     "blobSha": "5277c2a052ea8dcea3bb9e15eb7eb3f6b55e0c5d"
@@ -2171,5 +2171,13 @@
       "orbit360-platform/modules/leads.js"
     ],
     "backendRequiresBoundOwnerAndPreview": true
+  },
+  "paulaApprovedCommercialContinuity20261011": {
+    "status": "DOCUMENTARY_SCOPE_FROZEN_PRODUCT_REMEDIATION_PENDING",
+    "addendumPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PLAN_INTEGRAL_CICLO_COMERCIAL_TRAZABILIDAD_Y_RECUPERACION_20261011.md",
+    "addendumBlobSha": "85e265172204ba5e9f0655871ddbe64ab9926ce2",
+    "masterPlanSha": "71eba786de1236533e0339ae5cb79eeabed8ebaf",
+    "referenceFindingCount": 7,
+    "priorHumanPassPreserved": true
   }
 }

@@ -15226,5 +15226,51 @@
     "physicalSamplesPassed": 16,
     "readOnlyOnly": true,
     "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_R20_CONTRACT_AND_EXACT_PREVIEW"
+  },
+  "paulaApprovedCommercialContinuity20261011": {
+    "status": "FROZEN_SCOPE_AND_ACCEPTANCE_NO_PRODUCT_PASS",
+    "date": "2026-10-11",
+    "addendumPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PLAN_INTEGRAL_CICLO_COMERCIAL_TRAZABILIDAD_Y_RECUPERACION_20261011.md",
+    "addendumBlobSha": "85e265172204ba5e9f0655871ddbe64ab9926ce2",
+    "authorizedBy": "Paula 2026-10-11 explicit integration",
+    "existingGate": "I6.5/B4-003",
+    "relatedPreviousFreeze": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PAULA_UAT_DECISIONS_AND_RECOVERY_20261011.json",
+    "rootFindingIds": [
+      "B4-003-UAT-20261011-01",
+      "B4-003-UAT-20261011-02",
+      "B4-003-UAT-20261011-03",
+      "B4-003-UAT-20261011-04",
+      "B4-003-UAT-20261011-05",
+      "B4-003-UAT-20261011-06",
+      "B4-003-UAT-20261011-07"
+    ],
+    "contracts": [
+      "C01-C13"
+    ],
+    "tests": [
+      "T01-T20"
+    ],
+    "releaseBlocking": [
+      "C02",
+      "C03",
+      "C04",
+      "C06",
+      "C07",
+      "C08",
+      "C09",
+      "C11",
+      "C12"
+    ],
+    "p1Tracked": [
+      "C05_INTERNAL_PREVIEW",
+      "C10_RECOVERABLE_OPPORTUNITIES"
+    ],
+    "evidence": "No new PASS until exact preview, readback, roles, human UAT, certified promotion",
+    "singleCanonicalOpportunity": true,
+    "previousPassPreserved": true,
+    "sourceMutationAuthorizedByThisAddendum": false,
+    "dataWritesAuthorized": false,
+    "productionPromotionAuthorized": false,
+    "nextActionFromControlPlaneOnly": true
   }
 }

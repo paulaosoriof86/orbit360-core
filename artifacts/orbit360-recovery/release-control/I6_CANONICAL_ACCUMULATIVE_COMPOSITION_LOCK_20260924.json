@@ -3451,7 +3451,7 @@
     "noLive": true,
     "noReimport": true
   },
-  "masterPendingClosurePlanBlobSha": "ea776f11244d8df73d01240407be85861e87beda",
+  "masterPendingClosurePlanBlobSha": "71eba786de1236533e0339ae5cb79eeabed8ebaf",
   "r20CumulativeSourceFix": {
     "status": "SOURCE_FIXED_R20_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_CUMULATIVE_SOURCE_FIX_20261006.json",
@@ -4833,5 +4833,14 @@
     "realBusinessWritesForbidden": true,
     "productionUntouched": true,
     "noPassClaim": true
+  },
+  "paulaApprovedCommercialContinuity20261011": {
+    "addendumPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PLAN_INTEGRAL_CICLO_COMERCIAL_TRAZABILIDAD_Y_RECUPERACION_20261011.md",
+    "addendumBlobSha": "85e265172204ba5e9f0655871ddbe64ab9926ce2",
+    "masterPlanBlobSha": "71eba786de1236533e0339ae5cb79eeabed8ebaf",
+    "productSourceChanged": false,
+    "sourceCompositionUnchanged": true,
+    "activeBlock": "B4",
+    "next": "CAUSAL_SOURCE_FIX_ON_FIRST_OPEN_P0"
   }
 }
