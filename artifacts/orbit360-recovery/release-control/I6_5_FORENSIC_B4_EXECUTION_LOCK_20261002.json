@@ -120,7 +120,7 @@
   "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_R23_CONTRACT_AND_EXACT_PREVIEW",
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "blobSha": "926add224bf16ab473e9a291218847462382e4eb",
+    "blobSha": "011a47cd54ecfdb460b3e8fb08c868e8411abb01",
     "status": "FROZEN_ACTIVE_UAT3_P0_BATCH_1_SOURCE_COMPLETE"
   },
   "findingLedger": {
@@ -590,7 +590,7 @@
   },
   "findingLedgerBlobSha": "6d2d471056f129713edab6483c5089202f421549",
   "continuityRegisterBlobSha": "19fd55ad6cbb203b205b5ad9b11554c864e06e73",
-  "compositionLockBlobSha": "926add224bf16ab473e9a291218847462382e4eb",
+  "compositionLockBlobSha": "011a47cd54ecfdb460b3e8fb08c868e8411abb01",
   "r18SourceFix": {
     "status": "SOURCE_FIXED_R18_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_SOURCE_FIX_20261005.json",
@@ -2194,5 +2194,9 @@
     ],
     "noDataWrites": true,
     "liveTouched": false
+  },
+  "paulaHumanActorCacheBindingCorrection": {
+    "status": "STAGED_PREVIEW_RETRY",
+    "indexBlobSha": "11ec0649cf52ee237bc32197249bf801bfba9e6d"
   }
 }

@@ -1,0 +1,15 @@
+{
+  "schema": "GRAVICENTRA_B4_003_R24_CACHE_ASSET_VERSION_REPAIR",
+  "date": "2026-10-11",
+  "gate": "I6.5/B4-003",
+  "failedRunId": 38155717936,
+  "causalCode": "B4_003_R14A_CYCLE_CACHE_BINDING_MISSING",
+  "file": "orbit360-platform/index.html",
+  "blobBefore": "0db979357fd4435bcbf27498301df59a99b3bb97",
+  "blobAfter": "11ec0649cf52ee237bc32197249bf801bfba9e6d",
+  "fix": "Keep versioned legacy contract prefix and add new hashed suffix",
+  "qaRelaxed": false,
+  "dataMutation": false,
+  "liveTouched": false,
+  "previewRetestRequired": true
+}
