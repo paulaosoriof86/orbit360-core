@@ -1,0 +1,185 @@
+{
+  "schema": "GRAVICENTRA_B4_003_USER_VISUAL_FREEZE_20261011_V1",
+  "recordedAt": "2026-10-11",
+  "gate": "I6.5/B4-003",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "reference": {
+    "preview": "https://ays-orbit-360-lab--gi-i65-b4-38147642372-z2t7eolh.web.app",
+    "sourceSha": "b67cb2424c83910250874924c998976c0fa148ca",
+    "runId": 38147642372
+  },
+  "human": {
+    "cliente360": "VISUAL_PASS_PRESERVE",
+    "renovaciones": "VISUAL_PASS_PRESERVE_BUSINESS_OUTCOME_EXPLANATION_OPEN",
+    "inicio": "VISUAL_REJECTED_META_AND_PREMIUM",
+    "opsLeads": "PARTIAL_ACCEPTANCE_ADVISOR_EDIT_NOTIFICATION_ACTOR_DOCS_OPEN",
+    "productionApproval": false
+  },
+  "decisions": {
+    "name": "Oportunidades por recuperar",
+    "canonicalModel": "Existing negocios/Leads ID; preserve lost status and revive same record; no new collection or parallel module",
+    "issuance": "Atomic server client/policy linkage exists; documentary provenance and receipts/cartera must be E2E certified",
+    "design": "Restore approved premium speedometer layout, contrast and aligned placement, no false missing meta",
+    "roles": "No multiuser notification proof by switching active role on same UID",
+    "documents": "Keep Drive documentRef and provenance; do not duplicate binary; preview internal protected",
+    "reconciliation": "Do not reopen prior PASS outside causal impact; keep past machine proof as evidence, not human PASS",
+    "privacy": "Do not copy sensitive screenshot attachment names, emails or identifiers into artifact"
+  },
+  "mappedExisting": [
+    "B4-003-R19-07-INICIO-MONTHLY-ADVISOR-READINESS-REGRESSION",
+    "B4-003-R19-08-OPS-ADVISOR-HANDOFF-NOTIFICATION-GAP",
+    "B4-003-R20-B09",
+    "B4-003-R20-B14",
+    "B4-003-R15-07-RENEWALS-BUSINESS-COMPLETENESS",
+    "B4-003-R14-04-CLIENT360-LIST-AUTHORITY"
+  ],
+  "newFindingIds": [
+    "B4-003-UAT-20261011-01",
+    "B4-003-UAT-20261011-02",
+    "B4-003-UAT-20261011-03",
+    "B4-003-UAT-20261011-04",
+    "B4-003-UAT-20261011-05",
+    "B4-003-UAT-20261011-06",
+    "B4-003-UAT-20261011-07"
+  ],
+  "newFindings": [
+    {
+      "id": "B4-003-UAT-20261011-01",
+      "block": "B4",
+      "targetGate": "B4-003",
+      "source": "PAULA_AUTHENTICATED_PREVIEW_20261011",
+      "surface": "Inicio · Metas y diseño",
+      "priority": "BLOCKING_P0",
+      "blocking": true,
+      "owner": [
+        "orbit360-platform/modules/inicio.js",
+        "functions/assignable-advisor-roster.js"
+      ],
+      "finding": "Las tarjetas GT/CO sustituyen velocímetros aceptados, no están centradas, tienen poco contraste y muestran meta no configurada aunque Paula tiene meta individual.",
+      "rootCause": "configuredMeta exige meta global explícita o meta válida de todos los asesores para total país. Ausencia de total no significa ausencia de la meta de Paula.",
+      "closureCondition": "Restaurar indicadores premium centrados y legibles; resolver meta individual y global desde fuente/alcance real; GTQ y COP separados; roles y móvil.",
+      "status": "OPEN_PAULA_20261011_CAUSAL_FIX_REQUIRED",
+      "mayDisappearWithoutDisposition": false
+    },
+    {
+      "id": "B4-003-UAT-20261011-02",
+      "block": "B4",
+      "targetGate": "B4-003",
+      "source": "PAULA_AUTHENTICATED_PREVIEW_20261011",
+      "surface": "Ops/Leads · Guardar asesor y campos",
+      "priority": "BLOCKING_P0",
+      "blocking": true,
+      "owner": [
+        "orbit360-platform/core/ciclo.js",
+        "functions/product-ops-leads-domain.js"
+      ],
+      "finding": "La ficha acepta comentarios pero Dirección no pudo cambiar responsable/asesor ni guardar otras modificaciones.",
+      "rootCause": "El frontend envía asesorId en updateDurable; el dominio de escritura usual update_business se autoriza como leads con alcance own y puede rechazar cambio. Necesita readback y error causal de dos UIDs.",
+      "closureCondition": "Cambio asesor y demás campos autorizados: commit, readback, refresh, rol real; rechazo visible y no simular éxito.",
+      "status": "OPEN_PAULA_20261011_CAUSAL_FIX_REQUIRED",
+      "mayDisappearWithoutDisposition": false
+    },
+    {
+      "id": "B4-003-UAT-20261011-03",
+      "block": "B4",
+      "targetGate": "B4-003",
+      "source": "PAULA_AUTHENTICATED_PREVIEW_20261011",
+      "surface": "Ops/Leads · Identidad de actor",
+      "priority": "BLOCKING_P0",
+      "blocking": true,
+      "owner": [
+        "orbit360-platform/core/ciclo.js",
+        "functions/product-ops-leads-domain.js",
+        "functions/ops-advisor-inbox.js"
+      ],
+      "finding": "Comentarios y notificaciones muestran correo/etiquetas técnicas en vez de nombre de usuario ya aprobado.",
+      "rootCause": "humanCommentAuthor devuelve actorName si no es rol, aunque sea correo, antes de resolver actorUid; backend permite email como fallback.",
+      "closureCondition": "Mostrar nombre humano por UID/membresía/roster sin publicar email ni códigos técnicos; actor y bitácora coherentes después de reload.",
+      "status": "OPEN_PAULA_20261011_CAUSAL_FIX_REQUIRED",
+      "mayDisappearWithoutDisposition": false
+    },
+    {
+      "id": "B4-003-UAT-20261011-04",
+      "block": "B4",
+      "targetGate": "B4-003",
+      "source": "PAULA_AUTHENTICATED_PREVIEW_20261011",
+      "surface": "Ops/Leads · Respuesta y notificaciones",
+      "priority": "BLOCKING_P0",
+      "blocking": true,
+      "owner": [
+        "functions/product-ops-leads-domain.js",
+        "functions/ops-advisor-inbox.js",
+        "functions/notification-outbox-processor.js"
+      ],
+      "finding": "Las notificaciones se ven desde rol Asesor pero no desde Dirección/Operación tras devolución de asesor.",
+      "rootCause": "El retorno se enruta a role operations; recipientMatch filtra activeRole/opsScope y excluye el mismo actorUid. Alternar rol en una misma cuenta no verifica entrega a un segundo usuario.",
+      "closureCondition": "Prueba con dos UIDs reales autorizados: solicitud ops→asesor→ops, Dirección y Operativo, deep link, badge, actor, server readback y recarga; sin duplicados.",
+      "status": "OPEN_PAULA_20261011_CAUSAL_FIX_REQUIRED",
+      "mayDisappearWithoutDisposition": false
+    },
+    {
+      "id": "B4-003-UAT-20261011-05",
+      "block": "B4",
+      "targetGate": "B4-003",
+      "source": "PAULA_AUTHENTICATED_PREVIEW_20261011",
+      "surface": "Emisión integrada · Documento y cartera",
+      "priority": "BLOCKING_P0",
+      "blocking": true,
+      "owner": [
+        "functions/product-ops-leads-domain.js",
+        "Document Drive provider",
+        "Recibos/Cartera owner"
+      ],
+      "finding": "Emitir crea o vincula cliente y póliza, pero no certifica traspaso referencial de adjuntos del negocio ni generación de recibos/cartera en el mismo flujo.",
+      "rootCause": "El handler create emitido registra cliente/póliza/vehículo/actividad; no se observa propagación documental ni recibosEsperados/carteraPrimas en este handler. Revisar event consumers antes de concluir ausencia global.",
+      "closureCondition": "E2E distinto UID: emitir→cliente/póliza→documentos/bitácora con origen→recibos y cartera, permisos y reload, transacción e idempotencia.",
+      "status": "OPEN_PAULA_20261011_CAUSAL_FIX_REQUIRED",
+      "mayDisappearWithoutDisposition": false
+    },
+    {
+      "id": "B4-003-UAT-20261011-06",
+      "block": "B4",
+      "targetGate": "B4-003",
+      "source": "PAULA_AUTHENTICATED_PREVIEW_20261011",
+      "surface": "Documentos · Visor interno",
+      "priority": "PARALLEL_NONBLOCKING_P1",
+      "blocking": false,
+      "owner": [
+        "orbit360-platform/core/ciclo.js",
+        "Product Drive provider"
+      ],
+      "finding": "El adjunto de colaboración persiste y se descarga, pero falta previsualización integrada PDF/imagen.",
+      "rootCause": "El render presenta botón de documento; visor embebido no acreditado.",
+      "closureCondition": "Abrir PDF/imagen en visor seguro dentro de la plataforma, conservar descargar y permisos, no hacer público documento.",
+      "status": "OPEN_PAULA_20261011_CAUSAL_FIX_REQUIRED",
+      "mayDisappearWithoutDisposition": false
+    },
+    {
+      "id": "B4-003-UAT-20261011-07",
+      "block": "B4",
+      "targetGate": "B4-003",
+      "source": "PAULA_AUTHENTICATED_PREVIEW_20261011",
+      "surface": "Leads · Oportunidades por recuperar",
+      "priority": "PARALLEL_NONBLOCKING_P1",
+      "blocking": false,
+      "owner": [
+        "orbit360-platform/core/ciclo.js",
+        "orbit360-platform/modules/leads.js"
+      ],
+      "finding": "Leads perdidos no tienen listado/filtros de recuperación y seguimiento, pese a conservarse el registro.",
+      "rootCause": "Estado perdido y reactivar existen; metricasLeads excluye perdido y no hay vista de recuperación clara certificada.",
+      "closureCondition": "Sección Oportunidades por recuperar dentro de Leads: filtro por motivo/asesor/país/fecha, historial y documentos, reactivación mismo negocioId y nuevas acciones sin duplicados.",
+      "status": "OPEN_PAULA_20261011_CAUSAL_FIX_REQUIRED",
+      "mayDisappearWithoutDisposition": false
+    }
+  ],
+  "boundaries": {
+    "productionDeploy": false,
+    "realBusinessWrites": false,
+    "reimport": false,
+    "newRepoBranchFirebase": false,
+    "rollbackPreserved": true
+  },
+  "nextAction": "B4-003 causal corrections then exact cumulative preview and human UAT."
+}
