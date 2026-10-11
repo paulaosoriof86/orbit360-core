@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B4_EXECUTION_LOCK_V1",
   "recordedAt": "2026-10-08T21:43:35.454Z",
-  "status": "B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL",
+  "status": "B4_003_R23_SOURCE_STAGED_PENDING_PREVIEW",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "block": "B4",
@@ -38,10 +38,10 @@
   "activeFinding": {
     "id": "B4-003",
     "title": "Cumulative B4-003 remediation: Renovaciones, Cancelaciones and source-backed insurer knowledge.",
-    "status": "B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL",
+    "status": "B4_003_R23_SOURCE_STAGED_PENDING_PREVIEW",
     "blocking": true,
-    "nextAction": "B4_003_R20_TARGETED_PAULA_VISUAL",
-    "humanVisualStatus": "PENDING_R20_TARGETED_VISUAL",
+    "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_R23_CONTRACT_AND_EXACT_PREVIEW",
+    "humanVisualStatus": "PAULA_20261011_INICIO_CONTRAST_REJECTED_PREVIEW_RETEST",
     "knowledgePreview": true
   },
   "rules": {
@@ -91,8 +91,8 @@
     ],
     "reimportAuthorized": false,
     "livePromotionAuthorized": false,
-    "syntheticQaWritesAuthorized": false,
-    "syntheticQaScope": "B4-003 R23 exact isolated Preview only; authorized synthetic fixture creation and cleanup; no real data, no LIVE, no reimport",
+    "syntheticQaWritesAuthorized": true,
+    "syntheticQaScope": "B4-003 R23 exact Preview synthetic fixtures with mandatory cleanup only; no real writes, no LIVE",
     "paulaVisualAcceptanceRequiredBeforeAdvance": true,
     "cotcompRealTransportAuthorized": false,
     "providerDeploymentAuthorized": true,
@@ -119,15 +119,15 @@
     "renewalCutoffDataMutationAuthorized": false,
     "realOperationalWritesAuthorized": false
   },
-  "nextAction": "B4_003_R20_TARGETED_PAULA_VISUAL",
+  "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_R23_CONTRACT_AND_EXACT_PREVIEW",
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "blobSha": "6c1f48919a312343f4442c506ad11ba59d1089af",
+    "blobSha": "c6c49b010ad764f81eaffbbbc0afa68738667853",
     "status": "FROZEN_ACTIVE_UAT3_P0_BATCH_1_SOURCE_COMPLETE"
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "blobSha": "c42ae7dca4f7d8b52d09c330d6390c02cb770cd3",
+    "blobSha": "0bfa23823338cc55235646e8a23bd1207ebee7a7",
     "count": 282
   },
   "sourceFix": {
@@ -590,9 +590,9 @@
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_RENEWAL_KPI_PARITY_CAUSAL_ADDENDUM_20261005.json",
     "blobSha": "87bab7ee2778a0525cdbe81cf4cbf82020bf6139"
   },
-  "findingLedgerBlobSha": "d41d2dc19af7f66a0b7a05d7ca8da53b1a648160",
-  "continuityRegisterBlobSha": "f3649634e1bc208582262207e4e0819437c11925",
-  "compositionLockBlobSha": "c9b8a3f6612adfc727175889f409aad6d4411e4a",
+  "findingLedgerBlobSha": "0bfa23823338cc55235646e8a23bd1207ebee7a7",
+  "continuityRegisterBlobSha": "05e007d18542e553cb89af3f6a48e499605c0084",
+  "compositionLockBlobSha": "c6c49b010ad764f81eaffbbbc0afa68738667853",
   "r18SourceFix": {
     "status": "SOURCE_FIXED_R18_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_SOURCE_FIX_20261005.json",
@@ -2226,5 +2226,20 @@
     "status": "PENDING_EXACT_PREVIEW",
     "sourceSha": "9616691badc2a5bdb16310b4c15c0a95e0e83b8e",
     "failedRunId": 38156085497
+  },
+  "paulaInicioContrast20261011": {
+    "status": "SOURCE_STAGED_EXACT_PREVIEW_REQUIRED",
+    "sourceHead": "276dba0572a3adba4144c9765f3352cba086d498",
+    "sourceBlobs": {
+      "orbit360-platform/styles/infra.css": "d6fe258364c4e11daad21848a40fbb121c36e4a8",
+      "orbit360-platform/modules/inicio.js": "3bfac3ae73b5b954303a30eb683ffe8deac1ce84",
+      "orbit360-platform/index.html": "21ef7de672da7eb7b2d8e1043368e03f6f9d9031"
+    },
+    "paulaVisualPass": false,
+    "readbackRequired": true,
+    "livePromotionAuthorized": false,
+    "compositionLockBlobSha": "c6c49b010ad764f81eaffbbbc0afa68738667853",
+    "ledgerBlobSha": "0bfa23823338cc55235646e8a23bd1207ebee7a7",
+    "carryBlobSha": "05e007d18542e553cb89af3f6a48e499605c0084"
   }
 }
