@@ -542,7 +542,7 @@ if(control.nextAction==='I6_5_FORENSIC_REMEDIATION_B4_003_R23_CONTRACT_AND_EXACT
  need(previewProof.includes('B4_003_R23_INBOX_UNAUTHORIZED_NAVIGATOR_RELOAD'),'B4_003_R23_INBOX_NAVIGATION_AUTHENTICATED_GUARD_MISSING');
  need(lock.r23CausalAuthorization?.status==='SCOPED_R23_SOURCE_MUTATION_APPROVED_WITHIN_B4_003'&&control.r23InicioProgress?.liveLineageUnresolved===true,'B4_003_R23_AUTHORITY_NOT_FROZEN');
  need(rosterBackend.includes('async function r23Dashboard(request)')&&rosterBackend.includes("request.data?.purpose==='inicio'")&&rosterBackend.includes("country,month,scope,rows"),'B4_003_R23_SECURE_BACKEND_PROJECTION_MISSING');
- need(rosterClient.includes('dashboardList,dashboardPeek,dashboardStatus')&&inicio.includes('api.dashboardList(country,month)')&&index.includes('modules/inicio.js?v=20261010-r23'),'B4_003_R23_PRODUCT_CLIENT_INICIO_NOT_BOUND');
+ need(rosterClient.includes('dashboardList,dashboardPeek,dashboardGlobalMetas,dashboardStatus')&&inicio.includes('api.dashboardList(country,month)')&&inicio.includes('api.dashboardGlobalMetas')&&rosterBackend.includes('globalMetas')&&index.includes('modules/inicio.js?v=20261011-r23-goals')&&index.includes('core/assignable-advisor-roster-client.js?v=20261011-r23-goals'),'B4_003_R23_PRODUCT_CLIENT_INICIO_NOT_BOUND');
  need(previewProof.includes('r23InicioRoleCountryScopedBackendUiParity')&&previewProof.includes('r23InicioCanonicalGoalValueParity')&&previewProof.includes('r23InicioOperativoDireccionMobileReload'),'B4_003_R23_AUTHENTICATED_QA_DISCRIMINANT_MISSING');
 }
 
