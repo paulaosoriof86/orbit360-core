@@ -96,6 +96,27 @@ Orbit.modules = Orbit.modules || {};
   function canDirectQuote() {
     try{return !!(A.can&&A.can('renovaciones','edit')&&!(A.esAsesor&&A.esAsesor()));}catch(e){return false;}
   }
+  function overdueReviewAllowed(p){
+    const d=daysUntil(p?.vigenciaFin);
+    if(!p||d==null||d>=0||renewabilityState(p)==='NO'||terminalRenewalOutcome(p))return false;
+    const x=Orbit.renewalLifecycle?.snapshot?.()?.assess(p);
+    return x?.bucketEligible===true&&x?.reviewOnly===true&&x?.terminal!==true;
+  }
+  function openOverdueReview(p,kind){
+    if(!Orbit.ciclo?.managementCreateModal)return U.toast('Editor de gestiones no disponible.');
+    const existing=existingManagement(p.id,'renewal_proposals');
+    if(existing){location.hash='#/ops';window.__orbitOpenGestion=existing.id;return;}
+    return Orbit.ciclo.managementCreateModal({
+      clienteId:p.clienteId,polizaId:p.id,tipo:'Solicitar propuestas de renovación',
+      titulo:(kind==='accept'?'Pedir renovar · revisión previa · ':'Propuestas · revisión previa · ')+p.numero,
+      lista:'Renovaciones / Modif.',prioridad:'Alta',asesorId:p.asesorId,aseguradoraId:p.aseguradoraId,vence:p.vigenciaFin,
+      origen:'Renovaciones',proximaAccion:'Verificar vigencia, sucesora y aprobación antes de emitir',
+      nota:'Póliza vencida con resultado por confirmar: gestionar sin registrar emisión ni aprobación no acreditada.',
+      checklist:[{t:'Confirmar resultado y sucesora con soporte',done:false},{t:'Solicitar propuestas reales si procede',done:false},{t:'Documentar decisión del cliente',done:false}],
+      extraFields:{sourcePolicyId:p.id,pais:p.pais,moneda:p.moneda,producto:p.producto||p.subramo,workflowType:'renewal_proposals',renewalAction:'verify_overdue'},
+      openAfterCreate:false,onCreated:g=>{window.__orbitRenewalContext=renewalContext(p,g);location.hash='#/ops';window.__orbitOpenGestion=g.id;}
+    });
+  }
   function existingManagement(policyId,workflowType) {
     return (S().all('gestiones')||[]).find(g=>g.polizaId===policyId&&(!workflowType||g.workflowType===workflowType)&&!['resuelta','completada','cerrada','cancelada','anulada'].includes(norm(g.estado)));
   }
@@ -110,7 +131,7 @@ Orbit.modules = Orbit.modules || {};
   async function solicitarPropuestas(policyId) {
     const p=S().get('polizas',policyId);
     if(!p||!A.canView('polizas',p,'renovaciones'))return U.toast('Póliza fuera de tu alcance');
-    if(!active(p))return U.toast('La póliza está en histórico; usa recuperación o nueva gestión.');
+    if(!active(p)){if(overdueReviewAllowed(p))return openOverdueReview(p,'proposals');return U.toast('Póliza histórica fuera de gestión de renovación.');}
     const existing=existingManagement(p.id,'renewal_proposals');
     if(existing){
       window.__orbitRenewalContext=renewalContext(p,existing);
@@ -161,14 +182,15 @@ Orbit.modules = Orbit.modules || {};
   function cotizarDirecto(policyId) {
     const p=S().get('polizas',policyId);if(!p||!A.canView('polizas',p,'renovaciones'))return U.toast('Póliza fuera de tu alcance');
     if(!canDirectQuote())return U.toast('Tu rol activo debe solicitar propuestas mediante Ops.');
-    if(!active(p))return U.toast('Esta edición no está habilitada para cotización directa: revisa su vigencia, resultado y sucesora.');
+    if(!active(p)&&!overdueReviewAllowed(p))return U.toast('Cotización bloqueada: confirma vigencia, resultado y sucesora.');
+    if(overdueReviewAllowed(p))U.toast('Cotización para evaluación; no representa renovación emitida.');
     window.__orbitRenewalContext=renewalContext(p,null);
     location.hash='#/cotizador?renueva='+encodeURIComponent(p.id);
   }
   function registrarAceptacion(policyId) {
     const p=S().get('polizas',policyId);
     if(!p||!A.canView('polizas',p,'renovaciones'))return U.toast('Póliza fuera de tu alcance');
-    if(!active(p))return U.toast('La póliza está en histórico; usa recuperación o nueva gestión.');
+    if(!active(p)){if(overdueReviewAllowed(p))return openOverdueReview(p,'accept');return U.toast('No hay aceptación de renovación acreditada para esta versión.');}
     const existing=existingManagement(p.id,'renewal_accepted');
     if(existing){
       U.toast('La renovación aceptada ya está en Ops.');

@@ -593,6 +593,13 @@ try{
   proof.r23Inicio=r23Cases.map(x=>({country:x.api.country,scope:x.api.scope,rows:x.api.rows.length,reloaded:true}));
   proof.assertions.r23InicioRoleCountryScopedBackendUiParity=true;
   proof.assertions.r23InicioOperativoDireccionMobileReload=true;
+  proof.r23InicioCountrySplit=await page.evaluate(()=>{
+    Orbit.pais='TODOS';Orbit.modules.inicio.render(document.getElementById('host'));
+    return [...document.querySelectorAll('[data-inicio-monthly]')].map(e=>({type:e.getAttribute('data-inicio-monthly'),state:e.getAttribute('data-meta-state'),countries:[...e.querySelectorAll('[data-inicio-country]')].map(x=>x.getAttribute('data-inicio-country'))}));
+  });
+  need(proof.r23InicioCountrySplit.length===2&&proof.r23InicioCountrySplit.every(x=>x.state==='country-split'&&x.countries.join(',')==='GT,CO'),
+    'B4_003_R23_COUNTRY_SOURCE_SPLIT_MISSING:'+JSON.stringify(proof.r23InicioCountrySplit));
+  proof.assertions.r23InicioGtCoNoFxMixing=true;
 
  const quoteAuthorityHosted=await page.evaluate(async()=>{
    const [contractRes,gateRes]=await Promise.all([
@@ -1427,6 +1434,16 @@ try{
  });
  need(!proof.r20InsurerOptionalReadiness.loading&&proof.r20InsurerOptionalReadiness.buckets===4,'B4_003_R20_OPTIONAL_INSURER_READINESS_MUST_NOT_BLOCK');
  proof.assertions.renewalInsurerDirectoryOptionalNonblocking=true;
+ // Review-only overdue rows must retain follow-up actions; absent fixtures cannot prove this.
+ proof.r23OverdueActionUi=await page.evaluate(()=>{
+   const cards=[...document.querySelectorAll('[data-renewal-bucket="vencidas"] [data-renewal-policy]')];
+   return cards.filter(c=>/Seguimiento permitido/.test(c.textContent||'')).map(c=>({id:c.getAttribute('data-renewal-policy'),
+     whatsapp:!!c.querySelector('.reno-wa'),proposals:!!c.querySelector('button[onclick*="solicitarPropuestas"]'),
+     renew:[...c.querySelectorAll('button')].some(b=>/Pedir renovar/.test(b.textContent||'')),
+     quote:[...c.querySelectorAll('button')].some(b=>/Cotizar/.test(b.textContent||''))}));
+ });
+ need(proof.r23OverdueActionUi.every(x=>x.whatsapp&&x.proposals&&x.renew&&x.quote),'B4_003_R23_OVERDUE_ACTION_PARITY_FAILED:'+JSON.stringify(proof.r23OverdueActionUi));
+ proof.assertions.r23OverdueActionParity=proof.r23OverdueActionUi.length>0;
  proof.assertions.renewalFirstPaintReadiness=true;
  proof.assertions.expiredRenewalOutcomeContinuity=true;
  proof.assertions.unknownRenewabilityDebtVisibleFailClosed=true;
@@ -1703,7 +1720,7 @@ try{
      await Orbit.ciclo.openNegocio(probeId);
      m=document.getElementById('ciclo-modal');
      const file=m?.querySelector('#ng-com-file'),hint=m?.querySelector('#ng-com-file-name');
-     result={...result,modalPresent:!!m,disabled:file?.disabled===true,hint:String(hint?.textContent||''),guardPresent:!!m?.querySelector('.collab-file-btn[aria-disabled="true"]')};
+     result={...result,modalPresent:!!m,disabled:file?.disabled===true,hint:String(hint?.textContent||''),guardPresent:!!m?.querySelector('.collab-file-btn[aria-disabled="true"]'),qaTestButtonPresent:!!m?.querySelector('#ng-preview-attachment-test')};
    }finally{
      if(!visibleReal)store.get=originalGet;
      document.getElementById('ciclo-modal')?.remove();
@@ -1711,7 +1728,7 @@ try{
    const after=Orbit.productOperationalWriteP0?.status?.()||{};
    return{...result,readModelRestored:store.get===originalGet,writeCountUnchanged:Number(before.committed||0)===Number(after.committed||0),noOperationalWrites:true};
  },{id:ids.collabBusiness,fixture:r21SyntheticBusiness});
- need(realPreviewAttachment.modalPresent&&realPreviewAttachment.disabled&&realPreviewAttachment.guardPresent&&
+ need(realPreviewAttachment.modalPresent&&realPreviewAttachment.disabled&&realPreviewAttachment.guardPresent&&realPreviewAttachment.qaTestButtonPresent&&
       realPreviewAttachment.readModelRestored&&realPreviewAttachment.writeCountUnchanged&&
       /Preview protege los archivos/.test(realPreviewAttachment.hint),
       'B4_003_R21_REAL_PREVIEW_ATTACHMENT_DENIAL_NOT_VISIBLE_BEFORE_PICKER:'+JSON.stringify(realPreviewAttachment));

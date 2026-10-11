@@ -1,0 +1,43 @@
+{
+  "schema": "GRAVICENTRA_B4_003_P0_ROOTFIX_V1",
+  "headPrior": "6a8a880475392a6e81c7f106ed9565c8645dc30e",
+  "gate": "B4_003_R23_SOURCE_STAGED_PENDING_PREVIEW",
+  "scope": {
+    "status": "PAULA_P0_SCOPED_MUTATION_STAGED_PREVIEW_REQUIRED",
+    "scope": "I6.5 B4-003",
+    "approvedBy": "Paula 2026-10-10 reported P0 regressions",
+    "allowedProductFiles": [
+      "orbit360-platform/modules/renovaciones.js",
+      "orbit360-platform/modules/renewals-v1200-operational-bridge.js",
+      "orbit360-platform/modules/inicio.js",
+      "orbit360-platform/core/ciclo.js"
+    ],
+    "qaOwner": "tools/gravicentra-i6-5-b4-003-preview-proof.mjs",
+    "realBusinessWritesForbidden": true,
+    "productionForbidden": true,
+    "releaseNeedsHumanReview": true,
+    "insurersP1NonBlocking": true
+  },
+  "sourceBlobs": {
+    "orbit360-platform/modules/renovaciones.js": "e985fd4bf5b7c3b15060fa017549eba1b655d7bc",
+    "orbit360-platform/modules/renewals-v1200-operational-bridge.js": "43b3a6b07eba40baa50b61b238174540cd9bf430",
+    "orbit360-platform/modules/inicio.js": "8b2236d1ff1463b0619aaead6467b72c3a4da560",
+    "orbit360-platform/core/ciclo.js": "dbd828018c9323d712aa85d86f4397bda15e870f"
+  },
+  "qaBlob": "6a3e3795e5db58eae38a66bf1196ecb77a2a6c31",
+  "governance": {
+    "comp": "e9f459b9a5b58b691f4e113507763c67c02b2276",
+    "ledger": "de815d6a1e0ac26c0eeae5c66710563c18241fe0",
+    "carry": "fc19ae29eb9e107c6755cad45a8cd4260eaf669f",
+    "b4": "a7f27e8ea447e320c00934bf62f32dd22e3efac7",
+    "control": "d0bac6da7d9c253e31e33e40e533880f7374ef2e"
+  },
+  "syntax": "PASS",
+  "authenticatedPreview": "PENDING",
+  "userTestSynthetic": "PENDING",
+  "productionChanged": false,
+  "realBusinessWrites": 0,
+  "realOpsAttachmentStillProtected": true,
+  "insurerRealImporter": "NOT_PROVEN",
+  "passClaim": false
+}

@@ -394,6 +394,7 @@ Orbit.ciclo = (function () {
     let selectedInsurerIds=[...new Set([].concat(n.aseguradoraIds||[],n.aseguradoraId||[]).filter(Boolean))].filter(id=>asgs.some(a=>a.id===id));
     const enOps = !!ei.ops;
     const previewProtectedUpload=/--/.test(String(location.hostname||''))&&!(n.previewWrite===true&&/^b4003qa[_:-]/i.test(String(n.id||id)));
+    const previewHumanQa=/--/.test(String(location.hostname||''))&&n.previewWrite===true&&/^b4003qa_user_/i.test(String(n.id||id));
     // stepper
     const stepper = FLUJO.map((sid, i) => {
       const s = E[sid]; const idx = FLUJO.indexOf(n.etapa);
@@ -455,7 +456,9 @@ Orbit.ciclo = (function () {
             <div class="ciclo-sec-t ciclo-collab-title"><span>↕ Solicitudes, respuestas y comentarios</span><span class="badge neutral">${(n.comentarios||[]).length}</span></div>
             <div class="ciclo-collab-help">Usa esta sección para devolver, responder o dejar una observación. <b>Registrar guarda la colaboración inmediatamente</b>; no necesitas pulsar “Guardar cambios” después.</div>
             <div id="ng-coms" class="ciclo-collab-thread">${(n.comentarios || []).slice().reverse().map(comRow).join('') || '<div class="muted ciclo-collab-empty">Todavía no hay solicitudes ni comentarios.</div>'}</div>
-            <div class="cadd ciclo-collab-add"><select id="ng-com-type" class="o-sel">${COLLAB_TYPES.map(v=>'<option>'+U.esc(v)+'</option>').join('')}</select><input id="ng-com-new" class="o-sel" placeholder="Escribe qué necesitas o qué respondes…"><label class="btn ghost sm collab-file-btn" ${previewProtectedUpload?'aria-disabled="true" title="Preview: documentos de negocios reales protegidos" style="opacity:.55;cursor:not-allowed"':''}><span data-collab-file-action>📎 ${previewProtectedUpload?'Solo en LIVE':'Adjuntar'}</span><input id="ng-com-file" type="file" ${previewProtectedUpload?'disabled':''} hidden></label><button type="button" class="btn ghost sm" data-collab-file-remove hidden>Quitar archivo</button><button class="btn primary sm" id="ng-com-add">Registrar ahora</button></div><div class="muted" id="ng-com-file-name" role="status" aria-live="polite" style="font-size:11.5px;margin-top:6px">${previewProtectedUpload?'Esta Preview protege los archivos de negocios reales: no permite adjuntar aquí. Los adjuntos se prueban con expedientes sintéticos autorizados; en LIVE requieren prueba de lectura, persistencia y recarga.':'Puedes adjuntar un documento de respaldo.'}</div>
+            <div class="cadd ciclo-collab-add"><select id="ng-com-type" class="o-sel">${COLLAB_TYPES.map(v=>'<option>'+U.esc(v)+'</option>').join('')}</select><input id="ng-com-new" class="o-sel" placeholder="Escribe qué necesitas o qué respondes…"><label class="btn ghost sm collab-file-btn" ${previewProtectedUpload?'aria-disabled="true" title="Preview: documentos de negocios reales protegidos" style="opacity:.55;cursor:not-allowed"':''}><span data-collab-file-action>📎 ${previewProtectedUpload?'Solo en LIVE':'Adjuntar'}</span><input id="ng-com-file" type="file" ${previewProtectedUpload?'disabled':''} hidden></label><button type="button" class="btn ghost sm" data-collab-file-remove hidden>Quitar archivo</button><button class="btn primary sm" id="ng-com-add">Registrar ahora</button></div><div class="muted" id="ng-com-file-name" role="status" aria-live="polite" style="font-size:11.5px;margin-top:6px">${previewProtectedUpload?'Esta Preview protege los archivos de negocios reales: no permite adjuntar aquí. Los adjuntos se prueban con expedientes sintéticos autorizados; en LIVE requieren prueba de lectura, persistencia y recarga.':'Puedes adjuntar un documento de respaldo.'}${previewProtectedUpload?'<div class="cfg-note" data-attachment-preview-test style="margin-top:10px"><b>Prueba de adjuntos disponible.</b> Este negocio real está protegido en Preview. <button type="button" class="btn ghost sm" id="ng-preview-attachment-test">Abrir ficha de prueba aislada</button> Se utiliza un negocio sintético; no modifica esta oportunidad.</div>':''}
+            ${previewHumanQa?'<div class="cfg-note" data-attachment-synthetic style="margin-top:10px"><b>Ficha documental sintética.</b> Adjunta un archivo no confidencial, regístralo y recarga para comprobar la persistencia. <button type="button" class="btn ghost sm" id="ng-preview-attachment-cleanup">Limpiar documentos y archivar prueba</button></div>':''}
+            </div>
           </div>
         </div>
         <aside class="ciclo-aside">
@@ -553,6 +556,43 @@ Orbit.ciclo = (function () {
       catch (error) { n.checklist = prior; cadd.disabled = false; U.toast('No fue posible guardar el checklist.'); }
     });
     const comFile=back.querySelector('#ng-com-file'),comFileName=back.querySelector('#ng-com-file-name'),comFileRemove=back.querySelector('[data-collab-file-remove]'),comFileAction=back.querySelector('[data-collab-file-action]');
+    const testButton=back.querySelector('#ng-preview-attachment-test');
+    if(testButton)testButton.addEventListener('click',async()=>{
+      if(!previewProtectedUpload||!/--/.test(String(location.hostname||'')))return;
+      testButton.disabled=true;testButton.textContent='Preparando prueba…';
+      try{
+        const testId='b4003qa_user_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,8);
+        const qa={id:testId,nombre:'Prueba documental Ops/Leads (no operativa)',tipo:'Persona',etapa:'cotizando',
+          pais:n.pais||'GT',moneda:n.pais==='CO'?'COP':'GTQ',asesorId:n.asesorId,
+          ramo:n.ramo||'Prueba documental',producto:n.producto||'Adjunto de prueba',
+          origen:'QA Preview usuario',prioridad:'Baja',comentarios:[],bitacora:[],__syntheticQa:true,previewWrite:true};
+        await S().insertDurable('negocios',qa);
+        if(S().get('negocios',testId)?.previewWrite!==true)throw Error('QA_READBACK_PENDING');
+        back.remove();U.toast('Ficha de prueba aislada creada y confirmada.');openNegocio(testId);
+      }catch(error){
+        testButton.disabled=false;testButton.textContent='Abrir ficha de prueba aislada';
+        U.toast('No se confirmó la ficha sintética; la oportunidad original sigue intacta.');
+      }
+    });
+    const closeQa=back.querySelector('#ng-preview-attachment-cleanup');
+    if(closeQa)closeQa.addEventListener('click',async()=>{
+      if(!previewHumanQa||!window.confirm('¿Limpiar los archivos de prueba y archivar este negocio sintético?'))return;
+      closeQa.disabled=true;closeQa.textContent='Comprobando limpieza…';
+      try{
+        const provider=Orbit.productRuntimeBrowserProvidersP0,
+          cfg=window.__ORBIT360_PRODUCT_PUBLIC_CONFIG__||{},
+          tenantId=String(cfg.tenantHint||window.OrbitBackend?.tenantId||''),
+          activeRole=Orbit.session?.rol?.()||'';
+        if(!provider?.callFunction||!tenantId||!activeRole)throw Error('SCOPE_REQUIRED');
+        const refs=[...new Set([].concat(n.comentarios||[]).map(x=>String(x?.attachment?.documentRef||'')).filter(Boolean))];
+        for(const documentRef of refs){
+          const out=await provider.callFunction('orbit360DocumentDriveCleanupPreview',{tenantId,activeRole,entidad:'negocio',entidadId:id,sourceModule:'ops-leads',documentRef},'us-east1');
+          if(out?.ok!==true||out.deleted!==true)throw Error('QA_DOC_CLEANUP_MISSING');
+        }
+        await S().removeDurable('negocios',id);
+        back.remove();U.toast('Archivos limpiados. El negocio de prueba quedó archivado y auditado.');
+      }catch(error){closeQa.disabled=false;closeQa.textContent='Limpiar documentos y archivar prueba';U.toast('Limpieza no confirmada; conserva la ficha para revisión.');}
+    });
     const paintCollabFile=()=>{const file=comFile&&comFile.files&&comFile.files[0];if(comFileName)comFileName.textContent=file?('Adjunto seleccionado: '+file.name+'. Puedes reemplazarlo o quitarlo antes de registrar.'):'Puedes adjuntar un documento de respaldo.';if(comFileAction)comFileAction.textContent=file?'↻ Reemplazar':'📎 Adjuntar';if(comFileRemove)comFileRemove.hidden=!file;};
     if(comFile)comFile.addEventListener('change',paintCollabFile);
     if(comFileRemove)comFileRemove.addEventListener('click',()=>{if(comFile)comFile.value='';paintCollabFile();});

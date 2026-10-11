@@ -172,7 +172,7 @@
     "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js": "60ce88178f48ff5d9b5fd01c1e2d92abe642dac1",
     "orbit360-platform/core/backend-product-readonly-bootstrap-p0.js": "1f1da3d54b32d94fe7d7111f318437a48bbf95cd",
     "orbit360-platform/core/backend-resource-contracts.js": "826364d2a394d0bfe75d9f0ccdc5dd8905d2b3f0",
-    "orbit360-platform/core/ciclo.js": "3ab7c7f187933e295fbd19648d5c2d22f7d8a9ee",
+    "orbit360-platform/core/ciclo.js": "dbd828018c9323d712aa85d86f4397bda15e870f",
     "orbit360-platform/core/client-insurer-visual-contract-v20260720.js": "5025ee88abaed8be499d2bacf57796cc77a5736f",
     "orbit360-platform/core/cobros-reconciliation-domain-client.js": "7f00ced68ad64dd1ff4b9c0eff85f1f959dc6d68",
     "orbit360-platform/core/comisiones-eng.js": "f1aa5dfc3b8191944023b581abdcff27adf0dba3",
@@ -226,7 +226,7 @@
     "orbit360-platform/modules/equipo-credential-admin-v20260805-bridge.js": "7432bc05938469187fdd120a5bc023c53a000ab9",
     "orbit360-platform/modules/equipo-onboarding-v20260804-bridge.js": "1da619d8abd676d31d69a038d4770463ca67fdc5",
     "orbit360-platform/modules/equipo.js": "b0736237ee18ef45abbae1c13f5c94781178344e",
-    "orbit360-platform/modules/inicio.js": "ac06a355e397b0f4e7f67d5ae80a2a46d94de9c3",
+    "orbit360-platform/modules/inicio.js": "8b2236d1ff1463b0619aaead6467b72c3a4da560",
     "orbit360-platform/modules/issuance-endosos-v1201-bridge.js": "43e14e5dc03a296b9fd461bec2ecc3052d6cbce0",
     "orbit360-platform/modules/leads.js": "4e12e604382f2731a03d29cf00db3c086d77ebc1",
     "orbit360-platform/modules/ops.js": "a4ca3dbb4613d541af411f12fce9773a072b0d41",
@@ -235,10 +235,10 @@
     "orbit360-platform/modules/polizas.js": "e52869f5c7b3c219a6d80f39a100827e3ad4b599",
     "orbit360-platform/modules/portal-v1142-copyfix.js": "702cae307395361b3a7f61b7a268d15d85b44955",
     "orbit360-platform/modules/portal.js": "957cefe0647bff2b350e5b3f0f78ef7a9e97703f",
-    "orbit360-platform/modules/renewals-v1200-operational-bridge.js": "c3bdbbf5ddb5d11f5690649054ea069f67c3afa7",
+    "orbit360-platform/modules/renewals-v1200-operational-bridge.js": "43b3a6b07eba40baa50b61b238174540cd9bf430",
     "orbit360-platform/modules/renewals-v1200-permission-guard.js": "f3f75e25d32c7e4784a19b089353d9706c98dcda",
     "orbit360-platform/modules/renewals-v1201-issued-filter.js": "ae1df0174121c965f610407ae723094e833ebeaf",
-    "orbit360-platform/modules/renovaciones.js": "a3a582b3d72e036abd5fcf00e3e72b687c454fa3",
+    "orbit360-platform/modules/renovaciones.js": "e985fd4bf5b7c3b15060fa017549eba1b655d7bc",
     "orbit360-platform/modules/siniestros.js": "fbea51cf7084b66d9866a3c947c1e7ec3bb4a034",
     "orbit360-platform/product-runtime-config.js": "cce5e1b74b246640297a734871a71364e4209061",
     "orbit360-platform/styles/base.css": "608ef0709144ffcbe748a7bd04e1bd16744def65",
@@ -4561,11 +4561,11 @@
     "sourceOwnerBlobs": {
       "functions/assignable-advisor-roster.js": "1761a37806d8aa702f76f680dffcc473fb88d36c",
       "orbit360-platform/core/assignable-advisor-roster-client.js": "b70c0f0355a6284fcb8b586cfc9c02aad0b2b97f",
-      "orbit360-platform/modules/inicio.js": "ac06a355e397b0f4e7f67d5ae80a2a46d94de9c3",
+      "orbit360-platform/modules/inicio.js": "8b2236d1ff1463b0619aaead6467b72c3a4da560",
       "orbit360-platform/index.html": "0915d7c9b168f51adfa91c895f1842ea3087306c"
     },
     "qaOwner": "tools/gravicentra-i6-5-b4-003-preview-proof.mjs",
-    "qaBlob": "5b1c44c59e33519bfa344036f71d04f0ad5e3b27",
+    "qaBlob": "6a3e3795e5db58eae38a66bf1196ecb77a2a6c31",
     "priorHead": "25c4d44f7da43e85a5d76ccba05398955e63a574",
     "priorR22MachineAcceptedAsHistorical": true,
     "sourceChanged": true,
@@ -4602,9 +4602,9 @@
     "status": "R23_UNIFIED_AUTHORIZED_SOURCE_FIXED_EXACT_PREVIEW_REQUIRED",
     "finding": "B4-003-R19-07-INICIO-MONTHLY-ADVISOR-READINESS-REGRESSION",
     "sourceOwner": "orbit360-platform/modules/inicio.js",
-    "sourceBlobSha": "ac06a355e397b0f4e7f67d5ae80a2a46d94de9c3",
+    "sourceBlobSha": "8b2236d1ff1463b0619aaead6467b72c3a4da560",
     "qaOwner": "tools/gravicentra-i6-5-b4-003-preview-proof.mjs",
-    "qaBlobSha": "5b1c44c59e33519bfa344036f71d04f0ad5e3b27",
+    "qaBlobSha": "6a3e3795e5db58eae38a66bf1196ecb77a2a6c31",
     "rootCause": "Inicio was using canonical role-scoped backend projection only in Operativo, but non-Operativo roles used unrelated store/leaderboard data; UI parity against the same backend could not hold.",
     "remediation": "Use R23 backend scoped advisor and goals projection for all authorized active roles; remove direct asesores/metas readiness for this board; retain GTQ/COP separation; select active role explicitly in authenticated QA and record IDs first paint/reload.",
     "proof": "PENDING_NEW_IMMUTABLE_PREVIEW_AND_AUTHENTICATED_E2E",
@@ -4699,5 +4699,42 @@
     "sourceChanged": true,
     "productionTouched": false,
     "realWrites": 0
+  },
+  "r23Paula20261010P0CausalRootfix": {
+    "status": "SOURCE_FIXED_P0_PENDING_EXACT_PREVIEW_AND_PAULA_VISUAL",
+    "date": "2026-10-10",
+    "gate": "I6.5/B4-003",
+    "blockingPriorities": [
+      "Inicio GT/CO actual performance and target source",
+      "Overdue renewal 4 operational controls",
+      "Ops/Leads accessible isolated attachment persistence test"
+    ],
+    "rootCauses": [
+      "R23 Inicio had valid role-scoped roster but TODOS kept circular no-goal dashboard without country breakdown; source metas may be absent and must not be invented",
+      "Renewal core suppressed proposals for reviewOnly overdue while bridge decorated only proposal buttons",
+      "Real Preview documents purposely reject shared operational writes and existing QA only exercised hidden synthetic fixtures"
+    ],
+    "productBlobs": {
+      "orbit360-platform/modules/renovaciones.js": "e985fd4bf5b7c3b15060fa017549eba1b655d7bc",
+      "orbit360-platform/modules/renewals-v1200-operational-bridge.js": "43b3a6b07eba40baa50b61b238174540cd9bf430",
+      "orbit360-platform/modules/inicio.js": "8b2236d1ff1463b0619aaead6467b72c3a4da560",
+      "orbit360-platform/core/ciclo.js": "dbd828018c9323d712aa85d86f4397bda15e870f"
+    },
+    "qaBlob": "6a3e3795e5db58eae38a66bf1196ecb77a2a6c31",
+    "sourceSyntaxPass": true,
+    "sourceOnly": true,
+    "realBusinessWrites": 0,
+    "productionChanged": false,
+    "insurersParallelNonBlocking": {
+      "productPlansDocs": "NO_INDIVIDUAL_DOCUMENT_ADD_ENTRYPOINT_CONFIRMED",
+      "drive": "NO_UI_DRIVE_LINK_FIELD_CONFIRMED",
+      "importer": "SYNTHETIC_CLASSIFICATION_PASS_REAL_SOURCE_MAPPING_NOT_PROVEN",
+      "design": "HUMAN_CONTRAST_REJECTED",
+      "quoteComparison": "DEFERRED_UNTIL_POST_GO_LIVE_ENGINE_KNOWLEDGE",
+      "next": "P1_PARALLEL_CAUSAL_WORK_NOT_BLOCKING_B4_003"
+    },
+    "QAContract": "Overdue followup must not imply issued/accepted; synthetic business insert/read/reload/document/cleanup; GT and CO dials split; no real writes",
+    "previewPass": false,
+    "visualPass": false
   }
 }

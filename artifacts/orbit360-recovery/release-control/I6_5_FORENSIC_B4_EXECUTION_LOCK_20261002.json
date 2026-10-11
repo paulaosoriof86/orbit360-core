@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B4_EXECUTION_LOCK_V1",
   "recordedAt": "2026-10-08T21:43:35.454Z",
-  "status": "B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL",
+  "status": "B4_003_R23_SOURCE_STAGED_PENDING_PREVIEW",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "block": "B4",
@@ -38,10 +38,10 @@
   "activeFinding": {
     "id": "B4-003",
     "title": "Cumulative B4-003 remediation: Renovaciones, Cancelaciones and source-backed insurer knowledge.",
-    "status": "B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL",
+    "status": "B4_003_R23_SOURCE_STAGED_PENDING_PREVIEW",
     "blocking": true,
-    "nextAction": "B4_003_R20_TARGETED_PAULA_VISUAL",
-    "humanVisualStatus": "PENDING_R20_TARGETED_VISUAL",
+    "nextAction": "R23_CONTRACT_AND_EXACT_PREVIEW",
+    "humanVisualStatus": "REJECTED_PAULA_20261010_PENDING_TARGETED_RETEST",
     "knowledgePreview": true
   },
   "rules": {
@@ -117,7 +117,7 @@
     "renewalCutoffDataMutationAuthorized": false,
     "realOperationalWritesAuthorized": false
   },
-  "nextAction": "B4_003_R20_TARGETED_PAULA_VISUAL",
+  "nextAction": "R23_CONTRACT_AND_EXACT_PREVIEW",
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
     "blobSha": "b547de16f4a68e441854a0f1c6359e1ef436a765",
@@ -588,9 +588,9 @@
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_RENEWAL_KPI_PARITY_CAUSAL_ADDENDUM_20261005.json",
     "blobSha": "87bab7ee2778a0525cdbe81cf4cbf82020bf6139"
   },
-  "findingLedgerBlobSha": "2022d17bad1ed9081b7b95f30571461ca945216b",
-  "continuityRegisterBlobSha": "dad3cec5579d9e1dea5175397456c3fc650ee87b",
-  "compositionLockBlobSha": "d67fb30e2e807fed42716d611bf7c6fb7bfb53fd",
+  "findingLedgerBlobSha": "de815d6a1e0ac26c0eeae5c66710563c18241fe0",
+  "continuityRegisterBlobSha": "fc19ae29eb9e107c6755cad45a8cd4260eaf669f",
+  "compositionLockBlobSha": "e9f459b9a5b58b691f4e113507763c67c02b2276",
   "r18SourceFix": {
     "status": "SOURCE_FIXED_R18_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_SOURCE_FIX_20261005.json",
@@ -1788,9 +1788,9 @@
     "files": {
       "backend": "1761a37806d8aa702f76f680dffcc473fb88d36c",
       "client": "b70c0f0355a6284fcb8b586cfc9c02aad0b2b97f",
-      "inicio": "c2f346b4feece309c1c19e307f5b7b841fbd5119",
+      "inicio": "8b2236d1ff1463b0619aaead6467b72c3a4da560",
       "index": "c92ac86d311f0d3349a98e21e0c6acd3d2b15fdc",
-      "qa": "5e4d0c3d269b41eeb5f4b9403b1b7784fd935b9f"
+      "qa": "6a3e3795e5db58eae38a66bf1196ecb77a2a6c31"
     },
     "compositionBlobSha": "2cd985e5ffc848f4417042b5ef34bb7f05db240f",
     "findingLedgerBlobSha": "ccc5fa4fabf03bb44d2954e1db37135ad0c8ea9f",
@@ -2023,5 +2023,21 @@
     ],
     "productChanged": false,
     "realWrites": 0
+  },
+  "paulaP0SourceRootfixAuthorization": {
+    "status": "PAULA_P0_SCOPED_MUTATION_STAGED_PREVIEW_REQUIRED",
+    "scope": "I6.5 B4-003",
+    "approvedBy": "Paula 2026-10-10 reported P0 regressions",
+    "allowedProductFiles": [
+      "orbit360-platform/modules/renovaciones.js",
+      "orbit360-platform/modules/renewals-v1200-operational-bridge.js",
+      "orbit360-platform/modules/inicio.js",
+      "orbit360-platform/core/ciclo.js"
+    ],
+    "qaOwner": "tools/gravicentra-i6-5-b4-003-preview-proof.mjs",
+    "realBusinessWritesForbidden": true,
+    "productionForbidden": true,
+    "releaseNeedsHumanReview": true,
+    "insurersP1NonBlocking": true
   }
 }

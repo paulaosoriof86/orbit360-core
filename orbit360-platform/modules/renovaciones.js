@@ -312,6 +312,7 @@ Orbit.modules.renovaciones = (function () {
           <div style="padding:10px;display:grid;gap:9px;max-height:560px;overflow-y:auto">
             ${c.items.map(({ p, d }) => {
               const cli = S().get('clientes', p.clienteId), asg = q.aseguradora(p.aseguradoraId), life=lifecycleOf(p);
+              const overdueFollowup=d<0&&life.bucketEligible&&!life.terminal&&life.reviewOnly&&renewabilityState(p)!=='NO';
               const wa = (cli && cli.telefono || '').replace(/[^0-9]/g, '');
               const waTxt = encodeURIComponent('Hola ' + (cli ? cli.nombre.split(' ')[0] : '') + ', tu póliza ' + p.ramo + ' (' + p.numero + ') vence el ' + U.fmtDate(p.vigenciaFin) + '. ¿Coordinamos la renovación?');
               return `<div class="renewal-policy-card" data-renewal-policy="${U.esc(p.id)}" data-renewal-country="${U.esc(policyCountry(p))}" style="border:1px solid var(--line);border-radius:var(--r-sm);padding:10px 11px;background:var(--card)">
@@ -329,12 +330,12 @@ Orbit.modules.renovaciones = (function () {
                   <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:7px">
                     <span class="badge neutral" data-renewal-effective-status="${U.esc(life.reason)}" title="Estado de origen: ${U.esc(policyStateLabel(p))}">${U.esc(effectiveBadge(p,life,d))}</span>
                     <span class="badge ${d<0?'danger':'info'}">Vigencia calculada: ${U.esc(renewalStateLabel(p,d))}</span>
-                    ${life.reviewOnly?'<span class="badge warn">Revisión necesaria · renovación bloqueada</span>':renewabilityState(p)==='UNKNOWN'?'<span class="badge warn">Decisión: renovabilidad pendiente</span>':'<span class="badge ok">Decisión: renovable</span>'}
+                    ${life.reviewOnly?'<span class="badge warn">'+(overdueFollowup?'Seguimiento permitido · confirmar resultado antes de emitir':'Revisión necesaria · renovación protegida')+'</span>':renewabilityState(p)==='UNKNOWN'?'<span class="badge warn">Decisión: renovabilidad pendiente</span>':'<span class="badge ok">Decisión: renovable</span>'}
                   </div>
                 </div>
                 <div class="renewal-card-actions" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px">
                   ${renewabilityState(p)==='UNKNOWN'?'<button class="btn ghost sm" data-renewability-review="'+U.esc(p.id)+'" style="flex:1" onclick="event.stopPropagation();Orbit.modules.cliente360.editarPoliza(\''+p.id+'\',\'renovabilidad\')">Revisar renovabilidad</button>':''}
-                  ${life.actionable?'<a href="https://wa.me/'+wa+'?text='+waTxt+'" target="_blank" rel="noopener" class="reno-wa" style="flex:1" onclick="event.stopPropagation()">💬 WhatsApp</a><button class="btn ghost sm" style="flex:1" onclick="event.stopPropagation();Orbit.modules.renovaciones.solicitarPropuestas(\''+U.esc(p.id)+'\')">📋 Propuestas</button>':'<button class="btn ghost sm" style="flex:1" onclick="event.stopPropagation();Orbit.modules.cliente360.verPoliza(\''+U.esc(p.id)+'\')">Revisar situación de póliza</button>'}
+                  ${(life.actionable||overdueFollowup)?'<a href="https://wa.me/'+wa+'?text='+waTxt+'" target="_blank" rel="noopener" class="reno-wa" style="flex:1" onclick="event.stopPropagation()">💬 WhatsApp</a><button class="btn ghost sm" style="flex:1" onclick="event.stopPropagation();Orbit.modules.renovaciones.solicitarPropuestas(\''+U.esc(p.id)+'\')">📋 Propuestas</button>':'<button class="btn ghost sm" style="flex:1" onclick="event.stopPropagation();Orbit.modules.cliente360.verPoliza(\''+U.esc(p.id)+'\')">Revisar situación de póliza</button>'}
                 </div>
               </div>`;
             }).join('') || `<div class="muted" style="text-align:center;padding:24px 8px;font-size:12.5px">Sin pólizas en este tramo.</div>`}
