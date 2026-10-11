@@ -144,7 +144,7 @@
   "productFileBlobs": {
     ".github/workflows/cotcomp-workflow-s419-source-qa.yml": "1123c1bd7848433ce51c24586e9fedbbbd581dff",
     "docs/ays/GRAVICENTRA_QUOTE_AUTHORITY_CONTRACT_v1_20261003.md": "ad1abea0181c350a0effd819cbff483673eb24dd",
-    "functions/assignable-advisor-roster.js": "d799f1482be85ece09a3c599cb5dfb4754a274d0",
+    "functions/assignable-advisor-roster.js": "b8b485765707eeafae9e1299614cc92f69a0aee3",
     "functions/bootstrap.js": "42fd05b81a02d428e590c36e3feb32be202f4965",
     "functions/cobros-reconciliation-domain.js": "5b27038d1c8380e4d2d0ed044996c1570d8c3767",
     "functions/cotcomp-workflow-owner-patch.test.js": "f09315b416e95415ade2d811c4d7e52baba8904d",
@@ -166,7 +166,7 @@
     "orbit360-platform/core/academia-product-catalog-p0.js": "c4974b8734dbe384d4fe4b53394d015ec24e36da",
     "orbit360-platform/core/access-role-session-owner-v20260728.js": "eee3eb184f1b4d7219d455d6a15b7d579979d7f5",
     "orbit360-platform/core/access-scope.js": "5fd5aabdbe0e7b613ae55161be01aa17b5174769",
-    "orbit360-platform/core/assignable-advisor-roster-client.js": "fa5db623d4680d13b015aabe96294a72f07ac2cd",
+    "orbit360-platform/core/assignable-advisor-roster-client.js": "c04a4b35267e77d4353fa131331d4a7549255edc",
     "orbit360-platform/core/auth-password-change-v20260805.js": "873b484d42825db2fa31e0ae90c9ec78598728f4",
     "orbit360-platform/core/auth-product-runtime-p0.js": "5299e3397fc4f37488e65e609eb446d27d724128",
     "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js": "60ce88178f48ff5d9b5fd01c1e2d92abe642dac1",
@@ -208,7 +208,7 @@
     "orbit360-platform/data/tenant-alianzas-soluciones-insurers-p10.js": "41d2e31a42dac73eb68af304d5f532897210d0ee",
     "orbit360-platform/data/tenant-config/alianzas-soluciones.aseguradoras-knowledge-summary-v20261003.js": "2000d9ea8ab67bdd37d8bf404a29a405fa6374dd",
     "orbit360-platform/data/tenant-public-branding-index.js": "dc543c463f5ecd8ea44e49156d6282113bd95db6",
-    "orbit360-platform/index.html": "11ec0649cf52ee237bc32197249bf801bfba9e6d",
+    "orbit360-platform/index.html": "b2e2f6d3782b5e4c8254e578685dc2621aa3937d",
     "orbit360-platform/modules/academia.js": "4d48ee3edbc6afc4163bf6365a80bbcb680b1852",
     "orbit360-platform/modules/aseguradoras-v1202-import-bridge.js": "db5f012abe505c2dd27d77a47d0694868bee5348",
     "orbit360-platform/modules/aseguradoras.js": "9e56c296b55da499b52f42c462c668aa2f32eba7",
@@ -226,7 +226,7 @@
     "orbit360-platform/modules/equipo-credential-admin-v20260805-bridge.js": "7432bc05938469187fdd120a5bc023c53a000ab9",
     "orbit360-platform/modules/equipo-onboarding-v20260804-bridge.js": "1da619d8abd676d31d69a038d4770463ca67fdc5",
     "orbit360-platform/modules/equipo.js": "b0736237ee18ef45abbae1c13f5c94781178344e",
-    "orbit360-platform/modules/inicio.js": "37210ab93d1aba4795109fa068af47b1f8f8ccb2",
+    "orbit360-platform/modules/inicio.js": "6540788ac73ce4d5ee1606260063d3830ef4c3ae",
     "orbit360-platform/modules/issuance-endosos-v1201-bridge.js": "43e14e5dc03a296b9fd461bec2ecc3052d6cbce0",
     "orbit360-platform/modules/leads.js": "4e12e604382f2731a03d29cf00db3c086d77ebc1",
     "orbit360-platform/modules/ops.js": "a4ca3dbb4613d541af411f12fce9773a072b0d41",
@@ -4844,12 +4844,27 @@
     "next": "CAUSAL_SOURCE_FIX_ON_FIRST_OPEN_P0"
   },
   "paulaInicioPremium20261011": {
-    "status": "SOURCE_FIXED_PREVIEW_REQUIRED",
-    "before": "ca86944456685db948c64d4b532f84057b2a8f31",
-    "after": "37210ab93d1aba4795109fa068af47b1f8f8ccb2",
-    "causalFix": "Restored centered circular KPIs with per-country source-bound metas; no false individual meta absent claims.",
-    "sourceTouched": true,
-    "noRealDataWrites": true
+    "status": "SOURCE_STAGED_PREVIEW_REQUIRED",
+    "gate": "I6.5/B4-003",
+    "sourceHead": "c98e8ee49138b63759a602f4011916cda7663184",
+    "sourceBlobs": {
+      "functions/assignable-advisor-roster.js": "b8b485765707eeafae9e1299614cc92f69a0aee3",
+      "orbit360-platform/core/assignable-advisor-roster-client.js": "c04a4b35267e77d4353fa131331d4a7549255edc",
+      "orbit360-platform/modules/inicio.js": "6540788ac73ce4d5ee1606260063d3830ef4c3ae",
+      "orbit360-platform/index.html": "b2e2f6d3782b5e4c8254e578685dc2621aa3937d"
+    },
+    "unaffectedVisualPassPreserved": [
+      "Cliente 360",
+      "Renovaciones"
+    ],
+    "noRealBusinessWrites": true,
+    "noLive": true,
+    "defects": [
+      "UI speedometer hierarchy",
+      "personal vs global goal source",
+      "individual prima type filtered",
+      "cache asset version"
+    ]
   },
   "paulaHumanActorSourceFix20261011": {
     "status": "SOURCE_STAGED_EXACT_PREVIEW_REQUIRED",
