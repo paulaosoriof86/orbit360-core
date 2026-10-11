@@ -1,0 +1,23 @@
+{
+  "schema": "GRAVICENTRA_B4_003_R23_SYNTHETIC_QA_GATE_REPAIR",
+  "repair": {
+    "status": "PREVIEW_GATE_REOPENED_FOR_SYNTHETIC_QA_ONLY",
+    "failedRunId": 38101526510,
+    "rootCause": "r23Preview expression required l.boundaries.syntheticQaWritesAuthorized=true while new P0 source staging retained false from machine-pass freeze, so workflow SUCCESS skipped exact Preview",
+    "allowed": "isolated B4-003 synthetic fixtures with server readback and manual post-test cleanup",
+    "forbidden": [
+      "real business writes",
+      "production deploy",
+      "reimport",
+      "real Drive dossier mutation"
+    ],
+    "newProductSource": false,
+    "visualAccept": false
+  },
+  "oldLock": "a7f27e8ea447e320c00934bf62f32dd22e3efac7",
+  "newLock": "cd10314b65cdf0a2c0123b867e881e6fefbf3626",
+  "newControl": "5975ba8266227ce8805d0b46dd8751fba740439b",
+  "noSourceChange": true,
+  "noDeployInPriorRun": true,
+  "previewStillPending": true
+}

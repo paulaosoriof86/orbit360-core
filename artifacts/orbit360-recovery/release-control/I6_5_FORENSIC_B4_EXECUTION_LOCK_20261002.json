@@ -89,7 +89,7 @@
     ],
     "reimportAuthorized": false,
     "livePromotionAuthorized": false,
-    "syntheticQaWritesAuthorized": false,
+    "syntheticQaWritesAuthorized": true,
     "syntheticQaScope": "R20 exact Preview only: disposable insurer/logo/product/plan/requirement/document and Ops/Leads handoff/cadence fixtures; mandatory server commit, readback, reload and cleanup; no real operational row mutation.",
     "paulaVisualAcceptanceRequiredBeforeAdvance": true,
     "cotcompRealTransportAuthorized": false,
@@ -2039,5 +2039,19 @@
     "productionForbidden": true,
     "releaseNeedsHumanReview": true,
     "insurersP1NonBlocking": true
+  },
+  "r23SyntheticQaGateRootFix": {
+    "status": "PREVIEW_GATE_REOPENED_FOR_SYNTHETIC_QA_ONLY",
+    "failedRunId": 38101526510,
+    "rootCause": "r23Preview expression required l.boundaries.syntheticQaWritesAuthorized=true while new P0 source staging retained false from machine-pass freeze, so workflow SUCCESS skipped exact Preview",
+    "allowed": "isolated B4-003 synthetic fixtures with server readback and manual post-test cleanup",
+    "forbidden": [
+      "real business writes",
+      "production deploy",
+      "reimport",
+      "real Drive dossier mutation"
+    ],
+    "newProductSource": false,
+    "visualAccept": false
   }
 }
