@@ -24,7 +24,7 @@ Orbit.modules.inicio = (function () {
     const month=q.currentMonthKey?q.currentMonthKey():U.monthKey(),api=Orbit.assignableAdvisorRoster,key=rosterKey(country)+'|'+month;
     if(!api||typeof api.dashboardList!=='function'||typeof api.dashboardPeek!=='function')return{status:'unavailable',rows:[]};
     const cacheKey=String(Orbit.auth?.productUser?.uid||'')+'|'+String(Orbit.session?.rol?.()||'').toLowerCase()+'|'+country+'|'+month;
-    if((api.dashboardStatus?.().entries||[]).some(x=>x.key===cacheKey&&x.at))return{status:'ready',rows:api.dashboardPeek(country,month)};
+    if((api.dashboardStatus?.().entries||[]).some(x=>x.key===cacheKey&&x.at))return{status:'ready',rows:api.dashboardPeek(country,month),globalMetas:api.dashboardGlobalMetas?.(country,month)||{}};
     if(rosterFailures.has(key))return{status:'unavailable',rows:[]};
     if(!Orbit.auth?.productUser?.uid)return{status:'pending',rows:[]};
     if(!rosterRequested.has(key)){rosterRequested.add(key);api.dashboardList(country,month).then(()=>{rosterRequested.delete(key);if(host?.isConnected&&Orbit.route?.key==='inicio'&&rosterKey(country)+'|'+month===key)render(host);}).catch(()=>{rosterRequested.delete(key);rosterFailures.add(key);if(host?.isConnected&&Orbit.route?.key==='inicio'&&rosterKey(country)+'|'+month===key)render(host);});}
@@ -155,16 +155,18 @@ Orbit.modules.inicio = (function () {
     const financialMoneyMap=map=>{const keys=Object.keys(map||{}).sort((a,b)=>(a==='GTQ'?0:a==='COP'?1:2)-(b==='GTQ'?0:b==='COP'?1:2)||a.localeCompare(b));if(!keys.length)return'Sin movimientos';return keys.map(cur=>{const n=Number(map[cur]||0),shown=Math.abs(n)<100000?U.money(n,cur):U.moneyShort(n,cur);return '<span style="display:block;white-space:nowrap">'+U.esc(shown)+' '+U.esc(cur)+'</span>';}).join('');};
     const metricMap=field=>{const out={};Object.keys(cart.byCurrency||{}).forEach(cur=>{out[cur]=Number(cart.byCurrency[cur]&&cart.byCurrency[cur][field]||0);});return out;};
     const configuredMeta=(tipo,requestedCountry=activeCountry)=>{
-      if(metaReadiness!=='ready'||!['GT','CO'].includes(requestedCountry))return null;
-      const c=requestedCountry;
-      const values=secureRoster.rows.filter(a=>a.paises.includes(c)).map(a=>{
-        const t=a.metas?.[c];
-        if(tipo==='recaudo')return t?.explicit===true?U.finiteNumber(t.recaudo):null;
-        return t?.explicit===true?(t.produccion>0?t.produccion:null):(a.paises.length===1?U.finiteNumber(a.metaPrima):null);
-      });
-      return values.length&&values.every(v=>v!=null&&v>0)?values.reduce((sum,v)=>sum+v,0):null;
-    };
-    const metaPrima=configuredMeta('prima'),metaRec=configuredMeta('recaudo'),prodValue=activeCurrency?Number(production[activeCurrency]||0):null,recValue=activeCurrency?Number(recaudoMes[activeCurrency]||0):null;
+ if(metaReadiness!=='ready'||!['GT','CO'].includes(requestedCountry))return null;
+ const c=requestedCountry,global=secureRoster.globalMetas?.[c];
+ if(global&&((tipo==='prima'&&global.explicitPrima===true)||(tipo==='recaudo'&&global.explicitRecaudo===true))){
+  const n=U.finiteNumber(global[tipo]);if(n!=null&&n>0)return n;
+ }
+ const values=secureRoster.rows.filter(a=>a.paises.includes(c)).map(a=>{
+  const t=a.metas?.[c];if(tipo==='recaudo')return t?.explicit===true?U.finiteNumber(t.recaudo):null;
+  return t?.explicit===true?(t.produccion>0?t.produccion:null):(a.paises.length===1?U.finiteNumber(a.metaPrima):null);
+ });
+ return values.length&&values.every(v=>v!=null&&v>0)?values.reduce((sum,v)=>sum+v,0):null;
+ };
+ const metaPrima=configuredMeta('prima'),metaRec=configuredMeta('recaudo'),prodValue=activeCurrency?Number(production[activeCurrency]||0):null,recValue=activeCurrency?Number(recaudoMes[activeCurrency]||0):null;
     const pctPrima=metaPrima&&prodValue!=null?Math.max(0,Math.min(140,Math.round(prodValue/metaPrima*100))):null,pctRec=metaRec&&recValue!=null?Math.max(0,Math.min(140,Math.round(recValue/metaRec*100))):null;
     const targetDial=(kind,label,map,pct,meta)=>{const state=activeCountry==='TODOS'?'country-required':!activeCurrency?'currency-required':metaReadiness==='unavailable'?'unavailable':metaReadiness!=='ready'?'loading':meta?'configured':'missing',pctText=pct==null?'—':pct+'%',deg=pct==null?0:Math.max(0,Math.min(100,pct))*3.6,note=(state==='country-required'||state==='currency-required')?'Selecciona GT o CO para comparar con meta':state==='unavailable'?'Meta no disponible para este alcance':state==='loading'?'Actualizando meta':state==='missing'?'Meta no configurada':'Meta '+U.moneyShort(meta,activeCurrency);return '<div data-inicio-monthly="'+kind+'" data-values="'+escAttr(map)+'" data-meta-state="'+state+'" data-meta-value="'+(meta==null?'':meta)+'" data-pct="'+(pct==null?'':pct)+'" style="display:flex;flex-direction:column;align-items:center;gap:8px"><div style="width:118px;height:118px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(var(--red) '+deg+'deg,var(--line) '+deg+'deg)"><div style="width:90px;height:90px;border-radius:50%;background:var(--card);display:grid;place-items:center;text-align:center;box-shadow:inset 0 0 0 1px var(--line)"><div><div style="font-family:var(--f-display);font-weight:800;font-size:24px;color:var(--ink)">'+pctText+'</div><div style="font-size:10px;color:var(--ink-3);font-family:var(--f-mono)">'+moneyMap(map)+'</div></div></div></div><div style="font-size:12px;color:var(--ink-2);font-weight:600">'+label+'</div><div class="muted" style="font-size:10.5px;text-align:center;max-width:150px">'+note+'</div></div>';};
     const splitCountrySummary=(kind,label,map)=>{

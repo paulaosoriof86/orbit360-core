@@ -1,0 +1,24 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R23_INICIO_GLOBAL_GOALS_RESTORATION",
+  "date": "2026-10-11",
+  "headBefore": "2c1a838cb22bdbaf2a2484fc196de505b19f5027",
+  "status": "SOURCE_FIXED_EXACT_PREVIEW_PENDING",
+  "causal": "B3 tenant-level meta sources lost in R23 advisor-only projection",
+  "source": {
+    "functions/assignable-advisor-roster.js": "d799f1482be85ece09a3c599cb5dfb4754a274d0",
+    "orbit360-platform/core/assignable-advisor-roster-client.js": "fa5db623d4680d13b015aabe96294a72f07ac2cd",
+    "orbit360-platform/modules/inicio.js": "ca86944456685db948c64d4b532f84057b2a8f31",
+    "orbit360-platform/index.html": "9f39fe08dffde0b6645fee6ee78729b2d690c98d",
+    "tools/gravicentra-i6-5-b4-003-preview-proof.mjs": "cad1f74e9620c3241ed1312d46c9293183c6adb9"
+  },
+  "authority": {
+    "I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json": "461a5309083cf349e92dc36839d86acca788f414",
+    "I6_FINDINGS_LEDGER_20260924.json": "b476932f065fe0ac461b38e383613fb46444ff5f",
+    "I6_5_OPEN_FINDINGS_CARRY_FORWARD_REGISTER_20261003.json": "b6176f1cb42a23c8b1e50cf1302d719021cdef84",
+    "I6_5_FORENSIC_B4_EXECUTION_LOCK_20261002.json": "0c5bcbc89f7d034fd5365379242afce728422d75",
+    "CONTROL_PLANE.json": "6dc7978d7e6a5125513d675c697ac601ca884045"
+  },
+  "noLive": true,
+  "realWrites": 0,
+  "passClaim": false
+}

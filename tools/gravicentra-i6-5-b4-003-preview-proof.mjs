@@ -589,7 +589,21 @@ try{
    const goal=r23Goals.get(clean(row.id)+'|'+item.api.country);
    if(goal){need(row.metas[item.api.country]?.explicit===true,'B4_003_R23_SOURCE_GOAL_MISSING:'+row.id);for(const f of ['nueva','renovada','recaudo'])need(Math.abs(Number(row.metas[item.api.country][f])-goal[f])<0.001,'B4_003_R23_CANONICAL_GOAL_MISMATCH:'+f+':'+row.id);}
   }
-  proof.assertions.r23InicioCanonicalGoalValueParity=true;
+  const sourceGlobal={};
+ for(const d of r23Metas.docs){
+  const m=d.data()||{},id=clean(m.asesorId||m.advisorId),c=clean(m.pais).toUpperCase()||(clean(m.moneda).toUpperCase()==='GTQ'?'GT':clean(m.moneda).toUpperCase()==='COP'?'CO':''),type=clean(m.tipo).toLowerCase(),v=Number(m.valor);
+  if(id||!['GT','CO'].includes(c)||!['prima','nueva','renovada','recaudo'].includes(type)||String(m.mes||m.periodo||'').slice(0,7)!==r23Month||m.valor==null||m.valor===''||!Number.isFinite(v)||v<0)continue;
+  const g=sourceGlobal[c]||{prima:0,nueva:0,renovada:0,recaudo:0};g[type]+=v;sourceGlobal[c]=g;
+ }
+ for(const item of r23Cases){
+  if(item.api.scope!=='all'){need(!item.api.globalMetas||Object.keys(item.api.globalMetas).length===0,'B4_003_R23_GLOBAL_META_SCOPE_LEAK');continue;}
+  const source=sourceGlobal[item.api.country],returned=item.api.globalMetas?.[item.api.country];
+  if(!source){need(!returned,'B4_003_R23_GLOBAL_META_INVENTED');continue;}
+  need(!!returned&&Math.abs(Number(returned.prima)-(source.prima>0?source.prima:source.nueva+source.renovada))<0.001&&Math.abs(Number(returned.recaudo)-source.recaudo)<0.001,'B4_003_R23_GLOBAL_SOURCE_META_MISMATCH');
+  need(Object.keys(item.api.globalMetas||{}).every(c=>c===item.api.country),'B4_003_R23_GLOBAL_META_COUNTRY_LEAK');
+ }
+ proof.assertions.r23InicioAuthorizedGlobalSourceMetaParity=true;
+ proof.assertions.r23InicioCanonicalGoalValueParity=true;
   proof.r23Inicio=r23Cases.map(x=>({country:x.api.country,scope:x.api.scope,rows:x.api.rows.length,reloaded:true}));
   proof.assertions.r23InicioRoleCountryScopedBackendUiParity=true;
   proof.assertions.r23InicioOperativoDireccionMobileReload=true;

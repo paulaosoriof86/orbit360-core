@@ -53,13 +53,25 @@ async function r23Dashboard(request){
  unique(rm?mapping[rm]:[]).forEach(x=>teamIds.add(x));
  const own=text(member.advisorId||member.asesorId,160),team=text(member.teamId||member.equipoId,160);if(own)teamIds.add(own);
  const [as,gs]=await Promise.all([tenant.collection('data').doc('asesores').collection('items').get(),tenant.collection('data').doc('metas').collection('items').get()]);
- const goals=new Map();gs.docs.forEach(d=>{const g=d.data()||{},id=text(g.asesorId||g.advisorId,160),type=norm(g.tipo),c=text(g.pais,8).toUpperCase()||(text(g.moneda,8).toUpperCase()==='GTQ'?'GT':text(g.moneda,8).toUpperCase()==='COP'?'CO':''),n=Number(g.valor);if(!id||String(g.mes||g.periodo||'').slice(0,7)!==month||!['GT','CO'].includes(c)||!['nueva','renovada','recaudo'].includes(type)||g.valor==null||g.valor===''||!Number.isFinite(n)||n<0)return;const key=id+'|'+c,v=goals.get(key)||{nueva:0,renovada:0,recaudo:0,produccion:0,explicit:false};v[type]+=n;v.produccion=v.nueva+v.renovada;v.explicit=true;goals.set(key,v);});
+ const goals=new Map(),globalGoals=new Map();
+ gs.docs.forEach(d=>{
+ const g=d.data()||{},id=text(g.asesorId||g.advisorId,160),type=norm(g.tipo),c=text(g.pais,8).toUpperCase()||(text(g.moneda,8).toUpperCase()==='GTQ'?'GT':text(g.moneda,8).toUpperCase()==='COP'?'CO':''),n=Number(g.valor);
+ if(String(g.mes||g.periodo||'').slice(0,7)!==month||!['GT','CO'].includes(c)||!['nueva','renovada','recaudo','prima'].includes(type)||g.valor==null||g.valor===''||!Number.isFinite(n)||n<0)return;
+ if(!id){
+  if(scope!=='all'||(cc.length&&!cc.includes(c))||(country!=='TODOS'&&country!==c))return;
+  const v=globalGoals.get(c)||{nueva:0,renovada:0,recaudo:0,prima:0,explicitPrima:false,explicitRecaudo:false};
+  v[type]+=n;if(['prima','nueva','renovada'].includes(type))v.explicitPrima=true;if(type==='recaudo')v.explicitRecaudo=true;globalGoals.set(c,v);return;
+ }
+ if(!['nueva','renovada','recaudo'].includes(type))return;
+ const key=id+'|'+c,v=goals.get(key)||{nueva:0,renovada:0,recaudo:0,produccion:0,explicit:false};v[type]+=n;v.produccion=v.nueva+v.renovada;v.explicit=true;goals.set(key,v);
+ });
  const rows=[],seen=new Set();for(const d of as.docs){const raw=d.data()||{},a=project(d);if(!a.id||!a.nombre||seen.has(a.id))continue;if(scope==='own'&&a.id!==own)continue;if(scope==='team'&&!teamIds.has(a.id)&&(!team||text(raw.teamId||raw.equipoId,160)!==team))continue;
  const paises=a.paises.filter(c=>(c==='GT'||c==='CO')&&(!cc.length||cc.includes(c))&&(country==='TODOS'||country===c));if(!paises.length)continue;seen.add(a.id);
  const metas={};paises.forEach(c=>metas[c]=goals.get(a.id+'|'+c)||{nueva:0,renovada:0,recaudo:0,produccion:0,explicit:false});
  const legacy=Number(raw.metaPrima);rows.push({id:a.id,nombre:a.nombre,activo:a.activo,paises,metas,metaPrima:Number.isFinite(legacy)&&legacy>0&&paises.length===1?legacy:null});
  }rows.sort((a,b)=>a.nombre.localeCompare(b.nombre,'es',{sensitivity:'base'})||a.id.localeCompare(b.id));
- return{ok:true,schemaVersion:'gravicentra-inicio-r23',country,month,scope,rows};
+ const globalMetas={};for(const [c,g] of globalGoals)globalMetas[c]={prima:g.prima>0?g.prima:g.nueva+g.renovada,recaudo:g.recaudo,explicitPrima:g.explicitPrima,explicitRecaudo:g.explicitRecaudo};
+ return{ok:true,schemaVersion:'gravicentra-inicio-r23',country,month,scope,rows,globalMetas};
 }
 
 exports.orbit360AssignableAdvisorRoster=onCall({region:REGION,cors:true},execute);
