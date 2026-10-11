@@ -589,7 +589,7 @@
     "blobSha": "87bab7ee2778a0525cdbe81cf4cbf82020bf6139"
   },
   "findingLedgerBlobSha": "de815d6a1e0ac26c0eeae5c66710563c18241fe0",
-  "continuityRegisterBlobSha": "fc19ae29eb9e107c6755cad45a8cd4260eaf669f",
+  "continuityRegisterBlobSha": "89beac2628cb8010758f869095d64904b37f757e",
   "compositionLockBlobSha": "e9f459b9a5b58b691f4e113507763c67c02b2276",
   "r18SourceFix": {
     "status": "SOURCE_FIXED_R18_PENDING_CONTRACT_AND_EXACT_PREVIEW",
@@ -2053,5 +2053,13 @@
     ],
     "newProductSource": false,
     "visualAccept": false
+  },
+  "p0ContinuityStatusReconciliation": {
+    "status": "ALIGNED_WITH_LEDGER",
+    "oldCarrySha": "fc19ae29eb9e107c6755cad45a8cd4260eaf669f",
+    "newCarrySha": "89beac2628cb8010758f869095d64904b37f757e",
+    "ledgerSha": "de815d6a1e0ac26c0eeae5c66710563c18241fe0",
+    "sourceChanged": false,
+    "failedRun": 38101635296
   }
 }

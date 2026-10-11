@@ -8085,18 +8085,18 @@
         "orbit360-platform/modules/renovaciones.js",
         "orbit360-platform/modules/renewals-v1200-operational-bridge.js"
       ],
-      "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
+      "status": "PAULA_VISUAL_REJECTED_20261010_ROOT_CAUSE_FIXED_PENDING_NEW_PREVIEW",
       "blocking": true,
       "targetGate": "B4-003",
       "closureCondition": "Explicit YES expired unresolved policies remain in Vencidas; UNKNOWN stays fail-closed and visible as validation debt only.",
       "preLiveRequired": true,
-      "nextAction": "B4_003_TARGETED_PAULA_VISUAL",
+      "nextAction": "R23_EXACT_PREVIEW_AND_PAULA_UAT",
       "classification": "PRODUCT_RENEWAL_OUTCOME_CONTINUITY_DEFECT_DEMONSTRATED",
       "diagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R14_PAULA_VISUAL_REJECTION_AND_CAUSAL_DIAGNOSTIC_20261004.json",
       "diagnosticReceiptBlobSha": "966740ec45a6dda25da0da5f256531ed34ab846b",
       "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R14_NARROW_SOURCE_FIX_20261004.json",
       "sourceFixReceiptBlobSha": "df10f1bc9c5498fd74ab1a5732726813e6cbaea9",
-      "humanVisualStatus": "PENDING_AFTER_MACHINE_PASS",
+      "humanVisualStatus": "REJECTED_PAULA_20261010_PENDING_TARGETED_PREVIEW_RETEST",
       "machinePassRunId": 37187722951,
       "machinePassSourceSha": "7aa67243cd0bb26c79cb2e0540f8fbd176321379",
       "r16SourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R16_COMPREHENSIVE_SOURCE_FIX_20261004.json",
@@ -9824,7 +9824,7 @@
       "id": "B4-003-R19-07-INICIO-MONTHLY-ADVISOR-READINESS-REGRESSION",
       "block": "B4",
       "targetGate": "B4-003",
-      "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
+      "status": "PAULA_VISUAL_REJECTED_20261010_ROOT_CAUSE_FIXED_PENDING_NEW_PREVIEW",
       "blocking": true,
       "surface": "Inicio",
       "finding": "Monthly target dials and advisor progress remain in 'Actualizando...' / empty state in R18 visual review.",
@@ -9835,7 +9835,7 @@
       ],
       "remediation": "Render bounded readiness states (loading/unavailable/meta-not-configured/ready), rerender on relevant collection readiness, and never leave a terminal unavailable state as 'Actualizando'.",
       "closureCondition": "Login→Inicio reaches a deterministic terminal state without refresh; metas/advisor board either renders data or a truthful terminal explanation within the startup threshold.",
-      "nextAction": "B4_003_R20_TARGETED_PAULA_VISUAL",
+      "nextAction": "R23_EXACT_PREVIEW_AND_PAULA_UAT",
       "causalAuthority": {
         "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R19_CAUSAL_DIAGNOSTIC_AND_SOURCE_FIX_AUTHORIZATION_20261005.json",
         "blobSha": "4e03b16f56b174f66f5093d1c6e253675770fca1"
@@ -9849,7 +9849,8 @@
       "r20Freeze": {
         "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_PAULA_VISUAL_REVIEW_NOLOSS_FREEZE_20261006.json",
         "blobSha": "1878ce320f14a02b9ff09e9bc377e149b334f856"
-      }
+      },
+      "humanVisualStatus": "REJECTED_PAULA_20261010_PENDING_TARGETED_PREVIEW_RETEST"
     },
     {
       "id": "B4-003-R19-08-OPS-ADVISOR-HANDOFF-NOTIFICATION-GAP",
@@ -11233,16 +11234,16 @@
       ],
       "block": "B4",
       "targetGate": "B4-003",
-      "status": "PAULA_VISUAL_REJECTED_20261010_SOURCE_FIXED_PREVIEW_REQUIRED",
+      "status": "PAULA_VISUAL_REJECTED_20261010_ROOT_CAUSE_FIXED_PENDING_NEW_PREVIEW",
       "blocking": true,
       "rootCause": "PENDING_CAUSAL_DIAGNOSTIC",
       "remediation": "Diagnose effective runtime owner and correct within B4-003 without invalidating preserved PASS.",
       "closureCondition": "Exact Preview machine proof + targeted Paula human UAT pass.",
       "mayDisappearWithoutDisposition": false,
-      "humanVisualStatus": "REJECTED_R20_SECOND_REVIEW",
+      "humanVisualStatus": "REJECTED_PAULA_20261010_PENDING_TARGETED_PREVIEW_RETEST",
       "r20SecondHumanReviewPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_SECOND_PAULA_VISUAL_REJECTION_NOLOSS_20261007.json",
       "r20SecondHumanReviewBlobSha": "2767c83eed40b42a1445b2d6c512b3284a1c9c31",
-      "nextAction": "B4_003_R21_EXACT_CONTRACT_AND_PREVIEW",
+      "nextAction": "R23_EXACT_PREVIEW_AND_PAULA_UAT",
       "uat3Reconciliation": {
         "classification": "BLOCKING_P0",
         "observationIds": [
@@ -12811,5 +12812,29 @@
     "QAContract": "Overdue followup must not imply issued/accepted; synthetic business insert/read/reload/document/cleanup; GT and CO dials split; no real writes",
     "previewPass": false,
     "visualPass": false
+  },
+  "p0ContinuityStatusReconciliation": {
+    "date": "2026-10-10",
+    "status": "ALIGNED_WITH_EXACT_LEDGER",
+    "findings": [
+      {
+        "id": "B4-003-R14-02-RENEWALS-EXPIRED-OUTCOME-CONTINUITY",
+        "old": "MACHINE_PASS_PENDING_PAULA_VISUAL",
+        "new": "PAULA_VISUAL_REJECTED_20261010_ROOT_CAUSE_FIXED_PENDING_NEW_PREVIEW"
+      },
+      {
+        "id": "B4-003-R19-07-INICIO-MONTHLY-ADVISOR-READINESS-REGRESSION",
+        "old": "MACHINE_PASS_PENDING_PAULA_VISUAL",
+        "new": "PAULA_VISUAL_REJECTED_20261010_ROOT_CAUSE_FIXED_PENDING_NEW_PREVIEW"
+      },
+      {
+        "id": "B4-003-R20-V2-04-COLLAB-UX-COMMIT-SEMANTICS",
+        "old": "PAULA_VISUAL_REJECTED_20261010_SOURCE_FIXED_PREVIEW_REQUIRED",
+        "new": "PAULA_VISUAL_REJECTED_20261010_ROOT_CAUSE_FIXED_PENDING_NEW_PREVIEW"
+      }
+    ],
+    "previousLedgerSha": "de815d6a1e0ac26c0eeae5c66710563c18241fe0",
+    "productSourceChanged": false,
+    "realWrites": 0
   }
 }

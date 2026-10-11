@@ -4869,7 +4869,7 @@
       "entryGuardReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_ENTRY_GUARD_PASS_20261002.json",
       "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
       "executionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B4_EXECUTION_LOCK_20261002.json",
-      "executionLockBlobSha": "cd10314b65cdf0a2c0123b867e881e6fefbf3626",
+      "executionLockBlobSha": "fe7fd244490e897a0c6d10d517873eef80d86a32",
       "compositionLockBlobSha": "e9f459b9a5b58b691f4e113507763c67c02b2276",
       "findingLedgerBlobSha": "de815d6a1e0ac26c0eeae5c66710563c18241fe0",
       "activeFindingId": "B4-003",
@@ -6013,7 +6013,7 @@
     "activeFindingId": "B4-003",
     "findingContinuityRegisterBlobSha": "11ffaf6e7c691064be947fdc1af00b08d8fb8f9c",
     "findingContinuityGuardBlobSha": "868a0ba1a492d9adc8d91655f152b6fa7980f499",
-    "continuityRegisterBlobSha": "fc19ae29eb9e107c6755cad45a8cd4260eaf669f",
+    "continuityRegisterBlobSha": "89beac2628cb8010758f869095d64904b37f757e",
     "masterPendingClosurePlanPath": "artifacts/orbit360-recovery/release-control/I6_PENDING_CLOSURE_MASTER_PLAN_LOCK_20261004.json",
     "masterPendingClosurePlanBlobSha": "9d7ba423caf0aa09a0e2af4a1ed4713ea867d17a",
     "listingHumanProofStillRequired": true
@@ -6311,7 +6311,7 @@
     "status": "B4_003_R23_SOURCE_STAGED_PENDING_PREVIEW",
     "activeFindingId": "B4-003",
     "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
-    "executionLockBlobSha": "cd10314b65cdf0a2c0123b867e881e6fefbf3626",
+    "executionLockBlobSha": "fe7fd244490e897a0c6d10d517873eef80d86a32",
     "compositionLockBlobSha": "e9f459b9a5b58b691f4e113507763c67c02b2276",
     "findingLedgerBlobSha": "de815d6a1e0ac26c0eeae5c66710563c18241fe0",
     "noLive": true,
@@ -9351,5 +9351,13 @@
     ],
     "newProductSource": false,
     "visualAccept": false
+  },
+  "p0ContinuityStatusReconciliation": {
+    "status": "ALIGNED_WITH_LEDGER",
+    "oldCarrySha": "fc19ae29eb9e107c6755cad45a8cd4260eaf669f",
+    "newCarrySha": "89beac2628cb8010758f869095d64904b37f757e",
+    "ledgerSha": "de815d6a1e0ac26c0eeae5c66710563c18241fe0",
+    "sourceChanged": false,
+    "failedRun": 38101635296
   }
 }
