@@ -3,8 +3,8 @@
   "recordedAt": "2026-10-09",
   "authority": "FAIL_CLOSED_FINDING_CONTINUITY",
   "sourceLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-  "sourceLedgerPreviousBlobSha": "0cdb33f6b47a62426c7ce5c1d10ecfc2d69b3b74",
-  "expectedLedgerNextBlobSha": "6d2d471056f129713edab6483c5089202f421549",
+  "sourceLedgerPreviousBlobSha": "9da4116ca9e7d2dd71706ffe5e37f0fed673d93b",
+  "expectedLedgerNextBlobSha": "d41d2dc19af7f66a0b7a05d7ca8da53b1a648160",
   "policy": {
     "allLedgerFindingsMustAppearExactlyOnce": true,
     "newHumanFindingsMustBeIndividualLedgerEntries": true,
@@ -13098,5 +13098,16 @@
       "B4-003-UAT-20261011-06",
       "B4-003-UAT-20261011-07"
     ]
+  },
+  "paulaInicioPremiumContinuityReconciliation20261011": {
+    "priorMachineProofPreserved": true,
+    "status": "HUMAN_PARTIAL_PASS_BLOCKING_PENDING_EXACT_PREVIEW",
+    "sourceLedgerBlobSha": "d41d2dc19af7f66a0b7a05d7ca8da53b1a648160",
+    "sourceLedgerPriorBlobSha": "9da4116ca9e7d2dd71706ffe5e37f0fed673d93b",
+    "inventoryCount": 289,
+    "affectedFindingId": "B4-003",
+    "noFindingsAddedOrRemoved": true,
+    "noProductChange": true,
+    "noDataMutation": true
   }
 }
