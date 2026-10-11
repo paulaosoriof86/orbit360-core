@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B4_EXECUTION_LOCK_V1",
   "recordedAt": "2026-10-08T21:43:35.454Z",
-  "status": "B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL",
+  "status": "B4_003_R24_SOURCE_STAGED_PENDING_PREVIEW",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "block": "B4",
@@ -38,10 +38,10 @@
   "activeFinding": {
     "id": "B4-003",
     "title": "Cumulative B4-003 remediation: Renovaciones, Cancelaciones and source-backed insurer knowledge.",
-    "status": "B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL",
+    "status": "B4_003_R24_SOURCE_STAGED_PENDING_PREVIEW",
     "blocking": true,
-    "nextAction": "B4_003_R20_TARGETED_PAULA_VISUAL",
-    "humanVisualStatus": "PENDING_R20_TARGETED_VISUAL",
+    "nextAction": "R23_CONTRACT_AND_EXACT_PREVIEW",
+    "humanVisualStatus": "REJECTED_20261011_CLIENT360_REGRESSION",
     "knowledgePreview": true
   },
   "rules": {
@@ -117,7 +117,7 @@
     "renewalCutoffDataMutationAuthorized": false,
     "realOperationalWritesAuthorized": false
   },
-  "nextAction": "B4_003_R20_TARGETED_PAULA_VISUAL",
+  "nextAction": "R23_CONTRACT_AND_EXACT_PREVIEW",
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
     "blobSha": "010b5b286d11a845a5042afdb68f688f308b764d",
@@ -588,9 +588,9 @@
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_RENEWAL_KPI_PARITY_CAUSAL_ADDENDUM_20261005.json",
     "blobSha": "87bab7ee2778a0525cdbe81cf4cbf82020bf6139"
   },
-  "findingLedgerBlobSha": "b476932f065fe0ac461b38e383613fb46444ff5f",
-  "continuityRegisterBlobSha": "b6176f1cb42a23c8b1e50cf1302d719021cdef84",
-  "compositionLockBlobSha": "461a5309083cf349e92dc36839d86acca788f414",
+  "findingLedgerBlobSha": "12e16d8336ca5a06b38ba408352af22d97d89070",
+  "continuityRegisterBlobSha": "53f171df7ad229d3781e7614c48876ee37a3fb17",
+  "compositionLockBlobSha": "7cdaef7f01f2ab0197890b8cbb9a19c84f4d535e",
   "r18SourceFix": {
     "status": "SOURCE_FIXED_R18_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_SOURCE_FIX_20261005.json",
@@ -1790,7 +1790,7 @@
       "client": "fa5db623d4680d13b015aabe96294a72f07ac2cd",
       "inicio": "ca86944456685db948c64d4b532f84057b2a8f31",
       "index": "9f39fe08dffde0b6645fee6ee78729b2d690c98d",
-      "qa": "cad1f74e9620c3241ed1312d46c9293183c6adb9"
+      "qa": "21436d0dbd081098c091516721179480f4938420"
     },
     "compositionBlobSha": "2cd985e5ffc848f4417042b5ef34bb7f05db240f",
     "findingLedgerBlobSha": "ccc5fa4fabf03bb44d2954e1db37135ad0c8ea9f",
@@ -1886,7 +1886,7 @@
     "sourceOwner": "orbit360-platform/modules/inicio.js",
     "sourceBlobSha": "ca86944456685db948c64d4b532f84057b2a8f31",
     "qaOwner": "tools/gravicentra-i6-5-b4-003-preview-proof.mjs",
-    "qaBlobSha": "cad1f74e9620c3241ed1312d46c9293183c6adb9",
+    "qaBlobSha": "21436d0dbd081098c091516721179480f4938420",
     "rootCause": "Inicio was using canonical role-scoped backend projection only in Operativo, but non-Operativo roles used unrelated store/leaderboard data; UI parity against the same backend could not hold.",
     "remediation": "Use R23 backend scoped advisor and goals projection for all authorized active roles; remove direct asesores/metas readiness for this board; retain GTQ/COP separation; select active role explicitly in authenticated QA and record IDs first paint/reload.",
     "proof": "PENDING_NEW_IMMUTABLE_PREVIEW_AND_AUTHENTICATED_E2E",
@@ -1924,7 +1924,7 @@
     "owner": "orbit360-platform/modules/aseguradoras.js",
     "ownerBlobBefore": "28bb3f15a1ca20130b194bb2dd5b1d296984927d",
     "ownerBlobAfter": "9e56c296b55da499b52f42c462c668aa2f32eba7",
-    "qaBlobSha": "cad1f74e9620c3241ed1312d46c9293183c6adb9",
+    "qaBlobSha": "21436d0dbd081098c091516721179480f4938420",
     "fix": "Reacquire current connected panel after awaited secure provider read; show explicit document error when unavailable; separately assert protected read with sanitized response metadata.",
     "noNewPermissions": true,
     "productionTouched": false,
@@ -1953,7 +1953,7 @@
     "rootCause": "QA once-bound click listener on the originally found TR is lost when a store hydration/render replaces the TR before the Playwright click; browser renders detail but captured clickAt remains null.",
     "remediation": "Keep document-level capture listener until it receives a click on the exact matching #host policy row, ignoring other clicks; no once on document, no binding to transient row. Preserve wall/browser metric and strict <2500ms assertion.",
     "qaBlobBefore": "ac173f9a2f3e6edb84effe5e1f4d467cf34e6c39",
-    "qaBlobAfter": "cad1f74e9620c3241ed1312d46c9293183c6adb9",
+    "qaBlobAfter": "21436d0dbd081098c091516721179480f4938420",
     "productSourceChanged": false,
     "productionChanged": false,
     "dataMutation": false,
@@ -2090,5 +2090,35 @@
     "realWrites": 0,
     "newArtifactRequired": true,
     "passClaim": false
+  },
+  "r24Client360FinancialShadowFix": {
+    "status": "SOURCE_FIXED_EXACT_PREVIEW_REQUIRED",
+    "gate": "I6.5/B4-003",
+    "date": "2026-10-11",
+    "userReport": "PAULA_CLIENT360_PREVIOUSLY_APPROVED_HEALTH_AND_PORTFOLIO_REGRESSION",
+    "confirmedCause": "M1 client-insurer visual enhancer replaced canonical Client 360 financial and health DOM cells whenever a separate policy index lacked a linked client; absence of a policy is not absence of Cartera or Salud.",
+    "before": "5025ee88abaed8be499d2bacf57796cc77a5736f",
+    "after": "3cc80638704d728bb23510ec577a921d358b44e1",
+    "qa": "21436d0dbd081098c091516721179480f4938420",
+    "remediation": "Remove visual enhancer financial-cell writes; leave country validation and segmentation enhancements and canonical summary engine unchanged.",
+    "antiRegression": "Authenticated 30-row UI cell preservation probe before/after M1 enhancer; no synthetic values injected.",
+    "affected": [
+      "orbit360-platform/modules/cliente360.js",
+      "orbit360-platform/core/client-insurer-visual-contract-v20260720.js"
+    ],
+    "liveChanged": false,
+    "realBusinessWrites": 0,
+    "passClaim": false,
+    "previewRequired": true,
+    "caveat": "Client type-count literal equality and portfolio hydration need independent reconciliation; this fixes demonstrated DOM shadow, not every historical data quality issue."
+  },
+  "r24ScopedMutation": {
+    "status": "CAUSAL_REOPEN_APPROVED_PASS_REGRESSION",
+    "authorizedOwner": "orbit360-platform/core/client-insurer-visual-contract-v20260720.js",
+    "qa": "tools/gravicentra-i6-5-b4-003-preview-proof.mjs",
+    "sourceBlobSha": "3cc80638704d728bb23510ec577a921d358b44e1",
+    "priorApprovedB3Preserved": true,
+    "productionForbidden": true,
+    "realWritesForbidden": true
   }
 }

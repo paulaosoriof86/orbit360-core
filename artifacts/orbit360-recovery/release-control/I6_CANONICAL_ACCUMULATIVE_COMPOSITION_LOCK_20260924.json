@@ -173,7 +173,7 @@
     "orbit360-platform/core/backend-product-readonly-bootstrap-p0.js": "1f1da3d54b32d94fe7d7111f318437a48bbf95cd",
     "orbit360-platform/core/backend-resource-contracts.js": "826364d2a394d0bfe75d9f0ccdc5dd8905d2b3f0",
     "orbit360-platform/core/ciclo.js": "dbd828018c9323d712aa85d86f4397bda15e870f",
-    "orbit360-platform/core/client-insurer-visual-contract-v20260720.js": "5025ee88abaed8be499d2bacf57796cc77a5736f",
+    "orbit360-platform/core/client-insurer-visual-contract-v20260720.js": "3cc80638704d728bb23510ec577a921d358b44e1",
     "orbit360-platform/core/cobros-reconciliation-domain-client.js": "7f00ced68ad64dd1ff4b9c0eff85f1f959dc6d68",
     "orbit360-platform/core/comisiones-eng.js": "f1aa5dfc3b8191944023b581abdcff27adf0dba3",
     "orbit360-platform/core/config.js": "5245748330e410a1acf5749955f908aff30fcdcd",
@@ -4568,7 +4568,7 @@
       "orbit360-platform/index.html": "9f39fe08dffde0b6645fee6ee78729b2d690c98d"
     },
     "qaOwner": "tools/gravicentra-i6-5-b4-003-preview-proof.mjs",
-    "qaBlob": "cad1f74e9620c3241ed1312d46c9293183c6adb9",
+    "qaBlob": "21436d0dbd081098c091516721179480f4938420",
     "priorHead": "25c4d44f7da43e85a5d76ccba05398955e63a574",
     "priorR22MachineAcceptedAsHistorical": true,
     "sourceChanged": true,
@@ -4607,7 +4607,7 @@
     "sourceOwner": "orbit360-platform/modules/inicio.js",
     "sourceBlobSha": "ca86944456685db948c64d4b532f84057b2a8f31",
     "qaOwner": "tools/gravicentra-i6-5-b4-003-preview-proof.mjs",
-    "qaBlobSha": "cad1f74e9620c3241ed1312d46c9293183c6adb9",
+    "qaBlobSha": "21436d0dbd081098c091516721179480f4938420",
     "rootCause": "Inicio was using canonical role-scoped backend projection only in Operativo, but non-Operativo roles used unrelated store/leaderboard data; UI parity against the same backend could not hold.",
     "remediation": "Use R23 backend scoped advisor and goals projection for all authorized active roles; remove direct asesores/metas readiness for this board; retain GTQ/COP separation; select active role explicitly in authenticated QA and record IDs first paint/reload.",
     "proof": "PENDING_NEW_IMMUTABLE_PREVIEW_AND_AUTHENTICATED_E2E",
@@ -4645,7 +4645,7 @@
     "owner": "orbit360-platform/modules/aseguradoras.js",
     "ownerBlobBefore": "28bb3f15a1ca20130b194bb2dd5b1d296984927d",
     "ownerBlobAfter": "9e56c296b55da499b52f42c462c668aa2f32eba7",
-    "qaBlobSha": "cad1f74e9620c3241ed1312d46c9293183c6adb9",
+    "qaBlobSha": "21436d0dbd081098c091516721179480f4938420",
     "fix": "Reacquire current connected panel after awaited secure provider read; show explicit document error when unavailable; separately assert protected read with sanitized response metadata.",
     "noNewPermissions": true,
     "productionTouched": false,
@@ -4664,7 +4664,7 @@
     "rootCause": "QA once-bound click listener on the originally found TR is lost when a store hydration/render replaces the TR before the Playwright click; browser renders detail but captured clickAt remains null.",
     "remediation": "Keep document-level capture listener until it receives a click on the exact matching #host policy row, ignoring other clicks; no once on document, no binding to transient row. Preserve wall/browser metric and strict <2500ms assertion.",
     "qaBlobBefore": "ac173f9a2f3e6edb84effe5e1f4d467cf34e6c39",
-    "qaBlobAfter": "cad1f74e9620c3241ed1312d46c9293183c6adb9",
+    "qaBlobAfter": "21436d0dbd081098c091516721179480f4938420",
     "productSourceChanged": false,
     "productionChanged": false,
     "dataMutation": false,
@@ -4774,5 +4774,26 @@
     "realWrites": 0,
     "newArtifactRequired": true,
     "passClaim": false
+  },
+  "r24Client360FinancialShadowFix": {
+    "status": "SOURCE_FIXED_EXACT_PREVIEW_REQUIRED",
+    "gate": "I6.5/B4-003",
+    "date": "2026-10-11",
+    "userReport": "PAULA_CLIENT360_PREVIOUSLY_APPROVED_HEALTH_AND_PORTFOLIO_REGRESSION",
+    "confirmedCause": "M1 client-insurer visual enhancer replaced canonical Client 360 financial and health DOM cells whenever a separate policy index lacked a linked client; absence of a policy is not absence of Cartera or Salud.",
+    "before": "5025ee88abaed8be499d2bacf57796cc77a5736f",
+    "after": "3cc80638704d728bb23510ec577a921d358b44e1",
+    "qa": "21436d0dbd081098c091516721179480f4938420",
+    "remediation": "Remove visual enhancer financial-cell writes; leave country validation and segmentation enhancements and canonical summary engine unchanged.",
+    "antiRegression": "Authenticated 30-row UI cell preservation probe before/after M1 enhancer; no synthetic values injected.",
+    "affected": [
+      "orbit360-platform/modules/cliente360.js",
+      "orbit360-platform/core/client-insurer-visual-contract-v20260720.js"
+    ],
+    "liveChanged": false,
+    "realBusinessWrites": 0,
+    "passClaim": false,
+    "previewRequired": true,
+    "caveat": "Client type-count literal equality and portfolio hydration need independent reconciliation; this fixes demonstrated DOM shadow, not every historical data quality issue."
   }
 }

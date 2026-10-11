@@ -1,0 +1,38 @@
+{
+  "schema": "GRAVICENTRA_B4_003_CLIENT360_UI_SHADOW_CAUSAL_FIX_V1",
+  "recordedAt": "2026-10-11",
+  "headBefore": "323360cf7480772e93601c61f656c5f12c2119f9",
+  "report": {
+    "status": "SOURCE_FIXED_EXACT_PREVIEW_REQUIRED",
+    "gate": "I6.5/B4-003",
+    "date": "2026-10-11",
+    "userReport": "PAULA_CLIENT360_PREVIOUSLY_APPROVED_HEALTH_AND_PORTFOLIO_REGRESSION",
+    "confirmedCause": "M1 client-insurer visual enhancer replaced canonical Client 360 financial and health DOM cells whenever a separate policy index lacked a linked client; absence of a policy is not absence of Cartera or Salud.",
+    "before": "5025ee88abaed8be499d2bacf57796cc77a5736f",
+    "after": "3cc80638704d728bb23510ec577a921d358b44e1",
+    "qa": "21436d0dbd081098c091516721179480f4938420",
+    "remediation": "Remove visual enhancer financial-cell writes; leave country validation and segmentation enhancements and canonical summary engine unchanged.",
+    "antiRegression": "Authenticated 30-row UI cell preservation probe before/after M1 enhancer; no synthetic values injected.",
+    "affected": [
+      "orbit360-platform/modules/cliente360.js",
+      "orbit360-platform/core/client-insurer-visual-contract-v20260720.js"
+    ],
+    "liveChanged": false,
+    "realBusinessWrites": 0,
+    "passClaim": false,
+    "previewRequired": true,
+    "caveat": "Client type-count literal equality and portfolio hydration need independent reconciliation; this fixes demonstrated DOM shadow, not every historical data quality issue."
+  },
+  "blobs": {
+    "ui": "3cc80638704d728bb23510ec577a921d358b44e1",
+    "qa": "21436d0dbd081098c091516721179480f4938420",
+    "comp": "7cdaef7f01f2ab0197890b8cbb9a19c84f4d535e",
+    "ledger": "12e16d8336ca5a06b38ba408352af22d97d89070",
+    "carry": "53f171df7ad229d3781e7614c48876ee37a3fb17",
+    "b4": "18ffed6c5205544a125ffebe59689fef4af30dc0",
+    "control": "640641791b1e8318e141f0d9e2db65849e7ab643"
+  },
+  "sourceAltered": true,
+  "artifactCertificationPending": true,
+  "productionUnchanged": true
+}

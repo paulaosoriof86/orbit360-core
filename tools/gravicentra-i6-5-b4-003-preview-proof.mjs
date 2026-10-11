@@ -1485,6 +1485,32 @@ try{
  },ids);
  need(proof.r14Client360Authority.authority==='server-confirmed-store'&&proof.r14Client360Authority.storeHasSynthetic===true&&proof.r14Client360Authority.uiUniverseCount===proof.r14Client360Authority.authoritativeGtCount&&proof.r14Client360Authority.filteredRows===proof.r14Client360Authority.authoritativeGtCount&&proof.r14Client360Authority.pageSize>0&&proof.r14Client360Authority.renderedRows===Math.min(proof.r14Client360Authority.pageSize,proof.r14Client360Authority.authoritativeGtCount),'B4_003_R14_CLIENT360_AUTHORITATIVE_LIST_FAILED:'+JSON.stringify(proof.r14Client360Authority));
  proof.assertions.client360AuthoritativeList=true;
+ // Antiregression: decorative M1 enhancer must not mutate financial or health cells.
+ const client360UiOwnerProof=await page.evaluate(()=>{
+   const previous=String(location.hash||'');
+   const module=Orbit.modules.cliente360;
+   if(!module||typeof module.render!=='function')return{ok:false,reason:'module_missing'};
+   // Route is restored by the subsequent QA route owner; no product writes.
+   location.hash='#/cliente360';
+   module.render(document.getElementById('host'));
+   const rows=[...document.querySelectorAll('#host table.tbl tbody tr.clickable')].slice(0,30);
+   const financial=()=>rows.map(row=>{
+     const cells=row.querySelectorAll('td');
+     return [String(cells[4]?.innerHTML||''),String(cells[5]?.innerHTML||'')];
+   });
+   const before=financial();
+   const visual=Orbit.clientInsurerVisualContractV20260720;
+   if(visual&&typeof visual.enhance==='function')visual.enhance();
+   const after=financial();
+   return{ok:rows.length>0,rows:rows.length,stable:JSON.stringify(before)===JSON.stringify(after),
+     inventedPortfolio:after.filter(x=>/Sin cartera cargada/i.test(x[0])).length,
+     inventedHealth:after.filter(x=>/Pendiente de información/i.test(x[1])).length,
+     beforeRoute:previous};
+ });
+ need(client360UiOwnerProof.ok&&client360UiOwnerProof.stable&&client360UiOwnerProof.inventedPortfolio===0&&client360UiOwnerProof.inventedHealth===0,
+   'B4_003_CLIENT360_CANONICAL_FINANCIAL_UI_OWNER_SHADOWED:'+JSON.stringify(client360UiOwnerProof));
+ proof.r24Client360UiOwnerProof=client360UiOwnerProof;
+ proof.assertions.client360CanonicalHealthAndPortfolioNotOverwritten=true;
 
  proof.r14QualityGrammar=await page.evaluate(()=>{
    const h=document.getElementById('host'),previous=Orbit.pais||'TODOS';Orbit.pais='GT';Orbit.modules.calidad.render(h);
