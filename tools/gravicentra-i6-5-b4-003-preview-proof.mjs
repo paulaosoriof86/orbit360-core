@@ -1952,13 +1952,17 @@ try{
    dossierHttpTrace.push(entry);
  };
  page.on('response',observeDossierHttp);
- const clickAttempt=await page.evaluate(name=>{
-   const file=Array.from(document.querySelectorAll('#asg-ficha [data-drive-file]')).find(x=>String(x.innerText||'').includes(name));
-   if(!file)return{found:false};
-   const ref=String(file.getAttribute('data-drive-file')||'');
-   file.click();return{found:true,referenceValid:/^[A-Za-z0-9_-]{20,}$/.test(ref),disabledAfterClick:file.disabled};
- },driveFileName);
- need(clickAttempt.found&&clickAttempt.referenceValid,'B4_003_R20_INSURER_DRIVE_FILE_CLICK_TARGET_INVALID:'+JSON.stringify(clickAttempt));
+ const fileTarget=page.locator('#asg-ficha [data-drive-file]').filter({hasText:driveFileName}).first();
+ try{await fileTarget.waitFor({state:'visible',timeout:15000});}
+ catch(error){
+   const state=await page.evaluate(name=>({route:Orbit.route?.key||'',hash:location.hash,tab:document.querySelector('#asg-ficha [data-tab].active')?.dataset.tab||'',fileCount:document.querySelectorAll('#asg-ficha [data-drive-file]').length,folderCount:document.querySelectorAll('#asg-ficha [data-drive-folder]').length,folderStatus:String(document.querySelector('#asg-ficha [data-drive-items]')?.textContent||'').slice(0,320),targetName:name}),driveFileName);
+   throw Error('B4_003_R20_INSURER_DRIVE_FILE_STABLE_TARGET_MISSING:'+JSON.stringify(state)+'|'+String(error?.message||error));
+ }
+ const documentRef=String(await fileTarget.getAttribute('data-drive-file')||'');
+ const clickAttempt={found:true,referenceValid:/^[A-Za-z0-9_-]{20,}$/.test(documentRef)};
+ need(clickAttempt.referenceValid,'B4_003_R20_INSURER_DRIVE_FILE_CLICK_TARGET_INVALID:'+JSON.stringify(clickAttempt));
+ await fileTarget.click({timeout:15000});
+ clickAttempt.clicked=true;
  try{
    await page.waitForFunction(()=>{const p=document.querySelector('#asg-ficha [data-drive-preview]');return !!p&&!p.hidden&&String(p.innerText||'').length>0;},null,{timeout:15000});
  }catch(error){
