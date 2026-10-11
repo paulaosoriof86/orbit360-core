@@ -122,12 +122,12 @@
   "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_R23_CONTRACT_AND_EXACT_PREVIEW",
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "blobSha": "f2abbeb90b8d38f41376ac60dbdeb3a366a64b72",
+    "blobSha": "c9b8a3f6612adfc727175889f409aad6d4411e4a",
     "status": "FROZEN_ACTIVE_UAT3_P0_BATCH_1_SOURCE_COMPLETE"
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "blobSha": "9da4116ca9e7d2dd71706ffe5e37f0fed673d93b",
+    "blobSha": "d41d2dc19af7f66a0b7a05d7ca8da53b1a648160",
     "count": 282
   },
   "sourceFix": {
@@ -590,9 +590,9 @@
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_RENEWAL_KPI_PARITY_CAUSAL_ADDENDUM_20261005.json",
     "blobSha": "87bab7ee2778a0525cdbe81cf4cbf82020bf6139"
   },
-  "findingLedgerBlobSha": "6d2d471056f129713edab6483c5089202f421549",
-  "continuityRegisterBlobSha": "19fd55ad6cbb203b205b5ad9b11554c864e06e73",
-  "compositionLockBlobSha": "f2abbeb90b8d38f41376ac60dbdeb3a366a64b72",
+  "findingLedgerBlobSha": "d41d2dc19af7f66a0b7a05d7ca8da53b1a648160",
+  "continuityRegisterBlobSha": "f3649634e1bc208582262207e4e0819437c11925",
+  "compositionLockBlobSha": "c9b8a3f6612adfc727175889f409aad6d4411e4a",
   "r18SourceFix": {
     "status": "SOURCE_FIXED_R18_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_SOURCE_FIX_20261005.json",
@@ -2195,7 +2195,11 @@
     "realBusinessWrites": 0,
     "noLive": true,
     "boundaryReconciliation": "R23_PREEXISTING_SYNTHETIC_AUTH_REAPPLIED_ONLY_TO_EXACT_PREVIEW",
-    "syntheticWritesScoped": true
+    "syntheticWritesScoped": true,
+    "continuityGuardFix": "ONE_PARENT_STATUS_MISMATCH_RECONCILED",
+    "ledgerBlobSha": "d41d2dc19af7f66a0b7a05d7ca8da53b1a648160",
+    "carryBlobSha": "f3649634e1bc208582262207e4e0819437c11925",
+    "compositionBlobSha": "c9b8a3f6612adfc727175889f409aad6d4411e4a"
   },
   "paulaHumanActorSourceFix20261011": {
     "status": "SOURCE_STAGED_EXACT_PREVIEW_REQUIRED",
