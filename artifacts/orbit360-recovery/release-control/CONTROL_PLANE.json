@@ -4869,7 +4869,7 @@
       "entryGuardReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_ENTRY_GUARD_PASS_20261002.json",
       "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
       "executionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B4_EXECUTION_LOCK_20261002.json",
-      "executionLockBlobSha": "e7b04c0b17a4cf23d4e192f2facfebebd4731d7f",
+      "executionLockBlobSha": "46dbb1fe415a722301da99dd9b66dd39fef5e651",
       "compositionLockBlobSha": "f2abbeb90b8d38f41376ac60dbdeb3a366a64b72",
       "findingLedgerBlobSha": "9da4116ca9e7d2dd71706ffe5e37f0fed673d93b",
       "activeFindingId": "B4-003",
@@ -6311,7 +6311,7 @@
     "status": "B4_003_R23_SOURCE_STAGED_PENDING_PREVIEW",
     "activeFindingId": "B4-003",
     "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
-    "executionLockBlobSha": "e7b04c0b17a4cf23d4e192f2facfebebd4731d7f",
+    "executionLockBlobSha": "46dbb1fe415a722301da99dd9b66dd39fef5e651",
     "compositionLockBlobSha": "f2abbeb90b8d38f41376ac60dbdeb3a366a64b72",
     "findingLedgerBlobSha": "9da4116ca9e7d2dd71706ffe5e37f0fed673d93b",
     "noLive": true,
@@ -9507,7 +9507,7 @@
       "orbit360-platform/index.html": "b2e2f6d3782b5e4c8254e578685dc2621aa3937d"
     },
     "compositionLockBlobSha": "f2abbeb90b8d38f41376ac60dbdeb3a366a64b72",
-    "executionLockBlobSha": "e7b04c0b17a4cf23d4e192f2facfebebd4731d7f",
+    "executionLockBlobSha": "46dbb1fe415a722301da99dd9b66dd39fef5e651",
     "priorMachinePassPreserved": true,
     "priorHumanPassPreserved": [
       "Cliente 360",
@@ -9516,7 +9516,9 @@
     "productSourceChanged": true,
     "productionChanged": false,
     "operationalWrites": 0,
-    "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_R23_CONTRACT_AND_EXACT_PREVIEW"
+    "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_R23_CONTRACT_AND_EXACT_PREVIEW",
+    "previewSyntheticFixtureScopeAuthorized": true,
+    "realOperationalWrites": 0
   },
   "paulaHumanActorSourceFix20261011": {
     "status": "SOURCE_STAGED_PREVIEW_REQUIRED",
