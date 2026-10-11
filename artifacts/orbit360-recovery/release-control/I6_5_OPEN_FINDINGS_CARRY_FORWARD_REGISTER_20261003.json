@@ -3,8 +3,8 @@
   "recordedAt": "2026-10-09",
   "authority": "FAIL_CLOSED_FINDING_CONTINUITY",
   "sourceLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-  "sourceLedgerPreviousBlobSha": "9da4116ca9e7d2dd71706ffe5e37f0fed673d93b",
-  "expectedLedgerNextBlobSha": "d41d2dc19af7f66a0b7a05d7ca8da53b1a648160",
+  "sourceLedgerPreviousBlobSha": "c42ae7dca4f7d8b52d09c330d6390c02cb770cd3",
+  "expectedLedgerNextBlobSha": "0bfa23823338cc55235646e8a23bd1207ebee7a7",
   "policy": {
     "allLedgerFindingsMustAppearExactlyOnce": true,
     "newHumanFindingsMustBeIndividualLedgerEntries": true,
@@ -13109,5 +13109,11 @@
     "noFindingsAddedOrRemoved": true,
     "noProductChange": true,
     "noDataMutation": true
+  },
+  "inicioVisualContrast20261011": {
+    "status": "OPEN_VISUAL_HUMAN_APPROVAL_REQUIRED",
+    "findingId": "B4-003-UAT-20261011-01",
+    "ledgerBlobSha": "0bfa23823338cc55235646e8a23bd1207ebee7a7",
+    "noFindingLoss": true
   }
 }
