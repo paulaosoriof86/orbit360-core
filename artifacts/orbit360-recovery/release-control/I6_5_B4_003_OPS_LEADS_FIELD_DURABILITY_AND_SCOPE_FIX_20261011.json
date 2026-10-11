@@ -1,0 +1,26 @@
+{
+  "schema": "GRAVICENTRA_B4_003_BUSINESS_FIELD_SCOPE_CAUSAL_FIX",
+  "date": "2026-10-11",
+  "gate": "I6.5/B4-003",
+  "status": "SOURCE_ONLY_EXACT_PREVIEW_REQUIRED",
+  "file": "functions/product-ops-leads-domain.js",
+  "before": "9df632ae9eadbec141b6b7d75ba6a0dab98ab038",
+  "after": "1796343e19f99c0028e3ee324db3ce8888caddf9",
+  "cause": [
+    "Operational form sends plan, segmento but backend BUSINESS_MUTABLE_FIELDS and create extra whitelist omitted them",
+    "Operational business updates by admin/operativo were restricted to Leads scope unless comment directed to advisor"
+  ],
+  "remediation": [
+    "Whitelist plan/segmento for create/update",
+    "For already-ops-visible records admin/operativo uses ops domain subject to existing ops scope both before and after"
+  ],
+  "safety": [
+    "No hardcoded identities",
+    "Other roles remain Leads scope",
+    "aseguradoraIds deferred until server validates country/tenant",
+    "No real operational write",
+    "No production deploy"
+  ],
+  "requiredProof": "UI change advisor and fields with two distinct UIDs; canonical server commit/readback/reload and role matrix",
+  "passClaim": false
+}

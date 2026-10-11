@@ -28,7 +28,7 @@ const ADMIN_ROLES = new Set(['superadmin','admintenant','direccion','admin','ope
 const SELF_SERVICE_ROLES = new Set(['asesor','asesora','asesor_sr','asesora_sr','asesor_jr','asesora_jr','comercial']);
 const MANAGE_PERMISSIONS = new Set(['ops_manage','leads_manage','gestiones_manage','workflow_manage']);
 const BUSINESS_MUTABLE_FIELDS = Object.freeze([
-  'nombre','tipo','email','telefono','asesorId','clienteId','polizaId','vehiculoId','cancelacionId','pais','moneda','canal','producto','ramo','aseguradoraId',
+  'nombre','tipo','email','telefono','asesorId','clienteId','polizaId','vehiculoId','cancelacionId','pais','moneda','canal','producto','ramo','aseguradoraId','plan','segmento',
   'emissionContract','primaEst','prioridad','origen','proximoToque','descripcion','prob','cadenciaActiva','cadencia','nroCotizacion','decision',
   'bitacora','motivoPerdido','checklist','colLeads','notas','comentarios','vence','creado','actualizado','ultimoContacto'
 ]);
@@ -37,7 +37,7 @@ const MANAGEMENT_MUTABLE_FIELDS = Object.freeze([
   'proximaAccion','checklist','nota','notas','origen','bitacora','comentarios','creado','actualizado','resultado',
   'adjuntos','documentoCargaPendiente','documentoCargaFallida'
 ]);
-const BUSINESS_CREATE_EXTRA_FIELDS = Object.freeze(['polizaId','cancelacionId','prob','proximoToque','descripcion','cadenciaActiva','cadencia','nroCotizacion','decision','bitacora','motivoPerdido','checklist','colLeads','notas','comentarios','vence','creado','actualizado','ultimoContacto']);
+const BUSINESS_CREATE_EXTRA_FIELDS = Object.freeze(['plan','segmento','polizaId','cancelacionId','prob','proximoToque','descripcion','cadenciaActiva','cadencia','nroCotizacion','decision','bitacora','motivoPerdido','checklist','colLeads','notas','comentarios','vence','creado','actualizado','ultimoContacto']);
 const MANAGEMENT_CREATE_EXTRA_FIELDS = Object.freeze(['cancelacionId','ramo','pais','moneda','producto','vence','proximaAccion','checklist','notas','bitacora','comentarios','creado','actualizado','resultado','adjuntos','documentoCargaPendiente','documentoCargaFallida']);
 const ISSUANCE_MANAGEMENT_FIELDS = Object.freeze(['workflowType','requestKey','operationId','issuanceMode','sourcePolicyId','renewalManagementId','pais','moneda','producto','acceptedOffer','acceptedConfirmed','emissionStage','requiereInspeccion','documentosCompletos','requiereValidacion','validacionAlertas','policyCreatedId','policyNumber','documentRef','resueltaAt','nuevaPolizaId','emisionGestionId']);
 const RENEWAL_MANAGEMENT_FIELDS = Object.freeze(['workflowType','renewalAction','sourcePolicyId','acceptedConfirmed','clientApprovalAt','clientApprovalNote','quoteContext','directRenewalPolicyId','issuanceRequestId','nuevaPolizaId','emisionGestionId']);
@@ -62,7 +62,7 @@ function active(m){const s=norm(m&&(m.status||m.estado));return!!m&&m.active!==f
 function scope(m,domain){const s=m.dataScopes||{};const raw=domain==='leads'?(s.leads||s.commercial||s.default):(s.ops||s.workflow||s.gestiones||s.default);const x=norm(raw||m.scopeDatos||m.dataScope);if(['propios','own'].includes(x))return'own';if(['equipo','team'].includes(x))return'team';if(['ninguno','none'].includes(x))return'none';if(domain==='leads'&&text(m.advisorId||m.asesorId,180))return'own';return'all';}
 function advisorAllowed(m,target,domain){const sc=scope(m,domain),own=text(m.advisorId||m.asesorId,180),t=text(target,180);if(sc==='none')return false;if(sc==='own')return!!own&&own===t;if(sc==='team'){const set=new Set(unique(m.teamAdvisorIds||m.asesoresEquipo||[]));if(own)set.add(own);return set.has(t);}return true;}
 function collaborationWriteDirection(before,payload){const prior=[].concat(before&&before.comentarios||[]),next=[].concat(payload&&payload.comentarios||[]);if(next.length<=prior.length)return'';const last=next[next.length-1]||{},direction=text(last.direction,40),eventId=text(last.eventId,180);if(!eventId||!['advisor','operations'].includes(direction))return'';const seen=new Set(prior.map(x=>text(x&&x.eventId,180)).filter(Boolean));return seen.has(eventId)?'':direction;}
-function workflowAuthorizationDomain(authz,operation,entityType,before,payload,cfg){if(entityType!=='negocios')return'ops';const direction=collaborationWriteDirection(before,payload),stage=norm(before&&before.etapa),origin=norm(before&&before.origen),operationalContext=origin==='ops'||!!(cfg&&cfg.stages&&cfg.stages[stage]&&cfg.stages[stage].ops===true);if(operation==='update_business'&&direction==='advisor'&&operationalContext&&ADMIN_ROLES.has(authz.actor.activeRole))return'ops';return'leads';}
+function workflowAuthorizationDomain(authz,operation,entityType,before,payload,cfg){if(entityType!=='negocios')return'ops';const direction=collaborationWriteDirection(before,payload),stage=norm(before&&before.etapa),origin=norm(before&&before.origen),operationalContext=origin==='ops'||!!(cfg&&cfg.stages&&cfg.stages[stage]&&cfg.stages[stage].ops===true);if(operation==='update_business'&&operationalContext&&ADMIN_ROLES.has(authz.actor.activeRole))return'ops';return'leads';}
 function canonicalizeCollaborationPayload(before,payload,actor){
  const prior=[].concat(before&&before.comentarios||[]),next=[].concat(payload&&payload.comentarios||[]);
  if(next.length<=prior.length)return payload;
