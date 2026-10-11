@@ -157,7 +157,7 @@
     "functions/payment-inference-engine.js": "16bf21177364fbb94f39fab5b8e8ec8506bbd071",
     "functions/product-insurer-credentials.js": "04e681fdba71ee8438429dda11ae50edf9a40c8e",
     "functions/product-operational-domain.js": "61bbd6d4bc9e687fa698c129e4ffd4fb4fb085b7",
-    "functions/product-ops-leads-domain.js": "1796343e19f99c0028e3ee324db3ce8888caddf9",
+    "functions/product-ops-leads-domain.js": "9616691badc2a5bdb16310b4c15c0a95e0e83b8e",
     "functions/tenant-branding.js": "d3c3dcd191951f91a40eb17b7cc560dc535a2a3c",
     "functions/tenant-domain-config.js": "c9f2bd7234252ee7281e5aca2b20601fcf8d77e3",
     "functions/user-onboarding.js": "6512d49e4a01c4257e578652b0728f688cd063d1",
@@ -4883,5 +4883,12 @@
     ],
     "noLive": true,
     "noRealDataWrites": true
+  },
+  "opsScopeExplicitHandoffFix20261011": {
+    "status": "SOURCE_FIXED_PREVIEW_RETEST",
+    "sourceSha": "9616691badc2a5bdb16310b4c15c0a95e0e83b8e",
+    "oldSha": "1796343e19f99c0028e3ee324db3ce8888caddf9",
+    "preciseRule": "Preserve advisor handoff condition and separately allow OPS-stage privileged edits with opsScope",
+    "noRealDataMutation": true
   }
 }

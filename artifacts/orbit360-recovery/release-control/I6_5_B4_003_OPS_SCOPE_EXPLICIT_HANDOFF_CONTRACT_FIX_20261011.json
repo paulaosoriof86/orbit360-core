@@ -1,0 +1,14 @@
+{
+  "schema": "GRAVICENTRA_B4_003_OPS_SCOPE_HANDOFF_CONTRACT_FIX",
+  "date": "2026-10-11",
+  "gate": "I6.5/B4-003",
+  "status": "SOURCE_CHANGED_PREVIEW_REQUIRED",
+  "failedRunId": 38156085497,
+  "failure": "B4_003_R20_HANDOFF_BACKEND_SCOPE_DOMAIN_MISSING",
+  "productBefore": "1796343e19f99c0028e3ee324db3ce8888caddf9",
+  "productAfter": "9616691badc2a5bdb16310b4c15c0a95e0e83b8e",
+  "contractRelaxed": false,
+  "reason": "Preserve separate original advisor handoff condition and extended privileged edit rule; preserve explicit source contract",
+  "liveTouched": false,
+  "dataWrites": 0
+}
