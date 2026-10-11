@@ -1,18 +1,18 @@
 {
   "schema": "GRAVICENTRA_I6_5_B4_003_R20_MACHINE_PROOF_V1",
-  "recordedAt": "2026-10-10T21:01:23.220Z",
+  "recordedAt": "2026-10-11T14:13:04.563Z",
   "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
   "findingId": "B4-003",
-  "sourceSha": "8b4e2daa899d6d138916f33b686723e8f0081231",
-  "buildId": "gi-i65-b4-8b4e2daa899d-57f234755dc1",
-  "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-38085584155-taxk6226.web.app",
-  "channelId": "gi-i65-b4-38085584155",
-  "runId": 38085584155,
-  "artifactId": 11682447116,
-  "artifactDigest": "2e3ac39ce2ef3dba996a0046a53c2d9c4d250062da3f5677456f6ccbf581f2ab",
-  "hostedPayloadDigest": "d9abf155b73f900010471c310c8bf8c667484404a27cba00226ce3d347e2f14b",
-  "backendSourceDigest": "98931e5b672e4735a3a0e5d2896e7e18797911b03ffcb71e6f0da5a0f7c70081",
-  "bundleDigest": "520207e13fc83fc99660bc313f86fa3cf60ff175cc0d6f662483a57f0e44dbb6",
+  "sourceSha": "1407ce7f8b67152e4301053f587bcf66a0f09ebe",
+  "buildId": "gi-i65-b4-1407ce7f8b67-57f234755dc1",
+  "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-38145751742-zymi26sa.web.app",
+  "channelId": "gi-i65-b4-38145751742",
+  "runId": 38145751742,
+  "artifactId": 11705146696,
+  "artifactDigest": "7b5faaf7e24b81d6be664ad7e997e72d419de371ddc40ac5defb1871fa53f734",
+  "hostedPayloadDigest": "63b0d04b87db3a2dd0abb8534f5a54fdce8ff738ddc8bad652c50e5e7dfa8fcc",
+  "backendSourceDigest": "0291dbfadd1869d6ec8506e97cd96e8a7d01afdc1ecb35752a6abf2c3f1ac49c",
+  "bundleDigest": "7e77c01bb9af82d8424e5a6182cd07df04757982424a216652cbad2a3f0e068a",
   "exactHostingReadback": true,
   "assertions": {
     "handoffActorsDistinct": true,
@@ -22,9 +22,11 @@
     "realRenewalSourceDryRunReady": false,
     "academiaFiveManualsPrivateAuthenticatedUi": true,
     "academiaOperativoCrmManualAllowedRestrictedDenied": true,
+    "r23InicioAuthorizedGlobalSourceMetaParity": true,
     "r23InicioCanonicalGoalValueParity": true,
     "r23InicioRoleCountryScopedBackendUiParity": true,
     "r23InicioOperativoDireccionMobileReload": true,
+    "r23InicioGtCoNoFxMixing": true,
     "quoteAuthorityContractHosted": true,
     "manualFinancialInferenceRemoved": true,
     "authenticatedHydration": true,
@@ -102,6 +104,7 @@
     "policyRefreshCoherentHydration": true,
     "noDelayedRenewalRenderMutation": true,
     "renewalInsurerDirectoryOptionalNonblocking": true,
+    "r23OverdueActionParity": true,
     "renewalFirstPaintReadiness": true,
     "expiredRenewalOutcomeContinuity": true,
     "unknownRenewabilityDebtVisibleFailClosed": true,
@@ -241,7 +244,7 @@
   "qaResidueDisposition": "NOT_DELETED_FAIL_CLOSED",
   "qaResidueDeletedCount": 0,
   "qaResidueAdjudicationReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R19_B2_QA_RESIDUE_ADJUDICATION_20261005.json",
-  "qaResidueAdjudicationReceiptBlobSha": "7ad1ec30fa685740d30e9bc85bef07e9c1ec0289",
+  "qaResidueAdjudicationReceiptBlobSha": "d7b8133c9c8a246254d8500f65a4739722ae7b56",
   "syntheticQaWrites": 14,
   "cleanupWrites": 39,
   "syntheticFinalAbsent": true,
@@ -273,7 +276,7 @@
       "url": "https://us-east1-ays-orbit-360-lab.cloudfunctions.net/orbit360ProductOperationalCommandPreview",
       "resourceType": "fetch",
       "method": "POST",
-      "postData": "{\"data\":{\"tenantId\":\"alianzas-soluciones\",\"activeRole\":\"Dirección\",\"mutations\":[{\"action\":\"insert\",\"collection\":\"actividades\",\"id\":\"secres_mv2vpodzj6qzx\",\"payload\":{\"id\":\"secres_mv2vpodzj6qzx\",\"tipo\":\"admin\",\"icon\":\"🔐\",\"fecha\":\"2026-10-10\",\"titulo\":\"Acceso a recurso seguro\",\"detalle\":\"document.upload · ok\",\"tenantId\":\"alianzas-soluciones\",\"createdAt\":\"2026-10-10T21:01:00.983Z\",\"updatedAt\":\"2026-10-10T21:01:00.983Z\",\"ownerUid\":\"woJlxR1iFEeiQZvTscPj4qQ5Qc73\",\"ownerEmail\":\"orbit.lab@demo.com\"}}]}}",
+      "postData": "{\"data\":{\"tenantId\":\"alianzas-soluciones\",\"activeRole\":\"Dirección\",\"mutations\":[{\"action\":\"insert\",\"collection\":\"actividades\",\"id\":\"secres_mv3wkee778dmu\",\"payload\":{\"id\":\"secres_mv3wkee778dmu\",\"tipo\":\"admin\",\"icon\":\"🔐\",\"fecha\":\"2026-10-11\",\"titulo\":\"Acceso a recurso seguro\",\"detalle\":\"document.upload · ok\",\"tenantId\":\"alianzas-soluciones\",\"createdAt\":\"2026-10-11T14:12:40.544Z\",\"updatedAt\":\"2026-10-11T14:12:40.544Z\",\"ownerUid\":\"woJlxR1iFEeiQZvTscPj4qQ5Qc73\",\"ownerEmail\":\"orbit.lab@demo.com\"}}]}}",
       "responseBody": "{\"error\":{\"message\":\"Preview operativo solo admite fixtures sintéticos autorizados B3-004/B4-003.\",\"status\":\"PERMISSION_DENIED\"}}"
     }
   ],
@@ -303,7 +306,7 @@
     {
       "status": 403,
       "url": "https://us-east1-ays-orbit-360-lab.cloudfunctions.net/orbit360ProductOperationalCommandPreview",
-      "id": "secres_mv2vpodzj6qzx",
+      "id": "secres_mv3wkee778dmu",
       "collection": "actividades",
       "reason": "SECURE_RESOURCE_AUDIT_NON_SYNTHETIC_DENIED_IN_PREVIEW",
       "persisted": false
@@ -322,7 +325,7 @@
     "knowledgeProbe": {
       "aseguateId": "gt-aseguradora-guatemalteca",
       "columnaId": "gt-seguros-columna",
-      "count": 33
+      "count": 34
     },
     "aseguate": {
       "sourceBacked": true,
@@ -379,7 +382,7 @@
       "Vehículo Pesado"
     ],
     "nativeMultiple": false,
-    "insurerCheckboxes": 16
+    "insurerCheckboxes": 17
   },
   "r18ManagementModal": {
     "typeCount": 12,
@@ -411,7 +414,7 @@
     "buckets": [
       {
         "key": "vencidas",
-        "count": 14,
+        "count": 16,
         "ids": [
           "pol_9220fa6d4f3a49b2307746d1d869",
           "pol_be60fdba3a8e370e423a4307783f",
@@ -425,25 +428,30 @@
           "pol_0f89cc0a12840594abcc60d418b2",
           "pol_b8b99324d9016269d118d789095a",
           "pol_8231bbb8f9b7272c02891f5a4caf",
-          "b4003qa_policy_expired_renew_38085584155",
-          "pol_df6bf097045762297ec31fd4e5c5"
+          "pol_df6bf097045762297ec31fd4e5c5",
+          "b4003qa_policy_expired_renew_38102224750",
+          "b4003qa_policy_expired_renew_38145751742",
+          "pol_6e557c18fc77e18c06bb63a46b7b"
         ]
       },
       {
         "key": "d15",
-        "count": 3,
+        "count": 8,
         "ids": [
-          "b4003qa_policy_renew_38085584155",
-          "b4003qa_policy_renewwrite_38085584155",
-          "b4003qa_policy_unknown_38085584155"
+          "b4003qa_policy_renew_38102224750",
+          "b4003qa_policy_renew_38145751742",
+          "b4003qa_policy_renewwrite_38102224750",
+          "b4003qa_policy_renewwrite_38145751742",
+          "b4003qa_policy_unknown_38102224750",
+          "b4003qa_policy_unknown_38145751742",
+          "pol_638e276218baad9e84018415b0ba",
+          "pol_b39a58e5c216d8fb0f9fca4da4d6"
         ]
       },
       {
         "key": "d45",
-        "count": 10,
+        "count": 8,
         "ids": [
-          "pol_638e276218baad9e84018415b0ba",
-          "pol_b39a58e5c216d8fb0f9fca4da4d6",
           "pol_7280c9b1a5253a1fe1e463e5993b",
           "pol_d5e61976a38be76ba5e3c1e12575",
           "pol_3ddc9e613f40252f02b2e122072d",
@@ -495,15 +503,18 @@
         ]
       }
     ],
-    "pending": 2,
+    "pending": 3,
     "unknownInKanban": true,
     "unknownBadge": true,
     "unknownReview": true,
     "parallelDispositionAbsent": true,
     "date45ExpectedIds": [
-      "b4003qa_policy_renew_38085584155",
-      "b4003qa_policy_renewwrite_38085584155",
-      "b4003qa_policy_unknown_38085584155",
+      "b4003qa_policy_renew_38102224750",
+      "b4003qa_policy_renew_38145751742",
+      "b4003qa_policy_renewwrite_38102224750",
+      "b4003qa_policy_renewwrite_38145751742",
+      "b4003qa_policy_unknown_38102224750",
+      "b4003qa_policy_unknown_38145751742",
       "pol_3ddc9e613f40252f02b2e122072d",
       "pol_638e276218baad9e84018415b0ba",
       "pol_7280c9b1a5253a1fe1e463e5993b",
@@ -516,9 +527,12 @@
       "pol_ddbb135a5fcd5b9d61dba57f56ec"
     ],
     "date45VisibleIds": [
-      "b4003qa_policy_renew_38085584155",
-      "b4003qa_policy_renewwrite_38085584155",
-      "b4003qa_policy_unknown_38085584155",
+      "b4003qa_policy_renew_38102224750",
+      "b4003qa_policy_renew_38145751742",
+      "b4003qa_policy_renewwrite_38102224750",
+      "b4003qa_policy_renewwrite_38145751742",
+      "b4003qa_policy_unknown_38102224750",
+      "b4003qa_policy_unknown_38145751742",
       "pol_3ddc9e613f40252f02b2e122072d",
       "pol_638e276218baad9e84018415b0ba",
       "pol_7280c9b1a5253a1fe1e463e5993b",
@@ -530,9 +544,9 @@
       "pol_d5e61976a38be76ba5e3c1e12575",
       "pol_ddbb135a5fcd5b9d61dba57f56ec"
     ],
-    "expiredPipelineCount": 14,
-    "expiredHistoricalCount": 1159,
-    "noteText": "23 situaciones para revisar · Ver información"
+    "expiredPipelineCount": 16,
+    "expiredHistoricalCount": 1163,
+    "noteText": "25 situaciones para revisar · Ver información"
   },
   "r18PolicyEditionValidation": {
     "rows": [
@@ -575,8 +589,8 @@
     "queryResult": true
   },
   "r18RenewalKpiParity": {
-    "inicio": 13,
-    "polizas": 13,
+    "inicio": 16,
+    "polizas": 16,
     "owner": "polizas.policyMetrics.isRenewalWithin45Days"
   },
   "r18InsurerActivity": {
@@ -607,7 +621,7 @@
     "checkboxUsable": true
   },
   "r19RenewabilityDurable": {
-    "policyId": "b4003qa_policy_renewwrite_38085584155",
+    "policyId": "b4003qa_policy_renewwrite_38145751742",
     "serverValue": true,
     "reloadValue": true
   },
@@ -616,7 +630,7 @@
     "error": "Esta Preview protege los registros reales. La persistencia se valida aquí con una póliza sintética equivalente; el cambio real se prueba únicamente en el gate LIVE autorizado."
   },
   "r19InicioReadiness": {
-    "text": "🌅 Buen día · esto es lo importante hoy METAS DEL MES·PRIORIDADES·AVANCE POR ASESOR Abrir Cliente 360 → METAS DEL MES · OCTUBRE 2026 Avance real del mes Quedan 21 días para cerrar el mes. La producción usa la prima neta de pólizas con inicio de vigencia en el mes y el recaudo usa pagos confirmados con fecha efectiva del mes. Los importes se separan por moneda: selecciona Guatemala o Colombia para comparar con metas sin sumar GTQ y COP. Si faltan metas fuente, no se inventa un porcentaje. 443 clientes 1425 pólizas 594 registros vencidos en cartera — Q11K GTQ Producción neta del mes Selecciona GT o CO para comparar con meta — Sin movimientos Recaudo confirmado del mes Selecciona GT o CO para comparar con meta COBROS CONFIRMADOS Q851K GTQ $205.8M COP 1243 pagos confirmados › PENDIENTE DE COBRO Q 8,058 GTQ $ 0 COP 722 obligaciones · 18 con monto › CARTERA VENCIDA Q 8,274 GTQ $ 0 COP 594 obligaciones · 16 con monto › VENCEN ≤45 D 13 mismo universo de Pólizas › Avance por asesor producción neta del mes vs meta configurada BH Braulio Hernández Q0 GTQ Meta no configurada — CC Carlos Castro · CO $0 COP Meta no configurada — CC Carlos Castro · GT Q0 GTQ Meta no configurada — FA Fernando Arias Q0 GTQ Meta no configurada — JS Johanna Salgado Q0 GTQ Meta no configurada — NC Nicole Castro $0 COP Meta no configurada — PO Paula Osorio · GT Q11K GTQ 14% PO Paula Osorio · CO $0 COP Meta no configurada — SD Samuel Daza · GT Q0 GTQ Meta no configurada — SD Samuel Daza · CO $0 COP Meta no configurada — Prioridades 🔄 B4-003 QA Cliente Auto · renueva en 9 d 🔄 B4-003 QA Cliente Auto · renueva en 9 d 🔄 B4-003 QA Cliente ACCIDENTES QA FUENTE · renueva en 9 d 🔄 MARÍA DE JESÚS LÓPEZ GARZÓN ACCIDENTES Y ENFERMEDADES · renueva en 16 d ⚠ NORA LUCIA HURTARTE FLORES cuota — vencida · — ⚠ LUIS ESTUA",
+    "text": "🌅 Buen día · esto es lo importante hoy METAS DEL MES·PRIORIDADES·AVANCE POR ASESOR Abrir Cliente 360 → METAS DEL MES · OCTUBRE 2026 Avance real del mes Quedan 20 días para cerrar el mes. La producción usa la prima neta de pólizas con inicio de vigencia en el mes y el recaudo usa pagos confirmados con fecha efectiva del mes. Los importes se separan por moneda: selecciona Guatemala o Colombia para comparar con metas sin sumar GTQ y COP. Si faltan metas fuente, no se inventa un porcentaje. 444 clientes 1431 pólizas 598 registros vencidos en cartera Producción neta del mes GT · GTQ Q14K Meta no configurada en fuente CO · COP $0 Meta no configurada en fuente Recaudo confirmado del mes GT · GTQ Q0 Meta no configurada en fuente CO · COP $0 Meta no configurada en fuente COBROS CONFIRMADOS Q851K GTQ $205.8M COP 1243 pagos confirmados › PENDIENTE DE COBRO Q 8,058 GTQ $ 0 COP 719 obligaciones · 18 con monto › CARTERA VENCIDA Q 8,957 GTQ $ 0 COP 598 obligaciones · 17 con monto › VENCEN ≤45 D 16 mismo universo de Pólizas › Avance por asesor producción neta del mes vs meta configurada BH Braulio Hernández Q0 GTQ Meta no configurada — CC Carlos Castro · CO $0 COP Meta no configurada — CC Carlos Castro · GT Q0 GTQ Meta no configurada — FA Fernando Arias Q0 GTQ Meta no configurada — JS Johanna Salgado Q0 GTQ Meta no configurada — NC Nicole Castro $0 COP Meta no configurada — PO Paula Osorio · GT Q14K GTQ 18% PO Paula Osorio · CO $0 COP Meta no configurada — SD Samuel Daza · GT Q0 GTQ Meta no configurada — SD Samuel Daza · CO $0 COP Meta no configurada — Prioridades 🔄 B4-003 QA Cliente Auto · renueva en 9 d 🔄 B4-003 QA Cliente Auto · renueva en 9 d 🔄 B4-003 QA Cliente Auto · renueva en 9 d 🔄 B4-003 QA Cliente Auto · renueva en 9 d ⚠ NORA LUCIA HURTARTE FLORES cuota — vencida · — ⚠ L",
     "terminal": "ready"
   },
   "r19TypedHandoff": null,
