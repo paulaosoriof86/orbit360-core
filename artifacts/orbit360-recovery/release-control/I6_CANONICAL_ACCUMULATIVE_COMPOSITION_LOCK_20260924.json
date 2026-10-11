@@ -226,7 +226,7 @@
     "orbit360-platform/modules/equipo-credential-admin-v20260805-bridge.js": "7432bc05938469187fdd120a5bc023c53a000ab9",
     "orbit360-platform/modules/equipo-onboarding-v20260804-bridge.js": "1da619d8abd676d31d69a038d4770463ca67fdc5",
     "orbit360-platform/modules/equipo.js": "b0736237ee18ef45abbae1c13f5c94781178344e",
-    "orbit360-platform/modules/inicio.js": "ca86944456685db948c64d4b532f84057b2a8f31",
+    "orbit360-platform/modules/inicio.js": "37210ab93d1aba4795109fa068af47b1f8f8ccb2",
     "orbit360-platform/modules/issuance-endosos-v1201-bridge.js": "43e14e5dc03a296b9fd461bec2ecc3052d6cbce0",
     "orbit360-platform/modules/leads.js": "4e12e604382f2731a03d29cf00db3c086d77ebc1",
     "orbit360-platform/modules/ops.js": "a4ca3dbb4613d541af411f12fce9773a072b0d41",
@@ -4842,5 +4842,13 @@
     "sourceCompositionUnchanged": true,
     "activeBlock": "B4",
     "next": "CAUSAL_SOURCE_FIX_ON_FIRST_OPEN_P0"
+  },
+  "paulaInicioPremium20261011": {
+    "status": "SOURCE_FIXED_PREVIEW_REQUIRED",
+    "before": "ca86944456685db948c64d4b532f84057b2a8f31",
+    "after": "37210ab93d1aba4795109fa068af47b1f8f8ccb2",
+    "causalFix": "Restored centered circular KPIs with per-country source-bound metas; no false individual meta absent claims.",
+    "sourceTouched": true,
+    "noRealDataWrites": true
   }
 }

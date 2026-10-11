@@ -1,0 +1,15 @@
+{
+  "schema": "GRAVICENTRA_B4_003_INICIO_PREMIUM_SOURCE_FIX_20261011",
+  "status": "SOURCE_ONLY_STAGED_EXACT_PREVIEW_REQUIRED",
+  "date": "2026-10-11",
+  "gate": "I6.5/B4-003",
+  "cause": "Todos-los-países flat country split displaced accepted dials and aggregate missing meta was visually misrepresented as no personal goal",
+  "file": "orbit360-platform/modules/inicio.js",
+  "sourceBefore": "ca86944456685db948c64d4b532f84057b2a8f31",
+  "sourceAfter": "37210ab93d1aba4795109fa068af47b1f8f8ccb2",
+  "previewProof": "PENDING",
+  "humanPass": false,
+  "otherP0Open": true,
+  "realBusinessWrites": 0,
+  "liveDeploy": false
+}
