@@ -614,7 +614,7 @@ async function runR26RealReadOnly(){
  // an October payment. Do not treat a reported payment as confirmed.
  const historic={confirmedPaymentsByMonth:{},receiptPaymentEvidenceByMonth:{},
    confirmedWithoutPaymentDate:0,reportedCobros:0,receiptEvidenceWithoutDate:0};
- const put=(bucket,key)=>{if(!/^20\\d{2}-(0[1-9]|1[0-2])$/.test(key))return;
+ const put=(bucket,key)=>{if(!/^20\d{2}-(0[1-9]|1[0-2])$/.test(key))return;
    bucket[key]=(bucket[key]||0)+1;};
  for(const d of cSnap.docs){
   const x=d.data()||{},st=norm(x.estado);
