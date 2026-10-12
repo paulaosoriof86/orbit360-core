@@ -36,7 +36,9 @@ concurrency:
   # Preview must not compete with the two read-only B4-003 diagnostics for the single pending slot.
   # Diagnostics keep their own serialization; the exact Preview has an independent queue.
   group: gravicentra-b4-003-preview-${{ github.ref }}
-  cancel-in-progress: true
+  # Prevent cancellation during synthetic fixture writes; next run waits for cleanup.
+  # The exact-head lease still rejects superseded candidates.
+  cancel-in-progress: false
 
 jobs:
   b4-003-renewals-cancelations-preview:
@@ -989,8 +991,11 @@ jobs:
           node - <<'NODE'
           const fs=require('node:fs'),p=process.env.FINDINGS,o=JSON.parse(fs.readFileSync(p,'utf8'));
           const f=(o.findings||[]).find(x=>x.id==='B4-003'),n=(o.findings||[]).find(x=>x.id==='B4-004');if(!f||!n)throw Error('B4_FINDING_MISSING');
+          const ctrl=JSON.parse(fs.readFileSync(process.env.CONTROL,'utf8'));
           const rr=JSON.parse(fs.readFileSync(process.env.RECEIPT,'utf8')),blocked=rr.status==='MACHINE_PASS_EXCEPT_EXPLICIT_RENEWAL_DATA_BLOCKER',status=blocked?'MACHINE_PASS_EXCEPT_EXPLICIT_RENEWAL_DATA_BLOCKER':'MACHINE_PASS_PENDING_PAULA_VISUAL',nextAction=rr.nextAction;
-          Object.assign(f,{status,blocking:true,nextAction,humanVisualStatus:blocked?'REJECTED_R20_DATA_BLOCKER':'PENDING_R20_TARGETED_VISUAL',machineProofReceiptPath:process.env.RECEIPT,machineProofReceiptBlobSha:process.env.RECEIPT_BLOB,qaResidueAdjudicationReceiptPath:process.env.QA_RECEIPT,qaResidueAdjudicationReceiptBlobSha:process.env.QA_BLOB});
+          const human=String(ctrl.currentB4?.findingStatus||'');
+          const humanPreserved=/^PAULA_VISUAL_|^HUMAN_VISUAL_/.test(human);
+          Object.assign(f,{status:humanPreserved?human:status,blocking:true,nextAction,humanVisualStatus:humanPreserved?String(ctrl.paulaVisualReview20261011B4003?.status||human):(blocked?'REJECTED_R20_DATA_BLOCKER':'PENDING_R20_TARGETED_VISUAL'),machineProofReceiptPath:process.env.RECEIPT,machineProofReceiptBlobSha:process.env.RECEIPT_BLOB,qaResidueAdjudicationReceiptPath:process.env.QA_RECEIPT,qaResidueAdjudicationReceiptBlobSha:process.env.QA_BLOB});
           for(const x of (o.findings||[]).filter(x=>/^B4-003-R(?:18|19)-/.test(String(x.id||''))))Object.assign(x,{status:blocked?'MACHINE_BLOCKED_R19':'MACHINE_PASS_PENDING_PAULA_VISUAL',blocking:true,nextAction:blocked?'B4_003_RENEWAL_DATA_AUTHORIZATION_OR_CONFLICT_RESOLUTION':'B4_003_R20_TARGETED_PAULA_VISUAL',machineProofReceiptPath:process.env.RECEIPT,machineProofReceiptBlobSha:process.env.RECEIPT_BLOB});
           const r13=(o.findings||[]).find(x=>x.id==='B4-003-R13-04-RENEWALS-ZERO-REGRESSION');if(r13&&blocked)Object.assign(r13,{status:'MACHINE_PROOF_PASS_EXCEPT_EXPLICIT_RENEWAL_DATA_BLOCKER',blocking:true,nextAction:'B4_003_RENEWAL_DATA_AUTHORIZATION_OR_CONFLICT_RESOLUTION'});
           Object.assign(n,{status:'NOT_STARTED',blocking:true,nextAction:blocked?'WAIT_B4_003_RENEWAL_DATA_RESOLUTION':'WAIT_B4_003_R20_PAULA_VISUAL'});
@@ -999,10 +1004,17 @@ jobs:
           FINDINGS_BLOB=$(git hash-object "$FINDINGS"); export FINDINGS_BLOB
           node - <<'NODE'
           const fs=require('node:fs'),p=process.env.CARRY,o=JSON.parse(fs.readFileSync(p,'utf8')),rr=JSON.parse(fs.readFileSync(process.env.RECEIPT,'utf8')),blocked=rr.status==='MACHINE_PASS_EXCEPT_EXPLICIT_RENEWAL_DATA_BLOCKER',status=blocked?'MACHINE_PASS_EXCEPT_EXPLICIT_RENEWAL_DATA_BLOCKER':'MACHINE_PASS_PENDING_PAULA_VISUAL';
-          const f=(o.findings||[]).find(x=>x.id==='B4-003'),r13=(o.findings||[]).find(x=>x.id==='B4-003-R13-04-RENEWALS-ZERO-REGRESSION');
+          const f=(o.inventory||o.findings||[]).find(x=>x.id==='B4-003'),r13=(o.inventory||o.findings||[]).find(x=>x.id==='B4-003-R13-04-RENEWALS-ZERO-REGRESSION');
           if(f)Object.assign(f,{status,blocking:true,nextAction:rr.nextAction});
           for(const x of (o.inventory||o.findings||[]).filter(x=>/^B4-003-R(?:18|19)-/.test(String(x.id||''))))Object.assign(x,{status:blocked?'MACHINE_BLOCKED_R19':'MACHINE_PASS_PENDING_PAULA_VISUAL',blocking:true,nextAction:blocked?'B4_003_RENEWAL_DATA_AUTHORIZATION_OR_CONFLICT_RESOLUTION':'B4_003_R20_TARGETED_PAULA_VISUAL',machineProofReceiptPath:process.env.RECEIPT,machineProofReceiptBlobSha:process.env.RECEIPT_BLOB});
           if(r13&&blocked)Object.assign(r13,{status:'MACHINE_PROOF_PASS_EXCEPT_EXPLICIT_RENEWAL_DATA_BLOCKER',blocking:true,nextAction:'B4_003_RENEWAL_DATA_AUTHORIZATION_OR_CONFLICT_RESOLUTION'});
+          const authoritative=JSON.parse(fs.readFileSync(process.env.FINDINGS,'utf8'));
+          const rows=Array.isArray(o.inventory)?o.inventory:[];
+          const statuses=new Map((authoritative.findings||[]).map(x=>[String(x.id),String(x.status||'')]));
+          if(rows.length!==statuses.size||rows.some(x=>!statuses.has(String(x.id))))throw Error('B4_003_CARRY_LEDGER_ID_SET_MISMATCH');
+          for(const row of rows)row.status=statuses.get(String(row.id));
+          o.sourceLedgerPreviousBlobSha=o.expectedLedgerNextBlobSha||'';
+          o.expectedLedgerNextBlobSha=process.env.FINDINGS_BLOB;
           o.machineProofReceiptPath=process.env.RECEIPT;o.machineProofReceiptBlobSha=process.env.RECEIPT_BLOB;
           fs.writeFileSync(p,JSON.stringify(o,null,2)+'\n');
           NODE
