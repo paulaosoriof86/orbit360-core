@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B4_EXECUTION_LOCK_V1",
   "recordedAt": "2026-10-08T21:43:35.454Z",
-  "status": "B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL",
+  "status": "B4_003_R23_SOURCE_STAGED_PENDING_PREVIEW",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "block": "B4",
@@ -38,10 +38,10 @@
   "activeFinding": {
     "id": "B4-003",
     "title": "Cumulative B4-003 remediation: Renovaciones, Cancelaciones and source-backed insurer knowledge.",
-    "status": "B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL",
+    "status": "B4_003_R23_SOURCE_STAGED_PENDING_PREVIEW",
     "blocking": true,
-    "nextAction": "B4_003_R20_TARGETED_PAULA_VISUAL",
-    "humanVisualStatus": "PENDING_R20_TARGETED_VISUAL",
+    "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_R23_CONTRACT_AND_EXACT_PREVIEW",
+    "humanVisualStatus": "PAULA_PARTIAL_PASS_ONLY_UAT_MORE_PROOF_REQUIRED",
     "knowledgePreview": true
   },
   "rules": {
@@ -91,8 +91,8 @@
     ],
     "reimportAuthorized": false,
     "livePromotionAuthorized": false,
-    "syntheticQaWritesAuthorized": false,
-    "syntheticQaScope": "B4-003 R23 exact Preview synthetic fixtures with mandatory cleanup only; no real writes, no LIVE",
+    "syntheticQaWritesAuthorized": true,
+    "syntheticQaScope": "B4-003 existing exact isolated Preview only; disposable B4003 fixtures, targeted advisor UI readback/reload, read-only cancelled-run inventory, cleanup required",
     "paulaVisualAcceptanceRequiredBeforeAdvance": true,
     "cotcompRealTransportAuthorized": false,
     "providerDeploymentAuthorized": true,
@@ -119,7 +119,7 @@
     "renewalCutoffDataMutationAuthorized": false,
     "realOperationalWritesAuthorized": false
   },
-  "nextAction": "B4_003_R20_TARGETED_PAULA_VISUAL",
+  "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_R23_CONTRACT_AND_EXACT_PREVIEW",
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
     "blobSha": "2d9d2ef9fb67a57c518c4a62fec4eb86254ce21d",
@@ -2257,5 +2257,16 @@
     "nextP0": "OPS_ADVISOR_REASSIGNMENT_DURABLE_E2E",
     "noLive": true,
     "noDataWrites": true
+  },
+  "b4003QaContinuation20261012": {
+    "status": "QA_ONLY_PREVIEW_PENDING",
+    "userDirective": "RETOMA",
+    "activeP0": "B4-003-UAT-20261011-02",
+    "qaProofBlobSha": "9ab7eb3e5ddf32e76d2bebe644fad4d69ab4265a",
+    "cancelledRun": 38102224750,
+    "previousVisualAcceptancePreserved": true,
+    "realDataWritesAuthorized": false,
+    "qaDeleteHistoricalAllowed": false,
+    "productionForbidden": true
   }
 }
