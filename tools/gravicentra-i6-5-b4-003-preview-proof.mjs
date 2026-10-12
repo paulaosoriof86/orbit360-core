@@ -295,6 +295,9 @@ async function r23ProofSnapshot(browser,who,country,month){
     return{month,currency,hasAuthenticatedSession:!!Orbit.auth?.productUser?.uid,
       total:Number(total[currency]||0),personal:Number(personal[currency]||0),
       countryIsolation:!Number(total[other]||0)&&!Number(personal[other]||0),
+      julyRealized: q.recaudoMesPorMoneda('2026-07'),
+      julyPersonal: ownAdvisorId?q.recaudoMesPorMoneda('2026-07',ownAdvisorId):{},
+      hydratedCobroRows:(Orbit.store&&typeof Orbit.store.all==='function'?(Orbit.store.all('cobros')||[]).length:-1),
       monthlyPanel:!!panel,countryCard:!!card,source:String(card?.getAttribute('data-goal-source')||''),
       hasOwnAdvisor:!!ownAdvisorId,visibleText:String(card?.innerText||'').slice(0,400)};
   },{country,ownAdvisorId:api.ownAdvisorId||''});
@@ -634,6 +637,53 @@ async function runR26RealReadOnly(){
   if(!date)historic.receiptEvidenceWithoutDate++;
   else put(historic.receiptPaymentEvidenceByMonth,date);
  }
+
+ // Independent Firestore readback of real July payments; never reimport or create a receipt.
+ // Apply the same canonical precedence for policy country/currency and policy ownership.
+ const july={month:'2026-07',confirmedCount:0,eligibleCount:0,nonpositiveCount:0,
+   missingPolicyCount:0,countryConflictCount:0,currencyUnknownCount:0,
+   ambiguousAdvisorCount:0,amounts:{GTQ:0,COP:0},counts:{GT:0,CO:0},
+   ownerTotals:new Map(),knownReceiptPayments:0,datedProjectedReceipts:0,
+   directLinkedReceiptIds:new Set(),directLinkedCobroIds:new Set()};
+ const tenantClients=new Map((await tenant.collection('data').doc('clientes').collection('items').get()).docs.map(d=>[d.id,d.data()||{}]));
+ for(const doc of cSnap.docs){
+   const c=doc.data()||{},state=norm(c.estado);
+   if(!(['pagado','conciliado'].includes(state)||c.conciliado===true))continue;
+   if(clean(c.fechaPago||c.paidDate||c.inferredEffectiveDate).slice(0,7)!=='2026-07')continue;
+   july.confirmedCount++;
+   const policy=policies.get(clean(c.polizaId));
+   if(!policy){july.missingPolicyCount++;continue;}
+   const client=tenantClients.get(clean(c.clienteId||policy.clienteId))||{};
+   const policyCountry=clean(policy.pais).toUpperCase();
+   const cobroCountry=clean(c.pais).toUpperCase();
+   const clientCountry=clean(client.pais).toUpperCase();
+   if(policyCountry&&cobroCountry&&policyCountry!==cobroCountry){july.countryConflictCount++;continue;}
+   const country=policyCountry||cobroCountry||clientCountry;
+   const cur=clean(policy.moneda||policy.divisa||c.moneda||client.moneda).toUpperCase();
+   if(!['GT','CO'].includes(country)||!['GTQ','COP'].includes(cur)||cur!==(country==='GT'?'GTQ':'COP')){july.currencyUnknownCount++;continue;}
+   const n=Number(c.monto);
+   if(!Number.isFinite(n)||n<=0){july.nonpositiveCount++;continue;}
+   july.eligibleCount++;july.amounts[cur]+=n;july.counts[country]++;
+   const advisor=clean(policy.asesorId),declared=clean(c.asesorId);
+   if(!advisor||(declared&&declared!==advisor)){july.ambiguousAdvisorCount++;continue;}
+   const key=country+'|'+advisor;july.ownerTotals.set(key,(july.ownerTotals.get(key)||0)+n);
+   if(c.reciboId||c.receiptId)july.directLinkedReceiptIds.add(clean(c.reciboId||c.receiptId));
+   if(doc.id)july.directLinkedCobroIds.add(doc.id);
+ }
+ for(const doc of rSnap.docs){
+   const r=doc.data()||{},st=norm(r.estado),op=norm(r.estadoOperativo),ps=clean(r.paymentState).toUpperCase();
+   const paid=st==='pagado'||ps.startsWith('PAID_')||
+     ['pagado','pago_inferido','pago_reportado_aplicado','pago_reportado_asesor_aplicado'].includes(op)||
+     !!(r.cobroId||r.paidDate||r.fechaPago);
+   if(!paid)continue;
+   july.knownReceiptPayments++;
+   if(july.directLinkedReceiptIds.has(doc.id)||july.directLinkedCobroIds.has(clean(r.cobroId)))continue;
+   if(clean(r.fechaPago||r.paidDate||r.inferredEffectiveDate).slice(0,7)==='2026-07')july.datedProjectedReceipts++;
+ }
+ // A precise independent comparison is possible only if all real payment rows have validated lineage.
+ const julySourceUnambiguous=july.confirmedCount>0&&july.missingPolicyCount===0&&
+   july.countryConflictCount===0&&july.currencyUnknownCount===0&&july.nonpositiveCount===0&&
+   july.ambiguousAdvisorCount===0&&july.datedProjectedReceipts===0;
  const seen=new Set(),cases=[],roles=['direccion','operativo','asesor'];
  const chromiumBrowser=await chromium.launch({headless:true,args:['--no-sandbox']});
  try{
@@ -654,6 +704,19 @@ async function runR26RealReadOnly(){
     const canAssertTotal=row.api.scope==='all'&&rawCount>0&&conflicted===0&&unlinked===0&&nonpositive===0;
     if(canAssertTotal)need(v.total+0.005>=rawAmount,
       'B4_003_R26_AUTHENTICATED_PAYMENT_UNDERCOUNT:'+role+':'+country);
+
+    const julyCurrency=country==='GT'?'GTQ':'COP';
+    const observedGlobal=Number(v.julyRealized?.[julyCurrency]||0);
+    const observedPersonal=Number(v.julyPersonal?.[julyCurrency]||0);
+    const expectedGlobal=Number(july.amounts[julyCurrency]||0);
+    const ownId=clean(row.api.ownAdvisorId);
+    const expectedPersonal=ownId?Number(july.ownerTotals.get(country+'|'+ownId)||0):0;
+    const globalComparable=row.api.scope==='all'&&julySourceUnambiguous&&july.counts[country]>0;
+    const personalComparable=!!ownId&&julySourceUnambiguous;
+    if(globalComparable)need(Math.abs(observedGlobal-expectedGlobal)<0.005,
+      'B4_003_R26_JULY_GLOBAL_SOURCE_PARITY_FAILED:'+role+':'+country+':'+observedGlobal+':'+expectedGlobal);
+    if(personalComparable)need(Math.abs(observedPersonal-expectedPersonal)<0.005,
+      'B4_003_R26_JULY_PERSONAL_SOURCE_PARITY_FAILED:'+role+':'+country+':'+observedPersonal+':'+expectedPersonal);
     const own=row.api.ownAdvisorId||'';
     const ownRow=row.api.rows.find(x=>x.id===own);
     const goal=ownRow?.metas?.[country]?.recaudo||0;
@@ -663,19 +726,39 @@ async function runR26RealReadOnly(){
     cases.push({role,country,scope:row.api.scope,authenticated:true,reload:true,
        countryIsolation:true,sourcePaymentRows:rawCount,serverTotalLowerBoundChecked:canAssertTotal,
        ownAdvisorBound:!!own,ownGoalSet:goal>0,ownGoalVisible:personalVisible,
+       julySourceUnambiguous,julyConfirmedCountryRows:july.counts[country],
+       julyGlobalCompared:globalComparable,julyPersonalCompared:personalComparable,
+       julyPositiveGlobalCompared:globalComparable&&expectedGlobal>0,
+       julyPositivePersonalCompared:personalComparable&&expectedPersonal>0,
+       julyObservedGlobal:observedGlobal,julyExpectedGlobal:globalComparable?expectedGlobal:null,
+       julyObservedPersonal:observedPersonal,julyExpectedPersonal:personalComparable?expectedPersonal:null,
+       hydratedCobroRows:v.hydratedCobroRows,
        personalNonzero:v.personal>0,globalNonzero:v.total>0,
        monthlyPanel:true,countryCard:true});
    }
   }
  }finally{await chromiumBrowser.close();}
+ const julyPositiveComparisons=cases.filter(x=>x.julyPositiveGlobalCompared||x.julyPositivePersonalCompared).length;
+ const julyScopeComparisons=cases.filter(x=>x.julyPersonalCompared).length;
+ const julySourcePositive=july.confirmedCount>0&&july.eligibleCount>0;
  const observed=cases.filter(x=>x.serverTotalLowerBoundChecked).length;
- const status=observed>0?'R26_AUTHENTICATED_READONLY_PARTIAL_PASS_ORIGIN_PARITY_OPEN':'R26_AUTHENTICATED_READONLY_PARTIAL_NO_CURRENT_MONTH_SOURCE_ANCHOR';
+ const status=julyPositiveComparisons>0?'R26_JULY_POSITIVE_SOURCE_BACKED_ROLE_PARITY_PASS_OCTOBER_AND_ACCEPTANCE_OPEN':
+    julySourcePositive?'R26_JULY_SOURCE_POSITIVE_PARITY_BLOCKED':'R26_AUTHENTICATED_READONLY_PARTIAL_NO_CURRENT_MONTH_SOURCE_ANCHOR';
  const result={schema:'GRAVICENTRA_B4003_R26_AUTHENTICATED_REAL_READBACK_V1',status,runId:run,
    candidateSourceSha:process.env.B4_003_R26_SOURCE_SHA||'',target,
    readOnly:true,realBusinessWrites:0,syntheticWrites:0,liveTouched:false,reimport:false,
    month,rawSource:{policies:pSnap.size,cobros:cSnap.size,receipts:rSnap.size,
      currentMonthConfirmedGT:direct.get('GT'),currentMonthConfirmedCO:direct.get('CO'),
-     unlinked,undated,conflicted,nonpositive,history:historic},
+     unlinked,undated,conflicted,nonpositive,history:historic,
+     julyIndependent:{month:july.month,confirmedCount:july.confirmedCount,eligibleCount:july.eligibleCount,
+       byCountry:july.counts,byCurrency:july.amounts,unlinked:july.missingPolicyCount,
+       countryConflict:july.countryConflictCount,currencyUnknown:july.currencyUnknownCount,
+       nonpositive:july.nonpositiveCount,ambiguousAdvisor:july.ambiguousAdvisorCount,
+       receiptPaymentEvidenceCount:july.knownReceiptPayments,
+       datedUnlinkedProjectedReceiptCount:july.datedProjectedReceipts,
+       sourceUnambiguous:julySourceUnambiguous,positiveComparisons:julyPositiveComparisons,
+       roleScopedComparisons:julyScopeComparisons}},
+
    cases,verifiedPositiveMoneyCases:observed,
    unresolved:['INDEPENDENT_RECEIPT_PROJECTION_AND_PAYMENT_ORIGIN_PARITY','P0_FINAL_ROLE_BY_ROLE_FINANCIAL_ACCEPTANCE','PAULA_TARGETED_VISUAL_REVIEW'],
    p0Closed:false};
