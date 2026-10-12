@@ -609,6 +609,31 @@ async function runR26RealReadOnly(){
   if(!Number.isFinite(n)||n<=0){nonpositive++;continue;}
   direct.set(c,(direct.get(c)||0)+1);amounts.set(c,(amounts.get(c)||0)+n);
  }
+ // R26 historical source inventory: read-only and aggregate-only. A previous
+ // month with a genuine payment can discriminate attribution without fabricating
+ // an October payment. Do not treat a reported payment as confirmed.
+ const historic={confirmedPaymentsByMonth:{},receiptPaymentEvidenceByMonth:{},
+   confirmedWithoutPaymentDate:0,reportedCobros:0,receiptEvidenceWithoutDate:0};
+ const put=(bucket,key)=>{if(!/^20\\d{2}-(0[1-9]|1[0-2])$/.test(key))return;
+   bucket[key]=(bucket[key]||0)+1;};
+ for(const d of cSnap.docs){
+  const x=d.data()||{},st=norm(x.estado);
+  const confirmed=['pagado','conciliado'].includes(st)||x.conciliado===true;
+  if(!confirmed){historic.reportedCobros++;continue;}
+  const date=clean(x.fechaPago||x.paidDate||x.inferredEffectiveDate).slice(0,7);
+  if(!date)historic.confirmedWithoutPaymentDate++;
+  else put(historic.confirmedPaymentsByMonth,date);
+ }
+ for(const d of rSnap.docs){
+  const x=d.data()||{},st=norm(x.estado),pay=clean(x.paymentState).toUpperCase(),
+    operational=norm(x.estadoOperativo),isPaid=st==='pagado'||pay.startsWith('PAID_')||
+    ['pagado','pago_inferido','pago_reportado_aplicado','pago_reportado_asesor_aplicado'].includes(operational)||
+    !!(x.cobroId||x.paidDate||x.fechaPago);
+  if(!isPaid)continue;
+  const date=clean(x.fechaPago||x.paidDate||x.inferredEffectiveDate).slice(0,7);
+  if(!date)historic.receiptEvidenceWithoutDate++;
+  else put(historic.receiptPaymentEvidenceByMonth,date);
+ }
  const seen=new Set(),cases=[],roles=['direccion','operativo','asesor'];
  const chromiumBrowser=await chromium.launch({headless:true,args:['--no-sandbox']});
  try{
@@ -650,7 +675,7 @@ async function runR26RealReadOnly(){
    readOnly:true,realBusinessWrites:0,syntheticWrites:0,liveTouched:false,reimport:false,
    month,rawSource:{policies:pSnap.size,cobros:cSnap.size,receipts:rSnap.size,
      currentMonthConfirmedGT:direct.get('GT'),currentMonthConfirmedCO:direct.get('CO'),
-     unlinked,undated,conflicted,nonpositive},
+     unlinked,undated,conflicted,nonpositive,history:historic},
    cases,verifiedPositiveMoneyCases:observed,
    unresolved:['INDEPENDENT_RECEIPT_PROJECTION_AND_PAYMENT_ORIGIN_PARITY','P0_FINAL_ROLE_BY_ROLE_FINANCIAL_ACCEPTANCE','PAULA_TARGETED_VISUAL_REVIEW'],
    p0Closed:false};
