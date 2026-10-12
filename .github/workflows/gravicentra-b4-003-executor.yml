@@ -185,6 +185,31 @@ jobs:
             && l.boundaries?.providerDeploymentAuthorized===true
             && l.boundaries?.reimportAuthorized===false
             && l.boundaries?.livePromotionAuthorized===false;
+          // R26 targeted QA-only proof consumes the already-certified immutable Preview.
+          // No deploy, real writes, data migration, or reopening accepted visual scope.
+          const {execFileSync}=require('node:child_process');
+          const qaTrigger=execFileSync('git',['log','-1','--format=%s'],{encoding:'utf8'}).trim()==='test(i6.5 R26): authenticated read-only payment parity proof';
+          const exactPreview=String(c.currentB4?.previewUrl||'');
+          const r26ReadOnly=qaTrigger
+            && c.currentB4?.status==='B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL'
+            && c.nextAction==='I6_5_FORENSIC_REMEDIATION_B4_003_R20_TARGETED_PAULA_VISUAL'
+            && c.r26PersonalCollection?.p0Closed===false
+            && c.r26PersonalCollection?.noDataWrites===true
+            && c.r26PersonalCollection?.noProduction===true
+            && l.r26PersonalRecaudoSource?.findingId==='B4-003-P0-20261012-PERSONAL-COLLECTION'
+            && l.boundaries?.dataMutationAuthorized===false
+            && l.boundaries?.realOperationalWritesAuthorized===false
+            && l.boundaries?.livePromotionAuthorized===false
+            && l.boundaries?.syntheticQaWritesAuthorized===false
+            && /^https:\/\/ays-orbit-360-lab--gi-i65-b4-/.test(exactPreview)
+            && /^[a-f0-9]{40}$/.test(String(c.currentB4?.sourceSha||''))
+            && c.currentB4?.exactReadback===true;
+          if(qaTrigger&&!r26ReadOnly)throw Error('B4_003_R26_QA_BOUNDARY_INVALID_FAIL_CLOSED');
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'r26_readonly='+(r26ReadOnly?'true':'false')+'\n');
+          if(r26ReadOnly){
+            fs.appendFileSync(process.env.GITHUB_OUTPUT,'r26_preview='+exactPreview+'\n');
+            fs.appendFileSync(process.env.GITHUB_OUTPUT,'r26_source='+c.currentB4.sourceSha+'\n');
+          }
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'renewals_preview='+(renewalsPreview?'true':'false')+'\n');
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'run='+(previewOk?'true':'false')+'\n');
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'apply='+(applyOk?'true':'false')+'\n');
@@ -195,6 +220,51 @@ jobs:
           console.log('B4_003_PREVIEW_MODE='+(previewOk?'RUN':'NOOP')+' RENEWALS_PRIORITY_PREVIEW='+(renewalsPreview?'RUN':'NOOP')+' APPLY_MODE='+(applyOk?'RUN':'NOOP')+' R20_DRYRUN_MODE='+(r20DryRun?'RUN':'NOOP')+' R20_APPLY_MODE='+(r20Apply?'RUN':'NOOP')+' R20_CUTOFF_APPLY='+(r20CutoffApply?'RUN':'NOOP')+' R20_SECOND_DRYRUN='+(secondReviewDryRun?'RUN':'NOOP'));
           NODE
 
+
+      - name: Prepare R26 authenticated read-only QA
+        if: steps.gate.outputs.r26_readonly == 'true'
+        run: |
+          set -euo pipefail
+          node --check tools/gravicentra-i6-5-b4-003-preview-proof.mjs
+          python3 - <<'PY'
+          import json,os,pathlib
+          dest=pathlib.Path(os.environ['RUNNER_TEMP'])/'gravicentra-r26-readonly-service-account.json'
+          keys=['SA_DEFAULT','SA_ORBIT360_LAB','SA_ORBIT_360_LAB']
+          chosen=None
+          for key in keys:
+              try: item=json.loads(os.environ.get(key,''))
+              except (ValueError,TypeError): continue
+              if item.get('type')=='service_account' and item.get('project_id')=='ays-orbit-360-lab' and item.get('private_key'):
+                  chosen=item;break
+          if not chosen:raise SystemExit('B4_003_R26_READONLY_FIREBASE_AUTH_MISSING')
+          dest.write_text(json.dumps(chosen),encoding='utf-8')
+          dest.chmod(0o600)
+          with open(os.environ['GITHUB_ENV'],'a',encoding='utf-8') as handle: handle.write('GOOGLE_APPLICATION_CREDENTIALS='+str(dest)+'\\n')
+          print('B4_003_R26_READONLY_SERVICE_ACCOUNT_PRESENT')
+          PY
+          npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund firebase-admin@13.4.0 playwright@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: R26 real-data authenticated Preview readback
+        if: steps.gate.outputs.r26_readonly == 'true'
+        env:
+          B4_PREVIEW_URL: ${{ steps.gate.outputs.r26_preview }}
+          B4_003_R26_CERTIFIED_PREVIEW: ${{ steps.gate.outputs.r26_preview }}
+          B4_003_R26_SOURCE_SHA: ${{ steps.gate.outputs.r26_source }}
+          B4_003_R26_READONLY: 'true'
+          B4_003_PROOF_OUT: ${{ runner.temp }}/b4-003-r26-real-readonly.json
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-i6-5-b4-003-preview-proof.mjs
+
+      - name: Preserve R26 financial QA evidence
+        if: always() && steps.gate.outputs.r26_readonly == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: gravicentra-b4-003-r26-authenticated-readonly-${{ github.run_id }}
+          path: ${{ runner.temp }}/b4-003-r26-real-readonly.json
+          if-no-files-found: warn
+          retention-days: 14
 
       - name: Snapshot preexisting LIVE binding before second R20 review dry-runs
         if: steps.gate.outputs.r20_second_dryrun == 'true'
