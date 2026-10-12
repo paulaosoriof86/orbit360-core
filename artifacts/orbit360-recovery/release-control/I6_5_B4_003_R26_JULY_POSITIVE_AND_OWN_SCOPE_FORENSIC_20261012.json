@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I65_B4003_R26_JULY_SOURCE_POSITIVE_AND_OWN_SCOPE_FORENSIC_V1",
   "date": "2026-10-12",
-  "status": "JULY_REAL_PAYMENT_PARITY_VERIFIED_OWN_SCOPE_EXPOSURE_BLOCKING",
+  "status": "JULY_REAL_PAYMENT_PARITY_VERIFIED_OWN_SCOPE_FAIL_CLOSED_BLOCKING",
   "gate": "I6.5/B4-003",
   "findingId": "B4-003-P0-20261012-PERSONAL-COLLECTION",
   "kind": "SUPPLEMENTARY_EVIDENCE_NOT_GATE_ACCEPTANCE",
@@ -116,5 +116,24 @@
     "newBuild": false,
     "newPreview": false,
     "newProductionDeploy": false
+  },
+  "failClosedRegressionProof": {
+    "runId": 38322897777,
+    "jobId": 115054832549,
+    "sourceSha": "af2a91e7f4132f03592cf3e076f069d4ed13faaa",
+    "status": "EXPECTED_BLOCKING_FAILURE_CONFIRMED",
+    "causeCode": "B4_003_R26_OWN_SCOPE_COUNTRY_TOTAL_EXPOSURE_BLOCKING:operativo:GT,asesor:GT",
+    "artifactId": 11779691968,
+    "artifactName": "gravicentra-b4-003-r26-authenticated-readonly-38322897777",
+    "artifactSha256": "315ed82a7f8e59d178a8515c0a0414a815e2226c8d9fc15fc227c5c86b61c75d",
+    "details": {
+      "authenticatedRoleContexts": 5,
+      "ownScopeExposures": 2,
+      "positiveTotalBeforeBlock": 2743.61,
+      "positivePersonalBeforeBlock": 2615.85,
+      "realBusinessWrites": 0,
+      "productionTouched": false
+    },
+    "p0Closed": false
   }
 }
