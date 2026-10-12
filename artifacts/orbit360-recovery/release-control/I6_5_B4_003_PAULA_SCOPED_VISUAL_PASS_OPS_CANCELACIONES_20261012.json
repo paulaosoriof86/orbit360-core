@@ -1,0 +1,44 @@
+{
+  "schema": "GRAVICENTRA_I65_B4003_PAULA_SCOPED_VISUAL_ACCEPTANCE_20261012_V1",
+  "status": "SCOPED_HUMAN_VISUAL_PASS_NO_GATE_CLOSURE",
+  "userStatement": "Ya lo que debía revisar de preview está bien en ops y cancelaciones.",
+  "gate": "I6.5/B4-003",
+  "preview": "https://ays-orbit-360-lab--gi-i65-b4-38282275915-949g36lw.web.app",
+  "sourceSha": "bf2e398622995e1794b53640b348a7a3a3bbbc7c",
+  "machineRunId": 38282275915,
+  "scopedAcceptance": {
+    "opsLeads": "HUMAN_VISUAL_PASS_REVIEWED_SCOPE_ONLY",
+    "cancelaciones": "HUMAN_VISUAL_PASS_REVIEWED_SCOPE_ONLY"
+  },
+  "coveredReviewInstructions": [
+    "Ops/Leads: abrir ficha y visualizar edición de responsable/asesor sin escrituras reales",
+    "Cancelaciones: motivo y preparación WhatsApp sin enviar ni escribir datos reales"
+  ],
+  "carriedPreviouslyAccepted": {
+    "inicio": "VISUAL_PASS_WITH_FINANCIAL_READBACK_HOLD",
+    "cliente360": "VISUAL_PASS_R24_FINANCIAL_REGRESSION_PROOF_REQUIRED",
+    "renovaciones": "VISUAL_PASS_WITH_OUTCOME_PENDING",
+    "collaborationActor": "PREVIOUS_VISUAL_PASS_PRESERVED"
+  },
+  "machineEvidence": {
+    "advisorReassignment": "PASS_SYNTHETIC_UI_SERVER_READBACK_RELOAD",
+    "cancelReason": "PASS_SYNTHETIC_DURABLE",
+    "whatsapp": "PASS_DRAFT_ONLY",
+    "syntheticCleanup": true
+  },
+  "openP0": [
+    "B4-003-UAT-20261011-02",
+    "B4-003-UAT-20261011-04",
+    "B4-003-UAT-20261011-05",
+    "B4-003-P0-20261012-PERSONAL-COLLECTION",
+    "B4-003-P0-20261012-INSTITUTIONAL-GOALS",
+    "B4-003-P0-20261012-FREELANCERS-GOAL-SCOPE",
+    "B4-003-P0-20261012-INICIO-MOTIVATIONAL-TEXTS",
+    "B4-003-P0-20261012-QA-CANCELLED-RUN-FIXTURES",
+    "B4-003-P0-20261012-QA-ORPHAN-RENEWALS"
+  ],
+  "noWrite": true,
+  "noProductionChange": true,
+  "noReimport": true,
+  "b4004UnchangedHeld": true
+}

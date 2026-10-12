@@ -7746,7 +7746,14 @@
     "causalAuditPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_UAT3_CONCENTRATED_CAUSAL_AUDIT_P0_20261008.json",
     "causalAuditBlobSha": "9860f7d3aaaf8b1bbfdcae57636bb024b71ba33c",
     "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_RENEWALS_LIFECYCLE_CAUSAL_FIX_AND_GOVERNANCE_RECONCILIATION_20261008.json",
-    "sourceFixReceiptBlobSha": "00bc96d3bd14998bafbe851eeccb506ec88cc25b"
+    "sourceFixReceiptBlobSha": "00bc96d3bd14998bafbe851eeccb506ec88cc25b",
+    "scopedVisual20261012": {
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PAULA_SCOPED_VISUAL_PASS_OPS_CANCELACIONES_20261012.json",
+      "receiptBlobSha": "1bd7a04cd61c9f654b654e42776713326686c0b0",
+      "ops": "SCOPED_PASS",
+      "cancelaciones": "SCOPED_PASS",
+      "doesNotEqualB4003FullHumanAcceptance": true
+    }
   },
   "b3FinancialVisualFeedbackCarry": {
     "status": "R8_SYSTEM_FIRST_SOURCE_REUSE_AND_HEALTH_QUEUE",
@@ -9643,5 +9650,15 @@
     "realWrites": 0,
     "livePromotion": false,
     "nextActionUnchanged": true
+  },
+  "paulaVisualReview20261012OpsCancelaciones": {
+    "status": "SCOPED_HUMAN_VISUAL_PASS_NO_GATE_CLOSURE",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PAULA_SCOPED_VISUAL_PASS_OPS_CANCELACIONES_20261012.json",
+    "receiptBlobSha": "1bd7a04cd61c9f654b654e42776713326686c0b0",
+    "previewRunId": 38282275915,
+    "ops": "ACCEPTED_IN_REQUESTED_VISUAL_SCOPE",
+    "cancelaciones": "ACCEPTED_IN_REQUESTED_VISUAL_SCOPE",
+    "p0OpenPreserved": true,
+    "noLive": true
   }
 }
