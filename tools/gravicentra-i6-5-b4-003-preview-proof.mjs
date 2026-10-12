@@ -741,8 +741,15 @@ async function runR26RealReadOnly(){
  const julyPositiveComparisons=cases.filter(x=>x.julyPositiveGlobalCompared||x.julyPositivePersonalCompared).length;
  const julyScopeComparisons=cases.filter(x=>x.julyPersonalCompared).length;
  const julySourcePositive=july.confirmedCount>0&&july.eligibleCount>0;
+ // A positive all-advisor financial amount is not an authorized own-scope
+ // proof. Fail closed until the effective Cobros/Inicio scope and server rules
+ // establish that this institutional value is permitted for the active role.
+ const ownScopeCountryExposure=cases.filter(x=>x.scope==='own'&&x.julySourceUnambiguous&&
+   x.julyConfirmedCountryRows>0&&x.julyObservedGlobal>x.julyObservedPersonal+0.005);
+
  const observed=cases.filter(x=>x.serverTotalLowerBoundChecked).length;
- const status=julyPositiveComparisons>0?'R26_JULY_POSITIVE_SOURCE_BACKED_ROLE_PARITY_PASS_OCTOBER_AND_ACCEPTANCE_OPEN':
+ const status=ownScopeCountryExposure.length>0?'R26_JULY_PARITY_VERIFIED_BUT_OWN_SCOPE_COUNTRY_TOTAL_EXPOSURE_BLOCKED':
+    julyPositiveComparisons>0?'R26_JULY_POSITIVE_SOURCE_BACKED_ROLE_PARITY_PASS_OCTOBER_AND_ACCEPTANCE_OPEN':
     julySourcePositive?'R26_JULY_SOURCE_POSITIVE_PARITY_BLOCKED':'R26_AUTHENTICATED_READONLY_PARTIAL_NO_CURRENT_MONTH_SOURCE_ANCHOR';
  const result={schema:'GRAVICENTRA_B4003_R26_AUTHENTICATED_REAL_READBACK_V1',status,runId:run,
    candidateSourceSha:process.env.B4_003_R26_SOURCE_SHA||'',target,
@@ -760,11 +767,16 @@ async function runR26RealReadOnly(){
        roleScopedComparisons:julyScopeComparisons}},
 
    cases,verifiedPositiveMoneyCases:observed,
+   ownScopeCountryExposure:{blocked:ownScopeCountryExposure.length>0,count:ownScopeCountryExposure.length,
+     roles:ownScopeCountryExposure.map(x=>({role:x.role,country:x.country,scope:x.scope,
+       institutionalAmount:x.julyObservedGlobal,ownAmount:x.julyObservedPersonal})),
+     permissionRequiresServerEnforcedReadback:true,productionAcceptance:false},
    unresolved:['INDEPENDENT_RECEIPT_PROJECTION_AND_PAYMENT_ORIGIN_PARITY','P0_FINAL_ROLE_BY_ROLE_FINANCIAL_ACCEPTANCE','PAULA_TARGETED_VISUAL_REVIEW'],
    p0Closed:false};
  fs.writeFileSync(outPath,JSON.stringify(result,null,2)+'\n');
  console.log(JSON.stringify({status,resultPath:outPath,caseCount:cases.length,
    verifiedPositiveMoneyCases:observed,realBusinessWrites:0,liveTouched:false,p0Closed:false}));
+ if(ownScopeCountryExposure.length)throw Error('B4_003_R26_OWN_SCOPE_COUNTRY_TOTAL_EXPOSURE_BLOCKING:'+ownScopeCountryExposure.map(x=>x.role+':'+x.country).join(','));
 }
 if(process.env.B4_003_R26_READONLY==='true'){
  await runR26RealReadOnly();
