@@ -2969,7 +2969,7 @@
       "block": "B4",
       "source": "FROZEN_PLAN",
       "finding": "Cumulative B4-003 remediation: lifecycle, premium/source authority, Information Health, insurer knowledge and Gravicentra↔CotComp Quote Authority.",
-      "status": "MACHINE_PASS_PENDING_PAULA_VISUAL",
+      "status": "PAULA_VISUAL_PARTIAL_PASS_BLOCKING_20261011",
       "blocking": true,
       "mayDisappearWithoutDisposition": false,
       "humanEvidence": [
@@ -11137,7 +11137,26 @@
       "preUat3Blocking": true,
       "r21PriorStatus": "PAULA_VISUAL_REJECTED_R20_SECOND_REVIEW_REMEDIATION_REQUIRED",
       "r21SourceReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R21_BUSINESS_LINEAGE_ATTACHMENTS_INBOX_SOURCE_FIX_20261009.json",
-      "r21SourceReceiptBlobSha": "ba6c57c5b703329eea92be8d04b8e5074e7aae50"
+      "r21SourceReceiptBlobSha": "ba6c57c5b703329eea92be8d04b8e5074e7aae50",
+      "cancelledQaFixtureResidue20261011": {
+        "status": "CAUSE_DEMONSTRATED_READBACK_REQUIRED_NO_DELETE",
+        "historicalWorkflowRunId": 38102224750,
+        "historicalWorkflowConclusion": "cancelled",
+        "historicalFailedPhase": "Durable renewals cancelations browser proof",
+        "cleanupUnreached": true,
+        "sourceIdsPattern": "b4003qa_*_38102224750",
+        "userVisibleSurfaces": [
+          "Inicio prioridades",
+          "Inicio seguimientos",
+          "Cronograma",
+          "Ops colaboración"
+        ],
+        "rootCause": "QA executor cancel-in-progress true plus run-specific finally cleanup; newer PASS only asserts new run IDs absent",
+        "preventiveWorkflowCommit": "08eee75d01e1547071b87d5fd9833196a1015915",
+        "nextAction": "READ_ONLY_EXACT_UID_RUN_PROVENANCE_DEPENDENCIES_BEFORE_ANY_CLEANUP",
+        "beforeAfterDeletionEvidenceAbsent": true,
+        "deleteAuthorized": false
+      }
     },
     {
       "id": "B4-003-R20-V2-01-ACTION-QUEUE-RANK",
@@ -11868,6 +11887,22 @@
         "cause": "Gauge function restored but light gray-on-white contrast, hierarchy, surface separation remained visually rejected in Paula screenshot",
         "scope": "VISUAL_ONLY",
         "noFunctionalReopen": true
+      },
+      "visualReview20261011": {
+        "status": "HUMAN_VISUAL_ACCEPTED_SCOPED",
+        "previewRunId": 38184375082,
+        "design": "ACCEPTED_BY_PAULA",
+        "speedometer": "PASS",
+        "contrast": "PASS",
+        "personalGoalPct": "FORMULA_CONSISTENT_WITH_DISPLAYED_Q80K_AND_ROUNDED_Q11K",
+        "countryCurrencySeparation": "QA_ASSERTED",
+        "dataIntegrity": "HOLD_FOR_INDEPENDENT_SOURCE_AMOUNT_READBACK_AND_ORPHANED_PREVIEW_FIXTURES",
+        "fullCapabilityPass": false,
+        "notes": [
+          "Total confirmed cobros is historical; monthly confirmed could be zero without contradiction",
+          "Pending not overdue and overdue are separate portfolios",
+          "Only 18 of 719 nonoverdue obligations and 16 of 597 overdue obligations have valued amounts in human screenshot; avoid presenting Q amounts as complete portfolio universe until adjudication"
+        ]
       }
     },
     {
@@ -11909,7 +11944,13 @@
       "status": "OPEN_PAULA_20261011_CAUSAL_FIX_REQUIRED",
       "mayDisappearWithoutDisposition": false,
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PAULA_UAT_DECISIONS_AND_RECOVERY_20261011.json",
-      "receiptBlobSha": "abff2437533e1f9cab127acf0e5c98d1b024e37c"
+      "receiptBlobSha": "abff2437533e1f9cab127acf0e5c98d1b024e37c",
+      "visualReview20261011": {
+        "status": "VISUAL_PASS_COLLABORATION_ACTOR_HUMAN_NAMES",
+        "source": "PAULA_PREVIEW_SCREENSHOTS",
+        "scope": "Ops commercial comment panel",
+        "boundaries": "Does not certify cross-role notifications, reload across all surfaces, or historical actor names"
+      }
     },
     {
       "id": "B4-003-UAT-20261011-04",
