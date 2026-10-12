@@ -97,6 +97,39 @@ async function seed(who,fixtureAdvisorId,collabAdvisorId){
  await ref('negocios',ids.collabBusiness).set({...common,id:ids.collabBusiness,clienteId:ids.client,asesorId:collabAdvisorId||fixtureAdvisorId||who.advisorId||'qa',pais:'GT',moneda:'GTQ',titulo:'B4-003 QA colaboración',nombre:'B4-003 QA colaboración',etapa:'cotizando',estado:'Cotizando',origen:'Ops',comentarios:[],bitacora:[],archivado:false,previewWrite:true,previewSource:'b4003qa-harness'},{merge:false});proof.syntheticWrites++;
  await ref('negocios',ids.collabNoClientBusiness).set({...common,id:ids.collabNoClientBusiness,asesorId:collabAdvisorId||fixtureAdvisorId||who.advisorId||'qa',pais:'GT',moneda:'GTQ',titulo:'B4-003 QA colaboración pre-emisión',nombre:'B4-003 QA colaboración pre-emisión',etapa:'cotizando',estado:'Cotizando',origen:'Leads',comentarios:[],bitacora:[],archivado:false,previewWrite:true,previewSource:'b4003qa-harness'},{merge:false});proof.syntheticWrites++;
 }
+/* Existing B4-003 read-only diagnostic: verify exact fixtures orphaned by a cancelled run.
+   No deletes, no writes, no name-only heuristic; provenance and dependency checks first. */
+async function auditCancelledQaFixtures(){
+ const oldRun='38102224750',entries=[
+  ['clientes','b4003qa_client_'+oldRun],
+  ['polizas','b4003qa_policy_renew_'+oldRun],
+  ['polizas','b4003qa_policy_expired_renew_'+oldRun],
+  ['polizas','b4003qa_policy_unknown_'+oldRun],
+  ['polizas','b4003qa_policy_renewwrite_'+oldRun],
+  ['polizas','b4003qa_policy_cancel_'+oldRun],
+  ['polizas','b4003qa_policy_health_'+oldRun],
+  ['recibosEsperados','b4003qa_receipt_health_1_'+oldRun],
+  ['recibosEsperados','b4003qa_receipt_health_2_'+oldRun],
+  ['recibosEsperados','b4003qa_receipt_health_shadow_'+oldRun],
+  ['cancelaciones','b4003qa_cancel_'+oldRun],
+  ['aseguradoras','b4003qa_insurer_'+oldRun],
+  ['negocios','b4003qa_business_collab_'+oldRun],
+  ['negocios','b4003qa_business_collab_noclient_'+oldRun]
+ ];
+ const rows=[];
+ for(const [collection,id] of entries){
+  const snapshot=await ref(collection,id).get(),data=snapshot.exists?(snapshot.data()||{}):{};
+  rows.push({collection,id,exists:snapshot.exists,syntheticFlag:data.__syntheticQa===true,previewWrite:data.previewWrite===true,
+    ownerUidPresent:!!clean(data.ownerUid),ownerEmailPresent:!!clean(data.ownerEmail),source:clean(data.previewSource).slice(0,45),
+    clientRefPresent:!!clean(data.clienteId),policyRefPresent:!!clean(data.polizaId),
+    createdAtPresent:!!data.createdAt});
+ }
+ const byCollection={};
+ for(const row of rows){const v=byCollection[row.collection]||(byCollection[row.collection]={present:0,synthetic:0});if(row.exists)v.present++;if(row.exists&&row.syntheticFlag)v.synthetic++;}
+ return{status:'READ_ONLY_NO_DELETE',runId:Number(oldRun),cancellationStatus:'CANCELLED_MID_BROWSER_PROOF',rows,byCollection,
+  present:rows.filter(r=>r.exists).length,synthetic:rows.filter(r=>r.exists&&r.syntheticFlag).length,
+  provenOnlyForExactIds:true,dependencyGraphComplete:false,deleteAuthorized:false,operationalWrites:0};
+}
 async function applyLegal(page,who){
  const scope='user:'+clean(who.email||who.uid);
  await page.addInitScript(({scope})=>{try{
@@ -548,6 +581,7 @@ try{
  await cancellationEvidence();
  await renewalDistributionReadback();
  need(!!who.advisorId,'B4_003_R20_EXECUTION_ACTOR_ADVISOR_BINDING_REQUIRED');
+ proof.cancelledQaResidueAudit=await auditCancelledQaFixtures();
  await seed(who,who.advisorId,advisorActor.advisorId);
  const token=await auth.createCustomToken(who.uid);
  browser=await chromium.launch({headless:true,args:['--no-sandbox']});
@@ -1827,6 +1861,50 @@ try{
  proof.r21ResolvedOperationsCard={...opsResolvedActionCard,viewerRole:'direccion',actualResolutionActorRole:'operativo',fixtureStage:'cotizando'};
  proof.assertions.sharedInboxResolutionConvergesOpsActionBadge=true;
  proof.assertions.collaborationCanonicalIdentityAndTimestamp=true;
+
+ // B4-003 UAT-20261011-02 · real UI, server commit, reload; only disposable synthetic business.
+ const advisorBeforeSnap=await ref('negocios',ids.collabBusiness).get(),advisorBefore=advisorBeforeSnap.data()||{};
+ need(advisorBeforeSnap.exists&&advisorBefore.__syntheticQa===true&&advisorBefore.previewWrite===true,'B4_003_ADVISOR_REASSIGNMENT_SYNTHETIC_PRECONDITION_MISSING');
+ const newAdvisor=directionRoster?.rows?.find(r=>r&&r.assignable===true&&r.activo===true&&
+  String(r.id)!==String(advisorBefore.asesorId)&&(!r.paises?.length||r.paises.includes('GT')));
+ need(!!newAdvisor?.id,'B4_003_ADVISOR_REASSIGNMENT_AUTHORIZED_TARGET_MISSING');
+ const reassignmentToken=await auth.createCustomToken(directionActor.uid),editContext=await browser.newContext({ignoreHTTPSErrors:false,viewport:{width:1280,height:720}}),editPage=await editContext.newPage();
+ let reassignmentUi={};
+ try{
+  await applyLegal(editPage,directionActor);
+  await editPage.goto(target+'/#/ops',{waitUntil:'domcontentloaded',timeout:60000});
+  await bootProduct(editPage,reassignmentToken);
+  const active=await editPage.evaluate(role=>{
+   const norm=v=>String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'_');
+   return norm(Orbit.session?.rol?.())===norm(role)||Orbit.session?.set?.(role)===true;
+  },directionActor.activeRole);
+  need(active,'B4_003_ADVISOR_REASSIGNMENT_ACTIVE_ROLE_MISSING');
+  await editPage.waitForFunction(id=>Orbit.store?.get?.('negocios',id)?.previewWrite===true,ids.collabBusiness,{timeout:30000});
+  await editPage.evaluate(id=>Orbit.ciclo.openNegocio(id),ids.collabBusiness);
+  await editPage.waitForSelector('#ciclo-modal #ng-ase',{timeout:12000});
+  const selection=await editPage.evaluate(targetId=>{
+   const select=document.querySelector('#ciclo-modal #ng-ase');
+   return{visible:!!select,available:[...select.options].some(o=>o.value===targetId),before:String(select.value||'')};
+  },String(newAdvisor.id));
+  need(selection.visible&&selection.available&&selection.before!==String(newAdvisor.id),
+    'B4_003_ADVISOR_REASSIGNMENT_UI_TARGET_NOT_AVAILABLE');
+  await editPage.selectOption('#ciclo-modal #ng-ase',String(newAdvisor.id));
+  await editPage.click('#ciclo-modal #ng-save');
+  await editPage.waitForFunction(()=>!document.querySelector('#ciclo-modal')||!document.querySelector('#ciclo-modal #ng-save[aria-busy="true"]'),null,{timeout:20000});
+  reassignmentUi=await editPage.evaluate(()=>({closed:!document.querySelector('#ciclo-modal'),role:String(Orbit.session?.rol?.()||'')}));
+  need(reassignmentUi.closed,'B4_003_ADVISOR_REASSIGNMENT_UI_COMMIT_NOT_CONFIRMED');
+  const committed=(await ref('negocios',ids.collabBusiness).get()).data()||{};
+  need(committed.asesorId===String(newAdvisor.id),'B4_003_ADVISOR_REASSIGNMENT_SERVER_READBACK_FAILED');
+  await editPage.reload({waitUntil:'domcontentloaded'});await bootProduct(editPage,reassignmentToken);
+  await editPage.waitForFunction(id=>!!Orbit.store?.get?.('negocios',id),ids.collabBusiness,{timeout:30000});
+  const reloaded=await editPage.evaluate(id=>Orbit.store?.get?.('negocios',id)?.asesorId||'',ids.collabBusiness);
+  need(reloaded===String(newAdvisor.id),'B4_003_ADVISOR_REASSIGNMENT_RELOAD_NOT_PERSISTENT');
+  proof.r25AdvisorReassignment={status:'PASS_SYNTHETIC_UI_SERVER_READBACK_RELOAD',fixture:'b4003qa_business_collab_[run]',
+    directionActorDistinctFromAdvisor:true,previousAdvisorChanged:true,newAdvisorFromAuthorizedRoster:true,
+    uiClosedAfterCommit:reassignmentUi.closed,serverReadback:true,reloadPersistence:true,
+    operationalBusinessWrites:0,syntheticOnly:true};
+  proof.assertions.r25AdvisorReassignmentDurable=true;
+ }finally{await editContext.close();}
 
  // R13: controlled insurer Drive E2E on one disposable B4003 QA insurer only.
  // The ficha owner requires a host established by the module's canonical router.
