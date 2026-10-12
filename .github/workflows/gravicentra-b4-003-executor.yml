@@ -239,7 +239,7 @@ jobs:
           if not chosen:raise SystemExit('B4_003_R26_READONLY_FIREBASE_AUTH_MISSING')
           dest.write_text(json.dumps(chosen),encoding='utf-8')
           dest.chmod(0o600)
-          with open(os.environ['GITHUB_ENV'],'a',encoding='utf-8') as handle: handle.write('GOOGLE_APPLICATION_CREDENTIALS='+str(dest)+'\\n')
+          with open(os.environ['GITHUB_ENV'],'a',encoding='utf-8') as handle: handle.write('GOOGLE_APPLICATION_CREDENTIALS='+str(dest)+'\n')
           print('B4_003_R26_READONLY_SERVICE_ACCOUNT_PRESENT')
           PY
           npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund firebase-admin@13.4.0 playwright@1.55.0
