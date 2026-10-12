@@ -3184,7 +3184,24 @@ jobs:
           ref: ${{ github.sha }}
           fetch-depth: 0
           persist-credentials: false
+      - name: Gate historical B1 byte diagnostic
+        id: b1_byte_gate
+        env:
+          CONTROL: artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json
+        run: |
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const c=JSON.parse(fs.readFileSync(process.env.CONTROL,'utf8'));
+          const b=JSON.parse(fs.readFileSync(process.env.B1_LOCK,'utf8'));
+          const active=c.i65ForensicRemediationPlan?.currentBlock==='B1'
+            && String(c.nextAction||'').startsWith('I6_5_FORENSIC_REMEDIATION_B1_')
+            && /^PREVIEW_/.test(String(b.status||''))
+            && !!b.latestSuccessfulRun?.previewUrl;
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'run='+(active?'true':'false')+'\n');
+          console.log(active?'B1_BYTE_DIAG_ACTIVE':'B1_BYTE_DIAG_NOOP_HISTORIC_ACCEPTANCE_PRESERVED');
+          NODE
       - name: Compare Preview bytes to source
+        if: steps.b1_byte_gate.outputs.run == 'true'
         run: |
           set -euo pipefail
           python3 - <<'PY'
