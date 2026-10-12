@@ -122,13 +122,13 @@
   "nextAction": "B4_003_R20_TARGETED_PAULA_VISUAL",
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "blobSha": "c13bf0c925960e3ee84174604befb47e942531f5",
+    "blobSha": "d9e47cb9984d50320d3f45235396b68e05aea622",
     "status": "FROZEN_ACTIVE_UAT3_P0_BATCH_1_SOURCE_COMPLETE"
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "blobSha": "ac346111200a87c03f6572be583677121a62e911",
-    "count": 282
+    "blobSha": "b923461bc7b0bbff0df597187f0053228029e7b4",
+    "count": 295
   },
   "sourceFix": {
     "status": "FROZEN",
@@ -418,9 +418,9 @@
   },
   "continuityRegister": {
     "path": "artifacts/orbit360-recovery/release-control/I6_5_OPEN_FINDINGS_CARRY_FORWARD_REGISTER_20261003.json",
-    "blobSha": "bad7042273809e0a343e87d6890ecaf8d81cfa7e",
-    "inventoryCount": 282,
-    "attentionCount": 155,
+    "blobSha": "cc1f89ff31d1aea2e1f8055891f8f155de3b9c66",
+    "inventoryCount": 295,
+    "attentionCount": 166,
     "guardPath": "tools/gravicentra-open-findings-continuity-guard-v1.mjs",
     "guardBlobSha": "d45006a165be715b7663bbf61391e6c73b384c23",
     "enforcement": "ALL_FINDINGS_EXACTLY_ONCE_NO_SILENT_DISAPPEARANCE"
@@ -2268,5 +2268,10 @@
     "realDataWritesAuthorized": false,
     "qaDeleteHistoricalAllowed": false,
     "productionForbidden": true
+  },
+  "p0FindingsFreeze20261012": {
+    "status": "SIX_OPEN_UNTIL_FUNCTIONAL_AND_HUMAN_CLOSURE",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_P0_FINDINGS_DECISIONS_FREEZE_20261012.md",
+    "receiptBlobSha": "2760d2aeb961bac5a0ce11e326c689143d2cc083"
   }
 }

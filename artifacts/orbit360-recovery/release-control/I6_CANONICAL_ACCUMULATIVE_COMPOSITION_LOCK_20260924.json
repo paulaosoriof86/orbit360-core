@@ -2123,7 +2123,9 @@
     "r14SourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R14_NARROW_SOURCE_FIX_20261004.json",
     "r14SourceFixReceiptBlobSha": "df10f1bc9c5498fd74ab1a5732726813e6cbaea9",
     "r16SourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R16_COMPREHENSIVE_SOURCE_FIX_20261004.json",
-    "r16SourceFixReceiptBlobSha": "dcd545e14795e387a8f67130d5fa51aabfcd63ce"
+    "r16SourceFixReceiptBlobSha": "dcd545e14795e387a8f67130d5fa51aabfcd63ce",
+    "findingLedgerBlobSha": "b923461bc7b0bbff0df597187f0053228029e7b4",
+    "continuityRegisterBlobSha": "cc1f89ff31d1aea2e1f8055891f8f155de3b9c66"
   },
   "b4001SourceFix": {
     "status": "SOURCE_FIXED_PENDING_CONTRACT_AND_EXACT_PREVIEW",
@@ -2165,7 +2167,7 @@
     "operationalBusinessWrites": 0,
     "syntheticFinalAbsent": true
   },
-  "findingLedgerBlobSha": "8125e97dcf1feb7f46081f95327952e65c2d1077",
+  "findingLedgerBlobSha": "b923461bc7b0bbff0df597187f0053228029e7b4",
   "b4002Diagnostic": {
     "status": "CAUSE_DEMONSTRATED_SOURCE_FIX_AUTHORIZED",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_002_POST_COMMIT_NOTIFICATION_DIAGNOSTIC_20261003.json",
@@ -2813,7 +2815,7 @@
     "livePromotion": false,
     "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW"
   },
-  "continuityRegisterBlobSha": "4e6b0ac51736be360c4b95abe8fc01d8f1e78e20",
+  "continuityRegisterBlobSha": "cc1f89ff31d1aea2e1f8055891f8f155de3b9c66",
   "findingContinuityGuardBlobSha": "868a0ba1a492d9adc8d91655f152b6fa7980f499",
   "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_R20_CONTRACT_AND_EXACT_PREVIEW",
   "b4003R15VisualReview": {
@@ -4948,5 +4950,13 @@
     "qaResidue": "HOLD_NO_DELETE",
     "sameProductSource": true,
     "noReimport": true
+  },
+  "p0FindingsFreeze20261012": {
+    "status": "SCOPE_FROZEN_ALL_SIX_OPEN",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_P0_FINDINGS_DECISIONS_FREEZE_20261012.md",
+    "receiptBlobSha": "2760d2aeb961bac5a0ce11e326c689143d2cc083",
+    "ledgerBlobSha": "b923461bc7b0bbff0df597187f0053228029e7b4",
+    "registryBlobSha": "cc1f89ff31d1aea2e1f8055891f8f155de3b9c66",
+    "noProductChanges": true
   }
 }
