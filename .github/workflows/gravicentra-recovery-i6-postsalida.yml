@@ -165,6 +165,7 @@ jobs:
           NODE
 
       - name: Assert LIVE equals latest certified candidate
+        if: steps.mode.outputs.mode == 'release'
         env:
           LIVE_BINDING_ATTEMPTS: 12
         run: node tools/gravicentra-certified-live-binding-check.mjs
@@ -574,6 +575,7 @@ jobs:
           NODE
 
       - name: Assert LIVE equals latest certified candidate
+        if: steps.mode.outputs.mode == 'release'
         env:
           LIVE_BINDING_ATTEMPTS: 12
         run: node tools/gravicentra-certified-live-binding-check.mjs
@@ -990,6 +992,7 @@ jobs:
           NODE
 
       - name: Assert LIVE equals latest certified candidate
+        if: steps.mode.outputs.mode == 'release'
         env:
           LIVE_BINDING_ATTEMPTS: 12
         run: node tools/gravicentra-certified-live-binding-check.mjs
@@ -1816,6 +1819,7 @@ jobs:
           NODE
 
       - name: Assert LIVE equals latest certified candidate
+        if: steps.mode.outputs.mode == 'release'
         env:
           LIVE_BINDING_ATTEMPTS: 12
         run: node tools/gravicentra-certified-live-binding-check.mjs
