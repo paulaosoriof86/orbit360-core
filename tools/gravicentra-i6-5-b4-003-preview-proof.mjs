@@ -616,7 +616,7 @@ async function runR26RealReadOnly(){
    const actorFor=await actorForRole(role,[...seen]);seen.add(actorFor.uid);
    const mSnap=await tenant.collection('members').doc(actorFor.uid).get();
    const member=mSnap.data()||{},authorized=[].concat(member.countries||member.paises||[]).map(x=>clean(x).toUpperCase());
-   const countries=role==='asesor'?['GT']:(authorized.length?['GT','CO'].filter(c=>authorized.includes(c)):['GT','CO']);
+   const countries=role==='asesor'?[authorized.includes('GT')?'GT':authorized.includes('CO')?'CO':'GT']:(authorized.length?['GT','CO'].filter(c=>authorized.includes(c)):['GT','CO']);
    for(const country of countries){
     const row=await r23ProofSnapshot(chromiumBrowser,actorFor,country,month);
     const v=row.ui.r26||{};
