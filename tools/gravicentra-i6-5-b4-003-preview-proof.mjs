@@ -1720,8 +1720,38 @@ try{
  proof.assertions.renewalCampaignDurableReadback=true;
 
  // UAT4: reason edits commit to canonical cancellation data without creating recovery work.
- await page.evaluate(id=>{Orbit.pais='GT';const h=document.getElementById('host');Orbit.modules.cancelaciones.render(h);Orbit.modules.cancelaciones.detalle(id);},ids.cancelation);
- await page.waitForSelector('#cx-save-motivo',{timeout:10000});
+ // Targeted QA-only diagnosis: determine whether the cancellation editor fails to mount
+ // synchronously or is removed/hidden by a later route/render transition.
+ proof.r25CancelReasonModal=await page.evaluate(id=>{
+   Orbit.pais='GT';
+   const h=document.getElementById('host');
+   const inStoreBefore=!!Orbit.store?.get('cancelaciones',id);
+   Orbit.modules.cancelaciones.render(h);
+   Orbit.modules.cancelaciones.detalle(id);
+   const modal=document.getElementById('c360-edit');
+   return {route:String(Orbit.route?.key||''),country:String(Orbit.pais||''),
+     role:String(Orbit.session?.rol?.()||''),hostPresent:!!h,
+     inStoreBefore,inStoreAfter:!!Orbit.store?.get('cancelaciones',id),
+     modalMounted:!!modal,reasonInputMounted:!!modal?.querySelector('#cx-motivo'),
+     reasonButtonMounted:!!modal?.querySelector('#cx-save-motivo'),
+     modalDisplay:modal?getComputedStyle(modal).display:'absent'};
+ },ids.cancelation);
+ console.log('B4_003_CANCEL_REASON_MODAL_ENTRY='+JSON.stringify(proof.r25CancelReasonModal));
+ try{
+   await page.waitForSelector('#cx-save-motivo',{timeout:10000});
+ }catch(error){
+   proof.r25CancelReasonModal.afterWait=await page.evaluate(()=>{
+     const modal=document.getElementById('c360-edit');
+     const button=document.querySelector('#cx-save-motivo');
+     return {route:String(Orbit.route?.key||''),country:String(Orbit.pais||''),
+       modalMounted:!!modal,buttonMounted:!!button,
+       modalDisplay:modal?getComputedStyle(modal).display:'absent',
+       buttonDisplay:button?getComputedStyle(button).display:'absent',
+       visibleCancelRows:document.querySelectorAll('[data-cancel-open]').length};
+   });
+   console.error('B4_003_CANCEL_REASON_MODAL_LIFECYCLE='+JSON.stringify(proof.r25CancelReasonModal));
+   throw new Error('B4_003_CANCEL_REASON_MODAL_LIFECYCLE_DIAGNOSTIC: '+String(error.message||error));
+ }
  const priorRecovery=(await ref('negocios',ids.recoveryBusiness).get()).exists;
  await page.fill('#cx-motivo','B4-003 QA motivo confirmado');
  await page.click('#cx-save-motivo');
