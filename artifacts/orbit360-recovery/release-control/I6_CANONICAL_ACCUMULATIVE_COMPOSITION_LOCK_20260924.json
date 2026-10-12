@@ -2165,7 +2165,7 @@
     "operationalBusinessWrites": 0,
     "syntheticFinalAbsent": true
   },
-  "findingLedgerBlobSha": "0bfa23823338cc55235646e8a23bd1207ebee7a7",
+  "findingLedgerBlobSha": "8125e97dcf1feb7f46081f95327952e65c2d1077",
   "b4002Diagnostic": {
     "status": "CAUSE_DEMONSTRATED_SOURCE_FIX_AUTHORIZED",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_002_POST_COMMIT_NOTIFICATION_DIAGNOSTIC_20261003.json",
@@ -2813,7 +2813,7 @@
     "livePromotion": false,
     "nextAction": "B4_003_CONTRACT_AND_EXACT_PREVIEW"
   },
-  "continuityRegisterBlobSha": "05e007d18542e553cb89af3f6a48e499605c0084",
+  "continuityRegisterBlobSha": "4e6b0ac51736be360c4b95abe8fc01d8f1e78e20",
   "findingContinuityGuardBlobSha": "868a0ba1a492d9adc8d91655f152b6fa7980f499",
   "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_R20_CONTRACT_AND_EXACT_PREVIEW",
   "b4003R15VisualReview": {
@@ -4938,5 +4938,14 @@
     "noRelaxedValidator": true,
     "sourceHead": "97cf1680e22a1c1216879b2733cb7ba984e40479",
     "noLive": true
+  },
+  "userVisualScopedAcceptance20261011": {
+    "sourceProofRunId": 38184375082,
+    "inicio": "VISUAL_PASS_ONLY",
+    "collaborationActor": "VISUAL_PASS_OPS_PANEL_ONLY",
+    "financialAmountReadback": "OPEN",
+    "qaResidue": "HOLD_NO_DELETE",
+    "sameProductSource": true,
+    "noReimport": true
   }
 }
