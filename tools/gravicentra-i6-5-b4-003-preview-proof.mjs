@@ -284,6 +284,20 @@ async function r23ProofSnapshot(browser,who,country,month){
   ui.role=await p.evaluate(()=>String(Orbit.session?.rol?.()||''));
   ui.reloadRoute=await p.evaluate(()=>({hash:location.hash,route:Orbit.route?.key||''}));
   need(ui.reloadRoute.route==='inicio'&&ui.reloadRoute.hash==='#/inicio','B4_003_R23_INBOX_UNAUTHORIZED_NAVIGATOR_RELOAD:'+JSON.stringify({role:who.activeRole,country,...ui.reloadRoute}));
+  // R26 read-only: compare authenticated Inicio money projection and visible GT/CO card after real reload.
+  ui.r26=await p.evaluate(({country,ownAdvisorId})=>{
+    const q=Orbit.q,month=q.currentMonthKey(),currency=country==='GT'?'GTQ':'COP',other=country==='GT'?'COP':'GTQ';
+    Orbit.pais=country;
+    Orbit.modules.inicio.render(document.getElementById('host'));
+    const total=q.recaudoMesPorMoneda(month),personal=ownAdvisorId?q.recaudoMesPorMoneda(month,ownAdvisorId):{};
+    const panel=document.querySelector('[data-inicio-monthly="recaudo"]');
+    const card=panel?.querySelector('[data-inicio-country="'+country+'"]');
+    return{month,currency,hasAuthenticatedSession:!!Orbit.auth?.productUser?.uid,
+      total:Number(total[currency]||0),personal:Number(personal[currency]||0),
+      countryIsolation:!Number(total[other]||0)&&!Number(personal[other]||0),
+      monthlyPanel:!!panel,countryCard:!!card,source:String(card?.getAttribute('data-goal-source')||''),
+      hasOwnAdvisor:!!ownAdvisorId,visibleText:String(card?.innerText||'').slice(0,400)};
+  },{country,ownAdvisorId:api.ownAdvisorId||''});
   return{api,ui};
  }finally{await ctx.close();}
 }
@@ -566,6 +580,89 @@ async function cleanup(startMs){
   }
  }
 }
+// R26: isolated authenticated readback mode. Uses existing B4-003 browser helpers,
+ // current immutable Preview, and independent Firestore snapshots. Strictly zero writes.
+async function runR26RealReadOnly(){
+ const origin=process.env.B4_003_R26_CERTIFIED_PREVIEW||'';
+ need(origin===target,'B4_003_R26_PREVIEW_NOT_EXACT_CERTIFIED_TARGET');
+ const month=new Date().toISOString().slice(0,7);
+ const [pSnap,cSnap,rSnap]=await Promise.all([
+   tenant.collection('data').doc('polizas').collection('items').get(),
+   tenant.collection('data').doc('cobros').collection('items').get(),
+   tenant.collection('data').doc('recibosEsperados').collection('items').get()
+ ]);
+ const policies=new Map(pSnap.docs.map(d=>[d.id,d.data()||{}]));
+ const receipts=new Map(rSnap.docs.map(d=>[d.id,d.data()||{}]));
+ const direct=new Map([['GT',0],['CO',0]]),amounts=new Map([['GT',0],['CO',0]]);
+ let unlinked=0,undated=0,conflicted=0,nonpositive=0;
+ for(const d of cSnap.docs){
+  const x=d.data()||{},state=norm(x.estado),confirmed=['pagado','conciliado'].includes(state)||x.conciliado===true;
+  if(!confirmed)continue;
+  const day=clean(x.fechaPago||x.paidDate||x.inferredEffectiveDate).slice(0,10);
+  if(!day.startsWith(month)){if(!day)undated++;continue;}
+  const p=policies.get(clean(x.polizaId));
+  if(!p){unlinked++;continue;}
+  const c=clean(p.pais||x.pais).toUpperCase();
+  const cur=c==='GT'?'GTQ':c==='CO'?'COP':'';
+  const n=Number(x.monto);
+  if(!cur||(x.pais&&clean(x.pais).toUpperCase()!==c)||(x.moneda&&clean(x.moneda).toUpperCase()!==cur)||(x.asesorId&&p.asesorId&&clean(x.asesorId)!==clean(p.asesorId))){conflicted++;continue;}
+  if(!Number.isFinite(n)||n<=0){nonpositive++;continue;}
+  direct.set(c,(direct.get(c)||0)+1);amounts.set(c,(amounts.get(c)||0)+n);
+ }
+ const seen=new Set(),cases=[],roles=['direccion','operativo','asesor'];
+ const chromiumBrowser=await chromium.launch({headless:true,args:['--no-sandbox']});
+ try{
+  for(const role of roles){
+   const actorFor=await actorForRole(role,[...seen]);seen.add(actorFor.uid);
+   const mSnap=await tenant.collection('members').doc(actorFor.uid).get();
+   const member=mSnap.data()||{},authorized=[].concat(member.countries||member.paises||[]).map(x=>clean(x).toUpperCase());
+   const countries=role==='asesor'?['GT']:(authorized.length?['GT','CO'].filter(c=>authorized.includes(c)):['GT','CO']);
+   for(const country of countries){
+    const row=await r23ProofSnapshot(chromiumBrowser,actorFor,country,month);
+    const v=row.ui.r26||{};
+    need(v.hasAuthenticatedSession&&v.month===month&&v.currency===(country==='GT'?'GTQ':'COP'),
+      'B4_003_R26_AUTHENTICATED_RELOAD_SESSION_NOT_VERIFIED:'+role+':'+country);
+    need(v.countryIsolation&&v.monthlyPanel&&v.countryCard,
+      'B4_003_R26_COUNTRY_CARD_OR_SCOPE_MISMATCH:'+role+':'+country);
+    const rawCount=direct.get(country)||0,rawAmount=amounts.get(country)||0;
+    // Only compare country-wide source with an authorized ALL-scope read model.
+    const canAssertTotal=row.api.scope==='all'&&rawCount>0&&conflicted===0&&unlinked===0&&nonpositive===0;
+    if(canAssertTotal)need(v.total+0.005>=rawAmount,
+      'B4_003_R26_AUTHENTICATED_PAYMENT_UNDERCOUNT:'+role+':'+country);
+    const own=row.api.ownAdvisorId||'';
+    const ownRow=row.api.rows.find(x=>x.id===own);
+    const goal=ownRow?.metas?.[country]?.recaudo||0;
+    const personalVisible=own&&goal>0?(/Mi recaudo|MI AVANCE|Mi meta|meta propia/i.test(v.visibleText)):null;
+    if(own&&goal>0)need(personalVisible,
+      'B4_003_R26_PERSONAL_GOAL_NOT_VISIBLE:'+role+':'+country);
+    cases.push({role,country,scope:row.api.scope,authenticated:true,reload:true,
+       countryIsolation:true,sourcePaymentRows:rawCount,serverTotalLowerBoundChecked:canAssertTotal,
+       ownAdvisorBound:!!own,ownGoalSet:goal>0,ownGoalVisible:personalVisible,
+       personalNonzero:v.personal>0,globalNonzero:v.total>0,
+       monthlyPanel:true,countryCard:true});
+   }
+  }
+ }finally{await chromiumBrowser.close();}
+ const observed=cases.filter(x=>x.serverTotalLowerBoundChecked).length;
+ const status=observed>0?'R26_AUTHENTICATED_READONLY_PARTIAL_PASS_ORIGIN_PARITY_OPEN':'R26_AUTHENTICATED_READONLY_PARTIAL_NO_CURRENT_MONTH_SOURCE_ANCHOR';
+ const result={schema:'GRAVICENTRA_B4003_R26_AUTHENTICATED_REAL_READBACK_V1',status,runId:run,
+   candidateSourceSha:process.env.B4_003_R26_SOURCE_SHA||'',target,
+   readOnly:true,realBusinessWrites:0,syntheticWrites:0,liveTouched:false,reimport:false,
+   month,rawSource:{policies:pSnap.size,cobros:cSnap.size,receipts:rSnap.size,
+     currentMonthConfirmedGT:direct.get('GT'),currentMonthConfirmedCO:direct.get('CO'),
+     unlinked,undated,conflicted,nonpositive},
+   cases,verifiedPositiveMoneyCases:observed,
+   unresolved:['INDEPENDENT_RECEIPT_PROJECTION_AND_PAYMENT_ORIGIN_PARITY','P0_FINAL_ROLE_BY_ROLE_FINANCIAL_ACCEPTANCE','PAULA_TARGETED_VISUAL_REVIEW'],
+   p0Closed:false};
+ fs.writeFileSync(outPath,JSON.stringify(result,null,2)+'\n');
+ console.log(JSON.stringify({status,resultPath:outPath,caseCount:cases.length,
+   verifiedPositiveMoneyCases:observed,realBusinessWrites:0,liveTouched:false,p0Closed:false}));
+}
+if(process.env.B4_003_R26_READONLY==='true'){
+ await runR26RealReadOnly();
+ process.exit(0);
+}
+
 let browser,context,page,startMs=Date.now();
 const httpCapturePromises=[];
 try{
