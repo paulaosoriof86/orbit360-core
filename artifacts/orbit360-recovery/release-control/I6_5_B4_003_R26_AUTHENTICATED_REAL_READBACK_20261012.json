@@ -1,0 +1,84 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_R26_AUTHENTICATED_READONLY_RECEIPT_V1",
+  "date": "2026-10-12",
+  "kind": "EVIDENCE_SUBORDINATE_TO_CONTROL_PLANE_AND_FINDINGS_LEDGER",
+  "gate": "I6.5/B4-003",
+  "findingId": "B4-003-P0-20261012-PERSONAL-COLLECTION",
+  "status": "R26_AUTHENTICATED_READONLY_PARTIAL_NO_CURRENT_MONTH_SOURCE_ANCHOR",
+  "p0Closed": false,
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "certifiedPreviewSourceSha": "591d6655090342e1c9c3137eb8cdf88f292a3aa1",
+  "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-38309446443-1io2otyg.web.app",
+  "githubActions": {
+    "runId": 38316896287,
+    "conclusion": "success",
+    "artifactId": 11777835906,
+    "artifactName": "gravicentra-b4-003-r26-authenticated-readonly-38316896287",
+    "artifactDigest": "sha256:de52bc1176ff12c104c08070ab52746ec51c519c734fb1208756331f95dc6f90"
+  },
+  "evidence": {
+    "realReadback": true,
+    "month": "2026-10",
+    "sources": {
+      "polizas": 1425,
+      "cobros": 5,
+      "recibosEsperados": 1958,
+      "confirmedCurrentMonthGT": 0,
+      "confirmedCurrentMonthCO": 0
+    },
+    "authenticatedContexts": [
+      {
+        "role": "direccion",
+        "country": "GT",
+        "scope": "all"
+      },
+      {
+        "role": "direccion",
+        "country": "CO",
+        "scope": "all"
+      },
+      {
+        "role": "operativo",
+        "country": "GT",
+        "scope": "own"
+      },
+      {
+        "role": "operativo",
+        "country": "CO",
+        "scope": "own"
+      },
+      {
+        "role": "asesor",
+        "country": "GT",
+        "scope": "own"
+      }
+    ],
+    "contextsAuthenticatedWithReloadAndCountryIsolation": 5,
+    "contextsWithVisibleOwnGoal": 2,
+    "positivePaymentAnchors": 0,
+    "operationalWrites": 0,
+    "syntheticWrites": 0,
+    "productionHostingChanges": 0,
+    "reimport": false
+  },
+  "rootBoundary": "No source-backed confirmed October payment under the tested evidence/date filters; therefore positive realized-payment amount/advisor reconciliation cannot be certified from this real-data snapshot. This is an evidence gap, not proof that R26 is wrong or right for positive payments.",
+  "remaining": [
+    "Independently prove positive payment origin / receipt projection parity by advisor and month when a real accepted source exists or gate-authorized isolated fixture is available",
+    "Functional acceptance per role and certified candidate",
+    "Paula visual acceptance only on newly affected surface"
+  ],
+  "authorities": {
+    "controlPlane": "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json",
+    "findingsLedger": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
+    "carryForward": "artifacts/orbit360-recovery/release-control/I6_5_OPEN_FINDINGS_CARRY_FORWARD_REGISTER_20261003.json",
+    "r26SourceReceipt": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R26_PERSONAL_RECAUDO_CAUSAL_SOURCE_FIX_20261012.json"
+  },
+  "policy": {
+    "notACapabilityOrGatePass": true,
+    "noProductionMutation": true,
+    "noDataMutation": true,
+    "noProductSourceMutation": true,
+    "noReopenPriorAcceptedVisual": true
+  }
+}
