@@ -4869,9 +4869,9 @@
       "entryGuardReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_ENTRY_GUARD_PASS_20261002.json",
       "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
       "executionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B4_EXECUTION_LOCK_20261002.json",
-      "executionLockBlobSha": "87d60fb4fd044776a9b645fa983e39c32ca01007",
-      "compositionLockBlobSha": "f2c00793d9e49de6be8fcee617c9c66321624e21",
-      "findingLedgerBlobSha": "58b136888313c3fe0af0cd554d51f125bdffd2cd",
+      "executionLockBlobSha": "6723658da4b79761dbdd92c2a962739b7e059724",
+      "compositionLockBlobSha": "2d9d2ef9fb67a57c518c4a62fec4eb86254ce21d",
+      "findingLedgerBlobSha": "8125e97dcf1feb7f46081f95327952e65c2d1077",
       "activeFindingId": "B4-003",
       "productSourceSha": "c603fd3561e7229d9359db45495d4cf2d757cd8f",
       "baselineBuildId": "gi-i65-b3-dcd2b3f60b98-57f234755dc1",
@@ -5183,7 +5183,7 @@
       "priorMachinePreviewUrl": "https://ays-orbit-360-lab--gi-i65-b4-37136776942-5498wth2.web.app",
       "humanVisualStatus": "PAULA_VISUAL_PARTIAL_PASS_BLOCKING_20261011",
       "continuityRegisterPath": "artifacts/orbit360-recovery/release-control/I6_5_OPEN_FINDINGS_CARRY_FORWARD_REGISTER_20261003.json",
-      "continuityRegisterBlobSha": "47e0fb9c5d8ba45a743cd4d4a92a78198c49bff1",
+      "continuityRegisterBlobSha": "4e6b0ac51736be360c4b95abe8fc01d8f1e78e20",
       "continuityGuardPath": "tools/gravicentra-open-findings-continuity-guard-v1.mjs",
       "continuityGuardBlobSha": "868a0ba1a492d9adc8d91655f152b6fa7980f499",
       "qaHarnessR11aReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R11A_QA_HARNESS_ADJUDICATION_20261003.json",
@@ -5995,9 +5995,9 @@
   "canonicalAccumulationControl": {
     "status": "FROZEN_ACTIVE",
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "compositionLockBlobSha": "f2c00793d9e49de6be8fcee617c9c66321624e21",
+    "compositionLockBlobSha": "2d9d2ef9fb67a57c518c4a62fec4eb86254ce21d",
     "findingLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
-    "findingLedgerBlobSha": "58b136888313c3fe0af0cd554d51f125bdffd2cd",
+    "findingLedgerBlobSha": "8125e97dcf1feb7f46081f95327952e65c2d1077",
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
     "activePlanBlobSha": "76a275e511c3bd580496c07de93c2bfb2eace269",
     "activeBlock": "B4",
@@ -6013,7 +6013,7 @@
     "activeFindingId": "B4-003",
     "findingContinuityRegisterBlobSha": "11ffaf6e7c691064be947fdc1af00b08d8fb8f9c",
     "findingContinuityGuardBlobSha": "868a0ba1a492d9adc8d91655f152b6fa7980f499",
-    "continuityRegisterBlobSha": "47e0fb9c5d8ba45a743cd4d4a92a78198c49bff1",
+    "continuityRegisterBlobSha": "4e6b0ac51736be360c4b95abe8fc01d8f1e78e20",
     "masterPendingClosurePlanPath": "artifacts/orbit360-recovery/release-control/I6_PENDING_CLOSURE_MASTER_PLAN_LOCK_20261004.json",
     "masterPendingClosurePlanBlobSha": "9d7ba423caf0aa09a0e2af4a1ed4713ea867d17a",
     "listingHumanProofStillRequired": true
@@ -6311,9 +6311,9 @@
     "status": "B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL",
     "activeFindingId": "B4-003",
     "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
-    "executionLockBlobSha": "87d60fb4fd044776a9b645fa983e39c32ca01007",
-    "compositionLockBlobSha": "f2c00793d9e49de6be8fcee617c9c66321624e21",
-    "findingLedgerBlobSha": "58b136888313c3fe0af0cd554d51f125bdffd2cd",
+    "executionLockBlobSha": "6723658da4b79761dbdd92c2a962739b7e059724",
+    "compositionLockBlobSha": "2d9d2ef9fb67a57c518c4a62fec4eb86254ce21d",
+    "findingLedgerBlobSha": "8125e97dcf1feb7f46081f95327952e65c2d1077",
     "noLive": true,
     "noReimport": true,
     "nextAction": "B4_003_R20_TARGETED_PAULA_VISUAL",
@@ -6596,7 +6596,7 @@
     "r10RuntimeReachabilityRootFixBlobSha": "e7fcbadd0ed789db39eac860ab0cd82c269f73ea",
     "humanVisualStatus": "PAULA_VISUAL_PARTIAL_PASS_BLOCKING_20261011",
     "continuityRegisterPath": "artifacts/orbit360-recovery/release-control/I6_5_OPEN_FINDINGS_CARRY_FORWARD_REGISTER_20261003.json",
-    "continuityRegisterBlobSha": "47e0fb9c5d8ba45a743cd4d4a92a78198c49bff1",
+    "continuityRegisterBlobSha": "4e6b0ac51736be360c4b95abe8fc01d8f1e78e20",
     "continuityGuardPath": "tools/gravicentra-open-findings-continuity-guard-v1.mjs",
     "continuityGuardBlobSha": "868a0ba1a492d9adc8d91655f152b6fa7980f499",
     "qaHarnessR11aReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R11A_QA_HARNESS_ADJUDICATION_20261003.json",
@@ -9451,11 +9451,11 @@
     "status": "PAULA_VISUAL_PARTIAL_PASS_BLOCKING_20261011",
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PAULA_UAT_DECISIONS_AND_RECOVERY_20261011.json",
     "receiptBlobSha": "abff2437533e1f9cab127acf0e5c98d1b024e37c",
-    "latestProofRunId": 38147642372,
+    "latestProofRunId": 38184375082,
     "client360Visual": "PASS",
     "renovationsVisual": "PASS_WITH_OUTCOME_PENDING",
-    "inicioVisual": "REJECTED",
-    "opsLeads": "PARTIAL_FAIL",
+    "inicioVisual": "HUMAN_VISUAL_PASS_WITH_FINANCIAL_READBACK_HOLD",
+    "opsLeads": "COLLABORATION_NAMES_VISUAL_PASS_OTHER_P0_OPEN",
     "newFindingIds": [
       "B4-003-UAT-20261011-01",
       "B4-003-UAT-20261011-02",
@@ -9465,9 +9465,9 @@
       "B4-003-UAT-20261011-06",
       "B4-003-UAT-20261011-07"
     ],
-    "ledgerBlobSha": "6d2d471056f129713edab6483c5089202f421549",
-    "registerBlobSha": "19fd55ad6cbb203b205b5ad9b11554c864e06e73",
-    "lockBlobSha": "a69c43d5db4dcfdcecf20f4368016f6af583881a",
+    "ledgerBlobSha": "8125e97dcf1feb7f46081f95327952e65c2d1077",
+    "registerBlobSha": "4e6b0ac51736be360c4b95abe8fc01d8f1e78e20",
+    "lockBlobSha": "6723658da4b79761dbdd92c2a962739b7e059724",
     "productionTouched": false,
     "operationalDataWrites": 0
   },
@@ -9585,5 +9585,25 @@
     "fix": "Preserved the required 20261007-r20f2 version prefix while incrementing the cache suffix",
     "productionChanged": false,
     "operationalWrites": 0
-  }
+  },
+  "paulaCurrentVisualUat20261011": {
+    "status": "SCOPED_PASS_NO_CAPABILITY_CLOSURE",
+    "inicio": {
+      "design": "HUMAN_VISUAL_PASS",
+      "gaugeMath": "SOURCE_LOGIC_QA_PASS",
+      "amounts": "PENDING_INDEPENDENT_READBACK",
+      "qaFixtureResidue": "P0_HOLD"
+    },
+    "collaboration": {
+      "actorName": "VISUAL_PASS",
+      "notifications": "P0_OPEN",
+      "advisorEdit": "P0_OPEN"
+    },
+    "nextMaterialP0": "B4-003-UAT-20261011-02",
+    "qaCancelledRunId": 38102224750,
+    "qaExecutionPreventiveWorkflowCommit": "08eee75d01e1547071b87d5fd9833196a1015915",
+    "noLive": true,
+    "noRealBusinessWrites": true
+  },
+  "nextB4003WorkWithinCurrentGate": "VERIFY_ADVISOR_REASSIGNMENT_SERVER_COMMIT_READBACK_AND_RELOAD_TWO_UIDS"
 }
