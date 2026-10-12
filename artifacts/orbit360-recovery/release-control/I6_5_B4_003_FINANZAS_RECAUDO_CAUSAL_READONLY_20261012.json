@@ -1,0 +1,81 @@
+{
+  "schema": "GRAVICENTRA_I65_B4003_FINANZAS_RECAUDO_CAUSAL_READONLY_20261012_V1",
+  "status": "READONLY_CAUSES_DEMONSTRATED_NO_PRODUCT_MUTATION",
+  "date": "2026-10-12",
+  "gate": "I6.5/B4-003",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "sourceHead": "46765bec29e1c14ea04ab4d8b2cd6aa0fe31dcb2",
+  "authority": {
+    "controlPlanePath": "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json",
+    "controlPlaneBlobSha": "fb01237db21523a2dd848ecb40f7bcd0fe2f415d",
+    "findingsLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
+    "ledgerBlobSha": "b923461bc7b0bbff0df597187f0053228029e7b4"
+  },
+  "sourceBlobs": {
+    "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json": "fb01237db21523a2dd848ecb40f7bcd0fe2f415d",
+    "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json": "b923461bc7b0bbff0df597187f0053228029e7b4",
+    "orbit360-platform/modules/finanzas.js": "66e40ad29bdfd9a71ddf386c1c3c876dec0249dc",
+    "orbit360-platform/core/queries.js": "7ff1b3cdf9091ffcab864a247433e19c2f1d06be",
+    "orbit360-platform/modules/inicio.js": "3bfac3ae73b5b954303a30eb683ffe8deac1ce84",
+    "functions/product-operational-domain.js": "61bbd6d4bc9e687fa698c129e4ffd4fb4fb085b7",
+    "orbit360-platform/data/store-firestore-product-operational-p0.js": "7738314b843253c92be008dc0b812d035b377d43",
+    "functions/assignable-advisor-roster.js": "b8b485765707eeafae9e1299614cc92f69a0aee3",
+    "orbit360-platform/core/config.js": "5245748330e410a1acf5749955f908aff30fcdcd",
+    "artifacts/orbit360-recovery/release-control/PHASE_B_WORK_PLAN_LOCK_20260917.json": "1b85b08ec9a450d1c798149dea56de6954a09bce"
+  },
+  "assertions": {
+    "currentGatePreserved": true,
+    "financeBETA": true,
+    "financeRealSourceHasUiAndActions": true,
+    "financeWritableCollectionsMissingFromClientTransport": true,
+    "financeWritableCollectionsMissingFromBackendTransport": true,
+    "financeGoalsLegacyFireAndForget": true,
+    "financeGoalsWithoutCountry": true,
+    "backendCountryGoalMandatory": true,
+    "financialFallbacksAreNonAuthoritative": true,
+    "adviserCommissionIdentityByName": true,
+    "collectionAggregateMissingAdvisorParameter": true,
+    "inicioPersonalCollectionBlocked": true,
+    "financePhaseBConditional": true,
+    "sixP0Frozen": true
+  },
+  "finance": {
+    "classification": "BETA_SOURCE_PRESENT_NOT_LIVE_ACCEPTED",
+    "existingSurface": "Finanzas (administración): movimientos, CxC/CxP, presupuestos, financiación, comisiones empresa/asesor, metas, conciliación bancaria",
+    "codeRootCauses": [
+      "finanzas.js usa insert/update/remove (legacy fire-and-forget) en colecciones finmovs/facturas/presupuesto/acreedores; el transport canónico no incluye esas colecciones en su allowlist. No hay contrato de escritura productiva y readback para esas acciones.",
+      "Finanzas muestra Guardar y cierra formularios sin esperar server-owned commit ni refresh comprobado; metas se escriben con APIs legacy.",
+      "Las metas globales legacy no siempre preservan país ni moneda en la escritura; el proyector R23 de Inicio exige país GT/CO y mes, creando una frontera funcional incompatible.",
+      "Las metas sugeridas (crecimiento 10%, recaudo 85%) son hipótesis, no metas empresariales autorizadas. No presentarlas como metas configuradas reales.",
+      "El filtro de liquidaciones del asesor usa igualdad de nombre, no UID/asesorId canónico; falta prueba de alcance autorizado y filtrado de comisiones.",
+      "La UI presenta totales mezclados bajo moneda de vista; se debe probar separación GTQ/COP sin conversión implícita."
+    ],
+    "currentActualAvailability": "NOT_TESTED_LIVE_TENANT_ROLE; source has default menu entry but backend and member visibility remain authoritative",
+    "latestKnownSnapshotOnly": "I6.5 earlier control readback included finmovs:0 at its recorded historical cut; current Firestore financial rows not re-read and no live claim made.",
+    "normativeDisposition": "No habilitar operación de Finanzas sin I6.8 LIVE proof por rol/country, writes/readback, reconciliación e integridad. Preservar y diferir evolución a B-FINANCE-EVOLUTION-01 si no se certifica en Fase A; no bloquear CRM/Cobros por Beta Finance.",
+    "phaseBWorkItem": "B-FINANCE-EVOLUTION-01"
+  },
+  "personalRecaudo": {
+    "existingFindingId": "B4-003-P0-20261012-PERSONAL-COLLECTION",
+    "evidence": "Queries recaudoMesPorMoneda(monthKey) only returns aggregate by currency/country; Inicio splitCountrySummary() uses kind==='production' for personal only.",
+    "causalOwner": [
+      "orbit360-platform/core/queries.js",
+      "orbit360-platform/modules/inicio.js"
+    ],
+    "scopeRequirement": "Fuente real confirmada; asesorId canonical policy join; roles/tenant/country/month, no speculative dates for inferred payments; preserve reported-vs-confirmed origin and prevent duplicate receipt+payment counts.",
+    "nextProductAuthorizationCheck": "El B4 execution lock actual no autoriza product mutation y no lista core/queries.js. Debe tramitarse autorización causal acotada en el MISMO gate antes de tocar source y de emitir nueva build/Preview."
+  },
+  "existingFindingIdForGlobalMetas": "B4-003-P0-20261012-INSTITUTIONAL-GOALS",
+  "legacyFinanceNotAuthorityForInicio": true,
+  "requiresNewGate": false,
+  "requiresNewRepo": false,
+  "requiresDataImport": false,
+  "runtimeTests": "NOT_EXECUTED_READONLY_SOURCE_DIAGNOSTIC",
+  "productionWrites": 0,
+  "dataWrites": 0,
+  "sourceChanges": 0,
+  "productionPromotion": false,
+  "passClaims": [],
+  "nextAction": "B4-003 P0 scoped source authorization+causal fix+test; Finance not I6.8 certified, remains separate conditional deferred work."
+}
