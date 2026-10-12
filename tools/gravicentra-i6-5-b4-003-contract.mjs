@@ -21,6 +21,7 @@ const paths={
   ops:'orbit360-platform/modules/ops.js',
   leads:'orbit360-platform/modules/leads.js',
   inicio:'orbit360-platform/modules/inicio.js',
+  queries:'orbit360-platform/core/queries.js',
   policyEngine:'orbit360-platform/core/policy-receipts-engine.js',
   router:'orbit360-platform/core/router.js',
   cronograma:'orbit360-platform/modules/cronograma.js',
@@ -546,6 +547,49 @@ if(control.nextAction==='I6_5_FORENSIC_REMEDIATION_B4_003_R23_CONTRACT_AND_EXACT
  need(previewProof.includes('r23InicioRoleCountryScopedBackendUiParity')&&previewProof.includes('r23InicioCanonicalGoalValueParity')&&previewProof.includes('r23InicioOperativoDireccionMobileReload'),'B4_003_R23_AUTHENTICATED_QA_DISCRIMINANT_MISSING');
 }
 
+
+// B4-003-P0-20261012-PERSONAL-COLLECTION: deterministic source-executed, no Firestore writes.
+{
+ const src=read(paths.queries);
+ const tables={
+   clientes:[{id:'cGT',pais:'GT',moneda:'GTQ'},{id:'cCO',pais:'CO',moneda:'COP'}],
+   polizas:[{id:'pA',clienteId:'cGT',pais:'GT',moneda:'GTQ',asesorId:'advisorA'},
+     {id:'pB',clienteId:'cGT',pais:'GT',moneda:'GTQ',asesorId:'advisorB'},
+     {id:'pCO',clienteId:'cCO',pais:'CO',moneda:'COP',asesorId:'advisorA'}],
+   cobros:[
+     {id:'payA',polizaId:'pA',estado:'Pagado',asesorId:'advisorA',monto:100,moneda:'GTQ',pais:'GT',fechaPago:'2026-10-02'},
+     {id:'payFallback',polizaId:'pA',estado:'Pagado',monto:75,moneda:'GTQ',pais:'GT',fechaPago:'2026-10-03'},
+     {id:'payB',polizaId:'pB',estado:'Pagado',asesorId:'advisorB',monto:250,moneda:'GTQ',pais:'GT',fechaPago:'2026-10-04'},
+     {id:'payConflict',polizaId:'pA',estado:'Pagado',asesorId:'advisorB',monto:400,moneda:'GTQ',pais:'GT',fechaPago:'2026-10-05'},
+     {id:'payUnlinked',polizaId:'pMissing',estado:'Pagado',asesorId:'advisorA',monto:80,moneda:'GTQ',pais:'GT',fechaPago:'2026-10-06'},
+     {id:'payCO',polizaId:'pCO',estado:'Pagado',asesorId:'advisorA',monto:900,moneda:'COP',pais:'CO',fechaPago:'2026-10-07'},
+     {id:'notPaid',polizaId:'pA',estado:'Pendiente',monto:999,moneda:'GTQ',pais:'GT',fechaPago:'2026-10-08'},
+     {id:'wrongMonth',polizaId:'pA',estado:'Pagado',monto:777,moneda:'GTQ',pais:'GT',fechaPago:'2026-09-08'}],
+   recibosEsperados:[]
+ };
+ const store={all:k=>tables[k]||[],get:(k,id)=>(tables[k]||[]).find(x=>x.id===id)||null,
+    where:(k,p)=>(tables[k]||[]).filter(p),find:(k,p)=>(tables[k]||[]).find(p)};
+ const Orbit={pais:'TODOS',store,ui:{finiteNumber:v=>v==null||v===''?null:(Number.isFinite(Number(v))?Number(v):null),
+    now:()=>new Date('2026-10-15T12:00:00Z')}};
+ const context={Orbit,window:{Orbit}};
+ vm.runInNewContext(src,context,{timeout:1500});
+ const gtA=Orbit.q.recaudoMesPorMoneda('2026-10','advisorA');
+ const gtB=Orbit.q.recaudoMesPorMoneda('2026-10','advisorB');
+ const all=Orbit.q.recaudoMesPorMoneda('2026-10');
+ need(gtA.GTQ===175&&gtA.COP===900&&gtB.GTQ===250&&!gtB.COP,
+   'B4_003_R26_PERSONAL_RECAUDO_CANONICAL_POLICY_ADVISOR_OR_CURRENCY_FAILURE');
+ need(all.GTQ===905&&all.COP===900,'B4_003_R26_INSTITUTIONAL_RECAUDO_REGRESSION');
+ Orbit.pais='GT';
+ const scoped=Orbit.q.recaudoMesPorMoneda('2026-10','advisorA');
+ need(scoped.GTQ===175&&!scoped.COP,'B4_003_R26_COUNTRY_SCOPE_LEAK');
+ need(!Object.keys(Orbit.q.recaudoMesPorMoneda('2026-08','advisorA')).length,
+   'B4_003_R26_MONTH_SCOPE_LEAK');
+ need(inicio.includes("kind==='production'?(q.produccionMesPorMoneda")&&
+      inicio.includes('q.recaudoMesPorMoneda(mesKey,a.id)')&&
+      inicio.includes("const personal=!hasGlobal&&hasMine;")&&
+      index.includes('r26-personal-recaudo'),
+   'B4_003_R26_INICIO_PERSONAL_COLLECTION_BINDING_OR_ASSET_CACHE_MISSING');
+}
 
 console.log(JSON.stringify({status:'PASS',contract:'B4_003_R20_CONTRACT',exactBlobBindings:bindings,singleRenewalActionOwner:paths.bridge,noDelayedRenewalRenderOwners:true,durableRenewalCampaign:true,durableCancelationRecovery:true,previewGeneralWritesIsolated:true,r13PolicyIndexedSearch:true,r13PolicyCoherentHydration:true,r13CancelIndexedRelations:true,r13InsurerDriveTargetAuthority:true,productFileCount:comp.productFileCount},null,2));
 

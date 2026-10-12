@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_FORENSIC_B4_EXECUTION_LOCK_V1",
   "recordedAt": "2026-10-08T21:43:35.454Z",
-  "status": "B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL",
+  "status": "B4_003_R23_SOURCE_STAGED_PENDING_PREVIEW",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "block": "B4",
@@ -38,10 +38,10 @@
   "activeFinding": {
     "id": "B4-003",
     "title": "Cumulative B4-003 remediation: Renovaciones, Cancelaciones and source-backed insurer knowledge.",
-    "status": "B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL",
+    "status": "B4_003_R23_SOURCE_STAGED_PENDING_PREVIEW",
     "blocking": true,
-    "nextAction": "B4_003_R20_TARGETED_PAULA_VISUAL",
-    "humanVisualStatus": "PENDING_R20_TARGETED_VISUAL",
+    "nextAction": "B4_003_R23_CONTRACT_AND_EXACT_PREVIEW",
+    "humanVisualStatus": "SCOPED_OPS_CANCELACIONES_PASS_PRESERVED_OTHER_P0_OPEN",
     "knowledgePreview": true
   },
   "rules": {
@@ -87,12 +87,13 @@
       "orbit360-platform/data/store-firestore-product-operational-p0.js",
       "orbit360-platform/modules/inicio.js",
       "orbit360-platform/styles/infra.css",
-      "functions/product-ops-leads-domain.js"
+      "functions/product-ops-leads-domain.js",
+      "orbit360-platform/core/queries.js"
     ],
     "reimportAuthorized": false,
     "livePromotionAuthorized": false,
-    "syntheticQaWritesAuthorized": false,
-    "syntheticQaScope": "B4-003 existing exact isolated Preview only; disposable B4003 fixtures, targeted advisor UI readback/reload, read-only cancelled-run inventory, cleanup required",
+    "syntheticQaWritesAuthorized": true,
+    "syntheticQaScope": "EXACT_B4_003_PREVIEW_ONLY_EPHEMERAL_B4003_FIXTURES_MANDATORY_CLEANUP",
     "paulaVisualAcceptanceRequiredBeforeAdvance": true,
     "cotcompRealTransportAuthorized": false,
     "providerDeploymentAuthorized": true,
@@ -119,10 +120,10 @@
     "renewalCutoffDataMutationAuthorized": false,
     "realOperationalWritesAuthorized": false
   },
-  "nextAction": "B4_003_R20_TARGETED_PAULA_VISUAL",
+  "nextAction": "B4_003_R23_CONTRACT_AND_EXACT_PREVIEW",
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "blobSha": "d9e47cb9984d50320d3f45235396b68e05aea622",
+    "blobSha": "cb575f4a21ee6914e1e8a3551a812e98e2c1ab18",
     "status": "FROZEN_ACTIVE_UAT3_P0_BATCH_1_SOURCE_COMPLETE"
   },
   "findingLedger": {
@@ -1770,17 +1771,21 @@
       "functions/assignable-advisor-roster.js",
       "orbit360-platform/core/assignable-advisor-roster-client.js",
       "orbit360-platform/modules/inicio.js",
-      "orbit360-platform/index.html"
+      "orbit360-platform/index.html",
+      "orbit360-platform/core/queries.js"
     ],
     "allowedQaFiles": [
-      "tools/gravicentra-i6-5-b4-003-preview-proof.mjs"
+      "tools/gravicentra-i6-5-b4-003-preview-proof.mjs",
+      "tools/gravicentra-i6-5-b4-003-contract.mjs"
     ],
     "noNewTeamAdminRights": true,
     "productionForbidden": true,
     "syntheticFixturesAuthorizedOnlyWithinIsolatedPreview": true,
     "syntheticCleanupRequired": true,
     "realBusinessWritesForbidden": true,
-    "navigationRootfixOwner": "orbit360-platform/index.html"
+    "navigationRootfixOwner": "orbit360-platform/index.html",
+    "additionalScopedP0": "B4-003-P0-20261012-PERSONAL-COLLECTION",
+    "authoritySupplement": "Paula 2026-10-12 continue after causal Finance/recaudo source audit; no real or production writes"
   },
   "r23InicioProgress": {
     "status": "R23_UNIFIED_PROJECTION_SOURCE_FIXED_PREVIEW_REQUIRED",
@@ -1807,7 +1812,12 @@
     "productionChanged": false,
     "realDataWrites": 0,
     "renewalSourceDryRunReady": false,
-    "liveLineageUnresolved": true
+    "liveLineageUnresolved": true,
+    "r26PersonalRecaudoSourceStaged": true,
+    "personalRecaudoSourceBlobs": {
+      "orbit360-platform/core/queries.js": "55acae8c4c933bde47afb018be55e978d9b81cdd",
+      "orbit360-platform/modules/inicio.js": "e5aca652cb9ac4455017f9328142b0ccd841b97f"
+    }
   },
   "r23QaRenderDiagnostic": {
     "status": "QA_ONLY_ROOT_CAUSE_DIAGNOSTIC_STAGED_PREVIEW_RETRY_REQUIRED",
@@ -2273,5 +2283,22 @@
     "status": "SIX_OPEN_UNTIL_FUNCTIONAL_AND_HUMAN_CLOSURE",
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_P0_FINDINGS_DECISIONS_FREEZE_20261012.md",
     "receiptBlobSha": "2760d2aeb961bac5a0ce11e326c689143d2cc083"
+  },
+  "priorMachinePass": {
+    "status": "B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL",
+    "runId": 38282275915,
+    "sourceSha": "bf2e398622995e1794b53640b348a7a3a3bbbc7c",
+    "buildId": "gi-i65-b4-bf2e39862299-57f234755dc1",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-38282275915-949g36lw.web.app",
+    "scopedVisualPassPreserved": true
+  },
+  "r26PersonalRecaudoSource": {
+    "status": "SOURCE_STAGED_PREVIEW_PENDING",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R26_PERSONAL_RECAUDO_CAUSAL_SOURCE_FIX_20261012.json",
+    "blobSha": "2061b9f4d7845f8ff99326d2ab59ce28dca2fbee",
+    "unitQaBlobSha": "3bd36b2abb7ab5da881a9028e494d1a2e10cfec6",
+    "findingId": "B4-003-P0-20261012-PERSONAL-COLLECTION",
+    "priorAcceptedVisual": "PRESERVED",
+    "pendingFunctionalPass": true
   }
 }

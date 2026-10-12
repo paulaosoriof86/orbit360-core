@@ -1,0 +1,54 @@
+{
+  "schema": "GRAVICENTRA_B4003_P0_PERSONAL_RECAUDO_R26_SOURCE_STAGED_V1",
+  "date": "2026-10-12",
+  "status": "SOURCE_STAGED_CONTRACT_AND_AUTHENTICATED_PREVIEW_REQUIRED",
+  "repo": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "baseHead": "8970f276df97c3b3f2533f1483f1e54964f39bf9",
+  "gate": "I6.5/B4-003",
+  "findingId": "B4-003-P0-20261012-PERSONAL-COLLECTION",
+  "authority": "Paula continued B4-003 P0 causal remediation after 2026-10-12 diagnostic; only existing gate and canonical accumulation",
+  "oldBlobs": {
+    "orbit360-platform/core/queries.js": "7ff1b3cdf9091ffcab864a247433e19c2f1d06be",
+    "orbit360-platform/modules/inicio.js": "3bfac3ae73b5b954303a30eb683ffe8deac1ce84",
+    "orbit360-platform/index.html": "f6edee8066d41b653503bbbe11017cb270ca4c72",
+    "tools/gravicentra-i6-5-b4-003-contract.mjs": "4d93a32158e12e42cf8ca91ce808e296a30ce813"
+  },
+  "newBlobs": {
+    "orbit360-platform/core/queries.js": "55acae8c4c933bde47afb018be55e978d9b81cdd",
+    "orbit360-platform/modules/inicio.js": "e5aca652cb9ac4455017f9328142b0ccd841b97f",
+    "orbit360-platform/index.html": "d01e7529133bdf1a375c750380b7f4721c0deb0d",
+    "tools/gravicentra-i6-5-b4-003-contract.mjs": "3bd36b2abb7ab5da881a9028e494d1a2e10cfec6"
+  },
+  "scope": [
+    "Add optional advisorId to canonical realized-payment monthly money-map, preserve total when absent",
+    "Personal requires matching canonical policy advisor; explicit contradictory advisor blocks attribution",
+    "Use advisor scoped collection in Inicio and show personal alongside existing team/global dial, preserve approved premium layout",
+    "Cache-bust only changed assets",
+    "Run exact JS source in Node VM deterministic fixture contract; negative tests for cross-advisor, cross-country, non-payment, unlinked policy, wrong month"
+  ],
+  "evidenceBefore": "I6_5_B4_003_FINANZAS_RECAUDO_CAUSAL_READONLY_20261012.json",
+  "expectedProof": [
+    "node B4-003 contract with deterministic source-executed cases",
+    "authenticated Preview GTQ/COP, owner scope, financial readback, reload, responsive",
+    "visual compare accepted Inicio and preserve Ops/Cancelaciones/Client360/Renovaciones"
+  ],
+  "explicitHold": [
+    "institutional goals write owner and country/period persists - remains P0",
+    "freelancer canonical eligibility - remains P0",
+    "historical QA residue - remains P0",
+    "LIVE lineage mismatch remains production blocker"
+  ],
+  "policy": {
+    "productSourceMutationScopedToListedFiles": true,
+    "realBusinessWritesAuthorized": false,
+    "dataMutationAuthorized": false,
+    "reimportAuthorized": false,
+    "productionPromotionAuthorized": false,
+    "syntheticQaOnlyIsolatedPreview": true,
+    "priorHumanVisualAcceptedPassesPreserved": true,
+    "sourceFixNotFunctionalPass": true,
+    "newBranch": false,
+    "newGate": false
+  }
+}

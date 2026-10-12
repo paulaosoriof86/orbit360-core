@@ -176,13 +176,16 @@ Orbit.modules.inicio = (function () {
         const cur=country==='GT'?'GTQ':'COP',total=Number(map[cur]||0),global=configuredMeta(kind==='production'?'prima':'recaudo',country),hasGlobal=global!=null&&global>0;
         const a=self&&self.paises.includes(country)?self:null,m=a?.metas?.[country];
         const mine=kind==='production'?(m?.explicit===true?U.finiteNumber(m.produccion):(a?.paises.length===1?U.finiteNumber(a.metaPrima):null)):(m?.explicit===true?U.finiteNumber(m.recaudo):null);
-        const personal=!hasGlobal&&kind==='production'&&!!a&&mine!=null&&mine>0;
-        const ownTotals=personal&&q.produccionMesPorMoneda?q.produccionMesPorMoneda(mesKey,a.id):{};
-        const val=personal?Number(ownTotals[cur]||0):total,goal=hasGlobal?global:personal?mine:null;
+        const hasMine=!!a&&mine!=null&&mine>0;
+        const personal=!hasGlobal&&hasMine;
+        const ownTotals=hasMine?(kind==='production'?(q.produccionMesPorMoneda?q.produccionMesPorMoneda(mesKey,a.id):{}):(q.recaudoMesPorMoneda?q.recaudoMesPorMoneda(mesKey,a.id):{})):{};
+        const ownAmount=Number(ownTotals[cur]||0);
+        const val=personal?ownAmount:total,goal=hasGlobal?global:personal?mine:null;
         const pct=goal>0?Math.round(val/goal*100):null,deg=pct==null?0:Math.max(0,Math.min(100,pct))*2.7;
         const source=hasGlobal?'global':personal?'personal':metaReadiness==='ready'?'team-pending':'loading';
         const desc=hasGlobal?'Meta del equipo: '+U.moneyShort(global,cur):personal?'Mi meta: '+U.moneyShort(mine,cur):'Meta del equipo por confirmar';
-        const extra=personal?'Total país: '+U.moneyShort(total,cur):!hasGlobal&&mine>0?'Mi meta individual: '+U.moneyShort(mine,cur):!hasGlobal?'Metas personales en Avance por asesor':'';
+        const personalPct=hasMine?Math.round(ownAmount/mine*100):null;
+        const extra=hasMine?(personal?'Total país: '+U.moneyShort(total,cur):'Mi '+(kind==='production'?'producción':'recaudo')+': '+U.moneyShort(ownAmount,cur)+' · meta propia '+U.moneyShort(mine,cur)+' · '+personalPct+'%'):!hasGlobal?'Metas personales en Avance por asesor':'';
         return '<div data-inicio-country="'+country+'" data-goal-source="'+source+'" style="min-width:155px;flex:1 1 155px;max-width:255px;border:1px solid var(--line);border-top:4px solid var(--red);border-radius:16px;background:var(--card);padding:14px 10px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;text-align:center;box-shadow:0 6px 16px rgba(15,23,42,.07)">'
           +'<b style="color:var(--ink);font-size:12px">'+country+' · '+cur+'</b>'
           +'<div style="width:136px;height:136px;padding:13px;box-sizing:border-box;border-radius:50%;--gi-inicio-sweep:'+deg+'deg;background:conic-gradient(from 225deg,var(--red) 0deg,var(--red) '+deg+'deg,#dfe2e7 '+deg+'deg,#dfe2e7 270deg,transparent 270deg 360deg)">'

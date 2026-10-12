@@ -277,13 +277,22 @@ Orbit.q = (function () {
     });
     return out;
   }
-  function recaudoMesPorMoneda(monthKey) {
+  function recaudoMesPorMoneda(monthKey, advisorId) {
     const key = String(monthKey || currentMonthKey()).slice(0, 7);
     const clients = clientIndex();
     const policies = new Map((S().all('polizas') || []).filter(p => p && p.id != null).map(p => [p.id, p]));
     const out = {};
+    // A personal recaudo is attributable only to the canonical policy advisor.
+    // Preserve the existing institution-wide total when advisorId is omitted.
+    const requestedAdvisor = String(advisorId == null ? '' : advisorId).trim();
     realizedPaymentRows().filter(r => rowPais(r, clients, policies)).forEach(r => {
       if (paymentBusinessDate(r).slice(0, 7) !== key) return;
+      if (requestedAdvisor) {
+        const policy = r.polizaId != null ? policies.get(r.polizaId) : null;
+        const policyAdvisor = String(policy && policy.asesorId || '').trim();
+        const declaredAdvisor = String(r.asesorId || '').trim();
+        if (!policyAdvisor || policyAdvisor !== requestedAdvisor || (declaredAdvisor && declaredAdvisor !== policyAdvisor)) return;
+      }
       const n = finite(r.monto);
       if (n == null) return;
       const cur = currencyCodeFor(r, clients, policies);
