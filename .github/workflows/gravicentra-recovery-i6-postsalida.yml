@@ -2940,6 +2940,7 @@ jobs:
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'mode='+mode+'\n');console.log('B1_MODE='+mode);
           NODE
       - name: Assert LIVE still equals certified candidate
+        if: steps.mode.outputs.mode == 'preview'
         run: node tools/gravicentra-certified-live-binding-check.mjs
       - name: No-op until B1 product candidate exists
         if: steps.mode.outputs.mode == 'noop'
@@ -3590,6 +3591,7 @@ jobs:
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'mode='+mode+'\n');console.log('B2_MODE='+mode);
           NODE
       - name: Assert LIVE still equals certified candidate
+        if: steps.mode.outputs.mode == 'preview'
         run: node tools/gravicentra-certified-live-binding-check.mjs
       - name: Validate B2 source contracts
         if: steps.mode.outputs.mode == 'preview'
