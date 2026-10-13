@@ -821,6 +821,127 @@ async function runR26RealReadOnly(){
  if(ownForeignPolicyReads.length)throw Error('B4_003_R26_FOREIGN_POLICY_SERVER_READ_BLOCKING:'+ownForeignPolicyReads.map(x=>x.role+':'+x.country).join(','));
  if(ownScopeCountryExposure.length)throw Error('B4_003_R26_OWN_SCOPE_COUNTRY_TOTAL_EXPOSURE_BLOCKING:'+ownScopeCountryExposure.map(x=>x.role+':'+x.country).join(','));
 }
+/* B4-003 cumulative P0 classification. Uses the existing QA helper + exact
+   canonical records. No mutation, no new gate, no assumption-based cleanup. */
+async function runB4003CumulativeP0ReadOnly(){
+ const ledgerPath='artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json';
+ const carryPath='artifacts/orbit360-recovery/release-control/I6_5_OPEN_FINDINGS_CARRY_FORWARD_REGISTER_20261003.json';
+ const ledger=JSON.parse(fs.readFileSync(ledgerPath,'utf8'));
+ const carry=JSON.parse(fs.readFileSync(carryPath,'utf8'));
+ const findings=ledger.findings||[],inventory=carry.inventory||[],attention=carry.attentionIds||[];
+ const ids=new Set(findings.map(x=>x.id)), invIds=new Set(inventory.map(x=>x.id));
+ need(ids.size===295&&invIds.size===295&&findings.length===295&&inventory.length===295,
+   'B4_003_P0_FINDINGS_295_SET_COUNT_MISMATCH');
+ need([...ids].every(x=>invIds.has(x))&&[...invIds].every(x=>ids.has(x)),
+   'B4_003_P0_FINDINGS_LOSS_OR_ADDITION');
+ need(attention.length===166&&new Set(attention).size===166&&attention.every(x=>ids.has(x)),
+   'B4_003_P0_ATTENTION_SET_DRIFT');
+ const mandatoryIds=[
+  'B4-003-P0-20261012-PERSONAL-COLLECTION',
+  'B4-003-P0-20261012-INSTITUTIONAL-GOALS',
+  'B4-003-P0-20261012-FREELANCERS-GOAL-SCOPE',
+  'B4-003-P0-20261012-INICIO-MOTIVATIONAL-TEXTS',
+  'B4-003-P0-20261012-QA-CANCELLED-RUN-FIXTURES',
+  'B4-003-P0-20261012-QA-ORPHAN-RENEWALS',
+  ...Array.from({length:7},(_,i)=>'B4-003-UAT-20261011-0'+(i+1))
+ ];
+ need(mandatoryIds.every(id=>ids.has(id)),'B4_003_P0_CURRENT_ACCEPTANCE_FINDING_MISSING');
+ const snapshot=async key=>tenant.collection('data').doc(key).collection('items').get();
+ const [metas,advisors,oldQA]=await Promise.all([
+   snapshot('metas'),snapshot('asesores'),auditCancelledQaFixtures()
+ ]);
+ await residueReadback();
+ const contractFields=['tipoContrato','contractType','tipoVinculacion','vinculacion',
+   'relacionLaboral','tipoRelacionLaboral','esFreelancer','freelancer',
+   'independiente','modalidadContrato','modalidadTrabajo','tipoAsesor',
+   'elegibleMetaInstitucional','participaMetas','metaEmpresaElegible'];
+ const contractCoverage={};
+ for(const field of contractFields)contractCoverage[field]=advisors.docs.filter(d=>{
+  const row=d.data()||{};return row[field]!==undefined&&row[field]!==null&&String(row[field]).trim()!=='';
+ }).length;
+ const metaStatus={total:metas.size,advisorIndividual:0,institutionalGlobal:0,
+   untyped:0,missingCountry:0,missingPeriod:0,negativeOrNonnumeric:0,
+   countsByCountry:{},countsByMonth:{},countsByType:{},globalByCountry:{},duplicateSourceKeys:0};
+ const metaKeys=new Set();
+ const cappedCount=(o,k)=>{if(!o[k])o[k]=0;o[k]++;};
+ for(const d of metas.docs){
+  const x=d.data()||{},advisor=clean(x.asesorId||x.advisorId),country=clean(x.pais).toUpperCase()||
+    (clean(x.moneda).toUpperCase()==='GTQ'?'GT':clean(x.moneda).toUpperCase()==='COP'?'CO':'');
+  const period=clean(x.mes||x.periodo).slice(0,7),type=norm(x.tipo),amount=Number(x.valor);
+  if(advisor)metaStatus.advisorIndividual++;else metaStatus.institutionalGlobal++;
+  if(!type)metaStatus.untyped++;
+  if(!['GT','CO'].includes(country))metaStatus.missingCountry++;
+  if(!/^20\\d{2}-(0[1-9]|1[0-2])$/.test(period))metaStatus.missingPeriod++;
+  if(x.valor==null||x.valor===''||!Number.isFinite(amount)||amount<0)metaStatus.negativeOrNonnumeric++;
+  if(country)cappedCount(metaStatus.countsByCountry,country);
+  if(period&&/^20\\d{2}-/.test(period))cappedCount(metaStatus.countsByMonth,period);
+  if(type)cappedCount(metaStatus.countsByType,type);
+  if(!advisor&&country)cappedCount(metaStatus.globalByCountry,country);
+  const key=advisor+'|'+country+'|'+period+'|'+type;
+  if(metaKeys.has(key))metaStatus.duplicateSourceKeys++;
+  metaKeys.add(key);
+ }
+ const cleanResidue=(proof.qaResidue?.rows||[]).map(x=>({
+   qaPolicyId:x.id,exists:x.exists===true,previewWrite:x.previewWrite===true,
+   parentExists:x.parentExists===true,dependentTotal:x.dependentTotal,
+   dependents:x.dependents||{}
+ }));
+ const oldest=(oldQA.rows||[]).map(x=>({
+   collection:x.collection,qaId:x.id,exists:x.exists===true,
+   verifiedSynthetic:x.syntheticFlag===true,provenanceOwnerPresent:x.ownerUidPresent===true,
+   previewWrite:x.previewWrite===true,referentialReviewPending:true
+ }));
+ const statuses=mandatoryIds.map(id=>{
+  const x=findings.find(x=>x.id===id);
+  return{id,status:x.status,blocking:x.blocking===true,priority:x.priority||''};
+ });
+ const result={
+  schema:'GRAVICENTRA_I65_B4003_CUMULATIVE_P0_READONLY_INVENTORY_V1',
+  status:'READONLY_SOURCE_INVENTORY_COMPLETE_P0_ALL_OPEN',
+  sourceHead:process.env.GITHUB_SHA,gate:'I6.5/B4-003',readOnly:true,
+  realBusinessWrites:0,syntheticWrites:0,productionChanges:0,
+  mutationAuthorized:false,livePromotionAuthorized:false,
+  continuity:{totalLedger:findings.length,totalCarry:inventory.length,
+   uniqueIds:ids.size,attentionCount:attention.length,
+   mandatoryCurrentP0AndUat:statuses,currentP0Closed:0,
+   ledgerSha256:hash(findings),carryInventorySha256:hash(inventory)},
+  institutionalGoals:{metaSource:metaStatus,writeAuthorized:false,
+   serverOwnedGlobalMetaSaveBrowserReadback:'NOT_TESTED',
+   metadataRequiresMonthCountryCurrencyAdvisorEmpty:true},
+  freelancers:{advisorRows:advisors.size,contractFieldPresenceCounts:contractCoverage,
+   eligibilityBasedOnCanonicalContract:'UNPROVEN_NOT_ACCEPTED',
+   noNameHeuristicsApplied:true,willNotErasePersonalGoals:true},
+  legacyQAFixtures:{runId:38102224750,records:oldest,
+   currentPresent:oldest.filter(x=>x.exists).length,
+   cleanupPermitted:false,dependencyGraphComplete:false},
+  orphanRenewalFixtures:{records:cleanResidue,
+   status:proof.qaResidue?.classification||'UNVERIFIED',
+   exactThreeTracked:cleanResidue.length===3,
+   dependentTotal:cleanResidue.reduce((a,x)=>a+Number(x.dependentTotal||0),0),
+   cleanupPermitted:false},
+  otherCurrentUat:{currentIds:statuses.filter(x=>x.id.includes('-UAT-')),
+   previouslyAcceptedScopedVisualPreserved:true,
+   scopeAndReloadFinalAcceptance:'PENDING_EVIDENCE'},
+  remainingBlocks:['R26_SERVER_AUTHZ_BREACH','INSTITUTIONAL_GLOBAL_GOALS_OWNER',
+   'FREELANCER_REAL_CONTRACT_ELIGIBILITY','INICIO_CONTEXTUAL_COPY',
+   'QA_CANCELLED_RUN_PROVENANCE_AND_DEPENDENCIES',
+   'B2_ORPHAN_RENEWAL_DEPENDENT_RECONCILIATION',
+   'UAT_P0_FUNCTIONAL_AND_PAULA_VISUAL_REVIEW'],
+  p0ClosureCount:0,productionAccepted:false
+ };
+ fs.writeFileSync(outPath,JSON.stringify(result,null,2)+'\n');
+ console.log(JSON.stringify({status:result.status,ledger:findings.length,
+   carry:inventory.length,attention:attention.length,
+   advisorRows:advisors.size,metaRows:metas.size,
+   globalGoals:metaStatus.institutionalGlobal,
+   qaOldPresent:result.legacyQAFixtures.currentPresent,
+   orphanDependencies:result.orphanRenewalFixtures.dependentTotal,
+   realWrites:0,p0ClosureCount:0}));
+}
+if(process.env.B4_003_P0_READONLY==='true'){
+ await runB4003CumulativeP0ReadOnly();
+ process.exit(0);
+}
 if(process.env.B4_003_R26_READONLY==='true'){
  await runR26RealReadOnly();
  process.exit(0);
