@@ -189,6 +189,22 @@ jobs:
           // No deploy, real writes, data migration, or reopening accepted visual scope.
           const {execFileSync}=require('node:child_process');
           const qaTrigger=execFileSync('git',['log','-1','--format=%s'],{encoding:'utf8'}).trim()==='test(i6.5 R26): authenticated read-only payment parity proof';
+          const r26RulesTrigger=execFileSync('git',['log','-1','--format=%s'],{encoding:'utf8'}).trim()==='audit(i6.5 R26): read-only deployed Firestore rules binding';
+          const r26RulesReadOnly=r26RulesTrigger
+            && c.currentB4?.status==='B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL'
+            && c.nextAction==='I6_5_FORENSIC_REMEDIATION_B4_003_R20_TARGETED_PAULA_VISUAL'
+            && c.r26PersonalCollection?.p0Closed===false
+            && c.r26PersonalCollection?.noDataWrites===true
+            && c.r26PersonalCollection?.noProduction===true
+            && l.activeFinding?.id==='B4-003'
+            && l.boundaries?.productMutationAuthorized===false
+            && l.boundaries?.dataMutationAuthorized===false
+            && l.boundaries?.configWritesAuthorized===false
+            && l.boundaries?.realOperationalWritesAuthorized===false
+            && l.boundaries?.syntheticQaWritesAuthorized===false
+            && l.boundaries?.livePromotionAuthorized===false;
+          if(r26RulesTrigger&&!r26RulesReadOnly)throw Error('B4_003_R26_RULES_READONLY_GATE_FAIL_CLOSED');
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'r26_rules_readonly='+(r26RulesReadOnly?'true':'false')+'\n');
           const exactPreview=String(c.currentB4?.previewUrl||'');
           const r26ReadOnly=qaTrigger
             && c.currentB4?.status==='B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL'
@@ -263,6 +279,101 @@ jobs:
         with:
           name: gravicentra-b4-003-r26-authenticated-readonly-${{ github.run_id }}
           path: ${{ runner.temp }}/b4-003-r26-real-readonly.json
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Prepare authenticated Firestore Rules readback
+        if: steps.gate.outputs.r26_rules_readonly == 'true'
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json,os,pathlib
+          dest=pathlib.Path(os.environ['RUNNER_TEMP'])/'r26-rules-audit-service-account.json'
+          selected=None
+          for key in ['SA_DEFAULT','SA_ORBIT360_LAB','SA_ORBIT_360_LAB']:
+              try: item=json.loads(os.environ.get(key,''))
+              except (ValueError,TypeError): continue
+              if item.get('type')=='service_account' and item.get('project_id')==os.environ['PROJECT_ID'] and item.get('private_key'):
+                  selected=item;break
+          if not selected:raise SystemExit('R26_RULES_READBACK_EXISTING_SERVICE_ACCOUNT_MISSING')
+          dest.write_text(json.dumps(selected),encoding='utf8')
+          dest.chmod(0o600)
+          with open(os.environ['GITHUB_ENV'],'a',encoding='utf8') as out:
+              out.write('GOOGLE_APPLICATION_CREDENTIALS='+str(dest)+'\n')
+          print('R26_RULES_READBACK_EXISTING_AUTH=FOUND')
+          PY
+          npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund google-auth-library@9.15.1 >/dev/null
+
+      - name: Read effective live Firestore Rules release without writes
+        if: steps.gate.outputs.r26_rules_readonly == 'true'
+        env:
+          R26_RULES_OUT: ${{ runner.temp }}/r26-rules-live-readback.json
+        run: |
+          set -euo pipefail
+          node - <<'NODE'
+          const fs=require('node:fs'),crypto=require('node:crypto');
+          const {GoogleAuth}=require('google-auth-library');
+          const sha=s=>crypto.createHash('sha256').update(String(s||''),'utf8').digest('hex');
+          const project=process.env.PROJECT_ID,base='https://firebaserules.googleapis.com/v1/';
+          const result={schema:'GRAVICENTRA_B4_003_R26_EFFECTIVE_FIRESTORE_RULES_READONLY_V1',
+            status:'INIT',project,gate:'I6.5/B4-003',readOnly:true,
+            businessWrites:0,sourceMutations:0,ruleMutations:0,deploys:0,
+            productionPromotion:false,p0Closed:false,
+            gitSourceSha:process.env.GITHUB_SHA,
+            localCandidateRules:{
+              productReadOnlySha256:sha(fs.readFileSync('firestore.product-readonly.rules','utf8')),
+              legacySha256:sha(fs.readFileSync('firestore.rules','utf8'))
+            }};
+          (async()=>{
+            try{
+              const client=await new GoogleAuth({scopes:['https://www.googleapis.com/auth/firebase.readonly']}).getClient();
+              const release=(await client.request({url:base+'projects/'+project+'/releases/cloud.firestore'})).data;
+              if(!/^projects\/[a-z0-9-]+\/rulesets\/[^/]+$/.test(String(release.rulesetName||'')))
+                throw Error('R26_RULESET_RESOURCE_INVALID');
+              const rules=(await client.request({url:base+release.rulesetName})).data;
+              const files=rules.source?.files||[];
+              if(!files.length||files.some(f=>typeof f.content!=='string'))throw Error('R26_RULESET_SOURCE_EMPTY');
+              const body=files.map(f=>f.content).join('\n');
+              const productRules=fs.readFileSync('firestore.product-readonly.rules','utf8');
+              const legacyRules=fs.readFileSync('firestore.rules','utf8');
+              const dataRuleSection=body.match(/match\s+\/tenants\/\{tenantId\}\/data\/\{collection\}\/items\/\{documentId\}\s*\{([\s\S]*?)\n\s*\}/);
+              const memberOnly=dataRuleSection
+                ?/allow\s+read\s*:\s*if\s+activeMembership\(tenantId\)\s*;/.test(dataRuleSection[1]):false;
+              result.status='LIVE_FIRESTORE_RULESET_READBACK_COMPLETE_UNDER_REVIEW';
+              result.release={name:release.name,rulesetName:release.rulesetName,updateTime:release.updateTime||''};
+              result.files=files.map(f=>({name:f.name,sha256:sha(f.content),bytes:f.content.length}));
+              result.rulesSha256=sha(body);
+              result.exactProductRulesMatch=files.length===1&&files[0].content===productRules;
+              result.exactLegacyRulesMatch=files.length===1&&files[0].content===legacyRules;
+              result.hasCanonicalDataMatch=!!dataRuleSection;
+              result.sourceHasMembershipOnlyDataRead=memberOnly;
+              result.rowLevelScopeVerified=false;
+              result.securityPass=false;
+              result.additionalNegativeActorTestRequired=true;
+              result.classification=memberOnly?'LIVE_RULES_MEMBER_ONLY_DATA_READ_NO_ADVISOR_CHECK':
+                'LIVE_RULES_SOURCE_READBACK_REQUIRES_CAUSAL_ADVISOR_SCOPE_REVIEW';
+            }catch(e){
+              result.status='LIVE_RULES_READBACK_BLOCKED_FAIL_CLOSED';
+              result.blockerCode=String(e?.code||e?.response?.status||'UNKNOWN');
+              result.blockerClass=String(e?.message||'READ_FAILED').replace(/[\r\n]/g,' ').slice(0,230);
+            }
+            fs.writeFileSync(process.env.R26_RULES_OUT,JSON.stringify(result,null,2)+'\n');
+            console.log('R26_EFFECTIVE_RULES_READBACK='+JSON.stringify({
+              status:result.status,classification:result.classification||'BLOCKED',
+              exactProductRulesMatch:result.exactProductRulesMatch===true,
+              membershipOnlyDataRead:result.sourceHasMembershipOnlyDataRead===true,
+              rulesSha256:result.rulesSha256||'',blockerCode:result.blockerCode||''}));
+            if(result.status!=='LIVE_FIRESTORE_RULESET_READBACK_COMPLETE_UNDER_REVIEW')
+              process.exitCode=1;
+          })().catch(e=>{console.error('R26_RULES_READONLY_UNEXPECTED:'+String(e.message||e));process.exitCode=1;});
+          NODE
+
+      - name: Preserve effective Firestore Rules readback evidence
+        if: always() && steps.gate.outputs.r26_rules_readonly == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: gravicentra-r26-effective-rules-readonly-${{ github.run_id }}
+          path: ${{ runner.temp }}/r26-rules-live-readback.json
           if-no-files-found: warn
           retention-days: 14
 
