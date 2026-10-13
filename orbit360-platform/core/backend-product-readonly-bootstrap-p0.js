@@ -268,9 +268,14 @@
       var storeDeps = typeof deps.firebaseAdapter.storeDependencies === 'function'
         ? deps.firebaseAdapter.storeDependencies(firebaseContext)
         : { db: firebaseContext && firebaseContext.db };
+      if(options.protectedReadCandidate===true){
+        if(typeof deps.protectedReadPage!=='function')throw new Error('PROTECTED_READ_PROVIDER_MISSING');
+        storeDeps.protectedReadPage=deps.protectedReadPage;
+      }
       store = window.Orbit.createFirestoreProductReadOnlyStoreP0(storeDeps, {
         tenantId: tenantId,
         membership: membership,
+        protectedReadCandidate: options.protectedReadCandidate===true,
         collections: plan.collections,
         queryPlanner: queryPlanner,
         paths: window.Orbit.tenantCanonicalPathsP0

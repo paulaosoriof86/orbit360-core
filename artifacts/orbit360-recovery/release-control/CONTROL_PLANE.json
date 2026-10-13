@@ -5996,7 +5996,7 @@
   "canonicalAccumulationControl": {
     "status": "FROZEN_ACTIVE",
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "compositionLockBlobSha": "b38a7710cfae53e237655d1298f0bad2eeb5dcfc",
+    "compositionLockBlobSha": "82cce34dc28b2b67237b1f584837331844b15b93",
     "findingLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
     "findingLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
@@ -9956,6 +9956,28 @@
     "dataReimportAuthorized": false,
     "existingCertifiedPreviewImmutable": true,
     "previewBuildRequiredAfterSourceChange": true,
+    "securityP0Closed": false
+  },
+  "b4003ProtectedHydrationSourceCandidate": {
+    "status": "SOURCE_STAGED_PENDING_QA_AND_EXACT_PREVIEW",
+    "sourceAuthorizationBlobSha": "3b17ba3e560117345afc8fb476580ed26e275d67",
+    "productBlobs": {
+      "orbit360-platform/core/product-runtime-browser-providers-p0.js": "be42c187bb44071efda8b095f7f121f5de4bd092",
+      "orbit360-platform/core/backend-product-readonly-bootstrap-p0.js": "e8a8346d6dee65bb8cfaa1539595d7d83a978760",
+      "orbit360-platform/data/store-firestore-product-readonly-p0.js": "2dd7431c98f72461015830d2e71b00445215b38e",
+      "orbit360-platform/core/product-app-p0.js": "f114e264679fa2bcbab4e6de3506908d04712488",
+      "orbit360-platform/index.html": "115fd2b798e6139318cce282f39e4a7166c96262"
+    },
+    "manifestBlobSha": "82cce34dc28b2b67237b1f584837331844b15b93",
+    "qaBlobSha": "c239d051c1b49a4de659f0fe30d2fcdbdb30925b",
+    "previewOptIn": "scopedReadPreviewCandidate",
+    "backendExported": false,
+    "previewDeployed": false,
+    "previousMachineProofPreservedAsHistoricalOnly": true,
+    "newProductCandidateRequiresNewArtifact": true,
+    "liveReleasePromotionAuthorized": false,
+    "firestoreRulesDeployed": false,
+    "operationalWrites": 0,
     "securityP0Closed": false
   }
 }

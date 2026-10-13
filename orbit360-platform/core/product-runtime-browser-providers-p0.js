@@ -53,12 +53,32 @@
       return ctx.modules.functions.httpsCallable(fx,name)(data||{});
     }).then(function(result){return result&&Object.prototype.hasOwnProperty.call(result,'data')?result.data:result;});
   }
+
+  function protectedReadPage(data){
+    var v=data||{},cfg=config(),host=String(window.location&&window.location.hostname||'');
+    var coll=String(v.collection||'').trim(),tenant=String(v.tenantId||'').trim();
+    if(!host.includes('--'))return Promise.reject(new Error('PROTECTED_READ_PREVIEW_ONLY'));
+    if(!tenant||tenant!==String(cfg.tenantHint||''))return Promise.reject(new Error('PROTECTED_READ_TENANT_DENIED'));
+    if(!['clientes','polizas','vehiculos','recibosEsperados','carteraPrimas','cobros'].includes(coll)||
+       !['GT','CO'].includes(String(v.country||'').toUpperCase())||!String(v.activeRole||'').trim())
+       return Promise.reject(new Error('PROTECTED_READ_PARAMETERS_DENIED'));
+    if(!['clientes','polizas'].includes(coll)&&!String(v.policyId||'').trim())
+       return Promise.reject(new Error('PROTECTED_READ_POLICY_ANCHOR_REQUIRED'));
+    return callFunction('orbit360ScopedPolicyReadPreview',Object.assign({},v,{collection:coll,tenantId:tenant,mode:'list'}),'us-east1')
+      .then(function(r){
+        if(!r||r.ok!==true||r.serverScoped!==true||r.collection!==coll||
+           r.country!==String(v.country).toUpperCase()||!Array.isArray(r.rows))
+          throw new Error('PROTECTED_READ_SERVER_RESPONSE_INVALID');
+        return r;
+      });
+  }
+
   function dependencies(){
     return{
       environmentProvider:{describePublicConfig:publicDescriptor},
       firebaseAdapter:{initializeFromEnvironment:function(){return initialize();},storeDependencies:function(ctx){var m=ctx.modules.store;return{db:ctx.db,collection:m.collection,query:m.query,where:m.where,onSnapshot:m.onSnapshot,getDocsFromServer:m.getDocsFromServer};}},
       authProvider:{waitForAuthenticatedUser:function(){return waitUser().then(function(u){return{uid:u.uid,email:u.email||'',emailVerified:u.emailVerified===true,disabled:false};});}},
-      membershipProvider:{getByUid:membershipByUid}
+      membershipProvider:{getByUid:membershipByUid},protectedReadPage:protectedReadPage
     };
   }
   function signIn(email,password){return initialize().then(function(ctx){return ctx.modules.auth.signInWithEmailAndPassword(ctx.auth,String(email||'').trim(),String(password||''));});}
@@ -69,5 +89,5 @@
   function updateCurrentUserPassword(password){
     return initialize().then(function(ctx){var target=ctx.auth.currentUser;if(!target)throw new Error('AUTH_USER_NOT_AVAILABLE');return ctx.modules.auth.updatePassword(target,String(password||''));});
   }
-  window.Orbit.productRuntimeBrowserProvidersP0=Object.freeze({VERSION:'p0-b1-20260919.1',enabled:enabled,initialize:initialize,dependencies:dependencies,signIn:signIn,signOut:signOut,sendVerificationEmail:sendVerificationEmail,updateCurrentUserPassword:updateCurrentUserPassword,initialUser:initialUser,waitForUser:waitUser,readTenantConfig:readTenantConfig,callFunction:callFunction,configDescriptor:publicDescriptor,containsSecrets:false,tenantSource:'membership_only',browserFirestoreWriteAuthorized:false,serverWriteTransport:'firebase-functions',authoritativeFirstRead:true,authPersistence:'firebase-default-local',noFallback:true});
+  window.Orbit.productRuntimeBrowserProvidersP0=Object.freeze({VERSION:'p0-b1-20260919.1',enabled:enabled,initialize:initialize,dependencies:dependencies,signIn:signIn,signOut:signOut,sendVerificationEmail:sendVerificationEmail,updateCurrentUserPassword:updateCurrentUserPassword,initialUser:initialUser,waitForUser:waitUser,readTenantConfig:readTenantConfig,callFunction:callFunction,protectedReadPage:protectedReadPage,configDescriptor:publicDescriptor,containsSecrets:false,tenantSource:'membership_only',browserFirestoreWriteAuthorized:false,serverWriteTransport:'firebase-functions',authoritativeFirstRead:true,authPersistence:'firebase-default-local',noFallback:true});
 })();

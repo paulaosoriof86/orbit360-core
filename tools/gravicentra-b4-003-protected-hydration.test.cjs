@@ -1,0 +1,49 @@
+'use strict';
+const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
+const source=fs.readFileSync('orbit360-platform/data/store-firestore-product-readonly-p0.js','utf8');
+const provider=fs.readFileSync('orbit360-platform/core/product-runtime-browser-providers-p0.js','utf8');
+const app=fs.readFileSync('orbit360-platform/core/product-app-p0.js','utf8');
+const bootstrap=fs.readFileSync('orbit360-platform/core/backend-product-readonly-bootstrap-p0.js','utf8');
+assert.match(provider,/orbit360ScopedPolicyReadPreview/);
+assert.match(app,/scopedReadPreviewCandidate===true/);
+assert.match(bootstrap,/protectedReadCandidate: options.protectedReadCandidate===true/);
+const events={},calls=[],tenant='synthetic-tenant';let role='asesor',direct=0;
+const win={Orbit:{session:{rol:()=>role}}};
+const doc={addEventListener:(k,fn)=>events[k]=fn,removeEventListener:k=>delete events[k]};
+vm.runInNewContext(source,{window:win,document:doc,console,Promise,Map,Set,CustomEvent:function(){},
+setTimeout,clearTimeout,requestIdleCallback:fn=>setTimeout(fn,0)});
+const dataset={GT:[{id:'c1',canonicalDocumentId:'c1',tenantId:tenant,pais:'GT',asesorId:'a1'},
+{id:'c2',canonicalDocumentId:'c2',tenantId:tenant,pais:'GT',asesorId:'a2'}],
+CO:[{id:'c3',canonicalDocumentId:'c3',tenantId:tenant,pais:'CO',asesorId:'a1'}]};
+const deps={db:{},collection:()=>{direct++;throw Error('DIRECT_READ_USED');},
+onSnapshot:()=>{direct++;throw Error('DIRECT_LISTENER_USED');},getDocsFromServer:()=>{direct++;throw Error('DIRECT_GET_USED');},
+protectedReadPage:async req=>{
+ calls.push({...req});
+ const visible=(dataset[req.country]||[]).filter(x=>req.activeRole==='operativo'||x.asesorId==='a1');
+ const pos=req.cursor?visible.findIndex(x=>x.id===req.cursor)+1:0;
+ const slice=visible.slice(pos,pos+1);
+ return {ok:true,serverScoped:true,collection:req.collection,country:req.country,
+ rows:slice,nextCursor:pos+slice.length<visible.length?slice[slice.length-1].id:null};
+}};
+const paths={validateTenantId:id=>({ok:id===tenant,tenantId:id}),
+ dataCollectionPath:()=>{direct++;throw Error('DIRECT_COLLECTION_USED');}};
+const config=collections=>({tenantId:tenant,collections,requiredCollections:[collections[0]],
+ membership:{activeRole:'asesor',roles:['asesor','operativo'],countries:['GT','CO']},
+ protectedReadCandidate:true,paths,queryPlanner:()=>({ok:true,constraints:[{field:'tenantId',op:'==',value:tenant}]})});
+const pause=()=>new Promise(ok=>setTimeout(ok,30));
+(async()=>{
+ const store=win.Orbit.createFirestoreProductReadOnlyStoreP0(deps,config(['clientes']));
+ assert.equal(store._attachSnapshots(),true);await pause();
+ assert.deepEqual(Array.from(store.all('clientes'),x=>x.id),['c1','c3']);
+ assert.equal(direct,0);assert.equal(store._productStatus().serverConfirmedCollections.includes('clientes'),true);
+ assert.ok(calls.some(x=>x.country==='GT'&&x.activeRole==='asesor'));
+ role='operativo';events['orbit:active-role-changed']();
+ assert.deepEqual(Array.from(store.all('clientes'),x=>x.id),[]);
+ await pause();assert.deepEqual(Array.from(store.all('clientes'),x=>x.id),['c1','c2','c3']);
+ assert.equal(direct,0);
+ const unsupported=win.Orbit.createFirestoreProductReadOnlyStoreP0(deps,config(['recibosEsperados']));
+ assert.equal(unsupported._attachSnapshots(),false);
+ assert.equal(unsupported._productStatus().status,'attach-error');
+ assert.equal(direct,0);
+ console.log('B4_003_PROTECTED_HYDRATION_MOCK_PASS no_direct_firestore role_cache_reset unanchored_fail_closed');
+})().catch(error=>{console.error(error);process.exitCode=1;});

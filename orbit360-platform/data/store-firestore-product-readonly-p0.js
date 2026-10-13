@@ -23,6 +23,7 @@
     var startupCollections = requestedRequired.length ? requestedRequired.slice() : collections.slice();
     var deferredCollections = collections.filter(function (name) { return startupCollections.indexOf(name) < 0; });
     var authoritativeFirstReadRequired = options.authoritativeFirstReadRequired === true;
+    var protectedMode=options.protectedReadCandidate===true,protectedEpoch=0;
     var listeners = [], unsubscribers = [], cache = {}, prefs = clone(options.initialPrefs || {}), deferredAttached = false, deferredScheduled = false, deferredCursor = 0, deferredPauseUntil = 0, attachStarted = {};
     var state = { version: VERSION, mode: 'product', tenantId: tenantCheck.tenantId || text(options.tenantId), source: 'data/store-firestore-product-readonly-p0.js', noFallback: true, writeEnabled: false, ready: false, status: 'created', attachedCollections: [], observedCollections: [], serverConfirmedCollections: [], cacheOnlyCollections: [], snapshotSources: {}, deniedCollections: [], snapshotErrors: {}, quarantinedRows: {}, queryPlans: {}, lastSnapshotAt: null, requiredStartupCollections: startupCollections.slice(), deferredCollections: deferredCollections.slice(), deferredAttached: false, authoritativeFirstRead: authoritativeFirstReadRequired };
     collections.forEach(function (collection) { cache[collection] = []; state.quarantinedRows[collection] = []; });
@@ -71,9 +72,71 @@
     function sameRows(a, b) { if (a === b) return true; if (!Array.isArray(a) || !Array.isArray(b) || a.length !== b.length) return false; for (var i = 0; i < a.length; i += 1) { if (JSON.stringify(a[i]) !== JSON.stringify(b[i])) return false; } return true; }
     function acceptRows(collection, rows, snapshotMeta) { var accepted = [], quarantined = [], fromCache = !!(snapshotMeta && snapshotMeta.fromCache === true), alreadyServerConfirmed = state.serverConfirmedCollections.indexOf(collection) >= 0; if (fromCache && authoritativeFirstReadRequired && alreadyServerConfirmed) { state.snapshotSources[collection] = 'server'; return; } (rows || []).forEach(function (row) { var normalized = Object.assign({}, row); if (!normalized.tenantId) normalized.tenantId = state.tenantId; if (normalized.tenantId !== state.tenantId || !rowId(normalized)) quarantined.push(normalized); else accepted.push(normalized); }); var dataChanged = !sameRows(cache[collection] || [], accepted); cache[collection] = accepted; state.quarantinedRows[collection] = quarantined.map(function (row) { return { id: rowId(row) || '', reason: row.tenantId !== state.tenantId ? 'tenant_mismatch' : 'id_missing' }; }); if (state.observedCollections.indexOf(collection) < 0) state.observedCollections.push(collection); if (state.attachedCollections.indexOf(collection) < 0) state.attachedCollections.push(collection); state.snapshotSources[collection] = fromCache ? 'cache' : 'server'; if (fromCache) { if (state.serverConfirmedCollections.indexOf(collection) < 0 && state.cacheOnlyCollections.indexOf(collection) < 0) state.cacheOnlyCollections.push(collection); } else { if (state.serverConfirmedCollections.indexOf(collection) < 0) state.serverConfirmedCollections.push(collection); state.cacheOnlyCollections = state.cacheOnlyCollections.filter(function (name) { return name !== collection; }); } state.ready = state.serverConfirmedCollections.length > 0; state.status = state.ready ? 'authoritative-snapshots-progress' : 'waiting-authoritative-snapshots'; state.lastSnapshotAt = new Date().toISOString(); if (!alreadyServerConfirmed || dataChanged) emit(collection); maybeAttachDeferred(); }
     function subscribeRef(ref, onNext, onError) { if (ref && typeof ref.onSnapshot === 'function') return ref.onSnapshot(onNext, onError); if (typeof deps.onSnapshot === 'function') return deps.onSnapshot(ref, onNext, onError); throw new Error('firestore_snapshot_api_unavailable'); }
+
+    function role(){
+      var m=options.membership||{},r=text(m.activeRole);
+      try{var ss=window.Orbit&&window.Orbit.session;if(ss&&typeof ss.rol==='function')r=text(ss.rol())||r;}catch(_){}
+      var norm=function(x){return text(x).normalize('NFD').toLowerCase().replace(/[^a-z0-9]+/g,'_');};
+      if(!r||![].concat(m.roles||[]).some(function(x){return norm(x)===norm(r);}))
+        throw new Error('PROTECTED_READ_ROLE_NOT_ASSIGNED');
+      return r;
+    }
+    function protectedLoad(collection,policyId,epoch){
+      if(typeof deps.protectedReadPage!=='function')return Promise.reject(new Error('PROTECTED_READ_PROVIDER_MISSING'));
+      var countries=unique(options.membership&&options.membership.countries||[]).map(function(x){return x.toUpperCase();});
+      if(!countries.length||countries.some(function(x){return x!=='GT'&&x!=='CO';}))
+        return Promise.reject(new Error('PROTECTED_READ_COUNTRY_DENIED'));
+      var initialRole=role(),rows=[];
+      return countries.reduce(function(pr,country){return pr.then(function(){
+        var cursor='',pages=0;
+        function next(){
+          if(epoch!==protectedEpoch||role()!==initialRole)throw new Error('PROTECTED_READ_CONTEXT_CHANGED');
+          if(++pages>100)throw new Error('PROTECTED_READ_PAGE_LIMIT');
+          return Promise.resolve(deps.protectedReadPage({tenantId:state.tenantId,activeRole:initialRole,
+            country:country,collection:collection,mode:'list',policyId:policyId||'',pageSize:50,cursor:cursor})).then(function(r){
+              if(!r||r.ok!==true||r.serverScoped!==true||r.collection!==collection||
+                 r.country!==country||!Array.isArray(r.rows)||r.rows.length>50)
+                throw new Error('PROTECTED_READ_RESPONSE_INVALID');
+              r.rows.forEach(function(x){
+                if(!text(x&&x.canonicalDocumentId||x&&x.id))throw new Error('PROTECTED_READ_ROW_ID_MISSING');
+                rows.push(x);
+              });
+              if(!r.nextCursor)return;
+              if(!r.rows.length||r.nextCursor===cursor)throw new Error('PROTECTED_READ_CURSOR_INVALID');
+              cursor=r.nextCursor;return next();
+            });
+        }
+        return next();
+      });},Promise.resolve()).then(function(){
+        if(epoch!==protectedEpoch||role()!==initialRole)throw new Error('PROTECTED_READ_CONTEXT_CHANGED');
+        return rows;
+      });
+    }
+    function protectedAttach(collection){
+      var plan=queryPlan(collection);state.queryPlans[collection]=clone(plan);
+      if(plan.hardError)throw new Error('PROTECTED_READ_PLAN_DENIED');
+      if(plan.denied){if(state.deniedCollections.indexOf(collection)<0)state.deniedCollections.push(collection);return false;}
+      if(collection!=='clientes'&&collection!=='polizas')
+        throw new Error('PROTECTED_READ_UNANCHORED_GLOBAL_'+collection);
+      var epoch=protectedEpoch;
+      Promise.resolve().then(function(){return protectedLoad(collection,'',epoch);})
+        .then(function(rows){if(epoch===protectedEpoch)acceptRows(collection,rows,{fromCache:false});})
+        .catch(function(e){if(epoch===protectedEpoch)recordError(collection,e,'snapshot');});
+      return true;
+    }
+    function roleChanged(){
+      if(!protectedMode)return;
+      var names=Object.keys(attachStarted).filter(function(k){return !!attachStarted[k];});
+      ++protectedEpoch;attachStarted={};collections.forEach(function(k){cache[k]=[];});
+      state.serverConfirmedCollections=[];state.attachedCollections=[];state.observedCollections=[];
+      state.snapshotErrors={};state.deniedCollections=[];state.ready=false;state.status='waiting-protected-role';
+      emit('*');names.forEach(function(k){attachCollection(k,true);});
+    }
+
     function attachCollection(collection, authoritativeFirst) {
       if (attachStarted[collection]) return true;
       attachStarted[collection] = true;
+      if(protectedMode){try{return protectedAttach(collection);}catch(e){recordError(collection,e,'attach');return false;}}
       var built;
       try {
         built = queryRef(collection);
@@ -102,15 +165,17 @@
     function attach() {
       if (!tenantCheck.ok) { state.status = 'blocked-tenant'; return false; }
       if (!collections.length || !startupCollections.length) { state.status = 'blocked-no-collections'; return false; }
-      if (!database()) { state.status = 'blocked-no-database'; return false; }
-      if (authoritativeFirstReadRequired && typeof deps.getDocsFromServer !== 'function') { state.status = 'attach-error'; state.snapshotErrors.__startup = 'firestore_authoritative_read_api_unavailable'; return false; }
+      if (!protectedMode && !database()) { state.status = 'blocked-no-database'; return false; }
+      if(protectedMode&&typeof deps.protectedReadPage!=='function'){state.status='attach-error';return false;}
+      if (!protectedMode && authoritativeFirstReadRequired && typeof deps.getDocsFromServer !== 'function') { state.status = 'attach-error'; state.snapshotErrors.__startup = 'firestore_authoritative_read_api_unavailable'; return false; }
       state.status = 'attaching';
       startupCollections.forEach(function (collection) { attachCollection(collection, authoritativeFirstReadRequired); });
       state.ready = requiredConfirmed();
       if (!state.ready && state.status === 'attaching') state.status = 'waiting-authoritative-snapshots';
       return startupCollections.every(function (name) { return !state.snapshotErrors[name] && state.deniedCollections.indexOf(name) < 0; });
     }
-    function detach() { unsubscribers.splice(0).forEach(function (unsubscribe) { try { unsubscribe(); } catch (e) {} }); state.attachedCollections = []; state.observedCollections = []; state.serverConfirmedCollections = []; state.cacheOnlyCollections = []; state.snapshotSources = {}; state.ready = false; state.status = 'detached'; deferredAttached = false; deferredScheduled = false; deferredCursor = 0; deferredPauseUntil = 0; attachStarted = {}; state.deferredAttached = false; }
+    function detach() { ++protectedEpoch; if(protectedMode&&typeof document!=='undefined'&&document.removeEventListener)document.removeEventListener('orbit:active-role-changed',roleChanged); unsubscribers.splice(0).forEach(function (unsubscribe) { try { unsubscribe(); } catch (e) {} }); state.attachedCollections = []; state.observedCollections = []; state.serverConfirmedCollections = []; state.cacheOnlyCollections = []; state.snapshotSources = {}; state.ready = false; state.status = 'detached'; deferredAttached = false; deferredScheduled = false; deferredCursor = 0; deferredPauseUntil = 0; attachStarted = {}; state.deferredAttached = false; }
+    if(protectedMode&&typeof document!=='undefined'&&document.addEventListener)document.addEventListener('orbit:active-role-changed',roleChanged);
     function buildRelationIndexes() {
       var policyById = new Map(), clientById = new Map();
       (cache.polizas || []).forEach(function (p) { var id = text(rowId(p)); if (id) policyById.set(id, p); });
@@ -187,6 +252,14 @@
     function pref(key, defaultValue) { return Object.prototype.hasOwnProperty.call(prefs, key) ? clone(prefs[key]) : defaultValue; }
     function raw() { var out = {}; collections.forEach(function (collection) { out[collection] = all(collection); }); out.__prefs = clone(prefs); out.__backend = Object.assign({}, state, { quarantinedRows: clone(state.quarantinedRows), queryPlans: clone(state.queryPlans) }); return out; }
     var api = { all: all, get: get, where: where, find: find, insert: fail, update: fail, remove: fail, on: on, _emit: emit, pref: pref, setPref: fail, init: function () { return api; }, reseed: fail, raw: raw, subscribe: on, _subscribe: on, _attachSnapshots: attach, _detachSnapshots: detach, _ensureCollections: ensureCollections, _productStatus: function () { return Object.assign({}, state, { quarantinedRows: clone(state.quarantinedRows), queryPlans: clone(state.queryPlans) }); }, __productReadOnlyP0: true };
+    if(protectedMode){
+      api._protectedReadRelated=function(collection,policyId){
+        if(!['vehiculos','recibosEsperados','carteraPrimas','cobros'].includes(collection)||!text(policyId))
+          return Promise.reject(new Error('PROTECTED_READ_POLICY_ANCHOR_REQUIRED'));
+        return protectedLoad(collection,text(policyId),protectedEpoch).then(function(rows){return rows.map(clone);});
+      };
+      api._protectedCandidate=true;
+    }
     return api;
   }
   window.Orbit.createFirestoreProductReadOnlyStoreP0 = createStore;

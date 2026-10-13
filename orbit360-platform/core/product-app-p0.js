@@ -77,7 +77,10 @@
         authorizedProductReadOnly:true,
         runtimeAuthorized:true,
         collections:bootstrapCollections,
-        snapshotTimeoutMs:8000
+        snapshotTimeoutMs:8000,
+        // Preview-only candidate: no silent direct Firestore fallback.
+        protectedReadCandidate: cfg.scopedReadPreviewCandidate===true &&
+          String(window.location&&window.location.hostname||'').includes('--')
       }).then(function(result){
         if(result&&result.ready===true&&Orbit.store&&typeof Orbit.store._ensureCollections==='function'){
           var lazy=[].concat(hydration.optional||[]);
