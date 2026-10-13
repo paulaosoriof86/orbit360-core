@@ -1,0 +1,55 @@
+# SOURCE-ONLY / MANUAL. No deployment rights, credentials or Firebase commands.
+name: AYS G4 Shared Hosting Source-only Verification
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: ays-g4-shared-hosting-sourceonly
+  cancel-in-progress: false
+jobs:
+  verify-source-only:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Fetch immutable source commits
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch --no-tags origin f873ce1f2b55dc5ad8cac07b58be43faddeb0a99 1623cac977498bb5bba0092748a8c70a9cd06189
+          git cat-file -e 'f873ce1f2b55dc5ad8cac07b58be43faddeb0a99^{commit}'
+          git cat-file -e '1623cac977498bb5bba0092748a8c70a9cd06189^{commit}'
+      - name: Offline synthetic tests
+        run: python tools/ays-g4/AYS_G4_ENSAMBLADOR_TESTS.py
+      - name: Assemble immutable source in temporary directory
+        shell: bash
+        run: |
+          set -euo pipefail
+          python tools/ays-g4/AYS_G4_ENSAMBLADOR_HOSTING_READONLY.py --repo "$GITHUB_WORKSPACE" --out "$RUNNER_TEMP/ays-g4-source" --expected-count 2706
+      - name: Assert Portal and Siniestros contract files
+        shell: bash
+        run: |
+          set -euo pipefail
+          python tools/ays-g4/AYS_G3_SHARED_HOSTING_GUARD_2026-10-13.py --candidate-dir "$RUNNER_TEMP/ays-g4-source/candidate/orbit360-platform"
+      - name: Verify exact receipt without enabling release
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -c 'import json,os,pathlib; p=pathlib.Path(os.environ["RUNNER_TEMP"])/"ays-g4-source"; r=json.loads((p/"SOURCE_ASSEMBLY_RECEIPT.json").read_text()); assert r["result"]=="SOURCE_PRESERVATION_PASS" and r["assembled_files"]==2708 and r["critical_files_verified"]==4 and r["not_deployed"]'
+      - name: Preserve evidence only
+        uses: actions/upload-artifact@v4
+        with:
+          name: ays-g4-source-manifest
+          path: |
+            ${{ runner.temp }}/ays-g4-source/SOURCE_ASSEMBLY_RECEIPT.json
+            ${{ runner.temp }}/ays-g4-source/SOURCE_FILE_MANIFEST.json
+          if-no-files-found: error
+          retention-days: 15
+# NO firebase deploy, NO Firebase credentials, NO runtime writes, NO auto-trigger.
