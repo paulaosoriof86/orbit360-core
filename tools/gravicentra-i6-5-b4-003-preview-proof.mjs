@@ -871,10 +871,10 @@ async function runB4003CumulativeP0ReadOnly(){
   if(advisor)metaStatus.advisorIndividual++;else metaStatus.institutionalGlobal++;
   if(!type)metaStatus.untyped++;
   if(!['GT','CO'].includes(country))metaStatus.missingCountry++;
-  if(!/^20\\d{2}-(0[1-9]|1[0-2])$/.test(period))metaStatus.missingPeriod++;
+  if(!/^20\d{2}-(0[1-9]|1[0-2])$/.test(period))metaStatus.missingPeriod++;
   if(x.valor==null||x.valor===''||!Number.isFinite(amount)||amount<0)metaStatus.negativeOrNonnumeric++;
   if(country)cappedCount(metaStatus.countsByCountry,country);
-  if(period&&/^20\\d{2}-/.test(period))cappedCount(metaStatus.countsByMonth,period);
+  if(period&&/^20\d{2}-/.test(period))cappedCount(metaStatus.countsByMonth,period);
   if(type)cappedCount(metaStatus.countsByType,type);
   if(!advisor&&country)cappedCount(metaStatus.globalByCountry,country);
   const key=advisor+'|'+country+'|'+period+'|'+type;
