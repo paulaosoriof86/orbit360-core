@@ -64,6 +64,52 @@ Orbit.modules = Orbit.modules || {};
       .map(doc => ({ ref: documentaryRef(doc), name: String(doc && (doc.nombre || doc.name) || 'Documento') }))
       .filter(doc => doc.ref);
   }
+  async function persistManagementDocuments(request, clientId, existingRef, files, category) {
+    const id = request && request.id;
+    if (!id) throw Error('DOCUMENT_MANAGEMENT_ID_REQUIRED');
+    const attached = [].concat(request.adjuntos || []);
+    if (existingRef && !attached.some(x => documentaryRef(x) === existingRef)) {
+      const client = S().get('clientes',clientId);
+      const opt = clientDocumentOptions(client).find(d => d.ref === existingRef);
+      if (!opt) throw Error('DOCUMENT_REFERENCE_NOT_AUTHORIZED_FOR_CLIENT');
+      attached.push({documentRef:opt.ref,nombre:opt.name,clienteId,entidad:'gestion',entidadId:id,origen:'Documento cliente'});
+    }
+    const failed = [];
+    for (const file of files) {
+      const up = await Orbit.secureResources.uploadDocument(file,{
+        entidad:'gestion',entidadId:id,clienteId,polizaId:request.sourcePolicyId || '',
+        categoria:category || 'soporte_gestion',nombre:file.name
+      });
+      if (up && up.ok && (up.documentRef || up.fileId)) {
+        const ref = up.documentRef || up.fileId;
+        if (!attached.some(x => documentaryRef(x) === ref)) attached.push({
+          documentRef:ref,nombre:up.nombre || file.name,driveUrl:up.driveUrl || up.externalUrl || '',
+          externalUrl:up.externalUrl || up.driveUrl || '',mimeType:up.mimeType || file.type || '',
+          size:file.size,clienteId,entidad:'gestion',entidadId:id,origen:'Drive'
+        });
+      } else failed.push({nombre:file.name,status:up && up.status || 'error'});
+    }
+    if (attached.length || failed.length) {
+      const offer = Object.assign({},request.acceptedOffer || {});
+      if (!offer.documentRef && attached.some(x => documentaryRef(x))) offer.documentRef = documentaryRef(attached.find(x => documentaryRef(x)));
+      await S().updateDurable('gestiones',id,{
+        adjuntos:attached,acceptedOffer:offer,documentoCargaPendiente:failed.length > 0,
+        documentoCargaFallida:failed,actualizado:today()
+      });
+      const confirmed = S().get('gestiones',id);
+      if (!confirmed || attached.some(d => !(confirmed.adjuntos || []).some(x => documentaryRef(x) === documentaryRef(d))))
+        throw Error('DOCUMENT_DURABLE_READBACK_REQUIRED');
+    }
+    return {failed};
+  }
+  function documentaryUploadReady(files, clientId) {
+    if (!files.length) return '';
+    if (previewProtectedDriveClient(clientId)) return 'Preview protege expedientes reales. Usa la prueba documental sintética autorizada.';
+    const state=Orbit.secureResources && Orbit.secureResources.documentUploadStatus &&
+      Orbit.secureResources.documentUploadStatus({entidad:'gestion',clienteId});
+    return state && state.available === true && state.uploadAvailable !== false ? '' :
+      'Drive no está disponible para confirmar los documentos.';
+  }
   function previewProtectedDriveClient(clientId) {
     return /--/.test(String(location.hostname || '')) && !!clientId && !/^b2[-_]/i.test(String(clientId));
   }
@@ -103,24 +149,29 @@ Orbit.modules = Orbit.modules || {};
     });
   }
 
-  function openAcceptedProposal() {
+  async function openAcceptedProposal() {
     if (!I.canManage()) return toast('Tu rol activo no puede crear solicitudes de emisión.');
+    try { await Orbit.cat.ensure(); } catch (_) { return toast('No se pudieron confirmar los catálogos del tenant.'); }
     const context = Object.assign({}, window.__orbitQuoteContext || {}, window.__orbitRenewalContext || {});
     const clients = scopedClients();
     const quotes = quoteRows();
     const insurers = (S().all('aseguradoras') || []).filter(a => a.vinculada !== false && (!context.pais || !a.pais || a.pais === context.pais));
     const selectedClient = context.clienteId || (clients[0] && clients[0].id) || '';
-    const selectedQuote = quotes[0] || null;
-    const selectedInsurer = selectedQuote && selectedQuote.insurerId || (insurers[0] && insurers[0].id) || '';
-    const q = selectedQuote && selectedQuote.quote || {};
+    const selectedQuote = null;
+    const selectedInsurer = '';
+    const q = {};
+    const initialCountry = context.pais || ((clients.find(c => c.id === selectedClient) || {}).pais) || 'GT';
+    const initialRamo = context.ramo || '';
+    const initialProduct = context.producto || '';
     const payments = +(q.fracc || 1) || 1;
     const start = context.sourcePolicyId ? ((S().get('polizas', context.sourcePolicyId) || {}).vigenciaFin || today()) : today();
     const body = `<div class="cfg-note" style="margin-bottom:13px">Registrar la aceptación crea una <b>Solicitud de emisión en Ops</b>. Todavía no crea una póliza ni recibos. La póliza nace únicamente al recibir número y documento reales de la aseguradora.</div><div class="cgrid">
+      ${quotes.length ? `<label class="ce-l" style="grid-column:1/-1">Propuesta aceptada *<select id="emi-quote" class="o-sel"><option value="">— Seleccionar la propuesta que el cliente aceptó —</option>${quotes.map(row => `<option value="${row.index}">${esc(row.insurerName)} · ${esc((row.quote && (row.quote.cur || row.quote.moneda)) || (initialCountry === 'CO' ? 'COP' : 'GTQ'))} · ${esc(row.quote && row.quote.total || 0)}</option>`).join('')}</select><small class="muted">Debes elegir expresamente la oferta; no se acepta automáticamente la primera.</small></label>` : '<div class="cfg-note" style="grid-column:1/-1">No hay cotizaciones vinculadas al comparativo. Registra condiciones únicamente con referencia documental validada.</div>'}
       <label class="ce-l">Cliente *<select id="emi-cli" class="o-sel">${clients.map(c => `<option value="${esc(c.id)}" ${c.id === selectedClient ? 'selected' : ''}>${esc(c.nombre)}</option>`).join('')}</select></label>
-      <label class="ce-l">Aseguradora aceptada *<select id="emi-asg" class="o-sel">${insurers.map(a => `<option value="${esc(a.id)}" ${a.id === selectedInsurer ? 'selected' : ''}>${esc(a.nombre)}</option>`).join('')}</select></label>
-      <label class="ce-l">Ramo *<input id="emi-ramo" class="o-sel" value="${esc(context.ramo || q.ramo || '')}"></label>
-      <label class="ce-l">Producto / subramo *<input id="emi-prod" class="o-sel" value="${esc(context.producto || '')}"></label>
-      <label class="ce-l">País *<select id="emi-pais" class="o-sel"><option ${context.pais === 'GT' ? 'selected' : ''}>GT</option><option ${context.pais === 'CO' ? 'selected' : ''}>CO</option></select></label>
+      <label class="ce-l">Aseguradora aceptada *<select id="emi-asg" class="o-sel"><option value="">— Seleccionar aseguradora —</option>${insurers.map(a => `<option value="${esc(a.id)}" ${a.id === selectedInsurer ? 'selected' : ''}>${esc(a.nombre)}</option>`).join('')}</select></label>
+      <label class="ce-l">Ramo *<select id="emi-ramo" class="o-sel"><option value="">— Seleccionar ramo —</option></select></label>
+      <label class="ce-l">Producto / subramo *<select id="emi-prod" class="o-sel"><option value="">— Seleccionar producto —</option></select></label>
+      <label class="ce-l">País *<select id="emi-pais" class="o-sel"><option ${initialCountry === 'GT' ? 'selected' : ''}>GT</option><option ${initialCountry === 'CO' ? 'selected' : ''}>CO</option></select></label>
       <label class="ce-l">Moneda *<select id="emi-mon" class="o-sel"><option ${String(q.cur || '') === 'GTQ' ? 'selected' : ''}>GTQ</option><option ${String(q.cur || '') === 'COP' ? 'selected' : ''}>COP</option></select></label>
       <label class="ce-l">Prima neta aceptada *<input id="emi-neta" type="number" class="o-sel" value="${+q.neta || 0}"></label>
       <label class="ce-l">Gastos de emisión<input id="emi-gem" type="number" class="o-sel" value="${+q.gastosEm || 0}"></label>
@@ -130,18 +181,69 @@ Orbit.modules = Orbit.modules || {};
       <label class="ce-l">Cantidad de pagos<input id="emi-cuotas" type="number" min="1" class="o-sel" value="${payments}"></label>
       <label class="ce-l">Fuente de la oferta<select id="emi-source-type" class="o-sel"><option value="cotizacion_aseguradora">Cotización oficial de aseguradora</option><option value="pdf_validado">PDF / documento validado</option><option value="carga_manual_validada">Carga manual validada</option><option value="tarifa_parametrizada_validada">Tarifa parametrizada validada</option></select></label>
       <label class="ce-l">Referencia cotización / fuente<input id="emi-source" class="o-sel" placeholder="N.º cotización o referencia"></label>
-      <label class="ce-l">Referencia documental<input id="emi-doc" class="o-sel" placeholder="documentRef; puede completarse antes de emitir"></label>
+      <label class="ce-l">Documento existente<select id="emi-doc" class="o-sel"><option value="">— Sin documento vinculado todavía —</option></select></label>
+      <label class="ce-l" style="grid-column:1/-1">Adjuntar propuestas, aceptación y otros soportes
+        <input id="emi-files" type="file" multiple class="o-sel" accept=".pdf,.png,.jpg,.jpeg,.doc,.docx,.xls,.xlsx,.txt,application/pdf,image/*">
+        <small class="muted">Los archivos se vinculan a la solicitud canónica de Ops mediante Drive. La Preview protege los expedientes reales.</small>
+      </label>
       <label class="ce-l">Inicio estimado<input id="emi-start" type="date" class="o-sel" value="${esc(start)}"></label>
       <label class="ce-l">Fin estimado<input id="emi-end" type="date" class="o-sel" value="${esc(plusYear(start))}"></label>
     </div><label class="ce-l" style="margin-top:12px">Nota operativa<textarea id="emi-note" class="o-sel" style="min-height:64px">${context.sourcePolicyId ? 'Renovación de póliza ' + esc((S().get('polizas', context.sourcePolicyId) || {}).numero || '') : ''}</textarea></label><label style="display:flex;gap:8px;align-items:flex-start;margin-top:12px"><input id="emi-accepted" type="checkbox"><span><b>El cliente confirmó esta opción.</b><small class="muted" style="display:block">La aceptación debe estar soportada por la gestión, correo, documento o registro correspondiente.</small></span></label>`;
     const b = modal('issuance-accepted-v1201','Registrar propuesta aceptada',body,'<button class="btn primary" data-save>Crear solicitud de emisión</button>',820);
     const $ = s => b.querySelector(s);
     const country = $('#emi-pais'), currency = $('#emi-mon');
-    country.onchange = () => { currency.value = country.value === 'CO' ? 'COP' : 'GTQ'; };
+    const ramo = $('#emi-ramo'), product = $('#emi-prod'), quoteInput = $('#emi-quote'), clientInput = $('#emi-cli');
+    const paint = (node, values, preferred, label) => {
+      const rows = [...new Set((values || []).map(v => String(v || '').trim()).filter(Boolean))];
+      node.innerHTML = '<option value="">— Seleccionar ' + esc(label) + ' —</option>' + rows.map(v => '<option value="' + esc(v) + '">' + esc(v) + '</option>').join('');
+      node.value = rows.includes(preferred) ? preferred : '';
+    };
+    const updateProducts = preferred => paint(product, Orbit.cat.subramosDe(country.value, ramo.value), preferred || '', 'producto');
+    const updateRamos = (preferred, preferredProduct) => {
+      paint(ramo, Orbit.cat.ramosDe(country.value), preferred || '', 'ramo');
+      updateProducts(preferredProduct || '');
+    };
+    updateRamos(initialRamo, initialProduct);
+    const existingDocs = clientId => clientDocumentOptions(S().get('clientes', clientId));
+    const paintDocs = () => {
+      const target = $('#emi-doc'), old = target.value;
+      target.innerHTML = '<option value="">— Sin documento vinculado todavía —</option>' +
+        existingDocs(clientInput.value).map(d => '<option value="' + esc(d.ref) + '">' + esc(d.name) + '</option>').join('');
+      target.value = existingDocs(clientInput.value).some(d => d.ref === old) ? old : '';
+    };
+    paintDocs();
+    clientInput.addEventListener('change', () => {
+      paintDocs();
+      const client = S().get('clientes', clientInput.value);
+      if (client && client.pais && ['GT', 'CO'].includes(client.pais)) {
+        country.value = client.pais; currency.value = client.pais === 'CO' ? 'COP' : 'GTQ'; updateRamos('', '');
+      }
+    });
+    country.onchange = () => { currency.value = country.value === 'CO' ? 'COP' : 'GTQ'; updateRamos('', ''); };
+    ramo.onchange = () => updateProducts('');
+    if (quoteInput) quoteInput.addEventListener('change', () => {
+      const row = quotes.find(x => String(x.index) === quoteInput.value);
+      if (!row) return;
+      const selected = row.quote || {};
+      if (row.insurerId && insurers.some(x => x.id === row.insurerId)) $('#emi-asg').value = row.insurerId;
+      else $('#emi-asg').value = '';
+      updateRamos(selected.ramo || context.ramo || '', selected.producto || selected.subramo || context.producto || '');
+      const amounts = {'#emi-neta': selected.neta, '#emi-total': selected.total, '#emi-gem': selected.gastosEm,
+        '#emi-gfin': selected.recargo, '#emi-iva': selected.iva, '#emi-cuotas': selected.fracc};
+      Object.keys(amounts).forEach(key => { if (amounts[key] != null && Number.isFinite(Number(amounts[key]))) $(key).value = String(amounts[key]); });
+      if (selected.cur === 'GTQ' || selected.cur === 'COP') currency.value = selected.cur;
+    });
     b.querySelector('[data-save]').onclick = async () => {
       const saveBtn = b.querySelector('[data-save]'), originalSaveText = saveBtn.textContent;
-      saveBtn.disabled = true; saveBtn.textContent = 'Guardando…';
+      if (quoteInput && !quoteInput.value) return toast('Selecciona la cotización realmente aceptada.');
+      if (!ramo.value || !product.value) return toast('Selecciona ramo y producto desde el catálogo confirmado.');
+      if (!$('#emi-asg').value) return toast('Selecciona la aseguradora aceptada.');
+      const files = Array.from($('#emi-files').files || []);
       const clientId = $('#emi-cli').value, client = S().get('clientes', clientId);
+      const uploadError = documentaryUploadReady(files, clientId);
+      if (uploadError) return toast(uploadError);
+      saveBtn.disabled = true; saveBtn.textContent = 'Guardando…';
+      try {
       const cuotaN = Math.max(1, +$('#emi-cuotas').value || 1);
       const result = await I.createRequest({
         clienteId, asesorId: client && client.asesorId || context.asesorId, aseguradoraId: $('#emi-asg').value,
@@ -161,8 +263,15 @@ Orbit.modules = Orbit.modules || {};
         }
       }, { motivo: 'Opción aceptada desde Comparativo' });
       if (!result.ok) { saveBtn.disabled = false; saveBtn.textContent = originalSaveText; return toast('No se creó: ' + (result.errors || []).join(', ')); }
-      b.remove(); toast(result.reused ? 'La solicitud de emisión ya estaba activa.' : 'Solicitud de emisión creada en Ops.');
+      const selectedRef = $('#emi-doc').value.trim();
+      const {failed} = await persistManagementDocuments(result.request,clientId,selectedRef,files,'propuesta_aceptada');
+      b.remove();
+      toast(failed.length ? 'Solicitud creada; algunos archivos siguen pendientes de confirmar en Drive.' : result.reused ? 'La solicitud de emisión ya estaba activa.' : 'Solicitud de emisión creada en Ops.');
       location.hash = '#/ops'; window.__orbitOpenGestion = result.request.id;
+      } catch (error) {
+        saveBtn.disabled = false; saveBtn.textContent = originalSaveText;
+        toast('La operación no terminó con readback completo. Verifica la gestión en Ops antes de reintentar.');
+      }
     };
   }
 
@@ -309,12 +418,17 @@ Orbit.modules = Orbit.modules || {};
       <label class="ce-l">Cantidad de pagos<input id="reni-payments" type="number" min="1" class="o-sel" value="${payments}"></label>
       <label class="ce-l">Forma de pago<input id="reni-form" class="o-sel" value="${esc(source.formaPago||'')}"></label>
       <label class="ce-l">Referencia de propuesta / aceptación<input id="reni-source" class="o-sel" placeholder="Cotización, correo, WhatsApp o referencia"></label>
-      <label class="ce-l">Documento de propuesta<input id="reni-doc" class="o-sel" placeholder="documentRef opcional en esta etapa"></label>
+      <label class="ce-l">Documento existente<select id="reni-doc" class="o-sel"><option value="">— Sin documento vinculado —</option>${clientDocumentOptions(client).map(d=>`<option value="${esc(d.ref)}">${esc(d.name)}</option>`).join('')}</select></label>
+      <label class="ce-l">Adjuntar propuesta y documentos de aceptación<input type="file" id="reni-files" class="o-sel" multiple accept=".pdf,.png,.jpg,.jpeg,.doc,.docx,.xls,.xlsx,.txt,application/pdf,image/*"><small class="muted">Se vinculan a la gestión en Ops mediante Drive.</small></label>
     </div>`;
     const b=modal('ops-renewal-issuance-v1201','Crear solicitud de emisión en Ops',body,'<button class="btn primary" data-create>Crear solicitud en Ops</button>',740);
     const $=x=>b.querySelector(x),btn=b.querySelector('[data-create]');
     btn.onclick=async()=>{
-      const original=btn.textContent;btn.disabled=true;btn.textContent='Guardando…';
+      const original=btn.textContent, files=Array.from($('#reni-files').files||[]);
+      const preflight=documentaryUploadReady(files,source.clienteId);
+      if(preflight)return toast(preflight);
+      btn.disabled=true;btn.textContent='Guardando…';
+      try {
       const insurerId=$('#reni-asg').value,cuotas=Math.max(1,+$('#reni-payments').value||1);
       const result=await I.createRequest({
         clienteId:source.clienteId,asesorId:source.asesorId,aseguradoraId:insurerId,
@@ -327,8 +441,12 @@ Orbit.modules = Orbit.modules || {};
           sourceType:'renovacion_aceptada',sourceRef:$('#reni-source').value.trim(),documentRef:$('#reni-doc').value.trim()}
       },{motivo:'Renovación aprobada: solicitar emisión a aseguradora'});
       if(!result.ok){btn.disabled=false;btn.textContent=original;return toast('No se creó: '+(result.errors||[]).join(', '));}
-      try{await S().updateDurable('gestiones',g.id,{estado:'En proceso',renewalAction:'issuance_requested',issuanceRequestId:result.request.id,emisionGestionId:result.request.id,proximaAccion:'Esperar emisión de aseguradora'});}catch(e){}
-      b.remove();const base=document.getElementById('ciclo-modal');if(base)base.remove();toast(result.reused?'La solicitud de emisión ya estaba activa.':'Solicitud de emisión creada en Ops.');location.hash='#/ops';window.__orbitOpenGestion=result.request.id;
+      const docResult=await persistManagementDocuments(result.request,source.clienteId,$('#reni-doc').value.trim(),files,'propuesta_renovacion');
+      try{await S().updateDurable('gestiones',g.id,{estado:'En proceso',renewalAction:'issuance_requested',issuanceRequestId:result.request.id,emisionGestionId:result.request.id,proximaAccion:'Esperar emisión de aseguradora'});}catch(e){throw Error('RENEWAL_ORIGIN_LINK_READBACK_REQUIRED');}
+      b.remove();const base=document.getElementById('ciclo-modal');if(base)base.remove();
+      toast(docResult.failed.length?'Solicitud creada con documentos pendientes de confirmar.':'Solicitud de emisión creada en Ops.');
+      location.hash='#/ops';window.__orbitOpenGestion=result.request.id;
+      }catch(e){btn.disabled=false;btn.textContent=original;toast('Verifica la gestión en Ops antes de reintentar. No se confirmó toda la operación.');}
     };
   }
   function openDirectRenewal(g) {

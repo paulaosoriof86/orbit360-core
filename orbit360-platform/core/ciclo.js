@@ -728,6 +728,10 @@ Orbit.ciclo = (function () {
             <div class="ciclo-sec-t">Nota / contexto</div>
             <label class="ce-l"><textarea id="gs-nota" class="o-sel" style="min-height:64px;resize:vertical;padding:9px 11px" placeholder="Detalle de la gestión…">${U.esc(g.nota || g.notas || '')}</textarea></label>
             ${(g.adjuntos && g.adjuntos.length) ? `<div class="sg-files" style="margin-top:8px">${g.adjuntos.map((a, i) => gestionDocumentChip(a, i)).join('')}</div>` : '<div class="muted" style="font-size:12px;margin-top:8px">Sin documentos vinculados.</div>'}
+            <label class="ce-l" style="margin-top:12px">Adjuntar nuevos documentos
+              <input id="gs-new-files" class="o-sel" type="file" multiple accept=".pdf,.png,.jpg,.jpeg,.doc,.docx,.xls,.xlsx,.txt,application/pdf,image/*">
+            </label>
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:8px"><button type="button" id="gs-upload-files" class="btn ghost sm">Subir documentos a Drive</button><span id="gs-upload-status" class="muted" role="status" aria-live="polite"></span></div>
           </div>
         </div>
         <aside class="ciclo-aside">
@@ -752,6 +756,58 @@ Orbit.ciclo = (function () {
       </div>`;
     const back = modal(html, 820);
     back.querySelectorAll('[data-gdoc]').forEach(btn => btn.addEventListener('click', () => openGestionDocument((g.adjuntos || [])[+btn.dataset.gdoc], g.id)));
+    const uploadButton = back.querySelector('#gs-upload-files');
+    uploadButton.addEventListener('click',async()=>{
+      const files = Array.from(back.querySelector('#gs-new-files').files || []);
+      const status = back.querySelector('#gs-upload-status');
+      if (!files.length) { status.textContent = 'Selecciona uno o varios archivos.'; return; }
+      const protectedPreview = /--/.test(String(location.hostname || '')) &&
+        !!g.clienteId && !/^b2[-_]/i.test(String(g.clienteId));
+      if (protectedPreview) { status.textContent = 'La Preview protege expedientes reales: no se enviaron archivos.'; return; }
+      const provider = Orbit.secureResources;
+      const ready = provider && provider.documentUploadStatus && provider.documentUploadStatus({
+        entidad:'gestion',clienteId:g.clienteId || '',polizaId:g.polizaId || ''
+      });
+      if (!ready || ready.available !== true || ready.uploadAvailable === false ||
+        !provider || typeof provider.uploadDocument !== 'function') {
+        status.textContent = 'Drive no está disponible para la carga documental.'; return;
+      }
+      uploadButton.disabled = true; status.textContent = 'Guardando archivos…';
+      try {
+        const latest = S().get('gestiones',id) || g;
+        const existing = [].concat(latest.adjuntos || []),failures = [];
+        for (const file of files) {
+          const out = await provider.uploadDocument(file,{
+            entidad:'gestion',entidadId:id,clienteId:g.clienteId || '',
+            polizaId:g.polizaId || '',categoria:'soporte_gestion',nombre:file.name
+          });
+          if(out && out.ok && (out.documentRef || out.fileId)) {
+            const ref=out.documentRef || out.fileId;
+            if(!existing.some(x => String(x.documentRef || x.fileId || '') === ref))
+              existing.push({documentRef:ref,nombre:out.nombre||file.name,
+                driveUrl:out.driveUrl||out.externalUrl||'',externalUrl:out.externalUrl||out.driveUrl||'',
+                mimeType:out.mimeType||file.type||'',size:file.size,
+                clienteId:g.clienteId||'',polizaId:g.polizaId||'',entidad:'gestion',entidadId:id,origen:'Drive'});
+          } else failures.push({nombre:file.name,status:out&&out.status||'error'});
+        }
+        await S().updateDurable('gestiones',id,{
+          adjuntos:existing,documentoCargaPendiente:failures.length>0,
+          documentoCargaFallida:failures,actualizado:today()
+        });
+        const saved = S().get('gestiones',id);
+        if(!saved || existing.some(d => !(saved.adjuntos||[]).some(x =>
+          String(x.documentRef||x.fileId||'') === String(d.documentRef||d.fileId||''))))
+          throw Error('GESTION_DOCUMENT_CANONICAL_READBACK_REQUIRED');
+        if(failures.length) {
+          status.textContent=failures.length+' archivo(s) requieren reintento. Se preservaron los confirmados.';
+          U.toast('Documentos parcialmente confirmados en Drive. Revisa los pendientes.');
+        } else { status.textContent='Archivos guardados y confirmados.'; U.toast('Documentos vinculados a la gestión.'); }
+        openGestion(id);
+      }catch(error){
+        status.textContent='No se pudo confirmar toda la operación. Verifica la ficha antes de reintentar.';
+        uploadButton.disabled=false;
+      }
+    });
     back.querySelectorAll('[data-chk]').forEach(c => c.addEventListener('change', async () => {
       const i = +c.dataset.chk, before = !!g.checklist[i].done, next = !!c.checked, item = g.checklist[i] || {};
       c.disabled = true; g.checklist[i].done = next; g.bitacora = g.bitacora || [];

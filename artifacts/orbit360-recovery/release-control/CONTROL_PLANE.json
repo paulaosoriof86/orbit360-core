@@ -5996,7 +5996,7 @@
   "canonicalAccumulationControl": {
     "status": "FROZEN_ACTIVE",
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "compositionLockBlobSha": "53ab787b0404a2d331850b5b9ac45b0b1510b5ea",
+    "compositionLockBlobSha": "4094b08c084b76565aa9fccdcfb4c1e4bdf90d3f",
     "findingLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
     "findingLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
@@ -9762,5 +9762,23 @@
     "historicalB4LockPreserved": true,
     "historicalB4PreviewCompositionBindingPreserved": true,
     "guardFailureBeingReconciled": "I6_CANONICAL_COMPOSITION_EXACT_SET_DRIFT triggered on first staging commit, no deploy"
+  },
+  "b4003ModalCatalogDocsStaging": {
+    "status": "SOURCE_STAGED_PENDING_EXACT_AUTHENTICATED_PREVIEW",
+    "gate": "I6.5/B4-003",
+    "scope": "catalog selectors, explicit quote selection and Drive attachments on issuance + Ops management dialogs",
+    "authorizedBy": "Paula explicit user authorization 2026-10-13",
+    "fileBlobs": {
+      "orbit360-platform/modules/issuance-endosos-v1201-bridge.js": "52b6c2fc856ec7f68197ed37eb509eaea90e44b1",
+      "orbit360-platform/core/ciclo.js": "3377c627ee53e3449f4ee382a570ea72335a0ada",
+      "orbit360-platform/index.html": "168d1a7c228d168be982b85608fa78e6228c9924"
+    },
+    "compositionLockBlobSha": "4094b08c084b76565aa9fccdcfb4c1e4bdf90d3f",
+    "unitStaticProbe": "PENDING",
+    "sourceSyntaxProbe": "PENDING_CI",
+    "noLive": true,
+    "noRealWrites": true,
+    "needs": "IMMUTABLE_NEW_PREVIEW_AND_EXACT_READBACK_P0_SECURITY_HOLD_PRESERVED",
+    "openFindingsPreserved": true
   }
 }
