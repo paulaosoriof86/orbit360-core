@@ -9684,5 +9684,53 @@
     "noProduction": true,
     "previousVisualAcceptancePreserved": true,
     "p0Closed": false
+  },
+  "b4003SecurityReleaseHold": {
+    "status": "ACTIVE_FAIL_CLOSED_UNAUTHORIZED_BROWSER_FIRESTORE_READ_WRITE",
+    "gate": "I6.5/B4-003",
+    "originatingFindingId": "B4-003-P0-20261012-PERSONAL-COLLECTION",
+    "observedProof": {
+      "negativeServerGetRunId": 38415321605,
+      "affectedOwnRoleCountry": [
+        "operativo:GT",
+        "operativo:CO",
+        "asesor:GT"
+      ],
+      "effectiveRulesRunId": 38414040015,
+      "effectiveRulesRulesetId": "6b03deab-0ff4-4c5d-8e74-550982bafc34",
+      "actualActiveRulesEqualLegacySource": true,
+      "liveRulesSourceSha256": "105f13e095d021a32d49c9b30400e7b509756f8bb45ea958c7483c7a2316bae3",
+      "rulesSecurityFailRunId": 38419629377
+    },
+    "sourceReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R26_JULY_POSITIVE_AND_OWN_SCOPE_FORENSIC_20261012.json",
+    "sourceReceiptBlobSha": "2ee632754d2a0e78897908f3aae126e8dc6e2c9f",
+    "cumulativeP0ReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CUMULATIVE_P0_LIVE_SOURCE_CLASSIFICATION_20261013.json",
+    "cumulativeP0ReceiptBlobSha": "dac6ca893d6c3b1f1382d7819ad7b6e627d9de46",
+    "inventoryExpected": 295,
+    "attentionExpected": 166,
+    "allP0Preserved": true,
+    "dataWritesAuthorized": false,
+    "productSourceWritesAuthorized": false,
+    "firestoreRulesDeployAuthorized": false,
+    "livePromotionAuthorized": false,
+    "currentProductPreviewMustStayImmutable": true,
+    "previousProductionAcceptedStatusPreserved": true,
+    "requiredExit": [
+      "SCOPED_PRODUCT_SOURCE_AUTHORIZATION_ON_SAME_B4_003_GATE",
+      "RECONCILED_SOURCE_RULES_WITH_ROLE_COUNTRY_ADVISOR_AND_TEAM",
+      "NEGATIVE_AUTHENTICATED_FIRESTORE_GET_AND_QUERY_DENIAL_PER_ROLE",
+      "POSITIVE_AUTHORIZED_OWN_TEAM_ALL_READBACK_AND_RELOAD",
+      "SAME_ARTIFACT_PREVIEW_PLUS_REGRESSION_AND_PAULA_VISUAL",
+      "EXPLICIT_RELEASE_AUTHORIZATION_AFTER_SECURITY_AND_ALL_REMAINING_BLOCKING_P0"
+    ],
+    "additionalP0": [
+      "B4-003-P0-20261012-INSTITUTIONAL-GOALS",
+      "B4-003-P0-20261012-FREELANCERS-GOAL-SCOPE",
+      "B4-003-P0-20261012-INICIO-MOTIVATIONAL-TEXTS",
+      "B4-003-P0-20261012-QA-CANCELLED-RUN-FIXTURES",
+      "B4-003-P0-20261012-QA-ORPHAN-RENEWALS"
+    ],
+    "refreshAugustAuthorized": false,
+    "qaOrphanDeleteAuthorized": false
   }
 }

@@ -57,6 +57,49 @@ const ACTIVE_I65_FORENSIC_B4=String(C.i65ForensicRemediationPlan?.b4?.executionL
 need(exists(ACTIVE_I65_FORENSIC_B4),'I6_5_B4_ACTIVE_LOCK_MISSING:'+ACTIVE_I65_FORENSIC_B4);
 const S=readJson(STATUS_LEDGER),A=readJson(AUTH_RECEIPT),M5=readJson(V5_MANIFEST),M6=readJson(V6_MANIFEST),M=readJson(V7_MANIFEST),FRA=readJson(I65_FORENSIC_AUDIT),FRP=readJson(I65_FORENSIC_PLAN),PAY=readJson(I65_PAYMENT_INFERENCE),B1=readJson(I65_FORENSIC_B1),B2=readJson(I65_FORENSIC_B2),B3=readJson(I65_FORENSIC_B3),B4=readJson(ACTIVE_I65_FORENSIC_B4);
 const COMP=readJson(I6_CANONICAL_COMPOSITION),FIND=readJson(I6_FINDINGS_LEDGER),FRP2=readJson(I65_FORENSIC_PLAN_V2),REJ=readJson(I65_B2_REJECTION),RCM=readJson(I65_B2_ROOT_CAUSE);
+// Security release hold is subordinate to the same CONTROL_PLANE and B4 lock.
+// Historical PRODUCTION_ACCEPTED refers to an older certified artifact.
+// It never authorizes promotion of the current B4 candidate or overrides the
+// current unapproved product/rules mutation boundaries.
+if(String(C.i65ForensicRemediationPlan?.currentBlock||'')==='B4' &&
+   C.currentB4?.status==='B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL'){
+ const hold=C.b4003SecurityReleaseHold||{};
+ need(hold.status==='ACTIVE_FAIL_CLOSED_UNAUTHORIZED_BROWSER_FIRESTORE_READ_WRITE' &&
+   hold.gate==='I6.5/B4-003' &&
+   hold.originatingFindingId==='B4-003-P0-20261012-PERSONAL-COLLECTION',
+   'I65_B4_003_SECURITY_RELEASE_HOLD_MISSING');
+ need(hold.observedProof?.negativeServerGetRunId===38415321605 &&
+   hold.observedProof?.rulesSecurityFailRunId===38419629377 &&
+   hold.observedProof?.actualActiveRulesEqualLegacySource===true,
+   'I65_B4_003_SECURITY_READBACK_PROOF_MISSING');
+ need(hold.sourceReceiptPath==='artifacts/orbit360-recovery/release-control/I6_5_B4_003_R26_JULY_POSITIVE_AND_OWN_SCOPE_FORENSIC_20261012.json' &&
+   exists(hold.sourceReceiptPath) &&
+   git('hash-object',hold.sourceReceiptPath)===hold.sourceReceiptBlobSha,
+   'I65_B4_003_SECURITY_EVIDENCE_BLOB_DRIFT');
+ need(FIND.findings.length===295 &&
+   FIND.findings.some(x=>x.id===hold.originatingFindingId&&x.status==='OPEN_P0_NOT_ACCEPTED') &&
+   Array.isArray(hold.additionalP0)&&hold.additionalP0.length===5 &&
+   hold.additionalP0.every(id=>FIND.findings.some(x=>x.id===id&&x.status==='OPEN_P0_NOT_ACCEPTED')),
+   'I65_B4_003_SECURITY_FINDING_LOSS');
+ need(C.i6Execution?.productMutationAuthorized===false &&
+   C.i6Execution?.dataMutationAuthorized===false &&
+   C.i6Execution?.livePromotionAuthorized===false &&
+   B4.boundaries?.productMutationAuthorized===false &&
+   B4.boundaries?.dataMutationAuthorized===false &&
+   B4.boundaries?.livePromotionAuthorized===false &&
+   hold.dataWritesAuthorized===false &&
+   hold.productSourceWritesAuthorized===false &&
+   hold.firestoreRulesDeployAuthorized===false &&
+   hold.livePromotionAuthorized===false &&
+   C.nextAction==='I6_5_FORENSIC_REMEDIATION_B4_003_R20_TARGETED_PAULA_VISUAL',
+   'I65_B4_003_SECURITY_RELEASE_HOLD_BYPASS');
+ const rtext=fs.readFileSync('firestore.rules','utf8');
+ need(rtext.includes('match /tenants/{tenantId}/data/{document=**}') &&
+   rtext.includes('allow read, write: if isTenantMember(tenantId);'),
+   'I65_B4_003_SECURITY_SOURCE_RULES_CHANGED_WITHOUT_NEW_GATE');
+ console.log('SECURITY_RELEASE_HOLD=ACTIVE_FAIL_CLOSED');
+ console.log('B4_003_P0_STILL_OPEN=6');
+}
 const P=readJson(DATA_UPDATE_PLAN),D=readJson(DATA_UPDATE_DISCIPLINE),RGT=readJson(DATA_UPDATE_REGISTRY),SRC=readJson(ACTIVE_SOURCE_INTAKE),SRC3=readJson(I63_SOURCE),R63=readJson(I63_RECEIPT),SRC4=readJson(I64_SOURCE),R64=readJson(I64_RECEIPT),SRC5=readJson(I65_SOURCE),SYNC5=readJson(I65_SYNC);
 need(C.schemaVersion==='gravicentra-control-plane-v2','I6_CONTROL_SCHEMA_INVALID');
 need(C.controlPlaneId==='GRAVICENTRA-INSURANCE-FASE-A','I6_CONTROL_ID_INVALID');
