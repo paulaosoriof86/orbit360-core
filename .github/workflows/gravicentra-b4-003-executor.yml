@@ -347,11 +347,29 @@ jobs:
               result.exactLegacyRulesMatch=files.length===1&&files[0].content===legacyRules;
               result.hasCanonicalDataMatch=!!dataRuleSection;
               result.sourceHasMembershipOnlyDataRead=memberOnly;
+              // The August legacy ruleset grants recursive read AND write on all
+              // tenant data for any member document, without status/role/scope
+              // checking. Readback must fail closed, not certify the rules audit.
+              const broadLegacyDataGrant=result.exactLegacyRulesMatch
+                && legacyRules.includes('match /tenants/{tenantId}/data/{document=**}')
+                && legacyRules.includes('allow read, write: if isTenantMember(tenantId);');
+              const broadLegacyTenantGrant=result.exactLegacyRulesMatch
+                && legacyRules.includes('match /tenantId/{tenantId}/{document=**}')
+                && legacyRules.split('allow read, write: if isTenantMember(tenantId);').length-1>=2;
+              result.recursiveDataReadWriteAllowedToTenantMembers=broadLegacyDataGrant;
+              result.legacyTenantReadWriteAllowedToTenantMembers=broadLegacyTenantGrant;
+              result.memberAuthorizationDoesNotCheckActiveStatus=broadLegacyDataGrant
+                && legacyRules.includes('&& exists(memberPath(tenantId));');
+              result.directForeignPolicyReadProof={runId:38415321605,
+                result:'NEGATIVE_TEST_FAILED_FOREIGN_POLICY_SERVER_GET_ALLOWED',
+                actors:['operativo:GT','operativo:CO','asesor:GT']};
               result.rowLevelScopeVerified=false;
               result.securityPass=false;
-              result.additionalNegativeActorTestRequired=true;
-              result.classification=memberOnly?'LIVE_RULES_MEMBER_ONLY_DATA_READ_NO_ADVISOR_CHECK':
-                'LIVE_RULES_SOURCE_READBACK_REQUIRES_CAUSAL_ADVISOR_SCOPE_REVIEW';
+              result.additionalNegativeActorTestRequired=false;
+              result.classification=(broadLegacyDataGrant&&broadLegacyTenantGrant)
+                ?'ACTIVE_LEGACY_MEMBER_WIDE_READ_WRITE_SECURITY_BLOCKER'
+                :'EFFECTIVE_RULES_NOT_CERTIFIED_ROLE_SCOPE_BLOCKER';
+              result.status='SECURITY_BLOCKER_CONFIRMED_FAIL_CLOSED';
             }catch(e){
               result.status='LIVE_RULES_READBACK_BLOCKED_FAIL_CLOSED';
               result.blockerCode=String(e?.code||e?.response?.status||'UNKNOWN');
@@ -363,7 +381,7 @@ jobs:
               exactProductRulesMatch:result.exactProductRulesMatch===true,
               membershipOnlyDataRead:result.sourceHasMembershipOnlyDataRead===true,
               rulesSha256:result.rulesSha256||'',blockerCode:result.blockerCode||''}));
-            if(result.status!=='LIVE_FIRESTORE_RULESET_READBACK_COMPLETE_UNDER_REVIEW')
+            if(result.securityPass!==true)
               process.exitCode=1;
           })().catch(e=>{console.error('R26_RULES_READONLY_UNEXPECTED:'+String(e.message||e));process.exitCode=1;});
           NODE
