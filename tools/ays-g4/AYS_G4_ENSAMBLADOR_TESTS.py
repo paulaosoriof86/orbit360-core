@@ -18,6 +18,8 @@ def fixture(root):
  write(repo,"firebase.json",json.dumps({"hosting":{"public":"orbit360-platform","ignore":["docs/**"]}}))
  write(repo,"orbit360-platform/index.html","<html>shared</html>")
  write(repo,"orbit360-platform/core/util.js","const stable=true;")
+ write(repo,"orbit360-platform/tools/safe.sh","#!/bin/sh\nexit 0\n")
+ (repo/"orbit360-platform/tools/safe.sh").chmod(0o755)
  common=commit(repo,"common")
  git(repo,"checkout","-qb","portal",common)
  for p,m in a.PORTAL_FILES.items():write(repo,p,m+" source")
@@ -33,19 +35,21 @@ def must_fail(fn):
 cases=[]
 with tempfile.TemporaryDirectory(prefix="ays-g4-") as t:
  root=Path(t);repo,bref,pref=fixture(root);out=root/"bundle"
- receipt=a.build(repo,out,bref,pref,expected_count=4)
+ receipt=a.build(repo,out,bref,pref,expected_count=5)
  manifest=json.loads((out/"SOURCE_FILE_MANIFEST.json").read_text())
- assert receipt["result"]=="SOURCE_PRESERVATION_PASS" and manifest["assembled_count"]==6
- assert manifest["preserved_identical_count"]==2
+ assert receipt["result"]=="SOURCE_PRESERVATION_PASS" and manifest["assembled_count"]==7
+ assert manifest["preserved_identical_count"]==3
  assert all((out/"candidate"/p).exists() for p in a.DIFFERENCES)
  cases.append("merge_both_modules_and_preserve_common")
- must_fail(lambda:a.build(repo,out,bref,pref,expected_count=4))
+ assert (out/"candidate"/"orbit360-platform/tools/safe.sh").stat().st_mode & 0o111
+ cases.append("executable_file_mode_preserved")
+ must_fail(lambda:a.build(repo,out,bref,pref,expected_count=5))
  cases.append("never_overwrite_existing_staging")
  must_fail(lambda:a.build(repo,root/"wrongcount",bref,pref,expected_count=2706))
  cases.append("unexpected_inventory_size_fails")
  git(repo,"checkout","portal");write(repo,"orbit360-platform/index.html","unauthorized change")
  drift=commit(repo,"unexpected shared modification")
- must_fail(lambda:a.build(repo,root/"diverge",bref,drift,expected_count=4))
+ must_fail(lambda:a.build(repo,root/"diverge",bref,drift,expected_count=5))
  cases.append("shared_source_mutation_fails")
  git(repo,"rm","orbit360-platform/core/portal-p01-s511f.js")
  missing=commit(repo,"portal JS removed")
@@ -53,7 +57,7 @@ with tempfile.TemporaryDirectory(prefix="ays-g4-") as t:
  cases.append("missing_required_asset_fails")
  git(repo,"checkout","portal");write(repo,"firebase.json",json.dumps({"hosting":{"public":"other-folder"}}))
  cfg=commit(repo,"changed config")
- must_fail(lambda:a.build(repo,root/"cfg",bref,cfg,expected_count=4))
+ must_fail(lambda:a.build(repo,root/"cfg",bref,cfg,expected_count=5))
  cases.append("hosting_configuration_drift_fails")
  git(repo,"checkout","portal")
  write(repo,"firebase.json",json.dumps({"hosting":{"public":"orbit360-platform","ignore":["docs/**"]}}))
@@ -61,6 +65,6 @@ with tempfile.TemporaryDirectory(prefix="ays-g4-") as t:
  write(repo,"orbit360-platform/core/portal-p01-s511f.js",a.PORTAL_FILES["orbit360-platform/core/portal-p01-s511f.js"]+" source")
  write(repo,"orbit360-platform/portal-p01-lab.html","bad page")
  nomarker=commit(repo,"contract marker missing")
- must_fail(lambda:a.build(repo,root/"marker",bref,nomarker,expected_count=4))
+ must_fail(lambda:a.build(repo,root/"marker",bref,nomarker,expected_count=5))
  cases.append("critical_contract_marker_missing_fails")
 print(json.dumps({"classification":"SYNTHETIC_OFFLINE_UNIT_TESTS_ONLY","pass":len(cases),"total":7,"tests":[{"name":c,"result":"PASS"} for c in cases]},ensure_ascii=False,indent=2))

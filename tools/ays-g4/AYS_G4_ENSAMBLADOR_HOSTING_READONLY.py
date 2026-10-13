@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """A&S G4. Deterministic source-only shared Hosting candidate. No Firebase writes."""
 from __future__ import annotations
-import argparse, hashlib, io, json, os, subprocess, sys, tarfile
+import argparse, hashlib, io, json, os, stat, subprocess, sys, tarfile
 from pathlib import Path, PurePosixPath
 
 BASE_REF="f873ce1f2b55dc5ad8cac07b58be43faddeb0a99"
@@ -28,8 +28,8 @@ def entries(repo:Path,ref:str)->dict[str,str]:
   mode,kind,sha=metadata.decode().split(" ")
   p=path.decode("utf-8")
   if not p.startswith(PREFIX):continue
-  if kind!="blob" or mode!="100644":raise ValueError(f"Non-regular asset: {p} [{mode} {kind}]")
-  out[p]=sha
+  if kind!="blob" or mode not in ("100644","100755"):raise ValueError(f"Non-regular asset: {p} [{mode} {kind}]")
+  out[p]=(sha,mode)
  return out
 
 def blob_sha(data:bytes)->str:
@@ -47,6 +47,7 @@ def extract(repo:Path,base_ref:str,dst:Path):
    if not member.isfile():raise ValueError("Link or special file in archive: "+str(path))
    target.parent.mkdir(parents=True,exist_ok=True)
    with tf.extractfile(member) as src:target.write_bytes(src.read())
+   target.chmod(member.mode & 0o777)
 
 def build(repo:Path,out:Path,base_ref:str=BASE_REF,portal_ref:str=PORTAL_REF,expected_count:int|None=None):
  repo=repo.resolve();out=out.resolve()
@@ -68,21 +69,26 @@ def build(repo:Path,out:Path,base_ref:str=BASE_REF,portal_ref:str=PORTAL_REF,exp
   if p not in baseline or p in portal:raise ValueError("Siniestros ownership unexpected: "+p)
  out.mkdir(parents=True,exist_ok=True);stage=out/".candidate_INCOMPLETE"
  extract(repo,base_ref,stage)
+ # Git archive may apply tar.umask; canonical permissions come from each Git tree entry.
+ for p in baseline:
+  (stage/p).chmod(int(baseline[p][1][-3:],8))
  for p in PORTAL_FILES:
   dst=stage/p;dst.parent.mkdir(parents=True,exist_ok=True)
   data=git(repo,"show",portal_ref+":"+p)
-  if blob_sha(data)!=portal[p]:raise ValueError("Portal overlay hash mismatch: "+p)
+  if blob_sha(data)!=portal[p][0]:raise ValueError("Portal overlay hash mismatch: "+p)
   if dst.exists():raise ValueError("Overlay would overwrite inherited file")
   dst.write_bytes(data)
+  dst.chmod(int(portal[p][1][-3:],8))
  actual={str(p.relative_to(stage)).replace(os.sep,"/") for p in stage.rglob("*") if p.is_file()}
  if actual!=set(paths):raise ValueError("Missing/extra staging paths: "+repr(sorted(set(paths)^actual)[:12]))
  rows=[]
  for p in paths:
   data=(stage/p).read_bytes();chosen=portal[p] if p in PORTAL_FILES else baseline[p]
-  if blob_sha(data)!=chosen:raise ValueError("Inherited Git blob changed: "+p)
+  if blob_sha(data)!=chosen[0]:raise ValueError("Inherited Git blob changed: "+p)
+  if stat.S_IMODE((stage/p).stat().st_mode)!=int(chosen[1][-3:],8):raise ValueError("Git executable mode lost: "+p)
   marker=(PORTAL_FILES|SIN_FILES).get(p)
   if marker and marker.encode("utf-8") not in data:raise ValueError("Contract marker absent: "+p)
-  rows.append({"path":p,"blob_sha":chosen,"sha256":hashlib.sha256(data).hexdigest(),"size":len(data),
+  rows.append({"path":p,"blob_sha":chosen[0],"git_mode":chosen[1],"sha256":hashlib.sha256(data).hexdigest(),"size":len(data),
    "source_ref":portal_ref if p in PORTAL_FILES else base_ref,"critical":bool(marker)})
  manifest={"schema":"ays-g4-source-manifest.v1","classification":"SOURCE_ONLY_NOT_DEPLOYED",
   "baseline_ref":base_ref,"portal_ref":portal_ref,"firebase_config_sha256":hashlib.sha256(fb0).hexdigest(),

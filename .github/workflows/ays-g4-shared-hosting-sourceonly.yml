@@ -2,6 +2,12 @@
 name: AYS G4 Shared Hosting Source-only Verification
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - audit/ays-g4-shared-hosting-sourceonly-20261013
+    paths:
+      - '.github/workflows/ays-g4-shared-hosting-sourceonly.yml'
+      - 'tools/ays-g4/**'
 permissions:
   contents: read
 concurrency:
