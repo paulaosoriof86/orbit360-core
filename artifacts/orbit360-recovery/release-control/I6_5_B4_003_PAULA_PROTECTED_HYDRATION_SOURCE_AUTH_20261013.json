@@ -1,0 +1,34 @@
+{
+  "schema": "GRAVICENTRA_B4_003_SCOPED_SOURCE_AUTH_V1",
+  "status": "AUTHORIZED_SOURCE_ONLY",
+  "date": "2026-10-13",
+  "requestedBy": "Paula",
+  "scope": "Integrate server-protected read in existing B4-003 Preview candidate without deployment",
+  "headAtAuthorization": "35be0327813159afdad77b963b1af794d2d41460",
+  "gate": "I6.5/B4-003",
+  "allowedProductFiles": [
+    "orbit360-platform/core/product-runtime-browser-providers-p0.js",
+    "orbit360-platform/core/backend-product-readonly-bootstrap-p0.js",
+    "orbit360-platform/data/store-firestore-product-readonly-p0.js",
+    "orbit360-platform/core/product-app-p0.js",
+    "orbit360-platform/index.html"
+  ],
+  "allowedQaFiles": [
+    "tools/gravicentra-b4-003-protected-hydration.test.cjs",
+    ".github/workflows/gravicentra-release-lock-sync.yml"
+  ],
+  "boundaries": {
+    "onlyB4003": true,
+    "productSourceEdits": true,
+    "buildRequiresNewDigest": true,
+    "previousCertifiedPreviewImmutable": true,
+    "productionPromotion": false,
+    "firestoreRulesDeploy": false,
+    "productionBackendDeploy": false,
+    "liveWrites": false,
+    "dataReimport": false,
+    "previousPassPreserved": true,
+    "sourceChangeNotPreviewPass": true
+  },
+  "acceptance": "Authenticated positive/negative role-country and cross-module browser/readback required; no PASS by source inspection"
+}

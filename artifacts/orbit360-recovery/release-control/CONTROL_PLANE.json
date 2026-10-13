@@ -9931,5 +9931,31 @@
       "clientIntegrated": false,
       "securityP0Closed": false
     }
+  },
+  "b4003ProtectedHydrationScopedAuthorization": {
+    "status": "SOURCE_ONLY_AUTHORIZED_CURRENT_GATE",
+    "gate": "I6.5/B4-003",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PAULA_PROTECTED_HYDRATION_SOURCE_AUTH_20261013.json",
+    "receiptBlobSha": "3b17ba3e560117345afc8fb476580ed26e275d67",
+    "allowedProductFiles": [
+      "orbit360-platform/core/product-runtime-browser-providers-p0.js",
+      "orbit360-platform/core/backend-product-readonly-bootstrap-p0.js",
+      "orbit360-platform/data/store-firestore-product-readonly-p0.js",
+      "orbit360-platform/core/product-app-p0.js",
+      "orbit360-platform/index.html"
+    ],
+    "allowedQaFiles": [
+      "tools/gravicentra-b4-003-protected-hydration.test.cjs",
+      ".github/workflows/gravicentra-release-lock-sync.yml"
+    ],
+    "sourceMutationAllowedWithinScope": true,
+    "globalProductMutationAuthorityUnchanged": true,
+    "firestoreRulesDeployAuthorized": false,
+    "productionDeployAuthorized": false,
+    "operationalWritesAuthorized": false,
+    "dataReimportAuthorized": false,
+    "existingCertifiedPreviewImmutable": true,
+    "previewBuildRequiredAfterSourceChange": true,
+    "securityP0Closed": false
   }
 }
