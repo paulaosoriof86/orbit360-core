@@ -248,6 +248,14 @@ jobs:
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'r20_apply='+(r20Apply?'true':'false')+'\n');
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'r20_cutoff_apply='+(r20CutoffApply?'true':'false')+'\n');
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'r20_second_dryrun='+(secondReviewDryRun?'true':'false')+'\n');
+          // Surface an explicit NOOP on routine pushes; never certify a skipped Preview.
+          const requestedModes={preview:previewOk,renewalsPreview,apply:applyOk,r20DryRun,r20Apply,r20CutoffApply,secondReviewDryRun,p0CumulativeReadOnly,r26RulesReadOnly,r26ReadOnly};
+          const enabledModes=Object.entries(requestedModes).filter(([,on])=>on).map(([name])=>name);
+          if(!enabledModes.length){
+            fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY,'### B4-003: NOOP (not a Preview PASS)\nNo build, deploy, authenticated browser test, or readback was executed. Control Plane nextAction: `'+String(c.nextAction)+'`.\n');
+            console.log('::notice title=B4-003 NOOP::No functional proof executed; do not interpret this run as Preview PASS');
+            if(process.env.GITHUB_EVENT_NAME==='workflow_dispatch')throw Error('B4_003_MANUAL_DISPATCH_NOOP_FAIL_CLOSED');
+          }
           console.log('B4_003_PREVIEW_MODE='+(previewOk?'RUN':'NOOP')+' RENEWALS_PRIORITY_PREVIEW='+(renewalsPreview?'RUN':'NOOP')+' APPLY_MODE='+(applyOk?'RUN':'NOOP')+' R20_DRYRUN_MODE='+(r20DryRun?'RUN':'NOOP')+' R20_APPLY_MODE='+(r20Apply?'RUN':'NOOP')+' R20_CUTOFF_APPLY='+(r20CutoffApply?'RUN':'NOOP')+' R20_SECOND_DRYRUN='+(secondReviewDryRun?'RUN':'NOOP'));
           NODE
 
