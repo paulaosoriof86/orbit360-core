@@ -407,5 +407,24 @@ Orbit.modules.comparativo = (function () {
     Orbit.notify.pedir(cid, { tipo: 'Comparativo enviado', icon: '⚖️', asunto: 'Comparativo de ' + (meta.ramo || 'seguros') + ' · ' + props.length + ' opciones', mensaje: msg, adjunto: 'Comparativo-' + (meta.ramo || 'seguros') + '.pdf' });
   }
   function rgbaHex(hex, a) { let h = hex.replace('#', ''); if (h.length === 3) h = h.split('').map(x => x + x).join(''); const n = parseInt(h, 16); return `rgba(${n >> 16},${(n >> 8) & 255},${n & 255},${a})`; }
-  return { render, enviarCliente };
+  function acceptanceSnapshot() {
+    // Read-only snapshot of the offers currently rendered in Comparativo.
+    // Never substitute stale Cotizador offers for manually uploaded/edited proposals.
+    return {
+      pais: String(meta.pais || '').trim(),
+      ramo: String(meta.ramo || '').trim(),
+      producto: String(meta.sub || '').trim(),
+      clienteNombre: String(meta.cliente || '').trim(),
+      ofertas: props.map((p,i)=>({
+        indice:i,nombre:String(p.nombre||p.aseguradora||'').trim(),
+        ramo:String(p.ramo||meta.ramo||'').trim(),producto:String(p.producto||meta.sub||'').trim(),
+        cur:String(p.cur|| (meta.pais==='CO'?'COP':'GTQ')).trim(),
+        neta:Number(p.neta)||0,total:Number(p.total)||0,iva:Number(p.iva)||0,
+        gastosEm:Number(p.gastosEm)||0,recargo:Number(p.recargo)||0,
+        fracc:Number(p.fracc)||1,sourceRef:String(p.sourceRef||'').trim(),
+        origen:String(p.origen||'').trim()
+      }))
+    };
+  }
+  return { render, enviarCliente, acceptanceSnapshot };
 })();

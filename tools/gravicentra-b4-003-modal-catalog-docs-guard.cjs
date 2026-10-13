@@ -16,4 +16,8 @@ for(const x of ['id="gs-new-files"','id="gs-upload-files"','GESTION_DOCUMENT_CAN
 assert(!ui.includes('id="emi-ramo" class="o-sel" value='),'RAMO_TEXT_INPUT_REGRESSION');
 assert(!ui.includes('id="emi-prod" class="o-sel" value='),'PRODUCT_TEXT_INPUT_REGRESSION');
 assert(html.includes('b4003-modal-docs-20261013'),'NEW_ASSET_CACHE_BINDING_MISSING');
+const cmp=fs.readFileSync('orbit360-platform/modules/comparativo.js','utf8');
+assert(cmp.includes('acceptanceSnapshot'),'COMPARATIVO_LIVE_OFFERS_BRIDGE_MISSING');
+assert(ui.includes('quoteRows(compared)'),'ACCEPTED_OFFER_NOT_BOUND_TO_COMPARATIVO');
+assert(ui.includes('— Seleccionar cliente —'),'CLIENT_SELECTION_NOT_EXPLICIT');
 console.log('B4_003_MODAL_CATALOG_AND_DOC_SOURCE_CONTRACT_PASS; functional Preview pending');

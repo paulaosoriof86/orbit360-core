@@ -5996,7 +5996,7 @@
   "canonicalAccumulationControl": {
     "status": "FROZEN_ACTIVE",
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "compositionLockBlobSha": "cee851edb2a31d4705ee6a2bb708fe1bf64b16ba",
+    "compositionLockBlobSha": "973073193f3304924d89c7898bfe9f6b5c066706",
     "findingLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
     "findingLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
@@ -9764,22 +9764,25 @@
     "guardFailureBeingReconciled": "I6_CANONICAL_COMPOSITION_EXACT_SET_DRIFT triggered on first staging commit, no deploy"
   },
   "b4003ModalCatalogDocsStaging": {
-    "status": "SOURCE_STAGED_PENDING_EXACT_AUTHENTICATED_PREVIEW",
+    "status": "SOURCE_STAGED_WITH_CURRENT_COMPARATIVO_PROPOSAL_OWNER_PENDING_EXACT_PREVIEW",
     "gate": "I6.5/B4-003",
     "scope": "catalog selectors, explicit quote selection and Drive attachments on issuance + Ops management dialogs",
     "authorizedBy": "Paula explicit user authorization 2026-10-13",
     "fileBlobs": {
-      "orbit360-platform/modules/issuance-endosos-v1201-bridge.js": "52b6c2fc856ec7f68197ed37eb509eaea90e44b1",
+      "orbit360-platform/modules/issuance-endosos-v1201-bridge.js": "85a30d78291ffaf4a76bd77dce5a8239560a3661",
       "orbit360-platform/core/ciclo.js": "3377c627ee53e3449f4ee382a570ea72335a0ada",
-      "orbit360-platform/index.html": "168d1a7c228d168be982b85608fa78e6228c9924"
+      "orbit360-platform/index.html": "bfbec60cc9d713b63450c8f7b0d0d7529dacb96b",
+      "orbit360-platform/modules/comparativo.js": "982881a4c1e2f95be95428bd3f9f23360a9a2d5f"
     },
-    "compositionLockBlobSha": "4094b08c084b76565aa9fccdcfb4c1e4bdf90d3f",
+    "compositionLockBlobSha": "973073193f3304924d89c7898bfe9f6b5c066706",
     "unitStaticProbe": "PENDING",
     "sourceSyntaxProbe": "PENDING_CI",
     "noLive": true,
     "noRealWrites": true,
     "needs": "IMMUTABLE_NEW_PREVIEW_AND_EXACT_READBACK_P0_SECURITY_HOLD_PRESERVED",
-    "openFindingsPreserved": true
+    "openFindingsPreserved": true,
+    "quoteAuthority": "orbit360-platform/modules/comparativo.js acceptanceSnapshot from current props, not stale Orbit._cots",
+    "clientSelection": "EXPLICIT_IF_NO_CANONICAL_CONTEXT"
   },
   "b4003InicioMotivationalTexts": {
     "status": "SOURCE_STAGED_PENDING_EXACT_PREVIEW_AND_PAULA_VISUAL",

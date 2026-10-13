@@ -41,6 +41,7 @@ jobs:
           node tools/gravicentra-b4-003-scoped-boundary.test.cjs
           node --check orbit360-platform/modules/inicio.js
           node --check orbit360-platform/core/ciclo.js
+          node --check orbit360-platform/modules/comparativo.js
           node --check orbit360-platform/modules/issuance-endosos-v1201-bridge.js
           node tools/gravicentra-b4-003-modal-catalog-docs-guard.cjs
           node tools/gravicentra-governance-preflight-v1.mjs --mode=governance

@@ -142,8 +142,10 @@ Orbit.modules = Orbit.modules || {};
     mod.__contextV1201 = { original };
   }
 
-  function quoteRows() {
-    return (Orbit._cots || []).map((q, i) => {
+  function quoteRows(snapshot) {
+    // Use proposals actually shown in Comparativo, including user-edited/PDF rows.
+    const proposals = snapshot && Array.isArray(snapshot.ofertas) ? snapshot.ofertas : [];
+    return proposals.map((q, i) => {
       const insurer = insurerForQuote(q);
       return { index: i, insurerId: insurer && insurer.id || '', insurerName: insurer && insurer.nombre || q.nombre || q.aseguradora || ('Opción ' + (i + 1)), quote: q };
     });
@@ -152,11 +154,14 @@ Orbit.modules = Orbit.modules || {};
   async function openAcceptedProposal() {
     if (!I.canManage()) return toast('Tu rol activo no puede crear solicitudes de emisión.');
     try { await Orbit.cat.ensure(); } catch (_) { return toast('No se pudieron confirmar los catálogos del tenant.'); }
-    const context = Object.assign({}, window.__orbitQuoteContext || {}, window.__orbitRenewalContext || {});
+    const compared = Orbit.modules.comparativo && typeof Orbit.modules.comparativo.acceptanceSnapshot === 'function'
+      ? Orbit.modules.comparativo.acceptanceSnapshot() : null;
+    const context = Object.assign({}, window.__orbitQuoteContext || {}, window.__orbitRenewalContext || {},
+      compared ? {pais:compared.pais,ramo:compared.ramo,producto:compared.producto} : {});
     const clients = scopedClients();
-    const quotes = quoteRows();
+    const quotes = quoteRows(compared);
     const insurers = (S().all('aseguradoras') || []).filter(a => a.vinculada !== false && (!context.pais || !a.pais || a.pais === context.pais));
-    const selectedClient = context.clienteId || (clients[0] && clients[0].id) || '';
+    const selectedClient = clients.some(c => c.id === context.clienteId) ? context.clienteId : '';
     const selectedQuote = null;
     const selectedInsurer = '';
     const q = {};
@@ -167,12 +172,12 @@ Orbit.modules = Orbit.modules || {};
     const start = context.sourcePolicyId ? ((S().get('polizas', context.sourcePolicyId) || {}).vigenciaFin || today()) : today();
     const body = `<div class="cfg-note" style="margin-bottom:13px">Registrar la aceptación crea una <b>Solicitud de emisión en Ops</b>. Todavía no crea una póliza ni recibos. La póliza nace únicamente al recibir número y documento reales de la aseguradora.</div><div class="cgrid">
       ${quotes.length ? `<label class="ce-l" style="grid-column:1/-1">Propuesta aceptada *<select id="emi-quote" class="o-sel"><option value="">— Seleccionar la propuesta que el cliente aceptó —</option>${quotes.map(row => `<option value="${row.index}">${esc(row.insurerName)} · ${esc((row.quote && (row.quote.cur || row.quote.moneda)) || (initialCountry === 'CO' ? 'COP' : 'GTQ'))} · ${esc(row.quote && row.quote.total || 0)}</option>`).join('')}</select><small class="muted">Debes elegir expresamente la oferta; no se acepta automáticamente la primera.</small></label>` : '<div class="cfg-note" style="grid-column:1/-1">No hay cotizaciones vinculadas al comparativo. Registra condiciones únicamente con referencia documental validada.</div>'}
-      <label class="ce-l">Cliente *<select id="emi-cli" class="o-sel">${clients.map(c => `<option value="${esc(c.id)}" ${c.id === selectedClient ? 'selected' : ''}>${esc(c.nombre)}</option>`).join('')}</select></label>
+      <label class="ce-l">Cliente *<select id="emi-cli" class="o-sel"><option value="">— Seleccionar cliente —</option>${clients.map(c => `<option value="${esc(c.id)}" ${c.id === selectedClient ? 'selected' : ''}>${esc(c.nombre)}</option>`).join('')}</select></label>
       <label class="ce-l">Aseguradora aceptada *<select id="emi-asg" class="o-sel"><option value="">— Seleccionar aseguradora —</option>${insurers.map(a => `<option value="${esc(a.id)}" ${a.id === selectedInsurer ? 'selected' : ''}>${esc(a.nombre)}</option>`).join('')}</select></label>
       <label class="ce-l">Ramo *<select id="emi-ramo" class="o-sel"><option value="">— Seleccionar ramo —</option></select></label>
       <label class="ce-l">Producto / subramo *<select id="emi-prod" class="o-sel"><option value="">— Seleccionar producto —</option></select></label>
       <label class="ce-l">País *<select id="emi-pais" class="o-sel"><option ${initialCountry === 'GT' ? 'selected' : ''}>GT</option><option ${initialCountry === 'CO' ? 'selected' : ''}>CO</option></select></label>
-      <label class="ce-l">Moneda *<select id="emi-mon" class="o-sel"><option ${String(q.cur || '') === 'GTQ' ? 'selected' : ''}>GTQ</option><option ${String(q.cur || '') === 'COP' ? 'selected' : ''}>COP</option></select></label>
+      <label class="ce-l">Moneda *<select id="emi-mon" class="o-sel"><option ${initialCountry === 'GT' ? 'selected' : ''}>GTQ</option><option ${initialCountry === 'CO' ? 'selected' : ''}>COP</option></select></label>
       <label class="ce-l">Prima neta aceptada *<input id="emi-neta" type="number" class="o-sel" value="${+q.neta || 0}"></label>
       <label class="ce-l">Gastos de emisión<input id="emi-gem" type="number" class="o-sel" value="${+q.gastosEm || 0}"></label>
       <label class="ce-l">Gastos financieros<input id="emi-gfin" type="number" class="o-sel" value="${+q.recargo || 0}"></label>
@@ -232,6 +237,7 @@ Orbit.modules = Orbit.modules || {};
         '#emi-gfin': selected.recargo, '#emi-iva': selected.iva, '#emi-cuotas': selected.fracc};
       Object.keys(amounts).forEach(key => { if (amounts[key] != null && Number.isFinite(Number(amounts[key]))) $(key).value = String(amounts[key]); });
       if (selected.cur === 'GTQ' || selected.cur === 'COP') currency.value = selected.cur;
+      $('#emi-source').value = String(selected.sourceRef || '').trim();
     });
     b.querySelector('[data-save]').onclick = async () => {
       const saveBtn = b.querySelector('[data-save]'), originalSaveText = saveBtn.textContent;
