@@ -5996,7 +5996,7 @@
   "canonicalAccumulationControl": {
     "status": "FROZEN_ACTIVE",
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "compositionLockBlobSha": "a51d33c3ecebec6b01e971de89f1a365d03ab09c",
+    "compositionLockBlobSha": "53ab787b0404a2d331850b5b9ac45b0b1510b5ea",
     "findingLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
     "findingLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
@@ -9757,6 +9757,10 @@
       "AUTHENTICATED_PREVIEW_POSITIVE_AND_NEGATIVE",
       "SEPARATE_RULES_DEPLOY_AUTHORIZATION"
     ],
-    "tests": "PURE_CONTRACT_PROBES_PASS_NOT_AUTHENTICATED_PROOF"
+    "tests": "PURE_CONTRACT_PROBES_PASS_NOT_AUTHENTICATED_PROOF",
+    "compositionLockBlobSha": "53ab787b0404a2d331850b5b9ac45b0b1510b5ea",
+    "historicalB4LockPreserved": true,
+    "historicalB4PreviewCompositionBindingPreserved": true,
+    "guardFailureBeingReconciled": "I6_CANONICAL_COMPOSITION_EXACT_SET_DRIFT triggered on first staging commit, no deploy"
   }
 }

@@ -36,7 +36,7 @@
   "baselineCertifiedSourceSha": "4bf67a3738751fe2432a130fd23254a6f1c7d16e",
   "parentAcceptedBlockSourceSha": "7e96cf419c0858580fef584340e65b84e40c77b5",
   "currentBlock": "B4",
-  "productFileCount": 102,
+  "productFileCount": 104,
   "productFiles": [
     ".github/workflows/cotcomp-workflow-s419-source-qa.yml",
     "docs/ays/GRAVICENTRA_QUOTE_AUTHORITY_CONTRACT_v1_20261003.md",
@@ -139,7 +139,9 @@
     "orbit360-platform/product-runtime-config.js",
     "orbit360-platform/styles/base.css",
     "orbit360-platform/styles/infra.css",
-    "orbit360-platform/sw.js"
+    "orbit360-platform/sw.js",
+    "functions/b4-003-scoped-access-boundary.js",
+    "firestore.b4-003-scoped-candidate.rules"
   ],
   "productFileBlobs": {
     ".github/workflows/cotcomp-workflow-s419-source-qa.yml": "1123c1bd7848433ce51c24586e9fedbbbd581dff",
@@ -243,7 +245,9 @@
     "orbit360-platform/product-runtime-config.js": "cce5e1b74b246640297a734871a71364e4209061",
     "orbit360-platform/styles/base.css": "608ef0709144ffcbe748a7bd04e1bd16744def65",
     "orbit360-platform/styles/infra.css": "d6fe258364c4e11daad21848a40fbb121c36e4a8",
-    "orbit360-platform/sw.js": "87412e7c4ef1030e2a3389cfd709f0c287ab336b"
+    "orbit360-platform/sw.js": "87412e7c4ef1030e2a3389cfd709f0c287ab336b",
+    "functions/b4-003-scoped-access-boundary.js": "c88789a8b10f0a86d199754d9287ccd3f7dfc4f2",
+    "firestore.b4-003-scoped-candidate.rules": "6ae1a85b1f82525ac018ff682a2e20b6cca5f1d8"
   },
   "evidence": {
     "paulaVisualRejectionPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_PAULA_VISUAL_REJECTION_20260924.json",
@@ -4974,5 +4978,18 @@
     "realDataWrites": 0,
     "livePromotion": false,
     "qaBlob": "3bd36b2abb7ab5da881a9028e494d1a2e10cfec6"
+  },
+  "b4003SecuritySourceStaging": {
+    "status": "NONDEPLOYED_SOURCE_PINNED_IN_CANONICAL_COMPOSITION",
+    "paths": [
+      "functions/b4-003-scoped-access-boundary.js",
+      "firestore.b4-003-scoped-candidate.rules"
+    ],
+    "gate": "I6.5/B4-003",
+    "affectedRuntimeOwners": [],
+    "signedRoleSessionIntegrationRequired": true,
+    "firestoreRulesDeployAuthorized": false,
+    "productEntrypointUnchanged": true,
+    "priorAcceptedEvidencePreserved": true
   }
 }
