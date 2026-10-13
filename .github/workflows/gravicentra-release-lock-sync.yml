@@ -105,7 +105,7 @@ jobs:
       - name: Install isolated emulator test dependencies
         run: |
           set -euo pipefail
-          npm install --no-save --no-package-lock --ignore-scripts firebase-tools@14.0.0 firebase@12.0.0 @firebase/rules-unit-testing@5.0.0
+          npm install --no-save --no-package-lock --ignore-scripts firebase-tools@14.0.0 firebase@12.0.0 @firebase/rules-unit-testing@5.0.0 firebase-admin@13.0.0
       - name: Validate candidate rules against authenticated synthetic Firestore emulator
         run: |
           set -euo pipefail
