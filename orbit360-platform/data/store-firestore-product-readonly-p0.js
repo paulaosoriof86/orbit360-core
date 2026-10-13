@@ -23,7 +23,7 @@
     var startupCollections = requestedRequired.length ? requestedRequired.slice() : collections.slice();
     var deferredCollections = collections.filter(function (name) { return startupCollections.indexOf(name) < 0; });
     var authoritativeFirstReadRequired = options.authoritativeFirstReadRequired === true;
-    var protectedMode=options.protectedReadCandidate===true,protectedEpoch=0;
+    var protectedMode=options.protectedReadCandidate===true,protectedEpoch=0,protectedPoliciesPromise=null;
     var listeners = [], unsubscribers = [], cache = {}, prefs = clone(options.initialPrefs || {}), deferredAttached = false, deferredScheduled = false, deferredCursor = 0, deferredPauseUntil = 0, attachStarted = {};
     var state = { version: VERSION, mode: 'product', tenantId: tenantCheck.tenantId || text(options.tenantId), source: 'data/store-firestore-product-readonly-p0.js', noFallback: true, writeEnabled: false, ready: false, status: 'created', attachedCollections: [], observedCollections: [], serverConfirmedCollections: [], cacheOnlyCollections: [], snapshotSources: {}, deniedCollections: [], snapshotErrors: {}, quarantinedRows: {}, queryPlans: {}, lastSnapshotAt: null, requiredStartupCollections: startupCollections.slice(), deferredCollections: deferredCollections.slice(), deferredAttached: false, authoritativeFirstRead: authoritativeFirstReadRequired };
     collections.forEach(function (collection) { cache[collection] = []; state.quarantinedRows[collection] = []; });
@@ -81,11 +81,15 @@
         throw new Error('PROTECTED_READ_ROLE_NOT_ASSIGNED');
       return r;
     }
-    function protectedLoad(collection,policyId,epoch){
+    function protectedLoad(collection,policyId,epoch,selectedCountry,policyIds){
       if(typeof deps.protectedReadPage!=='function')return Promise.reject(new Error('PROTECTED_READ_PROVIDER_MISSING'));
       var countries=unique(options.membership&&options.membership.countries||[]).map(function(x){return x.toUpperCase();});
       if(!countries.length||countries.some(function(x){return x!=='GT'&&x!=='CO';}))
         return Promise.reject(new Error('PROTECTED_READ_COUNTRY_DENIED'));
+      if(selectedCountry){
+        if(countries.indexOf(selectedCountry)<0)return Promise.reject(new Error('PROTECTED_READ_COUNTRY_DENIED'));
+        countries=[selectedCountry];
+      }
       var initialRole=role(),rows=[],seen=new Set();
       return countries.reduce(function(pr,country){return pr.then(function(){
         var cursor='',pages=0;
@@ -93,7 +97,7 @@
           if(epoch!==protectedEpoch||role()!==initialRole)throw new Error('PROTECTED_READ_CONTEXT_CHANGED');
           if(++pages>100)throw new Error('PROTECTED_READ_PAGE_LIMIT');
           return Promise.resolve(deps.protectedReadPage({tenantId:state.tenantId,activeRole:initialRole,
-            country:country,collection:collection,mode:'list',policyId:policyId||'',pageSize:50,cursor:cursor})).then(function(r){
+            country:country,collection:collection,mode:'list',policyId:policyId||'',policyIds:Array.isArray(policyIds)?policyIds:undefined,pageSize:50,cursor:cursor})).then(function(r){
               if(!r||r.ok!==true||r.serverScoped!==true||r.collection!==collection||
                  r.country!==country||!Array.isArray(r.rows)||r.rows.length>50)
                 throw new Error('PROTECTED_READ_RESPONSE_INVALID');
@@ -117,14 +121,55 @@
         return rows;
       });
     }
+    function protectedRelatedUniverse(collection,epoch){
+      // Do not cache partially hydrated global views. Server verifies every batch.
+      if(!protectedPoliciesPromise)protectedPoliciesPromise=protectedLoad('polizas','',epoch);
+      return protectedPoliciesPromise.then(function(policies){
+        if(epoch!==protectedEpoch)throw new Error('PROTECTED_READ_CONTEXT_CHANGED');
+        var batches=[],rows=[],seenIds=new Set(),seenPolicies=new Set();
+        ['GT','CO'].forEach(function(country){
+          var mine=policies.filter(function(p){return text(p.pais||p.country).toUpperCase()===country;});
+          for(var i=0;i<mine.length;i+=10){
+            var ids=mine.slice(i,i+10).map(function(p){
+              var id=text(p.canonicalDocumentId||p.id);
+              if(!id||seenPolicies.has(id))throw new Error('PROTECTED_READ_POLICY_DUPLICATE');
+              seenPolicies.add(id);return id;
+            });
+            batches.push({country:country,ids:ids});
+          }
+        });
+        var offset=0;
+        function worker(){
+          if(epoch!==protectedEpoch)throw new Error('PROTECTED_READ_CONTEXT_CHANGED');
+          if(offset>=batches.length)return Promise.resolve();
+          var batch=batches[offset++];
+          return protectedLoad(collection,'',epoch,batch.country,batch.ids).then(function(items){
+            items.forEach(function(item){
+              var id=text(item&&item.canonicalDocumentId||item&&item.id);
+              if(!id||seenIds.has(id))throw new Error('PROTECTED_READ_RELATED_DUPLICATE');
+              if(batch.ids.indexOf(text(item.polizaId||item.policyId))<0)
+                throw new Error('PROTECTED_READ_RELATED_POLICY_MISMATCH');
+              seenIds.add(id);rows.push(item);
+            });
+            return worker();
+          });
+        }
+        return Promise.all(Array.from({length:Math.min(3,batches.length)},function(){return worker();}))
+          .then(function(){
+            if(epoch!==protectedEpoch)throw new Error('PROTECTED_READ_CONTEXT_CHANGED');
+            return rows.sort(function(a,b){return text(a.canonicalDocumentId||a.id).localeCompare(text(b.canonicalDocumentId||b.id));});
+          });
+      });
+    }
     function protectedAttach(collection){
       var plan=queryPlan(collection);state.queryPlans[collection]=clone(plan);
       if(plan.hardError)throw new Error('PROTECTED_READ_PLAN_DENIED');
       if(plan.denied){if(state.deniedCollections.indexOf(collection)<0)state.deniedCollections.push(collection);return false;}
-      if(collection!=='clientes'&&collection!=='polizas')
-        throw new Error('PROTECTED_READ_UNANCHORED_GLOBAL_'+collection);
+      var related=['vehiculos','recibosEsperados','carteraPrimas','cobros'].indexOf(collection)>=0;
+      if(!related&&collection!=='clientes'&&collection!=='polizas')
+        throw new Error('PROTECTED_READ_COLLECTION_UNSUPPORTED_'+collection);
       var epoch=protectedEpoch;
-      Promise.resolve().then(function(){return protectedLoad(collection,'',epoch);})
+      Promise.resolve().then(function(){return related?protectedRelatedUniverse(collection,epoch):protectedLoad(collection,'',epoch);})
         .then(function(rows){if(epoch===protectedEpoch)acceptRows(collection,rows,{fromCache:false});})
         .catch(function(e){if(epoch===protectedEpoch)recordError(collection,e,'snapshot');});
       return true;
@@ -132,7 +177,7 @@
     function roleChanged(){
       if(!protectedMode)return;
       var names=Object.keys(attachStarted).filter(function(k){return !!attachStarted[k];});
-      ++protectedEpoch;attachStarted={};collections.forEach(function(k){cache[k]=[];});
+      ++protectedEpoch;protectedPoliciesPromise=null;attachStarted={};collections.forEach(function(k){cache[k]=[];});
       state.serverConfirmedCollections=[];state.attachedCollections=[];state.observedCollections=[];
       state.snapshotErrors={};state.deniedCollections=[];state.ready=false;state.status='waiting-protected-role';
       emit('*');names.forEach(function(k){attachCollection(k,true);});
@@ -179,7 +224,7 @@
       if (!state.ready && state.status === 'attaching') state.status = 'waiting-authoritative-snapshots';
       return startupCollections.every(function (name) { return !state.snapshotErrors[name] && state.deniedCollections.indexOf(name) < 0; });
     }
-    function detach() { ++protectedEpoch; if(protectedMode&&typeof document!=='undefined'&&document.removeEventListener)document.removeEventListener('orbit:active-role-changed',roleChanged); unsubscribers.splice(0).forEach(function (unsubscribe) { try { unsubscribe(); } catch (e) {} }); state.attachedCollections = []; state.observedCollections = []; state.serverConfirmedCollections = []; state.cacheOnlyCollections = []; state.snapshotSources = {}; state.ready = false; state.status = 'detached'; deferredAttached = false; deferredScheduled = false; deferredCursor = 0; deferredPauseUntil = 0; attachStarted = {}; state.deferredAttached = false; }
+    function detach() { ++protectedEpoch; protectedPoliciesPromise=null; if(protectedMode&&typeof document!=='undefined'&&document.removeEventListener)document.removeEventListener('orbit:active-role-changed',roleChanged); unsubscribers.splice(0).forEach(function (unsubscribe) { try { unsubscribe(); } catch (e) {} }); state.attachedCollections = []; state.observedCollections = []; state.serverConfirmedCollections = []; state.cacheOnlyCollections = []; state.snapshotSources = {}; state.ready = false; state.status = 'detached'; deferredAttached = false; deferredScheduled = false; deferredCursor = 0; deferredPauseUntil = 0; attachStarted = {}; state.deferredAttached = false; }
     if(protectedMode&&typeof document!=='undefined'&&document.addEventListener)document.addEventListener('orbit:active-role-changed',roleChanged);
     function buildRelationIndexes() {
       var policyById = new Map(), clientById = new Map();

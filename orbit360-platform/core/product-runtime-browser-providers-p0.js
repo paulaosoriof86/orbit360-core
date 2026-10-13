@@ -62,9 +62,17 @@
     if(!['clientes','polizas','vehiculos','recibosEsperados','carteraPrimas','cobros'].includes(coll)||
        !['GT','CO'].includes(String(v.country||'').toUpperCase())||!String(v.activeRole||'').trim())
        return Promise.reject(new Error('PROTECTED_READ_PARAMETERS_DENIED'));
-    if(!['clientes','polizas'].includes(coll)&&!String(v.policyId||'').trim())
-       return Promise.reject(new Error('PROTECTED_READ_POLICY_ANCHOR_REQUIRED'));
-    return callFunction('orbit360ScopedPolicyReadPreview',Object.assign({},v,{collection:coll,tenantId:tenant,mode:'list'}),'us-east1')
+    var ids=v.policyIds,hasIds=Object.prototype.hasOwnProperty.call(v,'policyIds')&&ids!==undefined;
+    var related=['vehiculos','recibosEsperados','carteraPrimas','cobros'].includes(coll);
+    if(hasIds&&(!related||String(v.policyId||'').trim()||!Array.isArray(ids)||
+      ids.length<1||ids.length>10||new Set(ids).size!==ids.length||
+      ids.some(function(id){return !String(id||'').trim()||String(id).includes('/');})))
+      return Promise.reject(new Error('PROTECTED_READ_POLICY_BATCH_INVALID'));
+    if(related&&!String(v.policyId||'').trim()&&!hasIds)
+      return Promise.reject(new Error('PROTECTED_READ_POLICY_ANCHOR_REQUIRED'));
+    var outbound=Object.assign({},v,{collection:coll,tenantId:tenant,mode:'list'});
+    if(!hasIds)delete outbound.policyIds;
+    return callFunction('orbit360ScopedPolicyReadPreview',outbound,'us-east1')
       .then(function(r){
         if(!r||r.ok!==true||r.serverScoped!==true||r.collection!==coll||
            r.country!==String(v.country).toUpperCase()||!Array.isArray(r.rows))

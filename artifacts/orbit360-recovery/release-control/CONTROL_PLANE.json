@@ -5996,7 +5996,7 @@
   "canonicalAccumulationControl": {
     "status": "FROZEN_ACTIVE",
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "compositionLockBlobSha": "5620db838eda8706b023b39547efaf615f67c475",
+    "compositionLockBlobSha": "bf264c59249cc4fcd5289acf22611941ecafadb6",
     "findingLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
     "findingLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
@@ -10072,5 +10072,36 @@
     "previewPass": false,
     "securityP0Closed": false,
     "next": "CLIENT_BATCH_TRANSPORT_AND_READ_MODEL_HYDRATION"
+  },
+  "b4003ProtectedRelatedClientHydration20261013": {
+    "status": "SOURCE_STAGED_QA_PENDING_AUTHENTICATED_PREVIEW_PENDING",
+    "gate": "I6.5/B4-003",
+    "findingId": "B4-003-P0-20261012-PERSONAL-COLLECTION",
+    "rootCause": "NO_GLOBAL_RELATED_HYDRATION_USING_SERVER_VERIFIED_POLICY_BATCHES",
+    "allowedProductFiles": [
+      "orbit360-platform/data/store-firestore-product-readonly-p0.js",
+      "orbit360-platform/core/product-runtime-browser-providers-p0.js",
+      "orbit360-platform/index.html"
+    ],
+    "qaFile": "tools/gravicentra-b4-003-protected-hydration.test.cjs",
+    "sourceBefore": {
+      "orbit360-platform/data/store-firestore-product-readonly-p0.js": "16c4877815cf2006fd15bb0db650975c39d2bcd0",
+      "orbit360-platform/core/product-runtime-browser-providers-p0.js": "be42c187bb44071efda8b095f7f121f5de4bd092",
+      "tools/gravicentra-b4-003-protected-hydration.test.cjs": "012bf943ac3fa6d982a7787bde2b26b5df2f0191",
+      "orbit360-platform/index.html": "21b2dea8a2fe54507419da07ef914180142682c0"
+    },
+    "sourceAfter": {
+      "orbit360-platform/data/store-firestore-product-readonly-p0.js": "8154eb9fa8622079e59abde21d99ed72847da36e",
+      "orbit360-platform/core/product-runtime-browser-providers-p0.js": "30c4d78936be532e555eff123ff12dad7b9f139a",
+      "tools/gravicentra-b4-003-protected-hydration.test.cjs": "f020535b69550691a6cff1582a0fe9a1fec1b1cc",
+      "orbit360-platform/index.html": "81570d7e0bc2b9995b9c95bb0ba8bd44fac771e4"
+    },
+    "productionChanged": false,
+    "sharedRulesDeployAuthorized": false,
+    "backendExported": false,
+    "operationalWrites": 0,
+    "securityP0Closed": false,
+    "previewPass": false,
+    "next": "EXACT_PREVIEW_BACKEND_AND_AUTHENTICATED_CHECKS"
   }
 }
