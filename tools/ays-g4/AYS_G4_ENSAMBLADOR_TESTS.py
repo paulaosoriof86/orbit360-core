@@ -67,4 +67,5 @@ with tempfile.TemporaryDirectory(prefix="ays-g4-") as t:
  nomarker=commit(repo,"contract marker missing")
  must_fail(lambda:a.build(repo,root/"marker",bref,nomarker,expected_count=5))
  cases.append("critical_contract_marker_missing_fails")
-print(json.dumps({"classification":"SYNTHETIC_OFFLINE_UNIT_TESTS_ONLY","pass":len(cases),"total":7,"tests":[{"name":c,"result":"PASS"} for c in cases]},ensure_ascii=False,indent=2))
+assert len(cases)==8, f"Expected eight independent synthetic cases; found {len(cases)}"
+print(json.dumps({"classification":"SYNTHETIC_OFFLINE_UNIT_TESTS_ONLY","pass":len(cases),"total":len(cases),"tests":[{"name":c,"result":"PASS"} for c in cases]},ensure_ascii=False,indent=2))
