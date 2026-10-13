@@ -36,7 +36,7 @@
   "baselineCertifiedSourceSha": "4bf67a3738751fe2432a130fd23254a6f1c7d16e",
   "parentAcceptedBlockSourceSha": "7e96cf419c0858580fef584340e65b84e40c77b5",
   "currentBlock": "B4",
-  "productFileCount": 106,
+  "productFileCount": 107,
   "productFiles": [
     ".github/workflows/cotcomp-workflow-s419-source-qa.yml",
     "docs/ays/GRAVICENTRA_QUOTE_AUTHORITY_CONTRACT_v1_20261003.md",
@@ -143,7 +143,8 @@
     "functions/b4-003-scoped-access-boundary.js",
     "firestore.b4-003-scoped-candidate.rules",
     "orbit360-platform/modules/comparativo.js",
-    "functions/b4-003-scoped-policy-reader.js"
+    "functions/b4-003-scoped-policy-reader.js",
+    "functions/b4-003-scoped-policy-callable.js"
   ],
   "productFileBlobs": {
     ".github/workflows/cotcomp-workflow-s419-source-qa.yml": "1123c1bd7848433ce51c24586e9fedbbbd581dff",
@@ -251,7 +252,8 @@
     "functions/b4-003-scoped-access-boundary.js": "c88789a8b10f0a86d199754d9287ccd3f7dfc4f2",
     "firestore.b4-003-scoped-candidate.rules": "6ae1a85b1f82525ac018ff682a2e20b6cca5f1d8",
     "orbit360-platform/modules/comparativo.js": "982881a4c1e2f95be95428bd3f9f23360a9a2d5f",
-    "functions/b4-003-scoped-policy-reader.js": "55236d6c5ad619bb0ac204f177f29922efead0bb"
+    "functions/b4-003-scoped-policy-reader.js": "55236d6c5ad619bb0ac204f177f29922efead0bb",
+    "functions/b4-003-scoped-policy-callable.js": "87d9e2bc4d8b5f0029ce39a1d829b763f2d44e17"
   },
   "evidence": {
     "paulaVisualRejectionPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_PAULA_VISUAL_REJECTION_20260924.json",
@@ -5056,5 +5058,13 @@
     ],
     "sourceValidatedOnly": true,
     "realBusinessWrites": 0
+  },
+  "b4003ScopedPreviewCallable": {
+    "status": "SOURCE_STAGED_NOT_EXPORTED",
+    "sourcePath": "functions/b4-003-scoped-policy-callable.js",
+    "blobSha": "87d9e2bc4d8b5f0029ce39a1d829b763f2d44e17",
+    "functionName": "orbit360ScopedPolicyReadPreview",
+    "notBootstrapped": true,
+    "notDeployed": true
   }
 }

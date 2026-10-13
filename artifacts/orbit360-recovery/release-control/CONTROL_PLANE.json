@@ -5996,7 +5996,7 @@
   "canonicalAccumulationControl": {
     "status": "FROZEN_ACTIVE",
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "compositionLockBlobSha": "91173a69ed9b45df0f7dd0ddc00205533d4b852f",
+    "compositionLockBlobSha": "3562693069dc116f317dd6a6f9957131a5c1cda2",
     "findingLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
     "findingLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
@@ -9805,13 +9805,20 @@
     "component": "functions/b4-003-scoped-policy-reader.js",
     "sourceBlobSha": "55236d6c5ad619bb0ac204f177f29922efead0bb",
     "unitTest": "tools/gravicentra-b4-003-scoped-policy-reader.test.cjs",
-    "compositionLockBlobSha": "91173a69ed9b45df0f7dd0ddc00205533d4b852f",
+    "compositionLockBlobSha": "3562693069dc116f317dd6a6f9957131a5c1cda2",
     "browserSourceChanged": false,
     "backendExportsChanged": false,
     "firestoreRulesDeployed": false,
     "noLive": true,
     "noDataWrites": true,
     "securityP0Closed": false,
-    "blocker": "UNPROVEN_SERVER_ROLE_ATTESTATION_PLUS_FIRESTORE_RULES_PENDING"
+    "blocker": "UNPROVEN_SERVER_ROLE_ATTESTATION_PLUS_FIRESTORE_RULES_PENDING",
+    "previewCallable": {
+      "path": "functions/b4-003-scoped-policy-callable.js",
+      "blobSha": "87d9e2bc4d8b5f0029ce39a1d829b763f2d44e17",
+      "status": "ISOLATED_SOURCE_ONLY_NOT_EXPORTED",
+      "firebaseProjectUnchanged": true,
+      "productionFunctionsUntouched": true
+    }
   }
 }

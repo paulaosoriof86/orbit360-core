@@ -40,6 +40,7 @@ jobs:
           node --check functions/b4-003-scoped-access-boundary.js
           node tools/gravicentra-b4-003-scoped-boundary.test.cjs
           node --check functions/b4-003-scoped-policy-reader.js
+          node --check functions/b4-003-scoped-policy-callable.js
           node tools/gravicentra-b4-003-scoped-policy-reader.test.cjs
           node --check orbit360-platform/modules/inicio.js
           node --check orbit360-platform/core/ciclo.js
