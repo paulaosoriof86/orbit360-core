@@ -37,6 +37,8 @@ jobs:
           set -euo pipefail
           test "$GITHUB_REF_NAME" = "recovery/fase-a-clean-20260831"
           node --check tools/gravicentra-governance-preflight-v1.mjs
+          node --check functions/b4-003-scoped-access-boundary.js
+          node tools/gravicentra-b4-003-scoped-boundary.test.cjs
           node tools/gravicentra-governance-preflight-v1.mjs --mode=governance
           node - <<'NODE' >> "$GITHUB_STEP_SUMMARY"
           const fs=require('node:fs');
