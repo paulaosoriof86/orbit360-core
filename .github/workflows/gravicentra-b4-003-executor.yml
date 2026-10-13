@@ -189,6 +189,21 @@ jobs:
           // No deploy, real writes, data migration, or reopening accepted visual scope.
           const {execFileSync}=require('node:child_process');
           const qaTrigger=execFileSync('git',['log','-1','--format=%s'],{encoding:'utf8'}).trim()==='test(i6.5 R26): authenticated read-only payment parity proof';
+          const p0CumulativeTrigger=execFileSync('git',['log','-1','--format=%s'],{encoding:'utf8'}).trim()==='audit(i6.5 B4-003): execute cumulative P0 read-only inventory';
+          const p0CumulativeReadOnly=p0CumulativeTrigger
+            && c.currentB4?.status==='B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL'
+            && c.nextAction==='I6_5_FORENSIC_REMEDIATION_B4_003_R20_TARGETED_PAULA_VISUAL'
+            && l.activeFinding?.id==='B4-003'
+            && l.boundaries?.dataMutationAuthorized===false
+            && l.boundaries?.productMutationAuthorized===false
+            && l.boundaries?.configWritesAuthorized===false
+            && l.boundaries?.syntheticQaWritesAuthorized===false
+            && l.boundaries?.realOperationalWritesAuthorized===false
+            && l.boundaries?.livePromotionAuthorized===false
+            && c.currentB4?.exactReadback===true;
+          if(p0CumulativeTrigger&&!p0CumulativeReadOnly)throw Error('B4_003_P0_READONLY_GATE_INVALID_FAIL_CLOSED');
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'p0_readonly='+(p0CumulativeReadOnly?'true':'false')+'\n');
+          if(p0CumulativeReadOnly)fs.appendFileSync(process.env.GITHUB_OUTPUT,'p0_preview='+String(c.currentB4.previewUrl)+'\n');
           const r26RulesTrigger=execFileSync('git',['log','-1','--format=%s'],{encoding:'utf8'}).trim()==='audit(i6.5 R26): read-only deployed Firestore rules binding';
           const r26RulesReadOnly=r26RulesTrigger
             && c.currentB4?.status==='B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL'
@@ -392,6 +407,48 @@ jobs:
         with:
           name: gravicentra-r26-effective-rules-readonly-${{ github.run_id }}
           path: ${{ runner.temp }}/r26-rules-live-readback.json
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Prepare cumulative B4-003 P0 read-only source audit
+        if: steps.gate.outputs.p0_readonly == 'true'
+        run: |
+          set -euo pipefail
+          node --check tools/gravicentra-i6-5-b4-003-preview-proof.mjs
+          python3 - <<'PY'
+          import json,os,pathlib
+          dest=pathlib.Path(os.environ['RUNNER_TEMP'])/'b4-003-p0-readonly-service-account.json'
+          valid=None
+          for key in ['SA_DEFAULT','SA_ORBIT360_LAB','SA_ORBIT_360_LAB']:
+              try: candidate=json.loads(os.environ.get(key,''))
+              except (ValueError,TypeError): continue
+              if candidate.get('type')=='service_account' and candidate.get('project_id')==os.environ['PROJECT_ID'] and candidate.get('private_key'):
+                  valid=candidate;break
+          if not valid:raise SystemExit('B4_003_P0_READONLY_SA_MISSING')
+          dest.write_text(json.dumps(valid),encoding='utf8')
+          dest.chmod(0o600)
+          with open(os.environ['GITHUB_ENV'],'a',encoding='utf8') as handle:
+              handle.write('GOOGLE_APPLICATION_CREDENTIALS='+str(dest)+'\n')
+          print('B4_003_P0_SERVICE_ACCOUNT_PRESENT')
+          PY
+          npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund firebase-admin@13.4.0 playwright@1.55.0 >/dev/null
+
+      - name: Execute cumulative B4-003 P0 read-only classification
+        if: steps.gate.outputs.p0_readonly == 'true'
+        env:
+          B4_PREVIEW_URL: ${{ steps.gate.outputs.p0_preview }}
+          B4_003_P0_READONLY: 'true'
+          B4_003_PROOF_OUT: ${{ runner.temp }}/b4-003-p0-cumulative-readonly.json
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-i6-5-b4-003-preview-proof.mjs
+
+      - name: Preserve cumulative B4-003 P0 classification evidence
+        if: always() && steps.gate.outputs.p0_readonly == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: gravicentra-b4-003-p0-cumulative-readonly-${{ github.run_id }}
+          path: ${{ runner.temp }}/b4-003-p0-cumulative-readonly.json
           if-no-files-found: warn
           retention-days: 14
 
