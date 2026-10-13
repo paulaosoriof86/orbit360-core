@@ -5996,7 +5996,7 @@
   "canonicalAccumulationControl": {
     "status": "FROZEN_ACTIVE",
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "compositionLockBlobSha": "4094b08c084b76565aa9fccdcfb4c1e4bdf90d3f",
+    "compositionLockBlobSha": "cee851edb2a31d4705ee6a2bb708fe1bf64b16ba",
     "findingLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
     "findingLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
@@ -9780,5 +9780,18 @@
     "noRealWrites": true,
     "needs": "IMMUTABLE_NEW_PREVIEW_AND_EXACT_READBACK_P0_SECURITY_HOLD_PRESERVED",
     "openFindingsPreserved": true
+  },
+  "b4003InicioMotivationalTexts": {
+    "status": "SOURCE_STAGED_PENDING_EXACT_PREVIEW_AND_PAULA_VISUAL",
+    "findingId": "B4-003-P0-20261012-INICIO-MOTIVATIONAL-TEXTS",
+    "scope": "only role/readiness truthful banner copy",
+    "owner": "orbit360-platform/modules/inicio.js",
+    "blobSha": "dfa19bc626bc119aaaf2debb5a46f970f0560767",
+    "p0Closed": false,
+    "securityHoldPreserved": true,
+    "sourceMetricsUntouched": true,
+    "buildRequired": true,
+    "livePromotion": false,
+    "realWrites": 0
   }
 }
