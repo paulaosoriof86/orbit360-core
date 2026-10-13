@@ -119,7 +119,7 @@ async function run(){
 
     // Authenticated emulator positive/negative tests for the staged protected list.
     let listProof=0;
-    const list=(uid,activeRole,collection,policyId='',opts={})=>readScopedRelatedList({
+    const listRelated=(uid,activeRole,collection,policyId='',opts={})=>readScopedRelatedList({
       db,auth:{uid,token:{}},request:{tenantId:tenant,activeRole,collection,policyId,
         country:opts.country||'GT',cursor:opts.cursor||'',pageSize:opts.pageSize||20}
     });
@@ -131,22 +131,22 @@ async function run(){
       ['opGT','operativo','cobros','own',['pay_own']],
       ['advisorGT','asesor','recibosEsperados','foreign',['r_foreign']]
     ]){
-      const actual=await list(uid,role,collection,policyId);
+      const actual=await listRelated(uid,role,collection,policyId);
       assert.deepEqual(actual.rows.map(x=>x.id),expected);listProof++;
     }
-    const co=await list('opGT','operativo','clientes','',{country:'CO'});
+    const co=await listRelated('opGT','operativo','clientes','',{country:'CO'});
     assert.deepEqual(co.rows.map(x=>x.id),['c_co']);listProof++;
-    await denyRelated(()=>list('opGT','operativo','vehiculos'),'POLICY_ANCHOR_REQUIRED');listProof++;
-    await denyRelated(()=>list('opGT','operativo','vehiculos','foreign'),'POLICY_NOT_FOUND_OR_DENIED');listProof++;
-    await denyRelated(()=>list('opGT','operativo','recibosEsperados','own'),'RELATION_CLIENT_MISMATCH');listProof++;
-    await denyRelated(()=>list('opGT','asesor','clientes'),'ROLE_DENIED');listProof++;
-    await denyRelated(()=>list('advisorGT','asesor','clientes','',{country:'CO'}),'COUNTRY_DENIED');listProof++;
-    await denyRelated(()=>list('opGT','operativo','vehiculos','own',{cursor:'v_foreign'}),'CURSOR_DENIED');listProof++;
+    await denyRelated(()=>listRelated('opGT','operativo','vehiculos'),'POLICY_ANCHOR_REQUIRED');listProof++;
+    await denyRelated(()=>listRelated('opGT','operativo','vehiculos','foreign'),'POLICY_NOT_FOUND_OR_DENIED');listProof++;
+    await denyRelated(()=>listRelated('opGT','operativo','recibosEsperados','own'),'RELATION_CLIENT_MISMATCH');listProof++;
+    await denyRelated(()=>listRelated('opGT','asesor','clientes'),'ROLE_DENIED');listProof++;
+    await denyRelated(()=>listRelated('advisorGT','asesor','clientes','',{country:'CO'}),'COUNTRY_DENIED');listProof++;
+    await denyRelated(()=>listRelated('opGT','operativo','vehiculos','own',{cursor:'v_foreign'}),'CURSOR_DENIED');listProof++;
     await env.withSecurityRulesDisabled(async ctx=>setDoc(doc(ctx.firestore(),canonical('vehiculos','v_own2')),
       {tenantId:tenant,polizaId:'own',clienteId:'c_own'}));
-    const p1=await list('opGT','operativo','vehiculos','own',{pageSize:1});
+    const p1=await listRelated('opGT','operativo','vehiculos','own',{pageSize:1});
     assert.equal(p1.rows.length,1);assert.ok(p1.nextCursor);listProof++;
-    const p2=await list('opGT','operativo','vehiculos','own',{pageSize:1,cursor:p1.nextCursor});
+    const p2=await listRelated('opGT','operativo','vehiculos','own',{pageSize:1,cursor:p1.nextCursor});
     assert.equal(p2.rows.length,1);assert.equal(p2.nextCursor,null);assert.notEqual(p1.rows[0].id,p2.rows[0].id);listProof++;
     assert.equal(listProof,15);
     console.log('B4_003_EMULATOR_RELATED_SERVER_LIST_PASS assertions='+listProof+' synthetic_only no_deploy');

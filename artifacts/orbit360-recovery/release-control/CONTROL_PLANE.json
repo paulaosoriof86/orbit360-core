@@ -5996,7 +5996,7 @@
   "canonicalAccumulationControl": {
     "status": "FROZEN_ACTIVE",
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "compositionLockBlobSha": "29a2fe4b6f2c2b65406c0871c35ea1dca4dc9bc6",
+    "compositionLockBlobSha": "1183fcd37c6f63505622a5015f0167d6e4f45e70",
     "findingLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
     "findingLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
@@ -9874,7 +9874,7 @@
       "functions/b4-003-scoped-related-reader.js": "e9821f2d2c8c4dd83e14a0ba39065a840beab6fc",
       "functions/b4-003-scoped-policy-callable.js": "5d67d921261746fd0de2b9933c4041657375788a"
     },
-    "compositionBlobSha": "29a2fe4b6f2c2b65406c0871c35ea1dca4dc9bc6",
+    "compositionBlobSha": "1183fcd37c6f63505622a5015f0167d6e4f45e70",
     "owner": "functions/b4-003-scoped-related-reader.js",
     "previewCallable": "functions/b4-003-scoped-policy-callable.js",
     "notBootstrapped": true,
@@ -9889,12 +9889,14 @@
       "completeCollectionList": false
     },
     "listQa": {
-      "status": "EMULATOR_DISPATCH_REQUESTED_NOT_PASS",
+      "status": "EMULATOR_SYNTAX_COLLISION_REPAIRED_RERUN_PENDING",
       "assertionsExpected": 15,
-      "testBlobSha": "cf0e6242a578362eaf22b582d2f963ee5a390e2c",
+      "testBlobSha": "44ca1c81ff3f4dd108cb1ddc692537334507b7f6",
       "clientIntegrated": false,
       "rulesDeployed": false,
-      "previewCertified": false
+      "previewCertified": false,
+      "previousFailureRunId": 38453768094,
+      "previousFailureCause": "DUPLICATE_LOCAL_LIST_IDENTIFIER_QA_ONLY"
     }
   }
 }
