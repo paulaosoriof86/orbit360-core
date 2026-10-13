@@ -5116,7 +5116,7 @@
     "gate": "I6.5/B4-003",
     "readerBlobSha": "e9821f2d2c8c4dd83e14a0ba39065a840beab6fc",
     "callableBlobSha": "5d67d921261746fd0de2b9933c4041657375788a",
-    "testBlobSha": "8817ce0505648db02186ec7bf56a98164bef3444",
+    "testBlobSha": "cf0e6242a578362eaf22b582d2f963ee5a390e2c",
     "productionMutation": false,
     "clientEntrypointIntegrated": false,
     "limits": [
