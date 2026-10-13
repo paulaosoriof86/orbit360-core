@@ -49,6 +49,13 @@ jobs:
         run: |
           set -euo pipefail
           python -c 'import json,os,pathlib; p=pathlib.Path(os.environ["RUNNER_TEMP"])/"ays-g4-source"; r=json.loads((p/"SOURCE_ASSEMBLY_RECEIPT.json").read_text()); assert r["result"]=="SOURCE_PRESERVATION_PASS" and r["assembled_files"]==2708 and r["critical_files_verified"]==4 and r["not_deployed"]'
+      - name: Offline classification tests for public-asset readback
+        run: python tools/ays-g4/AYS_G6_REMOTE_HOSTING_READBACK.py --selftest
+      - name: Fingerprint four public LAB assets (READ ONLY)
+        shell: bash
+        run: |
+          set -euo pipefail
+          python tools/ays-g4/AYS_G6_REMOTE_HOSTING_READBACK.py --manifest "$RUNNER_TEMP/ays-g4-source/SOURCE_FILE_MANIFEST.json" --out "$RUNNER_TEMP/ays-g4-source/G6_REMOTE_HOSTING_READBACK.json"
       - name: Preserve evidence only
         uses: actions/upload-artifact@v4
         with:
@@ -56,6 +63,7 @@ jobs:
           path: |
             ${{ runner.temp }}/ays-g4-source/SOURCE_ASSEMBLY_RECEIPT.json
             ${{ runner.temp }}/ays-g4-source/SOURCE_FILE_MANIFEST.json
+            ${{ runner.temp }}/ays-g4-source/G6_REMOTE_HOSTING_READBACK.json
           if-no-files-found: error
           retention-days: 15
-# NO firebase deploy, NO Firebase credentials, NO runtime writes, NO auto-trigger.
+# NO deploy or Firebase credentials. Auto-run only on the single audited branch and scoped paths.
