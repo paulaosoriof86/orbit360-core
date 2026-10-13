@@ -253,7 +253,7 @@
     "functions/b4-003-scoped-access-boundary.js": "8047e4870722db6889152af84ff91b08b1305308",
     "firestore.b4-003-scoped-candidate.rules": "6ae1a85b1f82525ac018ff682a2e20b6cca5f1d8",
     "orbit360-platform/modules/comparativo.js": "982881a4c1e2f95be95428bd3f9f23360a9a2d5f",
-    "functions/b4-003-scoped-policy-reader.js": "55236d6c5ad619bb0ac204f177f29922efead0bb",
+    "functions/b4-003-scoped-policy-reader.js": "4181f6198c0163175579a2cc19197ebc63d9b328",
     "functions/b4-003-scoped-policy-callable.js": "5d67d921261746fd0de2b9933c4041657375788a",
     "functions/b4-003-scoped-related-reader.js": "930a592e7d9b103da03464f0568ce6c1613bbab7"
   },
@@ -5162,5 +5162,22 @@
     "qaTestBlob": "aab4c39f733c038b250450d07c82f9859d38e3f6",
     "newArtifactRequired": true,
     "productionChanged": false
+  },
+  "b4003ScopedPolicyLookaheadSafety20261013": {
+    "status": "SOURCE_STAGED_QA_PENDING",
+    "gate": "I6.5/B4-003",
+    "findingId": "B4-003-P0-20261012-PERSONAL-COLLECTION",
+    "scope": "SCOPED_POLICY_LIST_NEXT_PAGE_LOOKAHEAD_AUTHORIZATION",
+    "sourceFile": "functions/b4-003-scoped-policy-reader.js",
+    "oldBlobSha": "55236d6c5ad619bb0ac204f177f29922efead0bb",
+    "newBlobSha": "4181f6198c0163175579a2cc19197ebc63d9b328",
+    "qaFile": "tools/gravicentra-b4-003-scoped-policy-reader.test.cjs",
+    "qaBlobSha": "bafc06830002bfc8f21b07ac0a4d5d27e8662181",
+    "noBackendExport": true,
+    "noDeploy": true,
+    "noFirestoreRulesDeploy": true,
+    "noDataWrites": true,
+    "noLive": true,
+    "existingPassPreserved": true
   }
 }

@@ -5996,7 +5996,7 @@
   "canonicalAccumulationControl": {
     "status": "FROZEN_ACTIVE",
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "compositionLockBlobSha": "51e0bbd5c34cb305c71e2faac274f1a00ca3280c",
+    "compositionLockBlobSha": "db29c06ee1b0178f093285c5599947369b125070",
     "findingLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
     "findingLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
@@ -10016,5 +10016,35 @@
       "qaReceiptBlobSha": "024ae6bcf4c7c2b1b50cdfb16ca8ebaf4bc12a98",
       "authenticatedPreviewProof": false
     }
+  },
+  "b4003ScopedPolicyLookaheadSafety20261013": {
+    "status": "SOURCE_STAGED_QA_PENDING_NOT_PREVIEW_PASS",
+    "gate": "I6.5/B4-003",
+    "findingId": "B4-003-P0-20261012-PERSONAL-COLLECTION",
+    "rootCause": "SCOPED_POLICY_LIST_PAGINATION_LOOKAHEAD_NOT_AUTHORIZED",
+    "proof": "A pageSize=1 response previously returned the first allowed row and an unchecked foreign-tenant lookahead; the next-cursor calculation could expose a continuation boundary before the extra record passed policy.",
+    "extensionReason": "Completing the already staged protected backend reader requires a localized server-side validation; the client files alone cannot authorize records read through the server callable.",
+    "exactAuthorizedSourceExtension": [
+      "functions/b4-003-scoped-policy-reader.js"
+    ],
+    "exactQaExtension": [
+      "tools/gravicentra-b4-003-scoped-policy-reader.test.cjs"
+    ],
+    "scope": "Validation-only; no new read mode, no new collection, no exported callable, no browser transport change.",
+    "sourceBlobBefore": "55236d6c5ad619bb0ac204f177f29922efead0bb",
+    "sourceBlobAfter": "4181f6198c0163175579a2cc19197ebc63d9b328",
+    "qaBlobBefore": "20dc935c6488170e3d3f44e983a2904270ec0755",
+    "qaBlobAfter": "bafc06830002bfc8f21b07ac0a4d5d27e8662181",
+    "compositionBlobBefore": "51e0bbd5c34cb305c71e2faac274f1a00ca3280c",
+    "compositionBlobAfter": "db29c06ee1b0178f093285c5599947369b125070",
+    "result": "PENDING_GITHUB_ACTIONS_QA",
+    "browserAuthenticatedPreviewPass": false,
+    "backendCallableExported": false,
+    "firestoreRulesDeployed": false,
+    "operationalWrites": 0,
+    "productionChanged": false,
+    "securityP0Closed": false,
+    "livePromotionAuthorized": false,
+    "nextAction": "Complete protected related global list and backend/runtime integration in same B4-003 gate."
   }
 }

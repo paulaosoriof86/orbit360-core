@@ -60,13 +60,15 @@ async function scopedPolicyRead({db,auth,request}){
  }
  const result=await query.limit(v.pageSize+1).get();
  const docs=Array.isArray(result.docs)?result.docs:[];
- const rows=[],pageDocs=docs.slice(0,v.pageSize);
- for(const doc of pageDocs){
+ // Fail closed on the pagination lookahead too. The next record must not be
+ // used as a continuation signal before server-side authorization has passed.
+ const verified=docs.map(doc=>{
    const row=doc.data()||{};
-   allowRow(scope,row); // reject the entire response instead of silently skipping leaked rows
-   rows.push(Object.assign({},row,{id:row.id||doc.id,canonicalDocumentId:doc.id}));
- }
+   allowRow(scope,row);
+   return Object.assign({},row,{id:row.id||doc.id,canonicalDocumentId:doc.id});
+ });
+ const rows=verified.slice(0,v.pageSize);
  return {ok:true,collection:'polizas',country:v.country,scope:scope.scope,
-   rows,nextCursor:docs.length>v.pageSize&&pageDocs.length?pageDocs[pageDocs.length-1].id:null,serverScoped:true};
+   rows,nextCursor:verified.length>v.pageSize&&rows.length?docs[v.pageSize-1].id:null,serverScoped:true};
 }
 module.exports=Object.freeze({validateArguments,scopedPolicyRead,version:'b4-003-policy-reader-staged-v1'});

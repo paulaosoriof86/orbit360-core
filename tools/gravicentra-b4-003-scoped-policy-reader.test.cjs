@@ -65,6 +65,11 @@ const denied=async(fn,code)=>{
  assert.deepEqual(first.rows.map(x=>x.id),['p1']);assert.equal(first.nextCursor,'p1');count++;
  const second=await scopedPolicyRead(req('operativo','list',{pageSize:1,cursor:first.nextCursor}));
  assert.deepEqual(second.rows.map(x=>x.id),['p2']);count++;
+ // The lookahead document is never returned, yet it still has to pass
+ // authorization. A foreign-tenant row must fail the entire page.
+ policies.push({id:'p1-leak',tenantId:'another-tenant',pais:'GT',asesorId:'a3',numero:'FOREIGN'});
+ await denied(()=>scopedPolicyRead(req('operativo','list',{pageSize:1})),'TENANT_DENIED');count++;
+ policies.pop();
  await denied(()=>scopedPolicyRead(req('asesor','list',{cursor:'p3'})),'CURSOR_DENIED');count++;
  await denied(()=>scopedPolicyRead(req('asesor','list',{pageSize:51})),'PAGE_SIZE_INVALID');count++;
  await denied(()=>scopedPolicyRead(req('asesor','list',{policyId:'p1'})),'POLICY_GET_LIST_MIXED');count++;
