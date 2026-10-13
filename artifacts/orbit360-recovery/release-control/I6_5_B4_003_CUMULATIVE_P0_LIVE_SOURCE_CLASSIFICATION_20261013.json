@@ -1,0 +1,115 @@
+{
+  "schema": "GRAVICENTRA_I65_B4003_CUMULATIVE_P0_LIVE_SOURCE_CLASSIFICATION_V1",
+  "recordedAt": "2026-10-13",
+  "status": "READONLY_CUMULATIVE_SOURCE_PROOF_P0_REMAIN_OPEN",
+  "kind": "EVIDENCE_ONLY_NOT_NEW_GATE_OR_PLAN",
+  "authority": {
+    "controlPlane": "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json",
+    "findings": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
+    "findingsBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
+    "carry": "artifacts/orbit360-recovery/release-control/I6_5_OPEN_FINDINGS_CARRY_FORWARD_REGISTER_20261003.json",
+    "carryBlobSha": "2b935d0f0859075cc951a2e0a6cfcd0a8d958a02",
+    "priorityFreeze": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PAULA_RELEASE_PRIORITY_FREEZE_20261008.json",
+    "priorityFreezeSha": "fab0103ffeb10690160eef276e48bd648db998d7"
+  },
+  "source": {
+    "repository": "paulaosoriof86/orbit360-core",
+    "branch": "recovery/fase-a-clean-20260831",
+    "sourceHead": "bdda8033c48b9afcb18b70f3d8dd6729e3852e97",
+    "runId": 38420482046,
+    "artifactId": 11825598477,
+    "artifactName": "gravicentra-b4-003-p0-cumulative-readonly-38420482046",
+    "artifactSha256": "6992545773918e325e54679afeb9b5b91d79e0df5a9aa0cf2bcdae9dbba763ad",
+    "guardRunId": 38420482086,
+    "guardConclusion": "success",
+    "writes": 0,
+    "deploys": 0
+  },
+  "findings": {
+    "totalLedger": 295,
+    "totalCarry": 295,
+    "uniqueIds": 295,
+    "attentionIds": 166,
+    "unreconciledIds": 0,
+    "newlyClosedP0": 0,
+    "activeSubgate": "I6.5/B4-003"
+  },
+  "currentP0": [
+    {
+      "id": "B4-003-P0-20261012-PERSONAL-COLLECTION",
+      "state": "OPEN_P0_NOT_ACCEPTED",
+      "evidence": "Authenticated direct Firestore foreign-policy read allowed for own-scope GT and CO. Financial July parity positive, role authorization negative",
+      "remediation": "Server-enforced rules or protected read boundary + role scopes + cross-module QA"
+    },
+    {
+      "id": "B4-003-P0-20261012-INSTITUTIONAL-GOALS",
+      "state": "OPEN_P0_NOT_ACCEPTED",
+      "evidence": "metas=6: 6 individual, 0 institutional; Sep 3 and Oct 3; all GT",
+      "remediation": "Use canonical metas owner; country/month/currency, role, write readback, reload, audit. No Finance Beta fallback"
+    },
+    {
+      "id": "B4-003-P0-20261012-FREELANCERS-GOAL-SCOPE",
+      "state": "OPEN_P0_NOT_ACCEPTED",
+      "evidence": "7 advisor rows, zero values across 15 checked contract/eligibility fields",
+      "remediation": "Establish authoritative explicit internal/freelancer eligibility before computing institutional team targets; preserve personal goals"
+    },
+    {
+      "id": "B4-003-P0-20261012-INICIO-MOTIVATIONAL-TEXTS",
+      "state": "OPEN_P0_NOT_ACCEPTED",
+      "evidence": "Static generic banner remains in accepted source",
+      "remediation": "Role and state contextual truthful copy; maintain approved premium design"
+    },
+    {
+      "id": "B4-003-P0-20261012-QA-CANCELLED-RUN-FIXTURES",
+      "state": "OPEN_P0_NOT_ACCEPTED",
+      "evidence": "14 of 14 exact old-run synthetic rows remain, with source owner provenance",
+      "remediation": "Complete dependency graph and exact before/after; no delete until explicit approved cleanup"
+    },
+    {
+      "id": "B4-003-P0-20261012-QA-ORPHAN-RENEWALS",
+      "state": "OPEN_P0_NOT_ACCEPTED",
+      "evidence": "3 orphan policies, each linked to two receipts and two cartera rows; total 12 dependent records",
+      "remediation": "Source lineage and impact reconciliation, authorization for atomic cleanup or quarantine; no blind delete"
+    }
+  ],
+  "uatContinuity": {
+    "blocking": [
+      "B4-003-UAT-20261011-01",
+      "B4-003-UAT-20261011-02",
+      "B4-003-UAT-20261011-03",
+      "B4-003-UAT-20261011-04",
+      "B4-003-UAT-20261011-05"
+    ],
+    "nonblockingP1": [
+      "B4-003-UAT-20261011-06",
+      "B4-003-UAT-20261011-07"
+    ],
+    "statuses": "OPEN_PAULA_20261011_CAUSAL_FIX_REQUIRED",
+    "preserveScopedVisualPass": true
+  },
+  "effectiveRules": {
+    "runId": 38414040015,
+    "ruleset": "projects/ays-orbit-360-lab/rulesets/6b03deab-0ff4-4c5d-8e74-550982bafc34",
+    "rulesSha256": "105f13e095d021a32d49c9b30400e7b509756f8bb45ea958c7483c7a2316bae3",
+    "exactLegacyRulesMatch": true,
+    "normalizedProductReadonlyRulesMatch": false,
+    "securityGateRunId": 38419629377,
+    "securityGateConcluded": "failure_due_to_existing_broad_legacy_read_write",
+    "serverNegativeReadRunId": 38415321605,
+    "serverReadResult": "FAILED_TO_DENY_FOREIGN_POLICY_GET",
+    "readPermissions": "FAIL",
+    "writeRulesContract": "ALLOW_READ_AND_WRITE_FOR_ANY_TENANT_MEMBER_DOCUMENT_BY_ACTIVE_DEPLOYED_RULE_SOURCE",
+    "deployedPatchAuthorized": false
+  },
+  "releaseBoundaries": {
+    "productMutationAuthorized": false,
+    "dataMutationAuthorized": false,
+    "configWritesAuthorized": false,
+    "livePromotionAuthorized": false,
+    "latestCertifiedPreviewProductSource": "591d6655090342e1c9c3137eb8cdf88f292a3aa1",
+    "p0ReleaseAccepted": false,
+    "productionUnchangedByAudit": true,
+    "previousApprovedCapabilitiesPreserved": true
+  },
+  "nextGateAction": "Remain in same B4-003. Reconcile emergency security source authorization with Control Plane before product/firestore rules change. Then exact preview negative auth tests and regression for all roles and country/relationship flows. In parallel preserve frozen Renewals/Upsells/Leads/Ops priority and existing accepted visuals. No hidden fixes, no reimport, no delete, no false P0 PASS."
+}
