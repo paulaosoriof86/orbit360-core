@@ -1,12 +1,12 @@
 {
   "schema": "GRAVICENTRA_I6_5_B4_003_R20_LINEAGE_READONLY_AUDIT_V2",
-  "recordedAt": "2026-10-13T19:16:35.397Z",
+  "recordedAt": "2026-10-13T19:19:18.527Z",
   "status": "READONLY_LIFECYCLE_AUDIT_NO_LIVE_WRITE",
   "findingId": "B4-003",
   "mode": "READ_ONLY_NO_PRODUCT_OR_DATA_WRITES",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
-  "sourceSha": "de58b023420bb83e9a5208bd1edaa3bb9e358123",
+  "sourceSha": "f770810df1af2ff4eb03035b8d3c2163891e33a8",
   "projectId": "ays-orbit-360-lab",
   "tenantId": "alianzas-soluciones",
   "runtime": {
