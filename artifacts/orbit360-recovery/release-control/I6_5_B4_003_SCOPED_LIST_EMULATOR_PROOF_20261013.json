@@ -1,0 +1,47 @@
+{
+  "schema": "GRAVICENTRA_I65_B4003_SCOPED_LIST_EMULATOR_PROOF_V1",
+  "date": "2026-10-13",
+  "gate": "I6.5/B4-003",
+  "status": "EMULATOR_SCOPED_LIST_PROBE_PASS_NOT_SECURITY_RELEASE",
+  "proofRunId": 38454052527,
+  "runHeadSha": "9c4adfcafca08e254dc0a9a652f6f29ef1efd42c",
+  "governanceJobId": 115492063474,
+  "emulatorJobId": 115492064785,
+  "githubRunConclusion": "success",
+  "governanceJobConclusion": "success",
+  "emulatorJobConclusion": "success",
+  "results": {
+    "directFirestoreDenied": 16,
+    "relatedDocumentReads": 10,
+    "scopedRelatedListReads": 15,
+    "policyServerScopedReads": 10,
+    "totalAssertions": 51
+  },
+  "exactSourceBlobs": {
+    "functions/b4-003-scoped-related-reader.js": "e9821f2d2c8c4dd83e14a0ba39065a840beab6fc",
+    "functions/b4-003-scoped-policy-callable.js": "5d67d921261746fd0de2b9933c4041657375788a",
+    "tools/gravicentra-b4-003-firestore-emulator.test.cjs": "44ca1c81ff3f4dd108cb1ddc692537334507b7f6",
+    "firestore.b4-003-scoped-candidate.rules": "6ae1a85b1f82525ac018ff682a2e20b6cca5f1d8"
+  },
+  "previousFailedRunId": 38453768094,
+  "previousFailureCause": "QA_DUPLICATE_LIST_IDENTIFIER_SYNTAX_ONLY",
+  "scope": "SYNTHETIC_EMULATOR_NO_OPERATIONAL_FIRESTORE",
+  "notProven": [
+    "live_rules_secure",
+    "authenticated_preview_read_hydration",
+    "client_scoped_full_list_parity",
+    "index_load_performance",
+    "all_relational_collections",
+    "production_accepted"
+  ],
+  "boundaries": {
+    "firestoreRuleDeploy": false,
+    "livePromotion": false,
+    "clientEntrypointIntegrated": false,
+    "operationalWrites": 0,
+    "newPreview": false,
+    "dataReimport": false,
+    "securityP0Closed": false
+  },
+  "nextAction": "INTEGRATE_APPROVED_SERVER_READ_TRANSPORT_AND_AUTHENTICATED_PREVIEW_WITH_SEPARATE_RULES_RELEASE_GATE"
+}

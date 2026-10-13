@@ -9889,14 +9889,22 @@
       "completeCollectionList": false
     },
     "listQa": {
-      "status": "EMULATOR_SYNTAX_COLLISION_REPAIRED_RERUN_PENDING",
+      "status": "EMULATOR_PROBE_PASS_NOT_PREVIEW_OR_LIVE",
       "assertionsExpected": 15,
       "testBlobSha": "44ca1c81ff3f4dd108cb1ddc692537334507b7f6",
       "clientIntegrated": false,
       "rulesDeployed": false,
       "previewCertified": false,
       "previousFailureRunId": 38453768094,
-      "previousFailureCause": "DUPLICATE_LOCAL_LIST_IDENTIFIER_QA_ONLY"
+      "previousFailureCause": "DUPLICATE_LOCAL_LIST_IDENTIFIER_QA_ONLY",
+      "testRunId": 38454052527,
+      "testJobId": 115492064785,
+      "testConclusion": "success",
+      "assertionsPass": 15,
+      "cumulativeIsolatedAssertionsPass": 51,
+      "proofPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_SCOPED_LIST_EMULATOR_PROOF_20261013.json",
+      "proofBlobSha": "1938d69a1b4e2d247d25e9c92f3aacc4c249be35",
+      "readbackPending": true
     }
   }
 }
