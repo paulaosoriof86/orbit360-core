@@ -41,6 +41,8 @@ jobs:
           node tools/gravicentra-b4-003-scoped-boundary.test.cjs
           node --check functions/b4-003-scoped-policy-reader.js
           node --check functions/b4-003-scoped-policy-callable.js
+          node --check functions/b4-003-scoped-bootstrap-reader.js
+          node tools/gravicentra-b4-003-scoped-bootstrap-reader.test.cjs
           node tools/gravicentra-b4-003-scoped-policy-reader.test.cjs
           node --check functions/b4-003-scoped-related-reader.js
           node tools/gravicentra-b4-003-scoped-related-reader.test.cjs

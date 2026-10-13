@@ -5996,7 +5996,7 @@
   "canonicalAccumulationControl": {
     "status": "FROZEN_ACTIVE",
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "compositionLockBlobSha": "bf264c59249cc4fcd5289acf22611941ecafadb6",
+    "compositionLockBlobSha": "86be5a402104fd0b2581a9f6d3298d1327e81626",
     "findingLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
     "findingLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
@@ -10139,5 +10139,43 @@
     "sourceHead": "95498ffc7241fcc2a269a3f764ec90678ebf0b4f",
     "securityP0Closed": false,
     "livePromotionAuthorized": false
+  },
+  "b4003ProtectedBootstrap20261013": {
+    "status": "SOURCE_ONLY_PENDING_QA_AUTHENTICATED_PREVIEW_NOT_RUN",
+    "gate": "I6.5/B4-003",
+    "findingId": "B4-003-P0-20261012-PERSONAL-COLLECTION",
+    "cause": "BROWSER_DIRECT_MEMBERSHIP_AND_TENANT_CONFIG_READS_REMAIN_IN_PROTECTED_PREVIEW_BOOTSTRAP",
+    "authorizedExtensionReason": "A Preview-safe bootstrap requires a server-owned authenticated self-membership/config reader; the previously authorized browser-only sources cannot implement this authorization.",
+    "exactSourceExtensions": [
+      "functions/b4-003-scoped-bootstrap-reader.js",
+      "functions/b4-003-scoped-policy-callable.js"
+    ],
+    "existingAuthorizedBrowserFiles": [
+      "orbit360-platform/core/product-runtime-browser-providers-p0.js",
+      "orbit360-platform/index.html"
+    ],
+    "qaExtension": "tools/gravicentra-b4-003-scoped-bootstrap-reader.test.cjs",
+    "registeredSourceBlobs": {
+      "functions/b4-003-scoped-bootstrap-reader.js": "edd254de5345397dae51a3503c4b4cd5a93a4356",
+      "functions/b4-003-scoped-policy-callable.js": "f1813687a23c4350d8d1d4dc0fef6a4d58172dda",
+      "orbit360-platform/core/product-runtime-browser-providers-p0.js": "110240f07d334ea4976b59b52b4f433e6942bd48",
+      "tools/gravicentra-b4-003-scoped-bootstrap-reader.test.cjs": "db32b219fc3eed3b8d83b648a220bd5fd884998a",
+      ".github/workflows/gravicentra-release-lock-sync.yml": "fc3a34b20129697957a21656405a97de9e1acdd1",
+      "orbit360-platform/index.html": "839792d3aaf2b1ebf58769f542f96d5301904e9b"
+    },
+    "previousCompositionBlobSha": "bf264c59249cc4fcd5289acf22611941ecafadb6",
+    "compositionBlobSha": "86be5a402104fd0b2581a9f6d3298d1327e81626",
+    "stageOnly": true,
+    "callableExported": false,
+    "backendDeployed": false,
+    "firestoreRulesDeployed": false,
+    "sharedRulesDeployAuthorized": false,
+    "productionChanged": false,
+    "operationalWrites": 0,
+    "reimport": false,
+    "previewAccepted": false,
+    "livePromotionAuthorized": false,
+    "securityP0Closed": false,
+    "next": "SYNTHETIC_QA_AND_UNEXPORTED_FUNCTION_ISOLATED_SOURCE_VALIDATION"
   }
 }

@@ -38,11 +38,39 @@
   }
   function initialUser(){return initialize().then(function(ctx){if(ctx.auth&&typeof ctx.auth.authStateReady==='function')return ctx.auth.authStateReady().then(function(){return ctx.auth.currentUser||null;});return new Promise(function(resolve,reject){var off=function(){};off=ctx.modules.auth.onAuthStateChanged(ctx.auth,function(user){off();resolve(user||null);},function(error){off();reject(error);});});});}
   function waitUser(){return initialize().then(function(ctx){if(ctx.auth.currentUser)return ctx.auth.currentUser;return new Promise(function(resolve,reject){var off=ctx.modules.auth.onAuthStateChanged(ctx.auth,function(user){if(user){off();resolve(user);}},reject);});});}
+  function protectedPreview(){
+    return config().scopedReadPreviewCandidate===true &&
+      String(window.location&&window.location.hostname||'').includes('--');
+  }
+  function protectedBootstrap(mode,uid){
+    var tenant=String(config().tenantHint||'').trim();
+    if(!protectedPreview()||!tenant)return Promise.reject(new Error('PROTECTED_BOOTSTRAP_UNAVAILABLE'));
+    return callFunction('orbit360ScopedPolicyReadPreview',{tenantId:tenant,mode:mode,uid:uid||undefined},'us-east1')
+      .then(function(r){
+        if(!r||r.ok!==true||r.serverScoped!==true||r.mode!==mode||
+           r.tenantId!==tenant||!r.uid||(uid&&r.uid!==uid))
+          throw new Error('PROTECTED_BOOTSTRAP_RESPONSE_INVALID');
+        return r;
+      });
+  }
   function membershipByUid(uid){
+    if(protectedPreview())return protectedBootstrap('bootstrap-membership',uid).then(function(r){
+      if(!r.membership||r.membership.uid!==uid||r.membership.tenantId!==r.tenantId||
+         r.membership.status!=='active'||!Array.isArray(r.membership.roles)||!r.membership.roles.length)
+        throw new Error('PROTECTED_BOOTSTRAP_MEMBERSHIP_INVALID');
+      return r.membership;
+    });
     return initialize().then(function(ctx){var c=config();var ref=ctx.modules.store.doc(ctx.db,'tenants/'+c.tenantHint+'/members/'+uid);return ctx.modules.store.getDoc(ref).then(function(snap){if(!snap.exists())throw new Error('MEMBERSHIP_NOT_AVAILABLE');var row=snap.data()||{};if(String(row.uid||'')!==String(uid||'')||String(row.tenantId||'')!==String(c.tenantHint||''))throw new Error('MEMBERSHIP_IDENTITY_MISMATCH');return row;});});
   }
   function readTenantConfig(tenantId){
-    return initialize().then(function(ctx){var c=config();if(String(tenantId||'')!==String(c.tenantHint||''))throw new Error('TENANT_CONFIG_SCOPE_MISMATCH');var ref=ctx.modules.store.doc(ctx.db,'tenants/'+tenantId+'/system/config');return ctx.modules.store.getDoc(ref).then(function(snap){return snap.exists()?(snap.data()||{}):{};});});
+    var c=config();
+    if(String(tenantId||'')!==String(c.tenantHint||''))return Promise.reject(new Error('TENANT_CONFIG_SCOPE_MISMATCH'));
+    if(protectedPreview())return protectedBootstrap('bootstrap-tenant-config','').then(function(r){
+      if(!r.config||typeof r.config!=='object'||Array.isArray(r.config))
+        throw new Error('PROTECTED_BOOTSTRAP_CONFIG_INVALID');
+      return r.config;
+    });
+    return initialize().then(function(ctx){var ref=ctx.modules.store.doc(ctx.db,'tenants/'+tenantId+'/system/config');return ctx.modules.store.getDoc(ref).then(function(snap){return snap.exists()?(snap.data()||{}):{};});});
   }
   function callFunction(name,data,region){
     name=String(name||'').trim();region=String(region||'us-central1').trim();
