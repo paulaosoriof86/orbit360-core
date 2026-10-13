@@ -5996,7 +5996,7 @@
   "canonicalAccumulationControl": {
     "status": "FROZEN_ACTIVE",
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "compositionLockBlobSha": "1ffeae1e9a29a9d6badf40842f65e1cbc5306f1c",
+    "compositionLockBlobSha": "91173a69ed9b45df0f7dd0ddc00205533d4b852f",
     "findingLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
     "findingLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
@@ -9798,5 +9798,20 @@
     "buildRequired": true,
     "livePromotion": false,
     "realWrites": 0
+  },
+  "b4003SecurityScopedReadStaging": {
+    "status": "SCOPED_READ_SOURCE_PREPARED_UNIT_PROBES_NOT_AUTHENTICATED_PREVIEW_PASS",
+    "gate": "I6.5/B4-003",
+    "component": "functions/b4-003-scoped-policy-reader.js",
+    "sourceBlobSha": "55236d6c5ad619bb0ac204f177f29922efead0bb",
+    "unitTest": "tools/gravicentra-b4-003-scoped-policy-reader.test.cjs",
+    "compositionLockBlobSha": "91173a69ed9b45df0f7dd0ddc00205533d4b852f",
+    "browserSourceChanged": false,
+    "backendExportsChanged": false,
+    "firestoreRulesDeployed": false,
+    "noLive": true,
+    "noDataWrites": true,
+    "securityP0Closed": false,
+    "blocker": "UNPROVEN_SERVER_ROLE_ATTESTATION_PLUS_FIRESTORE_RULES_PENDING"
   }
 }
