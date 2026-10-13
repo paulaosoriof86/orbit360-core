@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I65_B4003_R26_JULY_SOURCE_POSITIVE_AND_OWN_SCOPE_FORENSIC_V1",
   "date": "2026-10-12",
-  "status": "JULY_REAL_PAYMENT_PARITY_VERIFIED_OWN_SCOPE_FAIL_CLOSED_BLOCKING",
+  "status": "SERVER_LEVEL_FOREIGN_POLICY_READ_CONFIRMED_B4_003_SECURITY_BLOCKER_OPEN",
   "gate": "I6.5/B4-003",
   "findingId": "B4-003-P0-20261012-PERSONAL-COLLECTION",
   "kind": "SUPPLEMENTARY_EVIDENCE_NOT_GATE_ACCEPTANCE",
@@ -135,5 +135,57 @@
       "productionTouched": false
     },
     "p0Closed": false
+  },
+  "serverLevelAuthorizationProof": {
+    "result": "CONFIRMED_UNAUTHORIZED_FOREIGN_POLICY_READ_AT_REAL_FIRESTORE_SERVER",
+    "qaSourceSha": "f1e2537136e2519680adbe0d8aa8329d947dc4ad",
+    "runId": 38415321605,
+    "conclusion": "failure_expected_security_gate",
+    "jobId": 115358110158,
+    "reasonCode": "B4_003_R26_FOREIGN_POLICY_SERVER_READ_BLOCKING:operativo:GT,operativo:CO,asesor:GT",
+    "artifactId": 11823677380,
+    "artifactDigest": "sha256:780d3ebe127c60f52a25e4442e07e4704230d962bf537b4581cb56bb4678df29",
+    "negativeTest": "Firebase Auth custom token for authorized real actors; getDocFromServer against policy assigned to other advisor in same authorized country; no policy contents logged",
+    "authenticatedRolesWithUnauthorizedGet": [
+      "operativo:GT",
+      "operativo:CO",
+      "asesor:GT"
+    ],
+    "realWrites": 0,
+    "fixtureWrites": 0,
+    "productionDeploy": 0,
+    "cleanupRequired": false,
+    "p0Closed": false
+  },
+  "effectiveDeployedRulesAudit": {
+    "runId": 38414040015,
+    "conclusion": "success",
+    "artifactId": 11823009142,
+    "artifactDigest": "sha256:bbad1c1c146f43ce34893e7f9a3d343bbcac1cfe3089720f405be4e21010808f",
+    "effectiveRulesSha256": "105f13e095d021a32d49c9b30400e7b509756f8bb45ea958c7483c7a2316bae3",
+    "exactMatchWithRepoProductReadonlyRules": false,
+    "membershipOnlyPatternDetected": false,
+    "note": "Do not replace effective rules blindly with stale repository firestore.product-readonly.rules or assert known source of live exposure without full ruleset readback."
+  },
+  "causalBoundary": {
+    "rootCause": "FIRESTORE_GET_AUTHORIZATION_BYPASS_OF_EFFECTIVE_OWN_SCOPE_CONFIRMATION",
+    "deeperReadPath": {
+      "queryPlanner": "orbit360-platform/core/product-query-planner-contract-p0.js",
+      "readStore": "orbit360-platform/data/store-firestore-product-readonly-p0.js",
+      "relationMechanism": "__relation_advisor__ filter applied in client-side logicalRows, not in Firestore query",
+      "firestoreRules": "effective deployed source != repository product-readonly rules"
+    },
+    "fixRequirements": [
+      "No UI hiding. Enforce role, tenant, country and advisor-level read authorization at Firestore rules or server-owned scoped read boundary.",
+      "Queries for own/team must be authorized server-side before hydration; preserve relation semantics without broad Firestore collection reads.",
+      "Do not deploy unverified repository ruleset; first reconcile effective release lineage and source SHA.",
+      "For GT and CO, test direct foreign-policy denial using getDocFromServer, list queries, role switching, first load and reload; all authorized roles must still see permitted records.",
+      "Recheck R26 real-money July totals and personal attribution; keep institutional goal access independent of personal policy scope when explicitly authorized.",
+      "Update composition lock and Control Plane atomically with specifically authorized product source when mutation gate is opened."
+    ],
+    "currentProductMutationAuthorized": false,
+    "currentDataMutationAuthorized": false,
+    "currentProductionPromotionAuthorized": false,
+    "noNewRepoBranchFirebase": true
   }
 }
