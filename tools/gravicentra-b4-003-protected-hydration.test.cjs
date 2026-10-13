@@ -64,5 +64,49 @@ const pause=()=>new Promise(ok=>setTimeout(ok,30));
  assert.ok(poison._productStatus().snapshotErrors.clientes);
  assert.equal(direct,0);
  assert.match(bootstrap,/productQueryPlannerP0\.compile\(collection/);
+
+ // Execute the actual bootstrap planner factory, not only its static source literal.
+ let bootstrapRole='asesor',capturedPlanner=null;
+ const authorizedMembership={uid:'mock-uid',email:'test@example.test',tenantId:tenant,
+   status:'active',activeRole:'asesor',roles:['asesor','operativo'],countries:['GT'],advisorId:'a1',
+   modulesExtra:[],modulesRestricted:[]};
+ const mockOrbit={
+   session:{rol:()=>bootstrapRole},
+   membershipMultirolEffectiveP0:{
+     normalize:m=>m,validate:m=>({ok:true,membership:m,errors:[]}),effectiveModules:()=>[]
+   },
+   tenantAccessPolicyProductP0:{VERSION:'mock-access'},
+   productQueryPlannerP0:{
+     createPlanner:()=>()=>({ok:true,scope:'frozen-asesor'}),
+     compile:(collection,member)=>({ok:true,scope:member.activeRole,collection,constraints:[{field:'tenantId',op:'==',value:tenant}]})
+   },
+   tenantCanonicalPathsP0:{VERSION:'mock-path',validateTenantId:id=>({ok:id===tenant,tenantId:id})},
+   backendProductReadinessP0:{readiness:()=>({ok:true})},
+   createFirestoreProductReadOnlyStoreP0:(_deps,opts)=>{
+     capturedPlanner=opts.queryPlanner;
+     throw Error('STOP_AFTER_CAPTURE');
+   }
+ };
+ const mockWindow={Orbit:mockOrbit,dispatchEvent:()=>{}};
+ vm.runInNewContext(bootstrap,{window:mockWindow,console,Promise,setTimeout,clearTimeout,Date,CustomEvent:function(){}});
+ const bootDeps={
+   environmentProvider:{describePublicConfig:async()=>({})},
+   firebaseAdapter:{initializeFromEnvironment:async()=>({db:{}}),storeDependencies:()=>({db:{}})},
+   authProvider:{waitForAuthenticatedUser:async()=>({uid:'mock-uid',email:'test@example.test'})},
+   membershipProvider:{getByUid:async()=>authorizedMembership},
+   protectedReadPage:async()=>({ok:true})
+ };
+ const bootResult=await mockOrbit.backendProductReadOnlyBootstrapP0.start(bootDeps,{
+   mode:'product',authorizedProductReadOnly:true,runtimeAuthorized:true,
+   protectedReadCandidate:true,collections:['clientes']
+ });
+ assert.equal(bootResult.ok,false,'only controlled QA capture is expected');
+ assert.equal(typeof capturedPlanner,'function');
+ assert.equal(capturedPlanner('clientes').scope,'asesor');
+ bootstrapRole='operativo';
+ assert.equal(capturedPlanner('clientes').scope,'operativo');
+ bootstrapRole='unassigned';
+ assert.equal(capturedPlanner('clientes').hardError,true);
+ console.log('B4_003_ACTUAL_BOOTSTRAP_ROLE_RECOMPILE_PASS mock-only no-reads');
  console.log('B4_003_PROTECTED_HYDRATION_MOCK_PASS no_direct_firestore role_cache_reset unanchored_fail_closed');
 })().catch(error=>{console.error(error);process.exitCode=1;});

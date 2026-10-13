@@ -9969,7 +9969,7 @@
       "orbit360-platform/index.html": "21b2dea8a2fe54507419da07ef914180142682c0"
     },
     "manifestBlobSha": "82cce34dc28b2b67237b1f584837331844b15b93",
-    "qaBlobSha": "0f6e3c175fa0e275de87ee07ba43209f39e758e0",
+    "qaBlobSha": "012bf943ac3fa6d982a7787bde2b26b5df2f0191",
     "previewOptIn": "scopedReadPreviewCandidate",
     "backendExported": false,
     "previewDeployed": false,
@@ -10000,6 +10000,16 @@
         "testBlobSha": "0f6e3c175fa0e275de87ee07ba43209f39e758e0",
         "sourceChanged": false,
         "rerunPending": true
+      },
+      "qaIntegration": {
+        "status": "ACTUAL_BOOTSTRAP_SIMULATION_PENDING",
+        "testBlobSha": "012bf943ac3fa6d982a7787bde2b26b5df2f0191",
+        "assertions": [
+          "advisor_to_operativo_compile",
+          "unassigned_role_denied",
+          "no_firebase_calls"
+        ],
+        "previousSyntheticRun": 38482757462
       }
     }
   }
