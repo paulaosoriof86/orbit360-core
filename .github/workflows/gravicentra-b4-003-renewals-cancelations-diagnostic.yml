@@ -1,12 +1,8 @@
 name: Gravicentra B4-003 Renewals Cancelations Diagnostic
 
+# B4-003: intentional diagnostic only. Routine Control Plane receipts must not
+# trigger another full diagnostic that commits a new timestamped receipt.
 on:
-  push:
-    branches:
-      - recovery/fase-a-clean-20260831
-    paths:
-      - '.github/workflows/gravicentra-b4-003-renewals-cancelations-diagnostic.yml'
-      - 'artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json'
   workflow_dispatch:
 
 permissions:
