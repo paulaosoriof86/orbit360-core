@@ -1,12 +1,8 @@
 name: Gravicentra B3-008 Exact Preview
 
+# B3 closed and preserved; only explicit causal manual revalidation may run this gate.
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - recovery/fase-a-clean-20260831
-    paths:
-      - 'artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json'
 
 permissions:
   contents: write
