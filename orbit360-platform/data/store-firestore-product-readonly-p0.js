@@ -143,10 +143,46 @@
       var indexes = buildRelationIndexes();
       return source.filter(function (row) { return constraints.every(function (constraint) { return indexedRelationConstraintMatches(row, constraint, indexes); }); });
     }
-    function all(collection) { return logicalRows(collection).map(clone); }
-    function get(collection, id) { var row = (cache[collection] || []).find(function (item) { return rowId(item) === id; }); return row ? clone(row) : null; }
-    function where(collection, fieldOrPredicate, opOrValue, maybeValue) { var source = cache[collection] || [], matches; if (typeof fieldOrPredicate === 'function') matches = source.filter(fieldOrPredicate); else if (fieldOrPredicate && typeof fieldOrPredicate === 'object') matches = source.filter(function (row) { return Object.keys(fieldOrPredicate).every(function (key) { return row[key] === fieldOrPredicate[key]; }); }); else { var field = fieldOrPredicate, op = arguments.length >= 4 ? opOrValue : '==', value = arguments.length >= 4 ? maybeValue : opOrValue; matches = source.filter(function (row) { if (op === '==' || op === '=') return row[field] === value; if (op === '!=') return row[field] !== value; if (op === '>') return row[field] > value; if (op === '>=') return row[field] >= value; if (op === '<') return row[field] < value; if (op === '<=') return row[field] <= value; if (op === 'array-contains') return Array.isArray(row[field]) && row[field].indexOf(value) >= 0; return false; }); } return matches.map(clone); }
-    function find(collection, predicate) { var source = cache[collection] || [], row = null; if (typeof predicate === 'function') row = source.find(predicate) || null; else if (predicate && typeof predicate === 'object') row = source.find(function (item) { return Object.keys(predicate).every(function (key) { return item[key] === predicate[key]; }); }) || null; return row ? clone(row) : null; }
+    // R26 B4-003: a scoped collection must have the same visibility through every
+    // store accessor. The previous get/where/find bypassed __relation_advisor__
+    // and __relation_team__ filters, even though all() enforced them.
+    // This is only a client-cache consistency guard; server security is separate.
+    function scopedRows(collection) {
+      if (state.deniedCollections.indexOf(collection) >= 0) return [];
+      return logicalRows(collection);
+    }
+    function all(collection) { return scopedRows(collection).map(clone); }
+    function get(collection, id) { var row = scopedRows(collection).find(function (item) { return rowId(item) === id; }); return row ? clone(row) : null; }
+    function where(collection, fieldOrPredicate, opOrValue, maybeValue) {
+      var source = scopedRows(collection), matches;
+      if (typeof fieldOrPredicate === 'function') matches = source.filter(fieldOrPredicate);
+      else if (fieldOrPredicate && typeof fieldOrPredicate === 'object') matches = source.filter(function (row) {
+        return Object.keys(fieldOrPredicate).every(function (key) { return row[key] === fieldOrPredicate[key]; });
+      });
+      else {
+        var field = fieldOrPredicate, op = arguments.length >= 4 ? opOrValue : '==',
+          value = arguments.length >= 4 ? maybeValue : opOrValue;
+        matches = source.filter(function (row) {
+          if (op === '==' || op === '=') return row[field] === value;
+          if (op === '!=') return row[field] !== value;
+          if (op === '>') return row[field] > value;
+          if (op === '>=') return row[field] >= value;
+          if (op === '<') return row[field] < value;
+          if (op === '<=') return row[field] <= value;
+          if (op === 'array-contains') return Array.isArray(row[field]) && row[field].indexOf(value) >= 0;
+          return false;
+        });
+      }
+      return matches.map(clone);
+    }
+    function find(collection, predicate) {
+      var source = scopedRows(collection), row = null;
+      if (typeof predicate === 'function') row = source.find(predicate) || null;
+      else if (predicate && typeof predicate === 'object') row = source.find(function (item) {
+        return Object.keys(predicate).every(function (key) { return item[key] === predicate[key]; });
+      }) || null;
+      return row ? clone(row) : null;
+    }
     function on(collection, callback) { if (typeof collection === 'function') { callback = collection; collection = '*'; } var listener = function (changed) { if (collection === '*' || collection === changed || changed === '*') callback(changed); }; listeners.push(listener); return function () { listeners = listeners.filter(function (item) { return item !== listener; }); }; }
     function pref(key, defaultValue) { return Object.prototype.hasOwnProperty.call(prefs, key) ? clone(prefs[key]) : defaultValue; }
     function raw() { var out = {}; collections.forEach(function (collection) { out[collection] = all(collection); }); out.__prefs = clone(prefs); out.__backend = Object.assign({}, state, { quarantinedRows: clone(state.quarantinedRows), queryPlans: clone(state.queryPlans) }); return out; }

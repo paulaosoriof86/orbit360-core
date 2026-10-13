@@ -5996,7 +5996,7 @@
   "canonicalAccumulationControl": {
     "status": "FROZEN_ACTIVE",
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "compositionLockBlobSha": "418a48c8fd8cc414d3edb43ee558833177f235b2",
+    "compositionLockBlobSha": "32b82360e2eaf26721d4bfd984eb2d6fcb17100c",
     "findingLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
     "findingLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
@@ -9847,5 +9847,15 @@
       "syntheticOnly": true,
       "securityP0Closed": false
     }
+  },
+  "b4003ClientCacheAccessorConsistency": {
+    "status": "SOURCE_STAGED_QA_CONTRACT_PASS_PREVIEW_PENDING",
+    "file": "orbit360-platform/data/store-firestore-product-readonly-p0.js",
+    "blobSha": "e8b9667f0f72b4e29720d162b7cf859e2a94ded2",
+    "compBlob": "32b82360e2eaf26721d4bfd984eb2d6fcb17100c",
+    "serverSecurityClaim": false,
+    "livePromotion": false,
+    "realWrites": 0,
+    "securityP0Closed": false
   }
 }

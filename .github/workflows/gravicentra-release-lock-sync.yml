@@ -43,6 +43,8 @@ jobs:
           node --check functions/b4-003-scoped-policy-callable.js
           node tools/gravicentra-b4-003-scoped-policy-reader.test.cjs
           node tools/gravicentra-b4-003-security-release-barrier.test.cjs
+          node --check orbit360-platform/data/store-firestore-product-readonly-p0.js
+          node tools/gravicentra-b4-003-relation-cache-accessors.test.cjs
           node --check orbit360-platform/modules/inicio.js
           node --check orbit360-platform/core/ciclo.js
           node --check orbit360-platform/modules/comparativo.js
