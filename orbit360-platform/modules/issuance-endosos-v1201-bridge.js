@@ -23,12 +23,12 @@ Orbit.modules = Orbit.modules || {};
   function today() { return U && U.today ? U.today() : new Date().toISOString().slice(0, 10); }
   function plusYear(date) { const d = new Date((date || today()) + 'T00:00:00'); d.setFullYear(d.getFullYear() + 1); return d.toISOString().slice(0, 10); }
   function toast(v) { try { U.toast(v); } catch (e) {} }
-  function modal(id, title, body, actions, width) {
+  function modal(id, title, body, actions, width, contextLabel) {
     let b = document.getElementById(id); if (b) b.remove();
     b = document.createElement('div'); b.id = id; b.className = 'drawer-back open'; b.style.cssText = 'display:grid;place-items:center;z-index:245';
     b.innerHTML = `<div class="ciclo-card" style="width:min(${width || 720}px,96vw);max-height:92vh;display:flex;flex-direction:column">
       <div class="ciclo-h" style="background:linear-gradient(120deg,#1f3a5f,#142840)">
-        <div><div class="ciclo-eyebrow">Gestión operativa · Renovaciones</div><h2 style="margin:0">${esc(title)}</h2></div>
+        <div><div class="ciclo-eyebrow">${esc(contextLabel || "Gestión operativa · Renovaciones")}</div><h2 style="margin:0">${esc(title)}</h2></div>
         <div class="ciclo-h-act"><button class="imp-x" data-close aria-label="Cerrar">✕</button></div>
       </div>
       <div style="padding:18px 20px;overflow:auto;flex:1">${body}</div>
@@ -160,7 +160,7 @@ Orbit.modules = Orbit.modules || {};
       compared ? {pais:compared.pais,ramo:compared.ramo,producto:compared.producto} : {});
     const clients = scopedClients();
     const quotes = quoteRows(compared);
-    const insurers = (S().all('aseguradoras') || []).filter(a => a.vinculada !== false && (!context.pais || !a.pais || a.pais === context.pais));
+    const insurers = (S().all('aseguradoras') || []).filter(a => a.vinculada !== false);
     const selectedClient = clients.some(c => c.id === context.clienteId) ? context.clienteId : '';
     const selectedQuote = null;
     const selectedInsurer = '';
@@ -173,7 +173,7 @@ Orbit.modules = Orbit.modules || {};
     const body = `<div class="cfg-note" style="margin-bottom:13px">Registrar la aceptación crea una <b>Solicitud de emisión en Ops</b>. Todavía no crea una póliza ni recibos. La póliza nace únicamente al recibir número y documento reales de la aseguradora.</div><div class="cgrid">
       ${quotes.length ? `<label class="ce-l" style="grid-column:1/-1">Propuesta aceptada *<select id="emi-quote" class="o-sel"><option value="">— Seleccionar la propuesta que el cliente aceptó —</option>${quotes.map(row => `<option value="${row.index}">${esc(row.insurerName)} · ${esc((row.quote && (row.quote.cur || row.quote.moneda)) || (initialCountry === 'CO' ? 'COP' : 'GTQ'))} · ${esc(row.quote && row.quote.total || 0)}</option>`).join('')}</select><small class="muted">Debes elegir expresamente la oferta; no se acepta automáticamente la primera.</small></label>` : '<div class="cfg-note" style="grid-column:1/-1">No hay cotizaciones vinculadas al comparativo. Registra condiciones únicamente con referencia documental validada.</div>'}
       <label class="ce-l">Cliente *<select id="emi-cli" class="o-sel"><option value="">— Seleccionar cliente —</option>${clients.map(c => `<option value="${esc(c.id)}" ${c.id === selectedClient ? 'selected' : ''}>${esc(c.nombre)}</option>`).join('')}</select></label>
-      <label class="ce-l">Aseguradora aceptada *<select id="emi-asg" class="o-sel"><option value="">— Seleccionar aseguradora —</option>${insurers.map(a => `<option value="${esc(a.id)}" ${a.id === selectedInsurer ? 'selected' : ''}>${esc(a.nombre)}</option>`).join('')}</select></label>
+      <label class="ce-l">Aseguradora aceptada *<select id="emi-asg" class="o-sel"><option value="">— Seleccionar aseguradora —</option>${insurers.filter(a => !a.pais || a.pais === initialCountry).map(a => `<option value="${esc(a.id)}" ${a.id === selectedInsurer ? 'selected' : ''}>${esc(a.nombre)}</option>`).join('')}</select></label>
       <label class="ce-l">Ramo *<select id="emi-ramo" class="o-sel"><option value="">— Seleccionar ramo —</option></select></label>
       <label class="ce-l">Producto / subramo *<select id="emi-prod" class="o-sel"><option value="">— Seleccionar producto —</option></select></label>
       <label class="ce-l">País *<select id="emi-pais" class="o-sel"><option ${initialCountry === 'GT' ? 'selected' : ''}>GT</option><option ${initialCountry === 'CO' ? 'selected' : ''}>CO</option></select></label>
@@ -194,10 +194,18 @@ Orbit.modules = Orbit.modules || {};
       <label class="ce-l">Inicio estimado<input id="emi-start" type="date" class="o-sel" value="${esc(start)}"></label>
       <label class="ce-l">Fin estimado<input id="emi-end" type="date" class="o-sel" value="${esc(plusYear(start))}"></label>
     </div><label class="ce-l" style="margin-top:12px">Nota operativa<textarea id="emi-note" class="o-sel" style="min-height:64px">${context.sourcePolicyId ? 'Renovación de póliza ' + esc((S().get('polizas', context.sourcePolicyId) || {}).numero || '') : ''}</textarea></label><label style="display:flex;gap:8px;align-items:flex-start;margin-top:12px"><input id="emi-accepted" type="checkbox"><span><b>El cliente confirmó esta opción.</b><small class="muted" style="display:block">La aceptación debe estar soportada por la gestión, correo, documento o registro correspondiente.</small></span></label>`;
-    const b = modal('issuance-accepted-v1201','Registrar propuesta aceptada',body,'<button class="btn primary" data-save>Crear solicitud de emisión</button>',820);
+    const b = modal('issuance-accepted-v1201','Registrar propuesta aceptada',body,'<button class="btn primary" data-save>Crear solicitud de emisión</button>',820,'Gestión operativa · Comparativo');
     const $ = s => b.querySelector(s);
     const country = $('#emi-pais'), currency = $('#emi-mon');
     const ramo = $('#emi-ramo'), product = $('#emi-prod'), quoteInput = $('#emi-quote'), clientInput = $('#emi-cli');
+    const insurerInput = $('#emi-asg');
+    const updateInsurerOptions = () => {
+      const old = insurerInput.value;
+      const rows = insurers.filter(a => !a.pais || a.pais === country.value);
+      insurerInput.innerHTML = '<option value="">— Seleccionar aseguradora —</option>' +
+        rows.map(a => '<option value="' + esc(a.id) + '">' + esc(a.nombre) + '</option>').join('');
+      insurerInput.value = rows.some(a => a.id === old) ? old : '';
+    };
     const paint = (node, values, preferred, label) => {
       const rows = [...new Set((values || []).map(v => String(v || '').trim()).filter(Boolean))];
       node.innerHTML = '<option value="">— Seleccionar ' + esc(label) + ' —</option>' + rows.map(v => '<option value="' + esc(v) + '">' + esc(v) + '</option>').join('');
@@ -221,16 +229,16 @@ Orbit.modules = Orbit.modules || {};
       paintDocs();
       const client = S().get('clientes', clientInput.value);
       if (client && client.pais && ['GT', 'CO'].includes(client.pais)) {
-        country.value = client.pais; currency.value = client.pais === 'CO' ? 'COP' : 'GTQ'; updateRamos('', '');
+        country.value = client.pais; currency.value = client.pais === 'CO' ? 'COP' : 'GTQ'; updateRamos('', ''); updateInsurerOptions();
       }
     });
-    country.onchange = () => { currency.value = country.value === 'CO' ? 'COP' : 'GTQ'; updateRamos('', ''); };
+    country.onchange = () => { currency.value = country.value === 'CO' ? 'COP' : 'GTQ'; updateRamos('', ''); updateInsurerOptions(); };
     ramo.onchange = () => updateProducts('');
     if (quoteInput) quoteInput.addEventListener('change', () => {
       const row = quotes.find(x => String(x.index) === quoteInput.value);
       if (!row) return;
       const selected = row.quote || {};
-      if (row.insurerId && insurers.some(x => x.id === row.insurerId)) $('#emi-asg').value = row.insurerId;
+      if (row.insurerId && Array.from(insurerInput.options).some(x => x.value === row.insurerId)) insurerInput.value = row.insurerId;
       else $('#emi-asg').value = '';
       updateRamos(selected.ramo || context.ramo || '', selected.producto || selected.subramo || context.producto || '');
       const amounts = {'#emi-neta': selected.neta, '#emi-total': selected.total, '#emi-gem': selected.gastosEm,

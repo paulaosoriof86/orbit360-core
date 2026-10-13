@@ -20,4 +20,6 @@ const cmp=fs.readFileSync('orbit360-platform/modules/comparativo.js','utf8');
 assert(cmp.includes('acceptanceSnapshot'),'COMPARATIVO_LIVE_OFFERS_BRIDGE_MISSING');
 assert(ui.includes('quoteRows(compared)'),'ACCEPTED_OFFER_NOT_BOUND_TO_COMPARATIVO');
 assert(ui.includes('— Seleccionar cliente —'),'CLIENT_SELECTION_NOT_EXPLICIT');
+assert(ui.includes('updateInsurerOptions()'),'INSURER_COUNTRY_REPAINT_MISSING');
+assert(ui.includes('Gestión operativa · Comparativo'),'WRONG_MODAL_ORIGIN');
 console.log('B4_003_MODAL_CATALOG_AND_DOC_SOURCE_CONTRACT_PASS; functional Preview pending');

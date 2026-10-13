@@ -5996,7 +5996,7 @@
   "canonicalAccumulationControl": {
     "status": "FROZEN_ACTIVE",
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "compositionLockBlobSha": "973073193f3304924d89c7898bfe9f6b5c066706",
+    "compositionLockBlobSha": "1ffeae1e9a29a9d6badf40842f65e1cbc5306f1c",
     "findingLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
     "findingLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
@@ -9769,12 +9769,12 @@
     "scope": "catalog selectors, explicit quote selection and Drive attachments on issuance + Ops management dialogs",
     "authorizedBy": "Paula explicit user authorization 2026-10-13",
     "fileBlobs": {
-      "orbit360-platform/modules/issuance-endosos-v1201-bridge.js": "85a30d78291ffaf4a76bd77dce5a8239560a3661",
+      "orbit360-platform/modules/issuance-endosos-v1201-bridge.js": "2020152b4b2df1338be4b3ef2a9f121d777e21db",
       "orbit360-platform/core/ciclo.js": "3377c627ee53e3449f4ee382a570ea72335a0ada",
-      "orbit360-platform/index.html": "bfbec60cc9d713b63450c8f7b0d0d7529dacb96b",
+      "orbit360-platform/index.html": "c6fb5870d6b4020308944bce28a3302b5ec37399",
       "orbit360-platform/modules/comparativo.js": "982881a4c1e2f95be95428bd3f9f23360a9a2d5f"
     },
-    "compositionLockBlobSha": "973073193f3304924d89c7898bfe9f6b5c066706",
+    "compositionLockBlobSha": "1ffeae1e9a29a9d6badf40842f65e1cbc5306f1c",
     "unitStaticProbe": "PENDING",
     "sourceSyntaxProbe": "PENDING_CI",
     "noLive": true,
@@ -9782,7 +9782,9 @@
     "needs": "IMMUTABLE_NEW_PREVIEW_AND_EXACT_READBACK_P0_SECURITY_HOLD_PRESERVED",
     "openFindingsPreserved": true,
     "quoteAuthority": "orbit360-platform/modules/comparativo.js acceptanceSnapshot from current props, not stale Orbit._cots",
-    "clientSelection": "EXPLICIT_IF_NO_CANONICAL_CONTEXT"
+    "clientSelection": "EXPLICIT_IF_NO_CANONICAL_CONTEXT",
+    "countryInsurerDynamic": true,
+    "headerComparativoCorrected": true
   },
   "b4003InicioMotivationalTexts": {
     "status": "SOURCE_STAGED_PENDING_EXACT_PREVIEW_AND_PAULA_VISUAL",
