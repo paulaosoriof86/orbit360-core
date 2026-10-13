@@ -36,7 +36,7 @@
   "baselineCertifiedSourceSha": "4bf67a3738751fe2432a130fd23254a6f1c7d16e",
   "parentAcceptedBlockSourceSha": "7e96cf419c0858580fef584340e65b84e40c77b5",
   "currentBlock": "B4",
-  "productFileCount": 107,
+  "productFileCount": 108,
   "productFiles": [
     ".github/workflows/cotcomp-workflow-s419-source-qa.yml",
     "docs/ays/GRAVICENTRA_QUOTE_AUTHORITY_CONTRACT_v1_20261003.md",
@@ -144,7 +144,8 @@
     "firestore.b4-003-scoped-candidate.rules",
     "orbit360-platform/modules/comparativo.js",
     "functions/b4-003-scoped-policy-reader.js",
-    "functions/b4-003-scoped-policy-callable.js"
+    "functions/b4-003-scoped-policy-callable.js",
+    "functions/b4-003-scoped-related-reader.js"
   ],
   "productFileBlobs": {
     ".github/workflows/cotcomp-workflow-s419-source-qa.yml": "1123c1bd7848433ce51c24586e9fedbbbd581dff",
@@ -249,11 +250,12 @@
     "orbit360-platform/styles/base.css": "608ef0709144ffcbe748a7bd04e1bd16744def65",
     "orbit360-platform/styles/infra.css": "d6fe258364c4e11daad21848a40fbb121c36e4a8",
     "orbit360-platform/sw.js": "87412e7c4ef1030e2a3389cfd709f0c287ab336b",
-    "functions/b4-003-scoped-access-boundary.js": "25bc062001a646611acc76e25263dd0b39a25350",
+    "functions/b4-003-scoped-access-boundary.js": "de9382fa7f11ad8e4ffc3b59526176b784502e51",
     "firestore.b4-003-scoped-candidate.rules": "6ae1a85b1f82525ac018ff682a2e20b6cca5f1d8",
     "orbit360-platform/modules/comparativo.js": "982881a4c1e2f95be95428bd3f9f23360a9a2d5f",
     "functions/b4-003-scoped-policy-reader.js": "55236d6c5ad619bb0ac204f177f29922efead0bb",
-    "functions/b4-003-scoped-policy-callable.js": "87d9e2bc4d8b5f0029ce39a1d829b763f2d44e17"
+    "functions/b4-003-scoped-policy-callable.js": "24d7349d805f95f3dae4bc14fd28ab525e86c7d8",
+    "functions/b4-003-scoped-related-reader.js": "2b9e8fc488a8848de83c8f2e3028dc3b805f088c"
   },
   "evidence": {
     "paulaVisualRejectionPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_PAULA_VISUAL_REJECTION_20260924.json",
@@ -5086,5 +5088,27 @@
     "scope": "client-only defense-in-depth; direct Firestore server authorization still FAIL",
     "liveTouched": false,
     "realWrites": 0
+  },
+  "b4003RelatedReadStaging": {
+    "status": "SERVER_GET_RELATION_AUTHZ_TESTED_17_MOCK_CHECKS_NOT_IN_RUNTIME",
+    "gate": "I6.5/B4-003",
+    "sourceBlobs": {
+      "functions/b4-003-scoped-access-boundary.js": "de9382fa7f11ad8e4ffc3b59526176b784502e51",
+      "functions/b4-003-scoped-related-reader.js": "2b9e8fc488a8848de83c8f2e3028dc3b805f088c",
+      "functions/b4-003-scoped-policy-callable.js": "24d7349d805f95f3dae4bc14fd28ab525e86c7d8"
+    },
+    "relatedCollections": [
+      "clientes",
+      "vehiculos",
+      "recibosEsperados",
+      "carteraPrimas",
+      "cobros"
+    ],
+    "provenance": "policy+client parent required for related read, owner country and advisor checked",
+    "openScope": "list queries, client hydration, emulator and real Preview",
+    "testPath": "tools/gravicentra-b4-003-scoped-related-reader.test.cjs",
+    "readOnly": true,
+    "livePromotion": false,
+    "securityP0Closed": false
   }
 }

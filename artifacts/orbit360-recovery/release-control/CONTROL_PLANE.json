@@ -5996,7 +5996,7 @@
   "canonicalAccumulationControl": {
     "status": "FROZEN_ACTIVE",
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "compositionLockBlobSha": "32b82360e2eaf26721d4bfd984eb2d6fcb17100c",
+    "compositionLockBlobSha": "7522973d03ac905152c6aa24d9203be7b76313f7",
     "findingLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
     "findingLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
@@ -9773,7 +9773,7 @@
     "contractCorrection": {
       "prior": "mandatory custom giActiveRole claim not emitted by canonical backend",
       "fixed": "validate requested activeRole against server membership; signed claim if present restricts further",
-      "sourceBlobSha": "25bc062001a646611acc76e25263dd0b39a25350",
+      "sourceBlobSha": "de9382fa7f11ad8e4ffc3b59526176b784502e51",
       "unitResult": "ISOLATED_PROBES_PASS_PENDING_CI",
       "liveChanged": false
     }
@@ -9820,7 +9820,7 @@
     "component": "functions/b4-003-scoped-policy-reader.js",
     "sourceBlobSha": "55236d6c5ad619bb0ac204f177f29922efead0bb",
     "unitTest": "tools/gravicentra-b4-003-scoped-policy-reader.test.cjs",
-    "compositionLockBlobSha": "418a48c8fd8cc414d3edb43ee558833177f235b2",
+    "compositionLockBlobSha": "7522973d03ac905152c6aa24d9203be7b76313f7",
     "browserSourceChanged": false,
     "backendExportsChanged": false,
     "firestoreRulesDeployed": false,
@@ -9830,7 +9830,7 @@
     "blocker": "UNPROVEN_SERVER_ROLE_ATTESTATION_PLUS_FIRESTORE_RULES_PENDING",
     "previewCallable": {
       "path": "functions/b4-003-scoped-policy-callable.js",
-      "blobSha": "87d9e2bc4d8b5f0029ce39a1d829b763f2d44e17",
+      "blobSha": "24d7349d805f95f3dae4bc14fd28ab525e86c7d8",
       "status": "ISOLATED_SOURCE_ONLY_NOT_EXPORTED",
       "firebaseProjectUnchanged": true,
       "productionFunctionsUntouched": true
@@ -9856,6 +9856,29 @@
     "serverSecurityClaim": false,
     "livePromotion": false,
     "realWrites": 0,
+    "securityP0Closed": false
+  },
+  "b4003ScopedRelatedReadStaging": {
+    "status": "SOURCE_STAGED_TESTED_MOCK_AWAITING_EMULATOR_BROWSER_LINK",
+    "scope": [
+      "clientes",
+      "vehiculos",
+      "recibosEsperados",
+      "carteraPrimas",
+      "cobros"
+    ],
+    "sourceBlobs": {
+      "functions/b4-003-scoped-access-boundary.js": "de9382fa7f11ad8e4ffc3b59526176b784502e51",
+      "functions/b4-003-scoped-related-reader.js": "2b9e8fc488a8848de83c8f2e3028dc3b805f088c",
+      "functions/b4-003-scoped-policy-callable.js": "24d7349d805f95f3dae4bc14fd28ab525e86c7d8"
+    },
+    "compositionBlobSha": "7522973d03ac905152c6aa24d9203be7b76313f7",
+    "owner": "functions/b4-003-scoped-related-reader.js",
+    "previewCallable": "functions/b4-003-scoped-policy-callable.js",
+    "notBootstrapped": true,
+    "notDeployed": true,
+    "noDataWrites": true,
+    "noNewPreview": true,
     "securityP0Closed": false
   }
 }
