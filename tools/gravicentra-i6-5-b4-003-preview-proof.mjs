@@ -239,7 +239,7 @@ async function academiaManualsScopeProof(browser,operativeActor){
  }finally{await ctx.close();}
 }
 
-async function r23ProofSnapshot(browser,who,country,month){
+async function r23ProofSnapshot(browser,who,country,month,foreignPolicyId=''){
  const token=await auth.createCustomToken(who.uid),ctx=await browser.newContext({ignoreHTTPSErrors:false,viewport:{width:390,height:844}}),p=await ctx.newPage();
  try{await applyLegal(p,who);await p.goto(target+'/#/inicio',{waitUntil:'domcontentloaded',timeout:60000});await bootProduct(p,token);
   const selectedRole=await p.evaluate(role=>{
@@ -301,6 +301,26 @@ async function r23ProofSnapshot(browser,who,country,month){
       monthlyPanel:!!panel,countryCard:!!card,source:String(card?.getAttribute('data-goal-source')||''),
       hasOwnAdvisor:!!ownAdvisorId,visibleText:String(card?.innerText||'').slice(0,400)};
   },{country,ownAdvisorId:api.ownAdvisorId||''});
+  // Negative test of the ACTIVE Firestore security boundary for a foreign
+  // policy. Do not return the customer record, document id or policy metadata.
+  if(foreignPolicyId){
+   ui.foreignPolicyRead=await p.evaluate(async ({tenantId,foreignPolicyId})=>{
+    const provider=Orbit.productRuntimeBrowserProvidersP0,c=await provider.initialize();
+    const store=c?.modules?.store;
+    if(!c?.db||typeof store?.getDocFromServer!=='function'||typeof store?.doc!=='function')
+      return{status:'CLIENT_READ_SDK_UNAVAILABLE',serverOnly:false};
+    try{
+      const ref=store.doc(c.db,'tenants/'+tenantId+'/data/polizas/items/'+foreignPolicyId);
+      const doc=await store.getDocFromServer(ref);
+      return{status:doc.exists()?'FOREIGN_POLICY_READ_ALLOWED':'FOREIGN_POLICY_NOT_FOUND',serverOnly:true};
+    }catch(error){
+      const code=String(error?.code||''),message=String(error?.message||'');
+      return{status:/permission-denied|insufficient permissions/i.test(code+' '+message)
+        ?'FOREIGN_POLICY_READ_DENIED':'FOREIGN_POLICY_READ_ERROR',
+        serverOnly:true,errorCode:code.replace(/[^a-zA-Z0-9_-]/g,'').slice(0,55)};
+    }
+   },{tenantId,foreignPolicyId});
+  }
   return{api,ui};
  }finally{await ctx.close();}
 }
@@ -693,7 +713,16 @@ async function runR26RealReadOnly(){
    const member=mSnap.data()||{},authorized=[].concat(member.countries||member.paises||[]).map(x=>clean(x).toUpperCase());
    const countries=role==='asesor'?[authorized.includes('GT')?'GT':authorized.includes('CO')?'CO':'GT']:(authorized.length?['GT','CO'].filter(c=>authorized.includes(c)):['GT','CO']);
    for(const country of countries){
-    const row=await r23ProofSnapshot(chromiumBrowser,actorFor,country,month);
+    const actorAdvisor=clean(member.advisorId||member.asesorId);
+    const foreignCandidate=pSnap.docs.find(doc=>{
+      const p=doc.data()||{};
+      const pAdvisor=clean(p.asesorId||p.advisorId),pCountry=clean(p.pais||
+        (tenantClients.get(clean(p.clienteId))||{}).pais).toUpperCase();
+      return pAdvisor&&pAdvisor!==actorAdvisor&&pCountry===country
+        && p.__syntheticQa!==true&&!doc.id.startsWith('b4003qa_');
+    });
+    const foreignPolicyId=foreignCandidate?.id||'';
+    const row=await r23ProofSnapshot(chromiumBrowser,actorFor,country,month,foreignPolicyId);
     const v=row.ui.r26||{};
     need(v.hasAuthenticatedSession&&v.month===month&&v.currency===(country==='GT'?'GTQ':'COP'),
       'B4_003_R26_AUTHENTICATED_RELOAD_SESSION_NOT_VERIFIED:'+role+':'+country);
@@ -733,6 +762,9 @@ async function runR26RealReadOnly(){
        julyObservedGlobal:observedGlobal,julyExpectedGlobal:globalComparable?expectedGlobal:null,
        julyObservedPersonal:observedPersonal,julyExpectedPersonal:personalComparable?expectedPersonal:null,
        hydratedCobroRows:v.hydratedCobroRows,
+       foreignPolicyNegativeRead:{targetFound:!!foreignPolicyId,
+         result:row.ui.foreignPolicyRead?.status||'NO_FOREIGN_TARGET',
+         serverOnly:row.ui.foreignPolicyRead?.serverOnly===true},
        personalNonzero:v.personal>0,globalNonzero:v.total>0,
        monthlyPanel:true,countryCard:true});
    }
@@ -746,9 +778,14 @@ async function runR26RealReadOnly(){
  // establish that this institutional value is permitted for the active role.
  const ownScopeCountryExposure=cases.filter(x=>x.scope==='own'&&x.julySourceUnambiguous&&
    x.julyConfirmedCountryRows>0&&x.julyObservedGlobal>x.julyObservedPersonal+0.005);
+ const ownForeignPolicyReads=cases.filter(x=>x.scope==='own'&&
+   x.foreignPolicyNegativeRead?.result==='FOREIGN_POLICY_READ_ALLOWED');
+ const ownForeignPolicyDenials=cases.filter(x=>x.scope==='own'&&
+   x.foreignPolicyNegativeRead?.result==='FOREIGN_POLICY_READ_DENIED');
 
  const observed=cases.filter(x=>x.serverTotalLowerBoundChecked).length;
- const status=ownScopeCountryExposure.length>0?'R26_JULY_PARITY_VERIFIED_BUT_OWN_SCOPE_COUNTRY_TOTAL_EXPOSURE_BLOCKED':
+ const status=ownForeignPolicyReads.length>0?'R26_OWN_SCOPE_FOREIGN_POLICY_SERVER_READ_EXPOSURE_BLOCKED':
+    ownScopeCountryExposure.length>0?'R26_JULY_PARITY_VERIFIED_BUT_OWN_SCOPE_COUNTRY_TOTAL_EXPOSURE_BLOCKED':
     julyPositiveComparisons>0?'R26_JULY_POSITIVE_SOURCE_BACKED_ROLE_PARITY_PASS_OCTOBER_AND_ACCEPTANCE_OPEN':
     julySourcePositive?'R26_JULY_SOURCE_POSITIVE_PARITY_BLOCKED':'R26_AUTHENTICATED_READONLY_PARTIAL_NO_CURRENT_MONTH_SOURCE_ANCHOR';
  const result={schema:'GRAVICENTRA_B4003_R26_AUTHENTICATED_REAL_READBACK_V1',status,runId:run,
@@ -767,6 +804,11 @@ async function runR26RealReadOnly(){
        roleScopedComparisons:julyScopeComparisons}},
 
    cases,verifiedPositiveMoneyCases:observed,
+   negativeForeignPolicyRead:{ownRoleUnauthorizedServerReads:ownForeignPolicyReads.length,
+     ownRoleServerDenials:ownForeignPolicyDenials.length,
+     affectedRoles:ownForeignPolicyReads.map(x=>x.role+':'+x.country),
+     allComparedAgainstDifferentAdvisor:true,
+     assertedAgainstServerOnly:true,readOnly:true},
    ownScopeCountryExposure:{blocked:ownScopeCountryExposure.length>0,count:ownScopeCountryExposure.length,
      roles:ownScopeCountryExposure.map(x=>({role:x.role,country:x.country,scope:x.scope,
        institutionalAmount:x.julyObservedGlobal,ownAmount:x.julyObservedPersonal})),
@@ -776,6 +818,7 @@ async function runR26RealReadOnly(){
  fs.writeFileSync(outPath,JSON.stringify(result,null,2)+'\n');
  console.log(JSON.stringify({status,resultPath:outPath,caseCount:cases.length,
    verifiedPositiveMoneyCases:observed,realBusinessWrites:0,liveTouched:false,p0Closed:false}));
+ if(ownForeignPolicyReads.length)throw Error('B4_003_R26_FOREIGN_POLICY_SERVER_READ_BLOCKING:'+ownForeignPolicyReads.map(x=>x.role+':'+x.country).join(','));
  if(ownScopeCountryExposure.length)throw Error('B4_003_R26_OWN_SCOPE_COUNTRY_TOTAL_EXPOSURE_BLOCKING:'+ownScopeCountryExposure.map(x=>x.role+':'+x.country).join(','));
 }
 if(process.env.B4_003_R26_READONLY==='true'){
