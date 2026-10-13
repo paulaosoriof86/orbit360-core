@@ -1,6 +1,6 @@
 'use strict';
 const assert=require('node:assert/strict');
-const {readScopedRelatedDocument}=require('../functions/b4-003-scoped-related-reader');
+const {readScopedRelatedDocument,readScopedRelatedList}=require('../functions/b4-003-scoped-related-reader');
 const {Denied}=require('../functions/b4-003-scoped-access-boundary');
 const tenantId='alianzas-soluciones';
 const docs={
@@ -18,10 +18,24 @@ const db={collection:x=>{assert.equal(x,'tenants');return{doc:tenant=>{assert.eq
  collection:col=>{
   if(col==='members')return {doc:()=>({get:async()=>snap(member)})};
   if(col==='config')return {doc:()=>({get:async()=>snap(cfg)})};
-  if(col==='data')return{doc:collection=>({collection:items=>{assert.equal(items,'items');return{doc:id=>({get:async()=>snap(docs[collection]?.[id])})}}})};
+  if(col==='data')return{doc:collection=>({collection:items=>{assert.equal(items,'items');return queryModel(collection);}})};
   throw Error('UNKNOWN_COL:'+col);
  }
 }}}}};
+function queryModel(table,terms=[],after='',cap=100){
+ const rows=docs[table]||{};
+ return {
+  doc:id=>({get:async()=>({id,exists:!!rows[id],data:()=>rows[id]})}),
+  where:(field,op,value)=>queryModel(table,terms.concat([{field,op,value}]),after,cap),
+  orderBy:field=>{assert.equal(field,'__name__');return queryModel(table,terms,after,cap);},
+  startAfter:doc=>queryModel(table,terms,doc.id,cap),
+  limit:n=>queryModel(table,terms,after,n),
+  get:async()=>({docs:Object.keys(rows).sort().filter(id=>id>after).filter(id=>{
+    const row=rows[id];return terms.every(t=>t.op==='=='?row[t.field]===t.value:
+      t.op==='in'&&t.value.includes(row[t.field]));
+   }).slice(0,cap).map(id=>({id,exists:true,data:()=>rows[id]}))})
+ };
+}
 const read=(collection,documentId,extras={})=>readScopedRelatedDocument({
  db,auth:{uid:'u1',token:extras.claims||{}},request:{tenantId,collection,documentId,country:extras.country||'GT',activeRole:extras.role||'asesor'}
 });
@@ -44,5 +58,23 @@ async function deny(fn,code){let thrown;try{await fn()}catch(e){thrown=e}assert.
  const all=await read('clientes','c2',{role:'operativo'});assert.equal(all.scope,'all');checks++;
  cfg={roleScopes:{...cfg.roleScopes,operativo:'none'}};
  await deny(()=>read('clientes','c1',{role:'operativo'}),'SCOPE_NONE');checks++;
+ // Global batches must independently authorize all supplied policies and clients.
+ member={...member,modulesRestricted:[],dataScopes:{default:'all'}};
+ cfg={roleScopes:{asesor:'own',operativo:'all'}};
+ const bulk=(collection,policyIds,role='operativo',options={})=>readScopedRelatedList({
+  db,auth:{uid:'u1',token:{}},request:{tenantId,collection,policyIds,activeRole:role,country:'GT',pageSize:1,...options}
+ });
+ const first=await bulk('vehiculos',['p1','p2']);
+ assert.deepEqual(first.rows.map(x=>x.id),['v1']);assert.equal(first.nextCursor,'v1');
+ assert.equal(first.rows[0].pais,'GT');checks++;
+ const second=await bulk('vehiculos',['p1','p2'],'operativo',{cursor:first.nextCursor});
+ assert.deepEqual(second.rows.map(x=>x.id),['v2']);assert.equal(second.nextCursor,null);checks++;
+ await deny(()=>bulk('vehiculos',['p1','p2'],'asesor'),'POLICY_NOT_FOUND_OR_DENIED');checks++;
+ await deny(()=>bulk('recibosEsperados',['p1']),'RELATION_CLIENT_MISMATCH');checks++;
+ await deny(()=>bulk('vehiculos',['p1','p1']),'POLICY_BATCH_INVALID');checks++;
+ await deny(()=>bulk('vehiculos',['p1','p2'],'operativo',{country:'CO'}),'POLICY_NOT_FOUND_OR_DENIED');checks++;
+ await deny(()=>bulk('clientes',['p1']),'POLICY_ANCHOR_UNEXPECTED');checks++;
+ const direct=await read('recibosEsperados','r1');assert.equal(direct.row.pais,'GT');checks++;
+ console.log('B4_003_RELATED_SERVER_BATCH_SCOPE_MOCK_PASS checks='+checks+' no Firebase writes');
  console.log('B4_003_RELATED_DOCUMENT_SERVER_SCOPE_MOCK_PASS checks='+checks+' no Firebase writes');
 })().catch(e=>{console.error(e);process.exitCode=1;});

@@ -255,7 +255,7 @@
     "orbit360-platform/modules/comparativo.js": "982881a4c1e2f95be95428bd3f9f23360a9a2d5f",
     "functions/b4-003-scoped-policy-reader.js": "4181f6198c0163175579a2cc19197ebc63d9b328",
     "functions/b4-003-scoped-policy-callable.js": "5d67d921261746fd0de2b9933c4041657375788a",
-    "functions/b4-003-scoped-related-reader.js": "930a592e7d9b103da03464f0568ce6c1613bbab7"
+    "functions/b4-003-scoped-related-reader.js": "8adba41c5aa5b1279b9b3fc2388f41a0ef5bc20b"
   },
   "evidence": {
     "paulaVisualRejectionPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_PAULA_VISUAL_REJECTION_20260924.json",
@@ -5179,5 +5179,19 @@
     "noDataWrites": true,
     "noLive": true,
     "existingPassPreserved": true
+  },
+  "b4003ProtectedRelatedGlobalBatch20261013": {
+    "status": "STAGED_SOURCE_PENDING_MOCK_QA",
+    "scope": "SERVER_SIDE_POLICY_BATCH_VALIDATION_AND_COUNTRY_PROJECTION",
+    "sourceBlobs": {
+      "functions/b4-003-scoped-related-reader.js": "8adba41c5aa5b1279b9b3fc2388f41a0ef5bc20b"
+    },
+    "qaBlobs": {
+      "tools/gravicentra-b4-003-scoped-related-reader.test.cjs": "61fdb18b499772067a4f16c8b23a28ce08686131"
+    },
+    "firebaseRulesDeployed": false,
+    "backendExported": false,
+    "live": false,
+    "dataWrites": 0
   }
 }

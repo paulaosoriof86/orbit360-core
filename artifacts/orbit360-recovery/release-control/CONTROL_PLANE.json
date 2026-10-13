@@ -5996,7 +5996,7 @@
   "canonicalAccumulationControl": {
     "status": "FROZEN_ACTIVE",
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "compositionLockBlobSha": "db29c06ee1b0178f093285c5599947369b125070",
+    "compositionLockBlobSha": "5620db838eda8706b023b39547efaf615f67c475",
     "findingLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
     "findingLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
@@ -10046,5 +10046,31 @@
     "securityP0Closed": false,
     "livePromotionAuthorized": false,
     "nextAction": "Complete protected related global list and backend/runtime integration in same B4-003 gate."
+  },
+  "b4003ProtectedRelatedGlobalBatch20261013": {
+    "status": "SOURCE_STAGED_MOCK_QA_PENDING_AUTHENTICATED_PREVIEW_PENDING",
+    "finding": "B4-003-P0-20261012-PERSONAL-COLLECTION",
+    "gate": "I6.5/B4-003",
+    "rootCause": "RELATED_ROWS_INHERIT_COUNTRY_FROM_VERIFIED_PARENT_AND_GLOBAL_READ_NEEDS_SERVER_AUTHORIZED_POLICY_BATCH",
+    "sourceExtensionReason": "Server-owned stage for an already authorized protected browser integration; client-only safeguards cannot validate policy/client source relations",
+    "exactSourceExtension": [
+      "functions/b4-003-scoped-related-reader.js"
+    ],
+    "exactQaExtension": [
+      "tools/gravicentra-b4-003-scoped-related-reader.test.cjs"
+    ],
+    "sourceBefore": "930a592e7d9b103da03464f0568ce6c1613bbab7",
+    "sourceAfter": "8adba41c5aa5b1279b9b3fc2388f41a0ef5bc20b",
+    "testBefore": "23a1fba1f39855641a8b974a4a14586ccb0c1b99",
+    "testAfter": "61fdb18b499772067a4f16c8b23a28ce08686131",
+    "compositionBefore": "db29c06ee1b0178f093285c5599947369b125070",
+    "compositionAfter": "5620db838eda8706b023b39547efaf615f67c475",
+    "operationalWrites": 0,
+    "sharedRulesDeployed": false,
+    "callableExported": false,
+    "productionChanged": false,
+    "previewPass": false,
+    "securityP0Closed": false,
+    "next": "CLIENT_BATCH_TRANSPORT_AND_READ_MODEL_HYDRATION"
   }
 }
