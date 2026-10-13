@@ -121,7 +121,8 @@ async function run(){
     let listProof=0;
     const listRelated=(uid,activeRole,collection,policyId='',opts={})=>readScopedRelatedList({
       db,auth:{uid,token:{}},request:{tenantId:tenant,activeRole,collection,policyId,
-        country:opts.country||'GT',cursor:opts.cursor||'',pageSize:opts.pageSize||20}
+        country:opts.country||'GT',cursor:opts.cursor||'',pageSize:opts.pageSize||20,
+        ...(Object.prototype.hasOwnProperty.call(opts,'policyIds')?{policyIds:opts.policyIds}:{})}
     });
     for(const [uid,role,collection,policyId,expected] of [
       ['opGT','operativo','clientes','',['c_own']],
@@ -150,6 +151,19 @@ async function run(){
     assert.equal(p2.rows.length,1);assert.equal(p2.nextCursor,null);assert.notEqual(p1.rows[0].id,p2.rows[0].id);listProof++;
     assert.equal(listProof,15);
     console.log('B4_003_EMULATOR_RELATED_SERVER_LIST_PASS assertions='+listProof+' synthetic_only no_deploy');
+
+    // Batch-based global related hydration: server validates every supplied
+    // parent, derives only canonical country and never returns partial leakage.
+    let batchChecks=0;
+    const verifiedBatch=await listRelated('opGT','operativo','vehiculos','',{policyIds:['own']});
+    assert.deepEqual(verifiedBatch.rows.map(x=>x.id),['v_own','v_own2']);
+    assert.ok(verifiedBatch.rows.every(x=>x.pais==='GT'&&x.tenantId===tenant));batchChecks++;
+    await denyRelated(()=>listRelated('opGT','operativo','vehiculos','',{policyIds:['own','foreign']}),'POLICY_NOT_FOUND_OR_DENIED');batchChecks++;
+    await denyRelated(()=>listRelated('opGT','operativo','recibosEsperados','',{policyIds:['own']}),'RELATION_CLIENT_MISMATCH');batchChecks++;
+    await denyRelated(()=>listRelated('opGT','operativo','vehiculos','',{policyIds:['own','own']}),'POLICY_BATCH_INVALID');batchChecks++;
+    await denyRelated(()=>listRelated('opGT','operativo','vehiculos','',{policyIds:['own'],country:'CO'}),'POLICY_NOT_FOUND_OR_DENIED');batchChecks++;
+    await denyRelated(()=>listRelated('opGT','operativo','clientes','',{policyIds:['own']}),'POLICY_ANCHOR_UNEXPECTED');batchChecks++;
+    console.log('B4_003_EMULATOR_PROTECTED_RELATED_BATCH_PASS assertions='+batchChecks+' synthetic_only no_deploy');
 
     await env.withSecurityRulesDisabled(async context=>{
       await setDoc(doc(context.firestore(),member('opGT')),{uid:'opGT',tenantId:tenant,status:'active',

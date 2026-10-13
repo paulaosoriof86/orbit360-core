@@ -10103,5 +10103,21 @@
     "securityP0Closed": false,
     "previewPass": false,
     "next": "EXACT_PREVIEW_BACKEND_AND_AUTHENTICATED_CHECKS"
+  },
+  "b4003ProtectedRelatedBatchEmulatorProof20261013": {
+    "status": "ISOLATED_FIRESTORE_EMULATOR_QA_PENDING",
+    "gate": "I6.5/B4-003",
+    "source": "functions/b4-003-scoped-related-reader.js",
+    "qaFile": "tools/gravicentra-b4-003-firestore-emulator.test.cjs",
+    "qaOldBlob": "c103ec93119dee153a33db33ddfae0444d1a97ca",
+    "qaNewBlob": "69433f618e870ffcba543e4fb1c62ff9b93fe49c",
+    "expectedAssertions": 6,
+    "environment": "DEMO_FIRESTORE_EMULATOR_NO_REAL_BUSINESS_DATA",
+    "runId": null,
+    "operationalWrites": 0,
+    "sharedRulesDeployed": false,
+    "previewPassed": false,
+    "livePassed": false,
+    "sourceProductChanged": false
   }
 }
