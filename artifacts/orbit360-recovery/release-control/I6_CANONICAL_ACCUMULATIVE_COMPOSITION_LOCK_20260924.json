@@ -254,8 +254,8 @@
     "firestore.b4-003-scoped-candidate.rules": "6ae1a85b1f82525ac018ff682a2e20b6cca5f1d8",
     "orbit360-platform/modules/comparativo.js": "982881a4c1e2f95be95428bd3f9f23360a9a2d5f",
     "functions/b4-003-scoped-policy-reader.js": "55236d6c5ad619bb0ac204f177f29922efead0bb",
-    "functions/b4-003-scoped-policy-callable.js": "24d7349d805f95f3dae4bc14fd28ab525e86c7d8",
-    "functions/b4-003-scoped-related-reader.js": "2b9e8fc488a8848de83c8f2e3028dc3b805f088c"
+    "functions/b4-003-scoped-policy-callable.js": "5d67d921261746fd0de2b9933c4041657375788a",
+    "functions/b4-003-scoped-related-reader.js": "e9821f2d2c8c4dd83e14a0ba39065a840beab6fc"
   },
   "evidence": {
     "paulaVisualRejectionPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_PAULA_VISUAL_REJECTION_20260924.json",
@@ -5110,5 +5110,19 @@
     "readOnly": true,
     "livePromotion": false,
     "securityP0Closed": false
+  },
+  "b4003ScopedRelatedListStage": {
+    "status": "NONDEPLOYED_SOURCE_STAGED_PENDING_EMULATOR",
+    "gate": "I6.5/B4-003",
+    "readerBlobSha": "e9821f2d2c8c4dd83e14a0ba39065a840beab6fc",
+    "callableBlobSha": "5d67d921261746fd0de2b9933c4041657375788a",
+    "testBlobSha": "8817ce0505648db02186ec7bf56a98164bef3444",
+    "productionMutation": false,
+    "clientEntrypointIntegrated": false,
+    "limits": [
+      "policy_anchor_required_for_indirect_collection",
+      "client_global_list_composite_index_pending_preview",
+      "existing_firestore_rules_insecure"
+    ]
   }
 }

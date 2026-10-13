@@ -52,4 +52,63 @@ async function readScopedRelatedDocument({db,auth,request}){
  return {ok:true,serverScoped:true,collection,country,scope:ctx.scope,
    row:Object.assign({},row,{id:row.id||documentId,canonicalDocumentId:documentId})};
 }
-module.exports=Object.freeze({readScopedRelatedDocument,collections,version:'b4-003-related-document-read-stage-v1'});
+
+async function readScopedRelatedList({db,auth,request}){
+ if(!db||!auth?.uid)throw new Denied('AUTH_REQUIRED');
+ const q=request||{},tenantId=safeId(q.tenantId,'TENANT'),coll=clean(q.collection);
+ const country=clean(q.country).toUpperCase(),role=clean(q.activeRole);
+ const policyId=clean(q.policyId),cursor=clean(q.cursor);
+ const pageSize=Number(q.pageSize==null?20:q.pageSize);
+ if(!collections.has(coll))throw new Denied('COLLECTION_DENIED');
+ if(!['GT','CO'].includes(country))throw new Denied('COUNTRY_DENIED');
+ if(!Number.isInteger(pageSize)||pageSize<1||pageSize>50)throw new Denied('PAGE_SIZE_INVALID');
+ if(policyId)safeId(policyId,'POLICY');
+ if(cursor)safeId(cursor,'CURSOR');
+ const tenant=db.collection('tenants').doc(tenantId);
+ const [ms,cs]=await Promise.all([tenant.collection('members').doc(auth.uid).get(),tenant.collection('config').doc('access').get()]);
+ if(!ms.exists)throw new Denied('MEMBERSHIP_DENIED');
+ const ctx=resolve({auth,member:ms.data()||{},config:cs.exists?cs.data()||{}:{},tenantId,activeRole:role,country,collection:coll});
+ const target=tenant.collection('data').doc(coll).collection('items');
+ let query;
+ if(coll==='clientes'){
+   if(policyId)throw new Denied('POLICY_ANCHOR_UNEXPECTED');
+   query=target.where('pais','==',country);
+   if(ctx.scope==='own')query=query.where('asesorId','==',ctx.advisorId);
+   else if(ctx.scope==='team'){
+     if(ctx.team.length>10)throw new Denied('TEAM_QUERY_BOUND_EXCEEDED');
+     query=query.where('asesorId','in',ctx.team);
+   }
+ }else{
+   // Indirect collection-wide lists are not certified. Require a verified parent.
+   if(!policyId)throw new Denied('POLICY_ANCHOR_REQUIRED');
+   const ps=await docRef(tenant,'polizas',policyId).get();
+   if(!ps.exists)throw new Denied('POLICY_NOT_FOUND_OR_DENIED');
+   const policy=ps.data()||{},clientId=clean(policy.clienteId);
+   if(!clientId)throw new Denied('POLICY_CLIENT_UNKNOWN');
+   const csnap=await docRef(tenant,'clientes',safeId(clientId,'CLIENT')).get();
+   if(!csnap.exists)throw new Denied('RELATION_CLIENT_NOT_FOUND');
+   try{allowRow(ctx,policy,[csnap.data()||{}]);}catch(e){if(e instanceof Denied)throw new Denied('POLICY_NOT_FOUND_OR_DENIED');throw e;}
+   query=target.where('polizaId','==',policyId);
+ }
+ query=query.orderBy('__name__');
+ if(cursor){
+   const csnap=await target.doc(cursor).get();
+   if(!csnap.exists||coll!=='clientes'&&clean(csnap.data()?.polizaId)!==policyId)throw new Denied('CURSOR_DENIED');
+   try{await readScopedRelatedDocument({db,auth,request:{tenantId,collection:coll,documentId:cursor,country,activeRole:role}});}
+   catch(_){throw new Denied('CURSOR_DENIED');}
+   query=query.startAfter(csnap);
+ }
+ const result=await query.limit(pageSize+1).get(),docs=Array.isArray(result.docs)?result.docs:[];
+ const verified=[];
+ // Reject the whole page, including lookahead, if any row violates the scoped relationship.
+ for(const d of docs){
+   const item=await readScopedRelatedDocument({db,auth,request:{tenantId,collection:coll,documentId:d.id,country,activeRole:role}});
+   if(item.serverScoped!==true||item.collection!==coll||!item.row)throw new Denied('LIST_VERIFICATION_FAILED');
+   verified.push(item.row);
+ }
+ return {ok:true,serverScoped:true,collection:coll,country,scope:ctx.scope,
+   rows:verified.slice(0,pageSize),nextCursor:verified.length>pageSize?docs[pageSize-1].id:null,
+   anchoring:coll==='clientes'?'country_scope':'authorized_policy'};
+}
+
+module.exports=Object.freeze({readScopedRelatedDocument,readScopedRelatedList,collections,version:'b4-003-related-server-list-stage-v2'});

@@ -6,7 +6,7 @@ const {getApps,initializeApp}=require('firebase-admin/app');
 const {getFirestore}=require('firebase-admin/firestore');
 const {HttpsError,onCall}=require('firebase-functions/v2/https');
 const {scopedPolicyRead}=require('./b4-003-scoped-policy-reader');
-const {readScopedRelatedDocument}=require('./b4-003-scoped-related-reader');
+const {readScopedRelatedDocument,readScopedRelatedList}=require('./b4-003-scoped-related-reader');
 const {Denied}=require('./b4-003-scoped-access-boundary');
 const REGION='us-east1';
 const db=getFirestore(getApps()[0]||initializeApp());
@@ -18,7 +18,9 @@ async function handle(request){
     const selectedCollection=String(sourceRequest.collection||'polizas').trim();
     const result=selectedCollection==='polizas'
       ? await scopedPolicyRead({db,auth:request.auth,request:sourceRequest})
-      : await readScopedRelatedDocument({db,auth:request.auth,request:sourceRequest});
+      : sourceRequest.mode==='list'
+        ? await readScopedRelatedList({db,auth:request.auth,request:sourceRequest})
+        : await readScopedRelatedDocument({db,auth:request.auth,request:sourceRequest});
     if(!result||result.serverScoped!==true||result.collection!==selectedCollection||result.ok!==true)
       throw new HttpsError('internal','SCOPED_READ_POSTCONDITION_FAILED');
     return result;
