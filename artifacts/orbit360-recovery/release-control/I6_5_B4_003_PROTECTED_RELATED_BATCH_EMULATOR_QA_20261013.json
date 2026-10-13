@@ -1,0 +1,46 @@
+{
+  "schema": "gravicentra-b4-003-isolated-related-batch-qa-receipt-v1",
+  "date": "2026-10-13",
+  "gate": "I6.5/B4-003",
+  "repo": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "executionSourceSha": "95498ffc7241fcc2a269a3f764ec90678ebf0b4f",
+  "sourceBlobs": {
+    "functions/b4-003-scoped-related-reader.js": "8adba41c5aa5b1279b9b3fc2388f41a0ef5bc20b",
+    "orbit360-platform/data/store-firestore-product-readonly-p0.js": "8154eb9fa8622079e59abde21d99ed72847da36e",
+    "orbit360-platform/core/product-runtime-browser-providers-p0.js": "30c4d78936be532e555eff123ff12dad7b9f139a",
+    "orbit360-platform/index.html": "81570d7e0bc2b9995b9c95bb0ba8bd44fac771e4"
+  },
+  "qaBlobs": {
+    "tools/gravicentra-b4-003-firestore-emulator.test.cjs": "69433f618e870ffcba543e4fb1c62ff9b93fe49c",
+    "tools/gravicentra-b4-003-protected-hydration.test.cjs": "f020535b69550691a6cff1582a0fe9a1fec1b1cc"
+  },
+  "runId": 38486385362,
+  "emulatorJobId": 115600943870,
+  "guardJobId": 115600944057,
+  "emulatorConclusion": "success",
+  "guardConclusion": "success",
+  "observedAssertions": {
+    "firestoreNegative": 16,
+    "relatedDocuments": 10,
+    "relatedLists": 15,
+    "newRelatedBatches": 6,
+    "perRoleTeam": 1,
+    "serverScopedPositiveNegative": 11,
+    "totalReported": 59
+  },
+  "disposition": "ISOLATED_SYNTHETIC_QA_PASS_ONLY_NO_AUTHENTICATED_HOSTING_PREVIEW",
+  "limits": [
+    "Firebase emulator is a demo project, not active Firestore rules",
+    "Callable remains unexported and undeployed",
+    "Browser is not running on an authenticated hosted Preview",
+    "Production security P0 remains open",
+    "Global reads are derived from policy-linked canonical records; orphan coverage and performance require authenticated end-to-end proof"
+  ],
+  "operationalDataWrites": 0,
+  "firestoreSharedRulesDeployed": false,
+  "livePromoted": false,
+  "previewAccepted": false,
+  "productionAcceptedForCurrentCandidate": false,
+  "securityP0Closed": false
+}

@@ -10048,7 +10048,7 @@
     "nextAction": "Complete protected related global list and backend/runtime integration in same B4-003 gate."
   },
   "b4003ProtectedRelatedGlobalBatch20261013": {
-    "status": "SOURCE_STAGED_MOCK_QA_PENDING_AUTHENTICATED_PREVIEW_PENDING",
+    "status": "ISOLATED_EMULATOR_PASS_AUTHENTICATED_PREVIEW_PENDING",
     "finding": "B4-003-P0-20261012-PERSONAL-COLLECTION",
     "gate": "I6.5/B4-003",
     "rootCause": "RELATED_ROWS_INHERIT_COUNTRY_FROM_VERIFIED_PARENT_AND_GLOBAL_READ_NEEDS_SERVER_AUTHORIZED_POLICY_BATCH",
@@ -10071,10 +10071,11 @@
     "productionChanged": false,
     "previewPass": false,
     "securityP0Closed": false,
-    "next": "CLIENT_BATCH_TRANSPORT_AND_READ_MODEL_HYDRATION"
+    "next": "CLIENT_BATCH_TRANSPORT_AND_READ_MODEL_HYDRATION",
+    "emulatorRunId": 38486385362
   },
   "b4003ProtectedRelatedClientHydration20261013": {
-    "status": "SOURCE_STAGED_QA_PENDING_AUTHENTICATED_PREVIEW_PENDING",
+    "status": "ISOLATED_MOCK_AND_EMULATOR_PASS_AUTHENTICATED_PREVIEW_PENDING",
     "gate": "I6.5/B4-003",
     "findingId": "B4-003-P0-20261012-PERSONAL-COLLECTION",
     "rootCause": "NO_GLOBAL_RELATED_HYDRATION_USING_SERVER_VERIFIED_POLICY_BATCHES",
@@ -10102,10 +10103,12 @@
     "operationalWrites": 0,
     "securityP0Closed": false,
     "previewPass": false,
-    "next": "EXACT_PREVIEW_BACKEND_AND_AUTHENTICATED_CHECKS"
+    "next": "EXACT_PREVIEW_BACKEND_AND_AUTHENTICATED_CHECKS",
+    "emulatorRunId": 38486385362,
+    "backendCallableExported": false
   },
   "b4003ProtectedRelatedBatchEmulatorProof20261013": {
-    "status": "ISOLATED_FIRESTORE_EMULATOR_QA_PENDING",
+    "status": "ISOLATED_FIRESTORE_EMULATOR_QA_PASS_NOT_PREVIEW",
     "gate": "I6.5/B4-003",
     "source": "functions/b4-003-scoped-related-reader.js",
     "qaFile": "tools/gravicentra-b4-003-firestore-emulator.test.cjs",
@@ -10113,11 +10116,28 @@
     "qaNewBlob": "69433f618e870ffcba543e4fb1c62ff9b93fe49c",
     "expectedAssertions": 6,
     "environment": "DEMO_FIRESTORE_EMULATOR_NO_REAL_BUSINESS_DATA",
-    "runId": null,
+    "runId": 38486385362,
     "operationalWrites": 0,
     "sharedRulesDeployed": false,
     "previewPassed": false,
     "livePassed": false,
-    "sourceProductChanged": false
+    "sourceProductChanged": false,
+    "emulatorJobId": 115600943870,
+    "guardJobId": 115600944057,
+    "conclusion": "success",
+    "reportedAssertions": {
+      "firestoreNegative": 16,
+      "relatedDocuments": 10,
+      "relatedLists": 15,
+      "newRelatedBatches": 6,
+      "perRoleTeam": 1,
+      "serverScopedPositiveNegative": 11,
+      "totalReported": 59
+    },
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PROTECTED_RELATED_BATCH_EMULATOR_QA_20261013.json",
+    "receiptBlobSha": "f3a50477bb9a28fdd0cc9c3710860d7180987c17",
+    "sourceHead": "95498ffc7241fcc2a269a3f764ec90678ebf0b4f",
+    "securityP0Closed": false,
+    "livePromotionAuthorized": false
   }
 }
