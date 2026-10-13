@@ -9,7 +9,8 @@ assert.match(app,/scopedReadPreviewCandidate===true/);
 assert.match(bootstrap,/protectedReadCandidate: options.protectedReadCandidate===true/);
 const events={},calls=[],tenant='synthetic-tenant';let role='asesor',direct=0;
 const win={Orbit:{session:{rol:()=>role}}};
-const doc={addEventListener:(k,fn)=>events[k]=fn,removeEventListener:k=>delete events[k]};
+const doc={addEventListener:(k,fn)=>{(events[k]||(events[k]=[])).push(fn);},
+ removeEventListener:(k,fn)=>{events[k]=(events[k]||[]).filter(v=>v!==fn);}};
 vm.runInNewContext(source,{window:win,document:doc,console,Promise,Map,Set,CustomEvent:function(){},
 setTimeout,clearTimeout,requestIdleCallback:fn=>setTimeout(fn,0)});
 const dataset={GT:[{id:'c1',canonicalDocumentId:'c1',tenantId:tenant,pais:'GT',asesorId:'a1'},
@@ -37,7 +38,7 @@ const pause=()=>new Promise(ok=>setTimeout(ok,30));
  assert.deepEqual(Array.from(store.all('clientes'),x=>x.id),['c1','c3']);
  assert.equal(direct,0);assert.equal(store._productStatus().serverConfirmedCollections.includes('clientes'),true);
  assert.ok(calls.some(x=>x.country==='GT'&&x.activeRole==='asesor'));
- role='operativo';events['orbit:active-role-changed']();
+ role='operativo';events['orbit:active-role-changed'].slice().forEach(fn=>fn());
  assert.deepEqual(Array.from(store.all('clientes'),x=>x.id),[]);
  await pause();assert.deepEqual(Array.from(store.all('clientes'),x=>x.id),['c1','c2','c3']);
  assert.equal(direct,0);
@@ -46,7 +47,7 @@ const pause=()=>new Promise(ok=>setTimeout(ok,30));
  assert.equal(unsupported._productStatus().status,'attach-error');
  assert.equal(direct,0);
 
- role='asesor';events['orbit:active-role-changed']();
+ role='asesor';events['orbit:active-role-changed'].slice().forEach(fn=>fn());
  assert.deepEqual(Array.from(store.all('clientes'),x=>x.id),[]);
  await pause();assert.deepEqual(Array.from(store.all('clientes'),x=>x.id),['c1','c3']);
  let poisonCount=0;

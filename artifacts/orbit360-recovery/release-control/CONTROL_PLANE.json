@@ -9959,7 +9959,7 @@
     "securityP0Closed": false
   },
   "b4003ProtectedHydrationSourceCandidate": {
-    "status": "ROLE_TRANSITION_SOURCE_PATCH_PENDING_CI",
+    "status": "ROLE_TRANSITION_QA_DOM_EVENT_MOCK_FIXED_RETEST_PENDING",
     "sourceAuthorizationBlobSha": "3b17ba3e560117345afc8fb476580ed26e275d67",
     "productBlobs": {
       "orbit360-platform/core/product-runtime-browser-providers-p0.js": "be42c187bb44071efda8b095f7f121f5de4bd092",
@@ -9969,7 +9969,7 @@
       "orbit360-platform/index.html": "21b2dea8a2fe54507419da07ef914180142682c0"
     },
     "manifestBlobSha": "82cce34dc28b2b67237b1f584837331844b15b93",
-    "qaBlobSha": "aab4c39f733c038b250450d07c82f9859d38e3f6",
+    "qaBlobSha": "0f6e3c175fa0e275de87ee07ba43209f39e758e0",
     "previewOptIn": "scopedReadPreviewCandidate",
     "backendExported": false,
     "previewDeployed": false,
@@ -9993,7 +9993,14 @@
       ],
       "countryAndDuplicateResponseDenied": true,
       "roleSwitchMockExtended": true,
-      "productionChanged": false
+      "productionChanged": false,
+      "qaHarnessRepair": {
+        "priorFailedRun": 38482605727,
+        "failure": "MOCK_SINGLE_LISTENER_OVERWROTE_AUTHORIZED_STORE_LISTENER",
+        "testBlobSha": "0f6e3c175fa0e275de87ee07ba43209f39e758e0",
+        "sourceChanged": false,
+        "rerunPending": true
+      }
     }
   }
 }
