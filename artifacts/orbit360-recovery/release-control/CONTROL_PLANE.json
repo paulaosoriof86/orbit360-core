@@ -9731,7 +9731,15 @@
       "B4-003-P0-20261012-QA-ORPHAN-RENEWALS"
     ],
     "refreshAugustAuthorized": false,
-    "qaOrphanDeleteAuthorized": false
+    "qaOrphanDeleteAuthorized": false,
+    "candidateEmulatorEvidence": {
+      "runId": 38446858563,
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_SCOPED_FIRESTORE_EMULATOR_PROOF_20261013.json",
+      "receiptBlobSha": "e0a35e178212bd3395e7cabd006d2117d2557e20",
+      "disposition": "QA_ONLY_NOT_SECURITY_RELEASE",
+      "firestoreRulesDeployAuthorized": false,
+      "livePromotionAuthorized": false
+    }
   },
   "b4003SecuritySourceStaging": {
     "status": "EXPLICITLY_AUTHORIZED_STAGED_SERVER_SCOPE_SOURCE",
@@ -9828,6 +9836,16 @@
       "productionFunctionsUntouched": true
     },
     "roleValidation": "SERVER_MEMBERSHIP_ASSIGNED_ROLE_VERIFIED; OPTIONAL_JWT_ROLE_CLAIM_MUST_MATCH_WHEN_PRESENT",
-    "mandatoryUnprovenGiActiveRoleClaim": false
+    "mandatoryUnprovenGiActiveRoleClaim": false,
+    "emulatorProof": {
+      "status": "CANDIDATE_FIRESTORE_NEGATIVE_AND_SCOPED_SERVER_POSITIVE_PASS",
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_SCOPED_FIRESTORE_EMULATOR_PROOF_20261013.json",
+      "receiptBlobSha": "e0a35e178212bd3395e7cabd006d2117d2557e20",
+      "runId": 38446858563,
+      "negativeAssertions": 14,
+      "serverReadAssertions": 10,
+      "syntheticOnly": true,
+      "securityP0Closed": false
+    }
   }
 }
