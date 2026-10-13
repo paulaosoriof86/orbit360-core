@@ -250,7 +250,7 @@
     "orbit360-platform/styles/base.css": "608ef0709144ffcbe748a7bd04e1bd16744def65",
     "orbit360-platform/styles/infra.css": "d6fe258364c4e11daad21848a40fbb121c36e4a8",
     "orbit360-platform/sw.js": "87412e7c4ef1030e2a3389cfd709f0c287ab336b",
-    "functions/b4-003-scoped-access-boundary.js": "de9382fa7f11ad8e4ffc3b59526176b784502e51",
+    "functions/b4-003-scoped-access-boundary.js": "8047e4870722db6889152af84ff91b08b1305308",
     "firestore.b4-003-scoped-candidate.rules": "6ae1a85b1f82525ac018ff682a2e20b6cca5f1d8",
     "orbit360-platform/modules/comparativo.js": "982881a4c1e2f95be95428bd3f9f23360a9a2d5f",
     "functions/b4-003-scoped-policy-reader.js": "55236d6c5ad619bb0ac204f177f29922efead0bb",
@@ -5125,5 +5125,14 @@
       "existing_firestore_rules_insecure"
     ],
     "listOptimization": "ONE_MEMBERSHIP_AND_PARENT_AUTHORIZATION_PER_PAGE_WITH_LOOKAHEAD_CHECK"
+  },
+  "b4003RoleSpecificTeamRestrict": {
+    "status": "STAGED_PENDING_ISOLATED_EMULATOR",
+    "boundaryBlobSha": "8047e4870722db6889152af84ff91b08b1305308",
+    "unitTestBlobSha": "8fe5d2035b9fb437f359c8c48d7465b79b45f318",
+    "emulatorTestBlobSha": "c103ec93119dee153a33db33ddfae0444d1a97ca",
+    "inheritGlobalTeamWhenExplicitRoleList": false,
+    "productEntrypointChanged": false,
+    "securityP0Closed": false
   }
 }

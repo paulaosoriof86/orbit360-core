@@ -5996,7 +5996,7 @@
   "canonicalAccumulationControl": {
     "status": "FROZEN_ACTIVE",
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "compositionLockBlobSha": "f43d922e60144296854e9cb9a19c3f67fefa8b7c",
+    "compositionLockBlobSha": "b38a7710cfae53e237655d1298f0bad2eeb5dcfc",
     "findingLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
     "findingLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
@@ -9773,8 +9773,8 @@
     "contractCorrection": {
       "prior": "mandatory custom giActiveRole claim not emitted by canonical backend",
       "fixed": "validate requested activeRole against server membership; signed claim if present restricts further",
-      "sourceBlobSha": "de9382fa7f11ad8e4ffc3b59526176b784502e51",
-      "unitResult": "ISOLATED_PROBES_PASS_PENDING_CI",
+      "sourceBlobSha": "8047e4870722db6889152af84ff91b08b1305308",
+      "unitResult": "STAGED_RETEST_PENDING",
       "liveChanged": false
     }
   },
@@ -9870,11 +9870,11 @@
       "cobros"
     ],
     "sourceBlobs": {
-      "functions/b4-003-scoped-access-boundary.js": "de9382fa7f11ad8e4ffc3b59526176b784502e51",
+      "functions/b4-003-scoped-access-boundary.js": "8047e4870722db6889152af84ff91b08b1305308",
       "functions/b4-003-scoped-related-reader.js": "930a592e7d9b103da03464f0568ce6c1613bbab7",
       "functions/b4-003-scoped-policy-callable.js": "5d67d921261746fd0de2b9933c4041657375788a"
     },
-    "compositionBlobSha": "f43d922e60144296854e9cb9a19c3f67fefa8b7c",
+    "compositionBlobSha": "b38a7710cfae53e237655d1298f0bad2eeb5dcfc",
     "owner": "functions/b4-003-scoped-related-reader.js",
     "previewCallable": "functions/b4-003-scoped-policy-callable.js",
     "notBootstrapped": true,
@@ -9912,6 +9912,16 @@
       },
       "sourceToTestBlobSha": "930a592e7d9b103da03464f0568ce6c1613bbab7",
       "performanceBenchmarkPending": true
+    },
+    "roleTeamIsolation": {
+      "status": "STAGED_PENDING_EMULATOR",
+      "boundaryBlobSha": "8047e4870722db6889152af84ff91b08b1305308",
+      "unitTestBlobSha": "8fe5d2035b9fb437f359c8c48d7465b79b45f318",
+      "emulatorTestBlobSha": "c103ec93119dee153a33db33ddfae0444d1a97ca",
+      "previousSecurityProofPreservedButAffectedRoleTeamRevalidationRequired": true,
+      "productEntrypointChanged": false,
+      "productionRulesChanged": false,
+      "dataWrites": 0
     }
   }
 }

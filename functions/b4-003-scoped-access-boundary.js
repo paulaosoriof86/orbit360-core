@@ -36,8 +36,13 @@ function resolve({auth,member,config,tenantId,activeRole,collection,country}){
  }
  if(effective==='none')deny('SCOPE_NONE');
  const advisor=clean(m.advisorId||m.asesorId);
- const roleTeam=get(m.roleVisibleAdvisorIds,role);
- const team=uniq([...(Array.isArray(roleTeam)?roleTeam:[]),...(m.teamAdvisorIds||[]),...(m.equipoAsesorIds||[]),advisor]);
+ // An explicit per-role team list replaces—not expands—the global team list.
+ const roleTeams=m.roleVisibleAdvisorIds&&typeof m.roleVisibleAdvisorIds==='object'&&!Array.isArray(m.roleVisibleAdvisorIds)?m.roleVisibleAdvisorIds:{};
+ const roleKey=Object.keys(roleTeams).find(k=>norm(k)===role);
+ const explicitRoleTeam=roleKey===undefined?null:roleTeams[roleKey];
+ if(roleKey!==undefined&&!Array.isArray(explicitRoleTeam))deny('ROLE_TEAM_CONFIG_INVALID');
+ const visible=roleKey===undefined?uniq([...(m.teamAdvisorIds||[]),...(m.equipoAsesorIds||[])]):uniq(explicitRoleTeam);
+ const team=uniq([...visible,advisor]);
  if(effective==='own'&&!advisor||effective==='team'&&!team.length)deny('ADVISOR_MAPPING_REQUIRED');
  return Object.freeze({tenantId,role,country,collection,scope:effective,advisorId:advisor,team});
 }

@@ -158,6 +158,17 @@ async function run(){
     });
     const teamRows=await list('opGT','operativo');
     assert.deepEqual(teamRows.rows.map(x=>x.id),['foreign','own']);positiveCount++;
+    // A per-role visibility assignment must not inherit a wider global team.
+    await env.withSecurityRulesDisabled(async context=>{
+      await setDoc(doc(context.firestore(),member('opGT')),{uid:'opGT',tenantId:tenant,status:'active',
+        roles:['Operativo'],advisorId:'advisor-own',countries:['GT','CO'],
+        dataScopes:{default:'team'},roleVisibleAdvisorIds:{Operativo:['advisor-own']},
+        teamAdvisorIds:['advisor-other']});
+    });
+    const roleScopedTeam=await list('opGT','operativo');
+    assert.deepEqual(roleScopedTeam.rows.map(x=>x.id),['own']);positiveCount++;
+    console.log('B4_003_EMULATOR_ROLE_TEAM_NONESCALATION_PASS assertions=1 synthetic_only');
+
     await env.withSecurityRulesDisabled(async context=>{
       await setDoc(doc(context.firestore(),member('opGT')),{uid:'opGT',tenantId:tenant,status:'active',
         roles:['Operativo'],advisorId:'advisor-own',countries:['GT','CO'],
@@ -171,7 +182,7 @@ async function run(){
       await setDoc(doc(context.firestore(),`tenants/${tenant}/config/access`),{roleScopes:{operativo:'none',asesor:'own'}});
     });
     await deniedServer(()=>get('opGT','operativo','own'),'SCOPE_NONE');
-    assert.equal(positiveCount,10);
+    assert.equal(positiveCount,11);
     console.log('B4_003_FIRESTORE_EMULATOR_SERVER_SCOPED_POSITIVE_AND_NEGATIVE_PASS assertions='+positiveCount+' synthetic_only no_production');
   }finally{await deleteApp(adminApp);}
 
