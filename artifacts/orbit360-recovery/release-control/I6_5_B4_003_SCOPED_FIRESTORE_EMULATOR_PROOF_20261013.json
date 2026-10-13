@@ -2,15 +2,15 @@
   "schema": "GRAVICENTRA_I65_B4003_SCOPED_FIRESTORE_EMULATOR_PROOF_V1",
   "recordedAt": "2026-10-13",
   "gate": "I6.5/B4-003",
-  "status": "ISOLATED_EMULATOR_CONTRACT_PASS_CURRENT_DEPLOYED_RULES_INSECURE",
+  "status": "ISOLATED_EMULATOR_EXTENDED_RELATIONAL_CONTRACT_PASS_CURRENT_DEPLOYED_RULES_INSECURE",
   "authority": "GITHUB_ACTIONS_VERIFIED",
-  "sourceHead": "51eec480352273dca2dd769e2200a3c003f5ebf1",
-  "runId": 38446858563,
+  "sourceHead": "7f99ced14da56418a06a5f16dee7c9bfc26dc6b0",
+  "runId": 38449500441,
   "runConclusion": "success",
-  "testJobId": 115467397114,
-  "authenticatedMockNegativeRulesAssertions": 14,
+  "testJobId": 115476437074,
+  "authenticatedMockNegativeRulesAssertions": 16,
   "serverOwnedReadAssertions": 10,
-  "totalAssertions": 24,
+  "totalAssertions": 36,
   "source": {
     "candidateRules": "firestore.b4-003-scoped-candidate.rules",
     "candidateRulesBlobSha": "6ae1a85b1f82525ac018ff682a2e20b6cca5f1d8",
@@ -19,7 +19,9 @@
     "authorizationOwner": "functions/b4-003-scoped-access-boundary.js",
     "authorizationOwnerBlobSha": "25bc062001a646611acc76e25263dd0b39a25350",
     "test": "tools/gravicentra-b4-003-firestore-emulator.test.cjs",
-    "testBlobSha": "203b8fc3a4036523d9858c05cac24c4320285c32"
+    "testBlobSha": "130d28630f8cdc4e7b3db2e3954c5e9bc33e54f0",
+    "relatedOwner": "functions/b4-003-scoped-related-reader.js",
+    "relatedOwnerBlobSha": "2b9e8fc488a8848de83c8f2e3028dc3b805f088c"
   },
   "proves": [
     "Browser direct canonical and legacy GET QUERY WRITE rejected by candidate rules",
@@ -32,7 +34,8 @@
     "Production or authenticated Preview integration",
     "UI hydration uses protected API",
     "Approval of new release",
-    "All data relationships authorization across every collection"
+    "All data relationships authorization across every collection",
+    "Server protected LIST/pagination for related collections; client hydration still directly reads Firestore"
   ],
   "boundaries": {
     "firebaseProject": "demo-gravicentra-b4003-security",
@@ -44,5 +47,13 @@
     "livePromotion": false,
     "p0Closed": false
   },
-  "nextWithinSameGate": "INTEGRATE_PROTECTED_BACKEND_AND_BROWSER_READ_AUTHORITY_FOR_REQUIRED_COLLECTIONS_THEN_EXACT_AUTHENTICATED_PREVIEW_AND_NEGATIVE_RULES_READBACK"
+  "nextWithinSameGate": "SERVER_SCOPED_LIST_FOR_RELATED_COLLECTIONS_THEN_CLIENT_HYDRATION_AND_AUTHENTICATED_PREVIEW",
+  "serverRelatedReadAssertions": 10,
+  "relatedCollections": [
+    "clientes",
+    "recibosEsperados",
+    "carteraPrimas",
+    "cobros",
+    "vehiculos"
+  ]
 }
