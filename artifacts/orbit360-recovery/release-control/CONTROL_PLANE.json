@@ -9914,14 +9914,22 @@
       "performanceBenchmarkPending": true
     },
     "roleTeamIsolation": {
-      "status": "STAGED_PENDING_EMULATOR",
+      "status": "ROLE_TEAM_NONESCALATION_EMULATOR_PASS_NOT_SECURITY_RELEASE",
       "boundaryBlobSha": "8047e4870722db6889152af84ff91b08b1305308",
       "unitTestBlobSha": "8fe5d2035b9fb437f359c8c48d7465b79b45f318",
       "emulatorTestBlobSha": "c103ec93119dee153a33db33ddfae0444d1a97ca",
       "previousSecurityProofPreservedButAffectedRoleTeamRevalidationRequired": true,
       "productEntrypointChanged": false,
       "productionRulesChanged": false,
-      "dataWrites": 0
+      "dataWrites": 0,
+      "proofRunId": 38468362268,
+      "emulatorJobId": 115540781856,
+      "guardJobId": 115540782198,
+      "proofPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_ROLE_TEAM_NONESCALATION_EMULATOR_PROOF_20261013.json",
+      "proofBlobSha": "0fbcb6a74026028203fd7e6764c655e4f677ec8a",
+      "isolatedCumulativeAssertionsPass": 52,
+      "clientIntegrated": false,
+      "securityP0Closed": false
     }
   }
 }

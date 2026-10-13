@@ -1,0 +1,41 @@
+{
+  "schema": "GRAVICENTRA_I65_B4003_ROLE_TEAM_NONESCALATION_PROOF_V1",
+  "date": "2026-10-13",
+  "gate": "I6.5/B4-003",
+  "status": "STAGED_SERVER_SCOPE_EMULATOR_PASS_NOT_PREVIEW_OR_LIVE",
+  "runId": 38468362268,
+  "runSourceSha": "5a4769c19f9a01ccaf2bcd64d83dc7999e6baff6",
+  "emulatorJobId": 115540781856,
+  "guardJobId": 115540782198,
+  "emulatorJobConclusion": "success",
+  "guardJobConclusion": "success",
+  "source": {
+    "boundaryPath": "functions/b4-003-scoped-access-boundary.js",
+    "boundaryBlobSha": "8047e4870722db6889152af84ff91b08b1305308",
+    "emulatorTestBlobSha": "c103ec93119dee153a33db33ddfae0444d1a97ca",
+    "unitTestBlobSha": "8fe5d2035b9fb437f359c8c48d7465b79b45f318",
+    "compositionBlobSha": "b38a7710cfae53e237655d1298f0bad2eeb5dcfc"
+  },
+  "testedAssertions": {
+    "directFirestoreNegative": 16,
+    "relatedGet": 10,
+    "relatedList": 15,
+    "serverPolicyRoleScope": 11,
+    "total": 52
+  },
+  "newInvariant": "For the selected active role, an explicit roleVisibleAdvisorIds list does not union with global teamAdvisorIds or equipoAsesorIds; malformed explicit role maps fail closed.",
+  "release": {
+    "firestoreRulesChanged": false,
+    "functionsExported": false,
+    "clientHydrationIntegrated": false,
+    "productionChanged": false,
+    "operationalWrites": 0,
+    "securityP0Closed": false
+  },
+  "remaining": [
+    "server role scope/read/write parity across active deployed functions",
+    "secure browser read transport and complete scoped lists",
+    "production Firestore Rules migration impact and separate authorization",
+    "authenticated Preview E2E and exact artifact acceptance"
+  ]
+}
