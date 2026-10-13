@@ -1,0 +1,41 @@
+{
+  "schema": "GRAVICENTRA_B4003_ROLE_QUERY_RECOMPILE_QA_V1",
+  "date": "2026-10-13",
+  "gate": "I6.5/B4-003",
+  "status": "ISOLATED_QA_PASS_NOT_AUTHENTICATED_PREVIEW",
+  "runId": 38483033529,
+  "runHeadSha": "ecb24ffc6d36d19b87759465e810f62375ac1b6e",
+  "guardJobId": 115589946622,
+  "guardConclusion": "success",
+  "source": {
+    "bootstrapBlobSha": "89a9083d192ba6a6516b42c5e730596499da75a7",
+    "storeBlobSha": "16c4877815cf2006fd15bb0db650975c39d2bcd0",
+    "qaBlobSha": "012bf943ac3fa6d982a7787bde2b26b5df2f0191",
+    "manifestBlobSha": "51e0bbd5c34cb305c71e2faac274f1a00ca3280c"
+  },
+  "proof": [
+    "ACTUAL_BOOTSTRAP_ROLE_RECOMPILE_PASS mock_only",
+    "PROTECTED_HYDRATION_MOCK_PASS no_direct_firestore role_cache_reset",
+    "GOVERNANCE_PREFLIGHT_PASS",
+    "RELEASE_READINESS_BLOCKED"
+  ],
+  "defectsFixed": [
+    "FROZEN_QUERY_PLANNER_OLD_ROLE",
+    "BROWSER_MOCK_SINGLE_LISTENER_OVERWRITES",
+    "PROTECTED_ROW_FOREIGN_COUNTRY_ACCEPTANCE"
+  ],
+  "limits": [
+    "server callable not exported or deployed",
+    "no authenticated browser acceptance",
+    "related lists not globally available",
+    "old Firestore rules still insecure"
+  ],
+  "boundaries": {
+    "dataMutation": false,
+    "sourceOnly": true,
+    "rulesDeploy": false,
+    "productionDeploy": false,
+    "priorArtifactUnchanged": true,
+    "securityP0Closed": false
+  }
+}
