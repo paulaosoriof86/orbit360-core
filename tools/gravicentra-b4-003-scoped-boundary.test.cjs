@@ -1,0 +1,11 @@
+'use strict';
+const assert = require('node:assert/strict');
+const {resolve, allowRow} = require('../functions/b4-003-scoped-access-boundary');
+const c={auth:{uid:'u',token:{giActiveRole:'asesor'}},tenantId:'t',activeRole:'asesor',collection:'polizas',country:'GT',member:{uid:'u',tenantId:'t',status:'active',roles:['asesor','operativo'],advisorId:'a1',countries:['GT'],dataScopes:{default:'own'}},config:{roleScopes:{asesor:'own'}}};
+const ctx=resolve(c);
+assert.equal(ctx.scope,'own');
+assert.equal(allowRow(ctx,{pais:'GT',asesorId:'a1'}),true);
+assert.throws(()=>allowRow(ctx,{pais:'GT',asesorId:'a2'}));
+assert.throws(()=>resolve({...c,activeRole:'operativo'}));
+assert.throws(()=>resolve({...c,config:{roleScopes:{asesor:'none'}}}));
+console.log('STAGED_B4_003_CONTRACT_UNIT_PASS');

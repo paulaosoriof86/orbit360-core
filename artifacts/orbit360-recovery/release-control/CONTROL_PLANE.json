@@ -9732,5 +9732,31 @@
     ],
     "refreshAugustAuthorized": false,
     "qaOrphanDeleteAuthorized": false
+  },
+  "b4003SecuritySourceStaging": {
+    "status": "EXPLICITLY_AUTHORIZED_STAGED_SERVER_SCOPE_SOURCE",
+    "authority": "Paula expressly authorized source remediation in this conversation, 2026-10-13",
+    "gate": "I6.5/B4-003",
+    "sourcePaths": [
+      "functions/b4-003-scoped-access-boundary.js",
+      "firestore.b4-003-scoped-candidate.rules"
+    ],
+    "testPath": "tools/gravicentra-b4-003-scoped-boundary.test.cjs",
+    "isolation": "NOT_REFERENCED_BY_PRODUCT_ENTRYPOINT_OR_FIREBASE_JSON_NOT_DEPLOYED",
+    "previouslyCertifiedPreviewImmutable": true,
+    "noProductionMutation": true,
+    "noFirestoreRulesDeploy": true,
+    "noDataWrites": true,
+    "noLivePromotion": true,
+    "p0Closed": false,
+    "gaps": [
+      "SERVER_READ_CALLABLE",
+      "SERVER_MINTED_ROLE_ATTESTATION",
+      "CLIENT_SCOPED_READ_INTEGRATION",
+      "EMULATOR_RULES_MATRIX",
+      "AUTHENTICATED_PREVIEW_POSITIVE_AND_NEGATIVE",
+      "SEPARATE_RULES_DEPLOY_AUTHORIZATION"
+    ],
+    "tests": "PURE_CONTRACT_PROBES_PASS_NOT_AUTHENTICATED_PROOF"
   }
 }
