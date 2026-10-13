@@ -5996,7 +5996,7 @@
   "canonicalAccumulationControl": {
     "status": "FROZEN_ACTIVE",
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "compositionLockBlobSha": "1183fcd37c6f63505622a5015f0167d6e4f45e70",
+    "compositionLockBlobSha": "f43d922e60144296854e9cb9a19c3f67fefa8b7c",
     "findingLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
     "findingLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
@@ -9861,7 +9861,7 @@
     "securityP0Closed": false
   },
   "b4003ScopedRelatedReadStaging": {
-    "status": "SCOPED_LIST_SOURCE_STAGED_PENDING_EMULATOR_AND_PREVIEW",
+    "status": "READONLY_LIST_OPTIMIZED_NOT_DEPLOYED_PENDING_EMULATOR",
     "scope": [
       "clientes",
       "vehiculos",
@@ -9871,10 +9871,10 @@
     ],
     "sourceBlobs": {
       "functions/b4-003-scoped-access-boundary.js": "de9382fa7f11ad8e4ffc3b59526176b784502e51",
-      "functions/b4-003-scoped-related-reader.js": "e9821f2d2c8c4dd83e14a0ba39065a840beab6fc",
+      "functions/b4-003-scoped-related-reader.js": "930a592e7d9b103da03464f0568ce6c1613bbab7",
       "functions/b4-003-scoped-policy-callable.js": "5d67d921261746fd0de2b9933c4041657375788a"
     },
-    "compositionBlobSha": "1183fcd37c6f63505622a5015f0167d6e4f45e70",
+    "compositionBlobSha": "f43d922e60144296854e9cb9a19c3f67fefa8b7c",
     "owner": "functions/b4-003-scoped-related-reader.js",
     "previewCallable": "functions/b4-003-scoped-policy-callable.js",
     "notBootstrapped": true,
@@ -9889,7 +9889,7 @@
       "completeCollectionList": false
     },
     "listQa": {
-      "status": "EMULATOR_PROBE_PASS_NOT_PREVIEW_OR_LIVE",
+      "status": "SOURCE_CHANGED_RETEST_PENDING",
       "assertionsExpected": 15,
       "testBlobSha": "44ca1c81ff3f4dd108cb1ddc692537334507b7f6",
       "clientIntegrated": false,
@@ -9900,11 +9900,17 @@
       "testRunId": 38454052527,
       "testJobId": 115492064785,
       "testConclusion": "success",
-      "assertionsPass": 15,
-      "cumulativeIsolatedAssertionsPass": 51,
+      "assertionsPass": null,
+      "cumulativeIsolatedAssertionsPass": null,
       "proofPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_SCOPED_LIST_EMULATOR_PROOF_20261013.json",
       "proofBlobSha": "1938d69a1b4e2d247d25e9c92f3aacc4c249be35",
-      "readbackPending": true
+      "readbackPending": true,
+      "priorTest": {
+        "runId": 38454052527,
+        "assertions": 51,
+        "sourceBlobSha": "e9821f2d2c8c4dd83e14a0ba39065a840beab6fc"
+      },
+      "sourceToTestBlobSha": "930a592e7d9b103da03464f0568ce6c1613bbab7"
     }
   }
 }

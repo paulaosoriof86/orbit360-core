@@ -255,7 +255,7 @@
     "orbit360-platform/modules/comparativo.js": "982881a4c1e2f95be95428bd3f9f23360a9a2d5f",
     "functions/b4-003-scoped-policy-reader.js": "55236d6c5ad619bb0ac204f177f29922efead0bb",
     "functions/b4-003-scoped-policy-callable.js": "5d67d921261746fd0de2b9933c4041657375788a",
-    "functions/b4-003-scoped-related-reader.js": "e9821f2d2c8c4dd83e14a0ba39065a840beab6fc"
+    "functions/b4-003-scoped-related-reader.js": "930a592e7d9b103da03464f0568ce6c1613bbab7"
   },
   "evidence": {
     "paulaVisualRejectionPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_PAULA_VISUAL_REJECTION_20260924.json",
@@ -5112,9 +5112,9 @@
     "securityP0Closed": false
   },
   "b4003ScopedRelatedListStage": {
-    "status": "NONDEPLOYED_SOURCE_STAGED_PENDING_EMULATOR",
+    "status": "SOURCE_OPTIMIZED_PENDING_ISOLATED_EMULATOR_RETTEST",
     "gate": "I6.5/B4-003",
-    "readerBlobSha": "e9821f2d2c8c4dd83e14a0ba39065a840beab6fc",
+    "readerBlobSha": "930a592e7d9b103da03464f0568ce6c1613bbab7",
     "callableBlobSha": "5d67d921261746fd0de2b9933c4041657375788a",
     "testBlobSha": "44ca1c81ff3f4dd108cb1ddc692537334507b7f6",
     "productionMutation": false,
@@ -5123,6 +5123,7 @@
       "policy_anchor_required_for_indirect_collection",
       "client_global_list_composite_index_pending_preview",
       "existing_firestore_rules_insecure"
-    ]
+    ],
+    "listOptimization": "ONE_MEMBERSHIP_AND_PARENT_AUTHORIZATION_PER_PAGE_WITH_LOOKAHEAD_CHECK"
   }
 }
