@@ -1,0 +1,33 @@
+{
+  "schema": "GRAVICENTRA_B4003_PROTECTED_HYDRATION_SOURCE_QA_V1",
+  "date": "2026-10-13",
+  "gate": "I6.5/B4-003",
+  "status": "SYNTAX_AND_ISOLATED_MOCK_PASS_NOT_PREVIEW",
+  "sourceCommitSha": "91fe5281184386106fe59d158ac326f1a5c32415",
+  "runId": 38471653634,
+  "runConclusion": "success",
+  "controlGuardConclusion": "success",
+  "proofs": [
+    "B4_003_PROTECTED_HYDRATION_MOCK_PASS no_direct_firestore role_cache_reset unanchored_fail_closed",
+    "GRAVICENTRA_GOVERNANCE_PREFLIGHT=PASS"
+  ],
+  "manifestBlobSha": "82cce34dc28b2b67237b1f584837331844b15b93",
+  "qaTestBlobSha": "c239d051c1b49a4de659f0fe30d2fcdbdb30925b",
+  "limits": [
+    "protected backend function not exported or deployed",
+    "isolated Preview build not generated",
+    "no authenticated browser proof",
+    "related collection global list remains fail-closed",
+    "full UI permission and reload proof pending",
+    "existing deployed Firestore rules unsafe"
+  ],
+  "boundaries": {
+    "firestoreRulesDeployed": false,
+    "functionsDeployed": false,
+    "livePromotion": false,
+    "operationalWrites": 0,
+    "securityP0Closed": false,
+    "priorAcceptedArtifactPreserved": true
+  },
+  "nextWithinB4003": "Review remaining read targets and enable secure Preview backend only through separately gated build and test"
+}

@@ -9959,7 +9959,7 @@
     "securityP0Closed": false
   },
   "b4003ProtectedHydrationSourceCandidate": {
-    "status": "SOURCE_STAGED_PENDING_QA_AND_EXACT_PREVIEW",
+    "status": "STAGED_SOURCE_SYNTAX_AND_MOCK_PASS_NOT_AUTHENTICATED_PREVIEW",
     "sourceAuthorizationBlobSha": "3b17ba3e560117345afc8fb476580ed26e275d67",
     "productBlobs": {
       "orbit360-platform/core/product-runtime-browser-providers-p0.js": "be42c187bb44071efda8b095f7f121f5de4bd092",
@@ -9978,6 +9978,10 @@
     "liveReleasePromotionAuthorized": false,
     "firestoreRulesDeployed": false,
     "operationalWrites": 0,
-    "securityP0Closed": false
+    "securityP0Closed": false,
+    "qaRunId": 38471653634,
+    "qaConclusion": "success",
+    "qaReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PROTECTED_HYDRATION_SOURCE_QA_20261013.json",
+    "qaReceiptBlobSha": "dc3f7574f68e694ad806fe2bf1a24755db04d341"
   }
 }
