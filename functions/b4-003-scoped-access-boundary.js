@@ -1,5 +1,5 @@
 'use strict';
-// B4-003: staged server-side policy. Not wired or deployed. Active role must be signed.
+// B4-003: staged server-side policy. Not wired or deployed. Active role is verified against server-owned assigned roles; signed claim, if present, further restricts it.
 const clean=x=>String(x??'').trim();
 const norm=x=>clean(x).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_+|_+$/g,'');
 const uniq=a=>[...new Set((Array.isArray(a)?a:a==null?[]:[a]).map(clean).filter(Boolean))];
@@ -13,9 +13,10 @@ const get=(o,k)=>{const key=Object.keys(o||{}).find(v=>norm(v)===norm(k));return
 const scope=v=>({none:'none',ninguno:'none',sin_acceso:'none',own:'own',propio:'own',team:'team',equipo:'team',all:'all',todos:'all',global:'all'})[norm(v)]||'';
 function resolve({auth,member,config,tenantId,activeRole,collection,country}){
  const m=member||{},role=norm(activeRole),signed=norm(auth?.token?.giActiveRole);
- if(!auth?.uid||!m.uid||m.uid!==auth.uid||m.tenantId!==tenantId||m.active===false||m.activo===false||m.inactivo===true||['inactive','inactivo','blocked','bloqueado','pending','pendiente'].includes(norm(m.status||m.estado)))deny('MEMBERSHIP_DENIED');
- if(!role||role!==signed)deny('SIGNED_ACTIVE_ROLE_REQUIRED');
- const assigned=uniq([...(m.roles||[]),...(m.rolesAsignados||[]),m.rol,m.role].filter(Boolean)).map(norm);
+ if(!auth?.uid||!m.uid||m.uid!==auth.uid||m.tenantId!==tenantId||m.active===false||m.activo===false||m.inactivo===true||['inactive','inactivo','blocked','bloqueado','pending','pendiente','invited','invitado','deleted','eliminado'].includes(norm(m.status||m.estado)))deny('MEMBERSHIP_DENIED');
+ if(!role)deny('ROLE_NOT_PROVIDED');
+ if(signed&&role!==signed)deny('SIGNED_ACTIVE_ROLE_MISMATCH');
+ const assigned=uniq([...(m.roles||[]),...(m.rolesAsignados||[]),m.rol,m.role,m.defaultRole,m.rolDefault].filter(Boolean)).map(norm);
  if(!assigned.includes(role)||(!self.has(role)&&!full.has(role)))deny('ROLE_DENIED');
  const moduleKey=modules[collection];
  if(!moduleKey)deny('COLLECTION_DENIED');
@@ -53,4 +54,4 @@ function allowRow(ctx,row,parents=[]){
  if(ctx.scope==='team'&&ctx.team.includes(advisors[0]))return true;
  deny('FOREIGN_RECORD_DENIED');
 }
-module.exports={version:'b4-003-staged-v1',resolve,allowRow,Denied};
+module.exports={version:'b4-003-server-assigned-role-v2',resolve,allowRow,Denied};

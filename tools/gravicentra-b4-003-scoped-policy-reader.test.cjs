@@ -51,10 +51,12 @@ const denied=async(fn,code)=>{
 (async()=>{
  let count=0;
  const own=await scopedPolicyRead(req('asesor'));assert.deepEqual(own.rows.map(x=>x.id),['p1']);count++;
+ const assignedRoleWithoutSpecialClaim=await scopedPolicyRead({...req('asesor'),auth:{uid:'u1',token:{}}});assert.deepEqual(assignedRoleWithoutSpecialClaim.rows.map(x=>x.id),['p1']);count++;
+
  const p1=await scopedPolicyRead(req('asesor','get',{policyId:'p1'}));assert.equal(p1.rows[0].id,'p1');count++;
  await denied(()=>scopedPolicyRead(req('asesor','get',{policyId:'p2'})),'POLICY_NOT_FOUND_OR_DENIED');count++;
  await denied(()=>scopedPolicyRead(req('asesor','get',{policyId:'p3'})),'POLICY_NOT_FOUND_OR_DENIED');count++;
- await denied(()=>scopedPolicyRead({...req('operativo'),auth:{uid:'u1',token:{giActiveRole:'asesor'}}}),'SIGNED_ACTIVE_ROLE_REQUIRED');count++;
+ await denied(()=>scopedPolicyRead({...req('operativo'),auth:{uid:'u1',token:{giActiveRole:'asesor'}}}),'SIGNED_ACTIVE_ROLE_MISMATCH');count++;
  activeMember={...activeMember,dataScopes:{default:'team'}};
  const team=await scopedPolicyRead({...req('operativo'),auth:{uid:'u1',token:{giActiveRole:'operativo'}}});
  assert.deepEqual(team.rows.map(x=>x.id),['p1','p2']);count++;

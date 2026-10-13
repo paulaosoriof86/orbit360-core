@@ -5996,7 +5996,7 @@
   "canonicalAccumulationControl": {
     "status": "FROZEN_ACTIVE",
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "compositionLockBlobSha": "3562693069dc116f317dd6a6f9957131a5c1cda2",
+    "compositionLockBlobSha": "418a48c8fd8cc414d3edb43ee558833177f235b2",
     "findingLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
     "findingLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
@@ -9761,7 +9761,14 @@
     "compositionLockBlobSha": "53ab787b0404a2d331850b5b9ac45b0b1510b5ea",
     "historicalB4LockPreserved": true,
     "historicalB4PreviewCompositionBindingPreserved": true,
-    "guardFailureBeingReconciled": "I6_CANONICAL_COMPOSITION_EXACT_SET_DRIFT triggered on first staging commit, no deploy"
+    "guardFailureBeingReconciled": "I6_CANONICAL_COMPOSITION_EXACT_SET_DRIFT triggered on first staging commit, no deploy",
+    "contractCorrection": {
+      "prior": "mandatory custom giActiveRole claim not emitted by canonical backend",
+      "fixed": "validate requested activeRole against server membership; signed claim if present restricts further",
+      "sourceBlobSha": "25bc062001a646611acc76e25263dd0b39a25350",
+      "unitResult": "ISOLATED_PROBES_PASS_PENDING_CI",
+      "liveChanged": false
+    }
   },
   "b4003ModalCatalogDocsStaging": {
     "status": "SOURCE_STAGED_WITH_CURRENT_COMPARATIVO_PROPOSAL_OWNER_PENDING_EXACT_PREVIEW",
@@ -9805,7 +9812,7 @@
     "component": "functions/b4-003-scoped-policy-reader.js",
     "sourceBlobSha": "55236d6c5ad619bb0ac204f177f29922efead0bb",
     "unitTest": "tools/gravicentra-b4-003-scoped-policy-reader.test.cjs",
-    "compositionLockBlobSha": "3562693069dc116f317dd6a6f9957131a5c1cda2",
+    "compositionLockBlobSha": "418a48c8fd8cc414d3edb43ee558833177f235b2",
     "browserSourceChanged": false,
     "backendExportsChanged": false,
     "firestoreRulesDeployed": false,
@@ -9819,6 +9826,8 @@
       "status": "ISOLATED_SOURCE_ONLY_NOT_EXPORTED",
       "firebaseProjectUnchanged": true,
       "productionFunctionsUntouched": true
-    }
+    },
+    "roleValidation": "SERVER_MEMBERSHIP_ASSIGNED_ROLE_VERIFIED; OPTIONAL_JWT_ROLE_CLAIM_MUST_MATCH_WHEN_PRESENT",
+    "mandatoryUnprovenGiActiveRoleClaim": false
   }
 }
