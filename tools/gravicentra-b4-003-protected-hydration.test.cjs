@@ -45,5 +45,23 @@ const pause=()=>new Promise(ok=>setTimeout(ok,30));
  assert.equal(unsupported._attachSnapshots(),false);
  assert.equal(unsupported._productStatus().status,'attach-error');
  assert.equal(direct,0);
+
+ role='asesor';events['orbit:active-role-changed']();
+ assert.deepEqual(Array.from(store.all('clientes'),x=>x.id),[]);
+ await pause();assert.deepEqual(Array.from(store.all('clientes'),x=>x.id),['c1','c3']);
+ let poisonCount=0;
+ const poisonDeps=Object.assign({},deps,{protectedReadPage:async request=>{
+   poisonCount++;
+   return {ok:true,serverScoped:true,collection:request.collection,country:request.country,
+     rows:[{id:'foreign-country',canonicalDocumentId:'foreign-country',tenantId:tenant,pais:'CO'}],nextCursor:null};
+ }});
+ const poison=win.Orbit.createFirestoreProductReadOnlyStoreP0(poisonDeps,config(['clientes']));
+ assert.equal(poison._attachSnapshots(),true);
+ await pause();
+ assert.ok(poisonCount>0);
+ assert.deepEqual(Array.from(poison.all('clientes'),x=>x.id),[]);
+ assert.ok(poison._productStatus().snapshotErrors.clientes);
+ assert.equal(direct,0);
+ assert.match(bootstrap,/productQueryPlannerP0\.compile\(collection/);
  console.log('B4_003_PROTECTED_HYDRATION_MOCK_PASS no_direct_firestore role_cache_reset unanchored_fail_closed');
 })().catch(error=>{console.error(error);process.exitCode=1;});

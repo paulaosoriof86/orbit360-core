@@ -265,6 +265,18 @@
       transition(state, 'planning');
       var accessPolicy = window.Orbit.tenantAccessPolicyProductP0;
       var queryPlanner = window.Orbit.productQueryPlannerP0.createPlanner(membership, { accessPolicy: accessPolicy });
+      if(options.protectedReadCandidate===true){
+        queryPlanner=function(collection){
+          // Read-scoped roles are not frozen at bootstrap: regenerate constraints per role.
+          var selected=text(membership.activeRole);
+          try{var s=window.Orbit.session;if(s&&typeof s.rol==='function')selected=text(s.rol())||selected;}catch(_){}
+          var norm=function(v){return text(v).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'_');};
+          if(!(membership.roles||[]).some(function(r){return norm(r)===norm(selected);}))
+            return {ok:false,hardError:true,constraints:[],errors:['PROTECTED_ROLE_NOT_ASSIGNED']};
+          return window.Orbit.productQueryPlannerP0.compile(collection,
+            Object.assign({},membership,{activeRole:selected}),{accessPolicy:accessPolicy});
+        };
+      }
       var storeDeps = typeof deps.firebaseAdapter.storeDependencies === 'function'
         ? deps.firebaseAdapter.storeDependencies(firebaseContext)
         : { db: firebaseContext && firebaseContext.db };

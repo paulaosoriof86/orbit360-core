@@ -176,7 +176,7 @@
     "orbit360-platform/core/auth-password-change-v20260805.js": "873b484d42825db2fa31e0ae90c9ec78598728f4",
     "orbit360-platform/core/auth-product-runtime-p0.js": "5299e3397fc4f37488e65e609eb446d27d724128",
     "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js": "60ce88178f48ff5d9b5fd01c1e2d92abe642dac1",
-    "orbit360-platform/core/backend-product-readonly-bootstrap-p0.js": "e8a8346d6dee65bb8cfaa1539595d7d83a978760",
+    "orbit360-platform/core/backend-product-readonly-bootstrap-p0.js": "89a9083d192ba6a6516b42c5e730596499da75a7",
     "orbit360-platform/core/backend-resource-contracts.js": "826364d2a394d0bfe75d9f0ccdc5dd8905d2b3f0",
     "orbit360-platform/core/ciclo.js": "3377c627ee53e3449f4ee382a570ea72335a0ada",
     "orbit360-platform/core/client-insurer-visual-contract-v20260720.js": "3fd89167a5a36662072dbdc3e970b48f61158343",
@@ -210,11 +210,11 @@
     "orbit360-platform/data/academia-product-catalog-v1.js": "22b6781519cb14e05965738ac3bbc0f6eb0baff3",
     "orbit360-platform/data/geo-gt-co-authoritative-v20261004.js": "734b6518bc968a8c4e278602aa7161a38351cb02",
     "orbit360-platform/data/store-firestore-product-operational-p0.js": "7738314b843253c92be008dc0b812d035b377d43",
-    "orbit360-platform/data/store-firestore-product-readonly-p0.js": "2dd7431c98f72461015830d2e71b00445215b38e",
+    "orbit360-platform/data/store-firestore-product-readonly-p0.js": "16c4877815cf2006fd15bb0db650975c39d2bcd0",
     "orbit360-platform/data/tenant-alianzas-soluciones-insurers-p10.js": "41d2e31a42dac73eb68af304d5f532897210d0ee",
     "orbit360-platform/data/tenant-config/alianzas-soluciones.aseguradoras-knowledge-summary-v20261003.js": "2000d9ea8ab67bdd37d8bf404a29a405fa6374dd",
     "orbit360-platform/data/tenant-public-branding-index.js": "dc543c463f5ecd8ea44e49156d6282113bd95db6",
-    "orbit360-platform/index.html": "115fd2b798e6139318cce282f39e4a7166c96262",
+    "orbit360-platform/index.html": "21b2dea8a2fe54507419da07ef914180142682c0",
     "orbit360-platform/modules/academia.js": "4d48ee3edbc6afc4163bf6365a80bbcb680b1852",
     "orbit360-platform/modules/aseguradoras-v1202-import-bridge.js": "db5f012abe505c2dd27d77a47d0694868bee5348",
     "orbit360-platform/modules/aseguradoras.js": "9e56c296b55da499b52f42c462c668aa2f32eba7",
@@ -5136,7 +5136,7 @@
     "securityP0Closed": false
   },
   "b4003ProtectedHydrationCandidate": {
-    "status": "SOURCE_STAGED_AWAITING_QA_AND_PREVIEW",
+    "status": "ROLE_RECOMPILE_AND_CROSS_COUNTRY_VALIDATION_SOURCE_PENDING_CI",
     "previewOnly": true,
     "flag": "scopedReadPreviewCandidate",
     "globalListSupported": [
@@ -5154,12 +5154,12 @@
     "serverCallableExportPending": true,
     "sourceBlobs": {
       "orbit360-platform/core/product-runtime-browser-providers-p0.js": "be42c187bb44071efda8b095f7f121f5de4bd092",
-      "orbit360-platform/core/backend-product-readonly-bootstrap-p0.js": "e8a8346d6dee65bb8cfaa1539595d7d83a978760",
-      "orbit360-platform/data/store-firestore-product-readonly-p0.js": "2dd7431c98f72461015830d2e71b00445215b38e",
+      "orbit360-platform/core/backend-product-readonly-bootstrap-p0.js": "89a9083d192ba6a6516b42c5e730596499da75a7",
+      "orbit360-platform/data/store-firestore-product-readonly-p0.js": "16c4877815cf2006fd15bb0db650975c39d2bcd0",
       "orbit360-platform/core/product-app-p0.js": "f114e264679fa2bcbab4e6de3506908d04712488",
-      "orbit360-platform/index.html": "115fd2b798e6139318cce282f39e4a7166c96262"
+      "orbit360-platform/index.html": "21b2dea8a2fe54507419da07ef914180142682c0"
     },
-    "qaTestBlob": "c239d051c1b49a4de659f0fe30d2fcdbdb30925b",
+    "qaTestBlob": "aab4c39f733c038b250450d07c82f9859d38e3f6",
     "newArtifactRequired": true,
     "productionChanged": false
   }

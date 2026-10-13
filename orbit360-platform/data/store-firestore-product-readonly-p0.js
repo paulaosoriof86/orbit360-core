@@ -86,7 +86,7 @@
       var countries=unique(options.membership&&options.membership.countries||[]).map(function(x){return x.toUpperCase();});
       if(!countries.length||countries.some(function(x){return x!=='GT'&&x!=='CO';}))
         return Promise.reject(new Error('PROTECTED_READ_COUNTRY_DENIED'));
-      var initialRole=role(),rows=[];
+      var initialRole=role(),rows=[],seen=new Set();
       return countries.reduce(function(pr,country){return pr.then(function(){
         var cursor='',pages=0;
         function next(){
@@ -98,8 +98,13 @@
                  r.country!==country||!Array.isArray(r.rows)||r.rows.length>50)
                 throw new Error('PROTECTED_READ_RESPONSE_INVALID');
               r.rows.forEach(function(x){
-                if(!text(x&&x.canonicalDocumentId||x&&x.id))throw new Error('PROTECTED_READ_ROW_ID_MISSING');
-                rows.push(x);
+                var id=text(x&&x.canonicalDocumentId||x&&x.id);
+                if(!id||seen.has(id))throw new Error('PROTECTED_READ_DUPLICATE_OR_MISSING_ID');
+                if(text(x.tenantId)&&text(x.tenantId)!==state.tenantId)
+                  throw new Error('PROTECTED_READ_TENANT_MISMATCH');
+                if(text(x.pais||x.country).toUpperCase()!==country)
+                  throw new Error('PROTECTED_READ_COUNTRY_MISMATCH');
+                seen.add(id);rows.push(x);
               });
               if(!r.nextCursor)return;
               if(!r.rows.length||r.nextCursor===cursor)throw new Error('PROTECTED_READ_CURSOR_INVALID');

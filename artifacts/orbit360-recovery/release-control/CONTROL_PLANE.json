@@ -5996,7 +5996,7 @@
   "canonicalAccumulationControl": {
     "status": "FROZEN_ACTIVE",
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "compositionLockBlobSha": "82cce34dc28b2b67237b1f584837331844b15b93",
+    "compositionLockBlobSha": "51e0bbd5c34cb305c71e2faac274f1a00ca3280c",
     "findingLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
     "findingLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
@@ -9959,17 +9959,17 @@
     "securityP0Closed": false
   },
   "b4003ProtectedHydrationSourceCandidate": {
-    "status": "STAGED_SOURCE_SYNTAX_AND_MOCK_PASS_NOT_AUTHENTICATED_PREVIEW",
+    "status": "ROLE_TRANSITION_SOURCE_PATCH_PENDING_CI",
     "sourceAuthorizationBlobSha": "3b17ba3e560117345afc8fb476580ed26e275d67",
     "productBlobs": {
       "orbit360-platform/core/product-runtime-browser-providers-p0.js": "be42c187bb44071efda8b095f7f121f5de4bd092",
-      "orbit360-platform/core/backend-product-readonly-bootstrap-p0.js": "e8a8346d6dee65bb8cfaa1539595d7d83a978760",
-      "orbit360-platform/data/store-firestore-product-readonly-p0.js": "2dd7431c98f72461015830d2e71b00445215b38e",
+      "orbit360-platform/core/backend-product-readonly-bootstrap-p0.js": "89a9083d192ba6a6516b42c5e730596499da75a7",
+      "orbit360-platform/data/store-firestore-product-readonly-p0.js": "16c4877815cf2006fd15bb0db650975c39d2bcd0",
       "orbit360-platform/core/product-app-p0.js": "f114e264679fa2bcbab4e6de3506908d04712488",
-      "orbit360-platform/index.html": "115fd2b798e6139318cce282f39e4a7166c96262"
+      "orbit360-platform/index.html": "21b2dea8a2fe54507419da07ef914180142682c0"
     },
     "manifestBlobSha": "82cce34dc28b2b67237b1f584837331844b15b93",
-    "qaBlobSha": "c239d051c1b49a4de659f0fe30d2fcdbdb30925b",
+    "qaBlobSha": "aab4c39f733c038b250450d07c82f9859d38e3f6",
     "previewOptIn": "scopedReadPreviewCandidate",
     "backendExported": false,
     "previewDeployed": false,
@@ -9982,6 +9982,18 @@
     "qaRunId": 38471653634,
     "qaConclusion": "success",
     "qaReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PROTECTED_HYDRATION_SOURCE_QA_20261013.json",
-    "qaReceiptBlobSha": "dc3f7574f68e694ad806fe2bf1a24755db04d341"
+    "qaReceiptBlobSha": "dc3f7574f68e694ad806fe2bf1a24755db04d341",
+    "roleRecompileFix": {
+      "status": "SOURCE_PATCH_AWAITING_SAME_HEAD_CI",
+      "cause": "FROZEN_BOOTSTRAP_QUERY_PLANNER_STALE_ON_ROLE_SWITCH",
+      "files": [
+        "orbit360-platform/core/backend-product-readonly-bootstrap-p0.js",
+        "orbit360-platform/data/store-firestore-product-readonly-p0.js",
+        "orbit360-platform/index.html"
+      ],
+      "countryAndDuplicateResponseDenied": true,
+      "roleSwitchMockExtended": true,
+      "productionChanged": false
+    }
   }
 }
