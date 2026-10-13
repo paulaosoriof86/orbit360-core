@@ -1,0 +1,36 @@
+{
+  "schema": "GRAVICENTRA_I65_B4003_OPTIMIZED_LIST_PROOF_V1",
+  "gate": "I6.5/B4-003",
+  "date": "2026-10-13",
+  "status": "ISOLATED_EMULATOR_PASS_WITHOUT_BROWSER_OR_RULE_DEPLOY",
+  "runId": 38456016801,
+  "jobId": 115498815103,
+  "runHead": "c7fc886532c5f978b0a09561f1f62337795e8d64",
+  "runConclusion": "success",
+  "guardConclusion": "success",
+  "readerPath": "functions/b4-003-scoped-related-reader.js",
+  "readerBlobSha": "930a592e7d9b103da03464f0568ce6c1613bbab7",
+  "compositionBlobSha": "f43d922e60144296854e9cb9a19c3f67fefa8b7c",
+  "checks": {
+    "directReadDeny": 16,
+    "relatedGet": 10,
+    "relatedList": 15,
+    "policyScoped": 10,
+    "total": 51
+  },
+  "change": "Resolve membership/authorization and policy-client parent once per list request; verify every returned item and lookahead; do not re-read same docs and membership per row.",
+  "limitations": [
+    "actual performance benchmark not executed",
+    "browser hydration not connected",
+    "currently deployed Firestore rules remain insecure",
+    "current B4 release not accepted"
+  ],
+  "boundaries": {
+    "noProductEntrypointChange": true,
+    "noFirestoreRulesDeploy": true,
+    "noPreviewDeploy": true,
+    "noDataWrites": true,
+    "noLivePromotion": true,
+    "p0SecurityClosed": false
+  }
+}

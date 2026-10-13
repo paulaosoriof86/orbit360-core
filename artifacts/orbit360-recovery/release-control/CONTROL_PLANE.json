@@ -9861,7 +9861,7 @@
     "securityP0Closed": false
   },
   "b4003ScopedRelatedReadStaging": {
-    "status": "READONLY_LIST_OPTIMIZED_NOT_DEPLOYED_PENDING_EMULATOR",
+    "status": "OPTIMIZED_SERVER_SCOPED_LIST_EMULATOR_PASS_BROWSER_PENDING",
     "scope": [
       "clientes",
       "vehiculos",
@@ -9889,7 +9889,7 @@
       "completeCollectionList": false
     },
     "listQa": {
-      "status": "SOURCE_CHANGED_RETEST_PENDING",
+      "status": "OPTIMIZED_SOURCE_EMULATOR_PASS_PREVIEW_PENDING",
       "assertionsExpected": 15,
       "testBlobSha": "44ca1c81ff3f4dd108cb1ddc692537334507b7f6",
       "clientIntegrated": false,
@@ -9897,20 +9897,21 @@
       "previewCertified": false,
       "previousFailureRunId": 38453768094,
       "previousFailureCause": "DUPLICATE_LOCAL_LIST_IDENTIFIER_QA_ONLY",
-      "testRunId": 38454052527,
-      "testJobId": 115492064785,
+      "testRunId": 38456016801,
+      "testJobId": 115498815103,
       "testConclusion": "success",
-      "assertionsPass": null,
-      "cumulativeIsolatedAssertionsPass": null,
-      "proofPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_SCOPED_LIST_EMULATOR_PROOF_20261013.json",
-      "proofBlobSha": "1938d69a1b4e2d247d25e9c92f3aacc4c249be35",
-      "readbackPending": true,
+      "assertionsPass": 15,
+      "cumulativeIsolatedAssertionsPass": 51,
+      "proofPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_OPTIMIZED_SCOPED_LIST_EMULATOR_PROOF_20261013.json",
+      "proofBlobSha": "3ea857674d6eb3df110a651fb850019783c2e7ab",
+      "readbackPending": false,
       "priorTest": {
         "runId": 38454052527,
         "assertions": 51,
         "sourceBlobSha": "e9821f2d2c8c4dd83e14a0ba39065a840beab6fc"
       },
-      "sourceToTestBlobSha": "930a592e7d9b103da03464f0568ce6c1613bbab7"
+      "sourceToTestBlobSha": "930a592e7d9b103da03464f0568ce6c1613bbab7",
+      "performanceBenchmarkPending": true
     }
   }
 }
