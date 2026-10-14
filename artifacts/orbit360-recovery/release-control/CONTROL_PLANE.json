@@ -4869,8 +4869,8 @@
       "entryGuardReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_ENTRY_GUARD_PASS_20261002.json",
       "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
       "executionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B4_EXECUTION_LOCK_20261002.json",
-      "executionLockBlobSha": "807fc4672af4cb7c36dfa93993280bfa26a3f2a1",
-      "compositionLockBlobSha": "a51d33c3ecebec6b01e971de89f1a365d03ab09c",
+      "executionLockBlobSha": "f19d47fd73ef4a20410a24b8350194406ca2ce33",
+      "compositionLockBlobSha": "06fbb74226adffccb97d7a56356face9d66dbd69",
       "findingLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
       "activeFindingId": "B4-003",
       "productSourceSha": "c603fd3561e7229d9359db45495d4cf2d757cd8f",
@@ -5996,7 +5996,7 @@
   "canonicalAccumulationControl": {
     "status": "FROZEN_ACTIVE",
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "compositionLockBlobSha": "aed32f6adf4d64ad3909f062d0fe8b57aad201f3",
+    "compositionLockBlobSha": "06fbb74226adffccb97d7a56356face9d66dbd69",
     "findingLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
     "findingLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
@@ -6312,8 +6312,8 @@
     "status": "B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL",
     "activeFindingId": "B4-003",
     "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
-    "executionLockBlobSha": "807fc4672af4cb7c36dfa93993280bfa26a3f2a1",
-    "compositionLockBlobSha": "a51d33c3ecebec6b01e971de89f1a365d03ab09c",
+    "executionLockBlobSha": "f19d47fd73ef4a20410a24b8350194406ca2ce33",
+    "compositionLockBlobSha": "06fbb74226adffccb97d7a56356face9d66dbd69",
     "findingLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
     "noLive": true,
     "noReimport": true,
@@ -10585,7 +10585,7 @@
     ]
   },
   "b4003LegacyWorkflowCountrySourceStage20261014": {
-    "status": "GIT_BLOB_STAGED_NOT_IN_CANDIDATE_P0_TEST_EXPECTED_FAIL",
+    "status": "SOURCE_PATCH_COMMITTED_QA_PENDING_NO_DEPLOY",
     "gate": "I6.5/B4-003",
     "existingFindingId": "B4-003-P0-20261012-PERSONAL-COLLECTION",
     "relatedModules": [
@@ -10605,9 +10605,9 @@
       "path": "functions/b4-003-scoped-related-reader.js",
       "fromBlob": "20569cfb3890f37a3e0c2cdf6faf79bbfa10062f",
       "toGitBlob": "5323126db9d4fadbf5c3bf7fae62ba1e9676f905",
-      "committedIntoBranch": false,
-      "productSourceChanged": false,
-      "compositionChanged": false,
+      "committedIntoBranch": true,
+      "productSourceChanged": true,
+      "compositionChanged": true,
       "backendDeployed": false,
       "immutableExistingPreviewPreserved": true,
       "compatibleBoundedReadMax": 250
@@ -10617,7 +10617,7 @@
       "blobSha": "a07fedf9053f23d5d837bd4590604e55a52b57f9",
       "commitSha": "699e48f96f484c88e2cd7c4c1e9bd882feaf72c0",
       "pass": false,
-      "realGithubRunnerOutcome": "NOT_YET_VERIFIED",
+      "realGithubRunnerOutcome": "PENDING_GUARD_RUN",
       "expectedCause": "MISSING_COUNTRY_EARLY_FIRESTORE_FILTER"
     },
     "requiredAtomicIntegration": [
@@ -10634,6 +10634,10 @@
     "productionPromotionAuthorized": false,
     "noNewIteration": true,
     "noNewBranch": true,
-    "noReimport": true
+    "noReimport": true,
+    "scopedAuthority": "CURRENT_USER_REQUESTED_CAUSAL_B4_003_INTERVENTION",
+    "sourceMutationScopedOnly": true,
+    "scopedAuthorizationLockBlobSha": "f19d47fd73ef4a20410a24b8350194406ca2ce33",
+    "canonicalCompositionBlobSha": "06fbb74226adffccb97d7a56356face9d66dbd69"
   }
 }

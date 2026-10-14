@@ -90,6 +90,65 @@ async function readScopedRelatedList({db,auth,request}){
  const ctx=resolve({auth,member:ms.data()||{},config:cs.exists?cs.data()||{}:{},
    tenantId,activeRole:role,country,collection:coll});
  const target=tenant.collection('data').doc(coll).collection('items');
+ // B4_003_LEGACY_WORKFLOW_DERIVED_COUNTRY:
+ // For the currently bounded historical Ops/Leads universe, country-less
+ // records cannot match an indexed Firestore where('pais','==',country).
+ // Resolve ONLY verifiable canonical parent relationships on the server.
+ // Do not repair historical records or grant broader permissions.
+ if(workflowCollections.has(coll)){
+   if(policyId||hasBatch)throw new Denied('POLICY_ANCHOR_UNEXPECTED');
+   const MAX_LEGACY_WORKFLOW_ROWS=250;
+   const all=await target.orderBy('__name__').limit(MAX_LEGACY_WORKFLOW_ROWS+1).get();
+   const docs=Array.isArray(all.docs)?all.docs:[];
+   if(docs.length>MAX_LEGACY_WORKFLOW_ROWS)throw new Denied('WORKFLOW_LEGACY_SCAN_BOUND_EXCEEDED');
+   async function authorize(d){
+     const row=d.data()||{};
+     const presentCountry=clean(row.pais||row.country).toUpperCase();
+     if(presentCountry&&presentCountry!==country)return null;
+     const absentCountry=!presentCountry;
+     const absentAdvisor=!clean(row.asesorId||row.advisorId||row.ownerAdvisorId);
+     let parent=null;
+     if(absentCountry||absentAdvisor){
+       const pid=clean(row.polizaId||row.policyId);
+       const cid=clean(row.clienteId||row.clientId);
+       if(pid){
+         const p=await docRef(tenant,'polizas',safeId(pid,'POLICY')).get();
+         if(!p.exists)return null;
+         const policy=p.data()||{};
+         if(cid&&clean(policy.clienteId)&&cid!==clean(policy.clienteId))return null;
+         parent=policy;
+       }
+       if(!parent&&cid){
+         const c=await docRef(tenant,'clientes',safeId(cid,'CLIENT')).get();
+         if(!c.exists)return null;
+         parent=c.data()||{};
+       }
+     }
+     if(absentCountry&&!parent)return null;
+     try{allowRow(ctx,row,parent?[parent]:[]);}catch(e){
+       if(e instanceof Denied)return null;
+       throw e;
+     }
+     return Object.assign({},row,{
+       id:row.id||d.id,canonicalDocumentId:d.id,
+       pais:clean(row.pais||row.country||parent?.pais||parent?.country),
+       tenantId:row.tenantId||tenantId
+     });
+   }
+   const filtered=[];
+   // Prevent uncontrolled parallel reads when 250 historical records need FKs.
+   for(let offset=0;offset<docs.length;offset+=10){
+     const batch=await Promise.all(docs.slice(offset,offset+10).map(authorize));
+     filtered.push(...batch.filter(Boolean));
+   }
+   const index=cursor?filtered.findIndex(x=>x.canonicalDocumentId===cursor):-1;
+   if(cursor&&index<0)throw new Denied('CURSOR_DENIED');
+   const rows=filtered.slice(index+1,index+1+pageSize);
+   const nextCursor=filtered.length>index+1+pageSize?
+     rows[rows.length-1].canonicalDocumentId:null;
+   return {ok:true,serverScoped:true,collection:coll,country,scope:ctx.scope,
+     rows,nextCursor,anchoring:'verified_server_country_or_canonical_parent'};
+ }
  let query,policy=null,client=null;
  const verifiedParents=new Map();
  if(coll==='clientes'||workflowCollections.has(coll)){

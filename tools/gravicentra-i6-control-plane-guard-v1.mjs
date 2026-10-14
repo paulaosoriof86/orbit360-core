@@ -98,6 +98,24 @@ if(String(C.i65ForensicRemediationPlan?.currentBlock||'')==='B4' &&
    rtext.includes('allow read, write: if isTenantMember(tenantId);'),
    'I65_B4_003_SECURITY_SOURCE_RULES_CHANGED_WITHOUT_NEW_GATE');
  console.log('SECURITY_RELEASE_HOLD=ACTIVE_FAIL_CLOSED');
+ const scoped=C.b4003LegacyWorkflowCountrySourceStage20261014;
+ if(scoped?.status==='SOURCE_PATCH_COMMITTED_QA_PENDING_NO_DEPLOY'){
+   const exact=B4.b4003LegacyWorkflowCountryExactSourceAuthorization20261014||{};
+   const owner='functions/b4-003-scoped-related-reader.js';
+   need(exact.mode==='SCOPED_SOURCE_PATCH_ONLY_GENERAL_MUTATION_AND_RELEASE_STILL_HOLD' &&
+     exact.file===owner && exact.fromBlob==='20569cfb3890f37a3e0c2cdf6faf79bbfa10062f' &&
+     exact.toBlob===git('hash-object',owner) &&
+     COMP.productFileBlobs?.[owner]===exact.toBlob &&
+     scoped.stagedCandidate?.toGitBlob===exact.toBlob &&
+     scoped.stagedCandidate?.committedIntoBranch===true &&
+     scoped.stagedCandidate?.backendDeployed===false &&
+     scoped.productionPromotionAuthorized===false &&
+     scoped.firestoreRulesDeploymentAuthorized===false &&
+     B4.boundaries?.productMutationAuthorized===false &&
+     hold.productSourceWritesAuthorized===false,
+     'I65_B4_003_SCOPED_SOURCE_AUTHORIZATION_DRIFT');
+   console.log('B4_003_SCOPED_SOURCE_PATCH=QA_PENDING_NOT_RELEASE_ACCEPTED');
+ }
  console.log('B4_003_P0_STILL_OPEN=6');
 }
 const P=readJson(DATA_UPDATE_PLAN),D=readJson(DATA_UPDATE_DISCIPLINE),RGT=readJson(DATA_UPDATE_REGISTRY),SRC=readJson(ACTIVE_SOURCE_INTAKE),SRC3=readJson(I63_SOURCE),R63=readJson(I63_RECEIPT),SRC4=readJson(I64_SOURCE),R64=readJson(I64_RECEIPT),SRC5=readJson(I65_SOURCE),SYNC5=readJson(I65_SYNC);

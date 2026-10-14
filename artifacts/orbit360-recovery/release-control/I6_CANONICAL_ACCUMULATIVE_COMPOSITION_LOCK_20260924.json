@@ -256,7 +256,7 @@
     "orbit360-platform/modules/comparativo.js": "982881a4c1e2f95be95428bd3f9f23360a9a2d5f",
     "functions/b4-003-scoped-policy-reader.js": "4181f6198c0163175579a2cc19197ebc63d9b328",
     "functions/b4-003-scoped-policy-callable.js": "8b468150003fe812d9e1d0763120f2b31f1df75f",
-    "functions/b4-003-scoped-related-reader.js": "20569cfb3890f37a3e0c2cdf6faf79bbfa10062f",
+    "functions/b4-003-scoped-related-reader.js": "5323126db9d4fadbf5c3bf7fae62ba1e9676f905",
     "functions/b4-003-scoped-bootstrap-reader.js": "e73b922173733b2c96693603d6035bfb3b31fa79"
   },
   "evidence": {
@@ -5484,5 +5484,19 @@
     "securityPathsUnchanged": true,
     "operationalWrites": 0,
     "livePromotion": false
+  },
+  "b4003LegacyWorkflowCountryExactSourcePatch20261014": {
+    "status": "SOURCE_CHANGED_NO_PREVIEW_ACCEPTANCE",
+    "owner": "functions/b4-003-scoped-related-reader.js",
+    "fromBlob": "20569cfb3890f37a3e0c2cdf6faf79bbfa10062f",
+    "toBlob": "5323126db9d4fadbf5c3bf7fae62ba1e9676f905",
+    "correction": "VERIFIED_CANONICAL_PARENT_COUNTRY_ONLY",
+    "scope": "EXACT_B4_003_CUMULATIVE_SOURCE",
+    "maxHistoryRows": 250,
+    "qaPending": true,
+    "noSchemaMigration": true,
+    "noRulesDeployment": true,
+    "noLivePromotion": true,
+    "noRealWrites": true
   }
 }

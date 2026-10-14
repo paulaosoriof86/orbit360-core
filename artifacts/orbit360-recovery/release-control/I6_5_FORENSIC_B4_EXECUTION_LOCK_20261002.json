@@ -2300,5 +2300,37 @@
     "findingId": "B4-003-P0-20261012-PERSONAL-COLLECTION",
     "priorAcceptedVisual": "PRESERVED",
     "pendingFunctionalPass": true
+  },
+  "b4003LegacyWorkflowCountryExactSourceAuthorization20261014": {
+    "gate": "I6.5/B4-003",
+    "mode": "SCOPED_SOURCE_PATCH_ONLY_GENERAL_MUTATION_AND_RELEASE_STILL_HOLD",
+    "approvedFor": "CURRENT_USER_REQUESTED_CAUSAL_B4_003_INTERVENTION",
+    "file": "functions/b4-003-scoped-related-reader.js",
+    "fromBlob": "20569cfb3890f37a3e0c2cdf6faf79bbfa10062f",
+    "toBlob": "5323126db9d4fadbf5c3bf7fae62ba1e9676f905",
+    "finding": "B4-003-P0-20261012-PERSONAL-COLLECTION",
+    "cause": "COUNTRY_FILTER_BEFORE_CANONICAL_PARENT_RESOLUTION",
+    "qaPath": "tools/gravicentra-b4-003-scoped-related-reader.test.cjs",
+    "qaBlob": "a07fedf9053f23d5d837bd4590604e55a52b57f9",
+    "maxHistoricalRows": 250,
+    "serverChecks": [
+      "TENANT",
+      "COUNTRY",
+      "ROLE",
+      "ADVISOR",
+      "PARENT_ID",
+      "SCOPE"
+    ],
+    "productSourceChange": true,
+    "runtimeAcceptance": false,
+    "previewPassed": false,
+    "backendDeployed": false,
+    "firestoreRulesDeployed": false,
+    "livePromoted": false,
+    "realWrites": 0,
+    "reimport": false,
+    "status": "SCOPED_CORRECTION_COMMITTED_PENDING_QA",
+    "globalProductMutationAuthorized": false,
+    "allOtherProductOwnersFrozen": true
   }
 }
