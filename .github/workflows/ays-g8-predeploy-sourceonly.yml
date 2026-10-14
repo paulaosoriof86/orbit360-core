@@ -1,0 +1,77 @@
+# G8 immutable evidence + byte verification only. No deploy or write permissions.
+name: AYS G8 Portal/Siniestros Hosting source-only predeploy gate
+on:
+  push:
+    branches:
+      - audit/ays-g4-shared-hosting-sourceonly-20261013
+    paths:
+      - '.github/workflows/ays-g8-predeploy-sourceonly.yml'
+      - 'tools/ays-g8/**'
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: ays-g8-hosting-sourceonly
+  cancel-in-progress: false
+jobs:
+  verify-source-and-live-critical:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Download immutable G4 evidence (run 38469690277)
+        uses: actions/download-artifact@v4
+        with:
+          artifact-ids: '11851102002'
+          run-id: '38469690277'
+          github-token: ${{ github.token }}
+          path: ${{ runner.temp }}/g8-g4
+      - name: Download immutable G7 read-only Hosting evidence (run 38582624499)
+        uses: actions/download-artifact@v4
+        with:
+          artifact-ids: '11903532229'
+          run-id: '38582624499'
+          github-token: ${{ github.token }}
+          path: ${{ runner.temp }}/g8-g7
+      - name: Fetch frozen Git source commits
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch --no-tags origin f873ce1f2b55dc5ad8cac07b58be43faddeb0a99 1623cac977498bb5bba0092748a8c70a9cd06189
+          git cat-file -e 'f873ce1f2b55dc5ad8cac07b58be43faddeb0a99^{commit}'
+          git cat-file -e '1623cac977498bb5bba0092748a8c70a9cd06189^{commit}'
+      - name: Rebuild exact G4 candidate outside repository without deploy
+        shell: bash
+        run: |
+          set -euo pipefail
+          python tools/ays-g4/AYS_G4_ENSAMBLADOR_HOSTING_READONLY.py --repo "$GITHUB_WORKSPACE" --out "$RUNNER_TEMP/g8-staged" --expected-count 2706
+      - name: G8 15/15 negative tests, source byte hashes and public static readback
+        shell: bash
+        run: |
+          set -euo pipefail
+          python tools/ays-g8/G8_RECOVERY_GATE.py \
+            --g4-dir "$RUNNER_TEMP/g8-g4/ays-g4-source-manifest" \
+            --g7-dir "$RUNNER_TEMP/g8-g7/ays-g7-firebase-lab-readonly-evidence" \
+            --staged-dir "$RUNNER_TEMP/g8-staged/candidate" \
+            --selftest \
+            --public-smoke \
+            --out "$RUNNER_TEMP/g8-evidence/G8_SOURCE_ONLY_RECEIPT.json"
+      - name: Upload source-only sanitized gate evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ays-g8-predeploy-sourceonly
+          path: |
+            ${{ runner.temp }}/g8-evidence/G8_SOURCE_ONLY_RECEIPT.json
+            ${{ runner.temp }}/g8-staged/SOURCE_ASSEMBLY_RECEIPT.json
+          if-no-files-found: warn
+          retention-days: 15
+# No Firebase credentials, Firebase CLI, application data writes, merge, or deployment.
+# Source-to-Hosting byte equivalence for all 963 common files is NOT certified here.
+# Legacy full-Hosting publishers still require separate owner-authorized governance.
