@@ -66,7 +66,7 @@ jobs:
           set -euo pipefail
           python tools/ays-g8/G8_RECOVERY_GATE.py \
             --g4-dir "$RUNNER_TEMP/g8-g4/ays-g4-source-manifest" \
-            --g7-dir "$RUNNER_TEMP/g8-g7/ays-g7-firebase-lab-readonly-evidence" \
+            --g7-dir "$RUNNER_TEMP/g8-g7" \
             --staged-dir "$RUNNER_TEMP/g8-staged/candidate" \
             --selftest \
             --public-smoke \
