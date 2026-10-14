@@ -61,6 +61,19 @@ fs.writeFileSync(path.join(EVIDENCE,'reachable-files.txt'),[...seen].sort().join
 
 function copyTree(src,dst){for(const e of fs.readdirSync(src,{withFileTypes:true})){if(e.name==='node_modules'||e.name==='.git'||e.name.endsWith('.local'))continue;const a=path.join(src,e.name),b=path.join(dst,e.name);if(e.isDirectory()){fs.mkdirSync(b,{recursive:true});copyTree(a,b);}else if(e.isFile()){fs.mkdirSync(path.dirname(b),{recursive:true});fs.copyFileSync(a,b);}}}
 copyTree(FUNCTIONS_SRC,BACKEND);
+// B4-003 explicit authorization: compose the staged callable exclusively during
+// the isolated Preview build, prior to the immutable bundle hash. No LIVE export.
+const SCOPED_PREVIEW=process.env.GRAVICENTRA_B4_003_SCOPED_PREVIEW==='true';
+if(SCOPED_PREVIEW){
+ if(RELEASE_GATE!=='I6.5-B4-003'||BUILD_PREFIX!=='gi-i65-b4'||!ENVIRONMENT_REF.includes('preview'))
+  throw new Error('B4_003_SCOPED_PREVIEW_BOUNDARY_DENIED');
+ const entry=path.join(BACKEND,'bootstrap.js');
+ const base=read(entry);
+ if(base.includes('b4-003-scoped-policy-callable'))throw new Error('B4_003_SCOPED_EXPORT_DUPLICATE');
+ fs.writeFileSync(entry,base+'\n// Authorized B4-003 Preview-only protected reader export.\nObject.assign(module.exports,require(\'./b4-003-scoped-policy-callable\'));\n');
+ fs.writeFileSync(path.join(EVIDENCE,'scoped-preview-authorization.json'),JSON.stringify({gate:RELEASE_GATE,onlyExport:'orbit360ScopedPolicyReadPreview',sourceOnlyStaged:true,sharedRulesDeploy:false,livePromotion:false,realDataWrites:0})+'\n');
+}
+
 
 /* Private, five-file allowlist. Never serve role-restricted HTML from Hosting. */
 const academyFiles=['manual-maestro.html','capacitacion-tecnica-interna.html','capacitacion-crm.html','manual-integraciones.html','comparativa-ia.html'];
@@ -87,7 +100,7 @@ if(cfg.projectId!==PROJECT_ID)throw new Error('PUBLIC_FIREBASE_PROJECT_MISMATCH'
 const canonical=Object.fromEntries(['apiKey','authDomain','projectId','appId','storageBucket'].map(k=>[k,cfg[k]||'']));
 const cfgHash=crypto.createHash('sha256').update(JSON.stringify(Object.fromEntries(Object.entries(canonical).sort()))).digest('hex');
 const buildId=`${BUILD_PREFIX}-${SOURCE_SHA.slice(0,12)}-${cfgHash.slice(0,12)}`;
-const payload={enabled:true,environmentRef:ENVIRONMENT_REF,tenantHint:TENANT_HINT,projectId:cfg.projectId,authDomain:cfg.authDomain,appId:cfg.appId,apiKey:cfg.apiKey,storageBucket:cfg.storageBucket||'',buildId,sourceSha:SOURCE_SHA,hydrationContractVersion:'fase-a-i2-20260919.5-team-canonical-required',hydrationContractSource:'recovery/fase-a-clean-20260831',requiredCollections:['clientes','polizas','cobros','aseguradoras','vehiculos','recibosEsperados','carteraPrimas','asesores'],optionalCollections:['estadosCuentaAseguradora','recibosAseguradora','conciliacionesPrimas','conciliaciones','metas','negocios','gestiones','reclamos','comisiones','cancelaciones','auditoria']};
+const payload={scopedReadPreviewCandidate:SCOPED_PREVIEW,enabled:true,environmentRef:ENVIRONMENT_REF,tenantHint:TENANT_HINT,projectId:cfg.projectId,authDomain:cfg.authDomain,appId:cfg.appId,apiKey:cfg.apiKey,storageBucket:cfg.storageBucket||'',buildId,sourceSha:SOURCE_SHA,hydrationContractVersion:'fase-a-i2-20260919.5-team-canonical-required',hydrationContractSource:'recovery/fase-a-clean-20260831',requiredCollections:['clientes','polizas','cobros','aseguradoras','vehiculos','recibosEsperados','carteraPrimas','asesores'],optionalCollections:['estadosCuentaAseguradora','recibosAseguradora','conciliacionesPrimas','conciliaciones','metas','negocios','gestiones','reclamos','comisiones','cancelaciones','auditoria']};
 fs.writeFileSync(path.join(SITE,'product-runtime-config.js'),'/* Generated only inside the certified I6.1 successor artifact. Public Firebase Web config; no secrets. */\nwindow.__ORBIT360_PRODUCT_PUBLIC_CONFIG__ = Object.freeze('+JSON.stringify(payload)+');\n');
 fs.mkdirSync(path.join(SITE,'__recovery__'),{recursive:true});fs.writeFileSync(path.join(SITE,'__recovery__/build.json'),JSON.stringify({product:'Gravicentra Insurance',gate:RELEASE_GATE,sourceSha:SOURCE_SHA,buildId,environmentRef:ENVIRONMENT_REF})+'\n');
 fs.writeFileSync(path.join(EVIDENCE,'public-config-descriptor.json'),JSON.stringify({projectId:cfg.projectId,authDomain:cfg.authDomain,appIdPresent:true,apiKeyPresent:true,storageBucketPresent:!!cfg.storageBucket,configSha256:cfgHash})+'\n');
