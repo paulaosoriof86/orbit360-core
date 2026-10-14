@@ -22,11 +22,20 @@ CO:[{id:'p3',canonicalDocumentId:'p3',tenantId:tenant,pais:'CO',asesorId:'a1'}]}
 const relatedFixtures={GT:[{id:'r1',canonicalDocumentId:'r1',tenantId:tenant,pais:'GT',polizaId:'p1'},
 {id:'r2',canonicalDocumentId:'r2',tenantId:tenant,pais:'GT',polizaId:'p2'}],
 CO:[{id:'r3',canonicalDocumentId:'r3',tenantId:tenant,pais:'CO',polizaId:'p3'}]};
+const insurerFixtures={
+ GT:[{id:'iGT',canonicalDocumentId:'iGT',tenantId:tenant,pais:'GT',nombre:'Aseguradora GT'}],
+ CO:[{id:'iCO',canonicalDocumentId:'iCO',tenantId:tenant,pais:'CO',nombre:'Aseguradora CO'}]
+};
+const advisorFixtures={
+ GT:[{id:'a1',canonicalDocumentId:'a1',tenantId:tenant,pais:'GT',paises:['GT','CO'],asesorId:'a1'},
+     {id:'a2',canonicalDocumentId:'a2',tenantId:tenant,pais:'GT',paises:['GT'],asesorId:'a2'}],
+ CO:[{id:'a1',canonicalDocumentId:'a1',tenantId:tenant,pais:'CO',paises:['GT','CO'],asesorId:'a1'}]
+};
 const deps={db:{},collection:()=>{direct++;throw Error('DIRECT_READ_USED');},
 onSnapshot:()=>{direct++;throw Error('DIRECT_LISTENER_USED');},getDocsFromServer:()=>{direct++;throw Error('DIRECT_GET_USED');},
 protectedReadPage:async req=>{
  calls.push({...req});
- const source=(req.collection==='polizas'?policyFixtures:req.collection==='recibosEsperados'?relatedFixtures:dataset);
+ const source=(req.collection==='polizas'?policyFixtures:req.collection==='recibosEsperados'?relatedFixtures:req.collection==='aseguradoras'?insurerFixtures:req.collection==='asesores'?advisorFixtures:dataset);
  const visiblePolicyIds=(policyFixtures[req.country]||[]).filter(x=>req.activeRole==='operativo'||x.asesorId==='a1').map(x=>x.id);
  const visible=(source[req.country]||[]).filter(x=>(req.activeRole==='operativo'||x.asesorId==='a1'||req.collection==='recibosEsperados'&&visiblePolicyIds.includes(x.polizaId))
    &&(!Array.isArray(req.policyIds)||req.policyIds.includes(x.polizaId))&&(!req.policyId||req.policyId===x.polizaId));
@@ -42,20 +51,22 @@ const config=collections=>({tenantId:tenant,collections,requiredCollections:[col
  protectedReadCandidate:true,paths,queryPlanner:()=>({ok:true,constraints:[{field:'tenantId',op:'==',value:tenant}]})});
 const pause=()=>new Promise(ok=>setTimeout(ok,30));
 (async()=>{
- // All eight canonical startup collections must be supported before any
- // protected query begins; partial authorization is not readiness.
+ // Exactly eight required collections, no direct Firestore fallback.
+ // A single advisor belongs to GT and CO: duplicate canonical ID must merge
+ // across countries but must never survive twice within one country.
+ role='operativo';
  const allRequired=['clientes','polizas','cobros','aseguradoras','vehiculos','recibosEsperados','carteraPrimas','asesores'];
  const allConfig=config(allRequired);allConfig.requiredCollections=allRequired;
- const beforeCalls=calls.length;
- const incomplete=win.Orbit.createFirestoreProductReadOnlyStoreP0(deps,allConfig);
- assert.equal(incomplete._attachSnapshots(),false);
- assert.equal(incomplete._productStatus().status,'blocked-protected-incomplete');
- assert.equal(incomplete._productStatus().snapshotErrors.__startup,
-  'PROTECTED_READ_REQUIRED_COLLECTIONS_UNSUPPORTED:aseguradoras,asesores');
+ const startup=win.Orbit.createFirestoreProductReadOnlyStoreP0(deps,allConfig);
+ assert.equal(startup._attachSnapshots(),true);
  await pause();
- assert.equal(calls.length,beforeCalls);
- assert.deepEqual(Array.from(incomplete.all('polizas')),[]);
- console.log('B4_003_REQUIRED_EIGHT_BOOTSTRAP_FAIL_CLOSED checks=5 zero_partial_reads');
+ assert.ok(allRequired.every(name=>startup._productStatus().serverConfirmedCollections.includes(name)),
+   'ALL_EIGHT_REQUIRE_AUTHORITATIVE_SERVER_RESPONSE');
+ assert.deepEqual(Array.from(startup.all('aseguradoras'),x=>x.id),['iGT','iCO']);
+ assert.deepEqual(Array.from(startup.all('asesores'),x=>x.id),['a1','a2']);
+ assert.equal(direct,0);
+ console.log('B4_003_PROTECTED_EIGHT_REQUIRED_COLLECTIONS_QA_PASS checks=5 no_direct_firestore multi_country_advisor_merged');
+ role='asesor';
  const store=win.Orbit.createFirestoreProductReadOnlyStoreP0(deps,config(['clientes']));
  assert.equal(store._attachSnapshots(),true);await pause();
  assert.deepEqual(Array.from(store.all('clientes'),x=>x.id),['c1','c3']);

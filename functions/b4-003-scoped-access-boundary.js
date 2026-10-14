@@ -6,7 +6,7 @@ const uniq=a=>[...new Set((Array.isArray(a)?a:a==null?[]:[a]).map(clean).filter(
 const order={none:0,own:1,team:2,all:3};
 const full=new Set(['operativo','admin','admintenant','admin_tenant','superadmin','super_admin','direccion']);
 const self=new Set(['asesor','comercial']);
-const modules={clientes:'cliente360',polizas:'polizas',vehiculos:'polizas',recibosEsperados:'recibos',carteraPrimas:'cobros',cobros:'cobros',negocios:'leads',gestiones:'ops',metas:'inicio',aseguradoras:'aseguradoras'};
+const modules={clientes:'cliente360',polizas:'polizas',vehiculos:'polizas',recibosEsperados:'recibos',carteraPrimas:'cobros',cobros:'cobros',negocios:'leads',gestiones:'ops',metas:'inicio',asesores:'inicio',aseguradoras:'aseguradoras'};
 class Denied extends Error{constructor(code){super(code);this.code=code;}}
 const deny=code=>{throw new Denied(code);};
 const get=(o,k)=>{const key=Object.keys(o||{}).find(v=>norm(v)===norm(k));return key===undefined?undefined:o[key];};

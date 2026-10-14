@@ -92,7 +92,7 @@
       }
       var initialRole=role(),rows=[],seen=new Set();
       return countries.reduce(function(pr,country){return pr.then(function(){
-        var cursor='',pages=0;
+        var cursor='',pages=0,countrySeen=new Set();
         function next(){
           if(epoch!==protectedEpoch||role()!==initialRole)throw new Error('PROTECTED_READ_CONTEXT_CHANGED');
           if(++pages>100)throw new Error('PROTECTED_READ_PAGE_LIMIT');
@@ -103,11 +103,14 @@
                 throw new Error('PROTECTED_READ_RESPONSE_INVALID');
               r.rows.forEach(function(x){
                 var id=text(x&&x.canonicalDocumentId||x&&x.id);
-                if(!id||seen.has(id))throw new Error('PROTECTED_READ_DUPLICATE_OR_MISSING_ID');
+                if(!id||countrySeen.has(id)||(seen.has(id)&&collection!=='asesores'))
+                  throw new Error('PROTECTED_READ_DUPLICATE_OR_MISSING_ID');
                 if(text(x.tenantId)&&text(x.tenantId)!==state.tenantId)
                   throw new Error('PROTECTED_READ_TENANT_MISMATCH');
                 if(text(x.pais||x.country).toUpperCase()!==country)
                   throw new Error('PROTECTED_READ_COUNTRY_MISMATCH');
+                countrySeen.add(id);
+                if(seen.has(id))return; // One advisor may serve both authorized countries.
                 seen.add(id);rows.push(x);
               });
               if(!r.nextCursor)return;
@@ -166,7 +169,7 @@
       if(plan.hardError)throw new Error('PROTECTED_READ_PLAN_DENIED');
       if(plan.denied){if(state.deniedCollections.indexOf(collection)<0)state.deniedCollections.push(collection);return false;}
       var related=['vehiculos','recibosEsperados','carteraPrimas','cobros'].indexOf(collection)>=0;
-      if(!related&&collection!=='clientes'&&collection!=='polizas')
+      if(!related&&collection!=='clientes'&&collection!=='polizas'&&collection!=='aseguradoras'&&collection!=='asesores')
         throw new Error('PROTECTED_READ_COLLECTION_UNSUPPORTED_'+collection);
       var epoch=protectedEpoch;
       Promise.resolve().then(function(){return related?protectedRelatedUniverse(collection,epoch):protectedLoad(collection,'',epoch);})
@@ -220,7 +223,7 @@
       // Preflight the complete required collection set before fetching any
       // protected data. A six-of-eight bootstrap is never an accepted startup.
       if(protectedMode){
-        var supported=new Set(['clientes','polizas','vehiculos','recibosEsperados','carteraPrimas','cobros']);
+        var supported=new Set(['clientes','polizas','vehiculos','recibosEsperados','carteraPrimas','cobros','aseguradoras','asesores']);
         var unsupported=startupCollections.filter(function(name){return !supported.has(name);});
         if(unsupported.length){
           state.status='blocked-protected-incomplete';

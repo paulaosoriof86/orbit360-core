@@ -5996,7 +5996,7 @@
   "canonicalAccumulationControl": {
     "status": "FROZEN_ACTIVE",
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "compositionLockBlobSha": "9fd531e052fdbb330d798ff955e83a25131e84eb",
+    "compositionLockBlobSha": "915648c6eca64c7e5ca1289c055fb03cb841f6e7",
     "findingLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
     "findingLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
@@ -10333,5 +10333,40 @@
     "firestoreRulesDeployed": false,
     "livePromotion": false,
     "operationalWrites": 0
+  },
+  "b4003ProtectedDirectory20261014": {
+    "status": "SOURCE_STAGED_SYNTHETIC_QA_ONLY_PREVIEW_PENDING",
+    "gate": "I6.5/B4-003",
+    "findingId": "B4-003-P0-20261012-PERSONAL-COLLECTION",
+    "sourceFiles": {
+      "functions/b4-003-scoped-bootstrap-reader.js": "381d7de300e4b57e41d53dceac70b49c90aa7cd2",
+      "functions/b4-003-scoped-access-boundary.js": "800296064056bd3048cf5dcc63872fee77abc31c",
+      "functions/b4-003-scoped-policy-callable.js": "8b468150003fe812d9e1d0763120f2b31f1df75f",
+      "orbit360-platform/core/product-runtime-browser-providers-p0.js": "aa35684ff95c01ca3c7b882ca27e43ceae5cd097",
+      "orbit360-platform/data/store-firestore-product-readonly-p0.js": "836588eddb263b4e4b5f947569e5f69d1eb24e76"
+    },
+    "qaFiles": {
+      "tools/gravicentra-b4-003-scoped-bootstrap-reader.test.cjs": "1a80c43be9c9affeb5cbd143a0c18f15d5dc1d86",
+      "tools/gravicentra-b4-003-protected-hydration.test.cjs": "4dcdb4840500a8667bb3c6af51959e97688bfb8b"
+    },
+    "authorizationScope": "CONTINUE_CURRENT_B4_003_PROTECTED_READER_SOURCE_ONLY",
+    "qaServerChecks": 34,
+    "qaClientExpectedChecks": 5,
+    "qaServerExecution": "LOCAL_SYNTHETIC_RUNTIME_PASS",
+    "qaClientExecution": "PENDING_GITHUB_RUNNER",
+    "remainingBlockers": [
+      "AUTHENTICATED_SERVER_PREVIEW_SCOPE_POSITIVE_AND_NEGATIVE",
+      "ROLE_AWARE_REQUIRED_COLLECTION_CONTRACT",
+      "PREVIEW_FUNCTION_EXPORT_AND_BUILD_FLAG_EXPLICIT_AUTHORITY",
+      "SHARED_FIRESTORE_RULES_DEPLOY_EXPLICIT_AUTHORITY",
+      "SAME_ARTIFACT_HUMAN_VISUAL_AND_LIVE_PROOF"
+    ],
+    "firebaseExported": false,
+    "firestoreRulesDeployed": false,
+    "productionChanged": false,
+    "operationalWrites": 0,
+    "noReimport": true,
+    "securityP0Closed": false,
+    "previousAcceptedProductionPreserved": true
   }
 }

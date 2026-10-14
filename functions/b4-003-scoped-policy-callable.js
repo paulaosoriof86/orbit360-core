@@ -8,7 +8,7 @@ const {HttpsError,onCall}=require('firebase-functions/v2/https');
 const {scopedPolicyRead}=require('./b4-003-scoped-policy-reader');
 const {readScopedRelatedDocument,readScopedRelatedList}=require('./b4-003-scoped-related-reader');
 const {Denied}=require('./b4-003-scoped-access-boundary');
-const {readBootstrap}=require('./b4-003-scoped-bootstrap-reader');
+const {readBootstrap,readProtectedDirectory}=require('./b4-003-scoped-bootstrap-reader');
 const REGION='us-east1';
 const db=getFirestore(getApps()[0]||initializeApp());
 async function handle(request){
@@ -20,6 +20,8 @@ async function handle(request){
     const bootstrap=['bootstrap-membership','bootstrap-tenant-config'].includes(sourceRequest.mode);
     const result=bootstrap
       ? await readBootstrap({db,auth:request.auth,request:sourceRequest})
+      : ['aseguradoras','asesores'].includes(selectedCollection)
+        ? await readProtectedDirectory({db,auth:request.auth,request:sourceRequest})
       : selectedCollection==='polizas'
         ? await scopedPolicyRead({db,auth:request.auth,request:sourceRequest})
         : sourceRequest.mode==='list'
