@@ -9,6 +9,7 @@ on:
       - '.github/workflows/gravicentra-b4-003-readonly-diagnostic.yml'
       - 'artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json'
       - 'tools/gravicentra-i6-5-b4-003-r18-readonly-forensic.mjs'
+      - 'tools/gravicentra-b4-003-one-pass-readonly-integrity.cjs'
 
 permissions:
   contents: write
@@ -64,6 +65,17 @@ jobs:
             && l.boundaries?.dataMutationAuthorized===false
             && l.boundaries?.reimportAuthorized===false
             && l.boundaries?.livePromotionAuthorized===false;
+          const integrity=c.b4003OnePassOpsLeadsSourceRepair?.status==='SOURCE_STAGED_QA_PENDING_NOT_ACCEPTED'
+            && c.currentB4?.status==='B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL'
+            && c.b4003SecurityReleaseHold?.status==='ACTIVE_FAIL_CLOSED_UNAUTHORIZED_BROWSER_FIRESTORE_READ_WRITE'
+            && c.nextAction==='I6_5_FORENSIC_REMEDIATION_B4_003_R20_TARGETED_PAULA_VISUAL'
+            && l.activeFinding?.id==='B4-003'
+            && l.boundaries?.businessWritesAuthorized===false
+            && l.boundaries?.dataMutationAuthorized===false
+            && l.boundaries?.reimportAuthorized===false
+            && l.boundaries?.livePromotionAuthorized===false
+            && require('node:child_process').execFileSync('git',['log','-1','--format=%s'],{encoding:'utf8'}).trim()==='audit(i6.5 B4-003): execute bounded operational relation readback';
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'integrity='+(integrity?'true':'false')+'\n');
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'run='+(ok?'true':'false')+'\n');
           const url=c.currentB4?.previewUrl||c.i65ForensicRemediationPlan?.b4?.previewUrl||'';
           if(!url)throw Error('B4_003_ACCEPTED_PREVIEW_URL_MISSING');
@@ -72,11 +84,11 @@ jobs:
           NODE
 
       - name: Assert LIVE unchanged
-        if: steps.gate.outputs.run == 'true'
+        if: steps.gate.outputs.run == 'true' || steps.gate.outputs.integrity == 'true'
         run: node tools/gravicentra-certified-live-binding-check.mjs
 
       - name: Prepare read-only Firebase and browser
-        if: steps.gate.outputs.run == 'true'
+        if: steps.gate.outputs.run == 'true' || steps.gate.outputs.integrity == 'true'
         shell: bash
         run: |
           set -euo pipefail
@@ -100,8 +112,27 @@ jobs:
               raise SystemExit('B4_003_SERVICE_ACCOUNT_NOT_FOUND')
           PY
           echo "GOOGLE_APPLICATION_CREDENTIALS=$ROOT/service-account.json" >> "$GITHUB_ENV"
-          npm install --no-save --package-lock=false firebase-admin@13.4.0 playwright@1.55.0 >/dev/null
-          npx playwright install --with-deps chromium >/dev/null
+          npm install --no-save --package-lock=false firebase-admin@13.4.0 >/dev/null
+          if [ "${{ steps.gate.outputs.run }}" = 'true' ]; then npm install --no-save --package-lock=false playwright@1.55.0 >/dev/null; npx playwright install --with-deps chromium >/dev/null; fi
+
+      - name: Read-only operational integrity within B4-003
+        if: steps.gate.outputs.integrity == 'true'
+        env:
+          B4_003_ONEPASS_OUT: ${{ runner.temp }}/b4-003-onepass-readonly.json
+        run: |
+          set -euo pipefail
+          node --check tools/gravicentra-b4-003-one-pass-readonly-integrity.cjs
+          node tools/gravicentra-b4-003-one-pass-readonly-integrity.cjs
+          test -s "$B4_003_ONEPASS_OUT"
+
+      - name: Preserve operational integrity evidence
+        if: steps.gate.outputs.integrity == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: gravicentra-b4-003-onepass-integrity-${{ github.run_id }}
+          path: ${{ runner.temp }}/b4-003-onepass-readonly.json
+          if-no-files-found: error
+          retention-days: 30
 
       - name: Execute B4-003 R18 read-only forensic
         if: steps.gate.outputs.run == 'true'
