@@ -527,6 +527,59 @@
       "productWrites": 0,
       "ratesEnabled": 0,
       "productionDeploy": false
+    },
+    "sampleComponentReconciliation": {
+      "status": "ARITHMETIC_VERIFIED_FOR_POPULATED_SAMPLES_FORMULA_INSURER_AUTHORITY_PENDING",
+      "source": "COTIZADOR BAM 2025 vehiculos seg. completo pr..xlsx",
+      "sourceId": "1wxGdyAj5E0a8Javcew6C0aAWfbfUuhAs",
+      "currency": "GTQ",
+      "cash": {
+        "primaNeta": 2500,
+        "emision": 125,
+        "iva": 315,
+        "total": 2940,
+        "check": 2940,
+        "vatCheck": 315
+      },
+      "fractionatedExamples": [
+        {
+          "installments": 7,
+          "sourceSample": {
+            "primaNeta": 2500,
+            "emision": 125,
+            "recargo": 175,
+            "iva": 336,
+            "total": 3136
+          },
+          "checkSum": 3136,
+          "vatCheck": 336,
+          "matchesSourceTotal": true,
+          "observedRecargoNetPercent": 7
+        },
+        {
+          "installments": 9,
+          "sourceSample": {
+            "primaNeta": 2500,
+            "emision": 125,
+            "recargo": 225,
+            "iva": 342,
+            "total": 3192
+          },
+          "checkSum": 3192,
+          "vatCheck": 342,
+          "matchesSourceTotal": true,
+          "observedRecargoNetPercent": 9
+        }
+      ],
+      "insurerTariffGeneralizationAuthorized": false,
+      "distinction": "Arithmetic is a crosscheck of two populated examples, not evidence that these rates apply across plans, currencies or later insurer editions.",
+      "remaining": [
+        "Inspect actual cell formula references",
+        "Validate quoted duration/vehicle risk eligibility",
+        "Reconcile official insurer 2026 policy output and effective rule/version"
+      ],
+      "noProductWrites": true,
+      "noOperationalWrites": true
     }
   }
 }
