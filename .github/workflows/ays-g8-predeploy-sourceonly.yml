@@ -35,7 +35,7 @@ jobs:
       - name: Download immutable G7 read-only Hosting evidence (run 38582624499)
         uses: actions/download-artifact@v4
         with:
-          artifact-ids: '11925512650'
+          name: ays-g7-firebase-lab-readonly-evidence
           run-id: '38582624499'
           github-token: ${{ github.token }}
           path: ${{ runner.temp }}/g8-g7
