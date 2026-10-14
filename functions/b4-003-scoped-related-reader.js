@@ -10,6 +10,14 @@ const safeId=(id,label)=>{
  if(!value||value.length>180||/[\/\u0000-\u001f]/.test(value))throw new Denied(label+'_INVALID');
  return value;
 };
+function verifiedLinkedClient(ctx,client){
+ if(!client)return;
+ if(client.tenantId&&client.tenantId!==ctx.tenantId)throw new Denied('RELATION_CLIENT_TENANT_DENIED');
+ const country=clean(client.pais||client.country).toUpperCase();
+ if(!country||country!==ctx.country)throw new Denied('RELATION_CLIENT_COUNTRY_DENIED');
+ // Advisor ownership of the client may differ after a legitimate reassignment.
+ // It must not override policy ownership for historical policy-linked rows.
+}
 function docRef(tenant,collection,id){
  return tenant.collection('data').doc(collection).collection('items').doc(id);
 }
@@ -48,7 +56,7 @@ async function readScopedRelatedDocument({db,auth,request}){
    client=c.data()||{};
  }
  if(collection!=='clientes'&&!workflowCollections.has(collection)&&!client&&!policy)throw new Denied('RELATION_NOT_VERIFIABLE');
- try{allowRow(ctx,row,[policy,client].filter(Boolean));}
+ try{verifiedLinkedClient(ctx,client);allowRow(ctx,row,policy?[policy]:client?[client]:[]);}
  catch(e){if(e instanceof Denied)throw new Denied('RECORD_NOT_FOUND_OR_DENIED');throw e;}
  return {ok:true,serverScoped:true,collection,country,scope:ctx.scope,
    row:Object.assign({},row,{id:row.id||documentId,canonicalDocumentId:documentId,
@@ -105,7 +113,7 @@ async function readScopedRelatedList({db,auth,request}){
      const csnap=await docRef(tenant,'clientes',safeId(clientId,'CLIENT')).get();
      if(!csnap.exists)throw new Denied('RELATION_CLIENT_NOT_FOUND');
      const verifiedClient=csnap.data()||{};
-     try{allowRow(ctx,verifiedPolicy,[verifiedClient]);}
+     try{verifiedLinkedClient(ctx,verifiedClient);allowRow(ctx,verifiedPolicy);}
      catch(e){if(e instanceof Denied)throw new Denied('POLICY_NOT_FOUND_OR_DENIED');throw e;}
      verifiedParents.set(pid,{policy:verifiedPolicy,client:verifiedClient});
    }
@@ -122,7 +130,7 @@ async function readScopedRelatedList({db,auth,request}){
      if(inputClientId&&inputClientId!==clean(parent.clienteId))
        throw new Denied('RELATION_CLIENT_MISMATCH');
    }
-   allowRow(ctx,row,parent?[parent,relatedClient]:[]);
+   allowRow(ctx,row,parent?[parent]:[]);
    return Object.assign({},row,{id:row.id||documentId,canonicalDocumentId:documentId,
      pais:clean(row.pais||row.country||parent?.pais||parent?.country||relatedClient?.pais||relatedClient?.country),
      tenantId:row.tenantId||tenantId});

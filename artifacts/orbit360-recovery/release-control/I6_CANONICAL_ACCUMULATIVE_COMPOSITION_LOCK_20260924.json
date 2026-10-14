@@ -256,7 +256,7 @@
     "orbit360-platform/modules/comparativo.js": "982881a4c1e2f95be95428bd3f9f23360a9a2d5f",
     "functions/b4-003-scoped-policy-reader.js": "4181f6198c0163175579a2cc19197ebc63d9b328",
     "functions/b4-003-scoped-policy-callable.js": "8b468150003fe812d9e1d0763120f2b31f1df75f",
-    "functions/b4-003-scoped-related-reader.js": "fc438b552a821274654ea5b6010158717d114568",
+    "functions/b4-003-scoped-related-reader.js": "d890a849d59f59e51ee31d470a7b8fc44073cdc7",
     "functions/b4-003-scoped-bootstrap-reader.js": "e73b922173733b2c96693603d6035bfb3b31fa79"
   },
   "evidence": {
@@ -5434,5 +5434,22 @@
     "livePromotion": false,
     "operationalWrites": 0,
     "releaseStatus": "NOT_ACCEPTED"
+  },
+  "b4003OnePassFinancialOwnerFix20261014": {
+    "status": "STAGED_NOT_PREVIEW_APPROVED",
+    "cause": "LINKED_CLIENT_CURRENT_ADVISOR_DIFFERENT_FROM_POLICY_AUTHORITY",
+    "evidenceRealSource": {
+      "receiptRowsWithPolicyClientAdvisorDisagreement": 161,
+      "portfolioRows": 113,
+      "vehicleRows": 60
+    },
+    "sourceOwner": "functions/b4-003-scoped-related-reader.js",
+    "sourceBlob": "d890a849d59f59e51ee31d470a7b8fc44073cdc7",
+    "qaOwner": "tools/gravicentra-b4-003-scoped-related-reader.test.cjs",
+    "qaBlob": "6e55d03f5e7104925f5b2ba8468d6d4fe9078598",
+    "securitySemantics": "verified tenant and country, policy advisor for policy-linked records, deny child-policy owner disagreements",
+    "notDataReimport": true,
+    "previousUIUnchanged": true,
+    "productionNotTouched": true
   }
 }

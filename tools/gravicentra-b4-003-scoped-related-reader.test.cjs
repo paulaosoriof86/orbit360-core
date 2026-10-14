@@ -88,6 +88,20 @@ async function deny(fn,code){let thrown;try{await fn()}catch(e){thrown=e}assert.
   await deny(()=>flow(collection,'operativo',{policyIds:['p1']}),'POLICY_ANCHOR_UNEXPECTED');checks++;
  }
  console.log('B4_003_OPS_LEADS_SCOPED_READ_SOURCE_QA_PASS checks=8 no_data_writes');
+ // Regression: a client's current advisor may differ from its policy advisor.
+ // Historical policy-linked finances remain scoped to their policy, while
+ // the client itself cannot be read via that old ownership.
+ docs.clientes.c1.asesorId='a2';
+ const historicalReceipt=await read('recibosEsperados','r1');
+ assert.equal(historicalReceipt.row.id,'r1');checks++;
+ const historicalPolicyBatch=await bulk('vehiculos',['p1'],'asesor',{pageSize:5});
+ assert.deepEqual(historicalPolicyBatch.rows.map(x=>x.id),['v1']);checks++;
+ await deny(()=>read('clientes','c1'),'RECORD_NOT_FOUND_OR_DENIED');checks++;
+ docs.clientes.c1.pais='CO';
+ await deny(()=>read('recibosEsperados','r1'),'RECORD_NOT_FOUND_OR_DENIED');checks++;
+ await deny(()=>bulk('vehiculos',['p1'],'asesor'),'POLICY_NOT_FOUND_OR_DENIED');checks++;
+ docs.clientes.c1.pais='GT';docs.clientes.c1.asesorId='a1';
+ console.log('B4_003_HISTORICAL_POLICY_ADVISOR_SCOPE_QA_PASS checks=5 no_cross_country_or_client_escalation');
  console.log('B4_003_RELATED_SERVER_BATCH_SCOPE_MOCK_PASS checks='+checks+' no Firebase writes');
  console.log('B4_003_RELATED_DOCUMENT_SERVER_SCOPE_MOCK_PASS checks='+checks+' no Firebase writes');
 })().catch(e=>{console.error(e);process.exitCode=1;});

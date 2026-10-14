@@ -5996,7 +5996,7 @@
   "canonicalAccumulationControl": {
     "status": "FROZEN_ACTIVE",
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "compositionLockBlobSha": "eab3d4b3c8e2611c0736b42cdec5dbcdb9ba91c6",
+    "compositionLockBlobSha": "54857c0af40dbdf7dcf7ad161ccc78a66827647e",
     "findingLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
     "findingLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
@@ -10467,5 +10467,32 @@
     "noSharedRulesDeploy": true,
     "qaExpectedOnly": true,
     "next": "RUN_GOVERNANCE_AND_NEGATIVE_SCOPED_TESTS_BEFORE_REBUILD"
+  },
+  "b4003OnePassFinanceRelationFix": {
+    "status": "SOURCE_STAGED_CONTRACT_QA_REQUIRED_NOT_ACCEPTED",
+    "gate": "I6.5/B4-003",
+    "realDataReadbackRunId": 38611983381,
+    "realDataArtifactId": 11918641494,
+    "realEvidence": {
+      "oscarHaroldo": {
+        "policies": 7,
+        "receipts": 37,
+        "portfolio": 28,
+        "vehicles": 6
+      },
+      "receiptPolicyClientOwnerConflictRows": 161,
+      "portfolioConflictRows": 113,
+      "vehicleConflictRows": 60
+    },
+    "sourceOwner": "functions/b4-003-scoped-related-reader.js",
+    "sourceBlobSha": "d890a849d59f59e51ee31d470a7b8fc44073cdc7",
+    "qaOwner": "tools/gravicentra-b4-003-scoped-related-reader.test.cjs",
+    "qaBlobSha": "6e55d03f5e7104925f5b2ba8468d6d4fe9078598",
+    "productVisualOwnerChanged": false,
+    "sharedRulesDeployAuthorized": false,
+    "livePromotionAuthorized": false,
+    "realDataWritesAuthorized": false,
+    "nextProof": "CANONICAL_GUARD_AND_SCOPED_RELATION_QA_THEN_AUTHENTICATED_PREVIEW",
+    "productionHostingDriftOpen": true
   }
 }
