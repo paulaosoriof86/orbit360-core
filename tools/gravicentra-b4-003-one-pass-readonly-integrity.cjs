@@ -1,0 +1,48 @@
+'use strict';
+// Existing B4-003: bounded operational evidence. Uses Admin only for READS.
+// No Firestore/Auth/Storage writes and no person-identifying rows in the receipt.
+const fs=require('node:fs'),crypto=require('node:crypto');
+const {initializeApp,applicationDefault,deleteApp}=require('firebase-admin/app');
+const {getFirestore}=require('firebase-admin/firestore');
+const assert=require('node:assert/strict');
+const projectId='ays-orbit-360-lab',tenantId='alianzas-soluciones';
+const allowed=['clientes','polizas','recibosEsperados','carteraPrimas','cobros','vehiculos','negocios','gestiones'];
+const app=initializeApp({credential:applicationDefault(),projectId});
+const db=getFirestore(app),safe=x=>String(x==null?'':x).trim(),norm=x=>safe(x).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+const hash=x=>crypto.createHash('sha256').update(safe(x)).digest('hex').slice(0,12);
+const result={schema:'GRAVICENTRA_B4_003_ONE_PASS_READONLY_INTEGRITY_V1',gate:'I6.5/B4-003',head:process.env.CANDIDATE_SOURCE_SHA||process.env.GITHUB_SHA||'',projectId,tenantId,status:'PENDING',collections:{},relationships:{},specificRegression:{},readOnly:true,realBusinessWrites:0,authWrites:0,hostingDeploy:false,sharedRulesDeploy:false,scopeByRoleNotVerified:true,visualPass:false,productionAccepted:false};
+async function main(){
+  const sets={};
+  for(const name of allowed){
+    const col=db.collection('tenants').doc(tenantId).collection('data').doc(name).collection('items');
+    const snap=await col.limit(3001).get();
+    if(snap.docs.length>3000)throw Error('READ_BOUND_EXCEEDED_'+name);
+    const rows=snap.docs.map(d=>({id:d.id,...d.data()}));
+    sets[name]=rows;
+    result.collections[name]={count:rows.length,country:{GT:rows.filter(x=>safe(x.pais||x.country)==='GT').length,CO:rows.filter(x=>safe(x.pais||x.country)==='CO').length},missingCountry:rows.filter(x=>!safe(x.pais||x.country)).length,missingAdvisor:rows.filter(x=>!safe(x.asesorId||x.advisorId)).length};
+  }
+  const clients=new Map(sets.clientes.map(r=>[r.id,r])),policies=new Map(sets.polizas.map(r=>[r.id,r]));
+  const stats={};
+  for(const collection of ['recibosEsperados','carteraPrimas','cobros','vehiculos']){
+    const rows=sets[collection],anchored=rows.filter(r=>safe(r.polizaId||r.policyId));
+    const orphans=anchored.filter(r=>!policies.has(safe(r.polizaId||r.policyId)));
+    const linked=anchored.filter(r=>policies.has(safe(r.polizaId||r.policyId)));
+    const mismatches=linked.filter(r=>{
+      const p=policies.get(safe(r.polizaId||r.policyId));return safe(r.clienteId)&&safe(p.clienteId)&&safe(r.clienteId)!==safe(p.clienteId);
+    });
+    stats[collection]={total:rows.length,withPolicyAnchor:anchored.length,withoutPolicyAnchor:rows.length-anchored.length,orphanPolicyCount:orphans.length,clientRelationMismatchCount:mismatches.length,orphanWithoutPersonalIds:true};
+  }
+  result.relationships=stats;
+  const matched=sets.clientes.filter(c=>norm(c.nombre).includes('oscar haroldo')&&norm(c.nombre).includes('padilla'));
+  result.specificRegression={case:'OSCAR_HAROLDO_PADILLA',clientMatches:matched.length,clients:matched.map(c=>{
+    const related=sets.polizas.filter(p=>safe(p.clienteId)===c.id),policyIds=new Set(related.map(p=>p.id));
+    return {caseHash:hash(c.id),policies:related.length,expectedReceipts:sets.recibosEsperados.filter(r=>policyIds.has(safe(r.polizaId||r.policyId))).length,portfolioRows:sets.carteraPrimas.filter(r=>policyIds.has(safe(r.polizaId||r.policyId))).length,vehicles:sets.vehiculos.filter(r=>policyIds.has(safe(r.polizaId||r.policyId))).length};
+  })};
+  result.status='READONLY_CARDINALITY_AND_RELATION_AUDIT_COMPLETE_NOT_AUTHENTICATED_SCOPE_PASS';
+}
+main().catch(e=>{result.status='FAIL';result.errorCode=safe(e.message).slice(0,120);process.exitCode=1;}).finally(async()=>{
+ const file=process.env.B4_003_ONEPASS_OUT||'/tmp/b4-003-onepass-readonly.json';
+ fs.writeFileSync(file,JSON.stringify(result,null,2)+'\n');
+ await deleteApp(app);
+ console.log('B4_003_ONEPASS_READONLY='+result.status);
+});
