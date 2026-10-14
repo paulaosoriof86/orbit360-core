@@ -10559,5 +10559,29 @@
     "previewRequired": true,
     "livePromotionAuthorized": false,
     "dataMutationAuthorized": false
+  },
+  "b4003OnePassPostFixPreview20261014": {
+    "status": "INTERNAL_PREVIEW_TECHNICAL_READBACK_PASS_REAL_AUTH_AND_BUSINESS_UAT_PENDING",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_ONE_PASS_POST_FIX_EXACT_PREVIEW_20261014.json",
+    "receiptBlobSha": "74f424fe30817405879957fc4ac539be7c36c3a2",
+    "sourceSha": "ea4f0ea86a11bc7c19ee11f1288c59daa43a0959",
+    "buildId": "gi-i65-b4-ea4f0ea86a11-57f234755dc1",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-38623948302-om1r268s.web.app",
+    "runId": 38623948302,
+    "artifactId": 11922693406,
+    "hostedReadbackExact": true,
+    "externalMarkerVerified": true,
+    "livePromotionAuthorized": false,
+    "securityP0Closed": false,
+    "finalHumanUATRequested": false,
+    "realAuthenticatedPass": false,
+    "previousRejectionPreserved": true,
+    "remainingBlockers": [
+      "AUTHENTICATED_SCOPE_E2E",
+      "INICIO_EXECUTIVE_RENEWAL_GOAL",
+      "DRIVE_FUNCTION_AVAILABILITY",
+      "FINANCIAL_CLIENT360_READBACK",
+      "LIVE_HOSTING_LINEAGE_AND_SHARED_RULES_SECURITY"
+    ]
   }
 }
