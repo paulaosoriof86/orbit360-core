@@ -194,7 +194,7 @@
     "orbit360-platform/core/product-drive-document-provider-p0.js": "074b38c168ed0e7c78569395f815a2ff037c2c3c",
     "orbit360-platform/core/product-hydration-required-optional-p0.js": "21f870d3e0e165487843d1d6efa454474fd73563",
     "orbit360-platform/core/product-insurer-credential-provider-p0.js": "3bf5ba98271c7012dd1328df2894f1b38f3983eb",
-    "orbit360-platform/core/product-runtime-browser-providers-p0.js": "aa35684ff95c01ca3c7b882ca27e43ceae5cd097",
+    "orbit360-platform/core/product-runtime-browser-providers-p0.js": "d6d6621493d20559e501e80c85501bfa1a6fad17",
     "orbit360-platform/core/public-tenant-branding.js": "ee1029772b1191c44817d315dc8ce8862bb3a152",
     "orbit360-platform/core/pwa.js": "14bc0d513a2ee3de8f7b598b38276e6136f05eb8",
     "orbit360-platform/core/queries.js": "55acae8c4c933bde47afb018be55e978d9b81cdd",
@@ -211,7 +211,7 @@
     "orbit360-platform/data/academia-product-catalog-v1.js": "22b6781519cb14e05965738ac3bbc0f6eb0baff3",
     "orbit360-platform/data/geo-gt-co-authoritative-v20261004.js": "734b6518bc968a8c4e278602aa7161a38351cb02",
     "orbit360-platform/data/store-firestore-product-operational-p0.js": "7738314b843253c92be008dc0b812d035b377d43",
-    "orbit360-platform/data/store-firestore-product-readonly-p0.js": "836588eddb263b4e4b5f947569e5f69d1eb24e76",
+    "orbit360-platform/data/store-firestore-product-readonly-p0.js": "8699b240237c0f7ade8d83cc4c255bb545cd0082",
     "orbit360-platform/data/tenant-alianzas-soluciones-insurers-p10.js": "41d2e31a42dac73eb68af304d5f532897210d0ee",
     "orbit360-platform/data/tenant-config/alianzas-soluciones.aseguradoras-knowledge-summary-v20261003.js": "2000d9ea8ab67bdd37d8bf404a29a405fa6374dd",
     "orbit360-platform/data/tenant-public-branding-index.js": "dc543c463f5ecd8ea44e49156d6282113bd95db6",
@@ -256,7 +256,7 @@
     "orbit360-platform/modules/comparativo.js": "982881a4c1e2f95be95428bd3f9f23360a9a2d5f",
     "functions/b4-003-scoped-policy-reader.js": "4181f6198c0163175579a2cc19197ebc63d9b328",
     "functions/b4-003-scoped-policy-callable.js": "8b468150003fe812d9e1d0763120f2b31f1df75f",
-    "functions/b4-003-scoped-related-reader.js": "8adba41c5aa5b1279b9b3fc2388f41a0ef5bc20b",
+    "functions/b4-003-scoped-related-reader.js": "fc438b552a821274654ea5b6010158717d114568",
     "functions/b4-003-scoped-bootstrap-reader.js": "e73b922173733b2c96693603d6035bfb3b31fa79"
   },
   "evidence": {
@@ -5418,5 +5418,21 @@
     "previewCertified": false,
     "noFirestoreWrites": true,
     "productionPromoted": false
+  },
+  "b4003OnePassOpsLeadsSourceFix20261014": {
+    "status": "SOURCE_CHANGE_PENDING_QA_AND_AUTHENTICATED_PREVIEW",
+    "gate": "I6.5/B4-003",
+    "sourceFiles": {
+      "functions/b4-003-scoped-related-reader.js": "fc438b552a821274654ea5b6010158717d114568",
+      "orbit360-platform/core/product-runtime-browser-providers-p0.js": "d6d6621493d20559e501e80c85501bfa1a6fad17",
+      "orbit360-platform/data/store-firestore-product-readonly-p0.js": "8699b240237c0f7ade8d83cc4c255bb545cd0082"
+    },
+    "qaPath": "tools/gravicentra-b4-003-scoped-related-reader.test.cjs",
+    "qaBlobSha": "11ce7093b9772acbc8408a940fb10f710a38359f",
+    "previouslyAcceptedUI": "UNCHANGED",
+    "sharedRulesDeployed": false,
+    "livePromotion": false,
+    "operationalWrites": 0,
+    "releaseStatus": "NOT_ACCEPTED"
   }
 }

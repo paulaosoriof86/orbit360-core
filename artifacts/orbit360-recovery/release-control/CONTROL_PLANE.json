@@ -5996,7 +5996,7 @@
   "canonicalAccumulationControl": {
     "status": "FROZEN_ACTIVE",
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "compositionLockBlobSha": "32a017ccb7cf4caf380c18ab87d281ab5a3c93d9",
+    "compositionLockBlobSha": "eab3d4b3c8e2611c0736b42cdec5dbcdb9ba91c6",
     "findingLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
     "findingLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
@@ -10447,5 +10447,25 @@
     "hostedReadbackExact": true,
     "unauthenticatedCallableDenied": true,
     "authenticatedPreviewProofPassed": false
+  },
+  "b4003OnePassOpsLeadsSourceRepair": {
+    "status": "SOURCE_STAGED_QA_PENDING_NOT_ACCEPTED",
+    "gate": "I6.5/B4-003",
+    "authority": "User requested urgent one-iteration preservation of approved frontend",
+    "rootCause": "PROTECTED_READER_OMITS_NEGOCIOS_AND_GESTIONES",
+    "sourcePaths": [
+      "functions/b4-003-scoped-related-reader.js",
+      "orbit360-platform/core/product-runtime-browser-providers-p0.js",
+      "orbit360-platform/data/store-firestore-product-readonly-p0.js"
+    ],
+    "qaPath": "tools/gravicentra-b4-003-scoped-related-reader.test.cjs",
+    "compositionBlobSha": "eab3d4b3c8e2611c0736b42cdec5dbcdb9ba91c6",
+    "noNewIteration": true,
+    "frontendUnchanged": true,
+    "noLive": true,
+    "noReimport": true,
+    "noSharedRulesDeploy": true,
+    "qaExpectedOnly": true,
+    "next": "RUN_GOVERNANCE_AND_NEGATIVE_SCOPED_TESTS_BEFORE_REBUILD"
   }
 }

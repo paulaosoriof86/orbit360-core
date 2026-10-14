@@ -9,7 +9,9 @@ const docs={
  vehiculos:{v1:{id:'v1',polizaId:'p1',clienteId:'c1'},v2:{id:'v2',polizaId:'p2',clienteId:'c2'}},
  recibosEsperados:{r1:{id:'r1',polizaId:'p1',clienteId:'c1',monto:12},r2:{id:'r2',polizaId:'p2',clienteId:'c2'},bad:{id:'bad',polizaId:'p1',clienteId:'c2'},orphan:{id:'orphan',polizaId:'missing',clienteId:'c1'},direct:{id:'direct',clienteId:'c1'}},
  carteraPrimas:{debt1:{id:'debt1',polizaId:'p1',clienteId:'c1',monto:10}},
- cobros:{paid1:{id:'paid1',polizaId:'p1',clienteId:'c1',monto:3},paid2:{id:'paid2',polizaId:'p2',clienteId:'c2'}}
+ cobros:{paid1:{id:'paid1',polizaId:'p1',clienteId:'c1',monto:3},paid2:{id:'paid2',polizaId:'p2',clienteId:'c2'}},
+ negocios:{n1:{id:'n1',tenantId,pais:'GT',asesorId:'a1',etapa:'nuevo'},n2:{id:'n2',tenantId,pais:'GT',asesorId:'a2',etapa:'cotizando'}},
+ gestiones:{g1:{id:'g1',tenantId,pais:'GT',asesorId:'a1',lista:'Gestiones Admin'},g2:{id:'g2',tenantId,pais:'GT',asesorId:'a2',lista:'Emisiones'}}
 };
 let member={uid:'u1',tenantId,status:'active',roles:['Asesor','Operativo'],advisorId:'a1',countries:['GT','CO'],dataScopes:{default:'own'}};
 let cfg={roleScopes:{asesor:'own',operativo:'all'}};
@@ -75,6 +77,17 @@ async function deny(fn,code){let thrown;try{await fn()}catch(e){thrown=e}assert.
  await deny(()=>bulk('vehiculos',['p1','p2'],'operativo',{country:'CO'}),'POLICY_NOT_FOUND_OR_DENIED');checks++;
  await deny(()=>bulk('clientes',['p1']),'POLICY_ANCHOR_UNEXPECTED');checks++;
  const direct=await read('recibosEsperados','r1');assert.equal(direct.row.pais,'GT');checks++;
+ const flow=(collection,role='operativo',options={})=>readScopedRelatedList({
+  db,auth:{uid:'u1',token:{}},request:{tenantId,collection,activeRole:role,country:'GT',pageSize:50,...options}
+ });
+ for(const collection of ['negocios','gestiones']){
+  const all=await flow(collection);assert.equal(all.rows.length,2);checks++;
+  const own=await flow(collection,'asesor');assert.equal(own.rows.length,1);checks++;
+  const id=collection==='negocios'?'n2':'g2';
+  await deny(()=>read(collection,id),'RECORD_NOT_FOUND_OR_DENIED');checks++;
+  await deny(()=>flow(collection,'operativo',{policyIds:['p1']}),'POLICY_ANCHOR_UNEXPECTED');checks++;
+ }
+ console.log('B4_003_OPS_LEADS_SCOPED_READ_SOURCE_QA_PASS checks=8 no_data_writes');
  console.log('B4_003_RELATED_SERVER_BATCH_SCOPE_MOCK_PASS checks='+checks+' no Firebase writes');
  console.log('B4_003_RELATED_DOCUMENT_SERVER_SCOPE_MOCK_PASS checks='+checks+' no Firebase writes');
 })().catch(e=>{console.error(e);process.exitCode=1;});

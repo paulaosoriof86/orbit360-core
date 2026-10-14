@@ -2,7 +2,8 @@
 // B4-003 staged protected document-read owner for related operational collections.
 // Read-only. Preview-only candidate; NO Firebase export or rule deploy.
 const {resolve,allowRow,Denied}=require('./b4-003-scoped-access-boundary');
-const collections=new Set(['clientes','vehiculos','recibosEsperados','carteraPrimas','cobros']);
+const collections=new Set(['clientes','vehiculos','recibosEsperados','carteraPrimas','cobros','negocios','gestiones']);
+const workflowCollections=new Set(['negocios','gestiones']);
 const clean=v=>String(v==null?'':v).trim();
 const safeId=(id,label)=>{
  const value=clean(id);
@@ -46,7 +47,7 @@ async function readScopedRelatedDocument({db,auth,request}){
    if(!c.exists)throw new Denied('RELATION_CLIENT_NOT_FOUND');
    client=c.data()||{};
  }
- if(collection!=='clientes'&&!client&&!policy)throw new Denied('RELATION_NOT_VERIFIABLE');
+ if(collection!=='clientes'&&!workflowCollections.has(collection)&&!client&&!policy)throw new Denied('RELATION_NOT_VERIFIABLE');
  try{allowRow(ctx,row,[policy,client].filter(Boolean));}
  catch(e){if(e instanceof Denied)throw new Denied('RECORD_NOT_FOUND_OR_DENIED');throw e;}
  return {ok:true,serverScoped:true,collection,country,scope:ctx.scope,
@@ -83,7 +84,7 @@ async function readScopedRelatedList({db,auth,request}){
  const target=tenant.collection('data').doc(coll).collection('items');
  let query,policy=null,client=null;
  const verifiedParents=new Map();
- if(coll==='clientes'){
+ if(coll==='clientes'||workflowCollections.has(coll)){
    if(policyId||hasBatch)throw new Denied('POLICY_ANCHOR_UNEXPECTED');
    query=target.where('pais','==',country);
    if(ctx.scope==='own')query=query.where('asesorId','==',ctx.advisorId);
@@ -112,7 +113,7 @@ async function readScopedRelatedList({db,auth,request}){
  }
  function checkedRow(row,documentId){
    let parent=null,relatedClient=null;
-   if(coll!=='clientes'){
+   if(coll!=='clientes'&&!workflowCollections.has(coll)){
      const linked=clean(row.polizaId||row.policyId);
      const found=verifiedParents.get(linked);
      if(!found)throw new Denied('RELATION_POLICY_MISMATCH');
@@ -140,7 +141,7 @@ async function readScopedRelatedList({db,auth,request}){
  return {ok:true,serverScoped:true,collection:coll,country,scope:ctx.scope,
    rows:verified.slice(0,pageSize),
    nextCursor:verified.length>pageSize?docs[pageSize-1].id:null,
-   anchoring:coll==='clientes'?'country_scope':hasBatch?'authorized_policy_batch':'authorized_policy'};
+   anchoring:coll==='clientes'||workflowCollections.has(coll)?'authorized_country_and_advisor_scope':hasBatch?'authorized_policy_batch':'authorized_policy'};
 }
 
 module.exports=Object.freeze({readScopedRelatedDocument,readScopedRelatedList,collections,version:'b4-003-related-server-list-stage-v3'});
