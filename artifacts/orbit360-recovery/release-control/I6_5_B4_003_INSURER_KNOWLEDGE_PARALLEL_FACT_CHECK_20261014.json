@@ -638,6 +638,97 @@
         "noOperationalWrites": true,
         "noNewFirebase": true
       }
+    },
+    "columnaSameRiskOfficialQuoteReconciliation20261014": {
+      "status": "SAME_RISK_CALCULATOR_TO_INSURER_PDF_OUTPUT_RECONCILED_NO_TARIFF_ENABLEMENT",
+      "insurer": "Seguros Columna",
+      "country": "GT",
+      "currency": "GTQ",
+      "product": "Vehiculos - Motocicleta",
+      "riskDescriptor": "2026 Bajaj Pulsar NS 400Z sample",
+      "workbook": {
+        "name": "Cotizador VA 2026 V1.4.xlsx",
+        "driveId": "1h7DnGbTxPZwEpvfK_OpUVU2HHs2vzAyI",
+        "sourceDocumentVersion": "V1.4",
+        "sheet": "IMPRESIÓN",
+        "observedOutput": {
+          "primaNeta": 1755,
+          "iva": 210.6,
+          "primaTotal": 1965.6,
+          "prontoPago": 1867.32
+        }
+      },
+      "officialQuote": {
+        "name": "Pulsar Danilo.pdf",
+        "driveId": "1bH3Vq-ppL9W40GzuNvTTC8sqy7OYNxKG",
+        "quoteDate": "2026-09-28",
+        "validityDays": 15,
+        "estimatedValidityEnd": "2026-10-13",
+        "currentAt20261014": false,
+        "observedOutput": {
+          "primaNeta": 1755,
+          "iva": 210.6,
+          "primaTotal": 1965.6,
+          "prontoPago": 1867.32
+        },
+        "formOfPayment": "mensual consecutivo, amounts 2/3/4/5/6/8/10/12 payments"
+      },
+      "reconciliations": {
+        "sourceNetPlusVatEqualsTotal": true,
+        "vatRateInSample": 0.12,
+        "issuanceExpensesSeparatelyChargedInThisSample": false,
+        "installments": [
+          {
+            "count": 2,
+            "amount": 982.8
+          },
+          {
+            "count": 3,
+            "amount": 655.2
+          },
+          {
+            "count": 4,
+            "amount": 491.4
+          },
+          {
+            "count": 5,
+            "amount": 393.12
+          },
+          {
+            "count": 6,
+            "amount": 327.6
+          },
+          {
+            "count": 8,
+            "amount": 245.7
+          },
+          {
+            "count": 10,
+            "amount": 196.56
+          },
+          {
+            "count": 12,
+            "amount": 163.8
+          }
+        ],
+        "sampleAmountsMatchWorkbookAndQuote": true,
+        "prontoPagoSample": 1867.32,
+        "prontoPagoRatioToTotal": 0.95
+      },
+      "restrictions": [
+        "Sample is motorcycle, must not generalize to automobiles or other products.",
+        "Quote valid for 15 calendar days from 2026-09-28 and not a current binding offer on 2026-10-14.",
+        "A quote and workbook sample reconcile presentation and arithmetic but not the insurer-wide tariff authority or all eligibility combinations.",
+        "Do not rewrite migrated policy premiums, do not enable default zero issuance expenses globally."
+      ],
+      "next": "Obtain insurer-authorized current V1.4 rate effective period and test additional vehicle/coverage/payment combinations before HUMAN_VALIDATED or ENABLED_FOR_QUOTING.",
+      "authorization": {
+        "tariffEnabled": false,
+        "quoteProviderRateEnabled": false,
+        "realBusinessWrites": 0,
+        "productSourceChanges": 0,
+        "livePromotion": false
+      }
     }
   }
 }
