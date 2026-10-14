@@ -447,6 +447,86 @@
       "preserveExistingKnowledgeAndFindings": true,
       "goLiveBlocking": false,
       "remainingWork": "EVIDENCE_VALIDITY_FORMULA_RECONCILIATION_AND_SCOPE_APPROVAL"
+    },
+    "nextSourceBatch": {
+      "status": "3_ADDITIONAL_ORIGINAL_FILES_VERIFIED_READ_ONLY",
+      "sources": [
+        {
+          "insurer": "Aseguradora Rural / Banrural",
+          "country": "GT",
+          "product": "Gastos Médicos Individual",
+          "document": "Cotizador Gastos Médicos Individual 2025.xlsx",
+          "driveFileId": "1hUeatQ7GkzfgB1raovS21bizSsg2JGAj",
+          "review": "ORIGINAL_XLSX_TEXT_READ",
+          "evidence": [
+            "Contratación titular y cónyuge desde 18 hasta 69 años en la matriz observada",
+            "Dependientes desde diez días, con edades límite específicas",
+            "Maternidad, dental, edad y condiciones por plan deben permanecer como dimensiones separadas"
+          ],
+          "limitations": [
+            "La fuente 2025 no certifica vigencia 2026",
+            "Fragmentos de salida con Sin Cobertura no prueban exclusión universal fuera de los planes mostrados",
+            "No aplicar como tarifa sin salida oficial contrastada"
+          ],
+          "approval": "UNVALIDATED_SOURCE_NO_QUOTING"
+        },
+        {
+          "insurer": "Bantrab",
+          "country": "GT",
+          "product": "Motocicletas",
+          "document": "COTIZADOR MOTO - INTERMEDIARIO 2024.xlsx",
+          "driveFileId": "1vlWaA_UV8tyfqATzDGL38IK19YN1ZbRi",
+          "review": "ORIGINAL_XLSX_TEXT_READ",
+          "evidence": [
+            "Primas separadas en neta, emisión, recargo de fraccionamiento, asistencia, IVA y total",
+            "Condiciones de deducible de robo y asistencia DISATEL individuales",
+            "Cuotas y coberturas de motocicleta requieren reglas propias, no el mismo tarifario de automóvil"
+          ],
+          "limitations": [
+            "Versión 2024; vigencia actual no probada",
+            "Referencia a mantenimiento de dispositivo externo debe confirmarse en condiciones actuales",
+            "No habilitar hasta fórmulas, elegibilidad y salida oficial"
+          ],
+          "approval": "UNVALIDATED_SOURCE_NO_QUOTING"
+        },
+        {
+          "insurer": "Seguros Universales",
+          "country": "GT",
+          "product": "Riesgo Plus",
+          "document": "CG - Riesgo Plus.pdf",
+          "driveFileId": "1Au0qulqhG34tN-0iS38jd1ha097ZCCw5",
+          "review": "ORIGINAL_PDF_EXTRACTED_TEXT_READ",
+          "evidence": [
+            "Condiciones generales contienen definiciones, secciones de cobertura y deducible",
+            "Los límites y deducibles efectivos dependen de la carátula/anexo particular",
+            "El documento de condiciones generales por sí solo no acredita una prima ni una tasa"
+          ],
+          "limitations": [
+            "No inferir cobertura concedida cuando no aparece en carátula",
+            "Vigencia de esta versión y vinculaciones a planes deben contrastarse",
+            "No activa cálculo"
+          ],
+          "approval": "DOCUMENTARY_COVERAGE_EVIDENCE_ONLY"
+        }
+      ],
+      "order": [
+        "BAM Vehículos y Salud",
+        "Banrural Automóviles y Gastos Médicos",
+        "Bantrab Auto y Moto",
+        "Seguros Universales Riesgo Plus"
+      ],
+      "totalAdditionalOriginalFilesReviewed": 7,
+      "trackingRule": "Country-insurer-product-plan-version-source-effective-period-coverage-deductible-payment-tax-authority and enablement status are independent",
+      "nextEvidenceOnlyAfterExistingDriveExhausted": [
+        "Current insurer tariff effective date or signed notice",
+        "Same plan version official quote and policy output for premium reconciliation",
+        "External link/formula repair where original Excel refers to missing tables"
+      ],
+      "requestPaulaNow": false,
+      "operationalWrites": 0,
+      "productWrites": 0,
+      "ratesEnabled": 0,
+      "productionDeploy": false
     }
   }
 }
