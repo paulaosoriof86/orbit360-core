@@ -1,0 +1,14 @@
+'use strict';
+const fs=require('node:fs'),assert=require('node:assert/strict');
+const i=fs.readFileSync('orbit360-platform/modules/inicio.js','utf8');
+const r=fs.readFileSync('orbit360-platform/modules/renovaciones.js','utf8');
+assert.ok(i.includes('grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr))'));
+assert.ok(i.includes('const greeting=nowHour<12?'));
+assert.ok(i.includes('Acompaña el avance de tu equipo'));
+assert.ok(!i.includes('Verificando datos y permisos del alcance seleccionado'));
+assert.ok(i.includes('splitCountrySummary')&&i.includes('openFinancialKpi'));
+assert.ok(!i.includes('width:118px;min-height:118px'));
+assert.ok(r.includes('Confirma si renovó o no')&&r.includes('Revisa el resultado de la renovación'));
+assert.ok(!r.includes('Seguimiento permitido · confirmar resultado antes de emitir'));
+assert.ok(r.includes('.renewal-policy-card .badge{max-width:100%;white-space:normal;'));
+console.log('B4_003_HUMAN_UX_COPY_LAYOUT_CONTRACT_PASS');

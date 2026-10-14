@@ -233,7 +233,7 @@
     "orbit360-platform/modules/equipo-credential-admin-v20260805-bridge.js": "7432bc05938469187fdd120a5bc023c53a000ab9",
     "orbit360-platform/modules/equipo-onboarding-v20260804-bridge.js": "1da619d8abd676d31d69a038d4770463ca67fdc5",
     "orbit360-platform/modules/equipo.js": "b0736237ee18ef45abbae1c13f5c94781178344e",
-    "orbit360-platform/modules/inicio.js": "6633b3b95de831e5decbbd532410fba802b38cd4",
+    "orbit360-platform/modules/inicio.js": "3759428cd65d7c6a7aa39669b1cff7ddeba4d332",
     "orbit360-platform/modules/issuance-endosos-v1201-bridge.js": "2020152b4b2df1338be4b3ef2a9f121d777e21db",
     "orbit360-platform/modules/leads.js": "4e12e604382f2731a03d29cf00db3c086d77ebc1",
     "orbit360-platform/modules/ops.js": "a4ca3dbb4613d541af411f12fce9773a072b0d41",
@@ -245,7 +245,7 @@
     "orbit360-platform/modules/renewals-v1200-operational-bridge.js": "43b3a6b07eba40baa50b61b238174540cd9bf430",
     "orbit360-platform/modules/renewals-v1200-permission-guard.js": "f3f75e25d32c7e4784a19b089353d9706c98dcda",
     "orbit360-platform/modules/renewals-v1201-issued-filter.js": "ae1df0174121c965f610407ae723094e833ebeaf",
-    "orbit360-platform/modules/renovaciones.js": "e985fd4bf5b7c3b15060fa017549eba1b655d7bc",
+    "orbit360-platform/modules/renovaciones.js": "040bce837cb35094be1f108665c42288b9b1f0d0",
     "orbit360-platform/modules/siniestros.js": "fbea51cf7084b66d9866a3c947c1e7ec3bb4a034",
     "orbit360-platform/product-runtime-config.js": "cce5e1b74b246640297a734871a71364e4209061",
     "orbit360-platform/styles/base.css": "608ef0709144ffcbe748a7bd04e1bd16744def65",
@@ -5464,5 +5464,25 @@
     "livePromotion": false,
     "dataWrites": 0,
     "previewRequiresNewBuild": true
+  },
+  "b4003HumanCopyLayoutSourceFix20261014": {
+    "status": "SOURCE_STAGED_QA_REQUIRED_NOT_APPROVED",
+    "sourceFiles": [
+      {
+        "path": "orbit360-platform/modules/inicio.js",
+        "sha": "3759428cd65d7c6a7aa39669b1cff7ddeba4d332"
+      },
+      {
+        "path": "orbit360-platform/modules/renovaciones.js",
+        "sha": "040bce837cb35094be1f108665c42288b9b1f0d0"
+      }
+    ],
+    "qaPath": "tools/gravicentra-b4-003-human-ux-copy-layout.test.cjs",
+    "qaBlobSha": "83a94dd5e479a30c5dfce244660104c95fcb339e",
+    "uiContract": "reported layout and copy defects only",
+    "otherApprovedVisualOwnersUnchanged": true,
+    "securityPathsUnchanged": true,
+    "operationalWrites": 0,
+    "livePromotion": false
   }
 }

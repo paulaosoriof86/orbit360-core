@@ -67,8 +67,8 @@ Orbit.modules.inicio = (function () {
     return 'pending';
   }
   function pendingDial(label, readiness) {
-    const txt=readiness==='unavailable'?'No disponible':'Actualizando datos';
-    return `<div data-inicio-dial="${label}" data-readiness="${readiness}" style="width:118px;min-height:118px;display:grid;place-items:center;text-align:center;border:1px solid var(--line);border-radius:50%;color:var(--ink-3);font-size:12px;font-weight:600">${txt}</div>`;
+    const txt=readiness==='unavailable'?'Este indicador no está disponible para tu acceso':'Preparando información del mes…';
+    return `<div data-inicio-dial="${label}" data-readiness="${readiness}" style="min-width:0;min-height:170px;display:grid;place-items:center;text-align:center;padding:18px;border:1px solid var(--line);border-radius:16px;background:var(--card);color:var(--ink-3)"><div><b style="display:block;font-size:13px;color:var(--ink);margin-bottom:8px">${U.esc(label)}</b><span style="font-size:12px">${txt}</span></div></div>`;
   }
   function receiptIndex() {
     const byId=new Map(), byPolicySeq=new Map();
@@ -215,17 +215,19 @@ Orbit.modules.inicio = (function () {
     const currentRole=Orbit.session&&typeof Orbit.session.rol==='function'?String(Orbit.session.rol()||''):'';
     const advisorView=/asesor|comercial/i.test(currentRole);
     const validCountry=activeCountry==='GT'?'Guatemala':activeCountry==='CO'?'Colombia':'Guatemala y Colombia';
+    const nowHour=new Date().getHours();
+    const greeting=nowHour<12?'Buen día':nowHour<19?'Buenas tardes':'Buenas noches';
     const bannerNote=policyReadiness==='unavailable'||paymentReadiness==='unavailable'||advisorReadiness==='unavailable'
-      ? 'No fue posible confirmar todas las fuentes de información autorizadas. Reintenta la consulta antes de tomar decisiones.'
+      ? greeting+'. Algunas cifras todavía no están disponibles. Puedes atender las gestiones visibles y consultar sus detalles.'
       : policyReadiness!=='ready'||paymentReadiness!=='ready'||advisorReadiness!=='ready'
-        ? 'Verificando datos y permisos del alcance seleccionado para mostrar prioridades reales.'
+        ? greeting+'. Estamos reuniendo la producción, renovaciones y cobros del mes para que decidas con información completa.'
         : advisorView
-          ? 'Consulta las metas individuales disponibles y tus seguimientos autorizados en '+validCountry+'.'
-          : 'Revisa metas institucionales, cuando estén configuradas, y pendientes autorizados en '+validCountry+'.';
+          ? greeting+'. Cada renovación y cada seguimiento cuentan. Consulta tus metas y oportunidades en '+validCountry+'.'
+          : greeting+'. Acompaña el avance de tu equipo: producción, renovaciones y recaudo en '+validCountry+', con sus detalles.';
     host.innerHTML=`<div class="page" data-inicio-reality-ready="1">
       ${Orbit.kit.banner({icon:'🌅',title:'Prioridades de gestión',sub:bannerNote,features:['Metas verificadas','Cartera y cobros','Seguimientos'],actions:`<button class="btn primary" onclick="location.hash='#/cliente360'">Abrir Cliente 360 →</button>`})}
-      <div class="card" data-inicio-premium="20261011" style="margin-top:18px;padding:18px 20px;display:flex;gap:16px;align-items:stretch;flex-wrap:wrap;border-top:3px solid var(--red)">
-        <div style="flex:0 1 220px;min-width:160px"><div style="font-family:var(--f-mono);font-size:11px;letter-spacing:.18em;color:var(--ink-3);text-transform:uppercase">Metas del mes · ${U.monthLabel()}</div><div style="font-family:var(--f-display);font-weight:800;font-size:22px;margin-top:6px;color:var(--ink)">Avance real del mes</div><div style="color:var(--ink-2);font-size:13.5px;margin-top:6px;line-height:1.5">Quedan <b style="color:var(--ink)">${diasMes} días</b> para cerrar el mes. Metas personales y de equipo separadas. Valores en GTQ y COP, sin inventar porcentajes.</div><div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap"><span class="badge neutral" data-inicio-count="clientes" data-readiness="${clientReadiness}">${readinessCount(clientReadiness,clientes.length+' clientes','Actualizando clientes')}</span><span class="badge neutral" data-inicio-count="polizas" data-readiness="${policyReadiness}">${readinessCount(policyReadiness,polizas.length+' pólizas','Actualizando pólizas')}</span><span class="badge ${portfolioReadiness==='ready'?'danger':'neutral'}" data-inicio-count="cartera-vencida" data-readiness="${portfolioReadiness}">${readinessCount(portfolioReadiness,venc.length+' registros vencidos en cartera','Actualizando cartera')}</span></div></div>
+      <div class="card" data-inicio-premium="20261011" style="margin-top:18px;padding:18px 20px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:16px;align-items:stretch;border-top:3px solid var(--red)">
+        <div style="min-width:0"><div style="font-family:var(--f-mono);font-size:11px;letter-spacing:.18em;color:var(--ink-3);text-transform:uppercase">Metas del mes · ${U.monthLabel()}</div><div style="font-family:var(--f-display);font-weight:800;font-size:22px;margin-top:6px;color:var(--ink)">Avance real del mes</div><div style="color:var(--ink-2);font-size:13.5px;margin-top:6px;line-height:1.5">Quedan <b style="color:var(--ink)">${diasMes} días</b> para cerrar el mes. Metas personales y de equipo separadas. Valores en GTQ y COP, sin inventar porcentajes.</div><div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap"><span class="badge neutral" data-inicio-count="clientes" data-readiness="${clientReadiness}">${readinessCount(clientReadiness,clientes.length+' clientes','Actualizando clientes')}</span><span class="badge neutral" data-inicio-count="polizas" data-readiness="${policyReadiness}">${readinessCount(policyReadiness,polizas.length+' pólizas','Actualizando pólizas')}</span><span class="badge ${portfolioReadiness==='ready'?'danger':'neutral'}" data-inicio-count="cartera-vencida" data-readiness="${portfolioReadiness}">${readinessCount(portfolioReadiness,venc.length+' registros vencidos en cartera','Actualizando cartera')}</span></div></div>
         ${productionReadiness==='ready'?splitCountrySummary('production','Producción neta del mes',production):pendingDial('Producción neta del mes',productionReadiness)}
         ${paymentReadiness==='ready'?splitCountrySummary('recaudo','Recaudo confirmado del mes',recaudoMes):pendingDial('Recaudo confirmado del mes',paymentReadiness)}
       </div>

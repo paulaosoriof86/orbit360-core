@@ -5996,7 +5996,7 @@
   "canonicalAccumulationControl": {
     "status": "FROZEN_ACTIVE",
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "compositionLockBlobSha": "f1d4ee2d0e4120c27857138c22791b202d6282dc",
+    "compositionLockBlobSha": "aed32f6adf4d64ad3909f062d0fe8b57aad201f3",
     "findingLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
     "findingLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
@@ -10540,5 +10540,24 @@
     "noDataWrites": true,
     "noRulesDeploy": true,
     "requiredProof": "SOURCE_MOCK_QA_AND_AUTHENTICATED_PREVIEW_BENCHMARK"
+  },
+  "b4003HumanCopyLayout20261014": {
+    "status": "SOURCE_STAGED_QA_NOT_HUMAN_PASS",
+    "sourcePaths": [
+      "orbit360-platform/modules/inicio.js",
+      "orbit360-platform/modules/renovaciones.js"
+    ],
+    "sourceBlobs": {
+      "orbit360-platform/modules/inicio.js": "3759428cd65d7c6a7aa39669b1cff7ddeba4d332",
+      "orbit360-platform/modules/renovaciones.js": "040bce837cb35094be1f108665c42288b9b1f0d0"
+    },
+    "qaPath": "tools/gravicentra-b4-003-human-ux-copy-layout.test.cjs",
+    "qaBlobSha": "83a94dd5e479a30c5dfce244660104c95fcb339e",
+    "compositionBlobSha": "aed32f6adf4d64ad3909f062d0fe8b57aad201f3",
+    "previouslyApprovedFunctionalModulesPreserved": true,
+    "frontendScope": "ONLY_REPORTED_COPY_LAYOUT_BLOCKERS",
+    "previewRequired": true,
+    "livePromotionAuthorized": false,
+    "dataMutationAuthorized": false
   }
 }

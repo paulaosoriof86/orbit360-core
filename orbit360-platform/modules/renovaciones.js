@@ -263,7 +263,7 @@ Orbit.modules.renovaciones = (function () {
     const unlinkedHistorical=activeLifecycle.rows.filter(p=>selectedCountry(p)&&lifecycleOf(p).reason==='SUCESORA_DE_FUENTE_PENDIENTE_ENLACE').length;
     const unlinkedCases=activeLifecycle.rows.filter(p=>selectedCountry(p)&&lifecycleOf(p).sourceBackedSuccessorId);
     const effectiveBadge=(p,life,d)=>d<0
-      ?life.reviewOnly?'Vencida · resultado por verificar':'Vencida'
+      ?life.reviewOnly?'Vencida · confirmar renovación':'Vencida'
       :life.reviewOnly?'Vigencia en revisión':'Vigente';
     const toneBg = { danger: 'var(--danger)', warn: 'var(--warn)', info: 'var(--info)' };
 
@@ -300,6 +300,7 @@ Orbit.modules.renovaciones = (function () {
         .renewal-board{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:14px;align-items:start}
         .renewal-bucket,.renewal-policy-card{min-width:0}
         .renewal-policy-name,.renewal-insurer-name{overflow-wrap:anywhere}
+        .renewal-policy-card .badge{max-width:100%;white-space:normal;overflow-wrap:anywhere;line-height:1.35}
         .renewal-card-actions>*{flex:1 1 118px;min-width:0;white-space:normal;text-align:center}
         @media(max-width:480px){.renewal-board{grid-template-columns:minmax(0,1fr)}.renewal-card-actions>*{flex-basis:100%}.renewal-policy-card{padding:12px!important}}
       </style>
@@ -330,7 +331,7 @@ Orbit.modules.renovaciones = (function () {
                   <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:7px">
                     <span class="badge neutral" data-renewal-effective-status="${U.esc(life.reason)}" title="Estado de origen: ${U.esc(policyStateLabel(p))}">${U.esc(effectiveBadge(p,life,d))}</span>
                     <span class="badge ${d<0?'danger':'info'}">Vigencia calculada: ${U.esc(renewalStateLabel(p,d))}</span>
-                    ${life.reviewOnly?'<span class="badge warn">'+(overdueFollowup?'Seguimiento permitido · confirmar resultado antes de emitir':'Revisión necesaria · renovación protegida')+'</span>':renewabilityState(p)==='UNKNOWN'?'<span class="badge warn">Decisión: renovabilidad pendiente</span>':'<span class="badge ok">Decisión: renovable</span>'}
+                    ${life.reviewOnly?'<span class="badge warn">'+(overdueFollowup?'Confirma si renovó o no':'Revisa el resultado de la renovación')+'</span>':renewabilityState(p)==='UNKNOWN'?'<span class="badge warn">Decisión: renovabilidad pendiente</span>':'<span class="badge ok">Decisión: renovable</span>'}
                   </div>
                 </div>
                 <div class="renewal-card-actions" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px">
