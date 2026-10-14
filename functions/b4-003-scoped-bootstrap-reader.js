@@ -2,12 +2,27 @@
 const {Denied}=require('./b4-003-scoped-access-boundary');
 const txt=x=>String(x==null?'':x).trim();
 const list=x=>[...new Set((Array.isArray(x)?x:[]).map(txt).filter(Boolean))];
-function safeScopes(d){
- const v=d&&typeof d==='object'?d:{},ok=new Set(['none','own','team','all']),o={};
- if(ok.has(v.default))o.default=v.default;
- if(v.modules&&typeof v.modules==='object'){o.modules={};for(const [k,s] of Object.entries(v.modules))
-  if(/^[a-zA-Z0-9_-]{1,80}$/.test(k)&&ok.has(s))o.modules[k]=s;}
- return o;
+function canonicalScope(value){
+ const key=txt(value).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+ if(['propios','propio','own','mios'].includes(key))return 'own';
+ if(['equipo','team'].includes(key))return 'team';
+ if(['todos','all','global'].includes(key))return 'all';
+ if(['ninguno','none','sin_acceso','sinacceso'].includes(key))return 'none';
+ throw new Denied('SCOPE_INVALID');
+}
+function safeScopes(input,legacyDefault){
+ const d=input&&typeof input==='object'&&!Array.isArray(input)?input:{};
+ const rawDefault=d.default??d['*']??legacyDefault;
+ if(!txt(rawDefault))throw new Denied('SCOPE_DEFAULT_MISSING');
+ const candidates=d.modules&&typeof d.modules==='object'&&!Array.isArray(d.modules)
+  ?d.modules:Object.fromEntries(Object.entries(d).filter(([key])=>!['default','*','modules'].includes(key)));
+ const modules={};
+ for(const [key,value] of Object.entries(candidates)){
+  if(!/^[a-zA-Z0-9_-]{1,80}$/.test(key)||['__proto__','prototype','constructor'].includes(key))
+    throw new Denied('SCOPE_MODULE_INVALID');
+  modules[key]=canonicalScope(value);
+ }
+ return {default:canonicalScope(rawDefault),modules};
 }
 async function readBootstrap({db,auth,request}){
  const q=request||{},mode=txt(q.mode),tenantId=txt(q.tenantId);
@@ -22,13 +37,13 @@ async function readBootstrap({db,auth,request}){
     !['active','activo'].includes(txt(m.status||m.estado).toLowerCase()))
    throw new Denied('MEMBERSHIP_DENIED');
  if(!roles.includes(role))throw new Denied('ROLE_DENIED');
- if(auth.token?.email&&txt(m.email).toLowerCase()!==txt(auth.token.email).toLowerCase())
-   throw new Denied('EMAIL_DENIED');
+ const memberEmail=txt(m.email).toLowerCase(),tokenEmail=txt(auth.token?.email).toLowerCase();
+ if(memberEmail&&tokenEmail&&memberEmail!==tokenEmail)throw new Denied('EMAIL_DENIED');
  if(mode==='bootstrap-membership'){
   const countries=list(m.countries).map(x=>x.toUpperCase());
   if(!countries.length||countries.some(x=>!['GT','CO'].includes(x)))throw new Denied('COUNTRY_DENIED');
-  const out={uid:auth.uid,tenantId,email:txt(m.email),status:'active',roles,activeRole:role,countries,
-   dataScopes:safeScopes(m.dataScopes),modulesExtra:list(m.modulesExtra),
+  const out={uid:auth.uid,tenantId,email:memberEmail||tokenEmail,status:'active',roles,activeRole:role,countries,
+   dataScopes:safeScopes(m.dataScopes,m.scopeDatos||m.dataScope),modulesExtra:list(m.modulesExtra),
    modulesRestricted:list(m.modulesRestricted),modulesVisible:list(m.modulesVisible),
    teamAdvisorIds:list(m.teamAdvisorIds)};
   for(const key of ['nombre','displayName','advisorId','teamId','defaultRole'])

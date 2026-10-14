@@ -5996,7 +5996,7 @@
   "canonicalAccumulationControl": {
     "status": "FROZEN_ACTIVE",
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "compositionLockBlobSha": "86be5a402104fd0b2581a9f6d3298d1327e81626",
+    "compositionLockBlobSha": "f00bbfd2631f5f7f872cb0b8f51d32be2db8b244",
     "findingLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
     "findingLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
@@ -10184,5 +10184,26 @@
     "qaReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PROTECTED_BOOTSTRAP_QA_20261013.json",
     "qaReceiptBlobSha": "7e0dbe7318da7e6033b2aeea5d3f8cc822b4de8a",
     "authenticatedPreviewPass": false
+  },
+  "b4003BootstrapCanonicalScopesRootfix20261013": {
+    "status": "SOURCE_STAGED_QA_PENDING_AUTHENTICATED_PREVIEW_PENDING",
+    "gate": "I6.5/B4-003",
+    "findingId": "B4-003-P0-20261012-PERSONAL-COLLECTION",
+    "rootCause": "CANONICAL_MEMBERSHIP_DATA_SCOPES_SPANISH_VALUES_SILENTLY_DROPPED_AND_MEMBERSHIP_EMAIL_OPTIONAL_IN_USER_ONBOARDING",
+    "sourceOwner": "functions/b4-003-scoped-bootstrap-reader.js",
+    "sourceBefore": "edd254de5345397dae51a3503c4b4cd5a93a4356",
+    "sourceAfter": "74eefa61f4ef18f001533c20620ea3591559064f",
+    "qaOwner": "tools/gravicentra-b4-003-scoped-bootstrap-reader.test.cjs",
+    "qaBefore": "db32b219fc3eed3b8d83b648a220bd5fd884998a",
+    "qaAfter": "5324d3778d19f159ff8aaa0dd7d96b0fe0900b99",
+    "compositionBefore": "86be5a402104fd0b2581a9f6d3298d1327e81626",
+    "compositionAfter": "f00bbfd2631f5f7f872cb0b8f51d32be2db8b244",
+    "sourceScope": "STAGED_PROTECTED_BOOTSTRAP_ONLY",
+    "callableExported": false,
+    "firestoreRulesDeployed": false,
+    "operationalWrites": 0,
+    "productionChanged": false,
+    "previewPass": false,
+    "securityP0Closed": false
   }
 }
