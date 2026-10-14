@@ -7,6 +7,8 @@ const firebase=JSON.parse(read('firebase.json'));
 const index=read('orbit360-platform/index.html');
 const store=read('orbit360-platform/data/store-firestore-product-readonly-p0.js');
 const provider=read('orbit360-platform/core/product-runtime-browser-providers-p0.js');
+const related=read('functions/b4-003-scoped-related-reader.js');
+const rejectedPreviewReceipt='artifacts/orbit360-recovery/release-control/I6_5_B4_003_ONE_PASS_REGRESSION_FREEZE_20261014.json';
 const bootstrap=read('functions/bootstrap.js');
 const deployedSource=read('firestore.rules');
 const hold=cp.b4003SecurityReleaseHold||{};
@@ -18,7 +20,11 @@ const findings={
   protectedCallableNotExported:!bootstrap.includes("require('./b4-003-scoped-policy-callable')"),
   candidateRulesNotConfigured:firebase.firestore.rules!=='firestore.b4-003-scoped-candidate.rules',
   broadLegacyRulesPresent:deployedSource.includes('allow read, write: if isTenantMember(tenantId);'),
-  authenticatedPreviewUnproven:staged.listQa?.previewCertified!==true
+  authenticatedPreviewUnproven:staged.listQa?.previewCertified!==true,
+  protectedOpsLeadsReadOwnerMissing:['negocios','gestiones'].some(k=>
+    !related.includes("'"+k+"'")||!store.includes("'"+k+"'")||!provider.includes("'"+k+"'")),
+  rejectedHumanPreviewStillActive:fs.existsSync(rejectedPreviewReceipt)&&
+    cp.b4003ProtectedPreviewAuthorization?.authenticatedPreviewProofPassed!==true
 };
 const blocked=Object.values(findings).some(Boolean);
 assert.equal(cp.gateState?.gates?.I6?.activeSubgate,'I6.5');
