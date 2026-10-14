@@ -6004,7 +6004,7 @@
     "activeBlock": "B4",
     "baselineCertifiedSourceSha": "4bf67a3738751fe2432a130fd23254a6f1c7d16e",
     "parentAcceptedB1SourceSha": "7e96cf419c0858580fef584340e65b84e40c77b5",
-    "productFileCount": 102,
+    "productFileCount": 109,
     "rootCause": "RELEASE_MECHANISM_COMPOSITION_AUTHORITY_SPLIT",
     "definitiveFix": "SINGLE_MACHINE_AUTHORITATIVE_EXACT_SET_AND_BLOB_BOUND_COMPOSITION",
     "atomicManifestWithSourceRequired": true,
@@ -10494,5 +10494,20 @@
     "realDataWritesAuthorized": false,
     "nextProof": "CANONICAL_GUARD_AND_SCOPED_RELATION_QA_THEN_AUTHENTICATED_PREVIEW",
     "productionHostingDriftOpen": true
+  },
+  "b4003OnePassInternalPreview20261014": {
+    "status": "TECHNICAL_PREVIEW_READBACK_PASS_AUTHENTICATED_FUNCTIONAL_PASS_PENDING",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_ONE_PASS_INTERNAL_PREVIEW_RECEIPT_20261014.json",
+    "receiptBlobSha": "b285bb111478252d878deedcdaa56aba3d9973c6",
+    "sourceSha": "bc0cb0fd6c01850fdecd1d9231886589cfbd1415",
+    "buildId": "gi-i65-b4-bc0cb0fd6c01-57f234755dc1",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-38613259322-nch5e0tl.web.app",
+    "artifactId": 11918977824,
+    "hostedReadbackExact": true,
+    "authenticatedFunctionalPass": false,
+    "securityP0Closed": false,
+    "productionPromotionAuthorized": false,
+    "sharedRulesDeployAuthorized": false,
+    "oneGateOnly": true
   }
 }
