@@ -171,5 +171,57 @@
     "readOnly": true,
     "tariffsEnabled": false,
     "productCodeChanged": false
+  },
+  "ficohsaSourceReconciliation": {
+    "status": "TWO_EXISTING_SOURCES_REVIEWED_DISPUTED_TERMS_NOT_ENABLED",
+    "country": "GT",
+    "insurer": "Ficohsa",
+    "product": "Auto Prime",
+    "references": [
+      {
+        "fileId": "1yVFxrRp6togLv4ZR0dKB7TRKyYxF1dxV",
+        "name": "FICOHSA AUTO PRIME.docx",
+        "sourceModified": "2026-09-17T16:55:24Z",
+        "kind": "internal_product_notes"
+      },
+      {
+        "fileId": "1ZXlcE_YWy_gsZQt20yjVLZ8sxMmDTvA2",
+        "name": "Resumen Ficohsa Auto Prime AyS Comercial.docx",
+        "sourceModified": "2026-09-17T18:08:15Z",
+        "kind": "commercial_summary"
+      }
+    ],
+    "confirmedWithoutGeneralization": {
+      "paymentMode": "monthly up to 10 installments with surcharge; Visa Cuotas 3, 6 and 10; cash price available",
+      "surchargePercent": "NOT_PRESENT_MUST_NOT_INFER",
+      "standardThirdPartyLimit": "Q1,200,000 per event as described in sources",
+      "multipleCarsSinglePolicyAccumulation": "Up to Q2,000,000 subject to same-policy terms, not separate standalone policies",
+      "deductibleBenefit": "Flux described as one event per annual policy subject to conditions"
+    },
+    "conflictsOrCaveats": [
+      {
+        "topic": "vehicle rental daily support",
+        "referenceA": "US$150 per day up to 15 days in product notes",
+        "referenceB": "Commercial summary explicitly flags Q200 per day vs US$150 and requires current quote",
+        "disposition": "NO_CONTRACTUAL_PROMISE_UNTIL_ACTIVE_TERMS_CONFIRMED"
+      },
+      {
+        "topic": "expired license",
+        "referenceA": "Product notes list license cover up to 12 months in assistance list and exclusion over two weeks later",
+        "disposition": "CONTRADICTORY_SAME_SOURCE_REQUIRE_CURRENT_INSURER_CONDITIONS"
+      },
+      {
+        "topic": "greater third party immediate payments",
+        "referenceA": "Q3,000 reference; occasional higher amounts described as case-by-case",
+        "disposition": "NEVER_PRESENT_10K_15K_AS_GUARANTEED"
+      }
+    ],
+    "releaseBoundary": {
+      "noOperationalDataChanges": true,
+      "noRatesEnabled": true,
+      "noCotizadorCalculation": true,
+      "sourceDocumentReviewOnly": true
+    },
+    "nextEvidence": "Current authorized insurer Auto Prime tariff/version and policy wording for contested benefits and recargo by payment mode"
   }
 }
