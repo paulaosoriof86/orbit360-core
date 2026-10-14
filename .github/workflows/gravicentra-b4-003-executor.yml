@@ -120,6 +120,9 @@ jobs:
           const requestedSubject='build(i6.5 B4-003): cumulative protected internal Preview';
           const currentSubject=require('node:child_process').execFileSync('git',['log','-1','--format=%s'],{encoding:'utf8'}).trim();
           const onePassInternal=currentSubject===requestedSubject
+            && c.b4003BoundedParallelParentFetch20261014?.status==='SOURCE_STAGED_NOT_ACCEPTED'
+            && c.b4003HumanCopyLayout20261014?.status==='SOURCE_STAGED_QA_NOT_HUMAN_PASS'
+            && c.b4003LiveHostingIntegrityHold?.releaseBlocked===true
             && c.b4003OnePassOpsLeadsSourceRepair?.status==='SOURCE_STAGED_QA_PENDING_NOT_ACCEPTED'
             && c.b4003OnePassFinanceRelationFix?.status==='SOURCE_STAGED_CONTRACT_QA_REQUIRED_NOT_ACCEPTED'
             && c.b4003ProtectedPreviewAuthorization?.status==='SCOPED_PREVIEW_PUBLIC_SMOKE_PASS_AUTHENTICATED_ROLE_SCOPE_PENDING'
