@@ -13,10 +13,34 @@
       "observations": [
         "Workbook text extraction identifies 2026 vehicle quotation model, product categories, risk-based rates, deductibles and minimum premiums.",
         "One populated motorcycle case is present with 2026 quotation date; do not use personal details as product knowledge.",
-        "Source includes an Aplicar recargo control; zero-surcharge cannot be universally inferred without formula and plan validation."
+        "Source includes an Aplicar recargo control; zero-surcharge cannot be universally inferred without formula and plan validation.",
+        "Direct formula inspection confirms the shown monthly installment amounts are based on the same printed total F51 divided by N, with duration eligibility checks; sample does not carry an extra installment surcharge."
       ],
-      "validation": "FORMULAS_AND_OUTPUT_RECONCILIATION_PENDING",
-      "tariffAllowed": false
+      "validation": "XLSX_FORMULA_LEVEL_PAYMENT_SCHEDULE_PASS_WITH_LIMITED_SCOPE",
+      "tariffAllowed": false,
+      "formulaAudit": {
+        "sourceFile": "Cotizador VA 2026 V1.4.xlsx",
+        "sheets": [
+          "DATA",
+          "BASE",
+          "IMPRESIÓN"
+        ],
+        "sourceCells": [
+          "DATA!G52",
+          "DATA!G57",
+          "IMPRESIÓN!F48:F51",
+          "IMPRESIÓN!I49:I58"
+        ],
+        "samplePrintedTotal": "GTQ 1965.60",
+        "samplePriceNet": "GTQ 1755.00",
+        "sampleIva": "GTQ 210.60 at 12% in output",
+        "sampleTenInstallments": "GTQ 196.56 each",
+        "monthlyScheduleFormula": "IMPRESIÓN payments 2-10 use IF(allowed_duration, $F$51/N, 'No aplica'); 12 uses F51/12 subject to condition",
+        "observedSurcharge": "No additional per-installment percent applied in printed 2-12 payment formula for sample",
+        "prontoPago": "GTQ 1867.32 computed from DATA!J57 x 1.12, separate from regular printed total",
+        "limitation": "Do not generalize beyond VA 2026 V1.4 and the selected vehicle product; insurer authorization, formula recalculation and version validation still required",
+        "policyDataWritten": false
+      }
     },
     {
       "insurer": "Aseguradora Guatemalteca",
