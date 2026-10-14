@@ -33,6 +33,14 @@ async function denied(fn,code){let e;try{await fn()}catch(err){e=err}
  await denied(()=>call('bootstrap-membership',{uid:'another'}),'IDENTITY_DENIED');count++;
  await denied(()=>call('delete'),'MODE_DENIED');count++;
  member={...member,status:'inactive'};await denied(()=>call(),'MEMBERSHIP_DENIED');count++;
+ member={...member,status:'active',estado:'suspended'};await denied(()=>call(),'MEMBERSHIP_DENIED');count++;
+ member={...member,estado:'invitado'};await denied(()=>call(),'MEMBERSHIP_DENIED');count++;
+ member={...member,estado:'activo',activo:false};await denied(()=>call(),'MEMBERSHIP_DENIED');count++;
+ member={...member,activo:true,inactivo:true};await denied(()=>call(),'MEMBERSHIP_DENIED');count++;
+ member={...member,inactivo:false,status:undefined,estado:undefined};await denied(()=>call(),'MEMBERSHIP_DENIED');count++;
+ member={...member,status:'active',estado:'activo'};const acceptedAliases=await call();assert.equal(acceptedAliases.membership.status,'active');count++;
+ member={...member,estado:undefined};
+
  member={...member,status:'active',activeRole:'Admin'};await denied(()=>call(),'ROLE_DENIED');count++;
  member={...member,activeRole:'Asesor',countries:['MX']};await denied(()=>call(),'COUNTRY_DENIED');count++;
  member={...member,countries:['GT'],email:'other@example.test'};await denied(()=>call(),'EMAIL_DENIED');count++;

@@ -5996,7 +5996,7 @@
   "canonicalAccumulationControl": {
     "status": "FROZEN_ACTIVE",
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "compositionLockBlobSha": "3a1363273d5fface0dede7098c88b53504acd07a",
+    "compositionLockBlobSha": "96e6db0888d97899853a5dd01ea8d2f7d326e806",
     "findingLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
     "findingLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
@@ -10387,5 +10387,23 @@
     "firestoreRulesDeployed": false,
     "livePromotionAuthorized": false,
     "securityP0Closed": false
+  },
+  "b4003BootstrapMembershipStatusParity20261014": {
+    "status": "SOURCE_FIXED_SYNTHETIC_QA_PASS_AUTHENTICATED_PREVIEW_PENDING",
+    "gate": "I6.5/B4-003",
+    "findingId": "B4-003-P0-20261012-PERSONAL-COLLECTION",
+    "cause": "BOOTSTRAP_STATUS_ALIAS_CONFLICT_ALLOWED_WHILE_SCOPED_READ_DENIED",
+    "sourcePath": "functions/b4-003-scoped-bootstrap-reader.js",
+    "sourceBeforeBlobSha": "381d7de300e4b57e41d53dceac70b49c90aa7cd2",
+    "sourceAfterBlobSha": "ecc027f2373a038a56f9fdfd67e75456dbe435ee",
+    "qaPath": "tools/gravicentra-b4-003-scoped-bootstrap-reader.test.cjs",
+    "qaBlobSha": "f60fe93afd35de889aa5c1b012aecfbb8bd15f4d",
+    "qaSyntheticChecks": 26,
+    "additionalNegativeCases": 5,
+    "positiveAliasCase": 1,
+    "productionChanged": false,
+    "firestoreRulesDeployed": false,
+    "operationalWrites": 0,
+    "securityHoldPreserved": true
   }
 }

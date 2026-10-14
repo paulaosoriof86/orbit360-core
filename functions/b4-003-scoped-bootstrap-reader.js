@@ -33,8 +33,9 @@ async function readBootstrap({db,auth,request}){
  const tenant=db.collection('tenants').doc(tenantId),s=await tenant.collection('members').doc(auth.uid).get();
  if(!s.exists)throw new Denied('MEMBERSHIP_DENIED');
  const m=s.data()||{},roles=list(m.roles),role=txt(m.activeRole||m.rolActivo);
- if(m.uid!==auth.uid||m.tenantId!==tenantId||m.active===false||
-    !['active','activo'].includes(txt(m.status||m.estado).toLowerCase()))
+ const declaredStates=[m.status,m.estado].filter(v=>txt(v)!=='').map(v=>txt(v).toLowerCase());
+ if(m.uid!==auth.uid||m.tenantId!==tenantId||m.active===false||m.activo===false||m.inactivo===true||
+    !declaredStates.length||declaredStates.some(v=>!['active','activo'].includes(v)))
    throw new Denied('MEMBERSHIP_DENIED');
  if(!roles.includes(role))throw new Denied('ROLE_DENIED');
  const memberEmail=txt(m.email).toLowerCase(),tokenEmail=txt(auth.token?.email).toLowerCase();
