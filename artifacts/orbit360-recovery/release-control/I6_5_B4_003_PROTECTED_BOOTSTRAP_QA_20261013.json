@@ -1,0 +1,41 @@
+{
+  "schemaVersion": "gravicentra-i65-b4003-protected-bootstrap-qa-v1",
+  "date": "2026-10-13",
+  "gate": "I6.5/B4-003",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "executionHead": "13cf4b554b96eb510ca8a96a9c69a6af9352c45f",
+  "proof": {
+    "runId": 38487526219,
+    "jobId": 115604663433,
+    "conclusion": "success",
+    "protectedBootstrapSourceChecks": 12,
+    "relatedScopeMockChecks": 25,
+    "policyScopeMockChecks": 16,
+    "sourceAndGovernanceGuards": "PASS"
+  },
+  "exactBlobs": {
+    "functions/b4-003-scoped-bootstrap-reader.js": "edd254de5345397dae51a3503c4b4cd5a93a4356",
+    "functions/b4-003-scoped-policy-callable.js": "f1813687a23c4350d8d1d4dc0fef6a4d58172dda",
+    "orbit360-platform/core/product-runtime-browser-providers-p0.js": "110240f07d334ea4976b59b52b4f433e6942bd48",
+    "tools/gravicentra-b4-003-scoped-bootstrap-reader.test.cjs": "db32b219fc3eed3b8d83b648a220bd5fd884998a",
+    ".github/workflows/gravicentra-release-lock-sync.yml": "fc3a34b20129697957a21656405a97de9e1acdd1",
+    "orbit360-platform/index.html": "839792d3aaf2b1ebf58769f542f96d5301904e9b"
+  },
+  "result": "SOURCE_AND_ISOLATED_QA_PASS_PREVIEW_PENDING",
+  "authorityLimits": {
+    "backendCallableExported": false,
+    "functionsDeployed": false,
+    "firestoreSharedRulesDeployed": false,
+    "authenticatedPreviewExecuted": false,
+    "productionPromotionAuthorized": false,
+    "operationalDataWrites": 0,
+    "securityFindingClosed": false
+  },
+  "nextRequired": [
+    "PREVIEW_ONLY_EXPORT_AUTHORITY_AFTER_SECURITY_CONTRACT_ADJUDICATION",
+    "AUTHENTICATED_BOOTSTRAP_GET_NEGATIVE_AND_POSITIVE_PER_ROLE_COUNTRY",
+    "FIRESTORE_DIRECT_DENIAL_REAL_AUTH_CONTEXT",
+    "EXACT_ARTIFACT_HOSTING_PREVIEW_READBACK"
+  ]
+}

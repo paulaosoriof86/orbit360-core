@@ -10141,7 +10141,7 @@
     "livePromotionAuthorized": false
   },
   "b4003ProtectedBootstrap20261013": {
-    "status": "SOURCE_ONLY_PENDING_QA_AUTHENTICATED_PREVIEW_NOT_RUN",
+    "status": "SOURCE_ONLY_ISOLATED_QA_PASS_AUTHENTICATED_PREVIEW_PENDING",
     "gate": "I6.5/B4-003",
     "findingId": "B4-003-P0-20261012-PERSONAL-COLLECTION",
     "cause": "BROWSER_DIRECT_MEMBERSHIP_AND_TENANT_CONFIG_READS_REMAIN_IN_PROTECTED_PREVIEW_BOOTSTRAP",
@@ -10176,6 +10176,13 @@
     "previewAccepted": false,
     "livePromotionAuthorized": false,
     "securityP0Closed": false,
-    "next": "SYNTHETIC_QA_AND_UNEXPORTED_FUNCTION_ISOLATED_SOURCE_VALIDATION"
+    "next": "SYNTHETIC_QA_AND_UNEXPORTED_FUNCTION_ISOLATED_SOURCE_VALIDATION",
+    "qaRunId": 38487526219,
+    "qaJobId": 115604663433,
+    "qaConclusion": "success",
+    "qaAssertionsPass": 12,
+    "qaReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PROTECTED_BOOTSTRAP_QA_20261013.json",
+    "qaReceiptBlobSha": "7e0dbe7318da7e6033b2aeea5d3f8cc822b4de8a",
+    "authenticatedPreviewPass": false
   }
 }
