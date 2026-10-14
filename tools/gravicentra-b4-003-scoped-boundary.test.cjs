@@ -18,5 +18,27 @@ assert.equal(allowRow(teamCtx,{pais:'GT',asesorId:'a1'}),true);
 assert.throws(()=>allowRow(teamCtx,{pais:'GT',asesorId:'a2'}),e=>e.code==='FOREIGN_RECORD_DENIED');
 assert.throws(()=>allowRow(teamCtx,{pais:'GT',asesorId:'a3'}),e=>e.code==='FOREIGN_RECORD_DENIED');
 assert.throws(()=>resolve({...teamCase,member:{...teamCase.member,roleVisibleAdvisorIds:{operativo:'a2'}}}),e=>e.code==='ROLE_TEAM_CONFIG_INVALID');
+
+const membershipStatusCases=[
+ {name:'missing_status',patch:{status:undefined,estado:undefined},allow:false},
+ {name:'suspended',patch:{status:'suspended'},allow:false},
+ {name:'paused',patch:{status:'paused'},allow:false},
+ {name:'invited',patch:{status:'invited'},allow:false},
+ {name:'inactive',patch:{status:'inactive'},allow:false},
+ {name:'conflicting_alias',patch:{status:'active',estado:'suspended'},allow:false},
+ {name:'active_status',patch:{status:'active',estado:undefined},allow:true},
+ {name:'active_spanish_alias',patch:{status:undefined,estado:'activo'},allow:true}
+];
+let membershipChecks=0;
+for(const testCase of membershipStatusCases){
+ const candidate={...c,member:{...c.member,...testCase.patch}};
+ if(testCase.allow)assert.equal(resolve(candidate).scope,'own',testCase.name);
+ else assert.throws(()=>resolve(candidate),error=>error&&error.code==='MEMBERSHIP_DENIED',testCase.name);
+ membershipChecks++;
+}
+assert.throws(()=>resolve({...c,member:{...c.member,status:'active',active:false}}),
+ error=>error&&error.code==='MEMBERSHIP_DENIED');
+membershipChecks++;
+console.log('B4_003_MEMBERSHIP_ACTIVE_ONLY_SCOPE_PASS checks='+membershipChecks+' staged_source_only_no_deploy');
 console.log('B4_003_PER_ROLE_TEAM_OVERRIDE_DENIES_GLOBAL_TEAM_PASS');
 console.log('STAGED_B4_003_CONTRACT_UNIT_PASS');

@@ -251,7 +251,7 @@
     "orbit360-platform/styles/base.css": "608ef0709144ffcbe748a7bd04e1bd16744def65",
     "orbit360-platform/styles/infra.css": "d6fe258364c4e11daad21848a40fbb121c36e4a8",
     "orbit360-platform/sw.js": "87412e7c4ef1030e2a3389cfd709f0c287ab336b",
-    "functions/b4-003-scoped-access-boundary.js": "8047e4870722db6889152af84ff91b08b1305308",
+    "functions/b4-003-scoped-access-boundary.js": "e1352a65a72162f23170ee5be455a8ac74f5ca46",
     "firestore.b4-003-scoped-candidate.rules": "6ae1a85b1f82525ac018ff682a2e20b6cca5f1d8",
     "orbit360-platform/modules/comparativo.js": "982881a4c1e2f95be95428bd3f9f23360a9a2d5f",
     "functions/b4-003-scoped-policy-reader.js": "4181f6198c0163175579a2cc19197ebc63d9b328",
@@ -5000,7 +5000,16 @@
     "signedRoleSessionIntegrationRequired": true,
     "firestoreRulesDeployAuthorized": false,
     "productEntrypointUnchanged": true,
-    "priorAcceptedEvidencePreserved": true
+    "priorAcceptedEvidencePreserved": true,
+    "membershipActiveOnlySource": {
+      "status": "STAGED_SOURCE_QA_NOT_PREVIEW",
+      "sourceBlobSha": "e1352a65a72162f23170ee5be455a8ac74f5ca46",
+      "qaBlobSha": "bf3ef6105dd1f45750fca6a4c72d8734d99285a7",
+      "issue": "ABSENT_OR_NONACTIVE_MEMBERSHIP_STATUS_ACCEPTED",
+      "nonDeployed": true,
+      "firestoreRulesUnchanged": true,
+      "livePromotion": false
+    }
   },
   "b4003ModalCatalogDocsStaging": {
     "scope": "Comparativo proposal + Renewal issuance + existing Ops management",

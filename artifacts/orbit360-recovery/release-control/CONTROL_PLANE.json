@@ -5996,7 +5996,7 @@
   "canonicalAccumulationControl": {
     "status": "FROZEN_ACTIVE",
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "compositionLockBlobSha": "b63d10128b9edd0ef7c75b2a0aeea3543393562c",
+    "compositionLockBlobSha": "22a6c28227b019daf0daa5f0f6671b1d310e54cc",
     "findingLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
     "findingLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
@@ -9773,9 +9773,25 @@
     "contractCorrection": {
       "prior": "mandatory custom giActiveRole claim not emitted by canonical backend",
       "fixed": "validate requested activeRole against server membership; signed claim if present restricts further",
-      "sourceBlobSha": "8047e4870722db6889152af84ff91b08b1305308",
+      "sourceBlobSha": "e1352a65a72162f23170ee5be455a8ac74f5ca46",
       "unitResult": "STAGED_RETEST_PENDING",
       "liveChanged": false
+    },
+    "membershipActiveOnlySource": {
+      "status": "STAGED_SOURCE_QA_NOT_PREVIEW",
+      "sourcePath": "functions/b4-003-scoped-access-boundary.js",
+      "sourceBlobSha": "e1352a65a72162f23170ee5be455a8ac74f5ca46",
+      "qaPath": "tools/gravicentra-b4-003-scoped-boundary.test.cjs",
+      "qaBlobSha": "bf3ef6105dd1f45750fca6a4c72d8734d99285a7",
+      "syntheticPreflightCases": 6,
+      "priorSourceBlobSha": "8047e4870722db6889152af84ff91b08b1305308",
+      "scope": "SERVER_SCOPED_READ_MEMBERSHIP_GATE_ONLY",
+      "firestoreRulesDeployed": false,
+      "backendDeployed": false,
+      "realDataWrites": 0,
+      "productionChanged": false,
+      "securityP0Closed": false,
+      "requires": "AUTHENTICATED_PREVIEW_NEGATIVE_AND_POSITIVE_ROLE_TESTS_AND_SEPARATE_DEPLOY_AUTHORIZATION"
     }
   },
   "b4003ModalCatalogDocsStaging": {

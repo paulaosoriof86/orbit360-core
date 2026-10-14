@@ -13,6 +13,10 @@ const get=(o,k)=>{const key=Object.keys(o||{}).find(v=>norm(v)===norm(k));return
 const scope=v=>({none:'none',ninguno:'none',sin_acceso:'none',own:'own',propio:'own',team:'team',equipo:'team',all:'all',todos:'all',global:'all'})[norm(v)]||'';
 function resolve({auth,member,config,tenantId,activeRole,collection,country}){
  const m=member||{},role=norm(activeRole),signed=norm(auth?.token?.giActiveRole);
+ // Membership must be affirmatively active; absent, suspended or conflicting
+ // status aliases cannot silently confer server-side read authorization.
+ const declaredStates=[m.status,m.estado].filter(value=>clean(value)!=='').map(norm);
+ if(!declaredStates.length||declaredStates.some(value=>!['active','activo'].includes(value)))deny('MEMBERSHIP_DENIED');
  if(!auth?.uid||!m.uid||m.uid!==auth.uid||m.tenantId!==tenantId||m.active===false||m.activo===false||m.inactivo===true||['inactive','inactivo','blocked','bloqueado','pending','pendiente','invited','invitado','deleted','eliminado'].includes(norm(m.status||m.estado)))deny('MEMBERSHIP_DENIED');
  if(!role)deny('ROLE_NOT_PROVIDED');
  if(signed&&role!==signed)deny('SIGNED_ACTIVE_ROLE_MISMATCH');
