@@ -5996,7 +5996,7 @@
   "canonicalAccumulationControl": {
     "status": "FROZEN_ACTIVE",
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "compositionLockBlobSha": "96e6db0888d97899853a5dd01ea8d2f7d326e806",
+    "compositionLockBlobSha": "32a017ccb7cf4caf380c18ab87d281ab5a3c93d9",
     "findingLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
     "findingLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
@@ -10405,5 +10405,19 @@
     "firestoreRulesDeployed": false,
     "operationalWrites": 0,
     "securityHoldPreserved": true
+  },
+  "b4003SignedActiveRoleBootstrapParity20261014": {
+    "status": "SOURCE_FIXED_QA_PENDING_AUTHENTICATED_PREVIEW",
+    "owner": "functions/b4-003-scoped-bootstrap-reader.js",
+    "sourceBlob": "e73b922173733b2c96693603d6035bfb3b31fa79",
+    "qa": "tools/gravicentra-b4-003-scoped-bootstrap-reader.test.cjs",
+    "qaBlob": "bd6bc37c4e7785475392f216709f7bc8424aea9e",
+    "rootCause": "BOOTSTRAP_IGNORED_OPTIONAL_SIGNED_ACTIVE_ROLE_CLAIM_WHILE_SCOPED_READER_REJECTED",
+    "safety": "server_membership_plus_optional_claim_must_match",
+    "qaSyntheticChecks": 29,
+    "operationalWrites": 0,
+    "firestoreRulesDeployed": false,
+    "livePromotionAuthorized": false,
+    "securityP0Closed": false
   }
 }

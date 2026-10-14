@@ -38,6 +38,11 @@ async function readBootstrap({db,auth,request}){
     !declaredStates.length||declaredStates.some(v=>!['active','activo'].includes(v)))
    throw new Denied('MEMBERSHIP_DENIED');
  if(!roles.includes(role))throw new Denied('ROLE_DENIED');
+ // Match the signed active-role claim when present, as the scoped reader does.
+ // Empty/absent claims do not grant privilege; server membership still governs.
+ const key=v=>txt(v).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_+|_+$/g,'');
+ const signedRole=key(auth.token?.giActiveRole);
+ if(signedRole&&signedRole!==key(role))throw new Denied('SIGNED_ACTIVE_ROLE_MISMATCH');
  const memberEmail=txt(m.email).toLowerCase(),tokenEmail=txt(auth.token?.email).toLowerCase();
  if(memberEmail&&tokenEmail&&memberEmail!==tokenEmail)throw new Denied('EMAIL_DENIED');
  if(mode==='bootstrap-membership'){

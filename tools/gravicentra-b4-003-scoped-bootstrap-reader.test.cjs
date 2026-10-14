@@ -32,6 +32,11 @@ async function denied(fn,code){let e;try{await fn()}catch(err){e=err}
  assert.equal(JSON.stringify(config).includes('DO_NOT_RETURN'),false);count++;
  await denied(()=>call('bootstrap-membership',{uid:'another'}),'IDENTITY_DENIED');count++;
  await denied(()=>call('delete'),'MODE_DENIED');count++;
+ const signed=await readBootstrap({db,auth:{uid,token:{email:'qa@example.test',giActiveRole:'Asesor'}},request:{tenantId,mode:'bootstrap-membership'}});
+ assert.equal(signed.membership.activeRole,'Asesor');count++;
+ await denied(()=>readBootstrap({db,auth:{uid,token:{email:'qa@example.test',giActiveRole:'Operativo'}},request:{tenantId,mode:'bootstrap-membership'}}),'SIGNED_ACTIVE_ROLE_MISMATCH');count++;
+ await denied(()=>readBootstrap({db,auth:{uid,token:{email:'qa@example.test',giActiveRole:'Operativo'}},request:{tenantId,mode:'bootstrap-tenant-config'}}),'SIGNED_ACTIVE_ROLE_MISMATCH');count++;
+
  member={...member,status:'inactive'};await denied(()=>call(),'MEMBERSHIP_DENIED');count++;
  member={...member,status:'active',estado:'suspended'};await denied(()=>call(),'MEMBERSHIP_DENIED');count++;
  member={...member,estado:'invitado'};await denied(()=>call(),'MEMBERSHIP_DENIED');count++;
