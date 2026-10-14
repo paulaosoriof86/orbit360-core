@@ -99,7 +99,7 @@ jobs:
             && l.r23CausalAuthorization?.status==='SCOPED_R23_SOURCE_MUTATION_APPROVED_WITHIN_B4_003'
             && l.r23InicioProgress?.authProofExecuted===false;
           // Separate, narrowly approved B4-003 security Preview path; never a LIVE release.
-          const scopedPreview=c.b4003ProtectedPreviewAuthorization?.status==='AUTHORIZED_SCOPED_PREVIEW_ONLY_PENDING_EXECUTION'
+          const priorScopedPreview=c.b4003ProtectedPreviewAuthorization?.status==='AUTHORIZED_SCOPED_PREVIEW_ONLY_PENDING_EXECUTION'
             && c.b4003ProtectedPreviewAuthorization?.receiptBlobSha==='c73a05cbdbed710a9e446ec5a4a6e73786ab1ba6'
             && require('node:child_process').execFileSync('git',['log','-1','--format=%s'],{encoding:'utf8'}).trim()==='build(i6.5 B4-003): wire isolated protected Preview reader'
             && c.currentB4?.status==='B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL'
@@ -115,6 +115,31 @@ jobs:
             && l.boundaries?.livePromotionAuthorized===false
             && c.b4003ProtectedPreviewAuthorization?.sharedFirestoreRulesDeployAuthorized===false
             && c.b4003ProtectedPreviewAuthorization?.operationalWritesAuthorized===false;
+          // Same B4-003 gate: one cumulative INTERNAL Preview for the restored
+          // Ops/Leads and policy-owned financial relations. No LIVE promotion.
+          const requestedSubject='build(i6.5 B4-003): cumulative protected internal Preview';
+          const currentSubject=require('node:child_process').execFileSync('git',['log','-1','--format=%s'],{encoding:'utf8'}).trim();
+          const onePassInternal=currentSubject===requestedSubject
+            && c.b4003OnePassOpsLeadsSourceRepair?.status==='SOURCE_STAGED_QA_PENDING_NOT_ACCEPTED'
+            && c.b4003OnePassFinanceRelationFix?.status==='SOURCE_STAGED_CONTRACT_QA_REQUIRED_NOT_ACCEPTED'
+            && c.b4003ProtectedPreviewAuthorization?.status==='SCOPED_PREVIEW_PUBLIC_SMOKE_PASS_AUTHENTICATED_ROLE_SCOPE_PENDING'
+            && c.canonicalAccumulationControl?.compositionLockBlobSha===require('node:child_process').execFileSync('git',['hash-object','artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json'],{encoding:'utf8'}).trim()
+            && c.currentB4?.status==='B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL'
+            && c.nextAction==='I6_5_FORENSIC_REMEDIATION_B4_003_R20_TARGETED_PAULA_VISUAL'
+            && c.b4003SecurityReleaseHold?.status==='ACTIVE_FAIL_CLOSED_UNAUTHORIZED_BROWSER_FIRESTORE_READ_WRITE'
+            && l.activeFinding?.id==='B4-003'
+            && l.boundaries?.previewMutationAuthorized===true
+            && l.boundaries?.functionDeploymentAuthorized===true
+            && l.boundaries?.businessWritesAuthorized===false
+            && l.boundaries?.syntheticQaWritesAuthorized===false
+            && l.boundaries?.dataMutationAuthorized===false
+            && l.boundaries?.realOperationalWritesAuthorized===false
+            && l.boundaries?.reimportAuthorized===false
+            && l.boundaries?.livePromotionAuthorized===false
+            && c.b4003ProtectedPreviewAuthorization?.sharedFirestoreRulesDeployAuthorized===false
+            && c.b4003ProtectedPreviewAuthorization?.operationalWritesAuthorized===false;
+          if(currentSubject===requestedSubject&&!onePassInternal)throw Error('B4_003_CUMULATIVE_INTERNAL_PREVIEW_GATE_DENIED');
+          const scopedPreview=priorScopedPreview||onePassInternal;
           const previewOk=(r19Preview||r20Preview||r23Preview)
             && l.activeFinding?.id==='B4-003'
             && l.boundaries?.businessWritesAuthorized===false
