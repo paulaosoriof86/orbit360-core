@@ -52,5 +52,84 @@ const denied=async(fn,code)=>{let x;try{await fn()}catch(e){x=e}assert.equal(x&&
  member={...member,nombre:'Persona válida'};
  r=await call('asesor');assert.equal(r.actor.activeRole,'asesor');checks++;
  assert.equal(JSON.stringify(r.actor).includes('synthetic-advisor'),true);checks++;
+
+ // B4-003 priority preflight: exercise the REAL Preview command handler with
+ // a synthetic transactional Firestore double. This does not touch Firebase.
+ {
+  const documents=new Map(),unitTenant='test-tenant',managementId='synthetic-management';
+  const memberPath=id=>'tenants/'+unitTenant+'/members/'+id;
+  const rowPath='tenants/'+unitTenant+'/data/gestiones/items/'+managementId;
+  documents.set(memberPath('operator-01'),{tenantId:unitTenant,uid:'operator-01',
+   status:'active',roles:['operativo'],activeRole:'operativo',advisorId:'advisor-01',
+   nombre:'Operador sintético',
+   dataScopes:{modules:{ops:'equipo'}},roleVisibleAdvisorIds:{operativo:['advisor-01','advisor-02']}});
+  documents.set(memberPath('advisor-02'),{tenantId:unitTenant,uid:'advisor-02',
+   status:'active',roles:['asesor'],activeRole:'asesor',advisorId:'advisor-02',
+   nombre:'Asesor sintético',dataScopes:{modules:{ops:'propios'}}});
+  documents.set('tenants/'+unitTenant+'/config/workflow',{version:'synthetic'});
+  documents.set(rowPath,{id:managementId,tenantId:unitTenant,asesorId:'advisor-01',
+   titulo:'Gestión sintética',lista:'Gestiones Admin',estado:'Pendiente',pais:'GT',
+   previewWrite:true,comentarios:[]});
+  let logicalWrites=0;
+  class Reference{
+   constructor(path){this.path=path;}
+   collection(name){return new Reference(this.path+'/'+name);}
+   doc(name){return new Reference(this.path+'/'+name);}
+   async get(){return snap(documents.get(this.path));}
+  }
+  const db={collection:name=>new Reference(name),
+   runTransaction:async fn=>{
+    const changes=[];
+    const tx={get:ref=>ref.get(),set:(ref,patch,options)=>{
+     changes.push({path:ref.path,patch,merge:options&&options.merge===true});
+    }};
+    const response=await fn(tx);
+    for(const ch of changes){
+     documents.set(ch.path,ch.merge?Object.assign({},documents.get(ch.path)||{},ch.patch):ch.patch);
+     logicalWrites++;
+    }
+    return response;
+   }};
+  const sandboxExports={};
+  const realRequire=require;
+  const stubRequire=name=>{
+   if(name==='node:crypto')return realRequire(name);
+   if(name==='firebase-admin/app')return{getApps:()=>[],initializeApp:()=>({})};
+   if(name==='firebase-admin/firestore')return{getFirestore:()=>db,
+    FieldValue:{serverTimestamp:()=> '2026-10-13T00:00:00Z'}};
+   if(name==='firebase-functions/v2/https')return{HttpsError,onCall:(_opts,fn)=>fn};
+   if(name==='firebase-functions/v2/scheduler')return{onSchedule:(_opts,fn)=>fn};
+   if(name==='./product-active-role-contract')return{resolveProductActiveRole:(m,requested)=>{
+    const role=String(requested||m.activeRole).toLowerCase();
+    if(!m.roles.includes(role))throw Error('ROLE_NOT_ASSIGNED');
+    return{activeRole:role,assignedRoles:m.roles.slice()};
+   }};
+   throw Error('UNEXPECTED_MOCK_IMPORT_'+name);
+  };
+  vm.runInNewContext(source,{require:stubRequire,exports:sandboxExports,process:{env:{}}},
+   {timeout:1000});
+  const call=sandboxExports.orbit360OpsLeadsCommandPreview;
+  const opRequest={auth:{uid:'operator-01',token:{email:'operator@example.invalid'}},
+   data:{tenantId:unitTenant,activeRole:'operativo',operation:'assign_management',
+    entityId:managementId,requestId:'synthetic-request-001',
+    reason:'Reasignación controlada',payload:{asesorId:'advisor-02'}}};
+  const first=await call(opRequest);
+  assert.equal(first.ok,true);checks++;
+  assert.equal(first.canonicalReadback,true);checks++;
+  assert.equal(documents.get(rowPath).asesorId,'advisor-02');checks++;
+  const repeat=await call(opRequest);
+  assert.equal(repeat.reused,true);checks++;
+  assert.equal(documents.get(rowPath).asesorId,'advisor-02');checks++;
+  const advisorRequest={auth:{uid:'advisor-02',token:{email:'advisor@example.invalid'}},
+   data:{tenantId:unitTenant,activeRole:'asesor',operation:'update_management',
+    entityId:managementId,requestId:'synthetic-request-002',
+    reason:'Validación de alcance',payload:{asesorId:'advisor-01'}}};
+  let rejection;
+  try{await call(advisorRequest);}catch(error){rejection=error;}
+  assert.equal(rejection&&rejection.code,'permission-denied');checks++;
+  assert.equal(documents.get(rowPath).asesorId,'advisor-02');checks++;
+  assert.equal(logicalWrites,4);checks++;
+  console.log('B4_003_TWO_UID_SYNTHETIC_ASSIGNMENT_QA_PASS checks=8 mock_only no_firestore_writes no_preview_claim');
+ }
  console.log('B4_003_OPS_LEADS_CANONICAL_HUMAN_ACTOR_SOURCE_QA_PASS checks='+checks+' synthetic_only_no_writes');
 })().catch(e=>{console.error(e);process.exitCode=1;});
