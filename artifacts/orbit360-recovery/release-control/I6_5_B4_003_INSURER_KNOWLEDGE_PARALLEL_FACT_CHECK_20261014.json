@@ -223,5 +223,230 @@
       "sourceDocumentReviewOnly": true
     },
     "nextEvidence": "Current authorized insurer Auto Prime tariff/version and policy wording for contested benefits and recargo by payment mode"
+  },
+  "parallelSourceInventoryExtension20261014": {
+    "status": "ORIGINAL_DRIVE_SOURCE_READ_AND_METADATA_VERIFIED_MAPPING_ONLY",
+    "scope": "EXISTING_B4_003_INSURER_KNOWLEDGE_PARALLEL_LANE",
+    "recordedDate": "2026-10-14",
+    "sources": [
+      {
+        "insurer": "BAM",
+        "country": "GT",
+        "product": "Vehículos",
+        "sourceFile": "COTIZADOR BAM 2025 vehiculos seg. completo pr..xlsx",
+        "driveFileId": "1wxGdyAj5E0a8Javcew6C0aAWfbfUuhAs",
+        "modifiedAt": "2026-08-18T20:11:33Z",
+        "verification": "ORIGINAL_FILE_METADATA_AND_TEXT_READ",
+        "observedExample": {
+          "primaNeta": 2500,
+          "emision": 125,
+          "iva": 315,
+          "primaTotal": 2940,
+          "moneda": "GTQ",
+          "arithmeticCheck": "2500+125+315=2940"
+        },
+        "observedVariables": [
+          "plan/cobertura",
+          "prima mínima",
+          "desglose de emisión e IVA",
+          "recargo según pagos",
+          "beneficios adicionales"
+        ],
+        "limitations": [
+          "2025 workbook; no insurer affirmation of October 2026 validity",
+          "quoted populated example cannot authorize universal rates",
+          "formula-by-formula and printed output reconciliation pending"
+        ],
+        "status": "SOURCE_REVIEW_ONLY_NOT_TARIFF_AUTHORITY_NOT_QUOTING_ENABLED"
+      },
+      {
+        "insurer": "BAM",
+        "country": "GT",
+        "product": "Gastos Médicos",
+        "sourceFile": "Cotizador BAMSALUD 2025.xlsx",
+        "driveFileId": "1o_M1jR4LdQm_-L0pVTj8opFfl54qRwPw",
+        "modifiedAt": "2025-05-09T18:48:09Z",
+        "verification": "ORIGINAL_FILE_METADATA_AND_TEXT_READ",
+        "observedVariables": [
+          "Plan I–V",
+          "maternidad",
+          "edad titular/cónyuge/dependientes",
+          "prima mensual con emisión e IVA",
+          "deducible/copago/coaseguro",
+          "carencias"
+        ],
+        "limitations": [
+          "2025 version stale/validity unverified",
+          "plan and household input dimensions must be kept independent",
+          "sample populated with individual input; no PII copied",
+          "formula and official quote reconciliation pending"
+        ],
+        "status": "SOURCE_REVIEW_ONLY_NOT_TARIFF_AUTHORITY_NOT_QUOTING_ENABLED"
+      },
+      {
+        "insurer": "Aseguradora Rural / Banrural",
+        "country": "GT",
+        "product": "Mi Carro Seguro",
+        "sourceFile": "Mi Carro Seguro Cotizador Banrural.xlsx",
+        "driveFileId": "1KL1MIJmEYDU08tCvR-ypMcHr7hoXqXqJ",
+        "modifiedAt": "2026-08-18T17:17:59Z",
+        "verification": "ORIGINAL_FILE_METADATA_AND_TEXT_READ",
+        "observedExample": {
+          "primaNetaAnual": 2500,
+          "totalContadoMostrado": 2940,
+          "doceCuotasDe": 276.43,
+          "totalDoceCuotasMostrado": 3317.16,
+          "moneda": "GTQ"
+        },
+        "observedVariables": [
+          "modalidad contado, mensual y Visa Cuotas",
+          "tabla 12 mensual con parámetro 0.1347",
+          "deducibles y asistencias diferenciadas"
+        ],
+        "limitations": [
+          "table parameter is not validated as universal rate",
+          "monthly total differs from cash quote; exact formula basis requires audit",
+          "effective tariff period and official insurer quote needed"
+        ],
+        "status": "SOURCE_REVIEW_ONLY_NOT_TARIFF_AUTHORITY_NOT_QUOTING_ENABLED"
+      },
+      {
+        "insurer": "Bantrab",
+        "country": "GT",
+        "product": "Vehículos",
+        "sourceFile": "COTIZADOR V13. CORREDORES.xlsx",
+        "driveFileId": "1BxsO83DRazQXXOc-QDv0C8Hc9v7GPga9",
+        "modifiedAt": "2026-10-12T22:21:09Z",
+        "verification": "ORIGINAL_FILE_METADATA_AND_TEXT_READ",
+        "observedVariables": [
+          "subprima y prima neta",
+          "gastos de emisión",
+          "recargo por fraccionamiento",
+          "asistencia",
+          "IVA y total",
+          "categoría VIP/empleado",
+          "deducibles"
+        ],
+        "limitations": [
+          "Drive modified date is not insurer tariff effective date",
+          "complex mode-specific versions/conditions",
+          "external references/formula errors flagged in earlier R8 inventory; isolate until resolved"
+        ],
+        "status": "SOURCE_REVIEW_ONLY_NOT_TARIFF_AUTHORITY_NOT_QUOTING_ENABLED"
+      }
+    ],
+    "authoritativePriority": [
+      {
+        "priority": 1,
+        "insurer": "Columna",
+        "action": "Reconcile VA 2026 V1.4 exact risk/payment formulas with official current quote and issuance policy; validate zero-emission assertion by product and plan; retain source-specific provenance",
+        "available": [
+          "Cotizador VA 2026 V1.4.xlsx"
+        ],
+        "missingOnlyAfterExhaustiveCheck": [
+          "official validity/version confirmation for Oct 2026",
+          "corresponding quote or policy under same product/payment"
+        ]
+      },
+      {
+        "priority": 2,
+        "insurer": "Aseguradora Guatemalteca",
+        "action": "Verify Premium/Plus/Básico separately; relate source rate, minimum, assistance, vehicle age and payment surcharge to real quote output",
+        "available": [
+          "Tasas AseGuate.xlsx"
+        ],
+        "missingOnlyAfterExhaustiveCheck": [
+          "current rate validity/plan authorization",
+          "matching issued quote or policy per differentiated payment plan"
+        ]
+      },
+      {
+        "priority": 3,
+        "insurer": "BAM Vehículos y Salud",
+        "action": "Use both original 2025 workbooks; map plan and product dimensions and reconcile output before any tariff activation",
+        "available": [
+          "COTIZADOR BAM 2025 vehiculos seg. completo pr..xlsx",
+          "Cotizador BAMSALUD 2025.xlsx"
+        ],
+        "missingOnlyAfterExhaustiveCheck": [
+          "2026 current official workbook or effective version statement",
+          "matching current official outputs for Auto and GM"
+        ]
+      },
+      {
+        "priority": 4,
+        "insurer": "Banrural",
+        "action": "Inspect current Mi Carro Seguro printed schedule and formula/recargo base; never substitute a universal 13% rate",
+        "available": [
+          "Mi Carro Seguro Cotizador Banrural.xlsx"
+        ],
+        "missingOnlyAfterExhaustiveCheck": [
+          "validity of workbook",
+          "official same-risk quote for cash vs 12 monthly"
+        ]
+      },
+      {
+        "priority": 5,
+        "insurer": "Bantrab",
+        "action": "Resolve V13 rate/financing table conditions and isolated external references before calculating per plan",
+        "available": [
+          "COTIZADOR V13. CORREDORES.xlsx",
+          "COTIZADOR V13. CORREDORES.pdf",
+          "COTIZADOR MOTO - INTERMEDIARIO 2024.xlsx"
+        ],
+        "missingOnlyAfterExhaustiveCheck": [
+          "current V13 applicability by auto/motorcycle",
+          "independent official output for representative variants"
+        ]
+      },
+      {
+        "priority": 6,
+        "insurer": "Ficohsa Auto Prime",
+        "action": "Resolve conflicting vehicle rental daily support and expired-license conditions using effective policy wording; confirm exact recargo by payment mode",
+        "available": [
+          "FICOHSA AUTO PRIME.docx",
+          "Resumen Ficohsa Auto Prime AyS Comercial.docx"
+        ],
+        "missingOnlyAfterExhaustiveCheck": [
+          "current official conditions and tariff version",
+          "quoted recargo and benefits by chosen plan"
+        ]
+      },
+      {
+        "priority": 7,
+        "insurer": "Seguros Universales",
+        "action": "Map Riesgo Plus source PDF as evidence of coverage/presentation, not tariff rule",
+        "available": [
+          "CG - Riesgo Plus.pdf"
+        ],
+        "missingOnlyAfterExhaustiveCheck": [
+          "official current version/quote tied to plan",
+          "rate formula/elegibility and insurer authorization"
+        ]
+      },
+      {
+        "priority": 8,
+        "insurer": "AXA Colpatria / La Previsora",
+        "action": "Retain sample contractual amounts only; acquire product-version quoting authority and isolate financing as distinct if external",
+        "available": [
+          "R9 policy samples"
+        ],
+        "missingOnlyAfterExhaustiveCheck": [
+          "current insurer-product official rate/payment terms",
+          "same-product current quote and policy comparison"
+        ]
+      }
+    ],
+    "governance": {
+      "noProductSourceChanged": true,
+      "noOperationalWrites": true,
+      "noFirestoreRulesChanged": true,
+      "noHostingPromotion": true,
+      "noReimport": true,
+      "noTariffRuleEnabled": true,
+      "preserveExistingKnowledgeAndFindings": true,
+      "goLiveBlocking": false,
+      "remainingWork": "EVIDENCE_VALIDITY_FORMULA_RECONCILIATION_AND_SCOPE_APPROVAL"
+    }
   }
 }
