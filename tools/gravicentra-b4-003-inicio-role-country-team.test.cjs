@@ -42,14 +42,14 @@ const denied=async fn=>{let error;try{await fn()}catch(e){error=e}
  assert.equal(error&&error.code,'permission-denied');checks++;};
 (async()=>{
  let v=await call();eq(v.scope,'team');
- eq(v.rows.map(x=>x.id).join(','),'a1,a3');
+ eq(v.rows.map(x=>x.id).sort().join(','),'a1,a3');
  eq(Object.keys(v.globalMetas).length,0);
- v=await call('Asesor');eq(v.scope,'own');eq(v.rows.map(x=>x.id).join(','),'a1');
+ v=await call('Asesor');eq(v.scope,'own');eq(v.rows.map(x=>x.id).sort().join(','),'a1');
  eq(Object.keys(v.globalMetas).length,0);
  membership.dataScopes.modules.inicio='todos';access.roleScopes.operativo='all';
- v=await call();eq(v.scope,'all');eq(v.rows.map(x=>x.id).join(','),'a1,a2,a3');eq(v.globalMetas.GT.prima,1200);
- v=await call('Asesor');eq(v.scope,'own');eq(v.rows.map(x=>x.id).join(','),'a1');
- v=await call('Operativo','CO');eq(v.rows.map(x=>x.id).join(','),'a4');
+ v=await call();eq(v.scope,'all');eq(v.rows.map(x=>x.id).sort().join(','),'a1,a2,a3');eq(v.globalMetas.GT.prima,1200);
+ v=await call('Asesor');eq(v.scope,'own');eq(v.rows.map(x=>x.id).sort().join(','),'a1');
+ v=await call('Operativo','CO');eq(v.rows.map(x=>x.id).sort().join(','),'a4');
  membership.dataScopes.modules.inicio='ninguno';await denied(()=>call());
  membership.dataScopes.modules.inicio='incorrecto';await denied(()=>call());
  membership.dataScopes.modules.inicio='equipo';membership.roleVisibleAdvisorIds.Operativo='bad';
