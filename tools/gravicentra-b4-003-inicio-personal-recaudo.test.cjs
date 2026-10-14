@@ -28,7 +28,8 @@ const q={
 const roster={
  // This test targets the rendered own-vs-institutional split. Dashboard
  // cache-key correctness is covered independently; force a confirmed roster.
- dashboardStatus:()=>({entries:{some:()=>true}}),
+ dashboardStatus:()=>({entries:[{key:id+'|'+role.toLowerCase()+'|'+scope+'|'+month,at:'confirmed'}]}),
+ dashboardList:async()=>[row()],
  dashboardPeek:()=>[row()],
  dashboardGlobalMetas:()=>global?{GT:{recaudo:1000,prima:1200,explicitPrima:true,explicitRecaudo:true}}:{},
  dashboardSelfAdvisorId:()=>ownId
