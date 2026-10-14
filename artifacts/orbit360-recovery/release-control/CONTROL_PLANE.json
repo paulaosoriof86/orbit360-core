@@ -10638,6 +10638,24 @@
     "scopedAuthority": "CURRENT_USER_REQUESTED_CAUSAL_B4_003_INTERVENTION",
     "sourceMutationScopedOnly": true,
     "scopedAuthorizationLockBlobSha": "f19d47fd73ef4a20410a24b8350194406ca2ce33",
-    "canonicalCompositionBlobSha": "06fbb74226adffccb97d7a56356face9d66dbd69"
+    "canonicalCompositionBlobSha": "06fbb74226adffccb97d7a56356face9d66dbd69",
+    "qaGuardProof": {
+      "status": "SOURCE_MOCK_REGRESSION_AND_CANONICAL_GUARD_PASS_NOT_AUTHENTICATED_PREVIEW",
+      "runId": 38650050139,
+      "jobId": 116146315904,
+      "headSha": "92a3f6a0c73d5a3388bdf254ad15fe96fb033e02",
+      "conclusion": "success",
+      "legacyCountryRegressionChecks": 3,
+      "relatedServerMockChecks": 41,
+      "securityRulesReleaseHoldPreserved": true
+    },
+    "previewRequest": {
+      "status": "EXACT_SCOPED_PREVIEW_REQUESTED_ON_CURRENT_GATE",
+      "mode": "EXISTING_B4_003_SCOPED_PREVIEW",
+      "noLive": true,
+      "noSharedRulesDeploy": true,
+      "noRealWrites": true,
+      "authPositiveNegativeStillRequired": true
+    }
   }
 }
