@@ -63,11 +63,11 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          mkdir -p "$RUNNER_TEMP/g14-portal-tests"
-          git show 1623cac977498bb5bba0092748a8c70a9cd06189:functions/portal-p01-s511f-shell.test.js > "$RUNNER_TEMP/g14-portal-tests/portal-p01-s511f-shell.test.js"
+          mkdir -p "$RUNNER_TEMP/g14-staged/candidate/functions"
+          git show 1623cac977498bb5bba0092748a8c70a9cd06189:functions/portal-p01-s511f-shell.test.js > "$RUNNER_TEMP/g14-staged/candidate/functions/portal-p01-s511f-shell.test.js"
           node --check "$RUNNER_TEMP/g14-staged/candidate/orbit360-platform/core/portal-p01-s511f.js"
           node --check "$RUNNER_TEMP/g14-staged/candidate/orbit360-platform/core/siniestros-s512d-public.js"
-          node --test "$RUNNER_TEMP/g14-portal-tests/portal-p01-s511f-shell.test.js"
+          node --test "$RUNNER_TEMP/g14-staged/candidate/functions/portal-p01-s511f-shell.test.js"
       - name: Recheck G8 immutable manifests, 15/15 negatives and 963 live public bytes
         shell: bash
         run: |
