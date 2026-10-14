@@ -1,0 +1,271 @@
+name: AYS G7 Firebase Hosting LAB release manifest READ ONLY
+on:
+  push:
+    branches:
+      - audit/ays-g4-shared-hosting-sourceonly-20261013
+    paths:
+      - '.github/workflows/ays-g7-hosting-readonly-releases.yml'
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: ays-g7-firebase-hosting-readonly
+  cancel-in-progress: false
+jobs:
+  g7-firebase-readonly:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Retrieve exact prior G4/G6 CI evidence (no source rewrite)
+        uses: actions/download-artifact@v4
+        with:
+          artifact-ids: '11851102002'
+          run-id: '38469690277'
+          github-token: ${{ github.token }}
+          path: ${{ runner.temp }}/ays-g7-input
+      - name: Install read-only OAuth client
+        run: python -m pip install --disable-pip-version-check google-auth==2.38.0
+      - name: Read Firebase Hosting LAB releases and file manifests (GET only)
+        shell: bash
+        env:
+          FIREBASE_SA_LAB_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+          G7_INPUT_DIR: ${{ runner.temp }}/ays-g7-input
+          G7_OUTPUT_DIR: ${{ runner.temp }}/ays-g7-output
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import hashlib
+          import json
+          import os
+          import pathlib
+          import sys
+          import urllib.error
+          import urllib.parse
+          import urllib.request
+          
+          from google.oauth2 import service_account
+          from google.auth.transport.requests import Request
+          
+          SITE = "ays-orbit-360-lab"
+          BASE = "https://firebasehosting.googleapis.com/v1beta1/sites/" + SITE
+          SCOPE = "https://www.googleapis.com/auth/firebase.hosting.readonly"
+          SOURCE_REF = "11851102002"
+          ROOT = pathlib.Path(os.environ["G7_INPUT_DIR"])
+          OUT = pathlib.Path(os.environ["G7_OUTPUT_DIR"])
+          OUT.mkdir(parents=True, exist_ok=True)
+          
+          def sha256(data):
+              return hashlib.sha256(data).hexdigest()
+          
+          def save(name, value):
+              (OUT / name).write_text(json.dumps(value, ensure_ascii=False, sort_keys=True, indent=2) + "\n", encoding="utf-8")
+          
+          def sanitized_error(exc):
+              if isinstance(exc, urllib.error.HTTPError):
+                  return "FIREBASE_READ_HTTP_" + str(exc.code)
+              return type(exc).__name__ + ": " + str(exc)[:170]
+          
+          def get_json(credentials, path, params=None):
+              assert path.startswith(BASE + "/"), "Out-of-scope Firebase URL"
+              url = path
+              if params:
+                  url += "?" + urllib.parse.urlencode(params)
+              request = urllib.request.Request(
+                  url,
+                  headers={"Authorization": "Bearer " + credentials.token, "Accept": "application/json"},
+                  method="GET",
+              )
+              with urllib.request.urlopen(request, timeout=25) as response:
+                  assert response.status == 200, "Unexpected HTTP status"
+                  data = response.read(6_000_001)
+              if len(data) > 6_000_000:
+                  raise ValueError("Oversized read response")
+              return json.loads(data)
+          
+          def pages(credentials, path, field, page_size):
+              seen = set()
+              output = []
+              token = None
+              for index in range(25):
+                  params = {"pageSize": page_size}
+                  if token:
+                      params["pageToken"] = token
+                  response = get_json(credentials, path, params)
+                  new_items = response.get(field, [])
+                  if not isinstance(new_items, list):
+                      raise ValueError("Invalid API list")
+                  output.extend(new_items)
+                  token = response.get("nextPageToken")
+                  if not token:
+                      return output, index + 1
+                  if token in seen:
+                      raise ValueError("Pagination cycle")
+                  seen.add(token)
+              raise ValueError("Pagination safety limit exceeded")
+          
+          def inspect_version(credentials, version):
+              name = version.get("name", "")
+              prefix = "sites/" + SITE + "/versions/"
+              if not name.startswith(prefix) or "/" in name[len(prefix):]:
+                  raise ValueError("Unexpected version resource")
+              records, pages_read = pages(credentials, "https://firebasehosting.googleapis.com/v1beta1/" + name + "/files", "files", 500)
+              files = {}
+              statuses = {}
+              for row in records:
+                  p = row.get("path", "").lstrip("/")
+                  h = row.get("hash", "")
+                  if not p or p in files or not isinstance(h, str) or len(h) != 64:
+                      raise ValueError("Invalid or duplicate file entry")
+                  files[p] = h.lower()
+                  statuses[p] = row.get("status")
+              return {"version": name, "declared_file_count": int(version.get("fileCount", -1)), "observed_file_count": len(files), "pages": pages_read, "files": files, "statuses": statuses}
+          
+          def run():
+              b = (ROOT / "SOURCE_FILE_MANIFEST.json").read_bytes()
+              source = json.loads(b)
+              receipt = json.loads((ROOT / "SOURCE_ASSEMBLY_RECEIPT.json").read_text(encoding="utf-8"))
+              if sha256(b) != receipt["manifest_sha256"]:
+                  raise ValueError("G4 source manifest digest mismatch")
+              if source.get("classification") != "SOURCE_ONLY_NOT_DEPLOYED" or source.get("assembled_count") != 2708:
+                  raise ValueError("G4 source identity mismatch")
+              if source.get("baseline_ref") != "f873ce1f2b55dc5ad8cac07b58be43faddeb0a99":
+                  raise ValueError("G4 base ref mismatch")
+              if source.get("portal_ref") != "1623cac977498bb5bba0092748a8c70a9cd06189":
+                  raise ValueError("G4 Portal ref mismatch")
+              publishable = {}
+              for record in source["files"]:
+                  if not record["path"].startswith("orbit360-platform/"):
+                      raise ValueError("Source path outside Hosting root")
+                  path = record["path"].removeprefix("orbit360-platform/")
+                  if path.startswith("docs/") or path == ".verify-academia.png":
+                      continue
+                  if path in publishable:
+                      raise ValueError("Duplicate source path")
+                  publishable[path] = record["sha256"]
+              if len(publishable) != 965:
+                  raise ValueError("Expected source candidate path count changed")
+              important = ["portal-p01-lab.html", "core/portal-p01-s511f.js", "siniestros-asistencia-lab.html", "core/siniestros-s512d-public.js"]
+              if not all(p in publishable for p in important):
+                  raise ValueError("Missing source critical path")
+              secret = os.environ.get("FIREBASE_SA_LAB_JSON", "")
+              if not secret:
+                  raise ValueError("Dedicated Firebase LAB service account not configured; no fallback")
+              info = json.loads(secret)
+              os.environ.pop("FIREBASE_SA_LAB_JSON", None)
+              if info.get("project_id") != SITE:
+                  raise ValueError("Service account project mismatch")
+              credentials = service_account.Credentials.from_service_account_info(info, scopes=[SCOPE])
+              del info
+              credentials.refresh(Request())
+              if not credentials.token:
+                  raise ValueError("No OAuth access token")
+              releases, release_pages = pages(credentials, BASE + "/channels/live/releases", "releases", 100)
+              releases = sorted(releases, key=lambda row: row.get("releaseTime", ""), reverse=True)
+              if len(releases) < 2:
+                  raise ValueError("Not enough live release history")
+              selected = releases[:2]
+              metas = []
+              manifests = []
+              for row in selected:
+                  rname = row.get("name", "")
+                  if not rname.startswith("sites/" + SITE + "/"):
+                      raise ValueError("Unexpected release resource")
+                  version = row.get("version") or {}
+                  measured = inspect_version(credentials, version)
+                  manifests.append(measured)
+                  metas.append({
+                      "release_name": rname,
+                      "release_time": row.get("releaseTime"),
+                      "release_type": row.get("type"),
+                      "version_name": measured["version"],
+                      "version_declared_file_count": measured["declared_file_count"],
+                      "version_observed_file_count": measured["observed_file_count"],
+                      "file_pages": measured["pages"],
+                  })
+              current, previous = manifests
+              live = current["files"]
+              prev = previous["files"]
+              current_only = sorted(set(live) - set(prev))
+              previous_only = sorted(set(prev) - set(live))
+              changed = sorted(p for p in set(live) & set(prev) if live[p] != prev[p])
+              missing_from_live = sorted(set(publishable) - set(live))
+              additional_live = sorted(set(live) - set(publishable))
+              critical = {p: {"live": p in live, "previous": p in prev, "source": p in publishable} for p in important}
+              summary = {
+                  "schema": "AYS_G7_FIREBASE_LAB_READONLY_V1",
+                  "result": "API_READBACK_COMPLETED_SOURCE_ONLY",
+                  "firebase_mutations": 0,
+                  "github_merge": False,
+                  "github_deploy": False,
+                  "oauth_scope": SCOPE,
+                  "site": SITE,
+                  "g4_artifact_id": SOURCE_REF,
+                  "g4_source_manifest_sha256": sha256(b),
+                  "g4_source_candidates": len(publishable),
+                  "release_history_pages": release_pages,
+                  "latest_two_releases": metas,
+                  "release_comparison": {
+                      "current_only": current_only,
+                      "previous_only": previous_only,
+                      "hash_changed": changed,
+                  },
+                  "source_path_comparison": {
+                      "source_missing_from_live": missing_from_live,
+                      "live_not_in_source": additional_live,
+                      "path_sets_identical": not missing_from_live and not additional_live,
+                  },
+                  "critical_paths": critical,
+                  "hash_semantics": "Firebase VersionFile.hash may refer to upload representation; not directly comparable with raw source SHA256. Only Firebase-to-Firebase file hashes compared.",
+                  "restore_authorized": False,
+                  "rollback_authorized": False,
+              }
+              save("G7_READONLY_RECEIPT.json", summary)
+              for label, manifest in (("LIVE", current), ("PREVIOUS", previous)):
+                  save("G7_" + label + "_VERSION_FILE_MANIFEST.json", manifest)
+              save("G7_G4_SOURCE_PATHS_SHA256.json", publishable)
+              print("G7_READONLY_COMPLETE " + json.dumps({
+                  "latest_release": metas[0]["release_name"],
+                  "live_file_count": len(live),
+                  "previous_file_count": len(prev),
+                  "current_only": len(current_only),
+                  "previous_only": len(previous_only),
+                  "changed": len(changed),
+                  "missing_from_live": len(missing_from_live),
+                  "live_not_in_source": len(additional_live),
+                  "critical": critical,
+                  "release_gate": "HOLD_NO_DEPLOY"
+              }, sort_keys=True))
+              if missing_from_live or additional_live:
+                  print("G7_RECONCILIATION_HOLD: Source and live path sets differ; no promotion.")
+              else:
+                  print("G7_PATH_SET_MATCH_ONLY: Still no release authorization or byte identity certification.")
+          
+          try:
+              run()
+          except Exception as exc:
+              save("G7_READONLY_FAILURE.json", {
+                  "schema": "AYS_G7_FIREBASE_LAB_READONLY_V1",
+                  "result": "FAIL_CLOSED",
+                  "error": sanitized_error(exc),
+                  "firebase_mutations": 0,
+                  "release_authorized": False
+              })
+              print("G7_FAIL_CLOSED " + sanitized_error(exc), file=sys.stderr)
+              sys.exit(2)
+          PY
+      - name: Retain sanitized file/path/hash manifests only
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ays-g7-firebase-lab-readonly-evidence
+          path: ${{ runner.temp }}/ays-g7-output/*.json
+          if-no-files-found: warn
+          retention-days: 15
+# Security: OAuth scope firebase.hosting.readonly, Firebase GET only, no Firebase CLI.
+# NO deploy / no merge / no rollback / no customer data / no Firebase mutation.
