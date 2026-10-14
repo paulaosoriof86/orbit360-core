@@ -95,7 +95,7 @@ jobs:
           from pathlib import Path
           t=Path(".github/workflows/ays-g14-coordinated-publisher-sourceonly.yml").read_text()
           live="\n".join(line for line in t.splitlines() if not line.lstrip().startswith("#"))
-          forbidden=("firebase deploy", "firebase-tools", "FIREBASE_SERVICE_ACCOUNT", "GOOGLE_APPLICATION_CREDENTIALS", "hosting:channel:deploy", "FirebaseExtended/action-hosting-deploy", "secrets.")
+          forbidden=tuple(a+b for a,b in (("firebase"," deploy"),("firebase","-tools"),("FIREBASE_","SERVICE_ACCOUNT"),("GOOGLE_","APPLICATION_CREDENTIALS"),("hosting:channel:","deploy"),("FirebaseExtended/","action-hosting-deploy"),("secrets",".")))
           # Forbid even echoing any cloud publishing command in executable source.
           assert all(s not in live for s in forbidden), "G14_WORKFLOW_DEPLOY_DENIED"
           assert "contents: read" in live and "actions: read" in live
