@@ -83,9 +83,26 @@ jobs:
           console.log('B4_003_DIAGNOSTIC_MODE='+(ok?'RUN':'NOOP'));
           NODE
 
-      - name: Assert LIVE unchanged
-        if: steps.gate.outputs.run == 'true' || steps.gate.outputs.integrity == 'true'
+      - name: Assert LIVE unchanged for release-bound R18 path
+        if: steps.gate.outputs.run == 'true'
         run: node tools/gravicentra-certified-live-binding-check.mjs
+
+      - name: Capture LIVE drift as blocker for strictly read-only diagnostic
+        if: steps.gate.outputs.integrity == 'true'
+        env:
+          LIVE_BINDING_ATTEMPTS: '1'
+        run: |
+          set +e
+          node tools/gravicentra-certified-live-binding-check.mjs > "$RUNNER_TEMP/b4-003-live-binding-check.log" 2>&1
+          RC=$?
+          set -e
+          if [ "$RC" = '0' ]; then
+            echo 'LIVE_BINDING_AUDIT=PASS'
+            printf '{"status":"LIVE_BINDING_PASS","productionReleaseAcceptedByThisAudit":false}\n' > "$RUNNER_TEMP/b4-003-live-binding-status.json"
+          else
+            echo 'LIVE_BINDING_AUDIT=DRIFT_BLOCKS_RELEASE_READONLY_AUDIT_CONTINUES'
+            printf '{"status":"LIVE_BINDING_MISMATCH_RELEASE_BLOCKED","reason":"CERTIFIED_BUILD_MARKER_UNAVAILABLE_OR_MISMATCH","productionReleaseAcceptedByThisAudit":false}\n' > "$RUNNER_TEMP/b4-003-live-binding-status.json"
+          fi
 
       - name: Prepare read-only Firebase and browser
         if: steps.gate.outputs.run == 'true' || steps.gate.outputs.integrity == 'true'
@@ -130,7 +147,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: gravicentra-b4-003-onepass-integrity-${{ github.run_id }}
-          path: ${{ runner.temp }}/b4-003-onepass-readonly.json
+          path: |
+            ${{ runner.temp }}/b4-003-onepass-readonly.json
+            ${{ runner.temp }}/b4-003-live-binding-status.json
           if-no-files-found: error
           retention-days: 30
 
