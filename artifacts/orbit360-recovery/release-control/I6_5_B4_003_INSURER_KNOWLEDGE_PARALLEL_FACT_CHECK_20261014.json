@@ -2,7 +2,7 @@
   "schema": "GRAVICENTRA_B4003_INSURER_KNOWLEDGE_PARALLEL_FACT_CHECK_V1",
   "gate": "I6.5/B4-003",
   "date": "2026-10-14",
-  "status": "SOURCE_REVIEW_PROGRESSED_NO_RATE_ENABLEMENT",
+  "status": "SOURCE_FORMULA_AND_TEXT_VALIDATION_PROGRESSED_NO_RATE_ENABLEMENT",
   "priority": "PARALLEL_NONBLOCKING_PER_FROZEN_USER_PRIORITY",
   "sources": [
     {
@@ -89,5 +89,87 @@
   "sourceProductChanges": 0,
   "firestoreRuleChanges": 0,
   "productionPromotion": false,
-  "notCotizadorRateApproval": true
+  "notCotizadorRateApproval": true,
+  "aseGuateWorkbookCellAudit": {
+    "status": "EXACT_SOURCE_TEXT_REVIEWED_TARIFF_ENABLEMENT_BLOCKED",
+    "sourceFile": "Tasas AseGuate.xlsx",
+    "driveId": "18qF8Ddty6kALuvuHIWnCjK2mDLRyTCMs",
+    "driveModifiedAt": "2026-06-04T06:12:35Z",
+    "workbookSheet": "Hoja1",
+    "hasExecutableCalculatorFormulas": false,
+    "tierRules": [
+      {
+        "tier": "PREMIUM",
+        "sheet": "Hoja1",
+        "sourceRows": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          8,
+          9
+        ],
+        "listedRate": "3.20%",
+        "minimum": "Q1,800 plus assistance",
+        "assistance": "Q350",
+        "deductible": "3% theft and damages, Q1800 min with named vehicle exceptions",
+        "vehicleAge": "20 years max",
+        "maxDiscount": "20% with minimum maintained"
+      },
+      {
+        "tier": "PLUS",
+        "sourceRows": [
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          20,
+          21
+        ],
+        "listedRate": "4%",
+        "minimum": "Q1600 plus recargo and assistance",
+        "vehicleAgeSurcharge": "15%",
+        "assistance": "Q350",
+        "vehicleAge": "25 years max",
+        "maxDiscount": "20% with minimum and surcharge maintained"
+      },
+      {
+        "tier": "BASICO",
+        "sourceRows": [
+          24,
+          25,
+          26,
+          27,
+          28
+        ],
+        "minimum": "Q800 plus assistance",
+        "assistance": "Q350",
+        "vehicleAge": "25 years max",
+        "discount": "not applicable"
+      }
+    ],
+    "paymentSourceRows": [
+      30,
+      31,
+      32
+    ],
+    "installments": {
+      "8": "5.37% insurer surcharge",
+      "10": "8.42% insurer surcharge",
+      "upTo6": "cash price"
+    },
+    "limitations": [
+      "Quote-level components and IVA still require reconciliation",
+      "Excel is a tariff text/reference, not an executable calculation model",
+      "Workbook modified date is not tariff effective validity",
+      "Do not apply listed rates outside vehicle tiers",
+      "Do not overwrite migrated contractual premium or split receipts without independent authority"
+    ],
+    "readOnly": true,
+    "tariffsEnabled": false,
+    "productCodeChanged": false
+  }
 }
