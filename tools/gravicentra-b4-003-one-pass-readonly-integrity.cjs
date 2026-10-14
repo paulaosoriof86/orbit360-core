@@ -95,7 +95,7 @@ async function main(){
     return {caseHash:hash(c.id),policies:related.length,expectedReceipts:sets.recibosEsperados.filter(r=>policyIds.has(safe(r.polizaId||r.policyId))).length,portfolioRows:sets.carteraPrimas.filter(r=>policyIds.has(safe(r.polizaId||r.policyId))).length,vehicles:sets.vehiculos.filter(r=>policyIds.has(safe(r.polizaId||r.policyId))).length};
   })};
   // No individual target values or identifying advisor IDs in this receipt.
-  const goalMonths=[...new Set(sets.metas.map(x=>safe(x.mes||x.periodo).slice(0,7)).filter(x=>/^\\d{4}-\\d{2}$/.test(x)))].sort().slice(-4);
+  const goalMonths=[...new Set(sets.metas.map(x=>safe(x.mes||x.periodo).slice(0,7)).filter(x=>/^[0-9]{4}-[0-9]{2}$/.test(x)))].sort().slice(-4);
   const groupedGoals={};
   for(const month of goalMonths){
     groupedGoals[month]={};
