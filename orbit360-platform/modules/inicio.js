@@ -176,23 +176,30 @@ Orbit.modules.inicio = (function () {
         const cur=country==='GT'?'GTQ':'COP',total=Number(map[cur]||0),global=configuredMeta(kind==='production'?'prima':'recaudo',country),hasGlobal=global!=null&&global>0;
         const a=self&&self.paises.includes(country)?self:null,m=a?.metas?.[country];
         const mine=kind==='production'?(m?.explicit===true?U.finiteNumber(m.produccion):(a?.paises.length===1?U.finiteNumber(a.metaPrima):null)):(m?.explicit===true?U.finiteNumber(m.recaudo):null);
-        const hasMine=!!a&&mine!=null&&mine>0;
-        const personal=!hasGlobal&&hasMine;
-        const ownTotals=hasMine?(kind==='production'?(q.produccionMesPorMoneda?q.produccionMesPorMoneda(mesKey,a.id):{}):(q.recaudoMesPorMoneda?q.recaudoMesPorMoneda(mesKey,a.id):{})):{};
+        const hasOwnIdentity=!!a,hasMine=hasOwnIdentity&&mine!=null&&mine>0;
+        // Own amounts stay visible even when the individual goal is not configured.
+        // Global and personal totals remain two independent read models.
+        const personal=!hasGlobal&&hasOwnIdentity;
+        const ownTotals=hasOwnIdentity?(kind==='production'?(q.produccionMesPorMoneda?q.produccionMesPorMoneda(mesKey,a.id):{}):(q.recaudoMesPorMoneda?q.recaudoMesPorMoneda(mesKey,a.id):{})):{};
         const ownAmount=Number(ownTotals[cur]||0);
-        const val=personal?ownAmount:total,goal=hasGlobal?global:personal?mine:null;
+        const val=personal?ownAmount:total,goal=hasGlobal?global:hasMine?mine:null;
         const pct=goal>0?Math.round(val/goal*100):null,deg=pct==null?0:Math.max(0,Math.min(100,pct))*2.7;
         const source=hasGlobal?'global':personal?'personal':metaReadiness==='ready'?'team-pending':'loading';
-        const desc=hasGlobal?'Meta del equipo: '+U.moneyShort(global,cur):personal?'Mi meta: '+U.moneyShort(mine,cur):'Meta del equipo por confirmar';
+        const desc=hasGlobal?'Meta institucional: '+U.moneyShort(global,cur):personal?(hasMine?'Mi meta: '+U.moneyShort(mine,cur):'Meta individual sin configurar'):'Meta institucional por confirmar';
         const personalPct=hasMine?Math.round(ownAmount/mine*100):null;
-        const extra=hasMine?(personal?'Total país: '+U.moneyShort(total,cur):'Mi '+(kind==='production'?'producción':'recaudo')+': '+U.moneyShort(ownAmount,cur)+' · meta propia '+U.moneyShort(mine,cur)+' · '+personalPct+'%'):!hasGlobal?'Metas personales en Avance por asesor':'';
+        const ownSummary=hasOwnIdentity
+          ?'<div data-inicio-own-contribution="'+kind+'" data-inicio-own-country="'+country+'" data-inicio-own-amount="'+ownAmount+'" data-inicio-own-goal="'+(hasMine?mine:'')+'" data-inicio-own-pct="'+(personalPct==null?'':personalPct)+'" style="width:100%;border-top:1px solid var(--line);padding-top:9px;display:grid;gap:3px;text-align:center">'
+            +'<b style="font-size:11px;color:var(--ink)">Mi '+(kind==='production'?'producción':'recaudo confirmado')+': '+U.esc(U.moneyShort(ownAmount,cur))+'</b>'
+            +'<small style="font-size:10px;color:var(--ink-2)">'+(hasMine?'Meta individual: '+U.esc(U.moneyShort(mine,cur))+' · '+personalPct+'%':'Meta individual por configurar')+'</small></div>'
+          :'';
+        const extra=!hasGlobal&&!hasOwnIdentity?'Meta institucional pendiente de configuración':'';
         return '<div data-inicio-country="'+country+'" data-goal-source="'+source+'" style="min-width:155px;flex:1 1 155px;max-width:255px;border:1px solid var(--line);border-top:4px solid var(--red);border-radius:16px;background:var(--card);padding:14px 10px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;text-align:center;box-shadow:0 6px 16px rgba(15,23,42,.07)">'
           +'<b style="color:var(--ink);font-size:12px">'+country+' · '+cur+'</b>'
           +'<div style="width:136px;height:136px;padding:13px;box-sizing:border-box;border-radius:50%;--gi-inicio-sweep:'+deg+'deg;background:conic-gradient(from 225deg,var(--red) 0deg,var(--red) '+deg+'deg,#dfe2e7 '+deg+'deg,#dfe2e7 270deg,transparent 270deg 360deg)">'
           +'<div style="height:100%;width:100%;border-radius:50%;background:var(--card);display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--ink)"><strong style="font-size:26px">'+(pct==null?'—':pct+'%')+'</strong><small style="font-size:9px;color:var(--ink-3)">'+(personal?'MI AVANCE':'AVANCE')+'</small></div></div>'
           +'<strong style="font-size:18px;color:var(--ink)">'+U.esc(U.moneyShort(val,cur))+'</strong>'
           +'<small style="min-height:28px;font-size:10.5px;line-height:1.4;color:var(--ink-2)">'+U.esc(desc)+'</small>'
-          +(extra?'<small style="font-size:10px;color:var(--ink-3)">'+U.esc(extra)+'</small>':'')+'</div>';
+          +(extra?'<small style="font-size:10px;color:var(--ink-3)">'+U.esc(extra)+'</small>':'')+ownSummary+'</div>';
       }).join('');
       return '<div data-inicio-monthly="'+kind+'" data-meta-state="'+(activeCountry==='TODOS'?'country-split':'country-one')+'" style="flex:1 1 350px;min-width:290px;display:flex;flex-direction:column;align-items:center;gap:11px"><b style="font-size:12px;text-align:center;color:var(--ink)">'+U.esc(label)+'</b><div style="display:flex;flex-wrap:wrap;justify-content:center;align-items:stretch;gap:12px;width:100%">'+cards+'</div></div>';
     };

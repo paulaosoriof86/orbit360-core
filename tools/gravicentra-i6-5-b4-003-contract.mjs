@@ -586,7 +586,8 @@ if(control.nextAction==='I6_5_FORENSIC_REMEDIATION_B4_003_R23_CONTRACT_AND_EXACT
    'B4_003_R26_MONTH_SCOPE_LEAK');
  need(inicio.includes("kind==='production'?(q.produccionMesPorMoneda")&&
       inicio.includes('q.recaudoMesPorMoneda(mesKey,a.id)')&&
-      inicio.includes("const personal=!hasGlobal&&hasMine;")&&
+      inicio.includes("const personal=!hasGlobal&&hasOwnIdentity;")&&
+      inicio.includes("data-inicio-own-contribution=")&&inicio.includes("Meta individual por configurar")&&
       index.includes('r26-personal-recaudo'),
    'B4_003_R26_INICIO_PERSONAL_COLLECTION_BINDING_OR_ASSET_CACHE_MISSING');
 }

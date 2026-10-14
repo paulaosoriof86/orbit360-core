@@ -299,8 +299,19 @@ async function r23ProofSnapshot(browser,who,country,month,foreignPolicyId=''){
       julyPersonal: ownAdvisorId?q.recaudoMesPorMoneda('2026-07',ownAdvisorId):{},
       hydratedCobroRows:(Orbit.store&&typeof Orbit.store.all==='function'?(Orbit.store.all('cobros')||[]).length:-1),
       monthlyPanel:!!panel,countryCard:!!card,source:String(card?.getAttribute('data-goal-source')||''),
-      hasOwnAdvisor:!!ownAdvisorId,visibleText:String(card?.innerText||'').slice(0,400)};
+      hasOwnAdvisor:!!ownAdvisorId,
+      hasPersonalContribution:!!card?.querySelector('[data-inicio-own-contribution="recaudo"]'),
+      visiblePersonalAmount:card?.querySelector('[data-inicio-own-contribution="recaudo"]')?.getAttribute('data-inicio-own-amount')??null,
+      visibleText:String(card?.innerText||'').slice(0,400)};
   },{country,ownAdvisorId:api.ownAdvisorId||''});
+  // Authenticated evidence must bind the displayed personal amount to the
+  // scoped payment readback; no success is inferred from DOM presence alone.
+  if(ui.r26.hasOwnAdvisor){
+    need(ui.r26.hasPersonalContribution===true &&
+      ui.r26.visiblePersonalAmount!==null &&
+      Number(ui.r26.visiblePersonalAmount)===ui.r26.personal,
+      'B4_003_PERSONAL_RECAUDO_UI_READBACK_MISMATCH');
+  }
   // Negative test of the ACTIVE Firestore security boundary for a foreign
   // policy. Do not return the customer record, document id or policy metadata.
   if(foreignPolicyId){

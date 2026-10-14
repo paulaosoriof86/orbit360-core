@@ -56,6 +56,7 @@ jobs:
           node --check orbit360-platform/data/store-firestore-product-readonly-p0.js
           node tools/gravicentra-b4-003-relation-cache-accessors.test.cjs
           node --check orbit360-platform/modules/inicio.js
+          node tools/gravicentra-b4-003-inicio-personal-recaudo.test.cjs
           node --check orbit360-platform/core/ciclo.js
           node --check orbit360-platform/modules/comparativo.js
           node --check orbit360-platform/modules/issuance-endosos-v1201-bridge.js

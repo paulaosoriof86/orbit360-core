@@ -215,7 +215,7 @@
     "orbit360-platform/data/tenant-alianzas-soluciones-insurers-p10.js": "41d2e31a42dac73eb68af304d5f532897210d0ee",
     "orbit360-platform/data/tenant-config/alianzas-soluciones.aseguradoras-knowledge-summary-v20261003.js": "2000d9ea8ab67bdd37d8bf404a29a405fa6374dd",
     "orbit360-platform/data/tenant-public-branding-index.js": "dc543c463f5ecd8ea44e49156d6282113bd95db6",
-    "orbit360-platform/index.html": "839792d3aaf2b1ebf58769f542f96d5301904e9b",
+    "orbit360-platform/index.html": "72f7b8e9a9443bf7c7745dbfa35623900df2db16",
     "orbit360-platform/modules/academia.js": "4d48ee3edbc6afc4163bf6365a80bbcb680b1852",
     "orbit360-platform/modules/aseguradoras-v1202-import-bridge.js": "db5f012abe505c2dd27d77a47d0694868bee5348",
     "orbit360-platform/modules/aseguradoras.js": "9e56c296b55da499b52f42c462c668aa2f32eba7",
@@ -233,7 +233,7 @@
     "orbit360-platform/modules/equipo-credential-admin-v20260805-bridge.js": "7432bc05938469187fdd120a5bc023c53a000ab9",
     "orbit360-platform/modules/equipo-onboarding-v20260804-bridge.js": "1da619d8abd676d31d69a038d4770463ca67fdc5",
     "orbit360-platform/modules/equipo.js": "b0736237ee18ef45abbae1c13f5c94781178344e",
-    "orbit360-platform/modules/inicio.js": "dfa19bc626bc119aaaf2debb5a46f970f0560767",
+    "orbit360-platform/modules/inicio.js": "9eaded303b98b2e9959abb9ed9b5d0090c3e1f80",
     "orbit360-platform/modules/issuance-endosos-v1201-bridge.js": "2020152b4b2df1338be4b3ef2a9f121d777e21db",
     "orbit360-platform/modules/leads.js": "4e12e604382f2731a03d29cf00db3c086d77ebc1",
     "orbit360-platform/modules/ops.js": "a4ca3dbb4613d541af411f12fce9773a072b0d41",
@@ -5241,6 +5241,18 @@
     "qaBlobAfter": "5324d3778d19f159ff8aaa0dd7d96b0fe0900b99",
     "noBackendExport": true,
     "noSharedRulesDeploy": true,
+    "noLive": true,
+    "noDataWrites": true
+  },
+  "b4003InicioPersonalVisibility": {
+    "status": "SOURCE_STAGED_QA_PENDING",
+    "gate": "I6.5/B4-003",
+    "findingId": "B4-003-P0-20261012-PERSONAL-COLLECTION",
+    "cause": "OWN_AMOUNT_NOT_VISIBLE_WITHOUT_OWN_GOAL_OR_BELOW_GLOBAL_GOAL",
+    "productBlobs": {
+      "orbit360-platform/modules/inicio.js": "9eaded303b98b2e9959abb9ed9b5d0090c3e1f80",
+      "orbit360-platform/index.html": "72f7b8e9a9443bf7c7745dbfa35623900df2db16"
+    },
     "noLive": true,
     "noDataWrites": true
   }

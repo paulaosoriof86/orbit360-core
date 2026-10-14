@@ -5996,7 +5996,7 @@
   "canonicalAccumulationControl": {
     "status": "FROZEN_ACTIVE",
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "compositionLockBlobSha": "f00bbfd2631f5f7f872cb0b8f51d32be2db8b244",
+    "compositionLockBlobSha": "c2ee38e0e3eca4bf5d894583c4a6290741596bd3",
     "findingLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
     "findingLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
@@ -10210,5 +10210,19 @@
     "qaAssertionsPass": 20,
     "qaReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CANONICAL_SCOPES_BOOTSTRAP_QA_20261013.json",
     "qaReceiptBlobSha": "0dd0818b2cd52d1f4278d1e700803e08ca42935b"
+  },
+  "b4003InicioPersonalVisibility": {
+    "status": "SOURCE_CORRECTED_QA_PENDING_NO_PREVIEW",
+    "gate": "I6.5/B4-003",
+    "findingId": "B4-003-P0-20261012-PERSONAL-COLLECTION",
+    "scope": "UI_PROJECTION_ONLY_NO_BACKEND_CHANGE",
+    "sourceOwner": "orbit360-platform/modules/inicio.js",
+    "sourceBlobSha": "9eaded303b98b2e9959abb9ed9b5d0090c3e1f80",
+    "qaOwner": "tools/gravicentra-b4-003-inicio-personal-recaudo.test.cjs",
+    "qaBlobSha": "730eaf4baa6dd5abb5130b1f851cea73f95db16a",
+    "operationalWrites": 0,
+    "livePromotion": false,
+    "securityP0Closed": false,
+    "needsExactPreview": true
   }
 }
