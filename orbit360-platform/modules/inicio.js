@@ -160,11 +160,9 @@ Orbit.modules.inicio = (function () {
  if(global&&((tipo==='prima'&&global.explicitPrima===true)||(tipo==='recaudo'&&global.explicitRecaudo===true))){
   const n=U.finiteNumber(global[tipo]);if(n!=null&&n>0)return n;
  }
- const values=secureRoster.rows.filter(a=>a.paises.includes(c)).map(a=>{
-  const t=a.metas?.[c];if(tipo==='recaudo')return t?.explicit===true?U.finiteNumber(t.recaudo):null;
-  return t?.explicit===true?(t.produccion>0?t.produccion:null):(a.paises.length===1?U.finiteNumber(a.metaPrima):null);
- });
- return values.length&&values.every(v=>v!=null&&v>0)?values.reduce((sum,v)=>sum+v,0):null;
+ // A partial advisor/team roster cannot establish a tenant-wide goal.
+ // Only a server-authorized explicit institutional target has that meaning.
+ return null;
  };
  const metaPrima=configuredMeta('prima'),metaRec=configuredMeta('recaudo'),prodValue=activeCurrency?Number(production[activeCurrency]||0):null,recValue=activeCurrency?Number(recaudoMes[activeCurrency]||0):null;
     const pctPrima=metaPrima&&prodValue!=null?Math.max(0,Math.min(140,Math.round(prodValue/metaPrima*100))):null,pctRec=metaRec&&recValue!=null?Math.max(0,Math.min(140,Math.round(recValue/metaRec*100))):null;

@@ -5996,7 +5996,7 @@
   "canonicalAccumulationControl": {
     "status": "FROZEN_ACTIVE",
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "compositionLockBlobSha": "c2ee38e0e3eca4bf5d894583c4a6290741596bd3",
+    "compositionLockBlobSha": "546b385c116aefef538827e7adef25cd06c3478e",
     "findingLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
     "findingLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
@@ -10224,5 +10224,19 @@
     "livePromotion": false,
     "securityP0Closed": false,
     "needsExactPreview": true
+  },
+  "b4003InstitutionalGoalScopeRootFix": {
+    "status": "SOURCE_CORRECTED_QA_PENDING_PREVIEW_PENDING",
+    "gate": "I6.5/B4-003",
+    "finding": "B4-003-P0-20261012-INSTITUTIONAL-GOALS",
+    "cause": "INSTITUTIONAL_METRIC_CALCULATED_FROM_VISIBLE_ADVISOR_SUBSET",
+    "remediation": "REQUIRE_EXPLICIT_SERVER_SCOPED_GLOBAL_GOAL_TO_LABEL_AS_INSTITUTIONAL",
+    "sourceOwner": "orbit360-platform/modules/inicio.js",
+    "sourceSha": "6633b3b95de831e5decbbd532410fba802b38cd4",
+    "qaRunRequired": true,
+    "noDataWrites": true,
+    "noProductionDeploy": true,
+    "securityP0Closed": false,
+    "visualPass": false
   }
 }
