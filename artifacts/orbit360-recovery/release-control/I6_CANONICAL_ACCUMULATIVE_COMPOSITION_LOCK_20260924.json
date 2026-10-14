@@ -211,7 +211,7 @@
     "orbit360-platform/data/academia-product-catalog-v1.js": "22b6781519cb14e05965738ac3bbc0f6eb0baff3",
     "orbit360-platform/data/geo-gt-co-authoritative-v20261004.js": "734b6518bc968a8c4e278602aa7161a38351cb02",
     "orbit360-platform/data/store-firestore-product-operational-p0.js": "7738314b843253c92be008dc0b812d035b377d43",
-    "orbit360-platform/data/store-firestore-product-readonly-p0.js": "8154eb9fa8622079e59abde21d99ed72847da36e",
+    "orbit360-platform/data/store-firestore-product-readonly-p0.js": "38ee5e7bbd7eee21bf5004c2fbeddf6b625e02b9",
     "orbit360-platform/data/tenant-alianzas-soluciones-insurers-p10.js": "41d2e31a42dac73eb68af304d5f532897210d0ee",
     "orbit360-platform/data/tenant-config/alianzas-soluciones.aseguradoras-knowledge-summary-v20261003.js": "2000d9ea8ab67bdd37d8bf404a29a405fa6374dd",
     "orbit360-platform/data/tenant-public-branding-index.js": "dc543c463f5ecd8ea44e49156d6282113bd95db6",
@@ -5333,5 +5333,19 @@
     "proof": "DENY_READ_WHEN_PREVIEW_FEATURE_DISABLED",
     "previewAccepted": false,
     "productionPromoted": false
+  },
+  "b4003ProtectedRequiredCollectionPreflight20261013": {
+    "status": "SOURCE_CANDIDATE_QA_PENDING",
+    "requiredCount": 8,
+    "supportedCount": 6,
+    "unsupported": [
+      "aseguradoras",
+      "asesores"
+    ],
+    "behavior": "FAIL_CLOSED_BEFORE_ANY_PARTIAL_READ",
+    "sourceBlob": "38ee5e7bbd7eee21bf5004c2fbeddf6b625e02b9",
+    "qaBlob": "c988164a2ff66720c8a493a0abae6fe9c36748fb",
+    "previewPass": false,
+    "productionPromotion": false
   }
 }

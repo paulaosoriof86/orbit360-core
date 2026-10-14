@@ -217,6 +217,17 @@
       if (!collections.length || !startupCollections.length) { state.status = 'blocked-no-collections'; return false; }
       if (!protectedMode && !database()) { state.status = 'blocked-no-database'; return false; }
       if(protectedMode&&typeof deps.protectedReadPage!=='function'){state.status='attach-error';return false;}
+      // Preflight the complete required collection set before fetching any
+      // protected data. A six-of-eight bootstrap is never an accepted startup.
+      if(protectedMode){
+        var supported=new Set(['clientes','polizas','vehiculos','recibosEsperados','carteraPrimas','cobros']);
+        var unsupported=startupCollections.filter(function(name){return !supported.has(name);});
+        if(unsupported.length){
+          state.status='blocked-protected-incomplete';
+          state.snapshotErrors.__startup='PROTECTED_READ_REQUIRED_COLLECTIONS_UNSUPPORTED:'+unsupported.join(',');
+          return false;
+        }
+      }
       if (!protectedMode && authoritativeFirstReadRequired && typeof deps.getDocsFromServer !== 'function') { state.status = 'attach-error'; state.snapshotErrors.__startup = 'firestore_authoritative_read_api_unavailable'; return false; }
       state.status = 'attaching';
       startupCollections.forEach(function (collection) { attachCollection(collection, authoritativeFirstReadRequired); });

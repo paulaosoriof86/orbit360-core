@@ -42,6 +42,20 @@ const config=collections=>({tenantId:tenant,collections,requiredCollections:[col
  protectedReadCandidate:true,paths,queryPlanner:()=>({ok:true,constraints:[{field:'tenantId',op:'==',value:tenant}]})});
 const pause=()=>new Promise(ok=>setTimeout(ok,30));
 (async()=>{
+ // All eight canonical startup collections must be supported before any
+ // protected query begins; partial authorization is not readiness.
+ const allRequired=['clientes','polizas','cobros','aseguradoras','vehiculos','recibosEsperados','carteraPrimas','asesores'];
+ const allConfig=config(allRequired);allConfig.requiredCollections=allRequired;
+ const beforeCalls=calls.length;
+ const incomplete=win.Orbit.createFirestoreProductReadOnlyStoreP0(deps,allConfig);
+ assert.equal(incomplete._attachSnapshots(),false);
+ assert.equal(incomplete._productStatus().status,'blocked-protected-incomplete');
+ assert.equal(incomplete._productStatus().snapshotErrors.__startup,
+  'PROTECTED_READ_REQUIRED_COLLECTIONS_UNSUPPORTED:aseguradoras,asesores');
+ await pause();
+ assert.equal(calls.length,beforeCalls);
+ assert.deepEqual(Array.from(incomplete.all('polizas')),[]);
+ console.log('B4_003_REQUIRED_EIGHT_BOOTSTRAP_FAIL_CLOSED checks=5 zero_partial_reads');
  const store=win.Orbit.createFirestoreProductReadOnlyStoreP0(deps,config(['clientes']));
  assert.equal(store._attachSnapshots(),true);await pause();
  assert.deepEqual(Array.from(store.all('clientes'),x=>x.id),['c1','c3']);
