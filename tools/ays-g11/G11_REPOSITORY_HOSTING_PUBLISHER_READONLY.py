@@ -23,6 +23,10 @@ CRITICAL = {
                          ".github/workflows/gravicentra-s509-new-lead-attention-lab.yml"),
     "Gravicentra S5.10": ("ays/gravicentra-s510-lead-card-summary-20261007",
                          ".github/workflows/gravicentra-s510-lead-card-summary-lab.yml"),
+    "Gravicentra S5.10A": ("ays/gravicentra-s510a-lead-card-visual-hierarchy-20261007",
+                          ".github/workflows/gravicentra-s510a-lead-card-visual-hierarchy-lab.yml"),
+    "CotComp S4.67": ("ays/cotcomp-s467-w5-first-real-intake-20261001",
+                      ".github/workflows/cotcomp-s467-w5-first-real-intake.yml"),
 }
 SCOPE = re.compile(r'ays-orbit-360-lab|FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB|FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB',re.I)
 ACTION = re.compile(r'\bFirebaseExtended/action-hosting-deploy\b|\bfirebase\s+hosting:(?:channel:deploy|channel:clone|clone)\b',re.I)
@@ -124,10 +128,10 @@ def audit(root):
                          "path":path,"hosting_write":c["hosting_write"],
                          "site_scope":c["target_credential_or_site"],
                          "workflow_dispatch_source":c["workflow_dispatch"]}
-    if critical["Portal S5.11F"]["hosting_write"] or critical["Siniestros S5.12D"]["hosting_write"]:
-        raise RuntimeError("G11_REGRESSION_IN_G10_PROTECTION")
-    if not critical["Gravicentra S5.09"]["hosting_write"] or not critical["Gravicentra S5.10"]["hosting_write"]:
-        raise RuntimeError("G11_EXPECTED_GRAVICENTRA_SOURCE_CHANGED_REVIEW")
+    if any(item["hosting_write"] for item in critical.values()):
+        raise RuntimeError("G12_REGRESSION_IN_PROTECTED_HISTORICAL_PUBLISHERS")
+    if len(critical)!=6:
+        raise RuntimeError("G12_PROTECTED_BRANCH_COUNT_DRIFT")
     hit_paths=collections.Counter(x["path"] for x in findings)
     hit_branches=sorted({x["branch"] for x in findings})
     return {
