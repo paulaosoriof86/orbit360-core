@@ -50,9 +50,9 @@ async function denied(fn,code){let e;try{await fn()}catch(err){e=err}
 
  // Synthetic authenticated directory proof: two actors, country and cursor,
  // secret redaction, no Firestore connection, no writes.
- let dirMember={uid,tenantId,status:'active',roles:['Asesor','Operativo'],
+ let dirMember={uid,tenantId,status:'active',roles:['Asesor','Operativo','Admin'],modulesVisible:['equipo'],
   activeRole:'Operativo',advisorId:'a1',countries:['GT','CO'],dataScopes:{default:'all'}};
- const dirConfig={roleScopes:{operativo:'all',asesor:'own'}};
+ const dirConfig={roleScopes:{operativo:'all',asesor:'own',admin:'all'}};
  const directories={
   aseguradoras:[
    {id:'insGT',tenantId,pais:'GT',nombre:'Aseguradora GT',password:'SECRET_TOP',
@@ -92,19 +92,23 @@ async function denied(fn,code){let e;try{await fn()}catch(err){e=err}
  assert.equal(gt.rows[0].cuentas[0].numero,'001122');directoryChecks++;
  assert.equal(JSON.stringify(gt).includes('SECRET_'),false);directoryChecks++;
  await denied(()=>dir('aseguradoras','GT','Asesor'),'DIRECTORY_DENIED');directoryChecks++;
- const one=await dir('asesores','GT','Operativo',{pageSize:1});
+ const one=await dir('asesores','GT','Admin',{pageSize:1});
  assert.deepEqual(one.rows.map(x=>x.id),['a1']);assert.equal(one.nextCursor,'a1');directoryChecks++;
- const two=await dir('asesores','GT','Operativo',{pageSize:1,cursor:'a1'});
+ const two=await dir('asesores','GT','Admin',{pageSize:1,cursor:'a1'});
  assert.deepEqual(two.rows.map(x=>x.id),['a2']);assert.equal(two.nextCursor,null);directoryChecks++;
- await denied(()=>dir('asesores','GT','Asesor',{cursor:'a2'}),'DIRECTORY_CURSOR_DENIED');directoryChecks++;
- const own=await dir('asesores','GT','Asesor');assert.deepEqual(own.rows.map(x=>x.id),['a1']);directoryChecks++;
- const co=await dir('asesores','CO','Operativo');assert.deepEqual(co.rows.map(x=>x.id),['a1','a3']);directoryChecks++;
+ await denied(()=>dir('asesores','GT','Asesor'),'TEAM_DIRECTORY_DENIED');directoryChecks++;
+ await denied(()=>dir('asesores','GT','Operativo'),'TEAM_DIRECTORY_DENIED');directoryChecks++;
+ await denied(()=>dir('asesores','GT','Admin',{cursor:'a3'}),'DIRECTORY_CURSOR_DENIED');directoryChecks++;
+ dirMember={...dirMember,modulesVisible:[]};
+ await denied(()=>dir('asesores','GT','Admin'),'MODULE_DENIED');directoryChecks++;
+ dirMember={...dirMember,modulesVisible:['equipo']};
+ const co=await dir('asesores','CO','Admin');assert.deepEqual(co.rows.map(x=>x.id),['a1','a3']);directoryChecks++;
  await denied(()=>dir('aseguradoras','MX'),'DIRECTORY_PAGINATION_DENIED');directoryChecks++;
  dirMember={...dirMember,status:'suspended'};
- await denied(()=>dir('asesores'),'MEMBERSHIP_DENIED');directoryChecks++;
+ await denied(()=>dir('asesores','GT','Admin'),'MEMBERSHIP_DENIED');directoryChecks++;
  dirMember={...dirMember,status:'active'};
  directories.asesores.push({id:'malicious',tenantId:'other-tenant',pais:'GT',nombre:'Denied'});
- await denied(()=>dir('asesores'),'DIRECTORY_IDENTITY_DENIED');directoryChecks++;
+ await denied(()=>dir('asesores','GT','Admin'),'DIRECTORY_IDENTITY_DENIED');directoryChecks++;
  directories.asesores.pop();
  console.log('B4_003_PROTECTED_DIRECTORIES_SOURCE_QA_PASS checks='+directoryChecks+' synthetic_only no_deploy no_secret_leakage');
 

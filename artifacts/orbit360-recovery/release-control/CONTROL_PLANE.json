@@ -5996,7 +5996,7 @@
   "canonicalAccumulationControl": {
     "status": "FROZEN_ACTIVE",
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "compositionLockBlobSha": "915648c6eca64c7e5ca1289c055fb03cb841f6e7",
+    "compositionLockBlobSha": "3a1363273d5fface0dede7098c88b53504acd07a",
     "findingLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
     "findingLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
@@ -10368,5 +10368,24 @@
     "noReimport": true,
     "securityP0Closed": false,
     "previousAcceptedProductionPreserved": true
+  },
+  "b4003TeamDirectoryParity20261014": {
+    "status": "SOURCE_STAGED_SYNTHETIC_QA_PASS_AUTHENTICATED_PREVIEW_PENDING",
+    "scope": "I6.5/B4-003",
+    "rootCause": "SCOPED_DIRECTORY_READER_PERMITTED_OPS_OR_ADVISOR_OUTSIDE_CANONICAL_EQUIPO_DIRECTORY_POLICY",
+    "sourceOwner": "functions/b4-003-scoped-access-boundary.js",
+    "sourceBlobSha": "7d91ee57307b158a71c19ece035ef90ee71e8615",
+    "qaSourceBlobs": {
+      "tools/gravicentra-b4-003-scoped-bootstrap-reader.test.cjs": "51717e0daf144816f8df9602d855143490d0feb0",
+      "tools/gravicentra-b4-003-scoped-boundary.test.cjs": "33e48f62320542849bd112687cf4b82d3853abe0"
+    },
+    "syntheticDirectoryChecks": 16,
+    "syntheticTeamParityChecks": 6,
+    "operationalAssignableRosterUnaffected": true,
+    "backendExported": false,
+    "operationalWrites": 0,
+    "firestoreRulesDeployed": false,
+    "livePromotionAuthorized": false,
+    "securityP0Closed": false
   }
 }

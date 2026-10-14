@@ -40,5 +40,23 @@ assert.throws(()=>resolve({...c,member:{...c.member,status:'active',active:false
  error=>error&&error.code==='MEMBERSHIP_DENIED');
 membershipChecks++;
 console.log('B4_003_MEMBERSHIP_ACTIVE_ONLY_SCOPE_PASS checks='+membershipChecks+' staged_source_only_no_deploy');
+
+const teamDirectoryBase={...c,collection:'asesores',
+ auth:{uid:'u',token:{}},activeRole:'Admin',
+ member:{...c.member,roles:['Asesor','Operativo','Admin'],
+   status:'active',dataScopes:{default:'all'},modulesVisible:['equipo']},
+ config:{roleScopes:{admin:'none'},rolePermissions:{admin:{equipo:{ver:true}}}}};
+const directory=resolve(teamDirectoryBase);
+assert.equal(directory.scope,'all');
+assert.equal(allowRow(directory,{tenantId:'t',pais:'GT',id:'a2'}),true);
+assert.throws(()=>resolve({...teamDirectoryBase,activeRole:'Operativo'}),
+ error=>error&&error.code==='TEAM_DIRECTORY_DENIED');
+assert.throws(()=>resolve({...teamDirectoryBase,activeRole:'Asesor'}),
+ error=>error&&error.code==='TEAM_DIRECTORY_DENIED');
+assert.throws(()=>resolve({...teamDirectoryBase,member:{...teamDirectoryBase.member,modulesVisible:[]}}),
+ error=>error&&error.code==='MODULE_DENIED');
+assert.throws(()=>resolve({...teamDirectoryBase,config:{rolePermissions:{admin:{equipo:{ver:false}}}}}),
+ error=>error&&error.code==='MODULE_DENIED');
+console.log('B4_003_TEAM_DIRECTORY_EFFECTIVE_POLICY_ALIGNMENT_PASS checks=6');
 console.log('B4_003_PER_ROLE_TEAM_OVERRIDE_DENIES_GLOBAL_TEAM_PASS');
 console.log('STAGED_B4_003_CONTRACT_UNIT_PASS');
