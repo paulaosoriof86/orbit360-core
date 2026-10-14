@@ -10656,6 +10656,21 @@
       "noSharedRulesDeploy": true,
       "noRealWrites": true,
       "authPositiveNegativeStillRequired": true
+    },
+    "qaResults20261014": {
+      "status": "SOURCE_AND_PREVIEW_TECHNICAL_PASS_BUSINESS_ACCEPTANCE_PENDING",
+      "sourceSha": "6474720d4c5377ea1f2ebb66574ac68654daf750",
+      "buildId": "gi-i65-b4-6474720d4c53-57f234755dc1",
+      "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-38650217599-6h9eoocw.web.app",
+      "previewRunId": 38650217599,
+      "previewArtifactId": 11934851519,
+      "previewReadbackExact": true,
+      "codeGuardRunId": 38650050139,
+      "codeGuardResult": "success",
+      "securityEmulatorRunId": 38650735047,
+      "securityEmulatorResult": "success",
+      "authenticatedBusinessAcceptance": false,
+      "newLivePromotion": false
     }
   }
 }
