@@ -10419,5 +10419,26 @@
     "firestoreRulesDeployed": false,
     "livePromotionAuthorized": false,
     "securityP0Closed": false
+  },
+  "b4003ProtectedPreviewAuthorization": {
+    "status": "AUTHORIZED_SCOPED_PREVIEW_ONLY_PENDING_EXECUTION",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PROTECTED_PREVIEW_EXPLICIT_AUTHORIZATION_20261014.json",
+    "receiptBlobSha": "c73a05cbdbed710a9e446ec5a4a6e73786ab1ba6",
+    "existingGate": "I6.5/B4-003",
+    "sourceProductMutationAuthorized": false,
+    "isolatedPreviewCallableAuthorized": true,
+    "isolatedPreviewHostingBuildAuthorized": true,
+    "frontendBuildFlagAuthorized": true,
+    "otherFunctionsDeployAuthorized": false,
+    "sharedFirestoreRulesDeployAuthorized": false,
+    "productionPromotionAuthorized": false,
+    "operationalWritesAuthorized": false,
+    "realUserImpersonationAuthorized": false,
+    "authenticatedPreviewProofRequired": true,
+    "roleScopeCountryPositiveNegativeProofRequired": true,
+    "backendExportNotProduction": true,
+    "scope": "EXACT_CALLABLE_ORBIT360_SCOPED_POLICY_READ_PREVIEW_ONLY",
+    "securityP0Closed": false,
+    "visualAcceptancePending": true
   }
 }
