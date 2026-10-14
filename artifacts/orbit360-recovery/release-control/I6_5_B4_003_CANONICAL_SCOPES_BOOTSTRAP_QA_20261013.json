@@ -1,0 +1,28 @@
+{
+  "schema": "gravicentra-b4-003-canonical-scopes-bootstrap-qa-v1",
+  "gate": "I6.5/B4-003",
+  "parentProductSourceSha": "d912cef19317360b539ff7ce83f6e8cd885513c0",
+  "qaRunId": 38488485360,
+  "qaJobId": 115607800402,
+  "qa": "ISOLATED_QA_PASS_ONLY",
+  "proofs": {
+    "bootstrap": 20,
+    "policy": 16,
+    "related": 25,
+    "controlPlaneGuard": "PASS",
+    "governancePreflight": "PASS"
+  },
+  "sourceOwner": "functions/b4-003-scoped-bootstrap-reader.js",
+  "sourceBefore": "edd254de5345397dae51a3503c4b4cd5a93a4356",
+  "sourceAfter": "74eefa61f4ef18f001533c20620ea3591559064f",
+  "qaOwner": "tools/gravicentra-b4-003-scoped-bootstrap-reader.test.cjs",
+  "qaBlob": "5324d3778d19f159ff8aaa0dd7d96b0fe0900b99",
+  "rootCause": "SPANISH_SCOPES_DROPPED_BY_PREVIEW_BOOTSTRAP_AND_AUTH_EMAIL_OPTIONAL_MEMBERSHIP_DENIAL",
+  "directRulesDeployed": false,
+  "serverCallableDeployed": false,
+  "authenticatedPreviewPassed": false,
+  "livePromotion": false,
+  "operationalWrites": 0,
+  "securityP0Closed": false,
+  "productionChanged": false
+}

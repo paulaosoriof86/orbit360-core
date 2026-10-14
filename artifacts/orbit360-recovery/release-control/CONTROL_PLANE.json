@@ -10186,7 +10186,7 @@
     "authenticatedPreviewPass": false
   },
   "b4003BootstrapCanonicalScopesRootfix20261013": {
-    "status": "SOURCE_STAGED_QA_PENDING_AUTHENTICATED_PREVIEW_PENDING",
+    "status": "SOURCE_QA_PASS_AUTHENTICATED_PREVIEW_PENDING",
     "gate": "I6.5/B4-003",
     "findingId": "B4-003-P0-20261012-PERSONAL-COLLECTION",
     "rootCause": "CANONICAL_MEMBERSHIP_DATA_SCOPES_SPANISH_VALUES_SILENTLY_DROPPED_AND_MEMBERSHIP_EMAIL_OPTIONAL_IN_USER_ONBOARDING",
@@ -10204,6 +10204,11 @@
     "operationalWrites": 0,
     "productionChanged": false,
     "previewPass": false,
-    "securityP0Closed": false
+    "securityP0Closed": false,
+    "qaRunId": 38488485360,
+    "qaJobId": 115607800402,
+    "qaAssertionsPass": 20,
+    "qaReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CANONICAL_SCOPES_BOOTSTRAP_QA_20261013.json",
+    "qaReceiptBlobSha": "0dd0818b2cd52d1f4278d1e700803e08ca42935b"
   }
 }
