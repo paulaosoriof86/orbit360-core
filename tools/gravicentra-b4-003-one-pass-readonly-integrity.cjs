@@ -80,6 +80,45 @@ async function main(){
       qaIdPrefixes:notCountry.filter(x=>/^(b4|qa[_-]|test[_-])/i.test(safe(x.id))).length,
       withoutAdvisor:notCountry.filter(x=>!safe(x.asesorId||x.advisorId)).length,verifiedParentKinds:grouped};
   }
+  // Read-only discriminant: which legacy Ops/Leads records could be recovered
+  // from canonical parents without altering Firestore or assuming a user's scope?
+  // Counts are source-classification evidence, never proof of authorization.
+  result.legacyWorkflowCountryResolution={};
+  for(const collection of ['negocios','gestiones']){
+    const tally={missingCountry:0,verifiedParentCountry:0,missingParentOrCountry:0,
+      tenantConflict:0,clientPolicyConflict:0,countryConflict:0,
+      consistentUniqueAdvisor:0,advisorConflictOrMissing:0,
+      GT:0,CO:0,sourceOnlyNotAuthenticated:true};
+    for(const row of sets[collection].filter(x=>!safe(x.pais||x.country))){
+      tally.missingCountry++;
+      const policy=policies.get(safe(row.polizaId||row.policyId))||
+        policyByDocumentId.get(safe(row.polizaId||row.policyId));
+      const linkedClient=clients.get(safe(row.clienteId||row.clientId))||
+        clientByDocumentId.get(safe(row.clienteId||row.clientId));
+      const parent=policy||linkedClient;
+      if(!parent){tally.missingParentOrCountry++;continue;}
+      if(parent.tenantId&&safe(parent.tenantId)!==tenantId||
+        row.tenantId&&safe(row.tenantId)!==tenantId){
+        tally.tenantConflict++;continue;
+      }
+      if(policy&&linkedClient&&safe(policy.clienteId)&&
+        safe(policy.clienteId)!==safe(linkedClient.id)){
+        tally.clientPolicyConflict++;continue;
+      }
+      const country=safe(parent.pais||parent.country).toUpperCase();
+      if(!['GT','CO'].includes(country)){tally.missingParentOrCountry++;continue;}
+      if(linkedClient&&policy&&safe(linkedClient.pais||linkedClient.country)&&
+        safe(linkedClient.pais||linkedClient.country).toUpperCase()!==country){
+        tally.countryConflict++;continue;
+      }
+      tally.verifiedParentCountry++;tally[country]++;
+      const advisors=[...new Set([row.asesorId,row.advisorId,row.ownerAdvisorId,
+        parent.asesorId,parent.advisorId,parent.ownerAdvisorId].map(safe).filter(Boolean))];
+      if(advisors.length===1)tally.consistentUniqueAdvisor++;
+      else tally.advisorConflictOrMissing++;
+    }
+    result.legacyWorkflowCountryResolution[collection]=tally;
+  }
   const orphans={};
   for(const collection of ['recibosEsperados','carteraPrimas','vehiculos']){
     const orphanRows=sets[collection].filter(x=>!policies.has(safe(x.polizaId||x.policyId))&&!policyByDocumentId.has(safe(x.polizaId||x.policyId)));
