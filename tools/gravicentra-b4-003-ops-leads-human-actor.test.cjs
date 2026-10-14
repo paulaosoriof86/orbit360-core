@@ -12,7 +12,7 @@ const snap=x=>({exists:x!=null,data:()=>x});
 const text=(x,n)=>String(x==null?'':x).trim().slice(0,n||10000);
 const norm=x=>text(x).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'_');
 class HttpsError extends Error{constructor(code,message){super(message);this.code=code;}}
-const scope={text,norm,HttpsError,
+const scope={text,norm,HttpsError,id:x=>text(x),
  memberRef:(_t,_uid)=>({get:async()=>{reads++;return snap(member)}}),
  dataRef:(_t,c,_id)=>{assert.equal(c,'asesores');return{get:async()=>{reads++;return snap(advisor)}};},
  active:m=>m&&m.status==='active',
