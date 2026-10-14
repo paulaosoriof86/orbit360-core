@@ -164,7 +164,7 @@
     "functions/payment-inference-engine.js": "16bf21177364fbb94f39fab5b8e8ec8506bbd071",
     "functions/product-insurer-credentials.js": "04e681fdba71ee8438429dda11ae50edf9a40c8e",
     "functions/product-operational-domain.js": "61bbd6d4bc9e687fa698c129e4ffd4fb4fb085b7",
-    "functions/product-ops-leads-domain.js": "6204e564d21e0b5a5167becb47ee3fd3111850b8",
+    "functions/product-ops-leads-domain.js": "be849f28c7c4c810098ca13f2813509c57f791bc",
     "functions/tenant-branding.js": "d3c3dcd191951f91a40eb17b7cc560dc535a2a3c",
     "functions/tenant-domain-config.js": "c9f2bd7234252ee7281e5aca2b20601fcf8d77e3",
     "functions/user-onboarding.js": "6512d49e4a01c4257e578652b0728f688cd063d1",
@@ -5300,5 +5300,19 @@
     "productionChanged": false,
     "providerDeployed": false,
     "securityP0Closed": false
+  },
+  "b4003OpsLeadsHumanActorName20261013": {
+    "status": "SOURCE_STAGED_QA_PENDING",
+    "gate": "I6.5/B4-003",
+    "findingId": "B4-003-UAT-20261011-03",
+    "sourceOwner": "functions/product-ops-leads-domain.js",
+    "sourceBefore": "6204e564d21e0b5a5167becb47ee3fd3111850b8",
+    "sourceAfter": "be849f28c7c4c810098ca13f2813509c57f791bc",
+    "qaOwner": "tools/gravicentra-b4-003-ops-leads-human-actor.test.cjs",
+    "qaBlob": "608ec86f60987470e89f04318ae3db2fb05ebf73",
+    "readOnlyActorRosterLookup": true,
+    "noOperationalWrites": true,
+    "noDeploy": true,
+    "noSecurityClaim": true
   }
 }

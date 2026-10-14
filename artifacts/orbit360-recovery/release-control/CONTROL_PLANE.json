@@ -5996,7 +5996,7 @@
   "canonicalAccumulationControl": {
     "status": "FROZEN_ACTIVE",
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "compositionLockBlobSha": "23342126022d21cc3b8f30b6afc6de212ff4d1d4",
+    "compositionLockBlobSha": "b63d10128b9edd0ef7c75b2a0aeea3543393562c",
     "findingLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
     "findingLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
@@ -10268,5 +10268,23 @@
     "opsLeadsRegressionAssertionsPassed": 13,
     "qaReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_INICIO_ROLE_COUNTRY_TEAM_ISOLATED_PROOF_20261013.json",
     "qaReceiptBlobSha": "012a5ae6a36959662c84a575cedf7a40080deaf2"
+  },
+  "b4003OpsLeadsHumanActorName20261013": {
+    "status": "SOURCE_STAGED_QA_PENDING_AUTHENTICATED_PREVIEW_PENDING",
+    "gate": "I6.5/B4-003",
+    "findingId": "B4-003-UAT-20261011-03",
+    "cause": "SERVER_USED_EMAIL_OR_UID_AS_COLLABORATION_ACTOR_NAME",
+    "sourceOwner": "functions/product-ops-leads-domain.js",
+    "sourceBefore": "6204e564d21e0b5a5167becb47ee3fd3111850b8",
+    "sourceAfter": "be849f28c7c4c810098ca13f2813509c57f791bc",
+    "qaOwner": "tools/gravicentra-b4-003-ops-leads-human-actor.test.cjs",
+    "qaBlob": "608ec86f60987470e89f04318ae3db2fb05ebf73",
+    "noHardcodedPeople": true,
+    "existingHistoryPreserved": true,
+    "previewReadbackPending": true,
+    "operationalWrites": 0,
+    "firestoreRulesDeployed": false,
+    "productionChanged": false,
+    "securityP0Closed": false
   }
 }

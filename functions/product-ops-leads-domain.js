@@ -104,7 +104,41 @@ function canonicalizeCollaborationPayload(before,payload,actor){
  }
  return out;
 }
-async function authorize(request,operation){if(!request.auth||!request.auth.uid)throw new HttpsError('unauthenticated','Se requiere sesión activa.');const tenantId=id(request.data&&request.data.tenantId,'tenantId');const snap=await memberRef(tenantId,request.auth.uid).get();const member=snap.exists?snap.data():null;if(!active(member))throw new HttpsError('permission-denied','Membresía inactiva.');let roleState;try{roleState=resolveProductActiveRole(member,request.data&&request.data.activeRole);}catch(error){throw new HttpsError('permission-denied',error&&error.code==='PRODUCT_ASSIGNED_ROLES_MISSING'?'La membresía no tiene roles asignados.':'El rol activo no está asignado.');}const pr=permissions(member);const can=ADMIN_ROLES.has(roleState.activeRole)||pr.some(p=>MANAGE_PERMISSIONS.has(p)),selfService=SELF_SERVICE_ROLES.has(roleState.activeRole)&&['create_management','portal_request'].includes(operation);if(!can&&!selfService&&!['update_business','transition_business','update_management','resolve_management'].includes(operation))throw new HttpsError('permission-denied','No tiene permiso para administrar este flujo.');return{tenantId,member,actor:{uid:request.auth.uid,email:text(member.email||request.auth.token&&request.auth.token.email,320),name:text(member.nombre||member.displayName||member.name||member.email||request.auth.token&&request.auth.token.name||request.auth.token&&request.auth.token.email||request.auth.uid,220),advisorId:text(member.advisorId||member.asesorId,180),activeRole:roleState.activeRole,roles:roleState.assignedRoles}};}
+function humanActorName(value){
+ const v=text(value,220);
+ if(!v||v.includes('@')||/^(?:admin|admintenant|superadmin|direccion|operativo|asesor|comercial|unknown|undefined|uid[:_-].*)$/i.test(norm(v)))
+   return '';
+ return v;
+}
+async function authorize(request,operation){
+ if(!request.auth||!request.auth.uid)throw new HttpsError('unauthenticated','Se requiere sesión activa.');
+ const tenantId=id(request.data&&request.data.tenantId,'tenantId'),snap=await memberRef(tenantId,request.auth.uid).get(),member=snap.exists?snap.data():null;
+ if(!active(member)||text(member.tenantId,180)!==tenantId)
+   throw new HttpsError('permission-denied','Membresía inactiva o fuera del tenant.');
+ let roleState;
+ try{roleState=resolveProductActiveRole(member,request.data&&request.data.activeRole);}
+ catch(error){throw new HttpsError('permission-denied',error&&error.code==='PRODUCT_ASSIGNED_ROLES_MISSING'?'La membresía no tiene roles asignados.':'El rol activo no está asignado.');}
+ const pr=permissions(member),can=ADMIN_ROLES.has(roleState.activeRole)||pr.some(p=>MANAGE_PERMISSIONS.has(p));
+ const selfService=SELF_SERVICE_ROLES.has(roleState.activeRole)&&['create_management','portal_request'].includes(operation);
+ if(!can&&!selfService&&!['update_business','transition_business','update_management','resolve_management'].includes(operation))
+   throw new HttpsError('permission-denied','No tiene permiso para administrar este flujo.');
+ const advisorId=text(member.advisorId||member.asesorId,180);
+ let actorName=humanActorName(member.nombre)||humanActorName(member.displayName)||humanActorName(member.name);
+ if(!actorName&&advisorId){
+   // Canonical advisor roster is the approved person display owner; never
+   // publish a membership email or UID as the author of a collaboration.
+   const advisorSnap=await dataRef(tenantId,'asesores',advisorId).get();
+   if(advisorSnap.exists){
+     const row=advisorSnap.data()||{};
+     if((!row.tenantId||row.tenantId===tenantId)&&(!row.id||row.id===advisorId))
+       actorName=humanActorName(row.nombre)||humanActorName(row.displayName)||humanActorName(row.name);
+   }
+ }
+ if(!actorName)actorName=humanActorName(request.auth.token&&request.auth.token.name)||'Usuario del equipo';
+ return{tenantId,member,actor:{uid:request.auth.uid,
+   email:text(member.email||request.auth.token&&request.auth.token.email,320),
+   name:actorName,advisorId,activeRole:roleState.activeRole,roles:roleState.assignedRoles}};
+}
 function workflowConfig(raw){raw=raw||{};const stages={};const source=raw.stages&&typeof raw.stages==='object'?raw.stages:DEFAULT_STAGES;Object.entries(source).forEach(([key,s])=>{const k=norm(key);stages[k]={leads:s.leads!==false,ops:s.ops===true,opsList:text(s.opsList||s.listaOps,100),terminal:s.terminal===true,next:unique(s.next||s.siguientes||[]).map(norm)};});return{version:text(raw.version||VERSION,120),stages,notificationChannels:unique(raw.notificationChannels||['portal','in_app']),portalResponseEnabled:raw.portalResponseEnabled!==false,cadenceEnabled:raw.cadenceEnabled!==false};}
 async function config(t){const s=await configRef(t).get();return workflowConfig(s.exists?s.data():{});}
 function copyAllowed(target,input,fields){fields.forEach(k=>{if(input&&input[k]!==undefined)target[k]=stable(input[k]);});return target;}
