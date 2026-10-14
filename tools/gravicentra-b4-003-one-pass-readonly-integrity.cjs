@@ -6,7 +6,7 @@ const {initializeApp,applicationDefault,deleteApp}=require('firebase-admin/app')
 const {getFirestore}=require('firebase-admin/firestore');
 const assert=require('node:assert/strict');
 const projectId='ays-orbit-360-lab',tenantId='alianzas-soluciones';
-const allowed=['clientes','polizas','recibosEsperados','carteraPrimas','cobros','vehiculos','negocios','gestiones'];
+const allowed=['clientes','polizas','recibosEsperados','carteraPrimas','cobros','vehiculos','negocios','gestiones','metas'];
 const app=initializeApp({credential:applicationDefault(),projectId});
 const db=getFirestore(app),safe=x=>String(x==null?'':x).trim(),norm=x=>safe(x).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
 const hash=x=>crypto.createHash('sha256').update(safe(x)).digest('hex').slice(0,12);
@@ -94,6 +94,25 @@ async function main(){
     const related=sets.polizas.filter(p=>safe(p.clienteId)===c.id),policyIds=new Set(related.map(p=>p.id));
     return {caseHash:hash(c.id),policies:related.length,expectedReceipts:sets.recibosEsperados.filter(r=>policyIds.has(safe(r.polizaId||r.policyId))).length,portfolioRows:sets.carteraPrimas.filter(r=>policyIds.has(safe(r.polizaId||r.policyId))).length,vehicles:sets.vehiculos.filter(r=>policyIds.has(safe(r.polizaId||r.policyId))).length};
   })};
+  // No individual target values or identifying advisor IDs in this receipt.
+  const goalMonths=[...new Set(sets.metas.map(x=>safe(x.mes||x.periodo).slice(0,7)).filter(x=>/^\\d{4}-\\d{2}$/.test(x)))].sort().slice(-4);
+  const groupedGoals={};
+  for(const month of goalMonths){
+    groupedGoals[month]={};
+    for(const country of ['GT','CO']){
+      const source=sets.metas.filter(g=>safe(g.mes||g.periodo).slice(0,7)===month
+        &&(safe(g.pais).toUpperCase()===country||safe(g.moneda).toUpperCase()===(country==='GT'?'GTQ':'COP')));
+      const types={};
+      for(const type of ['nueva','renovada','recaudo','prima']){
+        const selected=source.filter(g=>norm(g.tipo)===type),institutional=selected.filter(g=>!safe(g.asesorId||g.advisorId));
+        types[type]={records:selected.length,institutionalGoals:institutional.length,advisorGoals:selected.length-institutional.length,
+          institutionalHasPositiveTarget:institutional.some(g=>Number(g.valor)>0), noValuesDisclosed:true};
+      }
+      groupedGoals[month][country]=types;
+    }
+  }
+  result.institutionalGoalAuthority={status:'READONLY_CONFIGURED_TARGET_CARDINALITY_NOT_ATTESTED_UI',months:groupedGoals,
+    source:'tenants/'+tenantId+'/data/metas/items',writes:0,amountsDisclosed:false};
   result.status='READONLY_CARDINALITY_AND_RELATION_AUDIT_COMPLETE_NOT_AUTHENTICATED_SCOPE_PASS';
 }
 main().catch(e=>{result.status='FAIL';result.errorCode=safe(e.message).slice(0,120);process.exitCode=1;}).finally(async()=>{
