@@ -194,7 +194,7 @@
     "orbit360-platform/core/product-drive-document-provider-p0.js": "074b38c168ed0e7c78569395f815a2ff037c2c3c",
     "orbit360-platform/core/product-hydration-required-optional-p0.js": "21f870d3e0e165487843d1d6efa454474fd73563",
     "orbit360-platform/core/product-insurer-credential-provider-p0.js": "3bf5ba98271c7012dd1328df2894f1b38f3983eb",
-    "orbit360-platform/core/product-runtime-browser-providers-p0.js": "110240f07d334ea4976b59b52b4f433e6942bd48",
+    "orbit360-platform/core/product-runtime-browser-providers-p0.js": "eb2a0acba0a09e327a0260870386d9b503043d1b",
     "orbit360-platform/core/public-tenant-branding.js": "ee1029772b1191c44817d315dc8ce8862bb3a152",
     "orbit360-platform/core/pwa.js": "14bc0d513a2ee3de8f7b598b38276e6136f05eb8",
     "orbit360-platform/core/queries.js": "55acae8c4c933bde47afb018be55e978d9b81cdd",
@@ -5323,5 +5323,15 @@
     "noOperationalWrites": true,
     "noDeploy": true,
     "noSecurityClaim": true
+  },
+  "b4003ProtectedReadFlagGate20261013": {
+    "status": "SOURCE_CANDIDATE_QA_PENDING",
+    "source": "orbit360-platform/core/product-runtime-browser-providers-p0.js",
+    "sourceBlob": "eb2a0acba0a09e327a0260870386d9b503043d1b",
+    "qa": "tools/gravicentra-b4-003-protected-hydration.test.cjs",
+    "qaBlob": "d0b74c8f7aa2bd9a8e5bff3c85c70b63144c60d5",
+    "proof": "DENY_READ_WHEN_PREVIEW_FEATURE_DISABLED",
+    "previewAccepted": false,
+    "productionPromoted": false
   }
 }

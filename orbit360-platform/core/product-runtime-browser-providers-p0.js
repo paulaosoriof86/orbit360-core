@@ -86,6 +86,7 @@
     var v=data||{},cfg=config(),host=String(window.location&&window.location.hostname||'');
     var coll=String(v.collection||'').trim(),tenant=String(v.tenantId||'').trim();
     if(!host.includes('--'))return Promise.reject(new Error('PROTECTED_READ_PREVIEW_ONLY'));
+    if(!protectedPreview())return Promise.reject(new Error('PROTECTED_READ_CANDIDATE_DISABLED'));
     if(!tenant||tenant!==String(cfg.tenantHint||''))return Promise.reject(new Error('PROTECTED_READ_TENANT_DENIED'));
     if(!['clientes','polizas','vehiculos','recibosEsperados','carteraPrimas','cobros'].includes(coll)||
        !['GT','CO'].includes(String(v.country||'').toUpperCase())||!String(v.activeRole||'').trim())

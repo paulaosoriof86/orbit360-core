@@ -5996,7 +5996,7 @@
   "canonicalAccumulationControl": {
     "status": "FROZEN_ACTIVE",
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "compositionLockBlobSha": "22a6c28227b019daf0daa5f0f6671b1d310e54cc",
+    "compositionLockBlobSha": "a087b733c6b386d0cdfc8d8ff4d02a4a6281c100",
     "findingLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
     "findingLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
@@ -10302,5 +10302,18 @@
     "firestoreRulesDeployed": false,
     "productionChanged": false,
     "securityP0Closed": false
+  },
+  "b4003ProtectedReadFlagGate20261013": {
+    "status": "SOURCE_FIXED_QA_EXPECTED_PREVIEW_PENDING",
+    "sourcePath": "orbit360-platform/core/product-runtime-browser-providers-p0.js",
+    "sourceBlobSha": "eb2a0acba0a09e327a0260870386d9b503043d1b",
+    "qaPath": "tools/gravicentra-b4-003-protected-hydration.test.cjs",
+    "qaBlobSha": "d0b74c8f7aa2bd9a8e5bff3c85c70b63144c60d5",
+    "sourceOnly": true,
+    "securityReleaseHoldPreserved": true,
+    "previewTestPassed": false,
+    "livePromotion": false,
+    "firestoreRulesDeployed": false,
+    "operationalWrites": 0
   }
 }

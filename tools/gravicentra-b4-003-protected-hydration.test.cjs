@@ -121,6 +121,22 @@ const pause=()=>new Promise(ok=>setTimeout(ok,30));
  assert.equal(capturedPlanner('clientes').scope,'operativo');
  bootstrapRole='unassigned';
  assert.equal(capturedPlanner('clientes').hardError,true);
+
+ // Preview hostname alone must not authorize the protected read transport.
+ const flagCase=(flag,hostname)=>{
+  const w={Orbit:{},location:{hostname},__ORBIT360_PRODUCT_PUBLIC_CONFIG__:{
+   enabled:false,tenantHint:tenant,scopedReadPreviewCandidate:flag}};
+  vm.runInNewContext(provider,{window:w,Promise,Set,Map,console},{timeout:1000});
+  return w.Orbit.productRuntimeBrowserProvidersP0.protectedReadPage({
+   tenantId:tenant,collection:'polizas',country:'GT',activeRole:'asesor'});
+ };
+ await assert.rejects(flagCase(false,'ays-orbit-360-lab--gi-i65-b4-test.web.app'),
+  /PROTECTED_READ_CANDIDATE_DISABLED/);
+ await assert.rejects(flagCase(true,'ays-orbit-360-lab.web.app'),
+  /PROTECTED_READ_PREVIEW_ONLY/);
+ await assert.rejects(flagCase(true,'ays-orbit-360-lab--gi-i65-b4-test.web.app'),
+  /PRODUCT_RUNTIME_NOT_CONFIGURED/);
+ console.log('B4_003_PROTECTED_READ_PREVIEW_FLAG_QA_PASS checks=3 mock_only no_network');
  console.log('B4_003_ACTUAL_BOOTSTRAP_ROLE_RECOMPILE_PASS mock-only no-reads');
  console.log('B4_003_PROTECTED_HYDRATION_MOCK_PASS no_direct_firestore role_cache_reset protected_related_policy_batches');
 })().catch(error=>{console.error(error);process.exitCode=1;});
