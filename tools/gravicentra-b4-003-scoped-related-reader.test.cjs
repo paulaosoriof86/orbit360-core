@@ -3,6 +3,10 @@ const assert=require('node:assert/strict');
 const {readScopedRelatedDocument,readScopedRelatedList}=require('../functions/b4-003-scoped-related-reader');
 const {Denied}=require('../functions/b4-003-scoped-access-boundary');
 const tenantId='alianzas-soluciones';
+const fs=require('node:fs');
+const rawReader=fs.readFileSync(require('node:path').join(__dirname,'../functions/b4-003-scoped-related-reader.js'),'utf8');
+assert.ok(rawReader.includes('Promise.all(anchors.map(async pid=>'),'B4_003_RELATED_ANCHORS_PARALLEL_BOUNDED_REQUIRED');
+assert.ok(rawReader.includes('policyIds.length>10'),'B4_003_MAX_TEN_ANCHORS_PRESERVED');
 const docs={
  clientes:{c1:{id:'c1',tenantId,pais:'GT',asesorId:'a1'},c2:{id:'c2',tenantId,pais:'GT',asesorId:'a2'}},
  polizas:{p1:{id:'p1',tenantId,pais:'GT',asesorId:'a1',clienteId:'c1'},p2:{id:'p2',tenantId,pais:'GT',asesorId:'a2',clienteId:'c2'}},

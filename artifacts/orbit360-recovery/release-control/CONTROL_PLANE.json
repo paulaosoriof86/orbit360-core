@@ -5996,7 +5996,7 @@
   "canonicalAccumulationControl": {
     "status": "FROZEN_ACTIVE",
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "compositionLockBlobSha": "54857c0af40dbdf7dcf7ad161ccc78a66827647e",
+    "compositionLockBlobSha": "f1d4ee2d0e4120c27857138c22791b202d6282dc",
     "findingLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
     "findingLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
@@ -10524,5 +10524,21 @@
     "sourceLineageReadbackRequiredBeforeRelease": true,
     "noLiveMutation": true,
     "nonBlockingForReadOnlyB4SourceFixes": true
+  },
+  "b4003BoundedParallelParentFetch20261014": {
+    "status": "SOURCE_STAGED_NOT_ACCEPTED",
+    "sourceFile": "functions/b4-003-scoped-related-reader.js",
+    "sourceBlobSha": "20569cfb3890f37a3e0c2cdf6faf79bbfa10062f",
+    "qaFile": "tools/gravicentra-b4-003-scoped-related-reader.test.cjs",
+    "qaBlobSha": "fa5a41b291ff800f6172c4f2d5a2660904fdec56",
+    "compositionBlobSha": "f1d4ee2d0e4120c27857138c22791b202d6282dc",
+    "performanceCausalFix": "REMOVE_SERIAL_TEN_POLICY_ANCHOR_FIRESTORE_FETCH",
+    "uiFilesChanged": false,
+    "backendAPIContractChanged": false,
+    "securityP0Closed": false,
+    "noLive": true,
+    "noDataWrites": true,
+    "noRulesDeploy": true,
+    "requiredProof": "SOURCE_MOCK_QA_AND_AUTHENTICATED_PREVIEW_BENCHMARK"
   }
 }

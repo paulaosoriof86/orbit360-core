@@ -256,7 +256,7 @@
     "orbit360-platform/modules/comparativo.js": "982881a4c1e2f95be95428bd3f9f23360a9a2d5f",
     "functions/b4-003-scoped-policy-reader.js": "4181f6198c0163175579a2cc19197ebc63d9b328",
     "functions/b4-003-scoped-policy-callable.js": "8b468150003fe812d9e1d0763120f2b31f1df75f",
-    "functions/b4-003-scoped-related-reader.js": "d890a849d59f59e51ee31d470a7b8fc44073cdc7",
+    "functions/b4-003-scoped-related-reader.js": "20569cfb3890f37a3e0c2cdf6faf79bbfa10062f",
     "functions/b4-003-scoped-bootstrap-reader.js": "e73b922173733b2c96693603d6035bfb3b31fa79"
   },
   "evidence": {
@@ -5451,5 +5451,18 @@
     "notDataReimport": true,
     "previousUIUnchanged": true,
     "productionNotTouched": true
+  },
+  "b4003BoundedParallelParentFetch20261014": {
+    "status": "SOURCE_STAGED_QA_REQUIRED",
+    "sourceFile": "functions/b4-003-scoped-related-reader.js",
+    "sourceBlobSha": "20569cfb3890f37a3e0c2cdf6faf79bbfa10062f",
+    "qaFile": "tools/gravicentra-b4-003-scoped-related-reader.test.cjs",
+    "qaBlobSha": "fa5a41b291ff800f6172c4f2d5a2660904fdec56",
+    "boundedConcurrency": 10,
+    "securityPolicyUnchanged": true,
+    "uiUnchanged": true,
+    "livePromotion": false,
+    "dataWrites": 0,
+    "previewRequiresNewBuild": true
   }
 }

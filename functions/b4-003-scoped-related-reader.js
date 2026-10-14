@@ -105,7 +105,9 @@ async function readScopedRelatedList({db,auth,request}){
    // A batch is authorized server-side per policy and per client; a caller's
    // policyIds are only lookup hints and never confer read permission.
    const anchors=policyId?[policyId]:policyIds;
-   for(const pid of anchors){
+   // Limit: at most ten policy anchors. Read their verified relationships
+   // concurrently rather than serially to avoid N*20 round trips per page.
+   const parents=await Promise.all(anchors.map(async pid=>{
      const ps=await docRef(tenant,'polizas',pid).get();
      if(!ps.exists)throw new Denied('POLICY_NOT_FOUND_OR_DENIED');
      const verifiedPolicy=ps.data()||{},clientId=clean(verifiedPolicy.clienteId);
@@ -115,8 +117,9 @@ async function readScopedRelatedList({db,auth,request}){
      const verifiedClient=csnap.data()||{};
      try{verifiedLinkedClient(ctx,verifiedClient);allowRow(ctx,verifiedPolicy);}
      catch(e){if(e instanceof Denied)throw new Denied('POLICY_NOT_FOUND_OR_DENIED');throw e;}
-     verifiedParents.set(pid,{policy:verifiedPolicy,client:verifiedClient});
-   }
+     return [pid,{policy:verifiedPolicy,client:verifiedClient}];
+   }));
+   parents.forEach(([pid,verified])=>verifiedParents.set(pid,verified));
    query=hasBatch?target.where('polizaId','in',policyIds):target.where('polizaId','==',policyId);
  }
  function checkedRow(row,documentId){
