@@ -72,17 +72,26 @@ function rolesOf(member) {
 function advisorIdOf(member) {
   return text(member && (member.advisorId || member.asesorId), 180);
 }
-function scopeOf(member,domain) {
-  const scopes = member && member.dataScopes || {},raw=domain==='leads'?(scopes.leads||scopes.commercial||scopes.default):(scopes.ops||scopes.workflow||scopes.gestiones||scopes.default),value=norm(raw||member.scopeDatos||member.dataScope);
-  if (['ninguno','none'].includes(value)) return 'none';
-  if (['equipo','team'].includes(value)) return 'team';
-  if (['todos','all'].includes(value)) return 'all';
+function scopeOf(member,domain,activeRole) {
+  const scopes=member&&member.dataScopes||{},modules=scopes.modules&&typeof scopes.modules==='object'&&!Array.isArray(scopes.modules)?scopes.modules:{};
+  const raw=domain==='leads'?(modules.leads??scopes.leads??scopes.commercial??scopes.default):
+    (modules.ops??modules.gestiones??scopes.ops??scopes.workflow??scopes.gestiones??scopes.default);
+  const value=norm(raw??member.scopeDatos??member.dataScope),role=norm(activeRole);
+  if(/asesor|comercial|asistente/.test(role))return ['ninguno','none','sin_acceso'].includes(value)?'none':'own';
+  if(['ninguno','none','sin_acceso'].includes(value))return'none';
+  if(['propio','propios','own'].includes(value))return'own';
+  if(['equipo','team'].includes(value))return'team';
+  if(['todos','all','global'].includes(value))return'all';
+  if(value)return'none'; // Invalid configured scope must never become all.
   if(domain==='leads'&&advisorIdOf(member))return'own';
-  return rolesOf(member).some(role => /asesor|comercial|asistente/.test(role)) ? 'own' : 'all';
+  return rolesOf(member).some(r=>/asesor|comercial|asistente/.test(r))?'own':'all';
 }
-function teamAdvisorIds(member) {
-  const own = advisorIdOf(member);
-  return unique([own, ...(member.teamAdvisorIds || []), ...(member.asesoresEquipo || [])]);
+function teamAdvisorIds(member,activeRole) {
+  const own=advisorIdOf(member),map=member.roleVisibleAdvisorIds&&typeof member.roleVisibleAdvisorIds==='object'?member.roleVisibleAdvisorIds:{};
+  const key=Object.keys(map).find(k=>norm(k)===norm(activeRole));
+  if(key!==undefined&&!Array.isArray(map[key]))return [own].filter(Boolean);
+  const allowed=key!==undefined?map[key]:member.teamAdvisorIds||member.asesoresEquipo||[];
+  return unique([own,...allowed]);
 }
 async function authorize(request) {
   if (!request.auth || !request.auth.uid) throw new HttpsError('unauthenticated', 'Se requiere sesión activa.');
@@ -92,7 +101,7 @@ async function authorize(request) {
   if (!activeMember(member)) throw new HttpsError('permission-denied', 'La membresía no está activa.');
   const roles=rolesOf(member),requestedRole=norm(request.data&&request.data.activeRole),activeRole=requestedRole||norm(member.activeRole||member.rolActivo||member.defaultRole||member.rol)||roles[0]||'';
   if(requestedRole&&!roles.includes(requestedRole))throw new HttpsError('permission-denied','El rol activo no está asignado.');
-  const advisorId=advisorIdOf(member),opsScope=scopeOf(member,'ops'),leadsScope=scopeOf(member,'leads');
+  const advisorId=advisorIdOf(member),opsScope=scopeOf(member,'ops',activeRole),leadsScope=scopeOf(member,'leads',activeRole);
   if (opsScope==='none'&&leadsScope==='none') throw new HttpsError('permission-denied','Los alcances de Ops y Leads están deshabilitados.');
   if ((opsScope==='own'||leadsScope==='own')&&!advisorId) throw new HttpsError('failed-precondition','La membresía no está vinculada a un asesor.');
   return { tenantId, member, advisorId, opsScope, leadsScope, roles, activeRole, uid:request.auth.uid };
@@ -104,7 +113,7 @@ async function storageMode(tenantId) {
 function refFor(mode, tenantId, collection) {
   return mode === 'canonicalV2' ? canonicalCollection(tenantId, collection) : legacyCollection(tenantId, collection);
 }
-function allowedAdvisorIds(authz,domain){const scope=domain==='leads'?authz.leadsScope:authz.opsScope;if(scope==='own')return[authz.advisorId];if(scope==='team')return teamAdvisorIds(authz.member);return[];}
+function allowedAdvisorIds(authz,domain){const scope=domain==='leads'?authz.leadsScope:authz.opsScope;if(scope==='own')return[authz.advisorId];if(scope==='team')return teamAdvisorIds(authz.member,authz.activeRole);return[];}
 function visible(record,authz,domain){if(!record||record.archivado===true)return false;const scope=domain==='leads'?authz.leadsScope:authz.opsScope;if(scope==='none')return false;if(scope==='all')return true;return allowedAdvisorIds(authz,domain).includes(text(record.asesorId||record.advisorId,180));}
 function project(record, type) {
   return {

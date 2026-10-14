@@ -57,6 +57,9 @@ jobs:
           node tools/gravicentra-b4-003-relation-cache-accessors.test.cjs
           node --check orbit360-platform/modules/inicio.js
           node tools/gravicentra-b4-003-inicio-personal-recaudo.test.cjs
+          node --check functions/product-ops-leads-domain.js
+          node --check functions/ops-advisor-inbox.js
+          node tools/gravicentra-b4-003-ops-leads-role-scopes.test.cjs
           node --check orbit360-platform/core/ciclo.js
           node --check orbit360-platform/modules/comparativo.js
           node --check orbit360-platform/modules/issuance-endosos-v1201-bridge.js

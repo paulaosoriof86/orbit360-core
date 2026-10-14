@@ -157,14 +157,14 @@
     "functions/cotcomp-workflow-owner-patch.test.js": "f09315b416e95415ade2d811c4d7e52baba8904d",
     "functions/document-drive-domain.js": "928dc218aa09be4648552f84502e50f4c0d65227",
     "functions/notification-outbox-processor.js": "ce31ae776beb5945741ef0f9f9dbf53075d03910",
-    "functions/ops-advisor-inbox.js": "4fa4510c4911cbf931557b7586ffb607aca20a93",
+    "functions/ops-advisor-inbox.js": "1fb37c8f76647312d825fa88db7df8f66f8861ae",
     "functions/ops-leads-domain.js": "73e09a4404cb4298dc34c9c38e26ad1f960d3170",
     "functions/package-lock.json": "868690d441b0073c550aea2de56c35950fafa9d1",
     "functions/package.json": "2b7183aac731ee4f3e0626baa8448000d94115a1",
     "functions/payment-inference-engine.js": "16bf21177364fbb94f39fab5b8e8ec8506bbd071",
     "functions/product-insurer-credentials.js": "04e681fdba71ee8438429dda11ae50edf9a40c8e",
     "functions/product-operational-domain.js": "61bbd6d4bc9e687fa698c129e4ffd4fb4fb085b7",
-    "functions/product-ops-leads-domain.js": "9616691badc2a5bdb16310b4c15c0a95e0e83b8e",
+    "functions/product-ops-leads-domain.js": "6204e564d21e0b5a5167becb47ee3fd3111850b8",
     "functions/tenant-branding.js": "d3c3dcd191951f91a40eb17b7cc560dc535a2a3c",
     "functions/tenant-domain-config.js": "c9f2bd7234252ee7281e5aca2b20601fcf8d77e3",
     "functions/user-onboarding.js": "6512d49e4a01c4257e578652b0728f688cd063d1",
@@ -5268,5 +5268,23 @@
     "productionChanged": false,
     "operationalWrites": 0,
     "previewPending": true
+  },
+  "b4003OpsLeadsPerModuleRoleScopeRepair20261013": {
+    "status": "SOURCE_STAGED_INTEGRATED_QA_PENDING",
+    "gate": "I6.5/B4-003",
+    "findingIds": [
+      "B4-003-UAT-20261011-02",
+      "B4-003-UAT-20261011-04"
+    ],
+    "cause": "SERVER_WRITE_AND_INBOX_READ_IGNORED_NESTED_MODULE_SCOPES_AND_PER_ROLE_ADVISOR_LIST",
+    "productBlobs": {
+      "functions/product-ops-leads-domain.js": "6204e564d21e0b5a5167becb47ee3fd3111850b8",
+      "functions/ops-advisor-inbox.js": "1fb37c8f76647312d825fa88db7df8f66f8861ae"
+    },
+    "qaBlob": "4a8913d174483119670acb91ee6441a7faee6e59",
+    "previewAuthenticatedPending": true,
+    "realWrites": 0,
+    "productionChanged": false,
+    "noRulesDeploy": true
   }
 }
