@@ -35,7 +35,7 @@ jobs:
         shell: bash
         env:
           FIREBASE_SA_LAB_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
-          G7_INPUT_DIR: ${{ runner.temp }}/ays-g7-input
+          G7_INPUT_DIR: ${{ runner.temp }}/ays-g7-input/ays-g4-source-manifest
           G7_OUTPUT_DIR: ${{ runner.temp }}/ays-g7-output
         run: |
           set -euo pipefail
