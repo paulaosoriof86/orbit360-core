@@ -10240,7 +10240,7 @@
     "visualPass": false
   },
   "b4003InicioPerRoleTeamScopeGuard20261013": {
-    "status": "SOURCE_QA_PENDING_PREVIEW_NOT_ACCEPTED",
+    "status": "SOURCE_ISOLATED_QA_PASS_AUTHENTICATED_PREVIEW_PENDING",
     "gate": "I6.5/B4-003",
     "relatedFindings": [
       "B4-003-R19-07-INICIO-MONTHLY-ADVISOR-READINESS-REGRESSION",
@@ -10261,6 +10261,12 @@
     "productionChanged": false,
     "rulesDeployed": false,
     "previewPassed": false,
-    "securityP0Closed": false
+    "securityP0Closed": false,
+    "qaRunId": 38503641595,
+    "qaJobId": 115656045239,
+    "qaAssertionsPassed": 18,
+    "opsLeadsRegressionAssertionsPassed": 13,
+    "qaReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_INICIO_ROLE_COUNTRY_TEAM_ISOLATED_PROOF_20261013.json",
+    "qaReceiptBlobSha": "012a5ae6a36959662c84a575cedf7a40080deaf2"
   }
 }

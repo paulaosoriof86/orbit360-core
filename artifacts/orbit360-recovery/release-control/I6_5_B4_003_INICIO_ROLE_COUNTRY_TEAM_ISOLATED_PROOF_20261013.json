@@ -1,0 +1,30 @@
+{
+  "schema": "gravicentra-b4003-inicio-role-country-team-isolated-proof-v1",
+  "date": "2026-10-13",
+  "gate": "I6.5/B4-003",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "sourceCommit": "0c6818bc21823face2173218a5540d1c81f342d6",
+  "qaCommit": "fb43b1d5392b7f3e72e4b44b3dca24c3169bb45d",
+  "runId": 38503641595,
+  "jobId": 115656045239,
+  "sourceFile": "functions/assignable-advisor-roster.js",
+  "sourceBlobSha": "830971d3dd6ced951e56784fd95f7eeffbc8f541",
+  "testFile": "tools/gravicentra-b4-003-inicio-role-country-team.test.cjs",
+  "testBlobSha": "a64f1b07135e66ea73c0f42036e7014beab67810",
+  "result": "ISOLATED_SYNTHETIC_QA_PASS_NOT_PREVIEW_PASS",
+  "assertions": {
+    "inicioRoleCountryTeam": 18,
+    "opsLeadsRoleScopes": 13
+  },
+  "securityP0Closed": false,
+  "authenticatedPreviewPassed": false,
+  "productionChanged": false,
+  "realOperationalWrites": 0,
+  "firestoreRulesDeployed": false,
+  "remaining": [
+    "PER_ROLE_TWO_UID_AUTHENTICATED_PREVIEW",
+    "OWNER_FREELANCER_PARTICIPATION_EDITABLE",
+    "LATEST_APPROVED_VERSION_PREVIEW_PASS"
+  ]
+}
