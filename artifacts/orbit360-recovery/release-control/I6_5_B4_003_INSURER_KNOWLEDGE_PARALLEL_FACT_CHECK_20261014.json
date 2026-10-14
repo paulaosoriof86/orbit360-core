@@ -580,6 +580,64 @@
       ],
       "noProductWrites": true,
       "noOperationalWrites": true
+    },
+    "bamSalud2026SourceAudit": {
+      "status": "FIVE_PLAN_SAMPLE_ARITHMETIC_VERIFIED_RATE_ACTIVATION_PENDING",
+      "source2026": {
+        "file": "Cotizador BAMSALUD 2026.xlsx",
+        "driveId": "1xCuzly9QGFVUZ0xMt5vTKMAvaXadbkRP",
+        "modified": "2026-09-29T17:11:03Z",
+        "outputHeading": "Total Prima a Pagar Mensual",
+        "planTotalsGTQ": [
+          538.4354295260661,
+          823.496926698996,
+          1015.3378632736052,
+          1124.9143201752522,
+          1386.7561090870697
+        ],
+        "planMaternityComponentsGTQ": [
+          210.24,
+          283.72,
+          419.91,
+          419.91,
+          419.91
+        ],
+        "exampleIncluded": [
+          "titular",
+          "maternidad",
+          "vida"
+        ],
+        "exampleExcluded": [
+          "dependientes",
+          "dental"
+        ]
+      },
+      "source2025": {
+        "file": "Cotizador BAMSALUD 2025.xlsx",
+        "driveId": "1o_M1jR4LdQm_-L0pVTj8opFfl54qRwPw",
+        "outputHeading": "Prima Total a Pagar Mensual",
+        "exampleIncluded": [
+          "titular",
+          "dependientes",
+          "maternidad",
+          "dental",
+          "vida"
+        ]
+      },
+      "reconciliation": {
+        "plansValidated": 5,
+        "all2026ExampleComponentSumsAgree": true,
+        "amounts2025Versus2026NotComparableAsTariffChanges": true,
+        "reason": "Different populated risk/enrollment profiles and output labels; effective insurer tariff dates still need confirmation",
+        "productVersionSpecificProofRequired": true
+      },
+      "next": "Recompute both sources with identical risk profile, reconcile 2026 source formula output and an insurer-authorized same-product quotation before activating rate rules.",
+      "guard": {
+        "noRateEnabled": true,
+        "noPremiumChanged": true,
+        "noOperationalWrites": true,
+        "noNewFirebase": true
+      }
     }
   }
 }
