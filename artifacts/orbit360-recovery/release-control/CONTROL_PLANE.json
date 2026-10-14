@@ -5996,7 +5996,7 @@
   "canonicalAccumulationControl": {
     "status": "FROZEN_ACTIVE",
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "compositionLockBlobSha": "27c8380077096bbf97402b0d4d5da7a868da3076",
+    "compositionLockBlobSha": "23342126022d21cc3b8f30b6afc6de212ff4d1d4",
     "findingLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
     "findingLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
@@ -10238,5 +10238,29 @@
     "noProductionDeploy": true,
     "securityP0Closed": false,
     "visualPass": false
+  },
+  "b4003InicioPerRoleTeamScopeGuard20261013": {
+    "status": "SOURCE_QA_PENDING_PREVIEW_NOT_ACCEPTED",
+    "gate": "I6.5/B4-003",
+    "relatedFindings": [
+      "B4-003-R19-07-INICIO-MONTHLY-ADVISOR-READINESS-REGRESSION",
+      "B4-003-UAT-20261011-01",
+      "B4-003-P0-20261012-FREELANCERS-GOAL-SCOPE"
+    ],
+    "rootCause": "R23_INICIO_ROLE_TEAM_SCOPE_UNIONED_EXPLICIT_ROLE_TEAM_WITH_GLOBAL_TEAM_AND_SAME_TEAM_INFERENCE_ALLOWING_ADVISOR_CEILING_ABOVE_OWN",
+    "localizedAuthorization": "R23_INICIO_SECURE_ROSTER_SCOPED_CORRECTION",
+    "sourceFile": "functions/assignable-advisor-roster.js",
+    "sourceBefore": "b8b485765707eeafae9e1299614cc92f69a0aee3",
+    "sourceAfter": "830971d3dd6ced951e56784fd95f7eeffbc8f541",
+    "qaFile": "tools/gravicentra-b4-003-inicio-role-country-team.test.cjs",
+    "qaBlob": "87191ee8b97c78e09062f4cc9b4a167607030402",
+    "compositionBefore": "27c8380077096bbf97402b0d4d5da7a868da3076",
+    "compositionAfter": "23342126022d21cc3b8f30b6afc6de212ff4d1d4",
+    "remaining": "FREELANCER_PARTICIPATION_EDITABILITY_AND_AUTHENTICATED_TWO_UID_PREVIEW",
+    "operationalWrites": 0,
+    "productionChanged": false,
+    "rulesDeployed": false,
+    "previewPassed": false,
+    "securityP0Closed": false
   }
 }

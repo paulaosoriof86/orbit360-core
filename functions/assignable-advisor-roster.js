@@ -44,13 +44,21 @@ async function r23Dashboard(request){
  const tenant=db.collection('tenants').doc(tenantId),[m,c]=await Promise.all([tenant.collection('members').doc(request.auth.uid).get(),tenant.collection('config').doc('access').get()]);
  const member=m.exists?m.data()||{}:null,access=c.exists?c.data()||{}:{},role=norm(request.data?.activeRole||member?.activeRole||member?.defaultRole||member?.rol);
  if(!active(member)||text(member.tenantId,160)!==tenantId||!roles(member).includes(role)||(!FULL.has(role)&&!SELF.has(role))||restricted(member,'inicio')||matrix(access,role,'inicio','ver')===false)throw new HttpsError('permission-denied','Acceso Inicio no autorizado');
- const ds=member.dataScopes||{},modules=ds.modules||{},mk=Object.keys(modules).find(k=>norm(k)==='inicio'),wanted=r23Scope((mk&&modules[mk])||ds.default||member.scopeDatos||member.dataScope);
- const rsc=access.roleScopes||{},rk=Object.keys(rsc).find(k=>norm(k)===role),ceiling=r23Scope(rk&&rsc[rk])||(FULL.has(role)?'all':'own'),scope=wanted&&R23_SCOPE[wanted]<=R23_SCOPE[ceiling]?wanted:ceiling;
+ const ds=member.dataScopes||{},modules=ds.modules&&typeof ds.modules==='object'&&!Array.isArray(ds.modules)?ds.modules:{},mk=Object.keys(modules).find(k=>norm(k)==='inicio');
+ const rawScope=(mk!==undefined?modules[mk]:undefined)??ds.default??member.scopeDatos??member.dataScope;
+ const wanted=r23Scope(rawScope);
+ if(text(rawScope)&&!wanted)throw new HttpsError('permission-denied','Alcance de Inicio inválido');
+ const rsc=access.roleScopes||{},rk=Object.keys(rsc).find(k=>norm(k)===role),configured=r23Scope(rk&&rsc[rk]);
+ const ceiling=SELF.has(role)?(configured&&R23_SCOPE[configured]<R23_SCOPE.own?configured:'own'):(configured||'all');
+ const scope=wanted&&R23_SCOPE[wanted]<=R23_SCOPE[ceiling]?wanted:ceiling;
  if(scope==='none')throw new HttpsError('permission-denied','Sin alcance de Inicio');
  const cc=unique(member.countries||member.paises||member.paisesAutorizados).map(v=>text(v,8).toUpperCase()).filter(v=>v==='GT'||v==='CO');
- if(country!=='TODOS'&&cc.length&&!cc.includes(country))throw new HttpsError('permission-denied','País no autorizado');
- const teamIds=new Set(unique(member.teamAdvisorIds||member.equipoAsesorIds||member.asesoresEquipo)),mapping=member.roleVisibleAdvisorIds||{},rm=Object.keys(mapping).find(k=>norm(k)===role);
- unique(rm?mapping[rm]:[]).forEach(x=>teamIds.add(x));
+ if(!cc.length||country!=='TODOS'&&!cc.includes(country))throw new HttpsError('permission-denied','País no autorizado');
+ const mapping=member.roleVisibleAdvisorIds&&typeof member.roleVisibleAdvisorIds==='object'&&!Array.isArray(member.roleVisibleAdvisorIds)?member.roleVisibleAdvisorIds:{};
+ const rm=Object.keys(mapping).find(k=>norm(k)===role),explicitRoleTeam=rm!==undefined;
+ if(explicitRoleTeam&&!Array.isArray(mapping[rm]))throw new HttpsError('permission-denied','Configuración de equipo por rol inválida');
+ // Explicit per-role visibility replaces the global team and same-team inference.
+ const teamIds=new Set(unique(explicitRoleTeam?mapping[rm]:member.teamAdvisorIds||member.equipoAsesorIds||member.asesoresEquipo));
  const own=text(member.advisorId||member.asesorId,160),team=text(member.teamId||member.equipoId,160);if(own)teamIds.add(own);
  const [as,gs]=await Promise.all([tenant.collection('data').doc('asesores').collection('items').get(),tenant.collection('data').doc('metas').collection('items').get()]);
  const goals=new Map(),globalGoals=new Map();
@@ -65,7 +73,7 @@ async function r23Dashboard(request){
  if(!['nueva','renovada','recaudo','prima'].includes(type))return;
  const key=id+'|'+c,v=goals.get(key)||{nueva:0,renovada:0,recaudo:0,prima:0,produccion:0,explicit:false,explicitPrima:false};v[type]+=n;if(type==='prima')v.explicitPrima=true;v.produccion=v.explicitPrima?v.prima:v.nueva+v.renovada;v.explicit=true;goals.set(key,v);
  });
- const rows=[],seen=new Set();for(const d of as.docs){const raw=d.data()||{},a=project(d);if(!a.id||!a.nombre||seen.has(a.id))continue;if(scope==='own'&&a.id!==own)continue;if(scope==='team'&&!teamIds.has(a.id)&&(!team||text(raw.teamId||raw.equipoId,160)!==team))continue;
+ const rows=[],seen=new Set();for(const d of as.docs){const raw=d.data()||{},a=project(d);if(!a.id||!a.nombre||seen.has(a.id))continue;if(scope==='own'&&a.id!==own)continue;if(scope==='team'&&!teamIds.has(a.id)&&(!team||explicitRoleTeam||text(raw.teamId||raw.equipoId,160)!==team))continue;
  const paises=a.paises.filter(c=>(c==='GT'||c==='CO')&&(!cc.length||cc.includes(c))&&(country==='TODOS'||country===c));if(!paises.length)continue;seen.add(a.id);
  const metas={};paises.forEach(c=>metas[c]=goals.get(a.id+'|'+c)||{nueva:0,renovada:0,recaudo:0,produccion:0,explicit:false});
  const legacy=Number(raw.metaPrima);rows.push({id:a.id,nombre:a.nombre,activo:a.activo,paises,metas,metaPrima:Number.isFinite(legacy)&&legacy>0&&paises.length===1?legacy:null});

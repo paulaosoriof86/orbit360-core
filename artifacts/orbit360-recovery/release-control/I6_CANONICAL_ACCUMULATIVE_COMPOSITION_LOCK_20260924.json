@@ -151,7 +151,7 @@
   "productFileBlobs": {
     ".github/workflows/cotcomp-workflow-s419-source-qa.yml": "1123c1bd7848433ce51c24586e9fedbbbd581dff",
     "docs/ays/GRAVICENTRA_QUOTE_AUTHORITY_CONTRACT_v1_20261003.md": "ad1abea0181c350a0effd819cbff483673eb24dd",
-    "functions/assignable-advisor-roster.js": "b8b485765707eeafae9e1299614cc92f69a0aee3",
+    "functions/assignable-advisor-roster.js": "830971d3dd6ced951e56784fd95f7eeffbc8f541",
     "functions/bootstrap.js": "42fd05b81a02d428e590c36e3feb32be202f4965",
     "functions/cobros-reconciliation-domain.js": "5b27038d1c8380e4d2d0ed044996c1570d8c3767",
     "functions/cotcomp-workflow-owner-patch.test.js": "f09315b416e95415ade2d811c4d7e52baba8904d",
@@ -5286,5 +5286,19 @@
     "realWrites": 0,
     "productionChanged": false,
     "noRulesDeploy": true
+  },
+  "b4003InicioPerRoleTeamScopeGuard20261013": {
+    "gate": "I6.5/B4-003",
+    "status": "SOURCE_QA_PENDING_AUTHENTICATED_PREVIEW_PENDING",
+    "sourceOwner": "functions/assignable-advisor-roster.js",
+    "sourceBlob": "830971d3dd6ced951e56784fd95f7eeffbc8f541",
+    "qaOwner": "tools/gravicentra-b4-003-inicio-role-country-team.test.cjs",
+    "qaBlob": "87191ee8b97c78e09062f4cc9b4a167607030402",
+    "causal": "INICIO_ROLE_TEAM_VISIBILITY_EXPANDED_GLOBAL_TEAM_AND_SAME_TEAM_WHILE_ADVISOR_CEILING_WAS_CONFIGURABLE_ABOVE_OWN",
+    "readOnlyChanges": true,
+    "operationalWrites": 0,
+    "productionChanged": false,
+    "providerDeployed": false,
+    "securityP0Closed": false
   }
 }
