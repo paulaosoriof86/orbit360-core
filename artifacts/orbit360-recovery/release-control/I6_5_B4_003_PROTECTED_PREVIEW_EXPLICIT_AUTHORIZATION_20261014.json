@@ -1,0 +1,18 @@
+{
+  "schema": "GRAVICENTRA_B4_003_SCOPED_PREVIEW_AUTHORIZATION_V1",
+  "gate": "I6.5/B4-003",
+  "authorization": "User explicitly authorized isolated Preview callable enablement on 2026-10-14",
+  "scope": [
+    "READ_ONLY_PROTECTED_CALLABLE_PREVIEW",
+    "HOSTING_PREVIEW_BUILD_FLAG",
+    "AUTHENTICATED_POSITIVE_NEGATIVE_QA"
+  ],
+  "outOfScope": [
+    "SHARED_FIRESTORE_RULES_DEPLOY",
+    "PRODUCTION_PROMOTION",
+    "OPERATIONAL_DATA_MUTATION",
+    "DATA_REIMPORT"
+  ],
+  "securityP0Closed": false,
+  "productionAcceptedForSuccessor": false
+}
