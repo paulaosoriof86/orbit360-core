@@ -98,6 +98,23 @@ jobs:
             && l.status==='B4_003_R23_SOURCE_STAGED_PENDING_PREVIEW'
             && l.r23CausalAuthorization?.status==='SCOPED_R23_SOURCE_MUTATION_APPROVED_WITHIN_B4_003'
             && l.r23InicioProgress?.authProofExecuted===false;
+          // Separate, narrowly approved B4-003 security Preview path; never a LIVE release.
+          const scopedPreview=c.b4003ProtectedPreviewAuthorization?.status==='AUTHORIZED_SCOPED_PREVIEW_ONLY_PENDING_EXECUTION'
+            && c.b4003ProtectedPreviewAuthorization?.receiptBlobSha==='c73a05cbdbed710a9e446ec5a4a6e73786ab1ba6'
+            && require('node:child_process').execFileSync('git',['log','-1','--format=%s'],{encoding:'utf8'}).trim()==='build(i6.5 B4-003): wire isolated protected Preview reader'
+            && c.currentB4?.status==='B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL'
+            && c.nextAction==='I6_5_FORENSIC_REMEDIATION_B4_003_R20_TARGETED_PAULA_VISUAL'
+            && c.b4003SecurityReleaseHold?.status==='ACTIVE_FAIL_CLOSED_UNAUTHORIZED_BROWSER_FIRESTORE_READ_WRITE'
+            && l.activeFinding?.id==='B4-003'
+            && l.boundaries?.previewMutationAuthorized===true
+            && l.boundaries?.functionDeploymentAuthorized===true
+            && l.boundaries?.businessWritesAuthorized===false
+            && l.boundaries?.syntheticQaWritesAuthorized===false
+            && l.boundaries?.dataMutationAuthorized===false
+            && l.boundaries?.reimportAuthorized===false
+            && l.boundaries?.livePromotionAuthorized===false
+            && c.b4003ProtectedPreviewAuthorization?.sharedFirestoreRulesDeployAuthorized===false
+            && c.b4003ProtectedPreviewAuthorization?.operationalWritesAuthorized===false;
           const previewOk=(r19Preview||r20Preview||r23Preview)
             && l.activeFinding?.id==='B4-003'
             && l.boundaries?.businessWritesAuthorized===false
@@ -243,13 +260,14 @@ jobs:
           }
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'renewals_preview='+(renewalsPreview?'true':'false')+'\n');
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'run='+(previewOk?'true':'false')+'\n');
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'scoped_preview='+(scopedPreview?'true':'false')+'\n');
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'apply='+(applyOk?'true':'false')+'\n');
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'r20_dryrun='+(r20DryRun?'true':'false')+'\n');
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'r20_apply='+(r20Apply?'true':'false')+'\n');
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'r20_cutoff_apply='+(r20CutoffApply?'true':'false')+'\n');
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'r20_second_dryrun='+(secondReviewDryRun?'true':'false')+'\n');
           // Surface an explicit NOOP on routine pushes; never certify a skipped Preview.
-          const requestedModes={preview:previewOk,renewalsPreview,apply:applyOk,r20DryRun,r20Apply,r20CutoffApply,secondReviewDryRun,p0CumulativeReadOnly,r26RulesReadOnly,r26ReadOnly};
+          const requestedModes={scopedPreview,preview:previewOk,renewalsPreview,apply:applyOk,r20DryRun,r20Apply,r20CutoffApply,secondReviewDryRun,p0CumulativeReadOnly,r26RulesReadOnly,r26ReadOnly};
           const enabledModes=Object.entries(requestedModes).filter(([,on])=>on).map(([name])=>name);
           if(!enabledModes.length){
             fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY,'### B4-003: NOOP (not a Preview PASS)\nNo build, deploy, authenticated browser test, or readback was executed. Control Plane nextAction: `'+String(c.nextAction)+'`.\n');
@@ -828,7 +846,7 @@ jobs:
           git push origin "HEAD:$GITHUB_REF_NAME"
 
       - name: Snapshot preexisting LIVE binding before exact Preview
-        if: steps.gate.outputs.run == 'true' || steps.gate.outputs.renewals_preview == 'true'
+        if: steps.gate.outputs.run == 'true' || steps.gate.outputs.renewals_preview == 'true' || steps.gate.outputs.scoped_preview == 'true'
         env:
           LIVE_DRIFT_OUT: ${{ runner.temp }}/b4-003-preview-live-before.json
         run: node tools/gravicentra-live-preexisting-drift-snapshot.mjs --mode=snapshot
@@ -884,7 +902,7 @@ jobs:
           node --check orbit360-platform/modules/renewals-v1201-issued-filter.js
 
       - name: Prepare Firebase and browser dependencies
-        if: steps.gate.outputs.run == 'true' || steps.gate.outputs.renewals_preview == 'true'
+        if: steps.gate.outputs.run == 'true' || steps.gate.outputs.renewals_preview == 'true' || steps.gate.outputs.scoped_preview == 'true'
         run: |
           set -euo pipefail
           ROOT="$RUNNER_TEMP/b4-003-auth"
@@ -932,7 +950,7 @@ jobs:
           retry_bounded 600 npx playwright install --with-deps chromium
 
       - name: Resolve public web config
-        if: steps.gate.outputs.run == 'true' || steps.gate.outputs.renewals_preview == 'true'
+        if: steps.gate.outputs.run == 'true' || steps.gate.outputs.renewals_preview == 'true' || steps.gate.outputs.scoped_preview == 'true'
         run: |
           set -euo pipefail
           node "$FIREBASE_CLI_BIN" apps:list WEB --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/apps-b4-003.json"
@@ -949,8 +967,10 @@ jobs:
           echo "PUBLIC_CONFIG_FILE=$RUNNER_TEMP/public-config-b4-003.json" >> "$GITHUB_ENV"
 
       - name: Materialize immutable B4-003 package
-        if: steps.gate.outputs.run == 'true' || steps.gate.outputs.renewals_preview == 'true'
+        if: steps.gate.outputs.run == 'true' || steps.gate.outputs.renewals_preview == 'true' || steps.gate.outputs.scoped_preview == 'true'
         id: build
+        env:
+          GRAVICENTRA_B4_003_SCOPED_PREVIEW: ${{ steps.gate.outputs.scoped_preview }}
         run: |
           set -euo pipefail
           node tools/gravicentra-i6-5-b1-branding-snapshot.mjs "$RUNNER_TEMP/b4-003-branding-snapshot.json"
@@ -966,7 +986,7 @@ jobs:
           NODE
 
       - name: Deploy exact B4-003 Preview write backends
-        if: steps.gate.outputs.run == 'true' || steps.gate.outputs.renewals_preview == 'true'
+        if: steps.gate.outputs.run == 'true' || steps.gate.outputs.renewals_preview == 'true' || steps.gate.outputs.scoped_preview == 'true'
         run: |
           set -euo pipefail
           FROOT="$RUNNER_TEMP/b4-003-functions"
@@ -974,11 +994,16 @@ jobs:
           cp -a "$RUNNER_TEMP/b4-003-package/bundle/backend" "$FROOT/backend"
           (cd "$FROOT/backend" && npm ci --ignore-scripts --no-audit --no-fund >/dev/null)
           echo '{"functions":{"source":"backend"}}' > "$FROOT/firebase.json"
+          if [ "${{ steps.gate.outputs.scoped_preview }}" = "true" ]; then
+            node "$FIREBASE_CLI_BIN" deploy --only functions:orbit360ScopedPolicyReadPreview --config "$FROOT/firebase.json" --project "$PROJECT_ID" --non-interactive
+            printf '{"mode":"B4_003_SCOPED_READ_ONLY_PREVIEW","scopedFunctionDeployed":true,"sharedRulesDeployed":false,"otherFunctionsDeployed":false,"livePromotion":false,"dataWrites":0}\n' > "$RUNNER_TEMP/b4-003-package/evidence/b4-003-preview-backend-binding.json"
+          else
           node "$FIREBASE_CLI_BIN" deploy --only functions:orbit360ProductOperationalCommandPreview,functions:orbit360ProductAssetUploadPreview,functions:orbit360ProductAssetReadPreview,functions:orbit360OpsLeadsCommandPreview,functions:orbit360DocumentDriveStatusPreview,functions:orbit360DocumentDriveUploadPreview,functions:orbit360DocumentDriveListFolderPreview,functions:orbit360DocumentDriveReadDossierPreview,functions:orbit360DocumentDriveReadPreview,functions:orbit360DocumentDriveDownloadPreview,functions:orbit360DocumentDriveFinalizePreview,functions:orbit360DocumentDriveQuarantinePreview,functions:orbit360DocumentDriveBootstrapPreview,functions:orbit360DocumentDriveCleanupPreview,functions:orbit360TenantDomainConfigPreview,functions:orbit360AssignableAdvisorRosterPreview,functions:orbit360AcademiaManualReadPreview,functions:orbit360GetAdvisorOpsInboxPreview,functions:orbit360UpdateAdvisorOpsInboxStatePreview --config "$FROOT/firebase.json" --project "$PROJECT_ID" --non-interactive
           printf '{"status":"DEPLOYED_EXACT_PREVIEW_ONLY","sourceSha":"%s","backendSourceDigest":"%s","functions":["orbit360ProductOperationalCommandPreview","orbit360ProductAssetUploadPreview","orbit360ProductAssetReadPreview","orbit360OpsLeadsCommandPreview","orbit360DocumentDriveStatusPreview","orbit360DocumentDriveUploadPreview","orbit360DocumentDriveListFolderPreview","orbit360DocumentDriveReadDossierPreview","orbit360DocumentDriveReadPreview","orbit360DocumentDriveDownloadPreview","orbit360DocumentDriveFinalizePreview","orbit360DocumentDriveQuarantinePreview","orbit360DocumentDriveBootstrapPreview","orbit360DocumentDriveCleanupPreview","orbit360TenantDomainConfigPreview","orbit360AssignableAdvisorRosterPreview","orbit360AcademiaManualReadPreview","orbit360GetAdvisorOpsInboxPreview","orbit360UpdateAdvisorOpsInboxStatePreview"],"productionFunctionsDeployed":false,"realBusinessWritesAuthorized":false}\n' "$CANDIDATE_SOURCE_SHA" "${{ steps.build.outputs.backend_source_digest }}" > "$RUNNER_TEMP/b4-003-package/evidence/b4-003-preview-backend-binding.json"
+          fi
 
       - name: Deploy exact package to isolated Preview
-        if: steps.gate.outputs.run == 'true' || steps.gate.outputs.renewals_preview == 'true'
+        if: steps.gate.outputs.run == 'true' || steps.gate.outputs.renewals_preview == 'true' || steps.gate.outputs.scoped_preview == 'true'
         id: preview
         run: |
           set -euo pipefail
@@ -1008,7 +1033,7 @@ jobs:
           echo "preview_url=$PREVIEW_URL" >> "$GITHUB_OUTPUT"
 
       - name: Exact Hosting Preview readback
-        if: steps.gate.outputs.run == 'true' || steps.gate.outputs.renewals_preview == 'true'
+        if: steps.gate.outputs.run == 'true' || steps.gate.outputs.renewals_preview == 'true' || steps.gate.outputs.scoped_preview == 'true'
         env:
           TARGET_URL: ${{ steps.preview.outputs.preview_url }}
           EXPECTED_BUILD_ID: ${{ steps.build.outputs.build_id }}
@@ -1033,6 +1058,44 @@ jobs:
               time.sleep(3)
           print('B4_003_HOSTING_READBACK=PASS')
           PY
+
+      - name: Protected B4-003 Preview public and emulator smoke
+        if: steps.gate.outputs.scoped_preview == 'true'
+        env:
+          B4_PREVIEW_URL: ${{ steps.preview.outputs.preview_url }}
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-b4-003-scoped-bootstrap-reader.test.cjs
+          node tools/gravicentra-b4-003-protected-hydration.test.cjs
+          node --input-type=module - <<'NODE'
+          import fs from 'node:fs';
+          const host=process.env.B4_PREVIEW_URL||'';
+          if(!/^https:\/\/ays-orbit-360-lab--gi-i65-b4-[a-z0-9-]+\.web\.app$/.test(host))throw Error('PROTECTED_PREVIEW_HOST_MISMATCH');
+          const response=await fetch(host+'/product-runtime-config.js',{headers:{'Cache-Control':'no-cache'}});
+          if(!response.ok)throw Error('PROTECTED_PREVIEW_CONFIG_UNREACHABLE');
+          const config=await response.text();
+          if(!config.includes('"scopedReadPreviewCandidate":true'))throw Error('PROTECTED_PREVIEW_FLAG_NOT_HOSTED');
+          const url='https://us-east1-ays-orbit-360-lab.cloudfunctions.net/orbit360ScopedPolicyReadPreview';
+          const denied=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({data:{tenantId:'alianzas-soluciones',mode:'bootstrap-membership'}})});
+          if(denied.status!==401&&denied.status!==403)throw Error('UNAUTHENTICATED_CALLABLE_NOT_DENIED:'+denied.status);
+          const receipt={status:'PUBLIC_PREVIEW_AND_ANONYMOUS_DENIAL_PASS_AUTHENTICATED_PROOF_PENDING',
+            previewUrl:host,buildSourceSha:process.env.CANDIDATE_SOURCE_SHA,
+            callableUnauthenticatedStatus:denied.status,scopedReadFlagHosted:true,sharedRulesDeployed:false,
+            liveProductionChanged:false,operationalWrites:0,securityP0Closed:false,
+            authenticatedPositiveNegative:'PENDING'};
+          fs.writeFileSync(process.env.RUNNER_TEMP+'/b4-003-protected-preview-smoke.json',JSON.stringify(receipt,null,2)+'\n');
+          console.log('B4_003_SCOPED_PREVIEW_PUBLIC_SMOKE_PASS_NOT_AUTHENTICATED_SECURITY_PASS');
+          NODE
+
+      - name: Preserve isolated B4-003 Preview evidence
+        if: steps.gate.outputs.scoped_preview == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: gravicentra-b4-003-scoped-preview-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/b4-003-protected-preview-smoke.json
+            ${{ runner.temp }}/b4-003-package/evidence
+          if-no-files-found: error
 
       - name: Durable renewals cancelations browser proof
         if: steps.gate.outputs.run == 'true'
