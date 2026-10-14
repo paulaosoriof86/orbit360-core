@@ -10672,5 +10672,21 @@
       "authenticatedBusinessAcceptance": false,
       "newLivePromotion": false
     }
+  },
+  "b4003LiveHostingCausalAttribution": {
+    "status": "ROOT_CAUSE_DEMONSTRATED_LIVE_RESTORE_STILL_BLOCKED",
+    "gate": "I6.5/B4-003",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_LIVE_HOSTING_CAUSAL_ATTRIBUTION_20261014.json",
+    "receiptBlobSha": "ff3f74523400c11b7be3aa162f47b2bb6418b73b",
+    "portalRunId": 37666530245,
+    "siniestrosRunId": 37667921282,
+    "g7ManifestRunId": 38582624499,
+    "g7ArtifactId": 11925512650,
+    "preventionOnTwoNamedLabWorkflows": "SOURCE_ONLY_VERIFIED",
+    "remainingPublishersAuditRequired": true,
+    "securityP0Open": true,
+    "hostingRestorationAuthorized": false,
+    "liveRestored": false,
+    "productionAcceptedHistoricalNotCurrentVerification": true
   }
 }

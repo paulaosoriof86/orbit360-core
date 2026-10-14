@@ -1,0 +1,90 @@
+{
+  "schema": "GRAVICENTRA_I65_B4003_LIVE_HOSTING_COLLISION_CAUSAL_ATTRIBUTION_V1",
+  "recordedDate": "2026-10-14",
+  "gate": "I6.5/B4-003",
+  "status": "ROOT_CAUSE_DEMONSTRATED_LIVE_RESTORE_STILL_BLOCKED",
+  "project": "ays-orbit-360-lab",
+  "site": "ays-orbit-360-lab",
+  "productionUrl": "https://ays-orbit-360-lab.web.app",
+  "certifiedHistoricBuild": "gi-i65-4bf67a373875-57f234755dc1",
+  "observedLive": {
+    "release": "sites/ays-orbit-360-lab/channels/live/releases/1791398188833000",
+    "version": "sites/ays-orbit-360-lab/versions/3087fabd2db9b639",
+    "releaseTime": "2026-10-07T18:36:28.833Z",
+    "fileCount": 965,
+    "certifiedMarkerHttp": 404
+  },
+  "provenance": [
+    {
+      "role": "first_LAB_live_overwrite",
+      "workflow": "Portal P-01 S5.11F Customer Shell LAB",
+      "runId": 37666530245,
+      "sourceBranch": "ays/portal-p01-s511f-customer-shell-lab-20261007",
+      "head": "1623cac977498bb5bba0092748a8c70a9cd06189",
+      "observedLog": "firebase deploy --only hosting --project ays-orbit-360-lab --non-interactive --force; Hosting URL https://ays-orbit-360-lab.web.app; release complete",
+      "approxLiveTime": "2026-10-07T18:24:27.868Z"
+    },
+    {
+      "role": "second_LAB_live_overwrite",
+      "workflow": "Siniestros S5.12D Public Resolver LAB",
+      "runId": 37667921282,
+      "sourceBranch": "ays/siniestros-s512d-public-resolver-lab-20261007",
+      "head": "f873ce1f2b55dc5ad8cac07b58be43faddeb0a99",
+      "observedLog": "Deploy resolver and LAB hosting; hosting[ays-orbit-360-lab] found 963 files in orbit360-platform, published to LIVE, release complete at 18:36:29Z",
+      "approxLiveTime": "2026-10-07T18:36:28.833Z"
+    }
+  ],
+  "forensicManifest": {
+    "sourceRunId": 38582624499,
+    "sourceBranch": "audit/ays-g4-shared-hosting-sourceonly-20261013",
+    "sourceArtifactId": 11925512650,
+    "comparison": {
+      "previousOnly": [
+        "core/portal-p01-s511f.js",
+        "portal-p01-lab.html"
+      ],
+      "currentOnly": [
+        "core/siniestros-s512d-public.js",
+        "siniestros-asistencia-lab.html"
+      ],
+      "unchangedHashCountAllOthers": true
+    }
+  },
+  "rootCause": "LAB_WORKFLOWS_USED_SHARED_FIREBASE_HOSTING_LIVE_TARGET_INSTEAD_OF_ISOLATED_PREVIEW_AND_BYPASSED_CERTIFIED_RELEASE_IDENTITY",
+  "correctedPreventionCurrentSource": [
+    {
+      "path": ".github/workflows/portal-p01-s511f-customer-shell-lab.yml",
+      "branch": "ays/portal-p01-s511f-customer-shell-lab-20261007",
+      "blobSha": "24101a901ab7b76c86335a7e2e1106feda2a5a93",
+      "state": "SOURCE_ONLY_NO_FIREBASE_CLI_OR_HOSTING_MUTATION"
+    },
+    {
+      "path": ".github/workflows/siniestros-s512d-public-resolver-lab.yml",
+      "branch": "ays/siniestros-s512d-public-resolver-lab-20261007",
+      "blobSha": "2f693ea1a3a0d9b13b032d243b9d20503574f2cf",
+      "state": "SOURCE_ONLY_NO_FIREBASE_DEPLOY_OR_HOSTING_MUTATION"
+    }
+  ],
+  "residualRisks": [
+    "Only these two workflows checked; shared-site publisher inventory remains necessary.",
+    "Historical PRODUCTION_ACCEPTED does not certify currently served LIVE bytes.",
+    "Firestore deployed rules security P0 remains open.",
+    "Exact new B4 Preview authenticated/role/business UAT remains pending."
+  ],
+  "releaseExit": [
+    "Prove all shared Hosting publisher workflows cannot promote without canonical release control.",
+    "Reconcile effective LIVE bytes and verified rollback target.",
+    "Complete role-scoped backend and rules security positive/negative QA.",
+    "Complete B4-003 functional Preview and Paula visual acceptance on exact candidate.",
+    "Promote same immutable artifact and verify LIVE module by module."
+  ],
+  "boundaries": {
+    "liveRestorationExecuted": false,
+    "sharedRulesChanged": false,
+    "operationalWrites": 0,
+    "hostingDeployExecuted": false,
+    "noNewBranch": true,
+    "noNewFirebase": true,
+    "dataReimport": false
+  }
+}
