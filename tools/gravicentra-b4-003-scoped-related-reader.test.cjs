@@ -106,6 +106,21 @@ async function deny(fn,code){let thrown;try{await fn()}catch(e){thrown=e}assert.
  await deny(()=>bulk('vehiculos',['p1'],'asesor'),'POLICY_NOT_FOUND_OR_DENIED');checks++;
  docs.clientes.c1.pais='GT';docs.clientes.c1.asesorId='a1';
  console.log('B4_003_HISTORICAL_POLICY_ADVISOR_SCOPE_QA_PASS checks=5 no_cross_country_or_client_escalation');
+ // P0 discriminator: old operational rows without pais must be recovered
+ // only through a verified canonical country/tenant/role parent.
+ docs.negocios.nLegacy={id:'nLegacy',tenantId,polizaId:'p1',asesorId:'a1',etapa:'nuevo'};
+ docs.gestiones.gLegacy={id:'gLegacy',tenantId,clienteId:'c1',asesorId:'a1',lista:'Emisiones'};
+ docs.gestiones.gNoParent={id:'gNoParent',tenantId,asesorId:'a1',lista:'Emisiones'};
+ const legacyBiz=await flow('negocios','asesor');
+ const legacyOps=await flow('gestiones','asesor');
+ assert.ok(legacyBiz.rows.some(x=>x.id==='nLegacy'&&x.pais==='GT'),
+   'B4_003_LEGACY_COUNTRY_RELATION_REGRESSION:negocios_missing_policy_derived_country');
+ assert.ok(legacyOps.rows.some(x=>x.id==='gLegacy'&&x.pais==='GT'),
+   'B4_003_LEGACY_COUNTRY_RELATION_REGRESSION:gestiones_missing_client_derived_country');
+ assert.ok(!legacyOps.rows.some(x=>x.id==='gNoParent'),
+   'B4_003_LEGACY_COUNTRY_RELATION_REGRESSION:unknown_country_must_remain_denied');
+ checks+=3;
+ console.log('B4_003_LEGACY_COUNTRY_RELATION_REGRESSION_PASS checks=3 no_data_writes');
  console.log('B4_003_RELATED_SERVER_BATCH_SCOPE_MOCK_PASS checks='+checks+' no Firebase writes');
  console.log('B4_003_RELATED_DOCUMENT_SERVER_SCOPE_MOCK_PASS checks='+checks+' no Firebase writes');
 })().catch(e=>{console.error(e);process.exitCode=1;});
