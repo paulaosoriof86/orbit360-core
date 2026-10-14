@@ -158,6 +158,53 @@ def tests(e):
  hold(len(changes)==14,"NEGATIVE_TEST_COUNT")
  return {"passed":15,"total":15,"result":"PASS"}
 
+
+def all_public_bytes(e, max_workers=8):
+ # G8 physical equivalence: only known published static files, never customer APIs.
+ import concurrent.futures
+ import urllib.parse
+ import time
+ src={r["path"][len(ROOT):]:r for r in e["g4"]["files"] if r["path"].startswith(ROOT)}
+ live=e["live"]["files"]
+ scoped=sorted(set(live)-MANAGED)
+ hold(len(scoped)==963 and all(p in src for p in scoped),"LIVE_PHYSICAL_SCOPE")
+ def one(p):
+  hold(p and not p.startswith("/") and ".." not in p.split("/") and
+       not any(x in p for x in ("?","#","\\")),"UNSAFE_URL_PATH")
+  r=src[p]
+  url=SITE+urllib.parse.quote(p,safe="/-._~")
+  for attempt in range(2):
+   try:
+    req=urllib.request.Request(url,headers={
+      "Accept-Encoding":"identity","Cache-Control":"no-cache",
+      "User-Agent":"AYS-G8-ReadOnly-PhysicalSourceVerifier/1.0"},method="GET")
+    with urllib.request.urlopen(req,timeout=18) as response:
+     if response.geturl()!=url or response.status!=200:
+      return {"path":p,"state":"REDIRECT_OR_UNEXPECTED_STATUS"}
+     if response.headers.get("Content-Encoding") not in (None,"identity"):
+      return {"path":p,"state":"CONTENT_ENCODING_NOT_IDENTITY"}
+     body=response.read(r["size"]+1)
+     body_sha=digest(body)
+     return {"path":p,"state":"MATCH" if len(body)==r["size"] and body_sha==r["sha256"] else "BYTE_DRIFT",
+       "expected_size":r["size"],"actual_size":len(body),"expected_sha256":r["sha256"],"actual_sha256":body_sha}
+   except urllib.error.HTTPError as ex:
+    if attempt or ex.code not in (429,500,502,503,504):
+     return {"path":p,"state":"HTTP_ERROR","http":ex.code}
+   except Exception as ex:
+    if attempt: return {"path":p,"state":"NETWORK_ERROR","error_type":type(ex).__name__}
+   time.sleep(0.5)
+ with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as pool:
+  records=list(pool.map(one,scoped))
+ failed=[r for r in records if r["state"]!="MATCH"]
+ classes={}
+ for r in records: classes[r["state"]]=classes.get(r["state"],0)+1
+ return {"classification":"PHYSICAL_963_MATCH" if not failed else "HOLD_PHYSICAL_DRIFT",
+   "checked_count":len(records),"matched_count":classes.get("MATCH",0),
+   "failure_count":len(failed),"by_state":classes,"failure_details":failed[:80],
+   "source_to_public_bytes_identical":not failed,"public_static_only":True,
+   "hosting_release_identity_freshly_admin_verified":False,
+   "firebase_mutations":0,"no_deploy":True}
+
 def main():
  pa=argparse.ArgumentParser()
  pa.add_argument("--g4-dir",required=True)
@@ -165,18 +212,27 @@ def main():
  pa.add_argument("--staged-dir")
  pa.add_argument("--selftest",action="store_true")
  pa.add_argument("--public-smoke",action="store_true")
+ pa.add_argument("--full-bytes",action="store_true")
  pa.add_argument("--out")
  args=pa.parse_args()
  evidence=read_evidence(args.g4_dir,args.g7_dir)
  report={"g8":verify(evidence),"selftest":tests(evidence) if args.selftest else None}
  if args.staged_dir:report["source_staging"]=staged_bytes(evidence,args.staged_dir)
  if args.public_smoke:report["public_smoke"]=public_smoke(evidence)
+ if args.full_bytes:
+  report["full_physical_equivalence"]=all_public_bytes(evidence)
  if args.out:
   p=pathlib.Path(args.out)
   p.parent.mkdir(parents=True,exist_ok=True)
   hold(not p.exists(),"OUTPUT_EXISTS")
   p.write_text(json.dumps(report,sort_keys=True,indent=2,ensure_ascii=False)+"\n",encoding="utf-8")
- print("G8_SOURCE_ONLY_VERIFIED "+json.dumps(report,sort_keys=True))
+ print("G8_SOURCE_ONLY_VERIFIED "+json.dumps({k:v for k,v in report.items() if k!="full_physical_equivalence"},sort_keys=True))
+ if args.full_bytes:
+  physical=report["full_physical_equivalence"]
+  print("G8_PHYSICAL_SUMMARY "+json.dumps({k:v for k,v in physical.items() if k!="failure_details"},sort_keys=True))
+  for r in physical["failure_details"][:12]:
+   print("G8_PHYSICAL_MISMATCH "+json.dumps({k:v for k,v in r.items() if k in ("path","state","http","expected_size","actual_size","error_type")},sort_keys=True))
+  hold(physical["source_to_public_bytes_identical"],"LIVE_BYTE_DRIFT")
  return 0
 
 if __name__=="__main__":
