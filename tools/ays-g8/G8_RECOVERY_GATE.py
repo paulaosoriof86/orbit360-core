@@ -152,6 +152,7 @@ def tests(e):
   lambda x:x["source"].update({"rogue.js":"a"*64}),
   lambda x:x["live"]["statuses"].update({"index.html":"PENDING"}),
   lambda x:next(r for r in x["g4"]["files"] if r["path"]==ROOT+"portal-p01-lab.html").update({"critical":False}),
+  lambda x:x["g4"].update({"assembled_count":2707}),
  ]
  for change in changes:bad_change(change)
  hold(len(changes)==14,"NEGATIVE_TEST_COUNT")
