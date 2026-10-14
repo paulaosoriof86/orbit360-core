@@ -1,0 +1,69 @@
+{
+  "schema": "GRAVICENTRA_B4003_INSURER_KNOWLEDGE_PARALLEL_FACT_CHECK_V1",
+  "gate": "I6.5/B4-003",
+  "date": "2026-10-14",
+  "status": "SOURCE_REVIEW_PROGRESSED_NO_RATE_ENABLEMENT",
+  "priority": "PARALLEL_NONBLOCKING_PER_FROZEN_USER_PRIORITY",
+  "sources": [
+    {
+      "insurer": "Seguros Columna",
+      "document": "Cotizador VA 2026 V1.4.xlsx",
+      "sourceKind": "INSURER_CALCULATOR",
+      "driveFileId": "1h7DnGbTxPZwEpvfK_OpUVU2HHs2vzAyI",
+      "observations": [
+        "Workbook text extraction identifies 2026 vehicle quotation model, product categories, risk-based rates, deductibles and minimum premiums.",
+        "One populated motorcycle case is present with 2026 quotation date; do not use personal details as product knowledge.",
+        "Source includes an Aplicar recargo control; zero-surcharge cannot be universally inferred without formula and plan validation."
+      ],
+      "validation": "FORMULAS_AND_OUTPUT_RECONCILIATION_PENDING",
+      "tariffAllowed": false
+    },
+    {
+      "insurer": "Aseguradora Guatemalteca",
+      "document": "Tasas AseGuate.xlsx",
+      "sourceKind": "TARIFF_GUIDE",
+      "driveFileId": "18qF8Ddty6kALuvuHIWnCjK2mDLRyTCMs",
+      "observations": [
+        "Source lists vehicle payment up to six installments at cash price, eight installments with 5.37% surcharge, and ten installments with 8.42% surcharge.",
+        "Premium minima and assistance cost depend on named plan; must not be generalized to other products."
+      ],
+      "validation": "SOURCE_READ_REQUIRES_VERSION_AND_POLICY_RECONCILIATION",
+      "tariffAllowed": false
+    },
+    {
+      "insurer": "Seguros Columna",
+      "document": "Official GT vehicle quote from 2026-09-17 recorded in R8 inventory",
+      "sourceKind": "QUOTE_SAMPLE",
+      "observations": [
+        "Sample shows net premium Q1349.96, IVA Q162.00 and total Q1511.96.",
+        "No issuer installment surcharge is proven for that particular sample; this is not universal rate authority."
+      ],
+      "validation": "HISTORICAL_R8_SOURCE_BENCHMARK_ONLY",
+      "tariffAllowed": false
+    },
+    {
+      "insurer": "AXA Colpatria and La Previsora",
+      "document": "R9 source-backed sample adjudications",
+      "sourceKind": "POLICY_SAMPLES",
+      "observations": [
+        "R9 records COP20,000 expenses in two AXA auto samples and no expenses in one Previsora sample.",
+        "R9 reports 19% IVA for those samples; do not extrapolate to all plans."
+      ],
+      "validation": "PRODUCT_VERSION_SPECIFIC_AUTHORITY_PENDING",
+      "tariffAllowed": false
+    }
+  ],
+  "method": "Extract document facts, reconcile per insurer, country, product, version and payment mode; preserve source totals; no generic surcharges or recalculation of migrated premiums.",
+  "gaps": [
+    "FORMULA_LEVEL_EXCEL_INSPECTION_AND_PRINTED_OUTPUT_CROSSCHECK",
+    "DOCUMENT_VERSION_AND_VIGENCY_CONFIRMATION",
+    "PER_INSURER_PRODUCT_RATE_AUTHORITY",
+    "PREMIUM_CONTRACTUAL_RECONCILIATION_AFTER_SECURE_HYDRATION"
+  ],
+  "doNotRequestRepeatOfExistingSources": true,
+  "operationalWrites": 0,
+  "sourceProductChanges": 0,
+  "firestoreRuleChanges": 0,
+  "productionPromotion": false,
+  "notCotizadorRateApproval": true
+}
