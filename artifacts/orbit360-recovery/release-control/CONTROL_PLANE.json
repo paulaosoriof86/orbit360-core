@@ -10583,5 +10583,57 @@
       "FINANCIAL_CLIENT360_READBACK",
       "LIVE_HOSTING_LINEAGE_AND_SHARED_RULES_SECURITY"
     ]
+  },
+  "b4003LegacyWorkflowCountrySourceStage20261014": {
+    "status": "GIT_BLOB_STAGED_NOT_IN_CANDIDATE_P0_TEST_EXPECTED_FAIL",
+    "gate": "I6.5/B4-003",
+    "existingFindingId": "B4-003-P0-20261012-PERSONAL-COLLECTION",
+    "relatedModules": [
+      "Ops",
+      "Leads",
+      "Gestiones"
+    ],
+    "rootCause": "SERVER_WORKFLOW_LIST_FILTERS_PERSISTED_COUNTRY_BEFORE_CHECKING_VERIFIED_LINKED_POLICY_OR_CLIENT",
+    "realSourceEvidence": {
+      "negociosTotal": 9,
+      "negociosMissingCountry": 3,
+      "gestionesTotal": 13,
+      "gestionesMissingCountry": 4,
+      "otherFinancialCollectionsRequireSeparateExistingPolicyBatchProof": true
+    },
+    "stagedCandidate": {
+      "path": "functions/b4-003-scoped-related-reader.js",
+      "fromBlob": "20569cfb3890f37a3e0c2cdf6faf79bbfa10062f",
+      "toGitBlob": "5323126db9d4fadbf5c3bf7fae62ba1e9676f905",
+      "committedIntoBranch": false,
+      "productSourceChanged": false,
+      "compositionChanged": false,
+      "backendDeployed": false,
+      "immutableExistingPreviewPreserved": true,
+      "compatibleBoundedReadMax": 250
+    },
+    "regressionTest": {
+      "path": "tools/gravicentra-b4-003-scoped-related-reader.test.cjs",
+      "blobSha": "a07fedf9053f23d5d837bd4590604e55a52b57f9",
+      "commitSha": "699e48f96f484c88e2cd7c4c1e9bd882feaf72c0",
+      "pass": false,
+      "realGithubRunnerOutcome": "NOT_YET_VERIFIED",
+      "expectedCause": "MISSING_COUNTRY_EARLY_FIRESTORE_FILTER"
+    },
+    "requiredAtomicIntegration": [
+      "RECONCILE_SCOPED_SOURCE_AUTHORITY_WITH_B4_LOCK",
+      "ATOMIC_PRODUCT_SOURCE_PLUS_COMPOSITION_EXACT_BLOB_SHA_ON_SAME_BRANCH",
+      "PASS_CAUSAL_QA_AND_GOVERNANCE",
+      "NEW_IMMUTABLE_PREVIEW_AND_AUTHENTICATED_ROLE_COUNTRY_DATA_PROOF",
+      "SEPARATE_SHARED_RULES_DEPLOY_AUTHORIZATION_DIFF_ROLLBACK",
+      "LIVE_LINEAGE_RECONCILIATION_AND_PAULA_EXPLICIT_RELEASE_AUTHORIZATION"
+    ],
+    "otherBlockingP0Preserved": true,
+    "dataMutationAuthorized": false,
+    "firestoreRulesDeploymentAuthorized": false,
+    "productionPromotionAuthorized": false,
+    "noNewIteration": true,
+    "noNewBranch": true,
+    "noReimport": true
   }
 }
