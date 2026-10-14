@@ -17,7 +17,7 @@ async function main(){
     const col=db.collection('tenants').doc(tenantId).collection('data').doc(name).collection('items');
     const snap=await col.limit(3001).get();
     if(snap.docs.length>3000)throw Error('READ_BOUND_EXCEEDED_'+name);
-    const rows=snap.docs.map(d=>({id:d.id,...d.data()}));
+    const rows=snap.docs.map(d=>({...(d.data()||{}),id:(d.data()||{}).id||d.id,canonicalDocumentId:d.id}));
     sets[name]=rows;
     result.collections[name]={count:rows.length,country:{GT:rows.filter(x=>safe(x.pais||x.country)==='GT').length,CO:rows.filter(x=>safe(x.pais||x.country)==='CO').length},missingCountry:rows.filter(x=>!safe(x.pais||x.country)).length,missingAdvisor:rows.filter(x=>!safe(x.asesorId||x.advisorId)).length};
   }
@@ -33,6 +33,38 @@ async function main(){
     stats[collection]={total:rows.length,withPolicyAnchor:anchored.length,withoutPolicyAnchor:rows.length-anchored.length,orphanPolicyCount:orphans.length,clientRelationMismatchCount:mismatches.length,orphanWithoutPersonalIds:true};
   }
   result.relationships=stats;
+  const policyByDocumentId=new Map(sets.polizas.map(x=>[x.canonicalDocumentId,x]));
+  const aliasMismatches=sets.polizas.filter(x=>x.canonicalDocumentId!==x.id).length;
+  const clientByDocumentId=new Map(sets.clientes.map(x=>[x.canonicalDocumentId,x]));
+  const recovered={};
+  for(const collection of ['recibosEsperados','carteraPrimas','cobros','vehiculos']){
+    const rows=sets[collection];
+    let aliasAnchor=0,clientAdvisorDisagreement=0,receiptPolicyAdvisorDisagreement=0,countryInherited=0;
+    for(const row of rows){
+      const id=safe(row.polizaId||row.policyId),policy=policies.get(id)||policyByDocumentId.get(id);
+      if(!policy)continue;
+      if(!policies.has(id)&&policyByDocumentId.has(id))aliasAnchor++;
+      const cli=clients.get(safe(policy.clienteId))||clientByDocumentId.get(safe(policy.clienteId));
+      if(cli&&safe(policy.asesorId)&&safe(cli.asesorId)&&safe(policy.asesorId)!==safe(cli.asesorId))clientAdvisorDisagreement++;
+      if(safe(row.asesorId)&&safe(policy.asesorId)&&safe(row.asesorId)!==safe(policy.asesorId))receiptPolicyAdvisorDisagreement++;
+      if(!safe(row.pais||row.country)&&safe(policy.pais||policy.country))countryInherited++;
+    }
+    recovered[collection]={aliasPolicyAnchorCount:aliasAnchor,linkedPolicyClientAdvisorDisagreementRows:clientAdvisorDisagreement,childPolicyAdvisorDisagreementRows:receiptPolicyAdvisorDisagreement,countryResolvableFromLinkedPolicy:countryInherited};
+  }
+  const workflow={};
+  for(const collection of ['negocios','gestiones']){
+    let missingCountry=0,relatedCountry=0,missingAdvisor=0,relatedAdvisor=0;
+    for(const row of sets[collection]){
+      const pol=policies.get(safe(row.polizaId))||policyByDocumentId.get(safe(row.polizaId));
+      const cli=clients.get(safe(row.clienteId))||clientByDocumentId.get(safe(row.clienteId));
+      const parent=pol||cli;
+      if(!safe(row.pais||row.country)){missingCountry++;if(parent&&safe(parent.pais||parent.country))relatedCountry++;}
+      if(!safe(row.asesorId||row.advisorId)){missingAdvisor++;if(parent&&safe(parent.asesorId||parent.advisorId))relatedAdvisor++;}
+    }
+    workflow[collection]={missingCountry,missingCountryRecoverableViaVerifiedParent:relatedCountry,missingAdvisor,missingAdvisorRecoverableViaVerifiedParent:relatedAdvisor};
+  }
+  result.authorizationInputs={physicalPolicyIdVsStoredIdCount:aliasMismatches,linkedData:recovered,commercialAndOps:workflow,noPrivilegeInferred:true};
+
   const matched=sets.clientes.filter(c=>norm(c.nombre).includes('oscar haroldo')&&norm(c.nombre).includes('padilla'));
   result.specificRegression={case:'OSCAR_HAROLDO_PADILLA',clientMatches:matched.length,clients:matched.map(c=>{
     const related=sets.polizas.filter(p=>safe(p.clienteId)===c.id),policyIds=new Set(related.map(p=>p.id));
