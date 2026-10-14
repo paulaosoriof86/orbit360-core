@@ -63,6 +63,30 @@ async function main(){
     }
     workflow[collection]={missingCountry,missingCountryRecoverableViaVerifiedParent:relatedCountry,missingAdvisor,missingAdvisorRecoverableViaVerifiedParent:relatedAdvisor};
   }
+  // No raw document IDs, names, emails or monetary amounts enter this audit.
+  // This distinguishes legitimate legacy missing country from empty source data.
+  const classification={};
+  for(const collection of ['negocios','gestiones']){
+    const rows=sets[collection],notCountry=rows.filter(x=>!safe(x.pais||x.country));
+    const grouped={};
+    for(const row of notCountry){
+      const linkedPolicy=policies.get(safe(row.polizaId))||policyByDocumentId.get(safe(row.polizaId));
+      const linkedClient=clients.get(safe(row.clienteId))||clientByDocumentId.get(safe(row.clienteId));
+      const viaBusiness=sets.negocios.find(x=>x.id===safe(row.negocioId)||x.canonicalDocumentId===safe(row.negocioId));
+      const key=linkedPolicy?'POLICY':linkedClient?'CLIENT':viaBusiness?'BUSINESS':'NO_VERIFIED_PARENT';
+      grouped[key]=(grouped[key]||0)+1;
+    }
+    classification[collection]={missingCountry:notCountry.length,sourceSyntheticFlags:notCountry.filter(x=>x.__syntheticQa===true||x.syntheticQa===true).length,
+      qaIdPrefixes:notCountry.filter(x=>/^(b4|qa[_-]|test[_-])/i.test(safe(x.id))).length,
+      withoutAdvisor:notCountry.filter(x=>!safe(x.asesorId||x.advisorId)).length,verifiedParentKinds:grouped};
+  }
+  const orphans={};
+  for(const collection of ['recibosEsperados','carteraPrimas','vehiculos']){
+    const orphanRows=sets[collection].filter(x=>!policies.has(safe(x.polizaId||x.policyId))&&!policyByDocumentId.has(safe(x.polizaId||x.policyId)));
+    orphans[collection]={count:orphanRows.length,qaPrefixCount:orphanRows.filter(x=>/^(b2-|b4-|qa[_-]|test[_-])/i.test(safe(x.polizaId||x.policyId))).length,
+      syntheticMarked:orphanRows.filter(x=>x.__syntheticQa===true||x.syntheticQa===true).length};
+  }
+  result.authorityClassification={commercialCountryGaps:classification,orphanPolicyReferences:orphans,unauthorizedParentFallback:false,noRawIdentifiers:true};
   result.authorizationInputs={physicalPolicyIdVsStoredIdCount:aliasMismatches,linkedData:recovered,commercialAndOps:workflow,noPrivilegeInferred:true};
 
   const matched=sets.clientes.filter(c=>norm(c.nombre).includes('oscar haroldo')&&norm(c.nombre).includes('padilla'));
