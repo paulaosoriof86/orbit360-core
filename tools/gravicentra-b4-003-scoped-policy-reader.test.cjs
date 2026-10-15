@@ -73,7 +73,10 @@ const denied=async(fn,code)=>{
  policies.pop();
  await denied(()=>scopedPolicyRead(req('asesor','list',{cursor:'p3'})),'CURSOR_DENIED');count++;
  const boundedLarge=await scopedPolicyRead(req('operativo','list',{pageSize:200}));
- assert.deepEqual(boundedLarge.rows.map(x=>x.id),['p1','p2','p3']);assert.equal(boundedLarge.nextCursor,null);count++;
+ assert.deepEqual(boundedLarge.rows.map(x=>x.id),['p1','p2','p4']);assert.equal(boundedLarge.nextCursor,null);count++;
+ const colombia=await scopedPolicyRead(req('operativo','list',{country:'CO',pageSize:200}));
+ assert.deepEqual(colombia.rows.map(x=>x.id),['p3']);assert.equal(colombia.nextCursor,null);count++;
+ await denied(()=>scopedPolicyRead(req('operativo','list',{cursor:'p3'})),'CURSOR_DENIED');count++;
  await denied(()=>scopedPolicyRead(req('asesor','list',{pageSize:201})),'PAGE_SIZE_INVALID');count++;
  await denied(()=>scopedPolicyRead(req('asesor','get',{policyId:'p1',pageSize:51})),'PAGE_SIZE_INVALID');count++;
  await denied(()=>scopedPolicyRead(req('asesor','list',{policyId:'p1'})),'POLICY_GET_LIST_MIXED');count++;

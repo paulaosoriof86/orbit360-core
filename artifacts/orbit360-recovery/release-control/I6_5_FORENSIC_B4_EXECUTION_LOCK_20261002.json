@@ -2535,6 +2535,10 @@
     ],
     "qaPath": "tools/gravicentra-b4-003-scoped-policy-reader.test.cjs",
     "realOperationalWritesAuthorized": false,
-    "productionDeploymentAuthorized": false
+    "productionDeploymentAuthorized": false,
+    "qaStatus": "GT_CO_COUNTRY_QUERY_ASSERTIONS_REPAIRED_GUARD_PENDING",
+    "qaTestBlobSha": "08ff4baa96f792ebbfe2ddad26769cb8ab380ca8",
+    "qaGuardRetryReceipt": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PAGING_QA_GUARD_ROOT_FIX_20261015.json",
+    "qaGuardRetryReceiptBlobSha": "19d5c55c6537c52a8303b19b792c43b4ca7ab7c7"
   }
 }

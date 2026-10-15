@@ -1,0 +1,23 @@
+{
+  "schema": "GRAVICENTRA_B4_003_PAGING_QA_GUARD_ROOT_FIX_20261015",
+  "date": "2026-10-15",
+  "gate": "I6.5/B4-003",
+  "finding": "B4-003-R20-B01",
+  "cause": "Synthetic test assumed p3 CO belonged to GT policy query; actual GT p1 p2 p4 correct.",
+  "failedGuardRun": 38720001558,
+  "oldTestBlob": "0f7f5d2caf683fdf7bdb370e60b691aeaac09fc5",
+  "newTestBlob": "08ff4baa96f792ebbfe2ddad26769cb8ab380ca8",
+  "owner": "tools/gravicentra-b4-003-scoped-policy-reader.test.cjs",
+  "positive": [
+    "GT all p1,p2,p4",
+    "CO all p3"
+  ],
+  "negative": [
+    "GT with CO cursor p3 must return CURSOR_DENIED"
+  ],
+  "sourceChanged": false,
+  "notCertified": "Guard and exact authenticated Preview/performance readback pending",
+  "writes": 0,
+  "liveMutation": false,
+  "firestoreRulesDeploy": false
+}
