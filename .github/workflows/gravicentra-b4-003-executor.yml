@@ -1,4 +1,5 @@
 name: Gravicentra B4-003 R20 Exact Preview
+# R26 2026-10-14: read effective Firestore rules using existing GitHub service account; QA-only, no deploy, no data/secret exposure.
 # R20 insurer draft source fix: rerun exact Preview after remote-head freeze lease mismatch.
 # R19 inbox product-canonical read-owner rootfix retrigger.
 # R19 mobile policy-search visibility rootfix retrigger.
