@@ -287,6 +287,27 @@ jobs:
             fs.appendFileSync(process.env.GITHUB_OUTPUT,'r26_preview='+exactPreview+'\n');
             fs.appendFileSync(process.env.GITHUB_OUTPUT,'r26_source='+c.currentB4.sourceSha+'\n');
           }
+
+          const financeTrigger=execFileSync('git',['log','-1','--format=%s'],{encoding:'utf8'}).trim()==='test(i6.5 B4-003): exact finance and coverage readback';
+          const exactFinancialProof=c.b4003FunctionalContractRestore20261014?.newExactPreviewProof||{};
+          const financeCoverage=financeTrigger
+            && c.nextAction==='I6_5_FORENSIC_REMEDIATION_B4_003_R20_TARGETED_PAULA_VISUAL'
+            && c.currentB4?.status==='B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL'
+            && c.b4003SecurityReleaseHold?.status==='ACTIVE_FAIL_CLOSED_UNAUTHORIZED_BROWSER_FIRESTORE_READ_WRITE'
+            && l.activeFinding?.id==='B4-003'
+            && l.boundaries?.realOperationalWritesAuthorized===false
+            && l.boundaries?.syntheticQaWritesAuthorized===false
+            && l.boundaries?.dataMutationAuthorized===false
+            && l.boundaries?.livePromotionAuthorized===false
+            && exactFinancialProof.status==='HOSTING_DIGEST_AND_PUBLIC_SMOKE_PASS_NO_AUTHENTICATED_FUNCTIONAL_PROOF'
+            && exactFinancialProof.hostedMarkerExternallyReadback===true
+            && exactFinancialProof.hostingReadback===true
+            && exactFinancialProof.livePromoted===false
+            && /^https:\/\/ays-orbit-360-lab--gi-i65-b4-/.test(String(exactFinancialProof.previewUrl||''))
+            && /^[a-f0-9]{40}$/.test(String(exactFinancialProof.sourceSha||''));
+          if(financeTrigger&&!financeCoverage)throw Error('B4_003_FINANCE_SOURCE_QA_BOUNDARY_FAIL_CLOSED');
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'finance_source_readonly='+(financeCoverage?'true':'false')+'\n');
+          if(financeCoverage)fs.appendFileSync(process.env.GITHUB_OUTPUT,'finance_exact_preview='+exactFinancialProof.previewUrl+'\n');
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'renewals_preview='+(renewalsPreview?'true':'false')+'\n');
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'run='+(previewOk?'true':'false')+'\n');
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'scoped_preview='+(scopedPreview?'true':'false')+'\n');
@@ -296,7 +317,7 @@ jobs:
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'r20_cutoff_apply='+(r20CutoffApply?'true':'false')+'\n');
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'r20_second_dryrun='+(secondReviewDryRun?'true':'false')+'\n');
           // Surface an explicit NOOP on routine pushes; never certify a skipped Preview.
-          const requestedModes={scopedPreview,preview:previewOk,renewalsPreview,apply:applyOk,r20DryRun,r20Apply,r20CutoffApply,secondReviewDryRun,p0CumulativeReadOnly,r26RulesReadOnly,r26ReadOnly};
+          const requestedModes={scopedPreview,preview:previewOk,renewalsPreview,apply:applyOk,r20DryRun,r20Apply,r20CutoffApply,secondReviewDryRun,p0CumulativeReadOnly,r26RulesReadOnly,r26ReadOnly,financeCoverage};
           const enabledModes=Object.entries(requestedModes).filter(([,on])=>on).map(([name])=>name);
           if(!enabledModes.length){
             fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY,'### B4-003: NOOP (not a Preview PASS)\nNo build, deploy, authenticated browser test, or readback was executed. Control Plane nextAction: `'+String(c.nextAction)+'`.\n');
@@ -306,6 +327,128 @@ jobs:
           console.log('B4_003_PREVIEW_MODE='+(previewOk?'RUN':'NOOP')+' RENEWALS_PRIORITY_PREVIEW='+(renewalsPreview?'RUN':'NOOP')+' APPLY_MODE='+(applyOk?'RUN':'NOOP')+' R20_DRYRUN_MODE='+(r20DryRun?'RUN':'NOOP')+' R20_APPLY_MODE='+(r20Apply?'RUN':'NOOP')+' R20_CUTOFF_APPLY='+(r20CutoffApply?'RUN':'NOOP')+' R20_SECOND_DRYRUN='+(secondReviewDryRun?'RUN':'NOOP'));
           NODE
 
+
+
+      # Exact current-Preview financial source and protected coverage, no human impersonation.
+      # Firebase Admin is used only for tenant-aggregate readback; no business writes.
+      - name: Prepare B4-003 exact finance source readback
+        if: steps.gate.outputs.finance_source_readonly == 'true'
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json,os,pathlib
+          out=pathlib.Path(os.environ['RUNNER_TEMP'])/'b4003-finance-source-readonly-sa.json'
+          account=None
+          for key in ['SA_DEFAULT','SA_ORBIT360_LAB','SA_ORBIT_360_LAB']:
+              try: item=json.loads(os.environ.get(key,''))
+              except (ValueError,TypeError): continue
+              if item.get('type')=='service_account' and item.get('project_id')==os.environ['PROJECT_ID'] and item.get('private_key'):
+                  account=item;break
+          if not account: raise SystemExit('B4_003_FINANCE_SOURCE_SERVICE_ACCOUNT_UNAVAILABLE')
+          out.write_text(json.dumps(account),encoding='utf-8')
+          os.chmod(out,0o600)
+          with open(os.environ['GITHUB_ENV'],'a',encoding='utf-8') as f: f.write('GOOGLE_APPLICATION_CREDENTIALS='+str(out)+'\\n')
+          print('B4_003_FINANCE_SOURCE_READONLY_ACCOUNT_SELECTED')
+          PY
+          npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund firebase-admin@13.4.0 >/dev/null
+
+      - name: B4-003 exact GT CO finance and protected collection readback
+        if: steps.gate.outputs.finance_source_readonly == 'true'
+        env:
+          FINANCE_EXACT_PREVIEW: ${{ steps.gate.outputs.finance_exact_preview }}
+          FINANCE_EVIDENCE_OUT: ${{ runner.temp }}/b4-003-finance-source-readonly.json
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const fs=require('node:fs'),vm=require('node:vm');
+          const {initializeApp,applicationDefault}=require('firebase-admin/app');
+          const {getFirestore}=require('firebase-admin/firestore');
+          const cp=JSON.parse(fs.readFileSync(process.env.CONTROL,'utf8'));
+          const exact=cp.b4003FunctionalContractRestore20261014.newExactPreviewProof;
+          const fail=m=>{throw Error(m);};
+          const confCtx={window:{}};
+          vm.runInNewContext(fs.readFileSync('orbit360-platform/product-runtime-config.js','utf8'),confCtx,{timeout:1000});
+          const config=confCtx.window.__ORBIT360_PRODUCT_PUBLIC_CONFIG__;
+          const required=Array.from(config.requiredCollections),optional=Array.from(config.optionalCollections);
+          const related=fs.readFileSync('functions/b4-003-scoped-related-reader.js','utf8');
+          const policyReader=fs.readFileSync('functions/b4-003-scoped-policy-callable.js','utf8');
+          const protectedStore=fs.readFileSync('orbit360-platform/data/store-firestore-product-readonly-p0.js','utf8');
+          const names=[...required,...optional].filter((x,i,a)=>a.indexOf(x)===i);
+          const isCovered=name=>name==='polizas'||name==='aseguradoras'||name==='asesores'||
+            new RegExp("'"+name.replace(/[.*+?^${}()|[\]\\]/g,'\\      - name: Prepare R26 authenticated read-only QA')+"'").test(related.match(/const collections=new Set\(\[[^;]+\]\)/)?.[0]||'');
+          const unsupported=names.filter(x=>!isCovered(x));
+          if(!policyReader.includes('readScopedRelatedList')||!protectedStore.includes('PROTECTED_READ_COLLECTION_UNSUPPORTED_'))
+            fail('B4_003_PROTECTED_SOURCE_OWNER_NOT_FOUND');
+          const report={schema:'GRAVICENTRA_B4003_EXACT_FINANCE_SOURCE_COVERAGE_READONLY_V1',
+            headSha:process.env.CANDIDATE_SOURCE_SHA,gate:'I6.5/B4-003',preview:process.env.FINANCE_EXACT_PREVIEW,
+            sourceSha:exact.sourceSha,buildId:exact.buildId,readOnly:true,realBusinessWrites:0,
+            impersonation:false,firestoreRulesChanged:false,deploys:0,
+            requiredCount:required.length,optionalCount:optional.length,unsupportedCollections:unsupported,
+            requiredUnsupported:required.filter(x=>unsupported.includes(x)),sourceCounts:{},relations:{}};
+          (async()=>{
+            if(process.env.FINANCE_EXACT_PREVIEW!==exact.previewUrl)fail('B4_003_FINANCE_PREVIEW_MISMATCH');
+            const markerResponse=await fetch(exact.previewUrl+'/__recovery__/build.json',{signal:AbortSignal.timeout(15000)});
+            if(!markerResponse.ok)fail('B4_003_FINANCE_PREVIEW_MARKER_HTTP_'+markerResponse.status);
+            const marker=await markerResponse.json();
+            if(marker.sourceSha!==exact.sourceSha||marker.buildId!==exact.buildId)
+              fail('B4_003_FINANCE_PREVIEW_MARKER_MISMATCH');
+            report.markerExact=true;
+            const db=getFirestore(initializeApp({credential:applicationDefault(),projectId:process.env.PROJECT_ID}));
+            const tenant=db.collection('tenants').doc(process.env.TENANT_HINT);
+            const collection=k=>tenant.collection('data').doc(k).collection('items');
+            const counts=await Promise.all(names.map(async k=>{
+              const snap=await collection(k).count().get();
+              return [k,snap.data().count];
+            }));
+            for(const [k,n] of counts){if(!Number.isInteger(n)||n<0)fail('B4_003_COUNT_INVALID_'+k);report.sourceCounts[k]=n;}
+            const subset=['clientes','polizas','recibosEsperados','carteraPrimas','cobros','vehiculos'];
+            if(subset.some(k=>report.sourceCounts[k]>20000))fail('B4_003_RELATION_SOURCE_BOUND_REACHED');
+            const snapshots=await Promise.all(subset.map(async k=>{
+              const cols=k==='clientes'?['pais','country']:
+                k==='polizas'?['pais','country','clienteId','asesorId']:
+                ['polizaId','policyId','clienteId','clientId','pais','country'];
+              return [k,await collection(k).select(...cols).get()];
+            }));
+            const by=Object.fromEntries(snapshots.map(([k,s])=>[k,s]));
+            const clients=new Map(by.clientes.docs.map(d=>[d.id,d.data()||{}]));
+            const policies=new Map(by.polizas.docs.map(d=>[d.id,d.data()||{}]));
+            const country=v=>String(v||'').trim().toUpperCase();
+            const policyCountries={GT:0,CO:0,unknown:0},crossCountry={GTClientCOPolicy:0,COClientGTPolicy:0};
+            for(const p of policies.values()){
+              const k=country(p.pais||p.country);if(k==='GT'||k==='CO')policyCountries[k]++;else policyCountries.unknown++;
+              const c=clients.get(String(p.clienteId||'')),cc=country(c?.pais||c?.country);
+              if(cc==='GT'&&k==='CO')crossCountry.GTClientCOPolicy++;
+              if(cc==='CO'&&k==='GT')crossCountry.COClientGTPolicy++;
+            }
+            const children={};
+            for(const k of subset.filter(x=>!['clientes','polizas'].includes(x))){
+              let linked=0,missingPolicy=0,withoutAnchor=0,explicitCountryConflict=0,linkedGT=0,linkedCO=0;
+              for(const d of by[k].docs){
+                const r=d.data()||{},id=String(r.polizaId||r.policyId||'');
+                if(!id){withoutAnchor++;continue;}
+                const p=policies.get(id);if(!p){missingPolicy++;continue;}
+                linked++;
+                const pc=country(p.pais||p.country),rc=country(r.pais||r.country);
+                if(pc==='GT')linkedGT++;if(pc==='CO')linkedCO++;
+                if(pc&&rc&&pc!==rc)explicitCountryConflict++;
+              }
+              children[k]={rows:by[k].size,linked,missingPolicy,withoutAnchor,explicitCountryConflict,linkedGT,linkedCO};
+            }
+            report.relations={policiesByCountry:policyCountries,crossCountryPolicyClient:crossCountry,children};
+            report.status=unsupported.length?'SOURCE_READBACK_PASS_PROTECTED_COVERAGE_INCOMPLETE':'SOURCE_READBACK_PASS';
+            fs.writeFileSync(process.env.FINANCE_EVIDENCE_OUT,JSON.stringify(report,null,2)+'\\n');
+            console.log('B4_003_EXACT_FINANCE_READBACK='+JSON.stringify(report));
+          })().catch(e=>{console.error('B4_003_FINANCE_READBACK_FAIL:'+String(e.message||e));process.exitCode=1;});
+          NODE
+
+      - name: Preserve B4-003 finance source readback evidence
+        if: always() && steps.gate.outputs.finance_source_readonly == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: gravicentra-b4003-exact-finance-source-${{ github.run_id }}
+          path: ${{ runner.temp }}/b4-003-finance-source-readonly.json
+          if-no-files-found: error
+          retention-days: 14
 
       - name: Prepare R26 authenticated read-only QA
         if: steps.gate.outputs.r26_readonly == 'true'
