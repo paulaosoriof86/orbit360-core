@@ -1833,7 +1833,7 @@ jobs:
 
 
   b4-003-readonly-renewals:
-    if: github.event_name == 'push' && github.event.head_commit.message == 'test(i6.5 B4-003): existing Preview readonly renewals'
+    if: "github.event_name == 'push' && github.event.head_commit.message == 'test(i6.5 B4-003): existing Preview readonly renewals'"
     runs-on: ubuntu-24.04
     timeout-minutes: 18
     permissions:
