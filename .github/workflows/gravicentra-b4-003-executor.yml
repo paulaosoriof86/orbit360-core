@@ -24,6 +24,7 @@ on:
     paths:
       - '.github/workflows/gravicentra-b4-003-executor.yml'
       - 'tools/gravicentra-i6-5-b4-003-preview-proof.mjs'
+      - 'tools/gravicentra-b4-003-commercial-readonly-qa.cjs'
       - 'tools/gravicentra-i6-5-b4-003-renewals-priority-preview-proof.mjs'
       - 'tools/gravicentra-i6-5-b4-003-contract.mjs'
       - 'tools/gravicentra-i6-5-b4-003-knowledge-contract.mjs'

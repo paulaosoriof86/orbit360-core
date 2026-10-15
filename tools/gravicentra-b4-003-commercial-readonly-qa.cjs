@@ -51,7 +51,16 @@ async function main(){
   if(ops&&adv){pair={country,actors:[{...ops,role:ops.roles.includes('operativo')?'operativo':'direccion'},
    {...adv,role:adv.roles.includes('asesor')?'asesor':'comercial'}]};break;}
  }
- assert(pair&&pair.actors[0].uid!==pair.actors[1].uid,'TWO_DISTINCT_VERIFIED_ACTORS_NOT_AVAILABLE');
+ const eligibility={totalVerifiedActiveMembership:valid.length,byCountry:{}};
+ for(const country of ['GT','CO']){
+  const ops=valid.filter(x=>x.countries.includes(country)&&['operativo','direccion'].some(z=>x.roles.includes(z)&&(!x.claim||x.claim===z)));
+  const advisers=valid.filter(x=>x.countries.includes(country)&&['asesor','comercial'].some(z=>x.roles.includes(z)&&(!x.claim||x.claim===z)));
+  eligibility.byCountry[country]={operationsEligible:ops.length,advisorEligible:advisers.length,
+   distinctPairExists:ops.some(a=>advisers.some(b=>a.uid!==b.uid))};
+ }
+ result.actorEligibility=eligibility;
+ if(!pair){result.status='DIAGNOSTIC_HOLD_NO_TWO_DISTINCT_ELIGIBLE_UIDS';result.d15='NOT_TESTED_IDENTITY_PRECONDITION';return;}
+ assert(pair.actors[0].uid!==pair.actors[1].uid,'ACTOR_PAIR_COLLISION');
  result.twoVerifiedUids=true;result.country=pair.country;
  browser=await chromium.launch({headless:true});
  for(const actor of pair.actors){

@@ -11456,13 +11456,18 @@
     "artifactId": 11983958349,
     "artifactDigest": "sha256:8ab8ac40f70d472d0df891d280f57974be94ae87ff51104434080d6416dcca69",
     "qaPath": "tools/gravicentra-b4-003-commercial-readonly-qa.cjs",
-    "qaBlobSha": "03d38d9fc5df783010ad3e5b3239c30114775465",
+    "qaBlobSha": "482bb310fcbf5e5bc194d104dd91abcb305e5972",
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_COMMERCIAL_TWO_UID_QA_REQUEST_20261015.json",
     "receiptBlobSha": "be7cdb62995ebea3b5c2b43b5676b6dfd9b73006",
     "operationalWritesAuthorized": false,
     "syntheticWritesAuthorized": false,
     "firestoreRulesDeploymentAuthorized": false,
     "livePromotionAuthorized": false,
-    "d04D18StillOpen": true
+    "d04D18StillOpen": true,
+    "lastFailedRunId": 38761309873,
+    "lastFailedClass": "NO_TWO_DISTINCT_ELIGIBLE_ACTORS_BY_STRICT_SELECTOR",
+    "remediation": "QA_ONLY_SANITIZED_ACTOR_ELIGIBILITY_DIAGNOSTIC",
+    "businessWritesAuthorized": false,
+    "productionTouched": false
   }
 }
