@@ -1,0 +1,58 @@
+{
+  "schema": "GRAVICENTRA_B4_003_OPS_LEADS_EXACT_PREVIEW_PROVENANCE_V1",
+  "date": "2026-10-15",
+  "gate": "I6.5/B4-003",
+  "status": "IMMUTABLE_PREVIEW_READBACK_PASS_TARGETED_ROLE_COUNTRY_UI_RETEST_REQUESTED",
+  "preview": {
+    "status": "EXACT_HOSTING_AND_SCOPED_AUTHENTICATED_READONLY_PASS_NOT_B4_003_RELEASE_PASS",
+    "gate": "I6.5/B4-003",
+    "sourceHead": "159bbb25aa31fdd7e8351822bd4b343239231dcf",
+    "buildId": "gi-i65-b4-159bbb25aa31-57f234755dc1",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-38768311663-yf4ldq2m.web.app",
+    "runId": 38768311663,
+    "artifactId": 11990990838,
+    "artifactDigest": "sha256:a9003e5c4bd98c0d9ceb82f51325273bc9f5f68d72c373413f8b85895dd13b6e",
+    "exactHostingReadback": true,
+    "authenticatedReadOnlyPass": true,
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_OCT15_AUTHENTICATED_SCOPED_PREVIEW_RESULT_20261015.json",
+    "receiptBlobSha": "057ab176d2da279a68101a6c4e8532b86aeee9ae",
+    "existingSecurityHold": true,
+    "sharedRulesAccepted": false,
+    "fullB4003Closed": false,
+    "realBusinessWrites": 0,
+    "previewHumanAccepted": false
+  },
+  "priorPreview": {
+    "sourceHead": "ae6bc8be5c74581f6fb920ea79e39c826a7d1d9f",
+    "artifactId": 11983958349,
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-38758078678-iemf2kl2.web.app"
+  },
+  "sourceFix": {
+    "status": "SCOPED_SOURCE_FIXED_VM_QA_AND_EXACT_PREVIEW_PENDING",
+    "scope": "AUTHORIZED_PROTECTED_HYDRATION_ONLY",
+    "sourceOwner": "orbit360-platform/core/backend-product-readonly-bootstrap-p0.js",
+    "sourceBlobSha": "67193403d977f724ad7abfc86a7892d3d073e775",
+    "qaOwner": "tools/gravicentra-b4-003-protected-hydration.test.cjs",
+    "qaBlobSha": "2ff039f1d9dfecb1601585397bc94a6e8580c3c2",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_OPERATIVO_GT_PROTECTED_QUERY_VISIBILITY_CAUSAL_SOURCE_FIX_20261015.json",
+    "receiptBlobSha": "d018378a47405281dda1a9552e0f47dd33a780d1",
+    "compositionLockBlobSha": "96fde62e0ee618b0414d76a961753e1958049cc8",
+    "buildRequired": true,
+    "previewAccepted": false,
+    "securityP0Closed": false,
+    "productionChanged": false,
+    "realDataWrites": 0
+  },
+  "evidenceRun": "https://github.com/paulaosoriof86/orbit360-core/actions/runs/38768311663",
+  "targetedTest": "Commercial two-UID read-only QA, Operativo / GT and Asesor / GT, user-selected role and country, server vs hydrated store vs board",
+  "allowOnly": "existing B4-003 QA-only read-only on exact new Preview; no business/synthetic writes",
+  "notAccepted": [
+    "Ops/Leads persistence, D04 attachments, D18 CRUD",
+    "full module×role×viewport UI",
+    "effective shared Firestore rules",
+    "live promotion"
+  ],
+  "securityHold": true,
+  "productSourceChangedByThisCommit": false,
+  "previousArtifactsPreserved": true
+}

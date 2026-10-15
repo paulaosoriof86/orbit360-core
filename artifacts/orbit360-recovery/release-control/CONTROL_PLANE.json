@@ -11432,29 +11432,30 @@
   "b4003Oct15ScopedPreviewEvidence": {
     "status": "EXACT_HOSTING_AND_SCOPED_AUTHENTICATED_READONLY_PASS_NOT_B4_003_RELEASE_PASS",
     "gate": "I6.5/B4-003",
-    "sourceHead": "ae6bc8be5c74581f6fb920ea79e39c826a7d1d9f",
-    "buildId": "gi-i65-b4-ae6bc8be5c74-57f234755dc1",
-    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-38758078678-iemf2kl2.web.app",
-    "runId": 38758078678,
-    "artifactId": 11983958349,
-    "artifactDigest": "sha256:8ab8ac40f70d472d0df891d280f57974be94ae87ff51104434080d6416dcca69",
+    "sourceHead": "159bbb25aa31fdd7e8351822bd4b343239231dcf",
+    "buildId": "gi-i65-b4-159bbb25aa31-57f234755dc1",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-38768311663-yf4ldq2m.web.app",
+    "runId": 38768311663,
+    "artifactId": 11990990838,
+    "artifactDigest": "sha256:a9003e5c4bd98c0d9ceb82f51325273bc9f5f68d72c373413f8b85895dd13b6e",
     "exactHostingReadback": true,
     "authenticatedReadOnlyPass": true,
-    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_OCT15_AUTHENTICATED_SCOPED_PREVIEW_RESULT_20261015.json",
-    "receiptBlobSha": "057ab176d2da279a68101a6c4e8532b86aeee9ae",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_OPERATIVE_QUERY_FIX_EXACT_PREVIEW_AND_TARGETED_QA_BINDING_20261015.json",
+    "receiptBlobSha": "69030184f716c40d8c754e2da018e09ca4e43764",
     "existingSecurityHold": true,
     "sharedRulesAccepted": false,
     "fullB4003Closed": false,
     "realBusinessWrites": 0,
-    "previewHumanAccepted": false
+    "previewHumanAccepted": false,
+    "priorPreviewPreservedIn": "b4003Oct15PreviousScopedPreviewEvidence"
   },
   "b4003CommercialReadOnlyQa20261015": {
     "status": "REQUESTED_READONLY_EXISTING_PREVIEW_ONLY",
     "gate": "I6.5/B4-003",
-    "sourcePreviewHead": "ae6bc8be5c74581f6fb920ea79e39c826a7d1d9f",
-    "previewRunId": 38758078678,
-    "artifactId": 11983958349,
-    "artifactDigest": "sha256:8ab8ac40f70d472d0df891d280f57974be94ae87ff51104434080d6416dcca69",
+    "sourcePreviewHead": "159bbb25aa31fdd7e8351822bd4b343239231dcf",
+    "previewRunId": 38768311663,
+    "artifactId": 11990990838,
+    "artifactDigest": "sha256:a9003e5c4bd98c0d9ceb82f51325273bc9f5f68d72c373413f8b85895dd13b6e",
     "qaPath": "tools/gravicentra-b4-003-commercial-readonly-qa.cjs",
     "qaBlobSha": "6a20dec7c62d49be392b25eee99d4e9ab19a345c",
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_COMMERCIAL_TWO_UID_QA_REQUEST_20261015.json",
@@ -11491,7 +11492,8 @@
     "roleCountryQaRootfixBlobSha": "a2da7fb565d61a83e3a05257b0081ce862c370c4",
     "realBusinessWrites": 0,
     "protectedAttachQaPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_OPS_ROLE_SWITCH_PROTECTED_ATTACH_CAUSAL_PROBE_20261015.json",
-    "protectedAttachQaBlobSha": "957ee46e3221703329841da7c4e31bf8eedde572"
+    "protectedAttachQaBlobSha": "957ee46e3221703329841da7c4e31bf8eedde572",
+    "qaTargetSourceFix": "OPERATIVO_GT_PROTECTED_QUERY_VISIBILITY"
   },
   "b4003OperativoQueryVisibilitySourceFix20261015": {
     "status": "SCOPED_SOURCE_FIXED_VM_QA_AND_EXACT_PREVIEW_PENDING",
@@ -11510,7 +11512,7 @@
     "realDataWrites": 0
   },
   "b4003OperativoQueryVisibilityPreviewDispatch20261015": {
-    "status": "EXACT_SCOPED_PREVIEW_REQUESTED_NOT_YET_BUILT",
+    "status": "IMMUTABLE_BUILD_AND_SCOPED_READBACK_PASS_TARGETED_UI_QA_PENDING",
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_OPERATIVE_ROLE_QUERY_PARITY_EXACT_PREVIEW_DISPATCH_20261015.json",
     "receiptBlobSha": "e0a93655778ac0289294b68bb566224ea030d79e",
     "previousSourceHead": "92b5012b54e188af4adc50eb9556506b884de46a",
@@ -11521,6 +11523,31 @@
     "newArtifactRequired": true,
     "securityP0Closed": false,
     "livePromotion": false,
-    "operationalWrites": 0
+    "operationalWrites": 0,
+    "runId": 38768311663,
+    "artifactId": 11990990838,
+    "artifactDigest": "sha256:a9003e5c4bd98c0d9ceb82f51325273bc9f5f68d72c373413f8b85895dd13b6e",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-38768311663-yf4ldq2m.web.app",
+    "buildId": "gi-i65-b4-159bbb25aa31-57f234755dc1",
+    "sourceHead": "159bbb25aa31fdd7e8351822bd4b343239231dcf"
+  },
+  "b4003Oct15PreviousScopedPreviewEvidence": {
+    "status": "EXACT_HOSTING_AND_SCOPED_AUTHENTICATED_READONLY_PASS_NOT_B4_003_RELEASE_PASS",
+    "gate": "I6.5/B4-003",
+    "sourceHead": "ae6bc8be5c74581f6fb920ea79e39c826a7d1d9f",
+    "buildId": "gi-i65-b4-ae6bc8be5c74-57f234755dc1",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-38758078678-iemf2kl2.web.app",
+    "runId": 38758078678,
+    "artifactId": 11983958349,
+    "artifactDigest": "sha256:8ab8ac40f70d472d0df891d280f57974be94ae87ff51104434080d6416dcca69",
+    "exactHostingReadback": true,
+    "authenticatedReadOnlyPass": true,
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_OCT15_AUTHENTICATED_SCOPED_PREVIEW_RESULT_20261015.json",
+    "receiptBlobSha": "057ab176d2da279a68101a6c4e8532b86aeee9ae",
+    "existingSecurityHold": true,
+    "sharedRulesAccepted": false,
+    "fullB4003Closed": false,
+    "realBusinessWrites": 0,
+    "previewHumanAccepted": false
   }
 }
