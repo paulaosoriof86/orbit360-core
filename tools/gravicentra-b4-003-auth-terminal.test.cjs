@@ -28,7 +28,7 @@ function setup({restoredUser=null}={}){
  const productApp={activate:()=>{activationCalls++;return Promise.reject(new Error('PROTECTED_BOOTSTRAP_SERVER_UNAVAILABLE'));}};
  const win={Orbit:{productRuntimeBrowserProvidersP0:provider,productAppP0:productApp},__ORBIT360_PRODUCT_PUBLIC_CONFIG__:{tenantHint:'alianzas-soluciones'}};
  const loc={hash:'#/inicio',pathname:'/',search:''};
- vm.runInNewContext(source,{window:win,document:doc,location:loc,history:{replaceState(){}},sessionStorage:{getItem:()=>null,setItem(){}},
+ vm.runInNewContext(source,{window:win,Orbit:win.Orbit,document:doc,location:loc,history:{replaceState(){}},sessionStorage:{getItem:()=>null,setItem(){}},
    Promise,setTimeout:(fn)=>{fn();return 0;},Date,console:{warn(){}}},{timeout:2000});
  const settle=()=>new Promise(resolve=>setTimeout(resolve,0));
  return{auth:win.Orbit.auth,login,form,button,user,pass,small,doc,attrs,settle,submit:()=>listeners.submit({preventDefault(){}}),
