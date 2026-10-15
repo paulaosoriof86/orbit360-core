@@ -1,0 +1,27 @@
+{
+  "schema": "GRAVICENTRA_B4_003_QA_IDENTITY_NORMALIZER_CAUSAL_REPAIR_V1",
+  "date": "2026-10-15",
+  "gate": "I6.5/B4-003",
+  "status": "QA_SOURCE_CORRECTED_RUNTIME_RETEST_REQUIRED",
+  "failedRun": 38762450477,
+  "failedArtifact": 11985699105,
+  "observed": {
+    "canonicalMembershipDocuments": 8,
+    "canonicalActiveCandidates": 8,
+    "authVerifiedCountBeforeProjection": 4,
+    "projectedEligibleUids": 0,
+    "reportedAuthLookupErrors": 4
+  },
+  "rootCause": "After successful Firebase Auth getUser and emailVerified, the harness invoked undefined n() instead of existing norm(), caught the resulting ReferenceError and misclassified it as an Auth lookup failure. This suppressed every verified UID.",
+  "fix": "Replace n() with norm(), increment verified counter only after valid.push, assert counter equals projected identities, choose the exact assigned role consistent with optional signed claim.",
+  "scope": "QA-only; same immutable Preview; no product source change, no recreated accounts, no rules or LIVE, no writes.",
+  "qaOwner": "tools/gravicentra-b4-003-commercial-readonly-qa.cjs",
+  "fromBlob": "ddc5d243c2cc8d165b09f6287f8f019425521638",
+  "toBlob": "6fde45abeadd9b8a4f00d918ae9646c7b899fb41",
+  "commitParent": "dd3131082c080c7c35c621d9746dcae6fa91dd1e",
+  "expectedNext": "Authenticated two distinct existing UIDs; country GT/CO; read-only negocios/gestiones; D15 sampled contact comparison. If membership truly lacks pair, isolate it with aggregate counts.",
+  "priorCertifiedPreviewPreserved": true,
+  "productionTouched": false,
+  "operationalWrites": 0,
+  "syntheticWrites": 0
+}

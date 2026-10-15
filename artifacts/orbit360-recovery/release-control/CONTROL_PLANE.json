@@ -11456,7 +11456,7 @@
     "artifactId": 11983958349,
     "artifactDigest": "sha256:8ab8ac40f70d472d0df891d280f57974be94ae87ff51104434080d6416dcca69",
     "qaPath": "tools/gravicentra-b4-003-commercial-readonly-qa.cjs",
-    "qaBlobSha": "ddc5d243c2cc8d165b09f6287f8f019425521638",
+    "qaBlobSha": "6fde45abeadd9b8a4f00d918ae9646c7b899fb41",
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_COMMERCIAL_TWO_UID_QA_REQUEST_20261015.json",
     "receiptBlobSha": "be7cdb62995ebea3b5c2b43b5676b6dfd9b73006",
     "operationalWritesAuthorized": false,
@@ -11469,8 +11469,11 @@
     "remediation": "QA_ONLY_SANITIZED_ACTOR_ELIGIBILITY_DIAGNOSTIC",
     "businessWritesAuthorized": false,
     "productionTouched": false,
-    "lastDiagnosticRunId": 38761953611,
-    "lastDiagnosticResult": "ZERO_VERIFIED_MEMBERS_CONTRADICTS_EXISTING_OCT15_SCOPE_PROOF",
-    "diagnosticScope": "AUTH_LOOKUP_AND_MEMBERSHIP_STATUS_AGGREGATES_ONLY_NO_UIDS"
+    "lastDiagnosticRunId": 38762450477,
+    "lastDiagnosticResult": "QA_ERROR_UNDEFINED_IDENTITY_NORMALIZER_FALSE_AUTH_FAILURE",
+    "diagnosticScope": "AUTH_LOOKUP_AND_MEMBERSHIP_STATUS_AGGREGATES_ONLY_NO_UIDS",
+    "qaRootfixPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_COMMERCIAL_QA_UNDEFINED_IDENTITY_NORMALIZER_ROOTFIX_20261015.json",
+    "qaRootfixBlobSha": "5679b02f61f1dfec0e3dbc354a6e7265b64b0e11",
+    "productSourceChanged": false
   }
 }

@@ -47,17 +47,20 @@ async function main(){
   try{const a=await auth.getUser(d.id);
     if(a.disabled){diagnostic.authDisabled++;continue;}
     if(!a.emailVerified){diagnostic.emailNotVerified++;continue;}
+    valid.push({uid:d.id,roles,countries,claim:norm(a.customClaims?.giActiveRole)});
     diagnostic.authVerifiedEligible++;
-    valid.push({uid:d.id,roles,countries,claim:n(a.customClaims?.giActiveRole)});
   }catch{diagnostic.authLookupErrors++;}
  }
+ assert(valid.length===diagnostic.authVerifiedEligible,'AUTH_VERIFIED_COUNT_PROJECTION_DRIFT');
  result.membershipEligibilityDiagnostic=diagnostic;
  let pair=null;
  for(const country of ['GT','CO']){
   const ops=valid.find(x=>x.countries.includes(country)&&['operativo','direccion'].some(z=>x.roles.includes(z)&&(!x.claim||x.claim===z)));
   const adv=valid.find(x=>x.uid!==ops?.uid&&x.countries.includes(country)&&['asesor','comercial'].some(z=>x.roles.includes(z)&&(!x.claim||x.claim===z)));
-  if(ops&&adv){pair={country,actors:[{...ops,role:ops.roles.includes('operativo')?'operativo':'direccion'},
-   {...adv,role:adv.roles.includes('asesor')?'asesor':'comercial'}]};break;}
+  if(ops&&adv){const opRole=['operativo','direccion'].find(role=>ops.roles.includes(role)&&(!ops.claim||ops.claim===role));
+   const advRole=['asesor','comercial'].find(role=>adv.roles.includes(role)&&(!adv.claim||adv.claim===role));
+   assert(opRole&&advRole,'QA_ACTOR_ROLE_RESOLUTION_MISMATCH');
+   pair={country,actors:[{...ops,role:opRole},{...adv,role:advRole}]};break;}
  }
  const eligibility={totalVerifiedActiveMembership:valid.length,byCountry:{}};
  for(const country of ['GT','CO']){
