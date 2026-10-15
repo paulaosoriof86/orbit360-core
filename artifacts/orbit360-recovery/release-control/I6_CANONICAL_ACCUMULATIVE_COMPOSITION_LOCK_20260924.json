@@ -234,7 +234,7 @@
     "orbit360-platform/modules/equipo-credential-admin-v20260805-bridge.js": "7432bc05938469187fdd120a5bc023c53a000ab9",
     "orbit360-platform/modules/equipo-onboarding-v20260804-bridge.js": "1da619d8abd676d31d69a038d4770463ca67fdc5",
     "orbit360-platform/modules/equipo.js": "b0736237ee18ef45abbae1c13f5c94781178344e",
-    "orbit360-platform/modules/inicio.js": "283e0f4a23c2b278425140dd94f50d9424e1db86",
+    "orbit360-platform/modules/inicio.js": "ac18016edccac7c0f54b29defbc2e1e8d1a388d1",
     "orbit360-platform/modules/issuance-endosos-v1201-bridge.js": "2020152b4b2df1338be4b3ef2a9f121d777e21db",
     "orbit360-platform/modules/leads.js": "4e12e604382f2731a03d29cf00db3c086d77ebc1",
     "orbit360-platform/modules/ops.js": "a4ca3dbb4613d541af411f12fce9773a072b0d41",
@@ -5773,6 +5773,16 @@
     "frontendProductFilesChanged": 1,
     "backendProductFilesChanged": 1,
     "operationalWrites": 0,
+    "productionChanged": false
+  },
+  "b4003InicioContextPlacement20261015": {
+    "status": "SOURCE_FIXED_STATIC_CONTRACT_PASS_EXACT_PREVIEW_AUTHENTICATED_VISUAL_PENDING",
+    "owner": "orbit360-platform/modules/inicio.js",
+    "sourceGitBlob": "ac18016edccac7c0f54b29defbc2e1e8d1a388d1",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_INICIO_CONTEXT_PLACEMENT_CAUSAL_FIX_20261015.json",
+    "receiptBlobSha": "94f6c9793e7e26123d95923ac0d663ccf8d622d4",
+    "oneSourceOwnerChanged": true,
+    "previousAcceptedUiPreservedOutsideTarget": true,
     "productionChanged": false
   }
 }

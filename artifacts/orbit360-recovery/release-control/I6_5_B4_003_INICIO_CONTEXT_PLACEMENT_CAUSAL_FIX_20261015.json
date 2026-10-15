@@ -1,0 +1,40 @@
+{
+  "schema": "GRAVICENTRA_I65_B4003_SCOPED_INICIO_CONTEXT_PLACEMENT_FIX_V1",
+  "date": "2026-10-15",
+  "gate": "I6.5/B4-003",
+  "status": "SOURCE_FIXED_STATIC_CONTRACT_PASS_EXACT_PREVIEW_AUTHENTICATED_VISUAL_PENDING",
+  "findingIds": [
+    "B4-003-UAT-20261011-01",
+    "B4-003-P0-20261012-INICIO-MOTIVATIONAL-TEXTS",
+    "B4-003-R20-B12"
+  ],
+  "sourceHeadBefore": "c0044a5faed29dba1b5518380192b7f723367001",
+  "sourceOwner": "orbit360-platform/modules/inicio.js",
+  "oldGitBlob": "283e0f4a23c2b278425140dd94f50d9424e1db86",
+  "newGitBlob": "ac18016edccac7c0f54b29defbc2e1e8d1a388d1",
+  "rootCause": "The approved contextual bannerNote was rendered as the top header subtitle, outside the 'Avance real del mes' card, contrary to Paula's October 15 UAT. The main card contained a fixed generic paragraph instead.",
+  "appliedChange": "Retain the top banner but restore its 'Inicio' title and neutral subtitle. Move the existing escaped role/readiness-aware bannerNote into the body of 'Avance real del mes', replacing only the fixed paragraph. Do not change financial, scopes, goals or CSS rendering contracts.",
+  "staticChecks": {
+    "bannerOnlyNeutralSubtitle": true,
+    "contextInsideCard": true,
+    "contextEscaped": true,
+    "oneContextUse": true,
+    "cardUnchanged": true,
+    "financialLogicUnchanged": true,
+    "protectedRefUnchanged": true
+  },
+  "assurance": "Static source inspection only: no authenticated browser, performance proof or user visual acceptance yet.",
+  "boundaries": {
+    "operationalWrites": 0,
+    "qaFixtureWrites": 0,
+    "reimport": false,
+    "newFirebase": false,
+    "newBranch": false,
+    "firestoreRulesDeployed": false,
+    "livePromotion": false,
+    "sourceChanged": true,
+    "newBuildDigestRequired": true,
+    "oldPreviewPassesPreservedOnlyIfUnaffected": true
+  },
+  "next": "Run existing central guard and exact B4-003 Preview; targeted Inicio role/country/responsive/first-paint checks; preserve prior Renewals performance PASS unless causal regression."
+}
