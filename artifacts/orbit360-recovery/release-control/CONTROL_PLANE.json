@@ -11112,20 +11112,23 @@
   },
   "b4003LatestQASessionBoundary": {
     "gate": "I6.5/B4-003",
-    "status": "WAITING_REAL_ACCOUNT_SIGNIN_ON_FIXED_QA_PREVIEW_NO_INFINITE_SPINNER_PROOF",
+    "status": "PAULA_AUTHENTICATED_LOGIN_PASSED_PREVIOUS_PREVIEW_FINANCE_UAT_REQUESTED_NEW_EXACT_PREVIEW",
     "profile": "Gravicentra Preview QA",
     "noCredentialsShared": true,
     "priorSavedSessionAuthenticated": false,
-    "reviewOnlyPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b4-38671649065-2hq9dnfu.web.app",
+    "reviewOnlyPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b4-38687708932-daoqncg1.web.app",
     "disableNewSourceBuildUntilFirstAuthenticatedUAT": true,
     "requestedFirstTest": "LOGIN_THEN_CLIENTE360_COBROS_HISTORIAL_METAS",
-    "productionSecurityStillBlocked": true
+    "productionSecurityStillBlocked": true,
+    "firstAuthenticatedPaulaLoginConfirmedFromScreenshot": true,
+    "priorClient360CobrosFailuresReproducedByPaula": true,
+    "newPreviewUATStatus": "PENDING"
   },
   "b4003FinanceCobrosScopedRecovery20261014": {
     "gate": "I6.5/B4-003",
-    "status": "SOURCE_COMMITTED_QA_REQUIRED_NOT_ACCEPTED",
+    "status": "EXACT_PREVIEW_TECHNICAL_PASS_AUTHENTICATED_FINANCE_UAT_PENDING",
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_FINANCE_COBROS_SCOPED_SOURCE_FIX_20261014.json",
-    "receiptBlobSha": "1bef95a39cbc8a063087a57a3daadefbcdcbae88",
+    "receiptBlobSha": "b974a58c72f6858734208c0abcd552be8d21c3ee",
     "sourceFiles": {
       "functions/b4-003-scoped-related-reader.js": "373fd17a92cb93349817219c41ed40e38dbc48f5",
       "orbit360-platform/data/store-firestore-product-readonly-p0.js": "0875fda2539aba9a7e0073cacb07eb83345c8955",
@@ -11141,10 +11144,20 @@
     "realBusinessWrites": 0,
     "sharedRulesDeploy": false,
     "productionPromotion": false,
-    "sourceQA": "PENDING",
+    "sourceQA": "SOURCE_SYNTAX_AND_GUARD_PASS",
     "authenticatedPreviewUAT": "PENDING",
     "p0FindingsClosed": 0,
     "lastQaRunId": 38687585862,
-    "lastQaFailure": "ASSERTION_EXPECTED_TWO_CALLS_BUT_THREE_PAGINATED_REQUESTS"
+    "lastQaFailure": "ASSERTION_EXPECTED_TWO_CALLS_BUT_THREE_PAGINATED_REQUESTS",
+    "emulatorQA": "NOT_REEXECUTED_FOR_THIS_PREVIEW",
+    "previewRunId": 38687708932,
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-38687708932-daoqncg1.web.app",
+    "previewBuildId": "gi-i65-b4-53e66a2d4930-57f234755dc1",
+    "previewSourceSha": "53e66a2d4930b60e45bb9ef98a770a5fa4e14437",
+    "previewArtifactId": 11950279225,
+    "previewDigest": "sha256:c739f555dc5e1cff5d279f891905c028acd114dae6da5679d6f07ce5776db35d",
+    "humanAccepted": false,
+    "functionalAccepted": false,
+    "securityP0Closed": false
   }
 }

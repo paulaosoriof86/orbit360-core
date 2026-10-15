@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I65_B4003_FINANCE_COBROS_SCOPED_SOURCE_FIX_V1",
   "gate": "I6.5/B4-003",
-  "status": "SOURCE_STAGED_QA_PREVIEW_PENDING",
+  "status": "EXACT_TECHNICAL_PREVIEW_PASS_AUTHENTICATED_FINANCIAL_UAT_PENDING",
   "authorization": "Paula explicit instruction to continue urgent recovery within same gate, 2026-10-14",
   "priorAccepted": {
     "gate": "I6.5 B3-008",
@@ -48,8 +48,8 @@
     "readbackProofPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_FINANCE_SCOPED_HYDRATION_READONLY_PROBE_20261014.json"
   },
   "readiness": {
-    "sourceSyntaxAndStaticComposition": "PENDING_GITHUB_QA",
-    "emulator": "PENDING",
+    "sourceSyntaxAndStaticComposition": "PASS_WITH_GITHUB_GUARD",
+    "emulator": "NOT_REEXECUTED_FOR_THIS_PREVIEW",
     "authenticatedBrowser": "PENDING",
     "paulaVisual": "PENDING",
     "lastApprovedModuleReconstruction": false
@@ -69,6 +69,26 @@
     "status": "QA_ASSERTION_ONLY",
     "reason": "Paginated synthetic GT list (2 pages) and empty CO (1 page) produce three bounded read calls. Previous assertion expected two.",
     "noProductSourceChange": true,
-    "previousFailureRunId": 38687585862
+    "previousFailureRunId": 38687585862,
+    "qaCorrectedCommit": "53e66a2d4930b60e45bb9ef98a770a5fa4e14437"
+  },
+  "previewProof": {
+    "status": "EXACT_HOSTING_READBACK_AND_ANONYMOUS_DENIAL_PASS",
+    "sourceSha": "53e66a2d4930b60e45bb9ef98a770a5fa4e14437",
+    "buildId": "gi-i65-b4-53e66a2d4930-57f234755dc1",
+    "url": "https://ays-orbit-360-lab--gi-i65-b4-38687708932-daoqncg1.web.app",
+    "runId": 38687708932,
+    "jobId": 116266905508,
+    "artifactId": 11950279225,
+    "artifactDigest": "sha256:c739f555dc5e1cff5d279f891905c028acd114dae6da5679d6f07ce5776db35d",
+    "workflow": "success",
+    "hostingReadback": "PASS",
+    "syntheticProtectedHydration": "PASS",
+    "rolePositiveNegativeReal": "PENDING",
+    "paulaVisualFinance": "PENDING",
+    "noDirectFirestore": true,
+    "livePromoted": false,
+    "sharedRulesDeployed": false,
+    "operationalWrites": 0
   }
 }
