@@ -395,10 +395,26 @@ jobs:
             if(marker.sourceSha!==exact.sourceSha||marker.buildId!==exact.buildId)
               fail('B4_003_FINANCE_PREVIEW_MARKER_MISMATCH');
             report.markerExact=true;
+            const configReply=await fetch(exact.previewUrl+'/product-runtime-config.js',{signal:AbortSignal.timeout(15000)});
+            if(!configReply.ok)fail('B4_003_PREVIEW_PUBLIC_CONFIG_HTTP_'+configReply.status);
+            const liveConfigCtx={window:{}};
+            vm.runInNewContext(await configReply.text(),liveConfigCtx,{timeout:1500});
+            const hosted=liveConfigCtx.window.__ORBIT360_PRODUCT_PUBLIC_CONFIG__||{};
+            if(hosted.sourceSha!==exact.sourceSha||hosted.buildId!==exact.buildId||
+               hosted.scopedReadPreviewCandidate!==true)
+              fail('B4_003_HOSTED_CONFIG_RELEASE_IDENTITY_MISMATCH');
+            const effectiveRequired=Array.from(hosted.requiredCollections||[]);
+            const effectiveOptional=Array.from(hosted.optionalCollections||[]);
+            const effectiveConfigured=[...new Set([...effectiveRequired,...effectiveOptional])];
+            report.hostedCollectionAuthority={required:effectiveRequired,optional:effectiveOptional,
+              unsupported:effectiveConfigured.filter(k=>!isCovered(k)),
+              staticOnly:names.filter(k=>!effectiveConfigured.includes(k)),
+              missingFromStatic:effectiveConfigured.filter(k=>!names.includes(k))};
             const db=getFirestore(initializeApp({credential:applicationDefault(),projectId:process.env.PROJECT_ID}));
             const tenant=db.collection('tenants').doc(process.env.TENANT_HINT);
             const collection=k=>tenant.collection('data').doc(k).collection('items');
-            const counts=await Promise.all(names.map(async k=>{
+            const tracked=[...new Set([...names,'actividades'])];
+            const counts=await Promise.all(tracked.map(async k=>{
               const snap=await collection(k).count().get();
               return [k,snap.data().count];
             }));
@@ -437,9 +453,20 @@ jobs:
               children[k]={rows:by[k].size,linked,missingPolicy,withoutAnchor,explicitCountryConflict,linkedGT,linkedCO};
             }
             report.relations={policiesByCountry:policyCountries,crossCountryPolicyClient:crossCountry,children};
-            report.status=unsupported.length?'SOURCE_READBACK_PASS_PROTECTED_COVERAGE_INCOMPLETE':'SOURCE_READBACK_PASS';
+            const hostedGap=report.hostedCollectionAuthority.unsupported.filter(k=>report.sourceCounts[k]>0);
+            const historyCode=fs.readFileSync('orbit360-platform/modules/historial.js','utf8');
+            const historyUsesActivities=historyCode.includes("S().all('actividades')");
+            const historyRequested=report.hostedCollectionAuthority.required.includes('actividades')||
+              report.hostedCollectionAuthority.optional.includes('actividades');
+            report.protectedOperationalBlockers={hostedUncoveredWithRealRows:hostedGap,
+              historyUsesActivities,historyRequested,activitySourceCount:report.sourceCounts.actividades,
+              historyHydrationMissing:historyUsesActivities&&!historyRequested&&report.sourceCounts.actividades>0};
+            report.status=hostedGap.length||report.protectedOperationalBlockers.historyHydrationMissing
+              ?'HOLD_PROTECTED_READ_COVERAGE_REAL_DATA_NOT_CAPABILITY_PASS'
+              :'SOURCE_READBACK_ONLY_NOT_FUNCTIONAL_PASS';
             fs.writeFileSync(process.env.FINANCE_EVIDENCE_OUT,JSON.stringify(report,null,2)+'\n');
             console.log('B4_003_EXACT_FINANCE_READBACK='+JSON.stringify(report));
+            if(report.status.startsWith('HOLD_'))process.exitCode=1;
           })().catch(e=>{console.error('B4_003_FINANCE_READBACK_FAIL:'+String(e.message||e));process.exitCode=1;});
           NODE
 
