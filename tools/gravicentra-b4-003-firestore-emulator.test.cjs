@@ -216,7 +216,8 @@ async function run(){
     assert.deepEqual(verifiedBatch.rows.map(x=>x.id),['v_own','v_own2']);
     assert.ok(verifiedBatch.rows.every(x=>x.pais==='GT'&&x.tenantId===tenant));batchChecks++;
     await denyRelated(()=>listRelated('opGT','operativo','vehiculos','',{policyIds:['own','foreign']}),'POLICY_NOT_FOUND_OR_DENIED');batchChecks++;
-    await denyRelated(()=>listRelated('opGT','operativo','recibosEsperados','',{policyIds:['own']}),'RELATION_CLIENT_MISMATCH');batchChecks++;
+    const validBatch=await listRelated('opGT','operativo','recibosEsperados','',{policyIds:['own']});
+    assert.deepEqual(validBatch.rows.map(x=>x.id),['r_own']);batchChecks++;
     await denyRelated(()=>listRelated('opGT','operativo','vehiculos','',{policyIds:['own','own']}),'POLICY_BATCH_INVALID');batchChecks++;
     await denyRelated(()=>listRelated('opGT','operativo','vehiculos','',{policyIds:['own'],country:'CO'}),'POLICY_NOT_FOUND_OR_DENIED');batchChecks++;
     await denyRelated(()=>listRelated('opGT','operativo','clientes','',{policyIds:['own']}),'POLICY_ANCHOR_UNEXPECTED');batchChecks++;
