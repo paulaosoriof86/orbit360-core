@@ -4870,7 +4870,7 @@
       "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
       "executionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B4_EXECUTION_LOCK_20261002.json",
       "executionLockBlobSha": "ba98aa51e81921a3fdc08f6b561e011cf52d6210",
-      "compositionLockBlobSha": "df6cd9f383c107dd547be9a37aaaa82ea56da72a",
+      "compositionLockBlobSha": "75e37dfde242238f47ea775eecbf021d83edec2a",
       "findingLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
       "activeFindingId": "B4-003",
       "productSourceSha": "c603fd3561e7229d9359db45495d4cf2d757cd8f",
@@ -5996,7 +5996,7 @@
   "canonicalAccumulationControl": {
     "status": "FROZEN_ACTIVE",
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "compositionLockBlobSha": "df6cd9f383c107dd547be9a37aaaa82ea56da72a",
+    "compositionLockBlobSha": "75e37dfde242238f47ea775eecbf021d83edec2a",
     "findingLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
     "findingLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
@@ -6313,7 +6313,7 @@
     "activeFindingId": "B4-003",
     "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
     "executionLockBlobSha": "ba98aa51e81921a3fdc08f6b561e011cf52d6210",
-    "compositionLockBlobSha": "df6cd9f383c107dd547be9a37aaaa82ea56da72a",
+    "compositionLockBlobSha": "75e37dfde242238f47ea775eecbf021d83edec2a",
     "findingLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
     "noLive": true,
     "noReimport": true,
@@ -11242,5 +11242,22 @@
     "operationalWrites": 0,
     "noReimport": true,
     "findingsClosed": 0
+  },
+  "b4003VerifiedCanonicalFinanceScope20261015": {
+    "status": "SOURCE_AND_SYNTHETIC_QA_PASS_EXACT_AUTHENTICATED_PREVIEW_PENDING",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CANONICAL_FINANCIAL_PARENT_SCOPE_FIX_20261015.json",
+    "receiptBlobSha": "5e2487fdc66ac9d013c2a18e5b5f320a2a541a2b",
+    "sourcePath": "functions/b4-003-scoped-related-reader.js",
+    "sourceBlobSha": "5a1d36f898f88b45550c94868abb30a837972c4f",
+    "qaPath": "tools/gravicentra-b4-003-scoped-related-reader.test.cjs",
+    "qaBlobSha": "d8a0170425a399bdd5f1b5652ace1c629de54d62",
+    "compositionLockBlobSha": "75e37dfde242238f47ea775eecbf021d83edec2a",
+    "authorizedWithinExistingB4003Scope": true,
+    "realAuthenticatedUat": "PENDING",
+    "securityHoldStillActive": true,
+    "firestoreRulesDeploy": false,
+    "operationalDataWrites": 0,
+    "livePromotion": false,
+    "next": "EXACT_PREVIEW_THEN_AUTHENTICATED_FUNCTIONAL_AND_VISUAL"
   }
 }

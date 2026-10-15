@@ -593,7 +593,7 @@
   },
   "findingLedgerBlobSha": "8125e97dcf1feb7f46081f95327952e65c2d1077",
   "continuityRegisterBlobSha": "4e6b0ac51736be360c4b95abe8fc01d8f1e78e20",
-  "compositionLockBlobSha": "2d9d2ef9fb67a57c518c4a62fec4eb86254ce21d",
+  "compositionLockBlobSha": "75e37dfde242238f47ea775eecbf021d83edec2a",
   "r18SourceFix": {
     "status": "SOURCE_FIXED_R18_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_SOURCE_FIX_20261005.json",
@@ -2495,5 +2495,20 @@
     "roleAndConfigContractsUnchanged": true,
     "securityHoldActive": true,
     "authenticatedAcceptance": false
+  },
+  "b4003VerifiedCanonicalFinanceScope20261015": {
+    "status": "SOURCE_AND_SYNTHETIC_QA_PASS_EXACT_AUTHENTICATED_PREVIEW_PENDING",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CANONICAL_FINANCIAL_PARENT_SCOPE_FIX_20261015.json",
+    "receiptBlobSha": "5e2487fdc66ac9d013c2a18e5b5f320a2a541a2b",
+    "sourcePath": "functions/b4-003-scoped-related-reader.js",
+    "sourceBlobSha": "5a1d36f898f88b45550c94868abb30a837972c4f",
+    "qaPath": "tools/gravicentra-b4-003-scoped-related-reader.test.cjs",
+    "qaBlobSha": "d8a0170425a399bdd5f1b5652ace1c629de54d62",
+    "scopedProductSourceRepair": true,
+    "globalProductionMutationAuthorized": false,
+    "requiresRealAuthenticatedUat": true,
+    "noDataWrites": true,
+    "noSharedRulesDeploy": true,
+    "noLive": true
   }
 }

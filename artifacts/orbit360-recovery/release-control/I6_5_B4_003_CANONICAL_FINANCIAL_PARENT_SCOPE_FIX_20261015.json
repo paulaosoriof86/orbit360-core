@@ -1,0 +1,33 @@
+{
+  "schema": "GRAVICENTRA_I65_B4003_CANONICAL_FINANCIAL_SCOPE_CAUSAL_FIX_V1",
+  "date": "2026-10-15",
+  "gate": "I6.5/B4-003",
+  "status": "SOURCE_AND_SYNTHETIC_QA_PASS_EXACT_AUTHENTICATED_PREVIEW_PENDING",
+  "rootCause": "B4_PROTECTED_CHILD_AUTHORIZATION_TREATED_STALE_DENORMALIZED_CHILD_COUNTRY_OR_ADVISOR_AS_EQUAL_AUTHORITY_WITH_VERIFIED_POLICY",
+  "approvedContract": "B3_003_POLICY_COUNTRY_AND_ADVISOR_AUTHORITY_WITH_STRICT_VERIFIED_CLIENT_RELATION",
+  "sourcePath": "functions/b4-003-scoped-related-reader.js",
+  "sourceBeforeBlob": "6f6f4866e62c404328d4dff5e24fb5a8f15b4077",
+  "sourceAfterBlob": "5a1d36f898f88b45550c94868abb30a837972c4f",
+  "qaPath": "tools/gravicentra-b4-003-scoped-related-reader.test.cjs",
+  "qaAfterBlob": "d8a0170425a399bdd5f1b5652ace1c629de54d62",
+  "discriminant": "Old allowRow(ctx,child,[policy]) denies a GT/a1 policy-backed financial record when historic child is CO/a2; validated policy is authoritative for scope and country; foreign policy/client or mismatched client remains denied.",
+  "syntheticEvidence": {
+    "environment": "CHAT_CODE_MODE_NODE_STYLE_CJS_HARNESS_NO_FIREBASE",
+    "existingPlusNewMockChecks": 81,
+    "distinctCrossCountryNegativeAssertions": 12,
+    "passed": true,
+    "productionAccepted": false
+  },
+  "constraints": {
+    "singleCandidate": true,
+    "productionTouched": false,
+    "sharedFirestoreRulesDeployed": false,
+    "operationalWrites": 0,
+    "realAuthenticatedFunctionalAcceptance": false,
+    "existingB4SecurityHold": true,
+    "paulaHumanVisualAcceptance": false,
+    "reimport": false,
+    "releasePromotionAuthorized": false
+  },
+  "next": "EXACT_BUILD_AND_AUTHENTICATED_GT_CO_ROLE_SCOPE_CLIENTE360_COBROS_HEALTH_CARTERA_UAT"
+}

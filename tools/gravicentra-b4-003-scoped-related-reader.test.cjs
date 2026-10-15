@@ -157,6 +157,18 @@ async function deny(fn,code){let thrown;try{await fn()}catch(e){thrown=e}assert.
  assert.equal(validCrossBorder.row.pais,'GT');checks++;
  const policyCrossBorder=await bulk('vehiculos',['p1'],'asesor');
  assert.deepEqual(policyCrossBorder.rows.map(x=>x.id),['v1']);checks++;
+ // Regression: stale row denormalization must not override verified policy
+ // country/advisor for financial projections, but never widen foreign scope.
+ for(const [collection,id] of [['recibosEsperados','r1'],['carteraPrimas','debt1'],['vehiculos','v1'],['cobros','paid1']]){
+   docs[collection][id].pais='CO';docs[collection][id].asesorId='a2';
+   const document=await read(collection,id);
+   assert.equal(document.row.pais,'GT');assert.equal(document.row.asesorId,'a1');checks++;
+   const projection=await flow(collection,'asesor');
+   assert.ok(projection.rows.some(row=>row.id===id&&row.pais==='GT'&&row.asesorId==='a1'));checks++;
+   await deny(()=>read(collection,id,{country:'CO'}),'RECORD_NOT_FOUND_OR_DENIED');checks++;
+   delete docs[collection][id].pais;delete docs[collection][id].asesorId;
+ }
+ console.log('B4_003_CANONICAL_FINANCE_PARENT_SCOPE_QA_PASS checks=12 no_cross_country_escalation');
  docs.clientes.c1.pais='GT';docs.clientes.c1.asesorId='a1';
  console.log('B4_003_HISTORICAL_POLICY_ADVISOR_SCOPE_QA_PASS checks=5 no_cross_country_or_client_escalation');
  // P0 discriminator: old operational rows without pais must be recovered

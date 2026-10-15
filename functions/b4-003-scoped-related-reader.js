@@ -4,6 +4,7 @@
 const {resolve,allowRow,Denied}=require('./b4-003-scoped-access-boundary');
 const collections=new Set(['clientes','vehiculos','recibosEsperados','carteraPrimas','cobros','negocios','gestiones','actividades','metas']);
 const workflowCollections=new Set(['negocios','gestiones','actividades']);
+const financeCollections=new Set(['vehiculos','recibosEsperados','carteraPrimas','cobros']);
 const clean=v=>String(v==null?'':v).trim();
 const safeId=(id,label)=>{
  const value=clean(id);
@@ -24,6 +25,19 @@ function verifiedLinkedClient(ctx,client,policy){
 }
 function docRef(tenant,collection,id){
  return tenant.collection('data').doc(collection).collection('items').doc(id);
+}
+// Enforce authorization on the verified canonical parent; historical child
+// country/advisor fields are not an independent grant or veto of that scope.
+function financialView(ctx,row,policy,client,tenantId,id){
+ if(row.tenantId&&row.tenantId!==tenantId)throw new Denied('TENANT_DENIED');
+ const parent=policy||client;
+ if(!parent)throw new Denied('RELATION_NOT_VERIFIABLE');
+ allowRow(ctx,parent);
+ const country=clean(parent.pais||parent.country).toUpperCase();
+ if(!country||country!==ctx.country)throw new Denied('COUNTRY_DENIED');
+ const advisor=clean(parent.asesorId||parent.advisorId||parent.ownerAdvisorId);
+ return Object.assign({},row,{id:row.id||id,canonicalDocumentId:id,
+   tenantId,pais:country,asesorId:advisor||clean(row.asesorId||row.advisorId||row.ownerAdvisorId)});
 }
 async function readScopedRelatedDocument({db,auth,request}){
  if(!db||!auth||!auth.uid)throw new Denied('AUTH_REQUIRED');
@@ -60,12 +74,18 @@ async function readScopedRelatedDocument({db,auth,request}){
    client=c.data()||{};
  }
  if(collection!=='clientes'&&!workflowCollections.has(collection)&&!client&&!policy)throw new Denied('RELATION_NOT_VERIFIABLE');
- try{verifiedLinkedClient(ctx,client,policy);allowRow(ctx,row,policy?[policy]:client?[client]:[]);}
- catch(e){if(e instanceof Denied)throw new Denied('RECORD_NOT_FOUND_OR_DENIED');throw e;}
- return {ok:true,serverScoped:true,collection,country,scope:ctx.scope,
-   row:Object.assign({},row,{id:row.id||documentId,canonicalDocumentId:documentId,
-     pais:clean(row.pais||row.country||policy?.pais||policy?.country||client?.pais||client?.country),
-     tenantId:row.tenantId||tenantId})};
+ let projected;
+ try{
+   verifiedLinkedClient(ctx,client,policy);
+   if(financeCollections.has(collection))projected=financialView(ctx,row,policy,client,tenantId,documentId);
+   else{
+     allowRow(ctx,row,policy?[policy]:client?[client]:[]);
+     projected=Object.assign({},row,{id:row.id||documentId,canonicalDocumentId:documentId,
+       pais:clean(row.pais||row.country||policy?.pais||policy?.country||client?.pais||client?.country),
+       tenantId:row.tenantId||tenantId});
+   }
+ }catch(e){if(e instanceof Denied)throw new Denied('RECORD_NOT_FOUND_OR_DENIED');throw e;}
+ return {ok:true,serverScoped:true,collection,country,scope:ctx.scope,row:projected};
 }
 
 async function readScopedRelatedList({db,auth,request}){
@@ -126,15 +146,12 @@ async function readScopedRelatedList({db,auth,request}){
        if(!client)return null;
      }
      if(!policy&&!client)return null;
+     let projected;
      try{
        verifiedLinkedClient(ctx,client,policy);
-       allowRow(ctx,row,policy?[policy]:[client]);
+       projected=financialView(ctx,row,policy,client,tenantId,d.id);
      }catch(e){if(e instanceof Denied)return null;throw e;}
-     return Object.assign({},row,{
-       id:row.id||d.id,canonicalDocumentId:d.id,tenantId,
-       pais:clean(row.pais||row.country||policy?.pais||policy?.country||client?.pais||client?.country),
-       clienteId:linkedCid,polizaId:pid||clean(row.polizaId)
-     });
+     return Object.assign({},projected,{clienteId:linkedCid,polizaId:pid||clean(row.polizaId)});
      }catch(e){if(e instanceof Denied)return null;throw e;}
    }
    let ordered=target.orderBy('__name__'),scanned=0;
@@ -305,6 +322,8 @@ async function readScopedRelatedList({db,auth,request}){
      if(inputClientId&&inputClientId!==clean(parent.clienteId))
        throw new Denied('RELATION_CLIENT_MISMATCH');
    }
+   if(financeCollections.has(coll))
+     return financialView(ctx,row,parent,relatedClient,tenantId,documentId);
    allowRow(ctx,row,parent?[parent]:[]);
    return Object.assign({},row,{id:row.id||documentId,canonicalDocumentId:documentId,
      pais:clean(row.pais||row.country||parent?.pais||parent?.country||relatedClient?.pais||relatedClient?.country),
