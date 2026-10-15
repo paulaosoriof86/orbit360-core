@@ -26,24 +26,32 @@ async function main(){
  assert(h.ok,'HOSTING_MARKER_HTTP');const m=await h.json();
  assert(m.sourceSha===proof.sourceHead&&m.buildId===proof.buildId,'HOSTING_IDENTITY_CHANGED');
  result.buildId=proof.buildId;result.artifactId=proof.artifactId;
- const sa=['SA_ORBIT360_LAB','SA_DEFAULT','SA_ORBIT_360_LAB']
+ const sa=['SA_DEFAULT','SA_ORBIT360_LAB','SA_ORBIT_360_LAB']
   .map(k=>{try{return JSON.parse(process.env[k]||'')}catch{return null}})
   .find(x=>x?.type==='service_account'&&x.project_id==='ays-orbit-360-lab'&&x.private_key);
  assert(sa,'EXISTING_SERVICE_ACCOUNT_NOT_AVAILABLE');
  app=initializeApp({credential:cert(sa),projectId:'ays-orbit-360-lab'});
  const db=getFirestore(app),auth=getAuth(app);
  const docs=(await db.collection('tenants').doc(tid).collection('members').get()).docs;
- const valid=[];
+ const valid=[],diagnostic={membershipDocuments:docs.length,
+   canonicalActiveCandidates:0,contradictoryInactivoFlag:0,authLookupErrors:0,
+   authDisabled:0,emailNotVerified:0,authVerifiedEligible:0};
  for(const d of docs){
   const v=d.data()||{},roles=[v.rol,v.role,v.defaultRole,v.rolDefault,...(v.roles||[]),...(v.rolesAsignados||[])].map(norm),
    countries=[...(v.countries||[]),...(v.paises||[]),...(v.paisesAutorizados||[])].map(x=>String(x||'').toUpperCase()),
    states=[v.status,v.estado].filter(Boolean).map(norm);
-  if(v.uid!==d.id||v.tenantId!==tid||v.active===false||v.activo===false||v.inactivo===true||!states.length||
+  if(v.uid!==d.id||v.tenantId!==tid||v.active===false||v.activo===false||!states.length||
     states.some(x=>!['active','activo'].includes(x)))continue;
-  try{const a=await auth.getUser(d.id);if(!a.disabled&&a.emailVerified){
+  diagnostic.canonicalActiveCandidates++;
+  if(v.inactivo===true){diagnostic.contradictoryInactivoFlag++;continue;}
+  try{const a=await auth.getUser(d.id);
+    if(a.disabled){diagnostic.authDisabled++;continue;}
+    if(!a.emailVerified){diagnostic.emailNotVerified++;continue;}
+    diagnostic.authVerifiedEligible++;
     valid.push({uid:d.id,roles,countries,claim:n(a.customClaims?.giActiveRole)});
-  }}catch{}
+  }catch{diagnostic.authLookupErrors++;}
  }
+ result.membershipEligibilityDiagnostic=diagnostic;
  let pair=null;
  for(const country of ['GT','CO']){
   const ops=valid.find(x=>x.countries.includes(country)&&['operativo','direccion'].some(z=>x.roles.includes(z)&&(!x.claim||x.claim===z)));
@@ -59,7 +67,7 @@ async function main(){
    distinctPairExists:ops.some(a=>advisers.some(b=>a.uid!==b.uid))};
  }
  result.actorEligibility=eligibility;
- if(!pair){result.status='DIAGNOSTIC_HOLD_NO_TWO_DISTINCT_ELIGIBLE_UIDS';result.d15='NOT_TESTED_IDENTITY_PRECONDITION';return;}
+ if(!pair){result.status='DIAGNOSTIC_HOLD_NO_TWO_DISTINCT_ELIGIBLE_UIDS';result.d15='NOT_TESTED_IDENTITY_PRECONDITION';result.identityBlocker=diagnostic.authLookupErrors?'AUTH_LOOKUP_FAILURE_OR_IAM':diagnostic.contradictoryInactivoFlag?'CONTRADICTORY_MEMBER_INACTIVO':diagnostic.canonicalActiveCandidates===0?'NO_CANONICAL_ACTIVE_MEMBERS':'NO_DISTINCT_COUNTRY_ROLE_PAIR';return;}
  assert(pair.actors[0].uid!==pair.actors[1].uid,'ACTOR_PAIR_COLLISION');
  result.twoVerifiedUids=true;result.country=pair.country;
  browser=await chromium.launch({headless:true});
