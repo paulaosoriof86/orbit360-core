@@ -11572,7 +11572,7 @@
     "readyForLive": false
   },
   "b4003OperativoRoleSwitchModuleVisibility20261015": {
-    "status": "SCOPED_SOURCE_FIXED_PENDING_NEW_EXACT_PREVIEW",
+    "status": "SCOPED_SOURCE_FIXED_NEW_EXACT_PREVIEW_DISPATCH_REQUESTED",
     "sourceOwner": "orbit360-platform/core/backend-product-readonly-bootstrap-p0.js",
     "sourceBlobSha": "8cc5ce156ee63eb212ba66667846305870f1befd",
     "qaPath": "tools/gravicentra-b4-003-protected-hydration.test.cjs",
@@ -11583,6 +11583,17 @@
     "securityP0Closed": false,
     "readyForPaulaVisual": false,
     "productionChanged": false,
-    "realBusinessWrites": 0
+    "realBusinessWrites": 0,
+    "exactBuildDispatch": {
+      "status": "EXISTING_CUMULATIVE_SCOPED_PREVIEW_REQUESTED",
+      "priorSourceFixCommit": "f9303693e1ae04cee5e5dcd4bb45e983603ec005",
+      "sourceBlob": "8cc5ce156ee63eb212ba66667846305870f1befd",
+      "existingOldPreviewInvalidForNewSource": true,
+      "runNotYetProven": true,
+      "syntheticWritesAuthorized": false,
+      "operationalWritesAuthorized": false,
+      "firestoreRulesDeploymentAuthorized": false,
+      "livePromotionAuthorized": false
+    }
   }
 }
