@@ -1,0 +1,34 @@
+{
+  "schema": "GRAVICENTRA_B4003_TWO_UID_OPS_LEADS_UI_READONLY_QA_V1",
+  "status": "REQUESTED_NO_PASS_YET",
+  "date": "2026-10-15",
+  "gate": "I6.5/B4-003",
+  "priorHead": "90bac8c45ebe74ab5db88641808bda639302754b",
+  "priorProof": {
+    "runId": 38762908533,
+    "artifactId": 11987046128,
+    "digest": "sha256:fbe6006538b740eeb1a023cf97e9dd5734281ebee841aa2b9169c2975b5f8070",
+    "twoUid": true,
+    "country": "GT",
+    "roles": [
+      "operativo",
+      "asesor"
+    ],
+    "contactPairsChecked": 1,
+    "contactConflicts": 0
+  },
+  "scope": "Exact existing Preview read-only UI navigation: Ops and Leads each selected role, viewport 390, board available only when module granted. Block mutation callables and direct Firestore access. No click/create/update/upload.",
+  "sourcePath": "tools/gravicentra-b4-003-commercial-readonly-qa.cjs",
+  "qaBlobSha": "343c38c47417514175a87aaa986548f8cd410d40",
+  "productSourceChanged": false,
+  "materialBuildRequired": false,
+  "existingPreviewArtifactId": 11983958349,
+  "boundaries": {
+    "operationalWrites": 0,
+    "syntheticWrites": 0,
+    "noSharedRulesDeploy": true,
+    "noLivePromotion": true,
+    "noReimport": true,
+    "noTinyFish": true
+  }
+}

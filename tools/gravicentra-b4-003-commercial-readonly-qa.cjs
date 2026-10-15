@@ -115,15 +115,40 @@ async function main(){
    result.contactUnavailable+=q.contacts.missing;
    const record={role:actor.role,readBusiness:q.businessOk,readManagement:q.managementOk,
      unauthorizedDenied:q.denied,readBusinessCount:q.businessCount,
-     readManagementCount:q.managementCount,pageErrors:errs.length};
-   result.actors.push(record);
+     readManagementCount:q.managementCount,pageErrors:errs.length,uiRoutes:{}};
    assert(q.businessOk&&q.managementOk&&q.denied,'READ_SCOPES_NOT_CONFIRMED_'+actor.role);
    assert(!errs.length,'PAGE_ERROR_'+actor.role);
+   // No click, write or server-side change. All non-readonly callables and direct
+   // Firestore requests remain blocked by the browser's network route.
+   try{
+    await page.evaluate(async()=>{if(!Orbit.productAppP0?.activate)throw Error('APP_ACTIVATE_UNAVAILABLE');
+      await Orbit.productAppP0.activate();});
+    for(const moduleKey of ['ops','leads']){
+      await page.evaluate(k=>{if(Orbit.router?.go)Orbit.router.go(k);else location.hash='#/'+k;},moduleKey);
+      await page.waitForTimeout(550);
+      record.uiRoutes[moduleKey]=await page.evaluate(k=>({
+        route:Orbit.route?.key||'',moduleAuthorized:Orbit.access?.can?.(k,'view')===true,
+        hasBoard:!!document.querySelector('#host .kanban'),
+        deniedNotice:/No tienes acceso con el rol activo/.test(document.querySelector('#host')?.innerText||''),
+        cards:document.querySelectorAll('#host [data-neg],#host [data-ges]').length,
+        horizontalOverflow:document.documentElement.scrollWidth>innerWidth+2
+      }),moduleKey);
+    }
+   }catch(e){record.uiRoutes.diagnosticError=String(e?.message||e).slice(0,100);}
+   record.pageErrors=errs.length;
+   result.actors.push(record);
   }finally{await ctx.close();}
  }
  result.d15=result.contactConflictsReview?'SAMPLED_CONTACT_CONFLICT_REVIEW_REQUIRED':
    result.contactPairsChecked?'SAMPLED_CONTACT_READBACK_NO_CONFLICT':'NO_COMPARABLE_SAMPLE_HOLD';
- result.status='TWO_UID_COMMERCIAL_SCOPED_READ_PASS_WRITES_AND_UI_E2E_PENDING';
+ const uiReady=result.actors.every(a=>['ops','leads'].every(k=>{
+  const x=a.uiRoutes?.[k];
+  return x&&x.route===k&&(x.moduleAuthorized?x.hasBoard&&!x.deniedNotice:x.deniedNotice);
+ }));
+ result.uiReadOnlyEvaluated=true;
+ result.uiReadOnlyReady=uiReady;
+ result.status=uiReady?'TWO_UID_SCOPED_READ_AND_ROLE_UI_NAVIGATION_PASS_WRITES_PENDING':
+  'TWO_UID_SCOPED_READ_PASS_UI_NAVIGATION_REQUIRES_DIAGNOSTIC';
 }
 main().catch(e=>{result.status='HOLD_OR_QA_FAIL';result.errors.push(String(e?.message||e).slice(0,130));process.exitCode=1})
 .finally(async()=>{try{if(browser)await browser.close()}catch{}
