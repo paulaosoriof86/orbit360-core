@@ -2422,5 +2422,36 @@
       "283e0f4a23c2b278425140dd94f50d9424e1db86",
       "7090d49895ea4235b29c78cf4ec3ebd22017cd26"
     ]
+  },
+  "b4003RoleParityScopedRecovery20261015": {
+    "status": "SCOPED_ROLE_PARITY_SOURCE_AUTHORIZED_QA_PENDING",
+    "scope": "EXACT_B4_003_SERVER_ROLE_AUTHORIZATION_ONLY",
+    "authority": "Paula urgent request to restore prior approved Configuration roles and permissions without new recovery, 2026-10-15",
+    "allowedProductFiles": [
+      "functions/b4-003-scoped-access-boundary.js"
+    ],
+    "allowedQaFiles": [
+      "tools/gravicentra-b4-003-scoped-boundary.test.cjs"
+    ],
+    "sourceBefore": "600fbb6a262086ac111c5046f5544723fd2be1c4",
+    "sourceAfter": "29a64c48fa531b13d2ce2a0d7a719381ecb42b16",
+    "qaBefore": "33e48f62320542849bd112687cf4b82d3853abe0",
+    "qaAfter": "c97372d65a0e9c8578255857837f2021f2dacef9",
+    "roleParity": "Finance all, Marketing team, Assistant own, advisor tier own; all bounded by stored roleScopes and user dataScopes",
+    "restrictedDirectoryRolesUnchanged": true,
+    "explicitModuleDenialPreserved": true,
+    "offCountryDenied": true,
+    "membershipStatusGateUnchanged": true,
+    "globalProductMutationAuthorized": false,
+    "productionPromotionAuthorized": false,
+    "sharedRulesDeployAuthorized": false,
+    "realBusinessWritesAuthorized": false,
+    "securityP0Closed": false,
+    "testsRequired": [
+      "ROLE_POSITIVE_NEGATIVE_SYNTHETIC",
+      "EXACT_PREVIEW_ACCEPTED_ARTIFACT_READBACK",
+      "AUTHENTICATED_ROLE_GT_CO_AND_CONFIGURATION_READBACK"
+    ],
+    "newGate": false
   }
 }

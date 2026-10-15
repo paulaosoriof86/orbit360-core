@@ -60,3 +60,42 @@ assert.throws(()=>resolve({...teamDirectoryBase,config:{rolePermissions:{admin:{
 console.log('B4_003_TEAM_DIRECTORY_EFFECTIVE_POLICY_ALIGNMENT_PASS checks=6');
 console.log('B4_003_PER_ROLE_TEAM_OVERRIDE_DENIES_GLOBAL_TEAM_PASS');
 console.log('STAGED_B4_003_CONTRACT_UNIT_PASS');
+
+
+// Restore every explicitly approved role ceiling without allowing scope escalation.
+// These tests use only synthetic memberships and no tenant data or real users.
+const roleBase={...c,auth:{uid:'u',token:{}},member:{
+ ...c.member,roles:['Finanzas','Marketing','Asistente','Asesor','Operativo','Dirección'],
+ dataScopes:{default:'all'},advisorId:'a1',teamAdvisorIds:['a2'],countries:['GT','CO']},
+ config:{roleScopes:{Finanzas:'all',Marketing:'team',Asistente:'own',Asesor:'own',Operativo:'all',Dirección:'all'}}};
+function roleCtx(role,scope){
+ const ctx=resolve({...roleBase,activeRole:role});
+ assert.equal(ctx.scope,scope,role+'_APPROVED_SCOPE');
+ return ctx;
+}
+const finance=roleCtx('Finanzas','all');
+assert.equal(allowRow(finance,{tenantId:'t',pais:'GT',asesorId:'a3'}),true);
+const marketing=roleCtx('Marketing','team');
+assert.equal(allowRow(marketing,{tenantId:'t',pais:'GT',asesorId:'a2'}),true);
+assert.throws(()=>allowRow(marketing,{tenantId:'t',pais:'GT',asesorId:'a3'}),
+ e=>e.code==='FOREIGN_RECORD_DENIED');
+const assistant=roleCtx('Asistente','own');
+assert.equal(allowRow(assistant,{tenantId:'t',pais:'GT',asesorId:'a1'}),true);
+assert.throws(()=>allowRow(assistant,{tenantId:'t',pais:'GT',asesorId:'a2'}),
+ e=>e.code==='FOREIGN_RECORD_DENIED');
+for(const role of ['Asesor Sr.','Asesora Sr.','Asesor Jr.','Asesora Jr.']){
+ const x={...roleBase,activeRole:role,member:{...roleBase.member,roles:[role]}};
+ assert.equal(resolve(x).scope,'own',role+'_OWN_CEILING');
+}
+assert.throws(()=>resolve({...roleBase,activeRole:'Finanzas',collection:'aseguradoras'}),
+ e=>e.code==='DIRECTORY_DENIED','FINANCE_MUST_NOT_INHERIT_INSURER_DIRECTORY_FULL');
+assert.throws(()=>resolve({...roleBase,activeRole:'Marketing',country:'MX'}),
+ e=>e.code==='COUNTRY_DENIED');
+assert.throws(()=>resolve({...roleBase,activeRole:'Asistente',config:{roleScopes:{Asistente:'none'}}}),
+ e=>e.code==='SCOPE_NONE');
+assert.throws(()=>resolve({...roleBase,activeRole:'Finanzas',member:{...roleBase.member,status:'invited'}}),
+ e=>e.code==='MEMBERSHIP_DENIED');
+assert.throws(()=>resolve({...roleBase,activeRole:'Finanzas',
+ config:{roleScopes:{Finanzas:'all'},rolePermissions:{Finanzas:{polizas:{ver:false}}}}}),
+ e=>e.code==='MODULE_DENIED');
+console.log('B4_003_APPROVED_ROLE_SCOPE_PARITY_PASS Finance Marketing Assistant and advisor tiers; negative country role module insurer denied');

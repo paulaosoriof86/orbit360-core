@@ -252,7 +252,7 @@
     "orbit360-platform/styles/base.css": "608ef0709144ffcbe748a7bd04e1bd16744def65",
     "orbit360-platform/styles/infra.css": "d6fe258364c4e11daad21848a40fbb121c36e4a8",
     "orbit360-platform/sw.js": "87412e7c4ef1030e2a3389cfd709f0c287ab336b",
-    "functions/b4-003-scoped-access-boundary.js": "600fbb6a262086ac111c5046f5544723fd2be1c4",
+    "functions/b4-003-scoped-access-boundary.js": "29a64c48fa531b13d2ce2a0d7a719381ecb42b16",
     "firestore.b4-003-scoped-candidate.rules": "6ae1a85b1f82525ac018ff682a2e20b6cca5f1d8",
     "orbit360-platform/modules/comparativo.js": "982881a4c1e2f95be95428bd3f9f23360a9a2d5f",
     "functions/b4-003-scoped-policy-reader.js": "4181f6198c0163175579a2cc19197ebc63d9b328",
@@ -5670,5 +5670,33 @@
     "previousPreviewRejected": true,
     "realWrites": 0,
     "livePromotion": false
+  },
+  "b4003ApprovedRoleParityRecovery20261015": {
+    "gate": "I6.5/B4-003",
+    "status": "STAGED_SOURCE_QA_PENDING_NOT_SECURITY_ACCEPTED",
+    "cause": "Scoped server reader omits approved Finance, Marketing, Assistant and advisor tier roles, conflicting with canonical role taxonomy.",
+    "approvedRoles": [
+      "Finanzas",
+      "Marketing",
+      "Asistente",
+      "Asesor Sr.",
+      "Asesora Sr.",
+      "Asesor Jr.",
+      "Asesora Jr."
+    ],
+    "preservedScopeCaps": {
+      "Finanzas": "all_or_lower_by_authorized_roleScopes_and_user",
+      "Marketing": "team_or_lower",
+      "Asistente": "own_or_lower",
+      "Asesor Sr.": "own_or_lower",
+      "Asesor Jr.": "own_or_lower"
+    },
+    "directoryCeilingUnchanged": true,
+    "sourceBlob": "29a64c48fa531b13d2ce2a0d7a719381ecb42b16",
+    "qaBlob": "c97372d65a0e9c8578255857837f2021f2dacef9",
+    "priorPreviewImmutable": true,
+    "realDataWrites": 0,
+    "sharedRulesDeploy": false,
+    "productionPromotion": false
   }
 }

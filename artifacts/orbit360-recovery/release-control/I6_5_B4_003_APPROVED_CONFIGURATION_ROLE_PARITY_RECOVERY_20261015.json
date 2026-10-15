@@ -1,0 +1,76 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_CONFIG_ROLE_PARITY_RECOVERY_V1",
+  "gate": "I6.5/B4-003",
+  "status": "SOURCE_STAGED_QA_EXACT_PREVIEW_AUTHENTICATED_ROLE_MATRIX_PENDING",
+  "authority": "Subordinate to canonical Control Plane, addenda, execution lock, approved B3 version and ledger",
+  "comparison": {
+    "previouslyApprovedSource": "dcd2b3f60b98ad96c94933f09da9e8478ea165c3",
+    "acceptedUserTeamModuleBlob": "b0736237ee18ef45abbae1c13f5c94781178344e",
+    "acceptedMembershipAccessBridgeBlob": "b48f3afcc8eddf8a3fc1473e2b27388fa00d7fdd",
+    "canonicalRoleCeilings": "tenant-access-policy-contract-p0.js: Finanzas all, Marketing team, Asistente own, advisor tiers own",
+    "priorSecurityConcern": "Prior authorization design existed but 2026-10-12 authenticated negative tests proved deployed broad Firestore rules; do not reverse security constraints."
+  },
+  "causalDefect": "New B4-003 server-scoped reader ROLE_DENIED excludes approved Finanzas, Marketing, Asistente and advisor-tier names, despite roles existing in canonical taxonomy and UI.",
+  "fix": {
+    "path": "functions/b4-003-scoped-access-boundary.js",
+    "before": "600fbb6a262086ac111c5046f5544723fd2be1c4",
+    "after": "29a64c48fa531b13d2ce2a0d7a719381ecb42b16",
+    "safeguards": [
+      "No unassigned role",
+      "No broadened insurer directory visibility",
+      "Marketing <= team",
+      "Assistant/advisor tiers <= own",
+      "Role scopes and user scopes cannot escalate",
+      "Module explicit denial preserved",
+      "Country and membership restrictions unchanged"
+    ]
+  },
+  "qa": {
+    "path": "tools/gravicentra-b4-003-scoped-boundary.test.cjs",
+    "before": "33e48f62320542849bd112687cf4b82d3853abe0",
+    "after": "c97372d65a0e9c8578255857837f2021f2dacef9",
+    "syntheticBeforeCommit": "ISOLATED_V8_POSITIVE_4_NEGATIVE_5_PASS",
+    "githubCi": "PENDING",
+    "authenticatedBrowser": "PENDING",
+    "configurationWriteReadback": "PENDING"
+  },
+  "configurationPreservation": {
+    "sourceOwnersUnchanged": [
+      "orbit360-platform/modules/equipo.js",
+      "orbit360-platform/core/product-membership-access-bridge-p0.js",
+      "orbit360-platform/modules/equipo-onboarding-v20260804-bridge.js",
+      "orbit360-platform/modules/equipo-credential-admin-v20260805-bridge.js"
+    ],
+    "changedOwners": [
+      "orbit360-platform/modules/configuracion.js",
+      "orbit360-platform/core/tenant-domain-config-client.js",
+      "functions/tenant-domain-config.js"
+    ],
+    "previewConfigReadsCanonicalBaselineAndWritesIsolatedCollection": true,
+    "outstandingVerification": [
+      "All approved user CRUD and membership persist/reload",
+      "role switching Own/Team/All per advisor per country",
+      "modulesExtra/modulesRestricted and cotizador/comparativo",
+      "rolePermissions matrix and roleScopes saved server-side",
+      "branding/config domains, catalogs and plans",
+      "institutional and individual goals, freelancer eligibility",
+      "access invitation emails, notifications and audit"
+    ],
+    "warning": "In configuracion.js: legacy custom-plan saves call Orbit.store.setPref, which a product readonly store forbids; this was also in accepted B3 source and requires acceptance-specific causal proof before changing."
+  },
+  "boundaries": {
+    "globalProductMutationAuthorized": false,
+    "newGate": false,
+    "newRepo": false,
+    "realBusinessWrites": 0,
+    "reimport": false,
+    "firestoreRulesDeployed": false,
+    "productionPromoted": false,
+    "securityP0Closed": false,
+    "p0FindingsClosed": 0
+  },
+  "binding": {
+    "compositionBlob": "391062fd13d01df783dd512472f14967a50c29da",
+    "executionLockBlob": "af330c456cb80f42a72376d3d86ac29db59b8513"
+  }
+}

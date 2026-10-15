@@ -4,8 +4,10 @@ const clean=x=>String(x??'').trim();
 const norm=x=>clean(x).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_+|_+$/g,'');
 const uniq=a=>[...new Set((Array.isArray(a)?a:a==null?[]:[a]).map(clean).filter(Boolean))];
 const order={none:0,own:1,team:2,all:3};
-const full=new Set(['operativo','admin','admintenant','admin_tenant','superadmin','super_admin','direccion']);
-const self=new Set(['asesor','comercial']);
+const full=new Set(['operativo','admin','admintenant','admin_tenant','superadmin','super_admin','direccion','finanzas']);
+const insurerDirectoryRoles=new Set(['operativo','admin','admintenant','admin_tenant','superadmin','super_admin','direccion']);
+const teamScopedRoles=new Set(['marketing']);
+const self=new Set(['asesor','asesora','asesor_sr','asesora_sr','asesor_jr','asesora_jr','comercial','asistente']);
 // Aligned with tenant-access-policy-effective-p0 TEAM_DIRECTORY_ROLES.
 const teamDirectoryRoles=new Set(['direccion','superadmin','admintenant','admin']);
 const modules={clientes:'cliente360',polizas:'polizas',vehiculos:'polizas',recibosEsperados:'recibos',carteraPrimas:'cobros',cobros:'cobros',negocios:'leads',gestiones:'ops',metas:'inicio',actividades:'historial',asesores:'equipo',aseguradoras:'aseguradoras'};
@@ -23,7 +25,7 @@ function resolve({auth,member,config,tenantId,activeRole,collection,country}){
  if(!role)deny('ROLE_NOT_PROVIDED');
  if(signed&&role!==signed)deny('SIGNED_ACTIVE_ROLE_MISMATCH');
  const assigned=uniq([...(m.roles||[]),...(m.rolesAsignados||[]),m.rol,m.role,m.defaultRole,m.rolDefault].filter(Boolean)).map(norm);
- if(!assigned.includes(role)||(!self.has(role)&&!full.has(role)))deny('ROLE_DENIED');
+ if(!assigned.includes(role)||(!self.has(role)&&!full.has(role)&&!teamScopedRoles.has(role)))deny('ROLE_DENIED');
  const moduleKey=modules[collection];
  if(!moduleKey)deny('COLLECTION_DENIED');
  if(uniq(m.modulesRestricted||m.modulosRestringidos).map(norm).includes(norm(moduleKey)))deny('MODULE_DENIED');
@@ -32,7 +34,7 @@ function resolve({auth,member,config,tenantId,activeRole,collection,country}){
  if(!['GT','CO'].includes(country)||!countries.includes(country))deny('COUNTRY_DENIED');
  let effective='none';
  if(collection==='aseguradoras'){
-  if(!full.has(role))deny('DIRECTORY_DENIED');
+  if(!insurerDirectoryRoles.has(role))deny('DIRECTORY_DENIED');
   effective='all';
  }else if(collection==='asesores'){
   // The complete Equipo directory is not a personal/operational roster.
@@ -44,7 +46,8 @@ function resolve({auth,member,config,tenantId,activeRole,collection,country}){
  }else{
   const ds=m.dataScopes||{},requested=scope(get(ds.modules,moduleKey)||ds.default||m.scopeDatos||m.dataScope);
   const configured=scope(get(config?.roleScopes,role));
-  const ceiling=self.has(role)?(configured&&order[configured]<order.own?configured:'own'):(configured||'none');
+  const maxScope=self.has(role)?'own':teamScopedRoles.has(role)?'team':(configured||'none');
+  const ceiling=configured&&order[configured]<order[maxScope]?configured:maxScope;
   effective=requested?(order[requested]<=order[ceiling]?requested:ceiling):(configured?ceiling:'none');
  }
  if(effective==='none')deny('SCOPE_NONE');
