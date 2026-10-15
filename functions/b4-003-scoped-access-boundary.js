@@ -8,7 +8,7 @@ const full=new Set(['operativo','admin','admintenant','admin_tenant','superadmin
 const self=new Set(['asesor','comercial']);
 // Aligned with tenant-access-policy-effective-p0 TEAM_DIRECTORY_ROLES.
 const teamDirectoryRoles=new Set(['direccion','superadmin','admintenant','admin']);
-const modules={clientes:'cliente360',polizas:'polizas',vehiculos:'polizas',recibosEsperados:'recibos',carteraPrimas:'cobros',cobros:'cobros',negocios:'leads',gestiones:'ops',metas:'inicio',asesores:'equipo',aseguradoras:'aseguradoras'};
+const modules={clientes:'cliente360',polizas:'polizas',vehiculos:'polizas',recibosEsperados:'recibos',carteraPrimas:'cobros',cobros:'cobros',negocios:'leads',gestiones:'ops',metas:'inicio',actividades:'historial',asesores:'equipo',aseguradoras:'aseguradoras'};
 class Denied extends Error{constructor(code){super(code);this.code=code;}}
 const deny=code=>{throw new Denied(code);};
 const get=(o,k)=>{const key=Object.keys(o||{}).find(v=>norm(v)===norm(k));return key===undefined?undefined:o[key];};

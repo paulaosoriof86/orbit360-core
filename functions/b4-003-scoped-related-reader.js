@@ -2,8 +2,8 @@
 // B4-003 staged protected document-read owner for related operational collections.
 // Read-only. Preview-only candidate; NO Firebase export or rule deploy.
 const {resolve,allowRow,Denied}=require('./b4-003-scoped-access-boundary');
-const collections=new Set(['clientes','vehiculos','recibosEsperados','carteraPrimas','cobros','negocios','gestiones']);
-const workflowCollections=new Set(['negocios','gestiones']);
+const collections=new Set(['clientes','vehiculos','recibosEsperados','carteraPrimas','cobros','negocios','gestiones','actividades']);
+const workflowCollections=new Set(['negocios','gestiones','actividades']);
 const clean=v=>String(v==null?'':v).trim();
 const safeId=(id,label)=>{
  const value=clean(id);
@@ -101,7 +101,7 @@ async function readScopedRelatedList({db,auth,request}){
  // Do not repair historical records or grant broader permissions.
  if(workflowCollections.has(coll)){
    if(policyId||hasBatch)throw new Denied('POLICY_ANCHOR_UNEXPECTED');
-   const MAX_LEGACY_WORKFLOW_ROWS=250;
+   const MAX_LEGACY_WORKFLOW_ROWS=coll==='actividades'?1000:250;
    const all=await target.orderBy('__name__').limit(MAX_LEGACY_WORKFLOW_ROWS+1).get();
    const docs=Array.isArray(all.docs)?all.docs:[];
    if(docs.length>MAX_LEGACY_WORKFLOW_ROWS)throw new Denied('WORKFLOW_LEGACY_SCAN_BOUND_EXCEEDED');
@@ -231,4 +231,4 @@ async function readScopedRelatedList({db,auth,request}){
    anchoring:coll==='clientes'?'authorized_country_and_advisor_scope':hasBatch?'authorized_policy_batch':'authorized_policy'};
 }
 
-module.exports=Object.freeze({readScopedRelatedDocument,readScopedRelatedList,collections,version:'b4-003-related-server-list-stage-v3'});
+module.exports=Object.freeze({readScopedRelatedDocument,readScopedRelatedList,collections,version:'b4-003-related-server-list-stage-v4-activity-scoped'});

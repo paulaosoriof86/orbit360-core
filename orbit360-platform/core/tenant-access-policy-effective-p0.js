@@ -14,6 +14,7 @@
   var PRODUCT_COLLECTION_POLICY_OVERRIDE = Object.freeze({
     negocios: { module: 'leads', scoped: true, advisorRead: true, advisorWrite: false },
     metas: { module: 'inicio', scoped: true, advisorRead: true, advisorWrite: false },
+    actividades: { module: 'historial', scoped: true, advisorRead: true, advisorWrite: false },
     asesores: { module: 'equipo', scoped: false, advisorRead: false, advisorWrite: false },
     auditoria: { module: 'equipo', scoped: false, advisorRead: false, advisorWrite: false, restricted: true, audit: true }
   });

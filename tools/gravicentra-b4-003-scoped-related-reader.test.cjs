@@ -15,7 +15,14 @@ const docs={
  carteraPrimas:{debt1:{id:'debt1',polizaId:'p1',clienteId:'c1',monto:10}},
  cobros:{paid1:{id:'paid1',polizaId:'p1',clienteId:'c1',monto:3},paid2:{id:'paid2',polizaId:'p2',clienteId:'c2'}},
  negocios:{n1:{id:'n1',tenantId,pais:'GT',asesorId:'a1',etapa:'nuevo'},n2:{id:'n2',tenantId,pais:'GT',asesorId:'a2',etapa:'cotizando'}},
- gestiones:{g1:{id:'g1',tenantId,pais:'GT',asesorId:'a1',lista:'Gestiones Admin'},g2:{id:'g2',tenantId,pais:'GT',asesorId:'a2',lista:'Emisiones'}}
+ gestiones:{g1:{id:'g1',tenantId,pais:'GT',asesorId:'a1',lista:'Gestiones Admin'},g2:{id:'g2',tenantId,pais:'GT',asesorId:'a2',lista:'Emisiones'}},
+ actividades:{
+  hPolicy:{id:'hPolicy',tenantId,polizaId:'p1',tipo:'llamada'},
+  hClient:{id:'hClient',tenantId,clienteId:'c1',tipo:'nota'},
+  hForeign:{id:'hForeign',tenantId,clienteId:'c2',tipo:'reunion'},
+  hNoParent:{id:'hNoParent',tenantId,tipo:'sistema'},
+  hWrongScope:{id:'hWrongScope',tenantId,polizaId:'p2',asesorId:'a1',tipo:'nota'}
+ }
 };
 let member={uid:'u1',tenantId,status:'active',roles:['Asesor','Operativo'],advisorId:'a1',countries:['GT','CO'],dataScopes:{default:'own'}};
 let cfg={roleScopes:{asesor:'own',operativo:'all'}};
@@ -124,6 +131,23 @@ async function deny(fn,code){let thrown;try{await fn()}catch(e){thrown=e}assert.
  assert.ok(!legacyOps.rows.some(x=>x.id==='gNoParent'),
    'B4_003_LEGACY_COUNTRY_RELATION_REGRESSION:unknown_country_must_remain_denied');
  checks+=3;
+ // B4-003: history is a tenant-scoped product capability, but legacy records
+ // with no verified country/parent must NOT become visible via a broad read.
+ const scopedHistory=await flow('actividades','asesor');
+ assert.deepEqual(scopedHistory.rows.map(x=>x.id),['hClient','hPolicy']);
+ checks++;
+ const privilegedHistory=await flow('actividades','operativo');
+ assert.deepEqual(privilegedHistory.rows.map(x=>x.id),['hClient','hForeign','hPolicy','hWrongScope']);
+ checks++;
+ assert.ok(!privilegedHistory.rows.some(x=>x.id==='hNoParent'));checks++;
+ await deny(()=>read('actividades','hNoParent'),'RECORD_NOT_FOUND_OR_DENIED');checks++;
+ await deny(()=>read('actividades','hForeign'),'RECORD_NOT_FOUND_OR_DENIED');checks++;
+ member={...member,modulesRestricted:['historial']};
+ await deny(()=>flow('actividades','asesor'),'MODULE_DENIED');checks++;
+ member={...member,modulesRestricted:[]};
+ const coHistory=await flow('actividades','operativo',{country:'CO'});
+ assert.equal(coHistory.rows.length,0);checks++;
+ console.log('B4_003_HISTORY_VERIFIED_RELATION_ROLE_COUNTRY_SCOPE_QA_PASS checks=7 no_data_writes');
  console.log('B4_003_LEGACY_COUNTRY_RELATION_REGRESSION_PASS checks=3 no_data_writes');
  console.log('B4_003_RELATED_SERVER_BATCH_SCOPE_MOCK_PASS checks='+checks+' no Firebase writes');
  console.log('B4_003_RELATED_DOCUMENT_SERVER_SCOPE_MOCK_PASS checks='+checks+' no Firebase writes');
