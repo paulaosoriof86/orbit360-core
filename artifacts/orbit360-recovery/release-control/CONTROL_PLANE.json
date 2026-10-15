@@ -10974,7 +10974,15 @@
     "compositionBlobSha": "451021b8a89b872bd30db1045662106937f7f4af",
     "globallyAuthorizedProductMutation": false,
     "existingB4Only": true,
-    "qaGuardRequired": true
+    "qaGuardRequired": true,
+    "qaGuardRunId": 38668058258,
+    "qaGuardConclusion": "success",
+    "metasSyntheticScopeChecks": 7,
+    "historySyntheticScopeChecks": 7,
+    "protectedReadMockChecks": 55,
+    "previewTechnicalBuildRunId": 38668152907,
+    "previewSourceSha": "b2dec8726ec1af300174277781cc15b684c74ea1",
+    "authenticatedMetasE2E": false
   },
   "b4003ProtectedTransportParityFix": {
     "gate": "I6.5/B4-003",
@@ -10988,7 +10996,10 @@
     "noBusinessWrites": true,
     "compositionBlobSha": "c8c6507a3b19745128b484667a41124ab729b05b",
     "previousVisualAcceptancePreserved": true,
-    "authenticatedE2E": false
+    "authenticatedE2E": false,
+    "technicalPreviewRunId": 38668152907,
+    "hostedAllowlistVerified": true,
+    "authenticatedScopePass": false
   },
   "b4003MetasHistorialLatestTechnicalPreview": {
     "gate": "I6.5/B4-003",
@@ -11010,13 +11021,48 @@
     "operationalWrites": 0
   },
   "b4003ExactPublicBrowserSmoke20261014": {
-    "status": "REQUESTED_NOT_PROVEN",
+    "status": "PUBLIC_LOGIN_RENDER_PASS_AUTHENTICATED_UAT_PENDING",
     "gate": "I6.5/B4-003",
-    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-38668152907-wou5i63o.web.app",
     "sourceSha": "b2dec8726ec1af300174277781cc15b684c74ea1",
-    "access": "ANONYMOUS_PUBLIC_ONLY",
-    "dataWrites": 0,
+    "buildId": "gi-i65-b4-b2dec8726ec1-57f234755dc1",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-38668152907-wou5i63o.web.app",
+    "runId": 38668687052,
+    "runConclusion": "success",
+    "artifactId": 11942248448,
+    "realChromium": true,
+    "responsiveCases": [
+      {
+        "width": 1440,
+        "loginVisible": true,
+        "bodyCharacters": 579,
+        "pageErrors": 0,
+        "httpErrors": 0,
+        "horizontalOverflow": false
+      },
+      {
+        "width": 390,
+        "loginVisible": true,
+        "bodyCharacters": 271,
+        "pageErrors": 0,
+        "httpErrors": 0,
+        "horizontalOverflow": false
+      },
+      {
+        "width": 320,
+        "loginVisible": true,
+        "bodyCharacters": 271,
+        "pageErrors": 0,
+        "httpErrors": 0,
+        "horizontalOverflow": false
+      }
+    ],
+    "unauthenticatedPublicStartupPass": true,
+    "roleAuthorizedUiProof": false,
+    "realDataAcceptance": false,
+    "liveReleaseAccepted": false,
+    "realBusinessWrites": 0,
+    "firestoreRulesDeployed": false,
     "productionPromotion": false,
-    "authenticatedProductAcceptance": false
+    "screenshotsArtifact": "gravicentra-b4003-public-browser-38668687052"
   }
 }
