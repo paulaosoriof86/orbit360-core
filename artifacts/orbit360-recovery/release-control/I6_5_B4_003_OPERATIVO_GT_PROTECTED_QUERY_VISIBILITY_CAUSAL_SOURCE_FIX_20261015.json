@@ -1,0 +1,23 @@
+{
+  "schema": "GRAVICENTRA_B4_003_OPERATIVE_PROTECTED_QUERY_VISIBILITY_SCOPED_PATCH_V1",
+  "recordedDate": "2026-10-15",
+  "gate": "I6.5/B4-003",
+  "status": "SCOPED_SOURCE_FIXED_VM_QA_AND_EXACT_PREVIEW_PENDING",
+  "authority": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PAULA_PROTECTED_HYDRATION_SOURCE_AUTH_20261013.json",
+  "authorityBlob": "3b17ba3e560117345afc8fb476580ed26e275d67",
+  "allowedOwner": "orbit360-platform/core/backend-product-readonly-bootstrap-p0.js",
+  "allowedQa": "tools/gravicentra-b4-003-protected-hydration.test.cjs",
+  "priorRun": 38766903674,
+  "rootCause": "The product static tenantAccessPolicy moduleVisible rejects Operativo negocio/gestion query plans with modulo_no_visible when modulesVisible/modulesExtra are absent, even while the authenticated role UI has both modules enabled and the server-scoped callable independently allows those records. It causes protected store attach-error after switching role.",
+  "previousOwnerBlob": "89a9083d192ba6a6516b42c5e730596499da75a7",
+  "newOwnerBlob": "67193403d977f724ad7abfc86a7892d3d073e775",
+  "previousQaBlob": "91e4bc72c232cdb46ded0ec5ea84d56524e2c2e1",
+  "newQaBlob": "2ff039f1d9dfecb1601585397bc94a6e8580c3c2",
+  "change": "Within the pre-authorized protected-read bootstrap owner, reconcile ONLY a sole modulo_no_visible compile error for Operativo and negocios/leads or gestiones/ops, with allowed effective module view, exact tenant constraint, an existing scoped plan and no __deny__. All other errors and unsupported roles stay denied. Backend authorization remains mandatory.",
+  "notClosed": "Preview source mutation requires a NEW build/digest and authenticated role/country reload plus human UAT. Prior Preview source remains immutable. Shared Firestore rules P0 still open.",
+  "noDataWrites": true,
+  "noSyntheticWrites": true,
+  "noRulesDeployed": true,
+  "noLivePromotion": true,
+  "noReimport": true
+}

@@ -36,6 +36,33 @@
     catch (error) { return value && typeof value === 'object' ? Object.assign({}, value) : value; }
   }
 
+  // B4-003 scoped-only resolution of a stale static module visibility check.
+  // The effective module gate and the server callable must BOTH authorize.
+  // Never promote a denied/foreign scope or a malformed tenant plan.
+  function protectedReadRolePlan(collection, membership, selected, compiled) {
+    var moduleKey = collection === 'negocios' ? 'leads' :
+      collection === 'gestiones' ? 'ops' : '';
+    if(!moduleKey || String(selected||'').toLowerCase() !== 'operativo' ||
+       !compiled || compiled.ok !== false) return compiled;
+    var errors = Array.isArray(compiled.errors) ? compiled.errors : [];
+    if(errors.length !== 1 || errors[0] !== 'modulo_no_visible' ||
+       compiled.module !== moduleKey ||
+       ['own','team','all'].indexOf(String(compiled.scope||'')) < 0) return compiled;
+    var constraints = Array.isArray(compiled.constraints) ? compiled.constraints : [];
+    var tenant = constraints.filter(function(c){return c&&c.field==='tenantId'&&
+      c.op==='=='&&c.value===membership.tenantId;});
+    if(tenant.length!==1 || constraints.some(function(c){return c&&c.field==='__deny__';}))
+      return compiled;
+    var access=window.Orbit&&window.Orbit.access;
+    if(!access||typeof access.can!=='function'||
+       access.can(moduleKey,'view')!==true) return compiled;
+    // This plan is still used solely to request the independently scoped
+    // Preview callable; it is not an access grant or a Firestore Rules bypass.
+    return Object.assign({},compiled,{ok:true,errors:[],
+      protectedReadAuthorization:'EFFECTIVE_MODULE_VIEW_PLUS_SERVER_SCOPED_CALLABLE'});
+  }
+  // B4_003_PROTECTED_ROLE_QUERY_PARITY_END
+
   function unique(values) {
     var out = [];
     (Array.isArray(values) ? values : []).forEach(function (value) {
@@ -273,8 +300,9 @@
           var norm=function(v){return text(v).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'_');};
           if(!(membership.roles||[]).some(function(r){return norm(r)===norm(selected);}))
             return {ok:false,hardError:true,constraints:[],errors:['PROTECTED_ROLE_NOT_ASSIGNED']};
-          return window.Orbit.productQueryPlannerP0.compile(collection,
+          var compiled=window.Orbit.productQueryPlannerP0.compile(collection,
             Object.assign({},membership,{activeRole:selected}),{accessPolicy:accessPolicy});
+          return protectedReadRolePlan(collection,membership,selected,compiled);
         };
       }
       var storeDeps = typeof deps.firebaseAdapter.storeDependencies === 'function'

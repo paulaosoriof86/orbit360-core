@@ -7,6 +7,40 @@ const bootstrap=fs.readFileSync('orbit360-platform/core/backend-product-readonly
 assert.match(provider,/orbit360ScopedPolicyReadPreview/);
 assert.match(app,/scopedReadPreviewCandidate===true/);
 assert.match(bootstrap,/protectedReadCandidate: options.protectedReadCandidate===true/);
+
+// Fail-closed role-switch regression: only an exact stale module visibility
+// error for Operativo Ops/Leads may be reconciled, never disabled modules,
+// foreign roles, denied scopes, mismatched tenants or additional plan errors.
+const begin=bootstrap.indexOf('  function protectedReadRolePlan(');
+const end=bootstrap.indexOf('  // B4_003_PROTECTED_ROLE_QUERY_PARITY_END',begin);
+assert.ok(begin>0&&end>begin,'B4_003_PROTECTED_ROLE_QUERY_PARITY_HELPER_MISSING');
+const probeContext={window:{Orbit:{access:{can:(module,action)=>['ops','leads'].includes(module)&&action==='view'}}}};
+vm.runInNewContext(bootstrap.slice(begin,end)+'\nthis.probe=protectedReadRolePlan;',probeContext);
+const prototypePlan=(moduleKey)=>({ok:false,errors:['modulo_no_visible'],module:moduleKey,scope:'all',
+ constraints:[{field:'tenantId',op:'==',value:'synthetic-tenant'}]});
+const membershipProbe={tenantId:'synthetic-tenant'};
+for(const [collection,module] of [['negocios','leads'],['gestiones','ops']]){
+ const plan=prototypePlan(module),fixed=probeContext.probe(collection,membershipProbe,'Operativo',plan);
+ assert.equal(fixed.ok,true,'OPERATIVE_PROTECTED_MODULE_VISIBILITY_PARITY_REQUIRED');
+ assert.equal(fixed.constraints[0].value,'synthetic-tenant');
+ assert.equal(probeContext.probe(collection,membershipProbe,'Asesor',plan).ok,false,
+   'FOREIGN_ROLE_MUST_NOT_BYPASS');
+ const extra={...plan,errors:['modulo_no_visible','tenant_constraint_unico_requerido']};
+ assert.equal(probeContext.probe(collection,membershipProbe,'Operativo',extra).ok,false,
+   'OTHER_QUERY_PLAN_ERRORS_MUST_REMAIN_BLOCKING');
+ const noScope={...plan,scope:'none',constraints:[...plan.constraints,{field:'__deny__',op:'==',value:true}]};
+ assert.equal(probeContext.probe(collection,membershipProbe,'Operativo',noScope).ok,false,
+   'SCOPE_NONE_MUST_REMAIN_DENIED');
+ const wrongTenant={...plan,constraints:[{field:'tenantId',op:'==',value:'foreign-tenant'}]};
+ assert.equal(probeContext.probe(collection,membershipProbe,'Operativo',wrongTenant).ok,false,
+   'TENANT_CONSTRAINT_MUST_REMAIN_EXACT');
+}
+const deniedAccess={window:{Orbit:{access:{can:()=>false}}}};
+vm.runInNewContext(bootstrap.slice(begin,end)+'\nthis.probe=protectedReadRolePlan;',deniedAccess);
+assert.equal(deniedAccess.probe('gestiones',membershipProbe,'Operativo',prototypePlan('ops')).ok,false,
+ 'MODULE_NOT_ENABLED_MUST_REMAIN_DENIED');
+console.log('B4_003_PROTECTED_OPERATIVE_ROLE_SWITCH_PARITY_STATIC_AND_VM_PASS checks=12 no_data_writes');
+
 const events={},calls=[],tenant='synthetic-tenant';let role='asesor',direct=0;
 const win={Orbit:{session:{rol:()=>role}}};
 const doc={addEventListener:(k,fn)=>{(events[k]||(events[k]=[])).push(fn);},
