@@ -1830,3 +1830,66 @@ jobs:
         if: failure() && (steps.gate.outputs.run == 'true' || steps.gate.outputs.renewals_preview == 'true')
         run: echo "B4_003_FAILED_NO_REIMPORT_NO_LIVE"
 # R12 contract harness rootfix trigger 2026-10-03
+
+
+  b4-003-readonly-renewals:
+    if: github.event_name == 'push' && github.event.head_commit.message == 'test(i6.5 B4-003): existing Preview readonly renewals'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 18
+    permissions:
+      contents: read
+    env:
+      PROJECT_ID: ays-orbit-360-lab
+      TENANT_HINT: alianzas-soluciones
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_LAB_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      RECEIPT: artifacts/orbit360-recovery/release-control/I6_5_B4_003_AUTHENTICATED_SCOPED_READONLY_PREVIEW_RECEIPT_20261015.json
+      B4_RENEWALS_PROOF_OUT: ${{ runner.temp }}/gravicentra-b4-003-renewals-readonly.json
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: recovery/fase-a-clean-20260831
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify existing candidate and fail-closed governance
+        run: |
+          set -euo pipefail
+          node - <<'NODE'
+          const fs=require('fs'),c=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json','utf8')),l=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B4_EXECUTION_LOCK_20261002.json','utf8')),r=JSON.parse(fs.readFileSync(process.env.RECEIPT,'utf8'));
+          if(c.currentB4?.status!=='B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL'||c.nextAction!=='I6_5_FORENSIC_REMEDIATION_B4_003_R20_TARGETED_PAULA_VISUAL'||c.b4003SecurityReleaseHold?.status!=='ACTIVE_FAIL_CLOSED_UNAUTHORIZED_BROWSER_FIRESTORE_READ_WRITE'||l.boundaries?.dataMutationAuthorized!==false||l.boundaries?.realOperationalWritesAuthorized!==false||l.boundaries?.livePromotionAuthorized!==false||r.workflowRunId!==38713063435||r.executedHead!=='8b4a6b12b753a0fefcdbde053517381f98f02c35')throw Error('B4_003_READONLY_RENEWALS_AUTHORITY_DENIED');
+          NODE
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const r=JSON.parse(fs.readFileSync(process.env.RECEIPT,'utf8'));
+          const response=await fetch(r.previewUrl+'/__recovery__/build.json?readonly='+Date.now());
+          if(!response.ok)throw Error('PREVIEW_UNAVAILABLE');
+          const b=await response.json();
+          if(b.sourceSha!==r.executedHead||b.buildId!==r.buildId)throw Error('EXACT_PREVIEW_DRIFT');
+          fs.appendFileSync(process.env.GITHUB_ENV,'B4_PREVIEW_URL='+r.previewUrl+'\n');
+          NODE
+      - name: Prepare read-only QA dependencies
+        run: |
+          set -euo pipefail
+          SA="$SA_LAB"
+          if [ -z "$SA" ]; then SA="$SA_LAB_ALT"; fi
+          if [ -z "$SA" ]; then SA="$SA_DEFAULT"; fi
+          test -n "$SA"
+          printf '%s' "$SA" > "$RUNNER_TEMP/gravicentra-readonly-sa.json"
+          chmod 600 "$RUNNER_TEMP/gravicentra-readonly-sa.json"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/gravicentra-readonly-sa.json" >> "$GITHUB_ENV"
+          npm install --no-save --package-lock=false --ignore-scripts firebase-admin@13.4.0 playwright@1.55.0
+          npx playwright install --with-deps chromium
+      - name: Run existing authenticated Renovaciones read-only proof
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-i6-5-b4-003-renewals-priority-preview-proof.mjs
+      - name: Preserve targeted QA outcome
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gravicentra-b4-003-renewals-readonly-${{ github.run_id }}
+          path: ${{ runner.temp }}/gravicentra-b4-003-renewals-readonly.json
+          if-no-files-found: warn
