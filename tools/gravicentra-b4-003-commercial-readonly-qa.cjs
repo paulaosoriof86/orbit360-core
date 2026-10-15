@@ -174,10 +174,28 @@ async function main(){
         counts={};
       for(const k of ['negocios','gestiones']){
         const rows=getRows(k),keys=new Set(rows.map(x=>String(x.canonicalDocumentId||x.id||'')));
+        const p=st.queryPlans?.[k]||{},error=String(snapshotErrors[k]||'');
+        // Aggregated, categorical diagnostics only. No record content, IDs,
+        // UID, emails, filenames, request URLs or raw error detail in receipts.
+        const knownCodes=['PROTECTED_READ_PLAN_DENIED','PROTECTED_READ_ROLE_NOT_ASSIGNED',
+          'PROTECTED_READ_CONTEXT_CHANGED','PROTECTED_READ_PARAMETERS_DENIED',
+          'PROTECTED_READ_COUNTRY_DENIED','PROTECTED_READ_SERVER_RESPONSE_INVALID',
+          'PROTECTED_READ_COLLECTION_UNSUPPORTED','PROTECTED_READ_DUPLICATE_OR_MISSING_ID',
+          'PROTECTED_READ_ROLE_DENIED','permission-denied'];
+        const categorizedError=knownCodes.find(x=>error.includes(x))||
+          (error?'OTHER_SANITIZED_ERROR':'');
+        const allowedPlanErrors=['politica_no_autoriza_consulta','scope_own_sin_constraint_asesor',
+          'scope_team_sin_constraint_equipo','scope_none_sin_deny',
+          'modulo_no_visible','tenant_constraint_unico_requerido',
+          'PROTECTED_ROLE_NOT_ASSIGNED','politica_acceso_faltante',
+          'membresia_inactiva','tenant_faltante','coleccion_faltante'];
         counts[k]={storeRows:rows.length,serverPageRows:ids[k].length,
           serverIdsPresentInStore:ids[k].filter(id=>keys.has(id)).length,
           serverConfirmed:allNames.includes(k),denied:(st.deniedCollections||[]).includes(k),
-          hasSnapshotError:!!snapshotErrors[k]};
+          hasSnapshotError:!!snapshotErrors[k],snapshotErrorCategory:categorizedError,
+          queryPlanHardError:p.hardError===true,queryPlanDenied:p.denied===true,
+          queryPlanOk:p.ok===true,queryPlanScope:String(p.scope||'').slice(0,16),
+          queryPlanErrors:(p.errors||[]).filter(x=>allowedPlanErrors.includes(String(x))).slice(0,8)};
       }
       return{status:String(st.status||''),ready:st.ready===true,
         requiredConfirmed:['negocios','gestiones'].every(k=>allNames.includes(k)),

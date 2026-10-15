@@ -1,0 +1,40 @@
+{
+  "schema": "GRAVICENTRA_B4_003_OPS_ROLE_SWITCH_PROTECTED_ATTACH_DIAGNOSTIC_V1",
+  "date": "2026-10-15",
+  "gate": "I6.5/B4-003",
+  "status": "QA_ONLY_SOURCE_STAGED_PENDING_RUNTIME",
+  "fromHead": "28d9f764517e77cbb6a04bb53275169a6b24940b",
+  "existingPreview": {
+    "sourceHead": "ae6bc8be5c74581f6fb920ea79e39c826a7d1d9f",
+    "artifactId": 11983958349
+  },
+  "observedPriorRun": 38766159124,
+  "priorFinding": {
+    "operativo": {
+      "role": "operativo",
+      "country": "GT",
+      "status": "attach-error",
+      "negociosServerRows": 4,
+      "gestionesServerRows": 5,
+      "storeRowsNegocios": 0,
+      "storeRowsGestiones": 0,
+      "hasSnapshotError": true
+    },
+    "asesor": {
+      "role": "asesor",
+      "country": "GT",
+      "status": "ready-read-only",
+      "confirmed": true
+    },
+    "reusedExistingBrowserSession": true
+  },
+  "diagnostic": "Record only allowlisted query-plan failure codes, hardError/denied flags, snapshot error category, readiness, and counts. No business data, actor identity or raw messages. Target product owner is dynamic read-only query compilation and role switch.",
+  "qaPath": "tools/gravicentra-b4-003-commercial-readonly-qa.cjs",
+  "fromBlob": "49360ae392a2a7b90523304ae72103460c19f3ac",
+  "toBlob": "6a20dec7c62d49be392b25eee99d4e9ab19a345c",
+  "noProductSourceChange": true,
+  "noRulesDeploy": true,
+  "noLive": true,
+  "noOperationalWrites": true,
+  "decision": "Do not open new gate or declare server/UI parity PASS. If confirmed hardError, do cause-aligned source authorization within B4; otherwise classify the protected read failure."
+}
