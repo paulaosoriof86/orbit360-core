@@ -291,6 +291,29 @@ try{
     await page.goto(target+'/#/inicio',{waitUntil:'domcontentloaded',timeout:60000});
     await bootProduct(page,token);await selectRole(page,role);
     const session={role,actorUidHash:hash(who.uid).slice(0,16),cold:[],warm:[],mobile:[],firstPaint:null};
+    // Ensure both REQUIRED collections are actually confirmed before proving
+    // that removing optional Aseguradoras does not block Renovaciones.
+    // This is a fail-closed 8-second startup assertion, not a successful timeout path.
+    let firstPaintReady=false;
+    try {
+      await page.waitForFunction(()=>{
+        const s=Orbit.store&&Orbit.store._productStatus&&Orbit.store._productStatus();
+        const confirmed=[].concat(s&&s.serverConfirmedCollections||[]);
+        return ['clientes','polizas'].every(x=>confirmed.includes(x));
+      },null,{timeout:8000});
+      firstPaintReady=true;
+    }catch{}
+    if(!firstPaintReady){
+      const status=await page.evaluate(()=>{
+        const s=Orbit.store&&Orbit.store._productStatus&&Orbit.store._productStatus()||{};
+        return {confirmed:[].concat(s.serverConfirmedCollections||[]).filter(x=>['clientes','polizas','aseguradoras'].includes(x)),
+          denied:[].concat(s.deniedCollections||[]).filter(x=>['clientes','polizas'].includes(x)),
+          errors:Object.keys(s.snapshotErrors||{}).filter(x=>['clientes','polizas'].includes(x))};
+      });
+      session.prePaintRequiredData=status;
+      proof.sessions.push(session);
+      need(false,'B4_003_FIRST_PAINT_REQUIRED_SERVER_DATA_NOT_READY:'+JSON.stringify(status));
+    }
     session.firstPaint=await firstPaintGuard(page);
     for(const country of proof.countries)session.cold.push(await renderCountry(page,country,'cold','DESKTOP'));
     await page.evaluate(()=>{location.hash='#/inicio';});
