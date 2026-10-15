@@ -11338,7 +11338,7 @@
     "exactPreviewSource": "dc394982cadbb51ee943a6c81fc2c84e54a5fe0b"
   },
   "b4003PolicyPagingPerformance20261015": {
-    "status": "SOURCE_STAGED_EXACT_PREVIEW_AND_AUTH_PERFORMANCE_PROOF_PENDING",
+    "status": "EXACT_HOSTING_AND_AUTHENTICATED_SCOPED_GT_PASS_FUNCTIONAL_PERFORMANCE_QA_PENDING",
     "gate": "I6.5/B4-003",
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PROTECTED_POLICY_PAGING_PERFORMANCE_SOURCE_FIX_20261015.json",
     "receiptBlobSha": "8db32c6a017defba14b770d397962d871cf003ad",
@@ -11357,6 +11357,13 @@
     "qaStatus": "TEST_COUNTRY_EXPECTATION_REPAIRED_GUARD_AND_EXACT_PREVIEW_PENDING",
     "guardFailureRunId": 38720001558,
     "guardRootFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PAGING_QA_GUARD_ROOT_FIX_20261015.json",
-    "guardRootFixReceiptBlobSha": "19d5c55c6537c52a8303b19b792c43b4ca7ab7c7"
+    "guardRootFixReceiptBlobSha": "19d5c55c6537c52a8303b19b792c43b4ca7ab7c7",
+    "technicalRunId": 38720928748,
+    "artifactId": 11965961374,
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-38720928748-vj9zib9f.web.app",
+    "buildId": "gi-i65-b4-e2939e391696-57f234755dc1",
+    "exactReadbackReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PAGING_EXACT_PREVIEW_FUNCTIONAL_QA_BINDING_20261015.json",
+    "guardRunId": 38720928640,
+    "guardConclusion": "success"
   }
 }

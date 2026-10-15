@@ -1846,7 +1846,7 @@ jobs:
       SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
       SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
       SA_LAB_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
-      RECEIPT: artifacts/orbit360-recovery/release-control/I6_5_B4_003_RENEWALS_QA_FILTER_EXACT_PREVIEW_READBACK_20261015.json
+      RECEIPT: artifacts/orbit360-recovery/release-control/I6_5_B4_003_PAGING_EXACT_PREVIEW_FUNCTIONAL_QA_BINDING_20261015.json
     steps:
       - uses: actions/checkout@v4
         with:
@@ -1860,7 +1860,7 @@ jobs:
           set -euo pipefail
           node - <<'NODE'
           const fs=require('fs'),c=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json','utf8')),l=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B4_EXECUTION_LOCK_20261002.json','utf8')),r=JSON.parse(fs.readFileSync(process.env.RECEIPT,'utf8'));
-          if(c.currentB4?.status!=='B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL'||c.nextAction!=='I6_5_FORENSIC_REMEDIATION_B4_003_R20_TARGETED_PAULA_VISUAL'||c.b4003SecurityReleaseHold?.status!=='ACTIVE_FAIL_CLOSED_UNAUTHORIZED_BROWSER_FIRESTORE_READ_WRITE'||l.boundaries?.dataMutationAuthorized!==false||l.boundaries?.realOperationalWritesAuthorized!==false||l.boundaries?.livePromotionAuthorized!==false||r.workflowRunId!==38717794781||r.executedHead!=='dc394982cadbb51ee943a6c81fc2c84e54a5fe0b')throw Error('B4_003_READONLY_RENEWALS_AUTHORITY_DENIED');
+          if(c.currentB4?.status!=='B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL'||c.nextAction!=='I6_5_FORENSIC_REMEDIATION_B4_003_R20_TARGETED_PAULA_VISUAL'||c.b4003SecurityReleaseHold?.status!=='ACTIVE_FAIL_CLOSED_UNAUTHORIZED_BROWSER_FIRESTORE_READ_WRITE'||l.boundaries?.dataMutationAuthorized!==false||l.boundaries?.realOperationalWritesAuthorized!==false||l.boundaries?.livePromotionAuthorized!==false||r.workflowRunId!==38720928748||r.executedHead!=='e2939e3916967bfcc4bbf3bebc6ab24869c0945a')throw Error('B4_003_READONLY_RENEWALS_AUTHORITY_DENIED');
           NODE
           node --input-type=module <<'NODE'
           import fs from 'node:fs';
