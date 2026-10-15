@@ -10742,6 +10742,19 @@
     "releaseAccepted": false,
     "executionLockBlobSha": "8f78bfd3ed4d6c17db51b664921e92d760faea95",
     "compositionBlobSha": "f0c3a2ea74ba1be707f2d9909acf55acde9287af",
-    "lastQaFinding": "TWO_LEGACY_ASSERTIONS_PREVIOUSLY_EXPECTED_ALL_OR_NOTHING_RELATED_RECEIPT_FAILURE;NOW_REQUIRE_VISIBLE_VALID_ROWS"
+    "lastQaFinding": "TWO_LEGACY_ASSERTIONS_PREVIOUSLY_EXPECTED_ALL_OR_NOTHING_RELATED_RECEIPT_FAILURE;NOW_REQUIRE_VISIBLE_VALID_ROWS",
+    "emulatorProof": {
+      "status": "PASS_SYNTHETIC_SECURITY_NOT_REAL_AUTHENTICATED_PRODUCT_ACCEPTANCE",
+      "runId": 38660079937,
+      "headSha": "95dd16190a18c978afceb78d85a1a3ee5fd38c84",
+      "securityRulesInProductionModified": false,
+      "checks": [
+        "B3_GT_CLIENT_CO_POLICY_COUNTRY_PRIORITY",
+        "VALID_FINANCIAL_ROWS_SURVIVE_BAD_ROW",
+        "AUTH_DENIAL",
+        "EQUIPO_ADMIN_DIRECTORY_OPERATIONAL_FIELDS"
+      ],
+      "previewPending": true
+    }
   }
 }
