@@ -1,0 +1,103 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_AUTHENTICATED_SCOPED_PREVIEW_READ_ONLY_EVIDENCE_V1",
+  "date": "2026-10-15",
+  "gate": "I6.5/B4-003",
+  "status": "SCOPED_CALLABLE_AUTHENTICATED_READ_ONLY_PROOF_PASS_NOT_FULL_SECURITY_ACCEPTANCE",
+  "evidenceType": "PHYSICAL_GITHUB_ACTIONS_ARTIFACT_CONFIRMED",
+  "repo": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "executedHead": "8b4a6b12b753a0fefcdbde053517381f98f02c35",
+  "workflowRunId": 38713063435,
+  "workflowUrl": "https://github.com/paulaosoriof86/orbit360-core/actions/runs/38713063435",
+  "workflowConclusion": "success",
+  "guardRunId": 38713063718,
+  "guardConclusion": "success",
+  "artifactId": 11961810722,
+  "artifactName": "gravicentra-b4-003-scoped-preview-38713063435",
+  "artifactDigest": "sha256:a90f8239d1e8d512b9e5c7f85dfc4f3df0be1f8735b3da3e4d70256059aeb3c6",
+  "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-38713063435-2p8096b0.web.app",
+  "buildId": "gi-i65-b4-8b4a6b12b753-57f234755dc1",
+  "hostedFileCount": 218,
+  "hostedPayloadDigest": "d93906f67e0b899fd9231c3f1aab9266b4144bee8857338217a9e0c6e17a7ed7",
+  "backendSourceDigest": "ebdfb5105050922549638a52140bff74807a4aaa546b66c5a17a787321d791ee",
+  "bundleDigest": "23012a30e3b9f60319f1b13c51725bd203108c3c6d34cc096ccb4aa224ff64df",
+  "authenticatedScope": {
+    "method": "Firebase Auth verified existing actors + browser callable; no credentials or identity data emitted",
+    "countriesTested": [
+      "GT"
+    ],
+    "roles": [
+      {
+        "role": "Dirección",
+        "authorizedCollections": 9,
+        "unexpectedDenials": 0,
+        "negativeAccessDenials": 3,
+        "bootstrap": true,
+        "consolePageErrors": 0,
+        "scopeExamples": {
+          "clientes": "all",
+          "polizas": "all",
+          "cobros": "all"
+        }
+      },
+      {
+        "role": "Operativo",
+        "authorizedCollections": 9,
+        "unexpectedDenials": 0,
+        "negativeAccessDenials": 3,
+        "bootstrap": true,
+        "consolePageErrors": 0,
+        "scopeExamples": {
+          "clientes": "all",
+          "polizas": "team",
+          "cobros": "team"
+        },
+        "note": "Zero returned cobros in one team-scoped page is not evidence that the full portfolio is empty."
+      },
+      {
+        "role": "Asesor",
+        "authorizedCollections": 2,
+        "expectedInsurerDirectoryDenial": true,
+        "negativeAccessDenials": 3,
+        "bootstrap": true,
+        "consolePageErrors": 0,
+        "scopeExamples": {
+          "clientes": "own",
+          "polizas": "own"
+        }
+      }
+    ],
+    "allowChecks": 20,
+    "expectedDenials": 10,
+    "unexpectedAllow": 0,
+    "unexpectedDeny": 0
+  },
+  "boundaries": {
+    "operationalDataWrites": 0,
+    "syntheticWrites": 0,
+    "productionMutation": false,
+    "firestoreSharedRulesDeploy": false,
+    "livePromotion": false,
+    "reimport": false,
+    "previousB3PassPreserved": true,
+    "findingsInventoryPreserved": 295,
+    "attentionInventoryPreserved": 166
+  },
+  "notProven": [
+    "Firestore shared rules security positive/negative after deploy",
+    "CO role/country E2E",
+    "Team/own full negative record ID tests",
+    "Real UI readback and reload of Renovaciones, Cancelaciones, Ops, Leads, Inicio, Equipo, Cliente 360, Cobros, Calidad and Aseguradoras",
+    "Collaborative state-changing two-user Ops↔Leads workflow",
+    "Preview visual acceptance by Paula",
+    "Live production exact promotion and acceptance"
+  ],
+  "carryForward": {
+    "ledgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
+    "ledgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
+    "activeFinding": "B4-003",
+    "p0Security": "OPEN_NOT_ACCEPTED",
+    "currentGateNoChange": true,
+    "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_R20_TARGETED_PAULA_VISUAL"
+  }
+}
