@@ -11258,6 +11258,17 @@
     "firestoreRulesDeploy": false,
     "operationalDataWrites": 0,
     "livePromotion": false,
-    "next": "EXACT_PREVIEW_THEN_AUTHENTICATED_FUNCTIONAL_AND_VISUAL"
+    "next": "EXACT_PREVIEW_THEN_AUTHENTICATED_FUNCTIONAL_AND_VISUAL",
+    "exactPreviewDispatch": {
+      "status": "REQUESTED_EXISTING_B4_003_CUMULATIVE_PREVIEW",
+      "sourceProductBlob": "5a1d36f898f88b45550c94868abb30a837972c4f",
+      "sameAccumulatedTree": true,
+      "noNewMethodology": true,
+      "securityP0StillOpen": true,
+      "realAuthenticatedFunctionalUat": "PENDING",
+      "operationalWritesAuthorized": false,
+      "firestoreRulesDeploymentAuthorized": false,
+      "livePromotionAuthorized": false
+    }
   }
 }
