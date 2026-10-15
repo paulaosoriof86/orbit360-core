@@ -1,0 +1,76 @@
+{
+  "schema": "GRAVICENTRA_I65_B4003_OCT15_SCOPED_PREVIEW_CERTIFIED_EVIDENCE_V1",
+  "date": "2026-10-15",
+  "status": "EXACT_HOSTING_AND_SCOPED_AUTHENTICATED_READONLY_PASS_NOT_B4_003_RELEASE_PASS",
+  "gate": "I6.5/B4-003",
+  "sourceHead": "ae6bc8be5c74581f6fb920ea79e39c826a7d1d9f",
+  "productFilesUnchangedFrom": "4bc6d6c1dcb60a01cbf2cc80aa8894e469f59616",
+  "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-38758078678-iemf2kl2.web.app",
+  "buildId": "gi-i65-b4-ae6bc8be5c74-57f234755dc1",
+  "runId": 38758078678,
+  "runUrl": "https://github.com/paulaosoriof86/orbit360-core/actions/runs/38758078678",
+  "artifactId": 11983958349,
+  "artifactName": "gravicentra-b4-003-scoped-preview-38758078678",
+  "artifactDigest": "sha256:8ab8ac40f70d472d0df891d280f57974be94ae87ff51104434080d6416dcca69",
+  "artifactSizeBytes": 30758,
+  "execution": {
+    "jobId": 116501744098,
+    "stepsPass": [
+      "Gate exact B4-003 Preview",
+      "Snapshot preexisting LIVE binding before exact Preview",
+      "Materialize immutable B4-003 package",
+      "Deploy exact package to isolated Preview",
+      "Exact Hosting Preview readback",
+      "Protected B4-003 Preview public and emulator smoke",
+      "Authenticated scoped role-country readback",
+      "Preserve isolated B4-003 Preview evidence"
+    ],
+    "runConclusion": "success",
+    "exactHostingReadback": true,
+    "publicAndEmulatorSmoke": true,
+    "authenticatedScopedReadback": true,
+    "anonymousCallableDenied": true,
+    "authenticatedProofLogMessage": "B4_003_AUTHENTICATED_READONLY=AUTHENTICATED_READ_ONLY_PASS_NOT_RULES_ACCEPTANCE"
+  },
+  "sourceChangeCoverage": {
+    "inicio": {
+      "path": "orbit360-platform/modules/inicio.js",
+      "sha": "ac18016edccac7c0f54b29defbc2e1e8d1a388d1"
+    },
+    "calidad": {
+      "path": "orbit360-platform/modules/calidad.js",
+      "sha": "baaa2b6aec3b24fa49892da2a3fe3bfa6549d340"
+    }
+  },
+  "limits": {
+    "scopedReadOnlyNotSharedRulesAcceptance": true,
+    "notCompleteB4003RoleViewportCRUDMatrix": true,
+    "notUserVisualAcceptance": true,
+    "notLiveProductionAcceptance": true,
+    "noSharedFirestoreRuleDeployment": true,
+    "realBusinessWrites": 0,
+    "syntheticWrites": 0,
+    "reimport": false,
+    "livePromotion": false,
+    "tinyFish": false
+  },
+  "securityHold": "ACTIVE_FAIL_CLOSED_UNAUTHORIZED_BROWSER_FIRESTORE_READ_WRITE",
+  "remaining": [
+    "Ops/Leads D-04/D-15/D-18 transactional and document E2E",
+    "Emision customer-policy-receipts-portfolio integration",
+    "Inicio and Calidad targeted UI 1440/390/320 human acceptance",
+    "Effective shared Firestore rules negative/positive proofs before any rules promotion",
+    "QA residual records exact dependency authorization",
+    "LIVE release binding reconcile and release authorization"
+  ],
+  "checklist": {
+    "exactHead": true,
+    "runPass": true,
+    "materialSteps": true,
+    "artifactExact": true,
+    "lockStillOpen": true,
+    "securityStillHold": true,
+    "noProduction": true,
+    "compositionMatch": true
+  }
+}
