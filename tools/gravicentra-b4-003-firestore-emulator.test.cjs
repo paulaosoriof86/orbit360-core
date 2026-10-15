@@ -32,7 +32,7 @@ async function run(){
    await setDoc(doc(db,member('suspendedGT')),{uid:'suspendedGT',tenantId:tenant,status:'active',estado:'suspended',roles:['Operativo'],activeRole:'Operativo',advisorId:'advisor-own',countries:['GT'],dataScopes:{default:'own'}});
    await setDoc(doc(db,canonical('aseguradoras','insGT')),{id:'insGT',tenantId:tenant,pais:'GT',nombre:'Synthetic Insurer GT',password:'NEVER_EXPOSE_PASSWORD',portales:[{id:'portal',usuario:'test-user',password:'NEVER_EXPOSE_PORTAL',credentialRef:'cred_synthetic'}],cuentas:[{banco:'Synthetic Bank',numero:'00001111',tipo:'Monetaria',moneda:'GTQ'}]});
    await setDoc(doc(db,canonical('aseguradoras','insCO')),{id:'insCO',tenantId:tenant,pais:'CO',nombre:'Synthetic Insurer CO'});
-   await setDoc(doc(db,canonical('asesores','advisor-own')),{id:'advisor-own',tenantId:tenant,paises:['GT','CO'],nombre:'Synthetic Advisor Own'});
+   await setDoc(doc(db,canonical('asesores','advisor-own')),{id:'advisor-own',tenantId:tenant,paises:['GT','CO'],nombre:'Synthetic Advisor Own',rolDefault:'Asesor',scopeDatos:'propios',accessProvisioned:true,comModo:'comision',shareCom:68,comValor:325,modulosExtra:['cotizador'],modulosRestringidos:['finanzas']});
    await setDoc(doc(db,canonical('asesores','advisor-other')),{id:'advisor-other',tenantId:tenant,paises:['GT'],nombre:'Synthetic Advisor Other'});
    await setDoc(doc(db,canonical('polizas','own')),{tenantId:tenant,pais:'GT',asesorId:'advisor-own',clienteId:'c_own',numero:'SYNTHETIC-OWN'});
    await setDoc(doc(db,canonical('polizas','foreign')),{tenantId:tenant,pais:'GT',asesorId:'advisor-other',clienteId:'c_foreign',numero:'SYNTHETIC-FOREIGN'});
@@ -100,6 +100,10 @@ async function run(){
     assert.deepEqual(colInsurers.rows.map(x=>x.id),['insCO']);guardedDirectoryChecks++;
     const adminAdvisors=await dir('adminGT','Admin','asesores');
     assert.deepEqual(adminAdvisors.rows.map(x=>x.id),['advisor-other','advisor-own']);guardedDirectoryChecks++;
+    const restored=adminAdvisors.rows.find(x=>x.id==='advisor-own');
+    for(const [key,val] of Object.entries({rolDefault:'Asesor',scopeDatos:'propios',accessProvisioned:true,comModo:'comision',shareCom:68,comValor:325}))assert.equal(restored[key],val,'Advisor directory field lost: '+key);
+    assert.deepEqual(restored.modulosExtra,['cotizador']);assert.deepEqual(restored.modulosRestringidos,['finanzas']);
+    guardedDirectoryChecks+=8;
     const adminColAdvisors=await dir('adminGT','Admin','asesores','CO');
     assert.deepEqual(adminColAdvisors.rows.map(x=>x.id),['advisor-own']);guardedDirectoryChecks++;
     const adminPage=await dir('adminGT','Admin','asesores','GT',{pageSize:1});
@@ -243,6 +247,16 @@ async function run(){
     assert.deepEqual(allRows.rows.map(x=>x.id),['foreign','own']);positiveCount++;
     const colombiaRows=await list('opGT','operativo','CO');
     assert.deepEqual(colombiaRows.rows.map(x=>x.id),['co']);positiveCount++;
+    // B3-003: client may live in GT while its independently issued policy
+    // and attached receipt belong to CO. Never widen the scoped policy role.
+    await env.withSecurityRulesDisabled(async context=>{
+      await setDoc(doc(context.firestore(),canonical('polizas','crossCO')),{tenantId:tenant,pais:'CO',asesorId:'advisor-own',clienteId:'c_own'});
+      await setDoc(doc(context.firestore(),canonical('recibosEsperados','r_crossCO')),{tenantId:tenant,polizaId:'crossCO',clienteId:'c_own',monto:7});
+    });
+    const crossCO=await listRelated('opGT','operativo','recibosEsperados','',{country:'CO',policyIds:['crossCO']});
+    assert.deepEqual(crossCO.rows.map(x=>x.id),['r_crossCO']);
+    assert.equal(crossCO.rows[0].pais,'CO');
+    console.log('B4_003_B3_COUNTRY_LINEAGE_RESTORED_PASS 2 assertions synthetic_only');
     await env.withSecurityRulesDisabled(async context=>{
       await setDoc(doc(context.firestore(),`tenants/${tenant}/config/access`),{roleScopes:{operativo:'none',asesor:'own'}});
     });

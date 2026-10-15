@@ -10,13 +10,17 @@ const safeId=(id,label)=>{
  if(!value||value.length>180||/[\/\u0000-\u001f]/.test(value))throw new Denied(label+'_INVALID');
  return value;
 };
-function verifiedLinkedClient(ctx,client){
+function verifiedLinkedClient(ctx,client,policy){
  if(!client)return;
  if(client.tenantId&&client.tenantId!==ctx.tenantId)throw new Denied('RELATION_CLIENT_TENANT_DENIED');
- const country=clean(client.pais||client.country).toUpperCase();
- if(!country||country!==ctx.country)throw new Denied('RELATION_CLIENT_COUNTRY_DENIED');
- // Advisor ownership of the client may differ after a legitimate reassignment.
- // It must not override policy ownership for historical policy-linked rows.
+ // B3-003 ACCEPTED: the country of a policy-linked financial record is
+ // anchored to the policy, NOT to the client's current domicile.
+ // For client-only reads, the actual client country remains compulsory.
+ if(!policy){
+   const country=clean(client.pais||client.country).toUpperCase();
+   if(!country||country!==ctx.country)throw new Denied('RELATION_CLIENT_COUNTRY_DENIED');
+ }
+ // Ownership for a policy-linked historical item is checked against the policy.
 }
 function docRef(tenant,collection,id){
  return tenant.collection('data').doc(collection).collection('items').doc(id);
@@ -56,7 +60,7 @@ async function readScopedRelatedDocument({db,auth,request}){
    client=c.data()||{};
  }
  if(collection!=='clientes'&&!workflowCollections.has(collection)&&!client&&!policy)throw new Denied('RELATION_NOT_VERIFIABLE');
- try{verifiedLinkedClient(ctx,client);allowRow(ctx,row,policy?[policy]:client?[client]:[]);}
+ try{verifiedLinkedClient(ctx,client,policy);allowRow(ctx,row,policy?[policy]:client?[client]:[]);}
  catch(e){if(e instanceof Denied)throw new Denied('RECORD_NOT_FOUND_OR_DENIED');throw e;}
  return {ok:true,serverScoped:true,collection,country,scope:ctx.scope,
    row:Object.assign({},row,{id:row.id||documentId,canonicalDocumentId:documentId,
@@ -174,7 +178,7 @@ async function readScopedRelatedList({db,auth,request}){
      const csnap=await docRef(tenant,'clientes',safeId(clientId,'CLIENT')).get();
      if(!csnap.exists)throw new Denied('RELATION_CLIENT_NOT_FOUND');
      const verifiedClient=csnap.data()||{};
-     try{verifiedLinkedClient(ctx,verifiedClient);allowRow(ctx,verifiedPolicy);}
+     try{verifiedLinkedClient(ctx,verifiedClient,verifiedPolicy);allowRow(ctx,verifiedPolicy);}
      catch(e){if(e instanceof Denied)throw new Denied('POLICY_NOT_FOUND_OR_DENIED');throw e;}
      return [pid,{policy:verifiedPolicy,client:verifiedClient}];
    }));
@@ -205,13 +209,26 @@ async function readScopedRelatedList({db,auth,request}){
    catch(_){throw new Denied('CURSOR_DENIED');}
    query=query.startAfter(csnap);
  }
- const result=await query.limit(pageSize+1).get(),docs=Array.isArray(result.docs)?result.docs:[];
- // Validate the lookahead record as well: no partial, filtered or optimistic results.
- const verified=docs.map(d=>checkedRow(d.data()||{},d.id));
+ // A malformed legacy child must not blank the financial picture for all
+ // other authorized policies in this batch. Never disclose the excluded row.
+ // Keep the positive policy anchors fully validated before reading children.
+ const verified=[];let scanned=0,more=true,scan=query;
+ const MAX_RAW_SCANNED=1000;
+ while(verified.length<=pageSize&&more){
+   const result=await scan.limit(100).get(),docs=Array.isArray(result.docs)?result.docs:[];
+   more=docs.length===100;
+   for(const d of docs){
+     if(++scanned>MAX_RAW_SCANNED)throw new Denied('RELATED_SCAN_BOUND_EXCEEDED');
+     try{verified.push(checkedRow(d.data()||{},d.id));}
+     catch(e){if(!(e instanceof Denied))throw e;}
+     if(verified.length>pageSize)break;
+   }
+   if(more&&verified.length<=pageSize)scan=query.startAfter(docs[docs.length-1]);
+ }
  return {ok:true,serverScoped:true,collection:coll,country,scope:ctx.scope,
    rows:verified.slice(0,pageSize),
-   nextCursor:verified.length>pageSize?docs[pageSize-1].id:null,
-   anchoring:coll==='clientes'||workflowCollections.has(coll)?'authorized_country_and_advisor_scope':hasBatch?'authorized_policy_batch':'authorized_policy'};
+   nextCursor:verified.length>pageSize?verified[pageSize-1].canonicalDocumentId:null,
+   anchoring:coll==='clientes'?'authorized_country_and_advisor_scope':hasBatch?'authorized_policy_batch':'authorized_policy'};
 }
 
 module.exports=Object.freeze({readScopedRelatedDocument,readScopedRelatedList,collections,version:'b4-003-related-server-list-stage-v3'});

@@ -116,6 +116,26 @@ if(String(C.i65ForensicRemediationPlan?.currentBlock||'')==='B4' &&
      'I65_B4_003_SCOPED_SOURCE_AUTHORIZATION_DRIFT');
    console.log('B4_003_SCOPED_SOURCE_PATCH=QA_PENDING_NOT_RELEASE_ACCEPTED');
  }
+ const rescue=C.b4003FunctionalContractRestore20261014;
+ if(rescue?.status==='SOURCE_COMMITTED_QA_PENDING_NOT_ACCEPTED'){
+   const lock=B4.b4003FunctionalContractRestore20261014||{};
+   need(lock.status===rescue.status && rescue.noFirestoreRulesChanged===true &&
+     rescue.noLivePromotion===true && rescue.noOperationalDataMutation===true &&
+     rescue.releaseAccepted===false && B4.boundaries?.productMutationAuthorized===false &&
+     lock.sharedRulesAuthorized===false && lock.liveAuthorized===false,
+     'I65_B4_003_RESCUE_SCOPE_OR_RELEASE_BYPASS');
+   for(const [owner,bound] of Object.entries(rescue.sourceFiles||{})){
+     need(COMP.productFileBlobs?.[owner]===bound.to &&
+       git('hash-object',owner)===bound.to &&
+       lock.sourceFiles?.[owner]?.to===bound.to,
+       'I65_B4_003_RESCUE_PRODUCT_BLOB_DRIFT:'+owner);
+   }
+   for(const [path,bound] of Object.entries(rescue.qaFiles||{})){
+     need(git('hash-object',path)===bound.to,
+       'I65_B4_003_RESCUE_QA_BLOB_DRIFT:'+path);
+   }
+   console.log('B4_003_RESCUE_SOURCE=PREVIEW_QA_PENDING_RELEASE_BLOCKED');
+ }
  console.log('B4_003_P0_STILL_OPEN=6');
 }
 const P=readJson(DATA_UPDATE_PLAN),D=readJson(DATA_UPDATE_DISCIPLINE),RGT=readJson(DATA_UPDATE_REGISTRY),SRC=readJson(ACTIVE_SOURCE_INTAKE),SRC3=readJson(I63_SOURCE),R63=readJson(I63_RECEIPT),SRC4=readJson(I64_SOURCE),R64=readJson(I64_RECEIPT),SRC5=readJson(I65_SOURCE),SYNC5=readJson(I65_SYNC);

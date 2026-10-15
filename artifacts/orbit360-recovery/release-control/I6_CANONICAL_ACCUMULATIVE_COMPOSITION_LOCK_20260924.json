@@ -256,8 +256,8 @@
     "orbit360-platform/modules/comparativo.js": "982881a4c1e2f95be95428bd3f9f23360a9a2d5f",
     "functions/b4-003-scoped-policy-reader.js": "4181f6198c0163175579a2cc19197ebc63d9b328",
     "functions/b4-003-scoped-policy-callable.js": "8b468150003fe812d9e1d0763120f2b31f1df75f",
-    "functions/b4-003-scoped-related-reader.js": "5323126db9d4fadbf5c3bf7fae62ba1e9676f905",
-    "functions/b4-003-scoped-bootstrap-reader.js": "e73b922173733b2c96693603d6035bfb3b31fa79"
+    "functions/b4-003-scoped-related-reader.js": "15eb2a4782df292fa154391525af22ea91de744f",
+    "functions/b4-003-scoped-bootstrap-reader.js": "356d36e0679a5e499c05632a981b9ef3f1ffb9ec"
   },
   "evidence": {
     "paulaVisualRejectionPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_PAULA_VISUAL_REJECTION_20260924.json",
@@ -5498,5 +5498,37 @@
     "noRulesDeployment": true,
     "noLivePromotion": true,
     "noRealWrites": true
+  },
+  "b4003FunctionalContractRestore20261014": {
+    "status": "SOURCE_COMMITTED_QA_PENDING_NOT_ACCEPTED",
+    "ownerBlobs": {
+      "functions/b4-003-scoped-related-reader.js": {
+        "from": "5323126db9d4fadbf5c3bf7fae62ba1e9676f905",
+        "to": "15eb2a4782df292fa154391525af22ea91de744f",
+        "size": 12429
+      },
+      "functions/b4-003-scoped-bootstrap-reader.js": {
+        "from": "e73b922173733b2c96693603d6035bfb3b31fa79",
+        "to": "356d36e0679a5e499c05632a981b9ef3f1ffb9ec",
+        "size": 10391
+      }
+    },
+    "qaBlobs": {
+      "tools/gravicentra-b4-003-scoped-related-reader.test.cjs": {
+        "from": "a07fedf9053f23d5d837bd4590604e55a52b57f9",
+        "to": "fd69a114cf6dacd9423c3acf9a4c7ca481c1a102",
+        "size": 9267
+      },
+      "tools/gravicentra-b4-003-firestore-emulator.test.cjs": {
+        "from": "33af3aab9f5f2bce7698ad19ec97f0489d8d48dd",
+        "to": "4e25aa655b4d5d2d270d88b04f81e7629b191eba",
+        "size": 21132
+      }
+    },
+    "antiRegressionReference": [
+      "I6_5_B3_003_TARGETED_VISUAL_PASS_20260930.json",
+      "I6_5_B3_008_TARGETED_PAULA_VISUAL_PASS_20261002.json"
+    ],
+    "newBuildRequired": true
   }
 }

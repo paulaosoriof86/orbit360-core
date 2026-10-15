@@ -2332,5 +2332,37 @@
     "status": "SCOPED_CORRECTION_COMMITTED_PENDING_QA",
     "globalProductMutationAuthorized": false,
     "allOtherProductOwnersFrozen": true
+  },
+  "b4003FunctionalContractRestore20261014": {
+    "status": "SOURCE_COMMITTED_QA_PENDING_NOT_ACCEPTED",
+    "sourceFiles": {
+      "functions/b4-003-scoped-related-reader.js": {
+        "from": "5323126db9d4fadbf5c3bf7fae62ba1e9676f905",
+        "to": "15eb2a4782df292fa154391525af22ea91de744f",
+        "size": 12429
+      },
+      "functions/b4-003-scoped-bootstrap-reader.js": {
+        "from": "e73b922173733b2c96693603d6035bfb3b31fa79",
+        "to": "356d36e0679a5e499c05632a981b9ef3f1ffb9ec",
+        "size": 10391
+      }
+    },
+    "qaFiles": {
+      "tools/gravicentra-b4-003-scoped-related-reader.test.cjs": {
+        "from": "a07fedf9053f23d5d837bd4590604e55a52b57f9",
+        "to": "fd69a114cf6dacd9423c3acf9a4c7ca481c1a102",
+        "size": 9267
+      },
+      "tools/gravicentra-b4-003-firestore-emulator.test.cjs": {
+        "from": "33af3aab9f5f2bce7698ad19ec97f0489d8d48dd",
+        "to": "4e25aa655b4d5d2d270d88b04f81e7629b191eba",
+        "size": 21132
+      }
+    },
+    "productMutationAuthorizedGlobally": false,
+    "exception": "TWO_SOURCE_FILES_PRECISE",
+    "sharedRulesAuthorized": false,
+    "liveAuthorized": false,
+    "businessWritesAuthorized": false
   }
 }

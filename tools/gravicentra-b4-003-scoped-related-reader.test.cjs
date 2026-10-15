@@ -76,7 +76,9 @@ async function deny(fn,code){let thrown;try{await fn()}catch(e){thrown=e}assert.
  const second=await bulk('vehiculos',['p1','p2'],'operativo',{cursor:first.nextCursor});
  assert.deepEqual(second.rows.map(x=>x.id),['v2']);assert.equal(second.nextCursor,null);checks++;
  await deny(()=>bulk('vehiculos',['p1','p2'],'asesor'),'POLICY_NOT_FOUND_OR_DENIED');checks++;
- await deny(()=>bulk('recibosEsperados',['p1']),'RELATION_CLIENT_MISMATCH');checks++;
+ const validWithQuarantined=await bulk('recibosEsperados',['p1']);
+ assert.deepEqual(validWithQuarantined.rows.map(x=>x.id),['r1']);
+ assert.equal(validWithQuarantined.nextCursor,null);checks++;
  await deny(()=>bulk('vehiculos',['p1','p1']),'POLICY_BATCH_INVALID');checks++;
  await deny(()=>bulk('vehiculos',['p1','p2'],'operativo',{country:'CO'}),'POLICY_NOT_FOUND_OR_DENIED');checks++;
  await deny(()=>bulk('clientes',['p1']),'POLICY_ANCHOR_UNEXPECTED');checks++;
@@ -102,8 +104,10 @@ async function deny(fn,code){let thrown;try{await fn()}catch(e){thrown=e}assert.
  assert.deepEqual(historicalPolicyBatch.rows.map(x=>x.id),['v1']);checks++;
  await deny(()=>read('clientes','c1'),'RECORD_NOT_FOUND_OR_DENIED');checks++;
  docs.clientes.c1.pais='CO';
- await deny(()=>read('recibosEsperados','r1'),'RECORD_NOT_FOUND_OR_DENIED');checks++;
- await deny(()=>bulk('vehiculos',['p1'],'asesor'),'POLICY_NOT_FOUND_OR_DENIED');checks++;
+ const validCrossBorder=await read('recibosEsperados','r1');
+ assert.equal(validCrossBorder.row.pais,'GT');checks++;
+ const policyCrossBorder=await bulk('vehiculos',['p1'],'asesor');
+ assert.deepEqual(policyCrossBorder.rows.map(x=>x.id),['v1']);checks++;
  docs.clientes.c1.pais='GT';docs.clientes.c1.asesorId='a1';
  console.log('B4_003_HISTORICAL_POLICY_ADVISOR_SCOPE_QA_PASS checks=5 no_cross_country_or_client_escalation');
  // P0 discriminator: old operational rows without pais must be recovered

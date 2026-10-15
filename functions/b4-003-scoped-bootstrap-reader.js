@@ -96,7 +96,7 @@ const sanitize=(v,depth=0)=>{
 };
 const viewDirectory=(coll,row,id,country,tenantId)=>{
  const base={id,canonicalDocumentId:id,tenantId,pais:country};
- if(coll==='asesores')return Object.assign(pick(row,['nombre','displayName','name','activo','active','estado','status','paises','countries','paisDefault','countryDefault','teamId','equipoId','roles','rol','tipo','metaPrima','email','telefono','tel','cargo','color','foto','avatar']),base);
+ if(coll==='asesores')return Object.assign(sanitize(pick(row,['nombre','displayName','name','activo','active','inactivo','estado','status','paises','countries','paisDefault','countryDefault','teamId','equipoId','roles','rol','rolDefault','tipo','metaPrima','metaRecaudo','email','telefono','tel','cargo','color','foto','avatar','scopeDatos','dataScopes','modulosExtra','modulosRestringidos','modulesExtra','modulesRestricted','comModo','shareCom','comValor','accessProvisioned','invitacionEstado','authUid','uid','userId','equipoAsesorIds'])),base);
  const a=pick(row,['nombre','canonicalName','displayName','nit','codigoIntermediario','web','portal','logo','logoAssetRef','logoContentHash','color','responsable','telGeneral','emergencia','observaciones','ultimaRevision','vinculada','ramos','ramosHabilitados','ramosDetalle','cotTasas','cotTasasValidadas','comisionDefault','comisiones','drive','docs','docsRequeridos','estado','activo','actualizado']);
  const schema={
   facturacion:['razonSocial','dirFiscal','regimen','correo','nit','documento'],
