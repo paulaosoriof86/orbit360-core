@@ -10845,5 +10845,23 @@
     "productMutationGloballyAuthorized": false,
     "explicitScopedException": "CONTINUE_B4_003_HISTORIAL_CAUSAL_RESTORE",
     "functionalPass": false
+  },
+  "b4003HydrationPackageCanonSourceFix": {
+    "gate": "I6.5/B4-003",
+    "status": "BUILD_TOOL_SOURCE_REPAIRED_PENDING_EXACT_PREVIEW",
+    "cause": "BUILD_HARDCODED_OPTIONAL_IGNORED_SOURCE_ACTIVIDADES",
+    "generator": "tools/gravicentra-i6-1-preview-package.mjs",
+    "scopedBackendOwnerOnly": true,
+    "canonicalHydrationSource": "orbit360-platform/product-runtime-config.js",
+    "excludedSecureServiceOptional": [
+      "cursos",
+      "academyProgress"
+    ],
+    "releaseBuildRequired": true,
+    "rulesDeploymentAuthorized": false,
+    "livePromotionAuthorized": false,
+    "realDataWrites": 0,
+    "reimport": false,
+    "sourceChangeRequiresNewArtifact": true
   }
 }

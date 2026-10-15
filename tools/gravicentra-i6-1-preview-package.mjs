@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
+import vm from 'node:vm';
 
 const [sourceRoot, packageRoot, publicConfigPath] = process.argv.slice(2);
 if (!sourceRoot || !packageRoot || !publicConfigPath) throw new Error('USAGE: package.mjs <sourceRoot> <packageRoot> <publicConfigJson>');
@@ -28,6 +29,28 @@ const runtimeCfg=read(path.join(SRC,'product-runtime-config.js'));
 if(!runtimeCfg.includes("hydrationContractVersion: 'fase-a-i2-20260919.5-team-canonical-required'")) throw new Error('HYDRATION_CONTRACT_VERSION_DRIFT');
 if(!runtimeCfg.includes("hydrationContractSource: 'recovery/fase-a-clean-20260831'")) throw new Error('HYDRATION_CONTRACT_SOURCE_DRIFT');
 if(!runtimeCfg.includes('enabled: false')) throw new Error('SOURCE_RUNTIME_CONFIG_MUST_BE_DISABLED');
+// One canonical hydration contract; the release builder must never silently
+// substitute a hardcoded collection list for the source approved at HEAD.
+const sourceContext={window:{}};
+vm.runInNewContext(runtimeCfg,sourceContext,{timeout:1000,filename:'product-runtime-config.js'});
+const sourceContract=sourceContext.window.__ORBIT360_PRODUCT_PUBLIC_CONFIG__;
+if(!sourceContract||sourceContract.enabled!==false)throw new Error('SOURCE_RUNTIME_CONFIG_UNTRUSTED');
+const collect=(key)=>{
+ const arr=sourceContract[key];
+ if(!Array.isArray(arr)||!arr.length||arr.some(k=>typeof k!=='string'||!/^[A-Za-z][A-Za-z0-9]{0,69}$/.test(k))||new Set(arr).size!==arr.length)
+  throw new Error('HYDRATION_SOURCE_COLLECTIONS_INVALID:'+key);
+ return Array.from(arr);
+};
+const canonicalRequired=collect('requiredCollections');
+const canonicalOptional=collect('optionalCollections');
+if(canonicalRequired.some(k=>canonicalOptional.includes(k)))throw new Error('HYDRATION_SOURCE_REQUIRED_OPTIONAL_OVERLAP');
+// Academy manuals/progress follow their independently authorized secure service.
+// Keep the historical explicit exclusion, but record it in the build evidence.
+const separateSecureService=new Set(['cursos','academyProgress']);
+const runtimeOptional=canonicalOptional.filter(k=>!separateSecureService.has(k));
+if(!runtimeOptional.includes('actividades'))throw new Error('B4_003_HISTORIAL_HYDRATION_SOURCE_MISSING');
+if(runtimeOptional.length!==canonicalOptional.length-[...separateSecureService].filter(k=>canonicalOptional.includes(k)).length)
+ throw new Error('HYDRATION_SOURCE_OMISSION_NOT_ACCOUNTED_FOR');
 if(!read(path.join(SRC,'data/tenant-runtime-config-index.js')).includes("'alianzas-soluciones'")) throw new Error('TENANT_INDEX_MISSING');
 
 const assetExt='(?:js|css|json|webmanifest|png|jpg|jpeg|webp|svg|ico|woff2?|ttf|pdf)';
@@ -100,8 +123,14 @@ if(cfg.projectId!==PROJECT_ID)throw new Error('PUBLIC_FIREBASE_PROJECT_MISMATCH'
 const canonical=Object.fromEntries(['apiKey','authDomain','projectId','appId','storageBucket'].map(k=>[k,cfg[k]||'']));
 const cfgHash=crypto.createHash('sha256').update(JSON.stringify(Object.fromEntries(Object.entries(canonical).sort()))).digest('hex');
 const buildId=`${BUILD_PREFIX}-${SOURCE_SHA.slice(0,12)}-${cfgHash.slice(0,12)}`;
-const payload={scopedReadPreviewCandidate:SCOPED_PREVIEW,enabled:true,environmentRef:ENVIRONMENT_REF,tenantHint:TENANT_HINT,projectId:cfg.projectId,authDomain:cfg.authDomain,appId:cfg.appId,apiKey:cfg.apiKey,storageBucket:cfg.storageBucket||'',buildId,sourceSha:SOURCE_SHA,hydrationContractVersion:'fase-a-i2-20260919.5-team-canonical-required',hydrationContractSource:'recovery/fase-a-clean-20260831',requiredCollections:['clientes','polizas','cobros','aseguradoras','vehiculos','recibosEsperados','carteraPrimas','asesores'],optionalCollections:['estadosCuentaAseguradora','recibosAseguradora','conciliacionesPrimas','conciliaciones','metas','negocios','gestiones','reclamos','comisiones','cancelaciones','auditoria']};
+const payload={scopedReadPreviewCandidate:SCOPED_PREVIEW,enabled:true,environmentRef:ENVIRONMENT_REF,tenantHint:TENANT_HINT,projectId:cfg.projectId,authDomain:cfg.authDomain,appId:cfg.appId,apiKey:cfg.apiKey,storageBucket:cfg.storageBucket||'',buildId,sourceSha:SOURCE_SHA,hydrationContractVersion:'fase-a-i2-20260919.5-team-canonical-required',hydrationContractSource:'recovery/fase-a-clean-20260831',requiredCollections:canonicalRequired,optionalCollections:runtimeOptional};
 fs.writeFileSync(path.join(SITE,'product-runtime-config.js'),'/* Generated only inside the certified I6.1 successor artifact. Public Firebase Web config; no secrets. */\nwindow.__ORBIT360_PRODUCT_PUBLIC_CONFIG__ = Object.freeze('+JSON.stringify(payload)+');\n');
+fs.writeFileSync(path.join(EVIDENCE,'hydration-configuration-binding.json'),
+ JSON.stringify({schema:'GRAVICENTRA_HYDRATION_SOURCE_BINDING_V1',sourceSha:SOURCE_SHA,required:canonicalRequired,
+  runtimeOptional,secureServiceExcluded:[...separateSecureService].filter(k=>canonicalOptional.includes(k)),
+  generatedExact:JSON.stringify(payload.requiredCollections)===JSON.stringify(canonicalRequired)
+    &&JSON.stringify(payload.optionalCollections)===JSON.stringify(runtimeOptional),
+  productionModified:false,firestoreRulesModified:false},null,2)+'\n');
 fs.mkdirSync(path.join(SITE,'__recovery__'),{recursive:true});fs.writeFileSync(path.join(SITE,'__recovery__/build.json'),JSON.stringify({product:'Gravicentra Insurance',gate:RELEASE_GATE,sourceSha:SOURCE_SHA,buildId,environmentRef:ENVIRONMENT_REF})+'\n');
 fs.writeFileSync(path.join(EVIDENCE,'public-config-descriptor.json'),JSON.stringify({projectId:cfg.projectId,authDomain:cfg.authDomain,appIdPresent:true,apiKeyPresent:true,storageBucketPresent:!!cfg.storageBucket,configSha256:cfgHash})+'\n');
 if(!TENANT_BRANDING_SNAPSHOT_FILE||!fs.existsSync(TENANT_BRANDING_SNAPSHOT_FILE))throw new Error('TENANT_BRANDING_SNAPSHOT_FILE_REQUIRED');

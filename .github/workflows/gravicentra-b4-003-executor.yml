@@ -1311,6 +1311,7 @@ jobs:
           if(!response.ok)throw Error('PROTECTED_PREVIEW_CONFIG_UNREACHABLE');
           const config=await response.text();
           if(!config.includes('"scopedReadPreviewCandidate":true'))throw Error('PROTECTED_PREVIEW_FLAG_NOT_HOSTED');
+          if(!config.includes('"actividades"'))throw Error('B4_003_HISTORIAL_SOURCE_COLLECTION_NOT_HOSTED');
           const url='https://us-east1-ays-orbit-360-lab.cloudfunctions.net/orbit360ScopedPolicyReadPreview';
           const denied=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({data:{tenantId:'alianzas-soluciones',mode:'bootstrap-membership'}})});
           if(denied.status!==401&&denied.status!==403)throw Error('UNAUTHENTICATED_CALLABLE_NOT_DENIED:'+denied.status);
