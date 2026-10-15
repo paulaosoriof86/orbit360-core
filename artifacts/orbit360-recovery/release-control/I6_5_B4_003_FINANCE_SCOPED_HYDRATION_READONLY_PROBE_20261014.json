@@ -55,5 +55,48 @@
     "cobrosApprovedModuleBlobSha": "866570f35d87f8d4d7709736058831a218cb461e"
   },
   "proposedNext": "Reconcile authorized narrow source patch for server-verified cobros query and reactive terminal error; validate with synthetic own/team/all and country-negative scenarios, then exact new Preview and Paula functional readback before any PASS.",
-  "security": "Do not restore unscoped browser Firestore grants, read or log sensitive policy data, impersonate real users, or change shared Firestore rules."
+  "security": "Do not restore unscoped browser Firestore grants, read or log sensitive policy data, impersonate real users, or change shared Firestore rules.",
+  "transversalRouteCompatibility": {
+    "kind": "STATIC_SOURCE_CONTRACT_PROOF_NO_RUNTIME_PASS",
+    "sourceBlobs": {
+      "orbit360-platform/core/router.js": "7f3bbde2aecbdc97853c4e8260d5bf78c9ccb5fb",
+      "orbit360-platform/product-runtime-config.js": "977f9b7075e420a47d286769f2cdbfffba52b7b0",
+      "orbit360-platform/data/store-firestore-product-readonly-p0.js": "7a6cda8afdf7bf0a7c076d760fa0e84ed7e853c7"
+    },
+    "declaredRouteCount": 15,
+    "configuredOptionalUnsupportedByProtectedReader": [
+      "estadosCuentaAseguradora",
+      "recibosAseguradora",
+      "conciliacionesPrimas",
+      "conciliaciones",
+      "reclamos",
+      "comisiones",
+      "cancelaciones",
+      "auditoria",
+      "cursos",
+      "academyProgress"
+    ],
+    "routesWithDeclaredDependenciesAbsentFromProtectedReader": {
+      "inicio": [
+        "comisiones"
+      ],
+      "cliente360": [
+        "comisiones"
+      ],
+      "cronograma": [
+        "tareas"
+      ],
+      "conciliaciones": [
+        "finmovs"
+      ],
+      "comisiones": [
+        "comisiones"
+      ],
+      "finanzas": [
+        "comisiones"
+      ]
+    },
+    "limitation": "Some routes may use alternate approved transports, which must be inspected before asserting a UI failure; these are source-level incompatibilities, not six certified failing modules.",
+    "acceptedSourcePreservationRequired": true
+  }
 }
