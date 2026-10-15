@@ -1,0 +1,127 @@
+{
+  "schema": "GRAVICENTRA_I65_B4003_HUMAN_PREVIEW_REJECTION_FORENSIC_V1",
+  "status": "READ_ONLY_FORENSIC_REJECTION_NO_PRODUCT_MUTATION",
+  "preparedAt": "2026-10-15",
+  "authority": "Subordinate evidence only. Repo Control Plane, B4 execution lock, capability lineage, accepted artifacts and findings ledger remain governing.",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "headBefore": "febe06fa29d8f2945a8b23cc612e769493c1ac0a",
+  "gate": "I6.5/B4-003",
+  "previewRejected": {
+    "sourceSha": "53e66a2d4930b60e45bb9ef98a770a5fa4e14437",
+    "buildId": "gi-i65-b4-53e66a2d4930-57f234755dc1",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-38687708932-daoqncg1.web.app",
+    "runId": 38687708932,
+    "artifactId": 11950279225,
+    "digest": "sha256:c739f555dc5e1cff5d279f891905c028acd114dae6da5679d6f07ce5776db35d",
+    "userObservationDateLocal": "2026-10-14",
+    "userReportedInitialHydrationMinutes": 8,
+    "evidenceLocation": "Current Chat conversation five user-supplied screenshots (not stored in GitHub)",
+    "screenshotDescriptions": [
+      "Inicio personal GT/CO production dials resolved, recaudo remains loading",
+      "Inicio cobros, pendientes and vencidos remain Actualizando datos; QA renewal fixtures in Prioridades",
+      "Inicio team rows, QA collaborations visible in daily follow-ups",
+      "Cliente 360 434 clients, 218 active, 1413 historical, GTQ/COP, 0 empresa and 1 persona, cartera Actualizando, salud Calculando, expiry 18",
+      "Cobros y cartera route blank content area, shell present"
+    ],
+    "status": "HUMAN_UAT_FAIL",
+    "technicalWorkflowCaveat": "Deploy/readback/public+anonymous/virtual-mock smoke PASS only; authenticated finance, browser E2E, security positive-negative, historical approved B3 parity skipped."
+  },
+  "historicalAccepted": {
+    "date": "2026-10-02",
+    "receipt": "artifacts/orbit360-recovery/release-control/I6_5_B3_008_TARGETED_PAULA_VISUAL_PASS_20261002.json",
+    "acceptedSourceSha": "dcd2b3f60b98ad96c94933f09da9e8478ea165c3",
+    "cobrosModuleSha": "866570f35d87f8d4d7709736058831a218cb461e",
+    "cobrosModuleShaCurrent": "866570f35d87f8d4d7709736058831a218cb461e",
+    "conclusion": "Approved Cobros module is unchanged; the client/provider/store transport and server scope changed after B3 acceptance."
+  },
+  "confirmedStaticCauses": [
+    {
+      "code": "BLANK_COBROS_NULL_AGING",
+      "path": "orbit360-platform/modules/cobros.js",
+      "blob": "866570f35d87f8d4d7709736058831a218cb461e",
+      "condition": "Hydration coreReady=true and financialReady=false sets aging=null; template unconditionally evaluates aging.country before rendering page.",
+      "impact": "Deterministic TypeError; host already cleared by router, so blank route while shell remains.",
+      "browserConsoleStackRecorded": false
+    },
+    {
+      "code": "FINANCE_POLICY_ANCHOR_READ_AMPLIFICATION",
+      "path": "orbit360-platform/data/store-firestore-product-readonly-p0.js",
+      "blob": "0875fda2539aba9a7e0073cacb07eb83345c8955",
+      "condition": "Related receipts and cartera still traverse all visible policies in batches of 10 with three workers; only Cobros was optimized.",
+      "impact": "Cumulative request cost and failure risk; 8-min exact causal latency cannot be asserted without authenticated network traces.",
+      "syntheticPriorProof": {
+        "policyCount": 1425,
+        "policyPageCalls": 30,
+        "relatedCalls": 143,
+        "collectionFailureWhenOneBatchFails": true
+      }
+    },
+    {
+      "code": "PENDING_READINESS_IGNORES_TERMINAL_ERRORS",
+      "paths": [
+        "orbit360-platform/modules/inicio.js",
+        "orbit360-platform/modules/cliente360.js"
+      ],
+      "blobs": [
+        "3759428cd65d7c6a7aa39669b1cff7ddeba4d332",
+        "5250cd40950cc58106df2915f0605b38a566524a"
+      ],
+      "condition": "Readiness returns pending unless collections confirmed or denied; snapshotErrors do not generally produce unavailable state.",
+      "impact": "Loading copy may remain indefinitely instead of terminal error."
+    },
+    {
+      "code": "CLIENT_TYPE_COUNTS_STRICT_LITERAL",
+      "path": "orbit360-platform/modules/cliente360.js",
+      "condition": "KPI filters use tipo==='Empresa' and tipo==='Persona' while total count uses all client rows.",
+      "impact": "Total and subtype counts are not exhaustive for differently encoded/empty type values; actual underlying classifications need readback."
+    },
+    {
+      "code": "RENEWAL_KPI_NONIDENTICAL_PREDICATES",
+      "paths": [
+        "orbit360-platform/modules/inicio.js",
+        "orbit360-platform/modules/cliente360.js"
+      ],
+      "condition": "Inicio uses polizas.policyMetrics.isRenewalWithin45Days with lifecycle; Cliente360 uses status and U.daysFromNow(vigenciaFin) without same lifecycle predicate.",
+      "impact": "Observed 16 versus 18 may result from source formula divergence; exact row-level delta not established."
+    },
+    {
+      "code": "INICIO_MONTH_END_PANEL_NOT_DYNAMIC_MOTIVATION",
+      "path": "orbit360-platform/modules/inicio.js",
+      "condition": "Static month-end text and financial pending banner; dynamic personal motivational wording not in requested gray panel.",
+      "impact": "User-approved dynamic copy not visible; layout width/height concern confirmed visually."
+    }
+  ],
+  "additionalOpenRisks": [
+    "QA synthetic business entities visible in Prioridades and Seguimientos; cannot infer deletion authorization. 14 old-run rows and 3 orphan policies with 12 dependencies remain held.",
+    "Unanchored direct Cobros events are excluded by new fast path until canonical source ownership is proved.",
+    "Active legacy Firestore rules permit member-wide scope; current LIVE security hold must not be bypassed.",
+    "Full role×country×viewport, persistence/reload, console, API latency and financial parity not executed in exact authenticated Preview."
+  ],
+  "disallowed": [
+    "Reimport for visualization",
+    "Restore insecure direct Firestore read",
+    "Mutate production",
+    "Claim functional PASS from workflow success",
+    "Create new gate or repository",
+    "Delete QA financial dependencies without exact rollback"
+  ],
+  "minimalRecoverySequence": [
+    "Fix null aging access within existing Cobros module, with partial-read render and no blank route test.",
+    "Make financial readiness treat denied and snapshotErrors as terminal without false zero.",
+    "Repair remaining policy-scoped recibosEsperados/carteraPrimas reader without broadening scopes, preserve canonical policy/client and currency.",
+    "Bind consistent client type segmentation and one approved 45-day KPI predicate; retain full financial relationships.",
+    "Isolated reusable authenticated QA: Paula GT/CO + scoped test roles own/team/all, positive and negative, source financial readback, no 404/console/page errors, cold+warm performance, reload.",
+    "Only after exact artifact preview pass + Paula visual, reconcile ledger/Control Plane and consider release security gating."
+  ],
+  "outcome": {
+    "sourceChanges": 0,
+    "operationalWrites": 0,
+    "productionDeploys": 0,
+    "ruleDeploys": 0,
+    "builds": 0,
+    "closedFindings": 0,
+    "gateClosed": false,
+    "liveAuthorized": false
+  }
+}
