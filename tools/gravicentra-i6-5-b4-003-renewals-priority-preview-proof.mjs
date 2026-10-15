@@ -311,8 +311,30 @@ try{
           errors:Object.keys(s.snapshotErrors||{}).filter(x=>['clientes','polizas'].includes(x))};
       });
       session.prePaintRequiredData=status;
-      proof.sessions.push(session);
-      need(false,'B4_003_FIRST_PAINT_REQUIRED_SERVER_DATA_NOT_READY:'+JSON.stringify(status));
+      session.prePaintBudgetBreach=true;
+      // Diagnostic continuation only: allow bounded extra observation after
+      // recording an already failed 8s contract. This can NEVER become PASS.
+      const lateStarted=Date.now();
+      try{
+        await page.waitForFunction(()=>{
+          const s=Orbit.store&&Orbit.store._productStatus&&Orbit.store._productStatus();
+          const confirmed=[].concat(s&&s.serverConfirmedCollections||[]);
+          return ['clientes','polizas'].every(x=>confirmed.includes(x));
+        },null,{timeout:25000});
+        firstPaintReady=true;
+      }catch{}
+      session.prePaintLateExtraMs=Date.now()-lateStarted;
+      session.prePaintEventuallyReady=firstPaintReady;
+      if(!firstPaintReady){
+        session.prePaintLateStatus=await page.evaluate(()=>{
+          const s=Orbit.store&&Orbit.store._productStatus&&Orbit.store._productStatus()||{};
+          return {state:s.status||'',confirmed:[].concat(s.serverConfirmedCollections||[]).filter(x=>['clientes','polizas','aseguradoras'].includes(x)),
+            denied:[].concat(s.deniedCollections||[]).filter(x=>['clientes','polizas'].includes(x)),
+            errors:Object.keys(s.snapshotErrors||{}).filter(x=>['clientes','polizas'].includes(x))};
+        });
+        proof.sessions.push(session);
+        need(false,'B4_003_REQUIRED_DATA_STILL_UNCONFIRMED_AFTER_FORENSIC_OBSERVATION:'+JSON.stringify(session.prePaintLateStatus));
+      }
     }
     session.firstPaint=await firstPaintGuard(page);
     for(const country of proof.countries)session.cold.push(await renderCountry(page,country,'cold','DESKTOP'));
@@ -340,6 +362,7 @@ try{
   proof.assertions.policyAndRenewalLabelsSeparate=true;
   proof.assertions.kpiBucketsCanonical=true;
   proof.assertions.noRelevantBrowserErrors=true;
+  need(proof.sessions.every(s=>s.prePaintBudgetBreach!==true),'B4_003_STARTUP_REQUIRED_DATA_NOT_CONFIRMED_WITHIN_8S');
   delete proof.backend.terminalIds;delete proof.backend.recentIds;delete proof.backend.qaSixIds;
   proof.status='PASS';
 }catch(error){
