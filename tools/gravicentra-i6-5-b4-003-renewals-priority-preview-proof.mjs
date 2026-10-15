@@ -128,7 +128,7 @@ async function backendReadback(){
   need(recent.length===EXPECTED_RECENT_COUNT,'B4_003_RENEWALS_RECENT_COUNT:'+recent.length);
   need(hash(recent)===EXPECTED_RECENT_DIGEST,'B4_003_RENEWALS_RECENT_DIGEST:'+hash(recent));
   const counts=(items,pick)=>items.reduce((a,x)=>{const k=clean(pick(x))||'VACIO';a[k]=(a[k]||0)+1;return a;},{});
-  proof.backend={policyCount:ps.size,b02TerminalCount:terminal.length,b02TerminalIdDigest:hash(terminal.map(x=>x.id).sort()),oldOpenCount:0,recentCount:recent.length,recentDigest:hash(recent),recentStateCounts:counts(recentRaw,x=>x.p.estado),recentCountryCounts:counts(recentRaw,x=>x.p.pais),recentRenewabilityCounts:counts(recentRaw,x=>renewability(x.p)),terminalIds:terminal.map(x=>x.id),recentIds:recentRaw.map(x=>x.id)};
+  proof.backend={...proof.backend,policyCount:operationalRows.length,physicalPolicyCount:ps.size,qaSixIds:qaKeys,b02TerminalCount:terminal.length,b02TerminalIdDigest:hash(terminal.map(x=>x.id).sort()),oldOpenCount:0,recentCount:recent.length,recentDigest:hash(recent),recentStateCounts:counts(recentRaw,x=>x.p.estado),recentCountryCounts:counts(recentRaw,x=>x.p.pais),recentRenewabilityCounts:counts(recentRaw,x=>renewability(x.p)),terminalIds:terminal.map(x=>x.id),recentIds:recentRaw.map(x=>x.id)};
   proof.assertions.b02Exact583Terminal=true;
   proof.assertions.b02OldOpenZero=true;
   proof.assertions.b02Recent24Untouched=true;
@@ -213,7 +213,7 @@ async function renderCountry(page,country,phase,viewport){
     await page.click('[data-renewals-retry]');
     await page.waitForFunction(()=>!document.querySelector('[data-renewals-loading]')&&document.querySelectorAll('[data-renewal-bucket]').length===4,null,{timeout:15000});
   }
-  const state=await page.evaluate(({country,terminalIds,recentIds})=>{
+  const state=await page.evaluate(({country,terminalIds,recentIds,qaSixIds})=>{
     const n=v=>String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'');
     const cc=v=>String(v==null?'':v).trim().toUpperCase(),store=Orbit.store,h=document.getElementById('host');
     const client=id=>id?store.get('clientes',id):null;
@@ -228,6 +228,7 @@ async function renderCountry(page,country,phase,viewport){
     const recentAccessible=recentIds.filter(id=>{const p=store.get('polizas',id);return !!p&&selected(p);}).sort();
     const recentVisible=recentAccessible.filter(id=>{const el=h.querySelector('[data-renewal-policy="'+CSS.escape(id)+'"]');return !!el&&el.closest('[data-renewal-bucket]')?.dataset.renewalBucket==='vencidas';});
     const terminalVisible=terminalIds.filter(id=>!!h.querySelector('[data-renewal-policy="'+CSS.escape(id)+'"]'));
+    const qaFixtureVisible=qaSixIds.filter(id=>!!h.querySelector('[data-renewal-policy="'+CSS.escape(id)+'"]'));
     const labelOk=cards.every(card=>{const t=[...card.querySelectorAll('.badge')].map(x=>String(x.textContent||'').trim());return t.some(x=>x.startsWith('Póliza:'))&&t.some(x=>x.startsWith('Renovación:'));});
     const board=h.querySelector('.renewal-board'),boardRect=board?.getBoundingClientRect();
     const cardsFit=cards.every(card=>{const r=card.getBoundingClientRect();return !boardRect||r.left>=boardRect.left-2&&r.right<=boardRect.right+2;});
@@ -238,16 +239,17 @@ async function renderCountry(page,country,phase,viewport){
       exactCanonicalIds:JSON.stringify(expected)===JSON.stringify(visible),
       recentAccessibleCount:recentAccessible.length,recentVisibleCount:recentVisible.length,
       recentExact:recentAccessible.length===recentVisible.length,
-      terminalVisibleCount:terminalVisible.length,labelOk,cardsFit,actionsFit,
+      terminalVisibleCount:terminalVisible.length,qaFixtureVisibleCount:qaFixtureVisible.length,labelOk,cardsFit,actionsFit,
       boardFits:!!board&&board.scrollWidth<=board.clientWidth+2,
       hostText:String(h.innerText||'').slice(0,500)
     };
-  },{country,terminalIds:proof.backend.terminalIds,recentIds:proof.backend.recentIds});
+  },{country,terminalIds:proof.backend.terminalIds,recentIds:proof.backend.recentIds,qaSixIds:proof.backend.qaSixIds});
   state.phase=phase;state.country=country;state.viewport=viewport;state.readyMs=Date.now()-started;state.initialTerminal=initialTerminal||null;state.recovery=recovery;
   need(state.loadingState==='ready','B4_003_RENEWALS_ROUTE_TERMINAL_'+state.loadingState);
   need(JSON.stringify(state.bucketKeys)===JSON.stringify(['vencidas','d15','d45','d90']),'B4_003_RENEWALS_BUCKET_KEYS');
   need(state.exactCanonicalIds&&state.bucketCounts.every(x=>x.count===x.visible)&&state.bucketCounts.reduce((s,x)=>s+x.count,0)===state.visibleCount,'B4_003_RENEWALS_CANONICAL_RECONCILIATION');
   need(state.recentExact&&state.terminalVisibleCount===0,'B4_003_RENEWALS_B02_UI_RECONCILIATION');
+  need(state.qaFixtureVisibleCount===0,'B4_003_CANCELLED_QA_VISIBLE_IN_KANBAN:'+state.qaFixtureVisibleCount);
   need(country!=='TODOS'||(state.recentAccessibleCount===EXPECTED_RECENT_COUNT&&state.recentVisibleCount===EXPECTED_RECENT_COUNT),'B4_003_RENEWALS_RECENT_24_NOT_ALL_IN_VENCIDAS:'+state.recentAccessibleCount+':'+state.recentVisibleCount);
   need(state.labelOk,'B4_003_RENEWALS_POLICY_RENEWAL_LABELS');
   need(state.boardFits&&state.cardsFit&&state.actionsFit,'B4_003_RENEWALS_RESPONSIVE_LAYOUT');
@@ -315,7 +317,7 @@ try{
   proof.assertions.policyAndRenewalLabelsSeparate=true;
   proof.assertions.kpiBucketsCanonical=true;
   proof.assertions.noRelevantBrowserErrors=true;
-  delete proof.backend.terminalIds;delete proof.backend.recentIds;
+  delete proof.backend.terminalIds;delete proof.backend.recentIds;delete proof.backend.qaSixIds;
   proof.status='PASS';
 }catch(error){
   proof.status='FAIL';proof.error=String(error&&error.stack||error);
@@ -323,7 +325,7 @@ try{
 }finally{
   try{if(browser)await browser.close();}catch{}
   try{await deleteApp(app);}catch{}
-  delete proof.backend.terminalIds;delete proof.backend.recentIds;
+  delete proof.backend.terminalIds;delete proof.backend.recentIds;delete proof.backend.qaSixIds;
   fs.writeFileSync(outPath,JSON.stringify(proof,null,2)+'\n');
 }
 console.log(JSON.stringify(proof,null,2));
