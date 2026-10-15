@@ -77,10 +77,13 @@ async function main(){
  for(const actor of pair.actors){
   const ctx=await browser.newContext({viewport:{width:390,height:844}}),page=await ctx.newPage(),errs=[];
   page.on('pageerror',e=>errs.push(String(e?.message||'PAGE_ERROR').slice(0,80)));
+  const blockedNetwork={directFirestore:0,nonScopedCallable:0};
   await page.route('**/*',r=>{
    const url=r.request().url();
-   if(url.includes('firestore.googleapis.com')||
-      (url.includes('cloudfunctions.net')&&!url.includes('orbit360ScopedPolicyReadPreview')))return r.abort();
+   if(url.includes('firestore.googleapis.com')){blockedNetwork.directFirestore++;return r.abort();}
+   if(url.includes('cloudfunctions.net')&&!url.includes('orbit360ScopedPolicyReadPreview')){
+     blockedNetwork.nonScopedCallable++;return r.abort();
+   }
    return r.continue();
   });
   try{
@@ -108,47 +111,111 @@ async function main(){
     return{businessOk:a.ok,managementOk:b.ok,denied:!deny.ok&&
       /permission-denied|invalid-argument|unauthenticated/.test(deny.error),
       businessCount:a.rows.length,managementCount:b.rows.length,
-      businessError:a.error,managementError:b.error,contacts};
+      businessError:a.error,managementError:b.error,contacts,
+      serverDocumentIds:{
+        negocios:a.rows.map(x=>String(x.canonicalDocumentId||x.id||'')),
+        gestiones:b.rows.map(x=>String(x.canonicalDocumentId||x.id||''))
+      }};
    },{token,tid,country:pair.country,role:actor.role});
    result.contactPairsChecked+=q.contacts.checked;
    result.contactConflictsReview+=q.contacts.conflicts;
    result.contactUnavailable+=q.contacts.missing;
    const record={role:actor.role,readBusiness:q.businessOk,readManagement:q.managementOk,
      unauthorizedDenied:q.denied,readBusinessCount:q.businessCount,
-     readManagementCount:q.managementCount,pageErrors:errs.length,uiRoutes:{}};
+     readManagementCount:q.managementCount,pageErrors:errs.length,
+     requestedCountry:pair.country,uiRoutes:{},hydration:{},blockedNetwork:{}};
    assert(q.businessOk&&q.managementOk&&q.denied,'READ_SCOPES_NOT_CONFIRMED_'+actor.role);
    assert(!errs.length,'PAGE_ERROR_'+actor.role);
-   // No click, write or server-side change. All non-readonly callables and direct
-   // Firestore requests remain blocked by the browser's network route.
+   // The previously green UI assertion only proved .kanban existed. Compare
+   // identical authenticated source IDs to the hydrated store, then to each
+   // projected board. Keep IDs in isolated browser memory, never in evidence.
    try{
-    await page.evaluate(async()=>{if(!Orbit.productAppP0?.activate)throw Error('APP_ACTIVATE_UNAVAILABLE');
-      await Orbit.productAppP0.activate();});
+    record.activation=await page.evaluate(async()=>{
+      if(!Orbit.productAppP0?.activate)throw Error('APP_ACTIVATE_UNAVAILABLE');
+      const r=await Orbit.productAppP0.activate();
+      return {started:Orbit.productAppP0?.isStarted?.()===true,
+        ready:r?.ready===true,status:String(r?.status||'').slice(0,65)};
+    });
+    await page.evaluate(()=>{Orbit.store?._ensureCollections?.(['negocios','gestiones']);});
+    await page.waitForFunction(()=>{
+      const st=Orbit.store?._productStatus?.()||{},required=['negocios','gestiones'];
+      const ok=st.serverConfirmedCollections||[],denied=st.deniedCollections||[],errors=st.snapshotErrors||{};
+      return required.every(k=>ok.includes(k))||
+        required.some(k=>denied.includes(k)||Object.prototype.hasOwnProperty.call(errors,k));
+    },null,{timeout:12000}).catch(()=>{});
+    record.hydration=await page.evaluate(ids=>{
+      const store=Orbit.store,st=store?._productStatus?.()||{},
+        getRows=k=>{try{return store?.all?.(k)||[]}catch{return[]}},
+        allNames=(st.serverConfirmedCollections||[]),snapshotErrors=st.snapshotErrors||{},
+        counts={};
+      for(const k of ['negocios','gestiones']){
+        const rows=getRows(k),keys=new Set(rows.map(x=>String(x.canonicalDocumentId||x.id||'')));
+        counts[k]={storeRows:rows.length,serverPageRows:ids[k].length,
+          serverIdsPresentInStore:ids[k].filter(id=>keys.has(id)).length,
+          serverConfirmed:allNames.includes(k),denied:(st.deniedCollections||[]).includes(k),
+          hasSnapshotError:!!snapshotErrors[k]};
+      }
+      return{status:String(st.status||''),ready:st.ready===true,
+        requiredConfirmed:['negocios','gestiones'].every(k=>allNames.includes(k)),
+        counts,role:String(Orbit.session?.rol?.()||'').toLowerCase(),
+        country:String(Orbit.pais||'').toUpperCase(),
+        started:Orbit.productAppP0?.isStarted?.()===true};
+    },q.serverDocumentIds);
     for(const moduleKey of ['ops','leads']){
       await page.evaluate(k=>{if(Orbit.router?.go)Orbit.router.go(k);else location.hash='#/'+k;},moduleKey);
-      await page.waitForTimeout(550);
-      record.uiRoutes[moduleKey]=await page.evaluate(k=>({
-        route:Orbit.route?.key||'',moduleAuthorized:Orbit.access?.can?.(k,'view')===true,
-        hasBoard:!!document.querySelector('#host .kanban'),
-        deniedNotice:/No tienes acceso con el rol activo/.test(document.querySelector('#host')?.innerText||''),
-        cards:document.querySelectorAll('#host [data-neg],#host [data-ges]').length,
-        horizontalOverflow:document.documentElement.scrollWidth>innerWidth+2
-      }),moduleKey);
+      await page.waitForFunction(k=>Orbit.route?.key===k,null,{timeout:7000},moduleKey).catch(()=>{});
+      await page.waitForTimeout(350);
+      record.uiRoutes[moduleKey]=await page.evaluate(k=>{
+        const board=k==='ops'?Orbit.ciclo?.opsBoard?.():Orbit.ciclo?.leadsBoard?.();
+        const all=Array.isArray(board)?board:[];
+        const countItems=all.reduce((n,col)=>n+(col.items?.length||0),0);
+        const visibleItems=k==='ops'?all.reduce((n,col)=>n+(col.items||[])
+          .filter(it=>!Orbit.access?.canView||Orbit.access.canView(
+            it.kind==='negocio'?'negocios':'gestiones',it.rec,'ops')).length,0):countItems;
+        const text=String(document.querySelector('#host')?.innerText||'');
+        const authorized=Orbit.access?.can?.(k,'view')===true;
+        return{route:String(Orbit.route?.key||''),moduleAuthorized:authorized,
+          hasBoard:!!document.querySelector('#host .kanban'),
+          deniedNotice:/No tienes acceso con el rol activo/.test(text),
+          cards:document.querySelectorAll('#host [data-neg],#host [data-ges]').length,
+          boardCandidates:countItems,boardExpectedVisible:visibleItems,
+          boardColumns:all.length,preAuth:document.body.classList.contains('pre-auth'),
+          horizontalOverflow:document.documentElement.scrollWidth>innerWidth+2};
+      },moduleKey);
     }
-   }catch(e){record.uiRoutes.diagnosticError=String(e?.message||e).slice(0,100);}
+   }catch(e){record.uiRoutes.diagnosticError=String(e?.code||e?.message||e).slice(0,110);}
+   record.blockedNetwork=blockedNetwork;
    record.pageErrors=errs.length;
+   record.roleAligned=record.hydration.role===actor.role;
+   record.countryComparable=record.hydration.country===pair.country;
+   const h=record.hydration;
+   record.serverStoreComparable=record.roleAligned&&record.countryComparable&&h.requiredConfirmed===true;
+   record.serverRowsAbsent=record.serverStoreComparable&&Object.values(h.counts||{})
+     .some(x=>x.serverIdsPresentInStore<x.serverPageRows);
+   record.uiProjectionCoherent=['ops','leads'].every(k=>{
+     const x=record.uiRoutes[k];return x&&x.route===k&&
+       (x.moduleAuthorized?x.hasBoard&&!x.deniedNotice&&
+         x.cards===x.boardExpectedVisible:x.deniedNotice);
+   });
    result.actors.push(record);
   }finally{await ctx.close();}
  }
  result.d15=result.contactConflictsReview?'SAMPLED_CONTACT_CONFLICT_REVIEW_REQUIRED':
    result.contactPairsChecked?'SAMPLED_CONTACT_READBACK_NO_CONFLICT':'NO_COMPARABLE_SAMPLE_HOLD';
- const uiReady=result.actors.every(a=>['ops','leads'].every(k=>{
-  const x=a.uiRoutes?.[k];
-  return x&&x.route===k&&(x.moduleAuthorized?x.hasBoard&&!x.deniedNotice:x.deniedNotice);
- }));
  result.uiReadOnlyEvaluated=true;
- result.uiReadOnlyReady=uiReady;
- result.status=uiReady?'TWO_UID_SCOPED_READ_AND_ROLE_UI_NAVIGATION_PASS_WRITES_PENDING':
-  'TWO_UID_SCOPED_READ_PASS_UI_NAVIGATION_REQUIRES_DIAGNOSTIC';
+ result.uiReadOnlyReady=result.actors.every(a=>a.uiProjectionCoherent&&
+   a.hydration.requiredConfirmed&&a.activation?.started&&a.pageErrors===0);
+ result.serverStoreComparability=result.actors.map(a=>({
+   role:a.role,roleAligned:a.roleAligned,countryComparable:a.countryComparable,
+   fullyHydrated:a.hydration.requiredConfirmed,serverRowsAbsent:a.serverRowsAbsent,
+   projectionCoherent:a.uiProjectionCoherent
+ }));
+ const comparable=result.actors.every(a=>a.serverStoreComparable===true);
+ const mismatch=result.actors.some(a=>a.serverRowsAbsent||!a.uiProjectionCoherent);
+ result.status=!comparable?'QA_PRECONDITION_ROLE_COUNTRY_OR_HYDRATION_NOT_COMPARABLE':
+   mismatch?'SERVER_STORE_OR_UI_PARITY_MISMATCH_DIAGNOSTIC_NOT_ACCEPTED':
+   result.uiReadOnlyReady?'TWO_UID_SERVER_STORE_UI_PARITY_READONLY_PASS_WRITES_PENDING':
+   'TWO_UID_UI_ACTIVATION_OR_RENDER_NOT_READY_DIAGNOSTIC';
 }
 main().catch(e=>{result.status='HOLD_OR_QA_FAIL';result.errors.push(String(e?.message||e).slice(0,130));process.exitCode=1})
 .finally(async()=>{try{if(browser)await browser.close()}catch{}

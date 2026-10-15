@@ -1,0 +1,31 @@
+{
+  "schema": "GRAVICENTRA_I65_B4003_COMMERCIAL_SERVER_STORE_UI_PARITY_DIAG_V1",
+  "gate": "I6.5/B4-003",
+  "date": "2026-10-15",
+  "status": "QA_PROBE_PATCHED_EXACT_EXISTING_PREVIEW_RETEST_PENDING",
+  "sourceHead": "cd00c4583cefa1249f251c3ea64c2b10f3280dfb",
+  "existingPreview": {
+    "sourceHead": "ae6bc8be5c74581f6fb920ea79e39c826a7d1d9f",
+    "artifactId": 11983958349,
+    "runId": 38758078678
+  },
+  "trigger": "test(i6.5 B4-003): commercial two-UID read-only",
+  "owner": "tools/gravicentra-b4-003-commercial-readonly-qa.cjs",
+  "fromBlob": "343c38c47417514175a87aaa986548f8cd410d40",
+  "toBlob": "6f39f62acd6e8d6643fb4a080ab1719ac59a4275",
+  "rootCause": "The previous harness marked Ops/Leads UI PASS when .kanban existed, without waiting for authoritative negocios/gestiones hydration, checking active role and country, or comparing hydrated store/board/rendered cards. Server page count is not automatically equal to eligible board cards.",
+  "proof": "Compare read-only server page IDs to local store only when active role/country and server-confirmed collections match; measure board candidates and visibility-filtered expected cards and actual cards without outputting identifiers. Otherwise label QA noncomparable.",
+  "previousRun": 38763522986,
+  "previousUiPassWithdrawn": true,
+  "previousAuthenticatedServerReadPassPreserved": true,
+  "bounds": {
+    "dataWrites": 0,
+    "syntheticWrites": 0,
+    "buildChanged": false,
+    "rulesDeploy": false,
+    "livePromotion": false,
+    "reimport": false,
+    "tinyFish": false
+  },
+  "next": "Run current B4 executor QA-only; if read model and DOM diverge when comparable, isolate product owner and seek narrow source authorization. Never overwrite the existing certified Preview."
+}
