@@ -1,0 +1,76 @@
+{
+  "schema": "GRAVICENTRA_B4_003_RENEWALS_POLICY_PAGING_AUTHENTICATED_FUNCTIONAL_PROOF_V1",
+  "date": "2026-10-15",
+  "gate": "I6.5/B4-003",
+  "status": "LATEST_SOURCE_EXACT_PREVIEW_AUTHENTICATED_READONLY_FUNCTIONAL_PASS_HUMAN_ACCEPTANCE_AND_SECURITY_HOLD",
+  "sourceHead": "e2939e3916967bfcc4bbf3bebc6ab24869c0945a",
+  "buildId": "gi-i65-b4-e2939e391696-57f234755dc1",
+  "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-38720928748-vj9zib9f.web.app",
+  "previewTechnicalRun": 38720928748,
+  "functionalRun": 38722133958,
+  "functionalRunUrl": "https://github.com/paulaosoriof86/orbit360-core/actions/runs/38722133958",
+  "functionalConclusion": "success",
+  "artifactId": 11965542869,
+  "artifactDigest": "sha256:defdccc32a4591ded1a54b6509953d00fa3f128c1b23698b5c6eea15063133b2",
+  "sourceOwners": {
+    "orbit360-platform/modules/renovaciones.js": "6dcea79fcb8b5fda72e141f02d4f32cb05e39954",
+    "orbit360-platform/data/store-firestore-product-readonly-p0.js": "75d7745603686da0607a48fc4c1adcbefc37494f",
+    "functions/b4-003-scoped-policy-reader.js": "24546aa40f26d818aef7f1714c2a21deda63a550"
+  },
+  "assertions": {
+    "exactPhysicalPolicyCount": 1425,
+    "syntheticSixExcludedFromOperationalCount": true,
+    "operationalPolicyCount": 1419,
+    "historical583Terminal": true,
+    "olderExpiredOpenZero": true,
+    "recent24ExactDigest": true,
+    "countries": [
+      "TODOS",
+      "GT",
+      "CO"
+    ],
+    "roles": [
+      "direccion",
+      "operativo"
+    ],
+    "scenarios": 24,
+    "viewports": [
+      "1440x1000",
+      "390x844",
+      "320x568"
+    ],
+    "allBucketCardCountsAndLabels": true,
+    "allSixSyntheticInvisible": true,
+    "allRelevantPageConsoleHttp5xxErrorsZero": true,
+    "readyWithin8SecondBudgetBothRoles": true,
+    "postRoleRequiredDataBudgetBreaches": 0,
+    "normalSuccessful30Or120SecondTimeoutUsed": false,
+    "firstPaintNoPartialLeak": true,
+    "optionalInsurerDoesNotBlock": true,
+    "renewalUiClientAccepted": false
+  },
+  "physicalQaResidue": {
+    "sixCancelledRunSyntheticStillPhysicallyPresent": true,
+    "threeB2OrphanPoliciesRetained": true,
+    "b2OrphanFinancialDependents": 12,
+    "cleanupAuthorized": false,
+    "rosterClassificationPendingPhysicalCleanup": true
+  },
+  "releaseStatus": {
+    "b4003FindingStillOpen": true,
+    "securityP0StillOpen": true,
+    "sharedFirestoreRulesReadWriteStillBlocked": true,
+    "gtCoFullPermissionMatrixPending": true,
+    "crossModuleWritesPending": true,
+    "humanVisualPending": true,
+    "livePromotion": false
+  },
+  "boundaries": {
+    "realBusinessWrites": 0,
+    "syntheticWrites": 0,
+    "reimport": false,
+    "deleteCount": 0,
+    "sourceFilesChangedByReceipt": 0
+  },
+  "next": "Reconcile existing B4-003 case status without declaring release PASS; continue Ops/Leads authenticated UAT, Inicio and financial issues and Firestore security."
+}

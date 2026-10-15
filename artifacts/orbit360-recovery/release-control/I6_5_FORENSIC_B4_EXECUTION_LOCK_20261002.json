@@ -2526,7 +2526,7 @@
     "uiProofBlobSha": "4e1e5894e58da5ede3a4554ea88fc3115f3e1526"
   },
   "b4003PolicyPagingPerformance20261015": {
-    "status": "SCOPED_SOURCE_STAGED_PREVIEW_PENDING",
+    "status": "EXACT_AUTHENTICATED_READONLY_PERFORMANCE_PASS_HUMAN_AND_SECURITY_PENDING",
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PROTECTED_POLICY_PAGING_PERFORMANCE_SOURCE_FIX_20261015.json",
     "receiptBlobSha": "8db32c6a017defba14b770d397962d871cf003ad",
     "sourcePaths": [
@@ -2539,6 +2539,11 @@
     "qaStatus": "GT_CO_COUNTRY_QUERY_ASSERTIONS_REPAIRED_GUARD_PENDING",
     "qaTestBlobSha": "08ff4baa96f792ebbfe2ddad26769cb8ab380ca8",
     "qaGuardRetryReceipt": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PAGING_QA_GUARD_ROOT_FIX_20261015.json",
-    "qaGuardRetryReceiptBlobSha": "19d5c55c6537c52a8303b19b792c43b4ca7ab7c7"
+    "qaGuardRetryReceiptBlobSha": "19d5c55c6537c52a8303b19b792c43b4ca7ab7c7",
+    "functionalProofPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_RENEWALS_POLICY_PAGING_AUTHENTICATED_FUNCTIONAL_PASS_20261015.json",
+    "functionalProofBlobSha": "e8c971abc1e676c98cafa65801b9d8cdbc473e38",
+    "runId": 38722133958,
+    "operationalDataWritesAuthorized": false,
+    "livePromotionAuthorized": false
   }
 }
