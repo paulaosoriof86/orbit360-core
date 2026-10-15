@@ -179,7 +179,10 @@ async function main(){
         'PROTECTED_READ_COUNTRY_DENIED','PROTECTED_READ_RESPONSE_INVALID',
         'PROTECTED_READ_SERVER_RESPONSE_INVALID','PROTECTED_READ_COLLECTION_UNSUPPORTED',
         'PROTECTED_READ_DUPLICATE_OR_MISSING_ID','PROTECTED_READ_COUNTRY_MISMATCH',
-        'PROTECTED_READ_TENANT_MISMATCH','PROTECTED_READ_PAGE_LIMIT','permission-denied'];
+        'PROTECTED_READ_TENANT_MISMATCH','PROTECTED_READ_PAGE_LIMIT','permission-denied',
+        'modulo_no_visible','politica_no_autoriza_consulta','tenant_constraint_unico_requerido',
+        'scope_own_sin_constraint_asesor','scope_team_sin_constraint_equipo',
+        'scope_none_sin_deny','membresia_inactiva'];
       const category=raw=>codes.find(code=>String(raw||'').includes(code))||
         (raw?'OTHER_SANITIZED_ERROR':'');
       const diagnostics={
@@ -188,6 +191,9 @@ async function main(){
         denied:(st.deniedCollections||[]).filter(safeName),
         confirmed:(st.serverConfirmedCollections||[]).filter(safeName),
         required:(st.requiredStartupCollections||[]).filter(safeName),
+        quarantinedCounts:Object.entries(st.quarantinedRows||{}).filter(([k])=>safeName(k))
+          .map(([collection,rows])=>({collection,count:Array.isArray(rows)?rows.length:0}))
+          .filter(x=>x.count>0),
         planFailures:Object.entries(st.queryPlans||{}).filter(([k,p])=>
           safeName(k)&&p&&(p.hardError===true||p.denied===true||p.ok===false))
           .map(([collection,p])=>({collection,hardError:p.hardError===true,

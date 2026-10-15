@@ -1,0 +1,19 @@
+{
+  "schema": "GRAVICENTRA_B4003_OPERATIVE_QUERY_PLAN_DISCRIMINANT_QA_ONLY_V1",
+  "date": "2026-10-15",
+  "gate": "I6.5/B4-003",
+  "priorHead": "20eba484fc68837f780d487a5dee25885951ddf1",
+  "priorQaBlobSha": "58851f86d728a35de18779963783bb7674a9f77a",
+  "newQaBlobSha": "575ba9e070315dbaec0cacb5f6ec860fa77a71ed",
+  "status": "QA_ONLY_TARGETED_CODE_CATEGORIES_READONLY_RETEST_PENDING",
+  "provenPriorRunId": 38776649342,
+  "provenPriorQaArtifactId": 11994536071,
+  "provenCause": "OPERATIVO_REQUIRED_CLIENTES_PLAN_DENIED_AND_OTHER_COLLECTIONS_WITH_ATTACHED_OPS_LEADS",
+  "remainingQuestion": "Exact query planner codes vs denied/optional and quarantined-row counts",
+  "productChanged": false,
+  "previewChanged": false,
+  "dataWrites": 0,
+  "syntheticWrites": 0,
+  "firestoreRulesChanged": false,
+  "livePromotion": false
+}
