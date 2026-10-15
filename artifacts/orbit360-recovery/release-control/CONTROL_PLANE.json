@@ -11549,5 +11549,24 @@
     "fullB4003Closed": false,
     "realBusinessWrites": 0,
     "previewHumanAccepted": false
+  },
+  "b4003OperativoGtReadModelParity20261015": {
+    "status": "AUTHENTICATED_READ_PASS_READMODEL_UI_PARITY_NOT_ACCEPTED",
+    "runId": 38770154112,
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_OPERATIVO_GT_READONLY_PARITY_HOLD_20261015.json",
+    "receiptBlobSha": "914f8c333df5c49b2df4bd558e253497d6a0c66f",
+    "previewArtifactId": 11990990838,
+    "previewBuildId": "gi-i65-b4-159bbb25aa31-57f234755dc1",
+    "qaArtifactId": 11990603084,
+    "qaArtifactDigest": "sha256:025462f3160c82452b90f066c6fdc27d7dcbf639c208d5410d2e7fc172cb6936",
+    "operativoAttachErrorOpen": true,
+    "serverStoreIdParityOpen": true,
+    "restrictedReadPassPreserved": true,
+    "needsTrueCountryScopedParity": true,
+    "needsDataWriteQA": true,
+    "noProductMutation": true,
+    "securityHold": true,
+    "readyForPaulaReview": false,
+    "readyForLive": false
   }
 }
