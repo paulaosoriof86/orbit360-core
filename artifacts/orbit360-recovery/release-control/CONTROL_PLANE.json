@@ -11067,7 +11067,7 @@
   },
   "b4003TerminalAuthFailureSourceStage": {
     "gate": "I6.5/B4-003",
-    "status": "SOURCE_STAGED_GUARD_PENDING_NOT_ACCEPTED",
+    "status": "EXACT_PREVIEW_PUBLIC_LOGIN_PASS_AUTHENTICATED_POST_LOGIN_UAT_PENDING",
     "rootCause": "POST_AUTH_ACTIVATION_CATCH_LEFT_LOADING_OVERLAY_AND_DISABLED_SUBMIT",
     "sourceFiles": {
       "orbit360-platform/core/auth-product-runtime-p0.js": "5ae27034e76592cd34c2d90dc7962dac3fa0b000",
@@ -11088,6 +11088,37 @@
     "rebuildRequiredAfterPass": true,
     "qa": "tools/gravicentra-b4-003-auth-terminal.test.cjs",
     "sourceMutationAuthorizedOnlyWithinB4": true,
-    "livePromotionAuthorized": false
+    "livePromotionAuthorized": false,
+    "qaGuardRun": 38671530775,
+    "qaGuardResult": "PASS",
+    "syntheticChecks": 8,
+    "previewRun": 38671649065,
+    "previewRunResult": "success",
+    "previewSourceSha": "f18a8e26fcc7150995d575f250e6547a626044b2",
+    "previewBuildId": "gi-i65-b4-f18a8e26fcc7-57f234755dc1",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-38671649065-2hq9dnfu.web.app",
+    "artifactId": 11943739611,
+    "artifactDigest": "sha256:e96bfac1ee77a6656bc3699628a6b6bd54b67d31b97fc7a5bfbf0cada1169aac",
+    "hostedMarkerExact": true,
+    "hostedAuthRecoverySourceReadback": true,
+    "hostedScopedCallableTimeoutMs": 16000,
+    "qaBrowserRunId": "08b5e8a1-14ff-4231-a3a5-215b9e36cc3d",
+    "qaBrowserResult": "PUBLIC_LOGIN_VISIBLE_SESSION_NOT_AUTHENTICATED",
+    "realAuthenticatedPostLoginPass": false,
+    "firestoreRulesDeployed": false,
+    "productionPromoted": false,
+    "businessWrites": 0,
+    "previousPreviewDoNotUse": true
+  },
+  "b4003LatestQASessionBoundary": {
+    "gate": "I6.5/B4-003",
+    "status": "WAITING_REAL_ACCOUNT_SIGNIN_ON_FIXED_QA_PREVIEW_NO_INFINITE_SPINNER_PROOF",
+    "profile": "Gravicentra Preview QA",
+    "noCredentialsShared": true,
+    "priorSavedSessionAuthenticated": false,
+    "reviewOnlyPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b4-38671649065-2hq9dnfu.web.app",
+    "disableNewSourceBuildUntilFirstAuthenticatedUAT": true,
+    "requestedFirstTest": "LOGIN_THEN_CLIENTE360_COBROS_HISTORIAL_METAS",
+    "productionSecurityStillBlocked": true
   }
 }
