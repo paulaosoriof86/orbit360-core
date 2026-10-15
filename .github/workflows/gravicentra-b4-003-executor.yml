@@ -347,7 +347,7 @@ jobs:
           if not account: raise SystemExit('B4_003_FINANCE_SOURCE_SERVICE_ACCOUNT_UNAVAILABLE')
           out.write_text(json.dumps(account),encoding='utf-8')
           os.chmod(out,0o600)
-          with open(os.environ['GITHUB_ENV'],'a',encoding='utf-8') as f: f.write('GOOGLE_APPLICATION_CREDENTIALS='+str(out)+'\\n')
+          with open(os.environ['GITHUB_ENV'],'a',encoding='utf-8') as f: f.write('GOOGLE_APPLICATION_CREDENTIALS='+str(out)+'\n')
           print('B4_003_FINANCE_SOURCE_READONLY_ACCOUNT_SELECTED')
           PY
           npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund firebase-admin@13.4.0 >/dev/null
@@ -374,8 +374,9 @@ jobs:
           const policyReader=fs.readFileSync('functions/b4-003-scoped-policy-callable.js','utf8');
           const protectedStore=fs.readFileSync('orbit360-platform/data/store-firestore-product-readonly-p0.js','utf8');
           const names=[...required,...optional].filter((x,i,a)=>a.indexOf(x)===i);
-          const isCovered=name=>name==='polizas'||name==='aseguradoras'||name==='asesores'||
-            new RegExp("'"+name.replace(/[.*+?^${}()|[\]\\]/g,'\\      - name: Prepare R26 authenticated read-only QA')+"'").test(related.match(/const collections=new Set\(\[[^;]+\]\)/)?.[0]||'');
+          const relatedCollectionList=(related.match(/const collections=new Set\(\[[^;]+\]\)/)||[])[0]||'';
+          const isCovered=name=>['polizas','aseguradoras','asesores'].includes(name)
+            ||relatedCollectionList.includes("'"+name+"'");
           const unsupported=names.filter(x=>!isCovered(x));
           if(!policyReader.includes('readScopedRelatedList')||!protectedStore.includes('PROTECTED_READ_COLLECTION_UNSUPPORTED_'))
             fail('B4_003_PROTECTED_SOURCE_OWNER_NOT_FOUND');
@@ -436,7 +437,7 @@ jobs:
             }
             report.relations={policiesByCountry:policyCountries,crossCountryPolicyClient:crossCountry,children};
             report.status=unsupported.length?'SOURCE_READBACK_PASS_PROTECTED_COVERAGE_INCOMPLETE':'SOURCE_READBACK_PASS';
-            fs.writeFileSync(process.env.FINANCE_EVIDENCE_OUT,JSON.stringify(report,null,2)+'\\n');
+            fs.writeFileSync(process.env.FINANCE_EVIDENCE_OUT,JSON.stringify(report,null,2)+'\n');
             console.log('B4_003_EXACT_FINANCE_READBACK='+JSON.stringify(report));
           })().catch(e=>{console.error('B4_003_FINANCE_READBACK_FAIL:'+String(e.message||e));process.exitCode=1;});
           NODE
