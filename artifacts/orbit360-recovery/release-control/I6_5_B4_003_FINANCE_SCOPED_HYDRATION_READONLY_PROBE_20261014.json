@@ -1,0 +1,59 @@
+{
+  "schema": "GRAVICENTRA_B4003_FINANCE_SCOPED_HYDRATION_READONLY_PROBE_V1",
+  "gate": "I6.5/B4-003",
+  "kind": "READONLY_SYNTHETIC_CAUSAL_PROOF_NOT_SOURCE_FIX",
+  "source": {
+    "path": "orbit360-platform/data/store-firestore-product-readonly-p0.js",
+    "gitBlobSha": "7a6cda8afdf7bf0a7c076d760fa0e84ed7e853c7",
+    "repoHeadAtProof": "c5bf21e7048c87862d658511d69afec0540bd696"
+  },
+  "reproduction": {
+    "kind": "EXECUTED_MOCK_IN_CHAT_ISOLATED_V8",
+    "policies": 1425,
+    "cobros": 1,
+    "countries": [
+      "GT",
+      "CO"
+    ],
+    "authorizedRole": "operativo",
+    "casePositive": {
+      "policyReadCalls": 30,
+      "financialReadCalls": 143,
+      "loadedCobros": 1,
+      "serverConfirmed": true
+    },
+    "caseFailure": {
+      "injectedThirdFinancialCallError": "RESOURCE_EXHAUSTED",
+      "confirmed": false,
+      "loadedCobros": 0,
+      "snapshotError": "RESOURCE_EXHAUSTED",
+      "reactiveStoreErrorEvents": 0
+    }
+  },
+  "findings": [
+    "ONE_SYNTHETIC_COBRO_LOAD_REQUIRES_143_POLICY_ANCHORED_FINANCIAL_BATCH_CALLS",
+    "ONE_FAILED_BATCH_INVALIDATES_THE_ENTIRE_COLLECTION",
+    "STORE_RECORDERROR_DOES_NOT_NOTIFY_RENDER_LISTENERS"
+  ],
+  "interpretation": "This demonstrates source behavior with synthetic records, not actual production failure code or authenticated runtime performance.",
+  "boundary": {
+    "sourceModified": false,
+    "productionModified": false,
+    "firestoreRulesModified": false,
+    "operationalWrites": 0,
+    "qaFixtureWrites": 0,
+    "buildCreated": false,
+    "previewCertified": false,
+    "authenticatedUatPassed": false,
+    "securityGatePassed": false,
+    "liveAuthorized": false,
+    "ledgerItemsClosed": 0
+  },
+  "historicalApprovedReference": {
+    "gate": "B3-008",
+    "acceptedSourceSha": "dcd2b3f60b98ad96c94933f09da9e8478ea165c3",
+    "cobrosApprovedModuleBlobSha": "866570f35d87f8d4d7709736058831a218cb461e"
+  },
+  "proposedNext": "Reconcile authorized narrow source patch for server-verified cobros query and reactive terminal error; validate with synthetic own/team/all and country-negative scenarios, then exact new Preview and Paula functional readback before any PASS.",
+  "security": "Do not restore unscoped browser Firestore grants, read or log sensitive policy data, impersonate real users, or change shared Firestore rules."
+}
