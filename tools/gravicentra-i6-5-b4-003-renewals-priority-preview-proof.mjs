@@ -56,6 +56,47 @@ async function backendReadback(){
   const rows=ps.docs.map(d=>({id:d.id,p:d.data()||{}})),cancellations=new Set();
   for(const d of cs.docs){const p=d.data()||{},id=clean(p.polizaId||p.policyId);if(id)cancellations.add(id);}
   const terminal=rows.filter(({p})=>p.renewalDispositionRuleId===RULE_ID),recentRaw=[];
+  // Read-only discriminant when the frozen R20 count drifts. Keep the
+  // original expected count strict; NEVER bless six unexplained rows.
+  const qaCandidates=rows.filter(({id,p})=>p.__syntheticQa===true||
+    /^b4003qa_/i.test(id)||/^B2-REN-/i.test(clean(p.numero)));
+  const knownOrphans=['pol_mulsmxsk','pol_mulssmuz','pol_mulsxofx'];
+  const orphanChecks=await Promise.all(knownOrphans.map(async id=>{
+    const row=rows.find(x=>x.id===id);
+    const [receipts,portfolio]=await Promise.all([
+      col('recibosEsperados').where('polizaId','==',id).get(),
+      col('carteraPrimas').where('polizaId','==',id).get()
+    ]);
+    return {idHash:hash(id).slice(0,16),exists:!!row,
+      synthetic:!!row?.p.__syntheticQa,
+      b2QaNumber:/^B2-REN-/i.test(clean(row?.p.numero)),
+      linkedOriginalPresent:!!(row?.p.renuevaDe&&rows.some(x=>x.id===row.p.renuevaDe)),
+      receiptDependents:receipts.size,portfolioDependents:portfolio.size};
+  }));
+  const newer=rows.filter(({p})=>{
+    const v=p.createdAt||p.creadoAt||p.fechaCreacion||'';
+    const day=typeof v==='string'?v.slice(0,10):
+      v&&typeof v.toDate==='function'?v.toDate().toISOString().slice(0,10):'';
+    return day>='2026-10-08';
+  });
+  proof.backend.rosterDriftReadOnly={
+    status:ps.size===EXPECTED_POLICY_COUNT?'NO_COUNT_DRIFT':'ROSTER_DRIFT_REQUIRES_PROVENANCE',
+    expected:EXPECTED_POLICY_COUNT,observed:ps.size,delta:ps.size-EXPECTED_POLICY_COUNT,
+    qaCandidateCount:qaCandidates.length,
+    qaCandidateIdDigests:qaCandidates.map(({id})=>hash(id).slice(0,16)).sort(),
+    qaCandidateKinds:{
+      syntheticFlag:qaCandidates.filter(({p})=>p.__syntheticQa===true).length,
+      previewFlag:qaCandidates.filter(({p})=>p.previewWrite===true).length,
+      b2RenewalNumber:qaCandidates.filter(({p})=>/^B2-REN-/i.test(clean(p.numero))).length
+    },
+    recentlyCreatedCount:newer.length,
+    recentlyCreatedIdDigests:newer.map(({id})=>hash(id).slice(0,16)).sort(),
+    orphanChecks,
+    provenanceVerifiedForSixExtra:false,
+    actualWrites:0,approvalToDelete:false
+  };
+  console.log('B4_003_ROSTER_DRIFT_READONLY expected='+EXPECTED_POLICY_COUNT+
+    ' observed='+ps.size+' qaCandidates='+qaCandidates.length+' newer='+newer.length);
   need(ps.size===EXPECTED_POLICY_COUNT,'B4_003_RENEWALS_POLICY_COUNT_DRIFT:'+ps.size);
   need(terminal.length===EXPECTED_TERMINAL_COUNT,'B4_003_RENEWALS_B02_TERMINAL_COUNT:'+terminal.length);
   need(terminal.every(({p})=>clean(p.renovacionEstado)==='No renovada'&&clean(p.renewalDispositionReason)===REASON&&validDate(p.vigenciaFin||p.fechaFin||p.endDate)&&clean(p.vigenciaFin||p.fechaFin||p.endDate)<=CUTOFF),'B4_003_RENEWALS_B02_TERMINAL_READBACK');
