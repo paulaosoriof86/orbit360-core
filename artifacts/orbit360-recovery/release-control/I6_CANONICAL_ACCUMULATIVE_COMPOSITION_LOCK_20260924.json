@@ -178,7 +178,7 @@
     "orbit360-platform/core/auth-password-change-v20260805.js": "873b484d42825db2fa31e0ae90c9ec78598728f4",
     "orbit360-platform/core/auth-product-runtime-p0.js": "5ae27034e76592cd34c2d90dc7962dac3fa0b000",
     "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js": "60ce88178f48ff5d9b5fd01c1e2d92abe642dac1",
-    "orbit360-platform/core/backend-product-readonly-bootstrap-p0.js": "67193403d977f724ad7abfc86a7892d3d073e775",
+    "orbit360-platform/core/backend-product-readonly-bootstrap-p0.js": "8cc5ce156ee63eb212ba66667846305870f1befd",
     "orbit360-platform/core/backend-resource-contracts.js": "826364d2a394d0bfe75d9f0ccdc5dd8905d2b3f0",
     "orbit360-platform/core/ciclo.js": "3377c627ee53e3449f4ee382a570ea72335a0ada",
     "orbit360-platform/core/client-insurer-visual-contract-v20260720.js": "3fd89167a5a36662072dbdc3e970b48f61158343",
@@ -5806,5 +5806,17 @@
     "previousPreviewImmutable": true,
     "buildRequired": true,
     "livePromotion": false
+  },
+  "b4003OperativoRoleSwitchModuleVisibility20261015": {
+    "status": "SCOPED_SOURCE_FIXED_PENDING_VM_QA_AND_NEW_EXACT_PREVIEW",
+    "owner": "orbit360-platform/core/backend-product-readonly-bootstrap-p0.js",
+    "blobSha": "8cc5ce156ee63eb212ba66667846305870f1befd",
+    "qaPath": "tools/gravicentra-b4-003-protected-hydration.test.cjs",
+    "qaBlobSha": "eab90bc675adf33a8b885988787f100431c203c7",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_OPERATIVO_ROLE_SWITCH_VISIBILITY_CAUSAL_SOURCE_FIX_20261015.json",
+    "receiptBlobSha": "1d38ba27adbff30b84bf3e61176ca1b1f9331a36",
+    "existingPreviewUnchanged": true,
+    "livePromotion": false,
+    "securityHold": true
   }
 }

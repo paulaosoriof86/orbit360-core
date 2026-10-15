@@ -61,6 +61,20 @@
     return Object.assign({},compiled,{ok:true,errors:[],
       protectedReadAuthorization:'EFFECTIVE_MODULE_VIEW_PLUS_SERVER_SCOPED_CALLABLE'});
   }
+  // Use the selected, assigned Operativo role's own approved module set.
+  // A privileged/default-role bootstrap may have projected an empty module
+  // array that must not shadow Operativo after a legitimate view switch.
+  // Backend scoped callable and query scope remain independent authorities.
+  function protectedRoleMembership(membership, selected) {
+    var member = Object.assign({}, membership || {}, { activeRole: selected });
+    if (String(selected || '').toLowerCase() !== 'operativo') return member;
+    var owner = window.Orbit && window.Orbit.membershipMultirolEffectiveP0;
+    var modules = owner && typeof owner.effectiveModules === 'function'
+      ? owner.effectiveModules(member) : null;
+    // A missing evaluator never grants broad access.
+    member.modulesVisible = Array.isArray(modules) ? modules.slice() : [];
+    return member;
+  }
   // B4_003_PROTECTED_ROLE_QUERY_PARITY_END
 
   function unique(values) {
@@ -301,7 +315,7 @@
           if(!(membership.roles||[]).some(function(r){return norm(r)===norm(selected);}))
             return {ok:false,hardError:true,constraints:[],errors:['PROTECTED_ROLE_NOT_ASSIGNED']};
           var compiled=window.Orbit.productQueryPlannerP0.compile(collection,
-            Object.assign({},membership,{activeRole:selected}),{accessPolicy:accessPolicy});
+            protectedRoleMembership(membership,selected),{accessPolicy:accessPolicy});
           return protectedReadRolePlan(collection,membership,selected,compiled);
         };
       }

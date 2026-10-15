@@ -40,6 +40,34 @@ vm.runInNewContext(bootstrap.slice(begin,end)+'\nthis.probe=protectedReadRolePla
 assert.equal(deniedAccess.probe('gestiones',membershipProbe,'Operativo',prototypePlan('ops')).ok,false,
  'MODULE_NOT_ENABLED_MUST_REMAIN_DENIED');
 console.log('B4_003_PROTECTED_OPERATIVE_ROLE_SWITCH_PARITY_STATIC_AND_VM_PASS checks=12 no_data_writes');
+// Recompute effective modules for the actual selected Operativo role, not
+// a stale set frozen while signed in as Dirección. No blanket UI bypass.
+const membershipOwnerSource=fs.readFileSync('orbit360-platform/core/membership-multirol-contract-p0.js','utf8');
+const membershipCtx={window:{Orbit:{}}};
+vm.runInNewContext(membershipOwnerSource,membershipCtx);
+membershipCtx.window.Orbit.membershipMultirolEffectiveP0={
+ effectiveModules:membershipCtx.window.Orbit.membershipMultirolP0.effectiveModules};
+vm.runInNewContext(bootstrap.slice(begin,end)+'\nthis.roleMembership=protectedRoleMembership;',membershipCtx);
+const initial={tenantId:'synthetic-tenant',status:'active',
+ roles:['Dirección','Operativo','Asesor'],activeRole:'Dirección',
+ modulesVisible:[],modulesExtra:[],modulesRestricted:['comisiones'],
+ countries:['GT'],dataScopes:{default:'all',modules:{}}};
+const chosen=membershipCtx.roleMembership(initial,'Operativo');
+assert.equal(chosen.activeRole,'Operativo');
+assert.ok(chosen.modulesVisible.includes('cliente360')&&chosen.modulesVisible.includes('polizas')&&
+ chosen.modulesVisible.includes('cobros')&&chosen.modulesVisible.includes('ops')&&
+ chosen.modulesVisible.includes('leads'),'OPERATIVO_APPROVED_MODULE_PROJECTION_REQUIRED');
+assert.ok(!chosen.modulesVisible.includes('comisiones'),'RESTRICTED_COMMISSION_NOT_VISIBLE');
+assert.ok(!chosen.modulesVisible.includes('siniestros'),'UNAPPROVED_MODULE_NOT_GRANTED');
+assert.deepEqual(Array.from(initial.modulesVisible),[],'ORIGINAL_MEMBERSHIP_UNMODIFIED');
+const adviserView=membershipCtx.roleMembership(initial,'Asesor');
+assert.deepEqual(Array.from(adviserView.modulesVisible),[],'OTHER_ROLE_NOT_RECOMPOSED');
+const unavailable={window:{Orbit:{}}};
+vm.runInNewContext(bootstrap.slice(begin,end)+'\nthis.roleMembership=protectedRoleMembership;',unavailable);
+assert.deepEqual(Array.from(unavailable.roleMembership(initial,'Operativo').modulesVisible),[],
+ 'MISSING_EFFECTIVE_MODULE_OWNER_FAILS_CLOSED');
+console.log('B4_003_OPERATIVO_SELECTED_ROLE_MODULE_RECOMPOSITION_VM_PASS checks=8 no_data_writes');
+
 
 const events={},calls=[],tenant='synthetic-tenant';let role='asesor',direct=0;
 const win={Orbit:{session:{rol:()=>role}}};

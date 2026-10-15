@@ -1,0 +1,33 @@
+{
+  "schema": "GRAVICENTRA_B4003_OPERATIVO_ROLE_MODULE_CAUSAL_SOURCE_FIX_V1",
+  "date": "2026-10-15",
+  "gate": "I6.5/B4-003",
+  "status": "SOURCE_FIXED_VM_TEST_PENDING_NEW_IMMUTABLE_BUILD_AND_FUNCTIONAL_PREVIEW",
+  "priorPhysicalHead": "8ece92e7817720c63bc3a3354bcd2c941a2af486",
+  "causalEvidenceRun": 38777183453,
+  "causalEvidenceArtifact": 11994656531,
+  "rootCause": "Operativo after effective role switch uses modulesVisible projected at initial membership role; query compiler rejects authorized required collections (cliente360/polizas/cobros/metas) with modulo_no_visible; other unsupported collections retain politica_no_autoriza_consulta",
+  "scopedFix": "Only protected read mode when selected role Operativo recomputes modulesVisible from approved effective role modules and existing restrictions; server callable still independently authorizes; never alter scopes, direct reads, or runtime live rules",
+  "sourcePath": "orbit360-platform/core/backend-product-readonly-bootstrap-p0.js",
+  "previousSourceBlob": "67193403d977f724ad7abfc86a7892d3d073e775",
+  "newSourceBlob": "8cc5ce156ee63eb212ba66667846305870f1befd",
+  "testPath": "tools/gravicentra-b4-003-protected-hydration.test.cjs",
+  "previousTestBlob": "2ff039f1d9dfecb1601585397bc94a6e8580c3c2",
+  "newTestBlob": "eab90bc675adf33a8b885988787f100431c203c7",
+  "remainingHold": [
+    "REAL_FUNCTIONAL_RUN_REQUIRED",
+    "OPS_LEADS_SERVER_STORE_ID_PARITY",
+    "FIRESTORE_SHARED_RULES_SECURITY",
+    "PERSISTENCE_WRITES_NOT_AUTHORIZED",
+    "PAULA_VISUAL_REQUIRED"
+  ],
+  "productSourceChanged": true,
+  "previewRebuildRequired": true,
+  "oldPreviewImmutable": true,
+  "productionPromotion": false,
+  "firestoreRulesDeployment": false,
+  "operationalWrites": 0,
+  "syntheticWrites": 0,
+  "reimport": false,
+  "notPass": true
+}
