@@ -1,6 +1,6 @@
 # G14 creates an immutable single-publisher candidate specification only.
 # This workflow intentionally has NO publisher job and NO release credentials.
-name: AYS G14 coordinated Hosting publisher SOURCE ONLY
+name: AYS G14 G15 coordinated Hosting publisher SOURCE ONLY
 on:
   push:
     branches:
@@ -8,6 +8,7 @@ on:
     paths:
       - '.github/workflows/ays-g14-coordinated-publisher-sourceonly.yml'
       - 'tools/ays-g14/**'
+      - 'tools/ays-g15/**'
   workflow_dispatch:
 permissions:
   contents: read
@@ -87,6 +88,17 @@ jobs:
             --g7-dir "$RUNNER_TEMP/g14-g7" \
             --g8-receipt "$RUNNER_TEMP/g14-evidence/G8_SAME_RUN_PRECHECK.json" \
             --out-dir "$RUNNER_TEMP/g14-evidence/final"
+      - name: G15 prepare exact 965-file isolated Hosting publication bundle, no deploy
+        shell: bash
+        run: |
+          set -euo pipefail
+          python tools/ays-g15/G15_PREPARE_EXACT_HOSTING_TREE_SOURCEONLY.py \
+            --repo "$GITHUB_WORKSPACE" \
+            --source-root "$RUNNER_TEMP/g14-staged/candidate/orbit360-platform" \
+            --manifest "$RUNNER_TEMP/g14-evidence/final/G14_PUBLISH_CANDIDATE_MANIFEST.json" \
+            --g14-receipt "$RUNNER_TEMP/g14-evidence/final/G14_SOURCE_ONLY_RELEASE_HOLD_RECEIPT.json" \
+            --g8-receipt "$RUNNER_TEMP/g14-evidence/G8_SAME_RUN_PRECHECK.json" \
+            --out "$RUNNER_TEMP/g15-publisher"
       - name: Assert no publishing commands or Firebase credentials in G14 workflow
         shell: bash
         run: |
@@ -106,11 +118,12 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: ays-g14-coordinated-publisher-sourceonly
+          name: ays-g14-g15-coordinated-publisher-sourceonly
           path: |
             ${{ runner.temp }}/g14-evidence/G8_SAME_RUN_PRECHECK.json
             ${{ runner.temp }}/g14-evidence/final/G14_PUBLISH_CANDIDATE_MANIFEST.json
             ${{ runner.temp }}/g14-evidence/final/G14_SOURCE_ONLY_RELEASE_HOLD_RECEIPT.json
+            ${{ runner.temp }}/g15-publisher/
           if-no-files-found: warn
           retention-days: 15
 # NEVER deploy or merge from this job. A separately authorized release mechanism is required.
