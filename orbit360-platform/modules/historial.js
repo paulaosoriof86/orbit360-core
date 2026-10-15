@@ -7,6 +7,15 @@ Orbit.modules = Orbit.modules || {};
 Orbit.modules.historial = (function () {
   const U = Orbit.ui, q = Orbit.q, K = Orbit.kit, S = () => Orbit.store;
   let st = { fq: '', ftipo: '', fase: '' };
+  // Authoritative hydration state: never display a false zero while the
+  // scoped source is still loading or was denied by the server.
+  function activityReadiness() {
+    let x={}; try{x=S()?._productStatus?.()||{};}catch(_){}
+    const known=Array.isArray(x.serverConfirmedCollections);
+    const ready=!known||x.serverConfirmedCollections.includes('actividades');
+    const failed=!!(x.snapshotErrors&&x.snapshotErrors.actividades);
+    return {ready,failed,pending:!ready&&!failed};
+  }
 
   const TIPOS = { llamada: 'Llamada', whatsapp: 'WhatsApp', email: 'Correo', correo: 'Correo', reunion: 'Reunión', nota: 'Nota', sistema: 'Sistema', recuperacion: 'Recuperación', siniestro: 'Siniestro' };
   const FDEFS = () => [
@@ -26,6 +35,12 @@ Orbit.modules.historial = (function () {
   }
 
   function render(host) {
+    const sourceState=activityReadiness();
+    const notice=sourceState.failed
+      ? '<div class="cfg-note" role="alert">No fue posible consultar el historial autorizado. Vuelve a intentar la carga.</div>'
+      :sourceState.pending
+      ? '<div class="cfg-note" role="status">Consultando historial autorizado…</div>'
+      :'';
     const all = S().all('actividades');
     const r = rows();
     st.__count = r.length + ' interacciones';
@@ -39,8 +54,9 @@ Orbit.modules.historial = (function () {
 
     host.innerHTML = `<div class="page">
       ${K.bannerFor('historial', '')}
+      ${notice}
       ${K.kpis([
-        { label: 'Interacciones', val: all.length, color: 'var(--red)', foot: 'ver todas', onclick: "Orbit.modules.historial.filtrarTipo('')" },
+        { label: 'Interacciones', val: sourceState.ready?all.length:'—', color: 'var(--red)', foot: 'ver todas', onclick: "Orbit.modules.historial.filtrarTipo('')" },
         { label: 'Llamadas', val: porTipo.llamada || 0, color: 'var(--info)', foot: 'telefónicas', onclick: "Orbit.modules.historial.filtrarTipo('llamada')" },
         { label: 'WhatsApp', val: porTipo.whatsapp || 0, color: 'var(--ok)', foot: 'mensajes', onclick: "Orbit.modules.historial.filtrarTipo('whatsapp')" },
         { label: 'Reuniones', val: porTipo.reunion || 0, color: 'var(--warn)', foot: 'asesorías', onclick: "Orbit.modules.historial.filtrarTipo('reunion')" }

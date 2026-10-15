@@ -4870,7 +4870,7 @@
       "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
       "executionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B4_EXECUTION_LOCK_20261002.json",
       "executionLockBlobSha": "8f78bfd3ed4d6c17db51b664921e92d760faea95",
-      "compositionLockBlobSha": "37eed40a90034eb463f0271f16329e9c3ba66aed",
+      "compositionLockBlobSha": "2cb6102e2a59cf48e4e76246c5258ff8abac64f5",
       "findingLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
       "activeFindingId": "B4-003",
       "productSourceSha": "c603fd3561e7229d9359db45495d4cf2d757cd8f",
@@ -5996,7 +5996,7 @@
   "canonicalAccumulationControl": {
     "status": "FROZEN_ACTIVE",
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "compositionLockBlobSha": "37eed40a90034eb463f0271f16329e9c3ba66aed",
+    "compositionLockBlobSha": "2cb6102e2a59cf48e4e76246c5258ff8abac64f5",
     "findingLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
     "findingLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
@@ -6313,7 +6313,7 @@
     "activeFindingId": "B4-003",
     "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
     "executionLockBlobSha": "8f78bfd3ed4d6c17db51b664921e92d760faea95",
-    "compositionLockBlobSha": "37eed40a90034eb463f0271f16329e9c3ba66aed",
+    "compositionLockBlobSha": "2cb6102e2a59cf48e4e76246c5258ff8abac64f5",
     "findingLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
     "noLive": true,
     "noReimport": true,
@@ -10819,5 +10819,31 @@
     "productMutationGloballyAuthorized": false,
     "conditionalSourceScopeOnly": true,
     "existingGateUnchanged": true
+  },
+  "b4003ScopedHistoryReactiveSourceStage": {
+    "gate": "I6.5/B4-003",
+    "status": "SOURCE_STAGED_QA_PENDING_NO_PREVIEW_PASS",
+    "paths": [
+      "orbit360-platform/core/router.js",
+      "orbit360-platform/modules/historial.js",
+      "orbit360-platform/index.html"
+    ],
+    "productBlobs": {
+      "orbit360-platform/core/router.js": "d0f930d3ff020b0724000ccc5c64b065dec5817b",
+      "orbit360-platform/modules/historial.js": "6329129526b850a62e645aa9cd384e7d19317365",
+      "orbit360-platform/index.html": "f7273c4ef700fee90d82ca2c6ba276851d87f76f",
+      "tools/gravicentra-b4-003-scoped-related-reader.test.cjs": "340cd0b5968696a4454987f32bc3948b067b5174"
+    },
+    "design": "ROUTER_REPAINT_ON_AUTHORIZED_ACTIVITY_READ_AND_BOUNDED_LOADING_STATE",
+    "unlinkedHistoricalActivitiesStillHeld": true,
+    "previewAlreadyTriggeredPriorSource": true,
+    "requiresNewImmutablePreview": true,
+    "sharedFirestoreRulesNotChanged": true,
+    "realDataWrites": 0,
+    "livePromotion": false,
+    "compositionBlobSha": "2cb6102e2a59cf48e4e76246c5258ff8abac64f5",
+    "productMutationGloballyAuthorized": false,
+    "explicitScopedException": "CONTINUE_B4_003_HISTORIAL_CAUSAL_RESTORE",
+    "functionalPass": false
   }
 }

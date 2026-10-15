@@ -5,6 +5,12 @@ const {Denied}=require('../functions/b4-003-scoped-access-boundary');
 const tenantId='alianzas-soluciones';
 const fs=require('node:fs');
 const rawReader=fs.readFileSync(require('node:path').join(__dirname,'../functions/b4-003-scoped-related-reader.js'),'utf8');
+const routerSource=fs.readFileSync(require('node:path').join(__dirname,'../orbit360-platform/core/router.js'),'utf8');
+const historialSource=fs.readFileSync(require('node:path').join(__dirname,'../orbit360-platform/modules/historial.js'),'utf8');
+assert.ok(routerSource.includes("historial: ['actividades', 'clientes', 'polizas', 'asesores']"),
+  'B4_003_HISTORIAL_ROUTER_REACTIVE_COLLECTIONS_REQUIRED');
+assert.ok(historialSource.includes('function activityReadiness()')&&historialSource.includes('sourceState.ready?all.length'),
+  'B4_003_HISTORIAL_MUST_NOT_RENDER_FALSE_ZERO_BEFORE_SERVER_READ');
 assert.ok(rawReader.includes('Promise.all(anchors.map(async pid=>'),'B4_003_RELATED_ANCHORS_PARALLEL_BOUNDED_REQUIRED');
 assert.ok(rawReader.includes('policyIds.length>10'),'B4_003_MAX_TEN_ANCHORS_PRESERVED');
 const docs={
