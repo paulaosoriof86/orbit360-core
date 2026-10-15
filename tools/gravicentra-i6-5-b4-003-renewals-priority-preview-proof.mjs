@@ -229,7 +229,15 @@ async function renderCountry(page,country,phase,viewport){
     const recentVisible=recentAccessible.filter(id=>{const el=h.querySelector('[data-renewal-policy="'+CSS.escape(id)+'"]');return !!el&&el.closest('[data-renewal-bucket]')?.dataset.renewalBucket==='vencidas';});
     const terminalVisible=terminalIds.filter(id=>!!h.querySelector('[data-renewal-policy="'+CSS.escape(id)+'"]'));
     const qaFixtureVisible=qaSixIds.filter(id=>!!h.querySelector('[data-renewal-policy="'+CSS.escape(id)+'"]'));
-    const labelOk=cards.every(card=>{const t=[...card.querySelectorAll('.badge')].map(x=>String(x.textContent||'').trim());return t.some(x=>x.startsWith('Póliza:'))&&t.some(x=>x.startsWith('Renovación:'));});
+    const labelOk=cards.every(card=>{
+      const policyNumber=[...card.querySelectorAll('.mono')].some(el=>/^Póliza\s+\S/.test(String(el.textContent||'').trim()));
+      const effective=card.querySelector('[data-renewal-effective-status]');
+      const sourceState=!!effective&&String(effective.title||'').startsWith('Estado de origen:');
+      const badges=[...card.querySelectorAll('.badge')].map(el=>String(el.textContent||'').trim());
+      const term=badges.some(t=>t.startsWith('Vigencia calculada:'));
+      const decision=badges.some(t=>t.startsWith('Decisión:')||t==='Confirma si renovó o no'||t==='Revisa el resultado de la renovación');
+      return policyNumber&&sourceState&&term&&decision;
+    });
     const board=h.querySelector('.renewal-board'),boardRect=board?.getBoundingClientRect();
     const cardsFit=cards.every(card=>{const r=card.getBoundingClientRect();return !boardRect||r.left>=boardRect.left-2&&r.right<=boardRect.right+2;});
     const actionsFit=cards.every(card=>[...card.querySelectorAll('.renewal-card-actions > *')].every(el=>{const r=el.getBoundingClientRect(),cr=card.getBoundingClientRect();return r.left>=cr.left-2&&r.right<=cr.right+2&&r.width>0;}));

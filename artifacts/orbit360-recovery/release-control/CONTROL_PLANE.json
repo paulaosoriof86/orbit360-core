@@ -4869,7 +4869,7 @@
       "entryGuardReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_ENTRY_GUARD_PASS_20261002.json",
       "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
       "executionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B4_EXECUTION_LOCK_20261002.json",
-      "executionLockBlobSha": "18d6a61c129024c89a3dd66e6adbd6ac7718e9d4",
+      "executionLockBlobSha": "579b1eb3092dbcd3a348a21ad5cc7162fbc9e1f9",
       "compositionLockBlobSha": "6067adc820a426652fa68c855740146176df8e07",
       "findingLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
       "activeFindingId": "B4-003",
@@ -6312,7 +6312,7 @@
     "status": "B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL",
     "activeFindingId": "B4-003",
     "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
-    "executionLockBlobSha": "18d6a61c129024c89a3dd66e6adbd6ac7718e9d4",
+    "executionLockBlobSha": "579b1eb3092dbcd3a348a21ad5cc7162fbc9e1f9",
     "compositionLockBlobSha": "6067adc820a426652fa68c855740146176df8e07",
     "findingLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
     "noLive": true,
@@ -11295,9 +11295,9 @@
     "sourcePath": "orbit360-platform/modules/renovaciones.js",
     "sourceBlobSha": "6dcea79fcb8b5fda72e141f02d4f32cb05e39954",
     "qaPath": "tools/gravicentra-i6-5-b4-003-renewals-priority-preview-proof.mjs",
-    "qaBlobSha": "7793cd1bc619233fc58e5bebad47179ae41bbf23",
+    "qaBlobSha": "fd3070f07ec96dba52824288785ed07a635c37f0",
     "compositionBlobSha": "6067adc820a426652fa68c855740146176df8e07",
-    "executionLockBlobSha": "18d6a61c129024c89a3dd66e6adbd6ac7718e9d4",
+    "executionLockBlobSha": "579b1eb3092dbcd3a348a21ad5cc7162fbc9e1f9",
     "realBusinessWrites": 0,
     "livePromotion": false,
     "firestoreRulesDeploy": false,
@@ -11314,6 +11314,9 @@
     "buildId": "gi-i65-b4-dc394982cadb-57f234755dc1",
     "artifactId": 11963277777,
     "artifactDigest": "sha256:881bf17dd5bc81e85a1b4f338ec2ad5fd7b3d681bd2cd13e172e187ae00d2df6",
-    "p0Closed": 0
+    "p0Closed": 0,
+    "uiLabelQa": "REAL_APPROVED_UI_SEMANTICS_CONTRACT",
+    "uiUat": "PENDING_AUTHENTICATED_RETRY",
+    "securityP0Closed": false
   }
 }
