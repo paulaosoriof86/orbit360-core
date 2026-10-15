@@ -1,0 +1,97 @@
+{
+  "schema": "GRAVICENTRA_B4_003_RENEWALS_READONLY_FULL_UI_MATRIX_AND_STARTUP_HOLD_V1",
+  "date": "2026-10-15",
+  "gate": "I6.5/B4-003",
+  "status": "MODULE_READONLY_UI_MATRIX_PASS_STARTUP_PERFORMANCE_FAIL_VISUAL_HUMAN_PENDING",
+  "findingIds": [
+    "B4-003-R20-B01",
+    "B4-003-P0-20261012-QA-CANCELLED-RUN-FIXTURES"
+  ],
+  "sourceHead": "dc394982cadbb51ee943a6c81fc2c84e54a5fe0b",
+  "sourceBlob": "6dcea79fcb8b5fda72e141f02d4f32cb05e39954",
+  "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-38717794781-vnjqmd6p.web.app",
+  "buildId": "gi-i65-b4-dc394982cadb-57f234755dc1",
+  "qaHead": "62307053bb32f19b61f66d0237bbb528d3c11248",
+  "qaBlob": "fd3070f07ec96dba52824288785ed07a635c37f0",
+  "runId": 38719080466,
+  "runConclusion": "failure",
+  "qaJobStatus": "failure",
+  "artifactId": 11963378668,
+  "artifactDigest": "sha256:570b79eb506f55e76d357d749838fe8e748ca823ce50352e4c042c41a02a2434",
+  "backend": {
+    "totalPhysical": 1425,
+    "exactSyntheticSix": 6,
+    "operational": 1419,
+    "terminal583": 583,
+    "oldOpen": 0,
+    "recent24": 24,
+    "exactDigest": "3512b167cdde30b51f67acc3c77135f2a94df5f133fd2d3b45cde8540938e67a"
+  },
+  "functional": {
+    "roles": [
+      "direccion",
+      "operativo"
+    ],
+    "countries": [
+      "TODOS",
+      "GT",
+      "CO"
+    ],
+    "viewports": [
+      "desktop 1440x1000",
+      "mobile 390x844",
+      "mobile 320x568"
+    ],
+    "coldWarm": true,
+    "roleCountryViewportScenarios": 24,
+    "allCanonicalCardCountsMatched": true,
+    "allFourBucketsMatched": true,
+    "labelsMatchCurrentApprovedUi": true,
+    "noSyntheticQaVisible": true,
+    "noTerminalHistoricalVisible": true,
+    "desktopMobileOverflowChecksPassed": true,
+    "errors": {
+      "page": 0,
+      "console": 0,
+      "http5xx": 0
+    },
+    "allCountriesCardCount": 73,
+    "gtCardCount": 63,
+    "coCardCount": 10
+  },
+  "performance": {
+    "status": "FAIL_8S_BOUND",
+    "type": "RENEWALS_POST_ROLE_CHANGE_REQUIRED_SERVER_POLICIES_HYDRATION",
+    "directionRequiredReadyMsApprox": 12813,
+    "operativeRequiredReadyMsApprox": 11235,
+    "limitMs": 8000,
+    "note": "8 seconds elapsed before required 'polizas' server confirmation; during bounded forensic observation the collection eventually became ready. Diagnostic extra wait cannot satisfy the normal successful path.",
+    "ownerCandidates": [
+      "orbit360-platform/data/store-firestore-product-readonly-p0.js",
+      "functions/b4-003-scoped-policy-reader.js",
+      "orbit360-platform/core/product-runtime-browser-providers-p0.js"
+    ],
+    "sourceMechanism": "protectedLoad processes 50-policy pages sequentially per country; changing active role resets cache and reattaches. Page latency attribution still requires targeted metrics; no performance PASS.",
+    "remaining": [
+      "Bounded policy-list hydration below allowed time without losing approved rows",
+      "Full GT/CO roles and writes",
+      "Human visual acceptance",
+      "Effective Firestore Rules negative security",
+      "LIVE promotion/readback"
+    ]
+  },
+  "security": {
+    "sharedRulesDeployed": false,
+    "releaseHoldActive": true,
+    "operationalWrites": 0,
+    "syntheticWrites": 0,
+    "reimport": false,
+    "livePromotion": false,
+    "findingsClosed": 0
+  },
+  "noLoss": {
+    "existingFindingsPreserved": 295,
+    "parentB4StatusUnchanged": true,
+    "nextActionUnchanged": "I6_5_FORENSIC_REMEDIATION_B4_003_R20_TARGETED_PAULA_VISUAL"
+  }
+}

@@ -2512,7 +2512,7 @@
     "noLive": true
   },
   "b4003RenewalsSyntheticQaFilter20261015": {
-    "status": "SCOPED_SOURCE_STAGED_EXACT_PREVIEW_REQUIRED",
+    "status": "TARGETED_AUTHENTICATED_READONLY_UI_MATRIX_PASS_PERFORMANCE_HOLD",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_RENEWALS_SYNTHETIC_EXCLUSION_SOURCE_FIX_20261015.json",
     "blobSha": "16a12d58094a8ba164b652a11b4d68c8cffe8249",
     "sourceBlobSha": "6dcea79fcb8b5fda72e141f02d4f32cb05e39954",
@@ -2521,6 +2521,8 @@
     "realOperationalWritesAuthorized": false,
     "livePromotionAuthorized": false,
     "qaScope": "CHECK_ACTUAL_APPROVED_UI_NUMBER_ORIGIN_VALIDITY_DECISION",
-    "currentPreviewNoDataWrites": true
+    "currentPreviewNoDataWrites": true,
+    "uiProofPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_RENEWALS_FUNCTIONAL_MATRIX_AND_STARTUP_HOLD_20261015.json",
+    "uiProofBlobSha": "4e1e5894e58da5ede3a4554ea88fc3115f3e1526"
   }
 }
