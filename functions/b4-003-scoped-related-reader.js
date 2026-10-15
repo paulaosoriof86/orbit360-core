@@ -95,42 +95,73 @@ async function readScopedRelatedList({db,auth,request}){
    tenantId,activeRole:role,country,collection:coll});
  const target=tenant.collection('data').doc(coll).collection('items');
 
- // Small, server-authorized Cobros event index: avoid querying every policy.
- // No browser Firestore fallback; fail closed above the bounded row ceiling.
- if(coll==='cobros'&&!policyId&&!hasBatch){
-   const MAX_EVENTS=200;
-   const snap=await target.orderBy('__name__').limit(MAX_EVENTS+1).get();
-   const docs=Array.isArray(snap.docs)?snap.docs:[];
-   if(docs.length>MAX_EVENTS)throw new Denied('COBROS_EVENT_SCAN_BOUND_EXCEEDED');
-   const visible=[];
-   for(const d of docs){
-     const row=d.data()||{},pid=clean(row.polizaId||row.policyId);
-     if(!pid||(row.tenantId&&row.tenantId!==tenantId))continue;
-     let policy;
-     try{
-       const ps=await docRef(tenant,'polizas',safeId(pid,'POLICY')).get();
-       if(!ps.exists)continue;
-       policy=ps.data()||{};
-       allowRow(ctx,policy);
-     }catch(e){if(e instanceof Denied)continue;throw e;}
-     const policyClient=clean(policy.clienteId);
-     const rowClient=clean(row.clienteId||row.clientId);
-     if(!policyClient||(rowClient&&rowClient!==policyClient))continue;
-     const policyCountry=clean(policy.pais||policy.country).toUpperCase();
-     if(policyCountry!==country)continue;
-     visible.push(Object.assign({},row,{
-       id:row.id||d.id,canonicalDocumentId:d.id,
-       tenantId,pais:policyCountry,clienteId:policyClient,polizaId:pid
-     }));
+ // B4-003 financial-source parity: page the *child collection* once, not
+ // every existing policy.  A requested page is a lookup hint, NEVER authority.
+ // Parents and scopes are verified server-side for every returned record.
+ // Unlike the earlier Cobros fast path, client-only real receipts are retained.
+ if(['vehiculos','recibosEsperados','carteraPrimas','cobros'].includes(coll)&&!policyId&&!hasBatch){
+   const MAX_SCANNED=3000,RAW_PAGE=100,PARENT_CONCURRENCY=10;
+   const parents=new Map();
+   async function verifiedParent(kind,id){
+     const key=kind+':'+id;
+     if(!parents.has(key))parents.set(key,docRef(tenant,kind,safeId(id,'RELATION')).get()
+       .then(s=>s.exists?s.data()||{}:null));
+     return parents.get(key);
    }
-   const start=cursor?visible.findIndex(r=>r.canonicalDocumentId===cursor)+1:0;
-   if(cursor&&start===0)throw new Denied('CURSOR_DENIED');
-   const rows=visible.slice(start,start+pageSize);
+   async function verifiedEvent(d){
+     const row=d.data()||{},pid=clean(row.polizaId||row.policyId),
+       inputCid=clean(row.clienteId||row.clientId);
+     if(!clean(d.id)||(row.tenantId&&row.tenantId!==tenantId))return null;
+     if(!pid&&!inputCid)return null;
+     try{
+     let policy=null,client=null,linkedCid=inputCid;
+     if(pid){
+       policy=await verifiedParent('polizas',pid);
+       if(!policy)return null;
+       linkedCid=clean(policy.clienteId);
+       if(!linkedCid||(inputCid&&inputCid!==linkedCid))return null;
+     }
+     if(linkedCid){
+       client=await verifiedParent('clientes',linkedCid);
+       if(!client)return null;
+     }
+     if(!policy&&!client)return null;
+     try{
+       verifiedLinkedClient(ctx,client,policy);
+       allowRow(ctx,row,policy?[policy]:[client]);
+     }catch(e){if(e instanceof Denied)return null;throw e;}
+     return Object.assign({},row,{
+       id:row.id||d.id,canonicalDocumentId:d.id,tenantId,
+       pais:clean(row.pais||row.country||policy?.pais||policy?.country||client?.pais||client?.country),
+       clienteId:linkedCid,polizaId:pid||clean(row.polizaId)
+     });
+     }catch(e){if(e instanceof Denied)return null;throw e;}
+   }
+   let ordered=target.orderBy('__name__'),scanned=0;
+   if(cursor){
+     const at=await target.doc(cursor).get();
+     if(!at.exists||!await verifiedEvent(at))throw new Denied('CURSOR_DENIED');
+     ordered=ordered.startAfter(at);
+   }
+   const filtered=[];
+   while(filtered.length<=pageSize){
+     const ss=await ordered.limit(RAW_PAGE).get(),docs=Array.isArray(ss.docs)?ss.docs:[];
+     if(!docs.length)break;
+     scanned+=docs.length;
+     if(scanned>MAX_SCANNED)throw new Denied('FINANCIAL_SCAN_BOUND_EXCEEDED');
+     for(let n=0;n<docs.length;n+=PARENT_CONCURRENCY){
+       const batch=await Promise.all(docs.slice(n,n+PARENT_CONCURRENCY).map(verifiedEvent));
+       filtered.push(...batch.filter(Boolean));
+       if(filtered.length>pageSize)break;
+     }
+     if(filtered.length>pageSize||docs.length<RAW_PAGE)break;
+     ordered=target.orderBy('__name__').startAfter(docs[docs.length-1]);
+   }
+   const rows=filtered.slice(0,pageSize);
    return {ok:true,serverScoped:true,collection:coll,country,scope:ctx.scope,
-     rows,nextCursor:visible.length>start+pageSize?rows[rows.length-1].canonicalDocumentId:null,
-     anchoring:'verified_policy_event'};
+     rows,nextCursor:filtered.length>pageSize?rows[rows.length-1].canonicalDocumentId:null,
+     anchoring:'server_verified_financial_parent_or_direct_client'};
  }
-
 
  // Canonical R23 goal projection contract: raw goals have an advisor or are
  // institution-wide. Country may be derived from the explicitly stored currency,

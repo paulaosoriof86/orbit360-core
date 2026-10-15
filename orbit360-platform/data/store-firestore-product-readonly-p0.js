@@ -125,7 +125,7 @@
       });
     }
     function protectedRelatedUniverse(collection,epoch){
-      if(collection==='cobros')return protectedLoad('cobros','',epoch);
+      if(['vehiculos','recibosEsperados','carteraPrimas','cobros'].includes(collection))return protectedLoad(collection,'',epoch);
       // Do not cache partially hydrated global views. Server verifies every batch.
       if(!protectedPoliciesPromise)protectedPoliciesPromise=protectedLoad('polizas','',epoch);
       return protectedPoliciesPromise.then(function(policies){

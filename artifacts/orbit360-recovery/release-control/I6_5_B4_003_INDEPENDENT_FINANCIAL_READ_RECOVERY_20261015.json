@@ -1,0 +1,83 @@
+{
+  "schema": "GRAVICENTRA_I65_B4003_INDEPENDENT_FINANCIAL_READ_V1",
+  "gate": "I6.5/B4-003",
+  "status": "SOURCE_STAGED_QA_AND_EXACT_PREVIEW_PENDING",
+  "reason": "P0 previously-approved finance views degraded by role-protected per-10-policy read amplification for recibosEsperados, carteraPrimas and vehiculos (plus earlier Cobros partial).",
+  "sourceBefore": {
+    "functions/b4-003-scoped-related-reader.js": "373fd17a92cb93349817219c41ed40e38dbc48f5",
+    "orbit360-platform/data/store-firestore-product-readonly-p0.js": "0875fda2539aba9a7e0073cacb07eb83345c8955",
+    "orbit360-platform/core/product-runtime-browser-providers-p0.js": "c3fc310737ed4377b7e83f0969bfbba0e57344ab"
+  },
+  "sourceAfter": {
+    "functions/b4-003-scoped-related-reader.js": "6f6f4866e62c404328d4dff5e24fb5a8f15b4077",
+    "orbit360-platform/data/store-firestore-product-readonly-p0.js": "cb64ae67a5531cd3f6a966843f5286c14aac25a7",
+    "orbit360-platform/core/product-runtime-browser-providers-p0.js": "36239a65b7a00a471f5020c5e45c7a252bfecd16"
+  },
+  "qaAfter": {
+    "tools/gravicentra-b4-003-scoped-related-reader.test.cjs": "710fc78e362b6aeba3da115491bf4b07d7e1ec91",
+    "tools/gravicentra-b4-003-protected-hydration.test.cjs": "91e4bc72c232cdb46ded0ec5ea84d56524e2c2e1"
+  },
+  "sourceBehavior": "Server-owned child-collection pagination with per-row canonical policy/client validation, bounded to 3,000 raw rows per call, 10 parallel parent validations, direct-client records preserved, cursor foreign-record denied.",
+  "isolatedSyntheticExecution": {
+    "status": "PASS",
+    "collections": [
+      "recibosEsperados",
+      "carteraPrimas",
+      "cobros",
+      "vehiculos"
+    ],
+    "results": [
+      [
+        "direct",
+        "r1",
+        "r2"
+      ],
+      [
+        "direct",
+        "r1"
+      ],
+      [
+        "debt1"
+      ],
+      [
+        "cb1",
+        "cb2",
+        "cbDirect"
+      ],
+      [
+        "v1"
+      ]
+    ],
+    "unauthorizedCursorDenied": true,
+    "quarantinedLegacyRelations": true,
+    "childQueryCalls": 5,
+    "operationalWrites": 0
+  },
+  "configAndPermissionsContinuity": {
+    "lastPreviewRunId": 38691683797,
+    "sourceBuildId": "gi-i65-b4-707337f47677-57f234755dc1",
+    "rolesRestoredSource": true,
+    "configurationSaveReloadRealUat": "PENDING",
+    "multiRoleAndAdvisorScope": "PENDING",
+    "noApprovedSourceRebuild": true
+  },
+  "limitations": [
+    "Synthetic results do not establish real cold/warm performance nor complete financial data.",
+    "Records without verifiable policy or client are not blindly exposed; require provenance reconciliation in existing ledger.",
+    "3,000 document scan cap is fail closed and requires real aggregate volume verification.",
+    "LIVE shared Firestore Rules remain on security hold; no deployment.",
+    "The new Preview must demonstrate Clientes360 Cartera/Salud and Cobros, Inicio, role scopes GT/CO and no page/console errors."
+  ],
+  "constraints": {
+    "newBranch": false,
+    "newRepo": false,
+    "newFirebase": false,
+    "noOperationalDataMutation": true,
+    "noReimport": true,
+    "noFirestoreRulesDeploy": true,
+    "noLive": true,
+    "zeroNewAcceptedP0": true
+  },
+  "compositionBlob": "df6cd9f383c107dd547be9a37aaaa82ea56da72a",
+  "executionLockBlob": "ba98aa51e81921a3fdc08f6b561e011cf52d6210"
+}

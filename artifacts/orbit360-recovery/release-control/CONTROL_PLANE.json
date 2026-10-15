@@ -4869,8 +4869,8 @@
       "entryGuardReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_ENTRY_GUARD_PASS_20261002.json",
       "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
       "executionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B4_EXECUTION_LOCK_20261002.json",
-      "executionLockBlobSha": "af330c456cb80f42a72376d3d86ac29db59b8513",
-      "compositionLockBlobSha": "391062fd13d01df783dd512472f14967a50c29da",
+      "executionLockBlobSha": "ba98aa51e81921a3fdc08f6b561e011cf52d6210",
+      "compositionLockBlobSha": "df6cd9f383c107dd547be9a37aaaa82ea56da72a",
       "findingLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
       "activeFindingId": "B4-003",
       "productSourceSha": "c603fd3561e7229d9359db45495d4cf2d757cd8f",
@@ -5996,7 +5996,7 @@
   "canonicalAccumulationControl": {
     "status": "FROZEN_ACTIVE",
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "compositionLockBlobSha": "391062fd13d01df783dd512472f14967a50c29da",
+    "compositionLockBlobSha": "df6cd9f383c107dd547be9a37aaaa82ea56da72a",
     "findingLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
     "findingLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
@@ -6312,8 +6312,8 @@
     "status": "B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL",
     "activeFindingId": "B4-003",
     "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
-    "executionLockBlobSha": "af330c456cb80f42a72376d3d86ac29db59b8513",
-    "compositionLockBlobSha": "391062fd13d01df783dd512472f14967a50c29da",
+    "executionLockBlobSha": "ba98aa51e81921a3fdc08f6b561e011cf52d6210",
+    "compositionLockBlobSha": "df6cd9f383c107dd547be9a37aaaa82ea56da72a",
     "findingLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
     "noLive": true,
     "noReimport": true,
@@ -11112,19 +11112,19 @@
   },
   "b4003LatestQASessionBoundary": {
     "gate": "I6.5/B4-003",
-    "status": "EXACT_CONFIGURATION_ROLE_PARITY_PREVIEW_TECHNICAL_PASS_AUTHENTICATED_FINANCIAL_AND_CONFIG_UAT_PENDING",
+    "status": "FINANCE_PROTECTED_CHILD_COLLECTION_SOURCE_STAGED_QA_PREVIEW_REQUIRED",
     "profile": "Gravicentra Preview QA",
     "noCredentialsShared": true,
     "priorSavedSessionAuthenticated": false,
     "reviewOnlyPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b4-38691683797-vqfu87tg.web.app",
-    "disableNewSourceBuildUntilFirstAuthenticatedUAT": true,
+    "disableNewSourceBuildUntilFirstAuthenticatedUAT": false,
     "requestedFirstTest": "LOGIN_THEN_CLIENTE360_COBROS_HISTORIAL_METAS",
     "productionSecurityStillBlocked": true,
     "firstAuthenticatedPaulaLoginConfirmedFromScreenshot": true,
     "priorClient360CobrosFailuresReproducedByPaula": true,
     "newPreviewUATStatus": "PENDING",
     "lastRejectedRunId": 38687708932,
-    "nextUAT": "RENDER_PARTIAL_TERMINAL_COMPLETE_THEN_GT_CO_CARTERA_PRIMAS_RECONCILIATION",
+    "nextUAT": "EXACT_GT_CO_CLIENT360_CARTERA_SALUD_COBROS_INICIO_AND_CONFIGURATION_ROLE_PERMISSION_MATRIX",
     "lastTechnicalRunId": 38691683797
   },
   "b4003FinanceCobrosScopedRecovery20261014": {
@@ -11217,5 +11217,30 @@
     "authenticatedRoleUat": "PENDING",
     "configurationPersistenceUat": "PENDING",
     "securityP0Closed": false
+  },
+  "b4003IndependentFinanceReadRecovery20261015": {
+    "gate": "I6.5/B4-003",
+    "status": "SOURCE_COMMITTED_QA_AUTHENTICATED_PREVIEW_PENDING",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_INDEPENDENT_FINANCIAL_READ_RECOVERY_20261015.json",
+    "receiptBlobSha": "327be202097e041774d2a99da00dd52b2742a0cd",
+    "compositionBlobSha": "df6cd9f383c107dd547be9a37aaaa82ea56da72a",
+    "executionLockBlobSha": "ba98aa51e81921a3fdc08f6b561e011cf52d6210",
+    "productOwners": [
+      "functions/b4-003-scoped-related-reader.js",
+      "orbit360-platform/data/store-firestore-product-readonly-p0.js",
+      "orbit360-platform/core/product-runtime-browser-providers-p0.js"
+    ],
+    "qaOwners": [
+      "tools/gravicentra-b4-003-scoped-related-reader.test.cjs",
+      "tools/gravicentra-b4-003-protected-hydration.test.cjs"
+    ],
+    "authBrowserUat": "PENDING",
+    "exactBuild": "PENDING",
+    "securityP0Closed": false,
+    "livePromotion": false,
+    "sharedRulesDeploy": false,
+    "operationalWrites": 0,
+    "noReimport": true,
+    "findingsClosed": 0
   }
 }

@@ -22,6 +22,15 @@ CO:[{id:'p3',canonicalDocumentId:'p3',tenantId:tenant,pais:'CO',asesorId:'a1'}]}
 const relatedFixtures={GT:[{id:'r1',canonicalDocumentId:'r1',tenantId:tenant,pais:'GT',polizaId:'p1'},
 {id:'r2',canonicalDocumentId:'r2',tenantId:tenant,pais:'GT',polizaId:'p2'}],
 CO:[{id:'r3',canonicalDocumentId:'r3',tenantId:tenant,pais:'CO',polizaId:'p3'}]};
+const vehicleFixtures={
+ GT:[{id:'v1',canonicalDocumentId:'v1',tenantId:tenant,pais:'GT',polizaId:'p1',asesorId:'a1'},
+ {id:'v2',canonicalDocumentId:'v2',tenantId:tenant,pais:'GT',polizaId:'p2',asesorId:'a2'}],
+ CO:[{id:'v3',canonicalDocumentId:'v3',tenantId:tenant,pais:'CO',polizaId:'p3',asesorId:'a1'}]
+};
+const portfolioFixtures={
+ GT:[{id:'d1',canonicalDocumentId:'d1',tenantId:tenant,pais:'GT',polizaId:'p1',asesorId:'a1'}],
+ CO:[{id:'d3',canonicalDocumentId:'d3',tenantId:tenant,pais:'CO',polizaId:'p3',asesorId:'a1'}]
+};
 const cobrosFixtures={GT:[
   {id:'pay1',canonicalDocumentId:'pay1',tenantId:tenant,pais:'GT',polizaId:'p1',asesorId:'a1'},
   {id:'pay2',canonicalDocumentId:'pay2',tenantId:tenant,pais:'GT',polizaId:'p2',asesorId:'a2'}
@@ -43,7 +52,7 @@ const deps={db:{},collection:()=>{direct++;throw Error('DIRECT_READ_USED');},
 onSnapshot:()=>{direct++;throw Error('DIRECT_LISTENER_USED');},getDocsFromServer:()=>{direct++;throw Error('DIRECT_GET_USED');},
 protectedReadPage:async req=>{
  calls.push({...req});
- const source=(req.collection==='polizas'?policyFixtures:req.collection==='recibosEsperados'?relatedFixtures:req.collection==='cobros'?cobrosFixtures:req.collection==='aseguradoras'?insurerFixtures:req.collection==='asesores'?advisorFixtures:workflowFixtures[req.collection]||dataset);
+ const source=(req.collection==='polizas'?policyFixtures:req.collection==='recibosEsperados'?relatedFixtures:req.collection==='vehiculos'?vehicleFixtures:req.collection==='carteraPrimas'?portfolioFixtures:req.collection==='cobros'?cobrosFixtures:req.collection==='aseguradoras'?insurerFixtures:req.collection==='asesores'?advisorFixtures:workflowFixtures[req.collection]||dataset);
  const visiblePolicyIds=(policyFixtures[req.country]||[]).filter(x=>req.activeRole==='operativo'||x.asesorId==='a1').map(x=>x.id);
  const visible=(source[req.country]||[]).filter(x=>(req.activeRole==='operativo'||x.asesorId==='a1'||req.collection==='recibosEsperados'&&visiblePolicyIds.includes(x.polizaId))
    &&(!Array.isArray(req.policyIds)||req.policyIds.includes(x.polizaId))&&(!req.policyId||req.policyId===x.polizaId));
@@ -72,6 +81,8 @@ const pause=()=>new Promise(ok=>setTimeout(ok,30));
    'ALL_EIGHT_REQUIRE_AUTHORITATIVE_SERVER_RESPONSE');
  assert.deepEqual(Array.from(startup.all('aseguradoras'),x=>x.id),['iGT','iCO']);
  assert.deepEqual(Array.from(startup.all('asesores'),x=>x.id),['a1','a2']);
+ assert.deepEqual(Array.from(startup.all('vehiculos'),x=>x.id),['v1','v2','v3']);
+ assert.deepEqual(Array.from(startup.all('carteraPrimas'),x=>x.id),['d1','d3']);
  assert.equal(direct,0);
   console.log('B4_003_PROTECTED_EIGHT_REQUIRED_COLLECTIONS_QA_PASS checks=5 no_direct_firestore multi_country_advisor_merged');
  const flowsConfig=config(['negocios','gestiones']);flowsConfig.requiredCollections=['negocios','gestiones'];
@@ -112,7 +123,10 @@ const pause=()=>new Promise(ok=>setTimeout(ok,30));
  await pause();
  assert.deepEqual(Array.from(related.all('recibosEsperados'),x=>x.id),['r1','r2','r3']);
  assert.equal(related._productStatus().serverConfirmedCollections.includes('recibosEsperados'),true);
- assert.ok(calls.some(x=>x.collection==='recibosEsperados'&&Array.isArray(x.policyIds)&&x.policyIds.length>0));
+ assert.ok(calls.filter(x=>x.collection==='recibosEsperados').every(x=>!x.policyId&&!Array.isArray(x.policyIds)),
+  'RECEIPTS_MUST_USE_INDEPENDENT_SERVER_VERIFIED_PAGES');
+ assert.ok(calls.filter(x=>['vehiculos','carteraPrimas','cobros'].includes(x.collection)).every(x=>!x.policyId&&!Array.isArray(x.policyIds)),
+  'FINANCIAL_VEHICLE_READS_MUST_NOT_TRAVERSE_ALL_POLICIES');
  assert.equal(direct,0);
 
  role='asesor';events['orbit:active-role-changed'].slice().forEach(fn=>fn());

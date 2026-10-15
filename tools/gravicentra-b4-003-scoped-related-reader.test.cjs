@@ -25,7 +25,7 @@ const docs={
  vehiculos:{v1:{id:'v1',polizaId:'p1',clienteId:'c1'},v2:{id:'v2',polizaId:'p2',clienteId:'c2'}},
  recibosEsperados:{r1:{id:'r1',polizaId:'p1',clienteId:'c1',monto:12},r2:{id:'r2',polizaId:'p2',clienteId:'c2'},bad:{id:'bad',polizaId:'p1',clienteId:'c2'},orphan:{id:'orphan',polizaId:'missing',clienteId:'c1'},direct:{id:'direct',clienteId:'c1'}},
  carteraPrimas:{debt1:{id:'debt1',polizaId:'p1',clienteId:'c1',monto:10}},
- cobros:{paid1:{id:'paid1',polizaId:'p1',clienteId:'c1',monto:3},paid2:{id:'paid2',polizaId:'p2',clienteId:'c2'}},
+ cobros:{directPaid:{id:'directPaid',clienteId:'c1',monto:1},paid1:{id:'paid1',polizaId:'p1',clienteId:'c1',monto:3},paid2:{id:'paid2',polizaId:'p2',clienteId:'c2'}},
  negocios:{n1:{id:'n1',tenantId,pais:'GT',asesorId:'a1',etapa:'nuevo'},n2:{id:'n2',tenantId,pais:'GT',asesorId:'a2',etapa:'cotizando'}},
  gestiones:{g1:{id:'g1',tenantId,pais:'GT',asesorId:'a1',lista:'Gestiones Admin'},g2:{id:'g2',tenantId,pais:'GT',asesorId:'a2',lista:'Emisiones'}},
  actividades:{
@@ -105,15 +105,35 @@ async function deny(fn,code){let thrown;try{await fn()}catch(e){thrown=e}assert.
  const flow=(collection,role='operativo',options={})=>readScopedRelatedList({
   db,auth:{uid:'u1',token:{}},request:{tenantId,collection,activeRole:role,country:'GT',pageSize:50,...options}
  });
+ // P0 regression: financial and vehicle universes do not require
+ // N policy-batch HTTP requests. The server still validates policy/client FK.
+ const receiptAll=await flow('recibosEsperados');
+ assert.deepEqual(receiptAll.rows.map(x=>x.id),['direct','r1','r2']);checks++;
+ const receiptOwn=await flow('recibosEsperados','asesor');
+ assert.deepEqual(receiptOwn.rows.map(x=>x.id),['direct','r1']);checks++;
+ const receiptCO=await flow('recibosEsperados','operativo',{country:'CO'});
+ assert.deepEqual(receiptCO.rows.map(x=>x.id),[]);checks++;
+ const portfolioGlobal=await flow('carteraPrimas');
+ assert.deepEqual(portfolioGlobal.rows.map(x=>x.id),['debt1']);checks++;
+ const vehicleGlobal=await flow('vehiculos');
+ assert.deepEqual(vehicleGlobal.rows.map(x=>x.id),['v1','v2']);checks++;
+ const vehicleOwn=await flow('vehiculos','asesor');
+ assert.deepEqual(vehicleOwn.rows.map(x=>x.id),['v1']);checks++;
+ const receiptPageOne=await flow('recibosEsperados','operativo',{pageSize:1});
+ assert.deepEqual(receiptPageOne.rows.map(x=>x.id),['direct']);
+ const receiptPageTwo=await flow('recibosEsperados','operativo',{pageSize:1,cursor:receiptPageOne.nextCursor});
+ assert.deepEqual(receiptPageTwo.rows.map(x=>x.id),['r1']);checks++;
+ await deny(()=>flow('recibosEsperados','operativo',{cursor:'bad'}),'CURSOR_DENIED');checks++;
+ await deny(()=>flow('carteraPrimas','asesor',{policyIds:['p2']}),'POLICY_NOT_FOUND_OR_DENIED');checks++;
  const payAll=await flow('cobros');
- assert.deepEqual(payAll.rows.map(x=>x.id),['paid1','paid2']);checks++;
+ assert.deepEqual(payAll.rows.map(x=>x.id),['directPaid','paid1','paid2']);checks++;
  const payOwn=await flow('cobros','asesor');
- assert.deepEqual(payOwn.rows.map(x=>x.id),['paid1']);checks++;
+ assert.deepEqual(payOwn.rows.map(x=>x.id),['directPaid','paid1']);checks++;
  const payPage=await flow('cobros','operativo',{pageSize:1});
- assert.deepEqual(payPage.rows.map(x=>x.id),['paid1']);
- assert.equal(payPage.nextCursor,'paid1');checks++;
- const payPageTwo=await flow('cobros','operativo',{pageSize:1,cursor:'paid1'});
- assert.deepEqual(payPageTwo.rows.map(x=>x.id),['paid2']);checks++;
+ assert.deepEqual(payPage.rows.map(x=>x.id),['directPaid']);
+ assert.equal(payPage.nextCursor,'directPaid');checks++;
+ const payPageTwo=await flow('cobros','operativo',{pageSize:1,cursor:'directPaid'});
+ assert.deepEqual(payPageTwo.rows.map(x=>x.id),['paid1']);checks++;
  await deny(()=>flow('cobros','operativo',{cursor:'wrong'}),'CURSOR_DENIED');checks++;
  for(const collection of ['negocios','gestiones']){
   const all=await flow(collection);assert.equal(all.rows.length,2);checks++;
