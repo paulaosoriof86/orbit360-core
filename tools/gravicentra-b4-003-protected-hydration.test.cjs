@@ -22,6 +22,10 @@ CO:[{id:'p3',canonicalDocumentId:'p3',tenantId:tenant,pais:'CO',asesorId:'a1'}]}
 const relatedFixtures={GT:[{id:'r1',canonicalDocumentId:'r1',tenantId:tenant,pais:'GT',polizaId:'p1'},
 {id:'r2',canonicalDocumentId:'r2',tenantId:tenant,pais:'GT',polizaId:'p2'}],
 CO:[{id:'r3',canonicalDocumentId:'r3',tenantId:tenant,pais:'CO',polizaId:'p3'}]};
+const cobrosFixtures={GT:[
+  {id:'pay1',canonicalDocumentId:'pay1',tenantId:tenant,pais:'GT',polizaId:'p1',asesorId:'a1'},
+  {id:'pay2',canonicalDocumentId:'pay2',tenantId:tenant,pais:'GT',polizaId:'p2',asesorId:'a2'}
+],CO:[]};
 const workflowFixtures={
  negocios:{GT:[{id:'nGT1',canonicalDocumentId:'nGT1',tenantId:tenant,pais:'GT',asesorId:'a1'},{id:'nGT2',canonicalDocumentId:'nGT2',tenantId:tenant,pais:'GT',asesorId:'a2'}],CO:[{id:'nCO1',canonicalDocumentId:'nCO1',tenantId:tenant,pais:'CO',asesorId:'a1'}]},
  gestiones:{GT:[{id:'gGT1',canonicalDocumentId:'gGT1',tenantId:tenant,pais:'GT',asesorId:'a1'},{id:'gGT2',canonicalDocumentId:'gGT2',tenantId:tenant,pais:'GT',asesorId:'a2'}],CO:[{id:'gCO1',canonicalDocumentId:'gCO1',tenantId:tenant,pais:'CO',asesorId:'a1'}]}
@@ -39,7 +43,7 @@ const deps={db:{},collection:()=>{direct++;throw Error('DIRECT_READ_USED');},
 onSnapshot:()=>{direct++;throw Error('DIRECT_LISTENER_USED');},getDocsFromServer:()=>{direct++;throw Error('DIRECT_GET_USED');},
 protectedReadPage:async req=>{
  calls.push({...req});
- const source=(req.collection==='polizas'?policyFixtures:req.collection==='recibosEsperados'?relatedFixtures:req.collection==='aseguradoras'?insurerFixtures:req.collection==='asesores'?advisorFixtures:workflowFixtures[req.collection]||dataset);
+ const source=(req.collection==='polizas'?policyFixtures:req.collection==='recibosEsperados'?relatedFixtures:req.collection==='cobros'?cobrosFixtures:req.collection==='aseguradoras'?insurerFixtures:req.collection==='asesores'?advisorFixtures:workflowFixtures[req.collection]||dataset);
  const visiblePolicyIds=(policyFixtures[req.country]||[]).filter(x=>req.activeRole==='operativo'||x.asesorId==='a1').map(x=>x.id);
  const visible=(source[req.country]||[]).filter(x=>(req.activeRole==='operativo'||x.asesorId==='a1'||req.collection==='recibosEsperados'&&visiblePolicyIds.includes(x.polizaId))
    &&(!Array.isArray(req.policyIds)||req.policyIds.includes(x.polizaId))&&(!req.policyId||req.policyId===x.polizaId));
@@ -93,6 +97,15 @@ const pause=()=>new Promise(ok=>setTimeout(ok,30));
  role='operativo';events['orbit:active-role-changed'].slice().forEach(fn=>fn());
  assert.deepEqual(Array.from(store.all('clientes'),x=>x.id),[]);
  await pause();assert.deepEqual(Array.from(store.all('clientes'),x=>x.id),['c1','c2','c3']);
+ assert.equal(direct,0);
+ const finance=win.Orbit.createFirestoreProductReadOnlyStoreP0(deps,config(['cobros']));
+ const from=calls.length;
+ assert.equal(finance._attachSnapshots(),true);await pause();
+ assert.deepEqual(Array.from(finance.all('cobros'),x=>x.id),['pay1','pay2']);
+ assert.equal(finance._productStatus().serverConfirmedCollections.includes('cobros'),true);
+ assert.equal(calls.slice(from).filter(x=>x.collection==='cobros').length,2,
+   'COBROS_MUST_NOT_FETCH_142_PLUS_POLICY_ANCHOR_BATCHES');
+ assert.ok(calls.slice(from).filter(x=>x.collection==='cobros').every(x=>!x.policyId&&!Array.isArray(x.policyIds)));
  assert.equal(direct,0);
  const related=win.Orbit.createFirestoreProductReadOnlyStoreP0(deps,config(['recibosEsperados']));
  assert.equal(related._attachSnapshots(),true);

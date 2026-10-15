@@ -95,6 +95,43 @@ async function readScopedRelatedList({db,auth,request}){
    tenantId,activeRole:role,country,collection:coll});
  const target=tenant.collection('data').doc(coll).collection('items');
 
+ // Small, server-authorized Cobros event index: avoid querying every policy.
+ // No browser Firestore fallback; fail closed above the bounded row ceiling.
+ if(coll==='cobros'&&!policyId&&!hasBatch){
+   const MAX_EVENTS=200;
+   const snap=await target.orderBy('__name__').limit(MAX_EVENTS+1).get();
+   const docs=Array.isArray(snap.docs)?snap.docs:[];
+   if(docs.length>MAX_EVENTS)throw new Denied('COBROS_EVENT_SCAN_BOUND_EXCEEDED');
+   const visible=[];
+   for(const d of docs){
+     const row=d.data()||{},pid=clean(row.polizaId||row.policyId);
+     if(!pid||(row.tenantId&&row.tenantId!==tenantId))continue;
+     let policy;
+     try{
+       const ps=await docRef(tenant,'polizas',safeId(pid,'POLICY')).get();
+       if(!ps.exists)continue;
+       policy=ps.data()||{};
+       allowRow(ctx,policy);
+     }catch(e){if(e instanceof Denied)continue;throw e;}
+     const policyClient=clean(policy.clienteId);
+     const rowClient=clean(row.clienteId||row.clientId);
+     if(!policyClient||(rowClient&&rowClient!==policyClient))continue;
+     const policyCountry=clean(policy.pais||policy.country).toUpperCase();
+     if(policyCountry!==country)continue;
+     visible.push(Object.assign({},row,{
+       id:row.id||d.id,canonicalDocumentId:d.id,
+       tenantId,pais:policyCountry,clienteId:policyClient,polizaId:pid
+     }));
+   }
+   const start=cursor?visible.findIndex(r=>r.canonicalDocumentId===cursor)+1:0;
+   if(cursor&&start===0)throw new Denied('CURSOR_DENIED');
+   const rows=visible.slice(start,start+pageSize);
+   return {ok:true,serverScoped:true,collection:coll,country,scope:ctx.scope,
+     rows,nextCursor:visible.length>start+pageSize?rows[rows.length-1].canonicalDocumentId:null,
+     anchoring:'verified_policy_event'};
+ }
+
+
  // Canonical R23 goal projection contract: raw goals have an advisor or are
  // institution-wide. Country may be derived from the explicitly stored currency,
  // never from an unrelated client or team. Return an allowlisted projection.

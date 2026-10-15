@@ -1,0 +1,68 @@
+{
+  "schema": "GRAVICENTRA_I65_B4003_FINANCE_COBROS_SCOPED_SOURCE_FIX_V1",
+  "gate": "I6.5/B4-003",
+  "status": "SOURCE_STAGED_QA_PREVIEW_PENDING",
+  "authorization": "Paula explicit instruction to continue urgent recovery within same gate, 2026-10-14",
+  "priorAccepted": {
+    "gate": "I6.5 B3-008",
+    "sourceSha": "dcd2b3f60b98ad96c94933f09da9e8478ea165c3",
+    "cobrosModuleBlob": "866570f35d87f8d4d7709736058831a218cb461e"
+  },
+  "cause": "Authenticated protected reader traverses whole policy universe to recover a small Cobros event collection; a single failed child batch aborts hydration, while recordError does not emit change event.",
+  "sourceFiles": {
+    "functions/b4-003-scoped-related-reader.js": {
+      "before": "6b218560d9248be1d994d3f451d1f478807cadfc",
+      "after": "373fd17a92cb93349817219c41ed40e38dbc48f5"
+    },
+    "orbit360-platform/data/store-firestore-product-readonly-p0.js": {
+      "before": "7a6cda8afdf7bf0a7c076d760fa0e84ed7e853c7",
+      "after": "0875fda2539aba9a7e0073cacb07eb83345c8955"
+    },
+    "orbit360-platform/core/product-runtime-browser-providers-p0.js": {
+      "before": "18a54174fac664ef843d90d1a05a64368bb6b81d",
+      "after": "c3fc310737ed4377b7e83f0969bfbba0e57344ab"
+    }
+  },
+  "qaFiles": {
+    "tools/gravicentra-b4-003-scoped-related-reader.test.cjs": {
+      "before": "14eaecbf8120266712cbeddc1f40e55a9aeabdc6",
+      "after": "6f611df2103db63965091b14d05918a650f7bd71"
+    },
+    "tools/gravicentra-b4-003-protected-hydration.test.cjs": {
+      "before": "401465c5276289978dd851a69a723a9553bc0fd1",
+      "after": "c7fd589ec21400c62f4877195991f794c5b5b4e7"
+    }
+  },
+  "scope": {
+    "maxServerCobroEvents": 200,
+    "policyLinkedAuthorization": true,
+    "crossRoleIsolationRequired": true,
+    "serverOwnedReadOnly": true,
+    "errorEventPropagation": true
+  },
+  "syntheticCausalProof": {
+    "policies": 1425,
+    "policyCalls": 30,
+    "financialCalls": 143,
+    "afterOneInjectedFailureFinancialRows": 0,
+    "readbackProofPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_FINANCE_SCOPED_HYDRATION_READONLY_PROBE_20261014.json"
+  },
+  "readiness": {
+    "sourceSyntaxAndStaticComposition": "PENDING_GITHUB_QA",
+    "emulator": "PENDING",
+    "authenticatedBrowser": "PENDING",
+    "paulaVisual": "PENDING",
+    "lastApprovedModuleReconstruction": false
+  },
+  "release": {
+    "productMutationAuthorizedGlobally": false,
+    "sharedRulesDeploy": false,
+    "livePromotion": false,
+    "operationalWrites": 0,
+    "reimport": false,
+    "securityP0Closed": false
+  },
+  "compositionBlobSha": "a089de044cc497fb9af80534153a060a269ff683",
+  "executionLockBlobSha": "46ad973d733dba9829dd91edaf34207bce7d685f",
+  "ledgerDisposition": "NO_FINDINGS_CLOSED"
+}

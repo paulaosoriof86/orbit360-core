@@ -97,7 +97,7 @@
       ids.length<1||ids.length>10||new Set(ids).size!==ids.length||
       ids.some(function(id){return !String(id||'').trim()||String(id).includes('/');})))
       return Promise.reject(new Error('PROTECTED_READ_POLICY_BATCH_INVALID'));
-    if(related&&!String(v.policyId||'').trim()&&!hasIds)
+    if(related&&!String(v.policyId||'').trim()&&!hasIds&&coll!=='cobros')
       return Promise.reject(new Error('PROTECTED_READ_POLICY_ANCHOR_REQUIRED'));
     var outbound=Object.assign({},v,{collection:coll,tenantId:tenant,mode:'list'});
     if(!hasIds)delete outbound.policyIds;

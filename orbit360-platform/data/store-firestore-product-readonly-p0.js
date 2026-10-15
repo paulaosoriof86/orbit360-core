@@ -37,7 +37,7 @@
     function queryRef(collection) { if (!paths || typeof paths.dataCollectionPath !== 'function') throw new Error('contrato_rutas_faltante'); var path = paths.dataCollectionPath(state.tenantId, collection), ref = compatCollection(path) || modularCollection(path); if (!ref) throw new Error('firestore_collection_api_unavailable'); var plan = queryPlan(collection); state.queryPlans[collection] = clone(plan); if (plan.hardError) throw new Error((plan.errors || ['query_plan_invalido']).join('|')); if (plan.denied) return { denied: true, ref: null, plan: plan, path: path }; plan.constraints.forEach(function (constraint) { ref = applyConstraint(ref, constraint); }); return { denied: false, ref: ref, plan: plan, path: path }; }
     function docRows(snapshot) { var rows = []; function add(doc) { var data = typeof doc.data === 'function' ? doc.data() : doc.data || {}, physicalId = String(doc.id || '').trim(), legacyId = String(data.id || '').trim(); rows.push(Object.assign({}, data, { id: legacyId || physicalId, canonicalDocumentId: physicalId, legacyDataId: legacyId })); } if (!snapshot) return rows; if (typeof snapshot.forEach === 'function') { snapshot.forEach(add); return rows; } (snapshot.docs || []).forEach(add); return rows; }
     function requiredConfirmed() { return startupCollections.every(function (name) { return state.serverConfirmedCollections.indexOf(name) >= 0; }); }
-    function recordError(collection, error, phase) { state.snapshotErrors[collection] = String(error && (error.message || error) || error); state.status = phase === 'attach' ? 'attach-error' : 'snapshot-error'; }
+    function recordError(collection, error, phase) { state.snapshotErrors[collection] = String(error && (error.code || error.message || error) || error); state.status = phase === 'attach' ? 'attach-error' : 'snapshot-error'; emit(collection); }
     function subscribeBuilt(collection, built) {
       var unsubscribe = subscribeRef(built.ref, function (snapshot) { var meta = snapshot && snapshot.metadata ? { fromCache: snapshot.metadata.fromCache === true } : { fromCache: false }; acceptRows(collection, docRows(snapshot), meta); }, function (error) { recordError(collection, error, 'snapshot'); });
       if (typeof unsubscribe === 'function') unsubscribers.push(unsubscribe);
@@ -125,6 +125,7 @@
       });
     }
     function protectedRelatedUniverse(collection,epoch){
+      if(collection==='cobros')return protectedLoad('cobros','',epoch);
       // Do not cache partially hydrated global views. Server verifies every batch.
       if(!protectedPoliciesPromise)protectedPoliciesPromise=protectedLoad('polizas','',epoch);
       return protectedPoliciesPromise.then(function(policies){

@@ -105,6 +105,16 @@ async function deny(fn,code){let thrown;try{await fn()}catch(e){thrown=e}assert.
  const flow=(collection,role='operativo',options={})=>readScopedRelatedList({
   db,auth:{uid:'u1',token:{}},request:{tenantId,collection,activeRole:role,country:'GT',pageSize:50,...options}
  });
+ const payAll=await flow('cobros');
+ assert.deepEqual(payAll.rows.map(x=>x.id),['paid1','paid2']);checks++;
+ const payOwn=await flow('cobros','asesor');
+ assert.deepEqual(payOwn.rows.map(x=>x.id),['paid1']);checks++;
+ const payPage=await flow('cobros','operativo',{pageSize:1});
+ assert.deepEqual(payPage.rows.map(x=>x.id),['paid1']);
+ assert.equal(payPage.nextCursor,'paid1');checks++;
+ const payPageTwo=await flow('cobros','operativo',{pageSize:1,cursor:'paid1'});
+ assert.deepEqual(payPageTwo.rows.map(x=>x.id),['paid2']);checks++;
+ await deny(()=>flow('cobros','operativo',{cursor:'wrong'}),'CURSOR_DENIED');checks++;
  for(const collection of ['negocios','gestiones']){
   const all=await flow(collection);assert.equal(all.rows.length,2);checks++;
   const own=await flow(collection,'asesor');assert.equal(own.rows.length,1);checks++;
