@@ -1,0 +1,29 @@
+{
+  "schema": "GRAVICENTRA_B4_003_OPERATIVE_ROLE_QUERY_PARITY_PREVIEW_DISPATCH_V1",
+  "date": "2026-10-15",
+  "gate": "I6.5/B4-003",
+  "status": "EXACT_SCOPED_PREVIEW_REQUESTED_NOT_YET_BUILT",
+  "baseSourceCommit": "92b5012b54e188af4adc50eb9556506b884de46a",
+  "scopedSourceAuthorization": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PAULA_PROTECTED_HYDRATION_SOURCE_AUTH_20261013.json",
+  "sourceFixReceipt": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_OPERATIVO_GT_PROTECTED_QUERY_VISIBILITY_CAUSAL_SOURCE_FIX_20261015.json",
+  "sourceFixBlob": "d018378a47405281dda1a9552e0f47dd33a780d1",
+  "sourceOwner": "orbit360-platform/core/backend-product-readonly-bootstrap-p0.js",
+  "sourceBlob": "67193403d977f724ad7abfc86a7892d3d073e775",
+  "qaOwner": "tools/gravicentra-b4-003-protected-hydration.test.cjs",
+  "qaBlob": "2ff039f1d9dfecb1601585397bc94a6e8580c3c2",
+  "compositionBlob": "96fde62e0ee618b0414d76a961753e1958049cc8",
+  "expectedWorkflow": ".github/workflows/gravicentra-b4-003-executor.yml",
+  "expectedMode": "scoped_preview",
+  "oldPreviewArtifactId": 11983958349,
+  "oldPreviewAcceptedOnlyForPreviousSource": true,
+  "bounds": {
+    "noOperationalWrites": true,
+    "noSyntheticWrites": true,
+    "noFirestoreRulesDeploy": true,
+    "noLivePromotion": true,
+    "noReimport": true,
+    "noNewRepoBranch": true,
+    "noTinyFish": true
+  },
+  "required": "New source SHA/buildId/site digest/exact hosted readback; public+mock source guard; authenticated server scopes. Targeted two-UID Ops/Leads UI reload must follow exact new artifact."
+}

@@ -11508,5 +11508,19 @@
     "securityP0Closed": false,
     "productionChanged": false,
     "realDataWrites": 0
+  },
+  "b4003OperativoQueryVisibilityPreviewDispatch20261015": {
+    "status": "EXACT_SCOPED_PREVIEW_REQUESTED_NOT_YET_BUILT",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_OPERATIVE_ROLE_QUERY_PARITY_EXACT_PREVIEW_DISPATCH_20261015.json",
+    "receiptBlobSha": "e0a93655778ac0289294b68bb566224ea030d79e",
+    "previousSourceHead": "92b5012b54e188af4adc50eb9556506b884de46a",
+    "compositionLockBlobSha": "96fde62e0ee618b0414d76a961753e1958049cc8",
+    "sourceBlobSha": "67193403d977f724ad7abfc86a7892d3d073e775",
+    "qaBlobSha": "2ff039f1d9dfecb1601585397bc94a6e8580c3c2",
+    "buildRequired": true,
+    "newArtifactRequired": true,
+    "securityP0Closed": false,
+    "livePromotion": false,
+    "operationalWrites": 0
   }
 }
