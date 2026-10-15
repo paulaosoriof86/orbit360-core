@@ -1482,7 +1482,7 @@ jobs:
                 const states=[m.status,m.estado].filter(Boolean).map(n);
                 if(!states.length||states.some(x=>!['active','activo'].includes(x))||m.uid!==d.id||
                   m.tenantId!==tid||m.active===false||m.activo===false||!assigned.includes(role)||
-                  (m.activeRole&&n(m.activeRole)!==role)||!countries.some(x=>['GT','CO'].includes(x)))continue;
+                  !countries.some(x=>['GT','CO'].includes(x)))continue;
                 try{
                   const user=await auth.getUser(d.id);
                   if(!user.disabled&&user.emailVerified&&(!user.customClaims?.giActiveRole||n(user.customClaims.giActiveRole)===role)){
