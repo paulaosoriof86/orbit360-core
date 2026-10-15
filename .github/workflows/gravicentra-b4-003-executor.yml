@@ -1401,6 +1401,7 @@ jobs:
           set -euo pipefail
           node tools/gravicentra-b4-003-scoped-bootstrap-reader.test.cjs
           node tools/gravicentra-b4-003-protected-hydration.test.cjs
+          node tools/gravicentra-b4-003-finance-partial-render.test.cjs
           node --input-type=module - <<'NODE'
           import fs from 'node:fs';
           const host=process.env.B4_PREVIEW_URL||'';

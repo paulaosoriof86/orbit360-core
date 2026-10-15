@@ -2389,5 +2389,38 @@
       "AUTHENTICATED_FINANCE_GT_CO_POSITIVE_NEGATIVE",
       "PAULA_VISUAL_ACCEPTANCE"
     ]
+  },
+  "b4003FinancePartialRenderRecovery20261015": {
+    "status": "SCOPED_CORRECTION_SOURCE_ONLY_QA_PENDING",
+    "authority": "Paula October 14 urgent correction request and rejected exact 38687708932 UAT",
+    "acceptedB3Owner": "orbit360-platform/modules/cobros.js",
+    "affectedOwners": [
+      "orbit360-platform/modules/cobros.js",
+      "orbit360-platform/modules/inicio.js",
+      "orbit360-platform/modules/cliente360.js"
+    ],
+    "qaOwners": [
+      "tools/gravicentra-b4-003-finance-partial-render.test.cjs",
+      ".github/workflows/gravicentra-release-lock-sync.yml",
+      ".github/workflows/gravicentra-b4-003-executor.yml"
+    ],
+    "sourceMutationException": "EXACT_THREE_RUNTIME_FILES_ONLY",
+    "tests": "PARTIAL_TERMINAL_COMPLETE_MUST_NOT_BLANK_OR_SHOW_FALSE_ZERO",
+    "globalProductMutationAuthorized": false,
+    "operationalWritesAuthorized": false,
+    "firestoreRulesDeployAuthorized": false,
+    "productionPromotionAuthorized": false,
+    "newGate": false,
+    "requiresHumanVisual": true,
+    "before": [
+      "866570f35d87f8d4d7709736058831a218cb461e",
+      "3759428cd65d7c6a7aa39669b1cff7ddeba4d332",
+      "5250cd40950cc58106df2915f0605b38a566524a"
+    ],
+    "after": [
+      "438cc2f7ddeb4e285b4918c9b8bfb2473cbb3129",
+      "283e0f4a23c2b278425140dd94f50d9424e1db86",
+      "7090d49895ea4235b29c78cf4ec3ebd22017cd26"
+    ]
   }
 }

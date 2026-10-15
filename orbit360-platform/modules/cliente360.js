@@ -69,8 +69,8 @@ Orbit.modules.cliente360 = (function () {
   function dataReadiness(names) {
     const store = S();
     if (!store || store.__productReadOnlyP0 !== true || typeof store._productStatus !== 'function') return 'ready';
-    const ps = store._productStatus() || {}, confirmed = [].concat(ps.serverConfirmedCollections || []), denied = [].concat(ps.deniedCollections || []);
-    if (names.some(name => denied.includes(name))) return 'unavailable';
+    const ps = store._productStatus() || {}, confirmed = [].concat(ps.serverConfirmedCollections || []), denied = [].concat(ps.deniedCollections || []), errors = ps.snapshotErrors || {};
+    if (names.some(name => denied.includes(name) || !!errors[name])) return 'unavailable';
     return names.every(name => confirmed.includes(name)) ? 'ready' : 'pending';
   }
   function ensureDataCollections(names) { try { const store=S(); if(store&&typeof store._ensureCollections==='function') store._ensureCollections(names); } catch (_) {} }

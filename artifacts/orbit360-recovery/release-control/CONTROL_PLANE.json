@@ -4869,8 +4869,8 @@
       "entryGuardReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_ENTRY_GUARD_PASS_20261002.json",
       "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
       "executionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B4_EXECUTION_LOCK_20261002.json",
-      "executionLockBlobSha": "46ad973d733dba9829dd91edaf34207bce7d685f",
-      "compositionLockBlobSha": "a089de044cc497fb9af80534153a060a269ff683",
+      "executionLockBlobSha": "67adf2171dd3670720542d2cb2d4669de06bdaff",
+      "compositionLockBlobSha": "a82414af8315b19a66cd9f14c06ca9ded31fe056",
       "findingLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
       "activeFindingId": "B4-003",
       "productSourceSha": "c603fd3561e7229d9359db45495d4cf2d757cd8f",
@@ -5996,7 +5996,7 @@
   "canonicalAccumulationControl": {
     "status": "FROZEN_ACTIVE",
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "compositionLockBlobSha": "a089de044cc497fb9af80534153a060a269ff683",
+    "compositionLockBlobSha": "a82414af8315b19a66cd9f14c06ca9ded31fe056",
     "findingLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
     "findingLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
@@ -6312,8 +6312,8 @@
     "status": "B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL",
     "activeFindingId": "B4-003",
     "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
-    "executionLockBlobSha": "46ad973d733dba9829dd91edaf34207bce7d685f",
-    "compositionLockBlobSha": "a089de044cc497fb9af80534153a060a269ff683",
+    "executionLockBlobSha": "67adf2171dd3670720542d2cb2d4669de06bdaff",
+    "compositionLockBlobSha": "a82414af8315b19a66cd9f14c06ca9ded31fe056",
     "findingLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
     "noLive": true,
     "noReimport": true,
@@ -11112,17 +11112,19 @@
   },
   "b4003LatestQASessionBoundary": {
     "gate": "I6.5/B4-003",
-    "status": "PAULA_AUTHENTICATED_LOGIN_PASSED_PREVIOUS_PREVIEW_FINANCE_UAT_REQUESTED_NEW_EXACT_PREVIEW",
+    "status": "PAULA_REJECTED_38687708932_FINANCE_HYDRATION_AND_BLANK_COBROS",
     "profile": "Gravicentra Preview QA",
     "noCredentialsShared": true,
     "priorSavedSessionAuthenticated": false,
     "reviewOnlyPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b4-38687708932-daoqncg1.web.app",
-    "disableNewSourceBuildUntilFirstAuthenticatedUAT": true,
+    "disableNewSourceBuildUntilFirstAuthenticatedUAT": false,
     "requestedFirstTest": "LOGIN_THEN_CLIENTE360_COBROS_HISTORIAL_METAS",
     "productionSecurityStillBlocked": true,
     "firstAuthenticatedPaulaLoginConfirmedFromScreenshot": true,
     "priorClient360CobrosFailuresReproducedByPaula": true,
-    "newPreviewUATStatus": "PENDING"
+    "newPreviewUATStatus": "PENDING",
+    "lastRejectedRunId": 38687708932,
+    "nextUAT": "RENDER_PARTIAL_TERMINAL_COMPLETE_THEN_GT_CO_CARTERA_PRIMAS_RECONCILIATION"
   },
   "b4003FinanceCobrosScopedRecovery20261014": {
     "gate": "I6.5/B4-003",
@@ -11159,5 +11161,28 @@
     "humanAccepted": false,
     "functionalAccepted": false,
     "securityP0Closed": false
+  },
+  "b4003FinancePartialRenderRecovery20261015": {
+    "gate": "I6.5/B4-003",
+    "status": "SOURCE_STAGED_QA_AND_EXACT_PREVIEW_PENDING",
+    "humanUat": "REJECTED_PRIOR_PREVIEW",
+    "sourceChanged": true,
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_FINANCE_PARTIAL_RENDER_CAUSAL_FIX_20261015.json",
+    "receiptBlobSha": "0667b39ec2889a9aa69fc3e75e3652b181a3ff09",
+    "compositionBlobSha": "a82414af8315b19a66cd9f14c06ca9ded31fe056",
+    "executionLockBlobSha": "67adf2171dd3670720542d2cb2d4669de06bdaff",
+    "sourcePaths": [
+      "orbit360-platform/modules/cobros.js",
+      "orbit360-platform/modules/inicio.js",
+      "orbit360-platform/modules/cliente360.js"
+    ],
+    "qaPath": "tools/gravicentra-b4-003-finance-partial-render.test.cjs",
+    "noFirestoreRulesChange": true,
+    "noLive": true,
+    "noDataWrites": true,
+    "noReimport": true,
+    "sourceQa": "PENDING_GITHUB_GUARD",
+    "functionalAcceptance": false,
+    "p0Closed": 0
   }
 }

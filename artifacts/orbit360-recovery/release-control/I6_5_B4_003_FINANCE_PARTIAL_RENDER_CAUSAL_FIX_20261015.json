@@ -1,0 +1,60 @@
+{
+  "schema": "GRAVICENTRA_I65_B4003_FINANCE_PARTIAL_RENDER_SOURCE_FIX_V1",
+  "gate": "I6.5/B4-003",
+  "status": "SOURCE_STAGED_QA_NEW_PREVIEW_PENDING",
+  "requestedBy": "Paula urgent repeated B4-003 financial regression rejected UAT on 2026-10-14",
+  "rejectedPreview": {
+    "url": "https://ays-orbit-360-lab--gi-i65-b4-38687708932-daoqncg1.web.app",
+    "sourceSha": "53e66a2d4930b60e45bb9ef98a770a5fa4e14437",
+    "runId": 38687708932,
+    "artifactDigest": "sha256:c739f555dc5e1cff5d279f891905c028acd114dae6da5679d6f07ce5776db35d",
+    "humanUat": "FAIL"
+  },
+  "reproduced": "Actual cobros module with financialReady=false throws TypeError null aging.country after core collections confirmed; router clears host => blank route.",
+  "cause": "Guarded core financial rendering missed one unconditional aging.country evaluation; Inicio/Cliente360 snapshotErrors remain pending indefinitely.",
+  "sourceFiles": {
+    "orbit360-platform/modules/cobros.js": {
+      "from": "866570f35d87f8d4d7709736058831a218cb461e",
+      "to": "438cc2f7ddeb4e285b4918c9b8bfb2473cbb3129"
+    },
+    "orbit360-platform/modules/inicio.js": {
+      "from": "3759428cd65d7c6a7aa39669b1cff7ddeba4d332",
+      "to": "283e0f4a23c2b278425140dd94f50d9424e1db86"
+    },
+    "orbit360-platform/modules/cliente360.js": {
+      "from": "5250cd40950cc58106df2915f0605b38a566524a",
+      "to": "7090d49895ea4235b29c78cf4ec3ebd22017cd26"
+    }
+  },
+  "qa": {
+    "path": "tools/gravicentra-b4-003-finance-partial-render.test.cjs",
+    "gitBlobSha": "8209c23293d572c6d13e652470bd209d87f418cf",
+    "workflows": {
+      ".github/workflows/gravicentra-release-lock-sync.yml": "7b28700c46d76d4c4dda5c74bb16618ca0f2cca4",
+      ".github/workflows/gravicentra-b4-003-executor.yml": "89c0629d8b7a82729d7ec6128165c814347ce606"
+    },
+    "syntheticScenarios": {
+      "partial": "PASS_NO_BLANK_NO_FALSE_ZERO",
+      "terminal": "PASS_NO_BLANK_NO_FALSE_ZERO",
+      "fullyConfirmed": "PASS_NOT_PENDING"
+    },
+    "emulator": "PENDING",
+    "sourceCI": "PENDING",
+    "authenticatedFunctional": "PENDING",
+    "securityPositiveNegative": "PENDING"
+  },
+  "authority": {
+    "acceptedB3CobrosNotRebuilt": true,
+    "noNewBranch": true,
+    "noNewGate": true,
+    "compositionSha": "a82414af8315b19a66cd9f14c06ca9ded31fe056",
+    "executionLockSha": "67adf2171dd3670720542d2cb2d4669de06bdaff",
+    "sourceMutationException": "SCOPED_THREE_FILES",
+    "liveBlocked": true,
+    "firestoreRulesUnchanged": true,
+    "businessWrites": 0,
+    "reimport": false,
+    "ledgerP0Closed": 0
+  },
+  "caveat": "This patch prevents a blank route and terminal-unreported loading; it does not certify full recibosEsperados/carteraPrimas hydration. Exact new authenticated GT/CO financial readback and cold/warm latency remain mandatory before acceptance."
+}

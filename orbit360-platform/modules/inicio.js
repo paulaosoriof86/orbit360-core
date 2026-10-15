@@ -58,7 +58,7 @@ Orbit.modules.inicio = (function () {
     const store=Orbit.store;
     if(!store || store.__productReadOnlyP0 !== true || typeof store._productStatus !== 'function') return 'ready';
     const ps=store._productStatus()||{}, confirmed=[].concat(ps.serverConfirmedCollections||[]), denied=[].concat(ps.deniedCollections||[]), optional=[].concat(ps.optionalCollections||[]), failed=Object.keys(ps.snapshotErrors||{});
-    if(names.some(name=>denied.includes(name))) return 'unavailable';
+    if(names.some(name=>denied.includes(name)||failed.includes(name))) return 'unavailable';
     if(names.every(name=>confirmed.includes(name))) return 'ready';
     if(options.optionalTerminal===true && ps.ready===true) {
       const unresolved=names.filter(name=>!confirmed.includes(name));

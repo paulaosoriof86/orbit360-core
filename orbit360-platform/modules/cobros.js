@@ -397,7 +397,7 @@ Orbit.modules.cobros = (function () {
       <div class="card pad" style="margin-bottom:16px">
         <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
           <b style="font-family:var(--f-display);font-size:15px">Antigüedad de cartera vencida (aging)</b>
-          <span class="muted" style="font-size:12px">País: ${U.esc(aging.country === 'TODOS' ? 'Todos los países' : aging.country)} · importes separados por moneda</span>
+          <span class="muted" style="font-size:12px">País: ${U.esc((aging && aging.country || activeCountry()) === 'TODOS' ? 'Todos los países' : (aging && aging.country || activeCountry()))} · importes separados por moneda</span>
         </div>
         ${hyd.financialReady ? agingCurrencyBlocks(aging, agingCols) : '<div class="muted" data-cobros-aging-pending="1" style="font-size:12.5px;margin-top:12px">Actualizando cartera vencida…</div>'}
       </div>
