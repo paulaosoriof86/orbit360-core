@@ -1,0 +1,48 @@
+{
+  "schema": "GRAVICENTRA_B4_003_RENEWALS_QA_FILTER_EXACT_PREVIEW_READBACK_V1",
+  "date": "2026-10-15",
+  "gate": "I6.5/B4-003",
+  "findingIds": [
+    "B4-003-R20-B01",
+    "B4-003-P0-20261012-QA-CANCELLED-RUN-FIXTURES"
+  ],
+  "status": "EXACT_HOSTING_READBACK_AND_SCOPED_ROLE_AUTH_PASS_RENEWALS_UI_PENDING",
+  "workflowRunId": 38717794781,
+  "workflowUrl": "https://github.com/paulaosoriof86/orbit360-core/actions/runs/38717794781",
+  "workflowConclusion": "success",
+  "executedHead": "dc394982cadbb51ee943a6c81fc2c84e54a5fe0b",
+  "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-38717794781-vnjqmd6p.web.app",
+  "buildId": "gi-i65-b4-dc394982cadb-57f234755dc1",
+  "hostedFileCount": 218,
+  "hostedPayloadDigest": "71ad9f6c0652c299c8be9468b586bffdbede965b0e0fe07666e8d9300d3787b3",
+  "backendSourceDigest": "ebdfb5105050922549638a52140bff74807a4aaa546b66c5a17a787321d791ee",
+  "bundleDigest": "8115c3b2bc4471e297a225b107077bc70c1f3ff3d463e01cbc3f4cb4302be84d",
+  "artifactId": 11963277777,
+  "artifactDigest": "sha256:881bf17dd5bc81e85a1b4f338ec2ad5fd7b3d681bd2cd13e172e187ae00d2df6",
+  "sourceOwner": "orbit360-platform/modules/renovaciones.js",
+  "sourceBlobSha": "6dcea79fcb8b5fda72e141f02d4f32cb05e39954",
+  "proofs": {
+    "hostedFileReadback": true,
+    "publicReadback": true,
+    "callableAnonymousDenied": true,
+    "realScopedGtRoles": [
+      "direccion",
+      "operativo",
+      "asesor"
+    ],
+    "authorizedReadChecks": 20,
+    "expectedDenialChecks": 10,
+    "uiRenewalsAuthenticatedAfterFix": "PENDING",
+    "firestoreSharedRulesSecurity": "OPEN",
+    "gtCoMatrix": "OPEN",
+    "previewHuman": "PENDING"
+  },
+  "boundaries": {
+    "realBusinessWrites": 0,
+    "syntheticWrites": 0,
+    "livePromotion": false,
+    "firestoreSharedRulesDeploy": false,
+    "reimport": false,
+    "p0Closed": 0
+  }
+}

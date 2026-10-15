@@ -11289,13 +11289,13 @@
     "nextActionUnchanged": "I6_5_FORENSIC_REMEDIATION_B4_003_R20_TARGETED_PAULA_VISUAL"
   },
   "b4003RenewalsSyntheticQaFilter20261015": {
-    "status": "SCOPED_SOURCE_FIX_EXACT_PREVIEW_AUTHENTICATED_UAT_PENDING",
+    "status": "EXACT_PREVIEW_HOSTED_READBACK_AND_SCOPED_GT_AUTH_PASS_RENEWALS_UI_UAT_PENDING",
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_RENEWALS_SYNTHETIC_EXCLUSION_SOURCE_FIX_20261015.json",
     "receiptBlobSha": "16a12d58094a8ba164b652a11b4d68c8cffe8249",
     "sourcePath": "orbit360-platform/modules/renovaciones.js",
     "sourceBlobSha": "6dcea79fcb8b5fda72e141f02d4f32cb05e39954",
     "qaPath": "tools/gravicentra-i6-5-b4-003-renewals-priority-preview-proof.mjs",
-    "qaBlobSha": "6f8a96e03750405203b48a7d98f5c6ddeb123cfb",
+    "qaBlobSha": "7793cd1bc619233fc58e5bebad47179ae41bbf23",
     "compositionBlobSha": "6067adc820a426652fa68c855740146176df8e07",
     "executionLockBlobSha": "18d6a61c129024c89a3dd66e6adbd6ac7718e9d4",
     "realBusinessWrites": 0,
@@ -11305,6 +11305,15 @@
       "B4-003-R20-B01",
       "B4-003-P0-20261012-QA-CANCELLED-RUN-FIXTURES"
     ],
-    "priorHumanAcceptancePreserved": true
+    "priorHumanAcceptancePreserved": true,
+    "previewBindingReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_RENEWALS_QA_FILTER_EXACT_PREVIEW_READBACK_20261015.json",
+    "previewBindingReceiptBlobSha": "27450c6f289d6281d9f8d0af7b7c5d5c2c889ce8",
+    "runId": 38717794781,
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-38717794781-vnjqmd6p.web.app",
+    "sourceSha": "dc394982cadbb51ee943a6c81fc2c84e54a5fe0b",
+    "buildId": "gi-i65-b4-dc394982cadb-57f234755dc1",
+    "artifactId": 11963277777,
+    "artifactDigest": "sha256:881bf17dd5bc81e85a1b4f338ec2ad5fd7b3d681bd2cd13e172e187ae00d2df6",
+    "p0Closed": 0
   }
 }

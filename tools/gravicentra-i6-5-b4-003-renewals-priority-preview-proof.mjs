@@ -291,6 +291,7 @@ try{
     await page.goto(target+'/#/inicio',{waitUntil:'domcontentloaded',timeout:60000});
     await bootProduct(page,token);await selectRole(page,role);
     const session={role,actorUidHash:hash(who.uid).slice(0,16),cold:[],warm:[],mobile:[],firstPaint:null};
+    proof.sessions.push(session);
     // Ensure both REQUIRED collections are actually confirmed before proving
     // that removing optional Aseguradoras does not block Renovaciones.
     // This is a fail-closed 8-second startup assertion, not a successful timeout path.
@@ -332,7 +333,6 @@ try{
             denied:[].concat(s.deniedCollections||[]).filter(x=>['clientes','polizas'].includes(x)),
             errors:Object.keys(s.snapshotErrors||{}).filter(x=>['clientes','polizas'].includes(x))};
         });
-        proof.sessions.push(session);
         need(false,'B4_003_REQUIRED_DATA_STILL_UNCONFIRMED_AFTER_FORENSIC_OBSERVATION:'+JSON.stringify(session.prePaintLateStatus));
       }
     }
@@ -348,7 +348,6 @@ try{
     proof.pageErrors.push(...pageErrors.map(error=>({role,error})));
     proof.consoleErrors.push(...consoleErrors.map(error=>({role,error})));
     proof.httpErrors.push(...httpErrors.map(error=>({role,...error})));
-    proof.sessions.push(session);
     await ctx.close();
   }
   need(proof.pageErrors.length===0,'B4_003_RENEWALS_PAGE_ERRORS');
