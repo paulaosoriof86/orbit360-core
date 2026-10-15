@@ -11270,5 +11270,22 @@
       "firestoreRulesDeploymentAuthorized": false,
       "livePromotionAuthorized": false
     }
+  },
+  "b4003NoLossReviewBinding20261015": {
+    "status": "NO_LOSS_CROSSCHECK_COMPLETE_USER_UAT_20261015_NEEDS_CAUSAL_DISPOSITION",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_NO_LOSS_USER_REVIEW_AND_EXECUTION_BINDING_20261015.json",
+    "receiptBlobSha": "0f236d620a1826c887102da102ee8fc55599592c",
+    "frozenLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
+    "frozenCarryBlobSha": "2b935d0f0859075cc951a2e0a6cfcd0a8d958a02",
+    "allFindings": 295,
+    "attention": 166,
+    "blockingB4003AtLastCount": 76,
+    "sourceHeadBeforeGovernanceCommit": "c496f36ecfe9588fecb996bfb4128b8938db7c08",
+    "scope": "B4_003_EXISTING_PLAN_ONLY",
+    "userVisual20261015": "PARTIAL_RECOVERY_AND_MULTIPLE_PENDING",
+    "productionMutation": false,
+    "operationalDataWrites": 0,
+    "newGate": false,
+    "nextActionUnchanged": "I6_5_FORENSIC_REMEDIATION_B4_003_R20_TARGETED_PAULA_VISUAL"
   }
 }
