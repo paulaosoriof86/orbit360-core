@@ -1,0 +1,61 @@
+{
+  "schema": "GRAVICENTRA_B4_003_EXISTING_SCOPED_PREVIEW_DISPATCH_BINDING_V1",
+  "date": "2026-10-15",
+  "gate": "I6.5/B4-003",
+  "status": "REQUESTED_EXISTING_AUTHORIZED_EXACT_SCOPED_PREVIEW_NOT_RESULT",
+  "authoritativeControl": "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json",
+  "authorizationPointer": "b4003VerifiedCanonicalFinanceScope20261015.exactPreviewDispatch",
+  "targetBranch": "recovery/fase-a-clean-20260831",
+  "parentHead": "4bc6d6c1dcb60a01cbf2cc80aa8894e469f59616",
+  "latestProductFixes": {
+    "inicio": {
+      "path": "orbit360-platform/modules/inicio.js",
+      "sha": "ac18016edccac7c0f54b29defbc2e1e8d1a388d1",
+      "receipt": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_INICIO_CONTEXT_PLACEMENT_CAUSAL_FIX_20261015.json"
+    },
+    "calidad": {
+      "path": "orbit360-platform/modules/calidad.js",
+      "sha": "baaa2b6aec3b24fa49892da2a3fe3bfa6549d340",
+      "receipt": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CALIDAD_FINANCIAL_READINESS_FALSE_ZERO_FIX_20261015.json"
+    }
+  },
+  "alreadyProvenRenewalsReadOnly": {
+    "proofRunId": 38722133958,
+    "repeatWithoutCausalRegression": false
+  },
+  "sourceReader": {
+    "path": "functions/b4-003-scoped-related-reader.js",
+    "sha": "5a1d36f898f88b45550c94868abb30a837972c4f"
+  },
+  "compositionLockSha": "c6dac2dced2a7399c76889e20896821c4891e5d5",
+  "controlPlaneSha": "6b5e62c2b4f8072909c84fa9f7cde7c3d476a77c",
+  "executionLockSha": "a2ce9c93d0182b5fbb8bd256f51de6c725d06939",
+  "scope": "Trigger existing .github/workflows/gravicentra-b4-003-executor.yml, oct15ScopedReadback path; isolated preview only; same accumulated tree; record resulting run, new immutable artifact/readback if actual steps execute.",
+  "staticAuthorizationChecks": {
+    "headFrozen": true,
+    "authorizedRequest": true,
+    "ownerBlobExact": true,
+    "compositionExact": true,
+    "activeGate": true,
+    "securityHold": true,
+    "lockGate": true,
+    "noWrites": true,
+    "noProduction": true,
+    "newSourceNeedsPreview": true
+  },
+  "boundaries": {
+    "dataWrites": 0,
+    "operationalWrites": 0,
+    "syntheticWrites": 0,
+    "productionDeploy": false,
+    "firestoreRulesDeploy": false,
+    "sharedBackendDeploy": false,
+    "livePromotion": false,
+    "reimport": false,
+    "tinyFish": false
+  },
+  "expectedEvidence": "Isolated exact Hosting Preview, source SHA & digest, hosted readback, tests permitted by existing scoped workflow, authentic role/country probes only if physically run. All other affected functionality remains pending.",
+  "noGateAdvance": true,
+  "noHumanVisualPassClaim": true,
+  "noSecurityPassClaim": true
+}
