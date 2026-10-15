@@ -1,0 +1,61 @@
+{
+  "schema": "GRAVICENTRA_B4_003_RENEWALS_PHYSICAL_COUNT_DRIFT_FORENSIC_V1",
+  "recordedDate": "2026-10-15",
+  "gate": "I6.5/B4-003",
+  "findingIds": [
+    "B4-003-R20-B01",
+    "B4-003-P0-20261012-QA-CANCELLED-RUN-FIXTURES",
+    "B4-003-P0-20261012-QA-ORPHAN-RENEWALS"
+  ],
+  "status": "DIAGNOSIS_CONFIRMED_RENEWALS_FUNCTIONAL_ACCEPTANCE_STILL_BLOCKED",
+  "sourceBranch": "recovery/fase-a-clean-20260831",
+  "sourceHead": "b4c0e0e6a8aa679ba06e270837dd3f1edc6ee1b7",
+  "physicalEvidence": {
+    "runId": 38715248852,
+    "runConclusion": "failure",
+    "qaJobId": 116356240706,
+    "artifactId": 11963140230,
+    "artifactDigest": "sha256:03f8aa5c845dd0314c7fc9ec11c4768b99bca528ed112c5b222a38505e5edefd",
+    "sourceBlobSha": "b0b1a8f00fc8d2b94feb2b7170a50d9fb08a4905"
+  },
+  "counts": {
+    "expectedFrozenOperational": 1419,
+    "physicalReadback": 1425,
+    "delta": 6,
+    "qaCandidates": 9,
+    "explicitSyntheticQa": 6,
+    "b2OrphanRenewals": 3,
+    "b2OrphanReceiptDependents": 6,
+    "b2OrphanPortfolioDependents": 6
+  },
+  "rootCauseEvidence": {
+    "cancelledQaRunId": 38102224750,
+    "matchingExactSixPolicyIdDigests": true,
+    "hashAlgorithm": "sha256(JSON.stringify(id)) first 16 hex characters",
+    "syntheticFixtureSuffix": "38102224750",
+    "syntheticFixturesPreserved": true,
+    "baselineOperationalCountIndependentRetest": "PENDING_AFTER_QA_SCOPE_DISCRIMINANT",
+    "currentKanbanAbsenceOfSix": "NOT_YET_PROVEN"
+  },
+  "pendingRisk": "Synthetic fixtures may still be visible in the browser; do not declare Renovaciones PASS without exact UI absence check and 24 recent renewals plus 583 terminal invariants.",
+  "orphanCase": {
+    "exactIds": [
+      "pol_mulsmxsk",
+      "pol_mulssmuz",
+      "pol_mulsxofx"
+    ],
+    "linkedOriginalPresent": false,
+    "dependentTotal": 12,
+    "deleteAuthorized": false
+  },
+  "constraints": {
+    "noBusinessWrites": true,
+    "noReimport": true,
+    "noSourceProductChange": true,
+    "noFirestoreRulesDeploy": true,
+    "noLivePromotion": true,
+    "noSyntheticCleanup": true,
+    "noP0Closed": true
+  },
+  "nextWithinExistingGate": "ADJUDICATE_QA_ONLY_EXACT_SIX_EXCLUSION_VS_LIVE_UI_LEAK_AND_REVALIDATE_B4_003_R20_B01_BEFORE_HUMAN_UAT"
+}
