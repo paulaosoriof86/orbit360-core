@@ -10822,7 +10822,7 @@
   },
   "b4003ScopedHistoryReactiveSourceStage": {
     "gate": "I6.5/B4-003",
-    "status": "SOURCE_STAGED_QA_PENDING_NO_PREVIEW_PASS",
+    "status": "EXACT_PREVIEW_QA_PUBLIC_PASS_AUTHENTICATED_PENDING",
     "paths": [
       "orbit360-platform/core/router.js",
       "orbit360-platform/modules/historial.js",
@@ -10848,7 +10848,7 @@
   },
   "b4003HydrationPackageCanonSourceFix": {
     "gate": "I6.5/B4-003",
-    "status": "BUILD_TOOL_SOURCE_REPAIRED_PENDING_EXACT_PREVIEW",
+    "status": "EXACT_HOSTED_BINDING_PASS_FUNCTIONAL_PENDING",
     "cause": "BUILD_HARDCODED_OPTIONAL_IGNORED_SOURCE_ACTIVIDADES",
     "generator": "tools/gravicentra-i6-1-preview-package.mjs",
     "scopedBackendOwnerOnly": true,
@@ -10863,5 +10863,90 @@
     "realDataWrites": 0,
     "reimport": false,
     "sourceChangeRequiresNewArtifact": true
+  },
+  "b4003ScopedHistoryPreview20261014": {
+    "gate": "I6.5/B4-003",
+    "status": "EXACT_PREVIEW_BUILD_AND_PUBLIC_READBACK_PASS_AUTHENTICATED_FUNCTIONAL_HOLD",
+    "sourceSha": "9a5776295495c736e0f9a2f1baa79fa70752bd8e",
+    "buildId": "gi-i65-b4-9a5776295495-57f234755dc1",
+    "runId": 38666832869,
+    "runConclusion": "success",
+    "artifactId": 11942251342,
+    "artifactDigest": "sha256:ee7756aa503354665218b2d4b954e39a5f8d366eef0bbd6d09bd3309166c9d6f",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-38666832869-75tpwwni.web.app",
+    "sourceAssets": [
+      "orbit360-platform/core/router.js",
+      "orbit360-platform/modules/historial.js",
+      "functions/b4-003-scoped-related-reader.js",
+      "orbit360-platform/product-runtime-config.js",
+      "tools/gravicentra-i6-1-preview-package.mjs"
+    ],
+    "hostedMarkerExact": true,
+    "hostedActivitiesConfigured": true,
+    "hostedScopedReadFlag": true,
+    "routerActivityReactiveExternallyVerified": true,
+    "releaseFileReadback": "PASS",
+    "publicAnonymousSmoke": "PASS",
+    "syntheticServerRoleCountryTest": "PASS_PREVIOUS_GUARD",
+    "authenticatedRoleCountryPositiveNegative": "PENDING",
+    "realHistoricoVisible": "PENDING",
+    "humanVisualAccepted": false,
+    "newFirestoreRulesDeployed": false,
+    "livePromotion": false,
+    "operationalBusinessWrites": 0,
+    "reimport": false,
+    "historicalActivityInventory": {
+      "total": 785,
+      "parentCountryDerivable": 36,
+      "missingCountry": 749,
+      "advisorMissing": 659
+    },
+    "holdReason": "REAL_AUTH_ACCEPTANCE_AND_FIRESTORE_SHARED_SECURITY_NOT_PROVEN",
+    "firstRemainingTask": "AUTHENTICATED_PREVIEW_ROLE_COUNTRY_CLIENT360_COBROS_HISTORIAL_AND_SECURITY_NEGATIVE_E2E",
+    "stillOpen": [
+      "B4_003_FIRESTORE_RULES_SECURITY_P0",
+      "LIVE_HOSTING_RELEASE_LINEAGE",
+      "CLIENT360_COBROS_ROLE_COUNTRY",
+      "METAS_COMISIONES_AUDIT_PROTECTED_COVERAGE",
+      "OPS_LEADS_RENEWALS_CANCELATIONS_REGRESSION"
+    ]
+  },
+  "b4003InsurerKnowledgeParallel20261014": {
+    "mode": "SOURCE_BACKED_PARALLEL_READONLY_NOT_RELEASE_BLOCKING",
+    "sourceReceipt": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_INSURER_KNOWLEDGE_PARALLEL_FACT_CHECK_20261014.json",
+    "validatedOriginalSources": [
+      {
+        "insurer": "Seguros Columna",
+        "country": "GT",
+        "source": "Cotizador VA 2026 V1.4.xlsx",
+        "driveId": "1h7DnGbTxPZwEpvfK_OpUVU2HHs2vzAyI",
+        "sampleVehicle": "Motocicleta",
+        "sampleCurrency": "GTQ",
+        "sampleNet": 1755,
+        "sampleIVA": 210.6,
+        "sampleTotal": 1965.6,
+        "sampleProntoPago": 1867.32,
+        "scope": "EXAMPLE_ARITHMETIC_NOT_GENERAL_TARIFF"
+      },
+      {
+        "insurer": "BAM",
+        "country": "GT",
+        "source": "Cotizador BAMSALUD 2026.xlsx",
+        "driveId": "1xCuzly9QGFVUZ0xMt5vTKMAvaXadbkRP",
+        "planSampleTotalsMonthlyGTQ": [
+          538.44,
+          823.5,
+          1015.34,
+          1124.91,
+          1386.76
+        ],
+        "sampleComponents": "Titular, maternidad y vida",
+        "scope": "SINGLE_FILLED_SCENARIO_NOT_GENERAL_RATE"
+      }
+    ],
+    "factsOnly": true,
+    "tariffsEnabled": false,
+    "operationalWrites": 0,
+    "unresolved": "Plan/version vigencia, elegibilidad, deducibles, impuestos y fuente contractual vigente antes de cotizador"
   }
 }
