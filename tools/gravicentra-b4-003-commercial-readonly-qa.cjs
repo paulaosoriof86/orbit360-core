@@ -172,6 +172,27 @@ async function main(){
         getRows=k=>{try{return store?.all?.(k)||[]}catch{return[]}},
         allNames=(st.serverConfirmedCollections||[]),snapshotErrors=st.snapshotErrors||{},
         counts={};
+      // No IDs, client data, credentials, URLs or raw provider errors in artifact.
+      const safeName=k=>/^(__startup|[A-Za-z][A-Za-z0-9]*)$/.test(k);
+      const codes=['PROTECTED_READ_PLAN_DENIED','PROTECTED_READ_ROLE_NOT_ASSIGNED',
+        'PROTECTED_READ_CONTEXT_CHANGED','PROTECTED_READ_PARAMETERS_DENIED',
+        'PROTECTED_READ_COUNTRY_DENIED','PROTECTED_READ_RESPONSE_INVALID',
+        'PROTECTED_READ_SERVER_RESPONSE_INVALID','PROTECTED_READ_COLLECTION_UNSUPPORTED',
+        'PROTECTED_READ_DUPLICATE_OR_MISSING_ID','PROTECTED_READ_COUNTRY_MISMATCH',
+        'PROTECTED_READ_TENANT_MISMATCH','PROTECTED_READ_PAGE_LIMIT','permission-denied'];
+      const category=raw=>codes.find(code=>String(raw||'').includes(code))||
+        (raw?'OTHER_SANITIZED_ERROR':'');
+      const diagnostics={
+        errors:Object.entries(snapshotErrors).filter(([k])=>safeName(k))
+          .map(([collection,raw])=>({collection,category:category(raw)})),
+        denied:(st.deniedCollections||[]).filter(safeName),
+        confirmed:(st.serverConfirmedCollections||[]).filter(safeName),
+        required:(st.requiredStartupCollections||[]).filter(safeName),
+        planFailures:Object.entries(st.queryPlans||{}).filter(([k,p])=>
+          safeName(k)&&p&&(p.hardError===true||p.denied===true||p.ok===false))
+          .map(([collection,p])=>({collection,hardError:p.hardError===true,
+            denied:p.denied===true,errors:(p.errors||[]).map(category)}))
+      };
       for(const k of ['negocios','gestiones']){
         const rows=getRows(k),keys=new Set(rows.map(x=>String(x.canonicalDocumentId||x.id||'')));
         const p=st.queryPlans?.[k]||{},error=String(snapshotErrors[k]||'');
@@ -189,7 +210,13 @@ async function main(){
           'modulo_no_visible','tenant_constraint_unico_requerido',
           'PROTECTED_ROLE_NOT_ASSIGNED','politica_acceso_faltante',
           'membresia_inactiva','tenant_faltante','coleccion_faltante'];
-        counts[k]={storeRows:rows.length,serverPageRows:ids[k].length,
+        const inCountry=rows.filter(x=>String(x.pais||x.country||'').toUpperCase()===
+          String(Orbit.pais||'').toUpperCase());
+        const inCountryIds=new Set(inCountry.map(x=>String(x.canonicalDocumentId||x.id||'')));
+        counts[k]={storeRows:rows.length,storeRowsCountry:inCountry.length,
+          storeRowsOtherCountry:rows.length-inCountry.length,
+          serverIdsInCountryStore:ids[k].filter(id=>inCountryIds.has(id)).length,
+          serverPageRows:ids[k].length,
           serverIdsPresentInStore:ids[k].filter(id=>keys.has(id)).length,
           serverConfirmed:allNames.includes(k),denied:(st.deniedCollections||[]).includes(k),
           hasSnapshotError:!!snapshotErrors[k],snapshotErrorCategory:categorizedError,
@@ -197,7 +224,7 @@ async function main(){
           queryPlanOk:p.ok===true,queryPlanScope:String(p.scope||'').slice(0,16),
           queryPlanErrors:(p.errors||[]).filter(x=>allowedPlanErrors.includes(String(x))).slice(0,8)};
       }
-      return{status:String(st.status||''),ready:st.ready===true,
+      return{status:String(st.status||''),ready:st.ready===true,diagnostics,
         requiredConfirmed:['negocios','gestiones'].every(k=>allNames.includes(k)),
         counts,role:String(Orbit.session?.rol?.()||'').toLowerCase(),
         country:String(Orbit.pais||'').toUpperCase(),

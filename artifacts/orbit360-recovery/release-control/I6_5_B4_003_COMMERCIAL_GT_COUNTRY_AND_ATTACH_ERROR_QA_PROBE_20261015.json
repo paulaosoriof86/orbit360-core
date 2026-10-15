@@ -1,0 +1,21 @@
+{
+  "schema": "GRAVICENTRA_B4003_TARGETED_QA_ONLY_DIAGNOSTIC_V1",
+  "date": "2026-10-15",
+  "gate": "I6.5/B4-003",
+  "priorHead": "ef5c262f309a9f5cbe7afa23c1e195d2fb5c5b79",
+  "status": "QA_ONLY_SOURCE_PREPARED_READONLY_RETEST_PENDING",
+  "scope": "EXISTING_TWO_UID_GT_OPERATIVO_ASESOR_PREVIEW",
+  "question": "Identify remaining attach-error collection and compare same-role, same-country IDs",
+  "qaPath": "tools/gravicentra-b4-003-commercial-readonly-qa.cjs",
+  "oldQaBlobSha": "6a20dec7c62d49be392b25eee99d4e9ab19a345c",
+  "newQaBlobSha": "58851f86d728a35de18779963783bb7674a9f77a",
+  "previewSourceHead": "159bbb25aa31fdd7e8351822bd4b343239231dcf",
+  "previewBuildId": "gi-i65-b4-159bbb25aa31-57f234755dc1",
+  "previewArtifactId": 11990990838,
+  "productSourceChanged": false,
+  "dataWrites": 0,
+  "syntheticWrites": 0,
+  "firestoreRulesChanged": false,
+  "livePromotion": false,
+  "passDeclared": false
+}
