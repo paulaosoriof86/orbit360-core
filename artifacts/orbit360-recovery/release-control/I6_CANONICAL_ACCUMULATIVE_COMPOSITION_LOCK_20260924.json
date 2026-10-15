@@ -212,7 +212,7 @@
     "orbit360-platform/data/academia-product-catalog-v1.js": "22b6781519cb14e05965738ac3bbc0f6eb0baff3",
     "orbit360-platform/data/geo-gt-co-authoritative-v20261004.js": "734b6518bc968a8c4e278602aa7161a38351cb02",
     "orbit360-platform/data/store-firestore-product-operational-p0.js": "7738314b843253c92be008dc0b812d035b377d43",
-    "orbit360-platform/data/store-firestore-product-readonly-p0.js": "cb64ae67a5531cd3f6a966843f5286c14aac25a7",
+    "orbit360-platform/data/store-firestore-product-readonly-p0.js": "75d7745603686da0607a48fc4c1adcbefc37494f",
     "orbit360-platform/data/tenant-alianzas-soluciones-insurers-p10.js": "41d2e31a42dac73eb68af304d5f532897210d0ee",
     "orbit360-platform/data/tenant-config/alianzas-soluciones.aseguradoras-knowledge-summary-v20261003.js": "2000d9ea8ab67bdd37d8bf404a29a405fa6374dd",
     "orbit360-platform/data/tenant-public-branding-index.js": "dc543c463f5ecd8ea44e49156d6282113bd95db6",
@@ -255,7 +255,7 @@
     "functions/b4-003-scoped-access-boundary.js": "29a64c48fa531b13d2ce2a0d7a719381ecb42b16",
     "firestore.b4-003-scoped-candidate.rules": "6ae1a85b1f82525ac018ff682a2e20b6cca5f1d8",
     "orbit360-platform/modules/comparativo.js": "982881a4c1e2f95be95428bd3f9f23360a9a2d5f",
-    "functions/b4-003-scoped-policy-reader.js": "4181f6198c0163175579a2cc19197ebc63d9b328",
+    "functions/b4-003-scoped-policy-reader.js": "24546aa40f26d818aef7f1714c2a21deda63a550",
     "functions/b4-003-scoped-policy-callable.js": "8b468150003fe812d9e1d0763120f2b31f1df75f",
     "functions/b4-003-scoped-related-reader.js": "5a1d36f898f88b45550c94868abb30a837972c4f",
     "functions/b4-003-scoped-bootstrap-reader.js": "356d36e0679a5e499c05632a981b9ef3f1ffb9ec",
@@ -5749,5 +5749,30 @@
     "livePromoted": false,
     "securityHoldPreserved": true,
     "needsExactReadback": true
+  },
+  "b4003PolicyPagingPerformance20261015": {
+    "status": "SCOPE_LIMITED_SOURCE_STAGED_EXACT_PREVIEW_AND_ROLE_PERFORMANCE_TEST_PENDING",
+    "finding": "B4-003-R20-B01",
+    "rootCause": "POLICY_PROTECTED_READER_50_ROW_SERIAL_PAGING_EXCEEDS_8S_AFTER_ROLE_SWITCH",
+    "sourceBlobs": {
+      "orbit360-platform/data/store-firestore-product-readonly-p0.js": "75d7745603686da0607a48fc4c1adcbefc37494f",
+      "functions/b4-003-scoped-policy-reader.js": "24546aa40f26d818aef7f1714c2a21deda63a550"
+    },
+    "priorBlobs": {
+      "orbit360-platform/data/store-firestore-product-readonly-p0.js": "cb64ae67a5531cd3f6a966843f5286c14aac25a7",
+      "functions/b4-003-scoped-policy-reader.js": "4181f6198c0163175579a2cc19197ebc63d9b328"
+    },
+    "securityProperties": [
+      "role_signed_and_assigned_server",
+      "country_scope_per_row",
+      "201st_lookahead_authorization",
+      "max_200_list",
+      "max_50_get",
+      "no_shared_rules_change"
+    ],
+    "frontendProductFilesChanged": 1,
+    "backendProductFilesChanged": 1,
+    "operationalWrites": 0,
+    "productionChanged": false
   }
 }

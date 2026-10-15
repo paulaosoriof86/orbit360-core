@@ -69,9 +69,13 @@ const denied=async(fn,code)=>{
  // authorization. A foreign-tenant row must fail the entire page.
  policies.push({id:'p1-leak',tenantId:'another-tenant',pais:'GT',asesorId:'a3',numero:'FOREIGN'});
  await denied(()=>scopedPolicyRead(req('operativo','list',{pageSize:1})),'TENANT_DENIED');count++;
+ await denied(()=>scopedPolicyRead(req('operativo','list',{pageSize:200})),'TENANT_DENIED');count++;
  policies.pop();
  await denied(()=>scopedPolicyRead(req('asesor','list',{cursor:'p3'})),'CURSOR_DENIED');count++;
- await denied(()=>scopedPolicyRead(req('asesor','list',{pageSize:51})),'PAGE_SIZE_INVALID');count++;
+ const boundedLarge=await scopedPolicyRead(req('operativo','list',{pageSize:200}));
+ assert.deepEqual(boundedLarge.rows.map(x=>x.id),['p1','p2','p3']);assert.equal(boundedLarge.nextCursor,null);count++;
+ await denied(()=>scopedPolicyRead(req('asesor','list',{pageSize:201})),'PAGE_SIZE_INVALID');count++;
+ await denied(()=>scopedPolicyRead(req('asesor','get',{policyId:'p1',pageSize:51})),'PAGE_SIZE_INVALID');count++;
  await denied(()=>scopedPolicyRead(req('asesor','list',{policyId:'p1'})),'POLICY_GET_LIST_MIXED');count++;
  await denied(()=>scopedPolicyRead({...req('asesor'),auth:null}),'AUTH_REQUIRED');count++;
  activeMember={...activeMember,status:'inactive'};

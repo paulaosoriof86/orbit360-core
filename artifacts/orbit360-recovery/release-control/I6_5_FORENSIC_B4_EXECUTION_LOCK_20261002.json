@@ -123,7 +123,7 @@
   "nextAction": "B4_003_R20_TARGETED_PAULA_VISUAL",
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "blobSha": "6067adc820a426652fa68c855740146176df8e07",
+    "blobSha": "016f251811f22bc4fc04b2a5f674dfe09243e605",
     "status": "FROZEN_ACTIVE_UAT3_P0_BATCH_1_SOURCE_COMPLETE"
   },
   "findingLedger": {
@@ -2524,5 +2524,17 @@
     "currentPreviewNoDataWrites": true,
     "uiProofPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_RENEWALS_FUNCTIONAL_MATRIX_AND_STARTUP_HOLD_20261015.json",
     "uiProofBlobSha": "4e1e5894e58da5ede3a4554ea88fc3115f3e1526"
+  },
+  "b4003PolicyPagingPerformance20261015": {
+    "status": "SCOPED_SOURCE_STAGED_PREVIEW_PENDING",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PROTECTED_POLICY_PAGING_PERFORMANCE_SOURCE_FIX_20261015.json",
+    "receiptBlobSha": "8db32c6a017defba14b770d397962d871cf003ad",
+    "sourcePaths": [
+      "orbit360-platform/data/store-firestore-product-readonly-p0.js",
+      "functions/b4-003-scoped-policy-reader.js"
+    ],
+    "qaPath": "tools/gravicentra-b4-003-scoped-policy-reader.test.cjs",
+    "realOperationalWritesAuthorized": false,
+    "productionDeploymentAuthorized": false
   }
 }

@@ -12,7 +12,7 @@ function validateArguments(input){
  if(!/^[A-Za-z0-9][A-Za-z0-9._:-]{1,159}$/.test(tenantId))throw new Denied('TENANT_INVALID');
  if(!['GT','CO'].includes(country))throw new Denied('COUNTRY_DENIED');
  if(!['get','list'].includes(mode))throw new Denied('MODE_DENIED');
- if(!Number.isInteger(rawSize)||rawSize<1||rawSize>50)throw new Denied('PAGE_SIZE_INVALID');
+ if(!Number.isInteger(rawSize)||rawSize<1||rawSize>(mode==='list'?200:50))throw new Denied('PAGE_SIZE_INVALID');
  if(mode==='get'&&(!policyId||policyId.length>160))throw new Denied('POLICY_ID_REQUIRED');
  if(mode==='list'&&policyId)throw new Denied('POLICY_GET_LIST_MIXED');
  if(mode==='get'&&cursor)throw new Denied('CURSOR_UNEXPECTED');

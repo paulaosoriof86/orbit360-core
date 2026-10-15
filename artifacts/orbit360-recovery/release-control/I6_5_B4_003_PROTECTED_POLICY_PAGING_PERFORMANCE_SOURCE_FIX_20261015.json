@@ -1,0 +1,64 @@
+{
+  "schema": "GRAVICENTRA_B4_003_PROTECTED_POLICY_PAGING_PERFORMANCE_SOURCE_FIX_V1",
+  "date": "2026-10-15",
+  "gate": "I6.5/B4-003",
+  "findingId": "B4-003-R20-B01",
+  "status": "SCOPE_LIMITED_SOURCE_STAGED_NEW_EXACT_PREVIEW_REQUIRED",
+  "causalEvidence": {
+    "runId": 38719080466,
+    "artifactId": 11963378668,
+    "readOnlyUiMatrix": 24,
+    "uiPass": true,
+    "performanceFail": true,
+    "postRoleServerPolicyReadinessMs": [
+      12813,
+      11235
+    ],
+    "approvedBudgetMs": 8000,
+    "observedPhysicalPolicies": 1425,
+    "operationalPolicies": 1419
+  },
+  "sourceBefore": {
+    "orbit360-platform/data/store-firestore-product-readonly-p0.js": "cb64ae67a5531cd3f6a966843f5286c14aac25a7",
+    "functions/b4-003-scoped-policy-reader.js": "4181f6198c0163175579a2cc19197ebc63d9b328"
+  },
+  "sourceAfter": {
+    "orbit360-platform/data/store-firestore-product-readonly-p0.js": "75d7745603686da0607a48fc4c1adcbefc37494f",
+    "functions/b4-003-scoped-policy-reader.js": "24546aa40f26d818aef7f1714c2a21deda63a550"
+  },
+  "qaPath": "tools/gravicentra-b4-003-scoped-policy-reader.test.cjs",
+  "qaBlobSha": "0f7f5d2caf683fdf7bdb370e60b691aeaac09fc5",
+  "workflowPath": ".github/workflows/gravicentra-b4-003-executor.yml",
+  "workflowBlobSha": "d98efe93565578061b6501725da65c2ad0961434",
+  "compositionBlobSha": "016f251811f22bc4fc04b2a5f674dfe09243e605",
+  "scopedAuthorization": {
+    "existingAuthorisedOwner": "orbit360-platform/data/store-firestore-product-readonly-p0.js",
+    "existingAuthorizationReceipt": "3b17ba3e560117345afc8fb476580ed26e275d67",
+    "exactBackendExtension": "functions/b4-003-scoped-policy-reader.js",
+    "reason": "Server reader already controls the authorized protected hydration path; only bounded list window extension, no new services or grants",
+    "userContinuityAuthorization": "Continue material fixes inside the active B4-003 gate",
+    "globalMutationAuthorityChanged": false
+  },
+  "invariants": {
+    "pagesBeforeAtLeast": 29,
+    "physicalRowsUnchanged": true,
+    "policyPageSize": 200,
+    "getPageMax": 50,
+    "otherCollectionsPageSize": 50,
+    "authRoleCountryPerRowMaintained": true,
+    "lookaheadAuthorizationMaintained": true,
+    "identityNoWrites": true,
+    "livePromotion": false,
+    "sharedRulesDeploy": false,
+    "noReimport": true,
+    "noP0Closed": true
+  },
+  "acceptanceRequired": [
+    "unit policy-boundary QA",
+    "protected-hydration QA",
+    "exact new preview and readback",
+    "authenticated GT/CO roles full policy cardinality",
+    "startup under eight-second budget",
+    "human visual"
+  ]
+}

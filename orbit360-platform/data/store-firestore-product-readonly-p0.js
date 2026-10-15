@@ -90,16 +90,16 @@
         if(countries.indexOf(selectedCountry)<0)return Promise.reject(new Error('PROTECTED_READ_COUNTRY_DENIED'));
         countries=[selectedCountry];
       }
-      var initialRole=role(),rows=[],seen=new Set();
+      var initialRole=role(),rows=[],seen=new Set(),pageSize=collection==='polizas'?200:50;
       return countries.reduce(function(pr,country){return pr.then(function(){
         var cursor='',pages=0,countrySeen=new Set();
         function next(){
           if(epoch!==protectedEpoch||role()!==initialRole)throw new Error('PROTECTED_READ_CONTEXT_CHANGED');
           if(++pages>100)throw new Error('PROTECTED_READ_PAGE_LIMIT');
           return Promise.resolve(deps.protectedReadPage({tenantId:state.tenantId,activeRole:initialRole,
-            country:country,collection:collection,mode:'list',policyId:policyId||'',policyIds:Array.isArray(policyIds)?policyIds:undefined,pageSize:50,cursor:cursor})).then(function(r){
+            country:country,collection:collection,mode:'list',policyId:policyId||'',policyIds:Array.isArray(policyIds)?policyIds:undefined,pageSize:pageSize,cursor:cursor})).then(function(r){
               if(!r||r.ok!==true||r.serverScoped!==true||r.collection!==collection||
-                 r.country!==country||!Array.isArray(r.rows)||r.rows.length>50)
+                 r.country!==country||!Array.isArray(r.rows)||r.rows.length>pageSize)
                 throw new Error('PROTECTED_READ_RESPONSE_INVALID');
               r.rows.forEach(function(x){
                 var id=text(x&&x.canonicalDocumentId||x&&x.id);
