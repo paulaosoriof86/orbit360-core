@@ -149,7 +149,33 @@ jobs:
             && c.b4003ProtectedPreviewAuthorization?.sharedFirestoreRulesDeployAuthorized===false
             && c.b4003ProtectedPreviewAuthorization?.operationalWritesAuthorized===false;
           if(currentSubject===requestedSubject&&!onePassInternal)throw Error('B4_003_CUMULATIVE_INTERNAL_PREVIEW_GATE_DENIED');
-          const scopedPreview=priorScopedPreview||onePassInternal;
+          // B4-003: same cumulative candidate, specifically requested 15-Oct
+          // scoped Preview. Read authorization from Control Plane rather than a
+          // historical commit or hardcoded source hash. This does not open LIVE,
+          // shared Firestore rules or business/synthetic writes.
+          const requestedOct15Subject='build(i6.5 B4-003): exact cumulative Oct15 scoped Preview';
+          const oct15ScopedReadback=currentSubject===requestedOct15Subject
+            && c.b4003VerifiedCanonicalFinanceScope20261015?.exactPreviewDispatch?.status==='REQUESTED_EXISTING_B4_003_CUMULATIVE_PREVIEW'
+            && c.b4003VerifiedCanonicalFinanceScope20261015?.exactPreviewDispatch?.sourceProductBlob===require('node:child_process').execFileSync('git',['hash-object','functions/b4-003-scoped-related-reader.js'],{encoding:'utf8'}).trim()
+            && c.b4003VerifiedCanonicalFinanceScope20261015?.sourceBlobSha===c.b4003VerifiedCanonicalFinanceScope20261015?.exactPreviewDispatch?.sourceProductBlob
+            && c.canonicalAccumulationControl?.compositionLockBlobSha===require('node:child_process').execFileSync('git',['hash-object','artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json'],{encoding:'utf8'}).trim()
+            && c.b4003SecurityReleaseHold?.status==='ACTIVE_FAIL_CLOSED_UNAUTHORIZED_BROWSER_FIRESTORE_READ_WRITE'
+            && c.currentB4?.status==='B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL'
+            && c.nextAction==='I6_5_FORENSIC_REMEDIATION_B4_003_R20_TARGETED_PAULA_VISUAL'
+            && l.activeFinding?.id==='B4-003'
+            && l.boundaries?.previewMutationAuthorized===true
+            && l.boundaries?.functionDeploymentAuthorized===true
+            && l.boundaries?.businessWritesAuthorized===false
+            && l.boundaries?.realOperationalWritesAuthorized===false
+            && l.boundaries?.syntheticQaWritesAuthorized===false
+            && l.boundaries?.dataMutationAuthorized===false
+            && l.boundaries?.reimportAuthorized===false
+            && l.boundaries?.livePromotionAuthorized===false
+            && c.b4003SecurityReleaseHold?.firestoreRulesDeployAuthorized===false
+            && c.b4003VerifiedCanonicalFinanceScope20261015?.exactPreviewDispatch?.firestoreRulesDeploymentAuthorized===false
+            && c.b4003VerifiedCanonicalFinanceScope20261015?.exactPreviewDispatch?.operationalWritesAuthorized===false;
+          if(currentSubject===requestedOct15Subject&&!oct15ScopedReadback)throw Error('B4_003_OCT15_SCOPED_PREVIEW_GATE_DENIED_FAIL_CLOSED');
+          const scopedPreview=priorScopedPreview||onePassInternal||oct15ScopedReadback;
           const previewOk=(r19Preview||r20Preview||r23Preview)
             && l.activeFinding?.id==='B4-003'
             && l.boundaries?.businessWritesAuthorized===false
