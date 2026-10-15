@@ -369,7 +369,24 @@ jobs:
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'r20_cutoff_apply='+(r20CutoffApply?'true':'false')+'\n');
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'r20_second_dryrun='+(secondReviewDryRun?'true':'false')+'\n');
           // Surface an explicit NOOP on routine pushes; never certify a skipped Preview.
-          const requestedModes={scopedPreview,preview:previewOk,renewalsPreview,apply:applyOk,r20DryRun,r20Apply,r20CutoffApply,secondReviewDryRun,p0CumulativeReadOnly,r26RulesReadOnly,r26ReadOnly,financeCoverage,publicBrowserSmoke};
+          const commercialSubject='test(i6.5 B4-003): commercial two-UID read-only';
+          const commercialReadonly=currentSubject===commercialSubject
+            && c.b4003CommercialReadOnlyQa20261015?.status==='REQUESTED_READONLY_EXISTING_PREVIEW_ONLY'
+            && c.b4003CommercialReadOnlyQa20261015?.sourcePreviewHead===c.b4003Oct15ScopedPreviewEvidence?.sourceHead
+            && c.b4003Oct15ScopedPreviewEvidence?.exactHostingReadback===true
+            && c.b4003Oct15ScopedPreviewEvidence?.authenticatedReadOnlyPass===true
+            && c.nextAction==='I6_5_FORENSIC_REMEDIATION_B4_003_R20_TARGETED_PAULA_VISUAL'
+            && c.currentB4?.status==='B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL'
+            && c.b4003SecurityReleaseHold?.status==='ACTIVE_FAIL_CLOSED_UNAUTHORIZED_BROWSER_FIRESTORE_READ_WRITE'
+            && l.activeFinding?.id==='B4-003'
+            && l.boundaries?.businessWritesAuthorized===false
+            && l.boundaries?.syntheticQaWritesAuthorized===false
+            && l.boundaries?.dataMutationAuthorized===false
+            && l.boundaries?.livePromotionAuthorized===false;
+          if(currentSubject===commercialSubject&&!commercialReadonly)throw Error('B4_003_COMMERCIAL_READONLY_GATE_DENIED');
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'commercial_readonly='+(commercialReadonly?'true':'false')+'\n');
+
+          const requestedModes={scopedPreview,preview:previewOk,renewalsPreview,apply:applyOk,r20DryRun,r20Apply,r20CutoffApply,secondReviewDryRun,p0CumulativeReadOnly,r26RulesReadOnly,r26ReadOnly,financeCoverage,publicBrowserSmoke,commercialReadonly};
           const enabledModes=Object.entries(requestedModes).filter(([,on])=>on).map(([name])=>name);
           if(!enabledModes.length){
             fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY,'### B4-003: NOOP (not a Preview PASS)\nNo build, deploy, authenticated browser test, or readback was executed. Control Plane nextAction: `'+String(c.nextAction)+'`.\n');
@@ -380,6 +397,27 @@ jobs:
           NODE
 
 
+
+      # Existing B4-003 executor; strictly QA-only on the immutable Preview.
+      - name: Prepare B4-003 two-UID read-only QA
+        if: steps.gate.outputs.commercial_readonly == 'true'
+        run: |
+          set -euo pipefail
+          node --check tools/gravicentra-b4-003-commercial-readonly-qa.cjs
+          npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund firebase-admin@13.4.0 playwright@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Execute B4-003 two-UID read-only QA
+        if: steps.gate.outputs.commercial_readonly == 'true'
+        run: node tools/gravicentra-b4-003-commercial-readonly-qa.cjs
+
+      - name: Preserve B4-003 two-UID read-only result
+        if: always() && steps.gate.outputs.commercial_readonly == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: gravicentra-b4-003-commercial-readonly-${{ github.run_id }}
+          path: ${{ runner.temp }}/b4-003-commercial-readonly.json
+          if-no-files-found: error
 
       # Exact current-Preview financial source and protected coverage, no human impersonation.
       # Firebase Admin is used only for tenant-aggregate readback; no business writes.

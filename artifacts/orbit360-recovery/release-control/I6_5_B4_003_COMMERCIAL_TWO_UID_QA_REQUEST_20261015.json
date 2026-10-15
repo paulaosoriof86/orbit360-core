@@ -1,0 +1,18 @@
+{
+  "schema": "GRAVICENTRA_B4_003_TWO_UID_READONLY_QA_REQUEST_V1",
+  "gate": "I6.5/B4-003",
+  "date": "2026-10-15",
+  "status": "REQUESTED_QA_ONLY_NOT_ACCEPTED",
+  "headBefore": "159e2a14892b916f9496dcf0ab4094a54f9974af",
+  "preview": {
+    "sourceHead": "ae6bc8be5c74581f6fb920ea79e39c826a7d1d9f",
+    "buildId": "gi-i65-b4-ae6bc8be5c74-57f234755dc1",
+    "runId": 38758078678,
+    "artifactId": 11983958349,
+    "digest": "sha256:8ab8ac40f70d472d0df891d280f57974be94ae87ff51104434080d6416dcca69"
+  },
+  "qaPath": "tools/gravicentra-b4-003-commercial-readonly-qa.cjs",
+  "qaBlobSha": "03d38d9fc5df783010ad3e5b3239c30114775465",
+  "limits": "No business/synthetic writes, no Firestore Rules deploy, no rebuild/reimport, no LIVE, no TinyFish; D04 and D18 remain open.",
+  "purpose": "Verify two distinct active users, country and role scopes in Negocios/Gestiones, negative access, sample canonical contact relation (D15). No frontend CRUD PASS without save/readback/reload."
+}

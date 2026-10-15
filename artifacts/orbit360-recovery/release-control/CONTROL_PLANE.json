@@ -11447,5 +11447,22 @@
     "fullB4003Closed": false,
     "realBusinessWrites": 0,
     "previewHumanAccepted": false
+  },
+  "b4003CommercialReadOnlyQa20261015": {
+    "status": "REQUESTED_READONLY_EXISTING_PREVIEW_ONLY",
+    "gate": "I6.5/B4-003",
+    "sourcePreviewHead": "ae6bc8be5c74581f6fb920ea79e39c826a7d1d9f",
+    "previewRunId": 38758078678,
+    "artifactId": 11983958349,
+    "artifactDigest": "sha256:8ab8ac40f70d472d0df891d280f57974be94ae87ff51104434080d6416dcca69",
+    "qaPath": "tools/gravicentra-b4-003-commercial-readonly-qa.cjs",
+    "qaBlobSha": "03d38d9fc5df783010ad3e5b3239c30114775465",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_COMMERCIAL_TWO_UID_QA_REQUEST_20261015.json",
+    "receiptBlobSha": "be7cdb62995ebea3b5c2b43b5676b6dfd9b73006",
+    "operationalWritesAuthorized": false,
+    "syntheticWritesAuthorized": false,
+    "firestoreRulesDeploymentAuthorized": false,
+    "livePromotionAuthorized": false,
+    "d04D18StillOpen": true
   }
 }
