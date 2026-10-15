@@ -452,6 +452,39 @@ jobs:
               }
               children[k]={rows:by[k].size,linked,missingPolicy,withoutAnchor,explicitCountryConflict,linkedGT,linkedCO};
             }
+            // Historial read contract — aggregate attributes only, no event text
+            // and no user identifiers in the artifact. Never infer permissions.
+            const asnap=await collection('actividades')
+              .select('pais','country','polizaId','policyId','clienteId','clientId',
+                'asesorId','advisorId','ownerAdvisorId','tenantId').get();
+            const events={count:asnap.size,countryExplicit:0,countryFromPolicy:0,
+              countryFromClient:0,countryUnknown:0,countryConflict:0,
+              policyMatched:0,clientMatched:0,unresolvedParent:0,
+              advisorExplicit:0,advisorFromPolicy:0,advisorFromClient:0,advisorMissing:0,
+              matchedGT:0,matchedCO:0,tenantMismatch:0};
+            for(const doc of asnap.docs){
+              const row=doc.data()||{},p=policies.get(String(row.polizaId||row.policyId||'')),
+                c=clients.get(String(row.clienteId||row.clientId||p?.clienteId||''));
+              if(p)events.policyMatched++;if(c)events.clientMatched++;
+              if(!p&&!c)events.unresolvedParent++;
+              const explicit=country(row.pais||row.country),
+                fromPolicy=country(p?.pais||p?.country),
+                fromClient=country(c?.pais||c?.country);
+              if(explicit)events.countryExplicit++;
+              else if(fromPolicy)events.countryFromPolicy++;
+              else if(fromClient)events.countryFromClient++;
+              else events.countryUnknown++;
+              const canonical=fromPolicy||fromClient||explicit;
+              if(explicit&&canonical&&explicit!==canonical)events.countryConflict++;
+              if(canonical==='GT')events.matchedGT++;
+              if(canonical==='CO')events.matchedCO++;
+              if(row.tenantId&&row.tenantId!==process.env.TENANT_HINT)events.tenantMismatch++;
+              if(row.asesorId||row.advisorId||row.ownerAdvisorId)events.advisorExplicit++;
+              else if(p?.asesorId)events.advisorFromPolicy++;
+              else if(c?.asesorId)events.advisorFromClient++;
+              else events.advisorMissing++;
+            }
+            report.activityRelationshipProfile=events;
             report.relations={policiesByCountry:policyCountries,crossCountryPolicyClient:crossCountry,children};
             const hostedGap=report.hostedCollectionAuthority.unsupported.filter(k=>report.sourceCounts[k]>0);
             const historyCode=fs.readFileSync('orbit360-platform/modules/historial.js','utf8');
