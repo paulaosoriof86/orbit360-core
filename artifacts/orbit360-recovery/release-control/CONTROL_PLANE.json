@@ -4870,7 +4870,7 @@
       "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
       "executionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B4_EXECUTION_LOCK_20261002.json",
       "executionLockBlobSha": "8f78bfd3ed4d6c17db51b664921e92d760faea95",
-      "compositionLockBlobSha": "c8c6507a3b19745128b484667a41124ab729b05b",
+      "compositionLockBlobSha": "54f45ecfbbd00df5e12b1aeea1f6403584407674",
       "findingLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
       "activeFindingId": "B4-003",
       "productSourceSha": "c603fd3561e7229d9359db45495d4cf2d757cd8f",
@@ -5996,7 +5996,7 @@
   "canonicalAccumulationControl": {
     "status": "FROZEN_ACTIVE",
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "compositionLockBlobSha": "c8c6507a3b19745128b484667a41124ab729b05b",
+    "compositionLockBlobSha": "54f45ecfbbd00df5e12b1aeea1f6403584407674",
     "findingLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
     "findingLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
@@ -6313,7 +6313,7 @@
     "activeFindingId": "B4-003",
     "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
     "executionLockBlobSha": "8f78bfd3ed4d6c17db51b664921e92d760faea95",
-    "compositionLockBlobSha": "c8c6507a3b19745128b484667a41124ab729b05b",
+    "compositionLockBlobSha": "54f45ecfbbd00df5e12b1aeea1f6403584407674",
     "findingLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
     "noLive": true,
     "noReimport": true,
@@ -11064,5 +11064,30 @@
     "firestoreRulesDeployed": false,
     "productionPromotion": false,
     "screenshotsArtifact": "gravicentra-b4003-public-browser-38668687052"
+  },
+  "b4003TerminalAuthFailureSourceStage": {
+    "gate": "I6.5/B4-003",
+    "status": "SOURCE_STAGED_GUARD_PENDING_NOT_ACCEPTED",
+    "rootCause": "POST_AUTH_ACTIVATION_CATCH_LEFT_LOADING_OVERLAY_AND_DISABLED_SUBMIT",
+    "sourceFiles": {
+      "orbit360-platform/core/auth-product-runtime-p0.js": "5ae27034e76592cd34c2d90dc7962dac3fa0b000",
+      "orbit360-platform/core/product-runtime-browser-providers-p0.js": "18a54174fac664ef843d90d1a05a64368bb6b81d",
+      "orbit360-platform/index.html": "8b447eb22e191d5af0bda11ebbd4603befa148db",
+      ".github/workflows/gravicentra-release-lock-sync.yml": "4e6f54e2e8fe755c873aa46292e1d0de4db4489b",
+      "tools/gravicentra-b4-003-auth-terminal.test.cjs": "05a216fe0afde3035f919a3ab773f6ce2420791f"
+    },
+    "correction": "POST_AUTH_AND_RESTORE_FAILURE_EXIT_RESTORING_MODE_AND_UNLOCK_RETRY",
+    "scopedCallableTimeoutMs": 16000,
+    "timeoutUse": "FAIL_CLOSED_ONLY_NOT_NORMAL_SUCCESS",
+    "functionalAuthenticatedPass": false,
+    "productionChanged": false,
+    "firestoreRulesChanged": false,
+    "operationalWrites": 0,
+    "compositionBlobSha": "54f45ecfbbd00df5e12b1aeea1f6403584407674",
+    "previousPreviewImmutable": true,
+    "rebuildRequiredAfterPass": true,
+    "qa": "tools/gravicentra-b4-003-auth-terminal.test.cjs",
+    "sourceMutationAuthorizedOnlyWithinB4": true,
+    "livePromotionAuthorized": false
   }
 }

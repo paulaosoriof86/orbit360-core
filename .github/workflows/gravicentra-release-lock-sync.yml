@@ -53,6 +53,7 @@ jobs:
           node --check orbit360-platform/data/store-firestore-product-readonly-p0.js
           node --check orbit360-platform/core/product-app-p0.js
           node tools/gravicentra-b4-003-protected-hydration.test.cjs
+          node tools/gravicentra-b4-003-auth-terminal.test.cjs
           node --check orbit360-platform/data/store-firestore-product-readonly-p0.js
           node tools/gravicentra-b4-003-relation-cache-accessors.test.cjs
           node --check orbit360-platform/modules/inicio.js

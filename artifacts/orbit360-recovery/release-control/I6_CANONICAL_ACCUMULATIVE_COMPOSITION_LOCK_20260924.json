@@ -176,7 +176,7 @@
     "orbit360-platform/core/access-scope.js": "5fd5aabdbe0e7b613ae55161be01aa17b5174769",
     "orbit360-platform/core/assignable-advisor-roster-client.js": "c04a4b35267e77d4353fa131331d4a7549255edc",
     "orbit360-platform/core/auth-password-change-v20260805.js": "873b484d42825db2fa31e0ae90c9ec78598728f4",
-    "orbit360-platform/core/auth-product-runtime-p0.js": "5299e3397fc4f37488e65e609eb446d27d724128",
+    "orbit360-platform/core/auth-product-runtime-p0.js": "5ae27034e76592cd34c2d90dc7962dac3fa0b000",
     "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js": "60ce88178f48ff5d9b5fd01c1e2d92abe642dac1",
     "orbit360-platform/core/backend-product-readonly-bootstrap-p0.js": "89a9083d192ba6a6516b42c5e730596499da75a7",
     "orbit360-platform/core/backend-resource-contracts.js": "826364d2a394d0bfe75d9f0ccdc5dd8905d2b3f0",
@@ -195,7 +195,7 @@
     "orbit360-platform/core/product-drive-document-provider-p0.js": "074b38c168ed0e7c78569395f815a2ff037c2c3c",
     "orbit360-platform/core/product-hydration-required-optional-p0.js": "21f870d3e0e165487843d1d6efa454474fd73563",
     "orbit360-platform/core/product-insurer-credential-provider-p0.js": "3bf5ba98271c7012dd1328df2894f1b38f3983eb",
-    "orbit360-platform/core/product-runtime-browser-providers-p0.js": "c7e0beb627f36f7662183ca7e6ebb1d97c3e0d30",
+    "orbit360-platform/core/product-runtime-browser-providers-p0.js": "18a54174fac664ef843d90d1a05a64368bb6b81d",
     "orbit360-platform/core/public-tenant-branding.js": "ee1029772b1191c44817d315dc8ce8862bb3a152",
     "orbit360-platform/core/pwa.js": "14bc0d513a2ee3de8f7b598b38276e6136f05eb8",
     "orbit360-platform/core/queries.js": "55acae8c4c933bde47afb018be55e978d9b81cdd",
@@ -216,7 +216,7 @@
     "orbit360-platform/data/tenant-alianzas-soluciones-insurers-p10.js": "41d2e31a42dac73eb68af304d5f532897210d0ee",
     "orbit360-platform/data/tenant-config/alianzas-soluciones.aseguradoras-knowledge-summary-v20261003.js": "2000d9ea8ab67bdd37d8bf404a29a405fa6374dd",
     "orbit360-platform/data/tenant-public-branding-index.js": "dc543c463f5ecd8ea44e49156d6282113bd95db6",
-    "orbit360-platform/index.html": "549b5da5a7c28a5ada7ff95cee49102e24816924",
+    "orbit360-platform/index.html": "8b447eb22e191d5af0bda11ebbd4603befa148db",
     "orbit360-platform/modules/academia.js": "4d48ee3edbc6afc4163bf6365a80bbcb680b1852",
     "orbit360-platform/modules/aseguradoras-v1202-import-bridge.js": "db5f012abe505c2dd27d77a47d0694868bee5348",
     "orbit360-platform/modules/aseguradoras.js": "9e56c296b55da499b52f42c462c668aa2f32eba7",
@@ -5618,5 +5618,24 @@
     "noLive": true,
     "noRules": true,
     "noBusinessWrites": true
+  },
+  "b4003TerminalAuthFailureSourceStage": {
+    "gate": "I6.5/B4-003",
+    "status": "SOURCE_STAGED_GUARD_PENDING_NOT_ACCEPTED",
+    "rootCause": "POST_AUTH_ACTIVATION_CATCH_LEFT_LOADING_OVERLAY_AND_DISABLED_SUBMIT",
+    "sourceFiles": {
+      "orbit360-platform/core/auth-product-runtime-p0.js": "5ae27034e76592cd34c2d90dc7962dac3fa0b000",
+      "orbit360-platform/core/product-runtime-browser-providers-p0.js": "18a54174fac664ef843d90d1a05a64368bb6b81d",
+      "orbit360-platform/index.html": "8b447eb22e191d5af0bda11ebbd4603befa148db",
+      ".github/workflows/gravicentra-release-lock-sync.yml": "4e6f54e2e8fe755c873aa46292e1d0de4db4489b",
+      "tools/gravicentra-b4-003-auth-terminal.test.cjs": "05a216fe0afde3035f919a3ab773f6ce2420791f"
+    },
+    "correction": "POST_AUTH_AND_RESTORE_FAILURE_EXIT_RESTORING_MODE_AND_UNLOCK_RETRY",
+    "scopedCallableTimeoutMs": 16000,
+    "timeoutUse": "FAIL_CLOSED_ONLY_NOT_NORMAL_SUCCESS",
+    "functionalAuthenticatedPass": false,
+    "productionChanged": false,
+    "firestoreRulesChanged": false,
+    "operationalWrites": 0
   }
 }

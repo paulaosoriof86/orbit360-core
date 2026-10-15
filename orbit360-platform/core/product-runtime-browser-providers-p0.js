@@ -78,7 +78,7 @@
     return initialize().then(function(ctx){
       var fx=ctx.functionsByRegion[region];
       if(!fx){fx=ctx.modules.functions.getFunctions(ctx.app,region);ctx.functionsByRegion[region]=fx;}
-      return ctx.modules.functions.httpsCallable(fx,name)(data||{});
+      var callable=name==='orbit360ScopedPolicyReadPreview'?ctx.modules.functions.httpsCallable(fx,name,{timeout:16000}):ctx.modules.functions.httpsCallable(fx,name);return callable(data||{});
     }).then(function(result){return result&&Object.prototype.hasOwnProperty.call(result,'data')?result.data:result;});
   }
 
