@@ -195,7 +195,8 @@ async function run(){
     assert.deepEqual(co.rows.map(x=>x.id),['c_co']);listProof++;
     await denyRelated(()=>listRelated('opGT','operativo','vehiculos'),'POLICY_ANCHOR_REQUIRED');listProof++;
     await denyRelated(()=>listRelated('opGT','operativo','vehiculos','foreign'),'POLICY_NOT_FOUND_OR_DENIED');listProof++;
-    await denyRelated(()=>listRelated('opGT','operativo','recibosEsperados','own'),'RELATION_CLIENT_MISMATCH');listProof++;
+    const filteredReceiptList=await listRelated('opGT','operativo','recibosEsperados','own');
+    assert.deepEqual(filteredReceiptList.rows.map(x=>x.id),['r_own']);listProof++;
     await denyRelated(()=>listRelated('opGT','asesor','clientes'),'ROLE_DENIED');listProof++;
     await denyRelated(()=>listRelated('advisorGT','asesor','clientes','',{country:'CO'}),'COUNTRY_DENIED');listProof++;
     await denyRelated(()=>listRelated('opGT','operativo','vehiculos','own',{cursor:'v_foreign'}),'CURSOR_DENIED');listProof++;

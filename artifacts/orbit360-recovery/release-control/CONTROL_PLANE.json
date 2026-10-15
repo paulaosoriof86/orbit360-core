@@ -4869,8 +4869,8 @@
       "entryGuardReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_ENTRY_GUARD_PASS_20261002.json",
       "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
       "executionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B4_EXECUTION_LOCK_20261002.json",
-      "executionLockBlobSha": "3ddde174626b5411340af68c4c71ac7e1206903e",
-      "compositionLockBlobSha": "30d11faa97bc6d0cf1e2f51522747b70704d997c",
+      "executionLockBlobSha": "696f0bc32b77ce20136c106fa73bfa958d0f0259",
+      "compositionLockBlobSha": "b36c51bee607970f3c2171051c2291b945e7bcd3",
       "findingLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
       "activeFindingId": "B4-003",
       "productSourceSha": "c603fd3561e7229d9359db45495d4cf2d757cd8f",
@@ -5996,7 +5996,7 @@
   "canonicalAccumulationControl": {
     "status": "FROZEN_ACTIVE",
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "compositionLockBlobSha": "30d11faa97bc6d0cf1e2f51522747b70704d997c",
+    "compositionLockBlobSha": "b36c51bee607970f3c2171051c2291b945e7bcd3",
     "findingLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
     "findingLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
@@ -6312,8 +6312,8 @@
     "status": "B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL",
     "activeFindingId": "B4-003",
     "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
-    "executionLockBlobSha": "3ddde174626b5411340af68c4c71ac7e1206903e",
-    "compositionLockBlobSha": "30d11faa97bc6d0cf1e2f51522747b70704d997c",
+    "executionLockBlobSha": "696f0bc32b77ce20136c106fa73bfa958d0f0259",
+    "compositionLockBlobSha": "b36c51bee607970f3c2171051c2291b945e7bcd3",
     "findingLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
     "noLive": true,
     "noReimport": true,
@@ -10714,7 +10714,7 @@
       },
       "tools/gravicentra-b4-003-firestore-emulator.test.cjs": {
         "from": "33af3aab9f5f2bce7698ad19ec97f0489d8d48dd",
-        "to": "0e728c9d486a30f65ec00e5de87cec2bc2143e3c",
+        "to": "6c88abe0080466182732218b42a0d044fddc9a01",
         "size": 21132
       }
     },
@@ -10740,7 +10740,8 @@
     "noOperationalDataMutation": true,
     "noReimport": true,
     "releaseAccepted": false,
-    "executionLockBlobSha": "3ddde174626b5411340af68c4c71ac7e1206903e",
-    "compositionBlobSha": "30d11faa97bc6d0cf1e2f51522747b70704d997c"
+    "executionLockBlobSha": "696f0bc32b77ce20136c106fa73bfa958d0f0259",
+    "compositionBlobSha": "b36c51bee607970f3c2171051c2291b945e7bcd3",
+    "lastQaFinding": "LEGACY_EMULATOR_EXPECTED_FULL_BATCH_FAILURE_FOR_MISMATCHED_RECEIPT_NOW_EXPECTS_FILTERED_VALID_RECEIPT"
   }
 }
