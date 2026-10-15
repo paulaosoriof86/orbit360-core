@@ -5996,7 +5996,7 @@
   "canonicalAccumulationControl": {
     "status": "FROZEN_ACTIVE",
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "compositionLockBlobSha": "fae35c22fff5cf04275dde510e7fc227cf39b9b2",
+    "compositionLockBlobSha": "c6dac2dced2a7399c76889e20896821c4891e5d5",
     "findingLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
     "findingLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
@@ -6313,7 +6313,7 @@
     "activeFindingId": "B4-003",
     "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
     "executionLockBlobSha": "a2ce9c93d0182b5fbb8bd256f51de6c725d06939",
-    "compositionLockBlobSha": "fae35c22fff5cf04275dde510e7fc227cf39b9b2",
+    "compositionLockBlobSha": "c6dac2dced2a7399c76889e20896821c4891e5d5",
     "findingLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
     "noLive": true,
     "noReimport": true,
@@ -7821,7 +7821,7 @@
     "conversationDependent": false,
     "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_R23_CONTRACT_AND_EXACT_PREVIEW"
   },
-  "compositionLockBlobSha": "fae35c22fff5cf04275dde510e7fc227cf39b9b2",
+  "compositionLockBlobSha": "c6dac2dced2a7399c76889e20896821c4891e5d5",
   "findingLedgerBlobSha": "b923461bc7b0bbff0df597187f0053228029e7b4",
   "continuityRegisterBlobSha": "cc1f89ff31d1aea2e1f8055891f8f155de3b9c66",
   "r16PerformanceRegression": {
@@ -11390,5 +11390,18 @@
     "productScopeAuthorization": "paulaP0SourceRootfixAuthorization",
     "humanReviewPending": true,
     "sourceChangeOnly": true
+  },
+  "b4003CalidadFinancialReadiness20261015": {
+    "status": "SOURCE_FIXED_STATIC_INVARIANTS_PASS_EXACT_PREVIEW_PENDING",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CALIDAD_FINANCIAL_READINESS_FALSE_ZERO_FIX_20261015.json",
+    "receiptBlobSha": "3735b95ee76625410b951813f1d90c96f51e1ad8",
+    "sourceBlobSha": "baaa2b6aec3b24fa49892da2a3fe3bfa6549d340",
+    "owner": "orbit360-platform/modules/calidad.js",
+    "compositionLockBlobSha": "c6dac2dced2a7399c76889e20896821c4891e5d5",
+    "qaPending": true,
+    "releaseHold": true,
+    "securityP0Closed": false,
+    "humanAccepted": false,
+    "realDataWrites": 0
   }
 }

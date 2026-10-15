@@ -220,7 +220,7 @@
     "orbit360-platform/modules/academia.js": "4d48ee3edbc6afc4163bf6365a80bbcb680b1852",
     "orbit360-platform/modules/aseguradoras-v1202-import-bridge.js": "db5f012abe505c2dd27d77a47d0694868bee5348",
     "orbit360-platform/modules/aseguradoras.js": "9e56c296b55da499b52f42c462c668aa2f32eba7",
-    "orbit360-platform/modules/calidad.js": "9245739d821d357f9486b0541b5128c070797c76",
+    "orbit360-platform/modules/calidad.js": "baaa2b6aec3b24fa49892da2a3fe3bfa6549d340",
     "orbit360-platform/modules/cancelaciones.js": "f14842484b464da6296a10459eb523d2b056ed98",
     "orbit360-platform/modules/cliente360.js": "7090d49895ea4235b29c78cf4ec3ebd22017cd26",
     "orbit360-platform/modules/cobros-cartera-i65-closure-bridge.js": "45e95a42596a27008e67a3cd6cd4601ea8ca6cb8",
@@ -5784,5 +5784,15 @@
     "oneSourceOwnerChanged": true,
     "previousAcceptedUiPreservedOutsideTarget": true,
     "productionChanged": false
+  },
+  "b4003CalidadFinancialReadiness20261015": {
+    "status": "SOURCE_FIXED_STATIC_INVARIANTS_PASS_EXACT_PREVIEW_PENDING",
+    "sourcePath": "orbit360-platform/modules/calidad.js",
+    "sourceGitBlob": "baaa2b6aec3b24fa49892da2a3fe3bfa6549d340",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CALIDAD_FINANCIAL_READINESS_FALSE_ZERO_FIX_20261015.json",
+    "receiptBlobSha": "3735b95ee76625410b951813f1d90c96f51e1ad8",
+    "scope": "R20_Q01_FINANCIAL_READINESS_ONLY",
+    "dataMutation": false,
+    "livePromotion": false
   }
 }

@@ -1,0 +1,46 @@
+{
+  "schema": "GRAVICENTRA_I65_B4003_QUALITY_FINANCIAL_READINESS_NO_FALSE_ZERO_SOURCE_FIX_V1",
+  "date": "2026-10-15",
+  "gate": "I6.5/B4-003",
+  "status": "SOURCE_FIXED_STATIC_INVARIANTS_PASS_EXACT_PREVIEW_PENDING",
+  "findingIds": [
+    "B4-003-R20-Q01",
+    "B4-003-R15-06-QUALITY-POLICY-MISMATCH-ACTIONABILITY"
+  ],
+  "findingScope": "Readiness/false-zero part only; do not close other Quality actions or financial reconciliation finding.",
+  "oldHead": "e29068ae98327d8b76dbc646ed577a8f31f42c61",
+  "owner": "orbit360-platform/modules/calidad.js",
+  "beforeBlob": "9245739d821d357f9486b0541b5128c070797c76",
+  "afterBlob": "baaa2b6aec3b24fa49892da2a3fe3bfa6549d340",
+  "rootCause": "financialIntegrityIssues returned an empty issue array when the financial integrity engine was unavailable; financialHealthHtml and KPI interpreted it as proof of zero differences without confirming polizas and recibosEsperados were server-read.",
+  "change": "Use existing Firestore product read-model _productStatus and serverConfirmedCollections to separate PENDING, UNAVAILABLE, READY_WITH_ZERO, READY_WITH_FINDINGS. Only show zero differences when both collections are confirmed and the integrity engine actually ran. Preserve all readonly provenance and amount semantics.",
+  "staticChecks": {
+    "fourStates": true,
+    "requiresServerConfirmation": true,
+    "unavailableOnReaderMissing": true,
+    "doesNotClaimZeroWhenPending": true,
+    "kpiRefusesFalseZero": true,
+    "existingDetailReaderRetained": true,
+    "clientAndCountryScopePreserved": true,
+    "noAmountWriteAdded": true,
+    "panelReadinessMarkers": true
+  },
+  "remaining": [
+    "Node syntax and existing module contract tests",
+    "Exact authenticated Preview GT/CO role scope and cold hydration",
+    "Financial readback against canonical policies/receipts; verify no false green state",
+    "Human visual approval of Quality workbench"
+  ],
+  "boundaries": {
+    "dataWrites": 0,
+    "receiptWrites": 0,
+    "policyWrites": 0,
+    "livePromotion": false,
+    "firestoreRulesDeploy": false,
+    "reimport": false,
+    "buildRequired": true,
+    "securityHoldPreserved": true
+  },
+  "humanAcceptance": false,
+  "globalB4003Pass": false
+}

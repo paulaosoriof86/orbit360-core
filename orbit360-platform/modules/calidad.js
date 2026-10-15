@@ -60,12 +60,23 @@ Orbit.modules.calidad = (function () {
     const ids = Array.from(new Set(clients.map(c => c.asesorId).filter(Boolean)));
     return ids.map(id => { const a = S().get('asesores', id) || {}; return { id, nombre: a.nombre || id }; }).sort((a,b) => a.nombre.localeCompare(b.nombre));
   }
-  function financialIntegrityIssues() {
-    const rm=Orbit.policyVehicleReadModelV1199c;
-    if(!rm||typeof rm.financialIntegrityBatch!=='function') return [];
-    const policies=(S().all('polizas')||[]).filter(p=>p&&inActiveCountry(p));
-    return rm.financialIntegrityBatch(policies);
+  function financialIntegritySnapshot() {
+    const store=S(), rm=Orbit.policyVehicleReadModelV1199c;
+    if(!store||!rm||typeof rm.financialIntegrityBatch!=='function')return{status:'UNAVAILABLE',issues:[]};
+    if(store.__productReadOnlyP0!==true||typeof store._productStatus!=='function')return{status:'UNAVAILABLE',issues:[]};
+    const state=store._productStatus()||{},needed=['polizas','recibosEsperados'];
+    const confirmed=[].concat(state.serverConfirmedCollections||[]);
+    const denied=[].concat(state.deniedCollections||[]),failed=Object.keys(state.snapshotErrors||{});
+    if(needed.some(name=>denied.includes(name)||failed.includes(name)))return{status:'UNAVAILABLE',issues:[]};
+    if(!needed.every(name=>confirmed.includes(name)))return{status:'PENDING',issues:[]};
+    try {
+      const policies=(store.all('polizas')||[]).filter(p=>p&&inActiveCountry(p));
+      const issues=rm.financialIntegrityBatch(policies);
+      if(!Array.isArray(issues))return{status:'UNAVAILABLE',issues:[]};
+      return{status:issues.length?'READY_WITH_FINDINGS':'READY_WITH_ZERO',issues};
+    }catch(_error){return{status:'UNAVAILABLE',issues:[]};}
   }
+  function financialIntegrityIssues(){return financialIntegritySnapshot().issues;}
   function sourceLabel(value){const raw=clean(value);if(!raw)return 'Origen de la prima no identificado';if(/^I\d+[_-]|PRIMARY_POLICY_UNIVERSE|SOURCE[_-]UNIVERSE|LINEAGE/i.test(raw))return 'Prima tomada de la póliza importada';return raw.replace(/_/g,' ');}
   function financialClientCell(c, fallbackId) {
     c = c || {};
@@ -102,8 +113,9 @@ Orbit.modules.calidad = (function () {
     back.querySelector('[data-receipts]').addEventListener('click',()=>{back.remove();location.hash='#/cliente360?c='+encodeURIComponent(cid)+'&p='+encodeURIComponent(x.p.id)+'&t=recibos';});
     back.querySelector('[data-policy]').addEventListener('click',()=>{back.remove();Orbit.modules.cliente360.editarPoliza(x.p.id);});
   }
-  function financialHealthHtml(issues, clientsById) {
-    if(!issues.length)return '<div class="cfg-note" style="margin:14px 0"><b>Integridad financiera:</b> no se detectaron diferencias materiales entre prima registrada y recibos programados dentro del alcance seleccionado.</div>';
+  function financialHealthHtml(issues, clientsById, readiness) {
+    if(readiness!=='READY_WITH_ZERO'&&readiness!=='READY_WITH_FINDINGS')return '<div class="cfg-note" data-quality-financial-readiness="'+readiness+'" style="margin:14px 0"><b>Integridad financiera:</b> '+(readiness==='PENDING'?'Confirmando pólizas y recibos programados con el servidor. Todavía no existe un resultado definitivo.':'La verificación de primas y recibos no está disponible para el alcance actual. No se pueden afirmar diferencias ni conciliación.')+'</div>';
+    if(!issues.length)return '<div class="cfg-note" data-quality-financial-readiness="READY_WITH_ZERO" style="margin:14px 0"><b>Integridad financiera:</b> no se detectaron diferencias materiales entre prima registrada y recibos programados dentro del alcance seleccionado.</div>';
     const views=issues.map(x=>{const c=(clientsById&&clientsById.get(x.p.clienteId))||S().get('clientes',x.p.clienteId)||{id:x.p.clienteId},cur=x.p.moneda||c.moneda||'',delta=Math.abs(Number(x.delta)||0)<0.005?0:Number(x.delta||0);return{x,c,cur,delta};});
     const desktop=`<div class="quality-fin-desktop" style="overflow-x:auto"><table class="tbl"><thead><tr><th>Póliza</th><th>Cliente</th><th>Prima en póliza / origen</th><th>Programación de pagos</th><th class="num">Suma</th><th class="num">Diferencia</th><th>Tolerancia / causa</th><th>Resolver</th></tr></thead><tbody>${views.map(v=>{const x=v.x;return `<tr data-information-health-policy="${U.esc(x.p.id)}"><td><b>${U.esc(x.p.numero||x.p.id)}</b><div class="muted" style="font-size:11px">${x.receipts} recibo(s) vigente(s)${x.shadowRows?' · '+x.shadowRows+' legado(s) excluido(s)':''}</div></td><td>${financialClientCell(v.c,x.p.clienteId)}</td><td><b>${moneyValue(x.total,v.cur)}</b><div class="muted" style="font-size:11px">${U.esc(sourceLabel(x.contractualSource))}</div></td><td><b>${U.esc(calendarAuthorityLabel(x.calendarAuthority))}</b><div class="muted" style="font-size:11px">${x.reviewRows||0} fila(s) requieren revisión</div></td><td class="num">${moneyValue(x.schedule,v.cur)}</td><td class="num"><b>${moneyValue(v.delta,v.cur)}</b></td><td><b>${moneyValue(x.tolerance||0,v.cur)}</b><div class="muted" style="font-size:11px">${U.esc(x.reason||'Requiere validación de fuente.')}</div></td><td style="white-space:nowrap">${healthActions(x)}</td></tr>`;}).join('')}</tbody></table></div>`;
     const mobile=`<div class="quality-fin-mobile" data-information-health-mobile="1">${views.map(v=>{const x=v.x;return `<article class="card pad" data-information-health-card-policy="${U.esc(x.p.id)}"><div style="display:flex;justify-content:space-between;gap:10px"><div><small class="muted">Póliza</small><b style="display:block">${U.esc(x.p.numero||x.p.id)}</b></div><span class="badge danger">Diferencia ${moneyValue(v.delta,v.cur)}</span></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px"><div><small class="muted">Prima total en póliza</small><b style="display:block">${moneyValue(x.total,v.cur)}</b></div><div><small class="muted">Recibos programados</small><b style="display:block">${moneyValue(x.schedule,v.cur)}</b></div><div><small class="muted">Origen de la prima</small><span style="display:block">${U.esc(sourceLabel(x.contractualSource))}</span></div><div><small class="muted">Programación</small><span style="display:block">${U.esc(calendarAuthorityLabel(x.calendarAuthority))}</span></div></div><div class="cfg-note" style="margin-top:10px">${U.esc(x.reason||'Requiere validación de fuente.')}${x.shadowRows?' · '+x.shadowRows+' registro(s) legado(s) duplicado(s) fueron excluidos del calendario activo.':''}</div><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">${healthActions(x)}</div></article>`;}).join('')}</div>`;
@@ -142,7 +154,7 @@ Orbit.modules.calidad = (function () {
     const completeCount = Math.max(0, clients.length - all.length);
     const completePct = clients.length ? (completeCount / clients.length) * 100 : 100;
     const ownScope = A.dataScope && A.dataScope('calidad') === 'own';
-    const financialIssues = financialIntegrityIssues();
+    const financialSnapshot = financialIntegritySnapshot(), financialIssues = financialSnapshot.issues;
     const pageSize = st.pageSize || 50, pageCount = Math.max(1, Math.ceil(rows.length / pageSize));
     st.page = Math.max(1, Math.min(st.page || 1, pageCount));
     const pageStart = (st.page - 1) * pageSize, visibleRows = rows.slice(pageStart, pageStart + pageSize), pageEnd = Math.min(rows.length, pageStart + visibleRows.length);
@@ -156,9 +168,9 @@ Orbit.modules.calidad = (function () {
         { label: 'Con póliza vigente', val: conVig.length, color: 'var(--info)', foot: 'prioridad operativa' },
         { label: 'Sin teléfono / WhatsApp', val: sinContacto, color: 'var(--red)', foot: 'prioridad de contacto' },
         { label: 'Expedientes completos', val: completeCount + ' / ' + clients.length, color: 'var(--ok)', foot: completePct.toFixed(1) + '% de completitud', footTone: 'up' },
-        { label: 'Diferencias prima/recibos', val: financialIssues.length, color: 'var(--danger)', foot: 'requieren fuente / conciliación', footTone: financialIssues.length ? 'down' : 'up' }
+        { label: 'Diferencias prima/recibos', val: ['READY_WITH_ZERO','READY_WITH_FINDINGS'].includes(financialSnapshot.status)?financialIssues.length:'—', color: 'var(--danger)', foot: financialSnapshot.status==='PENDING'?'Confirmando información del servidor':financialSnapshot.status==='UNAVAILABLE'?'Verificación no disponible':'requieren fuente / conciliación', footTone: financialIssues.length ? 'down' : 'up' }
       ])}
-      ${financialHealthHtml(financialIssues, clientsById)}
+      ${financialHealthHtml(financialIssues, clientsById, financialSnapshot.status)}
       <div class="card quality-workbench" data-quality-table-grammar="canonical" style="overflow:hidden">
         <div class="quality-section-head"><div><span class="quality-eyebrow">Calidad operativa</span><h3>Expedientes que requieren atención</h3><p>Corrige únicamente datos faltantes o inconsistentes con evidencia. Los casos determinísticos se agrupan para evitar trabajo manual repetitivo.</p></div></div><div class="quality-toolbar" style="display:flex;gap:10px;flex-wrap:wrap;padding:13px 14px;border-bottom:1px solid var(--line);align-items:center">
           <div class="tb-search quality-search" data-quality-search="1"><span>⌕</span><input id="q-search" value="${U.esc(st.q)}" placeholder="Buscar cliente, documento, correo o teléfono" autocomplete="off"></div>
