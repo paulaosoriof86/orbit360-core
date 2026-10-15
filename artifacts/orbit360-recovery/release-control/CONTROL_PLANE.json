@@ -11125,7 +11125,7 @@
     "gate": "I6.5/B4-003",
     "status": "SOURCE_COMMITTED_QA_REQUIRED_NOT_ACCEPTED",
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_FINANCE_COBROS_SCOPED_SOURCE_FIX_20261014.json",
-    "receiptBlobSha": "4795df78fb83acadce82ff1f0a387a6aa7249048",
+    "receiptBlobSha": "1bef95a39cbc8a063087a57a3daadefbcdcbae88",
     "sourceFiles": {
       "functions/b4-003-scoped-related-reader.js": "373fd17a92cb93349817219c41ed40e38dbc48f5",
       "orbit360-platform/data/store-firestore-product-readonly-p0.js": "0875fda2539aba9a7e0073cacb07eb83345c8955",
@@ -11133,7 +11133,7 @@
     },
     "qaFiles": {
       "tools/gravicentra-b4-003-scoped-related-reader.test.cjs": "6f611df2103db63965091b14d05918a650f7bd71",
-      "tools/gravicentra-b4-003-protected-hydration.test.cjs": "c7fd589ec21400c62f4877195991f794c5b5b4e7"
+      "tools/gravicentra-b4-003-protected-hydration.test.cjs": "c9a900c8f9ecf508a5f17691cdcd33cfcd827dda"
     },
     "compositionBlobSha": "a089de044cc497fb9af80534153a060a269ff683",
     "executionLockBlobSha": "46ad973d733dba9829dd91edaf34207bce7d685f",
@@ -11143,6 +11143,8 @@
     "productionPromotion": false,
     "sourceQA": "PENDING",
     "authenticatedPreviewUAT": "PENDING",
-    "p0FindingsClosed": 0
+    "p0FindingsClosed": 0,
+    "lastQaRunId": 38687585862,
+    "lastQaFailure": "ASSERTION_EXPECTED_TWO_CALLS_BUT_THREE_PAGINATED_REQUESTS"
   }
 }

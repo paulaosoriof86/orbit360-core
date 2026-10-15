@@ -30,7 +30,7 @@
     },
     "tools/gravicentra-b4-003-protected-hydration.test.cjs": {
       "before": "401465c5276289978dd851a69a723a9553bc0fd1",
-      "after": "c7fd589ec21400c62f4877195991f794c5b5b4e7"
+      "after": "c9a900c8f9ecf508a5f17691cdcd33cfcd827dda"
     }
   },
   "scope": {
@@ -64,5 +64,11 @@
   },
   "compositionBlobSha": "a089de044cc497fb9af80534153a060a269ff683",
   "executionLockBlobSha": "46ad973d733dba9829dd91edaf34207bce7d685f",
-  "ledgerDisposition": "NO_FINDINGS_CLOSED"
+  "ledgerDisposition": "NO_FINDINGS_CLOSED",
+  "qaCorrection": {
+    "status": "QA_ASSERTION_ONLY",
+    "reason": "Paginated synthetic GT list (2 pages) and empty CO (1 page) produce three bounded read calls. Previous assertion expected two.",
+    "noProductSourceChange": true,
+    "previousFailureRunId": 38687585862
+  }
 }

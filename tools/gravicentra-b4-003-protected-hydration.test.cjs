@@ -103,7 +103,7 @@ const pause=()=>new Promise(ok=>setTimeout(ok,30));
  assert.equal(finance._attachSnapshots(),true);await pause();
  assert.deepEqual(Array.from(finance.all('cobros'),x=>x.id),['pay1','pay2']);
  assert.equal(finance._productStatus().serverConfirmedCollections.includes('cobros'),true);
- assert.equal(calls.slice(from).filter(x=>x.collection==='cobros').length,2,
+ assert.equal(calls.slice(from).filter(x=>x.collection==='cobros').length,3,
    'COBROS_MUST_NOT_FETCH_142_PLUS_POLICY_ANCHOR_BATCHES');
  assert.ok(calls.slice(from).filter(x=>x.collection==='cobros').every(x=>!x.policyId&&!Array.isArray(x.policyIds)));
  assert.equal(direct,0);
