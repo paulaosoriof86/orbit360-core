@@ -123,7 +123,7 @@
   "nextAction": "B4_003_R20_TARGETED_PAULA_VISUAL",
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "blobSha": "a51d33c3ecebec6b01e971de89f1a365d03ab09c",
+    "blobSha": "6067adc820a426652fa68c855740146176df8e07",
     "status": "FROZEN_ACTIVE_UAT3_P0_BATCH_1_SOURCE_COMPLETE"
   },
   "findingLedger": {
@@ -2510,5 +2510,15 @@
     "noDataWrites": true,
     "noSharedRulesDeploy": true,
     "noLive": true
+  },
+  "b4003RenewalsSyntheticQaFilter20261015": {
+    "status": "SCOPED_SOURCE_STAGED_EXACT_PREVIEW_REQUIRED",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_RENEWALS_SYNTHETIC_EXCLUSION_SOURCE_FIX_20261015.json",
+    "blobSha": "16a12d58094a8ba164b652a11b4d68c8cffe8249",
+    "sourceBlobSha": "6dcea79fcb8b5fda72e141f02d4f32cb05e39954",
+    "qaBlobSha": "6f8a96e03750405203b48a7d98f5c6ddeb123cfb",
+    "scope": "EXACT_CANCELLED_QA_FIXTURES_ONLY",
+    "realOperationalWritesAuthorized": false,
+    "livePromotionAuthorized": false
   }
 }

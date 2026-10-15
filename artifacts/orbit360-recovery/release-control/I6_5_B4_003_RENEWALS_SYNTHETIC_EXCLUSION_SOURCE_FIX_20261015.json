@@ -1,0 +1,35 @@
+{
+  "schema": "GRAVICENTRA_B4_003_SCOPED_QA_RESIDUE_PROJECTION_FIX_V1",
+  "date": "2026-10-15",
+  "gate": "I6.5/B4-003",
+  "findingIds": [
+    "B4-003-R20-B01",
+    "B4-003-P0-20261012-QA-CANCELLED-RUN-FIXTURES"
+  ],
+  "causalRunId": 38717144699,
+  "causalFailure": "B4_003_CANCELLED_QA_VISIBLE_IN_KANBAN:4",
+  "qaResidueOriginRunId": 38102224750,
+  "sourcePath": "orbit360-platform/modules/renovaciones.js",
+  "priorSourceBlob": "040bce837cb35094be1f108665c42288b9b1f0d0",
+  "newSourceBlob": "6dcea79fcb8b5fda72e141f02d4f32cb05e39954",
+  "qaPath": "tools/gravicentra-i6-5-b4-003-renewals-priority-preview-proof.mjs",
+  "qaBlob": "6f8a96e03750405203b48a7d98f5c6ddeb123cfb",
+  "compositionBlob": "6067adc820a426652fa68c855740146176df8e07",
+  "sourceFix": "Exclude only explicit __syntheticQa true from Renewals scoped country selection and lineage universe; match canonical QA eligibility.",
+  "recordCountsFrozen": {
+    "physical": 1425,
+    "operationalWithoutExactSix": 1419,
+    "terminal": 583,
+    "recent": 24
+  },
+  "boundaries": {
+    "noDataWrites": true,
+    "noDeletes": true,
+    "noReimport": true,
+    "noFirestoreRulesDeploy": true,
+    "noLive": true,
+    "previewOnly": true,
+    "noP0Closed": true
+  },
+  "state": "SOURCE_STAGED_NEW_EXACT_PREVIEW_AND_UAT_REQUIRED"
+}

@@ -246,7 +246,7 @@
     "orbit360-platform/modules/renewals-v1200-operational-bridge.js": "43b3a6b07eba40baa50b61b238174540cd9bf430",
     "orbit360-platform/modules/renewals-v1200-permission-guard.js": "f3f75e25d32c7e4784a19b089353d9706c98dcda",
     "orbit360-platform/modules/renewals-v1201-issued-filter.js": "ae1df0174121c965f610407ae723094e833ebeaf",
-    "orbit360-platform/modules/renovaciones.js": "040bce837cb35094be1f108665c42288b9b1f0d0",
+    "orbit360-platform/modules/renovaciones.js": "6dcea79fcb8b5fda72e141f02d4f32cb05e39954",
     "orbit360-platform/modules/siniestros.js": "fbea51cf7084b66d9866a3c947c1e7ec3bb4a034",
     "orbit360-platform/product-runtime-config.js": "977f9b7075e420a47d286769f2cdbfffba52b7b0",
     "orbit360-platform/styles/base.css": "608ef0709144ffcbe748a7bd04e1bd16744def65",
@@ -5730,5 +5730,24 @@
     "noFirestoreRulesDeploy": true,
     "noLivePromotion": true,
     "securityP0StillOpen": true
+  },
+  "b4003RenewalsSyntheticQaFilter20261015": {
+    "status": "SCOPED_P0_SOURCE_STAGED_EXACT_PREVIEW_AND_AUTHENTICATED_UAT_PENDING",
+    "findingIds": [
+      "B4-003-R20-B01",
+      "B4-003-P0-20261012-QA-CANCELLED-RUN-FIXTURES"
+    ],
+    "scope": "SIX_VERIFIED_CANCELLED_QA_ROWS_ONLY",
+    "sourcePath": "orbit360-platform/modules/renovaciones.js",
+    "sourceBlobSha": "6dcea79fcb8b5fda72e141f02d4f32cb05e39954",
+    "qaPath": "tools/gravicentra-i6-5-b4-003-renewals-priority-preview-proof.mjs",
+    "qaBlobSha": "6f8a96e03750405203b48a7d98f5c6ddeb123cfb",
+    "priorSourceBlobSha": "040bce837cb35094be1f108665c42288b9b1f0d0",
+    "realOperationalWrites": 0,
+    "deleteCount": 0,
+    "qaFixtureIdsStored": true,
+    "livePromoted": false,
+    "securityHoldPreserved": true,
+    "needsExactReadback": true
   }
 }

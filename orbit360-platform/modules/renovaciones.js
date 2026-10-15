@@ -60,7 +60,9 @@ Orbit.modules.renovaciones = (function () {
   }
   const countryCode = v => String(v == null ? '' : v).trim().toUpperCase();
   const policyCountry = p => { const own=countryCode(p&&p.pais);if(own)return own;const cli=p&&p.clienteId?S().get('clientes',p.clienteId):null;return countryCode(cli&&cli.pais); };
-  const selectedCountry = p => { const wanted=countryCode(Orbit.pais); return !wanted || wanted==='TODOS' || policyCountry(p)===wanted; };
+  // B4-003: synthetic fixtures from cancelled QA must never enter a user's
+  // renewal/aging/CTA universe. This is not a deletion or inference.
+  const selectedCountry = p => { if(p&&p.__syntheticQa===true)return false; const wanted=countryCode(Orbit.pais); return !wanted || wanted==='TODOS' || policyCountry(p)===wanted; };
   const renewabilityState = p => {
     if(!p || !Object.prototype.hasOwnProperty.call(p,'renovable') || p.renovable==null || String(p.renovable).trim()==='') return 'UNKNOWN';
     const v=String(p.renovable).trim().toLowerCase();
@@ -80,7 +82,7 @@ Orbit.modules.renovaciones = (function () {
      una renovacion. La continuidad puede cambiar de numero de poliza.
      Toda proyeccion es read-only, nunca escribe renuevaDe/renovadaPor. */
   function renewalLifecycleSnapshot(){
-    const store=S(),rows=(store.all('polizas')||[]).filter(p=>p&&p.id);
+    const store=S(),rows=(store.all('polizas')||[]).filter(p=>p&&p.id&&p.__syntheticQa!==true);
     const norm=v=>String(v==null?'':v).trim().normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase().replace(/[^A-Z0-9]/g,'');
     const byId=new Map(rows.map(p=>[String(p.id),p])),reverse=new Map(),byCore=new Map(),cache=new Map(),plates=new Map();
     const coreKey=p=>{
