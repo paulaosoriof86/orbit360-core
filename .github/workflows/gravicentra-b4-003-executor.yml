@@ -313,6 +313,25 @@ jobs:
           if(financeTrigger&&!financeCoverage)throw Error('B4_003_FINANCE_SOURCE_QA_BOUNDARY_FAIL_CLOSED');
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'finance_source_readonly='+(financeCoverage?'true':'false')+'\n');
           if(financeCoverage)fs.appendFileSync(process.env.GITHUB_OUTPUT,'finance_exact_preview='+exactFinancialProof.previewUrl+'\n');
+
+          const publicSmokeTrigger=execFileSync('git',['log','-1','--format=%s'],{encoding:'utf8'}).trim()==='test(i6.5 B4-003): exact public browser smoke';
+          const browserBinding=c.b4003MetasHistorialLatestTechnicalPreview||{};
+          const publicBrowserSmoke=publicSmokeTrigger
+            && c.b4003ExactPublicBrowserSmoke20261014?.status==='REQUESTED_NOT_PROVEN'
+            && browserBinding.hostingReadbackExact===true
+            && browserBinding.metadataExternallyVerified===true
+            && browserBinding.securityHoldActive===true
+            && c.b4003SecurityReleaseHold?.status==='ACTIVE_FAIL_CLOSED_UNAUTHORIZED_BROWSER_FIRESTORE_READ_WRITE'
+            && c.nextAction==='I6_5_FORENSIC_REMEDIATION_B4_003_R20_TARGETED_PAULA_VISUAL'
+            && l.boundaries?.dataMutationAuthorized===false
+            && l.boundaries?.realOperationalWritesAuthorized===false
+            && l.boundaries?.syntheticQaWritesAuthorized===false
+            && l.boundaries?.livePromotionAuthorized===false
+            && /^[a-f0-9]{40}$/.test(String(browserBinding.sourceSha||''))
+            && /^https:\/\/ays-orbit-360-lab--gi-i65-b4-/.test(String(browserBinding.previewUrl||''));
+          if(publicSmokeTrigger&&!publicBrowserSmoke)throw Error('B4_003_PUBLIC_BROWSER_SCOPE_FAIL_CLOSED');
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'public_smoke='+(publicBrowserSmoke?'true':'false')+'\n');
+          if(publicBrowserSmoke)fs.appendFileSync(process.env.GITHUB_OUTPUT,'public_smoke_url='+browserBinding.previewUrl+'\n');
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'renewals_preview='+(renewalsPreview?'true':'false')+'\n');
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'run='+(previewOk?'true':'false')+'\n');
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'scoped_preview='+(scopedPreview?'true':'false')+'\n');
@@ -322,7 +341,7 @@ jobs:
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'r20_cutoff_apply='+(r20CutoffApply?'true':'false')+'\n');
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'r20_second_dryrun='+(secondReviewDryRun?'true':'false')+'\n');
           // Surface an explicit NOOP on routine pushes; never certify a skipped Preview.
-          const requestedModes={scopedPreview,preview:previewOk,renewalsPreview,apply:applyOk,r20DryRun,r20Apply,r20CutoffApply,secondReviewDryRun,p0CumulativeReadOnly,r26RulesReadOnly,r26ReadOnly,financeCoverage};
+          const requestedModes={scopedPreview,preview:previewOk,renewalsPreview,apply:applyOk,r20DryRun,r20Apply,r20CutoffApply,secondReviewDryRun,p0CumulativeReadOnly,r26RulesReadOnly,r26ReadOnly,financeCoverage,publicBrowserSmoke};
           const enabledModes=Object.entries(requestedModes).filter(([,on])=>on).map(([name])=>name);
           if(!enabledModes.length){
             fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY,'### B4-003: NOOP (not a Preview PASS)\nNo build, deploy, authenticated browser test, or readback was executed. Control Plane nextAction: `'+String(c.nextAction)+'`.\n');
@@ -513,6 +532,82 @@ jobs:
         with:
           name: gravicentra-b4003-exact-finance-source-${{ github.run_id }}
           path: ${{ runner.temp }}/b4-003-finance-source-readonly.json
+          if-no-files-found: error
+          retention-days: 14
+
+
+      # No credentials, data writes, browser impersonation or deploy. Screenshot-only
+      # proof of the exact already-built public login and responsive app shell.
+      - name: Prepare exact public login browser QA
+        if: steps.gate.outputs.public_smoke == 'true'
+        run: |
+          set -euo pipefail
+          npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund playwright@1.55.0 >/dev/null
+          npx playwright install --with-deps chromium >/dev/null
+
+      - name: Real Chromium login and responsive public smoke
+        if: steps.gate.outputs.public_smoke == 'true'
+        env:
+          B4_PUBLIC_PREVIEW: ${{ steps.gate.outputs.public_smoke_url }}
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const fs=require('node:fs'),path=require('node:path');
+          const {chromium}=require('playwright');
+          const c=JSON.parse(fs.readFileSync(process.env.CONTROL,'utf8'));
+          const bound=c.b4003MetasHistorialLatestTechnicalPreview;
+          const target=process.env.B4_PUBLIC_PREVIEW;
+          if(target!==bound.previewUrl)throw Error('B4_003_PUBLIC_BROWSER_URL_NOT_BOUND');
+          const dir=path.join(process.env.RUNNER_TEMP,'b4-003-public-browser');
+          fs.mkdirSync(dir,{recursive:true});
+          (async()=>{
+            const browser=await chromium.launch({headless:true,args:['--no-sandbox']});
+            const cases=[],globalErrors=[];
+            try{
+              for(const width of [1440,390,320]){
+                const ctx=await browser.newContext({viewport:{width,height:860},serviceWorkers:'block'});
+                const page=await ctx.newPage(),errors=[],http=[];
+                page.on('pageerror',e=>errors.push(String(e.message).slice(0,230)));
+                page.on('response',r=>{
+                  if(r.status()>=400&&r.url().startsWith(target+'/'))http.push({status:r.status(),path:new URL(r.url()).pathname.slice(0,140)});
+                });
+                await page.goto(target+'/#/historial',{waitUntil:'domcontentloaded',timeout:30000});
+                await page.waitForTimeout(2800);
+                const v=await page.evaluate(()=>({
+                  title:document.title,bodyChars:(document.body?.innerText||'').trim().length,
+                  bodyText:(document.body?.innerText||'').trim().slice(0,600),
+                  htmlWidth:document.documentElement.scrollWidth,viewport:innerWidth,
+                  hash:location.hash,inputs:document.querySelectorAll('input').length,
+                  passwordInputs:document.querySelectorAll('input[type=password]').length
+                }));
+                await page.screenshot({path:path.join(dir,'public-'+width+'.png'),fullPage:true});
+                const result={width,bodyChars:v.bodyChars,hasVisibleContent:v.bodyChars>35,
+                  title:v.title,brand:/gravicentra/i.test(v.title+' '+v.bodyText),
+                  route:v.hash,loginFields:v.inputs,passwordFields:v.passwordInputs,
+                  horizontalOverflow:v.htmlWidth>v.viewport+4,pageErrors:errors,httpErrors:http};
+                cases.push(result);
+                if(!result.hasVisibleContent||!result.brand||errors.length||http.some(x=>x.status===404)||result.horizontalOverflow)
+                  globalErrors.push('PUBLIC_BROWSER_FAILED_'+width);
+                await ctx.close();
+              }
+            }finally{await browser.close();}
+            const result={schema:'GRAVICENTRA_B4003_PUBLIC_REAL_CHROMIUM_SMOKE_V1',
+              previewUrl:target,sourceSha:bound.sourceSha,buildId:bound.buildId,
+              status:globalErrors.length?'FAIL':'PUBLIC_LOGIN_RENDER_PASS_AUTHENTICATED_UAT_PENDING',
+              cases,errors:globalErrors,authenticated:false,operationalWrites:0,
+              firestoreRulesDeployed:false,livePromotion:false};
+            fs.writeFileSync(path.join(dir,'proof.json'),JSON.stringify(result,null,2)+'\n');
+            console.log('B4_003_PUBLIC_BROWSER_PROOF='+JSON.stringify(result));
+            if(globalErrors.length)process.exitCode=1;
+          })().catch(e=>{console.error('B4_003_PUBLIC_BROWSER_FAILURE:'+String(e.message||e));process.exitCode=1;});
+          NODE
+
+      - name: Preserve public browser screenshots
+        if: always() && steps.gate.outputs.public_smoke == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: gravicentra-b4003-public-browser-${{ github.run_id }}
+          path: ${{ runner.temp }}/b4-003-public-browser
           if-no-files-found: error
           retention-days: 14
 

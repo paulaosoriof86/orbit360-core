@@ -10989,5 +10989,34 @@
     "compositionBlobSha": "c8c6507a3b19745128b484667a41124ab729b05b",
     "previousVisualAcceptancePreserved": true,
     "authenticatedE2E": false
+  },
+  "b4003MetasHistorialLatestTechnicalPreview": {
+    "gate": "I6.5/B4-003",
+    "sourceSha": "b2dec8726ec1af300174277781cc15b684c74ea1",
+    "runId": 38668152907,
+    "artifactId": 11942937682,
+    "archiveDigest": "sha256:ee9642a0fbe40e99344afe3e2ca2eb3d9cd0fee7c97757ccbd9d09492abfcfc4",
+    "buildId": "gi-i65-b4-b2dec8726ec1-57f234755dc1",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-38668152907-wou5i63o.web.app",
+    "hostingReadbackExact": true,
+    "metadataExternallyVerified": true,
+    "metasAndActivitiesPublicFlag": true,
+    "providerAllowlistPresent": true,
+    "routerMetasReactive": true,
+    "syntheticProof": "PASS",
+    "authenticatedFunctional": "PENDING",
+    "securityHoldActive": true,
+    "productionPromotion": false,
+    "operationalWrites": 0
+  },
+  "b4003ExactPublicBrowserSmoke20261014": {
+    "status": "REQUESTED_NOT_PROVEN",
+    "gate": "I6.5/B4-003",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-38668152907-wou5i63o.web.app",
+    "sourceSha": "b2dec8726ec1af300174277781cc15b684c74ea1",
+    "access": "ANONYMOUS_PUBLIC_ONLY",
+    "dataWrites": 0,
+    "productionPromotion": false,
+    "authenticatedProductAcceptance": false
   }
 }
