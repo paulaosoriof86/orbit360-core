@@ -1,5 +1,6 @@
 'use strict';
 // B4_003_SCOPED_READ_EMULATOR_TRIGGER_20261014: run existing isolated real-rules QA against corrected source; no live deploy.
+// B4-003 protected source verification: existing synthetic rule QA.
 // B4-003 isolated Firestore emulator proof. No production Firebase credentials,
 // no actual tenant data and no operational writes.
 const assert=require('node:assert/strict');
