@@ -154,7 +154,7 @@ jobs:
           // historical commit or hardcoded source hash. This does not open LIVE,
           // shared Firestore rules or business/synthetic writes.
           const requestedOct15Subject='build(i6.5 B4-003): exact cumulative Oct15 scoped Preview';
-          const oct15ScopedReadback=currentSubject===requestedOct15Subject
+          const oct15ScopedReadback=[requestedOct15Subject,'test(i6.5 B4-003): authenticated read-only Preview'].includes(currentSubject)
             && c.b4003VerifiedCanonicalFinanceScope20261015?.exactPreviewDispatch?.status==='REQUESTED_EXISTING_B4_003_CUMULATIVE_PREVIEW'
             && c.b4003VerifiedCanonicalFinanceScope20261015?.exactPreviewDispatch?.sourceProductBlob===require('node:child_process').execFileSync('git',['hash-object','functions/b4-003-scoped-related-reader.js'],{encoding:'utf8'}).trim()
             && c.b4003VerifiedCanonicalFinanceScope20261015?.sourceBlobSha===c.b4003VerifiedCanonicalFinanceScope20261015?.exactPreviewDispatch?.sourceProductBlob
@@ -1449,13 +1449,103 @@ jobs:
           console.log('B4_003_SCOPED_PREVIEW_PUBLIC_SMOKE_PASS_NOT_AUTHENTICATED_SECURITY_PASS');
           NODE
 
-      - name: Preserve isolated B4-003 Preview evidence
+
+      - name: Authenticated scoped role-country readback
         if: steps.gate.outputs.scoped_preview == 'true'
+        env:
+          B4_PREVIEW_URL: ${{ steps.preview.outputs.preview_url }}
+        run: |
+          set -euo pipefail
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          import {chromium} from 'playwright';
+          import {initializeApp,applicationDefault,getApps,deleteApp} from 'firebase-admin/app';
+          import {getFirestore} from 'firebase-admin/firestore';
+          import {getAuth} from 'firebase-admin/auth';
+          const tid='alianzas-soluciones',host=process.env.B4_PREVIEW_URL||'';
+          const result={schema:'B4_003_AUTHENTICATED_READONLY_V1',sourceSha:process.env.CANDIDATE_SOURCE_SHA,
+            url:host,roles:[],writes:0,rulesDeploy:false,livePromotion:false,status:'STARTED'};
+          const n=x=>String(x||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'');
+          const check=(ok,m)=>{if(!ok)throw Error(m);};
+          let app,browser;
+          try{
+            check(/^https:\/\/ays-orbit-360-lab--gi-i65-b4-[a-z0-9-]+\.web\.app$/.test(host),'URL_NOT_EXACT_PREVIEW');
+            app=getApps()[0]||initializeApp({credential:applicationDefault(),projectId:process.env.PROJECT_ID});
+            const db=getFirestore(app),auth=getAuth(app);
+            const members=(await db.collection('tenants').doc(tid).collection('members').get()).docs;
+            browser=await chromium.launch({headless:true});
+            for(const role of ['direccion','operativo','asesor']){
+              let who=null;
+              for(const d of members){
+                const m=d.data()||{},assigned=[m.rol,m.role,m.defaultRole,m.rolDefault,...(m.roles||[]),...(m.rolesAsignados||[])].map(n);
+                const countries=[...(m.countries||[]),...(m.paises||[]),...(m.paisesAutorizados||[])].map(x=>String(x||'').toUpperCase());
+                const states=[m.status,m.estado].filter(Boolean).map(n);
+                if(!states.length||states.some(x=>!['active','activo'].includes(x))||m.uid!==d.id||
+                  m.tenantId!==tid||m.active===false||m.activo===false||!assigned.includes(role)||
+                  (m.activeRole&&n(m.activeRole)!==role)||!countries.some(x=>['GT','CO'].includes(x)))continue;
+                try{
+                  const user=await auth.getUser(d.id);
+                  if(!user.disabled&&user.emailVerified&&(!user.customClaims?.giActiveRole||n(user.customClaims.giActiveRole)===role)){
+                    who={uid:d.id,country:countries.includes('GT')?'GT':'CO'};break;
+                  }
+                }catch{}
+              }
+              check(who,'NO_VERIFIED_ACTOR_'+role);
+              const token=await auth.createCustomToken(who.uid),ctx=await browser.newContext(),page=await ctx.newPage();
+              const found={role,country:who.country,positives:[],negatives:[],pageErrors:[]};
+              page.on('pageerror',e=>found.pageErrors.push(String(e?.message||e).slice(0,160)));
+              try{
+                await page.goto(host+'/#/inicio',{waitUntil:'domcontentloaded',timeout:30000});
+                await page.waitForFunction(()=>!!window.Orbit?.productRuntimeBrowserProvidersP0,null,{timeout:20000});
+                const data=await page.evaluate(async({token,tid,role,country})=>{
+                  const p=Orbit.productRuntimeBrowserProvidersP0,c=await p.initialize();
+                  await c.modules.auth.signInWithCustomToken(c.auth,token);
+                  const invoke=async body=>{try{
+                    const v=await p.callFunction('orbit360ScopedPolicyReadPreview',
+                      {tenantId:tid,country,activeRole:role,...body},'us-east1');
+                    return{ok:v?.ok===true&&v?.serverScoped===true,scope:v?.scope||'',count:v?.rows?.length??null};
+                  }catch(e){return{ok:false,error:String(e?.code||e?.message||'').slice(0,100)};}};
+                  const bootstrap=await invoke({mode:'bootstrap-membership'});
+                  const cols=role==='asesor'?['clientes','polizas','aseguradoras']:
+                    ['clientes','polizas','recibosEsperados','cobros','gestiones','negocios','metas','actividades','aseguradoras'];
+                  const positives=[];
+                  for(const collection of cols)positives.push({collection,...await invoke({mode:'list',collection,pageSize:2})});
+                  const negatives=[];
+                  for(const body of [{mode:'list',collection:'credentialRefs',pageSize:1},
+                    {mode:'list',collection:'clientes',country:'ZZ',pageSize:1},
+                    {mode:'list',collection:'clientes',activeRole:'unassigned_role',pageSize:1}]){
+                    negatives.push(await invoke(body));
+                  }
+                  return{bootstrap,positives,negatives};
+                },{token,tid,role,country:who.country});
+                found.bootstrap=data.bootstrap.ok===true;found.positives=data.positives;found.negatives=data.negatives;
+                check(found.bootstrap,'BOOTSTRAP_DENIED_'+role);
+                check(found.positives.some(x=>x.collection==='clientes'&&x.ok),'CLIENTS_READ_DENIED_'+role);
+                check(found.positives.some(x=>x.collection==='polizas'&&x.ok),'POLICIES_READ_DENIED_'+role);
+                check(found.negatives.length===3&&found.negatives.every(x=>!x.ok&&
+                  /permission-denied|invalid-argument|unauthenticated/i.test(x.error||'')),
+                  'NEGATIVE_ACCESS_NOT_DENIED_'+role);
+                check(found.pageErrors.length===0,'PAGE_ERROR_'+role);
+              }finally{result.roles.push(found);await ctx.close();}
+            }
+            result.status='AUTHENTICATED_READ_ONLY_PASS_NOT_RULES_ACCEPTANCE';
+          }catch(e){result.status='BLOCKED';result.blocker=String(e.message||e).slice(0,200);process.exitCode=1;}
+          finally{
+            try{if(browser)await browser.close();}catch{}
+            try{if(app)await deleteApp(app);}catch{}
+            fs.writeFileSync(process.env.RUNNER_TEMP+'/b4-003-authenticated-readonly.json',JSON.stringify(result,null,2)+'\n');
+            console.log('B4_003_AUTHENTICATED_READONLY='+result.status+' '+String(result.blocker||''));
+          }
+          NODE
+
+      - name: Preserve isolated B4-003 Preview evidence
+        if: always() && steps.gate.outputs.scoped_preview == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: gravicentra-b4-003-scoped-preview-${{ github.run_id }}
           path: |
             ${{ runner.temp }}/b4-003-protected-preview-smoke.json
+            ${{ runner.temp }}/b4-003-authenticated-readonly.json
             ${{ runner.temp }}/b4-003-package/evidence
           if-no-files-found: error
 
