@@ -11112,19 +11112,20 @@
   },
   "b4003LatestQASessionBoundary": {
     "gate": "I6.5/B4-003",
-    "status": "PAULA_REJECTED_38687708932_FINANCE_HYDRATION_AND_BLANK_COBROS",
+    "status": "EXACT_CONFIGURATION_ROLE_PARITY_PREVIEW_TECHNICAL_PASS_AUTHENTICATED_FINANCIAL_AND_CONFIG_UAT_PENDING",
     "profile": "Gravicentra Preview QA",
     "noCredentialsShared": true,
     "priorSavedSessionAuthenticated": false,
-    "reviewOnlyPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b4-38687708932-daoqncg1.web.app",
-    "disableNewSourceBuildUntilFirstAuthenticatedUAT": false,
+    "reviewOnlyPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b4-38691683797-vqfu87tg.web.app",
+    "disableNewSourceBuildUntilFirstAuthenticatedUAT": true,
     "requestedFirstTest": "LOGIN_THEN_CLIENTE360_COBROS_HISTORIAL_METAS",
     "productionSecurityStillBlocked": true,
     "firstAuthenticatedPaulaLoginConfirmedFromScreenshot": true,
     "priorClient360CobrosFailuresReproducedByPaula": true,
     "newPreviewUATStatus": "PENDING",
     "lastRejectedRunId": 38687708932,
-    "nextUAT": "RENDER_PARTIAL_TERMINAL_COMPLETE_THEN_GT_CO_CARTERA_PRIMAS_RECONCILIATION"
+    "nextUAT": "RENDER_PARTIAL_TERMINAL_COMPLETE_THEN_GT_CO_CARTERA_PRIMAS_RECONCILIATION",
+    "lastTechnicalRunId": 38691683797
   },
   "b4003FinanceCobrosScopedRecovery20261014": {
     "gate": "I6.5/B4-003",
@@ -11186,10 +11187,10 @@
     "p0Closed": 0
   },
   "b4003ConfigurationRoleParityRecovery20261015": {
-    "status": "SOURCE_STAGED_EXACT_PREVIEW_AND_ROLE_UAT_PENDING",
+    "status": "EXACT_PREVIEW_TECHNICAL_PASS_CONFIG_ROLE_UAT_PENDING",
     "gate": "I6.5/B4-003",
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_APPROVED_CONFIGURATION_ROLE_PARITY_RECOVERY_20261015.json",
-    "receiptBlobSha": "2f85fb1a34ca3a99dadde4331aea52e91b102713",
+    "receiptBlobSha": "e85891103bf2cea6282691cf876e68bb7f6c5dd0",
     "affectedSource": "functions/b4-003-scoped-access-boundary.js",
     "beforeBlob": "600fbb6a262086ac111c5046f5544723fd2be1c4",
     "afterBlob": "29a64c48fa531b13d2ce2a0d7a719381ecb42b16",
@@ -11205,6 +11206,16 @@
     "scopedRoleParityApprovalOnly": true,
     "gatesOpened": 0,
     "p0FindingsClosed": 0,
-    "functionalPass": false
+    "functionalPass": false,
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-38691683797-vqfu87tg.web.app",
+    "previewSourceSha": "707337f47677a05baa3d3124ffb1841c51b08541",
+    "previewBuildId": "gi-i65-b4-707337f47677-57f234755dc1",
+    "previewRunId": 38691683797,
+    "previewArtifactId": 11952159184,
+    "previewDigest": "sha256:c56d6446cd675b4d7f152c5c8ce472847f99ef074f3ba234a5920cb72b8ad3f6",
+    "sourceQa": "PASS",
+    "authenticatedRoleUat": "PENDING",
+    "configurationPersistenceUat": "PENDING",
+    "securityP0Closed": false
   }
 }

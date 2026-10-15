@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_B4_003_CONFIG_ROLE_PARITY_RECOVERY_V1",
   "gate": "I6.5/B4-003",
-  "status": "SOURCE_STAGED_QA_EXACT_PREVIEW_AUTHENTICATED_ROLE_MATRIX_PENDING",
+  "status": "EXACT_PREVIEW_TECHNICAL_PASS_AUTHENTICATED_CONFIGURATION_UAT_PENDING",
   "authority": "Subordinate to canonical Control Plane, addenda, execution lock, approved B3 version and ledger",
   "comparison": {
     "previouslyApprovedSource": "dcd2b3f60b98ad96c94933f09da9e8478ea165c3",
@@ -30,7 +30,7 @@
     "before": "33e48f62320542849bd112687cf4b82d3853abe0",
     "after": "c97372d65a0e9c8578255857837f2021f2dacef9",
     "syntheticBeforeCommit": "ISOLATED_V8_POSITIVE_4_NEGATIVE_5_PASS",
-    "githubCi": "PENDING",
+    "githubCi": "PASS_CONTROL_PLANE_GUARD_RUN_38691683722_ROLE_SCOPE_NEGATIVE_CASES",
     "authenticatedBrowser": "PENDING",
     "configurationWriteReadback": "PENDING"
   },
@@ -72,5 +72,25 @@
   "binding": {
     "compositionBlob": "391062fd13d01df783dd512472f14967a50c29da",
     "executionLockBlob": "af330c456cb80f42a72376d3d86ac29db59b8513"
-  }
+  },
+  "preview": {
+    "sourceSha": "707337f47677a05baa3d3124ffb1841c51b08541",
+    "buildId": "gi-i65-b4-707337f47677-57f234755dc1",
+    "url": "https://ays-orbit-360-lab--gi-i65-b4-38691683797-vqfu87tg.web.app",
+    "runId": 38691683797,
+    "jobId": 116278785065,
+    "artifactId": 11952159184,
+    "artifactDigest": "sha256:c56d6446cd675b4d7f152c5c8ce472847f99ef074f3ba234a5920cb72b8ad3f6",
+    "conclusion": "success",
+    "exactHostingReadback": "PASS",
+    "browserAnonymousDenial": "PASS",
+    "authenticatedRoleUat": "PENDING",
+    "userVisualUat": "PENDING",
+    "newProductionRulesDeployed": false,
+    "operationalDataWrites": 0
+  },
+  "notes": [
+    "Google Hosting Preview channel quota produced a recoverable 429 handled by existing workflow channel cleanup; final Hosting exact readback passed.",
+    "No claim of restored live Firestore security, full configuration persistence, or finance functional accuracy based on this public smoke."
+  ]
 }
