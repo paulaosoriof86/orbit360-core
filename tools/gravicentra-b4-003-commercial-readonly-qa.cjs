@@ -136,6 +136,30 @@ async function main(){
       return {started:Orbit.productAppP0?.isStarted?.()===true,
         ready:r?.ready===true,status:String(r?.status||'').slice(0,65)};
     });
+    // Reproduce the exact role/country used for the protected read using
+    // the application's ordinary selectors. This changes the isolated
+    // browser view only (no tenant, Firestore, or operational write).
+    record.viewSelection=await page.evaluate(({targetRole,targetCountry})=>{
+      const n=x=>String(x||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+        .toLowerCase().replace(/[^a-z0-9]+/g,'');
+      const roles=Orbit.session?.allowedRoles?.()||[];
+      const selected=roles.find(x=>n(x)===n(targetRole));
+      if(!selected)return{ok:false,reason:'ROLE_NOT_ASSIGNED_TO_UI_SESSION',roleAvailable:false};
+      const countrySel=document.getElementById('pais-sel');
+      if(!countrySel||![...countrySel.options].some(x=>x.value===targetCountry))
+        return{ok:false,reason:'COUNTRY_SELECTOR_UNAVAILABLE',roleAvailable:true};
+      if(Orbit.session?.set?.(selected)!==true)
+        return{ok:false,reason:'ROLE_SELECTOR_REJECTED',roleAvailable:true};
+      countrySel.value=targetCountry;
+      countrySel.dispatchEvent(new Event('change',{bubbles:true}));
+      return{ok:true,roleAvailable:true};
+    },{targetRole:actor.role,targetCountry:pair.country});
+    if(!record.viewSelection.ok)throw Error(record.viewSelection.reason);
+    await page.waitForFunction(({targetRole,targetCountry})=>{
+      const n=x=>String(x||'').toLowerCase().replace(/[^a-z0-9]+/g,'');
+      return n(Orbit.session?.rol?.())===n(targetRole)&&
+        String(Orbit.pais||'').toUpperCase()===targetCountry;
+    },{targetRole:actor.role,targetCountry:pair.country},{timeout:5000});
     await page.evaluate(()=>{Orbit.store?._ensureCollections?.(['negocios','gestiones']);});
     await page.waitForFunction(()=>{
       const st=Orbit.store?._productStatus?.()||{},required=['negocios','gestiones'];
@@ -163,7 +187,7 @@ async function main(){
     },q.serverDocumentIds);
     for(const moduleKey of ['ops','leads']){
       await page.evaluate(k=>{if(Orbit.router?.go)Orbit.router.go(k);else location.hash='#/'+k;},moduleKey);
-      await page.waitForFunction(k=>Orbit.route?.key===k,null,{timeout:7000},moduleKey).catch(()=>{});
+      await page.waitForFunction(k=>Orbit.route?.key===k,moduleKey,{timeout:7000}).catch(()=>{});
       await page.waitForTimeout(350);
       record.uiRoutes[moduleKey]=await page.evaluate(k=>{
         const board=k==='ops'?Orbit.ciclo?.opsBoard?.():Orbit.ciclo?.leadsBoard?.();

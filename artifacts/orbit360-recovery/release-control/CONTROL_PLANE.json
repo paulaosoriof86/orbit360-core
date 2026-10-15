@@ -11456,7 +11456,7 @@
     "artifactId": 11983958349,
     "artifactDigest": "sha256:8ab8ac40f70d472d0df891d280f57974be94ae87ff51104434080d6416dcca69",
     "qaPath": "tools/gravicentra-b4-003-commercial-readonly-qa.cjs",
-    "qaBlobSha": "6f39f62acd6e8d6643fb4a080ab1719ac59a4275",
+    "qaBlobSha": "49360ae392a2a7b90523304ae72103460c19f3ac",
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_COMMERCIAL_TWO_UID_QA_REQUEST_20261015.json",
     "receiptBlobSha": "be7cdb62995ebea3b5c2b43b5676b6dfd9b73006",
     "operationalWritesAuthorized": false,
@@ -11469,7 +11469,7 @@
     "remediation": "QA_ONLY_SANITIZED_ACTOR_ELIGIBILITY_DIAGNOSTIC",
     "businessWritesAuthorized": false,
     "productionTouched": false,
-    "lastDiagnosticRunId": 38763522986,
+    "lastDiagnosticRunId": 38765339012,
     "lastDiagnosticResult": "QA_ERROR_UNDEFINED_IDENTITY_NORMALIZER_FALSE_AUTH_FAILURE",
     "diagnosticScope": "AUTH_LOOKUP_AND_MEMBERSHIP_STATUS_AGGREGATES_ONLY_NO_UIDS",
     "qaRootfixPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_COMMERCIAL_QA_UNDEFINED_IDENTITY_NORMALIZER_ROOTFIX_20261015.json",
@@ -11480,12 +11480,15 @@
     "newScope": "UI_READONLY_OPS_LEADS_390",
     "uiQaRequestPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_TWO_UID_OPS_LEADS_READONLY_UI_QA_REQUEST_20261015.json",
     "uiQaRequestBlobSha": "eb3ac2b6525bf92bfcf5b49fecf7bb271e29eddb",
-    "lastDiagnosticStatus": "FALSE_POSITIVE_KANBAN_EXISTENCE_NO_HYDRATION_OR_PARITY_ASSERTION",
+    "lastDiagnosticStatus": "QA_ROLE_COUNTRY_CONTEXT_MISMATCH_NOT_PRODUCT_DEFECT",
     "lastDiagnosticReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_TWO_UID_COMMERCIAL_SERVER_STORE_UI_PARITY_DIAGNOSTIC_20261015.json",
     "lastDiagnosticReceiptBlobSha": "bd14ea73f77a3435a9f4e732bb555e23f01ce5e0",
     "previousUiPassInvalidated": true,
     "previousServerReadPassPreserved": true,
     "qaHardened": true,
-    "sourceProductChanged": false
+    "sourceProductChanged": false,
+    "roleCountryQaRootfixPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_TWO_UID_UI_ROLE_COUNTRY_ALIGNMENT_QA_ROOTFIX_20261015.json",
+    "roleCountryQaRootfixBlobSha": "a2da7fb565d61a83e3a05257b0081ce862c370c4",
+    "realBusinessWrites": 0
   }
 }

@@ -1,0 +1,50 @@
+{
+  "schema": "GRAVICENTRA_B4_003_QA_UI_ROLE_COUNTRY_ALIGNMENT_ROOTFIX_V1",
+  "gate": "I6.5/B4-003",
+  "date": "2026-10-15",
+  "status": "QA_SOURCE_FIXED_EXACT_PREVIEW_READONLY_RETEST_PENDING",
+  "lastRun": 38765339012,
+  "previousArtifactId": 11990360030,
+  "previousStatus": "QA_PRECONDITION_ROLE_COUNTRY_OR_HYDRATION_NOT_COMPARABLE",
+  "evidence": {
+    "operativo": {
+      "apiRole": "operativo",
+      "apiCountry": "GT",
+      "uiRole": "admintenant",
+      "uiCountry": "TODOS",
+      "storeRowsBusiness": 3,
+      "storeRowsManagement": 6,
+      "uiOpsCards": 3,
+      "uiLeadsCards": 3
+    },
+    "asesor": {
+      "apiRole": "asesor",
+      "apiCountry": "GT",
+      "uiRole": "operativo",
+      "uiCountry": "TODOS",
+      "storeRowsBusiness": 5,
+      "storeRowsManagement": 6,
+      "uiOpsCards": 2,
+      "uiLeadsCards": 1
+    },
+    "hydratedForBoth": true,
+    "uiProjectionMatchesRenderedCardsForBoth": true
+  },
+  "rootCause": "The prior harness deliberately invoked scoped backend with requested roles/country, but did not select those values through the application's role/country UI controls prior to UI parity. The contexts were not comparable.",
+  "fix": "Use the membership-authorized Orbit.session.set() selector in an isolated browser, select GT through #pais-sel change event, confirm exact effective role/country, wait for protected store server hydration, compare IDs and Kanban totals. Repair waitForFunction argument order to avoid phantom wait.",
+  "precondition": "Role must actually be selectable for the actor; otherwise HOLD without inferring a product defect.",
+  "owner": "tools/gravicentra-b4-003-commercial-readonly-qa.cjs",
+  "oldBlob": "6f39f62acd6e8d6643fb4a080ab1719ac59a4275",
+  "newBlob": "49360ae392a2a7b90523304ae72103460c19f3ac",
+  "productSourceChanged": false,
+  "existingPreviewPreserved": true,
+  "boundaries": {
+    "operationalWrites": 0,
+    "syntheticWrites": 0,
+    "livePromotion": false,
+    "firestoreRulesDeploy": false,
+    "reimport": false,
+    "tinyFish": false
+  },
+  "next": "Execute only existing B4-003 QA-only read path on certified immutable Preview; preserve D04/D18 write HOLD."
+}
