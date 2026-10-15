@@ -1845,7 +1845,6 @@ jobs:
       SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
       SA_LAB_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
       RECEIPT: artifacts/orbit360-recovery/release-control/I6_5_B4_003_AUTHENTICATED_SCOPED_READONLY_PREVIEW_RECEIPT_20261015.json
-      B4_RENEWALS_PROOF_OUT: ${{ runner.temp }}/gravicentra-b4-003-renewals-readonly.json
     steps:
       - uses: actions/checkout@v4
         with:
@@ -1883,6 +1882,8 @@ jobs:
           npm install --no-save --package-lock=false --ignore-scripts firebase-admin@13.4.0 playwright@1.55.0
           npx playwright install --with-deps chromium
       - name: Run existing authenticated Renovaciones read-only proof
+        env:
+          B4_RENEWALS_PROOF_OUT: ${{ runner.temp }}/gravicentra-b4-003-renewals-readonly.json
         run: |
           set -euo pipefail
           node tools/gravicentra-i6-5-b4-003-renewals-priority-preview-proof.mjs
