@@ -195,7 +195,7 @@
     "orbit360-platform/core/product-drive-document-provider-p0.js": "074b38c168ed0e7c78569395f815a2ff037c2c3c",
     "orbit360-platform/core/product-hydration-required-optional-p0.js": "21f870d3e0e165487843d1d6efa454474fd73563",
     "orbit360-platform/core/product-insurer-credential-provider-p0.js": "3bf5ba98271c7012dd1328df2894f1b38f3983eb",
-    "orbit360-platform/core/product-runtime-browser-providers-p0.js": "d6d6621493d20559e501e80c85501bfa1a6fad17",
+    "orbit360-platform/core/product-runtime-browser-providers-p0.js": "c7e0beb627f36f7662183ca7e6ebb1d97c3e0d30",
     "orbit360-platform/core/public-tenant-branding.js": "ee1029772b1191c44817d315dc8ce8862bb3a152",
     "orbit360-platform/core/pwa.js": "14bc0d513a2ee3de8f7b598b38276e6136f05eb8",
     "orbit360-platform/core/queries.js": "55acae8c4c933bde47afb018be55e978d9b81cdd",
@@ -216,7 +216,7 @@
     "orbit360-platform/data/tenant-alianzas-soluciones-insurers-p10.js": "41d2e31a42dac73eb68af304d5f532897210d0ee",
     "orbit360-platform/data/tenant-config/alianzas-soluciones.aseguradoras-knowledge-summary-v20261003.js": "2000d9ea8ab67bdd37d8bf404a29a405fa6374dd",
     "orbit360-platform/data/tenant-public-branding-index.js": "dc543c463f5ecd8ea44e49156d6282113bd95db6",
-    "orbit360-platform/index.html": "9e9286957f8b37e460dab1743cec3f29b06eac69",
+    "orbit360-platform/index.html": "549b5da5a7c28a5ada7ff95cee49102e24816924",
     "orbit360-platform/modules/academia.js": "4d48ee3edbc6afc4163bf6365a80bbcb680b1852",
     "orbit360-platform/modules/aseguradoras-v1202-import-bridge.js": "db5f012abe505c2dd27d77a47d0694868bee5348",
     "orbit360-platform/modules/aseguradoras.js": "9e56c296b55da499b52f42c462c668aa2f32eba7",
@@ -5607,5 +5607,16 @@
     "firestoreRulesDeployed": false,
     "livePromotion": false,
     "previousPreviewImmutable": true
+  },
+  "b4003ProtectedTransportParityFix": {
+    "gate": "I6.5/B4-003",
+    "status": "SOURCE_STAGED_QA_AND_EXACT_PREVIEW_PENDING",
+    "cause": "BROWSER_SCOPED_READ_ALLOWLIST_EXCLUDED_ACTIVIDADES_AND_METAS",
+    "owner": "orbit360-platform/core/product-runtime-browser-providers-p0.js",
+    "sha": "c7e0beb627f36f7662183ca7e6ebb1d97c3e0d30",
+    "qaOwner": "tools/gravicentra-b4-003-scoped-related-reader.test.cjs",
+    "noLive": true,
+    "noRules": true,
+    "noBusinessWrites": true
   }
 }

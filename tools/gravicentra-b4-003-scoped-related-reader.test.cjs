@@ -5,6 +5,12 @@ const {Denied}=require('../functions/b4-003-scoped-access-boundary');
 const tenantId='alianzas-soluciones';
 const fs=require('node:fs');
 const rawReader=fs.readFileSync(require('node:path').join(__dirname,'../functions/b4-003-scoped-related-reader.js'),'utf8');
+const protectedBrowserProvider=fs.readFileSync(require('node:path').join(__dirname,'../orbit360-platform/core/product-runtime-browser-providers-p0.js'),'utf8');
+for(const collection of ['actividades','metas']) {
+ assert.ok(protectedBrowserProvider.includes("'"+collection+"'"),
+   'B4_003_PROTECTED_BROWSER_ALLOWLIST_MISSING_'+collection);
+}
+
 const routerSource=fs.readFileSync(require('node:path').join(__dirname,'../orbit360-platform/core/router.js'),'utf8');
 const historialSource=fs.readFileSync(require('node:path').join(__dirname,'../orbit360-platform/modules/historial.js'),'utf8');
 assert.ok(routerSource.includes("historial: ['actividades', 'clientes', 'polizas', 'asesores']"),

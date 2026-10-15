@@ -4870,7 +4870,7 @@
       "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
       "executionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B4_EXECUTION_LOCK_20261002.json",
       "executionLockBlobSha": "8f78bfd3ed4d6c17db51b664921e92d760faea95",
-      "compositionLockBlobSha": "451021b8a89b872bd30db1045662106937f7f4af",
+      "compositionLockBlobSha": "c8c6507a3b19745128b484667a41124ab729b05b",
       "findingLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
       "activeFindingId": "B4-003",
       "productSourceSha": "c603fd3561e7229d9359db45495d4cf2d757cd8f",
@@ -5996,7 +5996,7 @@
   "canonicalAccumulationControl": {
     "status": "FROZEN_ACTIVE",
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "compositionLockBlobSha": "451021b8a89b872bd30db1045662106937f7f4af",
+    "compositionLockBlobSha": "c8c6507a3b19745128b484667a41124ab729b05b",
     "findingLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
     "findingLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
@@ -6313,7 +6313,7 @@
     "activeFindingId": "B4-003",
     "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
     "executionLockBlobSha": "8f78bfd3ed4d6c17db51b664921e92d760faea95",
-    "compositionLockBlobSha": "451021b8a89b872bd30db1045662106937f7f4af",
+    "compositionLockBlobSha": "c8c6507a3b19745128b484667a41124ab729b05b",
     "findingLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
     "noLive": true,
     "noReimport": true,
@@ -10975,5 +10975,19 @@
     "globallyAuthorizedProductMutation": false,
     "existingB4Only": true,
     "qaGuardRequired": true
+  },
+  "b4003ProtectedTransportParityFix": {
+    "gate": "I6.5/B4-003",
+    "status": "SOURCE_STAGED_QA_AND_EXACT_PREVIEW_PENDING",
+    "cause": "BROWSER_SCOPED_READ_ALLOWLIST_EXCLUDED_ACTIVIDADES_AND_METAS",
+    "owner": "orbit360-platform/core/product-runtime-browser-providers-p0.js",
+    "sha": "c7e0beb627f36f7662183ca7e6ebb1d97c3e0d30",
+    "qaOwner": "tools/gravicentra-b4-003-scoped-related-reader.test.cjs",
+    "noLive": true,
+    "noRules": true,
+    "noBusinessWrites": true,
+    "compositionBlobSha": "c8c6507a3b19745128b484667a41124ab729b05b",
+    "previousVisualAcceptancePreserved": true,
+    "authenticatedE2E": false
   }
 }
