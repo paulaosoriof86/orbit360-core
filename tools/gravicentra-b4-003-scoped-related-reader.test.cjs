@@ -155,6 +155,32 @@ async function deny(fn,code){let thrown;try{await fn()}catch(e){thrown=e}assert.
  assert.equal(coHistory.rows.length,0);checks++;
  console.log('B4_003_HISTORY_VERIFIED_RELATION_ROLE_COUNTRY_SCOPE_QA_PASS checks=7 no_data_writes');
  console.log('B4_003_LEGACY_COUNTRY_RELATION_REGRESSION_PASS checks=3 no_data_writes');
+
+ // R23 institutional/individual metas contract against secure B4 list.
+ docs.metas={
+  own:{id:'own',tenantId,asesorId:'a1',pais:'GT',moneda:'GTQ',tipo:'recaudo',mes:'2026-10',valor:120},
+  other:{id:'other',tenantId,asesorId:'a2',pais:'GT',moneda:'GTQ',tipo:'recaudo',mes:'2026-10',valor:250},
+  institution:{id:'institution',tenantId,pais:'GT',moneda:'GTQ',tipo:'prima',mes:'2026-10',valor:900},
+  col:{id:'col',tenantId,asesorId:'a1',pais:'CO',moneda:'COP',tipo:'recaudo',mes:'2026-10',valor:330},
+  currencyOnly:{id:'currencyOnly',tenantId,asesorId:'a1',moneda:'GTQ',tipo:'renovada',mes:'2026-10',valor:50},
+  contradictory:{id:'contradictory',tenantId,asesorId:'a1',pais:'GT',moneda:'COP',tipo:'prima',mes:'2026-10',valor:999}
+ };
+ const ownGoals=await flow('metas','asesor',{pageSize:50});
+ assert.deepEqual(ownGoals.rows.map(r=>r.id),['currencyOnly','own']);
+ assert.ok(ownGoals.rows.every(r=>r.asesorId==='a1'&&r.pais==='GT'));checks++;
+ const allGoals=await flow('metas','operativo',{pageSize:50});
+ assert.deepEqual(allGoals.rows.map(r=>r.id),['currencyOnly','institution','other','own']);checks++;
+ const countryGoal=await flow('metas','operativo',{country:'CO',pageSize:50});
+ assert.deepEqual(countryGoal.rows.map(r=>r.id),['col']);checks++;
+ await deny(()=>flow('metas','asesor',{policyIds:['p1']}),'META_POLICY_ANCHOR_UNEXPECTED');checks++;
+ member={...member,modulesRestricted:['inicio']};
+ await deny(()=>flow('metas','asesor'),'MODULE_DENIED');checks++;
+ member={...member,modulesRestricted:[],dataScopes:{default:'own'}};
+ const pagedGoals=await flow('metas','operativo',{pageSize:1});
+ assert.equal(pagedGoals.rows.length,1);assert.ok(pagedGoals.nextCursor);checks++;
+ const page2=await flow('metas','operativo',{pageSize:1,cursor:pagedGoals.nextCursor});
+ assert.notEqual(page2.rows[0].id,pagedGoals.rows[0].id);checks++;
+ console.log('B4_003_METAS_INSTITUTIONAL_AND_ADVISOR_SCOPE_QA_PASS checks=7 no_data_writes');
  console.log('B4_003_RELATED_SERVER_BATCH_SCOPE_MOCK_PASS checks='+checks+' no Firebase writes');
  console.log('B4_003_RELATED_DOCUMENT_SERVER_SCOPE_MOCK_PASS checks='+checks+' no Firebase writes');
 })().catch(e=>{console.error(e);process.exitCode=1;});

@@ -203,7 +203,7 @@
     "orbit360-platform/core/quote-comparison-contracts-v1203.js": "c3342d5fc94661a9f23563e4b1c644346dd10fb3",
     "orbit360-platform/core/quote-comparison-p06-runtime-adapter-v1208.js": "1e3a5d79b4bdcba69f8de0737bf0df96d4cbd3d0",
     "orbit360-platform/core/record-delete.js": "749722f8482db5a72b72ac9b64dbcac08af86b82",
-    "orbit360-platform/core/router.js": "d0f930d3ff020b0724000ccc5c64b065dec5817b",
+    "orbit360-platform/core/router.js": "7f3bbde2aecbdc97853c4e8260d5bf78c9ccb5fb",
     "orbit360-platform/core/tenant-access-policy-contract-p0.js": "08c413690f301f964f9ecf4a52d8bfdc117dc600",
     "orbit360-platform/core/tenant-access-policy-effective-p0.js": "43d572266ac3f21aca3b5c9b6aa981f7cd52373c",
     "orbit360-platform/core/tenant-access-policy-product-p0.js": "045322231523ec624c6f19efea1a66c204b962bc",
@@ -212,11 +212,11 @@
     "orbit360-platform/data/academia-product-catalog-v1.js": "22b6781519cb14e05965738ac3bbc0f6eb0baff3",
     "orbit360-platform/data/geo-gt-co-authoritative-v20261004.js": "734b6518bc968a8c4e278602aa7161a38351cb02",
     "orbit360-platform/data/store-firestore-product-operational-p0.js": "7738314b843253c92be008dc0b812d035b377d43",
-    "orbit360-platform/data/store-firestore-product-readonly-p0.js": "aee542ecabf0bfa3330cfed37a9aa0d85d708a7d",
+    "orbit360-platform/data/store-firestore-product-readonly-p0.js": "7a6cda8afdf7bf0a7c076d760fa0e84ed7e853c7",
     "orbit360-platform/data/tenant-alianzas-soluciones-insurers-p10.js": "41d2e31a42dac73eb68af304d5f532897210d0ee",
     "orbit360-platform/data/tenant-config/alianzas-soluciones.aseguradoras-knowledge-summary-v20261003.js": "2000d9ea8ab67bdd37d8bf404a29a405fa6374dd",
     "orbit360-platform/data/tenant-public-branding-index.js": "dc543c463f5ecd8ea44e49156d6282113bd95db6",
-    "orbit360-platform/index.html": "f7273c4ef700fee90d82ca2c6ba276851d87f76f",
+    "orbit360-platform/index.html": "9e9286957f8b37e460dab1743cec3f29b06eac69",
     "orbit360-platform/modules/academia.js": "4d48ee3edbc6afc4163bf6365a80bbcb680b1852",
     "orbit360-platform/modules/aseguradoras-v1202-import-bridge.js": "db5f012abe505c2dd27d77a47d0694868bee5348",
     "orbit360-platform/modules/aseguradoras.js": "9e56c296b55da499b52f42c462c668aa2f32eba7",
@@ -257,7 +257,7 @@
     "orbit360-platform/modules/comparativo.js": "982881a4c1e2f95be95428bd3f9f23360a9a2d5f",
     "functions/b4-003-scoped-policy-reader.js": "4181f6198c0163175579a2cc19197ebc63d9b328",
     "functions/b4-003-scoped-policy-callable.js": "8b468150003fe812d9e1d0763120f2b31f1df75f",
-    "functions/b4-003-scoped-related-reader.js": "3900664dfe3a487692dd587a2ab89e5c716d6201",
+    "functions/b4-003-scoped-related-reader.js": "6b218560d9248be1d994d3f451d1f478807cadfc",
     "functions/b4-003-scoped-bootstrap-reader.js": "356d36e0679a5e499c05632a981b9ef3f1ffb9ec",
     "orbit360-platform/modules/historial.js": "6329129526b850a62e645aa9cd384e7d19317365"
   },
@@ -5584,5 +5584,28 @@
     "sharedFirestoreRulesNotChanged": true,
     "realDataWrites": 0,
     "livePromotion": false
+  },
+  "b4003ProtectedMetasSourceFix": {
+    "gate": "I6.5/B4-003",
+    "status": "SOURCE_STAGED_QA_REQUIRED_NO_FUNCTIONAL_ACCEPTANCE",
+    "why": "SIX_REAL_METAS_NOT_SUPPORTED_BY_SCOPED_READER",
+    "owners": {
+      "functions/b4-003-scoped-related-reader.js": "6b218560d9248be1d994d3f451d1f478807cadfc",
+      "orbit360-platform/data/store-firestore-product-readonly-p0.js": "7a6cda8afdf7bf0a7c076d760fa0e84ed7e853c7",
+      "orbit360-platform/core/router.js": "7f3bbde2aecbdc97853c4e8260d5bf78c9ccb5fb",
+      "orbit360-platform/index.html": "9e9286957f8b37e460dab1743cec3f29b06eac69",
+      "tools/gravicentra-b4-003-scoped-related-reader.test.cjs": "83755d5223cff07c7573c1cbcb857038b74e2855"
+    },
+    "readModel": "EXPLICIT_ADVISOR_OR_INSTITUTIONAL_SCOPE_WITH_COUNTRY_CURRENCY_COHERENCE",
+    "allScopeOnlyForInstitutional": true,
+    "forbidAdvisorCrossTenantCountry": true,
+    "sourceScope": "CURRENT_B4_003_CONTINUATION_ONLY",
+    "changeRecordedAt": "2026-10-14",
+    "qaEvidenceRequired": true,
+    "readOnly": true,
+    "realBusinessWrites": 0,
+    "firestoreRulesDeployed": false,
+    "livePromotion": false,
+    "previousPreviewImmutable": true
   }
 }

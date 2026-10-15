@@ -4870,7 +4870,7 @@
       "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
       "executionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B4_EXECUTION_LOCK_20261002.json",
       "executionLockBlobSha": "8f78bfd3ed4d6c17db51b664921e92d760faea95",
-      "compositionLockBlobSha": "2cb6102e2a59cf48e4e76246c5258ff8abac64f5",
+      "compositionLockBlobSha": "451021b8a89b872bd30db1045662106937f7f4af",
       "findingLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
       "activeFindingId": "B4-003",
       "productSourceSha": "c603fd3561e7229d9359db45495d4cf2d757cd8f",
@@ -5996,7 +5996,7 @@
   "canonicalAccumulationControl": {
     "status": "FROZEN_ACTIVE",
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "compositionLockBlobSha": "2cb6102e2a59cf48e4e76246c5258ff8abac64f5",
+    "compositionLockBlobSha": "451021b8a89b872bd30db1045662106937f7f4af",
     "findingLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
     "findingLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
@@ -6313,7 +6313,7 @@
     "activeFindingId": "B4-003",
     "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
     "executionLockBlobSha": "8f78bfd3ed4d6c17db51b664921e92d760faea95",
-    "compositionLockBlobSha": "2cb6102e2a59cf48e4e76246c5258ff8abac64f5",
+    "compositionLockBlobSha": "451021b8a89b872bd30db1045662106937f7f4af",
     "findingLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
     "noLive": true,
     "noReimport": true,
@@ -10948,5 +10948,32 @@
     "tariffsEnabled": false,
     "operationalWrites": 0,
     "unresolved": "Plan/version vigencia, elegibilidad, deducibles, impuestos y fuente contractual vigente antes de cotizador"
+  },
+  "b4003ProtectedMetasSourceFix": {
+    "gate": "I6.5/B4-003",
+    "status": "SOURCE_STAGED_QA_REQUIRED_NO_FUNCTIONAL_ACCEPTANCE",
+    "why": "SIX_REAL_METAS_NOT_SUPPORTED_BY_SCOPED_READER",
+    "owners": {
+      "functions/b4-003-scoped-related-reader.js": "6b218560d9248be1d994d3f451d1f478807cadfc",
+      "orbit360-platform/data/store-firestore-product-readonly-p0.js": "7a6cda8afdf7bf0a7c076d760fa0e84ed7e853c7",
+      "orbit360-platform/core/router.js": "7f3bbde2aecbdc97853c4e8260d5bf78c9ccb5fb",
+      "orbit360-platform/index.html": "9e9286957f8b37e460dab1743cec3f29b06eac69",
+      "tools/gravicentra-b4-003-scoped-related-reader.test.cjs": "83755d5223cff07c7573c1cbcb857038b74e2855"
+    },
+    "readModel": "EXPLICIT_ADVISOR_OR_INSTITUTIONAL_SCOPE_WITH_COUNTRY_CURRENCY_COHERENCE",
+    "allScopeOnlyForInstitutional": true,
+    "forbidAdvisorCrossTenantCountry": true,
+    "sourceScope": "CURRENT_B4_003_CONTINUATION_ONLY",
+    "changeRecordedAt": "2026-10-14",
+    "qaEvidenceRequired": true,
+    "readOnly": true,
+    "realBusinessWrites": 0,
+    "firestoreRulesDeployed": false,
+    "livePromotion": false,
+    "previousPreviewImmutable": true,
+    "compositionBlobSha": "451021b8a89b872bd30db1045662106937f7f4af",
+    "globallyAuthorizedProductMutation": false,
+    "existingB4Only": true,
+    "qaGuardRequired": true
   }
 }

@@ -2,7 +2,7 @@
 // B4-003 staged protected document-read owner for related operational collections.
 // Read-only. Preview-only candidate; NO Firebase export or rule deploy.
 const {resolve,allowRow,Denied}=require('./b4-003-scoped-access-boundary');
-const collections=new Set(['clientes','vehiculos','recibosEsperados','carteraPrimas','cobros','negocios','gestiones','actividades']);
+const collections=new Set(['clientes','vehiculos','recibosEsperados','carteraPrimas','cobros','negocios','gestiones','actividades','metas']);
 const workflowCollections=new Set(['negocios','gestiones','actividades']);
 const clean=v=>String(v==null?'':v).trim();
 const safeId=(id,label)=>{
@@ -94,6 +94,47 @@ async function readScopedRelatedList({db,auth,request}){
  const ctx=resolve({auth,member:ms.data()||{},config:cs.exists?cs.data()||{}:{},
    tenantId,activeRole:role,country,collection:coll});
  const target=tenant.collection('data').doc(coll).collection('items');
+
+ // Canonical R23 goal projection contract: raw goals have an advisor or are
+ // institution-wide. Country may be derived from the explicitly stored currency,
+ // never from an unrelated client or team. Return an allowlisted projection.
+ if(coll==='metas'){
+   if(policyId||hasBatch)throw new Denied('META_POLICY_ANCHOR_UNEXPECTED');
+   const MAX_GOALS=150;
+   const snap=await target.orderBy('__name__').limit(MAX_GOALS+1).get();
+   const docs=Array.isArray(snap.docs)?snap.docs:[];
+   if(docs.length>MAX_GOALS)throw new Denied('META_CATALOG_SCAN_BOUND_EXCEEDED');
+   const authorized=[];
+   for(const d of docs){
+     const row=d.data()||{},id=clean(d.id),advisor=clean(row.asesorId||row.advisorId);
+     const declared=clean(row.pais||row.country).toUpperCase();
+     const fromCurrency=clean(row.moneda).toUpperCase()==='GTQ'?'GT':
+       clean(row.moneda).toUpperCase()==='COP'?'CO':'';
+     if(declared&&fromCurrency&&declared!==fromCurrency)continue;
+     const canonicalCountry=declared||fromCurrency;
+     if(!id||canonicalCountry!==country||row.tenantId&&row.tenantId!==tenantId)continue;
+     // An unassigned goal is institutional, not personal. It cannot be exposed
+     // by an 'own' or 'team' scope, including through client-side cache filtering.
+     if(!advisor&&ctx.scope!=='all')continue;
+     if(advisor){
+       try{allowRow(ctx,{tenantId,pais:country,asesorId:advisor});}
+       catch(e){if(e instanceof Denied)continue;throw e;}
+     }
+     const value=Number(row.valor);
+     if(!Number.isFinite(value)||value<0||row.valor===null||row.valor==='')continue;
+     authorized.push({id,canonicalDocumentId:id,tenantId,pais:country,
+       moneda:clean(row.moneda)||(country==='GT'?'GTQ':'COP'),
+       mes:clean(row.mes),periodo:clean(row.periodo),tipo:clean(row.tipo),
+       asesorId:advisor,valor:value});
+   }
+   const index=cursor?authorized.findIndex(x=>x.canonicalDocumentId===cursor):-1;
+   if(cursor&&index<0)throw new Denied('CURSOR_DENIED');
+   const rows=authorized.slice(index+1,index+1+pageSize);
+   const nextCursor=authorized.length>index+1+pageSize?
+     rows[rows.length-1].canonicalDocumentId:null;
+   return {ok:true,serverScoped:true,collection:coll,country,scope:ctx.scope,
+     rows,nextCursor,anchoring:'institutional_only_all_or_explicit_authorized_advisor'};
+ }
  // B4_003_LEGACY_WORKFLOW_DERIVED_COUNTRY:
  // For the currently bounded historical Ops/Leads universe, country-less
  // records cannot match an indexed Firestore where('pais','==',country).
@@ -231,4 +272,4 @@ async function readScopedRelatedList({db,auth,request}){
    anchoring:coll==='clientes'?'authorized_country_and_advisor_scope':hasBatch?'authorized_policy_batch':'authorized_policy'};
 }
 
-module.exports=Object.freeze({readScopedRelatedDocument,readScopedRelatedList,collections,version:'b4-003-related-server-list-stage-v4-activity-scoped'});
+module.exports=Object.freeze({readScopedRelatedDocument,readScopedRelatedList,collections,version:'b4-003-related-server-list-stage-v5-goals-scoped'});

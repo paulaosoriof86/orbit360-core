@@ -169,7 +169,7 @@
       if(plan.hardError)throw new Error('PROTECTED_READ_PLAN_DENIED');
       if(plan.denied){if(state.deniedCollections.indexOf(collection)<0)state.deniedCollections.push(collection);return false;}
       var related=['vehiculos','recibosEsperados','carteraPrimas','cobros'].indexOf(collection)>=0;
-      if(!related&&collection!=='clientes'&&collection!=='polizas'&&collection!=='aseguradoras'&&collection!=='asesores'&&collection!=='negocios'&&collection!=='gestiones'&&collection!=='actividades')
+      if(!related&&collection!=='clientes'&&collection!=='polizas'&&collection!=='aseguradoras'&&collection!=='asesores'&&collection!=='negocios'&&collection!=='gestiones'&&collection!=='actividades'&&collection!=='metas')
         throw new Error('PROTECTED_READ_COLLECTION_UNSUPPORTED_'+collection);
       var epoch=protectedEpoch;
       Promise.resolve().then(function(){return related?protectedRelatedUniverse(collection,epoch):protectedLoad(collection,'',epoch);})
@@ -223,7 +223,7 @@
       // Preflight the complete required collection set before fetching any
       // protected data. A six-of-eight bootstrap is never an accepted startup.
       if(protectedMode){
-        var supported=new Set(['clientes','polizas','vehiculos','recibosEsperados','carteraPrimas','cobros','aseguradoras','asesores','negocios','gestiones','actividades']);
+        var supported=new Set(['clientes','polizas','vehiculos','recibosEsperados','carteraPrimas','cobros','aseguradoras','asesores','negocios','gestiones','actividades','metas']);
         var unsupported=startupCollections.filter(function(name){return !supported.has(name);});
         if(unsupported.length){
           state.status='blocked-protected-incomplete';
