@@ -97,7 +97,21 @@ async function backendReadback(){
   };
   console.log('B4_003_ROSTER_DRIFT_READONLY expected='+EXPECTED_POLICY_COUNT+
     ' observed='+ps.size+' qaCandidates='+qaCandidates.length+' newer='+newer.length);
-  need(ps.size===EXPECTED_POLICY_COUNT,'B4_003_RENEWALS_POLICY_COUNT_DRIFT:'+ps.size);
+  // Scoped forensic exclusion in this QA harness only. Does not change Firestore.
+  const qaRun='38102224750';
+  const qaKeys=['renew','expired_renew','unknown','renewwrite','cancel','health']
+    .map(k=>'b4003qa_policy_'+k+'_'+qaRun);
+  const fixtureRows=qaKeys.map(id=>rows.find(x=>x.id===id));
+  need(fixtureRows.every(x=>x&&x.p.__syntheticQa===true),
+    'B4_003_CANCELLED_RUN_EXACT_SIX_NOT_ATTESTED');
+  const operationalRows=rows.filter(x=>!qaKeys.includes(x.id));
+  proof.backend.rosterDriftReadOnly={
+    ...proof.backend.rosterDriftReadOnly,operationalCount:operationalRows.length,
+    excludedExactSyntheticCount:fixtureRows.length,fixtureSourceRun:qaRun,
+    exactFixtureIdsVerified:true,recordsDeleted:0,uiAbsence:'NOT_YET_PROVEN'
+  };
+  need(ps.size===EXPECTED_POLICY_COUNT+6&&operationalRows.length===EXPECTED_POLICY_COUNT,
+    'B4_003_RENEWALS_OPERATIONAL_COUNT_DRIFT:'+operationalRows.length+':physical='+ps.size);
   need(terminal.length===EXPECTED_TERMINAL_COUNT,'B4_003_RENEWALS_B02_TERMINAL_COUNT:'+terminal.length);
   need(terminal.every(({p})=>clean(p.renovacionEstado)==='No renovada'&&clean(p.renewalDispositionReason)===REASON&&validDate(p.vigenciaFin||p.fechaFin||p.endDate)&&clean(p.vigenciaFin||p.fechaFin||p.endDate)<=CUTOFF),'B4_003_RENEWALS_B02_TERMINAL_READBACK');
   const oldOpen=[],recent=[];
