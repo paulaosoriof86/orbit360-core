@@ -1,4 +1,5 @@
 name: Gravicentra B4-003 R20 Exact Preview
+# Historial scoped and reactive source guards PASS; build exact accumulated B4-003 Preview; zero business writes, no LIVE or shared rules.
 # B4-003 scoped historial source regression passed; exact immutable internal Preview requested with no rules or LIVE deploy.
 # Repeat existing read-only B4-003 finance source validation after isolated QA source quoting repair.
 # R26 2026-10-14: read effective Firestore rules using existing GitHub service account; QA-only, no deploy, no data/secret exposure.
