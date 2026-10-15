@@ -11403,5 +11403,27 @@
     "securityP0Closed": false,
     "humanAccepted": false,
     "realDataWrites": 0
+  },
+  "b4003Oct15CumulativeExactPreviewDispatch": {
+    "status": "REQUESTED_EXISTING_AUTHORIZED_SCOPED_PREVIEW_WORKFLOW_PENDING",
+    "gate": "I6.5/B4-003",
+    "mode": "SCOPED_PREVIEW_ONLY",
+    "trigger": "EXISTING_B4_003_EXECUTOR_CONTROL_PLANE_PUSH_PATH",
+    "sourceRequestCommit": "b8193625bbdd1ad1a6a6d1184a4a7345c0d3596b",
+    "existingAuthorization": "b4003VerifiedCanonicalFinanceScope20261015.exactPreviewDispatch",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_OCT15_CUMULATIVE_EXACT_PREVIEW_DISPATCH_20261015.json",
+    "receiptSha": "714d8af00d352f981ae9da081f903951c96f3f05",
+    "compositionLockSha": "c6dac2dced2a7399c76889e20896821c4891e5d5",
+    "includesSourceChanges": [
+      "orbit360-platform/modules/inicio.js",
+      "orbit360-platform/modules/calidad.js"
+    ],
+    "sharedFirestoreRulesDeployAuthorized": false,
+    "operationalWritesAuthorized": false,
+    "syntheticWritesAuthorized": false,
+    "livePromotionAuthorized": false,
+    "securityP0Closed": false,
+    "authenticatedPass": false,
+    "frozenNextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_R20_TARGETED_PAULA_VISUAL"
   }
 }
