@@ -11595,5 +11595,33 @@
       "firestoreRulesDeploymentAuthorized": false,
       "livePromotionAuthorized": false
     }
+  },
+  "paulaNoLossVisualFreeze20261016": {
+    "status": "USER_DECISIONS_FROZEN_RENEWALS_VISUAL_PASS_B4_003_STILL_OPEN",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PAULA_FREEZE_VISUAL_20261016.md",
+    "blobSha": "68c79350c7c02f20cf4427ca82300ba82c776ff8",
+    "commit": "7222ce503764757128862d3f2cfe032b047d1719",
+    "baselineFindingIdsPreserved": 295,
+    "carriedAttentionIdsPreserved": 166,
+    "newOctoberFeedback": "ADDENDUM_INCLUDES_LINKED_EXISTING_FINDINGS_AND_EXPLICIT_UNMAPPED_VISUAL_REGRESSIONS",
+    "historicalInicioAugustReferenceBlobSha": "b1bfb0ce131848ee0892cd6aaff55b1bde2b7cd4",
+    "restoreHistoricalDataFormulas": false,
+    "sourceChanged": false,
+    "reimport": false,
+    "realBusinessWrites": 0,
+    "sharedRulesDeployed": false,
+    "livePromotion": false,
+    "remainingGate": "I6.5/B4-003"
+  },
+  "paulaRenovacionesVisualPass20261016": {
+    "status": "PAULA_VISUAL_PASS_PRESERVE",
+    "buildId": "gi-i65-b4-cae4d25d15cf-57f234755dc1",
+    "sourceSha": "cae4d25d15cf11659eb7c9171ba89e45a5d97f6b",
+    "runId": 38778679312,
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-38778679312-0svpff19.web.app",
+    "notAProductionReleasePass": true,
+    "technicalOpenFindingsUnchanged": true,
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PAULA_FREEZE_VISUAL_20261016.md",
+    "receiptBlobSha": "68c79350c7c02f20cf4427ca82300ba82c776ff8"
   }
 }
