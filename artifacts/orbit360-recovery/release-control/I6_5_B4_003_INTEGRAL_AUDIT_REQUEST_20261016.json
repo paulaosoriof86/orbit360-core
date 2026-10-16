@@ -8,7 +8,7 @@
   "observedSourceHead": "4a022cec65c38eb6513a79d4386e61fad06c65d1",
   "existingExecutor": ".github/workflows/gravicentra-b4-003-readonly-diagnostic.yml",
   "auditTool": "tools/gravicentra-b4-003-integral-readonly-audit.cjs",
-  "auditToolBlob": "0d4545b0bb308371e87718153c552761815af11a",
+  "auditToolBlob": "748f05135165bcbce4121024f425f2323eb1b860",
   "productWrites": false,
   "dataWrites": false,
   "deploy": false,
@@ -20,6 +20,15 @@
   "mayAdvanceFormalPercent": false,
   "authority": "USER_REQUESTED_READ_ONLY_COMPLEMENT_SUBORDINATE_TO_EXISTING_CONTROL_PLANE",
   "scope": ["repository ledger and carry reconciliation", "effective Hosting/rules/function metadata", "sanitized existing membership configuration", "bounded operational relationship aggregates", "authenticated read-only navigation with mutation endpoints blocked"],
+  "qaOnlyCorrection": {
+    "previousRunId": 38970051423,
+    "previousArtifactId": 12076144596,
+    "preservePreviousEvidence": true,
+    "cause": "Custom-token sign-in did not repeat the product restore path. Auth owner activates through restore/form, not the SDK sign-in alone.",
+    "changes": ["natural reload after transient sign-in", "canonical advisor-to-Auth link for ambiguous name selector", "preserve public callable names in blocked-endpoint diagnostics", "team-list cardinalities", "read-only responsive observation"],
+    "selfSyncWriteStillBlocked": true,
+    "productSourceChanged": false
+  },
   "remainingAfterThisAudit": ["controlled-write acceptance", "full negative security matrix", "visual and responsive acceptance", "same-artifact LIVE acceptance"],
   "evidencePolicy": "Record denied, failed, truncated and untested surfaces explicitly. No PASS from inventory, Admin reads, empty output, or successful workflow alone."
 }
