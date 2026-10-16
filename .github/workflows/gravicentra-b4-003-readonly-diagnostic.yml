@@ -10,6 +10,8 @@ on:
       - 'artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json'
       - 'tools/gravicentra-i6-5-b4-003-r18-readonly-forensic.mjs'
       - 'tools/gravicentra-b4-003-one-pass-readonly-integrity.cjs'
+      - 'artifacts/orbit360-recovery/release-control/I6_5_B4_003_INTEGRAL_AUDIT_REQUEST_20261016.json'
+      - 'tools/gravicentra-b4-003-integral-readonly-audit.cjs'
 
 permissions:
   contents: write
@@ -192,3 +194,80 @@ jobs:
           fi
           git commit -m "diag(i6.5 B4-003): freeze R18 authenticated forensic evidence"
           git push origin "HEAD:$GITHUB_REF_NAME"
+
+  b4-003-integral-readonly-complement:
+    needs: b4-003-readonly-diagnostic
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    permissions:
+      contents: read
+    env:
+      PROJECT_ID: ays-orbit-360-lab
+      TENANT_HINT: alianzas-soluciones
+      AUDIT_REQUEST: artifacts/orbit360-recovery/release-control/I6_5_B4_003_INTEGRAL_AUDIT_REQUEST_20261016.json
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify typed read-only audit request on canonical authority
+        id: integral
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = "recovery/fase-a-clean-20260831"
+          node tools/gravicentra-governance-preflight-v1.mjs --mode=i6
+          node - <<'NODE'
+          const fs=require('fs'),cp=require('child_process');
+          const p=process.env.AUDIT_REQUEST;
+          const request=JSON.parse(fs.readFileSync(p));
+          const changed=cp.execFileSync('git',['diff-tree','--no-commit-id','--name-only','-r','HEAD'],{encoding:'utf8'}).trim().split('\n');
+          const requested=process.env.GITHUB_EVENT_NAME==='workflow_dispatch'||changed.includes(p);
+          const blob=cp.execFileSync('git',['hash-object','artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json'],{encoding:'utf8'}).trim();
+          if(requested&&(request.controlPlaneBlob!==blob||request.mode!=='READ_ONLY_AUDIT_NO_ACCEPTANCE'||request.dataWrites!==false||request.productWrites!==false||request.deploy!==false))throw Error('INTEGRAL_AUDIT_AUTHORITY_MISMATCH');
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'run='+(requested?'true':'false')+'\n');
+          NODE
+      - name: Prepare existing authorized credential for reads only
+        if: steps.integral.outputs.run == 'true'
+        env:
+          SA_A: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+          SA_B: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+          SA_C: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import os,json,pathlib
+          for name in ['SA_A','SA_B','SA_C']:
+              try: d=json.loads(os.environ.get(name,''))
+              except: continue
+              if d.get('type')=='service_account' and d.get('project_id')=='ays-orbit-360-lab' and d.get('private_key'):
+                  p=pathlib.Path(os.environ['RUNNER_TEMP'])/'gi-integral-readonly-credential.json'
+                  p.write_text(json.dumps(d)); p.chmod(0o600)
+                  with open(os.environ['GITHUB_ENV'],'a') as f: f.write('GOOGLE_APPLICATION_CREDENTIALS='+str(p)+'\n')
+                  break
+          else: raise SystemExit('INTEGRAL_AUDIT_EXISTING_CREDENTIAL_UNAVAILABLE')
+          PY
+          npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund firebase-admin@13.4.0 playwright@1.55.0 >/dev/null
+          npx playwright install --with-deps chromium >/dev/null
+      - name: Read-only integral evidence no product acceptance
+        if: steps.integral.outputs.run == 'true'
+        env:
+          INTEGRAL_AUDIT_OUT: ${{ runner.temp }}/gi-integral-readonly-evidence
+        run: |
+          set -euo pipefail
+          node --check tools/gravicentra-b4-003-integral-readonly-audit.cjs
+          node tools/gravicentra-b4-003-integral-readonly-audit.cjs
+      - name: Preserve evidence including incomplete sections
+        if: always() && steps.integral.outputs.run == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: gravicentra-b4-003-integral-readonly-${{ github.run_id }}
+          path: ${{ runner.temp }}/gi-integral-readonly-evidence
+          if-no-files-found: warn
+          retention-days: 30
+      - name: Remove transient credential
+        if: always()
+        run: rm -f "$RUNNER_TEMP/gi-integral-readonly-credential.json"
