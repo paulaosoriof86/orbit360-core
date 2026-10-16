@@ -1469,6 +1469,8 @@ jobs:
           node tools/gravicentra-b4-003-scoped-bootstrap-reader.test.cjs
           node tools/gravicentra-b4-003-protected-hydration.test.cjs
           node tools/gravicentra-b4-003-ops-leads-role-scopes.test.cjs
+          node tools/gravicentra-b4-003-inicio-role-country-team.test.cjs
+          node tools/gravicentra-b4-003-inicio-personal-recaudo.test.cjs
           node tools/gravicentra-b4-003-scoped-policy-reader.test.cjs
           node tools/gravicentra-b4-003-finance-partial-render.test.cjs
           node --input-type=module - <<'NODE'
