@@ -32,7 +32,7 @@ const roster={
  dashboardList:async()=>[row()],
  dashboardPeek:()=>[row()],
  dashboardGlobalMetas:()=>global?{GT:{recaudo:1000,prima:1200,explicitPrima:true,explicitRecaudo:true}}:{},
- dashboardSelfAdvisorId:()=>ownId
+ dashboardSelfAdvisorId:()=>ownId,dashboardPrimaryCountry:()=>scope==='TODOS'?'GT':scope
 };
 const Orbit={ui,q,pais:scope,route:{key:'inicio'},
  modules:{polizas:{policyMetrics:{isRenewalWithin45Days:()=>false}}},
@@ -65,3 +65,6 @@ assert.match(src,/data-inicio-days-left/, 'MONTH_END_COUNTDOWN_PRESERVED');
 assert.match(src,/Doble clic para cambiar el mensaje/, 'MOTIVATIONAL_INTERACTION_DISCOVERABLE');
 assert.match(src,/message\.addEventListener\('dblclick',advance\)/, 'DOUBLE_CLICK_WIRED');
 assert.match(src,/align-items:start;border-top:3px/, 'CARD_NOT_STRETCHED');
+
+assert.match(src,/data-inicio-primary-country-unresolved/, 'COUNTRY_NOT_GUESSED');
+assert.match(src,/filter\(c=>c===a.primaryCountry/, 'ADVISOR_GOAL_ONLY_PRIMARY_COUNTRY');

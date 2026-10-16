@@ -152,7 +152,7 @@
   "productFileBlobs": {
     ".github/workflows/cotcomp-workflow-s419-source-qa.yml": "1123c1bd7848433ce51c24586e9fedbbbd581dff",
     "docs/ays/GRAVICENTRA_QUOTE_AUTHORITY_CONTRACT_v1_20261003.md": "ad1abea0181c350a0effd819cbff483673eb24dd",
-    "functions/assignable-advisor-roster.js": "830971d3dd6ced951e56784fd95f7eeffbc8f541",
+    "functions/assignable-advisor-roster.js": "a30f24eb3767ed8fd580db79a62c3508c8485720",
     "functions/bootstrap.js": "42fd05b81a02d428e590c36e3feb32be202f4965",
     "functions/cobros-reconciliation-domain.js": "5b27038d1c8380e4d2d0ed044996c1570d8c3767",
     "functions/cotcomp-workflow-owner-patch.test.js": "f09315b416e95415ade2d811c4d7e52baba8904d",
@@ -174,7 +174,7 @@
     "orbit360-platform/core/academia-product-catalog-p0.js": "c4974b8734dbe384d4fe4b53394d015ec24e36da",
     "orbit360-platform/core/access-role-session-owner-v20260728.js": "eee3eb184f1b4d7219d455d6a15b7d579979d7f5",
     "orbit360-platform/core/access-scope.js": "5fd5aabdbe0e7b613ae55161be01aa17b5174769",
-    "orbit360-platform/core/assignable-advisor-roster-client.js": "c04a4b35267e77d4353fa131331d4a7549255edc",
+    "orbit360-platform/core/assignable-advisor-roster-client.js": "40b51c6ded0c2c5dc4341427670dd5d300244853",
     "orbit360-platform/core/auth-password-change-v20260805.js": "873b484d42825db2fa31e0ae90c9ec78598728f4",
     "orbit360-platform/core/auth-product-runtime-p0.js": "5ae27034e76592cd34c2d90dc7962dac3fa0b000",
     "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js": "60ce88178f48ff5d9b5fd01c1e2d92abe642dac1",
@@ -234,7 +234,7 @@
     "orbit360-platform/modules/equipo-credential-admin-v20260805-bridge.js": "7432bc05938469187fdd120a5bc023c53a000ab9",
     "orbit360-platform/modules/equipo-onboarding-v20260804-bridge.js": "1da619d8abd676d31d69a038d4770463ca67fdc5",
     "orbit360-platform/modules/equipo.js": "b0736237ee18ef45abbae1c13f5c94781178344e",
-    "orbit360-platform/modules/inicio.js": "42a8efdc0ff0a3d341376151483b70c8581ddaa1",
+    "orbit360-platform/modules/inicio.js": "72019bd556018da24db1beee4118ccddcf4f6f31",
     "orbit360-platform/modules/issuance-endosos-v1201-bridge.js": "2020152b4b2df1338be4b3ef2a9f121d777e21db",
     "orbit360-platform/modules/leads.js": "4e12e604382f2731a03d29cf00db3c086d77ebc1",
     "orbit360-platform/modules/ops.js": "a4ca3dbb4613d541af411f12fce9773a072b0d41",
@@ -5838,5 +5838,20 @@
     "existingHistoricalNoticesNotAutoMigrated": true,
     "securityHold": true,
     "realWrites": 0
+  },
+  "paulaPrimaryCountryGoals20261016": {
+    "status": "SOURCE_STAGED_PENDING_SCOPE_QA_AND_EXACT_PREVIEW",
+    "files": {
+      "server": "a30f24eb3767ed8fd580db79a62c3508c8485720",
+      "client": "40b51c6ded0c2c5dc4341427670dd5d300244853",
+      "inicio": "72019bd556018da24db1beee4118ccddcf4f6f31"
+    },
+    "tests": {
+      "server": "d5e4c9098b235245ccc49127eaa81b349d6d6ace",
+      "ui": "51629ba6c4478dd389e7efc733d6db912782804b"
+    },
+    "noPermissionChange": true,
+    "roleCountryFailClosed": true,
+    "renewalsPassPreserved": true
   }
 }

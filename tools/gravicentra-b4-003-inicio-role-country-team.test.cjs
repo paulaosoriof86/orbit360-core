@@ -61,3 +61,7 @@ const denied=async fn=>{let error;try{await fn()}catch(e){error=e}
  await denied(()=>call());
  console.log('B4_003_INICIO_ROLE_COUNTRY_TEAM_SERVER_SCOPE_QA_PASS checks='+checks+' synthetic_only_no_writes');
 })().catch(e=>{console.error(e);process.exitCode=1;});
+
+// Primary country is verified; a multination advisor is never assigned an arbitrary first-country target.
+assert.match(source,/primaryCandidate=claimedPrimary\|\|rosterPrimary/,'VERIFIED_PRIMARY_COUNTRY_REQUIRED');
+assert.match(source,/primaryCountry=cc.includes\(primaryCandidate\)/,'PRIMARY_COUNTRY_WITHIN_MEMBERSHIP_COUNTRIES');

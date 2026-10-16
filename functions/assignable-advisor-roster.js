@@ -75,11 +75,18 @@ async function r23Dashboard(request){
  });
  const rows=[],seen=new Set();for(const d of as.docs){const raw=d.data()||{},a=project(d);if(!a.id||!a.nombre||seen.has(a.id))continue;if(scope==='own'&&a.id!==own)continue;if(scope==='team'&&!teamIds.has(a.id)&&(!team||explicitRoleTeam||text(raw.teamId||raw.equipoId,160)!==team))continue;
  const paises=a.paises.filter(c=>(c==='GT'||c==='CO')&&(!cc.length||cc.includes(c))&&(country==='TODOS'||country===c));if(!paises.length)continue;seen.add(a.id);
+ const explicitPrimary=text(raw.paisPrincipal||raw.primaryCountry||raw.paisDefault||raw.countryDefault,8).toUpperCase();
+ const primaryCountry=paises.includes(explicitPrimary)?explicitPrimary:(!explicitPrimary&&paises.length===1?paises[0]:'');
  const metas={};paises.forEach(c=>metas[c]=goals.get(a.id+'|'+c)||{nueva:0,renovada:0,recaudo:0,produccion:0,explicit:false});
- const legacy=Number(raw.metaPrima);rows.push({id:a.id,nombre:a.nombre,activo:a.activo,paises,metas,metaPrima:Number.isFinite(legacy)&&legacy>0&&paises.length===1?legacy:null});
+ const legacy=Number(raw.metaPrima);rows.push({id:a.id,nombre:a.nombre,activo:a.activo,paises,primaryCountry,metas,metaPrima:Number.isFinite(legacy)&&legacy>0&&paises.length===1?legacy:null});
  }rows.sort((a,b)=>a.nombre.localeCompare(b.nombre,'es',{sensitivity:'base'})||a.id.localeCompare(b.id));
  const globalMetas={};for(const [c,g] of globalGoals)globalMetas[c]={prima:g.prima>0?g.prima:g.nueva+g.renovada,recaudo:g.recaudo,explicitPrima:g.explicitPrima,explicitRecaudo:g.explicitRecaudo};
- return{ok:true,schemaVersion:'gravicentra-inicio-r23',country,month,scope,rows,globalMetas,ownAdvisorId:rows.some(r=>r.id===own)?own:''};
+ const ownSource=as.docs.find(d=>d.id===own),ownData=ownSource&&ownSource.data()||{};
+ const claimedPrimary=text(member.paisPrincipal||member.primaryCountry||member.paisDefault||member.countryDefault,8).toUpperCase();
+ const rosterPrimary=text(ownData.paisPrincipal||ownData.primaryCountry||ownData.paisDefault||ownData.countryDefault,8).toUpperCase();
+ const primaryCandidate=claimedPrimary||rosterPrimary||(!claimedPrimary&&!rosterPrimary&&cc.length===1?cc[0]:'');
+ const primaryCountry=cc.includes(primaryCandidate)?primaryCandidate:'';
+ return{ok:true,schemaVersion:'gravicentra-inicio-r23',country,month,scope,rows,globalMetas,primaryCountry,ownAdvisorId:rows.some(r=>r.id===own)?own:''};
 }
 
 exports.orbit360AssignableAdvisorRoster=onCall({region:REGION,cors:true},execute);
