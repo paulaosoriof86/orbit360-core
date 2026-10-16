@@ -1,0 +1,53 @@
+{
+  "schema": "GRAVICENTRA_I65_B4003_INTEGRAL_READONLY_RESULT_V1",
+  "status": "REAL_READBACK_AND_DOCUMENTARY_SCOPE_FROZEN_FUNCTIONAL_HOLD",
+  "date": "2026-10-16",
+  "gate": "I6.5/B4-003",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "productSourceAudited": "4a022cec65c38eb6513a79d4386e61fad06c65d1",
+  "controlPlaneBlobPreserved": "a17ca3527ac927533c7db55b8d344e4cb72a0939",
+  "qaSource": "e6c1b0d6c6f79561f8888b1a9ad577a6836d40a4",
+  "runId": 38971037517,
+  "runConclusion": "success",
+  "artifactId": 12077216951,
+  "artifactSha256": "4e2c8143c84dd00638b206e07beb5006e5d74b27e8e9b1c5be5ef89004d21e51",
+  "priorEvidencePreserved": {"runId":38970051423,"artifactId":12076144596,"artifactSha256":"a82d29b1bc6de2c0418acb26bab507d68c54c8045774e864ec625240173f21f1","uiHarnessIssue":"SDK custom-token sign-in did not trigger product restore; corrected with natural reload, without product change"},
+  "scope": {"moduleAndCapabilityAreas":44,"workTasks":86,"flowGroups":14,"criterionGroups":168,"analyticalFindingFamilies":22,"newSubcases":12,"newIsolatedBehaviorChecks":12,"priorIsolatedBehaviorChecksPreserved":46},
+  "findingReconciliation": {"ledgerEntries":295,"carryEntries":295,"uniqueIdsEach":295,"missingInLedger":[],"missingInCarry":[],"statusMismatch":[],"declaredAttention":166,"declaredCurrentBlocking":117,"declaredB4003Blocking":76,"noDoubleCounting":true,"allCurrentReceiptsAdjudicated":false,"warning":"Labels are preserved; absence of a rootCause or remediation field does not prove absence of a cause in referenced evidence."},
+  "effectiveLive": {"version":"sites/ays-orbit-360-lab/versions/3087fabd2db9b639","releaseTime":"2026-10-07T18:36:28.833Z","certifiedMarkerHttp":404,"restored":false},
+  "effectivePreview": {"markerHttp":200,"buildId":"gi-i65-b4-61e3cd0bbb25-57f234755dc1","sourceSha":"61e3cd0bbb254f14fbaba07af6f304d21f5b3b86","markerCheckDoesNotRehashAllAssets":true},
+  "effectiveRules": {"ruleset":"projects/ays-orbit-360-lab/rulesets/6b03deab-0ff4-4c5d-8e74-550982bafc34","updateTime":"2026-08-19T03:21:12.229188Z","sha256":"105f13e095d021a32d49c9b30400e7b509756f8bb45ea958c7483c7a2316bae3","broadMemberGrant":true,"exactRepoLegacyRules":true,"deployedChange":false,"newAuthenticatedNegativeMatrixExecuted":false},
+  "backendMetadata": {"v2FunctionsObserved":77,"hasNextPage":false,"notSourceDigestAttestation":true,"gen1AndIamNotCovered":true},
+  "operationalReadback": {
+    "existingCollections":18,"documentsInThoseCollections":7259,"allCollectionScansWithinDeclaredLimit":true,"memberships":8,"advisors":7,
+    "counts":{"clientes":443,"polizas":1425,"vehiculos":1144,"recibosEsperados":1958,"carteraPrimas":1396,"cobros":5,"negocios":9,"gestiones":13,"aseguradoras":33,"metas":6,"auditoria":27},
+    "unresolvedParentReferences":{"polizas":{"client":3},"vehiculos":{"client":76,"policy":76},"recibosEsperados":{"client":86,"policy":80},"carteraPrimas":{"client":86,"policy":80},"gestiones":{"client":3,"policy":1}},
+    "warning":"Reference columns overlap. Unresolved reference is not yet classified as real-data corruption, legacy alias, or QA fixture. Do not sum as unique records or delete/reimport.",
+    "goals":{"individual":6,"institutional":0,"periods":["2026-09","2026-10"],"types":["nueva","recaudo","renovada"]}
+  },
+  "userReadback": {
+    "Paula":{"nameMatches":2,"browserIdentityResolvedByCanonicalAdvisorAuthLink":true,"observedRoleLabels":["Dirección","Operativo","Asesor"],"routeRoleObservations":93,"mobileObservations":12,"pageErrors":["PRODUCT_WRITE_COLLECTION_NOT_AUTHORIZED"],"notEveryNominalMembershipCertified":true},
+    "Samuel":{"nameMatches":1,"membershipRoles":["AdminTenant","Operativo","Asesor"],"defaultRole":"AdminTenant","status":"active","countries":["GT","CO"],"severalModuleScopes":"equipo","globalDefaultScope":"todos","hasTeamId":false,"globalAdvisorTeamCount":0,"roleTeams":{},"routeRoleObservations":21,"mobileObservations":12,"specificReassignedLeadNotAdjudicated":true},
+    "Carlos":{"nameMatches":1,"membershipRoles":["Operativo","Asesor"],"status":"active","defaultScope":"propios","severalModuleOverrides":"todos","uiActivation":"NOT_VERIFIED_TIMEOUT","rootCauseOfActivationNotProven":true},
+    "Fernando":{"nameMatches":1,"membershipRoles":["Asesor","Asistente"],"status":"active","countries":["GT"],"defaultScope":"propios","uiActivation":"NOT_VERIFIED_TIMEOUT","rootCauseOfActivationNotProven":true},
+    "freelancerRoleRowsObserved":0
+  },
+  "uiReadOnly": {
+    "routeRoleObservations":114,"uniqueRequestedRoutes":31,"routeNameMatches":114,"mobileObservations":24,"mobileWidths":[390,320],"documentHorizontalOverflowObserved":0,
+    "snapshotErrorsObserved":true,"advisorSwitchHydrationNotConfirmedInObservationWindows":true,
+    "blockedEndpointsByHarness":["orbit360ProvisionTeamAccess","orbit360DocumentDriveStatusPreview"],
+    "warning":"350-500 ms navigation samples are not settled performance measurements or visual acceptance. Empty rows are not evidence of absent data. Blocked read/self-sync endpoints are harness restrictions, not proved product faults.",
+    "controlledWrites":0,"fullCrud":false,"fullNegativeMatrix":false,"fullVisualAcceptance":false,"liveAcceptance":false
+  },
+  "plan": {
+    "path":"artifacts/orbit360-recovery/release-control/I6_5_B4_003_AUDIT_COMPLEMENT_PLAN_FROZEN_20261016.md",
+    "blob":"4d617c53f30ff144d0914b7e1978f376d204796b",
+    "subordinateToExistingMasterPlan":true,"newGate":false,"localIdNamespace":"AUDIT_COMPLEMENT_Cxx.yy_NOT_COMMERCIAL_C01_C13",
+    "requiredSequence":["B4-003","B4-004","B4-005","B4-006","B4-007","I6.6","I6.7","I6.8","I6.9"],
+    "detailedDownloadPlanSha256":"189fa66dbad7dca559970649a877be378bcdd8e4d327d29c4ab520e7fadc11ec"
+  },
+  "progress": {"formalI6Percent":50,"formallyFrozenMiniGates":5,"totalMiniGates":10,"newProductFixesCertified":0,"formalPointsAdded":0,"integrationPercent":"NOT_DETERMINED_UNTIL_CURRENT_EVIDENCE_BASELINE_ADJUDICATED","conditionalMilestones":{"I6.5":60,"I6.6":70,"I6.7":80,"I6.8":90,"I6.9":100},"remainingDuration":"NOT_ESTIMATED_WITH_EVIDENCE"},
+  "remaining": ["specific Carlos/Fernando activation discriminants", "settled collection hydration and exact error mapping", "same-record two-UID reassignment, return, reply and approval", "controlled writes, reload, collision/retry and audit", "full SDK/API/Drive negative tests", "all shared publishers, IAM and backend source attestation", "contractual graph including Endosos/Certificados/Anexos/knowledge/CotComp", "visual, keyboard, responsive and instrumented performance", "source-adjudicated residual data and exact authorized cleanup", "same-artifact LIVE matrix and rollback"],
+  "boundaries": {"productSourceChanged":false,"controlPlaneChanged":false,"operationalWrites":0,"dataReimport":false,"rulesDeployment":false,"hostingDeployment":false,"livePromotion":false,"findingsClosedByThisReceipt":0,"functionalAuditComplete":false,"documentaryFreezeOnly":true}
+}
