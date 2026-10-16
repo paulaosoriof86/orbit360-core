@@ -1,0 +1,13 @@
+--- a/functions/product-operational-domain.js
++++ b/functions/product-operational-domain.js
+@@ -311,6 +311,10 @@
+       const before = snap.exists ? snap.data() : null;
+       if (mutation.action === 'insert' && before) throw new HttpsError('already-exists', `${mutation.collection}/${mutation.id} ya existe.`);
+       if ((mutation.action === 'update' || mutation.action === 'remove') && !before) throw new HttpsError('not-found', `${mutation.collection}/${mutation.id} no existe.`);
++      // Validate the server-read before image before considering any client payload.
++      // Changing owner or country must never manufacture access to a foreign record.
++      if(before&&!withinScope(actor,mutation.collection,COLLECTION_MODULE[mutation.collection],before))
++        throw new HttpsError('permission-denied','El alcance activo no autoriza modificar el registro anterior.');
+       const scopeRow=Object.assign({},before||{},mutation.payload||{},{id:mutation.id,tenantId});
+       if(!withinScope(actor,mutation.collection,COLLECTION_MODULE[mutation.collection],scopeRow))throw new HttpsError('permission-denied',`El alcance activo no autoriza ${mutation.collection}/${mutation.id}.`);
+       if (mutation.action === 'remove') {
