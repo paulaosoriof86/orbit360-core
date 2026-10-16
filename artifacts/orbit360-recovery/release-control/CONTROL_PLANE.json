@@ -11688,7 +11688,7 @@
     "noLive": true
   },
   "paulaActiveRoleExactPreview20261016": {
-    "status": "EXACT_PREVIEW_REQUESTED_AFTER_SOURCE_CHANGE",
+    "status": "HOSTING_AUTHENTICATED_READONLY_PASS_B4_003_STILL_HOLD",
     "sourceHead": "8a3bbc04459d9eeef869815ee66112ab2a938d0b",
     "previousPreviewRunId": 38918446879,
     "previousArtifactImmutable": true,
@@ -11697,5 +11697,43 @@
     "operationalWrites": 0,
     "livePromotion": false,
     "renewalsVisualPassPreserved": true
+  },
+  "paulaOct16LatestCertifiedReadOnlyPreview": {
+    "status": "EXACT_HOSTING_AND_AUTHENTICATED_READONLY_PASS_FUNCTIONAL_B4_003_HOLD",
+    "runId": 38919563648,
+    "artifactId": 12053009697,
+    "artifactName": "gravicentra-b4-003-scoped-preview-38919563648",
+    "sourceHead": "61e3cd0bbb254f14fbaba07af6f304d21f5b3b86",
+    "buildId": "gi-i65-b4-61e3cd0bbb25-57f234755dc1",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-38919563648-vq5xdc3r.web.app",
+    "hostedPayloadDigest": "0386ec76c0512c5ec4af68934b1162cc4d81d916385d34c3112e5dbb6372233d",
+    "backendSourceDigest": "a7895e35f7a67e35ec0ec5fe1e5a93d306111d760b6f9c161a841a290723d513",
+    "bundleDigest": "1e2eef3b1d7f78044917b3341b64208576ee9db7759ac72c06c548a37eb3fb8f",
+    "authenticatedRolesChecked": [
+      "Direccion_GT",
+      "Operativo_GT",
+      "Asesor_GT"
+    ],
+    "authenticatedReadOnlyPass": true,
+    "publicSmokePass": true,
+    "exactHostingReadback": true,
+    "tests": [
+      "INICIO_ROLE_COUNTRY_TEAM_SERVER_SCOPE_QA_PASS",
+      "INICIO_PERSONAL_RECAUDO_UI_QA_PASS",
+      "OPS_LEADS_ROLE_SCOPE_SOURCE_QA_PASS",
+      "COLLABORATION_LATEST_TURN_AND_NOTIFICATION_ID_QA_PASS"
+    ],
+    "noRealWrites": true,
+    "sharedFirestoreRulesChanged": false,
+    "livePromotion": false,
+    "remaining": [
+      "actual operative KPI month financial readback",
+      "management bidirectional collaboration and Drive attachments",
+      "prior notices role and actor mapping",
+      "real two-UID reassignment persistence",
+      "full controlled writes and reload",
+      "Paula targeted visual UAT",
+      "security P0"
+    ]
   }
 }
