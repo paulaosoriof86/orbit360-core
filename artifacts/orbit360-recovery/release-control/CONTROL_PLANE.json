@@ -11686,5 +11686,16 @@
     "sourceChangeRequiresNewBuild": true,
     "noDataWrites": true,
     "noLive": true
+  },
+  "paulaActiveRoleExactPreview20261016": {
+    "status": "EXACT_PREVIEW_REQUESTED_AFTER_SOURCE_CHANGE",
+    "sourceHead": "8a3bbc04459d9eeef869815ee66112ab2a938d0b",
+    "previousPreviewRunId": 38918446879,
+    "previousArtifactImmutable": true,
+    "newArtifactRequired": true,
+    "securityHold": true,
+    "operationalWrites": 0,
+    "livePromotion": false,
+    "renewalsVisualPassPreserved": true
   }
 }
