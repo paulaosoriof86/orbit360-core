@@ -11659,5 +11659,22 @@
     "realBusinessWrites": 0,
     "sharedRulesUnchanged": true,
     "live": false
+  },
+  "paulaOct16TargetedPreviewDispatch": {
+    "status": "EXACT_CUMULATIVE_SCOPED_PREVIEW_REQUESTED",
+    "sourceHead": "ee3eae4ce1b9a503cf0e2a1f2729021a6cbff520",
+    "compositionBlobSha": "0bf4229f6810753bfff50852a6393ae0a2ec24cd",
+    "requestedScopes": [
+      "inicio_countdown_compact",
+      "primary_country_goals",
+      "ops_leads_directional_notifications"
+    ],
+    "existingGate": "I6.5/B4-003",
+    "syntheticWritesAuthorized": false,
+    "realBusinessWritesAuthorized": false,
+    "sharedRulesDeploymentAuthorized": false,
+    "livePromotionAuthorized": false,
+    "renewalVisualPassPreserved": true,
+    "fullB4003Acceptance": false
   }
 }
