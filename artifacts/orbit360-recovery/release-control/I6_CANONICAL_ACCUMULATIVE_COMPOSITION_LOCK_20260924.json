@@ -165,7 +165,7 @@
     "functions/payment-inference-engine.js": "16bf21177364fbb94f39fab5b8e8ec8506bbd071",
     "functions/product-insurer-credentials.js": "04e681fdba71ee8438429dda11ae50edf9a40c8e",
     "functions/product-operational-domain.js": "61bbd6d4bc9e687fa698c129e4ffd4fb4fb085b7",
-    "functions/product-ops-leads-domain.js": "be849f28c7c4c810098ca13f2813509c57f791bc",
+    "functions/product-ops-leads-domain.js": "7156b5ff6d6dbf7ec9460b1be6c4efae0bc3ac5c",
     "functions/tenant-branding.js": "d3c3dcd191951f91a40eb17b7cc560dc535a2a3c",
     "functions/tenant-domain-config.js": "c9f2bd7234252ee7281e5aca2b20601fcf8d77e3",
     "functions/user-onboarding.js": "6512d49e4a01c4257e578652b0728f688cd063d1",
@@ -180,7 +180,7 @@
     "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js": "60ce88178f48ff5d9b5fd01c1e2d92abe642dac1",
     "orbit360-platform/core/backend-product-readonly-bootstrap-p0.js": "8cc5ce156ee63eb212ba66667846305870f1befd",
     "orbit360-platform/core/backend-resource-contracts.js": "826364d2a394d0bfe75d9f0ccdc5dd8905d2b3f0",
-    "orbit360-platform/core/ciclo.js": "3377c627ee53e3449f4ee382a570ea72335a0ada",
+    "orbit360-platform/core/ciclo.js": "39d6df83780e65d68dd10a6a5abf6bdea214d767",
     "orbit360-platform/core/client-insurer-visual-contract-v20260720.js": "3fd89167a5a36662072dbdc3e970b48f61158343",
     "orbit360-platform/core/cobros-reconciliation-domain-client.js": "7f00ced68ad64dd1ff4b9c0eff85f1f959dc6d68",
     "orbit360-platform/core/comisiones-eng.js": "f1aa5dfc3b8191944023b581abdcff27adf0dba3",
@@ -5828,5 +5828,15 @@
     "oldHistoricalBusinessFormulasExcluded": true,
     "unchangedPermissions": true,
     "renewalsVisualPassPreserved": true
+  },
+  "paulaOpsLeadsHandoffSource20261016": {
+    "status": "SOURCE_STAGED_PENDING_EXACT_PREVIEW_TWO_UID_QA",
+    "serverBlob": "7156b5ff6d6dbf7ec9460b1be6c4efae0bc3ac5c",
+    "clientBlob": "39d6df83780e65d68dd10a6a5abf6bdea214d767",
+    "qaBlob": "60fe6f71dbf0497a443365e95b1173d765a23a20",
+    "notificationEventDeduplicated": true,
+    "existingHistoricalNoticesNotAutoMigrated": true,
+    "securityHold": true,
+    "realWrites": 0
   }
 }

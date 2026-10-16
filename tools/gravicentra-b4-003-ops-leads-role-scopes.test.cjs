@@ -9,3 +9,13 @@ m.dataScopes.modules.ops='ninguno';eq(ops.scope(m,'ops','operativo'),'none');m.d
 const inbox=grab('functions/ops-advisor-inbox.js','function scopeOf(member,domain,activeRole) {','function teamAdvisorIds(member,activeRole) {','scopeOf',{advisorIdOf:x=>text(x?.advisorId),rolesOf:x=>x.roles.map(norm)});eq(inbox.scopeOf(m,'ops','asesor'),'own');eq(inbox.scopeOf(m,'ops','operativo'),'all');m.dataScopes.modules.ops='ninguno';eq(inbox.scopeOf(m,'ops','operativo'),'none');
 const team=grab('functions/ops-advisor-inbox.js','function teamAdvisorIds(member,activeRole) {','async function authorize(','teamAdvisorIds',{advisorIdOf:x=>text(x?.advisorId)});eq(team.teamAdvisorIds(m,'Operativo').includes('a3'),true);eq(team.teamAdvisorIds(m,'Operativo').includes('a2'),false);
 console.log('B4_003_OPS_LEADS_ROLE_SCOPE_SOURCE_QA_PASS checks='+n+' mock_only_no_writes');
+
+const srcFs=require('node:fs');
+const domain=srcFs.readFileSync('functions/product-ops-leads-domain.js','utf8');
+assert.match(domain,/collabDirection=entityType==='negocios'\?collaborationWriteDirection\(before,after\):''/,'NO_STALE_COLLABORATION_DIRECTION_ON_UNRELATED_SAVE');
+assert.match(domain,/eventId:collabDirection&&collab&&collab.eventId\?text\(collab.eventId,180\):eventId/,'SAME_CANONICAL_EVENT_INBOX_AND_COMMENT');
+const cyc=grab('orbit360-platform/core/ciclo.js','function collaborationState(n,board){','function actionQueueRanks(board){','collaborationState',{Orbit:{sharedInboxState:{lookup:()=>({known:true,globalResolved:false})}}});
+const thread=[{direction:'operations',eventId:'operations-request'},{direction:'advisor',eventId:'advisor-return'}];
+assert.equal(cyc.collaborationState({comentarios:thread},'ops').needsAction,false,'OLD_OPERATIONS_TURN_NOT_CURRENT');
+assert.equal(cyc.collaborationState({comentarios:thread},'leads').needsAction,true,'LATEST_ADVISOR_TURN_CURRENT');
+console.log('B4_003_COLLABORATION_LATEST_TURN_AND_NOTIFICATION_ID_QA_PASS checks=4');

@@ -293,7 +293,8 @@ Orbit.ciclo = (function () {
   function collaborationState(n,board){
     const comments=[].concat(n&&n.comentarios||[]),last=comments.length?comments[comments.length-1]:null,direction=last&&last.direction||'';
     const needed=board==='ops'?'operations':board==='leads'?'advisor':'';
-    const directed=needed?comments.filter(c=>c&&c.direction===needed):[];
+    const latestOther=comments.reduce((i,c,j)=>c&&c.direction&&c.direction!==needed?j:i,-1);
+    const directed=needed?comments.filter((c,i)=>i>latestOther&&c&&c.direction===needed):[];
     const lookup=Orbit.sharedInboxState&&Orbit.sharedInboxState.lookup;
     const states=directed.map(c=>{
       const id=String(c.eventId||'').trim();
