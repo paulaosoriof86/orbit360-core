@@ -180,7 +180,7 @@
     "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js": "60ce88178f48ff5d9b5fd01c1e2d92abe642dac1",
     "orbit360-platform/core/backend-product-readonly-bootstrap-p0.js": "8cc5ce156ee63eb212ba66667846305870f1befd",
     "orbit360-platform/core/backend-resource-contracts.js": "826364d2a394d0bfe75d9f0ccdc5dd8905d2b3f0",
-    "orbit360-platform/core/ciclo.js": "39d6df83780e65d68dd10a6a5abf6bdea214d767",
+    "orbit360-platform/core/ciclo.js": "dc1e77c900edf6eb366bf836f19ecb0ebd17a541",
     "orbit360-platform/core/client-insurer-visual-contract-v20260720.js": "3fd89167a5a36662072dbdc3e970b48f61158343",
     "orbit360-platform/core/cobros-reconciliation-domain-client.js": "7f00ced68ad64dd1ff4b9c0eff85f1f959dc6d68",
     "orbit360-platform/core/comisiones-eng.js": "f1aa5dfc3b8191944023b581abdcff27adf0dba3",
@@ -5853,5 +5853,13 @@
     "noPermissionChange": true,
     "roleCountryFailClosed": true,
     "renewalsPassPreserved": true
+  },
+  "paulaOpsLeadsActiveRoleScope20261016": {
+    "status": "SOURCE_FIXED_QA_EXACT_PREVIEW_PENDING",
+    "sourceBlobSha": "dc1e77c900edf6eb366bf836f19ecb0ebd17a541",
+    "qaBlobSha": "8b429cb0dfb33852cdb5089fcc8f2fdf7aa006e0",
+    "readModelOnly": true,
+    "serverRoleAuthorityUnchanged": true,
+    "securityHold": true
   }
 }

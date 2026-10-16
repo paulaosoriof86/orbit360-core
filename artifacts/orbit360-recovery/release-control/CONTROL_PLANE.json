@@ -5996,7 +5996,7 @@
   "canonicalAccumulationControl": {
     "status": "FROZEN_ACTIVE",
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "compositionLockBlobSha": "0bf4229f6810753bfff50852a6393ae0a2ec24cd",
+    "compositionLockBlobSha": "ca7b9f82b87e124ae29d1244db1b683bdf0988ea",
     "findingLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
     "findingLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
@@ -6313,7 +6313,7 @@
     "activeFindingId": "B4-003",
     "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
     "executionLockBlobSha": "a2ce9c93d0182b5fbb8bd256f51de6c725d06939",
-    "compositionLockBlobSha": "0bf4229f6810753bfff50852a6393ae0a2ec24cd",
+    "compositionLockBlobSha": "ca7b9f82b87e124ae29d1244db1b683bdf0988ea",
     "findingLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
     "noLive": true,
     "noReimport": true,
@@ -11676,5 +11676,15 @@
     "livePromotionAuthorized": false,
     "renewalVisualPassPreserved": true,
     "fullB4003Acceptance": false
+  },
+  "paulaOpsLeadsActiveRoleScope20261016": {
+    "status": "SOURCE_STAGED_NEXT_EXACT_PREVIEW",
+    "sourceBlobSha": "dc1e77c900edf6eb366bf836f19ecb0ebd17a541",
+    "qaBlobSha": "8b429cb0dfb33852cdb5089fcc8f2fdf7aa006e0",
+    "compositionBlobSha": "ca7b9f82b87e124ae29d1244db1b683bdf0988ea",
+    "priorPreviewRun": 38918446879,
+    "sourceChangeRequiresNewBuild": true,
+    "noDataWrites": true,
+    "noLive": true
   }
 }

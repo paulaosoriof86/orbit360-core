@@ -119,9 +119,16 @@ Orbit.ciclo = (function () {
   function advisorIdentity(){try{return Orbit.session&&Orbit.session.asesorId?String(Orbit.session.asesorId()||'').trim():'';}catch(e){return'';}}
   function normalizedScope(value){value=String(value==null?'':value).trim().toLowerCase();if(['own','propios','propio'].includes(value))return'own';if(['team','equipo'].includes(value))return'team';if(['none','ninguno'].includes(value))return'none';if(['all','todos'].includes(value))return'all';return'';}
   function surfaceScope(surface){
+    // The configured ACTIVE ROLE owns the scope, not the mere presence of an
+    // advisor identity. Multirol Operativo must not be silently forced to own.
+    const policy=Orbit.access&&typeof Orbit.access.dataScope==='function'?Orbit.access:null;
+    if(policy){const value=normalizedScope(policy.dataScope(surface));return value||'none';}
+    // Absent the effective access owner, never infer tenant-wide visibility.
     const p=membershipProjection(),scopes=p&&p.dataScopes||{},own=advisorIdentity();
-    if(surface==='leads')return own?'own':(normalizedScope(scopes.leads||scopes.commercial||scopes.default)||'all');
-    return normalizedScope(scopes.ops||scopes.workflow||scopes.gestiones||scopes.default)||(own?'own':'all');
+    const role=String(Orbit.session?.rol?.()||'').toLowerCase();
+    if(/asesor|comercial/.test(role))return own?'own':'none';
+    return normalizedScope(surface==='leads'?(scopes.leads||scopes.commercial||scopes.default):
+      (scopes.ops||scopes.workflow||scopes.gestiones||scopes.default))||'none';
   }
   function scopeAllows(asesorId,surface){
     const scope=surfaceScope(surface),own=advisorIdentity(),target=String(asesorId||'').trim();

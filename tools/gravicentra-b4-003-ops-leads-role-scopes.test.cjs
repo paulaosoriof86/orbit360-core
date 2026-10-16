@@ -19,3 +19,8 @@ const thread=[{direction:'operations',eventId:'operations-request'},{direction:'
 assert.equal(cyc.collaborationState({comentarios:thread},'ops').needsAction,false,'OLD_OPERATIONS_TURN_NOT_CURRENT');
 assert.equal(cyc.collaborationState({comentarios:thread},'leads').needsAction,true,'LATEST_ADVISOR_TURN_CURRENT');
 console.log('B4_003_COLLABORATION_LATEST_TURN_AND_NOTIFICATION_ID_QA_PASS checks=4');
+
+const sourceCycle=require('node:fs').readFileSync('orbit360-platform/core/ciclo.js','utf8');
+assert.match(sourceCycle,/policy\.dataScope\(surface\)/,'ROLE_EFFECTIVE_DATA_SCOPE_AUTHORITY');
+assert.match(sourceCycle,/return value\|\|'none'/,'NO_SCOPE_WIDENING_ON_UNKNOWN_ROLE');
+assert.doesNotMatch(sourceCycle,/surface==='leads'\)return own\?'own'/,'MULTIROL_LEADS_NOT_FORCED_TO_ADVISOR');
