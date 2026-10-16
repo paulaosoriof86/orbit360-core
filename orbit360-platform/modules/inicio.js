@@ -9,6 +9,12 @@ Orbit.modules = Orbit.modules || {};
 Orbit.modules.inicio = (function () {
   const U = Orbit.ui, q = Orbit.q;
   const rosterRequested = new Set(), rosterFailures = new Set();
+  let motivationIndex=-1;
+  const leadershipMessages=[
+    'Liderar es actuar con información clara, prioridades y seguimiento oportuno.',
+    'Cada compromiso atendido fortalece la confianza de nuestros clientes.',
+    'Los resultados sostenibles empiezan con decisiones responsables hoy.'
+  ];
   function secureDashboardRosterRole() {
     try {
       const role=String(Orbit.session&&Orbit.session.rol?Orbit.session.rol():'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'_');
@@ -191,9 +197,9 @@ Orbit.modules.inicio = (function () {
             +'<small style="font-size:10px;color:var(--ink-2)">'+(hasMine?'Meta individual: '+U.esc(U.moneyShort(mine,cur))+' · '+personalPct+'%':'Meta individual por configurar')+'</small></div>'
           :'';
         const extra=!hasGlobal&&!hasOwnIdentity?'Meta institucional pendiente de configuración':'';
-        return '<div data-inicio-country="'+country+'" data-goal-source="'+source+'" style="min-width:155px;flex:1 1 155px;max-width:255px;border:1px solid var(--line);border-top:4px solid var(--red);border-radius:16px;background:var(--card);padding:14px 10px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;text-align:center;box-shadow:0 6px 16px rgba(15,23,42,.07)">'
+        return '<div data-inicio-country="'+country+'" data-goal-source="'+source+'" style="min-width:145px;flex:1 1 145px;max-width:205px;border:1px solid var(--line);border-top:4px solid var(--red);border-radius:16px;background:var(--card);padding:14px 10px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;text-align:center;box-shadow:0 6px 16px rgba(15,23,42,.07)">'
           +'<b style="color:var(--ink);font-size:12px">'+country+' · '+cur+'</b>'
-          +'<div style="width:136px;height:136px;padding:13px;box-sizing:border-box;border-radius:50%;--gi-inicio-sweep:'+deg+'deg;background:conic-gradient(from 225deg,var(--red) 0deg,var(--red) '+deg+'deg,#dfe2e7 '+deg+'deg,#dfe2e7 270deg,transparent 270deg 360deg)">'
+          +'<div style="width:116px;height:116px;padding:12px;box-sizing:border-box;border-radius:50%;--gi-inicio-sweep:'+deg+'deg;background:conic-gradient(from 225deg,var(--red) 0deg,var(--red) '+deg+'deg,#dfe2e7 '+deg+'deg,#dfe2e7 270deg,transparent 270deg 360deg)">'
           +'<div style="height:100%;width:100%;border-radius:50%;background:var(--card);display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--ink)"><strong style="font-size:26px">'+(pct==null?'—':pct+'%')+'</strong><small style="font-size:9px;color:var(--ink-3)">'+(personal?'MI AVANCE':'AVANCE')+'</small></div></div>'
           +'<strong style="font-size:18px;color:var(--ink)">'+U.esc(U.moneyShort(val,cur))+'</strong>'
           +'<small style="min-height:28px;font-size:10.5px;line-height:1.4;color:var(--ink-2)">'+U.esc(desc)+'</small>'
@@ -226,8 +232,8 @@ Orbit.modules.inicio = (function () {
           : greeting+'. Acompaña el avance de tu equipo: producción, renovaciones y recaudo en '+validCountry+', con sus detalles.';
     host.innerHTML=`<div class="page" data-inicio-reality-ready="1">
       ${Orbit.kit.banner({icon:'🌅',title:'Inicio',sub:'Visión general y prioridades',features:['Metas verificadas','Cartera y cobros','Seguimientos'],actions:`<button class="btn primary" onclick="location.hash='#/cliente360'">Abrir Cliente 360 →</button>`})}
-      <div class="card" data-inicio-premium="20261011" style="margin-top:18px;padding:18px 20px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:16px;align-items:stretch;border-top:3px solid var(--red)">
-        <div style="min-width:0"><div style="font-family:var(--f-mono);font-size:11px;letter-spacing:.18em;color:var(--ink-3);text-transform:uppercase">Metas del mes · ${U.monthLabel()}</div><div style="font-family:var(--f-display);font-weight:800;font-size:22px;margin-top:6px;color:var(--ink)">Avance real del mes</div><div data-inicio-context-message="1" style="color:var(--ink-2);font-size:13.5px;margin-top:6px;line-height:1.5">${U.esc(bannerNote)}</div><div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap"><span class="badge neutral" data-inicio-count="clientes" data-readiness="${clientReadiness}">${readinessCount(clientReadiness,clientes.length+' clientes','Actualizando clientes')}</span><span class="badge neutral" data-inicio-count="polizas" data-readiness="${policyReadiness}">${readinessCount(policyReadiness,polizas.length+' pólizas','Actualizando pólizas')}</span><span class="badge ${portfolioReadiness==='ready'?'danger':'neutral'}" data-inicio-count="cartera-vencida" data-readiness="${portfolioReadiness}">${readinessCount(portfolioReadiness,venc.length+' registros vencidos en cartera','Actualizando cartera')}</span></div></div>
+      <div class="card" data-inicio-premium="20261011" style="margin-top:18px;padding:18px 20px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:12px;align-items:start;border-top:3px solid var(--red)">
+        <div style="min-width:0"><div style="font-family:var(--f-mono);font-size:11px;letter-spacing:.18em;color:var(--ink-3);text-transform:uppercase">Metas del mes · ${U.monthLabel()}</div><div style="font-family:var(--f-display);font-weight:800;font-size:22px;margin-top:6px;color:var(--ink)">Avance real del mes</div><div data-inicio-days-left="${diasMes}" style="margin-top:5px;font-weight:700;font-size:12.5px;color:var(--ink)">${diasMes===0?'Hoy termina el mes':'Faltan '+diasMes+' días para cerrar el mes'}</div><div data-inicio-context-message="1" role="button" tabindex="0" title="Doble clic o Enter para ver otra frase" style="color:var(--ink-2);font-size:13px;margin-top:6px;line-height:1.4;cursor:pointer">${U.esc(motivationIndex<0?bannerNote:leadershipMessages[motivationIndex])}</div><small style="color:var(--ink-3);font-size:10px">Doble clic para cambiar el mensaje</small><div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap"><span class="badge neutral" data-inicio-count="clientes" data-readiness="${clientReadiness}">${readinessCount(clientReadiness,clientes.length+' clientes','Actualizando clientes')}</span><span class="badge neutral" data-inicio-count="polizas" data-readiness="${policyReadiness}">${readinessCount(policyReadiness,polizas.length+' pólizas','Actualizando pólizas')}</span><span class="badge ${portfolioReadiness==='ready'?'danger':'neutral'}" data-inicio-count="cartera-vencida" data-readiness="${portfolioReadiness}">${readinessCount(portfolioReadiness,venc.length+' registros vencidos en cartera','Actualizando cartera')}</span></div></div>
         ${productionReadiness==='ready'?splitCountrySummary('production','Producción neta del mes',production):pendingDial('Producción neta del mes',productionReadiness)}
         ${paymentReadiness==='ready'?splitCountrySummary('recaudo','Recaudo confirmado del mes',recaudoMes):pendingDial('Recaudo confirmado del mes',paymentReadiness)}
       </div>
@@ -245,6 +251,12 @@ Orbit.modules.inicio = (function () {
       </div>
       ${seguimientosHoy()}
     </div>`;
+    const message=typeof host.querySelector==='function'?host.querySelector('[data-inicio-context-message]'):null;
+    if(message){
+      const advance=()=>{motivationIndex=(motivationIndex+1)%leadershipMessages.length;message.textContent=leadershipMessages[motivationIndex];};
+      message.addEventListener('dblclick',advance);
+      message.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();advance();}});
+    }
   }
 
   /* Seguimientos pendientes (sin automatizar) → gestionar por WhatsApp Web / correo */

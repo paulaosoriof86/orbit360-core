@@ -234,7 +234,7 @@
     "orbit360-platform/modules/equipo-credential-admin-v20260805-bridge.js": "7432bc05938469187fdd120a5bc023c53a000ab9",
     "orbit360-platform/modules/equipo-onboarding-v20260804-bridge.js": "1da619d8abd676d31d69a038d4770463ca67fdc5",
     "orbit360-platform/modules/equipo.js": "b0736237ee18ef45abbae1c13f5c94781178344e",
-    "orbit360-platform/modules/inicio.js": "ac18016edccac7c0f54b29defbc2e1e8d1a388d1",
+    "orbit360-platform/modules/inicio.js": "42a8efdc0ff0a3d341376151483b70c8581ddaa1",
     "orbit360-platform/modules/issuance-endosos-v1201-bridge.js": "2020152b4b2df1338be4b3ef2a9f121d777e21db",
     "orbit360-platform/modules/leads.js": "4e12e604382f2731a03d29cf00db3c086d77ebc1",
     "orbit360-platform/modules/ops.js": "a4ca3dbb4613d541af411f12fce9773a072b0d41",
@@ -5818,5 +5818,15 @@
     "existingPreviewUnchanged": true,
     "livePromotion": false,
     "securityHold": true
+  },
+  "paulaInicioRestoration20261016": {
+    "status": "SOURCE_CHANGED_TEST_AND_EXACT_PREVIEW_PENDING",
+    "sourceOwner": "orbit360-platform/modules/inicio.js",
+    "sourceBlobSha": "42a8efdc0ff0a3d341376151483b70c8581ddaa1",
+    "qaOwner": "tools/gravicentra-b4-003-inicio-personal-recaudo.test.cjs",
+    "qaBlobSha": "0a55b011b78dfc1d72ec69c9dd1021a1129ca24b",
+    "oldHistoricalBusinessFormulasExcluded": true,
+    "unchangedPermissions": true,
+    "renewalsVisualPassPreserved": true
   }
 }

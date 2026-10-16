@@ -61,3 +61,7 @@ assert.match(html,/Meta individual por configurar/);checks++;
 ownId='';html=render();
 assert.doesNotMatch(html,/data-inicio-own-contribution=/);checks++;
 console.log('B4_003_INICIO_PERSONAL_RECAUDO_UI_QA_PASS checks='+checks+' mock_only no_real_writes');
+assert.match(src,/data-inicio-days-left/, 'MONTH_END_COUNTDOWN_PRESERVED');
+assert.match(src,/Doble clic para cambiar el mensaje/, 'MOTIVATIONAL_INTERACTION_DISCOVERABLE');
+assert.match(src,/message\.addEventListener\('dblclick',advance\)/, 'DOUBLE_CLICK_WIRED');
+assert.match(src,/align-items:start;border-top:3px/, 'CARD_NOT_STRETCHED');
