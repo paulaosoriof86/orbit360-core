@@ -365,6 +365,9 @@ jobs:
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'renewals_preview='+(renewalsPreview?'true':'false')+'\n');
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'run='+(previewOk?'true':'false')+'\n');
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'scoped_preview='+(scopedPreview?'true':'false')+'\n');
+          // No custom Firebase Auth tokens for real users without explicit scoped approval.
+          const identityProofAllowed=scopedPreview&&c.b4003ProtectedPreviewAuthorization?.realUserImpersonationAuthorized===true;
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'authenticated_identity_proof='+(identityProofAllowed?'true':'false')+'\n');
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'apply='+(applyOk?'true':'false')+'\n');
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'r20_dryrun='+(r20DryRun?'true':'false')+'\n');
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'r20_apply='+(r20Apply?'true':'false')+'\n');
@@ -1495,8 +1498,14 @@ jobs:
           NODE
 
 
+      - name: Record authenticated readback HOLD without real-user token issuance
+        if: steps.gate.outputs.scoped_preview == 'true' && steps.gate.outputs.authenticated_identity_proof != 'true'
+        run: |
+          printf '{"schema":"B4_003_AUTHENTICATED_READONLY_V1","status":"PENDING_REAL_USER_IDENTITY_AUTHORIZATION","writes":0,"rulesDeploy":false,"livePromotion":false,"realUserTokensIssued":0,"authenticatedEvidenceAccepted":false}\n' > "$RUNNER_TEMP/b4-003-authenticated-readonly.json"
+          echo 'B4_003_AUTHENTICATED_READONLY=PENDING_REAL_USER_IDENTITY_AUTHORIZATION_NOT_A_SECURITY_PASS'
+
       - name: Authenticated scoped role-country readback
-        if: steps.gate.outputs.scoped_preview == 'true'
+        if: steps.gate.outputs.scoped_preview == 'true' && steps.gate.outputs.authenticated_identity_proof == 'true'
         env:
           B4_PREVIEW_URL: ${{ steps.preview.outputs.preview_url }}
         run: |
