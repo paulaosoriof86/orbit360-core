@@ -1,0 +1,83 @@
+{
+  "schema": "GRAVICENTRA_I65_B4003_P0_CUMULATIVE_READONLY_FREEZE_V1",
+  "gate": "I6.5/B4-003",
+  "date": "2026-10-17",
+  "status": "READONLY_SOURCE_INVENTORY_COMPLETE_P0_ALL_OPEN",
+  "sourceHead": "4abe5f59cc3613cd7b7b572ddb601a013c3d8dab",
+  "targetCertifiedPreview": {
+    "sourceSha": "591d6655090342e1c9c3137eb8cdf88f292a3aa1",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-38309446443-1io2otyg.web.app"
+  },
+  "execution": {
+    "workflow": "Gravicentra B4-003 R20 Exact Preview",
+    "runId": 39048410909,
+    "conclusion": "success",
+    "artifactId": 12106721934,
+    "artifactName": "gravicentra-b4-003-p0-cumulative-readonly-39048410909",
+    "artifactDigest": "sha256:a822ec03ae22f44c8ec316e2182bf14da2f23e41b4751e3397887f56220154f9",
+    "realBusinessWrites": 0,
+    "syntheticWrites": 0,
+    "dataMutation": false,
+    "productMutation": false,
+    "productionChanges": 0,
+    "reimport": false
+  },
+  "inventory": {
+    "findingsLedger": 295,
+    "carryForward": 295,
+    "attention": 166,
+    "advisorRows": 7,
+    "metaRows": 6,
+    "institutionalGlobalGoals": 0,
+    "legacyQaFixturesPresent": 14,
+    "orphanRenewalDependentRows": 12,
+    "p0ClosureCount": 0
+  },
+  "sourceCausalAudit": {
+    "status": "SOURCE_MECHANISMS_DEMONSTRATED_RUNTIME_FIX_NOT_AUTHORIZED_BY_CURRENT_LOCK",
+    "observed": [
+      {
+        "path": "orbit360-platform/core/access-role-session-owner-v20260728.js",
+        "blobSha": "c5b1e1b98dc5e69a5cab7ffde5cc4f52dd744d91",
+        "mechanism": "PRODUCT_ROLE_CHANGE_EMITS_ORBIT_SESSION_BEFORE_ORBIT_ACTIVE_ROLE_CHANGED",
+        "impact": "Router/session rerender may occur before protected store invalidates previous-role cache."
+      },
+      {
+        "path": "orbit360-platform/data/store-firestore-product-readonly-p0.js",
+        "blobSha": "75d7745603686da0607a48fc4c1adcbefc37494f",
+        "mechanism": "ROLE_CHANGED_CLEARS_CACHE_THEN_REATTACHES_EVERY_PREVIOUSLY_ATTACHED_COLLECTION_IMMEDIATELY",
+        "impact": "Role switch fans out protected reads instead of prioritizing current-route hydration."
+      },
+      {
+        "path": "orbit360-platform/core/product-app-p0.js",
+        "blobSha": "b3080c0dbb8d5ae80061754676a5a39b2c913ec4",
+        "mechanism": "APP_BULK_ENSURES_OPTIONAL_COLLECTIONS_AND_PREWARMS_FINANCIAL_COLLECTIONS_DURING_ACTIVATION",
+        "impact": "Nonessential protected reads compete with first useful render."
+      },
+      {
+        "path": "orbit360-platform/modules/inicio.js",
+        "blobSha": "a819209312108d735392acb247242d2c58f87644",
+        "mechanism": "INICIO_FIRST_RENDER_ENSURES_CLIENTS_POLICIES_COBROS_RECEIPTS_AND_PORTFOLIO_TOGETHER",
+        "impact": "Financial hydration is started before the lightweight dashboard can settle."
+      }
+    ],
+    "businessCorrelation": [
+      "SLOW_FIRST_RENDER_AND_ROLE_SWITCH",
+      "ASESOR_AUTHORIZED_SALES_NOT_VISIBLE_OR_DELAYED_AFTER_ROLE_CHANGE",
+      "CANCELACIONES_DIRECTION_OPERATIVO_ASESOR_DIRECTION_RESTORE_FAILURE"
+    ],
+    "proofBoundary": "SOURCE_CAUSAL_MECHANISM_PROVEN; DISAPPEARANCE_REQUIRES AUTHORIZED SOURCE FIX + EXACT PREVIEW + AUTHENTICATED ROLE SEQUENCE"
+  },
+  "mutationBoundary": {
+    "currentExecutionLockProductMutationAuthorized": false,
+    "currentDataMutationAuthorized": false,
+    "currentLivePromotionAuthorized": false,
+    "currentReimportAuthorized": false,
+    "note": "No source patch applied because the physical B4 execution lock explicitly keeps product mutation closed."
+  },
+  "progress": {
+    "formalI6Before": 50,
+    "formalI6After": 50
+  },
+  "nextMaterialAction": "EXACT_B4_003_SOURCE_MUTATION_AUTHORIZATION_FOR_CAUSAL_HYDRATION_FIX_THEN_NEW_EXACT_PREVIEW"
+}

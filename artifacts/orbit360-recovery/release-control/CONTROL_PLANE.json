@@ -11946,7 +11946,7 @@
     "priority": "CAUSAL_BACKEND_COMPOSITION_ROLE_SCOPE_MONTHLY_RECEIPTS_AND_LATENCY_BEFORE_MORE_COSMETICS"
   },
   "b4003P0CumulativeReadOnlyExecution20261017": {
-    "status": "REQUESTED_EXISTING_IMMUTABLE_PREVIEW_READONLY",
+    "status": "EXECUTED_PASS_READONLY_P0_ALL_OPEN",
     "authority": "PAULA_CONTINUITY_20261017",
     "triggerSubject": "audit(i6.5 B4-003): execute cumulative P0 read-only inventory",
     "targetPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b4-38309446443-1io2otyg.web.app",
@@ -11965,6 +11965,26 @@
     "livePromotion": false,
     "reimport": false,
     "formalI6PercentBefore": 50,
-    "formalI6PercentAfterRequest": 50
+    "formalI6PercentAfterRequest": 50,
+    "runId": 39048410909,
+    "artifactId": 12106721934,
+    "artifactDigest": "sha256:a822ec03ae22f44c8ec316e2182bf14da2f23e41b4751e3397887f56220154f9",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_P0_CUMULATIVE_READONLY_FREEZE_20261017.json",
+    "receiptBlobSha": "3d586f04936b0ce4b37c8e690ef71e28c59ebcfe",
+    "result": {
+      "findings": 295,
+      "carry": 295,
+      "attention": 166,
+      "advisorRows": 7,
+      "metaRows": 6,
+      "institutionalGlobalGoals": 0,
+      "legacyQaFixturesPresent": 14,
+      "orphanRenewalDependentRows": 12,
+      "p0ClosureCount": 0
+    },
+    "sourceCausalMechanismDemonstrated": true,
+    "sourcePatchApplied": false,
+    "sourcePatchBlockedByExecutionLock": true,
+    "formalI6PercentAfterExecution": 50
   }
 }
