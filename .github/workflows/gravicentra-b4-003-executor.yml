@@ -26,6 +26,7 @@ on:
     paths:
       - '.github/workflows/gravicentra-b4-003-executor.yml'
       - 'tools/gravicentra-i6-5-b4-003-preview-proof.mjs'
+      - 'tools/gravicentra-b4-003-protected-hydration.test.cjs'
       - 'tools/gravicentra-b4-003-commercial-readonly-qa.cjs'
       - 'tools/gravicentra-i6-5-b4-003-renewals-priority-preview-proof.mjs'
       - 'tools/gravicentra-i6-5-b4-003-contract.mjs'
@@ -87,6 +88,9 @@ jobs:
           REMOTE=$(git ls-remote origin "refs/heads/$GITHUB_REF_NAME" | awk '{print $1}')
           test "$CANDIDATE_SOURCE_SHA" = "$REMOTE"
           echo "CANDIDATE_SOURCE_SHA=$CANDIDATE_SOURCE_SHA" >> "$GITHUB_ENV"
+
+      - name: B4-003 protected role hydration regression (mock, no writes)
+        run: node tools/gravicentra-b4-003-protected-hydration.test.cjs
 
       - name: Gate exact B4-003 Preview
         id: gate
