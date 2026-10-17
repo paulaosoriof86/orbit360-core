@@ -2545,5 +2545,23 @@
     "runId": 38722133958,
     "operationalDataWritesAuthorized": false,
     "livePromotionAuthorized": false
+  },
+  "b4003C0304BeforeImageSourceIntegration": {
+    "gate": "I6.5/B4-003",
+    "owner": "functions/product-operational-domain.js",
+    "baseBlob": "61bbd6d4bc9e687fa698c129e4ffd4fb4fb085b7",
+    "candidateBlob": "c53930ce987f589eee1873b1743d0c350324e9d2",
+    "mode": "EXACT_SOURCE_ONLY_NO_RUNTIME_MUTATION",
+    "status": "SOURCE_STAGED_PENDING_GOVERNANCE_QA",
+    "authorityReceipt": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_AUDIT_COMPLEMENT_EXECUTION_20261016.md",
+    "sourceChangeAuthorized": true,
+    "generalProductMutationAuthorized": false,
+    "operationalDataWritesAuthorized": false,
+    "realRoleWritesAuthorized": false,
+    "sharedRulesDeployAuthorized": false,
+    "previewDeployAuthorized": false,
+    "livePromotionAuthorized": false,
+    "wholeTaskClosed": false,
+    "formalPointsAdded": 0
   }
 }
