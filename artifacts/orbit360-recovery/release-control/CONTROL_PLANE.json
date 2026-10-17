@@ -11856,7 +11856,7 @@
     "formalPointsAdded": 0
   },
   "b4003PaulaExecutiveDashboardUat20261017": {
-    "status": "VISUAL_AND_FUNCTIONAL_REJECTED_FROZEN_CHILD",
+    "status": "SOURCE_QA_PASS_EXACT_READONLY_PREVIEW_REQUESTED_VISUAL_REJECTION_REMAINS",
     "evidencePath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PAULA_DASHBOARD_AND_TRANSVERSAL_REGRESSION_LOCK_20261017.json",
     "evidenceBlobSha": "4741d00ce8df68f158dd2c39dda3dfb20db7b9fa",
     "dashboardSourceSha": "a819209312108d735392acb247242d2c58f87644",
@@ -11875,6 +11875,21 @@
     "noProductionAcceptance": true,
     "securityP0StillOpen": true,
     "formalPercentBefore": 50,
-    "formalPercentAfter": 50
+    "formalPercentAfter": 50,
+    "exactPreviewDispatch": {
+      "status": "REQUESTED_EXISTING_B4_003_CUMULATIVE_PREVIEW",
+      "sourceCommit": "a275b0af4387409135a0bd4f81ae9484d41d3ee5",
+      "mode": "EXACT_TWO_READONLY_CALLABLES_NO_WRITES",
+      "onlyFunctions": [
+        "orbit360ScopedPolicyReadPreview",
+        "orbit360AssignableAdvisorRosterPreview"
+      ],
+      "frontendSourceBlob": "a819209312108d735392acb247242d2c58f87644",
+      "backendSourceBlob": "a2f5d110201eb83cb0c72f7d716443c3b08c4d49",
+      "productionPromotionAuthorized": false,
+      "firestoreRulesDeployAuthorized": false,
+      "operationalWritesAuthorized": false,
+      "authenticatedUatPending": true
+    }
   }
 }
