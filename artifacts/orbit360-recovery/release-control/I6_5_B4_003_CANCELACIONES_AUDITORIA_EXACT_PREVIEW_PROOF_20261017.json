@@ -1,0 +1,79 @@
+{
+  "schema": "GRAVICENTRA_I65_B4003_RESTRICTED_READ_EXACT_PREVIEW_MACHINE_PROOF_V1",
+  "recordedAt": "2026-10-17",
+  "gate": "I6.5/B4-003",
+  "status": "PREVIEW_HOSTED_PUBLIC_SMOKE_PASS_AUTHENTICATED_ROLES_HOLD",
+  "sourceHead": "6f0d3a1a6c5827419d0e5f18dca4bed8abc9eb2b",
+  "sourceFrozen": true,
+  "sourceCodeFiles": [
+    {
+      "path": "functions/b4-003-scoped-access-boundary.js",
+      "blobSha": "01934d22cfe6f353c6e143e553e3bc1c704c029a"
+    },
+    {
+      "path": "functions/b4-003-scoped-related-reader.js",
+      "blobSha": "652042d544d8dbf52b6d0f8c55bc6de7d3c64aa2"
+    },
+    {
+      "path": "orbit360-platform/core/product-runtime-browser-providers-p0.js",
+      "blobSha": "51f2801cf8e7590ff92ffa9e7dae07ff8304f5d7"
+    },
+    {
+      "path": "orbit360-platform/data/store-firestore-product-readonly-p0.js",
+      "blobSha": "41a903a88caa338c74f636c1cd31e23f79aa2481"
+    }
+  ],
+  "compositionLockBlobSha": "7175a97df252a1459df7692d7e8d3f99e3c3bc6d",
+  "preview": {
+    "url": "https://ays-orbit-360-lab--gi-i65-b4-39063058792-l08egx7p.web.app",
+    "channelId": "gi-i65-b4-39063058792",
+    "runId": 39063058792,
+    "runConclusion": "success",
+    "buildId": "gi-i65-b4-6f0d3a1a6c58-57f234755dc1",
+    "artifactId": 12111899071,
+    "artifactDigest": "sha256:57622fa1fa735edb26c71a8ba27899ee1aaddb174626a4ca12c47b03c966294a",
+    "hostedPayloadDigest": "e33c1352e0669f79e3dfd4215502609f7a52765f0d5e41284f6473549ee87621",
+    "backendSourceDigest": "db953fdb8172324fd89aba13d07da082567b98c285c0d83cae9c484f9cc76df0",
+    "bundleDigest": "ca915a16993602d08513e20380f289e37b3d1700ea843f00952ca89c022fefb8",
+    "buildBoundAssetCount": 138,
+    "hostedFileCount": 218,
+    "backendFileCount": 33,
+    "exactHostingReadback": true,
+    "publicSmoke": true,
+    "anonymousCallableHttpStatus": 401,
+    "protectedReadCandidateHosted": true
+  },
+  "functionDeploy": {
+    "scopedReader": true,
+    "readOnlyRoster": true,
+    "otherFunctions": false,
+    "sharedRules": false
+  },
+  "regression": {
+    "codeQaChecks": 91,
+    "restrictedCancelAuditChecks": 10,
+    "sourceQaRunId": 39061257991,
+    "latestPreviewCodeQa": "PASS_STATIC_MOCK",
+    "governanceGuardRunId": 39063058911,
+    "governanceGuardConclusion": "success"
+  },
+  "releaseStatus": {
+    "realAuthenticatedPositiveNegative": "PENDING",
+    "livePromotion": false,
+    "productionAccepted": false,
+    "securityP0Closed": false,
+    "realBusinessWrites": 0,
+    "syntheticQaWrites": 0,
+    "dataMutation": false,
+    "reimport": false,
+    "firestoreRulesDeploy": false,
+    "noRealUserAuthTokensIssued": true
+  },
+  "quotaAction": {
+    "workflowRecoveryChannelGc": true,
+    "removedOldRecoveryChannel": "gi-i65-b4-38060653254",
+    "productionChannelUnchanged": true
+  },
+  "nextAction": "AUTHENTICATED_ROLE_COUNTRY_MODULE_PERMISSIONS_AND_RELOAD_PREVIEW_UAT",
+  "formalI6Percent": 50
+}

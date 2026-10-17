@@ -12085,7 +12085,7 @@
     "sourceChanged": true
   },
   "b4003RestrictedCancellationAuditSourceFix20261017": {
-    "status": "SOURCE_QA_PASS_EXACT_PREVIEW_PENDING",
+    "status": "PREVIEW_HOSTED_PUBLIC_SMOKE_PASS_AUTHENTICATED_UAT_PENDING",
     "gate": "I6.5/B4-003",
     "compositionLockBlobSha": "7175a97df252a1459df7692d7e8d3f99e3c3bc6d",
     "files": [
@@ -12111,13 +12111,13 @@
       }
     ],
     "qa": {
-      "status": "MOCK_91_CHECKS_PASS",
+      "status": "SOURCE_QA_AND_EXACT_PREVIEW_PUBLIC_SMOKE_PASS",
       "runId": 39061257991,
       "guardRunId": 39061257915,
       "count": 91,
       "cancellationAuditChecks": 10,
       "realAuthenticatedE2E": false,
-      "previewDeployed": false
+      "previewDeployed": true
     },
     "roleScope": "READ_ONLY_PREVIEW_ONLY",
     "generalProductMutationAuthorized": false,
@@ -12133,7 +12133,7 @@
     "firestoreRulesDeployAuthorized": false,
     "dataMutationAuthorized": false,
     "previewDispatch": {
-      "status": "EXACT_B4_003_READ_ONLY_PREVIEW_AUTHORIZED_NOT_EXECUTED",
+      "status": "EXECUTED_EXACT_PREVIEW_PUBLIC_READBACK_PASS",
       "sourceHead": "729ac226a87c9a1502c422f2c1f90993c5d24ae8",
       "triggerSubject": "build(i6.5 B4-003): exact protected cancellation audit Preview",
       "codeQaRunId": 39061257991,
@@ -12158,15 +12158,33 @@
       "reimportAuthorized": false,
       "authenticatedUserImpersonationAuthorized": false,
       "dispatchRequest": {
-        "status": "REQUESTED_EXACT_BUILD_AND_READONLY_ISOLATED_PREVIEW",
+        "status": "EXECUTED_SCOPED_PREVIEW_WITH_MACHINE_READBACK_PASS",
         "requestType": "EXISTING_B4_003_EXECUTOR",
         "qaBaselineRunId": 39061257991,
-        "contractProof": "PENDING_RUN_AND_HOSTED_READBACK",
+        "contractProof": "PUBLIC_HOSTED_READBACK_PASS_AUTHENTICATED_UAT_PENDING",
         "originCommit": "a42d0e6c9b6e6610f11418ee9aa3423d14c13854",
         "noLive": true,
         "noSharedRules": true,
         "noDataWrites": true
       }
+    },
+    "previewEvidence": {
+      "status": "PREVIEW_HOSTED_PUBLIC_SMOKE_PASS_AUTHENTICATED_ROLES_HOLD",
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CANCELACIONES_AUDITORIA_EXACT_PREVIEW_PROOF_20261017.json",
+      "blobSha": "c8e24bdca045b35ebb633b4e4d6977b71b650d71",
+      "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-39063058792-l08egx7p.web.app",
+      "buildId": "gi-i65-b4-6f0d3a1a6c58-57f234755dc1",
+      "sourceHead": "6f0d3a1a6c5827419d0e5f18dca4bed8abc9eb2b",
+      "workflowRunId": 39063058792,
+      "artifactId": 12111899071,
+      "artifactDigest": "sha256:57622fa1fa735edb26c71a8ba27899ee1aaddb174626a4ca12c47b03c966294a",
+      "hostedPayloadDigest": "e33c1352e0669f79e3dfd4215502609f7a52765f0d5e41284f6473549ee87621",
+      "backendSourceDigest": "db953fdb8172324fd89aba13d07da082567b98c285c0d83cae9c484f9cc76df0",
+      "exactHostingReadback": true,
+      "anonymous401": true,
+      "authenticatedPositiveNegative": "PENDING",
+      "securityReleaseHold": true,
+      "productionPromotionAuthorized": false
     }
   }
 }
