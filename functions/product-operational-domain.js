@@ -61,8 +61,9 @@ function permissionsOf(member) {
   return unique([...(member.permissions || []), ...(member.permisosExtra || []), ...(member.extras || [])]).map(norm);
 }
 function activeMember(member) {
-  const status = norm(member && (member.status || member.estado));
-  return !!member && member.active !== false && member.activo !== false && !['inactive','inactivo','blocked','bloqueado','suspended','suspendido'].includes(status);
+  if (!member || member.active === false || member.activo === false || member.inactivo === true) return false;
+  const states = [member.status, member.estado].map(norm).filter(Boolean);
+  return states.length > 0 && states.every(status => status === 'active' || status === 'activo');
 }
 function containsSecret(value, path = '') {
   if (!value || typeof value !== 'object') return '';
@@ -218,8 +219,12 @@ async function authorizeRead(request, tenantId, collection) {
   const accessConfig=accessSnap.exists?accessSnap.data()||{}:{};
   if(!moduleVisibleForWrite(member,accessConfig,requestedRole,moduleKey))throw new HttpsError('permission-denied',`El rol activo no puede ver ${collection}.`);
   const own=text(member.advisorId,180),teamAdvisorIds=new Set(own?[own]:[]),roleMap=member.roleVisibleAdvisorIds&&typeof member.roleVisibleAdvisorIds==='object'?member.roleVisibleAdvisorIds:{};
-  const roleMapKey=Object.keys(roleMap).find(k=>norm(k)===norm(requestedRole)); unique(roleMapKey?roleMap[roleMapKey]:[]).forEach(id=>teamAdvisorIds.add(id)); unique(member.teamAdvisorIds||member.asesoresEquipo||[]).forEach(id=>teamAdvisorIds.add(id));
-  if(!UNSCOPED_COLLECTIONS.has(collection)&&effectiveScope(member,accessConfig,requestedRole,moduleKey)==='team'){
+  const roleMapKey=Object.keys(roleMap).find(k=>norm(k)===norm(requestedRole));
+  if(roleMapKey!==undefined){
+    if(!Array.isArray(roleMap[roleMapKey]))throw new HttpsError('permission-denied','Configuración de equipo por rol inválida.');
+    unique(roleMap[roleMapKey]).forEach(id=>teamAdvisorIds.add(id));
+  }else unique(member.teamAdvisorIds||member.asesoresEquipo||[]).forEach(id=>teamAdvisorIds.add(id));
+  if(roleMapKey===undefined&&!UNSCOPED_COLLECTIONS.has(collection)&&effectiveScope(member,accessConfig,requestedRole,moduleKey)==='team'){
     const teamId=text(member.teamId||member.equipoId,160);
     if(teamId||own){
       const advisorSnap=await db.collection('tenants').doc(tenantId).collection('data').doc('asesores').collection('items').get();
@@ -244,8 +249,12 @@ async function authorize(request, tenantId, mutations) {
     if(!UNSCOPED_COLLECTIONS.has(collection)&&effectiveScope(member,accessConfig,requestedRole,moduleKey)==='team')needsTeam=true;
   }
   const own=text(member.advisorId,180),teamAdvisorIds=new Set(own?[own]:[]),roleMap=member.roleVisibleAdvisorIds&&typeof member.roleVisibleAdvisorIds==='object'?member.roleVisibleAdvisorIds:{};
-  const roleMapKey=Object.keys(roleMap).find(k=>norm(k)===norm(requestedRole)); unique(roleMapKey?roleMap[roleMapKey]:[]).forEach(id=>teamAdvisorIds.add(id)); unique(member.teamAdvisorIds||member.asesoresEquipo||[]).forEach(id=>teamAdvisorIds.add(id));
-  if(needsTeam){const teamId=text(member.teamId||member.equipoId,160); if(teamId||own){const advisorSnap=await db.collection('tenants').doc(tenantId).collection('data').doc('asesores').collection('items').get(); advisorSnap.docs.forEach(doc=>{const row=doc.data()||{},id=text(row.id||doc.id,180);if(teamId&&text(row.teamId||row.equipoId,160)===teamId)teamAdvisorIds.add(id);if(own&&text(row.supervisorId,180)===own)teamAdvisorIds.add(id);});}}
+  const roleMapKey=Object.keys(roleMap).find(k=>norm(k)===norm(requestedRole));
+  if(roleMapKey!==undefined){
+    if(!Array.isArray(roleMap[roleMapKey]))throw new HttpsError('permission-denied','Configuración de equipo por rol inválida.');
+    unique(roleMap[roleMapKey]).forEach(id=>teamAdvisorIds.add(id));
+  }else unique(member.teamAdvisorIds||member.asesoresEquipo||[]).forEach(id=>teamAdvisorIds.add(id));
+  if(needsTeam&&roleMapKey===undefined){const teamId=text(member.teamId||member.equipoId,160); if(teamId||own){const advisorSnap=await db.collection('tenants').doc(tenantId).collection('data').doc('asesores').collection('items').get(); advisorSnap.docs.forEach(doc=>{const row=doc.data()||{},id=text(row.id||doc.id,180);if(teamId&&text(row.teamId||row.equipoId,160)===teamId)teamAdvisorIds.add(id);if(own&&text(row.supervisorId,180)===own)teamAdvisorIds.add(id);});}}
   return{uid:request.auth.uid,activeRole:requestedRole,member,accessConfig,teamAdvisorIds};
 }
 function normalizeMutation(raw) {

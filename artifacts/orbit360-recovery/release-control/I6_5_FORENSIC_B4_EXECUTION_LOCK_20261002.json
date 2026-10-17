@@ -2550,9 +2550,9 @@
     "gate": "I6.5/B4-003",
     "owner": "functions/product-operational-domain.js",
     "baseBlob": "61bbd6d4bc9e687fa698c129e4ffd4fb4fb085b7",
-    "candidateBlob": "c53930ce987f589eee1873b1743d0c350324e9d2",
+    "candidateBlob": "edbe77331327fdfa05a278d7c1f1b68005d70773",
     "mode": "EXACT_SOURCE_ONLY_NO_RUNTIME_MUTATION",
-    "status": "SOURCE_STAGED_PENDING_GOVERNANCE_QA",
+    "status": "SOURCE_STAGED_PENDING_GOVERNANCE_QA_MEMBERSHIP_TEAM",
     "authorityReceipt": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_AUDIT_COMPLEMENT_EXECUTION_20261016.md",
     "sourceChangeAuthorized": true,
     "generalProductMutationAuthorized": false,
@@ -2562,6 +2562,15 @@
     "previewDeployAuthorized": false,
     "livePromotionAuthorized": false,
     "wholeTaskClosed": false,
-    "formalPointsAdded": 0
+    "formalPointsAdded": 0,
+    "previousCandidateBlob": "c53930ce987f589eee1873b1743d0c350324e9d2",
+    "securityCoverage": [
+      "ACTIVE_MEMBERSHIP_STATUS_AND_ALIASES",
+      "EFFECTIVE_ROLE_TEAM_OVERRIDE_FOR_READ_AND_WRITE",
+      "NO_DERIVED_TEAM_ESCALATION_WHEN_ROLE_OVERRIDE_PRESENT"
+    ],
+    "newTestPath": "tools/gravicentra-b4-003-operational-write-security-regression.test.cjs",
+    "newTestBlob": "2f1945c9933353500319f05807054c2935d4a183",
+    "newTestCases": 24
   }
 }

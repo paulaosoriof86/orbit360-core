@@ -39,6 +39,8 @@ jobs:
           node --check tools/gravicentra-governance-preflight-v1.mjs
           node --check functions/b4-003-scoped-access-boundary.js
           node tools/gravicentra-b4-003-scoped-boundary.test.cjs
+          node --check tools/gravicentra-b4-003-operational-write-security-regression.test.cjs
+          node tools/gravicentra-b4-003-operational-write-security-regression.test.cjs
           node --check functions/b4-003-scoped-policy-reader.js
           node --check functions/b4-003-scoped-policy-callable.js
           node --check functions/b4-003-scoped-bootstrap-reader.js
