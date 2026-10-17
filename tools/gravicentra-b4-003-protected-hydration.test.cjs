@@ -300,3 +300,23 @@ const pause=()=>new Promise(ok=>setTimeout(ok,30));
  console.log('B4_003_ACTUAL_BOOTSTRAP_ROLE_RECOMPILE_PASS mock-only no-reads');
  console.log('B4_003_PROTECTED_HYDRATION_MOCK_PASS no_direct_firestore role_cache_reset protected_related_policy_batches');
 })().catch(error=>{console.error(error);process.exitCode=1;});
+
+/* B4-003 current-source regression: checks are static only, not authenticated PASS. */
+{
+ const session=fs.readFileSync('orbit360-platform/core/access-role-session-owner-v20260728.js','utf8');
+ const store=fs.readFileSync('orbit360-platform/data/store-firestore-product-readonly-p0.js','utf8');
+ const reader=fs.readFileSync('functions/b4-003-scoped-related-reader.js','utf8');
+ const config=fs.readFileSync('orbit360-platform/product-runtime-config.js','utf8');
+ const before=session.indexOf("document.dispatchEvent(new CustomEvent('orbit:active-role-changed'");
+ const after=session.indexOf("if (saved && projection) emitSession()");
+ assert.ok(before>=0&&after>before,'ROLE_INVALIDATION_MUST_PRECEDE_SESSION_RENDER');
+ assert.ok(store.includes('state.snapshotSources={};state.queryPlans={};state.snapshotErrors={};'),'ROLE_CACHE_INVALIDATION_REQUIRED');
+ assert.ok(store.includes('startupCollections.forEach(function(k){attachCollection(k,true);});'),'ROLE_CHANGE_MUST_NOT_REATTACH_ALL_COLLECTIONS');
+ const collections=(reader.match(/const collections=new Set\(\[([^\]]*)\]\)/)||[])[1]||'';
+ for(const name of ['cancelaciones','auditoria']){
+  assert.ok(config.includes("'"+name+"'"),'CONFIGURED_COLLECTION_MISSING_'+name);
+  if(!collections.includes("'"+name+"'"))console.log('B4_003_PROTECTED_COVERAGE_HOLD_'+name);
+ }
+ assert.ok(reader.includes("if(!collections.has(coll))throw new Denied('COLLECTION_DENIED')"),'PROTECTED_COLLECTION_DENIAL_REQUIRED');
+ console.log('B4_003_ROLE_HYDRATION_STATIC_PASS_NOT_AUTHENTICATED');
+}
