@@ -1,0 +1,97 @@
+{
+  "schema": "GRAVICENTRA_I65_B4003_PAULA_VISUAL_FEEDBACK_FOLLOWUP_V1",
+  "date": "2026-10-17",
+  "gate": "I6.5/B4-003",
+  "parentFrozenFinding": "I6_5_B4_003_PAULA_DASHBOARD_AND_TRANSVERSAL_REGRESSION_LOCK_20261017.json",
+  "source": "Nine dated Paula screenshots from authenticated Preview and accompanying first-person observations; user visual feedback overrides prior technical smoke as functional acceptance",
+  "preview": {
+    "url": "https://ays-orbit-360-lab--gi-i65-b4-39036774854-1bfdnc91.web.app",
+    "runId": 39036774854,
+    "sourceSha": "06601638179c3f22885c6aed14d870cd5b4807c0",
+    "buildId": "gi-i65-b4-06601638179c-57f234755dc1",
+    "technicalReadback": "PASS",
+    "authenticatedFunctionalAcceptance": "REJECTED_BY_PAULA"
+  },
+  "screenshotFiles": [
+    "image(20261017-141342).png",
+    "image(20261017-141508).png",
+    "image(20261017-141607).png",
+    "image(20261017-141709).png",
+    "image(20261017-141900).png",
+    "image(20261017-142027).png",
+    "image(20261017-142128).png",
+    "image(20261017-142224).png",
+    "image(20261017-142341).png"
+  ],
+  "positiveAcceptanceToPreserve": [
+    "Inicio's live visual executive layout substantially improved and accepted as direction, not final QA.",
+    "Dynamic insurance/leadership messages are working and explicitly approved; preserve content and rotation.",
+    "Progress ring and advisor board now visible at least for Direction/Operativo after loading.",
+    "Renewals, overdue workload, critical text and followups render when source confirmed, with GTQ and COP kept separate."
+  ],
+  "p0ObservedAndRequired": [
+    {
+      "key": "B4_003_INICIO_DELAY",
+      "observed": "Direction often >60 seconds to complete metrics; Operativo ~120 seconds; role switches similarly very slow",
+      "required": "Quantified navigation-to-first-useful-render and each server collection/callable request with no 30/120s success-path timeout; fail-closed visible retry; identify slow dependency by request trace."
+    },
+    {
+      "key": "B4_003_ASESOR_UNAVAILABLE",
+      "observed": "Asesor mode renders No disponible and 1/5 sources confirmed, despite user asserting current-month sales and renewals; 71 unread count observed not proof of scope",
+      "required": "Authenticated advisor UID+canonical advisorId/policyId ownership/role/country source IDs and positive+negative E2E; correct scope and cache hydration, preserve no data leakage."
+    },
+    {
+      "key": "B4_003_RECAUDO_MONTHLY_ZERO",
+      "observed": "Dashboard renders October confirmed recaudo Q0 against Q50K personal goal, while historic confirmed collections appear ~Q851K GTQ and ~COP205.8M; not proof monthly zero correct or wrong",
+      "required": "Source-level October dated payments, direct versus inferred receipts, applied/conciliation status, paymentBusinessDate and policy advisor attribution reconciled by stable IDs/currency."
+    },
+    {
+      "key": "B4_003_GOAL_LACK_OF_INSTITUTIONAL",
+      "observed": "One of seven advisor profiles has verifiable goal; personal Q80K production and Q50K collection; no institutional goal displayed for full team",
+      "required": "Read server metas; define approved team goal as sum eligible configured individual goals per country/month without silently substituting, distinguish freelancers, excluded advisors, active/approved scopes, no mixing currencies."
+    },
+    {
+      "key": "B4_003_METRIC_SOURCE_TRUTH",
+      "observed": "16 renewals, 618 overdue obligations, and 5/5 sources confirmed after delay; synthetic QA fixture records seen among priorities",
+      "required": "Reconcile exact ids and dates across Pólizas, Renovaciones, Cliente360 and Cobros; 5/5 means source availability not correctness; isolate QA markers via provenance, not blind deletion."
+    },
+    {
+      "key": "B4_003_TRANSVERSAL_ROLE_HYDRATION",
+      "observed": "Role Dirección->Operativo->Asesor switch causes minute+ reload and visible loss of valid records; same concern affects Cobros/Cancelaciones/Cliente360/Pólizas",
+      "required": "Role-scoped abort/invalidation+reload and collection dependency matrix with no stale returns, no partial zero, restore original role and complete data."
+    }
+  ],
+  "p1VisualAcceptance": [
+    "Keep current preferred Inicio look, but shorten leadership card only if content/responsiveness remain legible.",
+    "Add a premium brand-consistent three-dimensional insurance/leadership glyph/emoji in the leadership card without remaking either company logo.",
+    "Keep phrase contrast, centered alignment, spacing, working rotation; responsive 1440/390/320, keyboard accessible.",
+    "Do not regress chart links, sector bars, monthly performance gauges or advisor list."
+  ],
+  "sourceEvidenceAsOfOct16": {
+    "type": "bounded read-only admin Firestore aggregates; NOT current authenticated role-by-role acceptance or fresh Oct17 numbers",
+    "evidenceZip": "GRAVICENTRA_EVIDENCIA_INTEGRAL_38971037517.zip",
+    "physicalClientes": 443,
+    "physicalPolizas": 1425,
+    "asesores": 7,
+    "metas": 6,
+    "metasIndividuales": 6,
+    "metasInstitucionales": 0,
+    "carteraPrimas": 1396,
+    "recibosEsperados": 1958,
+    "cobrosDirectos": 5,
+    "polizasSinClienteEnRelaciones": 3,
+    "carteraConReferenciaClienteFaltante": 86,
+    "carteraConReferenciaPolizaFaltante": 80,
+    "caution": "434 UI-visible clients versus 443 physical may reflect merges/scope; 5 direct cobros documents versus 1243 presented confirmed payments may include derived projected receipts; ID-level reconciliation mandatory before declaring discrepancy or correcting data."
+  },
+  "qaSuccessContract": "LAST_ACCEPTED_UI_PLUS_SERVER_METRIC_PARITY_PLUS_AUTHENTICATED_SCOPE_E2E_PLUS_PERFORMANCE_AND_PERSISTENCE; technical build/guard success alone never functional PASS",
+  "workflow": "existing B4-003 only, update existing Control Plane, lock, capability lineage and 295 finding IDs without branching, rebuild/reimports, DB writes, production deploy, shared Firestore rules, or role impersonation",
+  "progress": {
+    "before": 50,
+    "formalIncrement": 0,
+    "after": 50,
+    "wholeGateStatus": "HOLD_VISUAL_PROGRESS_ACCEPTED_FUNCTIONAL_REJECTED",
+    "productionAcceptedForThisCandidate": false
+  },
+  "nextExactAction": "First reconcile bound backend source and authenticated role-scoped requests, especially monthly recaudo and Asesor; measure ~2min slowdown, then correct within active gate and validate module-specific readback in Preview before further design polishing."
+}

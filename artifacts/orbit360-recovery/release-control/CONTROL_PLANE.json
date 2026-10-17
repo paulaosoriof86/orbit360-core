@@ -11915,5 +11915,34 @@
     "noBusinessWrites": true,
     "priorPaulaRejectionPreserved": true,
     "formalPercent": 50
+  },
+  "b4003PaulaExecutiveDashboardVisualFollowup20261017": {
+    "status": "DESIGN_IMPROVED_PRESERVE_DYNAMIC_MESSAGES_BUT_FUNCTIONAL_UAT_REJECTED",
+    "gate": "I6.5/B4-003",
+    "previewRunId": 39036774854,
+    "previewHead": "06601638179c3f22885c6aed14d870cd5b4807c0",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PAULA_VISUAL_FEEDBACK_FOLLOWUP_20261017.json",
+    "receiptBlobSha": "76dc4e38ac26c484dce72e23ce2ab039638d1663",
+    "p0": [
+      "SLOW_FIRST_RENDER_AND_ROLE_SWITCH",
+      "ASESOR_AUTHORIZED_SALES_NOT_VISIBLE",
+      "RECAUDO_MONTHLY_ZERO_UNVERIFIED",
+      "TEAM_GOAL_6_INDIVIDUAL_NO_INSTITUTIONAL_OCT16",
+      "METRIC_ID_PARITY_AND_FIXTURE_PROVENANCE",
+      "ROLE_SWITCH_AUTHENTICATED_E2E_MISSING"
+    ],
+    "preserve": [
+      "LEADERSHIP_ROTATION_APPROVED",
+      "EXECUTIVE_DASHBOARD_VISUAL_DIRECTION_APPROVED"
+    ],
+    "productionPromotionAuthorized": false,
+    "sharedRulesDeployAuthorized": false,
+    "operationalDataWritesAuthorized": false,
+    "realUserTokenIssuanceAuthorized": false,
+    "visualAcceptanceForRelease": false,
+    "functionalAcceptanceForRelease": false,
+    "securityP0Closed": false,
+    "formalI6Percent": 50,
+    "priority": "CAUSAL_BACKEND_COMPOSITION_ROLE_SCOPE_MONTHLY_RECEIPTS_AND_LATENCY_BEFORE_MORE_COSMETICS"
   }
 }
