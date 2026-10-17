@@ -163,11 +163,12 @@
   function emitSession() {
     try { document.dispatchEvent(new CustomEvent('orbit:session')); } catch (error) {}
   }
-  function safeSessionWrite(role, advisorId, projection) {
+  function safeSessionWrite(role, advisorId, projection, deferSessionEvent) {
     if (projection) {
       clearSecureView();
-      saveViewRole(role);
-      emitSession();
+      if (!saveViewRole(role)) return false;
+      // A product role switch invalidates scoped data BEFORE route/session render.
+      if (deferSessionEvent !== true) emitSession();
       return true;
     }
     if (legacy && typeof legacy.set === 'function') {
@@ -190,10 +191,11 @@
     var projection = productProjection();
     var advisorId = projection ? projection.advisorId : text(ignoredAdvisorId);
     var before = currentRole();
-    var saved = safeSessionWrite(role, advisorId, projection);
+    var saved = safeSessionWrite(role, advisorId, projection, !!projection);
     if (saved && before !== role) {
       try { document.dispatchEvent(new CustomEvent('orbit:active-role-changed', { detail: { before: before, role: role } })); } catch (error) {}
     }
+    if (saved && projection) emitSession();
     return saved;
   }
   function syncFromAuth() {

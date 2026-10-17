@@ -5996,7 +5996,7 @@
   "canonicalAccumulationControl": {
     "status": "FROZEN_ACTIVE",
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "compositionLockBlobSha": "816309c63ed254d9b0e05cf63621c3d1c03cbfd5",
+    "compositionLockBlobSha": "460a8d65c64ed3bf1ac99f4c221208bc0fd67283",
     "findingLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
     "findingLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
@@ -12061,5 +12061,27 @@
     "sourcePatchApplied": false,
     "sourcePatchBlockedByExecutionLock": true,
     "formalI6Percent": 50
+  },
+  "b4003RoleHydrationOrderScopedRootFix20261017": {
+    "status": "EXACT_TWO_SOURCE_FILES_STAGED_PENDING_QA_AND_NEW_PREVIEW",
+    "gate": "I6.5/B4-003",
+    "scopeAuthority": "USER_CONTINUE_AFTER_CURRENT_SOURCE_CAUSAL_ADJUDICATION",
+    "compositionLockBlobSha": "460a8d65c64ed3bf1ac99f4c221208bc0fd67283",
+    "files": {
+      "orbit360-platform/core/access-role-session-owner-v20260728.js": {
+        "before": "eee3eb184f1b4d7219d455d6a15b7d579979d7f5",
+        "after": "4c627da7d568d453ed13d9c30eb6e8431556ec36"
+      },
+      "orbit360-platform/data/store-firestore-product-readonly-p0.js": {
+        "before": "75d7745603686da0607a48fc4c1adcbefc37494f",
+        "after": "19ec8d0d986a3b90042c822edc123a76eb566715"
+      }
+    },
+    "dataMutation": false,
+    "sharedRulesDeploy": false,
+    "livePromotion": false,
+    "generalProductMutationAuthorized": false,
+    "productPreviewPass": false,
+    "sourceChanged": true
   }
 }

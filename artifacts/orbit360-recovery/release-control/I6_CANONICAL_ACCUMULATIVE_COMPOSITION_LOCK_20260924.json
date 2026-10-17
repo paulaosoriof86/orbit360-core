@@ -172,7 +172,7 @@
     "orbit360-platform/assets/tenant/alianzas-soluciones/logo-bolita-96.png": "9e16fae65f366556f55398309eb7bb3f398bf072",
     "orbit360-platform/assets/tenant/alianzas-soluciones/logo-oficial-360.png": "726da844034b98f3132788920a1b8111f4d1764a",
     "orbit360-platform/core/academia-product-catalog-p0.js": "c4974b8734dbe384d4fe4b53394d015ec24e36da",
-    "orbit360-platform/core/access-role-session-owner-v20260728.js": "eee3eb184f1b4d7219d455d6a15b7d579979d7f5",
+    "orbit360-platform/core/access-role-session-owner-v20260728.js": "4c627da7d568d453ed13d9c30eb6e8431556ec36",
     "orbit360-platform/core/access-scope.js": "5fd5aabdbe0e7b613ae55161be01aa17b5174769",
     "orbit360-platform/core/assignable-advisor-roster-client.js": "123f90ab2bce500f7a89338ae6e3de0b82811fe3",
     "orbit360-platform/core/auth-password-change-v20260805.js": "873b484d42825db2fa31e0ae90c9ec78598728f4",
@@ -212,7 +212,7 @@
     "orbit360-platform/data/academia-product-catalog-v1.js": "22b6781519cb14e05965738ac3bbc0f6eb0baff3",
     "orbit360-platform/data/geo-gt-co-authoritative-v20261004.js": "734b6518bc968a8c4e278602aa7161a38351cb02",
     "orbit360-platform/data/store-firestore-product-operational-p0.js": "7738314b843253c92be008dc0b812d035b377d43",
-    "orbit360-platform/data/store-firestore-product-readonly-p0.js": "75d7745603686da0607a48fc4c1adcbefc37494f",
+    "orbit360-platform/data/store-firestore-product-readonly-p0.js": "19ec8d0d986a3b90042c822edc123a76eb566715",
     "orbit360-platform/data/tenant-alianzas-soluciones-insurers-p10.js": "41d2e31a42dac73eb68af304d5f532897210d0ee",
     "orbit360-platform/data/tenant-config/alianzas-soluciones.aseguradoras-knowledge-summary-v20261003.js": "2000d9ea8ab67bdd37d8bf404a29a405fa6374dd",
     "orbit360-platform/data/tenant-public-branding-index.js": "dc543c463f5ecd8ea44e49156d6282113bd95db6",
@@ -5861,5 +5861,24 @@
     "readModelOnly": true,
     "serverRoleAuthorityUnchanged": true,
     "securityHold": true
+  },
+  "b4003RoleHydrationOrderScopedRootFix20261017": {
+    "status": "SOURCE_STAGED_EXACT_PREVIEW_REQUIRED",
+    "gate": "I6.5/B4-003",
+    "scope": "EXACT_TWO_FILE_CAUSAL_CHANGE_WITHOUT_GENERAL_RELEASE_AUTHORIZATION",
+    "files": {
+      "orbit360-platform/core/access-role-session-owner-v20260728.js": {
+        "before": "eee3eb184f1b4d7219d455d6a15b7d579979d7f5",
+        "after": "4c627da7d568d453ed13d9c30eb6e8431556ec36"
+      },
+      "orbit360-platform/data/store-firestore-product-readonly-p0.js": {
+        "before": "75d7745603686da0607a48fc4c1adcbefc37494f",
+        "after": "19ec8d0d986a3b90042c822edc123a76eb566715"
+      }
+    },
+    "realWrites": 0,
+    "sharedRulesDeploy": false,
+    "livePromotion": false,
+    "sourceChangeRequiresNewBuild": true
   }
 }

@@ -180,11 +180,16 @@
     }
     function roleChanged(){
       if(!protectedMode)return;
-      var names=Object.keys(attachStarted).filter(function(k){return !!attachStarted[k];});
+      // Invalidate all old-role bytes synchronously; do not refetch every
+      // previously opened optional module on a role change.
       ++protectedEpoch;protectedPoliciesPromise=null;attachStarted={};collections.forEach(function(k){cache[k]=[];});
       state.serverConfirmedCollections=[];state.attachedCollections=[];state.observedCollections=[];
-      state.snapshotErrors={};state.deniedCollections=[];state.ready=false;state.status='waiting-protected-role';
-      emit('*');names.forEach(function(k){attachCollection(k,true);});
+      state.snapshotSources={};state.queryPlans={};state.snapshotErrors={};state.deniedCollections=[];
+      state.ready=false;state.status='waiting-protected-role';
+      emit('*');
+      // Keep the boot route's authoritative source warm. The newly rendered
+      // route explicitly ensures its own dependencies through _ensureCollections.
+      startupCollections.forEach(function(k){attachCollection(k,true);});
     }
 
     function attachCollection(collection, authoritativeFirst) {
