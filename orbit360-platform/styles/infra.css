@@ -1307,3 +1307,93 @@ a.fh-chip:hover{border-color:var(--red);color:var(--red)}
  [data-inicio-premium="20261011"] [data-inicio-country]{transition:none}
 }
 
+
+
+/* B4-003 / Gravicentra Insurance · executive dashboard: live source, high contrast, responsive */
+[data-gi-dashboard="insurance-live-v1"]{grid-template-columns:minmax(255px,.94fr) minmax(300px,1fr) minmax(300px,1fr)!important;align-items:stretch!important}
+[data-gi-dashboard="insurance-live-v1"] .gi-leadership-card{
+ background:linear-gradient(150deg,#27313f 0%,#151d28 74%,#111a25 100%);
+ color:#fff;border-radius:16px;border-left:5px solid #e32047;padding:24px 20px 20px;
+ display:flex;flex-direction:column;gap:0;min-width:0;min-height:290px;
+ box-shadow:0 14px 30px -18px rgba(17,27,40,.7)
+}
+.gi-leadership-card .gi-month-eyebrow{font:700 10.5px/1.5 var(--f-mono),monospace;color:#d9e4f0;letter-spacing:.14em;text-transform:uppercase;text-align:center}
+.gi-leadership-card .gi-month-title{font:800 24px/1.18 var(--f-display),sans-serif;color:#fff;margin:10px 0 0;text-align:center;letter-spacing:-.025em}
+.gi-leadership-card .gi-month-countdown{font:700 12.5px/1.45 var(--f-text),sans-serif;text-align:center;margin:12px 0 0;color:#f7d5df}
+.gi-leadership-card .gi-leadership-body{
+ display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;
+ border-top:1px solid rgba(255,255,255,.21);padding:17px 0 7px;margin-top:17px;flex:1;min-height:100px
+}
+.gi-leadership-card .gi-motivation-quote{
+ font:600 14px/1.6 var(--f-text),sans-serif;color:#f1f5fb!important;text-align:center;
+ max-width:43ch;margin:0 auto;cursor:pointer;outline-offset:5px;text-wrap:pretty
+}
+.gi-leadership-card .gi-motivation-quote:focus-visible,.gi-leadership-card .gi-motivation-next:focus-visible{outline:2px solid #fff;border-radius:6px}
+.gi-leadership-card .gi-motivation-next{
+ appearance:none;border:1px solid rgba(255,255,255,.27);background:rgba(255,255,255,.11);
+ color:#f8fafc;border-radius:50%;width:28px;height:28px;font-size:17px;
+ margin-top:10px;cursor:pointer;line-height:1
+}
+.gi-leadership-card .gi-motivation-next:hover{background:rgba(255,255,255,.24)}
+.gi-leadership-card .gi-dashboard-source{font:700 10px/1.4 var(--f-text),sans-serif;color:#dce8f5;display:flex;align-items:center;justify-content:center;gap:7px;text-align:center;margin:9px auto 0}
+.gi-leadership-card .gi-source-dot{width:7px;height:7px;flex:0 0 7px;border-radius:50%;background:#79d6b7}
+.gi-leadership-card .gi-month-chips{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:17px}
+.gi-leadership-card .gi-month-chips .badge{
+ font-size:10.5px!important;font-weight:700!important;background:rgba(255,255,255,.14)!important;
+ color:#fff!important;border:1px solid rgba(255,255,255,.3)!important;
+}
+.gi-leadership-card .gi-month-chips .badge.danger{background:rgba(198,23,61,.4)!important;border-color:#f5bac7!important}
+.gi-insurance-analysis{display:grid;grid-template-columns:1fr 1fr;gap:17px;margin:18px 0 0}
+.gi-insurance-analysis .gi-analysis-surface{
+ background:var(--card);color:var(--ink);border:1px solid color-mix(in srgb,var(--line) 65%,var(--ink) 11%);
+ border-radius:15px;padding:19px 20px;box-shadow:0 6px 24px -22px rgba(16,25,42,.5)
+}
+.gi-insurance-analysis header{display:flex;align-items:center;gap:11px;margin:0 0 16px}
+.gi-insurance-analysis header b{font:800 17px/1.3 var(--f-display),sans-serif;color:var(--ink);display:block}
+.gi-insurance-analysis header small{font-size:11px;line-height:1.5;color:var(--ink-2);display:block;margin-top:4px}
+.gi-insurance-analysis .gi-analysis-symbol{
+ display:grid;place-items:center;min-width:38px;width:38px;height:38px;background:#bd183b;color:white;
+ border-radius:11px;font-size:18px;font-weight:800
+}
+.gi-insurance-analysis .gi-analysis-bars{display:grid;gap:11px}
+.gi-insurance-analysis .gi-analysis-bar{
+ appearance:none;display:grid;grid-template-columns:minmax(0,1.15fr) minmax(80px,1.35fr) auto;
+ gap:11px;align-items:center;width:100%;padding:10px 11px;border-radius:10px;
+ border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;text-align:left
+}
+.gi-insurance-analysis .gi-analysis-bar:hover{border-color:#b61b39;box-shadow:0 4px 12px -10px rgba(15,17,20,.5)}
+.gi-insurance-analysis .gi-analysis-bar:focus-visible{outline:2px solid #bd183b;outline-offset:2px}
+.gi-insurance-analysis .gi-analysis-bar-label{font-size:12.5px;font-weight:650;line-height:1.4}
+.gi-insurance-analysis .gi-analysis-bar-track{display:block;width:100%;height:11px;background:#e0e4e9;border-radius:30px;overflow:hidden}
+.gi-insurance-analysis .gi-analysis-bar-fill{display:block;height:100%;border-radius:30px;background:#c3193a}
+.gi-insurance-analysis .gi-analysis-bar-fill.gi-tone-overdue{background:#d59021}
+.gi-insurance-analysis .gi-analysis-bar-value{font:800 17px/1 var(--f-display),sans-serif;color:var(--ink);font-variant-numeric:tabular-nums;text-align:right}
+.gi-insurance-analysis .gi-analysis-bar[data-readiness!="ready"] .gi-analysis-bar-track{opacity:.45}
+.gi-insurance-analysis .gi-analysis-bar[data-readiness!="ready"] .gi-analysis-bar-value{font-size:11px;white-space:nowrap}
+.gi-insurance-analysis .gi-analysis-hint,.gi-insurance-analysis .gi-analysis-proof{color:var(--ink-2);font-size:11px;line-height:1.45;margin:13px 0 0}
+.gi-insurance-analysis .gi-analysis-insights{display:grid;gap:9px;list-style:none;padding:0;margin:0}
+.gi-insurance-analysis .gi-analysis-insights li{
+ background:color-mix(in srgb,var(--surface) 80%,var(--card));border-left:3px solid #bd183b;
+ padding:9px 11px;border-radius:4px 10px 10px 4px;color:var(--ink);font-size:12.5px;line-height:1.5
+}
+.gi-insurance-analysis .gi-analysis-proof{border-top:1px solid var(--line);padding-top:10px;font-weight:650}
+@media(max-width:1300px){
+ [data-gi-dashboard="insurance-live-v1"]{grid-template-columns:minmax(245px,.85fr) minmax(280px,1fr)!important}
+ [data-gi-dashboard="insurance-live-v1"]>[data-inicio-monthly="recaudo"]{grid-column:2}
+}
+@media(max-width:920px){
+ [data-gi-dashboard="insurance-live-v1"]{grid-template-columns:minmax(0,1fr)!important}
+ [data-gi-dashboard="insurance-live-v1"]>[data-inicio-monthly="recaudo"]{grid-column:auto}
+ [data-gi-dashboard="insurance-live-v1"] .gi-leadership-card{min-height:255px}
+ .gi-insurance-analysis{grid-template-columns:1fr}
+}
+@media(max-width:500px){
+ [data-gi-dashboard="insurance-live-v1"] .gi-leadership-card{padding:22px 14px;min-height:255px}
+ .gi-insurance-analysis .gi-analysis-surface{padding:14px}
+ .gi-insurance-analysis .gi-analysis-bar{grid-template-columns:minmax(0,1fr) auto;gap:7px}
+ .gi-insurance-analysis .gi-analysis-bar-track{grid-column:1/-1;grid-row:2}
+ .gi-insurance-analysis .gi-analysis-bar-value{grid-column:2;grid-row:1}
+}
+@media(prefers-reduced-motion:reduce){
+ .gi-insurance-analysis .gi-analysis-bar{transition:none}
+}

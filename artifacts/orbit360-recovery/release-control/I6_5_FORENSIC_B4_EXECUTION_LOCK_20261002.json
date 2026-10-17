@@ -2599,5 +2599,39 @@
     "securityP0Closed": false,
     "releaseAccepted": false,
     "formalPercentAdded": 0
+  },
+  "b4003ExecutiveReadOnlyRosterSync20261017": {
+    "status": "AUTHORIZED_EXACT_PREVIEW_READONLY_ROSTER_ONLY",
+    "sourcePath": "functions/assignable-advisor-roster.js",
+    "sourceBlobSha": "a2f5d110201eb83cb0c72f7d716443c3b08c4d49",
+    "service": "orbit360AssignableAdvisorRosterPreview",
+    "contractId": "gi-i65-b4-003-executive-read-v1",
+    "requiresSameBackendDigestAsScopedRead": true,
+    "onlyApprovedFunctionExports": [
+      "orbit360ScopedPolicyReadPreview",
+      "orbit360AssignableAdvisorRosterPreview"
+    ],
+    "onlyIsolatedPreview": true,
+    "businessWritesAuthorized": false,
+    "configWritesAuthorized": false,
+    "otherFunctionsDeployAuthorized": false,
+    "sharedFirestoreRulesDeployAuthorized": false,
+    "livePromotionAuthorized": false,
+    "realUserTokensAuthorized": false,
+    "firestoreDataImportsAuthorized": false,
+    "statusAfter": "EXACT_AUTHENTICATED_PREVIEW_NOT_YET_PROVEN",
+    "sourceProvenance": "PAULA_20261017_SCREENSHOT_REJECTION_AND_TARGETED_CAUSAL_REVIEW"
+  },
+  "b4003PaulaExecutiveDashboardUat20261017": {
+    "status": "VISUAL_AND_FUNCTIONAL_REJECTED_FROZEN_CHILD",
+    "evidencePath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PAULA_DASHBOARD_AND_TRANSVERSAL_REGRESSION_LOCK_20261017.json",
+    "evidenceBlobSha": "4741d00ce8df68f158dd2c39dda3dfb20db7b9fa",
+    "dashboardSourceSha": "a819209312108d735392acb247242d2c58f87644",
+    "dashboardStyleSha": "02bea455bce9f5659eeaf8fd73e799eccb7f7e23",
+    "clientReadContractSha": "123f90ab2bce500f7a89338ae6e3de0b82811fe3",
+    "scope": "B4-003_TARGETED_SOURCE_AND_PREVIEW_ONLY",
+    "productionAccepted": false,
+    "securityAccepted": false,
+    "formalPointsAdded": 0
   }
 }

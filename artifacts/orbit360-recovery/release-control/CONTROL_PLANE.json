@@ -4869,7 +4869,7 @@
       "entryGuardReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_ENTRY_GUARD_PASS_20261002.json",
       "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
       "executionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B4_EXECUTION_LOCK_20261002.json",
-      "executionLockBlobSha": "a4d17a337430003d6795c012b3e77b405dcbb48b",
+      "executionLockBlobSha": "0d0b885409768df40fe0b7e03f924faee8843e4b",
       "compositionLockBlobSha": "016f251811f22bc4fc04b2a5f674dfe09243e605",
       "findingLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
       "activeFindingId": "B4-003",
@@ -5996,7 +5996,7 @@
   "canonicalAccumulationControl": {
     "status": "FROZEN_ACTIVE",
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "compositionLockBlobSha": "24733181250c55583078e3a90076e7e1e8b23d47",
+    "compositionLockBlobSha": "816309c63ed254d9b0e05cf63621c3d1c03cbfd5",
     "findingLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
     "findingLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
@@ -6312,8 +6312,8 @@
     "status": "B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL",
     "activeFindingId": "B4-003",
     "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
-    "executionLockBlobSha": "a4d17a337430003d6795c012b3e77b405dcbb48b",
-    "compositionLockBlobSha": "24733181250c55583078e3a90076e7e1e8b23d47",
+    "executionLockBlobSha": "0d0b885409768df40fe0b7e03f924faee8843e4b",
+    "compositionLockBlobSha": "816309c63ed254d9b0e05cf63621c3d1c03cbfd5",
     "findingLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
     "noLive": true,
     "noReimport": true,
@@ -11833,5 +11833,48 @@
     "noReleaseAcceptedClaim": true,
     "formalPercentUnchanged": 50,
     "priorPreviewReceiptPreserved": "b4003LatestScopedReadOnlyPreview20261017"
+  },
+  "b4003ExecutiveReadOnlyRosterSync20261017": {
+    "status": "AUTHORIZED_EXACT_PREVIEW_READONLY_ROSTER_ONLY",
+    "sourcePath": "functions/assignable-advisor-roster.js",
+    "sourceBlobSha": "a2f5d110201eb83cb0c72f7d716443c3b08c4d49",
+    "service": "orbit360AssignableAdvisorRosterPreview",
+    "contractId": "gi-i65-b4-003-executive-read-v1",
+    "requiresSameBackendDigestAsScopedRead": true,
+    "onlyApprovedFunctionExports": [
+      "orbit360ScopedPolicyReadPreview",
+      "orbit360AssignableAdvisorRosterPreview"
+    ],
+    "onlyIsolatedPreview": true,
+    "businessWritesAuthorized": false,
+    "configWritesAuthorized": false,
+    "otherFunctionsDeployAuthorized": false,
+    "sharedFirestoreRulesDeployAuthorized": false,
+    "livePromotionAuthorized": false,
+    "realUserTokensAuthorized": false,
+    "firestoreDataImportsAuthorized": false,
+    "formalPointsAdded": 0
+  },
+  "b4003PaulaExecutiveDashboardUat20261017": {
+    "status": "VISUAL_AND_FUNCTIONAL_REJECTED_FROZEN_CHILD",
+    "evidencePath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PAULA_DASHBOARD_AND_TRANSVERSAL_REGRESSION_LOCK_20261017.json",
+    "evidenceBlobSha": "4741d00ce8df68f158dd2c39dda3dfb20db7b9fa",
+    "dashboardSourceSha": "a819209312108d735392acb247242d2c58f87644",
+    "dashboardStyleSha": "02bea455bce9f5659eeaf8fd73e799eccb7f7e23",
+    "clientReadContractSha": "123f90ab2bce500f7a89338ae6e3de0b82811fe3",
+    "previewRunPending": true,
+    "unresolved": [
+      "Inicio executive visual and live goal readback",
+      "Equipo role matrix/modal and freelancers",
+      "Cliente360/Pólizas count parity",
+      "Cobros readiness/reload",
+      "Cancelaciones role-switch recovery",
+      "Firestore live rules security"
+    ],
+    "statusCriteria": "NO_B4_PASS_UNTIL_AUTHENTICATED_ROLE_SCOPE_AND_FINANCIAL_PARITY_AND_PAULA_VISUAL",
+    "noProductionAcceptance": true,
+    "securityP0StillOpen": true,
+    "formalPercentBefore": 50,
+    "formalPercentAfter": 50
   }
 }

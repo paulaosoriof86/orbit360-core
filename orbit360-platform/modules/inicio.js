@@ -8,12 +8,15 @@ window.Orbit = window.Orbit || {};
 Orbit.modules = Orbit.modules || {};
 Orbit.modules.inicio = (function () {
   const U = Orbit.ui, q = Orbit.q;
-  const rosterRequested = new Set(), rosterFailures = new Set();
-  let motivationIndex=-1;
+  const rosterRequested = new Set(), rosterFailures = new Set(), rosterAttempts=new Map(), rosterRetryAt=new Map();
+  let motivationIndex=0, motivationTimer=null;
   const leadershipMessages=[
-    'Liderar es actuar con información clara, prioridades y seguimiento oportuno.',
-    'Cada compromiso atendido fortalece la confianza de nuestros clientes.',
-    'Los resultados sostenibles empiezan con decisiones responsables hoy.'
+    'Cada póliza representa una promesa de protección. Liderar es convertirla en confianza.',
+    'La prevención abre oportunidades; el seguimiento oportuno protege las relaciones.',
+    'Los mejores resultados nacen de decisiones informadas y compromisos cumplidos.',
+    'Renovar la confianza de un cliente es tan importante como renovar su cobertura.',
+    'Un equipo que comparte prioridades transforma los datos en protección real.',
+    'Medir con rigor, actuar con criterio y acompañar con cercanía: así crecemos.'
   ];
   function secureDashboardRosterRole() {
     try {
@@ -31,14 +34,33 @@ Orbit.modules.inicio = (function () {
     if(!api||typeof api.dashboardList!=='function'||typeof api.dashboardPeek!=='function')return{status:'unavailable',rows:[]};
     const cacheKey=String(Orbit.auth?.productUser?.uid||'')+'|'+String(Orbit.session?.rol?.()||'').toLowerCase()+'|'+country+'|'+month;
     if((api.dashboardStatus?.().entries||[]).some(x=>x.key===cacheKey&&x.at))return{status:'ready',rows:api.dashboardPeek(country,month),globalMetas:api.dashboardGlobalMetas?.(country,month)||{},ownAdvisorId:api.dashboardSelfAdvisorId?.(country,month)||'',primaryCountry:api.dashboardPrimaryCountry?.(country,month)||''};
-    if(rosterFailures.has(key))return{status:'unavailable',rows:[]};
+    if(rosterFailures.has(key)){
+      if(Date.now()<(rosterRetryAt.get(key)||0))return{status:'unavailable',rows:[]};
+      if((rosterAttempts.get(key)||0)>2)return{status:'unavailable',rows:[]};
+      rosterFailures.delete(key);
+    }
     if(!Orbit.auth?.productUser?.uid)return{status:'pending',rows:[]};
-    if(!rosterRequested.has(key)){rosterRequested.add(key);api.dashboardList(country,month).then(()=>{rosterRequested.delete(key);if(host?.isConnected&&Orbit.route?.key==='inicio'&&rosterKey(country)+'|'+month===key)render(host);}).catch(()=>{rosterRequested.delete(key);rosterFailures.add(key);if(host?.isConnected&&Orbit.route?.key==='inicio'&&rosterKey(country)+'|'+month===key)render(host);});}
+    if(!rosterRequested.has(key)){
+      rosterRequested.add(key);
+      api.dashboardList(country,month).then(()=>{
+        rosterRequested.delete(key);rosterFailures.delete(key);rosterRetryAt.delete(key);rosterAttempts.delete(key);
+        if(host?.isConnected&&Orbit.route?.key==='inicio'&&rosterKey(country)+'|'+month===key)render(host);
+      }).catch(()=>{
+        rosterRequested.delete(key);rosterFailures.add(key);
+        const attempts=(rosterAttempts.get(key)||0)+1,delay=attempts===1?1200:attempts===2?3000:0;
+        rosterAttempts.set(key,attempts);rosterRetryAt.set(key,Date.now()+delay);
+        if(attempts<=2) setTimeout(()=>{
+          if(rosterKey(country)+'|'+month===key){rosterFailures.delete(key);
+            if(host?.isConnected&&Orbit.route?.key==='inicio')render(host);}
+        },delay);
+        else if(host?.isConnected&&Orbit.route?.key==='inicio')render(host);
+      });
+    }
     return{status:'pending',rows:[]};
   }
   function retryAdvisorRoster(){
     const country=String(Orbit.pais||'TODOS').toUpperCase(),key=rosterKey(country)+'|'+(q.currentMonthKey?q.currentMonthKey():U.monthKey());
-    rosterFailures.delete(key);rosterRequested.delete(key);
+    rosterFailures.delete(key);rosterRequested.delete(key);rosterRetryAt.delete(key);rosterAttempts.delete(key);
     const host=document.getElementById('host');
     if(host&&Orbit.route?.key==='inicio')render(host);
   }
@@ -223,19 +245,53 @@ Orbit.modules.inicio = (function () {
     const currentRole=Orbit.session&&typeof Orbit.session.rol==='function'?String(Orbit.session.rol()||''):'';
     const advisorView=/asesor|comercial/i.test(currentRole);
     const validCountry=activeCountry==='GT'?'Guatemala':activeCountry==='CO'?'Colombia':'Guatemala y Colombia';
-    const nowHour=new Date().getHours();
-    const greeting=nowHour<12?'Buen día':nowHour<19?'Buenas tardes':'Buenas noches';
-    const bannerNote=policyReadiness==='unavailable'||paymentReadiness==='unavailable'||advisorReadiness==='unavailable'
-      ? greeting+'. Algunas cifras todavía no están disponibles. Puedes atender las gestiones visibles y consultar sus detalles.'
-      : policyReadiness!=='ready'||paymentReadiness!=='ready'||advisorReadiness!=='ready'
-        ? greeting+'. Estamos reuniendo la producción, renovaciones y cobros del mes para que decidas con información completa.'
-        : advisorView
-          ? greeting+'. Cada renovación y cada seguimiento cuentan. Consulta tus metas y oportunidades en '+validCountry+'.'
-          : greeting+'. Acompaña el avance de tu equipo: producción, renovaciones y recaudo en '+validCountry+', con sus detalles.';
+    const boardReadiness=advisorReadiness==='ready'?'Datos de metas confirmados por servidor':advisorReadiness==='unavailable'?'Metas pendientes de validación':'Sincronizando metas';
+    const contextMessage=leadershipMessages[motivationIndex];
+    const analysisRows=[
+      {id:'renovaciones',label:'Renovaciones próximas (45 días)',state:policyReadiness,count:renov.length,route:'renovaciones',tone:'renew'},
+      {id:'vencido',label:'Obligaciones vencidas',state:portfolioReadiness,count:venc.length,route:'cobros',tone:'overdue'}
+    ];
+    const analysisMax=Math.max(1,...analysisRows.filter(row=>row.state==='ready').map(row=>row.count));
+    const analysisBars=analysisRows.map(item=>{
+      const reliable=item.state==='ready',width=reliable?Math.round(100*item.count/analysisMax):0;
+      const countText=reliable?String(item.count):item.state==='unavailable'?'No disponible':'Por confirmar';
+      return '<button type="button" class="gi-analysis-bar" data-inicio-analysis-bar="'+item.id+'" data-route="'+item.route+
+        '" data-readiness="'+item.state+'"><span class="gi-analysis-bar-label">'+U.esc(item.label)+
+        '</span><span class="gi-analysis-bar-track" aria-hidden="true"><i class="gi-analysis-bar-fill gi-tone-'+item.tone+
+        '" style="width:'+width+'%"></i></span><strong class="gi-analysis-bar-value">'+U.esc(countText)+'</strong></button>';
+    }).join('');
+    const criticalInsights=[];
+    criticalInsights.push(policyReadiness==='ready'
+      ?(renov.length?'Hay '+renov.length+' pólizas que vencen dentro de 45 días y requieren priorización.':
+        'No se detectaron vencimientos en el universo de pólizas confirmado.')
+      :'El universo de vencimientos aún no está confirmado por el servidor.');
+    criticalInsights.push(portfolioReadiness==='ready'
+      ?(venc.length?'Hay '+venc.length+' obligaciones vencidas visibles; revisa su gestión y aplicación.':
+        'No se registran obligaciones vencidas en el alcance visible confirmado.')
+      :'La cartera aún no tiene una lectura completa y no se calcula un saldo provisional.');
+    const verifiedAdvisorGoals=board.filter(item=>item.metaDisponible).length;
+    criticalInsights.push(advisorReadiness==='ready'&&productionReadiness==='ready'&&board.length
+      ? verifiedAdvisorGoals+' de '+board.length+' perfiles del alcance tienen meta individual verificable.'
+      :'No se certifica el cumplimiento de asesores sin metas y producción confirmadas.');
+    const evidenceCount=[clientReadiness,policyReadiness,portfolioReadiness,paymentReadiness,advisorReadiness].filter(v=>v==='ready').length;
     host.innerHTML=`<div class="page" data-inicio-reality-ready="1">
       ${Orbit.kit.banner({icon:'🌅',title:'Inicio',sub:'Visión general y prioridades',features:['Metas verificadas','Cartera y cobros','Seguimientos'],actions:`<button class="btn primary" onclick="location.hash='#/cliente360'">Abrir Cliente 360 →</button>`})}
-      <div class="card" data-inicio-premium="20261011" style="margin-top:18px;padding:18px 20px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:12px;align-items:start;border-top:3px solid var(--red)">
-        <div style="min-width:0"><div style="font-family:var(--f-mono);font-size:11px;letter-spacing:.18em;color:var(--ink-3);text-transform:uppercase">Metas del mes · ${U.monthLabel()}</div><div style="font-family:var(--f-display);font-weight:800;font-size:22px;margin-top:6px;color:var(--ink)">Avance real del mes</div><div data-inicio-days-left="${diasMes}" style="margin-top:5px;font-weight:700;font-size:12.5px;color:var(--ink)">${diasMes===0?'Hoy termina el mes':'Faltan '+diasMes+' días para cerrar el mes'}</div><div data-inicio-context-message="1" role="button" tabindex="0" title="Doble clic o Enter para ver otra frase" style="color:var(--ink-2);font-size:13px;margin-top:6px;line-height:1.4;cursor:pointer">${U.esc(motivationIndex<0?bannerNote:leadershipMessages[motivationIndex])}</div><small style="color:var(--ink-3);font-size:10px">Doble clic para cambiar el mensaje</small><div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap"><span class="badge neutral" data-inicio-count="clientes" data-readiness="${clientReadiness}">${readinessCount(clientReadiness,clientes.length+' clientes','Actualizando clientes')}</span><span class="badge neutral" data-inicio-count="polizas" data-readiness="${policyReadiness}">${readinessCount(policyReadiness,polizas.length+' pólizas','Actualizando pólizas')}</span><span class="badge ${portfolioReadiness==='ready'?'danger':'neutral'}" data-inicio-count="cartera-vencida" data-readiness="${portfolioReadiness}">${readinessCount(portfolioReadiness,venc.length+' registros vencidos en cartera','Actualizando cartera')}</span></div></div>
+      <div class="card gi-executive-board" data-inicio-premium="20261011" data-gi-dashboard="insurance-live-v1" style="margin-top:18px;padding:18px 20px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:12px;align-items:start;border-top:3px solid var(--red)">
+        <section class="gi-leadership-card" aria-label="Liderazgo y protección">
+          <div class="gi-month-eyebrow">Metas del mes · ${U.monthLabel()}</div>
+          <h2 class="gi-month-title">Avance real del mes</h2>
+          <p class="gi-month-countdown" data-inicio-days-left="${diasMes}">${diasMes===0?'Hoy termina el mes':'Faltan '+diasMes+' días para cerrar el mes'}</p>
+          <div class="gi-leadership-body">
+            <p data-inicio-context-message="1" role="button" tabindex="0" aria-label="Mostrar otra reflexión sobre liderazgo y seguros" class="gi-motivation-quote">${U.esc(contextMessage)}</p>
+            <button class="gi-motivation-next" type="button" data-inicio-next-quote aria-label="Otra reflexión">↻</button>
+          </div>
+          <div class="gi-dashboard-source"><span class="gi-source-dot"></span>${U.esc(boardReadiness)}</div>
+          <div class="gi-month-chips">
+            <span class="badge neutral" data-inicio-count="clientes" data-readiness="${clientReadiness}">${readinessCount(clientReadiness,clientes.length+' clientes','Confirmando clientes')}</span>
+            <span class="badge neutral" data-inicio-count="polizas" data-readiness="${policyReadiness}">${readinessCount(policyReadiness,polizas.length+' pólizas','Confirmando pólizas')}</span>
+            <span class="badge ${portfolioReadiness==='ready'?'danger':'neutral'}" data-inicio-count="cartera-vencida" data-readiness="${portfolioReadiness}">${readinessCount(portfolioReadiness,venc.length+' vencidos','Validando cartera')}</span>
+          </div>
+        </section>
         ${productionReadiness==='ready'?splitCountrySummary('production','Producción neta del mes',production):pendingDial('Producción neta del mes',productionReadiness)}
         ${paymentReadiness==='ready'?splitCountrySummary('recaudo','Recaudo confirmado del mes',recaudoMes):pendingDial('Recaudo confirmado del mes',paymentReadiness)}
       </div>
@@ -243,8 +299,20 @@ Orbit.modules.inicio = (function () {
         <button class="kpi kpi-click" data-inicio-metric="cobros-confirmados" data-readiness="${paymentReadiness}" data-values="${escAttr(confirmedMap)}" onclick="Orbit.modules.inicio.openFinancialKpi('confirmed')" title="Ver cobros confirmados"><div class="k-accent" style="background:${paymentReadiness==='ready'?'var(--red)':'var(--line)'}"></div><div class="k-label">Cobros confirmados</div><div class="k-val">${paymentReadiness==='ready'?financialMoneyMap(confirmedMap):(paymentReadiness==='unavailable'?'No disponible':'Actualizando datos')}</div><div class="k-foot ${paymentReadiness==='ready'?'up':'muted'}">${paymentReadiness==='ready'?confirmedRows.length+' pagos confirmados ›':'Esperando confirmación del servidor'}</div></button>
         <button class="kpi kpi-click" data-inicio-metric="cartera-pendiente" data-readiness="${portfolioReadiness}" data-values="${escAttr(pendingMap)}" onclick="Orbit.modules.inicio.openFinancialKpi('pending')" title="Ver pendiente de cobro"><div class="k-accent" style="background:${portfolioReadiness==='ready'?'var(--warn)':'var(--line)'}"></div><div class="k-label">Pendiente de cobro</div><div class="k-val">${portfolioReadiness==='ready'?financialMoneyMap(pendingMap):(portfolioReadiness==='unavailable'?'No disponible':'Actualizando datos')}</div><div class="k-foot muted">${portfolioReadiness==='ready'?pendingRows.length+' obligaciones · '+valuedCount(pendingRows)+' con monto ›':'Esperando confirmación del servidor'}</div></button>
         <button class="kpi kpi-click" data-inicio-metric="cartera-vencida" data-readiness="${portfolioReadiness}" data-values="${escAttr(overdueMap)}" onclick="Orbit.modules.inicio.openFinancialKpi('overdue')" title="Ver cartera vencida"><div class="k-accent" style="background:${portfolioReadiness==='ready'?'var(--danger)':'var(--line)'}"></div><div class="k-label">Cartera vencida</div><div class="k-val">${portfolioReadiness==='ready'?financialMoneyMap(overdueMap):(portfolioReadiness==='unavailable'?'No disponible':'Actualizando datos')}</div><div class="k-foot ${portfolioReadiness==='ready'?'down':'muted'}">${portfolioReadiness==='ready'?overdueRows.length+' obligaciones · '+valuedCount(overdueRows)+' con monto ›':'Esperando confirmación del servidor'}</div></button>
-        <button class="kpi kpi-click" data-inicio-renew45="${renov.length}" data-renewal-owner="polizas.policyMetrics.isRenewalWithin45Days" onclick="Orbit.modules.inicio.openRenewalsKpi()" title="Ver pólizas con vencimiento en 0–45 días"><div class="k-accent" style="background:var(--info)"></div><div class="k-label">Vencen ≤45 d</div><div class="k-val">${renov.length}</div><div class="k-foot muted">mismo universo de Pólizas ›</div></button>
+        <button class="kpi kpi-click" data-inicio-renew45="${policyReadiness==='ready'?renov.length:''}" data-renewal-owner="polizas.policyMetrics.isRenewalWithin45Days" onclick="Orbit.modules.inicio.openRenewalsKpi()" title="Ver pólizas con vencimiento en 0–45 días"><div class="k-accent" style="background:var(--info)"></div><div class="k-label">Vencen ≤45 d</div><div class="k-val">${policyReadiness==='ready'?renov.length:policyReadiness==='unavailable'?'No disponible':'Por confirmar'}</div><div class="k-foot muted">${policyReadiness==='ready'?'mismo universo de Pólizas ›':'Esperando confirmación del servidor'}</div></button>
       </div>
+      <section class="gi-insurance-analysis" data-inicio-critical-analysis="1" aria-label="Indicadores de análisis operativo">
+        <div class="gi-analysis-surface">
+          <header><span class="gi-analysis-symbol">▤</span><div><b>Panorama de prioridades</b><small>Volumen de casos · cifras de lectura autorizada</small></div></header>
+          <div class="gi-analysis-bars">${analysisBars}</div>
+          <div class="gi-analysis-hint">Cada barra abre los registros de su módulo.</div>
+        </div>
+        <div class="gi-analysis-surface">
+          <header><span class="gi-analysis-symbol">◉</span><div><b>Lectura crítica del mes</b><small>Interpretación sin proyecciones ni datos inventados</small></div></header>
+          <ul class="gi-analysis-insights">${criticalInsights.map(item=>'<li>'+U.esc(item)+'</li>').join('')}</ul>
+          <p class="gi-analysis-proof" data-inicio-evidence-confirmed="${evidenceCount}" data-inicio-evidence-total="5">${evidenceCount} de 5 fuentes confirmadas · ${activeCountry==='TODOS'?'GTQ y COP sin conversión':'País '+U.esc(activeCountry)}</p>
+        </div>
+      </section>
       <div class="inicio-main-grid" style="display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:18px;margin-top:18px">
         <div class="card pad"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px"><b style="font-family:var(--f-display);font-size:16px">Avance por asesor</b><span class="muted" style="font-size:12px">producción neta del mes vs meta configurada</span></div>
           ${advisorBoardHtml}
@@ -253,11 +321,18 @@ Orbit.modules.inicio = (function () {
       </div>
       ${seguimientosHoy()}
     </div>`;
+    if(typeof host.querySelectorAll==='function')host.querySelectorAll('[data-inicio-analysis-bar]').forEach(button=>button.addEventListener('click',()=>{const route=button.getAttribute('data-route');if(route==='renovaciones'||route==='cobros')location.hash='#/'+route;}));
+    if(motivationTimer!==null){clearInterval(motivationTimer);motivationTimer=null;}
     const message=typeof host.querySelector==='function'?host.querySelector('[data-inicio-context-message]'):null;
+    const quoteButton=typeof host.querySelector==='function'?host.querySelector('[data-inicio-next-quote]'):null;
     if(message){
-      const advance=()=>{motivationIndex=(motivationIndex+1)%leadershipMessages.length;message.textContent=leadershipMessages[motivationIndex];};
-      message.addEventListener('dblclick',advance);
+      const advance=()=>{if(!host.isConnected)return;motivationIndex=(motivationIndex+1)%leadershipMessages.length;message.textContent=leadershipMessages[motivationIndex];};
+      message.addEventListener('click',advance);
       message.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();advance();}});
+      if(quoteButton)quoteButton.addEventListener('click',advance);
+      if(typeof window!=='undefined'&&typeof window.setInterval==='function'&&
+        !(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches))
+        motivationTimer=window.setInterval(()=>{if(!host.isConnected||Orbit.route?.key!=='inicio'){clearInterval(motivationTimer);motivationTimer=null;return;}if(!document.hidden)advance();},12000);
     }
   }
 

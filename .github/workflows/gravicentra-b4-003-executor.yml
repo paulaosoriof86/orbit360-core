@@ -365,6 +365,23 @@ jobs:
           if(publicBrowserSmoke)fs.appendFileSync(process.env.GITHUB_OUTPUT,'public_smoke_url='+browserBinding.previewUrl+'\n');
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'renewals_preview='+(renewalsPreview?'true':'false')+'\n');
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'run='+(previewOk?'true':'false')+'\n');
+          // B4-003: exact two-read-only-function Preview scope. Product and
+          // operational APIs remain blocked; no prod or Firestore rules writes.
+          const rosterAuth=c.b4003ExecutiveReadOnlyRosterSync20261017||{};
+          const rosterBlob=require('node:child_process').execFileSync('git',['hash-object','functions/assignable-advisor-roster.js'],{encoding:'utf8'}).trim();
+          const readonlyRoster=scopedPreview&&rosterAuth.status==='AUTHORIZED_EXACT_PREVIEW_READONLY_ROSTER_ONLY'
+            && rosterAuth.sourceBlobSha===rosterBlob
+            && rosterAuth.service==='orbit360AssignableAdvisorRosterPreview'
+            && rosterAuth.businessWritesAuthorized===false
+            && rosterAuth.otherFunctionsDeployAuthorized===false
+            && rosterAuth.sharedFirestoreRulesDeployAuthorized===false
+            && rosterAuth.livePromotionAuthorized===false
+            && c.b4003SecurityReleaseHold?.status==='ACTIVE_FAIL_CLOSED_UNAUTHORIZED_BROWSER_FIRESTORE_READ_WRITE'
+            && l.boundaries?.previewMutationAuthorized===true
+            && l.boundaries?.realOperationalWritesAuthorized===false;
+          if(currentSubject===requestedOct15Subject&&scopedPreview&&!readonlyRoster)
+            throw Error('B4_003_DASHBOARD_READONLY_PREVIEW_SYNC_NOT_AUTHORIZED');
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'readonly_roster='+(readonlyRoster?'true':'false')+'\n');
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'scoped_preview='+(scopedPreview?'true':'false')+'\n');
           // No custom Firebase Auth tokens for real users without explicit scoped approval.
           const identityProofAllowed=scopedPreview&&c.b4003ProtectedPreviewAuthorization?.realUserImpersonationAuthorized===true;
@@ -1400,8 +1417,12 @@ jobs:
           (cd "$FROOT/backend" && npm ci --ignore-scripts --no-audit --no-fund >/dev/null)
           echo '{"functions":{"source":"backend"}}' > "$FROOT/firebase.json"
           if [ "${{ steps.gate.outputs.scoped_preview }}" = "true" ]; then
+            if [ "${{ steps.gate.outputs.readonly_roster }}" = "true" ]; then
+              node "$FIREBASE_CLI_BIN" deploy --only functions:orbit360ScopedPolicyReadPreview,functions:orbit360AssignableAdvisorRosterPreview --config "$FROOT/firebase.json" --project "$PROJECT_ID" --non-interactive
+            else
             node "$FIREBASE_CLI_BIN" deploy --only functions:orbit360ScopedPolicyReadPreview --config "$FROOT/firebase.json" --project "$PROJECT_ID" --non-interactive
-            printf '{"mode":"B4_003_SCOPED_READ_ONLY_PREVIEW","scopedFunctionDeployed":true,"sharedRulesDeployed":false,"otherFunctionsDeployed":false,"livePromotion":false,"dataWrites":0}\n' > "$RUNNER_TEMP/b4-003-package/evidence/b4-003-preview-backend-binding.json"
+            fi
+            printf '{"mode":"B4_003_SCOPED_READ_ONLY_PREVIEW","scopedFunctionDeployed":true,"dashboardReadOnlyRosterDeployed":%s,"dashboardContract":"gi-i65-b4-003-executive-read-v1","sourceSha":"%s","backendSourceDigest":"%s","sharedRulesDeployed":false,"otherFunctionsDeployed":false,"livePromotion":false,"dataWrites":0}\n' "${{ steps.gate.outputs.readonly_roster }}" "$CANDIDATE_SOURCE_SHA" "${{ steps.build.outputs.backend_source_digest }}" > "$RUNNER_TEMP/b4-003-package/evidence/b4-003-preview-backend-binding.json"
           else
           node "$FIREBASE_CLI_BIN" deploy --only functions:orbit360ProductOperationalCommandPreview,functions:orbit360ProductAssetUploadPreview,functions:orbit360ProductAssetReadPreview,functions:orbit360OpsLeadsCommandPreview,functions:orbit360DocumentDriveStatusPreview,functions:orbit360DocumentDriveUploadPreview,functions:orbit360DocumentDriveListFolderPreview,functions:orbit360DocumentDriveReadDossierPreview,functions:orbit360DocumentDriveReadPreview,functions:orbit360DocumentDriveDownloadPreview,functions:orbit360DocumentDriveFinalizePreview,functions:orbit360DocumentDriveQuarantinePreview,functions:orbit360DocumentDriveBootstrapPreview,functions:orbit360DocumentDriveCleanupPreview,functions:orbit360TenantDomainConfigPreview,functions:orbit360AssignableAdvisorRosterPreview,functions:orbit360AcademiaManualReadPreview,functions:orbit360GetAdvisorOpsInboxPreview,functions:orbit360UpdateAdvisorOpsInboxStatePreview --config "$FROOT/firebase.json" --project "$PROJECT_ID" --non-interactive
           printf '{"status":"DEPLOYED_EXACT_PREVIEW_ONLY","sourceSha":"%s","backendSourceDigest":"%s","functions":["orbit360ProductOperationalCommandPreview","orbit360ProductAssetUploadPreview","orbit360ProductAssetReadPreview","orbit360OpsLeadsCommandPreview","orbit360DocumentDriveStatusPreview","orbit360DocumentDriveUploadPreview","orbit360DocumentDriveListFolderPreview","orbit360DocumentDriveReadDossierPreview","orbit360DocumentDriveReadPreview","orbit360DocumentDriveDownloadPreview","orbit360DocumentDriveFinalizePreview","orbit360DocumentDriveQuarantinePreview","orbit360DocumentDriveBootstrapPreview","orbit360DocumentDriveCleanupPreview","orbit360TenantDomainConfigPreview","orbit360AssignableAdvisorRosterPreview","orbit360AcademiaManualReadPreview","orbit360GetAdvisorOpsInboxPreview","orbit360UpdateAdvisorOpsInboxStatePreview"],"productionFunctionsDeployed":false,"realBusinessWritesAuthorized":false}\n' "$CANDIDATE_SOURCE_SHA" "${{ steps.build.outputs.backend_source_digest }}" > "$RUNNER_TEMP/b4-003-package/evidence/b4-003-preview-backend-binding.json"

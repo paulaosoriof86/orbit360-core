@@ -3,7 +3,7 @@ const {getApps,initializeApp}=require('firebase-admin/app');
 const {getFirestore}=require('firebase-admin/firestore');
 const {HttpsError,onCall}=require('firebase-functions/v2/https');
 const REGION=process.env.ORBIT360_FUNCTIONS_REGION||'us-central1',PREVIEW_REGION=process.env.ORBIT360_PREVIEW_FUNCTIONS_REGION||'us-east1';
-const VERSION='gravicentra-assignable-advisor-roster-v1',db=getFirestore(getApps()[0]||initializeApp());
+const VERSION='gravicentra-assignable-advisor-roster-v1',DASHBOARD_CONTRACT='gi-i65-b4-003-executive-read-v1',db=getFirestore(getApps()[0]||initializeApp());
 const FULL=new Set(['superadmin','super_admin','superadministrador','admintenant','admin_tenant','admin','direccion','operativo']),SELF=new Set(['asesor','comercial']);
 const text=(v,m=180)=>String(v==null?'':v).replace(/\u0000/g,'').trim().slice(0,m);
 const norm=v=>text(v,120).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_+|_+$/g,'');
@@ -86,7 +86,7 @@ async function r23Dashboard(request){
  const rosterPrimary=text(ownData.paisPrincipal||ownData.primaryCountry||ownData.paisDefault||ownData.countryDefault,8).toUpperCase();
  const primaryCandidate=claimedPrimary||rosterPrimary||(!claimedPrimary&&!rosterPrimary&&cc.length===1?cc[0]:'');
  const primaryCountry=cc.includes(primaryCandidate)?primaryCandidate:'';
- return{ok:true,schemaVersion:'gravicentra-inicio-r23',country,month,scope,rows,globalMetas,primaryCountry,ownAdvisorId:rows.some(r=>r.id===own)?own:''};
+ return{ok:true,schemaVersion:'gravicentra-inicio-r23',dashboardContract:DASHBOARD_CONTRACT,country,month,scope,rows,globalMetas,primaryCountry,ownAdvisorId:rows.some(r=>r.id===own)?own:''};
 }
 
 exports.orbit360AssignableAdvisorRoster=onCall({region:REGION,cors:true},execute);

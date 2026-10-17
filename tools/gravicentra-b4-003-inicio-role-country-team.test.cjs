@@ -41,7 +41,7 @@ const eq=(got,want)=>{assert.equal(got,want);checks++;};
 const denied=async fn=>{let error;try{await fn()}catch(e){error=e}
  assert.equal(error&&error.code,'permission-denied');checks++;};
 (async()=>{
- let v=await call();eq(v.scope,'team');
+ let v=await call();eq(v.dashboardContract,'gi-i65-b4-003-executive-read-v1');eq(v.scope,'team');
  eq(v.rows.map(x=>x.id).sort().join(','),'a1,a3');
  eq(Object.keys(v.globalMetas).length,0);
  v=await call('Asesor');eq(v.scope,'own');eq(v.rows.map(x=>x.id).sort().join(','),'a1');
@@ -65,3 +65,23 @@ const denied=async fn=>{let error;try{await fn()}catch(e){error=e}
 // Primary country is verified; a multination advisor is never assigned an arbitrary first-country target.
 assert.match(source,/primaryCandidate=claimedPrimary\|\|rosterPrimary/,'VERIFIED_PRIMARY_COUNTRY_REQUIRED');
 assert.match(source,/primaryCountry=cc.includes\(primaryCandidate\)/,'PRIMARY_COUNTRY_WITHIN_MEMBERSHIP_COUNTRIES');
+
+ // B4-003 Preview frontend MUST refuse older backend contracts even when
+ // they return valid-looking rows. No cache success for stale backend.
+(async()=>{
+ const client=fs.readFileSync('orbit360-platform/core/assignable-advisor-roster-client.js','utf8');
+ let response={ok:true,schemaVersion:'gravicentra-inicio-r23',country:'GT',month:'2026-10',scope:'all',
+   rows:[],globalMetas:{},primaryCountry:'GT',ownAdvisorId:''};
+ const w={__ORBIT360_PRODUCT_PUBLIC_CONFIG__:{tenantHint:tenantId,scopedReadPreviewCandidate:true},
+   addEventListener:()=>{},Orbit:{auth:{productUser:{uid}},session:{rol:()=>'Operativo'},
+   productRuntimeBrowserProvidersP0:{callFunction:async()=>response}}};
+ // Define the explicit synthetic tenant above; never use deployed identities.
+ w.__ORBIT360_PRODUCT_PUBLIC_CONFIG__.tenantHint=tenantId;
+ vm.runInNewContext(client,{window:w,Orbit:w.Orbit,location:{hostname:'ays-orbit-360-lab--gi-i65-b4-test.web.app'},Map,Set,Promise,Date,console},{timeout:1000});
+ await assert.rejects(w.Orbit.assignableAdvisorRoster.dashboardList('GT','2026-10'),/INICIO_DASHBOARD_PREVIEW_BACKEND_VERSION_MISMATCH/);
+ response={...response,dashboardContract:'gi-i65-b4-003-executive-read-v1'};
+ const valid=await w.Orbit.assignableAdvisorRoster.dashboardList('GT','2026-10');
+ assert.equal(valid.length,0);
+ assert.equal(w.Orbit.assignableAdvisorRoster.dashboardPrimaryCountry('GT','2026-10'),'GT');
+ console.log('B4_003_INICIO_DASHBOARD_BACKEND_DIGEST_CONTRACT_QA_PASS stale_denied current_allowed synthetic_only');
+})().catch(error=>{console.error(error);process.exitCode=1;});

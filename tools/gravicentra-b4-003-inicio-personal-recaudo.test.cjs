@@ -62,8 +62,16 @@ ownId='';html=render();
 assert.doesNotMatch(html,/data-inicio-own-contribution=/);checks++;
 console.log('B4_003_INICIO_PERSONAL_RECAUDO_UI_QA_PASS checks='+checks+' mock_only no_real_writes');
 assert.match(src,/data-inicio-days-left/, 'MONTH_END_COUNTDOWN_PRESERVED');
-assert.match(src,/Doble clic para cambiar el mensaje/, 'MOTIVATIONAL_INTERACTION_DISCOVERABLE');
-assert.match(src,/message\.addEventListener\('dblclick',advance\)/, 'DOUBLE_CLICK_WIRED');
+assert.doesNotMatch(src,/Doble clic para cambiar el mensaje/, 'NO_INTERNAL_INTERACTION_INSTRUCTIONS');
+assert.match(src,/message\.addEventListener\('click',advance\)/, 'SINGLE_CLICK_ROTATION_WIRED');
+assert.match(src,/gi-motivation-quote/, 'HIGH_CONTRAST_LEADERSHIP_QUOTE');
+assert.match(src,/data-inicio-critical-analysis/, 'SOURCE_BACKED_CRITICAL_ANALYSIS_PRESENT');
+assert.match(src,/data-inicio-evidence-confirmed/, 'SOURCE_READINESS_VISIBLE');
+assert.match(src,/policyReadiness==='ready'\?renov.length/, 'NO_FALSE_ZERO_WHILE_LOADING');
+assert.doesNotMatch(src,/const greeting=/, 'NO_TIME_DEPENDENT_GREETING');
+const style=fs.readFileSync('orbit360-platform/styles/infra.css','utf8');
+assert.match(style,/\.gi-motivation-quote\{[\s\S]*?color:#f1f5fb!important/, 'LEADERSHIP_CONTRAST');
+assert.match(style,/@media\(max-width:500px\)/, 'PHONE_LAYOUT_REQUIRED');
 assert.match(src,/align-items:start;border-top:3px/, 'CARD_NOT_STRETCHED');
 
 assert.match(src,/data-inicio-primary-country-unresolved/, 'COUNTRY_NOT_GUESSED');

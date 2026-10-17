@@ -16,6 +16,7 @@ async function dashboardList(country,month){
  const k=dashKey(country,month);if(dashMeta.get(k)?.confirmed)return dashboardPeek(country,month);if(dashPending.has(k))return dashPending.get(k);
  const p=(async()=>{const data=await call({tenantId:tenant(),activeRole:role(),country:text(country).toUpperCase(),month:text(month),purpose:'inicio'});
  if(!data||data.ok!==true||data.schemaVersion!=='gravicentra-inicio-r23'||!Array.isArray(data.rows)||data.month!==text(month))throw Error('INICIO_R23_READBACK_REQUIRED');
+ if((window.__ORBIT360_PRODUCT_PUBLIC_CONFIG__||{}).scopedReadPreviewCandidate===true&&data.dashboardContract!=='gi-i65-b4-003-executive-read-v1')throw Error('INICIO_DASHBOARD_PREVIEW_BACKEND_VERSION_MISMATCH');
  const rows=[],seen=new Set();for(const r of data.rows){const id=text(r.id),nombre=text(r.nombre),paises=[...new Set([].concat(r.paises||[]).map(x=>text(x).toUpperCase()).filter(x=>x==='GT'||x==='CO'))];if(!id||!nombre||!paises.length||seen.has(id))throw Error('INICIO_R23_ADVISOR_INVALID');seen.add(id);const metas={};
  for(const c of paises){const source=r.metas?.[c]||{},m={};for(const f of ['nueva','renovada','recaudo','produccion']){const n=Number(source[f]);if(!Number.isFinite(n)||n<0)throw Error('INICIO_R23_META_INVALID');m[f]=n;}metas[c]={...m,explicit:source.explicit===true};}
  const primaryCountry=text(r.primaryCountry).toUpperCase();
