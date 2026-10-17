@@ -90,7 +90,9 @@ jobs:
           echo "CANDIDATE_SOURCE_SHA=$CANDIDATE_SOURCE_SHA" >> "$GITHUB_ENV"
 
       - name: B4-003 protected role hydration regression (mock, no writes)
-        run: node tools/gravicentra-b4-003-protected-hydration.test.cjs
+        run: |
+          node tools/gravicentra-b4-003-protected-hydration.test.cjs
+          node tools/gravicentra-b4-003-scoped-related-reader.test.cjs
 
       - name: Gate exact B4-003 Preview
         id: gate

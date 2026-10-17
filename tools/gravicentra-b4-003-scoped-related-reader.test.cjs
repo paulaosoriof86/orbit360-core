@@ -228,6 +228,43 @@ async function deny(fn,code){let thrown;try{await fn()}catch(e){thrown=e}assert.
  assert.equal(pagedGoals.rows.length,1);assert.ok(pagedGoals.nextCursor);checks++;
  const page2=await flow('metas','operativo',{pageSize:1,cursor:pagedGoals.nextCursor});
  assert.notEqual(page2.rows[0].id,pagedGoals.rows[0].id);checks++;
+
+ // Guarded cancellation and audit branch; real membership/role resolver.
+ const oldMember=member,oldCfg=cfg;
+ docs.cancelaciones={
+  aOwn:{id:'aOwn',tenantId,polizaId:'p1',clienteId:'c1'},
+  bOther:{id:'bOther',tenantId,polizaId:'p2',clienteId:'c2'},
+  cStale:{id:'cStale',tenantId,polizaId:'p1',clienteId:'c1',pais:'CO',asesorId:'a2'},
+  dOrphan:{id:'dOrphan',tenantId,polizaId:'missing',clienteId:'c1'},
+  eMismatch:{id:'eMismatch',tenantId,polizaId:'p1',clienteId:'c2'}
+ };
+ docs.auditoria={
+  aGT:{id:'aGT',tenantId,pais:'GT',accion:'editar'},
+  bCO:{id:'bCO',tenantId,pais:'CO',accion:'guardar'},
+  cGlobal:{id:'cGlobal',tenantId,accion:'cambio',password:'secret',before:{secret:'secret'}},
+  dForeign:{id:'dForeign',tenantId:'foreign',accion:'leer'}
+ };
+ member={...member,roles:['Asesor','Operativo','Dirección','AdminTenant'],
+  modulesVisible:['equipo'],modulesRestricted:[],dataScopes:{default:'all'}};
+ cfg={roleScopes:{asesor:'own',operativo:'all',direccion:'all',admintenant:'all'}};
+ const cancelled=await flow('cancelaciones','operativo',{pageSize:50});
+ assert.deepEqual(cancelled.rows.map(x=>x.id),['aOwn','bOther','cStale']);
+ assert.equal(cancelled.rows[2].pais,'GT');checks++;
+ await deny(()=>flow('cancelaciones','asesor'),'MODULE_DENIED');checks++;
+ await deny(()=>read('cancelaciones','eMismatch',{role:'operativo'}),'RECORD_NOT_FOUND_OR_DENIED');checks++;
+ await deny(()=>flow('cancelaciones','operativo',{cursor:'dOrphan'}),'CURSOR_DENIED');checks++;
+ const audit=await flow('auditoria','Dirección',{pageSize:50});
+ assert.deepEqual(audit.rows.map(x=>x.id),['aGT','cGlobal']);
+ assert.ok(audit.rows.every(x=>!('password' in x)&&!('before' in x)));checks++;
+ const auditCO=await flow('auditoria','Dirección',{country:'CO',pageSize:50});
+ assert.deepEqual(auditCO.rows.map(x=>x.id),['bCO','cGlobal']);checks++;
+ await deny(()=>flow('auditoria','asesor'),'TEAM_DIRECTORY_DENIED');checks++;
+ await deny(()=>flow('auditoria','operativo'),'TEAM_DIRECTORY_DENIED');checks++;
+ await deny(()=>read('auditoria','bCO',{role:'Dirección'}),'RECORD_NOT_FOUND_OR_DENIED');checks++;
+ member={...member,modulesRestricted:['equipo']};
+ await deny(()=>flow('auditoria','Dirección'),'MODULE_DENIED');checks++;
+ member=oldMember;cfg=oldCfg;
+ console.log('B4_003_CANCELACIONES_AUDITORIA_AUTHORIZATION_QA_PASS checks=10 no_data_writes');
  console.log('B4_003_METAS_INSTITUTIONAL_AND_ADVISOR_SCOPE_QA_PASS checks=7 no_data_writes');
  console.log('B4_003_RELATED_SERVER_BATCH_SCOPE_MOCK_PASS checks='+checks+' no Firebase writes');
  console.log('B4_003_RELATED_DOCUMENT_SERVER_SCOPE_MOCK_PASS checks='+checks+' no Firebase writes');

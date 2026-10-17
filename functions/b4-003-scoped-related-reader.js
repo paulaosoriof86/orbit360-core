@@ -2,7 +2,7 @@
 // B4-003 staged protected document-read owner for related operational collections.
 // Read-only. Preview-only candidate; NO Firebase export or rule deploy.
 const {resolve,allowRow,Denied}=require('./b4-003-scoped-access-boundary');
-const collections=new Set(['clientes','vehiculos','recibosEsperados','carteraPrimas','cobros','negocios','gestiones','actividades','metas']);
+const collections=new Set(['clientes','vehiculos','recibosEsperados','carteraPrimas','cobros','negocios','gestiones','actividades','metas','cancelaciones','auditoria']);
 const workflowCollections=new Set(['negocios','gestiones','actividades']);
 const financeCollections=new Set(['vehiculos','recibosEsperados','carteraPrimas','cobros']);
 const clean=v=>String(v==null?'':v).trim();
@@ -39,6 +39,43 @@ function financialView(ctx,row,policy,client,tenantId,id){
  return Object.assign({},row,{id:row.id||id,canonicalDocumentId:id,
    tenantId,pais:country,asesorId:advisor||clean(row.asesorId||row.advisorId||row.ownerAdvisorId)});
 }
+
+async function verifiedCancellationView(ctx,tenant,row,id,lookup){
+ if(row.tenantId&&row.tenantId!==ctx.tenantId)throw new Denied('TENANT_DENIED');
+ const pid=clean(row.polizaId||row.policyId),inputCid=clean(row.clienteId||row.clientId);
+ if(!pid&&!inputCid)throw new Denied('CANCELLATION_PARENT_REQUIRED');
+ async function parent(kind,key){
+  const k=kind+':'+key;
+  if(!lookup.has(k))lookup.set(k,docRef(tenant,kind,safeId(key,'RELATION')).get());
+  const snap=await lookup.get(k);
+  return snap.exists?snap.data()||{}:null;
+ }
+ const policy=pid?await parent('polizas',pid):null;
+ if(pid&&!policy)throw new Denied('RELATION_POLICY_NOT_FOUND');
+ const cid=policy?clean(policy.clienteId):inputCid;
+ if(!cid||(inputCid&&inputCid!==cid))throw new Denied('RELATION_CLIENT_MISMATCH');
+ const client=await parent('clientes',cid);
+ if(!client)throw new Denied('RELATION_CLIENT_NOT_FOUND');
+ verifiedLinkedClient(ctx,client,policy);
+ const canonical=policy||client;
+ allowRow(ctx,canonical);
+ const country=clean(canonical.pais||canonical.country).toUpperCase();
+ if(country!==ctx.country)throw new Denied('COUNTRY_DENIED');
+ const advisor=clean(canonical.asesorId||canonical.advisorId||canonical.ownerAdvisorId);
+ return Object.assign({},row,{id:row.id||id,canonicalDocumentId:id,
+  tenantId:ctx.tenantId,pais:country,asesorId:advisor,clienteId:cid,polizaId:pid||clean(row.polizaId)});
+}
+function verifiedAuditView(ctx,row,id){
+ if(ctx.collection!=='auditoria'||ctx.scope!=='all')throw new Denied('AUDIT_SCOPE_DENIED');
+ if(row.tenantId&&row.tenantId!==ctx.tenantId)throw new Denied('TENANT_DENIED');
+ const stated=clean(row.pais||row.country).toUpperCase();
+ if(stated&&stated!==ctx.country)throw new Denied('COUNTRY_DENIED');
+ const scalar=(field,max=240)=>typeof row[field]==='string'?row[field].slice(0,max):'';
+ return {id,canonicalDocumentId:id,tenantId:ctx.tenantId,pais:ctx.country,
+  fecha:scalar('fecha',64),modulo:scalar('modulo',100),accion:scalar('accion',120),
+  fase:scalar('fase',80),usuario:scalar('usuario',120),motivo:scalar('motivo',500)};
+}
+
 async function readScopedRelatedDocument({db,auth,request}){
  if(!db||!auth||!auth.uid)throw new Denied('AUTH_REQUIRED');
  const q=request||{},tenantId=safeId(q.tenantId,'TENANT');
@@ -56,7 +93,17 @@ async function readScopedRelatedDocument({db,auth,request}){
    tenantId,activeRole:role,country,collection});
  const snap=await docRef(tenant,collection,documentId).get();
  if(!snap.exists)throw new Denied('RECORD_NOT_FOUND_OR_DENIED');
- const row=snap.data()||{},policyId=clean(row.polizaId||row.policyId);
+
+ const record=snap.data()||{};
+ if(collection==='auditoria'||collection==='cancelaciones'){
+  let projected;
+  try{projected=collection==='auditoria'
+   ?verifiedAuditView(ctx,record,documentId)
+   :await verifiedCancellationView(ctx,tenant,record,documentId,new Map());}
+  catch(e){if(e instanceof Denied)throw new Denied('RECORD_NOT_FOUND_OR_DENIED');throw e;}
+  return {ok:true,serverScoped:true,collection,country,scope:ctx.scope,row:projected};
+ }
+ const row=record,policyId=clean(row.polizaId||row.policyId);
  const inputClientId=clean(row.clienteId||row.clientId);
  let policy=null,client=null;
  if(policyId){
@@ -114,6 +161,32 @@ async function readScopedRelatedList({db,auth,request}){
  const ctx=resolve({auth,member:ms.data()||{},config:cs.exists?cs.data()||{}:{},
    tenantId,activeRole:role,country,collection:coll});
  const target=tenant.collection('data').doc(coll).collection('items');
+
+
+ if(coll==='auditoria'||coll==='cancelaciones'){
+  if(policyId||hasBatch)throw new Denied('POLICY_ANCHOR_UNEXPECTED');
+  const MAX_ROWS=500,ss=await target.orderBy('__name__').limit(MAX_ROWS+1).get();
+  const docs=Array.isArray(ss.docs)?ss.docs:[];
+  if(docs.length>MAX_ROWS)throw new Denied('RESTRICTED_COLLECTION_SCAN_BOUND');
+  const verified=[],parentCache=new Map(),batchSize=8;
+  for(let i=0;i<docs.length;i+=batchSize){
+   const batch=await Promise.all(docs.slice(i,i+batchSize).map(async d=>{
+    try{return coll==='auditoria'
+     ?verifiedAuditView(ctx,d.data()||{},d.id)
+     :await verifiedCancellationView(ctx,tenant,d.data()||{},d.id,parentCache);}
+    catch(e){if(e instanceof Denied)return null;throw e;}
+   }));
+   verified.push(...batch.filter(Boolean));
+  }
+  const at=cursor?verified.findIndex(r=>r.canonicalDocumentId===cursor):-1;
+  if(cursor&&at<0)throw new Denied('CURSOR_DENIED');
+  const rows=verified.slice(at+1,at+1+pageSize);
+  return {ok:true,serverScoped:true,collection:coll,country,scope:ctx.scope,
+   rows,nextCursor:verified.length>at+1+pageSize?
+    rows[rows.length-1].canonicalDocumentId:null,
+   anchoring:coll==='auditoria'?'administrative_role_tenant_scalar_projection':
+    'verified_cancellation_policy_or_client'};
+ }
 
  // B4-003 financial-source parity: page the *child collection* once, not
  // every existing policy.  A requested page is a lookup hint, NEVER authority.

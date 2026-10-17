@@ -5996,7 +5996,7 @@
   "canonicalAccumulationControl": {
     "status": "FROZEN_ACTIVE",
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "compositionLockBlobSha": "460a8d65c64ed3bf1ac99f4c221208bc0fd67283",
+    "compositionLockBlobSha": "7175a97df252a1459df7692d7e8d3f99e3c3bc6d",
     "findingLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
     "findingLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
@@ -12083,5 +12083,53 @@
     "generalProductMutationAuthorized": false,
     "productPreviewPass": false,
     "sourceChanged": true
+  },
+  "b4003RestrictedCancellationAuditSourceFix20261017": {
+    "status": "SOURCE_STAGED_MOCK_TEST_AND_PREVIEW_REQUIRED",
+    "gate": "I6.5/B4-003",
+    "compositionLockBlobSha": "7175a97df252a1459df7692d7e8d3f99e3c3bc6d",
+    "files": [
+      {
+        "path": "functions/b4-003-scoped-access-boundary.js",
+        "previousBlobSha": "29a64c48fa531b13d2ce2a0d7a719381ecb42b16",
+        "sourceBlobSha": "01934d22cfe6f353c6e143e553e3bc1c704c029a"
+      },
+      {
+        "path": "functions/b4-003-scoped-related-reader.js",
+        "previousBlobSha": "5a1d36f898f88b45550c94868abb30a837972c4f",
+        "sourceBlobSha": "652042d544d8dbf52b6d0f8c55bc6de7d3c64aa2"
+      },
+      {
+        "path": "orbit360-platform/core/product-runtime-browser-providers-p0.js",
+        "previousBlobSha": "5c0b6aae5bdbbfbdd3134a4508cce3531c01a37a",
+        "sourceBlobSha": "51f2801cf8e7590ff92ffa9e7dae07ff8304f5d7"
+      },
+      {
+        "path": "orbit360-platform/data/store-firestore-product-readonly-p0.js",
+        "previousBlobSha": "19ec8d0d986a3b90042c822edc123a76eb566715",
+        "sourceBlobSha": "41a903a88caa338c74f636c1cd31e23f79aa2481"
+      }
+    ],
+    "qa": [
+      {
+        "path": "tools/gravicentra-b4-003-scoped-related-reader.test.cjs",
+        "blobSha": "55f1e3c625214d6de185e5fa808138b7f715510b",
+        "status": "PENDING_EXECUTION"
+      },
+      {
+        "path": ".github/workflows/gravicentra-b4-003-executor.yml",
+        "blobSha": "f0189c81c1840d3d5a49977c3a51f0eac32a62c6",
+        "status": "PENDING_EXECUTION"
+      }
+    ],
+    "roleScope": "READ_ONLY_PREVIEW_ONLY",
+    "generalProductMutationAuthorized": false,
+    "sharedFirestoreRulesDeployAuthorized": false,
+    "productionPromotionAuthorized": false,
+    "businessWritesAuthorized": false,
+    "reimportAuthorized": false,
+    "currentlyCertifiedPreviewUnchanged": true,
+    "newArtifactAndAuthenticatedE2ERequired": true,
+    "formalI6Percent": 50
   }
 }

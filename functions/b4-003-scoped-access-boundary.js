@@ -10,7 +10,7 @@ const teamScopedRoles=new Set(['marketing']);
 const self=new Set(['asesor','asesora','asesor_sr','asesora_sr','asesor_jr','asesora_jr','comercial','asistente']);
 // Aligned with tenant-access-policy-effective-p0 TEAM_DIRECTORY_ROLES.
 const teamDirectoryRoles=new Set(['direccion','superadmin','admintenant','admin']);
-const modules={clientes:'cliente360',polizas:'polizas',vehiculos:'polizas',recibosEsperados:'recibos',carteraPrimas:'cobros',cobros:'cobros',negocios:'leads',gestiones:'ops',metas:'inicio',actividades:'historial',asesores:'equipo',aseguradoras:'aseguradoras'};
+const modules={clientes:'cliente360',polizas:'polizas',vehiculos:'polizas',recibosEsperados:'recibos',carteraPrimas:'cobros',cobros:'cobros',negocios:'leads',gestiones:'ops',metas:'inicio',actividades:'historial',cancelaciones:'cancelaciones',auditoria:'equipo',asesores:'equipo',aseguradoras:'aseguradoras'};
 class Denied extends Error{constructor(code){super(code);this.code=code;}}
 const deny=code=>{throw new Denied(code);};
 const get=(o,k)=>{const key=Object.keys(o||{}).find(v=>norm(v)===norm(k));return key===undefined?undefined:o[key];};
@@ -36,7 +36,7 @@ function resolve({auth,member,config,tenantId,activeRole,collection,country}){
  if(collection==='aseguradoras'){
   if(!insurerDirectoryRoles.has(role))deny('DIRECTORY_DENIED');
   effective='all';
- }else if(collection==='asesores'){
+ }else if(collection==='asesores'||collection==='auditoria'){
   // The complete Equipo directory is not a personal/operational roster.
   // Operativo uses the separately authorized assignable-advisor service.
   if(!teamDirectoryRoles.has(role))deny('TEAM_DIRECTORY_DENIED');
@@ -44,6 +44,7 @@ function resolve({auth,member,config,tenantId,activeRole,collection,country}){
     deny('MODULE_DENIED');
   effective='all';
  }else{
+  if(collection==='cancelaciones'&&!full.has(role))deny('MODULE_DENIED');
   const ds=m.dataScopes||{},requested=scope(get(ds.modules,moduleKey)||ds.default||m.scopeDatos||m.dataScope);
   const configured=scope(get(config?.roleScopes,role));
   const maxScope=self.has(role)?'own':teamScopedRoles.has(role)?'team':(configured||'none');

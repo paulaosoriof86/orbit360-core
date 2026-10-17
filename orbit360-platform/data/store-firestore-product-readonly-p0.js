@@ -103,7 +103,7 @@
                 throw new Error('PROTECTED_READ_RESPONSE_INVALID');
               r.rows.forEach(function(x){
                 var id=text(x&&x.canonicalDocumentId||x&&x.id);
-                if(!id||countrySeen.has(id)||(seen.has(id)&&collection!=='asesores'))
+                if(!id||countrySeen.has(id)||(seen.has(id)&&collection!=='asesores'&&collection!=='auditoria'))
                   throw new Error('PROTECTED_READ_DUPLICATE_OR_MISSING_ID');
                 if(text(x.tenantId)&&text(x.tenantId)!==state.tenantId)
                   throw new Error('PROTECTED_READ_TENANT_MISMATCH');
@@ -170,7 +170,7 @@
       if(plan.hardError)throw new Error('PROTECTED_READ_PLAN_DENIED');
       if(plan.denied){if(state.deniedCollections.indexOf(collection)<0)state.deniedCollections.push(collection);return false;}
       var related=['vehiculos','recibosEsperados','carteraPrimas','cobros'].indexOf(collection)>=0;
-      if(!related&&collection!=='clientes'&&collection!=='polizas'&&collection!=='aseguradoras'&&collection!=='asesores'&&collection!=='negocios'&&collection!=='gestiones'&&collection!=='actividades'&&collection!=='metas')
+      if(!related&&collection!=='clientes'&&collection!=='polizas'&&collection!=='aseguradoras'&&collection!=='asesores'&&collection!=='negocios'&&collection!=='gestiones'&&collection!=='actividades'&&collection!=='metas'&&collection!=='cancelaciones'&&collection!=='auditoria')
         throw new Error('PROTECTED_READ_COLLECTION_UNSUPPORTED_'+collection);
       var epoch=protectedEpoch;
       Promise.resolve().then(function(){return related?protectedRelatedUniverse(collection,epoch):protectedLoad(collection,'',epoch);})
@@ -229,7 +229,7 @@
       // Preflight the complete required collection set before fetching any
       // protected data. A six-of-eight bootstrap is never an accepted startup.
       if(protectedMode){
-        var supported=new Set(['clientes','polizas','vehiculos','recibosEsperados','carteraPrimas','cobros','aseguradoras','asesores','negocios','gestiones','actividades','metas']);
+        var supported=new Set(['clientes','polizas','vehiculos','recibosEsperados','carteraPrimas','cobros','aseguradoras','asesores','negocios','gestiones','actividades','metas','cancelaciones','auditoria']);
         var unsupported=startupCollections.filter(function(name){return !supported.has(name);});
         if(unsupported.length){
           state.status='blocked-protected-incomplete';
