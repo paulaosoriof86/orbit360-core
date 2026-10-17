@@ -10,6 +10,18 @@
   window.Orbit = window.Orbit || {};
   var modulesPromise=null, contextPromise=null;
   function config(){return window.__ORBIT360_PRODUCT_PUBLIC_CONFIG__||{};}
+  // Preview-only protected transport is non-downgradable: changing the public
+  // flag or serving it from an unexpected host can NEVER enable direct reads.
+  function protectedPreviewHost(){
+    var host=String(window.location&&window.location.hostname||'').toLowerCase();
+    return /^ays-orbit-360-lab--gi-i65-b4-[a-z0-9-]+\.web\.app$/.test(host);
+  }
+  function protectedTransportError(){
+    var requested=config().scopedReadPreviewCandidate===true,channel=protectedPreviewHost();
+    if(channel&&!requested)return 'PROTECTED_READ_CANDIDATE_DISABLED';
+    if(requested&&!channel)return 'PROTECTED_READ_PREVIEW_HOST_DENIED';
+    return '';
+  }
   function enabled(){var c=config();return c.enabled===true&&!!c.projectId&&!!c.authDomain&&!!c.appId&&!!c.apiKey&&!!c.tenantHint;}
   function loadModules(){
     if(modulesPromise)return modulesPromise;
@@ -22,6 +34,8 @@
     return modulesPromise;
   }
   function initialize(){
+    var scopeError=protectedTransportError();
+    if(scopeError)return Promise.reject(new Error(scopeError));
     if(!enabled())return Promise.reject(new Error('PRODUCT_RUNTIME_NOT_CONFIGURED'));
     if(contextPromise)return contextPromise;
     contextPromise=loadModules().then(function(m){
@@ -39,8 +53,7 @@
   function initialUser(){return initialize().then(function(ctx){if(ctx.auth&&typeof ctx.auth.authStateReady==='function')return ctx.auth.authStateReady().then(function(){return ctx.auth.currentUser||null;});return new Promise(function(resolve,reject){var off=function(){};off=ctx.modules.auth.onAuthStateChanged(ctx.auth,function(user){off();resolve(user||null);},function(error){off();reject(error);});});});}
   function waitUser(){return initialize().then(function(ctx){if(ctx.auth.currentUser)return ctx.auth.currentUser;return new Promise(function(resolve,reject){var off=ctx.modules.auth.onAuthStateChanged(ctx.auth,function(user){if(user){off();resolve(user);}},reject);});});}
   function protectedPreview(){
-    return config().scopedReadPreviewCandidate===true &&
-      String(window.location&&window.location.hostname||'').includes('--');
+    return config().scopedReadPreviewCandidate===true && protectedPreviewHost();
   }
   function protectedBootstrap(mode,uid){
     var tenant=String(config().tenantHint||'').trim();

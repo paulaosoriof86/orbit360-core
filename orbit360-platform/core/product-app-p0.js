@@ -65,6 +65,13 @@
       var owner=Orbit.backendProductReadOnlyBootstrapP0;
       var hydrationOwner=Orbit.productHydrationRequiredOptionalP0;
       if(cfg.enabled!==true)throw new Error('PRODUCT_RUNTIME_NOT_CONFIGURED');
+      // A B4-003 scoped channel must never downgrade to direct Firestore reads.
+      var scopedChannel=/^ays-orbit-360-lab--gi-i65-b4-[a-z0-9-]+\.web\.app$/i.test(
+        String(window.location&&window.location.hostname||''));
+      if(scopedChannel&&cfg.scopedReadPreviewCandidate!==true)
+        throw new Error('PROTECTED_READ_CANDIDATE_DISABLED');
+      if(!scopedChannel&&cfg.scopedReadPreviewCandidate===true)
+        throw new Error('PROTECTED_READ_PREVIEW_HOST_DENIED');
       if(!providers||typeof providers.dependencies!=='function')throw new Error('PRODUCT_RUNTIME_PROVIDERS_MISSING');
       if(!owner||typeof owner.start!=='function')throw new Error('PRODUCT_READONLY_BOOTSTRAP_MISSING');
       if(!hydrationOwner||typeof hydrationOwner.contract!=='function')throw new Error('PRODUCT_HYDRATION_CONTRACT_MISSING');

@@ -268,6 +268,34 @@ const pause=()=>new Promise(ok=>setTimeout(ok,30));
   /PROTECTED_READ_PREVIEW_ONLY/);
  await assert.rejects(flagCase(true,'ays-orbit-360-lab--gi-i65-b4-test.web.app'),
   /PRODUCT_RUNTIME_NOT_CONFIGURED/);
+ // Detect the real fail-open: a missing protected flag on our B4 Preview or
+ // a leaked protected flag on LIVE must NEVER initialize direct Firestore SDK.
+ const scopedHost='ays-orbit-360-lab--gi-i65-b4-synthetic.web.app';
+ const liveHost='ays-orbit-360-lab.web.app';
+ const unrelatedHost='ays-orbit-360-lab--other-synthetic.web.app';
+ const guardedMembership=(flag,hostname)=>{
+   const w={Orbit:{},location:{hostname},__ORBIT360_PRODUCT_PUBLIC_CONFIG__:{
+     enabled:false,tenantHint:tenant,scopedReadPreviewCandidate:flag}};
+   vm.runInNewContext(provider,{window:w,Promise,console},{timeout:1000});
+   return w.Orbit.productRuntimeBrowserProvidersP0.dependencies().membershipProvider.getByUid('synthetic-uid');
+ };
+ await assert.rejects(guardedMembership(false,scopedHost),/PROTECTED_READ_CANDIDATE_DISABLED/);
+ await assert.rejects(guardedMembership(true,liveHost),/PROTECTED_READ_PREVIEW_HOST_DENIED/);
+ await assert.rejects(guardedMembership(true,unrelatedHost),/PROTECTED_READ_PREVIEW_HOST_DENIED/);
+ await assert.rejects(guardedMembership(true,scopedHost),/PRODUCT_RUNTIME_NOT_CONFIGURED/);
+ const guardedApp=(flag,hostname)=>{
+   const w={Orbit:{},location:{hostname},__ORBIT360_PRODUCT_PUBLIC_CONFIG__:{
+     enabled:true,scopedReadPreviewCandidate:flag}};
+   vm.runInNewContext(app,{window:w,Orbit:w.Orbit,Promise,console,
+     document:{querySelector:()=>null,dispatchEvent:()=>{}},
+     CustomEvent:function(){}},{timeout:1000});
+   return w.Orbit.productAppP0.activate();
+ };
+ await assert.rejects(guardedApp(false,scopedHost),/PROTECTED_READ_CANDIDATE_DISABLED/);
+ await assert.rejects(guardedApp(true,liveHost),/PROTECTED_READ_PREVIEW_HOST_DENIED/);
+ await assert.rejects(guardedApp(true,unrelatedHost),/PROTECTED_READ_PREVIEW_HOST_DENIED/);
+ await assert.rejects(guardedApp(false,liveHost),/PRODUCT_RUNTIME_PROVIDERS_MISSING/);
+ console.log('B4_003_PROTECTED_TRANSPORT_NON_DOWNGRADE_VM_PASS checks=8 no_direct_firestore no_network');
  console.log('B4_003_PROTECTED_READ_PREVIEW_FLAG_QA_PASS checks=3 mock_only no_network');
  console.log('B4_003_ACTUAL_BOOTSTRAP_ROLE_RECOMPILE_PASS mock-only no-reads');
  console.log('B4_003_PROTECTED_HYDRATION_MOCK_PASS no_direct_firestore role_cache_reset protected_related_policy_batches');

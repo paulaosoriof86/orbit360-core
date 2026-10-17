@@ -2572,5 +2572,32 @@
     "newTestPath": "tools/gravicentra-b4-003-operational-write-security-regression.test.cjs",
     "newTestBlob": "2f1945c9933353500319f05807054c2935d4a183",
     "newTestCases": 24
+  },
+  "b4003ProtectedPreviewTransportBinding20261017": {
+    "gate": "I6.5/B4-003",
+    "status": "SOURCE_STAGED_PENDING_GUARD_AND_EXACT_PREVIEW",
+    "classification": "SCOPED_PREVIEW_DIRECT_FIRESTORE_DOWNGRADE_ROOTFIX",
+    "productPaths": [
+      "orbit360-platform/core/product-runtime-browser-providers-p0.js",
+      "orbit360-platform/core/product-app-p0.js"
+    ],
+    "productBlobs": {
+      "orbit360-platform/core/product-runtime-browser-providers-p0.js": "5c0b6aae5bdbbfbdd3134a4508cce3531c01a37a",
+      "orbit360-platform/core/product-app-p0.js": "b3080c0dbb8d5ae80061754676a5a39b2c913ec4"
+    },
+    "testPath": "tools/gravicentra-b4-003-protected-hydration.test.cjs",
+    "testBlob": "be4f7c01713abc480dd6b9e594edd96ca12238f4",
+    "syntheticTestsAdded": 8,
+    "sourceChangeAuthorizedWithinB4003": true,
+    "usesExistingPreviewOnly": true,
+    "directReadFallbackOnScopedPreviewForbidden": true,
+    "isolatedPreviewDeploymentAllowedAsPreviouslyApproved": true,
+    "sharedFirestoreRulesDeployAllowed": false,
+    "productionPromotionAllowed": false,
+    "businessWritesAllowed": false,
+    "realUserTokenIssuanceAllowed": false,
+    "securityP0Closed": false,
+    "releaseAccepted": false,
+    "formalPercentAdded": 0
   }
 }
