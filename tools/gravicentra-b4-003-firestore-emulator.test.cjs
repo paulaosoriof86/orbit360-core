@@ -71,6 +71,26 @@ async function run(){
   await denied(getDoc(doc(own,canonical('clientes','c_own'))));
   await denied(getDoc(doc(own,canonical('recibosEsperados','r_own'))));
   assert.equal(n,16);
+  // Authenticating as a privileged role never grants direct Firestore access:
+  // the protected callable (not the browser SDK) owns role/country/advisor scope.
+  let directRoleDenials=0;
+  const admin=env.authenticatedContext('adminGT',{email:'synthetic-admin@example.invalid'}).firestore();
+  const suspended=env.authenticatedContext('suspendedGT',{email:'synthetic-suspended@example.invalid'}).firestore();
+  const roleMatrix=[['admin',admin],['advisor',advisor],['suspended',suspended]];
+  for(const [name,client] of roleMatrix){
+    for(const [col,id] of [['polizas','own'],['clientes','c_own'],['cobros','pay_own']]){
+      await assertFails(getDoc(doc(client,canonical(col,id))));directRoleDenials++;
+      await assertFails(getDocs(collection(client,'tenants/'+tenant+'/data/'+col+'/items')));directRoleDenials++;
+    }
+    await assertFails(getDoc(doc(client,legacy('polizas','own'))));directRoleDenials++;
+    await assertFails(getDocs(collection(client,'tenantId/'+tenant+'/polizas')));directRoleDenials++;
+    await assertFails(setDoc(doc(client,canonical('polizas','own')),{tenantId:tenant,pais:'GT',asesorId:'advisor-own'}));directRoleDenials++;
+  }
+  // A signed-in UID cannot cross into another tenant by choosing its path.
+  await assertFails(getDoc(doc(own,'tenants/another-tenant/data/polizas/items/own')));directRoleDenials++;
+  await assertFails(getDocs(collection(own,'tenantId/another-tenant/polizas')));directRoleDenials++;
+  assert.equal(directRoleDenials,29);
+  console.log('B4_003_EMULATOR_ROLE_MATRIX_DIRECT_DENIAL_PASS assertions='+directRoleDenials+' GT_CO_canonical_legacy synthetic_only no_deploy');
   let directoryDirectDenied=0;
   for(const coll of ['aseguradoras','asesores']){
    await assertFails(getDoc(doc(own,canonical(coll,coll==='aseguradoras'?'insGT':'advisor-own'))));
@@ -193,7 +213,11 @@ async function run(){
     }
     const co=await listRelated('opGT','operativo','clientes','',{country:'CO'});
     assert.deepEqual(co.rows.map(x=>x.id),['c_co']);listProof++;
-    await denyRelated(()=>listRelated('opGT','operativo','vehiculos'),'POLICY_ANCHOR_REQUIRED');listProof++;
+    // Latest authorized list contract: parent-scoped server filtering, no unfiltered browser access.
+    const globalVehicleList=await listRelated('opGT','operativo','vehiculos');
+    assert.deepEqual(globalVehicleList.rows.map(x=>x.id),['v_own']);listProof++;
+    const advisorVehicleList=await listRelated('advisorGT','asesor','vehiculos');
+    assert.deepEqual(advisorVehicleList.rows.map(x=>x.id),[]);listProof++;
     await denyRelated(()=>listRelated('opGT','operativo','vehiculos','foreign'),'POLICY_NOT_FOUND_OR_DENIED');listProof++;
     const filteredReceiptList=await listRelated('opGT','operativo','recibosEsperados','own');
     assert.deepEqual(filteredReceiptList.rows.map(x=>x.id),['r_own']);listProof++;
@@ -206,7 +230,7 @@ async function run(){
     assert.equal(p1.rows.length,1);assert.ok(p1.nextCursor);listProof++;
     const p2=await listRelated('opGT','operativo','vehiculos','own',{pageSize:1,cursor:p1.nextCursor});
     assert.equal(p2.rows.length,1);assert.equal(p2.nextCursor,null);assert.notEqual(p1.rows[0].id,p2.rows[0].id);listProof++;
-    assert.equal(listProof,15);
+    assert.equal(listProof,16);
     console.log('B4_003_EMULATOR_RELATED_SERVER_LIST_PASS assertions='+listProof+' synthetic_only no_deploy');
 
     // Batch-based global related hydration: server validates every supplied
