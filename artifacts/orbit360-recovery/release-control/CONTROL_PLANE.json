@@ -11991,5 +11991,26 @@
       "path": "orbit360-platform/core/access-role-session-owner-v20260728.js",
       "correctedBlobSha": "eee3eb184f1b4d7219d455d6a15b7d579979d7f5"
     }
+  },
+  "b4003ExactFinanceCoverageReadback20261017": {
+    "status": "REQUESTED_EXISTING_EXACT_PREVIEW_READONLY",
+    "authority": "PAULA_CONTINUITY_20261017",
+    "triggerSubject": "test(i6.5 B4-003): exact finance and coverage readback",
+    "targetPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b4-38660268117-6wht8qxi.web.app",
+    "targetSourceSha": "5a933c705fa4e080e30dbc8e483c972c8a2b256f",
+    "purpose": [
+      "CROSS_MODULE_FINANCIAL_RELATION_PARITY",
+      "PROTECTED_COLLECTION_COVERAGE",
+      "NO_ROLE_IMPERSONATION"
+    ],
+    "productMutation": false,
+    "dataMutation": false,
+    "realBusinessWrites": false,
+    "syntheticWrites": false,
+    "sharedFirestoreRulesDeploy": false,
+    "livePromotion": false,
+    "reimport": false,
+    "formalI6PercentBefore": 50,
+    "formalI6PercentAfterRequest": 50
   }
 }
