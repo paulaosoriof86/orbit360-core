@@ -1,0 +1,67 @@
+{
+  "schema": "gravicentra-b4003-github-write-diagnostic-v1",
+  "recordedDate": "2026-10-17",
+  "gate": "I6.5/B4-003",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "baseHead": "a8a795592559b401c3ba3595457e749f36f9afb6",
+  "kind": "TOOLING_DIAGNOSTIC_NOT_PRODUCT_CORRECTION",
+  "observations": {
+    "currentDiscoveredGithubActions": 89,
+    "createBlobExposed": true,
+    "createTreeExposed": true,
+    "createCommitExposed": true,
+    "updateRefExposed": true,
+    "repositoryPushPermission": true,
+    "repositoryAdminPermission": true,
+    "githubPluginPermission": "Allow all actions",
+    "localGitCloneFailure": "Could not resolve host: github.com",
+    "localCloneDoesNotDetermineConnectorCapability": true,
+    "idempotentBlobWrite": {
+      "operation": "create_blob",
+      "sourcePath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_C03_04_BEFORE_IMAGE_20261016.patch",
+      "expectedBlob": "0ceafe1a8fc28627bf87fd9cfba6564f1d5305a3",
+      "returnedBlob": "0ceafe1a8fc28627bf87fd9cfba6564f1d5305a3",
+      "succeeded": true,
+      "branchChanged": false
+    },
+    "auxiliaryUtilityUpload": {
+      "accepted": false,
+      "reportedBlocker": "OpenAI safety controls rejected this specific tool call",
+      "githubHttpPermissionFailureReported": false,
+      "underlyingSafetyClassificationKnown": false,
+      "rejectedUtilityNotPublished": true
+    }
+  },
+  "adjudication": {
+    "previousBlanketGithubWriteUnavailableConclusionSupportedNow": false,
+    "previousSessionToolExposureDifferenceExplained": false,
+    "noAdditionalUserAuthorizationRequested": true,
+    "permissionSettingsChanged": false,
+    "safetyControlsBypassed": false
+  },
+  "continuity": {
+    "authority": "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json",
+    "executionReceipt": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_AUDIT_COMPLEMENT_EXECUTION_20261016.md",
+    "owner": "functions/product-operational-domain.js",
+    "currentOwnerBlob": "61bbd6d4bc9e687fa698c129e4ffd4fb4fb085b7",
+    "testedCandidateBlob": "1411d6d3e40908e558547dfe2db71c4945439779",
+    "productSourceIntegrated": false,
+    "nextIncompleteAction": "RECONCILE_EXACT_C03_04_AUTHORIZATION_AND_ATOMIC_PRODUCT_CONTROL_LOCK_COMPOSITION_INTEGRATION",
+    "newWorkflowAuthorizedByThisReceipt": false,
+    "doNotRepeatGeneralAuditOrClaimOldPreviewAsNew": true
+  },
+  "boundaries": {
+    "controlPlaneChanged": false,
+    "productSourceChanged": false,
+    "operationalDataWrites": 0,
+    "authOrRoleWrites": 0,
+    "firestoreRulesChanged": false,
+    "hostingDeploy": false,
+    "backendDeploy": false,
+    "livePromotion": false,
+    "formalI6Percent": 50,
+    "formalPointsAdded": 0,
+    "functionalFindingsClosed": 0
+  }
+}
