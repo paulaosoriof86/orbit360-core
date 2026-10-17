@@ -1,0 +1,47 @@
+{
+  "schema": "GRAVICENTRA_B4_003_PROTECTED_PREVIEW_CHECKPOINT_V1",
+  "recordedDate": "2026-10-17",
+  "gate": "I6.5/B4-003",
+  "status": "EXACT_HOSTING_READBACK_AND_PUBLIC_SMOKE_PASS_AUTHENTICATED_SCOPE_PENDING_RELEASE_HOLD",
+  "productReleaseAccepted": false,
+  "sourceHead": "6fa614c3cce8185a2d0db95727e358e39bea3d8c",
+  "buildId": "gi-i65-b4-6fa614c3cce8-57f234755dc1",
+  "url": "https://ays-orbit-360-lab--gi-i65-b4-39029724695-0vmuf317.web.app",
+  "hostedPayloadDigest": "4821cd6a8b9436c7761a7c1a305720d772edda30ab2a6dc4bf530a91f3fa241d",
+  "backendSourceDigest": "6eb9e04a7cdb2e84b32a70c35b9d1736de09ce4b3c2b1fbe945902ca5c8f3ae9",
+  "bundleDigest": "183d8bba7e8cec5f47a1d872647de57d82e272331e1e4de7caf456962260e870",
+  "hostedFileCount": 218,
+  "builtBackendFileCount": 33,
+  "workflowRunId": 39029724695,
+  "workflowConclusion": "success",
+  "githubArtifactId": 12099838064,
+  "artifactZipSha256": "d190ddb03164e27e0f2f99295937a2c24af7d9e62879e139a8ba9ded215259ea",
+  "sourceTestCommit": "a8bd438e06feff0cd78463ef783405fc4b53b8ab",
+  "emulatorRunId": 39029295507,
+  "emulatorConclusion": "success",
+  "previewGuardRunId": 39029724720,
+  "publicSmoke": {
+    "status": "PASS",
+    "hostingExactReadback": true,
+    "unauthenticatedCallableDeniedStatus": 401,
+    "protectedReadFlagHosted": true
+  },
+  "authenticatedQa": {
+    "status": "PENDING_REAL_USER_IDENTITY_AUTHORIZATION",
+    "realUserImpersonationAuthorized": false,
+    "realUserTokensIssued": 0,
+    "authenticatedEvidenceAccepted": false
+  },
+  "boundaries": {
+    "scopedPreviewCallableOnly": true,
+    "otherFunctionsDeployed": false,
+    "operationalWrites": 0,
+    "sharedFirestoreRulesDeployed": false,
+    "productionPromotion": false,
+    "securityP0Closed": false,
+    "humanVisualAccepted": false
+  },
+  "next": "AUTHENTICATED_PERMISSION_PROOF_WITH_EXPLICIT_AUTHORIZATION_AND_SECURE_SHARED_RULES_TRANSITION_WITHOUT_BREAKING_LIVE",
+  "formalI6Percent": 50,
+  "formalPointsAdded": 0
+}

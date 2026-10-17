@@ -11762,5 +11762,25 @@
     "newTestPath": "tools/gravicentra-b4-003-operational-write-security-regression.test.cjs",
     "newTestBlob": "2f1945c9933353500319f05807054c2935d4a183",
     "newTestCases": 24
+  },
+  "b4003LatestScopedReadOnlyPreview20261017": {
+    "status": "EXACT_HOSTING_READBACK_PUBLIC_SMOKE_PASS_AUTHENTICATED_PENDING",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PROTECTED_PREVIEW_CHECKPOINT_20261017.json",
+    "receiptBlobSha": "de4904c8739895137209f062658b5643846678d8",
+    "runId": 39029724695,
+    "sourceHead": "6fa614c3cce8185a2d0db95727e358e39bea3d8c",
+    "buildId": "gi-i65-b4-6fa614c3cce8-57f234755dc1",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-39029724695-0vmuf317.web.app",
+    "hostedPayloadDigest": "4821cd6a8b9436c7761a7c1a305720d772edda30ab2a6dc4bf530a91f3fa241d",
+    "backendSourceDigest": "6eb9e04a7cdb2e84b32a70c35b9d1736de09ce4b3c2b1fbe945902ca5c8f3ae9",
+    "authenticatedPass": false,
+    "realUserTokensIssued": 0,
+    "noFirestoreRulesDeploy": true,
+    "noLivePromotion": true,
+    "noOperationalWrites": true,
+    "p0Closed": false,
+    "humanVisualPending": true,
+    "formalI6Percent": 50,
+    "next": "AUTHENTICATED_PROOF_AND_SHARED_RULES_TRANSITION_WITH_GATE_AUTHORIZATION"
   }
 }
