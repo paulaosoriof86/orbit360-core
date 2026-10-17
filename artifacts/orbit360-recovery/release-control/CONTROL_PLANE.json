@@ -12037,6 +12037,29 @@
     },
     "sourcePatchApplied": false,
     "sourcePatchBlockedByExecutionLock": true,
-    "formalI6PercentAfterExecution": 50
+    "formalI6PercentAfterExecution": 50,
+    "currentCandidateQualification": {
+      "status": "HISTORICAL_EXACT_PREVIEW_RUNTIME_EVIDENCE_WITH_RELEVANT_SOURCE_DRIFT",
+      "currentSourceAdjudicationPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CURRENT_SOURCE_COMPOSITION_CAUSAL_ADJUDICATION_20261017.json",
+      "currentSourceAdjudicationBlobSha": "47fb3182f7e0931069e62edcfcba4df0395f1270",
+      "doNotTreatHistoricalHistoryHydrationMissingAsCurrentFact": true
+    }
+  },
+  "b4003CurrentSourceCompositionCausalAdjudication20261017": {
+    "status": "CURRENT_SOURCE_CAUSAL_GAPS_DEMONSTRATED_EXACT_CURRENT_PREVIEW_RETEST_REQUIRED",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CURRENT_SOURCE_COMPOSITION_CAUSAL_ADJUDICATION_20261017.json",
+    "receiptBlobSha": "47fb3182f7e0931069e62edcfcba4df0395f1270",
+    "currentSourceBound": true,
+    "historicalFinancePreviewRuntimeHoldQualifiedForSourceDrift": true,
+    "currentDemonstratedGaps": [
+      "PROTECTED_OPTIONAL_COVERAGE_CANCELACIONES_AUDITORIA",
+      "ROLE_SWITCH_REATTACH_ALL_STARTED_COLLECTIONS",
+      "SESSION_EVENT_ORDER_BEFORE_STORE_INVALIDATION",
+      "STARTUP_OPTIONAL_AND_FINANCIAL_FANOUT"
+    ],
+    "currentActivitiesHydrationGapCarried": false,
+    "sourcePatchApplied": false,
+    "sourcePatchBlockedByExecutionLock": true,
+    "formalI6Percent": 50
   }
 }

@@ -1,0 +1,119 @@
+{
+  "schema": "GRAVICENTRA_I65_B4003_CURRENT_SOURCE_COMPOSITION_CAUSAL_ADJUDICATION_V1",
+  "gate": "I6.5/B4-003",
+  "date": "2026-10-17",
+  "status": "CURRENT_SOURCE_CAUSAL_GAPS_DEMONSTRATED_EXACT_CURRENT_PREVIEW_RETEST_REQUIRED",
+  "currentBranchHead": "9a7c3245fff2180fe45cd7cfbb0ffa11a9e1fb1b",
+  "productSourceBinding": {
+    "lastHumanPreviewSource": "06601638179c3f22885c6aed14d870cd5b4807c0",
+    "handoffSource": "4f6758790219617b9225463195499df0f8b60991",
+    "humanPreviewToHandoffRelevantProductDiffCount": 0,
+    "config": {
+      "path": "orbit360-platform/product-runtime-config.js",
+      "blobSha": "977f9b7075e420a47d286769f2cdbfffba52b7b0"
+    },
+    "protectedStore": {
+      "path": "orbit360-platform/data/store-firestore-product-readonly-p0.js",
+      "blobSha": "75d7745603686da0607a48fc4c1adcbefc37494f"
+    },
+    "protectedRelatedReader": {
+      "path": "functions/b4-003-scoped-related-reader.js",
+      "blobSha": "5a1d36f898f88b45550c94868abb30a837972c4f"
+    },
+    "historial": {
+      "path": "orbit360-platform/modules/historial.js",
+      "blobSha": "6329129526b850a62e645aa9cd384e7d19317365"
+    },
+    "productApp": {
+      "path": "orbit360-platform/core/product-app-p0.js",
+      "blobSha": "b3080c0dbb8d5ae80061754676a5a39b2c913ec4"
+    },
+    "roleSessionOwner": {
+      "path": "orbit360-platform/core/access-role-session-owner-v20260728.js",
+      "blobSha": "eee3eb184f1b4d7219d455d6a15b7d579979d7f5"
+    },
+    "inicio": {
+      "path": "orbit360-platform/modules/inicio.js",
+      "blobSha": "a819209312108d735392acb247242d2c58f87644"
+    }
+  },
+  "historicalExactPreviewQualification": {
+    "readbackRunId": 39048654780,
+    "testedPreviewSource": "5a933c705fa4e080e30dbc8e483c972c8a2b256f",
+    "currentHumanPreviewSource": "06601638179c3f22885c6aed14d870cd5b4807c0",
+    "relevantSourceDrift": true,
+    "commitsAhead": 108,
+    "rule": "Do not promote the historical runtime HOLD wholesale to the current candidate. Rebind only mechanisms still physically present in current source."
+  },
+  "currentSourceFindings": [
+    {
+      "id": "CURRENT-PROTECTED-OPTIONAL-COVERAGE-GAP",
+      "demonstrated": true,
+      "mechanism": "Current runtime config requests optional collections including cancelaciones and auditoria, while the current protected store whitelist and scoped related reader do not support them.",
+      "currentConfigOptionalIncludes": [
+        "cancelaciones",
+        "auditoria"
+      ],
+      "currentProtectedWhitelistExcludes": [
+        "cancelaciones",
+        "auditoria"
+      ],
+      "currentReadOnlySourceRowsObserved": {
+        "cancelaciones": 1,
+        "auditoria": 27
+      },
+      "effect": "_ensureCollections records attach errors for unsupported optional collections. Any module that requires those collections cannot reach authoritative protected readiness."
+    },
+    {
+      "id": "CURRENT-ROLE-SWITCH-FANOUT",
+      "demonstrated": true,
+      "mechanism": "Role change clears protected caches and immediately reattaches every previously started collection, including optional/failed collections, instead of route-priority hydration.",
+      "effect": "Repeated protected reads and repeated attach errors after Dirección→Operativo→Asesor→Dirección can delay or destabilize route readiness."
+    },
+    {
+      "id": "CURRENT-SESSION-EVENT-ORDER",
+      "demonstrated": true,
+      "mechanism": "Selected role is persisted and orbit:session is emitted before orbit:active-role-changed invalidates protected store context.",
+      "effect": "Router/session rerender can observe stale or empty prior-role state before authoritative new-role hydration settles."
+    },
+    {
+      "id": "CURRENT-STARTUP-OPTIONAL-FANOUT",
+      "demonstrated": true,
+      "mechanism": "Product app schedules all optional collections immediately after bootstrap and prewarms financial route collections; Inicio also ensures five core/financial collections on first render.",
+      "effect": "This defeats the intended minimal route-primary hydration and competes with first useful render."
+    }
+  ],
+  "correctedHistoricalCarry": {
+    "actividadesCurrentSupport": true,
+    "actividadesCurrentOptionalHydration": true,
+    "historicalHistoryHydrationMissingNotCarriedAsCurrentFact": true,
+    "exactCurrentPreviewRetestStillRequired": true
+  },
+  "dataIntegrityReadOnlyProfile": {
+    "observedRunId": 39048654780,
+    "polizas": 1425,
+    "recibosEsperadosMissingPolicy": 80,
+    "carteraPrimasMissingPolicy": 80,
+    "vehiculosMissingPolicy": 76,
+    "vehiculosExplicitCountryConflict": 1,
+    "note": "Counts are read-only source facts from the same tenant; they are not authorization to change or delete records."
+  },
+  "mutationBoundary": {
+    "productMutationAuthorized": false,
+    "dataMutationAuthorized": false,
+    "sharedFirestoreRulesDeployAuthorized": false,
+    "livePromotionAuthorized": false,
+    "reimportAuthorized": false,
+    "sourcePatchApplied": false
+  },
+  "nextMaterialAction": [
+    "Open exact same-gate source mutation authority for the demonstrated protected-read/session/hydration owners.",
+    "Patch current source only; do not reimport data or deploy shared rules.",
+    "Build a new immutable exact Preview because product source would change.",
+    "Run authenticated Dirección→Operativo→Asesor→Dirección with route readiness/timing plus current protected collection positive/negative coverage."
+  ],
+  "progress": {
+    "formalI6Before": 50,
+    "formalI6After": 50
+  }
+}
