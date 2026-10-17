@@ -12156,7 +12156,17 @@
       "syntheticQaWritesAuthorized": false,
       "dataMutationAuthorized": false,
       "reimportAuthorized": false,
-      "authenticatedUserImpersonationAuthorized": false
+      "authenticatedUserImpersonationAuthorized": false,
+      "dispatchRequest": {
+        "status": "REQUESTED_EXACT_BUILD_AND_READONLY_ISOLATED_PREVIEW",
+        "requestType": "EXISTING_B4_003_EXECUTOR",
+        "qaBaselineRunId": 39061257991,
+        "contractProof": "PENDING_RUN_AND_HOSTED_READBACK",
+        "originCommit": "a42d0e6c9b6e6610f11418ee9aa3423d14c13854",
+        "noLive": true,
+        "noSharedRules": true,
+        "noDataWrites": true
+      }
     }
   }
 }
