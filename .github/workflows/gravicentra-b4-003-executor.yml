@@ -185,7 +185,51 @@ jobs:
             && c.b4003VerifiedCanonicalFinanceScope20261015?.exactPreviewDispatch?.firestoreRulesDeploymentAuthorized===false
             && c.b4003VerifiedCanonicalFinanceScope20261015?.exactPreviewDispatch?.operationalWritesAuthorized===false;
           if(currentSubject===requestedOct15Subject&&!oct15ScopedReadback)throw Error('B4_003_OCT15_SCOPED_PREVIEW_GATE_DENIED_FAIL_CLOSED');
-          const scopedPreview=priorScopedPreview||onePassInternal||oct15ScopedReadback;
+          // Stable B4-003 scoped candidate request, bound to frozen source,
+          // validated server policy owner and exact preview-only authority.
+          const restrictedRequest=c.b4003RestrictedCancellationAuditSourceFix20261017||{};
+          const restrictedAuth=restrictedRequest.previewDispatch||{};
+          const restrictedSubject='build(i6.5 B4-003): exact protected cancellation audit Preview';
+          const protectedSha=p=>require('node:child_process').execFileSync('git',['hash-object',p],{encoding:'utf8'}).trim();
+          const restrictedFiles=Array.isArray(restrictedRequest.files)?restrictedRequest.files:[];
+          const restrictedScoped=currentSubject===restrictedSubject
+            && restrictedRequest.status==='SOURCE_QA_PASS_EXACT_PREVIEW_PENDING'
+            && restrictedRequest.qa?.count===91
+            && restrictedRequest.qa?.realAuthenticatedE2E===false
+            && restrictedAuth.status==='EXACT_B4_003_READ_ONLY_PREVIEW_AUTHORIZED_NOT_EXECUTED'
+            && restrictedAuth.triggerSubject===restrictedSubject
+            && restrictedAuth.sourceHead==='729ac226a87c9a1502c422f2c1f90993c5d24ae8'
+            && restrictedAuth.codeQaRunId===39061257991
+            && restrictedAuth.sourceQaReceiptBlobSha===restrictedRequest.receiptBlobSha
+            && restrictedFiles.length===4
+            && restrictedFiles.every(f=>f&&f.path&&f.sourceBlobSha===protectedSha(f.path)&&
+              restrictedAuth.sourceBlobs?.[f.path]===f.sourceBlobSha)
+            && restrictedAuth.exactCompositionBlobSha===protectedSha('artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json')
+            && c.canonicalAccumulationControl?.compositionLockBlobSha===restrictedAuth.exactCompositionBlobSha
+            && c.currentB4?.status==='B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL'
+            && c.nextAction==='I6_5_FORENSIC_REMEDIATION_B4_003_R20_TARGETED_PAULA_VISUAL'
+            && c.b4003SecurityReleaseHold?.status==='ACTIVE_FAIL_CLOSED_UNAUTHORIZED_BROWSER_FIRESTORE_READ_WRITE'
+            && l.activeFinding?.id==='B4-003'
+            && l.boundaries?.previewMutationAuthorized===true
+            && l.boundaries?.functionDeploymentAuthorized===true
+            && l.boundaries?.productMutationAuthorized===false
+            && l.boundaries?.dataMutationAuthorized===false
+            && l.boundaries?.businessWritesAuthorized===false
+            && l.boundaries?.realOperationalWritesAuthorized===false
+            && l.boundaries?.syntheticQaWritesAuthorized===false
+            && l.boundaries?.livePromotionAuthorized===false
+            && l.boundaries?.reimportAuthorized===false
+            && restrictedAuth.readOnly===true
+            && restrictedAuth.livePromotionAuthorized===false
+            && restrictedAuth.sharedRulesDeployAuthorized===false
+            && restrictedAuth.businessWritesAuthorized===false
+            && restrictedAuth.syntheticQaWritesAuthorized===false
+            && restrictedAuth.dataMutationAuthorized===false
+            && restrictedAuth.reimportAuthorized===false
+            && restrictedAuth.authenticatedUserImpersonationAuthorized===false;
+          if(currentSubject===restrictedSubject&&!restrictedScoped)
+            throw Error('B4_003_RESTRICTED_SOURCE_PREVIEW_AUTHORIZATION_FAILED_CLOSED');
+          const scopedPreview=priorScopedPreview||onePassInternal||oct15ScopedReadback||restrictedScoped;
           const previewOk=(r19Preview||r20Preview||r23Preview)
             && l.activeFinding?.id==='B4-003'
             && l.boundaries?.businessWritesAuthorized===false

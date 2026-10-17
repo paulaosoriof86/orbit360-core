@@ -12131,6 +12131,32 @@
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CANCELACIONES_AUDITORIA_SOURCE_QA_20261017.json",
     "receiptBlobSha": "a683c5c792841a610bfc1ef27ceb359265cd2588",
     "firestoreRulesDeployAuthorized": false,
-    "dataMutationAuthorized": false
+    "dataMutationAuthorized": false,
+    "previewDispatch": {
+      "status": "EXACT_B4_003_READ_ONLY_PREVIEW_AUTHORIZED_NOT_EXECUTED",
+      "sourceHead": "729ac226a87c9a1502c422f2c1f90993c5d24ae8",
+      "triggerSubject": "build(i6.5 B4-003): exact protected cancellation audit Preview",
+      "codeQaRunId": 39061257991,
+      "sourceQaReceiptBlobSha": "a683c5c792841a610bfc1ef27ceb359265cd2588",
+      "exactCompositionBlobSha": "7175a97df252a1459df7692d7e8d3f99e3c3bc6d",
+      "sourceBlobs": {
+        "functions/b4-003-scoped-access-boundary.js": "01934d22cfe6f353c6e143e553e3bc1c704c029a",
+        "functions/b4-003-scoped-related-reader.js": "652042d544d8dbf52b6d0f8c55bc6de7d3c64aa2",
+        "orbit360-platform/core/product-runtime-browser-providers-p0.js": "51f2801cf8e7590ff92ffa9e7dae07ff8304f5d7",
+        "orbit360-platform/data/store-firestore-product-readonly-p0.js": "41a903a88caa338c74f636c1cd31e23f79aa2481"
+      },
+      "requiredRoleCountryProof": "PENDING_AUTHENTICATED",
+      "readOnly": true,
+      "functionScope": "orbit360ScopedPolicyReadPreview",
+      "hostingScope": "EXACT_B4_003_ISOLATED_CHANNEL",
+      "allowedExistingReadOnlyRosterIfSeparatelyAuthorized": true,
+      "livePromotionAuthorized": false,
+      "sharedRulesDeployAuthorized": false,
+      "businessWritesAuthorized": false,
+      "syntheticQaWritesAuthorized": false,
+      "dataMutationAuthorized": false,
+      "reimportAuthorized": false,
+      "authenticatedUserImpersonationAuthorized": false
+    }
   }
 }
