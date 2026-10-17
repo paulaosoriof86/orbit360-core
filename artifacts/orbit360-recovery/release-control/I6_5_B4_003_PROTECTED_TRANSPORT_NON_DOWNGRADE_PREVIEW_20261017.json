@@ -1,0 +1,50 @@
+{
+  "schema": "GRAVICENTRA_I65_B4003_NON_DOWNGRADE_PREVIEW_RECEIPT_V1",
+  "gate": "I6.5/B4-003",
+  "status": "EXACT_PREVIEW_PUBLIC_PASS_AUTHENTICATED_ROLE_SCOPE_AND_LIVE_RULES_PENDING",
+  "sourceCommit": "7ed067a86a0b4af4f5591f223be9681bb98d1f00",
+  "sourceFixOwnerBlobs": {
+    "orbit360-platform/core/product-runtime-browser-providers-p0.js": "5c0b6aae5bdbbfbdd3134a4508cce3531c01a37a",
+    "orbit360-platform/core/product-app-p0.js": "b3080c0dbb8d5ae80061754676a5a39b2c913ec4"
+  },
+  "sourceUnitGuard": {
+    "runId": 39030832987,
+    "conclusion": "success",
+    "nonDowngradeSyntheticChecks": 8
+  },
+  "previewRunId": 39030833076,
+  "previewRunConclusion": "success",
+  "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-39030833076-2j9hu3bj.web.app",
+  "buildId": "gi-i65-b4-7ed067a86a0b-57f234755dc1",
+  "hostedFileCount": 218,
+  "hostedPayloadDigest": "365b46ca19dd49764618607fa1a33f77d3a325619b5fee71815832053ffa767b",
+  "backendFileCount": 33,
+  "backendSourceDigest": "6eb9e04a7cdb2e84b32a70c35b9d1736de09ce4b3c2b1fbe945902ca5c8f3ae9",
+  "bundleDigest": "2fbd376088e8f7a2152014f56f4a4110d58c14e99a6a490dd5d01b40de957103",
+  "artifactId": 12100007543,
+  "artifactSha256": "df1de19de2709426b36330094b6418b9ae8d06e9c2e969567c62d7bbda5b6e0f",
+  "technicalProof": {
+    "hostingReadback": "PASS",
+    "publicSmoke": "PASS",
+    "anonymousCallableStatus": 401,
+    "scopedFunctionDeployment": "PASS",
+    "roleCountryAuthenticated": "PENDING",
+    "roleCountrySyntheticEmulator": "PREVIOUS_PASS_NOT_THIS_RUN",
+    "realUserTokensIssued": 0
+  },
+  "boundaries": {
+    "firebaseProjectUnchanged": true,
+    "sharedRulesDeployed": false,
+    "otherFunctionsDeployed": false,
+    "productionPromotion": false,
+    "operationalWrites": 0,
+    "realUserImpersonationAuthorized": false,
+    "securityP0Closed": false,
+    "paulaVisualAccepted": false
+  },
+  "nextAction": "B4_003_AUTHENTICATED_ROLE_COUNTRY_NEGATIVE_AND_POSITIVE_PROOF_UNDER_EXPLICIT_GATE_AUTHORITY",
+  "formalI6Before": 50,
+  "formalI6After": 50,
+  "supersedesPreviewRunId": 39029724695,
+  "previousPreviewPreserved": true
+}
