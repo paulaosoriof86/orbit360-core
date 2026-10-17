@@ -11970,7 +11970,7 @@
     "artifactId": 12106721934,
     "artifactDigest": "sha256:a822ec03ae22f44c8ec316e2182bf14da2f23e41b4751e3397887f56220154f9",
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_P0_CUMULATIVE_READONLY_FREEZE_20261017.json",
-    "receiptBlobSha": "3d586f04936b0ce4b37c8e690ef71e28c59ebcfe",
+    "receiptBlobSha": "e7a47779cace349d01dffb9e9b1faeb62030a676",
     "result": {
       "findings": 295,
       "carry": 295,
@@ -11985,6 +11985,11 @@
     "sourceCausalMechanismDemonstrated": true,
     "sourcePatchApplied": false,
     "sourcePatchBlockedByExecutionLock": true,
-    "formalI6PercentAfterExecution": 50
+    "formalI6PercentAfterExecution": 50,
+    "evidenceCorrection": {
+      "status": "CORRECTED_SOURCE_BLOB_BINDING",
+      "path": "orbit360-platform/core/access-role-session-owner-v20260728.js",
+      "correctedBlobSha": "eee3eb184f1b4d7219d455d6a15b7d579979d7f5"
+    }
   }
 }

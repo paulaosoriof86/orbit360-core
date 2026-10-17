@@ -38,7 +38,7 @@
     "observed": [
       {
         "path": "orbit360-platform/core/access-role-session-owner-v20260728.js",
-        "blobSha": "c5b1e1b98dc5e69a5cab7ffde5cc4f52dd744d91",
+        "blobSha": "eee3eb184f1b4d7219d455d6a15b7d579979d7f5",
         "mechanism": "PRODUCT_ROLE_CHANGE_EMITS_ORBIT_SESSION_BEFORE_ORBIT_ACTIVE_ROLE_CHANGED",
         "impact": "Router/session rerender may occur before protected store invalidates previous-role cache."
       },
