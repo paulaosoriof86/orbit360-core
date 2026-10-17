@@ -11862,7 +11862,7 @@
     "dashboardSourceSha": "a819209312108d735392acb247242d2c58f87644",
     "dashboardStyleSha": "02bea455bce9f5659eeaf8fd73e799eccb7f7e23",
     "clientReadContractSha": "123f90ab2bce500f7a89338ae6e3de0b82811fe3",
-    "previewRunPending": true,
+    "previewRunPending": false,
     "unresolved": [
       "Inicio executive visual and live goal readback",
       "Equipo role matrix/modal and freelancers",
@@ -11877,7 +11877,7 @@
     "formalPercentBefore": 50,
     "formalPercentAfter": 50,
     "exactPreviewDispatch": {
-      "status": "REQUESTED_EXISTING_B4_003_CUMULATIVE_PREVIEW",
+      "status": "DONE_TECHNICAL_PASS_NOT_VISUAL_ACCEPTANCE",
       "sourceCommit": "a275b0af4387409135a0bd4f81ae9484d41d3ee5",
       "mode": "EXACT_TWO_READONLY_CALLABLES_NO_WRITES",
       "onlyFunctions": [
@@ -11891,5 +11891,29 @@
       "operationalWritesAuthorized": false,
       "authenticatedUatPending": true
     }
+  },
+  "b4003ExecutiveDashboardPreviewReceipt20261017": {
+    "status": "TECHNICAL_PREVIEW_PASS_AUTHENTICATED_AND_VISUAL_UAT_PENDING",
+    "sourceHead": "06601638179c3f22885c6aed14d870cd5b4807c0",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_EXECUTIVE_PREVIEW_CERTIFIED_TECH_CHECKPOINT_20261017.json",
+    "receiptBlobSha": "5f8caf5889f2968f82bdac613215010a73956c29",
+    "previewRunId": 39036774854,
+    "guardRunId": 39036774834,
+    "buildId": "gi-i65-b4-06601638179c-57f234755dc1",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-39036774854-1bfdnc91.web.app",
+    "hostedPayloadDigest": "9aa751c66a1e40f66bae5b92f75deff73eb8b15d898657974a5c37ff9de27cb6",
+    "backendSourceDigest": "73b5384dd2321fba3e5f1e3588edf42af4e401f85a74e267358124e8e7c543f7",
+    "previewReadOnlyServices": [
+      "orbit360ScopedPolicyReadPreview",
+      "orbit360AssignableAdvisorRosterPreview"
+    ],
+    "authenticatedQaPassed": false,
+    "visualAcceptance": false,
+    "globalSecurityAccepted": false,
+    "noLivePromotion": true,
+    "noRulesDeploy": true,
+    "noBusinessWrites": true,
+    "priorPaulaRejectionPreserved": true,
+    "formalPercent": 50
   }
 }

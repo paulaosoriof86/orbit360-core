@@ -1,0 +1,69 @@
+{
+  "schema": "GRAVICENTRA_B4_003_EXECUTIVE_PREVIEW_TECH_CHECKPOINT_V1",
+  "date": "2026-10-17",
+  "gate": "I6.5/B4-003",
+  "status": "TECHNICAL_PREVIEW_PASS_AUTHENTICATED_AND_VISUAL_REJECTED_PENDING",
+  "sourceCommit": "06601638179c3f22885c6aed14d870cd5b4807c0",
+  "sourceFunctionalCommit": "91e9f260584bd65c485228b54f64eae862cfdb35",
+  "sourceUxQaCommit": "a275b0af4387409135a0bd4f81ae9484d41d3ee5",
+  "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-39036774854-1bfdnc91.web.app",
+  "buildId": "gi-i65-b4-06601638179c-57f234755dc1",
+  "manifest": {
+    "hostedFileCount": 218,
+    "hostedPayloadDigest": "9aa751c66a1e40f66bae5b92f75deff73eb8b15d898657974a5c37ff9de27cb6",
+    "backendFileCount": 33,
+    "backendSourceDigest": "73b5384dd2321fba3e5f1e3588edf42af4e401f85a74e267358124e8e7c543f7",
+    "bundleFileCount": 253,
+    "bundleDigest": "e21d51ee000f5b18a58ecef3b15d1a7448ee885737e2"
+  },
+  "ci": {
+    "guardRun": 39036774834,
+    "guardResult": "success",
+    "previewRun": 39036774854,
+    "previewResult": "success",
+    "artifactId": 12102616278,
+    "zipSha256": "bfdd5fc427d85cd09a136d2a6338a1c009b439058c1a2cc34ded7ec241d82a60"
+  },
+  "callableUpdates": [
+    {
+      "name": "orbit360ScopedPolicyReadPreview",
+      "region": "us-east1",
+      "ciDeploymentStatus": "SUCCESSFUL_UPDATE"
+    },
+    {
+      "name": "orbit360AssignableAdvisorRosterPreview",
+      "region": "us-east1",
+      "ciDeploymentStatus": "SUCCESSFUL_UPDATE",
+      "contract": "gi-i65-b4-003-executive-read-v1"
+    }
+  ],
+  "technicalEvidence": {
+    "hostingExactReadback": "PASS",
+    "publicPreviewSmoke": "PASS",
+    "anonymousCallableAccess": "DENIED",
+    "backendBindingDigestFromArtifact": true
+  },
+  "nonClaimedEvidence": {
+    "realRoleCountryAuth": "PENDING",
+    "advisorGoalsInteractiveReadback": "PENDING",
+    "fullVisualAcceptance": "REJECTED_OR_PENDING",
+    "client360CollectionLoad": "PENDING",
+    "cobrosCollectionLoad": "PENDING",
+    "cancelacionesReturnAfterRoleSwitch": "PENDING",
+    "perRoleMatrix": "PENDING",
+    "reconciledBusinessKpis": "PENDING",
+    "sharedRulesSecured": "PENDING"
+  },
+  "boundaries": {
+    "existingFirebaseProjectOnly": true,
+    "isolatedHostingPreviewOnly": true,
+    "sharedFirestoreRulesDeployed": false,
+    "productionPromoted": false,
+    "operationalDataWrites": 0,
+    "realUserTokensIssued": 0
+  },
+  "rejectedPriorVisualEvidence": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PAULA_DASHBOARD_AND_TRANSVERSAL_REGRESSION_LOCK_20261017.json",
+  "formalI6ProgressBefore": 50,
+  "formalI6ProgressAfter": 50,
+  "next": "B4_003_ROLE_HYDRATION_AND_PERMISSION_MATRIX_ROOT_CAUSE_WITH_UI_REAL_READBACK_THEN_PAULA_VISUAL"
+}
