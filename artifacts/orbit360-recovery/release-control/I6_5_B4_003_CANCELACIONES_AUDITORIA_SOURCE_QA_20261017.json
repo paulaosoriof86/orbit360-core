@@ -1,0 +1,39 @@
+{
+  "schema": "GRAVICENTRA_I65_B4003_RESTRICTED_READ_SOURCE_QA_RECEIPT_V1",
+  "gate": "I6.5/B4-003",
+  "date": "2026-10-17",
+  "status": "SOURCE_QA_PASS_EXACT_PREVIEW_PENDING",
+  "sourceCommit": "3d71610c68c73fd5977cb4bce6e2d81336554bb1",
+  "verification": {
+    "workflowName": "Gravicentra B4-003 R20 Exact Preview",
+    "runId": 39061257991,
+    "conclusion": "success",
+    "guardRunId": 39061257915,
+    "guardConclusion": "success",
+    "sourceTestSummary": "B4_003_RELATED_SERVER_BATCH_SCOPE_MOCK_PASS checks=91 no Firebase writes",
+    "newContractTests": "B4_003_CANCELACIONES_AUDITORIA_AUTHORIZATION_QA_PASS checks=10 no_data_writes",
+    "transportMock": "B4_003_PROTECTED_HYDRATION_MOCK_PASS",
+    "previewMode": "NOOP",
+    "realAuthenticatedTest": false,
+    "newBuildExecuted": false,
+    "newDeployExecuted": false
+  },
+  "productBlobs": {
+    "functions/b4-003-scoped-access-boundary.js": "01934d22cfe6f353c6e143e553e3bc1c704c029a",
+    "functions/b4-003-scoped-related-reader.js": "652042d544d8dbf52b6d0f8c55bc6de7d3c64aa2",
+    "orbit360-platform/core/product-runtime-browser-providers-p0.js": "51f2801cf8e7590ff92ffa9e7dae07ff8304f5d7",
+    "orbit360-platform/data/store-firestore-product-readonly-p0.js": "41a903a88caa338c74f636c1cd31e23f79aa2481"
+  },
+  "scope": "EXACT_CANONICAL_PRODUCT_TREE_SOURCE_ONLY",
+  "productionPromotion": false,
+  "sharedRulesDeploy": false,
+  "dataWrites": 0,
+  "reimport": false,
+  "restrictions": [
+    "DO_NOT_CLAIM_LATEST_APPROVED_VERSION_PREVIEW_PASS",
+    "DO_NOT_PROPOSE_AUDIT_UNRESTRICTED_READ",
+    "DO_NOT_ENABLE_LIVE_OR_DATA_MUTATIONS"
+  ],
+  "next": "EXACT_READONLY_PREVIEW_BUILD_THEN_AUTHENTICATED_ROLE_COUNTRY_POSITIVE_NEGATIVE_PROOF",
+  "formalI6Percent": 50
+}
