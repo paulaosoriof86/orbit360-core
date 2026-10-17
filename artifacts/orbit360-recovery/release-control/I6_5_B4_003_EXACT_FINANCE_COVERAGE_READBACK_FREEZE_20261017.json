@@ -1,0 +1,167 @@
+{
+  "schema": "GRAVICENTRA_I65_B4003_EXACT_FINANCE_COVERAGE_READBACK_FREEZE_V1",
+  "gate": "I6.5/B4-003",
+  "date": "2026-10-17",
+  "status": "HOLD_PROTECTED_READ_COVERAGE_REAL_DATA_NOT_CAPABILITY_PASS",
+  "sourceHead": "78255d7824fbe17923bddb4950a8c873a7b9ca89",
+  "testedCertifiedPreview": {
+    "sourceSha": "5a933c705fa4e080e30dbc8e483c972c8a2b256f",
+    "buildId": "gi-i65-b4-5a933c705fa4-57f234755dc1",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-38660268117-6wht8qxi.web.app",
+    "markerExact": true
+  },
+  "execution": {
+    "workflow": "Gravicentra B4-003 R20 Exact Preview",
+    "runId": 39048654780,
+    "conclusion": "failure_expected_fail_closed_hold",
+    "artifactId": 12105899412,
+    "artifactName": "gravicentra-b4003-exact-finance-source-39048654780",
+    "artifactDigest": "sha256:3549a64422a4baee77e9c2deceaf3da0d11b20d86928931f1324ab2b7308c5a8",
+    "readOnly": true,
+    "realBusinessWrites": 0,
+    "syntheticWrites": 0,
+    "impersonation": false,
+    "firestoreRulesChanged": false,
+    "deploys": 0,
+    "productionChanges": 0,
+    "reimport": false
+  },
+  "sourceCounts": {
+    "clientes": 443,
+    "polizas": 1425,
+    "cobros": 5,
+    "aseguradoras": 33,
+    "vehiculos": 1144,
+    "recibosEsperados": 1958,
+    "carteraPrimas": 1396,
+    "asesores": 7,
+    "estadosCuentaAseguradora": 0,
+    "recibosAseguradora": 0,
+    "conciliacionesPrimas": 0,
+    "conciliaciones": 0,
+    "metas": 6,
+    "negocios": 9,
+    "gestiones": 13,
+    "actividades": 785,
+    "reclamos": 0,
+    "comisiones": 0,
+    "cancelaciones": 1,
+    "auditoria": 27,
+    "cursos": 0,
+    "academyProgress": 0
+  },
+  "relations": {
+    "policiesByCountry": {
+      "GT": 1301,
+      "CO": 124,
+      "unknown": 0
+    },
+    "crossCountryPolicyClient": {
+      "GTClientCOPolicy": 41,
+      "COClientGTPolicy": 1
+    },
+    "recibosEsperados": {
+      "rows": 1958,
+      "linked": 1878,
+      "missingPolicy": 80,
+      "withoutAnchor": 0,
+      "explicitCountryConflict": 0,
+      "linkedGT": 1836,
+      "linkedCO": 42
+    },
+    "carteraPrimas": {
+      "rows": 1396,
+      "linked": 1316,
+      "missingPolicy": 80,
+      "withoutAnchor": 0,
+      "explicitCountryConflict": 0,
+      "linkedGT": 1302,
+      "linkedCO": 14
+    },
+    "cobros": {
+      "rows": 5,
+      "linked": 5,
+      "missingPolicy": 0,
+      "withoutAnchor": 0,
+      "explicitCountryConflict": 0,
+      "linkedGT": 5,
+      "linkedCO": 0
+    },
+    "vehiculos": {
+      "rows": 1144,
+      "linked": 1068,
+      "missingPolicy": 76,
+      "withoutAnchor": 0,
+      "explicitCountryConflict": 1,
+      "linkedGT": 1028,
+      "linkedCO": 40
+    }
+  },
+  "protectedReadCoverage": {
+    "requiredCount": 8,
+    "optionalCount": 14,
+    "unsupportedConfigured": [
+      "estadosCuentaAseguradora",
+      "recibosAseguradora",
+      "conciliacionesPrimas",
+      "conciliaciones",
+      "reclamos",
+      "comisiones",
+      "cancelaciones",
+      "auditoria",
+      "cursos",
+      "academyProgress"
+    ],
+    "realRowsInHostedUnsupported": [
+      "cancelaciones",
+      "auditoria"
+    ],
+    "cancelacionesRows": 1,
+    "auditoriaRows": 27,
+    "historialUsesActividades": true,
+    "actividadesRows": 785,
+    "historialRequestedByHostedHydration": false,
+    "historyHydrationMissing": true
+  },
+  "activityRelationshipProfile": {
+    "count": 785,
+    "countryExplicit": 0,
+    "countryFromPolicy": 16,
+    "countryFromClient": 20,
+    "countryUnknown": 749,
+    "countryConflict": 0,
+    "policyMatched": 16,
+    "clientMatched": 33,
+    "unresolvedParent": 749,
+    "advisorExplicit": 126,
+    "advisorFromPolicy": 0,
+    "advisorFromClient": 0,
+    "advisorMissing": 659,
+    "matchedGT": 23,
+    "matchedCO": 12,
+    "tenantMismatch": 0
+  },
+  "adjudication": {
+    "capabilityPass": false,
+    "reason": [
+      "Protected Preview read owner does not cover configured collections that contain real rows: cancelaciones and auditoria.",
+      "Historial consumes actividades but actividades is not requested by hosted hydration while 785 source rows exist.",
+      "Financial/vehicle child universes contain unresolved policy relationships that must be reconciled by canonical IDs; no source data was changed."
+    ],
+    "crossCountryPolicyClientProfileIsNotAutomaticallyAnError": true,
+    "noDataCleanupAuthorized": true
+  },
+  "mutationBoundary": {
+    "productMutationAuthorized": false,
+    "dataMutationAuthorized": false,
+    "sharedFirestoreRulesDeployAuthorized": false,
+    "livePromotionAuthorized": false,
+    "reimportAuthorized": false,
+    "sourcePatchApplied": false
+  },
+  "progress": {
+    "formalI6Before": 50,
+    "formalI6After": 50
+  },
+  "nextMaterialAction": "OPEN_EXACT_SAME_GATE_PRODUCT_SOURCE_MUTATION_BOUNDARY_THEN_APPLY_CAUSAL_PROTECTED_COVERAGE_AND_ROLE_HYDRATION_FIXES_AND_BUILD_NEW_EXACT_PREVIEW"
+}

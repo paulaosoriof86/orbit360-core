@@ -11993,7 +11993,7 @@
     }
   },
   "b4003ExactFinanceCoverageReadback20261017": {
-    "status": "REQUESTED_EXISTING_EXACT_PREVIEW_READONLY",
+    "status": "EXECUTED_HOLD_PROTECTED_READ_COVERAGE_REAL_DATA",
     "authority": "PAULA_CONTINUITY_20261017",
     "triggerSubject": "test(i6.5 B4-003): exact finance and coverage readback",
     "targetPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b4-38660268117-6wht8qxi.web.app",
@@ -12011,6 +12011,32 @@
     "livePromotion": false,
     "reimport": false,
     "formalI6PercentBefore": 50,
-    "formalI6PercentAfterRequest": 50
+    "formalI6PercentAfterRequest": 50,
+    "runId": 39048654780,
+    "artifactId": 12105899412,
+    "artifactDigest": "sha256:3549a64422a4baee77e9c2deceaf3da0d11b20d86928931f1324ab2b7308c5a8",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_EXACT_FINANCE_COVERAGE_READBACK_FREEZE_20261017.json",
+    "receiptBlobSha": "07e23e9b8046ba53641de50ee1486409fcb2db84",
+    "exactPreview": {
+      "sourceSha": "5a933c705fa4e080e30dbc8e483c972c8a2b256f",
+      "buildId": "gi-i65-b4-5a933c705fa4-57f234755dc1",
+      "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-38660268117-6wht8qxi.web.app"
+    },
+    "blockers": {
+      "unsupportedRealCollections": [
+        "cancelaciones",
+        "auditoria"
+      ],
+      "historialActividadesHydrationMissing": true,
+      "missingPolicyLinks": {
+        "recibosEsperados": 80,
+        "carteraPrimas": 80,
+        "vehiculos": 76
+      },
+      "vehicleCountryConflicts": 1
+    },
+    "sourcePatchApplied": false,
+    "sourcePatchBlockedByExecutionLock": true,
+    "formalI6PercentAfterExecution": 50
   }
 }
