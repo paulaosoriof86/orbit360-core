@@ -99,3 +99,48 @@ assert.throws(()=>resolve({...roleBase,activeRole:'Finanzas',
  config:{roleScopes:{Finanzas:'all'},rolePermissions:{Finanzas:{polizas:{ver:false}}}}}),
  e=>e.code==='MODULE_DENIED');
 console.log('B4_003_APPROVED_ROLE_SCOPE_PARITY_PASS Finance Marketing Assistant and advisor tiers; negative country role module insurer denied');
+
+// Exercise the existing writer regression as well as the protected read boundary.
+// This test only reads repository files and runs the committed in-memory harness.
+// The vulnerable baseline remains an explicit release HOLD, never a product PASS.
+{
+ const fs=require('node:fs'),child=require('node:child_process'),crypto=require('node:crypto');
+ const root='artifacts/orbit360-recovery/release-control/';
+ const proof=JSON.parse(fs.readFileSync(root+'I6_5_B4_003_C03_04_LOCAL_PROOF_20261016.json','utf8'));
+ const control=JSON.parse(fs.readFileSync(root+'CONTROL_PLANE.json','utf8'));
+ const owner=fs.readFileSync(proof.owner);
+ const blob=crypto.createHash('sha1').update(Buffer.concat([Buffer.from('blob '+owner.length+'\0'),owner])).digest('hex');
+ const harness='tools/gravicentra-b4-003-before-image-regression.test.cjs';
+ const qa=fs.readFileSync(harness);
+ assert.equal(crypto.createHash('sha256').update(qa).digest('hex'),proof.qaSha256,'Recorded writer regression must not drift silently');
+ const run=child.spawnSync(process.execPath,[harness,'functions'],{encoding:'utf8',timeout:15000,maxBuffer:1024*1024});
+ if(run.error)throw run.error;
+ assert.equal(run.signal,null,'Writer regression was interrupted');
+ const result=JSON.parse(run.stdout);
+ assert.equal(result.sourceBlob,blob);
+ assert.equal(result.syntheticOnly,true);
+ assert.equal(result.externalRequests,0);
+ assert.equal(result.releaseAccepted,false);
+ assert.equal(result.total,12);
+ if(blob===proof.baseBlob){
+  assert.equal(run.status,1);
+  assert.equal(result.passed,8);
+  assert.equal(result.failed,4);
+  assert.deepEqual(result.tests.filter(t=>!t.pass).map(t=>t.id).sort(),[...proof.reproducedFailureIds].sort());
+  assert.equal(control.b4003SecurityReleaseHold.livePromotionAuthorized,false);
+  assert.equal(control.b4003SecurityReleaseHold.firestoreRulesDeployAuthorized,false);
+  assert.equal(control.i6Execution.livePromotionAuthorized,false);
+  console.log('C03_04_WRITER_PRODUCT_STATUS=DEFECT_REPRODUCED_INTEGRATION_PENDING');
+  console.log('C03_04_BASELINE_CONTROLS=8/12; KNOWN_FAILURES=4; PRODUCT_PASS=false');
+ }else{
+  const binding=control.b4003C0304BeforeImageSourceIntegration;
+  assert.ok(binding,'Changed writer source requires a current Control Plane binding');
+  assert.equal(binding.owner,proof.owner);
+  assert.equal(binding.candidateBlob,blob);
+  assert.equal(binding.sourceChangeAuthorized,true);
+  assert.equal(run.status,0);
+  assert.equal(result.passed,12);
+  assert.equal(result.failed,0);
+  console.log('C03_04_WRITER_REGRESSION=12/12; PREVIEW_AND_LIVE_ACCEPTANCE_NOT_PROVEN_BY_UNIT_TEST');
+ }
+}
