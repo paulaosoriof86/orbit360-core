@@ -11944,5 +11944,27 @@
     "securityP0Closed": false,
     "formalI6Percent": 50,
     "priority": "CAUSAL_BACKEND_COMPOSITION_ROLE_SCOPE_MONTHLY_RECEIPTS_AND_LATENCY_BEFORE_MORE_COSMETICS"
+  },
+  "b4003P0CumulativeReadOnlyExecution20261017": {
+    "status": "REQUESTED_EXISTING_IMMUTABLE_PREVIEW_READONLY",
+    "authority": "PAULA_CONTINUITY_20261017",
+    "triggerSubject": "audit(i6.5 B4-003): execute cumulative P0 read-only inventory",
+    "targetPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b4-38309446443-1io2otyg.web.app",
+    "targetSourceSha": "591d6655090342e1c9c3137eb8cdf88f292a3aa1",
+    "objective": [
+      "CLASSIFY_CURRENT_P0_WITHOUT_PRODUCT_OR_DATA_MUTATION",
+      "RECONCILE_ROLE_SCOPE_AND_CROSS_MODULE_RUNTIME_EVIDENCE",
+      "PRESERVE_SECURITY_AND_RELEASE_HOLDS"
+    ],
+    "productMutation": false,
+    "dataMutation": false,
+    "configWrites": false,
+    "syntheticQaWrites": false,
+    "realOperationalWrites": false,
+    "sharedFirestoreRulesDeploy": false,
+    "livePromotion": false,
+    "reimport": false,
+    "formalI6PercentBefore": 50,
+    "formalI6PercentAfterRequest": 50
   }
 }
