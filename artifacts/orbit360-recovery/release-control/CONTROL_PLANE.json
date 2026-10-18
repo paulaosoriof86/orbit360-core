@@ -12717,5 +12717,36 @@
     "productionPathPercent": 20,
     "formalI6Percent": 50,
     "nextWithinGate": "ROLE_PERMISSION_CONFIG_DELTA_DRYRUN_THEN_AUTHORIZED_SCOPED_READ_WRITE_TEST_AND_GT_CO_E2E"
+  },
+  "b4003Uat2CancelacionesExactDeltaDryrun": {
+    "status": "EXACT_SOURCE_CONFIG_TWO_FIELD_DRYRUN_PASS_WRITE_AUTH_AND_REAL_UID_HOLD",
+    "gate": "I6.5/B4-003",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_UAT2_CANCELACIONES_ACCESS_DELTA_DRYRUN_20261018.json",
+    "receiptBlobSha": "7539a25bdc441d1ae256ff48a604d100b72f1e9c",
+    "sourceRunId": 39175546003,
+    "sourceArtifactId": 12153679799,
+    "sourceArchiveDigest": "sha256:257e85675fefd2037c17c2d23f2d34c54529d48cafc905371136bce6c9c8dcaa",
+    "fields": [
+      "rolePermissions.Operativo.cancelaciones.ver",
+      "rolePermissions.Asesor.cancelaciones.ver"
+    ],
+    "beforeDigest": "7286e3169b2a488929c8fef38d3a666b15750315a3526e1c63c732f7d9a64b37",
+    "proposedDigest": "fba9c3a248b4bd700fb592a7d70ca49f0db3306fb4dfe3f827965c5faf1a03e8",
+    "configUpdateTimeMillis": 1790721722871,
+    "otherPermissionsUnchanged": true,
+    "editPermissionsUnchanged": true,
+    "roleScopesUnchanged": true,
+    "sourceQAPath": "tools/gravicentra-b4-003-scoped-related-reader.test.cjs",
+    "sourceQABlobSha": "4fd02dbafb278a6bf4bd7483f6c4e896c7e9dbe9",
+    "ciRegressionVerified": false,
+    "realUidGtCoVerified": false,
+    "writeApplied": false,
+    "productSourceChanged": false,
+    "sharedRulesDeployed": false,
+    "productionPromoted": false,
+    "nextRequiredAction": "SOURCE_QA_THEN_SCOPED_AUTH_PREVIEW_GT_CO_AND_EXPLICIT_AUTHORIZED_CONFIG_READ_WRITE",
+    "productionPathPercent": 20,
+    "formalI6Percent": 50,
+    "gateAdvanced": false
   }
 }

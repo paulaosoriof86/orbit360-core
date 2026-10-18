@@ -1,0 +1,73 @@
+{
+  "schema": "GRAVICENTRA_I65_B4003_UAT2_ACCESS_CONFIG_FIELD_EXACT_DRYRUN_V1",
+  "gate": "I6.5/B4-003",
+  "dateLocal": "2026-10-18",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "headForReadback": "850f1dee116963d33239fbe99a0c9cd525a6cae1",
+  "controlPlaneBeforeBlobSha": "e0ade003830e799ac98e68170aa6371c714b9f9a",
+  "sourceReadback": {
+    "runId": 39175546003,
+    "job": "b4-003-readonly-diagnostic",
+    "result": "PASS_FIELD_EXACT_DRY_RUN_NO_WRITE",
+    "artifactId": 12153679799,
+    "artifactName": "gravicentra-b4-003-onepass-integrity-39175546003",
+    "archiveSha256": "257e85675fefd2037c17c2d23f2d34c54529d48cafc905371136bce6c9c8dcaa",
+    "archiveShaIndependentlyVerified": true,
+    "configPath": "tenants/alianzas-soluciones/config/access",
+    "configExists": true,
+    "configUpdateTimeMillis": 1790721722871,
+    "permissionDigestBefore": "7286e3169b2a488929c8fef38d3a666b15750315a3526e1c63c732f7d9a64b37",
+    "permissionDigestAfterProposed": "fba9c3a248b4bd700fb592a7d70ca49f0db3306fb4dfe3f827965c5faf1a03e8"
+  },
+  "exactProposedDelta": [
+    {
+      "field": "rolePermissions.Operativo.cancelaciones.ver",
+      "old": false,
+      "new": true,
+      "editRemains": false,
+      "scopeRemains": "all"
+    },
+    {
+      "field": "rolePermissions.Asesor.cancelaciones.ver",
+      "old": false,
+      "new": true,
+      "editRemains": false,
+      "scopeRemains": "own"
+    }
+  ],
+  "otherRolePermissionsUnchanged": true,
+  "otherModulePermissionsUnchanged": true,
+  "roleScopesUnchanged": true,
+  "serverAuthorizationContract": {
+    "roleSignedAndAssignedRequired": true,
+    "tenantAndCountryRequired": true,
+    "advisorOwnScopedInBackend": true,
+    "negativeForeignDirectGetAndQueryRequired": true,
+    "serverPolicyExistingProofNotCurrentRealUidPass": true,
+    "neverInferSecurityFromUI": true
+  },
+  "qa": {
+    "syntheticCasesAddedToExistingB4003QA": true,
+    "runnerStatus": "PENDING_GITHUB_EXECUTION",
+    "realUidRoleGTCO": "HOLD"
+  },
+  "authorization": {
+    "dataWritesAllowed": false,
+    "tenantAccessConfigWritesAllowed": false,
+    "sharedFirestoreRulesDeployAllowed": false,
+    "livePromotionAllowed": false,
+    "authImpersonationAllowed": false
+  },
+  "result": "DRYRUN_PASS_NOT_APPLIED",
+  "productionProgress": {
+    "beforePercent": 20,
+    "afterPercent": 20,
+    "deltaPercentagePoints": 0,
+    "passedChecks": 2,
+    "totalChecks": 10,
+    "formalI6Percent": 50
+  },
+  "notBuildOrLiveAcceptance": true,
+  "retainCurrentExactPreviewBuildId": "gi-i65-b4-80c8be5a0472-57f234755dc1"
+}
