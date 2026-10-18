@@ -1,0 +1,73 @@
+{
+  "schema": "GRAVICENTRA_I65_B4003_CANCELACIONES_ACCESS_DRYRUN_AND_SYNTHETIC_BACKEND_QA_PASS_V1",
+  "gate": "I6.5/B4-003",
+  "dateLocal": "2026-10-18",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "previousDryrun": {
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_UAT2_CANCELACIONES_ACCESS_DELTA_DRYRUN_20261018.json",
+    "receiptBlobSha": "7539a25bdc441d1ae256ff48a604d100b72f1e9c",
+    "sourceRunId": 39175546003,
+    "archiveDigest": "sha256:257e85675fefd2037c17c2d23f2d34c54529d48cafc905371136bce6c9c8dcaa",
+    "result": "PASS_FIELD_EXACT_DRY_RUN_NO_WRITE"
+  },
+  "qa": {
+    "runId": 39175737022,
+    "workflow": "Gravicentra B4-003 R20 Exact Preview",
+    "runConclusion": "success",
+    "sourceJob": "b4-003-renewals-cancelations-preview",
+    "logProofs": [
+      "B4_003_CANCEL_ACCESS_CONFIG_BEFORE_AFTER_SCOPE_QA_PASS checks=9 no_backend_or_config_writes",
+      "B4_003_CANCELACIONES_AUDITORIA_AUTHORIZATION_QA_PASS checks=10 no_data_writes",
+      "B4_003_RELATED_DOCUMENT_SERVER_SCOPE_MOCK_PASS checks=104 no Firebase writes"
+    ],
+    "correctedQAOwner": "tools/gravicentra-b4-003-scoped-related-reader.test.cjs",
+    "qaBlobSha": "4fd02dbafb278a6bf4bd7483f6c4e896c7e9dbe9",
+    "assertions": [
+      "Operativo false server config denies read; after proposed true can read approved scope",
+      "Asesor false denies read; after proposed true may read own only",
+      "Foreign cancellation direct get rejected and stale foreign child excluded",
+      "GT/CO synthetic country check and edit flags remain unchanged false"
+    ],
+    "syntheticOnly": true,
+    "realAuthenticatedGTCO": false,
+    "notPreviewAccepted": true,
+    "executorMode": "NOOP_NO_NEW_PREVIEW_OR_HOSTING_SOURCE_DIFF"
+  },
+  "negativeSecurityRelease": {
+    "liveEffectiveFirestoreRulesStillBroad": true,
+    "realServerForeignPolicyDenialPending": true
+  },
+  "configuration": {
+    "canonicalBeforeDigest": "7286e3169b2a488929c8fef38d3a666b15750315a3526e1c63c732f7d9a64b37",
+    "proposedAfterDigest": "fba9c3a248b4bd700fb592a7d70ca49f0db3306fb4dfe3f827965c5faf1a03e8",
+    "preparedExactFields": [
+      "rolePermissions.Operativo.cancelaciones.ver",
+      "rolePermissions.Asesor.cancelaciones.ver"
+    ],
+    "configUpdateTimeMillis": 1790721722871,
+    "beforeAfterProven": "ONLY_TWO_VER_FLAGS",
+    "writeExecuted": false,
+    "nextWriteRequiresExactSourceReadbackAndAuthorizedSignedAdministrativeActor": true
+  },
+  "environment": {
+    "productionTouched": false,
+    "firestoreRulesDeployed": false,
+    "operationalWrites": 0,
+    "realUserTokensIssued": 0,
+    "newProductBuild": false
+  },
+  "state": "SOURCE_DRYRUN_AND_SYNTHETIC_AUTHORIZATION_QA_PASS_REAL_UID_AND_WRITE_PARITY_HOLD",
+  "release": {
+    "gateStill": "I6.5/B4-003",
+    "progressPrevious": 20,
+    "progressCurrent": 20,
+    "deltaPercentagePoints": 0,
+    "controlsPassed": 2,
+    "controlsTotal": 10,
+    "formalI6Percent": 50,
+    "humanUat": false,
+    "productionAccepted": false
+  },
+  "nextWork": "Authenticated per-role GT/CO positive/negative readback and protected preview-config writer authorization proof; no config save or LIVE without scoped authorization"
+}

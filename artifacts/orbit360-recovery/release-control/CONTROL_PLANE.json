@@ -12719,7 +12719,7 @@
     "nextWithinGate": "ROLE_PERMISSION_CONFIG_DELTA_DRYRUN_THEN_AUTHORIZED_SCOPED_READ_WRITE_TEST_AND_GT_CO_E2E"
   },
   "b4003Uat2CancelacionesExactDeltaDryrun": {
-    "status": "EXACT_SOURCE_CONFIG_TWO_FIELD_DRYRUN_PASS_WRITE_AUTH_AND_REAL_UID_HOLD",
+    "status": "SOURCE_DRYRUN_AND_BACKEND_SYNTHETIC_QA_PASS_REAL_UID_AND_WRITE_AUTH_HOLD",
     "gate": "I6.5/B4-003",
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_UAT2_CANCELACIONES_ACCESS_DELTA_DRYRUN_20261018.json",
     "receiptBlobSha": "7539a25bdc441d1ae256ff48a604d100b72f1e9c",
@@ -12738,15 +12738,37 @@
     "roleScopesUnchanged": true,
     "sourceQAPath": "tools/gravicentra-b4-003-scoped-related-reader.test.cjs",
     "sourceQABlobSha": "4fd02dbafb278a6bf4bd7483f6c4e896c7e9dbe9",
-    "ciRegressionVerified": false,
+    "ciRegressionVerified": true,
     "realUidGtCoVerified": false,
     "writeApplied": false,
     "productSourceChanged": false,
     "sharedRulesDeployed": false,
     "productionPromoted": false,
-    "nextRequiredAction": "SOURCE_QA_THEN_SCOPED_AUTH_PREVIEW_GT_CO_AND_EXPLICIT_AUTHORIZED_CONFIG_READ_WRITE",
+    "nextRequiredAction": "AUTHENTICATED_GT_CO_EFFECTIVE_ROLE_SCOPE_AND_PREVIEW_CONFIG_READ_WRITE_PARITY_WITH_SEPARATE_WRITE_AUTHORIZATION",
     "productionPathPercent": 20,
     "formalI6Percent": 50,
-    "gateAdvanced": false
+    "gateAdvanced": false,
+    "ciQaRunId": 39175737022,
+    "ciQaProofPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_UAT2_CANCELACIONES_DELTA_QA_PASS_20261018.json",
+    "ciQaProofBlobSha": "d66fd26f4056426f47fd20ff2fee31eb00357f8e",
+    "verifiedOwnForeignScopeCases": 9,
+    "signedInRoleGTCOAccepted": false,
+    "previewCertifiedForConfigWrite": false,
+    "liveSecurityAccepted": false
+  },
+  "b4003Uat2CancelacionesDeltaQAPass": {
+    "status": "SOURCE_DRYRUN_AND_SYNTHETIC_AUTHORIZATION_QA_PASS_REAL_UID_AND_WRITE_PARITY_HOLD",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_UAT2_CANCELACIONES_DELTA_QA_PASS_20261018.json",
+    "receiptBlobSha": "d66fd26f4056426f47fd20ff2fee31eb00357f8e",
+    "sourceRunId": 39175546003,
+    "ciRunId": 39175737022,
+    "ciSourceChecks": 104,
+    "readinessTechnicalPass": true,
+    "realSignedUatPass": false,
+    "configWrites": false,
+    "sharedRulesDeploy": false,
+    "livePromotion": false,
+    "progressPercent": 20,
+    "formalI6Percent": 50
   }
 }
