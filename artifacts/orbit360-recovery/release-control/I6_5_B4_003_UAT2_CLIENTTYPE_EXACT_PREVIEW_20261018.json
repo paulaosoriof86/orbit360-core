@@ -1,0 +1,105 @@
+{
+  "schema": "GRAVICENTRA_I65_B4003_UAT2_CLIENT_TYPE_AND_CUMULATIVE_EXACT_PREVIEW_V1",
+  "gate": "I6.5/B4-003",
+  "dateLocal": "2026-10-18",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "headAtBuild": "7535c140aa2c3d5ded3740b8c6a8b84ca0fd7e27",
+  "sourceSha": "7535c140aa2c3d5ded3740b8c6a8b84ca0fd7e27",
+  "runId": 39176366918,
+  "runConclusion": "success",
+  "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-39176366918-jlm7bups.web.app",
+  "buildId": "gi-i65-b4-7535c140aa2c-57f234755dc1",
+  "artifactId": 12153993277,
+  "artifactName": "gravicentra-b4-003-scoped-preview-39176366918",
+  "artifactZipSha256": "f4f9b420ac0d707ea9984eaad9ac00767254c365673567d5e743f5dea975a89c",
+  "independentlyVerifiedZipSha256": true,
+  "immutablePackage": {
+    "hostedFileCount": 218,
+    "hostedPayloadDigest": "d6a4222b51ff4a96b38cf0414554114c42e481427a3e345fe03eaef4109e4a8d",
+    "backendFileCount": 33,
+    "backendSourceDigest": "40bdb9090cf7eb3e19f1296b1d52269288985dfe510bb59bed371f479f222686",
+    "bundleFileCount": 253,
+    "bundleDigest": "d1ecf1b553b36df17e0a2aa435b0e6ae50a5bb2c60a57380a8e1fca94e8a90b0"
+  },
+  "technical": {
+    "governancePreflight": "PASS",
+    "cumulativeSourceQaChecks": 99,
+    "sourceQaRunId": 39176211511,
+    "immutableBuild": "PASS",
+    "readOnlyPreviewBackendDeploy": "PASS",
+    "onlyBackendExports": [
+      "orbit360ScopedPolicyReadPreview",
+      "orbit360AssignableAdvisorRosterPreview"
+    ],
+    "isolatedFirebaseHostingDeploy": "PASS",
+    "hostingReadback": "EXACT_PASS",
+    "publicSmoke": "PASS",
+    "unauthenticatedReaderRequest": "401_DENIED"
+  },
+  "reviewChangedModules": [
+    "Cliente360 read-only type labels/KPI/filter",
+    "Equipo cached administrative count asset"
+  ],
+  "explicitlyNotFixed": [
+    "live access config still ver=false Operativo/Asesor Cancelaciones",
+    "current effective Firestore rules still broad",
+    "preview tenant domain-config write callable not deployed",
+    "real signed-in GT/CO per-UID positive and negative role proof still pending",
+    "Cliente360 and Pólizas 12-policy ID-universe full reconciliation still pending",
+    "Cobros complete KPI and timing proof still pending"
+  ],
+  "scopes": {
+    "sharedRulesDeployed": false,
+    "livePromoted": false,
+    "operationalDataWrites": 0,
+    "configWrites": 0,
+    "newRealUserTokensIssued": 0,
+    "reimport": false
+  },
+  "focusedReview": [
+    {
+      "role": "Dirección",
+      "module": "Cliente360",
+      "action": "Verificar filtro Persona/Empresa y que 16 registros sin tipo no se clasifiquen arbitrariamente; leer KPI bajo universo actual",
+      "expected": "Denominaciones visibles consistentes con fuente natural/juridica"
+    },
+    {
+      "role": "Dirección",
+      "module": "Equipo",
+      "action": "Verificar 3 membresías administrativas según universo administrativo, con nota de distinción frente a 7 perfiles de equipo",
+      "expected": "Sin cero administrativo falso"
+    },
+    {
+      "role": "Operativo",
+      "module": "Cliente360",
+      "action": "Cambiar GT/CO y verificar los tipos solo dentro de cartera permitida",
+      "expected": "Sin cambiar alcance ni revelar expedientes ajenos"
+    },
+    {
+      "role": "Asesor",
+      "module": "Cliente360",
+      "action": "Verificar tipos dentro de cartera propia",
+      "expected": "Sin universo global ni cross-role stale cache"
+    }
+  ],
+  "actionsForbidden": [
+    "No guardar matriz de permisos",
+    "No editar usuarios, pólizas, cancelaciones o cobros",
+    "No registrar ni conciliar pagos",
+    "No borrar registros B4-003",
+    "No interpretar dropdown rol como UID ajeno certificado"
+  ],
+  "humanUat": "PENDING_CURRENT_PREVIEW",
+  "realAuthenticatedRoleMatrix": "HOLD",
+  "productionPath": {
+    "before": 20,
+    "after": 20,
+    "delta": 0,
+    "passed": 2,
+    "total": 10
+  },
+  "formalI6Percent": 50,
+  "productionAccepted": false,
+  "continuation": "SECURITY_EFFECTIVE_RULES_AND_AUTHENTICATED_CONFIG_ROLE_GT_CO_QA_WITHIN_EXISTING_B4003_GATE"
+}
