@@ -12085,7 +12085,7 @@
     "sourceChanged": true
   },
   "b4003RestrictedCancellationAuditSourceFix20261017": {
-    "status": "PREVIEW_HOSTED_PUBLIC_SMOKE_PASS_AUTHENTICATED_UAT_PENDING",
+    "status": "EXACT_PREVIEW_AND_EMULATOR_PASS_AUTHENTICATED_UAT_HOLD",
     "gate": "I6.5/B4-003",
     "compositionLockBlobSha": "7175a97df252a1459df7692d7e8d3f99e3c3bc6d",
     "files": [
@@ -12117,7 +12117,9 @@
       "count": 91,
       "cancellationAuditChecks": 10,
       "realAuthenticatedE2E": false,
-      "previewDeployed": true
+      "previewDeployed": true,
+      "emulatorRunId": 39089524098,
+      "emulatorStatus": "PASS_SYNTHETIC_ONLY"
     },
     "roleScope": "READ_ONLY_PREVIEW_ONLY",
     "generalProductMutationAuthorized": false,
@@ -12185,6 +12187,17 @@
       "authenticatedPositiveNegative": "PENDING",
       "securityReleaseHold": true,
       "productionPromotionAuthorized": false
+    },
+    "emulatorGate20261017": {
+      "status": "ISOLATED_EMULATOR_ROLE_GT_CO_PASS_AUTHENTICATED_PREVIEW_HOLD",
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_AUTHENTICATED_GATE_EMULATOR_SCOPE_PROOF_20261017.json",
+      "receiptBlobSha": "6a5e81afe17bdd16b7228864717158b30eacfc81",
+      "runId": 39089524098,
+      "qaHead": "803d4de7fe7f98ee1cdf13d1c17e238d1643ba55",
+      "directDenied": 18,
+      "serverChecks": 13,
+      "candidateRulesOnly": true,
+      "currentProductionRulesAccepted": false
     }
   }
 }

@@ -1,0 +1,60 @@
+{
+  "schema": "GRAVICENTRA_I65_B4003_AUTHENTICATED_GATE_CURRENT_SOURCE_EMULATOR_V1",
+  "dateLocal": "2026-10-17",
+  "gate": "I6.5/B4-003",
+  "status": "ISOLATED_EMULATOR_PASS_REAL_AUTHENTICATED_PREVIEW_HOLD",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "candidatePreview": {
+    "url": "https://ays-orbit-360-lab--gi-i65-b4-39063058792-l08egx7p.web.app",
+    "sourceHead": "6f0d3a1a6c5827419d0e5f18dca4bed8abc9eb2b",
+    "buildId": "gi-i65-b4-6f0d3a1a6c58-57f234755dc1",
+    "artifactDigest": "sha256:57622fa1fa735edb26c71a8ba27899ee1aaddb174626a4ca12c47b03c966294a",
+    "exactHostingReadback": true,
+    "sourceUnchanged": true
+  },
+  "emulator": {
+    "runId": 39089524098,
+    "jobId": 117563076716,
+    "conclusion": "success",
+    "qaHead": "803d4de7fe7f98ee1cdf13d1c17e238d1643ba55",
+    "qaPath": "tools/gravicentra-b4-003-firestore-emulator.test.cjs",
+    "qaBlobSha": "406262637861d4d7a17779442d0d6d69f94a7b31",
+    "rulesPath": "firestore.b4-003-scoped-candidate.rules",
+    "rulesBlobSha": "6ae1a85b1f82525ac018ff682a2e20b6cca5f1d8",
+    "directCancellationAuditDenials": 18,
+    "scopedCancellationAuditChecks": 13,
+    "foreignDirectRoleMatrixDenials": 29,
+    "anonymousAndInitialDenials": 16,
+    "otherRelatedListAssertions": 16,
+    "serverCountryRoleAssertions": 11,
+    "identities": "SYNTHETIC_FIRESTORE_EMULATOR_ONLY",
+    "realUserImpersonation": false,
+    "realBusinessWrites": 0
+  },
+  "publicPreview": {
+    "publicLoginReachable": true,
+    "publicVerificationSource": "TinyFish public read-only fetch; not authenticated screenshot",
+    "baselineReadbackAndAnonymous401FromRun": 39063058792
+  },
+  "blocking": {
+    "realUidScopedGetQueryDenial": "NOT_EXECUTED_CURRENT_PREVIEW",
+    "realAuthorizedRoleCountryPositiveReadback": "NOT_EXECUTED_CURRENT_PREVIEW",
+    "roleSwitchNoStaleData": "NOT_EXECUTED_AUTHENTICATED_CURRENT_PREVIEW",
+    "persistenceAndReload": "NOT_EXECUTED_AUTHENTICATED_CURRENT_PREVIEW",
+    "visualUat": "PENDING",
+    "activeRulesStillUnreconciled": true,
+    "productionAccepted": false
+  },
+  "restrictions": {
+    "sourceMutation": false,
+    "livePromotion": false,
+    "sharedFirestoreRulesDeploy": false,
+    "operationalDataWrites": 0,
+    "reimport": false,
+    "syntheticQaWritesOnRealTenant": 0,
+    "explicitRealUserImpersonationAuthorized": false
+  },
+  "formalI6Percent": 50,
+  "nextAction": "AUTHENTICATED_PREVIEW_UI_WITH_LEGITIMATE_SIGNED_IN_USERS_AND_SERVER_DIRECT_FIRESTORE_NEGATIVE_PROOF"
+}
