@@ -5996,7 +5996,7 @@
   "canonicalAccumulationControl": {
     "status": "FROZEN_ACTIVE",
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "compositionLockBlobSha": "51acbebbf616fdd731ac80df10d5389225bcae8c",
+    "compositionLockBlobSha": "1209db7df99e9afcce8d6e148243bab7f4417896",
     "findingLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
     "findingLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
@@ -12866,15 +12866,15 @@
     "nextSameGate": "C03_C04_EFFECTIVE_SECURITY_AND_AUTHENTICATED_GT_CO_REAL_READBACK"
   },
   "b4003AffirmativeModuleAndReceiptOwner20261018": {
-    "status": "SOURCE_QA_DIAGNOSTIC_PRIORITY_REPAIRED_CI_PENDING",
+    "status": "CAUSAL_QA_FIX_STAGED_CENTRAL_GUARD_RERUN_PENDING",
     "gate": "I6.5/B4-003",
     "cause": "UNRELATED_MODULE_ACCESS_ALLOWED_WITHOUT_POSITIVE_ROLE_ENTITLEMENT",
     "sourcePath": "functions/b4-003-scoped-access-boundary.js",
     "sourceBlobBefore": "a3b70fb9f795b9208e5de281892f1df49666dae2",
-    "sourceBlobAfter": "e04b448b8fb045f17314adf0886c117d1b58860a",
+    "sourceBlobAfter": "a550ffcbf1ab1a218a7d61312db4180acad41872",
     "qaPath": "tools/gravicentra-b4-003-scoped-related-reader.test.cjs",
     "qaBlobAfter": "15f4f702668951bf76f5475d31bcbd854878aefd",
-    "manifestBlobSha": "51acbebbf616fdd731ac80df10d5389225bcae8c",
+    "manifestBlobSha": "1209db7df99e9afcce8d6e148243bab7f4417896",
     "directExecutedPositiveNegativeChecks": 13,
     "oldBackendUnrelatedAccessCount": 5,
     "realUIDGTCOProof": false,
@@ -12889,6 +12889,11 @@
     "formalI6Percent": 50,
     "nextSameGate": "GITHUB_SERVER_AUTH_SOURCE_QA_THEN_NEW_EXACT_PREVIEW_AND_REAL_ACTOR_SCOPE_SECURITY_QA",
     "ciFirstRunId": 39177722318,
-    "ciFirstRunDisposition": "FAILED_EXPECTED_DENIAL_CODE_ONLY"
+    "ciFirstRunDisposition": "FAILED_EXPECTED_DENIAL_CODE_ONLY",
+    "sourceGateQA": "tools/gravicentra-b4-003-scoped-boundary.test.cjs",
+    "sourceGateQABlob": "cc9f778adc99b26c8999fbad145b0013faf992ed",
+    "centralGuardPreviousRunId": 39177863720,
+    "centralGuardPreviousFailure": "OLD_ROLE_SCOPE_QA_USED_UNAPPROVED_POLIZAS_AS_TEST_RESOURCE",
+    "realAuthenticatedGTCO": false
   }
 }

@@ -68,35 +68,39 @@ const roleBase={...c,auth:{uid:'u',token:{}},member:{
  ...c.member,roles:['Finanzas','Marketing','Asistente','Asesor','Operativo','Dirección'],
  dataScopes:{default:'all'},advisorId:'a1',teamAdvisorIds:['a2'],countries:['GT','CO']},
  config:{roleScopes:{Finanzas:'all',Marketing:'team',Asistente:'own',Asesor:'own',Operativo:'all',Dirección:'all'}}};
-function roleCtx(role,scope){
- const ctx=resolve({...roleBase,activeRole:role});
+function roleCtx(role,scope,collection){
+ const ctx=resolve({...roleBase,activeRole:role,collection});
  assert.equal(ctx.scope,scope,role+'_APPROVED_SCOPE');
  return ctx;
 }
-const finance=roleCtx('Finanzas','all');
+const finance=roleCtx('Finanzas','all','cobros');
+// Role scope parity is tested on a module the role ACTUALLY owns, not Pólizas.
+assert.throws(()=>resolve({...roleBase,activeRole:'Finanzas',collection:'polizas'}),e=>e.code==='MODULE_DENIED','FINANCE_POLIZAS_NOT_IN_ROLE');
+assert.throws(()=>resolve({...roleBase,activeRole:'Marketing',collection:'polizas'}),e=>e.code==='MODULE_DENIED','MARKETING_POLIZAS_NOT_IN_ROLE');
+assert.throws(()=>resolve({...roleBase,activeRole:'Asistente',collection:'polizas'}),e=>e.code==='MODULE_DENIED','ASSISTANT_POLIZAS_NOT_IN_ROLE');
 assert.equal(allowRow(finance,{tenantId:'t',pais:'GT',asesorId:'a3'}),true);
-const marketing=roleCtx('Marketing','team');
+const marketing=roleCtx('Marketing','team','negocios');
 assert.equal(allowRow(marketing,{tenantId:'t',pais:'GT',asesorId:'a2'}),true);
 assert.throws(()=>allowRow(marketing,{tenantId:'t',pais:'GT',asesorId:'a3'}),
  e=>e.code==='FOREIGN_RECORD_DENIED');
-const assistant=roleCtx('Asistente','own');
+const assistant=roleCtx('Asistente','own','clientes');
 assert.equal(allowRow(assistant,{tenantId:'t',pais:'GT',asesorId:'a1'}),true);
 assert.throws(()=>allowRow(assistant,{tenantId:'t',pais:'GT',asesorId:'a2'}),
  e=>e.code==='FOREIGN_RECORD_DENIED');
 for(const role of ['Asesor Sr.','Asesora Sr.','Asesor Jr.','Asesora Jr.']){
- const x={...roleBase,activeRole:role,member:{...roleBase.member,roles:[role]}};
+ const x={...roleBase,collection:'clientes',activeRole:role,member:{...roleBase.member,roles:[role]}};
  assert.equal(resolve(x).scope,'own',role+'_OWN_CEILING');
 }
 assert.throws(()=>resolve({...roleBase,activeRole:'Finanzas',collection:'aseguradoras'}),
  e=>e.code==='DIRECTORY_DENIED','FINANCE_MUST_NOT_INHERIT_INSURER_DIRECTORY_FULL');
-assert.throws(()=>resolve({...roleBase,activeRole:'Marketing',country:'MX'}),
+assert.throws(()=>resolve({...roleBase,activeRole:'Marketing',collection:'negocios',country:'MX'}),
  e=>e.code==='COUNTRY_DENIED');
-assert.throws(()=>resolve({...roleBase,activeRole:'Asistente',config:{roleScopes:{Asistente:'none'}}}),
+assert.throws(()=>resolve({...roleBase,activeRole:'Asistente',collection:'clientes',config:{roleScopes:{Asistente:'none'}}}),
  e=>e.code==='SCOPE_NONE');
 assert.throws(()=>resolve({...roleBase,activeRole:'Finanzas',member:{...roleBase.member,status:'invited'}}),
  e=>e.code==='MEMBERSHIP_DENIED');
-assert.throws(()=>resolve({...roleBase,activeRole:'Finanzas',
- config:{roleScopes:{Finanzas:'all'},rolePermissions:{Finanzas:{polizas:{ver:false}}}}}),
+assert.throws(()=>resolve({...roleBase,activeRole:'Finanzas',collection:'cobros',
+ config:{roleScopes:{Finanzas:'all'},rolePermissions:{Finanzas:{cobros:{ver:false}}}}}),
  e=>e.code==='MODULE_DENIED');
 console.log('B4_003_APPROVED_ROLE_SCOPE_PARITY_PASS Finance Marketing Assistant and advisor tiers; negative country role module insurer denied');
 

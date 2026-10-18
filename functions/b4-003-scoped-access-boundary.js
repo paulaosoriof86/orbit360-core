@@ -54,6 +54,7 @@ function resolve({auth,member,config,tenantId,activeRole,collection,country}){
  if(!assigned.includes(role)||(!self.has(role)&&!full.has(role)&&!teamScopedRoles.has(role)))deny('ROLE_DENIED');
  const moduleKey=modules[collection];
  if(!moduleKey)deny('COLLECTION_DENIED');
+ if(collection==='aseguradoras'&&!insurerDirectoryRoles.has(role))deny('DIRECTORY_DENIED');
  // Keep the previously approved restricted-directory denial precedence.
  if((collection==='asesores'||collection==='auditoria')&&!teamDirectoryRoles.has(role))deny('TEAM_DIRECTORY_DENIED');
  if(uniq(m.modulesRestricted||m.modulosRestringidos).map(norm).includes(norm(moduleKey)))deny('MODULE_DENIED');
