@@ -5996,7 +5996,7 @@
   "canonicalAccumulationControl": {
     "status": "FROZEN_ACTIVE",
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "compositionLockBlobSha": "ac0a8d4e64b972c47a25d019a86d604d8227ac2e",
+    "compositionLockBlobSha": "8cf72d0e4be8e03fa32c472114967b3ec134e946",
     "findingLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
     "findingLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
@@ -12770,5 +12770,36 @@
     "livePromotion": false,
     "progressPercent": 20,
     "formalI6Percent": 50
+  },
+  "b4003Uat2ClientTypePresentation": {
+    "status": "SOURCE_ONLY_CAUSAL_FIX_QA_PENDING_NEW_BUILD_AND_EXACT_PREVIEW",
+    "gate": "I6.5/B4-003",
+    "owner": "orbit360-platform/modules/cliente360.js",
+    "ownerBefore": "7090d49895ea4235b29c78cf4ec3ebd22017cd26",
+    "ownerAfter": "2eeabe26db6d9d951f6fbe2659b55992f52648c8",
+    "index": "orbit360-platform/index.html",
+    "indexBefore": "8b447eb22e191d5af0bda11ebbd4603befa148db",
+    "indexAfter": "4891a03530cee5517a76c9392896c11040abcab5",
+    "qa": "tools/gravicentra-b4-003-role-first-paint-and-team-regression.test.cjs",
+    "qaBefore": "96be44a4ac7c31fb3f73cfd289b555f7ef1d6999",
+    "qaAfter": "02f7e1402a79c5e2ef125b54dc8b100af195af04",
+    "compositionLockBlobSha": "8cf72d0e4be8e03fa32c472114967b3ec134e946",
+    "normalizedValues": [
+      "natural:Persona",
+      "juridica:Empresa"
+    ],
+    "unknownTypesRemainUnclassified": true,
+    "sourceOnlyPreflightPass": true,
+    "githubQaRunId": null,
+    "previewBuildId": null,
+    "humanUat": false,
+    "sameAlreadyCertifiedPreviewCannotCoverNewSource": true,
+    "realRecordMutations": 0,
+    "sharedRulesDeployed": false,
+    "livePromotion": false,
+    "reimport": false,
+    "productionPathPercent": 20,
+    "formalI6Percent": 50,
+    "noGateAdvance": true
   }
 }

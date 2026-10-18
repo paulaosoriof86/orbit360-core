@@ -111,4 +111,28 @@ expect(cfgCan({permisosExtra:['workflow_config_manage']},'access','Asesor'),fals
 expect(cfgCan({extras:['catalog_config_manage']},'workflow','Asesor'),false,'CONFIG_ADVISOR_EXTRA_FOREIGN_GRANT');
 expect(cfgCan({permissions:['unknown']},'access','Operativo'),false,'CONFIG_UNKNOWN_GRANT');
 
+
+// UAT2 CLIENT360 source semantics: canonical raw values map to approved visible
+// classifications without changing a stored record or widening its ID universe.
+const c360Src=read('orbit360-platform/modules/cliente360.js');
+const clientTypeFrom=c360Src.indexOf('  function tipoClienteVisible(value) {');
+const clientTypeTo=c360Src.indexOf('  const esRenovable',clientTypeFrom);
+assert.ok(clientTypeFrom>=0&&clientTypeTo>clientTypeFrom,'CLIENT_TYPE_CANONICAL_HELPER_MISSING');checks++;
+const typeContext={String};
+vm.runInNewContext(c360Src.slice(clientTypeFrom,clientTypeTo)+'\nthis.qaType=tipoClienteVisible;',typeContext);
+for(const [raw,want,label] of [
+  ['natural','Persona','natural'],['Natural','Persona','natural_case'],
+  ['PERSONA NATURAL','Persona','persona_natural'],['Persona','Persona','persona_legacy'],
+  ['juridica','Empresa','juridica'],['jurídica','Empresa','juridica_accent'],
+  ['Persona Jurídica','Empresa','persona_juridica'],['Empresa','Empresa','empresa_legacy'],
+  ['', '', 'missing_unknown'],['Sin clasificar','Sin clasificar','unknown_not_invented']
+])expect(typeContext.qaType(raw),want,'CLIENT_TYPE_'+label);
+assert.match(c360Src,/!f\.tipo \|\| tipoClienteVisible\(c\.tipo\) === f\.tipo/,'CLIENT_TYPE_FILTER_CANONICAL');checks++;
+assert.match(c360Src,/rows\.filter\(c => tipoClienteVisible\(c\.tipo\) === 'Empresa'\)/,'CLIENT_TYPE_KPI_LEGAL');checks++;
+assert.match(c360Src,/rows\.filter\(c => tipoClienteVisible\(c\.tipo\) === 'Persona'\)/,'CLIENT_TYPE_KPI_NATURAL');checks++;
+assert.doesNotMatch(c360Src,/\$\{c\.tipo\}<\/span>/,'CLIENT_TYPE_RAW_HTML_LEAK');checks++;
+const entry=read('orbit360-platform/index.html');
+assert.match(entry,/modules\/cliente360\.js\?v=20261018-b4003-uat2-clienttype-canonical/,'CLIENT_TYPE_CURRENT_CACHE_KEY');checks++;
+assert.match(entry,/modules\/equipo\.js\?v=20261018-b4003-uat2-admin-roster/,'EQUIPO_CURRENT_CACHE_KEY');checks++;
+
 console.log('B4_003_FIRST_PAINT_TEAM_ROLE_READINESS_SOURCE_VM_QA_PASS checks='+checks+' no_remote_access no_writes');

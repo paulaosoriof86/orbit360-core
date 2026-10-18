@@ -217,13 +217,13 @@
     "orbit360-platform/data/tenant-alianzas-soluciones-insurers-p10.js": "41d2e31a42dac73eb68af304d5f532897210d0ee",
     "orbit360-platform/data/tenant-config/alianzas-soluciones.aseguradoras-knowledge-summary-v20261003.js": "2000d9ea8ab67bdd37d8bf404a29a405fa6374dd",
     "orbit360-platform/data/tenant-public-branding-index.js": "dc543c463f5ecd8ea44e49156d6282113bd95db6",
-    "orbit360-platform/index.html": "8b447eb22e191d5af0bda11ebbd4603befa148db",
+    "orbit360-platform/index.html": "4891a03530cee5517a76c9392896c11040abcab5",
     "orbit360-platform/modules/academia.js": "4d48ee3edbc6afc4163bf6365a80bbcb680b1852",
     "orbit360-platform/modules/aseguradoras-v1202-import-bridge.js": "db5f012abe505c2dd27d77a47d0694868bee5348",
     "orbit360-platform/modules/aseguradoras.js": "9e56c296b55da499b52f42c462c668aa2f32eba7",
     "orbit360-platform/modules/calidad.js": "baaa2b6aec3b24fa49892da2a3fe3bfa6549d340",
     "orbit360-platform/modules/cancelaciones.js": "f14842484b464da6296a10459eb523d2b056ed98",
-    "orbit360-platform/modules/cliente360.js": "7090d49895ea4235b29c78cf4ec3ebd22017cd26",
+    "orbit360-platform/modules/cliente360.js": "2eeabe26db6d9d951f6fbe2659b55992f52648c8",
     "orbit360-platform/modules/cobros-cartera-i65-closure-bridge.js": "45e95a42596a27008e67a3cd6cd4601ea8ca6cb8",
     "orbit360-platform/modules/cobros.js": "438cc2f7ddeb4e285b4918c9b8bfb2473cbb3129",
     "orbit360-platform/modules/comisiones.js": "5b26dfc1cf2331af99eadb7a71f8348c9c053594",
@@ -6112,5 +6112,31 @@
     "sharedRulesDeployed": false,
     "livePromoted": false,
     "operationalWrites": 0
+  },
+  "b4003Uat2ClientTypePresentation": {
+    "status": "SOURCE_STAGED_QA_PENDING_PREVIEW_NOT_ACCEPTED",
+    "gate": "I6.5/B4-003",
+    "sourceChanges": [
+      {
+        "path": "orbit360-platform/modules/cliente360.js",
+        "before": "7090d49895ea4235b29c78cf4ec3ebd22017cd26",
+        "after": "2eeabe26db6d9d951f6fbe2659b55992f52648c8"
+      },
+      {
+        "path": "orbit360-platform/index.html",
+        "before": "8b447eb22e191d5af0bda11ebbd4603befa148db",
+        "after": "4891a03530cee5517a76c9392896c11040abcab5"
+      }
+    ],
+    "qaFile": "tools/gravicentra-b4-003-role-first-paint-and-team-regression.test.cjs",
+    "qaBefore": "96be44a4ac7c31fb3f73cfd289b555f7ef1d6999",
+    "qaAfter": "02f7e1402a79c5e2ef125b54dc8b100af195af04",
+    "evidence": "REAL_CANONICAL_CLIENT_TYPES_403_NATURAL_23_JURIDICA_1_PERSONA_16_UNSET",
+    "semantics": "READ_ONLY_DISPLAY_KPI_AND_FILTER_NO_STORED_TYPE_MUTATION",
+    "knownUnknown": "16_CLIENT_TYPES_UNSET_REMAIN_UNCLASSIFIED",
+    "sourcePreflight": "SOURCE_SYNTAX_AND_7_DIRECT_CLASSIFIER_CASES_PASS",
+    "roleScopeRulesDataLiveChanged": false,
+    "dataWrites": 0,
+    "realAuthUat": false
   }
 }

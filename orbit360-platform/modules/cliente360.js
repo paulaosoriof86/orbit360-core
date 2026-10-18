@@ -8,6 +8,16 @@ window.Orbit = window.Orbit || {};
 Orbit.modules = Orbit.modules || {};
 Orbit.modules.cliente360 = (function () {
   const U = Orbit.ui, q = Orbit.q, S = () => Orbit.store;
+  // UAT2: render-only alias of existing canonical person/entity values.
+  // Do not alter Firestore, identity, filter scope or policy ownership.
+  function tipoClienteVisible(value) {
+    const raw=String(value==null?'':value).trim();
+    const key=raw.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase()
+      .replace(/[_-]+/g,' ').replace(/\s+/g,' ');
+    if(['natural','persona','persona natural','persona fisica'].includes(key))return 'Persona';
+    if(['juridica','juridico','persona juridica','empresa','sociedad'].includes(key))return 'Empresa';
+    return raw;
+  }
   const esRenovable = p => p && (p.estado === 'Vigente' || p.estado === 'Por renovar');
   const policyTotal = p => U.finiteNumber(p && p.primaTotal);
   const renovabilidad = p => {
@@ -204,7 +214,7 @@ Orbit.modules.cliente360 = (function () {
     const rows = clientes.filter(c =>
       (!f.q || (c.nombre + ' ' + c.email + ' ' + c.identificacion).toLowerCase().includes(f.q.toLowerCase())) &&
       (!f.pais || c.pais === f.pais) &&
-      (!f.tipo || c.tipo === f.tipo) &&
+      (!f.tipo || tipoClienteVisible(c.tipo) === f.tipo) &&
       (!f.asesor || c.asesorId === f.asesor) &&
       (!f.seg || c.segmento === f.seg)
     );
@@ -261,9 +271,9 @@ Orbit.modules.cliente360 = (function () {
               : `<span class="muted" data-c360-list-health="1" data-readiness="${portfolioReadiness}">${portfolioReadiness === 'unavailable' ? 'No disponible' : 'Calculando'}</span>`;
             return `<tr class="clickable" onclick="location.hash='#/cliente360?c=${c.id}'">
               <td><div style="display:flex;align-items:center;gap:11px">
-                ${U.avatar(c.nombre, c.tipo === 'Empresa' ? '#1E2227' : '#C5162E', 'md')}
+                ${U.avatar(c.nombre, tipoClienteVisible(c.tipo) === 'Empresa' ? '#1E2227' : '#C5162E', 'md')}
                 <div><div class="c360-client-name" style="font-weight:700">${U.esc(c.nombre)}</div>
-                <div class="muted" style="font-size:11.5px">${U.esc(U.text(c.tipo, 'Pendiente de completar'))} · ${U.esc(U.text(c.ciudad, 'Pendiente de completar'))} · ${U.esc(U.text(c.pais, 'Pendiente de completar'))}</div></div>
+                <div class="muted" style="font-size:11.5px">${U.esc(U.text(tipoClienteVisible(c.tipo), 'Pendiente de completar'))} · ${U.esc(U.text(c.ciudad, 'Pendiente de completar'))} · ${U.esc(U.text(c.pais, 'Pendiente de completar'))}</div></div>
               </div></td>
               <td><div style="display:flex;align-items:center;gap:7px"><span class="dot-s" style="background:${ase ? ase.color : '#999'}"></span>${U.esc(ase ? ase.nombre : '—')}</div></td>
               <td class="num">${policyReadiness === 'ready' ? r.nVigentes + '<span class="muted">/' + r.nPolizas + '</span>' : '<span class="muted" data-c360-policy-row-readiness="' + U.esc(policyReadiness) + '">Actualizando</span>'}</td>
@@ -280,7 +290,7 @@ Orbit.modules.cliente360 = (function () {
       ${Orbit.kit.bannerFor('cliente360', `<button class="btn primary" onclick="Orbit.modules.cliente360.nuevoCliente()">+ Nuevo cliente</button>`)}
 
       <div class="kpi-row" data-c360-kpi-scope="${globalCountry}" data-c360-filter-country="${f.pais || ''}" data-c360-kpi-client-count="${rows.length}" data-c360-kpi-active-count="${activePolicyCount==null?'':activePolicyCount}" data-c360-kpi-policy-count="${totalPolicyCount==null?'':totalPolicyCount}" data-c360-kpi-renew-count="${renewals45Count==null?'':renewals45Count}" style="grid-template-columns:repeat(4,1fr);margin-bottom:16px">
-        <button class="kpi kpi-click" data-c360-kpi="clients" title="Ver clientes del universo actual"><div class="k-accent"></div><div class="k-label">Clientes</div><div class="k-val">${rows.length}</div><div class="k-foot muted">${rows.filter(c => c.tipo === 'Empresa').length} empresas · ${rows.filter(c => c.tipo === 'Persona').length} personas ›</div></button>
+        <button class="kpi kpi-click" data-c360-kpi="clients" title="Ver clientes del universo actual"><div class="k-accent"></div><div class="k-label">Clientes</div><div class="k-val">${rows.length}</div><div class="k-foot muted">${rows.filter(c => tipoClienteVisible(c.tipo) === 'Empresa').length} empresas · ${rows.filter(c => tipoClienteVisible(c.tipo) === 'Persona').length} personas ›</div></button>
         <button class="kpi kpi-click" data-c360-kpi="active" title="Ver pólizas activas"><div class="k-accent" style="background:var(--info)"></div><div class="k-label">Pólizas activas</div><div class="k-val">${policyReadiness === 'ready' ? activePolicyCount : '—'}</div><div class="k-foot muted">${policyReadiness === 'ready' ? 'de ' + totalPolicyCount + ' históricas ›' : 'Actualizando pólizas'}</div></button>
         <button class="kpi kpi-click" data-c360-kpi="premium" title="Ver detalle de prima vigente"><div class="k-accent" style="background:var(--ok)"></div><div class="k-label">Prima neta vigente</div><div class="k-val">${primaNetaVigenteHtml}</div><div class="k-foot muted">Separada por moneda; no se suman GTQ y COP ›</div></button>
         <button class="kpi kpi-click" data-c360-kpi="renewals" title="Ver renovaciones próximas"><div class="k-accent" style="background:var(--warn)"></div><div class="k-label">Vencen ≤45 d</div><div class="k-val">${policyReadiness === 'ready' ? renewals45Count : '—'}</div><div class="k-foot muted">${policyReadiness === 'ready' ? 'requieren gestión ›' : 'Actualizando pólizas'}</div></button>
@@ -396,13 +406,13 @@ Orbit.modules.cliente360 = (function () {
       <div class="card fichahdr" style="overflow:hidden">
         <div class="fh-top">
           <div class="fh-avwrap">
-            ${U.avatar(c.nombre, c.tipo === 'Empresa' ? '#1E2227' : '#C5162E', 'lg')}
+            ${U.avatar(c.nombre, tipoClienteVisible(c.tipo) === 'Empresa' ? '#1E2227' : '#C5162E', 'lg')}
             <span class="fh-pais">${c.pais === 'GT' ? '🇬🇹' : c.pais === 'CO' ? '🇨🇴' : '🌎'} ${c.pais}</span>
           </div>
           <div style="flex:1;min-width:240px">
             <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
               <h2 class="c360-client-name" style="font-family:var(--f-display);font-weight:800;font-size:25px;letter-spacing:-.02em;margin:0">${U.esc(c.nombre)}</h2>
-              <span class="badge ${c.tipo === 'Empresa' ? 'info' : 'neutral'}">${c.tipo}</span>
+              <span class="badge ${tipoClienteVisible(c.tipo) === 'Empresa' ? 'info' : 'neutral'}">${U.esc(U.text(tipoClienteVisible(c.tipo), 'Pendiente de completar'))}</span>
               ${c.etiquetas.map(t => `<span class="badge ${t === 'VIP' ? 'danger' : 'neutral'}">${t}</span>`).join('')}
             </div>
             <div class="fh-contact">
