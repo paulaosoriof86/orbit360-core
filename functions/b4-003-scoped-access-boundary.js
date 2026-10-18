@@ -10,11 +10,37 @@ const teamScopedRoles=new Set(['marketing']);
 const self=new Set(['asesor','asesora','asesor_sr','asesora_sr','asesor_jr','asesora_jr','comercial','asistente']);
 // Aligned with tenant-access-policy-effective-p0 TEAM_DIRECTORY_ROLES.
 const teamDirectoryRoles=new Set(['direccion','superadmin','admintenant','admin']);
-const modules={clientes:'cliente360',polizas:'polizas',vehiculos:'polizas',recibosEsperados:'recibos',carteraPrimas:'cobros',cobros:'cobros',negocios:'leads',gestiones:'ops',metas:'inicio',actividades:'historial',cancelaciones:'cancelaciones',auditoria:'equipo',asesores:'equipo',aseguradoras:'aseguradoras'};
+
+const UNIVERSAL_MODULE_ROLES=new Set(['direccion','superadmin','super_admin','admintenant','admin_tenant','admin']);
+const ROLE_MODULES=Object.freeze({
+ operativo:['inicio','cliente360','polizas','cobros','renovaciones','cancelaciones','ops','leads','aseguradoras','calidad','importar','historial'],
+ finanzas:['inicio','finanzas','cobros','conciliaciones','comisiones','reportes','calidad'],
+ marketing:['inicio','marketing','leads','plantillas','automatizaciones','reportes'],
+ asesor:['inicio','cliente360','polizas','cobros','renovaciones','cancelaciones','ops','leads','aseguradoras','calidad','portal','historial'],
+ comercial:['inicio','cliente360','polizas','cotizador','comparativo','leads','calidad'],
+ asistente:['inicio','cliente360','ops','calidad']
+});
+const ADVISOR_TIER_ROLES=new Set(['asesor','asesora','asesor_sr','asesora_sr','asesor_jr','asesora_jr']);
+
+const modules={clientes:'cliente360',polizas:'polizas',vehiculos:'polizas',recibosEsperados:'cobros',carteraPrimas:'cobros',cobros:'cobros',negocios:'leads',gestiones:'ops',metas:'inicio',actividades:'historial',cancelaciones:'cancelaciones',auditoria:'equipo',asesores:'equipo',aseguradoras:'aseguradoras'};
 class Denied extends Error{constructor(code){super(code);this.code=code;}}
 const deny=code=>{throw new Denied(code);};
 const get=(o,k)=>{const key=Object.keys(o||{}).find(v=>norm(v)===norm(k));return key===undefined?undefined:o[key];};
 const scope=v=>({none:'none',ninguno:'none',sin_acceso:'none',own:'own',propio:'own',team:'team',equipo:'team',all:'all',todos:'all',global:'all'})[norm(v)]||'';
+
+function canReadAssignedModule(member,role,moduleKey,permission){
+ // Enforce affirmative server-owned module entitlement; no absent-matrix grant.
+ // An explicit role permission or per-user extra may add an approved module.
+ // modulesVisible is deliberately ignored: it can reflect a different role on
+ // multi-role memberships. Client-only UI hiding is not authorization.
+ if(UNIVERSAL_MODULE_ROLES.has(role))return true;
+ if(permission?.ver===true)return true;
+ const extras=uniq(member.modulesExtra||member.modulosExtra).map(norm);
+ if(extras.includes(norm(moduleKey)))return true;
+ const roleDef=ADVISOR_TIER_ROLES.has(role)?'asesor':role;
+ return (ROLE_MODULES[roleDef]||[]).includes(moduleKey);
+}
+
 function resolve({auth,member,config,tenantId,activeRole,collection,country}){
  const m=member||{},role=norm(activeRole),signed=norm(auth?.token?.giActiveRole);
  // Membership must be affirmatively active; absent, suspended or conflicting
@@ -29,7 +55,10 @@ function resolve({auth,member,config,tenantId,activeRole,collection,country}){
  const moduleKey=modules[collection];
  if(!moduleKey)deny('COLLECTION_DENIED');
  if(uniq(m.modulesRestricted||m.modulosRestringidos).map(norm).includes(norm(moduleKey)))deny('MODULE_DENIED');
- if(get(get(get(config,'rolePermissions'),role),moduleKey)?.ver===false)deny('MODULE_DENIED');
+
+ const explicitModulePermission=get(get(get(config,'rolePermissions'),role),moduleKey);
+ if(explicitModulePermission?.ver===false)deny('MODULE_DENIED');
+ if(!canReadAssignedModule(m,role,moduleKey,explicitModulePermission))deny('MODULE_DENIED');
  const countries=uniq([...(m.countries||[]),...(m.paises||[]),...(m.paisesAutorizados||[])].filter(Boolean)).map(v=>v.toUpperCase());
  if(!['GT','CO'].includes(country)||!countries.includes(country))deny('COUNTRY_DENIED');
  let effective='none';

@@ -5996,7 +5996,7 @@
   "canonicalAccumulationControl": {
     "status": "FROZEN_ACTIVE",
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "compositionLockBlobSha": "8cf72d0e4be8e03fa32c472114967b3ec134e946",
+    "compositionLockBlobSha": "7b2efdba374a4b0d513f514d26e3beaf334fb986",
     "findingLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
     "findingLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
@@ -12864,5 +12864,29 @@
     "noLive": true,
     "noDataWrites": true,
     "nextSameGate": "C03_C04_EFFECTIVE_SECURITY_AND_AUTHENTICATED_GT_CO_REAL_READBACK"
+  },
+  "b4003AffirmativeModuleAndReceiptOwner20261018": {
+    "status": "SERVER_SOURCE_PREPARED_SYNTHETIC_PRECHECK_PASS_CI_AND_EXACT_PREVIEW_PENDING",
+    "gate": "I6.5/B4-003",
+    "cause": "UNRELATED_MODULE_ACCESS_ALLOWED_WITHOUT_POSITIVE_ROLE_ENTITLEMENT",
+    "sourcePath": "functions/b4-003-scoped-access-boundary.js",
+    "sourceBlobBefore": "a3b70fb9f795b9208e5de281892f1df49666dae2",
+    "sourceBlobAfter": "6377694cedd17608b20acd91abacf1eb6359f8cf",
+    "qaPath": "tools/gravicentra-b4-003-scoped-related-reader.test.cjs",
+    "qaBlobAfter": "92f7837afe831fe37b9f663e6434659ec8aa4804",
+    "manifestBlobSha": "7b2efdba374a4b0d513f514d26e3beaf334fb986",
+    "directExecutedPositiveNegativeChecks": 13,
+    "oldBackendUnrelatedAccessCount": 5,
+    "realUIDGTCOProof": false,
+    "currentPreviewStaleSource": true,
+    "needNewBuild": true,
+    "sharedRulesDeployed": false,
+    "configWrites": false,
+    "operationalWrites": 0,
+    "livePromotion": false,
+    "productionPathPercent": 20,
+    "productionPathDelta": 0,
+    "formalI6Percent": 50,
+    "nextSameGate": "GITHUB_SERVER_AUTH_SOURCE_QA_THEN_NEW_EXACT_PREVIEW_AND_REAL_ACTOR_SCOPE_SECURITY_QA"
   }
 }

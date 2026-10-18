@@ -3,6 +3,61 @@ const assert=require('node:assert/strict');
 const {readScopedRelatedDocument,readScopedRelatedList}=require('../functions/b4-003-scoped-related-reader');
 const {Denied}=require('../functions/b4-003-scoped-access-boundary');
 const tenantId='alianzas-soluciones';
+
+const {resolve:resolveSecureModule}=require('../functions/b4-003-scoped-access-boundary');
+// B4-003 C03/C04: a missing explicit deny MUST NOT grant an unrelated module.
+// These are pure server-owner calls with synthetic memberships, never user tokens.
+const secureCase=(role,collection,extraConfig={},extraMember={})=>{
+ const member={uid:'u-sec',tenantId,status:'active',roles:[role],advisorId:'a1',
+   countries:['GT','CO'],dataScopes:{default:'all'},...extraMember};
+ const config={roleScopes:{[role]:'all'},...extraConfig};
+ return {auth:{uid:'u-sec',token:{}},member,config,tenantId,activeRole:role,
+   country:'GT',collection};
+};
+const moduleSecurityCases=[
+ ['Marketing no Cliente360','Marketing','clientes',false,'MODULE_DENIED'],
+ ['Marketing Leads','Marketing','negocios',true],
+ ['Finanzas no Clientes','Finanzas','clientes',false,'MODULE_DENIED'],
+ ['Finanzas Cobros','Finanzas','cobros',true],
+ ['Finanzas Recibos como Cobros','Finanzas','recibosEsperados',true],
+ ['Finanzas no Cancelaciones','Finanzas','cancelaciones',false,'MODULE_DENIED'],
+ ['Asistente no Polizas','Asistente','polizas',false,'MODULE_DENIED'],
+ ['Asistente Cliente360','Asistente','clientes',true],
+ ['Comercial no Cobros','Comercial','cobros',false,'MODULE_DENIED'],
+ ['Comercial Cliente360','Comercial','clientes',true],
+ ['Operativo Cancelaciones','Operativo','cancelaciones',true],
+ ['Asesor Cancelaciones propio','Asesor','cancelaciones',true],
+ ['Asesor no Equipo','Asesor','auditoria',false,'MODULE_DENIED'],
+ ['Asesor Sr Cliente360 propio','Asesor Sr.','clientes',true],
+ ['Dirección Equipo','Dirección','asesores',true],
+ ['AdminTenant Cobros','AdminTenant','cobros',true]
+];
+let positiveModuleChecks=0;
+for(const [label,role,collection,allow,code] of moduleSecurityCases){
+ const args=secureCase(role,collection);
+ if(allow){
+   const ctx=resolveSecureModule(args);
+   assert.ok(ctx.scope!=='none'&&ctx.role,'SERVER_AFFIRMATIVE_ROLE_'+label);
+ }else{
+   assert.throws(()=>resolveSecureModule(args),e=>e instanceof Denied&&e.code===code,
+     'SERVER_NEGATIVE_MODULE_'+label);
+ }positiveModuleChecks++;
+}
+const selectedAdvisor=secureCase('Asesor','auditoria',{},{
+ roles:['Dirección','Asesor'],modulesVisible:['*','equipo']
+});
+assert.throws(()=>resolveSecureModule(selectedAdvisor),e=>e instanceof Denied&&e.code==='MODULE_DENIED',
+ 'MULTIROLE_DIRECTION_MODULES_VISIBLE_MUST_NOT_LEAK_IN_ADVISOR');positiveModuleChecks++;
+const financeExtra=secureCase('Marketing','clientes',{rolePermissions:{Marketing:{cliente360:{ver:true}}}});
+assert.equal(resolveSecureModule(financeExtra).scope,'team','EXPLICIT_ROLE_MODULE_GRANT_RESPECTS_TEAM_CEILING');positiveModuleChecks++;
+const cancelFalse=secureCase('Operativo','cancelaciones',{rolePermissions:{Operativo:{cancelaciones:{ver:false}}}});
+assert.throws(()=>resolveSecureModule(cancelFalse),e=>e instanceof Denied&&e.code==='MODULE_DENIED',
+ 'STORED_FALSE_OVERRIDES_OPERATIVE_BASELINE');positiveModuleChecks++;
+const restrictedAdvisor=secureCase('Asesor','clientes',{}, {modulesRestricted:['cliente360']});
+assert.throws(()=>resolveSecureModule(restrictedAdvisor),e=>e instanceof Denied&&e.code==='MODULE_DENIED',
+ 'INDIVIDUAL_MODULE_RESTRICTION_OVERRIDES_APPROVED_ROLE');positiveModuleChecks++;
+console.log('B4_003_AFFIRMATIVE_MODULE_ENTITLEMENT_QA_PASS checks='+positiveModuleChecks+' synthetic_only no_Firebase_no_writes');
+
 const fs=require('node:fs');
 const rawReader=fs.readFileSync(require('node:path').join(__dirname,'../functions/b4-003-scoped-related-reader.js'),'utf8');
 const protectedBrowserProvider=fs.readFileSync(require('node:path').join(__dirname,'../orbit360-platform/core/product-runtime-browser-providers-p0.js'),'utf8');
