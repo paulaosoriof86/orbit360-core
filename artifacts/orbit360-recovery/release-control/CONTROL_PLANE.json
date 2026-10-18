@@ -12238,5 +12238,18 @@
       "allowedNextWork": "CONTINUE_SCOPED_READONLY_SOURCE_QA_EMULATOR_AND_SECURITY_CAUSAL_GATES",
       "formalI6Percent": 50
     }
+  },
+  "b4003EffectiveRulesReadbackRequest20261017": {
+    "status": "REQUESTED_READ_ONLY_EFFECTIVE_FIRESTORE_RULES_REFRESH",
+    "scope": "I6.5/B4-003_SECURITY_P0_EXISTING_READONLY_WORKFLOW",
+    "triggerSubject": "audit(i6.5 R26): read-only deployed Firestore rules binding",
+    "sourceHeadBeforeRequest": "b55cc468572e8c0f2c2786648aa736f00ec89709",
+    "currentPreviewUnchanged": true,
+    "productSourceWrites": 0,
+    "realBusinessWrites": 0,
+    "sharedRulesDeploy": false,
+    "livePromotion": false,
+    "reason": "VERIFY_ACTUAL_ACTIVE_RULES_FOR_SAFE_PREVIEW_TO_LIVE_SECURITY_BLOCKER",
+    "gateAdvanceAuthorized": false
   }
 }
