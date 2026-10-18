@@ -2661,7 +2661,7 @@
   },
   "paulaOct18C03CommercialWriterSourceFix": {
     "gate": "I6.5/B4-003",
-    "status": "SOURCE_STAGED_PENDING_QA_NO_DEPLOY",
+    "status": "SOURCE_QA_PASS_PREVIEW_FUNCTIONAL_HOLD",
     "sourcePath": "functions/product-ops-leads-domain.js",
     "fromBlob": "7156b5ff6d6dbf7ec9460b1be6c4efae0bc3ac5c",
     "toBlob": "a0f79b34433c6b93702eabbece6a53a5e6124f45",
@@ -2680,6 +2680,16 @@
     "realBusinessWritesAuthorized": false,
     "realUserImpersonationAuthorized": false,
     "testContract": "OLD_PENDING_ACCEPTED_NEW_PENDING_DENIED; ACTIVE_ALIAS_PRESERVED; COUNTERCASES_16",
-    "formalPercentAdded": 0
+    "formalPercentAdded": 0,
+    "qaRunId": 39136430470,
+    "qaProofReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_C03_WRITER_SOURCE_QA_READBACK_20261018.json",
+    "qaProofReceiptBlobSha": "39d229d0887167a29166a6f09b8018285cdc7cbe",
+    "provenTestCases": 16,
+    "remainingOtherWriterPaths": [
+      "functions/assignable-advisor-roster.js",
+      "functions/ops-advisor-inbox.js",
+      "functions/ops-leads-domain.js",
+      "functions/tenant-domain-config.js"
+    ]
   }
 }

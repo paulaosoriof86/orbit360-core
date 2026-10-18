@@ -4869,7 +4869,7 @@
       "entryGuardReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_ENTRY_GUARD_PASS_20261002.json",
       "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
       "executionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B4_EXECUTION_LOCK_20261002.json",
-      "executionLockBlobSha": "e0b19a0e97eb6ba175c7999bbb0c599f790320bb",
+      "executionLockBlobSha": "1028a1ca4eae70f143874dc01daf4c572329df1a",
       "compositionLockBlobSha": "016f251811f22bc4fc04b2a5f674dfe09243e605",
       "findingLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
       "activeFindingId": "B4-003",
@@ -6312,7 +6312,7 @@
     "status": "B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL",
     "activeFindingId": "B4-003",
     "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
-    "executionLockBlobSha": "e0b19a0e97eb6ba175c7999bbb0c599f790320bb",
+    "executionLockBlobSha": "1028a1ca4eae70f143874dc01daf4c572329df1a",
     "compositionLockBlobSha": "816309c63ed254d9b0e05cf63621c3d1c03cbfd5",
     "findingLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
     "noLive": true,
@@ -12271,10 +12271,10 @@
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PAULA_ACCELERATED_EXECUTION_DECISION_20261018.json",
     "receiptBlobSha": "b527923db84f13e22e05e3f427de3e6994028167",
     "executionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B4_EXECUTION_LOCK_20261002.json",
-    "executionLockBlobSha": "e0b19a0e97eb6ba175c7999bbb0c599f790320bb",
+    "executionLockBlobSha": "1028a1ca4eae70f143874dc01daf4c572329df1a",
     "noNewGate": true,
     "sourceOnlyPreparationAuthorized": true,
-    "nextTechnicalAction": "C03_C04_CURRENT_RULES_AND_WRITER_CONTRACT",
+    "nextTechnicalAction": "C03_C04_OTHER_WRITER_SOURCE_REVIEW_AND_PROTECTED_LIVE_PARITY",
     "preserveFormalGateAction": "I6_5_FORENSIC_REMEDIATION_B4_003_R20_TARGETED_PAULA_VISUAL",
     "preserveFormalI6Percent": 50,
     "sharedRulesDeployAuthorized": false,
@@ -12285,7 +12285,7 @@
     "qaAuthorization": "SOURCE_AND_EMULATOR_ONLY_UNTIL_SEPARATELY_ATTESTED_PREVIEW"
   },
   "paulaOct18C03CommercialWriterSourceFix": {
-    "status": "SOURCE_STAGED_PENDING_QA_NO_DEPLOY",
+    "status": "SOURCE_QA_PASS_PREVIEW_FUNCTIONAL_HOLD",
     "gate": "I6.5/B4-003",
     "owner": "functions/product-ops-leads-domain.js",
     "sourceBefore": "7156b5ff6d6dbf7ec9460b1be6c4efae0bc3ac5c",
@@ -12295,7 +12295,7 @@
     "executorPath": ".github/workflows/gravicentra-b4-003-executor.yml",
     "executorSha": "5ca2e1fc38c039d8fd185562f010b910919dab6c",
     "compositionBlobSha": "7cf514672b9efd386d3b8733becf73306d7469a8",
-    "executionLockBlobSha": "e0b19a0e97eb6ba175c7999bbb0c599f790320bb",
+    "executionLockBlobSha": "1028a1ca4eae70f143874dc01daf4c572329df1a",
     "securedStatusAliases": true,
     "scopedSourceOnly": true,
     "priorPassInvalidation": "ONLY_WRITER_MEMBERSHIP_PENDING",
@@ -12306,6 +12306,23 @@
     "realOperationalWrites": 0,
     "formalPercentBefore": 50,
     "formalPercentAfter": 50,
-    "pending": "RUN_EXISTING_B4_003_QA_AND_VERIFY_GUARD_THEN_EXACT_PREVIEW"
+    "pending": "RUN_EXISTING_B4_003_QA_AND_VERIFY_GUARD_THEN_EXACT_PREVIEW",
+    "qaRunId": 39136430470,
+    "qaReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_C03_WRITER_SOURCE_QA_READBACK_20261018.json",
+    "qaReceiptBlobSha": "39d229d0887167a29166a6f09b8018285cdc7cbe",
+    "nextSourceWork": "SOURCE_OWNER_REVIEW_OF_FOUR_REMAINING_AUTHORIZATION_PATHS_AND_LIVE_PROTECTED_BACKEND_PARITY; THEN_SCOPED_QA_AND_EXACT_PREVIEW"
+  },
+  "paulaOct18C03WriterReadback": {
+    "status": "READ_ONLY_FOUR_RELATED_GUARDS_REQUIRE_CAUSAL_QA",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_C03_WRITER_SOURCE_QA_READBACK_20261018.json",
+    "receiptBlobSha": "39d229d0887167a29166a6f09b8018285cdc7cbe",
+    "affectedSourceOwners": [
+      "functions/assignable-advisor-roster.js",
+      "functions/ops-advisor-inbox.js",
+      "functions/ops-leads-domain.js",
+      "functions/tenant-domain-config.js"
+    ],
+    "sourceFixesAppliedToThem": 0,
+    "noProductionChanges": true
   }
 }

@@ -1,0 +1,74 @@
+{
+  "schema": "GRAVICENTRA_B4003_C03_WRITER_SOURCE_QA_READBACK_V1",
+  "dateLocal": "2026-10-18",
+  "gate": "I6.5/B4-003",
+  "status": "SOURCE_QA_PASS_REMAINING_SECURITY_P0_HOLD",
+  "sourceCommit": "a26eef906a103a84d28271abb67f966651b84fb8",
+  "sourceFile": "functions/product-ops-leads-domain.js",
+  "sourceBeforeBlobSha": "7156b5ff6d6dbf7ec9460b1be6c4efae0bc3ac5c",
+  "sourceAfterBlobSha": "a0f79b34433c6b93702eabbece6a53a5e6124f45",
+  "qa": {
+    "runId": 39136430470,
+    "workflow": "Gravicentra B4-003 R20 Exact Preview",
+    "conclusion": "success",
+    "step": "B4-003 protected role hydration regression (mock, no writes)",
+    "membershipDiscriminants": 16,
+    "runLogMarker": "B4_003_C03_OPS_LEADS_MEMBERSHIP_WRITER_SOURCE_QA_PASS checks=16 mock_only_no_writes",
+    "onlySourceVmMock": true,
+    "gitHubUrl": "https://github.com/paulaosoriof86/orbit360-core/actions/runs/39136430470"
+  },
+  "governanceGuard": {
+    "runId": 39136430437,
+    "conclusion": "success",
+    "url": "https://github.com/paulaosoriof86/orbit360-core/actions/runs/39136430437"
+  },
+  "preview": {
+    "newBuild": false,
+    "deployed": false,
+    "why": "current commit subject/gate requested CODE_QA_ONLY; Preview executor materialize and deploy steps SKIPPED; not a functional acceptance"
+  },
+  "remainingAuthOwnerSourceReview": [
+    {
+      "path": "functions/assignable-advisor-roster.js",
+      "blob": "a2f5d110201eb83cb0c72f7d716443c3b08c4d49",
+      "observation": "negative-only active() predicate; pending/invited status not expressly denied",
+      "runtimeExploitationProven": false
+    },
+    {
+      "path": "functions/ops-advisor-inbox.js",
+      "blob": "1fb37c8f76647312d825fa88db7df8f66f8861ae",
+      "observation": "negative-only activeMember() predicate; pending/invited status not expressly denied",
+      "runtimeExploitationProven": false
+    },
+    {
+      "path": "functions/ops-leads-domain.js",
+      "blob": "73e09a4404cb4298dc34c9c38e26ad1f960d3170",
+      "observation": "negative-only activeMember() predicate; pending/invited status not expressly denied",
+      "runtimeExploitationProven": false
+    },
+    {
+      "path": "functions/tenant-domain-config.js",
+      "blob": "c9f2bd7234252ee7281e5aca2b20601fcf8d77e3",
+      "observation": "negative-only active() predicate; pending/invited status not expressly denied",
+      "runtimeExploitationProven": false
+    }
+  ],
+  "controlsPreserved": [
+    "ACTIVE_LEGACY_MEMBER_WIDE_READ_WRITE_SECURITY_BLOCKER",
+    "PROTECTED_HOST_PREVIEW_ONLY_NO_LIVE_PARITY",
+    "NO_SHARED_RULES_DEPLOY",
+    "NO_REAL_USER_IMPERSONATION",
+    "NO_LIVE_PROMOTION"
+  ],
+  "nextMaterialAction": "SOURCE_OWNER_REVIEW_OF_FOUR_REMAINING_AUTHORIZATION_PATHS_AND_LIVE_PROTECTED_BACKEND_PARITY; THEN_SCOPED_QA_AND_EXACT_PREVIEW",
+  "gates": {
+    "current": "B4-003",
+    "formallyAcceptedNewCapabilities": 0,
+    "securityP0Closed": false,
+    "formalI6Percent": 50
+  },
+  "operationalWrites": 0,
+  "sharedRulesDeploy": false,
+  "livePromotion": false,
+  "reimport": false
+}
