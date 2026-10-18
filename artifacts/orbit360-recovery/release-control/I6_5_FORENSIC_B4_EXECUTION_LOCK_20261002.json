@@ -2633,5 +2633,30 @@
     "productionAccepted": false,
     "securityAccepted": false,
     "formalPointsAdded": 0
+  },
+  "paulaAccelerationDecision20261018": {
+    "status": "FROZEN_USER_APPROVED_EXECUTION_DISCIPLINE_NO_GATE_ADVANCE",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PAULA_ACCELERATED_EXECUTION_DECISION_20261018.json",
+    "receiptBlobSha": "b527923db84f13e22e05e3f427de3e6994028167",
+    "approvedSourceOnlyPreparation": true,
+    "sourceQaWithinExistingGate": true,
+    "allowedOwners": [
+      "functions/b4-003-scoped-access-boundary.js",
+      "functions/b4-003-scoped-related-reader.js",
+      "functions/b4-003-scoped-policy-callable.js",
+      "functions/product-operational-domain.js",
+      "orbit360-platform/core/product-runtime-browser-providers-p0.js",
+      "orbit360-platform/core/product-app-p0.js",
+      "orbit360-platform/data/store-firestore-product-readonly-p0.js",
+      "orbit360-platform/core/access-role-session-owner-v20260728.js"
+    ],
+    "exactNextAction": "C03_C04_CURRENT_RULES_AND_WRITER_CONTRACT",
+    "noGeneralProductMutation": true,
+    "sharedRulesDeployAuthorized": false,
+    "livePromotionAuthorized": false,
+    "dataMutationAuthorized": false,
+    "realUserImpersonationAuthorized": false,
+    "formalPointsAdded": 0,
+    "priorPassPreserved": true
   }
 }

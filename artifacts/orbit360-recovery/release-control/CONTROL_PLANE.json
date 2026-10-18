@@ -4869,7 +4869,7 @@
       "entryGuardReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_ENTRY_GUARD_PASS_20261002.json",
       "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
       "executionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B4_EXECUTION_LOCK_20261002.json",
-      "executionLockBlobSha": "0d0b885409768df40fe0b7e03f924faee8843e4b",
+      "executionLockBlobSha": "b33a97757ce425df5de13770c3e8bd3c29aca1da",
       "compositionLockBlobSha": "016f251811f22bc4fc04b2a5f674dfe09243e605",
       "findingLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
       "activeFindingId": "B4-003",
@@ -6312,7 +6312,7 @@
     "status": "B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL",
     "activeFindingId": "B4-003",
     "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
-    "executionLockBlobSha": "0d0b885409768df40fe0b7e03f924faee8843e4b",
+    "executionLockBlobSha": "b33a97757ce425df5de13770c3e8bd3c29aca1da",
     "compositionLockBlobSha": "816309c63ed254d9b0e05cf63621c3d1c03cbfd5",
     "findingLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
     "noLive": true,
@@ -12265,5 +12265,23 @@
     "productionPromotionAuthorized": false,
     "realUserImpersonationAuthorized": false,
     "formalI6Percent": 50
+  },
+  "paulaAccelerationDecision20261018": {
+    "status": "FROZEN_USER_APPROVED_EXECUTION_DISCIPLINE_NO_GATE_ADVANCE",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PAULA_ACCELERATED_EXECUTION_DECISION_20261018.json",
+    "receiptBlobSha": "b527923db84f13e22e05e3f427de3e6994028167",
+    "executionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B4_EXECUTION_LOCK_20261002.json",
+    "executionLockBlobSha": "b33a97757ce425df5de13770c3e8bd3c29aca1da",
+    "noNewGate": true,
+    "sourceOnlyPreparationAuthorized": true,
+    "nextTechnicalAction": "C03_C04_CURRENT_RULES_AND_WRITER_CONTRACT",
+    "preserveFormalGateAction": "I6_5_FORENSIC_REMEDIATION_B4_003_R20_TARGETED_PAULA_VISUAL",
+    "preserveFormalI6Percent": 50,
+    "sharedRulesDeployAuthorized": false,
+    "livePromotionAuthorized": false,
+    "realBusinessWritesAuthorized": false,
+    "realUserImpersonationAuthorized": false,
+    "noReimport": true,
+    "qaAuthorization": "SOURCE_AND_EMULATOR_ONLY_UNTIL_SEPARATELY_ATTESTED_PREVIEW"
   }
 }

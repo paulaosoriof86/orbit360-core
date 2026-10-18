@@ -1,0 +1,96 @@
+{
+  "schema": "GRAVICENTRA_I65_B4003_PAULA_ACCELERATED_EXECUTION_DECISION_V1",
+  "dateLocal": "2026-10-18",
+  "status": "FROZEN_USER_APPROVED_EXECUTION_DISCIPLINE_NO_GATE_ADVANCE",
+  "authority": "PAULA_20261018_FREEZE_DECISIONS_AND_START",
+  "governs": "ONLY_I6_5_B4_003_WITHIN_EXISTING_CONTROL_PLANE",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "baselineHead": "a113bdb0ff021e831b001049c0d422952bb71fe7",
+  "baselineControlBlob": "5481d7eab862b948fe994f2dd022bcd5f64ea1df",
+  "baselineB4LockBlob": "0d0b885409768df40fe0b7e03f924faee8843e4b",
+  "preservedPlan": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_AUDIT_COMPLEMENT_PLAN_FROZEN_20261016.md",
+    "taskCount": 86,
+    "scopeGroups": 14
+  },
+  "preservedFindingRegister": {
+    "ledgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
+    "expectedIds": 295,
+    "attentionIds": 166,
+    "p0FrozenOpen": 6
+  },
+  "immutableDecisions": [
+    "Only B4-003 active; no new gate, branch, repository, Firebase, workflow, baseline overlay, data reimport or legacy release.",
+    "Use one cumulative source candidate and current owners; reuse the existing B4-003 executor, Playwright, Firebase Emulator and governance guards.",
+    "Source fix groups by causal owner, never serial micro-batches by symptom or duplicated full audits.",
+    "Distinguish SOURCE_CORRECTED, CODE_QA_PASS, EXACT_PREVIEW_TECHNICAL_PASS, AUTHENTICATED_FUNCTIONAL_PASS, PAULA_VISUAL_PASS and LIVE_PASS; no green workflow as functional certification.",
+    "Independent read-only QA and source analysis can parallelize; serialize only Control Plane/lock/branch mutations and controlled writes.",
+    "Signed-in tests require authorized existing QA identities or a supported legitimate interactive session; do not impersonate actual users or request repeated TinyFish profile setup.",
+    "No Browser direct Firestore role bypass; enforce role, country, advisor, team on server and Firestore effective rules, preserving authorized own/team/all and approved writes.",
+    "Full protected backend/frontend parity is required for Preview and LIVE before promoting one immutable certified artifact/digest.",
+    "After each exact cumulative Preview with relevant source QA, offer Paula focused visual inspection; preserve prior visual PASS unless causal regression is proven.",
+    "Prioritize C03/C04 backend/rules/parity; then startup and active-role, Inicio/KPIs, Cliente360/Polizas/Cobros parity, Ops/Leads and commercial flows; retain Frozen priority Renewals then Upsells/Leads/Ops and B4-004..B4-007.",
+    "For any build or source change, record source SHA, blobs, buildId, hosted digest, backend digest and zero-error readback; never patch accepted artifact.",
+    "Only promote after real authenticated module-role-country-viewport QA, Paula visual, live permissions/writes/integrity/rollback gates; I6 remains 50% until formal mini-gate closure.",
+    "No data cleanup, orphan deletions, August refresh, shared Firestore Rules deploy, real credential exposure or product LIVE deployment under this decision."
+  ],
+  "exactNextActions": [
+    {
+      "order": 1,
+      "id": "C03_C04_CURRENT_RULES_AND_WRITER_CONTRACT",
+      "type": "READ_ONLY_AND_SOURCE_QA",
+      "required": "enumerate current effective rules plus all production writers and existing protected reader; prove positive authorized and negative forbidden operations"
+    },
+    {
+      "order": 2,
+      "id": "C03_C04_SCOPED_SOURCE_CANDIDATE",
+      "type": "CODE_DEFECT",
+      "required": "correct existing owners inside B4-003 with source/blob before-after and QA only; one cumulative candidate, no shared/live deployment"
+    },
+    {
+      "order": 3,
+      "id": "EXACT_CUMULATIVE_PREVIEW",
+      "type": "RELEASE_DEPLOY",
+      "required": "use existing state-gated B4-003 isolated Preview after source QA; no real operational writes; readback exact"
+    },
+    {
+      "order": 4,
+      "id": "AUTHENTICATED_UAT",
+      "type": "QA",
+      "required": "role/country/UID positive and negative tests plus reload, functional/UI/financial contract; if identity authority absent, HOLD only its real-auth portion"
+    },
+    {
+      "order": 5,
+      "id": "LATER_GATES",
+      "type": "FROZEN",
+      "required": "B4-004, B4-005, B4-006, B4-007, I6.5 seal; no early promotion"
+    }
+  ],
+  "scopedPreparation": {
+    "authorizedByUserToProceedWithinExistingGate": true,
+    "sourceOnlyReviewAndScopedCodeQA": true,
+    "scopeOwners": [
+      "functions/b4-003-scoped-access-boundary.js",
+      "functions/b4-003-scoped-related-reader.js",
+      "functions/b4-003-scoped-policy-callable.js",
+      "functions/product-operational-domain.js",
+      "orbit360-platform/core/product-runtime-browser-providers-p0.js",
+      "orbit360-platform/core/product-app-p0.js",
+      "orbit360-platform/data/store-firestore-product-readonly-p0.js",
+      "orbit360-platform/core/access-role-session-owner-v20260728.js"
+    ],
+    "sharedRulesDeploymentAuthorized": false,
+    "productionPromotionAuthorized": false,
+    "realOperationalWritesAuthorized": false,
+    "realUserTokenImpersonationAuthorized": false,
+    "dataMutationAuthorized": false
+  },
+  "progress": {
+    "formalI6Before": 50,
+    "formalI6After": 50,
+    "sourceCorrectionsNewlyAccepted": 0,
+    "humanUatNewlyAccepted": 0
+  },
+  "gateProof": "UNCHANGED_FAIL_CLOSED_C03_C04"
+}
