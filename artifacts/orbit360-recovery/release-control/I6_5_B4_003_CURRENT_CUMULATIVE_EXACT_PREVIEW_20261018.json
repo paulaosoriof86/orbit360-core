@@ -1,0 +1,69 @@
+{
+  "schema": "GRAVICENTRA_I65_B4003_CURRENT_CUMULATIVE_EXACT_PREVIEW_TECHNICAL_RECEIPT_V1",
+  "recordDate": "2026-10-18",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "gate": "I6.5/B4-003",
+  "sourceHead": "80c8be5a0472fd9cc807dcc123b3ec90300ca68c",
+  "buildId": "gi-i65-b4-80c8be5a0472-57f234755dc1",
+  "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-39171025187-7km7yvfy.web.app",
+  "runId": 39171025187,
+  "runConclusion": "success",
+  "jobName": "b4-003-renewals-cancelations-preview",
+  "artifactId": 12152009814,
+  "artifactName": "gravicentra-b4-003-scoped-preview-39171025187",
+  "artifactDigest": "sha256:7dc879c6c78f77bf190fe09e91d627a3334e654b2ec49d3875bc20d9f9217f4a",
+  "sourceBuild": {
+    "hostedFileCount": 218,
+    "hostedPayloadDigest": "7def61b5b30a13ffa2245e7386644f223daeb5bad3b6e783bc6dcd27eedd32df",
+    "backendFileCount": 33,
+    "backendSourceDigest": "40bdb9090cf7eb3e19f1296b1d52269288985dfe510bb59bed371f479f222686",
+    "bundleFileCount": 253,
+    "bundleDigest": "a71ec5c3c300811617553aa4425d960185a136bae1f4642fcfe7a4764f9e30ce"
+  },
+  "checks": {
+    "canonicalGovernance": "PASS_RUN_39171025140",
+    "protectedSourceRegression": "PASS",
+    "immutablePackage": "PASS",
+    "readOnlyBackendDeploy": "PASS_TWO_FUNCTIONS_ONLY",
+    "hostingPreviewDeploy": "PASS",
+    "exactHostingReadback": "PASS",
+    "publicProtectedSmoke": "PASS",
+    "anonymousProtectedCallable": "401_DENIED",
+    "artifactZipSha256VerifiedAgainstGitHub": "PASS",
+    "crossEvidenceBinding": "PASS_LOCAL_REVIEW",
+    "signedInRolesGTCO": "HOLD_NOT_EXECUTED",
+    "configWriterPersistence": "HOLD_NOT_DEPLOYED",
+    "liveRulesPrivacy": "HOLD",
+    "humanFunctionalUat": "REJECTED_LAST_REVIEW_NOT_RETESTED"
+  },
+  "approvedPreviewFunctions": [
+    "orbit360ScopedPolicyReadPreview",
+    "orbit360AssignableAdvisorRosterPreview"
+  ],
+  "securityStatus": "P0_OPEN_UNAUTHORIZED_DIRECT_FIRESTORE_READ_WRITE_ON_SHARED_EFFECTIVE_RULES",
+  "productionStatus": "BLOCKED",
+  "productionMutation": false,
+  "dataWrites": 0,
+  "sharedRulesDeploy": false,
+  "realUserTokensIssued": 0,
+  "reimport": false,
+  "releaseMetric": {
+    "productionPathPercent": 20,
+    "numerator": 2,
+    "denominator": 10,
+    "deltaPercentagePoints": 0,
+    "formalI6Percent": 50
+  },
+  "pending": [
+    "NEGATIVE_AND_POSITIVE_AUTHENTICATED_ROLE_COUNTRY_UID_SCOPED_READBACK",
+    "PREVIEW_LIVE_BACKEND_AND_WRITE_CONTRACT_PARITY",
+    "SAFE_SHARED_RULES_RECONCILIATION_AND_NEGATIVE_DIRECT_FIRESTORE_READ_DENIAL",
+    "CANONICAL_PERMISSIONS_GET_SAVE_SERVER_READBACK",
+    "CLIENT360_POLIZAS_ID_LEVEL_12_POLICY_DELTA_AND_FINANCIAL_LATENCY",
+    "CURRENT_EXACT_PREVIEW_HUMAN_FUNCTIONAL_UAT",
+    "NEXT_B4_004_TO_B4_007_REMAIN_HELD"
+  ],
+  "planUnchanged": true,
+  "lineageAndPreviouslyPassedEvidencePreserved": true
+}
