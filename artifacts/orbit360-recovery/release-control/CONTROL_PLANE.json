@@ -12362,6 +12362,19 @@
       "classification": "HARNESS_ONLY",
       "cause": "CONFIG_OPERATIVO_NOT_ADMIN_FIXTURE_EXPECTED_INCORRECT_ADMIN_SET",
       "productionCodeRetested": false
+    },
+    "harnessDependencyRepair": {
+      "status": "HARNESS_ONLY_PENDING_RERUN",
+      "failureRunId": 39139250841,
+      "qaPath": "tools/gravicentra-b4-003-inicio-role-country-team.test.cjs",
+      "previousBlobSha": "9158cf58786200bb311603a8d3c94a6279b100b7",
+      "candidateBlobSha": "26518654b5f2559bfceef66e2c92077012febe0f",
+      "demonstratedCause": "VM mocked roster imports rejected the newly used existing product-active-role-contract module",
+      "changeToProductSource": false,
+      "newFunctionDeployment": false,
+      "sharedRulesDeployment": false,
+      "operationalWrites": 0,
+      "livePromotion": false
     }
   }
 }
