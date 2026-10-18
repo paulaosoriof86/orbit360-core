@@ -1,0 +1,82 @@
+{
+  "schema": "GRAVICENTRA_I65_B4003_C03_OCT18_SCOPED_READONLY_PREVIEW_RECEIPT_V1",
+  "gate": "I6.5/B4-003",
+  "dateLocal": "2026-10-18",
+  "status": "EXACT_READONLY_PREVIEW_TECHNICAL_PASS_AUTHENTICATED_AND_SECURITY_HOLD",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "sourceHead": "3f34d7fe678a02253fcf95887b6186fd7acfca1b",
+  "sourceProductCorrections": [
+    {
+      "path": "functions/product-ops-leads-domain.js",
+      "blobSha": "a0f79b34433c6b93702eabbece6a53a5e6124f45"
+    },
+    {
+      "path": "functions/assignable-advisor-roster.js",
+      "blobSha": "75ca53db55e2665123589b0e63253a8e4f8c377c"
+    },
+    {
+      "path": "functions/ops-advisor-inbox.js",
+      "blobSha": "a26aeefdb27344bf91f978ca054ae9c1bfa8c3f7"
+    },
+    {
+      "path": "functions/ops-leads-domain.js",
+      "blobSha": "1ceab5d1c65eb97c965304e417ee638fbc9ba309"
+    },
+    {
+      "path": "functions/tenant-domain-config.js",
+      "blobSha": "ede400068d0797e0a9677a099aa7198a25f8f9a6"
+    }
+  ],
+  "qa": {
+    "sourceSyntheticRunId": 39139438239,
+    "sourceSyntheticConclusion": "success",
+    "fourOwnerMemberRoleChecks": 84,
+    "priorWriterChecks": 16,
+    "prePreviewGuardRunId": 39139438232,
+    "prePreviewGuardConclusion": "success",
+    "previewHeadGuardRunId": 39139960258,
+    "previewHeadGuardConclusion": "success"
+  },
+  "preview": {
+    "runId": 39139960212,
+    "workflowConclusion": "success",
+    "url": "https://ays-orbit-360-lab--gi-i65-b4-39139960212-uxf1a0eb.web.app",
+    "buildId": "gi-i65-b4-3f34d7fe678a-57f234755dc1",
+    "hostedFileCount": 218,
+    "hostedPayloadDigest": "f814f83b20f82e8c6f381493aa5ff5ac40ab389eb03ce6f00fb1bd0e8e17a761",
+    "backendFileCount": 33,
+    "backendSourceDigest": "9e8bb31113f3141f7b9cb84c9511062db03f67e036d05feada586aafe3a8cf08",
+    "bundleFileCount": 253,
+    "bundleDigest": "4b3cebcf93eb6ec61f36dc4e37f9ffd14a0d0e8d55a481fd64fd479485f5ed3f",
+    "hostedExactReadback": true,
+    "publicSmoke": true,
+    "unauthenticatedCallableStatus": 401
+  },
+  "artifact": {
+    "id": 12141412031,
+    "name": "gravicentra-b4-003-scoped-preview-39139960212",
+    "zipSha256": "6c5db543cbbf508e44351f12454a046e98b5373ca6a5ffdfd01fb918513d673b",
+    "evidenceOnly": true,
+    "backendFunctionDeploymentOnly": [
+      "orbit360ScopedPolicyReadPreview",
+      "orbit360AssignableAdvisorRosterPreview"
+    ]
+  },
+  "heldProofs": {
+    "realUserAuthenticatedPositiveNegative": "NOT_EXECUTED_UNAUTHORIZED",
+    "realUserTokenIssuance": 0,
+    "rolesGtCoLiveReload": "NOT_ATTESTED",
+    "securityP0Closed": false,
+    "sharedFirestoreRulesDeploy": false,
+    "writerBackendDeployed": false,
+    "livePromotion": false,
+    "operationalDataWrites": 0,
+    "reimport": false,
+    "paulaVisualAcceptance": "PENDING"
+  },
+  "control": "C03_SAME_GATE_PREVIEW_PASS_NOT_B4_CLOSURE; NO_NEXT_GATE_ADVANCE",
+  "formalI6PercentBefore": 50,
+  "formalI6PercentAfter": 50,
+  "nextMaterialAction": "RECONCILE_AUTHENTICATED_GT_CO_SCOPE_TEST_AUTHORIZATION_AND_EFFECTIVE_LIVE_RULES_BACKEND_WRITER_PARITY_WITHOUT_IMPERSONATION_OR_UNAUTHORIZED_DEPLOY"
+}

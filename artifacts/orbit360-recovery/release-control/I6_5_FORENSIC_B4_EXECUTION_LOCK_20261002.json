@@ -2697,7 +2697,7 @@
     ]
   },
   "paulaOct18C03FourOwnerBoundaryFix": {
-    "status": "SOURCE_QA_PASS_PREVIEW_AUTHORIZED",
+    "status": "EXACT_READONLY_PREVIEW_TECHNICAL_PASS_AUTHENTICATED_HOLD",
     "gate": "I6.5/B4-003",
     "authority": "PAULA_20261018_CONTINUE_FROZEN_ACCELERATION_WITH_CAUSAL_SOURCE_READBACK",
     "reason": "Four operational backends used negative-only member state checks; multi-role paths could retain elevated role",
@@ -2750,7 +2750,7 @@
     "sourceQaRunId": 39139438239,
     "governanceRunId": 39139438232,
     "previewAuthorization": {
-      "status": "AUTHORIZED_EXACT_READONLY_PREVIEW_PENDING",
+      "status": "CONSUMED_EXACT_TECHNICAL_PASS_AUTHENTICATED_HOLD",
       "triggerSubject": "build(i6.5 B4-003): exact C03 protected read-only Preview",
       "sourceQaRunId": 39139438239,
       "governanceRunId": 39139438232,
@@ -2776,6 +2776,19 @@
       "securityP0Closed": false,
       "existingExecutor": ".github/workflows/gravicentra-b4-003-executor.yml",
       "existingExecutorBlobSha": "3dbd68138dc8bccca396405802840645c7c2922c"
-    }
+    },
+    "previewRunId": 39139960212,
+    "previewArtifactId": 12141412031,
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-39139960212-uxf1a0eb.web.app",
+    "previewSourceSha": "3f34d7fe678a02253fcf95887b6186fd7acfca1b",
+    "previewBuildId": "gi-i65-b4-3f34d7fe678a-57f234755dc1",
+    "previewHostedPayloadDigest": "f814f83b20f82e8c6f381493aa5ff5ac40ab389eb03ce6f00fb1bd0e8e17a761",
+    "evidenceReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_C03_EXACT_READONLY_PREVIEW_20261018.json",
+    "evidenceReceiptBlobSha": "be23352e85d888db11b4f8d4d104048c82edac52",
+    "fullRoleE2EPending": true,
+    "securityP0Closed": false,
+    "humanVisualAccepted": false,
+    "releaseAccepted": false,
+    "formalPercentAdded": 0
   }
 }

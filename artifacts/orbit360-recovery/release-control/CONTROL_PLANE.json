@@ -4869,7 +4869,7 @@
       "entryGuardReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_ENTRY_GUARD_PASS_20261002.json",
       "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
       "executionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B4_EXECUTION_LOCK_20261002.json",
-      "executionLockBlobSha": "46466d0fb4d61685c6fccfd558170427db9f1fb7",
+      "executionLockBlobSha": "048aabc0acdbf986c266e3aa2e2753d5fe5edbee",
       "compositionLockBlobSha": "016f251811f22bc4fc04b2a5f674dfe09243e605",
       "findingLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
       "activeFindingId": "B4-003",
@@ -6312,7 +6312,7 @@
     "status": "B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL",
     "activeFindingId": "B4-003",
     "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
-    "executionLockBlobSha": "46466d0fb4d61685c6fccfd558170427db9f1fb7",
+    "executionLockBlobSha": "048aabc0acdbf986c266e3aa2e2753d5fe5edbee",
     "compositionLockBlobSha": "816309c63ed254d9b0e05cf63621c3d1c03cbfd5",
     "findingLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
     "noLive": true,
@@ -12271,10 +12271,10 @@
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PAULA_ACCELERATED_EXECUTION_DECISION_20261018.json",
     "receiptBlobSha": "b527923db84f13e22e05e3f427de3e6994028167",
     "executionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B4_EXECUTION_LOCK_20261002.json",
-    "executionLockBlobSha": "46466d0fb4d61685c6fccfd558170427db9f1fb7",
+    "executionLockBlobSha": "048aabc0acdbf986c266e3aa2e2753d5fe5edbee",
     "noNewGate": true,
     "sourceOnlyPreparationAuthorized": true,
-    "nextTechnicalAction": "EXACT_SCOPED_READONLY_PREVIEW_THEN_AUTHENTICATED_GATE",
+    "nextTechnicalAction": "LIVE_RULES_AND_PROTECTED_WRITERS_PARITY_PLUS_AUTHENTICATED_GT_CO_E2E",
     "preserveFormalGateAction": "I6_5_FORENSIC_REMEDIATION_B4_003_R20_TARGETED_PAULA_VISUAL",
     "preserveFormalI6Percent": 50,
     "sharedRulesDeployAuthorized": false,
@@ -12326,7 +12326,7 @@
     "noProductionChanges": true
   },
   "paulaOct18C03FourOwnerBoundaryFix": {
-    "status": "SOURCE_QA_PASS_PREVIEW_AUTHORIZED",
+    "status": "EXACT_READONLY_PREVIEW_TECHNICAL_PASS_AUTHENTICATED_HOLD",
     "gate": "I6.5/B4-003",
     "baselineHead": "50ae06ece2712dd43e8f13a88cc86404ce332385",
     "paths": [
@@ -12344,7 +12344,7 @@
     "qaPath": "tools/gravicentra-b4-003-ops-leads-role-scopes.test.cjs",
     "qaBlobSha": "f6ec56dddd39dc3a25d35e1b5b2ce8654b34dcbe",
     "compositionBlobSha": "99699f7e58829a88aae099beb50012ade421c9ee",
-    "executionLockBlobSha": "46466d0fb4d61685c6fccfd558170427db9f1fb7",
+    "executionLockBlobSha": "048aabc0acdbf986c266e3aa2e2753d5fe5edbee",
     "onlySourceAndQa": true,
     "onlyExistingB4003Executor": true,
     "productDeployed": false,
@@ -12381,7 +12381,7 @@
     "qaConclusion": "success",
     "guardConclusion": "success",
     "previewAuthorization": {
-      "status": "AUTHORIZED_EXACT_READONLY_PREVIEW_PENDING",
+      "status": "CONSUMED_EXACT_TECHNICAL_PASS_AUTHENTICATED_HOLD",
       "triggerSubject": "build(i6.5 B4-003): exact C03 protected read-only Preview",
       "sourceQaRunId": 39139438239,
       "governanceRunId": 39139438232,
@@ -12407,6 +12407,29 @@
       "securityP0Closed": false,
       "existingExecutor": ".github/workflows/gravicentra-b4-003-executor.yml",
       "existingExecutorBlobSha": "3dbd68138dc8bccca396405802840645c7c2922c"
+    },
+    "previewProof": {
+      "status": "EXACT_HOSTED_READBACK_PASS_PUBLIC_SMOKE_PASS_REAL_AUTH_HOLD",
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_C03_EXACT_READONLY_PREVIEW_20261018.json",
+      "receiptBlobSha": "be23352e85d888db11b4f8d4d104048c82edac52",
+      "sourceSha": "3f34d7fe678a02253fcf95887b6186fd7acfca1b",
+      "buildId": "gi-i65-b4-3f34d7fe678a-57f234755dc1",
+      "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-39139960212-uxf1a0eb.web.app",
+      "runId": 39139960212,
+      "artifactId": 12141412031,
+      "hostedFileCount": 218,
+      "hostedPayloadDigest": "f814f83b20f82e8c6f381493aa5ff5ac40ab389eb03ce6f00fb1bd0e8e17a761",
+      "backendSourceDigest": "9e8bb31113f3141f7b9cb84c9511062db03f67e036d05feada586aafe3a8cf08",
+      "archiveDigest": "sha256:6c5db543cbbf508e44351f12454a046e98b5373ca6a5ffdfd01fb918513d673b",
+      "backendWritersDeployed": false,
+      "scopedReadOnlyFunctionsDeployed": 2,
+      "authenticatedRoleUatPassed": false,
+      "securityP0Closed": false,
+      "userVisualAccepted": false,
+      "sharedRulesDeploy": false,
+      "livePromotion": false,
+      "realOperationalWrites": 0,
+      "formalI6Percent": 50
     }
   }
 }
