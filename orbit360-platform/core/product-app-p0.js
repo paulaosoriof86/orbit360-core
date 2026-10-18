@@ -32,11 +32,6 @@
     // recipient-aware redirect only when an actionable request exists.
     return'inicio';
   }
-  function prewarmCriticalRoutes(){
-    var store=Orbit.store;
-    if(!store||typeof store._ensureCollections!=='function')return;
-    try{store._ensureCollections(['clientes','polizas','cobros','recibosEsperados','carteraPrimas']);}catch(e){}
-  }
   function fail(message){
     state.lastError=clean(message)||'PRODUCT_APP_ACTIVATION_FAILED';
     state.activating=false;
@@ -89,11 +84,8 @@
         protectedReadCandidate: cfg.scopedReadPreviewCandidate===true &&
           String(window.location&&window.location.hostname||'').includes('--')
       }).then(function(result){
-        if(result&&result.ready===true&&Orbit.store&&typeof Orbit.store._ensureCollections==='function'){
-          var lazy=[].concat(hydration.optional||[]);
-          var defer=window.requestIdleCallback||function(fn){return setTimeout(fn,0);};
-          defer(function(){try{Orbit.store._ensureCollections(lazy);}catch(e){}},{timeout:600});
-        }
+        // Optional collections load on their authorized route, not during login.
+        // This prevents every financial/legacy source competing with first paint.
         return result;
       });
     }).then(function(result){
@@ -103,8 +95,6 @@
 
       // Non-blocking overlap: critical Cliente360/Cobros dependencies begin loading
       // while tenant/session owners finish activation. They remain optional for startup.
-      prewarmCriticalRoutes();
-
       var tenantBridge=Orbit.productTenantRuntimeContextP0;
       if(!tenantBridge||typeof tenantBridge.install!=='function')throw new Error('PRODUCT_TENANT_CONTEXT_BRIDGE_MISSING');
       var tenantStatus=tenantBridge.install();
@@ -136,7 +126,6 @@
       signal();
       try{document.dispatchEvent(new CustomEvent('orbit:auth'));document.dispatchEvent(new CustomEvent('orbit:store'));}catch(e){}
       var defer=window.requestIdleCallback||function(fn){return setTimeout(fn,0);};
-      defer(function(){prewarmCriticalRoutes();},{timeout:350});
       defer(function(){if(Orbit.novedades&&typeof Orbit.novedades.init==='function'){try{Orbit.novedades.init();}catch(e){}}});
       return status();
     }).catch(function(error){

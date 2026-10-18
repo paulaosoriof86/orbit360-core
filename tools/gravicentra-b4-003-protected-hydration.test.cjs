@@ -61,7 +61,9 @@ assert.ok(!chosen.modulesVisible.includes('comisiones'),'RESTRICTED_COMMISSION_N
 assert.ok(!chosen.modulesVisible.includes('siniestros'),'UNAPPROVED_MODULE_NOT_GRANTED');
 assert.deepEqual(Array.from(initial.modulesVisible),[],'ORIGINAL_MEMBERSHIP_UNMODIFIED');
 const adviserView=membershipCtx.roleMembership(initial,'Asesor');
-assert.deepEqual(Array.from(adviserView.modulesVisible),[],'OTHER_ROLE_NOT_RECOMPOSED');
+assert.ok(adviserView.modulesVisible.includes('cliente360')&&adviserView.modulesVisible.includes('polizas')&&adviserView.modulesVisible.includes('cobros'),'ADVISOR_MUST_RECOMPOSE_APPROVED_MODULES');
+assert.ok(!adviserView.modulesVisible.includes('comisiones')&&!adviserView.modulesVisible.includes('equipo'),'ADVISOR_MUST_NOT_INHERIT_DIRECTION_MODULES');
+assert.deepEqual(Array.from(initial.modulesVisible),[],'UNCHANGED_SIGNED_MEMBER');
 const unavailable={window:{Orbit:{}}};
 vm.runInNewContext(bootstrap.slice(begin,end)+'\nthis.roleMembership=protectedRoleMembership;',unavailable);
 assert.deepEqual(Array.from(unavailable.roleMembership(initial,'Operativo').modulesVisible),[],

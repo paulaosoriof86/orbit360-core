@@ -1,0 +1,115 @@
+{
+  "schema": "GRAVICENTRA_B4003_PAULA_20261018_VISUAL_UAT_REJECT_SOURCE_CORRECTION_V1",
+  "dateLocal": "2026-10-18",
+  "gate": "I6.5/B4-003",
+  "status": "REJECTED_PREVIEW_SOURCE_CAUSES_DEMONSTRATED_SOURCE_FIX_CANDIDATE_NOT_QA_PASS",
+  "rejectedPreview": {
+    "sourceSha": "3f34d7fe678a02253fcf95887b6186fd7acfca1b",
+    "runId": 39139960212,
+    "technicalReadbackPass": true,
+    "authenticatedBusinessAcceptance": false,
+    "paulaVisualAccepted": false
+  },
+  "observedUat": [
+    {
+      "module": "Inicio",
+      "finding": "No requested shield 3D-style emoji inside monthly card, monthly quotes click-responsive, financial KPI pending across roles, direction→operativo→asesor readiness loss, blank third card",
+      "status": "FAIL"
+    },
+    {
+      "module": "Equipo",
+      "finding": "Direction shows 0 users, 0 advisors and empty metas while Inicio returns 7 advisor profiles via independent callable; role matrix renders no role columns",
+      "status": "FAIL"
+    },
+    {
+      "module": "Cliente360",
+      "finding": "Dirección 434 clients /218 active /1413 historic; Operativo fails full financial/advisor projection; Asesor clients indefinite pending",
+      "status": "FAIL"
+    },
+    {
+      "module": "Polizas",
+      "finding": "Pólizas 230 active /1425 total /16 renew45 versus Cliente360 218/1413/18; IDs/universe differ, not adjudicated",
+      "status": "HOLD_CAUSAL_RELATION_AUDIT"
+    },
+    {
+      "module": "Cobros",
+      "finding": "Dirección/Operativo 5 materialized cobros visible while financial KPIs and aging remain loading; Asesor core state unavailable",
+      "status": "FAIL"
+    },
+    {
+      "module": "Cancelaciones",
+      "finding": "Direction sees list; Operativo/Asesor route denied despite approval for authorized personal/team scopes; no full Advisor access",
+      "status": "FAIL"
+    },
+    {
+      "module": "Quality",
+      "finding": "B4-003 QA Cliente synthetic fixture surfaces in client and priorities; never delete/unlink without exact fixture provenance and authorization",
+      "status": "OPEN"
+    }
+  ],
+  "provenSourceCauses": [
+    {
+      "id": "CAUSE-01",
+      "owner": "orbit360-platform/modules/equipo.js",
+      "cause": "Unconfirmed asesores store read rendered as literal 0; permission role columns sourced only from undefined/optional Orbit.ROLES, not canonical role definitions"
+    },
+    {
+      "id": "CAUSE-02",
+      "owner": "orbit360-platform/core/backend-product-readonly-bootstrap-p0.js",
+      "cause": "EffectiveModules recomposed solely for Operativo, not for Asesor after activeRole change"
+    },
+    {
+      "id": "CAUSE-03",
+      "owner": "orbit360-platform/core/product-app-p0.js",
+      "cause": "Before useful render fan-out ensured 5 finance collections and entire optional contract, competing with route hydration"
+    },
+    {
+      "id": "CAUSE-04",
+      "owner": "orbit360-platform/core/access-scope.js",
+      "cause": "Role-specific team visibility list was unioned with global team, risking broad/stale team rendering"
+    },
+    {
+      "id": "CAUSE-05",
+      "owner": "functions/b4-003-scoped-access-boundary.js",
+      "cause": "Asesor cancellation read unconditional denial despite scoped policy/client parent verification"
+    },
+    {
+      "id": "CAUSE-06",
+      "owner": "orbit360-platform/modules/cliente360.js / orbit360-platform/modules/polizas.js",
+      "cause": "Client360 KPI only policies linked to included client IDs and uses esRenovable, Pólizas KPI counts all within policy domain using active statuses; 12-record delta remains by-ID to resolve"
+    },
+    {
+      "id": "CAUSE-07",
+      "owner": "functions/b4-003-scoped-related-reader.js",
+      "cause": "Financial reads scan up to 3000 child rows and verify each canonical parent; source demands performance proof before declaring KPI complete"
+    },
+    {
+      "id": "CAUSE-08",
+      "owner": "orbit360-platform/core/tenant-domain-config-client.js",
+      "cause": "Protected Preview only two callable functions deployed, domain access config callable not deployed; no secure permission configuration readback"
+    }
+  ],
+  "candidateScope": [
+    "Canonical Equipo readonly readiness and role matrix source plus no fake-zero",
+    "Recompute roles and replace explicit per-role team scopes",
+    "Move financial prewarm behind first paint and ensure only current route",
+    "Place monthly insurance/protection dimensional emoji",
+    "Allow Asesor strictly own authorized cancellations with server/tenant role limitations and write disabled"
+  ],
+  "excludedScope": [
+    "No data cleanup, reimport, LIVE, Firestore Rules changes, or unverified permissions save",
+    "No KPI value edits or fake reconciliations",
+    "No production approval from screenshots, synthetic QA or artifact readback"
+  ],
+  "blocker": "FIRESTORE_EFFECTIVE_RULES_AND_PREVIEW_LIVE_PROTECTED_WRITE_PARITY_STILL_FAIL_CLOSED",
+  "qaContract": "Existing B4-003 harness + new source-specific role/first paint tests; authenticated GT/CO roles and E2E still required",
+  "statusOfNewSource": "STAGED_AS_GIT_BLOBS_NOT_COMMITTED_OR_DEPLOYED",
+  "businessProductionProgress": {
+    "beforePercent": 20,
+    "afterPercent": 20,
+    "criteriaPassed": 2,
+    "total": 10,
+    "technicalOnly": true
+  },
+  "nextMaterialStep": "CANONICAL_COMPOSITION_AND_EXISTING_B4_SOURCE_QA_THEN_NEW_EXACT_PREVIEW_ONLY_AFTER_GATE_PROOF"
+}

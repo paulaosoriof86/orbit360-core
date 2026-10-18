@@ -94,6 +94,7 @@ jobs:
           node tools/gravicentra-b4-003-protected-hydration.test.cjs
           node tools/gravicentra-b4-003-scoped-related-reader.test.cjs
           node tools/gravicentra-b4-003-ops-leads-role-scopes.test.cjs
+          node tools/gravicentra-b4-003-role-first-paint-and-team-regression.test.cjs
 
       - name: Gate exact B4-003 Preview
         id: gate

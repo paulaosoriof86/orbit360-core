@@ -250,7 +250,15 @@ async function deny(fn,code){let thrown;try{await fn()}catch(e){thrown=e}assert.
  const cancelled=await flow('cancelaciones','operativo',{pageSize:50});
  assert.deepEqual(cancelled.rows.map(x=>x.id),['aOwn','bOther','cStale']);
  assert.equal(cancelled.rows[2].pais,'GT');checks++;
+ const advisorCancellations=await flow('cancelaciones','asesor',{pageSize:50});
+ assert.deepEqual(advisorCancellations.rows.map(x=>x.id),['aOwn'],'ADVISOR_ONLY_OWN_CANCELLATIONS');checks++;
+ await deny(()=>read('cancelaciones','bOther',{role:'asesor'}),'RECORD_NOT_FOUND_OR_DENIED');checks++;
+ member={...member,modulesRestricted:['cancelaciones']};
  await deny(()=>flow('cancelaciones','asesor'),'MODULE_DENIED');checks++;
+ member={...member,modulesRestricted:[]};
+ cfg={...cfg,rolePermissions:{asesor:{cancelaciones:{ver:false}}}};
+ await deny(()=>flow('cancelaciones','asesor'),'MODULE_DENIED');checks++;
+ cfg={...cfg,rolePermissions:{}};
  await deny(()=>read('cancelaciones','eMismatch',{role:'operativo'}),'RECORD_NOT_FOUND_OR_DENIED');checks++;
  await deny(()=>flow('cancelaciones','operativo',{cursor:'dOrphan'}),'CURSOR_DENIED');checks++;
  const audit=await flow('auditoria','Dirección',{pageSize:50});

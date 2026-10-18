@@ -197,13 +197,17 @@ Orbit.access = (function () {
   function teamAdvisorIds() {
     var a = actorAdvisor(), own = actorAdvisorId(), out = new Set(own ? [own] : []);
     var roleMap=a&&a.roleVisibleAdvisorIds&&typeof a.roleVisibleAdvisorIds==='object'?a.roleVisibleAdvisorIds:{};
-    [].concat(roleMap[activeRole()]||[],a.equipoAsesorIds || a.teamAdvisorIds || a.asesoresEquipo || []).forEach(function (x) { if (x) out.add(String(x)); });
-    var teamId = clean(a.equipoId || a.teamId || '');
+    var active=activeRole(),explicitRoleKey=Object.keys(roleMap).find(function(k){return norm(k)===norm(active);});
+    // Explicit per-role visibility replaces global team membership.
+    var visible=explicitRoleKey!==undefined?(Array.isArray(roleMap[explicitRoleKey])?roleMap[explicitRoleKey]:[]):(
+      a.equipoAsesorIds || a.teamAdvisorIds || a.asesoresEquipo || []);
+    [].concat(visible).forEach(function(x){if(x)out.add(String(x));});
+    var teamId = explicitRoleKey!==undefined?'':clean(a.equipoId || a.teamId || '');
     try {
       var store = rawS();
       ((store && store.all && store.all('asesores')) || []).forEach(function (x) {
         if (teamId && clean(x.equipoId || x.teamId) === teamId) out.add(String(x.id));
-        if (clean(x.supervisorId) === own) out.add(String(x.id));
+        if (explicitRoleKey===undefined&&clean(x.supervisorId) === own) out.add(String(x.id));
       });
     } catch (e) {}
     return Array.from(out);

@@ -61,13 +61,11 @@
     return Object.assign({},compiled,{ok:true,errors:[],
       protectedReadAuthorization:'EFFECTIVE_MODULE_VIEW_PLUS_SERVER_SCOPED_CALLABLE'});
   }
-  // Use the selected, assigned Operativo role's own approved module set.
-  // A privileged/default-role bootstrap may have projected an empty module
-  // array that must not shadow Operativo after a legitimate view switch.
-  // Backend scoped callable and query scope remain independent authorities.
+  // Every assigned role needs its own effective-module projection.
+  // Never carry old Dirección/Operativo modules into Asesor or vice versa.
+  // Server callable and query scope enforce permissions independently.
   function protectedRoleMembership(membership, selected) {
     var member = Object.assign({}, membership || {}, { activeRole: selected });
-    if (String(selected || '').toLowerCase() !== 'operativo') return member;
     var owner = window.Orbit && window.Orbit.membershipMultirolEffectiveP0;
     var modules = owner && typeof owner.effectiveModules === 'function'
       ? owner.effectiveModules(member) : null;

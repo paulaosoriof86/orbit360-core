@@ -17,7 +17,7 @@ Orbit.modules.equipo = (function () {
   let metaPeriodo = now.toISOString().slice(0, 7);
   let metaPais = (Orbit.pais && Orbit.pais !== 'TODOS') ? Orbit.pais : 'GT';
 
-  const ROLE_ORDER = ['Dirección', 'Admin', 'Finanzas', 'Marketing', 'Operativo', 'Asesor', 'Asistente'];
+  const ROLE_ORDER = ['Dirección', 'SuperAdmin', 'AdminTenant', 'Admin', 'Finanzas', 'Operativo', 'Marketing', 'Asesor', 'Asistente'];
   const LEGACY_ROLE = 'Comercial';
   const SCOPE_LABELS = { propios: 'Solo propios', equipo: 'Equipo', todos: 'Todos', ninguno: 'Ninguno' };
   const MODULE_LABELS = {
@@ -44,8 +44,9 @@ Orbit.modules.equipo = (function () {
   function arr(v) { return Array.isArray(v) ? v.filter(Boolean) : (v ? [v] : []); }
   function uniq(v) { return [...new Set(arr(v))]; }
   function rolesOf(a) {
-    const roles = uniq((a && a.roles && a.roles.length) ? a.roles : [a && a.rol]);
-    return roles.length ? roles : [];
+    const taxonomy=Orbit.productRoleTaxonomyP0;
+    return uniq((a&&a.roles&&a.roles.length)?a.roles:[a&&a.rol]).map(role=>
+      taxonomy&&typeof taxonomy.canonicalRole==='function'?(taxonomy.canonicalRole(role)||role):role);
   }
   function hasRole(a, role) { return rolesOf(a).includes(role); }
   function hasAnyRole(a, roles) { return roles.some(r => hasRole(a, r)); }
@@ -60,18 +61,43 @@ Orbit.modules.equipo = (function () {
     if (typeof meta === 'string') return meta;
     return `${MODULE_ICONS[id] || '•'} ${MODULE_LABELS[id] || id}`;
   }
+  function roleDefinition(role) {
+    const legacy=Orbit.ROLES&&Orbit.ROLES[role];
+    if(legacy&&Array.isArray(legacy.modulos))return {modules:legacy.modulos,nivel:legacy.nivel};
+    const base=Orbit.membershipMultirolP0&&Orbit.membershipMultirolP0.DEFAULT_ROLE_DEFINITIONS||{};
+    return base[role]||((role==='Admin'&&base.AdminTenant)?base.AdminTenant:null);
+  }
+  function roleCatalog() {
+    const taxonomy=Orbit.productRoleTaxonomyP0&&Orbit.productRoleTaxonomyP0.CANONICAL_ROLES||[];
+    return [...ROLE_ORDER,LEGACY_ROLE].filter(role=>!!roleDefinition(role)||taxonomy.includes(role));
+  }
   function allModuleIds() {
-    const ids = new Set(Object.keys(MODULE_LABELS));
-    Object.values(Orbit.ROLES || {}).forEach(def => arr(def && def.modulos).forEach(m => ids.add(typeof m === 'string' ? m : m && (m.route || m.id))));
+    const ids=new Set(Object.keys(MODULE_LABELS));
+    Object.values(Orbit.ROLES||{}).forEach(def=>arr(def&&def.modulos).forEach(m=>ids.add(typeof m==='string'?m:m&&(m.route||m.id))));
     return [...ids].filter(Boolean);
   }
   function baseModules(roles) {
-    const out = new Set();
-    arr(roles).forEach(role => {
-      const def = Orbit.ROLES && Orbit.ROLES[role];
-      arr(def && def.modulos).forEach(m => out.add(typeof m === 'string' ? m : m && (m.route || m.id)));
+    const out=new Set(),all=allModuleIds();
+    arr(roles).forEach(role=>{
+      const def=roleDefinition(role)||{};
+      arr(def.modules||def.modulos).forEach(m=>{
+        const key=typeof m==='string'?m:m&&(m.route||m.id);
+        if(key==='*')all.forEach(x=>out.add(x));else if(key)out.add(key);
+      });
     });
-    return [...out].filter(Boolean);
+    return [...out];
+  }
+  function teamReadiness(){
+    const store=S(),st=store&&typeof store._productStatus==='function'?store._productStatus():null;
+    if(!st||store.__productReadOnlyP0!==true)return 'ready';
+    if([].concat(st.deniedCollections||[]).includes('asesores')||st.snapshotErrors&&st.snapshotErrors.asesores)return 'unavailable';
+    return [].concat(st.serverConfirmedCollections||[]).includes('asesores')?'ready':'pending';
+  }
+  function teamReadinessNotice(){
+    const st=teamReadiness(),message=st==='unavailable'
+      ?'No fue posible consultar el directorio autorizado. Los usuarios existentes no se consideran eliminados.'
+      :'Confirmando el directorio autorizado por servidor…';
+    return '<div class="card pad" role="'+(st==='unavailable'?'alert':'status')+'" data-equipo-directory-readiness="'+st+'"><b>'+message+'</b></div>';
   }
   function userCountries(a) {
     const ps = uniq((a && a.paises && a.paises.length) ? a.paises : [a && a.pais]);
@@ -121,6 +147,12 @@ Orbit.modules.equipo = (function () {
   }
 
   function render(host) {
+    const currentStore=S();
+    if(currentStore&&typeof currentStore._ensureCollections==='function'){
+      const required=tab==='metas'?['asesores','metas']:tab==='auditoria'?['auditoria']:
+        ['usuarios','comisiones'].includes(tab)?['asesores']:[];
+      if(required.length)try{currentStore._ensureCollections(required);}catch(_){}
+    }
     const TABS = [
       ['usuarios', '👥 Usuarios'], ['permisos', '🔐 Permisos por rol'], ['comisiones', '💵 Comisiones'],
       ['metas', '🎯 Metas'], ['auditoria', '📝 Historial de cambios']
@@ -149,6 +181,7 @@ Orbit.modules.equipo = (function () {
 
   function teamRows() { return (S().all('asesores') || []).filter(a => !(a && (a.deleted === true || a.eliminado === true || a.estado === 'eliminado'))); }
   function usuarios() {
+    if(teamReadiness()!=='ready')return teamReadinessNotice();
     const team = teamRows();
     const shown = filteredTeam(team);
     const asesores = team.filter(a => hasRole(a, 'Asesor')).length;
@@ -186,10 +219,11 @@ Orbit.modules.equipo = (function () {
 
   function defaultPermissions() {
     const def = {};
-    const roles = [...ROLE_ORDER, LEGACY_ROLE].filter(r => Orbit.ROLES && Orbit.ROLES[r]);
+    const roles = roleCatalog();
     roles.forEach(rol => {
       def[rol] = {};
-      const nivel = Orbit.ROLES[rol].nivel;
+      // Existing role definitions govern reading; missing edit authority is not assumed.
+      const nivel = Number(roleDefinition(rol)?.nivel||0);
       allModuleIds().forEach(m => {
         const admin = ['comisiones', 'finanzas', 'configuracion', 'equipo'].includes(m);
         def[rol][m] = { ver: admin ? nivel >= 3 : baseModules([rol]).includes(m), editar: admin ? nivel >= 4 : nivel >= 2 && baseModules([rol]).includes(m) };
@@ -224,28 +258,35 @@ Orbit.modules.equipo = (function () {
     return mergePermissionMatrix(mergePermissionMatrix(base,legacy),canonical||{});
   }
   function getRoleScopes(){ return Object.assign({},defaultRoleScopes(),getAccessConfig().roleScopes||{}); }
+  function accessConfigReady(){
+    const status=Orbit.domainConfig&&Orbit.domainConfig.status&&Orbit.domainConfig.status();
+    return !!(status&&Array.isArray(status.domains)&&status.domains.some(d=>
+      d.domain==='access'&&d.source==='protected'&&d.syncPending!==true));
+  }
   function ensureAccessConfig(){
     if(accessConfigLoading||!Orbit.domainConfig||typeof Orbit.domainConfig.get!=='function')return accessConfigLoading||Promise.resolve(null);
     accessConfigLoading=Orbit.domainConfig.get('access').then(out=>{if(out&&out.config)accessConfigCache=out.config;return out;}).finally(()=>{accessConfigLoading=null;});
     return accessConfigLoading;
   }
   function permisos() {
-    const P = getPermisos(), scopes=getRoleScopes();
-    const roles = [...ROLE_ORDER, LEGACY_ROLE].filter(r => Orbit.ROLES && Orbit.ROLES[r]);
-    return `<div class="cfg-note" style="margin-bottom:14px">🔐 Esta matriz es la política canónica por rol. <b>Ver/Editar</b> controla módulos y <b>Alcance de datos</b> controla qué cartera se ve al seleccionar ese rol. Las restricciones particulares del usuario siguen prevaleciendo.</div>
-    <div class="card pad" style="margin-bottom:12px"><b style="font-family:var(--f-display)">Alcance de datos por rol</b><div class="muted" style="font-size:12px;margin:4px 0 10px">Propios = solo cartera del usuario. Equipo = usuarios del mismo grupo de visibilidad. Todos = cartera autorizada del tenant y países del usuario.</div><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:9px">${roles.map(r=>`<label class="ce-l">${U.esc(r)}<select class="o-sel" data-role-scope="${U.esc(r)}"><option value="own" ${scopes[r]==='own'?'selected':''}>Solo propios</option><option value="team" ${scopes[r]==='team'?'selected':''}>Equipo</option><option value="all" ${scopes[r]==='all'?'selected':''}>Todos</option><option value="none" ${scopes[r]==='none'?'selected':''}>Ninguno</option></select></label>`).join('')}</div></div>
+    const P=getPermisos(),scopes=getRoleScopes(),verified=accessConfigReady();
+    const roles=roleCatalog();
+    const warning=verified?'':'<div class="cfg-note" role="status" data-equipo-permissions-unconfirmed="1">Permisos pendientes de confirmación por servidor. La matriz de referencia permanece en modo consulta.</div>';
+    return `${warning}<div class="cfg-note" style="margin-bottom:14px">🔐 Esta matriz es la política canónica por rol. <b>Ver/Editar</b> controla módulos y <b>Alcance de datos</b> controla qué cartera se ve al seleccionar ese rol. Las restricciones particulares del usuario siguen prevaleciendo.</div>
+    <div class="card pad" style="margin-bottom:12px"><b style="font-family:var(--f-display)">Alcance de datos por rol</b><div class="muted" style="font-size:12px;margin:4px 0 10px">Propios = solo cartera del usuario. Equipo = usuarios del mismo grupo de visibilidad. Todos = cartera autorizada del tenant y países del usuario.</div><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:9px">${roles.map(r=>`<label class="ce-l">${U.esc(r)}<select class="o-sel" data-role-scope="${U.esc(r)}" ${verified?'':'disabled'}><option value="own" ${scopes[r]==='own'?'selected':''}>Solo propios</option><option value="team" ${scopes[r]==='team'?'selected':''}>Equipo</option><option value="all" ${scopes[r]==='all'?'selected':''}>Todos</option><option value="none" ${scopes[r]==='none'?'selected':''}>Ninguno</option></select></label>`).join('')}</div></div>
     <div class="card" style="overflow:hidden"><div style="overflow-x:auto"><table class="tbl perm-tbl">
       <thead><tr><th>Módulo</th>${roles.map(r => `<th colspan="2" style="text-align:center;border-left:1px solid var(--line)">${U.esc(r)}${r === LEGACY_ROLE ? ' · legado' : ''}</th>`).join('')}</tr>
       <tr><th></th>${roles.map(() => ACCIONES.map(a => `<th style="text-align:center;font-size:10.5px;font-weight:600;color:var(--ink-3)">${a[1]}</th>`).join('')).join('')}</tr></thead>
       <tbody>${allModuleIds().map(m => `<tr><td><b style="font-size:12.5px">${U.esc(moduleLabel(m))}</b></td>${roles.map(r => ACCIONES.map(([ac]) => {
         const on = P[r] && P[r][m] && P[r][m][ac];
-        return `<td style="text-align:center"><input type="checkbox" data-perm="${r}|${m}|${ac}" ${on ? 'checked' : ''}></td>`;
+        return `<td style="text-align:center"><input type="checkbox" data-perm="${r}|${m}|${ac}" ${on ? 'checked' : ''} ${verified?'':'disabled'}></td>`;
       }).join('')).join('')}</tr>`).join('')}</tbody>
     </table></div></div>
-    <div style="margin-top:10px;display:flex;gap:8px"><button class="btn primary sm" id="perm-save">Guardar matriz</button><button class="btn ghost sm" id="perm-reset">Restablecer por defecto</button></div>`;
+    <div style="margin-top:10px;display:flex;gap:8px"><button class="btn primary sm" id="perm-save" ${verified?'':'disabled'}>Guardar matriz</button><button class="btn ghost sm" id="perm-reset" ${verified?'':'disabled'}>Restablecer por defecto</button></div>`;
   }
 
   function comisiones() {
+    if(teamReadiness()!=='ready')return teamReadinessNotice();
     const team = teamRows().filter(a => hasRole(a, 'Asesor'));
     return `<div class="cfg-note" style="margin-bottom:14px">💵 Esquema de comisión de asesores. Las metas comerciales y de recaudo se configuran en la pestaña <b>Metas</b>, separadas por país y moneda.</div>
     <div class="card" style="overflow:hidden"><div style="overflow-x:auto"><table class="tbl">
@@ -309,6 +350,7 @@ Orbit.modules.equipo = (function () {
     };
   }
   function metas() {
+    if(teamReadiness()!=='ready')return teamReadinessNotice();
     const all = teamRows().filter(a => hasRole(a, 'Asesor'));
     const team = all.filter(a => { const ps = userCountries(a); return !ps.length || ps.includes(metaPais); });
     const cur = currencyForCountry(metaPais);

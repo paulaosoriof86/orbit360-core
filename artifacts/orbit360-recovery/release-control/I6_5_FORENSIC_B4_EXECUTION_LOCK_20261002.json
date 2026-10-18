@@ -92,7 +92,15 @@
       "functions/assignable-advisor-roster.js",
       "functions/ops-advisor-inbox.js",
       "functions/ops-leads-domain.js",
-      "functions/tenant-domain-config.js"
+      "functions/tenant-domain-config.js",
+      "orbit360-platform/core/backend-product-readonly-bootstrap-p0.js",
+      "orbit360-platform/core/access-scope.js",
+      "orbit360-platform/modules/equipo.js",
+      "orbit360-platform/core/product-app-p0.js",
+      "orbit360-platform/core/router.js",
+      "functions/b4-003-scoped-access-boundary.js",
+      "orbit360-platform/core/membership-multirol-contract-p0.js",
+      "orbit360-platform/core/tenant-access-policy-contract-p0.js"
     ],
     "reimportAuthorized": false,
     "livePromotionAuthorized": false,
@@ -107,7 +115,10 @@
       "tools/gravicentra-i6-5-b4-003-preview-proof.mjs",
       ".github/workflows/gravicentra-b4-003-executor.yml",
       "tools/gravicentra-i6-control-plane-guard-v1.mjs",
-      "tools/gravicentra-i6-5-b4-003-renewals-priority-preview-proof.mjs"
+      "tools/gravicentra-i6-5-b4-003-renewals-priority-preview-proof.mjs",
+      "tools/gravicentra-b4-003-protected-hydration.test.cjs",
+      "tools/gravicentra-b4-003-scoped-related-reader.test.cjs",
+      "tools/gravicentra-b4-003-role-first-paint-and-team-regression.test.cjs"
     ],
     "renewalProductMutationAuthorized": false,
     "policyVisualMutationAuthorized": true,
@@ -2804,5 +2815,44 @@
     "sharedRulesDeployAuthorized": false,
     "livePromotionAuthorized": false,
     "exactNextAction": "B4_003_EFFECTIVE_RULES_WRITER_PARITY_AND_AUTHENTICATED_GT_CO_VALIDATION"
+  },
+  "paula18OctVisualRejectSourceRemediation": {
+    "gate": "I6.5/B4-003",
+    "status": "PAULA_REJECTED_EXACT_PREVIEW_SOURCE_STAGED_PENDING_QA",
+    "userAuthority": "2026-10-18_DIRECT_UAT_SCREENSHOTS_MODULE_ROLE_REJECTIONS",
+    "rejectedSourceSha": "3f34d7fe678a02253fcf95887b6186fd7acfca1b",
+    "rejectionReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PAULA_UAT_REJECTION_AND_CAUSAL_SOURCE_FIX_20261018.json",
+    "rejectionReceiptBlobSha": "c07407fed4fbbb46b3fdd952b754ce51b76c60ac",
+    "allowedScopedSourceOwners": [
+      "orbit360-platform/core/backend-product-readonly-bootstrap-p0.js",
+      "orbit360-platform/core/access-scope.js",
+      "orbit360-platform/modules/equipo.js",
+      "orbit360-platform/core/product-app-p0.js",
+      "orbit360-platform/core/router.js",
+      "orbit360-platform/modules/inicio.js",
+      "functions/b4-003-scoped-access-boundary.js",
+      "orbit360-platform/core/membership-multirol-contract-p0.js",
+      "orbit360-platform/core/tenant-access-policy-contract-p0.js"
+    ],
+    "onlyCodeWithinB4003": true,
+    "sourceBlobAuthority": "4c540c63c677582ded15fc241a2bbf2617f4d80c",
+    "qaFiles": [
+      "tools/gravicentra-b4-003-protected-hydration.test.cjs",
+      "tools/gravicentra-b4-003-scoped-related-reader.test.cjs",
+      "tools/gravicentra-b4-003-role-first-paint-and-team-regression.test.cjs"
+    ],
+    "qaEvidencePending": true,
+    "backendFunctionDeploymentAuthorized": false,
+    "sharedRulesDeploymentAuthorized": false,
+    "realUserImpersonationAuthorized": false,
+    "realBusinessWritesAuthorized": false,
+    "livePromotionAuthorized": false,
+    "dataMutationAuthorized": false,
+    "reimportAuthorized": false,
+    "previousVisuallyApprovedModulesPreserved": true,
+    "unauthorizedBroadTeamScopeForbidden": true,
+    "exactNextAction": "B4_003_EXISTING_EXECUTOR_QA_AND_SECURITY_GUARD_NO_PREVIEW_DISPATCH_YET",
+    "businessProductionProgress": 20,
+    "formalI6Progress": 50
   }
 }

@@ -20,10 +20,10 @@
     'Dirección': { modules: ['*'], defaultScope: 'all' },
     'SuperAdmin': { modules: ['*'], defaultScope: 'all' },
     'AdminTenant': { modules: ['*'], defaultScope: 'all' },
-    'Operativo': { modules: ['inicio', 'cliente360', 'polizas', 'cobros', 'renovaciones', 'ops', 'leads', 'aseguradoras', 'calidad', 'importar'], defaultScope: 'team' },
+    'Operativo': { modules: ['inicio', 'cliente360', 'polizas', 'cobros', 'renovaciones', 'cancelaciones', 'ops', 'leads', 'aseguradoras', 'calidad', 'importar'], defaultScope: 'team' },
     'Finanzas': { modules: ['inicio', 'finanzas', 'cobros', 'conciliaciones', 'comisiones', 'reportes', 'calidad'], defaultScope: 'all' },
     'Marketing': { modules: ['inicio', 'marketing', 'leads', 'plantillas', 'automatizaciones', 'reportes'], defaultScope: 'team' },
-    'Asesor': { modules: ['inicio', 'cliente360', 'polizas', 'cobros', 'renovaciones', 'ops', 'leads', 'aseguradoras', 'calidad', 'portal'], defaultScope: 'own' },
+    'Asesor': { modules: ['inicio', 'cliente360', 'polizas', 'cobros', 'renovaciones', 'cancelaciones', 'ops', 'leads', 'aseguradoras', 'calidad', 'portal'], defaultScope: 'own' },
     'Comercial': { modules: ['inicio', 'cliente360', 'polizas', 'cotizador', 'comparativo', 'leads', 'calidad'], defaultScope: 'own' },
     'Asistente': { modules: ['inicio', 'cliente360', 'ops', 'calidad'], defaultScope: 'team' }
   });

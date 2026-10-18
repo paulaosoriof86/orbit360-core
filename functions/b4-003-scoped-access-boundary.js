@@ -44,12 +44,15 @@ function resolve({auth,member,config,tenantId,activeRole,collection,country}){
     deny('MODULE_DENIED');
   effective='all';
  }else{
-  if(collection==='cancelaciones'&&!full.has(role))deny('MODULE_DENIED');
+  // Asesor's cancellation permission is read-own only. Explicit role matrix
+  // denial or user restriction still prevails. No tenant-wide advisor grants.
+  if(collection==='cancelaciones'&&!full.has(role)&&!self.has(role))deny('MODULE_DENIED');
   const ds=m.dataScopes||{},requested=scope(get(ds.modules,moduleKey)||ds.default||m.scopeDatos||m.dataScope);
   const configured=scope(get(config?.roleScopes,role));
   const maxScope=self.has(role)?'own':teamScopedRoles.has(role)?'team':(configured||'none');
   const ceiling=configured&&order[configured]<order[maxScope]?configured:maxScope;
-  effective=requested?(order[requested]<=order[ceiling]?requested:ceiling):(configured?ceiling:'none');
+  effective=requested?(order[requested]<=order[ceiling]?requested:ceiling):
+    (configured?ceiling:(collection==='cancelaciones'&&self.has(role)?'own':'none'));
  }
  if(effective==='none')deny('SCOPE_NONE');
  const advisor=clean(m.advisorId||m.asesorId);

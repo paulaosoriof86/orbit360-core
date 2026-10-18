@@ -9,7 +9,18 @@ Orbit.modules = Orbit.modules || {};
 Orbit.modules.inicio = (function () {
   const U = Orbit.ui, q = Orbit.q;
   const rosterRequested = new Set(), rosterFailures = new Set(), rosterAttempts=new Map(), rosterRetryAt=new Map();
-  let motivationIndex=0, motivationTimer=null;
+  let motivationIndex=0, motivationTimer=null,financeStageTimer=null;
+  function stageMonthlyFinancialRead(){
+    // A user's first paint and role switch must not wait for portfolio scans.
+    if(financeStageTimer)return;
+    financeStageTimer=setTimeout(()=>{
+      financeStageTimer=null;
+      if(Orbit.route&&Orbit.route.key!=='inicio')return;
+      const store=Orbit.store;
+      if(store&&typeof store._ensureCollections==='function')
+        store._ensureCollections(['cobros','recibosEsperados','carteraPrimas']);
+    },250);
+  }
   const leadershipMessages=[
     'Cada póliza representa una promesa de protección. Liderar es convertirla en confianza.',
     'La prevención abre oportunidades; el seguimiento oportuno protege las relaciones.',
@@ -162,7 +173,7 @@ Orbit.modules.inicio = (function () {
   }
 
   function render(host) {
-    try { if (Orbit.store && typeof Orbit.store._ensureCollections === 'function') Orbit.store._ensureCollections(['clientes','polizas','cobros','recibosEsperados','carteraPrimas']); } catch (_) {}
+    try { if (Orbit.store && typeof Orbit.store._ensureCollections === 'function') Orbit.store._ensureCollections(['clientes','polizas']); } catch (_) {}
     const activeCountry=String(Orbit.pais||'TODOS').toUpperCase();
     const secureRoster=rosterReadiness(host,activeCountry);
     const clientReadiness=dataReadiness(['clientes']), policyReadiness=dataReadiness(['clientes','polizas']), productionReadiness=dataReadiness(['clientes','polizas']), advisorReadiness=secureRoster.status, metaReadiness=secureRoster.status, paymentReadiness=dataReadiness(['clientes','polizas','cobros','recibosEsperados','carteraPrimas']), portfolioReadiness=dataReadiness(['clientes','polizas','carteraPrimas']);
@@ -279,6 +290,7 @@ Orbit.modules.inicio = (function () {
       <div class="card gi-executive-board" data-inicio-premium="20261011" data-gi-dashboard="insurance-live-v1" style="margin-top:18px;padding:18px 20px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:12px;align-items:start;border-top:3px solid var(--red)">
         <section class="gi-leadership-card" aria-label="Liderazgo y protección">
           <div class="gi-month-eyebrow">Metas del mes · ${U.monthLabel()}</div>
+          <div class="gi-month-emblem" aria-hidden="true" style="margin:5px auto 8px;width:46px;height:46px;display:grid;place-items:center;border-radius:17px;font-size:28px;background:linear-gradient(145deg,#fff,#cbd2dc);box-shadow:4px 6px 0 rgba(0,0,0,.18),inset 2px 2px 5px rgba(255,255,255,.85);transform:rotate(-6deg);filter:drop-shadow(0 4px 5px rgba(0,0,0,.18))">🛡️</div>
           <h2 class="gi-month-title">Avance real del mes</h2>
           <p class="gi-month-countdown" data-inicio-days-left="${diasMes}">${diasMes===0?'Hoy termina el mes':'Faltan '+diasMes+' días para cerrar el mes'}</p>
           <div class="gi-leadership-body">
@@ -321,6 +333,7 @@ Orbit.modules.inicio = (function () {
       </div>
       ${seguimientosHoy()}
     </div>`;
+    stageMonthlyFinancialRead();
     if(typeof host.querySelectorAll==='function')host.querySelectorAll('[data-inicio-analysis-bar]').forEach(button=>button.addEventListener('click',()=>{const route=button.getAttribute('data-route');if(route==='renovaciones'||route==='cobros')location.hash='#/'+route;}));
     if(motivationTimer!==null){clearInterval(motivationTimer);motivationTimer=null;}
     const message=typeof host.querySelector==='function'?host.querySelector('[data-inicio-context-message]'):null;

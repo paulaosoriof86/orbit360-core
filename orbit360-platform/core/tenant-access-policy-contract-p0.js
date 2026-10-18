@@ -46,7 +46,7 @@
     cobros: { module: 'cobros', scoped: true, advisorRead: true, advisorWrite: false },
     carteraPrimas: { module: 'cobros', scoped: true, advisorRead: true, advisorWrite: false },
     reclamos: { module: 'siniestros', scoped: true, advisorRead: true, advisorWrite: false },
-    cancelaciones: { module: 'cancelaciones', scoped: true, advisorRead: false, advisorWrite: false },
+    cancelaciones: { module: 'cancelaciones', scoped: true, advisorRead: true, advisorWrite: false },
     comisiones: { module: 'comisiones', scoped: true, advisorRead: false, advisorWrite: false, finance: true },
     documentos: { module: 'cliente360', scoped: true, advisorRead: true, advisorWrite: false },
     solicitudesPortal: { module: 'portal', scoped: true, advisorRead: true, advisorWrite: false },

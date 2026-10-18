@@ -36,7 +36,7 @@
   "baselineCertifiedSourceSha": "4bf67a3738751fe2432a130fd23254a6f1c7d16e",
   "parentAcceptedBlockSourceSha": "7e96cf419c0858580fef584340e65b84e40c77b5",
   "currentBlock": "B4",
-  "productFileCount": 110,
+  "productFileCount": 111,
   "productFiles": [
     ".github/workflows/cotcomp-workflow-s419-source-qa.yml",
     "docs/ays/GRAVICENTRA_QUOTE_AUTHORITY_CONTRACT_v1_20261003.md",
@@ -147,7 +147,8 @@
     "orbit360-platform/styles/base.css",
     "orbit360-platform/styles/infra.css",
     "orbit360-platform/sw.js",
-    "orbit360-platform/modules/historial.js"
+    "orbit360-platform/modules/historial.js",
+    "orbit360-platform/core/membership-multirol-contract-p0.js"
   ],
   "productFileBlobs": {
     ".github/workflows/cotcomp-workflow-s419-source-qa.yml": "1123c1bd7848433ce51c24586e9fedbbbd581dff",
@@ -173,12 +174,12 @@
     "orbit360-platform/assets/tenant/alianzas-soluciones/logo-oficial-360.png": "726da844034b98f3132788920a1b8111f4d1764a",
     "orbit360-platform/core/academia-product-catalog-p0.js": "c4974b8734dbe384d4fe4b53394d015ec24e36da",
     "orbit360-platform/core/access-role-session-owner-v20260728.js": "4c627da7d568d453ed13d9c30eb6e8431556ec36",
-    "orbit360-platform/core/access-scope.js": "5fd5aabdbe0e7b613ae55161be01aa17b5174769",
+    "orbit360-platform/core/access-scope.js": "66462ba7263fe7cb9a078148810bd17c96ad72c7",
     "orbit360-platform/core/assignable-advisor-roster-client.js": "123f90ab2bce500f7a89338ae6e3de0b82811fe3",
     "orbit360-platform/core/auth-password-change-v20260805.js": "873b484d42825db2fa31e0ae90c9ec78598728f4",
     "orbit360-platform/core/auth-product-runtime-p0.js": "5ae27034e76592cd34c2d90dc7962dac3fa0b000",
     "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js": "60ce88178f48ff5d9b5fd01c1e2d92abe642dac1",
-    "orbit360-platform/core/backend-product-readonly-bootstrap-p0.js": "8cc5ce156ee63eb212ba66667846305870f1befd",
+    "orbit360-platform/core/backend-product-readonly-bootstrap-p0.js": "aa70a29b7e3d5a5ac4bef003fb6db07a0439af0f",
     "orbit360-platform/core/backend-resource-contracts.js": "826364d2a394d0bfe75d9f0ccdc5dd8905d2b3f0",
     "orbit360-platform/core/ciclo.js": "dc1e77c900edf6eb366bf836f19ecb0ebd17a541",
     "orbit360-platform/core/client-insurer-visual-contract-v20260720.js": "3fd89167a5a36662072dbdc3e970b48f61158343",
@@ -191,7 +192,7 @@
     "orbit360-platform/core/issuance-workflow-v1201.js": "ab138f218e041b41ac737ff250c7e808edc8c030",
     "orbit360-platform/core/policy-receipts-engine.js": "b04fdd580efcc2fdfa8703238e92ab5bc51d6347",
     "orbit360-platform/core/policy-receipts-v1199-refinements.js": "3f222509093ede51676efd7edd6347d5794c7e05",
-    "orbit360-platform/core/product-app-p0.js": "b3080c0dbb8d5ae80061754676a5a39b2c913ec4",
+    "orbit360-platform/core/product-app-p0.js": "2c1f4e6558945480a8ba4b50836ef84acf978bfe",
     "orbit360-platform/core/product-drive-document-provider-p0.js": "074b38c168ed0e7c78569395f815a2ff037c2c3c",
     "orbit360-platform/core/product-hydration-required-optional-p0.js": "21f870d3e0e165487843d1d6efa454474fd73563",
     "orbit360-platform/core/product-insurer-credential-provider-p0.js": "3bf5ba98271c7012dd1328df2894f1b38f3983eb",
@@ -203,8 +204,8 @@
     "orbit360-platform/core/quote-comparison-contracts-v1203.js": "c3342d5fc94661a9f23563e4b1c644346dd10fb3",
     "orbit360-platform/core/quote-comparison-p06-runtime-adapter-v1208.js": "1e3a5d79b4bdcba69f8de0737bf0df96d4cbd3d0",
     "orbit360-platform/core/record-delete.js": "749722f8482db5a72b72ac9b64dbcac08af86b82",
-    "orbit360-platform/core/router.js": "7f3bbde2aecbdc97853c4e8260d5bf78c9ccb5fb",
-    "orbit360-platform/core/tenant-access-policy-contract-p0.js": "08c413690f301f964f9ecf4a52d8bfdc117dc600",
+    "orbit360-platform/core/router.js": "0d52fe45097c8880b6ff8fc29fd93f04da2b6919",
+    "orbit360-platform/core/tenant-access-policy-contract-p0.js": "2eb52557ca9b38f80746527987a66091f1e1b81f",
     "orbit360-platform/core/tenant-access-policy-effective-p0.js": "43d572266ac3f21aca3b5c9b6aa981f7cd52373c",
     "orbit360-platform/core/tenant-access-policy-product-p0.js": "045322231523ec624c6f19efea1a66c204b962bc",
     "orbit360-platform/core/tenant-domain-config-client.js": "0ce2acdd0022fae441e39992444c46ab99cc3585",
@@ -233,8 +234,8 @@
     "orbit360-platform/modules/cronograma.js": "c2c5e2cccae88e5c3492aef0e7f109a0a896e5fa",
     "orbit360-platform/modules/equipo-credential-admin-v20260805-bridge.js": "7432bc05938469187fdd120a5bc023c53a000ab9",
     "orbit360-platform/modules/equipo-onboarding-v20260804-bridge.js": "1da619d8abd676d31d69a038d4770463ca67fdc5",
-    "orbit360-platform/modules/equipo.js": "b0736237ee18ef45abbae1c13f5c94781178344e",
-    "orbit360-platform/modules/inicio.js": "a819209312108d735392acb247242d2c58f87644",
+    "orbit360-platform/modules/equipo.js": "d38a48e41680193906637c08f8e6695b221099b7",
+    "orbit360-platform/modules/inicio.js": "15fcfea5195f6c1ec7c61ee937761b1d2300e3b0",
     "orbit360-platform/modules/issuance-endosos-v1201-bridge.js": "2020152b4b2df1338be4b3ef2a9f121d777e21db",
     "orbit360-platform/modules/leads.js": "4e12e604382f2731a03d29cf00db3c086d77ebc1",
     "orbit360-platform/modules/ops.js": "a4ca3dbb4613d541af411f12fce9773a072b0d41",
@@ -252,14 +253,15 @@
     "orbit360-platform/styles/base.css": "608ef0709144ffcbe748a7bd04e1bd16744def65",
     "orbit360-platform/styles/infra.css": "02bea455bce9f5659eeaf8fd73e799eccb7f7e23",
     "orbit360-platform/sw.js": "87412e7c4ef1030e2a3389cfd709f0c287ab336b",
-    "functions/b4-003-scoped-access-boundary.js": "01934d22cfe6f353c6e143e553e3bc1c704c029a",
+    "functions/b4-003-scoped-access-boundary.js": "a3b70fb9f795b9208e5de281892f1df49666dae2",
     "firestore.b4-003-scoped-candidate.rules": "6ae1a85b1f82525ac018ff682a2e20b6cca5f1d8",
     "orbit360-platform/modules/comparativo.js": "982881a4c1e2f95be95428bd3f9f23360a9a2d5f",
     "functions/b4-003-scoped-policy-reader.js": "24546aa40f26d818aef7f1714c2a21deda63a550",
     "functions/b4-003-scoped-policy-callable.js": "8b468150003fe812d9e1d0763120f2b31f1df75f",
     "functions/b4-003-scoped-related-reader.js": "652042d544d8dbf52b6d0f8c55bc6de7d3c64aa2",
     "functions/b4-003-scoped-bootstrap-reader.js": "356d36e0679a5e499c05632a981b9ef3f1ffb9ec",
-    "orbit360-platform/modules/historial.js": "6329129526b850a62e645aa9cd384e7d19317365"
+    "orbit360-platform/modules/historial.js": "6329129526b850a62e645aa9cd384e7d19317365",
+    "orbit360-platform/core/membership-multirol-contract-p0.js": "d27b052d4d32872bfe2e1c950c9995a2e2100841"
   },
   "evidence": {
     "paulaVisualRejectionPath": "artifacts/orbit360-recovery/release-control/I6_5_B2_PAULA_VISUAL_REJECTION_20260924.json",
@@ -5983,5 +5985,73 @@
     "reimport": false,
     "formalPointsAdded": 0,
     "qaFixtureCorrection": "CONFIG_OPERATIVO_ROLE_IS_NOT_ADMIN_ALLOWED"
+  },
+  "paula18OctUatRejectedCrossModuleSourceCorrection": {
+    "status": "SOURCE_STAGED_QA_PENDING_NOT_PREVIEW_ACCEPTED",
+    "gate": "I6.5/B4-003",
+    "reviewedPreviewSource": "3f34d7fe678a02253fcf95887b6186fd7acfca1b",
+    "rejectionReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PAULA_UAT_REJECTION_AND_CAUSAL_SOURCE_FIX_20261018.json",
+    "rejectionReceiptBlob": "c07407fed4fbbb46b3fdd952b754ce51b76c60ac",
+    "correctedSourceFiles": [
+      {
+        "path": "orbit360-platform/core/backend-product-readonly-bootstrap-p0.js",
+        "beforeBlob": "8cc5ce156ee63eb212ba66667846305870f1befd",
+        "afterBlob": "aa70a29b7e3d5a5ac4bef003fb6db07a0439af0f"
+      },
+      {
+        "path": "orbit360-platform/core/access-scope.js",
+        "beforeBlob": "5fd5aabdbe0e7b613ae55161be01aa17b5174769",
+        "afterBlob": "66462ba7263fe7cb9a078148810bd17c96ad72c7"
+      },
+      {
+        "path": "orbit360-platform/modules/equipo.js",
+        "beforeBlob": "b0736237ee18ef45abbae1c13f5c94781178344e",
+        "afterBlob": "d38a48e41680193906637c08f8e6695b221099b7"
+      },
+      {
+        "path": "orbit360-platform/core/product-app-p0.js",
+        "beforeBlob": "b3080c0dbb8d5ae80061754676a5a39b2c913ec4",
+        "afterBlob": "2c1f4e6558945480a8ba4b50836ef84acf978bfe"
+      },
+      {
+        "path": "orbit360-platform/core/router.js",
+        "beforeBlob": "7f3bbde2aecbdc97853c4e8260d5bf78c9ccb5fb",
+        "afterBlob": "0d52fe45097c8880b6ff8fc29fd93f04da2b6919"
+      },
+      {
+        "path": "orbit360-platform/modules/inicio.js",
+        "beforeBlob": "a819209312108d735392acb247242d2c58f87644",
+        "afterBlob": "15fcfea5195f6c1ec7c61ee937761b1d2300e3b0"
+      },
+      {
+        "path": "functions/b4-003-scoped-access-boundary.js",
+        "beforeBlob": "01934d22cfe6f353c6e143e553e3bc1c704c029a",
+        "afterBlob": "a3b70fb9f795b9208e5de281892f1df49666dae2"
+      },
+      {
+        "path": "orbit360-platform/core/membership-multirol-contract-p0.js",
+        "beforeBlob": "3b041af5482136068344f9d2160a75d183ef3619",
+        "afterBlob": "d27b052d4d32872bfe2e1c950c9995a2e2100841"
+      },
+      {
+        "path": "orbit360-platform/core/tenant-access-policy-contract-p0.js",
+        "beforeBlob": "08c413690f301f964f9ecf4a52d8bfdc117dc600",
+        "afterBlob": "2eb52557ca9b38f80746527987a66091f1e1b81f"
+      }
+    ],
+    "sourceQa": [
+      "tools/gravicentra-b4-003-protected-hydration.test.cjs",
+      "tools/gravicentra-b4-003-scoped-related-reader.test.cjs",
+      "tools/gravicentra-b4-003-role-first-paint-and-team-regression.test.cjs"
+    ],
+    "sourceQaNewBlob": "1824f7048559bc9dcfcdae2272b1065330914f44",
+    "roleCountryRealUat": "PENDING",
+    "prevSourcePassPreserved": true,
+    "noProductDeploy": true,
+    "noSharedRulesDeploy": true,
+    "noLivePromotion": true,
+    "noRealOperationalWrites": true,
+    "formalI6PercentDelta": 0,
+    "next": "EXISTING_B4003_SYNTHETIC_GUARD_THEN_AUTHENTICATED_PREVIEW_GATE"
   }
 }
