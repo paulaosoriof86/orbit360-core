@@ -252,6 +252,7 @@ async function deny(fn,code){let thrown;try{await fn()}catch(e){thrown=e}assert.
  assert.equal(cancelled.rows[2].pais,'GT');checks++;
  const advisorCancellations=await flow('cancelaciones','asesor',{pageSize:50});
  assert.deepEqual(advisorCancellations.rows.map(x=>x.id),['aOwn'],'ADVISOR_ONLY_OWN_CANCELLATIONS');checks++;
+ await deny(()=>read('cancelaciones','cStale',{role:'asesor'}),'RECORD_NOT_FOUND_OR_DENIED');checks++;
  await deny(()=>read('cancelaciones','bOther',{role:'asesor'}),'RECORD_NOT_FOUND_OR_DENIED');checks++;
  member={...member,modulesRestricted:['cancelaciones']};
  await deny(()=>flow('cancelaciones','asesor'),'MODULE_DENIED');checks++;

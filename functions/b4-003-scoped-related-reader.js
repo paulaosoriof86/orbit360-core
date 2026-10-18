@@ -62,6 +62,15 @@ async function verifiedCancellationView(ctx,tenant,row,id,lookup){
  const country=clean(canonical.pais||canonical.country).toUpperCase();
  if(country!==ctx.country)throw new Denied('COUNTRY_DENIED');
  const advisor=clean(canonical.asesorId||canonical.advisorId||canonical.ownerAdvisorId);
+ // Child metadata cannot grant extra scope. In own/team reads, a contradictory
+ // recorded country or advisor remains quarantined pending source reconciliation.
+ if(ctx.scope!=='all'){
+  const declaredCountry=clean(row.pais||row.country).toUpperCase();
+  const declaredAdvisor=clean(row.asesorId||row.advisorId||row.ownerAdvisorId);
+  if((declaredCountry&&declaredCountry!==country)||
+     (declaredAdvisor&&declaredAdvisor!==advisor))
+   throw new Denied('CANCELLATION_STALE_SCOPE_CONFLICT');
+ }
  return Object.assign({},row,{id:row.id||id,canonicalDocumentId:id,
   tenantId:ctx.tenantId,pais:country,asesorId:advisor,clienteId:cid,polizaId:pid||clean(row.polizaId)});
 }

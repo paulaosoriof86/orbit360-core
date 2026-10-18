@@ -100,7 +100,8 @@
       "orbit360-platform/core/router.js",
       "functions/b4-003-scoped-access-boundary.js",
       "orbit360-platform/core/membership-multirol-contract-p0.js",
-      "orbit360-platform/core/tenant-access-policy-contract-p0.js"
+      "orbit360-platform/core/tenant-access-policy-contract-p0.js",
+      "functions/b4-003-scoped-related-reader.js"
     ],
     "reimportAuthorized": false,
     "livePromotionAuthorized": false,
@@ -2854,5 +2855,27 @@
     "exactNextAction": "B4_003_EXISTING_EXECUTOR_QA_AND_SECURITY_GUARD_NO_PREVIEW_DISPATCH_YET",
     "businessProductionProgress": 20,
     "formalI6Progress": 50
+  },
+  "paula18OctCancellationStaleOwnScopeCausalFix": {
+    "status": "CAUSAL_SOURCE_STAGED_PENDING_EXISTING_QA",
+    "gate": "I6.5/B4-003",
+    "authority": "PAULA_20261018_CONTINUE_FROM_REJECTED_FUNCTIONAL_PREVIEW_AND_CAUSAL_QA_FAILURE",
+    "allowedScope": "ONE_PROTECTED_SCOPED_READER_SOURCE_AND_ITS_EXISTING_QA_ONLY",
+    "beforeSourceBlob": "652042d544d8dbf52b6d0f8c55bc6de7d3c64aa2",
+    "afterSourceBlob": "69706943a73c926da41b2256db425031b8f87b19",
+    "qaBlobSha": "6a6a10970dac7392b1062a5cbe4feeb682f19c8b",
+    "compositionBlobSha": "5031475321c059ced7a0ba3a49147f4b7669ce5a",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PAULA_UAT_CANCELLATIONS_CONFLICT_SOURCE_FIX_20261018.json",
+    "receiptBlobSha": "180fc66ca8c1ea49d39bd7fe897f732b89d1840a",
+    "noSourceWideReopen": true,
+    "noRealWrite": true,
+    "noSharedRulesDeploy": true,
+    "noPreviewDeployUntilQaPass": true,
+    "noProductionDeployment": true,
+    "noRealUserImpersonation": true,
+    "noNewGate": true,
+    "percentToProduction": 20,
+    "formalI6Percent": 50,
+    "releaseSecurityHoldPreserved": true
   }
 }

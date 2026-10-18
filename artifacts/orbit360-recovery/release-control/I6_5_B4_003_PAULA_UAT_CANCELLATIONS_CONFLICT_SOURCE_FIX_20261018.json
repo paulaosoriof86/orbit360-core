@@ -1,0 +1,52 @@
+{
+  "schema": "GRAVICENTRA_B4003_PAULA_UAT_CANCELLATIONS_CONFLICT_QA_CLOSURE_V1",
+  "dateLocal": "2026-10-18",
+  "status": "SOURCE_PATCH_STAGED_REQUIRES_EXISTING_QA_NOT_DEPLOYABLE",
+  "gate": "I6.5/B4-003",
+  "role": "Asesor_read_own;Operativo_read_scoped;Direccion_read_all",
+  "baselineHead": "dba2afee6400c87a7c9e2ca9ab7f77e98fb9f5d7",
+  "failedRuns": [
+    {
+      "id": 39158559104,
+      "reason": "ADVISOR_ONLY_OWN_CANCELLATIONS"
+    },
+    {
+      "id": 39158559379,
+      "reason": "ADVISOR_ONLY_OWN_CANCELLATIONS"
+    }
+  ],
+  "rootCause": "verifiedCancellationView projected the verified policy advisor and country over a contradictory historical child row, so own-role result included cStale whose raw child declared CO/other advisor",
+  "affectedSource": {
+    "path": "functions/b4-003-scoped-related-reader.js",
+    "beforeBlob": "652042d544d8dbf52b6d0f8c55bc6de7d3c64aa2",
+    "afterBlob": "69706943a73c926da41b2256db425031b8f87b19"
+  },
+  "discriminant": {
+    "test": "tools/gravicentra-b4-003-scoped-related-reader.test.cjs",
+    "beforeBlob": "840bc029eb06c11a9c13d2a646384db860037311",
+    "afterBlob": "6a6a10970dac7392b1062a5cbe4feeb682f19c8b",
+    "positive": "Operativo still receives parent-verified historical row",
+    "negative": "Asesor list and direct document exclude stale child with mismatched country/advisor and exclude foreign parent",
+    "serverChecks": "Tenant, active membership, effective role, canonical parent"
+  },
+  "safety": {
+    "businessWrites": 0,
+    "sharedRulesDeployment": false,
+    "backendFunctionDeployment": false,
+    "realUserTokenImpersonation": false,
+    "livePromotion": false,
+    "dataReimport": false,
+    "securityP0StillOpen": true
+  },
+  "existingGovernance": {
+    "rejectionReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PAULA_UAT_REJECTION_AND_CAUSAL_SOURCE_FIX_20261018.json",
+    "guard": "Gravicentra Control Plane Guard v5",
+    "qa": "Gravicentra B4-003 R20 Exact Preview",
+    "singleCandidate": true,
+    "noNewGate": true
+  },
+  "targetNext": "RUN_EXISTING_GUARD_AND_QA; ONLY_AFTER_SOURCE_QA_PASS_GATE_EXACT_ISOLATED_PREVIEW_AND_REAL_AUTH",
+  "releaseToProductionProgressBefore": 20,
+  "releaseToProductionProgressAfter": 20,
+  "acceptedModulesAdded": 0
+}
