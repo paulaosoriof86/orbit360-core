@@ -80,4 +80,35 @@ for(const [record,want,label] of [
 assert.match(team,/if \(userFilter === 'admin'\) return team\.filter\(isAdministrative\)/,'ADMIN_FILTER_MATCHES_CLASSIFIER');checks++;
 assert.match(team,/const admins = team\.filter\(isAdministrative\)\.length;/,'ADMIN_TALLY_MATCHES_FILTER');checks++;
 
+
+// UAT2-02. Backend config permissions must be scoped to their exact domain.
+// This is a source-only VM regression, not a LIVE or signed-user security PASS.
+const cfgText=read('functions/tenant-domain-config.js');
+const cfgStart=cfgText.indexOf('function roles(member) {');
+const cfgEnd=cfgText.indexOf('async function authorize(',cfgStart);
+assert.ok(cfgStart>=0&&cfgEnd>cfgStart,'CONFIG_ROLE_WRITER_BOUNDS');checks++;
+const cfgCtx={
+  norm:x=>String(x==null?'':x).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_+|_+$/g,''),
+  unique:xs=>[...new Set((Array.isArray(xs)?xs:[]).map(String).filter(Boolean))],
+  ADMIN_ROLES:new Set(['superadmin','admintenant','direccion','admin']),
+  PERMISSIONS:new Set(['config_manage','workflow_config_manage','reconciliation_config_manage','access_config_manage','catalog_config_manage']),
+  Set,Array,Object
+};
+vm.runInNewContext(cfgText.slice(cfgStart,cfgEnd)+String.fromCharCode(10)+'this.configAuthQA={canManage};',cfgCtx);
+const cfgCan=cfgCtx.configAuthQA.canManage,cfgDomains=['workflow','access','catalogs','reconciliation'];
+for(const role of ['SuperAdmin','AdminTenant','Dirección','Admin'])
+  for(const domain of cfgDomains)expect(cfgCan({permissions:[]},domain,role),true,'CONFIG_ADMIN_'+role+'_'+domain);
+for(const [grant,allowedDomain] of [
+  ['workflow_config_manage','workflow'],['access_config_manage','access'],
+  ['catalog_config_manage','catalogs'],['reconciliation_config_manage','reconciliation']
+])
+  for(const domain of cfgDomains)expect(cfgCan({permissions:[grant]},domain,'Operativo'),domain===allowedDomain,'CONFIG_DOMAIN_'+grant+'_'+domain);
+for(const domain of cfgDomains){
+ expect(cfgCan({permissions:['config_manage']},domain,'Operativo'),true,'CONFIG_EXPLICIT_GLOBAL_'+domain);
+ expect(cfgCan({permissions:[]},domain,'Asesor'),false,'CONFIG_NO_GRANT_'+domain);
+}
+expect(cfgCan({permisosExtra:['workflow_config_manage']},'access','Asesor'),false,'CONFIG_ADVISOR_FOREIGN_GRANT');
+expect(cfgCan({extras:['catalog_config_manage']},'workflow','Asesor'),false,'CONFIG_ADVISOR_EXTRA_FOREIGN_GRANT');
+expect(cfgCan({permissions:['unknown']},'access','Operativo'),false,'CONFIG_UNKNOWN_GRANT');
+
 console.log('B4_003_FIRST_PAINT_TEAM_ROLE_READINESS_SOURCE_VM_QA_PASS checks='+checks+' no_remote_access no_writes');

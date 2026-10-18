@@ -168,7 +168,7 @@
     "functions/product-operational-domain.js": "edbe77331327fdfa05a278d7c1f1b68005d70773",
     "functions/product-ops-leads-domain.js": "a0f79b34433c6b93702eabbece6a53a5e6124f45",
     "functions/tenant-branding.js": "d3c3dcd191951f91a40eb17b7cc560dc535a2a3c",
-    "functions/tenant-domain-config.js": "ede400068d0797e0a9677a099aa7198a25f8f9a6",
+    "functions/tenant-domain-config.js": "231fb2f106a6c139bb83c367f0f5e1a1c8924823",
     "functions/user-onboarding.js": "6512d49e4a01c4257e578652b0728f688cd063d1",
     "orbit360-platform/assets/tenant/alianzas-soluciones/logo-bolita-96.png": "9e16fae65f366556f55398309eb7bb3f398bf072",
     "orbit360-platform/assets/tenant/alianzas-soluciones/logo-oficial-360.png": "726da844034b98f3132788920a1b8111f4d1764a",
@@ -6093,5 +6093,24 @@
     "sharedRulesDeployed": false,
     "livePromoted": false,
     "dataWrites": 0
+  },
+  "b4003Oct18C04ConfigDomainAuthorization": {
+    "gate": "I6.5/B4-003",
+    "finding": "UAT2-02",
+    "owner": "functions/tenant-domain-config.js",
+    "previousBlob": "ede400068d0797e0a9677a099aa7198a25f8f9a6",
+    "sourceBlob": "231fb2f106a6c139bb83c367f0f5e1a1c8924823",
+    "qa": "tools/gravicentra-b4-003-role-first-paint-and-team-regression.test.cjs",
+    "previousQaBlob": "2f84c391ccc6b0a40895e08481681431125775e9",
+    "qaBlob": "96be44a4ac7c31fb3f73cfd289b555f7ef1d6999",
+    "rootCause": "CONFIG_PERMISSION_FROM_ONE_DOMAIN_GRANTED_WRITES_TO_OTHER_DOMAIN",
+    "fix": "EXACT_DOMAIN_PERMISSION_OR_EXPLICIT_GLOBAL_CONFIG_MANAGE_OR_ADMINISTRATIVE_ACTIVE_ROLE",
+    "sourceOnlyTests": 43,
+    "runner": "PENDING_GITHUB_CI",
+    "preview": "NOT_REBUILT",
+    "realUID": "HOLD",
+    "sharedRulesDeployed": false,
+    "livePromoted": false,
+    "operationalWrites": 0
   }
 }

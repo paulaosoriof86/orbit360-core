@@ -5996,7 +5996,7 @@
   "canonicalAccumulationControl": {
     "status": "FROZEN_ACTIVE",
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "compositionLockBlobSha": "2cf72906b1dc859fb3757e01def446f14da22712",
+    "compositionLockBlobSha": "ac0a8d4e64b972c47a25d019a86d604d8227ac2e",
     "findingLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
     "findingLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
@@ -12606,5 +12606,28 @@
     "productionPathPercent": 20,
     "formalI6Percent": 50,
     "existingGatePreserved": true
+  },
+  "b4003Oct18C04ConfigDomainAuthorization": {
+    "status": "SOURCE_PATCH_COMPOSED_PREVIEW_NOT_ACCEPTED",
+    "gate": "I6.5/B4-003",
+    "finding": "UAT2-02",
+    "owner": "functions/tenant-domain-config.js",
+    "oldBlob": "ede400068d0797e0a9677a099aa7198a25f8f9a6",
+    "newBlob": "231fb2f106a6c139bb83c367f0f5e1a1c8924823",
+    "qa": "tools/gravicentra-b4-003-role-first-paint-and-team-regression.test.cjs",
+    "qaBlob": "96be44a4ac7c31fb3f73cfd289b555f7ef1d6999",
+    "compositionBlob": "ac0a8d4e64b972c47a25d019a86d604d8227ac2e",
+    "sourcePreflightChecks": 43,
+    "githubQaRunId": null,
+    "previewBuildId": null,
+    "realAuthGtCoPass": false,
+    "configWritePersisted": false,
+    "sharedRulesDeployed": false,
+    "operationalWrites": 0,
+    "livePromotion": false,
+    "productionPathPercent": 20,
+    "productionPathDelta": 0,
+    "formalI6Percent": 50,
+    "gateAdvanced": false
   }
 }

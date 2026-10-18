@@ -62,7 +62,7 @@ function active(member) {
 }
 function canManage(member, domain, activeRole) {
   const needed = domain === 'workflow' ? 'workflow_config_manage' : domain === 'access' ? 'access_config_manage' : domain === 'catalogs' ? 'catalog_config_manage' : 'reconciliation_config_manage';
-  return ADMIN_ROLES.has(norm(activeRole)) || permissions(member).some(permission => PERMISSIONS.has(permission) || permission === needed);
+  return ADMIN_ROLES.has(norm(activeRole)) || permissions(member).some(permission => permission === 'config_manage' || permission === needed);
 }
 async function authorize(request, domain, write) {
   if (!request.auth || !request.auth.uid) throw new HttpsError('unauthenticated', 'Se requiere sesión activa.');
