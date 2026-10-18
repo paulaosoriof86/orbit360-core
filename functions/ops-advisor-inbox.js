@@ -3,6 +3,7 @@
 const { getApps, initializeApp } = require('firebase-admin/app');
 const { getFirestore, FieldValue } = require('firebase-admin/firestore');
 const { HttpsError, onCall } = require('firebase-functions/v2/https');
+const {resolveProductActiveRole}=require('./product-active-role-contract');
 
 const REGION = process.env.ORBIT360_FUNCTIONS_REGION || 'us-central1';
 const VERSION = 'orbit360-ops-advisor-inbox-v7-shared-task-state';
@@ -63,8 +64,9 @@ function recipientMatch(target,authz,actorUid){
   return false;
 }
 function activeMember(member) {
-  const status = norm(member && (member.status || member.estado));
-  return !!member && member.active !== false && member.activo !== false && !['inactive', 'inactivo', 'blocked', 'bloqueado', 'suspended', 'suspendido'].includes(status);
+  if (!member || member.active === false || member.activo === false || member.inactivo === true) return false;
+  const states = [member.status, member.estado].map(norm).filter(Boolean);
+  return states.length > 0 && states.every(state => state === 'active' || state === 'activo');
 }
 function rolesOf(member) {
   return unique([...(member.roles || []), member.activeRole, member.rolActivo, member.defaultRole, member.rol]).map(norm);
@@ -99,8 +101,10 @@ async function authorize(request) {
   const snap = await membershipRef(tenantId, request.auth.uid).get();
   const member = snap.exists ? snap.data() : null;
   if (!activeMember(member)) throw new HttpsError('permission-denied', 'La membresía no está activa.');
-  const roles=rolesOf(member),requestedRole=norm(request.data&&request.data.activeRole),activeRole=requestedRole||norm(member.activeRole||member.rolActivo||member.defaultRole||member.rol)||roles[0]||'';
-  if(requestedRole&&!roles.includes(requestedRole))throw new HttpsError('permission-denied','El rol activo no está asignado.');
+  let resolvedRole;
+  try{resolvedRole=resolveProductActiveRole(member,request.data&&request.data.activeRole);}
+  catch(_){throw new HttpsError('permission-denied','El rol activo no está asignado.');}
+  const roles=resolvedRole.assignedRoles,activeRole=resolvedRole.activeRole;
   const advisorId=advisorIdOf(member),opsScope=scopeOf(member,'ops',activeRole),leadsScope=scopeOf(member,'leads',activeRole);
   if (opsScope==='none'&&leadsScope==='none') throw new HttpsError('permission-denied','Los alcances de Ops y Leads están deshabilitados.');
   if ((opsScope==='own'||leadsScope==='own')&&!advisorId) throw new HttpsError('failed-precondition','La membresía no está vinculada a un asesor.');

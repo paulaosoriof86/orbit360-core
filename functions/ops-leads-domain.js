@@ -4,6 +4,7 @@ const crypto = require('node:crypto');
 const { getApps, initializeApp } = require('firebase-admin/app');
 const { getFirestore, FieldValue } = require('firebase-admin/firestore');
 const { HttpsError, onCall } = require('firebase-functions/v2/https');
+const {resolveProductActiveRole}=require('./product-active-role-contract');
 
 const REGION = process.env.ORBIT360_FUNCTIONS_REGION || 'us-central1';
 const VERSION = 'orbit360-ops-leads-domain-v1';
@@ -84,8 +85,9 @@ function permissionsOf(member) {
   return unique([...(member.permissions || []), ...(member.permisosExtra || []), ...(member.extras || [])]).map(norm);
 }
 function activeMember(member) {
-  const status = norm(member && (member.status || member.estado));
-  return !!member && member.active !== false && member.activo !== false && !['inactive', 'inactivo', 'blocked', 'bloqueado'].includes(status);
+  if (!member || member.active === false || member.activo === false || member.inactivo === true) return false;
+  const states = [member.status, member.estado].map(norm).filter(Boolean);
+  return states.length > 0 && states.every(state => state === 'active' || state === 'activo');
 }
 function scopeOf(member, domain) {
   const scopes = member.dataScopes || {};
@@ -95,10 +97,10 @@ function scopeOf(member, domain) {
   if (['ninguno', 'none'].includes(value)) return 'none';
   return 'all';
 }
-function canManage(member) {
-  const roles = rolesOf(member);
+function canManage(member, activeRole) {
   const permissions = permissionsOf(member);
-  return roles.some(role => ADMIN_ROLES.has(role)) || permissions.some(permission => MANAGE_PERMISSIONS.has(permission));
+  // Changing to Asesor cannot inherit another assigned role's admin privileges.
+  return ADMIN_ROLES.has(norm(activeRole)) || permissions.some(permission => MANAGE_PERMISSIONS.has(permission));
 }
 function actorProjection(context, member) {
   return {
@@ -114,10 +116,13 @@ async function authorize(request, operation) {
   const memberSnap = await membershipRef(tenantId, request.auth.uid).get();
   const member = memberSnap.exists ? memberSnap.data() : null;
   if (!activeMember(member)) throw new HttpsError('permission-denied', 'La membresía no está activa.');
-  if (!canManage(member) && !['update_business', 'transition_business', 'update_management', 'resolve_management'].includes(operation)) {
+  let resolvedRole;
+  try{resolvedRole=resolveProductActiveRole(member,request.data&&request.data.activeRole);}
+  catch(_){throw new HttpsError('permission-denied','El rol activo no está asignado.');}
+  if (!canManage(member,resolvedRole.activeRole) && !['update_business', 'transition_business', 'update_management', 'resolve_management'].includes(operation)) {
     throw new HttpsError('permission-denied', 'No tiene permiso para administrar este flujo.');
   }
-  return { tenantId, member, actor: actorProjection(request, member) };
+  return { tenantId, member, actor: { ...actorProjection(request, member), activeRole: resolvedRole.activeRole, roles: resolvedRole.assignedRoles } };
 }
 
 function workflowConfig(raw) {

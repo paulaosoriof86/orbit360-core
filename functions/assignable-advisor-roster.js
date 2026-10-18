@@ -2,6 +2,7 @@
 const {getApps,initializeApp}=require('firebase-admin/app');
 const {getFirestore}=require('firebase-admin/firestore');
 const {HttpsError,onCall}=require('firebase-functions/v2/https');
+const {resolveProductActiveRole}=require('./product-active-role-contract');
 const REGION=process.env.ORBIT360_FUNCTIONS_REGION||'us-central1',PREVIEW_REGION=process.env.ORBIT360_PREVIEW_FUNCTIONS_REGION||'us-east1';
 const VERSION='gravicentra-assignable-advisor-roster-v1',DASHBOARD_CONTRACT='gi-i65-b4-003-executive-read-v1',db=getFirestore(getApps()[0]||initializeApp());
 const FULL=new Set(['superadmin','super_admin','superadministrador','admintenant','admin_tenant','admin','direccion','operativo']),SELF=new Set(['asesor','comercial']);
@@ -10,7 +11,13 @@ const norm=v=>text(v,120).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowe
 const unique=a=>Array.from(new Set([].concat(a||[]).map(v=>text(v)).filter(Boolean)));
 const roles=r=>unique([...(Array.isArray(r&&r.roles)?r.roles:[]),...(Array.isArray(r&&r.rolesAsignados)?r.rolesAsignados:[]),r&&r.rol,r&&r.role,r&&r.rolDefault,r&&r.defaultRole]).map(norm);
 const countries=r=>unique([...(Array.isArray(r&&r.paises)?r.paises:[]),...(Array.isArray(r&&r.countries)?r.countries:[]),r&&r.pais,r&&r.country,r&&r.paisDefault,r&&r.countryDefault]).map(v=>text(v,8).toUpperCase());
-const active=r=>!!r&&r.activo!==false&&r.active!==false&&r.inactivo!==true&&!['inactivo','inactive','blocked','bloqueado','eliminado','deleted'].includes(norm(r.estado||r.status));
+// Roster rows may have only an activo flag; signed-in membership needs affirmative status.
+const active=r=>!!r&&r.activo!==false&&r.active!==false&&r.inactivo!==true&&!['inactivo','inactive','blocked','bloqueado','eliminado','deleted','pending','pendiente','invited','invitado','suspended','suspendido'].includes(norm(r.estado||r.status));
+function activeMember(member) {
+  if (!member || member.active === false || member.activo === false || member.inactivo === true) return false;
+  const states = [member.status, member.estado].map(norm).filter(Boolean);
+  return states.length > 0 && states.every(state => state === 'active' || state === 'activo');
+}
 function roleConfig(access,role){const all=access&&access.rolePermissions&&typeof access.rolePermissions==='object'?access.rolePermissions:{};const k=Object.keys(all).find(x=>norm(x)===norm(role));return k?all[k]:null;}
 function matrix(access,role,moduleKey,action){const rc=roleConfig(access,role);if(!rc||typeof rc!=='object')return null;const k=Object.keys(rc).find(x=>norm(x)===norm(moduleKey)),cell=k?rc[k]:null;return cell&&cell[action]!=null?cell[action]===true:null;}
 function restricted(member,moduleKey){return unique(member&&(member.modulesRestricted||member.modulosRestringidos)).map(norm).includes(norm(moduleKey));}
@@ -20,9 +27,10 @@ async function authz(request){
  if(!request.auth?.uid)throw new HttpsError('unauthenticated','Se requiere sesión activa.');
  const tenantId=text(request.data?.tenantId,160);if(!/^[A-Za-z0-9][A-Za-z0-9._:-]{1,159}$/.test(tenantId))throw new HttpsError('invalid-argument','tenantId inválido.');
  const [snap,accessSnap]=await Promise.all([db.collection('tenants').doc(tenantId).collection('members').doc(request.auth.uid).get(),db.collection('tenants').doc(tenantId).collection('config').doc('access').get()]),member=snap.exists?(snap.data()||{}):null,access=accessSnap.exists?(accessSnap.data()||{}):{};
- if(!active(member)||text(member.tenantId,160)!==tenantId)throw new HttpsError('permission-denied','Membresía inactiva o fuera del tenant.');
- const assigned=roles(member),role=norm(request.data?.activeRole||member.activeRole||member.defaultRole||member.rolActivo||member.rol);
- if(!role||!assigned.includes(role))throw new HttpsError('permission-denied','El rol activo no está asignado.');
+ if(!activeMember(member)||text(member.tenantId,160)!==tenantId)throw new HttpsError('permission-denied','Membresía inactiva o fuera del tenant.');
+ let role;
+ try{role=resolveProductActiveRole(member,request.data?.activeRole).activeRole;}
+ catch(_){throw new HttpsError('permission-denied','El rol activo no está asignado.');}
  const ops=moduleCanAssign(member,access,role,'ops'),leads=moduleCanAssign(member,access,role,'leads');if(!ops&&!leads)throw new HttpsError('permission-denied','El rol activo no puede asignar trabajo en Ops/Leads.');
  if(FULL.has(role))return{tenantId,mode:'full',member,access};if(SELF.has(role))return{tenantId,mode:'self',member,access};
  throw new HttpsError('permission-denied','El rol activo no puede asignar responsables.');
@@ -42,8 +50,11 @@ async function r23Dashboard(request){
  const tenantId=text(request.data?.tenantId,160),country=text(request.data?.country,8).toUpperCase(),month=text(request.data?.month,7);
  if(!/^[\w][\w.:-]{1,159}$/.test(tenantId)||!['GT','CO','TODOS'].includes(country)||!/^[0-9]{4}-(0[1-9]|1[0-2])$/.test(month))throw new HttpsError('invalid-argument','Consulta de Inicio inválida');
  const tenant=db.collection('tenants').doc(tenantId),[m,c]=await Promise.all([tenant.collection('members').doc(request.auth.uid).get(),tenant.collection('config').doc('access').get()]);
- const member=m.exists?m.data()||{}:null,access=c.exists?c.data()||{}:{},role=norm(request.data?.activeRole||member?.activeRole||member?.defaultRole||member?.rol);
- if(!active(member)||text(member.tenantId,160)!==tenantId||!roles(member).includes(role)||(!FULL.has(role)&&!SELF.has(role))||restricted(member,'inicio')||matrix(access,role,'inicio','ver')===false)throw new HttpsError('permission-denied','Acceso Inicio no autorizado');
+ const member=m.exists?m.data()||{}:null,access=c.exists?c.data()||{}:{};
+  let role;
+  try{role=resolveProductActiveRole(member,request.data?.activeRole).activeRole;}
+  catch(_){throw new HttpsError('permission-denied','El rol activo no está asignado.');}
+ if(!activeMember(member)||text(member.tenantId,160)!==tenantId||(!FULL.has(role)&&!SELF.has(role))||restricted(member,'inicio')||matrix(access,role,'inicio','ver')===false)throw new HttpsError('permission-denied','Acceso Inicio no autorizado');
  const ds=member.dataScopes||{},modules=ds.modules&&typeof ds.modules==='object'&&!Array.isArray(ds.modules)?ds.modules:{},mk=Object.keys(modules).find(k=>norm(k)==='inicio');
  const rawScope=(mk!==undefined?modules[mk]:undefined)??ds.default??member.scopeDatos??member.dataScope;
  const wanted=r23Scope(rawScope);

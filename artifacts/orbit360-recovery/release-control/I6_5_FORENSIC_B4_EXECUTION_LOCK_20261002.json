@@ -88,7 +88,11 @@
       "orbit360-platform/modules/inicio.js",
       "orbit360-platform/styles/infra.css",
       "functions/product-ops-leads-domain.js",
-      "orbit360-platform/core/queries.js"
+      "orbit360-platform/core/queries.js",
+      "functions/assignable-advisor-roster.js",
+      "functions/ops-advisor-inbox.js",
+      "functions/ops-leads-domain.js",
+      "functions/tenant-domain-config.js"
     ],
     "reimportAuthorized": false,
     "livePromotionAuthorized": false,
@@ -2691,5 +2695,49 @@
       "functions/ops-leads-domain.js",
       "functions/tenant-domain-config.js"
     ]
+  },
+  "paulaOct18C03FourOwnerBoundaryFix": {
+    "status": "SCOPED_SOURCE_STAGED_PENDING_EXISTING_QA",
+    "gate": "I6.5/B4-003",
+    "authority": "PAULA_20261018_CONTINUE_FROZEN_ACCELERATION_WITH_CAUSAL_SOURCE_READBACK",
+    "reason": "Four operational backends used negative-only member state checks; multi-role paths could retain elevated role",
+    "reviewedAndApprovedAsScopedSourcePreparation": true,
+    "scope": [
+      {
+        "path": "functions/assignable-advisor-roster.js",
+        "before": "a2f5d110201eb83cb0c72f7d716443c3b08c4d49",
+        "after": "75ca53db55e2665123589b0e63253a8e4f8c377c"
+      },
+      {
+        "path": "functions/ops-advisor-inbox.js",
+        "before": "1fb37c8f76647312d825fa88db7df8f66f8861ae",
+        "after": "a26aeefdb27344bf91f978ca054ae9c1bfa8c3f7"
+      },
+      {
+        "path": "functions/ops-leads-domain.js",
+        "before": "73e09a4404cb4298dc34c9c38e26ad1f960d3170",
+        "after": "1ceab5d1c65eb97c965304e417ee638fbc9ba309"
+      },
+      {
+        "path": "functions/tenant-domain-config.js",
+        "before": "c9f2bd7234252ee7281e5aca2b20601fcf8d77e3",
+        "after": "ede400068d0797e0a9677a099aa7198a25f8f9a6"
+      }
+    ],
+    "qaPath": "tools/gravicentra-b4-003-ops-leads-role-scopes.test.cjs",
+    "qaBlobSha": "3f8eaf8efc530d1f64fe304cffd2748a433ef1e5",
+    "compositionBlobSha": "b341bd162b0b48c4e315a36bc95fb6586e06785a",
+    "productSourceOnly": true,
+    "broadProductMutationAuthorized": false,
+    "productionDeployAuthorized": false,
+    "sharedFirestoreRulesDeployAuthorized": false,
+    "livePromotionAuthorized": false,
+    "realBusinessWritesAuthorized": false,
+    "realUserTokensAuthorized": false,
+    "dataMutationAuthorized": false,
+    "reimportAuthorized": false,
+    "pastFunctionalAcceptancePreserved": true,
+    "formalPointsAdded": 0,
+    "nextAction": "EXISTING_B4003_SOURCE_QA_AND_EMULATOR_THEN_NEW_EXACT_PREVIEW_AUTHORIZATION"
   }
 }

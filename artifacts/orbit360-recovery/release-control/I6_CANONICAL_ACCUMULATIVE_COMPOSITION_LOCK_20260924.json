@@ -152,14 +152,14 @@
   "productFileBlobs": {
     ".github/workflows/cotcomp-workflow-s419-source-qa.yml": "1123c1bd7848433ce51c24586e9fedbbbd581dff",
     "docs/ays/GRAVICENTRA_QUOTE_AUTHORITY_CONTRACT_v1_20261003.md": "ad1abea0181c350a0effd819cbff483673eb24dd",
-    "functions/assignable-advisor-roster.js": "a2f5d110201eb83cb0c72f7d716443c3b08c4d49",
+    "functions/assignable-advisor-roster.js": "75ca53db55e2665123589b0e63253a8e4f8c377c",
     "functions/bootstrap.js": "42fd05b81a02d428e590c36e3feb32be202f4965",
     "functions/cobros-reconciliation-domain.js": "5b27038d1c8380e4d2d0ed044996c1570d8c3767",
     "functions/cotcomp-workflow-owner-patch.test.js": "f09315b416e95415ade2d811c4d7e52baba8904d",
     "functions/document-drive-domain.js": "928dc218aa09be4648552f84502e50f4c0d65227",
     "functions/notification-outbox-processor.js": "ce31ae776beb5945741ef0f9f9dbf53075d03910",
-    "functions/ops-advisor-inbox.js": "1fb37c8f76647312d825fa88db7df8f66f8861ae",
-    "functions/ops-leads-domain.js": "73e09a4404cb4298dc34c9c38e26ad1f960d3170",
+    "functions/ops-advisor-inbox.js": "a26aeefdb27344bf91f978ca054ae9c1bfa8c3f7",
+    "functions/ops-leads-domain.js": "1ceab5d1c65eb97c965304e417ee638fbc9ba309",
     "functions/package-lock.json": "868690d441b0073c550aea2de56c35950fafa9d1",
     "functions/package.json": "2b7183aac731ee4f3e0626baa8448000d94115a1",
     "functions/payment-inference-engine.js": "16bf21177364fbb94f39fab5b8e8ec8506bbd071",
@@ -167,7 +167,7 @@
     "functions/product-operational-domain.js": "edbe77331327fdfa05a278d7c1f1b68005d70773",
     "functions/product-ops-leads-domain.js": "a0f79b34433c6b93702eabbece6a53a5e6124f45",
     "functions/tenant-branding.js": "d3c3dcd191951f91a40eb17b7cc560dc535a2a3c",
-    "functions/tenant-domain-config.js": "c9f2bd7234252ee7281e5aca2b20601fcf8d77e3",
+    "functions/tenant-domain-config.js": "ede400068d0797e0a9677a099aa7198a25f8f9a6",
     "functions/user-onboarding.js": "6512d49e4a01c4257e578652b0728f688cd063d1",
     "orbit360-platform/assets/tenant/alianzas-soluciones/logo-bolita-96.png": "9e16fae65f366556f55398309eb7bb3f398bf072",
     "orbit360-platform/assets/tenant/alianzas-soluciones/logo-oficial-360.png": "726da844034b98f3132788920a1b8111f4d1764a",
@@ -5946,5 +5946,41 @@
     "productionPromotion": false,
     "inheritedScopeFromExistingB4AllowedProductFiles": true,
     "formalPercentAdded": 0
+  },
+  "paulaOct18C03FourOwnerBoundaryFix": {
+    "status": "SOURCE_STAGED_QA_PENDING_PREVIEW_NOT_LIVE",
+    "gate": "I6.5/B4-003",
+    "sourceFiles": [
+      {
+        "path": "functions/assignable-advisor-roster.js",
+        "beforeBlobSha": "a2f5d110201eb83cb0c72f7d716443c3b08c4d49",
+        "afterBlobSha": "75ca53db55e2665123589b0e63253a8e4f8c377c"
+      },
+      {
+        "path": "functions/ops-advisor-inbox.js",
+        "beforeBlobSha": "1fb37c8f76647312d825fa88db7df8f66f8861ae",
+        "afterBlobSha": "a26aeefdb27344bf91f978ca054ae9c1bfa8c3f7"
+      },
+      {
+        "path": "functions/ops-leads-domain.js",
+        "beforeBlobSha": "73e09a4404cb4298dc34c9c38e26ad1f960d3170",
+        "afterBlobSha": "1ceab5d1c65eb97c965304e417ee638fbc9ba309"
+      },
+      {
+        "path": "functions/tenant-domain-config.js",
+        "beforeBlobSha": "c9f2bd7234252ee7281e5aca2b20601fcf8d77e3",
+        "afterBlobSha": "ede400068d0797e0a9677a099aa7198a25f8f9a6"
+      }
+    ],
+    "qaPath": "tools/gravicentra-b4-003-ops-leads-role-scopes.test.cjs",
+    "qaBlobSha": "3f8eaf8efc530d1f64fe304cffd2748a433ef1e5",
+    "productSourceStaged": true,
+    "backendDeployed": false,
+    "sharedRulesDeploy": false,
+    "livePromotion": false,
+    "realUserImpersonation": false,
+    "realBusinessWrites": 0,
+    "reimport": false,
+    "formalPointsAdded": 0
   }
 }

@@ -49,3 +49,59 @@ const membershipCases=[
 for(const [member,expected,label] of membershipCases)assert.equal(membershipGate.active(member),expected,'C03_OPS_LEADS_MEMBERSHIP_'+label);
 assert.match(domain,/!active\(member\)\|\|text\(member\.tenantId,180\)!==tenantId/,'C03_WRITER_MUST_VALIDATE_ACTIVE_MEMBER_AND_TENANT');
 console.log('B4_003_C03_OPS_LEADS_MEMBERSHIP_WRITER_SOURCE_QA_PASS checks='+membershipCases.length+' mock_only_no_writes');
+
+// C03 membership and selected-role boundary: source-only VM, no external reads.
+// Keep assignable advisor roster eligibility separate from auth membership status.
+const c03Cases=[
+ [{status:'active'},true,'active'],[{estado:'activo'},true,'activo_alias'],
+ [{status:'active',estado:'activo'},true,'matching_aliases'],
+ [{},false,'missing_state'],[{active:true},false,'boolean_only'],
+ [{status:'pending'},false,'pending'],[{status:'pendiente'},false,'pendiente'],
+ [{status:'invited'},false,'invited'],[{status:'invitado'},false,'invitado'],
+ [{status:'blocked'},false,'blocked'],[{status:'suspended'},false,'suspended'],
+ [{status:'deleted'},false,'deleted'],
+ [{status:'active',estado:'pending'},false,'contradictory_alias'],
+ [{status:'invited',estado:'active'},false,'contradictory_reverse'],
+ [{status:'active',active:false},false,'active_false'],
+ [{status:'active',activo:false},false,'activo_false'],
+ [{status:'active',inactivo:true},false,'inactivo_true']
+];
+const c03Owners=[
+ ['functions/assignable-advisor-roster.js','function activeMember(member) {','function roleConfig(','activeMember'],
+ ['functions/ops-advisor-inbox.js','function activeMember(member) {','function rolesOf(member) {','activeMember'],
+ ['functions/ops-leads-domain.js','function activeMember(member) {','function scopeOf(member, domain) {','activeMember'],
+ ['functions/tenant-domain-config.js','function active(member) {','function canManage(member, domain, activeRole) {','active']
+];
+let securityChecks=0;
+for(const [path,start,end,name] of c03Owners){
+ const fn=grab(path,start,end,name);
+ for(const [member,expected,label] of c03Cases){
+  assert.equal(fn[name](member),expected,'C03_MEMBERSHIP_'+path+'_'+label);securityChecks++;
+ }
+ const source=fs.readFileSync(path,'utf8');
+ assert.match(source,/resolveProductActiveRole\(member,\s*request\.data/,'C03_ROLE_RESOLVER_NOT_WIRED_'+path);securityChecks++;
+}
+const roster=grab('functions/assignable-advisor-roster.js','const active=r=>','function activeMember(member) {','active');
+assert.equal(roster.active({activo:true}),true,'EXISTING_VALID_ADVISOR_BOOLEAN_STATUS_PRESERVED');
+assert.equal(roster.active({estado:'activo'}),true,'EXISTING_VALID_ADVISOR_STATUS_PRESERVED');
+assert.equal(roster.active({estado:'pending'}),false,'PENDING_ADVISOR_CANNOT_BE_ASSIGNED');
+securityChecks+=3;
+const roleContract=require('../functions/product-active-role-contract');
+const multi={roles:['Asesor','Operativo'],activeRole:'Operativo',status:'active'};
+assert.equal(roleContract.resolveProductActiveRole(multi,'Asesor').activeRole,'asesor');
+assert.equal(roleContract.resolveProductActiveRole(multi,'Operativo').activeRole,'operativo');
+assert.throws(()=>roleContract.resolveProductActiveRole(multi,'Dirección'),/PRODUCT_ACTIVE_ROLE_NOT_ASSIGNED/);
+assert.throws(()=>roleContract.resolveProductActiveRole({roles:[],activeRole:'Dirección'},'Dirección'),/PRODUCT_ASSIGNED_ROLES_MISSING/);
+securityChecks+=4;
+const adminRoles=new Set(['direccion','operativo','admin','admintenant','superadmin']);
+const legacyAdmin=grab('functions/ops-leads-domain.js','function canManage(member, activeRole) {','function actorProjection(','canManage',{ADMIN_ROLES:adminRoles,permissionsOf:member=>member.permissions||[]});
+assert.equal(legacyAdmin.canManage(multi,'asesor'),false,'LEGACY_ADVISOR_NO_ADMIN_INHERIT');
+assert.equal(legacyAdmin.canManage(multi,'operativo'),true,'LEGACY_ACTIVE_OPERATIVO_PRESERVED');
+securityChecks+=2;
+const accessAdmin=grab('functions/tenant-domain-config.js','function canManage(member, domain, activeRole) {','async function authorize(','canManage',{
+ ADMIN_ROLES:adminRoles,permissions:member=>member.permissions||[],PERMISSIONS:new Set(['config_manage'])});
+assert.equal(accessAdmin.canManage(multi,'access','asesor'),false,'CONFIG_ADVISOR_NO_ADMIN_INHERIT');
+assert.equal(accessAdmin.canManage(multi,'access','operativo'),false,'CONFIG_OPERATIVO_NOT_ADMIN');
+assert.equal(accessAdmin.canManage(multi,'access','admin'),true,'CONFIG_APPROVED_ADMIN_PRESERVED');
+securityChecks+=3;
+console.log('B4_003_C03_FOUR_OWNER_MEMBERSHIP_QA_PASS checks='+securityChecks+' mock_only_no_writes');

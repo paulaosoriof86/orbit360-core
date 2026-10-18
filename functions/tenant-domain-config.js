@@ -4,6 +4,7 @@ const crypto = require('node:crypto');
 const { getApps, initializeApp } = require('firebase-admin/app');
 const { getFirestore, FieldValue } = require('firebase-admin/firestore');
 const { HttpsError, onCall } = require('firebase-functions/v2/https');
+const {resolveProductActiveRole}=require('./product-active-role-contract');
 
 const REGION = process.env.ORBIT360_FUNCTIONS_REGION || 'us-central1';
 const PREVIEW_REGION = process.env.ORBIT360_PREVIEW_FUNCTIONS_REGION || 'us-east1';
@@ -55,12 +56,13 @@ function permissions(member) {
   return unique([...(member.permissions || []), ...(member.permisosExtra || []), ...(member.extras || [])]).map(norm);
 }
 function active(member) {
-  const state = norm(member && (member.status || member.estado));
-  return !!member && member.active !== false && member.activo !== false && !['inactive', 'inactivo', 'blocked', 'bloqueado'].includes(state);
+  if (!member || member.active === false || member.activo === false || member.inactivo === true) return false;
+  const states = [member.status, member.estado].map(norm).filter(Boolean);
+  return states.length > 0 && states.every(state => state === 'active' || state === 'activo');
 }
-function canManage(member, domain) {
+function canManage(member, domain, activeRole) {
   const needed = domain === 'workflow' ? 'workflow_config_manage' : domain === 'access' ? 'access_config_manage' : domain === 'catalogs' ? 'catalog_config_manage' : 'reconciliation_config_manage';
-  return roles(member).some(role => ADMIN_ROLES.has(role)) || permissions(member).some(permission => PERMISSIONS.has(permission) || permission === needed);
+  return ADMIN_ROLES.has(norm(activeRole)) || permissions(member).some(permission => PERMISSIONS.has(permission) || permission === needed);
 }
 async function authorize(request, domain, write) {
   if (!request.auth || !request.auth.uid) throw new HttpsError('unauthenticated', 'Se requiere sesión activa.');
@@ -68,8 +70,11 @@ async function authorize(request, domain, write) {
   const snap = await memberRef(tenantId, request.auth.uid).get();
   const member = snap.exists ? snap.data() : null;
   if (!active(member)) throw new HttpsError('permission-denied', 'Membresía inactiva.');
-  if (write && !canManage(member, domain)) throw new HttpsError('permission-denied', 'No puede administrar esta configuración.');
-  return { tenantId, actor: { uid: request.auth.uid, activeRole: text(member.activeRole || member.rolActivo || member.rol, 100) } };
+  let resolvedRole;
+  try{resolvedRole=resolveProductActiveRole(member,request.data&&request.data.activeRole);}
+  catch(_){throw new HttpsError('permission-denied','El rol activo no está asignado.');}
+  if (write && !canManage(member, domain, resolvedRole.activeRole)) throw new HttpsError('permission-denied', 'No puede administrar esta configuración.');
+  return { tenantId, actor: { uid: request.auth.uid, activeRole: resolvedRole.activeRole } };
 }
 
 function validateWorkflow(input) {
