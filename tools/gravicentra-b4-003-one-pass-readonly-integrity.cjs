@@ -152,6 +152,103 @@ async function main(){
   }
   result.institutionalGoalAuthority={status:'READONLY_CONFIGURED_TARGET_CARDINALITY_NOT_ATTESTED_UI',months:groupedGoals,
     source:'tenants/'+tenantId+'/data/metas/items',writes:0,amountsDisclosed:false};
+  // B4-003 UAT2 precise canonical configuration/roster readback.
+  // All output is aggregate/role-level only. Never expose UID, names, email,
+  // policy numbers, raw IDs, documents, credentials or individual records.
+  const tenant=db.collection('tenants').doc(tenantId);
+  const [accessSnap,previewAccessSnap,memberSnap]=await Promise.all([
+    tenant.collection('config').doc('access').get(),
+    tenant.collection('previewUatConfig').doc('access').get(),
+    tenant.collection('members').limit(251).get()
+  ]);
+  if(memberSnap.size>250)throw Error('B4_003_MEMBERSHIP_READ_BOUND_EXCEEDED');
+  const access=accessSnap.exists?accessSnap.data()||{}:{};
+  const rolePermissions=access.rolePermissions&&typeof access.rolePermissions==='object'?access.rolePermissions:{};
+  const roleScopes=access.roleScopes&&typeof access.roleScopes==='object'?access.roleScopes:{};
+  const moduleNames=['cancelaciones','cliente360','polizas','cobros','ops','leads','equipo','aseguradoras'];
+  const roles=['Dirección','SuperAdmin','AdminTenant','Admin','Operativo','Asesor','Comercial','Finanzas'];
+  const grant=(role,moduleKey,action)=>{
+    const roleKey=Object.keys(rolePermissions).find(key=>norm(key)===norm(role));
+    const entry=roleKey&&rolePermissions[roleKey]&&typeof rolePermissions[roleKey]==='object'?rolePermissions[roleKey]:{};
+    const moduleName=Object.keys(entry).find(key=>norm(key)===norm(moduleKey));
+    const flags=moduleName&&entry[moduleName]&&typeof entry[moduleName]==='object'?entry[moduleName]:null;
+    return flags&&typeof flags[action]==='boolean'?flags[action]:null;
+  };
+  result.canonicalAccessConfigReadback={
+    canonicalDocumentExists:accessSnap.exists,
+    previewIsolatedDocumentExists:previewAccessSnap.exists,
+    storedRolesWithPermissions:Object.keys(rolePermissions).length,
+    scopesDefined:Object.keys(roleScopes).length,
+    securitySemantics:'null means no explicit server override; a UI checkbox alone is not an authorization',
+    modules:Object.fromEntries(roles.map(role=>[role,Object.fromEntries(moduleNames.map(moduleKey=>[
+      moduleKey,{ver:grant(role,moduleKey,'ver'),editar:grant(role,moduleKey,'editar')}
+    ]))])),
+    roleScopes:Object.fromEntries(roles.map(role=>{
+      const key=Object.keys(roleScopes).find(x=>norm(x)===norm(role));
+      const v=key?safe(roleScopes[key]).toLowerCase():'';
+      return[role,['all','todos','team','equipo','own','propios','none','ninguno'].includes(v)?v:null];
+    })),
+    noFullConfigOrPersonalIdentityExported:true,fromServerAdminReadOnly:true
+  };
+  const membershipRows=memberSnap.docs.map(doc=>doc.data()||{});
+  const membershipRoles={};
+  const stateBuckets={active:0,inactive:0,pending:0,other:0};
+  const administrativeRoles=new Set(['direccion','superadmin','admintenant','admin','finanzas']);
+  let adminMemberships=0,multiRoleMemberships=0;
+  for(const m of membershipRows){
+    const roleSet=[...new Set([...(Array.isArray(m.roles)?m.roles:[]),m.rol,m.role].map(norm).filter(Boolean))];
+    const state=norm(m.status||m.estado);
+    if(['active','activo'].includes(state)&&m.inactivo!==true&&m.active!==false&&m.activo!==false)stateBuckets.active++;
+    else if(['invited','invitado','pending','pendiente'].includes(state))stateBuckets.pending++;
+    else if(['disabled','inactive','inactivo','blocked','bloqueado','suspended'].includes(state)||m.inactivo===true||m.active===false)stateBuckets.inactive++;
+    else stateBuckets.other++;
+    for(const role of roleSet)membershipRoles[role]=(membershipRoles[role]||0)+1;
+    if(roleSet.some(x=>administrativeRoles.has(x)))adminMemberships++;
+    if(roleSet.length>1)multiRoleMemberships++;
+  }
+  result.canonicalTeamMembershipReadback={
+    memberDocuments:membershipRows.length,status:stateBuckets,
+    roleCounts:membershipRoles,administrativeMemberships:adminMemberships,
+    multiRoleMemberships,source:'tenants/'+tenantId+'/members',
+    notes:'membership counts are not proof of user directory projection or exact UID authorization',
+    noNamesEmailsUidsOrMemberDocs:true
+  };
+  const activePolicy=p=>p&&['Vigente','Por renovar'].includes(safe(p.estado));
+  const policyRows=sets.polizas,clientRows=sets.clientes;
+  const canonicalClientIds=new Set(clientRows.map(c=>safe(c.id||c.canonicalDocumentId)).filter(Boolean));
+  const nonDeletedClientIds=new Set(clientRows.filter(c=>
+    !(c.deleted===true||c.eliminado===true||c.estado==='eliminado'||c.inactivo===true||c.activo===false)
+  ).map(c=>safe(c.id||c.canonicalDocumentId)).filter(Boolean));
+  const policyNoClientLink=policyRows.filter(p=>!safe(p.clienteId)).length;
+  const policyClientMissing=policyRows.filter(p=>safe(p.clienteId)&&!canonicalClientIds.has(safe(p.clienteId)));
+  const policyClientNonDeleted=policyRows.filter(p=>nonDeletedClientIds.has(safe(p.clienteId)));
+  const byCountry={};
+  for(const country of ['GT','CO']){
+    const ps=policyRows.filter(p=>safe(p.pais||p.country).toUpperCase()===country);
+    const linked=ps.filter(p=>nonDeletedClientIds.has(safe(p.clienteId)));
+    byCountry[country]={
+      policiesAll:ps.length,policiesActiveAll:ps.filter(activePolicy).length,
+      linkedNonDeletedClients:linked.length,linkedActive:linked.filter(activePolicy).length,
+      notLinkedToVisibleNonDeletedClient:ps.length-linked.length
+    };
+  }
+  const typeCounts={};
+  for(const c of clientRows){
+    const key=safe(c.tipo||'(sin tipo)').slice(0,70);
+    typeCounts[key]=(typeCounts[key]||0)+1;
+  }
+  result.client360PolicyUniverseCausalReadback={
+    fullPolicies:policyRows.length,fullActive:policyRows.filter(activePolicy).length,
+    fullClients:clientRows.length,nonDeletedClients:nonDeletedClientIds.size,
+    linkedToNonDeletedClients:policyClientNonDeleted.length,
+    linkedActive:policyClientNonDeleted.filter(activePolicy).length,
+    policyMissingClientId:policyNoClientLink,
+    policyClientIdNotInCanonicalClients:policyClientMissing.length,
+    countryBreakdown:byCountry,clientTypeVocabularyCounts:typeCounts,
+    exactIdJoinUsed:true,uiScopedUniverseNotAttested:true,
+    noPolicyNumbersOrRawRecordIdsExported:true
+  };
+
   result.status='READONLY_CARDINALITY_AND_RELATION_AUDIT_COMPLETE_NOT_AUTHENTICATED_SCOPE_PASS';
 }
 main().catch(e=>{result.status='FAIL';result.errorCode=safe(e.message).slice(0,120);process.exitCode=1;}).finally(async()=>{
