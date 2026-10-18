@@ -47,6 +47,16 @@ async function run(){
    await setDoc(doc(db,canonical('vehiculos','v_own')),{tenantId:tenant,polizaId:'own',clienteId:'c_own'});
    await setDoc(doc(db,canonical('carteraPrimas','d_own')),{tenantId:tenant,polizaId:'own',clienteId:'c_own',monto:10});
    await setDoc(doc(db,canonical('cobros','pay_own')),{tenantId:tenant,polizaId:'own',clienteId:'c_own',monto:6});
+   // B4-003 security UAT surrogate: synthetic only, no real tenant or QA fixture writes.
+   await setDoc(doc(db,canonical('cancelaciones','canOwn')),{tenantId:tenant,polizaId:'own',clienteId:'c_own',pais:'CO',asesorId:'advisor-other',motivo:'Synthetic cancellation'});
+   await setDoc(doc(db,canonical('cancelaciones','canForeign')),{tenantId:tenant,polizaId:'foreign',clienteId:'c_foreign',motivo:'Synthetic foreign'});
+   await setDoc(doc(db,canonical('cancelaciones','canCO')),{tenantId:tenant,polizaId:'co',clienteId:'c_co',motivo:'Synthetic CO'});
+   await setDoc(doc(db,canonical('cancelaciones','canOrphan')),{tenantId:tenant,polizaId:'missing',clienteId:'c_own'});
+   await setDoc(doc(db,canonical('cancelaciones','canMismatch')),{tenantId:tenant,polizaId:'own',clienteId:'c_foreign'});
+   await setDoc(doc(db,canonical('auditoria','auGT')),{tenantId:tenant,pais:'GT',accion:'alta',password:'MUST_NOT_LEAK',before:{password:'MUST_NOT_LEAK'}});
+   await setDoc(doc(db,canonical('auditoria','auCO')),{tenantId:tenant,pais:'CO',accion:'cambio'});
+   await setDoc(doc(db,canonical('auditoria','auGlobal')),{tenantId:tenant,accion:'revisión',credentialRef:'RESTRICTED_REFERENCE',after:{secret:'MUST_NOT_LEAK'}});
+   await setDoc(doc(db,canonical('auditoria','auForeign')),{tenantId:'another-tenant',accion:'no revelar'});
    await setDoc(doc(db,legacy('polizas','own')),{tenantId:tenant,pais:'GT',asesorId:'advisor-own'});
   });
   const own=env.authenticatedContext('opGT',{email:'synthetic-op@example.invalid'}).firestore();
@@ -246,6 +256,50 @@ async function run(){
     await denyRelated(()=>listRelated('opGT','operativo','vehiculos','',{policyIds:['own'],country:'CO'}),'POLICY_NOT_FOUND_OR_DENIED');batchChecks++;
     await denyRelated(()=>listRelated('opGT','operativo','clientes','',{policyIds:['own']}),'POLICY_ANCHOR_UNEXPECTED');batchChecks++;
     console.log('B4_003_EMULATOR_PROTECTED_RELATED_BATCH_PASS assertions='+batchChecks+' synthetic_only no_deploy');
+
+    // Current-source B4-003 role/country tests run using synthetic emulator UIDs.
+    // Even a privileged role cannot directly GET, LIST or mutate canonical records.
+    let restrictedDirectDenials=0,restrictedServerChecks=0;
+    const directContexts=[own,advisor,admin];
+    for(const client of directContexts){
+      for(const [coll,id] of [['cancelaciones','canOwn'],['auditoria','auGT']]){
+        await assertFails(getDoc(doc(client,canonical(coll,id))));restrictedDirectDenials++;
+        await assertFails(getDocs(collection(client,'tenants/'+tenant+'/data/'+coll+'/items')));restrictedDirectDenials++;
+        await assertFails(setDoc(doc(client,canonical(coll,id)),{tenantId:tenant,pais:'GT'}));restrictedDirectDenials++;
+      }
+    }
+    assert.equal(restrictedDirectDenials,18);
+    console.log('B4_003_EMULATOR_CANCEL_AUDIT_DIRECT_DENIAL_PASS assertions='+restrictedDirectDenials+' synthetic_only no_deploy');
+    const opCancellation=await listRelated('opGT','operativo','cancelaciones');
+    assert.deepEqual(opCancellation.rows.map(x=>x.id),['canOwn']);
+    assert.equal(opCancellation.rows[0].pais,'GT');
+    assert.equal(opCancellation.rows[0].asesorId,'advisor-own');restrictedServerChecks++;
+    const coCancellation=await listRelated('opGT','operativo','cancelaciones','',{country:'CO'});
+    assert.deepEqual(coCancellation.rows.map(x=>x.id),['canCO']);restrictedServerChecks++;
+    await denyRelated(()=>listRelated('advisorGT','asesor','cancelaciones'),'MODULE_DENIED');restrictedServerChecks++;
+    await denyRelated(()=>listRelated('opGT','operativo','cancelaciones','',{cursor:'canForeign'}),'CURSOR_DENIED');restrictedServerChecks++;
+    await denyRelated(()=>readRelated('cancelaciones','canMismatch'),'RECORD_NOT_FOUND_OR_DENIED');restrictedServerChecks++;
+    await denyRelated(()=>readRelated('cancelaciones','canOrphan'),'RECORD_NOT_FOUND_OR_DENIED');restrictedServerChecks++;
+    const adminAudit=await listRelated('adminGT','Admin','auditoria');
+    assert.deepEqual(adminAudit.rows.map(x=>x.id),['auGT','auGlobal']);
+    assert.ok(adminAudit.rows.every(x=>!('password' in x)&&!('before' in x)&&!('after' in x)&&!('credentialRef' in x)));
+    restrictedServerChecks++;
+    const adminAuditCO=await listRelated('adminGT','Admin','auditoria','',{country:'CO'});
+    assert.deepEqual(adminAuditCO.rows.map(x=>x.id),['auCO','auGlobal']);restrictedServerChecks++;
+    await denyRelated(()=>listRelated('opGT','operativo','auditoria'),'TEAM_DIRECTORY_DENIED');restrictedServerChecks++;
+    await denyRelated(()=>listRelated('advisorGT','asesor','auditoria'),'TEAM_DIRECTORY_DENIED');restrictedServerChecks++;
+    await denyRelated(()=>listRelated('adminGT','Admin','auditoria','',{cursor:'auForeign'}),'CURSOR_DENIED');restrictedServerChecks++;
+    await denyRelated(()=>readScopedRelatedDocument({
+      db,auth:{uid:'adminGT',token:{}},request:{tenantId:tenant,collection:'auditoria',documentId:'auCO',
+        activeRole:'Admin',country:'GT'}
+    }),'RECORD_NOT_FOUND_OR_DENIED');restrictedServerChecks++;
+    await denyRelated(()=>readScopedRelatedList({
+      db,auth:{uid:'adminGT',token:{giActiveRole:'Operativo'}},
+      request:{tenantId:tenant,collection:'auditoria',activeRole:'Admin',country:'GT',mode:'list',pageSize:20}
+    }),'SIGNED_ACTIVE_ROLE_MISMATCH');restrictedServerChecks++;
+    assert.equal(restrictedServerChecks,13);
+    console.log('B4_003_EMULATOR_CANCEL_AUDIT_SERVER_ROLE_COUNTRY_PASS assertions='+restrictedServerChecks+' synthetic_only no_deploy');
+
 
     await env.withSecurityRulesDisabled(async context=>{
       await setDoc(doc(context.firestore(),member('opGT')),{uid:'opGT',tenantId:tenant,status:'active',
