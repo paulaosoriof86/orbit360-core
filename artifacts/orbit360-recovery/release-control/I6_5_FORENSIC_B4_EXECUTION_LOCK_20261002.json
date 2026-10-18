@@ -2933,5 +2933,18 @@
     "previewBuildId": "gi-i65-b4-373a91ef46e1-57f234755dc1",
     "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-39159944246-pir227nq.web.app",
     "securityP0Closed": false
+  },
+  "paulaOct18SecondUatReadback": {
+    "status": "HUMAN_UAT_REJECTED_FUNCTIONAL_HOLD",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PAULA_20261018_SECOND_UAT_ROLE_PERMISSIONS_AND_MODULE_COVERAGE.json",
+    "receiptBlobSha": "ebb5e503e2fd575d1f6c98d99af51799d6ea4820",
+    "sourcePreviewRunId": 39159944246,
+    "issues": 14,
+    "roleMatrixRealVerified": false,
+    "acceptedFunctionalClosuresNew": 0,
+    "nextSameGate": "C03_C04_EFFECTIVE_ROLE_ACCESS_PLUS_PERFORMANCE_RECONCILIATION",
+    "sharedRulesDeploy": false,
+    "livePromotion": false,
+    "dataWrites": 0
   }
 }

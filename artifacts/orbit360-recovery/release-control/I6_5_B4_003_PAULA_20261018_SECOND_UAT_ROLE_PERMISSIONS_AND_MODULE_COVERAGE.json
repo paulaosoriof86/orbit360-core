@@ -1,0 +1,178 @@
+{
+  "schema": "GRAVICENTRA_I65_B4003_PAULA_SECOND_UAT_FROZEN_OBSERVATIONS_V1",
+  "localDate": "2026-10-18",
+  "status": "USER_REPORTED_UAT_FAILURES_SOURCE_CAUSAL_TRIAGE_NO_NEW_PASS",
+  "sourceAuthority": {
+    "repo": "paulaosoriof86/orbit360-core",
+    "ref": "recovery/fase-a-clean-20260831",
+    "baselineHead": "ee6a111f0f98f554781f475c99fdb1ce28a05c1d",
+    "previewSourceSha": "373a91ef46e11ce4b846774e609c2fd07a7ec2a6",
+    "previewRunId": 39159944246,
+    "buildId": "gi-i65-b4-373a91ef46e1-57f234755dc1",
+    "previewReceipt": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PAULA_UAT_RECOVERY_EXACT_PREVIEW_READBACK_20261018.json"
+  },
+  "existingPlan": {
+    "gate": "I6.5/B4-003",
+    "tasksPreserved": 86,
+    "findingsPreserved": 295,
+    "attentionPreserved": 166,
+    "activeNextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_R20_TARGETED_PAULA_VISUAL"
+  },
+  "businessProgress": {
+    "accreditedPercent": 20,
+    "passedChecks": 2,
+    "totalChecks": 10,
+    "deltaPercentPoints": 0,
+    "humanUatLatestAccepted": false,
+    "remainingSafetyHolds": true
+  },
+  "method": "Source-backed cause when verified; screenshot observation otherwise. Role checkbox visibility is NOT actual permission enforcement; no auth persona replay, no secrets.",
+  "findings": [
+    {
+      "id": "UAT2-01",
+      "severity": "P0",
+      "module": "Equipo",
+      "proof": "Screenshot shows 7 users, 7 asesor roles, 3 operativo, 4 multirol but zero administrative; source team.filter counts only Dirección/Admin/Finanzas and excludes SuperAdmin/AdminTenant",
+      "rootVerified": true,
+      "source": "orbit360-platform/modules/equipo.js",
+      "sourceBlob": "d38a48e41680193906637c08f8e6695b221099b7",
+      "fixGate": "B4-003 existing owner; require no widened permissions"
+    },
+    {
+      "id": "UAT2-02",
+      "severity": "P0",
+      "module": "Permisos por rol",
+      "proof": "Visible checkbox matrix and scopes are not proof of server readback/actual per-UID enforcement; preview only deployed two read-only callables and domainConfigPreview is not one of them",
+      "rootVerified": true,
+      "source": "orbit360-platform/core/tenant-domain-config-client.js",
+      "sourceBlob": "0ce2acdd0022fae441e39992444c46ab99cc3585",
+      "fixGate": "actual canonical access GET, persist/save gated, role-country-module negative and positive verification"
+    },
+    {
+      "id": "UAT2-03",
+      "severity": "P0",
+      "module": "Roles actual vs label",
+      "proof": "Authenticated tab displays select value SuperAdmin with text Dirección; the UI cannot be treated as an attested separate Dirección-role test",
+      "rootVerified": true,
+      "source": "orbit360-platform/core/access-role-session-owner-v20260728.js",
+      "fixGate": "role code+label mapping in readback/QA, no permission impersonation"
+    },
+    {
+      "id": "UAT2-04",
+      "severity": "P0",
+      "module": "Cancelaciones",
+      "proof": "Dirección list shows cancellation records including B4-003 QA case; Operativo navigation explicitly denies the module, although current membership definition includes cancelaciones for Operativo and Asesor",
+      "rootVerified": true,
+      "source": "orbit360-platform/core/membership-multirol-contract-p0.js",
+      "fixGate": "router/UI/per-user matrix/scoped callable cross-parity; Asesor own, Operativo approved team/all, negative foreign"
+    },
+    {
+      "id": "UAT2-05",
+      "severity": "P0",
+      "module": "Cliente360/Polizas",
+      "proof": "Dirección/Operativo displayed 434 clients 218 of 1413 policy universe; Pólizas displayed 230 active of 1425; Asesor displayed 392 clients and 191 active of 1245 policies; do not equate screen totals to authorized own scope",
+      "rootVerified": false,
+      "fixGate": "canonical policy IDs + client relations + advisor ownership, country GT/CO and role matrices, freeze differing KPI denominators"
+    },
+    {
+      "id": "UAT2-06",
+      "severity": "P0",
+      "module": "Cobros/Recaudo",
+      "proof": "Directory shows 1243 confirmed receipts all-period, 1238 pending reconciliation and 5 reconciled, while monthly personal recaudo may show zero; role readbacks may take minutes and initial list shows 4-5 rows before global hydration",
+      "rootVerified": false,
+      "fixGate": "October 2026 paid and applied dates by authoritative record ID, payer/role/country/currency, SIGA inference contract, server completeness and measured cold/warm latency"
+    },
+    {
+      "id": "UAT2-07",
+      "severity": "P0",
+      "module": "Seguridad",
+      "proof": "Shared effective Firestore Rules still allow broad tenant-member read/write; no real signed multi-UID role negative/positive readback attestation",
+      "rootVerified": true,
+      "fixGate": "C03/C04 rules+writes+preview/live parity, real GT/CO identity tests"
+    },
+    {
+      "id": "UAT2-08",
+      "severity": "P1",
+      "module": "Inicio/Visual premium",
+      "proof": "Protection/shield emoji appears but non-premium colors/dimension; rotating quotes work; dashboard loading for some roles, leading copy and hierarchy vary",
+      "rootVerified": false,
+      "fixGate": "revised premium visual approved token baseline and no loss, real KPI readiness"
+    },
+    {
+      "id": "UAT2-09",
+      "severity": "P1",
+      "module": "Equipo tabla/matriz/modales",
+      "proof": "Low contrast, dense hierarchies, very small labels, long horizontal permissions table, metadata/UI notes, nested-scroll credential form; hover/keyboard/mobile QA absent",
+      "rootVerified": false,
+      "fixGate": "cross-module tokens and actual accessible premium contrast and responsive tests"
+    },
+    {
+      "id": "UAT2-10",
+      "severity": "P0",
+      "module": "QA fixtures",
+      "proof": "B4-003 QA Client/collaboration, synthetic renewal/cancellation appear in productive business-facing priority views; provenance and rollback/cleanup unproven",
+      "rootVerified": false,
+      "fixGate": "per-record provenance and candidate QA quarantine, no delete/reimport without authorization"
+    },
+    {
+      "id": "UAT2-11",
+      "severity": "P0",
+      "module": "Renovaciones/Cronograma",
+      "proof": "Renewals board shows 26 overdue, 3 <=15 days, 10 at 16-45, 38 at 46-90 while Inicio/Pólizas sometimes show 16 <=45; Cronograma shows dated receipts and renewals; route relations/actions unproved",
+      "rootVerified": false,
+      "fixGate": "compare exact IDs, renewability semantics, country/timezone; follow buttons action readback"
+    },
+    {
+      "id": "UAT2-12",
+      "severity": "P0",
+      "module": "Notificaciones",
+      "proof": "The visible notifications/inbox count differs materially across active roles; filters and read/unread identity semantics were not attested",
+      "rootVerified": false,
+      "fixGate": "same UID role-switch, recipient scope, unread count and no cross-role stale cache"
+    },
+    {
+      "id": "UAT2-13",
+      "severity": "P0",
+      "module": "Ops/Leads/Aseguradoras/Calidad/Notificaciones",
+      "proof": "Previous source and synthetic tests exist but no new exact Preview module-role-viewport UAT proof in supplied images; do not mark 'not built' or 'PASS'",
+      "rootVerified": false,
+      "fixGate": "individual module QA + cross-module relations/roles/GT/CO and exact source owner buildId"
+    },
+    {
+      "id": "UAT2-14",
+      "severity": "P1",
+      "module": "Equipo metas/comisiones/historial",
+      "proof": "Monthly goals and commission fields now visible; nonconfigured values labeled provisional zero, raw audit action keys and historic internal QA reasons shown; no latest writes demonstrated",
+      "rootVerified": false,
+      "fixGate": "canonical goals, before-after controlled write authorization, stable audit readback, readable labels and no internal technical prose"
+    }
+  ],
+  "passPreserved": [
+    "Exact hosted Preview readback TECHNICAL PASS only",
+    "Previously accepted module visual versions preserved unless a reproduced regression shows invalidation"
+  ],
+  "mustNotClaim": [
+    "Production-ready",
+    "Effective permission matrix PASS",
+    "Member or advisor data safe across roles",
+    "October personal recaudo zero",
+    "Ops/Leads/Aseguradoras/Calidad/Notificaciones functional PASS",
+    "No issues because Preview deploy succeeded"
+  ],
+  "nextInExistingGate": [
+    "Run exact authenticated access config/read-only permissions GET if authorized",
+    "Causal role/tenant/user/UID source tracing + server denial and authorized positives",
+    "Repair false administrative count with existing Equipo owner + QA, not a new module",
+    "Resolve Cancelaciones UI/server role permission drift without widening Asesor",
+    "Reconcile policies/clients and financial row-ID sets, timing and view readiness",
+    "Source-permitted grouped patch + existing QA emulator + only then new exact Preview with targeted review guide"
+  ],
+  "safety": {
+    "liveDeploy": false,
+    "sharedRulesDeploy": false,
+    "dataWrites": 0,
+    "sourceCodeMutatedByThisReceipt": false,
+    "reimport": false,
+    "realUserImpersonation": false
+  }
+}
