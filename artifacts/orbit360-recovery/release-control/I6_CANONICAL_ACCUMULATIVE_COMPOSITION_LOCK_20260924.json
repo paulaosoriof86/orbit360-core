@@ -165,7 +165,7 @@
     "functions/payment-inference-engine.js": "16bf21177364fbb94f39fab5b8e8ec8506bbd071",
     "functions/product-insurer-credentials.js": "04e681fdba71ee8438429dda11ae50edf9a40c8e",
     "functions/product-operational-domain.js": "edbe77331327fdfa05a278d7c1f1b68005d70773",
-    "functions/product-ops-leads-domain.js": "7156b5ff6d6dbf7ec9460b1be6c4efae0bc3ac5c",
+    "functions/product-ops-leads-domain.js": "a0f79b34433c6b93702eabbece6a53a5e6124f45",
     "functions/tenant-branding.js": "d3c3dcd191951f91a40eb17b7cc560dc535a2a3c",
     "functions/tenant-domain-config.js": "c9f2bd7234252ee7281e5aca2b20601fcf8d77e3",
     "functions/user-onboarding.js": "6512d49e4a01c4257e578652b0728f688cd063d1",
@@ -5929,5 +5929,22 @@
         "runPending": true
       }
     ]
+  },
+  "paulaOct18C03CommercialWriterSourceFix": {
+    "gate": "I6.5/B4-003",
+    "status": "SCOPED_C03_SOURCE_STAGED_QA_PENDING_NO_DEPLOY",
+    "sourcePath": "functions/product-ops-leads-domain.js",
+    "beforeBlobSha": "7156b5ff6d6dbf7ec9460b1be6c4efae0bc3ac5c",
+    "afterBlobSha": "a0f79b34433c6b93702eabbece6a53a5e6124f45",
+    "qaPath": "tools/gravicentra-b4-003-ops-leads-role-scopes.test.cjs",
+    "qaBlobSha": "0e2e985a03df20233955206c8b205bc98e2e697a",
+    "executorPath": ".github/workflows/gravicentra-b4-003-executor.yml",
+    "executorBlobSha": "5ca2e1fc38c039d8fd185562f010b910919dab6c",
+    "signedInProof": false,
+    "sharedRulesDeploy": false,
+    "realBusinessWrites": 0,
+    "productionPromotion": false,
+    "inheritedScopeFromExistingB4AllowedProductFiles": true,
+    "formalPercentAdded": 0
   }
 }

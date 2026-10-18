@@ -24,3 +24,28 @@ const sourceCycle=require('node:fs').readFileSync('orbit360-platform/core/ciclo.
 assert.match(sourceCycle,/policy\.dataScope\(surface\)/,'ROLE_EFFECTIVE_DATA_SCOPE_AUTHORITY');
 assert.match(sourceCycle,/return value\|\|'none'/,'NO_SCOPE_WIDENING_ON_UNKNOWN_ROLE');
 assert.doesNotMatch(sourceCycle,/surface==='leads'\)return own\?'own'/,'MULTIROL_LEADS_NOT_FORCED_TO_ADVISOR');
+
+// C03.03 authenticated writer guard: reject missing/pending/invited/contradictory
+// membership states before any transaction. Synthetic source-only VM proof.
+const membershipGate=grab('functions/product-ops-leads-domain.js','function active(m){','function scope(m,domain,activeRole){','active');
+const membershipCases=[
+ [{status:'active'},true,'active'],
+ [{estado:'activo'},true,'activo_alias'],
+ [{status:'active',estado:'activo'},true,'matching_active_aliases'],
+ [{},false,'absent_state'],
+ [{active:true},false,'boolean_only_not_sufficient'],
+ [{status:'pending'},false,'pending'],
+ [{status:'invited'},false,'invited'],
+ [{status:'invitado'},false,'invitado'],
+ [{status:'blocked'},false,'blocked'],
+ [{status:'deleted'},false,'deleted'],
+ [{status:'suspended'},false,'suspended'],
+ [{status:'active',estado:'pending'},false,'conflicting_alias'],
+ [{status:'pending',estado:'active'},false,'conflicting_reverse'],
+ [{status:'active',active:false},false,'disabled_boolean'],
+ [{status:'active',activo:false},false,'inactive_spanish_boolean'],
+ [{status:'active',inactivo:true},false,'inactivo_flag']
+];
+for(const [member,expected,label] of membershipCases)assert.equal(membershipGate.active(member),expected,'C03_OPS_LEADS_MEMBERSHIP_'+label);
+assert.match(domain,/!active\(member\)\|\|text\(member\.tenantId,180\)!==tenantId/,'C03_WRITER_MUST_VALIDATE_ACTIVE_MEMBER_AND_TENANT');
+console.log('B4_003_C03_OPS_LEADS_MEMBERSHIP_WRITER_SOURCE_QA_PASS checks='+membershipCases.length+' mock_only_no_writes');

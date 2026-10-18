@@ -58,7 +58,12 @@ function requestRef(t,r,preview){return db.collection('tenants').doc(t).collecti
 function eventRef(t,e,preview){return db.collection('tenants').doc(t).collection(preview?'previewWorkflowEvents':'workflowEvents').doc(e);}
 function outboxRef(t,e,preview){return db.collection('tenants').doc(t).collection(preview?'previewNotificationOutbox':'notificationOutbox').doc(e);}
 function permissions(m){return unique([...(m.permissions||[]),...(m.permisosExtra||[]),...(m.extras||[])]).map(norm);}
-function active(m){const s=norm(m&&(m.status||m.estado));return!!m&&m.active!==false&&m.activo!==false&&!['inactive','inactivo','blocked','bloqueado'].includes(s);}
+function active(m){
+  if(!m||m.active===false||m.activo===false||m.inactivo===true)return false;
+  // The two legacy status aliases must agree: pending/invited/missing is not active.
+  const states=[m.status,m.estado].map(norm).filter(Boolean);
+  return states.length>0&&states.every(s=>s==='active'||s==='activo');
+}
 function scope(m,domain,activeRole){
  const ds=m.dataScopes||{},modules=ds.modules&&typeof ds.modules==='object'&&!Array.isArray(ds.modules)?ds.modules:{};
  const raw=domain==='leads'?(modules.leads??ds.leads??ds.commercial??ds.default):
