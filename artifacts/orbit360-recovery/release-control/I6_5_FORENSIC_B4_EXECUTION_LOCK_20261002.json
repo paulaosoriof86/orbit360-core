@@ -2697,7 +2697,7 @@
     ]
   },
   "paulaOct18C03FourOwnerBoundaryFix": {
-    "status": "SCOPED_SOURCE_STAGED_PENDING_EXISTING_QA",
+    "status": "SOURCE_QA_PASS_PREVIEW_AUTHORIZED",
     "gate": "I6.5/B4-003",
     "authority": "PAULA_20261018_CONTINUE_FROZEN_ACCELERATION_WITH_CAUSAL_SOURCE_READBACK",
     "reason": "Four operational backends used negative-only member state checks; multi-role paths could retain elevated role",
@@ -2746,6 +2746,36 @@
       "rootCause": "VM fixture reused Ops administrator roles for Configuracion, whose contract has no Operativo admin",
       "productSourceChanged": false,
       "noRerunPreviouslyAcceptedProductWork": true
+    },
+    "sourceQaRunId": 39139438239,
+    "governanceRunId": 39139438232,
+    "previewAuthorization": {
+      "status": "AUTHORIZED_EXACT_READONLY_PREVIEW_PENDING",
+      "triggerSubject": "build(i6.5 B4-003): exact C03 protected read-only Preview",
+      "sourceQaRunId": 39139438239,
+      "governanceRunId": 39139438232,
+      "sourceQaConclusion": "success",
+      "governanceConclusion": "success",
+      "rosterSourceBlobSha": "75ca53db55e2665123589b0e63253a8e4f8c377c",
+      "qaBlobSha": "f6ec56dddd39dc3a25d35e1b5b2ce8654b34dcbe",
+      "compositionBlobSha": "99699f7e58829a88aae099beb50012ade421c9ee",
+      "onlyTwoReadOnlyFunctions": true,
+      "approvedFunctionExports": [
+        "orbit360ScopedPolicyReadPreview",
+        "orbit360AssignableAdvisorRosterPreview"
+      ],
+      "isolatedHostingOnly": true,
+      "sharedRulesDeploymentAuthorized": false,
+      "otherFunctionsDeployAuthorized": false,
+      "productionPromotionAuthorized": false,
+      "realUserImpersonationAuthorized": false,
+      "operationalDataWritesAuthorized": false,
+      "reimportAuthorized": false,
+      "sourceOwnerQualifiedByQa": true,
+      "backendWritersDeployed": false,
+      "securityP0Closed": false,
+      "existingExecutor": ".github/workflows/gravicentra-b4-003-executor.yml",
+      "existingExecutorBlobSha": "3dbd68138dc8bccca396405802840645c7c2922c"
     }
   }
 }
