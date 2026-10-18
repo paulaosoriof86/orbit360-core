@@ -1,0 +1,123 @@
+{
+  "schema": "GRAVICENTRA_B4003_UAT2_CANONICAL_ACCESS_POLICY_UNIVERSE_READBACK_V1",
+  "date": "2026-10-18",
+  "gate": "I6.5/B4-003",
+  "repo": "paulaosoriof86/orbit360-core",
+  "ref": "recovery/fase-a-clean-20260831",
+  "sourceHeadAtReadback": "b877b5dfcff2186b323aa75cfbcca7cde4a1bb31",
+  "readOnlyRunId": 39172012061,
+  "runConclusion": "success",
+  "artifactId": 12152019094,
+  "artifactDigest": "sha256:584411037928732a0fa5ed4be821ac15ad25261cc03676af40c7d79214b263e4",
+  "localZipDigestIndependentlyChecked": true,
+  "authorizationConfig": {
+    "backendDocument": "tenants/alianzas-soluciones/config/access",
+    "exists": true,
+    "previewAccessConfigExists": false,
+    "storedRolePermissionMaps": 8,
+    "storedRoleScopes": 10,
+    "cancelaciones": {
+      "Direccion": {
+        "view": true,
+        "edit": true
+      },
+      "Operativo": {
+        "view": false,
+        "edit": false
+      },
+      "Asesor": {
+        "view": false,
+        "edit": false
+      },
+      "SuperAdmin": {
+        "view": null,
+        "edit": null
+      },
+      "AdminTenant": {
+        "view": null,
+        "edit": null
+      }
+    },
+    "scope": {
+      "Operativo": "all",
+      "Asesor": "own",
+      "SuperAdmin": "all",
+      "AdminTenant": "all"
+    },
+    "causality": "ACTUAL_CANONICAL_FALSE_DENIES_OPERATIVO_AND_ASESOR_CANCELACIONES_IRRESPECTIVE_OF_DEFAULT_MEMBERSHIP_MODULES",
+    "sourceFixRequired": "CONFIG_LEVEL_CHANGE_WITH_BACKEND_AUTH_AND_SECURITY_TEST; NOT_UI_BYPASS",
+    "mutationAuthorized": false,
+    "writeApplied": false
+  },
+  "membership": {
+    "documents": 8,
+    "active": 8,
+    "adminMemberships": 3,
+    "multiRoleMemberships": 5,
+    "runtimeEquipoDisplayedPreviously": 7,
+    "missingUIDJoinProof": "PENDING",
+    "noPersonIdentifiers": true
+  },
+  "clientPolicies": {
+    "policiesAll": 1425,
+    "policiesActive": 230,
+    "clientsAll": 443,
+    "policiesLinkedToNonDeletedClients": 1422,
+    "linkedActive": 227,
+    "missingCanonicalClientById": 3,
+    "displayedClient360PreviousPolicies": 1413,
+    "displayedClient360PreviousActive": 218,
+    "otherDifference": "9 remaining rows in displayed Client360 relative to server-linked, requiring UID role-country-filtered readback",
+    "country": {
+      "GT": {
+        "all": 1301,
+        "active": 203
+      },
+      "CO": {
+        "all": 124,
+        "active": 27
+      }
+    },
+    "clientTypes": {
+      "natural": 403,
+      "juridica": 23,
+      "Persona": 1,
+      "missing": 16
+    },
+    "reimportAuthorized": false
+  },
+  "financial": {
+    "recibosEsperados": 1958,
+    "withoutCountryExplicit": 5,
+    "carteraPrimas": 1396,
+    "cobros": 5,
+    "sourceParentPolicyCountryResolvable": true,
+    "partialHydrationAndLatencyUnverified": true
+  },
+  "relationHolds": {
+    "orphanReceiptPolicyById": 80,
+    "orphanPortfolioPolicyById": 80,
+    "orphanVehiclePolicyById": 76,
+    "status": "REVIEW_REQUIRED_PROVENANCE_BEFORE_ANY_MUTATION",
+    "deleteAuthorized": false
+  },
+  "security": {
+    "realSignedRoleCountryNegativePositiveProof": "HOLD",
+    "effectiveLiveRules": "WIDE_TENANT_MEMBER_READ_WRITE_BLOCKING",
+    "livePromotionAuthorized": false,
+    "productionAcceptedNewCandidate": false
+  },
+  "noPII": true,
+  "operationalDataWrites": 0,
+  "productionTouched": false,
+  "newBuild": false,
+  "productionPath": {
+    "previous": 20,
+    "current": 20,
+    "delta": 0,
+    "numerator": 2,
+    "denominator": 10
+  },
+  "formalI6Percent": 50,
+  "noNewGate": true
+}

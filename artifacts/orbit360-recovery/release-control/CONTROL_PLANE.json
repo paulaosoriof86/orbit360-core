@@ -12693,5 +12693,29 @@
     "noLive": true,
     "noDataWrites": true,
     "nextSameGate": "C03_C04_EFFECTIVE_SECURITY_AND_AUTHENTICATED_GT_CO_REAL_READBACK"
+  },
+  "b4003Uat2CanonicalAccessAndUniverseReadback": {
+    "status": "CANONICAL_CONFIG_FALSE_DENY_CAUSE_CONFIRMED_AND_POLICY_DIFFERENCE_PARTIALLY_RECONCILED",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_UAT2_CANONICAL_ACCESS_AND_POLICY_UNIVERSE_READBACK_20261018.json",
+    "receiptBlobSha": "a4e8d00671902ed8d717ec5d030d7afc4adc94da",
+    "runId": 39172012061,
+    "artifactId": 12152019094,
+    "artifactDigest": "sha256:584411037928732a0fa5ed4be821ac15ad25261cc03676af40c7d79214b263e4",
+    "operativeCancellationStoredView": false,
+    "advisorCancellationStoredView": false,
+    "policiesAll": 1425,
+    "policiesActive": 230,
+    "policyClientMissing": 3,
+    "remainingVisibleUniverseDelta": 9,
+    "clientTypesRequireReadModelAlias": true,
+    "realMembershipCount": 8,
+    "dataIntegrityOrphansRequireProvenanceReview": true,
+    "securityP0Open": true,
+    "configWritesAuthorized": false,
+    "livePromotionAuthorized": false,
+    "reimportAuthorized": false,
+    "productionPathPercent": 20,
+    "formalI6Percent": 50,
+    "nextWithinGate": "ROLE_PERMISSION_CONFIG_DELTA_DRYRUN_THEN_AUTHORIZED_SCOPED_READ_WRITE_TEST_AND_GT_CO_E2E"
   }
 }
