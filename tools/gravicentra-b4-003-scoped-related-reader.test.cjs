@@ -259,6 +259,30 @@ async function deny(fn,code){let thrown;try{await fn()}catch(e){thrown=e}assert.
  member={...member,modulesRestricted:[]};
  cfg={...cfg,rolePermissions:{asesor:{cancelaciones:{ver:false}}}};
  await deny(()=>flow('cancelaciones','asesor'),'MODULE_DENIED');checks++;
+ // UAT2 canonical config: original false-deny, minimal permission flip,
+ // Operativo configured visibility and Asesor STRICT own after flip.
+ cfg={...cfg,rolePermissions:{
+  operativo:{cancelaciones:{ver:false,editar:false}},
+  asesor:{cancelaciones:{ver:false,editar:false}}
+ }};
+ await deny(()=>flow('cancelaciones','operativo'),'MODULE_DENIED');checks++;
+ await deny(()=>flow('cancelaciones','asesor'),'MODULE_DENIED');checks++;
+ cfg={...cfg,rolePermissions:{
+  operativo:{cancelaciones:{ver:true,editar:false}},
+  asesor:{cancelaciones:{ver:true,editar:false}}
+ }};
+ const openedOperativo=await flow('cancelaciones','operativo',{pageSize:50});
+ assert.deepEqual(openedOperativo.rows.map(x=>x.id),['aOwn','bOther','cStale']);checks++;
+ const openedAsesor=await flow('cancelaciones','asesor',{pageSize:50});
+ assert.deepEqual(openedAsesor.rows.map(x=>x.id),['aOwn']);checks++;
+ await deny(()=>read('cancelaciones','bOther',{role:'asesor'}),'RECORD_NOT_FOUND_OR_DENIED');checks++;
+ await deny(()=>read('cancelaciones','cStale',{role:'asesor'}),'RECORD_NOT_FOUND_OR_DENIED');checks++;
+ const cancellationCO=await flow('cancelaciones','asesor',{country:'CO',pageSize:50});
+ assert.equal(cancellationCO.rows.length,0);checks++;
+ // Administrative roles continue with their prior module/tenant membership gates.
+ assert.equal(cfg.rolePermissions.operativo.cancelaciones.editar,false);checks++;
+ assert.equal(cfg.rolePermissions.asesor.cancelaciones.editar,false);checks++;
+ console.log('B4_003_CANCEL_ACCESS_CONFIG_BEFORE_AFTER_SCOPE_QA_PASS checks=9 no_backend_or_config_writes');
  cfg={...cfg,rolePermissions:{}};
  await deny(()=>read('cancelaciones','eMismatch',{role:'operativo'}),'RECORD_NOT_FOUND_OR_DENIED');checks++;
  await deny(()=>flow('cancelaciones','operativo',{cursor:'dOrphan'}),'CURSOR_DENIED');checks++;

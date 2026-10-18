@@ -249,6 +249,72 @@ async function main(){
     noPolicyNumbersOrRawRecordIdsExported:true
   };
 
+  // B4-003 UAT2: deterministic, field-exact CANCELACIONES configuration
+  // dry-run. This NEVER calls set/update/transaction or a write-capable API.
+  // Future writes MUST independently verify the same document updateTime and
+  // active owner UID/role against the server before touching even these fields.
+  function explicitCanonicalFlag(role,action){
+    const keys=Object.keys(rolePermissions).filter(key=>norm(key)===norm(role));
+    if(keys.length!==1)throw Error('CANCEL_ACCESS_ROLE_MISSING_OR_ALIAS_COLLISION_'+role);
+    const perm=rolePermissions[keys[0]];
+    const modules=Object.keys(perm||{}).filter(key=>norm(key)==='cancelaciones');
+    if(modules.length!==1)throw Error('CANCEL_ACCESS_MODULE_MISSING_OR_ALIAS_COLLISION_'+role);
+    if(typeof perm[modules[0]][action]!=='boolean')throw Error('CANCEL_ACCESS_ACTION_NOT_BOOLEAN_'+role+'_'+action);
+    return{roleKey:keys[0],moduleKey:modules[0],value:perm[modules[0]][action]};
+  }
+  if(!accessSnap.exists)throw Error('CANCEL_ACCESS_CANONICAL_DOCUMENT_MISSING');
+  const affectedRoles=['Operativo','Asesor'];
+  const sourceFlags=affectedRoles.map(role=>({
+    role,view:explicitCanonicalFlag(role,'ver'),edit:explicitCanonicalFlag(role,'editar')
+  }));
+  if(sourceFlags.some(x=>x.view.value!==false||x.edit.value!==false))
+    throw Error('CANCEL_ACCESS_BEFORE_IMAGE_NO_LONGER_MATCHES_UAT2');
+  const scopeKeys=Object.keys(roleScopes),roleScopeValue=role=>{
+    const keys=scopeKeys.filter(key=>norm(key)===norm(role));
+    if(keys.length!==1)throw Error('CANCEL_ACCESS_SCOPE_MISSING_OR_ALIAS_COLLISION_'+role);
+    return safe(roleScopes[keys[0]]).toLowerCase();
+  };
+  const operativeScope=roleScopeValue('Operativo'),advisorScope=roleScopeValue('Asesor');
+  if(operativeScope!=='all'||advisorScope!=='own')
+    throw Error('CANCEL_ACCESS_ROLE_SCOPE_CHANGED_SAFE_STOP');
+  const permissionBefore=JSON.stringify(rolePermissions),scopesBefore=JSON.stringify(roleScopes);
+  const proposed=JSON.parse(permissionBefore);
+  const fieldDiff=sourceFlags.map(({role,view})=>{
+    proposed[view.roleKey][view.moduleKey].ver=true;
+    return{path:'rolePermissions.'+view.roleKey+'.'+view.moduleKey+'.ver',before:false,after:true,
+      forbiddenEditMutation:true};
+  });
+  // Independently assert only the two intended flags differ.
+  const changes=[];
+  for(const [roleKey,modules] of Object.entries(rolePermissions)){
+    for(const [moduleKey,actions] of Object.entries(modules||{})){
+      for(const [action,value] of Object.entries(actions||{})){
+        if(proposed[roleKey]?.[moduleKey]?.[action]!==value)
+          changes.push('rolePermissions.'+roleKey+'.'+moduleKey+'.'+action);
+      }
+    }
+  }
+  if(changes.length!==2||changes.slice().sort().join('|')!==fieldDiff.map(x=>x.path).sort().join('|')
+    ||JSON.stringify(roleScopes)!==scopesBefore)
+    throw Error('CANCEL_ACCESS_DELTA_WIDENED_OR_SCOPE_CHANGED');
+  result.cancelacionesExactAccessDryRun={
+    status:'PASS_FIELD_EXACT_DRY_RUN_NO_WRITE',baselineFrom:'tenants/'+tenantId+'/config/access',
+    realConfigExists:true,isolatedPreviewConfigExists:previewAccessSnap.exists,
+    expectedOwnerRoles:affectedRoles,patch:fieldDiff,
+    roleScopesUnchanged:{Operativo:operativeScope,Asesor:advisorScope},
+    editRightsPreserved:{Operativo:false,Asesor:false},
+    unchangedOtherPermissionsVerified:true,
+    storedOtherRolePermissionEntries:Object.keys(rolePermissions).length,
+    permissionDigestBefore:crypto.createHash('sha256').update(permissionBefore).digest('hex'),
+    permissionDigestAfter:crypto.createHash('sha256').update(JSON.stringify(proposed)).digest('hex'),
+    canonicalConfigUpdateTime:accessSnap.updateTime&&typeof accessSnap.updateTime.toMillis==='function'?accessSnap.updateTime.toMillis():null,
+    futureMutationRequiresNewReadback:true,configWritesAuthorized:false,
+    businessWrites:0,productionMutation:false,sharedRulesDeploy:false,
+    serverScopedPositiveNegativeRoleQA:'PENDING',realSignedGTCO:'HOLD',
+    result:'DRY_RUN_ONLY_NOT_APPLIED_NOT_AUTHORIZATION_ACCEPTED',
+    noNamesUserIdsCredentialsOrRawConfig:true
+  };
+
   result.status='READONLY_CARDINALITY_AND_RELATION_AUDIT_COMPLETE_NOT_AUTHENTICATED_SCOPE_PASS';
 }
 main().catch(e=>{result.status='FAIL';result.errorCode=safe(e.message).slice(0,120);process.exitCode=1;}).finally(async()=>{
