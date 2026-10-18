@@ -4869,7 +4869,7 @@
       "entryGuardReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_ENTRY_GUARD_PASS_20261002.json",
       "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
       "executionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B4_EXECUTION_LOCK_20261002.json",
-      "executionLockBlobSha": "2998cbacdb843b4b0a3cf6c6f3e8d07af4b26f1c",
+      "executionLockBlobSha": "5e9b0cd6ea52b919d155373f42b3345cbb2c89bc",
       "compositionLockBlobSha": "016f251811f22bc4fc04b2a5f674dfe09243e605",
       "findingLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
       "activeFindingId": "B4-003",
@@ -6312,7 +6312,7 @@
     "status": "B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL",
     "activeFindingId": "B4-003",
     "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
-    "executionLockBlobSha": "2998cbacdb843b4b0a3cf6c6f3e8d07af4b26f1c",
+    "executionLockBlobSha": "5e9b0cd6ea52b919d155373f42b3345cbb2c89bc",
     "compositionLockBlobSha": "816309c63ed254d9b0e05cf63621c3d1c03cbfd5",
     "findingLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
     "noLive": true,
@@ -12271,10 +12271,10 @@
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PAULA_ACCELERATED_EXECUTION_DECISION_20261018.json",
     "receiptBlobSha": "b527923db84f13e22e05e3f427de3e6994028167",
     "executionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B4_EXECUTION_LOCK_20261002.json",
-    "executionLockBlobSha": "2998cbacdb843b4b0a3cf6c6f3e8d07af4b26f1c",
+    "executionLockBlobSha": "5e9b0cd6ea52b919d155373f42b3345cbb2c89bc",
     "noNewGate": true,
     "sourceOnlyPreparationAuthorized": true,
-    "nextTechnicalAction": "B4_003_SOURCE_QA_CONTRACT_THEN_AUTHENTICATED_ROLE_PARITY",
+    "nextTechnicalAction": "REAL_AUTH_AND_EFFECTIVE_RULES_FULL_BACKEND_PARITY_FOCUSED_UAT",
     "preserveFormalGateAction": "I6_5_FORENSIC_REMEDIATION_B4_003_R20_TARGETED_PAULA_VISUAL",
     "preserveFormalI6Percent": 50,
     "sharedRulesDeployAuthorized": false,
@@ -12344,7 +12344,7 @@
     "qaPath": "tools/gravicentra-b4-003-ops-leads-role-scopes.test.cjs",
     "qaBlobSha": "f6ec56dddd39dc3a25d35e1b5b2ce8654b34dcbe",
     "compositionBlobSha": "99699f7e58829a88aae099beb50012ade421c9ee",
-    "executionLockBlobSha": "2998cbacdb843b4b0a3cf6c6f3e8d07af4b26f1c",
+    "executionLockBlobSha": "5e9b0cd6ea52b919d155373f42b3345cbb2c89bc",
     "onlySourceAndQa": true,
     "onlyExistingB4003Executor": true,
     "productDeployed": false,
@@ -12437,7 +12437,7 @@
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PREVIEW_GUIDE_AND_RELEASE_PROGRESS_CONTRACT_20261018.json",
     "receiptBlobSha": "cc7bd6f4670e7de6012b1d6ac5a9c2615f45f286",
     "executionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B4_EXECUTION_LOCK_20261002.json",
-    "executionLockBlobSha": "2998cbacdb843b4b0a3cf6c6f3e8d07af4b26f1c",
+    "executionLockBlobSha": "5e9b0cd6ea52b919d155373f42b3345cbb2c89bc",
     "currentProductionPathPercent": 20,
     "numerator": 2,
     "denominator": 10,
@@ -12449,19 +12449,21 @@
     "livePromotionAuthorized": false,
     "sharedRulesDeployAuthorized": false,
     "noBusinessWrites": true,
-    "lastHumanReviewStatus": "LATEST_EXACT_PREVIEW_REJECTED_FUNCTIONAL_NO_PROGRESS_GAIN",
+    "lastHumanReviewStatus": "LATEST_NEW_EXACT_PREVIEW_UAT_PENDING_PREVIOUS_REJECTION_PRESERVED",
     "latestRemediationReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PAULA_UAT_REJECTION_AND_CAUSAL_SOURCE_FIX_20261018.json",
-    "latestRemediationStatus": "SOURCE_QA_PASS_PREVIEW_DISPATCH_PENDING"
+    "latestRemediationStatus": "SOURCE_QA_PASS_PREVIEW_DISPATCH_PENDING",
+    "latestPreviewReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PAULA_UAT_RECOVERY_EXACT_PREVIEW_READBACK_20261018.json",
+    "latestPreviewReceiptSha": "70a82733352e373258df66f5f5c8fe344c277228"
   },
   "paula18OctVisualRejectSourceRemediation": {
-    "status": "SOURCE_QA_PASS_UAT_REJECTED_PREVIEW_STILL_UNACCEPTED",
+    "status": "PREVIOUS_PREVIEW_REJECTED_NEW_CANDIDATE_TECHNICAL_PASS_HUMAN_UAT_PENDING",
     "gate": "I6.5/B4-003",
     "humanUat": "FAIL_ON_LATEST_SCOPED_PREVIEW",
     "rejectedPreviewSha": "3f34d7fe678a02253fcf95887b6186fd7acfca1b",
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PAULA_UAT_REJECTION_AND_CAUSAL_SOURCE_FIX_20261018.json",
     "receiptBlobSha": "c07407fed4fbbb46b3fdd952b754ce51b76c60ac",
     "compositionBlobSha": "5031475321c059ced7a0ba3a49147f4b7669ce5a",
-    "executionLockBlobSha": "2998cbacdb843b4b0a3cf6c6f3e8d07af4b26f1c",
+    "executionLockBlobSha": "5e9b0cd6ea52b919d155373f42b3345cbb2c89bc",
     "correctionScope": "NINE_EXACT_SOURCE_FILES_ONE_ACCUMULATIVE_SAME_GATE",
     "tests": [
       "tools/gravicentra-b4-003-protected-hydration.test.cjs",
@@ -12489,7 +12491,7 @@
     "formalI6Percent": 50
   },
   "paula18OctCancellationStaleOwnScopeCausalFix": {
-    "status": "SOURCE_QA_PASS_NO_DEPLOY",
+    "status": "SOURCE_QA_PASS_TECHNICAL_PREVIEW_PASS_REAL_AUTH_HOLD",
     "gate": "I6.5/B4-003",
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PAULA_UAT_CANCELLATIONS_CONFLICT_SOURCE_FIX_20261018.json",
     "receiptBlobSha": "180fc66ca8c1ea49d39bd7fe897f732b89d1840a",
@@ -12497,7 +12499,7 @@
     "sourceBlobAfter": "69706943a73c926da41b2256db425031b8f87b19",
     "qaBlob": "6a6a10970dac7392b1062a5cbe4feeb682f19c8b",
     "compositionLockBlobSha": "5031475321c059ced7a0ba3a49147f4b7669ce5a",
-    "executionLockBlobSha": "2998cbacdb843b4b0a3cf6c6f3e8d07af4b26f1c",
+    "executionLockBlobSha": "5e9b0cd6ea52b919d155373f42b3345cbb2c89bc",
     "testOutcome": "PASS_SYNTHETIC_NO_REAL_USER",
     "sourcePreviewDeployed": false,
     "realUidQA": false,
@@ -12509,7 +12511,7 @@
     "guardRunId": 39159302361
   },
   "paula18OctUatReadOnlyPreviewAuthorization": {
-    "status": "AUTHORIZED_EXACT_READONLY_PREVIEW_PENDING",
+    "status": "EXACT_READONLY_PREVIEW_TECHNICAL_PASS_HUMAN_AND_AUTH_HOLD",
     "triggerSubject": "build(i6.5 B4-003): Paula UAT recovered exact readonly Preview",
     "previousPreviewRejected": true,
     "qaRunId": 39159302326,
@@ -12547,7 +12549,7 @@
     "workflowPath": ".github/workflows/gravicentra-b4-003-executor.yml",
     "workflowCandidateBlobSha": "7c5305e8bae79c5ce4f428726e46dd6842bb34b4",
     "needHumanRoleTestAfterDeploy": true,
-    "executionLockBlobSha": "2998cbacdb843b4b0a3cf6c6f3e8d07af4b26f1c",
+    "executionLockBlobSha": "5e9b0cd6ea52b919d155373f42b3345cbb2c89bc",
     "initialPreviewAttempt": {
       "runId": 39159703367,
       "status": "FAIL_CLOSED_WORKFLOW_SYNTAX",
@@ -12555,6 +12557,11 @@
       "deployed": false,
       "sourceChanged": false,
       "rootCause": "COMPARISON_OPERATOR_ASSIGNED_INSTEAD_OF_COMPARED"
-    }
+    },
+    "previewProofPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PAULA_UAT_RECOVERY_EXACT_PREVIEW_READBACK_20261018.json",
+    "previewProofBlobSha": "70a82733352e373258df66f5f5c8fe344c277228",
+    "previewRunId": 39159944246,
+    "previewBuildId": "gi-i65-b4-373a91ef46e1-57f234755dc1",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-39159944246-pir227nq.web.app"
   }
 }

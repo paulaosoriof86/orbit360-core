@@ -2857,7 +2857,7 @@
     "formalI6Progress": 50
   },
   "paula18OctCancellationStaleOwnScopeCausalFix": {
-    "status": "SOURCE_QA_PASS_EXACT_PREVIEW_UNCHANGED_SECURITY_HOLD",
+    "status": "SOURCE_QA_PASS_TECHNICAL_PREVIEW_PASS_AUTH_HOLD",
     "gate": "I6.5/B4-003",
     "authority": "PAULA_20261018_CONTINUE_FROM_REJECTED_FUNCTIONAL_PREVIEW_AND_CAUSAL_QA_FAILURE",
     "allowedScope": "ONE_PROTECTED_SCOPED_READER_SOURCE_AND_ITS_EXISTING_QA_ONLY",
@@ -2881,7 +2881,7 @@
     "guardRunId": 39159302361
   },
   "paula18OctUatReadOnlyPreviewAuthorization": {
-    "status": "AUTHORIZED_EXACT_READONLY_PREVIEW_PENDING",
+    "status": "EXACT_READONLY_PREVIEW_TECHNICAL_PASS_HUMAN_AND_AUTH_HOLD",
     "triggerSubject": "build(i6.5 B4-003): Paula UAT recovered exact readonly Preview",
     "previousPreviewRejected": true,
     "qaRunId": 39159302326,
@@ -2926,6 +2926,12 @@
       "deployed": false,
       "sourceChanged": false,
       "rootCause": "COMPARISON_OPERATOR_ASSIGNED_INSTEAD_OF_COMPARED"
-    }
+    },
+    "previewProofPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PAULA_UAT_RECOVERY_EXACT_PREVIEW_READBACK_20261018.json",
+    "previewProofBlobSha": "70a82733352e373258df66f5f5c8fe344c277228",
+    "previewRunId": 39159944246,
+    "previewBuildId": "gi-i65-b4-373a91ef46e1-57f234755dc1",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-39159944246-pir227nq.web.app",
+    "securityP0Closed": false
   }
 }

@@ -1,0 +1,76 @@
+{
+  "schema": "GRAVICENTRA_B4003_PAULA_UAT_RECOVERY_EXACT_PREVIEW_READBACK_V1",
+  "dateLocal": "2026-10-18",
+  "gate": "I6.5/B4-003",
+  "status": "EXACT_TECHNICAL_PREVIEW_PASS_AUTHENTICATED_FUNCTIONAL_UAT_HOLD",
+  "head": "373a91ef46e11ce4b846774e609c2fd07a7ec2a6",
+  "technical": {
+    "qaSourceRunId": 39159302326,
+    "qaSourceConclusion": "success",
+    "guardSourceRunId": 39159302361,
+    "guardSourceConclusion": "success",
+    "previewRunId": 39159944246,
+    "previewRunConclusion": "success",
+    "guardPreviewRunId": 39159944195,
+    "guardPreviewConclusion": "success",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-39159944246-pir227nq.web.app",
+    "buildId": "gi-i65-b4-373a91ef46e1-57f234755dc1",
+    "hostedFileCount": 218,
+    "hostedPayloadDigest": "cf4d2012bed55959c656fa890f64f10e100c62efb1c7ce5d4714a2be9b44518a",
+    "backendFileCount": 33,
+    "backendSourceDigest": "8a6993bd13afd62760ec4eb0adba9e0bd952c78601c3d857c48681faa4421dbe",
+    "bundleFileCount": 253,
+    "bundleDigest": "3592064665ae0ede6d448bd153323af7f49b185a8af76d53a573934604a35f07",
+    "artifactId": 12148885469,
+    "artifactName": "gravicentra-b4-003-scoped-preview-39159944246",
+    "artifactZipSha256": "73a5c9ff3c7082a116a1f9793432ba38db7807e5c6c48d70cda2e440c91d0e80",
+    "exactHostedReadback": true,
+    "publicSmoke": true,
+    "unauthenticatedCallableStatus": 401,
+    "protectedPreviewFunctions": [
+      "orbit360ScopedPolicyReadPreview",
+      "orbit360AssignableAdvisorRosterPreview"
+    ],
+    "otherFunctionsDeployed": false,
+    "sharedRulesDeployed": false,
+    "liveProductionChanged": false,
+    "operationalWrites": 0
+  },
+  "userAccepted": {
+    "previousPreview": "REJECTED_20261018",
+    "currentPreview": "AWAITING_FOCUSED_PAULA_REVIEW",
+    "newRealIdentityAuth": "NOT_EXECUTED_UNAUTHORIZED",
+    "moduleRoleGtCoLivePersistenceAccepted": false,
+    "sourceQaPassNotUserPass": true
+  },
+  "focusedHumanChecks": [
+    "Direccion Equipo Usuarios/Matriz/Metas: no zeros unless authoritative read complete; no save",
+    "Inicio insurance shield emblem, automatic 12-s rotation, truthful KPI readiness; do not claim finance fixed",
+    "Dirección -> Operativo -> Asesor -> Dirección Cliente360/Polizas: no stale data, no indefinite spinner; own vs team correct",
+    "Cancelaciones: Dirección full and Operativo/Asesor read only approved scope; foreign/stale negative"
+  ],
+  "continuingBlockers": [
+    "Effective shared Firestore Rules still wide tenant member read/write",
+    "LIVE secured reader/backend writer parity not attested",
+    "Real authenticated two-UID country-role positive/negative matrix pending",
+    "Equipo protected config-access canonical permission readback not proven on this 2-callable Preview",
+    "Cobros KPIs and aging complete source/readback not proven",
+    "Cliente360 vs Polizas 12-policy delta needs ID-level reconciliation",
+    "B4-003 human acceptance and later B4-004..007 not closed"
+  ],
+  "statusToProduction": {
+    "passed": 2,
+    "total": 10,
+    "percent": 20,
+    "deltaPercentagePoints": 0
+  },
+  "formalI6Percent": 50,
+  "safety": {
+    "livePromoted": false,
+    "sharedRulesDeployed": false,
+    "realUserTokensIssued": 0,
+    "realBusinessWrites": 0,
+    "reimport": false
+  },
+  "nextAction": "FUSED_CAUSAL_AUTHORIZED_GTC0_REAL_UID_READBACK_AND_EFFECTIVE_RULES_PARITY_NO_AUTOMATIC_LIVE"
+}
