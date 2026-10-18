@@ -12199,5 +12199,44 @@
       "candidateRulesOnly": true,
       "currentProductionRulesAccepted": false
     }
+  },
+  "b4003AuthenticatedBrowserProfileTransferDiagnostic20261017": {
+    "gate": "I6.5/B4-003",
+    "status": "CONFIRMED_PROFILE_CAPTURED_WITH_SIGNED_IN_UI_BUT_AGENT_SESSION_NOT_RESTORED",
+    "sourceHeadAtDiagnostic": "232519b7545af7b24d1788ad11f93cb35c2dacdd",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-39063058792-l08egx7p.web.app",
+    "exactPreviewSourceSha": "6f0d3a1a6c5827419d0e5f18dca4bed8abc9eb2b",
+    "evidence": {
+      "userProvidedCapture": "SIGNED_IN_DIRECCION_UI_VISIBLE_BEFORE_SAVE_PROFILE",
+      "subsequentSetup": "PROFILE_SAVED_SUCCESSFULLY",
+      "targetProfile": "Gravicentra Preview QA",
+      "capturedSiteCookies": 0,
+      "capturedSiteStorageOrigins": 1,
+      "automationRunId": "84e6f015-553f-4f4e-8d85-60b14d1e1081",
+      "automationResult": "SESSION_NOT_RESTORED_SHOWED_LOGIN",
+      "authenticatedBusinessUatPerformed": false,
+      "operationalDataWrites": 0
+    },
+    "technicalCauseAssessment": {
+      "productAuthOwner": "orbit360-platform/core/product-runtime-browser-providers-p0.js",
+      "productAuthOwnerBlobSha": "51f2801cf8e7590ff92ffa9e7dae07ff8304f5d7",
+      "productAuthInitialization": "FIREBASE_MODULAR_GET_AUTH_DEFAULT_PERSISTENCE",
+      "mechanismHypothesis": "FIREBASE_INDEXEDDB_AUTH_SESSION_NOT_TRANSFERRED_IN_TINYFISH_PROFILE",
+      "mechanismVerifiedEndToEnd": false,
+      "knownBrowserProfileState": "PROVIDER_DOCUMENTATION_MENTIONS_COOKIES_LOCAL_AND_SESSION_STORAGE_NOT_INDEXEDDB",
+      "notEvidenceOfUserFailure": true,
+      "notEvidenceOfProductLoginFailure": true
+    },
+    "continuationContract": {
+      "noRepeatedProfileSetupRequest": true,
+      "noUserSecretsRequested": true,
+      "noProductionOrRulesDeploy": true,
+      "noProductPersistenceWeakeningForQa": true,
+      "noRealUserTokenIssuance": true,
+      "securityP0StillBlocking": true,
+      "authenticatedPreviewRoleProof": "HOLD_PENDING_SUPPORTED_AUTHENTICATED_BROWSER_MECHANISM",
+      "allowedNextWork": "CONTINUE_SCOPED_READONLY_SOURCE_QA_EMULATOR_AND_SECURITY_CAUSAL_GATES",
+      "formalI6Percent": 50
+    }
   }
 }
