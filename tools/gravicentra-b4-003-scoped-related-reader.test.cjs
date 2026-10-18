@@ -27,7 +27,7 @@ const moduleSecurityCases=[
  ['Comercial Cliente360','Comercial','clientes',true],
  ['Operativo Cancelaciones','Operativo','cancelaciones',true],
  ['Asesor Cancelaciones propio','Asesor','cancelaciones',true],
- ['Asesor no Equipo','Asesor','auditoria',false,'MODULE_DENIED'],
+ ['Asesor no Equipo','Asesor','auditoria',false,'TEAM_DIRECTORY_DENIED'],
  ['Asesor Sr Cliente360 propio','Asesor Sr.','clientes',true],
  ['Dirección Equipo','Dirección','asesores',true],
  ['AdminTenant Cobros','AdminTenant','cobros',true]
@@ -46,7 +46,7 @@ for(const [label,role,collection,allow,code] of moduleSecurityCases){
 const selectedAdvisor=secureCase('Asesor','auditoria',{},{
  roles:['Dirección','Asesor'],modulesVisible:['*','equipo']
 });
-assert.throws(()=>resolveSecureModule(selectedAdvisor),e=>e instanceof Denied&&e.code==='MODULE_DENIED',
+assert.throws(()=>resolveSecureModule(selectedAdvisor),e=>e instanceof Denied&&e.code==='TEAM_DIRECTORY_DENIED',
  'MULTIROLE_DIRECTION_MODULES_VISIBLE_MUST_NOT_LEAK_IN_ADVISOR');positiveModuleChecks++;
 const financeExtra=secureCase('Marketing','clientes',{rolePermissions:{Marketing:{cliente360:{ver:true}}}});
 assert.equal(resolveSecureModule(financeExtra).scope,'team','EXPLICIT_ROLE_MODULE_GRANT_RESPECTS_TEAM_CEILING');positiveModuleChecks++;

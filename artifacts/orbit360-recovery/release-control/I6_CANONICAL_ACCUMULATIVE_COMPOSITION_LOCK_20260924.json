@@ -253,7 +253,7 @@
     "orbit360-platform/styles/base.css": "608ef0709144ffcbe748a7bd04e1bd16744def65",
     "orbit360-platform/styles/infra.css": "02bea455bce9f5659eeaf8fd73e799eccb7f7e23",
     "orbit360-platform/sw.js": "87412e7c4ef1030e2a3389cfd709f0c287ab336b",
-    "functions/b4-003-scoped-access-boundary.js": "6377694cedd17608b20acd91abacf1eb6359f8cf",
+    "functions/b4-003-scoped-access-boundary.js": "e04b448b8fb045f17314adf0886c117d1b58860a",
     "firestore.b4-003-scoped-candidate.rules": "6ae1a85b1f82525ac018ff682a2e20b6cca5f1d8",
     "orbit360-platform/modules/comparativo.js": "982881a4c1e2f95be95428bd3f9f23360a9a2d5f",
     "functions/b4-003-scoped-policy-reader.js": "24546aa40f26d818aef7f1714c2a21deda63a550",
@@ -6145,10 +6145,10 @@
     "cause": "BACKEND_PROTECTED_READER_DENY_ONLY_ROLE_MATRIX_ALLOWS_UNRELATED_MODULE_WITH_ABSENT_OVERRIDE",
     "owner": "functions/b4-003-scoped-access-boundary.js",
     "sourceBlobBefore": "a3b70fb9f795b9208e5de281892f1df49666dae2",
-    "sourceBlobAfter": "6377694cedd17608b20acd91abacf1eb6359f8cf",
+    "sourceBlobAfter": "e04b448b8fb045f17314adf0886c117d1b58860a",
     "qa": "tools/gravicentra-b4-003-scoped-related-reader.test.cjs",
     "qaBlobBefore": "4fd02dbafb278a6bf4bd7483f6c4e896c7e9dbe9",
-    "qaBlobAfter": "92f7837afe831fe37b9f663e6434659ec8aa4804",
+    "qaBlobAfter": "15f4f702668951bf76f5475d31bcbd854878aefd",
     "semantics": "DENY_UNASSIGNED_MODULES;EXPLICIT_TRUE_ROLE_MATRIX_OR_SERVER_USER_EXTRA_ALLOWED;EXPLICIT_FALSE_OVERRIDES;ROLE_CEILINGS_PRESERVED;IGNORE_STALE_MODULESVISIBLE",
     "receiptOwnerCorrection": "recibosEsperados mapped to cobros (matches canonical access contract)",
     "unitPreflight": {
@@ -6163,6 +6163,8 @@
       "configWrites": 0,
       "realUserTokens": 0
     },
-    "realAuthenticatedRoleEvidence": "HOLD"
+    "realAuthenticatedRoleEvidence": "HOLD",
+    "regressionFix": "RETAIN_TEAM_DIRECTORY_DENIED_PRECEDENCE_FOR_TEAM_ADMIN_AUDIT_COLLECTIONS",
+    "qaStatus": "REPAIR_PENDING_GITHUB_CI"
   }
 }
