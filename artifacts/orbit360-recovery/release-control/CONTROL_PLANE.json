@@ -12629,5 +12629,44 @@
     "productionPathDelta": 0,
     "formalI6Percent": 50,
     "gateAdvanced": false
+  },
+  "b4003CurrentCumulativePreviewIntent": {
+    "status": "AUTHORIZED_EXACT_SCOPED_PREVIEW_ONLY",
+    "gate": "I6.5/B4-003",
+    "triggerSubject": "build(i6.5 B4-003): cumulative authorized protected Preview",
+    "rationale": "B4-003 repeated GitHub success NOOP hid composed fixes; new exact isolated Preview under existing executor to test current cumulative source",
+    "rejectedUatReceiptBlobSha": "ebb5e503e2fd575d1f6c98d99af51799d6ea4820",
+    "compositionBlobSha": "ac0a8d4e64b972c47a25d019a86d604d8227ac2e",
+    "sourceBlobs": {
+      "orbit360-platform/modules/equipo.js": "9e76fbcb70d5a19b8b58aeb72b9fad7acd0bbecf",
+      "functions/tenant-domain-config.js": "231fb2f106a6c139bb83c367f0f5e1a1c8924823",
+      "functions/b4-003-scoped-access-boundary.js": "a3b70fb9f795b9208e5de281892f1df49666dae2",
+      "functions/b4-003-scoped-related-reader.js": "69706943a73c926da41b2256db425031b8f87b19",
+      "functions/assignable-advisor-roster.js": "75ca53db55e2665123589b0e63253a8e4f8c377c",
+      "orbit360-platform/core/access-scope.js": "66462ba7263fe7cb9a078148810bd17c96ad72c7",
+      "orbit360-platform/core/backend-product-readonly-bootstrap-p0.js": "aa70a29b7e3d5a5ac4bef003fb6db07a0439af0f",
+      "orbit360-platform/core/product-runtime-browser-providers-p0.js": "51f2801cf8e7590ff92ffa9e7dae07ff8304f5d7"
+    },
+    "rosterSourceBlobSha": "75ca53db55e2665123589b0e63253a8e4f8c377c",
+    "onlyReadOnlyCallables": true,
+    "allowedExports": [
+      "orbit360ScopedPolicyReadPreview",
+      "orbit360AssignableAdvisorRosterPreview"
+    ],
+    "sourceQaRequired": true,
+    "governanceGuardRequired": true,
+    "exactHostedReadbackRequired": true,
+    "unauthenticatedCallableNegativeRequired": true,
+    "realRoleGTCOUatPending": true,
+    "sharedRulesDeployAuthorized": false,
+    "livePromotionAuthorized": false,
+    "operationalWritesAuthorized": false,
+    "configWritesAuthorized": false,
+    "realUserTokenIssuanceAuthorized": false,
+    "reimportAuthorized": false,
+    "securityP0RemainsOpen": true,
+    "noGateAdvance": true,
+    "notProductionAccepted": true,
+    "previousProductionReadinessPercent": 20
   }
 }
