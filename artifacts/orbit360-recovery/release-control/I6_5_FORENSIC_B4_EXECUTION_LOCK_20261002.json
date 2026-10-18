@@ -2790,5 +2790,19 @@
     "humanVisualAccepted": false,
     "releaseAccepted": false,
     "formalPercentAdded": 0
+  },
+  "paulaPreviewGuideAndReleaseProgress20261018": {
+    "status": "FROZEN_REPORTING_ONLY_SUBORDINATE_TO_CONTROL_PLANE_AND_B4",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PREVIEW_GUIDE_AND_RELEASE_PROGRESS_CONTRACT_20261018.json",
+    "blobSha": "cc7bd6f4670e7de6012b1d6ac5a9c2615f45f286",
+    "gate": "I6.5/B4-003",
+    "progressToProductionPercent": 20,
+    "numerator": 2,
+    "denominator": 10,
+    "reportingOnly": true,
+    "operationalWritesAuthorized": false,
+    "sharedRulesDeployAuthorized": false,
+    "livePromotionAuthorized": false,
+    "exactNextAction": "B4_003_EFFECTIVE_RULES_WRITER_PARITY_AND_AUTHENTICATED_GT_CO_VALIDATION"
   }
 }

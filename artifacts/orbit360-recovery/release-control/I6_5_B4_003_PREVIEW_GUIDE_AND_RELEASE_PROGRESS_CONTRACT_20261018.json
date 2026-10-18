@@ -1,0 +1,181 @@
+{
+  "schema": "GRAVICENTRA_B4003_USER_PREVIEW_INSTRUCTIONS_AND_PRODUCTION_READINESS_REPORT_V1",
+  "dateLocal": "2026-10-18",
+  "authority": "PAULA_20261018_EXPLICIT_PREVIEW_INSTRUCTIONS_AND_CURRENT_PRODUCTION_PLAN_PERCENT",
+  "status": "FROZEN_REPORTING_ONLY_SUBORDINATE_TO_CONTROL_PLANE_AND_B4",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "baselineHead": "57e5b4ac096a3311df97253bcbe9abb175141840",
+  "existingPlanPath": "artifacts/orbit360-recovery/release-control/I6_PENDING_CLOSURE_MASTER_PLAN_LOCK_20261004.json",
+  "existingCommercialContractPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PLAN_INTEGRAL_CICLO_COMERCIAL_TRAZABILIDAD_Y_RECUPERACION_20261011.md",
+  "existing86TaskPlanPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_AUDIT_COMPLEMENT_PLAN_FROZEN_20261016.md",
+  "metric": {
+    "name": "AVANCE_ACREDITADO_HACIA_PRODUCCION_DE_LA_CANDIDATA_ACTUAL",
+    "scope": "RELEASE_PATH_B4_003_THROUGH_B4_007",
+    "type": "EVIDENCE_CHECKPOINT_RATIO_NOT_EFFORT_OR_TIME_ESTIMATE",
+    "numerator": 2,
+    "denominator": 10,
+    "percent": 20,
+    "method": "COUNT_PASS_CHECKPOINTS/10 * 100; report-only subdivisions of the frozen execution path; a source or preview step may pass narrowly without certifying functionality",
+    "previousPercent": 20,
+    "deltaPercentagePoints": 0,
+    "denominatorLocked": true,
+    "relabelOrChangeRequiresExplicitEvidenceAndVersionedDecision": true,
+    "doNotConflateWithFormalI6Percent": true,
+    "reportEachTurnWithDeltaAndReason": true,
+    "itemStatusAllMustRemainEvidenceBound": true,
+    "reportBlocksAndNextMaterialStep": true,
+    "releaseMayProceedOnlyAfterExistingB4Gates": true,
+    "checks": [
+      {
+        "id": "R01",
+        "stage": "I6.5/B4-003",
+        "criterion": "Five existing C03 member/active-role source owners repaired and synthetically regressed; NOT deployed writers/real identity proof.",
+        "status": "PASS_SOURCE_QA_ONLY",
+        "evidence": {
+          "runId": 39139438239,
+          "writerChecks": 16,
+          "otherOwnerChecks": 84,
+          "sourceHead": "8f86721abfb401f9f93ac2249244213852e15afd"
+        }
+      },
+      {
+        "id": "R02",
+        "stage": "I6.5/B4-003",
+        "criterion": "Exact cumulative isolated Preview frontend/read-only scoped functions, asset digest/readback and anonymous denial confirmed.",
+        "status": "PASS_TECHNICAL_READ_ONLY_ONLY",
+        "evidence": {
+          "runId": 39139960212,
+          "sourceHead": "3f34d7fe678a02253fcf95887b6186fd7acfca1b",
+          "buildId": "gi-i65-b4-3f34d7fe678a-57f234755dc1",
+          "receiptBlob": "be23352e85d888db11b4f8d4d104048c82edac52"
+        }
+      },
+      {
+        "id": "R03",
+        "stage": "I6.5/B4-003 C03/C04",
+        "criterion": "Effective Firestore direct-get/query denial plus full protected Preview/LIVE backend writer and reader parity; preserve allowed workflows.",
+        "status": "HOLD_BLOCKED_SECURITY",
+        "evidence": {
+          "currentRulesWide": true,
+          "functionsLiveParity": false
+        }
+      },
+      {
+        "id": "R04",
+        "stage": "I6.5/B4-003 C03/C04",
+        "criterion": "Legitimate authenticated multi-UID role×country GT/CO positive/negative permissions, role-switch reload and no stale disclosures.",
+        "status": "HOLD_UNTESTED_AUTHENTICATED"
+      },
+      {
+        "id": "R05",
+        "stage": "I6.5/B4-003",
+        "criterion": "Commercial T01–T18, financial parity, Inicio goals, Ops/Leads and cross-module actions fully tested with server readback.",
+        "status": "HOLD_NOT_FULL_FUNCTIONAL_PASS"
+      },
+      {
+        "id": "R06",
+        "stage": "I6.5/B4-003",
+        "criterion": "Paula targeted visual approval on exact final B4-003 candidate; preserve earlier accepted visual where unaffected.",
+        "status": "HOLD_PAULA_LATEST_PREVIEW_NOT_ACCEPTED"
+      },
+      {
+        "id": "R07",
+        "stage": "I6.5/B4-004",
+        "criterion": "Siniestros/Cronograma causal regression and authenticated acceptance.",
+        "status": "BLOCKED_BY_PREVIOUS_GATE"
+      },
+      {
+        "id": "R08",
+        "stage": "I6.5/B4-005",
+        "criterion": "Full Phase A module×role×country×viewport relations E2E, including Endosos, Certificados, Anexos and knowledge.",
+        "status": "BLOCKED_BY_PREVIOUS_GATE"
+      },
+      {
+        "id": "R09",
+        "stage": "I6.5/B4-006",
+        "criterion": "Final exact-candidate owner UAT and evidence-backed release decision.",
+        "status": "BLOCKED_BY_PREVIOUS_GATE"
+      },
+      {
+        "id": "R10",
+        "stage": "I6.5/B4-007",
+        "criterion": "Exact immutable Preview artifact to LIVE, backend parity, before/after approved writes, integrity, rollback and live module acceptance.",
+        "status": "BLOCKED_RELEASE_UNAUTHORIZED"
+      }
+    ]
+  },
+  "previewReviewPolicy": {
+    "alwaysGiveDirectExactPreviewUrl": true,
+    "alwaysInclude": "source commit, build ID, release status, what changed vs last preview, precise module/route/role/country, actions to perform, expected observations, known blockers, do-not-test actions, and how acceptance is recorded",
+    "targetedOwnerReviewOnly": true,
+    "noManualTechConsoleRequired": true,
+    "preservationRule": "Earlier Paula visual PASS remains unless reproducible causal regression; missing capability does not become PASS by hiding it.",
+    "sourceValidationVsHostedFunctionalProofClearlySeparated": true,
+    "ifNotAuthenticatedNeverClaimUserRoleE2E": true,
+    "doNotAskUserToPerformDeveloperQA": true,
+    "credentialRule": "Never request passwords, secrets, F12 console, or evidence exposing insurer credentials.",
+    "currentPreview": {
+      "url": "https://ays-orbit-360-lab--gi-i65-b4-39139960212-uxf1a0eb.web.app",
+      "sourceSha": "3f34d7fe678a02253fcf95887b6186fd7acfca1b",
+      "buildId": "gi-i65-b4-3f34d7fe678a-57f234755dc1",
+      "runId": 39139960212,
+      "scope": "ISOLATED_PROTECTED_READONLY_PREVIEW_TWO_CALLABLES_OTHER_WRITERS_NOT_DEPLOYED",
+      "targetReview": [
+        {
+          "module": "Login/Inicio",
+          "actions": "Sign in using existing authorized account; inspect visual contrast, automatic centered rotating message, authoritative KPI/metas and GTQ/COP separation; note loading or permission errors",
+          "expected": "No false zero or indefinite loading; approved contrast and no double-click instructions",
+          "proofLimit": "Not a certified real-user authentication test"
+        },
+        {
+          "module": "Equipo/roles",
+          "actions": "Open roster and permitted directory; if account has assigned roles, select Dirección→Operativo→Asesor→Dirección and navigate back to Inicio",
+          "expected": "Only eligible advisor entries by approved role, no stale role data; role access not widened",
+          "proofLimit": "Do not declare security PASS from UI alone"
+        },
+        {
+          "module": "Cliente 360/Pólizas/Cobros",
+          "actions": "Navigate read-only, examine lists, counts, cartera/salud columns and readiness indicators",
+          "expected": "Sources distinguish pending/denied/ready and IDs remain coherent; do not infer repairs not in released writer backend",
+          "proofLimit": "Full finance reconciliation and writes untested"
+        },
+        {
+          "module": "Cancelaciones",
+          "actions": "Open, navigate away and back; check whether content/readiness restores without black screen",
+          "expected": "No persistent spinner or wrong-role cached rows",
+          "proofLimit": "Backend multi-UID functional regression still open"
+        },
+        {
+          "module": "Responsive",
+          "actions": "Check desktop and mobile readability without changing records",
+          "expected": "No overflow, cutoff or unreadable actions",
+          "proofLimit": "Automated 1440/390/320 evidence still required"
+        }
+      ],
+      "doNotTest": [
+        "Create/update/delete records",
+        "Payments or policy issuance",
+        "Invitation or role-permission mutation",
+        "Reveal/share secrets",
+        "Operational workflow persistence, sent emails or provider delivery"
+      ],
+      "realAuthAccepted": false,
+      "sharedRulesDeployed": false,
+      "backendWritersDeployed": false,
+      "productionAccepted": false
+    }
+  },
+  "hardBoundaries": {
+    "noNewGate": true,
+    "noNewBranch": true,
+    "noProductSourceMutation": true,
+    "noOperationalWrites": true,
+    "noDataReimport": true,
+    "noSharedRulesDeploy": true,
+    "noLivePromotion": true,
+    "noRealUserImpersonation": true
+  },
+  "formalI6PercentUnchanged": 50,
+  "nextMaterialAction": "B4_003_EFFECTIVE_RULES_WRITER_PARITY_AND_AUTHENTICATED_GT_CO_VALIDATION"
+}
