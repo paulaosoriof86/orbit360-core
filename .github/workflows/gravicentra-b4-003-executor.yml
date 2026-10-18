@@ -513,7 +513,7 @@ jobs:
           const uatRosterReady=uatScoped&&uat.sourceBlobs&&
             uat.sourceBlobs['functions/assignable-advisor-roster.js']===rosterBlob
             && uat.onlyTwoReadOnlyFunctions===true;
-          const readonlyRoster=scopedPreview&&rosterAuth.status='AUTHORIZED_EXACT_PREVIEW_READONLY_ROSTER_ONLY'
+          const readonlyRoster=scopedPreview&&rosterAuth.status==='AUTHORIZED_EXACT_PREVIEW_READONLY_ROSTER_ONLY'
             && (rosterAuth.sourceBlobSha===rosterBlob||c03RosterReady||uatRosterReady)
             && rosterAuth.service==='orbit360AssignableAdvisorRosterPreview'
             && rosterAuth.businessWritesAuthorized===false

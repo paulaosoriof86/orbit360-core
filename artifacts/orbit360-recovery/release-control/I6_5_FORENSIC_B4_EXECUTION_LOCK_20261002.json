@@ -2917,7 +2917,15 @@
     "realUserImpersonationAuthorized": false,
     "sourceHead": "304454bea5f6a5542e1529cb59d98a9a1a8b455d",
     "workflowPath": ".github/workflows/gravicentra-b4-003-executor.yml",
-    "workflowCandidateBlobSha": "da8816e13d92097e4e828440c1caa6264f66ed8a",
-    "needHumanRoleTestAfterDeploy": true
+    "workflowCandidateBlobSha": "7c5305e8bae79c5ce4f428726e46dd6842bb34b4",
+    "needHumanRoleTestAfterDeploy": true,
+    "initialPreviewAttempt": {
+      "runId": 39159703367,
+      "status": "FAIL_CLOSED_WORKFLOW_SYNTAX",
+      "materialized": false,
+      "deployed": false,
+      "sourceChanged": false,
+      "rootCause": "COMPARISON_OPERATOR_ASSIGNED_INSTEAD_OF_COMPARED"
+    }
   }
 }
