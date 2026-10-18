@@ -12631,13 +12631,15 @@
     "gateAdvanced": false
   },
   "b4003CurrentCumulativePreviewIntent": {
-    "status": "FULFILLED_EXACT_TECHNICAL_PREVIEW_NOT_FUNCTIONAL_ACCEPTANCE",
+    "status": "AUTHORIZED_EXACT_SCOPED_PREVIEW_ONLY",
     "gate": "I6.5/B4-003",
     "triggerSubject": "build(i6.5 B4-003): cumulative authorized protected Preview",
-    "rationale": "B4-003 repeated GitHub success NOOP hid composed fixes; new exact isolated Preview under existing executor to test current cumulative source",
+    "reason": "UAT2 canonical natural/juridica source projection and stale Equipo cached asset corrected with approved source-only fix; one new immutable Preview",
     "rejectedUatReceiptBlobSha": "ebb5e503e2fd575d1f6c98d99af51799d6ea4820",
-    "compositionBlobSha": "ac0a8d4e64b972c47a25d019a86d604d8227ac2e",
+    "compositionBlobSha": "8cf72d0e4be8e03fa32c472114967b3ec134e946",
     "sourceBlobs": {
+      "orbit360-platform/modules/cliente360.js": "2eeabe26db6d9d951f6fbe2659b55992f52648c8",
+      "orbit360-platform/index.html": "4891a03530cee5517a76c9392896c11040abcab5",
       "orbit360-platform/modules/equipo.js": "9e76fbcb70d5a19b8b58aeb72b9fad7acd0bbecf",
       "functions/tenant-domain-config.js": "231fb2f106a6c139bb83c367f0f5e1a1c8924823",
       "functions/b4-003-scoped-access-boundary.js": "a3b70fb9f795b9208e5de281892f1df49666dae2",
@@ -12654,7 +12656,9 @@
       "orbit360AssignableAdvisorRosterPreview"
     ],
     "sourceQaRequired": true,
-    "governanceGuardRequired": true,
+    "sourceQaRunId": 39176211511,
+    "sourceQaCount": 99,
+    "governanceGuardRunId": 39176211521,
     "exactHostedReadbackRequired": true,
     "unauthenticatedCallableNegativeRequired": true,
     "realRoleGTCOUatPending": true,
@@ -12772,7 +12776,7 @@
     "formalI6Percent": 50
   },
   "b4003Uat2ClientTypePresentation": {
-    "status": "SOURCE_ONLY_CAUSAL_FIX_QA_PENDING_NEW_BUILD_AND_EXACT_PREVIEW",
+    "status": "SOURCE_QA_99_CHECKS_PASS_EXACT_READONLY_PREVIEW_AUTHORIZED_HOLD",
     "gate": "I6.5/B4-003",
     "owner": "orbit360-platform/modules/cliente360.js",
     "ownerBefore": "7090d49895ea4235b29c78cf4ec3ebd22017cd26",
@@ -12790,7 +12794,7 @@
     ],
     "unknownTypesRemainUnclassified": true,
     "sourceOnlyPreflightPass": true,
-    "githubQaRunId": null,
+    "githubQaRunId": 39176211511,
     "previewBuildId": null,
     "humanUat": false,
     "sameAlreadyCertifiedPreviewCannotCoverNewSource": true,
@@ -12800,6 +12804,35 @@
     "reimport": false,
     "productionPathPercent": 20,
     "formalI6Percent": 50,
-    "noGateAdvance": true
+    "noGateAdvance": true,
+    "githubGuardRunId": 39176211521,
+    "githubQaResult": "success"
+  },
+  "b4003PreviousCumulativePreviewIntent": {
+    "status": "FULFILLED_EXACT_TECHNICAL_PREVIEW_NOT_FUNCTIONAL_ACCEPTANCE",
+    "buildTriggerSubject": "build(i6.5 B4-003): cumulative authorized protected Preview",
+    "compositionBlobSha": "ac0a8d4e64b972c47a25d019a86d604d8227ac2e",
+    "previewRunId": 39171025187,
+    "buildId": "gi-i65-b4-80c8be5a0472-57f234755dc1",
+    "artifactDigest": "sha256:7dc879c6c78f77bf190fe09e91d627a3334e654b2ec49d3875bc20d9f9217f4a",
+    "humanAccepted": false
+  },
+  "b4003Uat2CurrentPreviewDispatch": {
+    "status": "EXACT_READONLY_BUILD_REQUESTED_WITHIN_EXISTING_B4003_GATE",
+    "sourceChangedSinceLastPreview": true,
+    "affectedModules": [
+      "Cliente360",
+      "Equipo"
+    ],
+    "roleScopesChanged": false,
+    "additionalBackendExportsAuthorized": false,
+    "previousBuildId": "gi-i65-b4-80c8be5a0472-57f234755dc1",
+    "newBuildId": null,
+    "previewUrl": null,
+    "serverWriteQaStatus": "HOLD",
+    "humanAcceptance": false,
+    "securityP0Open": true,
+    "sourceQaRunId": 39176211511,
+    "expectedNoWrite": true
   }
 }
