@@ -1,0 +1,58 @@
+{
+  "schema": "GRAVICENTRA_B4003_C03_CURRENT_SECURITY_GATE_READONLY_V1",
+  "dateLocal": "2026-10-17",
+  "gate": "I6.5/B4-003",
+  "status": "BLOCKED_UNDER_CONFIRMED_LIVE_RULES_AND_HOST_PARITY",
+  "branch": "recovery/fase-a-clean-20260831",
+  "sourceHeadAtReadback": "0f12d8443aeb731b0d1f0f7b0a9d30fba90877be",
+  "liveRules": {
+    "runId": 39092193038,
+    "workflowConclusion": "failure",
+    "outcome": "EXPECTED_SECURITY_HOLD_FAIL_CLOSED",
+    "class": "ACTIVE_LEGACY_MEMBER_WIDE_READ_WRITE_SECURITY_BLOCKER",
+    "digest": "sha256:105f13e095d021a32d49c9b30400e7b509756f8bb45ea958c7483c7a2316bae3",
+    "artifactId": 12122344213,
+    "artifactDigest": "sha256:8b46389989698edb2d400dc82ae0a1b306ff8c301f9206c72787ecf698b9a72c",
+    "latestVerifiedActiveRulesAreSafe": false,
+    "currentSecurityP0Closed": false
+  },
+  "releaseParity": {
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-39063058792-l08egx7p.web.app",
+    "certifiedPreviewSource": "6f0d3a1a6c5827419d0e5f18dca4bed8abc9eb2b",
+    "provider": "orbit360-platform/core/product-runtime-browser-providers-p0.js",
+    "providerBlobSha": "51f2801cf8e7590ff92ffa9e7dae07ff8304f5d7",
+    "app": "orbit360-platform/core/product-app-p0.js",
+    "appBlobSha": "b3080c0dbb8d5ae80061754676a5a39b2c913ec4",
+    "currentPreviewTransportOnly": true,
+    "liveDirectFirestorePathExists": true,
+    "sameImmutableArtifactOnLiveReady": false,
+    "unsafePromotionBlocked": true
+  },
+  "chosenQA": {
+    "method": "EXISTING_GRAVICENTRA_GITHUB_ACTIONS_PLAYWRIGHT_AND_FIREBASE_TEST_LANES",
+    "alternativeReference": {
+      "paulaWorkOS": "GITHUB_OIDC_READ_ONLY_E2E_BUT_DIFFERENT_APP_AUTH",
+      "aysTransformacion": "CHROMIUM_PLAYWRIGHT_VISUAL_CI_NOT_FIREBASE_USER_PROOF"
+    },
+    "currentPreviewRealRoleQa": "HOLD",
+    "existingRealActorTokenQaCode": true,
+    "realUserImpersonationAuthorized": false,
+    "doNotRepeatTinyFishProfile": true
+  },
+  "requiredSameGateWork": [
+    "RECONCILE_LIVE_FIRESTORE_RULES_AND_PROTECTED_BACKEND_REQUIRED_PRODUCT_WRITERS",
+    "PATCH_PREVIEW_LIVE_PROTECTED_HOST_PARITY_WITH_SAME_ARTIFACT_AND_NO_FALLBACK",
+    "REVERIFY_NONREGRESSION_ALL_APPROVED_MODULES_ROLES_GT_CO",
+    "AUTHORIZED_REAL_IDENTITY_OR_SUPPORTED_INTERACTIVE_E2E",
+    "PAULA_VISUAL_AND_EXACT_SAME_DIGEST_LIVE_GATE_AFTER_ALL_P0"
+  ],
+  "explicitBoundaries": {
+    "productMutationAuthorized": false,
+    "realUserImpersonationAuthorized": false,
+    "sharedRulesDeploymentAuthorized": false,
+    "realBusinessWritesAuthorized": false,
+    "livePromotionAuthorized": false,
+    "sourceChangesInThisReceipt": 0
+  },
+  "formalI6Percent": 50
+}

@@ -12251,5 +12251,19 @@
     "livePromotion": false,
     "reason": "VERIFY_ACTUAL_ACTIVE_RULES_FOR_SAFE_PREVIEW_TO_LIVE_SECURITY_BLOCKER",
     "gateAdvanceAuthorized": false
+  },
+  "b4003CurrentSecurityAndReleaseParityReadback20261017": {
+    "status": "BLOCKED_UNDER_CONFIRMED_LIVE_RULES_AND_HOST_PARITY",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CURRENT_LIVE_RULES_AND_RELEASE_PARITY_BLOCKERS_20261017.json",
+    "receiptBlobSha": "e7f683d8ab24c9b6f724021e3a88cfac4f8792ee",
+    "readbackRunId": 39092193038,
+    "readbackArtifactId": 12122344213,
+    "classification": "ACTIVE_LEGACY_MEMBER_WIDE_READ_WRITE_SECURITY_BLOCKER",
+    "effectiveRulesDigest": "sha256:105f13e095d021a32d49c9b30400e7b509756f8bb45ea958c7483c7a2316bae3",
+    "fullProtectedPreviewLiveParityRequired": true,
+    "sourcePatchApplied": false,
+    "productionPromotionAuthorized": false,
+    "realUserImpersonationAuthorized": false,
+    "formalI6Percent": 50
   }
 }
