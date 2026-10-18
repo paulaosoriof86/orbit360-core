@@ -50,6 +50,7 @@ Orbit.modules.equipo = (function () {
   }
   function hasRole(a, role) { return rolesOf(a).includes(role); }
   function hasAnyRole(a, roles) { return roles.some(r => hasRole(a, r)); }
+  function isAdministrative(a) { return hasAnyRole(a, ['Dirección', 'SuperAdmin', 'AdminTenant', 'Admin', 'Finanzas']); }
   function active(a) { return !(a && (a.inactivo || a.activo === false || a.estado === 'inactivo')); }
   function slug(v) {
     return String(v || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
@@ -174,7 +175,7 @@ Orbit.modules.equipo = (function () {
   function filteredTeam(team) {
     if (userFilter === 'asesor') return team.filter(a => hasRole(a, 'Asesor'));
     if (userFilter === 'operativo') return team.filter(a => hasRole(a, 'Operativo'));
-    if (userFilter === 'admin') return team.filter(a => hasAnyRole(a, ['Dirección', 'Admin', 'Finanzas']));
+    if (userFilter === 'admin') return team.filter(isAdministrative);
     if (userFilter === 'multirol') return team.filter(a => rolesOf(a).length > 1);
     return team;
   }
@@ -186,7 +187,7 @@ Orbit.modules.equipo = (function () {
     const shown = filteredTeam(team);
     const asesores = team.filter(a => hasRole(a, 'Asesor')).length;
     const operativos = team.filter(a => hasRole(a, 'Operativo')).length;
-    const admins = team.filter(a => hasAnyRole(a, ['Dirección', 'Admin', 'Finanzas'])).length;
+    const admins = team.filter(isAdministrative).length;
     const multi = team.filter(a => rolesOf(a).length > 1).length;
     return `<div class="cfg-note" style="margin-bottom:14px">👥 Un usuario puede tener varios roles. Los conteos se superponen: una persona puede ser asesora y administrativa u operativa. <b>Comercial</b> queda como rol legado; para nuevas configuraciones usa <b>Asesor</b> y agrega módulos extra cuando corresponda.</div>
     ${K.kpis([

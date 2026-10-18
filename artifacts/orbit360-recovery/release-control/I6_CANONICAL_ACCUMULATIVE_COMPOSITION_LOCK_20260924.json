@@ -234,7 +234,7 @@
     "orbit360-platform/modules/cronograma.js": "c2c5e2cccae88e5c3492aef0e7f109a0a896e5fa",
     "orbit360-platform/modules/equipo-credential-admin-v20260805-bridge.js": "7432bc05938469187fdd120a5bc023c53a000ab9",
     "orbit360-platform/modules/equipo-onboarding-v20260804-bridge.js": "1da619d8abd676d31d69a038d4770463ca67fdc5",
-    "orbit360-platform/modules/equipo.js": "d38a48e41680193906637c08f8e6695b221099b7",
+    "orbit360-platform/modules/equipo.js": "9e76fbcb70d5a19b8b58aeb72b9fad7acd0bbecf",
     "orbit360-platform/modules/inicio.js": "15fcfea5195f6c1ec7c61ee937761b1d2300e3b0",
     "orbit360-platform/modules/issuance-endosos-v1201-bridge.js": "2020152b4b2df1338be4b3ef2a9f121d777e21db",
     "orbit360-platform/modules/leads.js": "4e12e604382f2731a03d29cf00db3c086d77ebc1",
@@ -6076,5 +6076,22 @@
     "deploy": false,
     "realWrites": 0,
     "gate": "I6.5/B4-003"
+  },
+  "b4003Oct18TeamAdministrativeRoleClassifier": {
+    "gate": "I6.5/B4-003",
+    "sourceFile": "orbit360-platform/modules/equipo.js",
+    "sourceBeforeBlob": "d38a48e41680193906637c08f8e6695b221099b7",
+    "sourceAfterBlob": "9e76fbcb70d5a19b8b58aeb72b9fad7acd0bbecf",
+    "qaFile": "tools/gravicentra-b4-003-role-first-paint-and-team-regression.test.cjs",
+    "qaBeforeBlob": "1824f7048559bc9dcfcdae2272b1065330914f44",
+    "qaAfterBlob": "2f84c391ccc6b0a40895e08481681431125775e9",
+    "cause": "ADMINISTRATIVE_FILTER_AND_KPI_OMIT_SUPERADMIN_AND_ADMINTENANT",
+    "scope": "DISPLAY_COUNT_AND_FILTER_ONLY_NO_ROLE_PERMISSION_OR_DATA_CHANGE",
+    "preflight": "SYNTAX_AND_8_EXECUTED_SYNTHETIC_CASES_PASS",
+    "authAndUat": "HOLD",
+    "preview": "NOT_BUILT",
+    "sharedRulesDeployed": false,
+    "livePromoted": false,
+    "dataWrites": 0
   }
 }

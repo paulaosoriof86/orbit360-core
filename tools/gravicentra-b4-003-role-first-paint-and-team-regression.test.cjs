@@ -60,4 +60,24 @@ assert.match(bootstrap,/function protectedRoleMembership\(membership, selected\)
 assert.doesNotMatch(bootstrap,/if\s*\(String\(selected \|\| ''\)\.toLowerCase\(\) !== 'operativo'\) return member/,'ADVISOR_ROLE_RECOMPILE_BYPASS');checks++;
 assert.match(access,/var visible=explicitRoleKey!==undefined\?/,'ROLE_TEAM_MUST_NOT_UNION_GLOBAL');checks++;
 assert.match(access,/var teamId = explicitRoleKey!==undefined\?'':/,'TEAM_ID_MUST_NOT_OVERRIDE_EXPLICIT_MAP');checks++;
+
+// UAT2-01: the administrative tally and filter consume the same canonical
+// classifier; synthetic only, not signed-in authorization or LIVE acceptance.
+const adminFrom=team.indexOf('  function arr(v) {'),adminTo=team.indexOf('  function active(a)',adminFrom);
+assert.ok(adminFrom>=0&&adminTo>adminFrom,'ADMIN_CLASSIFIER_SOURCE_BOUNDS');checks++;
+const adminContext={Orbit:{productRoleTaxonomyP0:{canonicalRole:r=>r==='Admin'?'AdminTenant':r}},Array,Set};
+vm.runInNewContext(team.slice(adminFrom,adminTo)+'\nthis.adminQA={isAdministrative};',adminContext);
+for(const [record,want,label] of [
+ [{roles:['SuperAdmin','Asesor']},true,'superadmin_multirol'],
+ [{roles:['AdminTenant','Operativo']},true,'admintenant_multirol'],
+ [{roles:['Dirección']},true,'direccion'],
+ [{roles:['Admin']},true,'admin_alias'],
+ [{roles:['Finanzas']},true,'finanzas_preserved'],
+ [{roles:['Asesor','Operativo']},false,'nonadmin_multirol'],
+ [{roles:['Asesor']},false,'asesor_only'],
+ [{roles:['Operativo']},false,'operativo_only']
+]){expect(adminContext.adminQA.isAdministrative(record),want,'ADMIN_TALLY_'+label);}
+assert.match(team,/if \(userFilter === 'admin'\) return team\.filter\(isAdministrative\)/,'ADMIN_FILTER_MATCHES_CLASSIFIER');checks++;
+assert.match(team,/const admins = team\.filter\(isAdministrative\)\.length;/,'ADMIN_TALLY_MATCHES_FILTER');checks++;
+
 console.log('B4_003_FIRST_PAINT_TEAM_ROLE_READINESS_SOURCE_VM_QA_PASS checks='+checks+' no_remote_access no_writes');
