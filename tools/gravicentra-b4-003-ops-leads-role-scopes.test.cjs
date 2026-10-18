@@ -98,8 +98,9 @@ const legacyAdmin=grab('functions/ops-leads-domain.js','function canManage(membe
 assert.equal(legacyAdmin.canManage(multi,'asesor'),false,'LEGACY_ADVISOR_NO_ADMIN_INHERIT');
 assert.equal(legacyAdmin.canManage(multi,'operativo'),true,'LEGACY_ACTIVE_OPERATIVO_PRESERVED');
 securityChecks+=2;
+const configAdminRoles=new Set(['direccion','admin','admintenant','superadmin']);
 const accessAdmin=grab('functions/tenant-domain-config.js','function canManage(member, domain, activeRole) {','async function authorize(','canManage',{
- ADMIN_ROLES:adminRoles,permissions:member=>member.permissions||[],PERMISSIONS:new Set(['config_manage'])});
+ ADMIN_ROLES:configAdminRoles,permissions:member=>member.permissions||[],PERMISSIONS:new Set(['config_manage'])});
 assert.equal(accessAdmin.canManage(multi,'access','asesor'),false,'CONFIG_ADVISOR_NO_ADMIN_INHERIT');
 assert.equal(accessAdmin.canManage(multi,'access','operativo'),false,'CONFIG_OPERATIVO_NOT_ADMIN');
 assert.equal(accessAdmin.canManage(multi,'access','admin'),true,'CONFIG_APPROVED_ADMIN_PRESERVED');

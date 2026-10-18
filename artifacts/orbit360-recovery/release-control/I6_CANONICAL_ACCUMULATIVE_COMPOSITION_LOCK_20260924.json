@@ -5973,7 +5973,7 @@
       }
     ],
     "qaPath": "tools/gravicentra-b4-003-ops-leads-role-scopes.test.cjs",
-    "qaBlobSha": "3f8eaf8efc530d1f64fe304cffd2748a433ef1e5",
+    "qaBlobSha": "f6ec56dddd39dc3a25d35e1b5b2ce8654b34dcbe",
     "productSourceStaged": true,
     "backendDeployed": false,
     "sharedRulesDeploy": false,
@@ -5981,6 +5981,7 @@
     "realUserImpersonation": false,
     "realBusinessWrites": 0,
     "reimport": false,
-    "formalPointsAdded": 0
+    "formalPointsAdded": 0,
+    "qaFixtureCorrection": "CONFIG_OPERATIVO_ROLE_IS_NOT_ADMIN_ALLOWED"
   }
 }

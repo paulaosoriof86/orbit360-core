@@ -2725,8 +2725,8 @@
       }
     ],
     "qaPath": "tools/gravicentra-b4-003-ops-leads-role-scopes.test.cjs",
-    "qaBlobSha": "3f8eaf8efc530d1f64fe304cffd2748a433ef1e5",
-    "compositionBlobSha": "b341bd162b0b48c4e315a36bc95fb6586e06785a",
+    "qaBlobSha": "f6ec56dddd39dc3a25d35e1b5b2ce8654b34dcbe",
+    "compositionBlobSha": "99699f7e58829a88aae099beb50012ade421c9ee",
     "productSourceOnly": true,
     "broadProductMutationAuthorized": false,
     "productionDeployAuthorized": false,
@@ -2738,6 +2738,14 @@
     "reimportAuthorized": false,
     "pastFunctionalAcceptancePreserved": true,
     "formalPointsAdded": 0,
-    "nextAction": "EXISTING_B4003_SOURCE_QA_AND_EMULATOR_THEN_NEW_EXACT_PREVIEW_AUTHORIZATION"
+    "nextAction": "EXISTING_B4003_SOURCE_QA_AND_EMULATOR_THEN_NEW_EXACT_PREVIEW_AUTHORIZATION",
+    "qaFixtureCorrection": {
+      "status": "QA_ONLY_REPAIR",
+      "failedRunId": 39139094080,
+      "failedCode": "CONFIG_OPERATIVO_NOT_ADMIN",
+      "rootCause": "VM fixture reused Ops administrator roles for Configuracion, whose contract has no Operativo admin",
+      "productSourceChanged": false,
+      "noRerunPreviouslyAcceptedProductWork": true
+    }
   }
 }
