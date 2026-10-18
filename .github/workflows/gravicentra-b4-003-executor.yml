@@ -318,7 +318,7 @@ jobs:
           if(currentSubject===uat.triggerSubject&&!uatScoped)
             throw Error('B4_003_PAULA_REJECTED_UAT_EXACT_PREVIEW_GATE_DENIED');
           // B4-003 same executor: new approved cumulative source after second UAT rejection.
-// No legacy preview can certify this SHA; any unsupported intent FAILS rather than NOOP.
+          // No legacy preview can certify this SHA; any unsupported intent FAILS rather than NOOP.
           const currentPreviewIntent=c.b4003CurrentCumulativePreviewIntent||{};
           const currentScoped=currentSubject===currentPreviewIntent.triggerSubject
             && currentPreviewIntent.status==='AUTHORIZED_EXACT_SCOPED_PREVIEW_ONLY'
