@@ -273,7 +273,51 @@ jobs:
             && l.boundaries?.livePromotionAuthorized===false;
           if(currentSubject===c03Auth.triggerSubject&&!c03Scoped)
             throw Error('B4_003_C03_OCT18_SCOPED_PREVIEW_GATE_DENIED');
-          const scopedPreview=priorScopedPreview||onePassInternal||oct15ScopedReadback||restrictedScoped||c03Scoped;
+          // Paula's rejected UAT must never inherit the earlier C03 Preview PASS.
+          // This authorizes only a fresh read-only candidate from the approved
+          // source/QA blobs, not the old artifact or any production function.
+          const uat=c.paula18OctUatReadOnlyPreviewAuthorization||{};
+          const uatLock=l.paula18OctUatReadOnlyPreviewAuthorization||{};
+          const uatBlobs=uat.sourceBlobs&&typeof uat.sourceBlobs==='object'?uat.sourceBlobs:{};
+          const uatScoped=currentSubject===uat.triggerSubject
+            && uat.status==='AUTHORIZED_EXACT_READONLY_PREVIEW_PENDING'
+            && uatLock.status==='AUTHORIZED_EXACT_READONLY_PREVIEW_PENDING'
+            && uat.sourceQaStatus==='success'&&uat.governanceStatus==='success'
+            && Number.isInteger(uat.qaRunId)&&uat.qaRunId>0&&uat.qaRunId===uatLock.qaRunId
+            && Number.isInteger(uat.guardRunId)&&uat.guardRunId>0&&uat.guardRunId===uatLock.guardRunId
+            && uat.previousPreviewRejected===true
+            && Object.keys(uatBlobs).length>=10
+            && Object.keys(uatBlobs).every(p=>uatBlobs[p]===c03Hash(p))
+            && uatLock.sourceBlobs&&Object.keys(uatBlobs).every(p=>uatLock.sourceBlobs[p]===uatBlobs[p])
+            && uat.compositionBlobSha===c03Hash('artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json')
+            && c.canonicalAccumulationControl?.compositionLockBlobSha===uat.compositionBlobSha
+            && uat.onlyTwoReadOnlyFunctions===true&&uatLock.onlyTwoReadOnlyFunctions===true
+            && uat.isolatedHostingOnly===true
+            && uat.sharedRulesDeploymentAuthorized===false
+            && uat.otherFunctionsDeployAuthorized===false
+            && uat.productionPromotionAuthorized===false
+            && uat.operationalWritesAuthorized===false
+            && uat.dataMutationAuthorized===false
+            && uat.realUserImpersonationAuthorized===false
+            && uat.reimportAuthorized===false
+            && c.paula18OctVisualRejectSourceRemediation?.humanUat==='FAIL_ON_LATEST_SCOPED_PREVIEW'
+            && c.paula18OctCancellationStaleOwnScopeCausalFix?.status==='SOURCE_QA_PASS_NO_DEPLOY'
+            && c.currentB4?.status==='B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL'
+            && c.nextAction==='I6_5_FORENSIC_REMEDIATION_B4_003_R20_TARGETED_PAULA_VISUAL'
+            && c.b4003SecurityReleaseHold?.status==='ACTIVE_FAIL_CLOSED_UNAUTHORIZED_BROWSER_FIRESTORE_READ_WRITE'
+            && l.activeFinding?.id==='B4-003'
+            && l.boundaries?.previewMutationAuthorized===true
+            && l.boundaries?.functionDeploymentAuthorized===true
+            && l.boundaries?.productMutationAuthorized===false
+            && l.boundaries?.dataMutationAuthorized===false
+            && l.boundaries?.realOperationalWritesAuthorized===false
+            && l.boundaries?.businessWritesAuthorized===false
+            && l.boundaries?.syntheticQaWritesAuthorized===false
+            && l.boundaries?.reimportAuthorized===false
+            && l.boundaries?.livePromotionAuthorized===false;
+          if(currentSubject===uat.triggerSubject&&!uatScoped)
+            throw Error('B4_003_PAULA_REJECTED_UAT_EXACT_PREVIEW_GATE_DENIED');
+          const scopedPreview=priorScopedPreview||onePassInternal||oct15ScopedReadback||restrictedScoped||c03Scoped||uatScoped;
           const previewOk=(r19Preview||r20Preview||r23Preview)
             && l.activeFinding?.id==='B4-003'
             && l.boundaries?.businessWritesAuthorized===false
@@ -466,8 +510,11 @@ jobs:
           const c03RosterReady=c03Scoped&&c03Auth.rosterSourceBlobSha===rosterBlob
             && rosterAuth.service==='orbit360AssignableAdvisorRosterPreview'
             && c03Auth.onlyTwoReadOnlyFunctions===true;
-          const readonlyRoster=scopedPreview&&rosterAuth.status==='AUTHORIZED_EXACT_PREVIEW_READONLY_ROSTER_ONLY'
-            && (rosterAuth.sourceBlobSha===rosterBlob||c03RosterReady)
+          const uatRosterReady=uatScoped&&uat.sourceBlobs&&
+            uat.sourceBlobs['functions/assignable-advisor-roster.js']===rosterBlob
+            && uat.onlyTwoReadOnlyFunctions===true;
+          const readonlyRoster=scopedPreview&&rosterAuth.status='AUTHORIZED_EXACT_PREVIEW_READONLY_ROSTER_ONLY'
+            && (rosterAuth.sourceBlobSha===rosterBlob||c03RosterReady||uatRosterReady)
             && rosterAuth.service==='orbit360AssignableAdvisorRosterPreview'
             && rosterAuth.businessWritesAuthorized===false
             && rosterAuth.otherFunctionsDeployAuthorized===false
@@ -476,7 +523,7 @@ jobs:
             && c.b4003SecurityReleaseHold?.status==='ACTIVE_FAIL_CLOSED_UNAUTHORIZED_BROWSER_FIRESTORE_READ_WRITE'
             && l.boundaries?.previewMutationAuthorized===true
             && l.boundaries?.realOperationalWritesAuthorized===false;
-          if((currentSubject===requestedOct15Subject||c03Scoped)&&scopedPreview&&!readonlyRoster)
+          if((currentSubject===requestedOct15Subject||c03Scoped||uatScoped)&&scopedPreview&&!readonlyRoster)
             throw Error('B4_003_DASHBOARD_READONLY_PREVIEW_SYNC_NOT_AUTHORIZED');
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'readonly_roster='+(readonlyRoster?'true':'false')+'\n');
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'scoped_preview='+(scopedPreview?'true':'false')+'\n');

@@ -2857,7 +2857,7 @@
     "formalI6Progress": 50
   },
   "paula18OctCancellationStaleOwnScopeCausalFix": {
-    "status": "CAUSAL_SOURCE_STAGED_PENDING_EXISTING_QA",
+    "status": "SOURCE_QA_PASS_EXACT_PREVIEW_UNCHANGED_SECURITY_HOLD",
     "gate": "I6.5/B4-003",
     "authority": "PAULA_20261018_CONTINUE_FROM_REJECTED_FUNCTIONAL_PREVIEW_AND_CAUSAL_QA_FAILURE",
     "allowedScope": "ONE_PROTECTED_SCOPED_READER_SOURCE_AND_ITS_EXISTING_QA_ONLY",
@@ -2876,6 +2876,48 @@
     "noNewGate": true,
     "percentToProduction": 20,
     "formalI6Percent": 50,
-    "releaseSecurityHoldPreserved": true
+    "releaseSecurityHoldPreserved": true,
+    "qaRunId": 39159302326,
+    "guardRunId": 39159302361
+  },
+  "paula18OctUatReadOnlyPreviewAuthorization": {
+    "status": "AUTHORIZED_EXACT_READONLY_PREVIEW_PENDING",
+    "triggerSubject": "build(i6.5 B4-003): Paula UAT recovered exact readonly Preview",
+    "previousPreviewRejected": true,
+    "qaRunId": 39159302326,
+    "guardRunId": 39159302361,
+    "sourceQaStatus": "success",
+    "governanceStatus": "success",
+    "sourceBlobs": {
+      "functions/b4-003-scoped-related-reader.js": "69706943a73c926da41b2256db425031b8f87b19",
+      "functions/b4-003-scoped-access-boundary.js": "a3b70fb9f795b9208e5de281892f1df49666dae2",
+      "functions/assignable-advisor-roster.js": "75ca53db55e2665123589b0e63253a8e4f8c377c",
+      "orbit360-platform/core/access-scope.js": "66462ba7263fe7cb9a078148810bd17c96ad72c7",
+      "orbit360-platform/core/backend-product-readonly-bootstrap-p0.js": "aa70a29b7e3d5a5ac4bef003fb6db07a0439af0f",
+      "orbit360-platform/core/membership-multirol-contract-p0.js": "d27b052d4d32872bfe2e1c950c9995a2e2100841",
+      "orbit360-platform/core/tenant-access-policy-contract-p0.js": "2eb52557ca9b38f80746527987a66091f1e1b81f",
+      "orbit360-platform/core/product-app-p0.js": "2c1f4e6558945480a8ba4b50836ef84acf978bfe",
+      "orbit360-platform/core/router.js": "0d52fe45097c8880b6ff8fc29fd93f04da2b6919",
+      "orbit360-platform/modules/equipo.js": "d38a48e41680193906637c08f8e6695b221099b7",
+      "orbit360-platform/modules/inicio.js": "15fcfea5195f6c1ec7c61ee937761b1d2300e3b0"
+    },
+    "compositionBlobSha": "5031475321c059ced7a0ba3a49147f4b7669ce5a",
+    "onlyTwoReadOnlyFunctions": true,
+    "approvedFunctionExports": [
+      "orbit360ScopedPolicyReadPreview",
+      "orbit360AssignableAdvisorRosterPreview"
+    ],
+    "isolatedHostingOnly": true,
+    "otherFunctionsDeployAuthorized": false,
+    "sharedRulesDeploymentAuthorized": false,
+    "productionPromotionAuthorized": false,
+    "operationalWritesAuthorized": false,
+    "dataMutationAuthorized": false,
+    "reimportAuthorized": false,
+    "realUserImpersonationAuthorized": false,
+    "sourceHead": "304454bea5f6a5542e1529cb59d98a9a1a8b455d",
+    "workflowPath": ".github/workflows/gravicentra-b4-003-executor.yml",
+    "workflowCandidateBlobSha": "da8816e13d92097e4e828440c1caa6264f66ed8a",
+    "needHumanRoleTestAfterDeploy": true
   }
 }
