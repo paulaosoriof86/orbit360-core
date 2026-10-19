@@ -12631,7 +12631,7 @@
     "gateAdvanced": false
   },
   "b4003CurrentCumulativePreviewIntent": {
-    "status": "AUTHORIZED_EXACT_SCOPED_PREVIEW_ONLY",
+    "status": "FULFILLED_EXACT_TECHNICAL_PREVIEW_NOT_FUNCTIONAL_ACCEPTANCE",
     "gate": "I6.5/B4-003",
     "triggerSubject": "build(i6.5 B4-003): cumulative authorized protected Preview",
     "reason": "Affirmative server module entitlements now fail closed while preserving sanctioned role scopes and Receipt owner; source QA and central guard PASS",
@@ -12927,5 +12927,16 @@
     "guardRunId": 39178134554,
     "formalI6Percent": 50,
     "productionPathPercent": 20
+  },
+  "b4003AffirmativeReadPreviewReceipt": {
+    "status": "TECHNICAL_PREVIEW_PASS_AUTHENTICATED_UAT_HOLD",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_AFFIRMATIVE_MODULE_PREVIEW_READBACK_20261018.json",
+    "sha": "6988b0d397ef2b78abc096329657e05b79b92afa",
+    "runId": 39178292742,
+    "buildId": "gi-i65-b4-aed453e5a70d-57f234755dc1",
+    "url": "https://ays-orbit-360-lab--gi-i65-b4-39178292742-kgklkjoy.web.app",
+    "signedInRoleCountryPass": false,
+    "releaseAuthorized": false,
+    "productionPercent": 20
   }
 }

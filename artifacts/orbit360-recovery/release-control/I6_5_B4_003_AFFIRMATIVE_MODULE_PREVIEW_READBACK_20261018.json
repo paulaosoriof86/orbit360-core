@@ -1,0 +1,28 @@
+{
+  "gate": "I6.5/B4-003",
+  "status": "TECHNICAL_PREVIEW_PASS_AUTHENTICATED_UAT_HOLD",
+  "sourceSha": "aed453e5a70dd5729d448cdef2d5dd9f13612f0e",
+  "runId": 39178292742,
+  "url": "https://ays-orbit-360-lab--gi-i65-b4-39178292742-kgklkjoy.web.app",
+  "buildId": "gi-i65-b4-aed453e5a70d-57f234755dc1",
+  "artifactId": 12155192785,
+  "archiveSha256": "8b36d311d218f5aee1333d13853b3254bea284ead8731eeb71820d5f82fe7a99",
+  "hostedDigest": "f54184abb500a7881b8df2d704f18e203040f7d6929ad3c01dd88e10d0bfa50e",
+  "backendDigest": "b12da1d6d6f12189730510ee6861f3768c098f34e215227c00d2a7666c7ac8a4",
+  "tests": {
+    "positiveModuleChecks": 20,
+    "relatedChecks": 104,
+    "guardRun": 39178134554
+  },
+  "realUidGtCoAccepted": false,
+  "rulesDeployed": false,
+  "livePromoted": false,
+  "dataWrites": 0,
+  "productionReadiness": {
+    "passed": 2,
+    "total": 10,
+    "percent": 20,
+    "delta": 0
+  },
+  "formalI6Percent": 50
+}
