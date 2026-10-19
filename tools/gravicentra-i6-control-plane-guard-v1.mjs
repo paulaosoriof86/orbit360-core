@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import {execFileSync} from 'node:child_process';
+import {createHash} from 'node:crypto';
 
 const CONTROL='artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json';
 const STATUS_LEDGER='artifacts/orbit360-recovery/release-control/CAPABILITY_STATUS_LEDGER.json';
@@ -208,7 +209,7 @@ if(String(C.i65ForensicRemediationPlan?.currentBlock||'')==='B4' &&
        uat.gate==='I6.5/B4-003'&&
        uat.userReportBlobSha===git('hash-object',reportPath)&&
        uat.userReportBlobSha===lock.userReportBlobSha&&
-       require('node:crypto').createHash('sha256').update(fs.readFileSync(reportPath)).digest('hex')===uat.userReportSha256&&
+       createHash('sha256').update(fs.readFileSync(reportPath)).digest('hex')===uat.userReportSha256&&
        uat.receiptPath===receiptPath&&uat.receiptBlobSha===git('hash-object',receiptPath)&&
        uat.receiptBlobSha===lock.receiptBlobSha,
        'B4_003_UAT4_EXACT_HUMAN_REPORT_OR_RECEIPT_DRIFT');
