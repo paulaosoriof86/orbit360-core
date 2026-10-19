@@ -2946,5 +2946,56 @@
     "sharedRulesDeploy": false,
     "livePromotion": false,
     "dataWrites": 0
+  },
+  "b4003LoginStartupScopedRepair20261019": {
+    "status": "SOURCE_STAGED_QA_PENDING_EXACT_PREVIEW",
+    "gate": "I6.5/B4-003",
+    "date": "2026-10-19",
+    "authority": "USER_REQUESTED_CONTINUATION_OF_PREVIOUSLY_DEFINED_B4_003_P0_REPAIR",
+    "preciseAuthorizedFiles": [
+      "orbit360-platform/data/store-firestore-product-readonly-p0.js",
+      "functions/b4-003-scoped-related-reader.js"
+    ],
+    "beforeBlobs": {
+      "orbit360-platform/data/store-firestore-product-readonly-p0.js": "41a903a88caa338c74f636c1cd31e23f79aa2481",
+      "functions/b4-003-scoped-related-reader.js": "69706943a73c926da41b2256db425031b8f87b19"
+    },
+    "sourceBlobs": {
+      "orbit360-platform/data/store-firestore-product-readonly-p0.js": "111d5409f33cf71c301255b57aba1e4f72581478",
+      "functions/b4-003-scoped-related-reader.js": "889feecc4e8ebd9240c53ad6f8d4777d47900f00"
+    },
+    "qaBlobs": {
+      "tools/gravicentra-b4-003-protected-hydration.test.cjs": "5705bb22b79cb3e0e7dfa10db1c32f009ff9f141",
+      "tools/gravicentra-b4-003-scoped-related-reader.test.cjs": "963021928f4ab74d4b876fb4ef221f51558782de"
+    },
+    "compositionBlobSha": "d83fc23b8eb329dfb47dd7e70ff6d83ce3d6fbc2",
+    "cause": "BOUNDED_SYNTHETIC_REPRODUCTION_OF_8S_POST_AUTH_CLIENT_HYDRATION_FAILURE",
+    "proof": {
+      "baselineClients": 443,
+      "countrySplit": {
+        "GT": 400,
+        "CO": 43
+      },
+      "simulatedResponseLatencyMs": 950,
+      "preFix": {
+        "clientPageSize": 50,
+        "readyWithin8Sec": false
+      },
+      "inMemoryPostFix": {
+        "clientPageSize": 200,
+        "clientPages": 3,
+        "readyWithin8Sec": true,
+        "recordsComplete": 443
+      },
+      "sourceSystemRuntimeError": "UNVERIFIED_PENDING_AUTHENTICATED_TRACING",
+      "roleCountrySecureE2E": "HOLD",
+      "liveRulesSecure": "HOLD"
+    },
+    "scope": "SOURCE_AND_SYNTHETIC_QA_ONLY_EXISTING_B4_003_NOT_AN_EXPANSION_OF_GLOBAL_MUTATION",
+    "noSharedRulesDeploy": true,
+    "noLivePromotion": true,
+    "noFirebaseDataWrites": true,
+    "noSecrets": true,
+    "previousPreviewStaleForThisSource": true
   }
 }

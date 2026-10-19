@@ -154,7 +154,7 @@ async function readScopedRelatedList({db,auth,request}){
  const pageSize=Number(q.pageSize==null?20:q.pageSize);
  if(!collections.has(coll))throw new Denied('COLLECTION_DENIED');
  if(!['GT','CO'].includes(country))throw new Denied('COUNTRY_DENIED');
- if(!Number.isInteger(pageSize)||pageSize<1||pageSize>50)throw new Denied('PAGE_SIZE_INVALID');
+ if(!Number.isInteger(pageSize)||pageSize<1||pageSize>(coll==='clientes'?200:50))throw new Denied('PAGE_SIZE_INVALID');
  if(policyId)safeId(policyId,'POLICY');
  if(hasBatch&&(!Array.isArray(q.policyIds)||policyIds.length<1||policyIds.length>10||
     new Set(policyIds).size!==policyIds.length||policyId))

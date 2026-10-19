@@ -148,7 +148,33 @@ const pause=()=>new Promise(ok=>setTimeout(ok,30));
  assert.deepEqual(Array.from(startup.all('vehiculos'),x=>x.id),['v1','v2','v3']);
  assert.deepEqual(Array.from(startup.all('carteraPrimas'),x=>x.id),['d1','d3']);
  assert.equal(direct,0);
-  console.log('B4_003_PROTECTED_EIGHT_REQUIRED_COLLECTIONS_QA_PASS checks=5 no_direct_firestore multi_country_advisor_merged');
+ 
+ // B4-003 P0: 443 synthetic cross-country clients must hydrate in <=3 bounded
+ // requests, preserving complete authoritative results and no direct Firestore.
+ const bulkByCountry={
+   GT:Array.from({length:400},(_,i)=>({id:'gt-client-'+i,canonicalDocumentId:'gt-client-'+i,tenantId:tenant,pais:'GT',asesorId:'a1'})),
+   CO:Array.from({length:43},(_,i)=>({id:'co-client-'+i,canonicalDocumentId:'co-client-'+i,tenantId:tenant,pais:'CO',asesorId:'a1'}))
+ };
+ const bulkCalls=[];
+ const bulkDeps={...deps,protectedReadPage:async req=>{
+   bulkCalls.push({collection:req.collection,country:req.country,pageSize:req.pageSize,cursor:req.cursor});
+   assert.equal(req.collection,'clientes','P0_BOOTSTRAP_CLIENTS_ONLY');
+   assert.equal(req.pageSize,200,'P0_CLIENTS_PAGE_SIZE_BOUND');
+   const source=bulkByCountry[req.country]||[];
+   const pos=req.cursor?source.findIndex(row=>row.id===req.cursor)+1:0;
+   const portion=source.slice(pos,pos+req.pageSize);
+   return {ok:true,serverScoped:true,collection:'clientes',country:req.country,rows:portion,
+     nextCursor:pos+portion.length<source.length?portion[portion.length-1].id:null};
+ }};
+ const bulkStore=win.Orbit.createFirestoreProductReadOnlyStoreP0(bulkDeps,config(['clientes']));
+ assert.equal(bulkStore._attachSnapshots(),true);
+ await pause();
+ assert.equal(bulkStore._productStatus().ready,true,'P0_COMPLETE_CLIENT_UNIVERSE_AUTHORITATIVE');
+ assert.equal(bulkStore.all('clientes').length,443,'P0_NO_PARTIAL_CLIENT_FINALS');
+ assert.equal(bulkCalls.length,3,'P0_NO_9_SEQUENTIAL_CLIENT_PAGE_ROUNDTRIPS');
+ assert.equal(direct,0,'P0_NO_BROWSER_FIRESTORE_FALLBACK');
+ console.log('B4_003_P0_CLIENT_PAGE_BATCHING_SYNTHETIC_PASS clients=443 calls=3 pageSize=200 directFirestore=0 writes=0');
+ console.log('B4_003_PROTECTED_EIGHT_REQUIRED_COLLECTIONS_QA_PASS checks=5 no_direct_firestore multi_country_advisor_merged');
  const flowsConfig=config(['negocios','gestiones']);flowsConfig.requiredCollections=['negocios','gestiones'];
  const flows=win.Orbit.createFirestoreProductReadOnlyStoreP0(deps,flowsConfig);
  assert.equal(flows._attachSnapshots(),true);

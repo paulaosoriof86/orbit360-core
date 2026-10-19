@@ -90,7 +90,7 @@
         if(countries.indexOf(selectedCountry)<0)return Promise.reject(new Error('PROTECTED_READ_COUNTRY_DENIED'));
         countries=[selectedCountry];
       }
-      var initialRole=role(),rows=[],seen=new Set(),pageSize=collection==='polizas'?200:50;
+      var initialRole=role(),rows=[],seen=new Set(),pageSize=(collection==='polizas'||collection==='clientes')?200:50;
       return countries.reduce(function(pr,country){return pr.then(function(){
         var cursor='',pages=0,countrySeen=new Set();
         function next(){

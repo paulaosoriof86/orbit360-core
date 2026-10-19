@@ -136,6 +136,45 @@ if(String(C.i65ForensicRemediationPlan?.currentBlock||'')==='B4' &&
    }
    console.log('B4_003_RESCUE_SOURCE=PREVIEW_QA_PENDING_RELEASE_BLOCKED');
  }
+
+ const clientRepair=C.b4003LoginStartupScopedRepair20261019;
+ if(clientRepair){
+  const scoped=B4.b4003LoginStartupScopedRepair20261019||{};
+  const exact=[
+   'orbit360-platform/data/store-firestore-product-readonly-p0.js',
+   'functions/b4-003-scoped-related-reader.js'
+  ];
+  const qa=[
+   'tools/gravicentra-b4-003-protected-hydration.test.cjs',
+   'tools/gravicentra-b4-003-scoped-related-reader.test.cjs'
+  ];
+  need(clientRepair.status==='SOURCE_STAGED_QA_PENDING_EXACT_PREVIEW'&&
+       scoped.status===clientRepair.status&&clientRepair.gate==='I6.5/B4-003'&&
+       clientRepair.syntheticReproduction===true&&
+       clientRepair.authenticatedLivePass===false&&
+       clientRepair.previousPreviewIncludesFix===false,
+       'B4_003_P0_LOGIN_REMEDIATION_STATE_INVALID');
+  need(Object.keys(clientRepair.sourceBlobs||{}).length===2 &&
+       Object.keys(scoped.sourceBlobs||{}).length===2 &&
+       exact.every(p=>clientRepair.sourceBlobs[p]===git('hash-object',p)&&
+          scoped.sourceBlobs[p]===clientRepair.sourceBlobs[p]&&
+          COMP.productFileBlobs?.[p]===clientRepair.sourceBlobs[p]&&
+          scoped.beforeBlobs?.[p]&&scoped.beforeBlobs[p]!==clientRepair.sourceBlobs[p]),
+       'B4_003_P0_LOGIN_OWNER_BLOB_NOT_PINNED');
+  need(qa.every(p=>clientRepair.qaBlobs?.[p]===git('hash-object',p)&&
+       scoped.qaBlobs?.[p]===clientRepair.qaBlobs[p]),
+       'B4_003_P0_LOGIN_QA_BLOB_NOT_PINNED');
+  need(clientRepair.compositionBlobSha===git('hash-object',I6_CANONICAL_COMPOSITION)&&
+       C.canonicalAccumulationControl?.compositionLockBlobSha===clientRepair.compositionBlobSha&&
+       scoped.compositionBlobSha===clientRepair.compositionBlobSha &&
+       C.i6Execution?.productMutationAuthorized===false&&
+       B4.boundaries?.productMutationAuthorized===false&&
+       C.b4003SecurityReleaseHold?.firestoreRulesDeployAuthorized===false&&
+       clientRepair.productionPromotionAuthorized===false&&
+       clientRepair.dataWrites===0&&clientRepair.rulesDeployed===false,
+       'B4_003_P0_LOGIN_SOURCE_SCOPE_RELEASE_BARRIER');
+  console.log('B4_003_P0_LOGIN_STARTUP_SCOPED_SOURCE_BOUND_QA_NOT_AUTHENTICATED_PASS');
+ }
  console.log('B4_003_P0_STILL_OPEN=6');
 }
 const P=readJson(DATA_UPDATE_PLAN),D=readJson(DATA_UPDATE_DISCIPLINE),RGT=readJson(DATA_UPDATE_REGISTRY),SRC=readJson(ACTIVE_SOURCE_INTAKE),SRC3=readJson(I63_SOURCE),R63=readJson(I63_RECEIPT),SRC4=readJson(I64_SOURCE),R64=readJson(I64_RECEIPT),SRC5=readJson(I65_SOURCE),SYNC5=readJson(I65_SYNC);

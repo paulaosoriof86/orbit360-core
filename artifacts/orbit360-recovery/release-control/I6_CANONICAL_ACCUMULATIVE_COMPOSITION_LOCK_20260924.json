@@ -213,7 +213,7 @@
     "orbit360-platform/data/academia-product-catalog-v1.js": "22b6781519cb14e05965738ac3bbc0f6eb0baff3",
     "orbit360-platform/data/geo-gt-co-authoritative-v20261004.js": "734b6518bc968a8c4e278602aa7161a38351cb02",
     "orbit360-platform/data/store-firestore-product-operational-p0.js": "7738314b843253c92be008dc0b812d035b377d43",
-    "orbit360-platform/data/store-firestore-product-readonly-p0.js": "41a903a88caa338c74f636c1cd31e23f79aa2481",
+    "orbit360-platform/data/store-firestore-product-readonly-p0.js": "111d5409f33cf71c301255b57aba1e4f72581478",
     "orbit360-platform/data/tenant-alianzas-soluciones-insurers-p10.js": "41d2e31a42dac73eb68af304d5f532897210d0ee",
     "orbit360-platform/data/tenant-config/alianzas-soluciones.aseguradoras-knowledge-summary-v20261003.js": "2000d9ea8ab67bdd37d8bf404a29a405fa6374dd",
     "orbit360-platform/data/tenant-public-branding-index.js": "dc543c463f5ecd8ea44e49156d6282113bd95db6",
@@ -258,7 +258,7 @@
     "orbit360-platform/modules/comparativo.js": "982881a4c1e2f95be95428bd3f9f23360a9a2d5f",
     "functions/b4-003-scoped-policy-reader.js": "24546aa40f26d818aef7f1714c2a21deda63a550",
     "functions/b4-003-scoped-policy-callable.js": "8b468150003fe812d9e1d0763120f2b31f1df75f",
-    "functions/b4-003-scoped-related-reader.js": "69706943a73c926da41b2256db425031b8f87b19",
+    "functions/b4-003-scoped-related-reader.js": "889feecc4e8ebd9240c53ad6f8d4777d47900f00",
     "functions/b4-003-scoped-bootstrap-reader.js": "356d36e0679a5e499c05632a981b9ef3f1ffb9ec",
     "orbit360-platform/modules/historial.js": "6329129526b850a62e645aa9cd384e7d19317365",
     "orbit360-platform/core/membership-multirol-contract-p0.js": "d27b052d4d32872bfe2e1c950c9995a2e2100841"
@@ -6171,5 +6171,35 @@
     "qaBoundaryPath": "tools/gravicentra-b4-003-scoped-boundary.test.cjs",
     "qaBoundaryBlobSha": "cc9f778adc99b26c8999fbad145b0013faf992ed",
     "insurerDirectoryDiagnosticPriorityPreserved": true
+  },
+  "b4003LoginStartupScopedRepair20261019": {
+    "status": "NARROW_SOURCE_STAGED_NOT_RELEASE_ACCEPTED",
+    "date": "2026-10-19",
+    "gate": "I6.5/B4-003",
+    "classification": "CODE_DEFECT_STARTUP_PERFORMANCE",
+    "mechanism": "PROTECTED_CLIENT_PAGE_SIZE_50_SEQUENTIAL_PER_COUNTRY_AFTER_AUTH_EXCEEDS_EIGHT_SECOND_BOOTSTRAP_BUDGET_UNDER_MEASURED_SYNTHETIC_LATENCY",
+    "finding": "POST_AUTH_ACTIVATION_FAILED",
+    "previousPreviewRunId": 39178292742,
+    "previousPreviewAcceptance": "FUNCTIONAL_UAT_HOLD",
+    "fileBlobsBefore": {
+      "orbit360-platform/data/store-firestore-product-readonly-p0.js": "41a903a88caa338c74f636c1cd31e23f79aa2481",
+      "functions/b4-003-scoped-related-reader.js": "69706943a73c926da41b2256db425031b8f87b19"
+    },
+    "fileBlobsAfter": {
+      "orbit360-platform/data/store-firestore-product-readonly-p0.js": "111d5409f33cf71c301255b57aba1e4f72581478",
+      "functions/b4-003-scoped-related-reader.js": "889feecc4e8ebd9240c53ad6f8d4777d47900f00"
+    },
+    "qaBlobs": {
+      "tools/gravicentra-b4-003-protected-hydration.test.cjs": "5705bb22b79cb3e0e7dfa10db1c32f009ff9f141",
+      "tools/gravicentra-b4-003-scoped-related-reader.test.cjs": "963021928f4ab74d4b876fb4ef221f51558782de"
+    },
+    "realAuthenticatedRootError": "NOT_CAPTURED_CLOUD_LOGGING_IAM_DENIED",
+    "noBroadGateMutation": true,
+    "noLive": true,
+    "noFirestoreRulesDeploy": true,
+    "noDataWrites": true,
+    "noImpersonation": true,
+    "noReimport": true,
+    "preservation": "LATEST_APPROVED_CAPABILITIES_AND_295_FINDING_IDENTITIES"
   }
 }

@@ -160,6 +160,15 @@ async function deny(fn,code){let thrown;try{await fn()}catch(e){thrown=e}assert.
  const flow=(collection,role='operativo',options={})=>readScopedRelatedList({
   db,auth:{uid:'u1',token:{}},request:{tenantId,collection,activeRole:role,country:'GT',pageSize:50,...options}
  });
+
+ // P0 startup pagination exception is clients-only; no elevated collection scope.
+ const fullClientPage=await flow('clientes','operativo',{pageSize:200});
+ assert.equal(fullClientPage.ok,true,'CLIENTS_200_PAGE_AUTHORIZED_SCOPED');
+ assert.ok(Array.isArray(fullClientPage.rows),'CLIENTS_ONLY_PAGE_SHAPE');checks++;
+ await deny(()=>flow('cobros','operativo',{pageSize:200}),'PAGE_SIZE_INVALID');checks++;
+ await deny(()=>flow('recibosEsperados','operativo',{pageSize:200}),'PAGE_SIZE_INVALID');checks++;
+ await deny(()=>flow('cancelaciones','operativo',{pageSize:200}),'PAGE_SIZE_INVALID');checks++;
+ console.log('B4_003_P0_SCOPED_CLIENT_200_SERVER_ONLY_PASS checks=4 no_firestore_writes');
  // P0 regression: financial and vehicle universes do not require
  // N policy-batch HTTP requests. The server still validates policy/client FK.
  const receiptAll=await flow('recibosEsperados');
