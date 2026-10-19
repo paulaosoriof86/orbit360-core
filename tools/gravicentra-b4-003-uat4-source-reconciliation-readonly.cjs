@@ -62,7 +62,14 @@ async function fetchCollection(name){
  const merged=clients.filter(c=>c.fusionado===true||!!text(c.mergedIntoClientId));
  const shown=clients.filter(c=>!(c.fusionado===true||!!text(c.mergedIntoClientId)));
  const visible=new Set(shown.map(c=>c.id));
+ const validCountryClients=shown.filter(c=>['GT','CO'].includes(country(c)));
+ const validCountryClientIds=new Set(validCountryClients.map(c=>c.id));
+ const countryUnresolved=shown.filter(c=>!['GT','CO'].includes(country(c)));
  const linked=policies.filter(p=>visible.has(text(p.clienteId)));
+ const scopedLinked=policies.filter(p=>validCountryClientIds.has(text(p.clienteId)));
+ const scopedExcluded=policies.filter(p=>!validCountryClientIds.has(text(p.clienteId)));
+ const missingDueToCountry=scopedExcluded.filter(p=>{const c=byId.get(text(p.clienteId));return c&&!['GT','CO'].includes(country(c))});
+ const missingDueToMerge=scopedExcluded.filter(p=>{const c=byId.get(text(p.clienteId));return c&&(c.fusionado===true||!!text(c.mergedIntoClientId))});
  const omitted=policies.filter(p=>!visible.has(text(p.clienteId)));
  const linkedToMerged=omitted.filter(p=>{const c=byId.get(text(p.clienteId));return c&&(c.fusionado===true||!!text(c.mergedIntoClientId))});
  const orphan=omitted.filter(p=>!byId.has(text(p.clienteId)));
@@ -89,17 +96,33 @@ async function fetchCollection(name){
    countryVisible:countBy(shown,country),countryMerged:countBy(merged,country),
    rawType:countBy(shown,c=>iso(c.tipo)||'SIN_TIPO'),
    visibleNatural:natural.length,visibleLegal:legal.length,visibleUnknownType:unknownType.length,
-   visibleTypeUnknownCountries:countBy(unknownType,country)},
+   visibleTypeUnknownCountries:countBy(unknownType,country),
+   onlyGtCoVisible:validCountryClients.length,
+   onlyGtCoNatural:validCountryClients.filter(c=>['natural','persona','persona natural','persona fisica'].includes(iso(c.tipo))).length,
+   onlyGtCoLegal:validCountryClients.filter(c=>['juridica','juridico','persona juridica','empresa','sociedad'].includes(iso(c.tipo))).length,
+   onlyGtCoUnknownType:validCountryClients.filter(c=>!['natural','persona','persona natural','persona fisica','juridica','juridico','persona juridica','empresa','sociedad'].includes(iso(c.tipo))).length,
+   countryUnresolvedCount:countryUnresolved.length},
   policies:{all:policies.length,active:policies.filter(active).length,
    countryAll:policyCountryTotals,visibleClientLinked:linked.length,visibleClientLinkedActive:linked.filter(active).length,
    excludedFromCliente360:omitted.length,excludedActive:omitted.filter(active).length,
    excludedLinkedToMerged:linkedToMerged.length,excludedLinkedToMergedActive:linkedToMerged.filter(active).length,
    excludedOrphanClient:orphan.length,excludedOrphanActive:orphan.filter(active).length,
    excludedBlankClient:emptyClient.length,
+   gtCoCanonicalClientLinked:scopedLinked.length,
+   gtCoCanonicalClientLinkedActive:scopedLinked.filter(active).length,
+   gtCoExcludedPolicies:scopedExcluded.length,
+   gtCoExcludedActive:scopedExcluded.filter(active).length,
+   excludedDueToUnresolvedCountry:missingDueToCountry.length,
+   excludedDueToUnresolvedCountryActive:missingDueToCountry.filter(active).length,
+   excludedDueToMerge:missingDueToMerge.length,
+   excludedDueToMergeActive:missingDueToMerge.filter(active).length,
    omittedCountry:countBy(omitted,country),
    premiumByCurrencyAllActive:policyAmounts(policies,byId),
    premiumByCurrencyVisibleClientLinkedActive:policyAmounts(linked,byId),
-   premiumByCurrencyExcludedActive:policyAmounts(omitted,byId)},
+   premiumByCurrencyExcludedActive:policyAmounts(omitted,byId),
+   premiumByCurrencyGtCoClientLinkedActive:policyAmounts(scopedLinked,byId),
+   premiumByCurrencyGtCoExcludedActive:policyAmounts(scopedExcluded,byId),
+   premiumByCurrencyUnresolvedCountryActive:policyAmounts(missingDueToCountry,byId)},
   goldenPolicy:{
    number:'AUTO39012',matchingPolicies:golden.length,
    available:!!gold,
@@ -134,7 +157,7 @@ async function fetchCollection(name){
  fs.writeFileSync(outPath,JSON.stringify(report,null,2)+'\n',{mode:0o600});
  console.log('B4_003_UAT4_READONLY_COUNTS='+JSON.stringify(report.collectionsCount));
  console.log('B4_003_UAT4_CLIENT_RECONCILIATION='+JSON.stringify(report.clients).slice(0,900));
- console.log('B4_003_UAT4_POLICY_RECONCILIATION='+JSON.stringify(report.policies).slice(0,1400));
+ console.log('B4_003_UAT4_POLICY_RECONCILIATION='+JSON.stringify(report.policies).slice(0,2200));
  console.log('B4_003_UAT4_GOLDEN_POLICY='+JSON.stringify(report.goldenPolicy).slice(0,900));
  console.log('B4_003_UAT4_AGGREGATE_FORENSIC_COMPLETE_WITHOUT_ACCEPTANCE');
 })().catch(e=>{console.error('B4_003_UAT4_READONLY_FAIL_CLOSED',String(e?.code||e?.message||e).slice(0,160));process.exitCode=1;});
