@@ -3043,5 +3043,40 @@
       "humanVisualAccepted": false,
       "liveRulesSecurityAccepted": false
     }
+  },
+  "b4003PostAuthMembershipParityReadback20261019": {
+    "status": "SCHEMA_AND_FIREBASE_AUTH_ADMIN_READBACK_PASS_SIGNEDIN_UAT_HOLD",
+    "proofPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_POST_AUTH_MEMBERSHIP_PARITY_READBACK_20261019.json",
+    "proofBlobSha": "b37a6c00ef8ec0c4036f06fda80dd6d63394463d",
+    "runs": [
+      39327054733,
+      39327577132,
+      39328353663
+    ],
+    "guardRunId": 39328353617,
+    "observed": {
+      "membershipCount": 8,
+      "exactContractPass": 8,
+      "contractBlock": 0,
+      "authPresent": 8,
+      "emailUnverified": 4,
+      "membershipEmailMissing": 7,
+      "giActiveRoleClaimMissing": 8,
+      "claimOptional": true
+    },
+    "noIdentityImpersonation": true,
+    "noTokenIssuance": true,
+    "noDataWrites": true,
+    "noRulesDeploy": true,
+    "noLive": true,
+    "loginActuallyEnteredInicio": false,
+    "cloudLoggingStatus": "IAM_DENIED_HOLD",
+    "sameGate": "I6.5/B4-003",
+    "productionProgress": {
+      "passed": 2,
+      "total": 10,
+      "percent": 20,
+      "delta": 0
+    }
   }
 }

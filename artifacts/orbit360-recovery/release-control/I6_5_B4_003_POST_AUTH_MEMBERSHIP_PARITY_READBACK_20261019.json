@@ -1,0 +1,101 @@
+{
+  "schema": "GRAVICENTRA_B4_003_POST_AUTH_AGGREGATE_READBACK_20261019_V1",
+  "date": "2026-10-19",
+  "gate": "I6.5/B4-003",
+  "branch": "recovery/fase-a-clean-20260831",
+  "status": "MEMBERSHIP_SOURCE_CONTRACT_QA_PASS_REAL_AUTHENTICATED_PREVIEW_HOLD",
+  "readonlySourceHead": "0bf9a55db7dff14148f686a03517883a8e7285f5",
+  "boundPreview": {
+    "sourceSha": "125a3f314cb23aa128951ad714c95f143de64abb",
+    "buildId": "gi-i65-b4-125a3f314cb2-57f234755dc1",
+    "runId": 39324152069,
+    "technicalReadbackExact": true,
+    "authenticatedUatPassed": false
+  },
+  "evidence": [
+    {
+      "runId": 39327054733,
+      "artifactId": 12221294582,
+      "archiveSha256": "5dd46d18cf88d8227718c9dcd72d96b83a0c243c1d508b49a652205449dcfcc3",
+      "contentSha256": "6c028d21170aaa7a1eecaa25ef4f4ec1a71838b278e036174c4496df9a1724f0",
+      "purpose": "membership_and_cloud_logging"
+    },
+    {
+      "runId": 39327577132,
+      "artifactId": 12223071248,
+      "archiveSha256": "7d84a19fe99e8ff1c9aa0a36976fabcbfcd85eeb26aaaec7a9547f02d1d0050c",
+      "contentSha256": "341e1b884ac725d5d690cb7ce12c6448a464f51e47bfe2d6c96b7f7e66dd44f5",
+      "purpose": "firebase_auth_and_membership_parity"
+    },
+    {
+      "runId": 39328353663,
+      "artifactId": 12222577344,
+      "archiveSha256": "772767f257655815b8f965c8dfd218e612f6ad3db6fbce33bf7f47657aff5bef",
+      "contentSha256": "8de4bc8caf6a6666860dd4aadaa21d9f9d1a7f5d8298e4df0a214cb2e0466a01",
+      "purpose": "exact_browser_validator_using_sanitized_bootstrap_projection"
+    }
+  ],
+  "lastCentralGuardRunId": 39328353617,
+  "membership": {
+    "total": 8,
+    "multiRole": 5,
+    "administrative": 3,
+    "authRecordPresent": 8,
+    "validatorPass": 8,
+    "validatorFail": 0,
+    "missingVerifiedEmail": 4,
+    "membershipEmailAbsent": 7,
+    "signedGiActiveRoleClaimAbsent": 8,
+    "signedRoleOptional": true,
+    "invalidRoles": 0,
+    "invalidAdvisorId": 0,
+    "invalidScope": 0,
+    "nonBlockingWarnings": {
+      "visibleNameMissing": 7,
+      "activationTimestampMissing": 8
+    }
+  },
+  "cloudLogging": {
+    "result": "IAM_PERMISSION_DENIED_403",
+    "attemptedWithConnectedGoogleAccount": true,
+    "attemptedWithExistingGithubServiceAccount": true,
+    "notRetriedWhenUnchanged": true,
+    "logEventsAvailableForAnalysis": 0
+  },
+  "rootCauseAdjudication": {
+    "structuralMembershipInvalid": "EXCLUDED_FOR_EIGHT_CANONICAL_MEMBERSHIPS",
+    "allRealAuthUsersSignedIn": "NOT_PROVEN",
+    "realPostAuthActivationFirstError": "UNKNOWN",
+    "exactRequestFailure": "UNKNOWN",
+    "syntheticPerformanceHazard": "REPRODUCED_AND_CODE_FIXED_IN_PREVIEW_ONLY",
+    "cloudRunErrorTracing": "HOLD_MISSING_LOG_VIEW_ACCESS",
+    "actualRoleCountrySignedInE2E": "HOLD",
+    "effectiveFirestoreRules": "HOLD_BROAD_LIVE_RULES_PREVIOUSLY_OBSERVED"
+  },
+  "rules": {
+    "noRealUserImpersonation": true,
+    "noCustomTokens": true,
+    "noLiveSecurityRuleDeploy": true,
+    "noProductionPromotion": true,
+    "noOperationalWrites": true,
+    "noConfigWrites": true,
+    "noEmailSends": true,
+    "noCredentialExposure": true,
+    "noDataReimport": true
+  },
+  "progression": {
+    "production": {
+      "passed": 2,
+      "total": 10,
+      "percent": 20,
+      "deltaPoints": 0
+    },
+    "formalI6": {
+      "passed": 5,
+      "total": 10,
+      "percent": 50,
+      "deltaPoints": 0
+    }
+  },
+  "nextAction": "B4_003_AUTHENTICATED_HUMAN_OR_AUTHORIZED_QA_IDENTITY_REAL_LOGIN_READBACK_WITH_GT_CO_ROLE_SCOPE_AND_CLOUD_LOGGING_IF_PERMISSION_GRANTED"
+}

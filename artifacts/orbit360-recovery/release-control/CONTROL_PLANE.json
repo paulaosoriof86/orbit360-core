@@ -4869,7 +4869,7 @@
       "entryGuardReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_ENTRY_GUARD_PASS_20261002.json",
       "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
       "executionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B4_EXECUTION_LOCK_20261002.json",
-      "executionLockBlobSha": "aa26f28f82a7cab528268e29bb37aa487b8e913f",
+      "executionLockBlobSha": "24f295e42e73344e86333d87688a92277d405f60",
       "compositionLockBlobSha": "016f251811f22bc4fc04b2a5f674dfe09243e605",
       "findingLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
       "activeFindingId": "B4-003",
@@ -6312,7 +6312,7 @@
     "status": "B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL",
     "activeFindingId": "B4-003",
     "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
-    "executionLockBlobSha": "aa26f28f82a7cab528268e29bb37aa487b8e913f",
+    "executionLockBlobSha": "24f295e42e73344e86333d87688a92277d405f60",
     "compositionLockBlobSha": "816309c63ed254d9b0e05cf63621c3d1c03cbfd5",
     "findingLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
     "noLive": true,
@@ -13064,6 +13064,45 @@
       "sourceSha": "aed453e5a70dd5729d448cdef2d5dd9f13612f0e",
       "buildId": "gi-i65-b4-aed453e5a70d-57f234755dc1",
       "status": "HISTORICAL_TECHNICAL_PASS_FUNCTIONAL_HOLD_NOT_THIS_RELEASE"
-    }
+    },
+    "membershipReadbackReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_POST_AUTH_MEMBERSHIP_PARITY_READBACK_20261019.json",
+    "membershipReadbackReceiptBlobSha": "b37a6c00ef8ec0c4036f06fda80dd6d63394463d"
+  },
+  "b4003PostAuthMembershipParityReadback20261019": {
+    "status": "SCHEMA_AND_FIREBASE_AUTH_ADMIN_READBACK_PASS_SIGNEDIN_UAT_HOLD",
+    "proofPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_POST_AUTH_MEMBERSHIP_PARITY_READBACK_20261019.json",
+    "proofBlobSha": "b37a6c00ef8ec0c4036f06fda80dd6d63394463d",
+    "runs": [
+      39327054733,
+      39327577132,
+      39328353663
+    ],
+    "guardRunId": 39328353617,
+    "observed": {
+      "membershipCount": 8,
+      "exactContractPass": 8,
+      "contractBlock": 0,
+      "authPresent": 8,
+      "emailUnverified": 4,
+      "membershipEmailMissing": 7,
+      "giActiveRoleClaimMissing": 8,
+      "claimOptional": true
+    },
+    "noIdentityImpersonation": true,
+    "noTokenIssuance": true,
+    "noDataWrites": true,
+    "noRulesDeploy": true,
+    "noLive": true,
+    "loginActuallyEnteredInicio": false,
+    "cloudLoggingStatus": "IAM_DENIED_HOLD",
+    "sameGate": "I6.5/B4-003",
+    "productionProgress": {
+      "passed": 2,
+      "total": 10,
+      "percent": 20,
+      "delta": 0
+    },
+    "executionLockBlobSha": "24f295e42e73344e86333d87688a92277d405f60",
+    "nextActionWithinGate": "AUTHENTICATED_REAL_IDENTITY_SIGNIN_UAT_OR_APPROVED_QA_IDENTITY_NO_IMPERSONATION_AND_EFFECTIVE_RULES_PROOF"
   }
 }
