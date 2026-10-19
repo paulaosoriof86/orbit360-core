@@ -1,0 +1,89 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_UAT5_TECHNICAL_PREVIEW_READBACK_V1",
+  "date": "2026-10-19",
+  "gate": "I6.5/B4-003",
+  "branch": "recovery/fase-a-clean-20260831",
+  "status": "EXACT_TECHNICAL_PREVIEW_PASS_FUNCTIONAL_UAT_HOLD",
+  "sourceSha": "7833d38452f2be4ed6d1dff4ec8ae91f0081665f",
+  "codeOwnersPriorHead": "fb44a94b08c9750217b2bb912899746975dbcde4",
+  "buildId": "gi-i65-b4-7833d38452f2-57f234755dc1",
+  "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-39341715708-yf06t3z5.web.app",
+  "runId": 39341715708,
+  "githubActionsConclusion": "success",
+  "evidenceArtifactId": 12229197798,
+  "evidenceArtifactZipSha256": "3f100d8f1ae610395d5b9219f501423c07bcc39453b15b412a8b85fca922c79d",
+  "hostedPayloadDigest": "b23cfc3794bd3f682858b52da661ef67a56ae166cd9cf3bd36d246d4614e4422",
+  "backendSourceDigest": "3a518289868c3e0534a4620718b80cc910db5072bd7c489a9d201077c99a9daf",
+  "bundleDigest": "57e3a6810ef9bc3f004123af986b6e5e497dca6210db834c93db207137774c5c",
+  "fileCounts": {
+    "hosting": 218,
+    "backend": 33,
+    "bundle": 253
+  },
+  "checks": {
+    "centralGuardRunId": 39341715667,
+    "centralGuardConclusion": "success",
+    "sourceQARunId": 39340901653,
+    "sourceQaContractCount": 20,
+    "packageMaterialized": true,
+    "hostingDeploySuccess": true,
+    "exactHostFilesReadback": true,
+    "independentPublicBuildMarkerMatch": true,
+    "anonymousProtectedFunctionDeniedHttpStatus": 401,
+    "onlyApprovedReadOnlyCallables": true,
+    "onlyIsolatedPreviewHosting": true,
+    "realSignedInStartupPass": false,
+    "realRoleGTCOPositiveNegativeE2EPass": false,
+    "humanFunctionalAccepted": false,
+    "mobileAuthenticatedViewPass": false,
+    "kpiCrossModuleReconciledRealPass": false,
+    "firestoreLiveSecurityAccepted": false
+  },
+  "priorPreview": {
+    "runId": 39324152069,
+    "sourceSha": "125a3f314cb23aa128951ad714c95f143de64abb",
+    "humanUat": "REJECTED_UAT4_CHROME_20261019_P1"
+  },
+  "sourceChanges": "Six file-owners frozen in I6 canonical composition, previous accepted capabilities retained, no baseline overlays",
+  "additionalReadOnlySourceClue": {
+    "file": "Polizas (16).xlsx",
+    "sha256": "e68bfd576b28b01d2839d8c3a22e547d8905f1eaeb84d1d7ffc3a0082960c2a7",
+    "locator": "Worksheet / 1-indexed row 291 (AUTO 39012), row 290 (39012)",
+    "columnSemantics": {
+      "25": "Prima neta",
+      "26": "Prima total",
+      "29": "Estatus póliza"
+    },
+    "goldenAlias": "AUTO 39012",
+    "goldenNet": 1800,
+    "goldenTotal": 2678.53,
+    "closeAlias": "39012",
+    "closeNet": 1800,
+    "closeTotal": 2678.51,
+    "sourceRowsPotentiallyDifferentPolicyVersionsOrEntities": true,
+    "approvedAuthorityAdjudication": "NOT_DONE_CANNOT_ADOPT_AMOUNT_OR_IDENTITY_WITHOUT_SOURCE_REF_LINEAGE",
+    "policyProductCurrentTotal": 2116.8,
+    "noFinancialValueEdited": true,
+    "sensitiveDataStoredInReceipt": false
+  },
+  "security": {
+    "livePromotionAuthorized": false,
+    "sharedFirestoreRulesDeployed": false,
+    "otherProductionFunctionsDeployed": false,
+    "operationalWrites": 0,
+    "configWrites": 0,
+    "realUserImpersonation": false,
+    "dataReimport": false,
+    "augustDataRefresh": false
+  },
+  "progress": {
+    "productionPassed": 2,
+    "productionTotal": 10,
+    "productionPercent": 20,
+    "productionDelta": 0,
+    "formalI6Passed": 5,
+    "formalI6Total": 10,
+    "formalI6Percent": 50
+  },
+  "remainingWithinGate": "AUTHENTICATED_GT_CO_ROLE_READBACK_AND_UAT5_CROSS_MODULE_RERUN; SOURCE_CAUSAL_FINALIZE_AUTO39012_AND_STARTUP_PERFORMANCE; EFFECTIVE_LIVE_FIRESTORE_SECURITY_UNPROVEN"
+}

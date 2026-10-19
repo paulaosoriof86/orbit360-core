@@ -163,15 +163,15 @@
     "B4_003_R20_TARGETED_PAULA_VISUAL_PASS"
   ],
   "candidate": {
-    "sourceSha": "125a3f314cb23aa128951ad714c95f143de64abb",
-    "buildId": "gi-i65-b4-125a3f314cb2-57f234755dc1",
-    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-39324152069-txaa3c71.web.app",
-    "runId": 39324152069,
-    "artifactId": 12222310006,
-    "artifactDigest": "sha256:0554dd11bd3bc445f43db40041df12ddc60e0c2a0a9c7e9fba821d8c10ffe8b3",
-    "hostedPayloadDigest": "02c53f94a998d28cae48575dd649c3a5865c2ce87c8755671f0d9a4a18def827",
+    "sourceSha": "7833d38452f2be4ed6d1dff4ec8ae91f0081665f",
+    "buildId": "gi-i65-b4-7833d38452f2-57f234755dc1",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-39341715708-yf06t3z5.web.app",
+    "runId": 39341715708,
+    "artifactId": 12229197798,
+    "artifactDigest": "sha256:3f100d8f1ae610395d5b9219f501423c07bcc39453b15b412a8b85fca922c79d",
+    "hostedPayloadDigest": "b23cfc3794bd3f682858b52da661ef67a56ae166cd9cf3bd36d246d4614e4422",
     "backendSourceDigest": "3a518289868c3e0534a4620718b80cc910db5072bd7c489a9d201077c99a9daf",
-    "bundleDigest": "7326642abfedf684a9f483dd3ccb3cc33c53cd07e57de7575bc286823ec6cb5b",
+    "bundleDigest": "57e3a6810ef9bc3f004123af986b6e5e497dca6210db834c93db207137774c5c",
     "exactReadback": true,
     "functionalAuthenticatedAccepted": false,
     "livePromotionAuthorized": false
@@ -3155,7 +3155,7 @@
     "formalI6Percent": 50
   },
   "b4003Uat5ScopedSource20261019": {
-    "status": "EXACT_SCOPED_SOURCE_QA_PENDING_PREVIEW",
+    "status": "EXACT_TECHNICAL_PREVIEW_PASS_FUNCTIONAL_UAT_HOLD",
     "gate": "I6.5/B4-003",
     "userInstruction": "CONTINUE_ALL_PENDING_FRONTS_AND_MAKE_MATERIAL_PROGRESS_20261019",
     "boundedSourceOnly": true,
@@ -3170,8 +3170,8 @@
     "qaBlobSha": "b5d3a169384a85fd644f2b52ed0a66c760d4b479",
     "compositionBlobSha": "37fc6586672d9570c2affd4177d0da5dd5762c1b",
     "previousUat4Rejected": true,
-    "qaNotYetExecuted": true,
-    "previewNotYetBuilt": true,
+    "qaNotYetExecuted": false,
+    "previewNotYetBuilt": false,
     "noBroadProductMutation": true,
     "livePromotionAuthorized": false,
     "sharedFirestoreRulesDeployAuthorized": false,
@@ -3180,10 +3180,10 @@
     "configWritesAuthorized": false,
     "reimportAuthorized": false,
     "dataWrites": 0,
-    "authenticatedE2EStatus": "HOLD",
+    "authenticatedE2EStatus": "HOLD_REAL_ACCOUNT_REQUIRED",
     "findingLedgerCount": 295,
     "previewDispatch": {
-      "status": "AUTHORIZED_EXACT_B4_003_SOURCE_QA_PASS_PREVIEW_PENDING",
+      "status": "COMPLETED_TECHNICAL_PASS_NO_FUNCTIONAL_ACCEPTANCE",
       "triggerSubject": "build(i6.5 B4-003): cumulative authorized protected Preview",
       "sourceOwnerBlobs": {
         "orbit360-platform/modules/cliente360.js": "53946c5746ececf3d4141c769cef30b4c1f902d8",
@@ -3211,6 +3211,36 @@
       "previousPreviewSourceSha": "125a3f314cb23aa128951ad714c95f143de64abb"
     },
     "sourceQaStatus": "GITHUB_ACTIONS_SOURCE_CONTRACT_PASS_NOT_FUNCTIONAL_PASS",
-    "sourceQaRunId": 39340901653
+    "sourceQaRunId": 39340901653,
+    "previewProof": {
+      "status": "EXACT_TECHNICAL_PREVIEW_PASS_FUNCTIONAL_UAT_HOLD",
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_UAT5_EXACT_PREVIEW_TECHNICAL_READBACK_20261019.json",
+      "receiptBlobSha": "ca2879b8b3010eb2ae128e956afcfd3f2c90a087",
+      "runId": 39341715708,
+      "sourceSha": "7833d38452f2be4ed6d1dff4ec8ae91f0081665f",
+      "buildId": "gi-i65-b4-7833d38452f2-57f234755dc1",
+      "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-39341715708-yf06t3z5.web.app",
+      "artifactId": 12229197798,
+      "artifactDigest": "sha256:3f100d8f1ae610395d5b9219f501423c07bcc39453b15b412a8b85fca922c79d",
+      "hostedPayloadDigest": "b23cfc3794bd3f682858b52da661ef67a56ae166cd9cf3bd36d246d4614e4422",
+      "backendSourceDigest": "3a518289868c3e0534a4620718b80cc910db5072bd7c489a9d201077c99a9daf",
+      "bundleDigest": "57e3a6810ef9bc3f004123af986b6e5e497dca6210db834c93db207137774c5c",
+      "filesHosting": 218,
+      "filesBackend": 33,
+      "exactHostingReadback": true,
+      "independentMarkerReadback": true,
+      "sourceQaRunId": 39340901653,
+      "centralGuardRunId": 39341715667,
+      "anonymousCallableDeniedStatus": 401,
+      "realAuthenticatedUatAccepted": false,
+      "realRoleCountrySecurityAccepted": false,
+      "humanFunctionalAccepted": false,
+      "configWrites": 0,
+      "dataWrites": 0,
+      "sharedRulesDeploy": false,
+      "productionPromotion": false,
+      "progressProductionPercent": 20,
+      "formalI6Percent": 50
+    }
   }
 }

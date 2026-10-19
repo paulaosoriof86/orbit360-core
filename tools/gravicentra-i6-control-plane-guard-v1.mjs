@@ -188,7 +188,7 @@ if(String(C.i65ForensicRemediationPlan?.currentBlock||'')==='B4' &&
       preview.previewUrl===verified.previewUrl&&
       preview.receiptBlobSha===git('hash-object',preview.receiptPath)&&
       scoped.previewProof?.receiptBlobSha===preview.receiptBlobSha&&
-      C.b4003CurrentCumulativePreviewProof?.sourceSha===preview.sourceSha&&
+      (C.b4003Uat5PriorPreviewProof20261019||C.b4003CurrentCumulativePreviewProof)?.sourceSha===preview.sourceSha&&
       C.b4003CurrentCumulativePreviewProof?.humanFunctionalAccepted===false&&
       preview.authenticatedPositiveNegativeAccepted===false&&
       preview.sharedRulesDeployed===false&&
@@ -236,8 +236,8 @@ if(String(C.i65ForensicRemediationPlan?.currentBlock||'')==='B4' &&
        'B4_003_UAT4_SOURCE_CAUSAL_CONTRACT_INVALID');
   need(C.currentB4?.status==='B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL'&&
        C.nextAction==='I6_5_FORENSIC_REMEDIATION_B4_003_R20_TARGETED_PAULA_VISUAL'&&
-       C.b4003CurrentCumulativePreviewProof?.sourceSha==='125a3f314cb23aa128951ad714c95f143de64abb'&&
-       C.b4003CurrentCumulativePreviewProof?.runId===39324152069&&
+       (C.b4003Uat5PriorPreviewProof20261019||C.b4003CurrentCumulativePreviewProof)?.sourceSha==='125a3f314cb23aa128951ad714c95f143de64abb'&&
+       (C.b4003Uat5PriorPreviewProof20261019||C.b4003CurrentCumulativePreviewProof)?.runId===39324152069&&
        C.b4003CurrentCumulativePreviewProof?.humanFunctionalAccepted===false&&
        C.b4003CurrentCumulativePreviewProof?.signedInRoleProof===false&&
        C.b4003SecurityReleaseHold?.status==='ACTIVE_FAIL_CLOSED_UNAUTHORIZED_BROWSER_FIRESTORE_READ_WRITE'&&
@@ -259,7 +259,7 @@ if(String(C.i65ForensicRemediationPlan?.currentBlock||'')==='B4' &&
  const stage=C.b4003Uat5ScopedSource20261019;
  if(stage){
  const fields=Object.keys(stage.sourceBlobs||{});
- need(stage.status==='EXACT_SCOPED_SOURCE_QA_PENDING_PREVIEW'
+ need(['EXACT_SCOPED_SOURCE_QA_PENDING_PREVIEW','EXACT_TECHNICAL_PREVIEW_PASS_FUNCTIONAL_UAT_HOLD'].includes(stage.status)
  &&fields.length===6
  &&fields.every(p=>COMP.productFileBlobs[p]===stage.sourceBlobs[p]&&git('hash-object',p)===stage.sourceBlobs[p])
  &&stage.compositionBlobSha===git('hash-object',I6_CANONICAL_COMPOSITION)
@@ -268,7 +268,41 @@ if(String(C.i65ForensicRemediationPlan?.currentBlock||'')==='B4' &&
  &&C.b4003CurrentCumulativePreviewProof?.humanFunctionalAccepted===false
  &&C.b4003SecurityReleaseHold?.firestoreRulesDeployAuthorized===false
  &&FIND.findings.length===295,'B4_003_UAT5_SCOPED_SOURCE_DRIFT');
- console.log('B4_003_UAT5_SOURCE_QA_PENDING_NO_RELEASE');
+ if(stage.status==='EXACT_TECHNICAL_PREVIEW_PASS_FUNCTIONAL_UAT_HOLD'){
+  const proof=stage.previewProof||{};
+  const path='artifacts/orbit360-recovery/release-control/I6_5_B4_003_UAT5_EXACT_PREVIEW_TECHNICAL_READBACK_20261019.json';
+  const receipt=readJson(path);
+  need(proof.status===stage.status&&
+       proof.receiptPath===path&&
+       proof.receiptBlobSha===git('hash-object',path)&&
+       receipt.status===proof.status&&
+       receipt.sourceSha===proof.sourceSha&&
+       receipt.buildId===proof.buildId&&
+       receipt.runId===proof.runId&&
+       receipt.previewUrl===proof.previewUrl&&
+       receipt.hostedPayloadDigest===proof.hostedPayloadDigest&&
+       receipt.githubActionsConclusion==='success'&&
+       B4.b4003Uat5ScopedSource20261019?.status===stage.status&&
+       B4.b4003Uat5ScopedSource20261019?.previewProof?.receiptBlobSha===proof.receiptBlobSha&&
+       C.b4003CurrentCumulativePreviewProof?.sourceSha===proof.sourceSha&&
+       C.b4003CurrentCumulativePreviewProof?.runId===proof.runId&&
+       C.b4003CurrentCumulativePreviewProof?.buildId===proof.buildId&&
+       C.b4003CurrentCumulativePreviewProof?.exactHostingReadback===true&&
+       C.b4003CurrentCumulativePreviewProof?.humanFunctionalAccepted===false&&
+       C.b4003CurrentCumulativePreviewProof?.signedInRoleProof===false&&
+       C.b4003CurrentCumulativePreviewIntent?.status==='FULFILLED_EXACT_TECHNICAL_PREVIEW_NOT_FUNCTIONAL_ACCEPTANCE'&&
+       C.b4003Uat5PriorPreviewProof20261019?.sourceSha==='125a3f314cb23aa128951ad714c95f143de64abb'&&
+       C.b4003Uat5PriorPreviewProof20261019?.runId===39324152069&&
+       receipt.security?.operationalWrites===0&&
+       receipt.security?.sharedFirestoreRulesDeployed===false&&
+       receipt.security?.livePromotionAuthorized===false&&
+       C.b4003SecurityReleaseHold?.status==='ACTIVE_FAIL_CLOSED_UNAUTHORIZED_BROWSER_FIRESTORE_READ_WRITE'&&
+       B4.boundaries?.productMutationAuthorized===false&&
+       B4.boundaries?.dataMutationAuthorized===false&&
+       B4.boundaries?.livePromotionAuthorized===false,
+       'B4_003_UAT5_TECHNICAL_PROOF_OR_GATE_INVALID');
+  console.log('B4_003_UAT5_EXACT_PREVIEW_TECHNICAL_READBACK=PASS_AUTH_UAT_HOLD');
+ }else console.log('B4_003_UAT5_SOURCE_QA_PENDING_NO_RELEASE');
  }
  console.log('B4_003_P0_STILL_OPEN=6');
 }
