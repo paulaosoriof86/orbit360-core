@@ -13,6 +13,7 @@ on:
       - 'artifacts/orbit360-recovery/release-control/I6_5_B4_003_INTEGRAL_AUDIT_REQUEST_20261016.json'
       - 'tools/gravicentra-b4-003-integral-readonly-audit.cjs'
       - 'tools/gravicentra-b4-003-auth-activation-readonly.cjs'
+      - 'tools/gravicentra-b4-003-uat4-source-reconciliation-readonly.cjs'
 
 permissions:
   contents: write
@@ -101,6 +102,26 @@ jobs:
             && c.b4003SecurityReleaseHold?.firestoreRulesDeployAuthorized===false;
           if(currentSubject===diagSubject&&!authReadonly)
             throw Error('B4_003_POST_AUTH_READONLY_DIAGNOSTIC_SCOPE_DENIED');
+          const uat4Subject='audit(i6.5 B4-003): UAT4 source reconciliation read-only';
+          const uat4Readonly=currentSubject===uat4Subject
+            && c.currentB4?.status==='B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL'
+            && c.nextAction==='I6_5_FORENSIC_REMEDIATION_B4_003_R20_TARGETED_PAULA_VISUAL'
+            && c.b4003CurrentCumulativePreviewProof?.sourceSha==='125a3f314cb23aa128951ad714c95f143de64abb'
+            && c.b4003CurrentCumulativePreviewProof?.runId===39324152069
+            && c.b4003CurrentCumulativePreviewProof?.humanFunctionalAccepted===false
+            && c.b4003SecurityReleaseHold?.status==='ACTIVE_FAIL_CLOSED_UNAUTHORIZED_BROWSER_FIRESTORE_READ_WRITE'
+            && l.activeFinding?.id==='B4-003'
+            && l.boundaries?.productMutationAuthorized===false
+            && l.boundaries?.businessWritesAuthorized===false
+            && l.boundaries?.configWritesAuthorized===false
+            && l.boundaries?.dataMutationAuthorized===false
+            && l.boundaries?.realOperationalWritesAuthorized===false
+            && l.boundaries?.livePromotionAuthorized===false
+            && c.b4003SecurityReleaseHold?.firestoreRulesDeployAuthorized===false;
+          if(currentSubject===uat4Subject&&!uat4Readonly)
+            throw Error('B4_003_UAT4_READONLY_SCOPE_DENIED');
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'uat4_readonly='+(uat4Readonly?'true':'false')+'\n');
+          console.log('B4_003_UAT4_FORENSIC='+(uat4Readonly?'READONLY_BOUNDED_SOURCE_RECONCILIATION':'NOOP'));
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'auth_readonly='+(authReadonly?'true':'false')+'\n');
           console.log('B4_003_AUTH_OBSERVABILITY='+(authReadonly?'READ_ONLY_NO_IMPERSONATION':'NOOP'));
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'integrity='+(integrity?'true':'false')+'\n');
@@ -133,7 +154,7 @@ jobs:
           fi
 
       - name: Prepare read-only Firebase and browser
-        if: steps.gate.outputs.run == 'true' || steps.gate.outputs.integrity == 'true' || steps.gate.outputs.auth_readonly == 'true'
+        if: steps.gate.outputs.run == 'true' || steps.gate.outputs.integrity == 'true' || steps.gate.outputs.auth_readonly == 'true' || steps.gate.outputs.uat4_readonly == 'true'
         shell: bash
         run: |
           set -euo pipefail
@@ -178,6 +199,25 @@ jobs:
         with:
           name: gravicentra-b4-003-auth-observability-${{ github.run_id }}
           path: ${{ runner.temp }}/b4-003-auth-observability.json
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Read-only UAT4 source and lineage totals (no writes)
+        if: steps.gate.outputs.uat4_readonly == 'true'
+        env:
+          B4_003_UAT4_CAUSAL_OUT: ${{ runner.temp }}/b4-003-uat4-causal-readback.json
+        run: |
+          set -euo pipefail
+          node --check tools/gravicentra-b4-003-uat4-source-reconciliation-readonly.cjs
+          timeout 240s node tools/gravicentra-b4-003-uat4-source-reconciliation-readonly.cjs
+          test -s "$B4_003_UAT4_CAUSAL_OUT"
+
+      - name: Preserve UAT4 source parity readback
+        if: always() && steps.gate.outputs.uat4_readonly == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: gravicentra-b4-003-uat4-source-parity-${{ github.run_id }}
+          path: ${{ runner.temp }}/b4-003-uat4-causal-readback.json
           if-no-files-found: warn
           retention-days: 30
 
