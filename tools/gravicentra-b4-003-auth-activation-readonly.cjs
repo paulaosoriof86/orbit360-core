@@ -2,6 +2,7 @@
 // Gravicentra B4-003: read-only Cloud Logging and canonical membership schema probe.
 // Existing service account only. No real-member token minting, no personal data output.
 const fs=require('node:fs');
+const vm=require('node:vm');
 const {applicationDefault,initializeApp,getApps}=require('firebase-admin/app');
 const {getFirestore}=require('firebase-admin/firestore');
 const {getAuth}=require('firebase-admin/auth');
@@ -98,7 +99,56 @@ async function membershipRead(){
     'ADMIN_AUTH_MEMBERSHIP_PARITY_PARTIAL_HOLD',total:snapshot.size,
     counts:parity,realLoginProven:false,
     note:'Admin getUser metadata, NOT user sign-in or current ID token proof; stale signed claims can differ from persisted customClaims'};
-  report.membership={status:'SCHEMA_READBACK_COMPLETE_NOT_AUTHENTICATED_UAT',total:snapshot.size,
+  // Evaluate the ACTUAL browser membership validator using a sanitized
+  // server-bootstrap projection; no real auth request/token is simulated.
+  const validatorSource=fs.readFileSync('orbit360-platform/core/membership-multirol-contract-p0.js','utf8');
+  const sandbox={window:{Orbit:{}}};
+  vm.runInNewContext(validatorSource,sandbox,{timeout:1500});
+  const validator=sandbox.window.Orbit.membershipMultirolP0;
+  if(!validator||typeof validator.validate!=='function')
+    throw Error('READONLY_MEMBERSHIP_VALIDATOR_OWNER_MISSING');
+  const canonical=v=>{
+    const x=normal(v);
+    if(['propios','propio','own','mios'].includes(x))return 'own';
+    if(['equipo','team'].includes(x))return 'team';
+    if(['todos','all','global'].includes(x))return 'all';
+    if(['ninguno','none','sin_acceso','sinacceso'].includes(x))return 'none';
+    return x;
+  };
+  const contractErrors={},warnings={};let validated=0,blocked=0;
+  for(const d of snapshot.docs){
+    const raw=d.data()||{},rawScopes=raw.dataScopes&&typeof raw.dataScopes==='object'&&!Array.isArray(raw.dataScopes)?raw.dataScopes:{};
+    const fallback=rawScopes.default??rawScopes['*']??raw.scopeDatos??raw.dataScope;
+    const sourceModules=rawScopes.modules&&typeof rawScopes.modules==='object'&&!Array.isArray(rawScopes.modules)?
+      rawScopes.modules:Object.fromEntries(Object.entries(rawScopes).filter(([k])=>!['default','*','modules'].includes(k)));
+    const projected={
+      uid:raw.uid,tenantId:raw.tenantId,status:'active',
+      email:raw.email||'',nombre:raw.nombre||'',displayName:raw.displayName||'',
+      roles:Array.isArray(raw.roles)?raw.roles:[],activeRole:raw.activeRole||raw.rolActivo||'',
+      countries:Array.isArray(raw.countries)?raw.countries:[],
+      advisorId:typeof raw.advisorId==='string'?raw.advisorId:'',
+      teamId:typeof raw.teamId==='string'?raw.teamId:'',
+      defaultRole:typeof raw.defaultRole==='string'?raw.defaultRole:'',
+      modulesExtra:Array.isArray(raw.modulesExtra)?raw.modulesExtra:[],
+      modulesRestricted:Array.isArray(raw.modulesRestricted)?raw.modulesRestricted:[],
+      dataScopes:{default:canonical(fallback),modules:Object.fromEntries(Object.entries(sourceModules).map(([k,v])=>[k,canonical(v)]))}
+    };
+    const result=validator.validate(projected);
+    if(result.ok)validated++;else blocked++;
+    for(const e of result.errors||[]){
+      const code=clean(e).split(':')[0].replace(/[^a-z0-9_]/gi,'').slice(0,80);
+      contractErrors[code]=(contractErrors[code]||0)+1;
+    }
+    for(const e of result.warnings||[]){
+      const code=clean(e).split(':')[0].replace(/[^a-z0-9_]/gi,'').slice(0,80);
+      warnings[code]=(warnings[code]||0)+1;
+    }
+  }
+  report.membership.browserValidator={status:'EXACT_SOURCE_SANITIZED_PROJECTION_NOT_SIGNED_IN',
+    validated,blocked,errorCounts:contractErrors,warningCounts:warnings,
+    sourceOwner:'orbit360-platform/core/membership-multirol-contract-p0.js',
+    note:'Snapshot projected through the current server bootstrap allowlist; no token, identity impersonation or browser session'};
+  report.membership={...report.membership,status:'SCHEMA_READBACK_COMPLETE_NOT_AUTHENTICATED_UAT',total:snapshot.size,
     counts,canonicalContract:{uidMatchesDocument:true,tenantExact:true,statusActiveOnly:true,roleAssignedExactly:true,memberCountryExplicit:true,scopeCanonicalizationRequired:true},
     note:'Aggregate metadata only; membership alone does not authenticate Firebase credentials, confirm active claims or prove real-user callable access'};
  }catch(error){report.membership.status='READ_FAILED';report.membership.errorType=clean(error&&error.code||'READ_UNAVAILABLE').replace(/[^a-z0-9_/.-]/gi,'').slice(0,70);}
@@ -148,7 +198,10 @@ async function loggingRead(){
  }
 }
 (async()=>{
- await Promise.all([membershipRead(),loggingRead()]);
+ if(process.argv.includes('--membership-contract-only')){
+  await membershipRead();
+  report.cloudLogging.status='PREVIOUSLY_CONFIRMED_IAM_DENIED_NOT_RETRIED';
+ }else await Promise.all([membershipRead(),loggingRead()]);
  fs.writeFileSync(output,JSON.stringify(report,null,2)+'\n',{mode:0o600});
  console.log('B4_003_POST_AUTH_READONLY_MEMBERSHIP='+report.membership.status);
  console.log('B4_003_POST_AUTH_READONLY_FIREBASE_AUTH_PARITY='+report.authUserParity.status);

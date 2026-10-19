@@ -169,7 +169,7 @@ jobs:
         run: |
           set -euo pipefail
           node --check tools/gravicentra-b4-003-auth-activation-readonly.cjs
-          node tools/gravicentra-b4-003-auth-activation-readonly.cjs
+          node tools/gravicentra-b4-003-auth-activation-readonly.cjs --membership-contract-only
           test -s "$B4_003_AUTH_OBSERVABILITY_OUT"
 
       - name: Preserve B4-003 post-auth read-only observability
