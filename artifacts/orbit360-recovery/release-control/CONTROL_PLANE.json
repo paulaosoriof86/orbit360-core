@@ -4869,7 +4869,7 @@
       "entryGuardReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_ENTRY_GUARD_PASS_20261002.json",
       "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
       "executionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B4_EXECUTION_LOCK_20261002.json",
-      "executionLockBlobSha": "3dfc0b08d96f90091fbc6bbec8b0b541da04a914",
+      "executionLockBlobSha": "aa26f28f82a7cab528268e29bb37aa487b8e913f",
       "compositionLockBlobSha": "016f251811f22bc4fc04b2a5f674dfe09243e605",
       "findingLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
       "activeFindingId": "B4-003",
@@ -6312,7 +6312,7 @@
     "status": "B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL",
     "activeFindingId": "B4-003",
     "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
-    "executionLockBlobSha": "3dfc0b08d96f90091fbc6bbec8b0b541da04a914",
+    "executionLockBlobSha": "aa26f28f82a7cab528268e29bb37aa487b8e913f",
     "compositionLockBlobSha": "816309c63ed254d9b0e05cf63621c3d1c03cbfd5",
     "findingLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
     "noLive": true,
@@ -7250,18 +7250,18 @@
       "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R16_03_CATALOG_PREAUTH_401_SOURCE_FIX_20261004.json",
       "sourceFixReceiptBlobSha": "46ab8e219ab93e7251036720ce6435cc3d0b50c5"
     },
-    "sourceSha": "591d6655090342e1c9c3137eb8cdf88f292a3aa1",
-    "buildId": "gi-i65-b4-591d66550903-57f234755dc1",
-    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-38309446443-1io2otyg.web.app",
-    "runId": 38309446443,
-    "artifactId": 11774242543,
-    "artifactDigest": "c2e2d2a5303bd95c538e95ceedfad6bf2ae3678a416ea53008289af8856424f6",
+    "sourceSha": "125a3f314cb23aa128951ad714c95f143de64abb",
+    "buildId": "gi-i65-b4-125a3f314cb2-57f234755dc1",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-39324152069-txaa3c71.web.app",
+    "runId": 39324152069,
+    "artifactId": 12222310006,
+    "artifactDigest": "sha256:0554dd11bd3bc445f43db40041df12ddc60e0c2a0a9c7e9fba821d8c10ffe8b3",
     "exactReadback": true,
     "compositionBlobSha": "de82446f4924f6b688ac3029ededd25d798221f3",
     "r17SourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R17_SOURCE_FIX_20261005.json",
     "r17SourceFixReceiptBlobSha": "ff532a6577e58076821a41fb593da642fd2e7ef7",
     "findingCount": 282,
-    "productSourceSha": "97cf1680e22a1c1216879b2733cb7ba984e40479",
+    "productSourceSha": "125a3f314cb23aa128951ad714c95f143de64abb",
     "r18NoLossFreeze": {
       "status": "FROZEN",
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_PAULA_VISUAL_REJECTION_DECISION_AND_NOLOSS_FREEZE_20261005.json",
@@ -7271,9 +7271,9 @@
       "masterPlanBlobSha": "2841bd259d89ee272d00dbcda25d33e53ad69972",
       "exactFindingSetCount": 234
     },
-    "hostedPayloadDigest": "495293c7122b7d8772ccf646c862ec539f2a36feb0e61720e87b07a366c40cb9",
-    "backendSourceDigest": "46bfa1b16c79227e40252d9eeef3fc058c3b1de9390f5ce9fb7fda42e7caaf68",
-    "bundleDigest": "580704c8082e1dc068c4199c9b57d487ca9e85e24fc4ecb37c2898da1f2598fa",
+    "hostedPayloadDigest": "02c53f94a998d28cae48575dd649c3a5865c2ce87c8755671f0d9a4a18def827",
+    "backendSourceDigest": "3a518289868c3e0534a4620718b80cc910db5072bd7c489a9d201077c99a9daf",
+    "bundleDigest": "7326642abfedf684a9f483dd3ccb3cc33c53cd07e57de7575bc286823ec6cb5b",
     "r18HumanStatus": "R18_HUMAN_REJECTED_R19_CAUSAL_REMEDIATION_REQUIRED",
     "r19CausalAuthorization": {
       "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R19_CAUSAL_DIAGNOSTIC_AND_SOURCE_FIX_AUTHORIZATION_20261005.json",
@@ -7700,7 +7700,8 @@
     "priorPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b4-38282275915-949g36lw.web.app",
     "priorHumanVisualPassPreserved": true,
     "newSourceRequiresPreview": true,
-    "livePromoted": false
+    "livePromoted": false,
+    "humanFunctionalAccepted": false
   },
   "b4VisualAcceptanceControl": {
     "status": "R19_MACHINE_PASS_PENDING_TARGETED_PAULA_VISUAL",
@@ -12631,7 +12632,7 @@
     "gateAdvanced": false
   },
   "b4003CurrentCumulativePreviewIntent": {
-    "status": "AUTHORIZED_EXACT_SCOPED_PREVIEW_ONLY",
+    "status": "FULFILLED_EXACT_TECHNICAL_PREVIEW_NOT_FUNCTIONAL_ACCEPTANCE",
     "gate": "I6.5/B4-003",
     "triggerSubject": "build(i6.5 B4-003): cumulative authorized protected Preview",
     "reason": "19-Oct narrowly committed post-auth Clientes page 200 performance source; CI synthetic secure QA and central guard PASS; older Preview is NOT functional acceptance.",
@@ -12674,20 +12675,26 @@
     "securityP0RemainsOpen": true,
     "noGateAdvance": true,
     "notProductionAccepted": true,
-    "previousProductionReadinessPercent": 20
+    "previousProductionReadinessPercent": 20,
+    "runId": 39324152069,
+    "sourceSha": "125a3f314cb23aa128951ad714c95f143de64abb",
+    "buildId": "gi-i65-b4-125a3f314cb2-57f234755dc1",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-39324152069-txaa3c71.web.app",
+    "humanAccepted": false
   },
   "b4003CurrentCumulativePreviewProof": {
     "status": "EXACT_PREVIEW_TECHNICAL_PASS_AUTH_AND_HUMAN_HOLD",
-    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_AFFIRMATIVE_MODULE_PREVIEW_READBACK_20261018.json",
-    "receiptBlobSha": "6988b0d397ef2b78abc096329657e05b79b92afa",
-    "runId": 39178292742,
-    "sourceSha": "aed453e5a70dd5729d448cdef2d5dd9f13612f0e",
-    "buildId": "gi-i65-b4-aed453e5a70d-57f234755dc1",
-    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-39178292742-kgklkjoy.web.app",
-    "artifactId": 12155192785,
-    "artifactDigest": "sha256:8b36d311d218f5aee1333d13853b3254bea284ead8731eeb71820d5f82fe7a99",
-    "hostedPayloadDigest": "f54184abb500a7881b8df2d704f18e203040f7d6929ad3c01dd88e10d0bfa50e",
-    "backendSourceDigest": "b12da1d6d6f12189730510ee6861f3768c098f34e215227c00d2a7666c7ac8a4",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_LOGIN_STARTUP_PREVIEW_TECHNICAL_READBACK_20261019.json",
+    "receiptBlobSha": "dc16a3bbd9e6b0800972bdcbffefdb1c02aae500",
+    "runId": 39324152069,
+    "sourceSha": "125a3f314cb23aa128951ad714c95f143de64abb",
+    "buildId": "gi-i65-b4-125a3f314cb2-57f234755dc1",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-39324152069-txaa3c71.web.app",
+    "artifactId": 12222310006,
+    "artifactDigest": "sha256:0554dd11bd3bc445f43db40041df12ddc60e0c2a0a9c7e9fba821d8c10ffe8b3",
+    "hostedPayloadDigest": "02c53f94a998d28cae48575dd649c3a5865c2ce87c8755671f0d9a4a18def827",
+    "backendSourceDigest": "3a518289868c3e0534a4620718b80cc910db5072bd7c489a9d201077c99a9daf",
+    "bundleDigest": "7326642abfedf684a9f483dd3ccb3cc33c53cd07e57de7575bc286823ec6cb5b",
     "exactHostingReadback": true,
     "publicSmoke": true,
     "signedInRoleProof": false,
@@ -12699,7 +12706,7 @@
     "noSourceRebuild": true,
     "noLive": true,
     "noDataWrites": true,
-    "nextSameGate": "AUTHENTICATED_ROLE_COUNTRY_AND_EFFECTIVE_RULES_PARITY"
+    "nextSameGate": "AUTHENTICATED_POST_AUTH_LOGIN_AND_REAL_ROLE_GT_CO_UAT"
   },
   "b4003Uat2CanonicalAccessAndUniverseReadback": {
     "status": "CANONICAL_CONFIG_FALSE_DENY_CAUSE_CONFIRMED_AND_POLICY_DIFFERENCE_PARTIALLY_RECONCILED",
@@ -12964,7 +12971,7 @@
     "oneFrozenGate": true
   },
   "b4003LoginStartupScopedRepair20261019": {
-    "status": "SOURCE_STAGED_QA_PENDING_EXACT_PREVIEW",
+    "status": "TECHNICAL_PREVIEW_PASS_AUTHENTICATED_UAT_HOLD",
     "gate": "I6.5/B4-003",
     "sourceBlobs": {
       "orbit360-platform/data/store-firestore-product-readonly-p0.js": "111d5409f33cf71c301255b57aba1e4f72581478",
@@ -12975,7 +12982,7 @@
       "tools/gravicentra-b4-003-scoped-related-reader.test.cjs": "963021928f4ab74d4b876fb4ef221f51558782de"
     },
     "compositionBlobSha": "d83fc23b8eb329dfb47dd7e70ff6d83ce3d6fbc2",
-    "executionLockBlobSha": "3dfc0b08d96f90091fbc6bbec8b0b541da04a914",
+    "executionLockBlobSha": "aa26f28f82a7cab528268e29bb37aa487b8e913f",
     "sourceOwner": [
       "orbit360-platform/data/store-firestore-product-readonly-p0.js",
       "functions/b4-003-scoped-related-reader.js"
@@ -12989,7 +12996,7 @@
     "rootErrorRealSession": "UNKNOWN_CLOUD_LOGGING_IAM_DENIED",
     "roleCountryUat": "HOLD",
     "cloudLoggingReadOnlyAccess": "PERMISSION_DENIED_GOOGLE_CLOUD_CONNECTED_SESSION",
-    "testStatus": "SOURCE_QA_AND_CENTRAL_GUARD_PASS",
+    "testStatus": "GITHUB_SOURCE_QA_GUARD_AND_EXACT_PREVIEW_TECHNICAL_PASS",
     "productionPathProgress": {
       "numerator": 2,
       "denominator": 10,
@@ -13027,6 +13034,36 @@
       "productionPromotion": false,
       "operationalWrites": 0,
       "customTokensForRealMembers": false
+    },
+    "previewProof": {
+      "status": "TECHNICAL_PREVIEW_PASS_AUTHENTICATED_UAT_HOLD",
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_LOGIN_STARTUP_PREVIEW_TECHNICAL_READBACK_20261019.json",
+      "receiptBlobSha": "dc16a3bbd9e6b0800972bdcbffefdb1c02aae500",
+      "sourceSha": "125a3f314cb23aa128951ad714c95f143de64abb",
+      "buildId": "gi-i65-b4-125a3f314cb2-57f234755dc1",
+      "runId": 39324152069,
+      "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-39324152069-txaa3c71.web.app",
+      "artifactId": 12222310006,
+      "artifactArchiveDigest": "sha256:0554dd11bd3bc445f43db40041df12ddc60e0c2a0a9c7e9fba821d8c10ffe8b3",
+      "hostedPayloadDigest": "02c53f94a998d28cae48575dd649c3a5865c2ce87c8755671f0d9a4a18def827",
+      "backendSourceDigest": "3a518289868c3e0534a4620718b80cc910db5072bd7c489a9d201077c99a9daf",
+      "bundleDigest": "7326642abfedf684a9f483dd3ccb3cc33c53cd07e57de7575bc286823ec6cb5b",
+      "hostingExactReadback": true,
+      "anonymousFunctionDeniedStatus": 401,
+      "authenticatedPositiveNegativeAccepted": false,
+      "sharedRulesDeployed": false,
+      "productionPromoted": false,
+      "businessWrites": 0,
+      "configWrites": 0,
+      "realCustomTokens": 0,
+      "humanVisualAccepted": false,
+      "liveRulesSecurityAccepted": false
+    },
+    "previousPreviewIdentity": {
+      "runId": 39178292742,
+      "sourceSha": "aed453e5a70dd5729d448cdef2d5dd9f13612f0e",
+      "buildId": "gi-i65-b4-aed453e5a70d-57f234755dc1",
+      "status": "HISTORICAL_TECHNICAL_PASS_FUNCTIONAL_HOLD_NOT_THIS_RELEASE"
     }
   }
 }

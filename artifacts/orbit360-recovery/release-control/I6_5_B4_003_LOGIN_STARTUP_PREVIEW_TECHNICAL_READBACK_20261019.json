@@ -1,0 +1,72 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_LOGIN_STARTUP_PREVIEW_READBACK_20261019_V1",
+  "date": "2026-10-19",
+  "gate": "I6.5/B4-003",
+  "finding": "POST_AUTH_ACTIVATION_FAILED",
+  "status": "TECHNICAL_PREVIEW_PASS_AUTHENTICATED_UAT_HOLD",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "sourceSha": "125a3f314cb23aa128951ad714c95f143de64abb",
+  "codeRemediationSourceCommit": "b318071e4e5d3afe963409482d9ca2874f678b36",
+  "buildId": "gi-i65-b4-125a3f314cb2-57f234755dc1",
+  "runId": 39324152069,
+  "conclusion": "success",
+  "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-39324152069-txaa3c71.web.app",
+  "artifactId": 12222310006,
+  "artifactArchiveSha256": "0554dd11bd3bc445f43db40041df12ddc60e0c2a0a9c7e9fba821d8c10ffe8b3",
+  "hostedPayloadDigest": "02c53f94a998d28cae48575dd649c3a5865c2ce87c8755671f0d9a4a18def827",
+  "backendSourceDigest": "3a518289868c3e0534a4620718b80cc910db5072bd7c489a9d201077c99a9daf",
+  "bundleDigest": "7326642abfedf684a9f483dd3ccb3cc33c53cd07e57de7575bc286823ec6cb5b",
+  "fileCounts": {
+    "hosting": 218,
+    "backend": 33,
+    "bundle": 253
+  },
+  "checks": {
+    "codeQaRunId": 39323507431,
+    "centralGuardRunId": 39324152129,
+    "synthetic443ClientsThreePages": true,
+    "clientsOnly200ServerAccepted": true,
+    "otherCollections200Denied": true,
+    "noDirectFirestoreFallback": true,
+    "hostingExactReadback": true,
+    "independentBuildMarkerSourceAndBuildIdMatch": true,
+    "unauthenticatedCallableResponseStatus": 401,
+    "authenticatedLoginEnteredInicio": false,
+    "authenticatedRealRoleCountryProof": false,
+    "configurationWriteAccepted": false,
+    "liveFirestoreRulesSecure": false,
+    "humanVisualAccepted": false
+  },
+  "statusByStage": {
+    "source": "QA_PASS",
+    "preview": "TECHNICAL_PASS",
+    "functionalUat": "HOLD",
+    "securityLive": "HOLD",
+    "productionPromotion": "BLOCKED"
+  },
+  "productionPath": {
+    "numerator": 2,
+    "denominator": 10,
+    "percent": 20,
+    "delta": 0
+  },
+  "formalI6": {
+    "numerator": 5,
+    "denominator": 10,
+    "percent": 50,
+    "delta": 0
+  },
+  "actions": {
+    "sharedFirestoreRulesDeployed": false,
+    "otherProductionFunctionsDeployed": false,
+    "operationalDataWrites": 0,
+    "configWrites": 0,
+    "customUserTokensIssued": 0,
+    "productionPromoted": false,
+    "augustRefresh": false
+  },
+  "previousPreviewRunId": 39178292742,
+  "nextWithinGate": "AUTHENTICATED_POST_AUTH_ACTIVATION_GT_CO_ROLE_UAT_AND_EFFECTIVE_RULES_PARITY",
+  "limit": "No observed authenticated post-login pass. Cloud Logging authenticated account denied viewer access; no assumed production readiness."
+}

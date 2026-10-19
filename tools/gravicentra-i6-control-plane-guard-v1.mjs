@@ -148,7 +148,7 @@ if(String(C.i65ForensicRemediationPlan?.currentBlock||'')==='B4' &&
    'tools/gravicentra-b4-003-protected-hydration.test.cjs',
    'tools/gravicentra-b4-003-scoped-related-reader.test.cjs'
   ];
-  need(clientRepair.status==='SOURCE_STAGED_QA_PENDING_EXACT_PREVIEW'&&
+  need(['SOURCE_STAGED_QA_PENDING_EXACT_PREVIEW','TECHNICAL_PREVIEW_PASS_AUTHENTICATED_UAT_HOLD'].includes(clientRepair.status)&&
        scoped.status===clientRepair.status&&clientRepair.gate==='I6.5/B4-003'&&
        clientRepair.syntheticReproduction===true&&
        clientRepair.authenticatedLivePass===false&&
@@ -173,6 +173,27 @@ if(String(C.i65ForensicRemediationPlan?.currentBlock||'')==='B4' &&
        clientRepair.productionPromotionAuthorized===false&&
        clientRepair.dataWrites===0&&clientRepair.rulesDeployed===false,
        'B4_003_P0_LOGIN_SOURCE_SCOPE_RELEASE_BARRIER');
+
+  if(clientRepair.status==='TECHNICAL_PREVIEW_PASS_AUTHENTICATED_UAT_HOLD'){
+   const preview=clientRepair.previewProof||{};
+   const verified=preview.receiptPath==='artifacts/orbit360-recovery/release-control/I6_5_B4_003_LOGIN_STARTUP_PREVIEW_TECHNICAL_READBACK_20261019.json'&&exists(preview.receiptPath)?readJson(preview.receiptPath):{};
+   need(preview.status===clientRepair.status&&
+      preview.receiptPath==='artifacts/orbit360-recovery/release-control/I6_5_B4_003_LOGIN_STARTUP_PREVIEW_TECHNICAL_READBACK_20261019.json'&&
+      /^[a-f0-9]{40}$/.test(String(preview.sourceSha||''))&&
+      /^[0-9]+$/.test(String(preview.runId||''))&&
+      preview.sourceSha===verified.sourceSha&&
+      preview.runId===verified.runId&&
+      preview.buildId===verified.buildId&&
+      preview.previewUrl===verified.previewUrl&&
+      preview.receiptBlobSha===git('hash-object',preview.receiptPath)&&
+      scoped.previewProof?.receiptBlobSha===preview.receiptBlobSha&&
+      C.b4003CurrentCumulativePreviewProof?.sourceSha===preview.sourceSha&&
+      C.b4003CurrentCumulativePreviewProof?.humanFunctionalAccepted===false&&
+      preview.authenticatedPositiveNegativeAccepted===false&&
+      preview.sharedRulesDeployed===false&&
+      preview.productionPromoted===false,
+      'B4_003_P0_LOGIN_NEW_PREVIEW_TECHNICAL_RECEIPT_INVALID');
+  }
   console.log('B4_003_P0_LOGIN_STARTUP_SCOPED_SOURCE_BOUND_QA_NOT_AUTHENTICATED_PASS');
  }
  console.log('B4_003_P0_STILL_OPEN=6');
