@@ -48,7 +48,9 @@ async function run(){
    await setDoc(doc(db,canonical('carteraPrimas','d_own')),{tenantId:tenant,polizaId:'own',clienteId:'c_own',monto:10});
    await setDoc(doc(db,canonical('cobros','pay_own')),{tenantId:tenant,polizaId:'own',clienteId:'c_own',monto:6});
    // B4-003 security UAT surrogate: synthetic only, no real tenant or QA fixture writes.
-   await setDoc(doc(db,canonical('cancelaciones','canOwn')),{tenantId:tenant,polizaId:'own',clienteId:'c_own',pais:'CO',asesorId:'advisor-other',motivo:'Synthetic cancellation'});
+   // A valid own record must be visible; the legacy-stale child remains deliberately quarantined.
+   await setDoc(doc(db,canonical('cancelaciones','canClean')),{tenantId:tenant,polizaId:'own',clienteId:'c_own',pais:'GT',asesorId:'advisor-own',motivo:'Synthetic own cancellation'});
+   await setDoc(doc(db,canonical('cancelaciones','canOwn')),{tenantId:tenant,polizaId:'own',clienteId:'c_own',pais:'CO',asesorId:'advisor-other',motivo:'Synthetic contradictory child - must deny own scope'});
    await setDoc(doc(db,canonical('cancelaciones','canForeign')),{tenantId:tenant,polizaId:'foreign',clienteId:'c_foreign',motivo:'Synthetic foreign'});
    await setDoc(doc(db,canonical('cancelaciones','canCO')),{tenantId:tenant,polizaId:'co',clienteId:'c_co',motivo:'Synthetic CO'});
    await setDoc(doc(db,canonical('cancelaciones','canOrphan')),{tenantId:tenant,polizaId:'missing',clienteId:'c_own'});
@@ -271,15 +273,31 @@ async function run(){
     assert.equal(restrictedDirectDenials,18);
     console.log('B4_003_EMULATOR_CANCEL_AUDIT_DIRECT_DENIAL_PASS assertions='+restrictedDirectDenials+' synthetic_only no_deploy');
     const opCancellation=await listRelated('opGT','operativo','cancelaciones');
-    assert.deepEqual(opCancellation.rows.map(x=>x.id),['canOwn']);
+    assert.deepEqual(opCancellation.rows.map(x=>x.id),['canClean']);
     assert.equal(opCancellation.rows[0].pais,'GT');
     assert.equal(opCancellation.rows[0].asesorId,'advisor-own');restrictedServerChecks++;
+    assert.ok(!opCancellation.rows.some(x=>x.id==='canOwn'),'STALE_CHILD_METADATA_MUST_NOT_GRANT_OR_APPEAR_IN_OWN_SCOPE');restrictedServerChecks++;
     const coCancellation=await listRelated('opGT','operativo','cancelaciones','',{country:'CO'});
     assert.deepEqual(coCancellation.rows.map(x=>x.id),['canCO']);restrictedServerChecks++;
-    await denyRelated(()=>listRelated('advisorGT','asesor','cancelaciones'),'MODULE_DENIED');restrictedServerChecks++;
+    // Advisor has the approved own-read baseline when no canonical false denial exists.
+    const advisorCancellation=await listRelated('advisorGT','asesor','cancelaciones');
+    assert.deepEqual(advisorCancellation.rows.map(x=>x.id),['canForeign']);restrictedServerChecks++;
+    await denyRelated(()=>readScopedRelatedDocument({db,auth:{uid:'advisorGT',token:{}},
+      request:{tenantId:tenant,activeRole:'Asesor',collection:'cancelaciones',country:'GT',documentId:'canClean'}}),
+      'RECORD_NOT_FOUND_OR_DENIED');restrictedServerChecks++;
     await denyRelated(()=>listRelated('opGT','operativo','cancelaciones','',{cursor:'canForeign'}),'CURSOR_DENIED');restrictedServerChecks++;
     await denyRelated(()=>readRelated('cancelaciones','canMismatch'),'RECORD_NOT_FOUND_OR_DENIED');restrictedServerChecks++;
     await denyRelated(()=>readRelated('cancelaciones','canOrphan'),'RECORD_NOT_FOUND_OR_DENIED');restrictedServerChecks++;
+    await denyRelated(()=>readRelated('cancelaciones','canOwn'),'RECORD_NOT_FOUND_OR_DENIED');restrictedServerChecks++;
+    // Canonical role-specific ver=false overrides baseline without touching real tenant data.
+    await env.withSecurityRulesDisabled(async context=>{
+      await setDoc(doc(context.firestore(),`tenants/${tenant}/config/access`),
+        {roleScopes:{operativo:'all',asesor:'own'},rolePermissions:{Asesor:{cancelaciones:{ver:false,editar:false}}}});
+    });
+    await denyRelated(()=>listRelated('advisorGT','asesor','cancelaciones'),'MODULE_DENIED');restrictedServerChecks++;
+    await env.withSecurityRulesDisabled(async context=>{
+      await setDoc(doc(context.firestore(),`tenants/${tenant}/config/access`),{roleScopes:{operativo:'all',asesor:'own'}});
+    });
     const adminAudit=await listRelated('adminGT','Admin','auditoria');
     assert.deepEqual(adminAudit.rows.map(x=>x.id),['auGT','auGlobal']);
     assert.ok(adminAudit.rows.every(x=>!('password' in x)&&!('before' in x)&&!('after' in x)&&!('credentialRef' in x)));
@@ -297,7 +315,7 @@ async function run(){
       db,auth:{uid:'adminGT',token:{giActiveRole:'Operativo'}},
       request:{tenantId:tenant,collection:'auditoria',activeRole:'Admin',country:'GT',mode:'list',pageSize:20}
     }),'SIGNED_ACTIVE_ROLE_MISMATCH');restrictedServerChecks++;
-    assert.equal(restrictedServerChecks,13);
+    assert.equal(restrictedServerChecks,17);
     console.log('B4_003_EMULATOR_CANCEL_AUDIT_SERVER_ROLE_COUNTRY_PASS assertions='+restrictedServerChecks+' synthetic_only no_deploy');
 
 
