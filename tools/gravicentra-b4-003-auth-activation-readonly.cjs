@@ -4,6 +4,7 @@
 const fs=require('node:fs');
 const {applicationDefault,initializeApp,getApps}=require('firebase-admin/app');
 const {getFirestore}=require('firebase-admin/firestore');
+const {getAuth}=require('firebase-admin/auth');
 const project='ays-orbit-360-lab',tenant='alianzas-soluciones';
 const file=process.env.GOOGLE_APPLICATION_CREDENTIALS;
 if(!file||!fs.existsSync(file))throw Error('B4_003_READONLY_SERVICE_ACCOUNT_NOT_CONFIGURED');
@@ -24,6 +25,7 @@ const report={
  priorPreviewFunctionalUat:'HOLD',
  referenceWindowUtc:'2026-10-19T18:00:00Z_to_execution',
  membership:{status:'NOT_RUN',total:0,canonicalContract:{},counts:{}},
+ authUserParity:{status:'NOT_RUN',total:0,counts:{},realLoginProven:false},
  cloudLogging:{status:'NOT_RUN',function:'orbit360ScopedPolicyReadPreview',windowStart:'2026-10-19T18:00:00Z',entriesAnalyzed:0,httpStatuses:{},knownFailureCodes:{},sampleCodes:[]},
  security:{realUserImpersonation:false,customTokens:0,operationalWrites:0,rulesDeploy:false,livePromotion:false,credentialPayloadPrinted:false,rawLogsExported:false,realSignedInUatAccepted:false}
 };
@@ -60,6 +62,42 @@ async function membershipRead(){
    if(roles.length>1)flag('multiRoleMembers');
    if(roles.some(x=>['direccion','superadmin','admintenant','admin'].includes(normal(x))))flag('administrativeMembers');
   }
+  // Read-only Auth Admin lookups: no custom tokens, password reads, user writes,
+  // impersonation or disclosure of individual UID/email/profile fields.
+  const parity={};
+  const authCount=k=>{parity[k]=(parity[k]||0)+1;};
+  const auth=getAuth(app);
+  const lookups=await Promise.all(snapshot.docs.map(async d=>{
+   const m=d.data()||{};
+   try{
+    const actual=await auth.getUser(d.id);
+    authCount('authRecordPresent');
+    if(actual.disabled===true)authCount('authDisabled');
+    if(actual.emailVerified!==true)authCount('authEmailUnverified');
+    if(!clean(m.email))authCount('membershipEmailAbsentNotComparable');
+    else if(!clean(actual.email)||clean(m.email).toLowerCase()!==clean(actual.email).toLowerCase())
+       authCount('authMembershipEmailMismatch');
+    const signed=normal(actual.customClaims&&actual.customClaims.giActiveRole);
+    const effective=normal(m.activeRole||m.rolActivo);
+    if(signed){
+      authCount('signedActiveRoleClaimPresent');
+      if(signed!==effective)authCount('signedActiveRoleClaimMismatchToMembership');
+      if(!(m.roles||[]).some(role=>normal(role)===signed))
+        authCount('signedActiveRoleNotAssigned');
+    }else authCount('signedActiveRoleClaimAbsent');
+    const claimedTenant=clean(actual.customClaims&&actual.customClaims.tenantId);
+    if(claimedTenant&&claimedTenant!==tenant)authCount('signedTenantClaimMismatch');
+    return true;
+   }catch(error){
+    const code=clean(error&&error.code);
+    authCount(code.includes('user-not-found')?'authRecordMissing':code.includes('permission')?'authLookupPermissionDenied':'authLookupUnavailable');
+    return false;
+   }
+  }));
+  report.authUserParity={status:lookups.every(Boolean)?'ADMIN_AUTH_MEMBERSHIP_PARITY_READ_COMPLETE_NOT_TOKEN_UAT':
+    'ADMIN_AUTH_MEMBERSHIP_PARITY_PARTIAL_HOLD',total:snapshot.size,
+    counts:parity,realLoginProven:false,
+    note:'Admin getUser metadata, NOT user sign-in or current ID token proof; stale signed claims can differ from persisted customClaims'};
   report.membership={status:'SCHEMA_READBACK_COMPLETE_NOT_AUTHENTICATED_UAT',total:snapshot.size,
     counts,canonicalContract:{uidMatchesDocument:true,tenantExact:true,statusActiveOnly:true,roleAssignedExactly:true,memberCountryExplicit:true,scopeCanonicalizationRequired:true},
     note:'Aggregate metadata only; membership alone does not authenticate Firebase credentials, confirm active claims or prove real-user callable access'};
@@ -113,6 +151,7 @@ async function loggingRead(){
  await Promise.all([membershipRead(),loggingRead()]);
  fs.writeFileSync(output,JSON.stringify(report,null,2)+'\n',{mode:0o600});
  console.log('B4_003_POST_AUTH_READONLY_MEMBERSHIP='+report.membership.status);
+ console.log('B4_003_POST_AUTH_READONLY_FIREBASE_AUTH_PARITY='+report.authUserParity.status);
  console.log('B4_003_POST_AUTH_READONLY_LOGGING='+report.cloudLogging.status);
  console.log('B4_003_POST_AUTH_READONLY_AUTHENTICATED_UAT=HOLD');
  console.log('B4_003_POST_AUTH_READONLY_ZERO_WRITES=true');
