@@ -12,6 +12,7 @@ on:
       - 'tools/gravicentra-b4-003-one-pass-readonly-integrity.cjs'
       - 'artifacts/orbit360-recovery/release-control/I6_5_B4_003_INTEGRAL_AUDIT_REQUEST_20261016.json'
       - 'tools/gravicentra-b4-003-integral-readonly-audit.cjs'
+      - 'tools/gravicentra-b4-003-auth-activation-readonly.cjs'
 
 permissions:
   contents: write
@@ -77,6 +78,31 @@ jobs:
             && l.boundaries?.reimportAuthorized===false
             && l.boundaries?.livePromotionAuthorized===false
             && require('node:child_process').execFileSync('git',['log','-1','--format=%s'],{encoding:'utf8'}).trim()==='audit(i6.5 B4-003): execute bounded operational relation readback';
+          const diagSubject='audit(i6.5 B4-003): post-auth cloud logging and membership readback';
+          const currentSubject=require('node:child_process').execFileSync('git',['log','-1','--format=%s'],{encoding:'utf8'}).trim();
+          const login=c.b4003LoginStartupScopedRepair20261019||{}, proof=login.previewProof||{};
+          const authReadonly=currentSubject===diagSubject
+            && c.nextAction==='I6_5_FORENSIC_REMEDIATION_B4_003_R20_TARGETED_PAULA_VISUAL'
+            && c.currentB4?.status==='B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL'
+            && c.b4003SecurityReleaseHold?.status==='ACTIVE_FAIL_CLOSED_UNAUTHORIZED_BROWSER_FIRESTORE_READ_WRITE'
+            && login.status==='TECHNICAL_PREVIEW_PASS_AUTHENTICATED_UAT_HOLD'
+            && proof.status===login.status
+            && proof.runId===39324152069
+            && proof.sourceSha==='125a3f314cb23aa128951ad714c95f143de64abb'
+            && proof.authenticatedPositiveNegativeAccepted===false
+            && l.activeFinding?.id==='B4-003'
+            && l.boundaries?.productMutationAuthorized===false
+            && l.boundaries?.dataMutationAuthorized===false
+            && l.boundaries?.configWritesAuthorized===false
+            && l.boundaries?.businessWritesAuthorized===false
+            && l.boundaries?.realOperationalWritesAuthorized===false
+            && l.boundaries?.livePromotionAuthorized===false
+            && c.b4003ProtectedPreviewAuthorization?.realUserImpersonationAuthorized===false
+            && c.b4003SecurityReleaseHold?.firestoreRulesDeployAuthorized===false;
+          if(currentSubject===diagSubject&&!authReadonly)
+            throw Error('B4_003_POST_AUTH_READONLY_DIAGNOSTIC_SCOPE_DENIED');
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'auth_readonly='+(authReadonly?'true':'false')+'\n');
+          console.log('B4_003_AUTH_OBSERVABILITY='+(authReadonly?'READ_ONLY_NO_IMPERSONATION':'NOOP'));
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'integrity='+(integrity?'true':'false')+'\n');
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'run='+(ok?'true':'false')+'\n');
           const url=c.currentB4?.previewUrl||c.i65ForensicRemediationPlan?.b4?.previewUrl||'';
@@ -107,7 +133,7 @@ jobs:
           fi
 
       - name: Prepare read-only Firebase and browser
-        if: steps.gate.outputs.run == 'true' || steps.gate.outputs.integrity == 'true'
+        if: steps.gate.outputs.run == 'true' || steps.gate.outputs.integrity == 'true' || steps.gate.outputs.auth_readonly == 'true'
         shell: bash
         run: |
           set -euo pipefail
@@ -133,6 +159,27 @@ jobs:
           echo "GOOGLE_APPLICATION_CREDENTIALS=$ROOT/service-account.json" >> "$GITHUB_ENV"
           npm install --no-save --package-lock=false firebase-admin@13.4.0 >/dev/null
           if [ "${{ steps.gate.outputs.run }}" = 'true' ]; then npm install --no-save --package-lock=false playwright@1.55.0 >/dev/null; npx playwright install --with-deps chromium >/dev/null; fi
+
+      # B4-003 existing forensic executor: targeted auth observability only.
+      # Never mint real-member credentials or deploy Firestore Rules/LIVE.
+      - name: B4-003 post-auth log and membership readback (no writes)
+        if: steps.gate.outputs.auth_readonly == 'true'
+        env:
+          B4_003_AUTH_OBSERVABILITY_OUT: ${{ runner.temp }}/b4-003-auth-observability.json
+        run: |
+          set -euo pipefail
+          node --check tools/gravicentra-b4-003-auth-activation-readonly.cjs
+          node tools/gravicentra-b4-003-auth-activation-readonly.cjs
+          test -s "$B4_003_AUTH_OBSERVABILITY_OUT"
+
+      - name: Preserve B4-003 post-auth read-only observability
+        if: always() && steps.gate.outputs.auth_readonly == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: gravicentra-b4-003-auth-observability-${{ github.run_id }}
+          path: ${{ runner.temp }}/b4-003-auth-observability.json
+          if-no-files-found: warn
+          retention-days: 30
 
       - name: Read-only operational integrity within B4-003
         if: steps.gate.outputs.integrity == 'true'
