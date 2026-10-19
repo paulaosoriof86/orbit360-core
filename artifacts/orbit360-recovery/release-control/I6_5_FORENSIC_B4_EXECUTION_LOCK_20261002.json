@@ -2996,6 +2996,26 @@
     "noLivePromotion": true,
     "noFirebaseDataWrites": true,
     "noSecrets": true,
-    "previousPreviewStaleForThisSource": true
+    "previousPreviewStaleForThisSource": true,
+    "sourceQaRunId": 39323507431,
+    "centralGuardRunId": 39323507431,
+    "previewDispatch": {
+      "status": "AUTHORIZED_EXACT_READONLY_PREVIEW_PENDING",
+      "triggerSubject": "build(i6.5 B4-003): cumulative authorized protected Preview",
+      "compositionBlobSha": "d83fc23b8eb329dfb47dd7e70ff6d83ce3d6fbc2",
+      "sourceBlobs": {
+        "orbit360-platform/data/store-firestore-product-readonly-p0.js": "111d5409f33cf71c301255b57aba1e4f72581478",
+        "functions/b4-003-scoped-related-reader.js": "889feecc4e8ebd9240c53ad6f8d4777d47900f00"
+      },
+      "sourceQaRunId": 39323507431,
+      "guardRunId": 39323507431,
+      "realRoleCountryUat": "HOLD",
+      "previousPreviewObsolete": true,
+      "readOnlyCallablesOnly": true,
+      "firestoreRulesDeploy": false,
+      "productionPromotion": false,
+      "operationalWrites": 0,
+      "customTokensForRealMembers": false
+    }
   }
 }
