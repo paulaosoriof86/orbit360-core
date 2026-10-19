@@ -4869,7 +4869,7 @@
       "entryGuardReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_ENTRY_GUARD_PASS_20261002.json",
       "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
       "executionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B4_EXECUTION_LOCK_20261002.json",
-      "executionLockBlobSha": "19857357d570dd9f21eb1cfdbc95480f8de27327",
+      "executionLockBlobSha": "d0ff305aa9185575abe1be0cbc551e4ff049ccda",
       "compositionLockBlobSha": "016f251811f22bc4fc04b2a5f674dfe09243e605",
       "findingLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
       "activeFindingId": "B4-003",
@@ -6312,7 +6312,7 @@
     "status": "B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL",
     "activeFindingId": "B4-003",
     "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
-    "executionLockBlobSha": "19857357d570dd9f21eb1cfdbc95480f8de27327",
+    "executionLockBlobSha": "d0ff305aa9185575abe1be0cbc551e4ff049ccda",
     "compositionLockBlobSha": "816309c63ed254d9b0e05cf63621c3d1c03cbfd5",
     "findingLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
     "noLive": true,
@@ -12633,14 +12633,14 @@
     "gateAdvanced": false
   },
   "b4003CurrentCumulativePreviewIntent": {
-    "status": "FULFILLED_EXACT_TECHNICAL_PREVIEW_NOT_FUNCTIONAL_ACCEPTANCE",
+    "status": "AUTHORIZED_EXACT_SCOPED_PREVIEW_ONLY",
     "gate": "I6.5/B4-003",
     "triggerSubject": "build(i6.5 B4-003): cumulative authorized protected Preview",
-    "reason": "19-Oct narrowly committed post-auth Clientes page 200 performance source; CI synthetic secure QA and central guard PASS; older Preview is NOT functional acceptance.",
+    "reason": "UAT5 six-owner source QA PASS after Chrome UAT4 rejection, exact isolated Preview required for effective visual and role-country readback",
     "rejectedUatReceiptBlobSha": "ebb5e503e2fd575d1f6c98d99af51799d6ea4820",
-    "compositionBlobSha": "d83fc23b8eb329dfb47dd7e70ff6d83ce3d6fbc2",
+    "compositionBlobSha": "37fc6586672d9570c2affd4177d0da5dd5762c1b",
     "sourceBlobs": {
-      "orbit360-platform/modules/cliente360.js": "2eeabe26db6d9d951f6fbe2659b55992f52648c8",
+      "orbit360-platform/modules/cliente360.js": "53946c5746ececf3d4141c769cef30b4c1f902d8",
       "orbit360-platform/index.html": "4891a03530cee5517a76c9392896c11040abcab5",
       "orbit360-platform/modules/equipo.js": "9e76fbcb70d5a19b8b58aeb72b9fad7acd0bbecf",
       "functions/tenant-domain-config.js": "231fb2f106a6c139bb83c367f0f5e1a1c8924823",
@@ -12650,7 +12650,12 @@
       "orbit360-platform/core/access-scope.js": "66462ba7263fe7cb9a078148810bd17c96ad72c7",
       "orbit360-platform/core/backend-product-readonly-bootstrap-p0.js": "aa70a29b7e3d5a5ac4bef003fb6db07a0439af0f",
       "orbit360-platform/core/product-runtime-browser-providers-p0.js": "51f2801cf8e7590ff92ffa9e7dae07ff8304f5d7",
-      "orbit360-platform/data/store-firestore-product-readonly-p0.js": "111d5409f33cf71c301255b57aba1e4f72581478"
+      "orbit360-platform/data/store-firestore-product-readonly-p0.js": "111d5409f33cf71c301255b57aba1e4f72581478",
+      "orbit360-platform/modules/polizas.js": "3c3c1bc42bcbf03a88cea985d2101392a1c47c4d",
+      "orbit360-platform/modules/cobros.js": "ceb666bc1016c5365e420ad6791f112a947966a4",
+      "orbit360-platform/modules/conciliaciones.js": "3b77b2cff04e2f10ab78541d8802c191901de240",
+      "orbit360-platform/core/router.js": "9eeb0d3e0764c66e1ee9b242bbfe8d03c47f1816",
+      "orbit360-platform/styles/infra.css": "1f9fca202d72a3a56454ee30b2b94c9657feab23"
     },
     "rosterSourceBlobSha": "75ca53db55e2665123589b0e63253a8e4f8c377c",
     "onlyReadOnlyCallables": true,
@@ -12659,11 +12664,11 @@
       "orbit360AssignableAdvisorRosterPreview"
     ],
     "sourceQaRequired": true,
-    "sourceQaRunId": 39323507431,
+    "sourceQaRunId": 39340901653,
     "sourceRoleModuleCases": 20,
     "sourceRelatedCases": 104,
     "governanceGuardRequired": true,
-    "governanceGuardRunId": 39323507431,
+    "governanceGuardRunId": 39340901653,
     "exactHostedReadbackRequired": true,
     "unauthenticatedCallableNegativeRequired": true,
     "realRoleGTCOUatPending": true,
@@ -12681,7 +12686,17 @@
     "sourceSha": "125a3f314cb23aa128951ad714c95f143de64abb",
     "buildId": "gi-i65-b4-125a3f314cb2-57f234755dc1",
     "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-39324152069-txaa3c71.web.app",
-    "humanAccepted": false
+    "humanAccepted": false,
+    "latestUat4ReceiptBlobSha": "28f24fb4ddd26fa892392c9871007e698f2c970c",
+    "latestUat4HumanAccepted": false,
+    "exactSixProductSourceBlobs": {
+      "orbit360-platform/modules/cliente360.js": "53946c5746ececf3d4141c769cef30b4c1f902d8",
+      "orbit360-platform/modules/polizas.js": "3c3c1bc42bcbf03a88cea985d2101392a1c47c4d",
+      "orbit360-platform/modules/cobros.js": "ceb666bc1016c5365e420ad6791f112a947966a4",
+      "orbit360-platform/modules/conciliaciones.js": "3b77b2cff04e2f10ab78541d8802c191901de240",
+      "orbit360-platform/core/router.js": "9eeb0d3e0764c66e1ee9b242bbfe8d03c47f1816",
+      "orbit360-platform/styles/infra.css": "1f9fca202d72a3a56454ee30b2b94c9657feab23"
+    }
   },
   "b4003CurrentCumulativePreviewProof": {
     "status": "EXACT_PREVIEW_TECHNICAL_PASS_AUTH_AND_HUMAN_HOLD",
@@ -13205,6 +13220,37 @@
     "productionPercent": 20,
     "formalI6Percent": 50,
     "findingLedgerCount": 295,
-    "qaCorrection": "UAT5_POLICY_GAP_TEST_START_END_INDEX_ANCHOR_ONLY"
+    "qaCorrection": "UAT5_POLICY_GAP_TEST_START_END_INDEX_ANCHOR_ONLY",
+    "previewDispatch": {
+      "status": "AUTHORIZED_EXACT_B4_003_SOURCE_QA_PASS_PREVIEW_PENDING",
+      "triggerSubject": "build(i6.5 B4-003): cumulative authorized protected Preview",
+      "sourceOwnerBlobs": {
+        "orbit360-platform/modules/cliente360.js": "53946c5746ececf3d4141c769cef30b4c1f902d8",
+        "orbit360-platform/modules/polizas.js": "3c3c1bc42bcbf03a88cea985d2101392a1c47c4d",
+        "orbit360-platform/modules/cobros.js": "ceb666bc1016c5365e420ad6791f112a947966a4",
+        "orbit360-platform/modules/conciliaciones.js": "3b77b2cff04e2f10ab78541d8802c191901de240",
+        "orbit360-platform/core/router.js": "9eeb0d3e0764c66e1ee9b242bbfe8d03c47f1816",
+        "orbit360-platform/styles/infra.css": "1f9fca202d72a3a56454ee30b2b94c9657feab23"
+      },
+      "compositionBlobSha": "37fc6586672d9570c2affd4177d0da5dd5762c1b",
+      "qaBlobSha": "b5d3a169384a85fd644f2b52ed0a66c760d4b479",
+      "sourceQaRunId": 39340901653,
+      "guardConclusion": "success",
+      "onlyReadOnlyCallables": true,
+      "isolatedHostingOnly": true,
+      "firestoreRulesDeployAuthorized": false,
+      "otherLiveFunctionsDeployAuthorized": false,
+      "operationalDataWritesAuthorized": false,
+      "configWritesAuthorized": false,
+      "realUserTokenIssuanceAuthorized": false,
+      "productionPromotionAuthorized": false,
+      "reimportAuthorized": false,
+      "humanFunctionalAccepted": false,
+      "previousPreviewRunId": 39324152069,
+      "previousPreviewSourceSha": "125a3f314cb23aa128951ad714c95f143de64abb"
+    },
+    "sourceQaStatus": "GITHUB_ACTIONS_SOURCE_CONTRACT_PASS_NOT_FUNCTIONAL_PASS",
+    "sourceQaRunId": 39340901653,
+    "executionLockBlobSha": "d0ff305aa9185575abe1be0cbc551e4ff049ccda"
   }
 }

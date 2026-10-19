@@ -3181,6 +3181,36 @@
     "reimportAuthorized": false,
     "dataWrites": 0,
     "authenticatedE2EStatus": "HOLD",
-    "findingLedgerCount": 295
+    "findingLedgerCount": 295,
+    "previewDispatch": {
+      "status": "AUTHORIZED_EXACT_B4_003_SOURCE_QA_PASS_PREVIEW_PENDING",
+      "triggerSubject": "build(i6.5 B4-003): cumulative authorized protected Preview",
+      "sourceOwnerBlobs": {
+        "orbit360-platform/modules/cliente360.js": "53946c5746ececf3d4141c769cef30b4c1f902d8",
+        "orbit360-platform/modules/polizas.js": "3c3c1bc42bcbf03a88cea985d2101392a1c47c4d",
+        "orbit360-platform/modules/cobros.js": "ceb666bc1016c5365e420ad6791f112a947966a4",
+        "orbit360-platform/modules/conciliaciones.js": "3b77b2cff04e2f10ab78541d8802c191901de240",
+        "orbit360-platform/core/router.js": "9eeb0d3e0764c66e1ee9b242bbfe8d03c47f1816",
+        "orbit360-platform/styles/infra.css": "1f9fca202d72a3a56454ee30b2b94c9657feab23"
+      },
+      "compositionBlobSha": "37fc6586672d9570c2affd4177d0da5dd5762c1b",
+      "qaBlobSha": "b5d3a169384a85fd644f2b52ed0a66c760d4b479",
+      "sourceQaRunId": 39340901653,
+      "guardConclusion": "success",
+      "onlyReadOnlyCallables": true,
+      "isolatedHostingOnly": true,
+      "firestoreRulesDeployAuthorized": false,
+      "otherLiveFunctionsDeployAuthorized": false,
+      "operationalDataWritesAuthorized": false,
+      "configWritesAuthorized": false,
+      "realUserTokenIssuanceAuthorized": false,
+      "productionPromotionAuthorized": false,
+      "reimportAuthorized": false,
+      "humanFunctionalAccepted": false,
+      "previousPreviewRunId": 39324152069,
+      "previousPreviewSourceSha": "125a3f314cb23aa128951ad714c95f143de64abb"
+    },
+    "sourceQaStatus": "GITHUB_ACTIONS_SOURCE_CONTRACT_PASS_NOT_FUNCTIONAL_PASS",
+    "sourceQaRunId": 39340901653
   }
 }
