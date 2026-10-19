@@ -12941,5 +12941,25 @@
     "signedInRoleCountryPass": false,
     "releaseAuthorized": false,
     "productionPercent": 20
+  },
+  "b4003CurrentSecurityEmulatorRequest": {
+    "status": "REQUESTED_EXISTING_ISOLATED_FIRESTORE_EMULATOR_ONLY",
+    "gate": "I6.5/B4-003",
+    "rulesCandidatePath": "firestore.b4-003-scoped-candidate.rules",
+    "rulesCandidateBlobSha": "6ae1a85b1f82525ac018ff682a2e20b6cca5f1d8",
+    "backendOwnerPath": "functions/b4-003-scoped-access-boundary.js",
+    "backendOwnerBlobSha": "a550ffcbf1ab1a218a7d61312db4180acad41872",
+    "lastPreviewSource": "aed453e5a70dd5729d448cdef2d5dd9f13612f0e",
+    "previewRunId": 39178292742,
+    "tests": "ANONYMOUS_AND_AUTHENTICATED_SYNTHETIC_DIRECT_FIRESTORE_NEGATIVES_PLUS_SCOPED_BACKEND_POSITIVE",
+    "realUserProof": false,
+    "configWrites": false,
+    "operationalWrites": false,
+    "liveFirestoreRulesDeploy": false,
+    "livePromotion": false,
+    "productionAcceptance": false,
+    "productionPathPercent": 20,
+    "formalI6Percent": 50,
+    "oneFrozenGate": true
   }
 }
