@@ -1,0 +1,34 @@
+'use strict';
+const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
+const get=p=>fs.readFileSync(p,'utf8');
+const c=get('orbit360-platform/modules/cliente360.js');
+const start=c.indexOf('  function visiblePolicyGap('),end=c.indexOf('  const policyTotal',start);
+assert.ok(start>0&&end>start,'UAT5_POLICY_GAP_OWNER_MISSING');
+const ctx={Set,Number,String,Array,Object};
+vm.runInNewContext('const esRenovable=p=>p&&["Vigente","Por renovar"].includes(p.estado);'+c.slice(start,end)+';this.gap=visiblePolicyGap;',ctx);
+const policies=[{id:'p1',clienteId:'c1',estado:'Vigente',primaNeta:100,moneda:'GTQ'},
+{id:'p2',clienteId:'missing',estado:'Por renovar',primaNeta:250,moneda:'COP'},
+{id:'p3',clienteId:'invalid-country',estado:'Vigente',primaNeta:50,moneda:'GTQ'}];
+const ids=new Set(['c1']);
+const admin=ctx.gap(policies,ids,'Dirección','TODOS',false);
+assert.equal(admin.total,3);assert.equal(admin.unmatched,2);assert.equal(admin.active,2);
+assert.equal(admin.currency.GTQ,50);assert.equal(admin.currency.COP,250);
+for(const role of ['Asesor','Operativo','Marketing','Comercial'])assert.equal(ctx.gap(policies,ids,role,'TODOS',false),null,'ROLE_PRIVACY_'+role);
+assert.equal(ctx.gap(policies,ids,'Dirección','GT',false),null);
+assert.equal(ctx.gap(policies,ids,'Dirección','TODOS',true),null);
+assert.ok(c.includes('policyGapNote')&&c.includes('data-c360-list-ready'),'GAP_VISIBLE_WHEN_AUTHORIZED');
+const p=get('orbit360-platform/modules/polizas.js');
+assert.ok(p.includes('pendingCalendarAuthority')&&p.includes('|| pendingCalendarAuthority;'),'POLICY_UNKNOWN_CALENDAR_NOT_CERTIFIED');
+assert.ok(p.includes('sin calendario activo confirmado'),'POLICY_RECEIPT_PROVENANCE_COPY');
+const cobr=get('orbit360-platform/modules/cobros.js');
+assert.ok(cobr.includes('conciliados en todo el universo'),'GLOBAL_COBROS_DENOMINATOR_MISSING');
+assert.ok(cobr.includes('este subconjunto'),'SIGA_DENOMINATOR_MISSING');
+const conc=get('orbit360-platform/modules/conciliaciones.js');
+assert.ok(conc.includes('propuestas formales')&&conc.includes('Cobros y cartera'),'PROPOSAL_VS_PAYMENT_BOUNDARY');
+assert.ok(conc.includes('const CANONICAL_COLLECTION'),'CONCILIATION_OWNER_CHANGED');
+const rt=get('orbit360-platform/core/router.js');
+assert.ok(rt.includes("if (isMobile()) closeMobile(); if (location.hash !== '#/' + route)"),'MOBILE_NAV_CLOSE_IMMEDIATE');
+const css=get('orbit360-platform/styles/infra.css');
+assert.ok(!css.includes('display:flex!important;flex:1 1 100%!important;order:-10!important'),'MOBILE_SEARCH_FORCE_OPEN_REGRESSION');
+assert.ok(get('orbit360-platform/styles/base.css').includes('.tb-search.mobile-open'),'CANONICAL_SEARCH_TOGGLE_PRESERVED');
+console.log('B4_003_UAT5_CAUSAL_UI_CONTRACT_QA_PASS checks=20 no_operational_writes no_scope_grants');

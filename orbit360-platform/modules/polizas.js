@@ -269,8 +269,9 @@ Orbit.modules.polizas = (function () {
     const iva = numberOrNull(p.ivaMonto != null ? p.ivaMonto : (p.iva != null ? p.iva : p.impuestosIVA));
     const sourceAdjustment = numberOrNull(p.descuento);
     const recibos = rb.receipts;
+    const pendingCalendarAuthority = recibos.length>0 && rb.total!=null && total!=null && Math.abs(rb.total-total)>0.01;
     const genera = (p.estado === 'Vigente' || p.estado === 'Por renovar');
-    const req = p.requiereValidacion || !p.pais || !p.moneda || p.estado === 'Requiere validación' || neta == null || total == null;
+    const req = p.requiereValidacion || !p.pais || !p.moneda || p.estado === 'Requiere validación' || neta == null || total == null || pendingCalendarAuthority;
     const fuente = p.sourceRef || p._origenHoja || (p.importado ? 'Importación' : 'Carga manual');
     const filaFuente = p._numeroFila ? (' · fila ' + p._numeroFila) : '';
     const row = (k, v, extra) => `<div class="pt-det" style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--line)"><span class="muted">${k}</span><b style="${extra||''}">${v}</b></div>`;
@@ -290,7 +291,7 @@ Orbit.modules.polizas = (function () {
         ${row('Descuento / ajuste (campo fuente)', M(sourceAdjustment != null ? sourceAdjustment : rb.sourceAdjustment,cur))}
         ${row('IVA / impuestos', M(iva != null ? iva : rb.iva,cur))}
         ${row('Prima total de póliza', M(total,cur), 'color:var(--red)')}
-        ${recibos.length ? row('Total calendario de recibos', M(rb.total,cur)) : ''}
+        ${recibos.length ? row('Total de recibos relacionados (sin calendario activo confirmado)', M(rb.total,cur)) : ''}
         <div class="muted" style="font-size:11.5px;margin-top:6px">Los componentes tomados del calendario son informativos y no se inventan cuando la fuente no los trae. Una diferencia entre póliza y calendario queda pendiente de conciliación de fuente.</div>
         <div style="font-family:var(--f-display);font-weight:800;font-size:13px;margin:14px 0 6px">Condiciones</div>
         ${row('Frecuencia', U.esc(p.frecuencia || p.forma || '—'))}

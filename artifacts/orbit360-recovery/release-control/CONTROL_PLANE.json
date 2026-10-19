@@ -4869,7 +4869,7 @@
       "entryGuardReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_ENTRY_GUARD_PASS_20261002.json",
       "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
       "executionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B4_EXECUTION_LOCK_20261002.json",
-      "executionLockBlobSha": "e1c20c689e727959118c68292a64bc64dd61256b",
+      "executionLockBlobSha": "84edec9b2e76c8f209c275715ecc5318583fd343",
       "compositionLockBlobSha": "016f251811f22bc4fc04b2a5f674dfe09243e605",
       "findingLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
       "activeFindingId": "B4-003",
@@ -5996,7 +5996,7 @@
   "canonicalAccumulationControl": {
     "status": "FROZEN_ACTIVE",
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "compositionLockBlobSha": "d83fc23b8eb329dfb47dd7e70ff6d83ce3d6fbc2",
+    "compositionLockBlobSha": "4856a78f4ac959991765b2378b7509c3bb6626db",
     "findingLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
     "findingLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
@@ -6312,7 +6312,7 @@
     "status": "B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL",
     "activeFindingId": "B4-003",
     "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
-    "executionLockBlobSha": "e1c20c689e727959118c68292a64bc64dd61256b",
+    "executionLockBlobSha": "84edec9b2e76c8f209c275715ecc5318583fd343",
     "compositionLockBlobSha": "816309c63ed254d9b0e05cf63621c3d1c03cbfd5",
     "findingLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
     "noLive": true,
@@ -13181,5 +13181,27 @@
     "productionDelta": 0,
     "formalI6Percent": 50,
     "executionLockBlobSha": "e1c20c689e727959118c68292a64bc64dd61256b"
+  },
+  "b4003Uat5ScopedSource20261019": {
+    "status": "EXACT_SCOPED_SOURCE_QA_PENDING_PREVIEW",
+    "compositionBlobSha": "4856a78f4ac959991765b2378b7509c3bb6626db",
+    "qaBlobSha": "fcb9ded0feb55b9f7cc9512b41d564535fb50c7b",
+    "sourceBlobs": {
+      "orbit360-platform/modules/cliente360.js": "53946c5746ececf3d4141c769cef30b4c1f902d8",
+      "orbit360-platform/modules/polizas.js": "3c3c1bc42bcbf03a88cea985d2101392a1c47c4d",
+      "orbit360-platform/modules/cobros.js": "ceb666bc1016c5365e420ad6791f112a947966a4",
+      "orbit360-platform/modules/conciliaciones.js": "3b77b2cff04e2f10ab78541d8802c191901de240",
+      "orbit360-platform/core/router.js": "9eeb0d3e0764c66e1ee9b242bbfe8d03c47f1816",
+      "orbit360-platform/styles/infra.css": "1f9fca202d72a3a56454ee30b2b94c9657feab23"
+    },
+    "previousPreviewRunId": 39324152069,
+    "humanFunctionalAccepted": false,
+    "dataWrites": 0,
+    "productionPromotionAuthorized": false,
+    "firestoreRulesDeployed": false,
+    "nextWithinGate": "SOURCE_QA_THEN_NEW_PREVIEW",
+    "productionPercent": 20,
+    "formalI6Percent": 50,
+    "findingLedgerCount": 295
   }
 }

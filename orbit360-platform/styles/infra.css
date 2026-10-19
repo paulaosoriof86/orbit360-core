@@ -921,7 +921,7 @@ a.fh-chip:hover{border-color:var(--red);color:var(--red)}
 
 /* B4-003 R18 · mobile search + insurer knowledge hierarchy */
 @media(max-width:760px){
-  .tb-search{display:flex!important;flex:1 1 100%!important;order:-10!important;min-width:0!important;width:100%!important;max-width:none!important}
+  .tb-search{min-width:0!important;width:100%!important;max-width:none!important}
   .tb-search input{display:block!important;min-width:0!important;width:100%!important;flex:1 1 auto!important}
   .insurer-source-card summary{align-items:flex-start!important;padding:12px!important}
   .insurer-source-card summary>span:first-child{min-width:0!important;width:100%!important;flex-basis:100%!important;overflow-wrap:anywhere}

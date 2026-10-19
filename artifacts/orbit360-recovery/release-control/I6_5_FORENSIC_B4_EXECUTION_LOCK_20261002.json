@@ -3151,5 +3151,34 @@
     "productionPercent": 20,
     "productionDelta": 0,
     "formalI6Percent": 50
+  },
+  "b4003Uat5ScopedSource20261019": {
+    "status": "EXACT_SCOPED_SOURCE_QA_PENDING_PREVIEW",
+    "gate": "I6.5/B4-003",
+    "userInstruction": "CONTINUE_ALL_PENDING_FRONTS_AND_MAKE_MATERIAL_PROGRESS_20261019",
+    "boundedSourceOnly": true,
+    "sourceBlobs": {
+      "orbit360-platform/modules/cliente360.js": "53946c5746ececf3d4141c769cef30b4c1f902d8",
+      "orbit360-platform/modules/polizas.js": "3c3c1bc42bcbf03a88cea985d2101392a1c47c4d",
+      "orbit360-platform/modules/cobros.js": "ceb666bc1016c5365e420ad6791f112a947966a4",
+      "orbit360-platform/modules/conciliaciones.js": "3b77b2cff04e2f10ab78541d8802c191901de240",
+      "orbit360-platform/core/router.js": "9eeb0d3e0764c66e1ee9b242bbfe8d03c47f1816",
+      "orbit360-platform/styles/infra.css": "1f9fca202d72a3a56454ee30b2b94c9657feab23"
+    },
+    "qaBlobSha": "fcb9ded0feb55b9f7cc9512b41d564535fb50c7b",
+    "compositionBlobSha": "4856a78f4ac959991765b2378b7509c3bb6626db",
+    "previousUat4Rejected": true,
+    "qaNotYetExecuted": true,
+    "previewNotYetBuilt": true,
+    "noBroadProductMutation": true,
+    "livePromotionAuthorized": false,
+    "sharedFirestoreRulesDeployAuthorized": false,
+    "operationalDataWritesAuthorized": false,
+    "identityImpersonationAuthorized": false,
+    "configWritesAuthorized": false,
+    "reimportAuthorized": false,
+    "dataWrites": 0,
+    "authenticatedE2EStatus": "HOLD",
+    "findingLedgerCount": 295
   }
 }

@@ -62,6 +62,7 @@ jobs:
           node --check orbit360-platform/modules/inicio.js
           node tools/gravicentra-b4-003-inicio-personal-recaudo.test.cjs
           node tools/gravicentra-b4-003-human-ux-copy-layout.test.cjs
+          node tools/gravicentra-b4-003-uat5-display-contract.test.cjs
           node --check functions/product-ops-leads-domain.js
           node --check functions/ops-advisor-inbox.js
           node tools/gravicentra-b4-003-ops-leads-role-scopes.test.cjs

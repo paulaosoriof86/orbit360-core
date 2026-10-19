@@ -256,6 +256,20 @@ if(String(C.i65ForensicRemediationPlan?.currentBlock||'')==='B4' &&
        'B4_003_UAT4_REJECTION_CANNOT_BYPASS_SECURITY_OR_PRODUCT_GATE');
   console.log('B4_003_UAT4_EXACT_CHROME_EVIDENCE_CAUSAL_PARITY=PASS_UAT_REJECTED_NO_RELEASE');
  }
+ const stage=C.b4003Uat5ScopedSource20261019;
+ if(stage){
+ const fields=Object.keys(stage.sourceBlobs||{});
+ need(stage.status==='EXACT_SCOPED_SOURCE_QA_PENDING_PREVIEW'
+ &&fields.length===6
+ &&fields.every(p=>COMP.productFileBlobs[p]===stage.sourceBlobs[p]&&git('hash-object',p)===stage.sourceBlobs[p])
+ &&stage.compositionBlobSha===git('hash-object',I6_CANONICAL_COMPOSITION)
+ &&stage.qaBlobSha===git('hash-object','tools/gravicentra-b4-003-uat5-display-contract.test.cjs')
+ &&B4.boundaries.productMutationAuthorized===false
+ &&C.b4003CurrentCumulativePreviewProof?.humanFunctionalAccepted===false
+ &&C.b4003SecurityReleaseHold?.firestoreRulesDeployAuthorized===false
+ &&FIND.findings.length===295,'B4_003_UAT5_SCOPED_SOURCE_DRIFT');
+ console.log('B4_003_UAT5_SOURCE_QA_PENDING_NO_RELEASE');
+ }
  console.log('B4_003_P0_STILL_OPEN=6');
 }
 const P=readJson(DATA_UPDATE_PLAN),D=readJson(DATA_UPDATE_DISCIPLINE),RGT=readJson(DATA_UPDATE_REGISTRY),SRC=readJson(ACTIVE_SOURCE_INTAKE),SRC3=readJson(I63_SOURCE),R63=readJson(I63_RECEIPT),SRC4=readJson(I64_SOURCE),R64=readJson(I64_RECEIPT),SRC5=readJson(I65_SOURCE),SYNC5=readJson(I65_SYNC);

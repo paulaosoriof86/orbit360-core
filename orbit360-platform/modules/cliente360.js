@@ -20,6 +20,24 @@ Orbit.modules.cliente360 = (function () {
   }
   const esRenovable = p => p && (p.estado === 'Vigente' || p.estado === 'Por renovar');
   const policyTotal = p => U.finiteNumber(p && p.primaTotal);
+
+  // B4-003 UAT4: reconcile authorized policy scope against visible clients.
+  function visiblePolicyGap(source, ids, role, country, hasFilters) {
+    const r=String(role||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+    if(!['direccion','superadmin','admintenant'].includes(r)||country!=='TODOS'||hasFilters)return null;
+    const total=Array.isArray(source)?source:[];
+    const unmatched=total.filter(p=>p&&!ids.has(String(p.clienteId||'')));
+    const active=unmatched.filter(esRenovable),currency={};
+    active.forEach(p=>{
+      const n=p.primaNeta!=null?p.primaNeta:p.prima;
+      if(n==null||String(n).trim()==='')return;
+      const val=Number(n);if(!Number.isFinite(val))return;
+      const cur=String(p.moneda||p.divisa||'SIN_MONEDA');
+      currency[cur]=(currency[cur]||0)+val;
+    });
+    return {total:total.length,unmatched:unmatched.length,active:active.length,currency};
+  }
+
   const renovabilidad = p => {
     if (!p || !Object.prototype.hasOwnProperty.call(p, 'renovable') || p.renovable == null || String(p.renovable).trim() === '') return 'UNKNOWN';
     if (p.renovable === true || ['true', 'si', 'sí', 'renovable'].includes(String(p.renovable).trim().toLowerCase())) return 'YES';
@@ -256,6 +274,10 @@ Orbit.modules.cliente360 = (function () {
     const totalPolicyCount = policyReadiness === 'ready' ? policiesForKpi.length : null;
     const renewals45Policies = policyReadiness === 'ready' ? policiesForKpi.filter(p => { const d = U.daysFromNow(p.vigenciaFin); return esRenovable(p) && d != null && d >= 0 && d <= 45; }) : [];
     const renewals45Count = policyReadiness === 'ready' ? renewals45Policies.length : null;
+    const selectedRole=Orbit.session&&typeof Orbit.session.rol==='function'?Orbit.session.rol():'';
+    const hasFilters=Boolean(f.q||f.pais||f.tipo||f.asesor||f.seg);
+    const policyGap=policyReadiness==='ready'?visiblePolicyGap(policiesForList,kpiClientIds,selectedRole,globalCountry,hasFilters):null;
+    const policyGapNote=policyGap&&policyGap.unmatched>0?policyGap.unmatched+' pólizas sin cliente visible':'';
     const summaryAggregateMs = perfNow() - summaryAggregateStartedAt;
 
     const rowsBuildStartedAt = perfNow();
@@ -291,7 +313,7 @@ Orbit.modules.cliente360 = (function () {
 
       <div class="kpi-row" data-c360-kpi-scope="${globalCountry}" data-c360-filter-country="${f.pais || ''}" data-c360-kpi-client-count="${rows.length}" data-c360-kpi-active-count="${activePolicyCount==null?'':activePolicyCount}" data-c360-kpi-policy-count="${totalPolicyCount==null?'':totalPolicyCount}" data-c360-kpi-renew-count="${renewals45Count==null?'':renewals45Count}" style="grid-template-columns:repeat(4,1fr);margin-bottom:16px">
         <button class="kpi kpi-click" data-c360-kpi="clients" title="Ver clientes del universo actual"><div class="k-accent"></div><div class="k-label">Clientes</div><div class="k-val">${rows.length}</div><div class="k-foot muted">${rows.filter(c => tipoClienteVisible(c.tipo) === 'Empresa').length} empresas · ${rows.filter(c => tipoClienteVisible(c.tipo) === 'Persona').length} personas ›</div></button>
-        <button class="kpi kpi-click" data-c360-kpi="active" title="Ver pólizas activas"><div class="k-accent" style="background:var(--info)"></div><div class="k-label">Pólizas activas</div><div class="k-val">${policyReadiness === 'ready' ? activePolicyCount : '—'}</div><div class="k-foot muted">${policyReadiness === 'ready' ? 'de ' + totalPolicyCount + ' históricas ›' : 'Actualizando pólizas'}</div></button>
+        <button class="kpi kpi-click" data-c360-kpi="active" title="Ver pólizas activas"><div class="k-accent" style="background:var(--info)"></div><div class="k-label">Pólizas activas</div><div class="k-val">${policyReadiness === 'ready' ? activePolicyCount : '—'}</div><div class="k-foot muted">${policyReadiness === 'ready' ? 'de ' + totalPolicyCount + ' vinculadas a estos clientes ›' + (policyGapNote ? ' · '+ policyGapNote : '') : 'Actualizando pólizas'}</div></button>
         <button class="kpi kpi-click" data-c360-kpi="premium" title="Ver detalle de prima vigente"><div class="k-accent" style="background:var(--ok)"></div><div class="k-label">Prima neta vigente</div><div class="k-val">${primaNetaVigenteHtml}</div><div class="k-foot muted">Separada por moneda; no se suman GTQ y COP ›</div></button>
         <button class="kpi kpi-click" data-c360-kpi="renewals" title="Ver renovaciones próximas"><div class="k-accent" style="background:var(--warn)"></div><div class="k-label">Vencen ≤45 d</div><div class="k-val">${policyReadiness === 'ready' ? renewals45Count : '—'}</div><div class="k-foot muted">${policyReadiness === 'ready' ? 'requieren gestión ›' : 'Actualizando pólizas'}</div></button>
       </div>
