@@ -1,0 +1,80 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_QA_BROWSER_SESSION_PERSISTENCE_READBACK_V1",
+  "observedAtDate": "2026-10-19",
+  "gate": "I6.5/B4-003",
+  "finding": "POST_AUTH_ACTIVATION_FAILED",
+  "status": "HUMAN_SNAPSHOT_SIGNEDIN_POSITIVE_QA_PROFILE_RESTORE_BLOCKED_UAT_HOLD",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "binding": {
+    "productSourceSha": "125a3f314cb23aa128951ad714c95f143de64abb",
+    "productBuildId": "gi-i65-b4-125a3f314cb2-57f234755dc1",
+    "previewRunId": 39324152069,
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-39324152069-txaa3c71.web.app",
+    "exactSourceAndBuildPublicReadback": true
+  },
+  "userProvidedVisualEvidence": {
+    "mode": "TinyFish interactive profile setup browser before Save profile",
+    "screenshotsNotUploadedToRepo": true,
+    "screenshots": [
+      {
+        "sha256": "cad50c4744c195a1a26a7d3d545e9740cc88a047f1197a72cbe13c8f5bac563b",
+        "observed": "Signed in Inicio visible, role Dirección, country selector Todos los países, visible 434 clientes and 1425 pólizas, cartera validando and recaudo preparando"
+      },
+      {
+        "sha256": "55c83c30bc94e34476994d64353a6e35dd1f36e4a5b6fb27c417216aede7fc88",
+        "observed": "TinyFish Profile saved acknowledgement"
+      }
+    ],
+    "proofScope": "Visual human screenshot presence only, no authenticated reload or role-country authorization acceptance",
+    "userApprovedFunctionalUat": false,
+    "inconsistentClientCountCandidate": {
+      "visibleInicio": 434,
+      "previousCanonicalDataset": 443,
+      "difference": 9,
+      "adjudication": "UNVERIFIED_MAY_BE_PARTIAL_OR_FILTERED_DO_NOT_CORRECT_DATA"
+    }
+  },
+  "automatedReadOnlyRun": {
+    "runId": "1c9017be-0780-483c-a595-324de87f05b2",
+    "completion": "COMPLETED_TOOL_EXECUTION_BUT_UNAUTHENTICATED_UAT_HOLD",
+    "exactBuildMarkerMatched": true,
+    "profileSelected": "Gravicentra Preview QA",
+    "savedProfileMetadataSignedInSitesCount": 0,
+    "authenticatedSessionRestored": false,
+    "loginPageVisible": true,
+    "inicioAfterRestore": false,
+    "authenticatedReloadAttempted": false,
+    "cliente360Observed": false,
+    "equipoObserved": false,
+    "aseguradorasObserved": false,
+    "realCredentialsUsed": false,
+    "credentialsSharedInChat": false,
+    "note": "Agent reported an empty-fields login submit; no valid credentials or authenticated actions followed",
+    "rootCause": "UNKNOWN_SAVED_BROWSER_STATE_NOT_RESTORED_IN_NEW_RUN",
+    "potentialMechanism": "Firebase getAuth persistence may require browser storage not fully restored; no storage capture trace, not proven",
+    "unsupportedInferenceForbidden": "Do not claim product login regression from TinyFish saved-profile failure"
+  },
+  "safeStop": {
+    "humanFunctionalAccepted": false,
+    "signedInRoleProof": false,
+    "postReloadSessionPass": false,
+    "rulesLivePrivacyAccepted": false,
+    "cloudLogsIamPermission": "403_DENIED_PREVIOUSLY",
+    "productMutation": false,
+    "hostingDeploy": false,
+    "firestoreRulesDeploy": false,
+    "operationsWritesRequested": false,
+    "dataReimport": false,
+    "productionPromotion": false,
+    "findingsCountPreserved": 295,
+    "productionPathPercent": 20,
+    "productionPassed": 2,
+    "productionTotal": 10,
+    "productionDelta": 0,
+    "formalI6Percent": 50,
+    "formalFrozen": 5,
+    "formalTotal": 10
+  },
+  "nextSameGate": "AUTHENTICATED_READONLY_BROWSER_WITH_PERSISTED_FIREBASE_SESSION_OR_WORK_COMPUTER_USE; THEN LOGIN_RELOAD_MODULE_COUNTRY_ROLE_UAT"
+}

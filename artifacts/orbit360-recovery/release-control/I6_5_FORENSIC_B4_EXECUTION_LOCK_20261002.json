@@ -3078,5 +3078,24 @@
       "percent": 20,
       "delta": 0
     }
+  },
+  "b4003QaBrowserStateReadback20261019": {
+    "status": "HUMAN_SNAPSHOT_SIGNEDIN_POSITIVE_QA_PROFILE_RESTORE_BLOCKED_UAT_HOLD",
+    "gate": "I6.5/B4-003",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_QA_BROWSER_SESSION_PERSISTENCE_READBACK_20261019.json",
+    "receiptBlobSha": "43419f0a5f658bf89ba4674ce3d2ac9fae6acd25",
+    "humanPreviewAtInicioObserved": true,
+    "humanUatAccepted": false,
+    "toolRunId": "1c9017be-0780-483c-a595-324de87f05b2",
+    "qaProfileRestoreAuthenticated": false,
+    "sourceSha": "125a3f314cb23aa128951ad714c95f143de64abb",
+    "buildId": "gi-i65-b4-125a3f314cb2-57f234755dc1",
+    "liveSecurityHold": true,
+    "nonproductSourceOnly": true,
+    "noOperationalWrites": true,
+    "noReimport": true,
+    "productionPercent": 20,
+    "productionDelta": 0,
+    "formalI6Percent": 50
   }
 }

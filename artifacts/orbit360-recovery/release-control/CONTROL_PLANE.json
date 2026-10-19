@@ -4869,7 +4869,7 @@
       "entryGuardReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_ENTRY_GUARD_PASS_20261002.json",
       "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
       "executionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B4_EXECUTION_LOCK_20261002.json",
-      "executionLockBlobSha": "24f295e42e73344e86333d87688a92277d405f60",
+      "executionLockBlobSha": "423f83363a16563465fb43d3acf315291d6828db",
       "compositionLockBlobSha": "016f251811f22bc4fc04b2a5f674dfe09243e605",
       "findingLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
       "activeFindingId": "B4-003",
@@ -6312,7 +6312,7 @@
     "status": "B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL",
     "activeFindingId": "B4-003",
     "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
-    "executionLockBlobSha": "24f295e42e73344e86333d87688a92277d405f60",
+    "executionLockBlobSha": "423f83363a16563465fb43d3acf315291d6828db",
     "compositionLockBlobSha": "816309c63ed254d9b0e05cf63621c3d1c03cbfd5",
     "findingLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
     "noLive": true,
@@ -13104,5 +13104,25 @@
     },
     "executionLockBlobSha": "24f295e42e73344e86333d87688a92277d405f60",
     "nextActionWithinGate": "AUTHENTICATED_REAL_IDENTITY_SIGNIN_UAT_OR_APPROVED_QA_IDENTITY_NO_IMPERSONATION_AND_EFFECTIVE_RULES_PROOF"
+  },
+  "b4003QaBrowserStateReadback20261019": {
+    "status": "HUMAN_SNAPSHOT_SIGNEDIN_POSITIVE_QA_PROFILE_RESTORE_BLOCKED_UAT_HOLD",
+    "gate": "I6.5/B4-003",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_QA_BROWSER_SESSION_PERSISTENCE_READBACK_20261019.json",
+    "receiptBlobSha": "43419f0a5f658bf89ba4674ce3d2ac9fae6acd25",
+    "humanPreviewAtInicioObserved": true,
+    "humanUatAccepted": false,
+    "toolRunId": "1c9017be-0780-483c-a595-324de87f05b2",
+    "qaProfileRestoreAuthenticated": false,
+    "sourceSha": "125a3f314cb23aa128951ad714c95f143de64abb",
+    "buildId": "gi-i65-b4-125a3f314cb2-57f234755dc1",
+    "liveSecurityHold": true,
+    "nonproductSourceOnly": true,
+    "noOperationalWrites": true,
+    "noReimport": true,
+    "productionPercent": 20,
+    "productionDelta": 0,
+    "formalI6Percent": 50,
+    "executionLockBlobSha": "423f83363a16563465fb43d3acf315291d6828db"
   }
 }
