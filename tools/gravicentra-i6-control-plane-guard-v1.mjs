@@ -196,6 +196,65 @@ if(String(C.i65ForensicRemediationPlan?.currentBlock||'')==='B4' &&
   }
   console.log('B4_003_P0_LOGIN_STARTUP_SCOPED_SOURCE_BOUND_QA_NOT_AUTHENTICATED_PASS');
  }
+
+ // UAT4 2026-10-19 source-backed rejection is subordinate to B4-003.
+ // A Chrome route/UI PASS is not module/write/security/production acceptance.
+ if(C.b4003Uat4Chrome20261019){
+  const uat=C.b4003Uat4Chrome20261019||{},lock=B4.b4003Uat4Chrome20261019||{};
+  const reportPath='artifacts/orbit360-recovery/release-control/I6_5_B4_003_CHROME_UAT_READONLY_20261019.md';
+  const receiptPath='artifacts/orbit360-recovery/release-control/I6_5_B4_003_UAT4_CHROME_CAUSAL_RECONCILIATION_20261019.json';
+  need(uat.status==='AUTHENTICATED_PREVIEW_UAT_REJECTED_SOURCE_CAUSAL_READBACK'&&
+       lock.status===uat.status&&
+       uat.gate==='I6.5/B4-003'&&
+       uat.userReportBlobSha===git('hash-object',reportPath)&&
+       uat.userReportBlobSha===lock.userReportBlobSha&&
+       require('node:crypto').createHash('sha256').update(fs.readFileSync(reportPath)).digest('hex')===uat.userReportSha256&&
+       uat.receiptPath===receiptPath&&uat.receiptBlobSha===git('hash-object',receiptPath)&&
+       uat.receiptBlobSha===lock.receiptBlobSha,
+       'B4_003_UAT4_EXACT_HUMAN_REPORT_OR_RECEIPT_DRIFT');
+  const uat4=readJson(receiptPath);
+  const rc=uat4.sourceBackedReconciliation||{};
+  need(uat4.status==='AUTHENTICATED_CHROME_UAT_REJECTED_P1_CAUSES_PARTIAL_RECONCILIATION'&&
+       uat4.canonicalUat?.rows===26&&
+       Array.isArray(uat4.matrix)&&uat4.matrix.length===26&&
+       uat4.matrix.every(x=>x.wholeCapabilityAccepted===false)&&
+       uat4.canonicalUat?.humanFunctionalAccepted===false&&
+       uat4.canonicalUat?.byteExactGitBlobSha===uat.userReportBlobSha&&
+       uat4.canonicalUat?.originalUploadedSha256===uat.userReportSha256&&
+       rc.cliente360Customers?.raw===443&&
+       rc.cliente360Customers?.uiVisibleTotal===434&&
+       rc.polizas?.rawTotal===1425&&
+       rc.polizas?.client360Total===1413&&
+       rc.polizas?.client360Active===218&&
+       rc.polizas?.excludedActive===12&&
+       rc.polizas?.excludedLinkedToInvalidCountry===9&&
+       rc.polizas?.excludedOrphanClient===3&&
+       rc.goldenPolicyAUTO39012?.rawPolicyTotalGTQ===2116.8&&
+       rc.cobrosConciliaciones?.canonicalConciliacionesProposals===0&&
+       rc.cobrosConciliaciones?.canonicalConciliacionesPrimasProposals===0,
+       'B4_003_UAT4_SOURCE_CAUSAL_CONTRACT_INVALID');
+  need(C.currentB4?.status==='B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL'&&
+       C.nextAction==='I6_5_FORENSIC_REMEDIATION_B4_003_R20_TARGETED_PAULA_VISUAL'&&
+       C.b4003CurrentCumulativePreviewProof?.sourceSha==='125a3f314cb23aa128951ad714c95f143de64abb'&&
+       C.b4003CurrentCumulativePreviewProof?.runId===39324152069&&
+       C.b4003CurrentCumulativePreviewProof?.humanFunctionalAccepted===false&&
+       C.b4003CurrentCumulativePreviewProof?.signedInRoleProof===false&&
+       C.b4003SecurityReleaseHold?.status==='ACTIVE_FAIL_CLOSED_UNAUTHORIZED_BROWSER_FIRESTORE_READ_WRITE'&&
+       C.i6Execution?.productMutationAuthorized===false&&
+       B4.boundaries?.productMutationAuthorized===false&&
+       B4.boundaries?.dataMutationAuthorized===false&&
+       B4.boundaries?.businessWritesAuthorized===false&&
+       B4.boundaries?.livePromotionAuthorized===false&&
+       FIND.findings.length===295&&
+       uat4.retainedGovernance?.existingFindingsCount===295&&
+       uat4.retainedGovernance?.productionPathProgress?.percent===20&&
+       uat4.retainedGovernance?.formalI6Progress?.percent===50&&
+       uat.livePromotionAuthorized===false&&
+       uat.dataWrites===0&&
+       lock.livePromotionAuthorized===false&&lock.dataWrites===0,
+       'B4_003_UAT4_REJECTION_CANNOT_BYPASS_SECURITY_OR_PRODUCT_GATE');
+  console.log('B4_003_UAT4_EXACT_CHROME_EVIDENCE_CAUSAL_PARITY=PASS_UAT_REJECTED_NO_RELEASE');
+ }
  console.log('B4_003_P0_STILL_OPEN=6');
 }
 const P=readJson(DATA_UPDATE_PLAN),D=readJson(DATA_UPDATE_DISCIPLINE),RGT=readJson(DATA_UPDATE_REGISTRY),SRC=readJson(ACTIVE_SOURCE_INTAKE),SRC3=readJson(I63_SOURCE),R63=readJson(I63_RECEIPT),SRC4=readJson(I64_SOURCE),R64=readJson(I64_RECEIPT),SRC5=readJson(I65_SOURCE),SYNC5=readJson(I65_SYNC);

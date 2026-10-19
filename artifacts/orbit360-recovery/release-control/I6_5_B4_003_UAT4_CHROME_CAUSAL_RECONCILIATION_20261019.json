@@ -1,0 +1,417 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_UAT4_CHROME_CAUSAL_RECONCILIATION_V1",
+  "date": "2026-10-19",
+  "gate": "I6.5/B4-003",
+  "status": "AUTHENTICATED_CHROME_UAT_REJECTED_P1_CAUSES_PARTIAL_RECONCILIATION",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "canonicalUat": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CHROME_UAT_READONLY_20261019.md",
+    "originalUploadedFilename": "UAT_GRAVICENTRA_I65_B4-003_2026-10-19(1).md",
+    "byteExactGitBlobSha": "2e0768a0a623c092f969f9498e2a171c55dfa180",
+    "originalUploadedSha256": "2cfbb1c601d50cd9caf019ac234ec66f3e4664f97011beb6819326137251fad1",
+    "rows": 26,
+    "readOnly": true,
+    "sourceIntegrityVerified": true,
+    "authenticatedDirectionObserved": true,
+    "roleCountryEffectiveServerProven": false,
+    "signedInReloadSessionPreserved": true,
+    "firstColdLoginTested": false,
+    "loadingTimeToShellMaxObservedSeconds": 8.3,
+    "startupFiveOfFiveSourcesOver17Seconds": true,
+    "humanFunctionalAccepted": false
+  },
+  "candidate": {
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-39324152069-txaa3c71.web.app",
+    "runId": 39324152069,
+    "sourceSha": "125a3f314cb23aa128951ad714c95f143de64abb",
+    "buildId": "gi-i65-b4-125a3f314cb2-57f234755dc1",
+    "prevTechnicalPass": true,
+    "authenticatedUatAccepted": false,
+    "sourceMutatedForThisReceipt": false,
+    "productionAccepted": false
+  },
+  "forensicReadOnly": {
+    "runs": [
+      39335628832,
+      39336054053
+    ],
+    "latestArtifactId": 12227020521,
+    "latestArtifactDigest": "sha256:dbcd3ed850959bc6e3c677c351d40e8fefe98f269db2519cf84528e1f66ae0d3",
+    "latestQaSourceSha": "ba244414a0c035a7bd3e8fe3080df3a3afbe6ac3",
+    "file": "tools/gravicentra-b4-003-uat4-source-reconciliation-readonly.cjs",
+    "sourceOwnerBlobs": {
+      "orbit360-platform/modules/cliente360.js": "2eeabe26db6d9d951f6fbe2659b55992f52648c8",
+      "orbit360-platform/modules/polizas.js": "e52869f5c7b3c219a6d80f39a100827e3ad4b599",
+      "orbit360-platform/modules/cobros.js": "438cc2f7ddeb4e285b4918c9b8bfb2473cbb3129",
+      "orbit360-platform/modules/conciliaciones.js": "e0c4ef051fadb033e1a66ac4f0db67a52186ed25"
+    }
+  },
+  "sourceBackedReconciliation": {
+    "cliente360Customers": {
+      "raw": 443,
+      "excludedAsMerged": 3,
+      "notRoutableByCountry": 6,
+      "clientVisibleGT": 417,
+      "clientVisibleCO": 17,
+      "uiVisibleTotal": 434,
+      "natural": 395,
+      "legal": 23,
+      "missingType": 16,
+      "classification": "ROOT_CAUSE_CONFIRMED_COUNTRY_SCOPED_HYDRATION_AND_FUSION",
+      "fixRule": "NOT_A_DATA_LOSS_NO_REIMPORT_DO_NOT_GRANT_OWN_TEAM_UNAUTHORIZED_VISIBILITY; REPRESENT_EXCLUSIONS_IN_AUTHORIZED_ADMIN_COUNTS_WITH_DIAGNOSTICS"
+    },
+    "polizas": {
+      "rawTotal": 1425,
+      "rawActive": 230,
+      "client360Total": 1413,
+      "client360Active": 218,
+      "excludedActive": 12,
+      "excludedLinkedToInvalidCountry": 9,
+      "excludedOrphanClient": 3,
+      "excludedMerged": 0,
+      "premiumTotalActive": {
+        "GTQ": 638174.75,
+        "COP": 175456570.26
+      },
+      "premiumClient360VisibleActive": {
+        "GTQ": 627574.75,
+        "COP": 81897592.26
+      },
+      "premiumDifference": {
+        "GTQ": 10600,
+        "COP": 93558978
+      },
+      "premiumCountryUnresolved": {
+        "GTQ": 7600,
+        "COP": 93558978
+      },
+      "premiumOrphan": {
+        "GTQ": 3000
+      },
+      "classification": "ROOT_CAUSE_CONFIRMED_DIFFERENT_CLIENT_SCOPE_AND_NONEXISTENT_CLIENT_FOREIGN_KEYS",
+      "fixRule": "PRESERVE_DATA_AND_POLICIES; RECONCILE_KPIS_AS_GLOBAL_VS_LINKED_VS_SCOPE_EXCLUSIONS; REPAIR_INVALID_DATA_ONLY_AFTER_AUTHORIZED_PROVENANCE_CONTROL"
+    },
+    "goldenPolicyAUTO39012": {
+      "recordCount": 1,
+      "rawNetGTQ": 1800,
+      "rawFinancingGTQ": 90,
+      "rawTaxGTQ": 226.8,
+      "rawPolicyTotalGTQ": 2116.8,
+      "userUatReportedApprovedTotalGTQ": 2678.53,
+      "contractTotalDeltaGTQ": 561.73,
+      "amountsSimpleSumGTQ": 2116.8,
+      "receiptsUnfilteredRowsCount": 25,
+      "receiptsUnfilteredRowsRawTotalGTQ": 5951.67,
+      "userVisibleScheduleTotalRoundedGTQ": 3482,
+      "status": "STORE_VALUE_CONFLICTS_WITH_UAT_REPORTED_APPROVED_TOTAL_SOURCE_AUTHORITY_NOT_YET_RECONCILED",
+      "owner": "orbit360-platform/modules/polizas.js",
+      "protection": "DO_NOT_INFER_ADJUSTMENT_OR_UPDATE_POLICY; AUDIT_SOURCE_REF AND RECEIPT_CALENDAR_LINEAGE BEFORE ANY PATCH"
+    },
+    "cobrosConciliaciones": {
+      "canonicalCobrosRecords": 5,
+      "recibosEsperados": 1958,
+      "carteraPrimas": 1396,
+      "sigaSourceTag": 1242,
+      "sigaMixedSourceTag": 1,
+      "userUatCobrosConfirmed": 1243,
+      "userUatPendingConciliation": 1238,
+      "userUatAllReconciled": 5,
+      "userUatSigaSubsetReconciled": 0,
+      "canonicalConciliacionesProposals": 0,
+      "canonicalConciliacionesPrimasProposals": 0,
+      "state": "SCOPES_DIFFER_BETWEEN_PAYMENT_EVIDENCE_AND_PROPOSAL_QUEUE",
+      "owner": [
+        "orbit360-platform/modules/cobros.js",
+        "orbit360-platform/modules/conciliaciones.js"
+      ],
+      "classification": "TWO_DIFFERENT_COUNTS_EXPLAINED_BY_CANONICAL_COBROS_VERSUS_SIGA_ONLY_SUBSET; FINANCIAL_APPLICATION_WORKFLOW_NOT_VERIFIED",
+      "fixRule": "MAKE_DENOMINATORS_EXPLICIT; RECONCILE_POLICY_FOR_SIGA_PAYMENTS_PENDING_CONCILIATION; NEVER_AUTO_GENERATE_WRITES_TO_FILL_EMPTY_QUEUE"
+    }
+  },
+  "otherUatFindings": {
+    "inicioPerf": "FAIL_SOURCE_READINESS_3_5_OVER_17S_P1_ROOT_UNCONFIRMED",
+    "quality": "FAIL_433_434_INCOMPLETE_CLIENTS_1_COMPLETE_ROOT_UNCONFIRMED",
+    "mobile": "FAIL_390x844_SEARCH_BAR_OVER_TITLE_DRAWER_NO_AUTOCLOSE_P2",
+    "advisorCommissions": "FAIL_NAV_NOT_VISIBLE_FOR_ADVISOR_PENDING_PERMISSION_OWNER",
+    "ops": "PARTIAL_BUSINESS_WITHOUT_CLIENT_UNVERIFIED",
+    "renewals": "PARTIAL_RENEWED_AND_EXPIRED_DIFFERENT_SEMANTICS_UNVERIFIED",
+    "receiptsImportCounters": "IMPORT_LAYER_1872_RECEIPTS_VS_CANONICAL_1958;NOT_SAME_SOURCE_LAYER",
+    "vehicles": "NOT_TESTED_STANDALONE_ROUTE",
+    "siniestros": "PARTIAL_EMPTY",
+    "roleAndScopes": "AUTHENTICATED_VISUAL_NOT_EFFECTIVE_SERVER_PROOF",
+    "network": "NOT_TESTED_DUE_TO_BROWSER_LIMITATIONS",
+    "writes": "NOT_TESTED_UNAUTHORIZED"
+  },
+  "matrix": [
+    {
+      "id": "UAT-01",
+      "control": "Identidad",
+      "roleCountryRoute": "Dirección / Todos; marcador Preview",
+      "observation": "PASS de identidad. Producto, gate, SHA y BuildId coinciden; URL corresponde al run 39324152069.",
+      "timeImpact": "Lectura inmediata.",
+      "causeStatus": "Confirmada para el marcador. Rama y HEAD fuera de esta prueba.",
+      "wholeCapabilityAccepted": false
+    },
+    {
+      "id": "UAT-02",
+      "control": "Sesión / reload",
+      "roleCountryRoute": "Dirección / Todos; Inicio",
+      "observation": "PARTIAL. La sesión autenticada persistió y el shell volvió. No se ejecutó login nuevo ni logout.",
+      "timeImpact": "A ~3.3 s de recarga decía “Restaurando sesión”; shell visible a más tardar ~8.3 s.",
+      "causeStatus": "Probable restauración/hidratación tardía; inicio en frío no medido porque la pestaña ya estaba abierta.",
+      "wholeCapabilityAccepted": false
+    },
+    {
+      "id": "UAT-03",
+      "control": "Inicio e indicadores",
+      "roleCountryRoute": "Dirección / Todos; #/inicio",
+      "observation": "FAIL. Tras reload, “Preparando información del mes”, “Actualizando datos”, “Confirmando pólizas” y “Validando cartera”; llegó a 3/5 fuentes y siguió así más de 17 s. Más tarde mostró 5/5. Avance personal Q11K/Q80K (14%); recaudo Q0/Q50K. Global: 1,243 pagos confirmados; 679 obligaciones pendientes (12 con monto); 631 vencidas (16 con monto); 16 renovaciones ≤45 días. Solo 1 de 7 perfiles tiene meta verificable.",
+      "timeImpact": "Resolución tardía/intermitente; tiempo final no medido. P1.",
+      "causeStatus": "Probable confirmación tardía de fuentes/agregados; causa técnica no confirmada en UI.",
+      "wholeCapabilityAccepted": false
+    },
+    {
+      "id": "UAT-04",
+      "control": "Universo Cliente 360",
+      "roleCountryRoute": "Dirección / Todos, GT y CO; #/cliente360",
+      "observation": "FAIL de reconciliación, no de carga. Total 434; GT 417 y CO 17. Persona 395 + Empresa 23 = 418, con 16 sin tipo visible. Cliente 360 indica 218 activas / 1,413 históricas. Filas conservaron “Actualizando datos” y “Calculando” tras varios segundos.",
+      "timeImpact": "Más de ~6 s para estados secundarios observados. P1.",
+      "causeStatus": "Confirmado: 434 es el universo mostrado y GT+CO suma 434. No determinada: diferencial 9 frente a readback 443 y 16 sin tipo. Sin evidencia de pérdida.",
+      "wholeCapabilityAccepted": false
+    },
+    {
+      "id": "UAT-05",
+      "control": "Filtros de país",
+      "roleCountryRoute": "Dirección y Operativo / GT, CO, Todos; #/cliente360",
+      "observation": "PASS de filtro: 434 total, 417 Guatemala y 17 Colombia; la lista y KPIs cambian con selección.",
+      "timeImpact": "Inmediato. No validó todos los scopes backend.",
+      "causeStatus": "No se observó filtración entre países en esta vista.",
+      "wholeCapabilityAccepted": false
+    },
+    {
+      "id": "UAT-06",
+      "control": "Roles disponibles",
+      "roleCountryRoute": "SuperAdmin/Dirección, Operativo y Asesor / GT+CO; #/equipo",
+      "observation": "PARTIAL. Cuenta actual muestra SuperAdmin, Operativo, Asesor, países GT/CO. Selector ofrece Dirección, Operativo y Asesor. Operativo no accede a Equipo. No se modificaron permisos.",
+      "timeImpact": "Inmediato. Admin y AdminTenant no seleccionables en la cuenta probada.",
+      "causeStatus": "Asignación visible confirmada; roles ajenos no suplantados.",
+      "wholeCapabilityAccepted": false
+    },
+    {
+      "id": "UAT-07",
+      "control": "Aseguradoras",
+      "roleCountryRoute": "Dirección y Operativo / Todos; #/aseguradoras",
+      "observation": "PARTIAL. Ambas vistas abren directorio de 33 registros (29 activos). Asesor recibe denegación de acceso, coherente con restricción. No se revelaron credenciales ni se usaron controles de copia/edición.",
+      "timeImpact": "Lectura inmediata. CRUD y autorización backend no probados.",
+      "causeStatus": "No determinada para operaciones CRUD; evidencia solo de vista y gate por rol.",
+      "wholeCapabilityAccepted": false
+    },
+    {
+      "id": "UAT-08",
+      "control": "Ops",
+      "roleCountryRoute": "Dirección / Todos; #/ops",
+      "observation": "PARTIAL. Tablero visible con 3 negocios en flujo y 2 gestiones; declara “Sincronizado con Orbit Leads”. Un elemento de renovación aparece “Sin cliente”. No se abrió ni editó.",
+      "timeImpact": "Ruta visible tras clic; no cronometraje fiable. P2 por integridad.",
+      "causeStatus": "No determinada: posible referencia huérfana o dato intencionalmente incompleto. La etiqueta de sincronización no prueba sincronización real.",
+      "wholeCapabilityAccepted": false
+    },
+    {
+      "id": "UAT-09",
+      "control": "Leads",
+      "roleCountryRoute": "Dirección / Todos; #/leads",
+      "observation": "PARTIAL. Pipeline con 5 negocios, prima estimada Q0, pronóstico Q0 y 0 ganados. No se probaron transiciones/sincronización por escritura.",
+      "timeImpact": "Sin cronometraje fiable.",
+      "causeStatus": "No se observó defecto de carga; la sincronización no quedó demostrada.",
+      "wholeCapabilityAccepted": false
+    },
+    {
+      "id": "UAT-10",
+      "control": "Pólizas / golden",
+      "roleCountryRoute": "Dirección / Todos; #/polizas, búsqueda y desglose AUTO39012",
+      "observation": "FAIL. 1 póliza encontrada. Neta Q1,800 coincide con golden invariant; total Q2,117 frente a Q2,678.53 aprobado; calendario Q3,482. La ficha marca “Datos principales validados” y “Genera calendario”.",
+      "timeImpact": "Desglose inmediato. Diferencia Q561.53 frente al aprobado y Q1,365 frente al calendario. P1.",
+      "causeStatus": "No determinada. Probable inconsistencia de mapeo/cálculo de ajuste/total; UI no muestra qué fuente o fórmula causó el valor.",
+      "wholeCapabilityAccepted": false
+    },
+    {
+      "id": "UAT-11",
+      "control": "Cliente 360 ↔ Pólizas",
+      "roleCountryRoute": "Dirección / Todos; #/cliente360 y #/polizas",
+      "observation": "FAIL. Cliente 360: 218 activas/1,413 históricas; netas GTQ 627,575/COP 81,897,592. Pólizas: 230/1,425 y GTQ 638,175/COP 175,456,570. Inicio/importación indican 1,425 pólizas.",
+      "timeImpact": "Reproducible al navegar. P1.",
+      "causeStatus": "Probable read-model, filtro o agregación diferente; causa no confirmada.",
+      "wholeCapabilityAccepted": false
+    },
+    {
+      "id": "UAT-12",
+      "control": "Vehículos / riesgos",
+      "roleCountryRoute": "Dirección / Todos; navegación",
+      "observation": "NOT_TESTED como módulo independiente. No hay entrada “Vehículos” en navegación. Pólizas muestra ramos/productos de vehículos, pero ficha/CRUD y relación Cliente↔Póliza↔Vehículo no quedaron certificados por ruta propia.",
+      "timeImpact": "No medido. P1/P2 por capacidad no demostrada.",
+      "causeStatus": "Módulo no expuesto como ruta visible o no disponible en esta candidata; no determinado.",
+      "wholeCapabilityAccepted": false
+    },
+    {
+      "id": "UAT-13",
+      "control": "Cobros / cartera",
+      "roleCountryRoute": "Dirección, Operativo y Asesor / Todos; #/cobros",
+      "observation": "FAIL. Dirección ve 2,381 registros y 1,238 pagos SIGA por conciliar. Operativo ve 5 filas; cuatro KPI siguen “Actualizando datos”/“confirmando” tras >6 s; Asesor ve 4 filas. Tarjeta dice 1,238 de 1,243 confirmados y “5 ya conciliados”; texto inferior dice “0 ya conciliados”. Tabla solo lectura.",
+      "timeImpact": "KPIs Operativo pendientes >6 s. P1.",
+      "causeStatus": "Confirmada contradicción textual; probable desacople de agregados/listado por rol. Causa backend no determinada.",
+      "wholeCapabilityAccepted": false
+    },
+    {
+      "id": "UAT-14",
+      "control": "Conciliaciones",
+      "roleCountryRoute": "Dirección / Todos; #/conciliaciones",
+      "observation": "FAIL de consistencia. Todos los estados muestran 0 (propuesta, revisión, validación, validada, rechazada, bloqueada), mientras Cobros muestra 1,238 pagos SIGA pendientes. No se concilió.",
+      "timeImpact": "Inmediato. P1.",
+      "causeStatus": "Probable ausencia de puente entre pagos y bandeja, o estados/filtros diferentes; no determinada.",
+      "wholeCapabilityAccepted": false
+    },
+    {
+      "id": "UAT-15",
+      "control": "Recibos / cartera",
+      "roleCountryRoute": "Dirección / Todos; Cobros e Importación inteligente",
+      "observation": "BLOCKED para lineage separado. No aparece ruta independiente “Recibos”. Tablero de importación: 1,872 recibos esperados (72 por validar), 0 recibos de aseguradora, 1,310 cartera primas (28 por validar), 0 conciliaciones de primas. No se importó nada.",
+      "timeImpact": "Lectura inmediata. P1.",
+      "causeStatus": "No determinada; capas diferentes no reconciliadas en esta UAT.",
+      "wholeCapabilityAccepted": false
+    },
+    {
+      "id": "UAT-16",
+      "control": "Renovaciones",
+      "roleCountryRoute": "Dirección / Todos; #/renovaciones",
+      "observation": "PARTIAL. Pipeline: 26 vencidas, 3 ≤15 días, 10 entre 16–45 y 22 situaciones para revisar. Un registro muestra origen “Renovada” junto con “Vencida · confirmar renovación”. Sin contactos ni cambios.",
+      "timeImpact": "Sin cronometraje fiable. P2.",
+      "causeStatus": "Posible divergencia entre estado fuente y vencimiento calculado; semántica no confirmada.",
+      "wholeCapabilityAccepted": false
+    },
+    {
+      "id": "UAT-17",
+      "control": "Cancelaciones",
+      "roleCountryRoute": "Dirección / Todos; #/cancelaciones",
+      "observation": "PARTIAL. 490 canceladas históricas y 34% de cartera histórica. Se ve un registro marcado “B4-003 QA”; excluido como prueba funcional real. No se seleccionó ni preparó WhatsApp.",
+      "timeImpact": "Ruta visible.",
+      "causeStatus": "Origen del fixture QA no determinado.",
+      "wholeCapabilityAccepted": false
+    },
+    {
+      "id": "UAT-18",
+      "control": "Cotizador",
+      "roleCountryRoute": "Dirección / Todos; #/cotizador",
+      "observation": "BLOCKED para cálculo. Formulario y aseguradoras cargan; cálculo depende de fuente/configuración válida. No se pulsó Cotizar porque no se comprobó que no guardara ni generara efecto.",
+      "timeImpact": "Cálculo no ejecutado.",
+      "causeStatus": "Prueba intencionalmente omitida bajo regla read-only.",
+      "wholeCapabilityAccepted": false
+    },
+    {
+      "id": "UAT-19",
+      "control": "Comparativo",
+      "roleCountryRoute": "Dirección / Todos; #/comparativo",
+      "observation": "PARTIAL. Carga sin propuestas. No se cargaron PDF, no se creó propuesta manual ni se registró opción aceptada.",
+      "timeImpact": "Ruta visible.",
+      "causeStatus": "No determinada; las acciones crean o registran datos.",
+      "wholeCapabilityAccepted": false
+    },
+    {
+      "id": "UAT-20",
+      "control": "Calidad de datos",
+      "roleCountryRoute": "Dirección / Todos; #/calidad",
+      "observation": "FAIL. 433 expedientes incompletos de 434; solo 1/434 completo (0.2%). Integridad financiera permanece “Confirmando pólizas y recibos”; diferencias prima/recibos sin resultado. No se preparó actualización.",
+      "timeImpact": "Confirmación pendiente. P1/P2.",
+      "causeStatus": "Probable lectura/hidratación pendiente; causa técnica no confirmada.",
+      "wholeCapabilityAccepted": false
+    },
+    {
+      "id": "UAT-21",
+      "control": "Cronograma",
+      "roleCountryRoute": "Dirección / Todos; #/cronograma",
+      "observation": "PARTIAL. Calendario y controles Día/Semana/Mes cargan con eventos. No se abrió o modificó una tarea.",
+      "timeImpact": "Sin cronometraje fiable.",
+      "causeStatus": "Persistencia/filtros/relaciones no probados.",
+      "wholeCapabilityAccepted": false
+    },
+    {
+      "id": "UAT-22",
+      "control": "Historial",
+      "roleCountryRoute": "Dirección / Todos; #/historial",
+      "observation": "PARTIAL. Pasa de “Consultando historial autorizado…” a 35 interacciones; llamadas, WhatsApp y reuniones muestran 0.",
+      "timeImpact": "~5 s hasta estado estable observado.",
+      "causeStatus": "Probable consulta tardía; filtros y persistencia no probados.",
+      "wholeCapabilityAccepted": false
+    },
+    {
+      "id": "UAT-23",
+      "control": "Comisiones",
+      "roleCountryRoute": "Dirección y Asesor / Todos; #/comisiones y navegación",
+      "observation": "PARTIAL/FAIL de acceso Asesor. Dirección abre la vista, sin registros utilizables visibles. Navegación Asesor no incluye Comisiones pese a regla de mostrar su propia comisión. No se extrajeron importes.",
+      "timeImpact": "P2.",
+      "causeStatus": "Probable discrepancia de navegación/policy; backend no probado.",
+      "wholeCapabilityAccepted": false
+    },
+    {
+      "id": "UAT-24",
+      "control": "Siniestros",
+      "roleCountryRoute": "Dirección / Todos; #/siniestros",
+      "observation": "PARTIAL. Ruta abre estado vacío, 0 reclamos. No se creó/importó.",
+      "timeImpact": "Ruta visible.",
+      "causeStatus": "Vacío no demuestra CRUD/integración.",
+      "wholeCapabilityAccepted": false
+    },
+    {
+      "id": "UAT-25",
+      "control": "Responsive",
+      "roleCountryRoute": "Dirección / Todos; Inicio y Cliente 360, 390×844",
+      "observation": "FAIL visual parcial. Tarjetas/filtros se apilan sin desbordamiento horizontal evidente. Barra fija tapa parte del título; menú no se cierra al seleccionar ruta y requiere cierre manual. Viewport restablecido.",
+      "timeImpact": "Evidencia visual interna de Chrome. P2.",
+      "causeStatus": "Probable espaciado/z-index y estado del drawer en móvil; causa no confirmada.",
+      "wholeCapabilityAccepted": false
+    },
+    {
+      "id": "UAT-26",
+      "control": "Consola/red",
+      "roleCountryRoute": "Rutas visitadas",
+      "observation": "No se observaron errores ni warnings de consola en lecturas realizadas. El panel de red no está disponible en esta conexión: HTTP 404, fallos de requests y recursos quedan NOT_TESTED. Varias llamadas de control tuvieron timeout CDP; lecturas posteriores funcionaron.",
+      "timeImpact": "Limitación de navegador, no atribuida al producto.",
+      "causeStatus": "Timeout de control confirmado; red no probada.",
+      "wholeCapabilityAccepted": false
+    }
+  ],
+  "retainedGovernance": {
+    "existingFindingsCount": 295,
+    "existingFindingsLedgerUnchanged": true,
+    "frozen86TaskPlanUnchanged": true,
+    "b1B2B3HistoricalPassUnchanged": true,
+    "knownFindingLineage": [
+      "B4-003-R11-09-POLICY-PREMIUM-CALENDAR-MISMATCH",
+      "B3-CARRY-DASHBOARD-REALITY-RECONCILIATION-R6",
+      "B4-003-R20-V2-14-QUALITY-COUNTRY-DATA-DEBT",
+      "B4-003-P0-20261012-PERSONAL-COLLECTION"
+    ],
+    "noNewBlock": true,
+    "noSeparateMethodology": true,
+    "dataWritesAuthorized": false,
+    "productMutationAuthorized": false,
+    "sharedRulesDeployAuthorized": false,
+    "productionPromotionAuthorized": false,
+    "noReimport": true,
+    "realUserImpersonation": false,
+    "productionPathProgress": {
+      "passed": 2,
+      "total": 10,
+      "percent": 20,
+      "delta": 0
+    },
+    "formalI6Progress": {
+      "passed": 5,
+      "total": 10,
+      "percent": 50,
+      "delta": 0
+    },
+    "securityHoldStatus": "ACTIVE_FAIL_CLOSED_UNAUTHORIZED_BROWSER_FIRESTORE_READ_WRITE",
+    "nextGate": "I6.5/B4-003",
+    "nextAction": "BOUND_CAUSAL_SOURCE_REPAIR_WITH_EXACT_OWNER_SOURCE_AND_QA_AUTHORIZATION_THEN_NEW_PREVIEW_ROLE_COUNTRY_E2E_AND_SECURITY_RULES"
+  }
+}

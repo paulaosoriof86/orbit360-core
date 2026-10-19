@@ -4869,7 +4869,7 @@
       "entryGuardReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_ENTRY_GUARD_PASS_20261002.json",
       "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
       "executionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B4_EXECUTION_LOCK_20261002.json",
-      "executionLockBlobSha": "423f83363a16563465fb43d3acf315291d6828db",
+      "executionLockBlobSha": "e1c20c689e727959118c68292a64bc64dd61256b",
       "compositionLockBlobSha": "016f251811f22bc4fc04b2a5f674dfe09243e605",
       "findingLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
       "activeFindingId": "B4-003",
@@ -6312,7 +6312,7 @@
     "status": "B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL",
     "activeFindingId": "B4-003",
     "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
-    "executionLockBlobSha": "423f83363a16563465fb43d3acf315291d6828db",
+    "executionLockBlobSha": "e1c20c689e727959118c68292a64bc64dd61256b",
     "compositionLockBlobSha": "816309c63ed254d9b0e05cf63621c3d1c03cbfd5",
     "findingLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
     "noLive": true,
@@ -7701,7 +7701,8 @@
     "priorHumanVisualPassPreserved": true,
     "newSourceRequiresPreview": true,
     "livePromoted": false,
-    "humanFunctionalAccepted": false
+    "humanFunctionalAccepted": false,
+    "humanUatStatus": "REJECTED_UAT4_CHROME_20261019_P1"
   },
   "b4VisualAcceptanceControl": {
     "status": "R19_MACHINE_PASS_PENDING_TARGETED_PAULA_VISUAL",
@@ -12706,7 +12707,8 @@
     "noSourceRebuild": true,
     "noLive": true,
     "noDataWrites": true,
-    "nextSameGate": "AUTHENTICATED_POST_AUTH_LOGIN_AND_REAL_ROLE_GT_CO_UAT"
+    "nextSameGate": "AUTHENTICATED_POST_AUTH_LOGIN_AND_REAL_ROLE_GT_CO_UAT",
+    "humanUatStatus": "REJECTED_UAT4_CHROME_20261019_P1"
   },
   "b4003Uat2CanonicalAccessAndUniverseReadback": {
     "status": "CANONICAL_CONFIG_FALSE_DENY_CAUSE_CONFIRMED_AND_POLICY_DIFFERENCE_PARTIALLY_RECONCILED",
@@ -13124,5 +13126,60 @@
     "productionDelta": 0,
     "formalI6Percent": 50,
     "executionLockBlobSha": "423f83363a16563465fb43d3acf315291d6828db"
+  },
+  "b4003Uat4Chrome20261019": {
+    "status": "AUTHENTICATED_PREVIEW_UAT_REJECTED_SOURCE_CAUSAL_READBACK",
+    "date": "2026-10-19",
+    "gate": "I6.5/B4-003",
+    "userReportPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CHROME_UAT_READONLY_20261019.md",
+    "userReportBlobSha": "2e0768a0a623c092f969f9498e2a171c55dfa180",
+    "userReportSha256": "2cfbb1c601d50cd9caf019ac234ec66f3e4664f97011beb6819326137251fad1",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_UAT4_CHROME_CAUSAL_RECONCILIATION_20261019.json",
+    "receiptBlobSha": "28f24fb4ddd26fa892392c9871007e698f2c970c",
+    "qaRuns": [
+      39335628832,
+      39336054053
+    ],
+    "qaArtifactId": 12227020521,
+    "qaArtifactSha256": "dbcd3ed850959bc6e3c677c351d40e8fefe98f269db2519cf84528e1f66ae0d3",
+    "uatTestCount": 26,
+    "uatMismatchesConfirmed": true,
+    "dataReadbackRootCause": {
+      "clientVisible434": "443 raw - 3 merged - 6 country REQUIERE_VALIDACION",
+      "policyGap12": "9 policy links to invalid-country clients + 3 orphan client references",
+      "premiumGapGTQ": 10600,
+      "premiumGapCOP": 93558978,
+      "goldenAUTO39012": "stored Q2116.80 vs UAT-reported approved Q2678.53; source authority not reconciled",
+      "cobros": "5 canonical payment rows; SIGA-only subuniverse differs from overall summary",
+      "conciliations": "0 proposals; pending SIGA source must not be mistaken for proposal count"
+    },
+    "unresolved": [
+      "GOLDEN_APPROVED_SOURCE_AUTHORITY",
+      "CLIENT_RELATION_REPAIR_DATA_PROVENANCE",
+      "SECURE_ADVISOR_ROLE_COUNTRY_E2E",
+      "INICIO_HYDRATION_LATENCY",
+      "RECEIPT_CALENDAR_LINEAGE",
+      "FINANCE_CONCILIATION_PROPOSAL_WORKFLOW",
+      "PREVIEW_SECURITY_AND_LIVE_RULES"
+    ],
+    "nextInsideSameGate": "CAUSAL_SCOPED_SOURCE_CONTRACT_QA_FIRST_THEN_EXACT_NEW_PREVIEW_AND_AUTHENTICATED_ROLE_COUNTRY_UAT",
+    "existing295FindingsPreserved": true,
+    "priorB1B2B3PassPreserved": true,
+    "productSourceWritesAuthorized": false,
+    "configWritesAuthorized": false,
+    "businessWritesAuthorized": false,
+    "dataWrites": 0,
+    "productionWrites": 0,
+    "firestoreRulesDeployAuthorized": false,
+    "livePromotionAuthorized": false,
+    "reimportAuthorized": false,
+    "noParallelGate": true,
+    "noNewRepo": true,
+    "humanFunctionalAccepted": false,
+    "signedInRolePermissionsFullyProved": false,
+    "productionPercent": 20,
+    "productionDelta": 0,
+    "formalI6Percent": 50,
+    "executionLockBlobSha": "e1c20c689e727959118c68292a64bc64dd61256b"
   }
 }
