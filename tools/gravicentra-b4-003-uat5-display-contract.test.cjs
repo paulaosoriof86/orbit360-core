@@ -2,7 +2,7 @@
 const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
 const get=p=>fs.readFileSync(p,'utf8');
 const c=get('orbit360-platform/modules/cliente360.js');
-const start=c.indexOf('  function visiblePolicyGap('),end=c.indexOf('  const policyTotal',start);
+const start=c.indexOf('  function visiblePolicyGap('),end=c.indexOf('  const renovabilidad',start);
 assert.ok(start>0&&end>start,'UAT5_POLICY_GAP_OWNER_MISSING');
 const ctx={Set,Number,String,Array,Object};
 vm.runInNewContext('const esRenovable=p=>p&&["Vigente","Por renovar"].includes(p.estado);'+c.slice(start,end)+';this.gap=visiblePolicyGap;',ctx);
