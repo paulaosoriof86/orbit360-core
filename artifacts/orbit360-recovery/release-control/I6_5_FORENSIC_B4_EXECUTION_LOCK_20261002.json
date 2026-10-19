@@ -2970,7 +2970,7 @@
       "tools/gravicentra-b4-003-protected-hydration.test.cjs": "5705bb22b79cb3e0e7dfa10db1c32f009ff9f141",
       "tools/gravicentra-b4-003-scoped-related-reader.test.cjs": "963021928f4ab74d4b876fb4ef221f51558782de"
     },
-    "compositionBlobSha": "d83fc23b8eb329dfb47dd7e70ff6d83ce3d6fbc2",
+    "compositionBlobSha": "37fc6586672d9570c2affd4177d0da5dd5762c1b",
     "cause": "BOUNDED_SYNTHETIC_REPRODUCTION_OF_8S_POST_AUTH_CLIENT_HYDRATION_FAILURE",
     "proof": {
       "baselineClients": 443,
@@ -3042,7 +3042,9 @@
       "realCustomTokens": 0,
       "humanVisualAccepted": false,
       "liveRulesSecurityAccepted": false
-    }
+    },
+    "previousCertifiedCompositionBlobSha": "d83fc23b8eb329dfb47dd7e70ff6d83ce3d6fbc2",
+    "compositionBoundToLaterSourceOnly": true
   },
   "b4003PostAuthMembershipParityReadback20261019": {
     "status": "SCHEMA_AND_FIREBASE_AUTH_ADMIN_READBACK_PASS_SIGNEDIN_UAT_HOLD",

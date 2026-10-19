@@ -4869,7 +4869,7 @@
       "entryGuardReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_ENTRY_GUARD_PASS_20261002.json",
       "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
       "executionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B4_EXECUTION_LOCK_20261002.json",
-      "executionLockBlobSha": "570c9d131fcf8662caa93faf6b4e703655c73eda",
+      "executionLockBlobSha": "19857357d570dd9f21eb1cfdbc95480f8de27327",
       "compositionLockBlobSha": "016f251811f22bc4fc04b2a5f674dfe09243e605",
       "findingLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
       "activeFindingId": "B4-003",
@@ -6312,7 +6312,7 @@
     "status": "B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL",
     "activeFindingId": "B4-003",
     "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
-    "executionLockBlobSha": "570c9d131fcf8662caa93faf6b4e703655c73eda",
+    "executionLockBlobSha": "19857357d570dd9f21eb1cfdbc95480f8de27327",
     "compositionLockBlobSha": "816309c63ed254d9b0e05cf63621c3d1c03cbfd5",
     "findingLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
     "noLive": true,
@@ -12983,7 +12983,7 @@
       "tools/gravicentra-b4-003-protected-hydration.test.cjs": "5705bb22b79cb3e0e7dfa10db1c32f009ff9f141",
       "tools/gravicentra-b4-003-scoped-related-reader.test.cjs": "963021928f4ab74d4b876fb4ef221f51558782de"
     },
-    "compositionBlobSha": "d83fc23b8eb329dfb47dd7e70ff6d83ce3d6fbc2",
+    "compositionBlobSha": "37fc6586672d9570c2affd4177d0da5dd5762c1b",
     "executionLockBlobSha": "aa26f28f82a7cab528268e29bb37aa487b8e913f",
     "sourceOwner": [
       "orbit360-platform/data/store-firestore-product-readonly-p0.js",
@@ -13068,7 +13068,9 @@
       "status": "HISTORICAL_TECHNICAL_PASS_FUNCTIONAL_HOLD_NOT_THIS_RELEASE"
     },
     "membershipReadbackReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_POST_AUTH_MEMBERSHIP_PARITY_READBACK_20261019.json",
-    "membershipReadbackReceiptBlobSha": "b37a6c00ef8ec0c4036f06fda80dd6d63394463d"
+    "membershipReadbackReceiptBlobSha": "b37a6c00ef8ec0c4036f06fda80dd6d63394463d",
+    "previousCertifiedCompositionBlobSha": "d83fc23b8eb329dfb47dd7e70ff6d83ce3d6fbc2",
+    "compositionBoundToLaterSourceOnly": true
   },
   "b4003PostAuthMembershipParityReadback20261019": {
     "status": "SCHEMA_AND_FIREBASE_AUTH_ADMIN_READBACK_PASS_SIGNEDIN_UAT_HOLD",
