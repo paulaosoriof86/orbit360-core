@@ -6284,10 +6284,10 @@
       }
     },
     "qaBlobs": {
-      "tools/gravicentra-b4-003-insurer-source-catalog.test.cjs": "d3d4f4bde99e6689c6cbad72b83628933992f750"
+      "tools/gravicentra-b4-003-insurer-source-catalog.test.cjs": "06d6cfe1989abb65170051c06785cbcb9d1bd2c0"
     },
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_INSURER_KNOWLEDGE_SOURCE_FIX_20261020.json",
-    "receiptBlobSha": "ff1e2de70e298cf3a38fc5fcc468f7dbdbfba77f",
+    "receiptBlobSha": "c3120fcff1c0d0bf8604238a41f58ea8b062cef7",
     "sourceOnly": true,
     "productSourceFixAuthorized": true,
     "humanUatAccepted": false,

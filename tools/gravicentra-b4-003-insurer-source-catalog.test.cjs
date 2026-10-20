@@ -41,5 +41,5 @@ assert.ok(!foreign.includes('Plan Extranjero'),'COUNTRY_FILTER_NOT_APPLIED');
 assert.ok(code.includes('draft.ramosHabilitados')&&code.includes('cotTasasValidadas'),
  'EXPLICIT_OFFER_AND_TARIFF_GATES_MUST_REMAIN');
 assert.ok(!code.includes('data-b4003-insurer-auto-enable'),'NO_IMPLICIT_RATE_ACTIVATION');
-assert.match(fs.readFileSync('orbit360-platform/index.html','utf8'), /modules\\/aseguradoras\\.js\\?v=20261007-r20f4-20261020-b4003-source-catalog/, 'INSURER_NEW_SCRIPT_KEY_REQUIRED');
+assert.ok(fs.readFileSync('orbit360-platform/index.html','utf8').includes('modules/aseguradoras.js?v=20261007-r20f4-20261020-b4003-source-catalog'), 'INSURER_NEW_SCRIPT_KEY_REQUIRED');
 console.log('B4_003_INSURER_SOURCE_CATALOG_ALIAS_PRODUCT_PLAN_QA_PASS checks=13 mock_only no_rate_enable no_data_writes');

@@ -19,7 +19,8 @@
   "qaFiles": {
     "tools/gravicentra-b4-003-insurer-source-catalog.test.cjs": {
       "status": "NEW_EXACT_QA_BLOB",
-      "after": "d3d4f4bde99e6689c6cbad72b83628933992f750"
+      "after": "06d6cfe1989abb65170051c06785cbcb9d1bd2c0",
+      "qaRepair": "Same test, deterministic string comparison replaces malformed regex literal"
     }
   },
   "rootCauses": [
