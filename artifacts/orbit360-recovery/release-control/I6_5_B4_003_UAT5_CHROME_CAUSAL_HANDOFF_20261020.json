@@ -1,0 +1,151 @@
+{
+  "schema": "GI_I65_B4003_UAT5_CHROME_CAUSAL_HANDOFF_V1",
+  "status": "UAT5_FUNCTIONAL_HOLD_WITH_TWO_SOURCE_CAUSES_REPRODUCED",
+  "gate": "I6.5/B4-003",
+  "branch": "recovery/fase-a-clean-20260831",
+  "report": {
+    "uploadedName": "GRAVICENTRA_INSURANCE_UAT5_CHROME_I6_5_B4_003_2026-10-20(1).md",
+    "sha256": "0a0cfb5910feac668df00cf7e4667de1f79b6b361359c029fdbd7bc6179b3c8b",
+    "bytes": 42612,
+    "dateInReport": "2026-10-20",
+    "execution": "CHROME_AUTHENTICATED_READ_ONLY",
+    "productionApproval": false,
+    "snapshotErrorsNetworkMeasured": false
+  },
+  "candidate": {
+    "sourceSha": "7833d38452f2be4ed6d1dff4ec8ae91f0081665f",
+    "buildId": "gi-i65-b4-7833d38452f2-57f234755dc1",
+    "run": 39341715708,
+    "preview": "https://ays-orbit-360-lab--gi-i65-b4-39341715708-yf06t3z5.web.app",
+    "technicalPass": true,
+    "functionalAccept": false
+  },
+  "sourceReproduction": {
+    "run": 39351267404,
+    "step": "B4-003 protected role hydration regression (mock, no writes)",
+    "stepResult": "success",
+    "wholeWorkflow": "failure_by_expected_P0_LOGIN_QA_BLOB_NOT_PINNED_after_QA_change",
+    "temporaryTestCommit": "b90241e59c22b371e21ee28129ccde9bb8fc6ed0",
+    "restoredOriginalQaBlob": "5705bb22b79cb3e0e7dfa10db1c32f009ff9f141",
+    "restoredCommit": "6fa04419b197735e1880874c648a7e4180bc9ea1",
+    "postRestoreGuardRun": 39351377084,
+    "postRestoreGuardConclusion": "success",
+    "postRestoreExecutorRun": 39351377100,
+    "postRestoreExecutorConclusion": "success",
+    "previewRebuilt": false,
+    "codeMutation": false
+  },
+  "findings": [
+    {
+      "id": "U5-P1-ROUTE",
+      "category": "CODE_DEFECT_CAUSE_REPRODUCED",
+      "severity": "P1",
+      "owner": "orbit360-platform/modules/renovaciones.js",
+      "ownerBlobSha": "6dcea79fcb8b5fda72e141f02d4f32cb05e39954",
+      "source": "scheduleReadinessRecheck",
+      "proof": "Timer callback renders a still-connected shared host after hash changed to #/aseguradoras; synthetic paintAfterNavigation=1",
+      "fix": "Cancel stale timer or reject non-renovaciones route on callback; route-time guards already exist in separate refresh handler; test quick and delayed route transitions."
+    },
+    {
+      "id": "U5-P1-IMPORTER",
+      "category": "CODE_DEFECT_CAUSE_REPRODUCED",
+      "severity": "P1",
+      "owner": "orbit360-platform/modules/importar-p0-dashboard.js",
+      "ownerBlobSha": "a9afeb3e3e9037523bc626d1a91e69c7be70f218",
+      "source": "rows(coll) -> Orbit.store.all(coll) || []; layerStats()->totalRows",
+      "proof": "Synthetic unconfirmed receipts returned UI 0 while serverConfirmedCollections lacked recibosEsperados",
+      "fix": "Tri-state source readiness and explicit ensure only server-permitted collections; must not write or reimport. This owner is OUTSIDE current exact B4 allowedProductFiles and needs scoped authorization before source mutation."
+    },
+    {
+      "id": "U5-P1-FINANCIAL-PAGING",
+      "category": "CODE_PERFORMANCE_RISK_SOURCE_BOUND_PROVEN_REAL_TIMING_PENDING",
+      "severity": "P1",
+      "owners": [
+        "orbit360-platform/data/store-firestore-product-readonly-p0.js",
+        "functions/b4-003-scoped-related-reader.js"
+      ],
+      "blobs": [
+        "111d5409f33cf71c301255b57aba1e4f72581478",
+        "889feecc4e8ebd9240c53ad6f8d4777d47900f00"
+      ],
+      "proof": "Related protected collection list pageSize=50, GT/CO reduced sequentially; backend per-page authenticated membership/config read and per-row authorized parent verification; theoretical minimum 68 list pages based on 1958 receipts + 1396 portfolio (ignores country splits, cursor probes and retries).",
+      "notProven": "Real duration, precise number of calls, which protected source fails to finish after 20 seconds.",
+      "fix": "Measure per-request timing and source terminal states, then coalesce or page efficiently without bypassing backend scope. No timeouts as substitute."
+    },
+    {
+      "id": "U5-P1-C360-RECEIPTS",
+      "category": "CODE_DEFECT_TERMINAL_STATE_MISSING",
+      "severity": "P1",
+      "owner": "orbit360-platform/modules/cliente360.js",
+      "ownerBlobSha": "53946c5746ececf3d4141c769cef30b4c1f902d8",
+      "proof": "renderTab(recibos) checks only serverConfirmedCollections for receipts and cartera; terminal denied/errors are not classified before presenting spinner. Browser observed >14s.",
+      "fix": "Only render values when both are server-confirmed; render unavailable/error if terminal denied; retain pending otherwise and reattempt only authorized request."
+    },
+    {
+      "id": "U5-P1-C360-ADVISOR-GAP",
+      "category": "SOURCE_PRESENTATION_SCOPE_GAP_CONFIRMED",
+      "severity": "P1",
+      "owner": "orbit360-platform/modules/cliente360.js",
+      "ownerBlobSha": "53946c5746ececf3d4141c769cef30b4c1f902d8",
+      "proof": "visiblePolicyGap returns null outside direccion/superadmin/admintenant; authenticated Asesor sees 1245 policies versus 1223 in Cliente360, gap 22 (8 active), no explanation.",
+      "fix": "Only show count within role's own server-scoped returned rows, without disclosing client identities or elevating read permissions."
+    },
+    {
+      "id": "U5-P1-FINANCIAL-SEMANTICS",
+      "category": "REQUIRES_VERIFIED_READBACK_NOT_AUTO_REPAIR",
+      "severity": "P1",
+      "proof": "Dirección C360 1413 linked/218 active versus Pólizas 1425/230; recorded raw 443 vs client visible 434, 9 country/merged and orphan cases in prior source reconciliation; Inicio 3/5 after 20s; Cobros 5 rows while SIGA confirmed source rows 1243; Insights financial denominators inconsistent.",
+      "fix": "Same authenticated readback role/country/period/currency/universe, isolate orphan keys; do not manufacture payments or sync data for UI."
+    },
+    {
+      "id": "U5-P1-GOLDEN-AUTO39012",
+      "category": "PROVENANCE_HOLD",
+      "severity": "P1",
+      "proof": "The separate documentary readback keeps two source records, 10-vs-12 quota calendars, insurer statements and premium source; current stored value Q2116.80 vs prewrite source Q2678.53 not reconciled.",
+      "linkedReceipt": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_AUTO39012_DOCUMENTARY_READBACK_20261019.json",
+      "fix": "Read exact last-writer before/after and insurer contract; no premium mutation until authorized."
+    },
+    {
+      "id": "U5-P0-LIVE-SECURITY",
+      "category": "RELEASE_BLOCKER",
+      "severity": "P0",
+      "proof": "CONTROL_PLANE.b4003SecurityReleaseHold is ACTIVE_FAIL_CLOSED_UNAUTHORIZED_BROWSER_FIRESTORE_READ_WRITE; underlying broad legacy rules and authenticated positive/negative GT/CO backend tests not certified.",
+      "fix": "No live promotion until effective Firestore backend authorization, exact role/country E2E and mandatory LIVE write/integrity proofs are physically PASS."
+    }
+  ],
+  "otherWorkFindingsRetained": [
+    "U5-mobile-search-overlap 390x844",
+    "Ops/Leads canonical write+outbox not tested",
+    "Comisiones own-only Asesor visibility not proven",
+    "No external notification provider proof",
+    "Import/policy/receipt/carriage write not tested",
+    "74 financial discrepancies source review",
+    "Missing client historical references",
+    "Network/404 unavailable in Work tool"
+  ],
+  "governance": {
+    "lastFormallyFrozenMiniGate": "I6.4",
+    "active": "I6.5/B4-003",
+    "findingsLedgerTotal": 295,
+    "productionPath": {
+      "passed": 2,
+      "total": 10,
+      "percent": 20,
+      "delta": 0
+    },
+    "formalI6": {
+      "passed": 5,
+      "total": 10,
+      "percent": 50
+    },
+    "allowedProductMutation": false,
+    "firestoreRulesDeployAuthorized": false,
+    "livePromotionAuthorized": false,
+    "operationalDataWritesAuthorized": false,
+    "qaLockedRestored": true,
+    "noNewGate": true,
+    "noNewBranch": true,
+    "reimport": false
+  },
+  "nextAuthorizedAction": "TARGETED_QA_AND_SCOPED_SOURCE_AUTHORIZATION_IN_SAME_B4_003; then immutable cumulative candidate, exact Preview, real UAT, LIVE security and approved writes before production."
+}
