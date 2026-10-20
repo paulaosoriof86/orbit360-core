@@ -182,13 +182,18 @@ Orbit.q = (function () {
   function policyLinkedCountry(row, clients, policies) {
     row = row || {};
     const policy = row.polizaId != null ? (policies instanceof Map ? policies.get(row.polizaId) : S().get('polizas', row.polizaId)) : null;
-    const clientId = row.clienteId != null ? row.clienteId : (policy && policy.clienteId);
+    // Fail closed on contradictory source and linked-parent evidence, not
+    // merely the policy-vs-row pair. Align with the staged server allowRow.
+    if (row.polizaId != null && !policy) return 'REQUIERE_VALIDACION';
+    const ownClientId = row.clienteId != null ? row.clienteId : null;
+    const parentClientId = policy && policy.clienteId != null ? policy.clienteId : null;
+    if (ownClientId != null && parentClientId != null && String(ownClientId) !== String(parentClientId)) return 'REQUIERE_VALIDACION';
+    const clientId = parentClientId != null ? parentClientId : ownClientId;
     const cli = clientId != null ? (clients instanceof Map ? clients.get(clientId) : S().get('clientes', clientId)) : null;
-    const policyCountry = countryCode(policy && policy.pais);
-    const rowCountry = countryCode(row.pais);
-    const clientCountry = countryCode(cli && cli.pais);
-    if (policyCountry && rowCountry && policyCountry !== rowCountry) return 'REQUIERE_VALIDACION';
-    return policyCountry || rowCountry || clientCountry || '';
+    if (clientId != null && !cli) return 'REQUIERE_VALIDACION';
+    const countries = [countryCode(policy && policy.pais),countryCode(row.pais),countryCode(cli && cli.pais)].filter(Boolean);
+    if (countries.some(v => v !== 'GT' && v !== 'CO') || new Set(countries).size > 1) return 'REQUIERE_VALIDACION';
+    return countries[0] || '';
   }
   function rowPais(row, clients, policies) {
     const p = paisActivo();
@@ -202,7 +207,8 @@ Orbit.q = (function () {
     const policy = policies instanceof Map ? policies.get(row.polizaId) : S().get('polizas', row.polizaId);
     if (!policy) return false;
     const p = paisActivo();
-    return !p || policyLinkedCountry(row, clients, policies) === p;
+    const country = policyLinkedCountry(row, clients, policies);
+    return (country === 'GT' || country === 'CO') && (!p || country === p);
   }
   function polPais(p2, clients) {
     const cli = p2 && p2.clienteId != null ? (clients instanceof Map ? clients.get(p2.clienteId) : S().get('clientes', p2.clienteId)) : null;

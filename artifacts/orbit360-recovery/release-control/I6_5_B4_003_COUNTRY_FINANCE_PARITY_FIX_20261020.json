@@ -1,0 +1,50 @@
+{
+  "schema": "GI_B4_003_COUNTRY_FINANCE_PARENT_PARITY_SOURCE_20261020_V1",
+  "gate": "I6.5/B4-003",
+  "parentHead": "710f392ec129b689f4797be1350611c43852ab39",
+  "status": "SOURCE_FIXED_SYNTHETIC_QA_PENDING_EXACT_PREVIEW_AUTHENTICATED_UAT",
+  "sourceBlobsBefore": {
+    "orbit360-platform/core/queries.js": "55acae8c4c933bde47afb018be55e978d9b81cdd",
+    "orbit360-platform/modules/cobros.js": "e47d5463fbd89e556b02aa2ab0f5388a88bad825"
+  },
+  "sourceBlobsAfter": {
+    "orbit360-platform/core/queries.js": "0f3f540a71e98ccdca8c040f937d18a169e52396",
+    "orbit360-platform/modules/cobros.js": "6b3892ab83ef7974fbae20e0b1ee15b32d62f08f"
+  },
+  "qaPath": "tools/gravicentra-b4-003-country-finance-parity.test.cjs",
+  "qaBlobSha": "d00f423470373fbcc7ef328498f936e5f9e90a9c",
+  "rootCauses": [
+    "POLICY_LINKED_COUNTRY_DID_NOT_COMPARE_LINKED_CLIENT_COUNTRY",
+    "COUNTRY_TODOS_BYPASSED_INVALID_COUNTRY_RELATION",
+    "PORTFOLIO_RECEIPT_PROJECTION_OVERWROTE_CONFLICTING_ORIGIN_COUNTRY",
+    "COBROS_TABLE_VENCIDO_VS_CARTERA_PRIMAS_ZERO_HAD_NO_EXPLICIT_PROVENANCE_WARNING"
+  ],
+  "syntheticPriorCO": {
+    "tableRows": 2,
+    "vencCOP": 1200,
+    "gtClientVisible": true
+  },
+  "syntheticFixedCO": {
+    "tableRows": 1,
+    "vencCOP": 500,
+    "gtClientVisible": false
+  },
+  "unchangedTruth": "Only Cartera Primas sets pending/overdue amount; no invented money or data mutation",
+  "frozenTaskIds": [
+    "C03.01",
+    "C03.02",
+    "C05.05",
+    "C08.01",
+    "C08.06",
+    "C12.02"
+  ],
+  "sourceOnly": true,
+  "sharedRulesDeployAuthorized": false,
+  "livePromotionAuthorized": false,
+  "operationalWrites": 0,
+  "reimport": false,
+  "authenticatedFunctionalPass": false,
+  "wholeSecurityPass": false,
+  "previousCobrosCachePreviewMustStayImmutable": true,
+  "previousInsurerAndUAT5ReceiptsPreserved": true
+}

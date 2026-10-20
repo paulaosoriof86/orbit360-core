@@ -142,8 +142,9 @@ Orbit.modules.cobros = (function () {
     return String((p && p.pais) || (c && c.pais) || (cli && cli.pais) || '').trim().toUpperCase();
   }
   function countryMatches(c, idx) {
-    const selected = activeCountry();
-    return !selected || rowCountry(c, idx) === selected;
+    const selected = activeCountry(),country = rowCountry(c, idx);
+    // 'TODOS' does not authorize cross-country or unknown-parent records.
+    return (country === 'GT' || country === 'CO') && (!selected || country === selected);
   }
   function rowSearchText(c, idx) {
     const cli = indexClient(idx, c && c.clienteId), p = indexPolicy(idx, c && c.polizaId);
@@ -237,6 +238,9 @@ Orbit.modules.cobros = (function () {
       const receiptId = String(r && (r.reciboId || r.receiptId) || '');
       if (!receiptId || linked.has(receiptId)) return null;
       const receipt = S().get('recibosEsperados', receiptId) || r;
+      // Do not collapse contradictory origin/expected-receipt evidence.
+      const originCountry=rowCountry(r,idx),receiptCountry=rowCountry(receipt,idx);
+      if (!['GT','CO'].includes(originCountry) || !['GT','CO'].includes(receiptCountry) || originCountry !== receiptCountry) return null;
       const op = String(receipt.estadoOperativo || r.estadoOperativo || '').trim().toLowerCase();
       if (op === 'pago_reportado') return null;
       const p = indexPolicy(idx, receipt.polizaId || r.polizaId);
@@ -378,6 +382,9 @@ Orbit.modules.cobros = (function () {
     const crmDirect = reported.filter(x => x.__crmDirectEvidence), paidReceiptFallback = reported.filter(x => x.__paidReceiptEvidence), advisorReported = reported.filter(x => x.__advisorReportedEvidence), clientReported = reported.filter(x => x.__clientReportedEvidence);
     const allRowsUnfiltered = qaReceipt ? (qaSurfaceRow ? [qaSurfaceRow] : []) : authoritative.concat(portfolioOnly, reported).sort((a, b) => String(a.vence || '').localeCompare(String(b.vence || '')));
     const allRows = qaReceipt ? allRowsUnfiltered.filter(row => receiptIdOf(row) === qaReceipt) : allRowsUnfiltered;
+    const overdueCobrosCount=qaReceipt?0:authoritative.filter(row=>row.estado==='Vencido').length;
+    const hasPortfolioOverdue=hyd.financialReady&&Object.values(cart.byCurrency||{}).some(value=>Number(value&&value.venc||0)!==0);
+    const overdueUnmatchedWarning=hyd.financialReady&&overdueCobrosCount>0&&!hasPortfolioOverdue;
     const totalPages = Math.max(1, Math.ceil(allRows.length / PAGE_SIZE));
     if (st.page > totalPages) st.page = totalPages;
     if (st.page < 1) st.page = 1;
@@ -406,6 +413,7 @@ Orbit.modules.cobros = (function () {
         { label: 'Vencido', val: 'Actualizando datos', color: 'var(--line)', foot: 'confirmando cartera' },
         { label: 'Por conciliar', val: 'Actualizando datos', color: 'var(--line)', foot: 'confirmando pagos' }
       ])}
+      ${overdueUnmatchedWarning ? `<div class="card" data-cobros-aging-universe-mismatch="${overdueCobrosCount}" style="padding:12px 14px;margin-bottom:14px;border-left:3px solid var(--warn)"><b>Cobros vencidos pendientes de conciliación de fuente</b><div class="muted" style="margin-top:4px">${overdueCobrosCount} registro(s) aparecen como Vencido en Cobros; el indicador de importe vencido corresponde a Cartera Primas y no presenta saldo en el alcance seleccionado. Verificar correspondencia por recibo y póliza, sin inferir ni duplicar deuda.</div></div>` : ''}
       ${crmDirect.length ? `<div class="card" data-siga-payments-note="1" style="padding:11px 14px;margin-bottom:14px;border-left:3px solid var(--ok)"><b>${crmDirect.length} pagos registrados en SIGA</b><div class="muted" style="font-size:12px;margin-top:3px">Pagos según fuente SIGA: en este subconjunto hay <b>${crmDirect.filter(x=>!x.conciliado).length}</b> pendientes de conciliación y <b>${crmDirect.filter(x=>x.conciliado).length}</b> ya conciliados. No requieren aplicación manual.</div></div>` : ''}
       ${advisorReported.length ? `<div class="card" data-advisor-payments-note="1" style="padding:11px 14px;margin-bottom:14px;border-left:3px solid var(--info)"><b>${advisorReported.length} pago(s) reportado(s) por asesor</b><div class="muted" style="font-size:12px;margin-top:3px">El reporte no aplica el pago. Operativo valida la correspondencia desde Ops y luego aplica el mismo pago sin duplicarlo.</div></div>` : ''}
       ${clientReported.length ? `<div class="card" data-reported-payments-note="1" style="padding:11px 14px;margin-bottom:14px;border-left:3px solid var(--info)"><b>${clientReported.length} pago(s) reportado(s) realmente desde portal</b><div class="muted" style="font-size:12px;margin-top:3px">Cuando el recibo coincide de forma única y válida, el pago se aplica automáticamente. Solo los casos ambiguos o contradictorios quedan para revisión.</div></div>` : ''}

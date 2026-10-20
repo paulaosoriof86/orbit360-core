@@ -201,7 +201,7 @@
     "orbit360-platform/core/product-runtime-browser-providers-p0.js": "51f2801cf8e7590ff92ffa9e7dae07ff8304f5d7",
     "orbit360-platform/core/public-tenant-branding.js": "ee1029772b1191c44817d315dc8ce8862bb3a152",
     "orbit360-platform/core/pwa.js": "14bc0d513a2ee3de8f7b598b38276e6136f05eb8",
-    "orbit360-platform/core/queries.js": "55acae8c4c933bde47afb018be55e978d9b81cdd",
+    "orbit360-platform/core/queries.js": "0f3f540a71e98ccdca8c040f937d18a169e52396",
     "orbit360-platform/core/quote-authority-contract-v1.js": "7fb49d51476f21456540b0b7a178e82675231562",
     "orbit360-platform/core/quote-comparison-contracts-v1203.js": "c3342d5fc94661a9f23563e4b1c644346dd10fb3",
     "orbit360-platform/core/quote-comparison-p06-runtime-adapter-v1208.js": "1e3a5d79b4bdcba69f8de0737bf0df96d4cbd3d0",
@@ -227,7 +227,7 @@
     "orbit360-platform/modules/cancelaciones.js": "f14842484b464da6296a10459eb523d2b056ed98",
     "orbit360-platform/modules/cliente360.js": "935c54d18da90b6f9dd1d7ba5c58672499c82ed7",
     "orbit360-platform/modules/cobros-cartera-i65-closure-bridge.js": "45e95a42596a27008e67a3cd6cd4601ea8ca6cb8",
-    "orbit360-platform/modules/cobros.js": "e47d5463fbd89e556b02aa2ab0f5388a88bad825",
+    "orbit360-platform/modules/cobros.js": "6b3892ab83ef7974fbae20e0b1ee15b32d62f08f",
     "orbit360-platform/modules/comisiones.js": "5b26dfc1cf2331af99eadb7a71f8348c9c053594",
     "orbit360-platform/modules/conciliaciones.js": "3b77b2cff04e2f10ab78541d8802c191901de240",
     "orbit360-platform/modules/configuracion.js": "bc30918ac226d0f510fa180141a30af8ff8a7933",
@@ -6316,5 +6316,31 @@
     "livePromotionAuthorized": false,
     "reimportAuthorized": false,
     "acceptance": "PENDING_AUTHENTICATED_UAT"
+  },
+  "b4003CountryFinanceParityFix20261020": {
+    "status": "COUNTRY_PARENT_FINANCE_SOURCE_FIXED_QA_PENDING_EXACT_PREVIEW",
+    "gate": "I6.5/B4-003",
+    "approval": "USER_CONTINUE_FAST_WITHIN_EXISTING_I6_5_B4_003",
+    "parentHead": "710f392ec129b689f4797be1350611c43852ab39",
+    "previousCompositionBlobSha": "4563979caadd63cb4897304c60df7a087cac024c",
+    "previousExecutionLockBlobSha": "063c848deca0138cb5ce230ab12d6599b4a251cb",
+    "sourceBlobsBefore": {
+      "orbit360-platform/core/queries.js": "55acae8c4c933bde47afb018be55e978d9b81cdd",
+      "orbit360-platform/modules/cobros.js": "e47d5463fbd89e556b02aa2ab0f5388a88bad825"
+    },
+    "sourceBlobsAfter": {
+      "orbit360-platform/core/queries.js": "0f3f540a71e98ccdca8c040f937d18a169e52396",
+      "orbit360-platform/modules/cobros.js": "6b3892ab83ef7974fbae20e0b1ee15b32d62f08f"
+    },
+    "qaPath": "tools/gravicentra-b4-003-country-finance-parity.test.cjs",
+    "qaBlobSha": "d00f423470373fbcc7ef328498f936e5f9e90a9c",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_COUNTRY_FINANCE_PARITY_FIX_20261020.json",
+    "receiptBlobSha": "405196111ac5d6884ea929d2fc5104f3105e48d3",
+    "sourceOnly": true,
+    "operationalWritesAuthorized": false,
+    "sharedRulesDeployAuthorized": false,
+    "livePromotionAuthorized": false,
+    "reimportAuthorized": false,
+    "authenticatedUatAccepted": false
   }
 }

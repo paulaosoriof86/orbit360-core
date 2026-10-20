@@ -58,6 +58,41 @@ const ACTIVE_I65_FORENSIC_B4=String(C.i65ForensicRemediationPlan?.b4?.executionL
 need(exists(ACTIVE_I65_FORENSIC_B4),'I6_5_B4_ACTIVE_LOCK_MISSING:'+ACTIVE_I65_FORENSIC_B4);
 const S=readJson(STATUS_LEDGER),A=readJson(AUTH_RECEIPT),M5=readJson(V5_MANIFEST),M6=readJson(V6_MANIFEST),M=readJson(V7_MANIFEST),FRA=readJson(I65_FORENSIC_AUDIT),FRP=readJson(I65_FORENSIC_PLAN),PAY=readJson(I65_PAYMENT_INFERENCE),B1=readJson(I65_FORENSIC_B1),B2=readJson(I65_FORENSIC_B2),B3=readJson(I65_FORENSIC_B3),B4=readJson(ACTIVE_I65_FORENSIC_B4);
 const COMP=readJson(I6_CANONICAL_COMPOSITION),FIND=readJson(I6_FINDINGS_LEDGER),FRP2=readJson(I65_FORENSIC_PLAN_V2),REJ=readJson(I65_B2_REJECTION),RCM=readJson(I65_B2_ROOT_CAUSE);
+const COUNTRY_FIX=C.b4003CountryFinanceParityFix20261020||{};
+const COUNTRY_ACTIVE=COUNTRY_FIX.status==='COUNTRY_PARENT_FINANCE_SOURCE_FIXED_QA_PENDING_EXACT_PREVIEW';
+if(COUNTRY_ACTIVE){
+ const receipt=exists(COUNTRY_FIX.receiptPath)?readJson(COUNTRY_FIX.receiptPath):{};
+ const stageLock=B4.b4003CountryFinanceParityFix20261020||{},stageComp=COMP.b4003CountryFinanceParityFix20261020||{};
+ const source=Object.keys(COUNTRY_FIX.sourceBlobsAfter||{}).sort(),expect=['orbit360-platform/core/queries.js','orbit360-platform/modules/cobros.js'].sort();
+ need(COUNTRY_FIX.gate==='I6.5/B4-003'&&COUNTRY_FIX.approval==='USER_CONTINUE_FAST_WITHIN_EXISTING_I6_5_B4_003'&&
+   COUNTRY_FIX.previousCompositionBlobSha==='4563979caadd63cb4897304c60df7a087cac024c'&&
+   COUNTRY_FIX.previousExecutionLockBlobSha==='063c848deca0138cb5ce230ab12d6599b4a251cb'&&
+   COUNTRY_FIX.parentHead==='710f392ec129b689f4797be1350611c43852ab39'&&
+   COUNTRY_FIX.receiptBlobSha===git('hash-object',COUNTRY_FIX.receiptPath)&&
+   receipt.schema==='GI_B4_003_COUNTRY_FINANCE_PARENT_PARITY_SOURCE_20261020_V1'&&
+   receipt.parentHead===COUNTRY_FIX.parentHead&&receipt.operationalWrites===0&&
+   source.length===2&&sameJson(source,expect)&&
+   sameJson(COUNTRY_FIX.sourceBlobsBefore,receipt.sourceBlobsBefore)&&sameJson(COUNTRY_FIX.sourceBlobsAfter,receipt.sourceBlobsAfter)&&
+   sameJson(COUNTRY_FIX.sourceBlobsAfter,stageLock.sourceBlobsAfter)&&sameJson(COUNTRY_FIX.sourceBlobsAfter,stageComp.sourceBlobsAfter)&&
+   source.every(path=>git('hash-object',path)===COUNTRY_FIX.sourceBlobsAfter[path]&&
+     COMP.productFileBlobs[path]===COUNTRY_FIX.sourceBlobsAfter[path]&&COMP.productFiles.includes(path)&&B4.boundaries.allowedProductFiles.includes(path))&&
+   COUNTRY_FIX.qaBlobSha===git('hash-object',COUNTRY_FIX.qaPath)&&B4.boundaries.allowedQaFiles.includes(COUNTRY_FIX.qaPath)&&
+   COUNTRY_FIX.compositionBlobSha===git('hash-object',I6_CANONICAL_COMPOSITION)&&
+   COUNTRY_FIX.executionLockBlobSha===git('hash-object',ACTIVE_I65_FORENSIC_B4)&&
+   C.canonicalAccumulationControl?.compositionLockBlobSha===COUNTRY_FIX.compositionBlobSha&&
+   C.currentB4?.executionLockBlobSha===COUNTRY_FIX.executionLockBlobSha&&
+   C.i65ForensicRemediationPlan?.b4?.executionLockBlobSha===COUNTRY_FIX.executionLockBlobSha&&
+   B4.compositionLockBlobSha===COUNTRY_FIX.compositionBlobSha&&
+   C.b4003SecurityReleaseHold?.status==='ACTIVE_FAIL_CLOSED_UNAUTHORIZED_BROWSER_FIRESTORE_READ_WRITE'&&
+   C.i6Execution?.productMutationAuthorized===false&&B4.boundaries?.productMutationAuthorized===false&&
+   B4.boundaries?.businessWritesAuthorized===false&&B4.boundaries?.dataMutationAuthorized===false&&
+   B4.boundaries?.livePromotionAuthorized===false&&COUNTRY_FIX.sharedRulesDeployAuthorized===false&&
+   COUNTRY_FIX.operationalWritesAuthorized===false&&COUNTRY_FIX.livePromotionAuthorized===false&&
+   receipt.authenticatedFunctionalPass===false&&FIND.findings.length===295,
+   'B4_003_COUNTRY_FINANCE_SOURCE_CAUSAL_LINEAGE_DRIFT');
+ execFileSync(process.execPath,[COUNTRY_FIX.qaPath],{stdio:'inherit'});
+ console.log('B4_003_COUNTRY_FINANCE_PARENT_SCOPE_SYNTHETIC_PASS_UAT_HOLD');
+}
 const CACHE_PROOF=C.b4003CobrosCachePreviewProof20261020||{};
 if(CACHE_PROOF.status==='EXACT_TECHNICAL_PREVIEW_PASS_AUTHENTICATED_UAT_HOLD'){
  const locked=B4.b4003CobrosCachePreviewProof20261020||{};
@@ -73,7 +108,7 @@ if(CACHE_PROOF.status==='EXACT_TECHNICAL_PREVIEW_PASS_AUTHENTICATED_UAT_HOLD'){
   readback.artifactId===CACHE_PROOF.artifactId&&
   readback.artifactArchiveDigest===CACHE_PROOF.artifactArchiveDigest&&
   readback.backendSourceDigest===CACHE_PROOF.backendSourceDigest&&
-  readback.sourceProductBlobSha===git('hash-object','orbit360-platform/modules/cobros.js')&&
+  readback.sourceProductBlobSha===(COUNTRY_ACTIVE?COUNTRY_FIX.sourceBlobsBefore['orbit360-platform/modules/cobros.js']:git('hash-object','orbit360-platform/modules/cobros.js'))&&
   readback.qaTestBlobSha===git('hash-object','tools/gravicentra-b4-003-cobros-scope-cache.test.cjs')&&
   readback.workflowConclusion==='success'&&readback.hostingReadbackExact===true&&
   readback.publicAndEmulatorSmoke===true&&
@@ -97,13 +132,13 @@ if(CACHE_PREVIEW.status==='AUTHORIZED_EXACT_READONLY_PREVIEW'){
  need(sameJson(CACHE_PREVIEW,locked)&&CACHE_PREVIEW.gate==='I6.5/B4-003'&&
   CACHE_PREVIEW.triggerSubject==='build(i6.5 B4-003): exact Cobros scoped finance Preview'&&
   CACHE_PREVIEW.sourcePath==='orbit360-platform/modules/cobros.js'&&
-  CACHE_PREVIEW.sourceBlobSha===git('hash-object',CACHE_PREVIEW.sourcePath)&&
+  CACHE_PREVIEW.sourceBlobSha===(COUNTRY_ACTIVE?COUNTRY_FIX.sourceBlobsBefore[CACHE_PREVIEW.sourcePath]:git('hash-object',CACHE_PREVIEW.sourcePath))&&
   CACHE_PREVIEW.qaBlobSha===git('hash-object',CACHE_PREVIEW.qaPath)&&
   CACHE_PREVIEW.centralGuardRunId===39436838311&&CACHE_PREVIEW.centralGuardConclusion==='success'&&
   CACHE_PREVIEW.sourceFixReceiptBlobSha===C.b4003CobrosScopeCacheFix20261020?.receiptBlobSha&&
   CACHE_PREVIEW.sourceBlobSha===C.b4003CobrosScopeCacheFix20261020?.sourceBlobAfter&&
-  CACHE_PREVIEW.compositionBlobSha===git('hash-object',I6_CANONICAL_COMPOSITION)&&
-  C.canonicalAccumulationControl?.compositionLockBlobSha===CACHE_PREVIEW.compositionBlobSha&&
+  CACHE_PREVIEW.compositionBlobSha===(COUNTRY_ACTIVE?COUNTRY_FIX.previousCompositionBlobSha:git('hash-object',I6_CANONICAL_COMPOSITION))&&
+  C.canonicalAccumulationControl?.compositionLockBlobSha===git('hash-object',I6_CANONICAL_COMPOSITION)&&
   CACHE_PREVIEW.authorizationReceiptBlobSha===git('hash-object',CACHE_PREVIEW.authorizationReceiptPath)&&
   authorization.schema==='GI_B4_003_COBROS_SCOPE_CACHE_EXACT_PREVIEW_AUTH_V1'&&
   authorization.authorization?.sourceBlobSha===CACHE_PREVIEW.sourceBlobSha&&
@@ -129,7 +164,7 @@ const CACHE_FIX_ACTIVE=CACHE_FIX.status==='SCOPED_COBROS_SCOPE_CACHE_SOURCE_FIXE
 if(CACHE_FIX_ACTIVE){
  const locked=B4.b4003CobrosScopeCacheFix20261020||{},manifest=COMP.b4003CobrosScopeCacheFix20261020||{};
  const receipt=exists(CACHE_FIX.receiptPath)?readJson(CACHE_FIX.receiptPath):{};
- const sourceSha=git('hash-object',CACHE_FIX.productPath),qaSha=git('hash-object',CACHE_FIX.qaPath);
+ const sourceSha=COUNTRY_ACTIVE?COUNTRY_FIX.sourceBlobsBefore[CACHE_FIX.productPath]:git('hash-object',CACHE_FIX.productPath),qaSha=git('hash-object',CACHE_FIX.qaPath);
  need(CACHE_FIX.gate==='I6.5/B4-003'&&CACHE_FIX.approval==='USER_CONTINUE_ACTIVE_GATE_20261020_CAUSAL_SCOPE'&&
    CACHE_FIX.productPath==='orbit360-platform/modules/cobros.js'&&CACHE_FIX.qaPath==='tools/gravicentra-b4-003-cobros-scope-cache.test.cjs'&&
    CACHE_FIX.sourceOnly===true&&CACHE_FIX.globalProductMutationAuthorized===false&&
@@ -144,14 +179,14 @@ if(CACHE_FIX_ACTIVE){
    sourceSha===CACHE_FIX.sourceBlobAfter&&qaSha===CACHE_FIX.qaBlobSha&&
    manifest.productPath===CACHE_FIX.productPath&&manifest.sourceBlobAfter===sourceSha&&
    locked.sourceBlobAfter===sourceSha&&locked.qaBlobSha===qaSha&&
-   CACHE_FIX.compositionBlobSha===git('hash-object',I6_CANONICAL_COMPOSITION)&&
-   CACHE_FIX.executionLockBlobSha===git('hash-object',ACTIVE_I65_FORENSIC_B4)&&
-   COMP.productFileBlobs[CACHE_FIX.productPath]===sourceSha&&COMP.productFiles.includes(CACHE_FIX.productPath)&&
+   CACHE_FIX.compositionBlobSha===(COUNTRY_ACTIVE?COUNTRY_FIX.previousCompositionBlobSha:git('hash-object',I6_CANONICAL_COMPOSITION))&&
+   CACHE_FIX.executionLockBlobSha===(COUNTRY_ACTIVE?COUNTRY_FIX.previousExecutionLockBlobSha:git('hash-object',ACTIVE_I65_FORENSIC_B4))&&
+   COMP.productFileBlobs[CACHE_FIX.productPath]===(COUNTRY_ACTIVE?COUNTRY_FIX.sourceBlobsAfter[CACHE_FIX.productPath]:sourceSha)&&COMP.productFiles.includes(CACHE_FIX.productPath)&&
    B4.boundaries?.allowedProductFiles?.includes(CACHE_FIX.productPath)&&B4.boundaries?.allowedQaFiles?.includes(CACHE_FIX.qaPath)&&
-   C.canonicalAccumulationControl?.compositionLockBlobSha===CACHE_FIX.compositionBlobSha&&
-   C.currentB4?.executionLockBlobSha===CACHE_FIX.executionLockBlobSha&&
-   C.i65ForensicRemediationPlan?.b4?.executionLockBlobSha===CACHE_FIX.executionLockBlobSha&&
-   B4.compositionLockBlobSha===CACHE_FIX.compositionBlobSha&&
+   C.canonicalAccumulationControl?.compositionLockBlobSha===git('hash-object',I6_CANONICAL_COMPOSITION)&&
+   C.currentB4?.executionLockBlobSha===git('hash-object',ACTIVE_I65_FORENSIC_B4)&&
+   C.i65ForensicRemediationPlan?.b4?.executionLockBlobSha===git('hash-object',ACTIVE_I65_FORENSIC_B4)&&
+   B4.compositionLockBlobSha===git('hash-object',I6_CANONICAL_COMPOSITION)&&
    C.b4003SecurityReleaseHold?.status==='ACTIVE_FAIL_CLOSED_UNAUTHORIZED_BROWSER_FIRESTORE_READ_WRITE'&&
    C.i6Execution?.productMutationAuthorized===false&&B4.boundaries?.productMutationAuthorized===false&&
    B4.boundaries?.businessWritesAuthorized===false&&B4.boundaries?.dataMutationAuthorized===false&&
