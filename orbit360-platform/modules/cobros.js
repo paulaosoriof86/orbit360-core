@@ -103,11 +103,27 @@ Orbit.modules.cobros = (function () {
     });
     return { clients, policies, vehicleByPolicy };
   }
+  // B4-003 scope isolation: a financial aggregate cannot survive a role,
+  // identity, tenant, advisor or country change. Missing auth disables reuse.
+  function financialCacheScopeKey(){
+    try{
+      const auth=Orbit.auth||{},product=auth.productUser||{};
+      const current=typeof auth.user==='function'?(auth.user()||{}):{};
+      const uid=String(product.uid||current.uid||'').trim();
+      if(product.uid&&current.uid&&String(product.uid)!==String(current.uid))return '';
+      const tenant=Orbit.tenant&&typeof Orbit.tenant.get==='function'?(Orbit.tenant.get()||{}):{};
+      const tenantId=String(tenant.tenantId||tenant.id||product.tenantId||current.tenantId||'').trim();
+      const advisorId=String(Orbit.session&&typeof Orbit.session.asesorId==='function'?(Orbit.session.asesorId()||''):'').trim();
+      const role=activeRoleNorm();
+      if(!uid||!tenantId||!role)return '';
+      return JSON.stringify([tenantId,uid,role,advisorId,activeCountry()]);
+    }catch(_){return '';}
+  }
   function baseModel(reuse){
-    const country=activeCountry();
-    if(reuse&&baseCache&&baseCache.country===country)return baseCache;
+    const country=activeCountry(),scopeKey=financialCacheScopeKey();
+    if(reuse&&scopeKey&&baseCache&&baseCache.scopeKey===scopeKey)return baseCache;
     const idx=buildIndex();
-    baseCache={country,idx,cart:q.carteraGlobalPorMoneda(),aging:q.agingVencidoPorMoneda()};
+    baseCache={scopeKey,country,idx,cart:q.carteraGlobalPorMoneda(),aging:q.agingVencidoPorMoneda()};
     return baseCache;
   }
   function indexClient(idx, id) { return idx.clients.get(String(id || '')) || null; }

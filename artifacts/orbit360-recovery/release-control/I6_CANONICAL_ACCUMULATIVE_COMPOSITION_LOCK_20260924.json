@@ -227,7 +227,7 @@
     "orbit360-platform/modules/cancelaciones.js": "f14842484b464da6296a10459eb523d2b056ed98",
     "orbit360-platform/modules/cliente360.js": "935c54d18da90b6f9dd1d7ba5c58672499c82ed7",
     "orbit360-platform/modules/cobros-cartera-i65-closure-bridge.js": "45e95a42596a27008e67a3cd6cd4601ea8ca6cb8",
-    "orbit360-platform/modules/cobros.js": "ceb666bc1016c5365e420ad6791f112a947966a4",
+    "orbit360-platform/modules/cobros.js": "e47d5463fbd89e556b02aa2ab0f5388a88bad825",
     "orbit360-platform/modules/comisiones.js": "5b26dfc1cf2331af99eadb7a71f8348c9c053594",
     "orbit360-platform/modules/conciliaciones.js": "3b77b2cff04e2f10ab78541d8802c191901de240",
     "orbit360-platform/modules/configuracion.js": "bc30918ac226d0f510fa180141a30af8ff8a7933",
@@ -6295,5 +6295,26 @@
     "previewAcceptance": false,
     "productionPromotion": false,
     "operationalWrites": 0
+  },
+  "b4003CobrosScopeCacheFix20261020": {
+    "status": "SCOPED_COBROS_SCOPE_CACHE_SOURCE_FIXED_QA_PENDING_EXACT_PREVIEW",
+    "gate": "I6.5/B4-003",
+    "approval": "USER_CONTINUE_ACTIVE_GATE_20261020_CAUSAL_SCOPE",
+    "previousCompositionBlobSha": "e100a88bc817a80a9fcbcaf2ff9356ab0eb58b3f",
+    "previousExecutionLockBlobSha": "ec57c71a784dc986dbaf480e69c9e3d68ff566d9",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_COBROS_SCOPE_CACHE_CAUSAL_FIX_20261020.json",
+    "receiptBlobSha": "942d9318cfa78b9ecdbe7f57aabc9a14ac676a7d",
+    "productPath": "orbit360-platform/modules/cobros.js",
+    "sourceBlobBefore": "ceb666bc1016c5365e420ad6791f112a947966a4",
+    "sourceBlobAfter": "e47d5463fbd89e556b02aa2ab0f5388a88bad825",
+    "qaPath": "tools/gravicentra-b4-003-cobros-scope-cache.test.cjs",
+    "qaBlobSha": "10e47d97a2eb2d987d39b535d3bcfe471cf57742",
+    "sourceOnly": true,
+    "globalProductMutationAuthorized": false,
+    "operationalWritesAuthorized": false,
+    "sharedRulesDeployAuthorized": false,
+    "livePromotionAuthorized": false,
+    "reimportAuthorized": false,
+    "acceptance": "PENDING_AUTHENTICATED_UAT"
   }
 }

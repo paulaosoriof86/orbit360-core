@@ -1,0 +1,34 @@
+{
+  "schema": "GI_B4_003_COBROS_SCOPE_CACHE_CAUSAL_REPAIR_V1",
+  "date": "2026-10-20",
+  "gate": "I6.5/B4-003",
+  "parentHead": "dfc1dc6d6024b51fa130e2ec1cf0dd391caa8703",
+  "status": "SCOPED_SOURCE_FIXED_SYNTHETIC_QA_PENDING_AUTHENTICATED_UAT",
+  "path": "orbit360-platform/modules/cobros.js",
+  "before": "ceb666bc1016c5365e420ad6791f112a947966a4",
+  "after": "e47d5463fbd89e556b02aa2ab0f5388a88bad825",
+  "testPath": "tools/gravicentra-b4-003-cobros-scope-cache.test.cjs",
+  "testSha": "10e47d97a2eb2d987d39b535d3bcfe471cf57742",
+  "rootCause": "country-only baseCache held a prior scoped-store aggregate through same-country active-role/UID change",
+  "observed": {
+    "before": 101,
+    "afterOld": 101,
+    "expectedAfterRole": 7,
+    "afterPatched": 7
+  },
+  "syntheticNoWrites": true,
+  "sourceOnly": true,
+  "productionPromotionAuthorized": false,
+  "sharedRulesDeployAuthorized": false,
+  "permissionsChanged": false,
+  "reimport": false,
+  "tasks": [
+    "C03.02",
+    "C03.05",
+    "C05.05",
+    "C08.06",
+    "C12.02"
+  ],
+  "findingLedgerPreserved": 295,
+  "uat5HistoricalEvidencePreserved": true
+}
