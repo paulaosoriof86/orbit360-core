@@ -4869,7 +4869,7 @@
       "entryGuardReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_ENTRY_GUARD_PASS_20261002.json",
       "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
       "executionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B4_EXECUTION_LOCK_20261002.json",
-      "executionLockBlobSha": "bf66174deacfa92c76c50a4d44b37fbf63684dff",
+      "executionLockBlobSha": "683178c87067b8d743e7f574b1589b717ae2d2f5",
       "compositionLockBlobSha": "016f251811f22bc4fc04b2a5f674dfe09243e605",
       "findingLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
       "activeFindingId": "B4-003",
@@ -6312,7 +6312,7 @@
     "status": "B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL",
     "activeFindingId": "B4-003",
     "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
-    "executionLockBlobSha": "bf66174deacfa92c76c50a4d44b37fbf63684dff",
+    "executionLockBlobSha": "683178c87067b8d743e7f574b1589b717ae2d2f5",
     "compositionLockBlobSha": "816309c63ed254d9b0e05cf63621c3d1c03cbfd5",
     "findingLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
     "noLive": true,
@@ -13353,6 +13353,40 @@
     "productionAcceptance": false,
     "previewAcceptance": false,
     "humanFunctionalAccepted": false,
-    "executionLockBlobSha": "bf66174deacfa92c76c50a4d44b37fbf63684dff"
+    "executionLockBlobSha": "683178c87067b8d743e7f574b1589b717ae2d2f5"
+  },
+  "b4003Uat5CausalPreviewAuthorization20261019": {
+    "status": "AUTHORIZED_EXACT_READONLY_PREVIEW",
+    "gate": "I6.5/B4-003",
+    "triggerSubject": "build(i6.5 B4-003): cumulative UAT5 causal read-only Preview",
+    "sourceFixReceiptBlobSha": "be6dd193f68aee5bce7febd0729124452dadc865",
+    "compositionBlobSha": "93ee0f0e259d82477f82512ff04ad6dd56f6cbd4",
+    "productBlobs": {
+      "orbit360-platform/data/store-firestore-product-readonly-p0.js": "eae7ee73df662fd4cde5ffa762a44d9a71168844",
+      "functions/b4-003-scoped-related-reader.js": "ae77e1e62f8fb940cf665b01c48d190c1457b66f",
+      "orbit360-platform/modules/renovaciones.js": "f2bad025390b919ed2589d9429f2a617f87affcf",
+      "orbit360-platform/modules/cliente360.js": "935c54d18da90b6f9dd1d7ba5c58672499c82ed7",
+      "orbit360-platform/modules/importar-p0-dashboard.js": "7e0be5f5474042d864a586f14b640cf4cba66a48",
+      "orbit360-platform/modules/importar.js": "47a77a7d819dcb4b8bb5a1c9dfc36014fc19af3e",
+      "orbit360-platform/styles/infra.css": "f676afd6feba0e40fff0864446884b278da5a923",
+      "orbit360-platform/index.html": "f0e80ec83c0e00057885e8a63c6bebefe53ed2b3"
+    },
+    "qaBlobs": {
+      "tools/gravicentra-b4-003-scoped-related-reader.test.cjs": "d32e4e6887dd2eb151d415b44ee05b0be3d58cca"
+    },
+    "rosterSourceBlobSha": "75ca53db55e2665123589b0e63253a8e4f8c377c",
+    "onlyReadOnlyFunctions": [
+      "orbit360ScopedPolicyReadPreview",
+      "orbit360AssignableAdvisorRosterPreview"
+    ],
+    "onlyExistingPreviewHosting": true,
+    "sharedRulesDeployAuthorized": false,
+    "otherFunctionsDeployAuthorized": false,
+    "operationalWritesAuthorized": false,
+    "configWritesAuthorized": false,
+    "livePromotionAuthorized": false,
+    "realUserImpersonationAuthorized": false,
+    "reimportAuthorized": false,
+    "authenticatedUatRequired": true
   }
 }

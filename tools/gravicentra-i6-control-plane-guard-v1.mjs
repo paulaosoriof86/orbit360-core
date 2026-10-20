@@ -94,6 +94,30 @@ if(FIX_ACTIVE){
  'B4_003_UAT5_SCOPED_SOURCE_BOUNDARY_OR_BLOB_DRIFT');
  console.log('B4_003_UAT5_SCOPED_SOURCE_VERIFIED_QA_PENDING_UAT_NO_LIVE');
 }
+
+const PREVIEW_AUTH=C.b4003Uat5CausalPreviewAuthorization20261019;
+if(PREVIEW_AUTH){
+ const p=PREVIEW_AUTH, q=B4.b4003Uat5CausalPreviewAuthorization20261019||{};
+ const product=Object.entries(p.productBlobs||{});
+ need(sameJson(p,q)&&p.status==='AUTHORIZED_EXACT_READONLY_PREVIEW'&&p.gate==='I6.5/B4-003'&&
+   p.triggerSubject==='build(i6.5 B4-003): cumulative UAT5 causal read-only Preview'&&
+   p.sourceFixReceiptBlobSha===FIX.receiptBlobSha&&
+   p.compositionBlobSha===git('hash-object',I6_CANONICAL_COMPOSITION)&&
+   p.onlyExistingPreviewHosting===true&&
+   product.length===8&&product.every(([path,sha])=>sha===FIX.sourceBlobs[path]&&git('hash-object',path)===sha)&&
+   sameJson(p.qaBlobs,FIX.qaBlobs)&&
+   p.rosterSourceBlobSha===git('hash-object','functions/assignable-advisor-roster.js')&&
+   sameJson(p.onlyReadOnlyFunctions,['orbit360ScopedPolicyReadPreview','orbit360AssignableAdvisorRosterPreview'])&&
+   p.sharedRulesDeployAuthorized===false&&p.otherFunctionsDeployAuthorized===false&&
+   p.operationalWritesAuthorized===false&&p.configWritesAuthorized===false&&
+   p.livePromotionAuthorized===false&&p.realUserImpersonationAuthorized===false&&p.reimportAuthorized===false&&
+   p.authenticatedUatRequired===true&&
+   B4.boundaries?.previewMutationAuthorized===true&&B4.boundaries?.functionDeploymentAuthorized===true&&
+   C.b4003SecurityReleaseHold?.status==='ACTIVE_FAIL_CLOSED_UNAUTHORIZED_BROWSER_FIRESTORE_READ_WRITE',
+   'B4_003_UAT5_NEW_EXACT_READONLY_PREVIEW_AUTH_INVALID');
+ console.log('B4_003_UAT5_EXACT_PREVIEW_AUTH=PASS_READONLY_LIVE_HOLD');
+}
+
 // Security release hold is subordinate to the same CONTROL_PLANE and B4 lock.
 // Historical PRODUCTION_ACCEPTED refers to an older certified artifact.
 // It never authorizes promotion of the current B4 candidate or overrides the

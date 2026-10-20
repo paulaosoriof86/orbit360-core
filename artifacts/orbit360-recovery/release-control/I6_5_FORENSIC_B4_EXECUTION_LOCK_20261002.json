@@ -3287,5 +3287,39 @@
     "productionAcceptance": false,
     "previewAcceptance": false,
     "humanFunctionalAccepted": false
+  },
+  "b4003Uat5CausalPreviewAuthorization20261019": {
+    "status": "AUTHORIZED_EXACT_READONLY_PREVIEW",
+    "gate": "I6.5/B4-003",
+    "triggerSubject": "build(i6.5 B4-003): cumulative UAT5 causal read-only Preview",
+    "sourceFixReceiptBlobSha": "be6dd193f68aee5bce7febd0729124452dadc865",
+    "compositionBlobSha": "93ee0f0e259d82477f82512ff04ad6dd56f6cbd4",
+    "productBlobs": {
+      "orbit360-platform/data/store-firestore-product-readonly-p0.js": "eae7ee73df662fd4cde5ffa762a44d9a71168844",
+      "functions/b4-003-scoped-related-reader.js": "ae77e1e62f8fb940cf665b01c48d190c1457b66f",
+      "orbit360-platform/modules/renovaciones.js": "f2bad025390b919ed2589d9429f2a617f87affcf",
+      "orbit360-platform/modules/cliente360.js": "935c54d18da90b6f9dd1d7ba5c58672499c82ed7",
+      "orbit360-platform/modules/importar-p0-dashboard.js": "7e0be5f5474042d864a586f14b640cf4cba66a48",
+      "orbit360-platform/modules/importar.js": "47a77a7d819dcb4b8bb5a1c9dfc36014fc19af3e",
+      "orbit360-platform/styles/infra.css": "f676afd6feba0e40fff0864446884b278da5a923",
+      "orbit360-platform/index.html": "f0e80ec83c0e00057885e8a63c6bebefe53ed2b3"
+    },
+    "qaBlobs": {
+      "tools/gravicentra-b4-003-scoped-related-reader.test.cjs": "d32e4e6887dd2eb151d415b44ee05b0be3d58cca"
+    },
+    "rosterSourceBlobSha": "75ca53db55e2665123589b0e63253a8e4f8c377c",
+    "onlyReadOnlyFunctions": [
+      "orbit360ScopedPolicyReadPreview",
+      "orbit360AssignableAdvisorRosterPreview"
+    ],
+    "onlyExistingPreviewHosting": true,
+    "sharedRulesDeployAuthorized": false,
+    "otherFunctionsDeployAuthorized": false,
+    "operationalWritesAuthorized": false,
+    "configWritesAuthorized": false,
+    "livePromotionAuthorized": false,
+    "realUserImpersonationAuthorized": false,
+    "reimportAuthorized": false,
+    "authenticatedUatRequired": true
   }
 }
