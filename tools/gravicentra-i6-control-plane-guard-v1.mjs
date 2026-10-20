@@ -58,6 +58,38 @@ const ACTIVE_I65_FORENSIC_B4=String(C.i65ForensicRemediationPlan?.b4?.executionL
 need(exists(ACTIVE_I65_FORENSIC_B4),'I6_5_B4_ACTIVE_LOCK_MISSING:'+ACTIVE_I65_FORENSIC_B4);
 const S=readJson(STATUS_LEDGER),A=readJson(AUTH_RECEIPT),M5=readJson(V5_MANIFEST),M6=readJson(V6_MANIFEST),M=readJson(V7_MANIFEST),FRA=readJson(I65_FORENSIC_AUDIT),FRP=readJson(I65_FORENSIC_PLAN),PAY=readJson(I65_PAYMENT_INFERENCE),B1=readJson(I65_FORENSIC_B1),B2=readJson(I65_FORENSIC_B2),B3=readJson(I65_FORENSIC_B3),B4=readJson(ACTIVE_I65_FORENSIC_B4);
 const COMP=readJson(I6_CANONICAL_COMPOSITION),FIND=readJson(I6_FINDINGS_LEDGER),FRP2=readJson(I65_FORENSIC_PLAN_V2),REJ=readJson(I65_B2_REJECTION),RCM=readJson(I65_B2_ROOT_CAUSE);
+const CACHE_PROOF=C.b4003CobrosCachePreviewProof20261020||{};
+if(CACHE_PROOF.status==='EXACT_TECHNICAL_PREVIEW_PASS_AUTHENTICATED_UAT_HOLD'){
+ const locked=B4.b4003CobrosCachePreviewProof20261020||{};
+ const readback=exists(CACHE_PROOF.receiptPath)?readJson(CACHE_PROOF.receiptPath):{};
+ need(sameJson(CACHE_PROOF,locked)&&
+  CACHE_PROOF.receiptPath==='artifacts/orbit360-recovery/release-control/I6_5_B4_003_COBROS_SCOPE_CACHE_TECHNICAL_PREVIEW_READBACK_20261020.json'&&
+  CACHE_PROOF.receiptBlobSha===git('hash-object',CACHE_PROOF.receiptPath)&&
+  readback.schema==='GRAVICENTRA_I6_5_B4_003_COBROS_SCOPE_CACHE_PREVIEW_READBACK_20261020_V1'&&
+  readback.runId===39438090400&&readback.sourceSha==='7240d02621526921035a2125b41ccc8f2d6ff0b8'&&
+  readback.previewChannelId==='gi-i65-b4-39438090400'&&
+  readback.buildId===CACHE_PROOF.buildId&&
+  readback.previewUrl===CACHE_PROOF.previewUrl&&
+  readback.artifactId===CACHE_PROOF.artifactId&&
+  readback.artifactArchiveDigest===CACHE_PROOF.artifactArchiveDigest&&
+  readback.backendSourceDigest===CACHE_PROOF.backendSourceDigest&&
+  readback.sourceProductBlobSha===git('hash-object','orbit360-platform/modules/cobros.js')&&
+  readback.qaTestBlobSha===git('hash-object','tools/gravicentra-b4-003-cobros-scope-cache.test.cjs')&&
+  readback.workflowConclusion==='success'&&readback.hostingReadbackExact===true&&
+  readback.publicAndEmulatorSmoke===true&&
+  sameJson(readback.deployedPreviewFunctions,['orbit360ScopedPolicyReadPreview','orbit360AssignableAdvisorRosterPreview'])&&
+  CACHE_PROOF.hostedReadbackExact===true&&CACHE_PROOF.publicAndEmulatorSmoke===true&&
+  CACHE_PROOF.authenticatedRoleCountryE2E===false&&CACHE_PROOF.humanFunctionalAccepted===false&&
+  readback.authenticatedRoleCountryE2E===false&&readback.humanFunctionalAccepted===false&&
+  readback.operationalBusinessWritesExecuted===0&&readback.productionPromotionAuthorized===false&&
+  C.currentB4?.executionLockBlobSha===git('hash-object',ACTIVE_I65_FORENSIC_B4)&&
+  C.i65ForensicRemediationPlan?.b4?.executionLockBlobSha===git('hash-object',ACTIVE_I65_FORENSIC_B4)&&
+  C.b4003SecurityReleaseHold?.status==='ACTIVE_FAIL_CLOSED_UNAUTHORIZED_BROWSER_FIRESTORE_READ_WRITE'&&
+  B4.boundaries?.productMutationAuthorized===false&&B4.boundaries?.dataMutationAuthorized===false&&
+  B4.boundaries?.livePromotionAuthorized===false&&FIND.findings.length===295,
+  'B4_003_COBROS_CACHE_EXACT_PREVIEW_PROOF_MISMATCH');
+ console.log('B4_003_COBROS_CACHE_EXACT_TECHNICAL_PREVIEW=PASS_AUTHENTICATED_UAT_HOLD');
+}
 const CACHE_PREVIEW=C.b4003CobrosCachePreviewAuthorization20261020||{};
 if(CACHE_PREVIEW.status==='AUTHORIZED_EXACT_READONLY_PREVIEW'){
  const locked=B4.b4003CobrosCachePreviewAuthorization20261020||{};
