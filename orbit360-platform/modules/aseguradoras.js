@@ -173,23 +173,37 @@ Orbit.modules.aseguradoras = (function () {
   function legacyType(cat){return Orbit.insurerSourceRegistry&&Orbit.insurerSourceRegistry.taxonomyId?Orbit.insurerSourceRegistry.taxonomyId(cat):(CAT_TO_TYPE[cat]||'otro_requiere_clasificacion');}
   function normalizarFuente(d,a){if(Orbit.insurerSourceRegistry&&typeof Orbit.insurerSourceRegistry.normalize==='function'){const n=Orbit.insurerSourceRegistry.normalize(d,a);return Object.assign({},d,n,{familiaProducto:d.familiaProducto||'',subtipoProducto:d.subtipoProducto||'',segmento:d.segmento||'',tipoRiesgo:d.tipoRiesgo||'',tipoVehiculo:d.tipoVehiculo||'',usoVehiculo:d.usoVehiculo||''});}return Object.assign({id:d.id,nombre:d.nombre||'Documento',cat:d.cat||'Otro/requiere clasificación',tipo:d.tipo||legacyType(d.cat),pais:d.pais||a.pais,moneda:d.moneda||(a.pais==='GT'?'GTQ':'COP'),ramo:d.ramo||'',producto:d.producto||'',plan:d.plan||'',estado:d.estado||'Documento recibido',version:d.version||1,vigencia:d.vigencia||''},d);}
   function sourceDimensions(d) { const o = {}; DIMENSION_KEYS.forEach(k => { if (d[k]) o[k] = d[k]; }); return o; }
+  // Insurer source aliases remain product-specific; do not use broad substring
+  // matching or extend country/role visibility. 'Auto', 'Vehículos' and
+  // 'Automóviles' are the documented names of the same vehicle insurance ramo.
+  function sameInsurerRamo(a,b){
+    const left=norm(a),right=norm(b);
+    if(!left||!right)return !left&&!right;
+    if(left===right)return true;
+    const motor=new Set(['auto','automovil','automoviles','vehiculo','vehiculos']);
+    return motor.has(left)&&motor.has(right);
+  }
   function sourceCombinationKey(d) { return DIMENSION_KEYS.map(k => d[k] || '—').join(' · '); }
   function groupLabel(key) { const parts=clean(key).split(' · ').filter(x=>x&&x!=='—'); return parts.join(' · ')||'Dimensiones pendientes'; }
   function sourceIdentity(item) { return clean(item && (item.documentId || item.sourceDocumentId || item.id || item.nombre || item.fileName || item.archivo)).toLowerCase(); }
   function uniqueText(values){return [...new Set([].concat(values||[]).map(clean).filter(Boolean))];}
   function productOptionsFor(a,ramo){
     let rows=[];try{rows=Orbit.cat&&typeof Orbit.cat.subramosDe==='function'?Orbit.cat.subramosDe(a.pais,ramo)||[]:[];}catch(e){}
-    [].concat(a.docsRequeridos||[],a.docs||[],knowledgeSources(a)||[]).forEach(x=>{if(!ramo||norm(x&&x.ramo)===norm(ramo)){if(x&&x.producto)rows.push(x.producto);}});
+    [].concat(a.docsRequeridos||[],a.docs||[],knowledgeSources(a)||[],knowledgeProductsFor(a)||[])
+      .forEach(x=>{if((!x?.pais||clean(x.pais).toUpperCase()===clean(a.pais).toUpperCase())&&(!ramo||sameInsurerRamo(x&&x.ramo,ramo))){if(x&&x.producto)rows.push(x.producto);}});
     return uniqueText(rows).sort((x,y)=>x.localeCompare(y,'es'));
   }
   function planOptionsFor(a,ramo,producto){
     const out=[];const det=a&&a.ramosDetalle&&a.ramosDetalle[ramo]||{},raw=det.planes||det.plan||[];
     [].concat(raw||[]).flatMap(v=>String(v||'').split(/[;,|]/)).map(clean).filter(Boolean).forEach(v=>out.push(v));
-    [].concat(a.docsRequeridos||[],a.docs||[],knowledgeSources(a)||[]).forEach(x=>{if((!ramo||norm(x&&x.ramo)===norm(ramo))&&(!producto||norm(x&&x.producto)===norm(producto))&&x&&x.plan)out.push(x.plan);});
+    [].concat(a.docsRequeridos||[],a.docs||[],knowledgeSources(a)||[],knowledgeProductsFor(a)||[])
+      .forEach(x=>{if(x&&(!x.pais||clean(x.pais).toUpperCase()===clean(a.pais).toUpperCase())&&(!ramo||sameInsurerRamo(x.ramo,ramo))&&(!producto||norm(x.producto)===norm(producto))){
+        [].concat(x.plan||[],x.planes||[]).forEach(value=>{if(typeof value==='string')out.push(value);});
+      }});
     return uniqueText(out).sort((x,y)=>x.localeCompare(y,'es'));
   }
   function commercialPlanCatalog(a,ramo){let out=[];try{out=out.concat(Orbit.cat&&Orbit.cat.get?Orbit.cat.get('planes')||[]:[]);}catch(e){}out=out.concat(planOptionsFor(a,ramo,''));return uniqueText(out).sort((x,y)=>x.localeCompare(y,'es'));}
-  function commercialProductCatalog(a,ramo){let out=[];try{out=Orbit.cat&&typeof Orbit.cat.subramosDe==='function'?Orbit.cat.subramosDe(a.pais,ramo)||[]:[];}catch(e){}if(!out.length){try{out=Orbit.cat&&Orbit.cat.get?Orbit.cat.get('productos')||[]:[];}catch(e){}}return uniqueText(out).sort((x,y)=>x.localeCompare(y,'es'));}
+  function commercialProductCatalog(a,ramo){let out=[];try{out=Orbit.cat&&typeof Orbit.cat.subramosDe==='function'?Orbit.cat.subramosDe(a.pais,ramo)||[]:[];}catch(e){}if(!out.length){try{out=Orbit.cat&&Orbit.cat.get?Orbit.cat.get('productos')||[]:[];}catch(e){}}return uniqueText(out.concat(productOptionsFor(a,ramo))).sort((x,y)=>x.localeCompare(y,'es'));}
   function selectedCommercialList(a,ramo,key,legacyKey){const det=a&&a.ramosDetalle&&a.ramosDetalle[ramo]||{},raw=det[key]!=null?det[key]:det[legacyKey];return uniqueText([].concat(raw||[]).flatMap(v=>String(v||'').split(/[;,|]/))).sort((x,y)=>x.localeCompare(y,'es'));}
   function multiCheckOptions(values,selected,attr,ramo){const chosen=new Set([].concat(selected||[]).map(clean));return '<div class="insurer-offering-checks">'+uniqueText(values).map(v=>'<label><input type="checkbox" '+attr+'="'+U.esc(ramo)+'" value="'+U.esc(v)+'" '+(chosen.has(clean(v))?'checked':'')+'><span>'+U.esc(v)+'</span></label>').join('')+'</div>';}
   function selectOptions(values,current,blank){return (blank!=null?'<option value="">'+U.esc(blank)+'</option>':'')+uniqueText(values).map(v=>'<option value="'+U.esc(v)+'" '+(clean(v)===clean(current)?'selected':'')+'>'+U.esc(v)+'</option>').join('');}
@@ -949,7 +963,7 @@ Orbit.modules.aseguradoras = (function () {
     const products=commercialProductCatalog(a,r),plans=commercialPlanCatalog(a,r);
     return `<section class="insurer-offering-card" data-offering-ramo="${U.esc(r)}"><div class="insurer-offering-head"><div><b>${U.esc(r)}</b><span>${selectedProducts.length} producto(s) · ${selectedPlans.length} plan(es)</span></div><label class="insurer-cotizador-toggle"><input type="checkbox" data-ramohab="${U.esc(r)}" ${hab ? 'checked' : ''} ${editing ? '' : 'disabled'}><span>${hab?'Disponible para Cotizador':'No habilitado para Cotizador'}</span></label></div>
       <div class="insurer-offering-meta"><label>Comisión %<input class="o-sel" type="number" min="0" max="100" step="0.5" data-ramopct="${U.esc(r)}" value="${pct}" ${editing ? '' : 'disabled'}></label><label>Segmento<select class="o-sel" data-ramoseg="${U.esc(r)}" ${editing ? '' : 'disabled'}>${selectOptions((Orbit.cat&&Orbit.cat.get?Orbit.cat.get('segmentos'):[]).filter(x=>typeof x==='string'),det.segmento||'','Seleccionar…')}</select></label></div>
-      <div class="insurer-offering-cols"><div><b>Productos</b><small>Catálogo del país y ramo</small>${editing?multiCheckOptions(products,selectedProducts,'data-ramoprod',r):(selectedProducts.map(v=>'<span class="badge neutral">'+U.esc(v)+'</span>').join('')||'<span class="muted">Sin productos seleccionados.</span>')}</div><div><b>Planes</b><small>Planes comerciales definidos para el tenant o documentados</small>${editing?multiCheckOptions(plans,selectedPlans,'data-ramoplancheck',r):(selectedPlans.map(v=>'<span class="badge neutral">'+U.esc(v)+'</span>').join('')||'<span class="muted">Sin planes específicos.</span>')}</div></div>
+      <div class="insurer-offering-cols"><div><b>Productos</b><small>Catálogo del país, ramo y evidencia documental; seleccionar no equivale a validar tarifas</small>${editing?multiCheckOptions(products,selectedProducts,'data-ramoprod',r):(selectedProducts.map(v=>'<span class="badge neutral">'+U.esc(v)+'</span>').join('')||'<span class="muted">Sin productos seleccionados.</span>')}</div><div><b>Planes</b><small>Planes comerciales definidos para el tenant o documentados</small>${editing?multiCheckOptions(plans,selectedPlans,'data-ramoplancheck',r):(selectedPlans.map(v=>'<span class="badge neutral">'+U.esc(v)+'</span>').join('')||'<span class="muted">Sin planes específicos.</span>')}</div></div>
     </section>`;
   }
   function reqRow(r, i, editing, a) {

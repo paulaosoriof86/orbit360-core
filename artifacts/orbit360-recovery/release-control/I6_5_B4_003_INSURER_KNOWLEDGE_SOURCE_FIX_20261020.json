@@ -1,0 +1,61 @@
+{
+  "schema": "GI_I65_B4003_INSURER_KNOWLEDGE_EXACT_SOURCE_REMEDIATION_V1",
+  "gate": "I6.5/B4-003",
+  "status": "SOURCE_STAGED_QA_PENDING",
+  "parentHead": "ebd8b6e6641737d19ee93b17b8ded5201de066e3",
+  "previousCompositionBlobSha": "93ee0f0e259d82477f82512ff04ad6dd56f6cbd4",
+  "previousExecutionLockBlobSha": "683178c87067b8d743e7f574b1589b717ae2d2f5",
+  "userIntent": "Continue existing I6.5/B4-003, repair insurer knowledge/product/plan presentation, preserve last-approved modules",
+  "sourceFiles": {
+    "orbit360-platform/modules/aseguradoras.js": {
+      "before": "9e56c296b55da499b52f42c462c668aa2f32eba7",
+      "after": "ed1c1376f632d4123c25eac0d5ab7bb005424f3b"
+    },
+    "orbit360-platform/index.html": {
+      "before": "f0e80ec83c0e00057885e8a63c6bebefe53ed2b3",
+      "after": "1399f035ca07a236f741b47824c947dec536144d"
+    }
+  },
+  "qaFiles": {
+    "tools/gravicentra-b4-003-insurer-source-catalog.test.cjs": {
+      "status": "NEW_EXACT_QA_BLOB",
+      "after": "d3d4f4bde99e6689c6cbad72b83628933992f750"
+    }
+  },
+  "rootCauses": [
+    {
+      "id": "R-01",
+      "owner": "orbit360-platform/modules/aseguradoras.js",
+      "cause": "commercialProductCatalog drops source-backed product candidates when tenant catalog is populated; Auto/Vehículos/Automóviles labels fail equality",
+      "remedy": "union insured source-backed product options with the existing tenant catalog and narrowly equivalent vehicle ramo names",
+      "expectedTest": "VM exact owner: documented GT Vehículos visible even when catalog nonempty; unrelated ramo and CO source excluded"
+    },
+    {
+      "id": "R-02",
+      "owner": "orbit360-platform/modules/aseguradoras.js",
+      "cause": "planOptionsFor ignores documented knowledgeProducts records and strict ramo mismatch hides supported plans",
+      "remedy": "include document-backed product plans scoped by insurer/country/ramo/product",
+      "expectedTest": "VM exact owner: Plan Premium and Plus visible for source-backed GT Auto; foreign plan unavailable"
+    }
+  ],
+  "preservation": {
+    "insurerDirectoryOwnerStable": true,
+    "tenantCatalogPreserved": true,
+    "selectedOffersNotModified": true,
+    "tariffValidationRequired": true,
+    "noAutomaticRateActivation": true,
+    "priorAcceptedB1B2B3Frozen": true,
+    "uat5Source": "ebd8b6e6641737d19ee93b17b8ded5201de066e3",
+    "authenticatedUatRequired": true
+  },
+  "boundaries": {
+    "operationalWrites": 0,
+    "firestoreRulesDeploys": 0,
+    "livePromotions": 0,
+    "configChanges": 0,
+    "realUserTokenIssuance": 0,
+    "reimport": false,
+    "sourceOnly": true
+  },
+  "next": "Run source VM + canonical guard, then one immutable isolated Preview and targeted UAT. Never call a synthetic test functional PASS."
+}

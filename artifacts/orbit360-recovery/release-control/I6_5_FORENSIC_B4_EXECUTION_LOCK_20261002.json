@@ -93,6 +93,7 @@
       "orbit360-platform/data/store-firestore-product-operational-p0.js",
       "orbit360-platform/data/store-firestore-product-readonly-p0.js",
       "orbit360-platform/index.html",
+      "orbit360-platform/modules/aseguradoras.js",
       "orbit360-platform/modules/cancelaciones.js",
       "orbit360-platform/modules/cliente360.js",
       "orbit360-platform/modules/equipo.js",
@@ -115,14 +116,15 @@
     "providerDeploymentAuthorized": true,
     "findingContinuityGuardRequired": true,
     "allowedQaFiles": [
+      ".github/workflows/gravicentra-b4-003-executor.yml",
+      "tools/gravicentra-b4-003-insurer-source-catalog.test.cjs",
+      "tools/gravicentra-b4-003-protected-hydration.test.cjs",
+      "tools/gravicentra-b4-003-role-first-paint-and-team-regression.test.cjs",
+      "tools/gravicentra-b4-003-scoped-related-reader.test.cjs",
       "tools/gravicentra-i6-5-b4-003-contract.mjs",
       "tools/gravicentra-i6-5-b4-003-preview-proof.mjs",
-      ".github/workflows/gravicentra-b4-003-executor.yml",
-      "tools/gravicentra-i6-control-plane-guard-v1.mjs",
       "tools/gravicentra-i6-5-b4-003-renewals-priority-preview-proof.mjs",
-      "tools/gravicentra-b4-003-protected-hydration.test.cjs",
-      "tools/gravicentra-b4-003-scoped-related-reader.test.cjs",
-      "tools/gravicentra-b4-003-role-first-paint-and-team-regression.test.cjs"
+      "tools/gravicentra-i6-control-plane-guard-v1.mjs"
     ],
     "renewalProductMutationAuthorized": false,
     "policyVisualMutationAuthorized": true,
@@ -3321,5 +3323,34 @@
     "realUserImpersonationAuthorized": false,
     "reimportAuthorized": false,
     "authenticatedUatRequired": true
+  },
+  "b4003InsurerKnowledgeSourcePatch20261020": {
+    "status": "SCOPED_INSURER_KNOWLEDGE_SOURCE_QA_PENDING_PREVIEW",
+    "gate": "I6.5/B4-003",
+    "previousCompositionBlobSha": "93ee0f0e259d82477f82512ff04ad6dd56f6cbd4",
+    "previousExecutionLockBlobSha": "683178c87067b8d743e7f574b1589b717ae2d2f5",
+    "sourceFiles": {
+      "orbit360-platform/modules/aseguradoras.js": {
+        "before": "9e56c296b55da499b52f42c462c668aa2f32eba7",
+        "after": "ed1c1376f632d4123c25eac0d5ab7bb005424f3b"
+      },
+      "orbit360-platform/index.html": {
+        "before": "f0e80ec83c0e00057885e8a63c6bebefe53ed2b3",
+        "after": "1399f035ca07a236f741b47824c947dec536144d"
+      }
+    },
+    "qaBlobs": {
+      "tools/gravicentra-b4-003-insurer-source-catalog.test.cjs": "d3d4f4bde99e6689c6cbad72b83628933992f750"
+    },
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_INSURER_KNOWLEDGE_SOURCE_FIX_20261020.json",
+    "receiptBlobSha": "ff1e2de70e298cf3a38fc5fcc468f7dbdbfba77f",
+    "sourceOnly": true,
+    "productSourceFixAuthorized": true,
+    "humanUatAccepted": false,
+    "securityHoldRetained": true,
+    "previewAcceptance": false,
+    "productionPromotion": false,
+    "operationalWrites": 0,
+    "compositionBlobSha": "f26be950b5eb2ecd320da350bae34f2845c75a2a"
   }
 }
