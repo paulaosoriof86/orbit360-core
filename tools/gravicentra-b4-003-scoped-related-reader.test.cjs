@@ -161,12 +161,16 @@ async function deny(fn,code){let thrown;try{await fn()}catch(e){thrown=e}assert.
   db,auth:{uid:'u1',token:{}},request:{tenantId,collection,activeRole:role,country:'GT',pageSize:50,...options}
  });
 
- // P0 startup pagination exception is clients-only; no elevated collection scope.
+ // UAT5 source paging optimization is an exact bounded financial-contract change, never wider role/country authorization.
  const fullClientPage=await flow('clientes','operativo',{pageSize:200});
  assert.equal(fullClientPage.ok,true,'CLIENTS_200_PAGE_AUTHORIZED_SCOPED');
  assert.ok(Array.isArray(fullClientPage.rows),'CLIENTS_ONLY_PAGE_SHAPE');checks++;
- await deny(()=>flow('cobros','operativo',{pageSize:200}),'PAGE_SIZE_INVALID');checks++;
- await deny(()=>flow('recibosEsperados','operativo',{pageSize:200}),'PAGE_SIZE_INVALID');checks++;
+ for(const coll of ['cobros','recibosEsperados','carteraPrimas','vehiculos']){
+   const page=await flow(coll,'operativo',{pageSize:200});
+   assert.equal(page.ok,true,'FINANCE_200_SCOPED_'+coll);checks++;
+   await deny(()=>flow(coll,'operativo',{pageSize:201}),'PAGE_SIZE_INVALID');checks++;
+ }
+ await deny(()=>flow('clientes','operativo',{pageSize:201}),'PAGE_SIZE_INVALID');checks++;
  await deny(()=>flow('cancelaciones','operativo',{pageSize:200}),'PAGE_SIZE_INVALID');checks++;
  console.log('B4_003_P0_SCOPED_CLIENT_200_SERVER_ONLY_PASS checks=4 no_firestore_writes');
  // P0 regression: financial and vehicle universes do not require
@@ -366,3 +370,45 @@ async function deny(fn,code){let thrown;try{await fn()}catch(e){thrown=e}assert.
  console.log('B4_003_RELATED_SERVER_BATCH_SCOPE_MOCK_PASS checks='+checks+' no Firebase writes');
  console.log('B4_003_RELATED_DOCUMENT_SERVER_SCOPE_MOCK_PASS checks='+checks+' no Firebase writes');
 })().catch(e=>{console.error(e);process.exitCode=1;});
+
+/* UAT5_ROUTE_AND_IMPORTER_CAUSAL_QA: runtime-owner tests, synthetic no writes. */
+{
+ const vm=require('node:vm');
+ const renew=fs.readFileSync('orbit360-platform/modules/renovaciones.js','utf8');
+ const a=renew.indexOf('  function scheduleReadinessRecheck(host,readiness){');
+ const b=renew.indexOf('  function humanCollection(name){',a);
+ assert.ok(a>=0&&b>a,'UAT5_RENEWALS_SOURCE_BOUNDS');
+ let latePaint=0,callback=null;
+ const context={READINESS_BUDGET_MS:8000,Math,Orbit:{route:{key:'renovaciones'}},
+  location:{hash:'#/renovaciones'},Date:{now:()=>0},
+  setTimeout:fn=>{callback=fn;return 1;},
+  clearTimeout:()=>{},render:()=>{latePaint++;}};
+ vm.runInNewContext('let readinessTimer=null;\n'+renew.slice(a,b)+'\nthis.qa=scheduleReadinessRecheck;',context);
+ context.qa({isConnected:true},{state:'pending',elapsedMs:0});
+ assert.equal(typeof callback,'function','UAT5_TIMER_NOT_INSTALLED');
+ context.Orbit.route.key='aseguradoras';context.location.hash='#/aseguradoras';
+ callback();assert.equal(latePaint,0,'UAT5_STALE_RENEWAL_ROUTE_MUST_NOT_OVERWRITE_CURRENT_ROUTE');
+ const importer=fs.readFileSync('orbit360-platform/modules/importar-p0-dashboard.js','utf8');
+ const snapshot={requiredCollections:['clientes'],optionalCollections:['recibosEsperados'],
+  serverConfirmedCollections:[],deniedCollections:[],snapshotErrors:{}};
+ const store={__productReadOnlyP0:true,_productStatus:()=>snapshot,all:()=>[]};
+ const win={Orbit:{store,ui:{esc:x=>String(x)}}};
+ vm.runInNewContext(importer,{window:win,Orbit:win.Orbit,console,WeakSet},{timeout:1000});
+ const layer=Array.from(win.Orbit.importarP0Dashboard.LAYERS).find(x=>x.id==='recibosEsperados');
+ const pending=win.Orbit.importarP0Dashboard.layerStats(layer);
+ assert.equal(pending.readiness,'pending');
+ assert.equal(pending.totalRows,null,'UAT5_UNCONFIRMED_RECEIPTS_NEVER_ZERO');
+ snapshot.deniedCollections=['recibosEsperados'];
+ assert.equal(win.Orbit.importarP0Dashboard.layerStats(layer).readiness,'unavailable');
+ snapshot.deniedCollections=[];snapshot.serverConfirmedCollections=['recibosEsperados'];
+ const confirmed=win.Orbit.importarP0Dashboard.layerStats(layer);
+ assert.equal(confirmed.readiness,'ready');assert.equal(confirmed.totalRows,0);
+ const c360=fs.readFileSync('orbit360-platform/modules/cliente360.js','utf8');
+ assert.match(c360,/receiptState === 'unavailable'/,'UAT5_RECEIPT_TERMINAL_BRANCH');
+ assert.match(c360,/data-c360-receipts-unavailable/,'UAT5_RECEIPT_FAIL_CLOSED');
+ const backend=fs.readFileSync('functions/b4-003-scoped-related-reader.js','utf8');
+ const protectedStore=fs.readFileSync('orbit360-platform/data/store-firestore-product-readonly-p0.js','utf8');
+ assert.match(backend,/await warmParents\(docs\)/,'UAT5_BACKEND_BATCH_LOOKUP');
+ assert.match(protectedStore,/\['vehiculos','recibosEsperados','carteraPrimas','cobros'\]\.includes\(collection\)/,'UAT5_BATCHED_FINANCE_PAGING');
+ console.log('UAT5_CAUSAL_SOURCE_QA_PASS route_stale_blocked importer_tri_state_readiness financial_200_scoped_no_data_writes');
+}

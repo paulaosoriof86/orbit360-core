@@ -553,9 +553,13 @@ Orbit.modules.cliente360 = (function () {
     else if (tab === 'recibos') {
       const ps = S() && typeof S()._productStatus === 'function' ? S()._productStatus() : {};
       const confirmed = ps.serverConfirmedCollections || [];
-      if (confirmed.indexOf('recibosEsperados') < 0 || confirmed.indexOf('carteraPrimas') < 0) {
-        body.setAttribute('data-c360-receipts-loading','1');
-        body.innerHTML = '<div class="card pad" data-c360-receipts-pending="1"><b>Cargando recibos…</b><div class="muted" style="margin-top:5px">Estamos validando el calendario y la cartera.</div></div>';
+      const receiptState = dataReadiness(['recibosEsperados','carteraPrimas']);
+      if (receiptState !== 'ready') {
+        ensureDataCollections(['recibosEsperados','carteraPrimas']);
+        body.setAttribute('data-c360-receipts-loading',receiptState);
+        body.innerHTML = receiptState === 'unavailable'
+          ? '<div class="card pad" data-c360-receipts-unavailable="1" data-readiness="unavailable"><b>No fue posible confirmar recibos y cartera</b><div class="muted" style="margin-top:5px">La lectura autorizada devolvió un error o una restricción. No se muestran cuotas ni saldos provisionales.</div></div>'
+          : '<div class="card pad" data-c360-receipts-pending="1" data-readiness="pending"><b>Cargando recibos…</b><div class="muted" style="margin-top:5px">Estamos validando el calendario y la cartera en la fuente canónica.</div></div>';
       } else {
         body.removeAttribute('data-c360-receipts-loading');
         const projection = Orbit.receiptsPortfolioProjection;

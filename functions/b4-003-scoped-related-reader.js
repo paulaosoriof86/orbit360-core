@@ -154,7 +154,7 @@ async function readScopedRelatedList({db,auth,request}){
  const pageSize=Number(q.pageSize==null?20:q.pageSize);
  if(!collections.has(coll))throw new Denied('COLLECTION_DENIED');
  if(!['GT','CO'].includes(country))throw new Denied('COUNTRY_DENIED');
- if(!Number.isInteger(pageSize)||pageSize<1||pageSize>(coll==='clientes'?200:50))throw new Denied('PAGE_SIZE_INVALID');
+ if(!Number.isInteger(pageSize)||pageSize<1||pageSize>((coll==='clientes'||financeCollections.has(coll))?200:50))throw new Denied('PAGE_SIZE_INVALID');
  if(policyId)safeId(policyId,'POLICY');
  if(hasBatch&&(!Array.isArray(q.policyIds)||policyIds.length<1||policyIds.length>10||
     new Set(policyIds).size!==policyIds.length||policyId))
@@ -210,6 +210,33 @@ async function readScopedRelatedList({db,auth,request}){
        .then(s=>s.exists?s.data()||{}:null));
      return parents.get(key);
    }
+   // UAT5: authorized parent verification is batched per raw page; no
+   // permissions or parent records are cached across HTTP requests.
+   async function warmParents(docs){
+     if(typeof db.getAll!=='function')return; // emulator fallback still verifies individually
+     const policies=new Set(),clients=new Set();
+     for(const d of docs){
+       const row=d.data()||{},pid=clean(row.polizaId||row.policyId),cid=clean(row.clienteId||row.clientId);
+       try{if(pid)safeId(pid,'RELATION');if(cid)safeId(cid,'RELATION');}
+       catch(e){if(e instanceof Denied)continue;throw e;}
+       if(pid)policies.add(pid);
+       if(cid)clients.add(cid);
+     }
+     async function prefetch(kind,ids){
+       const pending=Array.from(ids).filter(id=>!parents.has(kind+':'+id));
+       if(!pending.length)return;
+       const refs=pending.map(id=>docRef(tenant,kind,id));
+       const snapshots=await db.getAll(...refs);
+       if(!Array.isArray(snapshots)||snapshots.length!==refs.length)throw new Denied('PARENT_BATCH_READBACK_INVALID');
+       snapshots.forEach((snap,i)=>parents.set(kind+':'+pending[i],Promise.resolve(snap&&snap.exists?snap.data()||{}:null)));
+     }
+     await prefetch('polizas',policies);
+     for(const pid of policies){
+       const policy=await parents.get('polizas:'+pid),cid=clean(policy&&policy.clienteId);
+       if(cid){try{safeId(cid,'RELATION');clients.add(cid);}catch(e){if(!(e instanceof Denied))throw e;}}
+     }
+     await prefetch('clientes',clients);
+   }
    async function verifiedEvent(d){
      const row=d.data()||{},pid=clean(row.polizaId||row.policyId),
        inputCid=clean(row.clienteId||row.clientId);
@@ -248,6 +275,7 @@ async function readScopedRelatedList({db,auth,request}){
      if(!docs.length)break;
      scanned+=docs.length;
      if(scanned>MAX_SCANNED)throw new Denied('FINANCIAL_SCAN_BOUND_EXCEEDED');
+     await warmParents(docs);
      for(let n=0;n<docs.length;n+=PARENT_CONCURRENCY){
        const batch=await Promise.all(docs.slice(n,n+PARENT_CONCURRENCY).map(verifiedEvent));
        filtered.push(...batch.filter(Boolean));

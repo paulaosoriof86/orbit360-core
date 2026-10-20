@@ -58,6 +58,42 @@ const ACTIVE_I65_FORENSIC_B4=String(C.i65ForensicRemediationPlan?.b4?.executionL
 need(exists(ACTIVE_I65_FORENSIC_B4),'I6_5_B4_ACTIVE_LOCK_MISSING:'+ACTIVE_I65_FORENSIC_B4);
 const S=readJson(STATUS_LEDGER),A=readJson(AUTH_RECEIPT),M5=readJson(V5_MANIFEST),M6=readJson(V6_MANIFEST),M=readJson(V7_MANIFEST),FRA=readJson(I65_FORENSIC_AUDIT),FRP=readJson(I65_FORENSIC_PLAN),PAY=readJson(I65_PAYMENT_INFERENCE),B1=readJson(I65_FORENSIC_B1),B2=readJson(I65_FORENSIC_B2),B3=readJson(I65_FORENSIC_B3),B4=readJson(ACTIVE_I65_FORENSIC_B4);
 const COMP=readJson(I6_CANONICAL_COMPOSITION),FIND=readJson(I6_FINDINGS_LEDGER),FRP2=readJson(I65_FORENSIC_PLAN_V2),REJ=readJson(I65_B2_REJECTION),RCM=readJson(I65_B2_ROOT_CAUSE);
+// Historical UAT5 receipt is immutable. A later exact owner repair does not
+// erase those proofs or authorize LIVE / Firestore Rules changes.
+const FIX=C.b4003Uat5CausalSourcePatch20261019||{};
+const FIX_ACTIVE=FIX.status==='SCOPED_SOURCE_FIXED_QA_PENDING_EXACT_PREVIEW';
+if(FIX_ACTIVE){
+ const lf=B4.b4003Uat5CausalSourcePatch20261019||{};
+ const cf=COMP.b4003Uat5CausalSourcePatch20261019||{};
+ const receipt=exists(FIX.receiptPath)?readJson(FIX.receiptPath):{};
+ const productPaths=Object.keys(FIX.sourceBlobs||{}).sort(),qaPaths=Object.keys(FIX.qaBlobs||{}).sort();
+ need(FIX.gate==='I6.5/B4-003'&&FIX.sourceOnly===true&&FIX.approval==='USER_DIRECT_EXACT_SCOPED_B4_003'&&
+ FIX.previousCompBlobSha==='37fc6586672d9570c2affd4177d0da5dd5762c1b'&&
+ FIX.priorSourceSha==='7833d38452f2be4ed6d1dff4ec8ae91f0081665f'&&
+ receipt.uat5Source===FIX.priorSourceSha&&
+ FIX.receiptBlobSha===git('hash-object',FIX.receiptPath)&&
+ FIX.compositionBlobSha===git('hash-object',I6_CANONICAL_COMPOSITION)&&
+ FIX.executionLockBlobSha===git('hash-object',ACTIVE_I65_FORENSIC_B4)&&
+ C.canonicalAccumulationControl?.compositionLockBlobSha===FIX.compositionBlobSha&&
+ C.currentB4?.executionLockBlobSha===FIX.executionLockBlobSha&&
+ C.i65ForensicRemediationPlan?.b4?.executionLockBlobSha===FIX.executionLockBlobSha&&
+ sameJson(FIX.sourceBlobs,lf.sourceBlobs)&&sameJson(FIX.sourceBlobs,cf.sourceBlobs)&&
+ productPaths.length===8&&qaPaths.length===1&&
+ productPaths.every(path=>FIX.beforeBlobs[path]===receipt.sourceFiles?.[path]?.before&&
+ FIX.sourceBlobs[path]===receipt.sourceFiles?.[path]?.after&&
+ COMP.productFileBlobs?.[path]===FIX.sourceBlobs[path]&&
+ COMP.productFiles.includes(path)&&B4.boundaries.allowedProductFiles.includes(path)&&
+ git('hash-object',path)===FIX.sourceBlobs[path])&&
+ qaPaths.every(path=>FIX.qaBeforeBlobs[path]===receipt.qaFiles?.[path]?.before&&
+ FIX.qaBlobs[path]===receipt.qaFiles?.[path]?.after&&
+ B4.boundaries.allowedQaFiles.includes(path)&&git('hash-object',path)===FIX.qaBlobs[path])&&
+ C.b4003SecurityReleaseHold?.status==='ACTIVE_FAIL_CLOSED_UNAUTHORIZED_BROWSER_FIRESTORE_READ_WRITE'&&
+ C.i6Execution?.productMutationAuthorized===false&&B4.boundaries.productMutationAuthorized===false&&
+ B4.boundaries.dataMutationAuthorized===false&&B4.boundaries.businessWritesAuthorized===false&&
+ B4.boundaries.livePromotionAuthorized===false&&FIND.findings.length===295,
+ 'B4_003_UAT5_SCOPED_SOURCE_BOUNDARY_OR_BLOB_DRIFT');
+ console.log('B4_003_UAT5_SCOPED_SOURCE_VERIFIED_QA_PENDING_UAT_NO_LIVE');
+}
 // Security release hold is subordinate to the same CONTROL_PLANE and B4 lock.
 // Historical PRODUCTION_ACCEPTED refers to an older certified artifact.
 // It never authorizes promotion of the current B4 candidate or overrides the
@@ -157,16 +193,18 @@ if(String(C.i65ForensicRemediationPlan?.currentBlock||'')==='B4' &&
        'B4_003_P0_LOGIN_REMEDIATION_STATE_INVALID');
   need(Object.keys(clientRepair.sourceBlobs||{}).length===2 &&
        Object.keys(scoped.sourceBlobs||{}).length===2 &&
-       exact.every(p=>clientRepair.sourceBlobs[p]===git('hash-object',p)&&
+       exact.every(p=>clientRepair.sourceBlobs[p]===(FIX_ACTIVE?FIX.beforeBlobs[p]:git('hash-object',p))&&
           scoped.sourceBlobs[p]===clientRepair.sourceBlobs[p]&&
-          COMP.productFileBlobs?.[p]===clientRepair.sourceBlobs[p]&&
+          COMP.productFileBlobs?.[p]===(FIX_ACTIVE?FIX.sourceBlobs[p]:clientRepair.sourceBlobs[p])&&
+          git('hash-object',p)===COMP.productFileBlobs[p]&&
           scoped.beforeBlobs?.[p]&&scoped.beforeBlobs[p]!==clientRepair.sourceBlobs[p]),
        'B4_003_P0_LOGIN_OWNER_BLOB_NOT_PINNED');
-  need(qa.every(p=>clientRepair.qaBlobs?.[p]===git('hash-object',p)&&
-       scoped.qaBlobs?.[p]===clientRepair.qaBlobs[p]),
+  need(qa.every(p=>clientRepair.qaBlobs?.[p]===(FIX_ACTIVE?(FIX.qaBeforeBlobs[p]||git('hash-object',p)):git('hash-object',p))&&
+       scoped.qaBlobs?.[p]===clientRepair.qaBlobs[p]&&
+       git('hash-object',p)===(FIX_ACTIVE?(FIX.qaBlobs[p]||clientRepair.qaBlobs[p]):clientRepair.qaBlobs[p])),
        'B4_003_P0_LOGIN_QA_BLOB_NOT_PINNED');
-  need(clientRepair.compositionBlobSha===git('hash-object',I6_CANONICAL_COMPOSITION)&&
-       C.canonicalAccumulationControl?.compositionLockBlobSha===clientRepair.compositionBlobSha&&
+  need(clientRepair.compositionBlobSha===(FIX_ACTIVE?FIX.previousCompBlobSha:git('hash-object',I6_CANONICAL_COMPOSITION))&&
+       C.canonicalAccumulationControl?.compositionLockBlobSha===git('hash-object',I6_CANONICAL_COMPOSITION)&&
        scoped.compositionBlobSha===clientRepair.compositionBlobSha &&
        C.i6Execution?.productMutationAuthorized===false&&
        B4.boundaries?.productMutationAuthorized===false&&
@@ -261,8 +299,10 @@ if(String(C.i65ForensicRemediationPlan?.currentBlock||'')==='B4' &&
  const fields=Object.keys(stage.sourceBlobs||{});
  need(['EXACT_SCOPED_SOURCE_QA_PENDING_PREVIEW','EXACT_TECHNICAL_PREVIEW_PASS_FUNCTIONAL_UAT_HOLD'].includes(stage.status)
  &&fields.length===6
- &&fields.every(p=>COMP.productFileBlobs[p]===stage.sourceBlobs[p]&&git('hash-object',p)===stage.sourceBlobs[p])
- &&stage.compositionBlobSha===git('hash-object',I6_CANONICAL_COMPOSITION)
+ &&fields.every(p=>stage.sourceBlobs[p]===(FIX_ACTIVE?(FIX.beforeBlobs[p]||COMP.productFileBlobs[p]):COMP.productFileBlobs[p])&&
+  COMP.productFileBlobs[p]===(FIX_ACTIVE?(FIX.sourceBlobs[p]||stage.sourceBlobs[p]):stage.sourceBlobs[p])&&
+  git('hash-object',p)===COMP.productFileBlobs[p])
+ &&stage.compositionBlobSha===(FIX_ACTIVE?FIX.previousCompBlobSha:git('hash-object',I6_CANONICAL_COMPOSITION))
  &&stage.qaBlobSha===git('hash-object','tools/gravicentra-b4-003-uat5-display-contract.test.cjs')
  &&B4.boundaries.productMutationAuthorized===false
  &&C.b4003CurrentCumulativePreviewProof?.humanFunctionalAccepted===false

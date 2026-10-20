@@ -25,6 +25,16 @@ Orbit.importarP0Dashboard = (function () {
     return String(s == null ? '' : s).replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
   }
 
+  const observedHosts=new WeakSet();
+  function sourceReadiness(layer) {
+    const store=Orbit.store;
+    if(!store||store.__productReadOnlyP0!==true||typeof store._productStatus!=='function')return 'ready';
+    const ps=store._productStatus()||{};
+    const supported=[].concat(ps.requiredCollections||[],ps.optionalCollections||[]);
+    if(supported.length&&!supported.includes(layer.coll))return 'unavailable';
+    if([].concat(ps.deniedCollections||[]).includes(layer.coll)||(ps.snapshotErrors||{})[layer.coll])return 'unavailable';
+    return [].concat(ps.serverConfirmedCollections||[]).includes(layer.coll)?'ready':'pending';
+  }
   function rows(coll) {
     try { return Orbit.store && Orbit.store.all ? Orbit.store.all(coll) || [] : []; }
     catch (e) { return []; }
@@ -40,26 +50,31 @@ Orbit.importarP0Dashboard = (function () {
   }
 
   function layerStats(layer) {
-    const rs = rows(layer.coll);
-    const warn = rs.filter(layer.warn || (() => false)).length;
-    const pending = rs.filter(r => /pendiente|probable|esperado|validacion/i.test(String(r.estado || r.estadoCartera || r.estadoConciliacion || r.estadoFactura || r.estadoComision || ''))).length;
-    const total = rs.reduce((sum, r) => sum + amountOf(r), 0);
-    const cur = (rs.find(r => r.moneda) || {}).moneda || '';
-    return { totalRows: rs.length, warn, pending, amount: total, currency: cur };
+    const readiness=sourceReadiness(layer);
+    if(readiness!=='ready')return {readiness,totalRows:null,warn:null,pending:null,amount:null,currency:'',byCurrency:{}};
+    const rs=rows(layer.coll);
+    const warn=rs.filter(layer.warn || (()=>false)).length;
+    const pending=rs.filter(r=>/pendiente|probable|esperado|validacion/i.test(String(r.estado||r.estadoCartera||r.estadoConciliacion||r.estadoFactura||r.estadoComision||''))).length;
+    const byCurrency={};rs.forEach(r=>{const cur=String(r.moneda||'SIN_MONEDA').toUpperCase();byCurrency[cur]=(byCurrency[cur]||0)+amountOf(r);});
+    const cur=Object.keys(byCurrency).length===1?Object.keys(byCurrency)[0]:'';
+    return {readiness,totalRows:rs.length,warn,pending,amount:cur?byCurrency[cur]:null,currency:cur,byCurrency};
   }
 
   function card(layer) {
     const s = layerStats(layer);
-    const tone = s.warn ? 'warn' : s.totalRows ? 'ok' : 'info';
-    return `<button class="p0d-card" data-layer="${esc(layer.id)}">
+    const tone=s.readiness!=='ready'?'info':s.warn?'warn':s.totalRows?'ok':'info';
+    const moneyLabel=Object.entries(s.byCurrency||{}).map(([cur,n])=>money(n,cur)).join(' · ')||'—';
+    return `<button class="p0d-card" data-layer="${esc(layer.id)}" data-import-source-state="${s.readiness}">
       <span class="p0d-title">${esc(layer.title)}</span>
-      <b>${s.totalRows}</b>
-      <small>${s.warn ? s.warn + ' requiere validacion' : (s.pending ? s.pending + ' pendiente' : 'sin alertas')}</small>
-      <em class="badge ${tone}">${s.amount ? money(s.amount, s.currency) : '—'}</em>
+      <b>${s.readiness==='ready'?s.totalRows:(s.readiness==='pending'?'Por confirmar':'No disponible')}</b>
+      <small>${s.readiness==='ready'?(s.warn?s.warn+' requiere validación':s.pending?s.pending+' pendiente':'Sin alertas'):'Sin lectura canónica confirmada'}</small>
+      <em class="badge ${tone}">${s.readiness==='ready'?esc(moneyLabel):'—'}</em>
     </button>`;
   }
 
   function table(layer) {
+    const readiness=sourceReadiness(layer);
+    if(readiness!=='ready')return '<div class="cfg-note" data-import-unconfirmed="'+readiness+'">'+(readiness==='unavailable'?'Fuente no disponible para este acceso.':'Esperando la confirmación del servidor.')+' No se asume que la fuente esté vacía ni se inicia una nueva importación.</div>';
     const rs = rows(layer.coll).slice(0, 80);
     if (!rs.length) return `<div class="cfg-note">Sin registros en <b>${esc(layer.title)}</b>. Se llenara al importar/dry-run fuentes reales validadas.</div>`;
     return `<div style="overflow:auto;max-height:360px"><table class="tbl" style="min-width:920px"><thead><tr>
@@ -78,9 +93,11 @@ Orbit.importarP0Dashboard = (function () {
   function render(host) {
     const activeId = host.dataset.p0Layer || LAYERS[0].id;
     const active = LAYERS.find(x => x.id === activeId) || LAYERS[0];
-    const totals = LAYERS.map(layerStats).reduce((acc, s) => {
-      acc.rows += s.totalRows; acc.warn += s.warn; acc.pending += s.pending; return acc;
-    }, { rows: 0, warn: 0, pending: 0 });
+    try{if(Orbit.store&&typeof Orbit.store._ensureCollections==='function')Orbit.store._ensureCollections([active.coll]);}catch(_){}
+    const totals=LAYERS.map(layerStats).reduce((acc,s)=>{
+      if(s.readiness!=='ready'){acc.unconfirmed++;return acc;}
+      acc.rows+=s.totalRows;acc.warn+=s.warn;acc.pending+=s.pending;return acc;
+    },{rows:0,warn:0,pending:0,unconfirmed:0});
 
     host.innerHTML = `<div class="card pad" style="margin-top:22px;border:1px solid var(--line)">
       <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-wrap:wrap">
@@ -90,7 +107,7 @@ Orbit.importarP0Dashboard = (function () {
           <p class="muted" style="margin:6px 0 0;max-width:780px;font-size:13px;line-height:1.5">Controla las capas creadas por importadores antes de operar con datos reales. Nada en este tablero confirma pagos, crea finmovs definitivos ni reemplaza validacion humana.</p>
         </div>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
-          <span class="badge info">${totals.rows} registros</span>
+          <span class="badge info">${totals.rows} registros confirmados${totals.unconfirmed?' · '+totals.unconfirmed+' fuentes sin confirmar':''}</span>
           <span class="badge warn">${totals.warn} alertas</span>
           <span class="badge info">${totals.pending} pendientes</span>
         </div>
@@ -112,6 +129,21 @@ Orbit.importarP0Dashboard = (function () {
     }));
   }
 
-  function mount(host) { if (host) render(host); }
+  function mount(host) {
+    if(!host)return;
+    if(!observedHosts.has(host)){
+      observedHosts.add(host);
+      const store=Orbit.store;
+      if(store&&typeof store.on==='function'){
+        let off=null;
+        off=store.on('*',collection=>{
+          if(!host.isConnected){if(off)off();off=null;return;}
+          const layer=LAYERS.find(x=>x.id===(host.dataset.p0Layer||LAYERS[0].id))||LAYERS[0];
+          if(collection==='*'||collection===layer.coll)render(host);
+        });
+      }
+    }
+    render(host);
+  }
   return { mount, render, LAYERS, layerStats };
 })();

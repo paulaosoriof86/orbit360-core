@@ -1397,3 +1397,8 @@ a.fh-chip:hover{border-color:var(--red);color:var(--red)}
 @media(prefers-reduced-motion:reduce){
  .gi-insurance-analysis .gi-analysis-bar{transition:none}
 }
+
+/* UAT5: preserve 58px of real shell space when mobile search is expanded. */
+@media(max-width:560px){
+  .topbar:has(.tb-search.mobile-open) + #shell{padding-top:calc(var(--topbar-h) + 58px)!important}
+}

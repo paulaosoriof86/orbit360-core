@@ -32,7 +32,7 @@ Orbit.modules.renovaciones = (function () {
   function scheduleReadinessRecheck(host,readiness){
     if(readinessTimer||!host||readiness.state!=='pending')return;
     const remaining=Math.max(0,READINESS_BUDGET_MS-Number(readiness.elapsedMs||0));
-    readinessTimer=setTimeout(()=>{readinessTimer=null;if(host.isConnected)render(host);},remaining+20);
+    readinessTimer=setTimeout(()=>{readinessTimer=null;if(host.isConnected&&Orbit.route?.key==='renovaciones'&&String(location.hash||'').startsWith('#/renovaciones'))render(host);},remaining+20);
   }
   function humanCollection(name){return({polizas:'pólizas',clientes:'clientes',aseguradoras:'aseguradoras'})[name]||name;}
   /* B4-003: nunca presentar como completa una búsqueda con datos sin hidratar. */

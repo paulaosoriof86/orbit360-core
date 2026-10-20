@@ -146,7 +146,7 @@ Orbit.modules.importar = (function () {
     if (Orbit.importarP0Dashboard) { if (onload) onload(); return; }
     if (Orbit.__importarP0DashboardLoader) return;
     Orbit.__importarP0DashboardLoader = true;
-    addScript('modules/importar-p0-dashboard.js?v=20260709', onload);
+    addScript('modules/importar-p0-dashboard.js?v=20261019-b4003-uat5-causal', onload);
   }
 
   function loadP0Confirmacion(onload) {
