@@ -1,0 +1,139 @@
+{
+  "schemaVersion": "GI_I65_B4003_AUTO39012_DOCUMENTARY_SOURCE_READBACK_V1",
+  "gate": "I6.5/B4-003",
+  "status": "SOURCE_IDENTITIES_DISTINCT_PREMIUM_WRITE_HOLD",
+  "mode": "READ_ONLY_EVIDENCE_APPEND_ONLY",
+  "preCommitHead": "d562d5de4b17dc11b646f2aac4fb46b116097f08",
+  "uat5Source": "7833d38452f2be4ed6d1dff4ec8ae91f0081665f",
+  "controlPlane": "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json",
+  "authorities": [
+    {
+      "file": "Polizas (16).xlsx",
+      "sha256": "e68bfd576b28b01d2839d8c3a22e547d8905f1eaeb84d1d7ffc3a0082960c2a7",
+      "rows": [
+        290,
+        291
+      ]
+    },
+    {
+      "file": "Reporte-2026-09-18-061226.xlsx",
+      "sha256": "5681c8d92c94ddd9aa904cede6157004726d70d6da86e179aca6e933f05a000a",
+      "rows": "39012:701,789,...,1187; AUTO39012:702,790,...,1159"
+    },
+    {
+      "file": "ORBIT360-AYS-POLIZAS-CANONICAL-PRIVATE-20260730.xlsx",
+      "sha256": "b63c5d10be40fcd4039be1b7844cafb0bf45c2a9904dd47ad65443b5fb43a89f",
+      "driveId": "1NXHACZ11815882AhoyGrQQCb9Amgbi95",
+      "sheet": "PoliciesToCreate",
+      "rows": [
+        285,
+        1162
+      ],
+      "nature": "PREWRITE_CANONICAL_NO_WRITES"
+    },
+    {
+      "file": "ORBIT360-AYS-RECIBOS-CARTERA-CANONICAL-PRIVATE-20260730.xlsx",
+      "sha256": "e64e75f78f6a64101627a9a860db566a95b83677fcf20eeb05be44c6f3f6a1d7",
+      "driveId": "1cttFAW4atpv8y9GAl5xrx26ojTDxQhYV",
+      "sheet": "Recibos_Calendario",
+      "rows": "39012:239-250; AUTO39012:1003-1012",
+      "nature": "SOURCE_RECONCILED_READ_ONLY"
+    },
+    {
+      "file": "Estado de cuenta AseGuate a 23 de junio.PDF",
+      "sha256": "ca916e35bfafcc678acd3317c62122626e9d40f83a96c947df334a8aa821028e",
+      "driveId": "1JAt5HEE_n0dDLfOSN9_gbQJqgX1n_oiu",
+      "page": 3,
+      "nature": "PRIMARY_INSURER_PENDING_BALANCE_AT_2026-06-23"
+    },
+    {
+      "file": "Planilla AseGuate.pdf",
+      "sha256": "d06b2f91127c05fed596763d181fa3234bbdc20bb41a446671c2f1538d60fbc0",
+      "driveId": "1LjQMBzN9ydUOdK8mxTLeLcdU1U4u6bJZ",
+      "page": 1,
+      "nature": "PRIMARY_INSURER_JULY_COMMISSION_EVIDENCE"
+    },
+    {
+      "file": "Planilla Aseguradora Guatemalteca.pdf",
+      "sha256": "0a874fbeac65c8d875d077c74f78f10ef814c0c2ae602a408cebf6be9f41c49d",
+      "driveId": "193joPHtfcbzGC9ycaIcDo3Ii_xmBqNPx",
+      "page": 1,
+      "nature": "PRIMARY_INSURER_AUGUST_COMMISSION_EVIDENCE_READ_ONLY"
+    }
+  ],
+  "canonicalPrewrite": [
+    {
+      "sourceReference": "39012",
+      "policyId": "pol_cdc32b549eb7c0732a9ef8b1626e",
+      "clientId": "cli_pol_38b5a6429eb2f0cbbe615347d440",
+      "premiumNetGTQ": 1800,
+      "premiumTotalGTQ": 2678.51,
+      "sourceInstallments": 12,
+      "sourceReceiptSumGTQ": 2678.48,
+      "paymentChannel": "Depósito",
+      "policyRow": 285
+    },
+    {
+      "sourceReference": "AUTO39012",
+      "policyId": "pol_6e62faaefa973c666a5fc797ebf3",
+      "clientId": "cli_pol_13786f3a1fb70ef7a2e6d9500595",
+      "premiumNetGTQ": 1800,
+      "premiumTotalGTQ": 2678.53,
+      "sourceInstallments": 10,
+      "sourceReceiptSumGTQ": 2678.5,
+      "paymentChannel": "Transferencia",
+      "policyRow": 1162
+    }
+  ],
+  "issuerProof": {
+    "issuerPolicyNumber": "39012",
+    "issuerRamo": "AUTO",
+    "parsingWarning": "AUTO is the separate insurance RAMO, not an insurer PDF policy prefix",
+    "insurerIdentityMatch": "INSURED_AND_TEN_INSTALLMENTS_MATCH_SOURCE_AUTO39012_NOT_SOURCE_39012",
+    "pendingAsOf20260623GTQ": 1071.42,
+    "pendingInstallments": [
+      "7/10",
+      "8/10",
+      "9/10",
+      "10/10"
+    ],
+    "pendingAmountsGTQ": [
+      267.85,
+      267.85,
+      267.85,
+      267.87
+    ],
+    "commissionPaidJul2026Installments": [
+      7,
+      8
+    ],
+    "commissionAug2026InstallmentsReadOnly": [
+      9
+    ],
+    "interpretation": "Balance not annual premium; commission payments not proof of premium composition"
+  },
+  "uat4GoldenReadback": {
+    "source": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CHROME_UAT_READONLY_20261019.md",
+    "candidate": "125a3f314cb23aa128951ad714c95f143de64abb",
+    "premiumNetGTQ": 1800,
+    "observedFirestorePremiumTotalGTQ": 2116.8,
+    "financeGTQ": 90,
+    "ivaGTQ": 226.8,
+    "uat5LiveReadback": "NOT_YET_VERIFIED"
+  },
+  "numericFingerprint": {
+    "sourceOwner": "orbit360-platform/core/primas.js",
+    "formula": "1800 + (1800*0.05) + ((1800+90)*0.12) = 2116.80",
+    "classification": "FORMULA_EQUALS_OBSERVED_AMOUNT_WRITE_CALLPATH_NOT_PROVEN"
+  },
+  "requiredNextProof": "Exact Firestore before/after and last writer provenance; insurer contractual original/endorsement; compare persisted receipt IDs with historical 12 and 10 source schedules, no source-data mutation.",
+  "forbidden": [
+    "MERGE_BY_STRIPPING_AUTO",
+    "PREMIUM_REWRITE_2116_80_TO_2678_53",
+    "REIMPORT_RECEIPTS",
+    "AUGUST_APPLY",
+    "LIVE_PROMOTION",
+    "FIRESTORE_RULE_CHANGE"
+  ],
+  "qa": "SOURCE_ONLY_VERIFIED_DOCUMENTARY_READBACK; NOT_UAT5_FUNCTIONAL_PASS"
+}
