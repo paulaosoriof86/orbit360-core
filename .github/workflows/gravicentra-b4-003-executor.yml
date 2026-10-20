@@ -411,7 +411,43 @@ jobs:
             && l.boundaries?.businessWritesAuthorized===false&&l.boundaries?.syntheticQaWritesAuthorized===false
             && l.boundaries?.reimportAuthorized===false&&l.boundaries?.livePromotionAuthorized===false;
           if(currentSubject===insurerAuth.triggerSubject&&!insurerScoped)throw Error('B4_003_INSURER_KNOWLEDGE_READONLY_PREVIEW_DENIED');
-          const scopedPreview=priorScopedPreview||onePassInternal||oct15ScopedReadback||restrictedScoped||c03Scoped||uatScoped||currentScoped||causalScoped||insurerScoped;
+          const cacheStage=c.b4003CobrosScopeCacheFix20261020||{},cacheAuth=c.b4003CobrosCachePreviewAuthorization20261020||{},cacheLock=l.b4003CobrosCachePreviewAuthorization20261020||{};
+          const cacheScoped=currentSubject===cacheAuth.triggerSubject
+            && cacheAuth.status==='AUTHORIZED_EXACT_READONLY_PREVIEW'
+            && cacheLock.status===cacheAuth.status
+            && cacheLock.triggerSubject===cacheAuth.triggerSubject
+            && cacheAuth.gate==='I6.5/B4-003'
+            && cacheStage.status==='SCOPED_COBROS_SCOPE_CACHE_SOURCE_FIXED_QA_PENDING_EXACT_PREVIEW'
+            && cacheAuth.sourceFixReceiptBlobSha===cacheStage.receiptBlobSha
+            && cacheAuth.sourceParentHead==='dec9cca0a09626fd244f19eefeb531fdf852a941'
+            && cacheAuth.sourcePath==='orbit360-platform/modules/cobros.js'
+            && cacheAuth.sourceBlobSha===cacheStage.sourceBlobAfter
+            && cacheAuth.sourceBlobSha===productSha(cacheAuth.sourcePath)
+            && cacheAuth.qaBlobSha===productSha(cacheAuth.qaPath)
+            && cacheAuth.qaBlobSha===cacheStage.qaBlobSha
+            && cacheAuth.centralGuardRunId===39436838311
+            && cacheAuth.centralGuardConclusion==='success'
+            && cacheAuth.compositionBlobSha===productSha('artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json')
+            && cacheAuth.compositionBlobSha===c.canonicalAccumulationControl?.compositionLockBlobSha
+            && cacheAuth.rosterSourceBlobSha===productSha('functions/assignable-advisor-roster.js')
+            && Array.isArray(cacheAuth.onlyReadOnlyFunctions)
+            && cacheAuth.onlyReadOnlyFunctions.join(',')==='orbit360ScopedPolicyReadPreview,orbit360AssignableAdvisorRosterPreview'
+            && cacheAuth.isolatedHostingOnly===true
+            && cacheAuth.sharedRulesDeployAuthorized===false&&cacheAuth.otherFunctionsDeployAuthorized===false
+            && cacheAuth.operationalWritesAuthorized===false&&cacheAuth.configWritesAuthorized===false
+            && cacheAuth.syntheticQaWritesAuthorized===false&&cacheAuth.livePromotionAuthorized===false
+            && cacheAuth.realUserImpersonationAuthorized===false&&cacheAuth.reimportAuthorized===false
+            && cacheAuth.authenticatedUatRequired===true&&cacheAuth.wholeCapabilityAccepted===false
+            && c.currentB4?.status==='B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL'
+            && c.nextAction==='I6_5_FORENSIC_REMEDIATION_B4_003_R20_TARGETED_PAULA_VISUAL'
+            && c.b4003SecurityReleaseHold?.status==='ACTIVE_FAIL_CLOSED_UNAUTHORIZED_BROWSER_FIRESTORE_READ_WRITE'
+            && l.activeFinding?.id==='B4-003'
+            && l.boundaries?.previewMutationAuthorized===true&&l.boundaries?.functionDeploymentAuthorized===true
+            && l.boundaries?.productMutationAuthorized===false&&l.boundaries?.dataMutationAuthorized===false
+            && l.boundaries?.businessWritesAuthorized===false&&l.boundaries?.syntheticQaWritesAuthorized===false
+            && l.boundaries?.livePromotionAuthorized===false;
+          if(currentSubject===cacheAuth.triggerSubject&&!cacheScoped)throw Error('B4_003_COBROS_CACHE_EXACT_PREVIEW_GATE_DENIED');
+          const scopedPreview=priorScopedPreview||onePassInternal||oct15ScopedReadback||restrictedScoped||c03Scoped||uatScoped||currentScoped||causalScoped||insurerScoped||cacheScoped;
           const previewOk=(r19Preview||r20Preview||r23Preview)
             && l.activeFinding?.id==='B4-003'
             && l.boundaries?.businessWritesAuthorized===false
@@ -608,7 +644,7 @@ jobs:
             uat.sourceBlobs['functions/assignable-advisor-roster.js']===rosterBlob
             && uat.onlyTwoReadOnlyFunctions===true;
           const readonlyRoster=scopedPreview&&rosterAuth.status==='AUTHORIZED_EXACT_PREVIEW_READONLY_ROSTER_ONLY'
-            && (rosterAuth.sourceBlobSha===rosterBlob||c03RosterReady||uatRosterReady||(currentScoped&&currentPreviewIntent.rosterSourceBlobSha===rosterBlob)||(causalScoped&&ca.rosterSourceBlobSha===rosterBlob)||(insurerScoped&&insurerAuth.rosterSourceBlobSha===rosterBlob))
+            && (rosterAuth.sourceBlobSha===rosterBlob||c03RosterReady||uatRosterReady||(currentScoped&&currentPreviewIntent.rosterSourceBlobSha===rosterBlob)||(causalScoped&&ca.rosterSourceBlobSha===rosterBlob)||(insurerScoped&&insurerAuth.rosterSourceBlobSha===rosterBlob)||(cacheScoped&&cacheAuth.rosterSourceBlobSha===rosterBlob))
             && rosterAuth.service==='orbit360AssignableAdvisorRosterPreview'
             && rosterAuth.businessWritesAuthorized===false
             && rosterAuth.otherFunctionsDeployAuthorized===false
@@ -617,7 +653,7 @@ jobs:
             && c.b4003SecurityReleaseHold?.status==='ACTIVE_FAIL_CLOSED_UNAUTHORIZED_BROWSER_FIRESTORE_READ_WRITE'
             && l.boundaries?.previewMutationAuthorized===true
             && l.boundaries?.realOperationalWritesAuthorized===false;
-          if((currentSubject===requestedOct15Subject||c03Scoped||uatScoped||currentScoped||causalScoped||insurerScoped)&&scopedPreview&&!readonlyRoster)
+          if((currentSubject===requestedOct15Subject||c03Scoped||uatScoped||currentScoped||causalScoped||insurerScoped||cacheScoped)&&scopedPreview&&!readonlyRoster)
             throw Error('B4_003_DASHBOARD_READONLY_PREVIEW_SYNC_NOT_AUTHORIZED');
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'readonly_roster='+(readonlyRoster?'true':'false')+'\n');
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'scoped_preview='+(scopedPreview?'true':'false')+'\n');

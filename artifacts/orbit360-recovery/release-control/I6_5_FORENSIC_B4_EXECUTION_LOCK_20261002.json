@@ -3406,5 +3406,37 @@
     "reimportAuthorized": false,
     "acceptance": "PENDING_AUTHENTICATED_UAT",
     "compositionBlobSha": "4563979caadd63cb4897304c60df7a087cac024c"
+  },
+  "b4003CobrosCachePreviewAuthorization20261020": {
+    "status": "AUTHORIZED_EXACT_READONLY_PREVIEW",
+    "gate": "I6.5/B4-003",
+    "triggerSubject": "build(i6.5 B4-003): exact Cobros scoped finance Preview",
+    "sourceParentHead": "dec9cca0a09626fd244f19eefeb531fdf852a941",
+    "sourceFixReceiptBlobSha": "942d9318cfa78b9ecdbe7f57aabc9a14ac676a7d",
+    "sourceBlobSha": "e47d5463fbd89e556b02aa2ab0f5388a88bad825",
+    "sourcePath": "orbit360-platform/modules/cobros.js",
+    "qaBlobSha": "10e47d97a2eb2d987d39b535d3bcfe471cf57742",
+    "qaPath": "tools/gravicentra-b4-003-cobros-scope-cache.test.cjs",
+    "centralGuardRunId": 39436838311,
+    "centralGuardConclusion": "success",
+    "compositionBlobSha": "4563979caadd63cb4897304c60df7a087cac024c",
+    "rosterSourceBlobSha": "a2f5d110201eb83cb0c72f7d716443c3b08c4d49",
+    "onlyReadOnlyFunctions": [
+      "orbit360ScopedPolicyReadPreview",
+      "orbit360AssignableAdvisorRosterPreview"
+    ],
+    "isolatedHostingOnly": true,
+    "sharedRulesDeployAuthorized": false,
+    "otherFunctionsDeployAuthorized": false,
+    "operationalWritesAuthorized": false,
+    "configWritesAuthorized": false,
+    "syntheticQaWritesAuthorized": false,
+    "livePromotionAuthorized": false,
+    "realUserImpersonationAuthorized": false,
+    "reimportAuthorized": false,
+    "authenticatedUatRequired": true,
+    "wholeCapabilityAccepted": false,
+    "authorizationReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_COBROS_SCOPE_CACHE_PREVIEW_AUTH_20261020.json",
+    "authorizationReceiptBlobSha": "a58fcd0edcb6502348187541a8549c89fa01732f"
   }
 }
