@@ -382,9 +382,20 @@ Orbit.modules.cobros = (function () {
     const crmDirect = reported.filter(x => x.__crmDirectEvidence), paidReceiptFallback = reported.filter(x => x.__paidReceiptEvidence), advisorReported = reported.filter(x => x.__advisorReportedEvidence), clientReported = reported.filter(x => x.__clientReportedEvidence);
     const allRowsUnfiltered = qaReceipt ? (qaSurfaceRow ? [qaSurfaceRow] : []) : authoritative.concat(portfolioOnly, reported).sort((a, b) => String(a.vence || '').localeCompare(String(b.vence || '')));
     const allRows = qaReceipt ? allRowsUnfiltered.filter(row => receiptIdOf(row) === qaReceipt) : allRowsUnfiltered;
-    const overdueCobrosCount=qaReceipt?0:authoritative.filter(row=>row.estado==='Vencido').length;
-    const hasPortfolioOverdue=hyd.financialReady&&Object.values(cart.byCurrency||{}).some(value=>Number(value&&value.venc||0)!==0);
-    const overdueUnmatchedWarning=hyd.financialReady&&overdueCobrosCount>0&&!hasPortfolioOverdue;
+    // Visibility contract only: the overdue AMOUNT belongs to Cartera Primas.
+    // Compare every visible Vencido row (including projected receipts) by
+    // currency, so GTQ overdue cannot conceal a COP mismatch under TODOS.
+    const overdueVisibleByCurrency={};
+    if(!qaReceipt&&hyd.financialReady)allRows.filter(row=>row.estado==='Vencido').forEach(row=>{
+      const policy=indexPolicy(idx,row.polizaId);
+      const cur=String(row.moneda||(policy&&(policy.moneda||policy.divisa))||'SIN_MONEDA').trim().toUpperCase()||'SIN_MONEDA';
+      overdueVisibleByCurrency[cur]=(overdueVisibleByCurrency[cur]||0)+1;
+    });
+    const overdueUnmatchedCurrencies=hyd.financialReady?Object.entries(overdueVisibleByCurrency)
+      .filter(([cur])=>Number(cart&&cart.byCurrency&&cart.byCurrency[cur]&&cart.byCurrency[cur].venc||0)<=0):[];
+    const overdueUnmatchedCount=overdueUnmatchedCurrencies.reduce((sum,[,n])=>sum+n,0);
+    const overdueUnmatchedWarning=overdueUnmatchedCount>0;
+    const overdueUnmatchedDescription=overdueUnmatchedCurrencies.map(([cur,n])=>cur+': '+n).join(' · ');
     const totalPages = Math.max(1, Math.ceil(allRows.length / PAGE_SIZE));
     if (st.page > totalPages) st.page = totalPages;
     if (st.page < 1) st.page = 1;
@@ -413,7 +424,7 @@ Orbit.modules.cobros = (function () {
         { label: 'Vencido', val: 'Actualizando datos', color: 'var(--line)', foot: 'confirmando cartera' },
         { label: 'Por conciliar', val: 'Actualizando datos', color: 'var(--line)', foot: 'confirmando pagos' }
       ])}
-      ${overdueUnmatchedWarning ? `<div class="card" data-cobros-aging-universe-mismatch="${overdueCobrosCount}" style="padding:12px 14px;margin-bottom:14px;border-left:3px solid var(--warn)"><b>Cobros vencidos pendientes de conciliación de fuente</b><div class="muted" style="margin-top:4px">${overdueCobrosCount} registro(s) aparecen como Vencido en Cobros; el indicador de importe vencido corresponde a Cartera Primas y no presenta saldo en el alcance seleccionado. Verificar correspondencia por recibo y póliza, sin inferir ni duplicar deuda.</div></div>` : ''}
+      ${overdueUnmatchedWarning ? `<div class="card" data-cobros-aging-universe-mismatch="${overdueUnmatchedCount}" data-cobros-aging-mismatch-currencies="${U.esc(overdueUnmatchedCurrencies.map(([cur])=>cur).join(','))}" style="padding:12px 14px;margin-bottom:14px;border-left:3px solid var(--warn)"><b>Cobros vencidos: correspondencia de cartera por confirmar</b><div class="muted" style="margin-top:4px">${overdueUnmatchedCount} fila(s) marcadas Vencido en Cobros (${U.esc(overdueUnmatchedDescription)}), pero Cartera Primas no registra importe vencido para esas monedas en el alcance seleccionado. El estado operativo y el saldo financiero son fuentes distintas. Verifica las relaciones por recibo y póliza antes de interpretar esto como deuda, duplicidad o pérdida.</div></div>` : ''}
       ${crmDirect.length ? `<div class="card" data-siga-payments-note="1" style="padding:11px 14px;margin-bottom:14px;border-left:3px solid var(--ok)"><b>${crmDirect.length} pagos registrados en SIGA</b><div class="muted" style="font-size:12px;margin-top:3px">Pagos según fuente SIGA: en este subconjunto hay <b>${crmDirect.filter(x=>!x.conciliado).length}</b> pendientes de conciliación y <b>${crmDirect.filter(x=>x.conciliado).length}</b> ya conciliados. No requieren aplicación manual.</div></div>` : ''}
       ${advisorReported.length ? `<div class="card" data-advisor-payments-note="1" style="padding:11px 14px;margin-bottom:14px;border-left:3px solid var(--info)"><b>${advisorReported.length} pago(s) reportado(s) por asesor</b><div class="muted" style="font-size:12px;margin-top:3px">El reporte no aplica el pago. Operativo valida la correspondencia desde Ops y luego aplica el mismo pago sin duplicarlo.</div></div>` : ''}
       ${clientReported.length ? `<div class="card" data-reported-payments-note="1" style="padding:11px 14px;margin-bottom:14px;border-left:3px solid var(--info)"><b>${clientReported.length} pago(s) reportado(s) realmente desde portal</b><div class="muted" style="font-size:12px;margin-top:3px">Cuando el recibo coincide de forma única y válida, el pago se aplica automáticamente. Solo los casos ambiguos o contradictorios quedan para revisión.</div></div>` : ''}

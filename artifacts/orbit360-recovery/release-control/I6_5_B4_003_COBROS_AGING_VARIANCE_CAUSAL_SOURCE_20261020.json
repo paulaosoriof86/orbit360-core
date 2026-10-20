@@ -1,0 +1,41 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_COBROS_AGING_VARIANCE_CAUSAL_SOURCE_V1",
+  "gate": "I6.5/B4-003",
+  "date": "2026-10-20",
+  "status": "SCOPED_SOURCE_FIXED_QA_PENDING_EXACT_CUMULATIVE_PREVIEW_AND_CHROME_UAT",
+  "parentHead": "80408604052a14d3a19294e4e2bb88e16fcba89b",
+  "owner": "orbit360-platform/modules/cobros.js",
+  "sourceBefore": "6b3892ab83ef7974fbae20e0b1ee15b32d62f08f",
+  "sourceAfter": "4ce62cade91e84a6230e5429a3f3b54b53c3ae07",
+  "qaPath": "tools/gravicentra-b4-003-cobros-aging-variance.test.cjs",
+  "qaBlobSha": "7935baa4b3ddf9512f3cb526cc19b70d12725530",
+  "cause": "The discrepancy warning checked authoritative Cobros rows only and tested whether ANY currency had canonical overdue money. Three projected receipt rows in COP with zero COP aging were omitted; a nonzero GTQ overdue amount additionally masked the COP discrepancy in TODOS.",
+  "evidence": {
+    "uatRun": 39490359753,
+    "uatSource": "46823b9f618da867321025e4d9601fa97005c708",
+    "uatStatus": "PARTIAL_REJECTED",
+    "roleCountry": "Dirección/CO;Operativo/CO;Dirección/TODOS",
+    "observedPortfolioRowsMarkedOverdue": 3,
+    "observedCopOverdueAmount": 0,
+    "syntheticPriorWarningCount": 0,
+    "syntheticNewWarningCount": 3
+  },
+  "scope": "Display discrepancy only; no change to financial amount, payment identity, country authorization, persistence, permissions, or reconciliation status",
+  "frozenTaskIds": [
+    "C03.02",
+    "C08.01",
+    "C08.06",
+    "C11.02",
+    "C12.02"
+  ],
+  "sourceOnly": true,
+  "dataWrites": 0,
+  "realUserTokenIssuance": false,
+  "noReimport": true,
+  "sharedRulesDeploy": false,
+  "livePromotion": false,
+  "moduleFunctionalPass": false,
+  "authUatRequired": true,
+  "wholeSecurityHold": true,
+  "technicalPreviewRequired": true
+}

@@ -227,7 +227,7 @@
     "orbit360-platform/modules/cancelaciones.js": "f14842484b464da6296a10459eb523d2b056ed98",
     "orbit360-platform/modules/cliente360.js": "935c54d18da90b6f9dd1d7ba5c58672499c82ed7",
     "orbit360-platform/modules/cobros-cartera-i65-closure-bridge.js": "45e95a42596a27008e67a3cd6cd4601ea8ca6cb8",
-    "orbit360-platform/modules/cobros.js": "6b3892ab83ef7974fbae20e0b1ee15b32d62f08f",
+    "orbit360-platform/modules/cobros.js": "4ce62cade91e84a6230e5429a3f3b54b53c3ae07",
     "orbit360-platform/modules/comisiones.js": "5b26dfc1cf2331af99eadb7a71f8348c9c053594",
     "orbit360-platform/modules/conciliaciones.js": "3b77b2cff04e2f10ab78541d8802c191901de240",
     "orbit360-platform/modules/configuracion.js": "bc30918ac226d0f510fa180141a30af8ff8a7933",
@@ -6342,5 +6342,26 @@
     "livePromotionAuthorized": false,
     "reimportAuthorized": false,
     "authenticatedUatAccepted": false
+  },
+  "b4003CobrosAgingVarianceFix20261020": {
+    "status": "SCOPED_COBROS_AGING_VARIANCE_SOURCE_FIXED_QA_PENDING_PREVIEW",
+    "gate": "I6.5/B4-003",
+    "approval": "USER_UAT6_HANDOFF_IN_EXISTING_B4_003",
+    "sourceOnly": true,
+    "parentHead": "80408604052a14d3a19294e4e2bb88e16fcba89b",
+    "sourcePath": "orbit360-platform/modules/cobros.js",
+    "sourceBlobBefore": "6b3892ab83ef7974fbae20e0b1ee15b32d62f08f",
+    "sourceBlobAfter": "4ce62cade91e84a6230e5429a3f3b54b53c3ae07",
+    "qaPath": "tools/gravicentra-b4-003-cobros-aging-variance.test.cjs",
+    "qaBlobSha": "7935baa4b3ddf9512f3cb526cc19b70d12725530",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_COBROS_AGING_VARIANCE_CAUSAL_SOURCE_20261020.json",
+    "receiptBlobSha": "8ae26444ebd532bdaca33300d36f8a344bea0f2d",
+    "previousCompositionBlobSha": "45352e79f74d9f5ed35b1b2e1b22ef52ac800039",
+    "previousExecutionLockBlobSha": "c821fd7628b7e1fadad243c42f7bfd9b9d3c97df",
+    "operationalWritesAuthorized": false,
+    "sharedRulesDeployAuthorized": false,
+    "livePromotionAuthorized": false,
+    "reimportAuthorized": false,
+    "humanUatAccepted": false
   }
 }

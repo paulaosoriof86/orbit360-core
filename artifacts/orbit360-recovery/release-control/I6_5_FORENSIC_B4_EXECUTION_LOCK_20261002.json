@@ -127,7 +127,8 @@
       "tools/gravicentra-i6-5-b4-003-renewals-priority-preview-proof.mjs",
       "tools/gravicentra-i6-control-plane-guard-v1.mjs",
       "tools/gravicentra-b4-003-cobros-scope-cache.test.cjs",
-      "tools/gravicentra-b4-003-country-finance-parity.test.cjs"
+      "tools/gravicentra-b4-003-country-finance-parity.test.cjs",
+      "tools/gravicentra-b4-003-cobros-aging-variance.test.cjs"
     ],
     "renewalProductMutationAuthorized": false,
     "policyVisualMutationAuthorized": true,
@@ -619,7 +620,7 @@
   },
   "findingLedgerBlobSha": "8125e97dcf1feb7f46081f95327952e65c2d1077",
   "continuityRegisterBlobSha": "4e6b0ac51736be360c4b95abe8fc01d8f1e78e20",
-  "compositionLockBlobSha": "45352e79f74d9f5ed35b1b2e1b22ef52ac800039",
+  "compositionLockBlobSha": "da8ffd0c253db638666059d34193cd3275d6e870",
   "r18SourceFix": {
     "status": "SOURCE_FIXED_R18_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_SOURCE_FIX_20261005.json",
@@ -3522,5 +3523,27 @@
     "wholeCapabilityAccepted": false,
     "authorizationReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_COUNTRY_FINANCE_PREVIEW_AUTH_20261020.json",
     "authorizationReceiptBlobSha": "a410a3fe979e5aa56400c4039949afcce23dae45"
+  },
+  "b4003CobrosAgingVarianceFix20261020": {
+    "status": "SCOPED_COBROS_AGING_VARIANCE_SOURCE_FIXED_QA_PENDING_PREVIEW",
+    "gate": "I6.5/B4-003",
+    "approval": "USER_UAT6_HANDOFF_IN_EXISTING_B4_003",
+    "sourceOnly": true,
+    "parentHead": "80408604052a14d3a19294e4e2bb88e16fcba89b",
+    "sourcePath": "orbit360-platform/modules/cobros.js",
+    "sourceBlobBefore": "6b3892ab83ef7974fbae20e0b1ee15b32d62f08f",
+    "sourceBlobAfter": "4ce62cade91e84a6230e5429a3f3b54b53c3ae07",
+    "qaPath": "tools/gravicentra-b4-003-cobros-aging-variance.test.cjs",
+    "qaBlobSha": "7935baa4b3ddf9512f3cb526cc19b70d12725530",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_COBROS_AGING_VARIANCE_CAUSAL_SOURCE_20261020.json",
+    "receiptBlobSha": "8ae26444ebd532bdaca33300d36f8a344bea0f2d",
+    "previousCompositionBlobSha": "45352e79f74d9f5ed35b1b2e1b22ef52ac800039",
+    "previousExecutionLockBlobSha": "c821fd7628b7e1fadad243c42f7bfd9b9d3c97df",
+    "operationalWritesAuthorized": false,
+    "sharedRulesDeployAuthorized": false,
+    "livePromotionAuthorized": false,
+    "reimportAuthorized": false,
+    "humanUatAccepted": false,
+    "compositionBlobSha": "da8ffd0c253db638666059d34193cd3275d6e870"
   }
 }
