@@ -91,6 +91,7 @@
       "orbit360-platform/core/router.js",
       "orbit360-platform/core/tenant-access-policy-contract-p0.js",
       "orbit360-platform/data/store-firestore-product-operational-p0.js",
+      "orbit360-platform/data/store-firestore-product-readonly-p0.js",
       "orbit360-platform/index.html",
       "orbit360-platform/modules/cancelaciones.js",
       "orbit360-platform/modules/cliente360.js",

@@ -4869,7 +4869,7 @@
       "entryGuardReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_ENTRY_GUARD_PASS_20261002.json",
       "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
       "executionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B4_EXECUTION_LOCK_20261002.json",
-      "executionLockBlobSha": "c58633cb7a19f8c3ce2976efc2be90f4c7412aa0",
+      "executionLockBlobSha": "bf66174deacfa92c76c50a4d44b37fbf63684dff",
       "compositionLockBlobSha": "016f251811f22bc4fc04b2a5f674dfe09243e605",
       "findingLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
       "activeFindingId": "B4-003",
@@ -6312,7 +6312,7 @@
     "status": "B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL",
     "activeFindingId": "B4-003",
     "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
-    "executionLockBlobSha": "c58633cb7a19f8c3ce2976efc2be90f4c7412aa0",
+    "executionLockBlobSha": "bf66174deacfa92c76c50a4d44b37fbf63684dff",
     "compositionLockBlobSha": "816309c63ed254d9b0e05cf63621c3d1c03cbfd5",
     "findingLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
     "noLive": true,
@@ -13353,6 +13353,6 @@
     "productionAcceptance": false,
     "previewAcceptance": false,
     "humanFunctionalAccepted": false,
-    "executionLockBlobSha": "c58633cb7a19f8c3ce2976efc2be90f4c7412aa0"
+    "executionLockBlobSha": "bf66174deacfa92c76c50a4d44b37fbf63684dff"
   }
 }
