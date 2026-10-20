@@ -3352,5 +3352,35 @@
     "productionPromotion": false,
     "operationalWrites": 0,
     "compositionBlobSha": "e100a88bc817a80a9fcbcaf2ff9356ab0eb58b3f"
+  },
+  "b4003InsurerKnowledgePreviewAuthorization20261020": {
+    "status": "AUTHORIZED_EXACT_READONLY_PREVIEW",
+    "gate": "I6.5/B4-003",
+    "triggerSubject": "build(i6.5 B4-003): exact insurer knowledge Preview",
+    "sourceReceiptBlobSha": "c3120fcff1c0d0bf8604238a41f58ea8b062cef7",
+    "compositionBlobSha": "e100a88bc817a80a9fcbcaf2ff9356ab0eb58b3f",
+    "sourceBlobs": {
+      "orbit360-platform/modules/aseguradoras.js": "ed1c1376f632d4123c25eac0d5ab7bb005424f3b",
+      "orbit360-platform/index.html": "1399f035ca07a236f741b47824c947dec536144d"
+    },
+    "qaBlobs": {
+      "tools/gravicentra-b4-003-insurer-source-catalog.test.cjs": "06d6cfe1989abb65170051c06785cbcb9d1bd2c0"
+    },
+    "rosterSourceBlobSha": "75ca53db55e2665123589b0e63253a8e4f8c377c",
+    "onlyReadOnlyFunctions": [
+      "orbit360ScopedPolicyReadPreview",
+      "orbit360AssignableAdvisorRosterPreview"
+    ],
+    "sharedRulesDeployAuthorized": false,
+    "operationalWritesAuthorized": false,
+    "configWritesAuthorized": false,
+    "livePromotionAuthorized": false,
+    "realUserImpersonationAuthorized": false,
+    "reimportAuthorized": false,
+    "authenticatedUatRequired": true,
+    "sourceOnly": false,
+    "buildDispatchAuthorized": true,
+    "previewIsolated": true,
+    "productionAccepted": false
   }
 }

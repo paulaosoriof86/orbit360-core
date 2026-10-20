@@ -379,7 +379,39 @@ jobs:
             && l.boundaries?.syntheticQaWritesAuthorized===false
             && l.boundaries?.livePromotionAuthorized===false;
           if(currentSubject===ca.triggerSubject&&!causalScoped)throw Error('B4_003_UAT5_CAUSAL_PREVIEW_SCOPE_DENIED');
-          const scopedPreview=priorScopedPreview||onePassInternal||oct15ScopedReadback||restrictedScoped||c03Scoped||uatScoped||currentScoped||causalScoped;
+          // B4-003 insurer knowledge source successor, READ-ONLY exact Preview.
+          const insurerAuth=c.b4003InsurerKnowledgePreviewAuthorization20261020||{};
+          const insurerLock=l.b4003InsurerKnowledgePreviewAuthorization20261020||{};
+          const insurerStage=c.b4003InsurerKnowledgeSourcePatch20261020||{};
+          const insurerScoped=currentSubject===insurerAuth.triggerSubject
+            && insurerAuth.status==='AUTHORIZED_EXACT_READONLY_PREVIEW'
+            && insurerLock.status===insurerAuth.status
+            && insurerLock.triggerSubject===insurerAuth.triggerSubject
+            && insurerAuth.gate==='I6.5/B4-003'
+            && insurerStage.status==='SCOPED_INSURER_KNOWLEDGE_SOURCE_QA_PENDING_PREVIEW'
+            && insurerAuth.sourceReceiptBlobSha===insurerStage.receiptBlobSha
+            && insurerAuth.compositionBlobSha===productSha('artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json')
+            && insurerAuth.compositionBlobSha===c.canonicalAccumulationControl?.compositionLockBlobSha
+            && Object.keys(insurerAuth.sourceBlobs||{}).length===2
+            && Object.entries(insurerAuth.sourceBlobs||{}).every(([path,sha])=>
+              insurerStage.sourceFiles?.[path]?.after===sha&&sha===productSha(path)&&l.boundaries?.allowedProductFiles?.includes(path))
+            && Object.keys(insurerAuth.qaBlobs||{}).length===1
+            && Object.entries(insurerAuth.qaBlobs||{}).every(([path,sha])=>
+              sha===productSha(path)&&l.boundaries?.allowedQaFiles?.includes(path))
+            && insurerAuth.rosterSourceBlobSha===productSha('functions/assignable-advisor-roster.js')
+            && Array.isArray(insurerAuth.onlyReadOnlyFunctions)
+            && insurerAuth.onlyReadOnlyFunctions.join(',')==='orbit360ScopedPolicyReadPreview,orbit360AssignableAdvisorRosterPreview'
+            && insurerAuth.sharedRulesDeployAuthorized===false&&insurerAuth.operationalWritesAuthorized===false
+            && insurerAuth.configWritesAuthorized===false&&insurerAuth.livePromotionAuthorized===false
+            && insurerAuth.realUserImpersonationAuthorized===false&&insurerAuth.reimportAuthorized===false
+            && c.currentB4?.status==='B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL'
+            && c.nextAction==='I6_5_FORENSIC_REMEDIATION_B4_003_R20_TARGETED_PAULA_VISUAL'
+            && c.b4003SecurityReleaseHold?.status==='ACTIVE_FAIL_CLOSED_UNAUTHORIZED_BROWSER_FIRESTORE_READ_WRITE'
+            && l.boundaries?.productMutationAuthorized===false&&l.boundaries?.dataMutationAuthorized===false
+            && l.boundaries?.businessWritesAuthorized===false&&l.boundaries?.syntheticQaWritesAuthorized===false
+            && l.boundaries?.reimportAuthorized===false&&l.boundaries?.livePromotionAuthorized===false;
+          if(currentSubject===insurerAuth.triggerSubject&&!insurerScoped)throw Error('B4_003_INSURER_KNOWLEDGE_READONLY_PREVIEW_DENIED');
+          const scopedPreview=priorScopedPreview||onePassInternal||oct15ScopedReadback||restrictedScoped||c03Scoped||uatScoped||currentScoped||causalScoped||insurerScoped;
           const previewOk=(r19Preview||r20Preview||r23Preview)
             && l.activeFinding?.id==='B4-003'
             && l.boundaries?.businessWritesAuthorized===false
@@ -576,7 +608,7 @@ jobs:
             uat.sourceBlobs['functions/assignable-advisor-roster.js']===rosterBlob
             && uat.onlyTwoReadOnlyFunctions===true;
           const readonlyRoster=scopedPreview&&rosterAuth.status==='AUTHORIZED_EXACT_PREVIEW_READONLY_ROSTER_ONLY'
-            && (rosterAuth.sourceBlobSha===rosterBlob||c03RosterReady||uatRosterReady||(currentScoped&&currentPreviewIntent.rosterSourceBlobSha===rosterBlob)||(causalScoped&&ca.rosterSourceBlobSha===rosterBlob))
+            && (rosterAuth.sourceBlobSha===rosterBlob||c03RosterReady||uatRosterReady||(currentScoped&&currentPreviewIntent.rosterSourceBlobSha===rosterBlob)||(causalScoped&&ca.rosterSourceBlobSha===rosterBlob)||(insurerScoped&&insurerAuth.rosterSourceBlobSha===rosterBlob))
             && rosterAuth.service==='orbit360AssignableAdvisorRosterPreview'
             && rosterAuth.businessWritesAuthorized===false
             && rosterAuth.otherFunctionsDeployAuthorized===false
@@ -585,7 +617,7 @@ jobs:
             && c.b4003SecurityReleaseHold?.status==='ACTIVE_FAIL_CLOSED_UNAUTHORIZED_BROWSER_FIRESTORE_READ_WRITE'
             && l.boundaries?.previewMutationAuthorized===true
             && l.boundaries?.realOperationalWritesAuthorized===false;
-          if((currentSubject===requestedOct15Subject||c03Scoped||uatScoped||currentScoped||causalScoped)&&scopedPreview&&!readonlyRoster)
+          if((currentSubject===requestedOct15Subject||c03Scoped||uatScoped||currentScoped||causalScoped||insurerScoped)&&scopedPreview&&!readonlyRoster)
             throw Error('B4_003_DASHBOARD_READONLY_PREVIEW_SYNC_NOT_AUTHORIZED');
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'readonly_roster='+(readonlyRoster?'true':'false')+'\n');
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'scoped_preview='+(scopedPreview?'true':'false')+'\n');

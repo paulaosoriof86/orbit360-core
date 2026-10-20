@@ -95,6 +95,32 @@ if(INS_ACTIVE){
  execFileSync(process.execPath,['tools/gravicentra-b4-003-insurer-source-catalog.test.cjs'],{stdio:'inherit'});
  console.log('B4_003_INSURER_KNOWLEDGE_SOURCE_QA_PASS_PREVIEW_AND_LIVE_HOLD');
 }
+const INS_PREVIEW=C.b4003InsurerKnowledgePreviewAuthorization20261020||{};
+if(INS_PREVIEW.status==='AUTHORIZED_EXACT_READONLY_PREVIEW'){
+ const lockPreview=B4.b4003InsurerKnowledgePreviewAuthorization20261020||{};
+ const receipt=exists(INS.receiptPath)?readJson(INS.receiptPath):{};
+ const paths=Object.keys(INS_PREVIEW.sourceBlobs||{}).sort();
+ need(INS_ACTIVE&&sameJson(INS_PREVIEW,lockPreview)&&
+ INS_PREVIEW.gate==='I6.5/B4-003'&&
+ INS_PREVIEW.triggerSubject==='build(i6.5 B4-003): exact insurer knowledge Preview'&&
+ INS_PREVIEW.sourceReceiptBlobSha===INS.receiptBlobSha&&
+ INS_PREVIEW.compositionBlobSha===git('hash-object',I6_CANONICAL_COMPOSITION)&&
+ paths.length===2&&
+ paths.every(path=>INS_PREVIEW.sourceBlobs[path]===INS.sourceFiles[path]?.after&&
+ git('hash-object',path)===INS_PREVIEW.sourceBlobs[path])&&
+ sameJson(INS_PREVIEW.qaBlobs,INS.qaBlobs)&&
+ INS_PREVIEW.rosterSourceBlobSha===git('hash-object','functions/assignable-advisor-roster.js')&&
+ sameJson(INS_PREVIEW.onlyReadOnlyFunctions,['orbit360ScopedPolicyReadPreview','orbit360AssignableAdvisorRosterPreview'])&&
+ INS_PREVIEW.sharedRulesDeployAuthorized===false&&INS_PREVIEW.operationalWritesAuthorized===false&&
+ INS_PREVIEW.configWritesAuthorized===false&&INS_PREVIEW.livePromotionAuthorized===false&&
+ INS_PREVIEW.realUserImpersonationAuthorized===false&&INS_PREVIEW.reimportAuthorized===false&&
+ INS_PREVIEW.authenticatedUatRequired===true&&INS_PREVIEW.previewIsolated===true&&
+ C.b4003SecurityReleaseHold?.status==='ACTIVE_FAIL_CLOSED_UNAUTHORIZED_BROWSER_FIRESTORE_READ_WRITE'&&
+ B4.boundaries?.dataMutationAuthorized===false&&B4.boundaries?.livePromotionAuthorized===false&&
+ FIND.findings.length===295,
+ 'B4_003_INSURER_EXACT_PREVIEW_AUTHORIZATION_OR_SECURITY_INVALID');
+ console.log('B4_003_INSURER_EXACT_PREVIEW_AUTH=PASS_READONLY_LIVE_HOLD');
+}
 const FIX=C.b4003Uat5CausalSourcePatch20261019||{};
 const FIX_ACTIVE=FIX.status==='SCOPED_SOURCE_FIXED_QA_PENDING_EXACT_PREVIEW';
 if(FIX_ACTIVE){
