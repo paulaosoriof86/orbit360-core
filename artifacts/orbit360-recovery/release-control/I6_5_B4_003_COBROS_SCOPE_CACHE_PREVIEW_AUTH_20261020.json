@@ -16,7 +16,7 @@
     "centralGuardRunId": 39436838311,
     "centralGuardConclusion": "success",
     "compositionBlobSha": "4563979caadd63cb4897304c60df7a087cac024c",
-    "rosterSourceBlobSha": "a2f5d110201eb83cb0c72f7d716443c3b08c4d49",
+    "rosterSourceBlobSha": "75ca53db55e2665123589b0e63253a8e4f8c377c",
     "onlyReadOnlyFunctions": [
       "orbit360ScopedPolicyReadPreview",
       "orbit360AssignableAdvisorRosterPreview"
@@ -38,5 +38,14 @@
   "noDataWrites": true,
   "noSharedRulesDeploy": true,
   "noLive": true,
-  "nextEvidence": "IMMUTABLE_BUILD_EXACT_HOSTING_READBACK_AND_AUTHENTICATED_ROLE_COUNTRY_HUMAN_UAT"
+  "nextEvidence": "IMMUTABLE_BUILD_EXACT_HOSTING_READBACK_AND_AUTHENTICATED_ROLE_COUNTRY_HUMAN_UAT",
+  "rootCauseFix20261020": {
+    "classification": "AUTH_RECEIPT_ROSTER_SOURCE_BINDING_ERROR",
+    "previousRosterBlob": "a2f5d110201eb83cb0c72f7d716443c3b08c4d49",
+    "actualRosterBlob": "75ca53db55e2665123589b0e63253a8e4f8c377c",
+    "failedGuardRun": 39437721308,
+    "sourceProductChanged": false,
+    "liveTouched": false,
+    "operationalWrites": 0
+  }
 }

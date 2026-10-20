@@ -3420,7 +3420,7 @@
     "centralGuardRunId": 39436838311,
     "centralGuardConclusion": "success",
     "compositionBlobSha": "4563979caadd63cb4897304c60df7a087cac024c",
-    "rosterSourceBlobSha": "a2f5d110201eb83cb0c72f7d716443c3b08c4d49",
+    "rosterSourceBlobSha": "75ca53db55e2665123589b0e63253a8e4f8c377c",
     "onlyReadOnlyFunctions": [
       "orbit360ScopedPolicyReadPreview",
       "orbit360AssignableAdvisorRosterPreview"
@@ -3437,6 +3437,6 @@
     "authenticatedUatRequired": true,
     "wholeCapabilityAccepted": false,
     "authorizationReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_COBROS_SCOPE_CACHE_PREVIEW_AUTH_20261020.json",
-    "authorizationReceiptBlobSha": "a58fcd0edcb6502348187541a8549c89fa01732f"
+    "authorizationReceiptBlobSha": "058b57b85a78717ec8d497e636e71ac5bfe9e79f"
   }
 }
