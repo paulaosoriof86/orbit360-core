@@ -525,8 +525,9 @@ if(String(C.i65ForensicRemediationPlan?.currentBlock||'')==='B4' &&
  &&fields.every(p=>{
    const historical=CACHE_FIX_ACTIVE&&p===CACHE_FIX.productPath?CACHE_FIX.sourceBlobBefore:
      (FIX_ACTIVE?(FIX.beforeBlobs[p]||COMP.productFileBlobs[p]):COMP.productFileBlobs[p]);
-   const current=CACHE_FIX_ACTIVE&&p===CACHE_FIX.productPath?CACHE_FIX.sourceBlobAfter:
-     (INS_ACTIVE&&INS.sourceFiles?.[p]?.after||(FIX_ACTIVE?(FIX.sourceBlobs[p]||stage.sourceBlobs[p]):stage.sourceBlobs[p]));
+   const current=COUNTRY_ACTIVE&&p===CACHE_FIX.productPath?COUNTRY_FIX.sourceBlobsAfter[p]:
+     (CACHE_FIX_ACTIVE&&p===CACHE_FIX.productPath?CACHE_FIX.sourceBlobAfter:
+     (INS_ACTIVE&&INS.sourceFiles?.[p]?.after||(FIX_ACTIVE?(FIX.sourceBlobs[p]||stage.sourceBlobs[p]):stage.sourceBlobs[p])));
    return stage.sourceBlobs[p]===historical&&COMP.productFileBlobs[p]===current&&git('hash-object',p)===current;
   })
  &&stage.compositionBlobSha===(FIX_ACTIVE?FIX.previousCompBlobSha:git('hash-object',I6_CANONICAL_COMPOSITION))
