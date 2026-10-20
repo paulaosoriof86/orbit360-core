@@ -1,0 +1,41 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_COBROS_AGING_VARIANCE_EXACT_PREVIEW_AUTH_V1",
+  "gate": "I6.5/B4-003",
+  "headBeforeRequest": "8b8942b1412e38bcd8c053d7797f2f2d6d9ab013",
+  "authorization": {
+    "status": "AUTHORIZED_EXACT_READONLY_PREVIEW",
+    "gate": "I6.5/B4-003",
+    "triggerSubject": "build(i6.5 B4-003): exact Cobros aging variance Preview",
+    "sourceParentHead": "8b8942b1412e38bcd8c053d7797f2f2d6d9ab013",
+    "sourceFixReceiptBlobSha": "8ae26444ebd532bdaca33300d36f8a344bea0f2d",
+    "sourcePath": "orbit360-platform/modules/cobros.js",
+    "sourceBlobSha": "4ce62cade91e84a6230e5429a3f3b54b53c3ae07",
+    "qaPath": "tools/gravicentra-b4-003-cobros-aging-variance.test.cjs",
+    "qaBlobSha": "7935baa4b3ddf9512f3cb526cc19b70d12725530",
+    "compositionBlobSha": "da8ffd0c253db638666059d34193cd3275d6e870",
+    "rosterSourceBlobSha": "75ca53db55e2665123589b0e63253a8e4f8c377c",
+    "preAuthExecutionLockBlobSha": "15e46946a034ce756d52fb4f48b3304036068b82",
+    "priorGuardRunId": 39502197076,
+    "priorGuardConclusion": "success",
+    "onlyReadOnlyFunctions": [
+      "orbit360ScopedPolicyReadPreview",
+      "orbit360AssignableAdvisorRosterPreview"
+    ],
+    "onlyIsolatedHosting": true,
+    "sharedRulesDeployAuthorized": false,
+    "otherFunctionsDeployAuthorized": false,
+    "operationalWritesAuthorized": false,
+    "configWritesAuthorized": false,
+    "syntheticQaWritesAuthorized": false,
+    "livePromotionAuthorized": false,
+    "realUserImpersonationAuthorized": false,
+    "reimportAuthorized": false,
+    "authenticatedUatRequired": true,
+    "wholeCapabilityAccepted": false
+  },
+  "readOnly": true,
+  "sharedRulesWrites": 0,
+  "businessWrites": 0,
+  "livePromotion": false,
+  "previousHumanUatStatus": "HOLD"
+}

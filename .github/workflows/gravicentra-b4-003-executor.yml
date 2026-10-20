@@ -484,7 +484,42 @@ jobs:
             && l.boundaries?.businessWritesAuthorized===false&&l.boundaries?.syntheticQaWritesAuthorized===false
             && l.boundaries?.livePromotionAuthorized===false;
           if(currentSubject===countryAuth.triggerSubject&&!countryScoped)throw Error('B4_003_COUNTRY_FINANCE_EXACT_PREVIEW_GATE_DENIED');
-          const scopedPreview=priorScopedPreview||onePassInternal||oct15ScopedReadback||restrictedScoped||c03Scoped||uatScoped||currentScoped||causalScoped||insurerScoped||cacheScoped||countryScoped;
+          const agingStage=c.b4003CobrosAgingVarianceFix20261020||{},agingAuth=c.b4003CobrosAgingVariancePreviewAuthorization20261020||{},agingLock=l.b4003CobrosAgingVariancePreviewAuthorization20261020||{};
+          const agingScoped=currentSubject===agingAuth.triggerSubject
+            && agingAuth.status==='AUTHORIZED_EXACT_READONLY_PREVIEW'
+            && agingLock.status===agingAuth.status
+            && agingLock.triggerSubject===agingAuth.triggerSubject
+            && agingAuth.gate==='I6.5/B4-003'
+            && agingAuth.sourceParentHead==='8b8942b1412e38bcd8c053d7797f2f2d6d9ab013'
+            && agingStage.status==='SCOPED_COBROS_AGING_VARIANCE_SOURCE_FIXED_QA_PENDING_PREVIEW'
+            && agingAuth.sourceFixReceiptBlobSha===agingStage.receiptBlobSha
+            && agingAuth.sourcePath===agingStage.sourcePath
+            && agingAuth.sourceBlobSha===agingStage.sourceBlobAfter
+            && agingAuth.sourceBlobSha===productSha(agingAuth.sourcePath)
+            && agingAuth.qaBlobSha===productSha(agingAuth.qaPath)
+            && agingAuth.priorGuardRunId===39502197076
+            && agingAuth.priorGuardConclusion==='success'
+            && agingAuth.preAuthExecutionLockBlobSha===agingStage.executionLockBlobSha
+            && agingAuth.compositionBlobSha===productSha('artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json')
+            && agingAuth.compositionBlobSha===c.canonicalAccumulationControl?.compositionLockBlobSha
+            && agingAuth.rosterSourceBlobSha===productSha('functions/assignable-advisor-roster.js')
+            && Array.isArray(agingAuth.onlyReadOnlyFunctions)
+            && agingAuth.onlyReadOnlyFunctions.join(',')==='orbit360ScopedPolicyReadPreview,orbit360AssignableAdvisorRosterPreview'
+            && agingAuth.onlyIsolatedHosting===true&&agingAuth.sharedRulesDeployAuthorized===false
+            && agingAuth.otherFunctionsDeployAuthorized===false&&agingAuth.operationalWritesAuthorized===false
+            && agingAuth.configWritesAuthorized===false&&agingAuth.syntheticQaWritesAuthorized===false
+            && agingAuth.livePromotionAuthorized===false&&agingAuth.realUserImpersonationAuthorized===false&&agingAuth.reimportAuthorized===false
+            && agingAuth.authenticatedUatRequired===true&&agingAuth.wholeCapabilityAccepted===false
+            && c.currentB4?.status==='B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL'
+            && c.nextAction==='I6_5_FORENSIC_REMEDIATION_B4_003_R20_TARGETED_PAULA_VISUAL'
+            && c.b4003SecurityReleaseHold?.status==='ACTIVE_FAIL_CLOSED_UNAUTHORIZED_BROWSER_FIRESTORE_READ_WRITE'
+            && l.activeFinding?.id==='B4-003'
+            && l.boundaries?.previewMutationAuthorized===true&&l.boundaries?.functionDeploymentAuthorized===true
+            && l.boundaries?.productMutationAuthorized===false&&l.boundaries?.dataMutationAuthorized===false
+            && l.boundaries?.businessWritesAuthorized===false&&l.boundaries?.syntheticQaWritesAuthorized===false
+            && l.boundaries?.livePromotionAuthorized===false;
+          if(currentSubject===agingAuth.triggerSubject&&!agingScoped)throw Error('B4_003_AGING_VARIANCE_EXACT_PREVIEW_DENIED');
+          const scopedPreview=priorScopedPreview||onePassInternal||oct15ScopedReadback||restrictedScoped||c03Scoped||uatScoped||currentScoped||causalScoped||insurerScoped||cacheScoped||countryScoped||agingScoped;
           const previewOk=(r19Preview||r20Preview||r23Preview)
             && l.activeFinding?.id==='B4-003'
             && l.boundaries?.businessWritesAuthorized===false
@@ -681,7 +716,7 @@ jobs:
             uat.sourceBlobs['functions/assignable-advisor-roster.js']===rosterBlob
             && uat.onlyTwoReadOnlyFunctions===true;
           const readonlyRoster=scopedPreview&&rosterAuth.status==='AUTHORIZED_EXACT_PREVIEW_READONLY_ROSTER_ONLY'
-            && (rosterAuth.sourceBlobSha===rosterBlob||c03RosterReady||uatRosterReady||(currentScoped&&currentPreviewIntent.rosterSourceBlobSha===rosterBlob)||(causalScoped&&ca.rosterSourceBlobSha===rosterBlob)||(insurerScoped&&insurerAuth.rosterSourceBlobSha===rosterBlob)||(cacheScoped&&cacheAuth.rosterSourceBlobSha===rosterBlob)||(countryScoped&&countryAuth.rosterSourceBlobSha===rosterBlob))
+            && (rosterAuth.sourceBlobSha===rosterBlob||c03RosterReady||uatRosterReady||(currentScoped&&currentPreviewIntent.rosterSourceBlobSha===rosterBlob)||(causalScoped&&ca.rosterSourceBlobSha===rosterBlob)||(insurerScoped&&insurerAuth.rosterSourceBlobSha===rosterBlob)||(cacheScoped&&cacheAuth.rosterSourceBlobSha===rosterBlob)||(countryScoped&&countryAuth.rosterSourceBlobSha===rosterBlob)||(agingScoped&&agingAuth.rosterSourceBlobSha===rosterBlob))
             && rosterAuth.service==='orbit360AssignableAdvisorRosterPreview'
             && rosterAuth.businessWritesAuthorized===false
             && rosterAuth.otherFunctionsDeployAuthorized===false
@@ -690,7 +725,7 @@ jobs:
             && c.b4003SecurityReleaseHold?.status==='ACTIVE_FAIL_CLOSED_UNAUTHORIZED_BROWSER_FIRESTORE_READ_WRITE'
             && l.boundaries?.previewMutationAuthorized===true
             && l.boundaries?.realOperationalWritesAuthorized===false;
-          if((currentSubject===requestedOct15Subject||c03Scoped||uatScoped||currentScoped||causalScoped||insurerScoped||cacheScoped||countryScoped)&&scopedPreview&&!readonlyRoster)
+          if((currentSubject===requestedOct15Subject||c03Scoped||uatScoped||currentScoped||causalScoped||insurerScoped||cacheScoped||countryScoped||agingScoped)&&scopedPreview&&!readonlyRoster)
             throw Error('B4_003_DASHBOARD_READONLY_PREVIEW_SYNC_NOT_AUTHORIZED');
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'readonly_roster='+(readonlyRoster?'true':'false')+'\n');
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'scoped_preview='+(scopedPreview?'true':'false')+'\n');

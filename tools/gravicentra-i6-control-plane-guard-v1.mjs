@@ -58,6 +58,43 @@ const ACTIVE_I65_FORENSIC_B4=String(C.i65ForensicRemediationPlan?.b4?.executionL
 need(exists(ACTIVE_I65_FORENSIC_B4),'I6_5_B4_ACTIVE_LOCK_MISSING:'+ACTIVE_I65_FORENSIC_B4);
 const S=readJson(STATUS_LEDGER),A=readJson(AUTH_RECEIPT),M5=readJson(V5_MANIFEST),M6=readJson(V6_MANIFEST),M=readJson(V7_MANIFEST),FRA=readJson(I65_FORENSIC_AUDIT),FRP=readJson(I65_FORENSIC_PLAN),PAY=readJson(I65_PAYMENT_INFERENCE),B1=readJson(I65_FORENSIC_B1),B2=readJson(I65_FORENSIC_B2),B3=readJson(I65_FORENSIC_B3),B4=readJson(ACTIVE_I65_FORENSIC_B4);
 const COMP=readJson(I6_CANONICAL_COMPOSITION),FIND=readJson(I6_FINDINGS_LEDGER),FRP2=readJson(I65_FORENSIC_PLAN_V2),REJ=readJson(I65_B2_REJECTION),RCM=readJson(I65_B2_ROOT_CAUSE);
+const AGING_PREVIEW=C.b4003CobrosAgingVariancePreviewAuthorization20261020||{};
+const AGING_PREVIEW_ACTIVE=AGING_PREVIEW.status==='AUTHORIZED_EXACT_READONLY_PREVIEW';
+if(AGING_PREVIEW_ACTIVE){
+ const locked=B4.b4003CobrosAgingVariancePreviewAuthorization20261020||{};
+ const receipt=exists(AGING_PREVIEW.authorizationReceiptPath)?readJson(AGING_PREVIEW.authorizationReceiptPath):{};
+ need(sameJson(AGING_PREVIEW,locked)&&AGING_PREVIEW.gate==='I6.5/B4-003'&&
+  AGING_PREVIEW.triggerSubject==='build(i6.5 B4-003): exact Cobros aging variance Preview'&&
+  AGING_PREVIEW.sourceParentHead==='8b8942b1412e38bcd8c053d7797f2f2d6d9ab013'&&
+  AGING_PREVIEW.sourcePath==='orbit360-platform/modules/cobros.js'&&
+  AGING_PREVIEW.qaPath==='tools/gravicentra-b4-003-cobros-aging-variance.test.cjs'&&
+  AGING_PREVIEW.sourceFixReceiptBlobSha===C.b4003CobrosAgingVarianceFix20261020?.receiptBlobSha&&
+  AGING_PREVIEW.sourceBlobSha===git('hash-object',AGING_PREVIEW.sourcePath)&&
+  AGING_PREVIEW.qaBlobSha===git('hash-object',AGING_PREVIEW.qaPath)&&
+  AGING_PREVIEW.compositionBlobSha===git('hash-object',I6_CANONICAL_COMPOSITION)&&
+  AGING_PREVIEW.compositionBlobSha===C.canonicalAccumulationControl?.compositionLockBlobSha&&
+  AGING_PREVIEW.preAuthExecutionLockBlobSha===C.b4003CobrosAgingVarianceFix20261020?.executionLockBlobSha&&
+  AGING_PREVIEW.rosterSourceBlobSha===git('hash-object','functions/assignable-advisor-roster.js')&&
+  AGING_PREVIEW.authorizationReceiptBlobSha===git('hash-object',AGING_PREVIEW.authorizationReceiptPath)&&
+  receipt.schema==='GRAVICENTRA_I6_5_B4_003_COBROS_AGING_VARIANCE_EXACT_PREVIEW_AUTH_V1'&&
+  receipt.authorization.sourceBlobSha===AGING_PREVIEW.sourceBlobSha&&
+  AGING_PREVIEW.priorGuardRunId===39502197076&&AGING_PREVIEW.priorGuardConclusion==='success'&&
+  sameJson(AGING_PREVIEW.onlyReadOnlyFunctions,['orbit360ScopedPolicyReadPreview','orbit360AssignableAdvisorRosterPreview'])&&
+  AGING_PREVIEW.onlyIsolatedHosting===true&&AGING_PREVIEW.sharedRulesDeployAuthorized===false&&
+  AGING_PREVIEW.otherFunctionsDeployAuthorized===false&&AGING_PREVIEW.operationalWritesAuthorized===false&&
+  AGING_PREVIEW.configWritesAuthorized===false&&AGING_PREVIEW.syntheticQaWritesAuthorized===false&&
+  AGING_PREVIEW.livePromotionAuthorized===false&&AGING_PREVIEW.realUserImpersonationAuthorized===false&&
+  AGING_PREVIEW.reimportAuthorized===false&&AGING_PREVIEW.authenticatedUatRequired===true&&
+  AGING_PREVIEW.wholeCapabilityAccepted===false&&
+  C.currentB4?.executionLockBlobSha===git('hash-object',ACTIVE_I65_FORENSIC_B4)&&
+  C.i65ForensicRemediationPlan?.b4?.executionLockBlobSha===git('hash-object',ACTIVE_I65_FORENSIC_B4)&&
+  C.b4003SecurityReleaseHold?.status==='ACTIVE_FAIL_CLOSED_UNAUTHORIZED_BROWSER_FIRESTORE_READ_WRITE'&&
+  B4.boundaries?.productMutationAuthorized===false&&B4.boundaries?.businessWritesAuthorized===false&&
+  B4.boundaries?.dataMutationAuthorized===false&&B4.boundaries?.livePromotionAuthorized===false&&
+  FIND.findings.length===295,
+  'B4_003_AGING_VARIANCE_PREVIEW_AUTHORIZATION_DRIFT');
+ console.log('B4_003_AGING_VARIANCE_PREVIEW_AUTH_PASS_READONLY_LIVE_HOLD');
+}
 const AGING=C.b4003CobrosAgingVarianceFix20261020||{};
 const AGING_ACTIVE=AGING.status==='SCOPED_COBROS_AGING_VARIANCE_SOURCE_FIXED_QA_PENDING_PREVIEW';
 if(AGING_ACTIVE){
@@ -83,7 +120,7 @@ if(AGING_ACTIVE){
    B4.boundaries?.allowedQaFiles?.includes(AGING.qaPath)&&
    manifest.sourceBlobAfter===AGING.sourceBlobAfter&&locked.sourceBlobAfter===AGING.sourceBlobAfter&&
    AGING.compositionBlobSha===git('hash-object',I6_CANONICAL_COMPOSITION)&&
-   AGING.executionLockBlobSha===git('hash-object',ACTIVE_I65_FORENSIC_B4)&&
+   AGING.executionLockBlobSha===(AGING_PREVIEW_ACTIVE?AGING_PREVIEW.preAuthExecutionLockBlobSha:git('hash-object',ACTIVE_I65_FORENSIC_B4))&&
    C.canonicalAccumulationControl?.compositionLockBlobSha===AGING.compositionBlobSha&&
    C.currentB4?.executionLockBlobSha===AGING.executionLockBlobSha&&
    C.i65ForensicRemediationPlan?.b4?.executionLockBlobSha===AGING.executionLockBlobSha&&
