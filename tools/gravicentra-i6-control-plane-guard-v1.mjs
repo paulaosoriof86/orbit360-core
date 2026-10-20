@@ -58,6 +58,35 @@ const ACTIVE_I65_FORENSIC_B4=String(C.i65ForensicRemediationPlan?.b4?.executionL
 need(exists(ACTIVE_I65_FORENSIC_B4),'I6_5_B4_ACTIVE_LOCK_MISSING:'+ACTIVE_I65_FORENSIC_B4);
 const S=readJson(STATUS_LEDGER),A=readJson(AUTH_RECEIPT),M5=readJson(V5_MANIFEST),M6=readJson(V6_MANIFEST),M=readJson(V7_MANIFEST),FRA=readJson(I65_FORENSIC_AUDIT),FRP=readJson(I65_FORENSIC_PLAN),PAY=readJson(I65_PAYMENT_INFERENCE),B1=readJson(I65_FORENSIC_B1),B2=readJson(I65_FORENSIC_B2),B3=readJson(I65_FORENSIC_B3),B4=readJson(ACTIVE_I65_FORENSIC_B4);
 const COMP=readJson(I6_CANONICAL_COMPOSITION),FIND=readJson(I6_FINDINGS_LEDGER),FRP2=readJson(I65_FORENSIC_PLAN_V2),REJ=readJson(I65_B2_REJECTION),RCM=readJson(I65_B2_ROOT_CAUSE);
+const AGING_PROOF=C.b4003CobrosAgingVariancePreviewProof20261020||{};
+if(AGING_PROOF.status==='EXACT_TECHNICAL_PREVIEW_PASS_AUTHENTICATED_UAT_HOLD'){
+ const lock=B4.b4003CobrosAgingVariancePreviewProof20261020||{};
+ const receipt=exists(AGING_PROOF.receiptPath)?readJson(AGING_PROOF.receiptPath):{};
+ need(sameJson(AGING_PROOF,lock)&&
+  AGING_PROOF.receiptPath==='artifacts/orbit360-recovery/release-control/I6_5_B4_003_COBROS_AGING_VARIANCE_TECHNICAL_PREVIEW_READBACK_20261020.json'&&
+  AGING_PROOF.receiptBlobSha===git('hash-object',AGING_PROOF.receiptPath)&&
+  receipt.schema==='GRAVICENTRA_I6_5_B4_003_COBROS_AGING_VARIANCE_TECHNICAL_PREVIEW_V1'&&
+  receipt.runId===39503173099&&receipt.sourceSha==='ca08bbde10e93be4506ca3e0105d5265e6021e7b'&&
+  receipt.channelId==='gi-i65-b4-39503173099'&&
+  receipt.buildId===AGING_PROOF.buildId&&receipt.previewUrl===AGING_PROOF.previewUrl&&
+  receipt.artifactId===AGING_PROOF.artifactId&&receipt.artifactArchiveDigest===AGING_PROOF.artifactArchiveDigest&&
+  receipt.cobrosSourceBlobSha===git('hash-object','orbit360-platform/modules/cobros.js')&&
+  receipt.qaBlobSha===git('hash-object','tools/gravicentra-b4-003-cobros-aging-variance.test.cjs')&&
+  receipt.githubActionsConclusion==='success'&&receipt.exactHostingReadback===true&&
+  receipt.publicSmoke===true&&receipt.authenticatedChromeFunctionalProof===false&&
+  receipt.realRoleCountryBackendAuthorizationProved===false&&
+  receipt.realDataWritesExecuted===0&&receipt.sharedRulesDeployed===false&&
+  receipt.productionPromotionAuthorized===false&&receipt.productionAccepted===false&&
+  receipt.humanUatAccepted===false&&
+  sameJson(receipt.previewReadOnlyFunctions,['orbit360ScopedPolicyReadPreview','orbit360AssignableAdvisorRosterPreview'])&&
+  C.currentB4?.executionLockBlobSha===git('hash-object',ACTIVE_I65_FORENSIC_B4)&&
+  C.i65ForensicRemediationPlan?.b4?.executionLockBlobSha===git('hash-object',ACTIVE_I65_FORENSIC_B4)&&
+  C.b4003SecurityReleaseHold?.status==='ACTIVE_FAIL_CLOSED_UNAUTHORIZED_BROWSER_FIRESTORE_READ_WRITE'&&
+  B4.boundaries?.productMutationAuthorized===false&&B4.boundaries?.dataMutationAuthorized===false&&
+  B4.boundaries?.livePromotionAuthorized===false&&FIND.findings.length===295,
+  'B4_003_COBROS_AGING_VARIANCE_PREVIEW_PROOF_INVALID');
+ console.log('GI_B4_003_AGING_VARIANCE_EXACT_PREVIEW=PASS_AUTHENTICATED_UAT_HOLD');
+}
 const AGING_PREVIEW=C.b4003CobrosAgingVariancePreviewAuthorization20261020||{};
 const AGING_PREVIEW_ACTIVE=AGING_PREVIEW.status==='AUTHORIZED_EXACT_READONLY_PREVIEW';
 if(AGING_PREVIEW_ACTIVE){

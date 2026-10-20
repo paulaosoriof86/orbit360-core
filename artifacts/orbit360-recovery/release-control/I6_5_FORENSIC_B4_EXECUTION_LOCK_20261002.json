@@ -3578,5 +3578,27 @@
     "wholeCapabilityAccepted": false,
     "authorizationReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_COBROS_AGING_VARIANCE_PREVIEW_AUTH_20261020.json",
     "authorizationReceiptBlobSha": "e983b2da751f5b6bb57e2433b8b1ebfbba05a86f"
+  },
+  "b4003CobrosAgingVariancePreviewProof20261020": {
+    "status": "EXACT_TECHNICAL_PREVIEW_PASS_AUTHENTICATED_UAT_HOLD",
+    "gate": "I6.5/B4-003",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_COBROS_AGING_VARIANCE_TECHNICAL_PREVIEW_READBACK_20261020.json",
+    "receiptBlobSha": "91e3db1fe0c7e69012c06e5daa77f88b976d49b8",
+    "sourceSha": "ca08bbde10e93be4506ca3e0105d5265e6021e7b",
+    "runId": 39503173099,
+    "buildId": "gi-i65-b4-ca08bbde10e9-57f234755dc1",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-39503173099-kwu3i9vu.web.app",
+    "artifactId": 12301323566,
+    "artifactArchiveDigest": "sha256:bbfadebac608c0aaa272813445ec69272510aec5d1a07e4c05709eadafffaed2",
+    "cobrosSourceBlobSha": "4ce62cade91e84a6230e5429a3f3b54b53c3ae07",
+    "qaBlobSha": "7935baa4b3ddf9512f3cb526cc19b70d12725530",
+    "exactHostingReadback": true,
+    "publicSmoke": true,
+    "authenticatedChromeFunctionalProof": false,
+    "realRoleCountryBackendAuthorizationProved": false,
+    "livePromotionAuthorized": false,
+    "dataWrites": 0,
+    "formalI6Percent": 50,
+    "productionPathPercent": 20
   }
 }
