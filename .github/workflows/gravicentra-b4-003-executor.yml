@@ -1,4 +1,5 @@
 # B4-003 canonical-vs-inactivo and Auth IAM eligibility diagnostic only; no writes, no LIVE.
+# 2026-10-20: current B4-003 exact aging/CO read-only Preview after source QA and guard 39502965910 PASS; no shared rules, user tokens, operational writes or LIVE.
 # 2026-10-20: retrigger exact country/finance Preview after guard reconciliation PASS run 39490137737; source blobs remain fixed, no shared rules/LIVE.
 # B4-003 paging GT/CO test corrected 2026-10-15; rerun cumulative protected Preview only; do not deploy shared rules, LIVE or data writes.
 name: Gravicentra B4-003 R20 Exact Preview
