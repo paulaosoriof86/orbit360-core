@@ -447,7 +447,43 @@ jobs:
             && l.boundaries?.businessWritesAuthorized===false&&l.boundaries?.syntheticQaWritesAuthorized===false
             && l.boundaries?.livePromotionAuthorized===false;
           if(currentSubject===cacheAuth.triggerSubject&&!cacheScoped)throw Error('B4_003_COBROS_CACHE_EXACT_PREVIEW_GATE_DENIED');
-          const scopedPreview=priorScopedPreview||onePassInternal||oct15ScopedReadback||restrictedScoped||c03Scoped||uatScoped||currentScoped||causalScoped||insurerScoped||cacheScoped;
+          const financeStage=c.b4003CountryFinanceParityFix20261020||{},countryAuth=c.b4003CountryFinancePreviewAuthorization20261020||{},countryLock=l.b4003CountryFinancePreviewAuthorization20261020||{};
+          const countryScoped=currentSubject===countryAuth.triggerSubject
+            && countryAuth.status==='AUTHORIZED_EXACT_READONLY_PREVIEW'
+            && countryLock.status===countryAuth.status
+            && countryLock.triggerSubject===countryAuth.triggerSubject
+            && countryAuth.gate==='I6.5/B4-003'
+            && countryAuth.sourceParentHead==='6d956fe21fc2064333034a79fa68156c147c3f77'
+            && financeStage.status==='COUNTRY_PARENT_FINANCE_SOURCE_FIXED_QA_PENDING_EXACT_PREVIEW'
+            && countryAuth.sourceFixReceiptBlobSha===financeStage.receiptBlobSha
+            && countryAuth.centralGuardRunId===39489212214
+            && countryAuth.centralGuardConclusion==='success'
+            && countryAuth.preAuthExecutionLockBlobSha===financeStage.executionLockBlobSha
+            && countryAuth.compositionBlobSha===productSha('artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json')
+            && countryAuth.compositionBlobSha===c.canonicalAccumulationControl?.compositionLockBlobSha
+            && Object.keys(countryAuth.sourceBlobs||{}).length===2
+            && Object.entries(countryAuth.sourceBlobs||{}).every(([path,sha])=>
+               sha===financeStage.sourceBlobsAfter?.[path]&&sha===productSha(path)&&l.boundaries?.allowedProductFiles?.includes(path))
+            && Object.keys(countryAuth.qaBlobs||{}).length===1
+            && Object.entries(countryAuth.qaBlobs||{}).every(([path,sha])=>sha===productSha(path)&&l.boundaries?.allowedQaFiles?.includes(path))
+            && countryAuth.rosterSourceBlobSha===productSha('functions/assignable-advisor-roster.js')
+            && Array.isArray(countryAuth.onlyReadOnlyFunctions)
+            && countryAuth.onlyReadOnlyFunctions.join(',')==='orbit360ScopedPolicyReadPreview,orbit360AssignableAdvisorRosterPreview'
+            && countryAuth.isolatedHostingOnly===true&&countryAuth.sharedRulesDeployAuthorized===false
+            && countryAuth.otherFunctionsDeployAuthorized===false&&countryAuth.operationalWritesAuthorized===false
+            && countryAuth.configWritesAuthorized===false&&countryAuth.syntheticQaWritesAuthorized===false
+            && countryAuth.livePromotionAuthorized===false&&countryAuth.realUserImpersonationAuthorized===false&&countryAuth.reimportAuthorized===false
+            && countryAuth.authenticatedUatRequired===true&&countryAuth.wholeCapabilityAccepted===false
+            && c.currentB4?.status==='B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL'
+            && c.nextAction==='I6_5_FORENSIC_REMEDIATION_B4_003_R20_TARGETED_PAULA_VISUAL'
+            && c.b4003SecurityReleaseHold?.status==='ACTIVE_FAIL_CLOSED_UNAUTHORIZED_BROWSER_FIRESTORE_READ_WRITE'
+            && l.activeFinding?.id==='B4-003'
+            && l.boundaries?.previewMutationAuthorized===true&&l.boundaries?.functionDeploymentAuthorized===true
+            && l.boundaries?.productMutationAuthorized===false&&l.boundaries?.dataMutationAuthorized===false
+            && l.boundaries?.businessWritesAuthorized===false&&l.boundaries?.syntheticQaWritesAuthorized===false
+            && l.boundaries?.livePromotionAuthorized===false;
+          if(currentSubject===countryAuth.triggerSubject&&!countryScoped)throw Error('B4_003_COUNTRY_FINANCE_EXACT_PREVIEW_GATE_DENIED');
+          const scopedPreview=priorScopedPreview||onePassInternal||oct15ScopedReadback||restrictedScoped||c03Scoped||uatScoped||currentScoped||causalScoped||insurerScoped||cacheScoped||countryScoped;
           const previewOk=(r19Preview||r20Preview||r23Preview)
             && l.activeFinding?.id==='B4-003'
             && l.boundaries?.businessWritesAuthorized===false
@@ -644,7 +680,7 @@ jobs:
             uat.sourceBlobs['functions/assignable-advisor-roster.js']===rosterBlob
             && uat.onlyTwoReadOnlyFunctions===true;
           const readonlyRoster=scopedPreview&&rosterAuth.status==='AUTHORIZED_EXACT_PREVIEW_READONLY_ROSTER_ONLY'
-            && (rosterAuth.sourceBlobSha===rosterBlob||c03RosterReady||uatRosterReady||(currentScoped&&currentPreviewIntent.rosterSourceBlobSha===rosterBlob)||(causalScoped&&ca.rosterSourceBlobSha===rosterBlob)||(insurerScoped&&insurerAuth.rosterSourceBlobSha===rosterBlob)||(cacheScoped&&cacheAuth.rosterSourceBlobSha===rosterBlob))
+            && (rosterAuth.sourceBlobSha===rosterBlob||c03RosterReady||uatRosterReady||(currentScoped&&currentPreviewIntent.rosterSourceBlobSha===rosterBlob)||(causalScoped&&ca.rosterSourceBlobSha===rosterBlob)||(insurerScoped&&insurerAuth.rosterSourceBlobSha===rosterBlob)||(cacheScoped&&cacheAuth.rosterSourceBlobSha===rosterBlob)||(countryScoped&&countryAuth.rosterSourceBlobSha===rosterBlob))
             && rosterAuth.service==='orbit360AssignableAdvisorRosterPreview'
             && rosterAuth.businessWritesAuthorized===false
             && rosterAuth.otherFunctionsDeployAuthorized===false
@@ -653,7 +689,7 @@ jobs:
             && c.b4003SecurityReleaseHold?.status==='ACTIVE_FAIL_CLOSED_UNAUTHORIZED_BROWSER_FIRESTORE_READ_WRITE'
             && l.boundaries?.previewMutationAuthorized===true
             && l.boundaries?.realOperationalWritesAuthorized===false;
-          if((currentSubject===requestedOct15Subject||c03Scoped||uatScoped||currentScoped||causalScoped||insurerScoped||cacheScoped)&&scopedPreview&&!readonlyRoster)
+          if((currentSubject===requestedOct15Subject||c03Scoped||uatScoped||currentScoped||causalScoped||insurerScoped||cacheScoped||countryScoped)&&scopedPreview&&!readonlyRoster)
             throw Error('B4_003_DASHBOARD_READONLY_PREVIEW_SYNC_NOT_AUTHORIZED');
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'readonly_roster='+(readonlyRoster?'true':'false')+'\n');
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'scoped_preview='+(scopedPreview?'true':'false')+'\n');

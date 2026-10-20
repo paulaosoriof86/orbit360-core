@@ -1,0 +1,45 @@
+{
+  "schema": "GI_B4_003_COUNTRY_FINANCE_EXACT_PREVIEW_AUTH_20261020_V1",
+  "headBeforeRequest": "6d956fe21fc2064333034a79fa68156c147c3f77",
+  "gate": "I6.5/B4-003",
+  "authorization": {
+    "status": "AUTHORIZED_EXACT_READONLY_PREVIEW",
+    "gate": "I6.5/B4-003",
+    "triggerSubject": "build(i6.5 B4-003): exact country finance parity Preview",
+    "sourceParentHead": "6d956fe21fc2064333034a79fa68156c147c3f77",
+    "sourceFixReceiptBlobSha": "3c7486b5a64f46a0fd9ecdcdf5c31dc219931174",
+    "sourceBlobs": {
+      "orbit360-platform/core/queries.js": "0f3f540a71e98ccdca8c040f937d18a169e52396",
+      "orbit360-platform/modules/cobros.js": "6b3892ab83ef7974fbae20e0b1ee15b32d62f08f"
+    },
+    "qaBlobs": {
+      "tools/gravicentra-b4-003-country-finance-parity.test.cjs": "4a9c69905bb22f35ce9e0fba9cc59e7a0cf7fa08"
+    },
+    "centralGuardRunId": 39489212214,
+    "centralGuardConclusion": "success",
+    "preAuthExecutionLockBlobSha": "acbbd81d13d60b4df2adea551c8f74f39a55f5aa",
+    "compositionBlobSha": "45352e79f74d9f5ed35b1b2e1b22ef52ac800039",
+    "rosterSourceBlobSha": "75ca53db55e2665123589b0e63253a8e4f8c377c",
+    "onlyReadOnlyFunctions": [
+      "orbit360ScopedPolicyReadPreview",
+      "orbit360AssignableAdvisorRosterPreview"
+    ],
+    "isolatedHostingOnly": true,
+    "sharedRulesDeployAuthorized": false,
+    "otherFunctionsDeployAuthorized": false,
+    "operationalWritesAuthorized": false,
+    "configWritesAuthorized": false,
+    "syntheticQaWritesAuthorized": false,
+    "livePromotionAuthorized": false,
+    "realUserImpersonationAuthorized": false,
+    "reimportAuthorized": false,
+    "authenticatedUatRequired": true,
+    "wholeCapabilityAccepted": false
+  },
+  "guardRunId": 39489212214,
+  "priorUat5Status": "HOLD",
+  "noDataWrites": true,
+  "noSharedRulesDeploy": true,
+  "noLive": true,
+  "nextEvidence": "EXACT_IMMUTABLE_HOSTING_READBACK_AUTHENTICATED_COBROS_GT_CO_ROLE_UAT_AND_C03_SECURITY_HOLD"
+}

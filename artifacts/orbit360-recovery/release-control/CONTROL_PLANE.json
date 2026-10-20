@@ -4869,7 +4869,7 @@
       "entryGuardReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_ENTRY_GUARD_PASS_20261002.json",
       "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
       "executionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B4_EXECUTION_LOCK_20261002.json",
-      "executionLockBlobSha": "acbbd81d13d60b4df2adea551c8f74f39a55f5aa",
+      "executionLockBlobSha": "c821fd7628b7e1fadad243c42f7bfd9b9d3c97df",
       "compositionLockBlobSha": "016f251811f22bc4fc04b2a5f674dfe09243e605",
       "findingLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
       "activeFindingId": "B4-003",
@@ -6312,7 +6312,7 @@
     "status": "B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL",
     "activeFindingId": "B4-003",
     "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
-    "executionLockBlobSha": "acbbd81d13d60b4df2adea551c8f74f39a55f5aa",
+    "executionLockBlobSha": "c821fd7628b7e1fadad243c42f7bfd9b9d3c97df",
     "compositionLockBlobSha": "816309c63ed254d9b0e05cf63621c3d1c03cbfd5",
     "findingLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
     "noLive": true,
@@ -13610,5 +13610,41 @@
     "authenticatedUatAccepted": false,
     "compositionBlobSha": "45352e79f74d9f5ed35b1b2e1b22ef52ac800039",
     "executionLockBlobSha": "acbbd81d13d60b4df2adea551c8f74f39a55f5aa"
+  },
+  "b4003CountryFinancePreviewAuthorization20261020": {
+    "status": "AUTHORIZED_EXACT_READONLY_PREVIEW",
+    "gate": "I6.5/B4-003",
+    "triggerSubject": "build(i6.5 B4-003): exact country finance parity Preview",
+    "sourceParentHead": "6d956fe21fc2064333034a79fa68156c147c3f77",
+    "sourceFixReceiptBlobSha": "3c7486b5a64f46a0fd9ecdcdf5c31dc219931174",
+    "sourceBlobs": {
+      "orbit360-platform/core/queries.js": "0f3f540a71e98ccdca8c040f937d18a169e52396",
+      "orbit360-platform/modules/cobros.js": "6b3892ab83ef7974fbae20e0b1ee15b32d62f08f"
+    },
+    "qaBlobs": {
+      "tools/gravicentra-b4-003-country-finance-parity.test.cjs": "4a9c69905bb22f35ce9e0fba9cc59e7a0cf7fa08"
+    },
+    "centralGuardRunId": 39489212214,
+    "centralGuardConclusion": "success",
+    "preAuthExecutionLockBlobSha": "acbbd81d13d60b4df2adea551c8f74f39a55f5aa",
+    "compositionBlobSha": "45352e79f74d9f5ed35b1b2e1b22ef52ac800039",
+    "rosterSourceBlobSha": "75ca53db55e2665123589b0e63253a8e4f8c377c",
+    "onlyReadOnlyFunctions": [
+      "orbit360ScopedPolicyReadPreview",
+      "orbit360AssignableAdvisorRosterPreview"
+    ],
+    "isolatedHostingOnly": true,
+    "sharedRulesDeployAuthorized": false,
+    "otherFunctionsDeployAuthorized": false,
+    "operationalWritesAuthorized": false,
+    "configWritesAuthorized": false,
+    "syntheticQaWritesAuthorized": false,
+    "livePromotionAuthorized": false,
+    "realUserImpersonationAuthorized": false,
+    "reimportAuthorized": false,
+    "authenticatedUatRequired": true,
+    "wholeCapabilityAccepted": false,
+    "authorizationReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_COUNTRY_FINANCE_PREVIEW_AUTH_20261020.json",
+    "authorizationReceiptBlobSha": "a410a3fe979e5aa56400c4039949afcce23dae45"
   }
 }
