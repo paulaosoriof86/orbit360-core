@@ -348,3 +348,69 @@ const pause=()=>new Promise(ok=>setTimeout(ok,30));
  assert.ok(reader.includes("if(!collections.has(coll))throw new Denied('COLLECTION_DENIED')"),'PROTECTED_COLLECTION_DENIAL_REQUIRED');
  console.log('B4_003_ROLE_HYDRATION_STATIC_PASS_NOT_AUTHENTICATED');
 }
+
+
+/* UAT5 2026-10-20: read-only causal reproduction (NOT acceptance). */
+{
+  // Reproduce the actual historical timer callback, not a rewritten
+  // approximation: an old route's live host may be reused after navigation.
+  const renewalSource=fs.readFileSync('orbit360-platform/modules/renovaciones.js','utf8');
+  const a=renewalSource.indexOf('  function scheduleReadinessRecheck(host,readiness){');
+  const b=renewalSource.indexOf('  function humanCollection(name){',a);
+  assert.ok(a>=0&&b>a,'UAT5_RENEWALS_TIMER_OWNER_MISSING');
+  let paintCount=0,scheduled=null;
+  const routeCtx={
+    READINESS_BUDGET_MS:8000,
+    Date:{now:()=>0},
+    location:{hash:'#/renovaciones'},
+    setTimeout:(callback)=>{scheduled=callback;return 1;},
+    clearTimeout:()=>{},
+    render:()=>{paintCount++;},
+    Math
+  };
+  vm.runInNewContext('let readinessTimer=null;\n'+renewalSource.slice(a,b)
+    +'\nthis.scheduleCheck=scheduleReadinessRecheck;',routeCtx);
+  routeCtx.scheduleCheck({isConnected:true},{state:'pending',elapsedMs:0});
+  assert.equal(typeof scheduled,'function','UAT5_RENEWALS_TIMEOUT_NOT_SCHEDULED');
+  routeCtx.location.hash='#/aseguradoras';
+  scheduled();
+  const staleRoutePaint=paintCount!==0;
+  console.log('UAT5_CAUSAL_ROUTE_TIMER_'+(staleRoutePaint
+    ?'DEFECT_REPRODUCED_HOLD':'STALE_ROUTE_GUARD_PRESENT')
+    +' paintAfterNavigation='+paintCount+' no_remote_reads_or_writes');
+
+  // The importer owner interprets an unobserved required source as an empty
+  // list. This reproduces the false-zero presentation, not missing Firestore data.
+  const importer=fs.readFileSync('orbit360-platform/modules/importar-p0-dashboard.js','utf8');
+  const storeStatus={serverConfirmedCollections:['polizas','carteraPrimas']};
+  const win={Orbit:{ui:{esc:v=>String(v)},store:{
+    all:coll=>coll==='recibosEsperados'?[]:[{id:'synthetic',moneda:'GTQ',monto:1}],
+    _productStatus:()=>storeStatus
+  }}};
+  vm.runInNewContext(importer,{window:win,Orbit:win.Orbit,console},{timeout:1000});
+  const layer=Array.from(win.Orbit.importarP0Dashboard.LAYERS)
+    .find(item=>item.id==='recibosEsperados');
+  assert.ok(layer,'UAT5_IMPORTER_RECEIPT_LAYER_MISSING');
+  const values=win.Orbit.importarP0Dashboard.layerStats(layer);
+  assert.equal(values.totalRows,0,'UAT5_IMPORTER_UNCONFIRMED_SOURCE_REPRO');
+  assert.ok(!storeStatus.serverConfirmedCollections.includes('recibosEsperados'),
+    'UAT5_IMPORTER_ZERO_IS_NOT_AUTHORITATIVE');
+  console.log('UAT5_CAUSAL_IMPORTER_UNCONFIRMED_ZERO_REPRODUCED_HOLD'
+    +' observedUiCount='+values.totalRows+' authoritative=false no_data_loss_proven');
+
+  // Protected financial pages fetch both countries serially with repeated
+  // server-side scope checks and parent document reads. This is a bounded
+  // source-level lower bound, NOT a measured real-browser network duration.
+  const reader=fs.readFileSync('functions/b4-003-scoped-related-reader.js','utf8');
+  assert.match(source,/pageSize=\(collection==='polizas'\|\|collection==='clientes'\)\?200:50/,
+    'UAT5_RELATED_CLIENT_PAGE_SIZE_SOURCE_CHANGED');
+  assert.match(reader,/PARENT_CONCURRENCY=10/,'UAT5_FINANCIAL_PARENT_VERIFICATION_MISSING');
+  assert.match(reader,/tenant\.collection\('members'\)\.doc\(auth\.uid\)\.get\(\)/,
+    'UAT5_FINANCIAL_MEMBERSHIP_READ_MISSING');
+  const receipts=1958,portfolio=1396,financialPage=50;
+  const theoreticalPages=Math.ceil(receipts/financialPage)+Math.ceil(portfolio/financialPage);
+  assert.equal(theoreticalPages,68,'UAT5_FINANCIAL_MIN_PAGE_COUNT_DISCRIMINANT');
+  console.log('UAT5_CAUSAL_FINANCIAL_READ_AMPLIFICATION_SOURCE_PROOF'
+    +' floorPages='+theoreticalPages+' member_config_each_call=1'
+    +' observedRealLatency=NOT_MEASURED security_fail_closed_retained');
+}
