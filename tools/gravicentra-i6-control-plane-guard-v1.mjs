@@ -120,8 +120,8 @@ if(COUNTRY_ACTIVE){
    COUNTRY_FIX.compositionBlobSha===git('hash-object',I6_CANONICAL_COMPOSITION)&&
    COUNTRY_FIX.executionLockBlobSha===(COUNTRY_PREVIEW_ACTIVE?COUNTRY_PREVIEW.preAuthExecutionLockBlobSha:git('hash-object',ACTIVE_I65_FORENSIC_B4))&&
    C.canonicalAccumulationControl?.compositionLockBlobSha===COUNTRY_FIX.compositionBlobSha&&
-   C.currentB4?.executionLockBlobSha===COUNTRY_FIX.executionLockBlobSha&&
-   C.i65ForensicRemediationPlan?.b4?.executionLockBlobSha===COUNTRY_FIX.executionLockBlobSha&&
+   C.currentB4?.executionLockBlobSha===git('hash-object',ACTIVE_I65_FORENSIC_B4)&&
+   C.i65ForensicRemediationPlan?.b4?.executionLockBlobSha===git('hash-object',ACTIVE_I65_FORENSIC_B4)&&
    B4.compositionLockBlobSha===COUNTRY_FIX.compositionBlobSha&&
    C.b4003SecurityReleaseHold?.status==='ACTIVE_FAIL_CLOSED_UNAUTHORIZED_BROWSER_FIRESTORE_READ_WRITE'&&
    C.i6Execution?.productMutationAuthorized===false&&B4.boundaries?.productMutationAuthorized===false&&
