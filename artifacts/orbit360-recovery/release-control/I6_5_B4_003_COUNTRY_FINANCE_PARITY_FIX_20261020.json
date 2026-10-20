@@ -12,7 +12,7 @@
     "orbit360-platform/modules/cobros.js": "6b3892ab83ef7974fbae20e0b1ee15b32d62f08f"
   },
   "qaPath": "tools/gravicentra-b4-003-country-finance-parity.test.cjs",
-  "qaBlobSha": "d00f423470373fbcc7ef328498f936e5f9e90a9c",
+  "qaBlobSha": "4a9c69905bb22f35ce9e0fba9cc59e7a0cf7fa08",
   "rootCauses": [
     "POLICY_LINKED_COUNTRY_DID_NOT_COMPARE_LINKED_CLIENT_COUNTRY",
     "COUNTRY_TODOS_BYPASSED_INVALID_COUNTRY_RELATION",
@@ -46,5 +46,12 @@
   "authenticatedFunctionalPass": false,
   "wholeSecurityPass": false,
   "previousCobrosCachePreviewMustStayImmutable": true,
-  "previousInsurerAndUAT5ReceiptsPreserved": true
+  "previousInsurerAndUAT5ReceiptsPreserved": true,
+  "syntheticTestHarnessCorrection": {
+    "reason": "CROSS_REALM_MAP_INSTANCEOF_WITH_VM",
+    "sourceProductBlobsUnchanged": true,
+    "failedGuardRunId": 39488354292,
+    "correctiveChange": "Inject Map constructor into VM scope for in-memory q function evidence",
+    "operationalWrites": 0
+  }
 }

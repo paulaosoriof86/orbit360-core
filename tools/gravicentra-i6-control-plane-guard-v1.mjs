@@ -76,7 +76,7 @@ if(COUNTRY_ACTIVE){
    sameJson(COUNTRY_FIX.sourceBlobsAfter,stageLock.sourceBlobsAfter)&&sameJson(COUNTRY_FIX.sourceBlobsAfter,stageComp.sourceBlobsAfter)&&
    source.every(path=>git('hash-object',path)===COUNTRY_FIX.sourceBlobsAfter[path]&&
      COMP.productFileBlobs[path]===COUNTRY_FIX.sourceBlobsAfter[path]&&COMP.productFiles.includes(path)&&B4.boundaries.allowedProductFiles.includes(path))&&
-   COUNTRY_FIX.qaBlobSha===git('hash-object',COUNTRY_FIX.qaPath)&&B4.boundaries.allowedQaFiles.includes(COUNTRY_FIX.qaPath)&&
+   COUNTRY_FIX.qaBlobSha===git('hash-object',COUNTRY_FIX.qaPath)&&receipt.qaBlobSha===COUNTRY_FIX.qaBlobSha&&B4.boundaries.allowedQaFiles.includes(COUNTRY_FIX.qaPath)&&
    COUNTRY_FIX.compositionBlobSha===git('hash-object',I6_CANONICAL_COMPOSITION)&&
    COUNTRY_FIX.executionLockBlobSha===git('hash-object',ACTIVE_I65_FORENSIC_B4)&&
    C.canonicalAccumulationControl?.compositionLockBlobSha===COUNTRY_FIX.compositionBlobSha&&

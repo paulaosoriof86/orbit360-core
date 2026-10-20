@@ -43,7 +43,7 @@ const map=new Map([['gt',{pais:'GT'}],['co',{pais:'CO'}]]);
 const pol=new Map([['good',{id:'good',pais:'CO',clienteId:'co'}],['cross',{id:'cross',pais:'CO',clienteId:'gt'}]]);
 const mockU={finiteNumber:x=>Number(x)||0};
 const qOrbit={ui:mockU,store:{get:()=>null,all:()=>[]},pais:'CO'};
-const qCtx={Orbit:qOrbit,window:{Orbit:qOrbit}};
+const qCtx={Orbit:qOrbit,window:{Orbit:qOrbit},Map};
 vm.runInNewContext(newQuery,qCtx);
 const country=qOrbit.q.policyLinkedCountry;
 assert.equal(country({polizaId:'good',clienteId:'co',pais:'CO'},map,pol),'CO');

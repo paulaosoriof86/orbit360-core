@@ -6333,9 +6333,9 @@
       "orbit360-platform/modules/cobros.js": "6b3892ab83ef7974fbae20e0b1ee15b32d62f08f"
     },
     "qaPath": "tools/gravicentra-b4-003-country-finance-parity.test.cjs",
-    "qaBlobSha": "d00f423470373fbcc7ef328498f936e5f9e90a9c",
+    "qaBlobSha": "4a9c69905bb22f35ce9e0fba9cc59e7a0cf7fa08",
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_COUNTRY_FINANCE_PARITY_FIX_20261020.json",
-    "receiptBlobSha": "405196111ac5d6884ea929d2fc5104f3105e48d3",
+    "receiptBlobSha": "3c7486b5a64f46a0fd9ecdcdf5c31dc219931174",
     "sourceOnly": true,
     "operationalWritesAuthorized": false,
     "sharedRulesDeployAuthorized": false,

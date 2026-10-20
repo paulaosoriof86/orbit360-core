@@ -619,7 +619,7 @@
   },
   "findingLedgerBlobSha": "8125e97dcf1feb7f46081f95327952e65c2d1077",
   "continuityRegisterBlobSha": "4e6b0ac51736be360c4b95abe8fc01d8f1e78e20",
-  "compositionLockBlobSha": "a393b000aa5e54f1663758247c97378ba3658a99",
+  "compositionLockBlobSha": "45352e79f74d9f5ed35b1b2e1b22ef52ac800039",
   "r18SourceFix": {
     "status": "SOURCE_FIXED_R18_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_SOURCE_FIX_20261005.json",
@@ -3476,15 +3476,15 @@
       "orbit360-platform/modules/cobros.js": "6b3892ab83ef7974fbae20e0b1ee15b32d62f08f"
     },
     "qaPath": "tools/gravicentra-b4-003-country-finance-parity.test.cjs",
-    "qaBlobSha": "d00f423470373fbcc7ef328498f936e5f9e90a9c",
+    "qaBlobSha": "4a9c69905bb22f35ce9e0fba9cc59e7a0cf7fa08",
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_COUNTRY_FINANCE_PARITY_FIX_20261020.json",
-    "receiptBlobSha": "405196111ac5d6884ea929d2fc5104f3105e48d3",
+    "receiptBlobSha": "3c7486b5a64f46a0fd9ecdcdf5c31dc219931174",
     "sourceOnly": true,
     "operationalWritesAuthorized": false,
     "sharedRulesDeployAuthorized": false,
     "livePromotionAuthorized": false,
     "reimportAuthorized": false,
     "authenticatedUatAccepted": false,
-    "compositionBlobSha": "a393b000aa5e54f1663758247c97378ba3658a99"
+    "compositionBlobSha": "45352e79f74d9f5ed35b1b2e1b22ef52ac800039"
   }
 }
