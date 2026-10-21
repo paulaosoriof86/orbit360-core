@@ -10,8 +10,28 @@ Orbit.modules.polizas = (function () {
   const MODULE_KEY = 'polizas';
   const PC = id => (window.Orbit && Orbit.clientProjection && Orbit.clientProjection.get(id)) || S().get('clientes', id);
   let st = { fq: '', framo: '', fasg: '', fase: '', fest: '', sort: 'vence', page: 0 };
-  let indexCache = null, searchTimer = null;
-  function invalidateIndexes() { indexCache = null; }
+  let indexCache = null, indexCacheKey = null, searchTimer = null;
+  function invalidateIndexes() { indexCache = null; indexCacheKey = null; }
+  // A scoped facade may change with role, country, tenant or membership before
+  // orbit:session / orbit:store is emitted. Never reuse rows from that old scope.
+  function indexContextKey() {
+    const access = Orbit.access || {};
+    const call = (fn, fallback) => { try { return typeof fn === 'function' ? fn() : fallback; } catch (_) { return fallback; } };
+    const actor = call(access.actorAdvisor, null) || {};
+    const user = call(Orbit.auth && Orbit.auth.user, null) || {};
+    const role = call(access.activeRole, call(Orbit.session && Orbit.session.rol, ''));
+    const scope = call(() => access.dataScope && access.dataScope(MODULE_KEY), '');
+    const teams = scope === 'team' ? call(access.teamAdvisorIds, []) : [];
+    const countries = [].concat(actor.countries || actor.paises || actor.paisesAutorizados || []);
+    const roles = call(access.assignedRoles, []);
+    return JSON.stringify([
+      String(call(access.tenantId, '') || ''), String(user.uid || user.id || ''),
+      String(role || ''), String(Orbit.pais || 'TODOS').toUpperCase(),
+      String(call(access.actorAdvisorId, '') || ''), String(scope || ''),
+      [].concat(roles || []).map(String).sort(),
+      countries.map(String).sort(), [].concat(teams || []).map(String).sort()
+    ]);
+  }
   function rerender(host) {
     if (!host || !host.isConnected) return;
     const store=Orbit.store;
@@ -84,7 +104,8 @@ Orbit.modules.polizas = (function () {
   }
 
   function buildIndexes() {
-    if (indexCache) return indexCache;
+    const contextKey = indexContextKey();
+    if (indexCache && indexCacheKey === contextKey) return indexCache;
     const policies = S().all('polizas') || [];
     const clients = S().all('clientes') || [];
     const insurers = S().all('aseguradoras') || [];
@@ -101,6 +122,7 @@ Orbit.modules.polizas = (function () {
       ramoOptions, insurerOptions, advisorOptions,
       basicSearchIndex:null, vehicleSearchIndex:null
     };
+    indexCacheKey = contextKey;
     return indexCache;
   }
 

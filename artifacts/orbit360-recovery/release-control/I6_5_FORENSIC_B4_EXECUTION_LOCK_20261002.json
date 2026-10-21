@@ -3600,5 +3600,21 @@
     "dataWrites": 0,
     "formalI6Percent": 50,
     "productionPathPercent": 20
+  },
+  "b4003PolizasContextCacheFix20261020": {
+    "status": "SOURCE_ONLY_COMPOSED_PENDING_NODE_QA_AND_EXACT_PREVIEW",
+    "sourcePath": "orbit360-platform/modules/polizas.js",
+    "sourceBlobBefore": "3c3c1bc42bcbf03a88cea985d2101392a1c47c4d",
+    "sourceBlobAfter": "3a423fea2083e1b1dfd1863f31e30910112af1f5",
+    "qaPath": "tools/gravicentra-b4-003-polizas-context-cache.test.cjs",
+    "qaBlobSha": "31c3a828311cd2443042c4f14cfdf7b98f1883b9",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_POLIZAS_CONTEXT_CACHE_SOURCE_FIX_20261020.json",
+    "receiptBlobSha": "6eaf80da79b8f3f20677a9617eb7d3ca87154e99",
+    "compositionBlobSha": "dbe96631d74bfd009d7bd86e40495e40ebe1ee3e",
+    "sourceOnly": true,
+    "realBusinessWritesAuthorized": false,
+    "sharedRulesDeployAuthorized": false,
+    "livePromotionAuthorized": false,
+    "authenticatedUatAccepted": false
   }
 }

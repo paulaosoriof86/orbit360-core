@@ -243,7 +243,7 @@
     "orbit360-platform/modules/ops.js": "a4ca3dbb4613d541af411f12fce9773a072b0d41",
     "orbit360-platform/modules/policy-receipts-v1199-bridge.js": "79e8eefc821b17b1abb3ba7b26558e90199a9ea5",
     "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js": "1b8dceb208b93220ce232037b4d0d394bb022f62",
-    "orbit360-platform/modules/polizas.js": "3c3c1bc42bcbf03a88cea985d2101392a1c47c4d",
+    "orbit360-platform/modules/polizas.js": "3a423fea2083e1b1dfd1863f31e30910112af1f5",
     "orbit360-platform/modules/portal-v1142-copyfix.js": "702cae307395361b3a7f61b7a268d15d85b44955",
     "orbit360-platform/modules/portal.js": "957cefe0647bff2b350e5b3f0f78ef7a9e97703f",
     "orbit360-platform/modules/renewals-v1200-operational-bridge.js": "43b3a6b07eba40baa50b61b238174540cd9bf430",
@@ -6363,5 +6363,20 @@
     "livePromotionAuthorized": false,
     "reimportAuthorized": false,
     "humanUatAccepted": false
+  },
+  "b4003PolizasContextCacheFix20261020": {
+    "status": "SCOPED_POLIZAS_CONTEXT_CACHE_SOURCE_ONLY_QA_HOLD",
+    "owner": "orbit360-platform/modules/polizas.js",
+    "sourceBefore": "3c3c1bc42bcbf03a88cea985d2101392a1c47c4d",
+    "sourceAfter": "3a423fea2083e1b1dfd1863f31e30910112af1f5",
+    "qaPath": "tools/gravicentra-b4-003-polizas-context-cache.test.cjs",
+    "qaBlobSha": "31c3a828311cd2443042c4f14cfdf7b98f1883b9",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_POLIZAS_CONTEXT_CACHE_SOURCE_FIX_20261020.json",
+    "receiptBlobSha": "6eaf80da79b8f3f20677a9617eb7d3ca87154e99",
+    "productFileCountPreserved": 113,
+    "sourceOnly": true,
+    "operationalWrites": 0,
+    "noLive": true,
+    "noReimport": true
   }
 }
