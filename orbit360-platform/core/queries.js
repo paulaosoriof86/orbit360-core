@@ -83,6 +83,67 @@ Orbit.q = (function () {
       ['pagado','pago_inferido','pago_reportado_aplicado','pago_reportado_asesor_aplicado'].includes(op) ||
       !!(row && (row.cobroId || row.paidDate || row.fechaPago));
   }
+
+  // B4-003: cartera determines whether an obligation is open and overdue;
+  // a linked expected receipt may supply a missing contractual installment
+  // amount only after an exact, unique, non-conflicting relation check.
+  // This is a read-model provenance fallback, NOT a payment/cobro or write.
+  function portfolioAmountContext(input) {
+    input = input || {};
+    const receipts = input.receipts || S().all('recibosEsperados') || [];
+    const portfolios = input.portfolios || S().all('carteraPrimas') || [];
+    const policies = input.policies || S().all('polizas') || [];
+    const cobros = input.cobros || S().all('cobros') || [];
+    const receiptsById = new Map(), duplicates = new Set(), portfoliosPerReceipt = new Map();
+    const policiesById = new Map(), paymentReceiptIds = new Set();
+    receipts.forEach(r => { const id=String(r&&r.id||'').trim(); if(!id)return;
+      if(receiptsById.has(id))duplicates.add(id); else receiptsById.set(id,r);
+    });
+    portfolios.forEach(r => { const id=String(r&&(r.reciboId||r.receiptId)||'').trim(); if(id)portfoliosPerReceipt.set(id,(portfoliosPerReceipt.get(id)||0)+1); });
+    policies.forEach(p => { const id=String(p&&p.id||'').trim(); if(id)policiesById.set(id,p); });
+    cobros.forEach(c => { const id=String(c&&(c.reciboId||c.receiptId)||'').trim(); if(id)paymentReceiptIds.add(id); });
+    return {receiptsById,duplicates,portfoliosPerReceipt,policiesById,paymentReceiptIds};
+  }
+  function explicitNumber(v) {
+    if(v==null||String(v).trim()==='')return null;
+    const n=finite(v);return n==null||!Number.isFinite(n)?null:n;
+  }
+  function portfolioAmountProof(row, ctx) {
+    const explicit=explicitNumber(row&&(row.monto!=null?row.monto:row.saldo));
+    if(explicit!=null)return {value:explicit,source:'CARTERA_EXPLICIT'};
+    if(!row||row.carteraActiva===false||!portfolioOpen(row))return {value:null,source:'UNVERIFIED'};
+    const key=String(row.reciboId||row.receiptId||'').trim();
+    const policyId=String(row.polizaId||row.policyId||'').trim();
+    if(!key||!policyId||!ctx||ctx.duplicates.has(key)||ctx.portfoliosPerReceipt.get(key)!==1||
+       ctx.paymentReceiptIds.has(key))return {value:null,source:'UNVERIFIED'};
+    const receipt=ctx.receiptsById.get(key),policy=ctx.policiesById.get(policyId);
+    if(!receipt||!policy||String(receipt.polizaId||receipt.policyId||'').trim()!==policyId)return {value:null,source:'UNVERIFIED'};
+    const pc=countryCode(policy.pais||policy.country),money=countryCode(policy.moneda||policy.divisa);
+    if(!['GT','CO'].includes(pc)||money!==(pc==='GT'?'GTQ':'COP')||
+       !['Vigente','Por renovar'].includes(String(policy.estado||'')))return {value:null,source:'UNVERIFIED'};
+    if([row.pais,row.country,receipt.pais,receipt.country].some(v=>v&&countryCode(v)!==pc)||
+       [row.moneda,receipt.moneda].some(v=>!v||countryCode(v)!==money))return {value:null,source:'UNVERIFIED'};
+    const parentClient=String(policy.clienteId||'').trim();
+    if(!parentClient||(row.clienteId&&String(row.clienteId)!==parentClient)||
+       (receipt.clienteId&&String(receipt.clienteId)!==parentClient))return {value:null,source:'UNVERIFIED'};
+    const duePortfolio=String(portfolioDue(row)||'').slice(0,10);
+    const dueReceipt=String(receipt.fechaLimite||receipt.vence||receipt.fechaVencimiento||'').slice(0,10);
+    if(!duePortfolio||duePortfolio!==dueReceipt)return {value:null,source:'UNVERIFIED'};
+    if(!expectedReceiptOpen(receipt)||receiptHasAppliedPayment(receipt)||
+       row.cobroId||row.fechaPago||row.paidDate||row.conciliadoPago===true)return {value:null,source:'UNVERIFIED'};
+    const state=textNorm(receipt.estadoOperativo||row.estadoOperativo).replace(/\s+/g,'_');
+    if(!['pendiente','pendiente_vencido'].includes(state))return {value:null,source:'UNVERIFIED'};
+    const amountReceipt=explicitNumber(receipt.primaTotal!=null?receipt.primaTotal:(receipt.montoTotal!=null?receipt.montoTotal:receipt.monto));
+    const amountPortfolio=explicitNumber(row.primaTotal!=null?row.primaTotal:row.montoTotal);
+    if(amountReceipt==null||amountReceipt<=0||
+       (amountPortfolio!=null&&Math.abs(amountPortfolio-amountReceipt)>0.01))return {value:null,source:'UNVERIFIED'};
+    return {value:amountReceipt,source:'MATCHED_EXPECTED_RECEIPT_CONTRACTUAL_AMOUNT',receiptId:key};
+  }
+  function portfolioAmountValue(row, ctx) {
+    const proof=portfolioAmountProof(row,ctx);
+    return proof.value==null?0:proof.value;
+  }
+
   // B3-008: la fórmula aprobada de Salud vive en un único owner.
   function saludCliente(cli, vigentes, vencido) {
     let salud = 70;
@@ -104,8 +165,9 @@ Orbit.q = (function () {
     const vigentes = pol.filter(p => p.estado === 'Vigente' || p.estado === 'Por renovar');
     const primaAnual = vigentes.reduce((s, p) => s + amount(p.primaTotal), 0);
     const cobrado = realized.reduce((s, c) => s + amount(c.monto), 0);
-    const pendiente = car.filter(r => portfolioOpen(r) && !portfolioIsOverdue(r)).reduce((s, r) => s + amount(r.monto != null ? r.monto : r.saldo), 0);
-    const vencido = car.filter(portfolioIsOverdue).reduce((s, r) => s + amount(r.monto != null ? r.monto : r.saldo), 0);
+    const amountIndex=portfolioAmountContext({receipts:rec,policies:pol,portfolios:car,cobros:cob});
+    const pendiente = car.filter(r => portfolioOpen(r) && !portfolioIsOverdue(r)).reduce((s, r) => s + portfolioAmountValue(r,amountIndex), 0);
+    const vencido = car.filter(portfolioIsOverdue).reduce((s, r) => s + portfolioAmountValue(r,amountIndex), 0);
     const recibosPendientes = rec.filter(r => expectedReceiptOpen(r) && !expectedReceiptIsOverdue(r)).reduce((s, r) => s + amount(r.monto != null ? r.monto : r.montoTotal), 0);
     const recibosVencidos = rec.filter(expectedReceiptIsOverdue).reduce((s, r) => s + amount(r.monto != null ? r.monto : r.montoTotal), 0);
     const comisionGen = com.reduce((s, c) => s + amount(c.monto), 0);
@@ -129,6 +191,7 @@ Orbit.q = (function () {
     const cobros = S().all('cobros') || [];
     const realized = realizedPaymentRows();
     const comisiones = S().all('comisiones') || [];
+    const portfolioMoney=portfolioAmountContext({receipts:recibos,policies:polizas,portfolios:cartera,cobros});
     const polByClient = new Map(), polById = new Map(), recByClient = new Map(), carByClient = new Map(), cobByClient = new Map(), realizedByClient = new Map(), comByClient = new Map();
     const add = (map, id, row) => {
       if (id == null) return;
@@ -154,8 +217,8 @@ Orbit.q = (function () {
       const vigentes = pol.filter(p => p.estado === 'Vigente' || p.estado === 'Por renovar');
       const primaAnual = vigentes.reduce((s, p) => s + amount(p.primaTotal), 0);
       const cobrado = realizedCob.reduce((s, c) => s + amount(c.monto), 0);
-      const pendiente = car.filter(r => portfolioOpen(r) && !portfolioIsOverdue(r)).reduce((s, r) => s + amount(r.monto != null ? r.monto : r.saldo), 0);
-      const vencido = car.filter(portfolioIsOverdue).reduce((s, r) => s + amount(r.monto != null ? r.monto : r.saldo), 0);
+      const pendiente = car.filter(r => portfolioOpen(r) && !portfolioIsOverdue(r)).reduce((s, r) => s + portfolioAmountValue(r,portfolioMoney), 0);
+      const vencido = car.filter(portfolioIsOverdue).reduce((s, r) => s + portfolioAmountValue(r,portfolioMoney), 0);
       const recibosPendientes = rec.filter(r => expectedReceiptOpen(r) && !expectedReceiptIsOverdue(r)).reduce((s, r) => s + amount(r.monto != null ? r.monto : r.montoTotal), 0);
       const recibosVencidos = rec.filter(expectedReceiptIsOverdue).reduce((s, r) => s + amount(r.monto != null ? r.monto : r.montoTotal), 0);
       const comisionGen = com.reduce((s, c) => s + amount(c.monto), 0);
@@ -363,9 +426,10 @@ Orbit.q = (function () {
     const cob = realizedPaymentRows().filter(c => rowPais(c, clients, policies));
     const pendingRows = carteraPendienteRows();
     const overdueRows = carteraVencidaRows();
+    const finance=portfolioAmountContext();
     const alDia = cob.filter(confirmedCobro).reduce((s, c) => s + norm(c.monto, c.moneda), 0);
-    const pend = pendingRows.reduce((s, r) => s + norm(r.monto != null ? r.monto : r.saldo, r.moneda), 0);
-    const venc = overdueRows.reduce((s, r) => s + norm(r.monto != null ? r.monto : r.saldo, r.moneda), 0);
+    const pend = pendingRows.reduce((s, r) => s + norm(portfolioAmountValue(r,finance), currencyCodeFor(r,clients,policies)), 0);
+    const venc = overdueRows.reduce((s, r) => s + norm(portfolioAmountValue(r,finance), currencyCodeFor(r,clients,policies)), 0);
     return { alDia, pend, venc, moneda: monedaPais(), source: 'cobros+carteraPrimas' };
   }
   function currencyCodeFor(row, clients, policies) {
@@ -380,7 +444,9 @@ Orbit.q = (function () {
     const clients = clientIndex();
     const policies = new Map((S().all('polizas') || []).filter(p => p && p.id != null).map(p => [p.id, p]));
     const cob = realizedPaymentRows().filter(c => rowPais(c, clients, policies));
-    const car = (S().all('carteraPrimas') || []).filter(c => policyLinkedRowPais(c, clients, policies));
+    const portfolioSource=S().all('carteraPrimas') || [];
+    const car = portfolioSource.filter(c => policyLinkedRowPais(c, clients, policies));
+    const finance=portfolioAmountContext({portfolios:portfolioSource,policies:[...policies.values()]});
     const byCurrency = {};
     let confirmedCount = 0, porConciliarCount = 0;
     const ensure = cur => byCurrency[cur] || (byCurrency[cur] = emptyPortfolioCurrency());
@@ -395,11 +461,11 @@ Orbit.q = (function () {
     });
     car.filter(r => portfolioOpen(r) && !portfolioIsOverdue(r)).forEach(r => {
       const cur = currencyCodeFor(r, clients, policies);
-      ensure(cur).pend += amount(r.monto != null ? r.monto : r.saldo);
+      ensure(cur).pend += portfolioAmountValue(r,finance);
     });
     car.filter(portfolioIsOverdue).forEach(r => {
       const cur = currencyCodeFor(r, clients, policies);
-      ensure(cur).venc += amount(r.monto != null ? r.monto : r.saldo);
+      ensure(cur).venc += portfolioAmountValue(r,finance);
     });
     return {
       byCurrency,
@@ -416,16 +482,17 @@ Orbit.q = (function () {
   function agingVencidoPorMoneda() {
     const clients = clientIndex();
     const policies = new Map((S().all('polizas') || []).filter(p => p && p.id != null).map(p => [p.id, p]));
-    const byCurrency = {};
+    const byCurrency = {},portfolioSource=S().all('carteraPrimas')||[];
+    const finance=portfolioAmountContext({portfolios:portfolioSource,policies:[...policies.values()]});
     const ensure = cur => byCurrency[cur] || (byCurrency[cur] = { '1-30': 0, '31-60': 0, '61-90': 0, '90+': 0 });
-    (S().all('carteraPrimas') || [])
+    portfolioSource
       .filter(r => policyLinkedRowPais(r, clients, policies))
       .filter(portfolioIsOverdue)
       .forEach(r => {
         const due = portfolioDue(r);
         const d = -U.daysFromNow(due);
         const cur = currencyCodeFor(r, clients, policies);
-        const v = amount(r.monto != null ? r.monto : r.saldo);
+        const v = portfolioAmountValue(r,finance);
         const buckets = ensure(cur);
         if (d <= 30) buckets['1-30'] += v;
         else if (d <= 60) buckets['31-60'] += v;
@@ -478,10 +545,12 @@ Orbit.q = (function () {
   /** Aging exclusivo de Cartera Primas; Cobros realizados no generan deuda vencida. */
   function agingVencido() {
     const buckets = { '1-30': 0, '31-60': 0, '61-90': 0, '90+': 0 };
+    const finance=portfolioAmountContext(),policyById=finance.policiesById;
     (S().all('carteraPrimas') || []).filter(portfolioIsOverdue).forEach(c => {
       const due = portfolioDue(c);
       const d = -U.daysFromNow(due);
-      const v = norm(c.monto != null ? c.monto : c.saldo, c.moneda);
+      const cur=countryCode(policyById.get(String(c.polizaId||''))?.moneda||c.moneda);
+      const v = norm(portfolioAmountValue(c,finance),cur);
       if (d <= 30) buckets['1-30'] += v;
       else if (d <= 60) buckets['31-60'] += v;
       else if (d <= 90) buckets['61-90'] += v;
@@ -510,6 +579,6 @@ Orbit.q = (function () {
     asesor, aseguradora, polizasDe, recibosEsperadosDe, carteraPrimasDe, carteraPendienteDe, carteraVencidaDe, cobrosDe, comisionesDe, actividadesDe, cancelacionesDe,
     clienteResumen, clientesResumenIndex, saludCliente, carteraGlobal, carteraPendienteRows, carteraVencidaRows, cobrosConfirmadosRows, carteraGlobalPorMoneda, primaVigenteGlobal, renovacionesProximas, cobrosVencidos, leaderboard,
     clientesScoped, polizasScoped, realizedPaymentRows, currentMonthKey, produccionMesPorMoneda, recaudoMesPorMoneda, metaAdvisorMes, leaderboardMes,
-    agingVencido, agingVencidoPorMoneda, comisionesPor, clienteNombre, norm, monedaPais, policyLinkedClientId, policyLinkedCountry, vehiculosDe, vehiculoDePoliza, postRecaudo
+    agingVencido, agingVencidoPorMoneda, portfolioAmountProof, portfolioAmountContext, comisionesPor, clienteNombre, norm, monedaPais, policyLinkedClientId, policyLinkedCountry, vehiculosDe, vehiculoDePoliza, postRecaudo
   };
 })();

@@ -60,6 +60,60 @@ const S=readJson(STATUS_LEDGER),A=readJson(AUTH_RECEIPT),M5=readJson(V5_MANIFEST
 const COMP=readJson(I6_CANONICAL_COMPOSITION),FIND=readJson(I6_FINDINGS_LEDGER),FRP2=readJson(I65_FORENSIC_PLAN_V2),REJ=readJson(I65_B2_REJECTION),RCM=readJson(I65_B2_ROOT_CAUSE);
 // Source-only successor: verify the new security-context index and preserve the old
 // aging Preview proof at its ORIGINAL immutable source/composition identity.
+// Exact source-backed I6.5 B4-003 financial amount read-model correction.
+// Historical Preview/QA evidence stays bound to the old source SHA.
+const MISSING_MONEY=C.b4003CanonicalPortfolioAmountFix20261021||{};
+const MISSING_MONEY_ACTIVE=MISSING_MONEY.status==='SOURCE_ONLY_QA_PENDING_GUARD';
+if(MISSING_MONEY_ACTIVE){
+ const locked=B4.b4003CanonicalPortfolioAmountFix20261021||{};
+ const manifest=COMP.b4003CanonicalPortfolioAmountFix20261021||{};
+ const receiptPath='artifacts/orbit360-recovery/release-control/I6_5_B4_003_CO_CARTERA_SOURCE_FIX_20261021.json';
+ const receipt=exists(receiptPath)?readJson(receiptPath):{};
+ need(
+  MISSING_MONEY.sourcePath==='orbit360-platform/core/queries.js'&&
+  MISSING_MONEY.sourceBlobBefore==='0f3f540a71e98ccdca8c040f937d18a169e52396'&&
+  MISSING_MONEY.sourceBlobAfter===git('hash-object',MISSING_MONEY.sourcePath)&&
+  MISSING_MONEY.qaPath==='tools/gravicentra-b4-003-portfolio-verified-receipt-amount.test.cjs'&&
+  MISSING_MONEY.qaBlobSha===git('hash-object',MISSING_MONEY.qaPath)&&
+  MISSING_MONEY.receiptPath===receiptPath&&
+  MISSING_MONEY.receiptBlobSha===git('hash-object',receiptPath)&&
+  receipt.schema==='GRAVICENTRA_I6_5_B4_003_CO_CARTERA_VERIFIED_READMODEL_FIX_V1'&&
+  receipt.oldSourceBlob===MISSING_MONEY.sourceBlobBefore&&
+  receipt.newSourceBlob===MISSING_MONEY.sourceBlobAfter&&
+  receipt.qaBlobSha===MISSING_MONEY.qaBlobSha&&
+  receipt.realBusinessWrites===0&&receipt.uatFunctionalAcceptance===false&&
+  receipt.realSourceEvidence.runId===39627038822&&
+  receipt.realSourceEvidence.id===12357866713&&
+  receipt.realSourceEvidence.archiveDigest==='sha256:7dfe1a74d2542e671fb735f7858daca816d58d0a781aac3f5959a429e08d7c24'&&
+  MISSING_MONEY.parentHead==='4734917b25fdf45e1dac3fe6481071fee5603ab6'&&
+  MISSING_MONEY.previousCompositionBlobSha==='dbe96631d74bfd009d7bd86e40495e40ebe1ee3e'&&
+  MISSING_MONEY.previousExecutionLockBlobSha==='bc8bd56c6ffe4836bfcfbfac47c664ccfbf1049d'&&
+  MISSING_MONEY.compositionBlobSha===git('hash-object',I6_CANONICAL_COMPOSITION)&&
+  MISSING_MONEY.executionLockBlobSha===git('hash-object',ACTIVE_I65_FORENSIC_B4)&&
+  locked.status==='SOURCE_ONLY_QA_PENDING_GUARD'&&
+  locked.sourceBlobAfter===MISSING_MONEY.sourceBlobAfter&&
+  locked.qaBlobSha===MISSING_MONEY.qaBlobSha&&
+  locked.receiptBlobSha===MISSING_MONEY.receiptBlobSha&&
+  locked.compositionBlobSha===MISSING_MONEY.compositionBlobSha&&
+  manifest.sourceAfter===MISSING_MONEY.sourceBlobAfter&&
+  manifest.qaBlobSha===MISSING_MONEY.qaBlobSha&&
+  COMP.productFileBlobs?.[MISSING_MONEY.sourcePath]===MISSING_MONEY.sourceBlobAfter&&
+  COMP.productFiles.includes(MISSING_MONEY.sourcePath)&&
+  B4.boundaries?.allowedProductFiles?.includes(MISSING_MONEY.sourcePath)&&
+  B4.boundaries?.allowedQaFiles?.includes(MISSING_MONEY.qaPath)&&
+  B4.compositionLockBlobSha===MISSING_MONEY.compositionBlobSha&&
+  C.canonicalAccumulationControl?.compositionLockBlobSha===MISSING_MONEY.compositionBlobSha&&
+  C.currentB4?.executionLockBlobSha===MISSING_MONEY.executionLockBlobSha&&
+  C.i65ForensicRemediationPlan?.b4?.executionLockBlobSha===MISSING_MONEY.executionLockBlobSha&&
+  C.b4003SecurityReleaseHold?.status==='ACTIVE_FAIL_CLOSED_UNAUTHORIZED_BROWSER_FIRESTORE_READ_WRITE'&&
+  B4.boundaries?.productMutationAuthorized===false&&B4.boundaries?.businessWritesAuthorized===false&&
+  B4.boundaries?.dataMutationAuthorized===false&&B4.boundaries?.livePromotionAuthorized===false&&
+  MISSING_MONEY.operationalDataWritesAuthorized===false&&MISSING_MONEY.livePromotionAuthorized===false&&
+  FIND.findings.length===295,
+  'B4_003_CO_PORTFOLIO_MONEY_SOURCE_OR_GOVERNANCE_DRIFT');
+ execFileSync(process.execPath,[MISSING_MONEY.qaPath],{stdio:'inherit'});
+ console.log('B4_003_CO_PORTFOLIO_MONEY_SOURCE_QA_PASS_SYNTHETIC_UAT_HOLD');
+}
 const PCACHE=C.b4003PolizasContextCacheFix20261020||{};
 const PCACHE_ACTIVE=PCACHE.status==='SOURCE_ONLY_COMPOSED_NODE_QA_REGISTERED_RUN_REQUIRED';
 if(PCACHE_ACTIVE){
@@ -79,7 +133,7 @@ if(PCACHE_ACTIVE){
   R.sourceBlobBefore===PCACHE.sourceBlobBefore&&R.qaBlobSha===PCACHE.qaBlobSha&&
   PCACHE.previousCompositionBlobSha==='da8ffd0c253db638666059d34193cd3275d6e870'&&
   PCACHE.previousExecutionLockBlobSha==='72e7ed7f07804c295f79ff245dce322cdc33c63a'&&
-  PCACHE.compositionBlobSha===git('hash-object',I6_CANONICAL_COMPOSITION)&&
+  PCACHE.compositionBlobSha===(MISSING_MONEY_ACTIVE?MISSING_MONEY.previousCompositionBlobSha:git('hash-object',I6_CANONICAL_COMPOSITION))&&
   PCACHE.executionLockBlobSha===git('hash-object',ACTIVE_I65_FORENSIC_B4)&&
   L.status==='SCOPED_CONTEXT_CACHE_SOURCE_FIXED_QA_RUN_BY_GUARD_NO_PREVIEW_AUTH'&&
   L.sourceBlobAfter===PCACHE.sourceBlobAfter&&L.qaBlobSha===PCACHE.qaBlobSha&&
@@ -90,8 +144,8 @@ if(PCACHE_ACTIVE){
   COMP.productFiles.includes(PCACHE.sourcePath)&&
   B4.boundaries?.allowedProductFiles?.includes(PCACHE.sourcePath)&&
   B4.boundaries?.allowedQaFiles?.includes(PCACHE.qaPath)&&
-  B4.compositionLockBlobSha===PCACHE.compositionBlobSha&&
-  C.canonicalAccumulationControl?.compositionLockBlobSha===PCACHE.compositionBlobSha&&
+  B4.compositionLockBlobSha===git('hash-object',I6_CANONICAL_COMPOSITION)&&
+  C.canonicalAccumulationControl?.compositionLockBlobSha===git('hash-object',I6_CANONICAL_COMPOSITION)&&
   C.currentB4?.executionLockBlobSha===PCACHE.executionLockBlobSha&&
   C.i65ForensicRemediationPlan?.b4?.executionLockBlobSha===PCACHE.executionLockBlobSha&&
   C.b4003SecurityReleaseHold?.status==='ACTIVE_FAIL_CLOSED_UNAUTHORIZED_BROWSER_FIRESTORE_READ_WRITE'&&
@@ -117,7 +171,7 @@ if(PCACHE_PREVIEW.status==='AUTHORIZED_EXACT_READONLY_PREVIEW'){
  PCACHE_PREVIEW.sourcePath===PCACHE.sourcePath&&PCACHE_PREVIEW.qaPath===PCACHE.qaPath&&
  PCACHE_PREVIEW.sourceBlobSha===git('hash-object',PCACHE.sourcePath)&&
  PCACHE_PREVIEW.qaBlobSha===git('hash-object',PCACHE.qaPath)&&
- PCACHE_PREVIEW.compositionBlobSha===git('hash-object',I6_CANONICAL_COMPOSITION)&&
+ PCACHE_PREVIEW.compositionBlobSha===(MISSING_MONEY_ACTIVE?MISSING_MONEY.previousCompositionBlobSha:git('hash-object',I6_CANONICAL_COMPOSITION))&&
  PCACHE_PREVIEW.rosterSourceBlobSha===git('hash-object','functions/assignable-advisor-roster.js')&&
  PCACHE_PREVIEW.preAuthExecutionLockBlobSha==='d820357a91536b14577a516e8f592ad5f4f5ff81'&&
  PCACHE_PREVIEW.priorGuardRunId===39536893703&&PCACHE_PREVIEW.priorGuardConclusion==='success'&&
@@ -155,7 +209,7 @@ if(PCACHE_PROOF.status==='EXACT_TECHNICAL_PREVIEW_PASS_AUTHENTICATED_UAT_HOLD'){
   R.status===PCACHE_PROOF.status&&R.sourceSha===PCACHE_PROOF.sourceSha&&
   R.sourceBlobSha===git('hash-object','orbit360-platform/modules/polizas.js')&&
   R.qaBlobSha===git('hash-object','tools/gravicentra-b4-003-polizas-context-cache.test.cjs')&&
-  R.compositionBlobSha===git('hash-object',I6_CANONICAL_COMPOSITION)&&
+  R.compositionBlobSha===(MISSING_MONEY_ACTIVE?MISSING_MONEY.previousCompositionBlobSha:git('hash-object',I6_CANONICAL_COMPOSITION))&&
   R.runId===39537641686&&R.channelId==='gi-i65-b4-'+R.runId&&
   R.buildId==='gi-i65-b4-'+R.sourceSha.slice(0,12)+'-57f234755dc1'&&
   R.previewUrl===PCACHE_PROOF.previewUrl&&
@@ -329,7 +383,7 @@ if(COUNTRY_PREVIEW_ACTIVE){
    receipt.schema==='GI_B4_003_COUNTRY_FINANCE_EXACT_PREVIEW_AUTH_20261020_V1'&&
    receipt.authorization?.sourceFixReceiptBlobSha===COUNTRY_PREVIEW.sourceFixReceiptBlobSha&&
    sameJson(paths,['orbit360-platform/core/queries.js','orbit360-platform/modules/cobros.js'])&&
-   paths.every(path=>COUNTRY_PREVIEW.sourceBlobs[path]===(AGING_ACTIVE&&path===AGING.sourcePath?AGING.sourceBlobBefore:git('hash-object',path))&&
+   paths.every(path=>COUNTRY_PREVIEW.sourceBlobs[path]===(MISSING_MONEY_ACTIVE&&path===MISSING_MONEY.sourcePath?MISSING_MONEY.sourceBlobBefore:(AGING_ACTIVE&&path===AGING.sourcePath?AGING.sourceBlobBefore:git('hash-object',path)))&&
      B4.boundaries?.allowedProductFiles?.includes(path))&&
    Object.keys(COUNTRY_PREVIEW.qaBlobs||{}).length===1&&
    Object.entries(COUNTRY_PREVIEW.qaBlobs||{}).every(([path,sha])=>sha===git('hash-object',path)&&
@@ -367,7 +421,7 @@ if(COUNTRY_ACTIVE){
    source.length===2&&sameJson(source,expect)&&
    sameJson(COUNTRY_FIX.sourceBlobsBefore,receipt.sourceBlobsBefore)&&sameJson(COUNTRY_FIX.sourceBlobsAfter,receipt.sourceBlobsAfter)&&
    sameJson(COUNTRY_FIX.sourceBlobsAfter,stageLock.sourceBlobsAfter)&&sameJson(COUNTRY_FIX.sourceBlobsAfter,stageComp.sourceBlobsAfter)&&
-   source.every(path=>COUNTRY_FIX.sourceBlobsAfter[path]===(AGING_ACTIVE&&path===AGING.sourcePath?AGING.sourceBlobBefore:git('hash-object',path))&&
+   source.every(path=>COUNTRY_FIX.sourceBlobsAfter[path]===(MISSING_MONEY_ACTIVE&&path===MISSING_MONEY.sourcePath?MISSING_MONEY.sourceBlobBefore:(AGING_ACTIVE&&path===AGING.sourcePath?AGING.sourceBlobBefore:git('hash-object',path)))&&
      COMP.productFileBlobs[path]===git('hash-object',path)&&COMP.productFiles.includes(path)&&B4.boundaries.allowedProductFiles.includes(path))&&
    COUNTRY_FIX.qaBlobSha===git('hash-object',COUNTRY_FIX.qaPath)&&receipt.qaBlobSha===COUNTRY_FIX.qaBlobSha&&B4.boundaries.allowedQaFiles.includes(COUNTRY_FIX.qaPath)&&
    COUNTRY_FIX.compositionBlobSha===(AGING_ACTIVE?AGING.previousCompositionBlobSha:git('hash-object',I6_CANONICAL_COMPOSITION))&&

@@ -1,0 +1,77 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_CO_CARTERA_VERIFIED_READMODEL_FIX_V1",
+  "gate": "I6.5/B4-003",
+  "classification": "CODE_DEFECT_SOURCE_PROJECTION_WITH_DATA_CONFLICTS_PRESERVED",
+  "date": "2026-10-21",
+  "status": "SOURCE_ONLY_QA_PENDING_GUARD_AND_EXACT_PREVIEW",
+  "parentHead": "4734917b25fdf45e1dac3fe6481071fee5603ab6",
+  "owner": "orbit360-platform/core/queries.js",
+  "oldSourceBlob": "0f3f540a71e98ccdca8c040f937d18a169e52396",
+  "newSourceBlob": "ee10618b0d2d04e1d7578e7abc44fc99686b60ed",
+  "qaPath": "tools/gravicentra-b4-003-portfolio-verified-receipt-amount.test.cjs",
+  "qaBlobSha": "567ed700711bb8b4375747b299296d2ebd2b4f1b",
+  "realSourceEvidence": {
+    "id": 12357866713,
+    "archiveDigest": "sha256:7dfe1a74d2542e671fb735f7858daca816d58d0a781aac3f5959a429e08d7c24",
+    "runId": 39627038822,
+    "runConclusion": "success",
+    "guardRunId": 39627039090,
+    "guardConclusion": "success",
+    "sourcePreviewSha": "aedf6fd705499b095fd711b16b1f9a42577ae04b",
+    "sourceReadback": "FIRESTORE_ADMIN_READONLY_NOT_ROLE_AUTHORIZATION_PROOF"
+  },
+  "empiricalFindings": [
+    {
+      "policy": "1003687",
+      "country": "CO",
+      "currency": "COP",
+      "receiptAmount": 6260611,
+      "cartera_monto_saldo": "ABSENT",
+      "portfolioReceiptLinked": true,
+      "paymentDocuments": 0
+    },
+    {
+      "policy": "57071",
+      "country": "CO",
+      "currency": "COP",
+      "receiptAmount": 733878.95,
+      "cartera_monto_saldo": "ABSENT",
+      "portfolioReceiptLinked": true,
+      "paymentDocuments": 0
+    },
+    {
+      "policy": "10104",
+      "country": "CO",
+      "currency": "COP",
+      "receiptAmount": 1227140.09,
+      "cartera_monto_saldo": "ABSENT",
+      "portfolioReceiptLinked": true,
+      "paymentDocuments": 0
+    },
+    {
+      "policy": "UTO-1000001645",
+      "country": "GT",
+      "policyCurrency": "GTQ",
+      "receiptAndCarteraCurrency": "COP",
+      "overdueInstallments": 2,
+      "eachAmount": 147,
+      "classification": "CURRENCY_CONFLICT_RETAINS_HOLD"
+    }
+  ],
+  "action": "Only when a unique open portfolio→expected receipt→policy matches currency/country/due/identity with no payment evidence, read projected amount from the explicit expected receipt without mutating persisted portfolio. Conflicts stay unverified; existing explicit zero amount overrides fallback.",
+  "excluded": [
+    "NO_PAYMENT_INFERRED",
+    "NO_COUNTRY_CURRENCY_OVERWRITE",
+    "NO_COBRO_CREATED",
+    "NO_DATA_MUTATION",
+    "NO_REIMPORT",
+    "NO_LIVE_DEPLOY"
+  ],
+  "syntheticNodeTest": "AWAITING_GITHUB_ACTIONS_GUARD",
+  "uatFunctionalAcceptance": false,
+  "securityC0304Pass": false,
+  "realBusinessWrites": 0,
+  "resolvedFindingIds": [],
+  "formalI6Percent": 50,
+  "productionReadinessPercent": 20
+}

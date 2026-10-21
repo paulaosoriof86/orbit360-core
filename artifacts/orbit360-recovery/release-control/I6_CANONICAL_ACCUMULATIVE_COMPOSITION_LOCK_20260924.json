@@ -201,7 +201,7 @@
     "orbit360-platform/core/product-runtime-browser-providers-p0.js": "51f2801cf8e7590ff92ffa9e7dae07ff8304f5d7",
     "orbit360-platform/core/public-tenant-branding.js": "ee1029772b1191c44817d315dc8ce8862bb3a152",
     "orbit360-platform/core/pwa.js": "14bc0d513a2ee3de8f7b598b38276e6136f05eb8",
-    "orbit360-platform/core/queries.js": "0f3f540a71e98ccdca8c040f937d18a169e52396",
+    "orbit360-platform/core/queries.js": "ee10618b0d2d04e1d7578e7abc44fc99686b60ed",
     "orbit360-platform/core/quote-authority-contract-v1.js": "7fb49d51476f21456540b0b7a178e82675231562",
     "orbit360-platform/core/quote-comparison-contracts-v1203.js": "c3342d5fc94661a9f23563e4b1c644346dd10fb3",
     "orbit360-platform/core/quote-comparison-p06-runtime-adapter-v1208.js": "1e3a5d79b4bdcba69f8de0737bf0df96d4cbd3d0",
@@ -6378,5 +6378,19 @@
     "operationalWrites": 0,
     "noLive": true,
     "noReimport": true
+  },
+  "b4003CanonicalPortfolioAmountFix20261021": {
+    "status": "SOURCE_ONLY_QA_PENDING_GUARD",
+    "sourcePath": "orbit360-platform/core/queries.js",
+    "sourceBefore": "0f3f540a71e98ccdca8c040f937d18a169e52396",
+    "sourceAfter": "ee10618b0d2d04e1d7578e7abc44fc99686b60ed",
+    "qaPath": "tools/gravicentra-b4-003-portfolio-verified-receipt-amount.test.cjs",
+    "qaBlobSha": "567ed700711bb8b4375747b299296d2ebd2b4f1b",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CO_CARTERA_SOURCE_FIX_20261021.json",
+    "receiptBlobSha": "8eaf41904b227bbbdf1e7c774060fad0ba237da6",
+    "oldCompositionBlobSha": "dbe96631d74bfd009d7bd86e40495e40ebe1ee3e",
+    "sourceOnly": true,
+    "realOperationalWrites": 0,
+    "livePromotion": false
   }
 }

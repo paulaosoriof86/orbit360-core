@@ -129,7 +129,8 @@
       "tools/gravicentra-b4-003-cobros-scope-cache.test.cjs",
       "tools/gravicentra-b4-003-country-finance-parity.test.cjs",
       "tools/gravicentra-b4-003-cobros-aging-variance.test.cjs",
-      "tools/gravicentra-b4-003-polizas-context-cache.test.cjs"
+      "tools/gravicentra-b4-003-polizas-context-cache.test.cjs",
+      "tools/gravicentra-b4-003-portfolio-verified-receipt-amount.test.cjs"
     ],
     "renewalProductMutationAuthorized": false,
     "policyVisualMutationAuthorized": true,
@@ -621,7 +622,7 @@
   },
   "findingLedgerBlobSha": "8125e97dcf1feb7f46081f95327952e65c2d1077",
   "continuityRegisterBlobSha": "4e6b0ac51736be360c4b95abe8fc01d8f1e78e20",
-  "compositionLockBlobSha": "dbe96631d74bfd009d7bd86e40495e40ebe1ee3e",
+  "compositionLockBlobSha": "06161d34a25954d92e11efd98c4226488a0bb704",
   "r18SourceFix": {
     "status": "SOURCE_FIXED_R18_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_SOURCE_FIX_20261005.json",
@@ -3731,5 +3732,23 @@
     "reimportAuthorized": false,
     "humanUatPass": false,
     "original295FindingsPreserved": true
+  },
+  "b4003CanonicalPortfolioAmountFix20261021": {
+    "status": "SOURCE_ONLY_QA_PENDING_GUARD",
+    "parentHead": "4734917b25fdf45e1dac3fe6481071fee5603ab6",
+    "sourcePath": "orbit360-platform/core/queries.js",
+    "sourceBlobBefore": "0f3f540a71e98ccdca8c040f937d18a169e52396",
+    "sourceBlobAfter": "ee10618b0d2d04e1d7578e7abc44fc99686b60ed",
+    "qaPath": "tools/gravicentra-b4-003-portfolio-verified-receipt-amount.test.cjs",
+    "qaBlobSha": "567ed700711bb8b4375747b299296d2ebd2b4f1b",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CO_CARTERA_SOURCE_FIX_20261021.json",
+    "receiptBlobSha": "8eaf41904b227bbbdf1e7c774060fad0ba237da6",
+    "previousCompositionBlobSha": "dbe96631d74bfd009d7bd86e40495e40ebe1ee3e",
+    "previousExecutionLockBlobSha": "bc8bd56c6ffe4836bfcfbfac47c664ccfbf1049d",
+    "compositionBlobSha": "06161d34a25954d92e11efd98c4226488a0bb704",
+    "sourceOnly": true,
+    "realBusinessWrites": 0,
+    "livePromotionAuthorized": false,
+    "authUatAccepted": false
   }
 }
