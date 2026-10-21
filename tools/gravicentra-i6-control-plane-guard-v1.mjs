@@ -718,9 +718,11 @@ if(String(C.i65ForensicRemediationPlan?.currentBlock||'')==='B4' &&
  need(['EXACT_SCOPED_SOURCE_QA_PENDING_PREVIEW','EXACT_TECHNICAL_PREVIEW_PASS_FUNCTIONAL_UAT_HOLD'].includes(stage.status)
  &&fields.length===6
  &&fields.every(p=>{
-   const historical=CACHE_FIX_ACTIVE&&p===CACHE_FIX.productPath?CACHE_FIX.sourceBlobBefore:
+   const historical=PCACHE_ACTIVE&&p===PCACHE.sourcePath?PCACHE.sourceBlobBefore:
+     CACHE_FIX_ACTIVE&&p===CACHE_FIX.productPath?CACHE_FIX.sourceBlobBefore:
      (FIX_ACTIVE?(FIX.beforeBlobs[p]||COMP.productFileBlobs[p]):COMP.productFileBlobs[p]);
-   const current=AGING_ACTIVE&&p===AGING.sourcePath?AGING.sourceBlobAfter:
+   const current=PCACHE_ACTIVE&&p===PCACHE.sourcePath?PCACHE.sourceBlobAfter:
+     AGING_ACTIVE&&p===AGING.sourcePath?AGING.sourceBlobAfter:
      (COUNTRY_ACTIVE&&p===CACHE_FIX.productPath?COUNTRY_FIX.sourceBlobsAfter[p]:
      (CACHE_FIX_ACTIVE&&p===CACHE_FIX.productPath?CACHE_FIX.sourceBlobAfter:
      (INS_ACTIVE&&INS.sourceFiles?.[p]?.after||(FIX_ACTIVE?(FIX.sourceBlobs[p]||stage.sourceBlobs[p]):stage.sourceBlobs[p]))));
