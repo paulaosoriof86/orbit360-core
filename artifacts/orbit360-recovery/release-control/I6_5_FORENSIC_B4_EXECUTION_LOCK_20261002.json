@@ -3620,5 +3620,38 @@
     "previousCompositionBlobSha": "da8ffd0c253db638666059d34193cd3275d6e870",
     "previousExecutionLockBlobSha": "72e7ed7f07804c295f79ff245dce322cdc33c63a",
     "qaRegistered": true
+  },
+  "b4003PolizasContextCachePreviewAuthorization20261020": {
+    "status": "AUTHORIZED_EXACT_READONLY_PREVIEW",
+    "gate": "I6.5/B4-003",
+    "triggerSubject": "build(i6.5 B4-003): exact Polizas context cache Preview",
+    "sourceParentHead": "fc57b8e7758c819a6fe29239a317d7c52f5331a5",
+    "priorGuardRunId": 39536893703,
+    "priorGuardConclusion": "success",
+    "sourceFixReceiptBlobSha": "6eaf80da79b8f3f20677a9617eb7d3ca87154e99",
+    "sourcePath": "orbit360-platform/modules/polizas.js",
+    "sourceBlobSha": "3a423fea2083e1b1dfd1863f31e30910112af1f5",
+    "qaPath": "tools/gravicentra-b4-003-polizas-context-cache.test.cjs",
+    "qaBlobSha": "31c3a828311cd2443042c4f14cfdf7b98f1883b9",
+    "rosterSourceBlobSha": "75ca53db55e2665123589b0e63253a8e4f8c377c",
+    "compositionBlobSha": "dbe96631d74bfd009d7bd86e40495e40ebe1ee3e",
+    "preAuthExecutionLockBlobSha": "d820357a91536b14577a516e8f592ad5f4f5ff81",
+    "authorizationReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_POLIZAS_CONTEXT_CACHE_PREVIEW_AUTH_20261020.json",
+    "onlyReadOnlyFunctions": [
+      "orbit360ScopedPolicyReadPreview",
+      "orbit360AssignableAdvisorRosterPreview"
+    ],
+    "onlyIsolatedHosting": true,
+    "sharedRulesDeployAuthorized": false,
+    "otherFunctionsDeployAuthorized": false,
+    "operationalWritesAuthorized": false,
+    "configWritesAuthorized": false,
+    "syntheticQaWritesAuthorized": false,
+    "livePromotionAuthorized": false,
+    "realUserImpersonationAuthorized": false,
+    "reimportAuthorized": false,
+    "authenticatedUatRequired": true,
+    "wholeCapabilityAccepted": false,
+    "authorizationReceiptBlobSha": "2fb752c4ce3ba1bdcca578077893b4cada0aee01"
   }
 }

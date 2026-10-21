@@ -520,7 +520,36 @@ jobs:
             && l.boundaries?.businessWritesAuthorized===false&&l.boundaries?.syntheticQaWritesAuthorized===false
             && l.boundaries?.livePromotionAuthorized===false;
           if(currentSubject===agingAuth.triggerSubject&&!agingScoped)throw Error('B4_003_AGING_VARIANCE_EXACT_PREVIEW_DENIED');
-          const scopedPreview=priorScopedPreview||onePassInternal||oct15ScopedReadback||restrictedScoped||c03Scoped||uatScoped||currentScoped||causalScoped||insurerScoped||cacheScoped||countryScoped||agingScoped;
+          const pctxAuth=c.b4003PolizasContextCachePreviewAuthorization20261020||{};
+          const pctxScoped=currentSubject===pctxAuth.triggerSubject
+            && pctxAuth.status==='AUTHORIZED_EXACT_READONLY_PREVIEW'
+            && pctxAuth.gate==='I6.5/B4-003'
+            && pctxAuth.triggerSubject==='build(i6.5 B4-003): exact Polizas context cache Preview'
+            && pctxAuth.priorGuardRunId===39536893703&&pctxAuth.priorGuardConclusion==='success'
+            && pctxAuth.sourceFixReceiptBlobSha===c.b4003PolizasContextCacheFix20261020?.receiptBlobSha
+            && pctxAuth.sourceBlobSha===productSha('orbit360-platform/modules/polizas.js')
+            && pctxAuth.qaBlobSha===productSha('tools/gravicentra-b4-003-polizas-context-cache.test.cjs')
+            && pctxAuth.compositionBlobSha===productSha('artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json')
+            && pctxAuth.compositionBlobSha===c.canonicalAccumulationControl?.compositionLockBlobSha
+            && pctxAuth.rosterSourceBlobSha===productSha('functions/assignable-advisor-roster.js')
+            && Array.isArray(pctxAuth.onlyReadOnlyFunctions)
+            && pctxAuth.onlyReadOnlyFunctions.join(',')==='orbit360ScopedPolicyReadPreview,orbit360AssignableAdvisorRosterPreview'
+            && pctxAuth.onlyIsolatedHosting===true&&pctxAuth.sharedRulesDeployAuthorized===false
+            && pctxAuth.otherFunctionsDeployAuthorized===false&&pctxAuth.operationalWritesAuthorized===false
+            && pctxAuth.configWritesAuthorized===false&&pctxAuth.syntheticQaWritesAuthorized===false
+            && pctxAuth.realUserImpersonationAuthorized===false&&pctxAuth.livePromotionAuthorized===false
+            && pctxAuth.reimportAuthorized===false&&pctxAuth.authenticatedUatRequired===true
+            && pctxAuth.wholeCapabilityAccepted===false
+            && c.currentB4?.status==='B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL'
+            && c.nextAction==='I6_5_FORENSIC_REMEDIATION_B4_003_R20_TARGETED_PAULA_VISUAL'
+            && c.b4003SecurityReleaseHold?.status==='ACTIVE_FAIL_CLOSED_UNAUTHORIZED_BROWSER_FIRESTORE_READ_WRITE'
+            && l.activeFinding?.id==='B4-003'
+            && l.boundaries?.previewMutationAuthorized===true&&l.boundaries?.functionDeploymentAuthorized===true
+            && l.boundaries?.productMutationAuthorized===false&&l.boundaries?.businessWritesAuthorized===false
+            && l.boundaries?.syntheticQaWritesAuthorized===false&&l.boundaries?.dataMutationAuthorized===false
+            && l.boundaries?.reimportAuthorized===false&&l.boundaries?.livePromotionAuthorized===false;
+          if(currentSubject===pctxAuth.triggerSubject&&!pctxScoped)throw Error('B4_003_POLIZAS_CTX_PREVIEW_GATE_DENIED');
+          const scopedPreview=priorScopedPreview||onePassInternal||oct15ScopedReadback||restrictedScoped||c03Scoped||uatScoped||currentScoped||causalScoped||insurerScoped||cacheScoped||countryScoped||agingScoped||pctxScoped;
           const previewOk=(r19Preview||r20Preview||r23Preview)
             && l.activeFinding?.id==='B4-003'
             && l.boundaries?.businessWritesAuthorized===false
@@ -717,7 +746,7 @@ jobs:
             uat.sourceBlobs['functions/assignable-advisor-roster.js']===rosterBlob
             && uat.onlyTwoReadOnlyFunctions===true;
           const readonlyRoster=scopedPreview&&rosterAuth.status==='AUTHORIZED_EXACT_PREVIEW_READONLY_ROSTER_ONLY'
-            && (rosterAuth.sourceBlobSha===rosterBlob||c03RosterReady||uatRosterReady||(currentScoped&&currentPreviewIntent.rosterSourceBlobSha===rosterBlob)||(causalScoped&&ca.rosterSourceBlobSha===rosterBlob)||(insurerScoped&&insurerAuth.rosterSourceBlobSha===rosterBlob)||(cacheScoped&&cacheAuth.rosterSourceBlobSha===rosterBlob)||(countryScoped&&countryAuth.rosterSourceBlobSha===rosterBlob)||(agingScoped&&agingAuth.rosterSourceBlobSha===rosterBlob))
+            && (rosterAuth.sourceBlobSha===rosterBlob||c03RosterReady||uatRosterReady||(currentScoped&&currentPreviewIntent.rosterSourceBlobSha===rosterBlob)||(causalScoped&&ca.rosterSourceBlobSha===rosterBlob)||(insurerScoped&&insurerAuth.rosterSourceBlobSha===rosterBlob)||(cacheScoped&&cacheAuth.rosterSourceBlobSha===rosterBlob)||(countryScoped&&countryAuth.rosterSourceBlobSha===rosterBlob)||(agingScoped&&agingAuth.rosterSourceBlobSha===rosterBlob)||(pctxScoped&&pctxAuth.rosterSourceBlobSha===rosterBlob))
             && rosterAuth.service==='orbit360AssignableAdvisorRosterPreview'
             && rosterAuth.businessWritesAuthorized===false
             && rosterAuth.otherFunctionsDeployAuthorized===false
@@ -726,7 +755,7 @@ jobs:
             && c.b4003SecurityReleaseHold?.status==='ACTIVE_FAIL_CLOSED_UNAUTHORIZED_BROWSER_FIRESTORE_READ_WRITE'
             && l.boundaries?.previewMutationAuthorized===true
             && l.boundaries?.realOperationalWritesAuthorized===false;
-          if((currentSubject===requestedOct15Subject||c03Scoped||uatScoped||currentScoped||causalScoped||insurerScoped||cacheScoped||countryScoped||agingScoped)&&scopedPreview&&!readonlyRoster)
+          if((currentSubject===requestedOct15Subject||c03Scoped||uatScoped||currentScoped||causalScoped||insurerScoped||cacheScoped||countryScoped||agingScoped||pctxScoped)&&scopedPreview&&!readonlyRoster)
             throw Error('B4_003_DASHBOARD_READONLY_PREVIEW_SYNC_NOT_AUTHORIZED');
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'readonly_roster='+(readonlyRoster?'true':'false')+'\n');
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'scoped_preview='+(scopedPreview?'true':'false')+'\n');

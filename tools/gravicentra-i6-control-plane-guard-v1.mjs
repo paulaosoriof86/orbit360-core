@@ -106,6 +106,43 @@ if(PCACHE_ACTIVE){
  execFileSync(process.execPath,[PCACHE.qaPath],{stdio:'inherit'});
  console.log('B4_003_POLIZAS_CONTEXT_CACHE_QA_PASS_SYNTHETIC_NO_FIRESTORE_NO_PREVIEW');
 }
+const PCACHE_PREVIEW=C.b4003PolizasContextCachePreviewAuthorization20261020||{};
+if(PCACHE_PREVIEW.status==='AUTHORIZED_EXACT_READONLY_PREVIEW'){
+ const locked=B4.b4003PolizasContextCachePreviewAuthorization20261020||{};
+ const path='artifacts/orbit360-recovery/release-control/I6_5_B4_003_POLIZAS_CONTEXT_CACHE_PREVIEW_AUTH_20261020.json';
+ const receipt=exists(path)?readJson(path):{};
+ need(sameJson(PCACHE_PREVIEW,locked)&&PCACHE_PREVIEW.gate==='I6.5/B4-003'&&
+ PCACHE_PREVIEW.triggerSubject==='build(i6.5 B4-003): exact Polizas context cache Preview'&&
+ PCACHE_PREVIEW.sourceFixReceiptBlobSha===PCACHE.receiptBlobSha&&
+ PCACHE_PREVIEW.sourcePath===PCACHE.sourcePath&&PCACHE_PREVIEW.qaPath===PCACHE.qaPath&&
+ PCACHE_PREVIEW.sourceBlobSha===git('hash-object',PCACHE.sourcePath)&&
+ PCACHE_PREVIEW.qaBlobSha===git('hash-object',PCACHE.qaPath)&&
+ PCACHE_PREVIEW.compositionBlobSha===git('hash-object',I6_CANONICAL_COMPOSITION)&&
+ PCACHE_PREVIEW.rosterSourceBlobSha===git('hash-object','functions/assignable-advisor-roster.js')&&
+ PCACHE_PREVIEW.preAuthExecutionLockBlobSha==='d820357a91536b14577a516e8f592ad5f4f5ff81'&&
+ PCACHE_PREVIEW.priorGuardRunId===39536893703&&PCACHE_PREVIEW.priorGuardConclusion==='success'&&
+ PCACHE_PREVIEW.authorizationReceiptPath===path&&PCACHE_PREVIEW.authorizationReceiptBlobSha===git('hash-object',path)&&
+ receipt.schema==='GRAVICENTRA_I65_B4003_POLIZAS_CONTEXT_CACHE_EXACT_PREVIEW_AUTH_V1'&&
+ receipt.authorization?.triggerSubject===PCACHE_PREVIEW.triggerSubject&&
+ receipt.authorization?.sourceBlobSha===PCACHE_PREVIEW.sourceBlobSha&&
+ receipt.authorization?.qaBlobSha===PCACHE_PREVIEW.qaBlobSha&&
+ receipt.guardRunId===PCACHE_PREVIEW.priorGuardRunId&&
+ sameJson(PCACHE_PREVIEW.onlyReadOnlyFunctions,['orbit360ScopedPolicyReadPreview','orbit360AssignableAdvisorRosterPreview'])&&
+ PCACHE_PREVIEW.onlyIsolatedHosting===true&&PCACHE_PREVIEW.sharedRulesDeployAuthorized===false&&
+ PCACHE_PREVIEW.otherFunctionsDeployAuthorized===false&&PCACHE_PREVIEW.operationalWritesAuthorized===false&&
+ PCACHE_PREVIEW.configWritesAuthorized===false&&PCACHE_PREVIEW.syntheticQaWritesAuthorized===false&&
+ PCACHE_PREVIEW.realUserImpersonationAuthorized===false&&PCACHE_PREVIEW.livePromotionAuthorized===false&&
+ PCACHE_PREVIEW.reimportAuthorized===false&&PCACHE_PREVIEW.authenticatedUatRequired===true&&
+ PCACHE_PREVIEW.wholeCapabilityAccepted===false&&
+ C.currentB4?.executionLockBlobSha===git('hash-object',ACTIVE_I65_FORENSIC_B4)&&
+ C.i65ForensicRemediationPlan?.b4?.executionLockBlobSha===git('hash-object',ACTIVE_I65_FORENSIC_B4)&&
+ C.canonicalAccumulationControl?.compositionLockBlobSha===git('hash-object',I6_CANONICAL_COMPOSITION)&&
+ C.b4003SecurityReleaseHold?.status==='ACTIVE_FAIL_CLOSED_UNAUTHORIZED_BROWSER_FIRESTORE_READ_WRITE'&&
+ B4.boundaries?.productMutationAuthorized===false&&B4.boundaries?.dataMutationAuthorized===false&&
+ B4.boundaries?.businessWritesAuthorized===false&&B4.boundaries?.livePromotionAuthorized===false&&
+ FIND.findings.length===295,'B4_003_POLIZAS_CTX_EXACT_PREVIEW_AUTH_INVALID');
+ console.log('B4_003_POLIZAS_CTX_EXACT_PREVIEW_AUTH_PASS_READONLY_LIVE_HOLD');
+}
 const AGING_PROOF=C.b4003CobrosAgingVariancePreviewProof20261020||{};
 if(AGING_PROOF.status==='EXACT_TECHNICAL_PREVIEW_PASS_AUTHENTICATED_UAT_HOLD'){
  const lock=B4.b4003CobrosAgingVariancePreviewProof20261020||{};
