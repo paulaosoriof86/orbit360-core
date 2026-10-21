@@ -3653,5 +3653,42 @@
     "authenticatedUatRequired": true,
     "wholeCapabilityAccepted": false,
     "authorizationReceiptBlobSha": "2fb752c4ce3ba1bdcca578077893b4cada0aee01"
+  },
+  "b4003PolizasContextCachePreviewProof20261020": {
+    "status": "EXACT_TECHNICAL_PREVIEW_PASS_AUTHENTICATED_UAT_HOLD",
+    "gate": "I6.5/B4-003",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_POLIZAS_CONTEXT_CACHE_EXACT_TECHNICAL_PREVIEW_READBACK_20261020.json",
+    "receiptBlobSha": "30e124e9391a3a3b874be39798e431edeecde894",
+    "sourceSha": "aedf6fd705499b095fd711b16b1f9a42577ae04b",
+    "sourceBlobSha": "3a423fea2083e1b1dfd1863f31e30910112af1f5",
+    "qaBlobSha": "31c3a828311cd2443042c4f14cfdf7b98f1883b9",
+    "compositionBlobSha": "dbe96631d74bfd009d7bd86e40495e40ebe1ee3e",
+    "runId": 39537641686,
+    "channelId": "gi-i65-b4-39537641686",
+    "buildId": "gi-i65-b4-aedf6fd70549-57f234755dc1",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-39537641686-ka1j8hss.web.app",
+    "artifactId": 12317498144,
+    "artifactArchiveDigest": "sha256:8bad671f4ecc1c3515599c530b9702c7d2e259a07d96ba632656e7919a59b7d9",
+    "hostedPayloadDigest": "c851c32cc46ee10554f88fa46ecc113254e19887f193e330e770b05c9cb1236b",
+    "backendSourceDigest": "ff0e7e698907b909e8674f716fe2f750e75ffb68ca7b33e0dbe3bab1977e687d",
+    "bundleDigest": "da48b6926807a93e41e6f6ea1b664f88b815a4be22a1ff8db2fdee535eee435c",
+    "guardRunId": 39537641730,
+    "exactHostingReadback": true,
+    "publicSmoke": true,
+    "authenticatedRoleCountryPass": false,
+    "humanFunctionalAccepted": false,
+    "sharedRulesDeployed": false,
+    "operationalWrites": 0,
+    "livePromotionAuthorized": false,
+    "securityP0Closed": false,
+    "formalI6Percent": 50,
+    "productionReadinessPercent": 20
+  },
+  "b4003PolizasContextCachePreviewDispatch20261020": {
+    "status": "EXACT_TECHNICAL_PREVIEW_PASS_AUTHENTICATED_UAT_HOLD",
+    "runId": 39537641686,
+    "receiptBlobSha": "30e124e9391a3a3b874be39798e431edeecde894",
+    "sourceSha": "aedf6fd705499b095fd711b16b1f9a42577ae04b",
+    "authenticatedUatAccepted": false
   }
 }

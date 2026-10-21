@@ -143,6 +143,67 @@ if(PCACHE_PREVIEW.status==='AUTHORIZED_EXACT_READONLY_PREVIEW'){
  FIND.findings.length===295,'B4_003_POLIZAS_CTX_EXACT_PREVIEW_AUTH_INVALID');
  console.log('B4_003_POLIZAS_CTX_EXACT_PREVIEW_AUTH_PASS_READONLY_LIVE_HOLD');
 }
+const PCACHE_PROOF=C.b4003PolizasContextCachePreviewProof20261020||{};
+if(PCACHE_PROOF.status==='EXACT_TECHNICAL_PREVIEW_PASS_AUTHENTICATED_UAT_HOLD'){
+ const lock=B4.b4003PolizasContextCachePreviewProof20261020||{};
+ const d=C.b4003PolizasContextCachePreviewDispatch20261020||{};
+ const p='artifacts/orbit360-recovery/release-control/I6_5_B4_003_POLIZAS_CONTEXT_CACHE_EXACT_TECHNICAL_PREVIEW_READBACK_20261020.json';
+ const R=exists(p)?readJson(p):{};
+ need(sameJson(PCACHE_PROOF,lock)&&PCACHE_PROOF.gate==='I6.5/B4-003'&&
+  PCACHE_PROOF.receiptPath===p&&PCACHE_PROOF.receiptBlobSha===git('hash-object',p)&&
+  R.schema==='GRAVICENTRA_I6_5_B4_003_POLIZAS_CONTEXT_CACHE_EXACT_TECHNICAL_PREVIEW_V1'&&
+  R.status===PCACHE_PROOF.status&&R.sourceSha===PCACHE_PROOF.sourceSha&&
+  R.sourceBlobSha===git('hash-object','orbit360-platform/modules/polizas.js')&&
+  R.qaBlobSha===git('hash-object','tools/gravicentra-b4-003-polizas-context-cache.test.cjs')&&
+  R.compositionBlobSha===git('hash-object',I6_CANONICAL_COMPOSITION)&&
+  R.runId===39537641686&&R.channelId==='gi-i65-b4-'+R.runId&&
+  R.buildId==='gi-i65-b4-'+R.sourceSha.slice(0,12)+'-57f234755dc1'&&
+  R.previewUrl===PCACHE_PROOF.previewUrl&&
+  /^https:\/\/ays-orbit-360-lab--gi-i65-b4-[a-z0-9-]+\.web\.app$/.test(R.previewUrl)&&
+  R.artifactId===12317498144&&
+  R.artifactArchiveDigest===PCACHE_PROOF.artifactArchiveDigest&&
+  /^sha256:[0-9a-f]{64}$/.test(R.artifactArchiveDigest)&&
+  R.hostedPayloadDigest===PCACHE_PROOF.hostedPayloadDigest&&
+  R.backendSourceDigest===PCACHE_PROOF.backendSourceDigest&&
+  R.bundleDigest===PCACHE_PROOF.bundleDigest&&
+  R.buildBoundAssetCount===138&&R.hostedFileCount===218&&R.backendFileCount===33&&
+  R.guardRunId===39537641730&&R.guardConclusion==='success'&&R.workflowConclusion==='success'&&
+  R.buildMaterialized===true&&R.isolatedHostingDeployed===true&&R.exactHostingReadback===true&&
+  R.publicSmoke===true&&R.unauthenticatedCallableStatus===401&&
+  sameJson(R.previewReadOnlyFunctions,['orbit360ScopedPolicyReadPreview','orbit360AssignableAdvisorRosterPreview'])&&
+  R.actualRoleCountryReadback==='SKIPPED_NO_REAL_USER_TOKEN_AUTHORIZATION'&&
+  R.actualAuthenticatedChromeUat==='HOLD'&&R.authenticatedAcceptance===false&&
+  R.securityP0Closed===false&&R.humanFunctionalAccepted===false&&
+  R.wholeCapabilityAccepted===false&&
+  R.sharedFirestoreRulesDeployed===false&&R.otherFunctionsDeployed===false&&
+  R.liveProductionChanged===false&&R.productionPromotion===false&&
+  R.operationalWrites===0&&R.syntheticWrites===0&&R.realUserTokensIssued===0&&
+  R.reimport===false&&R.findingsTotalPreserved===295&&
+  PCACHE_PROOF.sourceBlobSha===R.sourceBlobSha&&PCACHE_PROOF.qaBlobSha===R.qaBlobSha&&
+  PCACHE_PROOF.compositionBlobSha===R.compositionBlobSha&&
+  PCACHE_PROOF.buildId===R.buildId&&PCACHE_PROOF.runId===R.runId&&
+  PCACHE_PROOF.channelId===R.channelId&&PCACHE_PROOF.artifactId===R.artifactId&&
+  PCACHE_PROOF.guardRunId===R.guardRunId&&PCACHE_PROOF.exactHostingReadback===true&&
+  PCACHE_PROOF.humanFunctionalAccepted===false&&PCACHE_PROOF.authenticatedRoleCountryPass===false&&
+  PCACHE_PROOF.securityP0Closed===false&&
+  d.status===PCACHE_PROOF.status&&d.sourceSha===R.sourceSha&&
+  d.buildId===R.buildId&&d.runId===R.runId&&d.previewUrl===R.previewUrl&&
+  d.proofReceiptPath===p&&d.proofReceiptBlobSha===PCACHE_PROOF.receiptBlobSha&&
+  d.newBuildProofPending===false&&d.exactReadbackPending===false&&
+  d.authenticatedChromeUatPending===true&&
+  C.currentB4?.latestExactScopedTechnicalPreview20261020?.receiptBlobSha===PCACHE_PROOF.receiptBlobSha&&
+  C.currentB4?.executionLockBlobSha===git('hash-object',ACTIVE_I65_FORENSIC_B4)&&
+  C.i65ForensicRemediationPlan?.b4?.executionLockBlobSha===git('hash-object',ACTIVE_I65_FORENSIC_B4)&&
+  C.b4003PolizasContextCacheFix20261020?.executionLockBlobSha===git('hash-object',ACTIVE_I65_FORENSIC_B4)&&
+  C.canonicalAccumulationControl?.compositionLockBlobSha===git('hash-object',I6_CANONICAL_COMPOSITION)&&
+  C.b4003CobrosAgingVariancePreviewProof20261020?.sourceSha===R.formerCobrosAgingPreviewRetained.sourceSha&&
+  C.b4003CobrosAgingVariancePreviewProof20261020?.runId===R.formerCobrosAgingPreviewRetained.runId&&
+  C.b4003SecurityReleaseHold?.status==='ACTIVE_FAIL_CLOSED_UNAUTHORIZED_BROWSER_FIRESTORE_READ_WRITE'&&
+  B4.boundaries?.businessWritesAuthorized===false&&B4.boundaries?.dataMutationAuthorized===false&&
+  B4.boundaries?.livePromotionAuthorized===false&&FIND.findings.length===295,
+  'B4_003_POLIZAS_CONTEXT_CACHE_EXACT_TECHNICAL_PREVIEW_PROOF_INVALID');
+ console.log('B4_003_POLIZAS_CONTEXT_CACHE_EXACT_TECHNICAL_PREVIEW=PASS_AUTHENTICATED_UAT_HOLD');
+}
 const AGING_PROOF=C.b4003CobrosAgingVariancePreviewProof20261020||{};
 if(AGING_PROOF.status==='EXACT_TECHNICAL_PREVIEW_PASS_AUTHENTICATED_UAT_HOLD'){
  const lock=B4.b4003CobrosAgingVariancePreviewProof20261020||{};
