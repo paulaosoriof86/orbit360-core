@@ -58,6 +58,54 @@ const ACTIVE_I65_FORENSIC_B4=String(C.i65ForensicRemediationPlan?.b4?.executionL
 need(exists(ACTIVE_I65_FORENSIC_B4),'I6_5_B4_ACTIVE_LOCK_MISSING:'+ACTIVE_I65_FORENSIC_B4);
 const S=readJson(STATUS_LEDGER),A=readJson(AUTH_RECEIPT),M5=readJson(V5_MANIFEST),M6=readJson(V6_MANIFEST),M=readJson(V7_MANIFEST),FRA=readJson(I65_FORENSIC_AUDIT),FRP=readJson(I65_FORENSIC_PLAN),PAY=readJson(I65_PAYMENT_INFERENCE),B1=readJson(I65_FORENSIC_B1),B2=readJson(I65_FORENSIC_B2),B3=readJson(I65_FORENSIC_B3),B4=readJson(ACTIVE_I65_FORENSIC_B4);
 const COMP=readJson(I6_CANONICAL_COMPOSITION),FIND=readJson(I6_FINDINGS_LEDGER),FRP2=readJson(I65_FORENSIC_PLAN_V2),REJ=readJson(I65_B2_REJECTION),RCM=readJson(I65_B2_ROOT_CAUSE);
+// Source-only successor: verify the new security-context index and preserve the old
+// aging Preview proof at its ORIGINAL immutable source/composition identity.
+const PCACHE=C.b4003PolizasContextCacheFix20261020||{};
+const PCACHE_ACTIVE=PCACHE.status==='SOURCE_ONLY_COMPOSED_NODE_QA_REGISTERED_RUN_REQUIRED';
+if(PCACHE_ACTIVE){
+ const L=B4.b4003PolizasContextCacheFix20261020||{},T=COMP.b4003PolizasContextCacheFix20261020||{};
+ const expected='artifacts/orbit360-recovery/release-control/I6_5_B4_003_POLIZAS_CONTEXT_CACHE_SOURCE_FIX_20261020.json';
+ const R=exists(expected)?readJson(expected):{};
+ need(PCACHE.gate==='I6.5/B4-003'&&
+  PCACHE.parentHead==='ced800e580d50e5254c3f16b5f06e4de72c0a6f3'&&
+  PCACHE.sourcePath==='orbit360-platform/modules/polizas.js'&&
+  PCACHE.qaPath==='tools/gravicentra-b4-003-polizas-context-cache.test.cjs'&&
+  PCACHE.sourceBlobBefore==='3c3c1bc42bcbf03a88cea985d2101392a1c47c4d'&&
+  PCACHE.sourceBlobAfter===git('hash-object',PCACHE.sourcePath)&&
+  PCACHE.qaBlobSha===git('hash-object',PCACHE.qaPath)&&
+  PCACHE.receiptPath===expected&&PCACHE.receiptBlobSha===git('hash-object',expected)&&
+  R.schema==='GRAVICENTRA_I6_5_B4_003_POLIZAS_CONTEXT_CACHE_SOURCE_FIX_V1'&&
+  R.parentHead===PCACHE.parentHead&&R.sourceBlobAfter===PCACHE.sourceBlobAfter&&
+  R.sourceBlobBefore===PCACHE.sourceBlobBefore&&R.qaBlobSha===PCACHE.qaBlobSha&&
+  PCACHE.previousCompositionBlobSha==='da8ffd0c253db638666059d34193cd3275d6e870'&&
+  PCACHE.previousExecutionLockBlobSha==='72e7ed7f07804c295f79ff245dce322cdc33c63a'&&
+  PCACHE.compositionBlobSha===git('hash-object',I6_CANONICAL_COMPOSITION)&&
+  PCACHE.executionLockBlobSha===git('hash-object',ACTIVE_I65_FORENSIC_B4)&&
+  L.status==='SCOPED_CONTEXT_CACHE_SOURCE_FIXED_QA_RUN_BY_GUARD_NO_PREVIEW_AUTH'&&
+  L.sourceBlobAfter===PCACHE.sourceBlobAfter&&L.qaBlobSha===PCACHE.qaBlobSha&&
+  L.receiptBlobSha===PCACHE.receiptBlobSha&&
+  L.compositionBlobSha===PCACHE.compositionBlobSha&&
+  T.sourceAfter===PCACHE.sourceBlobAfter&&T.qaBlobSha===PCACHE.qaBlobSha&&
+  COMP.productFileBlobs?.[PCACHE.sourcePath]===PCACHE.sourceBlobAfter&&
+  COMP.productFiles.includes(PCACHE.sourcePath)&&
+  B4.boundaries?.allowedProductFiles?.includes(PCACHE.sourcePath)&&
+  B4.boundaries?.allowedQaFiles?.includes(PCACHE.qaPath)&&
+  B4.compositionLockBlobSha===PCACHE.compositionBlobSha&&
+  C.canonicalAccumulationControl?.compositionLockBlobSha===PCACHE.compositionBlobSha&&
+  C.currentB4?.executionLockBlobSha===PCACHE.executionLockBlobSha&&
+  C.i65ForensicRemediationPlan?.b4?.executionLockBlobSha===PCACHE.executionLockBlobSha&&
+  C.b4003SecurityReleaseHold?.status==='ACTIVE_FAIL_CLOSED_UNAUTHORIZED_BROWSER_FIRESTORE_READ_WRITE'&&
+  B4.boundaries?.productMutationAuthorized===false&&
+  B4.boundaries?.businessWritesAuthorized===false&&
+  B4.boundaries?.dataMutationAuthorized===false&&
+  B4.boundaries?.livePromotionAuthorized===false&&
+  PCACHE.operationalWritesAuthorized===false&&PCACHE.livePromotionAuthorized===false&&
+  PCACHE.authenticatedUatAccepted===false&&PCACHE.previewDispatchAuthorized===false&&
+  FIND.findings.length===295,
+  'B4_003_POLIZAS_CONTEXT_CACHE_SOURCE_LINEAGE_OR_RELEASE_BOUNDARY_INVALID');
+ execFileSync(process.execPath,[PCACHE.qaPath],{stdio:'inherit'});
+ console.log('B4_003_POLIZAS_CONTEXT_CACHE_QA_PASS_SYNTHETIC_NO_FIRESTORE_NO_PREVIEW');
+}
 const AGING_PROOF=C.b4003CobrosAgingVariancePreviewProof20261020||{};
 if(AGING_PROOF.status==='EXACT_TECHNICAL_PREVIEW_PASS_AUTHENTICATED_UAT_HOLD'){
  const lock=B4.b4003CobrosAgingVariancePreviewProof20261020||{};
@@ -100,8 +148,8 @@ if(AGING_PREVIEW_ACTIVE){
   AGING_PREVIEW.sourceFixReceiptBlobSha===C.b4003CobrosAgingVarianceFix20261020?.receiptBlobSha&&
   AGING_PREVIEW.sourceBlobSha===git('hash-object',AGING_PREVIEW.sourcePath)&&
   AGING_PREVIEW.qaBlobSha===git('hash-object',AGING_PREVIEW.qaPath)&&
-  AGING_PREVIEW.compositionBlobSha===git('hash-object',I6_CANONICAL_COMPOSITION)&&
-  AGING_PREVIEW.compositionBlobSha===C.canonicalAccumulationControl?.compositionLockBlobSha&&
+  AGING_PREVIEW.compositionBlobSha===(PCACHE_ACTIVE?PCACHE.previousCompositionBlobSha:git('hash-object',I6_CANONICAL_COMPOSITION))&&
+  C.canonicalAccumulationControl?.compositionLockBlobSha===git('hash-object',I6_CANONICAL_COMPOSITION)&&
   AGING_PREVIEW.preAuthExecutionLockBlobSha===C.b4003CobrosAgingVarianceFix20261020?.executionLockBlobSha&&
   AGING_PREVIEW.rosterSourceBlobSha===git('hash-object','functions/assignable-advisor-roster.js')&&
   AGING_PREVIEW.authorizationReceiptBlobSha===git('hash-object',AGING_PREVIEW.authorizationReceiptPath)&&
@@ -148,12 +196,12 @@ if(AGING_ACTIVE){
    B4.boundaries?.allowedProductFiles?.includes(AGING.sourcePath)&&
    B4.boundaries?.allowedQaFiles?.includes(AGING.qaPath)&&
    manifest.sourceBlobAfter===AGING.sourceBlobAfter&&locked.sourceBlobAfter===AGING.sourceBlobAfter&&
-   AGING.compositionBlobSha===git('hash-object',I6_CANONICAL_COMPOSITION)&&
+   AGING.compositionBlobSha===(PCACHE_ACTIVE?PCACHE.previousCompositionBlobSha:git('hash-object',I6_CANONICAL_COMPOSITION))&&
    AGING.executionLockBlobSha===(AGING_PREVIEW_ACTIVE?AGING_PREVIEW.preAuthExecutionLockBlobSha:git('hash-object',ACTIVE_I65_FORENSIC_B4))&&
-   C.canonicalAccumulationControl?.compositionLockBlobSha===AGING.compositionBlobSha&&
+   C.canonicalAccumulationControl?.compositionLockBlobSha===git('hash-object',I6_CANONICAL_COMPOSITION)&&
    C.currentB4?.executionLockBlobSha===git('hash-object',ACTIVE_I65_FORENSIC_B4)&&
    C.i65ForensicRemediationPlan?.b4?.executionLockBlobSha===git('hash-object',ACTIVE_I65_FORENSIC_B4)&&
-   B4.compositionLockBlobSha===AGING.compositionBlobSha&&
+   B4.compositionLockBlobSha===git('hash-object',I6_CANONICAL_COMPOSITION)&&
    C.b4003SecurityReleaseHold?.status==='ACTIVE_FAIL_CLOSED_UNAUTHORIZED_BROWSER_FIRESTORE_READ_WRITE'&&
    C.i6Execution?.productMutationAuthorized===false&&B4.boundaries?.productMutationAuthorized===false&&
    B4.boundaries?.businessWritesAuthorized===false&&B4.boundaries?.dataMutationAuthorized===false&&

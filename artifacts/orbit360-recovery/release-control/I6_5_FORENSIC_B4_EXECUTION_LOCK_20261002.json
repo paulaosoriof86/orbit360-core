@@ -128,7 +128,8 @@
       "tools/gravicentra-i6-control-plane-guard-v1.mjs",
       "tools/gravicentra-b4-003-cobros-scope-cache.test.cjs",
       "tools/gravicentra-b4-003-country-finance-parity.test.cjs",
-      "tools/gravicentra-b4-003-cobros-aging-variance.test.cjs"
+      "tools/gravicentra-b4-003-cobros-aging-variance.test.cjs",
+      "tools/gravicentra-b4-003-polizas-context-cache.test.cjs"
     ],
     "renewalProductMutationAuthorized": false,
     "policyVisualMutationAuthorized": true,
@@ -620,7 +621,7 @@
   },
   "findingLedgerBlobSha": "8125e97dcf1feb7f46081f95327952e65c2d1077",
   "continuityRegisterBlobSha": "4e6b0ac51736be360c4b95abe8fc01d8f1e78e20",
-  "compositionLockBlobSha": "da8ffd0c253db638666059d34193cd3275d6e870",
+  "compositionLockBlobSha": "dbe96631d74bfd009d7bd86e40495e40ebe1ee3e",
   "r18SourceFix": {
     "status": "SOURCE_FIXED_R18_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_SOURCE_FIX_20261005.json",
@@ -3602,7 +3603,7 @@
     "productionPathPercent": 20
   },
   "b4003PolizasContextCacheFix20261020": {
-    "status": "SOURCE_ONLY_COMPOSED_PENDING_NODE_QA_AND_EXACT_PREVIEW",
+    "status": "SCOPED_CONTEXT_CACHE_SOURCE_FIXED_QA_RUN_BY_GUARD_NO_PREVIEW_AUTH",
     "sourcePath": "orbit360-platform/modules/polizas.js",
     "sourceBlobBefore": "3c3c1bc42bcbf03a88cea985d2101392a1c47c4d",
     "sourceBlobAfter": "3a423fea2083e1b1dfd1863f31e30910112af1f5",
@@ -3615,6 +3616,9 @@
     "realBusinessWritesAuthorized": false,
     "sharedRulesDeployAuthorized": false,
     "livePromotionAuthorized": false,
-    "authenticatedUatAccepted": false
+    "authenticatedUatAccepted": false,
+    "previousCompositionBlobSha": "da8ffd0c253db638666059d34193cd3275d6e870",
+    "previousExecutionLockBlobSha": "72e7ed7f07804c295f79ff245dce322cdc33c63a",
+    "qaRegistered": true
   }
 }
