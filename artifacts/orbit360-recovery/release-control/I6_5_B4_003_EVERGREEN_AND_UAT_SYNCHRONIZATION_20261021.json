@@ -1,0 +1,69 @@
+{
+  "schema": "GRAVICENTRA_I65_B4003_DOC_AND_UAT_SYNC_V1",
+  "gate": "I6.5/B4-003",
+  "asOf": "2026-10-21",
+  "parentHead": "c5eb3c840caa1ce632210a9c55ef9a481f2fa16f",
+  "authority": {
+    "controlPath": "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json",
+    "b4Path": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B4_EXECUTION_LOCK_20261002.json",
+    "compositionPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
+    "b4BlobBefore": "f8a5b3b82f641bbc2df2a2b3e49402b5b32085f2",
+    "compositionBlob": "06161d34a25954d92e11efd98c4226488a0bb704",
+    "ledgerCount": 295
+  },
+  "correction": {
+    "previousSecondaryPointer": "816309c63ed254d9b0e05cf63621c3d1c03cbfd5",
+    "currentCompositionPointer": "06161d34a25954d92e11efd98c4226488a0bb704"
+  },
+  "uat": {
+    "sourceFile": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_AUTHENTICATED_UAT_REJECTED_20261021.md",
+    "sourceFileBlobSha": "5acdb8a55deb444556ef942c5716c957bbe68f7c",
+    "sha256": "ffcedc12cfb68bf212fbdf9369ee154f32a35b97c24d73016b3ebdafd492e443",
+    "status": "REJECTED_PREVIOUS_PREVIEW_ONLY",
+    "sourceSha": "ca08bbde10e93be4506ca3e0105d5265e6021e7b",
+    "runId": 39503173099,
+    "oneUidNotBackendSecurity": true,
+    "readOnly": true
+  },
+  "businessRule": {
+    "statement": "País del cliente corresponde al país de la aseguradora donde posee o tuvo póliza",
+    "status": "NEEDS_INSURER_COUNTRY_AND_MULTICOUNTRY_CLIENT_ADJUDICATION",
+    "sourcePolicyClientCrossings": {
+      "CO_policy_GT_client": 41,
+      "GT_policy_CO_client": 1
+    },
+    "noBlindDataWrite": true
+  },
+  "pendingProjectSynchronization": {
+    "existingPackage": "GRAVICENTRA_PROJECT_SOURCES_EVERGREEN_V7",
+    "missingExactProjectTitles": [
+      "09_ADDENDUM_COMPOSICION_CANONICA_Y_LEDGER_HALLAZGOS_EVERGREEN_V6_2026-09-24.md",
+      "11_ADDENDUM_PAGOS_COBROS_CONCILIACION_FECHAS_INFERENCIA_EVERGREEN_V7_2026-09-26.md"
+    ],
+    "repositoryFilesPresent": true,
+    "projectAttachmentsNeedReadback": true,
+    "retainedV3ToV5": true,
+    "staticSourceUpdateRequired": true,
+    "sourceFiles": {
+      "v6": "artifacts/orbit360-recovery/project-sources-v2/v6/09_ADDENDUM_COMPOSICION_CANONICA_Y_LEDGER_HALLAZGOS_EVERGREEN_V6_2026-09-24.md",
+      "v7": "artifacts/orbit360-recovery/project-sources-v2/v7/11_ADDENDUM_PAGOS_COBROS_CONCILIACION_FECHAS_INFERENCIA_EVERGREEN_V7_2026-09-26.md"
+    },
+    "notDirectRuntimeCause": true
+  },
+  "sourceFix": {
+    "file": "orbit360-platform/core/queries.js",
+    "blobSha": "ee10618b0d2d04e1d7578e7abc44fc99686b60ed",
+    "nodeSyntheticPass": 16,
+    "guardRunId": 39629585062,
+    "realDataReadbackRunId": 39627038822,
+    "functionalUatAccepted": false
+  },
+  "security": {
+    "sharedRulesStillHold": true,
+    "realOperationalWrites": 0,
+    "livePromotion": false,
+    "noReimport": true
+  },
+  "formalI6Percent": 50,
+  "productionReadinessPercent": 20
+}

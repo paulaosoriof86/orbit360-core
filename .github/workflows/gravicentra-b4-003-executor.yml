@@ -549,7 +549,43 @@ jobs:
             && l.boundaries?.syntheticQaWritesAuthorized===false&&l.boundaries?.dataMutationAuthorized===false
             && l.boundaries?.reimportAuthorized===false&&l.boundaries?.livePromotionAuthorized===false;
           if(currentSubject===pctxAuth.triggerSubject&&!pctxScoped)throw Error('B4_003_POLIZAS_CTX_PREVIEW_GATE_DENIED');
-          const scopedPreview=priorScopedPreview||onePassInternal||oct15ScopedReadback||restrictedScoped||c03Scoped||uatScoped||currentScoped||causalScoped||insurerScoped||cacheScoped||countryScoped||agingScoped||pctxScoped;
+          const moneyAuth=c.b4003CanonicalPortfolioAmountPreviewAuth20261021||{};
+          const moneyRequested=currentSubject===moneyAuth.triggerSubject;
+          const moneyScoped=moneyRequested
+            && moneyAuth.status==='AUTHORIZED_EXACT_ISOLATED_READONLY_PREVIEW'
+            && moneyAuth.gate==='I6.5/B4-003'
+            && moneyAuth.triggerSubject==='build(i6.5 B4-003): exact canonical cartera amount Preview'
+            && moneyAuth.priorGuardRunId===39629585062&&moneyAuth.priorGuardConclusion==='success'
+            && moneyAuth.sourceFixReceiptBlobSha===c.b4003CanonicalPortfolioAmountFix20261021?.receiptBlobSha
+            && moneyAuth.productOwnerBlobSha===productSha('orbit360-platform/core/queries.js')
+            && moneyAuth.qaBlobSha===productSha('tools/gravicentra-b4-003-portfolio-verified-receipt-amount.test.cjs')
+            && moneyAuth.compositionBlobSha===productSha('artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json')
+            && moneyAuth.compositionBlobSha===c.canonicalAccumulationControl?.compositionLockBlobSha
+            && moneyAuth.rosterSourceBlobSha===productSha('functions/assignable-advisor-roster.js')
+            && moneyAuth.onlyIsolatedHosting===true&&
+            Array.isArray(moneyAuth.functions)&&
+            moneyAuth.functions.join(',')==='orbit360ScopedPolicyReadPreview,orbit360AssignableAdvisorRosterPreview'
+            && moneyAuth.sharedRulesDeployAuthorized===false
+            && moneyAuth.otherFunctionsDeployAuthorized===false
+            && moneyAuth.operationalWritesAuthorized===false
+            && moneyAuth.configWritesAuthorized===false
+            && moneyAuth.syntheticQaWritesAuthorized===false
+            && moneyAuth.realUserImpersonationAuthorized===false
+            && moneyAuth.livePromotionAuthorized===false
+            && moneyAuth.reimportAuthorized===false
+            && moneyAuth.authUatRequired===true
+            && c.b4003SecurityReleaseHold?.status==='ACTIVE_FAIL_CLOSED_UNAUTHORIZED_BROWSER_FIRESTORE_READ_WRITE'
+            && c.currentB4?.status==='B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL'
+            && c.nextAction==='I6_5_FORENSIC_REMEDIATION_B4_003_R20_TARGETED_PAULA_VISUAL'
+            && l.activeFinding?.id==='B4-003'
+            && l.boundaries?.previewMutationAuthorized===true
+            && l.boundaries?.functionDeploymentAuthorized===true
+            && l.boundaries?.businessWritesAuthorized===false
+            && l.boundaries?.dataMutationAuthorized===false
+            && l.boundaries?.syntheticQaWritesAuthorized===false
+            && l.boundaries?.livePromotionAuthorized===false;
+          if(moneyRequested&&!moneyScoped)throw Error('B4_003_CARTERA_PREVIEW_REQUEST_DENIED');
+          const scopedPreview=priorScopedPreview||onePassInternal||oct15ScopedReadback||restrictedScoped||c03Scoped||uatScoped||currentScoped||causalScoped||insurerScoped||cacheScoped||countryScoped||agingScoped||pctxScoped||moneyScoped;
           const previewOk=(r19Preview||r20Preview||r23Preview)
             && l.activeFinding?.id==='B4-003'
             && l.boundaries?.businessWritesAuthorized===false
@@ -777,7 +813,7 @@ jobs:
             uat.sourceBlobs['functions/assignable-advisor-roster.js']===rosterBlob
             && uat.onlyTwoReadOnlyFunctions===true;
           const readonlyRoster=scopedPreview&&rosterAuth.status==='AUTHORIZED_EXACT_PREVIEW_READONLY_ROSTER_ONLY'
-            && (rosterAuth.sourceBlobSha===rosterBlob||c03RosterReady||uatRosterReady||(currentScoped&&currentPreviewIntent.rosterSourceBlobSha===rosterBlob)||(causalScoped&&ca.rosterSourceBlobSha===rosterBlob)||(insurerScoped&&insurerAuth.rosterSourceBlobSha===rosterBlob)||(cacheScoped&&cacheAuth.rosterSourceBlobSha===rosterBlob)||(countryScoped&&countryAuth.rosterSourceBlobSha===rosterBlob)||(agingScoped&&agingAuth.rosterSourceBlobSha===rosterBlob)||(pctxScoped&&pctxAuth.rosterSourceBlobSha===rosterBlob))
+            && (rosterAuth.sourceBlobSha===rosterBlob||c03RosterReady||uatRosterReady||(currentScoped&&currentPreviewIntent.rosterSourceBlobSha===rosterBlob)||(causalScoped&&ca.rosterSourceBlobSha===rosterBlob)||(insurerScoped&&insurerAuth.rosterSourceBlobSha===rosterBlob)||(cacheScoped&&cacheAuth.rosterSourceBlobSha===rosterBlob)||(countryScoped&&countryAuth.rosterSourceBlobSha===rosterBlob)||(agingScoped&&agingAuth.rosterSourceBlobSha===rosterBlob)||(pctxScoped&&pctxAuth.rosterSourceBlobSha===rosterBlob)||(moneyScoped&&moneyAuth.rosterSourceBlobSha===rosterBlob))
             && rosterAuth.service==='orbit360AssignableAdvisorRosterPreview'
             && rosterAuth.businessWritesAuthorized===false
             && rosterAuth.otherFunctionsDeployAuthorized===false
@@ -786,7 +822,7 @@ jobs:
             && c.b4003SecurityReleaseHold?.status==='ACTIVE_FAIL_CLOSED_UNAUTHORIZED_BROWSER_FIRESTORE_READ_WRITE'
             && l.boundaries?.previewMutationAuthorized===true
             && l.boundaries?.realOperationalWritesAuthorized===false;
-          if((currentSubject===requestedOct15Subject||c03Scoped||uatScoped||currentScoped||causalScoped||insurerScoped||cacheScoped||countryScoped||agingScoped||pctxScoped)&&scopedPreview&&!readonlyRoster)
+          if((currentSubject===requestedOct15Subject||c03Scoped||uatScoped||currentScoped||causalScoped||insurerScoped||cacheScoped||countryScoped||agingScoped||pctxScoped||moneyScoped)&&scopedPreview&&!readonlyRoster)
             throw Error('B4_003_DASHBOARD_READONLY_PREVIEW_SYNC_NOT_AUTHORIZED');
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'readonly_roster='+(readonlyRoster?'true':'false')+'\n');
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'scoped_preview='+(scopedPreview?'true':'false')+'\n');

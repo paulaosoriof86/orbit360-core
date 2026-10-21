@@ -3750,5 +3750,56 @@
     "realBusinessWrites": 0,
     "livePromotionAuthorized": false,
     "authUatAccepted": false
+  },
+  "b4003Uat20261021": {
+    "status": "REJECTED_PRIOR_PREVIEW_NOT_LATEST",
+    "runId": 39503173099,
+    "sourceSha": "ca08bbde10e93be4506ca3e0105d5265e6021e7b",
+    "filePath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_AUTHENTICATED_UAT_REJECTED_20261021.md",
+    "fileBlobSha": "5acdb8a55deb444556ef942c5716c957bbe68f7c",
+    "docReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_EVERGREEN_AND_UAT_SYNCHRONIZATION_20261021.json",
+    "docReceiptBlobSha": "88038c5e696e697b96d5e552006b5dc9cc9021f9",
+    "authenticatedSingleUID": true,
+    "realBackendAuthAccepted": false,
+    "humanFunctionalAccepted": false
+  },
+  "b4003DocSync20261021": {
+    "status": "REPOSITORY_V7_SOURCE_OK_PROJECT_V6_V7_SYNC_PENDING",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_EVERGREEN_AND_UAT_SYNCHRONIZATION_20261021.json",
+    "receiptBlobSha": "88038c5e696e697b96d5e552006b5dc9cc9021f9",
+    "staticSourceUpdateRequired": true,
+    "immutableHistoricalDataPreserved": true
+  },
+  "b4003CanonicalPortfolioAmountPreviewAuth20261021": {
+    "status": "AUTHORIZED_EXACT_ISOLATED_READONLY_PREVIEW",
+    "triggerSubject": "build(i6.5 B4-003): exact canonical cartera amount Preview",
+    "gate": "I6.5/B4-003",
+    "sourceParentHead": "c5eb3c840caa1ce632210a9c55ef9a481f2fa16f",
+    "sourceFixReceiptBlobSha": "8eaf41904b227bbbdf1e7c774060fad0ba237da6",
+    "productOwner": "orbit360-platform/core/queries.js",
+    "productOwnerBlobSha": "ee10618b0d2d04e1d7578e7abc44fc99686b60ed",
+    "qaPath": "tools/gravicentra-b4-003-portfolio-verified-receipt-amount.test.cjs",
+    "qaBlobSha": "567ed700711bb8b4375747b299296d2ebd2b4f1b",
+    "compositionBlobSha": "06161d34a25954d92e11efd98c4226488a0bb704",
+    "preAuthB4Sha": "f8a5b3b82f641bbc2df2a2b3e49402b5b32085f2",
+    "priorGuardRunId": 39629585062,
+    "priorGuardConclusion": "success",
+    "rosterSourceBlobSha": "75ca53db55e2665123589b0e63253a8e4f8c377c",
+    "authReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CANONICAL_PORTFOLIO_PREVIEW_AUTH_20261021.json",
+    "authReceiptBlobSha": "ee788ba8a25ed0450a52021bf06c11abab449875",
+    "functions": [
+      "orbit360ScopedPolicyReadPreview",
+      "orbit360AssignableAdvisorRosterPreview"
+    ],
+    "onlyIsolatedHosting": true,
+    "sharedRulesDeployAuthorized": false,
+    "otherFunctionsDeployAuthorized": false,
+    "operationalWritesAuthorized": false,
+    "configWritesAuthorized": false,
+    "syntheticQaWritesAuthorized": false,
+    "realUserImpersonationAuthorized": false,
+    "livePromotionAuthorized": false,
+    "reimportAuthorized": false,
+    "authUatRequired": true
   }
 }

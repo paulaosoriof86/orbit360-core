@@ -114,6 +114,54 @@ if(MISSING_MONEY_ACTIVE){
  execFileSync(process.execPath,[MISSING_MONEY.qaPath],{stdio:'inherit'});
  console.log('B4_003_CO_PORTFOLIO_MONEY_SOURCE_QA_PASS_SYNTHETIC_UAT_HOLD');
 }
+// I6.5 B4-003 documentary synchronization, prior exact-UAT rejection and
+// narrowly authorized current cumulative Preview. Historical SHA remain fixed.
+const NEW_MONEY_AUTH=C.b4003CanonicalPortfolioAmountPreviewAuth20261021||{};
+if(NEW_MONEY_AUTH.status==='AUTHORIZED_EXACT_ISOLATED_READONLY_PREVIEW'){
+ const lock=B4.b4003CanonicalPortfolioAmountPreviewAuth20261021||{};
+ const ar=exists('artifacts/orbit360-recovery/release-control/I6_5_B4_003_CANONICAL_PORTFOLIO_PREVIEW_AUTH_20261021.json')?readJson('artifacts/orbit360-recovery/release-control/I6_5_B4_003_CANONICAL_PORTFOLIO_PREVIEW_AUTH_20261021.json'):{};
+ const dr=exists('artifacts/orbit360-recovery/release-control/I6_5_B4_003_EVERGREEN_AND_UAT_SYNCHRONIZATION_20261021.json')?readJson('artifacts/orbit360-recovery/release-control/I6_5_B4_003_EVERGREEN_AND_UAT_SYNCHRONIZATION_20261021.json'):{};
+ const u=C.b4003Uat20261021||{},d=C.b4003DocSync20261021||{};
+ need(sameJson(NEW_MONEY_AUTH,lock)&&
+   NEW_MONEY_AUTH.gate==='I6.5/B4-003'&&
+   NEW_MONEY_AUTH.triggerSubject==='build(i6.5 B4-003): exact canonical cartera amount Preview'&&
+   NEW_MONEY_AUTH.sourceFixReceiptBlobSha===MISSING_MONEY.receiptBlobSha&&
+   NEW_MONEY_AUTH.productOwner===MISSING_MONEY.sourcePath&&
+   NEW_MONEY_AUTH.productOwnerBlobSha===git('hash-object',NEW_MONEY_AUTH.productOwner)&&
+   NEW_MONEY_AUTH.qaPath===MISSING_MONEY.qaPath&&
+   NEW_MONEY_AUTH.qaBlobSha===git('hash-object',NEW_MONEY_AUTH.qaPath)&&
+   NEW_MONEY_AUTH.compositionBlobSha===git('hash-object',I6_CANONICAL_COMPOSITION)&&
+   NEW_MONEY_AUTH.preAuthB4Sha==='f8a5b3b82f641bbc2df2a2b3e49402b5b32085f2'&&
+   NEW_MONEY_AUTH.priorGuardRunId===39629585062&&NEW_MONEY_AUTH.priorGuardConclusion==='success'&&
+   NEW_MONEY_AUTH.rosterSourceBlobSha===git('hash-object','functions/assignable-advisor-roster.js')&&
+   NEW_MONEY_AUTH.authReceiptPath==='artifacts/orbit360-recovery/release-control/I6_5_B4_003_CANONICAL_PORTFOLIO_PREVIEW_AUTH_20261021.json'&&
+   NEW_MONEY_AUTH.authReceiptBlobSha===git('hash-object','artifacts/orbit360-recovery/release-control/I6_5_B4_003_CANONICAL_PORTFOLIO_PREVIEW_AUTH_20261021.json')&&
+   ar.schema==='GRAVICENTRA_I65_B4003_CANONICAL_CARTERA_EXACT_PREVIEW_AUTH_V1'&&
+   ar.productOwnerBlobSha===NEW_MONEY_AUTH.productOwnerBlobSha&&
+   sameJson(ar.allowedFunctions,NEW_MONEY_AUTH.functions)&&
+   sameJson(NEW_MONEY_AUTH.functions,['orbit360ScopedPolicyReadPreview','orbit360AssignableAdvisorRosterPreview'])&&
+   NEW_MONEY_AUTH.onlyIsolatedHosting===true&&
+   NEW_MONEY_AUTH.sharedRulesDeployAuthorized===false&&NEW_MONEY_AUTH.otherFunctionsDeployAuthorized===false&&
+   NEW_MONEY_AUTH.operationalWritesAuthorized===false&&NEW_MONEY_AUTH.configWritesAuthorized===false&&
+   NEW_MONEY_AUTH.syntheticQaWritesAuthorized===false&&NEW_MONEY_AUTH.realUserImpersonationAuthorized===false&&
+   NEW_MONEY_AUTH.livePromotionAuthorized===false&&NEW_MONEY_AUTH.reimportAuthorized===false&&
+   NEW_MONEY_AUTH.authUatRequired===true&&
+   u.status==='REJECTED_PRIOR_PREVIEW_NOT_LATEST'&&u.runId===39503173099&&
+   u.sourceSha==='ca08bbde10e93be4506ca3e0105d5265e6021e7b'&&
+   u.fileBlobSha===git('hash-object',u.filePath)&&
+   d.receiptPath==='artifacts/orbit360-recovery/release-control/I6_5_B4_003_EVERGREEN_AND_UAT_SYNCHRONIZATION_20261021.json'&&d.receiptBlobSha===git('hash-object',d.receiptPath)&&
+   dr.uat.sourceFileBlobSha===u.fileBlobSha&&dr.authority.ledgerCount===295&&
+   C.currentB4?.compositionLockBlobSha===git('hash-object',I6_CANONICAL_COMPOSITION)&&
+   C.currentB4?.executionLockBlobSha===git('hash-object',ACTIVE_I65_FORENSIC_B4)&&
+   C.i65ForensicRemediationPlan?.b4?.executionLockBlobSha===git('hash-object',ACTIVE_I65_FORENSIC_B4)&&
+   C.projectSources?.staticSourceUpdateRequired===true&&
+   C.projectSources?.pendingNormativeChange?.status==='NEEDS_INSURER_COUNTRY_MULTICOUNTRY_EXCEPTION_RECONCILIATION'&&
+   C.b4003SecurityReleaseHold?.status==='ACTIVE_FAIL_CLOSED_UNAUTHORIZED_BROWSER_FIRESTORE_READ_WRITE'&&
+   B4.boundaries?.businessWritesAuthorized===false&&B4.boundaries?.dataMutationAuthorized===false&&
+   B4.boundaries?.livePromotionAuthorized===false&&FIND.findings.length===295,
+   'B4_003_DOC_SYNC_OR_CARTE RA_AUTH_DRIFT'.replace('CARTE RA','CARTERA'));
+ console.log('B4_003_DOC_SYNCHRONIZATION_PENDING_V6_V7_UAT_REJECTED_PREVIOUS_PREVIEW_NEW_AUTH_READONLY_PASS');
+}
 const PCACHE=C.b4003PolizasContextCacheFix20261020||{};
 const PCACHE_ACTIVE=PCACHE.status==='SOURCE_ONLY_COMPOSED_NODE_QA_REGISTERED_RUN_REQUIRED';
 if(PCACHE_ACTIVE){

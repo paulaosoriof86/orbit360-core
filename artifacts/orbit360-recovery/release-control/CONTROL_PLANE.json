@@ -47,7 +47,18 @@
     },
     "normativeAddendumPath": "artifacts/orbit360-recovery/project-sources-v2/v7/11_ADDENDUM_PAGOS_COBROS_CONCILIACION_FECHAS_INFERENCIA_EVERGREEN_V7_2026-09-26.md",
     "normativeAddendumBlobSha": "b51eb0f37f48a4fcab0336b8b300c559b0f76714",
-    "pendingNormativeChange": null,
+    "pendingNormativeChange": {
+      "status": "NEEDS_INSURER_COUNTRY_MULTICOUNTRY_EXCEPTION_RECONCILIATION",
+      "date": "2026-10-21",
+      "userRule": "Country of client for insurance records follows insurer country for a current/past policy",
+      "knownCrossings": {
+        "CO_Policy_GT_Client": 41,
+        "GT_Policy_CO_Client": 1
+      },
+      "multiCountryUnknown": true,
+      "noBlindWrites": true,
+      "requiresEvergreenSuccessorOnlyAfterAdjudication": true
+    },
     "projectSynchronization": {
       "status": "REPO_V7_GUARD_PASS_PROJECT_SOURCE_SYNC_PENDING",
       "requiredAdds": [
@@ -62,7 +73,14 @@
       "livePromotion": false,
       "repositoryGuardRunId": 37302206269,
       "repositoryGuardConclusion": "success",
-      "repositoryGuardHead": "11145eb2ee63dde90d4e8808169e5c31c49ad482"
+      "repositoryGuardHead": "11145eb2ee63dde90d4e8808169e5c31c49ad482",
+      "currentEvidence20261021": {
+        "status": "REPO_V7_CONFIRMED_PROJECT_V6_V7_SYNC_PENDING",
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_EVERGREEN_AND_UAT_SYNCHRONIZATION_20261021.json",
+        "receiptBlobSha": "88038c5e696e697b96d5e552006b5dc9cc9021f9",
+        "keepExistingSources": true,
+        "readbackRequiredBeforeClearingFlag": true
+      }
     }
   },
   "deprecatedMutableAuthorities": {
@@ -4869,7 +4887,7 @@
       "entryGuardReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_ENTRY_GUARD_PASS_20261002.json",
       "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
       "executionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B4_EXECUTION_LOCK_20261002.json",
-      "executionLockBlobSha": "f8a5b3b82f641bbc2df2a2b3e49402b5b32085f2",
+      "executionLockBlobSha": "5ec8eac9df2fdc21b035163007ac8669efd4a2f5",
       "compositionLockBlobSha": "016f251811f22bc4fc04b2a5f674dfe09243e605",
       "findingLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
       "activeFindingId": "B4-003",
@@ -6312,8 +6330,8 @@
     "status": "B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL",
     "activeFindingId": "B4-003",
     "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
-    "executionLockBlobSha": "f8a5b3b82f641bbc2df2a2b3e49402b5b32085f2",
-    "compositionLockBlobSha": "816309c63ed254d9b0e05cf63621c3d1c03cbfd5",
+    "executionLockBlobSha": "5ec8eac9df2fdc21b035163007ac8669efd4a2f5",
+    "compositionLockBlobSha": "06161d34a25954d92e11efd98c4226488a0bb704",
     "findingLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
     "noLive": true,
     "noReimport": true,
@@ -13767,7 +13785,7 @@
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_POLIZAS_CONTEXT_CACHE_SOURCE_FIX_20261020.json",
     "receiptBlobSha": "6eaf80da79b8f3f20677a9617eb7d3ca87154e99",
     "compositionBlobSha": "dbe96631d74bfd009d7bd86e40495e40ebe1ee3e",
-    "executionLockBlobSha": "f8a5b3b82f641bbc2df2a2b3e49402b5b32085f2",
+    "executionLockBlobSha": "5ec8eac9df2fdc21b035163007ac8669efd4a2f5",
     "sourceOnly": true,
     "operationalWritesAuthorized": false,
     "sharedRulesDeployAuthorized": false,
@@ -13955,7 +13973,7 @@
     "livePromotionAuthorized": false,
     "authUatAccepted": false,
     "approval": "USER_RETURN_TO_PLAN_20261021_B4_003_SOURCE_ONLY",
-    "executionLockBlobSha": "f8a5b3b82f641bbc2df2a2b3e49402b5b32085f2",
+    "executionLockBlobSha": "5ec8eac9df2fdc21b035163007ac8669efd4a2f5",
     "newPreviewRequired": true,
     "operationalDataWritesAuthorized": false,
     "realUserImpersonationAuthorized": false,
@@ -13964,5 +13982,56 @@
     "authenticatedUatAccepted": false,
     "formalI6Percent": 50,
     "productionReadinessPercent": 20
+  },
+  "b4003Uat20261021": {
+    "status": "REJECTED_PRIOR_PREVIEW_NOT_LATEST",
+    "runId": 39503173099,
+    "sourceSha": "ca08bbde10e93be4506ca3e0105d5265e6021e7b",
+    "filePath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_AUTHENTICATED_UAT_REJECTED_20261021.md",
+    "fileBlobSha": "5acdb8a55deb444556ef942c5716c957bbe68f7c",
+    "docReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_EVERGREEN_AND_UAT_SYNCHRONIZATION_20261021.json",
+    "docReceiptBlobSha": "88038c5e696e697b96d5e552006b5dc9cc9021f9",
+    "authenticatedSingleUID": true,
+    "realBackendAuthAccepted": false,
+    "humanFunctionalAccepted": false
+  },
+  "b4003DocSync20261021": {
+    "status": "REPOSITORY_V7_SOURCE_OK_PROJECT_V6_V7_SYNC_PENDING",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_EVERGREEN_AND_UAT_SYNCHRONIZATION_20261021.json",
+    "receiptBlobSha": "88038c5e696e697b96d5e552006b5dc9cc9021f9",
+    "staticSourceUpdateRequired": true,
+    "immutableHistoricalDataPreserved": true
+  },
+  "b4003CanonicalPortfolioAmountPreviewAuth20261021": {
+    "status": "AUTHORIZED_EXACT_ISOLATED_READONLY_PREVIEW",
+    "triggerSubject": "build(i6.5 B4-003): exact canonical cartera amount Preview",
+    "gate": "I6.5/B4-003",
+    "sourceParentHead": "c5eb3c840caa1ce632210a9c55ef9a481f2fa16f",
+    "sourceFixReceiptBlobSha": "8eaf41904b227bbbdf1e7c774060fad0ba237da6",
+    "productOwner": "orbit360-platform/core/queries.js",
+    "productOwnerBlobSha": "ee10618b0d2d04e1d7578e7abc44fc99686b60ed",
+    "qaPath": "tools/gravicentra-b4-003-portfolio-verified-receipt-amount.test.cjs",
+    "qaBlobSha": "567ed700711bb8b4375747b299296d2ebd2b4f1b",
+    "compositionBlobSha": "06161d34a25954d92e11efd98c4226488a0bb704",
+    "preAuthB4Sha": "f8a5b3b82f641bbc2df2a2b3e49402b5b32085f2",
+    "priorGuardRunId": 39629585062,
+    "priorGuardConclusion": "success",
+    "rosterSourceBlobSha": "75ca53db55e2665123589b0e63253a8e4f8c377c",
+    "authReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CANONICAL_PORTFOLIO_PREVIEW_AUTH_20261021.json",
+    "authReceiptBlobSha": "ee788ba8a25ed0450a52021bf06c11abab449875",
+    "functions": [
+      "orbit360ScopedPolicyReadPreview",
+      "orbit360AssignableAdvisorRosterPreview"
+    ],
+    "onlyIsolatedHosting": true,
+    "sharedRulesDeployAuthorized": false,
+    "otherFunctionsDeployAuthorized": false,
+    "operationalWritesAuthorized": false,
+    "configWritesAuthorized": false,
+    "syntheticQaWritesAuthorized": false,
+    "realUserImpersonationAuthorized": false,
+    "livePromotionAuthorized": false,
+    "reimportAuthorized": false,
+    "authUatRequired": true
   }
 }

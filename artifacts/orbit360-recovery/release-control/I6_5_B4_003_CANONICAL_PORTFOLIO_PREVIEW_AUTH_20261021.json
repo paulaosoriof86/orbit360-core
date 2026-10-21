@@ -1,0 +1,31 @@
+{
+  "schema": "GRAVICENTRA_I65_B4003_CANONICAL_CARTERA_EXACT_PREVIEW_AUTH_V1",
+  "gate": "I6.5/B4-003",
+  "triggerSubject": "build(i6.5 B4-003): exact canonical cartera amount Preview",
+  "sourceParentHead": "c5eb3c840caa1ce632210a9c55ef9a481f2fa16f",
+  "priorGuardRunId": 39629585062,
+  "priorGuardConclusion": "success",
+  "sourceFixReceiptBlobSha": "8eaf41904b227bbbdf1e7c774060fad0ba237da6",
+  "productOwner": "orbit360-platform/core/queries.js",
+  "productOwnerBlobSha": "ee10618b0d2d04e1d7578e7abc44fc99686b60ed",
+  "qaPath": "tools/gravicentra-b4-003-portfolio-verified-receipt-amount.test.cjs",
+  "qaBlobSha": "567ed700711bb8b4375747b299296d2ebd2b4f1b",
+  "preAuthB4Sha": "f8a5b3b82f641bbc2df2a2b3e49402b5b32085f2",
+  "compositionBlobSha": "06161d34a25954d92e11efd98c4226488a0bb704",
+  "rosterPath": "functions/assignable-advisor-roster.js",
+  "allowedFunctions": [
+    "orbit360ScopedPolicyReadPreview",
+    "orbit360AssignableAdvisorRosterPreview"
+  ],
+  "onlyIsolatedHosting": true,
+  "noSharedRules": true,
+  "noOtherFunctions": true,
+  "noBusinessWrites": true,
+  "noConfigWrites": true,
+  "noSyntheticWrites": true,
+  "noRealUserTokens": true,
+  "noLive": true,
+  "noReimport": true,
+  "authUatRequired": true,
+  "docSyncReceiptSha": "88038c5e696e697b96d5e552006b5dc9cc9021f9"
+}
