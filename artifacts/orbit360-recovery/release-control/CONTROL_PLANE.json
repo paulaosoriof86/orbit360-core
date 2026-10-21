@@ -14033,5 +14033,16 @@
     "livePromotionAuthorized": false,
     "reimportAuthorized": false,
     "authUatRequired": true
+  },
+  "b4003CanonicalPortfolioAmountPreviewDispatch20261021": {
+    "status": "TRIGGERED_PENDING_EXACT_READBACK",
+    "gate": "I6.5/B4-003",
+    "sourceHeadBeforeDispatch": "8531d77b52bf1819f3146681df95d356b6946f1e",
+    "evidenceGuardRunId": 39634114350,
+    "readOnly": true,
+    "livePromotion": false,
+    "sharedRulesDeploy": false,
+    "realBusinessWrites": 0,
+    "humanUatPending": true
   }
 }
