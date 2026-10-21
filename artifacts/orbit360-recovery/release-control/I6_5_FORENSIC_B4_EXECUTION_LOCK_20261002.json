@@ -3690,5 +3690,46 @@
     "receiptBlobSha": "30e124e9391a3a3b874be39798e431edeecde894",
     "sourceSha": "aedf6fd705499b095fd711b16b1f9a42577ae04b",
     "authenticatedUatAccepted": false
+  },
+  "b4003FocusedFinancialCanonicalReadback20261021": {
+    "status": "AUTHORIZED_READ_ONLY_CANONICAL_ID_READBACK",
+    "gate": "I6.5/B4-003",
+    "subject": "test(i6.5 B4-003): focused canonical finance readback",
+    "purpose": "Resolve UAT5 policy/receipt/portfolio/cobro IDs and source monetary-state disagreements, no UI-only assumptions",
+    "userEvidence": "GRAVICENTRA_UAT_AUTENTICADA_INTEGRAL_B4-003_2026-10-21",
+    "uatSourceSha": "ca08bbde10e93be4506ca3e0105d5265e6021e7b",
+    "uatRunId": 39503173099,
+    "currentSourceSha": "aedf6fd705499b095fd711b16b1f9a42577ae04b",
+    "currentPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b4-39537641686-ka1j8hss.web.app",
+    "currentBuildId": "gi-i65-b4-aedf6fd70549-57f234755dc1",
+    "currentPreviewProofReceiptBlobSha": "30e124e9391a3a3b874be39798e431edeecde894",
+    "priorGuardRunId": 39538605700,
+    "priorGuardConclusion": "success",
+    "testedPolicyNumbers": [
+      "1003687",
+      "57071",
+      "10104",
+      "UTO-1000001645"
+    ],
+    "allowedCollections": [
+      "polizas",
+      "clientes",
+      "recibosEsperados",
+      "carteraPrimas",
+      "cobros"
+    ],
+    "onlyExistingWorkflow": ".github/workflows/gravicentra-b4-003-executor.yml",
+    "mode": "FINANCE_AGGREGATE_SERVICE_ACCOUNT_READ_ONLY",
+    "realUserImpersonationAuthorized": false,
+    "dataMutationAuthorized": false,
+    "sourceDataApplyAuthorized": false,
+    "syntheticWritesAuthorized": false,
+    "sharedRulesDeployAuthorized": false,
+    "otherFunctionDeployAuthorized": false,
+    "hostingDeployAuthorized": false,
+    "livePromotionAuthorized": false,
+    "reimportAuthorized": false,
+    "humanUatPass": false,
+    "original295FindingsPreserved": true
   }
 }

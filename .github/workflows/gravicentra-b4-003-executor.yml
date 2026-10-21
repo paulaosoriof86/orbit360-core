@@ -712,8 +712,39 @@ jobs:
             && /^https:\/\/ays-orbit-360-lab--gi-i65-b4-/.test(String(exactFinancialProof.previewUrl||''))
             && /^[a-f0-9]{40}$/.test(String(exactFinancialProof.sourceSha||''));
           if(financeTrigger&&!financeCoverage)throw Error('B4_003_FINANCE_SOURCE_QA_BOUNDARY_FAIL_CLOSED');
-          fs.appendFileSync(process.env.GITHUB_OUTPUT,'finance_source_readonly='+(financeCoverage?'true':'false')+'\n');
-          if(financeCoverage)fs.appendFileSync(process.env.GITHUB_OUTPUT,'finance_exact_preview='+exactFinancialProof.previewUrl+'\n');
+          const financialIdSubject='test(i6.5 B4-003): focused canonical finance readback';
+          const financialIdRequested=currentSubject===financialIdSubject;
+          const financialIdAuth=c.b4003FocusedFinancialCanonicalReadback20261021||{};
+          const financialIdProof=c.b4003PolizasContextCachePreviewProof20261020||{};
+          const financialIdAllowed=financialIdRequested
+            && financialIdAuth.status==='AUTHORIZED_READ_ONLY_CANONICAL_ID_READBACK'
+            && financialIdAuth.gate==='I6.5/B4-003'
+            && financialIdAuth.subject===financialIdSubject
+            && financialIdAuth.currentSourceSha===financialIdProof.sourceSha
+            && financialIdAuth.currentPreviewUrl===financialIdProof.previewUrl
+            && financialIdAuth.currentBuildId===financialIdProof.buildId
+            && financialIdAuth.currentPreviewProofReceiptBlobSha===financialIdProof.receiptBlobSha
+            && financialIdAuth.priorGuardRunId===39538605700&&financialIdAuth.priorGuardConclusion==='success'
+            && financialIdProof.exactHostingReadback===true&&financialIdProof.humanFunctionalAccepted===false
+            && JSON.stringify(financialIdAuth.testedPolicyNumbers)===JSON.stringify(['1003687','57071','10104','UTO-1000001645'])
+            && JSON.stringify(financialIdAuth.allowedCollections)===JSON.stringify(['polizas','clientes','recibosEsperados','carteraPrimas','cobros'])
+            && financialIdAuth.onlyExistingWorkflow==='.github/workflows/gravicentra-b4-003-executor.yml'
+            && financialIdAuth.realUserImpersonationAuthorized===false
+            && financialIdAuth.dataMutationAuthorized===false&&financialIdAuth.sourceDataApplyAuthorized===false
+            && financialIdAuth.syntheticWritesAuthorized===false
+            && financialIdAuth.sharedRulesDeployAuthorized===false&&financialIdAuth.hostingDeployAuthorized===false
+            && financialIdAuth.livePromotionAuthorized===false&&financialIdAuth.reimportAuthorized===false
+            && c.b4003SecurityReleaseHold?.status==='ACTIVE_FAIL_CLOSED_UNAUTHORIZED_BROWSER_FIRESTORE_READ_WRITE'
+            && c.currentB4?.status==='B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL'
+            && c.nextAction==='I6_5_FORENSIC_REMEDIATION_B4_003_R20_TARGETED_PAULA_VISUAL'
+            && l.activeFinding?.id==='B4-003'
+            && l.boundaries?.realOperationalWritesAuthorized===false&&l.boundaries?.businessWritesAuthorized===false
+            && l.boundaries?.syntheticQaWritesAuthorized===false&&l.boundaries?.dataMutationAuthorized===false
+            && l.boundaries?.livePromotionAuthorized===false;
+          if(financialIdRequested&&!financialIdAllowed)throw Error('B4_003_FINANCIAL_ID_READBACK_NOT_AUTHORIZED');
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'finance_source_readonly='+((financeCoverage||financialIdAllowed)?'true':'false')+'\n');
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'finance_focused_target='+(financialIdAllowed?'true':'false')+'\n');
+          if(financeCoverage||financialIdAllowed)fs.appendFileSync(process.env.GITHUB_OUTPUT,'finance_exact_preview='+(financialIdAllowed?financialIdProof.previewUrl:exactFinancialProof.previewUrl)+'\n');
 
           const publicSmokeTrigger=execFileSync('git',['log','-1','--format=%s'],{encoding:'utf8'}).trim()==='test(i6.5 B4-003): exact public browser smoke';
           const browserBinding=c.b4003MetasHistorialLatestTechnicalPreview||{};
@@ -785,7 +816,7 @@ jobs:
           if(currentSubject===commercialSubject&&!commercialReadonly)throw Error('B4_003_COMMERCIAL_READONLY_GATE_DENIED');
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'commercial_readonly='+(commercialReadonly?'true':'false')+'\n');
 
-          const requestedModes={scopedPreview,preview:previewOk,renewalsPreview,apply:applyOk,r20DryRun,r20Apply,r20CutoffApply,secondReviewDryRun,p0CumulativeReadOnly,r26RulesReadOnly,r26ReadOnly,financeCoverage,publicBrowserSmoke,commercialReadonly};
+          const requestedModes={scopedPreview,preview:previewOk,renewalsPreview,apply:applyOk,r20DryRun,r20Apply,r20CutoffApply,secondReviewDryRun,p0CumulativeReadOnly,r26RulesReadOnly,r26ReadOnly,financeCoverage,financialIdAllowed,publicBrowserSmoke,commercialReadonly};
           const enabledModes=Object.entries(requestedModes).filter(([,on])=>on).map(([name])=>name);
           if(!enabledModes.length){
             fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY,'### B4-003: NOOP (not a Preview PASS)\nNo build, deploy, authenticated browser test, or readback was executed. Control Plane nextAction: `'+String(c.nextAction)+'`.\n');
@@ -846,6 +877,7 @@ jobs:
         env:
           FINANCE_EXACT_PREVIEW: ${{ steps.gate.outputs.finance_exact_preview }}
           FINANCE_EVIDENCE_OUT: ${{ runner.temp }}/b4-003-finance-source-readonly.json
+          FINANCE_FOCUSED_TARGET: ${{ steps.gate.outputs.finance_focused_target }}
         run: |
           set -euo pipefail
           node <<'NODE'
@@ -853,7 +885,8 @@ jobs:
           const {initializeApp,applicationDefault}=require('firebase-admin/app');
           const {getFirestore}=require('firebase-admin/firestore');
           const cp=JSON.parse(fs.readFileSync(process.env.CONTROL,'utf8'));
-          const exact=cp.b4003FunctionalContractRestore20261014.newExactPreviewProof;
+          const focused=process.env.FINANCE_FOCUSED_TARGET==='true';
+          const exact=focused?cp.b4003PolizasContextCachePreviewProof20261020:cp.b4003FunctionalContractRestore20261014.newExactPreviewProof;
           const fail=m=>{throw Error(m);};
           const confCtx={window:{}};
           vm.runInNewContext(fs.readFileSync('orbit360-platform/product-runtime-config.js','utf8'),confCtx,{timeout:1000});
@@ -974,6 +1007,93 @@ jobs:
             }
             report.activityRelationshipProfile=events;
             report.relations={policiesByCountry:policyCountries,crossCountryPolicyClient:crossCountry,children};
+
+            if(focused){
+              const targetNumbers=['1003687','57071','10104','UTO-1000001645'];
+              const number=v=>String(v==null?'':v).trim().toUpperCase().replace(/\s+/g,'');
+              const requested=new Set(targetNumbers.map(number));
+              const date=v=>String(v==null?'':v).trim().slice(0,10);
+              const numeric=v=>v==null||String(v).trim()===''?null:(Number.isFinite(Number(v))?Number(v):null);
+              const country=v=>String(v==null?'':v).trim().toUpperCase();
+              const pfields=['numero','numeroPoliza','numeroPolizaFuente','pais','country','moneda','divisa','estado','clienteId','asesorId','primaNeta','primaTotal','vigenciaFin'];
+              const childFields=['polizaId','policyId','reciboId','receiptId','pais','country','moneda','currency','estado','estadoOperativo','estadoCartera','paymentState','conciliadoPago','carteraActiva','fechaLimite','vence','fechaVencimiento','monto','saldo','primaTotal','montoTotal','cuota','secuencia','serie','paidDate','fechaPago'];
+              const pAll=await collection('polizas').select(...pfields).get();
+              const candidates=pAll.docs.filter(d=>{const x=d.data()||{};return [x.numero,x.numeroPoliza,x.numeroPolizaFuente].some(v=>requested.has(number(v)));});
+              const policyByNum=Object.fromEntries(targetNumbers.map(n=>[n,[]]));
+              const ids=new Set();
+              for(const d of candidates){
+                const p=d.data()||{};ids.add(d.id);
+                const which=targetNumbers.find(n=>[p.numero,p.numeroPoliza,p.numeroPolizaFuente].some(v=>number(v)===number(n)));
+                if(!which)continue;
+                policyByNum[which].push({policyId:d.id,numero:which,pais:country(p.pais||p.country),moneda:country(p.moneda||p.divisa),
+                  estado:String(p.estado||''),primaNeta:numeric(p.primaNeta),primaTotal:numeric(p.primaTotal),
+                  clienteVinculado:!!clients.get(String(p.clienteId||'')),
+                  clientCountry:country(clients.get(String(p.clienteId||''))?.pais),
+                  ultimoVencimiento:date(p.vigenciaFin)});
+              }
+              const childCollections=['recibosEsperados','carteraPrimas','cobros'];
+              const childRows={};
+              for(const kind of childCollections){
+                const snap=await collection(kind).select(...childFields).get();
+                childRows[kind]=snap.docs.filter(d=>{const x=d.data()||{};return ids.has(String(x.polizaId||x.policyId||''));})
+                  .map(d=>Object.assign({id:d.id},d.data()||{}));
+              }
+              const inScope=new Set(candidates.map(d=>d.id));
+              const perPolicy={};
+              const isPaid=r=>r.conciliadoPago===true||['pagado','cobrado','cerrado','anulado','cancelado','cancelada'].includes(String(r.estadoCartera||r.estado||'').trim().toLowerCase());
+              const D='2026-10-21';
+              for(const [policyNo,found] of Object.entries(policyByNum)){
+                perPolicy[policyNo]=found.map(p=>{
+                  const receipts=childRows.recibosEsperados.filter(r=>String(r.polizaId||r.policyId||'')===p.policyId);
+                  const portfolio=childRows.carteraPrimas.filter(r=>String(r.polizaId||r.policyId||'')===p.policyId);
+                  const payments=childRows.cobros.filter(r=>String(r.polizaId||r.policyId||'')===p.policyId);
+                  const lookup=new Map(receipts.map(r=>[r.id,r]));
+                  const portfolioByReceipt=new Map();
+                  portfolio.forEach(r=>{const key=String(r.reciboId||r.receiptId||'');if(!portfolioByReceipt.has(key))portfolioByReceipt.set(key,[]);portfolioByReceipt.get(key).push(r);});
+                  const lines=portfolio.map(r=>{
+                    const receiptId=String(r.reciboId||r.receiptId||''),receipt=lookup.get(receiptId)||null;
+                    const carDue=date(r.vence||r.fechaVencimiento||r.fechaLimite);
+                    const recDue=date(receipt&&(receipt.fechaLimite||receipt.vence||receipt.fechaVencimiento));
+                    const effectiveDue=recDue||carDue;
+                    const amountFromCar=numeric(r.monto!=null?r.monto:r.saldo);
+                    const amountFromReceipt=numeric(receipt&&(receipt.primaTotal!=null?receipt.primaTotal:receipt.montoTotal!=null?receipt.montoTotal:receipt.monto));
+                    const carOpen=!isPaid(r), agingEligible=carOpen&&!!carDue&&carDue<D;
+                    const rowOperative=String((receipt&&receipt.estadoOperativo)||r.estadoOperativo||'').toLowerCase();
+                    const uiVencido=rowOperative==='pendiente_vencido';
+                    const displayAmount=amountFromReceipt!=null?amountFromReceipt:numeric(r.primaTotal!=null?r.primaTotal:r.montoTotal!=null?r.montoTotal:r.monto);
+                    const mismatches=[];
+                    if(receipt&&country(receipt.moneda)&&p.moneda&&country(receipt.moneda)!==p.moneda)mismatches.push('RECEIPT_CURRENCY_VS_POLICY');
+                    if(country(r.moneda)&&p.moneda&&country(r.moneda)!==p.moneda)mismatches.push('PORTFOLIO_CURRENCY_VS_POLICY');
+                    if(receipt&&country(receipt.pais)&&p.pais&&country(receipt.pais)!==p.pais)mismatches.push('RECEIPT_COUNTRY_VS_POLICY');
+                    if(country(r.pais)&&p.pais&&country(r.pais)!==p.pais)mismatches.push('PORTFOLIO_COUNTRY_VS_POLICY');
+                    if(uiVencido&&!agingEligible)mismatches.push('UI_VENCIDO_NOT_AGING_ELIGIBLE');
+                    if(uiVencido&&amountFromCar==null&&displayAmount!=null)mismatches.push('UI_AMOUNT_WITHOUT_PORTFOLIO_AMOUNT');
+                    if(uiVencido&&amountFromCar===0&&displayAmount>0)mismatches.push('UI_AMOUNT_NONZERO_PORTFOLIO_ZERO');
+                    if(uiVencido&&carDue!==recDue)mismatches.push('DUE_DATE_DIFFERENCE');
+                    return{portfolioId:r.id,receiptId,receiptFound:!!receipt,policyId:p.policyId,
+                      countryPolicy:p.pais,currencyPolicy:p.moneda,receiptCountry:country(receipt&&receipt.pais),receiptCurrency:country(receipt&&receipt.moneda),
+                      portfolioCountry:country(r.pais),portfolioCurrency:country(r.moneda),
+                      carteraActiva:r.carteraActiva!==false,estadoCartera:String(r.estadoCartera||r.estado||''),
+                      estadoOperativo:rowOperative,duePortfolio:carDue,dueReceipt:recDue,uiVencido,agingEligible,
+                      amountFromPortfolio:amountFromCar,amountFromReceipt,uiDisplayAmount:displayAmount,conflicts:mismatches};
+                  });
+                  return{policy:p,receiptsCount:receipts.length,portfolioCount:portfolio.length,paymentCount:payments.length,
+                    rows:lines,orphanReceiptIds:receipts.filter(r=>!portfolioByReceipt.has(r.id)).map(r=>r.id),
+                    overdueUiAmount:lines.filter(x=>x.uiVencido).reduce((s,r)=>s+(r.uiDisplayAmount||0),0),
+                    overdueAgingAmount:lines.filter(x=>x.agingEligible).reduce((s,r)=>s+(r.amountFromPortfolio||0),0)};
+                });
+              }
+              const conflicts=Object.values(perPolicy).flatMap(x=>x.flatMap(y=>y.rows)).filter(x=>x.conflicts.length>0);
+              report.focusedPolicyReadback={
+                source:'FIRESTORE_ADMIN_READONLY_NOT_ROLE_AUTHORIZATION_PROOF',
+                asOfDay:D,policiesRequested:targetNumbers,matchedPolicyCount:inScope.size,
+                policies:perPolicy,crossCountryPolicyClient:crossCountry,
+                totalClassifiedConflicts:conflicts.length,
+                conflictTypes:[...new Set(conflicts.flatMap(x=>x.conflicts))].sort(),
+                noRealUserTokens:true,noDataWrites:true,noImpactsToLive:true
+              };
+            }
+
             const hostedGap=report.hostedCollectionAuthority.unsupported.filter(k=>report.sourceCounts[k]>0);
             const historyCode=fs.readFileSync('orbit360-platform/modules/historial.js','utf8');
             const historyUsesActivities=historyCode.includes("S().all('actividades')");
