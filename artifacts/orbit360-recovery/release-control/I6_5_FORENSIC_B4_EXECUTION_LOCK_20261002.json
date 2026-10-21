@@ -3801,5 +3801,22 @@
     "livePromotionAuthorized": false,
     "reimportAuthorized": false,
     "authUatRequired": true
+  },
+  "b4003CanonicalCarteraTechnicalPreview20261021": {
+    "status": "EXACT_TECHNICAL_PREVIEW_PASS_AUTHENTICATED_UAT_HOLD",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CARTERA_EXACT_PREVIEW_READBACK_20261021.json",
+    "receiptBlobSha": "fe5b670efd8bef75974c39454a249a345e7bc27c",
+    "sourceSha": "8a9fe4ca6a3c68a389a8ecfb2c5c6a2ea7bd90f1",
+    "runId": 39634567135,
+    "buildId": "gi-i65-b4-8a9fe4ca6a3c-57f234755dc1",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-39634567135-zqik09mk.web.app",
+    "artifactId": 12360847575,
+    "artifactArchiveDigest": "sha256:d0df74bf412f625b8dda896a8f56a1827e772534927eea1b05cad4a329adff43",
+    "hostedPayloadDigest": "38962324ccbb4866bc4a901434078f3e7110bb2b8d80da5f972340dfc10c2fe2",
+    "backendSourceDigest": "ff0e7e698907b909e8674f716fe2f750e75ffb68ca7b33e0dbe3bab1977e687d",
+    "bundleDigest": "9274bef835a486f465d09a8bd8f01fce8fd7447d642fc7e6904836b3f922bcc2",
+    "authenticatedUatAccepted": false,
+    "securityP0Closed": false,
+    "livePromotion": false
   }
 }

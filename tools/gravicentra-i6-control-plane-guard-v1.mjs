@@ -62,6 +62,39 @@ const COMP=readJson(I6_CANONICAL_COMPOSITION),FIND=readJson(I6_FINDINGS_LEDGER),
 // aging Preview proof at its ORIGINAL immutable source/composition identity.
 // Exact source-backed I6.5 B4-003 financial amount read-model correction.
 // Historical Preview/QA evidence stays bound to the old source SHA.
+const FPRE=C.b4003CanonicalCarteraTechnicalPreview20261021||{};
+if(FPRE.status==='EXACT_TECHNICAL_PREVIEW_PASS_AUTHENTICATED_UAT_HOLD'){
+ const doc=exists(FPRE.receiptPath)?readJson(FPRE.receiptPath):{};
+ const lock=B4.b4003CanonicalCarteraTechnicalPreview20261021||{};
+ need(sameJson(FPRE,lock)&&FPRE.receiptBlobSha===git('hash-object',FPRE.receiptPath)&&
+ doc.schema==='GRAVICENTRA_B4003_CARTERA_TECHNICAL_PREVIEW_20261021_V1'&&
+ doc.sourceSha==='8a9fe4ca6a3c68a389a8ecfb2c5c6a2ea7bd90f1'&&
+ doc.runId===39634567135&&doc.buildId==='gi-i65-b4-8a9fe4ca6a3c-57f234755dc1'&&
+ doc.url==='https://ays-orbit-360-lab--gi-i65-b4-39634567135-zqik09mk.web.app'&&
+ doc.artifactId===12360847575&&
+ doc.archiveDigest===FPRE.artifactArchiveDigest&&
+ doc.hostedPayloadDigest===FPRE.hostedPayloadDigest&&
+ doc.backendSourceDigest===FPRE.backendSourceDigest&&
+ doc.bundleDigest===FPRE.bundleDigest&&
+ doc.compositionBlobSha===git('hash-object',I6_CANONICAL_COMPOSITION)&&
+ doc.productBlobSha===git('hash-object','orbit360-platform/core/queries.js')&&
+ doc.qaBlobSha===git('hash-object','tools/gravicentra-b4-003-portfolio-verified-receipt-amount.test.cjs')&&
+ sameJson(doc.previewOnlyFunctions,['orbit360ScopedPolicyReadPreview','orbit360AssignableAdvisorRosterPreview'])&&
+ doc.technicalWorkflowConclusion==='success'&&doc.hostingReadbackExact===true&&doc.publicSmoke===true&&
+ doc.anonymousStatus===401&&doc.authenticatedUat==='HOLD'&&doc.differentUidsSecurityProof==='SKIPPED'&&
+ doc.firestoreEmulator==='SKIPPED'&&doc.dataWrites===0&&doc.firestoreRulesDeployed===false&&
+ doc.liveDeployment===false&&doc.reimport===false&&doc.securityP0Closed===false&&doc.humanAccepted===false&&
+ doc.findingsPreserved===295&&
+ C.currentB4?.latestExactScopedTechnicalPreview20261021?.receiptBlobSha===FPRE.receiptBlobSha&&
+ C.currentB4?.executionLockBlobSha===git('hash-object',ACTIVE_I65_FORENSIC_B4)&&
+ C.i65ForensicRemediationPlan?.b4?.executionLockBlobSha===git('hash-object',ACTIVE_I65_FORENSIC_B4)&&
+ C.b4003PolizasContextCacheFix20261020?.executionLockBlobSha===git('hash-object',ACTIVE_I65_FORENSIC_B4)&&
+ C.b4003CanonicalPortfolioAmountFix20261021?.executionLockBlobSha===git('hash-object',ACTIVE_I65_FORENSIC_B4)&&
+ C.b4003SecurityReleaseHold?.status==='ACTIVE_FAIL_CLOSED_UNAUTHORIZED_BROWSER_FIRESTORE_READ_WRITE'&&
+ B4.boundaries?.dataMutationAuthorized===false&&B4.boundaries?.livePromotionAuthorized===false&&
+ FIND.findings.length===295,'B4_003_CARTERA_EXACT_PREVIEW_PROOF_INVALID');
+ console.log('B4_003_CARTERA_EXACT_PREVIEW=TECH_PASS_AUTH_UAT_HOLD');
+}
 const MISSING_MONEY=C.b4003CanonicalPortfolioAmountFix20261021||{};
 const MISSING_MONEY_ACTIVE=MISSING_MONEY.status==='SOURCE_ONLY_QA_PENDING_GUARD';
 if(MISSING_MONEY_ACTIVE){
