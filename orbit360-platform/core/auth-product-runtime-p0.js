@@ -5,7 +5,19 @@
   var provider=function(){return window.Orbit.productRuntimeBrowserProvidersP0;},rawUser=null,restorePromise=null;
   function validRequestedRoute(){var h=String(location&&location.hash||'').trim();return /^#\/[a-z0-9_-]+(?:\?.*)?$/i.test(h)?h:'';}
   function tenantId(){var c=window.__ORBIT360_PRODUCT_PUBLIC_CONFIG__||{};try{return String(c.tenantHint||(window.OrbitBackend&&(OrbitBackend.tenantId||OrbitBackend.tenant))||'').trim();}catch(e){return String(c.tenantHint||'').trim();}}
-  function syncSelfAccess(p){var t=tenantId();if(!t||!p||typeof p.callFunction!=='function')return Promise.resolve(null);return p.callFunction('orbit360ProvisionTeamAccess',{tenantId:t,operation:'sync_self_auth_state'},'us-central1').catch(function(error){try{console.warn('[Orbit Auth] SELF_ACCESS_SYNC_FAILED',error&&error.message||error);}catch(e){}return null;});}
+  function syncSelfAccess(p){
+    var cfg=window.__ORBIT360_PRODUCT_PUBLIC_CONFIG__||{};
+    var host=String(window.location&&window.location.hostname||'');
+    // Protected B4-003 UAT is strictly read-only. This legacy post-auth
+    // helper calls a callable that may write membership/advisor state;
+    // bootstrap reads authoritative membership independently.
+    if(cfg.scopedReadPreviewCandidate===true&&
+       /^ays-orbit-360-lab--gi-i65-b4-[a-z0-9-]+\.web\.app$/i.test(host))
+      return Promise.resolve(null);
+    var t=tenantId();if(!t||!p||typeof p.callFunction!=='function')return Promise.resolve(null);
+    return p.callFunction('orbit360ProvisionTeamAccess',{tenantId:t,operation:'sync_self_auth_state'},'us-central1')
+      .catch(function(error){try{console.warn('[Orbit Auth] SELF_ACCESS_SYNC_FAILED',error&&error.message||error);}catch(e){}return null;});
+  }
 
   function setRestoring(message){
     document.documentElement.setAttribute('data-auth-restoring','1');

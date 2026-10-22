@@ -1,0 +1,74 @@
+{
+  "schema": "GRAVICENTRA_B4_003_POST_AUTH_READONLY_DIAGNOSTIC_RECEIPT_V1",
+  "date": "2026-10-22",
+  "gate": "I6.5/B4-003",
+  "status": "SOURCE_FIXED_SYNTHETIC_QA_PASS_EXACT_PREVIEW_PENDING",
+  "approval": "PAULA_EXPLICIT_SCOPED_B4_003_POST_AUTH_REPAIR_20261022",
+  "parentHead": "9be9de0512e42016ba4d1200880523c89a59fd9e",
+  "previousTechnicalPreview": {
+    "sourceSha": "8a9fe4ca6a3c68a389a8ecfb2c5c6a2ea7bd90f1",
+    "buildId": "gi-i65-b4-8a9fe4ca6a3c-57f234755dc1",
+    "runId": 39634567135,
+    "artifactId": 12360847575,
+    "technicalPass": true,
+    "authenticatedUatAccepted": false,
+    "observedBlocker": "PRODUCT_READONLY_BOOTSTRAP_NOT_READY"
+  },
+  "rootCauseScope": {
+    "demonstrated": [
+      "BOOTSTRAP_RESETS_FAILED_STAGE_TO_BLOCKED_AND_PRODUCT_APP_EMITS_GENERIC_ERROR",
+      "SELF_ACCESS_SYNC_CAN_INVOKE_WRITE_CAPABLE_CALLABLE_IN_READONLY_SCOPED_PREVIEW"
+    ],
+    "notYetDemonstrated": [
+      "EXACT_AUTHENTICATED_BACKEND_FAILED_REQUEST",
+      "FIRESTORE_401_OR_403",
+      "CANONICAL_FINANCIAL_DATA_DEFECT_FROM_THIS_UAT"
+    ]
+  },
+  "sourceFiles": {
+    "orbit360-platform/core/auth-product-runtime-p0.js": {
+      "before": "5ae27034e76592cd34c2d90dc7962dac3fa0b000",
+      "after": "b508b6ffad78602af9bfc294f3ee60b13b82890e"
+    },
+    "orbit360-platform/core/backend-product-readonly-bootstrap-p0.js": {
+      "before": "aa70a29b7e3d5a5ac4bef003fb6db07a0439af0f",
+      "after": "abf5e8d74f87f023b3f239565b44d1a9ac541590"
+    },
+    "orbit360-platform/core/product-app-p0.js": {
+      "before": "2c1f4e6558945480a8ba4b50836ef84acf978bfe",
+      "after": "8cb3bce143be1eb392bced4d878710d8e714d4f9"
+    }
+  },
+  "qa": {
+    "path": "tools/gravicentra-b4-003-post-auth-bootstrap-diagnostic.test.cjs",
+    "blobSha": "101c78654a1afc3a0fd06ad0b4d652232e491c3b",
+    "result": "PASS",
+    "syntheticChecks": 17,
+    "preexistingProtectedHydrationTestPreserved": true,
+    "noNetwork": true,
+    "noFirestoreWrites": true
+  },
+  "planImpact": {
+    "frozenTaskIds": ["C03.05", "C11.04", "C12.05"],
+    "closedTasks": 0,
+    "findingIdsPreserved": 295,
+    "attentionItemsPreserved": 166,
+    "formalI6PercentBefore": 50,
+    "formalI6PercentAfter": 50,
+    "productionReadinessPercentBefore": 20,
+    "productionReadinessPercentAfter": 20
+  },
+  "boundaries": {
+    "branch": "recovery/fase-a-clean-20260831",
+    "scopedPreviewOnlySelfSyncSkip": true,
+    "productionAuthBehaviorUnchanged": true,
+    "serverPermissionsUnchanged": true,
+    "sharedFirestoreRulesDeploymentAuthorized": false,
+    "realOperationalWritesAuthorized": false,
+    "syntheticPreviewWritesAuthorized": false,
+    "livePromotionAuthorized": false,
+    "realUserImpersonationAuthorized": false,
+    "reimportAuthorized": false
+  },
+  "nextProof": "COMPOSITION_GUARD_THEN_EXACT_ISOLATED_PREVIEW_AUTHENTICATED_FAILURE_PHASE_READBACK"
+}

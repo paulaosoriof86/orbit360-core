@@ -89,7 +89,22 @@
         return result;
       });
     }).then(function(result){
-      if(!result||result.ok!==true||result.ready!==true||result.writeAuthorized!==false)throw new Error('PRODUCT_READONLY_BOOTSTRAP_NOT_READY');
+      if(!result||result.ok!==true||result.ready!==true||result.writeAuthorized!==false){
+        var blocked=result&&result.status||{};
+        // Log only state-machine-owned diagnostics; never raw errors, tenant,
+        // identity, collection data, tokens or server response details.
+        var allowedPhases=['preflight','environment','authentication','membership','planning','attaching','waiting-snapshots','installing'];
+        var allowedCodes=['BOOTSTRAP_PREFLIGHT_REJECTED','STORE_READINESS_TIMEOUT','STORE_SNAPSHOT_ERROR',
+          'STORE_ATTACH_ERROR','STORE_BLOCKED','MEMBERSHIP_REJECTED','READINESS_CONTRACT_REJECTED',
+          'PROTECTED_PROVIDER_MISSING','SNAPSHOTS_NOT_ATTACHED','ENVIRONMENT_FAILED',
+          'AUTHENTICATION_FAILED','MEMBERSHIP_FAILED','PLANNING_FAILED','ATTACHING_FAILED',
+          'SNAPSHOT_READ_FAILED','INSTALLING_FAILED','BOOTSTRAP_FAILED'];
+        try{console.warn('[Orbit Product] READONLY_BOOTSTRAP_BLOCKED',{
+          phase:allowedPhases.includes(blocked.failurePhase)?blocked.failurePhase:'unknown',
+          code:allowedCodes.includes(blocked.failureCode)?blocked.failureCode:'UNKNOWN_FAILURE'
+        });}catch(e){}
+        throw new Error('PRODUCT_READONLY_BOOTSTRAP_NOT_READY');
+      }
       var ps=Orbit.store&&typeof Orbit.store._productStatus==='function'?Orbit.store._productStatus():{};
       if(ps.ready!==true||ps.status!=='ready-read-only'||ps.noFallback!==true||ps.writeEnabled!==false)throw new Error('PRODUCT_STORE_NOT_READY');
 

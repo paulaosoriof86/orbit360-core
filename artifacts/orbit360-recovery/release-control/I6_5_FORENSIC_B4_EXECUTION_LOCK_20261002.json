@@ -83,6 +83,7 @@
       "functions/product-ops-leads-domain.js",
       "functions/tenant-domain-config.js",
       "orbit360-platform/core/access-scope.js",
+      "orbit360-platform/core/auth-product-runtime-p0.js",
       "orbit360-platform/core/backend-product-readonly-bootstrap-p0.js",
       "orbit360-platform/core/ciclo.js",
       "orbit360-platform/core/membership-multirol-contract-p0.js",
@@ -130,7 +131,8 @@
       "tools/gravicentra-b4-003-country-finance-parity.test.cjs",
       "tools/gravicentra-b4-003-cobros-aging-variance.test.cjs",
       "tools/gravicentra-b4-003-polizas-context-cache.test.cjs",
-      "tools/gravicentra-b4-003-portfolio-verified-receipt-amount.test.cjs"
+      "tools/gravicentra-b4-003-portfolio-verified-receipt-amount.test.cjs",
+      "tools/gravicentra-b4-003-post-auth-bootstrap-diagnostic.test.cjs"
     ],
     "renewalProductMutationAuthorized": false,
     "policyVisualMutationAuthorized": true,
@@ -622,7 +624,7 @@
   },
   "findingLedgerBlobSha": "8125e97dcf1feb7f46081f95327952e65c2d1077",
   "continuityRegisterBlobSha": "4e6b0ac51736be360c4b95abe8fc01d8f1e78e20",
-  "compositionLockBlobSha": "06161d34a25954d92e11efd98c4226488a0bb704",
+  "compositionLockBlobSha": "9e08066da7f338690e18fac987842c969f418d4f",
   "r18SourceFix": {
     "status": "SOURCE_FIXED_R18_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_SOURCE_FIX_20261005.json",
@@ -3818,5 +3820,42 @@
     "authenticatedUatAccepted": false,
     "securityP0Closed": false,
     "livePromotion": false
+  },
+  "b4003PostAuthReadOnlyDiagnostic20261022": {
+    "status": "SOURCE_FIXED_SYNTHETIC_QA_PASS_EXACT_PREVIEW_PENDING",
+    "approval": "PAULA_EXPLICIT_SCOPED_B4_003_POST_AUTH_REPAIR_20261022",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_POST_AUTH_READONLY_DIAGNOSTIC_20261022.json",
+    "receiptBlobSha": "2f6613914639e52d1d1124599f1f7b8fe4dd3db8",
+    "compositionBlobSha": "9e08066da7f338690e18fac987842c969f418d4f",
+    "sourceFileCount": 3,
+    "qaPath": "tools/gravicentra-b4-003-post-auth-bootstrap-diagnostic.test.cjs",
+    "qaBlobSha": "101c78654a1afc3a0fd06ad0b4d652232e491c3b",
+    "syntheticQaPass": true,
+    "authenticatedUatAccepted": false,
+    "dataWrites": 0,
+    "sharedRulesDeployAuthorized": false,
+    "productionPromotionAuthorized": false,
+    "nextAction": "EXACT_ISOLATED_PREVIEW_POST_AUTH_BLOCKED_PHASE_OBSERVATION"
+  },
+  "b4003PostAuthPreviewAuthorization20261022": {
+    "status": "AUTHORIZED_ISOLATED_READONLY_PREVIEW",
+    "gate": "I6.5/B4-003",
+    "approval": "PAULA_EXPLICIT_SCOPED_B4_003_POST_AUTH_REPAIR_20261022",
+    "triggerSubject": "build(i6.5 B4-003): post-auth read-only diagnostic Preview",
+    "sourceReceiptBlobSha": "2f6613914639e52d1d1124599f1f7b8fe4dd3db8",
+    "compositionBlobSha": "9e08066da7f338690e18fac987842c969f418d4f",
+    "qaPath": "tools/gravicentra-b4-003-post-auth-bootstrap-diagnostic.test.cjs",
+    "qaBlobSha": "101c78654a1afc3a0fd06ad0b4d652232e491c3b",
+    "rosterSourceBlobSha": "75ca53db55e2665123589b0e63253a8e4f8c377c",
+    "onlyReadOnlyFunctions": ["orbit360ScopedPolicyReadPreview", "orbit360AssignableAdvisorRosterPreview"],
+    "onlyIsolatedHosting": true,
+    "sharedRulesDeployAuthorized": false,
+    "otherFunctionsDeployAuthorized": false,
+    "businessWritesAuthorized": false,
+    "syntheticQaWritesAuthorized": false,
+    "realUserImpersonationAuthorized": false,
+    "livePromotionAuthorized": false,
+    "reimportAuthorized": false,
+    "authenticatedUatRequired": true
   }
 }

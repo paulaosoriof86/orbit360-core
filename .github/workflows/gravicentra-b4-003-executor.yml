@@ -29,6 +29,7 @@ on:
       - '.github/workflows/gravicentra-b4-003-executor.yml'
       - 'tools/gravicentra-i6-5-b4-003-preview-proof.mjs'
       - 'tools/gravicentra-b4-003-protected-hydration.test.cjs'
+      - 'tools/gravicentra-b4-003-post-auth-bootstrap-diagnostic.test.cjs'
       - 'tools/gravicentra-b4-003-commercial-readonly-qa.cjs'
       - 'tools/gravicentra-i6-5-b4-003-renewals-priority-preview-proof.mjs'
       - 'tools/gravicentra-i6-5-b4-003-contract.mjs'
@@ -93,6 +94,7 @@ jobs:
 
       - name: B4-003 protected role hydration regression (mock, no writes)
         run: |
+          node tools/gravicentra-b4-003-post-auth-bootstrap-diagnostic.test.cjs
           node tools/gravicentra-b4-003-protected-hydration.test.cjs
           node tools/gravicentra-b4-003-scoped-related-reader.test.cjs
           node tools/gravicentra-b4-003-ops-leads-role-scopes.test.cjs
@@ -585,7 +587,39 @@ jobs:
             && l.boundaries?.syntheticQaWritesAuthorized===false
             && l.boundaries?.livePromotionAuthorized===false;
           if(moneyRequested&&!moneyScoped)throw Error('B4_003_CARTERA_PREVIEW_REQUEST_DENIED');
-          const scopedPreview=priorScopedPreview||onePassInternal||oct15ScopedReadback||restrictedScoped||c03Scoped||uatScoped||currentScoped||causalScoped||insurerScoped||cacheScoped||countryScoped||agingScoped||pctxScoped||moneyScoped;
+          const postAuth=c.b4003PostAuthPreviewAuthorization20261022||{};
+          const postAuthLock=l.b4003PostAuthPreviewAuthorization20261022||{};
+          const postAuthStage=c.b4003PostAuthReadOnlyDiagnostic20261022||{};
+          const postAuthRequested=currentSubject===postAuth.triggerSubject;
+          const postAuthScoped=postAuthRequested
+            && postAuth.status==='AUTHORIZED_ISOLATED_READONLY_PREVIEW'
+            && JSON.stringify(postAuth)===JSON.stringify(postAuthLock)
+            && postAuth.gate==='I6.5/B4-003'
+            && postAuth.approval==='PAULA_EXPLICIT_SCOPED_B4_003_POST_AUTH_REPAIR_20261022'
+            && postAuth.triggerSubject==='build(i6.5 B4-003): post-auth read-only diagnostic Preview'
+            && postAuthStage.status==='SOURCE_FIXED_SYNTHETIC_QA_PASS_EXACT_PREVIEW_PENDING'
+            && postAuth.sourceReceiptBlobSha===postAuthStage.receiptBlobSha
+            && postAuth.compositionBlobSha===productSha('artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json')
+            && postAuthStage.compositionBlobSha===postAuth.compositionBlobSha
+            && postAuthStage.executionLockBlobSha===productSha('artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B4_EXECUTION_LOCK_20261002.json')
+            && postAuth.qaBlobSha===productSha(postAuth.qaPath)
+            && postAuthStage.qaBlobSha===postAuth.qaBlobSha
+            && postAuth.rosterSourceBlobSha===productSha('functions/assignable-advisor-roster.js')
+            && Array.isArray(postAuth.onlyReadOnlyFunctions)
+            && postAuth.onlyReadOnlyFunctions.join(',')==='orbit360ScopedPolicyReadPreview,orbit360AssignableAdvisorRosterPreview'
+            && postAuth.onlyIsolatedHosting===true&&postAuth.sharedRulesDeployAuthorized===false
+            && postAuth.otherFunctionsDeployAuthorized===false&&postAuth.businessWritesAuthorized===false
+            && postAuth.syntheticQaWritesAuthorized===false&&postAuth.realUserImpersonationAuthorized===false
+            && postAuth.livePromotionAuthorized===false&&postAuth.reimportAuthorized===false
+            && postAuth.authenticatedUatRequired===true
+            && c.currentB4?.status==='B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL'
+            && c.b4003SecurityReleaseHold?.status==='ACTIVE_FAIL_CLOSED_UNAUTHORIZED_BROWSER_FIRESTORE_READ_WRITE'
+            && l.activeFinding?.id==='B4-003'
+            && l.boundaries?.previewMutationAuthorized===true&&l.boundaries?.functionDeploymentAuthorized===true
+            && l.boundaries?.businessWritesAuthorized===false&&l.boundaries?.syntheticQaWritesAuthorized===false
+            && l.boundaries?.dataMutationAuthorized===false&&l.boundaries?.livePromotionAuthorized===false;
+          if(postAuthRequested&&!postAuthScoped)throw Error('B4_003_POST_AUTH_PREVIEW_REQUEST_DENIED');
+          const scopedPreview=priorScopedPreview||onePassInternal||oct15ScopedReadback||restrictedScoped||c03Scoped||uatScoped||currentScoped||causalScoped||insurerScoped||cacheScoped||countryScoped||agingScoped||pctxScoped||moneyScoped||postAuthScoped;
           const previewOk=(r19Preview||r20Preview||r23Preview)
             && l.activeFinding?.id==='B4-003'
             && l.boundaries?.businessWritesAuthorized===false
@@ -813,7 +847,7 @@ jobs:
             uat.sourceBlobs['functions/assignable-advisor-roster.js']===rosterBlob
             && uat.onlyTwoReadOnlyFunctions===true;
           const readonlyRoster=scopedPreview&&rosterAuth.status==='AUTHORIZED_EXACT_PREVIEW_READONLY_ROSTER_ONLY'
-            && (rosterAuth.sourceBlobSha===rosterBlob||c03RosterReady||uatRosterReady||(currentScoped&&currentPreviewIntent.rosterSourceBlobSha===rosterBlob)||(causalScoped&&ca.rosterSourceBlobSha===rosterBlob)||(insurerScoped&&insurerAuth.rosterSourceBlobSha===rosterBlob)||(cacheScoped&&cacheAuth.rosterSourceBlobSha===rosterBlob)||(countryScoped&&countryAuth.rosterSourceBlobSha===rosterBlob)||(agingScoped&&agingAuth.rosterSourceBlobSha===rosterBlob)||(pctxScoped&&pctxAuth.rosterSourceBlobSha===rosterBlob)||(moneyScoped&&moneyAuth.rosterSourceBlobSha===rosterBlob))
+            && (rosterAuth.sourceBlobSha===rosterBlob||c03RosterReady||uatRosterReady||(currentScoped&&currentPreviewIntent.rosterSourceBlobSha===rosterBlob)||(causalScoped&&ca.rosterSourceBlobSha===rosterBlob)||(insurerScoped&&insurerAuth.rosterSourceBlobSha===rosterBlob)||(cacheScoped&&cacheAuth.rosterSourceBlobSha===rosterBlob)||(countryScoped&&countryAuth.rosterSourceBlobSha===rosterBlob)||(agingScoped&&agingAuth.rosterSourceBlobSha===rosterBlob)||(pctxScoped&&pctxAuth.rosterSourceBlobSha===rosterBlob)||(moneyScoped&&moneyAuth.rosterSourceBlobSha===rosterBlob)||(postAuthScoped&&postAuth.rosterSourceBlobSha===rosterBlob))
             && rosterAuth.service==='orbit360AssignableAdvisorRosterPreview'
             && rosterAuth.businessWritesAuthorized===false
             && rosterAuth.otherFunctionsDeployAuthorized===false
@@ -822,7 +856,7 @@ jobs:
             && c.b4003SecurityReleaseHold?.status==='ACTIVE_FAIL_CLOSED_UNAUTHORIZED_BROWSER_FIRESTORE_READ_WRITE'
             && l.boundaries?.previewMutationAuthorized===true
             && l.boundaries?.realOperationalWritesAuthorized===false;
-          if((currentSubject===requestedOct15Subject||c03Scoped||uatScoped||currentScoped||causalScoped||insurerScoped||cacheScoped||countryScoped||agingScoped||pctxScoped||moneyScoped)&&scopedPreview&&!readonlyRoster)
+          if((currentSubject===requestedOct15Subject||c03Scoped||uatScoped||currentScoped||causalScoped||insurerScoped||cacheScoped||countryScoped||agingScoped||pctxScoped||moneyScoped||postAuthScoped)&&scopedPreview&&!readonlyRoster)
             throw Error('B4_003_DASHBOARD_READONLY_PREVIEW_SYNC_NOT_AUTHORIZED');
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'readonly_roster='+(readonlyRoster?'true':'false')+'\n');
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'scoped_preview='+(scopedPreview?'true':'false')+'\n');

@@ -99,6 +99,8 @@
       countries: [],
       collections: [],
       errors: [],
+      failurePhase: '',
+      failureCode: '',
       lastTransitionAt: new Date().toISOString()
     };
   }
@@ -128,9 +130,37 @@
       assignedRoleCount: Array.isArray(state.assignedRoles) ? state.assignedRoles.length : 0,
       countryCount: Array.isArray(state.countries) ? state.countries.length : 0,
       collectionCount: Array.isArray(state.collections) ? state.collections.length : 0,
-      errors: unique(state.errors),
+      // These values come from our own finite state machine, never from an
+      // untrusted server error, membership document or user identity.
+      failurePhase: text(state.failurePhase),
+      failureCode: text(state.failureCode),
+      // The bootstrap event is also observed by the browser QA harness.
+      // Backend exception text must never be projected into that event.
+      errors: state.phase === 'blocked' ? [text(state.failureCode) || 'BOOTSTRAP_FAILED'] : unique(state.errors),
       lastTransitionAt: state.lastTransitionAt
     };
+  }
+
+  function safeFailureCode(error, phase) {
+    var message = text(error && (error.message || error));
+    if (message === 'product_store_readiness_timeout') return 'STORE_READINESS_TIMEOUT';
+    if (message === 'product_store_blocked:snapshot-error') return 'STORE_SNAPSHOT_ERROR';
+    if (message === 'product_store_blocked:attach-error') return 'STORE_ATTACH_ERROR';
+    if (message.indexOf('product_store_blocked:') === 0) return 'STORE_BLOCKED';
+    if (message.indexOf('membership_invalid:') === 0 || message === 'tenant_membership_invalido')
+      return 'MEMBERSHIP_REJECTED';
+    if (message.indexOf('product_readiness_blocked:') === 0) return 'READINESS_CONTRACT_REJECTED';
+    if (message === 'PROTECTED_READ_PROVIDER_MISSING') return 'PROTECTED_PROVIDER_MISSING';
+    if (message === 'snapshots_no_adjuntos') return 'SNAPSHOTS_NOT_ATTACHED';
+    // A finite allowlist prevents leaking Firebase messages, emails, UIDs,
+    // document paths, auth tokens or other personal information to console.
+    var stages = {
+      environment: 'ENVIRONMENT_FAILED', authentication: 'AUTHENTICATION_FAILED',
+      membership: 'MEMBERSHIP_FAILED', planning: 'PLANNING_FAILED',
+      attaching: 'ATTACHING_FAILED', 'waiting-snapshots': 'SNAPSHOT_READ_FAILED',
+      installing: 'INSTALLING_FAILED'
+    };
+    return stages[phase] || 'BOOTSTRAP_FAILED';
   }
 
   function dependencyErrors(deps) {
@@ -280,6 +310,8 @@
     state.collections = plan.collections.slice();
     if (!plan.ok || options.runtimeAuthorized !== true) {
       state.errors = unique(plan.errors.concat(options.runtimeAuthorized === true ? [] : ['runtime_productivo_no_autorizado']));
+      state.failurePhase = 'preflight';
+      state.failureCode = 'BOOTSTRAP_PREFLIGHT_REJECTED';
       transition(state, 'blocked', { ready: false });
       return { ok: false, ready: false, plan: plan, status: sanitizeState(state), storeInstalled: false, snapshotsAttached: false, writeAuthorized: false };
     }
@@ -370,6 +402,8 @@
       if (store && typeof store._detachSnapshots === 'function') {
         try { store._detachSnapshots(); } catch (detachError) {}
       }
+      state.failurePhase = state.phase;
+      state.failureCode = safeFailureCode(error, state.phase);
       state.errors = unique(state.errors.concat([String(error && (error.message || error) || error)]));
       transition(state, 'blocked', { ready: false });
       return { ok: false, ready: false, plan: plan, status: sanitizeState(state), storeInstalled: false, snapshotsAttached: false, writeAuthorized: false };
