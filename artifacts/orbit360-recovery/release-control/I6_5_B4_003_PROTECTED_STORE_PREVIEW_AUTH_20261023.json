@@ -1,0 +1,32 @@
+{
+  "schema": "GI_I65_B4003_PROTECTED_STORE_READONLY_PREVIEW_AUTH_V1",
+  "gate": "I6.5/B4-003",
+  "status": "AUTHORIZED_EXACT_ISOLATED_READONLY_PREVIEW",
+  "authority": "PAULA_CONTINUE_WITHIN_CURRENT_I65_B4003_20261023",
+  "sourceCommit": "8b8d32380c023789f4cf4123503065f2cda27e5c",
+  "triggerSubject": "build(i6.5 B4-003): exact protected store transport Preview",
+  "sourceReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PROTECTED_STORE_TRANSPORT_SUCCESSOR_20261023.json",
+  "sourceReceiptBlobSha": "29ac9f885338425fcf922f7d6b94c1c4f12007ef",
+  "sourcePath": "orbit360-platform/core/backend-product-readonly-bootstrap-p0.js",
+  "sourceBlobSha": "235c19fc9e55bd2e9338157b51ac157fca5ac002",
+  "qaPath": "tools/gravicentra-b4-003-protected-hydration.test.cjs",
+  "qaBlobSha": "0da324fbe65d88a3820ee30bb40fbac425f4f320",
+  "compositionBlobSha": "c9a52496d15fecbba152b509261d8238c142dc1b",
+  "rosterSourceBlobSha": "75ca53db55e2665123589b0e63253a8e4f8c377c",
+  "onlyReadOnlyFunctions": [
+    "orbit360ScopedPolicyReadPreview",
+    "orbit360AssignableAdvisorRosterPreview"
+  ],
+  "onlyIsolatedHosting": true,
+  "sharedFirestoreRulesDeployAuthorized": false,
+  "otherFunctionsDeployAuthorized": false,
+  "operationalWriterDeployAuthorized": false,
+  "businessWritesAuthorized": false,
+  "syntheticQaWritesAuthorized": false,
+  "realUserImpersonationAuthorized": false,
+  "livePromotionAuthorized": false,
+  "dataRefreshAuthorized": false,
+  "reimportAuthorized": false,
+  "authenticatedRoleCountryUatRequired": true,
+  "previewEvidenceNotProductionAcceptance": true
+}

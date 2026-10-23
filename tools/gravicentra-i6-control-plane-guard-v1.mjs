@@ -278,6 +278,54 @@ if(PROTECTED_STORE_TRANSPORT_ACTIVE){
   'B4_003_PROTECTED_STORE_TRANSPORT_SUCCESSOR_INVALID');
  console.log('B4_003_PROTECTED_STORE_TRANSPORT=CALLABLE_ONLY_SYNTHETIC_QA_PASS_RELEASE_HOLD');
 }
+// This authorization exists solely to certify the exact source successor on
+// isolated read-only Preview. It must never weaken the shared Rules/LIVE hold.
+const PROTECTED_STORE_PREVIEW=C.b4003ProtectedStorePreviewAuthorization20261023||{};
+if(PROTECTED_STORE_PREVIEW.status==='AUTHORIZED_EXACT_ISOLATED_READONLY_PREVIEW'){
+ const P=PROTECTED_STORE_PREVIEW;
+ const R=readJson(P.receiptPath);
+ const B=B4.b4003ProtectedStorePreviewAuthorization20261023||{};
+ const T=C.b4003ProtectedStoreTransportSuccessor20261023||{};
+ const ancestor=realGit('merge-base',P.sourceCommit,'HEAD');
+ need(P.gate==='I6.5/B4-003'&&
+  P.authority==='PAULA_CONTINUE_WITHIN_CURRENT_I65_B4003_20261023'&&
+  P.triggerSubject==='build(i6.5 B4-003): exact protected store transport Preview'&&
+  sameJson(P,B)&&P.sourceCommit===R.sourceCommit&&ancestor===P.sourceCommit&&
+  R.schema==='GI_I65_B4003_PROTECTED_STORE_READONLY_PREVIEW_AUTH_V1'&&
+  R.gate===P.gate&&R.status===P.status&&R.authority===P.authority&&R.triggerSubject===P.triggerSubject&&
+  P.receiptBlobSha===realGit('hash-object',P.receiptPath)&&
+  R.sourceReceiptPath===T.receiptPath&&P.sourceReceiptBlobSha===T.receiptBlobSha&&
+  P.sourceReceiptBlobSha===realGit('hash-object',T.receiptPath)&&
+  R.sourceReceiptBlobSha===P.sourceReceiptBlobSha&&
+  R.sourcePath==='orbit360-platform/core/backend-product-readonly-bootstrap-p0.js'&&
+  R.qaPath==='tools/gravicentra-b4-003-protected-hydration.test.cjs'&&
+  P.sourceBlobSha===T.sourceBlobSha&&P.sourceBlobSha===R.sourceBlobSha&&
+  P.sourceBlobSha===realGit('hash-object',R.sourcePath)&&
+  realGit('rev-parse',P.sourceCommit+':'+R.sourcePath)===P.sourceBlobSha&&
+  P.qaBlobSha===T.qaBlobSha&&P.qaBlobSha===R.qaBlobSha&&
+  P.qaBlobSha===realGit('hash-object',R.qaPath)&&
+  P.compositionBlobSha===R.compositionBlobSha&&
+  P.compositionBlobSha===realGit('hash-object',I6_CANONICAL_COMPOSITION)&&
+  P.rosterSourceBlobSha===R.rosterSourceBlobSha&&
+  P.rosterSourceBlobSha===realGit('hash-object','functions/assignable-advisor-roster.js')&&
+  sameJson(P.onlyReadOnlyFunctions,['orbit360ScopedPolicyReadPreview','orbit360AssignableAdvisorRosterPreview'])&&
+  sameJson(R.onlyReadOnlyFunctions,P.onlyReadOnlyFunctions)&&
+  ['onlyIsolatedHosting','authenticatedRoleCountryUatRequired','previewEvidenceNotProductionAcceptance']
+   .every(k=>P[k]===true&&R[k]===true)&&
+  ['sharedFirestoreRulesDeployAuthorized','otherFunctionsDeployAuthorized',
+   'operationalWriterDeployAuthorized','businessWritesAuthorized','syntheticQaWritesAuthorized',
+   'realUserImpersonationAuthorized','livePromotionAuthorized','dataRefreshAuthorized','reimportAuthorized']
+   .every(k=>P[k]===false&&R[k]===false)&&
+  C.currentB4?.status==='B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL'&&
+  C.b4003SecurityReleaseHold?.status==='ACTIVE_FAIL_CLOSED_UNAUTHORIZED_BROWSER_FIRESTORE_READ_WRITE'&&
+  C.b4003SecurityReleaseHold?.firestoreRulesDeployAuthorized===false&&
+  C.b4003SecurityReleaseHold?.livePromotionAuthorized===false&&
+  B4.boundaries?.previewMutationAuthorized===true&&B4.boundaries?.functionDeploymentAuthorized===true&&
+  B4.boundaries?.realOperationalWritesAuthorized===false&&B4.boundaries?.dataMutationAuthorized===false&&
+  B4.boundaries?.livePromotionAuthorized===false,
+  'B4_003_PROTECTED_STORE_PREVIEW_AUTH_INVALID');
+ console.log('B4_003_PROTECTED_STORE_PREVIEW_AUTH=EXACT_READONLY_HOSTING_ONLY_LIVE_HOLD');
+}
 // B4-003: A successor never rewrites the certified blobs of an older Preview.
 // Its source is checked against the parent commit, the canonical composition,
 // and the exact QA artifacts; historical receipts remain independently sealed.
