@@ -23,7 +23,12 @@ const q={
  recaudoMesPorMoneda:(_m,advisor)=>({GTQ:advisor?90:900}),
  carteraGlobalPorMoneda:()=>({byCurrency:{},currencies:[]}),
  carteraVencidaRows:()=>[],cobrosConfirmadosRows:()=>[],
- carteraPendienteRows:()=>[],renovacionesProximas:()=>[]
+ carteraPendienteRows:()=>[],renovacionesProximas:()=>[],
+ // Inicio now shares the strict portfolio provenance contract from core/queries.
+ // Keep the isolated financial mock aligned with the same public API.
+ portfolioAmountContext:()=>({}),
+ portfolioValuedRowsCount:rows=>(rows||[]).filter(r=>
+   ui.finiteNumber(r&&r.monto)!=null||ui.finiteNumber(r&&r.saldo)!=null).length
 };
 const roster={
  // This test targets the rendered own-vs-institutional split. Dashboard

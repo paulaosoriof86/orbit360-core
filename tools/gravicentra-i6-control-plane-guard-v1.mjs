@@ -145,6 +145,21 @@ if(UAT_FIX_PREVIEW.status==='AUTHORIZED_EXACT_SCOPED_READONLY_PREVIEW'){
    'B4_003_UAT_CAUSAL_EXACT_PREVIEW_AUTH_INVALID');
  console.log('B4_003_UAT_CAUSAL_EXACT_PREVIEW_AUTH=PASS_READONLY_LIVE_HOLD');
 }
+const MOCK_ALIGNMENT=C.b4003InicioSyntheticHarnessAlignment20261022||{};
+if(MOCK_ALIGNMENT.status==='SOURCE_QA_FIX_LOCAL_PASS_CI_RERUN_PENDING'){
+ need(MOCK_ALIGNMENT.gate==='I6.5/B4-003'&&
+   MOCK_ALIGNMENT.failedGuardRunId===39881999468&&
+   MOCK_ALIGNMENT.qaPath==='tools/gravicentra-b4-003-inicio-personal-recaudo.test.cjs'&&
+   MOCK_ALIGNMENT.qaBlobSha===git('hash-object',MOCK_ALIGNMENT.qaPath)&&
+   B4.boundaries?.allowedQaFiles?.includes(MOCK_ALIGNMENT.qaPath)&&
+   MOCK_ALIGNMENT.productSourceChanged===false&&MOCK_ALIGNMENT.unitTestLocalPass===true&&
+   MOCK_ALIGNMENT.securityHoldPreserved===true&&MOCK_ALIGNMENT.operationalWrites===0&&
+   MOCK_ALIGNMENT.livePromotion===false&&
+   C.b4003SecurityReleaseHold?.status==='ACTIVE_FAIL_CLOSED_UNAUTHORIZED_BROWSER_FIRESTORE_READ_WRITE',
+   'B4_003_INICIO_MOCK_ALIGNMENT_SOURCE_DRIFT');
+ execFileSync(process.execPath,[MOCK_ALIGNMENT.qaPath],{stdio:'inherit'});
+ console.log('B4_003_INICIO_MOCK_ALIGNMENT=PASS_CI_RERUN_REQUIRED');
+}
 // B4-003 2026-10-22: an exact, scoped SOURCE successor to the technical
 // Preview; the historical run 39634567135 must retain its original hashes.
 const POST_AUTH=C.b4003PostAuthReadOnlyDiagnostic20261022||{};

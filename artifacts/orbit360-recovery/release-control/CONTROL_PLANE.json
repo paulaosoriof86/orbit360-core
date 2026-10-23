@@ -4887,7 +4887,7 @@
       "entryGuardReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_ENTRY_GUARD_PASS_20261002.json",
       "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
       "executionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B4_EXECUTION_LOCK_20261002.json",
-      "executionLockBlobSha": "6e1ba05fff0b0b313cd4282d3c4186a7365d19e8",
+      "executionLockBlobSha": "64b206fc6d515dc6112edaf335bbbd21e0ae6b34",
       "compositionLockBlobSha": "016f251811f22bc4fc04b2a5f674dfe09243e605",
       "findingLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
       "activeFindingId": "B4-003",
@@ -6330,7 +6330,7 @@
     "status": "B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL",
     "activeFindingId": "B4-003",
     "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
-    "executionLockBlobSha": "6e1ba05fff0b0b313cd4282d3c4186a7365d19e8",
+    "executionLockBlobSha": "64b206fc6d515dc6112edaf335bbbd21e0ae6b34",
     "compositionLockBlobSha": "6fc965e06927b5775d462a136a2f4bd7e96c1e06",
     "findingLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
     "noLive": true,
@@ -14093,7 +14093,7 @@
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_AUTHENTICATED_UAT_CAUSAL_FIX_20261022.json",
     "receiptBlobSha": "62379623b3f1246daf5d671eef6f11697cf5e87c",
     "compositionBlobSha": "6fc965e06927b5775d462a136a2f4bd7e96c1e06",
-    "executionLockBlobSha": "6e1ba05fff0b0b313cd4282d3c4186a7365d19e8",
+    "executionLockBlobSha": "64b206fc6d515dc6112edaf335bbbd21e0ae6b34",
     "qaFiles": {
       "tools/gravicentra-b4-003-portfolio-verified-receipt-amount.test.cjs": "f5b25d9bae8771c0497db805ba471432fcd07a6d",
       "tools/gravicentra-b4-003-config-users-owner.test.cjs": "bfb2d6b13704e05a184ae97f21c1d10503410acc"
@@ -14104,6 +14104,20 @@
     "securityP0Closed": false,
     "formalI6Percent": 50,
     "productionReadinessPercent": 20
+  },
+  "b4003InicioSyntheticHarnessAlignment20261022": {
+    "status": "SOURCE_QA_FIX_LOCAL_PASS_CI_RERUN_PENDING",
+    "gate": "I6.5/B4-003",
+    "failedGuardRunId": 39881999468,
+    "failure": "inicio mock q.portfolioAmountContext absent",
+    "qaPath": "tools/gravicentra-b4-003-inicio-personal-recaudo.test.cjs",
+    "qaBlobSha": "a68498f92f517e3cd8d3f64386a92cb3717a1175",
+    "cause": "isolated test double omitted existing canonical queries contract",
+    "productSourceChanged": false,
+    "unitTestLocalPass": true,
+    "securityHoldPreserved": true,
+    "operationalWrites": 0,
+    "livePromotion": false
   },
   "b4003AuthenticatedUatPreviewAuthorization20261022": {
     "status": "AUTHORIZED_EXACT_SCOPED_READONLY_PREVIEW",

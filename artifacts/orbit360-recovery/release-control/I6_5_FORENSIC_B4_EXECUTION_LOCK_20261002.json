@@ -134,7 +134,8 @@
       "tools/gravicentra-b4-003-polizas-context-cache.test.cjs",
       "tools/gravicentra-b4-003-portfolio-verified-receipt-amount.test.cjs",
       "tools/gravicentra-b4-003-post-auth-bootstrap-diagnostic.test.cjs",
-      "tools/gravicentra-b4-003-config-users-owner.test.cjs"
+      "tools/gravicentra-b4-003-config-users-owner.test.cjs",
+      "tools/gravicentra-b4-003-inicio-personal-recaudo.test.cjs"
     ],
     "renewalProductMutationAuthorized": false,
     "policyVisualMutationAuthorized": true,
