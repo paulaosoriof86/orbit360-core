@@ -99,6 +99,8 @@ jobs:
           node tools/gravicentra-b4-003-scoped-related-reader.test.cjs
           node tools/gravicentra-b4-003-ops-leads-role-scopes.test.cjs
           node tools/gravicentra-b4-003-role-first-paint-and-team-regression.test.cjs
+          node tools/gravicentra-b4-003-config-users-owner.test.cjs
+          node tools/gravicentra-b4-003-portfolio-verified-receipt-amount.test.cjs
 
       - name: Gate exact B4-003 Preview
         id: gate
@@ -619,7 +621,39 @@ jobs:
             && l.boundaries?.businessWritesAuthorized===false&&l.boundaries?.syntheticQaWritesAuthorized===false
             && l.boundaries?.dataMutationAuthorized===false&&l.boundaries?.livePromotionAuthorized===false;
           if(postAuthRequested&&!postAuthScoped)throw Error('B4_003_POST_AUTH_PREVIEW_REQUEST_DENIED');
-          const scopedPreview=priorScopedPreview||onePassInternal||oct15ScopedReadback||restrictedScoped||c03Scoped||uatScoped||currentScoped||causalScoped||insurerScoped||cacheScoped||countryScoped||agingScoped||pctxScoped||moneyScoped||postAuthScoped;
+          const uatFix=c.b4003AuthenticatedUatCausalFix20261022||{};
+          const uatFixAuth=c.b4003AuthenticatedUatPreviewAuthorization20261022||{};
+          const uatFixRequested=currentSubject===uatFixAuth.triggerSubject;
+          const fixedSourceAt=p=>require('node:child_process').execFileSync('git',['rev-parse',uatFixAuth.sourceCommit+':'+p],{encoding:'utf8'}).trim();
+          const uatFixScoped=uatFixRequested
+            && uatFixAuth.status==='AUTHORIZED_EXACT_SCOPED_READONLY_PREVIEW'
+            && JSON.stringify(uatFixAuth)===JSON.stringify(l.b4003AuthenticatedUatPreviewAuthorization20261022||{})
+            && uatFixAuth.gate==='I6.5/B4-003'
+            && uatFixAuth.approval==='PAULA_CONTINUE_CAUSAL_CORRECTIONS_WITHIN_B4_003_20261022'
+            && uatFixAuth.triggerSubject==='build(i6.5 B4-003): exact authenticated UAT causal fixes Preview'
+            && uatFixAuth.sourceCommit===uatFix.sourceCommit
+            && uatFixAuth.sourceReceiptBlobSha===uatFix.receiptBlobSha
+            && uatFixAuth.compositionBlobSha===productSha(process.env.COMPOSITION)
+            && uatFixAuth.configQaBlobSha===productSha('tools/gravicentra-b4-003-config-users-owner.test.cjs')
+            && uatFixAuth.financeQaBlobSha===productSha('tools/gravicentra-b4-003-portfolio-verified-receipt-amount.test.cjs')
+            && ['orbit360-platform/core/queries.js','orbit360-platform/modules/inicio.js','orbit360-platform/modules/configuracion.js']
+                 .every(p=>fixedSourceAt(p)===productSha(p))
+            && uatFixAuth.rosterSourceBlobSha===productSha('functions/assignable-advisor-roster.js')
+            && Array.isArray(uatFixAuth.onlyReadOnlyFunctions)
+            && uatFixAuth.onlyReadOnlyFunctions.join(',')==='orbit360ScopedPolicyReadPreview,orbit360AssignableAdvisorRosterPreview'
+            && uatFixAuth.onlyIsolatedHosting===true&&uatFixAuth.sharedRulesDeployAuthorized===false
+            && uatFixAuth.otherFunctionsDeployAuthorized===false&&uatFixAuth.businessWritesAuthorized===false
+            && uatFixAuth.syntheticQaWritesAuthorized===false&&uatFixAuth.realUserImpersonationAuthorized===false
+            && uatFixAuth.livePromotionAuthorized===false&&uatFixAuth.reimportAuthorized===false
+            && uatFixAuth.authenticatedUatRequired===true
+            && c.currentB4?.status==='B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL'
+            && c.b4003SecurityReleaseHold?.status==='ACTIVE_FAIL_CLOSED_UNAUTHORIZED_BROWSER_FIRESTORE_READ_WRITE'
+            && l.activeFinding?.id==='B4-003'
+            && l.boundaries?.previewMutationAuthorized===true&&l.boundaries?.functionDeploymentAuthorized===true
+            && l.boundaries?.businessWritesAuthorized===false&&l.boundaries?.syntheticQaWritesAuthorized===false
+            && l.boundaries?.dataMutationAuthorized===false&&l.boundaries?.livePromotionAuthorized===false;
+          if(uatFixRequested&&!uatFixScoped)throw Error('B4_003_AUTHENTICATED_UAT_FIX_PREVIEW_REQUEST_DENIED');
+          const scopedPreview=priorScopedPreview||onePassInternal||oct15ScopedReadback||restrictedScoped||c03Scoped||uatScoped||currentScoped||causalScoped||insurerScoped||cacheScoped||countryScoped||agingScoped||pctxScoped||moneyScoped||postAuthScoped||uatFixScoped;
           const previewOk=(r19Preview||r20Preview||r23Preview)
             && l.activeFinding?.id==='B4-003'
             && l.boundaries?.businessWritesAuthorized===false
@@ -847,7 +881,7 @@ jobs:
             uat.sourceBlobs['functions/assignable-advisor-roster.js']===rosterBlob
             && uat.onlyTwoReadOnlyFunctions===true;
           const readonlyRoster=scopedPreview&&rosterAuth.status==='AUTHORIZED_EXACT_PREVIEW_READONLY_ROSTER_ONLY'
-            && (rosterAuth.sourceBlobSha===rosterBlob||c03RosterReady||uatRosterReady||(currentScoped&&currentPreviewIntent.rosterSourceBlobSha===rosterBlob)||(causalScoped&&ca.rosterSourceBlobSha===rosterBlob)||(insurerScoped&&insurerAuth.rosterSourceBlobSha===rosterBlob)||(cacheScoped&&cacheAuth.rosterSourceBlobSha===rosterBlob)||(countryScoped&&countryAuth.rosterSourceBlobSha===rosterBlob)||(agingScoped&&agingAuth.rosterSourceBlobSha===rosterBlob)||(pctxScoped&&pctxAuth.rosterSourceBlobSha===rosterBlob)||(moneyScoped&&moneyAuth.rosterSourceBlobSha===rosterBlob)||(postAuthScoped&&postAuth.rosterSourceBlobSha===rosterBlob))
+            && (rosterAuth.sourceBlobSha===rosterBlob||c03RosterReady||uatRosterReady||(currentScoped&&currentPreviewIntent.rosterSourceBlobSha===rosterBlob)||(causalScoped&&ca.rosterSourceBlobSha===rosterBlob)||(insurerScoped&&insurerAuth.rosterSourceBlobSha===rosterBlob)||(cacheScoped&&cacheAuth.rosterSourceBlobSha===rosterBlob)||(countryScoped&&countryAuth.rosterSourceBlobSha===rosterBlob)||(agingScoped&&agingAuth.rosterSourceBlobSha===rosterBlob)||(pctxScoped&&pctxAuth.rosterSourceBlobSha===rosterBlob)||(moneyScoped&&moneyAuth.rosterSourceBlobSha===rosterBlob)||(postAuthScoped&&postAuth.rosterSourceBlobSha===rosterBlob)||(uatFixScoped&&uatFixAuth.rosterSourceBlobSha===rosterBlob))
             && rosterAuth.service==='orbit360AssignableAdvisorRosterPreview'
             && rosterAuth.businessWritesAuthorized===false
             && rosterAuth.otherFunctionsDeployAuthorized===false
@@ -856,7 +890,7 @@ jobs:
             && c.b4003SecurityReleaseHold?.status==='ACTIVE_FAIL_CLOSED_UNAUTHORIZED_BROWSER_FIRESTORE_READ_WRITE'
             && l.boundaries?.previewMutationAuthorized===true
             && l.boundaries?.realOperationalWritesAuthorized===false;
-          if((currentSubject===requestedOct15Subject||c03Scoped||uatScoped||currentScoped||causalScoped||insurerScoped||cacheScoped||countryScoped||agingScoped||pctxScoped||moneyScoped||postAuthScoped)&&scopedPreview&&!readonlyRoster)
+          if((currentSubject===requestedOct15Subject||c03Scoped||uatScoped||currentScoped||causalScoped||insurerScoped||cacheScoped||countryScoped||agingScoped||pctxScoped||moneyScoped||postAuthScoped||uatFixScoped)&&scopedPreview&&!readonlyRoster)
             throw Error('B4_003_DASHBOARD_READONLY_PREVIEW_SYNC_NOT_AUTHORIZED');
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'readonly_roster='+(readonlyRoster?'true':'false')+'\n');
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'scoped_preview='+(scopedPreview?'true':'false')+'\n');

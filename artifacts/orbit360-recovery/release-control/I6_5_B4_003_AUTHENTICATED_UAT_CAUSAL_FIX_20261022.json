@@ -1,0 +1,38 @@
+{
+  "schema": "GRAVICENTRA_B4_003_AUTHENTICATED_UAT_CAUSAL_SOURCE_FIX_V1",
+  "gate": "I6.5/B4-003",
+  "status": "SOURCE_FIXED_LOCAL_QA_PASS_PREVIEW_PENDING",
+  "approval": "PAULA_CONTINUE_CAUSAL_CORRECTIONS_WITHIN_B4_003_20261022",
+  "parentHead": "d9e2cd656b4e9e2895605df5a1116c6e95055226",
+  "sourceCommit": "8c7e3c00874e43211b880014baa19ea45e455717",
+  "previousCompositionBlobSha": "9e08066da7f338690e18fac987842c969f418d4f",
+  "previousExecutionLockBlobSha": "13907e432e6de488bb1ecc10149e69935c4ca982",
+  "sourceFiles": {
+    "orbit360-platform/core/queries.js": { "before": "ee10618b0d2d04e1d7578e7abc44fc99686b60ed", "after": "ac5c4e9744fcd5f6a7753f4bd5c3d112eed9a5fc" },
+    "orbit360-platform/modules/inicio.js": { "before": "15fcfea5195f6c1ec7c61ee937761b1d2300e3b0", "after": "168a1d2648fbd98c550530144eea0876cb464192" },
+    "orbit360-platform/modules/configuracion.js": { "before": "bc30918ac226d0f510fa180141a30af8ff8a7933", "after": "868d4eaa4c0072b892dae2441e45242d1f8e722e" }
+  },
+  "qaFiles": {
+    "tools/gravicentra-b4-003-portfolio-verified-receipt-amount.test.cjs": "f5b25d9bae8771c0497db805ba471432fcd07a6d",
+    "tools/gravicentra-b4-003-config-users-owner.test.cjs": "bfb2d6b13704e05a184ae97f21c1d10503410acc"
+  },
+  "qa": { "testedLocally": true, "focusedTestsPassed": 4, "focusedTestsFailed": 0, "readOnly": true },
+  "authenticatedUat": {
+    "baselinePreviewRun": 39871274070,
+    "loginAndRestoreReachedShell": true,
+    "globalCobrosDisplayedRows": 2345,
+    "configUsersTabCrashBeforeFix": "TypeError:Object.keys(undefined) at configuracion.js:118",
+    "newSourceFixPreviewVerified": false,
+    "fullModuleCertification": false
+  },
+  "historicalProof": { "priorCarteraPreviewRun": 39634567135, "untouched": true, "noRetroactivePass": true },
+  "boundaries": {
+    "operationalBusinessWrites": 0,
+    "firestoreRulesDeployAuthorized": false,
+    "livePromotionAuthorized": false,
+    "productionAccepted": false,
+    "securityP0Closed": false,
+    "reimport": false
+  },
+  "planImpact": { "findingsPreserved": 295, "frozenTasksPreserved": 86, "formalI6Percent": 50, "productionReadinessPercent": 20 }
+}

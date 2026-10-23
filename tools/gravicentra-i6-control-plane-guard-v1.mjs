@@ -58,6 +58,93 @@ const ACTIVE_I65_FORENSIC_B4=String(C.i65ForensicRemediationPlan?.b4?.executionL
 need(exists(ACTIVE_I65_FORENSIC_B4),'I6_5_B4_ACTIVE_LOCK_MISSING:'+ACTIVE_I65_FORENSIC_B4);
 const S=readJson(STATUS_LEDGER),A=readJson(AUTH_RECEIPT),M5=readJson(V5_MANIFEST),M6=readJson(V6_MANIFEST),M=readJson(V7_MANIFEST),FRA=readJson(I65_FORENSIC_AUDIT),FRP=readJson(I65_FORENSIC_PLAN),PAY=readJson(I65_PAYMENT_INFERENCE),B1=readJson(I65_FORENSIC_B1),B2=readJson(I65_FORENSIC_B2),B3=readJson(I65_FORENSIC_B3),B4=readJson(ACTIVE_I65_FORENSIC_B4);
 const COMP=readJson(I6_CANONICAL_COMPOSITION),FIND=readJson(I6_FINDINGS_LEDGER),FRP2=readJson(I65_FORENSIC_PLAN_V2),REJ=readJson(I65_B2_REJECTION),RCM=readJson(I65_B2_ROOT_CAUSE);
+// B4-003: A successor never rewrites the certified blobs of an older Preview.
+// Its source is checked against the parent commit, the canonical composition,
+// and the exact QA artifacts; historical receipts remain independently sealed.
+const UAT_FIX=C.b4003AuthenticatedUatCausalFix20261022||{};
+const UAT_FIX_ACTIVE=UAT_FIX.status==='SOURCE_FIXED_LOCAL_QA_PASS_PREVIEW_PENDING';
+const preUatFixBlob=p=>UAT_FIX_ACTIVE?git('rev-parse',UAT_FIX.parentHead+':'+p):git('hash-object',p);
+const preUatFixComposition=UAT_FIX_ACTIVE?UAT_FIX.previousCompositionBlobSha:git('hash-object',I6_CANONICAL_COMPOSITION);
+const preUatFixExecution=UAT_FIX_ACTIVE?UAT_FIX.previousExecutionLockBlobSha:git('hash-object',ACTIVE_I65_FORENSIC_B4);
+if(UAT_FIX_ACTIVE){
+ const receipt=readJson(UAT_FIX.receiptPath),locked=B4.b4003AuthenticatedUatCausalFix20261022||{};
+ const staged=COMP.b4003AuthenticatedUatCausalFix20261022||{};
+ const source=Object.keys(receipt.sourceFiles||{}),qa=Object.keys(receipt.qaFiles||{});
+ need(UAT_FIX.gate==='I6.5/B4-003'&&UAT_FIX.approval===locked.approval&&
+   UAT_FIX.parentHead==='d9e2cd656b4e9e2895605df5a1116c6e95055226'&&
+   UAT_FIX.sourceCommit==='8c7e3c00874e43211b880014baa19ea45e455717'&&
+   UAT_FIX.previousCompositionBlobSha==='9e08066da7f338690e18fac987842c969f418d4f'&&
+   UAT_FIX.previousExecutionLockBlobSha==='13907e432e6de488bb1ecc10149e69935c4ca982'&&
+   UAT_FIX.receiptBlobSha===git('hash-object',UAT_FIX.receiptPath)&&
+   receipt.status===UAT_FIX.status&&receipt.approval===UAT_FIX.approval&&
+   receipt.parentHead===UAT_FIX.parentHead&&receipt.sourceCommit===UAT_FIX.sourceCommit&&
+   receipt.previousCompositionBlobSha===preUatFixComposition&&
+   receipt.previousExecutionLockBlobSha===preUatFixExecution&&
+   UAT_FIX.compositionBlobSha===git('hash-object',I6_CANONICAL_COMPOSITION)&&
+   UAT_FIX.executionLockBlobSha===git('hash-object',ACTIVE_I65_FORENSIC_B4)&&
+   locked.compositionBlobSha===UAT_FIX.compositionBlobSha&&
+   locked.receiptBlobSha===UAT_FIX.receiptBlobSha&&
+   B4.compositionLockBlobSha===UAT_FIX.compositionBlobSha&&
+   C.canonicalAccumulationControl?.compositionLockBlobSha===UAT_FIX.compositionBlobSha&&
+   C.currentB4?.executionLockBlobSha===UAT_FIX.executionLockBlobSha&&
+   C.i65ForensicRemediationPlan?.b4?.executionLockBlobSha===UAT_FIX.executionLockBlobSha&&
+   source.length===3&&qa.length===2&&
+   sameJson(receipt.sourceFiles,Object.fromEntries(source.map(p=>[p,{before:staged.sourceBlobsBefore?.[p],after:staged.sourceBlobsAfter?.[p]}])))&&
+   source.every(p=>receipt.sourceFiles[p].before===preUatFixBlob(p)&&
+     receipt.sourceFiles[p].after===git('hash-object',p)&&
+     receipt.sourceFiles[p].after===COMP.productFileBlobs?.[p]&&
+     COMP.productFiles.includes(p)&&B4.boundaries?.allowedProductFiles?.includes(p))&&
+   sameJson(receipt.qaFiles,UAT_FIX.qaFiles)&&
+   qa.every(p=>receipt.qaFiles[p]===git('hash-object',p)&&
+     B4.boundaries?.allowedQaFiles?.includes(p))&&
+   receipt.qa.testedLocally===true&&receipt.qa.focusedTestsFailed===0&&
+   receipt.historicalProof.untouched===true&&receipt.historicalProof.noRetroactivePass===true&&
+   receipt.boundaries.operationalBusinessWrites===0&&
+   receipt.boundaries.firestoreRulesDeployAuthorized===false&&
+   receipt.boundaries.livePromotionAuthorized===false&&
+   receipt.boundaries.productionAccepted===false&&
+   C.b4003SecurityReleaseHold?.status==='ACTIVE_FAIL_CLOSED_UNAUTHORIZED_BROWSER_FIRESTORE_READ_WRITE'&&
+   FIND.findings.length===295&&B4.boundaries?.dataMutationAuthorized===false&&
+   B4.boundaries?.livePromotionAuthorized===false,
+   'B4_003_UAT_CAUSAL_SUCCESSOR_SOURCE_OR_LINEAGE_INVALID');
+ console.log('B4_003_UAT_CAUSAL_SUCCESSOR=PASS_SOURCE_QA_PREVIEW_PENDING_SECURITY_HOLD');
+}
+const UAT_FIX_PREVIEW=C.b4003AuthenticatedUatPreviewAuthorization20261022||{};
+if(UAT_FIX_PREVIEW.status==='AUTHORIZED_EXACT_SCOPED_READONLY_PREVIEW'){
+ const locked=B4.b4003AuthenticatedUatPreviewAuthorization20261022||{};
+ const successor=COMP.b4003AuthenticatedUatCausalFix20261022||{};
+ need(UAT_FIX_ACTIVE&&sameJson(UAT_FIX_PREVIEW,locked)&&
+   UAT_FIX_PREVIEW.gate==='I6.5/B4-003'&&
+   UAT_FIX_PREVIEW.approval===UAT_FIX.approval&&
+   UAT_FIX_PREVIEW.triggerSubject==='build(i6.5 B4-003): exact authenticated UAT causal fixes Preview'&&
+   UAT_FIX_PREVIEW.sourceCommit===UAT_FIX.sourceCommit&&
+   UAT_FIX_PREVIEW.sourceReceiptBlobSha===UAT_FIX.receiptBlobSha&&
+   UAT_FIX_PREVIEW.compositionBlobSha===git('hash-object',I6_CANONICAL_COMPOSITION)&&
+   UAT_FIX_PREVIEW.configQaBlobSha===git('hash-object','tools/gravicentra-b4-003-config-users-owner.test.cjs')&&
+   UAT_FIX_PREVIEW.financeQaBlobSha===git('hash-object','tools/gravicentra-b4-003-portfolio-verified-receipt-amount.test.cjs')&&
+   Object.entries(successor.sourceBlobsAfter||{}).length===3&&
+   Object.entries(successor.sourceBlobsAfter).every(([p,sha])=>
+     sha===git('rev-parse',UAT_FIX_PREVIEW.sourceCommit+':'+p)&&sha===git('hash-object',p))&&
+   UAT_FIX_PREVIEW.rosterSourceBlobSha===git('hash-object','functions/assignable-advisor-roster.js')&&
+   sameJson(UAT_FIX_PREVIEW.onlyReadOnlyFunctions,['orbit360ScopedPolicyReadPreview','orbit360AssignableAdvisorRosterPreview'])&&
+   UAT_FIX_PREVIEW.onlyIsolatedHosting===true&&
+   UAT_FIX_PREVIEW.sharedRulesDeployAuthorized===false&&
+   UAT_FIX_PREVIEW.otherFunctionsDeployAuthorized===false&&
+   UAT_FIX_PREVIEW.businessWritesAuthorized===false&&
+   UAT_FIX_PREVIEW.syntheticQaWritesAuthorized===false&&
+   UAT_FIX_PREVIEW.realUserImpersonationAuthorized===false&&
+   UAT_FIX_PREVIEW.livePromotionAuthorized===false&&
+   UAT_FIX_PREVIEW.reimportAuthorized===false&&
+   UAT_FIX_PREVIEW.authenticatedUatRequired===true&&
+   C.b4003SecurityReleaseHold?.status==='ACTIVE_FAIL_CLOSED_UNAUTHORIZED_BROWSER_FIRESTORE_READ_WRITE'&&
+   B4.boundaries?.previewMutationAuthorized===true&&
+   B4.boundaries?.functionDeploymentAuthorized===true&&
+   B4.boundaries?.businessWritesAuthorized===false&&
+   B4.boundaries?.dataMutationAuthorized===false&&
+   B4.boundaries?.livePromotionAuthorized===false,
+   'B4_003_UAT_CAUSAL_EXACT_PREVIEW_AUTH_INVALID');
+ console.log('B4_003_UAT_CAUSAL_EXACT_PREVIEW_AUTH=PASS_READONLY_LIVE_HOLD');
+}
 // B4-003 2026-10-22: an exact, scoped SOURCE successor to the technical
 // Preview; the historical run 39634567135 must retain its original hashes.
 const POST_AUTH=C.b4003PostAuthReadOnlyDiagnostic20261022||{};
@@ -80,13 +167,13 @@ if(POST_AUTH_ACTIVE){
    POST_AUTH.receiptBlobSha===git('hash-object',POST_AUTH.receiptPath)&&
    receipt.status===POST_AUTH.status&&receipt.approval===scoped.approval&&
    scoped.status===POST_AUTH.status&&composition.status===POST_AUTH.status&&
-   POST_AUTH.compositionBlobSha===git('hash-object',I6_CANONICAL_COMPOSITION)&&
+   POST_AUTH.compositionBlobSha===preUatFixComposition&&
    scoped.compositionBlobSha===POST_AUTH.compositionBlobSha&&
-   C.canonicalAccumulationControl?.compositionLockBlobSha===POST_AUTH.compositionBlobSha&&
-   B4.compositionLockBlobSha===POST_AUTH.compositionBlobSha&&
-   POST_AUTH.executionLockBlobSha===git('hash-object',ACTIVE_I65_FORENSIC_B4)&&
-   C.currentB4?.executionLockBlobSha===POST_AUTH.executionLockBlobSha&&
-   C.i65ForensicRemediationPlan?.b4?.executionLockBlobSha===POST_AUTH.executionLockBlobSha&&
+   C.canonicalAccumulationControl?.compositionLockBlobSha===git('hash-object',I6_CANONICAL_COMPOSITION)&&
+   B4.compositionLockBlobSha===git('hash-object',I6_CANONICAL_COMPOSITION)&&
+   POST_AUTH.executionLockBlobSha===preUatFixExecution&&
+   C.currentB4?.executionLockBlobSha===git('hash-object',ACTIVE_I65_FORENSIC_B4)&&
+   C.i65ForensicRemediationPlan?.b4?.executionLockBlobSha===git('hash-object',ACTIVE_I65_FORENSIC_B4)&&
    expected.length===Object.keys(receipt.sourceFiles||{}).length&&
    sameJson(receipt.sourceFiles, Object.fromEntries(expected.map(p=>[p,{
      before:composition.sourceBlobsBefore?.[p],after:composition.sourceBlobsAfter?.[p]
@@ -122,7 +209,7 @@ if(POST_AUTH_PREVIEW.status==='AUTHORIZED_ISOLATED_READONLY_PREVIEW'){
    POST_AUTH_PREVIEW.approval==='PAULA_EXPLICIT_SCOPED_B4_003_POST_AUTH_REPAIR_20261022'&&
    POST_AUTH_PREVIEW.triggerSubject==='build(i6.5 B4-003): post-auth read-only diagnostic Preview'&&
    POST_AUTH_PREVIEW.sourceReceiptBlobSha===POST_AUTH.receiptBlobSha&&
-   POST_AUTH_PREVIEW.compositionBlobSha===git('hash-object',I6_CANONICAL_COMPOSITION)&&
+   POST_AUTH_PREVIEW.compositionBlobSha===preUatFixComposition&&
    POST_AUTH_PREVIEW.qaPath===POST_AUTH.qaPath&&
    POST_AUTH_PREVIEW.qaBlobSha===git('hash-object',POST_AUTH_PREVIEW.qaPath)&&
    POST_AUTH_PREVIEW.rosterSourceBlobSha===git('hash-object','functions/assignable-advisor-roster.js')&&
@@ -162,8 +249,8 @@ if(FPRE.status==='EXACT_TECHNICAL_PREVIEW_PASS_AUTHENTICATED_UAT_HOLD'){
  doc.backendSourceDigest===FPRE.backendSourceDigest&&
  doc.bundleDigest===FPRE.bundleDigest&&
  doc.compositionBlobSha===postAuthOriginalComposition&&
- doc.productBlobSha===git('hash-object','orbit360-platform/core/queries.js')&&
- doc.qaBlobSha===git('hash-object','tools/gravicentra-b4-003-portfolio-verified-receipt-amount.test.cjs')&&
+ doc.productBlobSha===preUatFixBlob('orbit360-platform/core/queries.js')&&
+ doc.qaBlobSha===preUatFixBlob('tools/gravicentra-b4-003-portfolio-verified-receipt-amount.test.cjs')&&
  sameJson(doc.previewOnlyFunctions,['orbit360ScopedPolicyReadPreview','orbit360AssignableAdvisorRosterPreview'])&&
  doc.technicalWorkflowConclusion==='success'&&doc.hostingReadbackExact===true&&doc.publicSmoke===true&&
  doc.anonymousStatus===401&&doc.authenticatedUat==='HOLD'&&doc.differentUidsSecurityProof==='SKIPPED'&&
@@ -190,9 +277,9 @@ if(MISSING_MONEY_ACTIVE){
  need(
   MISSING_MONEY.sourcePath==='orbit360-platform/core/queries.js'&&
   MISSING_MONEY.sourceBlobBefore==='0f3f540a71e98ccdca8c040f937d18a169e52396'&&
-  MISSING_MONEY.sourceBlobAfter===git('hash-object',MISSING_MONEY.sourcePath)&&
+  MISSING_MONEY.sourceBlobAfter===preUatFixBlob(MISSING_MONEY.sourcePath)&&
   MISSING_MONEY.qaPath==='tools/gravicentra-b4-003-portfolio-verified-receipt-amount.test.cjs'&&
-  MISSING_MONEY.qaBlobSha===git('hash-object',MISSING_MONEY.qaPath)&&
+  MISSING_MONEY.qaBlobSha===preUatFixBlob(MISSING_MONEY.qaPath)&&
   MISSING_MONEY.receiptPath===receiptPath&&
   MISSING_MONEY.receiptBlobSha===git('hash-object',receiptPath)&&
   receipt.schema==='GRAVICENTRA_I6_5_B4_003_CO_CARTERA_VERIFIED_READMODEL_FIX_V1'&&
@@ -215,7 +302,7 @@ if(MISSING_MONEY_ACTIVE){
   locked.compositionBlobSha===MISSING_MONEY.compositionBlobSha&&
   manifest.sourceAfter===MISSING_MONEY.sourceBlobAfter&&
   manifest.qaBlobSha===MISSING_MONEY.qaBlobSha&&
-  COMP.productFileBlobs?.[MISSING_MONEY.sourcePath]===MISSING_MONEY.sourceBlobAfter&&
+  COMP.productFileBlobs?.[MISSING_MONEY.sourcePath]===(UAT_FIX_ACTIVE?COMP.b4003AuthenticatedUatCausalFix20261022?.sourceBlobsAfter?.[MISSING_MONEY.sourcePath]:MISSING_MONEY.sourceBlobAfter)&&
   COMP.productFiles.includes(MISSING_MONEY.sourcePath)&&
   B4.boundaries?.allowedProductFiles?.includes(MISSING_MONEY.sourcePath)&&
   B4.boundaries?.allowedQaFiles?.includes(MISSING_MONEY.qaPath)&&
@@ -245,9 +332,9 @@ if(NEW_MONEY_AUTH.status==='AUTHORIZED_EXACT_ISOLATED_READONLY_PREVIEW'){
    NEW_MONEY_AUTH.triggerSubject==='build(i6.5 B4-003): exact canonical cartera amount Preview'&&
    NEW_MONEY_AUTH.sourceFixReceiptBlobSha===MISSING_MONEY.receiptBlobSha&&
    NEW_MONEY_AUTH.productOwner===MISSING_MONEY.sourcePath&&
-   NEW_MONEY_AUTH.productOwnerBlobSha===git('hash-object',NEW_MONEY_AUTH.productOwner)&&
+   NEW_MONEY_AUTH.productOwnerBlobSha===preUatFixBlob(NEW_MONEY_AUTH.productOwner)&&
    NEW_MONEY_AUTH.qaPath===MISSING_MONEY.qaPath&&
-   NEW_MONEY_AUTH.qaBlobSha===git('hash-object',NEW_MONEY_AUTH.qaPath)&&
+   NEW_MONEY_AUTH.qaBlobSha===preUatFixBlob(NEW_MONEY_AUTH.qaPath)&&
    NEW_MONEY_AUTH.compositionBlobSha===postAuthOriginalComposition&&
    NEW_MONEY_AUTH.preAuthB4Sha==='f8a5b3b82f641bbc2df2a2b3e49402b5b32085f2'&&
    NEW_MONEY_AUTH.priorGuardRunId===39629585062&&NEW_MONEY_AUTH.priorGuardConclusion==='success'&&
