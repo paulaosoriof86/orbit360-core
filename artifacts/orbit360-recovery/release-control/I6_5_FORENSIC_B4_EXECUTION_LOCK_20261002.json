@@ -627,7 +627,7 @@
   },
   "findingLedgerBlobSha": "8125e97dcf1feb7f46081f95327952e65c2d1077",
   "continuityRegisterBlobSha": "4e6b0ac51736be360c4b95abe8fc01d8f1e78e20",
-  "compositionLockBlobSha": "c9a52496d15fecbba152b509261d8238c142dc1b",
+  "compositionLockBlobSha": "7d57dd7cf5e2d6587337693bdb0e8dc78db91952",
   "r18SourceFix": {
     "status": "SOURCE_FIXED_R18_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_SOURCE_FIX_20261005.json",
@@ -3968,5 +3968,17 @@
     "reimportAuthorized": false,
     "authenticatedRoleCountryUatRequired": true,
     "previewEvidenceNotProductionAcceptance": true
+  },
+  "b4003SafePostAuthDiagnosticSuccessor20261023": {
+    "status": "SOURCE_STAGED_SAFE_DIAGNOSTIC_QA_PASS_SECURITY_HOLD",
+    "gate": "I6.5/B4-003",
+    "authority": "PAULA_CONTINUE_EXISTING_I65_B4003_AFTER_AUTHENTICATED_LOGIN_FAIL_20261023",
+    "parentHead": "f5704a38e6b5d1b91b251ca69375042a58e99034",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_SAFE_POST_AUTH_DIAGNOSTIC_SUCCESSOR_20261023.json",
+    "receiptBlobSha": "aa1022a9bc5887afa012c551e80fc29a46af6009",
+    "syntheticQaPass": true,
+    "authenticatedUatAccepted": false,
+    "sharedFirestoreRulesDeployAuthorized": false,
+    "livePromotionAuthorized": false
   }
 }

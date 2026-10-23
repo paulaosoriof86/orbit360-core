@@ -4,6 +4,31 @@ const source=fs.readFileSync('orbit360-platform/data/store-firestore-product-rea
 const provider=fs.readFileSync('orbit360-platform/core/product-runtime-browser-providers-p0.js','utf8');
 const app=fs.readFileSync('orbit360-platform/core/product-app-p0.js','utf8');
 const bootstrap=fs.readFileSync('orbit360-platform/core/backend-product-readonly-bootstrap-p0.js','utf8');
+// Real Chrome surfaced an authenticated but blocked login; the prior console
+// wrote "Object", hiding even the finite, non-sensitive failure category.
+// This probe must never reveal Firebase error text, UIDs, emails or paths.
+const diagnosticBegin=bootstrap.indexOf('  function safeFailureDetail(');
+const diagnosticEnd=bootstrap.indexOf('  function dependencyErrors(',diagnosticBegin);
+assert.ok(diagnosticBegin>0&&diagnosticEnd>diagnosticBegin,'SAFE_BOOTSTRAP_DIAGNOSTIC_MISSING');
+const diagnostic={};
+vm.runInNewContext("function text(value){return String(value == null ? '' : value).trim();}\n"+
+  bootstrap.slice(diagnosticBegin,diagnosticEnd)+'\nthis.probe=safeFailureDetail;',diagnostic);
+const pii='private-name@example.test tenant/secret-user',snapshot=message=>({
+  _productStatus:()=>({snapshotErrors:{clientes:message+' '+pii}})
+});
+assert.equal(diagnostic.probe(new Error('product_store_blocked:snapshot-error'),
+  snapshot('functions/permission-denied')),'FUNCTION_PERMISSION_DENIED');
+assert.equal(diagnostic.probe(new Error('product_store_blocked:snapshot-error'),
+  snapshot('PROTECTED_READ_COUNTRY_MISMATCH')),'COUNTRY_MISMATCH');
+assert.equal(diagnostic.probe(new Error('product_store_readiness_timeout'),null),
+  'STORE_TIMEOUT_UNCLASSIFIED');
+assert.equal(diagnostic.probe(new Error('product_readiness_blocked:auth_email_no_verificado'),null),
+  'READINESS_EMAIL_UNVERIFIED');
+assert.equal(diagnostic.probe(new Error('product_store_blocked:snapshot-error'),
+  snapshot('RAW_INTERNAL_DETAILS')),'STORE_SNAPSHOT_OTHER');
+assert.match(app,/READONLY_BOOTSTRAP_BLOCKED phase=/);
+assert.doesNotMatch(app,/console\.warn\('\[Orbit Product\] READONLY_BOOTSTRAP_BLOCKED',\{/);
+console.log('B4_003_SAFE_POST_AUTH_DIAGNOSTIC_QA_PASS categories=5 no_personal_data');
 assert.match(provider,/orbit360ScopedPolicyReadPreview/);
 assert.match(app,/scopedReadPreviewCandidate===true/);
 assert.match(bootstrap,/protectedReadCandidate: options.protectedReadCandidate===true/);

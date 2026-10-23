@@ -6483,5 +6483,23 @@
     "noSharedRulesDeploy": true,
     "noOperationalWriterDeployment": true,
     "noLivePromotion": true
+  },
+  "b4003SafePostAuthDiagnosticSuccessor20261023": {
+    "status": "SOURCE_STAGED_SAFE_DIAGNOSTIC_QA_PASS_SECURITY_HOLD",
+    "gate": "I6.5/B4-003",
+    "parentHead": "f5704a38e6b5d1b91b251ca69375042a58e99034",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_SAFE_POST_AUTH_DIAGNOSTIC_SUCCESSOR_20261023.json",
+    "receiptBlobSha": "aa1022a9bc5887afa012c551e80fc29a46af6009",
+    "sourceBlobsAfter": {
+      "orbit360-platform/core/backend-product-readonly-bootstrap-p0.js": "dff9ce24988259693aa7ba751a3a6eed2453246a",
+      "orbit360-platform/core/product-app-p0.js": "bea311ca29e6d51880c329c4bdc305c2be2557c9"
+    },
+    "qaBlobsAfter": {
+      "tools/gravicentra-b4-003-protected-hydration.test.cjs": "37d7cbaf3332fc4f28a3c35bd25b4bfdde375e58",
+      "tools/gravicentra-b4-003-post-auth-bootstrap-diagnostic.test.cjs": "e80d6c44268d6a7858d4d03f1175e567fddb9471"
+    },
+    "authenticatedUatAccepted": false,
+    "noSharedRulesDeploy": true,
+    "noLivePromotion": true
   }
 }

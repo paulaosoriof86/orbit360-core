@@ -130,10 +130,18 @@
           'PROTECTED_PROVIDER_MISSING','SNAPSHOTS_NOT_ATTACHED','ENVIRONMENT_FAILED',
           'AUTHENTICATION_FAILED','MEMBERSHIP_FAILED','PLANNING_FAILED','ATTACHING_FAILED',
           'SNAPSHOT_READ_FAILED','INSTALLING_FAILED','BOOTSTRAP_FAILED'];
-        try{console.warn('[Orbit Product] READONLY_BOOTSTRAP_BLOCKED',{
-          phase:allowedPhases.includes(blocked.failurePhase)?blocked.failurePhase:'unknown',
-          code:allowedCodes.includes(blocked.failureCode)?blocked.failureCode:'UNKNOWN_FAILURE'
-        });}catch(e){}
+        var safePhase=allowedPhases.includes(blocked.failurePhase)?blocked.failurePhase:'unknown';
+        var safeCode=allowedCodes.includes(blocked.failureCode)?blocked.failureCode:'UNKNOWN_FAILURE';
+        var allowedDetails=['NONE','READINESS_EMAIL_UNVERIFIED','READINESS_MEMBERSHIP_INVALID',
+          'READINESS_STORE_INVALID','READINESS_OTHER','MEMBERSHIP_INVALID','PROVIDER_MISSING',
+          'STORE_TIMEOUT_UNCLASSIFIED','COUNTRY_MISMATCH','TENANT_MISMATCH',
+          'DUPLICATE_OR_MISSING_ID','RESPONSE_INVALID','SERVER_RESPONSE_INVALID',
+          'ROLE_NOT_ASSIGNED','PLAN_DENIED','COUNTRY_DENIED','PAGE_LIMIT','CURSOR_INVALID',
+          'FUNCTION_UNAUTHENTICATED','FUNCTION_PERMISSION_DENIED','FUNCTION_DEADLINE_EXCEEDED',
+          'FUNCTION_UNAVAILABLE','FUNCTION_INTERNAL','STORE_SNAPSHOT_OTHER'];
+        var safeDetail=allowedDetails.includes(blocked.failureDetailCode)?blocked.failureDetailCode:'UNKNOWN_DETAIL';
+        try{console.warn('[Orbit Product] READONLY_BOOTSTRAP_BLOCKED phase='+safePhase+
+          ' code='+safeCode+' detail='+safeDetail);}catch(e){}
         throw new Error('PRODUCT_READONLY_BOOTSTRAP_NOT_READY');
       }
       var ps=Orbit.store&&typeof Orbit.store._productStatus==='function'?Orbit.store._productStatus():{};

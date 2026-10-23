@@ -1,0 +1,51 @@
+{
+  "schema": "GI_I65_B4003_SAFE_POST_AUTH_DIAGNOSTIC_SUCCESSOR_V1",
+  "gate": "I6.5/B4-003",
+  "status": "SOURCE_STAGED_SAFE_DIAGNOSTIC_QA_PASS_SECURITY_HOLD",
+  "authority": "PAULA_CONTINUE_EXISTING_I65_B4003_AFTER_AUTHENTICATED_LOGIN_FAIL_20261023",
+  "parentHead": "f5704a38e6b5d1b91b251ca69375042a58e99034",
+  "observedPreviewRunId": 40014810763,
+  "observedBuildId": "gi-i65-b4-f5704a38e6b5-57f234755dc1",
+  "observedFailure": "PRODUCT_READONLY_BOOTSTRAP_NOT_READY",
+  "realUserAuthenticatedUat": "FAIL_AFTER_FIREBASE_CREDENTIAL_ACCEPTANCE",
+  "rootCause": "UNDETERMINED_BOOTSTRAP_PHASE_NOT_RENDERED_BY_BROWSER_CONSOLE",
+  "sourceFiles": {
+    "orbit360-platform/core/backend-product-readonly-bootstrap-p0.js": {
+      "before": "235c19fc9e55bd2e9338157b51ac157fca5ac002",
+      "after": "dff9ce24988259693aa7ba751a3a6eed2453246a"
+    },
+    "orbit360-platform/core/product-app-p0.js": {
+      "before": "a2e818daa07981278b76c4b6b84900e72f6dac51",
+      "after": "bea311ca29e6d51880c329c4bdc305c2be2557c9"
+    }
+  },
+  "qaFiles": {
+    "tools/gravicentra-b4-003-protected-hydration.test.cjs": {
+      "before": "0da324fbe65d88a3820ee30bb40fbac425f4f320",
+      "after": "37d7cbaf3332fc4f28a3c35bd25b4bfdde375e58"
+    },
+    "tools/gravicentra-b4-003-post-auth-bootstrap-diagnostic.test.cjs": {
+      "before": "101c78654a1afc3a0fd06ad0b4d652232e491c3b",
+      "after": "e80d6c44268d6a7858d4d03f1175e567fddb9471"
+    }
+  },
+  "verification": {
+    "protectedHydrationSynthetic": "PASS",
+    "safePostAuthDiagnosticVm": "PASS",
+    "syntax": "PASS",
+    "privacyClassificationOnly": true,
+    "noRawErrorsOrIdentityInDiagnostic": true,
+    "authenticatedUatAccepted": false,
+    "securityP0Closed": false
+  },
+  "boundaries": {
+    "onlyLocalProductSourceAndQa": true,
+    "operationalBusinessWrites": 0,
+    "sharedFirestoreRulesDeploymentAuthorized": false,
+    "operationalWriterDeploymentAuthorized": false,
+    "productionPromotionAuthorized": false,
+    "realUserImpersonationAuthorized": false,
+    "dataReimportAuthorized": false,
+    "gateAdvanceAuthorized": false
+  }
+}

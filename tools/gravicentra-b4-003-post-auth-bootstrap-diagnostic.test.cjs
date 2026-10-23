@@ -62,7 +62,9 @@ const opts={mode:'product',authorizedProductReadOnly:true,runtimeAuthorized:true
     document:{querySelector:()=>null,dispatchEvent:()=>{}},CustomEvent:function(){}},{timeout:1000});
   await assert.rejects(appWindow.Orbit.productAppP0.activate(),/PRODUCT_READONLY_BOOTSTRAP_NOT_READY/);
   assert.equal(warnings.length,1);
-  assert.deepEqual(JSON.parse(JSON.stringify(warnings[0][1])),{phase:'membership',code:'MEMBERSHIP_REJECTED'});
+  assert.equal(warnings[0].length,1);
+  assert.equal(warnings[0][0],
+    '[Orbit Product] READONLY_BOOTSTRAP_BLOCKED phase=membership code=MEMBERSHIP_REJECTED detail=UNKNOWN_DETAIL');
   assert.ok(!JSON.stringify(warnings).includes('private@example.invalid'));
 
   // Call actual self-sync helper from its IIFE in sandbox; no real callable.

@@ -101,6 +101,7 @@
       errors: [],
       failurePhase: '',
       failureCode: '',
+      failureDetailCode: '',
       lastTransitionAt: new Date().toISOString()
     };
   }
@@ -134,6 +135,7 @@
       // untrusted server error, membership document or user identity.
       failurePhase: text(state.failurePhase),
       failureCode: text(state.failureCode),
+      failureDetailCode: text(state.failureDetailCode),
       // The bootstrap event is also observed by the browser QA harness.
       // Backend exception text must never be projected into that event.
       errors: state.phase === 'blocked' ? [text(state.failureCode) || 'BOOTSTRAP_FAILED'] : unique(state.errors),
@@ -161,6 +163,49 @@
       installing: 'INSTALLING_FAILED'
     };
     return stages[phase] || 'BOOTSTRAP_FAILED';
+  }
+
+  // Diagnostic taxonomy is deliberately finite. Snapshot errors may include
+  // Firebase messages or document identifiers, which must never reach console,
+  // the login surface or QA evidence from this authenticated browser.
+  function safeFailureDetail(error, store) {
+    var message = text(error && (error.message || error));
+    if (message.indexOf('product_readiness_blocked:') === 0) {
+      if (message.indexOf('auth_email_no_verificado') >= 0) return 'READINESS_EMAIL_UNVERIFIED';
+      if (message.indexOf('membresia_') >= 0) return 'READINESS_MEMBERSHIP_INVALID';
+      if (message.indexOf('store_') >= 0) return 'READINESS_STORE_INVALID';
+      return 'READINESS_OTHER';
+    }
+    if (message.indexOf('membership_invalid:') === 0) return 'MEMBERSHIP_INVALID';
+    if (message === 'PROTECTED_READ_PROVIDER_MISSING') return 'PROVIDER_MISSING';
+    var snapshot = {};
+    try { snapshot = store && typeof store._productStatus === 'function' ? store._productStatus() : {}; }
+    catch (_) {}
+    var failures = snapshot && snapshot.snapshotErrors && typeof snapshot.snapshotErrors === 'object'
+      ? Object.values(snapshot.snapshotErrors).map(text) : [];
+    if (!failures.length) return message === 'product_store_readiness_timeout' ? 'STORE_TIMEOUT_UNCLASSIFIED' : 'NONE';
+    var categories = [
+      ['PROTECTED_READ_COUNTRY_MISMATCH', 'COUNTRY_MISMATCH'],
+      ['PROTECTED_READ_TENANT_MISMATCH', 'TENANT_MISMATCH'],
+      ['PROTECTED_READ_DUPLICATE_OR_MISSING_ID', 'DUPLICATE_OR_MISSING_ID'],
+      ['PROTECTED_READ_RESPONSE_INVALID', 'RESPONSE_INVALID'],
+      ['PROTECTED_READ_SERVER_RESPONSE_INVALID', 'SERVER_RESPONSE_INVALID'],
+      ['PROTECTED_READ_ROLE_NOT_ASSIGNED', 'ROLE_NOT_ASSIGNED'],
+      ['PROTECTED_READ_PLAN_DENIED', 'PLAN_DENIED'],
+      ['PROTECTED_READ_COUNTRY_DENIED', 'COUNTRY_DENIED'],
+      ['PROTECTED_READ_PAGE_LIMIT', 'PAGE_LIMIT'],
+      ['PROTECTED_READ_CURSOR_INVALID', 'CURSOR_INVALID'],
+      ['functions/unauthenticated', 'FUNCTION_UNAUTHENTICATED'],
+      ['functions/permission-denied', 'FUNCTION_PERMISSION_DENIED'],
+      ['functions/deadline-exceeded', 'FUNCTION_DEADLINE_EXCEEDED'],
+      ['functions/unavailable', 'FUNCTION_UNAVAILABLE'],
+      ['functions/internal', 'FUNCTION_INTERNAL']
+    ];
+    for (var i = 0; i < categories.length; i += 1) {
+      if (failures.some(function (value) { return value.indexOf(categories[i][0]) >= 0; }))
+        return categories[i][1];
+    }
+    return 'STORE_SNAPSHOT_OTHER';
   }
 
   function dependencyErrors(deps) {
@@ -411,6 +456,7 @@
       }
       state.failurePhase = state.phase;
       state.failureCode = safeFailureCode(error, state.phase);
+      state.failureDetailCode = safeFailureDetail(error, store);
       state.errors = unique(state.errors.concat([String(error && (error.message || error) || error)]));
       transition(state, 'blocked', { ready: false });
       return { ok: false, ready: false, plan: plan, status: sanitizeState(state), storeInstalled: false, snapshotsAttached: false, writeAuthorized: false };
