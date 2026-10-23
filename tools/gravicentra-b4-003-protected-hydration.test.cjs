@@ -271,7 +271,7 @@ const pause=()=>new Promise(ok=>setTimeout(ok,30));
  assert.match(bootstrap,/productQueryPlannerP0\.compile\(collection/);
 
  // Execute the actual bootstrap planner factory, not only its static source literal.
- let bootstrapRole='asesor',capturedPlanner=null;
+ let bootstrapRole='asesor',capturedPlanner=null,capturedStoreDeps=null,directStoreDepsCalls=0;
  const authorizedMembership={uid:'mock-uid',email:'test@example.test',tenantId:tenant,
    status:'active',activeRole:'asesor',roles:['asesor','operativo'],countries:['GT'],advisorId:'a1',
    modulesExtra:[],modulesRestricted:[]};
@@ -288,6 +288,7 @@ const pause=()=>new Promise(ok=>setTimeout(ok,30));
    tenantCanonicalPathsP0:{VERSION:'mock-path',validateTenantId:id=>({ok:id===tenant,tenantId:id})},
    backendProductReadinessP0:{readiness:()=>({ok:true})},
    createFirestoreProductReadOnlyStoreP0:(_deps,opts)=>{
+     capturedStoreDeps=_deps;
      capturedPlanner=opts.queryPlanner;
      throw Error('STOP_AFTER_CAPTURE');
    }
@@ -296,7 +297,9 @@ const pause=()=>new Promise(ok=>setTimeout(ok,30));
  vm.runInNewContext(bootstrap,{window:mockWindow,console,Promise,setTimeout,clearTimeout,Date,CustomEvent:function(){}});
  const bootDeps={
    environmentProvider:{describePublicConfig:async()=>({})},
-   firebaseAdapter:{initializeFromEnvironment:async()=>({db:{}}),storeDependencies:()=>({db:{}})},
+   firebaseAdapter:{initializeFromEnvironment:async()=>({db:{}}),storeDependencies:()=>{
+     directStoreDepsCalls++;return {db:{},collection:()=>{},getDocsFromServer:()=>{},onSnapshot:()=>{}};
+   }},
    authProvider:{waitForAuthenticatedUser:async()=>({uid:'mock-uid',email:'test@example.test'})},
    membershipProvider:{getByUid:async()=>authorizedMembership},
    protectedReadPage:async()=>({ok:true})
@@ -306,12 +309,26 @@ const pause=()=>new Promise(ok=>setTimeout(ok,30));
    protectedReadCandidate:true,collections:['clientes']
  });
  assert.equal(bootResult.ok,false,'only controlled QA capture is expected');
+ assert.equal(directStoreDepsCalls,0,'PROTECTED_BOOTSTRAP_MUST_NEVER_ACQUIRE_DIRECT_STORE_DEPENDENCIES');
+ assert.deepEqual(Object.keys(capturedStoreDeps).sort(),['protectedReadPage'],
+   'PROTECTED_BOOTSTRAP_MUST_PASS_CALLABLE_ONLY');
  assert.equal(typeof capturedPlanner,'function');
  assert.equal(capturedPlanner('clientes').scope,'asesor');
  bootstrapRole='operativo';
  assert.equal(capturedPlanner('clientes').scope,'operativo');
  bootstrapRole='unassigned';
  assert.equal(capturedPlanner('clientes').hardError,true);
+ // The unprotected channel is unchanged, so this scoped correction does not
+ // silently convert the existing LIVE application into a broken Preview.
+ capturedStoreDeps=null;capturedPlanner=null;
+ const liveResult=await mockOrbit.backendProductReadOnlyBootstrapP0.start(bootDeps,{
+   mode:'product',authorizedProductReadOnly:true,runtimeAuthorized:true,
+   protectedReadCandidate:false,collections:['clientes']
+ });
+ assert.equal(liveResult.ok,false,'only controlled QA capture is expected');
+ assert.equal(directStoreDepsCalls,1,'LEGACY_CHANNEL_BEHAVIOR_MUST_REMAIN_UNCHANGED_PENDING_RULES_MIGRATION');
+ assert.equal(typeof capturedStoreDeps.getDocsFromServer,'function');
+ console.log('B4_003_PROTECTED_STORE_TRANSPORT_ISOLATION_PASS callable_only=true directDeps=0 legacy_unchanged=true');
 
  // Preview hostname alone must not authorize the protected read transport.
  const flagCase=(flag,hostname)=>{

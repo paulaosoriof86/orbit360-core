@@ -349,12 +349,19 @@
           return protectedReadRolePlan(collection,membership,selected,compiled);
         };
       }
-      var storeDeps = typeof deps.firebaseAdapter.storeDependencies === 'function'
-        ? deps.firebaseAdapter.storeDependencies(firebaseContext)
-        : { db: firebaseContext && firebaseContext.db };
+      // A protected Preview must never pass Firestore references, query helpers
+      // or snapshot callbacks to the product store. This is an explicit
+      // transport boundary, not a best-effort preference inside attach().
+      // Legacy direct-read dependencies remain available only to the existing
+      // unprotected channel until the shared rules migration is certified.
+      var storeDeps;
       if(options.protectedReadCandidate===true){
         if(typeof deps.protectedReadPage!=='function')throw new Error('PROTECTED_READ_PROVIDER_MISSING');
-        storeDeps.protectedReadPage=deps.protectedReadPage;
+        storeDeps={protectedReadPage:deps.protectedReadPage};
+      }else{
+        storeDeps=typeof deps.firebaseAdapter.storeDependencies==='function'
+          ?deps.firebaseAdapter.storeDependencies(firebaseContext)
+          :{db:firebaseContext&&firebaseContext.db};
       }
       store = window.Orbit.createFirestoreProductReadOnlyStoreP0(storeDeps, {
         tenantId: tenantId,

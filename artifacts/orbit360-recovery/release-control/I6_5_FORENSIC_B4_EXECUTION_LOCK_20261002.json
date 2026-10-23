@@ -627,7 +627,7 @@
   },
   "findingLedgerBlobSha": "8125e97dcf1feb7f46081f95327952e65c2d1077",
   "continuityRegisterBlobSha": "4e6b0ac51736be360c4b95abe8fc01d8f1e78e20",
-  "compositionLockBlobSha": "fc705b9f80fd9d20d67cfc79ff89116e520382dc",
+  "compositionLockBlobSha": "c9a52496d15fecbba152b509261d8238c142dc1b",
   "r18SourceFix": {
     "status": "SOURCE_FIXED_R18_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_SOURCE_FIX_20261005.json",
@@ -3926,6 +3926,20 @@
     "authenticatedUatAccepted": false,
     "sharedRulesDeployAuthorized": false,
     "operationalWriterDeploymentAuthorized": false,
+    "productionPromotionAuthorized": false
+  },
+  "b4003ProtectedStoreTransportSuccessor20261023": {
+    "status": "SOURCE_STAGED_SYNTHETIC_QA_PASS_SECURITY_HOLD",
+    "gate": "I6.5/B4-003",
+    "authority": "PAULA_CONTINUE_SCOPED_SOURCE_SECURITY_CORRECTION_20261023",
+    "parentHead": "9fa65116e5ddf9a3a0009d5befbf904d4aa1ddbc",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PROTECTED_STORE_TRANSPORT_SUCCESSOR_20261023.json",
+    "receiptBlobSha": "29ac9f885338425fcf922f7d6b94c1c4f12007ef",
+    "sourceBlobSha": "235c19fc9e55bd2e9338157b51ac157fca5ac002",
+    "qaBlobSha": "0da324fbe65d88a3820ee30bb40fbac425f4f320",
+    "syntheticQaPass": true,
+    "authenticatedUatAccepted": false,
+    "sharedRulesDeployAuthorized": false,
     "productionPromotionAuthorized": false
   }
 }

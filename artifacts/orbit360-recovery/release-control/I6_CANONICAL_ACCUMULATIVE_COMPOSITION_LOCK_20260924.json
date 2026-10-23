@@ -182,7 +182,7 @@
     "orbit360-platform/core/auth-password-change-v20260805.js": "873b484d42825db2fa31e0ae90c9ec78598728f4",
     "orbit360-platform/core/auth-product-runtime-p0.js": "b508b6ffad78602af9bfc294f3ee60b13b82890e",
     "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js": "60ce88178f48ff5d9b5fd01c1e2d92abe642dac1",
-    "orbit360-platform/core/backend-product-readonly-bootstrap-p0.js": "abf5e8d74f87f023b3f239565b44d1a9ac541590",
+    "orbit360-platform/core/backend-product-readonly-bootstrap-p0.js": "235c19fc9e55bd2e9338157b51ac157fca5ac002",
     "orbit360-platform/core/backend-resource-contracts.js": "826364d2a394d0bfe75d9f0ccdc5dd8905d2b3f0",
     "orbit360-platform/core/ciclo.js": "dc1e77c900edf6eb366bf836f19ecb0ebd17a541",
     "orbit360-platform/core/client-insurer-visual-contract-v20260720.js": "3fd89167a5a36662072dbdc3e970b48f61158343",
@@ -6468,6 +6468,18 @@
     "sourceBlobSha": "11065f9a4e5325d6387e70c9f5b7ddd1329666d2",
     "qaBlobSha": "e9d1a504b555d147a741a3717be5b2042305eabd",
     "syntheticWriteCasesPassed": 30,
+    "noSharedRulesDeploy": true,
+    "noOperationalWriterDeployment": true,
+    "noLivePromotion": true
+  },
+  "b4003ProtectedStoreTransportSuccessor20261023": {
+    "status": "SOURCE_STAGED_SYNTHETIC_QA_PASS_SECURITY_HOLD",
+    "gate": "I6.5/B4-003",
+    "parentHead": "9fa65116e5ddf9a3a0009d5befbf904d4aa1ddbc",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PROTECTED_STORE_TRANSPORT_SUCCESSOR_20261023.json",
+    "receiptBlobSha": "29ac9f885338425fcf922f7d6b94c1c4f12007ef",
+    "sourceBlobSha": "235c19fc9e55bd2e9338157b51ac157fca5ac002",
+    "qaBlobSha": "0da324fbe65d88a3820ee30bb40fbac425f4f320",
     "noSharedRulesDeploy": true,
     "noOperationalWriterDeployment": true,
     "noLivePromotion": true

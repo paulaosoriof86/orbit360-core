@@ -1,0 +1,39 @@
+{
+  "schema": "GI_I65_B4003_PROTECTED_STORE_TRANSPORT_SUCCESSOR_V1",
+  "gate": "I6.5/B4-003",
+  "status": "SOURCE_STAGED_SYNTHETIC_QA_PASS_SECURITY_HOLD",
+  "authority": "PAULA_CONTINUE_SCOPED_SOURCE_SECURITY_CORRECTION_20261023",
+  "parentHead": "9fa65116e5ddf9a3a0009d5befbf904d4aa1ddbc",
+  "rootCause": "The protected bootstrap still constructed and passed direct browser Firestore handles and listeners to the read-only store, even though its protected branch only needed the authenticated server-scoped callable. An accidental branch regression could regain direct reads under the legacy deployed rules.",
+  "sourceFiles": {
+    "orbit360-platform/core/backend-product-readonly-bootstrap-p0.js": {
+      "before": "abf5e8d74f87f023b3f239565b44d1a9ac541590",
+      "after": "235c19fc9e55bd2e9338157b51ac157fca5ac002"
+    }
+  },
+  "qaFiles": {
+    "tools/gravicentra-b4-003-protected-hydration.test.cjs": {
+      "before": "ae20c52f7e61cd0d2d1f62ae5094ea2b319625b2",
+      "after": "0da324fbe65d88a3820ee30bb40fbac425f4f320"
+    }
+  },
+  "verification": {
+    "transportDependencyAcquisitionInProtectedMode": 0,
+    "protectedStoreDependencyKeys": ["protectedReadPage"],
+    "legacyUnprotectedTransportUnchanged": true,
+    "focusedTestsPassed": 5,
+    "authenticatedRoleCountryUatAccepted": false,
+    "effectiveDeployedFirestoreRulesSecure": false,
+    "productionSecurityAccepted": false
+  },
+  "boundaries": {
+    "operationalBusinessWrites": 0,
+    "firebaseRulesChanged": false,
+    "sharedDataModified": false,
+    "sharedFirestoreRulesDeploymentAuthorized": false,
+    "operationalWriterDeploymentAuthorized": false,
+    "livePromotionAuthorized": false,
+    "productionAccepted": false,
+    "gateAdvanceAuthorized": false
+  }
+}

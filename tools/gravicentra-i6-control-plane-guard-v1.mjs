@@ -71,10 +71,19 @@ const COMP=readJson(I6_CANONICAL_COMPOSITION),FIND=readJson(I6_FINDINGS_LEDGER),
 // successor, while validating today's live working bytes independently below.
 const WRITER_COUNTRY=C.b4003WriterCountryFailClosedSuccessor20261023||{};
 const WRITER_COUNTRY_ACTIVE=WRITER_COUNTRY.status==='SOURCE_STAGED_SYNTHETIC_QA_PASS_SECURITY_HOLD';
+const PROTECTED_STORE_TRANSPORT=C.b4003ProtectedStoreTransportSuccessor20261023||{};
+const PROTECTED_STORE_TRANSPORT_ACTIVE=PROTECTED_STORE_TRANSPORT.status==='SOURCE_STAGED_SYNTHETIC_QA_PASS_SECURITY_HOLD';
+const protectedStorePreviousHash=p=>PROTECTED_STORE_TRANSPORT_ACTIVE&&[
+  'orbit360-platform/core/backend-product-readonly-bootstrap-p0.js',
+  'tools/gravicentra-b4-003-protected-hydration.test.cjs'
+ ].includes(p)?realGit('rev-parse',PROTECTED_STORE_TRANSPORT.parentHead+':'+p):git('hash-object',p);
+const protectedStoreHistoricCompositionBlob=p=>PROTECTED_STORE_TRANSPORT_ACTIVE&&
+ p==='orbit360-platform/core/backend-product-readonly-bootstrap-p0.js'
+ ?protectedStorePreviousHash(p):COMP.productFileBlobs?.[p];
 const writerPreviousHash=p=>WRITER_COUNTRY_ACTIVE&&[
   'functions/product-operational-domain.js',
   'tools/gravicentra-b4-003-operational-write-security-regression.test.cjs'
- ].includes(p)?realGit('rev-parse',WRITER_COUNTRY.parentHead+':'+p):realGit('hash-object',p);
+ ].includes(p)?realGit('rev-parse',WRITER_COUNTRY.parentHead+':'+p):protectedStorePreviousHash(p);
 // An exact B4-003 cumulative source successor is subordinate to the same
 // release/security HOLD. It does not rewrite, pass or waive prior approvals.
 const COUNTRY_RULES=C.b4003RulesCountryHydrationSourceSuccessor20261022||{};
@@ -156,8 +165,7 @@ if(WRITER_COUNTRY_ACTIVE){
  const source='functions/product-operational-domain.js';
  const qa='tools/gravicentra-b4-003-operational-write-security-regression.test.cjs';
  const current=realGit('rev-parse','HEAD');
- const parentMatches=current===WRITER_COUNTRY.parentHead||
-  realGit('rev-parse','HEAD^')===WRITER_COUNTRY.parentHead;
+ const parentMatches=realGit('merge-base',WRITER_COUNTRY.parentHead,current)===WRITER_COUNTRY.parentHead;
  const receiptSha=realGit('hash-object',WRITER_COUNTRY.receiptPath);
  need(parentMatches&&
   WRITER_COUNTRY.parentHead==='8e187a7bb1b788d886d021658846003b2756a995'&&
@@ -207,6 +215,68 @@ if(WRITER_COUNTRY_ACTIVE){
   B4.boundaries?.livePromotionAuthorized===false,
   'B4_003_WRITER_COUNTRY_FAIL_CLOSED_SOURCE_SUCCESSOR_INVALID');
  console.log('B4_003_WRITER_COUNTRY_FAIL_CLOSED=EXACT_SOURCE_SYNTHETIC_QA_PASS_RELEASE_HOLD');
+}
+// Latest narrowly scoped Preview transport hardening. Historical hashes are
+// checked at the committed parent, while the single cumulative composition
+// is pinned to the new working bytes. No change to shared Rules or LIVE.
+if(PROTECTED_STORE_TRANSPORT_ACTIVE){
+ const T=PROTECTED_STORE_TRANSPORT;
+ const R=readJson(T.receiptPath);
+ const B=B4.b4003ProtectedStoreTransportSuccessor20261023||{};
+ const P=COMP.b4003ProtectedStoreTransportSuccessor20261023||{};
+ const source='orbit360-platform/core/backend-product-readonly-bootstrap-p0.js';
+ const qa='tools/gravicentra-b4-003-protected-hydration.test.cjs';
+ const exactParent=realGit('rev-parse',T.parentHead);
+ const current=realGit('rev-parse','HEAD');
+ const parentIsReachable=realGit('merge-base',exactParent,current)===exactParent;
+ const receiptBlob=realGit('hash-object',T.receiptPath);
+ const sourceAfter=realGit('hash-object',source),qaAfter=realGit('hash-object',qa);
+ const currentComp=realGit('hash-object',I6_CANONICAL_COMPOSITION);
+ const currentB4=realGit('hash-object',ACTIVE_I65_FORENSIC_B4);
+ need(T.gate==='I6.5/B4-003'&&T.parentHead==='9fa65116e5ddf9a3a0009d5befbf904d4aa1ddbc'&&
+  (current===T.parentHead||parentIsReachable)&&
+  T.authority==='PAULA_CONTINUE_SCOPED_SOURCE_SECURITY_CORRECTION_20261023'&&
+  R.schema==='GI_I65_B4003_PROTECTED_STORE_TRANSPORT_SUCCESSOR_V1'&&
+  R.gate===T.gate&&R.status===T.status&&R.authority===T.authority&&R.parentHead===T.parentHead&&
+  T.receiptBlobSha===receiptBlob&&B.receiptBlobSha===receiptBlob&&P.receiptBlobSha===receiptBlob&&
+  sameJson(Object.keys(R.sourceFiles||{}),[source])&&sameJson(Object.keys(R.qaFiles||{}),[qa])&&
+  R.sourceFiles[source]?.before===realGit('rev-parse',T.parentHead+':'+source)&&
+  R.qaFiles[qa]?.before===realGit('rev-parse',T.parentHead+':'+qa)&&
+  R.sourceFiles[source]?.after===sourceAfter&&R.qaFiles[qa]?.after===qaAfter&&
+  R.sourceFiles[source]?.before!==sourceAfter&&R.qaFiles[qa]?.before!==qaAfter&&
+  T.sourceBlobSha===sourceAfter&&B.sourceBlobSha===sourceAfter&&P.sourceBlobSha===sourceAfter&&
+  T.qaBlobSha===qaAfter&&B.qaBlobSha===qaAfter&&P.qaBlobSha===qaAfter&&
+  COMP.productFileBlobs?.[source]===sourceAfter&&COMP.productFiles.includes(source)&&
+  B4.boundaries?.allowedProductFiles?.includes(source)&&B4.boundaries?.allowedQaFiles?.includes(qa)&&
+  realGit('rev-parse',T.parentHead+':'+I6_CANONICAL_COMPOSITION)==='fc705b9f80fd9d20d67cfc79ff89116e520382dc'&&
+  realGit('rev-parse',T.parentHead+':'+ACTIVE_I65_FORENSIC_B4)==='57d5ea416cc00c27e7d7e8577e84b5d2c2475308'&&
+  C.canonicalAccumulationControl?.compositionLockBlobSha===currentComp&&
+  B4.compositionLockBlobSha===currentComp&&
+  C.currentB4?.compositionLockBlobSha===currentComp&&
+  C.currentB4?.executionLockBlobSha===currentB4&&
+  C.i65ForensicRemediationPlan?.b4?.executionLockBlobSha===currentB4&&
+  R.verification?.transportDependencyAcquisitionInProtectedMode===0&&
+  sameJson(R.verification?.protectedStoreDependencyKeys,['protectedReadPage'])&&
+  R.verification?.legacyUnprotectedTransportUnchanged===true&&
+  R.verification?.focusedTestsPassed===5&&B.syntheticQaPass===true&&T.syntheticQaPass===true&&
+  R.verification?.authenticatedRoleCountryUatAccepted===false&&
+  R.verification?.effectiveDeployedFirestoreRulesSecure===false&&
+  R.verification?.productionSecurityAccepted===false&&
+  R.boundaries?.operationalBusinessWrites===0&&R.boundaries?.firebaseRulesChanged===false&&
+  R.boundaries?.sharedDataModified===false&&
+  R.boundaries?.sharedFirestoreRulesDeploymentAuthorized===false&&
+  R.boundaries?.operationalWriterDeploymentAuthorized===false&&
+  R.boundaries?.livePromotionAuthorized===false&&R.boundaries?.productionAccepted===false&&
+  R.boundaries?.gateAdvanceAuthorized===false&&
+  T.sharedFirestoreRulesDeploymentAuthorized===false&&
+  T.operationalWriterDeploymentAuthorized===false&&T.livePromotionAuthorized===false&&
+  T.productionReadinessUnchanged===true&&
+  C.b4003SecurityReleaseHold?.status==='ACTIVE_FAIL_CLOSED_UNAUTHORIZED_BROWSER_FIRESTORE_READ_WRITE'&&
+  C.b4003SecurityReleaseHold?.livePromotionAuthorized===false&&
+  C.b4003SecurityReleaseHold?.firestoreRulesDeployAuthorized===false&&
+  B4.boundaries?.livePromotionAuthorized===false,
+  'B4_003_PROTECTED_STORE_TRANSPORT_SUCCESSOR_INVALID');
+ console.log('B4_003_PROTECTED_STORE_TRANSPORT=CALLABLE_ONLY_SYNTHETIC_QA_PASS_RELEASE_HOLD');
 }
 // B4-003: A successor never rewrites the certified blobs of an older Preview.
 // Its source is checked against the parent commit, the canonical composition,
@@ -440,8 +510,8 @@ if(POST_AUTH_ACTIVE){
    }])))&&
    expected.every(p=>
      receipt.sourceFiles[p].before===git('rev-parse',POST_AUTH.parentHead+':'+p)&&
-     receipt.sourceFiles[p].after===COMP.productFileBlobs?.[p]&&
-     receipt.sourceFiles[p].after===git('hash-object',p)&&
+     receipt.sourceFiles[p].after===protectedStoreHistoricCompositionBlob(p)&&
+     receipt.sourceFiles[p].after===protectedStorePreviousHash(p)&&
      COMP.productFiles.includes(p)&&B4.boundaries?.allowedProductFiles?.includes(p))&&
    receipt.qa.path===POST_AUTH.qaPath&&receipt.qa.blobSha===POST_AUTH.qaBlobSha&&
    POST_AUTH.qaBlobSha===git('hash-object',POST_AUTH.qaPath)&&
