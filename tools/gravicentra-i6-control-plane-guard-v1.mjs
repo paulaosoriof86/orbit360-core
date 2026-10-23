@@ -116,6 +116,49 @@ if(SAFE_DIAG_ACTIVE){
   'B4_003_SAFE_POST_AUTH_DIAGNOSTIC_SUCCESSOR_INVALID');
  console.log('B4_003_SAFE_POST_AUTH_DIAGNOSTIC=VM_PASS_REAL_AUTH_FAILURE_RETAINED_RELEASE_HOLD');
 }
+// Scope the new browser diagnostic strictly to the verified source successor
+// and isolated read-only Preview. It is never a security or production PASS.
+const SAFE_DIAG_PREVIEW=C.b4003SafePostAuthDiagnosticPreviewAuthorization20261023||{};
+if(SAFE_DIAG_PREVIEW.status==='AUTHORIZED_EXACT_ISOLATED_READONLY_PREVIEW'){
+ const P=SAFE_DIAG_PREVIEW,R=readJson(P.receiptPath);
+ const B=B4.b4003SafePostAuthDiagnosticPreviewAuthorization20261023||{};
+ const sourceFiles=Object.assign({},R.sourceBlobs,R.qaBlobs);
+ const parent=realGit('merge-base',P.sourceCommit,'HEAD');
+ need(P.gate==='I6.5/B4-003'&&
+  P.authority==='PAULA_CONTINUE_EXISTING_I65_B4003_AFTER_AUTHENTICATED_LOGIN_FAIL_20261023'&&
+  P.triggerSubject==='build(i6.5 B4-003): safe post-auth diagnostic Preview'&&
+  P.sourceCommit==='23d3a012b77e98927b8dd9219953d0cfaffca14b'&&parent===P.sourceCommit&&
+  sameJson(P,B)&&
+  R.schema==='GI_I65_B4003_SAFE_POST_AUTH_DIAGNOSTIC_PREVIEW_AUTH_V1'&&
+  R.status===P.status&&R.gate===P.gate&&R.authority===P.authority&&
+  R.triggerSubject===P.triggerSubject&&R.sourceCommit===P.sourceCommit&&
+  P.receiptBlobSha===realGit('hash-object',P.receiptPath)&&
+  R.sourceReceiptPath===SAFE_DIAG.receiptPath&&
+  R.sourceReceiptBlobSha===SAFE_DIAG.receiptBlobSha&&
+  P.sourceReceiptBlobSha===SAFE_DIAG.receiptBlobSha&&
+  P.sourceReceiptBlobSha===realGit('hash-object',SAFE_DIAG.receiptPath)&&
+  sameJson(Object.keys(sourceFiles).sort(),SAFE_DIAG_FILES.slice().sort())&&
+  Object.entries(sourceFiles).every(([p,sha])=>sha===realGit('hash-object',p)&&
+   sha===realGit('rev-parse',P.sourceCommit+':'+p))&&
+  R.compositionBlobSha===P.compositionBlobSha&&
+  P.compositionBlobSha===realGit('hash-object',I6_CANONICAL_COMPOSITION)&&
+  R.rosterSourceBlobSha===P.rosterSourceBlobSha&&
+  P.rosterSourceBlobSha===realGit('hash-object','functions/assignable-advisor-roster.js')&&
+  sameJson(P.onlyReadOnlyFunctions,['orbit360ScopedPolicyReadPreview','orbit360AssignableAdvisorRosterPreview'])&&
+  sameJson(R.onlyReadOnlyFunctions,P.onlyReadOnlyFunctions)&&
+  ['onlyIsolatedHosting','authenticatedRoleCountryUatRequired','previewEvidenceNotProductionAcceptance']
+   .every(k=>P[k]===true&&R[k]===true)&&
+  ['sharedFirestoreRulesDeployAuthorized','otherFunctionsDeployAuthorized',
+   'operationalWriterDeployAuthorized','businessWritesAuthorized','syntheticQaWritesAuthorized',
+   'realUserImpersonationAuthorized','livePromotionAuthorized','dataRefreshAuthorized','reimportAuthorized']
+   .every(k=>P[k]===false&&R[k]===false)&&
+  R.previousAuthenticatedUatStatus==='FAIL_READONLY_BOOTSTRAP_BLOCKED'&&
+  C.b4003SecurityReleaseHold?.status==='ACTIVE_FAIL_CLOSED_UNAUTHORIZED_BROWSER_FIRESTORE_READ_WRITE'&&
+  B4.boundaries?.livePromotionAuthorized===false&&
+  B4.boundaries?.realOperationalWritesAuthorized===false,
+  'B4_003_SAFE_POST_AUTH_DIAGNOSTIC_PREVIEW_AUTH_INVALID');
+ console.log('B4_003_SAFE_POST_AUTH_DIAGNOSTIC_PREVIEW_AUTH=EXACT_ISOLATED_READONLY_SECURITY_HOLD');
+}
 // The writer security successor is a new, exact source version. Preserve the
 // 22-Oct signed country/rules receipt against the bytes committed before this
 // successor, while validating today's live working bytes independently below.
