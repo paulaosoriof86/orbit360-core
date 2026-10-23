@@ -11807,10 +11807,10 @@
     "gate": "I6.5/B4-003",
     "owner": "functions/product-operational-domain.js",
     "baseBlob": "61bbd6d4bc9e687fa698c129e4ffd4fb4fb085b7",
-    "candidateBlob": "edbe77331327fdfa05a278d7c1f1b68005d70773",
+    "candidateBlob": "2c2a3cef60fb8a12ff4994f0d1271cb266602bac",
     "mode": "EXACT_SOURCE_ONLY_NO_RUNTIME_MUTATION",
-    "status": "SOURCE_STAGED_PENDING_GOVERNANCE_QA_MEMBERSHIP_TEAM",
-    "authorityReceipt": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_AUDIT_COMPLEMENT_EXECUTION_20261016.md",
+    "status": "SOURCE_STAGED_QA_PASS_RELEASE_HOLD",
+    "authorityReceipt": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_RULES_COUNTRY_HYDRATION_SOURCE_SUCCESSOR_20261022.json",
     "sourceChangeAuthorized": true,
     "generalProductMutationAuthorized": false,
     "operationalDataWritesAuthorized": false,
@@ -11820,15 +11820,16 @@
     "livePromotionAuthorized": false,
     "wholeTaskClosed": false,
     "formalPointsAdded": 0,
-    "previousCandidateBlob": "c53930ce987f589eee1873b1743d0c350324e9d2",
+    "previousCandidateBlob": "edbe77331327fdfa05a278d7c1f1b68005d70773",
     "securityCoverage": [
       "ACTIVE_MEMBERSHIP_STATUS_AND_ALIASES",
       "EFFECTIVE_ROLE_TEAM_OVERRIDE_FOR_READ_AND_WRITE",
-      "NO_DERIVED_TEAM_ESCALATION_WHEN_ROLE_OVERRIDE_PRESENT"
+      "NO_DERIVED_TEAM_ESCALATION_WHEN_ROLE_OVERRIDE_PRESENT",
+      "COUNTRY_BOUNDARY_ON_GLOBAL_INSURER_OPERATIONAL_RECORDS"
     ],
     "newTestPath": "tools/gravicentra-b4-003-operational-write-security-regression.test.cjs",
-    "newTestBlob": "2f1945c9933353500319f05807054c2935d4a183",
-    "newTestCases": 24
+    "newTestBlob": "391f67841cd86c70d5cbc281f073b9d617b6fc24",
+    "newTestCases": 27
   },
   "b4003LatestScopedReadOnlyPreview20261017": {
     "status": "EXACT_HOSTING_READBACK_PUBLIC_SMOKE_PASS_AUTHENTICATED_PENDING",
