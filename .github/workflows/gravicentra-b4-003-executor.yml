@@ -1,5 +1,5 @@
 # B4-003 canonical-vs-inactivo and Auth IAM eligibility diagnostic only; no writes, no LIVE.
-# 2026-10-23: exact existing B4-003 protected rules-country source Preview retrigger; no shared Firestore Rules, operational writes or LIVE publication.
+# 2026-10-23: exact protected rules-country Preview retrigger; use runner-provided Chromium dependencies after apt mirror timeout and dpkg lock. No shared rules or LIVE.
 # 2026-10-20: current B4-003 exact aging/CO read-only Preview after source QA and guard 39502965910 PASS; no shared rules, user tokens, operational writes or LIVE.
 # 2026-10-20: retrigger exact country/finance Preview after guard reconciliation PASS run 39490137737; source blobs remain fixed, no shared rules/LIVE.
 # B4-003 paging GT/CO test corrected 2026-10-15; rerun cumulative protected Preview only; do not deploy shared rules, LIVE or data writes.
@@ -2014,7 +2014,10 @@ jobs:
           chmod 600 "$RUNNER_TEMP/b4-003-sa.json"
           echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/b4-003-sa.json" >> "$GITHUB_ENV"
           retry_bounded 420 npm install --no-save --package-lock=false firebase-admin@13.4.0 playwright@1.55.0
-          retry_bounded 600 npx playwright install --with-deps chromium
+          # ubuntu-24.04 hosted runners already provide the Chromium system
+          # libraries. Avoid apt upgrade/install here: mirror stalls leave
+          # orphaned apt-get locks and block a bounded second attempt.
+          retry_bounded 600 npx playwright install chromium
 
       - name: Resolve public web config
         if: steps.gate.outputs.run == 'true' || steps.gate.outputs.renewals_preview == 'true' || steps.gate.outputs.scoped_preview == 'true'
