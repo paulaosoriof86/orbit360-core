@@ -42,8 +42,26 @@ test('S5.12D UI consumes resolver and does not contain stale insurer directory n
   assert.doesNotMatch(c,/2225-7500|2279-9989|2208-0700/);
 });
 
-test('S5.12D endpoint origin allowlist is LAB only',()=>{
-  assert.equal(r.ALLOWED_ORIGINS.has('https://ays-orbit-360-lab.web.app'),true);
-  assert.equal(r.ALLOWED_ORIGINS.has('https://ays-orbit-360-lab.firebaseapp.com'),true);
-  assert.equal(r.ALLOWED_ORIGINS.has('https://example.com'),false);
+test('S5.12D endpoint allows exact LAB and A&S HTTPS origins without wildcard',()=>{
+  assert.deepEqual([...r.ALLOWED_ORIGINS].sort(),[
+    'https://ays-orbit-360-lab.web.app',
+    'https://ays-orbit-360-lab.firebaseapp.com',
+    'https://aysseguros.com'
+  ].sort());
+  for(const denied of [
+    'http://aysseguros.com',
+    'https://www.aysseguros.com',
+    'https://aysseguros.com.evil.invalid',
+    'https://aysseguros.com:443',
+    'https://example.com',
+    '*',
+    'null'
+  ])assert.equal(r.ALLOWED_ORIGINS.has(denied),false);
+  const headers={};
+  const response={set:(k,v)=>{headers[k]=v;return response;}};
+  assert.equal(r.allowOrigin({get:()=> 'https://aysseguros.com'},response),true);
+  assert.equal(headers['Access-Control-Allow-Origin'],'https://aysseguros.com');
+  assert.equal(headers.Vary,'Origin');
+  assert.equal(headers['Access-Control-Allow-Methods'],'GET, OPTIONS');
+  assert.equal(r.allowOrigin({get:()=> 'https://example.com'},response),false);
 });
