@@ -244,7 +244,11 @@ Orbit.modules.inicio = (function () {
     };
     const confirmedMap=metricMap('alDia'),pendingMap=metricMap('pend'),overdueMap=metricMap('venc');
     const confirmedRows=paymentReadiness==='ready'&&q.cobrosConfirmadosRows?q.cobrosConfirmadosRows():[],pendingRows=portfolioReadiness==='ready'&&q.carteraPendienteRows?q.carteraPendienteRows():[],overdueRows=portfolioReadiness==='ready'&&q.carteraVencidaRows?q.carteraVencidaRows():[];
-    const valuedCount=rows=>rows.filter(r=>U.finiteNumber(r&&r.monto)!=null||U.finiteNumber(r&&r.saldo)!=null).length;
+    // The totals also include strictly proven receipt-backed amounts. The
+    // "con monto" count must use exactly that canonical proof, otherwise the
+    // dashboard can show COP 8.2M while falsely saying "0 con monto".
+    const portfolioCountContext=portfolioReadiness==='ready'?q.portfolioAmountContext():null;
+    const valuedCount=rows=>q.portfolioValuedRowsCount(rows,portfolioCountContext);
     const diasMes=new Date(U.now().getFullYear(),U.now().getMonth()+1,0).getDate()-U.now().getDate();
     const readinessCount=(state,readyText,loadingText)=>state==='ready'?readyText:state==='unavailable'?'No disponible':loadingText;
     const advisorBoardHtml=productionReadiness==='unavailable'||advisorReadiness==='unavailable'

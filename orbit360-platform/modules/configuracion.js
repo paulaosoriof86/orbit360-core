@@ -108,23 +108,20 @@ Orbit.modules.configuracion = (function () {
 
   /* ---------- USUARIOS Y PERMISOS ---------- */
   function usuarios() {
-    const roles = Orbit.ROLES;
-    const team = Orbit.store.all('asesores');
-    return `${sectionHead('Usuarios y permisos', 'Roles por módulo, metas y visibilidad')}
-      <div class="card" style="overflow:hidden;margin-bottom:16px"><table class="tbl">
-        <thead><tr><th>Usuario</th><th>Rol</th><th>Comisión</th><th>Meta prima</th><th></th></tr></thead>
-        <tbody>${team.map(a => `<tr>
-          <td><div style="display:flex;align-items:center;gap:9px">${U.avatar(a.nombre, a.color, 'sm')}<b>${U.esc(a.nombre)}</b></div></td>
-          <td><select class="o-sel" data-role="${a.id}">${Object.keys(roles).map(r => `<option ${a.rol === r || (a.rol && a.rol.includes(r)) ? 'selected' : ''}>${r}</option>`).join('')}</select></td>
-          <td>${a.comTipo ? `<span class="badge ${a.comTipo === 'variable' ? 'info' : 'neutral'}">${a.comTipo} · ${a.comPct}%</span>` : '—'}</td>
-          <td class="num">${U.money(a.metaPrima, (a.pais === 'CO' ? 'COP' : a.pais === 'GT' ? 'GTQ' : Orbit.q.monedaPais()))}</td>
-          <td style="text-align:right"><button class="btn ghost sm" onclick="Orbit.modules.equipo.editar('${a.id}')">Permisos</button></td>
-        </tr>`).join('')}</tbody>
-      </table></div>
-      <div class="cfg-grid2">
-        ${Object.entries(roles).map(([r, d]) => `<div class="cfg-rolecard"><b>${r}</b><span class="cfg-nivel">Nivel ${d.nivel}</span><p>${d.desc}</p></div>`).join('')}
-      </div>
-      <button class="btn primary" style="margin-top:14px" onclick="Orbit.modules.equipo.editar(null)">+ Invitar usuario</button>`;
+    // B4-003: Equipo y permisos is the canonical owner of multi-role,
+    // country scopes and membership-backed user administration. The former
+    // shadow table depended on Orbit.ROLES (legacy-only, absent in the clean
+    // authenticated entrypoint) and crashed when Configuración was opened.
+    // Never re-create a second editable permissions authority here.
+    const canOpenTeam = !!(Orbit.access && typeof Orbit.access.can === 'function' && Orbit.access.can('equipo', 'view'));
+    return `${sectionHead('Usuarios y permisos', 'Administración canónica de usuarios, roles y países')}
+      <div class="card pad" data-cfg-usuarios-owner="equipo">
+        <b>Equipo y permisos</b>
+        <p style="margin:8px 0 14px">Los usuarios, invitaciones, roles múltiples, países autorizados, permisos por módulo, comisiones y metas se gestionan desde una sola autoridad.</p>
+        ${canOpenTeam
+          ? '<a class="btn primary" href="#/equipo" data-cfg-open-equipo="1">Abrir Equipo y permisos →</a>'
+          : '<div class="cfg-note" data-cfg-team-denied="1">Tu rol activo no permite administrar usuarios ni permisos.</div>'}
+      </div>`;
   }
 
   /* ---------- PAÍSES Y MONEDAS ---------- */

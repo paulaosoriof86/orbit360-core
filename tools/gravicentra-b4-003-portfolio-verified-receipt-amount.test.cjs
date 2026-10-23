@@ -3,6 +3,7 @@
 // Does not issue authentication tokens, access Firestore, or write business data.
 const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
 const source=fs.readFileSync('orbit360-platform/core/queries.js','utf8');
+const inicioSource=fs.readFileSync('orbit360-platform/modules/inicio.js','utf8');
 const asOf='2026-10-21',cases=[];
 function scenario({country='CO',currency='COP',carAmount=null,receiptAmount=6260611,
   due='2026-01-01',receiptDue='2026-01-01',receiptCurrency=currency,
@@ -28,17 +29,19 @@ function scenario({country='CO',currency='COP',carAmount=null,receiptAmount=6260
  const Orbit={store:S,ui:U,pais:country};
  vm.runInNewContext(source,{window:{Orbit},Orbit,Map,Set,Date,Number,String,Array});
  const q=Orbit.q,ctx=q.portfolioAmountContext(),proof=q.portfolioAmountProof(data.carteraPrimas[0],ctx);
+ const verifiedRows=q.portfolioValuedRowsCount(data.carteraPrimas,ctx);
  const overview=q.carteraGlobalPorMoneda(),aging=q.agingVencidoPorMoneda(),sum=q.clienteResumen('c1'),indexed=q.clientesResumenIndex().get('c1');
  const bills=overview.byCurrency[currency]||{};
- return{proof,value:bills.venc||0,aging:aging.byCurrency[currency]||{},summary:sum.vencido,
+ return{proof,verifiedRows,value:bills.venc||0,aging:aging.byCurrency[currency]||{},summary:sum.vencido,
    indexed:indexed.vencido,receipts:data.recibosEsperados.length,portfolio:data.carteraPrimas.length,
    cobros:data.cobros.length};
 }
-function check(name,opts,{value,source}){const r=scenario(opts);
+function check(name,opts,{value,source,valuedRows}){const r=scenario(opts);
  assert.equal(r.value,value,name+': aggregate');
  assert.equal(r.summary,value,name+': client detail');
  assert.equal(r.indexed,value,name+': client batch');
  assert.equal(r.proof.source,source,name+': source');
+ assert.equal(r.verifiedRows,valuedRows==null?(source==='UNVERIFIED'?0:1):valuedRows,name+': valued rows are provenance-backed');
  if(value>0)assert.equal(Object.values(r.aging).reduce((a,b)=>a+b,0),value,name+': aging');
  cases.push(name);return r;}
 const src='MATCHED_EXPECTED_RECEIPT_CONTRACTUAL_AMOUNT',un='UNVERIFIED';
@@ -60,5 +63,6 @@ check('CO_733878_95',{receiptAmount:733878.95},{value:733878.95,source:src});
 check('CO_1227140_09',{receiptAmount:1227140.09},{value:1227140.09,source:src});
 const sum=6260611+733878.95+1227140.09;
 assert.ok(Math.abs(sum-8221630.04)<0.001,'source-backed 3 policies no fabricated amount');
+assert.match(inicioSource,/q\.portfolioValuedRowsCount\(rows,portfolioCountContext\)/,'Inicio uses canonical proven-valued row count');
 assert.equal(positive.receipts,1);assert.equal(positive.portfolio,1);assert.equal(positive.cobros,0);
 console.log('PASS B4_003_PORTFOLIO_VERIFIED_RECEIPT_READMODEL checks='+cases.length+' source_records=three_CO financial_SUM_COP_8221630_04 no_firestore/no_cobros/no_writes');

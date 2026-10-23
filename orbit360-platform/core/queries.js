@@ -143,6 +143,13 @@ Orbit.q = (function () {
     const proof=portfolioAmountProof(row,ctx);
     return proof.value==null?0:proof.value;
   }
+  function portfolioValuedRowsCount(rows, ctx) {
+    // Counts the same provenance-confirmed amount universe used by the KPIs.
+    // Explicit amounts and uniquely matched expected receipts both count;
+    // unverified nominal amounts never silently become reliable amounts.
+    const proofContext=ctx||portfolioAmountContext();
+    return (Array.isArray(rows)?rows:[]).filter(row=>portfolioAmountProof(row,proofContext).value!=null).length;
+  }
 
   // B3-008: la fórmula aprobada de Salud vive en un único owner.
   function saludCliente(cli, vigentes, vencido) {
@@ -579,6 +586,6 @@ Orbit.q = (function () {
     asesor, aseguradora, polizasDe, recibosEsperadosDe, carteraPrimasDe, carteraPendienteDe, carteraVencidaDe, cobrosDe, comisionesDe, actividadesDe, cancelacionesDe,
     clienteResumen, clientesResumenIndex, saludCliente, carteraGlobal, carteraPendienteRows, carteraVencidaRows, cobrosConfirmadosRows, carteraGlobalPorMoneda, primaVigenteGlobal, renovacionesProximas, cobrosVencidos, leaderboard,
     clientesScoped, polizasScoped, realizedPaymentRows, currentMonthKey, produccionMesPorMoneda, recaudoMesPorMoneda, metaAdvisorMes, leaderboardMes,
-    agingVencido, agingVencidoPorMoneda, portfolioAmountProof, portfolioAmountContext, comisionesPor, clienteNombre, norm, monedaPais, policyLinkedClientId, policyLinkedCountry, vehiculosDe, vehiculoDePoliza, postRecaudo
+    agingVencido, agingVencidoPorMoneda, portfolioAmountProof, portfolioAmountContext, portfolioValuedRowsCount, comisionesPor, clienteNombre, norm, monedaPais, policyLinkedClientId, policyLinkedCountry, vehiculosDe, vehiculoDePoliza, postRecaudo
   };
 })();
