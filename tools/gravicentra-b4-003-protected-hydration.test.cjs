@@ -174,6 +174,37 @@ const pause=()=>new Promise(ok=>setTimeout(ok,30));
  assert.equal(bulkCalls.length,3,'P0_NO_9_SEQUENTIAL_CLIENT_PAGE_ROUNDTRIPS');
  assert.equal(direct,0,'P0_NO_BROWSER_FIRESTORE_FALLBACK');
  console.log('B4_003_P0_CLIENT_PAGE_BATCHING_SYNTHETIC_PASS clients=443 calls=3 pageSize=200 directFirestore=0 writes=0');
+ // Cross-country calls may overlap, but the visible snapshot is all-or-none.
+ // An early GT response must never expose a partial or stale role universe.
+ const pendingCountries={},concurrentCalls=[];
+ const concurrentDeps={...deps,protectedReadPage:req=>new Promise(resolve=>{
+   concurrentCalls.push(req.country);
+   pendingCountries[req.country]=resolve;
+ })};
+ const concurrentStore=win.Orbit.createFirestoreProductReadOnlyStoreP0(concurrentDeps,config(['clientes']));
+ assert.equal(concurrentStore._attachSnapshots(),true);
+ await pause();
+ assert.deepEqual(concurrentCalls,['GT','CO'],'COUNTRIES_MUST_START_WITHOUT_SERIAL_WAIT');
+ const response=(country,id)=>({ok:true,serverScoped:true,collection:'clientes',country,
+   rows:[{id,canonicalDocumentId:id,tenantId:tenant,pais:country}],nextCursor:null});
+ pendingCountries.GT(response('GT','parallel-gt'));
+ await pause();
+ assert.equal(concurrentStore.all('clientes').length,0,'PARTIAL_COUNTRY_MUST_NOT_RENDER');
+ assert.equal(concurrentStore._productStatus().serverConfirmedCollections.includes('clientes'),false,
+   'PARTIAL_COUNTRY_MUST_NOT_CONFIRM_SOURCE');
+ pendingCountries.CO(response('CO','parallel-co'));
+ await pause();
+ assert.deepEqual(Array.from(concurrentStore.all('clientes'),x=>x.id),['parallel-gt','parallel-co'],
+   'CONCURRENT_COUNTRIES_PRESERVE_DETERMINISTIC_COUNTRY_ORDER');
+ const invalidStore=win.Orbit.createFirestoreProductReadOnlyStoreP0({...deps,protectedReadPage:async req=>
+   response(req.country,'cross-country-shared-document')},config(['clientes']));
+ assert.equal(invalidStore._attachSnapshots(),true);
+ await pause();
+ assert.equal(invalidStore.all('clientes').length,0,'CROSS_COUNTRY_DUPLICATE_MUST_NOT_RENDER');
+ assert.match(invalidStore._productStatus().snapshotErrors.clientes,/PROTECTED_READ_DUPLICATE_OR_MISSING_ID/,
+   'CROSS_COUNTRY_DUPLICATE_MUST_FAIL_CLOSED');
+ assert.equal(direct,0,'CONCURRENT_READS_MUST_NOT_USE_DIRECT_FIRESTORE');
+ console.log('B4_003_PARALLEL_COUNTRY_READ_ATOMIC_COMMIT_SYNTHETIC_PASS starts=2 no_partial no_duplicate no_direct_firestore writes=0');
  console.log('B4_003_PROTECTED_EIGHT_REQUIRED_COLLECTIONS_QA_PASS checks=5 no_direct_firestore multi_country_advisor_merged');
  const flowsConfig=config(['negocios','gestiones']);flowsConfig.requiredCollections=['negocios','gestiones'];
  const flows=win.Orbit.createFirestoreProductReadOnlyStoreP0(deps,flowsConfig);

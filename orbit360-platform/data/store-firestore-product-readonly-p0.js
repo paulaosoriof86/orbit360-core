@@ -90,9 +90,12 @@
         if(countries.indexOf(selectedCountry)<0)return Promise.reject(new Error('PROTECTED_READ_COUNTRY_DENIED'));
         countries=[selectedCountry];
       }
-      var initialRole=role(),rows=[],seen=new Set(),pageSize=(collection==='polizas'||collection==='clientes'||['vehiculos','recibosEsperados','carteraPrimas','cobros'].includes(collection))?200:50;
-      return countries.reduce(function(pr,country){return pr.then(function(){
-        var cursor='',pages=0,countrySeen=new Set();
+      var initialRole=role(),pageSize=(collection==='polizas'||collection==='clientes'||['vehiculos','recibosEsperados','carteraPrimas','cobros'].includes(collection))?200:50;
+      // Each country's pages remain sequential to preserve cursor integrity.
+      // Independent authorized countries can load concurrently, but nothing
+      // becomes visible until *every* country passes its full validation.
+      return Promise.all(countries.map(function(country){
+        var cursor='',pages=0,countrySeen=new Set(),countryRows=[];
         function next(){
           if(epoch!==protectedEpoch||role()!==initialRole)throw new Error('PROTECTED_READ_CONTEXT_CHANGED');
           if(++pages>100)throw new Error('PROTECTED_READ_PAGE_LIMIT');
@@ -103,24 +106,32 @@
                 throw new Error('PROTECTED_READ_RESPONSE_INVALID');
               r.rows.forEach(function(x){
                 var id=text(x&&x.canonicalDocumentId||x&&x.id);
-                if(!id||countrySeen.has(id)||(seen.has(id)&&collection!=='asesores'&&collection!=='auditoria'))
+                if(!id||countrySeen.has(id))
                   throw new Error('PROTECTED_READ_DUPLICATE_OR_MISSING_ID');
                 if(text(x.tenantId)&&text(x.tenantId)!==state.tenantId)
                   throw new Error('PROTECTED_READ_TENANT_MISMATCH');
                 if(text(x.pais||x.country).toUpperCase()!==country)
                   throw new Error('PROTECTED_READ_COUNTRY_MISMATCH');
                 countrySeen.add(id);
-                if(seen.has(id))return; // One advisor may serve both authorized countries.
-                seen.add(id);rows.push(x);
+                countryRows.push(x);
               });
               if(!r.nextCursor)return;
               if(!r.rows.length||r.nextCursor===cursor)throw new Error('PROTECTED_READ_CURSOR_INVALID');
               cursor=r.nextCursor;return next();
             });
         }
-        return next();
-      });},Promise.resolve()).then(function(){
+        return next().then(function(){return countryRows;});
+      })).then(function(countryBatches){
         if(epoch!==protectedEpoch||role()!==initialRole)throw new Error('PROTECTED_READ_CONTEXT_CHANGED');
+        var seen=new Set(),rows=[];
+        countryBatches.forEach(function(batch){batch.forEach(function(x){
+          var id=text(x&&x.canonicalDocumentId||x&&x.id);
+          if(seen.has(id)){
+            if(collection!=='asesores'&&collection!=='auditoria')throw new Error('PROTECTED_READ_DUPLICATE_OR_MISSING_ID');
+            return; // One advisor may serve both authorized countries.
+          }
+          seen.add(id);rows.push(x);
+        });});
         return rows;
       });
     }

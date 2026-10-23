@@ -31,6 +31,9 @@ async function run(){
    await setDoc(doc(db,member('advisorGT')),{uid:'advisorGT',tenantId:tenant,status:'active',roles:['Asesor'],advisorId:'advisor-other',countries:['GT'],dataScopes:{default:'own'}});
    await setDoc(doc(db,member('adminGT')),{uid:'adminGT',tenantId:tenant,status:'active',roles:['Admin'],activeRole:'Admin',modulesVisible:['equipo'],countries:['GT','CO'],dataScopes:{default:'all'}});
    await setDoc(doc(db,member('suspendedGT')),{uid:'suspendedGT',tenantId:tenant,status:'active',estado:'suspended',roles:['Operativo'],activeRole:'Operativo',advisorId:'advisor-own',countries:['GT'],dataScopes:{default:'own'}});
+   await setDoc(doc(db,member('tenantMismatch')),{uid:'tenantMismatch',tenantId:'another-tenant',status:'active',roles:['Asesor'],countries:['GT']});
+   await setDoc(doc(db,member('noRoles')),{uid:'noRoles',tenantId:tenant,status:'active',roles:[]});
+   await setDoc(doc(db,member('blocked')),{uid:'blocked',tenantId:tenant,status:'blocked',roles:['Asesor']});
    await setDoc(doc(db,canonical('aseguradoras','insGT')),{id:'insGT',tenantId:tenant,pais:'GT',nombre:'Synthetic Insurer GT',password:'NEVER_EXPOSE_PASSWORD',portales:[{id:'portal',usuario:'test-user',password:'NEVER_EXPOSE_PORTAL',credentialRef:'cred_synthetic'}],cuentas:[{banco:'Synthetic Bank',numero:'00001111',tipo:'Monetaria',moneda:'GTQ'}]});
    await setDoc(doc(db,canonical('aseguradoras','insCO')),{id:'insCO',tenantId:tenant,pais:'CO',nombre:'Synthetic Insurer CO'});
    await setDoc(doc(db,canonical('asesores','advisor-own')),{id:'advisor-own',tenantId:tenant,paises:['GT','CO'],nombre:'Synthetic Advisor Own',rolDefault:'Asesor',scopeDatos:'propios',accessProvisioned:true,comModo:'comision',shareCom:68,comValor:325,modulosExtra:['cotizador'],modulosRestringidos:['finanzas']});
@@ -69,6 +72,10 @@ async function run(){
   await ok(getDoc(doc(own,member('opGT'))));
   await denied(getDoc(doc(own,member('advisorGT'))));
   await denied(getDoc(doc(anon,member('opGT'))));
+  await denied(getDoc(doc(env.authenticatedContext('suspendedGT').firestore(),member('suspendedGT'))));
+  await denied(getDoc(doc(env.authenticatedContext('tenantMismatch').firestore(),member('tenantMismatch'))));
+  await denied(getDoc(doc(env.authenticatedContext('noRoles').firestore(),member('noRoles'))));
+  await denied(getDoc(doc(env.authenticatedContext('blocked').firestore(),member('blocked'))));
   await denied(getDoc(doc(own,canonical('polizas','own'))));
   await denied(getDoc(doc(own,canonical('polizas','foreign'))));
   await denied(getDoc(doc(advisor,canonical('polizas','own'))));
@@ -82,7 +89,7 @@ async function run(){
   await denied(getDoc(doc(own,`tenants/${tenant}/credentialRefs/synthetic`)));
   await denied(getDoc(doc(own,canonical('clientes','c_own'))));
   await denied(getDoc(doc(own,canonical('recibosEsperados','r_own'))));
-  assert.equal(n,16);
+  assert.equal(n,20);
   // Authenticating as a privileged role never grants direct Firestore access:
   // the protected callable (not the browser SDK) owns role/country/advisor scope.
   let directRoleDenials=0;

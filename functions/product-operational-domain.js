@@ -198,9 +198,19 @@ function canWrite(member,accessConfig,role,moduleKey,collection){
   const configured=matrixPermission(accessConfig,role,moduleKey,'editar'); return configured==null?legacyWriteAllowed(member,role,moduleKey,collection):configured;
 }
 function countryAllowed(member,row){const allowed=unique(member&&member.countries).map(v=>text(v,8).toUpperCase());if(!allowed.length)return true;const p=text(row&&row.pais,8).toUpperCase();return !p||['REQUIERE_VALIDACION','POR_VALIDAR','PENDIENTE'].includes(p)||allowed.includes(p);}
+// Aseguradoras are global by *advisor*, never by *country*. The generic
+// unscoped shortcut previously allowed a CO-only administrator to edit a GT
+// insurer (or an unclassified insurer) through the server callable.
+function insurerCountryAllowed(member,row){
+  const countries=unique([...(member&&member.countries||[]),...(member&&member.paises||[]),...(member&&member.paisesAutorizados||[])])
+    .map(v=>text(v,8).toUpperCase());
+  const country=text(row&&(row.pais||row.country),8).toUpperCase();
+  return ['GT','CO'].includes(country)&&countries.includes(country);
+}
 function rowAdvisorId(collection,row){if(collection==='asesores')return text(row&&row.id,180);return text(row&&(row.asesorId||row.advisorId||row.ownerAdvisorId),180);}
 const UNSCOPED_COLLECTIONS=new Set(['aseguradoras','auditoria','auditoriaAsegExterna']);
 function withinScope(actor,collection,moduleKey,row){
+  if(collection==='aseguradoras'&&!insurerCountryAllowed(actor.member,row))return false;
   if(UNSCOPED_COLLECTIONS.has(collection))return true; if(!countryAllowed(actor.member,row))return false;
   const scope=effectiveScope(actor.member,actor.accessConfig,actor.activeRole,moduleKey); if(scope==='none')return false; if(scope==='all')return true;
   const target=rowAdvisorId(collection,row); if(!target)return false; if(scope==='own')return target===text(actor.member.advisorId,180); if(scope==='team')return actor.teamAdvisorIds.has(target); return false;

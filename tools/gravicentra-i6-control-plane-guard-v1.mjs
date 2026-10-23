@@ -46,7 +46,15 @@ const I65_APPLY_AUTH='artifacts/orbit360-recovery/release-control/I6_5_DETERMINI
 const MODE=(process.argv.find(x=>x.startsWith('--mode='))||'--mode=governance').split('=')[1];
 const need=(ok,code)=>{if(!ok)throw new Error(code);};
 const readJson=p=>JSON.parse(fs.readFileSync(p,'utf8'));
-const git=(...args)=>execFileSync('git',args,{encoding:'utf8'}).trim();
+const realGit=(...args)=>execFileSync('git',args,{encoding:'utf8'}).trim();
+// Historical receipts are verified against their exact already-committed
+// predecessor tree. A newer source successor is verified separately against
+// the actual working tree, never substituted into an older signed receipt.
+// Only files explicitly listed and byte-pinned by the current successor may
+// use the predecessor view in historic assertions.
+let predecessorSourceBlobs=new Map();
+const git=(...args)=>args[0]==='hash-object'&&predecessorSourceBlobs.has(args[1])?
+ predecessorSourceBlobs.get(args[1]):realGit(...args);
 const exists=p=>fs.existsSync(p);
 const stable=v=>{if(v===null||typeof v!=='object')return v;if(Array.isArray(v))return v.map(stable);const o={};for(const k of Object.keys(v).sort())o[k]=stable(v[k]);return o;};
 const sameJson=(a,b)=>JSON.stringify(stable(a))===JSON.stringify(stable(b));
@@ -58,6 +66,80 @@ const ACTIVE_I65_FORENSIC_B4=String(C.i65ForensicRemediationPlan?.b4?.executionL
 need(exists(ACTIVE_I65_FORENSIC_B4),'I6_5_B4_ACTIVE_LOCK_MISSING:'+ACTIVE_I65_FORENSIC_B4);
 const S=readJson(STATUS_LEDGER),A=readJson(AUTH_RECEIPT),M5=readJson(V5_MANIFEST),M6=readJson(V6_MANIFEST),M=readJson(V7_MANIFEST),FRA=readJson(I65_FORENSIC_AUDIT),FRP=readJson(I65_FORENSIC_PLAN),PAY=readJson(I65_PAYMENT_INFERENCE),B1=readJson(I65_FORENSIC_B1),B2=readJson(I65_FORENSIC_B2),B3=readJson(I65_FORENSIC_B3),B4=readJson(ACTIVE_I65_FORENSIC_B4);
 const COMP=readJson(I6_CANONICAL_COMPOSITION),FIND=readJson(I6_FINDINGS_LEDGER),FRP2=readJson(I65_FORENSIC_PLAN_V2),REJ=readJson(I65_B2_REJECTION),RCM=readJson(I65_B2_ROOT_CAUSE);
+// An exact B4-003 cumulative source successor is subordinate to the same
+// release/security HOLD. It does not rewrite, pass or waive prior approvals.
+const COUNTRY_RULES=C.b4003RulesCountryHydrationSourceSuccessor20261022||{};
+if(COUNTRY_RULES.status==='SOURCE_STAGED_QA_PASS_RELEASE_HOLD'){
+ const receipt=readJson(COUNTRY_RULES.receiptPath);
+ const source=Object.keys(receipt.sourceFiles||{}).sort(),qa=Object.keys(receipt.qaFiles||{}).sort();
+ const expectedSource=[
+  'firestore.b4-003-scoped-candidate.rules','functions/product-operational-domain.js',
+  'orbit360-platform/core/product-app-p0.js','orbit360-platform/data/store-firestore-product-readonly-p0.js',
+  'orbit360-platform/index.html','orbit360-platform/styles/infra.css'
+ ].sort();
+ const expectedQa=[
+  'tools/gravicentra-b4-003-firestore-emulator.test.cjs',
+  'tools/gravicentra-b4-003-operational-write-security-regression.test.cjs',
+  'tools/gravicentra-b4-003-protected-hydration.test.cjs',
+  'tools/gravicentra-b4-003-role-first-paint-and-team-regression.test.cjs'
+ ].sort();
+ const narrowOutsideSource=['firestore.b4-003-scoped-candidate.rules','functions/product-operational-domain.js'].sort();
+ const narrowOutsideQa=['tools/gravicentra-b4-003-firestore-emulator.test.cjs',
+  'tools/gravicentra-b4-003-operational-write-security-regression.test.cjs'].sort();
+ const head=COUNTRY_RULES.parentHead;
+ need(COUNTRY_RULES.gate==='I6.5/B4-003'&&
+  receipt.schema==='GI_I65_B4003_EXACT_CUMULATIVE_SOURCE_SUCCESSOR_V1'&&
+  receipt.status===COUNTRY_RULES.status&&
+  receipt.authority==='PAULA_CONTINUE_SYNC_RECONCILE_WITHIN_B4_003_20261022'&&
+  head==='d89e2a3d5739dba32e7a794556e58c2acd9e1546'&&
+  receipt.parentHead===head&&
+  COUNTRY_RULES.receiptBlobSha===realGit('hash-object',COUNTRY_RULES.receiptPath)&&
+  COUNTRY_RULES.sourceChanged===true&&COUNTRY_RULES.qaIsolatedPass===true&&
+  COUNTRY_RULES.authenticatedUatAccepted===false&&
+  COUNTRY_RULES.isolatedPreview?.status==='AUTHORIZED_EXISTING_B4_003_READONLY_HOSTING_PREVIEW_ONLY'&&
+  COUNTRY_RULES.isolatedPreview?.triggerSubject==='build(i6.5 B4-003): exact protected rules-country source Preview'&&
+  sameJson(COUNTRY_RULES.isolatedPreview?.onlyReadOnlyFunctions,
+   ['orbit360ScopedPolicyReadPreview','orbit360AssignableAdvisorRosterPreview'])&&
+  COUNTRY_RULES.isolatedPreview?.realUserImpersonationAuthorized===false&&
+  COUNTRY_RULES.isolatedPreview?.syntheticQaWritesAuthorized===false&&
+  COUNTRY_RULES.isolatedPreview?.sharedFirestoreRulesDeploymentAuthorized===false&&
+  COUNTRY_RULES.isolatedPreview?.operationalWriterDeploymentAuthorized===false&&
+  COUNTRY_RULES.isolatedPreview?.productionPromotionAuthorized===false&&
+  COUNTRY_RULES.sharedFirestoreRulesDeploymentAuthorized===false&&
+  COUNTRY_RULES.operationalWriterDeploymentAuthorized===false&&
+  COUNTRY_RULES.productionPromotionAuthorized===false&&
+  COUNTRY_RULES.gateAdvanceAuthorized===false&&
+  sameJson(source,expectedSource)&&sameJson(qa,expectedQa)&&
+  sameJson(receipt.exactOutsideFrozenB4SourceList?.slice().sort(),narrowOutsideSource)&&
+  sameJson(receipt.exactOutsideFrozenB4QaList?.slice().sort(),narrowOutsideQa)&&
+  source.every(p=>{
+    const pair=receipt.sourceFiles[p];
+    return pair.before===realGit('rev-parse',head+':'+p)&&
+      pair.before===COMP.productFileBlobs?.[p]&&COMP.productFiles.includes(p)&&
+      pair.after===realGit('hash-object',p)&&pair.after!==pair.before&&
+      (B4.boundaries?.allowedProductFiles?.includes(p)||narrowOutsideSource.includes(p));
+  })&&qa.every(p=>{
+    const pair=receipt.qaFiles[p];
+    return pair.before===realGit('rev-parse',head+':'+p)&&
+      pair.after===realGit('hash-object',p)&&pair.after!==pair.before&&
+      (B4.boundaries?.allowedQaFiles?.includes(p)||narrowOutsideQa.includes(p));
+  })&&receipt.verification?.firestoreEmulatorSyntheticDenialsPass===true&&
+  receipt.verification?.operationalWriteCasesPassed===27&&
+  receipt.verification?.firstPaintRoleCountryChecksPassed===120&&
+  receipt.verification?.authenticatedUatAccepted===false&&
+  receipt.boundaries?.operationalBusinessWrites===0&&
+  receipt.boundaries?.sharedFirestoreRulesDeploymentAuthorized===false&&
+  receipt.boundaries?.operationalWriterDeploymentAuthorized===false&&
+  receipt.boundaries?.productionPromotionAuthorized===false&&
+  receipt.boundaries?.gateAdvanceAuthorized===false&&
+  C.b4003SecurityReleaseHold?.firestoreRulesDeployAuthorized===false&&
+  B4.boundaries?.livePromotionAuthorized===false&&
+  FIND.findings.length===295,
+  'B4_003_CUMULATIVE_SUCCESSOR_SOURCE_QA_OR_BOUNDARY_INVALID');
+ predecessorSourceBlobs=new Map(source.map(p=>[p,receipt.sourceFiles[p].before])
+  .concat(qa.map(p=>[p,receipt.qaFiles[p].before])));
+ console.log('B4_003_CUMULATIVE_SUCCESSOR=EXACT_SOURCE_AND_QA_BOUND_LIVE_HOLD');
+}
 // B4-003: A successor never rewrites the certified blobs of an older Preview.
 // Its source is checked against the parent commit, the canonical composition,
 // and the exact QA artifacts; historical receipts remain independently sealed.

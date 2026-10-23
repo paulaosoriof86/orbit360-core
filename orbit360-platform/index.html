@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles/tokens.css?v1331"><link rel="stylesheet" href="styles/base.css?v=20261001-b3004r12p11"><link rel="stylesheet" href="styles/infra.css?v=20261007-r20f2-20261011-b4-premium-contrast-20261019-b4003-uat5-causal"><link rel="stylesheet" href="styles/v1197-empalme.css?v=20260711">
+  <link rel="stylesheet" href="styles/tokens.css?v1331"><link rel="stylesheet" href="styles/base.css?v=20261001-b3004r12p11"><link rel="stylesheet" href="styles/infra.css?v=20261022-b4003-320-shell-eight-controls"><link rel="stylesheet" href="styles/v1197-empalme.css?v=20260711">
 </head>
 <body class="pre-auth">
   <div id="auth-restoring" role="status" aria-live="polite" aria-label="Restaurando sesión">
@@ -29,7 +29,7 @@
   <script src="core/membership-multirol-contract-p0.js?v=20260901-i2"></script><script src="core/membership-multirol-effective-p0.js?v=20260901-i2"></script>
   <script src="core/tenant-access-policy-contract-p0.js?v=20260923-b2a1"></script><script src="core/tenant-access-policy-effective-p0.js?v=20261014-b4003-historial-scoped"></script><script src="core/tenant-access-policy-product-p0.js?v=20260920-b1r7"></script>
   <script src="core/tenant-canonical-paths-contract-p0.js?v=20260901-i2"></script><script src="core/product-query-planner-contract-p0.js?v=20260901-i2"></script><script src="core/backend-product-readiness-contract-p0.js?v=20260901-i2"></script>
-  <script src="data/store-firestore-product-readonly-p0.js?v=20261014-b4003-metas-scoped-20261019-b4003-uat5-causal"></script><script src="core/product-hydration-required-optional-p0.js?v=20261001-b3004r12p12"></script>
+  <script src="data/store-firestore-product-readonly-p0.js?v=20261022-b4003-country-parallel-atomic"></script><script src="core/product-hydration-required-optional-p0.js?v=20261001-b3004r12p12"></script>
   <script src="core/product-runtime-browser-providers-p0.js?v=20261014-b4003-terminal-auth-timeout"></script><script src="core/tenant-domain-config-client.js?v=20261004-r16"></script><script src="core/assignable-advisor-roster-client.js?v=20261011-r23-goals-r25-inicio"></script><script src="core/backend-product-readonly-bootstrap-p0.js?v=20261013-b4003-role-scope-guard"></script><script src="core/product-tenant-runtime-context-bridge-p0.js?v=20260901-i2"></script>
 
   <!-- Business/domain contracts; operational writes remain separate from read authority. -->
@@ -70,6 +70,11 @@
       sel.addEventListener('change', function(){
         var next = sel.value || 'TODOS';
         if ((Orbit.pais || 'TODOS') === next) return;
+        if (Orbit.productAppP0 && typeof Orbit.productAppP0.persistCountry === 'function' &&
+            !Orbit.productAppP0.persistCountry(next)) {
+          sel.value = Orbit.pais || 'TODOS';
+          return;
+        }
         Orbit.pais = next;
         var host = document.getElementById('host');
         var seq = ++countryRenderSeq;

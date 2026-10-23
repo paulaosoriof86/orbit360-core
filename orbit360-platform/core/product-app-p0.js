@@ -27,6 +27,37 @@
     try{document.dispatchEvent(new CustomEvent('orbit:product-app',{detail:status()}));}catch(e){}
   }
   function progress(message){try{var el=document.querySelector('#auth-restoring small');if(el)el.textContent=message||'';}catch(e){}}
+  // The country selector is a view preference, never a permission grant. Bind
+  // it to the authenticated UID and tenant, and revalidate it against the
+  // freshly confirmed membership before drawing the first post-reload page.
+  function countryContext(){
+    var m=Orbit.auth&&Orbit.auth.productUser;
+    if(!m||m.productReadOnly!==true||!clean(m.uid)||!clean(m.tenantId)||!Array.isArray(m.countries))return null;
+    var countries=m.countries.map(function(v){return clean(v).toUpperCase();}).filter(function(v){return v==='GT'||v==='CO';});
+    countries=Array.from(new Set(countries));
+    if(!countries.length)return null;
+    return{key:'gi-b4003-country:'+encodeURIComponent(m.tenantId)+':'+encodeURIComponent(m.uid),countries:countries};
+  }
+  function validCountry(value,context){
+    return context&&(context.countries.indexOf(value)>=0||(value==='TODOS'&&context.countries.length>1));
+  }
+  function persistCountry(next){
+    var context=countryContext(),value=clean(next).toUpperCase();
+    if(!validCountry(value,context))return false;
+    try{window.sessionStorage.setItem(context.key,value);}catch(e){}
+    return true;
+  }
+  function restoreCountry(){
+    var context=countryContext();
+    if(!context)return false;
+    var saved='';
+    try{saved=clean(window.sessionStorage.getItem(context.key)).toUpperCase();}catch(e){}
+    var selected=validCountry(saved,context)?saved:(context.countries.length===1?context.countries[0]:'TODOS');
+    Orbit.pais=selected;
+    var selector=document.getElementById('pais-sel');
+    if(selector)selector.value=selected;
+    return true;
+  }
   function preferredLanding(){
     // Fast neutral first paint. The inbox owner performs a non-blocking,
     // recipient-aware redirect only when an actionable request exists.
@@ -108,6 +139,8 @@
       var ps=Orbit.store&&typeof Orbit.store._productStatus==='function'?Orbit.store._productStatus():{};
       if(ps.ready!==true||ps.status!=='ready-read-only'||ps.noFallback!==true||ps.writeEnabled!==false)throw new Error('PRODUCT_STORE_NOT_READY');
 
+      if(!restoreCountry())throw new Error('PRODUCT_AUTHORIZED_COUNTRY_CONTEXT_MISSING');
+
       // Non-blocking overlap: critical Cliente360/Cobros dependencies begin loading
       // while tenant/session owners finish activation. They remain optional for startup.
       var tenantBridge=Orbit.productTenantRuntimeContextP0;
@@ -154,6 +187,7 @@
     VERSION:VERSION,
     init:init,
     activate:activate,
+    persistCountry:persistCountry,
     isStarted:function(){return state.started===true;},
     status:status,
     writeAuthorized:true,

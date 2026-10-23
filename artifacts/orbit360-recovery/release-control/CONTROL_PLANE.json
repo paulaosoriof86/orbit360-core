@@ -14163,6 +14163,30 @@
     "formalI6Percent": 50,
     "productionReadinessPercent": 20
   },
+  "b4003RulesCountryHydrationSourceSuccessor20261022": {
+    "status": "SOURCE_STAGED_QA_PASS_RELEASE_HOLD",
+    "gate": "I6.5/B4-003",
+    "parentHead": "d89e2a3d5739dba32e7a794556e58c2acd9e1546",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_RULES_COUNTRY_HYDRATION_SOURCE_SUCCESSOR_20261022.json",
+    "receiptBlobSha": "bbe00e0e71519801d8634f81968f7412b54ca1a8",
+    "sourceChanged": true,
+    "qaIsolatedPass": true,
+    "authenticatedUatAccepted": false,
+    "isolatedPreview": {
+      "status": "AUTHORIZED_EXISTING_B4_003_READONLY_HOSTING_PREVIEW_ONLY",
+      "triggerSubject": "build(i6.5 B4-003): exact protected rules-country source Preview",
+      "onlyReadOnlyFunctions": ["orbit360ScopedPolicyReadPreview", "orbit360AssignableAdvisorRosterPreview"],
+      "realUserImpersonationAuthorized": false,
+      "syntheticQaWritesAuthorized": false,
+      "sharedFirestoreRulesDeploymentAuthorized": false,
+      "operationalWriterDeploymentAuthorized": false,
+      "productionPromotionAuthorized": false
+    },
+    "sharedFirestoreRulesDeploymentAuthorized": false,
+    "operationalWriterDeploymentAuthorized": false,
+    "productionPromotionAuthorized": false,
+    "gateAdvanceAuthorized": false
+  },
   "b4003PostAuthPreviewAuthorization20261022": {
     "status": "AUTHORIZED_ISOLATED_READONLY_PREVIEW",
     "gate": "I6.5/B4-003",

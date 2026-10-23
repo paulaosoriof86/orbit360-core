@@ -1402,3 +1402,23 @@ a.fh-chip:hover{border-color:var(--red);color:var(--red)}
 @media(max-width:560px){
   .topbar:has(.tb-search.mobile-open) + #shell{padding-top:calc(var(--topbar-h) + 58px)!important}
 }
+
+/* B4-003 · 320px shell: the Ops inbox is a real eighth grid control.
+   Place all controls explicitly within two rows instead of auto-placing
+   the inbox or clipping the account avatar beyond the viewport. */
+@media(max-width:560px){
+  .topbar{grid-template-columns:36px minmax(0,1fr) repeat(6,34px)}
+  .topbar .brand{grid-column:2 / span 4}
+  .topbar #sw-pais{grid-column:6 / span 3}
+  .topbar #ops-inbox-bell{grid-column:7;grid-row:2}
+  .topbar #tb-user{grid-column:8;grid-row:2;min-width:0}
+}
+@media(max-width:350px){
+  .topbar{grid-template-columns:32px minmax(0,1fr) repeat(6,30px);column-gap:4px;padding-left:8px;padding-right:8px}
+  .topbar .tb-burger{width:32px;height:32px}
+  .topbar .tb-ico,.topbar .tb-user .av{width:30px;height:30px}
+  .topbar #sw-pais{padding-left:4px;padding-right:4px;gap:2px}
+  .topbar #sw-pais select{font-size:10.5px}
+  .topbar .tb-rol{padding-left:4px;padding-right:4px;gap:2px}
+  .topbar .tb-rol select{font-size:10.5px}
+}

@@ -3,8 +3,25 @@ rules_version = '2';
 // All operational data is server-owned until authenticated scoped read is integrated.
 service cloud.firestore {
   match /databases/{database}/documents {
+    // The browser may read only its own *active* tenant membership. A matching
+    // UID alone is not authority: suspended members, stale tenant bindings and
+    // missing assigned roles must all fail closed. Operational documents remain
+    // server-owned and inaccessible to the browser Firestore SDK.
+    function canReadOwnActiveMembership(tenantId, memberUid) {
+      return request.auth != null
+        && request.auth.uid == memberUid
+        && resource.data.uid == memberUid
+        && resource.data.tenantId == tenantId
+        && resource.data.status in ['active', 'activo']
+        && resource.data.get('estado', 'activo') in ['active', 'activo']
+        && resource.data.get('active', true) != false
+        && resource.data.get('activo', true) != false
+        && resource.data.get('inactivo', false) != true
+        && resource.data.roles is list
+        && resource.data.roles.size() > 0;
+    }
     match /tenants/{tenantId}/members/{memberUid} {
-      allow get: if request.auth != null && request.auth.uid == memberUid;
+      allow get: if canReadOwnActiveMembership(tenantId, memberUid);
       allow list, create, update, delete: if false;
     }
     match /tenants/{tenantId}/data/{document=**} {

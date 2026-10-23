@@ -1,0 +1,49 @@
+{
+  "schema": "GI_I65_B4003_EXACT_CUMULATIVE_SOURCE_SUCCESSOR_V1",
+  "gate": "I6.5/B4-003",
+  "status": "SOURCE_STAGED_QA_PASS_RELEASE_HOLD",
+  "authority": "PAULA_CONTINUE_SYNC_RECONCILE_WITHIN_B4_003_20261022",
+  "parentHead": "d89e2a3d5739dba32e7a794556e58c2acd9e1546",
+  "description": "One exact source successor for isolated rules denials, operational insurer country boundary, parallel protected reads, authenticated country reload and responsive first paint. Historical proof refers to the parent tree; the successor is checked against real working-file hashes independently.",
+  "sourceFiles": {
+    "firestore.b4-003-scoped-candidate.rules": {"before": "6ae1a85b1f82525ac018ff682a2e20b6cca5f1d8", "after": "63a71c3bc26d32e3bc7ed2836364e5327283956a"},
+    "functions/product-operational-domain.js": {"before": "edbe77331327fdfa05a278d7c1f1b68005d70773", "after": "2c2a3cef60fb8a12ff4994f0d1271cb266602bac"},
+    "orbit360-platform/core/product-app-p0.js": {"before": "8cb3bce143be1eb392bced4d878710d8e714d4f9", "after": "a2e818daa07981278b76c4b6b84900e72f6dac51"},
+    "orbit360-platform/data/store-firestore-product-readonly-p0.js": {"before": "eae7ee73df662fd4cde5ffa762a44d9a71168844", "after": "c2b98c04fd05e65b1f8392d03bbad29f5b9f569b"},
+    "orbit360-platform/index.html": {"before": "1399f035ca07a236f741b47824c947dec536144d", "after": "0f35481f3e3880365e98594b98860cd58c417be8"},
+    "orbit360-platform/styles/infra.css": {"before": "f676afd6feba0e40fff0864446884b278da5a923", "after": "7872b74a9a85a03a24d7eddcf9b4b74ae3e23c84"}
+  },
+  "qaFiles": {
+    "tools/gravicentra-b4-003-firestore-emulator.test.cjs": {"before": "f690f7a0a739abc469b01f72f30e428884de5e1d", "after": "89e5a3fff05c5c5e9cd2b71f64c39628ab475c44"},
+    "tools/gravicentra-b4-003-operational-write-security-regression.test.cjs": {"before": "2f1945c9933353500319f05807054c2935d4a183", "after": "391f67841cd86c70d5cbc281f073b9d617b6fc24"},
+    "tools/gravicentra-b4-003-protected-hydration.test.cjs": {"before": "5705bb22b79cb3e0e7dfa10db1c32f009ff9f141", "after": "ae20c52f7e61cd0d2d1f62ae5094ea2b319625b2"},
+    "tools/gravicentra-b4-003-role-first-paint-and-team-regression.test.cjs": {"before": "02f7e1402a79c5e2ef125b54dc8b100af195af04", "after": "eb7f4a4512dbc6e17ed33217de4b36bb1281a27e"}
+  },
+  "exactOutsideFrozenB4SourceList": [
+    "firestore.b4-003-scoped-candidate.rules",
+    "functions/product-operational-domain.js"
+  ],
+  "exactOutsideFrozenB4QaList": [
+    "tools/gravicentra-b4-003-firestore-emulator.test.cjs",
+    "tools/gravicentra-b4-003-operational-write-security-regression.test.cjs"
+  ],
+  "verification": {
+    "firestoreEmulatorSyntheticDenialsPass": true,
+    "operationalWriteCasesPassed": 27,
+    "firstPaintRoleCountryChecksPassed": 120,
+    "protectedHydrationSyntheticPass": true,
+    "existingReleaseBarrierPass": true,
+    "authenticatedUatAccepted": false,
+    "sourceCandidateInPreview": false,
+    "effectiveSharedRulesVerified": false
+  },
+  "boundaries": {
+    "sourceFilesOnly": true,
+    "operationalBusinessWrites": 0,
+    "sharedFirestoreRulesDeploymentAuthorized": false,
+    "operationalWriterDeploymentAuthorized": false,
+    "productionPromotionAuthorized": false,
+    "gateAdvanceAuthorized": false,
+    "historicalReceiptsChanged": false
+  }
+}

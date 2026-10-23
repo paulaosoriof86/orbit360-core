@@ -62,6 +62,19 @@ assert.match(access,/var visible=explicitRoleKey!==undefined\?/,'ROLE_TEAM_MUST_
 assert.match(access,/var teamId = explicitRoleKey!==undefined\?'':/,'TEAM_ID_MUST_NOT_OVERRIDE_EXPLICIT_MAP');checks++;
 
 // UAT2-01: the administrative tally and filter consume the same canonical
+// B4-003 mobile shell: eight interactive columns need two explicit rows at
+// 320px. Static layout guard; authenticated touch/visual UAT remains required.
+const infra=read('orbit360-platform/styles/infra.css');
+assert.match(infra,/@media\(max-width:560px\)\{\s*\.topbar\{grid-template-columns:36px minmax\(0,1fr\) repeat\(6,34px\)\}/,
+ 'MOBILE_EIGHT_COLUMN_GRID_REQUIRED');checks++;
+assert.match(infra,/\.topbar #ops-inbox-bell\{grid-column:7;grid-row:2\}/,'MOBILE_INBOX_EXPLICIT_CELL');checks++;
+assert.match(infra,/\.topbar #tb-user\{grid-column:8;grid-row:2;min-width:0\}/,'MOBILE_ACCOUNT_NOT_OVERLAPPED');checks++;
+assert.match(infra,/@media\(max-width:350px\)\{\s*\.topbar\{grid-template-columns:32px minmax\(0,1fr\) repeat\(6,30px\);column-gap:4px;padding-left:8px;padding-right:8px\}/,
+ 'TINY_MOBILE_REQUIRES_COMPACT_COLUMNS');checks++;
+const fixedWidth=32+6*30+7*4+2*8;
+assert.ok(fixedWidth<320,'MOBILE_320_FIXED_TRACKS_EXCEED_VIEWPORT');checks++;
+
+// UAT2-01: the administrative tally and filter consume the same canonical
 // classifier; synthetic only, not signed-in authorization or LIVE acceptance.
 const adminFrom=team.indexOf('  function arr(v) {'),adminTo=team.indexOf('  function active(a)',adminFrom);
 assert.ok(adminFrom>=0&&adminTo>adminFrom,'ADMIN_CLASSIFIER_SOURCE_BOUNDS');checks++;
@@ -134,5 +147,41 @@ assert.doesNotMatch(c360Src,/\$\{c\.tipo\}<\/span>/,'CLIENT_TYPE_RAW_HTML_LEAK')
 const entry=read('orbit360-platform/index.html');
 assert.match(entry,/modules\/cliente360\.js\?v=20261018-b4003-uat2-clienttype-canonical/,'CLIENT_TYPE_CURRENT_CACHE_KEY');checks++;
 assert.match(entry,/modules\/equipo\.js\?v=20261018-b4003-uat2-admin-roster/,'EQUIPO_CURRENT_CACHE_KEY');checks++;
+
+// Real-browser UAT found that reloading Asesor/CO kept the role but reset the
+// country to Todos and left finance projections unavailable. Country is a
+// UID+tenant-bound preference, never authority to read another country.
+const countryStart=app.indexOf('  function countryContext(){');
+const countryEnd=app.indexOf('  function preferredLanding(){',countryStart);
+assert.ok(countryStart>=0&&countryEnd>countryStart,'COUNTRY_AUTH_RESTORE_OWNER_MISSING');checks++;
+const persisted=new Map(),selector={value:'TODOS'};
+const countryCtx={
+  clean:v=>String(v==null?'':v).trim(),
+  Orbit:{auth:{productUser:{uid:'uid-paula',tenantId:'tenant-ays',productReadOnly:true,
+    activeRole:'Asesor',countries:['GT','CO']}},pais:'TODOS'},
+  window:{sessionStorage:{getItem:k=>persisted.get(k)||null,setItem:(k,v)=>persisted.set(k,v)}},
+  document:{getElementById:id=>id==='pais-sel'?selector:null},Array,Set,String,encodeURIComponent
+};
+vm.runInNewContext(app.slice(countryStart,countryEnd)+'\nthis.countryQA={persistCountry,restoreCountry};',countryCtx);
+expect(countryCtx.countryQA.persistCountry('CO'),true,'AUTHORIZED_ADVISOR_COUNTRY_STORED');
+countryCtx.Orbit.pais='TODOS';
+expect(countryCtx.countryQA.restoreCountry(),true,'AUTHORIZED_COUNTRY_RESTORED');
+expect(countryCtx.Orbit.pais,'CO','ADVISOR_CO_SURVIVES_RELOAD');
+expect(selector.value,'CO','COUNTRY_COMBO_MATCHES_RESTORED_COUNTRY');
+expect(countryCtx.countryQA.persistCountry('MX'),false,'FOREIGN_COUNTRY_DENIED');
+expect(countryCtx.Orbit.pais,'CO','DENIED_COUNTRY_DOES_NOT_SWITCH_CONTEXT');
+countryCtx.Orbit.auth.productUser.uid='uid-other';countryCtx.Orbit.pais='TODOS';
+expect(countryCtx.countryQA.restoreCountry(),true,'OTHER_UID_HAS_OWN_COUNTRY_CONTEXT');
+expect(countryCtx.Orbit.pais,'TODOS','COUNTRY_PREFERENCE_NOT_SHARED_ACROSS_UIDS');
+countryCtx.Orbit.auth.productUser.uid='uid-paula';countryCtx.Orbit.auth.productUser.tenantId='tenant-other';
+expect(countryCtx.countryQA.restoreCountry(),true,'OTHER_TENANT_HAS_OWN_COUNTRY_CONTEXT');
+expect(countryCtx.Orbit.pais,'TODOS','COUNTRY_PREFERENCE_NOT_SHARED_ACROSS_TENANTS');
+countryCtx.Orbit.auth.productUser.tenantId='tenant-ays';countryCtx.Orbit.auth.productUser.countries=['GT'];
+expect(countryCtx.countryQA.restoreCountry(),true,'COUNTRY_REVALIDATED_AFTER_MEMBERSHIP_CHANGE');
+expect(countryCtx.Orbit.pais,'GT','REVOKED_COUNTRY_NOT_RESTORED');
+expect(countryCtx.countryQA.persistCountry('TODOS'),false,'SINGLE_COUNTRY_TODOS_NOT_WIDENED');
+countryCtx.Orbit.auth.productUser=null;
+expect(countryCtx.countryQA.restoreCountry(),false,'UNAUTHENTICATED_CONTEXT_NOT_RESTORED');
+assert.match(entry,/!Orbit\.productAppP0\.persistCountry\(next\)/,'COUNTRY_SELECTOR_MUST_PERSIST_VALIDATED_CHOICE');checks++;
 
 console.log('B4_003_FIRST_PAINT_TEAM_ROLE_READINESS_SOURCE_VM_QA_PASS checks='+checks+' no_remote_access no_writes');
