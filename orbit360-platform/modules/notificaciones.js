@@ -21,6 +21,28 @@ Orbit.modules.notificaciones = (function () {
   function getLog() { return Orbit.store.pref('wa_log', []) || []; }
   function addLog(e) { const l = getLog(); l.unshift(e); if (l.length > 80) l.pop(); Orbit.store.setPref('wa_log', l); }
 
+  function countryCode(value) { return String(value == null ? '' : value).trim().toUpperCase(); }
+  function activeCountry() { const p = countryCode(Orbit.pais); return p && p !== 'TODOS' ? p : ''; }
+  function inCountry(value) {
+    const p = countryCode(value), active = activeCountry();
+    return (p === 'GT' || p === 'CO') && (!active || p === active);
+  }
+  function scopedRows(collection) {
+    const rows = S().all(collection) || [];
+    return Orbit.access && typeof Orbit.access.filter === 'function'
+      ? Orbit.access.filter(collection, rows, 'notificaciones') : [];
+  }
+  function clientesElegibles() {
+    return scopedRows('clientes').filter(c => c && c.id && c.telefono && inCountry(c.pais));
+  }
+  function polizasElegibles(cli) {
+    if (!cli || !inCountry(cli.pais)) return [];
+    const pais = countryCode(cli.pais);
+    return scopedRows('polizas').filter(p => p && p.id && String(p.clienteId) === String(cli.id)
+      && (!p.pais || countryCode(p.pais) === pais)
+      && (!p.country || countryCode(p.country) === pais));
+  }
+
   function render(h) {
     host = h;
     const log = getLog();
@@ -46,16 +68,17 @@ Orbit.modules.notificaciones = (function () {
   }
 
   function vEnviar() {
-    const clientes = S().all('clientes').filter(c => c && c.telefono);
+    const clientes = clientesElegibles();
     return '<div class="card pad">'
       + '<div class="cgrid">'
       +   '<label class="ce-l">Plantilla<select id="wa-tpl" class="o-sel"><option value="">— Mensaje libre —</option>'
       +     PLANTILLAS.map(p => '<option value="' + p.id + '">' + p.icon + ' ' + p.nombre + '</option>').join('') + '</select></label>'
       +   '<label class="ce-l">Destinatario<select id="wa-cli" class="o-sel"><option value="">— Seleccionar cliente —</option>'
-      +     clientes.map(c => '<option value="' + c.id + '">' + U.esc(c.nombre) + ' · ' + U.esc(c.telefono) + '</option>').join('') + '</select></label>'
+      +     clientes.map(c => '<option value="' + U.esc(c.id) + '">' + U.esc(c.nombre) + ' · ' + U.esc(c.telefono) + '</option>').join('') + '</select></label>'
       + '</div>'
+      + '<label class="ce-l" style="margin-top:12px">Póliza del mensaje<select id="wa-pol" class="o-sel"><option value="">— Selecciona primero el destinatario —</option></select></label>'
       + '<label class="ce-l" style="margin-top:12px">Mensaje<textarea id="wa-msg" class="o-sel" style="min-height:120px;resize:vertical;padding:11px 13px;line-height:1.6" placeholder="Escribe el mensaje o elige una plantilla..."></textarea></label>'
-      + '<div class="muted" style="font-size:11.5px;margin-top:6px">Variables: {nombre} {poliza} {ramo} {fecha} {monto} {medios} — se reemplazan con los datos del cliente al preparar el mensaje.</div>'
+      + '<div class="muted" style="font-size:11.5px;margin-top:6px">Variables: {nombre} {poliza} {ramo} {fecha} {monto} {medios}. Si hay varias pólizas, selecciona la correcta. Comprueba manualmente fecha y monto del recibo y medios de pago; los campos sin fuente verificada no se completan automáticamente.</div>'
       + '<div style="display:flex;gap:8px;margin-top:14px">'
       +   '<button class="btn primary" id="wa-send">💬 Abrir en WhatsApp Web</button>'
       +   '<button class="btn ghost" id="wa-api">📡 Registrar para API</button>'
@@ -86,29 +109,36 @@ Orbit.modules.notificaciones = (function () {
       + '</tbody></table></div>';
   }
 
-  function resolverMsg(txt, cli) {
+  function resolverMsg(txt, cli, pol, plantillaId) {
     if (!cli) return txt;
-    const pol = S().all('polizas').filter(p => p && p.clienteId === cli.id)[0] || {};
     return txt
       .replace(/{nombre}/g, (cli.nombre || '').split(' ')[0])
-      .replace(/{poliza}/g, pol.numero || '—')
-      .replace(/{ramo}/g, pol.ramo || 'tu seguro')
-      .replace(/{fecha}/g, pol.vence || 'la fecha indicada')
-      .replace(/{monto}/g, pol.primaTotal ? U.money(pol.primaTotal, cli.moneda || 'GTQ') : 'el monto')
-      .replace(/{medios}/g, 'transferencia o tarjeta');
+      .replace(/{poliza}/g, pol && pol.numero ? pol.numero : '{poliza}')
+      .replace(/{ramo}/g, pol && pol.ramo ? pol.ramo : '{ramo}')
+      // La fecha de la póliza NO es el vencimiento de un recibo.
+      .replace(/{fecha}/g, plantillaId === 'renov' && pol && pol.vigenciaFin ? U.fmtDate(pol.vigenciaFin) : '{fecha}');
   }
 
   function wire() {
     const $ = s => host.querySelector(s);
-    const tplSel = $('#wa-tpl'), cliSel = $('#wa-cli'), msgBox = $('#wa-msg');
-    if (tplSel) tplSel.addEventListener('change', () => {
-      const p = PLANTILLAS.find(x => x.id === tplSel.value);
-      if (p && msgBox) { const cli = S().get('clientes', cliSel.value); msgBox.value = resolverMsg(p.txt, cli); }
-    });
-    if (cliSel) cliSel.addEventListener('change', () => {
-      const p = PLANTILLAS.find(x => x.id === (tplSel ? tplSel.value : ''));
-      if (p && msgBox) { const cli = S().get('clientes', cliSel.value); msgBox.value = resolverMsg(p.txt, cli); }
-    });
+    const tplSel = $('#wa-tpl'), cliSel = $('#wa-cli'), polSel = $('#wa-pol'), msgBox = $('#wa-msg');
+    const client = () => clientesElegibles().find(c => String(c.id) === String(cliSel && cliSel.value));
+    const policy = cli => polizasElegibles(cli).find(p => String(p.id) === String(polSel && polSel.value));
+    const updatePolicies = () => {
+      if (!polSel) return;
+      const cli = client(), pols = polizasElegibles(cli);
+      polSel.innerHTML = '<option value="">— Seleccionar póliza —</option>'
+        + pols.map(p => '<option value="' + U.esc(p.id) + '">' + U.esc(p.numero || p.producto || p.id) + ' · ' + U.esc(p.ramo || 'Ramo pendiente') + '</option>').join('');
+      polSel.value = pols.length === 1 ? String(pols[0].id) : '';
+    };
+    const updateTemplate = () => {
+      const p = PLANTILLAS.find(x => x.id === (tplSel && tplSel.value));
+      if (p && msgBox) { const cli = client(); msgBox.value = resolverMsg(p.txt, cli, policy(cli), p.id); }
+    };
+    if (tplSel) tplSel.addEventListener('change', updateTemplate);
+    if (cliSel) cliSel.addEventListener('change', () => { updatePolicies(); updateTemplate(); });
+    if (polSel) polSel.addEventListener('change', updateTemplate);
+    updatePolicies();
     const send = $('#wa-send');
     if (send) send.addEventListener('click', () => doSend('wa.me'));
     const api = $('#wa-api');
@@ -122,13 +152,20 @@ Orbit.modules.notificaciones = (function () {
 
   function doSend(canal) {
     const $ = s => host.querySelector(s);
-    const cliEl = $('#wa-cli'), msgEl = $('#wa-msg'), tplEl = $('#wa-tpl');
+    const cliEl = $('#wa-cli'), polEl = $('#wa-pol'), msgEl = $('#wa-msg'), tplEl = $('#wa-tpl');
     if (!cliEl || !msgEl) return; // form no montado
-    const cli = S().get('clientes', cliEl.value);
+    const cli = clientesElegibles().find(c => String(c.id) === String(cliEl.value));
     const msg = (msgEl.value || '').trim();
     const tplId = tplEl ? tplEl.value : '';
     if (!msg) { Orbit.ui.toast('Escribe un mensaje primero.'); return; }
-    if (!cli) { Orbit.ui.toast('Selecciona un cliente destinatario.'); return; }
+    if (!cli) { Orbit.ui.toast('Destinatario no disponible en tu país o ámbito actual.'); return; }
+    const tpl = PLANTILLAS.find(p => p.id === tplId);
+    if (tpl && /\{(?:poliza|ramo)\}/.test(tpl.txt) && !polizasElegibles(cli).some(p => String(p.id) === String(polEl && polEl.value))) {
+      Orbit.ui.toast('Selecciona la póliza correcta para este mensaje.'); return;
+    }
+    if (/\{(?:nombre|poliza|ramo|fecha|monto|medios)\}/i.test(msg)) {
+      Orbit.ui.toast('Completa y verifica las variables pendientes antes de abrir WhatsApp.'); return;
+    }
     const canalLog = canal === 'API' ? 'API pendiente de conexión' : 'wa.me abierto';
     addLog({ fecha: new Date().toISOString().slice(0, 10), cliente: cli.nombre, tpl: tplId || 'libre', msg, canal: canalLog });
     // registrar en historial del cliente sin afirmar entrega confirmada

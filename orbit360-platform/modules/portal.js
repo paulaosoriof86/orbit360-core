@@ -13,21 +13,35 @@ Orbit.modules.portal = (function () {
   let host, clienteId, tab = 'inicio';
 
   function TT(k) { try { const c = S().get('clientes', clienteId) || {}; return (Orbit.termino ? Orbit.termino(k, c.pais) : k); } catch (e) { return k; } }
-  function clientes() { return S().all('clientes'); }
+  function clientes() {
+    const rows = S().all('clientes') || [];
+    const scoped = Orbit.access && typeof Orbit.access.filter === 'function'
+      ? Orbit.access.filter('clientes', rows, 'portal') : [];
+    const active = String(Orbit.pais || '').trim().toUpperCase();
+    return scoped.filter(c => {
+      const pais = String(c && c.pais || '').trim().toUpperCase();
+      return c && c.id && (pais === 'GT' || pais === 'CO') &&
+        (!active || active === 'TODOS' || pais === active);
+    });
+  }
   function notifsDe(cid) { return S().where('notifs', n => n.clienteId === cid).sort((a, b) => (b.fecha || '').localeCompare(a.fecha || '')); }
   function noLeidas(cid) { return notifsDe(cid).filter(n => !n.leida).length; }
   function esPolizaActivaPortal(p) { return p && (p.estado === 'Vigente' || p.estado === 'Por renovar'); }
 
   function render(h) {
     host = h;
-    if (!clienteId) clienteId = (clientes()[0] || {}).id;
-    const cli = S().get('clientes', clienteId);
-    if (!cli) { host.innerHTML = '<div class="page"><div class="modstate"><div class="ms-ico">🔒</div><h2>Portal del Cliente</h2><p>Sin clientes para previsualizar.</p></div></div>'; return; }
+    const visibles = clientes();
+    if (!visibles.some(c => String(c.id) === String(clienteId))) {
+      clienteId = (visibles[0] || {}).id || '';
+      tab = 'inicio';
+    }
+    const cli = visibles.find(c => String(c.id) === String(clienteId));
+    if (!cli) { host.innerHTML = '<div class="page"><div class="modstate"><div class="ms-ico">🔒</div><h2>Portal del Cliente</h2><p>Sin clientes disponibles para previsualizar en el país y ámbito seleccionados.</p></div></div>'; return; }
     if (Orbit.legal && Orbit.legal.gate) Orbit.legal.gate('cliente', 'cliente:' + clienteId);
     const nl = noLeidas(clienteId);
     host.innerHTML = `<div class="page">
       <div class="pt-preview">👁 Vista previa del <b>Portal del Cliente</b> · viendo a
-        <select id="pt-cli" class="o-sel" style="display:inline-block;width:auto;padding:4px 8px;margin:0 4px">${clientes().map(c => `<option value="${c.id}" ${c.id === clienteId ? 'selected' : ''}>${U.esc(c.nombre)}</option>`).join('')}</select>
+        <select id="pt-cli" class="o-sel" style="display:inline-block;width:auto;padding:4px 8px;margin:0 4px">${visibles.map(c => `<option value="${U.esc(c.id)}" ${c.id === clienteId ? 'selected' : ''}>${U.esc(c.nombre)}</option>`).join('')}</select>
         <button class="btn ghost sm" id="pt-admin" style="margin-left:8px">📢 Enviar notificación (admin)</button>
         <span style="float:right;color:var(--ink-3)">El portal real es <b>responsive</b> (móvil y escritorio)</span></div>
       <div class="pt-shell">
@@ -145,13 +159,17 @@ Orbit.modules.portal = (function () {
   }
 
   function adminNotif() {
-    const html = `<label class="ce-l">Destinatario<select id="an-dest" class="o-sel"><option value="__all">📢 Todos los clientes</option>${clientes().map(c => `<option value="${c.id}">${U.esc(c.nombre)}</option>`).join('')}</select></label>
+    const html = `<label class="ce-l">Destinatario<select id="an-dest" class="o-sel"><option value="__all">📢 Todos los clientes del ámbito visible</option>${clientes().map(c => `<option value="${U.esc(c.id)}">${U.esc(c.nombre)}</option>`).join('')}</select></label>
       <label class="ce-l" style="margin-top:10px">Título<input id="an-tit" class="o-sel" placeholder="Ej. Aviso importante"></label>
       <label class="ce-l" style="margin-top:10px">Mensaje<textarea id="an-msg" class="o-sel" style="min-height:64px;resize:vertical;padding:9px 11px"></textarea></label>
       <div class="cfg-note" style="margin-top:10px">La notificación aparece en el portal del cliente. WhatsApp/correo quedan pendientes de integración o canal conectado.</div>`;
     const back = drawer('📢 Enviar notificación', html, () => {
       const dest = back.querySelector('#an-dest').value, tit = back.querySelector('#an-tit').value || 'Aviso', msg = back.querySelector('#an-msg').value;
-      const dests = dest === '__all' ? clientes() : [S().get('clientes', dest)];
+      // Revalidar país/rol al confirmar: el selector puede haber quedado abierto
+      // mientras cambió el ámbito. Nunca recuperar por ID fuera del conjunto visible.
+      const actuales = clientes();
+      const dests = dest === '__all' ? actuales : actuales.filter(c => String(c.id) === String(dest));
+      if (!dests.length) { toast('No hay destinatarios disponibles en tu ámbito actual.'); return; }
       dests.forEach(c => { if (!c) return; S().insert('notifs', { id: 'ntf' + Date.now() + Math.floor(Math.random() * 999), clienteId: c.id, titulo: tit, cuerpo: msg, tipo: 'admin', fecha: Orbit.ui.today(), leida: false }); });
       back.remove(); toast('✓ Notificación registrada en portal para ' + (dest === '__all' ? 'todos' : '1 cliente')); render(host);
     }, 'Registrar');
