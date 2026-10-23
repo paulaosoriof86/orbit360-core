@@ -1,0 +1,45 @@
+{
+  "schema": "GI_I65_B4003_ROLE_CONTEXT_RECOVERY_PREVIEW_AUTH_V1",
+  "gate": "I6.5/B4-003",
+  "status": "AUTHORIZED_EXACT_ISOLATED_READONLY_PREVIEW",
+  "authority": "PAULA_CONTINUE_EXISTING_B4_003_AND_AUTHENTICATED_ROLE_COUNTRY_QA_20261023",
+  "sourceParentCommit": "a52a2d891d1d478933a9cec16f4b4470fbf316d2",
+  "triggerSubject": "build(i6.5 B4-003): guarded role context recovery Preview",
+  "observedAuthenticatedUat": {
+    "previewRun": 40028223603,
+    "firstAuthAndRouteHydration": "PASS_FOCAL",
+    "directionAllToAdvisorColombiaToDirectionAll": "FAIL_REPRODUCED",
+    "cobrosLoadingObservedAtSeconds": 28,
+    "cobrosBlockedObservedAtSeconds": 38,
+    "blockedSources": ["clientes", "polizas"],
+    "browserReadOnly": true,
+    "serverTransportFailureCause": "NOT_YET_CONFIRMED"
+  },
+  "causalSourceChange": "ROLE_EPOCH_REQUIRED_SOURCE_PRIORITY_OPTIONAL_COLLECTION_CONCURRENCY_TWO_BOUNDED_TRANSIENT_RETRY_ONE",
+  "sourceBlobs": {
+    "orbit360-platform/data/store-firestore-product-readonly-p0.js": "c7a334cd0699ae0d3f1e8b0f602fe5839bd28069",
+    "orbit360-platform/index.html": "797aa0adc0cd6253b8dc9fec8a1a161bbc175a6e"
+  },
+  "qaBlobs": {
+    "tools/gravicentra-b4-003-role-context-recovery.test.cjs": "0147d0a8f5f45165f67fbf710083548ea840b1cb"
+  },
+  "compositionBlobSha": "3550cacafb0260ee51820e0f1a130f375e61f505",
+  "rosterSourceBlobSha": "75ca53db55e2665123589b0e63253a8e4f8c377c",
+  "syntheticQaStatus": "PASS_PRIORITY_CAP_EPOCH_NO_STALE_DATA_ONE_RETRY_NO_PERMISSION_RETRY",
+  "authenticatedSuccessorUatRequired": true,
+  "onlyReadOnlyFunctions": ["orbit360ScopedPolicyReadPreview", "orbit360AssignableAdvisorRosterPreview"],
+  "onlyIsolatedHosting": true,
+  "sharedFirestoreRulesDeployAuthorized": false,
+  "otherFunctionsDeployAuthorized": false,
+  "operationalWriterDeployAuthorized": false,
+  "businessWritesAuthorized": false,
+  "syntheticQaWritesAuthorized": false,
+  "realUserImpersonationAuthorized": false,
+  "livePromotionAuthorized": false,
+  "dataRefreshAuthorized": false,
+  "reimportAuthorized": false,
+  "previewEvidenceNotProductionAcceptance": true,
+  "productionPathPercent": 20,
+  "formalI6Percent": 50,
+  "findingsPreserved": 295
+}

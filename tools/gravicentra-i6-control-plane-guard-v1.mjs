@@ -275,10 +275,58 @@ const WRITER_COUNTRY=C.b4003WriterCountryFailClosedSuccessor20261023||{};
 const WRITER_COUNTRY_ACTIVE=WRITER_COUNTRY.status==='SOURCE_STAGED_SYNTHETIC_QA_PASS_SECURITY_HOLD';
 const PROTECTED_STORE_TRANSPORT=C.b4003ProtectedStoreTransportSuccessor20261023||{};
 const PROTECTED_STORE_TRANSPORT_ACTIVE=PROTECTED_STORE_TRANSPORT.status==='SOURCE_STAGED_SYNTHETIC_QA_PASS_SECURITY_HOLD';
+const ROLE_RECOVERY=C.b4003RoleContextRecoveryPreviewAuthorization20261023||{};
+const ROLE_RECOVERY_ACTIVE=ROLE_RECOVERY.status==='AUTHORIZED_EXACT_ISOLATED_READONLY_PREVIEW';
+if(ROLE_RECOVERY_ACTIVE){
+ const P=ROLE_RECOVERY,B=B4.b4003RoleContextRecoveryPreviewAuthorization20261023||{};
+ need(exists(P.receiptPath),'B4_003_ROLE_RECOVERY_RECEIPT_MISSING');
+ const R=readJson(P.receiptPath);
+ const source=['orbit360-platform/data/store-firestore-product-readonly-p0.js','orbit360-platform/index.html'];
+ const qa=['tools/gravicentra-b4-003-role-context-recovery.test.cjs'];
+ const deny=['sharedFirestoreRulesDeployAuthorized','otherFunctionsDeployAuthorized',
+  'operationalWriterDeployAuthorized','businessWritesAuthorized','syntheticQaWritesAuthorized',
+  'realUserImpersonationAuthorized','livePromotionAuthorized','dataRefreshAuthorized','reimportAuthorized'];
+ need(P.gate==='I6.5/B4-003'&&P.sourceParentCommit==='a52a2d891d1d478933a9cec16f4b4470fbf316d2'&&
+  P.triggerSubject==='build(i6.5 B4-003): guarded role context recovery Preview'&&
+  sameJson(P,B)&&P.receiptBlobSha===physicalGit('hash-object',P.receiptPath)&&
+  R.schema==='GI_I65_B4003_ROLE_CONTEXT_RECOVERY_PREVIEW_AUTH_V1'&&
+  R.gate===P.gate&&R.status===P.status&&R.authority===P.authority&&
+  R.sourceParentCommit===P.sourceParentCommit&&R.triggerSubject===P.triggerSubject&&
+  R.observedAuthenticatedUat?.directionAllToAdvisorColombiaToDirectionAll==='FAIL_REPRODUCED'&&
+  R.observedAuthenticatedUat?.serverTransportFailureCause==='NOT_YET_CONFIRMED'&&
+  sameJson(Object.keys(R.sourceBlobs||{}).sort(),source.slice().sort())&&
+  sameJson(Object.keys(R.qaBlobs||{}).sort(),qa)&&
+  source.every(p=>R.sourceBlobs[p]===physicalGit('hash-object',p)&&
+   B4.boundaries?.allowedProductFiles?.includes(p))&&
+  qa.every(p=>R.qaBlobs[p]===physicalGit('hash-object',p)&&
+   B4.boundaries?.allowedQaFiles?.includes(p))&&
+  source.every(p=>R.sourceBlobs[p]!==physicalGit('rev-parse',
+   'a0220a39cdf91ff71d3ef44212c215a5c4623903:'+p))&&
+  R.compositionBlobSha===P.compositionBlobSha&&
+  R.compositionBlobSha===physicalGit('hash-object',I6_CANONICAL_COMPOSITION)&&
+  R.rosterSourceBlobSha===P.rosterSourceBlobSha&&
+  R.rosterSourceBlobSha===physicalGit('hash-object','functions/assignable-advisor-roster.js')&&
+  R.authenticatedSuccessorUatRequired===true&&P.authenticatedSuccessorUatRequired===true&&
+  sameJson(P.onlyReadOnlyFunctions,['orbit360ScopedPolicyReadPreview','orbit360AssignableAdvisorRosterPreview'])&&
+  sameJson(R.onlyReadOnlyFunctions,P.onlyReadOnlyFunctions)&&
+  P.onlyIsolatedHosting===true&&R.onlyIsolatedHosting===true&&
+  P.previewEvidenceNotProductionAcceptance===true&&R.previewEvidenceNotProductionAcceptance===true&&
+  deny.every(k=>P[k]===false&&R[k]===false)&&
+  C.b4003SecurityReleaseHold?.status==='ACTIVE_FAIL_CLOSED_UNAUTHORIZED_BROWSER_FIRESTORE_READ_WRITE'&&
+  C.b4003SecurityReleaseHold?.livePromotionAuthorized===false&&
+  B4.boundaries?.livePromotionAuthorized===false,
+  'B4_003_ROLE_RECOVERY_EXACT_PREVIEW_AUTH_INVALID');
+ console.log('B4_003_ROLE_RECOVERY=EXACT_SOURCE_QA_PREVIEW_ONLY_SECURITY_HOLD');
+}
+const roleRecoveryPredecessor=p=>ROLE_RECOVERY_ACTIVE&&[
+ 'orbit360-platform/data/store-firestore-product-readonly-p0.js',
+ 'orbit360-platform/index.html'
+].includes(p)?realGit('rev-parse','a0220a39cdf91ff71d3ef44212c215a5c4623903:'+p):null;
 const protectedStorePreviousHash=p=>PROTECTED_STORE_TRANSPORT_ACTIVE&&[
   'orbit360-platform/core/backend-product-readonly-bootstrap-p0.js',
   'tools/gravicentra-b4-003-protected-hydration.test.cjs'
- ].includes(p)?realGit('rev-parse',PROTECTED_STORE_TRANSPORT.parentHead+':'+p):git('hash-object',p);
+ ].includes(p)?realGit('rev-parse',PROTECTED_STORE_TRANSPORT.parentHead+':'+p):
+  roleRecoveryPredecessor(p)||git('hash-object',p);
 const protectedStoreHistoricCompositionBlob=p=>PROTECTED_STORE_TRANSPORT_ACTIVE&&
  p==='orbit360-platform/core/backend-product-readonly-bootstrap-p0.js'
  ?protectedStorePreviousHash(p):COMP.productFileBlobs?.[p];
