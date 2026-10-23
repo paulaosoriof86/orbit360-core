@@ -140,7 +140,17 @@ console.log('B4_003_APPROVED_ROLE_SCOPE_PARITY_PASS Finance Marketing Assistant 
   const binding=control.b4003C0304BeforeImageSourceIntegration;
   assert.ok(binding,'Changed writer source requires a current Control Plane binding');
   assert.equal(binding.owner,proof.owner);
-  assert.equal(binding.candidateBlob,blob);
+  // The Oct-16 C03 source binding remains historic. A later, narrowly scoped
+  // fail-closed country successor may bind a newer physical writer without
+  // rewriting its earlier evidence or claiming a production security PASS.
+  if(binding.candidateBlob!==blob){
+   const successor=control.b4003WriterCountryFailClosedSuccessor20261023;
+   assert.ok(successor,'New writer bytes require an explicit successor');
+   assert.equal(successor.sourceBlobSha,blob);
+   assert.equal(successor.status,'SOURCE_STAGED_SYNTHETIC_QA_PASS_SECURITY_HOLD');
+   assert.equal(successor.operationalWriterDeploymentAuthorized,false);
+   assert.equal(successor.livePromotionAuthorized,false);
+  }else assert.equal(binding.candidateBlob,blob);
   assert.equal(binding.sourceChangeAuthorized,true);
   assert.equal(run.status,0);
   assert.equal(result.passed,12);

@@ -66,6 +66,15 @@ const ACTIVE_I65_FORENSIC_B4=String(C.i65ForensicRemediationPlan?.b4?.executionL
 need(exists(ACTIVE_I65_FORENSIC_B4),'I6_5_B4_ACTIVE_LOCK_MISSING:'+ACTIVE_I65_FORENSIC_B4);
 const S=readJson(STATUS_LEDGER),A=readJson(AUTH_RECEIPT),M5=readJson(V5_MANIFEST),M6=readJson(V6_MANIFEST),M=readJson(V7_MANIFEST),FRA=readJson(I65_FORENSIC_AUDIT),FRP=readJson(I65_FORENSIC_PLAN),PAY=readJson(I65_PAYMENT_INFERENCE),B1=readJson(I65_FORENSIC_B1),B2=readJson(I65_FORENSIC_B2),B3=readJson(I65_FORENSIC_B3),B4=readJson(ACTIVE_I65_FORENSIC_B4);
 const COMP=readJson(I6_CANONICAL_COMPOSITION),FIND=readJson(I6_FINDINGS_LEDGER),FRP2=readJson(I65_FORENSIC_PLAN_V2),REJ=readJson(I65_B2_REJECTION),RCM=readJson(I65_B2_ROOT_CAUSE);
+// The writer security successor is a new, exact source version. Preserve the
+// 22-Oct signed country/rules receipt against the bytes committed before this
+// successor, while validating today's live working bytes independently below.
+const WRITER_COUNTRY=C.b4003WriterCountryFailClosedSuccessor20261023||{};
+const WRITER_COUNTRY_ACTIVE=WRITER_COUNTRY.status==='SOURCE_STAGED_SYNTHETIC_QA_PASS_SECURITY_HOLD';
+const writerPreviousHash=p=>WRITER_COUNTRY_ACTIVE&&[
+  'functions/product-operational-domain.js',
+  'tools/gravicentra-b4-003-operational-write-security-regression.test.cjs'
+ ].includes(p)?realGit('rev-parse',WRITER_COUNTRY.parentHead+':'+p):realGit('hash-object',p);
 // An exact B4-003 cumulative source successor is subordinate to the same
 // release/security HOLD. It does not rewrite, pass or waive prior approvals.
 const COUNTRY_RULES=C.b4003RulesCountryHydrationSourceSuccessor20261022||{};
@@ -116,12 +125,12 @@ if(COUNTRY_RULES.status==='SOURCE_STAGED_QA_PASS_RELEASE_HOLD'){
     const pair=receipt.sourceFiles[p];
     return pair.before===realGit('rev-parse',head+':'+p)&&
       pair.before===COMP.productFileBlobs?.[p]&&COMP.productFiles.includes(p)&&
-      pair.after===realGit('hash-object',p)&&pair.after!==pair.before&&
+      pair.after===writerPreviousHash(p)&&pair.after!==pair.before&&
       (B4.boundaries?.allowedProductFiles?.includes(p)||narrowOutsideSource.includes(p));
   })&&qa.every(p=>{
     const pair=receipt.qaFiles[p];
     return pair.before===realGit('rev-parse',head+':'+p)&&
-      pair.after===realGit('hash-object',p)&&pair.after!==pair.before&&
+      pair.after===writerPreviousHash(p)&&pair.after!==pair.before&&
       (B4.boundaries?.allowedQaFiles?.includes(p)||narrowOutsideQa.includes(p));
   })&&receipt.verification?.firestoreEmulatorSyntheticDenialsPass===true&&
   receipt.verification?.operationalWriteCasesPassed===27&&
@@ -139,6 +148,65 @@ if(COUNTRY_RULES.status==='SOURCE_STAGED_QA_PASS_RELEASE_HOLD'){
  predecessorSourceBlobs=new Map(source.map(p=>[p,receipt.sourceFiles[p].before])
   .concat(qa.map(p=>[p,receipt.qaFiles[p].before])));
  console.log('B4_003_CUMULATIVE_SUCCESSOR=EXACT_SOURCE_AND_QA_BOUND_LIVE_HOLD');
+}
+if(WRITER_COUNTRY_ACTIVE){
+ const R=readJson(WRITER_COUNTRY.receiptPath);
+ const B=B4.b4003WriterCountryFailClosedSuccessor20261023||{};
+ const P=COMP.b4003WriterCountryFailClosedSuccessor20261023||{};
+ const source='functions/product-operational-domain.js';
+ const qa='tools/gravicentra-b4-003-operational-write-security-regression.test.cjs';
+ const current=realGit('rev-parse','HEAD');
+ const parentMatches=current===WRITER_COUNTRY.parentHead||
+  realGit('rev-parse','HEAD^')===WRITER_COUNTRY.parentHead;
+ const receiptSha=realGit('hash-object',WRITER_COUNTRY.receiptPath);
+ need(parentMatches&&
+  WRITER_COUNTRY.parentHead==='8e187a7bb1b788d886d021658846003b2756a995'&&
+  WRITER_COUNTRY.gate==='I6.5/B4-003'&&
+  WRITER_COUNTRY.authority==='PAULA_EXPLICIT_FIX_AND_DEPLOY_REQUEST_WITHIN_B4_003_20261023'&&
+  R.schema==='GI_I65_B4003_WRITER_COUNTRY_FAIL_CLOSED_SUCCESSOR_V1'&&
+  R.gate===WRITER_COUNTRY.gate&&R.status===WRITER_COUNTRY.status&&
+  R.parentHead===WRITER_COUNTRY.parentHead&&R.authority===WRITER_COUNTRY.authority&&
+  WRITER_COUNTRY.receiptBlobSha===receiptSha&&
+  sameJson(Object.keys(R.sourceFiles||{}),[source])&&
+  sameJson(Object.keys(R.qaFiles||{}),[qa])&&
+  R.sourceFiles[source]?.before===realGit('rev-parse',WRITER_COUNTRY.parentHead+':'+source)&&
+  R.sourceFiles[source]?.after===realGit('hash-object',source)&&
+  R.sourceFiles[source]?.before!==R.sourceFiles[source]?.after&&
+  R.qaFiles[qa]?.before===realGit('rev-parse',WRITER_COUNTRY.parentHead+':'+qa)&&
+  R.qaFiles[qa]?.after===realGit('hash-object',qa)&&
+  R.qaFiles[qa]?.before!==R.qaFiles[qa]?.after&&
+  WRITER_COUNTRY.sourceBlobSha===R.sourceFiles[source]?.after&&
+  WRITER_COUNTRY.qaBlobSha===R.qaFiles[qa]?.after&&
+  B.sourceBlobSha===WRITER_COUNTRY.sourceBlobSha&&P.sourceBlobSha===WRITER_COUNTRY.sourceBlobSha&&
+  B.qaBlobSha===WRITER_COUNTRY.qaBlobSha&&P.qaBlobSha===WRITER_COUNTRY.qaBlobSha&&
+  B.receiptBlobSha===receiptSha&&P.receiptBlobSha===receiptSha&&
+  B.gate===WRITER_COUNTRY.gate&&P.gate===WRITER_COUNTRY.gate&&
+  B.parentHead===WRITER_COUNTRY.parentHead&&P.parentHead===WRITER_COUNTRY.parentHead&&
+  R.verification?.syntheticWriteCasesPassedAfterFix===30&&
+  WRITER_COUNTRY.syntheticWriteCasesPassed===30&&B.syntheticWriteCasesPassed===30&&
+  R.verification?.syntheticNoNetworkTestsPassed===true&&
+  sameJson(R.verification?.negativeCasesFailedBeforeFix,
+    ['missing_member_country_denied','missing_document_country_denied'])&&
+  R.verification?.authenticatedRoleCountryUatAccepted===false&&
+  R.verification?.effectiveFirestoreRulesVerifiedSecure===false&&
+  R.verification?.productionSecurityAccepted===false&&
+  R.boundaries?.operationalBusinessWrites===0&&
+  R.boundaries?.firebaseRulesChanged===false&&
+  R.boundaries?.sharedDataModified===false&&
+  R.boundaries?.sharedFirestoreRulesDeploymentAuthorized===false&&
+  R.boundaries?.operationalWriterDeploymentAuthorized===false&&
+  R.boundaries?.livePromotionAuthorized===false&&
+  R.boundaries?.productionAccepted===false&&
+  R.boundaries?.gateAdvanceAuthorized===false&&
+  WRITER_COUNTRY.sharedFirestoreRulesDeploymentAuthorized===false&&
+  WRITER_COUNTRY.operationalWriterDeploymentAuthorized===false&&
+  WRITER_COUNTRY.livePromotionAuthorized===false&&
+  WRITER_COUNTRY.productionReadinessUnchanged===true&&
+  C.b4003SecurityReleaseHold?.status==='ACTIVE_FAIL_CLOSED_UNAUTHORIZED_BROWSER_FIRESTORE_READ_WRITE'&&
+  C.b4003SecurityReleaseHold?.livePromotionAuthorized===false&&
+  B4.boundaries?.livePromotionAuthorized===false,
+  'B4_003_WRITER_COUNTRY_FAIL_CLOSED_SOURCE_SUCCESSOR_INVALID');
+ console.log('B4_003_WRITER_COUNTRY_FAIL_CLOSED=EXACT_SOURCE_SYNTHETIC_QA_PASS_RELEASE_HOLD');
 }
 // B4-003: A successor never rewrites the certified blobs of an older Preview.
 // Its source is checked against the parent commit, the canonical composition,
@@ -252,6 +320,10 @@ if(PORTAL_COUNTRY.status==='SOURCE_STAGED_SYNTHETIC_QA_PASS_SECURITY_HOLD'){
  const qa='tools/gravicentra-b4-003-whatsapp-portal-country-policy.test.cjs';
  const compBlob=realGit('hash-object',I6_CANONICAL_COMPOSITION);
  const b4Blob=realGit('hash-object',ACTIVE_I65_FORENSIC_B4);
+ const portalSealedComp=WRITER_COUNTRY_ACTIVE?
+  realGit('rev-parse',WRITER_COUNTRY.parentHead+':'+I6_CANONICAL_COMPOSITION):compBlob;
+ const portalSealedB4=WRITER_COUNTRY_ACTIVE?
+  realGit('rev-parse',WRITER_COUNTRY.parentHead+':'+ACTIVE_I65_FORENSIC_B4):b4Blob;
  need(PORTAL_COUNTRY.gate==='I6.5/B4-003'&&
    PORTAL_COUNTRY.authority==='PAULA_EXPLICIT_PUBLISH_DEPLOY_WITHIN_CURRENT_GATE_20261023'&&
    PORTAL_COUNTRY.parentHead==='20181b1d01c1adfd077f6e635cff1d47179451f0'&&
@@ -293,7 +365,7 @@ if(PORTAL_COUNTRY.status==='SOURCE_STAGED_SYNTHETIC_QA_PASS_SECURITY_HOLD'){
    BOUND.sourceCommit===PORTAL_COUNTRY.sourceCommit&&
    BOUND.receiptPath===PORTAL_COUNTRY.receiptPath&&
    BOUND.receiptBlobSha===PORTAL_COUNTRY.receiptBlobSha&&
-   BOUND.compositionBlobSha===compBlob&&
+   BOUND.compositionBlobSha===portalSealedComp&&
    BOUND.authenticatedUatAccepted===false&&
    BOUND.sharedRulesDeployAuthorized===false&&
    BOUND.productionPromotionAuthorized===false&&
@@ -305,8 +377,8 @@ if(PORTAL_COUNTRY.status==='SOURCE_STAGED_SYNTHETIC_QA_PASS_SECURITY_HOLD'){
    STAGED.previousCompositionBlobSha===PORTAL_COUNTRY.previousCompositionBlobSha&&
    STAGED.authenticatedUatAccepted===false&&
    STAGED.noSharedRulesDeploy===true&&STAGED.noLivePromotion===true&&
-   PORTAL_COUNTRY.compositionBlobSha===compBlob&&
-   PORTAL_COUNTRY.executionLockBlobSha===b4Blob&&
+   PORTAL_COUNTRY.compositionBlobSha===portalSealedComp&&
+   PORTAL_COUNTRY.executionLockBlobSha===portalSealedB4&&
    B4.compositionLockBlobSha===compBlob&&
    C.canonicalAccumulationControl?.compositionLockBlobSha===compBlob&&
    C.currentB4?.compositionLockBlobSha===compBlob&&

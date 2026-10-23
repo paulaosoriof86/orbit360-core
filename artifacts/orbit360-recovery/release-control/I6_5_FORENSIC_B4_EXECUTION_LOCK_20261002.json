@@ -627,7 +627,7 @@
   },
   "findingLedgerBlobSha": "8125e97dcf1feb7f46081f95327952e65c2d1077",
   "continuityRegisterBlobSha": "4e6b0ac51736be360c4b95abe8fc01d8f1e78e20",
-  "compositionLockBlobSha": "647e0722323654c09bed26ac35fff8bb9d9182b6",
+  "compositionLockBlobSha": "fc705b9f80fd9d20d67cfc79ff89116e520382dc",
   "r18SourceFix": {
     "status": "SOURCE_FIXED_R18_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_SOURCE_FIX_20261005.json",
@@ -3911,6 +3911,21 @@
     "compositionBlobSha": "647e0722323654c09bed26ac35fff8bb9d9182b6",
     "authenticatedUatAccepted": false,
     "sharedRulesDeployAuthorized": false,
+    "productionPromotionAuthorized": false
+  },
+  "b4003WriterCountryFailClosedSuccessor20261023": {
+    "status": "SOURCE_STAGED_SYNTHETIC_QA_PASS_SECURITY_HOLD",
+    "gate": "I6.5/B4-003",
+    "authority": "PAULA_EXPLICIT_FIX_AND_DEPLOY_REQUEST_WITHIN_B4_003_20261023",
+    "parentHead": "8e187a7bb1b788d886d021658846003b2756a995",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_WRITER_COUNTRY_FAIL_CLOSED_SUCCESSOR_20261023.json",
+    "receiptBlobSha": "181bfdeaa6273a7c7172da236c0fe33386230c4c",
+    "sourceBlobSha": "11065f9a4e5325d6387e70c9f5b7ddd1329666d2",
+    "qaBlobSha": "e9d1a504b555d147a741a3717be5b2042305eabd",
+    "syntheticWriteCasesPassed": 30,
+    "authenticatedUatAccepted": false,
+    "sharedRulesDeployAuthorized": false,
+    "operationalWriterDeploymentAuthorized": false,
     "productionPromotionAuthorized": false
   }
 }

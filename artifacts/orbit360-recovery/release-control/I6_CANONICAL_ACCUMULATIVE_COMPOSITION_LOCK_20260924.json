@@ -6458,5 +6458,18 @@
     "authenticatedUatAccepted": false,
     "noSharedRulesDeploy": true,
     "noLivePromotion": true
+  },
+  "b4003WriterCountryFailClosedSuccessor20261023": {
+    "status": "SOURCE_STAGED_SYNTHETIC_QA_PASS_SECURITY_HOLD",
+    "gate": "I6.5/B4-003",
+    "parentHead": "8e187a7bb1b788d886d021658846003b2756a995",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_WRITER_COUNTRY_FAIL_CLOSED_SUCCESSOR_20261023.json",
+    "receiptBlobSha": "181bfdeaa6273a7c7172da236c0fe33386230c4c",
+    "sourceBlobSha": "11065f9a4e5325d6387e70c9f5b7ddd1329666d2",
+    "qaBlobSha": "e9d1a504b555d147a741a3717be5b2042305eabd",
+    "syntheticWriteCasesPassed": 30,
+    "noSharedRulesDeploy": true,
+    "noOperationalWriterDeployment": true,
+    "noLivePromotion": true
   }
 }

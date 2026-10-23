@@ -197,7 +197,13 @@ function canWrite(member,accessConfig,role,moduleKey,collection){
   const permissions=permissionsOf(member),extraKeys=[`${moduleKey}_manage`,`${moduleKey}_edit`,`${moduleKey}_editar`,`${moduleKey}_create`,`${moduleKey}_crear`].map(norm); if(permissions.some(p=>extraKeys.includes(p)))return true;
   const configured=matrixPermission(accessConfig,role,moduleKey,'editar'); return configured==null?legacyWriteAllowed(member,role,moduleKey,collection):configured;
 }
-function countryAllowed(member,row){const allowed=unique(member&&member.countries).map(v=>text(v,8).toUpperCase());if(!allowed.length)return true;const p=text(row&&row.pais,8).toUpperCase();return !p||['REQUIERE_VALIDACION','POR_VALIDAR','PENDIENTE'].includes(p)||allowed.includes(p);}
+// Server-side reads and writes fail closed when the country is absent or is
+// awaiting classification. A missing membership country must never mean ALL.
+function countryAllowed(member,row){
+  const allowed=unique(member&&member.countries).map(v=>text(v,8).toUpperCase()).filter(v=>['GT','CO'].includes(v));
+  const country=text(row&&(row.pais||row.country),8).toUpperCase();
+  return allowed.length>0&&['GT','CO'].includes(country)&&allowed.includes(country);
+}
 // Aseguradoras are global by *advisor*, never by *country*. The generic
 // unscoped shortcut previously allowed a CO-only administrator to edit a GT
 // insurer (or an unclassified insurer) through the server callable.

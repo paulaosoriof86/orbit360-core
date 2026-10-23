@@ -1,0 +1,38 @@
+{
+  "schema": "GI_I65_B4003_WRITER_COUNTRY_FAIL_CLOSED_SUCCESSOR_V1",
+  "gate": "I6.5/B4-003",
+  "status": "SOURCE_STAGED_SYNTHETIC_QA_PASS_SECURITY_HOLD",
+  "authority": "PAULA_EXPLICIT_FIX_AND_DEPLOY_REQUEST_WITHIN_B4_003_20261023",
+  "parentHead": "8e187a7bb1b788d886d021658846003b2756a995",
+  "rootCause": "Backend countryAllowed treated an absent member country or missing document country as authorization. The canonical protected reader already requires an explicit assigned GT or CO country.",
+  "sourceFiles": {
+    "functions/product-operational-domain.js": {
+      "before": "2c2a3cef60fb8a12ff4994f0d1271cb266602bac",
+      "after": "11065f9a4e5325d6387e70c9f5b7ddd1329666d2"
+    }
+  },
+  "qaFiles": {
+    "tools/gravicentra-b4-003-operational-write-security-regression.test.cjs": {
+      "before": "391f67841cd86c70d5cbc281f073b9d617b6fc24",
+      "after": "e9d1a504b555d147a741a3717be5b2042305eabd"
+    }
+  },
+  "verification": {
+    "negativeCasesFailedBeforeFix": ["missing_member_country_denied", "missing_document_country_denied"],
+    "syntheticWriteCasesPassedAfterFix": 30,
+    "syntheticNoNetworkTestsPassed": true,
+    "authenticatedRoleCountryUatAccepted": false,
+    "effectiveFirestoreRulesVerifiedSecure": false,
+    "productionSecurityAccepted": false
+  },
+  "boundaries": {
+    "operationalBusinessWrites": 0,
+    "firebaseRulesChanged": false,
+    "sharedDataModified": false,
+    "sharedFirestoreRulesDeploymentAuthorized": false,
+    "operationalWriterDeploymentAuthorized": false,
+    "livePromotionAuthorized": false,
+    "productionAccepted": false,
+    "gateAdvanceAuthorized": false
+  }
+}
