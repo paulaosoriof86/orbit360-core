@@ -4015,5 +4015,30 @@
     "authenticatedUatAccepted": false,
     "sharedFirestoreRulesDeploymentAuthorized": false,
     "livePromotionAuthorized": false
+  },
+  "b4003PostAuthClientPagingLatencyPreviewAuthorization20261023": {
+    "status": "AUTHORIZED_EXACT_ISOLATED_READONLY_PREVIEW",
+    "gate": "I6.5/B4-003",
+    "authority": "PAULA_CONTINUE_EXISTING_I65_B4003_AFTER_AUTHENTICATED_LOGIN_FAIL_20261023",
+    "sourceCommit": "a0220a39cdf91ff71d3ef44212c215a5c4623903",
+    "triggerSubject": "build(i6.5 B4-003): post-auth client paging latency Preview",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_POST_AUTH_CLIENT_PAGING_LATENCY_PREVIEW_AUTH_20261023.json",
+    "receiptBlobSha": "4f2e2906da84957dcf5e3ca98f3422b02d8d32bf",
+    "sourceReceiptBlobSha": "dda7f7ea88bdf5dffcb536e48e9ec668def34725",
+    "compositionBlobSha": "3550cacafb0260ee51820e0f1a130f375e61f505",
+    "rosterSourceBlobSha": "75ca53db55e2665123589b0e63253a8e4f8c377c",
+    "onlyReadOnlyFunctions": ["orbit360ScopedPolicyReadPreview", "orbit360AssignableAdvisorRosterPreview"],
+    "onlyIsolatedHosting": true,
+    "authenticatedRoleCountryUatRequired": true,
+    "previewEvidenceNotProductionAcceptance": true,
+    "sharedFirestoreRulesDeployAuthorized": false,
+    "otherFunctionsDeployAuthorized": false,
+    "operationalWriterDeployAuthorized": false,
+    "businessWritesAuthorized": false,
+    "syntheticQaWritesAuthorized": false,
+    "realUserImpersonationAuthorized": false,
+    "livePromotionAuthorized": false,
+    "dataRefreshAuthorized": false,
+    "reimportAuthorized": false
   }
 }

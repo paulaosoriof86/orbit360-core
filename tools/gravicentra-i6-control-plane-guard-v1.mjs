@@ -132,6 +132,49 @@ if(LATENCY_REPAIR_ACTIVE){
  latencyHistoricBlobs=new Map(exactPaths.map(p=>[p,pairs[p].before]));
  console.log('B4_003_POST_AUTH_CLIENT_PAGING_LATENCY=BOUNDED_SYNTHETIC_QA_PASS_REAL_UAT_PENDING_LIVE_HOLD');
 }
+const LATENCY_PREVIEW=C.b4003PostAuthClientPagingLatencyPreviewAuthorization20261023||{};
+if(LATENCY_PREVIEW.status==='AUTHORIZED_EXACT_ISOLATED_READONLY_PREVIEW'){
+ const P=LATENCY_PREVIEW,R=readJson(P.receiptPath);
+ const B=B4.b4003PostAuthClientPagingLatencyPreviewAuthorization20261023||{};
+ const L=LATENCY_REPAIR;
+ const sourceFiles=Object.assign({},R.sourceBlobs||{},R.qaBlobs||{});
+ const sourceAncestor=physicalGit('merge-base',P.sourceCommit,'HEAD')===P.sourceCommit;
+ const localMatchesParent=physicalGit('rev-parse','HEAD^{tree}')===
+  physicalGit('rev-parse',L.parentHead+'^{tree}');
+ need(LATENCY_REPAIR_ACTIVE&&P.gate==='I6.5/B4-003'&&
+  P.authority==='PAULA_CONTINUE_EXISTING_I65_B4003_AFTER_AUTHENTICATED_LOGIN_FAIL_20261023'&&
+  P.triggerSubject==='build(i6.5 B4-003): post-auth client paging latency Preview'&&
+  P.sourceCommit==='a0220a39cdf91ff71d3ef44212c215a5c4623903'&&
+  (sourceAncestor||localMatchesParent)&&sameJson(P,B)&&
+  R.schema==='GI_I65_B4003_POST_AUTH_CLIENT_PAGING_LATENCY_PREVIEW_AUTH_V1'&&
+  R.gate===P.gate&&R.status===P.status&&R.authority===P.authority&&
+  R.triggerSubject===P.triggerSubject&&R.sourceCommit===P.sourceCommit&&
+  P.receiptBlobSha===physicalGit('hash-object',P.receiptPath)&&
+  P.sourceReceiptBlobSha===L.receiptBlobSha&&
+  R.sourceReceiptPath===L.receiptPath&&R.sourceReceiptBlobSha===L.receiptBlobSha&&
+  L.receiptBlobSha===physicalGit('hash-object',L.receiptPath)&&
+  sameJson(Object.keys(sourceFiles).sort(),Object.keys({...readJson(L.receiptPath).sourceFiles,...readJson(L.receiptPath).qaFiles}).sort())&&
+  Object.entries(sourceFiles).every(([p,sha])=>sha===physicalGit('hash-object',p)&&
+    sha===physicalGit('rev-parse',P.sourceCommit+':'+p))&&
+  P.compositionBlobSha===physicalGit('hash-object',I6_CANONICAL_COMPOSITION)&&
+  R.compositionBlobSha===P.compositionBlobSha&&
+  P.rosterSourceBlobSha===physicalGit('hash-object','functions/assignable-advisor-roster.js')&&
+  R.rosterSourceBlobSha===P.rosterSourceBlobSha&&
+  sameJson(P.onlyReadOnlyFunctions,['orbit360ScopedPolicyReadPreview','orbit360AssignableAdvisorRosterPreview'])&&
+  sameJson(R.onlyReadOnlyFunctions,P.onlyReadOnlyFunctions)&&
+  R.previousAuthenticatedUatStatus==='FAIL_WAITING_SNAPSHOTS_STORE_READINESS_TIMEOUT'&&
+  R.nextRealAuthenticatedUatStatus==='PENDING'&&
+  ['onlyIsolatedHosting','authenticatedRoleCountryUatRequired','previewEvidenceNotProductionAcceptance']
+   .every(k=>P[k]===true&&R[k]===true)&&
+  ['sharedFirestoreRulesDeployAuthorized','otherFunctionsDeployAuthorized',
+   'operationalWriterDeployAuthorized','businessWritesAuthorized','syntheticQaWritesAuthorized',
+   'realUserImpersonationAuthorized','livePromotionAuthorized','dataRefreshAuthorized','reimportAuthorized']
+   .every(k=>P[k]===false&&R[k]===false)&&
+  C.b4003SecurityReleaseHold?.status==='ACTIVE_FAIL_CLOSED_UNAUTHORIZED_BROWSER_FIRESTORE_READ_WRITE'&&
+  B4.boundaries?.livePromotionAuthorized===false&&FIND.findings.length===295,
+  'B4_003_POST_AUTH_CLIENT_PAGING_LATENCY_PREVIEW_AUTH_INVALID');
+ console.log('B4_003_POST_AUTH_CLIENT_PAGING_LATENCY_PREVIEW_AUTH=EXACT_READONLY_SECURITY_HOLD');
+}
 // Current diagnostic is a separate, narrowly pinned source successor. Map
 // historical receipt assertions back to the previously certified f570 tree;
 // the successor itself is checked against today's real working-tree bytes.
