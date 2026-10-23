@@ -148,6 +148,16 @@ const UAT_FIX_ACTIVE=UAT_FIX.status==='SOURCE_FIXED_LOCAL_QA_PASS_PREVIEW_PENDIN
 const preUatFixBlob=p=>UAT_FIX_ACTIVE?git('rev-parse',UAT_FIX.parentHead+':'+p):git('hash-object',p);
 const preUatFixComposition=UAT_FIX_ACTIVE?UAT_FIX.previousCompositionBlobSha:git('hash-object',I6_CANONICAL_COMPOSITION);
 const preUatFixExecution=UAT_FIX_ACTIVE?UAT_FIX.previousExecutionLockBlobSha:git('hash-object',ACTIVE_I65_FORENSIC_B4);
+// A new successor is checked against its exact predecessor commit. Preserve
+// the earlier UAT receipt at that committed parent; later updates never
+// retroactively change the historical composition or execution lock blobs.
+const afterUatCountry=C.b4003WhatsappPortalCountrySuccessor20261023||{};
+const uatSealAt=afterUatCountry.status==='SOURCE_STAGED_SYNTHETIC_QA_PASS_SECURITY_HOLD'?
+ afterUatCountry.parentHead:'';
+const uatFixSealedComposition=uatSealAt?
+ realGit('rev-parse',uatSealAt+':'+I6_CANONICAL_COMPOSITION):git('hash-object',I6_CANONICAL_COMPOSITION);
+const uatFixSealedExecution=uatSealAt?
+ realGit('rev-parse',uatSealAt+':'+ACTIVE_I65_FORENSIC_B4):git('hash-object',ACTIVE_I65_FORENSIC_B4);
 if(UAT_FIX_ACTIVE){
  const receipt=readJson(UAT_FIX.receiptPath),locked=B4.b4003AuthenticatedUatCausalFix20261022||{};
  const staged=COMP.b4003AuthenticatedUatCausalFix20261022||{};
@@ -162,14 +172,14 @@ if(UAT_FIX_ACTIVE){
    receipt.parentHead===UAT_FIX.parentHead&&receipt.sourceCommit===UAT_FIX.sourceCommit&&
    receipt.previousCompositionBlobSha===preUatFixComposition&&
    receipt.previousExecutionLockBlobSha===preUatFixExecution&&
-   UAT_FIX.compositionBlobSha===git('hash-object',I6_CANONICAL_COMPOSITION)&&
-   UAT_FIX.executionLockBlobSha===git('hash-object',ACTIVE_I65_FORENSIC_B4)&&
+   UAT_FIX.compositionBlobSha===uatFixSealedComposition&&
+   UAT_FIX.executionLockBlobSha===uatFixSealedExecution&&
    locked.compositionBlobSha===UAT_FIX.compositionBlobSha&&
    locked.receiptBlobSha===UAT_FIX.receiptBlobSha&&
-   B4.compositionLockBlobSha===UAT_FIX.compositionBlobSha&&
-   C.canonicalAccumulationControl?.compositionLockBlobSha===UAT_FIX.compositionBlobSha&&
-   C.currentB4?.executionLockBlobSha===UAT_FIX.executionLockBlobSha&&
-   C.i65ForensicRemediationPlan?.b4?.executionLockBlobSha===UAT_FIX.executionLockBlobSha&&
+   B4.compositionLockBlobSha===realGit('hash-object',I6_CANONICAL_COMPOSITION)&&
+   C.canonicalAccumulationControl?.compositionLockBlobSha===realGit('hash-object',I6_CANONICAL_COMPOSITION)&&
+   C.currentB4?.executionLockBlobSha===realGit('hash-object',ACTIVE_I65_FORENSIC_B4)&&
+   C.i65ForensicRemediationPlan?.b4?.executionLockBlobSha===realGit('hash-object',ACTIVE_I65_FORENSIC_B4)&&
    source.length===3&&qa.length===2&&
    sameJson(receipt.sourceFiles,Object.fromEntries(source.map(p=>[p,{before:staged.sourceBlobsBefore?.[p],after:staged.sourceBlobsAfter?.[p]}])))&&
    source.every(p=>receipt.sourceFiles[p].before===preUatFixBlob(p)&&
@@ -201,7 +211,7 @@ if(UAT_FIX_PREVIEW.status==='AUTHORIZED_EXACT_SCOPED_READONLY_PREVIEW'){
    UAT_FIX_PREVIEW.triggerSubject==='build(i6.5 B4-003): exact authenticated UAT causal fixes Preview'&&
    UAT_FIX_PREVIEW.sourceCommit===UAT_FIX.sourceCommit&&
    UAT_FIX_PREVIEW.sourceReceiptBlobSha===UAT_FIX.receiptBlobSha&&
-   UAT_FIX_PREVIEW.compositionBlobSha===git('hash-object',I6_CANONICAL_COMPOSITION)&&
+   UAT_FIX_PREVIEW.compositionBlobSha===uatFixSealedComposition&&
    UAT_FIX_PREVIEW.configQaBlobSha===git('hash-object','tools/gravicentra-b4-003-config-users-owner.test.cjs')&&
    UAT_FIX_PREVIEW.financeQaBlobSha===git('hash-object','tools/gravicentra-b4-003-portfolio-verified-receipt-amount.test.cjs')&&
    Object.entries(successor.sourceBlobsAfter||{}).length===3&&
@@ -226,6 +236,87 @@ if(UAT_FIX_PREVIEW.status==='AUTHORIZED_EXACT_SCOPED_READONLY_PREVIEW'){
    B4.boundaries?.livePromotionAuthorized===false,
    'B4_003_UAT_CAUSAL_EXACT_PREVIEW_AUTH_INVALID');
  console.log('B4_003_UAT_CAUSAL_EXACT_PREVIEW_AUTH=PASS_READONLY_LIVE_HOLD');
+}
+// Oct 23 successor: never replace UAT evidence with current bytes. Bind the
+// two exact product paths, the QA test and the preexisting source ancestry.
+// Explicit publication authority does not waive the Firestore security HOLD.
+const PORTAL_COUNTRY=C.b4003WhatsappPortalCountrySuccessor20261023||{};
+if(PORTAL_COUNTRY.status==='SOURCE_STAGED_SYNTHETIC_QA_PASS_SECURITY_HOLD'){
+ const BOUND=B4.b4003WhatsappPortalCountrySuccessor20261023||{};
+ const STAGED=COMP.b4003WhatsappPortalCountrySuccessor20261023||{};
+ const R=readJson(PORTAL_COUNTRY.receiptPath);
+ const product=[
+  'orbit360-platform/modules/notificaciones.js',
+  'orbit360-platform/modules/portal.js'
+ ];
+ const qa='tools/gravicentra-b4-003-whatsapp-portal-country-policy.test.cjs';
+ const compBlob=realGit('hash-object',I6_CANONICAL_COMPOSITION);
+ const b4Blob=realGit('hash-object',ACTIVE_I65_FORENSIC_B4);
+ need(PORTAL_COUNTRY.gate==='I6.5/B4-003'&&
+   PORTAL_COUNTRY.authority==='PAULA_EXPLICIT_PUBLISH_DEPLOY_WITHIN_CURRENT_GATE_20261023'&&
+   PORTAL_COUNTRY.parentHead==='20181b1d01c1adfd077f6e635cff1d47179451f0'&&
+   PORTAL_COUNTRY.sourceCommit==='0983f0cfde6eeb516ebc0133e1c43633af68f474'&&
+   realGit('rev-parse',PORTAL_COUNTRY.sourceCommit+'^')===PORTAL_COUNTRY.parentHead&&
+   realGit('rev-parse',PORTAL_COUNTRY.parentHead+':'+I6_CANONICAL_COMPOSITION)===PORTAL_COUNTRY.previousCompositionBlobSha&&
+   PORTAL_COUNTRY.receiptBlobSha===realGit('hash-object',PORTAL_COUNTRY.receiptPath)&&
+   R.schema==='GI_I65_B4003_WHATSAPP_PORTAL_COUNTRY_SOURCE_SUCCESSOR_V1'&&
+   R.status===PORTAL_COUNTRY.status&&R.gate===PORTAL_COUNTRY.gate&&
+   R.authority===PORTAL_COUNTRY.authority&&
+   R.parentHead===PORTAL_COUNTRY.parentHead&&
+   R.sourceCommit===PORTAL_COUNTRY.sourceCommit&&
+   R.previousCompositionBlobSha===PORTAL_COUNTRY.previousCompositionBlobSha&&
+   sameJson(Object.keys(R.sourceFiles||{}).sort(),product.slice().sort())&&
+   sameJson(Object.keys(R.qaFiles||{}),[qa])&&
+   product.every(p=>{
+     const pair=R.sourceFiles[p];
+     return pair.before===realGit('rev-parse',PORTAL_COUNTRY.parentHead+':'+p)&&
+       pair.after===realGit('rev-parse',PORTAL_COUNTRY.sourceCommit+':'+p)&&
+       pair.after===realGit('hash-object',p)&&pair.after!==pair.before&&
+       pair.after===COMP.productFileBlobs[p]&&COMP.productFiles.includes(p)&&
+       pair.after===STAGED.sourceBlobsAfter?.[p];
+   })&&
+   R.qaFiles[qa]===realGit('rev-parse',PORTAL_COUNTRY.sourceCommit+':'+qa)&&
+   R.qaFiles[qa]===realGit('hash-object',qa)&&R.qaFiles[qa]===STAGED.qaBlobSha&&
+   R.verification?.syntheticNoNetworkTestsPassed===true&&
+   R.verification?.authenticatedRoleCountryUatAccepted===false&&
+   R.verification?.effectiveFirestoreRulesVerifiedSecure===false&&
+   R.boundaries?.operationalBusinessWrites===0&&
+   R.boundaries?.firebaseRulesChanged===false&&
+   R.boundaries?.firestoreRulesDeployAuthorized===false&&
+   R.boundaries?.sharedDataModified===false&&
+   R.boundaries?.livePromotionAuthorized===false&&
+   R.boundaries?.productionAccepted===false&&
+   R.boundaries?.gateAdvanceAuthorized===false&&
+   BOUND.gate===PORTAL_COUNTRY.gate&&BOUND.status===PORTAL_COUNTRY.status&&
+   BOUND.authority===PORTAL_COUNTRY.authority&&
+   BOUND.parentHead===PORTAL_COUNTRY.parentHead&&
+   BOUND.sourceCommit===PORTAL_COUNTRY.sourceCommit&&
+   BOUND.receiptPath===PORTAL_COUNTRY.receiptPath&&
+   BOUND.receiptBlobSha===PORTAL_COUNTRY.receiptBlobSha&&
+   BOUND.compositionBlobSha===compBlob&&
+   BOUND.authenticatedUatAccepted===false&&
+   BOUND.sharedRulesDeployAuthorized===false&&
+   BOUND.productionPromotionAuthorized===false&&
+   STAGED.status===PORTAL_COUNTRY.status&&STAGED.gate===PORTAL_COUNTRY.gate&&
+   STAGED.parentHead===PORTAL_COUNTRY.parentHead&&
+   STAGED.sourceCommit===PORTAL_COUNTRY.sourceCommit&&
+   STAGED.receiptPath===PORTAL_COUNTRY.receiptPath&&
+   STAGED.receiptBlobSha===PORTAL_COUNTRY.receiptBlobSha&&
+   STAGED.previousCompositionBlobSha===PORTAL_COUNTRY.previousCompositionBlobSha&&
+   STAGED.authenticatedUatAccepted===false&&
+   STAGED.noSharedRulesDeploy===true&&STAGED.noLivePromotion===true&&
+   PORTAL_COUNTRY.compositionBlobSha===compBlob&&
+   PORTAL_COUNTRY.executionLockBlobSha===b4Blob&&
+   B4.compositionLockBlobSha===compBlob&&
+   C.canonicalAccumulationControl?.compositionLockBlobSha===compBlob&&
+   C.currentB4?.compositionLockBlobSha===compBlob&&
+   C.currentB4?.executionLockBlobSha===b4Blob&&
+   C.i65ForensicRemediationPlan?.b4?.executionLockBlobSha===b4Blob&&
+   C.b4003SecurityReleaseHold?.status==='ACTIVE_FAIL_CLOSED_UNAUTHORIZED_BROWSER_FIRESTORE_READ_WRITE'&&
+   C.b4003SecurityReleaseHold?.livePromotionAuthorized===false&&
+   FIND.findings.length===295,
+   'B4_003_WHATSAPP_PORTAL_COUNTRY_SOURCE_OR_AUTH_INVALID');
+ console.log('B4_003_WHATSAPP_PORTAL_COUNTRY_SUCCESSOR=EXACT_SOURCE_QA_BOUND_SECURITY_HOLD');
 }
 const MOCK_ALIGNMENT=C.b4003InicioSyntheticHarnessAlignment20261022||{};
 if(MOCK_ALIGNMENT.status==='SOURCE_QA_FIX_LOCAL_PASS_CI_RERUN_PENDING'){

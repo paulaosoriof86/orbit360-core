@@ -1,0 +1,36 @@
+{
+  "schema": "GI_I65_B4003_WHATSAPP_PORTAL_COUNTRY_SOURCE_SUCCESSOR_V1",
+  "status": "SOURCE_STAGED_SYNTHETIC_QA_PASS_SECURITY_HOLD",
+  "gate": "I6.5/B4-003",
+  "authority": "PAULA_EXPLICIT_PUBLISH_DEPLOY_WITHIN_CURRENT_GATE_20261023",
+  "parentHead": "20181b1d01c1adfd077f6e635cff1d47179451f0",
+  "sourceCommit": "0983f0cfde6eeb516ebc0133e1c43633af68f474",
+  "previousCompositionBlobSha": "6fc965e06927b5775d462a136a2f4bd7e96c1e06",
+  "sourceFiles": {
+    "orbit360-platform/modules/notificaciones.js": {
+      "before": "9f9019a62a7ff94e3728947c128b43b6877269f1",
+      "after": "f65488cbdb58b2dbcd98b8aa9495e2282d61006e"
+    },
+    "orbit360-platform/modules/portal.js": {
+      "before": "957cefe0647bff2b350e5b3f0f78ef7a9e97703f",
+      "after": "b91dab03139456a972422a398cf803cc0341922d"
+    }
+  },
+  "qaFiles": {
+    "tools/gravicentra-b4-003-whatsapp-portal-country-policy.test.cjs": "9b4beafb623948208bb6274a6a49bbfe2dff10c5"
+  },
+  "verification": {
+    "syntheticNoNetworkTestsPassed": true,
+    "authenticatedRoleCountryUatAccepted": false,
+    "effectiveFirestoreRulesVerifiedSecure": false
+  },
+  "boundaries": {
+    "operationalBusinessWrites": 0,
+    "firebaseRulesChanged": false,
+    "firestoreRulesDeployAuthorized": false,
+    "sharedDataModified": false,
+    "livePromotionAuthorized": false,
+    "productionAccepted": false,
+    "gateAdvanceAuthorized": false
+  }
+}

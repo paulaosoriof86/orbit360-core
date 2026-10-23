@@ -36,7 +36,7 @@
   "baselineCertifiedSourceSha": "4bf67a3738751fe2432a130fd23254a6f1c7d16e",
   "parentAcceptedBlockSourceSha": "7e96cf419c0858580fef584340e65b84e40c77b5",
   "currentBlock": "B4",
-  "productFileCount": 113,
+  "productFileCount": 114,
   "productFiles": [
     ".github/workflows/cotcomp-workflow-s419-source-qa.yml",
     "docs/ays/GRAVICENTRA_QUOTE_AUTHORITY_CONTRACT_v1_20261003.md",
@@ -136,6 +136,7 @@
     "orbit360-platform/modules/inicio.js",
     "orbit360-platform/modules/issuance-endosos-v1201-bridge.js",
     "orbit360-platform/modules/leads.js",
+    "orbit360-platform/modules/notificaciones.js",
     "orbit360-platform/modules/ops.js",
     "orbit360-platform/modules/policy-receipts-v1199-bridge.js",
     "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
@@ -240,12 +241,13 @@
     "orbit360-platform/modules/inicio.js": "168a1d2648fbd98c550530144eea0876cb464192",
     "orbit360-platform/modules/issuance-endosos-v1201-bridge.js": "2020152b4b2df1338be4b3ef2a9f121d777e21db",
     "orbit360-platform/modules/leads.js": "4e12e604382f2731a03d29cf00db3c086d77ebc1",
+    "orbit360-platform/modules/notificaciones.js": "f65488cbdb58b2dbcd98b8aa9495e2282d61006e",
     "orbit360-platform/modules/ops.js": "a4ca3dbb4613d541af411f12fce9773a072b0d41",
     "orbit360-platform/modules/policy-receipts-v1199-bridge.js": "79e8eefc821b17b1abb3ba7b26558e90199a9ea5",
     "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js": "1b8dceb208b93220ce232037b4d0d394bb022f62",
     "orbit360-platform/modules/polizas.js": "3a423fea2083e1b1dfd1863f31e30910112af1f5",
     "orbit360-platform/modules/portal-v1142-copyfix.js": "702cae307395361b3a7f61b7a268d15d85b44955",
-    "orbit360-platform/modules/portal.js": "957cefe0647bff2b350e5b3f0f78ef7a9e97703f",
+    "orbit360-platform/modules/portal.js": "b91dab03139456a972422a398cf803cc0341922d",
     "orbit360-platform/modules/renewals-v1200-operational-bridge.js": "43b3a6b07eba40baa50b61b238174540cd9bf430",
     "orbit360-platform/modules/renewals-v1200-permission-guard.js": "f3f75e25d32c7e4784a19b089353d9706c98dcda",
     "orbit360-platform/modules/renewals-v1201-issued-filter.js": "ae1df0174121c965f610407ae723094e833ebeaf",
@@ -6439,5 +6441,22 @@
     "noLivePromotion": true,
     "noFirestoreDataWrites": true,
     "previousTechnicalPreviewPreserved": true
+  },
+  "b4003WhatsappPortalCountrySuccessor20261023": {
+    "status": "SOURCE_STAGED_SYNTHETIC_QA_PASS_SECURITY_HOLD",
+    "gate": "I6.5/B4-003",
+    "parentHead": "20181b1d01c1adfd077f6e635cff1d47179451f0",
+    "sourceCommit": "0983f0cfde6eeb516ebc0133e1c43633af68f474",
+    "previousCompositionBlobSha": "6fc965e06927b5775d462a136a2f4bd7e96c1e06",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_WHATSAPP_PORTAL_COUNTRY_SOURCE_SUCCESSOR_20261023.json",
+    "receiptBlobSha": "0a6e8b737fb73cdd70592fbf12b3f39fae907fad",
+    "sourceBlobsAfter": {
+      "orbit360-platform/modules/notificaciones.js": "f65488cbdb58b2dbcd98b8aa9495e2282d61006e",
+      "orbit360-platform/modules/portal.js": "b91dab03139456a972422a398cf803cc0341922d"
+    },
+    "qaBlobSha": "9b4beafb623948208bb6274a6a49bbfe2dff10c5",
+    "authenticatedUatAccepted": false,
+    "noSharedRulesDeploy": true,
+    "noLivePromotion": true
   }
 }
