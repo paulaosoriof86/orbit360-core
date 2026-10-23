@@ -1,0 +1,120 @@
+name: AYS S5.12D Function-Only LAB Publish
+on:
+  push:
+    branches:
+      - ays/siniestros-s512d-public-resolver-lab-20261007
+    paths:
+      - .github/workflows/siniestros-s512d-function-only-lab-20261023.yml
+permissions:
+  contents: read
+concurrency:
+  group: ays-s512d-function-only-lab
+  cancel-in-progress: false
+env:
+  PROJECT_ID: ays-orbit-360-lab
+  FUNCTION_NAME: siniestrosPublicResolverS512D
+  EXPECTED_PARENT: 39839d10708814a28054919ae68eb716e0fbf4fc
+  WORKFLOW_PATH: .github/workflows/siniestros-s512d-function-only-lab-20261023.yml
+jobs:
+  publish:
+    if: github.repository == 'paulaosoriof86/orbit360-core' && github.ref == 'refs/heads/ays/siniestros-s512d-public-resolver-lab-20261007'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      FIREBASE_SERVICE_ACCOUNT_FALLBACK: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+    steps:
+      - name: Checkout exact source
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+          persist-credentials: false
+      - name: Fail closed if parent or change scope differs
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD^)" = "$EXPECTED_PARENT"
+          test "$(git diff --name-only "$EXPECTED_PARENT" HEAD)" = "$WORKFLOW_PATH"
+          test "$PROJECT_ID" = 'ays-orbit-360-lab'
+          test "$FUNCTION_NAME" = 'siniestrosPublicResolverS512D'
+          grep -Fq "'https://aysseguros.com'" functions/siniestros-public-resolver-s512d.js
+          grep -Fq "require('./siniestros-public-resolver-s512d')" functions/bootstrap.js
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install locked functions dependencies
+        working-directory: functions
+        run: npm ci
+      - name: Execute resolver tests and syntax check
+        working-directory: functions
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check siniestros-public-resolver-s512d.js
+          node --test siniestros-s512d-public-surface.test.js
+      - name: Verify existing LAB service-account identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          SA="$FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB"
+          if [ -z "$SA" ]; then SA="$FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB"; fi
+          if [ -z "$SA" ]; then SA="$FIREBASE_SERVICE_ACCOUNT_FALLBACK"; fi
+          test -n "$SA"
+          mkdir -p "$RUNNER_TEMP/s512d"
+          CREDS="$RUNNER_TEMP/s512d/credentials.json"
+          printf '%s' "$SA" > "$CREDS"
+          chmod 600 "$CREDS"
+          ACTUAL="$(node -e "const fs=require('fs');process.stdout.write(JSON.parse(fs.readFileSync(process.argv[1],'utf8')).project_id||'')" "$CREDS")"
+          test "$ACTUAL" = "$PROJECT_ID"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$CREDS" >> "$GITHUB_ENV"
+      - name: Install pinned Firebase CLI
+        run: npm install --global firebase-tools@15.32.0
+      - name: Deploy only S5.12D resolver to LAB
+        shell: bash
+        run: |
+          set -euo pipefail
+          firebase deploy --only "functions:siniestrosPublicResolverS512D" --project "ays-orbit-360-lab" --non-interactive --force
+      - name: Probe exact origin, insurer resolution and negative gates
+        shell: bash
+        run: |
+          set -euo pipefail
+          URL='https://us-central1-ays-orbit-360-lab.cloudfunctions.net/siniestrosPublicResolverS512D'
+          mkdir -p "$RUNNER_TEMP/s512d/probes"
+          for i in 1 2 3 4 5; do
+            CODE="$(curl -sS --max-time 20 -D "$RUNNER_TEMP/s512d/probes/headers" -o "$RUNNER_TEMP/s512d/probes/list" -w '%{http_code}' -G "$URL" --data-urlencode country=GT --data-urlencode action=list -H 'Origin: https://aysseguros.com')"
+            if [ "$CODE" = 200 ]; then break; fi
+            sleep 5
+          done
+          test "$CODE" = 200
+          grep -iq '^access-control-allow-origin: https://aysseguros.com' "$RUNNER_TEMP/s512d/probes/headers"
+          node - "$RUNNER_TEMP/s512d/probes/list" <<'NODE'
+          const fs=require('fs'),assert=require('node:assert/strict');
+          const x=JSON.parse(fs.readFileSync(process.argv[2],'utf8'));
+          assert.equal(x.ok,true);assert.equal(x.country,'GT');
+          assert.equal(x.schemaVersion,'ays-siniestros-s512d-public-resolver-v1');
+          assert.equal(x.count,8);assert.equal(x.insurerNames.length,8);
+          assert.equal(x.truth.coverageConfirmed,false);assert.equal(x.truth.eligibilityConfirmed,false);
+          NODE
+          CODE="$(curl -sS --max-time 20 -o "$RUNNER_TEMP/s512d/probes/roble" -w '%{http_code}' -G "$URL" --data-urlencode country=GT --data-urlencode 'insurer=SEGUROS EL ROBLE' -H 'Origin: https://aysseguros.com')"
+          test "$CODE" = 200
+          node - "$RUNNER_TEMP/s512d/probes/roble" <<'NODE'
+          const fs=require('fs'),assert=require('node:assert/strict');
+          const x=JSON.parse(fs.readFileSync(process.argv[2],'utf8'));
+          assert.equal(x.insurerChannel.value,'1797');assert.equal(x.insurerChannel.validated,true);
+          assert.equal(x.truth.coverageConfirmed,false);
+          NODE
+          CODE="$(curl -sS --max-time 20 -o "$RUNNER_TEMP/s512d/probes/deny" -w '%{http_code}' -G "$URL" --data-urlencode country=GT --data-urlencode action=list -H 'Origin: https://untrusted.example')"
+          test "$CODE" = 403
+          CODE="$(curl -sS --max-time 20 -o "$RUNNER_TEMP/s512d/probes/co" -w '%{http_code}' -G "$URL" --data-urlencode country=CO --data-urlencode action=list -H 'Origin: https://aysseguros.com')"
+          test "$CODE" = 400
+          CODE="$(curl -sS --max-time 20 -o "$RUNNER_TEMP/s512d/probes/post" -w '%{http_code}' -X POST "$URL" -H 'Origin: https://aysseguros.com')"
+          test "$CODE" = 405
+          echo 'S512D_LAB_RUNTIME_SECURITY_PASS'
+      - name: Delete temporary credential
+        if: always()
+        shell: bash
+        run: |
+          if [ -f "$RUNNER_TEMP/s512d/credentials.json" ]; then
+            shred -u "$RUNNER_TEMP/s512d/credentials.json" || rm -f "$RUNNER_TEMP/s512d/credentials.json"
+          fi
