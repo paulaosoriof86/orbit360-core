@@ -6501,5 +6501,23 @@
     "authenticatedUatAccepted": false,
     "noSharedRulesDeploy": true,
     "noLivePromotion": true
+  },
+  "b4003PostAuthClientPagingLatencySuccessor20261023": {
+    "status": "SOURCE_STAGED_SYNTHETIC_QA_PASS_AUTHENTICATED_UAT_HOLD",
+    "gate": "I6.5/B4-003",
+    "parentHead": "84516b718a312ca2993c33c1512f31977fa8b5f5",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_POST_AUTH_CLIENT_PAGING_LATENCY_SUCCESSOR_20261023.json",
+    "receiptBlobSha": "dda7f7ea88bdf5dffcb536e48e9ec668def34725",
+    "sourceBlobsAfter": {
+      "functions/b4-003-scoped-related-reader.js": "ef5842c262c690d42a39afa57e77a309205ee630",
+      "orbit360-platform/core/product-app-p0.js": "b016195f3979ea52cba50f8b2e6060fd114934ce"
+    },
+    "qaBlobsAfter": {
+      "tools/gravicentra-b4-003-post-auth-bootstrap-diagnostic.test.cjs": "1bd567f166d2e4a3e0caaa9d70e831d0d1a239a3",
+      "tools/gravicentra-b4-003-scoped-related-reader.test.cjs": "5e6b75451f7d6466aa95f8a3031177408274fe3d"
+    },
+    "authenticatedUatAccepted": false,
+    "noSharedRulesDeploy": true,
+    "noLivePromotion": true
   }
 }

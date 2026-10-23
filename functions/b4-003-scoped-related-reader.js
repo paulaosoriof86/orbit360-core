@@ -452,9 +452,14 @@ async function readScopedRelatedList({db,auth,request}){
  // Keep the positive policy anchors fully validated before reading children.
  const verified=[];let scanned=0,more=true,scan=query;
  const MAX_RAW_SCANNED=1000;
+ // A protected client startup page allows 200 verified rows. Fetch its
+ // bounded lookahead in one server query, while preserving per-row scope
+ // verification, quarantining and cursor semantics. Other list sources keep
+ // their existing conservative scan size.
+ const RAW_PAGE=coll==='clientes'?pageSize+1:100;
  while(verified.length<=pageSize&&more){
-   const result=await scan.limit(100).get(),docs=Array.isArray(result.docs)?result.docs:[];
-   more=docs.length===100;
+   const result=await scan.limit(RAW_PAGE).get(),docs=Array.isArray(result.docs)?result.docs:[];
+   more=docs.length===RAW_PAGE;
    for(const d of docs){
      if(++scanned>MAX_RAW_SCANNED)throw new Denied('RELATED_SCAN_BOUND_EXCEEDED');
      try{verified.push(checkedRow(d.data()||{},d.id));}

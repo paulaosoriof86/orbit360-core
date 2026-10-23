@@ -1,0 +1,72 @@
+{
+  "schema": "GI_I65_B4003_POST_AUTH_CLIENT_PAGING_LATENCY_SUCCESSOR_V1",
+  "status": "SOURCE_STAGED_SYNTHETIC_QA_PASS_AUTHENTICATED_UAT_HOLD",
+  "gate": "I6.5/B4-003",
+  "authority": "PAULA_CONTINUE_EXISTING_I65_B4003_AFTER_AUTHENTICATED_LOGIN_FAIL_20261023",
+  "parentHead": "84516b718a312ca2993c33c1512f31977fa8b5f5",
+  "observedPreviewRun": 40023376598,
+  "observedPreviewBuildId": "gi-i65-b4-84516b718a31-57f234755dc1",
+  "observedAuthenticatedUat": {
+    "identityConfirmed": true,
+    "result": "FAIL_READONLY_BOOTSTRAP_BLOCKED",
+    "failurePhase": "waiting-snapshots",
+    "failureCode": "STORE_READINESS_TIMEOUT",
+    "failureDetailCode": "STORE_TIMEOUT_UNCLASSIFIED",
+    "firstRealUatAfterThisChangePending": true
+  },
+  "sourceFiles": {
+    "functions/b4-003-scoped-related-reader.js": {
+      "before": "ae77e1e62f8fb940cf665b01c48d190c1457b66f",
+      "after": "ef5842c262c690d42a39afa57e77a309205ee630"
+    },
+    "orbit360-platform/core/product-app-p0.js": {
+      "before": "bea311ca29e6d51880c329c4bdc305c2be2557c9",
+      "after": "b016195f3979ea52cba50f8b2e6060fd114934ce"
+    }
+  },
+  "qaFiles": {
+    "tools/gravicentra-b4-003-post-auth-bootstrap-diagnostic.test.cjs": {
+      "before": "e80d6c44268d6a7858d4d03f1175e567fddb9471",
+      "after": "1bd567f166d2e4a3e0caaa9d70e831d0d1a239a3"
+    },
+    "tools/gravicentra-b4-003-scoped-related-reader.test.cjs": {
+      "before": "d32e4e6887dd2eb151d415b44ee05b0be3d58cca",
+      "after": "5e6b75451f7d6466aa95f8a3031177408274fe3d"
+    }
+  },
+  "changes": {
+    "previewOnlyStoreReadinessBudgetMs": 24000,
+    "legacyStoreReadinessBudgetMs": 8000,
+    "scopedCallableTimeoutMs": 16000,
+    "clientPageSizeMax": 200,
+    "clientRawLookaheadMax": 201,
+    "sourceAuthorization": "UNCHANGED_TENANT_ROLE_COUNTRY_INDIVIDUAL_ROW_AND_CURSOR_VALIDATION",
+    "serverRead": "BOUNDED_SINGLE_QUERY_LOOKAHEAD_WHEN_ALL_CLIENT_ROWS_ARE_AUTHORIZED"
+  },
+  "verification": {
+    "postAuthDiagnosticVm": "PASS",
+    "scopedRelatedReaderSynthetic": "PASS_442_ROWS_THREE_BOUNDED_PAGES",
+    "protectedHydrationSynthetic": "PASS",
+    "roleAndScopeRegressions": "PASS",
+    "realAuthenticatedRoleCountryUat": "PENDING",
+    "effectiveSharedFirestoreRulesSecurity": "HOLD",
+    "productionAcceptance": false
+  },
+  "boundaries": {
+    "onlyReadOnlyFunctions": [
+      "orbit360ScopedPolicyReadPreview",
+      "orbit360AssignableAdvisorRosterPreview"
+    ],
+    "onlyIsolatedHostingPreview": true,
+    "sharedFirestoreRulesDeploymentAuthorized": false,
+    "operationalWriterDeploymentAuthorized": false,
+    "realOperationalBusinessWrites": 0,
+    "productionPromotionAuthorized": false,
+    "dataReimportAuthorized": false,
+    "gateAdvanceAuthorized": false,
+    "authenticatedUatAccepted": false,
+    "productionPathPercent": 20,
+    "formalI6Percent": 50,
+    "findingsPreserved": 295
+  }
+}

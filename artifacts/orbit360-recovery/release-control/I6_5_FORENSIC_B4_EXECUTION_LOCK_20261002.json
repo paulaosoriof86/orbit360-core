@@ -627,7 +627,7 @@
   },
   "findingLedgerBlobSha": "8125e97dcf1feb7f46081f95327952e65c2d1077",
   "continuityRegisterBlobSha": "4e6b0ac51736be360c4b95abe8fc01d8f1e78e20",
-  "compositionLockBlobSha": "7d57dd7cf5e2d6587337693bdb0e8dc78db91952",
+  "compositionLockBlobSha": "3550cacafb0260ee51820e0f1a130f375e61f505",
   "r18SourceFix": {
     "status": "SOURCE_FIXED_R18_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_SOURCE_FIX_20261005.json",
@@ -4005,5 +4005,15 @@
     "reimportAuthorized": false,
     "authenticatedRoleCountryUatRequired": true,
     "previewEvidenceNotProductionAcceptance": true
+  },
+  "b4003PostAuthClientPagingLatencySuccessor20261023": {
+    "status": "SOURCE_STAGED_SYNTHETIC_QA_PASS_AUTHENTICATED_UAT_HOLD",
+    "gate": "I6.5/B4-003",
+    "parentHead": "84516b718a312ca2993c33c1512f31977fa8b5f5",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_POST_AUTH_CLIENT_PAGING_LATENCY_SUCCESSOR_20261023.json",
+    "receiptBlobSha": "dda7f7ea88bdf5dffcb536e48e9ec668def34725",
+    "authenticatedUatAccepted": false,
+    "sharedFirestoreRulesDeploymentAuthorized": false,
+    "livePromotionAuthorized": false
   }
 }

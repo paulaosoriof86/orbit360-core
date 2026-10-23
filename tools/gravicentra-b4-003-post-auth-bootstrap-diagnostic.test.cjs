@@ -48,12 +48,12 @@ const opts={mode:'product',authorizedProductReadOnly:true,runtimeAuthorized:true
   assert.equal(preflight.status.failurePhase,'preflight');
   assert.equal(preflight.status.failureCode,'BOOTSTRAP_PREFLIGHT_REJECTED');
 
-  const warnings=[];
+  const warnings=[];let protectedStartOptions=null;
   const appWindow={Orbit:{
     productRuntimeBrowserProvidersP0:{dependencies:()=>({})},
-    backendProductReadOnlyBootstrapP0:{start:async()=>({ok:false,ready:false,writeAuthorized:false,
+    backendProductReadOnlyBootstrapP0:{start:async(_deps,options)=>{protectedStartOptions=options;return {ok:false,ready:false,writeAuthorized:false,
       status:{failurePhase:'membership',failureCode:'MEMBERSHIP_REJECTED',
-        errors:['private@example.invalid /tenant/secret/token']}})},
+        errors:['private@example.invalid /tenant/secret/token']}};}},
     productHydrationRequiredOptionalP0:{contract:()=>({required:['clientes']})}
   },location:{hostname:'ays-orbit-360-lab--gi-i65-b4-synthetic.web.app'},
     __ORBIT360_PRODUCT_PUBLIC_CONFIG__:{enabled:true,scopedReadPreviewCandidate:true}};
@@ -61,6 +61,11 @@ const opts={mode:'product',authorizedProductReadOnly:true,runtimeAuthorized:true
     console:{warn:(...args)=>warnings.push(args)},
     document:{querySelector:()=>null,dispatchEvent:()=>{}},CustomEvent:function(){}},{timeout:1000});
   await assert.rejects(appWindow.Orbit.productAppP0.activate(),/PRODUCT_READONLY_BOOTSTRAP_NOT_READY/);
+  assert.equal(protectedStartOptions.snapshotTimeoutMs,24000,
+    'PROTECTED_PREVIEW_WATCHDOG_MUST_OUTLIVE_SCOPED_CALLABLE');
+  assert.equal(protectedStartOptions.protectedReadCandidate,true);
+  assert.match(app,/snapshotTimeoutMs:scopedChannel\?24000:8000/,
+    'UNPROTECTED_STARTUP_WATCHDOG_MUST_REMAIN_8S');
   assert.equal(warnings.length,1);
   assert.equal(warnings[0].length,1);
   assert.equal(warnings[0][0],

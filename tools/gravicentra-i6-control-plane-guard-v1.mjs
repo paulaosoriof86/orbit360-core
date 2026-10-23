@@ -46,7 +46,13 @@ const I65_APPLY_AUTH='artifacts/orbit360-recovery/release-control/I6_5_DETERMINI
 const MODE=(process.argv.find(x=>x.startsWith('--mode='))||'--mode=governance').split('=')[1];
 const need=(ok,code)=>{if(!ok)throw new Error(code);};
 const readJson=p=>JSON.parse(fs.readFileSync(p,'utf8'));
-const realGit=(...args)=>execFileSync('git',args,{encoding:'utf8'}).trim();
+const physicalGit=(...args)=>execFileSync('git',args,{encoding:'utf8'}).trim();
+// A newer, independently byte-checked successor must not rewrite historical
+// receipt expectations. The four pinned pre-successor hashes are used only
+// for prior proofs; the new successor is checked against actual disk bytes.
+let latencyHistoricBlobs=new Map();
+const realGit=(...args)=>args[0]==='hash-object'&&latencyHistoricBlobs.has(args[1])
+ ?latencyHistoricBlobs.get(args[1]):physicalGit(...args);
 // Historical receipts are verified against their exact already-committed
 // predecessor tree. A newer source successor is verified separately against
 // the actual working tree, never substituted into an older signed receipt.
@@ -68,6 +74,64 @@ const ACTIVE_I65_FORENSIC_B4=String(C.i65ForensicRemediationPlan?.b4?.executionL
 need(exists(ACTIVE_I65_FORENSIC_B4),'I6_5_B4_ACTIVE_LOCK_MISSING:'+ACTIVE_I65_FORENSIC_B4);
 const S=readJson(STATUS_LEDGER),A=readJson(AUTH_RECEIPT),M5=readJson(V5_MANIFEST),M6=readJson(V6_MANIFEST),M=readJson(V7_MANIFEST),FRA=readJson(I65_FORENSIC_AUDIT),FRP=readJson(I65_FORENSIC_PLAN),PAY=readJson(I65_PAYMENT_INFERENCE),B1=readJson(I65_FORENSIC_B1),B2=readJson(I65_FORENSIC_B2),B3=readJson(I65_FORENSIC_B3),B4=readJson(ACTIVE_I65_FORENSIC_B4);
 const COMP=readJson(I6_CANONICAL_COMPOSITION),FIND=readJson(I6_FINDINGS_LEDGER),FRP2=readJson(I65_FORENSIC_PLAN_V2),REJ=readJson(I65_B2_REJECTION),RCM=readJson(I65_B2_ROOT_CAUSE);
+const LATENCY_REPAIR=C.b4003PostAuthClientPagingLatencySuccessor20261023||{};
+const LATENCY_REPAIR_ACTIVE=LATENCY_REPAIR.status==='SOURCE_STAGED_SYNTHETIC_QA_PASS_AUTHENTICATED_UAT_HOLD';
+if(LATENCY_REPAIR_ACTIVE){
+ const L=LATENCY_REPAIR,R=readJson(L.receiptPath);
+ const BL=B4.b4003PostAuthClientPagingLatencySuccessor20261023||{};
+ const CL=COMP.b4003PostAuthClientPagingLatencySuccessor20261023||{};
+ const expectedSource=[
+  'functions/b4-003-scoped-related-reader.js',
+  'orbit360-platform/core/product-app-p0.js'
+ ].sort();
+ const expectedQa=[
+  'tools/gravicentra-b4-003-post-auth-bootstrap-diagnostic.test.cjs',
+  'tools/gravicentra-b4-003-scoped-related-reader.test.cjs'
+ ].sort();
+ const exactPaths=expectedSource.concat(expectedQa);
+ const pairs=Object.assign({},R.sourceFiles||{},R.qaFiles||{});
+ const samePredecessorTree=physicalGit('rev-parse','HEAD^{tree}')===
+  physicalGit('rev-parse',L.parentHead+'^{tree}');
+ const parentAncestor=physicalGit('merge-base',L.parentHead,'HEAD')===L.parentHead;
+ need(L.gate==='I6.5/B4-003'&&L.parentHead==='84516b718a312ca2993c33c1512f31977fa8b5f5'&&
+  (samePredecessorTree||parentAncestor)&&
+  L.authority==='PAULA_CONTINUE_EXISTING_I65_B4003_AFTER_AUTHENTICATED_LOGIN_FAIL_20261023'&&
+  R.schema==='GI_I65_B4003_POST_AUTH_CLIENT_PAGING_LATENCY_SUCCESSOR_V1'&&
+  R.gate===L.gate&&R.authority===L.authority&&R.status===L.status&&R.parentHead===L.parentHead&&
+  L.receiptBlobSha===physicalGit('hash-object',L.receiptPath)&&
+  BL.receiptBlobSha===L.receiptBlobSha&&CL.receiptBlobSha===L.receiptBlobSha&&
+  sameJson(Object.keys(R.sourceFiles||{}).sort(),expectedSource)&&
+  sameJson(Object.keys(R.qaFiles||{}).sort(),expectedQa)&&
+  exactPaths.every(p=>pairs[p]?.before===physicalGit('rev-parse',L.parentHead+':'+p)&&
+   pairs[p]?.after===physicalGit('hash-object',p)&&pairs[p].after!==pairs[p].before)&&
+  expectedSource.every(p=>CL.sourceBlobsAfter?.[p]===pairs[p].after)&&
+  expectedQa.every(p=>CL.qaBlobsAfter?.[p]===pairs[p].after)&&
+  R.observedAuthenticatedUat?.result==='FAIL_READONLY_BOOTSTRAP_BLOCKED'&&
+  R.observedAuthenticatedUat?.failureCode==='STORE_READINESS_TIMEOUT'&&
+  R.observedAuthenticatedUat?.firstRealUatAfterThisChangePending===true&&
+  R.changes?.previewOnlyStoreReadinessBudgetMs===24000&&
+  R.changes?.legacyStoreReadinessBudgetMs===8000&&
+  R.changes?.scopedCallableTimeoutMs===16000&&
+  R.changes?.clientRawLookaheadMax===201&&
+  R.verification?.postAuthDiagnosticVm==='PASS'&&
+  R.verification?.scopedRelatedReaderSynthetic==='PASS_442_ROWS_THREE_BOUNDED_PAGES'&&
+  R.verification?.realAuthenticatedRoleCountryUat==='PENDING'&&
+  R.verification?.productionAcceptance===false&&
+  R.boundaries?.realOperationalBusinessWrites===0&&
+  R.boundaries?.authenticatedUatAccepted===false&&
+  R.boundaries?.findingsPreserved===295&&
+  R.boundaries?.formalI6Percent===50&&R.boundaries?.productionPathPercent===20&&
+  ['sharedFirestoreRulesDeploymentAuthorized','operationalWriterDeploymentAuthorized',
+   'productionPromotionAuthorized','dataReimportAuthorized','gateAdvanceAuthorized']
+   .every(k=>R.boundaries?.[k]===false)&&
+  BL.gate===L.gate&&BL.parentHead===L.parentHead&&BL.authenticatedUatAccepted===false&&
+  CL.gate===L.gate&&CL.parentHead===L.parentHead&&CL.authenticatedUatAccepted===false&&
+  C.b4003SecurityReleaseHold?.status==='ACTIVE_FAIL_CLOSED_UNAUTHORIZED_BROWSER_FIRESTORE_READ_WRITE'&&
+  B4.boundaries?.livePromotionAuthorized===false&&FIND.findings.length===295,
+  'B4_003_POST_AUTH_CLIENT_PAGING_LATENCY_SUCCESSOR_INVALID');
+ latencyHistoricBlobs=new Map(exactPaths.map(p=>[p,pairs[p].before]));
+ console.log('B4_003_POST_AUTH_CLIENT_PAGING_LATENCY=BOUNDED_SYNTHETIC_QA_PASS_REAL_UAT_PENDING_LIVE_HOLD');
+}
 // Current diagnostic is a separate, narrowly pinned source successor. Map
 // historical receipt assertions back to the previously certified f570 tree;
 // the successor itself is checked against today's real working-tree bytes.
@@ -141,7 +205,9 @@ if(SAFE_DIAG_PREVIEW.status==='AUTHORIZED_EXACT_ISOLATED_READONLY_PREVIEW'){
   Object.entries(sourceFiles).every(([p,sha])=>sha===realGit('hash-object',p)&&
    sha===realGit('rev-parse',P.sourceCommit+':'+p))&&
   R.compositionBlobSha===P.compositionBlobSha&&
-  P.compositionBlobSha===realGit('hash-object',I6_CANONICAL_COMPOSITION)&&
+  P.compositionBlobSha===(LATENCY_REPAIR_ACTIVE?
+    physicalGit('rev-parse',LATENCY_REPAIR.parentHead+':'+I6_CANONICAL_COMPOSITION):
+    realGit('hash-object',I6_CANONICAL_COMPOSITION))&&
   R.rosterSourceBlobSha===P.rosterSourceBlobSha&&
   P.rosterSourceBlobSha===realGit('hash-object','functions/assignable-advisor-roster.js')&&
   sameJson(P.onlyReadOnlyFunctions,['orbit360ScopedPolicyReadPreview','orbit360AssignableAdvisorRosterPreview'])&&

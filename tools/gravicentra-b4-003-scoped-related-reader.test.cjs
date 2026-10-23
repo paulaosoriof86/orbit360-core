@@ -94,6 +94,7 @@ const docs={
 let member={uid:'u1',tenantId,status:'active',roles:['Asesor','Operativo'],advisorId:'a1',countries:['GT','CO'],dataScopes:{default:'own'}};
 let cfg={roleScopes:{asesor:'own',operativo:'all'}};
 const snap=v=>({exists:v!=null,data:()=>v});
+let observedClientPageLimits=[];
 const db={collection:x=>{assert.equal(x,'tenants');return{doc:tenant=>{assert.equal(tenant,tenantId);return{
  collection:col=>{
   if(col==='members')return {doc:()=>({get:async()=>snap(member)})};
@@ -110,10 +111,10 @@ function queryModel(table,terms=[],after='',cap=100){
   orderBy:field=>{assert.equal(field,'__name__');return queryModel(table,terms,after,cap);},
   startAfter:doc=>queryModel(table,terms,doc.id,cap),
   limit:n=>queryModel(table,terms,after,n),
-  get:async()=>({docs:Object.keys(rows).sort().filter(id=>id>after).filter(id=>{
+  get:async()=>{if(table==='clientes')observedClientPageLimits.push(cap);return {docs:Object.keys(rows).sort().filter(id=>id>after).filter(id=>{
     const row=rows[id];return terms.every(t=>t.op==='=='?row[t.field]===t.value:
       t.op==='in'&&t.value.includes(row[t.field]));
-   }).slice(0,cap).map(id=>({id,exists:true,data:()=>rows[id]}))})
+   }).slice(0,cap).map(id=>({id,exists:true,data:()=>rows[id]}))};}
  };
 }
 const read=(collection,documentId,extras={})=>readScopedRelatedDocument({
@@ -365,6 +366,28 @@ async function deny(fn,code){let thrown;try{await fn()}catch(e){thrown=e}assert.
  member={...member,modulesRestricted:['equipo']};
  await deny(()=>flow('auditoria','Dirección'),'MODULE_DENIED');checks++;
  member=oldMember;cfg=oldCfg;
+ // 442 fully authorized client fixtures mimic the frozen client universe.
+ // Preserve every cursor and every server-side membership/country check,
+ // without repeatedly scanning 100 rows to fill a 200-row page.
+ const retainedClients=docs.clientes,retainedMember=member,retainedConfig=cfg;
+ docs.clientes=Object.fromEntries(Array.from({length:442},(_,i)=>{
+   const id='client-'+String(i).padStart(4,'0');
+   return [id,{id,tenantId,pais:'GT',asesorId:'a1'}];
+ }));
+ member={...member,roles:['Operativo'],dataScopes:{default:'all'},countries:['GT']};
+ cfg={roleScopes:{operativo:'all'}};
+ observedClientPageLimits=[];
+ const first200=await flow('clientes','operativo',{pageSize:200});
+ const second200=await flow('clientes','operativo',{pageSize:200,cursor:first200.nextCursor});
+ const final42=await flow('clientes','operativo',{pageSize:200,cursor:second200.nextCursor});
+ assert.equal(first200.rows.length,200);assert.equal(second200.rows.length,200);
+ assert.equal(final42.rows.length,42);assert.equal(final42.nextCursor,null);
+ assert.equal(new Set([...first200.rows,...second200.rows,...final42.rows].map(x=>x.canonicalDocumentId)).size,442);
+ assert.deepEqual(observedClientPageLimits,[201,201,201],
+   'CLIENT_PAGINATION_ONE_BOUNDED_SERVER_QUERY_PER_AUTHORIZED_PAGE');
+ docs.clientes=retainedClients;member=retainedMember;cfg=retainedConfig;
+ checks+=5;
+ console.log('B4_003_PROTECTED_CLIENT_STARTUP_PAGING_QA_PASS 442_verified_rows 3_bounded_reads no_writes');
  console.log('B4_003_CANCELACIONES_AUDITORIA_AUTHORIZATION_QA_PASS checks=10 no_data_writes');
  console.log('B4_003_METAS_INSTITUTIONAL_AND_ADVISOR_SCOPE_QA_PASS checks=7 no_data_writes');
  console.log('B4_003_RELATED_SERVER_BATCH_SCOPE_MOCK_PASS checks='+checks+' no Firebase writes');

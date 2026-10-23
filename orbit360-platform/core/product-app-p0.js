@@ -110,7 +110,12 @@
         authorizedProductReadOnly:true,
         runtimeAuthorized:true,
         collections:bootstrapCollections,
-        snapshotTimeoutMs:8000,
+        // The protected callable has a 16s per-request budget and an authorized
+        // first read can require multiple sequential cursor pages. An 8s
+        // bootstrap watchdog discarded valid in-flight reads before the
+        // transport could report success or a real failure. Keep a bounded
+        // Preview-only safety budget; unprotected startup stays unchanged.
+        snapshotTimeoutMs:scopedChannel?24000:8000,
         // Preview-only candidate: no silent direct Firestore fallback.
         protectedReadCandidate: cfg.scopedReadPreviewCandidate===true &&
           String(window.location&&window.location.hostname||'').includes('--')
