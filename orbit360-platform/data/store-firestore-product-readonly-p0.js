@@ -222,6 +222,14 @@
         .finally(function(){if(epoch===protectedEpoch&&protectedDeferredActive.delete(collection))maybeDrainProtectedDeferred();});
       return true;
     }
+    // The authorized active insurer route must not wait for the former
+    // home startup collection. Backend and query-plan scope checks remain.
+    function activeInsurerRoute(){
+      var route='';
+      try{route=text(window.Orbit&&window.Orbit.route&&window.Orbit.route.key);}catch(_){}
+      if(!route){try{route=text(window.location&&window.location.hash).replace(/^#\/?/,'').split(/[?/#]/)[0];}catch(_){}}
+      return route==='aseguradoras'&&collections.indexOf('aseguradoras')>=0;
+    }
     function roleChanged(){
       if(!protectedMode)return;
       // Invalidate all old-role bytes synchronously; do not refetch every
@@ -232,8 +240,14 @@
       state.snapshotSources={};state.queryPlans={};state.snapshotErrors={};state.deniedCollections=[];
       state.ready=false;state.status='waiting-protected-role';
       emit('*');
-      // Keep the boot route's authoritative source warm. The newly rendered
-      // route explicitly ensures its own dependencies through _ensureCollections.
+      // Send only a locally authorized insurer plan first; the protected
+      // backend revalidates role, tenant and country on every request.
+      if(activeInsurerRoute()){
+        var activePlan=queryPlan('aseguradoras');
+        if(activePlan.ok===true&&!activePlan.denied&&!activePlan.hardError)
+          attachCollection('aseguradoras',true);
+      }
+      // Preserve required startup readiness without prefetching all modules.
       startupCollections.forEach(function(k){attachCollection(k,true);});
     }
 
@@ -265,7 +279,7 @@
       var requested = unique(names).filter(function (name) { return collections.indexOf(name) >= 0; });
       requested.forEach(function (name) {
         if(attachStarted[name])return;
-        if(protectedMode&&protectedRoleRecovery&&startupCollections.indexOf(name)<0){
+        if(protectedMode&&protectedRoleRecovery&&startupCollections.indexOf(name)<0&&!(name==='aseguradoras'&&activeInsurerRoute())){
           if(protectedDeferredQueue.indexOf(name)<0&&!protectedDeferredActive.has(name))protectedDeferredQueue.push(name);
         }else attachCollection(name,authoritativeFirstReadRequired);
       });

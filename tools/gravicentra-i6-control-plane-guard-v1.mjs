@@ -275,6 +275,16 @@ const WRITER_COUNTRY=C.b4003WriterCountryFailClosedSuccessor20261023||{};
 const WRITER_COUNTRY_ACTIVE=WRITER_COUNTRY.status==='SOURCE_STAGED_SYNTHETIC_QA_PASS_SECURITY_HOLD';
 const PROTECTED_STORE_TRANSPORT=C.b4003ProtectedStoreTransportSuccessor20261023||{};
 const PROTECTED_STORE_TRANSPORT_ACTIVE=PROTECTED_STORE_TRANSPORT.status==='SOURCE_STAGED_SYNTHETIC_QA_PASS_SECURITY_HOLD';
+const ACTIVE_INSURER=C.b4003ActiveInsurerReadinessPreviewAuthorization20261024||{};
+const ACTIVE_INSURER_ACTIVE=ACTIVE_INSURER.status==='AUTHORIZED_EXACT_ISOLATED_READONLY_PREVIEW';
+const historicalRoleRecoveryHash=p=>ACTIVE_INSURER_ACTIVE&&[
+ 'orbit360-platform/data/store-firestore-product-readonly-p0.js',
+ 'orbit360-platform/index.html'
+].includes(p)?realGit('rev-parse',ACTIVE_INSURER.sourceParentCommit+':'+p):
+ physicalGit('hash-object',p);
+const historicalRoleRecoveryComposition=()=>ACTIVE_INSURER_ACTIVE?
+ realGit('rev-parse',ACTIVE_INSURER.sourceParentCommit+':'+I6_CANONICAL_COMPOSITION):
+ physicalGit('hash-object',I6_CANONICAL_COMPOSITION);
 const ROLE_RECOVERY=C.b4003RoleContextRecoveryPreviewAuthorization20261023||{};
 const ROLE_RECOVERY_ACTIVE=ROLE_RECOVERY.status==='AUTHORIZED_EXACT_ISOLATED_READONLY_PREVIEW';
 if(ROLE_RECOVERY_ACTIVE){
@@ -296,14 +306,14 @@ if(ROLE_RECOVERY_ACTIVE){
   R.observedAuthenticatedUat?.serverTransportFailureCause==='NOT_YET_CONFIRMED'&&
   sameJson(Object.keys(R.sourceBlobs||{}).sort(),source.slice().sort())&&
   sameJson(Object.keys(R.qaBlobs||{}).sort(),qa)&&
-  source.every(p=>R.sourceBlobs[p]===physicalGit('hash-object',p)&&
+  source.every(p=>R.sourceBlobs[p]===historicalRoleRecoveryHash(p)&&
    B4.boundaries?.allowedProductFiles?.includes(p))&&
   qa.every(p=>R.qaBlobs[p]===physicalGit('hash-object',p)&&
    B4.boundaries?.allowedQaFiles?.includes(p))&&
   source.every(p=>R.sourceBlobs[p]!==physicalGit('rev-parse',
    'a0220a39cdf91ff71d3ef44212c215a5c4623903:'+p))&&
   R.compositionBlobSha===P.compositionBlobSha&&
-  R.compositionBlobSha===physicalGit('hash-object',I6_CANONICAL_COMPOSITION)&&
+  R.compositionBlobSha===historicalRoleRecoveryComposition()&&
   R.rosterSourceBlobSha===P.rosterSourceBlobSha&&
   R.rosterSourceBlobSha===physicalGit('hash-object','functions/assignable-advisor-roster.js')&&
   R.authenticatedSuccessorUatRequired===true&&P.authenticatedSuccessorUatRequired===true&&
@@ -318,6 +328,62 @@ if(ROLE_RECOVERY_ACTIVE){
   'B4_003_ROLE_RECOVERY_EXACT_PREVIEW_AUTH_INVALID');
  console.log('B4_003_ROLE_RECOVERY=EXACT_SOURCE_QA_PREVIEW_ONLY_SECURITY_HOLD');
 }
+
+if(ACTIVE_INSURER_ACTIVE){
+ const P=ACTIVE_INSURER,B=B4.b4003ActiveInsurerReadinessPreviewAuthorization20261024||{};
+ const R=readJson(P.receiptPath);
+ const M=COMP.b4003ActiveInsurerRouteReadiness20261024||{};
+ const sources=[
+  'orbit360-platform/data/store-firestore-product-readonly-p0.js',
+  'orbit360-platform/modules/aseguradoras.js',
+  'orbit360-platform/index.html'
+ ],qa='tools/gravicentra-b4-003-active-insurer-readiness.test.cjs';
+ const expectedPrevious=realGit('rev-parse',P.sourceParentCommit);
+ need(P.gate==='I6.5/B4-003'&&P.status==='AUTHORIZED_EXACT_ISOLATED_READONLY_PREVIEW'&&
+  P.sourceParentCommit==='aeabc4000c5c311ff2eab7e2c576c075ca7cd266'&&
+  realGit('merge-base',expectedPrevious,realGit('rev-parse','HEAD'))===expectedPrevious&&
+  P.triggerSubject==='build(i6.5 B4-003): active insurer role readiness Preview'&&
+  sameJson(P,B)&&P.receiptBlobSha===realGit('hash-object',P.receiptPath)&&
+  R.schema==='GI_I65_B4003_ACTIVE_INSURER_READINESS_PREVIEW_AUTH_V1'&&
+  R.status===P.status&&R.gate===P.gate&&R.authority===P.authority&&
+  R.sourceParentCommit===P.sourceParentCommit&&R.triggerSubject===P.triggerSubject&&
+  R.compositionBlobSha===realGit('hash-object',I6_CANONICAL_COMPOSITION)&&
+  P.compositionBlobSha===R.compositionBlobSha&&
+  M.status==='SOURCE_PATCH_STAGED_SYNTHETIC_VM_PASS_AUTHENTICATED_UAT_PENDING'&&
+  M.parentHead===P.sourceParentCommit&&M.qaBlobSha===R.qaBlobs?.[qa]&&
+  sameJson(Object.keys(R.sourceBlobs||{}).sort(),sources.slice().sort())&&
+  sameJson(Object.keys(R.qaBlobs||{}),[qa])&&
+  sources.every(p=>R.sourceBlobs[p]===realGit('hash-object',p)&&
+   M.sourceBlobs?.[p]===R.sourceBlobs[p]&&
+   COMP.productFileBlobs?.[p]===R.sourceBlobs[p]&&
+   COMP.productFiles.includes(p)&&B4.boundaries?.allowedProductFiles?.includes(p)&&
+   R.sourceBlobs[p]!==realGit('rev-parse',P.sourceParentCommit+':'+p))&&
+  R.qaBlobs?.[qa]===realGit('hash-object',qa)&&
+  B4.boundaries?.allowedQaFiles?.includes(qa)&&
+  P.rosterSourceBlobSha===realGit('hash-object','functions/assignable-advisor-roster.js')&&
+  P.rosterSourceBlobSha===R.rosterSourceBlobSha&&
+  R.syntheticVmResult==='PASS_ACTIVE_ROUTE_BEFORE_STARTUP_NO_DIRECT_FIRESTORE'&&
+  R.authenticatedRoleCountryUatRequired===true&&P.authenticatedRoleCountryUatRequired===true&&
+  P.onlyIsolatedHosting===true&&R.onlyIsolatedHosting===true&&
+  sameJson(P.onlyReadOnlyFunctions,['orbit360ScopedPolicyReadPreview','orbit360AssignableAdvisorRosterPreview'])&&
+  sameJson(R.onlyReadOnlyFunctions,P.onlyReadOnlyFunctions)&&
+  ['sharedFirestoreRulesDeployAuthorized','otherFunctionsDeployAuthorized',
+   'operationalWriterDeployAuthorized','businessWritesAuthorized',
+   'syntheticQaWritesAuthorized','realUserImpersonationAuthorized',
+   'livePromotionAuthorized','dataRefreshAuthorized','reimportAuthorized']
+   .every(k=>P[k]===false&&R[k]===false)&&
+  C.currentB4?.compositionLockBlobSha===realGit('hash-object',I6_CANONICAL_COMPOSITION)&&
+  C.canonicalAccumulationControl?.compositionLockBlobSha===realGit('hash-object',I6_CANONICAL_COMPOSITION)&&
+  B4.compositionLockBlobSha===realGit('hash-object',I6_CANONICAL_COMPOSITION)&&
+  C.currentB4?.executionLockBlobSha===realGit('hash-object',ACTIVE_I65_FORENSIC_B4)&&
+  C.i65ForensicRemediationPlan?.b4?.executionLockBlobSha===realGit('hash-object',ACTIVE_I65_FORENSIC_B4)&&
+  C.b4003SecurityReleaseHold?.status==='ACTIVE_FAIL_CLOSED_UNAUTHORIZED_BROWSER_FIRESTORE_READ_WRITE'&&
+  C.b4003SecurityReleaseHold?.livePromotionAuthorized===false&&
+  B4.boundaries?.livePromotionAuthorized===false&&FIND.findings.length===295,
+  'B4_003_ACTIVE_INSURER_READINESS_SCOPE_OR_PROOF_INVALID');
+ console.log('B4_003_ACTIVE_INSURER_READINESS=EXACT_SCOPED_SOURCE_VM_PASS_AUTH_UAT_HOLD');
+}
+
 const roleRecoveryPredecessor=p=>ROLE_RECOVERY_ACTIVE&&[
  'orbit360-platform/data/store-firestore-product-readonly-p0.js',
  'orbit360-platform/index.html'

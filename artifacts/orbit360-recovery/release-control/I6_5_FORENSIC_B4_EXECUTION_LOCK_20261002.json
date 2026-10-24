@@ -136,7 +136,8 @@
       "tools/gravicentra-b4-003-portfolio-verified-receipt-amount.test.cjs",
       "tools/gravicentra-b4-003-post-auth-bootstrap-diagnostic.test.cjs",
       "tools/gravicentra-b4-003-config-users-owner.test.cjs",
-      "tools/gravicentra-b4-003-inicio-personal-recaudo.test.cjs"
+      "tools/gravicentra-b4-003-inicio-personal-recaudo.test.cjs",
+      "tools/gravicentra-b4-003-active-insurer-readiness.test.cjs"
     ],
     "renewalProductMutationAuthorized": false,
     "policyVisualMutationAuthorized": true,
@@ -628,7 +629,7 @@
   },
   "findingLedgerBlobSha": "8125e97dcf1feb7f46081f95327952e65c2d1077",
   "continuityRegisterBlobSha": "4e6b0ac51736be360c4b95abe8fc01d8f1e78e20",
-  "compositionLockBlobSha": "3550cacafb0260ee51820e0f1a130f375e61f505",
+  "compositionLockBlobSha": "9ba1e9fb162c856e37773221e6a04c9c49d7ed4c",
   "r18SourceFix": {
     "status": "SOURCE_FIXED_R18_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_SOURCE_FIX_20261005.json",
@@ -3853,7 +3854,10 @@
     "configQaBlobSha": "bfb2d6b13704e05a184ae97f21c1d10503410acc",
     "financeQaBlobSha": "f5b25d9bae8771c0497db805ba471432fcd07a6d",
     "rosterSourceBlobSha": "75ca53db55e2665123589b0e63253a8e4f8c377c",
-    "onlyReadOnlyFunctions": ["orbit360ScopedPolicyReadPreview", "orbit360AssignableAdvisorRosterPreview"],
+    "onlyReadOnlyFunctions": [
+      "orbit360ScopedPolicyReadPreview",
+      "orbit360AssignableAdvisorRosterPreview"
+    ],
     "onlyIsolatedHosting": true,
     "sharedRulesDeployAuthorized": false,
     "otherFunctionsDeployAuthorized": false,
@@ -3890,7 +3894,10 @@
     "qaPath": "tools/gravicentra-b4-003-post-auth-bootstrap-diagnostic.test.cjs",
     "qaBlobSha": "101c78654a1afc3a0fd06ad0b4d652232e491c3b",
     "rosterSourceBlobSha": "75ca53db55e2665123589b0e63253a8e4f8c377c",
-    "onlyReadOnlyFunctions": ["orbit360ScopedPolicyReadPreview", "orbit360AssignableAdvisorRosterPreview"],
+    "onlyReadOnlyFunctions": [
+      "orbit360ScopedPolicyReadPreview",
+      "orbit360AssignableAdvisorRosterPreview"
+    ],
     "onlyIsolatedHosting": true,
     "sharedRulesDeployAuthorized": false,
     "otherFunctionsDeployAuthorized": false,
@@ -3956,7 +3963,10 @@
     "qaBlobSha": "0da324fbe65d88a3820ee30bb40fbac425f4f320",
     "compositionBlobSha": "c9a52496d15fecbba152b509261d8238c142dc1b",
     "rosterSourceBlobSha": "75ca53db55e2665123589b0e63253a8e4f8c377c",
-    "onlyReadOnlyFunctions": ["orbit360ScopedPolicyReadPreview", "orbit360AssignableAdvisorRosterPreview"],
+    "onlyReadOnlyFunctions": [
+      "orbit360ScopedPolicyReadPreview",
+      "orbit360AssignableAdvisorRosterPreview"
+    ],
     "onlyIsolatedHosting": true,
     "sharedFirestoreRulesDeployAuthorized": false,
     "otherFunctionsDeployAuthorized": false,
@@ -3993,7 +4003,10 @@
     "sourceReceiptBlobSha": "aa1022a9bc5887afa012c551e80fc29a46af6009",
     "compositionBlobSha": "7d57dd7cf5e2d6587337693bdb0e8dc78db91952",
     "rosterSourceBlobSha": "75ca53db55e2665123589b0e63253a8e4f8c377c",
-    "onlyReadOnlyFunctions": ["orbit360ScopedPolicyReadPreview", "orbit360AssignableAdvisorRosterPreview"],
+    "onlyReadOnlyFunctions": [
+      "orbit360ScopedPolicyReadPreview",
+      "orbit360AssignableAdvisorRosterPreview"
+    ],
     "onlyIsolatedHosting": true,
     "sharedFirestoreRulesDeployAuthorized": false,
     "otherFunctionsDeployAuthorized": false,
@@ -4028,7 +4041,10 @@
     "sourceReceiptBlobSha": "dda7f7ea88bdf5dffcb536e48e9ec668def34725",
     "compositionBlobSha": "3550cacafb0260ee51820e0f1a130f375e61f505",
     "rosterSourceBlobSha": "75ca53db55e2665123589b0e63253a8e4f8c377c",
-    "onlyReadOnlyFunctions": ["orbit360ScopedPolicyReadPreview", "orbit360AssignableAdvisorRosterPreview"],
+    "onlyReadOnlyFunctions": [
+      "orbit360ScopedPolicyReadPreview",
+      "orbit360AssignableAdvisorRosterPreview"
+    ],
     "onlyIsolatedHosting": true,
     "authenticatedRoleCountryUatRequired": true,
     "previewEvidenceNotProductionAcceptance": true,
@@ -4052,7 +4068,10 @@
     "receiptBlobSha": "b3a943c0eeec15ef951c53c094136129f849286d",
     "compositionBlobSha": "3550cacafb0260ee51820e0f1a130f375e61f505",
     "rosterSourceBlobSha": "75ca53db55e2665123589b0e63253a8e4f8c377c",
-    "onlyReadOnlyFunctions": ["orbit360ScopedPolicyReadPreview", "orbit360AssignableAdvisorRosterPreview"],
+    "onlyReadOnlyFunctions": [
+      "orbit360ScopedPolicyReadPreview",
+      "orbit360AssignableAdvisorRosterPreview"
+    ],
     "onlyIsolatedHosting": true,
     "authenticatedSuccessorUatRequired": true,
     "previewEvidenceNotProductionAcceptance": true,
@@ -4065,5 +4084,58 @@
     "livePromotionAuthorized": false,
     "dataRefreshAuthorized": false,
     "reimportAuthorized": false
+  },
+  "b4003ActiveInsurerReadinessPreviewAuthorization20261024": {
+    "schema": "GI_I65_B4003_ACTIVE_INSURER_READINESS_PREVIEW_AUTH_V1",
+    "status": "AUTHORIZED_EXACT_ISOLATED_READONLY_PREVIEW",
+    "gate": "I6.5/B4-003",
+    "authority": "PAULA_SCOPED_CORRECTION_AND_ISOLATED_PREVIEW_APPROVED_CONTINUED_20261024",
+    "sourceParentCommit": "aeabc4000c5c311ff2eab7e2c576c075ca7cd266",
+    "triggerSubject": "build(i6.5 B4-003): active insurer role readiness Preview",
+    "priorPreviewRunId": 40033974680,
+    "observedUat": {
+      "directionAllToAdvisorToDirectionAll": "FAIL_INSURER_DIRECTORY_TEMPORARY_ZERO",
+      "completeRecoverySec": 46,
+      "previousBootDurationSec": 56
+    },
+    "scope": {
+      "affectedCapability": "ASEGURADORAS_PRIMARY_RUNTIME",
+      "runtimeOwner": "orbit360-platform/data/store-firestore-product-readonly-p0.js",
+      "visualOwner": "orbit360-platform/modules/aseguradoras.js",
+      "assetBinding": "orbit360-platform/index.html",
+      "scopeVersion": "P0_CAUSAL_ACTIVE_ROUTE_ONLY"
+    },
+    "sourceBlobs": {
+      "orbit360-platform/data/store-firestore-product-readonly-p0.js": "e36a80efd787bea895c1f1852142b3bddafe49bb",
+      "orbit360-platform/modules/aseguradoras.js": "badf8da1ce44eb0528d212e97e6f3c40a76a7f03",
+      "orbit360-platform/index.html": "b527075daa762524361321bbf648cde96bff95d1"
+    },
+    "qaBlobs": {
+      "tools/gravicentra-b4-003-active-insurer-readiness.test.cjs": "3c2f1d913da50c488750fa8a82ad34da8dbae8d2"
+    },
+    "compositionBlobSha": "9ba1e9fb162c856e37773221e6a04c9c49d7ed4c",
+    "rosterSourceBlobSha": "75ca53db55e2665123589b0e63253a8e4f8c377c",
+    "syntheticVmResult": "PASS_ACTIVE_ROUTE_BEFORE_STARTUP_NO_DIRECT_FIRESTORE",
+    "nodeRegressionStatus": "PENDING_GITHUB_ACTIONS",
+    "authenticatedRoleCountryUatRequired": true,
+    "previewEvidenceNotProductionAcceptance": true,
+    "onlyReadOnlyFunctions": [
+      "orbit360ScopedPolicyReadPreview",
+      "orbit360AssignableAdvisorRosterPreview"
+    ],
+    "onlyIsolatedHosting": true,
+    "sharedFirestoreRulesDeployAuthorized": false,
+    "otherFunctionsDeployAuthorized": false,
+    "operationalWriterDeployAuthorized": false,
+    "businessWritesAuthorized": false,
+    "syntheticQaWritesAuthorized": false,
+    "realUserImpersonationAuthorized": false,
+    "livePromotionAuthorized": false,
+    "dataRefreshAuthorized": false,
+    "reimportAuthorized": false,
+    "sourceChangedRequiresNewBuildAndDigest": true,
+    "noPreviousEvidenceRewritten": true,
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_ACTIVE_INSURER_READINESS_PREVIEW_AUTH_20261024.json",
+    "receiptBlobSha": "0abc3bb94d8624e8f14a8750868c8df9c10a880b"
   }
 }

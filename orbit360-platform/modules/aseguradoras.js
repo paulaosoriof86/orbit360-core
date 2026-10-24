@@ -428,10 +428,21 @@ Orbit.modules.aseguradoras = (function () {
     }
     ficha(id);
   }
+  // Do not render unconfirmed protected data as a genuine empty directory.
+  function protectedDirectoryReadiness(){
+    const store=S();
+    if(!store||store._protectedCandidate!==true||typeof store._productStatus!=='function')return 'ready';
+    const state=store._productStatus()||{};
+    if((state.serverConfirmedCollections||[]).includes('aseguradoras'))return 'ready';
+    if((state.deniedCollections||[]).includes('aseguradoras'))return 'denied';
+    if((state.snapshotErrors||{}).aseguradoras)return 'failed';
+    return 'loading';
+  }
   function render(h) {
     host = h;
     ensureKnowledgeSummaryLoaded();
-    const todas = S().all('aseguradoras');
+    const readState=protectedDirectoryReadiness();
+    const todas=readState==='ready'?S().all('aseguradoras'):[];
     let all = todas.filter(a => paisOK(a.pais));
     if (fPais !== 'TODOS') all = all.filter(a => a.pais === fPais);
     if (fRamo) all = all.filter(a => (a.ramos || []).includes(fRamo));
@@ -451,7 +462,7 @@ Orbit.modules.aseguradoras = (function () {
     const conAcceso = base.filter(a => (a.portales || []).some(p => p.estadoAcceso === 'Acceso disponible'));
     const conDocs = base.filter(a => (a.docs || []).length);
     const pendActualizar = base.filter(a => (a.portales || []).some(p => p.estadoAcceso === 'Requiere actualización'));
-    const puedeEditar = canEdit();
+    const puedeEditar = canEdit() && readState==='ready';
 
     host.innerHTML = `<div class="page">
       ${K.banner({ icon: '🏢', title: 'Aseguradoras', sub: 'Directorio de aseguradoras vinculadas', features: [], actions: `${puedeEditar ? `<button class="btn ghost" id="asg-imp" style="background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.25)">✨ Importar</button>` : ''}${puedeEditar ? '<button class="btn primary" id="asg-new" style="background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.28)">+ Aseguradora</button>' : ''}` })}
@@ -462,7 +473,8 @@ Orbit.modules.aseguradoras = (function () {
         { label: 'Con acceso disponible', val: conAcceso.length, color: 'var(--info)', foot: 'según último registro', onclick: "Orbit.modules.aseguradoras.kpi('acceso')" },
         { label: 'Con documentación', val: conDocs.length, color: 'var(--ink-3)', foot: 'con documentos cargados', onclick: "Orbit.modules.aseguradoras.kpi('docs')" },
         { label: 'Requieren actualización', val: pendActualizar.length, color: 'var(--warn)', foot: 'revisar acceso', footTone: pendActualizar.length ? 'down' : undefined, onclick: "Orbit.modules.aseguradoras.kpi('pend')" }
-      ])}
+      ].map(item => readState==='ready'?item:Object.assign({},item,{val:'—',foot:readState==='loading'?'Consultando directorio…':'Lectura no confirmada',onclick:null})))}
+      ${readState==='ready'?'':('<div class="cfg-note" data-insurer-readiness="'+readState+'" role="status" aria-live="polite" style="margin-bottom:14px">'+U.esc(readState==='loading'?'Consultando directorio autorizado…':readState==='denied'?'El rol activo no tiene acceso al directorio.':'La lectura protegida no se confirmó; vuelve a abrir el módulo.')+'</div>')}
       ${!puedeEditar ? `<div class="cfg-note" style="margin-bottom:14px">Vista de solo lectura para tu rol (<b>${U.esc(activeRole())}</b>).</div>` : ''}
       <div class="card pad" style="margin-bottom:14px;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
         <input id="asg-q" class="o-sel" style="flex:1.5;min-width:200px" placeholder="🔎 Buscar por nombre, NIT, contacto o ramo…" value="${U.esc(q)}">
@@ -471,7 +483,7 @@ Orbit.modules.aseguradoras = (function () {
         <select id="asg-fest" class="o-sel" style="width:140px"><option value="TODAS" ${fEstado === 'TODAS' ? 'selected' : ''}>Todas</option><option value="ACTIVAS" ${fEstado === 'ACTIVAS' ? 'selected' : ''}>Activas</option><option value="INACTIVAS" ${fEstado === 'INACTIVAS' ? 'selected' : ''}>Inactivas</option></select>
         <select id="asg-order" class="o-sel" style="width:190px"><option value="country" ${orderMode === 'country' ? 'selected' : ''}>País preferido primero</option><option value="name" ${orderMode === 'name' ? 'selected' : ''}>Nombre A–Z</option><option value="active" ${orderMode === 'active' ? 'selected' : ''}>Activas primero</option><option value="recent" ${orderMode === 'recent' ? 'selected' : ''}>Actualización reciente</option></select>
       </div>
-      <div class="asg-grid">${all.map(a => card(a)).join('') || '<div class="muted" style="padding:16px">Sin resultados para este filtro.</div>'}</div>
+      <div class="asg-grid">${all.map(a => card(a)).join('') || '<div class="muted" data-insurer-list-readiness="' + readState + '" style="padding:16px">' + (readState==='ready'?'Sin resultados para este filtro.':readState==='loading'?'Consultando datos del directorio…':readState==='denied'?'Directorio no autorizado para el rol activo.':'Datos no confirmados por el servidor.') + '</div>'}</div>
     </div>`;
     hydrateLogoAssets(host);
     const previewUat=host.querySelector('#asg-preview-uat');if(previewUat)previewUat.addEventListener('click',async()=>{previewUat.disabled=true;try{await openHumanPreviewFixture();}catch(error){previewUat.disabled=false;U.toast('No fue posible preparar la ficha de prueba Preview.');}});
