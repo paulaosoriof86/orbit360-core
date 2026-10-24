@@ -51,7 +51,13 @@ const physicalGit=(...args)=>execFileSync('git',args,{encoding:'utf8'}).trim();
 // receipt expectations. The four pinned pre-successor hashes are used only
 // for prior proofs; the new successor is checked against actual disk bytes.
 let latencyHistoricBlobs=new Map();
-const realGit=(...args)=>args[0]==='hash-object'&&latencyHistoricBlobs.has(args[1])
+// Only the three amended insurer product paths use their verified 24-Oct
+// predecessor blobs in earlier proof assertions. Current composition checks
+// use physicalGit at the active candidate and must never use this map.
+let historicalInsurerProductBlobs=new Map();
+const realGit=(...args)=>args[0]==='hash-object'&&historicalInsurerProductBlobs.has(args[1])
+ ?historicalInsurerProductBlobs.get(args[1]):
+ args[0]==='hash-object'&&latencyHistoricBlobs.has(args[1])
  ?latencyHistoricBlobs.get(args[1]):physicalGit(...args);
 // Historical receipts are verified against their exact already-committed
 // predecessor tree. A newer source successor is verified separately against
@@ -384,6 +390,10 @@ if(ACTIVE_INSURER_ACTIVE){
   C.b4003SecurityReleaseHold?.livePromotionAuthorized===false&&
   B4.boundaries?.livePromotionAuthorized===false&&FIND.findings.length===295,
   'B4_003_ACTIVE_INSURER_READINESS_SCOPE_OR_PROOF_INVALID');
+ // Historical proof window only; no grant and no production artifact alias.
+ historicalInsurerProductBlobs=new Map(sources.map(p=>[
+   p,physicalGit('rev-parse',P.sourceParentCommit+':'+p)
+ ]));
  console.log('B4_003_ACTIVE_INSURER_READINESS=EXACT_SCOPED_SOURCE_VM_PASS_AUTH_UAT_HOLD');
 }
 
