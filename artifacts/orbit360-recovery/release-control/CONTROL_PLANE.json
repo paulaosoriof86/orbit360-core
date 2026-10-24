@@ -4887,7 +4887,7 @@
       "entryGuardReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_ENTRY_GUARD_PASS_20261002.json",
       "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
       "executionLockPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B4_EXECUTION_LOCK_20261002.json",
-      "executionLockBlobSha": "9d39c88a3036d2b4b0fb2e7de23657604beb1ee7",
+      "executionLockBlobSha": "96a7fbf73ec563cb53a5ef54a9551cb6612a08c9",
       "compositionLockBlobSha": "1d8ecaba5cfa8f786006fb508755f3a5d64f0280",
       "findingLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
       "activeFindingId": "B4-003",
@@ -6014,7 +6014,7 @@
   "canonicalAccumulationControl": {
     "status": "FROZEN_ACTIVE",
     "compositionLockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "compositionLockBlobSha": "763253b22c80d0a8604901cf595ace519f47db6c",
+    "compositionLockBlobSha": "45e3fa8a7887d72c899ebc4038aa36708869b50e",
     "findingLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
     "findingLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
     "activePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_V2_20260924.json",
@@ -6330,8 +6330,8 @@
     "status": "B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL",
     "activeFindingId": "B4-003",
     "entryGuardReceiptBlobSha": "3ceff5499cdb91f3224d807a05e9d1c1ab7e807b",
-    "executionLockBlobSha": "9d39c88a3036d2b4b0fb2e7de23657604beb1ee7",
-    "compositionLockBlobSha": "763253b22c80d0a8604901cf595ace519f47db6c",
+    "executionLockBlobSha": "96a7fbf73ec563cb53a5ef54a9551cb6612a08c9",
+    "compositionLockBlobSha": "45e3fa8a7887d72c899ebc4038aa36708869b50e",
     "findingLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
     "noLive": true,
     "noReimport": true,
@@ -14463,5 +14463,39 @@
     "noPreviousEvidenceRewritten": true,
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_ACTIVE_INSURER_READINESS_PREVIEW_AUTH_20261024.json",
     "receiptBlobSha": "1d87de3a3c958274e6be277f48cff0f19aff804c"
+  },
+  "b4003InsurerPolicyCountSourceSuccessor20261024": {
+    "status": "SOURCE_STAGED_SYNTHETIC_QA_PASS_SECURITY_HOLD",
+    "previewStatus": "AUTHORIZED_EXACT_ISOLATED_READONLY_PREVIEW",
+    "gate": "I6.5/B4-003",
+    "authority": "PAULA_EXPLICIT_INSURER_POLICY_COUNT_CODE_AND_ISOLATED_PREVIEW_20261024",
+    "parentHead": "695a467dec5369a0860b64b361d226cde26ea074",
+    "triggerSubject": "build(i6.5 B4-003): insurer policy count recovery Preview",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_INSURER_POLICY_COUNT_SUCCESSOR_20261024.json",
+    "receiptBlobSha": "9d3a0661aec38745934208ff736505a40fde9815",
+    "compositionBlobSha": "45e3fa8a7887d72c899ebc4038aa36708869b50e",
+    "rosterSourceBlobSha": "75ca53db55e2665123589b0e63253a8e4f8c377c",
+    "sourceBlobsAfter": {
+      "orbit360-platform/core/router.js": "df3f134f16246c770418ad11323f6e9a931cb3bb",
+      "orbit360-platform/index.html": "7737f31a5014acd699b6b8b3fdaf63e6d7a1a9f4",
+      "orbit360-platform/modules/aseguradoras.js": "018ed999cbcf4d621c84c36c081cb455b1a01fb6"
+    },
+    "qaBlobsAfter": {
+      ".github/workflows/gravicentra-b4-003-executor.yml": "c0e8fc659abbbbfb6677eb258ce4735d625ee38c",
+      "tools/gravicentra-b4-003-active-insurer-readiness.test.cjs": "ed051535104110683bcceef21ff19222018ec826",
+      "tools/gravicentra-i6-control-plane-guard-v1.mjs": "dce1dc7da1e088851662112f44a4f0ed75ff1a1d"
+    },
+    "onlyReadOnlyFunctions": [
+      "orbit360ScopedPolicyReadPreview",
+      "orbit360AssignableAdvisorRosterPreview"
+    ],
+    "onlyIsolatedHosting": true,
+    "authenticatedRoleCountryUatRequired": true,
+    "sharedFirestoreRulesDeployAuthorized": false,
+    "operationalWritesAuthorized": false,
+    "syntheticQaWritesAuthorized": false,
+    "realUserImpersonationAuthorized": false,
+    "livePromotionAuthorized": false,
+    "reimportAuthorized": false
   }
 }

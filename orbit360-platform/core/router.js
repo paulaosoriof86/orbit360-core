@@ -15,7 +15,9 @@ Orbit.router = (function () {
     ops: ['negocios', 'gestiones', 'clientes', 'polizas', 'aseguradoras', 'asesores'],
     leads: ['negocios', 'gestiones', 'clientes', 'polizas', 'aseguradoras', 'asesores'],
     cliente360: ['clientes', 'asesores', 'polizas', 'cobros', 'carteraPrimas', 'recibosEsperados', 'comisiones', 'vehiculos'],
-    aseguradoras: ['aseguradoras', 'asesores'],
+    // Insurer cards display policy counts; request that relation on this route,
+    // and rerender when its protected server-confirmed snapshot arrives.
+    aseguradoras: ['aseguradoras', 'asesores', 'polizas'],
     polizas: ['polizas', 'clientes', 'aseguradoras', 'vehiculos'],
     cobros: ['cobros', 'clientes', 'polizas', 'recibosEsperados', 'carteraPrimas'],
     cronograma: ['clientes', 'polizas', 'recibosEsperados', 'carteraPrimas', 'cobros', 'gestiones', 'tareas'],

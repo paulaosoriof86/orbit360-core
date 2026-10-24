@@ -140,6 +140,8 @@ if(LATENCY_REPAIR_ACTIVE){
 }
 const ACTIVE_INSURER=C.b4003ActiveInsurerReadinessPreviewAuthorization20261024||{};
 const ACTIVE_INSURER_ACTIVE=ACTIVE_INSURER.status==='AUTHORIZED_EXACT_ISOLATED_READONLY_PREVIEW';
+const INSURER_POLICY_COUNT=C.b4003InsurerPolicyCountSourceSuccessor20261024||{};
+const INSURER_POLICY_COUNT_ACTIVE=INSURER_POLICY_COUNT.status==='SOURCE_STAGED_SYNTHETIC_QA_PASS_SECURITY_HOLD';
 const historicalInsurerPredecessorComposition=()=>ACTIVE_INSURER_ACTIVE?
  physicalGit('rev-parse',ACTIVE_INSURER.sourceParentCommit+':'+I6_CANONICAL_COMPOSITION):
  physicalGit('hash-object',I6_CANONICAL_COMPOSITION);
@@ -342,6 +344,13 @@ if(ACTIVE_INSURER_ACTIVE){
  const P=ACTIVE_INSURER,B=B4.b4003ActiveInsurerReadinessPreviewAuthorization20261024||{};
  const R=readJson(P.receiptPath);
  const M=COMP.b4003ActiveInsurerRouteReadiness20261024||{};
+ // This already-accepted evidence belongs to the exact pre-successor tree.
+ // Only the new successor below may bind the current product bytes.
+ const priorComposition=INSURER_POLICY_COUNT_ACTIVE?
+  JSON.parse(physicalGit('show',INSURER_POLICY_COUNT.parentHead+':'+I6_CANONICAL_COMPOSITION)):COMP;
+ const priorCompositionBlob=INSURER_POLICY_COUNT_ACTIVE?
+  physicalGit('rev-parse',INSURER_POLICY_COUNT.parentHead+':'+I6_CANONICAL_COMPOSITION):
+  realGit('hash-object',I6_CANONICAL_COMPOSITION);
  const sources=[
   'orbit360-platform/data/store-firestore-product-readonly-p0.js',
   'orbit360-platform/modules/aseguradoras.js',
@@ -356,18 +365,20 @@ if(ACTIVE_INSURER_ACTIVE){
   R.schema==='GI_I65_B4003_ACTIVE_INSURER_READINESS_PREVIEW_AUTH_V1'&&
   R.status===P.status&&R.gate===P.gate&&R.authority===P.authority&&
   R.sourceParentCommit===P.sourceParentCommit&&R.triggerSubject===P.triggerSubject&&
-  R.compositionBlobSha===realGit('hash-object',I6_CANONICAL_COMPOSITION)&&
+  R.compositionBlobSha===priorCompositionBlob&&
   P.compositionBlobSha===R.compositionBlobSha&&
   M.status==='SOURCE_PATCH_STAGED_SYNTHETIC_VM_PASS_AUTHENTICATED_UAT_PENDING'&&
   M.parentHead===P.sourceParentCommit&&M.qaBlobSha===R.qaBlobs?.[qa]&&
   sameJson(Object.keys(R.sourceBlobs||{}).sort(),sources.slice().sort())&&
   sameJson(Object.keys(R.qaBlobs||{}),[qa])&&
-  sources.every(p=>R.sourceBlobs[p]===realGit('hash-object',p)&&
+  sources.every(p=>R.sourceBlobs[p]===(INSURER_POLICY_COUNT_ACTIVE?
+   physicalGit('rev-parse',INSURER_POLICY_COUNT.parentHead+':'+p):realGit('hash-object',p))&&
    M.sourceBlobs?.[p]===R.sourceBlobs[p]&&
-   COMP.productFileBlobs?.[p]===R.sourceBlobs[p]&&
+   priorComposition.productFileBlobs?.[p]===R.sourceBlobs[p]&&
    COMP.productFiles.includes(p)&&B4.boundaries?.allowedProductFiles?.includes(p)&&
    R.sourceBlobs[p]!==realGit('rev-parse',P.sourceParentCommit+':'+p))&&
-  R.qaBlobs?.[qa]===realGit('hash-object',qa)&&
+  R.qaBlobs?.[qa]===(INSURER_POLICY_COUNT_ACTIVE?
+   physicalGit('rev-parse',INSURER_POLICY_COUNT.parentHead+':'+qa):realGit('hash-object',qa))&&
   B4.boundaries?.allowedQaFiles?.includes(qa)&&
   P.rosterSourceBlobSha===realGit('hash-object','functions/assignable-advisor-roster.js')&&
   P.rosterSourceBlobSha===R.rosterSourceBlobSha&&
@@ -391,10 +402,67 @@ if(ACTIVE_INSURER_ACTIVE){
   B4.boundaries?.livePromotionAuthorized===false&&FIND.findings.length===295,
   'B4_003_ACTIVE_INSURER_READINESS_SCOPE_OR_PROOF_INVALID');
  // Historical proof window only; no grant and no production artifact alias.
- historicalInsurerProductBlobs=new Map(sources.map(p=>[
+ historicalInsurerProductBlobs=new Map((INSURER_POLICY_COUNT_ACTIVE?
+  sources.concat('orbit360-platform/core/router.js'):sources).map(p=>[
    p,physicalGit('rev-parse',P.sourceParentCommit+':'+p)
  ]));
  console.log('B4_003_ACTIVE_INSURER_READINESS=EXACT_SCOPED_SOURCE_VM_PASS_AUTH_UAT_HOLD');
+}
+
+if(INSURER_POLICY_COUNT_ACTIVE){
+ const P=INSURER_POLICY_COUNT,R=readJson(P.receiptPath);
+ const BL=B4.b4003InsurerPolicyCountSourceSuccessor20261024||{};
+ const CL=COMP.b4003InsurerPolicyCountSourceSuccessor20261024||{};
+ const source=[
+  'orbit360-platform/core/router.js',
+  'orbit360-platform/index.html',
+  'orbit360-platform/modules/aseguradoras.js'
+ ].sort();
+ const qa=[
+  '.github/workflows/gravicentra-b4-003-executor.yml',
+  'tools/gravicentra-b4-003-active-insurer-readiness.test.cjs',
+  'tools/gravicentra-i6-control-plane-guard-v1.mjs'
+ ].sort();
+ const pairs={...R.sourceFiles,...R.qaFiles};
+ need(P.parentHead==='695a467dec5369a0860b64b361d226cde26ea074'&&
+  physicalGit('merge-base',P.parentHead,'HEAD')===P.parentHead&&
+  P.gate==='I6.5/B4-003'&&
+  P.authority==='PAULA_EXPLICIT_INSURER_POLICY_COUNT_CODE_AND_ISOLATED_PREVIEW_20261024'&&
+  P.receiptBlobSha===physicalGit('hash-object',P.receiptPath)&&
+  R.schema==='GI_I65_B4003_INSURER_POLICY_COUNT_SUCCESSOR_V1'&&
+  R.status===P.status&&R.gate===P.gate&&R.authority===P.authority&&
+  R.parentHead===P.parentHead&&
+  P.sourceBlobsAfter&&P.qaBlobsAfter&&
+  sameJson(Object.keys(R.sourceFiles||{}).sort(),source)&&
+  sameJson(Object.keys(R.qaFiles||{}).sort(),qa)&&
+  [...source,...qa].every(p=>pairs[p]?.before===physicalGit('rev-parse',P.parentHead+':'+p)&&
+   pairs[p]?.after===physicalGit('hash-object',p)&&pairs[p].before!==pairs[p].after)&&
+  source.every(p=>P.sourceBlobsAfter[p]===pairs[p].after&&
+   BL.sourceBlobsAfter[p]===pairs[p].after&&CL.sourceBlobsAfter[p]===pairs[p].after&&
+   COMP.productFiles.includes(p)&&COMP.productFileBlobs[p]===pairs[p].after&&
+   B4.boundaries?.allowedProductFiles?.includes(p))&&
+  qa.every(p=>P.qaBlobsAfter[p]===pairs[p].after&&
+   BL.qaBlobsAfter[p]===pairs[p].after&&CL.qaBlobsAfter[p]===pairs[p].after&&
+   B4.boundaries?.allowedQaFiles?.includes(p))&&
+  P.receiptBlobSha===BL.receiptBlobSha&&P.receiptBlobSha===CL.receiptBlobSha&&
+  R.verification?.activeInsurerMock==='PASS'&&
+  R.verification?.protectedHydrationMock==='PASS'&&
+  R.verification?.roleRecoveryMock==='PASS'&&
+  R.verification?.authenticatedCrossUidSecurity==='HOLD'&&
+  R.verification?.humanAcceptance==='HOLD'&&
+  R.boundaries?.isolatedHostingOnly===true&&
+  ['sharedRulesDeployAuthorized','operationalWritesAuthorized','syntheticQaWritesAuthorized',
+   'livePromotionAuthorized','reimportAuthorized','realUserImpersonationAuthorized']
+   .every(k=>R.boundaries[k]===false)&&
+  C.b4003SecurityReleaseHold?.status==='ACTIVE_FAIL_CLOSED_UNAUTHORIZED_BROWSER_FIRESTORE_READ_WRITE'&&
+  C.b4003SecurityReleaseHold?.firestoreRulesDeployAuthorized===false&&
+  C.b4003SecurityReleaseHold?.livePromotionAuthorized===false&&
+  B4.boundaries?.livePromotionAuthorized===false&&
+  C.currentB4?.compositionLockBlobSha===physicalGit('hash-object',I6_CANONICAL_COMPOSITION)&&
+  C.canonicalAccumulationControl?.compositionLockBlobSha===physicalGit('hash-object',I6_CANONICAL_COMPOSITION)&&
+  B4.compositionLockBlobSha===physicalGit('hash-object',I6_CANONICAL_COMPOSITION)&&
+  FIND.findings.length===295,'B4_003_INSURER_POLICY_COUNT_SUCCESSOR_INVALID');
+ console.log('B4_003_INSURER_POLICY_COUNT=EXACT_CAUSAL_SOURCE_AND_QA_BOUND_UAT_HOLD');
 }
 
 // Historical proof snapshots are read from the exact predecessor tree that

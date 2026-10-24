@@ -438,11 +438,20 @@ Orbit.modules.aseguradoras = (function () {
     if((state.snapshotErrors||{}).aseguradoras)return 'failed';
     return 'loading';
   }
+  function insurerPolicyCountReadiness(){
+    const store=S();
+    if(!store||store._protectedCandidate!==true||typeof store._productStatus!=='function')return 'ready';
+    const state=store._productStatus()||{};
+    if((state.deniedCollections||[]).includes('polizas'))return 'denied';
+    if((state.snapshotErrors||{}).polizas)return 'failed';
+    return (state.serverConfirmedCollections||[]).includes('polizas')?'ready':'loading';
+  }
   function render(h) {
     host = h;
     ensureKnowledgeSummaryLoaded();
     const readState=protectedDirectoryReadiness();
     const todas=readState==='ready'?S().all('aseguradoras'):[];
+    const policyCountState=insurerPolicyCountReadiness();
     let all = todas.filter(a => paisOK(a.pais));
     if (fPais !== 'TODOS') all = all.filter(a => a.pais === fPais);
     if (fRamo) all = all.filter(a => (a.ramos || []).includes(fRamo));
@@ -483,7 +492,7 @@ Orbit.modules.aseguradoras = (function () {
         <select id="asg-fest" class="o-sel" style="width:140px"><option value="TODAS" ${fEstado === 'TODAS' ? 'selected' : ''}>Todas</option><option value="ACTIVAS" ${fEstado === 'ACTIVAS' ? 'selected' : ''}>Activas</option><option value="INACTIVAS" ${fEstado === 'INACTIVAS' ? 'selected' : ''}>Inactivas</option></select>
         <select id="asg-order" class="o-sel" style="width:190px"><option value="country" ${orderMode === 'country' ? 'selected' : ''}>País preferido primero</option><option value="name" ${orderMode === 'name' ? 'selected' : ''}>Nombre A–Z</option><option value="active" ${orderMode === 'active' ? 'selected' : ''}>Activas primero</option><option value="recent" ${orderMode === 'recent' ? 'selected' : ''}>Actualización reciente</option></select>
       </div>
-      <div class="asg-grid">${all.map(a => card(a)).join('') || '<div class="muted" data-insurer-list-readiness="' + readState + '" style="padding:16px">' + (readState==='ready'?'Sin resultados para este filtro.':readState==='loading'?'Consultando datos del directorio…':readState==='denied'?'Directorio no autorizado para el rol activo.':'Datos no confirmados por el servidor.') + '</div>'}</div>
+      <div class="asg-grid">${all.map(a => card(a,policyCountState)).join('') || '<div class="muted" data-insurer-list-readiness="' + readState + '" style="padding:16px">' + (readState==='ready'?'Sin resultados para este filtro.':readState==='loading'?'Consultando datos del directorio…':readState==='denied'?'Directorio no autorizado para el rol activo.':'Datos no confirmados por el servidor.') + '</div>'}</div>
     </div>`;
     hydrateLogoAssets(host);
     const previewUat=host.querySelector('#asg-preview-uat');if(previewUat)previewUat.addEventListener('click',async()=>{previewUat.disabled=true;try{await openHumanPreviewFixture();}catch(error){previewUat.disabled=false;U.toast('No fue posible preparar la ficha de prueba Preview.');}});
@@ -520,9 +529,13 @@ Orbit.modules.aseguradoras = (function () {
     }
   }
 
-  function card(a) {
+  function card(a, policyReadState) {
     const on = a.vinculada !== false;
-    const nPol = S().where('polizas', p => p.aseguradoraId === a.id).length;
+    // A protected role switch clears the policy cache before its next server
+    // response. Empty cache is not evidence of zero policies.
+    const policyText=policyReadState==='ready'
+      ? S().where('polizas',p=>p.aseguradoraId===a.id).length+' pólizas'
+      : policyReadState==='loading'?'Consultando pólizas…':'Pólizas no disponibles';
     const contactoP = (a.contactos || []).find(c => c.principal) || (a.contactos || [])[0];
     const portales = a.portales || [];
     const estAcc = portales.length ? (portales.some(p => p.estadoAcceso === 'Acceso disponible') ? 'Acceso disponible' : portales.some(p => p.estadoAcceso === 'Requiere actualización') ? 'Requiere actualización' : 'Pendiente de conexión segura') : 'Sin acceso registrado';
@@ -532,7 +545,7 @@ Orbit.modules.aseguradoras = (function () {
     return `<div class="asg-card ${on ? '' : 'off'}" data-asg="${a.id}">
       <div class="asg-card-h">
         ${logo}
-        <div style="flex:1;min-width:0"><b>${U.esc(a.nombre)}</b><div class="muted" style="font-size:11.5px">${U.esc(U.text(a.pais, 'País pendiente'))} · ${(a.ramos || []).length} ramos · ${nPol} pólizas</div></div>
+        <div style="flex:1;min-width:0"><b>${U.esc(a.nombre)}</b><div class="muted" style="font-size:11.5px" data-insurer-policy-readiness="${policyReadState}">${U.esc(U.text(a.pais, 'País pendiente'))} · ${(a.ramos || []).length} ramos · ${U.esc(policyText)}</div></div>
         <label class="asg-switch" title="Vinculación" onclick="event.stopPropagation()"><input type="checkbox" data-toggle="${a.id}" ${on ? 'checked' : ''} ${canEdit() ? '' : 'disabled'}><span></span></label>
       </div>
       <div class="asg-card-tags">${productos.map(r => `<span class="badge neutral">${U.esc(U.text(r, 'Ramo pendiente'))}</span>`).join('')}</div>

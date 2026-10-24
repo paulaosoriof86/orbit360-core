@@ -6,6 +6,7 @@ const fs=require('node:fs');
 const vm=require('node:vm');
 const storeSource=fs.readFileSync('orbit360-platform/data/store-firestore-product-readonly-p0.js','utf8');
 const insurerSource=fs.readFileSync('orbit360-platform/modules/aseguradoras.js','utf8');
+const routerSource=fs.readFileSync('orbit360-platform/core/router.js','utf8');
 const index=fs.readFileSync('orbit360-platform/index.html','utf8');
 const events={},calls=[];let currentRole='Asesor',directCalls=0;
 const pendingClients={};
@@ -73,21 +74,45 @@ const flush=async()=>{for(let i=0;i<150;i++)await Promise.resolve();};
  function ready(s){
   const scope={__store:s};
   vm.runInNewContext('const S=()=>__store;\n'+insurerSource.slice(b,e)+
-   '\nthis.readiness=protectedDirectoryReadiness;',scope);
-  return scope.readiness();
+   '\nthis.readiness=protectedDirectoryReadiness;this.policyReadiness=insurerPolicyCountReadiness;',scope);
+  return [scope.readiness(),scope.policyReadiness()];
  }
  const mock=(confirmed=[],errors={},denied=[])=>
   ({_protectedCandidate:true,_productStatus:()=>({
    serverConfirmedCollections:confirmed,snapshotErrors:errors,deniedCollections:denied})});
- assert.equal(ready(mock()),'loading');
- assert.equal(ready(mock(['aseguradoras'])),'ready');
- assert.equal(ready(mock([],{aseguradoras:'functions/unavailable'})),'failed');
- assert.equal(ready(mock([],{},['aseguradoras'])),'denied');
- assert.equal(ready({}), 'ready','UNPROTECTED_PRODUCTION_VIEW_UNCHANGED');
+ assert.deepEqual(ready(mock()),['loading','loading']);
+ assert.deepEqual(ready(mock(['aseguradoras'])),['ready','loading']);
+ assert.deepEqual(ready(mock(['aseguradoras','polizas'])),['ready','ready']);
+ assert.deepEqual(ready(mock([],{aseguradoras:'functions/unavailable',polizas:'functions/unavailable'})),['failed','failed']);
+ assert.deepEqual(ready(mock([],{},['aseguradoras','polizas'])),['denied','denied']);
+ assert.deepEqual(ready({}), ['ready','ready'],'UNPROTECTED_PRODUCTION_VIEW_UNCHANGED');
+ assert.match(routerSource,/aseguradoras:\s*\['aseguradoras',\s*'asesores',\s*'polizas'\]/,
+  'INSURER_ROUTE_MUST_REQUEST_POLICY_RELATION_AND_REPAINT');
+ assert.match(routerSource,/deps\.indexOf\(collection\)\s*<\s*0/,
+  'POLICY_CONFIRMATION_EVENT_MUST_REPAINT_ACTIVE_ROUTE');
+ const cardStart=insurerSource.indexOf('  function card(a, policyReadState) {');
+ const cardEnd=insurerSource.indexOf('  function nueva() {',cardStart);
+ assert.ok(cardStart>=0&&cardEnd>cardStart,'INSURER_CARD_OWNER_MISSING');
+ const cardScope={__store:{where:()=>[{id:'policy-1'},{id:'policy-2'}]},
+  __u:{esc:value=>String(value),text:(value,fallback)=>value||fallback}};
+ vm.runInNewContext('const S=()=>__store;const U=__u;const ACCESO_TONE={};'+
+  'const logoImg=()=>"";const canEdit=()=>false;'+
+  insurerSource.slice(cardStart,cardEnd)+'\nthis.card=card;',cardScope);
+ const insurer={id:'insurer-1',nombre:'Insurer',pais:'GT',ramos:[],contactos:[],portales:[],docs:[]};
+ for(const state of ['loading','failed','denied']){
+  const html=cardScope.card(insurer,state);
+  assert.doesNotMatch(html,/0 pólizas/,'UNCONFIRMED_POLICY_CACHE_MUST_NOT_REPORT_ZERO');
+  assert.match(html,new RegExp('data-insurer-policy-readiness="'+state+'"'));
+ }
+ assert.match(cardScope.card(insurer,'loading'),/Consultando pólizas…/);
+ assert.match(cardScope.card(insurer,'failed'),/Pólizas no disponibles/);
+ assert.match(cardScope.card(insurer,'ready'),/2 pólizas/);
  assert.match(insurerSource,/readState==='ready'\?S\(\)\.all\('aseguradoras'\):\[\]/);
  assert.match(insurerSource,/data-insurer-readiness=/);
+ assert.match(insurerSource,/all\.map\(a => card\(a,policyCountState\)\)/);
  assert.match(insurerSource,/val:'—'/);
  assert.match(index,/store-firestore-product-readonly-p0\.js\?v=20261024-b4003-active-insurer-readiness/);
- assert.match(index,/aseguradoras\.js\?v=20261007-r20f4-20261020-b4003-source-catalog-20261024-b4003-readiness-explicit/);
- console.log('B4_003_ACTIVE_INSURER_READINESS_VM_PASS early_scope_read=true false_zero=false adviser_denied=true cache_invalidated=true directFirestore=0 writes=0');
+ assert.match(index,/router\.js\?v=20261024-b4003-insurer-policy-count-readiness/);
+ assert.match(index,/aseguradoras\.js\?v=20261007-r20f4-20261020-b4003-source-catalog-20261024-b4003-readiness-explicit-20261024-b4003-insurer-policy-count-readiness/);
+ console.log('B4_003_ACTIVE_INSURER_READINESS_VM_PASS early_scope_read=true false_zero=false policy_pending_truthful=true policy_dependency=true adviser_denied=true cache_invalidated=true directFirestore=0 writes=0');
 })().catch(e=>{console.error(e);process.exitCode=1;});

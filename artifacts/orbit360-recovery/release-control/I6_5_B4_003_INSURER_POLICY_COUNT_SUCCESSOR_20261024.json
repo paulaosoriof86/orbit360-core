@@ -1,0 +1,86 @@
+{
+  "schema": "GI_I65_B4003_INSURER_POLICY_COUNT_SUCCESSOR_V1",
+  "status": "SOURCE_STAGED_SYNTHETIC_QA_PASS_SECURITY_HOLD",
+  "gate": "I6.5/B4-003",
+  "authority": "PAULA_EXPLICIT_INSURER_POLICY_COUNT_CODE_AND_ISOLATED_PREVIEW_20261024",
+  "parentHead": "695a467dec5369a0860b64b361d226cde26ea074",
+  "affectedCapabilities": [
+    "ASEGURADORAS_PRIMARY_RUNTIME",
+    "SINGLE_ENTRYPOINT_SHELL_ROUTER",
+    "CROSS_MODULE_RELATIONSHIPS"
+  ],
+  "causalDefect": {
+    "realSession": "Direccion/Todos -> Asesor/Colombia -> Direccion/Todos",
+    "oldBehavior": "Directory returned with 33 insurers but cards showed 0 policies until a separate visit to Polizas; 113 seconds without self-recovery were observed in the preceding authenticated session.",
+    "rootCause": "Protected role change invalidates polizas; Aseguradoras route neither requested the collection nor subscribed to its confirmation and counted an empty cache as zero.",
+    "sourceFix": "Aseguradoras now requests authorized polizas nonblocking, rerenders on server confirmation and never renders unconfirmed protected counts as zero.",
+    "writesToOperationalData": 0
+  },
+  "sourceFiles": {
+    "orbit360-platform/core/router.js": {
+      "before": "9eeb0d3e0764c66e1ee9b242bbfe8d03c47f1816",
+      "after": "df3f134f16246c770418ad11323f6e9a931cb3bb"
+    },
+    "orbit360-platform/index.html": {
+      "before": "07fa3bd6ffcff41c5ed307b220bfe5a016ffc4a1",
+      "after": "7737f31a5014acd699b6b8b3fdaf63e6d7a1a9f4"
+    },
+    "orbit360-platform/modules/aseguradoras.js": {
+      "before": "badf8da1ce44eb0528d212e97e6f3c40a76a7f03",
+      "after": "018ed999cbcf4d621c84c36c081cb455b1a01fb6"
+    }
+  },
+  "qaFiles": {
+    ".github/workflows/gravicentra-b4-003-executor.yml": {
+      "before": "33cc7a5d24b43993d58e144714fe279cd87ec3a4",
+      "after": "c0e8fc659abbbbfb6677eb258ce4735d625ee38c"
+    },
+    "tools/gravicentra-b4-003-active-insurer-readiness.test.cjs": {
+      "before": "5900850cdb57ca77808a0cd486cd62ee83d091b8",
+      "after": "ed051535104110683bcceef21ff19222018ec826"
+    },
+    "tools/gravicentra-i6-control-plane-guard-v1.mjs": {
+      "before": "1b60eb3a9ab2a937e04d9b59ea8949159901bab7",
+      "after": "dce1dc7da1e088851662112f44a4f0ed75ff1a1d"
+    }
+  },
+  "verification": {
+    "activeInsurerMock": "PASS",
+    "protectedHydrationMock": "PASS",
+    "roleRecoveryMock": "PASS",
+    "jsParse": "PASS",
+    "authenticatedCrossUidSecurity": "HOLD",
+    "humanAcceptance": "HOLD",
+    "scopeAndSourceGuard": "PENDING_CUMULATIVE_RECHECK_AFTER_RECEIPT_BINDING"
+  },
+  "workReview20261024": {
+    "source": "Work authenticated browser UAT report attached by Paula; not an acceptance receipt",
+    "overall": "PARTIAL_NOT_ACCEPTED",
+    "previewSourceSha": "695a467dec5369a0860b64b361d226cde26ea074",
+    "observedInsurerRoleReturn": "VISUAL_RECOVERED_IN_3_8S_BUT_BACKEND_SEGREGATION_UNPROVEN",
+    "additionalUnresolved": [
+      "C360_POLIZAS_ROLE_COUNTRY_DENOMINATOR_AND_PREMIUM_PARITY",
+      "UTO_1000001645_GTQ_VS_UNLABELED_DOLLAR_RECEIPTS",
+      "B4_003_FIXTURE_EXIGIBLE_ZERO_VS_PENDING_REQUIREMENTS",
+      "OPERATIVO_CO_STARTUP_20_6_SECONDS"
+    ],
+    "priorEvidencePreserved": true,
+    "findingCountNotReset": 295
+  },
+  "boundaries": {
+    "isolatedHostingOnly": true,
+    "onlyReadOnlyFunctions": [
+      "orbit360ScopedPolicyReadPreview",
+      "orbit360AssignableAdvisorRosterPreview"
+    ],
+    "sharedRulesDeployAuthorized": false,
+    "operationalWritesAuthorized": false,
+    "syntheticQaWritesAuthorized": false,
+    "realUserImpersonationAuthorized": false,
+    "livePromotionAuthorized": false,
+    "reimportAuthorized": false,
+    "sameArtifactPreviewThenLiveRequired": true,
+    "newBuildAndDigestRequired": true,
+    "activeSecurityHoldPreserved": true
+  }
+}
