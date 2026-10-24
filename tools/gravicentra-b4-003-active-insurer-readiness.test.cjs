@@ -88,6 +88,6 @@ const flush=async()=>{for(let i=0;i<150;i++)await Promise.resolve();};
  assert.match(insurerSource,/data-insurer-readiness=/);
  assert.match(insurerSource,/val:'—'/);
  assert.match(index,/store-firestore-product-readonly-p0\.js\?v=20261024-b4003-active-insurer-readiness/);
- assert.match(index,/aseguradoras\.js\?v=20261024-b4003-readiness-explicit/);
+ assert.match(index,/aseguradoras\.js\?v=20261007-r20f4-20261020-b4003-source-catalog-20261024-b4003-readiness-explicit/);
  console.log('B4_003_ACTIVE_INSURER_READINESS_VM_PASS early_scope_read=true false_zero=false adviser_denied=true cache_invalidated=true directFirestore=0 writes=0');
 })().catch(e=>{console.error(e);process.exitCode=1;});

@@ -21,15 +21,15 @@
   "sourceBlobs": {
     "orbit360-platform/data/store-firestore-product-readonly-p0.js": "e36a80efd787bea895c1f1852142b3bddafe49bb",
     "orbit360-platform/modules/aseguradoras.js": "badf8da1ce44eb0528d212e97e6f3c40a76a7f03",
-    "orbit360-platform/index.html": "b527075daa762524361321bbf648cde96bff95d1"
+    "orbit360-platform/index.html": "07fa3bd6ffcff41c5ed307b220bfe5a016ffc4a1"
   },
   "qaBlobs": {
-    "tools/gravicentra-b4-003-active-insurer-readiness.test.cjs": "165b7f78e100c7be8f839c1a5636e335f66909c5"
+    "tools/gravicentra-b4-003-active-insurer-readiness.test.cjs": "5900850cdb57ca77808a0cd486cd62ee83d091b8"
   },
-  "compositionBlobSha": "340f7dcb96020f415aca3b50325095e67da33ca6",
+  "compositionBlobSha": "763253b22c80d0a8604901cf595ace519f47db6c",
   "rosterSourceBlobSha": "75ca53db55e2665123589b0e63253a8e4f8c377c",
   "syntheticVmResult": "PASS_ACTIVE_ROUTE_BEFORE_STARTUP_NO_DIRECT_FIRESTORE",
-  "nodeRegressionStatus": "QA_ASSERTION_FIXED_CI_VALIDATION_PENDING",
+  "nodeRegressionStatus": "QA_SOURCE_CHANGED_PENDING_CI_REPROOF",
   "authenticatedRoleCountryUatRequired": true,
   "previewEvidenceNotProductionAcceptance": true,
   "onlyReadOnlyFunctions": [

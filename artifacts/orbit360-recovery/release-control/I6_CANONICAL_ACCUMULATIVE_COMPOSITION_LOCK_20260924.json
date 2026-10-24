@@ -220,7 +220,7 @@
     "orbit360-platform/data/tenant-alianzas-soluciones-insurers-p10.js": "41d2e31a42dac73eb68af304d5f532897210d0ee",
     "orbit360-platform/data/tenant-config/alianzas-soluciones.aseguradoras-knowledge-summary-v20261003.js": "2000d9ea8ab67bdd37d8bf404a29a405fa6374dd",
     "orbit360-platform/data/tenant-public-branding-index.js": "dc543c463f5ecd8ea44e49156d6282113bd95db6",
-    "orbit360-platform/index.html": "b527075daa762524361321bbf648cde96bff95d1",
+    "orbit360-platform/index.html": "07fa3bd6ffcff41c5ed307b220bfe5a016ffc4a1",
     "orbit360-platform/modules/academia.js": "4d48ee3edbc6afc4163bf6365a80bbcb680b1852",
     "orbit360-platform/modules/aseguradoras-v1202-import-bridge.js": "db5f012abe505c2dd27d77a47d0694868bee5348",
     "orbit360-platform/modules/aseguradoras.js": "badf8da1ce44eb0528d212e97e6f3c40a76a7f03",
@@ -6527,9 +6527,9 @@
     "sourceBlobs": {
       "orbit360-platform/data/store-firestore-product-readonly-p0.js": "e36a80efd787bea895c1f1852142b3bddafe49bb",
       "orbit360-platform/modules/aseguradoras.js": "badf8da1ce44eb0528d212e97e6f3c40a76a7f03",
-      "orbit360-platform/index.html": "b527075daa762524361321bbf648cde96bff95d1"
+      "orbit360-platform/index.html": "07fa3bd6ffcff41c5ed307b220bfe5a016ffc4a1"
     },
-    "qaBlobSha": "165b7f78e100c7be8f839c1a5636e335f66909c5",
+    "qaBlobSha": "5900850cdb57ca77808a0cd486cd62ee83d091b8",
     "roleSwitchEvidence": "ACTIVE_INSURER_READ_BEFORE_STARTUP_GT_CO_SYNTHETIC_PASS",
     "securityBoundary": "NO_DIRECT_BROWSER_FIRESTORE_NO_OPERATIONAL_WRITES",
     "productionPromotionAuthorized": false

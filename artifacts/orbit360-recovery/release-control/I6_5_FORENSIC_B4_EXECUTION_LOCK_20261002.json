@@ -629,7 +629,7 @@
   },
   "findingLedgerBlobSha": "8125e97dcf1feb7f46081f95327952e65c2d1077",
   "continuityRegisterBlobSha": "4e6b0ac51736be360c4b95abe8fc01d8f1e78e20",
-  "compositionLockBlobSha": "340f7dcb96020f415aca3b50325095e67da33ca6",
+  "compositionLockBlobSha": "763253b22c80d0a8604901cf595ace519f47db6c",
   "r18SourceFix": {
     "status": "SOURCE_FIXED_R18_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_SOURCE_FIX_20261005.json",
@@ -4108,12 +4108,12 @@
     "sourceBlobs": {
       "orbit360-platform/data/store-firestore-product-readonly-p0.js": "e36a80efd787bea895c1f1852142b3bddafe49bb",
       "orbit360-platform/modules/aseguradoras.js": "badf8da1ce44eb0528d212e97e6f3c40a76a7f03",
-      "orbit360-platform/index.html": "b527075daa762524361321bbf648cde96bff95d1"
+      "orbit360-platform/index.html": "07fa3bd6ffcff41c5ed307b220bfe5a016ffc4a1"
     },
     "qaBlobs": {
-      "tools/gravicentra-b4-003-active-insurer-readiness.test.cjs": "165b7f78e100c7be8f839c1a5636e335f66909c5"
+      "tools/gravicentra-b4-003-active-insurer-readiness.test.cjs": "5900850cdb57ca77808a0cd486cd62ee83d091b8"
     },
-    "compositionBlobSha": "340f7dcb96020f415aca3b50325095e67da33ca6",
+    "compositionBlobSha": "763253b22c80d0a8604901cf595ace519f47db6c",
     "rosterSourceBlobSha": "75ca53db55e2665123589b0e63253a8e4f8c377c",
     "syntheticVmResult": "PASS_ACTIVE_ROUTE_BEFORE_STARTUP_NO_DIRECT_FIRESTORE",
     "nodeRegressionStatus": "CI_FAIL_TEST_ASSERTION_CORRECTED_PENDING_RERUN",
@@ -4136,6 +4136,6 @@
     "sourceChangedRequiresNewBuildAndDigest": true,
     "noPreviousEvidenceRewritten": true,
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_ACTIVE_INSURER_READINESS_PREVIEW_AUTH_20261024.json",
-    "receiptBlobSha": "158ca2b2975e95e8aff57046542b0cd6d49e0b5f"
+    "receiptBlobSha": "1d87de3a3c958274e6be277f48cff0f19aff804c"
   }
 }
