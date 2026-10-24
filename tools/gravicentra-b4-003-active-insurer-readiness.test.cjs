@@ -65,7 +65,8 @@ const flush=async()=>{for(let i=0;i<150;i++)await Promise.resolve();};
  assert.ok(!store._productStatus().serverConfirmedCollections.includes('aseguradoras'),
   'OLD_DIRECTION_ROWS_MUST_NOT_BE_ACCEPTED');
  assert.equal(directCalls,0,'NEVER_FALLBACK_TO_BROWSER_FIRESTORE');
- assert.throws(()=>store.insert('aseguradoras',{id:'synthetic'}),/WRITE_BLOCKED/);
+ assert.throws(()=>store.insert('aseguradoras',{id:'synthetic'}),e=>
+  e&&e.code==='WRITE_BLOCKED_PRODUCT_READ_ONLY_P0');
  const b=insurerSource.indexOf('  function protectedDirectoryReadiness(){');
  const e=insurerSource.indexOf('  function render(h)',b);
  assert.ok(b>0&&e>b,'READINESS_OWNER_MISSING');

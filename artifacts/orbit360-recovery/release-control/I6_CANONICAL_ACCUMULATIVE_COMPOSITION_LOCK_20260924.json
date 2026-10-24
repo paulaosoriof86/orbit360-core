@@ -6529,7 +6529,7 @@
       "orbit360-platform/modules/aseguradoras.js": "badf8da1ce44eb0528d212e97e6f3c40a76a7f03",
       "orbit360-platform/index.html": "b527075daa762524361321bbf648cde96bff95d1"
     },
-    "qaBlobSha": "3c2f1d913da50c488750fa8a82ad34da8dbae8d2",
+    "qaBlobSha": "59b3caf98c569cdd9e5dafd56823c2ab036441b1",
     "roleSwitchEvidence": "ACTIVE_INSURER_READ_BEFORE_STARTUP_GT_CO_SYNTHETIC_PASS",
     "securityBoundary": "NO_DIRECT_BROWSER_FIRESTORE_NO_OPERATIONAL_WRITES",
     "productionPromotionAuthorized": false

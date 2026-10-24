@@ -132,6 +132,11 @@ if(LATENCY_REPAIR_ACTIVE){
  latencyHistoricBlobs=new Map(exactPaths.map(p=>[p,pairs[p].before]));
  console.log('B4_003_POST_AUTH_CLIENT_PAGING_LATENCY=BOUNDED_SYNTHETIC_QA_PASS_REAL_UAT_PENDING_LIVE_HOLD');
 }
+const ACTIVE_INSURER=C.b4003ActiveInsurerReadinessPreviewAuthorization20261024||{};
+const ACTIVE_INSURER_ACTIVE=ACTIVE_INSURER.status==='AUTHORIZED_EXACT_ISOLATED_READONLY_PREVIEW';
+const historicalInsurerPredecessorComposition=()=>ACTIVE_INSURER_ACTIVE?
+ physicalGit('rev-parse',ACTIVE_INSURER.sourceParentCommit+':'+I6_CANONICAL_COMPOSITION):
+ physicalGit('hash-object',I6_CANONICAL_COMPOSITION);
 const LATENCY_PREVIEW=C.b4003PostAuthClientPagingLatencyPreviewAuthorization20261023||{};
 if(LATENCY_PREVIEW.status==='AUTHORIZED_EXACT_ISOLATED_READONLY_PREVIEW'){
  const P=LATENCY_PREVIEW,R=readJson(P.receiptPath);
@@ -156,7 +161,7 @@ if(LATENCY_PREVIEW.status==='AUTHORIZED_EXACT_ISOLATED_READONLY_PREVIEW'){
   sameJson(Object.keys(sourceFiles).sort(),Object.keys({...readJson(L.receiptPath).sourceFiles,...readJson(L.receiptPath).qaFiles}).sort())&&
   Object.entries(sourceFiles).every(([p,sha])=>sha===physicalGit('hash-object',p)&&
     sha===physicalGit('rev-parse',P.sourceCommit+':'+p))&&
-  P.compositionBlobSha===physicalGit('hash-object',I6_CANONICAL_COMPOSITION)&&
+  P.compositionBlobSha===historicalInsurerPredecessorComposition()&&
   R.compositionBlobSha===P.compositionBlobSha&&
   P.rosterSourceBlobSha===physicalGit('hash-object','functions/assignable-advisor-roster.js')&&
   R.rosterSourceBlobSha===P.rosterSourceBlobSha&&
@@ -275,8 +280,6 @@ const WRITER_COUNTRY=C.b4003WriterCountryFailClosedSuccessor20261023||{};
 const WRITER_COUNTRY_ACTIVE=WRITER_COUNTRY.status==='SOURCE_STAGED_SYNTHETIC_QA_PASS_SECURITY_HOLD';
 const PROTECTED_STORE_TRANSPORT=C.b4003ProtectedStoreTransportSuccessor20261023||{};
 const PROTECTED_STORE_TRANSPORT_ACTIVE=PROTECTED_STORE_TRANSPORT.status==='SOURCE_STAGED_SYNTHETIC_QA_PASS_SECURITY_HOLD';
-const ACTIVE_INSURER=C.b4003ActiveInsurerReadinessPreviewAuthorization20261024||{};
-const ACTIVE_INSURER_ACTIVE=ACTIVE_INSURER.status==='AUTHORIZED_EXACT_ISOLATED_READONLY_PREVIEW';
 const historicalRoleRecoveryHash=p=>ACTIVE_INSURER_ACTIVE&&[
  'orbit360-platform/data/store-firestore-product-readonly-p0.js',
  'orbit360-platform/index.html'
