@@ -74,7 +74,7 @@ const flush=async()=>{for(let i=0;i<150;i++)await Promise.resolve();};
   const scope={__store:s};
   vm.runInNewContext('const S=()=>__store;\n'+insurerSource.slice(b,e)+
    '\nthis.readiness=protectedDirectoryReadiness;',scope);
-  return scope.readiness;
+  return scope.readiness();
  }
  const mock=(confirmed=[],errors={},denied=[])=>
   ({_protectedCandidate:true,_productStatus:()=>({

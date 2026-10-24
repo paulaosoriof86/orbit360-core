@@ -24,12 +24,12 @@
     "orbit360-platform/index.html": "b527075daa762524361321bbf648cde96bff95d1"
   },
   "qaBlobs": {
-    "tools/gravicentra-b4-003-active-insurer-readiness.test.cjs": "59b3caf98c569cdd9e5dafd56823c2ab036441b1"
+    "tools/gravicentra-b4-003-active-insurer-readiness.test.cjs": "165b7f78e100c7be8f839c1a5636e335f66909c5"
   },
-  "compositionBlobSha": "1d8ecaba5cfa8f786006fb508755f3a5d64f0280",
+  "compositionBlobSha": "340f7dcb96020f415aca3b50325095e67da33ca6",
   "rosterSourceBlobSha": "75ca53db55e2665123589b0e63253a8e4f8c377c",
   "syntheticVmResult": "PASS_ACTIVE_ROUTE_BEFORE_STARTUP_NO_DIRECT_FIRESTORE",
-  "nodeRegressionStatus": "CI_FAIL_TEST_ASSERTION_CORRECTED_PENDING_RERUN",
+  "nodeRegressionStatus": "QA_ASSERTION_FIXED_CI_VALIDATION_PENDING",
   "authenticatedRoleCountryUatRequired": true,
   "previewEvidenceNotProductionAcceptance": true,
   "onlyReadOnlyFunctions": [

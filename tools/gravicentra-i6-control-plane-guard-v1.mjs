@@ -424,6 +424,9 @@ if(COUNTRY_RULES.status==='SOURCE_STAGED_QA_PASS_RELEASE_HOLD'){
  const narrowOutsideQa=['tools/gravicentra-b4-003-firestore-emulator.test.cjs',
   'tools/gravicentra-b4-003-operational-write-security-regression.test.cjs'].sort();
  const head=COUNTRY_RULES.parentHead;
+ // Bind the historical before-image to the exact canonical manifest in the
+ // source receipt's parent commit, not to the later live composition.
+ const historicalCountryComposition=JSON.parse(realGit('show',head+':'+I6_CANONICAL_COMPOSITION));
  need(COUNTRY_RULES.gate==='I6.5/B4-003'&&
   receipt.schema==='GI_I65_B4003_EXACT_CUMULATIVE_SOURCE_SUCCESSOR_V1'&&
   receipt.status===COUNTRY_RULES.status&&
@@ -452,7 +455,8 @@ if(COUNTRY_RULES.status==='SOURCE_STAGED_QA_PASS_RELEASE_HOLD'){
   source.every(p=>{
     const pair=receipt.sourceFiles[p];
     return pair.before===realGit('rev-parse',head+':'+p)&&
-      pair.before===COMP.productFileBlobs?.[p]&&COMP.productFiles.includes(p)&&
+      pair.before===historicalCountryComposition.productFileBlobs?.[p]&&
+      historicalCountryComposition.productFiles.includes(p)&&COMP.productFiles.includes(p)&&
       pair.after===writerPreviousHash(p)&&pair.after!==pair.before&&
       (B4.boundaries?.allowedProductFiles?.includes(p)||narrowOutsideSource.includes(p));
   })&&qa.every(p=>{
