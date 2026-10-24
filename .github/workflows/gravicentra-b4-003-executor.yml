@@ -97,6 +97,7 @@ jobs:
 
       - name: B4-003 protected role hydration regression (mock, no writes)
         run: |
+          node tools/gravicentra-b4-003-dual-host-protected-transport.test.cjs
           node tools/gravicentra-b4-003-post-auth-bootstrap-diagnostic.test.cjs
           node tools/gravicentra-b4-003-protected-hydration.test.cjs
           node tools/gravicentra-b4-003-role-context-recovery.test.cjs
@@ -1000,7 +1001,54 @@ jobs:
             && l.boundaries?.dataMutationAuthorized===false
             && l.boundaries?.livePromotionAuthorized===false;
           if(policyCountRequested&&!policyCountScoped)throw Error('B4_003_INSURER_POLICY_COUNT_PREVIEW_DENIED');
-          const scopedPreview=priorScopedPreview||onePassInternal||oct15ScopedReadback||restrictedScoped||c03Scoped||uatScoped||currentScoped||causalScoped||insurerScoped||cacheScoped||countryScoped||agingScoped||pctxScoped||moneyScoped||postAuthScoped||uatFixScoped||rulesCountryScoped||storeScoped||safeDiagScoped||latencyScoped||roleRecoveryScoped||activeInsurerScoped||policyCountScoped;
+          // The same B4-003 and exact artifact; the LIVE reader is packaged
+          // but NEVER deployed by this isolated Preview executor.
+          const dualHostAuth=c.b4003DualHostProtectedTransport20261024||{};
+          const dualHostRequested=currentSubject===dualHostAuth.triggerSubject;
+          const dualHostReceipt=dualHostRequested
+            ?JSON.parse(fs.readFileSync(dualHostAuth.receiptPath,'utf8')):{};
+          const dualHostScoped=dualHostRequested
+            && dualHostAuth.status==='SOURCE_STAGED_SYNTHETIC_QA_PASS_SECURITY_HOLD'
+            && dualHostAuth.previewStatus==='AUTHORIZED_EXACT_ISOLATED_READONLY_PREVIEW'
+            && JSON.stringify(dualHostAuth)===JSON.stringify(l.b4003DualHostProtectedTransport20261024||{})
+            && dualHostAuth.gate==='I6.5/B4-003'
+            && dualHostAuth.parentHead==='833d859b7c2b2885aaf37e8775ff9f465b307e3e'
+            && require('node:child_process').execFileSync('git',
+              ['merge-base',dualHostAuth.parentHead,'HEAD'],{encoding:'utf8'}).trim()===dualHostAuth.parentHead
+            && dualHostAuth.receiptBlobSha===productSha(dualHostAuth.receiptPath)
+            && dualHostReceipt.schema==='GI_I65_B4003_DUAL_HOST_PROTECTED_TRANSPORT_SOURCE_V1'
+            && dualHostReceipt.gate===dualHostAuth.gate
+            && dualHostReceipt.status===dualHostAuth.status
+            && dualHostReceipt.authority===dualHostAuth.authority
+            && dualHostReceipt.parentHead===dualHostAuth.parentHead
+            && dualHostReceipt.triggerSubject===currentSubject
+            && dualHostAuth.compositionBlobSha===productSha(process.env.COMPOSITION)
+            && JSON.stringify(dualHostReceipt.sourceBlobsAfter)===JSON.stringify(dualHostAuth.sourceBlobsAfter)
+            && JSON.stringify(dualHostReceipt.qaBlobsAfter)===JSON.stringify(dualHostAuth.qaBlobsAfter)
+            && Object.keys(dualHostReceipt.sourceBlobsAfter||{}).length===4
+            && Object.keys(dualHostReceipt.qaBlobsAfter||{}).length===2
+            && Object.entries({...dualHostReceipt.sourceBlobsAfter,...dualHostReceipt.qaBlobsAfter})
+              .every(([p,sha])=>productSha(p)===sha)
+            && dualHostReceipt.stagedBackendExports.join(',')==='orbit360ScopedPolicyReadPreview,orbit360ScopedPolicyRead'
+            && dualHostReceipt.previewDeployOnly.join(',')==='orbit360ScopedPolicyReadPreview,orbit360AssignableAdvisorRosterPreview'
+            && dualHostReceipt.liveProtectedReaderDeployed===false
+            && dualHostReceipt.authenticatedNewPreviewUatAccepted===false
+            && dualHostReceipt.humanPreviewAcceptance===false
+            && ['sharedFirestoreRulesDeployAuthorized','operationalWritesAuthorized','syntheticQaWritesAuthorized',
+                'realUserImpersonationAuthorized','livePromotionAuthorized','reimportAuthorized','refreshAugustAuthorized']
+              .every(k=>dualHostAuth[k]===false&&dualHostReceipt[k]===false)
+            && c.b4003SecurityReleaseHold?.status==='ACTIVE_FAIL_CLOSED_UNAUTHORIZED_BROWSER_FIRESTORE_READ_WRITE'
+            && c.currentB4?.status==='B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL'
+            && c.nextAction==='I6_5_FORENSIC_REMEDIATION_B4_003_R20_TARGETED_PAULA_VISUAL'
+            && l.activeFinding?.id==='B4-003'
+            && l.boundaries?.previewMutationAuthorized===true
+            && l.boundaries?.functionDeploymentAuthorized===true
+            && l.boundaries?.businessWritesAuthorized===false
+            && l.boundaries?.syntheticQaWritesAuthorized===false
+            && l.boundaries?.dataMutationAuthorized===false
+            && l.boundaries?.livePromotionAuthorized===false;
+          if(dualHostRequested&&!dualHostScoped)throw Error('B4_003_DUAL_HOST_PROTECTED_PREVIEW_DENIED');
+          const scopedPreview=priorScopedPreview||onePassInternal||oct15ScopedReadback||restrictedScoped||c03Scoped||uatScoped||currentScoped||causalScoped||insurerScoped||cacheScoped||countryScoped||agingScoped||pctxScoped||moneyScoped||postAuthScoped||uatFixScoped||rulesCountryScoped||storeScoped||safeDiagScoped||latencyScoped||roleRecoveryScoped||activeInsurerScoped||policyCountScoped||dualHostScoped;
           const previewOk=(r19Preview||r20Preview||r23Preview)
             && l.activeFinding?.id==='B4-003'
             && l.boundaries?.businessWritesAuthorized===false
@@ -1228,7 +1276,7 @@ jobs:
             uat.sourceBlobs['functions/assignable-advisor-roster.js']===rosterBlob
             && uat.onlyTwoReadOnlyFunctions===true;
           const readonlyRoster=scopedPreview&&rosterAuth.status==='AUTHORIZED_EXACT_PREVIEW_READONLY_ROSTER_ONLY'
-            && (rosterAuth.sourceBlobSha===rosterBlob||c03RosterReady||uatRosterReady||(currentScoped&&currentPreviewIntent.rosterSourceBlobSha===rosterBlob)||(causalScoped&&ca.rosterSourceBlobSha===rosterBlob)||(insurerScoped&&insurerAuth.rosterSourceBlobSha===rosterBlob)||(cacheScoped&&cacheAuth.rosterSourceBlobSha===rosterBlob)||(countryScoped&&countryAuth.rosterSourceBlobSha===rosterBlob)||(agingScoped&&agingAuth.rosterSourceBlobSha===rosterBlob)||(pctxScoped&&pctxAuth.rosterSourceBlobSha===rosterBlob)||(moneyScoped&&moneyAuth.rosterSourceBlobSha===rosterBlob)||(postAuthScoped&&postAuth.rosterSourceBlobSha===rosterBlob)||(uatFixScoped&&uatFixAuth.rosterSourceBlobSha===rosterBlob)||(rulesCountryScoped&&uatFixAuth.rosterSourceBlobSha===rosterBlob)||(storeScoped&&storeAuth.rosterSourceBlobSha===rosterBlob)||(safeDiagScoped&&safeDiagAuth.rosterSourceBlobSha===rosterBlob)||(latencyScoped&&latencyAuth.rosterSourceBlobSha===rosterBlob)||(roleRecoveryScoped&&roleRecoveryAuth.rosterSourceBlobSha===rosterBlob)||(activeInsurerScoped&&activeInsurerAuth.rosterSourceBlobSha===rosterBlob)||(policyCountScoped&&policyCountAuth.rosterSourceBlobSha===rosterBlob))
+            && (rosterAuth.sourceBlobSha===rosterBlob||c03RosterReady||uatRosterReady||(currentScoped&&currentPreviewIntent.rosterSourceBlobSha===rosterBlob)||(causalScoped&&ca.rosterSourceBlobSha===rosterBlob)||(insurerScoped&&insurerAuth.rosterSourceBlobSha===rosterBlob)||(cacheScoped&&cacheAuth.rosterSourceBlobSha===rosterBlob)||(countryScoped&&countryAuth.rosterSourceBlobSha===rosterBlob)||(agingScoped&&agingAuth.rosterSourceBlobSha===rosterBlob)||(pctxScoped&&pctxAuth.rosterSourceBlobSha===rosterBlob)||(moneyScoped&&moneyAuth.rosterSourceBlobSha===rosterBlob)||(postAuthScoped&&postAuth.rosterSourceBlobSha===rosterBlob)||(uatFixScoped&&uatFixAuth.rosterSourceBlobSha===rosterBlob)||(rulesCountryScoped&&uatFixAuth.rosterSourceBlobSha===rosterBlob)||(storeScoped&&storeAuth.rosterSourceBlobSha===rosterBlob)||(safeDiagScoped&&safeDiagAuth.rosterSourceBlobSha===rosterBlob)||(latencyScoped&&latencyAuth.rosterSourceBlobSha===rosterBlob)||(roleRecoveryScoped&&roleRecoveryAuth.rosterSourceBlobSha===rosterBlob)||(activeInsurerScoped&&activeInsurerAuth.rosterSourceBlobSha===rosterBlob)||(policyCountScoped&&policyCountAuth.rosterSourceBlobSha===rosterBlob)||(dualHostScoped&&policyCountAuth.rosterSourceBlobSha===rosterBlob))
             && rosterAuth.service==='orbit360AssignableAdvisorRosterPreview'
             && rosterAuth.businessWritesAuthorized===false
             && rosterAuth.otherFunctionsDeployAuthorized===false
@@ -1237,7 +1285,7 @@ jobs:
             && c.b4003SecurityReleaseHold?.status==='ACTIVE_FAIL_CLOSED_UNAUTHORIZED_BROWSER_FIRESTORE_READ_WRITE'
             && l.boundaries?.previewMutationAuthorized===true
             && l.boundaries?.realOperationalWritesAuthorized===false;
-          if((currentSubject===requestedOct15Subject||c03Scoped||uatScoped||currentScoped||causalScoped||insurerScoped||cacheScoped||countryScoped||agingScoped||pctxScoped||moneyScoped||postAuthScoped||uatFixScoped||rulesCountryScoped||storeScoped||safeDiagScoped||latencyScoped||roleRecoveryScoped||activeInsurerScoped||policyCountScoped)&&scopedPreview&&!readonlyRoster)
+          if((currentSubject===requestedOct15Subject||c03Scoped||uatScoped||currentScoped||causalScoped||insurerScoped||cacheScoped||countryScoped||agingScoped||pctxScoped||moneyScoped||postAuthScoped||uatFixScoped||rulesCountryScoped||storeScoped||safeDiagScoped||latencyScoped||roleRecoveryScoped||activeInsurerScoped||policyCountScoped||dualHostScoped)&&scopedPreview&&!readonlyRoster)
             throw Error('B4_003_DASHBOARD_READONLY_PREVIEW_SYNC_NOT_AUTHORIZED');
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'readonly_roster='+(readonlyRoster?'true':'false')+'\n');
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'scoped_preview='+(scopedPreview?'true':'false')+'\n');

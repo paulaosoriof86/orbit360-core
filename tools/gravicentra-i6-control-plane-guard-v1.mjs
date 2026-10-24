@@ -55,10 +55,13 @@ let latencyHistoricBlobs=new Map();
 // predecessor blobs in earlier proof assertions. Current composition checks
 // use physicalGit at the active candidate and must never use this map.
 let historicalInsurerProductBlobs=new Map();
+let dualHistoricBlobs=new Map();
 const realGit=(...args)=>args[0]==='hash-object'&&historicalInsurerProductBlobs.has(args[1])
  ?historicalInsurerProductBlobs.get(args[1]):
  args[0]==='hash-object'&&latencyHistoricBlobs.has(args[1])
- ?latencyHistoricBlobs.get(args[1]):physicalGit(...args);
+ ?latencyHistoricBlobs.get(args[1]):
+ args[0]==='hash-object'&&dualHistoricBlobs.has(args[1])
+ ?dualHistoricBlobs.get(args[1]):physicalGit(...args);
 // Historical receipts are verified against their exact already-committed
 // predecessor tree. A newer source successor is verified separately against
 // the actual working tree, never substituted into an older signed receipt.
@@ -80,6 +83,48 @@ const ACTIVE_I65_FORENSIC_B4=String(C.i65ForensicRemediationPlan?.b4?.executionL
 need(exists(ACTIVE_I65_FORENSIC_B4),'I6_5_B4_ACTIVE_LOCK_MISSING:'+ACTIVE_I65_FORENSIC_B4);
 const S=readJson(STATUS_LEDGER),A=readJson(AUTH_RECEIPT),M5=readJson(V5_MANIFEST),M6=readJson(V6_MANIFEST),M=readJson(V7_MANIFEST),FRA=readJson(I65_FORENSIC_AUDIT),FRP=readJson(I65_FORENSIC_PLAN),PAY=readJson(I65_PAYMENT_INFERENCE),B1=readJson(I65_FORENSIC_B1),B2=readJson(I65_FORENSIC_B2),B3=readJson(I65_FORENSIC_B3),B4=readJson(ACTIVE_I65_FORENSIC_B4);
 const COMP=readJson(I6_CANONICAL_COMPOSITION),FIND=readJson(I6_FINDINGS_LEDGER),FRP2=readJson(I65_FORENSIC_PLAN_V2),REJ=readJson(I65_B2_REJECTION),RCM=readJson(I65_B2_ROOT_CAUSE);
+// The 24-Oct dual-host source is an independently pinned successor, never a
+// rewrite of preceding authenticated/Preview receipts. Earlier expectations
+// use the committed predecessor bytes; this change must match disk bytes.
+const DUAL_HOST=C.b4003DualHostProtectedTransport20261024||{};
+const DUAL_HOST_ACTIVE=DUAL_HOST.status==='SOURCE_STAGED_SYNTHETIC_QA_PASS_SECURITY_HOLD';
+const DUAL_PREVIOUS=new Map();
+if(DUAL_HOST_ACTIVE){
+ const D=DUAL_HOST,R=readJson(D.receiptPath);
+ const BL=B4.b4003DualHostProtectedTransport20261024||{};
+ const CL=COMP.b4003DualHostProtectedTransport20261024||{};
+ const sourceQa=Object.assign({},R.sourceBlobsAfter||{},R.qaBlobsAfter||{});
+ need(D.parentHead==='833d859b7c2b2885aaf37e8775ff9f465b307e3e'&&
+  physicalGit('merge-base',D.parentHead,'HEAD')===D.parentHead&&
+  D.gate==='I6.5/B4-003'&&R.schema==='GI_I65_B4003_DUAL_HOST_PROTECTED_TRANSPORT_SOURCE_V1'&&
+  R.authority===D.authority&&R.status===D.status&&R.gate===D.gate&&R.parentHead===D.parentHead&&
+  D.receiptBlobSha===physicalGit('hash-object',D.receiptPath)&&
+  BL.receiptBlobSha===D.receiptBlobSha&&CL.receiptBlobSha===D.receiptBlobSha&&
+  sameJson(D,BL)&&sameJson(D.sourceBlobsAfter,R.sourceBlobsAfter)&&
+  sameJson(D.qaBlobsAfter,R.qaBlobsAfter)&&
+  Object.keys(R.sourceBlobsAfter||{}).length===4&&Object.keys(R.qaBlobsAfter||{}).length===2&&
+  Object.entries(sourceQa).every(([p,sha])=>physicalGit('hash-object',p)===sha)&&
+  D.compositionBlobSha===physicalGit('hash-object',I6_CANONICAL_COMPOSITION)&&
+  R.stagedBackendExports?.join(',')==='orbit360ScopedPolicyReadPreview,orbit360ScopedPolicyRead'&&
+  R.liveProtectedReaderDeployed===false&&
+  R.authenticatedNewPreviewUatAccepted===false&&
+  ['sharedFirestoreRulesDeployAuthorized','operationalWritesAuthorized','syntheticQaWritesAuthorized',
+   'realUserImpersonationAuthorized','livePromotionAuthorized','reimportAuthorized','refreshAugustAuthorized']
+   .every(k=>D[k]===false&&R[k]===false)&&
+  C.b4003SecurityReleaseHold?.status==='ACTIVE_FAIL_CLOSED_UNAUTHORIZED_BROWSER_FIRESTORE_READ_WRITE'&&
+  B4.boundaries?.livePromotionAuthorized===false&&FIND.findings.length===295,
+  'B4_003_DUAL_HOST_PROTECTED_SOURCE_INVALID');
+ for(const p of Object.keys(sourceQa)){
+  if(p==='tools/gravicentra-b4-003-dual-host-protected-transport.test.cjs')continue;
+  try{
+   physicalGit('cat-file','-e',D.parentHead+':'+p);
+   DUAL_PREVIOUS.set(p,physicalGit('rev-parse',D.parentHead+':'+p));
+  }catch(_){/* New QA test did not exist in the predecessor tree. */}
+ }
+ console.log('B4_003_DUAL_HOST_PROTECTED_SOURCE=EXACT_SOURCE_QA_PASS_SECURITY_HOLD');
+}
+const preDualPhysicalHash=p=>DUAL_PREVIOUS.get(p)||physicalGit('hash-object',p);
+dualHistoricBlobs=DUAL_PREVIOUS;
 const LATENCY_REPAIR=C.b4003PostAuthClientPagingLatencySuccessor20261023||{};
 const LATENCY_REPAIR_ACTIVE=LATENCY_REPAIR.status==='SOURCE_STAGED_SYNTHETIC_QA_PASS_AUTHENTICATED_UAT_HOLD';
 if(LATENCY_REPAIR_ACTIVE){
@@ -109,7 +154,7 @@ if(LATENCY_REPAIR_ACTIVE){
   sameJson(Object.keys(R.sourceFiles||{}).sort(),expectedSource)&&
   sameJson(Object.keys(R.qaFiles||{}).sort(),expectedQa)&&
   exactPaths.every(p=>pairs[p]?.before===physicalGit('rev-parse',L.parentHead+':'+p)&&
-   pairs[p]?.after===physicalGit('hash-object',p)&&pairs[p].after!==pairs[p].before)&&
+   pairs[p]?.after===preDualPhysicalHash(p)&&pairs[p].after!==pairs[p].before)&&
   expectedSource.every(p=>CL.sourceBlobsAfter?.[p]===pairs[p].after)&&
   expectedQa.every(p=>CL.qaBlobsAfter?.[p]===pairs[p].after)&&
   R.observedAuthenticatedUat?.result==='FAIL_READONLY_BOOTSTRAP_BLOCKED'&&
@@ -167,7 +212,7 @@ if(LATENCY_PREVIEW.status==='AUTHORIZED_EXACT_ISOLATED_READONLY_PREVIEW'){
   R.sourceReceiptPath===L.receiptPath&&R.sourceReceiptBlobSha===L.receiptBlobSha&&
   L.receiptBlobSha===physicalGit('hash-object',L.receiptPath)&&
   sameJson(Object.keys(sourceFiles).sort(),Object.keys({...readJson(L.receiptPath).sourceFiles,...readJson(L.receiptPath).qaFiles}).sort())&&
-  Object.entries(sourceFiles).every(([p,sha])=>sha===physicalGit('hash-object',p)&&
+  Object.entries(sourceFiles).every(([p,sha])=>sha===preDualPhysicalHash(p)&&
     sha===physicalGit('rev-parse',P.sourceCommit+':'+p))&&
   P.compositionBlobSha===historicalInsurerPredecessorComposition()&&
   R.compositionBlobSha===P.compositionBlobSha&&
@@ -424,6 +469,8 @@ if(INSURER_POLICY_COUNT_ACTIVE){
   'tools/gravicentra-i6-control-plane-guard-v1.mjs'
  ].sort();
  const pairs={...R.sourceFiles,...R.qaFiles};
+ const policyCountHistoricalHash=p=>DUAL_HOST_ACTIVE&&qa.includes(p)
+  ?physicalGit('rev-parse',DUAL_HOST.parentHead+':'+p):preDualPhysicalHash(p);
  need(P.parentHead==='695a467dec5369a0860b64b361d226cde26ea074'&&
   physicalGit('merge-base',P.parentHead,'HEAD')===P.parentHead&&
   P.gate==='I6.5/B4-003'&&
@@ -436,7 +483,7 @@ if(INSURER_POLICY_COUNT_ACTIVE){
   sameJson(Object.keys(R.sourceFiles||{}).sort(),source)&&
   sameJson(Object.keys(R.qaFiles||{}).sort(),qa)&&
   [...source,...qa].every(p=>pairs[p]?.before===physicalGit('rev-parse',P.parentHead+':'+p)&&
-   pairs[p]?.after===physicalGit('hash-object',p)&&pairs[p].before!==pairs[p].after)&&
+   pairs[p]?.after===policyCountHistoricalHash(p)&&pairs[p].before!==pairs[p].after)&&
   source.every(p=>P.sourceBlobsAfter[p]===pairs[p].after&&
    BL.sourceBlobsAfter[p]===pairs[p].after&&CL.sourceBlobsAfter[p]===pairs[p].after&&
    COMP.productFiles.includes(p)&&COMP.productFileBlobs[p]===pairs[p].after&&

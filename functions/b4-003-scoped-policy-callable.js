@@ -1,7 +1,8 @@
 'use strict';
-// B4-003 PREVIEW-ONLY CANDIDATE. Not exported from functions/bootstrap.
-// Do NOT expose until signed active-role attestation and Firestore Rules denial
-// are independently verified. Firestore writes and live targets are excluded.
+// B4-003 staged protected reader. The immutable backend package may contain
+// both names, but the isolated Preview executor deploys ONLY the Preview name.
+// The LIVE name must never be deployed until scoped Rules and the complete
+// authenticated role/country/tenant security gate are independently certified.
 const {getApps,initializeApp}=require('firebase-admin/app');
 const {getFirestore}=require('firebase-admin/firestore');
 const {HttpsError,onCall}=require('firebase-functions/v2/https');
@@ -40,6 +41,8 @@ async function handle(request){
     throw new HttpsError('internal','SCOPED_DOCUMENT_READ_UNAVAILABLE');
   }
 }
-module.exports={orbit360ScopedPolicyReadPreview:onCall({
-  region:REGION,cors:true,maxInstances:2,memory:'256MiB'
-},handle)};
+const opts={region:REGION,cors:true,maxInstances:2,memory:'256MiB'};
+module.exports={
+  orbit360ScopedPolicyReadPreview:onCall(opts,handle),
+  orbit360ScopedPolicyRead:onCall(opts,handle)
+};

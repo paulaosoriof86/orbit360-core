@@ -1,0 +1,43 @@
+{
+  "schema": "GI_I65_B4003_DUAL_HOST_PROTECTED_TRANSPORT_SOURCE_V1",
+  "gate": "I6.5/B4-003",
+  "status": "SOURCE_STAGED_SYNTHETIC_QA_PASS_SECURITY_HOLD",
+  "previewStatus": "AUTHORIZED_EXACT_ISOLATED_READONLY_PREVIEW",
+  "authority": "PAULA_EXPLICIT_DUAL_HOST_PROTECTED_READER_SOURCE_AND_PREVIEW_AUTHORIZATION_20261024",
+  "parentHead": "833d859b7c2b2885aaf37e8775ff9f465b307e3e",
+  "triggerSubject": "build(i6.5 B4-003): stage dual-host protected reader Preview",
+  "cause": "The current isolated reader is only selected on Preview hostnames; the same promoted artifact would silently select direct browser Firestore reads on LIVE, while shared Rules still grant broad tenant-member access.",
+  "correction": "Require a non-downgradable protected transport for both exact release hostnames, select independently named Preview/LIVE server readers from the same artifact, stage the dual-name callable module without deploying its LIVE name, and preserve the read-only isolated Preview build.",
+  "sourceBlobsAfter": {
+    "functions/b4-003-scoped-policy-callable.js": "cff6c25c00eec628494cc6298a5d6f242f00438a",
+    "orbit360-platform/core/product-runtime-browser-providers-p0.js": "92fba6825c5af545995293f9b4f14e47e391e17d",
+    "orbit360-platform/core/product-app-p0.js": "574b30890efbf593b45ad817183089cbad892e7d",
+    "tools/gravicentra-i6-1-preview-package.mjs": "6098758271f8e0787a3e73708321fc300a0a455f"
+  },
+  "qaBlobsAfter": {
+    "tools/gravicentra-b4-003-protected-hydration.test.cjs": "426b1d08206cfa647ede2317ca5a4f2e0c072832",
+    "tools/gravicentra-b4-003-dual-host-protected-transport.test.cjs": "5ab3d4869964e391bcbe8efabb21decc1ab8813d"
+  },
+  "syntheticQa": {
+    "protectedHydration": "PASS_NO_NETWORK_NO_WRITES",
+    "dualHostSelection": "PASS_NO_NETWORK_NO_WRITES",
+    "syntax": "PASS",
+    "authenticatedTwoDistinctUidUat": "HOLD",
+    "effectiveFirestoreRulesReadback": "HOLD",
+    "runtimeStartupPerformance": "HOLD",
+    "fifteenCapabilitiesE2E": "HOLD"
+  },
+  "stagedBackendExports": ["orbit360ScopedPolicyReadPreview", "orbit360ScopedPolicyRead"],
+  "previewDeployOnly": ["orbit360ScopedPolicyReadPreview", "orbit360AssignableAdvisorRosterPreview"],
+  "liveProtectedReaderDeployed": false,
+  "authenticatedNewPreviewUatAccepted": false,
+  "humanPreviewAcceptance": false,
+  "securityReleaseHoldPreserved": true,
+  "sharedFirestoreRulesDeployAuthorized": false,
+  "operationalWritesAuthorized": false,
+  "syntheticQaWritesAuthorized": false,
+  "realUserImpersonationAuthorized": false,
+  "livePromotionAuthorized": false,
+  "reimportAuthorized": false,
+  "refreshAugustAuthorized": false
+}

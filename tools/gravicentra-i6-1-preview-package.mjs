@@ -84,8 +84,8 @@ fs.writeFileSync(path.join(EVIDENCE,'reachable-files.txt'),[...seen].sort().join
 
 function copyTree(src,dst){for(const e of fs.readdirSync(src,{withFileTypes:true})){if(e.name==='node_modules'||e.name==='.git'||e.name.endsWith('.local'))continue;const a=path.join(src,e.name),b=path.join(dst,e.name);if(e.isDirectory()){fs.mkdirSync(b,{recursive:true});copyTree(a,b);}else if(e.isFile()){fs.mkdirSync(path.dirname(b),{recursive:true});fs.copyFileSync(a,b);}}}
 copyTree(FUNCTIONS_SRC,BACKEND);
-// B4-003 explicit authorization: compose the staged callable exclusively during
-// the isolated Preview build, prior to the immutable bundle hash. No LIVE export.
+// B4-003: stage the two callable names in ONE immutable backend package.
+// The executor deploys ONLY the Preview target; LIVE stays undeployed until I5.
 const SCOPED_PREVIEW=process.env.GRAVICENTRA_B4_003_SCOPED_PREVIEW==='true';
 if(SCOPED_PREVIEW){
  if(RELEASE_GATE!=='I6.5-B4-003'||BUILD_PREFIX!=='gi-i65-b4'||!ENVIRONMENT_REF.includes('preview'))
@@ -93,8 +93,8 @@ if(SCOPED_PREVIEW){
  const entry=path.join(BACKEND,'bootstrap.js');
  const base=read(entry);
  if(base.includes('b4-003-scoped-policy-callable'))throw new Error('B4_003_SCOPED_EXPORT_DUPLICATE');
- fs.writeFileSync(entry,base+'\n// Authorized B4-003 Preview-only protected reader export.\nObject.assign(module.exports,require(\'./b4-003-scoped-policy-callable\'));\n');
- fs.writeFileSync(path.join(EVIDENCE,'scoped-preview-authorization.json'),JSON.stringify({gate:RELEASE_GATE,onlyExport:'orbit360ScopedPolicyReadPreview',sourceOnlyStaged:true,sharedRulesDeploy:false,livePromotion:false,realDataWrites:0})+'\n');
+ fs.writeFileSync(entry,base+'\n// B4-003 dual-name source; executor deploys Preview only.\nObject.assign(module.exports,require(\'./b4-003-scoped-policy-callable\'));\n');
+ fs.writeFileSync(path.join(EVIDENCE,'scoped-preview-authorization.json'),JSON.stringify({gate:RELEASE_GATE,stagedExports:['orbit360ScopedPolicyReadPreview','orbit360ScopedPolicyRead'],deployedExport:'orbit360ScopedPolicyReadPreview',liveExportDeployed:false,sourceOnlyStaged:true,sharedRulesDeploy:false,livePromotion:false,realDataWrites:0})+'\n');
 }
 
 

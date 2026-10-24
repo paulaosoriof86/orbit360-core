@@ -195,11 +195,11 @@
     "orbit360-platform/core/issuance-workflow-v1201.js": "ab138f218e041b41ac737ff250c7e808edc8c030",
     "orbit360-platform/core/policy-receipts-engine.js": "b04fdd580efcc2fdfa8703238e92ab5bc51d6347",
     "orbit360-platform/core/policy-receipts-v1199-refinements.js": "3f222509093ede51676efd7edd6347d5794c7e05",
-    "orbit360-platform/core/product-app-p0.js": "b016195f3979ea52cba50f8b2e6060fd114934ce",
+    "orbit360-platform/core/product-app-p0.js": "574b30890efbf593b45ad817183089cbad892e7d",
     "orbit360-platform/core/product-drive-document-provider-p0.js": "074b38c168ed0e7c78569395f815a2ff037c2c3c",
     "orbit360-platform/core/product-hydration-required-optional-p0.js": "21f870d3e0e165487843d1d6efa454474fd73563",
     "orbit360-platform/core/product-insurer-credential-provider-p0.js": "3bf5ba98271c7012dd1328df2894f1b38f3983eb",
-    "orbit360-platform/core/product-runtime-browser-providers-p0.js": "51f2801cf8e7590ff92ffa9e7dae07ff8304f5d7",
+    "orbit360-platform/core/product-runtime-browser-providers-p0.js": "92fba6825c5af545995293f9b4f14e47e391e17d",
     "orbit360-platform/core/public-tenant-branding.js": "ee1029772b1191c44817d315dc8ce8862bb3a152",
     "orbit360-platform/core/pwa.js": "14bc0d513a2ee3de8f7b598b38276e6136f05eb8",
     "orbit360-platform/core/queries.js": "ac5c4e9744fcd5f6a7753f4bd5c3d112eed9a5fc",
@@ -261,7 +261,7 @@
     "firestore.b4-003-scoped-candidate.rules": "63a71c3bc26d32e3bc7ed2836364e5327283956a",
     "orbit360-platform/modules/comparativo.js": "982881a4c1e2f95be95428bd3f9f23360a9a2d5f",
     "functions/b4-003-scoped-policy-reader.js": "24546aa40f26d818aef7f1714c2a21deda63a550",
-    "functions/b4-003-scoped-policy-callable.js": "8b468150003fe812d9e1d0763120f2b31f1df75f",
+    "functions/b4-003-scoped-policy-callable.js": "cff6c25c00eec628494cc6298a5d6f242f00438a",
     "functions/b4-003-scoped-related-reader.js": "ef5842c262c690d42a39afa57e77a309205ee630",
     "functions/b4-003-scoped-bootstrap-reader.js": "356d36e0679a5e499c05632a981b9ef3f1ffb9ec",
     "orbit360-platform/modules/historial.js": "6329129526b850a62e645aa9cd384e7d19317365",
@@ -6565,6 +6565,26 @@
     },
     "qaBlobsAfter": {
       "tools/gravicentra-b4-003-insurer-readiness-facade-bridge.test.cjs": "d1baaa1b71a26b256e56d16018e2bbe617071e48"
+    },
+    "authenticatedNewPreviewUatAccepted": false,
+    "securityReleaseHoldPreserved": true,
+    "livePromotionAuthorized": false
+  },
+  "b4003DualHostProtectedTransport20261024": {
+    "status": "SOURCE_STAGED_SYNTHETIC_QA_PASS_SECURITY_HOLD",
+    "gate": "I6.5/B4-003",
+    "parentHead": "833d859b7c2b2885aaf37e8775ff9f465b307e3e",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_DUAL_HOST_PROTECTED_TRANSPORT_20261024.json",
+    "receiptBlobSha": "88db517347a0460786a650d30307fe0732255ed3",
+    "sourceBlobsAfter": {
+      "functions/b4-003-scoped-policy-callable.js": "cff6c25c00eec628494cc6298a5d6f242f00438a",
+      "orbit360-platform/core/product-runtime-browser-providers-p0.js": "92fba6825c5af545995293f9b4f14e47e391e17d",
+      "orbit360-platform/core/product-app-p0.js": "574b30890efbf593b45ad817183089cbad892e7d",
+      "tools/gravicentra-i6-1-preview-package.mjs": "6098758271f8e0787a3e73708321fc300a0a455f"
+    },
+    "qaBlobsAfter": {
+      "tools/gravicentra-b4-003-protected-hydration.test.cjs": "426b1d08206cfa647ede2317ca5a4f2e0c072832",
+      "tools/gravicentra-b4-003-dual-host-protected-transport.test.cjs": "5ab3d4869964e391bcbe8efabb21decc1ab8813d"
     },
     "authenticatedNewPreviewUatAccepted": false,
     "securityReleaseHoldPreserved": true,

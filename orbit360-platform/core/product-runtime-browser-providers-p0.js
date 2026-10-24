@@ -10,16 +10,19 @@
   window.Orbit = window.Orbit || {};
   var modulesPromise=null, contextPromise=null;
   function config(){return window.__ORBIT360_PRODUCT_PUBLIC_CONFIG__||{};}
-  // Preview-only protected transport is non-downgradable: changing the public
-  // flag or serving it from an unexpected host can NEVER enable direct reads.
-  function protectedPreviewHost(){
+  // One immutable candidate must use the protected transport in Preview AND
+  // after promotion of those same bytes to the certified Hosting site. The
+  // hostname selects a separately deployed callable; it never grants access.
+  function protectedHostMode(){
     var host=String(window.location&&window.location.hostname||'').toLowerCase();
-    return /^ays-orbit-360-lab--gi-i65-b4-[a-z0-9-]+\.web\.app$/.test(host);
+    if(/^ays-orbit-360-lab--gi-i65-b4-[a-z0-9-]+\.web\.app$/.test(host))return 'preview';
+    if(host==='ays-orbit-360-lab.web.app'||host==='ays-orbit-360-lab.firebaseapp.com')return 'live';
+    return '';
   }
   function protectedTransportError(){
-    var requested=config().scopedReadPreviewCandidate===true,channel=protectedPreviewHost();
-    if(channel&&!requested)return 'PROTECTED_READ_CANDIDATE_DISABLED';
-    if(requested&&!channel)return 'PROTECTED_READ_PREVIEW_HOST_DENIED';
+    var requested=config().scopedReadPreviewCandidate===true,mode=protectedHostMode();
+    if(mode&&!requested)return 'PROTECTED_READ_CANDIDATE_DISABLED';
+    if(requested&&!mode)return 'PROTECTED_READ_HOST_DENIED';
     return '';
   }
   function enabled(){var c=config();return c.enabled===true&&!!c.projectId&&!!c.authDomain&&!!c.appId&&!!c.apiKey&&!!c.tenantHint;}
@@ -52,13 +55,19 @@
   }
   function initialUser(){return initialize().then(function(ctx){if(ctx.auth&&typeof ctx.auth.authStateReady==='function')return ctx.auth.authStateReady().then(function(){return ctx.auth.currentUser||null;});return new Promise(function(resolve,reject){var off=function(){};off=ctx.modules.auth.onAuthStateChanged(ctx.auth,function(user){off();resolve(user||null);},function(error){off();reject(error);});});});}
   function waitUser(){return initialize().then(function(ctx){if(ctx.auth.currentUser)return ctx.auth.currentUser;return new Promise(function(resolve,reject){var off=ctx.modules.auth.onAuthStateChanged(ctx.auth,function(user){if(user){off();resolve(user);}},reject);});});}
-  function protectedPreview(){
-    return config().scopedReadPreviewCandidate===true && protectedPreviewHost();
+  function protectedMode(){
+    return config().scopedReadPreviewCandidate===true?protectedHostMode():'';
+  }
+  function protectedReaderName(){
+    var mode=protectedMode();
+    if(mode==='preview')return 'orbit360ScopedPolicyReadPreview';
+    if(mode==='live')return 'orbit360ScopedPolicyRead';
+    throw new Error('PROTECTED_READ_HOST_DENIED');
   }
   function protectedBootstrap(mode,uid){
     var tenant=String(config().tenantHint||'').trim();
-    if(!protectedPreview()||!tenant)return Promise.reject(new Error('PROTECTED_BOOTSTRAP_UNAVAILABLE'));
-    return callFunction('orbit360ScopedPolicyReadPreview',{tenantId:tenant,mode:mode,uid:uid||undefined},'us-east1')
+    if(!protectedMode()||!tenant)return Promise.reject(new Error('PROTECTED_BOOTSTRAP_UNAVAILABLE'));
+    return callFunction(protectedReaderName(),{tenantId:tenant,mode:mode,uid:uid||undefined},'us-east1')
       .then(function(r){
         if(!r||r.ok!==true||r.serverScoped!==true||r.mode!==mode||
            r.tenantId!==tenant||!r.uid||(uid&&r.uid!==uid))
@@ -67,7 +76,7 @@
       });
   }
   function membershipByUid(uid){
-    if(protectedPreview())return protectedBootstrap('bootstrap-membership',uid).then(function(r){
+    if(protectedMode())return protectedBootstrap('bootstrap-membership',uid).then(function(r){
       if(!r.membership||r.membership.uid!==uid||r.membership.tenantId!==r.tenantId||
          r.membership.status!=='active'||!Array.isArray(r.membership.roles)||!r.membership.roles.length)
         throw new Error('PROTECTED_BOOTSTRAP_MEMBERSHIP_INVALID');
@@ -78,7 +87,7 @@
   function readTenantConfig(tenantId){
     var c=config();
     if(String(tenantId||'')!==String(c.tenantHint||''))return Promise.reject(new Error('TENANT_CONFIG_SCOPE_MISMATCH'));
-    if(protectedPreview())return protectedBootstrap('bootstrap-tenant-config','').then(function(r){
+    if(protectedMode())return protectedBootstrap('bootstrap-tenant-config','').then(function(r){
       if(!r.config||typeof r.config!=='object'||Array.isArray(r.config))
         throw new Error('PROTECTED_BOOTSTRAP_CONFIG_INVALID');
       return r.config;
@@ -91,15 +100,16 @@
     return initialize().then(function(ctx){
       var fx=ctx.functionsByRegion[region];
       if(!fx){fx=ctx.modules.functions.getFunctions(ctx.app,region);ctx.functionsByRegion[region]=fx;}
-      var callable=name==='orbit360ScopedPolicyReadPreview'?ctx.modules.functions.httpsCallable(fx,name,{timeout:16000}):ctx.modules.functions.httpsCallable(fx,name);return callable(data||{});
+      var callable=name==='orbit360ScopedPolicyReadPreview'||name==='orbit360ScopedPolicyRead'
+        ?ctx.modules.functions.httpsCallable(fx,name,{timeout:16000}):ctx.modules.functions.httpsCallable(fx,name);
+      return callable(data||{});
     }).then(function(result){return result&&Object.prototype.hasOwnProperty.call(result,'data')?result.data:result;});
   }
 
   function protectedReadPage(data){
-    var v=data||{},cfg=config(),host=String(window.location&&window.location.hostname||'');
+    var v=data||{},cfg=config(),mode=protectedMode();
     var coll=String(v.collection||'').trim(),tenant=String(v.tenantId||'').trim();
-    if(!host.includes('--'))return Promise.reject(new Error('PROTECTED_READ_PREVIEW_ONLY'));
-    if(!protectedPreview())return Promise.reject(new Error('PROTECTED_READ_CANDIDATE_DISABLED'));
+    if(!mode)return Promise.reject(new Error('PROTECTED_READ_CANDIDATE_DISABLED'));
     if(!tenant||tenant!==String(cfg.tenantHint||''))return Promise.reject(new Error('PROTECTED_READ_TENANT_DENIED'));
     if(!['clientes','polizas','vehiculos','recibosEsperados','carteraPrimas','cobros','aseguradoras','asesores','negocios','gestiones','actividades','metas','cancelaciones','auditoria'].includes(coll)||
        !['GT','CO'].includes(String(v.country||'').toUpperCase())||!String(v.activeRole||'').trim())
@@ -114,7 +124,7 @@
       return Promise.reject(new Error('PROTECTED_READ_POLICY_ANCHOR_REQUIRED'));
     var outbound=Object.assign({},v,{collection:coll,tenantId:tenant,mode:'list'});
     if(!hasIds)delete outbound.policyIds;
-    return callFunction('orbit360ScopedPolicyReadPreview',outbound,'us-east1')
+    return callFunction(protectedReaderName(),outbound,'us-east1')
       .then(function(r){
         if(!r||r.ok!==true||r.serverScoped!==true||r.collection!==coll||
            r.country!==String(v.country).toUpperCase()||!Array.isArray(r.rows))

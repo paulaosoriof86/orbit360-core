@@ -91,13 +91,17 @@
       var owner=Orbit.backendProductReadOnlyBootstrapP0;
       var hydrationOwner=Orbit.productHydrationRequiredOptionalP0;
       if(cfg.enabled!==true)throw new Error('PRODUCT_RUNTIME_NOT_CONFIGURED');
-      // A B4-003 scoped channel must never downgrade to direct Firestore reads.
-      var scopedChannel=/^ays-orbit-360-lab--gi-i65-b4-[a-z0-9-]+\.web\.app$/i.test(
-        String(window.location&&window.location.hostname||''));
+      // The same candidate bytes must remain protected on Preview and LIVE.
+      // A missing flag on either release host fails closed, never falling back
+      // to browser Firestore reads during a release promotion.
+      var runtimeHost=String(window.location&&window.location.hostname||'').toLowerCase();
+      var previewChannel=/^ays-orbit-360-lab--gi-i65-b4-[a-z0-9-]+\.web\.app$/.test(runtimeHost);
+      var liveChannel=runtimeHost==='ays-orbit-360-lab.web.app'||runtimeHost==='ays-orbit-360-lab.firebaseapp.com';
+      var scopedChannel=previewChannel||liveChannel;
       if(scopedChannel&&cfg.scopedReadPreviewCandidate!==true)
         throw new Error('PROTECTED_READ_CANDIDATE_DISABLED');
       if(!scopedChannel&&cfg.scopedReadPreviewCandidate===true)
-        throw new Error('PROTECTED_READ_PREVIEW_HOST_DENIED');
+        throw new Error('PROTECTED_READ_HOST_DENIED');
       if(!providers||typeof providers.dependencies!=='function')throw new Error('PRODUCT_RUNTIME_PROVIDERS_MISSING');
       if(!owner||typeof owner.start!=='function')throw new Error('PRODUCT_READONLY_BOOTSTRAP_MISSING');
       if(!hydrationOwner||typeof hydrationOwner.contract!=='function')throw new Error('PRODUCT_HYDRATION_CONTRACT_MISSING');
@@ -114,11 +118,10 @@
         // first read can require multiple sequential cursor pages. An 8s
         // bootstrap watchdog discarded valid in-flight reads before the
         // transport could report success or a real failure. Keep a bounded
-        // Preview-only safety budget; unprotected startup stays unchanged.
+        // Scoped candidate budget; the same bytes apply in Preview and LIVE.
         snapshotTimeoutMs:scopedChannel?24000:8000,
-        // Preview-only candidate: no silent direct Firestore fallback.
-        protectedReadCandidate: cfg.scopedReadPreviewCandidate===true &&
-          String(window.location&&window.location.hostname||'').includes('--')
+        // A protected release candidate never falls back to direct Firestore.
+        protectedReadCandidate: cfg.scopedReadPreviewCandidate===true && scopedChannel
       }).then(function(result){
         // Optional collections load on their authorized route, not during login.
         // This prevents every financial/legacy source competing with first paint.

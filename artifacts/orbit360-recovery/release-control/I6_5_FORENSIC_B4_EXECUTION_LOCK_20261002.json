@@ -629,7 +629,7 @@
   },
   "findingLedgerBlobSha": "8125e97dcf1feb7f46081f95327952e65c2d1077",
   "continuityRegisterBlobSha": "4e6b0ac51736be360c4b95abe8fc01d8f1e78e20",
-  "compositionLockBlobSha": "a8d31cb5fd17f1ea270864b9343c41cb3aaa765e",
+  "compositionLockBlobSha": "f2138a7815855d0df569fc08480631d22f2d5734",
   "r18SourceFix": {
     "status": "SOURCE_FIXED_R18_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_SOURCE_FIX_20261005.json",
@@ -4195,5 +4195,33 @@
     "realUserImpersonationAuthorized": false,
     "livePromotionAuthorized": false,
     "reimportAuthorized": false
+  },
+  "b4003DualHostProtectedTransport20261024": {
+    "status": "SOURCE_STAGED_SYNTHETIC_QA_PASS_SECURITY_HOLD",
+    "previewStatus": "AUTHORIZED_EXACT_ISOLATED_READONLY_PREVIEW",
+    "gate": "I6.5/B4-003",
+    "authority": "PAULA_EXPLICIT_DUAL_HOST_PROTECTED_READER_SOURCE_AND_PREVIEW_AUTHORIZATION_20261024",
+    "parentHead": "833d859b7c2b2885aaf37e8775ff9f465b307e3e",
+    "triggerSubject": "build(i6.5 B4-003): stage dual-host protected reader Preview",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_DUAL_HOST_PROTECTED_TRANSPORT_20261024.json",
+    "receiptBlobSha": "88db517347a0460786a650d30307fe0732255ed3",
+    "compositionBlobSha": "f2138a7815855d0df569fc08480631d22f2d5734",
+    "sourceBlobsAfter": {
+      "functions/b4-003-scoped-policy-callable.js": "cff6c25c00eec628494cc6298a5d6f242f00438a",
+      "orbit360-platform/core/product-runtime-browser-providers-p0.js": "92fba6825c5af545995293f9b4f14e47e391e17d",
+      "orbit360-platform/core/product-app-p0.js": "574b30890efbf593b45ad817183089cbad892e7d",
+      "tools/gravicentra-i6-1-preview-package.mjs": "6098758271f8e0787a3e73708321fc300a0a455f"
+    },
+    "qaBlobsAfter": {
+      "tools/gravicentra-b4-003-protected-hydration.test.cjs": "426b1d08206cfa647ede2317ca5a4f2e0c072832",
+      "tools/gravicentra-b4-003-dual-host-protected-transport.test.cjs": "5ab3d4869964e391bcbe8efabb21decc1ab8813d"
+    },
+    "sharedFirestoreRulesDeployAuthorized": false,
+    "operationalWritesAuthorized": false,
+    "syntheticQaWritesAuthorized": false,
+    "realUserImpersonationAuthorized": false,
+    "livePromotionAuthorized": false,
+    "reimportAuthorized": false,
+    "refreshAugustAuthorized": false
   }
 }
