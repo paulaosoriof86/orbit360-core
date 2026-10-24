@@ -215,7 +215,7 @@
     "orbit360-platform/core/user-onboarding.js": "bf645951a23491ce53d2034ba4281d965cbb326d",
     "orbit360-platform/data/academia-product-catalog-v1.js": "22b6781519cb14e05965738ac3bbc0f6eb0baff3",
     "orbit360-platform/data/geo-gt-co-authoritative-v20261004.js": "734b6518bc968a8c4e278602aa7161a38351cb02",
-    "orbit360-platform/data/store-firestore-product-operational-p0.js": "7738314b843253c92be008dc0b812d035b377d43",
+    "orbit360-platform/data/store-firestore-product-operational-p0.js": "4b9c8dc8c316b0c50aef5606aec460f7049d00d9",
     "orbit360-platform/data/store-firestore-product-readonly-p0.js": "e36a80efd787bea895c1f1852142b3bddafe49bb",
     "orbit360-platform/data/tenant-alianzas-soluciones-insurers-p10.js": "41d2e31a42dac73eb68af304d5f532897210d0ee",
     "orbit360-platform/data/tenant-config/alianzas-soluciones.aseguradoras-knowledge-summary-v20261003.js": "2000d9ea8ab67bdd37d8bf404a29a405fa6374dd",
@@ -6551,6 +6551,22 @@
       "tools/gravicentra-i6-control-plane-guard-v1.mjs": "dce1dc7da1e088851662112f44a4f0ed75ff1a1d"
     },
     "authenticatedRoleCountryUatAccepted": false,
+    "securityReleaseHoldPreserved": true,
+    "livePromotionAuthorized": false
+  },
+  "b4003InsurerFacadeReadinessBridge20261024": {
+    "status": "SOURCE_STAGED_SYNTHETIC_QA_PASS_SECURITY_HOLD",
+    "gate": "I6.5/B4-003",
+    "parentHead": "22c70cb45f922205ab7a44b32a048847011eca43",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_INSURER_FACADE_READINESS_BRIDGE_20261024.json",
+    "receiptBlobSha": "2515a09165509eed6cb64bd74852ca5fa426ecde",
+    "sourceBlobsAfter": {
+      "orbit360-platform/data/store-firestore-product-operational-p0.js": "4b9c8dc8c316b0c50aef5606aec460f7049d00d9"
+    },
+    "qaBlobsAfter": {
+      "tools/gravicentra-b4-003-insurer-readiness-facade-bridge.test.cjs": "d1baaa1b71a26b256e56d16018e2bbe617071e48"
+    },
+    "authenticatedNewPreviewUatAccepted": false,
     "securityReleaseHoldPreserved": true,
     "livePromotionAuthorized": false
   }

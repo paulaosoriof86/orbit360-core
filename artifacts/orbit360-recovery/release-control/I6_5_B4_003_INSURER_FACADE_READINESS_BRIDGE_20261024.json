@@ -1,0 +1,51 @@
+{
+  "schema": "GI_I65_B4003_INSURER_FACADE_READINESS_BRIDGE_V1",
+  "status": "SOURCE_STAGED_SYNTHETIC_QA_PASS_SECURITY_HOLD",
+  "gate": "I6.5/B4-003",
+  "authority": "PAULA_EXPLICIT_B4003_CAUSAL_CODE_CORRECTION_AND_ISOLATED_PREVIEW_20261024",
+  "parentHead": "22c70cb45f922205ab7a44b32a048847011eca43",
+  "finding": "ASEGURADORAS_TEMPORARY_FALSE_ZERO_AFTER_ROLE_COUNTRY_SWITCH",
+  "causalFinding": {
+    "authenticatedPreviewRun": 40113530567,
+    "buildId": "gi-i65-b4-22c70cb45f92-57f234755dc1",
+    "observed": "Aseguradoras briefly reported 0 de 0 under authorized Operativo/Direccion role transitions, then recovered 29 de 33 without reload. The false zero was repeatable.",
+    "rootCause": "Operational write facade omitted _protectedCandidate from its underlying protected read store. Readiness checks in Aseguradoras therefore interpreted an invalidated protected cache as ready.",
+    "fix": "Forward the read-only protected-candidate authority bit through the existing operational facade, retaining the store and authorization owners.",
+    "authorizedBusinessWrites": 0
+  },
+  "sourceFiles": {
+    "orbit360-platform/data/store-firestore-product-operational-p0.js": {
+      "before": "7738314b843253c92be008dc0b812d035b377d43",
+      "after": "4b9c8dc8c316b0c50aef5606aec460f7049d00d9"
+    }
+  },
+  "qaFiles": {
+    "tools/gravicentra-b4-003-insurer-readiness-facade-bridge.test.cjs": {
+      "before": null,
+      "after": "d1baaa1b71a26b256e56d16018e2bbe617071e48"
+    }
+  },
+  "verification": {
+    "syntheticOperationalFacadeVM": "PASS",
+    "legacyInsurerReadinessVM": "PASS",
+    "roleContextRecoveryVM": "PASS",
+    "protectedHydrationVM": "PASS",
+    "crossIdentityLiveFirestoreSecurity": "HOLD",
+    "authenticatedNewPreviewUAT": "PENDING",
+    "humanAcceptance": "HOLD"
+  },
+  "boundaries": {
+    "onlyIsolatedHostingPreviewAuthorized": true,
+    "sharedFirestoreRulesDeployAuthorized": false,
+    "operationalWritesAuthorized": false,
+    "syntheticQaWritesAuthorized": false,
+    "otherFunctionsDeploymentAuthorized": false,
+    "livePromotionAuthorized": false,
+    "reimportAuthorized": false,
+    "preservePreviousProofs": true,
+    "newBuildDigestPreviewRequired": true,
+    "securityReleaseHoldPreserved": true,
+    "findingsLedgerCount": 295,
+    "formalI6Percent": 50
+  }
+}
