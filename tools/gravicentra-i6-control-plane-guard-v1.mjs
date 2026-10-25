@@ -104,23 +104,6 @@ if(CORRECTIVE_SOURCE_ACTIVE){
  const CL=COMP.b4003CorrectiveSourceFix20261025||{};
  const historicalSourceQa=Object.assign({},R.sourceBlobsAfter||{},R.qaBlobsAfter||{});
  const successorSourceQa=Object.assign({},SR.sourceBlobsAfter||{},SR.qaBlobsAfter||{});
- const _successorChecks={
-  originalReceipt: D.gate==='I6.5/B4-003'&&D.authority==='PAULA_EXPLICIT_CORRECTIVE_AUTHORIZATION'&&D.parentHead==='2278ab067ace6e6bdaa4d35e7c0728f4a4160682'&&R.schema==='GI_I65_B4003_CORRECTIVE_SOURCE_FIX_V1'&&R.gate===D.gate&&R.authority===D.authority&&R.parentHead===D.parentHead&&R.status===D.status&&D.receiptBlobSha===physicalGit('hash-object',D.receiptPath)&&BL.receiptBlobSha===D.receiptBlobSha&&CL.receiptBlobSha===D.receiptBlobSha,
-  historicalMaps: sameJson(D.sourceBlobsAfter,R.sourceBlobsAfter)&&sameJson(D.qaBlobsAfter,R.qaBlobsAfter)&&sameJson(BL.sourceBlobsAfter,R.sourceBlobsAfter)&&sameJson(BL.qaBlobsAfter,R.qaBlobsAfter)&&sameJson(CL.sourceBlobsAfter,R.sourceBlobsAfter)&&sameJson(CL.qaBlobsAfter,R.qaBlobsAfter)&&Object.keys(R.sourceBlobsAfter||{}).length===7&&Object.keys(R.qaBlobsAfter||{}).length===2,
-  historicalBlobObjects: Object.entries(historicalSourceQa).every(([p,sha])=>/^[0-9a-f]{40}$/.test(sha)&&(()=>{try{physicalGit('cat-file','-e',sha);return true;}catch(_){return false;}})()),
-  sourceAllowlists: Object.keys(R.sourceBlobsAfter||{}).every(p=>(C.b4003CorrectiveSourceSecurityAuthorization20261024?.allowedSourcePaths||[]).includes(p))&&Object.keys(R.qaBlobsAfter||{}).every(p=>(B4.boundaries?.allowedQaFiles||[]).includes(p)),
-  fixedGovernance: D.compositionBlobSha===physicalGit('hash-object',I6_CANONICAL_COMPOSITION)&&BL.compositionBlobSha===D.compositionBlobSha&&R.findingsPreserved===295&&R.frozenTasksPreserved===86&&R.firestoreRulesDeployAuthorized===false&&R.dataMutationAuthorized===false&&R.realBusinessWritesAuthorized===false&&R.livePromotionAuthorized===false&&D.firestoreRulesDeployAuthorized===false&&D.dataMutationAuthorized===false&&D.realBusinessWritesAuthorized===false&&D.livePromotionAuthorized===false,
-  securityHold: C.b4003SecurityReleaseHold?.status==='ACTIVE_FAIL_CLOSED_UNAUTHORIZED_BROWSER_FIRESTORE_READ_WRITE'&&B4.boundaries?.livePromotionAuthorized===false&&FIND.findings.length===295,
-  successorRegistry: S.status==='SOURCE_SUCCESSOR_RECONCILED_PENDING_EXACT_PREVIEW'&&S.gate===D.gate&&S.authority===D.authority&&S.receiptBlobSha===physicalGit('hash-object',S.receiptPath)&&C.b4003CorrectiveSourceSuccessor20261025?.receiptBlobSha===S.receiptBlobSha&&C.b4003CorrectiveSourceSuccessor20261025?.receiptPath===S.receiptPath,
-  successorHistory: SR.historicalSourceFix?.blobSha===D.receiptBlobSha&&SR.historicalSourceFix?.parentHead===D.parentHead&&SR.historicalSourceFix?.sourceBlobsAfter?.['functions/bootstrap.js']===R.sourceBlobsAfter?.['functions/bootstrap.js'],
-  successorCommit: SR.sourceCommit==='15588c3c8ebeb11eac630cce624d136723bcf534'&&physicalGit('rev-parse',SR.sourceCommit+':functions/bootstrap.js')===SR.sourceBlobsAfter?.['functions/bootstrap.js']&&physicalGit('merge-base',SR.sourceCommit,'HEAD')===SR.sourceCommit,
-  successorCurrent: Object.keys(SR.sourceBlobsAfter||{}).length===7&&Object.keys(SR.qaBlobsAfter||{}).length===2&&Object.entries(successorSourceQa).every(([p,sha])=>physicalGit('hash-object',p)===sha),
-  successorAllowlists: Object.keys(SR.sourceBlobsAfter||{}).every(p=>(C.b4003CorrectiveSourceSecurityAuthorization20261024?.allowedSourcePaths||[]).includes(p))&&Object.keys(SR.qaBlobsAfter||{}).every(p=>(B4.boundaries?.allowedQaFiles||[]).includes(p)),
-  packagerAndAuth: S.packagerReceiptPath==='artifacts/orbit360-recovery/release-control/I6_5_B4_003_PREVIEW_PACKAGER_DUPLICATE_EXPORT_ROOTFIX_20261025.json'&&S.packagerReceiptBlobSha===physicalGit('hash-object',S.packagerReceiptPath)&&SR.packagerReceipt?.path===S.packagerReceiptPath&&SR.packagerReceipt?.blobSha===S.packagerReceiptBlobSha&&SR.authorizationReceipt?.path==='artifacts/orbit360-recovery/release-control/I6_5_B4_003_CORRECTIVE_SOURCE_SECURITY_AUTH_20261024.json'&&SR.authorizationReceipt?.blobSha===physicalGit('hash-object',SR.authorizationReceipt.path),
-  successorScope: SR.scope?.functions?.join(',')==='orbit360ScopedPolicyReadPreview'&&SR.scope?.sharedFirestoreRules===false&&SR.scope?.dataMutation===false&&SR.scope?.livePromotion===false&&SR.findingsPreserved===295&&SR.frozenTasksPreserved===86,
-  dispatch: PREVIEW.status==='AUTHORIZED_EXACT_ISOLATED_READONLY_PREVIEW_PENDING_DISPATCH'&&PREVIEW.receiptBlobSha===physicalGit('hash-object',PREVIEW.receiptPath)&&C.b4003CorrectiveSourcePreviewSuccessorDispatch20261025?.receiptBlobSha===PREVIEW.receiptBlobSha&&PR.schema==='GI_I65_B4_003_PREVIEW_DISPATCH_SUCCESSOR_V1'&&PR.status===PREVIEW.status&&PR.triggerSubject==='build(i6.5 B4-003): verify authorized corrective source in isolated Preview'&&PR.baseHead===physicalGit('rev-parse','HEAD^')&&PR.sourceFixReceiptBlobSha===D.receiptBlobSha&&PR.sourceSuccessorReceiptBlobSha===S.receiptBlobSha&&PR.packagerFixReceiptBlobSha===S.packagerReceiptBlobSha&&JSON.stringify(PR.expectedProductBlobs)===JSON.stringify(SR.sourceBlobsAfter)&&JSON.stringify(PR.expectedQaBlobs)===JSON.stringify(SR.qaBlobsAfter)&&PR.scope?.sharedFirestoreRules===false&&PR.scope?.otherFunctions===false&&PR.scope?.dataMutation===false&&PR.scope?.livePromotion===false&&PR.scope?.functions?.join(',')==='orbit360ScopedPolicyReadPreview'
- };
- console.log('B4_003_CORRECTIVE_SUCCESSOR_CHECKS_FAILED='+Object.keys(_successorChecks).filter(k=>!_successorChecks[k]).join(','));
  need(D.gate==='I6.5/B4-003'&&D.authority==='PAULA_EXPLICIT_CORRECTIVE_AUTHORIZATION'&&
   D.parentHead==='2278ab067ace6e6bdaa4d35e7c0728f4a4160682'&&
   physicalGit('merge-base',D.parentHead,'HEAD')===D.parentHead&&
@@ -146,26 +129,26 @@ if(CORRECTIVE_SOURCE_ACTIVE){
   S.receiptBlobSha===physicalGit('hash-object',S.receiptPath)&&C.b4003CorrectiveSourceSuccessor20261025?.receiptBlobSha===S.receiptBlobSha&&
   C.b4003CorrectiveSourceSuccessor20261025?.receiptPath===S.receiptPath&&
   SR.historicalSourceFix?.blobSha===D.receiptBlobSha&&
-  S.historicalSourceFix?.parentHead===D.parentHead&&
-  S.historicalSourceFix?.sourceBlobsAfter?.['functions/bootstrap.js']===R.sourceBlobsAfter?.['functions/bootstrap.js']&&
+  SR.historicalSourceFix?.parentHead===D.parentHead&&
+  SR.historicalSourceFix?.sourceBlobsAfter?.['functions/bootstrap.js']===R.sourceBlobsAfter?.['functions/bootstrap.js']&&
   SR.sourceCommit==='15588c3c8ebeb11eac630cce624d136723bcf534'&&
   physicalGit('rev-parse',SR.sourceCommit+':functions/bootstrap.js')===SR.sourceBlobsAfter?.['functions/bootstrap.js']&&
-  physicalGit('merge-base',SR.sourceCommit,'HEAD')===S.sourceCommit&&
+  physicalGit('merge-base',SR.sourceCommit,'HEAD')===SR.sourceCommit&&
   Object.keys(SR.sourceBlobsAfter||{}).length===7&&Object.keys(SR.qaBlobsAfter||{}).length===2&&
   Object.entries(successorSourceQa).every(([p,sha])=>physicalGit('hash-object',p)===sha)&&
   Object.keys(S.sourceBlobsAfter||{}).every(p=>(C.b4003CorrectiveSourceSecurityAuthorization20261024?.allowedSourcePaths||[]).includes(p))&&
   Object.keys(S.qaBlobsAfter||{}).every(p=>(B4.boundaries?.allowedQaFiles||[]).includes(p))&&
   S.packagerReceiptPath==='artifacts/orbit360-recovery/release-control/I6_5_B4_003_PREVIEW_PACKAGER_DUPLICATE_EXPORT_ROOTFIX_20261025.json'&&S.packagerReceiptBlobSha===physicalGit('hash-object',S.packagerReceiptPath)&&SR.packagerReceipt?.path===S.packagerReceiptPath&&SR.packagerReceipt?.blobSha===S.packagerReceiptBlobSha&&
   SR.authorizationReceipt?.path==='artifacts/orbit360-recovery/release-control/I6_5_B4_003_CORRECTIVE_SOURCE_SECURITY_AUTH_20261024.json'&&SR.authorizationReceipt?.blobSha===physicalGit('hash-object',SR.authorizationReceipt.path)&&
-  SR.scope?.functions?.join(',')==='orbit360ScopedPolicyReadPreview'&&S.scope?.sharedFirestoreRules===false&&
-  S.scope?.dataMutation===false&&S.scope?.livePromotion===false&&S.findingsPreserved===295&&S.frozenTasksPreserved===86&&SR.findingsPreserved===295&&SR.frozenTasksPreserved===86&&
+  SR.scope?.functions?.join(',')==='orbit360ScopedPolicyReadPreview'&&SR.scope?.sharedFirestoreRules===false&&
+  SR.scope?.dataMutation===false&&SR.scope?.livePromotion===false&&S.findingsPreserved===295&&S.frozenTasksPreserved===86&&SR.findingsPreserved===295&&SR.frozenTasksPreserved===86&&
   PREVIEW.status==='AUTHORIZED_EXACT_ISOLATED_READONLY_PREVIEW_PENDING_DISPATCH'&&
   PREVIEW.receiptBlobSha===physicalGit('hash-object',PREVIEW.receiptPath)&&
   C.b4003CorrectiveSourcePreviewSuccessorDispatch20261025?.receiptBlobSha===PREVIEW.receiptBlobSha&&
   PR.schema==='GI_I65_B4_003_PREVIEW_DISPATCH_SUCCESSOR_V1'&&PR.status===PREVIEW.status&&
   PR.triggerSubject==='build(i6.5 B4-003): verify authorized corrective source in isolated Preview'&&PR.baseHead===physicalGit('rev-parse','HEAD^')&&
   PR.sourceFixReceiptBlobSha===D.receiptBlobSha&&PR.sourceSuccessorReceiptBlobSha===S.receiptBlobSha&&
-  PR.packagerFixReceiptBlobSha===S.packagerReceipt?.blobSha&&
+  PR.packagerFixReceiptBlobSha===S.packagerReceiptBlobSha&&
   JSON.stringify(PR.expectedProductBlobs)===JSON.stringify(SR.sourceBlobsAfter)&&
   JSON.stringify(PR.expectedQaBlobs)===JSON.stringify(SR.qaBlobsAfter)&&
   PR.scope?.sharedFirestoreRules===false&&PR.scope?.otherFunctions===false&&PR.scope?.dataMutation===false&&
