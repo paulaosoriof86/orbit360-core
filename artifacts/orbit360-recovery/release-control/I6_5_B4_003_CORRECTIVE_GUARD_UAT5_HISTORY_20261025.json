@@ -1,0 +1,27 @@
+{
+  "schema": "GI_I65_B4003_CORRECTIVE_GUARD_UAT5_HISTORY_V1",
+  "status": "QA_GUARD_SOURCE_FIXED_PENDING_EXACT_GATE_RERUN",
+  "gate": "I6.5/B4-003",
+  "authority": "PAULA_EXPLICIT_CORRECTIVE_AUTHORIZATION",
+  "recordedAt": "2026-10-25",
+  "failedRunId": 40150971086,
+  "failureCode": "B4_003_UAT5_SCOPED_SOURCE_BOUNDARY_OR_BLOB_DRIFT",
+  "causalFinding": "The UAT5 source-patch receipt contains an immutable historical QA blob for the guard. Current guard evolution changed that file, so the old receipt's historical QA equality check incorrectly compared the old proof against today's guard bytes.",
+  "correction": "Keep receipt before/after and allowlist checks; exempt only the guard source path from current-byte equality in this historical UAT5 QA loop. The current guard executes normally and its new blob is pinned by the new corrective-guard receipt.",
+  "guardPath": "tools/gravicentra-i6-control-plane-guard-v1.mjs",
+  "previousGuardBlobSha": "97d074644fb1caa88dc79165c14fa8a029047409",
+  "currentGuardBlobSha": "e5013c82599442e86ae12853b64736e0a6bd66ce",
+  "predecessorGuardCorrectionReceipt": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CORRECTIVE_GUARD_HISTORICAL_COMPAT_20261025.json",
+  "predecessorGuardCorrectionBlobSha": "8ec95aaf4e2715e1f7ce1f71b2e32fbab72baf68",
+  "uat5SourcePatchReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_UAT5_CAUSAL_SOURCE_FIX_20261019.json",
+  "uat5SourcePatchReceiptBlobSha": "be6dd193f68aee5bce7febd0729124452dadc865",
+  "effects": {
+    "productDataWrites": 0,
+    "firestoreRulesChanged": false,
+    "functionsDeployed": false,
+    "previewDeployed": false,
+    "liveChanged": false,
+    "findingsPreserved": 295,
+    "frozenTasksPreserved": 86
+  }
+}
