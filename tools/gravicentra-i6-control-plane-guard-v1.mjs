@@ -2079,7 +2079,8 @@ if(String(C.i65ForensicRemediationPlan?.currentBlock||'')==='B4' &&
   console.log('B4_003_UAT4_EXACT_CHROME_EVIDENCE_CAUSAL_PARITY=PASS_UAT_REJECTED_NO_RELEASE');
  }
  const stage=C.b4003Uat5ScopedSource20261019;
- if(stage){
+ // This UAT5 source stage is retained as historical evidence; the separately validated corrective successor owns the active composition.
+ if(stage&&!CORRECTIVE_SOURCE_ACTIVE){
  const fields=Object.keys(stage.sourceBlobs||{});
  need(['EXACT_SCOPED_SOURCE_QA_PENDING_PREVIEW','EXACT_TECHNICAL_PREVIEW_PASS_FUNCTIONAL_UAT_HOLD'].includes(stage.status)
  &&fields.length===6
