@@ -128,20 +128,20 @@ if(CORRECTIVE_SOURCE_ACTIVE){
   S.status==='SOURCE_SUCCESSOR_RECONCILED_PENDING_EXACT_PREVIEW'&&S.gate===D.gate&&S.authority===D.authority&&
   S.receiptBlobSha===physicalGit('hash-object',S.receiptPath)&&C.b4003CorrectiveSourceSuccessor20261025?.receiptBlobSha===S.receiptBlobSha&&
   C.b4003CorrectiveSourceSuccessor20261025?.receiptPath===S.receiptPath&&
-  S.historicalSourceFix?.blobSha===D.receiptBlobSha&&
+  SR.historicalSourceFix?.blobSha===D.receiptBlobSha&&
   S.historicalSourceFix?.parentHead===D.parentHead&&
   S.historicalSourceFix?.sourceBlobsAfter?.['functions/bootstrap.js']===R.sourceBlobsAfter?.['functions/bootstrap.js']&&
-  S.sourceCommit==='15588c3c8ebeb11eac630cce624d136723bcf534'&&
-  physicalGit('rev-parse',S.sourceCommit+':functions/bootstrap.js')===S.sourceBlobsAfter?.['functions/bootstrap.js']&&
-  physicalGit('merge-base',S.sourceCommit,'HEAD')===S.sourceCommit&&
-  Object.keys(S.sourceBlobsAfter||{}).length===7&&Object.keys(S.qaBlobsAfter||{}).length===2&&
+  SR.sourceCommit==='15588c3c8ebeb11eac630cce624d136723bcf534'&&
+  physicalGit('rev-parse',SR.sourceCommit+':functions/bootstrap.js')===SR.sourceBlobsAfter?.['functions/bootstrap.js']&&
+  physicalGit('merge-base',SR.sourceCommit,'HEAD')===S.sourceCommit&&
+  Object.keys(SR.sourceBlobsAfter||{}).length===7&&Object.keys(SR.qaBlobsAfter||{}).length===2&&
   Object.entries(successorSourceQa).every(([p,sha])=>physicalGit('hash-object',p)===sha)&&
   Object.keys(S.sourceBlobsAfter||{}).every(p=>(C.b4003CorrectiveSourceSecurityAuthorization20261024?.allowedSourcePaths||[]).includes(p))&&
   Object.keys(S.qaBlobsAfter||{}).every(p=>(B4.boundaries?.allowedQaFiles||[]).includes(p))&&
-  S.packagerReceipt?.path==='artifacts/orbit360-recovery/release-control/I6_5_B4_003_PREVIEW_PACKAGER_DUPLICATE_EXPORT_ROOTFIX_20261025.json'&&S.packagerReceipt?.blobSha===physicalGit('hash-object',S.packagerReceipt.path)&&
-  S.authorizationReceipt?.path==='artifacts/orbit360-recovery/release-control/I6_5_B4_003_CORRECTIVE_SOURCE_SECURITY_AUTH_20261024.json'&&S.authorizationReceipt?.blobSha===physicalGit('hash-object',S.authorizationReceipt.path)&&
-  S.scope?.functions?.join(',')==='orbit360ScopedPolicyReadPreview'&&S.scope?.sharedFirestoreRules===false&&
-  S.scope?.dataMutation===false&&S.scope?.livePromotion===false&&S.findingsPreserved===295&&S.frozenTasksPreserved===86&&
+  S.packagerReceiptPath==='artifacts/orbit360-recovery/release-control/I6_5_B4_003_PREVIEW_PACKAGER_DUPLICATE_EXPORT_ROOTFIX_20261025.json'&&S.packagerReceiptBlobSha===physicalGit('hash-object',S.packagerReceiptPath)&&SR.packagerReceipt?.path===S.packagerReceiptPath&&SR.packagerReceipt?.blobSha===S.packagerReceiptBlobSha&&
+  SR.authorizationReceipt?.path==='artifacts/orbit360-recovery/release-control/I6_5_B4_003_CORRECTIVE_SOURCE_SECURITY_AUTH_20261024.json'&&SR.authorizationReceipt?.blobSha===physicalGit('hash-object',SR.authorizationReceipt.path)&&
+  SR.scope?.functions?.join(',')==='orbit360ScopedPolicyReadPreview'&&S.scope?.sharedFirestoreRules===false&&
+  S.scope?.dataMutation===false&&S.scope?.livePromotion===false&&S.findingsPreserved===295&&S.frozenTasksPreserved===86&&SR.findingsPreserved===295&&SR.frozenTasksPreserved===86&&
   PREVIEW.status==='AUTHORIZED_EXACT_ISOLATED_READONLY_PREVIEW_PENDING_DISPATCH'&&
   PREVIEW.receiptBlobSha===physicalGit('hash-object',PREVIEW.receiptPath)&&
   C.b4003CorrectiveSourcePreviewSuccessorDispatch20261025?.receiptBlobSha===PREVIEW.receiptBlobSha&&
@@ -149,8 +149,8 @@ if(CORRECTIVE_SOURCE_ACTIVE){
   PR.triggerSubject==='build(i6.5 B4-003): verify authorized corrective source in isolated Preview'&&PR.baseHead===physicalGit('rev-parse','HEAD^')&&
   PR.sourceFixReceiptBlobSha===D.receiptBlobSha&&PR.sourceSuccessorReceiptBlobSha===S.receiptBlobSha&&
   PR.packagerFixReceiptBlobSha===S.packagerReceipt?.blobSha&&
-  JSON.stringify(PR.expectedProductBlobs)===JSON.stringify(S.sourceBlobsAfter)&&
-  JSON.stringify(PR.expectedQaBlobs)===JSON.stringify(S.qaBlobsAfter)&&
+  JSON.stringify(PR.expectedProductBlobs)===JSON.stringify(SR.sourceBlobsAfter)&&
+  JSON.stringify(PR.expectedQaBlobs)===JSON.stringify(SR.qaBlobsAfter)&&
   PR.scope?.sharedFirestoreRules===false&&PR.scope?.otherFunctions===false&&PR.scope?.dataMutation===false&&
   PR.scope?.livePromotion===false&&PR.scope?.functions?.join(',')==='orbit360ScopedPolicyReadPreview'&&
   C.b4003SecurityReleaseHold?.status==='ACTIVE_FAIL_CLOSED_UNAUTHORIZED_BROWSER_FIRESTORE_READ_WRITE'&&
