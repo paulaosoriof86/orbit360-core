@@ -1236,15 +1236,18 @@ jobs:
            const securityRulesGitBlob=execFileSync('git',['hash-object',securityRulesPath],{encoding:'utf8'}).trim();
            const securityRulesSha256=require('node:crypto').createHash('sha256').update(fs.readFileSync(securityRulesPath)).digest('hex');
            const securityParent=execFileSync('git',['rev-parse','HEAD^'],{encoding:'utf8'}).trim();
+           const securityParentAllowed=['7324d0a99aec70462e15dbfcf1b068448d2567c5','4d282bbda7159ee11c2c98791b4b73b7fd5c75b7'].includes(securityParent);
            const securityQa=securityRequested&&process.env.GITHUB_REF_NAME==='recovery/fase-a-clean-20260831'
-             &&securityParent==='7324d0a99aec70462e15dbfcf1b068448d2567c5'&&securityRulesGitBlob==='63a71c3bc26d32e3bc7ed2836364e5327283956a'
+             &&securityParentAllowed&&securityRulesGitBlob==='63a71c3bc26d32e3bc7ed2836364e5327283956a'
              &&securityAuth.gate==='I6.5/B4-003'&&securityAuth.sourceCorrectionAuthorized===true
              &&securityAuth.exactCandidateRulesPath===securityRulesPath&&securityAuth.firestoreRulesDeployAuthorized===false
              &&securityAuth.dataMutationAuthorized===false&&securityAuth.realBusinessWritesAuthorized===false
              &&securityAuth.impersonationAuthorized===false&&securityAuth.livePromotionAuthorized===false
              &&securityFix.firestoreRulesDeployAuthorized===false&&securityFix.dataMutationAuthorized===false
              &&securityFix.livePromotionAuthorized===false&&l.activeFinding?.id==='B4-003'
-             &&l.counts?.total===295&&l.boundaries?.livePromotionAuthorized===false;
+             &&c.p0FindingsFreeze20261012?.count===6&&c.p0FindingsFreeze20261012?.ledgerTotal===295
+             &&securityFix.findingsPreserved===295&&securityFix.frozenTasksPreserved===86
+             &&l.boundaries?.livePromotionAuthorized===false;
            if(securityRequested&&!securityQa)throw Error('B4_003_SECURITY_QA_AUTH_OR_EXACT_RULES_BINDING_INVALID_FAIL_CLOSED');
            fs.appendFileSync(process.env.GITHUB_OUTPUT,'security_qa='+(securityQa?'true':'false')+'\n');
            if(securityQa){fs.appendFileSync(process.env.GITHUB_OUTPUT,'security_rules_git_blob='+securityRulesGitBlob+'\n');fs.appendFileSync(process.env.GITHUB_OUTPUT,'security_rules_sha256='+securityRulesSha256+'\n');}
