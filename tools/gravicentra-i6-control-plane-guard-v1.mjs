@@ -1908,7 +1908,7 @@ if(String(C.i65ForensicRemediationPlan?.currentBlock||'')==='B4' &&
        'B4_003_P0_LOGIN_OWNER_BLOB_NOT_PINNED');
   need(qa.every(p=>clientRepair.qaBlobs?.[p]===(FIX_ACTIVE?(FIX.qaBeforeBlobs[p]||git('hash-object',p)):git('hash-object',p))&&
        scoped.qaBlobs?.[p]===clientRepair.qaBlobs[p]&&
-       (FIX_ACTIVE||git('hash-object',p)===clientRepair.qaBlobs[p]),
+       (FIX_ACTIVE||git('hash-object',p)===clientRepair.qaBlobs[p])),
        'B4_003_P0_LOGIN_QA_BLOB_NOT_PINNED');
   need(clientRepair.compositionBlobSha===(FIX_ACTIVE?FIX.previousCompBlobSha:git('hash-object',I6_CANONICAL_COMPOSITION))&&
        C.canonicalAccumulationControl?.compositionLockBlobSha===git('hash-object',I6_CANONICAL_COMPOSITION)&&

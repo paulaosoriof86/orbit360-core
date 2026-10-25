@@ -1,0 +1,23 @@
+{
+  "schema": "GI_I65_B4003_CORRECTIVE_GUARD_LOGIN_HISTORY_SYNTAX_V1",
+  "status": "QA_GUARD_SYNTAX_FIXED_PENDING_EXACT_GATE_RERUN",
+  "gate": "I6.5/B4-003",
+  "authority": "PAULA_EXPLICIT_CORRECTIVE_AUTHORIZATION",
+  "recordedAt": "2026-10-25",
+  "failedRunId": 40151418662,
+  "failureCode": "GUARD_SYNTAX_ERROR_P0_LOGIN_QA_BLOB_BLOCK",
+  "guardPath": "tools/gravicentra-i6-control-plane-guard-v1.mjs",
+  "previousGuardBlobSha": "2937e2c437ef900b2210f28a618016ffd4ece6ac",
+  "currentGuardBlobSha": "16792347244147fc5217b1229c18cad4dc7d2b5a",
+  "causalFinding": "A parenthesis was omitted while editing the historical UAT5 P0 login QA comparison; governance preflight correctly stopped before gate evaluation.",
+  "correction": "Close the qa.every expression; current QA remains validated through the active corrective-source receipt.",
+  "effects": {
+    "productDataWrites": 0,
+    "firestoreRulesChanged": false,
+    "functionsDeployed": false,
+    "previewDeployed": false,
+    "liveChanged": false,
+    "findingsPreserved": 295,
+    "frozenTasksPreserved": 86
+  }
+}

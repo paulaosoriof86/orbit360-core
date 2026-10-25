@@ -14752,5 +14752,23 @@
     "liveChanged": false,
     "findingsPreserved": 295,
     "frozenTasksPreserved": 86
+  },
+  "b4003CorrectiveGuardLoginHistorySyntax20261025": {
+    "status": "QA_GUARD_SYNTAX_FIXED_PENDING_EXACT_GATE_RERUN",
+    "gate": "I6.5/B4-003",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CORRECTIVE_GUARD_LOGIN_HISTORY_SYNTAX_20261025.json",
+    "receiptBlobSha": "3ad91b4fed1c8249bea69d5b6c3b266e7ba1343c",
+    "guardPath": "tools/gravicentra-i6-control-plane-guard-v1.mjs",
+    "previousGuardBlobSha": "2937e2c437ef900b2210f28a618016ffd4ece6ac",
+    "currentGuardBlobSha": "16792347244147fc5217b1229c18cad4dc7d2b5a",
+    "failedRunId": 40151418662,
+    "failureCode": "GUARD_SYNTAX_ERROR_P0_LOGIN_QA_BLOB_BLOCK",
+    "productDataWrites": 0,
+    "firestoreRulesChanged": false,
+    "functionsDeployed": false,
+    "previewDeployed": false,
+    "liveChanged": false,
+    "findingsPreserved": 295,
+    "frozenTasksPreserved": 86
   }
 }
