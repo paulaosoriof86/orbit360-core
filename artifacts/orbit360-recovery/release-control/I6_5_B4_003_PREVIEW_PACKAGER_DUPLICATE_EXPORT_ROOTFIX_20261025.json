@@ -27,5 +27,32 @@
   "preserved": {
     "findings": 295,
     "frozenTasks": 86
+  },
+  "bootstrapIsolation20261024": {
+    "scope": "functions/bootstrap.js only; callable remains staged by authorized B4-003 Preview packager",
+    "sourceFixCommit": "15588c3c8ebeb11eac630cce624d136723bcf534",
+    "previousBootstrapBlobSha": "533f480e84ca4c4edbc8f6183c7d8f153a977569",
+    "correctedBootstrapBlobSha": "42fd05b81a02d428e590c36e3feb32be202f4965",
+    "staticGuard": "PASS: B4_003_SECURITY_RELEASE_BARRIER_SOURCE_PASS",
+    "bootstrapSyntax": "PASS",
+    "scopedPackageSmoke": {
+      "result": "PASS_WITH_SYNTHETIC_PUBLIC_CONFIG_AND_BRANDING_FIXTURES",
+      "testedSourceSha": "15588c3c8ebeb11eac630cce624d136723bcf534",
+      "hostedFiles": 218,
+      "backendFiles": 33,
+      "onlyStagedPreviewCallable": "orbit360ScopedPolicyReadPreview",
+      "packageDigestSynthetic": "71e87e2b1c83c3e728ce60529b67ce76fcc9628d4ad29b309497b683ed9d3f08",
+      "notAReleaseArtifact": true,
+      "requiresRealFirebasePublicConfigAndBrandingReadback": true
+    },
+    "boundary": {
+      "deployedRulesChanged": false,
+      "operationalWrites": 0,
+      "liveChanged": false,
+      "securityPass": false,
+      "uatPassed": false,
+      "productionAuthorized": false
+    },
+    "next": "Run exact Preview packaging with real public config and tenant branding in existing B4-003 workflow; test backend identity-positive paths; do not deploy shared Rules without separate authorization."
   }
 }
