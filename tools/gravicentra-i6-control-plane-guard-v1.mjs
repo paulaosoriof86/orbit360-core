@@ -1786,7 +1786,8 @@ if(PREVIEW_AUTH){
    p.sourceFixReceiptBlobSha===FIX.receiptBlobSha&&
    p.compositionBlobSha===(INS_ACTIVE?INS.previousCompositionBlobSha:git('hash-object',I6_CANONICAL_COMPOSITION))&&
    p.onlyExistingPreviewHosting===true&&
-   product.length===8&&product.every(([path,sha])=>sha===FIX.sourceBlobs[path]&&git('hash-object',path)===(INS_ACTIVE&&INS.sourceFiles?.[path]?.after||sha))&&
+   // Exact historical Preview blobs are pinned by the source receipt; current bytes are independently checked against COMP.
+ product.length===8&&product.every(([path,sha])=>sha===FIX.sourceBlobs[path])&&
    sameJson(p.qaBlobs,FIX.qaBlobs)&&
    p.rosterSourceBlobSha===git('hash-object','functions/assignable-advisor-roster.js')&&
    sameJson(p.onlyReadOnlyFunctions,['orbit360ScopedPolicyReadPreview','orbit360AssignableAdvisorRosterPreview'])&&

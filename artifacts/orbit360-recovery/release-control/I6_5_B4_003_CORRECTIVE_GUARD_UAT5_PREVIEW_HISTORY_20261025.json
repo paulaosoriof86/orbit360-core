@@ -1,0 +1,25 @@
+{
+  "schema": "GI_I65_B4003_CORRECTIVE_GUARD_UAT5_PREVIEW_HISTORY_V1",
+  "status": "QA_GUARD_SOURCE_FIXED_PENDING_EXACT_GATE_RERUN",
+  "gate": "I6.5/B4-003",
+  "authority": "PAULA_EXPLICIT_CORRECTIVE_AUTHORIZATION",
+  "recordedAt": "2026-10-25",
+  "failedRunId": 40151299558,
+  "failureCode": "B4_003_UAT5_NEW_EXACT_READONLY_PREVIEW_AUTH_INVALID",
+  "causalFinding": "The UAT5 Preview authorization already pins eight source blobs via its immutable source-fix receipt. The guard also compared these historical values to a mutable current-predecessor adapter, rejecting the UAT5 reader blob because the current source lineage advanced.",
+  "correction": "Validate the historical Preview's eight exact source entries against the pinned UAT5 source receipt; current active product bytes remain bound by the current composition and corrective-source checks.",
+  "guardPath": "tools/gravicentra-i6-control-plane-guard-v1.mjs",
+  "previousGuardBlobSha": "29bfc0879535cb47b77b6dd4ae6e6b4134bc4c10",
+  "currentGuardBlobSha": "404bf3bb929bb1fd85ac9428cdae318fd23ae06e",
+  "priorUat5HistoryReceiptSha": "19608979769a1d06298ba0ecb67c4318342afd32",
+  "uat5SourceReceiptSha": "be6dd193f68aee5bce7febd0729124452dadc865",
+  "effects": {
+    "productDataWrites": 0,
+    "firestoreRulesChanged": false,
+    "functionsDeployed": false,
+    "previewDeployed": false,
+    "liveChanged": false,
+    "findingsPreserved": 295,
+    "frozenTasksPreserved": 86
+  }
+}
