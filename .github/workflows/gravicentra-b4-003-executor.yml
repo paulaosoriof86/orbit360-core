@@ -1076,7 +1076,7 @@ jobs:
             && packagerReceipt.bootstrapIsolation20261024?.sourceFixCommit===sourceSuccessor.sourceCommit
             && packagerReceipt.bootstrapIsolation20261024?.correctedBootstrapBlobSha===correctiveExpectedProductBlobs['functions/bootstrap.js']
             && packagerReceipt.bootstrapIsolation20261024?.scopedPackageSmoke?.notAReleaseArtifact===true
-            && correctivePreviewReceipt.baseHead===require('node:child_process').execFileSync('git',['rev-parse','HEAD^'],{encoding:'utf8'}).trim()
+            && correctivePreviewReceipt.baseHead===require('node:child_process').execFileSync('git',['rev-parse','HEAD^^'],{encoding:'utf8'}).trim()
             && correctivePreviewReceipt.triggerSubject===correctivePreviewSubject
             && correctivePreviewReceipt.sourceSuccessorReceiptBlobSha===correctivePreviewAuth.sourceSuccessorReceiptBlobSha;
           const correctiveSourcePreview=correctivePreviewRequested
