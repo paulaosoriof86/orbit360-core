@@ -1,0 +1,84 @@
+{
+  "schema": "GI_I65_B4003_CORRECTIVE_SOURCE_SECURITY_AUTH_V1",
+  "product": "Gravicentra Insurance",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "gate": "I6.5/B4-003",
+  "approval": {
+    "authority": "PAULA_EXPLICIT_CORRECTIVE_AUTHORIZATION",
+    "date": "2026-10-24",
+    "recordedAt": "2026-10-25",
+    "parentHead": "6766ada60c6b2dbe93605ebbacbc99b383293b2c",
+    "sourceHeadVerified": true,
+    "permittedObjectives": [
+      "Integrate the B4-003 protected reader into the necessary Functions exports.",
+      "Complete protected reads for existing module collections, including reclamos/Siniestros.",
+      "Prepare protected write operations only where required to preserve existing flows; no real-record writes.",
+      "Classify SIGA records separately from confirmed payments; source alone is not confirmation.",
+      "Reconcile Policies and Client 360 by canonical ID, country, state, and currency without silent record changes.",
+      "Determine whether missing Asesor/CO and Operativo/CO goals are configuration gaps or read defects."
+    ],
+    "allowedSourcePaths": [
+      "functions/bootstrap.js",
+      "functions/b4-003-scoped-policy-callable.js",
+      "functions/b4-003-scoped-related-reader.js",
+      "functions/b4-003-scoped-access-boundary.js",
+      "functions/product-operational-domain.js",
+      "functions/ops-leads-domain.js",
+      "functions/product-ops-leads-domain.js",
+      "functions/package.json",
+      "orbit360-platform/core/product-runtime-browser-providers-p0.js",
+      "orbit360-platform/core/product-app-p0.js",
+      "orbit360-platform/core/queries.js",
+      "orbit360-platform/data/store-firestore-product-readonly-p0.js",
+      "orbit360-platform/data/store-firestore-product-operational-p0.js",
+      "orbit360-platform/modules/cobros.js",
+      "orbit360-platform/modules/polizas.js",
+      "orbit360-platform/modules/cliente360.js",
+      "orbit360-platform/modules/inicio.js",
+      "orbit360-platform/modules/siniestros.js",
+      "orbit360-platform/modules/ops.js",
+      "orbit360-platform/modules/leads.js",
+      "orbit360-platform/modules/renovaciones.js",
+      "orbit360-platform/modules/cancelaciones.js",
+      "firestore.b4-003-scoped-candidate.rules"
+    ],
+    "allowNewTargetedTests": true,
+    "allowSameGateGithubCommits": true
+  },
+  "rulesDeployment": {
+    "approval": "CONDITIONAL_ONLY",
+    "effectiveSharedRulesDeployAuthorized": false,
+    "prerequisites": [
+      "Frontend compatibility with protected readers and writers proven.",
+      "Emulator positive and negative tests bound to the exact candidate Rules blob intended for deployment.",
+      "Two independent legitimate QA identities; no impersonation.",
+      "Negative authorization proof across tenant, role, country, advisor, and team boundaries.",
+      "Positive authorized own/team/global readback and reload proof.",
+      "Coverage for all existing modules, including Siniestros/reclamos.",
+      "Previous deployed Rules backup, tested rollback procedure, and proven rollback.",
+      "No critical regressions."
+    ],
+    "candidatePath": "firestore.b4-003-scoped-candidate.rules",
+    "sharedRulesDeploymentMustRemainHoldUntilAllPrerequisitesPass": true
+  },
+  "prohibitions": {
+    "realClientPolicyPaymentWrites": false,
+    "importsOrReimports": false,
+    "dataChanges": false,
+    "permissionOrRoleChanges": false,
+    "impersonation": false,
+    "otherProjects": false,
+    "livePromotion": false,
+    "productionDeployment": false
+  },
+  "release": {
+    "livePromotionAuthorized": false,
+    "dataMutationAuthorized": false,
+    "reimportAuthorized": false,
+    "productionAcceptance": false,
+    "findingsPreserved": 295,
+    "frozenTasksPreserved": 86,
+    "previousEvidencePreserved": true
+  }
+}

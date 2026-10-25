@@ -7767,7 +7767,9 @@
       "authenticatedUatAccepted": false,
       "securityP0Closed": false,
       "livePromotion": false
-    }
+    },
+    "correctiveAuthorizationReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CORRECTIVE_SOURCE_SECURITY_AUTH_20261024.json",
+    "correctiveAuthorizationReceiptBlobSha": "5b999ed30d3a82e81c67528a86e0559f94013250"
   },
   "b4VisualAcceptanceControl": {
     "status": "R19_MACHINE_PASS_PENDING_TARGETED_PAULA_VISUAL",
@@ -14550,5 +14552,60 @@
     "livePromotionAuthorized": false,
     "reimportAuthorized": false,
     "refreshAugustAuthorized": false
+  },
+  "b4003CorrectiveSourceSecurityAuthorization20261024": {
+    "status": "SCOPED_SOURCE_CORRECTION_AUTHORIZED_RULES_DEPLOYMENT_CONDITIONAL_HOLD",
+    "gate": "I6.5/B4-003",
+    "authority": "PAULA_EXPLICIT_CORRECTIVE_AUTHORIZATION",
+    "recordedAt": "2026-10-25",
+    "approvalDate": "2026-10-24",
+    "parentHead": "6766ada60c6b2dbe93605ebbacbc99b383293b2c",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CORRECTIVE_SOURCE_SECURITY_AUTH_20261024.json",
+    "receiptBlobSha": "5b999ed30d3a82e81c67528a86e0559f94013250",
+    "allowedSourcePaths": [
+      "functions/bootstrap.js",
+      "functions/b4-003-scoped-policy-callable.js",
+      "functions/b4-003-scoped-related-reader.js",
+      "functions/b4-003-scoped-access-boundary.js",
+      "functions/product-operational-domain.js",
+      "functions/ops-leads-domain.js",
+      "functions/product-ops-leads-domain.js",
+      "functions/package.json",
+      "orbit360-platform/core/product-runtime-browser-providers-p0.js",
+      "orbit360-platform/core/product-app-p0.js",
+      "orbit360-platform/core/queries.js",
+      "orbit360-platform/data/store-firestore-product-readonly-p0.js",
+      "orbit360-platform/data/store-firestore-product-operational-p0.js",
+      "orbit360-platform/modules/cobros.js",
+      "orbit360-platform/modules/polizas.js",
+      "orbit360-platform/modules/cliente360.js",
+      "orbit360-platform/modules/inicio.js",
+      "orbit360-platform/modules/siniestros.js",
+      "orbit360-platform/modules/ops.js",
+      "orbit360-platform/modules/leads.js",
+      "orbit360-platform/modules/renovaciones.js",
+      "orbit360-platform/modules/cancelaciones.js",
+      "firestore.b4-003-scoped-candidate.rules"
+    ],
+    "sourceCorrectionAuthorized": true,
+    "exactCandidateRulesPath": "firestore.b4-003-scoped-candidate.rules",
+    "firestoreRulesDeployAuthorized": false,
+    "sharedRulesDeploymentPrerequisites": [
+      "Frontend compatibility with protected readers and writers proven.",
+      "Emulator positive and negative tests bound to the exact candidate Rules blob intended for deployment.",
+      "Two independent legitimate QA identities; no impersonation.",
+      "Negative authorization proof across tenant, role, country, advisor, and team boundaries.",
+      "Positive authorized own/team/global readback and reload proof.",
+      "Coverage for all existing modules, including Siniestros/reclamos.",
+      "Previous deployed Rules backup, tested rollback procedure, and proven rollback.",
+      "No critical regressions."
+    ],
+    "dataMutationAuthorized": false,
+    "realBusinessWritesAuthorized": false,
+    "reimportAuthorized": false,
+    "impersonationAuthorized": false,
+    "livePromotionAuthorized": false,
+    "findingsPreserved": 295,
+    "frozenTasksPreserved": 86
   }
 }
