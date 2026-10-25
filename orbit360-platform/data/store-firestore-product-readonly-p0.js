@@ -108,7 +108,7 @@
     function role(){
       var m=options.membership||{},r=text(m.activeRole);
       try{var ss=window.Orbit&&window.Orbit.session;if(ss&&typeof ss.rol==='function')r=text(ss.rol())||r;}catch(_){}
-      var norm=function(x){return text(x).normalize('NFD').toLowerCase().replace(/[^a-z0-9]+/g,'_');};
+      var norm=function(x){return text(x).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_+|_+$/g,'');};
       if(!r||![].concat(m.roles||[]).some(function(x){return norm(x)===norm(r);}))
         throw new Error('PROTECTED_READ_ROLE_NOT_ASSIGNED');
       return r;
@@ -122,7 +122,7 @@
         if(countries.indexOf(selectedCountry)<0)return Promise.reject(new Error('PROTECTED_READ_COUNTRY_DENIED'));
         countries=[selectedCountry];
       }
-      var initialRole=role(),pageSize=(collection==='polizas'||collection==='clientes'||['vehiculos','recibosEsperados','carteraPrimas','cobros'].includes(collection))?200:50;
+      var initialRole=role(),pageSize=(collection==='polizas'||collection==='clientes'||['vehiculos','recibosEsperados','carteraPrimas','cobros','reclamos','comisiones','finmovs','tareas'].includes(collection))?200:50;
       // Each country's pages remain sequential to preserve cursor integrity.
       // Independent authorized countries can load concurrently, but nothing
       // becomes visible until *every* country passes its full validation.
@@ -168,7 +168,7 @@
       });
     }
     function protectedRelatedUniverse(collection,epoch){
-      if(['vehiculos','recibosEsperados','carteraPrimas','cobros'].includes(collection))return protectedLoad(collection,'',epoch);
+      if(['vehiculos','recibosEsperados','carteraPrimas','cobros','reclamos','comisiones','finmovs','tareas'].includes(collection))return protectedLoad(collection,'',epoch);
       // Do not cache partially hydrated global views. Server verifies every batch.
       if(!protectedPoliciesPromise)protectedPoliciesPromise=protectedLoad('polizas','',epoch);
       return protectedPoliciesPromise.then(function(policies){
@@ -212,8 +212,8 @@
       var plan=queryPlan(collection);state.queryPlans[collection]=clone(plan);
       if(plan.hardError)throw new Error('PROTECTED_READ_PLAN_DENIED');
       if(plan.denied){if(state.deniedCollections.indexOf(collection)<0)state.deniedCollections.push(collection);return false;}
-      var related=['vehiculos','recibosEsperados','carteraPrimas','cobros'].indexOf(collection)>=0;
-      if(!related&&collection!=='clientes'&&collection!=='polizas'&&collection!=='aseguradoras'&&collection!=='asesores'&&collection!=='negocios'&&collection!=='gestiones'&&collection!=='actividades'&&collection!=='metas'&&collection!=='cancelaciones'&&collection!=='auditoria')
+      var related=['vehiculos','recibosEsperados','carteraPrimas','cobros','reclamos','comisiones','finmovs','tareas'].indexOf(collection)>=0;
+      if(!related&&collection!=='clientes'&&collection!=='polizas'&&collection!=='aseguradoras'&&collection!=='asesores'&&collection!=='negocios'&&collection!=='gestiones'&&collection!=='actividades'&&collection!=='metas'&&collection!=='cancelaciones'&&collection!=='reclamos'&&collection!=='comisiones'&&collection!=='finmovs'&&collection!=='tareas'&&collection!=='auditoria')
         throw new Error('PROTECTED_READ_COLLECTION_UNSUPPORTED_'+collection);
       var epoch=protectedEpoch;
       Promise.resolve().then(function(){return related?protectedRelatedUniverse(collection,epoch):protectedLoad(collection,'',epoch);})
@@ -294,7 +294,7 @@
       // Preflight the complete required collection set before fetching any
       // protected data. A six-of-eight bootstrap is never an accepted startup.
       if(protectedMode){
-        var supported=new Set(['clientes','polizas','vehiculos','recibosEsperados','carteraPrimas','cobros','aseguradoras','asesores','negocios','gestiones','actividades','metas','cancelaciones','auditoria']);
+        var supported=new Set(['clientes','polizas','vehiculos','recibosEsperados','carteraPrimas','cobros','aseguradoras','asesores','negocios','gestiones','actividades','metas','cancelaciones','reclamos','comisiones','finmovs','tareas','auditoria']);
         var unsupported=startupCollections.filter(function(name){return !supported.has(name);});
         if(unsupported.length){
           state.status='blocked-protected-incomplete';

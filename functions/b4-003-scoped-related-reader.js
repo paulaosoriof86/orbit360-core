@@ -2,9 +2,9 @@
 // B4-003 staged protected document-read owner for related operational collections.
 // Read-only. Preview-only candidate; NO Firebase export or rule deploy.
 const {resolve,allowRow,Denied}=require('./b4-003-scoped-access-boundary');
-const collections=new Set(['clientes','vehiculos','recibosEsperados','carteraPrimas','cobros','negocios','gestiones','actividades','metas','cancelaciones','reclamos','auditoria']);
+const collections=new Set(['clientes','vehiculos','recibosEsperados','carteraPrimas','cobros','comisiones','finmovs','tareas','negocios','gestiones','actividades','metas','cancelaciones','reclamos','auditoria']);
 const workflowCollections=new Set(['negocios','gestiones','actividades']);
-const financeCollections=new Set(['vehiculos','recibosEsperados','carteraPrimas','cobros']);
+const financeCollections=new Set(['vehiculos','recibosEsperados','carteraPrimas','cobros','comisiones']);
 const clean=v=>String(v==null?'':v).trim();
 const safeId=(id,label)=>{
  const value=clean(id);
@@ -85,6 +85,57 @@ function verifiedAuditView(ctx,row,id){
   fase:scalar('fase',80),usuario:scalar('usuario',120),motivo:scalar('motivo',500)};
 }
 
+
+const scopedOperationalCollections=new Set(['reclamos','comisiones','finmovs','tareas']);
+async function verifiedOperationalRow(ctx,tenant,tenantId,collection,row,id,cache){
+  if(row.tenantId&&row.tenantId!==tenantId)throw new Denied('TENANT_DENIED');
+  const countryOf=x=>clean(x&& (x.pais||x.country)).toUpperCase();
+  if(collection==='finmovs'){
+    const country=countryOf(row);
+    if(!country||country!==ctx.country)throw new Denied('COUNTRY_DENIED');
+    const advisor=clean(row.asesorId||row.advisorId||row.ownerAdvisorId);
+    if(advisor)allowRow(ctx,{tenantId,pais:country,asesorId:advisor});
+    else if(ctx.scope!=='all')throw new Denied('FINMOV_SCOPE_DENIED');
+    return Object.assign({},row,{id:row.id||id,canonicalDocumentId:id,tenantId,pais:country});
+  }
+  const policyId=clean(row.polizaId||row.policyId),inputClientId=clean(row.clienteId||row.clientId);
+  if(collection==='tareas'&&!policyId&&!inputClientId){
+    const country=countryOf(row),advisor=clean(row.asesorId||row.advisorId||row.ownerAdvisorId);
+    if(!country||country!==ctx.country)throw new Denied('TASK_COUNTRY_REQUIRED');
+    if(!advisor)throw new Denied('TASK_ADVISOR_REQUIRED');
+    allowRow(ctx,{tenantId,pais:country,asesorId:advisor});
+    return Object.assign({},row,{id:row.id||id,canonicalDocumentId:id,tenantId,pais:country,asesorId:advisor});
+  }
+  if(!policyId&&!inputClientId)throw new Denied(collection==='tareas'?'TASK_PARENT_REQUIRED':'RELATION_NOT_VERIFIABLE');
+  const parent=async(kind,key)=>{
+    const k=kind+':'+key;
+    if(!cache.has(k))cache.set(k,docRef(tenant,kind,safeId(key,'RELATION')).get().then(s=>s.exists?s.data()||{}:null));
+    return cache.get(k);
+  };
+  let policy=null,client=null;
+  if(policyId){
+    policy=await parent('polizas',policyId);
+    if(!policy||policy.tenantId&&policy.tenantId!==tenantId)throw new Denied('RELATION_POLICY_NOT_FOUND');
+    const canonicalClientId=clean(policy.clienteId);
+    if(!canonicalClientId||(inputClientId&&inputClientId!==canonicalClientId))throw new Denied('RELATION_CLIENT_MISMATCH');
+    client=await parent('clientes',canonicalClientId);
+  }else{
+    client=await parent('clientes',inputClientId);
+  }
+  if(!client||client.tenantId&&client.tenantId!==tenantId)throw new Denied('RELATION_CLIENT_NOT_FOUND');
+  verifiedLinkedClient(ctx,client,policy);
+  const canonical=policy||client;
+  allowRow(ctx,canonical);
+  const country=countryOf(canonical);
+  if(!country||country!==ctx.country)throw new Denied('COUNTRY_DENIED');
+  if(collection==='tareas'&&policy&&client&&clean(policy.clienteId)!==clean(row.clienteId||row.clientId||policy.clienteId))
+    throw new Denied('RELATION_CLIENT_MISMATCH');
+  return Object.assign({},row,{id:row.id||id,canonicalDocumentId:id,tenantId,pais:country,
+    asesorId:clean(canonical.asesorId||canonical.advisorId||canonical.ownerAdvisorId),
+    clienteId:policy?clean(policy.clienteId):clean(row.clienteId||row.clientId),
+    ...(policy?{polizaId:policyId}:{})});
+}
+
 async function readScopedRelatedDocument({db,auth,request}){
  if(!db||!auth||!auth.uid)throw new Denied('AUTH_REQUIRED');
  const q=request||{},tenantId=safeId(q.tenantId,'TENANT');
@@ -104,7 +155,13 @@ async function readScopedRelatedDocument({db,auth,request}){
  if(!snap.exists)throw new Denied('RECORD_NOT_FOUND_OR_DENIED');
 
  const record=snap.data()||{};
- if(collection==='auditoria'||collection==='cancelaciones'){
+ if(scopedOperationalCollections.has(collection)){
+  let projected;
+  try{projected=await verifiedOperationalRow(ctx,tenant,tenantId,collection,record,documentId,new Map());}
+  catch(e){if(e instanceof Denied)throw new Denied('RECORD_NOT_FOUND_OR_DENIED');throw e;}
+  return {ok:true,serverScoped:true,collection,country,scope:ctx.scope,row:projected};
+ }
+  if(collection==='auditoria'||collection==='cancelaciones'){
   let projected;
   try{projected=collection==='auditoria'
    ?verifiedAuditView(ctx,record,documentId)
@@ -154,7 +211,7 @@ async function readScopedRelatedList({db,auth,request}){
  const pageSize=Number(q.pageSize==null?20:q.pageSize);
  if(!collections.has(coll))throw new Denied('COLLECTION_DENIED');
  if(!['GT','CO'].includes(country))throw new Denied('COUNTRY_DENIED');
- if(!Number.isInteger(pageSize)||pageSize<1||pageSize>((coll==='clientes'||financeCollections.has(coll))?200:50))throw new Denied('PAGE_SIZE_INVALID');
+ if(!Number.isInteger(pageSize)||pageSize<1||pageSize>((coll==='clientes'||financeCollections.has(coll)||scopedOperationalCollections.has(coll))?200:50))throw new Denied('PAGE_SIZE_INVALID');
  if(policyId)safeId(policyId,'POLICY');
  if(hasBatch&&(!Array.isArray(q.policyIds)||policyIds.length<1||policyIds.length>10||
     new Set(policyIds).size!==policyIds.length||policyId))
@@ -171,6 +228,44 @@ async function readScopedRelatedList({db,auth,request}){
    tenantId,activeRole:role,country,collection:coll});
  const target=tenant.collection('data').doc(coll).collection('items');
 
+
+ if(scopedOperationalCollections.has(coll)){
+  if(policyId||hasBatch)throw new Denied('RELATION_ANCHOR_UNEXPECTED');
+  const MAX_SCANNED=3000,RAW_PAGE=100,cache=new Map();
+  let ordered=target.orderBy('__name__');
+  if(cursor){
+   const at=await target.doc(cursor).get();
+   if(!at.exists)throw new Denied('CURSOR_DENIED');
+   try{await verifiedOperationalRow(ctx,tenant,tenantId,coll,at.data()||{},at.id||cursor,cache);}
+   catch(_){throw new Denied('CURSOR_DENIED');}
+   ordered=ordered.startAfter(at);
+  }
+  const verified=[];let scanned=0,more=true,scan=ordered;
+  while(verified.length<=pageSize&&more){
+   const ss=await scan.limit(RAW_PAGE).get(),docs=Array.isArray(ss.docs)?ss.docs:[];
+   if(!docs.length)break;
+   scanned+=docs.length;
+   if(scanned>MAX_SCANNED)throw new Denied('OPERATIONAL_SCAN_BOUND_EXCEEDED');
+   const batch=[];
+   for(let i=0;i<docs.length;i+=10){
+    const rows=await Promise.all(docs.slice(i,i+10).map(async d=>{
+     try{return await verifiedOperationalRow(ctx,tenant,tenantId,coll,d.data()||{},d.id,cache);}
+     catch(e){if(e instanceof Denied)return null;throw e;}
+    }));
+    batch.push(...rows.filter(Boolean));
+    if(batch.length+verified.length>pageSize)break;
+   }
+   verified.push(...batch);
+   more=docs.length===RAW_PAGE;
+   if(verified.length<=pageSize&&more)scan=ordered.startAfter(docs[docs.length-1]);
+   else break;
+  }
+  const rows=verified.slice(0,pageSize);
+  return {ok:true,serverScoped:true,collection:coll,country,scope:ctx.scope,rows,
+   nextCursor:verified.length>pageSize?rows[rows.length-1].canonicalDocumentId:null,
+   anchoring:coll==='finmovs'?'country_and_finance_all_scope':
+    coll==='tareas'?'explicit_advisor_or_verified_client_policy':'verified_canonical_policy_or_client'};
+ }
 
  if(coll==='auditoria'||coll==='cancelaciones'){
   if(policyId||hasBatch)throw new Denied('POLICY_ANCHOR_UNEXPECTED');
@@ -474,4 +569,4 @@ async function readScopedRelatedList({db,auth,request}){
    anchoring:coll==='clientes'?'authorized_country_and_advisor_scope':hasBatch?'authorized_policy_batch':'authorized_policy'};
 }
 
-module.exports=Object.freeze({readScopedRelatedDocument,readScopedRelatedList,collections,version:'b4-003-related-server-list-stage-v5-goals-scoped'});
+module.exports=Object.freeze({readScopedRelatedDocument,readScopedRelatedList,collections,version:'b4-003-related-server-list-stage-v6-four-operational-collections'});

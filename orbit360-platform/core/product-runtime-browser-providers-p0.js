@@ -111,7 +111,7 @@
     var coll=String(v.collection||'').trim(),tenant=String(v.tenantId||'').trim();
     if(!mode)return Promise.reject(new Error('PROTECTED_READ_CANDIDATE_DISABLED'));
     if(!tenant||tenant!==String(cfg.tenantHint||''))return Promise.reject(new Error('PROTECTED_READ_TENANT_DENIED'));
-    if(!['clientes','polizas','vehiculos','recibosEsperados','carteraPrimas','cobros','aseguradoras','asesores','negocios','gestiones','actividades','metas','cancelaciones','reclamos','auditoria'].includes(coll)||
+    if(!['clientes','polizas','vehiculos','recibosEsperados','carteraPrimas','cobros','aseguradoras','asesores','negocios','gestiones','actividades','metas','cancelaciones','reclamos','comisiones','finmovs','tareas','auditoria'].includes(coll)||
        !['GT','CO'].includes(String(v.country||'').toUpperCase())||!String(v.activeRole||'').trim())
        return Promise.reject(new Error('PROTECTED_READ_PARAMETERS_DENIED'));
     var ids=v.policyIds,hasIds=Object.prototype.hasOwnProperty.call(v,'policyIds')&&ids!==undefined;

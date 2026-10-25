@@ -22,7 +22,7 @@ const ROLE_MODULES=Object.freeze({
 });
 const ADVISOR_TIER_ROLES=new Set(['asesor','asesora','asesor_sr','asesora_sr','asesor_jr','asesora_jr']);
 
-const modules={clientes:'cliente360',polizas:'polizas',vehiculos:'polizas',recibosEsperados:'cobros',carteraPrimas:'cobros',cobros:'cobros',negocios:'leads',gestiones:'ops',metas:'inicio',actividades:'historial',cancelaciones:'cancelaciones',reclamos:'cliente360',auditoria:'equipo',asesores:'equipo',aseguradoras:'aseguradoras'};
+const modules={clientes:'cliente360',polizas:'polizas',vehiculos:'polizas',recibosEsperados:'cobros',carteraPrimas:'cobros',cobros:'cobros',negocios:'leads',gestiones:'ops',metas:'inicio',actividades:'historial',cancelaciones:'cancelaciones',reclamos:'cliente360',comisiones:'comisiones',finmovs:'conciliaciones',tareas:'ops',auditoria:'equipo',asesores:'equipo',aseguradoras:'aseguradoras'};
 class Denied extends Error{constructor(code){super(code);this.code=code;}}
 const deny=code=>{throw new Denied(code);};
 const get=(o,k)=>{const key=Object.keys(o||{}).find(v=>norm(v)===norm(k));return key===undefined?undefined:o[key];};
