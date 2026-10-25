@@ -1,0 +1,27 @@
+{
+  "schema": "GI_I65_B4003_CORRECTIVE_GUARD_HISTORICAL_COMPAT_V1",
+  "status": "QA_GUARD_SOURCE_FIXED_PENDING_EXACT_GATE_RERUN",
+  "gate": "I6.5/B4-003",
+  "authority": "PAULA_EXPLICIT_CORRECTIVE_AUTHORIZATION",
+  "recordedAt": "2026-10-25",
+  "failedRunId": 40150880832,
+  "failedJobId": 121042009260,
+  "failureCode": "B4_003_INSURER_POLICY_COUNT_SUCCESSOR_INVALID",
+  "causalFinding": "Historical insurer-policy-count receipt pins the guard blob at dce1dc7da1e088851662112f44a4f0ed75ff1a1d; the active guard had advanced, so comparing its current bytes to a historical QA hash rejected an otherwise unchanged proof.",
+  "correction": "Compare all insurer-policy-count QA files to the immutable after hashes in the verified receipt; run the current guard normally for present-state checks.",
+  "guardPath": "tools/gravicentra-i6-control-plane-guard-v1.mjs",
+  "previousGuardBlobSha": "29fa4aacdb8521d1b96328407a54237623abb131",
+  "currentGuardBlobSha": "97d074644fb1caa88dc79165c14fa8a029047409",
+  "insurerPolicyCountReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_INSURER_POLICY_COUNT_SUCCESSOR_20261024.json",
+  "insurerPolicyCountReceiptBlobSha": "9d3a0661aec38745934208ff736505a40fde9815",
+  "insurerPolicyCountGuardQaBlobSha": "dce1dc7da1e088851662112f44a4f0ed75ff1a1d",
+  "sideEffects": {
+    "productDataWrites": 0,
+    "firestoreRulesChanged": false,
+    "functionsDeployed": false,
+    "previewDeployed": false,
+    "liveChanged": false,
+    "findingsChanged": false,
+    "frozenTasksChanged": false
+  }
+}

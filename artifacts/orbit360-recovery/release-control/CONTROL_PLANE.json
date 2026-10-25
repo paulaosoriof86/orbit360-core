@@ -14643,5 +14643,24 @@
     "dataMutationAuthorized": false,
     "realBusinessWritesAuthorized": false,
     "livePromotionAuthorized": false
+  },
+  "b4003CorrectiveGuardHistoricalCompatibility20261025": {
+    "status": "QA_GUARD_SOURCE_FIXED_PENDING_EXACT_GATE_RERUN",
+    "gate": "I6.5/B4-003",
+    "authority": "PAULA_EXPLICIT_CORRECTIVE_AUTHORIZATION",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CORRECTIVE_GUARD_HISTORICAL_COMPAT_20261025.json",
+    "receiptBlobSha": "8ec95aaf4e2715e1f7ce1f71b2e32fbab72baf68",
+    "guardPath": "tools/gravicentra-i6-control-plane-guard-v1.mjs",
+    "previousGuardBlobSha": "29fa4aacdb8521d1b96328407a54237623abb131",
+    "currentGuardBlobSha": "97d074644fb1caa88dc79165c14fa8a029047409",
+    "failedRunId": 40150880832,
+    "failureCode": "B4_003_INSURER_POLICY_COUNT_SUCCESSOR_INVALID",
+    "productDataWrites": 0,
+    "firestoreRulesChanged": false,
+    "functionsDeployed": false,
+    "previewDeployed": false,
+    "liveChanged": false,
+    "findingsPreserved": 295,
+    "frozenTasksPreserved": 86
   }
 }

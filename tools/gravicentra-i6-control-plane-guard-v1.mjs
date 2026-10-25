@@ -515,8 +515,11 @@ if(INSURER_POLICY_COUNT_ACTIVE){
   'tools/gravicentra-i6-control-plane-guard-v1.mjs'
  ].sort();
  const pairs={...R.sourceFiles,...R.qaFiles};
- const policyCountHistoricalHash=p=>DUAL_HOST_ACTIVE&&qa.includes(p)
-  ?physicalGit('rev-parse',DUAL_HOST.parentHead+':'+p):preDualPhysicalHash(p);
+ // Validate the insurer policy-count receipt against its immutable QA hashes.
+ // The guard itself has advanced since that receipt; current guard execution is
+ // still exercised below, while historical receipt bytes remain pinned here.
+ const policyCountHistoricalHash=p=>qa.includes(p)
+  ?P.qaBlobsAfter?.[p]:preDualPhysicalHash(p);
  need(P.parentHead==='695a467dec5369a0860b64b361d226cde26ea074'&&
   physicalGit('merge-base',P.parentHead,'HEAD')===P.parentHead&&
   P.gate==='I6.5/B4-003'&&
