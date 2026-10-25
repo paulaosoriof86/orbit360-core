@@ -7,14 +7,14 @@
   "status": "AUTHORIZED_EXACT_ISOLATED_READONLY_PREVIEW_PENDING_DISPATCH",
   "authority": "PAULA_EXPLICIT_CORRECTIVE_AUTHORIZATION",
   "triggerSubject": "build(i6.5 B4-003): verify authorized corrective source in isolated Preview",
-  "baseHead": "3d8359587f0e1d610b7efdc50502bfc3c4e54ed6",
+  "baseHead": "1690c0476fec56e28dd03e14ee2f12ca7bc52893",
   "sourceFixReceiptBlobSha": "19b6e0644015ea34b70e0216e0d128f7df2833e9",
   "sourceSuccessorReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_BOOTSTRAP_PREVIEW_ISOLATION_SUCCESSOR_20261025.json",
   "sourceSuccessorReceiptBlobSha": "d137e86d33f48c0aadf36c5b3c92e672c5afac44",
   "authorizationReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CORRECTIVE_SOURCE_SECURITY_AUTH_20261024.json",
   "authorizationReceiptBlobSha": "5b999ed30d3a82e81c67528a86e0559f94013250",
-  "compositionBlobSha": "c69d53112da9236046a79bed1d0a13379b135bd5",
-  "executionLockBlobSha": "b5294bc0c16a3974a5aef922d108ccfe7a68c203",
+  "compositionBlobSha": "ec6d567cd7ed42950d8dfabf201ce64433a11567",
+  "executionLockBlobSha": "5e30d236a09720108b2e8710f5629d64a18d6c63",
   "packagerFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PREVIEW_PACKAGER_DUPLICATE_EXPORT_ROOTFIX_20261025.json",
   "packagerFixReceiptBlobSha": "46abe678130a4c09964b0c8aac3a1b6f314574bc",
   "expectedProductBlobs": {
@@ -24,11 +24,13 @@
     "orbit360-platform/core/product-runtime-browser-providers-p0.js": "df30d8725485f7210282417edfb26f1698f08aa7",
     "orbit360-platform/core/queries.js": "ddb9e01c9f6aa82f750961ecf66d37475c2f6205",
     "orbit360-platform/modules/cobros.js": "9cbbf63775f30ce71c28ac93211e93a945cc2bf5",
-    "functions/package.json": "a016a9f9d6a48ab44d45dedc88611cff083091ef"
+    "functions/package.json": "a016a9f9d6a48ab44d45dedc88611cff083091ef",
+    "orbit360-platform/modules/polizas.js": "e561b8ebb7c872341d25c6d3cbe5a6cec5fac6b4"
   },
   "expectedQaBlobs": {
     "tools/gravicentra-b4-003-scoped-related-reader.test.cjs": "b175ac8b168eeed7e21fb518dfabaf32a21d0fb4",
-    "tools/gravicentra-b4-003-country-finance-parity.test.cjs": "fc93d180a4b2e80fa443d26f5b73c90e3f019b6e"
+    "tools/gravicentra-b4-003-country-finance-parity.test.cjs": "fc93d180a4b2e80fa443d26f5b73c90e3f019b6e",
+    "tools/gravicentra-b4-003-polizas-context-cache.test.cjs": "94b7d28c705666a2445107b527b95e069c4c1690"
   },
   "functions": [
     "orbit360ScopedPolicyReadPreview"
@@ -55,5 +57,7 @@
     "findings": 295,
     "frozenTasks": 86,
     "previousEvidence": true
-  }
+  },
+  "polizasCompositionSuccessorReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_POLIZAS_CONTEXT_CACHE_COMPOSITION_SUCCESSOR_20261025.json",
+  "polizasCompositionSuccessorReceiptBlobSha": "7224c1a1670beadd001dfffab1a93bf9ca4cdc32"
 }

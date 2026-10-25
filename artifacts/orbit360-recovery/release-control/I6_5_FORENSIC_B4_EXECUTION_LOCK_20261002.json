@@ -634,7 +634,7 @@
   },
   "findingLedgerBlobSha": "8125e97dcf1feb7f46081f95327952e65c2d1077",
   "continuityRegisterBlobSha": "4e6b0ac51736be360c4b95abe8fc01d8f1e78e20",
-  "compositionLockBlobSha": "c69d53112da9236046a79bed1d0a13379b135bd5",
+  "compositionLockBlobSha": "ec6d567cd7ed42950d8dfabf201ce64433a11567",
   "r18SourceFix": {
     "status": "SOURCE_FIXED_R18_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_SOURCE_FIX_20261005.json",
@@ -4283,6 +4283,25 @@
     "dataMutation": false,
     "reimport": false,
     "sharedRulesDeploy": false,
+    "livePromotion": false
+  },
+  "b4003PolizasContextCacheSuccessor20261025": {
+    "status": "COMPOSITION_SUCCESSOR_BOUND_PENDING_EXACT_PREVIEW",
+    "gate": "I6.5/B4-003",
+    "sourceCommit": "97b2eb7872f0a23ae8d9c3f206e149193dc34c20",
+    "sourcePath": "orbit360-platform/modules/polizas.js",
+    "predecessorSourceBlobSha": "3a423fea2083e1b1dfd1863f31e30910112af1f5",
+    "sourceBlobSha": "e561b8ebb7c872341d25c6d3cbe5a6cec5fac6b4",
+    "qaPath": "tools/gravicentra-b4-003-polizas-context-cache.test.cjs",
+    "predecessorQaBlobSha": "31c3a828311cd2443042c4f14cfdf7b98f1883b9",
+    "qaBlobSha": "94b7d28c705666a2445107b527b95e069c4c1690",
+    "predecessorCompositionBlobSha": "c69d53112da9236046a79bed1d0a13379b135bd5",
+    "successorCompositionBlobSha": "ec6d567cd7ed42950d8dfabf201ce64433a11567",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_POLIZAS_CONTEXT_CACHE_COMPOSITION_SUCCESSOR_20261025.json",
+    "receiptBlobSha": "7224c1a1670beadd001dfffab1a93bf9ca4cdc32",
+    "dataMutation": false,
+    "businessWrites": false,
+    "sharedFirestoreRules": false,
     "livePromotion": false
   }
 }

@@ -104,6 +104,10 @@ if(CORRECTIVE_SOURCE_ACTIVE){
  const CL=COMP.b4003CorrectiveSourceFix20261025||{};
  const historicalSourceQa=Object.assign({},R.sourceBlobsAfter||{},R.qaBlobsAfter||{});
  const successorSourceQa=Object.assign({},SR.sourceBlobsAfter||{},SR.qaBlobsAfter||{});
+ const POLIZAS_SUCCESSOR=C.b4003PolizasContextCacheSuccessor20261025||{};
+ const POLIZAS_SR=exists(POLIZAS_SUCCESSOR.receiptPath||'')?readJson(POLIZAS_SUCCESSOR.receiptPath):{};
+ const expectedProductBlobs={...(SR.sourceBlobsAfter||{}),...(POLIZAS_SR.sourceBlobsAfter||{})};
+ const expectedQaBlobs={...(SR.qaBlobsAfter||{}),...(POLIZAS_SR.qaBlobsAfter||{})};
  need(D.gate==='I6.5/B4-003'&&D.authority==='PAULA_EXPLICIT_CORRECTIVE_AUTHORIZATION'&&
   D.parentHead==='2278ab067ace6e6bdaa4d35e7c0728f4a4160682'&&
   physicalGit('merge-base',D.parentHead,'HEAD')===D.parentHead&&
@@ -149,8 +153,14 @@ if(CORRECTIVE_SOURCE_ACTIVE){
   PR.triggerSubject==='build(i6.5 B4-003): verify authorized corrective source in isolated Preview'&&PR.baseHead===physicalGit('rev-parse','HEAD^')&&
   PR.sourceFixReceiptBlobSha===D.receiptBlobSha&&PR.sourceSuccessorReceiptBlobSha===S.receiptBlobSha&&
   PR.packagerFixReceiptBlobSha===S.packagerReceiptBlobSha&&
-  JSON.stringify(PR.expectedProductBlobs)===JSON.stringify(SR.sourceBlobsAfter)&&
-  JSON.stringify(PR.expectedQaBlobs)===JSON.stringify(SR.qaBlobsAfter)&&
+  POLIZAS_SUCCESSOR.status==='COMPOSITION_SUCCESSOR_BOUND_PENDING_EXACT_PREVIEW'&&
+  POLIZAS_SUCCESSOR.receiptBlobSha===physicalGit('hash-object',POLIZAS_SUCCESSOR.receiptPath)&&
+  PR.polizasCompositionSuccessorReceiptPath===POLIZAS_SUCCESSOR.receiptPath&&
+  PR.polizasCompositionSuccessorReceiptBlobSha===POLIZAS_SUCCESSOR.receiptBlobSha&&
+  PR.compositionBlobSha===physicalGit('hash-object',I6_CANONICAL_COMPOSITION)&&
+  PR.executionLockBlobSha===physicalGit('hash-object',ACTIVE_I65_FORENSIC_B4)&&
+  JSON.stringify(PR.expectedProductBlobs)===JSON.stringify(expectedProductBlobs)&&
+  JSON.stringify(PR.expectedQaBlobs)===JSON.stringify(expectedQaBlobs)&&
   PR.scope?.sharedFirestoreRules===false&&PR.scope?.otherFunctions===false&&PR.scope?.dataMutation===false&&
   PR.scope?.livePromotion===false&&PR.scope?.functions?.join(',')==='orbit360ScopedPolicyReadPreview'&&
   C.b4003SecurityReleaseHold?.status==='ACTIVE_FAIL_CLOSED_UNAUTHORIZED_BROWSER_FIRESTORE_READ_WRITE'&&
@@ -1283,18 +1293,22 @@ if(NEW_MONEY_AUTH.status==='AUTHORIZED_EXACT_ISOLATED_READONLY_PREVIEW'){
  console.log('B4_003_DOC_SYNCHRONIZATION_PENDING_V6_V7_UAT_REJECTED_PREVIOUS_PREVIEW_NEW_AUTH_READONLY_PASS');
 }
 const PCACHE=C.b4003PolizasContextCacheFix20261020||{};
+const PCACHE_SUCCESSOR=C.b4003PolizasContextCacheSuccessor20261025||{};
 const PCACHE_ACTIVE=PCACHE.status==='SOURCE_ONLY_COMPOSED_NODE_QA_REGISTERED_RUN_REQUIRED';
 if(PCACHE_ACTIVE){
  const L=B4.b4003PolizasContextCacheFix20261020||{},T=COMP.b4003PolizasContextCacheFix20261020||{};
+ const LS=B4.b4003PolizasContextCacheSuccessor20261025||{},TS=COMP.b4003PolizasContextCacheSuccessor20261025||{};
  const expected='artifacts/orbit360-recovery/release-control/I6_5_B4_003_POLIZAS_CONTEXT_CACHE_SOURCE_FIX_20261020.json';
  const R=exists(expected)?readJson(expected):{};
+ const successorPath='artifacts/orbit360-recovery/release-control/I6_5_B4_003_POLIZAS_CONTEXT_CACHE_COMPOSITION_SUCCESSOR_20261025.json';
+ const SR=exists(successorPath)?readJson(successorPath):{};
  need(PCACHE.gate==='I6.5/B4-003'&&
   PCACHE.parentHead==='ced800e580d50e5254c3f16b5f06e4de72c0a6f3'&&
   PCACHE.sourcePath==='orbit360-platform/modules/polizas.js'&&
   PCACHE.qaPath==='tools/gravicentra-b4-003-polizas-context-cache.test.cjs'&&
   PCACHE.sourceBlobBefore==='3c3c1bc42bcbf03a88cea985d2101392a1c47c4d'&&
-  PCACHE.sourceBlobAfter===git('hash-object',PCACHE.sourcePath)&&
-  PCACHE.qaBlobSha===git('hash-object',PCACHE.qaPath)&&
+  PCACHE.sourceBlobAfter===R.sourceBlobAfter&&
+  PCACHE.qaBlobSha===R.qaBlobSha&&
   PCACHE.receiptPath===expected&&PCACHE.receiptBlobSha===git('hash-object',expected)&&
   R.schema==='GRAVICENTRA_I6_5_B4_003_POLIZAS_CONTEXT_CACHE_SOURCE_FIX_V1'&&
   R.parentHead===PCACHE.parentHead&&R.sourceBlobAfter===PCACHE.sourceBlobAfter&&
@@ -1323,6 +1337,33 @@ if(PCACHE_ACTIVE){
   B4.boundaries?.livePromotionAuthorized===false&&
   PCACHE.operationalWritesAuthorized===false&&PCACHE.livePromotionAuthorized===false&&
   PCACHE.authenticatedUatAccepted===false&&PCACHE.previewDispatchAuthorized===false&&
+  PCACHE_SUCCESSOR.status==='COMPOSITION_SUCCESSOR_BOUND_PENDING_EXACT_PREVIEW'&&
+  PCACHE_SUCCESSOR.gate==='I6.5/B4-003'&&PCACHE_SUCCESSOR.authority==='PAULA_EXPLICIT_SUCCESSOR_BINDING_AUTHORIZATION'&&
+  PCACHE_SUCCESSOR.sourcePath===PCACHE.sourcePath&&PCACHE_SUCCESSOR.predecessorSourceBlobSha===PCACHE.sourceBlobAfter&&
+  PCACHE_SUCCESSOR.sourceBlobSha===git('hash-object',PCACHE_SUCCESSOR.sourcePath)&&
+  PCACHE_SUCCESSOR.qaPath===PCACHE.qaPath&&PCACHE_SUCCESSOR.predecessorQaBlobSha===PCACHE.qaBlobSha&&
+  PCACHE_SUCCESSOR.qaBlobSha===git('hash-object',PCACHE_SUCCESSOR.qaPath)&&
+  PCACHE_SUCCESSOR.predecessorCompositionBlobSha===SR.predecessorCompositionBlobSha&&
+  PCACHE_SUCCESSOR.predecessorSourceReceiptCompositionBlobSha===PCACHE.compositionBlobSha&&
+  PCACHE_SUCCESSOR.receiptPath===successorPath&&PCACHE_SUCCESSOR.receiptBlobSha===git('hash-object',successorPath)&&
+  SR.schema==='GRAVICENTRA_I6_5_B4_003_POLIZAS_CONTEXT_CACHE_COMPOSITION_SUCCESSOR_V1'&&
+  SR.sourceCommit===PCACHE_SUCCESSOR.sourceCommit&&SR.sourceBlobSha===PCACHE_SUCCESSOR.sourceBlobSha&&
+  SR.sourceBlobsAfter?.[PCACHE_SUCCESSOR.sourcePath]===PCACHE_SUCCESSOR.sourceBlobSha&&
+  SR.predecessorSourceBlobSha===PCACHE_SUCCESSOR.predecessorSourceBlobSha&&
+  SR.qaBlobSha===PCACHE_SUCCESSOR.qaBlobSha&&SR.qaBlobsAfter?.[PCACHE_SUCCESSOR.qaPath]===PCACHE_SUCCESSOR.qaBlobSha&&
+  SR.predecessorQaBlobSha===PCACHE_SUCCESSOR.predecessorQaBlobSha&&
+  SR.successorCompositionBlobSha===git('hash-object',I6_CANONICAL_COMPOSITION)&&
+  PCACHE_SUCCESSOR.successorCompositionBlobSha===git('hash-object',I6_CANONICAL_COMPOSITION)&&
+  SR.findingsPreserved===295&&SR.frozenTasksPreserved===86&&
+  SR.boundaries?.dataMutation===false&&SR.boundaries?.businessWrites===false&&
+  SR.boundaries?.sharedFirestoreRules===false&&SR.boundaries?.livePromotion===false&&
+  LS.receiptBlobSha===PCACHE_SUCCESSOR.receiptBlobSha&&LS.sourceBlobSha===PCACHE_SUCCESSOR.sourceBlobSha&&
+  LS.successorCompositionBlobSha===PCACHE_SUCCESSOR.successorCompositionBlobSha&&
+  TS.sourceBlobSha===PCACHE_SUCCESSOR.sourceBlobSha&&TS.qaBlobSha===PCACHE_SUCCESSOR.qaBlobSha&&
+  COMP.productFileBlobs?.[PCACHE_SUCCESSOR.sourcePath]===PCACHE_SUCCESSOR.sourceBlobSha&&
+  C.compositionLockBlobSha===git('hash-object',I6_CANONICAL_COMPOSITION)&&
+  C.currentB4?.compositionLockBlobSha===git('hash-object',I6_CANONICAL_COMPOSITION)&&
+  C.canonicalAccumulationControl?.compositionLockBlobSha===git('hash-object',I6_CANONICAL_COMPOSITION)&&
   FIND.findings.length===295,
   'B4_003_POLIZAS_CONTEXT_CACHE_SOURCE_LINEAGE_OR_RELEASE_BOUNDARY_INVALID');
  execFileSync(process.execPath,[PCACHE.qaPath],{stdio:'inherit'});
