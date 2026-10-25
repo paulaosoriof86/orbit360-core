@@ -96,9 +96,14 @@ const DUAL_HOST_ACTIVE=DUAL_HOST.status==='SOURCE_STAGED_SYNTHETIC_QA_PASS_SECUR
 const DUAL_PREVIOUS=new Map();
 if(CORRECTIVE_SOURCE_ACTIVE){
  const D=CORRECTIVE_SOURCE,R=readJson(D.receiptPath);
+ const S=C.b4003CorrectiveSourceSuccessor20261025||{};
+ const SR=readJson(S.receiptPath||'');
+ const PREVIEW=C.b4003CorrectiveSourcePreviewSuccessorDispatch20261025||{};
+ const PR=readJson(PREVIEW.receiptPath||'');
  const BL=B4.b4003CorrectiveSourceFix20261025||{};
  const CL=COMP.b4003CorrectiveSourceFix20261025||{};
- const sourceQa=Object.assign({},R.sourceBlobsAfter||{},R.qaBlobsAfter||{});
+ const historicalSourceQa=Object.assign({},R.sourceBlobsAfter||{},R.qaBlobsAfter||{});
+ const successorSourceQa=Object.assign({},SR.sourceBlobsAfter||{},SR.qaBlobsAfter||{});
  need(D.gate==='I6.5/B4-003'&&D.authority==='PAULA_EXPLICIT_CORRECTIVE_AUTHORIZATION'&&
   D.parentHead==='2278ab067ace6e6bdaa4d35e7c0728f4a4160682'&&
   physicalGit('merge-base',D.parentHead,'HEAD')===D.parentHead&&
@@ -110,20 +115,48 @@ if(CORRECTIVE_SOURCE_ACTIVE){
   sameJson(BL.sourceBlobsAfter,R.sourceBlobsAfter)&&sameJson(BL.qaBlobsAfter,R.qaBlobsAfter)&&
   sameJson(CL.sourceBlobsAfter,R.sourceBlobsAfter)&&sameJson(CL.qaBlobsAfter,R.qaBlobsAfter)&&
   Object.keys(R.sourceBlobsAfter||{}).length===7&&Object.keys(R.qaBlobsAfter||{}).length===2&&
+  Object.entries(historicalSourceQa).every(([p,sha])=>physicalGit('rev-parse',D.parentHead+':'+p)===sha)&&
   Object.keys(R.sourceBlobsAfter||{}).every(p=>(C.b4003CorrectiveSourceSecurityAuthorization20261024?.allowedSourcePaths||[]).includes(p))&&
   Object.keys(R.qaBlobsAfter||{}).every(p=>(B4.boundaries?.allowedQaFiles||[]).includes(p))&&
   D.compositionBlobSha===physicalGit('hash-object',I6_CANONICAL_COMPOSITION)&&
   BL.compositionBlobSha===D.compositionBlobSha&&CL.receiptBlobSha===D.receiptBlobSha&&
-  Object.entries(sourceQa).every(([p,sha])=>physicalGit('hash-object',p)===sha)&&
   R.findingsPreserved===295&&R.frozenTasksPreserved===86&&
   R.firestoreRulesDeployAuthorized===false&&R.dataMutationAuthorized===false&&
   R.realBusinessWritesAuthorized===false&&R.livePromotionAuthorized===false&&
   D.firestoreRulesDeployAuthorized===false&&D.dataMutationAuthorized===false&&
   D.realBusinessWritesAuthorized===false&&D.livePromotionAuthorized===false&&
+  S.status==='SOURCE_SUCCESSOR_RECONCILED_PENDING_EXACT_PREVIEW'&&S.gate===D.gate&&S.authority===D.authority&&
+  S.receiptBlobSha===physicalGit('hash-object',S.receiptPath)&&C.b4003CorrectiveSourceSuccessor20261025?.receiptBlobSha===S.receiptBlobSha&&
+  C.b4003CorrectiveSourceSuccessor20261025?.receiptPath===S.receiptPath&&
+  S.historicalSourceFix?.blobSha===D.receiptBlobSha&&
+  S.historicalSourceFix?.parentHead===D.parentHead&&
+  S.historicalSourceFix?.sourceBlobsAfter?.['functions/bootstrap.js']===R.sourceBlobsAfter?.['functions/bootstrap.js']&&
+  S.sourceCommit==='15588c3c8ebeb11eac630cce624d136723bcf534'&&
+  physicalGit('rev-parse',S.sourceCommit+':functions/bootstrap.js')===S.sourceBlobsAfter?.['functions/bootstrap.js']&&
+  physicalGit('merge-base',S.sourceCommit,'HEAD')===S.sourceCommit&&
+  Object.keys(S.sourceBlobsAfter||{}).length===7&&Object.keys(S.qaBlobsAfter||{}).length===2&&
+  Object.entries(successorSourceQa).every(([p,sha])=>physicalGit('hash-object',p)===sha)&&
+  Object.keys(S.sourceBlobsAfter||{}).every(p=>(C.b4003CorrectiveSourceSecurityAuthorization20261024?.allowedSourcePaths||[]).includes(p))&&
+  Object.keys(S.qaBlobsAfter||{}).every(p=>(B4.boundaries?.allowedQaFiles||[]).includes(p))&&
+  S.packagerReceipt?.path==='artifacts/orbit360-recovery/release-control/I6_5_B4_003_PREVIEW_PACKAGER_DUPLICATE_EXPORT_ROOTFIX_20261025.json'&&S.packagerReceipt?.blobSha===physicalGit('hash-object',S.packagerReceipt.path)&&
+  S.authorizationReceipt?.path==='artifacts/orbit360-recovery/release-control/I6_5_B4_003_CORRECTIVE_SOURCE_SECURITY_AUTH_20261024.json'&&S.authorizationReceipt?.blobSha===physicalGit('hash-object',S.authorizationReceipt.path)&&
+  S.scope?.functions?.join(',')==='orbit360ScopedPolicyReadPreview'&&S.scope?.sharedFirestoreRules===false&&
+  S.scope?.dataMutation===false&&S.scope?.livePromotion===false&&S.findingsPreserved===295&&S.frozenTasksPreserved===86&&
+  PREVIEW.status==='AUTHORIZED_EXACT_ISOLATED_READONLY_PREVIEW_PENDING_DISPATCH'&&
+  PREVIEW.receiptBlobSha===physicalGit('hash-object',PREVIEW.receiptPath)&&
+  C.b4003CorrectiveSourcePreviewSuccessorDispatch20261025?.receiptBlobSha===PREVIEW.receiptBlobSha&&
+  PR.schema==='GI_I65_B4_003_PREVIEW_DISPATCH_SUCCESSOR_V1'&&PR.status===PREVIEW.status&&
+  PR.triggerSubject==='build(i6.5 B4-003): verify authorized corrective source in isolated Preview'&&PR.baseHead===physicalGit('rev-parse','HEAD^')&&
+  PR.sourceFixReceiptBlobSha===D.receiptBlobSha&&PR.sourceSuccessorReceiptBlobSha===S.receiptBlobSha&&
+  PR.packagerFixReceiptBlobSha===S.packagerReceipt?.blobSha&&
+  JSON.stringify(PR.expectedProductBlobs)===JSON.stringify(S.sourceBlobsAfter)&&
+  JSON.stringify(PR.expectedQaBlobs)===JSON.stringify(S.qaBlobsAfter)&&
+  PR.scope?.sharedFirestoreRules===false&&PR.scope?.otherFunctions===false&&PR.scope?.dataMutation===false&&
+  PR.scope?.livePromotion===false&&PR.scope?.functions?.join(',')==='orbit360ScopedPolicyReadPreview'&&
   C.b4003SecurityReleaseHold?.status==='ACTIVE_FAIL_CLOSED_UNAUTHORIZED_BROWSER_FIRESTORE_READ_WRITE'&&
   B4.boundaries?.livePromotionAuthorized===false&&FIND.findings.length===295,
   'B4_003_CORRECTIVE_SOURCE_SUCCESSOR_INVALID');
- for(const [p,sha] of Object.entries(sourceQa)){
+ for(const [p,sha] of Object.entries(historicalSourceQa)){
   try{physicalGit('cat-file','-e',D.parentHead+':'+p);CORRECTIVE_SOURCE_PREVIOUS.set(p,physicalGit('rev-parse',D.parentHead+':'+p));}
   catch(_){throw new Error('B4_003_CORRECTIVE_PARENT_MISSING_FILE:'+p);}
  }
@@ -133,7 +166,7 @@ if(CORRECTIVE_SOURCE_ACTIVE){
   try{physicalGit('cat-file','-e',DUAL_HOST.parentHead+':'+p);DUAL_PREVIOUS.set(p,physicalGit('rev-parse',DUAL_HOST.parentHead+':'+p));}
   catch(_){/* Original dual-host proof did not include this path in its parent. */}
  }
- console.log('B4_003_CORRECTIVE_SOURCE=EXACT_BLOBS_SYNTHETIC_QA_PENDING_PREVIEW_SECURITY_HOLD');
+ console.log('B4_003_CORRECTIVE_SOURCE=HISTORICAL_SHA_PRESERVED_SUCCESSOR_EXACT_BLOBS_SYNTHETIC_QA_PENDING_PREVIEW_SECURITY_HOLD');
 }
 if(DUAL_HOST_ACTIVE){
  const D=DUAL_HOST,R=readJson(D.receiptPath);

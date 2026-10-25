@@ -31,9 +31,7 @@
     "fullRepositoryParitySuite": "PENDING_GITHUB_ACTIONS",
     "emulatorRules": "NOT_TESTED; current candidate Rules and exact emulator suite not validated.",
     "authenticatedPreview": "PENDING_EXACT_PREVIEW",
-    "independentQaIdentities": "NOT_TESTED",
-    "bootstrapIsolation": "PASS_SOURCE_GUARD_AND_SYNTHETIC_SCOPED_PACKAGER_SMOKE; exact Preview still required.",
-    "scopedRelatedReaderContract": "Updated to require no shared bootstrap export and exact-gate packager injection."
+    "independentQaIdentities": "NOT_TESTED"
   },
   "dataMutationAuthorized": false,
   "realBusinessWritesAuthorized": false,
@@ -42,37 +40,5 @@
   "firestoreRulesDeployAuthorized": false,
   "livePromotionAuthorized": false,
   "findingsPreserved": 295,
-  "frozenTasksPreserved": 86,
-  "successorSourceBlobsAfter": {
-    "functions/bootstrap.js": "42fd05b81a02d428e590c36e3feb32be202f4965",
-    "functions/b4-003-scoped-related-reader.js": "a7fc08fc385084d74068c8ba9340930a713c3dd6",
-    "functions/b4-003-scoped-access-boundary.js": "24d7c52347c9dd32bfabbc66f8b340174b15b6a7",
-    "orbit360-platform/core/product-runtime-browser-providers-p0.js": "df30d8725485f7210282417edfb26f1698f08aa7",
-    "orbit360-platform/core/queries.js": "ddb9e01c9f6aa82f750961ecf66d37475c2f6205",
-    "orbit360-platform/modules/cobros.js": "9cbbf63775f30ce71c28ac93211e93a945cc2bf5",
-    "functions/package.json": "a016a9f9d6a48ab44d45dedc88611cff083091ef"
-  },
-  "successorQaBlobsAfter": {
-    "tools/gravicentra-b4-003-scoped-related-reader.test.cjs": "b175ac8b168eeed7e21fb518dfabaf32a21d0fb4",
-    "tools/gravicentra-b4-003-country-finance-parity.test.cjs": "fc93d180a4b2e80fa443d26f5b73c90e3f019b6e"
-  },
-  "sourceSuccessorBinding": {
-    "schema": "GI_I65_B4_003_BOOTSTRAP_PREVIEW_ISOLATION_SUCCESSOR_V1",
-    "status": "SOURCE_SUCCESSOR_RECONCILED_PENDING_EXACT_PREVIEW",
-    "historicalSourceFixReceiptBlobSha": "19b6e0644015ea34b70e0216e0d128f7df2833e9",
-    "historicalBootstrapBlobSha": "533f480e84ca4c4edbc8f6183c7d8f153a977569",
-    "correctedBootstrapBlobSha": "42fd05b81a02d428e590c36e3feb32be202f4965",
-    "sourceCommit": "15588c3c8ebeb11eac630cce624d136723bcf534",
-    "sourceCommitPathBlobSha": "42fd05b81a02d428e590c36e3feb32be202f4965",
-    "packagerReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PREVIEW_PACKAGER_DUPLICATE_EXPORT_ROOTFIX_20261025.json",
-    "packagerReceiptBlobSha": "46abe678130a4c09964b0c8aac3a1b6f314574bc",
-    "packageSmokeStatus": "PASS_WITH_SYNTHETIC_PUBLIC_CONFIG_AND_BRANDING_FIXTURES",
-    "exactPreviewStillRequired": true,
-    "retroactiveAttribution": false,
-    "sharedRulesDeployAuthorized": false,
-    "dataMutationAuthorized": false,
-    "livePromotionAuthorized": false,
-    "findingsPreserved": 295,
-    "frozenTasksPreserved": 86
-  }
+  "frozenTasksPreserved": 86
 }

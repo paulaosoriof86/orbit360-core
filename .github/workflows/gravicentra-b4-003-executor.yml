@@ -1052,12 +1052,13 @@ jobs:
           // Keep the callable, hosting artifact, and non-mutation boundary bound to the canonical receipt.
           const correctivePreviewSubject='build(i6.5 B4-003): verify authorized corrective source in isolated Preview';
           const correctivePreviewRequested=currentSubject===correctivePreviewSubject;
-          const correctivePreviewAuth=c.b4003CorrectiveSourcePreviewDispatch20261025||{};
+          const correctivePreviewAuth=c.b4003CorrectiveSourcePreviewSuccessorDispatch20261025||{};
           const correctiveFix=c.b4003CorrectiveSourceFix20261025||{};
-          const correctivePreviewReceipt=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/I6_5_B4_003_CORRECTIVE_SOURCE_PREVIEW_DISPATCH_20261025.json','utf8'));
-          const correctiveExpectedProductBlobs=correctiveFix.successorSourceBlobsAfter||correctiveFix.sourceBlobsAfter||{};
-          const correctiveExpectedQaBlobs=correctiveFix.successorQaBlobsAfter||correctiveFix.qaBlobsAfter||{};
-          const sourceSuccessor=correctiveFix.sourceSuccessorBinding||{};
+          const correctivePreviewReceipt=JSON.parse(fs.readFileSync(correctivePreviewAuth.receiptPath,'utf8'));
+          const sourceSuccessorReceipt=JSON.parse(fs.readFileSync(correctivePreviewAuth.sourceSuccessorReceiptPath,'utf8'));
+          const correctiveExpectedProductBlobs=sourceSuccessorReceipt.sourceBlobsAfter||{};
+          const correctiveExpectedQaBlobs=sourceSuccessorReceipt.qaBlobsAfter||{};
+          const sourceSuccessor=sourceSuccessorReceipt;
           const packagerReceiptPath=correctivePreviewReceipt.packagerFixReceiptPath||'';
           const packagerReceipt=packagerReceiptPath?JSON.parse(fs.readFileSync(packagerReceiptPath,'utf8')):{};
           const successorSourceCommitBlob=sourceSuccessor.sourceCommit
@@ -1067,23 +1068,23 @@ jobs:
             && Object.entries(correctiveExpectedQaBlobs).length===2
             && Object.entries(correctiveExpectedQaBlobs).every(([p,sha])=>productSha(p)===sha&&l.boundaries?.allowedQaFiles?.includes(p))
             && sourceSuccessor.status==='SOURCE_SUCCESSOR_RECONCILED_PENDING_EXACT_PREVIEW'
-            && sourceSuccessor.historicalBootstrapBlobSha===correctiveFix.sourceBlobsAfter?.['functions/bootstrap.js']
-            && sourceSuccessor.correctedBootstrapBlobSha===correctiveExpectedProductBlobs['functions/bootstrap.js']
-            && successorSourceCommitBlob===sourceSuccessor.correctedBootstrapBlobSha
-            && sourceSuccessor.packagerReceiptPath===packagerReceiptPath
-            && sourceSuccessor.packagerReceiptBlobSha===productSha(packagerReceiptPath)
+            && sourceSuccessor.historicalSourceFix?.blobSha===correctiveFix.receiptBlobSha
+            && sourceSuccessor.historicalSourceFix?.sourceBlobsAfter?.['functions/bootstrap.js']!==correctiveExpectedProductBlobs['functions/bootstrap.js']
+            && successorSourceCommitBlob===correctiveExpectedProductBlobs['functions/bootstrap.js']
+            && sourceSuccessor.packagerReceipt?.path===packagerReceiptPath
+            && sourceSuccessor.packagerReceipt?.blobSha===productSha(packagerReceiptPath)
             && packagerReceipt.bootstrapIsolation20261024?.sourceFixCommit===sourceSuccessor.sourceCommit
-            && packagerReceipt.bootstrapIsolation20261024?.correctedBootstrapBlobSha===sourceSuccessor.correctedBootstrapBlobSha
+            && packagerReceipt.bootstrapIsolation20261024?.correctedBootstrapBlobSha===correctiveExpectedProductBlobs['functions/bootstrap.js']
             && packagerReceipt.bootstrapIsolation20261024?.scopedPackageSmoke?.notAReleaseArtifact===true
-            && correctivePreviewReceipt.successorDispatch?.baseHead===execFileSync('git',['rev-parse','HEAD^'],{encoding:'utf8'}).trim()
-            && correctivePreviewReceipt.successorDispatch?.triggerSubject===correctivePreviewSubject
-            && correctivePreviewReceipt.successorDispatch?.sourceSuccessorBindingSha===correctiveFix.receiptBlobSha;
+            && correctivePreviewReceipt.baseHead===execFileSync('git',['rev-parse','HEAD^'],{encoding:'utf8'}).trim()
+            && correctivePreviewReceipt.triggerSubject===correctivePreviewSubject
+            && correctivePreviewReceipt.sourceSuccessorReceiptBlobSha===correctivePreviewAuth.sourceSuccessorReceiptBlobSha;
           const correctiveSourcePreview=correctivePreviewRequested
             && correctivePreviewAuth.status==='AUTHORIZED_EXACT_ISOLATED_READONLY_PREVIEW_PENDING_DISPATCH'
             && correctivePreviewAuth.triggerSubject===correctivePreviewSubject
-            && correctivePreviewAuth.receiptPath==='artifacts/orbit360-recovery/release-control/I6_5_B4_003_CORRECTIVE_SOURCE_PREVIEW_DISPATCH_20261025.json'
+            && correctivePreviewAuth.receiptPath==='artifacts/orbit360-recovery/release-control/I6_5_B4_003_PREVIEW_DISPATCH_SUCCESSOR_20261025.json'
             && correctivePreviewAuth.receiptBlobSha===productSha(correctivePreviewAuth.receiptPath)
-            && correctivePreviewReceipt.schema==='GI_I65_B4003_CORRECTIVE_SOURCE_PREVIEW_DISPATCH_V1'
+            && correctivePreviewReceipt.schema==='GI_I65_B4_003_PREVIEW_DISPATCH_SUCCESSOR_V1'
             && correctivePreviewReceipt.status===correctivePreviewAuth.status
             && correctivePreviewReceipt.triggerSubject===correctivePreviewSubject
             && correctivePreviewReceipt.authority==='PAULA_EXPLICIT_CORRECTIVE_AUTHORIZATION'
