@@ -150,7 +150,8 @@ if(CORRECTIVE_SOURCE_ACTIVE){
   PREVIEW.receiptBlobSha===physicalGit('hash-object',PREVIEW.receiptPath)&&
   C.b4003CorrectiveSourcePreviewSuccessorDispatch20261025?.receiptBlobSha===PREVIEW.receiptBlobSha&&
   PR.schema==='GI_I65_B4_003_PREVIEW_DISPATCH_SUCCESSOR_V1'&&PR.status===PREVIEW.status&&
-  PR.triggerSubject==='build(i6.5 B4-003): verify authorized corrective source in isolated Preview'&&PR.baseHead===physicalGit('rev-parse','HEAD^')&&
+  PR.triggerSubject==='build(i6.5 B4-003): verify authorized corrective source in isolated Preview'&&PR.baseHead===physicalGit('rev-parse','HEAD^^')&&
+  PR.receiptBlobSha===physicalGit('rev-parse','HEAD^:'+PREVIEW.receiptPath)&&
   PR.sourceFixReceiptBlobSha===D.receiptBlobSha&&PR.sourceSuccessorReceiptBlobSha===S.receiptBlobSha&&
   PR.packagerFixReceiptBlobSha===S.packagerReceiptBlobSha&&
   POLIZAS_SUCCESSOR.status==='COMPOSITION_SUCCESSOR_BOUND_PENDING_EXACT_PREVIEW'&&
