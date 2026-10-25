@@ -2,7 +2,7 @@
 // B4-003 staged protected document-read owner for related operational collections.
 // Read-only. Preview-only candidate; NO Firebase export or rule deploy.
 const {resolve,allowRow,Denied}=require('./b4-003-scoped-access-boundary');
-const collections=new Set(['clientes','vehiculos','recibosEsperados','carteraPrimas','cobros','negocios','gestiones','actividades','metas','cancelaciones','auditoria']);
+const collections=new Set(['clientes','vehiculos','recibosEsperados','carteraPrimas','cobros','negocios','gestiones','actividades','metas','cancelaciones','reclamos','auditoria']);
 const workflowCollections=new Set(['negocios','gestiones','actividades']);
 const financeCollections=new Set(['vehiculos','recibosEsperados','carteraPrimas','cobros']);
 const clean=v=>String(v==null?'':v).trim();

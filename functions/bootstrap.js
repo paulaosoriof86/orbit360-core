@@ -12,6 +12,7 @@ module.exports = Object.assign(
   require('./notification-outbox-processor'),
   require('./cobros-reconciliation-domain'),
   require('./product-operational-domain'),
+  require('./b4-003-scoped-policy-callable'),
   require('./product-insurer-credentials'),
   require('./recurring-insurance-import'),
   require('./index'),

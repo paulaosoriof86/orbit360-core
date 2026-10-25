@@ -59,9 +59,13 @@ assert.throws(()=>resolveSecureModule(restrictedAdvisor),e=>e instanceof Denied&
 console.log('B4_003_AFFIRMATIVE_MODULE_ENTITLEMENT_QA_PASS checks='+positiveModuleChecks+' synthetic_only no_Firebase_no_writes');
 
 const fs=require('node:fs');
+const bootstrapSource=fs.readFileSync(require('node:path').join(__dirname,'../functions/bootstrap.js'),'utf8');
+const functionsPackage=JSON.parse(fs.readFileSync(require('node:path').join(__dirname,'../functions/package.json'),'utf8'));
+assert.equal(functionsPackage.main,'bootstrap.js','B4_003_FUNCTIONS_ENTRYPOINT');
+assert.ok(bootstrapSource.includes("require('./b4-003-scoped-policy-callable')"),'B4_003_PROTECTED_CALLABLE_MUST_BE_EXPORTED');
 const rawReader=fs.readFileSync(require('node:path').join(__dirname,'../functions/b4-003-scoped-related-reader.js'),'utf8');
 const protectedBrowserProvider=fs.readFileSync(require('node:path').join(__dirname,'../orbit360-platform/core/product-runtime-browser-providers-p0.js'),'utf8');
-for(const collection of ['actividades','metas']) {
+for(const collection of ['actividades','metas','reclamos']) {
  assert.ok(protectedBrowserProvider.includes("'"+collection+"'"),
    'B4_003_PROTECTED_BROWSER_ALLOWLIST_MISSING_'+collection);
 }
@@ -83,6 +87,7 @@ const docs={
  cobros:{directPaid:{id:'directPaid',clienteId:'c1',monto:1},paid1:{id:'paid1',polizaId:'p1',clienteId:'c1',monto:3},paid2:{id:'paid2',polizaId:'p2',clienteId:'c2'}},
  negocios:{n1:{id:'n1',tenantId,pais:'GT',asesorId:'a1',etapa:'nuevo'},n2:{id:'n2',tenantId,pais:'GT',asesorId:'a2',etapa:'cotizando'}},
  gestiones:{g1:{id:'g1',tenantId,pais:'GT',asesorId:'a1',lista:'Gestiones Admin'},g2:{id:'g2',tenantId,pais:'GT',asesorId:'a2',lista:'Emisiones'}},
+ reclamos:{claim1:{id:'claim1',tenantId,pais:'GT',asesorId:'a1',clienteId:'c1',polizaId:'p1'},claim2:{id:'claim2',tenantId,pais:'GT',asesorId:'a2',clienteId:'c2',polizaId:'p2'}},
  actividades:{
   hPolicy:{id:'hPolicy',tenantId,polizaId:'p1',tipo:'llamada'},
   hClient:{id:'hClient',tenantId,clienteId:'c1',tipo:'nota'},
@@ -123,10 +128,10 @@ const read=(collection,documentId,extras={})=>readScopedRelatedDocument({
 async function deny(fn,code){let thrown;try{await fn()}catch(e){thrown=e}assert.ok(thrown instanceof Denied);assert.equal(thrown.code,code);}
 (async()=>{
  let checks=0;
- for(const [col,id] of [['clientes','c1'],['vehiculos','v1'],['recibosEsperados','r1'],['carteraPrimas','debt1'],['cobros','paid1'],['recibosEsperados','direct']]){
+ for(const [col,id] of [['clientes','c1'],['vehiculos','v1'],['recibosEsperados','r1'],['carteraPrimas','debt1'],['cobros','paid1'],['recibosEsperados','direct'],['reclamos','claim1']]){
   const r=await read(col,id);assert.equal(r.row.id,id);assert.equal(r.scope,'own');checks++;
  }
- for(const [col,id] of [['clientes','c2'],['vehiculos','v2'],['recibosEsperados','r2'],['cobros','paid2']]){
+ for(const [col,id] of [['clientes','c2'],['vehiculos','v2'],['recibosEsperados','r2'],['cobros','paid2'],['reclamos','claim2']]){
   await deny(()=>read(col,id),'RECORD_NOT_FOUND_OR_DENIED');checks++;
  }
  await deny(()=>read('recibosEsperados','bad'),'RELATION_CLIENT_MISMATCH');checks++;

@@ -86,9 +86,52 @@ const COMP=readJson(I6_CANONICAL_COMPOSITION),FIND=readJson(I6_FINDINGS_LEDGER),
 // The 24-Oct dual-host source is an independently pinned successor, never a
 // rewrite of preceding authenticated/Preview receipts. Earlier expectations
 // use the committed predecessor bytes; this change must match disk bytes.
+const CORRECTIVE_SOURCE=C.b4003CorrectiveSourceFix20261025||{};
+const CORRECTIVE_SOURCE_ACTIVE=CORRECTIVE_SOURCE.status==='SOURCE_STAGED_SYNTHETIC_QA_PENDING_EXACT_PREVIEW_SECURITY_HOLD';
+const CORRECTIVE_SOURCE_PREVIOUS=new Map();
 const DUAL_HOST=C.b4003DualHostProtectedTransport20261024||{};
-const DUAL_HOST_ACTIVE=DUAL_HOST.status==='SOURCE_STAGED_SYNTHETIC_QA_PASS_SECURITY_HOLD';
+const DUAL_HOST_ACTIVE=DUAL_HOST.status==='SOURCE_STAGED_SYNTHETIC_QA_PASS_SECURITY_HOLD'&&!CORRECTIVE_SOURCE_ACTIVE;
 const DUAL_PREVIOUS=new Map();
+if(CORRECTIVE_SOURCE_ACTIVE){
+ const D=CORRECTIVE_SOURCE,R=readJson(D.receiptPath);
+ const BL=B4.b4003CorrectiveSourceFix20261025||{};
+ const CL=COMP.b4003CorrectiveSourceFix20261025||{};
+ const sourceQa=Object.assign({},R.sourceBlobsAfter||{},R.qaBlobsAfter||{});
+ need(D.gate==='I6.5/B4-003'&&D.authority==='PAULA_EXPLICIT_CORRECTIVE_AUTHORIZATION'&&
+  D.parentHead==='2278ab067ace6e6bdaa4d35e7c0728f4a4160682'&&
+  physicalGit('merge-base',D.parentHead,'HEAD')===D.parentHead&&
+  R.schema==='GI_I65_B4003_CORRECTIVE_SOURCE_FIX_V1'&&R.gate===D.gate&&
+  R.authority===D.authority&&R.parentHead===D.parentHead&&R.status===D.status&&
+  D.receiptBlobSha===physicalGit('hash-object',D.receiptPath)&&
+  BL.receiptBlobSha===D.receiptBlobSha&&CL.receiptBlobSha===D.receiptBlobSha&&
+  sameJson(D.sourceBlobsAfter,R.sourceBlobsAfter)&&sameJson(D.qaBlobsAfter,R.qaBlobsAfter)&&
+  sameJson(BL.sourceBlobsAfter,R.sourceBlobsAfter)&&sameJson(BL.qaBlobsAfter,R.qaBlobsAfter)&&
+  sameJson(CL.sourceBlobsAfter,R.sourceBlobsAfter)&&sameJson(CL.qaBlobsAfter,R.qaBlobsAfter)&&
+  Object.keys(R.sourceBlobsAfter||{}).length===7&&Object.keys(R.qaBlobsAfter||{}).length===2&&
+  Object.keys(R.sourceBlobsAfter||{}).every(p=>(C.b4003CorrectiveSourceSecurityAuthorization20261024?.allowedSourcePaths||[]).includes(p))&&
+  Object.keys(R.qaBlobsAfter||{}).every(p=>(B4.boundaries?.allowedQaFiles||[]).includes(p))&&
+  D.compositionBlobSha===physicalGit('hash-object',I6_CANONICAL_COMPOSITION)&&
+  BL.compositionBlobSha===D.compositionBlobSha&&CL.receiptBlobSha===D.receiptBlobSha&&
+  Object.entries(sourceQa).every(([p,sha])=>physicalGit('hash-object',p)===sha)&&
+  R.findingsPreserved===295&&R.frozenTasksPreserved===86&&
+  R.firestoreRulesDeployAuthorized===false&&R.dataMutationAuthorized===false&&
+  R.realBusinessWritesAuthorized===false&&R.livePromotionAuthorized===false&&
+  D.firestoreRulesDeployAuthorized===false&&D.dataMutationAuthorized===false&&
+  D.realBusinessWritesAuthorized===false&&D.livePromotionAuthorized===false&&
+  C.b4003SecurityReleaseHold?.status==='ACTIVE_FAIL_CLOSED_UNAUTHORIZED_BROWSER_FIRESTORE_READ_WRITE'&&
+  B4.boundaries?.livePromotionAuthorized===false&&FIND.findings.length===295,
+  'B4_003_CORRECTIVE_SOURCE_SUCCESSOR_INVALID');
+ for(const [p,sha] of Object.entries(sourceQa)){
+  try{physicalGit('cat-file','-e',D.parentHead+':'+p);CORRECTIVE_SOURCE_PREVIOUS.set(p,physicalGit('rev-parse',D.parentHead+':'+p));}
+  catch(_){throw new Error('B4_003_CORRECTIVE_PARENT_MISSING_FILE:'+p);}
+ }
+ const priorSourceQa=Object.assign({},readJson(DUAL_HOST.receiptPath).sourceBlobsAfter||{},readJson(DUAL_HOST.receiptPath).qaBlobsAfter||{});
+ for(const p of Object.keys(priorSourceQa)){
+  try{physicalGit('cat-file','-e',DUAL_HOST.parentHead+':'+p);DUAL_PREVIOUS.set(p,physicalGit('rev-parse',DUAL_HOST.parentHead+':'+p));}
+  catch(_){/* Original dual-host proof did not include this path in its parent. */}
+ }
+ console.log('B4_003_CORRECTIVE_SOURCE=EXACT_BLOBS_SYNTHETIC_QA_PENDING_PREVIEW_SECURITY_HOLD');
+}
 if(DUAL_HOST_ACTIVE){
  const D=DUAL_HOST,R=readJson(D.receiptPath);
  const BL=B4.b4003DualHostProtectedTransport20261024||{};
@@ -123,7 +166,7 @@ if(DUAL_HOST_ACTIVE){
  }
  console.log('B4_003_DUAL_HOST_PROTECTED_SOURCE=EXACT_SOURCE_QA_PASS_SECURITY_HOLD');
 }
-const preDualPhysicalHash=p=>DUAL_PREVIOUS.get(p)||physicalGit('hash-object',p);
+const preDualPhysicalHash=p=>CORRECTIVE_SOURCE_PREVIOUS.get(p)||DUAL_PREVIOUS.get(p)||physicalGit('hash-object',p);
 dualHistoricBlobs=DUAL_PREVIOUS;
 const LATENCY_REPAIR=C.b4003PostAuthClientPagingLatencySuccessor20261023||{};
 const LATENCY_REPAIR_ACTIVE=LATENCY_REPAIR.status==='SOURCE_STAGED_SYNTHETIC_QA_PASS_AUTHENTICATED_UAT_HOLD';

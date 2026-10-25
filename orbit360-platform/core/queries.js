@@ -60,7 +60,15 @@ Orbit.q = (function () {
   }
   function confirmedCobro(row) {
     const state = textNorm(row && row.estado);
-    return state === 'pagado' || state === 'conciliado' || row && row.conciliado === true;
+    const paymentState = String(row && row.paymentState || '').trim().toUpperCase();
+    const applicationState = String(row && row.applicationState || '').trim().toUpperCase();
+    const op = textNorm(row && row.estadoOperativo);
+    const reported = ['pago_reportado','pago_reportado_aplicado','pago_reportado_asesor','pago_reportado_asesor_aplicado','pago_inferido','reportado','inferido'].includes(op) ||
+      ['PAID_REPORTED','PAID_INFERRED','REPORTED_PENDING_OPERATIVE_VALIDATION'].includes(paymentState) ||
+      row && (row.inferredPaid === true || row.paidInferred === true || row.pagoReportado === true);
+    if (reported) return false;
+    return state === 'pagado' || state === 'conciliado' || paymentState === 'PAID_DIRECT' ||
+      paymentState === 'PAID_CONFIRMED' || applicationState === 'APPLIED_DIRECT' || row && row.conciliado === true;
   }
   function paymentOriginKind(row) {
     try {
@@ -79,9 +87,13 @@ Orbit.q = (function () {
     const state = textNorm(row && row.estado);
     const paymentState = String(row && row.paymentState || '').trim().toUpperCase();
     const op = textNorm(row && row.estadoOperativo).replace(/\s+/g, '_');
-    return state === 'pagado' || paymentState.startsWith('PAID_') ||
-      ['pagado','pago_inferido','pago_reportado_aplicado','pago_reportado_asesor_aplicado'].includes(op) ||
-      !!(row && (row.cobroId || row.paidDate || row.fechaPago));
+    const applicationState = String(row && row.applicationState || '').trim().toUpperCase();
+    const denied = ['PAID_REPORTED','PAID_INFERRED','REPORTED_PENDING_OPERATIVE_VALIDATION'].includes(paymentState) ||
+      ['pago_inferido','pago_reportado','pago_reportado_aplicado','pago_reportado_asesor','pago_reportado_asesor_aplicado','reportado','inferido'].includes(op) ||
+      row && (row.inferredPaid === true || row.paidInferred === true || row.pagoReportado === true);
+    if (denied) return false;
+    return state === 'pagado' || state === 'conciliado' || paymentState === 'PAID_DIRECT' ||
+      paymentState === 'PAID_CONFIRMED' || applicationState === 'APPLIED_DIRECT' || row && row.conciliado === true;
   }
 
   // B4-003: cartera determines whether an obligation is open and overdue;
@@ -304,7 +316,7 @@ Orbit.q = (function () {
       if (rid && linkedReceiptIds.has(rid)) return false;
       const cobroId = String(r.cobroId || '').trim();
       if (cobroId && cobroIds.has(cobroId)) return false;
-      return receiptHasAppliedPayment(r) || paymentOriginKind(r) === 'CRM_DIRECT';
+      return receiptHasAppliedPayment(r);
     }).map(r => {
       const policy = policies.get(r.polizaId) || {};
       const origin = paymentOriginKind(r);

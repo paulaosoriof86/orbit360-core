@@ -51,4 +51,34 @@ assert.equal(country({polizaId:'cross',clienteId:'gt',pais:'CO'},map,pol),'REQUI
 assert.equal(country({polizaId:'good',clienteId:'gt',pais:'CO'},map,pol),'REQUIERE_VALIDACION');
 assert.equal(country({polizaId:'missing',clienteId:'co',pais:'CO'},map,pol),'REQUIERE_VALIDACION');
 assert.equal(country({polizaId:'good',clienteId:'missing',pais:'CO'},map,pol),'REQUIERE_VALIDACION');
+// SIGA/CRM source provenance is not payment confirmation. Execute the actual
+// confirmation helpers extracted from the changed production sources.
+function qaFunction(source,name){
+ const start=source.indexOf('function '+name+'(');
+ assert.ok(start>=0,'QA_HELPER_PRESENT_'+name);
+ const open=source.indexOf('{',start);let depth=0;
+ for(let i=open;i<source.length;i++){
+  const ch=source[i];
+  if(ch==='{')depth++;
+  else if(ch==='}'&&--depth===0)return source.slice(start,i+1);
+ }
+ throw new Error('QA_HELPER_UNCLOSED_'+name);
+}
+const textNorm=v=>String(v||'').trim().toLowerCase();
+const receiptPaidQ=vm.runInNewContext('('+qaFunction(newQuery,'receiptHasAppliedPayment')+')',{textNorm});
+const receiptPaidCobros=vm.runInNewContext('('+qaFunction(newCobros,'receiptHasAppliedPayment')+')',{});
+const confirmedCobroWithNorm=vm.runInNewContext('('+qaFunction(newQuery,'confirmedCobro')+')',{textNorm});
+const confirmedWrapper=row=>confirmedCobroWithNorm.call(null,row);
+assert.equal(receiptPaidQ({origen:'SIGA',origenPago:'CRM'}),false,'SIGA_ORIGIN_ALONE_NOT_PAID_QUERIES');
+assert.equal(receiptPaidCobros({origen:'SIGA',origenPago:'CRM'}),false,'SIGA_ORIGIN_ALONE_NOT_PAID_COBROS');
+assert.equal(receiptPaidQ({estado:'Pagado',paymentState:'PAID_REPORTED'}),false,'REPORTED_NOT_PAID_QUERIES');
+assert.equal(receiptPaidCobros({estado:'Pagado',paymentState:'PAID_INFERRED'}),false,'INFERRED_NOT_PAID_COBROS');
+assert.equal(receiptPaidQ({paymentState:'PAID_DIRECT'}),true,'EXPLICIT_DIRECT_PAYMENT_COUNTS');
+assert.equal(receiptPaidCobros({applicationState:'APPLIED_DIRECT'}),true,'EXPLICIT_APPLICATION_COUNTS');
+assert.equal(confirmedWrapper({estado:'Pagado',paymentState:'PAID_REPORTED'}),false,'REPORTED_CANONICAL_ROW_DENIED');
+assert.equal(confirmedWrapper({estado:'Pagado'}),true,'CANONICAL_PAID_STATE_COUNTS');
+assert.ok(newQuery.includes('return receiptHasAppliedPayment(r);'),'REALIZED_ROWS_REQUIRE_EXPLICIT_RECEIPT_CONFIRMATION');
+assert.ok(!newQuery.includes("receiptHasAppliedPayment(r) || paymentOriginKind(r) === 'CRM_DIRECT'"),'SIGA_ORIGIN_MUST_NOT_PROJECT_PAID');
+console.log('GI_B4_003_SIGA_CONFIRMATION_SOURCE_TEST_PASS source_only_pending reported_inferred_rejected explicit_direct_and_applied_accepted');
+
 console.log('GI_B4_003_COUNTRY_FINANCE_PARITY_SYNTHETIC_PASS checks=12 source=COBROS_AND_QUERIES no_network_no_writes',JSON.stringify({baseline,fixed,noPortfolio,todo}));
