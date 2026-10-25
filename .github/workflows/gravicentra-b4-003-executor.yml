@@ -1409,6 +1409,7 @@ jobs:
 
       # Candidate Rules tests use an isolated emulator project and synthetic identities only.
       - name: Prepare exact B4-003 Rules emulator
+        id: rules_emulator_prep
         if: always() && steps.gate.outputs.security_qa == 'true'
         env:
           EXPECTED_RULES_GIT_BLOB: ${{ steps.gate.outputs.security_rules_git_blob }}
@@ -1426,7 +1427,7 @@ jobs:
             done
             return 124
           }
-          retry_bounded 420 npm install --prefix "$ROOT" --no-save --package-lock=false --ignore-scripts --no-audit --no-fund firebase-tools@14.10.12 firebase@11.10.0 @firebase/rules-unit-testing@4.0.1 google-auth-library@9.15.1
+          retry_bounded 420 npm install --prefix "$ROOT" --no-save --package-lock=false --ignore-scripts --no-audit --no-fund firebase-tools@14.10.1 firebase@11.10.0 @firebase/rules-unit-testing@4.0.1 google-auth-library@9.15.1
           node tools/gravicentra-firebase-tools-empty-extensions-workaround-v1.mjs "$ROOT"
           CLI="$ROOT/node_modules/firebase-tools/lib/bin/firebase.js"
           test -f "$CLI"
@@ -1495,7 +1496,7 @@ jobs:
             }finally{if(env)await env.cleanup()}})().catch(e=>{console.error('B4_003_RULES_EMULATOR_FAIL:'+String(e.stack||e));process.exitCode=1});
           NODE
       - name: Execute exact B4-003 Rules emulator matrix
-        if: always() && steps.gate.outputs.security_qa == 'true'
+        if: steps.gate.outputs.security_qa == 'true' && steps.rules_emulator_prep.outcome == 'success'
         env:
           EXPECTED_RULES_GIT_BLOB: ${{ steps.gate.outputs.security_rules_git_blob }}
           EXPECTED_RULES_SHA256: ${{ steps.gate.outputs.security_rules_sha256 }}
@@ -1505,7 +1506,7 @@ jobs:
           node --check "$RUNNER_TEMP/b4-003-rules-emulator.test.cjs"
           NODE_PATH="$B4_RULES_QA_ROOT/node_modules" node "$FIREBASE_CLI_BIN" emulators:exec --only firestore --project demo-gravicentra-b4-003 --config "$RUNNER_TEMP/b4-003-rules-emulator.json" "NODE_PATH='$B4_RULES_QA_ROOT/node_modules' EXPECTED_RULES_GIT_BLOB='$EXPECTED_RULES_GIT_BLOB' EXPECTED_RULES_SHA256='$EXPECTED_RULES_SHA256' B4_SECURITY_EVIDENCE='$B4_SECURITY_EVIDENCE' node '$RUNNER_TEMP/b4-003-rules-emulator.test.cjs'"
       - name: Preserve exact B4-003 Rules emulator evidence
-        if: always() && steps.gate.outputs.security_qa == 'true'
+        if: always() && steps.gate.outputs.security_qa == 'true' && steps.rules_emulator_prep.outcome == 'success'
         uses: actions/upload-artifact@v4
         with:
           name: gravicentra-b4-003-exact-rules-emulator-${{ github.run_id }}
