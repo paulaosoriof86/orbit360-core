@@ -92,8 +92,11 @@ if(SCOPED_PREVIEW){
   throw new Error('B4_003_SCOPED_PREVIEW_BOUNDARY_DENIED');
  const entry=path.join(BACKEND,'bootstrap.js');
  const base=read(entry);
- if(base.includes('b4-003-scoped-policy-callable'))throw new Error('B4_003_SCOPED_EXPORT_DUPLICATE');
- fs.writeFileSync(entry,base+'\n// B4-003 dual-name source; executor deploys Preview only.\nObject.assign(module.exports,require(\'./b4-003-scoped-policy-callable\'));\n');
+ const alreadyIntegrated=base.includes("require('./b4-003-scoped-policy-callable')");
+ if(base.includes('b4-003-scoped-policy-callable')&&!alreadyIntegrated)
+  throw new Error('B4_003_SCOPED_EXPORT_DUPLICATE');
+ if(!alreadyIntegrated)
+  fs.writeFileSync(entry,base+'\n// B4-003 dual-name source; executor deploys Preview only.\nObject.assign(module.exports,require(\'./b4-003-scoped-policy-callable\'));\n');
  fs.writeFileSync(path.join(EVIDENCE,'scoped-preview-authorization.json'),JSON.stringify({gate:RELEASE_GATE,stagedExports:['orbit360ScopedPolicyReadPreview','orbit360ScopedPolicyRead'],deployedExport:'orbit360ScopedPolicyReadPreview',liveExportDeployed:false,sourceOnlyStaged:true,sharedRulesDeploy:false,livePromotion:false,realDataWrites:0})+'\n');
 }
 

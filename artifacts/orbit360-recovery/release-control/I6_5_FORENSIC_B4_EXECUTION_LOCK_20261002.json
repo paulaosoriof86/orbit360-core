@@ -65,7 +65,8 @@
     "allowedQaFiles": [
       "tools/gravicentra-i6-5-b4-003-contract.mjs",
       "tools/gravicentra-i6-5-b4-003-preview-proof.mjs",
-      "tools/gravicentra-i6-5-b4-003-renewals-priority-preview-proof.mjs"
+      "tools/gravicentra-i6-5-b4-003-renewals-priority-preview-proof.mjs",
+      "tools/gravicentra-i6-1-preview-package.mjs"
     ],
     "syntheticQaWritesAuthorized": true
   },
@@ -140,7 +141,8 @@
       "tools/gravicentra-b4-003-post-auth-bootstrap-diagnostic.test.cjs",
       "tools/gravicentra-b4-003-config-users-owner.test.cjs",
       "tools/gravicentra-b4-003-inicio-personal-recaudo.test.cjs",
-      "tools/gravicentra-b4-003-active-insurer-readiness.test.cjs"
+      "tools/gravicentra-b4-003-active-insurer-readiness.test.cjs",
+      "tools/gravicentra-i6-1-preview-package.mjs"
     ],
     "renewalProductMutationAuthorized": false,
     "policyVisualMutationAuthorized": true,

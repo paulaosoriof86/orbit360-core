@@ -1,0 +1,31 @@
+{
+  "schema": "GI_I65_B4003_PREVIEW_PACKAGER_DUPLICATE_EXPORT_ROOTFIX_V1",
+  "gate": "I6.5/B4-003",
+  "status": "SOURCE_QA_ROOTFIX_PENDING_EXACT_PREVIEW_RETRY",
+  "failedRunId": 40151726166,
+  "failedStep": "Materialize immutable B4-003 package",
+  "failureCode": "B4_003_SCOPED_EXPORT_DUPLICATE",
+  "rootCause": "The protected callable was added to source bootstrap after the preview packager's guarded injection path had been established. Packaging stopped before any backend or Hosting deploy.",
+  "correction": "When assembling an authorized scoped Preview, the packager now verifies whether bootstrap already exports the module; it injects only when absent. The B4 preview deploy target remains orbit360ScopedPolicyReadPreview only.",
+  "paths": {
+    "packager": "tools/gravicentra-i6-1-preview-package.mjs",
+    "previousPackagerBlobSha": "6098758271f8e0787a3e73708321fc300a0a455f",
+    "currentPackagerBlobSha": "245ca9140941d93c069f9229b0e9c82364eeff2f",
+    "executionLock": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B4_EXECUTION_LOCK_20261002.json",
+    "previousExecutionLockBlobSha": "c2174833933f5ad19dc4b70e40d897a7a051aa06",
+    "currentExecutionLockBlobSha": "b5294bc0c16a3974a5aef922d108ccfe7a68c203"
+  },
+  "effects": {
+    "packageBuildFailedBeforeDeploy": true,
+    "previewDeployed": false,
+    "hostingDeployed": false,
+    "functionsDeployed": false,
+    "sharedFirestoreRulesChanged": false,
+    "operationalWrites": 0,
+    "liveChanged": false
+  },
+  "preserved": {
+    "findings": 295,
+    "frozenTasks": 86
+  }
+}
