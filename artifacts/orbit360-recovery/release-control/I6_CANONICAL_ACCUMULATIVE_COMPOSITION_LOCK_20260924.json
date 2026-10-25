@@ -157,7 +157,7 @@
     ".github/workflows/cotcomp-workflow-s419-source-qa.yml": "1123c1bd7848433ce51c24586e9fedbbbd581dff",
     "docs/ays/GRAVICENTRA_QUOTE_AUTHORITY_CONTRACT_v1_20261003.md": "ad1abea0181c350a0effd819cbff483673eb24dd",
     "functions/assignable-advisor-roster.js": "75ca53db55e2665123589b0e63253a8e4f8c377c",
-    "functions/bootstrap.js": "533f480e84ca4c4edbc8f6183c7d8f153a977569",
+    "functions/bootstrap.js": "42fd05b81a02d428e590c36e3feb32be202f4965",
     "functions/cobros-reconciliation-domain.js": "5b27038d1c8380e4d2d0ed044996c1570d8c3767",
     "functions/cotcomp-workflow-owner-patch.test.js": "f09315b416e95415ade2d811c4d7e52baba8904d",
     "functions/document-drive-domain.js": "928dc218aa09be4648552f84502e50f4c0d65227",
@@ -6638,6 +6638,24 @@
     "dataMutation": false,
     "businessWrites": false,
     "sharedFirestoreRules": false,
+    "livePromotion": false
+  },
+  "b4003BootstrapPreviewIsolationSuccessor20261025": {
+    "status": "COMPOSITION_SUCCESSOR_BOUND_PENDING_EXACT_PREVIEW",
+    "gate": "I6.5/B4-003",
+    "authority": "PAULA_EXPLICIT_CORRECTIVE_AUTHORIZATION",
+    "sourceCommit": "15588c3c8ebeb11eac630cce624d136723bcf534",
+    "sourcePath": "functions/bootstrap.js",
+    "predecessorSourceBlobSha": "533f480e84ca4c4edbc8f6183c7d8f153a977569",
+    "sourceBlobSha": "42fd05b81a02d428e590c36e3feb32be202f4965",
+    "predecessorCompositionBlobSha": "ec6d567cd7ed42950d8dfabf201ce64433a11567",
+    "sourceSuccessorReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_BOOTSTRAP_PREVIEW_ISOLATION_SUCCESSOR_20261025.json",
+    "sourceSuccessorReceiptBlobSha": "d137e86d33f48c0aadf36c5b3c92e672c5afac44",
+    "productFileSetChanged": false,
+    "productFileCount": 114,
+    "sharedFirestoreRules": false,
+    "dataMutation": false,
+    "businessWrites": false,
     "livePromotion": false
   }
 }
