@@ -1062,7 +1062,7 @@ jobs:
           const packagerReceiptPath=correctivePreviewReceipt.packagerFixReceiptPath||'';
           const packagerReceipt=packagerReceiptPath?JSON.parse(fs.readFileSync(packagerReceiptPath,'utf8')):{};
           const successorSourceCommitBlob=sourceSuccessor.sourceCommit
-            ?execFileSync('git',['rev-parse',sourceSuccessor.sourceCommit+':functions/bootstrap.js'],{encoding:'utf8'}).trim():'';
+            ?require('node:child_process').execFileSync('git',['rev-parse',sourceSuccessor.sourceCommit+':functions/bootstrap.js'],{encoding:'utf8'}).trim():'';
           const correctivePreviewSourceBound=Object.entries(correctiveExpectedProductBlobs).length===7
             && Object.entries(correctiveExpectedProductBlobs).every(([p,sha])=>productSha(p)===sha&&l.boundaries?.allowedProductFiles?.includes(p))
             && Object.entries(correctiveExpectedQaBlobs).length===2
@@ -1076,7 +1076,7 @@ jobs:
             && packagerReceipt.bootstrapIsolation20261024?.sourceFixCommit===sourceSuccessor.sourceCommit
             && packagerReceipt.bootstrapIsolation20261024?.correctedBootstrapBlobSha===correctiveExpectedProductBlobs['functions/bootstrap.js']
             && packagerReceipt.bootstrapIsolation20261024?.scopedPackageSmoke?.notAReleaseArtifact===true
-            && correctivePreviewReceipt.baseHead===execFileSync('git',['rev-parse','HEAD^'],{encoding:'utf8'}).trim()
+            && correctivePreviewReceipt.baseHead===require('node:child_process').execFileSync('git',['rev-parse','HEAD^'],{encoding:'utf8'}).trim()
             && correctivePreviewReceipt.triggerSubject===correctivePreviewSubject
             && correctivePreviewReceipt.sourceSuccessorReceiptBlobSha===correctivePreviewAuth.sourceSuccessorReceiptBlobSha;
           const correctiveSourcePreview=correctivePreviewRequested
