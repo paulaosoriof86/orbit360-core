@@ -1,0 +1,31 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_BOOTSTRAP_COMPOSITION_SUCCESSOR_V1",
+  "product": "Gravicentra Insurance",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "gate": "I6.5/B4-003",
+  "status": "COMPOSITION_SUCCESSOR_BOUND_PENDING_EXACT_PREVIEW",
+  "authority": "PAULA_EXPLICIT_CORRECTIVE_AUTHORIZATION",
+  "sourceCommit": "15588c3c8ebeb11eac630cce624d136723bcf534",
+  "sourcePath": "functions/bootstrap.js",
+  "predecessorSourceBlobSha": "533f480e84ca4c4edbc8f6183c7d8f153a977569",
+  "sourceBlobSha": "42fd05b81a02d428e590c36e3feb32be202f4965",
+  "predecessorCompositionBlobSha": "ec6d567cd7ed42950d8dfabf201ce64433a11567",
+  "successorCompositionBlobSha": "ad7979d99c28c375ae6952b55aca5fcc0e47e71e",
+  "sourceSuccessorReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_BOOTSTRAP_PREVIEW_ISOLATION_SUCCESSOR_20261025.json",
+  "sourceSuccessorReceiptBlobSha": "d137e86d33f48c0aadf36c5b3c92e672c5afac44",
+  "productFileSetChanged": false,
+  "productFileCount": 114,
+  "scope": {
+    "previewOnly": true,
+    "sharedFirestoreRules": false,
+    "dataMutation": false,
+    "businessWrites": false,
+    "livePromotion": false
+  },
+  "preserved": {
+    "findings": 295,
+    "frozenTasks": 86,
+    "historicalSourceBlob": "533f480e84ca4c4edbc8f6183c7d8f153a977569"
+  }
+}
