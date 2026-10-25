@@ -1,0 +1,25 @@
+{
+  "schema": "GI_I65_B4003_CORRECTIVE_GUARD_LOGIN_HISTORY_V1",
+  "status": "QA_GUARD_SOURCE_FIXED_PENDING_EXACT_GATE_RERUN",
+  "gate": "I6.5/B4-003",
+  "authority": "PAULA_EXPLICIT_CORRECTIVE_AUTHORIZATION",
+  "recordedAt": "2026-10-25",
+  "failedRunId": 40151350069,
+  "failureCode": "B4_003_P0_LOGIN_OWNER_BLOB_NOT_PINNED",
+  "causalFinding": "The historical P0 login proof compared its protected reader blob to the mutable current predecessor (ef5842c262c690d42a39afa57e77a309205ee630) rather than the UAT5 proof's pinned historical blob (ae77e1e62f8fb940cf665b01c48d190c1457b66f).",
+  "correction": "Keep the exact login proof source and QA manifests, current release hold, and active corrective source validation. Remove only equality checks against mutable current Git adapters from this historical proof; current bytes are checked through corrective-source and current composition bindings.",
+  "guardPath": "tools/gravicentra-i6-control-plane-guard-v1.mjs",
+  "previousGuardBlobSha": "404bf3bb929bb1fd85ac9428cdae318fd23ae06e",
+  "currentGuardBlobSha": "2937e2c437ef900b2210f28a618016ffd4ece6ac",
+  "previousUat5PreviewHistoryReceiptSha": "1aab1f6cd30a8644fd50d8bd36519f4cc93dcae4",
+  "uat5SourceReceiptSha": "be6dd193f68aee5bce7febd0729124452dadc865",
+  "effects": {
+    "productDataWrites": 0,
+    "firestoreRulesChanged": false,
+    "functionsDeployed": false,
+    "previewDeployed": false,
+    "liveChanged": false,
+    "findingsPreserved": 295,
+    "frozenTasksPreserved": 86
+  }
+}

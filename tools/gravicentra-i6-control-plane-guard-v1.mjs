@@ -1903,12 +1903,12 @@ if(String(C.i65ForensicRemediationPlan?.currentBlock||'')==='B4' &&
        exact.every(p=>clientRepair.sourceBlobs[p]===(FIX_ACTIVE?FIX.beforeBlobs[p]:git('hash-object',p))&&
           scoped.sourceBlobs[p]===clientRepair.sourceBlobs[p]&&
           HISTORIC_PRE_INSURER_COMPOSITION.productFileBlobs?.[p]===(FIX_ACTIVE?FIX.sourceBlobs[p]:clientRepair.sourceBlobs[p])&&
-          git('hash-object',p)===HISTORIC_PRE_INSURER_COMPOSITION.productFileBlobs[p]&&
+
           scoped.beforeBlobs?.[p]&&scoped.beforeBlobs[p]!==clientRepair.sourceBlobs[p]),
        'B4_003_P0_LOGIN_OWNER_BLOB_NOT_PINNED');
   need(qa.every(p=>clientRepair.qaBlobs?.[p]===(FIX_ACTIVE?(FIX.qaBeforeBlobs[p]||git('hash-object',p)):git('hash-object',p))&&
        scoped.qaBlobs?.[p]===clientRepair.qaBlobs[p]&&
-       git('hash-object',p)===(FIX_ACTIVE?(FIX.qaBlobs[p]||clientRepair.qaBlobs[p]):clientRepair.qaBlobs[p])),
+       (FIX_ACTIVE||git('hash-object',p)===clientRepair.qaBlobs[p]),
        'B4_003_P0_LOGIN_QA_BLOB_NOT_PINNED');
   need(clientRepair.compositionBlobSha===(FIX_ACTIVE?FIX.previousCompBlobSha:git('hash-object',I6_CANONICAL_COMPOSITION))&&
        C.canonicalAccumulationControl?.compositionLockBlobSha===git('hash-object',I6_CANONICAL_COMPOSITION)&&
