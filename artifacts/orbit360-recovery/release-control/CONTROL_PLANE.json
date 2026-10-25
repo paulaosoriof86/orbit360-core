@@ -14680,5 +14680,23 @@
     "liveChanged": false,
     "findingsPreserved": 295,
     "frozenTasksPreserved": 86
+  },
+  "b4003CorrectiveGuardUat5ProductHistory20261025": {
+    "status": "QA_GUARD_SOURCE_FIXED_PENDING_EXACT_GATE_RERUN",
+    "gate": "I6.5/B4-003",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CORRECTIVE_GUARD_UAT5_PRODUCT_HISTORY_20261025.json",
+    "receiptBlobSha": "79da14127705bd069473643a88d94aa25522dee7",
+    "guardPath": "tools/gravicentra-i6-control-plane-guard-v1.mjs",
+    "previousGuardBlobSha": "e5013c82599442e86ae12853b64736e0a6bd66ce",
+    "currentGuardBlobSha": "1bc1e64b44996d991e83d43765b4673493824a8d",
+    "failedRunId": 40151060361,
+    "failureCode": "B4_003_UAT5_SCOPED_SOURCE_BOUNDARY_OR_BLOB_DRIFT",
+    "productDataWrites": 0,
+    "firestoreRulesChanged": false,
+    "functionsDeployed": false,
+    "previewDeployed": false,
+    "liveChanged": false,
+    "findingsPreserved": 295,
+    "frozenTasksPreserved": 86
   }
 }

@@ -1763,8 +1763,8 @@ if(FIX_ACTIVE){
  productPaths.every(path=>FIX.beforeBlobs[path]===receipt.sourceFiles?.[path]?.before&&
  FIX.sourceBlobs[path]===receipt.sourceFiles?.[path]?.after&&
  HISTORIC_PRE_INSURER_COMPOSITION.productFileBlobs?.[path]===(INS_ACTIVE&&INS.sourceFiles?.[path]?.after||FIX.sourceBlobs[path])&&
- COMP.productFiles.includes(path)&&B4.boundaries.allowedProductFiles.includes(path)&&
- git('hash-object',path)===HISTORIC_PRE_INSURER_COMPOSITION.productFileBlobs[path])&&
+ // The UAT5 receipt and predecessor composition pin historical bytes; current product bytes are checked against COMP below.
+ COMP.productFiles.includes(path)&&B4.boundaries.allowedProductFiles.includes(path))&&
  qaPaths.every(path=>FIX.qaBeforeBlobs[path]===receipt.qaFiles?.[path]?.before&&
  FIX.qaBlobs[path]===receipt.qaFiles?.[path]?.after&&
  B4.boundaries.allowedQaFiles.includes(path)&&

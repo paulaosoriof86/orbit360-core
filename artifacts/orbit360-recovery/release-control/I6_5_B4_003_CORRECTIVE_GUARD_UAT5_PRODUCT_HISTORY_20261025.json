@@ -1,0 +1,27 @@
+{
+  "schema": "GI_I65_B4003_CORRECTIVE_GUARD_UAT5_PRODUCT_HISTORY_V1",
+  "status": "QA_GUARD_SOURCE_FIXED_PENDING_EXACT_GATE_RERUN",
+  "gate": "I6.5/B4-003",
+  "authority": "PAULA_EXPLICIT_CORRECTIVE_AUTHORIZATION",
+  "recordedAt": "2026-10-25",
+  "failedRunId": 40151060361,
+  "failureCode": "B4_003_UAT5_SCOPED_SOURCE_BOUNDARY_OR_BLOB_DRIFT",
+  "causalFinding": "UAT5 historical product comparison used a Git adapter bound to the current corrective predecessor for functions/b4-003-scoped-related-reader.js (ef5842c262c690d42a39afa57e77a309205ee630), while the exact UAT5 receipt/composition pins ae77e1e62f8fb940cf665b01c48d190c1457b66f. The UAT5 receipt and predecessor composition are cryptographically pinned; current product bytes are validated separately against the current composition.",
+  "correction": "Remove only the historical check against the mutable Git adapter. Preserve exact receipt before/after, composition, product allowlist and current composition/blob validation.",
+  "guardPath": "tools/gravicentra-i6-control-plane-guard-v1.mjs",
+  "previousGuardBlobSha": "e5013c82599442e86ae12853b64736e0a6bd66ce",
+  "currentGuardBlobSha": "1bc1e64b44996d991e83d43765b4673493824a8d",
+  "precedingGuardCorrectionReceiptBlobSha": "fa7da34e3fd0704bb4f575e8a08b67efabe59896",
+  "uat5SourcePatchReceiptBlobSha": "be6dd193f68aee5bce7febd0729124452dadc865",
+  "expectedHistoricalReaderBlob": "ae77e1e62f8fb940cf665b01c48d190c1457b66f",
+  "observedAdapterBlob": "ef5842c262c690d42a39afa57e77a309205ee630",
+  "effects": {
+    "productDataWrites": 0,
+    "firestoreRulesChanged": false,
+    "functionsDeployed": false,
+    "previewDeployed": false,
+    "liveChanged": false,
+    "findingsPreserved": 295,
+    "frozenTasksPreserved": 86
+  }
+}
