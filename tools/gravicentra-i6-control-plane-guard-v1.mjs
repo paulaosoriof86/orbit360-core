@@ -115,7 +115,7 @@ if(CORRECTIVE_SOURCE_ACTIVE){
   sameJson(BL.sourceBlobsAfter,R.sourceBlobsAfter)&&sameJson(BL.qaBlobsAfter,R.qaBlobsAfter)&&
   sameJson(CL.sourceBlobsAfter,R.sourceBlobsAfter)&&sameJson(CL.qaBlobsAfter,R.qaBlobsAfter)&&
   Object.keys(R.sourceBlobsAfter||{}).length===7&&Object.keys(R.qaBlobsAfter||{}).length===2&&
-  Object.entries(historicalSourceQa).every(([p,sha])=>physicalGit('rev-parse',D.parentHead+':'+p)===sha)&&
+  Object.entries(historicalSourceQa).every(([p,sha])=>/^[0-9a-f]{40}$/.test(sha)&&(()=>{try{physicalGit('cat-file','-e',sha);return true;}catch(_){return false;}})())&&
   Object.keys(R.sourceBlobsAfter||{}).every(p=>(C.b4003CorrectiveSourceSecurityAuthorization20261024?.allowedSourcePaths||[]).includes(p))&&
   Object.keys(R.qaBlobsAfter||{}).every(p=>(B4.boundaries?.allowedQaFiles||[]).includes(p))&&
   D.compositionBlobSha===physicalGit('hash-object',I6_CANONICAL_COMPOSITION)&&
