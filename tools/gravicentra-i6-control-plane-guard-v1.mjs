@@ -1371,7 +1371,8 @@ if(PCACHE_ACTIVE){
  console.log('B4_003_POLIZAS_CONTEXT_CACHE_QA_PASS_SYNTHETIC_NO_FIRESTORE_NO_PREVIEW');
 }
 const PCACHE_PREVIEW=C.b4003PolizasContextCachePreviewAuthorization20261020||{};
-if(PCACHE_PREVIEW.status==='AUTHORIZED_EXACT_READONLY_PREVIEW'){
+// Keep the 20-Oct Polizas authorization as historical evidence when a separately validated B4 corrective successor is active.
+if(PCACHE_PREVIEW.status==='AUTHORIZED_EXACT_READONLY_PREVIEW'&&!CORRECTIVE_SOURCE_ACTIVE){
  const locked=B4.b4003PolizasContextCachePreviewAuthorization20261020||{};
  const path='artifacts/orbit360-recovery/release-control/I6_5_B4_003_POLIZAS_CONTEXT_CACHE_PREVIEW_AUTH_20261020.json';
  const receipt=exists(path)?readJson(path):{};
@@ -1408,7 +1409,8 @@ if(PCACHE_PREVIEW.status==='AUTHORIZED_EXACT_READONLY_PREVIEW'){
  console.log('B4_003_POLIZAS_CTX_EXACT_PREVIEW_AUTH_PASS_READONLY_LIVE_HOLD');
 }
 const PCACHE_PROOF=C.b4003PolizasContextCachePreviewProof20261020||{};
-if(PCACHE_PROOF.status==='EXACT_TECHNICAL_PREVIEW_PASS_AUTHENTICATED_UAT_HOLD'){
+// The exact technical proof below belongs to the predecessor source/composition; the successor dispatch is validated in the corrective-source guard above.
+if(PCACHE_PROOF.status==='EXACT_TECHNICAL_PREVIEW_PASS_AUTHENTICATED_UAT_HOLD'&&!CORRECTIVE_SOURCE_ACTIVE){
  const lock=B4.b4003PolizasContextCachePreviewProof20261020||{};
  const d=C.b4003PolizasContextCachePreviewDispatch20261020||{};
  const p='artifacts/orbit360-recovery/release-control/I6_5_B4_003_POLIZAS_CONTEXT_CACHE_EXACT_TECHNICAL_PREVIEW_READBACK_20261020.json';
