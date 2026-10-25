@@ -7,7 +7,7 @@
   "status": "AUTHORIZED_EXACT_ISOLATED_READONLY_PREVIEW_PENDING_DISPATCH",
   "authority": "PAULA_EXPLICIT_CORRECTIVE_AUTHORIZATION",
   "triggerSubject": "build(i6.5 B4-003): verify authorized corrective source in isolated Preview",
-  "baseHead": "e744d423fd9766c20649122e498c1cad47df8dbf",
+  "baseHead": "9803f0c074120664778f0d73494bbda5deb98b1c",
   "sourceFixReceiptBlobSha": "19b6e0644015ea34b70e0216e0d128f7df2833e9",
   "sourceSuccessorReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_BOOTSTRAP_PREVIEW_ISOLATION_SUCCESSOR_20261025.json",
   "sourceSuccessorReceiptBlobSha": "d137e86d33f48c0aadf36c5b3c92e672c5afac44",
