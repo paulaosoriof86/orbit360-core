@@ -1236,7 +1236,7 @@ jobs:
            const securityRulesGitBlob=execFileSync('git',['hash-object',securityRulesPath],{encoding:'utf8'}).trim();
            const securityRulesSha256=require('node:crypto').createHash('sha256').update(fs.readFileSync(securityRulesPath)).digest('hex');
            const securityParent=execFileSync('git',['rev-parse','HEAD^'],{encoding:'utf8'}).trim();
-           const securityParentAllowed=['7324d0a99aec70462e15dbfcf1b068448d2567c5','4d282bbda7159ee11c2c98791b4b73b7fd5c75b7','96185a90d9445c78ddd61c6a00d8c8941c3eaca3','6550b02f51394de4f97c8d50eb8d066bbbecb321'].includes(securityParent);
+           const securityParentAllowed=['7324d0a99aec70462e15dbfcf1b068448d2567c5','4d282bbda7159ee11c2c98791b4b73b7fd5c75b7','96185a90d9445c78ddd61c6a00d8c8941c3eaca3','6550b02f51394de4f97c8d50eb8d066bbbecb321','f4138b00eba8ae795bc88b40a2f206370a6d1e6e'].includes(securityParent);
            const securityQa=securityRequested&&process.env.GITHUB_REF_NAME==='recovery/fase-a-clean-20260831'
              &&securityParentAllowed&&securityRulesGitBlob==='63a71c3bc26d32e3bc7ed2836364e5327283956a'
              &&securityAuth.gate==='I6.5/B4-003'&&securityAuth.sourceCorrectionAuthorized===true
