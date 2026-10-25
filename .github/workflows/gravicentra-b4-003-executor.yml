@@ -1230,6 +1230,24 @@ jobs:
             && l.boundaries?.livePromotionAuthorized===false;
           if(r26RulesTrigger&&!r26RulesReadOnly)throw Error('B4_003_R26_RULES_READONLY_GATE_FAIL_CLOSED');
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'r26_rules_readonly='+(r26RulesReadOnly?'true':'false')+'\n');
+           const securitySubject='test(i6.5 B4-003): exact candidate Rules emulator and effective readback',securityRequested=currentSubject===securitySubject;
+           const securityAuth=c.b4003CorrectiveSourceSecurityAuthorization20261024||{},securityFix=c.b4003CorrectiveSourceFix20261025||{};
+           const securityRulesPath='firestore.b4-003-scoped-candidate.rules';
+           const securityRulesGitBlob=execFileSync('git',['hash-object',securityRulesPath],{encoding:'utf8'}).trim();
+           const securityRulesSha256=require('node:crypto').createHash('sha256').update(fs.readFileSync(securityRulesPath)).digest('hex');
+           const securityParent=execFileSync('git',['rev-parse','HEAD^'],{encoding:'utf8'}).trim();
+           const securityQa=securityRequested&&process.env.GITHUB_REF_NAME==='recovery/fase-a-clean-20260831'
+             &&securityParent==='7324d0a99aec70462e15dbfcf1b068448d2567c5'&&securityRulesGitBlob==='63a71c3bc26d32e3bc7ed2836364e5327283956a'
+             &&securityAuth.gate==='I6.5/B4-003'&&securityAuth.sourceCorrectionAuthorized===true
+             &&securityAuth.exactCandidateRulesPath===securityRulesPath&&securityAuth.firestoreRulesDeployAuthorized===false
+             &&securityAuth.dataMutationAuthorized===false&&securityAuth.realBusinessWritesAuthorized===false
+             &&securityAuth.impersonationAuthorized===false&&securityAuth.livePromotionAuthorized===false
+             &&securityFix.firestoreRulesDeployAuthorized===false&&securityFix.dataMutationAuthorized===false
+             &&securityFix.livePromotionAuthorized===false&&l.activeFinding?.id==='B4-003'
+             &&l.counts?.total===295&&l.boundaries?.livePromotionAuthorized===false;
+           if(securityRequested&&!securityQa)throw Error('B4_003_SECURITY_QA_AUTH_OR_EXACT_RULES_BINDING_INVALID_FAIL_CLOSED');
+           fs.appendFileSync(process.env.GITHUB_OUTPUT,'security_qa='+(securityQa?'true':'false')+'\n');
+           if(securityQa){fs.appendFileSync(process.env.GITHUB_OUTPUT,'security_rules_git_blob='+securityRulesGitBlob+'\n');fs.appendFileSync(process.env.GITHUB_OUTPUT,'security_rules_sha256='+securityRulesSha256+'\n');}
           const exactPreview=String(c.currentB4?.previewUrl||'');
           const r26ReadOnly=qaTrigger
             && c.currentB4?.status==='B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL'
@@ -1374,7 +1392,7 @@ jobs:
           if(currentSubject===commercialSubject&&!commercialReadonly)throw Error('B4_003_COMMERCIAL_READONLY_GATE_DENIED');
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'commercial_readonly='+(commercialReadonly?'true':'false')+'\n');
 
-          const requestedModes={scopedPreview,preview:previewOk,renewalsPreview,apply:applyOk,r20DryRun,r20Apply,r20CutoffApply,secondReviewDryRun,p0CumulativeReadOnly,r26RulesReadOnly,r26ReadOnly,financeCoverage,financialIdAllowed,publicBrowserSmoke,commercialReadonly};
+          const requestedModes={scopedPreview,preview:previewOk,renewalsPreview,apply:applyOk,r20DryRun,r20Apply,r20CutoffApply,secondReviewDryRun,p0CumulativeReadOnly,r26RulesReadOnly,r26ReadOnly,financeCoverage,financialIdAllowed,publicBrowserSmoke,commercialReadonly,securityQa};
           const enabledModes=Object.entries(requestedModes).filter(([,on])=>on).map(([name])=>name);
           if(!enabledModes.length){
             fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY,'### B4-003: NOOP (not a Preview PASS)\nNo build, deploy, authenticated browser test, or readback was executed. Control Plane nextAction: `'+String(c.nextAction)+'`.\n');
@@ -1385,6 +1403,119 @@ jobs:
           NODE
 
 
+
+      # Candidate Rules tests use an isolated emulator project and synthetic identities only.
+      - name: Prepare exact B4-003 Rules emulator
+        if: always() && steps.gate.outputs.security_qa == 'true'
+        env:
+          EXPECTED_RULES_GIT_BLOB: ${{ steps.gate.outputs.security_rules_git_blob }}
+          EXPECTED_RULES_SHA256: ${{ steps.gate.outputs.security_rules_sha256 }}
+        run: |
+          set -euo pipefail
+          ROOT="$RUNNER_TEMP/b4-003-rules-qa"
+          mkdir -p "$ROOT"
+          retry_bounded() {
+            local limit="$1"; shift
+            for attempt in 1 2; do
+              echo "B4_RULES_QA_INSTALL_ATTEMPT=$attempt LIMIT_SECONDS=$limit"
+              if timeout --foreground "${limit}s" "$@"; then return 0; fi
+              if [ "$attempt" -lt 2 ]; then sleep 5; fi
+            done
+            return 124
+          }
+          retry_bounded 420 npm install --prefix "$ROOT" --no-save --package-lock=false --ignore-scripts --no-audit --no-fund firebase-tools@14.10.12 firebase@11.10.0 @firebase/rules-unit-testing@4.0.1 google-auth-library@9.15.1
+          node tools/gravicentra-firebase-tools-empty-extensions-workaround-v1.mjs "$ROOT"
+          CLI="$ROOT/node_modules/firebase-tools/lib/bin/firebase.js"
+          test -f "$CLI"
+          echo "B4_RULES_QA_ROOT=$ROOT" >> "$GITHUB_ENV"
+          echo "FIREBASE_CLI_BIN=$CLI" >> "$GITHUB_ENV"
+          cat > "$RUNNER_TEMP/b4-003-rules-emulator.json" <<EOF
+          {"firestore":{"rules":"$GITHUB_WORKSPACE/firestore.b4-003-scoped-candidate.rules"},"emulators":{"firestore":{"host":"127.0.0.1","port":8080},"ui":{"enabled":false}}}
+          EOF
+          cat > "$RUNNER_TEMP/b4-003-rules-emulator.test.cjs" <<'NODE'
+          'use strict';
+          const fs=require('node:fs'),crypto=require('node:crypto'),assert=require('node:assert/strict');
+          const {initializeTestEnvironment}=require('@firebase/rules-unit-testing');
+          const {doc,getDoc,getDocs,collection,setDoc,updateDoc,deleteDoc}=require('firebase/firestore');
+          const path='firestore.b4-003-scoped-candidate.rules',rules=fs.readFileSync(path,'utf8');
+          const sha=crypto.createHash('sha256').update(rules).digest('hex');
+          const {execFileSync}=require('node:child_process'),blob=execFileSync('git',['hash-object',path],{encoding:'utf8'}).trim();
+          assert.equal(blob,process.env.EXPECTED_RULES_GIT_BLOB);assert.equal(sha,process.env.EXPECTED_RULES_SHA256);
+          const roles=['Direccion','Operativo','Asesor'],countries=['GT','CO','ALL'],scopes=['own','team','global'];
+          const cols=['clientes','polizas','recibosEsperados','carteraPrimas','cobros','ops','leads','reclamos'];
+          let n=0;async function ok(p){await p;n++}async function no(p,l){let e;try{await p}catch(x){e=x}assert(e,l+' unexpectedly succeeded');assert.equal(e.code,'permission-denied',l);n++}
+          (async()=>{let env=await initializeTestEnvironment({projectId:'demo-gravicentra-b4-003',firestore:{rules}}),users=[];
+            try{
+              await env.withSecurityRulesDisabled(async ctx=>{const db=ctx.firestore(),t='alianzas-soluciones';
+                for(const r of roles)for(const c of countries)for(const s of scopes){const uid='qa-'+r.toLowerCase()+'-'+c.toLowerCase()+'-'+s;users.push({uid,r,c,s,t});
+                  await setDoc(doc(db,'tenants',t,'members',uid),{uid,tenantId:t,status:'active',estado:'activo',active:true,activo:true,inactivo:false,roles:[r],country:c,dataScopes:{default:s,finance:s,workflow:s},advisorId:uid,teamId:'qa-team-'+c});}
+                await setDoc(doc(db,'tenants',t,'members','qa-suspended'),{uid:'qa-suspended',tenantId:t,status:'suspended',estado:'suspendido',roles:['Asesor']});
+                await setDoc(doc(db,'tenants',t,'members','qa-no-role'),{uid:'qa-no-role',tenantId:t,status:'active',estado:'activo',roles:[]});
+                await setDoc(doc(db,'tenants','foreign-tenant','members','qa-foreign'),{uid:'qa-foreign',tenantId:'foreign-tenant',status:'active',estado:'activo',roles:['Direccion']});
+                for(const c of cols){await setDoc(doc(db,'tenants',t,'data',c,'items','seed'),{tenantId:t});await setDoc(doc(db,'tenantId',t,c,'seed'),{tenantId:t});}
+              });
+              for(const u of users){const db=env.authenticatedContext(u.uid).firestore();await ok(getDoc(doc(db,'tenants',u.t,'members',u.uid)));
+                await no(getDoc(doc(db,'tenants',u.t,'members','qa-suspended')),'suspended membership');
+                await no(getDoc(doc(db,'tenants','foreign-tenant','members','qa-foreign')),'cross-tenant membership');
+                for(const c of cols){const d=doc(db,'tenants',u.t,'data',c,'items','seed');
+                  await no(getDoc(d),'SDK get '+u.r+'/'+u.c+'/'+u.s+'/'+c);
+                  await no(getDocs(collection(db,'tenants',u.t,'data',c,'items')),'SDK list '+c);
+                  await no(setDoc(doc(db,'tenants',u.t,'data',c,'items','new-'+u.uid),{uid:u.uid}),'SDK create '+c);
+                  await no(updateDoc(d,{attemptedBy:u.uid}),'SDK update '+c);await no(deleteDoc(d),'SDK delete '+c);
+                  await no(getDoc(doc(db,'tenantId',u.t,c,'seed')),'legacy path '+c);}
+                await no(setDoc(doc(db,'tenants',u.t,'members','new-'+u.uid),{uid:u.uid}),'membership create');
+                await no(updateDoc(doc(db,'tenants',u.t,'members',u.uid),{roles:['Direccion']}),'membership role update');}
+              for(const [uid,label] of [['qa-suspended','suspended own membership'],['qa-no-role','no assigned role'],['qa-absent','missing membership']])
+                await no(getDoc(doc(env.authenticatedContext(uid).firestore(),'tenants','alianzas-soluciones','members',uid)),label);
+              await env.cleanup();env=null;
+              const legacyRules=fs.readFileSync('firestore.rules','utf8');
+              const rollbackEnv=await initializeTestEnvironment({projectId:'demo-gravicentra-b4-003',firestore:{rules:legacyRules}});
+              try{
+                await rollbackEnv.withSecurityRulesDisabled(async ctx=>{
+                  const db=ctx.firestore(),t='alianzas-soluciones',uid='qa-rollback-rehearsal';
+                  await setDoc(doc(db,'tenants',t,'members',uid),{uid,tenantId:t,status:'active',estado:'activo',roles:['Direccion']});
+                  await setDoc(doc(db,'tenants',t,'data','cobros','items','rollback-probe'),{synthetic:true});
+                });
+                const rdb=rollbackEnv.authenticatedContext('qa-rollback-rehearsal').firestore();
+                await ok(getDoc(doc(rdb,'tenants','alianzas-soluciones','data','cobros','items','rollback-probe')));
+                await ok(setDoc(doc(rdb,'tenants','alianzas-soluciones','data','cobros','items','rollback-write-probe'),{synthetic:true}));
+              }finally{await rollbackEnv.cleanup()}
+                            const e={schema:'GRAVICENTRA_B4_003_EXACT_RULES_EMULATOR_MATRIX_V1',status:'PASS_CANDIDATE_RULES_EMULATOR_ONLY',gate:'I6.5/B4-003',
+                projectId:'demo-gravicentra-b4-003',rulesPath:path,rulesGitBlob:blob,rulesSha256:sha,syntheticIdentities:users.length+3,
+                roles,countries,scopes,collections:cols,assertionsPassed:n,allowedDirectOperationalReads:0,allowedDirectOperationalWrites:0,
+                realBusinessWrites:0,sharedRulesDeploys:0,livePromotion:false,rollbackRehearsal:{legacySourceRestoresPriorTenantAccess:true,actualSharedRulesRollback:false,legacyRulesSha256:crypto.createHash('sha256').update(legacyRules).digest('hex')},coverage:{ownActiveMembershipRead:true,suspendedMissingNoRoleDenied:true,
+                crossTenantDenied:true,directGetListDenied:true,directCreateUpdateDeleteDenied:true,legacyPathDenied:true,
+                modules:['Clientes','Pólizas','Recibos esperados','Cartera Primas','Cobros','Ops','Leads','Siniestros']},
+                limitation:'Rules emulator only; no real UID authorization or end-to-end frontend/backend proof.'};
+              fs.writeFileSync(process.env.B4_SECURITY_EVIDENCE,JSON.stringify(e,null,2)+'\n');
+              console.log('B4_003_RULES_EMULATOR='+JSON.stringify({status:e.status,rulesGitBlob:blob,rulesSha256:sha,assertionsPassed:n,identities:e.syntheticIdentities,collections:cols.length}));
+            }finally{if(env)await env.cleanup()}})().catch(e=>{console.error('B4_003_RULES_EMULATOR_FAIL:'+String(e.stack||e));process.exitCode=1});
+          NODE
+      - name: Execute exact B4-003 Rules emulator matrix
+        if: always() && steps.gate.outputs.security_qa == 'true'
+        env:
+          EXPECTED_RULES_GIT_BLOB: ${{ steps.gate.outputs.security_rules_git_blob }}
+          EXPECTED_RULES_SHA256: ${{ steps.gate.outputs.security_rules_sha256 }}
+          B4_SECURITY_EVIDENCE: ${{ runner.temp }}/b4-003-rules-emulator-evidence.json
+        run: |
+          set -euo pipefail
+          node --check "$RUNNER_TEMP/b4-003-rules-emulator.test.cjs"
+          NODE_PATH="$B4_RULES_QA_ROOT/node_modules" node "$FIREBASE_CLI_BIN" emulators:exec --only firestore --project demo-gravicentra-b4-003 --config "$RUNNER_TEMP/b4-003-rules-emulator.json" "NODE_PATH='$B4_RULES_QA_ROOT/node_modules' EXPECTED_RULES_GIT_BLOB='$EXPECTED_RULES_GIT_BLOB' EXPECTED_RULES_SHA256='$EXPECTED_RULES_SHA256' B4_SECURITY_EVIDENCE='$B4_SECURITY_EVIDENCE' node '$RUNNER_TEMP/b4-003-rules-emulator.test.cjs'"
+      - name: Preserve exact B4-003 Rules emulator evidence
+        if: always() && steps.gate.outputs.security_qa == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: gravicentra-b4-003-exact-rules-emulator-${{ github.run_id }}
+          path: ${{ runner.temp }}/b4-003-rules-emulator-evidence.json
+          if-no-files-found: warn
+          retention-days: 30
+      - name: Exercise protected reader compatibility regressions
+        if: always() && steps.gate.outputs.security_qa == 'true'
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-b4-003-dual-host-protected-transport.test.cjs
+          node tools/gravicentra-b4-003-scoped-related-reader.test.cjs
+          node tools/gravicentra-b4-003-country-finance-parity.test.cjs
 
       # Existing B4-003 executor; strictly QA-only on the immutable Preview.
       - name: Prepare B4-003 two-UID read-only QA
@@ -1800,7 +1931,7 @@ jobs:
           retention-days: 14
 
       - name: Prepare authenticated Firestore Rules readback
-        if: steps.gate.outputs.r26_rules_readonly == 'true'
+        if: always() && (steps.gate.outputs.r26_rules_readonly == 'true' || steps.gate.outputs.security_qa == 'true')
         run: |
           set -euo pipefail
           python3 - <<'PY'
@@ -1822,7 +1953,7 @@ jobs:
           npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund google-auth-library@9.15.1 >/dev/null
 
       - name: Read effective live Firestore Rules release without writes
-        if: steps.gate.outputs.r26_rules_readonly == 'true'
+        if: always() && (steps.gate.outputs.r26_rules_readonly == 'true' || steps.gate.outputs.security_qa == 'true')
         env:
           R26_RULES_OUT: ${{ runner.temp }}/r26-rules-live-readback.json
         run: |
@@ -1839,7 +1970,8 @@ jobs:
             gitSourceSha:process.env.GITHUB_SHA,
             localCandidateRules:{
               productReadOnlySha256:sha(fs.readFileSync('firestore.product-readonly.rules','utf8')),
-              legacySha256:sha(fs.readFileSync('firestore.rules','utf8'))
+              legacySha256:sha(fs.readFileSync('firestore.rules','utf8')),
+              b4CandidateSha256:sha(fs.readFileSync('firestore.b4-003-scoped-candidate.rules','utf8'))
             }};
           (async()=>{
             try{
@@ -1862,6 +1994,9 @@ jobs:
               result.rulesSha256=sha(body);
               result.exactProductRulesMatch=files.length===1&&files[0].content===productRules;
               result.exactLegacyRulesMatch=files.length===1&&files[0].content===legacyRules;
+              const b4CandidateRules=fs.readFileSync('firestore.b4-003-scoped-candidate.rules','utf8');
+              result.exactB4CandidateRulesMatch=files.length===1&&files[0].content===b4CandidateRules;
+              result.b4CandidateRulesSha256=sha(b4CandidateRules);
               result.hasCanonicalDataMatch=!!dataRuleSection;
               result.sourceHasMembershipOnlyDataRead=memberOnly;
               // The August legacy ruleset grants recursive read AND write on all
