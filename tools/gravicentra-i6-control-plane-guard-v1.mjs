@@ -108,26 +108,6 @@ if(CORRECTIVE_SOURCE_ACTIVE){
  const POLIZAS_SR=exists(POLIZAS_SUCCESSOR.receiptPath||'')?readJson(POLIZAS_SUCCESSOR.receiptPath):{};
  const expectedProductBlobs={...(SR.sourceBlobsAfter||{}),...(POLIZAS_SR.sourceBlobsAfter||{})};
  const expectedQaBlobs={...(SR.qaBlobsAfter||{}),...(POLIZAS_SR.qaBlobsAfter||{})};
- console.log('B4_003_CORRECTIVE_LINK_DIAGNOSTIC='+JSON.stringify({
-  head:physicalGit('rev-parse','HEAD'),
-  parent:physicalGit('rev-parse','HEAD^'),
-  grandparent:physicalGit('rev-parse','HEAD^^'),
-  dispatchBase:PR.baseHead,
-  dispatchBlobPinned:PREVIEW.receiptBlobSha,
-  parentDispatchBlob:(()=>{try{return physicalGit('rev-parse','HEAD^:'+PREVIEW.receiptPath)}catch(_){return 'MISSING'}})(),
-  compActual:physicalGit('hash-object',I6_CANONICAL_COMPOSITION),
-  compDispatch:PR.compositionBlobSha,
-  lockActual:physicalGit('hash-object',ACTIVE_I65_FORENSIC_B4),
-  lockDispatch:PR.executionLockBlobSha,
-  fixReceiptActual:physicalGit('hash-object',D.receiptPath),
-  successorReceiptActual:physicalGit('hash-object',S.receiptPath),
-  polReceiptActual:physicalGit('hash-object',POLIZAS_SUCCESSOR.receiptPath),
-  packagerReceiptActual:physicalGit('hash-object',S.packagerReceiptPath),
-  expectedProductMatches:JSON.stringify(PR.expectedProductBlobs)===JSON.stringify(expectedProductBlobs),
-  expectedQaMatches:JSON.stringify(PR.expectedQaBlobs)===JSON.stringify(expectedQaBlobs),
-  hold:C.b4003SecurityReleaseHold?.status,
-  findings:FIND.findings?.length
-}));
  need(D.gate==='I6.5/B4-003'&&D.authority==='PAULA_EXPLICIT_CORRECTIVE_AUTHORIZATION'&&
   D.parentHead==='2278ab067ace6e6bdaa4d35e7c0728f4a4160682'&&
   physicalGit('merge-base',D.parentHead,'HEAD')===D.parentHead&&
