@@ -14771,4 +14771,35 @@
     "findingsPreserved": 295,
     "frozenTasksPreserved": 86
   }
+  ,"b4003CorrectiveSourcePreviewDispatch20261025": {
+    "status": "AUTHORIZED_EXACT_ISOLATED_READONLY_PREVIEW_PENDING_DISPATCH",
+    "gate": "I6.5/B4-003",
+    "authority": "PAULA_EXPLICIT_CORRECTIVE_AUTHORIZATION",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CORRECTIVE_SOURCE_PREVIEW_DISPATCH_20261025.json",
+    "receiptBlobSha": "db5010b2aa31920cff31ae99903ebd6ce3a5dc19",
+    "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CORRECTIVE_SOURCE_FIX_20261025.json",
+    "sourceFixReceiptBlobSha": "19b6e0644015ea34b70e0216e0d128f7df2833e9",
+    "authorizationReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CORRECTIVE_SOURCE_SECURITY_AUTH_20261024.json",
+    "authorizationReceiptBlobSha": "5b999ed30d3a82e81c67528a86e0559f94013250",
+    "triggerSubject": "build(i6.5 B4-003): verify authorized corrective source in isolated Preview",
+    "dispatchParentHead": "7d910135bf31bf2e9391a09b7589510c1649e61f",
+    "compositionBlobSha": "c69d53112da9236046a79bed1d0a13379b135bd5",
+    "executionLockBlobSha": "c2174833933f5ad19dc4b70e40d897a7a051aa06",
+    "functions": [
+      "orbit360ScopedPolicyReadPreview"
+    ],
+    "otherFunctions": false,
+    "sharedFirestoreRules": false,
+    "hostingBuildAuthorized": true,
+    "isolatedCallableAuthorized": true,
+    "syntheticQaWrites": false,
+    "realBusinessWrites": false,
+    "dataMutation": false,
+    "reimport": false,
+    "impersonation": false,
+    "livePromotion": false,
+    "production": false,
+    "findingsPreserved": 295,
+    "frozenTasksPreserved": 86
+  }
 }

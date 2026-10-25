@@ -1048,7 +1048,66 @@ jobs:
             && l.boundaries?.dataMutationAuthorized===false
             && l.boundaries?.livePromotionAuthorized===false;
           if(dualHostRequested&&!dualHostScoped)throw Error('B4_003_DUAL_HOST_PROTECTED_PREVIEW_DENIED');
-          const scopedPreview=priorScopedPreview||onePassInternal||oct15ScopedReadback||restrictedScoped||c03Scoped||uatScoped||currentScoped||causalScoped||insurerScoped||cacheScoped||countryScoped||agingScoped||pctxScoped||moneyScoped||postAuthScoped||uatFixScoped||rulesCountryScoped||storeScoped||safeDiagScoped||latencyScoped||roleRecoveryScoped||activeInsurerScoped||policyCountScoped||dualHostScoped;
+          // New user-authorized corrective source can reach one isolated Preview only.
+          // Keep the callable, hosting artifact, and non-mutation boundary bound to the canonical receipt.
+          const correctivePreviewSubject='build(i6.5 B4-003): verify authorized corrective source in isolated Preview';
+          const correctivePreviewRequested=currentSubject===correctivePreviewSubject;
+          const correctivePreviewAuth=c.b4003CorrectiveSourcePreviewDispatch20261025||{};
+          const correctiveFix=c.b4003CorrectiveSourceFix20261025||{};
+          const correctivePreviewReceipt=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/I6_5_B4_003_CORRECTIVE_SOURCE_PREVIEW_DISPATCH_20261025.json','utf8'));
+          const correctivePreviewSourceBound=Object.entries(correctiveFix.sourceBlobsAfter||{}).length===7
+            && Object.entries(correctiveFix.sourceBlobsAfter||{}).every(([p,sha])=>productSha(p)===sha&&l.boundaries?.allowedProductFiles?.includes(p))
+            && Object.entries(correctiveFix.qaBlobsAfter||{}).length===2
+            && Object.entries(correctiveFix.qaBlobsAfter||{}).every(([p,sha])=>productSha(p)===sha&&l.boundaries?.allowedQaFiles?.includes(p));
+          const correctiveSourcePreview=correctivePreviewRequested
+            && correctivePreviewAuth.status==='AUTHORIZED_EXACT_ISOLATED_READONLY_PREVIEW_PENDING_DISPATCH'
+            && correctivePreviewAuth.triggerSubject===correctivePreviewSubject
+            && correctivePreviewAuth.receiptPath==='artifacts/orbit360-recovery/release-control/I6_5_B4_003_CORRECTIVE_SOURCE_PREVIEW_DISPATCH_20261025.json'
+            && correctivePreviewAuth.receiptBlobSha===productSha(correctivePreviewAuth.receiptPath)
+            && correctivePreviewReceipt.schema==='GI_I65_B4003_CORRECTIVE_SOURCE_PREVIEW_DISPATCH_V1'
+            && correctivePreviewReceipt.status===correctivePreviewAuth.status
+            && correctivePreviewReceipt.triggerSubject===correctivePreviewSubject
+            && correctivePreviewReceipt.authority==='PAULA_EXPLICIT_CORRECTIVE_AUTHORIZATION'
+            && correctivePreviewReceipt.sourceFixReceiptBlobSha===correctiveFix.receiptBlobSha
+            && correctivePreviewReceipt.compositionBlobSha===productSha(process.env.COMPOSITION)
+            && correctivePreviewAuth.compositionBlobSha===correctivePreviewReceipt.compositionBlobSha
+            && correctivePreviewReceipt.executionLockBlobSha===productSha(process.env.B4_LOCK)
+            && correctivePreviewAuth.executionLockBlobSha===correctivePreviewReceipt.executionLockBlobSha
+            && JSON.stringify(correctivePreviewReceipt.expectedProductBlobs)===JSON.stringify(correctiveFix.sourceBlobsAfter)
+            && JSON.stringify(correctivePreviewReceipt.expectedQaBlobs)===JSON.stringify(correctiveFix.qaBlobsAfter)
+            && correctivePreviewSourceBound
+            && c.currentB4?.status==='B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL'
+            && c.nextAction==='I6_5_FORENSIC_REMEDIATION_B4_003_R20_TARGETED_PAULA_VISUAL'
+            && c.b4003SecurityReleaseHold?.status==='ACTIVE_FAIL_CLOSED_UNAUTHORIZED_BROWSER_FIRESTORE_READ_WRITE'
+            && correctiveFix.status==='SOURCE_STAGED_SYNTHETIC_QA_PENDING_EXACT_PREVIEW_SECURITY_HOLD'
+            && correctiveFix.firestoreRulesDeployAuthorized===false
+            && correctiveFix.dataMutationAuthorized===false
+            && correctiveFix.livePromotionAuthorized===false
+            && correctivePreviewAuth.functions?.join(',')==='orbit360ScopedPolicyReadPreview'
+            && correctivePreviewReceipt.scope.functions.join(',')==='orbit360ScopedPolicyReadPreview'
+            && correctivePreviewAuth.sharedFirestoreRules===false
+            && correctivePreviewAuth.otherFunctions===false
+            && correctivePreviewAuth.syntheticQaWrites===false
+            && correctivePreviewAuth.realBusinessWrites===false
+            && correctivePreviewAuth.dataMutation===false
+            && correctivePreviewAuth.livePromotion===false
+            && correctivePreviewReceipt.scope.sharedFirestoreRules===false
+            && correctivePreviewReceipt.scope.otherFunctions===false
+            && correctivePreviewReceipt.scope.syntheticQaWrites===false
+            && correctivePreviewReceipt.scope.dataMutation===false
+            && correctivePreviewReceipt.scope.livePromotion===false
+            && correctivePreviewReceipt.scope.impersonation===false
+            && l.activeFinding?.id==='B4-003'
+            && l.boundaries?.previewMutationAuthorized===true
+            && l.boundaries?.functionDeploymentAuthorized===true
+            && l.boundaries?.providerDeploymentAuthorized===true
+            && l.boundaries?.businessWritesAuthorized===false
+            && l.boundaries?.syntheticQaWritesAuthorized===false
+            && l.boundaries?.dataMutationAuthorized===false
+            && l.boundaries?.realOperationalWritesAuthorized===false
+            && l.boundaries?.livePromotionAuthorized===false;
+          if(correctivePreviewRequested&&!correctiveSourcePreview)throw Error('B4_003_CORRECTIVE_SOURCE_PREVIEW_AUTH_INVALID_FAIL_CLOSED');
+          const scopedPreview=correctiveSourcePreview||priorScopedPreview||onePassInternal||oct15ScopedReadback||restrictedScoped||c03Scoped||uatScoped||currentScoped||causalScoped||insurerScoped||cacheScoped||countryScoped||agingScoped||pctxScoped||moneyScoped||postAuthScoped||uatFixScoped||rulesCountryScoped||storeScoped||safeDiagScoped||latencyScoped||roleRecoveryScoped||activeInsurerScoped||policyCountScoped||dualHostScoped;
           const previewOk=(r19Preview||r20Preview||r23Preview)
             && l.activeFinding?.id==='B4-003'
             && l.boundaries?.businessWritesAuthorized===false
@@ -1275,7 +1334,7 @@ jobs:
           const uatRosterReady=uatScoped&&uat.sourceBlobs&&
             uat.sourceBlobs['functions/assignable-advisor-roster.js']===rosterBlob
             && uat.onlyTwoReadOnlyFunctions===true;
-          const readonlyRoster=scopedPreview&&rosterAuth.status==='AUTHORIZED_EXACT_PREVIEW_READONLY_ROSTER_ONLY'
+          const readonlyRoster=!correctiveSourcePreview&&scopedPreview&&rosterAuth.status==='AUTHORIZED_EXACT_PREVIEW_READONLY_ROSTER_ONLY'
             && (rosterAuth.sourceBlobSha===rosterBlob||c03RosterReady||uatRosterReady||(currentScoped&&currentPreviewIntent.rosterSourceBlobSha===rosterBlob)||(causalScoped&&ca.rosterSourceBlobSha===rosterBlob)||(insurerScoped&&insurerAuth.rosterSourceBlobSha===rosterBlob)||(cacheScoped&&cacheAuth.rosterSourceBlobSha===rosterBlob)||(countryScoped&&countryAuth.rosterSourceBlobSha===rosterBlob)||(agingScoped&&agingAuth.rosterSourceBlobSha===rosterBlob)||(pctxScoped&&pctxAuth.rosterSourceBlobSha===rosterBlob)||(moneyScoped&&moneyAuth.rosterSourceBlobSha===rosterBlob)||(postAuthScoped&&postAuth.rosterSourceBlobSha===rosterBlob)||(uatFixScoped&&uatFixAuth.rosterSourceBlobSha===rosterBlob)||(rulesCountryScoped&&uatFixAuth.rosterSourceBlobSha===rosterBlob)||(storeScoped&&storeAuth.rosterSourceBlobSha===rosterBlob)||(safeDiagScoped&&safeDiagAuth.rosterSourceBlobSha===rosterBlob)||(latencyScoped&&latencyAuth.rosterSourceBlobSha===rosterBlob)||(roleRecoveryScoped&&roleRecoveryAuth.rosterSourceBlobSha===rosterBlob)||(activeInsurerScoped&&activeInsurerAuth.rosterSourceBlobSha===rosterBlob)||(policyCountScoped&&policyCountAuth.rosterSourceBlobSha===rosterBlob)||(dualHostScoped&&policyCountAuth.rosterSourceBlobSha===rosterBlob))
             && rosterAuth.service==='orbit360AssignableAdvisorRosterPreview'
             && rosterAuth.businessWritesAuthorized===false

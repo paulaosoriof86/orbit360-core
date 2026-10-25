@@ -1,0 +1,54 @@
+{
+  "schema": "GI_I65_B4003_CORRECTIVE_SOURCE_PREVIEW_DISPATCH_V1",
+  "product": "Gravicentra Insurance",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "gate": "I6.5/B4-003",
+  "status": "AUTHORIZED_EXACT_ISOLATED_READONLY_PREVIEW_PENDING_DISPATCH",
+  "authority": "PAULA_EXPLICIT_CORRECTIVE_AUTHORIZATION",
+  "authorizationReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CORRECTIVE_SOURCE_SECURITY_AUTH_20261024.json",
+  "authorizationReceiptBlobSha": "5b999ed30d3a82e81c67528a86e0559f94013250",
+  "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CORRECTIVE_SOURCE_FIX_20261025.json",
+  "sourceFixReceiptBlobSha": "19b6e0644015ea34b70e0216e0d128f7df2833e9",
+  "sourceFixParentHead": "2278ab067ace6e6bdaa4d35e7c0728f4a4160682",
+  "dispatchParentHead": "7d910135bf31bf2e9391a09b7589510c1649e61f",
+  "triggerSubject": "build(i6.5 B4-003): verify authorized corrective source in isolated Preview",
+  "compositionBlobSha": "c69d53112da9236046a79bed1d0a13379b135bd5",
+  "executionLockBlobSha": "c2174833933f5ad19dc4b70e40d897a7a051aa06",
+  "expectedProductBlobs": {
+    "functions/bootstrap.js": "533f480e84ca4c4edbc8f6183c7d8f153a977569",
+    "functions/b4-003-scoped-related-reader.js": "a7fc08fc385084d74068c8ba9340930a713c3dd6",
+    "functions/b4-003-scoped-access-boundary.js": "24d7c52347c9dd32bfabbc66f8b340174b15b6a7",
+    "orbit360-platform/core/product-runtime-browser-providers-p0.js": "df30d8725485f7210282417edfb26f1698f08aa7",
+    "orbit360-platform/core/queries.js": "ddb9e01c9f6aa82f750961ecf66d37475c2f6205",
+    "orbit360-platform/modules/cobros.js": "9cbbf63775f30ce71c28ac93211e93a945cc2bf5",
+    "functions/package.json": "a016a9f9d6a48ab44d45dedc88611cff083091ef"
+  },
+  "expectedQaBlobs": {
+    "tools/gravicentra-b4-003-scoped-related-reader.test.cjs": "2e7a5e26f0e3d00987c4653e0b51a4bca149b9dd",
+    "tools/gravicentra-b4-003-country-finance-parity.test.cjs": "fc93d180a4b2e80fa443d26f5b73c90e3f019b6e"
+  },
+  "scope": {
+    "hosting": "ONE_IMMUTABLE_B4_003_PREVIEW_ONLY",
+    "functions": [
+      "orbit360ScopedPolicyReadPreview"
+    ],
+    "otherFunctions": false,
+    "sharedFirestoreRules": false,
+    "production": false,
+    "livePromotion": false,
+    "syntheticQaWrites": false,
+    "realBusinessWrites": false,
+    "dataMutation": false,
+    "reimport": false,
+    "impersonation": false,
+    "authenticatedIdentityProof": false,
+    "publicUnauthenticatedSmoke": true,
+    "emulatorTests": "READ_ONLY_OR_IN_MEMORY_ONLY"
+  },
+  "preserved": {
+    "findings": 295,
+    "frozenTasks": 86,
+    "previousEvidence": true
+  }
+}
