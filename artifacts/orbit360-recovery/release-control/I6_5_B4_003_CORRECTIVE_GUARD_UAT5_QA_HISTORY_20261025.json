@@ -1,0 +1,27 @@
+{
+  "schema": "GI_I65_B4003_CORRECTIVE_GUARD_UAT5_QA_HISTORY_V1",
+  "status": "QA_GUARD_SOURCE_FIXED_PENDING_EXACT_GATE_RERUN",
+  "gate": "I6.5/B4-003",
+  "authority": "PAULA_EXPLICIT_CORRECTIVE_AUTHORIZATION",
+  "recordedAt": "2026-10-25",
+  "failedRunId": 40151240319,
+  "failureCode": "B4_003_UAT5_SCOPED_SOURCE_BOUNDARY_OR_BLOB_DRIFT",
+  "causalFinding": "UAT5's scoped-related-reader test blob in its immutable receipt is d32e4e6887dd2eb151d415b44ee05b0be3d58cca; the current corrective parent has 5e6b75451f7d6466aa95f8a3031177408274fe3d. Comparing today's test bytes to the old UAT5 after hash falsely rejected the historical proof.",
+  "correction": "Retain UAT5 receipt before/after equality and QA allowlist checks. Validate current QA bytes through the active corrective-source receipt before the historical UAT5 block; do not compare current QA bytes to the old UAT5 hash.",
+  "guardPath": "tools/gravicentra-i6-control-plane-guard-v1.mjs",
+  "previousGuardBlobSha": "1bc1e64b44996d991e83d43765b4673493824a8d",
+  "currentGuardBlobSha": "29bfc0879535cb47b77b6dd4ae6e6b4134bc4c10",
+  "previousGuardCompatibilityReceiptBlobSha": "79da14127705bd069473643a88d94aa25522dee7",
+  "uat5QaPath": "tools/gravicentra-b4-003-scoped-related-reader.test.cjs",
+  "uat5ExpectedBlob": "d32e4e6887dd2eb151d415b44ee05b0be3d58cca",
+  "currentParentBlob": "5e6b75451f7d6466aa95f8a3031177408274fe3d",
+  "effects": {
+    "productDataWrites": 0,
+    "firestoreRulesChanged": false,
+    "functionsDeployed": false,
+    "previewDeployed": false,
+    "liveChanged": false,
+    "findingsPreserved": 295,
+    "frozenTasksPreserved": 86
+  }
+}

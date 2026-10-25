@@ -1767,8 +1767,8 @@ if(FIX_ACTIVE){
  COMP.productFiles.includes(path)&&B4.boundaries.allowedProductFiles.includes(path))&&
  qaPaths.every(path=>FIX.qaBeforeBlobs[path]===receipt.qaFiles?.[path]?.before&&
  FIX.qaBlobs[path]===receipt.qaFiles?.[path]?.after&&
- B4.boundaries.allowedQaFiles.includes(path)&&
- (path==='tools/gravicentra-i6-control-plane-guard-v1.mjs'||git('hash-object',path)===FIX.qaBlobs[path]))&&
+ // Receipt and allowlist pin historical QA; current corrective QA bytes are checked by CORRECTIVE_SOURCE above.
+ B4.boundaries.allowedQaFiles.includes(path))&&
  C.b4003SecurityReleaseHold?.status==='ACTIVE_FAIL_CLOSED_UNAUTHORIZED_BROWSER_FIRESTORE_READ_WRITE'&&
  C.i6Execution?.productMutationAuthorized===false&&B4.boundaries.productMutationAuthorized===false&&
  B4.boundaries.dataMutationAuthorized===false&&B4.boundaries.businessWritesAuthorized===false&&
