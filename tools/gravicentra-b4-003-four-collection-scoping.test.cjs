@@ -112,5 +112,5 @@ const read=async(collection,documentId,role='Asesor',country='GT')=>readScopedRe
  await assert.rejects(()=>read('finmovs','fmCO','Finanzas','GT'),e=>e instanceof Denied&&e.code==='RECORD_NOT_FOUND_OR_DENIED','cross-country finance movement denied');
  await assert.rejects(()=>read('finmovs','fmUnscoped','Finanzas','GT'),e=>e instanceof Denied&&e.code==='RECORD_NOT_FOUND_OR_DENIED','country-less finance movement denied');
  await assert.rejects(()=>read('finmovs','fmGT','Asesor','GT'),e=>e instanceof Denied&&e.code==='MODULE_DENIED','non-finance role denied finance movements');
- console.log('B4_003_FOUR_COLLECTION_SCOPED_READER_PASS checks=20 synthetic_only no_data_writes');
+ console.log('B4_003_FOUR_COLLECTION_SCOPED_READER_PASS synthetic_only no_data_writes');
 })().catch(e=>{console.error(e);process.exitCode=1;});
