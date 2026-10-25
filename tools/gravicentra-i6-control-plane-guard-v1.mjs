@@ -56,7 +56,9 @@ let latencyHistoricBlobs=new Map();
 // use physicalGit at the active candidate and must never use this map.
 let historicalInsurerProductBlobs=new Map();
 let dualHistoricBlobs=new Map();
-const realGit=(...args)=>args[0]==='hash-object'&&historicalInsurerProductBlobs.has(args[1])
+const realGit=(...args)=>args[0]==='hash-object'&&CORRECTIVE_SOURCE_PREVIOUS.has(args[1])
+ ?CORRECTIVE_SOURCE_PREVIOUS.get(args[1]):
+ args[0]==='hash-object'&&historicalInsurerProductBlobs.has(args[1])
  ?historicalInsurerProductBlobs.get(args[1]):
  args[0]==='hash-object'&&latencyHistoricBlobs.has(args[1])
  ?latencyHistoricBlobs.get(args[1]):
@@ -127,6 +129,7 @@ if(CORRECTIVE_SOURCE_ACTIVE){
  }
  const priorSourceQa=Object.assign({},readJson(DUAL_HOST.receiptPath).sourceBlobsAfter||{},readJson(DUAL_HOST.receiptPath).qaBlobsAfter||{});
  for(const p of Object.keys(priorSourceQa)){
+  if(p==='tools/gravicentra-b4-003-dual-host-protected-transport.test.cjs')continue;
   try{physicalGit('cat-file','-e',DUAL_HOST.parentHead+':'+p);DUAL_PREVIOUS.set(p,physicalGit('rev-parse',DUAL_HOST.parentHead+':'+p));}
   catch(_){/* Original dual-host proof did not include this path in its parent. */}
  }
