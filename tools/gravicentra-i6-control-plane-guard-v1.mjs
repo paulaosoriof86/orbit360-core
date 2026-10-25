@@ -122,7 +122,7 @@ if(CORRECTIVE_SOURCE_ACTIVE){
   Object.entries(historicalSourceQa).every(([p,sha])=>/^[0-9a-f]{40}$/.test(sha)&&(()=>{try{physicalGit('cat-file','-e',sha);return true;}catch(_){return false;}})())&&
   Object.keys(R.sourceBlobsAfter||{}).every(p=>(C.b4003CorrectiveSourceSecurityAuthorization20261024?.allowedSourcePaths||[]).includes(p))&&
   Object.keys(R.qaBlobsAfter||{}).every(p=>(B4.boundaries?.allowedQaFiles||[]).includes(p))&&
-  D.compositionBlobSha===physicalGit('hash-object',I6_CANONICAL_COMPOSITION)&&
+  D.compositionBlobSha===POLIZAS_SUCCESSOR.predecessorCompositionBlobSha&&
   BL.compositionBlobSha===D.compositionBlobSha&&CL.receiptBlobSha===D.receiptBlobSha&&
   R.findingsPreserved===295&&R.frozenTasksPreserved===86&&
   R.firestoreRulesDeployAuthorized===false&&R.dataMutationAuthorized===false&&
