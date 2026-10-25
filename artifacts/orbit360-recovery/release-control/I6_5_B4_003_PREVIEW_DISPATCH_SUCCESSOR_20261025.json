@@ -7,14 +7,14 @@
   "status": "AUTHORIZED_EXACT_ISOLATED_READONLY_PREVIEW_PENDING_DISPATCH",
   "authority": "PAULA_EXPLICIT_CORRECTIVE_AUTHORIZATION",
   "triggerSubject": "build(i6.5 B4-003): verify authorized corrective source in isolated Preview",
-  "baseHead": "7191d6b078a5267dba537f9c71ba144a383f4ae1",
+  "baseHead": "e762ca52328b3fc82addc200ae906d83ba87005d",
   "sourceFixReceiptBlobSha": "19b6e0644015ea34b70e0216e0d128f7df2833e9",
   "sourceSuccessorReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_BOOTSTRAP_PREVIEW_ISOLATION_SUCCESSOR_20261025.json",
   "sourceSuccessorReceiptBlobSha": "d137e86d33f48c0aadf36c5b3c92e672c5afac44",
   "authorizationReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CORRECTIVE_SOURCE_SECURITY_AUTH_20261024.json",
   "authorizationReceiptBlobSha": "5b999ed30d3a82e81c67528a86e0559f94013250",
-  "compositionBlobSha": "ec6d567cd7ed42950d8dfabf201ce64433a11567",
-  "executionLockBlobSha": "5e30d236a09720108b2e8710f5629d64a18d6c63",
+  "compositionBlobSha": "ad7979d99c28c375ae6952b55aca5fcc0e47e71e",
+  "executionLockBlobSha": "2fc27fd7216e9ca892e1bc83afbfa9bf4d2c4df4",
   "packagerFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PREVIEW_PACKAGER_DUPLICATE_EXPORT_ROOTFIX_20261025.json",
   "packagerFixReceiptBlobSha": "46abe678130a4c09964b0c8aac3a1b6f314574bc",
   "expectedProductBlobs": {
@@ -59,5 +59,7 @@
     "previousEvidence": true
   },
   "polizasCompositionSuccessorReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_POLIZAS_CONTEXT_CACHE_COMPOSITION_SUCCESSOR_20261025.json",
-  "polizasCompositionSuccessorReceiptBlobSha": "7224c1a1670beadd001dfffab1a93bf9ca4cdc32"
+  "polizasCompositionSuccessorReceiptBlobSha": "7224c1a1670beadd001dfffab1a93bf9ca4cdc32",
+  "bootstrapCompositionSuccessorReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_BOOTSTRAP_COMPOSITION_SUCCESSOR_20261025.json",
+  "bootstrapCompositionSuccessorReceiptBlobSha": "7702767b1a09438b2f18061b5d5981e94bd8140d"
 }
