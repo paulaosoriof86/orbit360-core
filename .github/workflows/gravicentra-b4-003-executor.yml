@@ -1056,16 +1056,18 @@ jobs:
           const correctiveFix=c.b4003CorrectiveSourceFix20261025||{};
           const correctivePreviewReceipt=JSON.parse(fs.readFileSync(correctivePreviewAuth.receiptPath,'utf8'));
           const sourceSuccessorReceipt=JSON.parse(fs.readFileSync(correctivePreviewAuth.sourceSuccessorReceiptPath,'utf8'));
-          const correctiveExpectedProductBlobs=sourceSuccessorReceipt.sourceBlobsAfter||{};
-          const correctiveExpectedQaBlobs=sourceSuccessorReceipt.qaBlobsAfter||{};
+          const correctivePolizasSuccessor=c.b4003PolizasContextCacheSuccessor20261025||{};
+          const correctivePolizasReceipt=JSON.parse(fs.readFileSync(correctivePolizasSuccessor.receiptPath,'utf8'));
+          const correctiveExpectedProductBlobs={...(sourceSuccessorReceipt.sourceBlobsAfter||{}),...(correctivePolizasReceipt.sourceBlobsAfter||{})};
+          const correctiveExpectedQaBlobs={...(sourceSuccessorReceipt.qaBlobsAfter||{}),...(correctivePolizasReceipt.qaBlobsAfter||{})};
           const sourceSuccessor=sourceSuccessorReceipt;
           const packagerReceiptPath=correctivePreviewReceipt.packagerFixReceiptPath||'';
           const packagerReceipt=packagerReceiptPath?JSON.parse(fs.readFileSync(packagerReceiptPath,'utf8')):{};
           const successorSourceCommitBlob=sourceSuccessor.sourceCommit
             ?require('node:child_process').execFileSync('git',['rev-parse',sourceSuccessor.sourceCommit+':functions/bootstrap.js'],{encoding:'utf8'}).trim():'';
-          const correctivePreviewSourceBound=Object.entries(correctiveExpectedProductBlobs).length===7
+          const correctivePreviewSourceBound=Object.entries(correctiveExpectedProductBlobs).length===8
             && Object.entries(correctiveExpectedProductBlobs).every(([p,sha])=>productSha(p)===sha&&l.boundaries?.allowedProductFiles?.includes(p))
-            && Object.entries(correctiveExpectedQaBlobs).length===2
+            && Object.entries(correctiveExpectedQaBlobs).length===3
             && Object.entries(correctiveExpectedQaBlobs).every(([p,sha])=>productSha(p)===sha&&l.boundaries?.allowedQaFiles?.includes(p))
             && sourceSuccessor.status==='SOURCE_SUCCESSOR_RECONCILED_PENDING_EXACT_PREVIEW'
             && sourceSuccessor.historicalSourceFix?.blobSha===correctiveFix.receiptBlobSha
