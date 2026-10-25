@@ -1055,10 +1055,29 @@ jobs:
           const correctivePreviewAuth=c.b4003CorrectiveSourcePreviewDispatch20261025||{};
           const correctiveFix=c.b4003CorrectiveSourceFix20261025||{};
           const correctivePreviewReceipt=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/I6_5_B4_003_CORRECTIVE_SOURCE_PREVIEW_DISPATCH_20261025.json','utf8'));
-          const correctivePreviewSourceBound=Object.entries(correctiveFix.sourceBlobsAfter||{}).length===7
-            && Object.entries(correctiveFix.sourceBlobsAfter||{}).every(([p,sha])=>productSha(p)===sha&&l.boundaries?.allowedProductFiles?.includes(p))
-            && Object.entries(correctiveFix.qaBlobsAfter||{}).length===2
-            && Object.entries(correctiveFix.qaBlobsAfter||{}).every(([p,sha])=>productSha(p)===sha&&l.boundaries?.allowedQaFiles?.includes(p));
+          const correctiveExpectedProductBlobs=correctiveFix.successorSourceBlobsAfter||correctiveFix.sourceBlobsAfter||{};
+          const correctiveExpectedQaBlobs=correctiveFix.successorQaBlobsAfter||correctiveFix.qaBlobsAfter||{};
+          const sourceSuccessor=correctiveFix.sourceSuccessorBinding||{};
+          const packagerReceiptPath=correctivePreviewReceipt.packagerFixReceiptPath||'';
+          const packagerReceipt=packagerReceiptPath?JSON.parse(fs.readFileSync(packagerReceiptPath,'utf8')):{};
+          const successorSourceCommitBlob=sourceSuccessor.sourceCommit
+            ?execFileSync('git',['rev-parse',sourceSuccessor.sourceCommit+':functions/bootstrap.js'],{encoding:'utf8'}).trim():'';
+          const correctivePreviewSourceBound=Object.entries(correctiveExpectedProductBlobs).length===7
+            && Object.entries(correctiveExpectedProductBlobs).every(([p,sha])=>productSha(p)===sha&&l.boundaries?.allowedProductFiles?.includes(p))
+            && Object.entries(correctiveExpectedQaBlobs).length===2
+            && Object.entries(correctiveExpectedQaBlobs).every(([p,sha])=>productSha(p)===sha&&l.boundaries?.allowedQaFiles?.includes(p))
+            && sourceSuccessor.status==='SOURCE_SUCCESSOR_RECONCILED_PENDING_EXACT_PREVIEW'
+            && sourceSuccessor.historicalBootstrapBlobSha===correctiveFix.sourceBlobsAfter?.['functions/bootstrap.js']
+            && sourceSuccessor.correctedBootstrapBlobSha===correctiveExpectedProductBlobs['functions/bootstrap.js']
+            && successorSourceCommitBlob===sourceSuccessor.correctedBootstrapBlobSha
+            && sourceSuccessor.packagerReceiptPath===packagerReceiptPath
+            && sourceSuccessor.packagerReceiptBlobSha===productSha(packagerReceiptPath)
+            && packagerReceipt.bootstrapIsolation20261024?.sourceFixCommit===sourceSuccessor.sourceCommit
+            && packagerReceipt.bootstrapIsolation20261024?.correctedBootstrapBlobSha===sourceSuccessor.correctedBootstrapBlobSha
+            && packagerReceipt.bootstrapIsolation20261024?.scopedPackageSmoke?.notAReleaseArtifact===true
+            && correctivePreviewReceipt.successorDispatch?.baseHead===execFileSync('git',['rev-parse','HEAD^'],{encoding:'utf8'}).trim()
+            && correctivePreviewReceipt.successorDispatch?.triggerSubject===correctivePreviewSubject
+            && correctivePreviewReceipt.successorDispatch?.sourceSuccessorBindingSha===correctiveFix.receiptBlobSha;
           const correctiveSourcePreview=correctivePreviewRequested
             && correctivePreviewAuth.status==='AUTHORIZED_EXACT_ISOLATED_READONLY_PREVIEW_PENDING_DISPATCH'
             && correctivePreviewAuth.triggerSubject===correctivePreviewSubject
@@ -1073,8 +1092,8 @@ jobs:
             && correctivePreviewAuth.compositionBlobSha===correctivePreviewReceipt.compositionBlobSha
             && correctivePreviewReceipt.executionLockBlobSha===productSha(process.env.B4_LOCK)
             && correctivePreviewAuth.executionLockBlobSha===correctivePreviewReceipt.executionLockBlobSha
-            && JSON.stringify(correctivePreviewReceipt.expectedProductBlobs)===JSON.stringify(correctiveFix.sourceBlobsAfter)
-            && JSON.stringify(correctivePreviewReceipt.expectedQaBlobs)===JSON.stringify(correctiveFix.qaBlobsAfter)
+            && JSON.stringify(correctivePreviewReceipt.expectedProductBlobs)===JSON.stringify(correctiveExpectedProductBlobs)
+            && JSON.stringify(correctivePreviewReceipt.expectedQaBlobs)===JSON.stringify(correctiveExpectedQaBlobs)
             && correctivePreviewSourceBound
             && c.currentB4?.status==='B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL'
             && c.nextAction==='I6_5_FORENSIC_REMEDIATION_B4_003_R20_TARGETED_PAULA_VISUAL'

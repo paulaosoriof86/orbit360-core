@@ -62,7 +62,17 @@ const fs=require('node:fs');
 const bootstrapSource=fs.readFileSync(require('node:path').join(__dirname,'../functions/bootstrap.js'),'utf8');
 const functionsPackage=JSON.parse(fs.readFileSync(require('node:path').join(__dirname,'../functions/package.json'),'utf8'));
 assert.equal(functionsPackage.main,'bootstrap.js','B4_003_FUNCTIONS_ENTRYPOINT');
-assert.ok(bootstrapSource.includes("require('./b4-003-scoped-policy-callable')"),'B4_003_PROTECTED_CALLABLE_MUST_BE_EXPORTED');
+const previewPackagerSource=fs.readFileSync(require('node:path').join(__dirname,'gravicentra-i6-1-preview-package.mjs'),'utf8');
+assert.ok(!bootstrapSource.includes("require('./b4-003-scoped-policy-callable')"),
+  'B4_003_PREVIEW_ONLY_CALLABLE_MUST_NOT_BE_SHARED_BOOTSTRAP_EXPORTED');
+assert.ok(previewPackagerSource.includes("const SCOPED_PREVIEW=process.env.GRAVICENTRA_B4_003_SCOPED_PREVIEW==='true'"),
+  'B4_003_PREVIEW_CALLABLE_REQUIRES_SCOPED_PREVIEW_FLAG');
+assert.ok(previewPackagerSource.includes("RELEASE_GATE!=='I6.5-B4-003'")&&previewPackagerSource.includes("B4_003_SCOPED_PREVIEW_BOUNDARY_DENIED"),
+  'B4_003_PREVIEW_CALLABLE_REQUIRES_EXACT_GATE_BOUNDARY');
+assert.ok(previewPackagerSource.includes('const alreadyIntegrated=base.includes')&&previewPackagerSource.includes('if(!alreadyIntegrated)'),
+  'B4_003_PACKAGER_INJECTS_CALLABLE_ONLY_WHEN_MISSING');
+assert.ok(previewPackagerSource.includes("deployedExport:'orbit360ScopedPolicyReadPreview'")&&previewPackagerSource.includes('liveExportDeployed:false'),
+  'B4_003_PACKAGER_PREVIEW_ONLY_DEPLOY_TARGET');
 const rawReader=fs.readFileSync(require('node:path').join(__dirname,'../functions/b4-003-scoped-related-reader.js'),'utf8');
 const protectedBrowserProvider=fs.readFileSync(require('node:path').join(__dirname,'../orbit360-platform/core/product-runtime-browser-providers-p0.js'),'utf8');
 for(const collection of ['actividades','metas','reclamos']) {
