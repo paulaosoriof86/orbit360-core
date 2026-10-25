@@ -163,6 +163,35 @@ Orbit.modules.polizas = (function () {
       return countryCode(p&&p.pais || cli&&cli.pais)===selected;
     });
   }
+  // B4-003: the global Pólizas universe follows the policy country, while
+  // Cliente 360 follows the visible client's country. Preserve both owners and
+  // expose the exact, read-only difference rather than rewriting source data.
+  function countryClientJoinGap(policies, clientsById, selectedCountry) {
+    const selected=countryCode(selectedCountry);
+    const empty={total:0,active:0,reasons:{otherCountry:0,unavailable:0,merged:0,unknownCountry:0},netByCurrency:{},policyIds:new Set()};
+    if (!['GT','CO'].includes(selected)) return empty;
+    for (const p of policies || []) {
+      if (!p || p.id == null) continue;
+      const cid=String(p.clienteId||'').trim();
+      const c=cid && clientsById ? (clientsById.get(p.clienteId) || clientsById.get(cid)) : null;
+      let reason='';
+      if (!c) reason='unavailable';
+      else if (c.fusionado===true || String(c.mergedIntoClientId||'').trim()) reason='merged';
+      else if (!countryCode(c.pais)) reason='unknownCountry';
+      else if (countryCode(c.pais)!==selected) reason='otherCountry';
+      if (!reason) continue;
+      empty.policyIds.add(String(p.id));
+      empty.total++;
+      empty.reasons[reason]++;
+      if (!isActivePolicy(p)) continue;
+      empty.active++;
+      const net=policyPremiumNet(p);
+      if (net == null) continue;
+      const cur=String(p.moneda||p.divisa||(c&&c.moneda)||'SIN_MONEDA').trim()||'SIN_MONEDA';
+      empty.netByCurrency[cur]=(empty.netByCurrency[cur]||0)+net;
+    }
+    return empty;
+  }
   function clientCell(id,I) {
     const c=I.clientsById.get(id); if(!c) return '—';
     const nombre=c.nombre||'Cliente',tipo=c.tipo||'Pendiente de completar',pais=c.pais||'';
@@ -181,13 +210,13 @@ Orbit.modules.polizas = (function () {
     return '<span style="display:flex;align-items:center;gap:7px"><span class="dot-s" style="background:'+U.esc(a.color||'')+'"></span>'+U.esc(a.nombre||'—')+'</span>';
   }
 
-  function rows(I, source) {
+  function rows(I, source, countryGapIds) {
     const query=String(st.fq||'').trim().toLowerCase();
     const basic=query ? ensureBasicSearchIndex(I) : null;
     const vehicle=query ? ensureVehicleSearchIndex(I) : null;
     return (source || I.policies || []).filter(p => {
       const searchOk=!query || String(basic.get(p.id)||'').includes(query) || String(vehicle.get(p.id)||'').includes(query);
-      const grouped = !st.fkind || (st.fkind === 'renewals45' ? isRenewalWithin45Days(p) : st.fkind === 'historical' ? isHistoricalNoPortfolio(p) : st.fkind === 'active' ? isActivePolicy(p) : true);
+      const grouped = !st.fkind || (st.fkind === 'renewals45' ? isRenewalWithin45Days(p) : st.fkind === 'historical' ? isHistoricalNoPortfolio(p) : st.fkind === 'active' ? isActivePolicy(p) : st.fkind === 'countryClientGap' ? !!(countryGapIds&&countryGapIds.has(String(p.id))) : true);
       return grouped && searchOk &&
         (!st.framo || p.ramo === st.framo) &&
         (!st.fasg || p.aseguradoraId === st.fasg) &&
@@ -204,13 +233,14 @@ Orbit.modules.polizas = (function () {
     }
     const I = buildIndexes();
     const all = policiesForActiveCountry(I);
+    const countryGap=countryClientJoinGap(all,I.clientsById,Orbit.pais);
     const defs = FDEFS(I);
     const vig = all.filter(isActivePolicy);
     const primaVigentePorMoneda = premiumByCurrency(all,I);
     const renovaciones45 = all.filter(isRenewalWithin45Days);
     const historicasSinCartera = all.filter(isHistoricalNoPortfolio);
     const otherPolicyCount = Math.max(0, all.length - vig.length - historicasSinCartera.length);
-    const r = rows(I, all);
+    const r = rows(I, all, countryGap.policyIds);
     const pages = Math.max(1, Math.ceil(r.length / PAGE_SIZE));
     if (st.page >= pages) st.page = 0;
     const start = st.page * PAGE_SIZE;
@@ -225,11 +255,18 @@ Orbit.modules.polizas = (function () {
         { label: 'Vencen ≤45 d', val: renovaciones45.length, color: 'var(--warn)', foot: 'activas con vencimiento en 0–45 días', onclick: "Orbit.modules.polizas.filtrarGrupo('renewals45')" },
         { label: 'Histórico / sin cartera', onclick: "Orbit.modules.polizas.filtrarGrupo('historical')", val: historicasSinCartera.length, color: 'var(--danger)', foot: 'ediciones no vigentes sin cartera activa' }
       ])}
+      ${countryGap.total?`<div class="cfg-note" data-polizas-client-country-gap="${countryGap.total}" data-polizas-client-country-gap-active="${countryGap.active}" style="margin-bottom:12px;line-height:1.6">
+        <b>Conciliación Pólizas / Cliente 360 (${U.esc(countryCode(Orbit.pais))}):</b> ${countryGap.total} pólizas pertenecen al universo de este país, pero su cliente no figura en la lista de clientes de este mismo país.
+        ${countryGap.reasons.otherCountry?'Cliente visible de otro país: '+countryGap.reasons.otherCountry+'. ':''}${countryGap.reasons.unavailable?'Cliente no disponible en este alcance: '+countryGap.reasons.unavailable+'. ':''}${countryGap.reasons.merged?'Cliente fusionado: '+countryGap.reasons.merged+'. ':''}${countryGap.reasons.unknownCountry?'País del cliente sin confirmar: '+countryGap.reasons.unknownCountry+'. ':''}
+        ${countryGap.active?'De ellas, '+countryGap.active+' activas con prima neta '+premiumByCurrencyHtml(countryGap.netByCurrency)+'. ':''}
+        Esta diferencia de criterio no acredita pérdida ni autoriza cambiar el país de los datos.
+        <button class="btn ghost sm" onclick="Orbit.modules.polizas.filtrarGrupo('countryClientGap')" style="margin-left:6px">${st.fkind==='countryClientGap'?'Ver cartera completa':'Ver pólizas de la diferencia'}</button>
+      </div>`:''}
       <div class="card" style="overflow:hidden">
         ${K.filterBar(defs, st)}
         <div style="overflow-x:auto"><table class="tbl">
           <thead><tr><th>Póliza</th><th>Cliente</th><th>Ramo / Producto</th><th>Aseguradora</th><th>Asesor</th><th class="num">Prima total</th><th>Vence</th><th>Estado</th><th></th></tr></thead>
-          <tbody>${shown.map(p => `<tr class="clickable" onclick="Orbit.modules.cliente360.verPoliza('${p.id}')">
+          <tbody>${shown.map(p => `<tr class="clickable" onclick="${st.fkind==='countryClientGap'?'Orbit.modules.polizas.verDesglose':'Orbit.modules.cliente360.verPoliza'}('${p.id}')">
             <td><span class="mono" style="font-size:12.5px;font-weight:600">${U.esc(p.numero || '')}</span><div class="muted" style="font-size:11px">${U.esc(p.formaPago || p.forma || p.frecuencia || '—')}</div></td>
             <td>${clientCell(p.clienteId,I)}</td>
             <td><b>${U.esc(p.ramo || '—')}</b><div class="muted" style="font-size:12px">${U.esc(p.producto || p.subramo || '—')}</div></td>
