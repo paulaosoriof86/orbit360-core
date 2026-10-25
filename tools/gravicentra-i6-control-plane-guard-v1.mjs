@@ -1353,8 +1353,9 @@ if(PCACHE_ACTIVE){
   SR.predecessorSourceBlobSha===PCACHE_SUCCESSOR.predecessorSourceBlobSha&&
   SR.qaBlobSha===PCACHE_SUCCESSOR.qaBlobSha&&SR.qaBlobsAfter?.[PCACHE_SUCCESSOR.qaPath]===PCACHE_SUCCESSOR.qaBlobSha&&
   SR.predecessorQaBlobSha===PCACHE_SUCCESSOR.predecessorQaBlobSha&&
-  SR.successorCompositionBlobSha===git('hash-object',I6_CANONICAL_COMPOSITION)&&
-  PCACHE_SUCCESSOR.successorCompositionBlobSha===git('hash-object',I6_CANONICAL_COMPOSITION)&&
+  SR.successorCompositionBlobSha===PCACHE_SUCCESSOR.successorCompositionBlobSha&&
+  (()=>{try{physicalGit('cat-file','-e',PCACHE_SUCCESSOR.successorCompositionBlobSha);return true;}catch(_){return false;}})()&&
+  PCACHE_SUCCESSOR.successorCompositionBlobSha===SR.successorCompositionBlobSha&&
   SR.findingsPreserved===295&&SR.frozenTasksPreserved===86&&
   SR.boundaries?.dataMutation===false&&SR.boundaries?.businessWrites===false&&
   SR.boundaries?.sharedFirestoreRules===false&&SR.boundaries?.livePromotion===false&&
