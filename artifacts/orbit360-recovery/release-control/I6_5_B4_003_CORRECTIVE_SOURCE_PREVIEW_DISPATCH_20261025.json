@@ -9,14 +9,14 @@
   "authorizationReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CORRECTIVE_SOURCE_SECURITY_AUTH_20261024.json",
   "authorizationReceiptBlobSha": "5b999ed30d3a82e81c67528a86e0559f94013250",
   "sourceFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CORRECTIVE_SOURCE_FIX_20261025.json",
-  "sourceFixReceiptBlobSha": "90362c7d9fe0e263739ebddf001db620f5735506",
+  "sourceFixReceiptBlobSha": "19b6e0644015ea34b70e0216e0d128f7df2833e9",
   "sourceFixParentHead": "2278ab067ace6e6bdaa4d35e7c0728f4a4160682",
   "dispatchParentHead": "b0997c10c17a6915702d9277131f128a8f8129ae",
   "triggerSubject": "build(i6.5 B4-003): verify authorized corrective source in isolated Preview",
   "compositionBlobSha": "c69d53112da9236046a79bed1d0a13379b135bd5",
   "executionLockBlobSha": "b5294bc0c16a3974a5aef922d108ccfe7a68c203",
   "expectedProductBlobs": {
-    "functions/bootstrap.js": "42fd05b81a02d428e590c36e3feb32be202f4965",
+    "functions/bootstrap.js": "533f480e84ca4c4edbc8f6183c7d8f153a977569",
     "functions/b4-003-scoped-related-reader.js": "a7fc08fc385084d74068c8ba9340930a713c3dd6",
     "functions/b4-003-scoped-access-boundary.js": "24d7c52347c9dd32bfabbc66f8b340174b15b6a7",
     "orbit360-platform/core/product-runtime-browser-providers-p0.js": "df30d8725485f7210282417edfb26f1698f08aa7",
@@ -25,7 +25,7 @@
     "functions/package.json": "a016a9f9d6a48ab44d45dedc88611cff083091ef"
   },
   "expectedQaBlobs": {
-    "tools/gravicentra-b4-003-scoped-related-reader.test.cjs": "b175ac8b168eeed7e21fb518dfabaf32a21d0fb4",
+    "tools/gravicentra-b4-003-scoped-related-reader.test.cjs": "2e7a5e26f0e3d00987c4653e0b51a4bca149b9dd",
     "tools/gravicentra-b4-003-country-finance-parity.test.cjs": "fc93d180a4b2e80fa443d26f5b73c90e3f019b6e"
   },
   "scope": {
@@ -52,18 +52,5 @@
     "previousEvidence": true
   },
   "packagerFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PREVIEW_PACKAGER_DUPLICATE_EXPORT_ROOTFIX_20261025.json",
-  "packagerFixReceiptBlobSha": "46abe678130a4c09964b0c8aac3a1b6f314574bc",
-  "successorDispatch": {
-    "status": "AUTHORIZED_EXACT_PREVIEW_SUCCESSOR_DISPATCH",
-    "triggerSubject": "build(i6.5 B4-003): verify authorized corrective source in isolated Preview",
-    "baseHead": "ec2ca9a1c1ecda13d4ada5258dd008a4d38fe1f5",
-    "sourceSuccessorCommit": "15588c3c8ebeb11eac630cce624d136723bcf534",
-    "sourceSuccessorBindingSha": "90362c7d9fe0e263739ebddf001db620f5735506",
-    "packagerReceiptBlobSha": "46abe678130a4c09964b0c8aac3a1b6f314574bc",
-    "noSharedRulesDeploy": true,
-    "noOperationalWrites": true,
-    "noLivePromotion": true,
-    "findingsPreserved": 295,
-    "frozenTasksPreserved": 86
-  }
+  "packagerFixReceiptBlobSha": "f1f015ba6b03efd38af99170ef6ae25dfc6c47bc"
 }
