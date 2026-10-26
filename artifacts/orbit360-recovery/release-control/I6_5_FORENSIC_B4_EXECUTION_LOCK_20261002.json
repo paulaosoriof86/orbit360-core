@@ -162,8 +162,8 @@
   "nextAction": "B4_003_R20_TARGETED_PAULA_VISUAL",
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "blobSha": "016f251811f22bc4fc04b2a5f674dfe09243e605",
-    "status": "FROZEN_ACTIVE_UAT3_P0_BATCH_1_SOURCE_COMPLETE"
+    "blobSha": "fbdf3f07c0b5221f46e5e5d06472f6a047931a92",
+    "status": "FROZEN_ACTIVE"
   },
   "findingLedger": {
     "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
@@ -634,7 +634,7 @@
   },
   "findingLedgerBlobSha": "8125e97dcf1feb7f46081f95327952e65c2d1077",
   "continuityRegisterBlobSha": "4e6b0ac51736be360c4b95abe8fc01d8f1e78e20",
-  "compositionLockBlobSha": "ad7979d99c28c375ae6952b55aca5fcc0e47e71e",
+  "compositionLockBlobSha": "fbdf3f07c0b5221f46e5e5d06472f6a047931a92",
   "r18SourceFix": {
     "status": "SOURCE_FIXED_R18_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_SOURCE_FIX_20261005.json",
@@ -4316,5 +4316,35 @@
     "successorCompositionBlobSha": "ad7979d99c28c375ae6952b55aca5fcc0e47e71e",
     "preservedFindings": 295,
     "preservedFrozenTasks": 86
+  },
+  "b4003CorrectiveSourceSuccessor20261026": {
+    "status": "SOURCE_SUCCESSOR_RECONCILED_PENDING_EXACT_PREVIEW",
+    "gate": "I6.5/B4-003",
+    "authority": "PAULA_EXPLICIT_CORRECTIVE_AUTHORIZATION",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_SCOPED_READ_SOURCE_SUCCESSOR_20261026.json",
+    "receiptBlobSha": "05be0a9bb0aefbcb5924d8188881cb1e82bff8d6",
+    "historicalSourceFixReceiptBlobSha": "19b6e0644015ea34b70e0216e0d128f7df2833e9",
+    "predecessorReceiptBlobSha": "d137e86d33f48c0aadf36c5b3c92e672c5afac44",
+    "sourceCommit": "15588c3c8ebeb11eac630cce624d136723bcf534",
+    "correctiveSourceCommit": "98289883458be7dfd9da539eeebf0665febb0249",
+    "qaCommit": "b6dfcb1caa29ed63f0a031b38bdf4b4c8104f34f",
+    "sourceBlobsAfter": {
+      "functions/bootstrap.js": "42fd05b81a02d428e590c36e3feb32be202f4965",
+      "functions/b4-003-scoped-related-reader.js": "0ccb30bf7244b09385b71c89553ff50c7f4d3469",
+      "functions/b4-003-scoped-access-boundary.js": "61c0d528262a525ac4eaf6b5c727565b8131b772",
+      "orbit360-platform/core/product-runtime-browser-providers-p0.js": "2ab3c306be243743355cc47fdc3fc5245133539a",
+      "orbit360-platform/core/queries.js": "ddb9e01c9f6aa82f750961ecf66d37475c2f6205",
+      "orbit360-platform/modules/cobros.js": "9cbbf63775f30ce71c28ac93211e93a945cc2bf5",
+      "functions/package.json": "a016a9f9d6a48ab44d45dedc88611cff083091ef",
+      "orbit360-platform/data/store-firestore-product-readonly-p0.js": "a29c3afe08bb6bc2bd2aaeea1ccf1ee2164826d5"
+    },
+    "qaBlobsAfter": {
+      "tools/gravicentra-b4-003-scoped-related-reader.test.cjs": "9a6dfa2062700ddc85dbf7436cd10945f613e70c",
+      "tools/gravicentra-b4-003-country-finance-parity.test.cjs": "fc93d180a4b2e80fa443d26f5b73c90e3f019b6e"
+    },
+    "packagerReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PREVIEW_PACKAGER_DUPLICATE_EXPORT_ROOTFIX_20261025.json",
+    "packagerReceiptBlobSha": "46abe678130a4c09964b0c8aac3a1b6f314574bc",
+    "findingsPreserved": 295,
+    "frozenTasksPreserved": 86
   }
 }

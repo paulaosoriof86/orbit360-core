@@ -1,0 +1,96 @@
+{
+  "schema": "GI_I65_B4_003_SCOPED_READ_SUCCESSOR_V1",
+  "product": "Gravicentra Insurance",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "gate": "I6.5/B4-003",
+  "status": "SOURCE_SUCCESSOR_RECONCILED_PENDING_EXACT_PREVIEW",
+  "authority": "PAULA_EXPLICIT_CORRECTIVE_AUTHORIZATION",
+  "recordedAt": "2026-10-26",
+  "historicalSourceFix": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CORRECTIVE_SOURCE_FIX_20261025.json",
+    "blobSha": "19b6e0644015ea34b70e0216e0d128f7df2833e9",
+    "parentHead": "2278ab067ace6e6bdaa4d35e7c0728f4a4160682"
+  },
+  "predecessorSourceSuccessor": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_BOOTSTRAP_PREVIEW_ISOLATION_SUCCESSOR_20261025.json",
+    "receiptBlobSha": "d137e86d33f48c0aadf36c5b3c92e672c5afac44",
+    "sourceCommit": "15588c3c8ebeb11eac630cce624d136723bcf534",
+    "preservedUnmodified": true
+  },
+  "predecessorDispatch": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PREVIEW_DISPATCH_SUCCESSOR_20261025.json",
+    "receiptBlobSha": "b727f4619cad23ab5198564dd5e7f6b9f7f3974b",
+    "dispatchCommit": "fea3830908f0a6b1fd22dc69ef1a90448794d8af",
+    "preservedUnmodified": true
+  },
+  "sourceCommit": "15588c3c8ebeb11eac630cce624d136723bcf534",
+  "correctiveSourceCommit": "98289883458be7dfd9da539eeebf0665febb0249",
+  "correctiveSourcePaths": [
+    "functions/b4-003-scoped-related-reader.js",
+    "functions/b4-003-scoped-access-boundary.js",
+    "orbit360-platform/core/product-runtime-browser-providers-p0.js",
+    "orbit360-platform/data/store-firestore-product-readonly-p0.js"
+  ],
+  "qaCommit": "b6dfcb1caa29ed63f0a031b38bdf4b4c8104f34f",
+  "sourceBlobsAfter": {
+    "functions/bootstrap.js": "42fd05b81a02d428e590c36e3feb32be202f4965",
+    "functions/b4-003-scoped-related-reader.js": "0ccb30bf7244b09385b71c89553ff50c7f4d3469",
+    "functions/b4-003-scoped-access-boundary.js": "61c0d528262a525ac4eaf6b5c727565b8131b772",
+    "orbit360-platform/core/product-runtime-browser-providers-p0.js": "2ab3c306be243743355cc47fdc3fc5245133539a",
+    "orbit360-platform/core/queries.js": "ddb9e01c9f6aa82f750961ecf66d37475c2f6205",
+    "orbit360-platform/modules/cobros.js": "9cbbf63775f30ce71c28ac93211e93a945cc2bf5",
+    "functions/package.json": "a016a9f9d6a48ab44d45dedc88611cff083091ef",
+    "orbit360-platform/data/store-firestore-product-readonly-p0.js": "a29c3afe08bb6bc2bd2aaeea1ccf1ee2164826d5"
+  },
+  "qaBlobsAfter": {
+    "tools/gravicentra-b4-003-scoped-related-reader.test.cjs": "9a6dfa2062700ddc85dbf7436cd10945f613e70c",
+    "tools/gravicentra-b4-003-country-finance-parity.test.cjs": "fc93d180a4b2e80fa443d26f5b73c90e3f019b6e"
+  },
+  "packagerReceipt": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PREVIEW_PACKAGER_DUPLICATE_EXPORT_ROOTFIX_20261025.json",
+    "blobSha": "46abe678130a4c09964b0c8aac3a1b6f314574bc"
+  },
+  "authorizationReceipt": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CORRECTIVE_SOURCE_SECURITY_AUTH_20261024.json",
+    "blobSha": "5b999ed30d3a82e81c67528a86e0559f94013250"
+  },
+  "scope": {
+    "hosting": "ONE_IMMUTABLE_B4_003_PREVIEW_ONLY",
+    "functions": [
+      "orbit360ScopedPolicyReadPreview"
+    ],
+    "sharedFirestoreRules": false,
+    "otherFunctions": false,
+    "syntheticQaWrites": false,
+    "realBusinessWrites": false,
+    "dataMutation": false,
+    "reimport": false,
+    "impersonation": false,
+    "livePromotion": false,
+    "production": false
+  },
+  "integratedTest": {
+    "workflowRunId": 40249291849,
+    "executedHead": "00bcf204d5afd82ca304ab57aff924a8d2c58337",
+    "passMarker": "B4_003_FOUR_COLLECTION_SCOPED_READER_PASS",
+    "fixture": "synthetic_only no_data_writes"
+  },
+  "removedOutOfBoundaryTest": {
+    "path": "tools/gravicentra-b4-003-four-collection-scoping.test.cjs",
+    "historicalBlobSha": "ae351af78b828b51f6e79e73b6a6f505931ebb76",
+    "integratedInto": "tools/gravicentra-b4-003-scoped-related-reader.test.cjs",
+    "deletedFromCurrentTree": true
+  },
+  "productFileCount": 114,
+  "productFileSetChanged": false,
+  "findingsPreserved": 295,
+  "frozenTasksPreserved": 86,
+  "firestoreRulesDeployAuthorized": false,
+  "sharedRulesDeploymentAuthorized": false,
+  "dataMutationAuthorized": false,
+  "realBusinessWritesAuthorized": false,
+  "livePromotionAuthorized": false,
+  "previousEvidencePreserved": true,
+  "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_SCOPED_READ_SOURCE_SUCCESSOR_20261026.json"
+}
