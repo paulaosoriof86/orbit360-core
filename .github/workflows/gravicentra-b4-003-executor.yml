@@ -1148,7 +1148,52 @@ jobs:
             && l.boundaries?.realOperationalWritesAuthorized===false
             && l.boundaries?.livePromotionAuthorized===false;
           if(correctivePreviewRequested&&!correctiveSourcePreview)throw Error('B4_003_CORRECTIVE_SOURCE_PREVIEW_AUTH_INVALID_FAIL_CLOSED');
-          const scopedPreview=correctiveSourcePreview||priorScopedPreview||onePassInternal||oct15ScopedReadback||restrictedScoped||c03Scoped||uatScoped||currentScoped||causalScoped||insurerScoped||cacheScoped||countryScoped||agingScoped||pctxScoped||moneyScoped||postAuthScoped||uatFixScoped||rulesCountryScoped||storeScoped||safeDiagScoped||latencyScoped||roleRecoveryScoped||activeInsurerScoped||policyCountScoped||dualHostScoped;
+          // B4-003 26-Oct successor: ONE source-bound LAB callable + isolated Hosting Preview.
+          // Only the existing Paula-authorized two product blobs and one synthetic QA blob;
+          // never shared Rules, production, credentials, synthetic business writes, or IAM.
+          const scopeDenialSubject='build(i6.5 B4-003): exact scope-denial source Preview';
+          const scopeDenialRequested=currentSubject===scopeDenialSubject;
+          const scopeDenialControl=c.b4003BackendScopeDenialSuccessor20261026||{};
+          const scopeDenialLock=l.b4003BackendScopeDenialSuccessor20261026||{};
+          const scopeDenialComposition=JSON.parse(fs.readFileSync(process.env.COMPOSITION,'utf8')).b4003BackendScopeDenialSuccessor20261026||{};
+          const scopeDenialReceiptPath='artifacts/orbit360-recovery/release-control/I6_5_B4_003_BACKEND_SCOPE_DENIAL_SOURCE_SUCCESSOR_20261026.json';
+          const scopeDenialReceipt=JSON.parse(fs.readFileSync(scopeDenialReceiptPath,'utf8'));
+          const exactScopeProducts=['functions/b4-003-scoped-access-boundary.js','functions/b4-003-scoped-policy-callable.js'];
+          const exactScopeQa=['tools/gravicentra-b4-003-scoped-related-reader.test.cjs'];
+          const scopeDenialPreview=scopeDenialRequested
+            && scopeDenialControl.status==='SOURCE_STAGED_SYNTHETIC_QA_PASS_SECURITY_HOLD'
+            && scopeDenialReceipt.schema==='GI_I65_B4_003_BACKEND_SCOPE_DENIAL_SOURCE_SUCCESSOR_V1'
+            && scopeDenialReceipt.status===scopeDenialControl.status
+            && scopeDenialReceipt.gate==='I6.5/B4-003'
+            && scopeDenialReceipt.authority==='PAULA_EXPLICIT_CORRECTIVE_AUTHORIZATION'
+            && scopeDenialControl.receiptPath===scopeDenialReceiptPath
+            && scopeDenialControl.receiptBlobSha===productSha(scopeDenialReceiptPath)
+            && JSON.stringify(scopeDenialControl)===JSON.stringify(scopeDenialLock)
+            && JSON.stringify(scopeDenialControl)===JSON.stringify(scopeDenialComposition)
+            && Object.keys(scopeDenialReceipt.sourceBlobsAfter||{}).sort().join('|')===exactScopeProducts.sort().join('|')
+            && Object.keys(scopeDenialReceipt.qaBlobsAfter||{}).sort().join('|')===exactScopeQa.sort().join('|')
+            && Object.entries(scopeDenialReceipt.sourceBlobsAfter||{}).every(([p,sha])=>productSha(p)===sha)
+            && Object.entries(scopeDenialReceipt.qaBlobsAfter||{}).every(([p,sha])=>productSha(p)===sha&&l.boundaries?.allowedQaFiles?.includes(p))
+            && scopeDenialControl.sourceCommit===scopeDenialReceipt.sourceCommit
+            && require('node:child_process').execFileSync('git',['merge-base',scopeDenialReceipt.sourceCommit,'HEAD'],{encoding:'utf8'}).trim()===scopeDenialReceipt.sourceCommit
+            && scopeDenialReceipt.scope.functions.join(',')==='orbit360ScopedPolicyReadPreview'
+            && scopeDenialReceipt.scope.sharedFirestoreRules===false
+            && scopeDenialReceipt.scope.realBusinessWrites===false
+            && scopeDenialReceipt.scope.dataMutation===false
+            && scopeDenialReceipt.scope.livePromotion===false
+            && c.b4003SecurityReleaseHold?.status==='ACTIVE_FAIL_CLOSED_UNAUTHORIZED_BROWSER_FIRESTORE_READ_WRITE'
+            && c.currentB4?.status==='B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL'
+            && l.activeFinding?.id==='B4-003'
+            && l.boundaries?.buildDispatchAuthorized===true
+            && l.boundaries?.previewMutationAuthorized===true
+            && l.boundaries?.functionDeploymentAuthorized===true
+            && l.boundaries?.providerDeploymentAuthorized===true
+            && l.boundaries?.syntheticQaWritesAuthorized===false
+            && l.boundaries?.businessWritesAuthorized===false
+            && l.boundaries?.dataMutationAuthorized===false
+            && l.boundaries?.livePromotionAuthorized===false;
+          if(scopeDenialRequested&&!scopeDenialPreview)throw Error('B4_003_SCOPE_DENIAL_PREVIEW_NOT_SOURCE_BOUND_FAIL_CLOSED');
+          const scopedPreview=scopeDenialPreview||correctiveSourcePreview||priorScopedPreview||onePassInternal||oct15ScopedReadback||restrictedScoped||c03Scoped||uatScoped||currentScoped||causalScoped||insurerScoped||cacheScoped||countryScoped||agingScoped||pctxScoped||moneyScoped||postAuthScoped||uatFixScoped||rulesCountryScoped||storeScoped||safeDiagScoped||latencyScoped||roleRecoveryScoped||activeInsurerScoped||policyCountScoped||dualHostScoped;
           const previewOk=(r19Preview||r20Preview||r23Preview)
             && l.activeFinding?.id==='B4-003'
             && l.boundaries?.businessWritesAuthorized===false
@@ -1410,6 +1455,7 @@ jobs:
             throw Error('B4_003_DASHBOARD_READONLY_PREVIEW_SYNC_NOT_AUTHORIZED');
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'readonly_roster='+(readonlyRoster?'true':'false')+'\n');
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'scoped_preview='+(scopedPreview?'true':'false')+'\n');
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'scope_denial_preview='+(scopeDenialPreview?'true':'false')+'\n');
           // Additive one-case source, one LAB callable and isolated Hosting.
           // Exactly one owner-authorized push is admitted because the workflow
           // does not exist on the default branch (no manual Run workflow UI).
@@ -2737,8 +2783,8 @@ jobs:
           }
           if ! deploy_channel; then
             if grep -Fq "channel quota reached" "$RUNNER_TEMP/b4-003-preview.json"; then
-              if [ "${{ steps.gate.outputs.meta_tr_preview }}" = "true" ]; then
-                echo 'META_TR_V27_NO_HOSTING_CHANNEL_GC_AUTHORIZED' >&2
+              if [ "${{ steps.gate.outputs.meta_tr_preview }}" = "true" ] || [ "${{ steps.gate.outputs.scope_denial_preview }}" = "true" ]; then
+                echo 'B4_003_FOCUSED_PREVIEW_NO_HOSTING_CHANNEL_GC_AUTHORIZED' >&2
                 exit 1
               fi
               node "$GITHUB_WORKSPACE/tools/gravicentra-preview-channel-gc.mjs" "$FIREBASE_CLI_BIN" "$PROJECT_ID" "$CHANNEL_ID" "$GITHUB_WORKSPACE" "gi-"
