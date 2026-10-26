@@ -4388,5 +4388,21 @@
     "sharedRulesDeploymentAuthorized": false,
     "dataMutationAuthorized": false,
     "livePromotionAuthorized": false
+  },
+  "b4003BackendScopeDenialSuccessor20261026": {
+    "status": "SOURCE_STAGED_SYNTHETIC_QA_PASS_SECURITY_HOLD",
+    "gate": "I6.5/B4-003",
+    "authority": "PAULA_EXPLICIT_CORRECTIVE_AUTHORIZATION",
+    "parentHead": "17c4bed9ba8b2bd36f559a802390723647994ea2",
+    "sourceCommit": "81ba71afcd8527533ce1172af5aef98017d42d8e",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_BACKEND_SCOPE_DENIAL_SOURCE_SUCCESSOR_20261026.json",
+    "receiptBlobSha": "ff199298026d5a5f61aafeefaf74381b2ea148c7",
+    "sourceFileCount": 2,
+    "qaFileCount": 1,
+    "findingsPreserved": 295,
+    "frozenTasksPreserved": 86,
+    "sharedRulesDeploymentAuthorized": false,
+    "dataMutationAuthorized": false,
+    "livePromotionAuthorized": false
   }
 }

@@ -58,6 +58,7 @@ let latencyHistoricBlobs=new Map();
 let historicalInsurerProductBlobs=new Map();
 let dualHistoricBlobs=new Map();
 let operationalWriterHistoricalBlobs=new Map();
+let backendScopeHistoricalBlobs=new Map();
 const realGit=(...args)=>args[0]==='hash-object'&&CORRECTIVE_SOURCE_PREVIOUS.has(args[1])
  ?CORRECTIVE_SOURCE_PREVIOUS.get(args[1]):
  args[0]==='hash-object'&&historicalInsurerProductBlobs.has(args[1])
@@ -67,7 +68,9 @@ const realGit=(...args)=>args[0]==='hash-object'&&CORRECTIVE_SOURCE_PREVIOUS.has
  args[0]==='hash-object'&&dualHistoricBlobs.has(args[1])
  ?dualHistoricBlobs.get(args[1]):
  args[0]==='hash-object'&&operationalWriterHistoricalBlobs.has(args[1])
- ?operationalWriterHistoricalBlobs.get(args[1]):physicalGit(...args);
+ ?operationalWriterHistoricalBlobs.get(args[1]):
+ args[0]==='hash-object'&&backendScopeHistoricalBlobs.has(args[1])
+ ?backendScopeHistoricalBlobs.get(args[1]):physicalGit(...args);
 // Historical receipts are verified against their exact already-committed
 // predecessor tree. A newer source successor is verified separately against
 // the actual working tree, never substituted into an older signed receipt.
@@ -170,6 +173,8 @@ if(CORRECTIVE_SOURCE_ACTIVE){
  // operational-writer successor below separately validates the live bytes.
  const WRITER_NEXT=C.b4003OperationalWriterSourceSuccessor20261026||null;
  const writerQaPaths=new Set(WRITER_NEXT?Object.keys(readJson(WRITER_NEXT.receiptPath).qaBlobsAfter||{}):[]);
+ const latestAuthz=C.b4003BackendScopeDenialSuccessor20261026;
+ const authzSourcePaths=new Set(latestAuthz?Object.keys(readJson(latestAuthz.receiptPath).sourceBlobsAfter||{}):[]);
  const POLIZAS_SUCCESSOR=C.b4003PolizasContextCacheSuccessor20261025||{};
  const POLIZAS_SR=exists(POLIZAS_SUCCESSOR.receiptPath||'')?readJson(POLIZAS_SUCCESSOR.receiptPath):{};
  const expectedProductBlobs={...(SR26.sourceBlobsAfter||{}),...(POLIZAS_SR.sourceBlobsAfter||{})};
@@ -263,9 +268,11 @@ if(CORRECTIVE_SOURCE_ACTIVE){
   correctiveSourceCommit==='98289883458be7dfd9da539eeebf0665febb0249'&&
   qaCommit==='b6dfcb1caa29ed63f0a031b38bdf4b4c8104f34f'&&currentSourceCommitExact&&currentQaCommitExact&&
   Object.keys(SR26.sourceBlobsAfter||{}).length===8&&Object.keys(SR26.qaBlobsAfter||{}).length===2&&
-  Object.entries(currentSourceQa).every(([p,sha])=>writerQaPaths.has(p)
-   ?physicalGit('rev-parse','f31ad3e27ff07cb29fcf85a40165bc6b2ad6a9a4:'+p)===sha
-   :physicalGit('hash-object',p)===sha)&&
+  Object.entries(currentSourceQa).every(([p,sha])=>(writerQaPaths.has(p)
+   ?physicalGit('rev-parse','f31ad3e27ff07cb29fcf85a40165bc6b2ad6a9a4:'+p)
+   :authzSourcePaths.has(p)
+    ?physicalGit('rev-parse','17c4bed9ba8b2bd36f559a802390723647994ea2:'+p)
+    :physicalGit('hash-object',p))===sha)&&
   Object.keys(SR26.sourceBlobsAfter||{}).every(p=>(C.b4003CorrectiveSourceSecurityAuthorization20261024?.allowedSourcePaths||[]).includes(p))&&
   Object.keys(SR26.qaBlobsAfter||{}).every(p=>(B4.boundaries?.allowedQaFiles||[]).includes(p))&&
   SR26.packagerReceipt?.path==='artifacts/orbit360-recovery/release-control/I6_5_B4_003_PREVIEW_PACKAGER_DUPLICATE_EXPORT_ROOTFIX_20261025.json'&&
@@ -346,6 +353,59 @@ if(WRITER_SUCCESSOR){
  operationalWriterHistoricalBlobs=new Map(Object.keys(before).map(p=>[p,before[p]]));
  console.log('B4_003_OPERATIONAL_WRITER_SOURCE=FOUR_AUTHORIZED_SOURCES_ONE_QA_PHYSICAL_SHA_PASS_SECURITY_HOLD');
 }
+// 26-Oct additive backend authz successor: preserve immutable prior
+// source/QA receipts and independently attest live scope and diagnostic bytes.
+// This does not approve actual-user tests, LAB Rules or LIVE promotion.
+const BACKEND_SCOPE_NEXT=C.b4003BackendScopeDenialSuccessor20261026||null;
+if(BACKEND_SCOPE_NEXT){
+ const A=BACKEND_SCOPE_NEXT,B=B4.b4003BackendScopeDenialSuccessor20261026||{},
+  CP=COMP.b4003BackendScopeDenialSuccessor20261026||{},R=readJson(A.receiptPath);
+ const srcPaths=['functions/b4-003-scoped-access-boundary.js','functions/b4-003-scoped-policy-callable.js'];
+ const qaPath='tools/gravicentra-b4-003-scoped-related-reader.test.cjs';
+ const restoredQa='tools/gravicentra-b4-003-scoped-boundary.test.cjs';
+ need(A.status==='SOURCE_STAGED_SYNTHETIC_QA_PASS_SECURITY_HOLD'&&
+  A.gate==='I6.5/B4-003'&&A.authority==='PAULA_EXPLICIT_CORRECTIVE_AUTHORIZATION'&&
+  A.parentHead==='17c4bed9ba8b2bd36f559a802390723647994ea2'&&
+  A.sourceCommit==='81ba71afcd8527533ce1172af5aef98017d42d8e'&&
+  A.receiptPath==='artifacts/orbit360-recovery/release-control/I6_5_B4_003_BACKEND_SCOPE_DENIAL_SOURCE_SUCCESSOR_20261026.json'&&
+  A.receiptBlobSha===physicalGit('hash-object',A.receiptPath)&&
+  sameJson(A,B)&&sameJson(A,CP)&&
+  R.schema==='GI_I65_B4_003_BACKEND_SCOPE_DENIAL_SOURCE_SUCCESSOR_V1'&&
+  R.status===A.status&&R.gate===A.gate&&R.authority===A.authority&&
+  R.branch==='recovery/fase-a-clean-20260831'&&
+  R.parentHead===A.parentHead&&R.sourceCommit===A.sourceCommit&&
+  physicalGit('merge-base',A.sourceCommit,'HEAD')===A.sourceCommit&&
+  A.sourceFileCount===2&&A.qaFileCount===1&&
+  sameJson(Object.keys(R.sourceBlobsBefore).sort(),srcPaths.slice().sort())&&
+  sameJson(Object.keys(R.sourceBlobsAfter).sort(),srcPaths.slice().sort())&&
+  sameJson(Object.keys(R.qaBlobsAfter),[qaPath])&&
+  srcPaths.every(p=>
+   C.b4003CorrectiveSourceSecurityAuthorization20261024?.allowedSourcePaths?.includes(p)&&
+   R.sourceBlobsBefore[p]===physicalGit('rev-parse',A.parentHead+':'+p)&&
+   R.sourceBlobsAfter[p]===physicalGit('rev-parse',A.sourceCommit+':'+p)&&
+   R.sourceBlobsAfter[p]===physicalGit('hash-object',p)&&
+   R.sourceBlobsAfter[p]!==R.sourceBlobsBefore[p]&&
+   COMP.productFiles.includes(p)&&COMP.productFileBlobs[p]===R.sourceBlobsAfter[p])&&
+  B4.boundaries?.allowedQaFiles?.includes(qaPath)&&
+  R.qaBlobsBefore[qaPath]===physicalGit('rev-parse',A.parentHead+':'+qaPath)&&
+  R.qaBlobsAfter[qaPath]===physicalGit('hash-object',qaPath)&&
+  R.qaBlobsAfter[qaPath]!==R.qaBlobsBefore[qaPath]&&
+  R.restoredOriginalQa[restoredQa]===physicalGit('rev-parse',A.parentHead+':'+restoredQa)&&
+  R.restoredOriginalQa[restoredQa]===physicalGit('hash-object',restoredQa)&&
+  R.tests?.syntheticOnly===true&&
+  R.tests?.authenticatedBackendProof==='NOT_TESTED'&&
+  R.tests?.physicalRulesDeploymentProof==='NOT_TESTED'&&
+  R.scope?.sharedFirestoreRules===false&&
+  R.scope?.dataMutation===false&&R.scope?.livePromotion===false&&
+  R.scope?.authIamMutation===false&&R.scope?.newPreviewDispatched===false&&
+  A.findingsPreserved===295&&A.frozenTasksPreserved===86&&
+  B4.boundaries?.livePromotionAuthorized===false&&
+  C.b4003SecurityReleaseHold?.status==='ACTIVE_FAIL_CLOSED_UNAUTHORIZED_BROWSER_FIRESTORE_READ_WRITE',
+  'B4_003_BACKEND_SCOPE_DENIAL_SUCCESSOR_INVALID');
+ backendScopeHistoricalBlobs=new Map(Object.entries(R.sourceBlobsBefore));
+ console.log('B4_003_BACKEND_SCOPE_DENIAL_SUCCESSOR=EXACT_TWO_SOURCES_ONE_QA_PASS_SECURITY_HOLD');
+}
+
 if(DUAL_HOST_ACTIVE){
  const D=DUAL_HOST,R=readJson(D.receiptPath);
  const BL=B4.b4003DualHostProtectedTransport20261024||{};

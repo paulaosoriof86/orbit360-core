@@ -1,0 +1,53 @@
+{
+  "schema": "GI_I65_B4_003_BACKEND_SCOPE_DENIAL_SOURCE_SUCCESSOR_V1",
+  "status": "SOURCE_STAGED_SYNTHETIC_QA_PASS_SECURITY_HOLD",
+  "date": "2026-10-26",
+  "gate": "I6.5/B4-003",
+  "authority": "PAULA_EXPLICIT_CORRECTIVE_AUTHORIZATION",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "parentHead": "17c4bed9ba8b2bd36f559a802390723647994ea2",
+  "sourceCommit": "81ba71afcd8527533ce1172af5aef98017d42d8e",
+  "sourceBlobsBefore": {
+    "functions/b4-003-scoped-access-boundary.js": "61c0d528262a525ac4eaf6b5c727565b8131b772",
+    "functions/b4-003-scoped-policy-callable.js": "cff6c25c00eec628494cc6298a5d6f242f00438a"
+  },
+  "sourceBlobsAfter": {
+    "functions/b4-003-scoped-access-boundary.js": "8f93b300a6316189198e860a640b6cb8cf61e4ce",
+    "functions/b4-003-scoped-policy-callable.js": "743ed2a9bd9776cbd5d70ffe0669770b491b27aa"
+  },
+  "qaBlobsBefore": {
+    "tools/gravicentra-b4-003-scoped-related-reader.test.cjs": "ec6ea66466770a3906ba63e1ddaacd7b7c4da217"
+  },
+  "qaBlobsAfter": {
+    "tools/gravicentra-b4-003-scoped-related-reader.test.cjs": "73444822dce6ed3f3ded4433146737259492844f"
+  },
+  "restoredOriginalQa": {
+    "tools/gravicentra-b4-003-scoped-boundary.test.cjs": "26ba2d9d44c4679b0eef9f61032cd511ea4f7e61"
+  },
+  "changes": [
+    "normalize legacy propios to least-privilege own",
+    "emit allowlisted denial code and collection only without identity, tenant or payload",
+    "regress synthetic scope all/own policy"
+  ],
+  "tests": {
+    "syntheticOnly": true,
+    "checksInChangedQa": 2,
+    "authenticatedBackendProof": "NOT_TESTED",
+    "physicalRulesDeploymentProof": "NOT_TESTED"
+  },
+  "scope": {
+    "tenantId": "alianzas-soluciones",
+    "functions": [
+      "orbit360ScopedPolicyReadPreview"
+    ],
+    "sharedFirestoreRules": false,
+    "authIamMutation": false,
+    "dataMutation": false,
+    "realBusinessWrites": false,
+    "livePromotion": false,
+    "newPreviewDispatched": false
+  },
+  "findingsPreserved": 295,
+  "frozenTasksPreserved": 86
+}

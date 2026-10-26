@@ -43,6 +43,17 @@ for(const [label,role,collection,allow,code] of moduleSecurityCases){
      'SERVER_NEGATIVE_MODULE_'+label);
  }positiveModuleChecks++;
 }
+// Same authorized B4-003 security QA: Spanish legacy scope literals
+// must never acquire a wider role scope when module-specific values exist.
+const legacyOwn=secureCase('Operativo','polizas',{},
+ {dataScopes:{default:'propios',modules:{polizas:'propios'}}});
+assert.equal(resolveSecureModule(legacyOwn).scope,'own',
+ 'LEGACY_PROPIOS_MUST_NEVER_FALL_THROUGH_TO_OPERATIVO_ALL');
+const legacyAll=secureCase('Operativo','polizas',{},
+ {dataScopes:{default:'todos',modules:{polizas:'todos'}}});
+assert.equal(resolveSecureModule(legacyAll).scope,'all','CANONICAL_TODOS_RETAINED');
+console.log('B4_003_LEGACY_PROPIOS_FAIL_CLOSED_PASS checks=2 synthetic_only no_writes');
+
 const selectedAdvisor=secureCase('Asesor','auditoria',{},{
  roles:['Dirección','Asesor'],modulesVisible:['*','equipo']
 });
