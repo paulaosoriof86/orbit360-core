@@ -1,0 +1,59 @@
+{
+  "schema": "GI_I65_B4_003_C360_COBROS_FOCAL_SOURCE_SUCCESSOR_V1",
+  "gate": "I6.5/B4-003",
+  "status": "SOURCE_STAGED_SYNTHETIC_QA_PASS_SECURITY_HOLD",
+  "authority": "PAULA_EXPLICIT_SCOPED_ADDITIVE_SUCCESSOR_20261026",
+  "authorization": "Paula authorized adding only the canonical Cobros bridge and its new QA contract as a bounded successor within I6.5/B4-003, without changing historical locks, data, Rules or production.",
+  "branch": "recovery/fase-a-clean-20260831",
+  "parentHead": "f4423392d8bace3704c075dd1d98a12e5392ccf1",
+  "sourceBlobsBefore": {
+    "orbit360-platform/core/queries.js": "ddb9e01c9f6aa82f750961ecf66d37475c2f6205",
+    "orbit360-platform/modules/cliente360.js": "f170107fe3341d2e8d0b1d9b83a39674e36a3807",
+    "orbit360-platform/modules/cobros-cartera-i65-closure-bridge.js": "45e95a42596a27008e67a3cd6cd4601ea8ca6cb8"
+  },
+  "sourceBlobsAfter": {
+    "orbit360-platform/core/queries.js": "59e13621e931c4c4959a33e6de82f39bf5a03f08",
+    "orbit360-platform/modules/cliente360.js": "ef6edf61f35315026f8846a7a0c8c2cecb86ae8c",
+    "orbit360-platform/modules/cobros-cartera-i65-closure-bridge.js": "ec7185bb5e641c3a4f6e6f5da0ddac6bacb37860"
+  },
+  "qaBlobsAfter": {
+    "tools/gravicentra-b4-003-c360-cobros-currency-overdue.test.cjs": "13a5d5634be6108169ed7ef9855bc972c05705dd"
+  },
+  "additionalProductFileAuthorized": "orbit360-platform/modules/cobros-cartera-i65-closure-bridge.js",
+  "additionalQaFileAuthorized": "tools/gravicentra-b4-003-c360-cobros-currency-overdue.test.cjs",
+  "historicalB4LockBlobSha": "436f155bae1ccf042d45b398fbb53262f481095c",
+  "historicalCompositionBlobSha": "646aeaa0b50e9006d6bff52161a87f53f7aa7aca",
+  "historicalExecutorBlobSha": "59de415d61fb0699d882916723f41b764e7789e9",
+  "historicalGuardBlobSha": "aa2dc8aed62ff86aa75acf901d9a3fa2208f3618",
+  "previewWorkflowBlobSha": "539af429aeebfe9bd79e5a191454d34be22a3521",
+  "successorGuardBlobSha": "8455e13283479f873aef596355b5b307c44bb248",
+  "scope": {
+    "tenantId": "alianzas-soluciones",
+    "hostingPreviewOnly": true,
+    "scopedReadOnlyFunction": "orbit360ScopedPolicyReadPreview",
+    "sharedFirestoreRules": false,
+    "dataMutation": false,
+    "operationalWrites": false,
+    "syntheticBusinessWrites": false,
+    "authIamMutation": false,
+    "reimport": false,
+    "livePromotion": false,
+    "newBranch": false,
+    "historicalLocksChanged": false
+  },
+  "verification": {
+    "newSyntheticQa": "GI_B4_003_C360_COBROS_CURRENCY_OVERDUE_SYNTHETIC_PASS checks=26 active_only no_network no_business_writes",
+    "countryFinanceParity": "GI_B4_003_COUNTRY_FINANCE_PARITY_SYNTHETIC_PASS checks=12",
+    "historicalRoleScope": "B4_003_HISTORY_VERIFIED_RELATION_ROLE_COUNTRY_SCOPE_QA_PASS checks=7",
+    "authenticatedPreviewNewSource": "PENDING",
+    "client360CurrencyBySource": "SYNTHETIC_PASS",
+    "cobrosExpiredPolicyRows": "SYNTHETIC_PASS",
+    "cobrosParentCountryMismatchDenied": "SYNTHETIC_PASS"
+  },
+  "preserved": {
+    "findings": 295,
+    "frozenTasks": 86,
+    "gate": "I6.5/B4-003",
+    "securityReleaseHold": "ACTIVE_FAIL_CLOSED_UNAUTHORIZED_BROWSER_FIRESTORE_READ_WRITE"
+  }
+}

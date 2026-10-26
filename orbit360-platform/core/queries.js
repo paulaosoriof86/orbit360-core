@@ -163,6 +163,46 @@ Orbit.q = (function () {
     return (Array.isArray(rows)?rows:[]).filter(row=>portfolioAmountProof(row,proofContext).value!=null).length;
   }
 
+  // Financial summaries are projections, not a foreign-exchange authority.
+  // Preserve the legacy scalar fields for existing consumers, but expose the
+  // source-currency breakdown for any UI that displays monetary values.
+  function sumsByCurrency(rows, valueOf, currencyOf) {
+    const totals = {};
+    (rows || []).forEach(row => {
+      const value = explicitNumber(valueOf(row));
+      if (value == null) return;
+      const currency = String(currencyOf(row) || 'SIN_MONEDA').trim().toUpperCase() || 'SIN_MONEDA';
+      totals[currency] = (totals[currency] || 0) + value;
+    });
+    return totals;
+  }
+  function clientMoneyBreakdown(pol, car, realized, com, ctx, policies) {
+    const byPolicyCurrency = row => {
+      const policy = policies.get(String(row && row.polizaId || ''));
+      const fromRow = String(row && row.moneda || '').trim().toUpperCase();
+      const fromPolicy = String(policy && (policy.moneda || policy.divisa) || '').trim().toUpperCase();
+      // Conflicting original currencies are not silently relabelled.
+      return fromRow && fromPolicy && fromRow !== fromPolicy ? 'SIN_MONEDA' : (fromRow || fromPolicy || 'SIN_MONEDA');
+    };
+    // The canonical portfolio adapter excludes explicitly inactive obligations.
+    // Do not reintroduce them as overdue badges in Cliente 360.
+    const open = car.filter(row => row && row.carteraActiva !== false && portfolioOpen(row));
+    const overdue = open.filter(portfolioIsOverdue);
+    const pending = open.filter(row => !portfolioIsOverdue(row));
+    const proof = row => portfolioAmountProof(row, ctx).value;
+    return {
+      totals: {
+        primaAnual: sumsByCurrency(pol.filter(p => p.estado === 'Vigente' || p.estado === 'Por renovar'), p => p.primaTotal, p => p.moneda || p.divisa),
+        cobrado: sumsByCurrency(realized, p => p.monto, byPolicyCurrency),
+        pendiente: sumsByCurrency(pending, proof, byPolicyCurrency),
+        vencido: sumsByCurrency(overdue, proof, byPolicyCurrency),
+        comisionGen: sumsByCurrency(com, c => c.monto, c => c.moneda)
+      },
+      overdueCount: overdue.length,
+      overdueUnverifiedCount: overdue.filter(row => proof(row) == null || byPolicyCurrency(row) === 'SIN_MONEDA').length
+    };
+  }
+
   // B3-008: la fórmula aprobada de Salud vive en un único owner.
   function saludCliente(cli, vigentes, vencido) {
     let salud = 70;
@@ -192,12 +232,16 @@ Orbit.q = (function () {
     const comisionGen = com.reduce((s, c) => s + amount(c.monto), 0);
     const porRenovar = pol.filter(p => p.estado === 'Por renovar').length;
     const salud = saludCliente(cli, vigentes, vencido);
+    const policyIndex = new Map(pol.filter(p => p && p.id != null).map(p => [String(p.id), p]));
+    const currencySummary = clientMoneyBreakdown(pol, car, realized, com, amountIndex, policyIndex);
     return {
       cli, pol, rec, car, cob, com,
       moneda: cli ? cli.moneda : 'GTQ',
       nPolizas: pol.length, nVigentes: vigentes.length,
       primaAnual, cobrado, pendiente, vencido, recibosPendientes, recibosVencidos, comisionGen, porRenovar,
-      salud
+      salud, porMoneda: currencySummary.totals,
+      carteraVencidaCount: currencySummary.overdueCount,
+      carteraVencidaSinMonto: currencySummary.overdueUnverifiedCount
     };
   }
 
@@ -212,6 +256,7 @@ Orbit.q = (function () {
     const comisiones = S().all('comisiones') || [];
     const portfolioMoney=portfolioAmountContext({receipts:recibos,policies:polizas,portfolios:cartera,cobros});
     const polByClient = new Map(), polById = new Map(), recByClient = new Map(), carByClient = new Map(), cobByClient = new Map(), realizedByClient = new Map(), comByClient = new Map();
+    const policyCurrencyIndex = new Map(polizas.filter(p => p && p.id != null).map(p => [String(p.id), p]));
     const add = (map, id, row) => {
       if (id == null) return;
       if (!map.has(id)) map.set(id, []);
@@ -243,12 +288,15 @@ Orbit.q = (function () {
       const comisionGen = com.reduce((s, c) => s + amount(c.monto), 0);
       const porRenovar = pol.filter(p => p.estado === 'Por renovar').length;
       const salud = saludCliente(cli, vigentes, vencido);
+      const currencySummary = clientMoneyBreakdown(pol, car, realizedCob, com, portfolioMoney, policyCurrencyIndex);
       index.set(cli.id, {
         cli, pol, rec, car, cob, com,
         moneda: cli.moneda,
         nPolizas: pol.length, nVigentes: vigentes.length,
         primaAnual, cobrado, pendiente, vencido, recibosPendientes, recibosVencidos, comisionGen, porRenovar,
-        salud
+        salud, porMoneda: currencySummary.totals,
+        carteraVencidaCount: currencySummary.overdueCount,
+        carteraVencidaSinMonto: currencySummary.overdueUnverifiedCount
       });
     });
     return index;

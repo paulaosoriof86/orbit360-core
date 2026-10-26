@@ -15055,5 +15055,21 @@
     "sharedRulesDeploymentAuthorized": false,
     "dataMutationAuthorized": false,
     "livePromotionAuthorized": false
+  },
+  "b4003C360CobrosFocalSourceSuccessor20261026": {
+    "status": "SOURCE_STAGED_SYNTHETIC_QA_PASS_SECURITY_HOLD",
+    "gate": "I6.5/B4-003",
+    "authority": "PAULA_EXPLICIT_SCOPED_ADDITIVE_SUCCESSOR_20261026",
+    "parentHead": "f4423392d8bace3704c075dd1d98a12e5392ccf1",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_C360_COBROS_FOCAL_SOURCE_SUCCESSOR_20261026.json",
+    "receiptBlobSha": "9727048cadb62a892abb853a0db6fcd3309deb9e",
+    "sourceFileCount": 3,
+    "qaFileCount": 1,
+    "findingsPreserved": 295,
+    "frozenTasksPreserved": 86,
+    "historicalLocksChanged": false,
+    "sharedRulesDeploymentAuthorized": false,
+    "dataMutationAuthorized": false,
+    "livePromotionAuthorized": false
   }
 }

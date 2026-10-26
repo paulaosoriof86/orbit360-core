@@ -135,6 +135,30 @@ Orbit.modules.cliente360 = (function () {
   const ROLE_NORM = () => String(ROLE()||'').trim().normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'_');
   const advisorRole = () => ['asesor','asesora','asesor_sr','asesora_sr','asesor_jr','asesora_jr','comercial'].includes(ROLE_NORM());
   const verEmpresa = () => ['Dirección', 'Admin', 'Finanzas'].includes(ROLE());
+  function sourceCurrencyTotals(rows, amountOf, currencyOf) {
+    const totals = {};
+    (rows || []).forEach(row => {
+      const raw = amountOf(row);
+      if (raw == null || String(raw).trim() === '') return;
+      const n = U.finiteNumber(raw);
+      if (n == null) return;
+      const cur = String(currencyOf(row) || 'SIN_MONEDA').trim().toUpperCase() || 'SIN_MONEDA';
+      totals[cur] = (totals[cur] || 0) + n;
+    });
+    return totals;
+  }
+  function currencyTotalsHtml(totals, short) {
+    const pairs = Object.entries(totals || {}).sort(([a], [b]) => a.localeCompare(b));
+    if (!pairs.length) return '<span class="muted">Sin importes confirmados</span>';
+    return pairs.map(([cur, value]) => '<span data-c360-currency="' + U.esc(cur) + '" style="display:block">' +
+      (cur === 'SIN_MONEDA' ? 'Moneda por validar · ' + Number(value).toLocaleString('es-GT') :
+        (short ? U.moneyShort(value, cur) : U.money(value, cur)) + ' ' + U.esc(cur)) + '</span>').join('');
+  }
+  function summaryMoney(r, key, short) {
+    const html = currencyTotalsHtml(r && r.porMoneda && r.porMoneda[key], short);
+    const unknown = key === 'vencido' ? Number(r && r.carteraVencidaSinMonto || 0) : 0;
+    return html + (unknown ? '<span class="badge warn" data-c360-overdue-unverified="' + unknown + '" style="display:block;margin-top:3px">' + unknown + ' obligación(es) con importe o moneda por validar</span>' : '');
+  }
   // Estado de validación del cobro (coherente con Cobros): reportado ≠ aplicado
   function cobBadge(c) {
     let e, tone;
@@ -249,7 +273,9 @@ Orbit.modules.cliente360 = (function () {
       const vigentes = pol.filter(esRenovable);
       const primaAnual = vigentes.reduce((s, p) => s + (policyTotal(p) || 0), 0);
       const canonical = canonicalSummaryIndex && canonicalSummaryIndex.get(c.id);
-      return canonical || { moneda: c ? c.moneda : 'GTQ', nPolizas: pol.length, nVigentes: vigentes.length, primaAnual, pendiente: null, vencido: null, salud: null, readiness: portfolioReadiness, policyReadiness };
+      return canonical || { moneda: c ? c.moneda : 'GTQ', nPolizas: pol.length, nVigentes: vigentes.length, primaAnual,
+        porMoneda: { primaAnual: sourceCurrencyTotals(vigentes, p => policyTotal(p), p => p.moneda || p.divisa) },
+        pendiente: null, vencido: null, salud: null, readiness: portfolioReadiness, policyReadiness };
     };
     const summaryAggregateStartedAt = perfNow();
     const clientById = new Map(clientes.filter(c => c && c.id != null).map(c => [c.id, c]));
@@ -287,7 +313,7 @@ Orbit.modules.cliente360 = (function () {
             const financialReady = r.salud != null && r.vencido != null;
             const cartera = !financialReady
               ? `<span class="badge neutral" data-c360-list-portfolio-readiness="${portfolioReadiness}">${portfolioReadiness === 'unavailable' ? 'No disponible' : 'Actualizando datos'}</span>`
-              : r.vencido > 0 ? `<span class="badge danger">Vencida ${U.moneyShort(r.vencido, r.moneda)}</span>` : r.pendiente > 0 ? `<span class="badge warn">Al día</span>` : `<span class="badge ok">Al día</span>`;
+              : r.carteraVencidaCount > 0 ? `<span class="badge danger">Vencida</span>${summaryMoney(r,'vencido',true)}` : r.pendiente > 0 ? `<span class="badge warn">Por vencer</span>` : `<span class="badge ok">Sin cartera vencida</span>`;
             const salud = financialReady
               ? `<div data-c360-list-health="1" data-readiness="ready" data-value="${r.salud}" style="display:flex;align-items:center;gap:8px"><div class="bar" style="width:54px"><i style="width:${r.salud}%;background:${r.salud >= 70 ? 'linear-gradient(90deg,#1f8a4c,#34b96a)' : r.salud >= 45 ? 'linear-gradient(90deg,#c9821b,#e0a23c)' : 'linear-gradient(90deg,#a01828,#C5162E)'}"></i></div><span class="mono" style="font-size:12px">${r.salud}</span></div>`
               : `<span class="muted" data-c360-list-health="1" data-readiness="${portfolioReadiness}">${portfolioReadiness === 'unavailable' ? 'No disponible' : 'Calculando'}</span>`;
@@ -299,7 +325,7 @@ Orbit.modules.cliente360 = (function () {
               </div></td>
               <td><div style="display:flex;align-items:center;gap:7px"><span class="dot-s" style="background:${ase ? ase.color : '#999'}"></span>${U.esc(ase ? ase.nombre : '—')}</div></td>
               <td class="num">${policyReadiness === 'ready' ? r.nVigentes + '<span class="muted">/' + r.nPolizas + '</span>' : '<span class="muted" data-c360-policy-row-readiness="' + U.esc(policyReadiness) + '">Actualizando</span>'}</td>
-              <td class="num">${policyReadiness === 'ready' ? U.money(r.primaAnual, r.moneda) : '<span class="muted">Actualizando</span>'}</td>
+              <td class="num">${policyReadiness === 'ready' ? summaryMoney(r,'primaAnual') : '<span class="muted">Actualizando</span>'}</td>
               <td>${cartera}</td>
               <td>${salud}</td>
               <td style="text-align:right;color:var(--ink-3)">›</td>
@@ -477,10 +503,10 @@ Orbit.modules.cliente360 = (function () {
         <!-- KPI band -->
         <div class="fh-kpis">
           ${kpiMetricCell('Pólizas vigentes', r.nVigentes + ' <small>/ ' + r.nPolizas + '</small>', '', '📑', policyReadiness)}
-          ${kpiMetricCell('Prima anual', U.money(r.primaAnual, r.moneda), '', '💰', policyReadiness)}
-          ${kpiMetricCell('Cartera al día', U.money(r.cobrado, r.moneda), 'ok', '✅', paymentReadiness)}
-          ${kpiMetricCell('Cartera vencida', U.money(r.vencido, r.moneda), r.vencido > 0 ? 'danger' : '', '⚠', healthReadiness)}
-          ${kpiMetricCell('Comisión generada', U.money(r.comisionGen, r.moneda), '', '💼', commissionReadiness)}
+          ${kpiMetricCell('Prima anual', summaryMoney(r,'primaAnual'), '', '💰', policyReadiness)}
+          ${kpiMetricCell('Cobros confirmados', summaryMoney(r,'cobrado'), 'ok', '✅', paymentReadiness)}
+          ${kpiMetricCell('Cartera vencida', summaryMoney(r,'vencido'), r.carteraVencidaCount > 0 ? 'danger' : '', '⚠', healthReadiness)}
+          ${kpiMetricCell('Comisión generada', summaryMoney(r,'comisionGen'), '', '💼', commissionReadiness)}
         </div>
       </div>
 
@@ -593,9 +619,9 @@ Orbit.modules.cliente360 = (function () {
         <div class="card pad">
           <b style="font-family:var(--f-display);font-size:15px">Próximas acciones</b>
           <div style="margin-top:12px;display:grid;gap:10px">
-            ${proxRenov ? actionRow('🔄', 'Renovación', `${proxRenov.ramo} · ${proxRenov.numero}`, U.fmtDate(proxRenov.vigenciaFin), 'warn') : actionRow('✓', 'Sin renovaciones próximas', 'Cartera al día', '', 'ok')}
-            ${proxCobro ? actionRow('💳', 'Próxima cuota', `Cuota ${proxCobro.cuota || proxCobro.secuencia || '—'} · ${U.money(proxCobro.monto != null ? proxCobro.monto : proxCobro.saldo, proxCobro.moneda)}`, U.fmtDate(proxCobro.vence || proxCobro.fechaVencimiento || proxCobro.fechaLimite), 'info') : actionRow('✓', 'Sin cuotas pendientes', 'Cartera al día', '', 'ok')}
-            ${r.vencido > 0 ? actionRow('⚠', 'Cartera vencida', U.money(r.vencido, r.moneda) + ' por gestionar', 'urgente', 'danger') : ''}
+            ${proxRenov ? actionRow('🔄', 'Renovación', `${proxRenov.ramo} · ${proxRenov.numero}`, U.fmtDate(proxRenov.vigenciaFin), 'warn') : actionRow('✓', 'Sin renovaciones próximas', 'Sin renovación inmediata', '', 'ok')}
+            ${proxCobro ? actionRow('💳', 'Próxima cuota', `Cuota ${proxCobro.cuota || proxCobro.secuencia || '—'} · ${proxCobro.monto != null || proxCobro.saldo != null ? U.money(proxCobro.monto != null ? proxCobro.monto : proxCobro.saldo, proxCobro.moneda) : 'Importe por validar'}`, U.fmtDate(proxCobro.vence || proxCobro.fechaVencimiento || proxCobro.fechaLimite), 'info') : actionRow('✓', 'Sin cuotas por vencer', Number(r.carteraVencidaCount||0) > 0 ? 'Existen vencidas para revisar' : 'Sin pendientes futuros', '', Number(r.carteraVencidaCount||0) > 0 ? 'warn' : 'ok')}
+            ${Number(r.carteraVencidaCount||0) > 0 ? actionRow('⚠', 'Cartera vencida', summaryMoney(r,'vencido') + ' · requiere gestión', 'urgente', 'danger') : ''}
           </div>
         </div>
         <div class="card pad">
@@ -796,9 +822,9 @@ Orbit.modules.cliente360 = (function () {
     const note = noteParts.join(' ') || 'No hay pagos pendientes de conciliación para el filtro actual.';
     return `<div class="card" data-rp-native-cobros-note="1" style="padding:12px 14px;margin-bottom:12px"><b>Cobros y evidencia de pago</b><div class="muted" style="font-size:12.5px;margin-top:3px">${note} Los cobros confirmados se muestran en la misma tabla y su conciliación se mantiene separada.</div></div>
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px"><label style="font-size:12.5px;font-weight:600;color:var(--ink-2)">Filtrar por póliza:</label><select id="cob-pol-fil" class="o-sel" style="max-width:360px;font-size:12.5px">${polOptions}</select></div><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px">
-      ${miniStat('Cobrado confirmado', U.money(r.cobrado, r.moneda), 'ok')}
-      ${miniStat('Cartera por vencer', U.money(r.pendiente, r.moneda), 'warn')}
-      ${miniStat('Cartera exigible', U.money(r.vencido, r.moneda), r.vencido > 0 ? 'danger' : 'ok')}
+      ${miniStat('Cobrado confirmado', summaryMoney(r,'cobrado'), 'ok')}
+      ${miniStat('Cartera por vencer', summaryMoney(r,'pendiente'), 'warn')}
+      ${miniStat('Cartera exigible', summaryMoney(r,'vencido'), r.carteraVencidaCount > 0 ? 'danger' : 'ok')}
     </div>
     <div class="card" style="overflow:hidden"><div style="overflow-x:auto"><table class="tbl">
       <thead><tr><th>Póliza</th><th>Cuota</th><th class="num">Monto</th><th>Vence</th><th>Pago</th><th>Método</th><th>Estado</th><th>Conciliación</th><th>Acción</th></tr></thead>
@@ -1030,7 +1056,8 @@ Orbit.modules.cliente360 = (function () {
     const sel = recPolFiltro[cid] || 'todas';
     const cob = sel === 'todas' ? cobAll : cobAll.filter(c => c.polizaId === sel);
     const pend = cob.filter(c => c.estado === 'Pendiente' || c.estado === 'Vencido');
-    const cobrado = cob.filter(c => c.estado === 'Pagado').reduce((s, c) => s + (+c.monto || 0), 0);
+    const cobradoPorMoneda = sourceCurrencyTotals(cob.filter(c => c.estado === 'Pagado'), c => c.monto,
+      c => c.moneda || ((S().get('polizas', c.polizaId) || {}).moneda));
     const ident = (p) => {
       const v = S().where('vehiculos', x => x.polizaId === p.id)[0];
       return v ? ([v.marca,v.linea].filter(x=>x && !/^(undefined|null)$/i.test(String(x).trim())).join(' ') + (v.placa && !/^(undefined|null)$/i.test(String(v.placa).trim()) ? ' · ' + v.placa : '')) : (p.concepto || p.subramo || p.ramo);
@@ -1040,7 +1067,7 @@ Orbit.modules.cliente360 = (function () {
     return `<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px">
       ${miniStat('Recibos' + (sel === 'todas' ? ' del cliente' : ' de la póliza'), String(cob.length), '')}
       ${miniStat('Por confirmar', String(pend.length), pend.length ? 'warn' : 'ok')}
-      ${miniStat('Confirmado', U.money(cobrado, r.moneda), 'ok')}
+      ${miniStat('Confirmado', currencyTotalsHtml(cobradoPorMoneda), 'ok')}
     </div>
     <div class="card" style="overflow:hidden">
       <div style="padding:12px 14px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">

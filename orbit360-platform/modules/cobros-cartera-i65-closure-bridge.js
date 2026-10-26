@@ -19,10 +19,25 @@ function relationIndexes(q){
   return {policyById:policyById,clientById:clientById,vehicleByPolicy:vehicleByPolicy};
 }
 function policy(r,idx){var id=clean(r&&r.polizaId);return (idx&&idx.policyById&&idx.policyById[id])||{};}
-function activePolicyRow(r,idx){var p=policy(r,idx),s=clean(p&&p.estado).toLowerCase();return !!(p&&p.id&&(s==='vigente'||s==='por renovar'));}
+// An open premium obligation survives expiration of the linked policy.
+// Eligibility is based on the exact parent relationship and portfolio state,
+// never on the current policy's Vigente/Por renovar label.
+function linkedPolicyRow(r,idx){
+  var p=policy(r,idx);
+  return !!(p&&p.id&&countryOk(r,idx));
+}
 function client(r,idx){var p=policy(r||{},idx),id=clean((r&&r.clienteId)||p.clienteId);return (idx&&idx.clientById&&idx.clientById[id])||{};}
-function countryOk(r,idx){var c=client(r,idx),p=Orbit.pais;return !p||p==='TODOS'||c.pais===p||(r&&r.pais===p);}
-function accessOk(col,r){try{return !Orbit.access||!Orbit.access.canView||Orbit.access.canView(col,r,'cobros');}catch(e){return true;}}
+function countryOk(r,idx){
+  var p=policy(r,idx),ownId=clean(r&&r.clienteId),policyId=clean(r&&r.polizaId),parentId=clean(p&&p.clienteId);
+  if(policyId&&!p.id||ownId&&parentId&&ownId!==parentId)return false;
+  var resolvedId=parentId||ownId,c=idx&&idx.clientById&&idx.clientById[resolvedId];
+  if(!resolvedId||!c)return false;
+  var countries=[p.pais,c.pais,r&&r.pais].map(function(x){return clean(x).toUpperCase();}).filter(Boolean);
+  if(!countries.length||countries.some(function(x){return !['GT','CO'].includes(x)||x!==countries[0];}))return false;
+  var selected=clean(Orbit.pais).toUpperCase();
+  return !selected||selected==='TODOS'||countries[0]===selected;
+}
+function accessOk(col,r){try{return !!(Orbit.access&&typeof Orbit.access.canView==='function'&&Orbit.access.canView(col,r,'cobros'));}catch(e){return false;}}
 function searchText(r,idx){
   var c=client(r,idx),p=policy(r,idx),v=(idx&&idx.vehicleByPolicy&&idx.vehicleByPolicy[clean(p&&p.id)])||{};
   return [c.nombre,p.numero,v.placa,r&&r.serie,r&&r.cuota].map(clean).join(' ').toLowerCase();
@@ -30,7 +45,7 @@ function searchText(r,idx){
 function matches(r,q,idx){q=clean(q).toLowerCase();return !q||searchText(r,idx).indexOf(q)>=0;}
 function portfolioRows(q){
   var due=rp().dueDate||function(x){return x.fechaLimite||x.vence||x.fechaVencimiento;},idx=relationIndexes(q);
-  return (S().all('carteraPrimas')||[]).filter(function(r){return r&&r.carteraActiva!==false&&activePolicyRow(r,idx)&&countryOk(r,idx)&&accessOk('carteraPrimas',r)&&matches(r,q,idx);})
+  return (S().all('carteraPrimas')||[]).filter(function(r){return r&&r.carteraActiva!==false&&linkedPolicyRow(r,idx)&&accessOk('carteraPrimas',r)&&matches(r,q,idx);})
     .sort(function(a,b){return clean(due(a)).localeCompare(clean(due(b)));});
 }
 function cobroRows(q){

@@ -1193,7 +1193,68 @@ jobs:
             && l.boundaries?.dataMutationAuthorized===false
             && l.boundaries?.livePromotionAuthorized===false;
           if(scopeDenialRequested&&!scopeDenialPreview)throw Error('B4_003_SCOPE_DENIAL_PREVIEW_NOT_SOURCE_BOUND_FAIL_CLOSED');
-          const scopedPreview=scopeDenialPreview||correctiveSourcePreview||priorScopedPreview||onePassInternal||oct15ScopedReadback||restrictedScoped||c03Scoped||uatScoped||currentScoped||causalScoped||insurerScoped||cacheScoped||countryScoped||agingScoped||pctxScoped||moneyScoped||postAuthScoped||uatFixScoped||rulesCountryScoped||storeScoped||safeDiagScoped||latencyScoped||roleRecoveryScoped||activeInsurerScoped||policyCountScoped||dualHostScoped;
+          // Paula's 26-Oct explicit corrective authorization covers exactly the
+          // existing Client 360 owner, its queries, and the canonical Cobros
+          // adapter. The historical B4 lock is unchanged; this is a separate
+          // byte-pinned source successor and read-only isolated Preview.
+          const focalSubject='build(i6.5 B4-003): exact Cliente360 Cobros focal Preview';
+          const focalRequested=currentSubject===focalSubject;
+          const focalControl=c.b4003C360CobrosFocalSourceSuccessor20261026||{};
+          const focalReceiptPath='artifacts/orbit360-recovery/release-control/I6_5_B4_003_C360_COBROS_FOCAL_SOURCE_SUCCESSOR_20261026.json';
+          const focalReceipt=JSON.parse(fs.readFileSync(focalReceiptPath,'utf8'));
+          const focalFiles=['orbit360-platform/core/queries.js','orbit360-platform/modules/cliente360.js','orbit360-platform/modules/cobros-cartera-i65-closure-bridge.js'];
+          const focalTest='tools/gravicentra-b4-003-c360-cobros-currency-overdue.test.cjs';
+          const focalParent='f4423392d8bace3704c075dd1d98a12e5392ccf1';
+          const gitRead=(...args)=>require('node:child_process').execFileSync('git',args,{encoding:'utf8'}).trim();
+          const focalPreview=focalRequested
+            && focalControl.status==='SOURCE_STAGED_SYNTHETIC_QA_PASS_SECURITY_HOLD'
+            && focalControl.gate==='I6.5/B4-003'
+            && focalControl.authority==='PAULA_EXPLICIT_SCOPED_ADDITIVE_SUCCESSOR_20261026'
+            && focalControl.receiptPath===focalReceiptPath
+            && focalControl.receiptBlobSha===productSha(focalReceiptPath)
+            && focalControl.parentHead===focalParent
+            && focalControl.sourceFileCount===3&&focalControl.qaFileCount===1
+            && focalReceipt.schema==='GI_I65_B4_003_C360_COBROS_FOCAL_SOURCE_SUCCESSOR_V1'
+            && focalReceipt.status===focalControl.status
+            && focalReceipt.authority===focalControl.authority
+            && focalReceipt.parentHead===focalParent
+            && focalReceipt.branch==='recovery/fase-a-clean-20260831'
+            && gitRead('merge-base',focalParent,'HEAD')===focalParent
+            && Object.keys(focalReceipt.sourceBlobsBefore||{}).sort().join('|')===focalFiles.slice().sort().join('|')
+            && Object.keys(focalReceipt.sourceBlobsAfter||{}).sort().join('|')===focalFiles.slice().sort().join('|')
+            && Object.keys(focalReceipt.qaBlobsAfter||{}).join('|')===focalTest
+            && focalFiles.every(p=>focalReceipt.sourceBlobsBefore[p]===gitRead('rev-parse',focalParent+':'+p)
+              &&focalReceipt.sourceBlobsAfter[p]===productSha(p))
+            && focalReceipt.qaBlobsAfter[focalTest]===productSha(focalTest)
+            && focalReceipt.additionalProductFileAuthorized===focalFiles[2]
+            && focalReceipt.additionalQaFileAuthorized===focalTest
+            && focalReceipt.historicalB4LockBlobSha===productSha(process.env.B4_LOCK)
+            && focalReceipt.historicalCompositionBlobSha===productSha(process.env.COMPOSITION)
+            && focalReceipt.historicalExecutorBlobSha===gitRead('rev-parse',focalParent+':.github/workflows/gravicentra-b4-003-executor.yml')
+            && focalReceipt.previewWorkflowBlobSha===productSha('.github/workflows/gravicentra-b4-003-executor.yml')
+            && focalReceipt.scope?.tenantId==='alianzas-soluciones'
+            && focalReceipt.scope?.hostingPreviewOnly===true
+            && focalReceipt.scope?.scopedReadOnlyFunction==='orbit360ScopedPolicyReadPreview'
+            && ['sharedFirestoreRules','dataMutation','operationalWrites','syntheticBusinessWrites',
+              'authIamMutation','reimport','livePromotion','newBranch','historicalLocksChanged']
+              .every(k=>focalReceipt.scope?.[k]===false)
+            && focalReceipt.preserved?.findings===295
+            && focalReceipt.preserved?.frozenTasks===86
+            && c.b4003SecurityReleaseHold?.status==='ACTIVE_FAIL_CLOSED_UNAUTHORIZED_BROWSER_FIRESTORE_READ_WRITE'
+            && c.currentB4?.status==='B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL'
+            && c.nextAction==='I6_5_FORENSIC_REMEDIATION_B4_003_R20_TARGETED_PAULA_VISUAL'
+            && l.activeFinding?.id==='B4-003'
+            && l.boundaries?.buildDispatchAuthorized===true
+            && l.boundaries?.previewMutationAuthorized===true
+            && l.boundaries?.functionDeploymentAuthorized===true
+            && l.boundaries?.providerDeploymentAuthorized===true
+            && l.boundaries?.businessWritesAuthorized===false
+            && l.boundaries?.syntheticQaWritesAuthorized===false
+            && l.boundaries?.dataMutationAuthorized===false
+            && l.boundaries?.realOperationalWritesAuthorized===false
+            && l.boundaries?.livePromotionAuthorized===false;
+          if(focalRequested&&!focalPreview)throw Error('B4_003_C360_COBROS_FOCAL_PREVIEW_SCOPE_DENIED');
+          const scopedPreview=focalPreview||scopeDenialPreview||correctiveSourcePreview||priorScopedPreview||onePassInternal||oct15ScopedReadback||restrictedScoped||c03Scoped||uatScoped||currentScoped||causalScoped||insurerScoped||cacheScoped||countryScoped||agingScoped||pctxScoped||moneyScoped||postAuthScoped||uatFixScoped||rulesCountryScoped||storeScoped||safeDiagScoped||latencyScoped||roleRecoveryScoped||activeInsurerScoped||policyCountScoped||dualHostScoped;
           const previewOk=(r19Preview||r20Preview||r23Preview)
             && l.activeFinding?.id==='B4-003'
             && l.boundaries?.businessWritesAuthorized===false
