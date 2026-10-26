@@ -122,7 +122,7 @@ jobs:
       - name: Gate exact B4-003 Preview
         id: gate
         env:
-          META_TR_V27_REQUEST: ${{ github.event_name == 'workflow_dispatch' && inputs.meta_tr_v27 == true }}
+          META_TR_V27_REQUEST: "${{ (github.event_name == 'workflow_dispatch' && inputs.meta_tr_v27 == true) || (github.event_name == 'push' && github.event.head_commit.message == 'build(i6.5 B4-003): execute authorized Meta TR V27 one-function Preview') }}"
           META_TR_V27_CANDIDATE: ${{ inputs.meta_tr_source_sha || '' }}
         run: |
           set -euo pipefail
@@ -1410,16 +1410,26 @@ jobs:
             throw Error('B4_003_DASHBOARD_READONLY_PREVIEW_SYNC_NOT_AUTHORIZED');
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'readonly_roster='+(readonlyRoster?'true':'false')+'\n');
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'scoped_preview='+(scopedPreview?'true':'false')+'\n');
-          // Explicit manual dispatch only: additive one-case source, one LAB
-          // callable, and separate Hosting channel. The normal R20 path deploys
-          // 19 functions and must never be used for this synthetic campaign QA.
+          // Additive one-case source, one LAB callable and isolated Hosting.
+          // Exactly one owner-authorized push is admitted because the workflow
+          // does not exist on the default branch (no manual Run workflow UI).
+          // The normal R20 path deploys 19 functions and is forbidden here.
+          const metaDispatchSubject='build(i6.5 B4-003): execute authorized Meta TR V27 one-function Preview';
+          const metaPush=process.env.GITHUB_EVENT_NAME==='push'
+            && process.env.GITHUB_REPOSITORY==='paulaosoriof86/orbit360-core'
+            && process.env.GITHUB_REF_NAME==='recovery/fase-a-clean-20260831'
+            && currentSubject===metaDispatchSubject
+            && require('node:child_process').execFileSync('git',['rev-parse','HEAD^'],{encoding:'utf8'}).trim()==='5f7e5a60f88e02849bb840f8c9eb03bf60dfe0f5'
+            && require('node:child_process').execFileSync('git',['diff','--name-only','HEAD^','HEAD'],{encoding:'utf8'}).trim()==='.github/workflows/gravicentra-b4-003-executor.yml';
           const metaRequested=process.env.META_TR_V27_REQUEST==='true';
+          const metaCandidate=metaPush?process.env.CANDIDATE_SOURCE_SHA:process.env.META_TR_V27_CANDIDATE;
           const metaReceiptPath='artifacts/orbit360-recovery/release-control/I6_5_B4_003_META_TR_V27_SINGLE_CASE_SUCCESSOR_20261025.json';
           const metaReceipt=JSON.parse(fs.readFileSync(metaReceiptPath,'utf8'));
           const metaBlob=path=>require('node:child_process').execFileSync('git',['hash-object',path],{encoding:'utf8'}).trim();
           const metaAllowed=metaRequested
-            && /^[a-f0-9]{40}$/.test(process.env.META_TR_V27_CANDIDATE||'')
-            && process.env.META_TR_V27_CANDIDATE===process.env.CANDIDATE_SOURCE_SHA
+            && /^[a-f0-9]{40}$/.test(metaCandidate||'')
+            && metaCandidate===process.env.CANDIDATE_SOURCE_SHA
+            && (metaPush||process.env.GITHUB_EVENT_NAME==='workflow_dispatch')
             && metaReceipt.status==='QA_SOURCE_SUCCESSOR_STAGED_ISOLATED_PREVIEW_PENDING'
             && metaReceipt.gate==='I6.5/B4-003'
             && metaReceipt.scope?.tenantId==='alianzas-soluciones'
