@@ -134,12 +134,15 @@ function findHistoricalI4ASealCommit(){
     try{
       const cur=JSON.parse(execFileSync('git',['show',`${h}:${CONTROL}`],{encoding:'utf8'}));
       if(cur?.gateState?.gates?.I4A?.status!=='PASS')continue;
-      let prevStatus='MISSING';
+      let prevStatus=null;
       try{
         const prev=JSON.parse(execFileSync('git',['show',`${h}^:${CONTROL}`],{encoding:'utf8',stdio:['ignore','pipe','ignore']}));
-        prevStatus=prev?.gateState?.gates?.I4A?.status||'MISSING';
-      }catch{}
-      if(prevStatus!=='PASS')return h;
+        prevStatus=prev?.gateState?.gates?.I4A?.status||null;
+      }catch{continue;}
+      // A missing or unreadable parent is not evidence of a gate transition.
+      // Require the explicit IN_PROGRESS -> PASS edge, so a damaged unrelated
+      // ancestor cannot be misclassified as the historical I4A seal commit.
+      if(prevStatus==='IN_PROGRESS')return h;
     }catch{}
   }
   return null;
