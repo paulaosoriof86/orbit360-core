@@ -26,6 +26,8 @@
     negocios:'leads',
     gestiones:'ops',
     reclamos:'siniestros',
+    finmovs:'conciliaciones',
+    tareas:'ops',
     cancelaciones:'cancelaciones',
     comisiones:'comisiones',
     actividades:'cliente360',
@@ -50,6 +52,32 @@
     var moduleKey=SURFACE[collection];
     if(!moduleKey)error('PRODUCT_WRITE_COLLECTION_NOT_AUTHORIZED');
     return moduleKey;
+  }
+  // A manual calendar task has no policy/client parent. Bind it to a real
+  // authorized country and advisor BEFORE the optimistic write is exposed.
+  // Never turn a multi-country "TODOS" selection into an implicit GT write.
+  function scopedManualTask(row,m){
+    if(text(row.polizaId||row.policyId||row.clienteId||row.clientId))return row;
+    var allowed=[].concat(m.countries||[]).map(function(x){return text(x).toUpperCase();})
+      .filter(function(x){return x==='GT'||x==='CO';});
+    var declared=text(row.pais||row.country).toUpperCase();
+    var chosen=text(Orbit.pais).toUpperCase();
+    var country=declared||((chosen==='GT'||chosen==='CO')?chosen:'');
+    if(!country&&allowed.length===1)country=allowed[0];
+    if(!country||allowed.indexOf(country)<0)error('PRODUCT_TASK_COUNTRY_SELECTION_REQUIRED');
+    var advisor=text(row.asesorId||row.advisorId||m.advisorId);
+    if(!advisor)error('PRODUCT_TASK_ADVISOR_REQUIRED');
+    row.pais=country;row.asesorId=advisor;
+    return row;
+  }
+  function scopedMutationRow(collection,row,m){
+    if(collection==='tareas')scopedManualTask(row,m);
+    if(collection==='finmovs'){
+      var country=text(row.pais||row.country).toUpperCase();
+      var allowed=[].concat(m.countries||[]).map(function(x){return text(x).toUpperCase();});
+      if((country!=='GT'&&country!=='CO')||allowed.indexOf(country)<0)error('PRODUCT_FINMOV_COUNTRY_REQUIRED');
+    }
+    return row;
   }
   function sensitiveInsurerPatch(collection,payload){
     if(collection!=='aseguradoras'||!payload||typeof payload!=='object')return false;
@@ -255,8 +283,8 @@
         if(!['insert','update','remove'].includes(action)||!collection||!id)error('PRODUCT_BATCH_MUTATION_INVALID');
         var key=collection+'|'+id;if(seen[key])error('PRODUCT_BATCH_DUPLICATE_TARGET');seen[key]=true;
         var prior=get(collection,id),row=null;
-        if(action==='insert'){if(prior)error('PRODUCT_BATCH_INSERT_ALREADY_EXISTS');row=payload||{};row.id=id;row.tenantId=text(m.tenantId);row.createdAt=row.createdAt||new Date().toISOString();row.updatedAt=new Date().toISOString();row.ownerUid=row.ownerUid||text(m.uid);row.ownerEmail=row.ownerEmail||text(m.email);authorize(collection,'insert',row);}
-        else if(action==='update'){if(!prior)error('PRODUCT_BATCH_UPDATE_NOT_FOUND');row=Object.assign({},prior,payload||{},{id:id,tenantId:text(m.tenantId),updatedAt:new Date().toISOString(),updatedByUid:text(m.uid),updatedByEmail:text(m.email)});authorize(collection,'update',row);}
+        if(action==='insert'){if(prior)error('PRODUCT_BATCH_INSERT_ALREADY_EXISTS');row=payload||{};row.id=id;row.tenantId=text(m.tenantId);row.createdAt=row.createdAt||new Date().toISOString();row.updatedAt=new Date().toISOString();row.ownerUid=row.ownerUid||text(m.uid);row.ownerEmail=row.ownerEmail||text(m.email);scopedMutationRow(collection,row,m);authorize(collection,'insert',row);}
+        else if(action==='update'){if(!prior)error('PRODUCT_BATCH_UPDATE_NOT_FOUND');row=Object.assign({},prior,payload||{},{id:id,tenantId:text(m.tenantId),updatedAt:new Date().toISOString(),updatedByUid:text(m.uid),updatedByEmail:text(m.email)});scopedMutationRow(collection,row,m);authorize(collection,'update',row);}
         else{if(!prior)error('PRODUCT_BATCH_REMOVE_NOT_FOUND');authorize(collection,'remove',prior);}
         var pb=pendingBucket(collection),eb=expectationBucket(collection),db=deletedBucket(collection);
         backups.push({collection:collection,id:id,pendingHad:Object.prototype.hasOwnProperty.call(pb,id),pendingValue:clone(pb[id]),expectationHad:Object.prototype.hasOwnProperty.call(eb,id),expectationValue:clone(eb[id]),deletedHad:Object.prototype.hasOwnProperty.call(db,id),deletedValue:db[id]});
@@ -290,7 +318,7 @@
     var row=clone(payload)||{}, m=member();
     if(!row.id)row.id=collection+'_'+Date.now()+'_'+Math.random().toString(36).slice(2,8);
     row.tenantId=text(m.tenantId);row.createdAt=row.createdAt||new Date().toISOString();row.updatedAt=new Date().toISOString();row.ownerUid=row.ownerUid||text(m.uid);row.ownerEmail=row.ownerEmail||text(m.email);
-    authorize(collection,'insert',row);
+    scopedMutationRow(collection,row,m);authorize(collection,'insert',row);
     setPending(collection,row.id,row,{kind:'insert'});emit(collection);
     callDurable('insert',collection,row.id,row,null).catch(function(){});
     return clone(row);
@@ -299,7 +327,7 @@
     id=text(id);if(!id)error('PRODUCT_WRITE_ID_REQUIRED');
     var prior=get(collection,id);if(!prior)error('PRODUCT_WRITE_RECORD_NOT_FOUND');
     var m=member(), row=Object.assign({},prior,clone(patch)||{},{id:id,tenantId:text(m.tenantId),updatedAt:new Date().toISOString(),updatedByUid:text(m.uid),updatedByEmail:text(m.email)});
-    authorize(collection,'update',row);
+    scopedMutationRow(collection,row,m);authorize(collection,'update',row);
     var optimistic=clone(row);
     if(collection==='negocios'&&text(prior.etapa)!=='emitido'&&text(row.etapa)==='emitido'&&!text(row.clienteIdCreado))optimistic.clienteIdCreado=text(row.clienteId)||SERVER_EMISSION_GUARD;
     setPending(collection,id,optimistic,{kind:'update',patch:expectedPatch(patch||{})});emit(collection);
@@ -309,6 +337,7 @@
   function remove(collection,id){
     id=text(id);if(!id)error('PRODUCT_WRITE_ID_REQUIRED');
     var prior=get(collection,id);if(!prior)error('PRODUCT_WRITE_RECORD_NOT_FOUND');
+    if(collection==='finmovs')error('PRODUCT_FINMOV_PHYSICAL_DELETE_FORBIDDEN');
     authorize(collection,'remove',prior);
     if(collection==='negocios'||collection==='gestiones'){
       var row=Object.assign({},prior,{archivado:true,updatedAt:new Date().toISOString()});
@@ -324,19 +353,20 @@
     var row=clone(payload)||{},m=member();
     if(!row.id)row.id=collection+'_'+Date.now()+'_'+Math.random().toString(36).slice(2,8);
     row.tenantId=text(m.tenantId);row.createdAt=row.createdAt||new Date().toISOString();row.updatedAt=new Date().toISOString();row.ownerUid=row.ownerUid||text(m.uid);row.ownerEmail=row.ownerEmail||text(m.email);
-    authorize(collection,'insert',row);setPending(collection,row.id,row,{kind:'insert'});emit(collection);
+    scopedMutationRow(collection,row,m);authorize(collection,'insert',row);setPending(collection,row.id,row,{kind:'insert'});emit(collection);
     return callDurable('insert',collection,row.id,row,null).then(function(){return clone(row);});
   }
   function updateDurable(collection,id,patch){
     id=text(id);if(!id)error('PRODUCT_WRITE_ID_REQUIRED');
     var prior=get(collection,id);if(!prior)error('PRODUCT_WRITE_RECORD_NOT_FOUND');
     var m=member(),row=Object.assign({},prior,clone(patch)||{},{id:id,tenantId:text(m.tenantId),updatedAt:new Date().toISOString(),updatedByUid:text(m.uid),updatedByEmail:text(m.email)});
-    authorize(collection,'update',row);setPending(collection,id,row,{kind:'update',patch:expectedPatch(patch||{})});emit(collection);
+    scopedMutationRow(collection,row,m);authorize(collection,'update',row);setPending(collection,id,row,{kind:'update',patch:expectedPatch(patch||{})});emit(collection);
     return callDurable('update',collection,id,row,prior).then(function(){return clone(row);});
   }
   function removeDurable(collection,id){
     id=text(id);if(!id)error('PRODUCT_WRITE_ID_REQUIRED');
     var prior=get(collection,id);if(!prior)error('PRODUCT_WRITE_RECORD_NOT_FOUND');
+    if(collection==='finmovs')error('PRODUCT_FINMOV_PHYSICAL_DELETE_FORBIDDEN');
     authorize(collection,'remove',prior);deletedBucket(collection)[id]=true;clearPending(collection,id);emit(collection);
     return callDurable('remove',collection,id,null,prior).then(function(){return true;});
   }

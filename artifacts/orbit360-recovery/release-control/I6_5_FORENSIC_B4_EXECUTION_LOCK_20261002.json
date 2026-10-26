@@ -634,7 +634,7 @@
   },
   "findingLedgerBlobSha": "8125e97dcf1feb7f46081f95327952e65c2d1077",
   "continuityRegisterBlobSha": "4e6b0ac51736be360c4b95abe8fc01d8f1e78e20",
-  "compositionLockBlobSha": "967a63fa995d9beb45caf882eb91eb7c41bd332a",
+  "compositionLockBlobSha": "f9e3cce4f7b802966abdcc4072557821f3f1cac7",
   "r18SourceFix": {
     "status": "SOURCE_FIXED_R18_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_SOURCE_FIX_20261005.json",
@@ -4373,5 +4373,20 @@
     "production": false,
     "findingsPreserved": 295,
     "frozenTasksPreserved": 86
+  },
+  "b4003OperationalWriterSourceSuccessor20261026": {
+    "status": "SOURCE_STAGED_SYNTHETIC_QA_PASS_SECURITY_HOLD",
+    "gate": "I6.5/B4-003",
+    "authority": "PAULA_EXPLICIT_CORRECTIVE_AUTHORIZATION",
+    "parentHead": "f31ad3e27ff07cb29fcf85a40165bc6b2ad6a9a4",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_OPERATIONAL_WRITER_SOURCE_SUCCESSOR_20261026.json",
+    "receiptBlobSha": "7f636423053850b05aeb8dd5f4d3d3e3025743ac",
+    "sourceFileCount": 4,
+    "qaFileCount": 1,
+    "findingsPreserved": 295,
+    "frozenTasksPreserved": 86,
+    "sharedRulesDeploymentAuthorized": false,
+    "dataMutationAuthorized": false,
+    "livePromotionAuthorized": false
   }
 }

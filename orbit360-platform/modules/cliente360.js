@@ -1963,12 +1963,17 @@ Orbit.modules.cliente360 = (function () {
     const close = () => back.remove();
     back.querySelector('#nr-x').onclick = close; back.querySelector('#nr-cancel').onclick = close;
     back.addEventListener('click', e => { if (e.target === back) close(); });
-    back.querySelector('#nr-ok').onclick = () => {
+    back.querySelector('#nr-ok').onclick = async () => {
       const polId = back.querySelector('#nr-pol').value;
       const pol = Orbit.store.get('polizas', polId);
+      if (polId && (!pol || String(pol.clienteId) !== String(cid))) return c360toast('No se verificó la relación de la póliza con el cliente.');
+      const canonical = pol || cli;
+      const pais = String(canonical.pais || canonical.country || '').toUpperCase();
+      const asesorId = String(canonical.asesorId || canonical.advisorId || canonical.ownerAdvisorId || '').trim();
+      if (!['GT', 'CO'].includes(pais) || !asesorId) return c360toast('Falta país o asesor canónico del reclamo.');
       const rec = {
         id: 'rec_m' + Date.now().toString(36), polizaId: polId, clienteId: cid,
-        aseguradoraId: pol ? pol.aseguradoraId : '', asesorId: pol ? pol.asesorId : cli.asesorId,
+        aseguradoraId: pol ? pol.aseguradoraId : '', pais, asesorId,
         ramo: pol ? pol.ramo : '', tipo: back.querySelector('#nr-tipo').value || 'Reclamo general',
         estado: 'Reportado', numero: 'SIN-' + Math.floor(10000 + Math.random() * 89999),
         fecha: new Date().toISOString().slice(0, 10), montoReclamado: +back.querySelector('#nr-monto').value || 0, montoAprobado: 0,
@@ -1976,9 +1981,14 @@ Orbit.modules.cliente360 = (function () {
         bitacora: [{ ts: new Date().toISOString().slice(0, 16).replace('T', ' '), user: 'Equipo', t: 'Reclamo registrado', d: 'Creado manualmente desde la ficha del cliente.' }],
         correos: [], docs: [], actualizado: new Date().toISOString().slice(0, 10)
       };
-      Orbit.store.insert('reclamos', rec);
-      c360toast('✓ Reclamo ' + rec.numero + ' creado');
-      close(); tab = 'siniestros'; detalle(cid);
+      const save = back.querySelector('#nr-ok'); save.disabled = true;
+      try {
+        if (typeof Orbit.store.insertDurable !== 'function') throw new Error('Escritura protegida no disponible.');
+        await Orbit.store.insertDurable('reclamos', rec);
+        c360toast('✓ Reclamo ' + rec.numero + ' creado');
+        close(); tab = 'siniestros'; detalle(cid);
+      } catch (err) { c360toast('Reclamo no guardado: ' + (err && err.message || 'sin autorización')); }
+      finally { save.disabled = false; }
     };
   }
   async function addBitacora(reclamoId, cid) {

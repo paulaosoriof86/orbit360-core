@@ -409,6 +409,81 @@ async function deny(fn,code){let thrown;try{await fn()}catch(e){thrown=e}assert.
  console.log('B4_003_RELATED_DOCUMENT_SERVER_SCOPE_MOCK_PASS checks='+checks+' no Firebase writes');
 })().catch(e=>{console.error(e);process.exitCode=1;});
 
+// B4-003 writer compatibility. Reuse the existing immutable synthetic writer
+// fixture as an in-memory authority (no credentials, SDK or network). This
+// regression lives in an explicitly allowed QA file; the older QA stays intact.
+(async()=>{
+ const vm=require('node:vm');
+ const testSource=fs.readFileSync(require('node:path').join(__dirname,'gravicentra-b4-003-operational-write-security-regression.test.cjs'),'utf8');
+ const boundary=testSource.indexOf('\nconst cases=[');
+ assert.ok(boundary>0,'synthetic writer fixture remains available');
+ const sandbox={require,process:{argv:['node','synthetic-fixture','functions']},Buffer,console};
+ vm.runInNewContext(testSource.slice(0,boundary)+'\nthis.syntheticWriter=env;',sandbox);
+ const fixture=(options={})=>{
+  const e=sandbox.syntheticWriter(options),role=options.role||'Asesor',key=`tenants/${e.tenant}/config/access`;
+  const current=e.rows.get(key),rp=current.rolePermissions[role];
+  e.rows.set(key,{...current,rolePermissions:{...current.rolePermissions,[role]:{...rp,ops:{ver:true,editar:true},siniestros:{ver:true,editar:true},conciliaciones:{ver:true,editar:true}}}});
+  e.item=(collection,id)=>`tenants/${e.tenant}/data/${collection}/items/${id}`;
+  return e;
+ };
+ const create=(collection,id,payload)=>({collection,action:'insert',id,payload});
+ const check=[
+  ['task_scoped_own_positive',async()=>{const e=fixture();assert.equal((await e.execute([create('tareas','task-own',{pais:'GT',asesorId:e.own,t:'QA'})])).canonicalReadback,true);}],
+  ['task_country_missing_denied',async()=>{const e=fixture({role:'Dirección',scope:'todos'});await assert.rejects(e.execute([create('tareas','task-no-country',{asesorId:e.own})]),x=>x.code==='permission-denied');}],
+  ['task_advisor_missing_denied',async()=>{const e=fixture({role:'Dirección',scope:'todos'});await assert.rejects(e.execute([create('tareas','task-no-advisor',{pais:'GT'})]),x=>x.code==='permission-denied');}],
+  ['task_other_advisor_denied',async()=>{const e=fixture();await assert.rejects(e.execute([create('tareas','task-foreign',{pais:'GT',asesorId:'other'})]),x=>x.code==='permission-denied');}],
+  ['finmov_finance_positive',async()=>{const e=fixture({role:'Finanzas',scope:'todos'});assert.equal((await e.execute([create('finmovs','fm-gt',{pais:'GT',valor:10})])).canonicalReadback,true);}],
+  ['finmov_country_denied',async()=>{const e=fixture({role:'Finanzas',scope:'todos'});await assert.rejects(e.execute([create('finmovs','fm-co',{pais:'CO'})]),x=>x.code==='permission-denied');}],
+  ['finmov_own_scope_denied',async()=>{const e=fixture({role:'Finanzas',scope:'propios'});await assert.rejects(e.execute([create('finmovs','fm-own',{pais:'GT',asesorId:e.own})]),x=>x.code==='permission-denied');}],
+  ['finmov_operativo_denied_even_matrix',async()=>{const e=fixture({role:'Operativo',scope:'todos'});await assert.rejects(e.execute([create('finmovs','fm-oper',{pais:'GT'})]),x=>x.code==='permission-denied');}],
+  ['finmov_asesor_denied_even_matrix',async()=>{const e=fixture();await assert.rejects(e.execute([create('finmovs','fm-asesor',{pais:'GT',asesorId:e.own})]),x=>x.code==='permission-denied');}],
+  ['finmov_physical_delete_denied',async()=>{const e=fixture({role:'Dirección',scope:'todos'});await assert.rejects(e.execute([{collection:'finmovs',action:'remove',id:'fm-del'}]),x=>x.code==='failed-precondition');}],
+  ['claim_client_only_positive',async()=>{const e=fixture();e.set('client-a');assert.equal((await e.execute([create('reclamos','claim-own',{pais:'GT',asesorId:e.own,clienteId:'client-a'})])).canonicalReadback,true);}],
+  ['claim_parent_missing_denied',async()=>{const e=fixture();await assert.rejects(e.execute([create('reclamos','claim-no-parent',{pais:'GT',asesorId:e.own})]),x=>x.code==='failed-precondition');}],
+  ['claim_unknown_client_denied',async()=>{const e=fixture();await assert.rejects(e.execute([create('reclamos','claim-unknown',{pais:'GT',asesorId:e.own,clienteId:'ghost'})]),x=>x.code==='failed-precondition');}],
+  ['claim_country_mismatch_denied',async()=>{const e=fixture({role:'Dirección',scope:'todos',countries:['GT','CO']});e.set('client-a',e.own,'CO');await assert.rejects(e.execute([create('reclamos','claim-country',{pais:'GT',asesorId:e.own,clienteId:'client-a'})]),x=>x.code==='failed-precondition');}],
+  ['claim_advisor_mismatch_denied',async()=>{const e=fixture({role:'Dirección',scope:'todos'});e.set('client-a','other');await assert.rejects(e.execute([create('reclamos','claim-advisor',{pais:'GT',asesorId:e.own,clienteId:'client-a'})]),x=>x.code==='failed-precondition');}],
+  ['claim_policy_client_mismatch_denied',async()=>{const e=fixture();e.set('client-a');e.set('client-b');e.rows.set(e.item('polizas','policy-a'),{id:'policy-a',clienteId:'client-a',pais:'GT',asesorId:e.own});await assert.rejects(e.execute([create('reclamos','claim-cross',{pais:'GT',asesorId:e.own,polizaId:'policy-a',clienteId:'client-b'})]),x=>x.code==='failed-precondition');}],
+  ['claim_policy_over_changed_client_country',async()=>{const e=fixture();e.set('client-a',e.own,'CO');e.rows.set(e.item('polizas','policy-a'),{id:'policy-a',clienteId:'client-a',pais:'GT',asesorId:e.own});assert.equal((await e.execute([create('reclamos','claim-policy',{pais:'GT',asesorId:e.own,polizaId:'policy-a',clienteId:'client-a'})])).canonicalReadback,true);}],
+  ['task_parent_conflict_denied',async()=>{const e=fixture();e.set('client-a','other');await assert.rejects(e.execute([create('tareas','task-conflict',{pais:'GT',asesorId:e.own,clienteId:'client-a'})]),x=>x.code==='failed-precondition');}],
+  ['linked_claim_batch_atomic_denial',async()=>{const e=fixture();e.set('client-a');await assert.rejects(e.execute([create('reclamos','claim-ok',{pais:'GT',asesorId:e.own,clienteId:'client-a'}),create('reclamos','claim-bad',{pais:'GT',asesorId:e.own,clienteId:'absent'})]),x=>x.code==='failed-precondition');assert.equal(e.writes.length,0);assert.equal(e.rows.has(e.item('reclamos','claim-ok')),false);}]
+ ];
+ for(const [name,run] of check){await run().catch(e=>{throw Error('B4_003_WRITER_CASE_'+name+':'+e.message);});}
+ // Browser facade has no direct Firestore write authority. Test its automatic
+ // country/advisor binding using a signed-in synthetic provider response.
+ const facadeSource=fs.readFileSync(require('node:path').join(__dirname,'../orbit360-platform/data/store-firestore-product-operational-p0.js'),'utf8');
+ function browserFixture(countries,selected){
+  const calls=[];
+  const m={productReadOnly:true,uid:'synthetic-uid',tenantId:'synthetic-audit',roles:['Dirección'],activeRole:'Dirección',advisorId:'advisor-own',countries};
+  const provider={browserFirestoreWriteAuthorized:false,serverWriteTransport:'firebase-functions',noFallback:true,
+   initialize:async()=>({auth:{currentUser:{uid:m.uid}}}),
+   callFunction:async(_name,payload)=>{calls.push(payload);const x=payload.mutations[0];return{canonicalReadback:true,canonicalReadbackCount:1,readback:[{collection:x.collection,id:x.id,action:x.action,exists:true}]};}};
+  const O={auth:{productUser:m},pais:selected,session:{rol:()=>m.activeRole},access:{can:()=>true,canAccessRecord:()=>true},productRuntimeBrowserProvidersP0:provider};
+  const w={Orbit:O,dispatchEvent(){}};
+  const base={__productReadOnlyP0:true,_productStatus:()=>({ready:true,status:'ready-read-only',noFallback:true,writeEnabled:false}),all:()=>[],get:()=>null,on:()=>()=>{}};
+  vm.runInNewContext(facadeSource,{window:w,Orbit:O,document:{dispatchEvent(){}},location:{hostname:'isolated.example.invalid'},CustomEvent:class{},console,Date,Promise,setTimeout});
+  w.Orbit.productOperationalWriteP0.install(base);
+  return{store:w.Orbit.store,calls};
+ }
+ const multi=browserFixture(['GT','CO'],'TODOS');
+ assert.throws(()=>multi.store.insert('tareas',{id:'task-multi',t:'QA'}),e=>e.code==='PRODUCT_TASK_COUNTRY_SELECTION_REQUIRED');
+ assert.equal(multi.calls.length,0,'ambiguous task never reaches server');
+ const single=browserFixture(['CO'],'TODOS');
+ const scopedTask=await single.store.insertDurable('tareas',{id:'task-single',t:'QA',fecha:'2026-10-25'});
+ assert.equal(scopedTask.pais,'CO');assert.equal(scopedTask.asesorId,'advisor-own');
+ assert.equal(single.calls[0].mutations[0].payload.pais,'CO','single country task is sent to callable with canonical scope');
+ const cross=browserFixture(['GT'],'CO');
+ assert.throws(()=>cross.store.insert('tareas',{id:'task-cross',t:'QA'}),e=>e.code==='PRODUCT_TASK_COUNTRY_SELECTION_REQUIRED');
+ assert.throws(()=>cross.store.insert('finmovs',{id:'fm-cross',pais:'CO'}),e=>e.code==='PRODUCT_FINMOV_COUNTRY_REQUIRED');
+ assert.equal(cross.calls.length,0,'cross-country writes never reach server');
+ const siniestrosSource=fs.readFileSync(require('node:path').join(__dirname,'../orbit360-platform/modules/siniestros.js'),'utf8');
+ const client360Source=fs.readFileSync(require('node:path').join(__dirname,'../orbit360-platform/modules/cliente360.js'),'utf8');
+ assert.ok(siniestrosSource.includes('S().batchDurable(')&&siniestrosSource.includes('const canonical = p || cli'),'siniestros batch waits for policy/client canonical country');
+ assert.ok(client360Source.includes("await Orbit.store.insertDurable('reclamos', rec)")&&client360Source.includes('const canonical = pol || cli'),'client360 claim waits for protected canonical readback');
+ console.log('B4_003_OPERATIONAL_BROWSER_FACADE_SCOPE_PASS checks=8 synthetic_only no_Firebase_write');
+ console.log('B4_003_SCOPED_WRITER_COMPATIBILITY_PASS cases='+check.length+' synthetic_only no_data_writes');
+})().catch(e=>{console.error(e);process.exitCode=1;});
+
 /* UAT5_ROUTE_AND_IMPORTER_CAUSAL_QA: runtime-owner tests, synthetic no writes. */
 {
  const vm=require('node:vm');

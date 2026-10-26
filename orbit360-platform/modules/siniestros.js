@@ -189,12 +189,22 @@ Orbit.modules.siniestros = (function () {
     back.addEventListener('click', e => { if (e.target === back) close(); });
     $('#sn-x').addEventListener('click', close); $('#sn-cancel').addEventListener('click', close);
     $('#sn-cli').addEventListener('change', () => { $('#sn-pol').innerHTML = pols($('#sn-cli').value).map(p => `<option value="${p.id}">${p.numero} · ${p.ramo}</option>`).join('') || '<option value="">— sin pólizas —</option>'; });
-    $('#sn-ok').addEventListener('click', () => {
+    $('#sn-ok').addEventListener('click', async () => {
       const cid = $('#sn-cli').value, polId = $('#sn-pol').value, p = polId ? S().get('polizas', polId) : null, cli = S().get('clientes', cid);
+      if (!cli || (polId && (!p || String(p.clienteId) !== String(cid)))) return U.toast('La relación entre cliente y póliza no está verificada.');
+      const canonical = p || cli, pais = String(canonical.pais || canonical.country || '').toUpperCase();
+      const asesorId = String(canonical.asesorId || canonical.advisorId || canonical.ownerAdvisorId || '').trim();
+      if (!['GT', 'CO'].includes(pais) || !asesorId) return U.toast('Para registrar el reclamo se necesita país y asesor canónicos.');
       const id = 'rec' + Date.now().toString().slice(-7);
-      S().insert('reclamos', { id, polizaId: polId, clienteId: cid, aseguradoraId: p ? p.aseguradoraId : '', asesorId: cli.asesorId, ramo: p ? p.ramo : '', tipo: $('#sn-tipo').value || 'Reclamo', estado: 'Reportado', numero: 'SIN-' + Math.floor(10000 + Math.random() * 89999), fecha: Orbit.ui.today(), montoReclamado: +$('#sn-monto').value || 0, montoAprobado: 0, descripcion: $('#sn-desc').value, bitacora: [{ ts: ts(), user: cli.nombre, t: 'Reclamo reportado', d: $('#sn-desc').value }], correos: [], docs: [] });
-      S().insert('actividades', { id: 'act' + Date.now(), clienteId: cid, asesorId: cli.asesorId, tipo: 'sistema', icon: '🚨', fecha: Orbit.ui.today(), titulo: 'Siniestro reportado', detalle: $('#sn-tipo').value });
-      close(); ficha(id);
+      const claim = { id, pais, polizaId: polId, clienteId: cid, aseguradoraId: p ? p.aseguradoraId : '', asesorId, ramo: p ? p.ramo : '', tipo: $('#sn-tipo').value || 'Reclamo', estado: 'Reportado', numero: 'SIN-' + Math.floor(10000 + Math.random() * 89999), fecha: Orbit.ui.today(), montoReclamado: +$('#sn-monto').value || 0, montoAprobado: 0, descripcion: $('#sn-desc').value, bitacora: [{ ts: ts(), user: cli.nombre, t: 'Reclamo reportado', d: $('#sn-desc').value }], correos: [], docs: [] };
+      const activity = { id: 'act' + Date.now(), pais, clienteId: cid, asesorId, tipo: 'sistema', icon: '🚨', fecha: Orbit.ui.today(), titulo: 'Siniestro reportado', detalle: $('#sn-tipo').value };
+      const save = $('#sn-ok'); save.disabled = true;
+      try {
+        if (typeof S().batchDurable !== 'function') throw new Error('Escritura protegida no disponible.');
+        await S().batchDurable([{ action: 'insert', collection: 'reclamos', id, payload: claim }, { action: 'insert', collection: 'actividades', id: activity.id, payload: activity }]);
+        close(); ficha(id);
+      } catch (err) { U.toast('Reclamo no guardado: ' + (err && err.message || 'sin autorización')); }
+      finally { save.disabled = false; }
     });
   }
 

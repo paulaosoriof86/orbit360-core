@@ -1,0 +1,62 @@
+{
+  "schema": "GI_I65_B4_003_OPERATIONAL_WRITER_SOURCE_SUCCESSOR_V1",
+  "product": "Gravicentra Insurance",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "gate": "I6.5/B4-003",
+  "status": "SOURCE_STAGED_SYNTHETIC_QA_PASS_SECURITY_HOLD",
+  "authority": "PAULA_EXPLICIT_CORRECTIVE_AUTHORIZATION",
+  "parentHead": "f31ad3e27ff07cb29fcf85a40165bc6b2ad6a9a4",
+  "predecessorSourceReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_SCOPED_READ_SOURCE_SUCCESSOR_20261026.json",
+  "predecessorSourceReceiptBlobSha": "05be0a9bb0aefbcb5924d8188881cb1e82bff8d6",
+  "predecessorPreviewRunId": 40251937393,
+  "predecessorControlPlaneRunId": 40251937339,
+  "predecessorBuildId": "gi-i65-b4-f31ad3e27ff0-57f234755dc1",
+  "sourceBlobsBefore": {
+    "functions/product-operational-domain.js": "11065f9a4e5325d6387e70c9f5b7ddd1329666d2",
+    "orbit360-platform/data/store-firestore-product-operational-p0.js": "4b9c8dc8c316b0c50aef5606aec460f7049d00d9",
+    "orbit360-platform/modules/cliente360.js": "935c54d18da90b6f9dd1d7ba5c58672499c82ed7",
+    "orbit360-platform/modules/siniestros.js": "fbea51cf7084b66d9866a3c947c1e7ec3bb4a034"
+  },
+  "sourceBlobsAfter": {
+    "functions/product-operational-domain.js": "529a76cffaa847c13fdf468bb2bbdf0685e95903",
+    "orbit360-platform/data/store-firestore-product-operational-p0.js": "e7b9b4e802972f319d671487ef0a6447989f0ed5",
+    "orbit360-platform/modules/cliente360.js": "f170107fe3341d2e8d0b1d9b83a39674e36a3807",
+    "orbit360-platform/modules/siniestros.js": "f52c2046157f0bc72008e09e826d34d05eeb668b"
+  },
+  "qaBlobsBefore": {
+    "tools/gravicentra-b4-003-scoped-related-reader.test.cjs": "9a6dfa2062700ddc85dbf7436cd10945f613e70c"
+  },
+  "qaBlobsAfter": {
+    "tools/gravicentra-b4-003-scoped-related-reader.test.cjs": "ec6ea66466770a3906ba63e1ddaacd7b7c4da217"
+  },
+  "tests": {
+    "originalOperationalRegression": "30/30 PASS",
+    "relatedReadIntegrated": "B4_003_FOUR_COLLECTION_SCOPED_READER_PASS",
+    "protectedWriterCompatibility": "B4_003_SCOPED_WRITER_COMPATIBILITY_PASS",
+    "protectedWriterCases": 19,
+    "browserFacadeScope": "B4_003_OPERATIONAL_BROWSER_FACADE_SCOPE_PASS",
+    "browserFacadeChecks": 8,
+    "syntheticOnly": true,
+    "authenticatedBackendProof": "NOT_TESTED",
+    "physicalRulesDeploymentProof": "NOT_TESTED"
+  },
+  "scope": {
+    "collections": ["tareas", "finmovs", "reclamos", "actividades"],
+    "clientCountryAndAdvisor": "REQUIRED_OR_FAIL_CLOSED",
+    "claimsCanonicalRelations": "POLICY_FIRST_CLIENT_ONLY_SUPPORTED",
+    "finmovsRoles": "FINANCE_OR_PRIVILEGED_ASSIGNED_ROLE_ONLY",
+    "finmovsPhysicalDeletion": false,
+    "newPreviewDispatched": false,
+    "sharedFirestoreRules": false,
+    "otherFunctions": false,
+    "dataMutation": false,
+    "realBusinessWrites": false,
+    "reimport": false,
+    "livePromotion": false
+  },
+  "securityReleaseHold": "ACTIVE",
+  "findingsPreserved": 295,
+  "frozenTasksPreserved": 86,
+  "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_OPERATIONAL_WRITER_SOURCE_SUCCESSOR_20261026.json"
+}

@@ -57,6 +57,7 @@ let latencyHistoricBlobs=new Map();
 // use physicalGit at the active candidate and must never use this map.
 let historicalInsurerProductBlobs=new Map();
 let dualHistoricBlobs=new Map();
+let operationalWriterHistoricalBlobs=new Map();
 const realGit=(...args)=>args[0]==='hash-object'&&CORRECTIVE_SOURCE_PREVIOUS.has(args[1])
  ?CORRECTIVE_SOURCE_PREVIOUS.get(args[1]):
  args[0]==='hash-object'&&historicalInsurerProductBlobs.has(args[1])
@@ -64,7 +65,9 @@ const realGit=(...args)=>args[0]==='hash-object'&&CORRECTIVE_SOURCE_PREVIOUS.has
  args[0]==='hash-object'&&latencyHistoricBlobs.has(args[1])
  ?latencyHistoricBlobs.get(args[1]):
  args[0]==='hash-object'&&dualHistoricBlobs.has(args[1])
- ?dualHistoricBlobs.get(args[1]):physicalGit(...args);
+ ?dualHistoricBlobs.get(args[1]):
+ args[0]==='hash-object'&&operationalWriterHistoricalBlobs.has(args[1])
+ ?operationalWriterHistoricalBlobs.get(args[1]):physicalGit(...args);
 // Historical receipts are verified against their exact already-committed
 // predecessor tree. A newer source successor is verified separately against
 // the actual working tree, never substituted into an older signed receipt.
@@ -104,8 +107,11 @@ if(META_TR_ACTIVE){
   Q.baseHead==='f31ad3e27ff07cb29fcf85a40165bc6b2ad6a9a4'&&
   physicalGit('merge-base',Q.baseHead,'HEAD')===Q.baseHead&&
   META_TR.receiptBlobSha===physicalGit('hash-object',META_TR.receiptPath)&&
-  Q.historicalCompositionBlobSha===physicalGit('hash-object',I6_CANONICAL_COMPOSITION)&&
-  Q.historicalExecutionLockBlobSha===physicalGit('hash-object',ACTIVE_I65_FORENSIC_B4)&&
+  // The Meta TR receipt proves its own f31 source baseline. A separate
+  // bounded operational-writer successor may advance today's composition;
+  // the Meta receipt and its historical fingerprints remain immutable.
+  Q.historicalCompositionBlobSha===physicalGit('rev-parse',Q.baseHead+':'+I6_CANONICAL_COMPOSITION)&&
+  Q.historicalExecutionLockBlobSha===physicalGit('rev-parse',Q.baseHead+':'+ACTIVE_I65_FORENSIC_B4)&&
   Q.historicalDispatchReceiptBlobSha===C.b4003CorrectiveSourcePreviewSuccessorDispatch20261026?.receiptBlobSha&&
   sourcePaths.join(',')===META_TR_SOURCE_PATHS.slice().sort().join(',')&&
   qaPaths.join(',')===META_TR_QA_PATHS.slice().sort().join(',')&&
@@ -113,7 +119,10 @@ if(META_TR_ACTIVE){
    Q.sourceBlobsBefore?.[p]===physicalGit('rev-parse',Q.baseHead+':'+p)&&
    Q.sourceBlobsBefore[p]===COMP.productFileBlobs[p]&&
    Q.sourceBlobsAfter[p]===physicalGit('hash-object',p)&&Q.sourceBlobsAfter[p]!==Q.sourceBlobsBefore[p])&&
-  qaPaths.every(p=>Q.qaBlobsAfter[p]===physicalGit('hash-object',p))&&
+  qaPaths.every(p=>Q.qaBlobsAfter[p]===(p==='tools/gravicentra-i6-control-plane-guard-v1.mjs'&&
+   C.b4003OperationalWriterSourceSuccessor20261026
+   ?physicalGit('rev-parse','0b34853cfe5c715dee93167d6f6f0edd7f639940:'+p)
+   :physicalGit('hash-object',p)))&&
   B4.boundaries?.allowedQaFiles?.includes('tools/gravicentra-i6-control-plane-guard-v1.mjs')&&
   Q.scope?.tenantId==='alianzas-soluciones'&&
   Q.scope?.caseId==='b4003qa_meta_tr_v27_20261025_01'&&
@@ -156,6 +165,11 @@ if(CORRECTIVE_SOURCE_ACTIVE){
  const historicalSourceQa=Object.assign({},R.sourceBlobsAfter||{},R.qaBlobsAfter||{});
  const predecessorSourceQa=Object.assign({},SR25.sourceBlobsAfter||{},SR25.qaBlobsAfter||{});
  const currentSourceQa=Object.assign({},SR26.sourceBlobsAfter||{},SR26.qaBlobsAfter||{});
+ // Later B4-003 operational-writer work may amend an authorized QA file.
+ // Authenticate the old proof against the f31 immutable source tree; the
+ // operational-writer successor below separately validates the live bytes.
+ const WRITER_NEXT=C.b4003OperationalWriterSourceSuccessor20261026||null;
+ const writerQaPaths=new Set(WRITER_NEXT?Object.keys(readJson(WRITER_NEXT.receiptPath).qaBlobsAfter||{}):[]);
  const POLIZAS_SUCCESSOR=C.b4003PolizasContextCacheSuccessor20261025||{};
  const POLIZAS_SR=exists(POLIZAS_SUCCESSOR.receiptPath||'')?readJson(POLIZAS_SUCCESSOR.receiptPath):{};
  const expectedProductBlobs={...(SR26.sourceBlobsAfter||{}),...(POLIZAS_SR.sourceBlobsAfter||{})};
@@ -200,8 +214,10 @@ if(CORRECTIVE_SOURCE_ACTIVE){
    PR26.sourceFixReceiptBlobSha===D.receiptBlobSha&&
    PR26.sourceSuccessorReceiptBlobSha===S26.receiptBlobSha&&
    PR26.packagerFixReceiptBlobSha===S26.packagerReceiptBlobSha&&
-   PR26.compositionBlobSha===physicalGit('hash-object',I6_CANONICAL_COMPOSITION)&&
-   PR26.executionLockBlobSha===physicalGit('hash-object',ACTIVE_I65_FORENSIC_B4)&&
+   // A dispatched Preview stays attached to its ORIGINAL f31 tree; current
+   // Control Plane and composition can move only through a new successor.
+   PR26.compositionBlobSha===physicalGit('rev-parse','f31ad3e27ff07cb29fcf85a40165bc6b2ad6a9a4:'+I6_CANONICAL_COMPOSITION)&&
+   PR26.executionLockBlobSha===physicalGit('rev-parse','f31ad3e27ff07cb29fcf85a40165bc6b2ad6a9a4:'+ACTIVE_I65_FORENSIC_B4)&&
    JSON.stringify(PR26.expectedProductBlobs)===JSON.stringify(expectedProductBlobs)&&
    JSON.stringify(PR26.expectedQaBlobs)===JSON.stringify(expectedQaBlobs)&&
    PR26.scope?.sharedFirestoreRules===false&&PR26.scope?.otherFunctions===false&&
@@ -247,7 +263,9 @@ if(CORRECTIVE_SOURCE_ACTIVE){
   correctiveSourceCommit==='98289883458be7dfd9da539eeebf0665febb0249'&&
   qaCommit==='b6dfcb1caa29ed63f0a031b38bdf4b4c8104f34f'&&currentSourceCommitExact&&currentQaCommitExact&&
   Object.keys(SR26.sourceBlobsAfter||{}).length===8&&Object.keys(SR26.qaBlobsAfter||{}).length===2&&
-  Object.entries(currentSourceQa).every(([p,sha])=>physicalGit('hash-object',p)===sha)&&
+  Object.entries(currentSourceQa).every(([p,sha])=>writerQaPaths.has(p)
+   ?physicalGit('rev-parse','f31ad3e27ff07cb29fcf85a40165bc6b2ad6a9a4:'+p)===sha
+   :physicalGit('hash-object',p)===sha)&&
   Object.keys(SR26.sourceBlobsAfter||{}).every(p=>(C.b4003CorrectiveSourceSecurityAuthorization20261024?.allowedSourcePaths||[]).includes(p))&&
   Object.keys(SR26.qaBlobsAfter||{}).every(p=>(B4.boundaries?.allowedQaFiles||[]).includes(p))&&
   SR26.packagerReceipt?.path==='artifacts/orbit360-recovery/release-control/I6_5_B4_003_PREVIEW_PACKAGER_DUPLICATE_EXPORT_ROOTFIX_20261025.json'&&
@@ -276,6 +294,57 @@ if(CORRECTIVE_SOURCE_ACTIVE){
   catch(_){/* Original dual-host proof did not include this path in its parent. */}
  }
  console.log(PREVIEW26?'B4_003_CORRECTIVE_SOURCE=HISTORICAL_SHA_PRESERVED_SUCCESSOR_RECONCILED_PREVIEW_DISPATCH_BOUND':'B4_003_CORRECTIVE_SOURCE=HISTORICAL_SHA_PRESERVED_SUCCESSOR_RECONCILED_PENDING_EXACT_PREVIEW');
+}
+// Operational-writer source successor: only bounded paths, immutable f31
+// predecessor, physically checked post-fix bytes, and unchanged security HOLD.
+// This is NOT evidence of real auth, Firestore emulator, or a new Preview.
+const WRITER_SUCCESSOR=C.b4003OperationalWriterSourceSuccessor20261026||null;
+if(WRITER_SUCCESSOR){
+ const W=WRITER_SUCCESSOR,WB=B4.b4003OperationalWriterSourceSuccessor20261026||{},
+  WC=COMP.b4003OperationalWriterSourceSuccessor20261026||{};
+ const R=readJson(W.receiptPath);
+ const before=Object.assign({},R.sourceBlobsBefore||{},R.qaBlobsBefore||{});
+ const after=Object.assign({},R.sourceBlobsAfter||{},R.qaBlobsAfter||{});
+ const sourcePaths=Object.keys(R.sourceBlobsAfter||{});
+ const qaPaths=Object.keys(R.qaBlobsAfter||{});
+ const parent='f31ad3e27ff07cb29fcf85a40165bc6b2ad6a9a4';
+ need(W.receiptPath==='artifacts/orbit360-recovery/release-control/I6_5_B4_003_OPERATIONAL_WRITER_SOURCE_SUCCESSOR_20261026.json'&&
+  W.receiptBlobSha===physicalGit('hash-object',W.receiptPath)&&
+  sameJson(W,WB)&&sameJson(W,WC)&&
+  W.gate==='I6.5/B4-003'&&W.authority==='PAULA_EXPLICIT_CORRECTIVE_AUTHORIZATION'&&
+  W.status==='SOURCE_STAGED_SYNTHETIC_QA_PASS_SECURITY_HOLD'&&W.parentHead===parent&&
+  R.schema==='GI_I65_B4_003_OPERATIONAL_WRITER_SOURCE_SUCCESSOR_V1'&&
+  R.gate===W.gate&&R.authority===W.authority&&R.status===W.status&&R.parentHead===parent&&
+  R.branch==='recovery/fase-a-clean-20260831'&&
+  physicalGit('merge-base',parent,'HEAD')===parent&&
+  R.predecessorSourceReceiptBlobSha===C.b4003CorrectiveSourceSuccessor20261026?.receiptBlobSha&&
+  W.sourceFileCount===4&&W.qaFileCount===1&&sourcePaths.length===4&&qaPaths.length===1&&
+  sameJson(sourcePaths.sort(),[
+   'functions/product-operational-domain.js',
+   'orbit360-platform/data/store-firestore-product-operational-p0.js',
+   'orbit360-platform/modules/cliente360.js',
+   'orbit360-platform/modules/siniestros.js'
+  ].sort())&&
+  qaPaths[0]==='tools/gravicentra-b4-003-scoped-related-reader.test.cjs'&&
+  sourcePaths.every(p=>C.b4003CorrectiveSourceSecurityAuthorization20261024?.allowedSourcePaths?.includes(p)&&COMP.productFiles.includes(p))&&
+  qaPaths.every(p=>B4.boundaries?.allowedQaFiles?.includes(p))&&
+  Object.entries(before).every(([p,sha])=>physicalGit('rev-parse',parent+':'+p)===sha)&&
+  Object.entries(after).every(([p,sha])=>physicalGit('hash-object',p)===sha)&&
+  sourcePaths.every(p=>COMP.productFileBlobs?.[p]===R.sourceBlobsAfter[p])&&
+  R.findingsPreserved===295&&R.frozenTasksPreserved===86&&
+  W.findingsPreserved===295&&W.frozenTasksPreserved===86&&FIND.findings.length===295&&
+  R.scope?.sharedFirestoreRules===false&&R.scope?.dataMutation===false&&
+  R.scope?.livePromotion===false&&R.scope?.realBusinessWrites===false&&
+  R.scope?.newPreviewDispatched===false&&R.tests?.syntheticOnly===true&&
+  R.tests?.authenticatedBackendProof==='NOT_TESTED'&&
+  R.tests?.physicalRulesDeploymentProof==='NOT_TESTED'&&
+  W.sharedRulesDeploymentAuthorized===false&&W.dataMutationAuthorized===false&&
+  W.livePromotionAuthorized===false&&
+  B4.boundaries?.livePromotionAuthorized===false&&
+  C.b4003SecurityReleaseHold?.status==='ACTIVE_FAIL_CLOSED_UNAUTHORIZED_BROWSER_FIRESTORE_READ_WRITE',
+  'B4_003_OPERATIONAL_WRITER_SUCCESSOR_INVALID');
+ operationalWriterHistoricalBlobs=new Map(Object.keys(before).map(p=>[p,before[p]]));
+ console.log('B4_003_OPERATIONAL_WRITER_SOURCE=FOUR_AUTHORIZED_SOURCES_ONE_QA_PHYSICAL_SHA_PASS_SECURITY_HOLD');
 }
 if(DUAL_HOST_ACTIVE){
  const D=DUAL_HOST,R=readJson(D.receiptPath);

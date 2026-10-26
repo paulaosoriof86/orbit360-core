@@ -23,6 +23,8 @@ const COLLECTION_MODULE = Object.freeze({
   carteraPrimas: 'cobros',
   cobros: 'cobros',
   reclamos: 'siniestros',
+  finmovs: 'conciliaciones',
+  tareas: 'ops',
   cancelaciones: 'cancelaciones',
   comisiones: 'comisiones',
   actividades: 'cliente360',
@@ -193,6 +195,9 @@ function legacyWriteAllowed(member,role,moduleKey,collection){
   if(allowed)return true; const permissions=permissionsOf(member),keys=[`${moduleKey}_manage`,`${moduleKey}_edit`,`${moduleKey}_editar`,`${moduleKey}_create`,`${moduleKey}_crear`].map(norm); return permissions.some(p=>keys.includes(p));
 }
 function canWrite(member,accessConfig,role,moduleKey,collection){
+  // Financial movements are never implicitly editable by the operational
+  // roster, even when that role can edit unrelated Ops records.
+  if(collection==='finmovs'&&(!TEAM_ROLES.has(norm(role))&&!FINANCE_ROLES.has(norm(role))))return false;
   if(!moduleVisibleForWrite(member,accessConfig,role,moduleKey))return false;
   const permissions=permissionsOf(member),extraKeys=[`${moduleKey}_manage`,`${moduleKey}_edit`,`${moduleKey}_editar`,`${moduleKey}_create`,`${moduleKey}_crear`].map(norm); if(permissions.some(p=>extraKeys.includes(p)))return true;
   const configured=matrixPermission(accessConfig,role,moduleKey,'editar'); return configured==null?legacyWriteAllowed(member,role,moduleKey,collection):configured;
@@ -218,7 +223,9 @@ const UNSCOPED_COLLECTIONS=new Set(['aseguradoras','auditoria','auditoriaAsegExt
 function withinScope(actor,collection,moduleKey,row){
   if(collection==='aseguradoras'&&!insurerCountryAllowed(actor.member,row))return false;
   if(UNSCOPED_COLLECTIONS.has(collection))return true; if(!countryAllowed(actor.member,row))return false;
+  if(collection==='tareas'&&!rowAdvisorId(collection,row))return false;
   const scope=effectiveScope(actor.member,actor.accessConfig,actor.activeRole,moduleKey); if(scope==='none')return false; if(scope==='all')return true;
+  if(collection==='finmovs')return false; // Reader requires finance + country + all-scope.
   const target=rowAdvisorId(collection,row); if(!target)return false; if(scope==='own')return target===text(actor.member.advisorId,180); if(scope==='team')return actor.teamAdvisorIds.has(target); return false;
 }
 async function authorizeRead(request, tenantId, collection) {
@@ -273,6 +280,43 @@ async function authorize(request, tenantId, mutations) {
   if(needsTeam&&roleMapKey===undefined){const teamId=text(member.teamId||member.equipoId,160); if(teamId||own){const advisorSnap=await db.collection('tenants').doc(tenantId).collection('data').doc('asesores').collection('items').get(); advisorSnap.docs.forEach(doc=>{const row=doc.data()||{},id=text(row.id||doc.id,180);if(teamId&&text(row.teamId||row.equipoId,160)===teamId)teamAdvisorIds.add(id);if(own&&text(row.supervisorId,180)===own)teamAdvisorIds.add(id);});}}
   return{uid:request.auth.uid,activeRole:requestedRole,member,accessConfig,teamAdvisorIds};
 }
+
+// A client-only claim is legitimate. A policy-linked claim must use the
+// policy's canonical country/owner, even if the client's domicile changed.
+// Read parents in the transaction's read phase; no client-provided metadata
+// may replace those relationships or expand the actor's assigned scope.
+async function readOperationalParents(tx,tenantId,mutation,before){
+  if(mutation.action==='remove'||!['reclamos','tareas'].includes(mutation.collection))return null;
+  const prospective=Object.assign({},before||{},mutation.payload||{});
+  const policyId=text(prospective.polizaId||prospective.policyId,180);
+  const clientId=text(prospective.clienteId||prospective.clientId,180);
+  if(!policyId&&!clientId){
+    if(mutation.collection==='reclamos')throw new HttpsError('failed-precondition','Reclamo sin cliente o póliza canónica.');
+    return null; // Unlinked manual task: country+advisor are mandatory in withinScope.
+  }
+  const policySnap=policyId?await tx.get(canonicalRef(tenantId,'polizas',cleanId(policyId,'policyId'))):null;
+  if(policyId&&!policySnap.exists)throw new HttpsError('failed-precondition','Póliza relacionada no encontrada.');
+  const policy=policySnap&&policySnap.data()||null;
+  const canonicalClientId=policy?text(policy.clienteId,180):clientId;
+  if(!canonicalClientId||(clientId&&clientId!==canonicalClientId))throw new HttpsError('failed-precondition','Cliente y póliza relacionados no coinciden.');
+  const clientSnap=await tx.get(canonicalRef(tenantId,'clientes',cleanId(canonicalClientId,'clienteId')));
+  if(!clientSnap.exists)throw new HttpsError('failed-precondition','Cliente relacionado no encontrado.');
+  const client=clientSnap.data()||{};
+  if((policy&&policy.tenantId&&policy.tenantId!==tenantId)||(client.tenantId&&client.tenantId!==tenantId))throw new HttpsError('permission-denied','Relación fuera del tenant activo.');
+  return{policy,client,canonicalClientId};
+}
+function verifiedOperationalParentScope(collection,prospective,parents){
+  if(!parents)return;
+  const canonical=parents.policy||parents.client;
+  const parentCountry=text(canonical.pais||canonical.country,8).toUpperCase();
+  const country=text(prospective.pais||prospective.country,8).toUpperCase();
+  const parentAdvisor=text(canonical.asesorId||canonical.advisorId||canonical.ownerAdvisorId,180);
+  const advisor=text(prospective.asesorId||prospective.advisorId||prospective.ownerAdvisorId,180);
+  if(!['GT','CO'].includes(parentCountry)||country!==parentCountry||!parentAdvisor||advisor!==parentAdvisor)
+    throw new HttpsError('failed-precondition',`Alcance de ${collection} no coincide con el registro canónico.`);
+  const declaredClient=text(prospective.clienteId||prospective.clientId,180);
+  if(declaredClient&&declaredClient!==parents.canonicalClientId)throw new HttpsError('failed-precondition','Cliente vinculado inconsistente.');
+}
 function normalizeMutation(raw) {
   const mutation = raw || {};
   const action = norm(mutation.action);
@@ -318,6 +362,7 @@ async function execute(request) {
     for (const mutation of mutations) {
       const ref = canonicalRef(tenantId, mutation.collection, mutation.id);
       const snap = await tx.get(ref);
+      const parents=await readOperationalParents(tx,tenantId,mutation,snap.exists?snap.data():null);
       let linkedMemberRef = null, linkedMemberSnap = null;
       if (mutation.collection === 'asesores' && mutation.action !== 'remove') {
         const before = snap.exists ? snap.data() || {} : {};
@@ -328,16 +373,17 @@ async function execute(request) {
           linkedMemberSnap = await tx.get(linkedMemberRef);
         }
       }
-      reads.push({ mutation, ref, snap, linkedMemberRef, linkedMemberSnap });
+      reads.push({ mutation, ref, snap, parents, linkedMemberRef, linkedMemberSnap });
     }
 
     for (const item of reads) {
-      const { mutation, ref, snap, linkedMemberRef, linkedMemberSnap } = item;
+      const { mutation, ref, snap, parents, linkedMemberRef, linkedMemberSnap } = item;
       const before = snap.exists ? snap.data() : null;
       if (mutation.action === 'insert' && before) throw new HttpsError('already-exists', `${mutation.collection}/${mutation.id} ya existe.`);
       if ((mutation.action === 'update' || mutation.action === 'remove') && !before) throw new HttpsError('not-found', `${mutation.collection}/${mutation.id} no existe.`);
       if(before && !withinScope(actor,mutation.collection,COLLECTION_MODULE[mutation.collection],Object.assign({id:mutation.id,tenantId},before))) throw new HttpsError('permission-denied','No autorizado para modificar el registro original.');
       const scopeRow=Object.assign({},before||{},mutation.payload||{},{id:mutation.id,tenantId});
+      verifiedOperationalParentScope(mutation.collection,scopeRow,parents);
       if(!withinScope(actor,mutation.collection,COLLECTION_MODULE[mutation.collection],scopeRow))throw new HttpsError('permission-denied',`El alcance activo no autoriza ${mutation.collection}/${mutation.id}.`);
       if (mutation.action === 'remove') {
         if (mutation.collection === 'aseguradoras') {
