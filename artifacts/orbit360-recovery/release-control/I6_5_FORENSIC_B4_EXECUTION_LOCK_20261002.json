@@ -4346,5 +4346,32 @@
     "packagerReceiptBlobSha": "46abe678130a4c09964b0c8aac3a1b6f314574bc",
     "findingsPreserved": 295,
     "frozenTasksPreserved": 86
+  },
+  "b4003CorrectiveSourcePreviewSuccessorDispatch20261026": {
+    "status": "AUTHORIZED_EXACT_ISOLATED_READONLY_PREVIEW_PENDING_DISPATCH",
+    "gate": "I6.5/B4-003",
+    "authority": "PAULA_EXPLICIT_CORRECTIVE_AUTHORIZATION",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PREVIEW_DISPATCH_SUCCESSOR_20261026.json",
+    "sourceSuccessorReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_SCOPED_READ_SOURCE_SUCCESSOR_20261026.json",
+    "sourceSuccessorReceiptBlobSha": "05be0a9bb0aefbcb5924d8188881cb1e82bff8d6",
+    "dispatchParentHead": "af6d4b7be3e31c1c8bc8db62eca203573237d101",
+    "baseHead": "af6d4b7be3e31c1c8bc8db62eca203573237d101",
+    "triggerSubject": "build(i6.5 B4-003): verify authorized corrective source in isolated Preview",
+    "functions": [
+      "orbit360ScopedPolicyReadPreview"
+    ],
+    "otherFunctions": false,
+    "sharedFirestoreRules": false,
+    "hostingBuildAuthorized": true,
+    "isolatedCallableAuthorized": true,
+    "syntheticQaWrites": false,
+    "realBusinessWrites": false,
+    "dataMutation": false,
+    "reimport": false,
+    "impersonation": false,
+    "livePromotion": false,
+    "production": false,
+    "findingsPreserved": 295,
+    "frozenTasksPreserved": 86
   }
 }

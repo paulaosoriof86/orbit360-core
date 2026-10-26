@@ -143,14 +143,15 @@ if(CORRECTIVE_SOURCE_ACTIVE){
  if(PREVIEW26){
   const headSubject=physicalGit('log','-1','--format=%s','HEAD');
   const isBuildCommit=headSubject===PR26?.triggerSubject;
-  const expectedParent=isBuildCommit?physicalGit('rev-parse','HEAD^^'):physicalGit('rev-parse','HEAD^');
   const receiptLocation=isBuildCommit?'HEAD^':'HEAD';
   currentDispatchValid=PREVIEW26.status==='AUTHORIZED_EXACT_ISOLATED_READONLY_PREVIEW_PENDING_DISPATCH'&&
    PREVIEW26.receiptBlobSha===physicalGit('hash-object',PREVIEW26.receiptPath)&&
    physicalGit('rev-parse',receiptLocation+':'+PREVIEW26.receiptPath)===PREVIEW26.receiptBlobSha&&
    PR26?.schema==='GI_I65_B4_003_PREVIEW_DISPATCH_SUCCESSOR_V1'&&
    PR26.status===PREVIEW26.status&&PR26.triggerSubject==='build(i6.5 B4-003): verify authorized corrective source in isolated Preview'&&
-   PR26.baseHead===expectedParent&&PR26.sourceFixReceiptBlobSha===D.receiptBlobSha&&
+   PR26.baseHead===PR26.dispatchParentHead&&
+   physicalGit('merge-base',PR26.dispatchParentHead,'HEAD')===PR26.dispatchParentHead&&
+   PR26.sourceFixReceiptBlobSha===D.receiptBlobSha&&
    PR26.sourceSuccessorReceiptBlobSha===S26.receiptBlobSha&&
    PR26.packagerFixReceiptBlobSha===S26.packagerReceiptBlobSha&&
    PR26.compositionBlobSha===physicalGit('hash-object',I6_CANONICAL_COMPOSITION)&&

@@ -1,0 +1,67 @@
+{
+  "schema": "GI_I65_B4_003_PREVIEW_DISPATCH_SUCCESSOR_V1",
+  "product": "Gravicentra Insurance",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "gate": "I6.5/B4-003",
+  "status": "AUTHORIZED_EXACT_ISOLATED_READONLY_PREVIEW_PENDING_DISPATCH",
+  "authority": "PAULA_EXPLICIT_CORRECTIVE_AUTHORIZATION",
+  "triggerSubject": "build(i6.5 B4-003): verify authorized corrective source in isolated Preview",
+  "baseHead": "af6d4b7be3e31c1c8bc8db62eca203573237d101",
+  "sourceFixReceiptBlobSha": "19b6e0644015ea34b70e0216e0d128f7df2833e9",
+  "sourceSuccessorReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_SCOPED_READ_SOURCE_SUCCESSOR_20261026.json",
+  "sourceSuccessorReceiptBlobSha": "05be0a9bb0aefbcb5924d8188881cb1e82bff8d6",
+  "authorizationReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CORRECTIVE_SOURCE_SECURITY_AUTH_20261024.json",
+  "authorizationReceiptBlobSha": "5b999ed30d3a82e81c67528a86e0559f94013250",
+  "compositionBlobSha": "967a63fa995d9beb45caf882eb91eb7c41bd332a",
+  "executionLockBlobSha": "249a17b48d6c9c685e44bb1afc8018b02525e566",
+  "packagerFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PREVIEW_PACKAGER_DUPLICATE_EXPORT_ROOTFIX_20261025.json",
+  "packagerFixReceiptBlobSha": "46abe678130a4c09964b0c8aac3a1b6f314574bc",
+  "expectedProductBlobs": {
+    "functions/bootstrap.js": "42fd05b81a02d428e590c36e3feb32be202f4965",
+    "functions/b4-003-scoped-related-reader.js": "0ccb30bf7244b09385b71c89553ff50c7f4d3469",
+    "functions/b4-003-scoped-access-boundary.js": "61c0d528262a525ac4eaf6b5c727565b8131b772",
+    "orbit360-platform/core/product-runtime-browser-providers-p0.js": "2ab3c306be243743355cc47fdc3fc5245133539a",
+    "orbit360-platform/core/queries.js": "ddb9e01c9f6aa82f750961ecf66d37475c2f6205",
+    "orbit360-platform/modules/cobros.js": "9cbbf63775f30ce71c28ac93211e93a945cc2bf5",
+    "functions/package.json": "a016a9f9d6a48ab44d45dedc88611cff083091ef",
+    "orbit360-platform/data/store-firestore-product-readonly-p0.js": "a29c3afe08bb6bc2bd2aaeea1ccf1ee2164826d5",
+    "orbit360-platform/modules/polizas.js": "e561b8ebb7c872341d25c6d3cbe5a6cec5fac6b4"
+  },
+  "expectedQaBlobs": {
+    "tools/gravicentra-b4-003-scoped-related-reader.test.cjs": "9a6dfa2062700ddc85dbf7436cd10945f613e70c",
+    "tools/gravicentra-b4-003-country-finance-parity.test.cjs": "fc93d180a4b2e80fa443d26f5b73c90e3f019b6e",
+    "tools/gravicentra-b4-003-polizas-context-cache.test.cjs": "94b7d28c705666a2445107b527b95e069c4c1690"
+  },
+  "functions": [
+    "orbit360ScopedPolicyReadPreview"
+  ],
+  "scope": {
+    "hosting": "ONE_IMMUTABLE_B4_003_PREVIEW_ONLY",
+    "functions": [
+      "orbit360ScopedPolicyReadPreview"
+    ],
+    "otherFunctions": false,
+    "sharedFirestoreRules": false,
+    "production": false,
+    "livePromotion": false,
+    "syntheticQaWrites": false,
+    "realBusinessWrites": false,
+    "dataMutation": false,
+    "reimport": false,
+    "impersonation": false,
+    "authenticatedIdentityProof": false,
+    "publicUnauthenticatedSmoke": true,
+    "emulatorTests": "READ_ONLY_OR_IN_MEMORY_ONLY"
+  },
+  "preserved": {
+    "findings": 295,
+    "frozenTasks": 86,
+    "previousEvidence": true
+  },
+  "polizasCompositionSuccessorReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_POLIZAS_CONTEXT_CACHE_COMPOSITION_SUCCESSOR_20261025.json",
+  "polizasCompositionSuccessorReceiptBlobSha": "7224c1a1670beadd001dfffab1a93bf9ca4cdc32",
+  "bootstrapCompositionSuccessorReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_BOOTSTRAP_COMPOSITION_SUCCESSOR_20261025.json",
+  "bootstrapCompositionSuccessorReceiptBlobSha": "7702767b1a09438b2f18061b5d5981e94bd8140d",
+  "dispatchParentHead": "af6d4b7be3e31c1c8bc8db62eca203573237d101"
+}
