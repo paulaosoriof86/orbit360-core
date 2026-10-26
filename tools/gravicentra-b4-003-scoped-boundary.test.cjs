@@ -146,10 +146,31 @@ console.log('B4_003_APPROVED_ROLE_SCOPE_PARITY_PASS Finance Marketing Assistant 
   if(binding.candidateBlob!==blob){
    const successor=control.b4003WriterCountryFailClosedSuccessor20261023;
    assert.ok(successor,'New writer bytes require an explicit successor');
-   assert.equal(successor.sourceBlobSha,blob);
    assert.equal(successor.status,'SOURCE_STAGED_SYNTHETIC_QA_PASS_SECURITY_HOLD');
    assert.equal(successor.operationalWriterDeploymentAuthorized,false);
    assert.equal(successor.livePromotionAuthorized,false);
+   if(successor.sourceBlobSha!==blob){
+    // The country successor is an immutable historical receipt. The later
+    // operational-writer successor must prove BOTH its exact predecessor
+    // and its exact current source instead of replacing that old receipt.
+    const next=control.b4003OperationalWriterSourceSuccessor20261026;
+    assert.ok(next,'Later writer bytes require an immutable successor');
+    assert.equal(next.gate,'I6.5/B4-003');
+    assert.equal(next.status,'SOURCE_STAGED_SYNTHETIC_QA_PASS_SECURITY_HOLD');
+    const receiptBytes=fs.readFileSync(next.receiptPath);
+    const receipt=JSON.parse(receiptBytes);
+    const receiptBlob=crypto.createHash('sha1').update(Buffer.concat([
+     Buffer.from('blob '+receiptBytes.length+'\0'),receiptBytes
+    ])).digest('hex');
+    assert.equal(next.receiptBlobSha,receiptBlob,'Operational successor receipt integrity');
+    assert.equal(receipt.parentHead,next.parentHead);
+    assert.equal(receipt.sourceBlobsBefore[proof.owner],successor.sourceBlobSha);
+    assert.equal(receipt.sourceBlobsAfter[proof.owner],blob);
+    assert.equal(next.sharedRulesDeploymentAuthorized,false);
+    assert.equal(next.dataMutationAuthorized,false);
+    assert.equal(next.livePromotionAuthorized,false);
+    console.log('B4_003_WRITER_HISTORICAL_AND_OPERATIONAL_SUCCESSORS_CHAINED_PASS');
+   }else assert.equal(successor.sourceBlobSha,blob);
   }else assert.equal(binding.candidateBlob,blob);
   assert.equal(binding.sourceChangeAuthorized,true);
   assert.equal(run.status,0);
