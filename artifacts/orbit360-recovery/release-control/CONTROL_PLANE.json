@@ -15007,6 +15007,9 @@
     "compositionBlobSha": "967a63fa995d9beb45caf882eb91eb7c41bd332a",
     "executionLockBlobSha": "77485e130515ab14d29f1a19c176f0be0ffe949a",
     "packagerFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PREVIEW_PACKAGER_DUPLICATE_EXPORT_ROOTFIX_20261025.json",
-    "packagerFixReceiptBlobSha": "46abe678130a4c09964b0c8aac3a1b6f314574bc"
+    "packagerFixReceiptBlobSha": "46abe678130a4c09964b0c8aac3a1b6f314574bc",
+    "dispatchIntentCommitParentSha": "1e2611b7b60b533136521551b683e2970865b9f0",
+    "dispatchIntentSubject": "build(i6.5 B4-003): verify authorized corrective source in isolated Preview",
+    "dispatchIntentStatus": "AUTHORIZED_PENDING_EXACT_BUILD_GATE"
   }
 }
