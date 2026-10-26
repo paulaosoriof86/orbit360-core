@@ -86,6 +86,52 @@ const ACTIVE_I65_FORENSIC_B4=String(C.i65ForensicRemediationPlan?.b4?.executionL
 need(exists(ACTIVE_I65_FORENSIC_B4),'I6_5_B4_ACTIVE_LOCK_MISSING:'+ACTIVE_I65_FORENSIC_B4);
 const S=readJson(STATUS_LEDGER),A=readJson(AUTH_RECEIPT),M5=readJson(V5_MANIFEST),M6=readJson(V6_MANIFEST),M=readJson(V7_MANIFEST),FRA=readJson(I65_FORENSIC_AUDIT),FRP=readJson(I65_FORENSIC_PLAN),PAY=readJson(I65_PAYMENT_INFERENCE),B1=readJson(I65_FORENSIC_B1),B2=readJson(I65_FORENSIC_B2),B3=readJson(I65_FORENSIC_B3),B4=readJson(ACTIVE_I65_FORENSIC_B4);
 const COMP=readJson(I6_CANONICAL_COMPOSITION),FIND=readJson(I6_FINDINGS_LEDGER),FRP2=readJson(I65_FORENSIC_PLAN_V2),REJ=readJson(I65_B2_REJECTION),RCM=readJson(I65_B2_ROOT_CAUSE);
+// An explicitly byte-bound single-case QA successor can supersede only its
+// two source blobs without rewriting the historically certified composition.
+// The broad B4 execution lock and all previous Preview receipts remain frozen.
+const META_TR=C.b4003MetaTrV27SingleCaseSuccessor20261025||{};
+const META_TR_ACTIVE=META_TR.status==='QA_SOURCE_SUCCESSOR_STAGED_ISOLATED_PREVIEW_PENDING';
+const META_TR_SOURCE_PATHS=['functions/product-ops-leads-domain.js','orbit360-platform/core/ciclo.js'];
+const META_TR_QA_PATHS=['tools/gravicentra-b4-003-meta-tr-v27-preview-contract.test.cjs','tools/gravicentra-i6-control-plane-guard-v1.mjs'];
+let META_TR_SOURCE_BLOBS=new Map();
+if(META_TR_ACTIVE){
+ const Q=readJson(META_TR.receiptPath||'');
+ const sourcePaths=Object.keys(Q.sourceBlobsAfter||{}).sort();
+ const qaPaths=Object.keys(Q.qaBlobsAfter||{}).sort();
+ need(Q.schema==='GI_I65_B4_003_META_TR_V27_SINGLE_CASE_SUCCESSOR_V1'&&
+  Q.status===META_TR.status&&Q.gate==='I6.5/B4-003'&&
+  Q.authority==='PAULA_EXPLICIT_FOCAL_CONTROL_PLANE_RECONCILIATION'&&
+  Q.baseHead==='f31ad3e27ff07cb29fcf85a40165bc6b2ad6a9a4'&&
+  physicalGit('merge-base',Q.baseHead,'HEAD')===Q.baseHead&&
+  META_TR.receiptBlobSha===physicalGit('hash-object',META_TR.receiptPath)&&
+  Q.historicalCompositionBlobSha===physicalGit('hash-object',I6_CANONICAL_COMPOSITION)&&
+  Q.historicalExecutionLockBlobSha===physicalGit('hash-object',ACTIVE_I65_FORENSIC_B4)&&
+  Q.historicalDispatchReceiptBlobSha===C.b4003CorrectiveSourcePreviewSuccessorDispatch20261026?.receiptBlobSha&&
+  sourcePaths.join(',')===META_TR_SOURCE_PATHS.slice().sort().join(',')&&
+  qaPaths.join(',')===META_TR_QA_PATHS.slice().sort().join(',')&&
+  sourcePaths.every(p=>B4.boundaries?.allowedProductFiles?.includes(p)&&COMP.productFiles?.includes(p)&&
+   Q.sourceBlobsBefore?.[p]===physicalGit('rev-parse',Q.baseHead+':'+p)&&
+   Q.sourceBlobsBefore[p]===COMP.productFileBlobs[p]&&
+   Q.sourceBlobsAfter[p]===physicalGit('hash-object',p)&&Q.sourceBlobsAfter[p]!==Q.sourceBlobsBefore[p])&&
+  qaPaths.every(p=>Q.qaBlobsAfter[p]===physicalGit('hash-object',p))&&
+  B4.boundaries?.allowedQaFiles?.includes('tools/gravicentra-i6-control-plane-guard-v1.mjs')&&
+  Q.scope?.tenantId==='alianzas-soluciones'&&
+  Q.scope?.caseId==='b4003qa_meta_tr_v27_20261025_01'&&
+  Q.scope?.pieceId==='F02-V27-QA'&&Q.scope?.channel==='Facebook'&&
+  Q.scope?.allowedFunctions?.join(',')==='orbit360OpsLeadsCommandPreview'&&
+  Q.scope?.sharedFirestoreRules===false&&Q.scope?.authIamMutation===false&&
+  Q.scope?.realBusinessWrites===false&&Q.scope?.livePromotion===false&&
+  Q.scope?.externalCommunications===false&&Q.scope?.physicalDeletion===false&&
+  B4.boundaries?.syntheticQaWritesAuthorized===false&&
+  C.b4003CorrectiveSourcePreviewSuccessorDispatch20261026?.syntheticQaWrites===false&&
+  Q.preserved?.findings===295&&Q.preserved?.frozenTasks===86&&FIND.findings.length===295,
+  'B4_003_META_TR_V27_SINGLE_CASE_SUCCESSOR_INVALID');
+ const qaOutput=execFileSync(process.execPath,[META_TR_QA_PATHS[0]],{encoding:'utf8'});
+ need(qaOutput.includes('AYS_META_TR_V27_SOURCE_CONTRACT_PASS checks=37 in_memory_only physical_writes=0'),
+  'B4_003_META_TR_V27_QA_CONTRACT_FAILED');
+ META_TR_SOURCE_BLOBS=new Map(Object.entries(Q.sourceBlobsAfter));
+ console.log('B4_003_META_TR_V27=FOCAL_SOURCE_QA_SUCCESSOR_BOUND_GLOBAL_LOCK_UNCHANGED');
+}
 // The 24-Oct dual-host source is an independently pinned successor, never a
 // rewrite of preceding authenticated/Preview receipts. Earlier expectations
 // use the committed predecessor bytes; this change must match disk bytes.
@@ -2582,7 +2628,10 @@ if(canonicalCompositionActive){
  const actualProduct=changed.filter(p=>!allowedPrefixes.some(prefix=>p.startsWith(prefix))).sort();
  const declared=[...(COMP.productFiles||[])].sort();
  need(actualProduct.length===declared.length&&actualProduct.every((p,i)=>p===declared[i]),'I6_CANONICAL_COMPOSITION_EXACT_SET_DRIFT');
- need(declared.every(p=>COMP.productFileBlobs?.[p]&&physicalGit('hash-object',p)===COMP.productFileBlobs[p]),'I6_CANONICAL_COMPOSITION_BLOB_DRIFT');
+ need(declared.every(p=>COMP.productFileBlobs?.[p]&&(
+  META_TR_SOURCE_BLOBS.has(p)?physicalGit('hash-object',p)===META_TR_SOURCE_BLOBS.get(p):
+  physicalGit('hash-object',p)===COMP.productFileBlobs[p]
+ )),'I6_CANONICAL_COMPOSITION_BLOB_DRIFT');
  need(COMP.productFileCount===declared.length,'I6_CANONICAL_COMPOSITION_COUNT_DRIFT');
 }
 const b1Retained=activeI65&&['B1','B2','B3','B4'].includes(forensicActiveBlock)&&Array.isArray(B1.allowedProductFiles);

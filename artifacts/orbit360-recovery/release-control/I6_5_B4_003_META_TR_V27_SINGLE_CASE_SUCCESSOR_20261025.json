@@ -1,0 +1,60 @@
+{
+  "schema": "GI_I65_B4_003_META_TR_V27_SINGLE_CASE_SUCCESSOR_V1",
+  "status": "QA_SOURCE_SUCCESSOR_STAGED_ISOLATED_PREVIEW_PENDING",
+  "product": "Gravicentra Insurance",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "gate": "I6.5/B4-003",
+  "authority": "PAULA_EXPLICIT_FOCAL_CONTROL_PLANE_RECONCILIATION",
+  "baseHead": "f31ad3e27ff07cb29fcf85a40165bc6b2ad6a9a4",
+  "historicalCompositionBlobSha": "967a63fa995d9beb45caf882eb91eb7c41bd332a",
+  "historicalExecutionLockBlobSha": "77485e130515ab14d29f1a19c176f0be0ffe949a",
+  "historicalDispatchReceiptBlobSha": "b35b755539861d1bd0b3db9bf6b32ee3ff9e68d8",
+  "sourceBlobsBefore": {
+    "functions/product-ops-leads-domain.js": "a0f79b34433c6b93702eabbece6a53a5e6124f45",
+    "orbit360-platform/core/ciclo.js": "dc1e77c900edf6eb366bf836f19ecb0ebd17a541"
+  },
+  "sourceBlobsAfter": {
+    "functions/product-ops-leads-domain.js": "af3401d61671b03f07cb32952e1ed2cfb031d546",
+    "orbit360-platform/core/ciclo.js": "2d5ed8d48e0da1ec6736d2e1e14fc3e8f1a02d9a"
+  },
+  "qaBlobsAfter": {
+    "tools/gravicentra-b4-003-meta-tr-v27-preview-contract.test.cjs": "d7e403acd40d2c9b3a10b315ed04b6c137170f59",
+    "tools/gravicentra-i6-control-plane-guard-v1.mjs": "05220ab0316d40cfbc4334328e3ea7e777ddf7d2"
+  },
+  "scope": {
+    "tenantId": "alianzas-soluciones",
+    "caseId": "b4003qa_meta_tr_v27_20261025_01",
+    "channel": "Facebook",
+    "pieceId": "F02-V27-QA",
+    "allowedFunctions": ["orbit360OpsLeadsCommandPreview"],
+    "syntheticQaWrites": "ONE_EXACT_CASE_ONLY_AFTER_CANDIDATE_PREVIEW_DEPLOYMENT",
+    "readbackRoles": ["direccion", "asesor"],
+    "sharedFirestoreRules": false,
+    "authIamMutation": false,
+    "realBusinessWrites": false,
+    "livePromotion": false,
+    "externalCommunications": false,
+    "physicalDeletion": false,
+    "metaAdsPixelBudget": false,
+    "newBranchesGatesOrRepos": false
+  },
+  "preserved": {
+    "findings": 295,
+    "frozenTasks": 86,
+    "historicalReceipts": true,
+    "historicalCompositionBytes": true,
+    "historicalB4ExecutionLockBytes": true,
+    "historicalPreviewDispatchBytes": true
+  },
+  "validation": {
+    "qaLocalInMemoryChecks": 37,
+    "qaLocalContract": "SOURCE_CONTRACT_PASS_ONLY",
+    "canonicalGuard": "PENDING_CANDIDATE_COMMIT_AND_READBACK",
+    "isolatedPreviewDeployment": "NOT_EXECUTED",
+    "authenticatedPaulaSamuelReadback": "NOT_EXECUTED",
+    "tr01ThroughTr07": "HOLD",
+    "k01ThroughK06": "HOLD",
+    "productionRelease": "NO_GO"
+  }
+}

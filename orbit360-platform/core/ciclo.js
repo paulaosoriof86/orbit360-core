@@ -436,6 +436,7 @@ Orbit.ciclo = (function () {
               ${fInput('Correo', 'ng-email', n.email)}
               ${fSelect('País', 'ng-pais', (Orbit.PAISES||[]).filter(p=>p&&p.id&&p.id!=='TODOS').map(p=>p.id), n.pais)}
               ${fSelectCat('Canal de ingreso', 'ng-canal', 'canales', n.canal)}
+              ${fInput('Referencia de pieza / campaña', 'ng-pieza-view', n.piezaOrigen||'')}
             </div>
           </div>
           <div class="ciclo-sec">
@@ -500,6 +501,7 @@ Orbit.ciclo = (function () {
         </div>
       </div>`;
     const back = modal(html, 980);
+    const pieceReadback=back.querySelector('#ng-pieza-view');if(pieceReadback){pieceReadback.readOnly=true;pieceReadback.title='Origen de pieza registrado al crear el negocio; se conserva para trazabilidad.';}
     try{requestAnimationFrame(()=>{const finished=window.performance&&typeof performance.now==='function'?performance.now():Date.now(),duration=Math.max(0,finished-openedAt);back.dataset.firstPaintMs=String(Math.round(duration));if(window.performance&&performance.mark&&performance.measure){performance.mark(markId+'-paint');performance.measure(markId,markId+'-start',markId+'-paint');}document.dispatchEvent(new CustomEvent('orbit:timing',{detail:{surface:'business-card',phase:'first-paint',durationMs:duration}}));});}catch(_e){}
     const countrySelect=back.querySelector('#ng-pais'),insurerSelect=back.querySelector('#ng-asg'),advisorSelect=back.querySelector('#ng-ase'),ramoSelect=back.querySelector('#ng-ramo'),productSelect=back.querySelector('#ng-prod'),planSelect=back.querySelector('#ng-plan');
     // Hydrate the canonical assignable roster after first paint; preserve current selection.
@@ -1238,6 +1240,7 @@ Orbit.ciclo = (function () {
   async function nuevoNegocio(prefill) {
     try{await Orbit.cat.ensure();}catch(error){U.toast('No fue posible confirmar los catálogos del tenant. La operación queda bloqueada.');return;}
     prefill=prefill&&typeof prefill==='object'?prefill:{};
+    const metaQaPreview=/^ays-orbit-360-lab--gi-i65-b4-[a-z0-9-]+\.web\.app$/i.test(String(location.hostname||''))&&String(Orbit.auth?.productUser?.tenantId||'')==='alianzas-soluciones';
     const initialCountry = prefill.pais || (Orbit.pais && Orbit.pais !== 'TODOS' ? Orbit.pais : 'GT');
     const initialRamo=(Orbit.cat.ramosDe(initialCountry)||[])[0]||'';
     let asesores = await assignableAdvisors(initialCountry),asgs=insurersForCountry(initialCountry);
@@ -1256,6 +1259,7 @@ Orbit.ciclo = (function () {
           ${fInput('Correo', 'nn-email', prefill.email||'')}
           ${fSelect('País', 'nn-pais', (Orbit.PAISES||[]).filter(p=>p&&p.id&&p.id!=='TODOS').map(p=>p.id), initialCountry)}
           ${fSelectCat('Canal de ingreso', 'nn-canal', 'canales', prefill.canal||Orbit.cat.get('canales')[0]||'')}
+          ${fInput('Referencia de pieza / campaña (opcional)', 'nn-pieza', prefill.piezaOrigen||'')}
           ${fSelect('Ramo', 'nn-ramo', Orbit.cat.ramosDe(initialCountry), initialRamo)}
           ${fSelect('Producto', 'nn-prod', commercialProducts(initialCountry,initialRamo), '')}
           ${fSelect('Plan', 'nn-plan', [], '')}
@@ -1266,6 +1270,7 @@ Orbit.ciclo = (function () {
         </div>
         <div class="ce-l"><span>Aseguradoras de interés</span><div id="nn-asg" class="insurer-multicheck" data-country-scope="${U.esc(initialCountry)}">${insurerChecklistHtml(asgs,[])}</div><small class="muted" style="display:block;margin-top:4px">Marca una o varias aseguradoras. Solo se muestran las habilitadas para el país seleccionado.</small></div>
         ${fSelectOpt('Punto de ingreso', 'nn-ingreso', entryOptions.map(p=>[p.id,p.label]), defaultEntry)}
+        ${metaQaPreview?'<label class="ce-l" data-meta-qa-preview style="border:1px solid #c5162e;padding:9px 11px;border-radius:8px"><span><input type="checkbox" id="nn-meta-qa" /> Caso sintético Meta TR-01…TR-07, ID fijo <code>b4003qa_meta_tr_v27_20261025_01</code>, pieza <code>F02-V27-QA</code>. No utiliza datos personales ni comunicaciones externas.</span></label>':''}
         <label class="ce-l">Descripción / detalle del riesgo<textarea id="nn-desc" class="o-sel" style="min-height:54px;resize:vertical;padding:9px 11px"></textarea></label>
       </div>
       <div class="ciclo-foot"><div class="muted" style="font-size:12px">${prefill.commercialIdentityId?'Identidad comercial vinculada · oportunidades independientes':'Nuevo es el estado inicial normal'}</div><div style="display:flex;gap:8px"><button class="btn ghost" data-close>Cancelar</button><button class="btn primary" id="nn-ok">Crear</button></div></div>`;
@@ -1293,11 +1298,14 @@ Orbit.ciclo = (function () {
       const ingreso=Orbit.cat.puntoIngreso(v('nn-ingreso'));if(!ingreso)return U.toast('Selecciona un punto de ingreso válido.');
       const ingresoOps=ingreso.origen==='Ops',pais=v('nn-pais'),asesorId=v('nn-ase'),insurerIds=checkedInsurerIds(insurerSelect);
       if(!asesorId)return U.toast('Selecciona un asesor responsable.');
-      const id='neg'+Date.now().toString().slice(-7),identityId=prefill.commercialIdentityId||id;
-      const n={id,commercialIdentityId:identityId,sourceOpportunityId:prefill.sourceOpportunityId||'',nombre:v('nn-nombre')||'Prospecto',tipo:v('nn-tipo'),
-        etapa:ingreso.etapa,prob:Number(ingreso.probability??ingreso.prob??0),puntoIngreso:ingreso.id,asesorId,canal:v('nn-canal'),pais,moneda:pais==='CO'?'COP':'GTQ',
+      const metaQa=metaQaPreview&&back.querySelector('#nn-meta-qa')?.checked===true;
+      if(metaQa&&(pais!=='GT'||ingresoOps||ingreso.etapa!=='nuevo'))return U.toast('La prueba Meta requiere Guatemala y el punto de ingreso Leads / Nuevo.');
+      const id=metaQa?'b4003qa_meta_tr_v27_20261025_01':'neg'+Date.now().toString().slice(-7),identityId=prefill.commercialIdentityId||id;
+      const n={id,commercialIdentityId:identityId,sourceOpportunityId:prefill.sourceOpportunityId||'',nombre:metaQa?'QA Meta · Caso sintético sin datos personales':(v('nn-nombre')||'Prospecto'),tipo:metaQa?'Persona':v('nn-tipo'),
+        etapa:ingreso.etapa,prob:Number(ingreso.probability??ingreso.prob??0),puntoIngreso:ingreso.id,asesorId,canal:metaQa?'Facebook':v('nn-canal'),pais,moneda:pais==='CO'?'COP':'GTQ',
+        piezaOrigen:metaQa?'F02-V27-QA':v('nn-pieza'),
         producto:v('nn-prod')||'',plan:v('nn-plan')||'',ramo:v('nn-ramo')||'',segmento:v('nn-segmento')||'',aseguradoraIds:insurerIds,aseguradoraId:insurerIds[0]||'',
-        telefono:v('nn-tel'),email:v('nn-email'),primaEst:+v('nn-prima')||0,descripcion:v('nn-desc'),notas:'',cadencia:'',cadenciaActiva:false,
+        telefono:metaQa?'':v('nn-tel'),email:metaQa?'':v('nn-email'),primaEst:metaQa?0:(+v('nn-prima')||0),descripcion:metaQa?'QA interna: trazabilidad de pieza a necesidad, responsable, seguimiento y resultado.':v('nn-desc'),notas:'',cadencia:'',cadenciaActiva:false,
         proximoToque:inDays(2),vence:inDays(7),prioridad:v('nn-prioridad')||'',decision:'',nroCotizacion:'',nroPoliza:'',
         checklist:[{t:'Datos completos para cotizar',done:ingresoOps},{t:'Cotización enviada al cliente',done:false},{t:'Documentos del riesgo recibidos',done:false},{t:'Inspección / avalúo realizado',done:false}],
         clienteIdCreado:'',archivado:false,etiquetas:[],bitacora:[{ts:stamp(),user:(Orbit.session?Orbit.session.rol():'Equipo'),campo:'Creación',de:'',a:'Ingreso ('+(ingresoOps?'Ops':'Leads')+')',origen:'manual'}],

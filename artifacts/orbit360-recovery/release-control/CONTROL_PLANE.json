@@ -15011,5 +15011,18 @@
     "dispatchIntentCommitParentSha": "1e2611b7b60b533136521551b683e2970865b9f0",
     "dispatchIntentSubject": "build(i6.5 B4-003): verify authorized corrective source in isolated Preview",
     "dispatchIntentStatus": "AUTHORIZED_PENDING_EXACT_BUILD_GATE"
+  },
+  "b4003MetaTrV27SingleCaseSuccessor20261025": {
+    "status": "QA_SOURCE_SUCCESSOR_STAGED_ISOLATED_PREVIEW_PENDING",
+    "gate": "I6.5/B4-003",
+    "authority": "PAULA_EXPLICIT_FOCAL_CONTROL_PLANE_RECONCILIATION",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_META_TR_V27_SINGLE_CASE_SUCCESSOR_20261025.json",
+    "receiptBlobSha": "9c11907a35c769e9965175434bbe90e4eed4a189",
+    "caseId": "b4003qa_meta_tr_v27_20261025_01",
+    "allowedQaSourceSuccessor": true,
+    "isolatedPreviewReadbackAccepted": false,
+    "tr07Passed": false,
+    "realBusinessWritesAuthorized": false,
+    "livePromotionAuthorized": false
   }
 }
