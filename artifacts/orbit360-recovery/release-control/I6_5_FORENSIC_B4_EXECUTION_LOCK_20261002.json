@@ -162,7 +162,7 @@
   "nextAction": "B4_003_R20_TARGETED_PAULA_VISUAL",
   "compositionLock": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
-    "blobSha": "fbdf3f07c0b5221f46e5e5d06472f6a047931a92",
+    "blobSha": "967a63fa995d9beb45caf882eb91eb7c41bd332a",
     "status": "FROZEN_ACTIVE"
   },
   "findingLedger": {
@@ -634,7 +634,7 @@
   },
   "findingLedgerBlobSha": "8125e97dcf1feb7f46081f95327952e65c2d1077",
   "continuityRegisterBlobSha": "4e6b0ac51736be360c4b95abe8fc01d8f1e78e20",
-  "compositionLockBlobSha": "fbdf3f07c0b5221f46e5e5d06472f6a047931a92",
+  "compositionLockBlobSha": "967a63fa995d9beb45caf882eb91eb7c41bd332a",
   "r18SourceFix": {
     "status": "SOURCE_FIXED_R18_PENDING_CONTRACT_AND_EXACT_PREVIEW",
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R18_SOURCE_FIX_20261005.json",

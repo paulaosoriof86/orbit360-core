@@ -14,7 +14,7 @@
   "authorizationReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CORRECTIVE_SOURCE_SECURITY_AUTH_20261024.json",
   "authorizationReceiptBlobSha": "5b999ed30d3a82e81c67528a86e0559f94013250",
   "compositionBlobSha": "967a63fa995d9beb45caf882eb91eb7c41bd332a",
-  "executionLockBlobSha": "249a17b48d6c9c685e44bb1afc8018b02525e566",
+  "executionLockBlobSha": "77485e130515ab14d29f1a19c176f0be0ffe949a",
   "packagerFixReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PREVIEW_PACKAGER_DUPLICATE_EXPORT_ROOTFIX_20261025.json",
   "packagerFixReceiptBlobSha": "46abe678130a4c09964b0c8aac3a1b6f314574bc",
   "expectedProductBlobs": {
