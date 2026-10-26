@@ -402,11 +402,18 @@ if(BACKEND_SCOPE_NEXT){
   R.scope?.sharedFirestoreRules===false&&
   R.scope?.dataMutation===false&&R.scope?.livePromotion===false&&
   R.scope?.authIamMutation===false&&R.scope?.newPreviewDispatched===false&&
+  C.currentB4?.compositionLockBlobSha===physicalGit('rev-parse',A.parentHead+':'+I6_CANONICAL_COMPOSITION)&&
+  B4.compositionLockBlobSha===C.currentB4?.compositionLockBlobSha&&
+  C.currentB4?.executionLockBlobSha===physicalGit('rev-parse',A.parentHead+':'+ACTIVE_I65_FORENSIC_B4)&&
   A.findingsPreserved===295&&A.frozenTasksPreserved===86&&
   B4.boundaries?.livePromotionAuthorized===false&&
   C.b4003SecurityReleaseHold?.status==='ACTIVE_FAIL_CLOSED_UNAUTHORIZED_BROWSER_FIRESTORE_READ_WRITE',
   'B4_003_BACKEND_SCOPE_DENIAL_SUCCESSOR_INVALID');
- backendScopeHistoricalBlobs=new Map(Object.entries(R.sourceBlobsBefore));
+ backendScopeHistoricalBlobs=new Map([
+  ...Object.entries(R.sourceBlobsBefore),
+  [I6_CANONICAL_COMPOSITION,physicalGit('rev-parse',A.parentHead+':'+I6_CANONICAL_COMPOSITION)],
+  [ACTIVE_I65_FORENSIC_B4,physicalGit('rev-parse',A.parentHead+':'+ACTIVE_I65_FORENSIC_B4)]
+ ]);
  console.log('B4_003_BACKEND_SCOPE_DENIAL_SUCCESSOR=EXACT_TWO_SOURCES_ONE_QA_PASS_SECURITY_HOLD');
 }
 
