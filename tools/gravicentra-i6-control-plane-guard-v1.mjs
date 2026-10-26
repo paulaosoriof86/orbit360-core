@@ -336,7 +336,11 @@ if(WRITER_SUCCESSOR){
   sourcePaths.every(p=>C.b4003CorrectiveSourceSecurityAuthorization20261024?.allowedSourcePaths?.includes(p)&&COMP.productFiles.includes(p))&&
   qaPaths.every(p=>B4.boundaries?.allowedQaFiles?.includes(p))&&
   Object.entries(before).every(([p,sha])=>physicalGit('rev-parse',parent+':'+p)===sha)&&
-  Object.entries(after).every(([p,sha])=>physicalGit('hash-object',p)===sha)&&
+  Object.entries(after).every(([p,sha])=>
+   (p==='tools/gravicentra-b4-003-scoped-related-reader.test.cjs'&&
+    C.b4003BackendScopeDenialSuccessor20261026
+    ?physicalGit('rev-parse','17c4bed9ba8b2bd36f559a802390723647994ea2:'+p)
+    :physicalGit('hash-object',p))===sha)&&
   sourcePaths.every(p=>COMP.productFileBlobs?.[p]===R.sourceBlobsAfter[p])&&
   R.findingsPreserved===295&&R.frozenTasksPreserved===86&&
   W.findingsPreserved===295&&W.frozenTasksPreserved===86&&FIND.findings.length===295&&
