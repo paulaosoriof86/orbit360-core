@@ -26,7 +26,7 @@ const modules={clientes:'cliente360',polizas:'polizas',vehiculos:'polizas',recib
 class Denied extends Error{constructor(code){super(code);this.code=code;}}
 const deny=code=>{throw new Denied(code);};
 const get=(o,k)=>{const key=Object.keys(o||{}).find(v=>norm(v)===norm(k));return key===undefined?undefined:o[key];};
-const scope=v=>({none:'none',ninguno:'none',sin_acceso:'none',own:'own',propio:'own',team:'team',equipo:'team',all:'all',todos:'all',global:'all'})[norm(v)]||'';
+const scope=v=>({none:'none',ninguno:'none',sin_acceso:'none',own:'own',propio:'own',propios:'own',team:'team',equipo:'team',all:'all',todos:'all',global:'all'})[norm(v)]||'';
 
 function canReadAssignedModule(member,role,moduleKey,permission){
  // Enforce affirmative server-owned module entitlement; no absent-matrix grant.

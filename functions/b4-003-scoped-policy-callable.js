@@ -13,11 +13,13 @@ const {readBootstrap,readProtectedDirectory}=require('./b4-003-scoped-bootstrap-
 const REGION='us-east1';
 const db=getFirestore(getApps()[0]||initializeApp());
 async function handle(request){
+  let auditCollection='unknown';
   try {
     if(!request||!request.auth||!request.auth.uid)
       throw new HttpsError('unauthenticated','AUTH_REQUIRED');
     const sourceRequest=request.data||{};
     const selectedCollection=String(sourceRequest.collection||'polizas').trim();
+    auditCollection=/^[A-Za-z][A-Za-z0-9]{0,31}$/.test(selectedCollection)?selectedCollection:'invalid';
     const bootstrap=['bootstrap-membership','bootstrap-tenant-config'].includes(sourceRequest.mode);
     const result=bootstrap
       ? await readBootstrap({db,auth:request.auth,request:sourceRequest})
@@ -34,9 +36,19 @@ async function handle(request){
       throw new HttpsError('internal','SCOPED_READ_POSTCONDITION_FAILED');
     return result;
   }catch(e){
-    if(e instanceof HttpsError)throw e;
-    if(e instanceof Denied)throw new HttpsError(
-      e.code==='AUTH_REQUIRED'?'unauthenticated':'permission-denied',e.code);
+    if(e instanceof HttpsError){
+      if(e.code==='permission-denied')
+        console.warn('B4_003_SCOPED_POLICY_DENIED',{
+          code:e.code,
+          reason:/^[A-Z0-9_]{2,64}$/.test(e.message)?e.message:'UNSPECIFIED',
+          collection:auditCollection
+        });
+      throw e;
+    }
+    if(e instanceof Denied){
+      console.warn('B4_003_SCOPED_POLICY_DENIED',{code:e.code,collection:auditCollection});
+      throw new HttpsError(e.code==='AUTH_REQUIRED'?'unauthenticated':'permission-denied',e.code);
+    }
     // Do not leak policy data or internal exception details to browser.
     throw new HttpsError('internal','SCOPED_DOCUMENT_READ_UNAVAILABLE');
   }

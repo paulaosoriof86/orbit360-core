@@ -11,6 +11,22 @@ const unsigned=resolve({...c,auth:{uid:'u',token:{}}});
 assert.equal(unsigned.scope,'own');
 assert.throws(()=>resolve({...c,auth:{uid:'u',token:{}},member:{...c.member,roles:['operativo']}}),e=>e.code==='ROLE_DENIED');
 assert.throws(()=>resolve({...c,config:{roleScopes:{asesor:'none'}}}));
+// Regression: legacy membership literal "propios" must restrict the
+// individual user even when the assigned role can otherwise access all.
+// No real members, data, UID, tokens or external requests are used.
+const ownPlural={...c,auth:{uid:'u',token:{}},activeRole:'Operativo',
+ member:{...c.member,dataScopes:{default:'propios',modules:{polizas:'propios'}}},
+ config:{roleScopes:{Operativo:'all'}}};
+const ownPluralCtx=resolve(ownPlural);
+assert.equal(ownPluralCtx.scope,'own','PLURAL_OWN_MUST_NOT_EXPAND_TO_ROLE_ALL');
+assert.equal(allowRow(ownPluralCtx,{pais:'GT',asesorId:'a1'}),true);
+assert.throws(()=>allowRow(ownPluralCtx,{pais:'GT',asesorId:'a2'}),e=>e.code==='FOREIGN_RECORD_DENIED');
+assert.equal(resolve({...ownPlural,member:{...ownPlural.member,dataScopes:{default:'todos'}}}).scope,'all',
+ 'CANONICAL_TODOS_REMAINS_ALL');
+assert.equal(resolve({...ownPlural,activeRole:'Asesor',config:{roleScopes:{Asesor:'own'}}}).scope,'own',
+ 'ADVISOR_CEILING_STILL_OWN');
+console.log('B4_003_LEGACY_PROPIOS_SCOPE_FAIL_CLOSED_PASS checks=5 synthetic_only');
+
 const teamCase={...c,activeRole:'operativo',auth:{uid:'u',token:{}},member:{...c.member,roles:['asesor','operativo'],dataScopes:{default:'team'},roleVisibleAdvisorIds:{operativo:['a1']},teamAdvisorIds:['a2','a3']},config:{roleScopes:{asesor:'own',operativo:'team'}}};
 const teamCtx=resolve(teamCase);
 assert.equal(teamCtx.scope,'team');
