@@ -1,4 +1,5 @@
 name: Gravicentra Control Plane Guard v5
+# B4-003 Meta TR v27: trigger governance-only readback of the immutable single-case successor.
 
 on:
   workflow_dispatch:
