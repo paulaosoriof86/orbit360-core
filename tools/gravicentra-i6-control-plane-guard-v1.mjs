@@ -836,9 +836,9 @@ if(INSURER_POLICY_COUNT_ACTIVE){
   C.b4003SecurityReleaseHold?.firestoreRulesDeployAuthorized===false&&
   C.b4003SecurityReleaseHold?.livePromotionAuthorized===false&&
   B4.boundaries?.livePromotionAuthorized===false&&
-  C.currentB4?.compositionLockBlobSha===physicalGit('hash-object',I6_CANONICAL_COMPOSITION)&&
-  C.canonicalAccumulationControl?.compositionLockBlobSha===physicalGit('hash-object',I6_CANONICAL_COMPOSITION)&&
-  B4.compositionLockBlobSha===physicalGit('hash-object',I6_CANONICAL_COMPOSITION)&&
+  C.currentB4?.compositionLockBlobSha===realGit('hash-object',I6_CANONICAL_COMPOSITION)&&
+  C.canonicalAccumulationControl?.compositionLockBlobSha===realGit('hash-object',I6_CANONICAL_COMPOSITION)&&
+  B4.compositionLockBlobSha===realGit('hash-object',I6_CANONICAL_COMPOSITION)&&
   FIND.findings.length===295,'B4_003_INSURER_POLICY_COUNT_SUCCESSOR_INVALID');
  console.log('B4_003_INSURER_POLICY_COUNT=EXACT_CAUSAL_SOURCE_AND_QA_BOUND_UAT_HOLD');
 }
