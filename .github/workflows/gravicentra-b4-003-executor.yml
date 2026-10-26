@@ -24,6 +24,17 @@ name: Gravicentra B4-003 R20 Exact Preview
 
 on:
   workflow_dispatch:
+    inputs:
+      meta_tr_v27:
+        description: 'B4-003 exact Meta TR V27: one Preview function and one isolated Hosting channel; no data writes'
+        type: boolean
+        required: false
+        default: false
+      meta_tr_source_sha:
+        description: 'Exact 40-character approved candidate HEAD; required only for Meta TR V27'
+        type: string
+        required: false
+        default: ''
   push:
     branches:
       - recovery/fase-a-clean-20260831
@@ -110,9 +121,16 @@ jobs:
 
       - name: Gate exact B4-003 Preview
         id: gate
+        env:
+          META_TR_V27_REQUEST: ${{ github.event_name == 'workflow_dispatch' && inputs.meta_tr_v27 == true }}
+          META_TR_V27_CANDIDATE: ${{ inputs.meta_tr_source_sha || '' }}
         run: |
           set -euo pipefail
           node tools/gravicentra-governance-preflight-v1.mjs --mode=i6
+          if [ "$META_TR_V27_REQUEST" = "true" ]; then
+            node tools/gravicentra-i6-control-plane-guard-v1.mjs
+            node tools/gravicentra-b4-003-meta-tr-v27-preview-contract.test.cjs
+          fi
           node - <<'NODE'
           const fs=require('node:fs');
           const c=JSON.parse(fs.readFileSync(process.env.CONTROL,'utf8'));
@@ -1392,6 +1410,51 @@ jobs:
             throw Error('B4_003_DASHBOARD_READONLY_PREVIEW_SYNC_NOT_AUTHORIZED');
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'readonly_roster='+(readonlyRoster?'true':'false')+'\n');
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'scoped_preview='+(scopedPreview?'true':'false')+'\n');
+          // Explicit manual dispatch only: additive one-case source, one LAB
+          // callable, and separate Hosting channel. The normal R20 path deploys
+          // 19 functions and must never be used for this synthetic campaign QA.
+          const metaRequested=process.env.META_TR_V27_REQUEST==='true';
+          const metaReceiptPath='artifacts/orbit360-recovery/release-control/I6_5_B4_003_META_TR_V27_SINGLE_CASE_SUCCESSOR_20261025.json';
+          const metaReceipt=JSON.parse(fs.readFileSync(metaReceiptPath,'utf8'));
+          const metaBlob=path=>require('node:child_process').execFileSync('git',['hash-object',path],{encoding:'utf8'}).trim();
+          const metaAllowed=metaRequested
+            && /^[a-f0-9]{40}$/.test(process.env.META_TR_V27_CANDIDATE||'')
+            && process.env.META_TR_V27_CANDIDATE===process.env.CANDIDATE_SOURCE_SHA
+            && metaReceipt.status==='QA_SOURCE_SUCCESSOR_STAGED_ISOLATED_PREVIEW_PENDING'
+            && metaReceipt.gate==='I6.5/B4-003'
+            && metaReceipt.scope?.tenantId==='alianzas-soluciones'
+            && metaReceipt.scope?.caseId==='b4003qa_meta_tr_v27_20261025_01'
+            && metaReceipt.scope?.channel==='Facebook'
+            && metaReceipt.scope?.pieceId==='F02-V27-QA'
+            && JSON.stringify(metaReceipt.scope?.allowedFunctions)===JSON.stringify(['orbit360OpsLeadsCommandPreview'])
+            && metaReceipt.scope?.syntheticQaWrites==='ONE_EXACT_CASE_ONLY_AFTER_CANDIDATE_PREVIEW_DEPLOYMENT'
+            && metaReceipt.scope?.sharedFirestoreRules===false
+            && metaReceipt.scope?.authIamMutation===false
+            && metaReceipt.scope?.realBusinessWrites===false
+            && metaReceipt.scope?.livePromotion===false
+            && metaReceipt.scope?.externalCommunications===false
+            && metaReceipt.scope?.physicalDeletion===false
+            && metaReceipt.scope?.newBranchesGatesOrRepos===false
+            && Object.entries(metaReceipt.sourceBlobsAfter||{}).every(([path,sha])=>metaBlob(path)===sha)
+            // The historical Meta QA proof is immutable. The central guard is
+            // allowed to evolve under other B4-003 corrective successors; its
+            // current version is checked by the canonical guard above.
+            && metaBlob('tools/gravicentra-b4-003-meta-tr-v27-preview-contract.test.cjs')===metaReceipt.qaBlobsAfter?.['tools/gravicentra-b4-003-meta-tr-v27-preview-contract.test.cjs']
+            && metaReceipt.qaBlobsAfter?.['tools/gravicentra-i6-control-plane-guard-v1.mjs']==='05220ab0316d40cfbc4334328e3ea7e777ddf7d2'
+            && c.currentB4?.status==='B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL'
+            && c.nextAction==='I6_5_FORENSIC_REMEDIATION_B4_003_R20_TARGETED_PAULA_VISUAL'
+            && c.b4003SecurityReleaseHold?.status==='ACTIVE_FAIL_CLOSED_UNAUTHORIZED_BROWSER_FIRESTORE_READ_WRITE'
+            && l.activeFinding?.id==='B4-003'
+            && l.boundaries?.previewMutationAuthorized===true
+            && l.boundaries?.functionDeploymentAuthorized===true
+            && l.boundaries?.realOperationalWritesAuthorized===false
+            && l.boundaries?.businessWritesAuthorized===false
+            && l.boundaries?.syntheticQaWritesAuthorized===false
+            && l.boundaries?.dataMutationAuthorized===false
+            && l.boundaries?.livePromotionAuthorized===false
+            && !previewOk&&!renewalsPreview&&!scopedPreview;
+          if(metaRequested&&!metaAllowed)throw Error('B4_003_META_TR_V27_MANUAL_SINGLE_FUNCTION_PREVIEW_NOT_AUTHORIZED');
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'meta_tr_preview='+(metaAllowed?'true':'false')+'\n');
           // No custom Firebase Auth tokens for real users without explicit scoped approval.
           const identityProofAllowed=scopedPreview&&c.b4003ProtectedPreviewAuthorization?.realUserImpersonationAuthorized===true;
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'authenticated_identity_proof='+(identityProofAllowed?'true':'false')+'\n');
@@ -2484,7 +2547,7 @@ jobs:
           git push origin "HEAD:$GITHUB_REF_NAME"
 
       - name: Snapshot preexisting LIVE binding before exact Preview
-        if: steps.gate.outputs.run == 'true' || steps.gate.outputs.renewals_preview == 'true' || steps.gate.outputs.scoped_preview == 'true'
+        if: steps.gate.outputs.run == 'true' || steps.gate.outputs.renewals_preview == 'true' || steps.gate.outputs.scoped_preview == 'true' || steps.gate.outputs.meta_tr_preview == 'true'
         env:
           LIVE_DRIFT_OUT: ${{ runner.temp }}/b4-003-preview-live-before.json
         run: node tools/gravicentra-live-preexisting-drift-snapshot.mjs --mode=snapshot
@@ -2540,7 +2603,7 @@ jobs:
           node --check orbit360-platform/modules/renewals-v1201-issued-filter.js
 
       - name: Prepare Firebase and browser dependencies
-        if: steps.gate.outputs.run == 'true' || steps.gate.outputs.renewals_preview == 'true' || steps.gate.outputs.scoped_preview == 'true'
+        if: steps.gate.outputs.run == 'true' || steps.gate.outputs.renewals_preview == 'true' || steps.gate.outputs.scoped_preview == 'true' || steps.gate.outputs.meta_tr_preview == 'true'
         run: |
           set -euo pipefail
           ROOT="$RUNNER_TEMP/b4-003-auth"
@@ -2591,7 +2654,7 @@ jobs:
           retry_bounded 600 npx playwright install chromium
 
       - name: Resolve public web config
-        if: steps.gate.outputs.run == 'true' || steps.gate.outputs.renewals_preview == 'true' || steps.gate.outputs.scoped_preview == 'true'
+        if: steps.gate.outputs.run == 'true' || steps.gate.outputs.renewals_preview == 'true' || steps.gate.outputs.scoped_preview == 'true' || steps.gate.outputs.meta_tr_preview == 'true'
         run: |
           set -euo pipefail
           node "$FIREBASE_CLI_BIN" apps:list WEB --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/apps-b4-003.json"
@@ -2608,7 +2671,7 @@ jobs:
           echo "PUBLIC_CONFIG_FILE=$RUNNER_TEMP/public-config-b4-003.json" >> "$GITHUB_ENV"
 
       - name: Materialize immutable B4-003 package
-        if: steps.gate.outputs.run == 'true' || steps.gate.outputs.renewals_preview == 'true' || steps.gate.outputs.scoped_preview == 'true'
+        if: steps.gate.outputs.run == 'true' || steps.gate.outputs.renewals_preview == 'true' || steps.gate.outputs.scoped_preview == 'true' || steps.gate.outputs.meta_tr_preview == 'true'
         id: build
         env:
           GRAVICENTRA_B4_003_SCOPED_PREVIEW: ${{ steps.gate.outputs.scoped_preview }}
@@ -2627,7 +2690,7 @@ jobs:
           NODE
 
       - name: Deploy exact B4-003 Preview write backends
-        if: steps.gate.outputs.run == 'true' || steps.gate.outputs.renewals_preview == 'true' || steps.gate.outputs.scoped_preview == 'true'
+        if: steps.gate.outputs.run == 'true' || steps.gate.outputs.renewals_preview == 'true' || steps.gate.outputs.scoped_preview == 'true' || steps.gate.outputs.meta_tr_preview == 'true'
         run: |
           set -euo pipefail
           FROOT="$RUNNER_TEMP/b4-003-functions"
@@ -2635,7 +2698,10 @@ jobs:
           cp -a "$RUNNER_TEMP/b4-003-package/bundle/backend" "$FROOT/backend"
           (cd "$FROOT/backend" && npm ci --ignore-scripts --no-audit --no-fund >/dev/null)
           echo '{"functions":{"source":"backend"}}' > "$FROOT/firebase.json"
-          if [ "${{ steps.gate.outputs.scoped_preview }}" = "true" ]; then
+          if [ "${{ steps.gate.outputs.meta_tr_preview }}" = "true" ]; then
+            node "$FIREBASE_CLI_BIN" deploy --only functions:orbit360OpsLeadsCommandPreview --config "$FROOT/firebase.json" --project "$PROJECT_ID" --non-interactive
+            printf '{"status":"META_TR_V27_ONE_EXISTING_LAB_PREVIEW_FUNCTION_DEPLOYED","sourceSha":"%s","backendSourceDigest":"%s","functions":["orbit360OpsLeadsCommandPreview"],"otherFunctionsDeployed":false,"sharedFirestoreRulesDeployed":false,"productionDeployed":false,"syntheticBusinessWrites":0,"identityProof":"PENDING_REAL_USER_READBACK"}\n' "$CANDIDATE_SOURCE_SHA" "${{ steps.build.outputs.backend_source_digest }}" > "$RUNNER_TEMP/b4-003-package/evidence/b4-003-preview-backend-binding.json"
+          elif [ "${{ steps.gate.outputs.scoped_preview }}" = "true" ]; then
             if [ "${{ steps.gate.outputs.readonly_roster }}" = "true" ]; then
               node "$FIREBASE_CLI_BIN" deploy --only functions:orbit360ScopedPolicyReadPreview,functions:orbit360AssignableAdvisorRosterPreview --config "$FROOT/firebase.json" --project "$PROJECT_ID" --non-interactive
             else
@@ -2648,7 +2714,7 @@ jobs:
           fi
 
       - name: Deploy exact package to isolated Preview
-        if: steps.gate.outputs.run == 'true' || steps.gate.outputs.renewals_preview == 'true' || steps.gate.outputs.scoped_preview == 'true'
+        if: steps.gate.outputs.run == 'true' || steps.gate.outputs.renewals_preview == 'true' || steps.gate.outputs.scoped_preview == 'true' || steps.gate.outputs.meta_tr_preview == 'true'
         id: preview
         run: |
           set -euo pipefail
@@ -2661,6 +2727,10 @@ jobs:
           }
           if ! deploy_channel; then
             if grep -Fq "channel quota reached" "$RUNNER_TEMP/b4-003-preview.json"; then
+              if [ "${{ steps.gate.outputs.meta_tr_preview }}" = "true" ]; then
+                echo 'META_TR_V27_NO_HOSTING_CHANNEL_GC_AUTHORIZED' >&2
+                exit 1
+              fi
               node "$GITHUB_WORKSPACE/tools/gravicentra-preview-channel-gc.mjs" "$FIREBASE_CLI_BIN" "$PROJECT_ID" "$CHANNEL_ID" "$GITHUB_WORKSPACE" "gi-"
               deploy_channel
             else exit 1; fi
@@ -2678,7 +2748,7 @@ jobs:
           echo "preview_url=$PREVIEW_URL" >> "$GITHUB_OUTPUT"
 
       - name: Exact Hosting Preview readback
-        if: steps.gate.outputs.run == 'true' || steps.gate.outputs.renewals_preview == 'true' || steps.gate.outputs.scoped_preview == 'true'
+        if: steps.gate.outputs.run == 'true' || steps.gate.outputs.renewals_preview == 'true' || steps.gate.outputs.scoped_preview == 'true' || steps.gate.outputs.meta_tr_preview == 'true'
         env:
           TARGET_URL: ${{ steps.preview.outputs.preview_url }}
           EXPECTED_BUILD_ID: ${{ steps.build.outputs.build_id }}
@@ -2703,6 +2773,36 @@ jobs:
               time.sleep(3)
           print('B4_003_HOSTING_READBACK=PASS')
           PY
+
+      - name: Preserve Meta TR V27 one-case Preview publication evidence
+        if: steps.gate.outputs.meta_tr_preview == 'true'
+        env:
+          META_TR_V27_PREVIEW_URL: ${{ steps.preview.outputs.preview_url }}
+          META_TR_V27_BUILD_ID: ${{ steps.build.outputs.build_id }}
+          META_TR_V27_BACKEND_DIGEST: ${{ steps.build.outputs.backend_source_digest }}
+        run: |
+          set -euo pipefail
+          node "$FIREBASE_CLI_BIN" functions:list --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/b4-003-meta-tr-functions-readback.json"
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const raw=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/b4-003-meta-tr-functions-readback.json','utf8'));
+          const rows=Array.isArray(raw)?raw:Array.isArray(raw.result)?raw.result:[];
+          if(!rows.some(row=>String(row.id||row.name||row.function||'').split('/').pop()==='orbit360OpsLeadsCommandPreview'))
+            throw Error('META_TR_V27_SINGLE_FUNCTION_READBACK_MISSING');
+          const evidence={status:'PREVIEW_PUBLISHED_AUTHENTICATED_TR_01_TO_TR_07_PENDING',gate:'I6.5/B4-003',project:'ays-orbit-360-lab',tenant:'alianzas-soluciones',caseId:'b4003qa_meta_tr_v27_20261025_01',channel:'Facebook',pieceId:'F02-V27-QA',previewUrl:process.env.META_TR_V27_PREVIEW_URL,sourceSha:process.env.CANDIDATE_SOURCE_SHA,buildId:process.env.META_TR_V27_BUILD_ID,backendSourceDigest:process.env.META_TR_V27_BACKEND_DIGEST,deployedExistingFunctions:['orbit360OpsLeadsCommandPreview'],otherFunctionsDeployed:false,sharedLabPreviewCallable:true,sharedFirestoreRulesDeployed:false,authIamMutations:false,productionDeployed:false,physicalDeletions:false,syntheticWritesPerformedByWorkflow:0,authenticatedRoleReadback:'PENDING',tr01ToTr07:'HOLD',k01ToK06:'HOLD',production:'NO_GO'};
+          fs.writeFileSync(process.env.RUNNER_TEMP+'/b4-003-package/evidence/b4-003-meta-tr-v27-preview-publication.json',JSON.stringify(evidence,null,2)+'\n');
+          console.log('B4_003_META_TR_V27_PREVIEW_PUBLICATION=PASS; TR-01..TR-07 remain HOLD until signed-in readback');
+          NODE
+
+      - name: Upload immutable Meta TR V27 publication evidence
+        if: always() && steps.gate.outputs.meta_tr_preview == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: gravicentra-b4-003-meta-tr-v27-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/b4-003-meta-tr-functions-readback.json
+            ${{ runner.temp }}/b4-003-package/evidence
+          if-no-files-found: warn
 
       - name: Protected B4-003 Preview public and emulator smoke
         if: steps.gate.outputs.scoped_preview == 'true'
@@ -2888,7 +2988,7 @@ jobs:
           git push origin "HEAD:$GITHUB_REF_NAME"
 
       - name: Verify LIVE remained byte-stable during exact Preview
-        if: always() && (steps.gate.outputs.run == 'true' || steps.gate.outputs.renewals_preview == 'true')
+        if: always() && (steps.gate.outputs.run == 'true' || steps.gate.outputs.renewals_preview == 'true' || steps.gate.outputs.meta_tr_preview == 'true')
         env:
           LIVE_DRIFT_BEFORE: ${{ runner.temp }}/b4-003-preview-live-before.json
           LIVE_DRIFT_OUT: ${{ runner.temp }}/b4-003-preview-live-after.json
