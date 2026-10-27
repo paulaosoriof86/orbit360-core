@@ -24,7 +24,7 @@ eq(r.pendiente,120,'Canonical future amount cannot be shadowed');
 eq(r.salud,82,'Canonical health metric cannot be overwritten');
 eq(r.porMoneda.vencido.GTQ,683,'Source currency GTQ preserved');
 eq(r.porMoneda.primaAnual.COP,900,'Source currency COP preserved');
-const host={querySelectorAll:()=>[]}; Orbit.modules.cliente360.render(host);
+const host={querySelectorAll:()=>[],querySelector:()=>null}; Orbit.modules.cliente360.render(host);
 eq(label.textContent,'Cartera vencida','Canonical overdue label preserved');
 eq(value.textContent,'Q 683 GTQ','Canonical overdue UI amount preserved');
 Orbit.modules.cliente360.render(host);
