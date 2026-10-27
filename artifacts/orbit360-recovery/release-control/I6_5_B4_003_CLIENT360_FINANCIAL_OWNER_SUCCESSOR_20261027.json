@@ -12,7 +12,7 @@
   "qaPath": "tools/gravicentra-b4-003-c360-native-financial-owner.test.cjs",
   "qaBlobAfter": "df8a36fa02a2ef1133380ba42964aa481946bc96",
   "guardBlobBefore": "8455e13283479f873aef596355b5b307c44bb248",
-  "guardBlobAfter": "2e2c16be23eb556a1c19a643a9c8e044eca45edb",
+  "guardBlobAfter": "56a6f7b847543dad6d3146950b2443c407ab67b0",
   "workflowBlobBefore": "539af429aeebfe9bd79e5a191454d34be22a3521",
   "workflowBlobAfter": "930c2e9cf0ef1990925f6feee73a53cf54761cb2",
   "rootCause": "Native receipts bridge shadowed Cliente360's canonical financial health and overdue KPI with independently projected sum in the client's currency; zero collapsed valid overdue state and introduced cross-currency mislabeling.",

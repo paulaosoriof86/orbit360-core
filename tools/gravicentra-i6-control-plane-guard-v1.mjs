@@ -140,7 +140,7 @@ if(FOCAL_C360_COBROS){
   R.historicalCompositionBlobSha===physicalGit('hash-object',I6_CANONICAL_COMPOSITION)&&
   R.historicalExecutorBlobSha===physicalGit('rev-parse',parent+':.github/workflows/gravicentra-b4-003-executor.yml')&&
   R.historicalGuardBlobSha===physicalGit('rev-parse',parent+':tools/gravicentra-i6-control-plane-guard-v1.mjs')&&
-  R.previewWorkflowBlobSha===physicalGit('hash-object','.github/workflows/gravicentra-b4-003-executor.yml')&&
+  R.previewWorkflowBlobSha===physicalGit('rev-parse','d7091078ba896e4223919e9eeb2bac712c42536b:.github/workflows/gravicentra-b4-003-executor.yml')&&
   R.successorGuardBlobSha===physicalGit('rev-parse','d7091078ba896e4223919e9eeb2bac712c42536b:tools/gravicentra-i6-control-plane-guard-v1.mjs')&&
   R.scope?.tenantId==='alianzas-soluciones'&&
   R.scope?.hostingPreviewOnly===true&&
