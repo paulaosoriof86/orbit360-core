@@ -1,0 +1,109 @@
+{
+  "schema": "GI_I65_B4_003_CLIENT360_FINANCIAL_OWNER_UAT_RECONCILIATION_V1",
+  "gate": "I6.5/B4-003",
+  "status": "AUTOMATED_SUCCESSOR_QA_PASS_PREVIEW_UAT_HOLD",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "candidateHead": "c3c3f75fbe32fcd3b307e82d086f4a2d090c3b3c",
+  "sourceReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CLIENT360_FINANCIAL_OWNER_SUCCESSOR_20261027.json",
+  "sourceReceiptBlobSha": "db2888ba186881f15ae9b585f476ede4ec8c1b6d",
+  "automatedEvidence": {
+    "guardRunId": 40555417215,
+    "guardConclusion": "success",
+    "guardHead": "c3c3f75fbe32fcd3b307e82d086f4a2d090c3b3c",
+    "executedTestPath": "tools/gravicentra-b4-003-c360-native-financial-owner.test.cjs",
+    "executionMarker": "GI_B4_003_C360_SHADOW_OWNER_SYNTHETIC_PASS checks=15 no_network no_business_writes",
+    "verification": "PASS_EXECUTED_BY_CONTROL_PLANE_GUARD"
+  },
+  "preview": {
+    "runId": 40555417260,
+    "conclusion": "success",
+    "buildId": "gi-i65-b4-c3c3f75fbe32-57f234755dc1",
+    "url": "https://ays-orbit-360-lab--gi-i65-b4-40555417260-d4jddiq9.web.app/",
+    "artifactId": 12757955194,
+    "artifactDigest": "sha256:e4fd440cd96ef74568616bf24df775bd436cfca1f5d61139ef4c4bd9237f21a1",
+    "hostingReadback": "PASS"
+  },
+  "qaFinancialReadback": {
+    "clientId": "b4003qa_client_38102224750",
+    "policyId": "b4003qa_policy_renewwrite_38102224750",
+    "receiptId": "cob_b4003qa_policy_renewwrite_38102224750_001",
+    "scope": "synthetic QA only",
+    "country": "GT",
+    "currency": "GTQ",
+    "amount": 683.2,
+    "dueDate": "2026-10-26",
+    "dateObserved": "2026-10-27",
+    "receiptUi": {
+      "state": "Pendiente",
+      "dueDate": "2026-10-26",
+      "paymentDate": "not reported",
+      "paymentSupport": "not attached",
+      "portfolioAmount": 683.2
+    },
+    "receiptsAndPaymentsSummary": {
+      "future": "Q 683",
+      "exigible": "Q 0",
+      "activePortfolioRows": 1
+    },
+    "cobrosFilteredRow": {
+      "state": "Pendiente",
+      "dueDate": "2026-10-26",
+      "paymentDate": "not reported",
+      "amountDisplayed": "Q 683"
+    },
+    "canonicalClient360": {
+      "overdue": "Q 683 GTQ"
+    },
+    "relationReadback": {
+      "clientPolicyReceiptLinkedByVisibleSyntheticIdentifiers": true,
+      "carteraDocumentIdAndRawFields": "not surfaced by authorized UI read",
+      "receiptRawStateFields": [
+        "estadoOperativo",
+        "exigibilidad",
+        "carteraActiva",
+        "fechaCorte"
+      ],
+      "receiptRawStateFieldValues": "not verified",
+      "paymentAndReconciliationEvidence": "none shown in the authorized QA receipt detail"
+    },
+    "sourceAnalysis": {
+      "confirmedCodeDivergence": "canonical query classifies overdue by open state plus due date; native receipts bridge classifies future from exigibilidad=futura or estadoOperativo=futuro_pendiente",
+      "sourcePath": "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
+      "recordLevelStaleFlagCause": "not fully confirmed until the cartera row raw fields and cutoff are read"
+    },
+    "disposition": "HOLD_FINANCIAL_PARITY; no synthetic or business data changed"
+  },
+  "authenticatedSessions": {
+    "paula": {
+      "visiblePrincipal": "Paula Osorio · Dirección",
+      "uidVerified": false,
+      "roleMembershipVerified": false,
+      "previewVisualAcceptance": "HOLD_Q683_FINANCIAL_PARITY"
+    },
+    "samuel": {
+      "tabGroupLabel": "Samuel UAT",
+      "visiblePrincipal": "Paula Osorio · Dirección",
+      "uidVerified": false,
+      "independentSamuelSession": "NOT_AVAILABLE_IN_CONNECTED_CHROME",
+      "authorizationTests": "NOT_RUN"
+    },
+    "history": {
+      "paulaPriorDirectionReadback": "35 interactions; preserved historical evidence",
+      "samuelAsesorErrorCause": "UNDETERMINED; no authenticated Samuel session in this candidate"
+    }
+  },
+  "security": {
+    "sharedRulesChanged": false,
+    "liveChanged": false,
+    "operationalDataChanged": false,
+    "sdkDirectDenyTests": "NOT_RUN_IN_THIS_INTERVENTION",
+    "existingHold": "ACTIVE_FAIL_CLOSED_UNAUTHORIZED_BROWSER_FIRESTORE_READ_WRITE"
+  },
+  "preservation": {
+    "findings": 295,
+    "frozenTasks": 86,
+    "p0Open": 6
+  },
+  "nextAction": "Read the exact linked cartera row and its raw status/cutoff through the authorized backend path; obtain an independent effective Samuel session before role-country/team negative and positive security tests. Then correct only the demonstrated source owner if required and issue one cumulative B4-003 Preview."
+}

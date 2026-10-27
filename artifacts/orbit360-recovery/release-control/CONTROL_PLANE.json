@@ -15091,5 +15091,20 @@
     "livePromotionAuthorized": false,
     "findingsPreserved": 295,
     "frozenTasksPreserved": 86
+  },
+  "b4003Client360FinancialOwnerUatReconciliation20261027": {
+    "status": "AUTOMATED_SUCCESSOR_QA_PASS_PREVIEW_UAT_HOLD",
+    "gate": "I6.5/B4-003",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CLIENT360_FINANCIAL_OWNER_UAT_RECONCILIATION_20261027.json",
+    "receiptBlobSha": "f47d04be653c56642fb539fce56dfb8f0172487c",
+    "candidateProductHead": "c3c3f75fbe32fcd3b307e82d086f4a2d090c3b3c",
+    "guardRunId": 40555417215,
+    "previewRunId": 40555417260,
+    "buildId": "gi-i65-b4-c3c3f75fbe32-57f234755dc1",
+    "sourceReceiptPendingStatusPreserved": true,
+    "findingsPreserved": 295,
+    "frozenTasksPreserved": 86,
+    "sharedRulesDeploymentAuthorized": false,
+    "livePromotionAuthorized": false
   }
 }
