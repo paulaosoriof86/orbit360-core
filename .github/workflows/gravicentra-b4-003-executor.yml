@@ -1231,7 +1231,7 @@ jobs:
             && focalReceipt.historicalB4LockBlobSha===productSha(process.env.B4_LOCK)
             && focalReceipt.historicalCompositionBlobSha===productSha(process.env.COMPOSITION)
             && focalReceipt.historicalExecutorBlobSha===gitRead('rev-parse',focalParent+':.github/workflows/gravicentra-b4-003-executor.yml')
-            && focalReceipt.previewWorkflowBlobSha===productSha('.github/workflows/gravicentra-b4-003-executor.yml')
+            && focalReceipt.previewWorkflowBlobSha===gitRead('rev-parse','d7091078ba896e4223919e9eeb2bac712c42536b:.github/workflows/gravicentra-b4-003-executor.yml')
             && focalReceipt.scope?.tenantId==='alianzas-soluciones'
             && focalReceipt.scope?.hostingPreviewOnly===true
             && focalReceipt.scope?.scopedReadOnlyFunction==='orbit360ScopedPolicyReadPreview'
@@ -1516,6 +1516,9 @@ jobs:
             throw Error('B4_003_DASHBOARD_READONLY_PREVIEW_SYNC_NOT_AUTHORIZED');
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'readonly_roster='+(readonlyRoster?'true':'false')+'\n');
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'scoped_preview='+(scopedPreview?'true':'false')+'\n');
+          const finFix=c.b4003Client360FinancialOwnerSuccessor20261027||{};
+          const hostingOnly=focalPreview&&finFix.status==='SOURCE_STAGED_QA_PENDING_EXACT_ISOLATED_PREVIEW'&&finFix.gate==='I6.5/B4-003';
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'hosting_only='+(hostingOnly?'true':'false')+'\n');
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'scope_denial_preview='+(scopeDenialPreview?'true':'false')+'\n');
           // Additive one-case source, one LAB callable and isolated Hosting.
           // Exactly one owner-authorized push is admitted because the workflow
@@ -2810,6 +2813,11 @@ jobs:
         if: steps.gate.outputs.run == 'true' || steps.gate.outputs.renewals_preview == 'true' || steps.gate.outputs.scoped_preview == 'true' || steps.gate.outputs.meta_tr_preview == 'true'
         run: |
           set -euo pipefail
+          if [ "${{ steps.gate.outputs.hosting_only }}" = "true" ]; then
+            printf '{"status":"EXISTING_ISOLATED_PREVIEW_READONLY_BACKEND_PRESERVED","sourceSha":"%s","backendSourceDigest":"%s","functionsDeployed":false,"sharedRulesDeployed":false,"livePromotion":false,"dataWrites":0}\n' "$CANDIDATE_SOURCE_SHA" "${{ steps.build.outputs.backend_source_digest }}" > "$RUNNER_TEMP/b4-003-package/evidence/b4-003-preview-backend-binding.json"
+            echo 'B4_003_CLIENT360_HOSTING_ONLY_BACKEND_DEPLOY_SKIPPED'
+            exit 0
+          fi
           FROOT="$RUNNER_TEMP/b4-003-functions"
           rm -rf "$FROOT"; mkdir -p "$FROOT"
           cp -a "$RUNNER_TEMP/b4-003-package/bundle/backend" "$FROOT/backend"

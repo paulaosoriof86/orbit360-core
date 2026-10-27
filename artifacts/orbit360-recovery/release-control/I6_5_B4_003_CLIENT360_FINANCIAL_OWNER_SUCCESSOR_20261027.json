@@ -1,0 +1,60 @@
+{
+  "schema": "GI_I65_B4_003_CLIENT360_FINANCIAL_OWNER_SUCCESSOR_V1",
+  "gate": "I6.5/B4-003",
+  "status": "SOURCE_STAGED_QA_PENDING_EXACT_ISOLATED_PREVIEW",
+  "authority": "PAULA_EXPLICIT_20261027_HOSTING_ONLY_PREVIEW",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "parentHead": "d7091078ba896e4223919e9eeb2bac712c42536b",
+  "sourcePath": "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
+  "sourceBlobBefore": "60ce88178f48ff5d9b5fd01c1e2d92abe642dac1",
+  "sourceBlobAfter": "6ad8116a8f7e5cedd603444fa431afa12abbabc8",
+  "qaPath": "tools/gravicentra-b4-003-c360-native-financial-owner.test.cjs",
+  "qaBlobAfter": "df8a36fa02a2ef1133380ba42964aa481946bc96",
+  "guardBlobBefore": "8455e13283479f873aef596355b5b307c44bb248",
+  "guardBlobAfter": "2e2c16be23eb556a1c19a643a9c8e044eca45edb",
+  "workflowBlobBefore": "539af429aeebfe9bd79e5a191454d34be22a3521",
+  "workflowBlobAfter": "930c2e9cf0ef1990925f6feee73a53cf54761cb2",
+  "rootCause": "Native receipts bridge shadowed Cliente360's canonical financial health and overdue KPI with independently projected sum in the client's currency; zero collapsed valid overdue state and introduced cross-currency mislabeling.",
+  "correction": {
+    "authoritativeOwner": "Orbit.q.clienteResumen + Orbit.modules.cliente360",
+    "preservedNativeOwner": "Orbit.receiptsPortfolioProjectionV920 for Recibos presentation",
+    "protectedFields": [
+      "pendiente",
+      "vencido",
+      "salud",
+      "porMoneda"
+    ],
+    "headerMutationDisabled": true,
+    "receiptsRenderRetained": true,
+    "policyDrawerRetained": true
+  },
+  "verification": {
+    "expectedSyntheticMarker": "GI_B4_003_C360_SHADOW_OWNER_SYNTHETIC_PASS checks=15 no_network no_business_writes",
+    "execution": "PENDING_RUN",
+    "previewHumanUat": "PENDING",
+    "historialRoleCountry": "SEPARATE_EXISTING_HOLD"
+  },
+  "scope": {
+    "hostingPreviewOnly": true,
+    "previewFunctionRedeploy": false,
+    "productionHosting": false,
+    "productionFunctions": false,
+    "sharedFirestoreRules": false,
+    "businessWrites": false,
+    "dataWrites": false,
+    "authIamMutation": false,
+    "dataReimport": false,
+    "livePromotion": false,
+    "newBranch": false,
+    "historicalLockMutation": false
+  },
+  "preserved": {
+    "findings": 295,
+    "tasks": 86,
+    "block": "B4-003",
+    "lastAcceptedI5": true,
+    "previousFocalReceipt": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_C360_COBROS_FOCAL_SOURCE_SUCCESSOR_20261026.json"
+  },
+  "nextRequiredStep": "CI_GUARD_THEN_EXACT_HOSTING_PREVIEW_AND_HUMAN_RETEST"
+}

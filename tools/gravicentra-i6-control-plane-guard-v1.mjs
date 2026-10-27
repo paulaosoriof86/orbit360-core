@@ -141,7 +141,7 @@ if(FOCAL_C360_COBROS){
   R.historicalExecutorBlobSha===physicalGit('rev-parse',parent+':.github/workflows/gravicentra-b4-003-executor.yml')&&
   R.historicalGuardBlobSha===physicalGit('rev-parse',parent+':tools/gravicentra-i6-control-plane-guard-v1.mjs')&&
   R.previewWorkflowBlobSha===physicalGit('hash-object','.github/workflows/gravicentra-b4-003-executor.yml')&&
-  R.successorGuardBlobSha===physicalGit('hash-object','tools/gravicentra-i6-control-plane-guard-v1.mjs')&&
+  R.successorGuardBlobSha===physicalGit('rev-parse','d7091078ba896e4223919e9eeb2bac712c42536b:tools/gravicentra-i6-control-plane-guard-v1.mjs')&&
   R.scope?.tenantId==='alianzas-soluciones'&&
   R.scope?.hostingPreviewOnly===true&&
   R.scope?.scopedReadOnlyFunction==='orbit360ScopedPolicyReadPreview'&&
@@ -162,6 +162,46 @@ if(FOCAL_C360_COBROS){
   ['tools/gravicentra-i6-control-plane-guard-v1.mjs',R.historicalGuardBlobSha]
  ]);
  console.log('B4_003_C360_COBROS_FOCAL=THREE_EXACT_SOURCES_ONE_QA_PASS_HISTORICAL_LOCKS_UNCHANGED_PREVIEW_PENDING');
+}
+// B4-003 successor: the still-certified prior focal guard and Preview are
+// authenticated against their immutable d7091078ba89 tree. The only
+// new product bytes below are the native Cliente 360 financial-shadow fix.
+const C360_FINANCIAL_FIX=C.b4003Client360FinancialOwnerSuccessor20261027||null;
+const C360_FINANCIAL_PATH='orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js';
+const C360_FINANCIAL_QA='tools/gravicentra-b4-003-c360-native-financial-owner.test.cjs';
+let C360_FINANCIAL_RECEIPT=null;
+if(C360_FINANCIAL_FIX){
+ const A=C360_FINANCIAL_FIX,R=readJson(A.receiptPath),P='d7091078ba896e4223919e9eeb2bac712c42536b';
+ C360_FINANCIAL_RECEIPT=R;
+ need(A.status==='SOURCE_STAGED_QA_PENDING_EXACT_ISOLATED_PREVIEW'&&A.gate==='I6.5/B4-003'&&
+  A.authority==='PAULA_EXPLICIT_20261027_HOSTING_ONLY_PREVIEW'&&A.parentHead===P&&
+  A.receiptPath==='artifacts/orbit360-recovery/release-control/I6_5_B4_003_CLIENT360_FINANCIAL_OWNER_SUCCESSOR_20261027.json'&&A.receiptBlobSha===physicalGit('hash-object',A.receiptPath)&&
+  R.schema==='GI_I65_B4_003_CLIENT360_FINANCIAL_OWNER_SUCCESSOR_V1'&&R.status===A.status&&
+  R.gate===A.gate&&R.authority===A.authority&&R.parentHead===P&&
+  R.sourcePath===C360_FINANCIAL_PATH&&R.qaPath===C360_FINANCIAL_QA&&
+  physicalGit('merge-base',P,'HEAD')===P&&
+  R.sourceBlobBefore===physicalGit('rev-parse',P+':'+C360_FINANCIAL_PATH)&&
+  R.sourceBlobAfter===physicalGit('hash-object',C360_FINANCIAL_PATH)&&
+  R.sourceBlobAfter!==R.sourceBlobBefore&&
+  R.qaBlobAfter===physicalGit('hash-object',C360_FINANCIAL_QA)&&
+  R.guardBlobBefore===physicalGit('rev-parse',P+':tools/gravicentra-i6-control-plane-guard-v1.mjs')&&
+  R.guardBlobAfter===physicalGit('hash-object','tools/gravicentra-i6-control-plane-guard-v1.mjs')&&
+  R.workflowBlobBefore===physicalGit('rev-parse',P+':.github/workflows/gravicentra-b4-003-executor.yml')&&
+  R.workflowBlobAfter===physicalGit('hash-object','.github/workflows/gravicentra-b4-003-executor.yml')&&
+  COMP.productFiles.includes(C360_FINANCIAL_PATH)&&
+  COMP.productFileBlobs[C360_FINANCIAL_PATH]===R.sourceBlobBefore&&
+  R.scope?.hostingPreviewOnly===true&&R.scope?.previewFunctionRedeploy===false&&
+  ['productionHosting','productionFunctions','sharedFirestoreRules','businessWrites','dataWrites',
+   'authIamMutation','dataReimport','livePromotion','newBranch','historicalLockMutation'].every(k=>R.scope?.[k]===false)&&
+  R.preserved?.findings===295&&R.preserved?.tasks===86&&FIND.findings.length===295&&
+  C.currentB4?.status==='B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL'&&
+  B4.boundaries?.livePromotionAuthorized===false&&
+  C.b4003SecurityReleaseHold?.status==='ACTIVE_FAIL_CLOSED_UNAUTHORIZED_BROWSER_FIRESTORE_READ_WRITE',
+  'B4_003_CLIENT360_FINANCIAL_OWNER_SUCCESSOR_INVALID');
+ const out=execFileSync(process.execPath,[C360_FINANCIAL_QA],{encoding:'utf8'}).trim();
+ need(out==='GI_B4_003_C360_SHADOW_OWNER_SYNTHETIC_PASS checks=15 no_network no_business_writes',
+  'B4_003_CLIENT360_SHADOW_OWNER_QA_FAILED');
+ console.log('B4_003_CLIENT360_FINANCIAL_SHADOW_SUCCESSOR=PASS_HISTORIC_LOCKS_PRESERVED_LIVE_HOLD');
 }
 const preFocalPhysicalHash=p=>focalC360CobrosHistoricalBlobs.get(p)||physicalGit('hash-object',p);
 // An explicitly byte-bound single-case QA successor can supersede only its
@@ -2841,6 +2881,7 @@ if(canonicalCompositionActive){
  const declared=[...(COMP.productFiles||[])].sort();
  need(actualProduct.length===declared.length&&actualProduct.every((p,i)=>p===declared[i]),'I6_CANONICAL_COMPOSITION_EXACT_SET_DRIFT');
  need(declared.every(p=>COMP.productFileBlobs?.[p]&&(
+  C360_FINANCIAL_RECEIPT&&p===C360_FINANCIAL_PATH?physicalGit('hash-object',p)===C360_FINANCIAL_RECEIPT.sourceBlobAfter:
   META_TR_SOURCE_BLOBS.has(p)?physicalGit('hash-object',p)===META_TR_SOURCE_BLOBS.get(p):
   FOCAL_C360_COBROS&&Object.prototype.hasOwnProperty.call(readJson(FOCAL_C360_COBROS.receiptPath).sourceBlobsAfter,p)
    ?physicalGit('hash-object',p)===readJson(FOCAL_C360_COBROS.receiptPath).sourceBlobsAfter[p]:

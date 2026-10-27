@@ -290,9 +290,9 @@
         r=r||{};var p=portfolioSummary(cid),rec=q.recibosEsperadosDe(cid);
         r.recibosEsperados=rec;r.carteraPrimas=p.rows;r.carteraActiva=p.active;r.carteraHistorica=p.historical;
         r.carteraFutura=p.future;r.carteraExigible=p.due;r.carteraConciliada=p.reconciled;
-        r.pendiente=p.futureAmount;r.vencido=p.dueAmount;r.carteraHistoricaMonto=p.historicalAmount;
+        r.carteraHistoricaMonto=p.historicalAmount;
         r.carteraConciliadaMonto=p.reconciledAmount;r.carteraTotal=p.totalAmount;
-        if(p.dueAmount>0)r.salud=Math.max(8,Number(r.salud||70)-25);
+        // Financial health belongs to the canonical Cliente 360 read-model.
         return markSummaryApplied(r);
       };
       q.clienteResumen=projected;q.__rpNativeClienteResumenOwner=projected;
@@ -303,15 +303,9 @@
   }
 
   function activeClientId(){try{return Orbit.route&&Orbit.route.params&&Orbit.route.params.c||'';}catch(e){return'';}}
-  function patchHeader(cid){
-    var p=portfolioSummary(cid);
-    document.querySelectorAll('.fh-kpis>div').forEach(function(cell){
-      var lab=cell.querySelector('.fh-kpi-lab'),val=cell.querySelector('.fh-kpi-val');if(!lab||!val)return;
-      var t=clean(lab.textContent),cur=(Orbit.store.get('clientes',cid)||{}).moneda||'GTQ';
-      if(t.indexOf('Cartera al día')>=0){lab.textContent='Cartera por vencer';val.textContent=money(p.futureAmount,cur);}
-      else if(t.indexOf('Cartera vencida')>=0){lab.textContent='Cartera exigible';val.textContent=money(p.dueAmount,cur);}
-    });
-  }
+  // I6.5/B4-003: this bridge owns receipts presentation, never Cliente 360
+  // canonical summary KPIs. It must not relabel or aggregate currencies here.
+  function patchHeader(cid){return false;}
   function policyLabel(p){var a=Orbit.store.get('aseguradoras',p.aseguradoraId)||{};return clean(p.numero||'—')+(a.nombre?' · '+clean(a.nombre):'');}
   function receiptStateNote(r,portfolio,payment){
     var provenance=paymentProvenanceKind(r,payment),evidence=payment&&clean(payment.id)?payment:r;

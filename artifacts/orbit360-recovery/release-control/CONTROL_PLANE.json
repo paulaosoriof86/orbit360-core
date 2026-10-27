@@ -15071,5 +15071,25 @@
     "sharedRulesDeploymentAuthorized": false,
     "dataMutationAuthorized": false,
     "livePromotionAuthorized": false
+  },
+  "b4003Client360FinancialOwnerSuccessor20261027": {
+    "status": "SOURCE_STAGED_QA_PENDING_EXACT_ISOLATED_PREVIEW",
+    "gate": "I6.5/B4-003",
+    "authority": "PAULA_EXPLICIT_20261027_HOSTING_ONLY_PREVIEW",
+    "parentHead": "d7091078ba896e4223919e9eeb2bac712c42536b",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CLIENT360_FINANCIAL_OWNER_SUCCESSOR_20261027.json",
+    "receiptBlobSha": "2757178bf6861fbda8e25ecd6a65b12805f81bed",
+    "sourcePath": "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
+    "sourceBlobBefore": "60ce88178f48ff5d9b5fd01c1e2d92abe642dac1",
+    "sourceBlobAfter": "6ad8116a8f7e5cedd603444fa431afa12abbabc8",
+    "qaPath": "tools/gravicentra-b4-003-c360-native-financial-owner.test.cjs",
+    "qaBlobAfter": "df8a36fa02a2ef1133380ba42964aa481946bc96",
+    "previewOnly": true,
+    "previewFunctionRedeployAuthorized": false,
+    "sharedRulesDeploymentAuthorized": false,
+    "dataMutationAuthorized": false,
+    "livePromotionAuthorized": false,
+    "findingsPreserved": 295,
+    "frozenTasksPreserved": 86
   }
 }
