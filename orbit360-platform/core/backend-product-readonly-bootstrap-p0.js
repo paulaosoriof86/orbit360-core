@@ -73,6 +73,29 @@
     member.modulesVisible = Array.isArray(modules) ? modules.slice() : [];
     return member;
   }
+  // Select the already-assigned role before the first protected request. The
+  // session owner cannot read its saved view until the auth projection has
+  // been installed, which happens only after the required server snapshots.
+  // Never treat this local view preference as a permission grant.
+  function protectedStartupMembership(membership) {
+    var wanted = '';
+    try {
+      var saved = JSON.parse(window.localStorage.getItem('orbit360_effective_role_view') || 'null');
+      wanted = text(saved && saved.role);
+      var taxonomy = window.Orbit && window.Orbit.productRoleTaxonomyP0;
+      if (wanted && taxonomy && typeof taxonomy.canonicalRole === 'function')
+        wanted = text(taxonomy.canonicalRole(wanted));
+    } catch (_) { wanted = ''; }
+    var normalize = function (value) {
+      return text(value).normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase().replace(/[^a-z0-9]+/g, '_');
+    };
+    var selected = (membership.roles || []).find(function (role) {
+      return wanted && normalize(role) === normalize(wanted);
+    });
+    return selected && selected !== membership.activeRole
+      ? protectedRoleMembership(membership, selected) : membership;
+  }
   // B4_003_PROTECTED_ROLE_QUERY_PARITY_END
 
   function unique(values) {
@@ -372,6 +395,8 @@
       var membershipCheck = validateMembershipForUser(membershipRaw, authUser);
       if (!membershipCheck.ok) throw new Error('membership_invalid:' + membershipCheck.errors.join('|'));
       var membership = membershipCheck.membership;
+      if (options.protectedReadCandidate === true)
+        membership = protectedStartupMembership(membership);
       var tenantId = deriveTenantFromMembership(membership);
       state.tenantId = tenantId;
       state.activeRole = membership.activeRole;

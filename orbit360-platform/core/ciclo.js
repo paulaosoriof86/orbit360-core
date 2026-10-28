@@ -1301,6 +1301,7 @@ Orbit.ciclo = (function () {
       const metaQa=metaQaPreview&&back.querySelector('#nn-meta-qa')?.checked===true;
       if(metaQa&&(pais!=='GT'||ingresoOps||ingreso.etapa!=='nuevo'))return U.toast('La prueba Meta requiere Guatemala y el punto de ingreso Leads / Nuevo.');
       const id=metaQa?'b4003qa_meta_tr_v27_20261025_01':'neg'+Date.now().toString().slice(-7),identityId=prefill.commercialIdentityId||id;
+      const creator=currentUserIdentity();
       const n={id,commercialIdentityId:identityId,sourceOpportunityId:prefill.sourceOpportunityId||'',nombre:metaQa?'QA Meta · Caso sintético sin datos personales':(v('nn-nombre')||'Prospecto'),tipo:metaQa?'Persona':v('nn-tipo'),
         etapa:ingreso.etapa,prob:Number(ingreso.probability??ingreso.prob??0),puntoIngreso:ingreso.id,asesorId,canal:metaQa?'Facebook':v('nn-canal'),pais,moneda:pais==='CO'?'COP':'GTQ',
         piezaOrigen:metaQa?'F02-V27-QA':v('nn-pieza'),
@@ -1308,7 +1309,7 @@ Orbit.ciclo = (function () {
         telefono:metaQa?'':v('nn-tel'),email:metaQa?'':v('nn-email'),primaEst:metaQa?0:(+v('nn-prima')||0),descripcion:metaQa?'QA interna: trazabilidad de pieza a necesidad, responsable, seguimiento y resultado.':v('nn-desc'),notas:'',cadencia:'',cadenciaActiva:false,
         proximoToque:inDays(2),vence:inDays(7),prioridad:v('nn-prioridad')||'',decision:'',nroCotizacion:'',nroPoliza:'',
         checklist:[{t:'Datos completos para cotizar',done:ingresoOps},{t:'Cotización enviada al cliente',done:false},{t:'Documentos del riesgo recibidos',done:false},{t:'Inspección / avalúo realizado',done:false}],
-        clienteIdCreado:'',archivado:false,etiquetas:[],bitacora:[{ts:stamp(),user:(Orbit.session?Orbit.session.rol():'Equipo'),campo:'Creación',de:'',a:'Ingreso ('+(ingresoOps?'Ops':'Leads')+')',origen:'manual'}],
+        clienteIdCreado:'',archivado:false,etiquetas:[],bitacora:[{ts:stamp(),user:creator.name,actorUid:creator.uid,actorName:creator.name,campo:'Creación',de:'',a:'Ingreso ('+(ingresoOps?'Ops':'Leads')+')',origen:'manual'}],
         comentarios:[],origen:ingresoOps?'Ops':'Leads',creado:today(),actualizado:today()};
       save.disabled=true;const original=save.textContent;save.textContent='Guardando…';
       try{if(!S().insertDurable)throw new Error('OPS_BUSINESS_DURABLE_WRITE_REQUIRED');await S().insertDurable('negocios',n);const confirmed=S().get('negocios',n.id);if(!confirmed)throw new Error('OPS_BUSINESS_DURABLE_READBACK_MISSING');back.remove();refresh();openNegocio(n.id);}

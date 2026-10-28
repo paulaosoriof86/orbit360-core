@@ -95,6 +95,35 @@ assert.deepEqual(Array.from(unavailable.roleMembership(initial,'Operativo').modu
  'MISSING_EFFECTIVE_MODULE_OWNER_FAILS_CLOSED');
 console.log('B4_003_OPERATIVO_SELECTED_ROLE_MODULE_RECOMPOSITION_VM_PASS checks=8 no_data_writes');
 
+// Cold authenticated reload must hydrate the assigned saved role *before*
+// first protected pages. Otherwise the store may fetch a default role and
+// silently switch its UI context after the auth projection is installed.
+let savedRole='Asesor';
+const coldRoleContext={window:{
+ localStorage:{getItem:(key)=>key==='orbit360_effective_role_view'
+   ?JSON.stringify({role:savedRole}):null},
+ Orbit:{productRoleTaxonomyP0:{canonicalRole:value=>value},
+  membershipMultirolEffectiveP0:{effectiveModules:membershipCtx.window.Orbit.membershipMultirolP0.effectiveModules}}
+}};
+vm.runInNewContext('function text(value){return String(value == null ? "" : value).trim();}\n'+
+ bootstrap.slice(begin,end)+'\nthis.bootRole=protectedStartupMembership;',coldRoleContext);
+const coldMember={...initial,activeRole:'Operativo',roles:['Operativo','Asesor'],
+ countries:['GT','CO'],modulesVisible:['ops','leads']};
+const savedAdvisor=coldRoleContext.bootRole(coldMember);
+assert.equal(savedAdvisor.activeRole,'Asesor','COLD_RELOAD_ASSIGNED_ROLE_RESTORED_PRE_FETCH');
+assert.ok(savedAdvisor.modulesVisible.includes('polizas')&&savedAdvisor.modulesVisible.includes('cobros'),
+ 'COLD_RELOAD_RECOMPOSED_ADVISOR_MODULES');
+assert.ok(!savedAdvisor.modulesVisible.includes('comisiones')&&!savedAdvisor.modulesVisible.includes('equipo'),
+ 'COLD_RELOAD_NO_UNASSIGNED_MODULE_LEAK');
+assert.deepEqual(Array.from(savedAdvisor.countries),['GT','CO'],'COLD_RELOAD_COUNTRIES_UNCHANGED');
+assert.equal(coldMember.activeRole,'Operativo','COLD_RELOAD_MEMBER_SOURCE_UNCHANGED');
+savedRole='Dirección';
+assert.equal(coldRoleContext.bootRole(coldMember),coldMember,'UNASSIGNED_STORED_ROLE_IGNORED');
+savedRole='Asesor';
+assert.match(bootstrap,/if \(options\.protectedReadCandidate === true\)\s+membership = protectedStartupMembership\(membership\)/,
+ 'NO_LEGACY_DIRECT_STORE_ROLE_CHANGE');
+console.log('B4_003_COLD_ROLE_PRE_HYDRATION_VM_PASS assigned_only no_direct_firestore no_writes');
+
 
 const events={},calls=[],tenant='synthetic-tenant';let role='asesor',direct=0;
 const win={Orbit:{session:{rol:()=>role}}};

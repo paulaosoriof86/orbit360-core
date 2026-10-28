@@ -81,7 +81,30 @@ Orbit.modules.cronograma = (function () {
     S().all('tareas').forEach(tk => add(tk.fecha, { tipo: 'tarea', icon: tk.done ? '✅' : '📌', color: '#C5162E', t: tk.t, go: () => toggleTarea(tk.id), id: tk.id }));
     return ev;
   }
-  function toggleTarea(id) { const t = S().get('tareas', id); if (t) { S().update('tareas', id, { done: !t.done }); draw(); } }
+  function previewUat() {
+    return /^ays-orbit-360-lab--gi-i(?:3|61|65-b[1-4])-[a-z0-9-]+\.web\.app$/i.test(location.hostname);
+  }
+  function taskFeedback(message) {
+    if (U && typeof U.toast === 'function') U.toast(message);
+  }
+  async function toggleTarea(id) {
+    const t = S().get('tareas', id);
+    if (!t) return;
+    if (previewUat() && !(t.__syntheticQa === true && /^b4003qa_tareas_[a-z0-9._:-]+$/i.test(id))) {
+      taskFeedback('En Preview solo se pueden modificar tareas sintéticas B4-003.');
+      return;
+    }
+    if (typeof S().updateDurable !== 'function') {
+      taskFeedback('Guardado protegido de tareas no disponible.');
+      return;
+    }
+    try {
+      await S().updateDurable('tareas', id, { done: !t.done });
+      draw();
+    } catch (_) {
+      taskFeedback('No se confirmó el cambio de la tarea en el servidor.');
+    }
+  }
 
   function render(h) { host = h; if (!ref) ref = new Date(U.NOW || Date.now()); draw(); }
 
@@ -158,8 +181,21 @@ Orbit.modules.cronograma = (function () {
     if (!f) return;
     let fecha = iso(new Date(U.NOW || Date.now())), txt = f;
     const m = f.match(/^(\d{4}-\d{2}-\d{2})\s+(.*)$/); if (m) { fecha = m[1]; txt = m[2]; }
-    S().insert('tareas', { id: 'tk' + Date.now(), t: txt, fecha, done: false });
-    draw();
+    if (typeof S().insertDurable !== 'function') {
+      taskFeedback('Guardado protegido de tareas no disponible.');
+      return;
+    }
+    const synthetic = previewUat();
+    const id = synthetic ? 'b4003qa_tareas_' + Date.now() : 'tk' + Date.now();
+    const task = { id, t: txt, fecha, done: false };
+    if (synthetic) task.__syntheticQa = true;
+    try {
+      await S().insertDurable('tareas', task);
+      draw();
+      taskFeedback('Tarea creada y confirmada en el servidor.');
+    } catch (_) {
+      taskFeedback('La tarea no se guardó; vuelve a intentarlo.');
+    }
   }
 
   return { render, __b3007: Object.freeze({ obligationsReady, pendingObligations, linkedReceipt, openObligation }) };
