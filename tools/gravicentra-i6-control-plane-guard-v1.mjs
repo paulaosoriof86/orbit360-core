@@ -63,6 +63,10 @@ let backendScopeHistoricalBlobs=new Map();
 // present-day working tree. These are its already-committed predecessor
 // blobs, supplied only to historical receipts that predate the new source.
 let focalC360CobrosHistoricalBlobs=new Map();
+// The 27-Oct global Cobros correction has a new independent receipt. Only
+// earlier immutable receipts may see its exact pre-correction Cobros blob.
+// The active successor and final composition check use physicalGit instead.
+let cobrosQ683HistoricalBlobs=new Map();
 const realGit=(...args)=>args[0]==='hash-object'&&CORRECTIVE_SOURCE_PREVIOUS.has(args[1])
  ?CORRECTIVE_SOURCE_PREVIOUS.get(args[1]):
  args[0]==='hash-object'&&historicalInsurerProductBlobs.has(args[1])
@@ -76,7 +80,9 @@ const realGit=(...args)=>args[0]==='hash-object'&&CORRECTIVE_SOURCE_PREVIOUS.has
  args[0]==='hash-object'&&backendScopeHistoricalBlobs.has(args[1])
  ?backendScopeHistoricalBlobs.get(args[1]):
  args[0]==='hash-object'&&focalC360CobrosHistoricalBlobs.has(args[1])
- ?focalC360CobrosHistoricalBlobs.get(args[1]):physicalGit(...args);
+ ?focalC360CobrosHistoricalBlobs.get(args[1]):
+ args[0]==='hash-object'&&cobrosQ683HistoricalBlobs.has(args[1])
+ ?cobrosQ683HistoricalBlobs.get(args[1]):physicalGit(...args);
 // Historical receipts are verified against their exact already-committed
 // predecessor tree. A newer source successor is verified separately against
 // the actual working tree, never substituted into an older signed receipt.
@@ -160,6 +166,9 @@ const Q683_HOSTING_AUTH=C.b4003Q683CalendarHostingPreview20261027||null;
 let Q683_HOSTING_RECEIPT=null;
 if(Q683_HOSTING_AUTH){
  const A=Q683_HOSTING_AUTH,R=readJson(A.receiptPath),P='e13c81d2ff0bac78f344b1554a071c781afb15dd';
+ // The exact one-time Preview ran at this immutable successor. New source
+ // commits may descend from it; they cannot rewrite its certified four files.
+ const deployedPreviewCommit='1ab0ca1ef675177e1c117daea657c159c33311f3';
  const path='.github/workflows/gravicentra-b4-003-executor.yml';
  const guardPath='tools/gravicentra-i6-control-plane-guard-v1.mjs';
  const receiptPath='artifacts/orbit360-recovery/release-control/I6_5_B4_003_Q683_HOSTING_ONLY_PREVIEW_AUTH_20261027.json';
@@ -178,14 +187,14 @@ if(Q683_HOSTING_AUTH){
   R.triggerSubject==='build(i6.5 B4-003): exact Q683 calendar hosting-only Preview'&&
   R.sourceReceiptPath===Q683_CALENDAR.receiptPath&&R.sourceReceiptBlobSha===A.sourceReceiptBlobSha&&
   R.workflowPath===path&&R.workflowBlobShaBefore===physicalGit('rev-parse',P+':'+path)&&
-  R.workflowBlobShaAfter===physicalGit('hash-object',path)&&
+  R.workflowBlobShaAfter===physicalGit('rev-parse',deployedPreviewCommit+':'+path)&&
   R.guardPath===guardPath&&R.guardBlobShaBefore===physicalGit('rev-parse',P+':'+guardPath)&&
-  R.guardBlobShaAfter===physicalGit('hash-object',guardPath)&&
+  R.guardBlobShaAfter===physicalGit('rev-parse',deployedPreviewCommit+':'+guardPath)&&
   R.changedPathsOnly.slice().sort().join('|')===changedPaths.join('|')&&
-  physicalGit('rev-parse','HEAD^')===P&&
-  physicalGit('merge-base',P,'HEAD')===P&&
-  physicalGit('log','-1','--format=%s')===R.triggerSubject&&
-  physicalGit('diff','--name-only','HEAD^','HEAD').split(/\r?\n/).filter(Boolean).sort().join('|')===changedPaths.join('|')&&
+  physicalGit('rev-parse',deployedPreviewCommit+'^')===P&&
+  physicalGit('merge-base',deployedPreviewCommit,'HEAD')===deployedPreviewCommit&&
+  physicalGit('log','-1','--format=%s',deployedPreviewCommit)===R.triggerSubject&&
+  physicalGit('diff','--name-only',P,deployedPreviewCommit).split(/\r?\n/).filter(Boolean).sort().join('|')===changedPaths.join('|')&&
   physicalGit('rev-parse',P+'^{tree}')===A.sourceTree&&
   sameJson(R.sourceBlobs,Q683_CALENDAR_RECEIPT.sourceBlobsAfter)&&
   sameJson(R.qaBlobs,Q683_CALENDAR_RECEIPT.qaBlobsAfter)&&
@@ -208,6 +217,74 @@ if(Q683_HOSTING_AUTH){
   'B4_003_Q683_HOSTING_PREVIEW_SOURCE_AUTH_INVALID');
  Q683_HOSTING_RECEIPT=R;
  console.log('B4_003_Q683_HOSTING_AUTH=EXACT_E13_SOURCE_FOUR_FILE_DISPATCH_NO_BACKENDS_NO_WRITES_HOLD');
+}
+// This new Q683 Cobros source successor is pinned independently to its exact
+// parent and five-file commit. Older receipts remain verified against the
+// immutable parent blob, while the new code, tests and guard use real bytes.
+const COBROS_Q683_PATH='orbit360-platform/modules/cobros.js';
+const COBROS_Q683_QA='tools/gravicentra-b4-003-cobros-q683-filter-parity.test.cjs';
+const COBROS_Q683=C.b4003CobrosGlobalQ683SourceSuccessor20261027||null;
+let COBROS_Q683_RECEIPT=null;
+if(COBROS_Q683){
+ const A=COBROS_Q683,R=readJson(A.receiptPath),P='1ab0ca1ef675177e1c117daea657c159c33311f3';
+ const guardPath='tools/gravicentra-i6-control-plane-guard-v1.mjs';
+ const workflowPath='.github/workflows/gravicentra-b4-003-executor.yml';
+ const requiredPaths=[CONTROL,A.receiptPath,COBROS_Q683_PATH,COBROS_Q683_QA,guardPath].sort();
+ const prohibited=['backendFunctionsDeployAuthorized','sharedFirestoreRulesDeployAuthorized',
+  'authIamMutationAuthorized','dataMutationAuthorized','syntheticQaWritesAuthorized',
+  'realBusinessWritesAuthorized','importsAuthorized','hostingPreviewDeployAuthorized',
+  'productionHostingDeployAuthorized','livePromotionAuthorized','realUserTokenIssuanceAuthorized',
+  'historicalLocksChanged'];
+ need(A.status==='SOURCE_STAGED_SYNTHETIC_QA_PASS_SECURITY_HOLD'&&
+  A.gate==='I6.5/B4-003'&&A.authority==='PAULA_CONTINUE_B4_003_Q683_GLOBAL_COBROS_20261027'&&
+  A.parentHead===P&&R.parentHead===P&&R.authority===A.authority&&R.gate===A.gate&&
+  R.status===A.status&&R.branch==='recovery/fase-a-clean-20260831'&&
+  R.schema==='GI_I65_B4_003_Q683_COBROS_GLOBAL_SOURCE_SUCCESSOR_V1'&&
+  A.receiptPath==='artifacts/orbit360-recovery/release-control/I6_5_B4_003_Q683_COBROS_GLOBAL_SOURCE_SUCCESSOR_20261027.json'&&
+  A.receiptBlobSha===physicalGit('hash-object',A.receiptPath)&&
+  physicalGit('rev-parse','HEAD^')===P&&
+  physicalGit('merge-base',P,'HEAD')===P&&
+  physicalGit('diff','--name-only','HEAD^','HEAD').split(/\r?\n/).filter(Boolean).sort().join('|')===requiredPaths.join('|')&&
+  R.governance?.changedPathsOnly?.slice().sort().join('|')===requiredPaths.join('|')&&
+  A.sourceFileCount===1&&A.qaFileCount===1&&
+  Object.keys(R.sourceBlobsBefore||{}).join('|')===COBROS_Q683_PATH&&
+  Object.keys(R.sourceBlobsAfter||{}).join('|')===COBROS_Q683_PATH&&
+  Object.keys(R.qaBlobsAfter||{}).join('|')===COBROS_Q683_QA&&
+  R.sourceBlobsBefore[COBROS_Q683_PATH]===physicalGit('rev-parse',P+':'+COBROS_Q683_PATH)&&
+  R.sourceBlobsAfter[COBROS_Q683_PATH]===physicalGit('hash-object',COBROS_Q683_PATH)&&
+  R.sourceBlobsAfter[COBROS_Q683_PATH]!==R.sourceBlobsBefore[COBROS_Q683_PATH]&&
+  R.qaBlobsAfter[COBROS_Q683_QA]===physicalGit('hash-object',COBROS_Q683_QA)&&
+  R.governance.priorGuardBlobSha===physicalGit('rev-parse',P+':'+guardPath)&&
+  R.governance.successorGuardBlobSha===physicalGit('hash-object',guardPath)&&
+  R.governance.unchangedWorkflowBlobSha===physicalGit('hash-object',workflowPath)&&
+  R.governance.unchangedWorkflowBlobSha===physicalGit('rev-parse',P+':'+workflowPath)&&
+  R.governance.frozenB4ExecutionBlobSha===physicalGit('hash-object',ACTIVE_I65_FORENSIC_B4)&&
+  R.governance.frozenCompositionBlobSha===physicalGit('hash-object',I6_CANONICAL_COMPOSITION)&&
+  R.governance.findingsLedgerBlobSha===physicalGit('hash-object',I6_FINDINGS_LEDGER)&&
+  R.scope?.codeOnly===true&&R.scope?.singleProductSource===COBROS_Q683_PATH&&
+  R.scope?.singleNewQa===COBROS_Q683_QA&&prohibited.every(k=>R.scope?.[k]===false)&&
+  R.verification?.authenticatedFunctionalRetestPendingNewPreview===true&&
+  R.verification?.exactHostingPreviewPendingSeparateGate===true&&
+  R.browserWitness?.priorHostingPreviewRunId===40636511552&&
+  R.browserWitness?.independentRoleIdentityAcceptance===false&&
+  COMP.productFiles.includes(COBROS_Q683_PATH)&&B4.boundaries?.allowedProductFiles?.includes(COBROS_Q683_PATH)&&
+  !B4.boundaries?.allowedQaFiles?.includes(COBROS_Q683_QA)&&
+  A.findingsPreserved===295&&A.frozenTasksPreserved===86&&A.p0OpenPreserved===6&&
+  R.preserved?.findings===295&&R.preserved?.frozenTasks===86&&R.preserved?.openP0===6&&
+  R.preserved?.securityHold===C.b4003SecurityReleaseHold?.status&&
+  R.preserved?.noGateAdvance===true&&R.preserved?.release==='HOLD_NO_GO'&&
+  A.historicalLocksChanged===false&&A.backendFunctionsDeploymentAuthorized===false&&
+  A.sharedRulesDeploymentAuthorized===false&&A.authIamMutationAuthorized===false&&
+  A.dataMutationAuthorized===false&&A.hostingPreviewDeploymentAuthorized===false&&
+  A.livePromotionAuthorized===false&&FIND.findings.length===295&&
+  C.currentB4?.status==='B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL'&&
+  B4.boundaries?.livePromotionAuthorized===false,
+  'B4_003_Q683_COBROS_GLOBAL_SOURCE_SUCCESSOR_INVALID');
+ const out=execFileSync(process.execPath,[COBROS_Q683_QA],{encoding:'utf8'}).trim();
+ need(out===R.verification.qaMarker,'B4_003_Q683_COBROS_GLOBAL_SYNTHETIC_QA_FAILED');
+ COBROS_Q683_RECEIPT=R;
+ cobrosQ683HistoricalBlobs=new Map([[COBROS_Q683_PATH,R.sourceBlobsBefore[COBROS_Q683_PATH]]]);
+ console.log('B4_003_Q683_COBROS_GLOBAL_SOURCE=ONE_EXACT_SOURCE_ONE_QA_PASS_SECURITY_HOLD');
 }
 // Explicitly authorized focal correction, with immutable predecessor proofs.
 // This is a one-path exception for the actual canonical Cobros adapter, not a
@@ -314,7 +391,7 @@ if(C360_FINANCIAL_FIX){
   'B4_003_CLIENT360_SHADOW_OWNER_QA_FAILED');
  console.log('B4_003_CLIENT360_FINANCIAL_SHADOW_SUCCESSOR=PASS_HISTORIC_LOCKS_PRESERVED_LIVE_HOLD');
 }
-const preFocalPhysicalHash=p=>focalC360CobrosHistoricalBlobs.get(p)||physicalGit('hash-object',p);
+const preFocalPhysicalHash=p=>focalC360CobrosHistoricalBlobs.get(p)||cobrosQ683HistoricalBlobs.get(p)||physicalGit('hash-object',p);
 // An explicitly byte-bound single-case QA successor can supersede only its
 // two source blobs without rewriting the historically certified composition.
 // The broad B4 execution lock and all previous Preview receipts remain frozen.
@@ -2993,6 +3070,8 @@ if(canonicalCompositionActive){
  const declared=[...(COMP.productFiles||[]),...(Q683_CALENDAR_RECEIPT?['orbit360-platform/core/ui.js']:[])].sort();
  need(actualProduct.length===declared.length&&actualProduct.every((p,i)=>p===declared[i]),'I6_CANONICAL_COMPOSITION_EXACT_SET_DRIFT');
  need(declared.every(p=>(COMP.productFileBlobs?.[p]||Q683_CALENDAR_RECEIPT?.sourceBlobsAfter?.[p])&&(
+  COBROS_Q683_RECEIPT&&p===COBROS_Q683_PATH
+   ?physicalGit('hash-object',p)===COBROS_Q683_RECEIPT.sourceBlobsAfter[p]:
   Q683_CALENDAR_RECEIPT&&Object.prototype.hasOwnProperty.call(Q683_CALENDAR_RECEIPT.sourceBlobsAfter,p)
    ?physicalGit('hash-object',p)===Q683_CALENDAR_RECEIPT.sourceBlobsAfter[p]:
   C360_FINANCIAL_RECEIPT&&p===C360_FINANCIAL_PATH?physicalGit('hash-object',p)===C360_FINANCIAL_RECEIPT.sourceBlobAfter:

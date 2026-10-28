@@ -15150,5 +15150,25 @@
     "findingsPreserved": 295,
     "frozenTasksPreserved": 86,
     "p0OpenPreserved": 6
+  },
+  "b4003CobrosGlobalQ683SourceSuccessor20261027": {
+    "status": "SOURCE_STAGED_SYNTHETIC_QA_PASS_SECURITY_HOLD",
+    "gate": "I6.5/B4-003",
+    "authority": "PAULA_CONTINUE_B4_003_Q683_GLOBAL_COBROS_20261027",
+    "parentHead": "1ab0ca1ef675177e1c117daea657c159c33311f3",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_Q683_COBROS_GLOBAL_SOURCE_SUCCESSOR_20261027.json",
+    "receiptBlobSha": "d6541404cd303b1d8900c9c34c279aef73357084",
+    "sourceFileCount": 1,
+    "qaFileCount": 1,
+    "findingsPreserved": 295,
+    "frozenTasksPreserved": 86,
+    "p0OpenPreserved": 6,
+    "historicalLocksChanged": false,
+    "backendFunctionsDeploymentAuthorized": false,
+    "sharedRulesDeploymentAuthorized": false,
+    "authIamMutationAuthorized": false,
+    "dataMutationAuthorized": false,
+    "hostingPreviewDeploymentAuthorized": false,
+    "livePromotionAuthorized": false
   }
 }

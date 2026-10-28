@@ -1,0 +1,71 @@
+{
+  "schema": "GI_I65_B4_003_Q683_COBROS_GLOBAL_SOURCE_SUCCESSOR_V1",
+  "status": "SOURCE_STAGED_SYNTHETIC_QA_PASS_SECURITY_HOLD",
+  "gate": "I6.5/B4-003",
+  "authority": "PAULA_CONTINUE_B4_003_Q683_GLOBAL_COBROS_20261027",
+  "branch": "recovery/fase-a-clean-20260831",
+  "parentHead": "1ab0ca1ef675177e1c117daea657c159c33311f3",
+  "scope": {
+    "codeOnly": true,
+    "singleProductSource": "orbit360-platform/modules/cobros.js",
+    "singleNewQa": "tools/gravicentra-b4-003-cobros-q683-filter-parity.test.cjs",
+    "backendFunctionsDeployAuthorized": false,
+    "sharedFirestoreRulesDeployAuthorized": false,
+    "authIamMutationAuthorized": false,
+    "dataMutationAuthorized": false,
+    "syntheticQaWritesAuthorized": false,
+    "realBusinessWritesAuthorized": false,
+    "importsAuthorized": false,
+    "hostingPreviewDeployAuthorized": false,
+    "productionHostingDeployAuthorized": false,
+    "livePromotionAuthorized": false,
+    "realUserTokenIssuanceAuthorized": false,
+    "historicalLocksChanged": false
+  },
+  "browserWitness": {
+    "priorHostingPreviewRunId": 40636511552,
+    "priorHostingSourceSha": "e13c81d2ff0bac78f344b1554a071c781afb15dd",
+    "authenticatedDirectionReceiptDetail": "Vencido | Q 683.20 GTQ | vence 2026-10-11 | fechaLimite 2026-10-26",
+    "authenticatedGlobalCobrosDefect": "Pendiente | Q 683 | fecha 2026-10-26 | filtro Vencido: 0",
+    "countryFilterGtCopSeparationObserved": true,
+    "independentRoleIdentityAcceptance": false
+  },
+  "sourceBlobsBefore": {
+    "orbit360-platform/modules/cobros.js": "9cbbf63775f30ce71c28ac93211e93a945cc2bf5"
+  },
+  "sourceBlobsAfter": {
+    "orbit360-platform/modules/cobros.js": "0afec98578a6b0fb29d5afd716b06deb90127ef9"
+  },
+  "qaBlobsAfter": {
+    "tools/gravicentra-b4-003-cobros-q683-filter-parity.test.cjs": "5d1c157d85b9fabded02450806fd4ebd5096530b"
+  },
+  "governance": {
+    "priorGuardBlobSha": "5fca7377d4e3066f1cf5989abb64678915134597",
+    "successorGuardBlobSha": "4e867d4513eb13926850dffa76e61b678bfbe728",
+    "unchangedWorkflowBlobSha": "5a82a0d5be7f77da717872b13eccbe8f2e2b3668",
+    "frozenB4ExecutionBlobSha": "436f155bae1ccf042d45b398fbb53262f481095c",
+    "frozenCompositionBlobSha": "646aeaa0b50e9006d6bff52161a87f53f7aa7aca",
+    "findingsLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
+    "changedPathsOnly": [
+      "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json",
+      "artifacts/orbit360-recovery/release-control/I6_5_B4_003_Q683_COBROS_GLOBAL_SOURCE_SUCCESSOR_20261027.json",
+      "orbit360-platform/modules/cobros.js",
+      "tools/gravicentra-b4-003-cobros-q683-filter-parity.test.cjs",
+      "tools/gravicentra-i6-control-plane-guard-v1.mjs"
+    ]
+  },
+  "verification": {
+    "qaMarker": "GI_B4_003_COBROS_Q683_FILTER_PARITY_SYNTHETIC_PASS checks=33 no_network no_business_writes",
+    "calendarQaMarker": "GI_B4_003_Q683_CALENDAR_PARITY_SYNTHETIC_PASS checks=41 no_network no_business_writes",
+    "authenticatedFunctionalRetestPendingNewPreview": true,
+    "exactHostingPreviewPendingSeparateGate": true
+  },
+  "preserved": {
+    "findings": 295,
+    "frozenTasks": 86,
+    "openP0": 6,
+    "securityHold": "ACTIVE_FAIL_CLOSED_UNAUTHORIZED_BROWSER_FIRESTORE_READ_WRITE",
+    "noGateAdvance": true,
+    "release": "HOLD_NO_GO"
+  }
+}
