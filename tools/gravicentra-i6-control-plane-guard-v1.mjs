@@ -292,9 +292,13 @@ if(COBROS_Q683){
 // 7a09 Cobros correction. The prior calendar Preview proof remains immutable.
 // This authorization commit may change only workflow, control, guard and its
 // new receipt; no product code, backend, Rules, Auth, data or LIVE is admitted.
+// Check that one-time authorization against its original committed descendant,
+// not against the moving HEAD. Later authorized source/guard successors must
+// preserve the original four-file proof without pretending to be that commit.
 const Q683_COBROS_HOSTING_AUTH=C.b4003Q683CobrosHostingPreview20261027||null;
 if(Q683_COBROS_HOSTING_AUTH){
  const A=Q683_COBROS_HOSTING_AUTH,R=readJson(A.receiptPath),P='7a09bd51e1257f4d8e4de0e59631f3646506ca81';
+ const deployedPreviewCommit='c85bf90179ae9bbc97021ff4580dcf0291c5de8d';
  const workflowPath='.github/workflows/gravicentra-b4-003-executor.yml';
  const guardPath='tools/gravicentra-i6-control-plane-guard-v1.mjs';
  const receiptPath='artifacts/orbit360-recovery/release-control/I6_5_B4_003_Q683_COBROS_HOSTING_ONLY_PREVIEW_AUTH_20261027.json';
@@ -322,13 +326,15 @@ if(Q683_COBROS_HOSTING_AUTH){
   R.calendarSourceReceiptPath===calendarReceiptPath&&
   R.calendarSourceReceiptBlobSha===A.calendarSourceReceiptBlobSha&&
   R.workflowPath===workflowPath&&R.workflowBlobShaBefore===physicalGit('rev-parse',P+':'+workflowPath)&&
+  R.workflowBlobShaAfter===physicalGit('rev-parse',deployedPreviewCommit+':'+workflowPath)&&
   R.workflowBlobShaAfter===physicalGit('hash-object',workflowPath)&&
   R.guardPath===guardPath&&R.guardBlobShaBefore===physicalGit('rev-parse',P+':'+guardPath)&&
-  R.guardBlobShaAfter===physicalGit('hash-object',guardPath)&&
+  R.guardBlobShaAfter===physicalGit('rev-parse',deployedPreviewCommit+':'+guardPath)&&
   R.changedPathsOnly?.slice().sort().join('|')===expectedFiles.join('|')&&
-  physicalGit('rev-parse','HEAD^')===P&&
-  physicalGit('merge-base',P,'HEAD')===P&&
-  physicalGit('diff','--name-only','HEAD^','HEAD').split(/\r?\n/).filter(Boolean).sort().join('|')===expectedFiles.join('|')&&
+  physicalGit('rev-parse',deployedPreviewCommit+'^')===P&&
+  physicalGit('merge-base',deployedPreviewCommit,'HEAD')===deployedPreviewCommit&&
+  physicalGit('log','-1','--format=%s',deployedPreviewCommit)===R.triggerSubject&&
+  physicalGit('diff','--name-only',P,deployedPreviewCommit).split(/\r?\n/).filter(Boolean).sort().join('|')===expectedFiles.join('|')&&
   physicalGit('rev-parse',P+'^{tree}')===R.sourceTree&&
   sameJson(R.sourceBlobs,sourceBlobs)&&sameJson(R.qaBlobs,qaBlobs)&&
   Object.keys(R.sourceBlobs||{}).length===4&&Object.keys(R.qaBlobs||{}).length===2&&
@@ -470,9 +476,26 @@ const META_TR=C.b4003MetaTrV27SingleCaseSuccessor20261025||{};
 const META_TR_ACTIVE=META_TR.status==='QA_SOURCE_SUCCESSOR_STAGED_ISOLATED_PREVIEW_PENDING';
 const META_TR_SOURCE_PATHS=['functions/product-ops-leads-domain.js','orbit360-platform/core/ciclo.js'];
 const META_TR_QA_PATHS=['tools/gravicentra-b4-003-meta-tr-v27-preview-contract.test.cjs','tools/gravicentra-i6-control-plane-guard-v1.mjs'];
+// These two files have a later, explicitly authorized authenticated-UAT fix.
+// Its source bytes are checked independently; the Meta TR v27 receipt remains
+// bound to the exact 25-Oct tree where that receipt was first committed.
+const AUTHENTICATED_UAT_CHANGED_BLOBS=new Map([
+ ['functions/product-ops-leads-domain.js','2fb2ec7aef5d9942acdb1ecc4604040febb33123'],
+ ['orbit360-platform/core/ciclo.js','92e97567c007b3c9b6f05c15965b2317b46ed262'],
+ ['orbit360-platform/core/backend-product-readonly-bootstrap-p0.js','d1faf74618eed510b76ad0e49604acf9df6c3a81'],
+ ['tools/gravicentra-b4-003-protected-hydration.test.cjs','9b246dde42cb4bf8ab8f9572fc18ccd011da062d'],
+ ['orbit360-platform/index.html','c0d68b11a2990f7b54a38d76410472714ea23e00'],
+ ['orbit360-platform/modules/cronograma.js','cbc3109e81630812ae22ebfbb41163f1732aae09']
+]);
+// The user-approved nine-file candidate has these four changed paths relevant
+// to existing receipts; any other historical source must retain the exact
+// immediately preceding c85 bytes until an independently governed successor.
+const authenticatedUatCurrentBlob=p=>AUTHENTICATED_UAT_CHANGED_BLOBS.get(p)||
+ physicalGit('rev-parse','c85bf90179ae9bbc97021ff4580dcf0291c5de8d:'+p);
 let META_TR_SOURCE_BLOBS=new Map();
 if(META_TR_ACTIVE){
  const Q=readJson(META_TR.receiptPath||'');
+ const historicalMetaTrCommit='80e7a4bf608806c63806f7befc5285da4d2bba0c';
  const sourcePaths=Object.keys(Q.sourceBlobsAfter||{}).sort();
  const qaPaths=Object.keys(Q.qaBlobsAfter||{}).sort();
  need(Q.schema==='GI_I65_B4_003_META_TR_V27_SINGLE_CASE_SUCCESSOR_V1'&&
@@ -480,6 +503,7 @@ if(META_TR_ACTIVE){
   Q.authority==='PAULA_EXPLICIT_FOCAL_CONTROL_PLANE_RECONCILIATION'&&
   Q.baseHead==='f31ad3e27ff07cb29fcf85a40165bc6b2ad6a9a4'&&
   physicalGit('merge-base',Q.baseHead,'HEAD')===Q.baseHead&&
+  physicalGit('merge-base',historicalMetaTrCommit,'HEAD')===historicalMetaTrCommit&&
   META_TR.receiptBlobSha===physicalGit('hash-object',META_TR.receiptPath)&&
   // The Meta TR receipt proves its own f31 source baseline. A separate
   // bounded operational-writer successor may advance today's composition;
@@ -492,7 +516,9 @@ if(META_TR_ACTIVE){
   sourcePaths.every(p=>B4.boundaries?.allowedProductFiles?.includes(p)&&COMP.productFiles?.includes(p)&&
    Q.sourceBlobsBefore?.[p]===physicalGit('rev-parse',Q.baseHead+':'+p)&&
    Q.sourceBlobsBefore[p]===COMP.productFileBlobs[p]&&
-   Q.sourceBlobsAfter[p]===physicalGit('hash-object',p)&&Q.sourceBlobsAfter[p]!==Q.sourceBlobsBefore[p])&&
+   Q.sourceBlobsAfter[p]===physicalGit('rev-parse',historicalMetaTrCommit+':'+p)&&
+   Q.sourceBlobsAfter[p]!==Q.sourceBlobsBefore[p]&&
+   authenticatedUatCurrentBlob(p)===physicalGit('hash-object',p))&&
   qaPaths.every(p=>Q.qaBlobsAfter[p]===(p==='tools/gravicentra-i6-control-plane-guard-v1.mjs'&&
    C.b4003OperationalWriterSourceSuccessor20261026
    ?physicalGit('rev-parse','0b34853cfe5c715dee93167d6f6f0edd7f639940:'+p)
@@ -951,6 +977,7 @@ if(SAFE_DIAG_ACTIVE){
  const D=SAFE_DIAG,R=readJson(D.receiptPath);
  const BL=B4.b4003SafePostAuthDiagnosticSuccessor20261023||{};
  const CL=COMP.b4003SafePostAuthDiagnosticSuccessor20261023||{};
+ const historicalSafeDiagCommit='23d3a012b77e98927b8dd9219953d0cfaffca14b';
  const head=realGit('rev-parse','HEAD');
  const parentReachable=realGit('merge-base',D.parentHead,head)===D.parentHead||
   realGit('rev-parse',D.parentHead+'^{tree}')===realGit('rev-parse',head+'^{tree}');
@@ -961,9 +988,11 @@ if(SAFE_DIAG_ACTIVE){
   R.gate===D.gate&&R.status===D.status&&R.authority===D.authority&&R.parentHead===D.parentHead&&
   D.receiptBlobSha===realGit('hash-object',D.receiptPath)&&
   BL.receiptBlobSha===D.receiptBlobSha&&CL.receiptBlobSha===D.receiptBlobSha&&
+  realGit('merge-base',historicalSafeDiagCommit,head)===historicalSafeDiagCommit&&
   sameJson(Object.keys(files).sort(),SAFE_DIAG_FILES.slice().sort())&&
   Object.entries(files).every(([p,v])=>v.before===historicalDiagnosticHash(p)&&
-    v.after===realGit('hash-object',p)&&v.before!==v.after)&&
+    v.after===realGit('rev-parse',historicalSafeDiagCommit+':'+p)&&
+    authenticatedUatCurrentBlob(p)===physicalGit('hash-object',p)&&v.before!==v.after)&&
   R.verification?.protectedHydrationSynthetic==='PASS'&&
   R.verification?.safePostAuthDiagnosticVm==='PASS'&&
   R.verification?.privacyClassificationOnly===true&&
@@ -1002,8 +1031,8 @@ if(SAFE_DIAG_PREVIEW.status==='AUTHORIZED_EXACT_ISOLATED_READONLY_PREVIEW'){
   P.sourceReceiptBlobSha===SAFE_DIAG.receiptBlobSha&&
   P.sourceReceiptBlobSha===realGit('hash-object',SAFE_DIAG.receiptPath)&&
   sameJson(Object.keys(sourceFiles).sort(),SAFE_DIAG_FILES.slice().sort())&&
-  Object.entries(sourceFiles).every(([p,sha])=>sha===realGit('hash-object',p)&&
-   sha===realGit('rev-parse',P.sourceCommit+':'+p))&&
+  Object.entries(sourceFiles).every(([p,sha])=>sha===realGit('rev-parse',P.sourceCommit+':'+p)&&
+   authenticatedUatCurrentBlob(p)===physicalGit('hash-object',p))&&
   R.compositionBlobSha===P.compositionBlobSha&&
   P.compositionBlobSha===(LATENCY_REPAIR_ACTIVE?
     physicalGit('rev-parse',LATENCY_REPAIR.parentHead+':'+I6_CANONICAL_COMPOSITION):
@@ -1171,10 +1200,11 @@ if(INSURER_POLICY_COUNT_ACTIVE){
  // Validate the insurer policy-count receipt against its immutable QA hashes.
  // The guard itself has advanced since that receipt; current guard execution is
  // still exercised below, while historical receipt bytes remain pinned here.
- const policyCountHistoricalHash=p=>qa.includes(p)
-  ?P.qaBlobsAfter?.[p]:preDualPhysicalHash(p);
+ const policyCountHistoricalCommit='22c70cb45f922205ab7a44b32a048847011eca43';
+ const policyCountHistoricalHash=p=>physicalGit('rev-parse',policyCountHistoricalCommit+':'+p);
  need(P.parentHead==='695a467dec5369a0860b64b361d226cde26ea074'&&
   physicalGit('merge-base',P.parentHead,'HEAD')===P.parentHead&&
+  physicalGit('merge-base',policyCountHistoricalCommit,'HEAD')===policyCountHistoricalCommit&&
   P.gate==='I6.5/B4-003'&&
   P.authority==='PAULA_EXPLICIT_INSURER_POLICY_COUNT_CODE_AND_ISOLATED_PREVIEW_20261024'&&
   P.receiptBlobSha===physicalGit('hash-object',P.receiptPath)&&
@@ -1187,6 +1217,7 @@ if(INSURER_POLICY_COUNT_ACTIVE){
   [...source,...qa].every(p=>pairs[p]?.before===physicalGit('rev-parse',P.parentHead+':'+p)&&
    pairs[p]?.after===policyCountHistoricalHash(p)&&pairs[p].before!==pairs[p].after)&&
   source.every(p=>P.sourceBlobsAfter[p]===pairs[p].after&&
+   authenticatedUatCurrentBlob(p)===physicalGit('hash-object',p)&&
    BL.sourceBlobsAfter[p]===pairs[p].after&&CL.sourceBlobsAfter[p]===pairs[p].after&&
    COMP.productFiles.includes(p)&&COMP.productFileBlobs[p]===pairs[p].after&&
    B4.boundaries?.allowedProductFiles?.includes(p))&&
@@ -3141,6 +3172,8 @@ if(canonicalCompositionActive){
  const declared=[...(COMP.productFiles||[]),...(Q683_CALENDAR_RECEIPT?['orbit360-platform/core/ui.js']:[])].sort();
  need(actualProduct.length===declared.length&&actualProduct.every((p,i)=>p===declared[i]),'I6_CANONICAL_COMPOSITION_EXACT_SET_DRIFT');
  need(declared.every(p=>(COMP.productFileBlobs?.[p]||Q683_CALENDAR_RECEIPT?.sourceBlobsAfter?.[p])&&(
+  AUTHENTICATED_UAT_CHANGED_BLOBS.has(p)
+   ?physicalGit('hash-object',p)===AUTHENTICATED_UAT_CHANGED_BLOBS.get(p):
   COBROS_Q683_RECEIPT&&p===COBROS_Q683_PATH
    ?physicalGit('hash-object',p)===COBROS_Q683_RECEIPT.sourceBlobsAfter[p]:
   Q683_CALENDAR_RECEIPT&&Object.prototype.hasOwnProperty.call(Q683_CALENDAR_RECEIPT.sourceBlobsAfter,p)
