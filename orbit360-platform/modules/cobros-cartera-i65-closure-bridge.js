@@ -32,10 +32,15 @@ function countryOk(r,idx){
   if(policyId&&!p.id||ownId&&parentId&&ownId!==parentId)return false;
   var resolvedId=parentId||ownId,c=idx&&idx.clientById&&idx.clientById[resolvedId];
   if(!resolvedId||!c)return false;
-  var countries=[p.pais,c.pais,r&&r.pais].map(function(x){return clean(x).toUpperCase();}).filter(Boolean);
-  if(!countries.length||countries.some(function(x){return !['GT','CO'].includes(x)||x!==countries[0];}))return false;
+  // A policy-linked obligation follows the policy's authorized country, not
+  // the client's potentially different domicile. The linked client ID must
+  // still match, and child country conflicts remain blocked (server readers
+  // project the verified parent country before rows reach this surface).
+  var country=clean(p.id?(p.pais||p.country):(c.pais||c.country)).toUpperCase();
+  var childCountry=clean(r&&(r.pais||r.country)).toUpperCase();
+  if((country!=='GT'&&country!=='CO')||(childCountry&&childCountry!==country))return false;
   var selected=clean(Orbit.pais).toUpperCase();
-  return !selected||selected==='TODOS'||countries[0]===selected;
+  return !selected||selected==='TODOS'||country===selected;
 }
 function accessOk(col,r){try{return !!(Orbit.access&&typeof Orbit.access.canView==='function'&&Orbit.access.canView(col,r,'cobros'));}catch(e){return false;}}
 function searchText(r,idx){

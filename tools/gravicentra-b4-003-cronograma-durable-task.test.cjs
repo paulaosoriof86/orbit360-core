@@ -8,7 +8,7 @@ const vm = require('node:vm');
 
 const source = fs.readFileSync(path.join(__dirname, '../orbit360-platform/modules/cronograma.js'), 'utf8');
 
-function scenario(hostname, reject = false) {
+function scenario(hostname, reject = false, rejectedError = new Error('DENIED')) {
   const written = [];
   const rows = [];
   const messages = [];
@@ -25,7 +25,7 @@ function scenario(hostname, reject = false) {
     get(collection, id) { return collection === 'tareas' ? rows.find(row => row.id === id) : null; },
     insertDurable(collection, row) {
       written.push({ collection, row: { ...row } });
-      if (reject) return Promise.reject(new Error('DENIED'));
+      if (reject) return Promise.reject(rejectedError);
       rows.push({ ...row });
       return Promise.resolve(row);
     }
@@ -66,4 +66,18 @@ test('failed server write must not appear as a successfully created task', async
   await x.click();
   assert.equal(x.rows.length, 0);
   assert.ok(x.messages.some(message => message.includes('no se guardó')));
+  assert.ok(x.messages.some(message => message.includes('[código: SIN_CODIGO]')));
+});
+
+test('Preview shows only a safe failure code for faster authenticated UAT', async () => {
+  const denied = new Error('internal details must never be shown');
+  denied.code = 'functions/permission-denied';
+  const preview = scenario('ays-orbit-360-lab--gi-i65-b4-40727347719-zp30idpv.web.app', true, denied);
+  await preview.click();
+  assert.ok(preview.messages.some(message => message.includes('[código: functions/permission-denied]')));
+  assert.ok(preview.messages.every(message => !message.includes('internal details')));
+
+  const live = scenario('gravicentra.example.com', true, denied);
+  await live.click();
+  assert.ok(live.messages.every(message => !message.includes('[código:')));
 });

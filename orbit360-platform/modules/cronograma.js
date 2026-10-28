@@ -12,7 +12,6 @@ Orbit.modules.cronograma = (function () {
   const MESES = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
   const DIAS = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
 
-  function paisOK(cid, idx) { const c = idx && idx.clientById ? idx.clientById.get(String(cid || '')) : S().get('clientes', cid); return !Orbit.pais || Orbit.pais === 'TODOS' || (c && c.pais === Orbit.pais); }
   function relationIndex() {
     const clientById=new Map(),policyById=new Map();
     (S().all('clientes')||[]).forEach(c=>{if(c&&c.id!=null)clientById.set(String(c.id),c);});
@@ -50,7 +49,10 @@ Orbit.modules.cronograma = (function () {
     if (!obligationsReady() || !a || typeof a.portfolioRows !== 'function') return [];
     return (a.portfolioRows('') || []).filter(row => {
       const rec = linkedReceipt(row,idx), cid = String((row && row.clienteId) || (rec && rec.clienteId) || '').trim();
-      if (!rec || !cid || !paisOK(cid)) return false;
+      // The server-verified portfolio adapter has already scoped this row to
+      // its policy country. Rechecking the client's current domicile here
+      // would hide valid CO-policy obligations linked to GT-resident clients.
+      if (!rec || !cid) return false;
       const ids=idx.idsByClient.get(cid);
       return !!(ids && ids.has(String(rec.id||'')));
     });
@@ -76,7 +78,8 @@ Orbit.modules.cronograma = (function () {
       const label = 'Recibo pendiente · ' + (client.nombre || 'Cliente') + (policy.numero ? ' · ' + policy.numero : '');
       add(obligationDue(row), { tipo: 'recibo', icon: '🧾', color: '#c9821b', t: label, go: () => openObligation(row) });
     });
-    (q.renovacionesProximas ? q.renovacionesProximas(90) : []).filter(p => paisOK(p.clienteId,rel)).forEach(p => add(p.vigenciaFin, { tipo: 'renov', icon: '🔄', color: '#0f766e', t: 'Renueva ' + p.numero, go: () => Orbit.modules.cliente360.verPoliza(p.id) }));
+    // renovacionesProximas() already applies the linked policy's country.
+    (q.renovacionesProximas ? q.renovacionesProximas(90) : []).forEach(p => add(p.vigenciaFin, { tipo: 'renov', icon: '🔄', color: '#0f766e', t: 'Renueva ' + p.numero, go: () => Orbit.modules.cliente360.verPoliza(p.id) }));
     S().all('gestiones').filter(g => !g.archivado).forEach(g => add(g.vence, { tipo: 'gestion', icon: '🗂', color: '#1f3a5f', t: (g.titulo || g.tipo), go: () => Orbit.ciclo && Orbit.ciclo.openGestion && Orbit.ciclo.openGestion(g.id) }));
     S().all('tareas').forEach(tk => add(tk.fecha, { tipo: 'tarea', icon: tk.done ? '✅' : '📌', color: '#C5162E', t: tk.t, go: () => toggleTarea(tk.id), id: tk.id }));
     return ev;
@@ -86,6 +89,12 @@ Orbit.modules.cronograma = (function () {
   }
   function taskFeedback(message) {
     if (U && typeof U.toast === 'function') U.toast(message);
+  }
+  function safeTaskErrorCode(error) {
+    const raw = String(error && error.code || '').trim();
+    if (/^(PRODUCT_[A-Z0-9_]+|(functions\/)?(permission-denied|unauthenticated|failed-precondition|not-found|unavailable|internal|deadline-exceeded))$/i.test(raw)) return raw;
+    const token = String(error && error.message || '').match(/\bPRODUCT_[A-Z0-9_]+\b/);
+    return token ? token[0] : 'SIN_CODIGO';
   }
   async function toggleTarea(id) {
     const t = S().get('tareas', id);
@@ -193,8 +202,11 @@ Orbit.modules.cronograma = (function () {
       await S().insertDurable('tareas', task);
       draw();
       taskFeedback('Tarea creada y confirmada en el servidor.');
-    } catch (_) {
-      taskFeedback('La tarea no se guardó; vuelve a intentarlo.');
+    } catch (error) {
+      // Preview-only, allowlisted error code for authenticated write UAT.
+      // No raw server message, identity, token, or client data is disclosed.
+      taskFeedback('La tarea no se guardó; vuelve a intentarlo.' +
+        (synthetic ? ' [código: ' + safeTaskErrorCode(error) + ']' : ''));
     }
   }
 

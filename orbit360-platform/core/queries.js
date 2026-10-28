@@ -336,8 +336,11 @@ Orbit.q = (function () {
   function policyLinkedCountry(row, clients, policies) {
     row = row || {};
     const policy = row.polizaId != null ? (policies instanceof Map ? policies.get(row.polizaId) : S().get('polizas', row.polizaId)) : null;
-    // Fail closed on contradictory source and linked-parent evidence, not
-    // merely the policy-vs-row pair. Align with the staged server allowRow.
+    // For a policy-linked financial item, the verified policy is the country
+    // authority. A client's current domicile may legitimately differ; the
+    // protected B4-003 reader already enforces this same parent precedence.
+    // A contradictory *child* country remains quarantined until projected by
+    // that reader or reconciled at the source.
     if (row.polizaId != null && !policy) return 'REQUIERE_VALIDACION';
     const ownClientId = row.clienteId != null ? row.clienteId : null;
     const parentClientId = policy && policy.clienteId != null ? policy.clienteId : null;
@@ -345,9 +348,17 @@ Orbit.q = (function () {
     const clientId = parentClientId != null ? parentClientId : ownClientId;
     const cli = clientId != null ? (clients instanceof Map ? clients.get(clientId) : S().get('clientes', clientId)) : null;
     if (clientId != null && !cli) return 'REQUIERE_VALIDACION';
-    const countries = [countryCode(policy && policy.pais),countryCode(row.pais),countryCode(cli && cli.pais)].filter(Boolean);
-    if (countries.some(v => v !== 'GT' && v !== 'CO') || new Set(countries).size > 1) return 'REQUIERE_VALIDACION';
-    return countries[0] || '';
+    const policyCountry = countryCode(policy && (policy.pais || policy.country));
+    const itemCountry = countryCode(row.pais || row.country);
+    const clientCountry = countryCode(cli && (cli.pais || cli.country));
+    const valid = v => v === 'GT' || v === 'CO';
+    if (policy) {
+      if (!valid(policyCountry) || (itemCountry && itemCountry !== policyCountry)) return 'REQUIERE_VALIDACION';
+      return policyCountry;
+    }
+    if ((itemCountry && !valid(itemCountry)) || (clientCountry && !valid(clientCountry)) ||
+        (itemCountry && clientCountry && itemCountry !== clientCountry)) return 'REQUIERE_VALIDACION';
+    return itemCountry || clientCountry || '';
   }
   function rowPais(row, clients, policies) {
     const p = paisActivo();

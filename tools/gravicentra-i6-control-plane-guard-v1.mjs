@@ -104,6 +104,110 @@ const ACTIVE_I65_FORENSIC_B4=String(C.i65ForensicRemediationPlan?.b4?.executionL
 need(exists(ACTIVE_I65_FORENSIC_B4),'I6_5_B4_ACTIVE_LOCK_MISSING:'+ACTIVE_I65_FORENSIC_B4);
 const S=readJson(STATUS_LEDGER),A=readJson(AUTH_RECEIPT),M5=readJson(V5_MANIFEST),M6=readJson(V6_MANIFEST),M=readJson(V7_MANIFEST),FRA=readJson(I65_FORENSIC_AUDIT),FRP=readJson(I65_FORENSIC_PLAN),PAY=readJson(I65_PAYMENT_INFERENCE),B1=readJson(I65_FORENSIC_B1),B2=readJson(I65_FORENSIC_B2),B3=readJson(I65_FORENSIC_B3),B4=readJson(ACTIVE_I65_FORENSIC_B4);
 const COMP=readJson(I6_CANONICAL_COMPOSITION),FIND=readJson(I6_FINDINGS_LEDGER),FRP2=readJson(I65_FORENSIC_PLAN_V2),REJ=readJson(I65_B2_REJECTION),RCM=readJson(I65_B2_ROOT_CAUSE);
+// 28-Oct single additive governance successor. Its exact replacement bytes
+// are checked against the physical checkout, while an earlier certified
+// receipt may only compare with the immutable 98da predecessor. This map
+// never changes physicalGit(), existing certifications or release authority.
+const POLICY_COUNTRY_GOVERNANCE=C.b4003PolicyCountryCalendarGovernanceSuccessor20261028||null;
+const POLICY_COUNTRY_BASE='98da478c90c6d7dfa92d1d9f2d3e42a51deb5fc2';
+const POLICY_COUNTRY_RECEIPT_PATH='artifacts/orbit360-recovery/release-control/I6_5_B4_003_POLICY_COUNTRY_CALENDAR_GOVERNANCE_SUCCESSOR_20261028.json';
+const POLICY_COUNTRY_SOURCE_PATHS=[
+ 'orbit360-platform/core/queries.js',
+ 'orbit360-platform/modules/cobros-cartera-i65-closure-bridge.js',
+ 'orbit360-platform/modules/cronograma.js'
+];
+const POLICY_COUNTRY_QA_PATHS=[
+ 'tools/gravicentra-b4-003-cartera-bridge-policy-country.test.cjs',
+ 'tools/gravicentra-b4-003-country-finance-parity.test.cjs',
+ 'tools/gravicentra-b4-003-cronograma-durable-task.test.cjs'
+];
+const POLICY_COUNTRY_EVIDENCE_PATH='artifacts/orbit360-recovery/release-control/I6_5_B4_003_AUTHENTICATED_INTEGRAL_WRITE_UAT_DELTA_20261028.md';
+const POLICY_COUNTRY_GUARD_PATH='tools/gravicentra-i6-control-plane-guard-v1.mjs';
+const POLICY_COUNTRY_UNCHANGED_CERTS=[
+ 'artifacts/orbit360-recovery/release-control/I6_5_B4_003_Q683_CALENDAR_SOURCE_SUCCESSOR_20261027.json',
+ 'artifacts/orbit360-recovery/release-control/I6_5_B4_003_C360_COBROS_FOCAL_SOURCE_SUCCESSOR_20261026.json',
+ 'artifacts/orbit360-recovery/release-control/I6_5_B4_003_AUTHENTICATED_UAT_ONE_FUNCTION_PREVIEW_AUTH_20261028.json',
+ 'artifacts/orbit360-recovery/release-control/I6_5_B4_003_AUTHENTICATED_UAT_PREVIEW_LOGIN_CONFIG_FIX_20261028.json'
+];
+const POLICY_COUNTRY_PREVIOUS=new Map();
+const POLICY_COUNTRY_CURRENT=new Map();
+if(POLICY_COUNTRY_GOVERNANCE){
+ const A=POLICY_COUNTRY_GOVERNANCE,R=readJson(A.receiptPath);
+ const source=POLICY_COUNTRY_SOURCE_PATHS.slice().sort();
+ const qa=POLICY_COUNTRY_QA_PATHS.slice().sort();
+ const allowedChanged=[...source,...qa,POLICY_COUNTRY_EVIDENCE_PATH,POLICY_COUNTRY_GUARD_PATH,
+  CONTROL,POLICY_COUNTRY_RECEIPT_PATH].sort();
+ const blocked=['sharedFirestoreRulesDeployment','backendFunctionDeployment','authIamMutation',
+  'productionHostingDeployment','previewHostingDeployment','businessDataMutation',
+  'syntheticBusinessWrites','dataImportOrReimport','livePromotion','externalNotifications'];
+ const priorPath=p=>physicalGit('rev-parse',POLICY_COUNTRY_BASE+':'+p);
+ need(A.receiptPath===POLICY_COUNTRY_RECEIPT_PATH&&
+  A.receiptBlobSha===physicalGit('hash-object',POLICY_COUNTRY_RECEIPT_PATH)&&
+  A.status==='GOVERNANCE_SUCCESSOR_STAGED_UAT_SECURITY_HOLD'&&
+  A.gate==='I6.5/B4-003'&&A.authority==='PAULA_EXPLICIT_SINGLE_ADDITIVE_GOVERNANCE_20261028'&&
+  R.schema==='GI_I65_B4_003_SINGLE_ADDITIVE_POLICY_COUNTRY_GOVERNANCE_V1'&&
+  R.status===A.status&&R.gate===A.gate&&R.authority===A.authority&&
+  R.repository==='paulaosoriof86/orbit360-core'&&R.branch==='recovery/fase-a-clean-20260831'&&
+  R.predecessorRemoteHead===POLICY_COUNTRY_BASE&&
+  R.predecessorRemoteTree==='0fc7cd922ed251a2471cf88bcef4af2622466999'&&
+  R.predecessorRemoteTree===physicalGit('rev-parse',POLICY_COUNTRY_BASE+'^{tree}')&&
+  R.predecessorControlPlaneBlobSha===priorPath(CONTROL)&&
+  Object.keys(R.sourceBlobsBefore||{}).sort().join('|')===source.join('|')&&
+  Object.keys(R.sourceBlobsAfter||{}).sort().join('|')===source.join('|')&&
+  Object.keys(R.qaBlobsBefore||{}).sort().join('|')===qa.join('|')&&
+  Object.keys(R.qaBlobsAfter||{}).sort().join('|')===qa.join('|')&&
+  source.every(p=>R.sourceBlobsBefore[p]===priorPath(p)&&
+   R.sourceBlobsAfter[p]===physicalGit('hash-object',p)&&
+   R.sourceBlobsAfter[p]!==R.sourceBlobsBefore[p])&&
+  qa.every(p=>R.qaBlobsBefore[p]===(p==='tools/gravicentra-b4-003-cartera-bridge-policy-country.test.cjs'?null:priorPath(p))&&
+   R.qaBlobsAfter[p]===physicalGit('hash-object',p)&&
+   R.qaBlobsAfter[p]!==R.qaBlobsBefore[p])&&
+  R.evidence?.path===POLICY_COUNTRY_EVIDENCE_PATH&&
+  R.evidence?.blobBefore===priorPath(POLICY_COUNTRY_EVIDENCE_PATH)&&
+  R.evidence?.blobAfter===physicalGit('hash-object',POLICY_COUNTRY_EVIDENCE_PATH)&&
+  R.governance?.guardPath===POLICY_COUNTRY_GUARD_PATH&&
+  R.governance?.guardBlobBefore===priorPath(POLICY_COUNTRY_GUARD_PATH)&&
+  R.governance?.guardBlobAfter===physicalGit('hash-object',POLICY_COUNTRY_GUARD_PATH)&&
+  R.governance?.controlPlanePath===CONTROL&&
+  R.governance?.historicalB4ExecutionBlobSha===physicalGit('hash-object',ACTIVE_I65_FORENSIC_B4)&&
+  R.governance?.historicalCompositionBlobSha===physicalGit('hash-object',I6_CANONICAL_COMPOSITION)&&
+  Object.keys(R.historicalReceiptBlobs||{}).sort().join('|')===POLICY_COUNTRY_UNCHANGED_CERTS.slice().sort().join('|')&&
+  POLICY_COUNTRY_UNCHANGED_CERTS.every(p=>R.historicalReceiptBlobs[p]===priorPath(p)&&
+   R.historicalReceiptBlobs[p]===physicalGit('hash-object',p))&&
+  sameJson(R.changedPathsOnly?.slice().sort(),allowedChanged)&&
+  R.scope?.sameExistingBranch===true&&R.scope?.codeAndGovernanceOnly===true&&
+  blocked.every(k=>R.scope[k]===false)&&
+  R.preserved?.findings===295&&FIND.findings.length===295&&
+  R.preserved?.frozenTasks===86&&R.preserved?.securityHold===C.b4003SecurityReleaseHold?.status&&
+  R.preserved?.securityHold==='ACTIVE_FAIL_CLOSED_UNAUTHORIZED_BROWSER_FIRESTORE_READ_WRITE'&&
+  R.preserved?.historicalLocksUnmodified===true&&
+  R.preserved?.gateNotAdvanced===true&&
+  C.currentB4?.status==='B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL'&&
+  B4.boundaries?.livePromotionAuthorized===false,
+  'B4_003_POLICY_COUNTRY_SINGLE_GOVERNANCE_SUCCESSOR_INVALID');
+ for(const p of [...source,...qa]){
+  POLICY_COUNTRY_PREVIOUS.set(p,R.sourceBlobsBefore[p]??R.qaBlobsBefore[p]);
+  POLICY_COUNTRY_CURRENT.set(p,R.sourceBlobsAfter[p]??R.qaBlobsAfter[p]);
+ }
+ // The sole permitted difference from the remote tree is the ten-file
+ // candidate. Never silently allow an extra product, rule, workflow or IAM.
+ const changed=physicalGit('diff','--name-only',POLICY_COUNTRY_BASE,'HEAD').split(/\r?\n/).filter(Boolean).sort();
+ need(sameJson(changed,allowedChanged),'B4_003_POLICY_COUNTRY_UNDECLARED_SOURCE_DRIFT');
+ const markers=R.verification?.syntheticQaMarkers||{};
+ need(markers[POLICY_COUNTRY_QA_PATHS[0]]==='GI_B4_003_CARTERA_BRIDGE_POLICY_COUNTRY_SYNTHETIC_PASS checks=14 offline no_business_writes'&&
+  markers[POLICY_COUNTRY_QA_PATHS[1]]==='GI_B4_003_COUNTRY_FINANCE_PARITY_SYNTHETIC_PASS'&&
+  markers[POLICY_COUNTRY_QA_PATHS[2]]==='TAP_PASS_4_OF_4',
+  'B4_003_POLICY_COUNTRY_QA_MARKERS_INVALID');
+ for(const qaPath of qa){
+  const out=execFileSync(process.execPath,[qaPath],{encoding:'utf8'});
+  need(qaPath.endsWith('cronograma-durable-task.test.cjs')
+   ?out.includes('ℹ pass 4')&&out.includes('ℹ fail 0')
+   :out.includes(markers[qaPath]),'B4_003_POLICY_COUNTRY_SYNTHETIC_QA_FAILED:'+qaPath);
+ }
+ console.log('B4_003_POLICY_COUNTRY_GOVERNANCE=EXACT_THREE_SOURCES_THREE_QA_ONE_RECEIPT_HISTORICAL_CERTS_PRESERVED_SECURITY_HOLD');
+}
+const historicalOrPhysicalBlob=p=>POLICY_COUNTRY_PREVIOUS.has(p)
+ ?POLICY_COUNTRY_PREVIOUS.get(p):physicalGit('hash-object',p);
 // Paula's 27-Oct one-case Q683 calendar correction is a new additive source
 // successor. It preserves each prior byte-pinned receipt and the frozen B4
 // composition; ui.js is an explicitly bounded additional product source.
@@ -131,7 +235,7 @@ if(Q683_CALENDAR){
   Object.keys(R.qaBlobsAfter||{}).join('|')===Q683_CALENDAR_QA&&
   A.sourceFileCount===3&&A.qaFileCount===1&&
   Q683_CALENDAR_PATHS.every(p=>R.sourceBlobsBefore[p]===physicalGit('rev-parse',P+':'+p)&&
-   R.sourceBlobsAfter[p]===physicalGit('hash-object',p)&&R.sourceBlobsAfter[p]!==R.sourceBlobsBefore[p])&&
+   R.sourceBlobsAfter[p]===historicalOrPhysicalBlob(p)&&R.sourceBlobsAfter[p]!==R.sourceBlobsBefore[p])&&
   R.qaBlobsAfter[Q683_CALENDAR_QA]===physicalGit('hash-object',Q683_CALENDAR_QA)&&
   R.priorGuardBlobSha===physicalGit('rev-parse',P+':tools/gravicentra-i6-control-plane-guard-v1.mjs')&&
   R.historicalBindings?.frozenCompositionBlobSha===physicalGit('hash-object',I6_CANONICAL_COMPOSITION)&&
@@ -199,8 +303,8 @@ if(Q683_HOSTING_AUTH){
   sameJson(R.sourceBlobs,Q683_CALENDAR_RECEIPT.sourceBlobsAfter)&&
   sameJson(R.qaBlobs,Q683_CALENDAR_RECEIPT.qaBlobsAfter)&&
   Object.keys(R.sourceBlobs||{}).length===3&&Object.keys(R.qaBlobs||{}).length===1&&
-  Object.entries(R.sourceBlobs).every(([p,sha])=>sha===physicalGit('hash-object',p)&&sha===physicalGit('rev-parse',P+':'+p))&&
-  Object.entries(R.qaBlobs).every(([p,sha])=>sha===physicalGit('hash-object',p)&&sha===physicalGit('rev-parse',P+':'+p))&&
+  Object.entries(R.sourceBlobs).every(([p,sha])=>sha===historicalOrPhysicalBlob(p)&&sha===physicalGit('rev-parse',P+':'+p))&&
+  Object.entries(R.qaBlobs).every(([p,sha])=>sha===historicalOrPhysicalBlob(p)&&sha===physicalGit('rev-parse',P+':'+p))&&
   R.expectedProof?.calendarSyntheticQaChecks===41&&R.expectedProof?.release==='HOLD_NO_GO'&&
   R.scope?.hostingOnly===true&&R.scope?.existingCallableReadOnly===true&&R.scope?.newPreviewChannelsMaximum===1&&
   excluded.every(k=>R.scope?.[k]===false)&&
@@ -349,9 +453,9 @@ if(Q683_COBROS_HOSTING_AUTH){
   sameJson(R.sourceBlobs,sourceBlobs)&&sameJson(R.qaBlobs,qaBlobs)&&
   Object.keys(R.sourceBlobs||{}).length===4&&Object.keys(R.qaBlobs||{}).length===2&&
   Object.entries(R.sourceBlobs).every(([p,sha])=>sha===physicalGit('rev-parse',P+':'+p)&&
-    sha===physicalGit('hash-object',p))&&
+    sha===historicalOrPhysicalBlob(p))&&
   Object.entries(R.qaBlobs).every(([p,sha])=>sha===physicalGit('rev-parse',P+':'+p)&&
-    sha===physicalGit('hash-object',p))&&
+    sha===historicalOrPhysicalBlob(p))&&
   R.expectedProof?.calendarSyntheticQaChecks===41&&R.expectedProof?.cobrosSyntheticQaChecks===33&&
   R.expectedProof?.sourceTreeVerification==='REQUIRED_EXACT_7A09'&&
   R.expectedProof?.hostedFileSha256Readback==='REQUIRED'&&
@@ -408,7 +512,7 @@ if(FOCAL_C360_COBROS){
   !B4.boundaries.allowedQaFiles.includes(FOCAL_C360_COBROS_QA)&&
   FOCAL_C360_COBROS_PATHS.every(p=>COMP.productFiles.includes(p)&&
    R.sourceBlobsBefore[p]===physicalGit('rev-parse',parent+':'+p)&&
-   R.sourceBlobsAfter[p]===(Q683_CALENDAR_PREDECESSOR.get(p)||physicalGit('hash-object',p))&&
+   R.sourceBlobsAfter[p]===(Q683_CALENDAR_PREDECESSOR.get(p)||historicalOrPhysicalBlob(p))&&
    R.sourceBlobsAfter[p]!==R.sourceBlobsBefore[p])&&
   R.qaBlobsAfter[FOCAL_C360_COBROS_QA]===physicalGit('hash-object',FOCAL_C360_COBROS_QA)&&
   R.historicalB4LockBlobSha===physicalGit('hash-object',ACTIVE_I65_FORENSIC_B4)&&
@@ -478,7 +582,7 @@ if(C360_FINANCIAL_FIX){
   'B4_003_CLIENT360_SHADOW_OWNER_QA_FAILED');
  console.log('B4_003_CLIENT360_FINANCIAL_SHADOW_SUCCESSOR=PASS_HISTORIC_LOCKS_PRESERVED_LIVE_HOLD');
 }
-const preFocalPhysicalHash=p=>focalC360CobrosHistoricalBlobs.get(p)||cobrosQ683HistoricalBlobs.get(p)||physicalGit('hash-object',p);
+const preFocalPhysicalHash=p=>focalC360CobrosHistoricalBlobs.get(p)||cobrosQ683HistoricalBlobs.get(p)||historicalOrPhysicalBlob(p);
 // An explicitly byte-bound single-case QA successor can supersede only its
 // two source blobs without rewriting the historically certified composition.
 // The broad B4 execution lock and all previous Preview receipts remain frozen.
@@ -546,8 +650,8 @@ if(AUTH_UAT_PREVIEW_RECEIPT){
    :R.workflowBlobShaAfter===physicalGit('hash-object',R.workflowPath))&&
   physicalGit('hash-object',AUTH_UAT_PREVIEW_RECEIPT_PATH)==='838aa32daf07e04e2cefc35842528e2f3865fadf'&&
   sameJson(R.sourceBlobs,expectedSource)&&sameJson(R.qaBlobs,expectedQa)&&
-  Object.entries(R.sourceBlobs).every(([p,sha])=>physicalGit('hash-object',p)===sha)&&
-  Object.entries(R.qaBlobs).every(([p,sha])=>physicalGit('hash-object',p)===sha)&&
+  Object.entries(R.sourceBlobs).every(([p,sha])=>historicalOrPhysicalBlob(p)===sha)&&
+  Object.entries(R.qaBlobs).every(([p,sha])=>historicalOrPhysicalBlob(p)===sha)&&
   R.scope?.firebaseProject==='ays-orbit-360-lab'&&
   R.scope?.tenant==='alianzas-soluciones'&&
   R.scope?.isolatedHostingPreviewOnly===true&&
@@ -3298,6 +3402,8 @@ if(canonicalCompositionActive){
  const declared=[...(COMP.productFiles||[]),...(Q683_CALENDAR_RECEIPT?['orbit360-platform/core/ui.js']:[])].sort();
  need(actualProduct.length===declared.length&&actualProduct.every((p,i)=>p===declared[i]),'I6_CANONICAL_COMPOSITION_EXACT_SET_DRIFT');
  need(declared.every(p=>(COMP.productFileBlobs?.[p]||Q683_CALENDAR_RECEIPT?.sourceBlobsAfter?.[p])&&(
+  POLICY_COUNTRY_CURRENT.has(p)
+   ?physicalGit('hash-object',p)===POLICY_COUNTRY_CURRENT.get(p):
   AUTHENTICATED_UAT_CHANGED_BLOBS.has(p)
    ?physicalGit('hash-object',p)===AUTHENTICATED_UAT_CHANGED_BLOBS.get(p):
   COBROS_Q683_RECEIPT&&p===COBROS_Q683_PATH

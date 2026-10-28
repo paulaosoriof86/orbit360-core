@@ -15199,5 +15199,21 @@
     "findingsPreserved": 295,
     "frozenTasksPreserved": 86,
     "p0OpenPreserved": 6
+  },
+  "b4003PolicyCountryCalendarGovernanceSuccessor20261028": {
+    "status": "GOVERNANCE_SUCCESSOR_STAGED_UAT_SECURITY_HOLD",
+    "gate": "I6.5/B4-003",
+    "authority": "PAULA_EXPLICIT_SINGLE_ADDITIVE_GOVERNANCE_20261028",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_POLICY_COUNTRY_CALENDAR_GOVERNANCE_SUCCESSOR_20261028.json",
+    "receiptBlobSha": "dd074029e40672fcdee9250aaab08682c398a974",
+    "predecessorRemoteHead": "98da478c90c6d7dfa92d1d9f2d3e42a51deb5fc2",
+    "sourceFileCount": 3,
+    "qaFileCount": 3,
+    "historicalLocksChanged": false,
+    "securityHoldPreserved": true,
+    "sharedFirestoreRulesDeploymentAuthorized": false,
+    "backendFunctionDeploymentAuthorized": false,
+    "businessDataMutationAuthorized": false,
+    "livePromotionAuthorized": false
   }
 }
