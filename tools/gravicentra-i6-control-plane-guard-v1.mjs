@@ -113,6 +113,12 @@ const POLICY_COUNTRY_GOVERNANCE=C.b4003PolicyCountryCalendarGovernanceSuccessor2
 // 3ac95204 policy-country source. Keep the original ten-file certification
 // evaluated at its original commit, not at the new workflow-only descendant.
 const POLICY_COUNTRY_PREVIEW=C.b4003PolicyCountryHostingOnlyPreviewSuccessor20261028||null;
+// New authorized CI-format-only successor. The preceding Preview receipt is
+// immutable and must be verified at the already-published 42d060f snapshot.
+const POLICY_COUNTRY_PREVIEW_CI=C.b4003PolicyCountryPreviewCiCompatibility20261028||null;
+const POLICY_COUNTRY_PREVIEW_CERT_HEAD=POLICY_COUNTRY_PREVIEW_CI
+ ?'42d060f71c9674c36b8d7665dc490b06e7e609b6':'HEAD';
+const POLICY_COUNTRY_PREVIEW_CI_RECEIPT='artifacts/orbit360-recovery/release-control/I6_5_B4_003_POLICY_COUNTRY_PREVIEW_CI_NODE_OUTPUT_COMPAT_20261028.json';
 const POLICY_COUNTRY_CERT_HEAD=POLICY_COUNTRY_PREVIEW
  ?'3ac952041a4c9a07c6675d7f8f1f38e60f9bef31':'HEAD';
 const POLICY_COUNTRY_PREVIEW_RECEIPT='artifacts/orbit360-recovery/release-control/I6_5_B4_003_POLICY_COUNTRY_HOSTING_ONLY_PREVIEW_AUTH_20261028.json';
@@ -210,8 +216,12 @@ if(POLICY_COUNTRY_GOVERNANCE){
   'B4_003_POLICY_COUNTRY_QA_MARKERS_INVALID');
  for(const qaPath of qa){
   const out=execFileSync(process.execPath,[qaPath],{encoding:'utf8'});
+  // Node's default test reporter can be Spec (ℹ) or TAP (#) according to
+  // runner version/TTY. Both must prove precisely four passes and zero fails.
+  const cronogramaSummary=/(?:^|\r?\n)(?:ℹ|#)\s+pass\s+4(?:\r?\n|$)/u.test(out)&&
+   /(?:^|\r?\n)(?:ℹ|#)\s+fail\s+0(?:\r?\n|$)/u.test(out);
   need(qaPath.endsWith('cronograma-durable-task.test.cjs')
-   ?out.includes('ℹ pass 4')&&out.includes('ℹ fail 0')
+   ?cronogramaSummary
    :out.includes(markers[qaPath]),'B4_003_POLICY_COUNTRY_SYNTHETIC_QA_FAILED:'+qaPath);
  }
  console.log('B4_003_POLICY_COUNTRY_GOVERNANCE=EXACT_THREE_SOURCES_THREE_QA_ONE_RECEIPT_HISTORICAL_CERTS_PRESERVED_SECURITY_HOLD');
@@ -222,7 +232,7 @@ if(POLICY_COUNTRY_PREVIEW){
  const TREE='b77d6debcd3f4663ccd0a151d1adfe1c10874d73';
  const expected=[CONTROL,POLICY_COUNTRY_PREVIEW_RECEIPT,
   POLICY_COUNTRY_PREVIEW_WORKFLOW,POLICY_COUNTRY_GUARD_PATH].sort();
- const actual=physicalGit('diff','--name-only',SOURCE,'HEAD').split(/\r?\n/).filter(Boolean).sort();
+ const actual=physicalGit('diff','--name-only',SOURCE,POLICY_COUNTRY_PREVIEW_CERT_HEAD).split(/\r?\n/).filter(Boolean).sort();
  const requiredSources={
   'orbit360-platform/core/queries.js':'ab3e22bcce37c91d255075890188258576c3dee7',
   'orbit360-platform/modules/cronograma.js':'5d412e4ee263bb6cbfbd840b7124871a1e5b6ee8',
@@ -232,7 +242,9 @@ if(POLICY_COUNTRY_PREVIEW){
   'authIamMutation','productionHostingDeployment','livePromotion',
   'businessDataMutation','syntheticBusinessWrites','dataImportOrReimport',
   'externalNotifications','previewChannelGarbageCollection'];
- const workflow=fs.readFileSync(POLICY_COUNTRY_PREVIEW_WORKFLOW,'utf8');
+ const workflow=POLICY_COUNTRY_PREVIEW_CI
+  ?physicalGit('show',POLICY_COUNTRY_PREVIEW_CERT_HEAD+':'+POLICY_COUNTRY_PREVIEW_WORKFLOW)
+  :fs.readFileSync(POLICY_COUNTRY_PREVIEW_WORKFLOW,'utf8');
  need(P.receiptPath===POLICY_COUNTRY_PREVIEW_RECEIPT&&
   P.receiptBlobSha===physicalGit('hash-object',POLICY_COUNTRY_PREVIEW_RECEIPT)&&
   P.status==='AUTHORIZED_ONE_HOSTING_ONLY_LAB_PREVIEW_PENDING_TECHNICAL_READBACK'&&
@@ -247,13 +259,17 @@ if(POLICY_COUNTRY_PREVIEW){
   R.repository==='paulaosoriof86/orbit360-core'&&R.branch==='recovery/fase-a-clean-20260831'&&
   R.sourceCommit===SOURCE&&R.sourceTree===TREE&&
   physicalGit('rev-parse',SOURCE+'^{tree}')===TREE&&
-  physicalGit('rev-parse','HEAD^')===SOURCE&&
-  physicalGit('log','-1','--format=%s','HEAD')==='build(i6.5 B4-003): exact policy-country Hosting-only LAB Preview'&&
+  physicalGit('rev-parse',POLICY_COUNTRY_PREVIEW_CERT_HEAD+'^')===SOURCE&&
+  physicalGit('log','-1','--format=%s',POLICY_COUNTRY_PREVIEW_CERT_HEAD)==='build(i6.5 B4-003): exact policy-country Hosting-only LAB Preview'&&
   sameJson(actual,expected)&&sameJson(R.changedPathsOnly?.slice().sort(),expected)&&
   R.workflow?.path===POLICY_COUNTRY_PREVIEW_WORKFLOW&&
-  R.workflow?.blobAfter===physicalGit('hash-object',POLICY_COUNTRY_PREVIEW_WORKFLOW)&&
+  R.workflow?.blobAfter===(POLICY_COUNTRY_PREVIEW_CI
+   ?physicalGit('rev-parse',POLICY_COUNTRY_PREVIEW_CERT_HEAD+':'+POLICY_COUNTRY_PREVIEW_WORKFLOW)
+   :physicalGit('hash-object',POLICY_COUNTRY_PREVIEW_WORKFLOW))&&
   R.governance?.guardBlobBefore===physicalGit('rev-parse',SOURCE+':'+POLICY_COUNTRY_GUARD_PATH)&&
-  R.governance?.guardBlobAfter===physicalGit('hash-object',POLICY_COUNTRY_GUARD_PATH)&&
+  R.governance?.guardBlobAfter===(POLICY_COUNTRY_PREVIEW_CI
+   ?physicalGit('rev-parse',POLICY_COUNTRY_PREVIEW_CERT_HEAD+':'+POLICY_COUNTRY_GUARD_PATH)
+   :physicalGit('hash-object',POLICY_COUNTRY_GUARD_PATH))&&
   R.governance?.controlPlaneBlobBefore===physicalGit('rev-parse',SOURCE+':'+CONTROL)&&
   R.governance?.historicPolicyCountryReceiptBlob===physicalGit('hash-object',POLICY_COUNTRY_RECEIPT_PATH)&&
   sameJson(R.sourceBlobs,requiredSources)&&
@@ -276,6 +292,69 @@ if(POLICY_COUNTRY_PREVIEW){
   workflow.includes('hosting:channel:deploy "$CHANNEL_ID" --config firebase.json --project "$PROJECT_ID" --expires 7d'),
   'B4_003_POLICY_COUNTRY_HOSTING_ONLY_PREVIEW_SUCCESSOR_INVALID');
  console.log('B4_003_POLICY_COUNTRY_PREVIEW=EXACT_SOURCE_EXACT_WORKFLOW_ONLY_LAB_HOSTING_ONE_CHANNEL_SECURITY_HOLD');
+}
+if(POLICY_COUNTRY_PREVIEW_CI){
+ const P=POLICY_COUNTRY_PREVIEW_CI,R=readJson(P.receiptPath);
+ const OLD='42d060f71c9674c36b8d7665dc490b06e7e609b6';
+ const SOURCE='3ac952041a4c9a07c6675d7f8f1f38e60f9bef31';
+ const TREE='b77d6debcd3f4663ccd0a151d1adfe1c10874d73';
+ const paths=[CONTROL,POLICY_COUNTRY_PREVIEW_CI_RECEIPT,
+  POLICY_COUNTRY_PREVIEW_WORKFLOW,POLICY_COUNTRY_GUARD_PATH].sort();
+ const changed=physicalGit('diff','--name-only',OLD,'HEAD').split(/\r?\n/).filter(Boolean).sort();
+ const workflow=fs.readFileSync(POLICY_COUNTRY_PREVIEW_WORKFLOW,'utf8');
+ const oldBlob=f=>physicalGit('rev-parse',OLD+':'+f);
+ const deny=['backendFunctionDeployment','sharedFirestoreRulesDeployment',
+  'authIamMutation','productionHostingDeployment','livePromotion',
+  'businessDataMutation','syntheticBusinessWrites','dataImportOrReimport',
+  'externalNotifications','previewChannelGarbageCollection'];
+ need(P.receiptPath===POLICY_COUNTRY_PREVIEW_CI_RECEIPT&&
+  P.receiptBlobSha===physicalGit('hash-object',POLICY_COUNTRY_PREVIEW_CI_RECEIPT)&&
+  P.status==='CI_NODE_OUTPUT_COMPAT_AUTHORIZED_LAB_PREVIEW_PENDING_READBACK'&&
+  P.authority==='PAULA_EXPLICIT_SECOND_CI_COMPAT_SUCCESSOR_20261028'&&
+  P.gate==='I6.5/B4-003'&&P.parentHead===OLD&&P.sourceCommit===SOURCE&&
+  P.sourceTree===TREE&&P.hostingOnly===true&&P.isolatedLabOnly===true&&
+  P.newPreviewChannelsMaximum===1&&P.expiryDaysMaximum===7&&
+  P.historicalLocksChanged===false&&P.securityHoldPreserved===true&&
+  deny.every(k=>P[k]===false)&&
+  R.schema==='GI_I65_B4_003_POLICY_COUNTRY_CI_NODE_REPORTER_COMPAT_V1'&&
+  R.status===P.status&&R.authority===P.authority&&R.gate===P.gate&&
+  R.repository==='paulaosoriof86/orbit360-core'&&
+  R.branch==='recovery/fase-a-clean-20260831'&&
+  R.predecessorRemoteHead===OLD&&R.sourceCommit===SOURCE&&R.sourceTree===TREE&&
+  physicalGit('rev-parse','HEAD^')===OLD&&
+  physicalGit('rev-parse',OLD+'^')===SOURCE&&
+  physicalGit('rev-parse',SOURCE+'^{tree}')===TREE&&
+  physicalGit('log','-1','--format=%s','HEAD')==='fix(i6.5 B4-003): Node22 TAP CI compatibility for exact LAB Preview'&&
+  sameJson(changed,paths)&&sameJson(R.changedPathsOnly?.slice().sort(),paths)&&
+  R.workflow?.path===POLICY_COUNTRY_PREVIEW_WORKFLOW&&
+  R.workflow?.blobBefore===oldBlob(POLICY_COUNTRY_PREVIEW_WORKFLOW)&&
+  R.workflow?.blobAfter===physicalGit('hash-object',POLICY_COUNTRY_PREVIEW_WORKFLOW)&&
+  R.governance?.guardBlobBefore===oldBlob(POLICY_COUNTRY_GUARD_PATH)&&
+  R.governance?.guardBlobAfter===physicalGit('hash-object',POLICY_COUNTRY_GUARD_PATH)&&
+  R.governance?.controlPlaneBlobBefore===oldBlob(CONTROL)&&
+  R.governance?.originalPreviewReceiptBlob===physicalGit('hash-object',POLICY_COUNTRY_PREVIEW_RECEIPT)&&
+  R.governance?.originalPolicyReceiptBlob===physicalGit('hash-object',POLICY_COUNTRY_RECEIPT_PATH)&&
+  R.reporters?.spec==='ℹ pass 4 / ℹ fail 0'&&
+  R.reporters?.tap==='# pass 4 / # fail 0'&&
+  R.reporters?.passCount===4&&R.reporters?.failureCount===0&&
+  R.scope?.hostingProject==='ays-orbit-360-lab'&&
+  R.scope?.hostingSite==='ays-orbit-360-lab'&&
+  R.scope?.sourceImmutable===true&&R.scope?.previewOnly===true&&
+  R.scope?.hostingOnly===true&&R.scope?.maximumOneChannel===true&&
+  R.scope?.expiryDays===7&&deny.every(k=>R.scope[k]===false)&&
+  R.preserved?.findings===295&&FIND.findings.length===295&&
+  R.preserved?.frozenTasks===86&&R.preserved?.p0Open===6&&
+  R.preserved?.securityHold==='ACTIVE_FAIL_CLOSED_UNAUTHORIZED_BROWSER_FIRESTORE_READ_WRITE'&&
+  C.b4003SecurityReleaseHold?.status===R.preserved.securityHold&&
+  C.currentB4?.status==='B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL'&&
+  B4.boundaries?.livePromotionAuthorized===false&&
+  workflow.includes('CI_PREDECESSOR_SHA: 42d060f71c9674c36b8d7665dc490b06e7e609b6')&&
+  workflow.includes('SOURCE_SHA: 3ac952041a4c9a07c6675d7f8f1f38e60f9bef31')&&
+  workflow.includes('node tools/gravicentra-governance-preflight-v1.mjs --mode=i6')&&
+  workflow.includes('PROJECT_ID: ays-orbit-360-lab')&&
+  workflow.includes('hosting:channel:deploy "$CHANNEL_ID" --config firebase.json --project "$PROJECT_ID" --expires 7d'),
+  'B4_003_POLICY_COUNTRY_PREVIEW_CI_COMPAT_SUCCESSOR_INVALID');
+ console.log('B4_003_POLICY_COUNTRY_PREVIEW_CI_COMPAT=PASS_NODE22_TAP_OR_NODE24_SPEC_EXACT_ONE_LAB_HOSTING_SECURITY_HOLD');
 }
 const historicalOrPhysicalBlob=p=>POLICY_COUNTRY_PREVIOUS.has(p)
  ?POLICY_COUNTRY_PREVIOUS.get(p):physicalGit('hash-object',p);

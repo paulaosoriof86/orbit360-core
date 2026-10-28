@@ -8,6 +8,7 @@ on:
     paths:
       - .github/workflows/gravicentra-b4-003-policy-country-lab-preview.yml
       - artifacts/orbit360-recovery/release-control/I6_5_B4_003_POLICY_COUNTRY_HOSTING_ONLY_PREVIEW_AUTH_20261028.json
+      - artifacts/orbit360-recovery/release-control/I6_5_B4_003_POLICY_COUNTRY_PREVIEW_CI_NODE_OUTPUT_COMPAT_20261028.json
 
 permissions:
   contents: read
@@ -21,13 +22,14 @@ jobs:
     if: >-
       github.repository == 'paulaosoriof86/orbit360-core' &&
       github.ref == 'refs/heads/recovery/fase-a-clean-20260831' &&
-      github.event.head_commit.message == 'build(i6.5 B4-003): exact policy-country Hosting-only LAB Preview'
+      github.event.head_commit.message == 'fix(i6.5 B4-003): Node22 TAP CI compatibility for exact LAB Preview'
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     env:
       SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
       SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
       SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      CI_PREDECESSOR_SHA: 42d060f71c9674c36b8d7665dc490b06e7e609b6
       SOURCE_SHA: 3ac952041a4c9a07c6675d7f8f1f38e60f9bef31
       SOURCE_TREE_SHA: b77d6debcd3f4663ccd0a151d1adfe1c10874d73
       PROJECT_ID: ays-orbit-360-lab
@@ -52,14 +54,14 @@ jobs:
       - name: Fail closed on ancestry, exact diff, historic source and official governance
         run: |
           set -euo pipefail
-          test "$(git rev-parse HEAD^)" = "$SOURCE_SHA"
+          test "$(git rev-parse HEAD^)" = "$CI_PREDECESSOR_SHA"
           test "$(git rev-parse "$SOURCE_SHA^{tree}")" = "$SOURCE_TREE_SHA"
-          test "$(git show -s --format=%s HEAD)" = 'build(i6.5 B4-003): exact policy-country Hosting-only LAB Preview'
-          git diff --name-only "$SOURCE_SHA" HEAD | LC_ALL=C sort > "$RUNNER_TEMP/actual-files"
+          test "$(git show -s --format=%s HEAD)" = 'fix(i6.5 B4-003): Node22 TAP CI compatibility for exact LAB Preview'
+          git diff --name-only "$CI_PREDECESSOR_SHA" HEAD | LC_ALL=C sort > "$RUNNER_TEMP/actual-files"
           printf '%s\n' \
             .github/workflows/gravicentra-b4-003-policy-country-lab-preview.yml \
             artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json \
-            artifacts/orbit360-recovery/release-control/I6_5_B4_003_POLICY_COUNTRY_HOSTING_ONLY_PREVIEW_AUTH_20261028.json \
+            artifacts/orbit360-recovery/release-control/I6_5_B4_003_POLICY_COUNTRY_PREVIEW_CI_NODE_OUTPUT_COMPAT_20261028.json \
             tools/gravicentra-i6-control-plane-guard-v1.mjs | LC_ALL=C sort > "$RUNNER_TEMP/expected-files"
           diff -u "$RUNNER_TEMP/expected-files" "$RUNNER_TEMP/actual-files"
           test "$(git hash-object orbit360-platform/core/queries.js)" = 'ab3e22bcce37c91d255075890188258576c3dee7'

@@ -15241,5 +15241,31 @@
     "previewChannelGarbageCollection": false,
     "historicalLocksChanged": false,
     "securityHoldPreserved": true
+  },
+  "b4003PolicyCountryPreviewCiCompatibility20261028": {
+    "status": "CI_NODE_OUTPUT_COMPAT_AUTHORIZED_LAB_PREVIEW_PENDING_READBACK",
+    "gate": "I6.5/B4-003",
+    "authority": "PAULA_EXPLICIT_SECOND_CI_COMPAT_SUCCESSOR_20261028",
+    "parentHead": "42d060f71c9674c36b8d7665dc490b06e7e609b6",
+    "sourceCommit": "3ac952041a4c9a07c6675d7f8f1f38e60f9bef31",
+    "sourceTree": "b77d6debcd3f4663ccd0a151d1adfe1c10874d73",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_POLICY_COUNTRY_PREVIEW_CI_NODE_OUTPUT_COMPAT_20261028.json",
+    "receiptBlobSha": "cbf1f7f63f52cadc71a057ba05d8a9c1a293c0da",
+    "hostingOnly": true,
+    "isolatedLabOnly": true,
+    "newPreviewChannelsMaximum": 1,
+    "expiryDaysMaximum": 7,
+    "backendFunctionDeployment": false,
+    "sharedFirestoreRulesDeployment": false,
+    "authIamMutation": false,
+    "productionHostingDeployment": false,
+    "livePromotion": false,
+    "businessDataMutation": false,
+    "syntheticBusinessWrites": false,
+    "dataImportOrReimport": false,
+    "externalNotifications": false,
+    "previewChannelGarbageCollection": false,
+    "historicalLocksChanged": false,
+    "securityHoldPreserved": true
   }
 }
