@@ -120,7 +120,7 @@ const docs={
 let member={uid:'u1',tenantId,status:'active',roles:['Asesor','Operativo'],advisorId:'a1',countries:['GT','CO'],dataScopes:{default:'own'}};
 let cfg={roleScopes:{asesor:'own',operativo:'all'}};
 const snap=v=>({exists:v!=null,data:()=>v});
-let observedClientPageLimits=[];
+let observedClientPageLimits=[],historyParentGets=0;
 const db={collection:x=>{assert.equal(x,'tenants');return{doc:tenant=>{assert.equal(tenant,tenantId);return{
  collection:col=>{
   if(col==='members')return {doc:()=>({get:async()=>snap(member)})};
@@ -132,7 +132,8 @@ const db={collection:x=>{assert.equal(x,'tenants');return{doc:tenant=>{assert.eq
 function queryModel(table,terms=[],after='',cap=100){
  const rows=docs[table]||{};
  return {
-  doc:id=>({get:async()=>({id,exists:!!rows[id],data:()=>rows[id]})}),
+  doc:id=>({get:async()=>{if(table==='clientes'&&id==='c1')historyParentGets++;
+    return {id,exists:!!rows[id],data:()=>rows[id]};}}),
   where:(field,op,value)=>queryModel(table,terms.concat([{field,op,value}]),after,cap),
   orderBy:field=>{assert.equal(field,'__name__');return queryModel(table,terms,after,cap);},
   startAfter:doc=>queryModel(table,terms,doc.id,cap),
@@ -297,6 +298,35 @@ async function deny(fn,code){let thrown;try{await fn()}catch(e){thrown=e}assert.
  const coHistory=await flow('actividades','operativo',{country:'CO'});
  assert.equal(coHistory.rows.length,0);checks++;
  console.log('B4_003_HISTORY_VERIFIED_RELATION_ROLE_COUNTRY_SCOPE_QA_PASS checks=7 no_data_writes');
+ // One malformed legacy FK must not take down the entire history response.
+ // Hundreds of entries referencing one authorized parent are resolved once
+ // per protected HTTP request, with no cross-user or cross-country cache.
+ docs.actividades.histBadKey={id:'histBadKey',tenantId,clienteId:'not/a/doc',tipo:'nota'};
+ docs.actividades.histCrossTenant={id:'histCrossTenant',tenantId:'foreign-tenant',clienteId:'c1'};
+ docs.actividades.histForeignCountry={id:'histForeignCountry',tenantId,pais:'CO',clienteId:'c1'};
+ const performanceIds=[];
+ for(let i=0;i<120;i++){
+   const id='histLegacy'+String(i).padStart(3,'0');performanceIds.push(id);
+   docs.actividades[id]={id,tenantId,clienteId:'c1',tipo:'nota'};
+ }
+ historyParentGets=0;
+ const activityPage1=await flow('actividades','asesor',{pageSize:50});
+ assert.equal(activityPage1.rows.length,50);
+ assert.ok(activityPage1.nextCursor,'HISTORY_PAGINATION_REQUIRES_AUTHORIZED_CURSOR');
+ assert.ok(activityPage1.rows.every(x=>x.pais==='GT'&&x.tenantId===tenantId),
+   'HISTORY_EACH_ROW_VERIFIED_COUNTRY_TENANT');
+ assert.equal(historyParentGets,1,'HISTORY_PARENT_READ_MUST_BE_DEDUPLICATED_PER_REQUEST');
+ const activityPage2=await flow('actividades','asesor',{pageSize:50,cursor:activityPage1.nextCursor});
+ assert.equal(activityPage2.rows.length,50);
+ assert.equal(historyParentGets,2,'HISTORY_PARENT_CACHE_NOT_SHARED_BETWEEN_CALLS');
+ assert.ok(!activityPage2.rows.some(x=>activityPage1.rows.some(y=>y.id===x.id)));
+ const countryIsolation=await flow('actividades','operativo',{country:'CO'});
+ assert.equal(countryIsolation.rows.length,0,'HISTORY_FOREIGN_COUNTRY_WITH_GT_PARENT_DENIED');
+ const allHistory=await flow('actividades','operativo',{pageSize:50});
+ assert.ok(!allHistory.rows.some(x=>['histBadKey','histCrossTenant','histForeignCountry'].includes(x.id)));
+ for(const id of [...performanceIds,'histBadKey','histCrossTenant','histForeignCountry'])delete docs.actividades[id];
+ checks+=7;
+ console.log('B4_003_HISTORY_LEGACY_DERIVED_SCOPE_CACHE_PAGINATION_QA_PASS 120_synthetic_rows 1_parent_get_per_request malformed_fk_quarantined no_data_writes');
  console.log('B4_003_LEGACY_COUNTRY_RELATION_REGRESSION_PASS checks=3 no_data_writes');
 
  // R23 institutional/individual metas contract against secure B4 list.

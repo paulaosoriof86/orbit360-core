@@ -5,6 +5,17 @@
   "productBrand": "Gravicentra Insurance",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
+  "b4003HistorialReaderSuccessor20261028": {
+    "status": "SOURCE_QA_PASS_LAB_PREVIEW_PENDING_SECURITY_HOLD",
+    "authority": "PAULA_EXPLICIT_SINGLE_CORRECTIVE_SOURCE_AND_PREVIEW_20261028",
+    "gate": "I6.5/B4-003",
+    "parentHead": "9e4fd33a682f19d08b834daf370c73dd17b2b468",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_HISTORIAL_READER_SUCCESSOR_20261028.json",
+    "receiptBlobSha": "4f099c568ba335e8ed3c3b30619f5fac8703da91",
+    "nextAction": "ONE_ISOLATED_LAB_PREVIEW_THEN_AUTHENTICATED_READ_ONLY_HISTORY_PROOF",
+    "currentSecurityHoldUnchanged": true,
+    "productionReleaseAuthorized": false
+  },
   "forensicOriginSha": "9c95f31461f2eabe9804625b5659bee772f5602a",
   "frozenPlan": {
     "path": "artifacts/orbit360-recovery/release-control/PLAN_TRABAJO_CONGELADO_V2.md",

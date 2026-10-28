@@ -436,8 +436,21 @@ async function readScopedRelatedList({db,auth,request}){
    const all=await target.orderBy('__name__').limit(MAX_LEGACY_WORKFLOW_ROWS+1).get();
    const docs=Array.isArray(all.docs)?all.docs:[];
    if(docs.length>MAX_LEGACY_WORKFLOW_ROWS)throw new Denied('WORKFLOW_LEGACY_SCAN_BOUND_EXCEEDED');
+   // Historical activities frequently refer to the same policy or client.
+   // Cache *only within this authorized HTTP request* to avoid a new Firestore
+   // get for each activity; never cache identities, permissions or across users.
+   const parentReads=new Map();
+   function verifiedParent(kind,id){
+     const safe=safeId(id,kind==='polizas'?'POLICY':'CLIENT');
+     const key=kind+':'+safe;
+     if(!parentReads.has(key))parentReads.set(key,docRef(tenant,kind,safe).get()
+       .then(s=>s.exists?s.data()||{}:null));
+     return parentReads.get(key);
+   }
    async function authorize(d){
+     try{
      const row=d.data()||{};
+     if(row.tenantId&&row.tenantId!==tenantId)return null;
      const presentCountry=clean(row.pais||row.country).toUpperCase();
      if(presentCountry&&presentCountry!==country)return null;
      const absentCountry=!presentCountry;
@@ -447,16 +460,13 @@ async function readScopedRelatedList({db,auth,request}){
        const pid=clean(row.polizaId||row.policyId);
        const cid=clean(row.clienteId||row.clientId);
        if(pid){
-         const p=await docRef(tenant,'polizas',safeId(pid,'POLICY')).get();
-         if(!p.exists)return null;
-         const policy=p.data()||{};
+         const policy=await verifiedParent('polizas',pid);
+         if(!policy)return null;
          if(cid&&clean(policy.clienteId)&&cid!==clean(policy.clienteId))return null;
          parent=policy;
        }
        if(!parent&&cid){
-         const c=await docRef(tenant,'clientes',safeId(cid,'CLIENT')).get();
-         if(!c.exists)return null;
-         parent=c.data()||{};
+         parent=await verifiedParent('clientes',cid);
        }
      }
      if(absentCountry&&!parent)return null;
@@ -469,11 +479,19 @@ async function readScopedRelatedList({db,auth,request}){
        pais:clean(row.pais||row.country||parent?.pais||parent?.country),
        tenantId:row.tenantId||tenantId
      });
+     }catch(e){
+       // A malformed legacy FK is a quarantined row, not a reason to fail
+       // the entire protected history; infrastructure errors still fail closed.
+       if(e instanceof Denied)return null;
+       throw e;
+     }
    }
    const filtered=[];
-   // Prevent uncontrolled parallel reads when 250 historical records need FKs.
-   for(let offset=0;offset<docs.length;offset+=10){
-     const batch=await Promise.all(docs.slice(offset,offset+10).map(authorize));
+   // Bounded parallel verification. The parent cache sharply reduces total
+   // reads for the <=1000 legacy activities without widening row scope.
+   const MAX_WORKFLOW_CONCURRENCY=25;
+   for(let offset=0;offset<docs.length;offset+=MAX_WORKFLOW_CONCURRENCY){
+     const batch=await Promise.all(docs.slice(offset,offset+MAX_WORKFLOW_CONCURRENCY).map(authorize));
      filtered.push(...batch.filter(Boolean));
    }
    const index=cursor?filtered.findIndex(x=>x.canonicalDocumentId===cursor):-1;

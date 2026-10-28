@@ -67,6 +67,11 @@ let focalC360CobrosHistoricalBlobs=new Map();
 // earlier immutable receipts may see its exact pre-correction Cobros blob.
 // The active successor and final composition check use physicalGit instead.
 let cobrosQ683HistoricalBlobs=new Map();
+// Only one independently attested Historial reader successor may use its
+// immediate parent's exact blobs when evaluating immutable older evidence.
+// The active tree is checked with physicalGit against its own new receipt.
+let historialReaderHistoricalBlobs=new Map();
+let historialReaderCurrentBlobs=new Map();
 const realGit=(...args)=>args[0]==='hash-object'&&CORRECTIVE_SOURCE_PREVIOUS.has(args[1])
  ?CORRECTIVE_SOURCE_PREVIOUS.get(args[1]):
  args[0]==='hash-object'&&historicalInsurerProductBlobs.has(args[1])
@@ -100,6 +105,50 @@ const sameJson=(a,b)=>JSON.stringify(stable(a))===JSON.stringify(stable(b));
 need(MODE==='governance'||MODE==='i6','I6_GUARD_MODE_INVALID:'+MODE);
 for(const p of [CONTROL,STATUS_LEDGER,AUTH_RECEIPT,I6_ADDENDUM,I6_PLAN_LOCK,V5_MANIFEST,V6_MANIFEST,V6_ADDENDUM,V7_MANIFEST,V7_ADDENDUM,DATA_UPDATE_PLAN,DATA_UPDATE_DISCIPLINE,DATA_UPDATE_REGISTRY,ACTIVE_SOURCE_INTAKE,I63_SOURCE,I63_RECEIPT,I64_SOURCE,I64_RECEIPT,I65_SOURCE,I65_SYNC,I65_FORENSIC_AUDIT,I65_FORENSIC_PLAN,I65_FORENSIC_ADDENDUM,I65_PAYMENT_INFERENCE,I65_FORENSIC_B1,I65_FORENSIC_B2,I65_FORENSIC_B3,I65_FORENSIC_B4,I6_CANONICAL_COMPOSITION,I6_FINDINGS_LEDGER,I65_FORENSIC_PLAN_V2,I65_B2_REJECTION,I65_B2_ROOT_CAUSE]) need(exists(p),'I6_REQUIRED_FILE_MISSING:'+p);
 const C=readJson(CONTROL);
+const HISTORY_SUCCESSOR=C.b4003HistorialReaderSuccessor20261028||null;
+if(HISTORY_SUCCESSOR){
+ const H=HISTORY_SUCCESSOR;
+ const path='artifacts/orbit360-recovery/release-control/I6_5_B4_003_HISTORIAL_READER_SUCCESSOR_20261028.json';
+ const R=readJson(path);
+ const parent='9e4fd33a682f19d08b834daf370c73dd17b2b468';
+ const source='functions/b4-003-scoped-related-reader.js';
+ const qa='tools/gravicentra-b4-003-scoped-related-reader.test.cjs';
+ const expectedFiles=[source,qa,CONTROL,path,
+  'tools/gravicentra-i6-control-plane-guard-v1.mjs',
+  '.github/workflows/gravicentra-b4-003-historial-lab-preview.yml'].sort();
+ const actualHead=physicalGit('rev-parse','HEAD');
+ need(H.status==='SOURCE_QA_PASS_LAB_PREVIEW_PENDING_SECURITY_HOLD'&&
+  H.authority==='PAULA_EXPLICIT_SINGLE_CORRECTIVE_SOURCE_AND_PREVIEW_20261028'&&
+  H.gate==='I6.5/B4-003'&&H.parentHead===parent&&
+  H.receiptPath===path&&H.receiptBlobSha===physicalGit('hash-object',path)&&
+  H.currentSecurityHoldUnchanged===true&&H.productionReleaseAuthorized===false&&
+  R.schema==='GI_I65_B4_003_HISTORIAL_READER_SUCCESSOR_V1'&&
+  R.status===H.status&&R.authority===H.authority&&R.gate===H.gate&&
+  R.repository==='paulaosoriof86/orbit360-core'&&R.branch==='recovery/fase-a-clean-20260831'&&R.parentHead===parent&&
+  Object.keys(R.sourceBlobsBefore||{}).join(',')===source&&
+  Object.keys(R.sourceBlobsAfter||{}).join(',')===source&&
+  Object.keys(R.qaBlobsBefore||{}).join(',')===qa&&
+  Object.keys(R.qaBlobsAfter||{}).join(',')===qa&&
+  [source,qa].every(p=>R[p===source?'sourceBlobsBefore':'qaBlobsBefore'][p]===physicalGit('rev-parse',parent+':'+p))&&
+  [source,qa].every(p=>R[p===source?'sourceBlobsAfter':'qaBlobsAfter'][p]===physicalGit('hash-object',p))&&
+  R.regression?.result==='PASS'&&R.regression?.realFirestoreUsed===false&&R.regression?.dataWrites===0&&
+  R.historicalEvidence?.findingsPreserved===295&&R.historicalEvidence?.frozenTasksPreserved===86&&
+  R.scope?.callable==='orbit360ScopedPolicyReadPreview'&&
+  R.scope?.hosting==='ONE_ISOLATED_LAB_PREVIEW_CHANNEL_ONLY'&&
+  ['sharedFirestoreRulesDeploy','authIamMutation','realBusinessWrites','syntheticDataWrites',
+   'dataMutation','reimport','livePromotion','historicalCertificationsRewritten','securityB4003HoldReleased']
+    .every(k=>R.scope?.[k]===false)&&
+  (actualHead===parent||(
+   physicalGit('rev-parse','HEAD^')===parent&&
+   physicalGit('show','-s','--format=%s','HEAD')==='fix(i6.5 B4-003): bounded legacy history reader in LAB Preview'&&
+   physicalGit('diff','--name-only',parent,'HEAD').split('\n').filter(Boolean).sort().join('|')===expectedFiles.join('|'))),
+  'B4_003_HISTORIAL_READER_SUCCESSOR_INVALID');
+ historialReaderHistoricalBlobs=new Map([[source,R.sourceBlobsBefore[source]],[qa,R.qaBlobsBefore[qa]]]);
+ historialReaderCurrentBlobs=new Map([[source,R.sourceBlobsAfter[source]],[qa,R.qaBlobsAfter[qa]]]);
+ need(C.b4003SecurityReleaseHold?.status==='ACTIVE_FAIL_CLOSED_UNAUTHORIZED_BROWSER_FIRESTORE_READ_WRITE',
+  'B4_003_HISTORIAL_CANNOT_CLEAR_SECURITY_HOLD');
+ console.log('B4_003_HISTORIAL_SUCCESSOR=SOURCE_AND_QA_BYTE_BOUND_HISTORICAL_CERTS_PRESERVED_LAB_ONLY_SECURITY_HOLD');
+}
 const ACTIVE_I65_FORENSIC_B4=String(C.i65ForensicRemediationPlan?.b4?.executionLockPath||I65_FORENSIC_B4);
 need(exists(ACTIVE_I65_FORENSIC_B4),'I6_5_B4_ACTIVE_LOCK_MISSING:'+ACTIVE_I65_FORENSIC_B4);
 const S=readJson(STATUS_LEDGER),A=readJson(AUTH_RECEIPT),M5=readJson(V5_MANIFEST),M6=readJson(V6_MANIFEST),M=readJson(V7_MANIFEST),FRA=readJson(I65_FORENSIC_AUDIT),FRP=readJson(I65_FORENSIC_PLAN),PAY=readJson(I65_PAYMENT_INFERENCE),B1=readJson(I65_FORENSIC_B1),B2=readJson(I65_FORENSIC_B2),B3=readJson(I65_FORENSIC_B3),B4=readJson(ACTIVE_I65_FORENSIC_B4);
@@ -375,9 +424,12 @@ if(POLICY_COUNTRY_PREVIEW_CANONICAL){
  const SOURCE='3ac952041a4c9a07c6675d7f8f1f38e60f9bef31';
  const TREE='b77d6debcd3f4663ccd0a151d1adfe1c10874d73';
  const SUBJECT='fix(i6.5 B4-003): align Hosting-only LAB channel to certified host guard';
+ // A later exact successor keeps this prior host certification anchored to
+ // its own immutable commit, never to the newer HEAD or amended control.
+ const historicHostHead=HISTORY_SUCCESSOR?HISTORY_SUCCESSOR.parentHead:'HEAD';
  const changedPaths=[POLICY_COUNTRY_PREVIEW_WORKFLOW,POLICY_COUNTRY_GUARD_PATH,
   CONTROL,POLICY_COUNTRY_PREVIEW_CANONICAL_RECEIPT].sort();
- const actual=physicalGit('diff','--name-only',PARENT,'HEAD').split(/\r?\n/).filter(Boolean).sort();
+ const actual=physicalGit('diff','--name-only',PARENT,historicHostHead).split(/\r?\n/).filter(Boolean).sort();
  const denied=['backendFunctionDeployment','sharedFirestoreRulesDeployment','authIamMutation',
   'productionHostingDeployment','livePromotion','businessDataMutation','syntheticBusinessWrites',
   'dataImportOrReimport','externalNotifications','previewChannelGarbageCollection'];
@@ -406,15 +458,17 @@ if(POLICY_COUNTRY_PREVIEW_CANONICAL){
   R.repository==='paulaosoriof86/orbit360-core'&&
   R.branch==='recovery/fase-a-clean-20260831'&&
   R.predecessorRemoteHead===PARENT&&R.sourceCommit===SOURCE&&R.sourceTree===TREE&&
-  physicalGit('rev-parse','HEAD^')===PARENT&&
+  physicalGit('rev-parse',historicHostHead+'^')===PARENT&&
   physicalGit('rev-parse',SOURCE+'^{tree}')===TREE&&
-  physicalGit('log','-1','--format=%s','HEAD')===SUBJECT&&
+  physicalGit('log','-1','--format=%s',historicHostHead)===SUBJECT&&
   sameJson(actual,changedPaths)&&sameJson(R.changedPathsOnly?.slice().sort(),changedPaths)&&
   R.workflow?.path===POLICY_COUNTRY_PREVIEW_WORKFLOW&&
   R.workflow?.blobBefore===before(POLICY_COUNTRY_PREVIEW_WORKFLOW)&&
   R.workflow?.blobAfter===physicalGit('hash-object',POLICY_COUNTRY_PREVIEW_WORKFLOW)&&
   R.governance?.guardBlobBefore===before(POLICY_COUNTRY_GUARD_PATH)&&
-  R.governance?.guardBlobAfter===physicalGit('hash-object',POLICY_COUNTRY_GUARD_PATH)&&
+  R.governance?.guardBlobAfter===(HISTORY_SUCCESSOR?
+   physicalGit('rev-parse',HISTORY_SUCCESSOR.parentHead+':'+POLICY_COUNTRY_GUARD_PATH):
+   physicalGit('hash-object',POLICY_COUNTRY_GUARD_PATH))&&
   R.governance?.controlPlaneBlobBefore===before(CONTROL)&&
   R.governance?.originalCiReceiptBlob===physicalGit('hash-object',POLICY_COUNTRY_PREVIEW_CI_RECEIPT)&&
   R.governance?.originalPreviewReceiptBlob===physicalGit('hash-object',POLICY_COUNTRY_PREVIEW_RECEIPT)&&
@@ -823,7 +877,7 @@ if(C360_FINANCIAL_FIX){
   'B4_003_CLIENT360_SHADOW_OWNER_QA_FAILED');
  console.log('B4_003_CLIENT360_FINANCIAL_SHADOW_SUCCESSOR=PASS_HISTORIC_LOCKS_PRESERVED_LIVE_HOLD');
 }
-const preFocalPhysicalHash=p=>focalC360CobrosHistoricalBlobs.get(p)||cobrosQ683HistoricalBlobs.get(p)||historicalOrPhysicalBlob(p);
+const preFocalPhysicalHash=p=>historialReaderHistoricalBlobs.get(p)||focalC360CobrosHistoricalBlobs.get(p)||cobrosQ683HistoricalBlobs.get(p)||historicalOrPhysicalBlob(p);
 // An explicitly byte-bound single-case QA successor can supersede only its
 // two source blobs without rewriting the historically certified composition.
 // The broad B4 execution lock and all previous Preview receipts remain frozen.
@@ -1260,7 +1314,7 @@ if(BACKEND_SCOPE_NEXT){
    COMP.productFiles.includes(p)&&COMP.productFileBlobs[p]===R.sourceBlobsAfter[p])&&
   B4.boundaries?.allowedQaFiles?.includes(qaPath)&&
   R.qaBlobsBefore[qaPath]===physicalGit('rev-parse',A.parentHead+':'+qaPath)&&
-  R.qaBlobsAfter[qaPath]===physicalGit('hash-object',qaPath)&&
+  R.qaBlobsAfter[qaPath]===(historialReaderHistoricalBlobs.get(qaPath)||physicalGit('hash-object',qaPath))&&
   R.qaBlobsAfter[qaPath]!==R.qaBlobsBefore[qaPath]&&
   R.restoredOriginalQa[restoredQa]===physicalGit('rev-parse',A.parentHead+':'+restoredQa)&&
   R.restoredOriginalQa[restoredQa]===physicalGit('hash-object',restoredQa)&&
@@ -3643,6 +3697,8 @@ if(canonicalCompositionActive){
  const declared=[...(COMP.productFiles||[]),...(Q683_CALENDAR_RECEIPT?['orbit360-platform/core/ui.js']:[])].sort();
  need(actualProduct.length===declared.length&&actualProduct.every((p,i)=>p===declared[i]),'I6_CANONICAL_COMPOSITION_EXACT_SET_DRIFT');
  need(declared.every(p=>(COMP.productFileBlobs?.[p]||Q683_CALENDAR_RECEIPT?.sourceBlobsAfter?.[p])&&(
+  historialReaderCurrentBlobs.has(p)
+   ?physicalGit('hash-object',p)===historialReaderCurrentBlobs.get(p):
   POLICY_COUNTRY_CURRENT.has(p)
    ?physicalGit('hash-object',p)===POLICY_COUNTRY_CURRENT.get(p):
   AUTHENTICATED_UAT_CHANGED_BLOBS.has(p)

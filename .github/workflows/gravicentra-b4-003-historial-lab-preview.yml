@@ -1,0 +1,222 @@
+name: Gravicentra B4-003 Historial exact one LAB Preview
+
+# One source-bound successor within I6.5/B4-003. Never a security release.
+on:
+  push:
+    branches:
+      - recovery/fase-a-clean-20260831
+    paths:
+      - .github/workflows/gravicentra-b4-003-historial-lab-preview.yml
+      - artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json
+      - artifacts/orbit360-recovery/release-control/I6_5_B4_003_HISTORIAL_READER_SUCCESSOR_20261028.json
+      - functions/b4-003-scoped-related-reader.js
+      - tools/gravicentra-b4-003-scoped-related-reader.test.cjs
+      - tools/gravicentra-i6-control-plane-guard-v1.mjs
+
+permissions:
+  contents: read
+
+concurrency:
+  group: gravicentra-b4003-historial-one-preview-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  isolated-lab-historial:
+    if: >-
+      github.repository == 'paulaosoriof86/orbit360-core' &&
+      github.ref == 'refs/heads/recovery/fase-a-clean-20260831' &&
+      github.event.head_commit.message == 'fix(i6.5 B4-003): bounded legacy history reader in LAB Preview'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    env:
+      PROJECT_ID: ays-orbit-360-lab
+      HOSTING_SITE: ays-orbit-360-lab
+      TENANT_HINT: alianzas-soluciones
+      PARENT_SHA: 9e4fd33a682f19d08b834daf370c73dd17b2b468
+      RELEASE_GATE: I6.5-B4-003
+      BUILD_PREFIX: gi-i65-b4
+      ENVIRONMENT_REF: firebase-hosting-preview-i6-5-forensic-b4-003
+      GRAVICENTRA_B4_003_SCOPED_PREVIEW: 'true'
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+
+    steps:
+      - name: Checkout exact one source successor
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Fail closed on exact ancestry, diff and official governance
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD^)" = "$PARENT_SHA"
+          test "$(git show -s --format=%s HEAD)" = 'fix(i6.5 B4-003): bounded legacy history reader in LAB Preview'
+          git diff --name-only "$PARENT_SHA" HEAD | LC_ALL=C sort > "$RUNNER_TEMP/actual-files"
+          printf '%s\n' \
+            .github/workflows/gravicentra-b4-003-historial-lab-preview.yml \
+            artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json \
+            artifacts/orbit360-recovery/release-control/I6_5_B4_003_HISTORIAL_READER_SUCCESSOR_20261028.json \
+            functions/b4-003-scoped-related-reader.js \
+            tools/gravicentra-b4-003-scoped-related-reader.test.cjs \
+            tools/gravicentra-i6-control-plane-guard-v1.mjs | LC_ALL=C sort > "$RUNNER_TEMP/expected-files"
+          diff -u "$RUNNER_TEMP/expected-files" "$RUNNER_TEMP/actual-files"
+          test "$(git hash-object functions/b4-003-scoped-related-reader.js)" = '0c8dcec67e7f2316180b37e393cf4a1fd7f57a4c'
+          test "$(git hash-object tools/gravicentra-b4-003-scoped-related-reader.test.cjs)" = '27d6ed768b833afd6580a7a001fecf433ba536be'
+          node tools/gravicentra-b4-003-scoped-related-reader.test.cjs
+          node tools/gravicentra-b4-003-auth-terminal.test.cjs
+          node tools/gravicentra-b4-003-dual-host-protected-transport.test.cjs
+          node tools/gravicentra-governance-preflight-v1.mjs --mode=i6
+          echo 'B4_003_HISTORIAL_GOVERNED_SOURCE_QA=PASS_SECURITY_HOLD_RETAINED'
+
+      - name: Prepare existing read-only LAB configuration and pinned tooling
+        run: |
+          set -euo pipefail
+          AUTH_ROOT="$RUNNER_TEMP/gi-historial-auth"
+          mkdir -p "$AUTH_ROOT"
+          export AUTH_ROOT
+          python3 - <<'PY'
+          import json,os,pathlib
+          root=pathlib.Path(os.environ['AUTH_ROOT'])
+          paths=[]
+          for n,k in enumerate(('SA_ORBIT360_LAB','SA_ORBIT_360_LAB','SA_DEFAULT')):
+              try: candidate=json.loads(os.environ.get(k,''))
+              except Exception: continue
+              if candidate.get('type')=='service_account' and candidate.get('project_id')==os.environ['PROJECT_ID'] and candidate.get('private_key'):
+                  p=root/('candidate-'+str(n)+'.json')
+                  p.write_text(json.dumps(candidate),encoding='utf8')
+                  p.chmod(0o600)
+                  paths.append(str(p))
+          if not paths: raise SystemExit('B4_003_HISTORIAL_LAB_SA_MISSING')
+          (root/'candidates').write_text('\n'.join(paths)+'\n',encoding='utf8')
+          PY
+          CLI_ROOT="$RUNNER_TEMP/gi-historial-firebase-cli"
+          timeout --foreground 420s npm install --prefix "$CLI_ROOT" --no-save --ignore-scripts --no-audit --no-fund firebase-tools@14.10.1
+          node tools/gravicentra-firebase-tools-empty-extensions-workaround-v1.mjs "$CLI_ROOT"
+          CLI="$CLI_ROOT/node_modules/firebase-tools/lib/bin/firebase.js"
+          test -f "$CLI"
+          SELECTED=''
+          while read -r CANDIDATE; do
+            if GOOGLE_APPLICATION_CREDENTIALS="$CANDIDATE" node "$CLI" apps:list WEB --project "$PROJECT_ID" --non-interactive --json >/dev/null 2>&1; then
+              SELECTED="$CANDIDATE"
+              break
+            fi
+          done < "$AUTH_ROOT/candidates"
+          test -n "$SELECTED"
+          cp "$SELECTED" "$RUNNER_TEMP/gi-historial-sa.json"
+          chmod 600 "$RUNNER_TEMP/gi-historial-sa.json"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/gi-historial-sa.json" >> "$GITHUB_ENV"
+          echo "FIREBASE_CLI_BIN=$CLI" >> "$GITHUB_ENV"
+          timeout --foreground 420s npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund firebase-admin@13.4.0
+
+      - name: Read public LAB SDK configuration
+        run: |
+          set -euo pipefail
+          node "$FIREBASE_CLI_BIN" apps:list WEB --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/gi-historial-apps.json"
+          export APPS_FILE="$RUNNER_TEMP/gi-historial-apps.json"
+          APP_ID=$(python3 - <<'PY'
+          import json,os
+          d=json.load(open(os.environ['APPS_FILE']))
+          web=[a for a in (d.get('result') or []) if str(a.get('platform','')).upper() in ('WEB','PLATFORM_WEB','')]
+          if len(web)!=1: raise SystemExit('B4_003_HISTORIAL_LAB_WEB_APP_CARDINALITY_INVALID')
+          print(web[0].get('appId',''))
+          PY
+          )
+          test -n "$APP_ID"
+          node "$FIREBASE_CLI_BIN" apps:sdkconfig WEB "$APP_ID" --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/gi-historial-public-config.json"
+
+      - name: Materialize exact LAB source package
+        run: |
+          set -euo pipefail
+          export SOURCE_SHA="$GITHUB_SHA"
+          node tools/gravicentra-i6-5-b1-branding-snapshot.mjs "$RUNNER_TEMP/gi-historial-branding.json"
+          export TENANT_BRANDING_SNAPSHOT_FILE="$RUNNER_TEMP/gi-historial-branding.json"
+          node tools/gravicentra-i6-1-preview-package.mjs . "$RUNNER_TEMP/gi-historial-package" "$RUNNER_TEMP/gi-historial-public-config.json" > "$RUNNER_TEMP/gi-historial-package-output.json"
+          node --input-type=module - <<'NODE'
+          import fs from 'node:fs';
+          const dir=process.env.RUNNER_TEMP+'/gi-historial-package/bundle';
+          const conf=JSON.parse(fs.readFileSync(dir+'/firebase.json','utf8'));
+          const meta=JSON.parse(fs.readFileSync(dir+'/site/__recovery__/build.json','utf8'));
+          const runtime=fs.readFileSync(dir+'/site/product-runtime-config.js','utf8');
+          const backend=fs.readFileSync(dir+'/backend/b4-003-scoped-related-reader.js','utf8');
+          if(Object.keys(conf).join(',')!=='hosting'||conf.hosting.site!=='ays-orbit-360-lab'||conf.hosting.public!=='site')throw Error('HOSTING_LAB_ONLY_CONFIG_REQUIRED');
+          if(meta.sourceSha!==process.env.GITHUB_SHA||!runtime.includes('"scopedReadPreviewCandidate":true'))throw Error('HOSTED_SOURCE_OR_PROTECTED_READER_MISMATCH');
+          if(!backend.includes('const parentReads=new Map()')||!backend.includes('MAX_WORKFLOW_CONCURRENCY=25'))throw Error('SCOPED_BACKEND_HISTORIAL_PATCH_MISSING');
+          NODE
+
+      - name: Deploy only existing protected read-only LAB callable
+        run: |
+          set -euo pipefail
+          FROOT="$RUNNER_TEMP/gi-historial-functions"
+          mkdir -p "$FROOT"
+          cp -a "$RUNNER_TEMP/gi-historial-package/bundle/backend" "$FROOT/backend"
+          (cd "$FROOT/backend" && npm ci --ignore-scripts --no-audit --no-fund)
+          printf '{"functions":{"source":"backend"}}\n' > "$FROOT/firebase.json"
+          test "$PROJECT_ID" = 'ays-orbit-360-lab'
+          node "$FIREBASE_CLI_BIN" deploy --only functions:orbit360ScopedPolicyReadPreview --config "$FROOT/firebase.json" --project "$PROJECT_ID" --non-interactive
+          echo 'B4_003_HISTORIAL_ONE_EXISTING_READONLY_LAB_FUNCTION_DEPLOYED_NO_SHARED_RULES_NO_LIVE'
+
+      - name: Deploy exactly one isolated seven-day LAB Hosting channel
+        id: hosting
+        run: |
+          set -euo pipefail
+          cd "$RUNNER_TEMP/gi-historial-package/bundle"
+          CHANNEL_ID="gi-i65-b4-$GITHUB_RUN_ID"
+          test "$PROJECT_ID" = 'ays-orbit-360-lab'
+          test "$HOSTING_SITE" = 'ays-orbit-360-lab'
+          node "$FIREBASE_CLI_BIN" hosting:channel:deploy "$CHANNEL_ID" --config firebase.json --project "$PROJECT_ID" --expires 7d --non-interactive --json > "$RUNNER_TEMP/gi-historial-hosting-result.json" 2>&1
+          export CHANNEL_ID
+          PREVIEW_URL=$(python3 - <<'PY'
+          import os,re
+          raw=open(os.environ['RUNNER_TEMP']+'/gi-historial-hosting-result.json',encoding='utf8').read()
+          prefix='https://ays-orbit-360-lab--'+os.environ['CHANNEL_ID']+'-'
+          urls=sorted(set(u.rstrip('/') for u in re.findall(r'https://[A-Za-z0-9._-]+\.web\.app',raw) if u.startswith(prefix)))
+          if len(urls)!=1:raise SystemExit('B4_003_HISTORIAL_ONE_LAB_URL_EXPECTED')
+          print(urls[0])
+          PY
+          )
+          echo "preview_url=$PREVIEW_URL" >> "$GITHUB_OUTPUT"
+          echo "channel_id=$CHANNEL_ID" >> "$GITHUB_OUTPUT"
+          echo 'B4_003_HISTORIAL_ONE_ISOLATED_HOSTING_CHANNEL=DEPLOYED'
+
+      - name: Read back the deployed candidate over HTTPS, never write data
+        env:
+          PREVIEW_URL: ${{ steps.hosting.outputs.preview_url }}
+        run: |
+          set -euo pipefail
+          node --input-type=module - <<'NODE'
+          import fs from 'node:fs';
+          const url=process.env.PREVIEW_URL;
+          const prefix='https://ays-orbit-360-lab--gi-i65-b4-'+process.env.GITHUB_RUN_ID+'-';
+          if(!url.startsWith(prefix)||!url.endsWith('.web.app'))throw Error('B4_003_LAB_URL_INVALID');
+          let build;
+          for(let i=0;i<6;i++){
+            try{
+              const r=await fetch(url+'/__recovery__/build.json',{cache:'no-store',redirect:'error',signal:AbortSignal.timeout(12000)});
+              if(!r.ok)throw Error('BUILD_HTTP_'+r.status);
+              build=await r.json();
+              if(build.sourceSha===process.env.GITHUB_SHA)break;
+            }catch(e){if(i===5)throw e;}
+            await new Promise(resolve=>setTimeout(resolve,1800));
+          }
+          if(build?.sourceSha!==process.env.GITHUB_SHA)throw Error('B4_003_LAB_SOURCE_DRIFT');
+          const result={schema:'GI_I65_B4_003_HISTORIAL_LAB_TECHNICAL_READBACK_V1',status:'HOSTING_READBACK_PASS_AUTHENTICATED_UAT_PENDING',sourceSha:process.env.GITHUB_SHA,previewUrl:url,channelId:'gi-i65-b4-'+process.env.GITHUB_RUN_ID,projectId:process.env.PROJECT_ID,callable:'orbit360ScopedPolicyReadPreview',sharedRulesDeployed:false,authIamChanged:false,firestoreWrites:0,liveDeployed:false,securityB4003Released:false};
+          fs.writeFileSync(process.env.RUNNER_TEMP+'/gi-historial-readback.json',JSON.stringify(result,null,2)+'\n');
+          console.log('B4_003_HISTORIAL_LAB_HOSTING_READBACK=PASS_AUTH_UAT_PENDING');
+          console.log('B4_003_HISTORIAL_LAB_PREVIEW_URL='+url);
+          NODE
+
+      - name: Preserve additive technical readback artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gravicentra-b4003-historial-lab-${{ github.run_id }}
+          path: ${{ runner.temp }}/gi-historial-readback.json
+          if-no-files-found: ignore
+          retention-days: 30

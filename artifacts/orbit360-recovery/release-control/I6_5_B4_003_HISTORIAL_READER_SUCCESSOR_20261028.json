@@ -1,0 +1,55 @@
+{
+  "schema": "GI_I65_B4_003_HISTORIAL_READER_SUCCESSOR_V1",
+  "status": "SOURCE_QA_PASS_LAB_PREVIEW_PENDING_SECURITY_HOLD",
+  "authority": "PAULA_EXPLICIT_SINGLE_CORRECTIVE_SOURCE_AND_PREVIEW_20261028",
+  "gate": "I6.5/B4-003",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "parentHead": "9e4fd33a682f19d08b834daf370c73dd17b2b468",
+  "sourceBlobsBefore": {
+    "functions/b4-003-scoped-related-reader.js": "0ccb30bf7244b09385b71c89553ff50c7f4d3469"
+  },
+  "sourceBlobsAfter": {
+    "functions/b4-003-scoped-related-reader.js": "0c8dcec67e7f2316180b37e393cf4a1fd7f57a4c"
+  },
+  "qaBlobsBefore": {
+    "tools/gravicentra-b4-003-scoped-related-reader.test.cjs": "73444822dce6ed3f3ded4433146737259492844f"
+  },
+  "qaBlobsAfter": {
+    "tools/gravicentra-b4-003-scoped-related-reader.test.cjs": "27d6ed768b833afd6580a7a001fecf433ba536be"
+  },
+  "regression": {
+    "runner": "node tools/gravicentra-b4-003-scoped-related-reader.test.cjs",
+    "result": "PASS",
+    "fixtureActivityRows": 120,
+    "parentReadDeduplicatedPerRequest": true,
+    "parentCacheSharedAcrossRequests": false,
+    "malformedLegacyRelationQuarantined": true,
+    "roleCountryTenantAndPaginationVerified": true,
+    "realFirestoreUsed": false,
+    "dataWrites": 0
+  },
+  "historicalEvidence": {
+    "policy": "PRESERVE_IMMUTABLE_RECEIPTS_AND_CERTIFICATIONS",
+    "historicalActivityCountReference": 785,
+    "historicalSourceLinkableReference": 36,
+    "historicalUnresolvedCountryReference": 749,
+    "notAClaimOfCurrentDataCount": true,
+    "findingsPreserved": 295,
+    "frozenTasksPreserved": 86
+  },
+  "scope": {
+    "hosting": "ONE_ISOLATED_LAB_PREVIEW_CHANNEL_ONLY",
+    "callable": "orbit360ScopedPolicyReadPreview",
+    "sharedFirestoreRulesDeploy": false,
+    "authIamMutation": false,
+    "realBusinessWrites": false,
+    "syntheticDataWrites": false,
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false,
+    "historicalCertificationsRewritten": false,
+    "securityB4003HoldReleased": false
+  },
+  "acceptance": "SOURCE_PASS_ONLY_AUTHENTICATED_READBACK_PENDING_NOT_PRODUCTION_CERTIFIED"
+}
