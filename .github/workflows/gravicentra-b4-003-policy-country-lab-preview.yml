@@ -1,6 +1,6 @@
 name: Gravicentra B4-003 policy-country exact Hosting-only LAB Preview
 
-# One authorized successor from 3ac95204; never dispatch arbitrary sources.
+# One authorized canonical-host correction successor; immutable 3ac95204 source.
 on:
   push:
     branches:
@@ -9,6 +9,7 @@ on:
       - .github/workflows/gravicentra-b4-003-policy-country-lab-preview.yml
       - artifacts/orbit360-recovery/release-control/I6_5_B4_003_POLICY_COUNTRY_HOSTING_ONLY_PREVIEW_AUTH_20261028.json
       - artifacts/orbit360-recovery/release-control/I6_5_B4_003_POLICY_COUNTRY_PREVIEW_CI_NODE_OUTPUT_COMPAT_20261028.json
+      - artifacts/orbit360-recovery/release-control/I6_5_B4_003_POLICY_COUNTRY_PREVIEW_CANONICAL_CHANNEL_20261028.json
 
 permissions:
   contents: read
@@ -22,7 +23,7 @@ jobs:
     if: >-
       github.repository == 'paulaosoriof86/orbit360-core' &&
       github.ref == 'refs/heads/recovery/fase-a-clean-20260831' &&
-      github.event.head_commit.message == 'fix(i6.5 B4-003): Node22 TAP CI compatibility for exact LAB Preview'
+      github.event.head_commit.message == 'fix(i6.5 B4-003): align Hosting-only LAB channel to certified host guard'
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     env:
@@ -30,6 +31,7 @@ jobs:
       SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
       SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
       CI_PREDECESSOR_SHA: 42d060f71c9674c36b8d7665dc490b06e7e609b6
+      HOST_PREDECESSOR_SHA: 2e98fcd5f7da6a4d2109d33f174289dfc63ed403
       SOURCE_SHA: 3ac952041a4c9a07c6675d7f8f1f38e60f9bef31
       SOURCE_TREE_SHA: b77d6debcd3f4663ccd0a151d1adfe1c10874d73
       PROJECT_ID: ays-orbit-360-lab
@@ -54,19 +56,29 @@ jobs:
       - name: Fail closed on ancestry, exact diff, historic source and official governance
         run: |
           set -euo pipefail
-          test "$(git rev-parse HEAD^)" = "$CI_PREDECESSOR_SHA"
+          test "$(git rev-parse HEAD^)" = "$HOST_PREDECESSOR_SHA"
           test "$(git rev-parse "$SOURCE_SHA^{tree}")" = "$SOURCE_TREE_SHA"
-          test "$(git show -s --format=%s HEAD)" = 'fix(i6.5 B4-003): Node22 TAP CI compatibility for exact LAB Preview'
-          git diff --name-only "$CI_PREDECESSOR_SHA" HEAD | LC_ALL=C sort > "$RUNNER_TEMP/actual-files"
+          test "$(git show -s --format=%s HEAD)" = 'fix(i6.5 B4-003): align Hosting-only LAB channel to certified host guard'
+          git diff --name-only "$HOST_PREDECESSOR_SHA" HEAD | LC_ALL=C sort > "$RUNNER_TEMP/actual-files"
           printf '%s\n' \
             .github/workflows/gravicentra-b4-003-policy-country-lab-preview.yml \
             artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json \
-            artifacts/orbit360-recovery/release-control/I6_5_B4_003_POLICY_COUNTRY_PREVIEW_CI_NODE_OUTPUT_COMPAT_20261028.json \
+            artifacts/orbit360-recovery/release-control/I6_5_B4_003_POLICY_COUNTRY_PREVIEW_CANONICAL_CHANNEL_20261028.json \
             tools/gravicentra-i6-control-plane-guard-v1.mjs | LC_ALL=C sort > "$RUNNER_TEMP/expected-files"
           diff -u "$RUNNER_TEMP/expected-files" "$RUNNER_TEMP/actual-files"
           test "$(git hash-object orbit360-platform/core/queries.js)" = 'ab3e22bcce37c91d255075890188258576c3dee7'
           test "$(git hash-object orbit360-platform/modules/cronograma.js)" = '5d412e4ee263bb6cbfbd840b7124871a1e5b6ee8'
           test "$(git hash-object orbit360-platform/modules/cobros-cartera-i65-closure-bridge.js)" = 'a20facb46713ab859754b3fc0d011cf0cfdfc365'
+          for SOURCE_FILE in \
+            orbit360-platform/core/product-runtime-browser-providers-p0.js \
+            orbit360-platform/core/product-app-p0.js \
+            orbit360-platform/core/auth-product-runtime-p0.js \
+            orbit360-platform/index.html; do
+            test "$(git hash-object "$SOURCE_FILE")" = "$(git rev-parse "$SOURCE_SHA:$SOURCE_FILE")"
+          done
+          grep -Fq 'gi-i65-b4-' orbit360-platform/core/product-runtime-browser-providers-p0.js
+          grep -Fq 'gi-i65-b4-' orbit360-platform/core/product-app-p0.js
+          grep -Fq 'gi-i65-b4-' orbit360-platform/core/auth-product-runtime-p0.js
           node tools/gravicentra-governance-preflight-v1.mjs --mode=i6
           echo 'B4_003_EXACT_LAB_HOSTING_PREVIEW_GOVERNANCE=PASS_NO_LIVE_NO_DATA'
 
@@ -160,7 +172,7 @@ jobs:
         run: |
           set -euo pipefail
           cd "$RUNNER_TEMP/gi-b4003-package/bundle"
-          CHANNEL_ID="gi-b4003-pc-$GITHUB_RUN_ID"
+          CHANNEL_ID="gi-i65-b4-$GITHUB_RUN_ID"
           test "$PROJECT_ID" = 'ays-orbit-360-lab'
           test "$HOSTING_SITE" = 'ays-orbit-360-lab'
           # No functions, rules, IAM, production Hosting, database operations or channel cleanup.
@@ -188,7 +200,7 @@ jobs:
           import {createHash} from 'node:crypto';
           const source=process.env.SOURCE_SHA;
           const url=process.env.PREVIEW_URL;
-          if(!url?.startsWith('https://ays-orbit-360-lab--gi-b4003-pc-'+process.env.GITHUB_RUN_ID+'-')||!url.endsWith('.web.app'))
+          if(!url?.startsWith('https://ays-orbit-360-lab--gi-i65-b4-'+process.env.GITHUB_RUN_ID+'-')||!url.endsWith('.web.app'))
             throw Error('B4_003_PREVIEW_URL_NOT_ISOLATED');
           const read=async path=>{
             let err;

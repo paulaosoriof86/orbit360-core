@@ -1,0 +1,81 @@
+{
+  "schema": "GI_I65_B4_003_POLICY_COUNTRY_PREVIEW_CANONICAL_HOST_CHANNEL_V1",
+  "status": "CANONICAL_HOST_CHANNEL_ALIGNMENT_AUTHORIZED_LAB_PREVIEW_PENDING_READBACK",
+  "gate": "I6.5/B4-003",
+  "authority": "PAULA_EXPLICIT_THIRD_CANONICAL_HOST_ALIGNMENT_SUCCESSOR_20261028",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "predecessorRemoteHead": "2e98fcd5f7da6a4d2109d33f174289dfc63ed403",
+  "sourceCommit": "3ac952041a4c9a07c6675d7f8f1f38e60f9bef31",
+  "sourceTree": "b77d6debcd3f4663ccd0a151d1adfe1c10874d73",
+  "commitSubject": "fix(i6.5 B4-003): align Hosting-only LAB channel to certified host guard",
+  "changedPathsOnly": [
+    ".github/workflows/gravicentra-b4-003-policy-country-lab-preview.yml",
+    "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json",
+    "artifacts/orbit360-recovery/release-control/I6_5_B4_003_POLICY_COUNTRY_PREVIEW_CANONICAL_CHANNEL_20261028.json",
+    "tools/gravicentra-i6-control-plane-guard-v1.mjs"
+  ],
+  "rootCause": {
+    "observedBlockedHostPrefix": "gi-b4003-pc-",
+    "certifiedAllowedHostPrefix": "gi-i65-b4-",
+    "browserFailure": "PROTECTED_READ_HOST_DENIED",
+    "fix": "Change only the isolated Firebase Hosting Preview channel ID and its exact technical readback gate to the already-certified host prefix",
+    "codeChanged": false,
+    "authenticationOrAuthorizationExpanded": false,
+    "sourceRuntimeHostAllowlistChanged": false,
+    "originalRejectedPreviewUrl": "https://ays-orbit-360-lab--gi-b4003-pc-40774667381-5nj6s8xa.web.app"
+  },
+  "workflow": {
+    "path": ".github/workflows/gravicentra-b4-003-policy-country-lab-preview.yml",
+    "blobBefore": "c13b5a10b06efc52db8eeb816983f91bd30aa6e8",
+    "blobAfter": "627d78a00c75b16630e2ee4fb9220ef267531b21",
+    "trigger": "ONE_EXACT_THIRD_CANONICAL_HOST_CHANNEL_SUCCESSOR_PUSH_ONLY",
+    "previewChannelPrefix": "gi-i65-b4-",
+    "allowedAction": "firebase hosting:channel:deploy",
+    "hostingOnly": true,
+    "sevenDayExpiry": true
+  },
+  "governance": {
+    "guardBlobBefore": "f74eb34337c48a11c80ba2a77e144a0c3c7f279c",
+    "guardBlobAfter": "f86db4c65c57aa649542f0a90c9f650a1433f23d",
+    "controlPlaneBlobBefore": "4ccf3557e2124563997c4266bf3b89c3e8341a11",
+    "originalCiReceiptBlob": "cbf1f7f63f52cadc71a057ba05d8a9c1a293c0da",
+    "originalPreviewReceiptBlob": "0e2ba0a355b143fde958c3c29e8cd429360bc4f1",
+    "originalPolicyReceiptBlob": "dd074029e40672fcdee9250aaab08682c398a974",
+    "historicalCertificationsEdited": false,
+    "historicalB4LocksEdited": false
+  },
+  "scope": {
+    "hostingProject": "ays-orbit-360-lab",
+    "hostingSite": "ays-orbit-360-lab",
+    "sourceImmutable": true,
+    "previewOnly": true,
+    "hostingOnly": true,
+    "maximumOneChannel": true,
+    "expiryDays": 7,
+    "readbackHttpsOnly": true,
+    "backendFunctionDeployment": false,
+    "sharedFirestoreRulesDeployment": false,
+    "authIamMutation": false,
+    "productionHostingDeployment": false,
+    "livePromotion": false,
+    "businessDataMutation": false,
+    "syntheticBusinessWrites": false,
+    "dataImportOrReimport": false,
+    "externalNotifications": false,
+    "previewChannelGarbageCollection": false
+  },
+  "preserved": {
+    "findings": 295,
+    "frozenTasks": 86,
+    "p0Open": 6,
+    "securityHold": "ACTIVE_FAIL_CLOSED_UNAUTHORIZED_BROWSER_FIRESTORE_READ_WRITE",
+    "authenticatedWriteUatStillPending": true,
+    "liveReadiness": "HOLD_NO_GO"
+  },
+  "technicalReadback": {
+    "status": "PENDING_EXACT_REMOTE_THIRD_SUCCESSOR_CI",
+    "newPreviewUrl": null,
+    "authenticatedOrBusinessDataWrites": 0
+  }
+}
