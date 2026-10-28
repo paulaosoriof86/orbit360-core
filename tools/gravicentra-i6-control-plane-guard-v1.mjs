@@ -296,6 +296,9 @@ if(COBROS_Q683){
 // not against the moving HEAD. Later authorized source/guard successors must
 // preserve the original four-file proof without pretending to be that commit.
 const Q683_COBROS_HOSTING_AUTH=C.b4003Q683CobrosHostingPreview20261027||null;
+const AUTH_UAT_PREVIEW_RECEIPT_PATH='artifacts/orbit360-recovery/release-control/I6_5_B4_003_AUTHENTICATED_UAT_ONE_FUNCTION_PREVIEW_AUTH_20261028.json';
+const AUTH_UAT_PREVIEW_RECEIPT=fs.existsSync(AUTH_UAT_PREVIEW_RECEIPT_PATH)
+ ?readJson(AUTH_UAT_PREVIEW_RECEIPT_PATH):null;
 if(Q683_COBROS_HOSTING_AUTH){
  const A=Q683_COBROS_HOSTING_AUTH,R=readJson(A.receiptPath),P='7a09bd51e1257f4d8e4de0e59631f3646506ca81';
  const deployedPreviewCommit='c85bf90179ae9bbc97021ff4580dcf0291c5de8d';
@@ -327,7 +330,9 @@ if(Q683_COBROS_HOSTING_AUTH){
   R.calendarSourceReceiptBlobSha===A.calendarSourceReceiptBlobSha&&
   R.workflowPath===workflowPath&&R.workflowBlobShaBefore===physicalGit('rev-parse',P+':'+workflowPath)&&
   R.workflowBlobShaAfter===physicalGit('rev-parse',deployedPreviewCommit+':'+workflowPath)&&
-  R.workflowBlobShaAfter===physicalGit('hash-object',workflowPath)&&
+  (AUTH_UAT_PREVIEW_RECEIPT
+   ?AUTH_UAT_PREVIEW_RECEIPT.workflowBlobShaAfter===physicalGit('hash-object',workflowPath)
+   :R.workflowBlobShaAfter===physicalGit('hash-object',workflowPath))&&
   R.guardPath===guardPath&&R.guardBlobShaBefore===physicalGit('rev-parse',P+':'+guardPath)&&
   R.guardBlobShaAfter===physicalGit('rev-parse',deployedPreviewCommit+':'+guardPath)&&
   R.changedPathsOnly?.slice().sort().join('|')===expectedFiles.join('|')&&
@@ -492,6 +497,67 @@ const AUTHENTICATED_UAT_CHANGED_BLOBS=new Map([
 // immediately preceding c85 bytes until an independently governed successor.
 const authenticatedUatCurrentBlob=p=>AUTHENTICATED_UAT_CHANGED_BLOBS.get(p)||
  physicalGit('rev-parse','c85bf90179ae9bbc97021ff4580dcf0291c5de8d:'+p);
+// Independent exact-blob authorization for the current nine-file source
+// candidate's one-function LAB Preview. This is not a production release,
+// security waiver, broader CI mutation or retroactive Meta V27 acceptance.
+if(AUTH_UAT_PREVIEW_RECEIPT){
+ const R=AUTH_UAT_PREVIEW_RECEIPT;
+ const expectedSource={
+  'functions/product-ops-leads-domain.js':'2fb2ec7aef5d9942acdb1ecc4604040febb33123',
+  'orbit360-platform/core/backend-product-readonly-bootstrap-p0.js':'d1faf74618eed510b76ad0e49604acf9df6c3a81',
+  'orbit360-platform/core/ciclo.js':'92e97567c007b3c9b6f05c15965b2317b46ed262',
+  'orbit360-platform/index.html':'c0d68b11a2990f7b54a38d76410472714ea23e00',
+  'orbit360-platform/modules/cronograma.js':'cbc3109e81630812ae22ebfbb41163f1732aae09'
+ };
+ const expectedQa={
+  'tools/gravicentra-b4-003-business-creation-actor.test.cjs':'9af01c04633dd5cecc3bde7fd32e4878e5db3f6b',
+  'tools/gravicentra-b4-003-cronograma-durable-task.test.cjs':'caeb041d6e9e998fdc704cb45f1cb830e018ad55',
+  'tools/gravicentra-b4-003-protected-hydration.test.cjs':'9b246dde42cb4bf8ab8f9572fc18ccd011da062d'
+ };
+ const forbidden=['otherFunctionsDeployment','sharedFirestoreRulesDeployment','authIamMutation',
+  'realBusinessWritesByWorkflow','syntheticQaWritesByWorkflow','realOperationalPayments',
+  'dataImportOrRefresh','externalCommunications','physicalDeletion',
+  'previewChannelGarbageCollection','productionHostingDeployment','livePromotion','realUserImpersonation'];
+ const expectedPaths=[AUTH_UAT_PREVIEW_RECEIPT_PATH,
+  '.github/workflows/gravicentra-b4-003-executor.yml',
+  'tools/gravicentra-i6-control-plane-guard-v1.mjs'].sort();
+ const subject=physicalGit('log','-1','--format=%s');
+ const exactUatHead=subject==='build(i6.5 B4-003): exact authenticated UAT one-function Preview';
+ need(R.schema==='GI_I65_B4_003_AUTHENTICATED_UAT_ONE_FUNCTION_PREVIEW_AUTH_V1'&&
+  R.status==='AUTHORIZED_ONE_EXACT_LAB_PREVIEW_PENDING_EXECUTION'&&
+  R.gate==='I6.5/B4-003'&&
+  R.authority==='PAULA_20261028_CONTINUE_EXISTING_B4003_EXACT_AUTHENTICATED_WRITE_UAT'&&
+  R.repository==='paulaosoriof86/orbit360-core'&&
+  R.branch==='recovery/fase-a-clean-20260831'&&
+  R.parentRemoteSha==='9cfa022fea087749dcbd78eb6018e9c8447a4b80'&&
+  R.parentTreeSha==='86074a4d2fea84154917a20e4b762ea160d86b6c'&&
+  R.triggerSubject==='build(i6.5 B4-003): exact authenticated UAT one-function Preview'&&
+  R.workflowPath==='.github/workflows/gravicentra-b4-003-executor.yml',
+  'B4_003_UAT_ONE_FUNCTION_PREVIEW_SCOPE_PRECHECK_INVALID');
+ need(R.workflowPath==='.github/workflows/gravicentra-b4-003-executor.yml'&&
+  R.workflowBlobShaAfter===physicalGit('hash-object',R.workflowPath)&&
+  physicalGit('hash-object',AUTH_UAT_PREVIEW_RECEIPT_PATH)==='838aa32daf07e04e2cefc35842528e2f3865fadf'&&
+  sameJson(R.sourceBlobs,expectedSource)&&sameJson(R.qaBlobs,expectedQa)&&
+  Object.entries(R.sourceBlobs).every(([p,sha])=>physicalGit('hash-object',p)===sha)&&
+  Object.entries(R.qaBlobs).every(([p,sha])=>physicalGit('hash-object',p)===sha)&&
+  R.scope?.firebaseProject==='ays-orbit-360-lab'&&
+  R.scope?.tenant==='alianzas-soluciones'&&
+  R.scope?.isolatedHostingPreviewOnly===true&&
+  R.scope?.oneExistingLabFunction==='orbit360OpsLeadsCommandPreview'&&
+  R.scope?.newPreviewChannelsMaximum===1&&
+  forbidden.every(k=>R.scope?.[k]===false)&&
+  R.verification?.exactCandidateReadbackRequired===true&&
+  R.verification?.authenticatedBrowserWritesRequired===true&&
+  R.verification?.twoDistinctUidsRequiredForNotifications===true&&
+  R.verification?.scopeAndCountryReconciliationPending===true&&
+  R.verification?.release==='HOLD_NO_GO'&&
+  (!exactUatHead||(
+   physicalGit('rev-parse','HEAD^^{tree}')===R.parentTreeSha&&
+   physicalGit('diff','--name-only','HEAD^','HEAD').split(/\r?\n/).filter(Boolean).sort().join('|')===expectedPaths.join('|')&&
+   physicalGit('rev-parse','HEAD:'+R.workflowPath)===R.workflowBlobShaAfter)),
+  'B4_003_UAT_ONE_FUNCTION_PREVIEW_EXACT_BLOBS_OR_SCOPE_INVALID');
+ console.log('B4_003_UAT_ONE_FUNCTION_PREVIEW=EXACT_SOURCE_LAB_ONLY_NO_LIVE_SECURITY_HOLD');
+}
 let META_TR_SOURCE_BLOBS=new Map();
 if(META_TR_ACTIVE){
  const Q=readJson(META_TR.receiptPath||'');

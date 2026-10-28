@@ -1,0 +1,52 @@
+{
+  "schema": "GI_I65_B4_003_AUTHENTICATED_UAT_ONE_FUNCTION_PREVIEW_AUTH_V1",
+  "status": "AUTHORIZED_ONE_EXACT_LAB_PREVIEW_PENDING_EXECUTION",
+  "gate": "I6.5/B4-003",
+  "authority": "PAULA_20261028_CONTINUE_EXISTING_B4003_EXACT_AUTHENTICATED_WRITE_UAT",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "parentRemoteSha": "9cfa022fea087749dcbd78eb6018e9c8447a4b80",
+  "parentTreeSha": "86074a4d2fea84154917a20e4b762ea160d86b6c",
+  "triggerSubject": "build(i6.5 B4-003): exact authenticated UAT one-function Preview",
+  "workflowPath": ".github/workflows/gravicentra-b4-003-executor.yml",
+  "workflowBlobShaAfter": "7f9a32f5884c4284273c8d5c9caf1a5102eb236b",
+  "sourceBlobs": {
+    "functions/product-ops-leads-domain.js": "2fb2ec7aef5d9942acdb1ecc4604040febb33123",
+    "orbit360-platform/core/backend-product-readonly-bootstrap-p0.js": "d1faf74618eed510b76ad0e49604acf9df6c3a81",
+    "orbit360-platform/core/ciclo.js": "92e97567c007b3c9b6f05c15965b2317b46ed262",
+    "orbit360-platform/index.html": "c0d68b11a2990f7b54a38d76410472714ea23e00",
+    "orbit360-platform/modules/cronograma.js": "cbc3109e81630812ae22ebfbb41163f1732aae09"
+  },
+  "qaBlobs": {
+    "tools/gravicentra-b4-003-business-creation-actor.test.cjs": "9af01c04633dd5cecc3bde7fd32e4878e5db3f6b",
+    "tools/gravicentra-b4-003-cronograma-durable-task.test.cjs": "caeb041d6e9e998fdc704cb45f1cb830e018ad55",
+    "tools/gravicentra-b4-003-protected-hydration.test.cjs": "9b246dde42cb4bf8ab8f9572fc18ccd011da062d"
+  },
+  "scope": {
+    "firebaseProject": "ays-orbit-360-lab",
+    "tenant": "alianzas-soluciones",
+    "isolatedHostingPreviewOnly": true,
+    "oneExistingLabFunction": "orbit360OpsLeadsCommandPreview",
+    "newPreviewChannelsMaximum": 1,
+    "otherFunctionsDeployment": false,
+    "sharedFirestoreRulesDeployment": false,
+    "authIamMutation": false,
+    "realBusinessWritesByWorkflow": false,
+    "syntheticQaWritesByWorkflow": false,
+    "realOperationalPayments": false,
+    "dataImportOrRefresh": false,
+    "externalCommunications": false,
+    "physicalDeletion": false,
+    "previewChannelGarbageCollection": false,
+    "productionHostingDeployment": false,
+    "livePromotion": false,
+    "realUserImpersonation": false
+  },
+  "verification": {
+    "exactCandidateReadbackRequired": true,
+    "authenticatedBrowserWritesRequired": true,
+    "twoDistinctUidsRequiredForNotifications": true,
+    "scopeAndCountryReconciliationPending": true,
+    "release": "HOLD_NO_GO"
+  }
+}

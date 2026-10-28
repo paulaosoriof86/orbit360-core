@@ -118,11 +118,13 @@ jobs:
           node tools/gravicentra-b4-003-role-first-paint-and-team-regression.test.cjs
           node tools/gravicentra-b4-003-config-users-owner.test.cjs
           node tools/gravicentra-b4-003-portfolio-verified-receipt-amount.test.cjs
+          node tools/gravicentra-b4-003-business-creation-actor.test.cjs
+          node tools/gravicentra-b4-003-cronograma-durable-task.test.cjs
 
       - name: Gate exact B4-003 Preview
         id: gate
         env:
-          META_TR_V27_REQUEST: "${{ (github.event_name == 'workflow_dispatch' && inputs.meta_tr_v27 == true) || (github.event_name == 'push' && github.event.head_commit.message == 'build(i6.5 B4-003): execute authorized Meta TR V27 one-function Preview') }}"
+          META_TR_V27_REQUEST: "${{ (github.event_name == 'workflow_dispatch' && inputs.meta_tr_v27 == true) || (github.event_name == 'push' && (github.event.head_commit.message == 'build(i6.5 B4-003): execute authorized Meta TR V27 one-function Preview' || github.event.head_commit.message == 'build(i6.5 B4-003): exact authenticated UAT one-function Preview')) }}"
           META_TR_V27_CANDIDATE: ${{ inputs.meta_tr_source_sha || '' }}
         run: |
           set -euo pipefail
@@ -1686,6 +1688,25 @@ jobs:
             && currentSubject===metaDispatchSubject
             && require('node:child_process').execFileSync('git',['rev-parse','HEAD^'],{encoding:'utf8'}).trim()==='5f7e5a60f88e02849bb840f8c9eb03bf60dfe0f5'
             && require('node:child_process').execFileSync('git',['diff','--name-only','HEAD^','HEAD'],{encoding:'utf8'}).trim()==='.github/workflows/gravicentra-b4-003-executor.yml';
+          // Additive 28-Oct successor: one exact authenticated-UAT candidate,
+          // one existing LAB callable and one isolated Hosting channel. The
+          // historical Meta TR V27 receipt is never rewritten or relaxed.
+          const uatReceiptPath='artifacts/orbit360-recovery/release-control/I6_5_B4_003_AUTHENTICATED_UAT_ONE_FUNCTION_PREVIEW_AUTH_20261028.json';
+          const uatReceipt=JSON.parse(fs.readFileSync(uatReceiptPath,'utf8'));
+          const uatSubject='build(i6.5 B4-003): exact authenticated UAT one-function Preview';
+          const gitExact=(...args)=>require('node:child_process').execFileSync('git',args,{encoding:'utf8'}).trim();
+          const uatChangedPaths=[
+            '.github/workflows/gravicentra-b4-003-executor.yml',
+            'artifacts/orbit360-recovery/release-control/I6_5_B4_003_AUTHENTICATED_UAT_ONE_FUNCTION_PREVIEW_AUTH_20261028.json',
+            'tools/gravicentra-i6-control-plane-guard-v1.mjs'
+          ];
+          const uatPush=process.env.GITHUB_EVENT_NAME==='push'
+            && process.env.GITHUB_REPOSITORY==='paulaosoriof86/orbit360-core'
+            && process.env.GITHUB_REF_NAME==='recovery/fase-a-clean-20260831'
+            && currentSubject===uatSubject
+            && gitExact('rev-parse','HEAD^')===uatReceipt.parentRemoteSha
+            && gitExact('rev-parse','HEAD^^{tree}')===uatReceipt.parentTreeSha
+            && gitExact('diff','--name-only','HEAD^','HEAD').split(/\r?\n/).filter(Boolean).sort().join('|')===uatChangedPaths.sort().join('|');
           const metaRequested=process.env.META_TR_V27_REQUEST==='true';
           const metaCandidate=metaPush?process.env.CANDIDATE_SOURCE_SHA:process.env.META_TR_V27_CANDIDATE;
           const metaReceiptPath='artifacts/orbit360-recovery/release-control/I6_5_B4_003_META_TR_V27_SINGLE_CASE_SUCCESSOR_20261025.json';
@@ -1728,8 +1749,53 @@ jobs:
             && l.boundaries?.dataMutationAuthorized===false
             && l.boundaries?.livePromotionAuthorized===false
             && !previewOk&&!renewalsPreview&&!scopedPreview;
-          if(metaRequested&&!metaAllowed)throw Error('B4_003_META_TR_V27_MANUAL_SINGLE_FUNCTION_PREVIEW_NOT_AUTHORIZED');
-          fs.appendFileSync(process.env.GITHUB_OUTPUT,'meta_tr_preview='+(metaAllowed?'true':'false')+'\n');
+          const uatForbidden=[
+            'otherFunctionsDeployment','sharedFirestoreRulesDeployment','authIamMutation',
+            'realBusinessWritesByWorkflow','syntheticQaWritesByWorkflow',
+            'realOperationalPayments','dataImportOrRefresh','externalCommunications',
+            'physicalDeletion','previewChannelGarbageCollection',
+            'productionHostingDeployment','livePromotion','realUserImpersonation'
+          ];
+          const uatAllowed=metaRequested&&uatPush
+            && uatReceipt.schema==='GI_I65_B4_003_AUTHENTICATED_UAT_ONE_FUNCTION_PREVIEW_AUTH_V1'
+            && uatReceipt.status==='AUTHORIZED_ONE_EXACT_LAB_PREVIEW_PENDING_EXECUTION'
+            && uatReceipt.gate==='I6.5/B4-003'
+            && uatReceipt.authority==='PAULA_20261028_CONTINUE_EXISTING_B4003_EXACT_AUTHENTICATED_WRITE_UAT'
+            && uatReceipt.repository==='paulaosoriof86/orbit360-core'
+            && uatReceipt.branch==='recovery/fase-a-clean-20260831'
+            && uatReceipt.parentRemoteSha==='9cfa022fea087749dcbd78eb6018e9c8447a4b80'
+            && uatReceipt.parentTreeSha==='86074a4d2fea84154917a20e4b762ea160d86b6c'
+            && uatReceipt.triggerSubject===uatSubject
+            && uatReceipt.workflowPath==='.github/workflows/gravicentra-b4-003-executor.yml'
+            && uatReceipt.workflowBlobShaAfter===gitExact('hash-object',uatReceipt.workflowPath)
+            && Object.keys(uatReceipt.sourceBlobs||{}).length===5
+            && Object.keys(uatReceipt.qaBlobs||{}).length===3
+            && Object.entries(uatReceipt.sourceBlobs||{}).every(([path,sha])=>gitExact('hash-object',path)===sha)
+            && Object.entries(uatReceipt.qaBlobs||{}).every(([path,sha])=>gitExact('hash-object',path)===sha)
+            && uatReceipt.scope?.firebaseProject==='ays-orbit-360-lab'
+            && uatReceipt.scope?.tenant==='alianzas-soluciones'
+            && uatReceipt.scope?.isolatedHostingPreviewOnly===true
+            && uatReceipt.scope?.oneExistingLabFunction==='orbit360OpsLeadsCommandPreview'
+            && uatReceipt.scope?.newPreviewChannelsMaximum===1
+            && uatForbidden.every(k=>uatReceipt.scope?.[k]===false)
+            && uatReceipt.verification?.exactCandidateReadbackRequired===true
+            && uatReceipt.verification?.authenticatedBrowserWritesRequired===true
+            && uatReceipt.verification?.twoDistinctUidsRequiredForNotifications===true
+            && uatReceipt.verification?.release==='HOLD_NO_GO'
+            && c.currentB4?.status==='B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL'
+            && c.nextAction==='I6_5_FORENSIC_REMEDIATION_B4_003_R20_TARGETED_PAULA_VISUAL'
+            && c.b4003SecurityReleaseHold?.status==='ACTIVE_FAIL_CLOSED_UNAUTHORIZED_BROWSER_FIRESTORE_READ_WRITE'
+            && l.activeFinding?.id==='B4-003'
+            && l.boundaries?.realOperationalWritesAuthorized===false
+            && l.boundaries?.businessWritesAuthorized===false
+            && l.boundaries?.syntheticQaWritesAuthorized===false
+            && l.boundaries?.dataMutationAuthorized===false
+            && l.boundaries?.livePromotionAuthorized===false
+            && !previewOk&&!renewalsPreview&&!scopedPreview;
+          const oneFunctionPreview=metaAllowed||uatAllowed;
+          if(metaRequested&&!oneFunctionPreview)throw Error('B4_003_ONE_FUNCTION_PREVIEW_NOT_AUTHORIZED');
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'meta_tr_preview='+(oneFunctionPreview?'true':'false')+'\n');
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'authenticated_uat_preview='+(uatAllowed?'true':'false')+'\n');
           // No custom Firebase Auth tokens for real users without explicit scoped approval.
           const identityProofAllowed=!q683Preview&&scopedPreview&&c.b4003ProtectedPreviewAuthorization?.realUserImpersonationAuthorized===true;
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'authenticated_identity_proof='+(identityProofAllowed?'true':'false')+'\n');
@@ -1756,7 +1822,7 @@ jobs:
           if(currentSubject===commercialSubject&&!commercialReadonly)throw Error('B4_003_COMMERCIAL_READONLY_GATE_DENIED');
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'commercial_readonly='+(commercialReadonly?'true':'false')+'\n');
 
-          const requestedModes={scopedPreview,preview:previewOk,renewalsPreview,apply:applyOk,r20DryRun,r20Apply,r20CutoffApply,secondReviewDryRun,p0CumulativeReadOnly,r26RulesReadOnly,r26ReadOnly,financeCoverage,financialIdAllowed,publicBrowserSmoke,commercialReadonly,securityQa};
+          const requestedModes={scopedPreview,preview:previewOk,renewalsPreview,oneFunctionPreview,apply:applyOk,r20DryRun,r20Apply,r20CutoffApply,secondReviewDryRun,p0CumulativeReadOnly,r26RulesReadOnly,r26ReadOnly,financeCoverage,financialIdAllowed,publicBrowserSmoke,commercialReadonly,securityQa};
           const enabledModes=Object.entries(requestedModes).filter(([,on])=>on).map(([name])=>name);
           if(!enabledModes.length){
             fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY,'### B4-003: NOOP (not a Preview PASS)\nNo build, deploy, authenticated browser test, or readback was executed. Control Plane nextAction: `'+String(c.nextAction)+'`.\n');
@@ -3012,7 +3078,7 @@ jobs:
           echo '{"functions":{"source":"backend"}}' > "$FROOT/firebase.json"
           if [ "${{ steps.gate.outputs.meta_tr_preview }}" = "true" ]; then
             node "$FIREBASE_CLI_BIN" deploy --only functions:orbit360OpsLeadsCommandPreview --config "$FROOT/firebase.json" --project "$PROJECT_ID" --non-interactive
-            printf '{"status":"META_TR_V27_ONE_EXISTING_LAB_PREVIEW_FUNCTION_DEPLOYED","sourceSha":"%s","backendSourceDigest":"%s","functions":["orbit360OpsLeadsCommandPreview"],"otherFunctionsDeployed":false,"sharedFirestoreRulesDeployed":false,"productionDeployed":false,"syntheticBusinessWrites":0,"identityProof":"PENDING_REAL_USER_READBACK"}\n' "$CANDIDATE_SOURCE_SHA" "${{ steps.build.outputs.backend_source_digest }}" > "$RUNNER_TEMP/b4-003-package/evidence/b4-003-preview-backend-binding.json"
+            printf '{"status":"ONE_EXISTING_LAB_PREVIEW_FUNCTION_DEPLOYED_PENDING_AUTHENTICATED_UAT","sourceSha":"%s","backendSourceDigest":"%s","functions":["orbit360OpsLeadsCommandPreview"],"otherFunctionsDeployed":false,"sharedFirestoreRulesDeployed":false,"productionDeployed":false,"syntheticBusinessWrites":0,"identityProof":"PENDING_REAL_USER_READBACK"}\n' "$CANDIDATE_SOURCE_SHA" "${{ steps.build.outputs.backend_source_digest }}" > "$RUNNER_TEMP/b4-003-package/evidence/b4-003-preview-backend-binding.json"
           elif [ "${{ steps.gate.outputs.scoped_preview }}" = "true" ]; then
             if [ "${{ steps.gate.outputs.readonly_roster }}" = "true" ]; then
               node "$FIREBASE_CLI_BIN" deploy --only functions:orbit360ScopedPolicyReadPreview,functions:orbit360AssignableAdvisorRosterPreview --config "$FROOT/firebase.json" --project "$PROJECT_ID" --non-interactive
@@ -3092,6 +3158,7 @@ jobs:
           META_TR_V27_PREVIEW_URL: ${{ steps.preview.outputs.preview_url }}
           META_TR_V27_BUILD_ID: ${{ steps.build.outputs.build_id }}
           META_TR_V27_BACKEND_DIGEST: ${{ steps.build.outputs.backend_source_digest }}
+          B4_003_AUTHENTICATED_UAT: ${{ steps.gate.outputs.authenticated_uat_preview }}
         run: |
           set -euo pipefail
           node "$FIREBASE_CLI_BIN" functions:list --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/b4-003-meta-tr-functions-readback.json"
@@ -3101,16 +3168,20 @@ jobs:
           const rows=Array.isArray(raw)?raw:Array.isArray(raw.result)?raw.result:[];
           if(!rows.some(row=>String(row.id||row.name||row.function||'').split('/').pop()==='orbit360OpsLeadsCommandPreview'))
             throw Error('META_TR_V27_SINGLE_FUNCTION_READBACK_MISSING');
-          const evidence={status:'PREVIEW_PUBLISHED_AUTHENTICATED_TR_01_TO_TR_07_PENDING',gate:'I6.5/B4-003',project:'ays-orbit-360-lab',tenant:'alianzas-soluciones',caseId:'b4003qa_meta_tr_v27_20261025_01',channel:'Facebook',pieceId:'F02-V27-QA',previewUrl:process.env.META_TR_V27_PREVIEW_URL,sourceSha:process.env.CANDIDATE_SOURCE_SHA,buildId:process.env.META_TR_V27_BUILD_ID,backendSourceDigest:process.env.META_TR_V27_BACKEND_DIGEST,deployedExistingFunctions:['orbit360OpsLeadsCommandPreview'],otherFunctionsDeployed:false,sharedLabPreviewCallable:true,sharedFirestoreRulesDeployed:false,authIamMutations:false,productionDeployed:false,physicalDeletions:false,syntheticWritesPerformedByWorkflow:0,authenticatedRoleReadback:'PENDING',tr01ToTr07:'HOLD',k01ToK06:'HOLD',production:'NO_GO'};
-          fs.writeFileSync(process.env.RUNNER_TEMP+'/b4-003-package/evidence/b4-003-meta-tr-v27-preview-publication.json',JSON.stringify(evidence,null,2)+'\n');
-          console.log('B4_003_META_TR_V27_PREVIEW_PUBLICATION=PASS; TR-01..TR-07 remain HOLD until signed-in readback');
+          const isUat=process.env.B4_003_AUTHENTICATED_UAT==='true';
+          const evidence=isUat
+            ? {status:'EXACT_PREVIEW_PUBLISHED_AUTHENTICATED_UAT_PENDING',gate:'I6.5/B4-003',project:'ays-orbit-360-lab',tenant:'alianzas-soluciones',scope:'FULL_PHASE_A_AUTHENTICATED_SYNTHETIC_WRITE_UAT',previewUrl:process.env.META_TR_V27_PREVIEW_URL,sourceSha:process.env.CANDIDATE_SOURCE_SHA,buildId:process.env.META_TR_V27_BUILD_ID,backendSourceDigest:process.env.META_TR_V27_BACKEND_DIGEST,deployedExistingFunctions:['orbit360OpsLeadsCommandPreview'],otherFunctionsDeployed:false,sharedFirestoreRulesDeployed:false,authIamMutations:false,productionDeployed:false,physicalDeletions:false,syntheticWritesPerformedByWorkflow:0,authenticatedRoleReadback:'PENDING',twoDistinctUserUids:'PENDING',businessFlows:'HOLD',production:'NO_GO'}
+            : {status:'PREVIEW_PUBLISHED_AUTHENTICATED_TR_01_TO_TR_07_PENDING',gate:'I6.5/B4-003',project:'ays-orbit-360-lab',tenant:'alianzas-soluciones',caseId:'b4003qa_meta_tr_v27_20261025_01',channel:'Facebook',pieceId:'F02-V27-QA',previewUrl:process.env.META_TR_V27_PREVIEW_URL,sourceSha:process.env.CANDIDATE_SOURCE_SHA,buildId:process.env.META_TR_V27_BUILD_ID,backendSourceDigest:process.env.META_TR_V27_BACKEND_DIGEST,deployedExistingFunctions:['orbit360OpsLeadsCommandPreview'],otherFunctionsDeployed:false,sharedLabPreviewCallable:true,sharedFirestoreRulesDeployed:false,authIamMutations:false,productionDeployed:false,physicalDeletions:false,syntheticWritesPerformedByWorkflow:0,authenticatedRoleReadback:'PENDING',tr01ToTr07:'HOLD',k01ToK06:'HOLD',production:'NO_GO'};
+          const evidenceName=isUat?'b4-003-authenticated-uat-preview-publication.json':'b4-003-meta-tr-v27-preview-publication.json';
+          fs.writeFileSync(process.env.RUNNER_TEMP+'/b4-003-package/evidence/'+evidenceName,JSON.stringify(evidence,null,2)+'\n');
+          console.log('B4_003_'+(isUat?'AUTHENTICATED_UAT':'META_TR_V27')+'_PREVIEW_PUBLICATION=PASS; business flows and LIVE remain HOLD until signed-in readback');
           NODE
 
       - name: Upload immutable Meta TR V27 publication evidence
         if: always() && steps.gate.outputs.meta_tr_preview == 'true'
         uses: actions/upload-artifact@v4
         with:
-          name: gravicentra-b4-003-meta-tr-v27-${{ github.run_id }}
+          name: gravicentra-b4-003-one-function-preview-${{ github.run_id }}
           path: |
             ${{ runner.temp }}/b4-003-meta-tr-functions-readback.json
             ${{ runner.temp }}/b4-003-package/evidence
