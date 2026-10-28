@@ -1,0 +1,53 @@
+{
+  "schema": "GI_I65_B4_003_AUTHENTICATED_UAT_PREVIEW_LOGIN_CONFIG_FIX_V1",
+  "status": "BOUNDED_LAB_PREVIEW_CONFIG_CORRECTION_PENDING",
+  "gate": "I6.5/B4-003",
+  "authority": "PAULA_PHASE_A_AUTHENTICATED_UAT_CONTINUATION_BLOCKING_LOGIN_REPAIR_20261028",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "parentRemoteSha": "68e70fb4674d349da416c27cd2fb3e9326147f6a",
+  "parentTreeSha": "31b163e2724d1fdeb2870d7ca292ab79b7b8143d",
+  "sourceCommit": "68e70fb4674d349da416c27cd2fb3e9326147f6a",
+  "sourceTree": "31b163e2724d1fdeb2870d7ca292ab79b7b8143d",
+  "previousUatReceiptBlobSha": "838aa32daf07e04e2cefc35842528e2f3865fadf",
+  "previousWorkflowBlobSha": "7f9a32f5884c4284273c8d5c9caf1a5102eb236b",
+  "workflowPath": ".github/workflows/gravicentra-b4-003-executor.yml",
+  "workflowBlobShaAfter": "cf8305c9a5c4b483c2c5ea90cc5ea010dffa8588",
+  "triggerSubject": "build(i6.5 B4-003): repair protected authenticated UAT Preview config",
+  "cause": {
+    "publicRuntimeConfigBefore": "scopedReadPreviewCandidate=false",
+    "providerInitializationBlock": "PROTECTED_READ_CANDIDATE_DISABLED",
+    "observedSymptom": "LOGIN_UNAVAILABLE_BEFORE_CREDENTIALS_AND_GENERIC_SIGNIN_FAILURE",
+    "remediation": "scopedReadPreviewCandidate=true on exact isolated LAB candidate",
+    "credentialsRejectedNotEstablished": true
+  },
+  "scope": {
+    "firebaseProject": "ays-orbit-360-lab",
+    "tenant": "alianzas-soluciones",
+    "exactSourceCommitOnly": true,
+    "scopedReadPreviewCandidate": true,
+    "oneExistingLabFunction": "orbit360OpsLeadsCommandPreview",
+    "newPreviewChannelsMaximum": 1,
+    "otherFunctionsDeployment": false,
+    "sharedFirestoreRulesDeployment": false,
+    "authIamMutation": false,
+    "realBusinessWritesByWorkflow": false,
+    "syntheticQaWritesByWorkflow": false,
+    "realOperationalPayments": false,
+    "dataImportOrRefresh": false,
+    "externalCommunications": false,
+    "physicalDeletion": false,
+    "previewChannelGarbageCollection": false,
+    "productionHostingDeployment": false,
+    "livePromotion": false,
+    "realUserImpersonation": false
+  },
+  "verification": {
+    "exactHostingFileAndBuildMarkerReadbackRequired": true,
+    "publishedPublicConfigScopedFlagRequired": true,
+    "authenticatedLoginInChromeRequired": true,
+    "protectedReaderAfterLoginRequired": true,
+    "twoUidsAndSyntheticBusinessFlowsPending": true,
+    "release": "HOLD_NO_GO"
+  }
+}

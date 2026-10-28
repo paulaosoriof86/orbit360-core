@@ -124,7 +124,7 @@ jobs:
       - name: Gate exact B4-003 Preview
         id: gate
         env:
-          META_TR_V27_REQUEST: "${{ (github.event_name == 'workflow_dispatch' && inputs.meta_tr_v27 == true) || (github.event_name == 'push' && (github.event.head_commit.message == 'build(i6.5 B4-003): execute authorized Meta TR V27 one-function Preview' || github.event.head_commit.message == 'build(i6.5 B4-003): exact authenticated UAT one-function Preview')) }}"
+          META_TR_V27_REQUEST: "${{ (github.event_name == 'workflow_dispatch' && inputs.meta_tr_v27 == true) || (github.event_name == 'push' && (github.event.head_commit.message == 'build(i6.5 B4-003): execute authorized Meta TR V27 one-function Preview' || github.event.head_commit.message == 'build(i6.5 B4-003): exact authenticated UAT one-function Preview' || github.event.head_commit.message == 'build(i6.5 B4-003): repair protected authenticated UAT Preview config')) }}"
           META_TR_V27_CANDIDATE: ${{ inputs.meta_tr_source_sha || '' }}
         run: |
           set -euo pipefail
@@ -1792,10 +1792,77 @@ jobs:
             && l.boundaries?.dataMutationAuthorized===false
             && l.boundaries?.livePromotionAuthorized===false
             && !previewOk&&!renewalsPreview&&!scopedPreview;
-          const oneFunctionPreview=metaAllowed||uatAllowed;
+          // Correct only the isolated Preview public auth flag. Exact product
+          // source remains pinned to the prior approved UAT candidate; the
+          // corrective commit may touch workflow, guard and additive receipt.
+          const loginFixReceiptPath='artifacts/orbit360-recovery/release-control/I6_5_B4_003_AUTHENTICATED_UAT_PREVIEW_LOGIN_CONFIG_FIX_20261028.json';
+          const loginFixReceipt=JSON.parse(fs.readFileSync(loginFixReceiptPath,'utf8'));
+          const loginFixSubject='build(i6.5 B4-003): repair protected authenticated UAT Preview config';
+          const loginFixPaths=[
+            '.github/workflows/gravicentra-b4-003-executor.yml',
+            'artifacts/orbit360-recovery/release-control/I6_5_B4_003_AUTHENTICATED_UAT_PREVIEW_LOGIN_CONFIG_FIX_20261028.json',
+            'tools/gravicentra-i6-control-plane-guard-v1.mjs'
+          ];
+          const loginFixPush=process.env.GITHUB_EVENT_NAME==='push'
+            && process.env.GITHUB_REPOSITORY==='paulaosoriof86/orbit360-core'
+            && process.env.GITHUB_REF_NAME==='recovery/fase-a-clean-20260831'
+            && currentSubject===loginFixSubject
+            && gitExact('rev-parse','HEAD^')===loginFixReceipt.parentRemoteSha
+            && gitExact('rev-parse','HEAD^^{tree}')===loginFixReceipt.parentTreeSha
+            && gitExact('diff','--name-only','HEAD^','HEAD').split(/\r?\n/).filter(Boolean).sort().join('|')===loginFixPaths.sort().join('|');
+          const loginFixForbidden=[
+            'otherFunctionsDeployment','sharedFirestoreRulesDeployment','authIamMutation',
+            'realBusinessWritesByWorkflow','syntheticQaWritesByWorkflow',
+            'realOperationalPayments','dataImportOrRefresh','externalCommunications',
+            'physicalDeletion','previewChannelGarbageCollection',
+            'productionHostingDeployment','livePromotion','realUserImpersonation'
+          ];
+          const loginFixAllowed=metaRequested&&loginFixPush
+            && loginFixReceipt.schema==='GI_I65_B4_003_AUTHENTICATED_UAT_PREVIEW_LOGIN_CONFIG_FIX_V1'
+            && loginFixReceipt.status==='BOUNDED_LAB_PREVIEW_CONFIG_CORRECTION_PENDING'
+            && loginFixReceipt.gate==='I6.5/B4-003'
+            && loginFixReceipt.authority==='PAULA_PHASE_A_AUTHENTICATED_UAT_CONTINUATION_BLOCKING_LOGIN_REPAIR_20261028'
+            && loginFixReceipt.repository==='paulaosoriof86/orbit360-core'
+            && loginFixReceipt.branch==='recovery/fase-a-clean-20260831'
+            && loginFixReceipt.parentRemoteSha==='68e70fb4674d349da416c27cd2fb3e9326147f6a'
+            && loginFixReceipt.parentTreeSha==='31b163e2724d1fdeb2870d7ca292ab79b7b8143d'
+            && loginFixReceipt.sourceCommit==='68e70fb4674d349da416c27cd2fb3e9326147f6a'
+            && loginFixReceipt.sourceTree===loginFixReceipt.parentTreeSha
+            && loginFixReceipt.previousUatReceiptBlobSha===gitExact('hash-object',uatReceiptPath)
+            && loginFixReceipt.previousWorkflowBlobSha===uatReceipt.workflowBlobShaAfter
+            && loginFixReceipt.workflowPath==='.github/workflows/gravicentra-b4-003-executor.yml'
+            && loginFixReceipt.workflowBlobShaAfter===gitExact('hash-object',loginFixReceipt.workflowPath)
+            && loginFixReceipt.triggerSubject===loginFixSubject
+            && loginFixReceipt.scope?.firebaseProject==='ays-orbit-360-lab'
+            && loginFixReceipt.scope?.tenant==='alianzas-soluciones'
+            && loginFixReceipt.scope?.exactSourceCommitOnly===true
+            && loginFixReceipt.scope?.scopedReadPreviewCandidate===true
+            && loginFixReceipt.scope?.oneExistingLabFunction==='orbit360OpsLeadsCommandPreview'
+            && loginFixReceipt.scope?.newPreviewChannelsMaximum===1
+            && loginFixForbidden.every(k=>loginFixReceipt.scope?.[k]===false)
+            && loginFixReceipt.verification?.exactHostingFileAndBuildMarkerReadbackRequired===true
+            && loginFixReceipt.verification?.publishedPublicConfigScopedFlagRequired===true
+            && loginFixReceipt.verification?.authenticatedLoginInChromeRequired===true
+            && loginFixReceipt.verification?.release==='HOLD_NO_GO'
+            && c.currentB4?.status==='B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL'
+            && c.nextAction==='I6_5_FORENSIC_REMEDIATION_B4_003_R20_TARGETED_PAULA_VISUAL'
+            && c.b4003SecurityReleaseHold?.status==='ACTIVE_FAIL_CLOSED_UNAUTHORIZED_BROWSER_FIRESTORE_READ_WRITE'
+            && l.activeFinding?.id==='B4-003'
+            && l.boundaries?.realOperationalWritesAuthorized===false
+            && l.boundaries?.businessWritesAuthorized===false
+            && l.boundaries?.syntheticQaWritesAuthorized===false
+            && l.boundaries?.dataMutationAuthorized===false
+            && l.boundaries?.livePromotionAuthorized===false
+            && !previewOk&&!renewalsPreview&&!scopedPreview;
+          const oneFunctionPreview=metaAllowed||uatAllowed||loginFixAllowed;
           if(metaRequested&&!oneFunctionPreview)throw Error('B4_003_ONE_FUNCTION_PREVIEW_NOT_AUTHORIZED');
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'meta_tr_preview='+(oneFunctionPreview?'true':'false')+'\n');
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'authenticated_uat_preview='+(uatAllowed?'true':'false')+'\n');
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'auth_login_fix='+(loginFixAllowed?'true':'false')+'\n');
+          if(loginFixAllowed){
+            fs.appendFileSync(process.env.GITHUB_ENV,'CANDIDATE_SOURCE_SHA='+loginFixReceipt.sourceCommit+'\n');
+            console.log('B4_003_LOGIN_FIX_AUTHORIZED_EXACT_SOURCE='+loginFixReceipt.sourceCommit+' SCOPED_FLAG=true LAB_ONLY=true SECURITY_HOLD=true');
+          }
           // No custom Firebase Auth tokens for real users without explicit scoped approval.
           const identityProofAllowed=!q683Preview&&scopedPreview&&c.b4003ProtectedPreviewAuthorization?.realUserImpersonationAuthorized===true;
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'authenticated_identity_proof='+(identityProofAllowed?'true':'false')+'\n');
@@ -3034,7 +3101,7 @@ jobs:
         if: steps.gate.outputs.run == 'true' || steps.gate.outputs.renewals_preview == 'true' || steps.gate.outputs.scoped_preview == 'true' || steps.gate.outputs.meta_tr_preview == 'true'
         id: build
         env:
-          GRAVICENTRA_B4_003_SCOPED_PREVIEW: ${{ steps.gate.outputs.scoped_preview }}
+          GRAVICENTRA_B4_003_SCOPED_PREVIEW: ${{ steps.gate.outputs.scoped_preview == 'true' || steps.gate.outputs.auth_login_fix == 'true' }}
         run: |
           set -euo pipefail
           node tools/gravicentra-i6-5-b1-branding-snapshot.mjs "$RUNNER_TEMP/b4-003-branding-snapshot.json"
@@ -3056,7 +3123,18 @@ jobs:
             esac
             echo 'B4_003_Q683_PACKAGE_SOURCE=EXACT_PINNED_TREE'
           fi
+          if [ "${{ steps.gate.outputs.auth_login_fix }}" = "true" ]; then
+            PACKAGE_SOURCE="$RUNNER_TEMP/b4-003-auth-login-exact-source"
+            test "$SOURCE_SHA" = '68e70fb4674d349da416c27cd2fb3e9326147f6a'
+            git worktree add --detach "$PACKAGE_SOURCE" "$SOURCE_SHA"
+            test "$(git -C "$PACKAGE_SOURCE" rev-parse 'HEAD^{tree}')" = '31b163e2724d1fdeb2870d7ca292ab79b7b8143d'
+            echo 'B4_003_AUTH_LOGIN_PACKAGE_SOURCE=EXACT_PINNED_UAT_TREE'
+          fi
           node tools/gravicentra-i6-1-preview-package.mjs "$PACKAGE_SOURCE" "$RUNNER_TEMP/b4-003-package" "$PUBLIC_CONFIG_FILE" > "$RUNNER_TEMP/b4-003-package-output.json"
+          if [ "${{ steps.gate.outputs.auth_login_fix }}" = "true" ]; then
+            grep -Fq '"scopedReadPreviewCandidate":true' "$RUNNER_TEMP/b4-003-package/bundle/site/product-runtime-config.js"
+            echo 'B4_003_AUTH_LOGIN_PACKAGE_PUBLIC_CONFIG=SCOPED_TRUE'
+          fi
           node - <<'NODE'
           const fs=require('node:fs'),d=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/b4-003-package-output.json'));
           for(const [k,v] of Object.entries({build_id:d.buildId,hosted_payload_digest:d.hostedPayloadDigest,backend_source_digest:d.backendSourceDigest,bundle_digest:d.bundleDigest}))fs.appendFileSync(process.env.GITHUB_OUTPUT,k+'='+v+'\n');
@@ -3158,7 +3236,7 @@ jobs:
           META_TR_V27_PREVIEW_URL: ${{ steps.preview.outputs.preview_url }}
           META_TR_V27_BUILD_ID: ${{ steps.build.outputs.build_id }}
           META_TR_V27_BACKEND_DIGEST: ${{ steps.build.outputs.backend_source_digest }}
-          B4_003_AUTHENTICATED_UAT: ${{ steps.gate.outputs.authenticated_uat_preview }}
+          B4_003_AUTHENTICATED_UAT: ${{ steps.gate.outputs.authenticated_uat_preview == 'true' || steps.gate.outputs.auth_login_fix == 'true' }}
         run: |
           set -euo pipefail
           node "$FIREBASE_CLI_BIN" functions:list --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/b4-003-meta-tr-functions-readback.json"
@@ -3186,6 +3264,24 @@ jobs:
             ${{ runner.temp }}/b4-003-meta-tr-functions-readback.json
             ${{ runner.temp }}/b4-003-package/evidence
           if-no-files-found: warn
+
+      - name: Read back protected login flag on corrected LAB Preview
+        if: steps.gate.outputs.auth_login_fix == 'true'
+        env:
+          TARGET_URL: ${{ steps.preview.outputs.preview_url }}
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import os,urllib.request
+          u=os.environ['TARGET_URL'].rstrip('/')+'/product-runtime-config.js'
+          with urllib.request.urlopen(urllib.request.Request(u,headers={'Cache-Control':'no-cache, no-store'}),timeout=30) as r:
+              text=r.read().decode('utf8')
+          if '"scopedReadPreviewCandidate":true' not in text:
+              raise SystemExit('B4_003_AUTH_LOGIN_PREVIEW_FLAG_NOT_PUBLISHED')
+          if '"sourceSha":"68e70fb4674d349da416c27cd2fb3e9326147f6a"' not in text:
+              raise SystemExit('B4_003_AUTH_LOGIN_PREVIEW_SOURCE_DRIFT')
+          print('B4_003_AUTH_LOGIN_PUBLIC_FLAG=TRUE_SOURCE_PINNED_READBACK_PASS')
+          PY
 
       - name: Protected B4-003 Preview public and emulator smoke
         if: steps.gate.outputs.scoped_preview == 'true'
