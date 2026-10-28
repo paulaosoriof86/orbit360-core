@@ -1,0 +1,72 @@
+{
+  "schema": "GI_I65_B4_003_POLICY_COUNTRY_ONE_HOSTING_ONLY_LAB_PREVIEW_V1",
+  "status": "AUTHORIZED_ONE_HOSTING_ONLY_LAB_PREVIEW_PENDING_TECHNICAL_READBACK",
+  "gate": "I6.5/B4-003",
+  "authority": "PAULA_EXPLICIT_ONE_POLICY_COUNTRY_LAB_PREVIEW_20261028",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "sourceCommit": "3ac952041a4c9a07c6675d7f8f1f38e60f9bef31",
+  "sourceTree": "b77d6debcd3f4663ccd0a151d1adfe1c10874d73",
+  "changedPathsOnly": [
+    ".github/workflows/gravicentra-b4-003-policy-country-lab-preview.yml",
+    "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json",
+    "artifacts/orbit360-recovery/release-control/I6_5_B4_003_POLICY_COUNTRY_HOSTING_ONLY_PREVIEW_AUTH_20261028.json",
+    "tools/gravicentra-i6-control-plane-guard-v1.mjs"
+  ],
+  "workflow": {
+    "path": ".github/workflows/gravicentra-b4-003-policy-country-lab-preview.yml",
+    "blobAfter": "0176c786360a1fa1b43219b1c6fe318d7120944a",
+    "trigger": "ONE_EXACT_SUCCESSOR_PUSH_ONLY",
+    "allowedAction": "firebase hosting:channel:deploy",
+    "previewChannelPrefix": "gi-b4003-pc-",
+    "automaticChannelGarbageCollection": false
+  },
+  "governance": {
+    "guardPath": "tools/gravicentra-i6-control-plane-guard-v1.mjs",
+    "guardBlobBefore": "93fe96d7a880ca4995137a80d2932dddf0acdae1",
+    "guardBlobAfter": "0a076ca459f30bcad18b242653a61dede8802836",
+    "controlPlaneBlobBefore": "ee1a1d80e6f9de3ec9da347bf5de616c76b5071a",
+    "historicPolicyCountryReceiptBlob": "dd074029e40672fcdee9250aaab08682c398a974",
+    "historicalReceiptsAmended": false,
+    "securityGateAdvanced": false
+  },
+  "sourceBlobs": {
+    "orbit360-platform/core/queries.js": "ab3e22bcce37c91d255075890188258576c3dee7",
+    "orbit360-platform/modules/cronograma.js": "5d412e4ee263bb6cbfbd840b7124871a1e5b6ee8",
+    "orbit360-platform/modules/cobros-cartera-i65-closure-bridge.js": "a20facb46713ab859754b3fc0d011cf0cfdfc365"
+  },
+  "scope": {
+    "hostingProject": "ays-orbit-360-lab",
+    "hostingSite": "ays-orbit-360-lab",
+    "previewOnly": true,
+    "hostingOnly": true,
+    "maximumOneChannel": true,
+    "expiryDays": 7,
+    "brandingConfigurationReadOnly": true,
+    "readbackHttpsOnly": true,
+    "backendFunctionDeployment": false,
+    "sharedFirestoreRulesDeployment": false,
+    "authIamMutation": false,
+    "productionHostingDeployment": false,
+    "livePromotion": false,
+    "businessDataMutation": false,
+    "syntheticBusinessWrites": false,
+    "dataImportOrReimport": false,
+    "externalNotifications": false,
+    "previewChannelGarbageCollection": false
+  },
+  "preserved": {
+    "findings": 295,
+    "frozenTasks": 86,
+    "p0Open": 6,
+    "securityHold": "ACTIVE_FAIL_CLOSED_UNAUTHORIZED_BROWSER_FIRESTORE_READ_WRITE",
+    "historicalCertificationsImmutable": true,
+    "authenticatedWriteUatStillPending": true,
+    "liveReadiness": "HOLD_NO_GO"
+  },
+  "technicalReadback": {
+    "status": "PENDING_REMOTE_GITHUB_ACTION_AND_HTTPS_PROOF",
+    "expectedChecks": ["governance", "source_commit", "single_lab_preview_url", "hosting_config_only", "three_exact_js_blob_shas", "public_source_marker"],
+    "authenticatedOrBusinessDataWrites": 0
+  }
+}

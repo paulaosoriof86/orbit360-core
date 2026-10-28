@@ -1,0 +1,226 @@
+name: Gravicentra B4-003 policy-country exact Hosting-only LAB Preview
+
+# One authorized successor from 3ac95204; never dispatch arbitrary sources.
+on:
+  push:
+    branches:
+      - recovery/fase-a-clean-20260831
+    paths:
+      - .github/workflows/gravicentra-b4-003-policy-country-lab-preview.yml
+      - artifacts/orbit360-recovery/release-control/I6_5_B4_003_POLICY_COUNTRY_HOSTING_ONLY_PREVIEW_AUTH_20261028.json
+
+permissions:
+  contents: read
+
+concurrency:
+  group: gravicentra-b4003-country-preview-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  isolated-hosting-only:
+    if: >-
+      github.repository == 'paulaosoriof86/orbit360-core' &&
+      github.ref == 'refs/heads/recovery/fase-a-clean-20260831' &&
+      github.event.head_commit.message == 'build(i6.5 B4-003): exact policy-country Hosting-only LAB Preview'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      SOURCE_SHA: 3ac952041a4c9a07c6675d7f8f1f38e60f9bef31
+      SOURCE_TREE_SHA: b77d6debcd3f4663ccd0a151d1adfe1c10874d73
+      PROJECT_ID: ays-orbit-360-lab
+      HOSTING_SITE: ays-orbit-360-lab
+      TENANT_HINT: alianzas-soluciones
+      RELEASE_GATE: I6.5-B4-003
+      BUILD_PREFIX: gi-i65-b4
+      ENVIRONMENT_REF: firebase-hosting-preview-i6-5-forensic-b4-003
+      GRAVICENTRA_B4_003_SCOPED_PREVIEW: 'true'
+    steps:
+      - name: Checkout only the authorized successor
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Fail closed on ancestry, exact diff, historic source and official governance
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD^)" = "$SOURCE_SHA"
+          test "$(git rev-parse "$SOURCE_SHA^{tree}")" = "$SOURCE_TREE_SHA"
+          test "$(git show -s --format=%s HEAD)" = 'build(i6.5 B4-003): exact policy-country Hosting-only LAB Preview'
+          git diff --name-only "$SOURCE_SHA" HEAD | LC_ALL=C sort > "$RUNNER_TEMP/actual-files"
+          printf '%s\n' \
+            .github/workflows/gravicentra-b4-003-policy-country-lab-preview.yml \
+            artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json \
+            artifacts/orbit360-recovery/release-control/I6_5_B4_003_POLICY_COUNTRY_HOSTING_ONLY_PREVIEW_AUTH_20261028.json \
+            tools/gravicentra-i6-control-plane-guard-v1.mjs | LC_ALL=C sort > "$RUNNER_TEMP/expected-files"
+          diff -u "$RUNNER_TEMP/expected-files" "$RUNNER_TEMP/actual-files"
+          test "$(git hash-object orbit360-platform/core/queries.js)" = 'ab3e22bcce37c91d255075890188258576c3dee7'
+          test "$(git hash-object orbit360-platform/modules/cronograma.js)" = '5d412e4ee263bb6cbfbd840b7124871a1e5b6ee8'
+          test "$(git hash-object orbit360-platform/modules/cobros-cartera-i65-closure-bridge.js)" = 'a20facb46713ab859754b3fc0d011cf0cfdfc365'
+          node tools/gravicentra-governance-preflight-v1.mjs --mode=i6
+          echo 'B4_003_EXACT_LAB_HOSTING_PREVIEW_GOVERNANCE=PASS_NO_LIVE_NO_DATA'
+
+      - name: Prepare existing LAB Hosting credentials and pinned Firebase CLI
+        run: |
+          set -euo pipefail
+          AUTH_ROOT="$RUNNER_TEMP/gi-b4003-auth"
+          mkdir -p "$AUTH_ROOT"
+          export AUTH_ROOT
+          python3 - <<'PY'
+          import json,os,pathlib
+          root=pathlib.Path(os.environ['AUTH_ROOT'])
+          paths=[]
+          for n,k in enumerate(('SA_DEFAULT','SA_ORBIT360_LAB','SA_ORBIT_360_LAB')):
+              try: candidate=json.loads(os.environ.get(k,''))
+              except Exception: continue
+              if candidate.get('type')=='service_account' and candidate.get('project_id')==os.environ['PROJECT_ID'] and candidate.get('private_key'):
+                  f=root/('candidate-'+str(n)+'.json')
+                  f.write_text(json.dumps(candidate),encoding='utf8')
+                  f.chmod(0o600)
+                  paths.append(str(f))
+          if not paths: raise SystemExit('B4_003_HOSTING_LAB_SERVICE_ACCOUNT_MISSING')
+          (root/'candidates').write_text('\n'.join(paths)+'\n',encoding='utf8')
+          PY
+          CLI_ROOT="$RUNNER_TEMP/gi-b4003-firebase-cli"
+          timeout --foreground 420s npm install --prefix "$CLI_ROOT" --no-save --ignore-scripts --no-audit --no-fund firebase-tools@14.10.1
+          node tools/gravicentra-firebase-tools-empty-extensions-workaround-v1.mjs "$CLI_ROOT"
+          CLI="$CLI_ROOT/node_modules/firebase-tools/lib/bin/firebase.js"
+          test -f "$CLI"
+          SELECTED=''
+          while read -r CANDIDATE; do
+            if GOOGLE_APPLICATION_CREDENTIALS="$CANDIDATE" node "$CLI" apps:list WEB --project "$PROJECT_ID" --non-interactive --json >/dev/null 2>&1; then
+              SELECTED="$CANDIDATE"
+              break
+            fi
+          done < "$AUTH_ROOT/candidates"
+          test -n "$SELECTED"
+          cp "$SELECTED" "$RUNNER_TEMP/gi-b4003-hosting-sa.json"
+          chmod 600 "$RUNNER_TEMP/gi-b4003-hosting-sa.json"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/gi-b4003-hosting-sa.json" >> "$GITHUB_ENV"
+          echo "FIREBASE_CLI_BIN=$CLI" >> "$GITHUB_ENV"
+          # Required solely for the existing read-only tenant branding snapshot.
+          timeout --foreground 420s npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund firebase-admin@13.4.0
+
+      - name: Resolve only public LAB Web SDK configuration
+        run: |
+          set -euo pipefail
+          node "$FIREBASE_CLI_BIN" apps:list WEB --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/gi-b4003-apps.json"
+          export APPS_FILE="$RUNNER_TEMP/gi-b4003-apps.json"
+          APP_ID=$(python3 - <<'PY'
+          import json,os
+          d=json.load(open(os.environ['APPS_FILE']))
+          web=[a for a in (d.get('result') or []) if str(a.get('platform','')).upper() in ('WEB','PLATFORM_WEB','')]
+          if len(web)!=1: raise SystemExit('B4_003_WEB_APP_CARDINALITY_INVALID')
+          print(web[0].get('appId',''))
+          PY
+          )
+          test -n "$APP_ID"
+          node "$FIREBASE_CLI_BIN" apps:sdkconfig WEB "$APP_ID" --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/gi-b4003-public-config.json"
+
+      - name: Build exact source without deploying any backend
+        run: |
+          set -euo pipefail
+          SOURCE_ROOT="$RUNNER_TEMP/gi-b4003-source"
+          PACKAGE_ROOT="$RUNNER_TEMP/gi-b4003-package"
+          git worktree add --detach "$SOURCE_ROOT" "$SOURCE_SHA"
+          test "$(git -C "$SOURCE_ROOT" rev-parse 'HEAD^{tree}')" = "$SOURCE_TREE_SHA"
+          node tools/gravicentra-i6-5-b1-branding-snapshot.mjs "$RUNNER_TEMP/gi-b4003-branding.json"
+          export TENANT_BRANDING_SNAPSHOT_FILE="$RUNNER_TEMP/gi-b4003-branding.json"
+          node tools/gravicentra-i6-1-preview-package.mjs "$SOURCE_ROOT" "$PACKAGE_ROOT" "$RUNNER_TEMP/gi-b4003-public-config.json" > "$RUNNER_TEMP/gi-b4003-package-output.json"
+          export PACKAGE_ROOT
+          node --input-type=module - <<'NODE'
+          import fs from 'node:fs';
+          const root=process.env.PACKAGE_ROOT+'/bundle';
+          const conf=JSON.parse(fs.readFileSync(root+'/firebase.json','utf8'));
+          if(Object.keys(conf).join(',')!=='hosting'||conf.hosting.site!=='ays-orbit-360-lab'||conf.hosting.public!=='site')
+            throw Error('B4_003_HOSTING_ONLY_CONFIG_INVALID');
+          const p=fs.readFileSync(root+'/site/product-runtime-config.js','utf8');
+          const build=JSON.parse(fs.readFileSync(root+'/site/__recovery__/build.json','utf8'));
+          if(!p.includes('"scopedReadPreviewCandidate":true')||!p.includes('"sourceSha":"'+process.env.SOURCE_SHA+'"')||
+            build.sourceSha!==process.env.SOURCE_SHA||build.environmentRef!==process.env.ENVIRONMENT_REF)
+            throw Error('B4_003_SCOPED_PREVIEW_SOURCE_BINDING_INVALID');
+          NODE
+          test "$(git hash-object "$PACKAGE_ROOT/bundle/site/core/queries.js")" = 'ab3e22bcce37c91d255075890188258576c3dee7'
+          test "$(git hash-object "$PACKAGE_ROOT/bundle/site/modules/cronograma.js")" = '5d412e4ee263bb6cbfbd840b7124871a1e5b6ee8'
+          test "$(git hash-object "$PACKAGE_ROOT/bundle/site/modules/cobros-cartera-i65-closure-bridge.js")" = 'a20facb46713ab859754b3fc0d011cf0cfdfc365'
+          echo 'B4_003_PREVIEW_PACKAGE_EXACT_THREE_SOURCE_BLOBS=PASS'
+
+      - name: Deploy one seven-day isolated LAB Hosting channel only
+        id: hosting
+        run: |
+          set -euo pipefail
+          cd "$RUNNER_TEMP/gi-b4003-package/bundle"
+          CHANNEL_ID="gi-b4003-pc-$GITHUB_RUN_ID"
+          test "$PROJECT_ID" = 'ays-orbit-360-lab'
+          test "$HOSTING_SITE" = 'ays-orbit-360-lab'
+          # No functions, rules, IAM, production Hosting, database operations or channel cleanup.
+          node "$FIREBASE_CLI_BIN" hosting:channel:deploy "$CHANNEL_ID" --config firebase.json --project "$PROJECT_ID" --expires 7d --non-interactive --json > "$RUNNER_TEMP/gi-b4003-deploy.json" 2>&1
+          export CHANNEL_ID
+          PREVIEW_URL=$(python3 - <<'PY'
+          import os,re
+          raw=open(os.environ['RUNNER_TEMP']+'/gi-b4003-deploy.json',encoding='utf8').read()
+          prefix='https://ays-orbit-360-lab--'+os.environ['CHANNEL_ID']+'-'
+          urls=sorted(set(u.rstrip('/') for u in re.findall(r'https://[A-Za-z0-9._-]+\.web\.app',raw) if u.startswith(prefix)))
+          if len(urls)!=1: raise SystemExit('B4_003_ISOLATED_PREVIEW_URL_NOT_EXACT')
+          print(urls[0])
+          PY
+          )
+          echo "channel_id=$CHANNEL_ID" >> "$GITHUB_OUTPUT"
+          echo "preview_url=$PREVIEW_URL" >> "$GITHUB_OUTPUT"
+          echo 'B4_003_SINGLE_LAB_HOSTING_CHANNEL_DEPLOY=PASS'
+
+      - name: Technical HTTPS readback only; no authenticated or data writes
+        env:
+          PREVIEW_URL: ${{ steps.hosting.outputs.preview_url }}
+        run: |
+          set -euo pipefail
+          node --input-type=module - <<'NODE'
+          import {createHash} from 'node:crypto';
+          const source=process.env.SOURCE_SHA;
+          const url=process.env.PREVIEW_URL;
+          if(!url?.startsWith('https://ays-orbit-360-lab--gi-b4003-pc-'+process.env.GITHUB_RUN_ID+'-')||!url.endsWith('.web.app'))
+            throw Error('B4_003_PREVIEW_URL_NOT_ISOLATED');
+          const read=async path=>{
+            let err;
+            for(let i=0;i<6;i++){
+              try {
+                const r=await fetch(url+'/'+path,{cache:'no-store',redirect:'error',signal:AbortSignal.timeout(10000)});
+                if(!r.ok)throw Error('HTTP_'+r.status+':'+path);
+                return Buffer.from(await r.arrayBuffer());
+              }catch(e){err=e;if(i<5)await new Promise(ok=>setTimeout(ok,4000));}
+            }
+            throw err;
+          };
+          const build=JSON.parse((await read('__recovery__/build.json')).toString('utf8'));
+          if(build.sourceSha!==source||build.gate!=='I6.5-B4-003'||build.environmentRef!=='firebase-hosting-preview-i6-5-forensic-b4-003')
+            throw Error('B4_003_PUBLISHED_BUILD_IDENTITY_MISMATCH');
+          const config=(await read('product-runtime-config.js')).toString('utf8');
+          if(!config.includes('"scopedReadPreviewCandidate":true')||!config.includes('"sourceSha":"'+source+'"'))
+            throw Error('B4_003_PUBLISHED_PROTECTED_CONFIG_MISMATCH');
+          const expected={
+            'core/queries.js':'ab3e22bcce37c91d255075890188258576c3dee7',
+            'modules/cronograma.js':'5d412e4ee263bb6cbfbd840b7124871a1e5b6ee8',
+            'modules/cobros-cartera-i65-closure-bridge.js':'a20facb46713ab859754b3fc0d011cf0cfdfc365'
+          };
+          for(const [path,sha] of Object.entries(expected)){
+            const data=await read(path);
+            const blob=createHash('sha1').update(Buffer.from('blob '+data.length+'\0')).update(data).digest('hex');
+            if(blob!==sha)throw Error('B4_003_PUBLISHED_BLOB_MISMATCH:'+path);
+          }
+          console.log('B4_003_POLICY_COUNTRY_LAB_HOSTING_READBACK=PASS source='+source+' checked=3 no_data_writes no_live security_hold');
+          console.log('B4_003_LAB_PREVIEW_URL='+url);
+          NODE
+          echo "### B4-003 exact Hosting-only LAB Preview" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Source: $SOURCE_SHA" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Isolated Preview: $PREVIEW_URL" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Three exact source blob readbacks: PASS" >> "$GITHUB_STEP_SUMMARY"
+          echo "- LIVE, functions, IAM, Firestore rules and data writes: NOT PERFORMED" >> "$GITHUB_STEP_SUMMARY"
+          echo "- B4-003 six P0 security hold and authenticated UAT: STILL OPEN" >> "$GITHUB_STEP_SUMMARY"
