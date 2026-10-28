@@ -21,7 +21,12 @@ Orbit.ui = (function () {
   const NOW = _anchor();
   const MESES = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
   function now() { return NOW; }
-  function today() { return NOW.toISOString().slice(0, 10); }
+  // Estado de cartera: fecha civil local, no fecha UTC ni un instante congelado
+  // al iniciar sesión. La ancla de QA sigue siendo respetada por _anchor().
+  function _calendarKey(d) {
+    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  }
+  function today() { return _calendarKey(_anchor()); }
   function monthLabel() { return (MESES[NOW.getMonth()][0].toUpperCase() + MESES[NOW.getMonth()].slice(1)) + ' ' + NOW.getFullYear(); }
   function monthKey() { return NOW.getFullYear() + '-' + String(NOW.getMonth() + 1).padStart(2, '0'); }
   function monthProgressPct() { const dim = new Date(NOW.getFullYear(), NOW.getMonth() + 1, 0).getDate(); return NOW.getDate() / dim; }
@@ -67,11 +72,30 @@ Orbit.ui = (function () {
     if (!(raw instanceof Date) || !Number.isFinite(raw.getTime())) return '—';
     return raw.toLocaleDateString('es-GT', { day: '2-digit', month: 'short', year: 'numeric' });
   }
+  function _civilDayOrdinal(value) {
+    if (value == null || value === '') return null;
+    const source = String(value).trim();
+    const iso = /^(\d{4})-(\d{2})-(\d{2})(?=$|[Tt ])/.exec(source);
+    const fromParts = (y, m, d) => {
+      const utc = new Date(0);
+      utc.setUTCHours(0, 0, 0, 0);
+      utc.setUTCFullYear(y, m - 1, d);
+      return utc.getUTCFullYear() === y && utc.getUTCMonth() === m - 1 && utc.getUTCDate() === d
+        ? utc.getTime() / 86400000 : null;
+    };
+    if (iso) {
+      const y = Number(iso[1]), m = Number(iso[2]), d = Number(iso[3]);
+      if (fromParts(y, m, d) == null) return null;
+      // YYYY-MM-DD denotes the contractual date, independent of UTC offset.
+      if (source.length === 10) return fromParts(y, m, d);
+    }
+    const parsed = value instanceof Date ? value : new Date(source);
+    if (!Number.isFinite(parsed.getTime())) return null;
+    return fromParts(parsed.getFullYear(), parsed.getMonth() + 1, parsed.getDate());
+  }
   function daysFromNow(iso) {
-    if (!iso) return null;
-    const d = iso instanceof Date ? iso : new Date(String(iso).length <= 10 ? String(iso) + 'T00:00:00' : iso);
-    if (!(d instanceof Date) || !Number.isFinite(d.getTime())) return null;
-    return Math.round((d - NOW) / 86400000);
+    const target = _civilDayOrdinal(iso), current = _civilDayOrdinal(_anchor());
+    return target == null || current == null ? null : target - current;
   }
   function ago(iso) {
     const d = -daysFromNow(iso);

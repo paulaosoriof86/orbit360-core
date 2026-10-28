@@ -35,28 +35,52 @@ Orbit.q = (function () {
   function vehiculoDePoliza(polId) { return S().find('vehiculos', v => v.polizaId === polId); }
 
   function portfolioOpen(row) {
-    const state = textNorm(row && (row.estadoCartera || row.estado));
-    if (row && row.conciliadoPago === true) return false;
-    return !['pagado','cobrado','cerrado','anulado','cancelado','cancelada'].includes(state);
+    if (!row || row.carteraActiva === false || row.conciliadoPago === true) return false;
+    const states = [row.estadoCartera, row.estado, row.estadoOperativo].map(textNorm);
+    return !states.some(state => ['pagado','cobrado','cerrado','anulado','cancelado','cancelada'].includes(state) ||
+      state.startsWith('cerrado_') || state.startsWith('anulado_'));
+  }
+  // YYYY-MM-DD is a contractual calendar day, not an instant. Reject invalid
+  // dates before trying the next recorded field; never infer an extra grace day.
+  function validBusinessDate(value) {
+    if (value == null || value === '') return '';
+    if (value instanceof Date) {
+      if (!Number.isFinite(value.getTime())) return '';
+      return [value.getFullYear(),String(value.getMonth()+1).padStart(2,'0'),String(value.getDate()).padStart(2,'0')].join('-');
+    }
+    const match = /^(\d{4})-(\d{2})-(\d{2})(?=$|[Tt ])/.exec(String(value).trim());
+    if (!match) return '';
+    const y = Number(match[1]), m = Number(match[2]), d = Number(match[3]);
+    const verified = new Date(0); verified.setUTCHours(0,0,0,0); verified.setUTCFullYear(y,m-1,d);
+    return verified.getUTCFullYear()===y && verified.getUTCMonth()===m-1 && verified.getUTCDate()===d
+      ? match[1]+'-'+match[2]+'-'+match[3] : '';
   }
   function portfolioDue(row) {
-    return row && (row.vence || row.fechaVencimiento || row.fechaLimite || '');
+    return row && (validBusinessDate(row.fechaLimite) || validBusinessDate(row.fechaVencimiento) || validBusinessDate(row.vence)) || '';
   }
+  function calendarClassification(row, open) {
+    const dueDate = portfolioDue(row);
+    const daysRemaining = dueDate && U.daysFromNow ? U.daysFromNow(dueDate) : null;
+    return {
+      open, dueDate, daysRemaining,
+      overdue: open && daysRemaining != null && daysRemaining < 0,
+      future: open && daysRemaining != null && daysRemaining >= 0,
+      unknownDate: open && daysRemaining == null,
+      daysOverdue: open && daysRemaining != null && daysRemaining < 0 ? -daysRemaining : 0
+    };
+  }
+  function portfolioClassification(row) { return calendarClassification(row, portfolioOpen(row)); }
   function portfolioIsOverdue(row) {
-    if (!portfolioOpen(row)) return false;
-    const due = portfolioDue(row);
-    const d = due ? U.daysFromNow(due) : null;
-    return d != null && d < 0;
+    return portfolioClassification(row).overdue;
   }
   function expectedReceiptOpen(row) {
+    if (!row) return false;
     const state = textNorm(row && row.estado);
     return !['pagado','conciliado','anulado','cancelado','cancelada'].includes(state) && !(row && row.fechaPago);
   }
+  function expectedReceiptClassification(row) { return calendarClassification(row, expectedReceiptOpen(row)); }
   function expectedReceiptIsOverdue(row) {
-    if (!expectedReceiptOpen(row)) return false;
-    const due = row && (row.vence || row.fechaLimite || row.fechaVencimiento || '');
-    const d = due ? U.daysFromNow(due) : null;
-    return d != null && d < 0;
+    return expectedReceiptClassification(row).overdue;
   }
   function confirmedCobro(row) {
     const state = textNorm(row && row.estado);
@@ -591,7 +615,7 @@ Orbit.q = (function () {
   /** Nombre conservado por compatibilidad: retorna obligaciones esperadas vencidas, no Cobros reales. */
   function cobrosVencidos() {
     return (S().all('recibosEsperados') || []).filter(expectedReceiptIsOverdue)
-      .sort((a, b) => String(a.vence||a.fechaLimite||'').localeCompare(String(b.vence||b.fechaLimite||'')));
+      .sort((a, b) => portfolioDue(a).localeCompare(portfolioDue(b)));
   }
   function leaderboard() {
     const clients = clientIndex();
@@ -646,6 +670,6 @@ Orbit.q = (function () {
     asesor, aseguradora, polizasDe, recibosEsperadosDe, carteraPrimasDe, carteraPendienteDe, carteraVencidaDe, cobrosDe, comisionesDe, actividadesDe, cancelacionesDe,
     clienteResumen, clientesResumenIndex, saludCliente, carteraGlobal, carteraPendienteRows, carteraVencidaRows, cobrosConfirmadosRows, carteraGlobalPorMoneda, primaVigenteGlobal, renovacionesProximas, cobrosVencidos, leaderboard,
     clientesScoped, polizasScoped, realizedPaymentRows, currentMonthKey, produccionMesPorMoneda, recaudoMesPorMoneda, metaAdvisorMes, leaderboardMes,
-    agingVencido, agingVencidoPorMoneda, portfolioAmountProof, portfolioAmountContext, portfolioValuedRowsCount, comisionesPor, clienteNombre, norm, monedaPais, policyLinkedClientId, policyLinkedCountry, vehiculosDe, vehiculoDePoliza, postRecaudo
+    agingVencido, agingVencidoPorMoneda, portfolioAmountProof, portfolioAmountContext, portfolioValuedRowsCount, portfolioDue, portfolioOpen, portfolioClassification, portfolioIsOverdue, expectedReceiptClassification, expectedReceiptIsOverdue, comisionesPor, clienteNombre, norm, monedaPais, policyLinkedClientId, policyLinkedCountry, vehiculosDe, vehiculoDePoliza, postRecaudo
   };
 })();

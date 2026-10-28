@@ -98,6 +98,61 @@ const ACTIVE_I65_FORENSIC_B4=String(C.i65ForensicRemediationPlan?.b4?.executionL
 need(exists(ACTIVE_I65_FORENSIC_B4),'I6_5_B4_ACTIVE_LOCK_MISSING:'+ACTIVE_I65_FORENSIC_B4);
 const S=readJson(STATUS_LEDGER),A=readJson(AUTH_RECEIPT),M5=readJson(V5_MANIFEST),M6=readJson(V6_MANIFEST),M=readJson(V7_MANIFEST),FRA=readJson(I65_FORENSIC_AUDIT),FRP=readJson(I65_FORENSIC_PLAN),PAY=readJson(I65_PAYMENT_INFERENCE),B1=readJson(I65_FORENSIC_B1),B2=readJson(I65_FORENSIC_B2),B3=readJson(I65_FORENSIC_B3),B4=readJson(ACTIVE_I65_FORENSIC_B4);
 const COMP=readJson(I6_CANONICAL_COMPOSITION),FIND=readJson(I6_FINDINGS_LEDGER),FRP2=readJson(I65_FORENSIC_PLAN_V2),REJ=readJson(I65_B2_REJECTION),RCM=readJson(I65_B2_ROOT_CAUSE);
+// Paula's 27-Oct one-case Q683 calendar correction is a new additive source
+// successor. It preserves each prior byte-pinned receipt and the frozen B4
+// composition; ui.js is an explicitly bounded additional product source.
+const Q683_CALENDAR=C.b4003Q683CalendarSourceSuccessor20261027||null;
+const Q683_CALENDAR_PATHS=[
+ 'orbit360-platform/core/ui.js',
+ 'orbit360-platform/core/queries.js',
+ 'orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js'
+];
+const Q683_CALENDAR_QA='tools/gravicentra-b4-003-calendar-q683-parity.test.cjs';
+const Q683_CALENDAR_PREDECESSOR=new Map();
+let Q683_CALENDAR_RECEIPT=null;
+if(Q683_CALENDAR){
+ const A=Q683_CALENDAR,R=readJson(A.receiptPath),P='d832c1eba56a8707cee0d454604e5145e710eb7a';
+ Q683_CALENDAR_RECEIPT=R;
+ const sources=Object.keys(R.sourceBlobsAfter||{}).sort(),before=Object.keys(R.sourceBlobsBefore||{}).sort();
+ need(A.status==='SOURCE_STAGED_SYNTHETIC_QA_PASS_SECURITY_HOLD'&&A.gate==='I6.5/B4-003'&&
+  A.authority==='PAULA_EXPLICIT_Q683_CALENDAR_SOURCE_AUTHORIZATION_20261027'&&
+  A.parentHead===P&&R.parentHead===P&&R.authority===A.authority&&R.status===A.status&&R.gate===A.gate&&
+  R.schema==='GI_I65_B4_003_Q683_CALENDAR_SOURCE_SUCCESSOR_V1'&&
+  A.receiptPath==='artifacts/orbit360-recovery/release-control/I6_5_B4_003_Q683_CALENDAR_SOURCE_SUCCESSOR_20261027.json'&&
+  A.receiptBlobSha===physicalGit('hash-object',A.receiptPath)&&
+  physicalGit('merge-base',P,'HEAD')===P&&
+  sources.join('|')===Q683_CALENDAR_PATHS.slice().sort().join('|')&&before.join('|')===sources.join('|')&&
+  Object.keys(R.qaBlobsAfter||{}).join('|')===Q683_CALENDAR_QA&&
+  A.sourceFileCount===3&&A.qaFileCount===1&&
+  Q683_CALENDAR_PATHS.every(p=>R.sourceBlobsBefore[p]===physicalGit('rev-parse',P+':'+p)&&
+   R.sourceBlobsAfter[p]===physicalGit('hash-object',p)&&R.sourceBlobsAfter[p]!==R.sourceBlobsBefore[p])&&
+  R.qaBlobsAfter[Q683_CALENDAR_QA]===physicalGit('hash-object',Q683_CALENDAR_QA)&&
+  R.priorGuardBlobSha===physicalGit('rev-parse',P+':tools/gravicentra-i6-control-plane-guard-v1.mjs')&&
+  R.historicalBindings?.frozenCompositionBlobSha===physicalGit('hash-object',I6_CANONICAL_COMPOSITION)&&
+  R.historicalBindings?.frozenB4ExecutionBlobSha===physicalGit('hash-object',ACTIVE_I65_FORENSIC_B4)&&
+  R.historicalBindings?.findingsLedgerBlobSha===physicalGit('hash-object',I6_FINDINGS_LEDGER)&&
+  R.historicalBindings?.uiJsIsNewBoundedProductFileOutsideFrozenComposition===true&&
+  !COMP.productFiles.includes('orbit360-platform/core/ui.js')&&
+  Q683_CALENDAR_PATHS.slice(1).every(p=>COMP.productFiles.includes(p))&&
+  R.contract?.scheduledInstallmentDatePreserved===true&&R.contract?.fifteenDayEngineGenerationUnchanged===true&&
+  R.contract?.insurerGracePeriodLegalityNotInferred===true&&
+  R.scope?.codeOnly===true&&R.scope?.sameBranch===true&&
+  ['previewFunctionsRedeployAuthorized','sharedFirestoreRulesChanged','sharedFirestoreRulesDeploymentAuthorized',
+   'authIamMutation','realBusinessWrites','dataMutation','importsOrReimports','livePromotion','production']
+   .every(k=>R.scope?.[k]===false)&&
+  A.findingsPreserved===295&&A.frozenTasksPreserved===86&&R.preserved?.findings===295&&
+  R.preserved?.frozenTasks===86&&FIND.findings.length===295&&
+  A.historicalLocksChanged===false&&A.sharedRulesDeploymentAuthorized===false&&
+  A.dataMutationAuthorized===false&&A.livePromotionAuthorized===false&&
+  R.preserved?.securityHoldStatus===C.b4003SecurityReleaseHold?.status&&
+  C.currentB4?.status==='B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL'&&B4.boundaries?.livePromotionAuthorized===false,
+  'B4_003_Q683_CALENDAR_SOURCE_SUCCESSOR_INVALID');
+ const out=execFileSync(process.execPath,[Q683_CALENDAR_QA],{encoding:'utf8'}).trim();
+ need(out===R.verification.qaMarker,'B4_003_Q683_CALENDAR_QA_FAILED');
+ Q683_CALENDAR_PATHS.forEach(p=>Q683_CALENDAR_PREDECESSOR.set(p,R.sourceBlobsBefore[p]));
+ Q683_CALENDAR_PREDECESSOR.set('tools/gravicentra-i6-control-plane-guard-v1.mjs',R.priorGuardBlobSha);
+ console.log('B4_003_Q683_CALENDAR_SOURCE=THREE_EXACT_SOURCES_ONE_QA_PASS_SECURITY_HOLD');
+}
 // Explicitly authorized focal correction, with immutable predecessor proofs.
 // This is a one-path exception for the actual canonical Cobros adapter, not a
 // change to the historical B4 allowlist or a blanket product mutation grant.
@@ -133,7 +188,7 @@ if(FOCAL_C360_COBROS){
   !B4.boundaries.allowedQaFiles.includes(FOCAL_C360_COBROS_QA)&&
   FOCAL_C360_COBROS_PATHS.every(p=>COMP.productFiles.includes(p)&&
    R.sourceBlobsBefore[p]===physicalGit('rev-parse',parent+':'+p)&&
-   R.sourceBlobsAfter[p]===physicalGit('hash-object',p)&&
+   R.sourceBlobsAfter[p]===(Q683_CALENDAR_PREDECESSOR.get(p)||physicalGit('hash-object',p))&&
    R.sourceBlobsAfter[p]!==R.sourceBlobsBefore[p])&&
   R.qaBlobsAfter[FOCAL_C360_COBROS_QA]===physicalGit('hash-object',FOCAL_C360_COBROS_QA)&&
   R.historicalB4LockBlobSha===physicalGit('hash-object',ACTIVE_I65_FORENSIC_B4)&&
@@ -181,11 +236,11 @@ if(C360_FINANCIAL_FIX){
   R.sourcePath===C360_FINANCIAL_PATH&&R.qaPath===C360_FINANCIAL_QA&&
   physicalGit('merge-base',P,'HEAD')===P&&
   R.sourceBlobBefore===physicalGit('rev-parse',P+':'+C360_FINANCIAL_PATH)&&
-  R.sourceBlobAfter===physicalGit('hash-object',C360_FINANCIAL_PATH)&&
+  R.sourceBlobAfter===(Q683_CALENDAR_PREDECESSOR.get(C360_FINANCIAL_PATH)||physicalGit('hash-object',C360_FINANCIAL_PATH))&&
   R.sourceBlobAfter!==R.sourceBlobBefore&&
   R.qaBlobAfter===physicalGit('hash-object',C360_FINANCIAL_QA)&&
   R.guardBlobBefore===physicalGit('rev-parse',P+':tools/gravicentra-i6-control-plane-guard-v1.mjs')&&
-  R.guardBlobAfter===physicalGit('hash-object','tools/gravicentra-i6-control-plane-guard-v1.mjs')&&
+  R.guardBlobAfter===(Q683_CALENDAR_PREDECESSOR.get('tools/gravicentra-i6-control-plane-guard-v1.mjs')||physicalGit('hash-object','tools/gravicentra-i6-control-plane-guard-v1.mjs'))&&
   R.workflowBlobBefore===physicalGit('rev-parse',P+':.github/workflows/gravicentra-b4-003-executor.yml')&&
   R.workflowBlobAfter===physicalGit('hash-object','.github/workflows/gravicentra-b4-003-executor.yml')&&
   COMP.productFiles.includes(C360_FINANCIAL_PATH)&&
@@ -2874,20 +2929,23 @@ const forensicActiveBlock=String(C.i65ForensicRemediationPlan?.currentBlock||'')
 const canonicalCompositionBlock=String(COMP.activeBlock||COMP.currentBlock||'');
 const canonicalCompositionActive=activeI65&&COMP.status==='FROZEN_ACTIVE'&&canonicalCompositionBlock===forensicActiveBlock;
 const canonicalCompositionProduct=new Set(canonicalCompositionActive&&Array.isArray(COMP.productFiles)?COMP.productFiles:[]);
+const authorizedQ683CalendarProduct=new Set(Q683_CALENDAR_RECEIPT?Q683_CALENDAR_PATHS:[]);
 if(canonicalCompositionActive){
  need(COMP.baselineCertifiedSourceSha===R.sourceSha,'I6_CANONICAL_COMPOSITION_BASELINE_MISMATCH');
  need(COMP.definitiveSolution?.compositionAuthority==='THIS_FILE'&&COMP.definitiveSolution?.diffContract==='EXACT_PRODUCT_DIFF_SET_AND_EXACT_BLOB_BINDING_FROM_CERTIFIED_BASELINE','I6_CANONICAL_COMPOSITION_CONTRACT_INVALID');
  const actualProduct=changed.filter(p=>!allowedPrefixes.some(prefix=>p.startsWith(prefix))).sort();
- const declared=[...(COMP.productFiles||[])].sort();
+ const declared=[...(COMP.productFiles||[]),...(Q683_CALENDAR_RECEIPT?['orbit360-platform/core/ui.js']:[])].sort();
  need(actualProduct.length===declared.length&&actualProduct.every((p,i)=>p===declared[i]),'I6_CANONICAL_COMPOSITION_EXACT_SET_DRIFT');
- need(declared.every(p=>COMP.productFileBlobs?.[p]&&(
+ need(declared.every(p=>(COMP.productFileBlobs?.[p]||Q683_CALENDAR_RECEIPT?.sourceBlobsAfter?.[p])&&(
+  Q683_CALENDAR_RECEIPT&&Object.prototype.hasOwnProperty.call(Q683_CALENDAR_RECEIPT.sourceBlobsAfter,p)
+   ?physicalGit('hash-object',p)===Q683_CALENDAR_RECEIPT.sourceBlobsAfter[p]:
   C360_FINANCIAL_RECEIPT&&p===C360_FINANCIAL_PATH?physicalGit('hash-object',p)===C360_FINANCIAL_RECEIPT.sourceBlobAfter:
   META_TR_SOURCE_BLOBS.has(p)?physicalGit('hash-object',p)===META_TR_SOURCE_BLOBS.get(p):
   FOCAL_C360_COBROS&&Object.prototype.hasOwnProperty.call(readJson(FOCAL_C360_COBROS.receiptPath).sourceBlobsAfter,p)
    ?physicalGit('hash-object',p)===readJson(FOCAL_C360_COBROS.receiptPath).sourceBlobsAfter[p]:
   physicalGit('hash-object',p)===COMP.productFileBlobs[p]
  )),'I6_CANONICAL_COMPOSITION_BLOB_DRIFT');
- need(COMP.productFileCount===declared.length,'I6_CANONICAL_COMPOSITION_COUNT_DRIFT');
+ need(COMP.productFileCount===COMP.productFiles.length,'I6_CANONICAL_COMPOSITION_COUNT_DRIFT');
 }
 const b1Retained=activeI65&&['B1','B2','B3','B4'].includes(forensicActiveBlock)&&Array.isArray(B1.allowedProductFiles);
 const b1Active=activeI65&&forensicActiveBlock==='B1'&&['PREPARED_FOR_CANDIDATE','CANDIDATE_PENDING_PREVIEW','PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL','VISUAL_REJECTED_R2_ROOT_CAUSE_REQUIRED','VISUAL_REJECTED_R3_PERFORMANCE_AND_UNIVERSE_ROOT_CAUSE_REQUIRED','ACCEPTED_FOR_B2_EMAIL_DEFERRED'].includes(String(B1.status||''));
@@ -2895,7 +2953,7 @@ const b2PausedRetained=activeI65&&forensicActiveBlock==='B1'&&String(B2.status||
 const b2Active=activeI65&&forensicActiveBlock==='B2'&&['READ_ONLY_DIAGNOSTIC_ACTIVE','CAUSE_DEMONSTRATED_PATCH_AUTHORIZED','OPEN_PAULA_VISUAL_REJECTED_REMEDIATION_REQUIRED','CANDIDATE_PENDING_PREVIEW','PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL','PREVIEW_AUTHENTICATED_PASS_PENDING_PAULA_VISUAL','ACCEPTED_FOR_B3'].includes(String(B2.status||''));
 const allowedI65ForensicB1Product=new Set(b1Retained?B1.allowedProductFiles:[]);
 const allowedI65ForensicB2Product=new Set((b2Active||b2PausedRetained)&&Array.isArray(B2.boundaries?.allowedProductFiles)?B2.boundaries.allowedProductFiles:[]);
-const forbidden=changed.filter(p=>!allowedPrefixes.some(prefix=>p.startsWith(prefix))&&!canonicalCompositionProduct.has(p)&&!allowedSuccessorProduct.has(p)&&!allowedI63Product.has(p)&&!allowedI64Product.has(p)&&!allowedI65Product.has(p)&&!allowedI65HydrationProduct.has(p)&&!allowedI65OperationalProduct.has(p)&&!allowedI65ForensicB1Product.has(p)&&!allowedI65ForensicB2Product.has(p));
+const forbidden=changed.filter(p=>!allowedPrefixes.some(prefix=>p.startsWith(prefix))&&!canonicalCompositionProduct.has(p)&&!authorizedQ683CalendarProduct.has(p)&&!allowedSuccessorProduct.has(p)&&!allowedI63Product.has(p)&&!allowedI64Product.has(p)&&!allowedI65Product.has(p)&&!allowedI65HydrationProduct.has(p)&&!allowedI65OperationalProduct.has(p)&&!allowedI65ForensicB1Product.has(p)&&!allowedI65ForensicB2Product.has(p));
 need(forbidden.length===0,'I6_PRODUCT_SOURCE_DRIFT_OUTSIDE_BOUND_SUCCESSOR:'+forbidden.slice(0,20).join(','));
 if(forensicActiveBlock==='B3'||forensicActiveBlock==='B4'){
  const b2SealOk=

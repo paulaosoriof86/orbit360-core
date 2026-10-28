@@ -41,8 +41,12 @@
   var numberOrNull=function(v){if(v==null||clean(v)==='')return null;var n=Number(v);return Number.isFinite(n)?n:null;};
   var clone=function(v){try{return JSON.parse(JSON.stringify(v));}catch(e){return v;}};
   var amount=function(r){return num(r&&((r.primaTotal!=null?r.primaTotal:(r.montoTotal!=null?r.montoTotal:(r.montoFuente!=null?r.montoFuente:r.monto)))));};
-  var dueDate=function(r){return clean(r&&(r.fechaLimite||r.vence||r.fechaVencimiento));};
-  var isFuture=function(r){return clean(r&&r.exigibilidad)==='futura'||clean(r&&r.estadoOperativo)==='futuro_pendiente';};
+  // Read the canonical date/classification. Persisted future flags are a
+  // historical sync snapshot and cannot overrule a calendar day that passed.
+  var dueDate=function(r){return Orbit.q&&typeof Orbit.q.portfolioDue==='function'?Orbit.q.portfolioDue(r):'';};
+  var portfolioClass=function(r){return Orbit.q&&typeof Orbit.q.portfolioClassification==='function'?Orbit.q.portfolioClassification(r):{open:false,future:false,overdue:false,unknownDate:true};};
+  var receiptClass=function(r){return Orbit.q&&typeof Orbit.q.expectedReceiptClassification==='function'?Orbit.q.expectedReceiptClassification(r):{open:false,future:false,overdue:false,unknownDate:true};};
+  var isFuture=function(r){return portfolioClass(r).future===true;};
   var legacyHistorical=function(r){return !!(r&&((r.historicalExigible===true)||clean(r.carteraTipo)==='cartera_historica_exigible'||clean(r.exigibilidad)==='historica_exigible'));};
   function planDenominator(r){var raw=[r&&r.cuota,r&&r.serie,r&&r.numeroReciboFuente].map(clean).find(Boolean)||'',m=raw.match(/(?:^|\s)(\d+)\s*\/\s*(\d+)(?:\s|$)/);return m?Number(m[2]):null;}
   function baseReceiptInactive(r){var s=low(r&&r.estado);return !!(r&&(r.superseded===true||r.calendarActive===false||s==='anulado'||s==='superseded'||s==='reemplazado'));}
@@ -91,6 +95,25 @@
   function money(v,cur){try{return Orbit.ui&&Orbit.ui.money?Orbit.ui.money(v,cur||'GTQ'):(cur||'GTQ')+' '+num(v).toFixed(2);}catch(e){return (cur||'GTQ')+' '+num(v).toFixed(2);}}
   function moneyDetail(v,cur){var n=numberOrNull(v);if(n==null)return'Pendiente de completar';var code=clean(cur||'GTQ'),symbol=code==='GTQ'?'Q':code==='COP'?'$':code==='USD'?'US$':code==='EUR'?'€':code;try{return symbol+' '+n.toLocaleString('es-GT',{minimumFractionDigits:2,maximumFractionDigits:2});}catch(e){return symbol+' '+n.toFixed(2);}}
   function fmtDate(v){try{return Orbit.ui&&Orbit.ui.fmtDate?Orbit.ui.fmtDate(v):clean(v);}catch(e){return clean(v);}}
+  function originalCurrency(r){
+    var p=Orbit.store&&Orbit.store.get?Orbit.store.get('polizas',r&&r.polizaId):null;
+    var own=clean(r&&r.moneda).toUpperCase(),linked=clean(p&&(p.moneda||p.divisa)).toUpperCase();
+    return own&&linked&&own!==linked?'SIN_MONEDA':own||linked||'SIN_MONEDA';
+  }
+  function sumByCurrency(rows){
+    var by=Object.create(null);
+    (rows||[]).forEach(function(r){
+      var n=numberOrNull(r&&(r.primaTotal!=null?r.primaTotal:(r.montoTotal!=null?r.montoTotal:(r.montoFuente!=null?r.montoFuente:r.monto))));
+      if(n==null)return;
+      var currency=originalCurrency(r);by[currency]=(by[currency]||0)+n;
+    });
+    return by;
+  }
+  function homogeneousAmount(by){var keys=Object.keys(by);return keys.length===0?0:keys.length===1?by[keys[0]]:null;}
+  function currencySummaryHtml(by){
+    var entries=Object.keys(by||{}).sort();if(!entries.length)return'<span class="muted">Sin importe acreditado</span>';
+    return entries.map(function(cur){var n=by[cur],label=cur==='SIN_MONEDA'?'Moneda por validar · '+n.toFixed(2):moneyDetail(n,cur)+' '+cur;return'<div data-rp-currency="'+esc(cur)+'">'+esc(label)+'</div>';}).join('');
+  }
 
   function storeReady(){
     var S=Orbit.store,T=tenantId(),paths=Orbit.tenantCanonicalPathsP0;
@@ -172,9 +195,6 @@
     if(app==='PENDING_APPLICATION')return{t:'Pago aplicado · pendiente de conciliación',c:'warn'};
     if(isPaymentReconciled(evidence))return{t:'Cobro conciliado',c:'ok'};
     var s=clean(r&&r.estadoOperativo);
-    if(s==='futuro_pendiente')return{t:'Futuro',c:'warn'};
-    if(s==='pendiente_vencido')return{t:'Vencido',c:'danger'};
-    if(s==='pendiente_vence_corte')return{t:'Por vencer',c:'warn'};
     if(s==='pago_reportado'||s==='pago_reportado_asesor'){
       var origin=paymentOriginKind(r);
       if(origin==='CRM_DIRECT')return{t:'Pago registrado en SIGA · pendiente de conciliación',c:'ok'};
@@ -183,6 +203,10 @@
     }
     if(s==='no_pendiente_segun_aseguradora')return{t:'Sin saldo pendiente según aseguradora',c:'ok'};
     if(s==='requiere_validacion_estado')return{t:'Requiere validación',c:'warn'};
+    var calendar=receiptClass(r);
+    if(calendar.overdue)return{t:'Vencido',c:'danger'};
+    if(calendar.future)return{t:calendar.daysRemaining===0?'Vence hoy':'Por vencer',c:'warn'};
+    if(calendar.unknownDate&&calendar.open)return{t:'Fecha por validar',c:'warn'};
     return{t:s||'Pendiente',c:'warn'};
   }
   function linkedCobro(receiptId){
@@ -262,11 +286,13 @@
   }
 
   function portfolioSummary(cid){
-    var rows=Orbit.store.where('carteraPrimas',function(r){return r&&r.clienteId===cid;}),historical=rows.filter(isHistorical),review=rows.filter(isCalendarReview),active=rows.filter(function(r){return calendarClass(r)==='current';});
-    var future=active.filter(isFuture),due=active.filter(function(r){return!isFuture(r);});
+    var rows=Orbit.store.where('carteraPrimas',function(r){return r&&r.clienteId===cid;}),historical=rows.filter(function(r){return isHistorical(r)&&portfolioClass(r).open;}),review=rows.filter(isCalendarReview),active=rows.filter(function(r){return calendarClass(r)==='current'&&portfolioClass(r).open;});
+    var future=active.filter(isFuture),due=active.filter(function(r){return portfolioClass(r).overdue;}),undated=active.filter(function(r){return portfolioClass(r).unknownDate;});
     var reconciled=active.filter(isPortfolioReconciled);
-    function sum(a){return a.reduce(function(s,r){return s+amount(r);},0);}
-    return{rows:rows,future:future,due:due,historical:historical,review:review,active:active,reconciled:reconciled,futureAmount:sum(future),dueAmount:sum(due),historicalAmount:sum(historical),reviewAmount:sum(review),reconciledAmount:sum(reconciled),totalAmount:sum(active)};
+    var futureByCurrency=sumByCurrency(future),dueByCurrency=sumByCurrency(due),historicalByCurrency=sumByCurrency(historical),reviewByCurrency=sumByCurrency(review),reconciledByCurrency=sumByCurrency(reconciled),activeByCurrency=sumByCurrency(active),undatedByCurrency=sumByCurrency(undated);
+    return{rows:rows,future:future,due:due,undated:undated,historical:historical,review:review,active:active,reconciled:reconciled,
+      futureByCurrency:futureByCurrency,dueByCurrency:dueByCurrency,undatedByCurrency:undatedByCurrency,historicalByCurrency:historicalByCurrency,reviewByCurrency:reviewByCurrency,reconciledByCurrency:reconciledByCurrency,activeByCurrency:activeByCurrency,
+      futureAmount:homogeneousAmount(futureByCurrency),dueAmount:homogeneousAmount(dueByCurrency),historicalAmount:homogeneousAmount(historicalByCurrency),reviewAmount:homogeneousAmount(reviewByCurrency),reconciledAmount:homogeneousAmount(reconciledByCurrency),totalAmount:homogeneousAmount(activeByCurrency)};
   }
 
   function markSummaryApplied(r){
@@ -376,7 +402,7 @@
       +'<div class="crumb" style="margin-bottom:14px"><a href="'+back+'" data-rp-back-local="1" style="color:var(--red)">‹ Volver a Recibos y pagos</a> / Recibo '+esc(receiptOrdinalLabel(r))+'</div>'
       +'<div class="card" style="overflow:hidden;margin-bottom:16px;border-left:4px solid var(--red)"><div data-rp-receipt-hero="1" style="padding:20px 22px;background:linear-gradient(135deg,#fff7f8 0%,#f7f4f0 68%,#f4f7fb 100%);display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap"><div><div class="muted" style="font-size:11px;text-transform:uppercase;letter-spacing:.12em">🧾 Recibo esperado · '+esc(receiptOrdinalLabel(r))+'</div><h2 style="color:var(--ink);margin:4px 0;font-family:var(--f-display);font-size:24px;font-weight:800">Póliza '+esc(r.polizaNumero||p.numero||'—')+'</h2><div style="color:var(--ink-2)">'+esc(vehicle||p.ramo||'')+'</div></div><span data-rp-hero-status="1" class="badge '+st.c+'" style="align-self:flex-start;flex:0 0 auto;margin-top:2px">'+esc(st.t)+'</span></div></div>'
       +'<div class="orbit-detail-layout" data-rp-detail-layout="1" style="display:grid;grid-template-columns:minmax(0,1.2fr) minmax(300px,.8fr);gap:16px"><section class="card pad"><h3 style="margin-top:0;font-size:17px;font-weight:800">🧾 Desglose del recibo</h3><div class="orbit-detail-grid" data-rp-detail-values="1" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px">'
-      +cell('Prima neta',moneyDetail(r.primaNeta,cur))+cell('Gastos de expedición',moneyDetail(r.gastosExpedicion,cur))+cell('Gastos financieros',moneyDetail(r.gastosFinanciamiento,cur))+cell('Descuento / ajuste',moneyDetail(r.descuento,cur))+cell('IVA / impuestos',moneyDetail(r.impuestosIVA,cur))+cell('Prima total',moneyDetail(r.primaTotal!=null?r.primaTotal:(r.montoTotal!=null?r.montoTotal:r.monto),cur))+cell('Fecha límite',fmtDate(dueDate(r)))+cell('Fecha real de pago',paidDate?fmtDate(paidDate):'No informada')+cell('Fecha operativa inferida',r.inferredEffectiveDate?fmtDate(r.inferredEffectiveDate):'No aplica')+cell('Fecha de aplicación',applicationDate?fmtDate(applicationDate):'Pendiente / no informada')+cell('Número de factura',invoiceNumber||'No informado')+receiptDocumentHtml('Soporte de pago',paymentSupportRef,'payment_support')+receiptDocumentHtml('Factura / soporte de aplicación',invoiceDocumentRef,'insurer_invoice')
+      +cell('Prima neta',moneyDetail(r.primaNeta,cur))+cell('Gastos de expedición',moneyDetail(r.gastosExpedicion,cur))+cell('Gastos financieros',moneyDetail(r.gastosFinanciamiento,cur))+cell('Descuento / ajuste',moneyDetail(r.descuento,cur))+cell('IVA / impuestos',moneyDetail(r.impuestosIVA,cur))+cell('Prima total',moneyDetail(r.primaTotal!=null?r.primaTotal:(r.montoTotal!=null?r.montoTotal:r.monto),cur))+cell('Vencimiento de cuota',fmtDate(r.vence))+cell('Fecha límite operativa',fmtDate(dueDate(r)))+cell('Fecha real de pago',paidDate?fmtDate(paidDate):'No informada')+cell('Fecha operativa inferida',r.inferredEffectiveDate?fmtDate(r.inferredEffectiveDate):'No aplica')+cell('Fecha de aplicación',applicationDate?fmtDate(applicationDate):'Pendiente / no informada')+cell('Número de factura',invoiceNumber||'No informado')+receiptDocumentHtml('Soporte de pago',paymentSupportRef,'payment_support')+receiptDocumentHtml('Factura / soporte de aplicación',invoiceDocumentRef,'insurer_invoice')
       +'</div></section><div style="display:grid;gap:16px"><section class="card pad"><h3 style="margin-top:0;font-size:17px;font-weight:800">🔎 Estado del recibo</h3><div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">'+badges+'</div>'+(provenance==='INFERRED'?'<div data-rp-payment-provenance="inferred" class="cfg-note" style="margin-bottom:10px"><b>Pago inferido</b> · fecha real de pago no informada'+(sourceRef?' · evidencia: '+esc(sourceRef):'')+'</div>':'')+'<div class="muted" style="line-height:1.5">'+esc(receiptStateNote(r,portfolio,payment))+'</div>'
       +(portfolio?'<div style="margin-top:10px">En cartera: <span style="font-weight:600">'+esc(moneyDetail(portfolio.primaTotal||portfolio.montoTotal||portfolio.monto||r.primaTotal||r.montoTotal||r.monto,cur))+'</span></div>':'')
       +'</section><section class="card pad"><h3 style="margin-top:0;font-size:17px;font-weight:800">📅 Información del registro</h3><div class="orbit-detail-grid" style="display:grid;grid-template-columns:1fr;gap:12px">'+(operationalAsOf||'<div class="muted">Sin fecha adicional reportada.</div>')+'</div><details class="gi-technical-origin" style="margin-top:14px"><summary>Detalles de origen y auditoría</summary><div class="orbit-detail-grid" style="display:grid;grid-template-columns:1fr;gap:12px;margin-top:12px">'+trace+'</div></details></section></div></div></div>';
@@ -420,9 +446,9 @@
       var c=byReceipt[r.id]||null,p=Orbit.store.get('polizas',r.polizaId)||{},v=Orbit.store.where('vehiculos',function(x){return x&&x.polizaId===r.polizaId;})[0];
       var st=stateLabel(r,c),kind='Calendario vigente';
       var veh=v?[v.marca,v.linea,v.placa].filter(Boolean).join(' '):'';
-      return'<tr class="clickable" data-rp-receipt-id="'+esc(r.id)+'"><td><b>'+esc(r.polizaNumero||p.numero||'—')+'</b><div class="muted" style="font-size:11px">'+esc(veh||p.ramo||'')+'</div></td><td><span class="badge neutral">'+kind+'</span></td><td>'+esc(r.serie||r.numeroReciboFuente||'—')+'</td><td>'+fmtDate(dueDate(r))+'</td><td class="num">'+moneyDetail(amount(r),r.moneda||cur)+'</td><td><span class="badge '+st.c+'">'+esc(st.t)+'</span></td><td class="rp-action-cell" style="text-align:right;white-space:nowrap;position:sticky;right:0;background:var(--surface,#fff);z-index:2">'+actionHtml(r)+'</td></tr>';
+      return'<tr class="clickable" data-rp-receipt-id="'+esc(r.id)+'"><td><b>'+esc(r.polizaNumero||p.numero||'—')+'</b><div class="muted" style="font-size:11px">'+esc(veh||p.ramo||'')+'</div></td><td><span class="badge neutral">'+kind+'</span></td><td>'+esc(r.serie||r.numeroReciboFuente||'—')+'</td><td>'+fmtDate(r.vence)+'</td><td>'+fmtDate(dueDate(r))+'</td><td class="num">'+currencySummaryHtml(sumByCurrency([r]))+'</td><td><span class="badge '+st.c+'">'+esc(st.t)+'</span></td><td class="rp-action-cell" style="text-align:right;white-space:nowrap;position:sticky;right:0;background:var(--surface,#fff);z-index:2">'+actionHtml(r)+'</td></tr>';
     }).join('');
-    body.innerHTML='<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px"><label style="font-size:12.5px;font-weight:600;color:var(--ink-2)">Filtrar por póliza:</label><select id="rp-native-policy" class="o-sel" style="max-width:360px">'+opts+'</select><span class="muted" style="margin-left:auto;font-size:12px">'+shown.length+' de '+receipts.length+' requerimientos vigentes</span></div><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:14px"><div class="mini-stat"><div class="muted">Por vencer</div><b>'+money(ps.futureAmount,cur)+'</b></div><div class="mini-stat"><div class="muted">Exigible</div><b>'+money(ps.dueAmount,cur)+'</b></div><div class="mini-stat"><div class="muted">Histórica exigible</div><b>'+money(ps.historicalAmount,cur)+'</b></div><div class="mini-stat"><div class="muted">En cartera</div><b>'+ps.active.length+'</b></div></div>'+(receiptReview.length?'<div class="card pad" data-rp-calendar-review="1" style="border-left:3px solid var(--warn);margin-bottom:12px"><b>Calendario requiere revisión</b><div class="muted" style="margin-top:4px">Hay '+receiptReview.length+' requerimiento(s) de calendarios incompatibles sin autoridad contractual suficiente. No se cuentan como cartera vigente hasta resolverlos.</div></div>':'')+(receiptHistory.length?'<div class="muted" data-rp-calendar-history-count style="font-size:12px;margin:0 0 10px">Historial de calendarios: '+receiptHistory.length+' requerimiento(s) anteriores conservados.</div>':'')+'<div class="card" style="overflow:hidden"><div style="overflow-x:auto"><table class="tbl" data-rp-receipts-table="1"><thead><tr><th>Póliza / riesgo</th><th>Tipo</th><th>Serie / recibo</th><th>Vence</th><th class="num">Monto</th><th>Estado</th><th class="rp-action-cell" style="position:sticky;right:0;background:var(--surface,#fff);z-index:2">Acción</th></tr></thead><tbody>'+(rows||'<tr><td colspan="7" class="muted" style="text-align:center;padding:24px">No hay recibos esperados registrados para este cliente.</td></tr>')+'</tbody></table></div><div style="padding:11px 14px;border-top:1px solid var(--line);font-size:12.5px;color:var(--ink-3)">En Recibos y pagos solo se aplica el pago. La conciliación se realiza después, en la pestaña Cobros.</div></div>';
+    body.innerHTML='<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px"><label style="font-size:12.5px;font-weight:600;color:var(--ink-2)">Filtrar por póliza:</label><select id="rp-native-policy" class="o-sel" style="max-width:360px">'+opts+'</select><span class="muted" style="margin-left:auto;font-size:12px">'+shown.length+' de '+receipts.length+' requerimientos vigentes</span></div><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:14px"><div class="mini-stat"><div class="muted">Por vencer</div><b>'+currencySummaryHtml(ps.futureByCurrency)+'</b></div><div class="mini-stat"><div class="muted">Exigible</div><b>'+currencySummaryHtml(ps.dueByCurrency)+'</b></div><div class="mini-stat"><div class="muted">Histórica exigible</div><b>'+currencySummaryHtml(ps.historicalByCurrency)+'</b></div><div class="mini-stat"><div class="muted">En cartera</div><b>'+ps.active.length+'</b></div></div>'+(ps.undated.length?'<div class="cfg-note" data-rp-unknown-date="1" style="margin-bottom:12px">'+ps.undated.length+' obligación(es) sin fecha límite válida. Se conservan en cartera, pendientes de revisión, sin clasificarlas como futuras o vencidas.</div>':'')+(receiptReview.length?'<div class="card pad" data-rp-calendar-review="1" style="border-left:3px solid var(--warn);margin-bottom:12px"><b>Calendario requiere revisión</b><div class="muted" style="margin-top:4px">Hay '+receiptReview.length+' requerimiento(s) de calendarios incompatibles sin autoridad contractual suficiente. No se cuentan como cartera vigente hasta resolverlos.</div></div>':'')+(receiptHistory.length?'<div class="muted" data-rp-calendar-history-count style="font-size:12px;margin:0 0 10px">Historial de calendarios: '+receiptHistory.length+' requerimiento(s) anteriores conservados.</div>':'')+'<div class="card" style="overflow:hidden"><div style="overflow-x:auto"><table class="tbl" data-rp-receipts-table="1"><thead><tr><th>Póliza / riesgo</th><th>Tipo</th><th>Serie / recibo</th><th>Vencimiento de cuota</th><th>Fecha límite</th><th class="num">Monto</th><th>Estado</th><th class="rp-action-cell" style="position:sticky;right:0;background:var(--surface,#fff);z-index:2">Acción</th></tr></thead><tbody>'+(rows||'<tr><td colspan="8" class="muted" style="text-align:center;padding:24px">No hay recibos esperados registrados para este cliente.</td></tr>')+'</tbody></table></div><div style="padding:11px 14px;border-top:1px solid var(--line);font-size:12.5px;color:var(--ink-3)">En Recibos y pagos solo se aplica el pago. La conciliación se realiza después, en la pestaña Cobros.</div></div>';
     var sel=body.querySelector('#rp-native-policy');if(sel)sel.addEventListener('change',function(){recFilter[cid]=sel.value;renderReceipts(cid);});
     wireReceiptRows(body,cid);
   }
@@ -493,8 +519,8 @@
     var headings=Array.from(drawer.querySelectorAll('div')).filter(function(d){return clean(d.textContent).indexOf('🧾 Recibos generados (')===0&&d.children.length===0;});
     var h=headings[0];if(!h)return;h.textContent='🧾 Recibos esperados vigentes ('+receipts.length+')'+(receiptReview.length?' · revisión pendiente: '+receiptReview.length:'');
     var next=h.nextElementSibling;if(!next)return;
-    var html=receipts.slice(0,24).map(function(r){var st=stateLabel(r),c=portfolio.find(function(x){return x&&x.reciboId===r.id;})||null,rs=reconciliationLabel(r,c);return'<tr class="clickable" data-rp-receipt-id="'+esc(r.id)+'"><td>'+esc(r.serie||'—')+'</td><td class="num">'+moneyDetail(amount(r),r.moneda||cur)+'</td><td>'+fmtDate(dueDate(r))+'</td><td><span class="badge '+st.c+'">'+esc(st.t)+'</span></td><td><span class="badge '+rs.c+'">'+esc(rs.t)+'</span></td></tr>';}).join('');
-    next.outerHTML=receipts.length?'<div style="overflow-x:auto"><table class="tbl"><thead><tr><th>Serie</th><th class="num">Monto</th><th>Vence</th><th>Estado</th><th>Conciliación</th></tr></thead><tbody>'+html+'</tbody></table></div>':'<div class="muted" style="font-size:12.5px">Sin recibos esperados registrados.</div>';
+    var html=receipts.slice(0,24).map(function(r){var st=stateLabel(r),c=portfolio.find(function(x){return x&&x.reciboId===r.id;})||null,rs=reconciliationLabel(r,c);return'<tr class="clickable" data-rp-receipt-id="'+esc(r.id)+'"><td>'+esc(r.serie||'—')+'</td><td class="num">'+currencySummaryHtml(sumByCurrency([r]))+'</td><td>'+fmtDate(r.vence)+'</td><td>'+fmtDate(dueDate(r))+'</td><td><span class="badge '+st.c+'">'+esc(st.t)+'</span></td><td><span class="badge '+rs.c+'">'+esc(rs.t)+'</span></td></tr>';}).join('');
+    next.outerHTML=receipts.length?'<div style="overflow-x:auto"><table class="tbl"><thead><tr><th>Serie</th><th class="num">Monto</th><th>Vencimiento de cuota</th><th>Fecha límite</th><th>Estado</th><th>Conciliación</th></tr></thead><tbody>'+html+'</tbody></table></div>':'<div class="muted" style="font-size:12.5px">Sin recibos esperados registrados.</div>';
     wireReceiptRows(drawer,p.clienteId);
   }
 

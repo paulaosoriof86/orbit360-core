@@ -15106,5 +15106,21 @@
     "frozenTasksPreserved": 86,
     "sharedRulesDeploymentAuthorized": false,
     "livePromotionAuthorized": false
+  },
+  "b4003Q683CalendarSourceSuccessor20261027": {
+    "status": "SOURCE_STAGED_SYNTHETIC_QA_PASS_SECURITY_HOLD",
+    "gate": "I6.5/B4-003",
+    "authority": "PAULA_EXPLICIT_Q683_CALENDAR_SOURCE_AUTHORIZATION_20261027",
+    "parentHead": "d832c1eba56a8707cee0d454604e5145e710eb7a",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_Q683_CALENDAR_SOURCE_SUCCESSOR_20261027.json",
+    "receiptBlobSha": "db3d08d3d10ce74014c0c1bae1fa51679bf45a09",
+    "sourceFileCount": 3,
+    "qaFileCount": 1,
+    "findingsPreserved": 295,
+    "frozenTasksPreserved": 86,
+    "historicalLocksChanged": false,
+    "sharedRulesDeploymentAuthorized": false,
+    "dataMutationAuthorized": false,
+    "livePromotionAuthorized": false
   }
 }

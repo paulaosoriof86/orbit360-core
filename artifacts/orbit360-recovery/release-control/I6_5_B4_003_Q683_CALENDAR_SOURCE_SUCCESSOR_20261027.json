@@ -1,0 +1,74 @@
+{
+  "schema": "GI_I65_B4_003_Q683_CALENDAR_SOURCE_SUCCESSOR_V1",
+  "gate": "I6.5/B4-003",
+  "status": "SOURCE_STAGED_SYNTHETIC_QA_PASS_SECURITY_HOLD",
+  "authority": "PAULA_EXPLICIT_Q683_CALENDAR_SOURCE_AUTHORIZATION_20261027",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "parentHead": "d832c1eba56a8707cee0d454604e5145e710eb7a",
+  "rootCause": "The engine stores scheduled vence separately from fechaLimite. Queries preferred vence and rounded elapsed hours; the native receipt bridge trusted stale future flags and collapsed cross-currency totals.",
+  "sourceBlobsBefore": {
+    "orbit360-platform/core/ui.js": "702cc1a64bda7a7795930a1ca6d4ca8cca8c04cc",
+    "orbit360-platform/core/queries.js": "59e13621e931c4c4959a33e6de82f39bf5a03f08",
+    "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js": "6ad8116a8f7e5cedd603444fa431afa12abbabc8"
+  },
+  "sourceBlobsAfter": {
+    "orbit360-platform/core/ui.js": "9b14194f3d43a0910d418ba1175901ae38f825a8",
+    "orbit360-platform/core/queries.js": "63e3db92d0f4cb84ad20b3f63edc6d635d347736",
+    "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js": "9b52aeda135d0e371018e739dda5c4ecc9779b58"
+  },
+  "qaBlobsAfter": {
+    "tools/gravicentra-b4-003-calendar-q683-parity.test.cjs": "f97f0ef1737dfa4bfc894f0e177bc4506ee1bd83"
+  },
+  "priorGuardBlobSha": "56a6f7b847543dad6d3146950b2443c407ab67b0",
+  "historicalBindings": {
+    "frozenCompositionBlobSha": "646aeaa0b50e9006d6bff52161a87f53f7aa7aca",
+    "frozenB4ExecutionBlobSha": "436f155bae1ccf042d45b398fbb53262f481095c",
+    "findingsLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
+    "uiJsIsNewBoundedProductFileOutsideFrozenComposition": true,
+    "noHistoricalLockMutation": true
+  },
+  "contract": {
+    "datePriority": ["fechaLimite", "fechaVencimiento", "vence"],
+    "invalidDateFallback": true,
+    "effectiveDateInclusiveUntilEndOfCalendarDay": true,
+    "scheduledInstallmentDatePreserved": true,
+    "fifteenDayEngineGenerationUnchanged": true,
+    "insurerGracePeriodLegalityNotInferred": true,
+    "flagsNeverOverrideElapsedDate": true,
+    "closedAndInactiveExcluded": true,
+    "undatedObligationsVisibleForReview": true,
+    "gtqCopNeverAddedAsOneDisplayCurrency": true,
+    "confirmedPaymentsNotInferredFromReceipts": true
+  },
+  "verification": {
+    "qaMarker": "GI_B4_003_Q683_CALENDAR_PARITY_SYNTHETIC_PASS checks=41 no_network no_business_writes",
+    "priorFinancialOwnerQaPreserved": "GI_B4_003_C360_SHADOW_OWNER_SYNTHETIC_PASS checks=15 no_network no_business_writes",
+    "priorCobrosQaPreserved": "GI_B4_003_C360_COBROS_CURRENCY_OVERDUE_SYNTHETIC_PASS checks=26 active_only no_network no_business_writes",
+    "githubGuard": "PENDING",
+    "exactIsolatedPreview": "PENDING",
+    "authenticatedRoleCountrySecurityUat": "HOLD"
+  },
+  "scope": {
+    "codeOnly": true,
+    "sameBranch": true,
+    "hostingPreviewPendingSeparateGate": true,
+    "previewFunctionsRedeployAuthorized": false,
+    "sharedFirestoreRulesChanged": false,
+    "sharedFirestoreRulesDeploymentAuthorized": false,
+    "authIamMutation": false,
+    "realBusinessWrites": false,
+    "dataMutation": false,
+    "importsOrReimports": false,
+    "livePromotion": false,
+    "production": false
+  },
+  "preserved": {
+    "findings": 295,
+    "frozenTasks": 86,
+    "lastAcceptedI5": true,
+    "i65B4003Hold": true,
+    "securityHoldStatus": "ACTIVE_FAIL_CLOSED_UNAUTHORIZED_BROWSER_FIRESTORE_READ_WRITE"
+  },
+  "nextRequiredStep": "GUARD_CI_EXACT_SOURCE_READBACK_THEN_HOSTING_ONLY_PREVIEW_AND_AUTHENTICATED_UAT"
+}
