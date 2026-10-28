@@ -227,6 +227,7 @@ const COBROS_Q683=C.b4003CobrosGlobalQ683SourceSuccessor20261027||null;
 let COBROS_Q683_RECEIPT=null;
 if(COBROS_Q683){
  const A=COBROS_Q683,R=readJson(A.receiptPath),P='1ab0ca1ef675177e1c117daea657c159c33311f3';
+ const deployedSourceCommit='7a09bd51e1257f4d8e4de0e59631f3646506ca81';
  const guardPath='tools/gravicentra-i6-control-plane-guard-v1.mjs';
  const workflowPath='.github/workflows/gravicentra-b4-003-executor.yml';
  const requiredPaths=[CONTROL,A.receiptPath,COBROS_Q683_PATH,COBROS_Q683_QA,guardPath].sort();
@@ -242,9 +243,10 @@ if(COBROS_Q683){
   R.schema==='GI_I65_B4_003_Q683_COBROS_GLOBAL_SOURCE_SUCCESSOR_V1'&&
   A.receiptPath==='artifacts/orbit360-recovery/release-control/I6_5_B4_003_Q683_COBROS_GLOBAL_SOURCE_SUCCESSOR_20261027.json'&&
   A.receiptBlobSha===physicalGit('hash-object',A.receiptPath)&&
-  physicalGit('rev-parse','HEAD^')===P&&
-  physicalGit('merge-base',P,'HEAD')===P&&
-  physicalGit('diff','--name-only','HEAD^','HEAD').split(/\r?\n/).filter(Boolean).sort().join('|')===requiredPaths.join('|')&&
+  physicalGit('rev-parse',deployedSourceCommit+'^')===P&&
+  physicalGit('merge-base',deployedSourceCommit,'HEAD')===deployedSourceCommit&&
+  physicalGit('log','-1','--format=%s',deployedSourceCommit)==='fix(i6.5 B4-003): exact Q683 global Cobros calendar classification'&&
+  physicalGit('diff','--name-only',P,deployedSourceCommit).split(/\r?\n/).filter(Boolean).sort().join('|')===requiredPaths.join('|')&&
   R.governance?.changedPathsOnly?.slice().sort().join('|')===requiredPaths.join('|')&&
   A.sourceFileCount===1&&A.qaFileCount===1&&
   Object.keys(R.sourceBlobsBefore||{}).join('|')===COBROS_Q683_PATH&&
@@ -255,8 +257,8 @@ if(COBROS_Q683){
   R.sourceBlobsAfter[COBROS_Q683_PATH]!==R.sourceBlobsBefore[COBROS_Q683_PATH]&&
   R.qaBlobsAfter[COBROS_Q683_QA]===physicalGit('hash-object',COBROS_Q683_QA)&&
   R.governance.priorGuardBlobSha===physicalGit('rev-parse',P+':'+guardPath)&&
-  R.governance.successorGuardBlobSha===physicalGit('hash-object',guardPath)&&
-  R.governance.unchangedWorkflowBlobSha===physicalGit('hash-object',workflowPath)&&
+  R.governance.successorGuardBlobSha===physicalGit('rev-parse',deployedSourceCommit+':'+guardPath)&&
+  R.governance.unchangedWorkflowBlobSha===physicalGit('rev-parse',deployedSourceCommit+':'+workflowPath)&&
   R.governance.unchangedWorkflowBlobSha===physicalGit('rev-parse',P+':'+workflowPath)&&
   R.governance.frozenB4ExecutionBlobSha===physicalGit('hash-object',ACTIVE_I65_FORENSIC_B4)&&
   R.governance.frozenCompositionBlobSha===physicalGit('hash-object',I6_CANONICAL_COMPOSITION)&&
@@ -285,6 +287,75 @@ if(COBROS_Q683){
  COBROS_Q683_RECEIPT=R;
  cobrosQ683HistoricalBlobs=new Map([[COBROS_Q683_PATH,R.sourceBlobsBefore[COBROS_Q683_PATH]]]);
  console.log('B4_003_Q683_COBROS_GLOBAL_SOURCE=ONE_EXACT_SOURCE_ONE_QA_PASS_SECURITY_HOLD');
+}
+// Paula authorizes exactly one new Hosting channel for the already-committed
+// 7a09 Cobros correction. The prior calendar Preview proof remains immutable.
+// This authorization commit may change only workflow, control, guard and its
+// new receipt; no product code, backend, Rules, Auth, data or LIVE is admitted.
+const Q683_COBROS_HOSTING_AUTH=C.b4003Q683CobrosHostingPreview20261027||null;
+if(Q683_COBROS_HOSTING_AUTH){
+ const A=Q683_COBROS_HOSTING_AUTH,R=readJson(A.receiptPath),P='7a09bd51e1257f4d8e4de0e59631f3646506ca81';
+ const workflowPath='.github/workflows/gravicentra-b4-003-executor.yml';
+ const guardPath='tools/gravicentra-i6-control-plane-guard-v1.mjs';
+ const receiptPath='artifacts/orbit360-recovery/release-control/I6_5_B4_003_Q683_COBROS_HOSTING_ONLY_PREVIEW_AUTH_20261027.json';
+ const sourceReceiptPath=COBROS_Q683.receiptPath;
+ const calendarReceiptPath=Q683_CALENDAR.receiptPath;
+ const expectedFiles=[workflowPath,CONTROL,receiptPath,guardPath].sort();
+ const sourceBlobs={...Q683_CALENDAR_RECEIPT.sourceBlobsAfter,...COBROS_Q683_RECEIPT.sourceBlobsAfter};
+ const qaBlobs={...Q683_CALENDAR_RECEIPT.qaBlobsAfter,...COBROS_Q683_RECEIPT.qaBlobsAfter};
+ const blocked=['backendFunctionsDeploy','sharedFirestoreRulesDeploy','authIamMutation',
+  'syntheticQaWrites','realBusinessWrites','dataMutation','importOrReimport',
+  'livePromotion','productionHostingDeploy','previewChannelGarbageCollection',
+  'realUserTokenIssuance','historicalLocksChanged'];
+ need(A.status==='AUTHORIZED_ONE_HOSTING_PREVIEW_PENDING_EXECUTION'&&
+  A.gate==='I6.5/B4-003'&&A.authority==='PAULA_EXPLICIT_ONE_Q683_COBROS_HOSTING_ONLY_PREVIEW_20261027'&&
+  A.parentHead===P&&A.sourceCommit===P&&A.sourceTree==='39591b9848628f2f908cd712d7aa868fe9476fa0'&&
+  A.receiptPath===receiptPath&&A.receiptBlobSha===physicalGit('hash-object',receiptPath)&&
+  A.sourceReceiptBlobSha===physicalGit('hash-object',sourceReceiptPath)&&
+  A.calendarSourceReceiptBlobSha===physicalGit('hash-object',calendarReceiptPath)&&
+  R.schema==='GI_I65_B4_003_Q683_COBROS_HOSTING_ONLY_PREVIEW_AUTH_V1'&&
+  R.status===A.status&&R.gate===A.gate&&R.authority===A.authority&&
+  R.repository==='paulaosoriof86/orbit360-core'&&R.branch==='recovery/fase-a-clean-20260831'&&
+  R.parentHead===P&&R.sourceCommit===P&&R.sourceTree===A.sourceTree&&
+  R.triggerSubject==='build(i6.5 B4-003): exact Q683 Cobros hosting-only Preview'&&
+  R.sourceReceiptPath===sourceReceiptPath&&R.sourceReceiptBlobSha===A.sourceReceiptBlobSha&&
+  R.calendarSourceReceiptPath===calendarReceiptPath&&
+  R.calendarSourceReceiptBlobSha===A.calendarSourceReceiptBlobSha&&
+  R.workflowPath===workflowPath&&R.workflowBlobShaBefore===physicalGit('rev-parse',P+':'+workflowPath)&&
+  R.workflowBlobShaAfter===physicalGit('hash-object',workflowPath)&&
+  R.guardPath===guardPath&&R.guardBlobShaBefore===physicalGit('rev-parse',P+':'+guardPath)&&
+  R.guardBlobShaAfter===physicalGit('hash-object',guardPath)&&
+  R.changedPathsOnly?.slice().sort().join('|')===expectedFiles.join('|')&&
+  physicalGit('rev-parse','HEAD^')===P&&
+  physicalGit('merge-base',P,'HEAD')===P&&
+  physicalGit('diff','--name-only','HEAD^','HEAD').split(/\r?\n/).filter(Boolean).sort().join('|')===expectedFiles.join('|')&&
+  physicalGit('rev-parse',P+'^{tree}')===R.sourceTree&&
+  sameJson(R.sourceBlobs,sourceBlobs)&&sameJson(R.qaBlobs,qaBlobs)&&
+  Object.keys(R.sourceBlobs||{}).length===4&&Object.keys(R.qaBlobs||{}).length===2&&
+  Object.entries(R.sourceBlobs).every(([p,sha])=>sha===physicalGit('rev-parse',P+':'+p)&&
+    sha===physicalGit('hash-object',p))&&
+  Object.entries(R.qaBlobs).every(([p,sha])=>sha===physicalGit('rev-parse',P+':'+p)&&
+    sha===physicalGit('hash-object',p))&&
+  R.expectedProof?.calendarSyntheticQaChecks===41&&R.expectedProof?.cobrosSyntheticQaChecks===33&&
+  R.expectedProof?.sourceTreeVerification==='REQUIRED_EXACT_7A09'&&
+  R.expectedProof?.hostedFileSha256Readback==='REQUIRED'&&
+  R.expectedProof?.authenticatedChromeUat==='PENDING_NEW_PREVIEW'&&
+  R.expectedProof?.release==='HOLD_NO_GO'&&
+  R.scope?.hostingOnly===true&&R.scope?.existingCallableReadOnly===true&&
+  R.scope?.newPreviewChannelsMaximum===1&&blocked.every(k=>R.scope?.[k]===false)&&
+  A.backendFunctionsDeploymentAuthorized===false&&A.sharedFirestoreRulesDeploymentAuthorized===false&&
+  A.authIamMutationAuthorized===false&&A.previewChannelGarbageCollectionAuthorized===false&&
+  A.syntheticQaWritesAuthorized===false&&A.realBusinessWritesAuthorized===false&&
+  A.dataMutationAuthorized===false&&A.importOrReimportAuthorized===false&&
+  A.livePromotionAuthorized===false&&A.productionHostingDeploymentAuthorized===false&&
+  A.historicalLocksChanged===false&&A.newPreviewChannelsMaximum===1&&
+  A.findingsPreserved===295&&A.frozenTasksPreserved===86&&A.p0OpenPreserved===6&&
+  R.preserved?.findings===295&&R.preserved?.frozenTasks===86&&R.preserved?.openP0===6&&
+  R.preserved?.securityHold===C.b4003SecurityReleaseHold?.status&&
+  R.preserved?.noGateAdvance===true&&R.preserved?.priorI5LiveArtifactUntouched===true&&
+  B4.boundaries?.livePromotionAuthorized===false,
+  'B4_003_Q683_COBROS_HOSTING_PREVIEW_SOURCE_AUTH_INVALID');
+ console.log('B4_003_Q683_COBROS_HOSTING_AUTH=EXACT_7A09_SOURCE_FOUR_FILE_DISPATCH_NO_BACKENDS_NO_WRITES_HOLD');
 }
 // Explicitly authorized focal correction, with immutable predecessor proofs.
 // This is a one-path exception for the actual canonical Cobros adapter, not a

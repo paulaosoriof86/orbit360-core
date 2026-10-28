@@ -1,0 +1,75 @@
+{
+  "schema": "GI_I65_B4_003_Q683_COBROS_HOSTING_ONLY_PREVIEW_AUTH_V1",
+  "gate": "I6.5/B4-003",
+  "status": "AUTHORIZED_ONE_HOSTING_PREVIEW_PENDING_EXECUTION",
+  "authority": "PAULA_EXPLICIT_ONE_Q683_COBROS_HOSTING_ONLY_PREVIEW_20261027",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "parentHead": "7a09bd51e1257f4d8e4de0e59631f3646506ca81",
+  "triggerSubject": "build(i6.5 B4-003): exact Q683 Cobros hosting-only Preview",
+  "sourceCommit": "7a09bd51e1257f4d8e4de0e59631f3646506ca81",
+  "sourceTree": "39591b9848628f2f908cd712d7aa868fe9476fa0",
+  "sourceReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_Q683_COBROS_GLOBAL_SOURCE_SUCCESSOR_20261027.json",
+  "sourceReceiptBlobSha": "d6541404cd303b1d8900c9c34c279aef73357084",
+  "calendarSourceReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_Q683_CALENDAR_SOURCE_SUCCESSOR_20261027.json",
+  "calendarSourceReceiptBlobSha": "db3d08d3d10ce74014c0c1bae1fa51679bf45a09",
+  "workflowPath": ".github/workflows/gravicentra-b4-003-executor.yml",
+  "workflowBlobShaBefore": "5a82a0d5be7f77da717872b13eccbe8f2e2b3668",
+  "workflowBlobShaAfter": "3e0c9989d9d509222fe462fb9f3070c54fb3a300",
+  "guardPath": "tools/gravicentra-i6-control-plane-guard-v1.mjs",
+  "guardBlobShaBefore": "4e867d4513eb13926850dffa76e61b678bfbe728",
+  "guardBlobShaAfter": "e8f410e700541a65d3168b42c85f95bafe0f64b6",
+  "changedPathsOnly": [
+    ".github/workflows/gravicentra-b4-003-executor.yml",
+    "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json",
+    "artifacts/orbit360-recovery/release-control/I6_5_B4_003_Q683_COBROS_HOSTING_ONLY_PREVIEW_AUTH_20261027.json",
+    "tools/gravicentra-i6-control-plane-guard-v1.mjs"
+  ],
+  "sourceBlobs": {
+    "orbit360-platform/core/ui.js": "9b14194f3d43a0910d418ba1175901ae38f825a8",
+    "orbit360-platform/core/queries.js": "63e3db92d0f4cb84ad20b3f63edc6d635d347736",
+    "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js": "9b52aeda135d0e371018e739dda5c4ecc9779b58",
+    "orbit360-platform/modules/cobros.js": "0afec98578a6b0fb29d5afd716b06deb90127ef9"
+  },
+  "qaBlobs": {
+    "tools/gravicentra-b4-003-calendar-q683-parity.test.cjs": "f97f0ef1737dfa4bfc894f0e177bc4506ee1bd83",
+    "tools/gravicentra-b4-003-cobros-q683-filter-parity.test.cjs": "5d1c157d85b9fabded02450806fd4ebd5096530b"
+  },
+  "expectedProof": {
+    "calendarSyntheticQaChecks": 41,
+    "cobrosSyntheticQaChecks": 33,
+    "canonicalGuard": "PASS_REQUIRED",
+    "hostingPreviewUrl": "PENDING_ONE_ISOLATED_CHANNEL",
+    "sourceTreeVerification": "REQUIRED_EXACT_7A09",
+    "hostedFileSha256Readback": "REQUIRED",
+    "publicScopedReadSmoke": "REQUIRED_READ_ONLY",
+    "authenticatedChromeUat": "PENDING_NEW_PREVIEW",
+    "independentRoleCountryUat": "HOLD_UNTIL_REAL_IDENTITIES",
+    "release": "HOLD_NO_GO"
+  },
+  "scope": {
+    "hostingOnly": true,
+    "existingCallableReadOnly": true,
+    "newPreviewChannelsMaximum": 1,
+    "backendFunctionsDeploy": false,
+    "sharedFirestoreRulesDeploy": false,
+    "authIamMutation": false,
+    "syntheticQaWrites": false,
+    "realBusinessWrites": false,
+    "dataMutation": false,
+    "importOrReimport": false,
+    "livePromotion": false,
+    "productionHostingDeploy": false,
+    "previewChannelGarbageCollection": false,
+    "realUserTokenIssuance": false,
+    "historicalLocksChanged": false
+  },
+  "preserved": {
+    "findings": 295,
+    "frozenTasks": 86,
+    "openP0": 6,
+    "securityHold": "ACTIVE_FAIL_CLOSED_UNAUTHORIZED_BROWSER_FIRESTORE_READ_WRITE",
+    "priorI5LiveArtifactUntouched": true,
+    "noGateAdvance": true
+  }
+}
