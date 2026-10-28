@@ -1,0 +1,69 @@
+{
+  "schema": "GI_I65_B4_003_Q683_HOSTING_ONLY_PREVIEW_AUTH_V1",
+  "gate": "I6.5/B4-003",
+  "status": "AUTHORIZED_ONE_HOSTING_PREVIEW_PENDING_EXECUTION",
+  "authority": "PAULA_EXPLICIT_ONE_Q683_HOSTING_ONLY_PREVIEW_20261027",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "parentHead": "e13c81d2ff0bac78f344b1554a071c781afb15dd",
+  "triggerSubject": "build(i6.5 B4-003): exact Q683 calendar hosting-only Preview",
+  "sourceCommit": "e13c81d2ff0bac78f344b1554a071c781afb15dd",
+  "sourceTree": "b8c91f201bbb67594f2d508d2b35ebf7de581bb1",
+  "sourceReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_Q683_CALENDAR_SOURCE_SUCCESSOR_20261027.json",
+  "sourceReceiptBlobSha": "db3d08d3d10ce74014c0c1bae1fa51679bf45a09",
+  "workflowPath": ".github/workflows/gravicentra-b4-003-executor.yml",
+  "workflowBlobShaBefore": "930c2e9cf0ef1990925f6feee73a53cf54761cb2",
+  "workflowBlobShaAfter": "5a82a0d5be7f77da717872b13eccbe8f2e2b3668",
+  "guardPath": "tools/gravicentra-i6-control-plane-guard-v1.mjs",
+  "guardBlobShaBefore": "c87949cbd9ecb0c9d3691d09dd01152645f85595",
+  "guardBlobShaAfter": "5fca7377d4e3066f1cf5989abb64678915134597",
+  "changedPathsOnly": [
+    ".github/workflows/gravicentra-b4-003-executor.yml",
+    "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json",
+    "artifacts/orbit360-recovery/release-control/I6_5_B4_003_Q683_HOSTING_ONLY_PREVIEW_AUTH_20261027.json",
+    "tools/gravicentra-i6-control-plane-guard-v1.mjs"
+  ],
+  "sourceBlobs": {
+    "orbit360-platform/core/ui.js": "9b14194f3d43a0910d418ba1175901ae38f825a8",
+    "orbit360-platform/core/queries.js": "63e3db92d0f4cb84ad20b3f63edc6d635d347736",
+    "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js": "9b52aeda135d0e371018e739dda5c4ecc9779b58"
+  },
+  "qaBlobs": {
+    "tools/gravicentra-b4-003-calendar-q683-parity.test.cjs": "f97f0ef1737dfa4bfc894f0e177bc4506ee1bd83"
+  },
+  "expectedProof": {
+    "calendarSyntheticQaChecks": 41,
+    "canonicalGuard": "PASS_REQUIRED",
+    "hostingPreviewUrl": "PENDING_ONE_ISOLATED_CHANNEL",
+    "sourceTreeVerification": "REQUIRED_EXACT_E13",
+    "hostedFileSha256Readback": "REQUIRED",
+    "publicScopedReadSmoke": "REQUIRED_READ_ONLY",
+    "realRoleCountryUat": "HOLD_UNTIL_AUTHENTICATED_EVIDENCE",
+    "release": "HOLD_NO_GO"
+  },
+  "scope": {
+    "hostingOnly": true,
+    "existingCallableReadOnly": true,
+    "newPreviewChannelsMaximum": 1,
+    "backendFunctionsDeploy": false,
+    "sharedFirestoreRulesDeploy": false,
+    "authIamMutation": false,
+    "syntheticQaWrites": false,
+    "realBusinessWrites": false,
+    "dataMutation": false,
+    "importOrReimport": false,
+    "livePromotion": false,
+    "productionHostingDeploy": false,
+    "previewChannelGarbageCollection": false,
+    "realUserTokenIssuance": false,
+    "historicalLocksChanged": false
+  },
+  "preserved": {
+    "findings": 295,
+    "frozenTasks": 86,
+    "openP0": 6,
+    "securityHold": "ACTIVE_FAIL_CLOSED_UNAUTHORIZED_BROWSER_FIRESTORE_READ_WRITE",
+    "priorI5LiveArtifactUntouched": true,
+    "noGateAdvance": true
+  }
+}

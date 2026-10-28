@@ -1254,7 +1254,78 @@ jobs:
             && l.boundaries?.realOperationalWritesAuthorized===false
             && l.boundaries?.livePromotionAuthorized===false;
           if(focalRequested&&!focalPreview)throw Error('B4_003_C360_COBROS_FOCAL_PREVIEW_SCOPE_DENIED');
-          const scopedPreview=focalPreview||scopeDenialPreview||correctiveSourcePreview||priorScopedPreview||onePassInternal||oct15ScopedReadback||restrictedScoped||c03Scoped||uatScoped||currentScoped||causalScoped||insurerScoped||cacheScoped||countryScoped||agingScoped||pctxScoped||moneyScoped||postAuthScoped||uatFixScoped||rulesCountryScoped||storeScoped||safeDiagScoped||latencyScoped||roleRecoveryScoped||activeInsurerScoped||policyCountScoped||dualHostScoped;
+          // Paula's single Q683 Preview authorization: exact pre-existing source
+          // e13c81d2, Hosting ONLY, no callable/backend/Rules/Auth/IAM/data/LIVE.
+          // A one-commit, subject-and-parent-bound push cannot be replayed by dispatch.
+          const q683Subject='build(i6.5 B4-003): exact Q683 calendar hosting-only Preview';
+          const q683Requested=currentSubject===q683Subject;
+          const q683Auth=c.b4003Q683CalendarHostingPreview20261027||{};
+          const q683Path='artifacts/orbit360-recovery/release-control/I6_5_B4_003_Q683_HOSTING_ONLY_PREVIEW_AUTH_20261027.json';
+          const q683Receipt=fs.existsSync(q683Path)?JSON.parse(fs.readFileSync(q683Path,'utf8')):{};
+          const q683SourcePath='artifacts/orbit360-recovery/release-control/I6_5_B4_003_Q683_CALENDAR_SOURCE_SUCCESSOR_20261027.json';
+          const q683Source=JSON.parse(fs.readFileSync(q683SourcePath,'utf8'));
+          const q683Commit='e13c81d2ff0bac78f344b1554a071c781afb15dd';
+          const q683GuardPath='tools/gravicentra-i6-control-plane-guard-v1.mjs';
+          const q683Paths=['.github/workflows/gravicentra-b4-003-executor.yml','artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json',q683Path,q683GuardPath].sort();
+          const q683Scope=q683Receipt.scope||{};
+          const q683Flags=['backendFunctionsDeploy','sharedFirestoreRulesDeploy','authIamMutation','syntheticQaWrites','realBusinessWrites','dataMutation','importOrReimport','livePromotion','productionHostingDeploy','previewChannelGarbageCollection','realUserTokenIssuance','historicalLocksChanged'];
+          const q683Preview=q683Requested
+            && process.env.GITHUB_EVENT_NAME==='push'
+            && process.env.GITHUB_REPOSITORY==='paulaosoriof86/orbit360-core'
+            && process.env.GITHUB_REF_NAME==='recovery/fase-a-clean-20260831'
+            && gitRead('rev-parse','HEAD^')===q683Commit
+            && gitRead('diff','--name-only','HEAD^','HEAD').split(/\r?\n/).filter(Boolean).sort().join('|')===q683Paths.join('|')
+            && q683Auth.status==='AUTHORIZED_ONE_HOSTING_PREVIEW_PENDING_EXECUTION'
+            && q683Auth.authority==='PAULA_EXPLICIT_ONE_Q683_HOSTING_ONLY_PREVIEW_20261027'
+            && q683Auth.gate==='I6.5/B4-003'
+            && q683Auth.receiptPath===q683Path
+            && q683Auth.receiptBlobSha===productSha(q683Path)
+            && q683Auth.sourceCommit===q683Commit
+            && q683Auth.sourceTree==='b8c91f201bbb67594f2d508d2b35ebf7de581bb1'
+            && q683Receipt.schema==='GI_I65_B4_003_Q683_HOSTING_ONLY_PREVIEW_AUTH_V1'
+            && q683Receipt.status===q683Auth.status
+            && q683Receipt.authority===q683Auth.authority
+            && q683Receipt.gate===q683Auth.gate
+            && q683Receipt.triggerSubject===q683Subject
+            && q683Receipt.sourceCommit===q683Commit
+            && q683Receipt.sourceTree===q683Auth.sourceTree
+            && gitRead('rev-parse',q683Commit+'^{tree}')===q683Receipt.sourceTree
+            && q683Receipt.sourceReceiptPath===q683SourcePath
+            && q683Receipt.sourceReceiptBlobSha===productSha(q683SourcePath)
+            && q683Receipt.sourceReceiptBlobSha===q683Auth.sourceReceiptBlobSha
+            && q683Receipt.workflowBlobShaBefore===gitRead('rev-parse',q683Commit+':.github/workflows/gravicentra-b4-003-executor.yml')
+            && q683Receipt.workflowBlobShaAfter===productSha('.github/workflows/gravicentra-b4-003-executor.yml')
+            && q683Receipt.guardPath===q683GuardPath
+            && q683Receipt.guardBlobShaBefore===gitRead('rev-parse',q683Commit+':'+q683GuardPath)
+            && q683Receipt.guardBlobShaAfter===productSha(q683GuardPath)
+            && JSON.stringify(q683Receipt.sourceBlobs)===JSON.stringify(q683Source.sourceBlobsAfter)
+            && JSON.stringify(q683Receipt.qaBlobs)===JSON.stringify(q683Source.qaBlobsAfter)
+            && Object.entries(q683Receipt.sourceBlobs||{}).length===3
+            && Object.entries(q683Receipt.qaBlobs||{}).length===1
+            && Object.entries(q683Receipt.sourceBlobs||{}).every(([p,sha])=>sha===productSha(p)&&sha===gitRead('rev-parse',q683Commit+':'+p))
+            && Object.entries(q683Receipt.qaBlobs||{}).every(([p,sha])=>sha===productSha(p)&&sha===gitRead('rev-parse',q683Commit+':'+p))
+            && q683Source.verification?.qaMarker==='GI_B4_003_Q683_CALENDAR_PARITY_SYNTHETIC_PASS checks=41 no_network no_business_writes'
+            && q683Source.scope?.hostingPreviewPendingSeparateGate===true
+            && q683Receipt.preserved?.findings===295
+            && q683Receipt.preserved?.frozenTasks===86
+            && q683Receipt.preserved?.securityHold==='ACTIVE_FAIL_CLOSED_UNAUTHORIZED_BROWSER_FIRESTORE_READ_WRITE'
+            && q683Scope.hostingOnly===true
+            && q683Scope.existingCallableReadOnly===true
+            && q683Scope.newPreviewChannelsMaximum===1
+            && q683Flags.every(k=>q683Scope[k]===false)
+            && c.b4003Q683CalendarSourceSuccessor20261027?.receiptBlobSha===q683Receipt.sourceReceiptBlobSha
+            && c.b4003SecurityReleaseHold?.status===q683Receipt.preserved.securityHold
+            && c.currentB4?.status==='B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL'
+            && c.nextAction==='I6_5_FORENSIC_REMEDIATION_B4_003_R20_TARGETED_PAULA_VISUAL'
+            && l.activeFinding?.id==='B4-003'
+            && l.boundaries?.buildDispatchAuthorized===true
+            && l.boundaries?.previewMutationAuthorized===true
+            && l.boundaries?.businessWritesAuthorized===false
+            && l.boundaries?.syntheticQaWritesAuthorized===false
+            && l.boundaries?.dataMutationAuthorized===false
+            && l.boundaries?.livePromotionAuthorized===false;
+          if(q683Requested&&!q683Preview)throw Error('B4_003_Q683_HOSTING_ONLY_PREVIEW_AUTH_FAIL_CLOSED');
+          const scopedPreview=q683Preview||focalPreview||scopeDenialPreview||correctiveSourcePreview||priorScopedPreview||onePassInternal||oct15ScopedReadback||restrictedScoped||c03Scoped||uatScoped||currentScoped||causalScoped||insurerScoped||cacheScoped||countryScoped||agingScoped||pctxScoped||moneyScoped||postAuthScoped||uatFixScoped||rulesCountryScoped||storeScoped||safeDiagScoped||latencyScoped||roleRecoveryScoped||activeInsurerScoped||policyCountScoped||dualHostScoped;
           const previewOk=(r19Preview||r20Preview||r23Preview)
             && l.activeFinding?.id==='B4-003'
             && l.boundaries?.businessWritesAuthorized===false
@@ -1502,7 +1573,7 @@ jobs:
           const uatRosterReady=uatScoped&&uat.sourceBlobs&&
             uat.sourceBlobs['functions/assignable-advisor-roster.js']===rosterBlob
             && uat.onlyTwoReadOnlyFunctions===true;
-          const readonlyRoster=!correctiveSourcePreview&&scopedPreview&&rosterAuth.status==='AUTHORIZED_EXACT_PREVIEW_READONLY_ROSTER_ONLY'
+          const readonlyRoster=!q683Preview&&!correctiveSourcePreview&&scopedPreview&&rosterAuth.status==='AUTHORIZED_EXACT_PREVIEW_READONLY_ROSTER_ONLY'
             && (rosterAuth.sourceBlobSha===rosterBlob||c03RosterReady||uatRosterReady||(currentScoped&&currentPreviewIntent.rosterSourceBlobSha===rosterBlob)||(causalScoped&&ca.rosterSourceBlobSha===rosterBlob)||(insurerScoped&&insurerAuth.rosterSourceBlobSha===rosterBlob)||(cacheScoped&&cacheAuth.rosterSourceBlobSha===rosterBlob)||(countryScoped&&countryAuth.rosterSourceBlobSha===rosterBlob)||(agingScoped&&agingAuth.rosterSourceBlobSha===rosterBlob)||(pctxScoped&&pctxAuth.rosterSourceBlobSha===rosterBlob)||(moneyScoped&&moneyAuth.rosterSourceBlobSha===rosterBlob)||(postAuthScoped&&postAuth.rosterSourceBlobSha===rosterBlob)||(uatFixScoped&&uatFixAuth.rosterSourceBlobSha===rosterBlob)||(rulesCountryScoped&&uatFixAuth.rosterSourceBlobSha===rosterBlob)||(storeScoped&&storeAuth.rosterSourceBlobSha===rosterBlob)||(safeDiagScoped&&safeDiagAuth.rosterSourceBlobSha===rosterBlob)||(latencyScoped&&latencyAuth.rosterSourceBlobSha===rosterBlob)||(roleRecoveryScoped&&roleRecoveryAuth.rosterSourceBlobSha===rosterBlob)||(activeInsurerScoped&&activeInsurerAuth.rosterSourceBlobSha===rosterBlob)||(policyCountScoped&&policyCountAuth.rosterSourceBlobSha===rosterBlob)||(dualHostScoped&&policyCountAuth.rosterSourceBlobSha===rosterBlob))
             && rosterAuth.service==='orbit360AssignableAdvisorRosterPreview'
             && rosterAuth.businessWritesAuthorized===false
@@ -1517,8 +1588,13 @@ jobs:
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'readonly_roster='+(readonlyRoster?'true':'false')+'\n');
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'scoped_preview='+(scopedPreview?'true':'false')+'\n');
           const finFix=c.b4003Client360FinancialOwnerSuccessor20261027||{};
-          const hostingOnly=focalPreview&&finFix.status==='SOURCE_STAGED_QA_PENDING_EXACT_ISOLATED_PREVIEW'&&finFix.gate==='I6.5/B4-003';
+          const hostingOnly=q683Preview||(focalPreview&&finFix.status==='SOURCE_STAGED_QA_PENDING_EXACT_ISOLATED_PREVIEW'&&finFix.gate==='I6.5/B4-003');
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'hosting_only='+(hostingOnly?'true':'false')+'\n');
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'q683_hosting_only='+(q683Preview?'true':'false')+'\n');
+          if(q683Preview){
+            fs.appendFileSync(process.env.GITHUB_ENV,'CANDIDATE_SOURCE_SHA='+q683Commit+'\n');
+            console.log('B4_003_Q683_SOURCE_PINNED='+q683Commit+' HOSTING_ONLY=true FUNCTIONS_DEPLOY=false DATA_WRITES=0 SECURITY_HOLD=true');
+          }
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'scope_denial_preview='+(scopeDenialPreview?'true':'false')+'\n');
           // Additive one-case source, one LAB callable and isolated Hosting.
           // Exactly one owner-authorized push is admitted because the workflow
@@ -1576,7 +1652,7 @@ jobs:
           if(metaRequested&&!metaAllowed)throw Error('B4_003_META_TR_V27_MANUAL_SINGLE_FUNCTION_PREVIEW_NOT_AUTHORIZED');
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'meta_tr_preview='+(metaAllowed?'true':'false')+'\n');
           // No custom Firebase Auth tokens for real users without explicit scoped approval.
-          const identityProofAllowed=scopedPreview&&c.b4003ProtectedPreviewAuthorization?.realUserImpersonationAuthorized===true;
+          const identityProofAllowed=!q683Preview&&scopedPreview&&c.b4003ProtectedPreviewAuthorization?.realUserImpersonationAuthorized===true;
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'authenticated_identity_proof='+(identityProofAllowed?'true':'false')+'\n');
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'apply='+(applyOk?'true':'false')+'\n');
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'r20_dryrun='+(r20DryRun?'true':'false')+'\n');
@@ -2672,6 +2748,17 @@ jobs:
           LIVE_DRIFT_OUT: ${{ runner.temp }}/b4-003-preview-live-before.json
         run: node tools/gravicentra-live-preexisting-drift-snapshot.mjs --mode=snapshot
 
+      - name: Verify exact Q683 source and calendar QA before Hosting-only Preview
+        if: steps.gate.outputs.q683_hosting_only == 'true'
+        run: |
+          set -euo pipefail
+          test "$CANDIDATE_SOURCE_SHA" = 'e13c81d2ff0bac78f344b1554a071c781afb15dd'
+          node tools/gravicentra-b4-003-calendar-q683-parity.test.cjs
+          node tools/gravicentra-b4-003-c360-native-financial-owner.test.cjs
+          node tools/gravicentra-b4-003-c360-cobros-currency-overdue.test.cjs
+          node tools/gravicentra-i6-control-plane-guard-v1.mjs --mode=governance
+          echo 'B4_003_Q683_HOSTING_ONLY_CI_SOURCE_QA=PASS_NO_WRITES'
+
       - name: Validate B4-003 contract and syntax
         if: steps.gate.outputs.run == 'true'
         run: |
@@ -2803,7 +2890,15 @@ jobs:
           export RELEASE_GATE="I6.5-B4-003"
           export BUILD_PREFIX="gi-i65-b4"
           export ENVIRONMENT_REF="firebase-hosting-preview-i6-5-forensic-b4-003"
-          node tools/gravicentra-i6-1-preview-package.mjs . "$RUNNER_TEMP/b4-003-package" "$PUBLIC_CONFIG_FILE" > "$RUNNER_TEMP/b4-003-package-output.json"
+          PACKAGE_SOURCE=.
+          if [ "${{ steps.gate.outputs.q683_hosting_only }}" = "true" ]; then
+            PACKAGE_SOURCE="$RUNNER_TEMP/b4-003-q683-exact-source"
+            git worktree add --detach "$PACKAGE_SOURCE" "$SOURCE_SHA"
+            test "$(git -C "$PACKAGE_SOURCE" rev-parse HEAD)" = 'e13c81d2ff0bac78f344b1554a071c781afb15dd'
+            test "$(git -C "$PACKAGE_SOURCE" rev-parse 'HEAD^{tree}')" = 'b8c91f201bbb67594f2d508d2b35ebf7de581bb1'
+            echo 'B4_003_Q683_PACKAGE_SOURCE=PINNED_E13_EXACT_TREE'
+          fi
+          node tools/gravicentra-i6-1-preview-package.mjs "$PACKAGE_SOURCE" "$RUNNER_TEMP/b4-003-package" "$PUBLIC_CONFIG_FILE" > "$RUNNER_TEMP/b4-003-package-output.json"
           node - <<'NODE'
           const fs=require('node:fs'),d=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/b4-003-package-output.json'));
           for(const [k,v] of Object.entries({build_id:d.buildId,hosted_payload_digest:d.hostedPayloadDigest,backend_source_digest:d.backendSourceDigest,bundle_digest:d.bundleDigest}))fs.appendFileSync(process.env.GITHUB_OUTPUT,k+'='+v+'\n');
@@ -2852,7 +2947,7 @@ jobs:
           }
           if ! deploy_channel; then
             if grep -Fq "channel quota reached" "$RUNNER_TEMP/b4-003-preview.json"; then
-              if [ "${{ steps.gate.outputs.meta_tr_preview }}" = "true" ] || [ "${{ steps.gate.outputs.scope_denial_preview }}" = "true" ]; then
+              if [ "${{ steps.gate.outputs.meta_tr_preview }}" = "true" ] || [ "${{ steps.gate.outputs.scope_denial_preview }}" = "true" ] || [ "${{ steps.gate.outputs.q683_hosting_only }}" = "true" ]; then
                 echo 'B4_003_FOCUSED_PREVIEW_NO_HOSTING_CHANNEL_GC_AUTHORIZED' >&2
                 exit 1
               fi
@@ -3113,7 +3208,7 @@ jobs:
           git push origin "HEAD:$GITHUB_REF_NAME"
 
       - name: Verify LIVE remained byte-stable during exact Preview
-        if: always() && (steps.gate.outputs.run == 'true' || steps.gate.outputs.renewals_preview == 'true' || steps.gate.outputs.meta_tr_preview == 'true')
+        if: always() && (steps.gate.outputs.run == 'true' || steps.gate.outputs.renewals_preview == 'true' || steps.gate.outputs.meta_tr_preview == 'true' || steps.gate.outputs.q683_hosting_only == 'true')
         env:
           LIVE_DRIFT_BEFORE: ${{ runner.temp }}/b4-003-preview-live-before.json
           LIVE_DRIFT_OUT: ${{ runner.temp }}/b4-003-preview-live-after.json

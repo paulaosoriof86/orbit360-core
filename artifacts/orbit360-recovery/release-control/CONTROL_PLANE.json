@@ -15122,5 +15122,33 @@
     "sharedRulesDeploymentAuthorized": false,
     "dataMutationAuthorized": false,
     "livePromotionAuthorized": false
+  },
+  "b4003Q683CalendarHostingPreview20261027": {
+    "status": "AUTHORIZED_ONE_HOSTING_PREVIEW_PENDING_EXECUTION",
+    "gate": "I6.5/B4-003",
+    "authority": "PAULA_EXPLICIT_ONE_Q683_HOSTING_ONLY_PREVIEW_20261027",
+    "parentHead": "e13c81d2ff0bac78f344b1554a071c781afb15dd",
+    "sourceCommit": "e13c81d2ff0bac78f344b1554a071c781afb15dd",
+    "sourceTree": "b8c91f201bbb67594f2d508d2b35ebf7de581bb1",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_Q683_HOSTING_ONLY_PREVIEW_AUTH_20261027.json",
+    "receiptBlobSha": "8b63cd4872f55e61050e450a58a2c1fd408f2f26",
+    "sourceReceiptBlobSha": "db3d08d3d10ce74014c0c1bae1fa51679bf45a09",
+    "hostingOnly": true,
+    "existingCallableReadOnly": true,
+    "newPreviewChannelsMaximum": 1,
+    "backendFunctionsDeploymentAuthorized": false,
+    "sharedFirestoreRulesDeploymentAuthorized": false,
+    "authIamMutationAuthorized": false,
+    "previewChannelGarbageCollectionAuthorized": false,
+    "syntheticQaWritesAuthorized": false,
+    "realBusinessWritesAuthorized": false,
+    "dataMutationAuthorized": false,
+    "importOrReimportAuthorized": false,
+    "livePromotionAuthorized": false,
+    "productionHostingDeploymentAuthorized": false,
+    "historicalLocksChanged": false,
+    "findingsPreserved": 295,
+    "frozenTasksPreserved": 86,
+    "p0OpenPreserved": 6
   }
 }

@@ -153,6 +153,62 @@ if(Q683_CALENDAR){
  Q683_CALENDAR_PREDECESSOR.set('tools/gravicentra-i6-control-plane-guard-v1.mjs',R.priorGuardBlobSha);
  console.log('B4_003_Q683_CALENDAR_SOURCE=THREE_EXACT_SOURCES_ONE_QA_PASS_SECURITY_HOLD');
 }
+// One explicit Q683 Preview execution successor preserves historic workflow
+// receipts against their previous exact blob while checking the new workflow,
+// this guard, the immutable e13 source tree, and a four-file-only dispatch.
+const Q683_HOSTING_AUTH=C.b4003Q683CalendarHostingPreview20261027||null;
+let Q683_HOSTING_RECEIPT=null;
+if(Q683_HOSTING_AUTH){
+ const A=Q683_HOSTING_AUTH,R=readJson(A.receiptPath),P='e13c81d2ff0bac78f344b1554a071c781afb15dd';
+ const path='.github/workflows/gravicentra-b4-003-executor.yml';
+ const guardPath='tools/gravicentra-i6-control-plane-guard-v1.mjs';
+ const receiptPath='artifacts/orbit360-recovery/release-control/I6_5_B4_003_Q683_HOSTING_ONLY_PREVIEW_AUTH_20261027.json';
+ const changedPaths=[path,guardPath,receiptPath,CONTROL].sort();
+ const excluded=['backendFunctionsDeploy','sharedFirestoreRulesDeploy','authIamMutation','syntheticQaWrites',
+  'realBusinessWrites','dataMutation','importOrReimport','livePromotion','productionHostingDeploy',
+  'previewChannelGarbageCollection','realUserTokenIssuance','historicalLocksChanged'];
+ need(A.status==='AUTHORIZED_ONE_HOSTING_PREVIEW_PENDING_EXECUTION'&&A.gate==='I6.5/B4-003'&&
+  A.authority==='PAULA_EXPLICIT_ONE_Q683_HOSTING_ONLY_PREVIEW_20261027'&&
+  A.parentHead===P&&A.sourceCommit===P&&A.sourceTree==='b8c91f201bbb67594f2d508d2b35ebf7de581bb1'&&
+  A.receiptPath===receiptPath&&A.receiptBlobSha===physicalGit('hash-object',receiptPath)&&
+  A.sourceReceiptBlobSha===physicalGit('hash-object',Q683_CALENDAR.receiptPath)&&
+  R.schema==='GI_I65_B4_003_Q683_HOSTING_ONLY_PREVIEW_AUTH_V1'&&
+  R.status===A.status&&R.gate===A.gate&&R.authority===A.authority&&
+  R.parentHead===P&&R.sourceCommit===P&&R.sourceTree===A.sourceTree&&
+  R.triggerSubject==='build(i6.5 B4-003): exact Q683 calendar hosting-only Preview'&&
+  R.sourceReceiptPath===Q683_CALENDAR.receiptPath&&R.sourceReceiptBlobSha===A.sourceReceiptBlobSha&&
+  R.workflowPath===path&&R.workflowBlobShaBefore===physicalGit('rev-parse',P+':'+path)&&
+  R.workflowBlobShaAfter===physicalGit('hash-object',path)&&
+  R.guardPath===guardPath&&R.guardBlobShaBefore===physicalGit('rev-parse',P+':'+guardPath)&&
+  R.guardBlobShaAfter===physicalGit('hash-object',guardPath)&&
+  R.changedPathsOnly.slice().sort().join('|')===changedPaths.join('|')&&
+  physicalGit('rev-parse','HEAD^')===P&&
+  physicalGit('merge-base',P,'HEAD')===P&&
+  physicalGit('log','-1','--format=%s')===R.triggerSubject&&
+  physicalGit('diff','--name-only','HEAD^','HEAD').split(/\r?\n/).filter(Boolean).sort().join('|')===changedPaths.join('|')&&
+  physicalGit('rev-parse',P+'^{tree}')===A.sourceTree&&
+  sameJson(R.sourceBlobs,Q683_CALENDAR_RECEIPT.sourceBlobsAfter)&&
+  sameJson(R.qaBlobs,Q683_CALENDAR_RECEIPT.qaBlobsAfter)&&
+  Object.keys(R.sourceBlobs||{}).length===3&&Object.keys(R.qaBlobs||{}).length===1&&
+  Object.entries(R.sourceBlobs).every(([p,sha])=>sha===physicalGit('hash-object',p)&&sha===physicalGit('rev-parse',P+':'+p))&&
+  Object.entries(R.qaBlobs).every(([p,sha])=>sha===physicalGit('hash-object',p)&&sha===physicalGit('rev-parse',P+':'+p))&&
+  R.expectedProof?.calendarSyntheticQaChecks===41&&R.expectedProof?.release==='HOLD_NO_GO'&&
+  R.scope?.hostingOnly===true&&R.scope?.existingCallableReadOnly===true&&R.scope?.newPreviewChannelsMaximum===1&&
+  excluded.every(k=>R.scope?.[k]===false)&&
+  A.backendFunctionsDeploymentAuthorized===false&&A.sharedFirestoreRulesDeploymentAuthorized===false&&
+  A.authIamMutationAuthorized===false&&A.previewChannelGarbageCollectionAuthorized===false&&
+  A.syntheticQaWritesAuthorized===false&&A.realBusinessWritesAuthorized===false&&
+  A.dataMutationAuthorized===false&&A.importOrReimportAuthorized===false&&
+  A.livePromotionAuthorized===false&&A.productionHostingDeploymentAuthorized===false&&
+  A.historicalLocksChanged===false&&A.newPreviewChannelsMaximum===1&&
+  A.findingsPreserved===295&&A.frozenTasksPreserved===86&&A.p0OpenPreserved===6&&
+  R.preserved?.findings===295&&R.preserved?.frozenTasks===86&&R.preserved?.openP0===6&&
+  R.preserved?.securityHold===C.b4003SecurityReleaseHold?.status&&
+  R.preserved?.noGateAdvance===true&&B4.boundaries?.livePromotionAuthorized===false,
+  'B4_003_Q683_HOSTING_PREVIEW_SOURCE_AUTH_INVALID');
+ Q683_HOSTING_RECEIPT=R;
+ console.log('B4_003_Q683_HOSTING_AUTH=EXACT_E13_SOURCE_FOUR_FILE_DISPATCH_NO_BACKENDS_NO_WRITES_HOLD');
+}
 // Explicitly authorized focal correction, with immutable predecessor proofs.
 // This is a one-path exception for the actual canonical Cobros adapter, not a
 // change to the historical B4 allowlist or a blanket product mutation grant.
@@ -242,7 +298,7 @@ if(C360_FINANCIAL_FIX){
   R.guardBlobBefore===physicalGit('rev-parse',P+':tools/gravicentra-i6-control-plane-guard-v1.mjs')&&
   R.guardBlobAfter===(Q683_CALENDAR_PREDECESSOR.get('tools/gravicentra-i6-control-plane-guard-v1.mjs')||physicalGit('hash-object','tools/gravicentra-i6-control-plane-guard-v1.mjs'))&&
   R.workflowBlobBefore===physicalGit('rev-parse',P+':.github/workflows/gravicentra-b4-003-executor.yml')&&
-  R.workflowBlobAfter===physicalGit('hash-object','.github/workflows/gravicentra-b4-003-executor.yml')&&
+  R.workflowBlobAfter===(Q683_HOSTING_RECEIPT?.workflowBlobShaBefore||physicalGit('hash-object','.github/workflows/gravicentra-b4-003-executor.yml'))&&
   COMP.productFiles.includes(C360_FINANCIAL_PATH)&&
   COMP.productFileBlobs[C360_FINANCIAL_PATH]===R.sourceBlobBefore&&
   R.scope?.hostingPreviewOnly===true&&R.scope?.previewFunctionRedeploy===false&&
