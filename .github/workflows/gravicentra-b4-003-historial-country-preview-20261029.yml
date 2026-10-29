@@ -25,6 +25,9 @@ jobs:
       PROJECT_ID: ays-orbit-360-lab
       HOSTING_SITE: ays-orbit-360-lab
       TENANT_HINT: alianzas-soluciones
+      RELEASE_GATE: I6.5-B4-003
+      BUILD_PREFIX: gi-i65-b4
+      ENVIRONMENT_REF: firebase-hosting-preview-i6-5-forensic-b4-003
       GRAVICENTRA_B4_003_SCOPED_PREVIEW: 'true'
       SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
       SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
@@ -42,7 +45,7 @@ jobs:
       - name: Freeze exact ancestry, target, and read-only source tests
         run: |
           set -euo pipefail
-          test "$(git rev-parse HEAD^)" = '5441f8d510b937ef0a9ebe46a4485d93cc3c142e'
+          test "$(git rev-parse HEAD^)" = '91b57f6e57909fd6484f1a1a17d103063292f604'
           test "$(git diff --name-only HEAD^ HEAD)" = '.github/workflows/gravicentra-b4-003-historial-country-preview-20261029.yml'
           test "$(git hash-object orbit360-platform/modules/historial.js)" = '7dfef4b69a9dafffafde5f6f627f81ad27a33c37'
           node --check orbit360-platform/modules/historial.js
