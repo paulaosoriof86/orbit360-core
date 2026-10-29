@@ -1,0 +1,53 @@
+{
+  "schema": "GRAVICENTRA_I65_B4003_INSIGHTS_PLANTILLAS_SAFEREAD_SUCCESSOR_V1",
+  "gate": "I6.5/B4-003",
+  "status": "SOURCE_AND_SYNTHETIC_QA_PASS_PREVIEW_UAT_PENDING_SECURITY_HOLD",
+  "authority": "PAULA_SAME_CANONICAL_CANDIDATE_INCREMENTAL_RECOVERY_20261029",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "parentHead": "e6c050bd03fb923e11d4cdcf26f724410b82649e",
+  "sourceCommit": "cee34a50a2bc65b4162798348725a8657ed2d6fe",
+  "sourceTree": "782ac2822592269b9db3739160a8eb6a7fd5bd49",
+  "sourceChangedPaths": [
+    "orbit360-platform/modules/insights.js",
+    "orbit360-platform/modules/plantillas.js",
+    "tools/gravicentra-b4-003-insights-plantillas-country-no-seed.test.cjs"
+  ],
+  "additionalProductFilesOutsideFrozen114": {
+    "orbit360-platform/modules/insights.js": {
+      "before": "cb3e45ce4365c374d3b323b8878958bbf784a265",
+      "after": "b6c90e3caa9c86c27f36f95e6aea2aee28aae975"
+    },
+    "orbit360-platform/modules/plantillas.js": {
+      "before": "66f570d725e82beebfffad6df4e86aa8ab4ebd08",
+      "after": "702c90d4c655013fc168430cb44a48aab7bdfcd0"
+    }
+  },
+  "regressionTest": {
+    "path": "tools/gravicentra-b4-003-insights-plantillas-country-no-seed.test.cjs",
+    "blob": "839a82a705ddd0e26ee62b8c8db57cc266dfdde0",
+    "syntheticOnly": true,
+    "realBusinessWrites": 0,
+    "testCases": 4
+  },
+  "functionalScope": {
+    "insightsCountryPolicyParentAndDrills": "SOURCE_SYNTHETIC_PASS_REAL_UAT_PENDING",
+    "plantillasHistoricalSixReadOnly": "SOURCE_SYNTHETIC_PASS_REAL_UAT_PENDING",
+    "plantillasServerPersistentCrud": "NOT_AVAILABLE_SECURITY_DEPENDENCY",
+    "otherModulesHistoricalApprovals": "PRESERVED_NOT_REOPENED"
+  },
+  "preserved": {
+    "frozenCompositionFiles": 114,
+    "historicalCapabilityApprovals": 15,
+    "historicalFindings": 295,
+    "historicalTasks": 86,
+    "priorReceiptsImmutable": true
+  },
+  "nonPromotion": {
+    "liveDeployment": false,
+    "firestoreWrites": false,
+    "authIamRulesChanges": false,
+    "productionApproval": false,
+    "securityB4003StillHold": true
+  }
+}

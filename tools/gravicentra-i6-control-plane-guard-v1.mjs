@@ -4087,13 +4087,18 @@ const forensicActiveBlock=String(C.i65ForensicRemediationPlan?.currentBlock||'')
 const canonicalCompositionBlock=String(COMP.activeBlock||COMP.currentBlock||'');
 const canonicalCompositionActive=activeI65&&COMP.status==='FROZEN_ACTIVE'&&canonicalCompositionBlock===forensicActiveBlock;
 const canonicalCompositionProduct=new Set(canonicalCompositionActive&&Array.isArray(COMP.productFiles)?COMP.productFiles:[]);
+// This additive successor is independently SHA-pinned below. Do not rewrite
+// the historical 114-file composition or expand source eligibility unboundedly.
+const independentlyPinnedSafeReadProduct=new Set();
 const authorizedQ683CalendarProduct=new Set(Q683_CALENDAR_RECEIPT?Q683_CALENDAR_PATHS:[]);
 if(canonicalCompositionActive){
  need(COMP.baselineCertifiedSourceSha===R.sourceSha,'I6_CANONICAL_COMPOSITION_BASELINE_MISMATCH');
  need(COMP.definitiveSolution?.compositionAuthority==='THIS_FILE'&&COMP.definitiveSolution?.diffContract==='EXACT_PRODUCT_DIFF_SET_AND_EXACT_BLOB_BINDING_FROM_CERTIFIED_BASELINE','I6_CANONICAL_COMPOSITION_CONTRACT_INVALID');
  const actualProduct=changed.filter(p=>!allowedPrefixes.some(prefix=>p.startsWith(prefix))).sort();
  const declared=[...(COMP.productFiles||[]),...(Q683_CALENDAR_RECEIPT?['orbit360-platform/core/ui.js']:[])].sort();
- need(actualProduct.length===declared.length&&actualProduct.every((p,i)=>p===declared[i]),'I6_CANONICAL_COMPOSITION_EXACT_SET_DRIFT');
+ const safeReadProductPaths=['orbit360-platform/modules/insights.js','orbit360-platform/modules/plantillas.js'];
+ const boundedComposition=[...declared,...safeReadProductPaths].sort();
+ need(actualProduct.length===boundedComposition.length&&actualProduct.every((p,i)=>p===boundedComposition[i]),'I6_CANONICAL_COMPOSITION_EXACT_SET_DRIFT');
  // Keep the immutable 114-file composition intact. The five changed bytes
  // belong to ONE independently pinned I6.5/B4-003 source successor, never to
  // a rewritten prior receipt or an unbounded current working-tree override.
@@ -4182,6 +4187,47 @@ if(canonicalCompositionActive){
  need(declared.every(p=>physicalGit('hash-object',p)===(p===markerProduct?insurerMarkerReceipt.source.afterBlob:(newFiles[p]?.after||COMP.productFileBlobs?.[p]||
   (p==='orbit360-platform/core/ui.js'?Q683_CALENDAR_RECEIPT?.sourceBlobsAfter?.[p]:null)))),
   'I6_CANONICAL_COMPOSITION_BLOB_DRIFT');
+ // The two extra modules were historically developed but absent from the
+ // certified 114-file composition. Preserve that certified receipt untouched;
+ // require a single exact, descendant source commit and executable synthetic
+ // regression proof before accepting either changed file in this gate.
+ const safeReadReceiptPath='artifacts/orbit360-recovery/release-control/I6_5_B4_003_INSIGHTS_PLANTILLAS_SAFEREAD_SUCCESSOR_20261029.json';
+ need(exists(safeReadReceiptPath),'B4_003_SAFE_READ_SUCCESSOR_RECEIPT_MISSING');
+ const safeRead=readJson(safeReadReceiptPath),source='cee34a50a2bc65b4162798348725a8657ed2d6fe',parent='e6c050bd03fb923e11d4cdcf26f724410b82649e';
+ const testPath='tools/gravicentra-b4-003-insights-plantillas-country-no-seed.test.cjs',testBlob='839a82a705ddd0e26ee62b8c8db57cc266dfdde0';
+ const expectedPaths=[...safeReadProductPaths,testPath].sort();
+ const actualPaths=physicalGit('diff','--name-only',parent+'..'+source).split(/\r?\n/).filter(Boolean).sort();
+ const bound=safeRead.additionalProductFilesOutsideFrozen114||{};
+ need(safeRead.schema==='GRAVICENTRA_I65_B4003_INSIGHTS_PLANTILLAS_SAFEREAD_SUCCESSOR_V1'&&
+  safeRead.gate==='I6.5/B4-003'&&safeRead.status==='SOURCE_AND_SYNTHETIC_QA_PASS_PREVIEW_UAT_PENDING_SECURITY_HOLD'&&
+  safeRead.repository==='paulaosoriof86/orbit360-core'&&safeRead.branch==='recovery/fase-a-clean-20260831'&&
+  safeRead.parentHead===parent&&safeRead.sourceCommit===source&&
+  safeRead.sourceTree==='782ac2822592269b9db3739160a8eb6a7fd5bd49'&&
+  physicalGit('rev-parse',source+'^')===parent&&
+  physicalGit('rev-parse',source+'^{tree}')===safeRead.sourceTree&&
+  physicalGit('merge-base',source,current)===source&&
+  actualPaths.join('|')===expectedPaths.join('|')&&
+  (safeRead.sourceChangedPaths||[]).slice().sort().join('|')===expectedPaths.join('|')&&
+  Object.keys(bound).sort().join('|')===safeReadProductPaths.slice().sort().join('|')&&
+  safeReadProductPaths.every(p=>bound[p]?.before===physicalGit('rev-parse',parent+':'+p)&&
+    bound[p]?.after===physicalGit('rev-parse',source+':'+p)&&
+    bound[p]?.after===physicalGit('hash-object',p)&&bound[p]?.before!==bound[p]?.after)&&
+  safeRead.regressionTest?.path===testPath&&safeRead.regressionTest?.blob===testBlob&&
+  safeRead.regressionTest?.syntheticOnly===true&&safeRead.regressionTest?.realBusinessWrites===0&&
+  safeRead.regressionTest?.testCases===4&&
+  physicalGit('rev-parse',source+':'+testPath)===testBlob&&
+  physicalGit('hash-object',testPath)===testBlob&&
+  safeRead.functionalScope?.plantillasServerPersistentCrud==='NOT_AVAILABLE_SECURITY_DEPENDENCY'&&
+  safeRead.preserved?.frozenCompositionFiles===114&&safeRead.preserved?.historicalCapabilityApprovals===15&&
+  safeRead.preserved?.historicalFindings===295&&safeRead.preserved?.historicalTasks===86&&
+  safeRead.preserved?.priorReceiptsImmutable===true&&
+  safeRead.nonPromotion?.liveDeployment===false&&safeRead.nonPromotion?.firestoreWrites===false&&
+  safeRead.nonPromotion?.authIamRulesChanges===false&&safeRead.nonPromotion?.productionApproval===false&&
+  safeRead.nonPromotion?.securityB4003StillHold===true,
+  'B4_003_SAFE_READ_SUCCESSOR_EXACT_PROOF_DRIFT');
+ execFileSync(process.execPath,[testPath],{stdio:'pipe'});
+ for(const p of safeReadProductPaths)independentlyPinnedSafeReadProduct.add(p);
+ console.log('B4_003_SAFE_READ_SUCCESSOR=EXACT_TWO_BLOBS_ONE_TEST_FROZEN114_PRESERVED_SECURITY_HOLD');
  need(COMP.productFileCount===COMP.productFiles.length,'I6_CANONICAL_COMPOSITION_COUNT_DRIFT');
 }
 const b1Retained=activeI65&&['B1','B2','B3','B4'].includes(forensicActiveBlock)&&Array.isArray(B1.allowedProductFiles);
@@ -4190,7 +4236,7 @@ const b2PausedRetained=activeI65&&forensicActiveBlock==='B1'&&String(B2.status||
 const b2Active=activeI65&&forensicActiveBlock==='B2'&&['READ_ONLY_DIAGNOSTIC_ACTIVE','CAUSE_DEMONSTRATED_PATCH_AUTHORIZED','OPEN_PAULA_VISUAL_REJECTED_REMEDIATION_REQUIRED','CANDIDATE_PENDING_PREVIEW','PREVIEW_TECHNICAL_PASS_PENDING_PAULA_VISUAL','PREVIEW_AUTHENTICATED_PASS_PENDING_PAULA_VISUAL','ACCEPTED_FOR_B3'].includes(String(B2.status||''));
 const allowedI65ForensicB1Product=new Set(b1Retained?B1.allowedProductFiles:[]);
 const allowedI65ForensicB2Product=new Set((b2Active||b2PausedRetained)&&Array.isArray(B2.boundaries?.allowedProductFiles)?B2.boundaries.allowedProductFiles:[]);
-const forbidden=changed.filter(p=>!allowedPrefixes.some(prefix=>p.startsWith(prefix))&&!canonicalCompositionProduct.has(p)&&!authorizedQ683CalendarProduct.has(p)&&!allowedSuccessorProduct.has(p)&&!allowedI63Product.has(p)&&!allowedI64Product.has(p)&&!allowedI65Product.has(p)&&!allowedI65HydrationProduct.has(p)&&!allowedI65OperationalProduct.has(p)&&!allowedI65ForensicB1Product.has(p)&&!allowedI65ForensicB2Product.has(p));
+const forbidden=changed.filter(p=>!allowedPrefixes.some(prefix=>p.startsWith(prefix))&&!canonicalCompositionProduct.has(p)&&!independentlyPinnedSafeReadProduct.has(p)&&!authorizedQ683CalendarProduct.has(p)&&!allowedSuccessorProduct.has(p)&&!allowedI63Product.has(p)&&!allowedI64Product.has(p)&&!allowedI65Product.has(p)&&!allowedI65HydrationProduct.has(p)&&!allowedI65OperationalProduct.has(p)&&!allowedI65ForensicB1Product.has(p)&&!allowedI65ForensicB2Product.has(p));
 need(forbidden.length===0,'I6_PRODUCT_SOURCE_DRIFT_OUTSIDE_BOUND_SUCCESSOR:'+forbidden.slice(0,20).join(','));
 if(forensicActiveBlock==='B3'||forensicActiveBlock==='B4'){
  const b2SealOk=
