@@ -16062,6 +16062,13 @@
     "rulesAuthIamOrDataChangesAuthorized": false,
     "regressionRootQaPath": "tools/gravicentra-b4-003-insights-plantillas-country-no-seed.test.cjs",
     "regressionRootQaBeforeBlob": "839a82a705ddd0e26ee62b8c8db57cc266dfdde0",
-    "regressionRootQaBlob": "858ea2c2efebbbbc5e2ff4992543bed21f2090af"
+    "regressionRootQaBlob": "858ea2c2efebbbbc5e2ff4992543bed21f2090af",
+    "atomicCommitPaths": [
+      "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json",
+      "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PLANTILLAS_USE_LIFECYCLE_SUCCESSOR_20261029.json",
+      "orbit360-platform/modules/plantillas.js",
+      "tools/gravicentra-b4-003-insights-plantillas-country-no-seed.test.cjs",
+      "tools/gravicentra-i6-control-plane-guard-v1.mjs"
+    ]
   }
 }
