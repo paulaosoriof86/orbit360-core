@@ -162,7 +162,7 @@ need(CUMULATIVE_RECEIPT.schema==='GRAVICENTRA_I65_B4003_CUMULATIVE_READ_LIFECYCL
  CUMULATIVE_RECEIPT.historicalAnchor.receiptBlob===physicalGit('rev-parse',CUMULATIVE_PARENT+':'+CUMULATIVE_SAFE_READ_RECEIPT)&&
  CUMULATIVE_RECEIPT.historicalAnchor.sourceCommit==='cee34a50a2bc65b4162798348725a8657ed2d6fe'&&
  CUMULATIVE_RECEIPT.historicalAnchor.plantillasBlob==='702c90d4c655013fc168430cb44a48aab7bdfcd0'&&
- CUMULATIVE_RECEIPT.historicalAnchor.plantillasBlob===physicalGit('hash-object','orbit360-platform/modules/plantillas.js')&&
+ CUMULATIVE_RECEIPT.historicalAnchor.plantillasBlob===physicalGit('rev-parse',CUMULATIVE_RECEIPT.historicalAnchor.sourceCommit+':orbit360-platform/modules/plantillas.js')&&
  CUMULATIVE_RECEIPT.historicalAnchor.regressionTestBlob==='839a82a705ddd0e26ee62b8c8db57cc266dfdde0'&&
  CUMULATIVE_RECEIPT.historicalAnchor.regressionTestBlob===physicalGit('hash-object',CUMULATIVE_SAFE_READ_TEST)&&
  CUMULATIVE_RECEIPT.scope?.exactSixProductSourcesFourSyntheticTests===true&&
@@ -4336,6 +4336,7 @@ if(canonicalCompositionActive){
  const lifecycleReceiptPath='artifacts/orbit360-recovery/release-control/I6_5_B4_003_PLANTILLAS_USE_LIFECYCLE_SUCCESSOR_20261029.json';
  const lifecycleReceipt=readJson(lifecycleReceiptPath);
  const lifecycleSourcePath='orbit360-platform/modules/plantillas.js';
+ const lifecycleCommit=physicalGit('log','-n','1','--format=%H','--',lifecycleSourcePath);
  const lifecycleTestPath='artifacts/orbit360-recovery/release-control/b4003-uat-20261029/tests/plantillas-use-lifecycle.test.cjs';
  const lifecycleParent='d4a686e5e4e3c8e060a4cb0dc2a7943eba1ad0f9';
  const lifecycleExpectedCommitPaths=['artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json','artifacts/orbit360-recovery/release-control/I6_5_B4_003_PLANTILLAS_USE_LIFECYCLE_SUCCESSOR_20261029.json','orbit360-platform/modules/plantillas.js','tools/gravicentra-i6-control-plane-guard-v1.mjs'].sort();
@@ -4345,7 +4346,8 @@ if(canonicalCompositionActive){
   lifecycle?.gate==='I6.5/B4-003'&&lifecycle?.parentHead===lifecycleParent&&
   lifecycle?.receiptPath===lifecycleReceiptPath&&
   /^[0-9a-f]{40}$/.test(String(lifecycle.receiptBlobSha||''))&&
-  physicalGit('rev-parse',current+'^')===lifecycleParent&&
+  physicalGit('rev-parse',lifecycleCommit+'^')===lifecycleParent&&
+  physicalGit('merge-base',lifecycleCommit,current)===lifecycleCommit&&
   lifecycleReceipt.schema==='GRAVICENTRA_I65_B4003_PLANTILLAS_USE_LIFECYCLE_SOURCE_SUCCESSOR_V1'&&
   lifecycleReceipt.gate==='I6.5/B4-003'&&lifecycleReceipt.status===lifecycle.status&&
   lifecycleReceipt.repository==='paulaosoriof86/orbit360-core'&&lifecycleReceipt.branch==='recovery/fase-a-clean-20260831'&&
