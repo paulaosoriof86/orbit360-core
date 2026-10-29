@@ -46,3 +46,59 @@ Estos PASS no sustituyen la matriz de UAT real autenticada con más de una ident
 ## 5. Próxima acción única
 
 **Conciliar de forma acotada el baseline disjunto y los 15 hashes posteriores**, sin modificar Rules ni promover LIVE. No se declara `B4-003 PASS` hasta pasar el guard íntegro, fuente/hosting exactos y la UAT necesaria. Priorizar desbloqueos verificables sobre nuevos diagnósticos repetidos.
+
+
+---
+
+## 6. ADENDA OPERATIVA TRANSVERSAL 29-OCT-2026 — PLAN DE CHOQUE ACTUALIZADO
+
+**Carácter:** delta aditivo al freeze anterior, sin sustituir aprobaciones, recibos, 15 linajes, 86 tareas, 295 hallazgos ni planes de salida. El HEAD validado antes de esta actualización fue `a9d4f778ecd778c6c43c67f789a0682acfb812fd`. El frontend servido en LAB Preview sigue anclado a `199860dd23cad3db2df581828a45ae9f9e5cc7d8`, build `gi-i65-b4-199860dd23ca-57f234755dc1`, CI Hosting run `40861280332` SUCCESS. El resultado de Control Plane CI sobre `acefd8aa` o descendientes sigue sin acreditar: la ejecución anterior `40861280336` falló en el viejo HEAD.
+
+### A. Prioridad y semáforo sin reprocesos
+
+- **P0/A — Gobernanza y release:** acreditar Guard v5 en CI sobre HEAD posterior al ajuste histórico; proteger la composición canónica de 114 archivos, el sucesor `199860dd` y el baseline disjunto, sin falsificar descendencia. No publicar cambios de producto que disparen el workflow histórico con capacidad LIVE sin una secuencia aislada y verificable.
+- **P0/B — Renovaciones:** conservar aceptación visual de Paula del 16-oct y las pruebas por rol/país/viewport. Resolver solo el vínculo causal «Renovada» vs vencida sin sucesora acreditada, transacciones de seguimiento y rendimiento posterior a cambio de rol (anterior FAIL ~11–13s frente a límite 8s). No volver a diseñar tablero.
+- **P0/C — Ops, Leads y Upsells:** conservar aprobación Ops 12-oct, 4 negocios en flujo Ops y 6 leads visibles; cerrar ciclo Lead→gestión Ops→cliente/póliza con ownership, historial, persistencia y negativa de otro usuario. No duplicar gestiones.
+- **P0/D — Cliente 360 y relaciones:** diferenciar 1,413 pólizas con cliente visible + 12 sin cliente visible = 1,425 del listado. Adjudicar vínculo y país GT/CO con fuente; no reimportar ni asumir 12 pérdidas físicas. Mantener importes GTQ/COP separados.
+- **P0/E — Cartera, recibos, Cobros y Conciliaciones:** conservar total 2,560 Cobros, GT 2,514 / CO 46; 1,229 SIGA sin confirmar; 5 pagos confirmados GTQ Q2,744. Adjudicar cuatro filas COP marcadas vencidas bajo GT frente a Cartera, y verificar `finmovs` reader/writer y conciliación formal vacía. No inferir pagos ni alterar saldo real.
+- **P0/F — Roles, permisos y lector protegido:** diferenciar UIDs Paula/Carlos, membresía real, «Ver como» y permisos backend; comprobar matriz operativa/administrativa sin ampliar IAM. La excepción propietaria temporal de Firestore 28-oct permite considerar LIVE controlado una vez los demás gates pasen; no convierte Rules en PASS.
+
+### B. Trabajo concurrente por dominios (misma candidata, no nuevas ramas ni gates)
+
+| Frente | Capacidades conservadas | UAT exacta que falta | Criterio de cierre |
+| --- | --- | --- | --- |
+| Acceso e Inicio | Login, roles, sesión, 5/5 hidratación, KPI por país | Paula Dirección/Operativo/Asesor y Carlos UID independiente; logout/login, reload, first paint y error logs | Identidad/país/alcance correctos sin parpadeo ni fuga |
+| Cliente 360 / Pólizas / Vehículos | 434 clientes visibles, 1,425 pólizas, 230 activas y catálogo de riesgos | 12 vínculos y los cruces GT/CO; CRUD sintético y readback, estado de vehículo | Persistencia y relaciones correctas, no reimportación |
+| Cobros / recibos / Conciliaciones | Partición 2,514+46, 1,229 SIGA, 5 pagos | GT/CO/COP por registro; `finmovs` scoped; PDF/Excel/CSV con archivo comprobable | Montos por moneda, filtros y documentos sin discrepancias |
+| Renovaciones | 19 vencidas, 2 ≤15d, 14 16–45d, saludo corregido | Sucesora/vigencia, tareas, Ops, Historial y desempeño en cambio de rol | Flujo recuperado y respuesta rápida conforme a criterio |
+| Ops / Leads / Upsells | 4 gestiones de cotización y 6 leads | Handoff lead→Ops→cliente/póliza; dueño, país, notas, notificación y recarga | Un ciclo único, sin duplicar ni perder ownership |
+| Aseguradoras / Conocimiento / Fianzas | 33 fichas con 2 QA, 29 activas, 13 contactos, 7 accesos, 1 documentación | Edición de ficha sintética protegida; backend read/write y rol; tarifas solo validadas | CRUD real autorizado; negativa robusta a quien no deba editar |
+| Cronograma / Historial | Create→update→reload sintético PASS previamente archivado, 35 actividades de Paula | Verificar no regresión en candidata sucesora; relaciones actividad→cliente/renovación | Historial íntegro; Cronograma PASS previo conservado |
+| Cancelaciones / Siniestros | 490 cancelaciones, 0 reclamos | Motivos y moneda extrema USD fuente; `reclamos` reader/writer; caso sintético | Sin falsos motivos, country scope y persistencia |
+| Comisiones / Reportes / Calidad | Vistas y catálogos; Reportes 1,425 | Comisión source vs cero real; 74 discrepancias importación y relación; PDF real | Indicadores trazables, exportes readback |
+| Equipo / Configuración | 7 usuarios, multirrol, marca/catálogos | Roles por permiso efectivo y editar solo fixture autorizado; logout/invitado | Backend no confía solo en selector visual |
+| Shell / PWA / Responsive | 31 rutas y 15 linajes históricos | Navegación/errores/404, carga fría/cálida, móvil 320/390 y desktop | Todas las rutas aprobadas alcanzables sin regresión visual |
+
+**Cobertura extendida preservada:** Cotizador, Comparativo, Endosos, Certificados, Documentos/Drive, Portal, Notificaciones, Marketing, IA, Academia, Finanzas, Correo, Calidad e Importación siguen en el inventario de 44 áreas. Que aparezcan en menú no implica cierre de sus flujos; no se eliminan ni se reabren sin defecto causal.
+
+### C. Readback autenticado efectuado en la misma Preview (Paula / Dirección / Todos)
+
+Nueva inspección navegada 29-oct desde Chrome local, en pestaña aislada y sesión restaurada: Inicio (434 clientes, 1,425 pólizas, 645 vencidos); Pólizas (1,425, 230 activas, 16 próximas); Cliente 360 (1,413 vinculadas y 12 sin cliente visible); Renovaciones (19/2/14); Ops (4 negocios y 2 gestiones); Leads (6); Cobros (Q2,744, 5 pagos, 1,229 SIGA); Historial (35); Conciliaciones (6 categorías formales cero); Aseguradoras (33/29); Cancelaciones (490); Siniestros (0); Comisiones (0); Equipo (7); Cronograma (agenda visible); Reportes (1,425 tras hidratación). Son **readbacks funcionales de lectura y carga**, no PASS de escritura, exportación, autorización backend o LIVE. La pantalla Reportes inicialmente indicó cero durante restauración/hidratación y cargó 1,425 tras navegación; no se concluye pérdida de datos, se revisará su estado de carga.
+
+### D. Fuente correctiva preparada pero aún no desplegada
+
+Causa reproducida del rechazo `functions/permission-denied` en actualización QA de Aseguradoras: el reader de directorio protegido proyecta campos de negocio pero omite `__syntheticQa`; el writer Preview exige esa bandera al actualizar una entidad sintética; la ruta de `batchDurable` no la reconstituye para `aseguradoras` (sí hay trato especial previo para pólizas QA). Corrección preparada **solo** para update de aseguradora con ID sintético y Preview; IDs reales, otras colecciones y LIVE quedan inalterados. Test focal: 5/5 PASS local, sin Firebase ni UAT autenticada. Archivos propuestos:
+- `orbit360-platform/data/store-firestore-product-operational-p0.js` → blob propuesto `8bd608bc5a3aa7cd58feca8e309c97ea19059a91`.
+- `tools/gravicentra-b4-003-insurer-preview-projection.test.cjs` → blob propuesto `02edb6b02f7a88a705dba5c9b6d0adca838a790d`.
+
+**Publicación condicionada técnicamente:** el producto está protegido por comparación SHA de composición y el workflow I6 Post-Salida incluye `store-firestore-product-operational-p0.js` entre sus paths de push; un push directo puede activar camino de LIVE. Primero acreditar guard de fuente actual sin modificar producto; después integrar la corrección en sucesor **atómico y trazado**, neutralizando ejecución de LIVE y readback de CI/Preview, sin tocar Auth/IAM/Rules/datos. No usar el plan/checkpoint como certificación de código.
+
+### E. Entregables exigibles para la jornada y decisión Go/NoGo
+
+1. Evidencia CI del Control Plane sobre fuente/árbol correctos, o incidencia precisa con motivo, no solo prueba local.
+2. Candidata única publicada con SHA, cambios mínimos, tests y recibo aditivo; Preview nueva generada si cambia cualquier archivo de producto y byte-readback exacto.
+3. Matriz de 44 áreas y 15 capacidades clasificada `HISTÓRICO PRESERVADO`, `CURRENT_PREVIEW_READ_PASS`, `CURRENT_PREVIEW_WRITE_PASS`, `BLOCKED_CAUSAL` y `LIVE_PASS`, sin retrocesos ficticios.
+4. UAT crítica con dos UIDs y GT/CO; validar relaciones y operaciones sintéticas en lugar de reabrir diseños aprobados.
+5. Preflight de copia/restauración aislada, artefacto único y rollback; promoción controlada solo después de superar gates, con readback LIVE y escrituras expresamente autorizadas. Agosto sigue fuera de alcance hasta aceptación productiva.
+
+**Gobierno de avance:** reportar por lote **versiones reconciliadas, rutas verificadas, defectos causales abiertos/cerrados, builds/CI/Preview/LIVE acreditados**. No convertir el 50% formal I6 ni el 96% histórico de B3 en «porcentaje de módulos funcionando hoy». No repetir aprobaciones previas; limitar UAT a deltas de source/rol/dato realmente afectados.
