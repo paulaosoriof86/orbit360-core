@@ -15647,12 +15647,117 @@
           "country": "GT",
           "observed": "identidad A&S, marca, catálogos, roles, integraciones y configuración visible",
           "level": "READ_RENDER_PASS"
+        },
+        {
+          "module": "Cotizador",
+          "route": "#/cotizador",
+          "role": "Dirección",
+          "country": "GT",
+          "observed": "formulario de riesgo, selección aseguradora, historial y cálculo condicionado a fuente vigente",
+          "level": "READ_RENDER_NO_QUOTE_SUBMITTED"
+        },
+        {
+          "module": "Comparativo",
+          "route": "#/comparativo",
+          "role": "Dirección",
+          "country": "GT",
+          "observed": "riesgo, propuesta manual, carga PDF, historial y decisión con revisión humana visibles",
+          "level": "READ_RENDER_NO_PROPOSAL_SUBMITTED"
+        },
+        {
+          "module": "Importación inteligente",
+          "route": "#/importar",
+          "role": "Dirección",
+          "country": "GT",
+          "observed": "rutas de importación clientes, pólizas, vehículos, cobranza, finanzas y aseguradoras visibles; sin importar datos",
+          "level": "READ_RENDER_NO_DATA_IMPORT"
+        },
+        {
+          "module": "Plantillas de mensajes",
+          "route": "#/plantillas",
+          "role": "Dirección",
+          "country": "GT",
+          "observed": "main vacío; consola PRODUCT_WRITE_COLLECTION_NOT_AUTHORIZED al intentar insertar six defaults desde boot()",
+          "level": "FAIL_REPRODUCED_RENDER_AND_SECURITY_CONTRACT"
+        },
+        {
+          "module": "IA de Gravicentra",
+          "route": "#/ia",
+          "role": "Dirección",
+          "country": "GT",
+          "observed": "asistente interno y redacción visibles, motor declarado modo heurístico sin IA conectada",
+          "level": "READ_RENDER_PASS"
+        },
+        {
+          "module": "Academia",
+          "route": "#/academia",
+          "role": "Dirección",
+          "country": "GT",
+          "observed": "28 cursos, 102 lecciones; curso Cliente 360 abrió primera lección, sin registrar progreso",
+          "level": "READ_INTERACTION_PASS_NO_WRITE"
+        },
+        {
+          "module": "Insights",
+          "route": "#/insights",
+          "role": "Dirección",
+          "country": "GT/CO",
+          "observed": "GT muestra Q102.2M y 221 pólizas activas con AXA Colpatria Q95.2M; CO muestra $73.9M y 9 pólizas; riesgo de clasificación por país/moneda; contrastar fuente",
+          "level": "READ_RENDER_WITH_CRITICAL_COUNTRY_CURRENCY_SUSPECT"
+        },
+        {
+          "module": "Correo",
+          "route": "#/correo",
+          "role": "Dirección",
+          "country": "GT",
+          "observed": "bandeja sin cuenta conectada; preparar permitido; envío real bloqueado hasta OAuth/backend",
+          "level": "READ_RENDER_EXPLICIT_DEPENDENCY"
+        },
+        {
+          "module": "Automatizaciones",
+          "route": "#/automatizaciones",
+          "role": "Dirección",
+          "country": "GT",
+          "observed": "eventos Make/WhatsApp/Outlook y controles visibles; no se dispararon webhooks",
+          "level": "READ_RENDER_NO_EXTERNAL_SEND"
+        },
+        {
+          "module": "Notificaciones WhatsApp",
+          "route": "#/notificaciones",
+          "role": "Dirección",
+          "country": "GT",
+          "observed": "6 plantillas, destinatarios y controles; lista visible incluye clientes CO, verificar país efectivo vs filtro antes de envíos",
+          "level": "READ_RENDER_WITH_RECIPIENT_COUNTRY_SCOPE_SUSPECT"
+        },
+        {
+          "module": "Marketing",
+          "route": "#/marketing",
+          "role": "Dirección",
+          "country": "GT",
+          "observed": "calendario octubre 2026 con 0 contenidos y gestión visible; no se publicaron piezas",
+          "level": "READ_RENDER_PASS"
+        },
+        {
+          "module": "Portal del Cliente",
+          "route": "#/portal",
+          "role": "Dirección",
+          "country": "GT header",
+          "observed": "preview inició con cliente colombiano predeterminado y modal legal régimen Colombia; tras salir, Inicio mostraba País CO aunque header Guatemala; no aceptó términos",
+          "level": "READ_RENDER_WITH_CRITICAL_CROSS_MODULE_COUNTRY_STATE_DESYNC"
+        },
+        {
+          "module": "Finanzas",
+          "route": "#/finanzas",
+          "role": "Dirección",
+          "country": "GT",
+          "observed": "movimientos y submódulos cargan; Oct 2026 0 movimientos, periodo sin cierre; interfaz usa marca Orbit Finanzas",
+          "level": "READ_RENDER_PASS_WITH_BRANDING_REVIEW"
         }
       ],
       "additionalObservations": [
         "Cobros al alternar a vista Asesor/GT mostró Cargando Cobros y cartera en observaciones repetidas; medir duración y confirmar si es un fallo sostenido antes de cerrar.",
         "Durante transiciones de rutas algunas instantáneas repetían contenido de ruta anterior; esas lecturas descartadas, se validó URL y cabecera específicas.",
-        "Los módulos listados aquí NO cumplen todavía matriz completa de acciones, permisos multirol, responsive, source/blob, últimas interfaces aprobadas y aceptación visual; acceptedModuleEvidence continúa vacío."
+        "Los módulos listados aquí NO cumplen todavía matriz completa de acciones, permisos multirol, responsive, source/blob, últimas interfaces aprobadas y aceptación visual; acceptedModuleEvidence continúa vacío.",
+        "Brand-visible headers on several legacy modules still say Orbit (Finanzas, IA, Marketing, Siniestros, Reportes); require identity reconciliation without altering technical identifiers."
       ],
       "openReleaseConditions": [
         "Completar UAT de operaciones y persistencia por cada capacidad Fase A.",
@@ -15662,7 +15767,106 @@
         "Verificar seguridad B4-003 lector protegido/producción, sin declarar superado HOLD.",
         "Consolidar módulos a LATEST_APPROVED_VERSION_PREVIEW_PASS solo con recibo exacto y, después, mismo artifact LIVE y UAT productiva."
       ],
-      "sourceAndDataChangePolicy": "UAT authorized synthetic fixture only; no real business record changed; no LIVE deployment/data import/rules/Auth/IAM change."
+      "sourceAndDataChangePolicy": "UAT authorized synthetic fixture only; no real business record changed; no LIVE deployment/data import/rules/Auth/IAM change.",
+      "routeCoverage20261029": {
+        "navigationRoutesObserved": 31,
+        "routeRenderContent": 30,
+        "blankFailedRoutes": [
+          "#/plantillas"
+        ],
+        "rolesRead": [
+          "Dirección",
+          "Asesor (Cobros loading only)"
+        ],
+        "countriesRead": [
+          "GT",
+          "CO",
+          "TODOS"
+        ],
+        "scope": "Route and read smoke test; not complete action/permission/visual/viewport acceptance",
+        "uniqueRoutes": [
+          "inicio",
+          "cronograma",
+          "ops",
+          "leads",
+          "aseguradoras",
+          "cotizador",
+          "comparativo",
+          "cliente360",
+          "polizas",
+          "cobros",
+          "conciliaciones",
+          "renovaciones",
+          "cancelaciones",
+          "siniestros",
+          "historial",
+          "comisiones",
+          "importar",
+          "calidad",
+          "plantillas",
+          "reportes",
+          "ia",
+          "academia",
+          "insights",
+          "correo",
+          "automatizaciones",
+          "notificaciones",
+          "marketing",
+          "portal",
+          "finanzas",
+          "equipo",
+          "configuracion"
+        ]
+      },
+      "responsiveReadback20261029": {
+        "route": "#/inicio",
+        "sizes": [
+          {
+            "width": 390,
+            "height": 844,
+            "viewportWidth": 390,
+            "documentScrollWidth": 375,
+            "passNoHorizontalOverflow": true
+          },
+          {
+            "width": 320,
+            "height": 720,
+            "viewportWidth": 320,
+            "documentScrollWidth": 305,
+            "passNoHorizontalOverflow": true
+          }
+        ],
+        "viewportOverrideReset": true,
+        "scope": "Horizontal document overflow only; all other responsive criteria not yet certified"
+      },
+      "causalFindings20261029": [
+        {
+          "code": "P0_PLANTILLAS_BOOT_WRITE_BLOCKED",
+          "classification": "CONFIRMED_CAUSAL_RUNTIME",
+          "source": "orbit360-platform/modules/plantillas.js line 26 boot() S().insert('plantillas') on render; product operational facade SURFACE excludes plantillas",
+          "browser": "empty main and PRODUCT_WRITE_COLLECTION_NOT_AUTHORIZED",
+          "safety": "Do not whitelist unauthorized Firestore browser writes; restore approved CRUD only via vetted server contract"
+        },
+        {
+          "code": "P0_INSIGHTS_COUNTRY_FALLBACK_GT",
+          "classification": "CONFIRMED_SOURCE_RISK_DATA_IMPACT_REQUIRES_ADJUDICATION",
+          "source": "orbit360-platform/modules/insights.js lines 28-29 clientePais missing client defaults 'GT', country filter derives from client rather than canonical policy country; queries.js lines 336-357 uses policy country precedence for linked financial items",
+          "browser": "Insights GT Q102.2M/221 active and AXA Colpatria Q95.2M, whereas Pólizas GT active net GTQ 638175; still determine exact offending row IDs in scoped source",
+          "safety": "Do not infer/fill country for missing clients or reimport data"
+        },
+        {
+          "code": "P0_PORTAL_COUNTRY_GLOBAL_DESYNC",
+          "classification": "CONFIRMED_UI_CROSS_MODULE_MISMATCH_ROOT_UNDETERMINED",
+          "browser": "GT selected in topbar, Inicio source confirmed Pais CO, 17 CO clients/124 policies/$9.3M COP following Portal preview; Portal selected CO client by default and legal modal persisted",
+          "safety": "No client terms accepted, no notification sent"
+        },
+        {
+          "code": "P1_ASESOR_COBROS_HYDRATION_LATENCY",
+          "classification": "REPRODUCED_PROLONGED_LOADING_NOT_YET_FINAL_CAUSE",
+          "browser": "Asesor GT Cobros loading remained visible in repeated checks after switching role, despite prior Dirección full load",
+          "safety": "Do not classify 5 partially loaded payments as complete Cobros universe"
+        }
+      ]
     },
     "evidenceRequiredForEachCurrentApproval": [
       "capabilityId",
