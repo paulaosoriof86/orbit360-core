@@ -65,3 +65,26 @@ Evidencia ejecutada localmente en árbol de fuente B4-003, fixtures sintéticos,
 **Regla de continuidad:** en todo informe distinguir (a) dominio final aprobado, (b) Hosting de producción y frontend efectivamente servido, (c) funciones backend efectivamente desplegadas, (d) base de datos real conservada y (e) pruebas pendientes. No volver a confundir Firebase Preview, Firebase LIVE y HostDime `app.aysseguros.com`.
 
 **Precisión de aislamiento (obligatoria):** un canal de Firebase Hosting Preview por sí solo **no aísla Firestore ni Auth**: puede consultar el backend real del mismo proyecto. Hasta disponer de un Firebase project separado para QA o emuladores, la validación de Preview se limita a lecturas y fixtures sintéticos expresamente acotados, con comprobación previa del tenant/proyecto y sin escrituras sobre expedientes reales. No describir una Preview de Hosting como «base de datos de pruebas aislada». Los respaldos/PITR de Firestore requieren configuración y eventual coste propios; no asumirlos habilitados. Esta precisión protege la operación activa del equipo y no reabre la excepción específica de Rules ya aceptada.
+
+
+## Addendum prevalente de ejecución autenticada — 28-oct, continuación nocturna
+
+Este addendum **supersede las filas históricas de Dirección GT/Todos marcadas NO CERTIFICADO** sin borrar el checkpoint anterior. Se ejecutó en Chrome mediante la cuenta autenticada de Paula sobre la Preview LAB `gi-i65-b4-40805562769-e9si0n0l`, sin escrituras y con espera a la carga final; no equivale a pruebas de Carlos ni a LIVE.
+
+| Paula rol | País | Inicio fuentes | Clientes | Pólizas | Cobros confirmados | Cartera vencida | Cobros filas | Historial visible |
+|---|---|---|---:|---:|---|---|---:|---|
+| Dirección | TODOS | 5/5 PASS | 434 | 1425 | — | — | — | no medido en Todos |
+| Dirección | GT | 5/5 PASS | 420 | 1301 | Q 2,744 / 5 pagos | Q 215,658 aprox. | 2514 | 35 |
+| Dirección | CO | 5/5 PASS | 17 | 124 | COP 0 / 0 pagos | COP 9,262,532 | 46 | 35 |
+| Operativo | GT | 5/5 PASS (previo) | 420 | 1301 | Q 2,744 / 5 pagos | Q 215,658 aprox. | 2514 | no medido |
+| Operativo | CO | 5/5 PASS (previo) | 17 | 124 | COP 0 / 0 pagos | COP 9,262,532 | 46 | 35 |
+| Asesor | GT | 5/5 PASS (previo) | 378 | 1153 | Q 2,306 / 3 pagos | Q 164,377 aprox. | 2161 | 24 |
+| Asesor | CO | 5/5 PASS (previo) | 17 | 92 | COP 0 / 0 pagos | COP 8,221,630 | 15 | 24 |
+
+- **PASS focal Cobros**: Operativo y Dirección exponen igual universo; Asesor reduce alcance; no se hace conversión GTQ↔COP ni se interpreta origen SIGA como pago confirmado. El listado pasa por una fase transitoria de métricas en carga y se certificó solo tras estabilizarse.
+- **PASS focal Cliente 360, Dirección CO**: 17 clientes listados; 9 pólizas vigentes de 76 relacionadas con clientes, COP 73,920,141 de prima neta vigente mostrada. No comparar directamente esos denominadores con las 124 pólizas globales de Inicio sin validar semántica.
+- **HALLAZGO Historial por país, confirmado en UI previo a corrección**: Dirección CO→GT conservó 35 interacciones; Asesor CO→GT conservó 24, con entradas de contexto GT en vista CO. En la fuente, Historial no filtraba el país elegido, mientras el scope concedido de la persona abarcaba ambos países. Esto es una falla de segmentación visual; la autorización de servidor y el origen exacto de cada evento requieren readback separado.
+- **CORRECCIÓN SOURCE-ONLY publicada**: `3043a825a60e33b33847bcf2faa8daa7cc04a39b` introduce filtro por país elegido, país canónico de póliza antes que domicilio del cliente y protección del detalle; `5441f8d510b937ef0a9ebe46a4485d93cc3c142e` agrega prueba de regresión GT/CO/TODOS. Test nuevo, `node --check`, tests de contexto de rol y lector protegido PASS; bytes fuente/remoto equivalentes. **La UI corregida aún no es PASS** hasta Preview nueva, Chrome y readback.
+- **Preview preparado, no acreditado como desplegado hasta SUCCESS/readback**: workflow nuevo `650db2fd26178b5059dc8a0398fd01f8bedfb15f` exclusivamente Hosting Preview LAB por siete días, sin funciones LIVE, reglas, IAM, Auth, DNS ni escrituras.
+- **Revisión de datos no confundible con falla**: Cobros GT advierte cuatro filas con estado vencido en COP sin contraparte en Cartera Primas del alcance; una fila de Cobros CO tiene etiqueta de cliente domiciliado GT. Verificar relaciones por póliza, país canónico y origen SIGA antes de reclasificar o modificar nada.
+- **Pendiente de certificación**: Carlos como segundo UID real (Operativo/Asesor); prueba sintética durable de Cronograma y edición de Aseguradoras; flujo Cliente360→Historial→Cobros en Preview corregida; `orbit360ScopedPolicyRead` en LIVE; backup/PITR verificable; dominio HTTPS `app.aysseguros.com` sin corte todavía. La excepción Firestore Rules aceptada por Paula **permanece congelada como P0 postproducción, no bloqueo por sí sola**. El personal no debe usar la versión antigua de HostDime para crear expedientes que después quedarían en otro origen.
