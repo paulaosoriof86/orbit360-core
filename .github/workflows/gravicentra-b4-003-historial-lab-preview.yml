@@ -9,6 +9,7 @@ on:
       - .github/workflows/gravicentra-b4-003-historial-lab-preview.yml
       - artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json
       - artifacts/orbit360-recovery/release-control/I6_5_B4_003_HISTORIAL_ROLE_PARITY_SUCCESSOR_20261028.json
+      - artifacts/orbit360-recovery/release-control/I6_5_B4_003_HISTORIAL_CI_DEPENDENCY_20261028.json
       - artifacts/orbit360-recovery/release-control/I6_5_B4_003_HISTORIAL_READER_SUCCESSOR_20261028.json
       - artifacts/orbit360-recovery/release-control/I6_5_B4_003_HISTORIAL_PREFETCH_SUCCESSOR_20261028.json
       - orbit360-platform/core/membership-multirol-contract-p0.js
@@ -28,14 +29,14 @@ jobs:
     if: >-
       github.repository == 'paulaosoriof86/orbit360-core' &&
       github.ref == 'refs/heads/recovery/fase-a-clean-20260831' &&
-      github.event.head_commit.message == 'fix(i6.5 B4-003): align protected history client role plans for LAB UAT'
+      github.event.head_commit.message == 'build(i6.5 B4-003): restore Historial LAB packaging dependency'
     runs-on: ubuntu-24.04
     timeout-minutes: 35
     env:
       PROJECT_ID: ays-orbit-360-lab
       HOSTING_SITE: ays-orbit-360-lab
       TENANT_HINT: alianzas-soluciones
-      PARENT_SHA: 67e6208b27614b7298193315282bbd007b86557d
+      PARENT_SHA: 4d4919cb3a0a19ab960a141b0253a2bc437ce169
       RELEASE_GATE: I6.5-B4-003
       BUILD_PREFIX: gi-i65-b4
       ENVIRONMENT_REF: firebase-hosting-preview-i6-5-forensic-b4-003
@@ -45,7 +46,7 @@ jobs:
       SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
 
     steps:
-      - name: Checkout exact one browser-role source successor
+      - name: Checkout exact one dependency-only Hosting successor
         uses: actions/checkout@v4
         with:
           ref: ${{ github.sha }}
@@ -60,15 +61,12 @@ jobs:
         run: |
           set -euo pipefail
           test "$(git rev-parse HEAD^)" = "$PARENT_SHA"
-          test "$(git show -s --format=%s HEAD)" = 'fix(i6.5 B4-003): align protected history client role plans for LAB UAT'
+          test "$(git show -s --format=%s HEAD)" = 'build(i6.5 B4-003): restore Historial LAB packaging dependency'
           git diff --name-only "$PARENT_SHA" HEAD | LC_ALL=C sort > "$RUNNER_TEMP/actual-files"
           printf '%s\n' \
             .github/workflows/gravicentra-b4-003-historial-lab-preview.yml \
             artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json \
-            artifacts/orbit360-recovery/release-control/I6_5_B4_003_HISTORIAL_ROLE_PARITY_SUCCESSOR_20261028.json \
-            orbit360-platform/core/membership-multirol-contract-p0.js \
-            orbit360-platform/core/backend-product-readonly-bootstrap-p0.js \
-            tools/gravicentra-b4-003-protected-hydration.test.cjs \
+            artifacts/orbit360-recovery/release-control/I6_5_B4_003_HISTORIAL_CI_DEPENDENCY_20261028.json \
             tools/gravicentra-i6-control-plane-guard-v1.mjs | LC_ALL=C sort > "$RUNNER_TEMP/expected-files"
           diff -u "$RUNNER_TEMP/expected-files" "$RUNNER_TEMP/actual-files"
           test "$(git hash-object orbit360-platform/core/membership-multirol-contract-p0.js)" = '77f3da5415474202c2b62bf7a7057cd78eb76aa2'
@@ -119,6 +117,7 @@ jobs:
           chmod 600 "$RUNNER_TEMP/gi-historial-sa.json"
           echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/gi-historial-sa.json" >> "$GITHUB_ENV"
           echo "FIREBASE_CLI_BIN=$CLI" >> "$GITHUB_ENV"
+          timeout --foreground 420s npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund firebase-admin@13.4.0
 
       - name: Read public LAB SDK configuration
         run: |

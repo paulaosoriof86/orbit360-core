@@ -1,0 +1,54 @@
+{
+  "schema": "GI_I65_B4_003_HISTORIAL_CI_DEPENDENCY_SUCCESSOR_V1",
+  "status": "CI_PACKAGE_DEPENDENCY_FIXED_HOSTING_LAB_READBACK_PENDING_SECURITY_HOLD",
+  "authority": "PAULA_EXPLICIT_ONE_CI_DEPENDENCY_SUCCESSOR_20261028",
+  "gate": "I6.5/B4-003",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "parentHead": "4d4919cb3a0a19ab960a141b0253a2bc437ce169",
+  "parentTree": "86d852d2113992b0cbfe92fc3d44a0e1f3d49a71",
+  "changedPathsOnly": [
+    ".github/workflows/gravicentra-b4-003-historial-lab-preview.yml",
+    "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json",
+    "artifacts/orbit360-recovery/release-control/I6_5_B4_003_HISTORIAL_CI_DEPENDENCY_20261028.json",
+    "tools/gravicentra-i6-control-plane-guard-v1.mjs"
+  ],
+  "rootCause": {
+    "githubRun": 40804149069,
+    "failingStep": "Materialize exact LAB source package",
+    "errorCode": "ERR_MODULE_NOT_FOUND",
+    "missingPackage": "firebase-admin",
+    "pinnedPackage": "firebase-admin@13.4.0",
+    "reason": "The certified packaging script imports firebase-admin while the Hosting-only workflow omitted that build-time dependency. Deploy and HTTPS readback were skipped."
+  },
+  "workflow": {
+    "path": ".github/workflows/gravicentra-b4-003-historial-lab-preview.yml",
+    "blobBefore": "f59ba76f9e6f6fdac1c7c38ce1adfae10096f45d",
+    "blobAfter": "004a436fd6e4e6b6757f7781698cdd5368a79588",
+    "remediation": "Install pinned firebase-admin in the ephemeral CI runner before snapshot and packaging. No source or backend deployment."
+  },
+  "governance": {
+    "guardBlobBefore": "9da53fd4e3fb1b99976521dba8fe4605bbb3ea0b",
+    "controlPlaneBlobBefore": "97c82187170f4cb7e9169352fbd416e61b968e2c",
+    "historicRoleParityReceiptBlob": "a6d2dcb54ad587621f00cb29402b064babbad9a7"
+  },
+  "scope": {
+    "hostingOnly": true,
+    "hostingProject": "ays-orbit-360-lab",
+    "hostingSite": "ays-orbit-360-lab",
+    "maximumOneChannel": true,
+    "expiresAfterDays": 7,
+    "sourceUnchanged": true,
+    "backendFunctionRedeployment": false,
+    "sharedFirestoreRulesDeployment": false,
+    "authIamModification": false,
+    "productionDeployment": false,
+    "livePromotion": false,
+    "businessDataWrites": false,
+    "syntheticDataWrites": false,
+    "dataImport": false,
+    "historicalCertificationsModified": false,
+    "securityHoldReleased": false
+  },
+  "acceptance": "SOURCE_ONLY_CI_COMPATIBILITY_COMMIT; PREVIEW_AND_AUTHENTICATED_UAT_NOT_YET_PROVEN"
+}

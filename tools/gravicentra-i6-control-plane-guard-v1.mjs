@@ -108,6 +108,27 @@ for(const p of [CONTROL,STATUS_LEDGER,AUTH_RECEIPT,I6_ADDENDUM,I6_PLAN_LOCK,V5_M
 const C=readJson(CONTROL);
 const HISTORY_ROLE_PARITY=C.b4003HistorialRoleParitySuccessor20261028||null;
 const HISTORY_ROLE_PARITY_SUBJECT='fix(i6.5 B4-003): align protected history client role plans for LAB UAT';
+const HISTORY_ROLE_PARITY_CI=C.b4003HistorialRoleParityCiDependency20261028||null;
+const HISTORY_ROLE_PARITY_CI_SUBJECT='build(i6.5 B4-003): restore Historial LAB packaging dependency';
+const HISTORY_ROLE_PARITY_CI_RECEIPT='artifacts/orbit360-recovery/release-control/I6_5_B4_003_HISTORIAL_CI_DEPENDENCY_20261028.json';
+const HISTORY_ROLE_PARITY_CI_TREE='86d852d2113992b0cbfe92fc3d44a0e1f3d49a71';
+const HISTORY_ROLE_PARITY_CI_PARENT_REMOTE='4d4919cb3a0a19ab960a141b0253a2bc437ce169';
+const HISTORY_ROLE_PARITY_CI_PARENT_LOCAL='83da9c030cc5d2e01313b063a3e86c9b8f13e3b6';
+const HISTORY_ROLE_PARITY_CI_FILES=[
+ '.github/workflows/gravicentra-b4-003-historial-lab-preview.yml',
+ CONTROL,HISTORY_ROLE_PARITY_CI_RECEIPT,
+ 'tools/gravicentra-i6-control-plane-guard-v1.mjs'
+].sort();
+const historyRoleParityCiExactSuccessor=()=>{
+ if(!HISTORY_ROLE_PARITY_CI)return false;
+ const head=physicalGit('rev-parse','HEAD');
+ const parent=physicalGit('rev-parse','HEAD^');
+ if(![HISTORY_ROLE_PARITY_CI_PARENT_REMOTE,HISTORY_ROLE_PARITY_CI_PARENT_LOCAL].includes(parent))return false;
+ return physicalGit('rev-parse',parent+'^{tree}')===HISTORY_ROLE_PARITY_CI_TREE&&
+  physicalGit('show','-s','--format=%s',head)===HISTORY_ROLE_PARITY_CI_SUBJECT&&
+  physicalGit('diff','--name-only',parent,head).split('\n').filter(Boolean).sort().join('|')===
+   HISTORY_ROLE_PARITY_CI_FILES.join('|');
+};
 const HISTORY_ROLE_PARITY_RECEIPT='artifacts/orbit360-recovery/release-control/I6_5_B4_003_HISTORIAL_ROLE_PARITY_SUCCESSOR_20261028.json';
 const HISTORY_ROLE_PARITY_FILES=[
  '.github/workflows/gravicentra-b4-003-historial-lab-preview.yml',
@@ -162,7 +183,8 @@ if(HISTORY_SUCCESSOR){
     physicalGit('show','-s','--format=%s','HEAD')===
      'fix(i6.5 B4-003): batch verified history parents for isolated LAB UAT')||
    (HISTORY_ROLE_PARITY&&physicalGit('rev-parse','HEAD^')===HISTORY_ROLE_PARITY.parentHead&&
-    physicalGit('show','-s','--format=%s','HEAD')===HISTORY_ROLE_PARITY_SUBJECT)),
+    physicalGit('show','-s','--format=%s','HEAD')===HISTORY_ROLE_PARITY_SUBJECT)||
+   historyRoleParityCiExactSuccessor()),
   'B4_003_HISTORIAL_READER_SUCCESSOR_INVALID');
  historialReaderHistoricalBlobs=new Map([[source,R.sourceBlobsBefore[source]],[qa,R.qaBlobsBefore[qa]]]);
  historialReaderCurrentBlobs=new Map([[source,R.sourceBlobsAfter[source]],[qa,R.qaBlobsAfter[qa]]]);
@@ -210,7 +232,8 @@ if(HISTORY_PREFETCH){
    physicalGit('show','-s','--format=%s','HEAD')===subject&&
    physicalGit('diff','--name-only',parent,'HEAD').split('\n').filter(Boolean).sort().join('|')===exactFiles.join('|'))||
    (HISTORY_ROLE_PARITY&&physicalGit('rev-parse','HEAD^')===HISTORY_ROLE_PARITY.parentHead&&
-    physicalGit('show','-s','--format=%s','HEAD')===HISTORY_ROLE_PARITY_SUBJECT)),
+    physicalGit('show','-s','--format=%s','HEAD')===HISTORY_ROLE_PARITY_SUBJECT)||
+   historyRoleParityCiExactSuccessor()),
   'B4_003_HISTORIAL_PREFETCH_SUCCESSOR_INVALID');
  historialReaderCurrentBlobs=new Map([...source,qa].map(p=>[p,
   R[source.includes(p)?'sourceBlobsAfter':'qaBlobsAfter'][p]]));
@@ -259,12 +282,65 @@ if(HISTORY_ROLE_PARITY){
    'realBusinessWrites','syntheticDataWrites','dataMutation','reimport','livePromotion',
    'historicalCertificationsRewritten','securityB4003HoldReleased']
     .every(k=>R.scope?.[k]===false)&&
-  (head===parent||exactSuccessor)&&
+  (head===parent||exactSuccessor||historyRoleParityCiExactSuccessor())&&
   C.b4003SecurityReleaseHold?.status==='ACTIVE_FAIL_CLOSED_UNAUTHORIZED_BROWSER_FIRESTORE_READ_WRITE',
   'B4_003_HISTORIAL_ROLE_PARITY_SOURCE_QA_OR_ANCESTRY_INVALID');
  historialRoleParityCurrentBlobs=new Map([...source,qa].map(p=>[p,
   R[source.includes(p)?'sourceBlobsAfter':'qaBlobsAfter'][p]]));
  console.log('B4_003_HISTORIAL_ROLE_PARITY=SOURCE_QA_BYTE_BOUND_NO_BACKEND_DEPLOY_SECURITY_HOLD');
+}
+// One authorized additive successor repairs an omitted CI packaging dependency.
+// Its predecessor's product source tree and historical role-parity receipt are
+// immutable; the new commit may only change this guard, the workflow, the
+// additive receipt, and the active control-plane pointer. No release authority.
+if(HISTORY_ROLE_PARITY_CI){
+ const H=HISTORY_ROLE_PARITY_CI,R=readJson(HISTORY_ROLE_PARITY_CI_RECEIPT);
+ const workflow='.github/workflows/gravicentra-b4-003-historial-lab-preview.yml';
+ // GitHub API can publish the byte-identical predecessor with a different
+ // commit SHA; its immutable tree is pinned and checked above.
+ const parentAtRuntime=physicalGit('rev-parse','HEAD^');
+ const before=f=>physicalGit('rev-parse',parentAtRuntime+':'+f);
+ const wf=fs.readFileSync(workflow,'utf8');
+ const protectedSource={
+  'orbit360-platform/core/membership-multirol-contract-p0.js':'77f3da5415474202c2b62bf7a7057cd78eb76aa2',
+  'orbit360-platform/core/backend-product-readonly-bootstrap-p0.js':'169dd8c5ab146e93420be38a5610f92a069ba094',
+  'tools/gravicentra-b4-003-protected-hydration.test.cjs':'9d378dfb741e00dd58bfa0de64ebfa468964cdcb'
+ };
+ const scopeDenied=['backendFunctionRedeployment','sharedFirestoreRulesDeployment',
+  'authIamModification','productionDeployment','livePromotion','businessDataWrites',
+  'syntheticDataWrites','dataImport','historicalCertificationsModified','securityHoldReleased'];
+ need(historyRoleParityCiExactSuccessor()&&
+  H.status==='CI_PACKAGE_DEPENDENCY_FIXED_HOSTING_LAB_READBACK_PENDING_SECURITY_HOLD'&&
+  H.authority==='PAULA_EXPLICIT_ONE_CI_DEPENDENCY_SUCCESSOR_20261028'&&
+  H.gate==='I6.5/B4-003'&&H.parentHead===HISTORY_ROLE_PARITY_CI_PARENT_REMOTE&&
+  H.parentTree===HISTORY_ROLE_PARITY_CI_TREE&&
+  H.receiptPath===HISTORY_ROLE_PARITY_CI_RECEIPT&&
+  H.receiptBlobSha===physicalGit('hash-object',HISTORY_ROLE_PARITY_CI_RECEIPT)&&
+  H.currentSecurityHoldUnchanged===true&&H.productionReleaseAuthorized===false&&
+  R.schema==='GI_I65_B4_003_HISTORIAL_CI_DEPENDENCY_SUCCESSOR_V1'&&
+  R.status===H.status&&R.authority===H.authority&&R.gate===H.gate&&
+  R.repository==='paulaosoriof86/orbit360-core'&&R.branch==='recovery/fase-a-clean-20260831'&&
+  R.parentHead===H.parentHead&&R.parentTree===H.parentTree&&
+  JSON.stringify(R.changedPathsOnly?.slice().sort())===JSON.stringify(HISTORY_ROLE_PARITY_CI_FILES)&&
+  R.workflow?.path===workflow&&R.workflow?.blobBefore===before(workflow)&&
+  R.workflow?.blobAfter===physicalGit('hash-object',workflow)&&
+  R.governance?.guardBlobBefore===before('tools/gravicentra-i6-control-plane-guard-v1.mjs')&&
+  R.governance?.controlPlaneBlobBefore===before(CONTROL)&&
+  R.governance?.historicRoleParityReceiptBlob===physicalGit('hash-object',HISTORY_ROLE_PARITY_RECEIPT)&&
+  R.rootCause?.githubRun===40804149069&&R.rootCause?.missingPackage==='firebase-admin'&&
+  R.rootCause?.pinnedPackage==='firebase-admin@13.4.0'&&
+  R.scope?.hostingOnly===true&&R.scope?.hostingProject==='ays-orbit-360-lab'&&
+  R.scope?.hostingSite==='ays-orbit-360-lab'&&R.scope?.maximumOneChannel===true&&
+  R.scope?.expiresAfterDays===7&&R.scope?.sourceUnchanged===true&&
+  scopeDenied.every(k=>R.scope?.[k]===false)&&
+  Object.entries(protectedSource).every(([p,sha])=>
+   physicalGit('hash-object',p)===sha&&before(p)===sha)&&
+  wf.includes('firebase-admin@13.4.0')&&wf.includes('npm install --no-save --package-lock=false')&&
+  wf.includes('hosting:channel:deploy "$CHANNEL_ID" --config firebase.json --project "$PROJECT_ID" --expires 7d')&&
+  !wf.includes('functions:orbit360ScopedPolicyReadPreview')&&
+  C.b4003SecurityReleaseHold?.status==='ACTIVE_FAIL_CLOSED_UNAUTHORIZED_BROWSER_FIRESTORE_READ_WRITE',
+  'B4_003_HISTORIAL_CI_DEPENDENCY_OR_GOVERNANCE_INVALID');
+ console.log('B4_003_HISTORIAL_CI_DEPENDENCY=EXACT_FOUR_FILES_SOURCE_IMMUTABLE_ONE_LAB_PREVIEW_SECURITY_HOLD');
 }
 const ACTIVE_I65_FORENSIC_B4=String(C.i65ForensicRemediationPlan?.b4?.executionLockPath||I65_FORENSIC_B4);
 need(exists(ACTIVE_I65_FORENSIC_B4),'I6_5_B4_ACTIVE_LOCK_MISSING:'+ACTIVE_I65_FORENSIC_B4);
