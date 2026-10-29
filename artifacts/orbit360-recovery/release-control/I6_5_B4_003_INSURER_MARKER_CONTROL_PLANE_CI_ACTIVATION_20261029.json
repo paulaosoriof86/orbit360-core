@@ -29,5 +29,17 @@
   "authIamRulesChanges": false,
   "augustImport": false,
   "historicApprovalsPreserved": true,
-  "securityB4003HoldPreserved": true
+  "securityB4003HoldPreserved": true,
+  "history": [
+    {
+      "ciRun": 40887822120,
+      "sourceCommit": "8193ab69dabde3c8001258e4e8f33860c15418e4",
+      "result": "FAIL_HISTORIC_WRITER_BLOB_COMPARED_TO_CURRENT_SOURCE"
+    },
+    {
+      "successorCommit": "4c06fd22f4eb2e387803a60e982eaee948b7d762",
+      "change": "historic writer receipt still immutable; guard checks its predecessor blob at pinned add5 parent",
+      "recheck": "PENDING_CI"
+    }
+  ]
 }
