@@ -5,6 +5,21 @@
   "productBrand": "Gravicentra Insurance",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
+  "b4003OwnerTemporaryRulesRiskException20261028": {
+    "status": "OWNER_RISK_ACCEPTED_NON_BLOCKING_FOR_CONTROLLED_LIVE",
+    "authority": "PAULA_EXPLICIT_CONFIRMATION_20261028",
+    "gate": "I6.5/B4-003",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PAULA_OWNER_TEMPORARY_FIRESTORE_RISK_ACCEPTANCE_20261028.md",
+    "scope": "CURRENT_EFFECTIVE_FIRESTORE_TENANT_MEMBER_BROAD_READ_WRITE",
+    "securityCertStatus": "OPEN_NOT_PASS",
+    "firestoreHardeningPriority": "P0_URGENT_POSTPRODUCTION",
+    "securityRulesAloneBlockRelease": false,
+    "historicalSecurityHoldPreserved": true,
+    "releaseAuthorizationByThisExceptionAlone": false,
+    "functionalAndRuntimeE2EPending": true,
+    "firestoreRulesDeployAuthorized": false,
+    "authIamOrDataMutationAuthorized": false
+  },
   "b4003HistorialRoleParityCiDependency20261028": {
     "status": "CI_PACKAGE_DEPENDENCY_FIXED_HOSTING_LAB_READBACK_PENDING_SECURITY_HOLD",
     "authority": "PAULA_EXPLICIT_ONE_CI_DEPENDENCY_SUCCESSOR_20261028",
