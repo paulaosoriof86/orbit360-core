@@ -96,7 +96,7 @@
       // to browser Firestore reads during a release promotion.
       var runtimeHost=String(window.location&&window.location.hostname||'').toLowerCase();
       var previewChannel=/^ays-orbit-360-lab--gi-i65-b4-[a-z0-9-]+\.web\.app$/.test(runtimeHost);
-      var liveChannel=runtimeHost==='ays-orbit-360-lab.web.app'||runtimeHost==='ays-orbit-360-lab.firebaseapp.com';
+      var liveChannel=runtimeHost==='ays-orbit-360-lab.web.app'||runtimeHost==='ays-orbit-360-lab.firebaseapp.com'||runtimeHost==='app.aysseguros.com';
       var scopedChannel=previewChannel||liveChannel;
       if(scopedChannel&&cfg.scopedReadPreviewCandidate!==true)
         throw new Error('PROTECTED_READ_CANDIDATE_DISABLED');
