@@ -72,6 +72,7 @@ let cobrosQ683HistoricalBlobs=new Map();
 // The active tree is checked with physicalGit against its own new receipt.
 let historialReaderHistoricalBlobs=new Map();
 let historialReaderCurrentBlobs=new Map();
+let historialRoleParityCurrentBlobs=new Map();
 const realGit=(...args)=>args[0]==='hash-object'&&CORRECTIVE_SOURCE_PREVIOUS.has(args[1])
  ?CORRECTIVE_SOURCE_PREVIOUS.get(args[1]):
  args[0]==='hash-object'&&historicalInsurerProductBlobs.has(args[1])
@@ -105,6 +106,17 @@ const sameJson=(a,b)=>JSON.stringify(stable(a))===JSON.stringify(stable(b));
 need(MODE==='governance'||MODE==='i6','I6_GUARD_MODE_INVALID:'+MODE);
 for(const p of [CONTROL,STATUS_LEDGER,AUTH_RECEIPT,I6_ADDENDUM,I6_PLAN_LOCK,V5_MANIFEST,V6_MANIFEST,V6_ADDENDUM,V7_MANIFEST,V7_ADDENDUM,DATA_UPDATE_PLAN,DATA_UPDATE_DISCIPLINE,DATA_UPDATE_REGISTRY,ACTIVE_SOURCE_INTAKE,I63_SOURCE,I63_RECEIPT,I64_SOURCE,I64_RECEIPT,I65_SOURCE,I65_SYNC,I65_FORENSIC_AUDIT,I65_FORENSIC_PLAN,I65_FORENSIC_ADDENDUM,I65_PAYMENT_INFERENCE,I65_FORENSIC_B1,I65_FORENSIC_B2,I65_FORENSIC_B3,I65_FORENSIC_B4,I6_CANONICAL_COMPOSITION,I6_FINDINGS_LEDGER,I65_FORENSIC_PLAN_V2,I65_B2_REJECTION,I65_B2_ROOT_CAUSE]) need(exists(p),'I6_REQUIRED_FILE_MISSING:'+p);
 const C=readJson(CONTROL);
+const HISTORY_ROLE_PARITY=C.b4003HistorialRoleParitySuccessor20261028||null;
+const HISTORY_ROLE_PARITY_SUBJECT='fix(i6.5 B4-003): align protected history client role plans for LAB UAT';
+const HISTORY_ROLE_PARITY_RECEIPT='artifacts/orbit360-recovery/release-control/I6_5_B4_003_HISTORIAL_ROLE_PARITY_SUCCESSOR_20261028.json';
+const HISTORY_ROLE_PARITY_FILES=[
+ '.github/workflows/gravicentra-b4-003-historial-lab-preview.yml',
+ CONTROL,HISTORY_ROLE_PARITY_RECEIPT,
+ 'orbit360-platform/core/backend-product-readonly-bootstrap-p0.js',
+ 'orbit360-platform/core/membership-multirol-contract-p0.js',
+ 'tools/gravicentra-b4-003-protected-hydration.test.cjs',
+ 'tools/gravicentra-i6-control-plane-guard-v1.mjs'
+].sort();
 const HISTORY_PREFETCH=C.b4003HistorialPrefetchSuccessor20261028||null;
 const HISTORY_SUCCESSOR=C.b4003HistorialReaderSuccessor20261028||null;
 if(HISTORY_SUCCESSOR){
@@ -148,7 +160,9 @@ if(HISTORY_SUCCESSOR){
    physicalGit('diff','--name-only',parent,'HEAD').split('\n').filter(Boolean).sort().join('|')===expectedFiles.join('|'))||
    (HISTORY_PREFETCH&&physicalGit('rev-parse','HEAD^')==='a236f2c5fab1a338f1619ecdf187ff3d9fe1fc4f'&&
     physicalGit('show','-s','--format=%s','HEAD')===
-     'fix(i6.5 B4-003): batch verified history parents for isolated LAB UAT')),
+     'fix(i6.5 B4-003): batch verified history parents for isolated LAB UAT')||
+   (HISTORY_ROLE_PARITY&&physicalGit('rev-parse','HEAD^')===HISTORY_ROLE_PARITY.parentHead&&
+    physicalGit('show','-s','--format=%s','HEAD')===HISTORY_ROLE_PARITY_SUBJECT)),
   'B4_003_HISTORIAL_READER_SUCCESSOR_INVALID');
  historialReaderHistoricalBlobs=new Map([[source,R.sourceBlobsBefore[source]],[qa,R.qaBlobsBefore[qa]]]);
  historialReaderCurrentBlobs=new Map([[source,R.sourceBlobsAfter[source]],[qa,R.qaBlobsAfter[qa]]]);
@@ -194,13 +208,63 @@ if(HISTORY_PREFETCH){
   (head===parent||(
    physicalGit('rev-parse','HEAD^')===parent&&
    physicalGit('show','-s','--format=%s','HEAD')===subject&&
-   physicalGit('diff','--name-only',parent,'HEAD').split('\n').filter(Boolean).sort().join('|')===exactFiles.join('|'))),
+   physicalGit('diff','--name-only',parent,'HEAD').split('\n').filter(Boolean).sort().join('|')===exactFiles.join('|'))||
+   (HISTORY_ROLE_PARITY&&physicalGit('rev-parse','HEAD^')===HISTORY_ROLE_PARITY.parentHead&&
+    physicalGit('show','-s','--format=%s','HEAD')===HISTORY_ROLE_PARITY_SUBJECT)),
   'B4_003_HISTORIAL_PREFETCH_SUCCESSOR_INVALID');
  historialReaderCurrentBlobs=new Map([...source,qa].map(p=>[p,
   R[source.includes(p)?'sourceBlobsAfter':'qaBlobsAfter'][p]]));
  need(C.b4003SecurityReleaseHold?.status==='ACTIVE_FAIL_CLOSED_UNAUTHORIZED_BROWSER_FIRESTORE_READ_WRITE',
   'B4_003_HISTORIAL_PREFETCH_CANNOT_CLEAR_SECURITY_HOLD');
  console.log('B4_003_HISTORIAL_PREFETCH_SUCCESSOR=SOURCE_QA_BYTE_BOUND_HISTORICAL_CERTS_PRESERVED_LAB_ONLY_SECURITY_HOLD');
+}
+// Independent successor: browser policy/assigned-role parity only. All older
+// receipts stay evaluated at their original snapshots; current physical blobs
+// are byte-bound here and at final canonical composition. Never grants server
+// access, changes Firestore Rules, or clears B4-003.
+if(HISTORY_ROLE_PARITY){
+ const H=HISTORY_ROLE_PARITY,R=readJson(HISTORY_ROLE_PARITY_RECEIPT);
+ const source=['orbit360-platform/core/backend-product-readonly-bootstrap-p0.js',
+  'orbit360-platform/core/membership-multirol-contract-p0.js'].sort();
+ const qa='tools/gravicentra-b4-003-protected-hydration.test.cjs';
+ const parent='67e6208b27614b7298193315282bbd007b86557d';
+ const head=physicalGit('rev-parse','HEAD');
+ const exactSuccessor=head!==parent&&physicalGit('rev-parse','HEAD^')===parent&&
+  physicalGit('show','-s','--format=%s','HEAD')===HISTORY_ROLE_PARITY_SUBJECT&&
+  physicalGit('diff','--name-only',parent,'HEAD').split('\n').filter(Boolean).sort().join('|')===
+   HISTORY_ROLE_PARITY_FILES.join('|');
+ need(H.status==='SOURCE_QA_PASS_HOSTING_LAB_UAT_PENDING_SECURITY_HOLD'&&
+  H.authority==='PAULA_EXPLICIT_ONE_CORRECTIVE_SUCCESSOR_AND_HOSTING_PREVIEW_20261028'&&
+  H.gate==='I6.5/B4-003'&&H.parentHead===parent&&
+  H.receiptPath===HISTORY_ROLE_PARITY_RECEIPT&&
+  H.receiptBlobSha===physicalGit('hash-object',HISTORY_ROLE_PARITY_RECEIPT)&&
+  H.currentSecurityHoldUnchanged===true&&H.productionReleaseAuthorized===false&&
+  R.schema==='GI_I65_B4_003_HISTORIAL_ROLE_PARITY_SUCCESSOR_V1'&&
+  R.status===H.status&&R.authority===H.authority&&R.gate===H.gate&&
+  R.parentHead===parent&&R.repository==='paulaosoriof86/orbit360-core'&&
+  R.branch==='recovery/fase-a-clean-20260831'&&
+  Object.keys(R.sourceBlobsBefore||{}).sort().join('|')===source.join('|')&&
+  Object.keys(R.sourceBlobsAfter||{}).sort().join('|')===source.join('|')&&
+  Object.keys(R.qaBlobsBefore||{}).join(',')===qa&&
+  Object.keys(R.qaBlobsAfter||{}).join(',')===qa&&
+  [...source,qa].every(p=>
+   R[source.includes(p)?'sourceBlobsBefore':'qaBlobsBefore'][p]===physicalGit('rev-parse',parent+':'+p)&&
+   R[source.includes(p)?'sourceBlobsAfter':'qaBlobsAfter'][p]===physicalGit('hash-object',p))&&
+  R.regression?.result==='PASS'&&R.regression?.realFirestoreUsed===false&&
+  R.regression?.dataWrites===0&&
+  R.remediation?.serverAuthorizationCodeChanged===false&&
+  R.remediation?.explicitRestrictedHistorialStillDenied===true&&
+  R.scope?.hosting==='ONE_ISOLATED_LAB_PREVIEW_CHANNEL_SEVEN_DAYS'&&
+  ['protectedCallableRedeployed','sharedFirestoreRulesDeploy','authIamMutation',
+   'realBusinessWrites','syntheticDataWrites','dataMutation','reimport','livePromotion',
+   'historicalCertificationsRewritten','securityB4003HoldReleased']
+    .every(k=>R.scope?.[k]===false)&&
+  (head===parent||exactSuccessor)&&
+  C.b4003SecurityReleaseHold?.status==='ACTIVE_FAIL_CLOSED_UNAUTHORIZED_BROWSER_FIRESTORE_READ_WRITE',
+  'B4_003_HISTORIAL_ROLE_PARITY_SOURCE_QA_OR_ANCESTRY_INVALID');
+ historialRoleParityCurrentBlobs=new Map([...source,qa].map(p=>[p,
+  R[source.includes(p)?'sourceBlobsAfter':'qaBlobsAfter'][p]]));
+ console.log('B4_003_HISTORIAL_ROLE_PARITY=SOURCE_QA_BYTE_BOUND_NO_BACKEND_DEPLOY_SECURITY_HOLD');
 }
 const ACTIVE_I65_FORENSIC_B4=String(C.i65ForensicRemediationPlan?.b4?.executionLockPath||I65_FORENSIC_B4);
 need(exists(ACTIVE_I65_FORENSIC_B4),'I6_5_B4_ACTIVE_LOCK_MISSING:'+ACTIVE_I65_FORENSIC_B4);
@@ -998,8 +1062,12 @@ if(AUTH_UAT_PREVIEW_RECEIPT){
    :R.workflowBlobShaAfter===physicalGit('hash-object',R.workflowPath))&&
   physicalGit('hash-object',AUTH_UAT_PREVIEW_RECEIPT_PATH)==='838aa32daf07e04e2cefc35842528e2f3865fadf'&&
   sameJson(R.sourceBlobs,expectedSource)&&sameJson(R.qaBlobs,expectedQa)&&
-  Object.entries(R.sourceBlobs).every(([p,sha])=>historicalOrPhysicalBlob(p)===sha)&&
-  Object.entries(R.qaBlobs).every(([p,sha])=>historicalOrPhysicalBlob(p)===sha)&&
+  Object.entries(R.sourceBlobs).every(([p,sha])=>
+   (historialRoleParityCurrentBlobs.has(p)
+    ?physicalGit('rev-parse',HISTORY_ROLE_PARITY.parentHead+':'+p):historicalOrPhysicalBlob(p))===sha)&&
+  Object.entries(R.qaBlobs).every(([p,sha])=>
+   (historialRoleParityCurrentBlobs.has(p)
+    ?physicalGit('rev-parse',HISTORY_ROLE_PARITY.parentHead+':'+p):historicalOrPhysicalBlob(p))===sha)&&
   R.scope?.firebaseProject==='ays-orbit-360-lab'&&
   R.scope?.tenant==='alianzas-soluciones'&&
   R.scope?.isolatedHostingPreviewOnly===true&&
@@ -1570,7 +1638,9 @@ if(SAFE_DIAG_ACTIVE){
   sameJson(Object.keys(files).sort(),SAFE_DIAG_FILES.slice().sort())&&
   Object.entries(files).every(([p,v])=>v.before===historicalDiagnosticHash(p)&&
     v.after===realGit('rev-parse',historicalSafeDiagCommit+':'+p)&&
-    authenticatedUatCurrentBlob(p)===physicalGit('hash-object',p)&&v.before!==v.after)&&
+    authenticatedUatCurrentBlob(p)===(historialRoleParityCurrentBlobs.has(p)
+     ?physicalGit('rev-parse',HISTORY_ROLE_PARITY.parentHead+':'+p):physicalGit('hash-object',p))&&
+    v.before!==v.after)&&
   R.verification?.protectedHydrationSynthetic==='PASS'&&
   R.verification?.safePostAuthDiagnosticVm==='PASS'&&
   R.verification?.privacyClassificationOnly===true&&
@@ -1610,7 +1680,8 @@ if(SAFE_DIAG_PREVIEW.status==='AUTHORIZED_EXACT_ISOLATED_READONLY_PREVIEW'){
   P.sourceReceiptBlobSha===realGit('hash-object',SAFE_DIAG.receiptPath)&&
   sameJson(Object.keys(sourceFiles).sort(),SAFE_DIAG_FILES.slice().sort())&&
   Object.entries(sourceFiles).every(([p,sha])=>sha===realGit('rev-parse',P.sourceCommit+':'+p)&&
-   authenticatedUatCurrentBlob(p)===physicalGit('hash-object',p))&&
+   authenticatedUatCurrentBlob(p)===(historialRoleParityCurrentBlobs.has(p)
+    ?physicalGit('rev-parse',HISTORY_ROLE_PARITY.parentHead+':'+p):physicalGit('hash-object',p)))&&
   R.compositionBlobSha===P.compositionBlobSha&&
   P.compositionBlobSha===(LATENCY_REPAIR_ACTIVE?
     physicalGit('rev-parse',LATENCY_REPAIR.parentHead+':'+I6_CANONICAL_COMPOSITION):
@@ -3750,6 +3821,8 @@ if(canonicalCompositionActive){
  const declared=[...(COMP.productFiles||[]),...(Q683_CALENDAR_RECEIPT?['orbit360-platform/core/ui.js']:[])].sort();
  need(actualProduct.length===declared.length&&actualProduct.every((p,i)=>p===declared[i]),'I6_CANONICAL_COMPOSITION_EXACT_SET_DRIFT');
  need(declared.every(p=>(COMP.productFileBlobs?.[p]||Q683_CALENDAR_RECEIPT?.sourceBlobsAfter?.[p])&&(
+  historialRoleParityCurrentBlobs.has(p)
+   ?physicalGit('hash-object',p)===historialRoleParityCurrentBlobs.get(p):
   historialReaderCurrentBlobs.has(p)
    ?physicalGit('hash-object',p)===historialReaderCurrentBlobs.get(p):
   POLICY_COUNTRY_CURRENT.has(p)

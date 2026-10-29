@@ -1,0 +1,66 @@
+{
+  "schema": "GI_I65_B4_003_HISTORIAL_ROLE_PARITY_SUCCESSOR_V1",
+  "status": "SOURCE_QA_PASS_HOSTING_LAB_UAT_PENDING_SECURITY_HOLD",
+  "authority": "PAULA_EXPLICIT_ONE_CORRECTIVE_SUCCESSOR_AND_HOSTING_PREVIEW_20261028",
+  "gate": "I6.5/B4-003",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "parentHead": "67e6208b27614b7298193315282bbd007b86557d",
+  "sourceBlobsBefore": {
+    "orbit360-platform/core/backend-product-readonly-bootstrap-p0.js": "d1faf74618eed510b76ad0e49604acf9df6c3a81",
+    "orbit360-platform/core/membership-multirol-contract-p0.js": "d27b052d4d32872bfe2e1c950c9995a2e2100841"
+  },
+  "sourceBlobsAfter": {
+    "orbit360-platform/core/backend-product-readonly-bootstrap-p0.js": "169dd8c5ab146e93420be38a5610f92a069ba094",
+    "orbit360-platform/core/membership-multirol-contract-p0.js": "77f3da5415474202c2b62bf7a7057cd78eb76aa2"
+  },
+  "qaBlobsBefore": {
+    "tools/gravicentra-b4-003-protected-hydration.test.cjs": "9b246dde42cb4bf8ab8f9572fc18ccd011da062d"
+  },
+  "qaBlobsAfter": {
+    "tools/gravicentra-b4-003-protected-hydration.test.cjs": "9d378dfb741e00dd58bfa0de64ebfa468964cdcb"
+  },
+  "observedEvidence": {
+    "previewSourceSha": "67e6208b27614b7298193315282bbd007b86557d",
+    "previewWorkflowRun": 40797755167,
+    "authenticatedPerson": "Carlos Castro",
+    "rolesReadOnlyTested": ["Operativo", "Asesor"],
+    "historialErrorCode": "PROTECTED_READ_PLAN_DENIED",
+    "historyCountKnown": false,
+    "client360Readback": "PARTIAL_NONZERO",
+    "cobrosReadback": "PARTIAL_NONZERO"
+  },
+  "remediation": {
+    "missingClientRoleCatalogGrant": "historial",
+    "rolesAlignedWithPreexistingServerBoundary": ["Operativo", "Asesor"],
+    "savedAssignedRoleModulesRefreshedAtBootstrap": true,
+    "unassignedRoleGrantPossible": false,
+    "explicitRestrictedHistorialStillDenied": true,
+    "tenantCountryAdvisorServerRestrictionsRetained": true,
+    "serverAuthorizationCodeChanged": false
+  },
+  "regression": {
+    "runner": "node tools/gravicentra-b4-003-protected-hydration.test.cjs",
+    "redBeforeGreenAfter": true,
+    "result": "PASS",
+    "tenantScopeVerified": true,
+    "rolePlanBothRolesVerified": true,
+    "explicitRestrictedModuleDenied": true,
+    "realFirestoreUsed": false,
+    "dataWrites": 0
+  },
+  "scope": {
+    "hosting": "ONE_ISOLATED_LAB_PREVIEW_CHANNEL_SEVEN_DAYS",
+    "protectedCallableRedeployed": false,
+    "sharedFirestoreRulesDeploy": false,
+    "authIamMutation": false,
+    "realBusinessWrites": false,
+    "syntheticDataWrites": false,
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false,
+    "historicalCertificationsRewritten": false,
+    "securityB4003HoldReleased": false
+  },
+  "acceptance": "SOURCE_QA_PASS_AUTHENTICATED_LAB_TEST_PENDING_NO_PRODUCTION_CERTIFICATION"
+}

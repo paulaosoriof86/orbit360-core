@@ -5,6 +5,17 @@
   "productBrand": "Gravicentra Insurance",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
+  "b4003HistorialRoleParitySuccessor20261028": {
+    "status": "SOURCE_QA_PASS_HOSTING_LAB_UAT_PENDING_SECURITY_HOLD",
+    "authority": "PAULA_EXPLICIT_ONE_CORRECTIVE_SUCCESSOR_AND_HOSTING_PREVIEW_20261028",
+    "gate": "I6.5/B4-003",
+    "parentHead": "67e6208b27614b7298193315282bbd007b86557d",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_HISTORIAL_ROLE_PARITY_SUCCESSOR_20261028.json",
+    "receiptBlobSha": "a6d2dcb54ad587621f00cb29402b064babbad9a7",
+    "nextAction": "ONE_HOSTING_ONLY_PREVIEW_THEN_AUTHENTICATED_HISTORIAL_ROLE_COUNTRY_SCOPE_UAT",
+    "currentSecurityHoldUnchanged": true,
+    "productionReleaseAuthorized": false
+  },
   "b4003HistorialPrefetchSuccessor20261028": {
     "status": "SOURCE_QA_PASS_NEW_LAB_PREVIEW_PENDING_SECURITY_HOLD",
     "authority": "PAULA_EXPLICIT_SINGLE_CORRECTIVE_SUCCESSOR_AFTER_AUTHENTICATED_UAT_20261028",

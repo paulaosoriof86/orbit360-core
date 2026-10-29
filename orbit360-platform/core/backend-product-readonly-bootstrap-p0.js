@@ -93,8 +93,12 @@
     var selected = (membership.roles || []).find(function (role) {
       return wanted && normalize(role) === normalize(wanted);
     });
-    return selected && selected !== membership.activeRole
-      ? protectedRoleMembership(membership, selected) : membership;
+    // Even when the saved role already equals the active role, refresh its
+    // effective modules from the assigned-role catalog before query planning.
+    // A stale modulesVisible snapshot cannot suppress an approved collection
+    // or inherit permissions from a different role. The callable independently
+    // verifies server-owned entitlements, scope and tenant on every request.
+    return protectedRoleMembership(membership, selected || membership.activeRole);
   }
   // B4_003_PROTECTED_ROLE_QUERY_PARITY_END
 

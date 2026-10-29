@@ -1,4 +1,4 @@
-name: Gravicentra B4-003 Historial verified-parent LAB Preview
+name: Gravicentra B4-003 Historial role parity Hosting-only LAB Preview
 
 # One source-bound successor within I6.5/B4-003. Never a security release.
 on:
@@ -8,11 +8,12 @@ on:
     paths:
       - .github/workflows/gravicentra-b4-003-historial-lab-preview.yml
       - artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json
+      - artifacts/orbit360-recovery/release-control/I6_5_B4_003_HISTORIAL_ROLE_PARITY_SUCCESSOR_20261028.json
       - artifacts/orbit360-recovery/release-control/I6_5_B4_003_HISTORIAL_READER_SUCCESSOR_20261028.json
       - artifacts/orbit360-recovery/release-control/I6_5_B4_003_HISTORIAL_PREFETCH_SUCCESSOR_20261028.json
-      - functions/b4-003-scoped-related-reader.js
-      - orbit360-platform/modules/historial.js
-      - tools/gravicentra-b4-003-scoped-related-reader.test.cjs
+      - orbit360-platform/core/membership-multirol-contract-p0.js
+      - orbit360-platform/core/backend-product-readonly-bootstrap-p0.js
+      - tools/gravicentra-b4-003-protected-hydration.test.cjs
       - tools/gravicentra-i6-control-plane-guard-v1.mjs
 
 permissions:
@@ -27,14 +28,14 @@ jobs:
     if: >-
       github.repository == 'paulaosoriof86/orbit360-core' &&
       github.ref == 'refs/heads/recovery/fase-a-clean-20260831' &&
-      github.event.head_commit.message == 'fix(i6.5 B4-003): batch verified history parents for isolated LAB UAT'
+      github.event.head_commit.message == 'fix(i6.5 B4-003): align protected history client role plans for LAB UAT'
     runs-on: ubuntu-24.04
     timeout-minutes: 35
     env:
       PROJECT_ID: ays-orbit-360-lab
       HOSTING_SITE: ays-orbit-360-lab
       TENANT_HINT: alianzas-soluciones
-      PARENT_SHA: a236f2c5fab1a338f1619ecdf187ff3d9fe1fc4f
+      PARENT_SHA: 67e6208b27614b7298193315282bbd007b86557d
       RELEASE_GATE: I6.5-B4-003
       BUILD_PREFIX: gi-i65-b4
       ENVIRONMENT_REF: firebase-hosting-preview-i6-5-forensic-b4-003
@@ -44,7 +45,7 @@ jobs:
       SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
 
     steps:
-      - name: Checkout exact one source successor
+      - name: Checkout exact one browser-role source successor
         uses: actions/checkout@v4
         with:
           ref: ${{ github.sha }}
@@ -59,25 +60,26 @@ jobs:
         run: |
           set -euo pipefail
           test "$(git rev-parse HEAD^)" = "$PARENT_SHA"
-          test "$(git show -s --format=%s HEAD)" = 'fix(i6.5 B4-003): batch verified history parents for isolated LAB UAT'
+          test "$(git show -s --format=%s HEAD)" = 'fix(i6.5 B4-003): align protected history client role plans for LAB UAT'
           git diff --name-only "$PARENT_SHA" HEAD | LC_ALL=C sort > "$RUNNER_TEMP/actual-files"
           printf '%s\n' \
             .github/workflows/gravicentra-b4-003-historial-lab-preview.yml \
             artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json \
-            artifacts/orbit360-recovery/release-control/I6_5_B4_003_HISTORIAL_PREFETCH_SUCCESSOR_20261028.json \
-            functions/b4-003-scoped-related-reader.js \
-            orbit360-platform/modules/historial.js \
-            tools/gravicentra-b4-003-scoped-related-reader.test.cjs \
+            artifacts/orbit360-recovery/release-control/I6_5_B4_003_HISTORIAL_ROLE_PARITY_SUCCESSOR_20261028.json \
+            orbit360-platform/core/membership-multirol-contract-p0.js \
+            orbit360-platform/core/backend-product-readonly-bootstrap-p0.js \
+            tools/gravicentra-b4-003-protected-hydration.test.cjs \
             tools/gravicentra-i6-control-plane-guard-v1.mjs | LC_ALL=C sort > "$RUNNER_TEMP/expected-files"
           diff -u "$RUNNER_TEMP/expected-files" "$RUNNER_TEMP/actual-files"
-          test "$(git hash-object functions/b4-003-scoped-related-reader.js)" = '30086b675f5d1461e4e5c933d99cda9d636fbb86'
-          test "$(git hash-object orbit360-platform/modules/historial.js)" = '9e281830a6a98a4e42bb26baec68c1ca7a2de164'
-          test "$(git hash-object tools/gravicentra-b4-003-scoped-related-reader.test.cjs)" = '6e4e2b3c15415fef9bebd9c1ba8c6e00fd7692f7'
+          test "$(git hash-object orbit360-platform/core/membership-multirol-contract-p0.js)" = '77f3da5415474202c2b62bf7a7057cd78eb76aa2'
+          test "$(git hash-object orbit360-platform/core/backend-product-readonly-bootstrap-p0.js)" = '169dd8c5ab146e93420be38a5610f92a069ba094'
+          test "$(git hash-object tools/gravicentra-b4-003-protected-hydration.test.cjs)" = '9d378dfb741e00dd58bfa0de64ebfa468964cdcb'
+          node tools/gravicentra-b4-003-protected-hydration.test.cjs
           node tools/gravicentra-b4-003-scoped-related-reader.test.cjs
           node tools/gravicentra-b4-003-auth-terminal.test.cjs
           node tools/gravicentra-b4-003-dual-host-protected-transport.test.cjs
           node tools/gravicentra-governance-preflight-v1.mjs --mode=i6
-          echo 'B4_003_HISTORIAL_GOVERNED_SOURCE_QA=PASS_SECURITY_HOLD_RETAINED'
+          echo 'B4_003_HISTORIAL_ROLE_PARITY_GOVERNED_QA=PASS_SECURITY_HOLD_RETAINED'
 
       - name: Prepare existing read-only LAB configuration and pinned tooling
         run: |
@@ -117,7 +119,6 @@ jobs:
           chmod 600 "$RUNNER_TEMP/gi-historial-sa.json"
           echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/gi-historial-sa.json" >> "$GITHUB_ENV"
           echo "FIREBASE_CLI_BIN=$CLI" >> "$GITHUB_ENV"
-          timeout --foreground 420s npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund firebase-admin@13.4.0
 
       - name: Read public LAB SDK configuration
         run: |
@@ -152,22 +153,15 @@ jobs:
           if(Object.keys(conf).join(',')!=='hosting'||conf.hosting.site!=='ays-orbit-360-lab'||conf.hosting.public!=='site')throw Error('HOSTING_LAB_ONLY_CONFIG_REQUIRED');
           if(meta.sourceSha!==process.env.GITHUB_SHA||!runtime.includes('"scopedReadPreviewCandidate":true'))throw Error('HOSTED_SOURCE_OR_PROTECTED_READER_MISMATCH');
           const history=fs.readFileSync(dir+'/site/modules/historial.js','utf8');
+          const role=fs.readFileSync(dir+'/site/core/membership-multirol-contract-p0.js','utf8');
+          const bootstrap=fs.readFileSync(dir+'/site/core/backend-product-readonly-bootstrap-p0.js','utf8');
           if(!backend.includes('const parentReads=new Map()')||!backend.includes('MAX_WORKFLOW_CONCURRENCY=25')||
             !backend.includes('MAX_PARENT_BATCH=100,MAX_BATCH_WORKERS=4')||
             !history.includes('data-history-read-error'))throw Error('SCOPED_BACKEND_HISTORIAL_PREFETCH_OR_SAFE_DIAGNOSTIC_MISSING');
+          if(!role.includes("'leads', 'historial', 'aseguradoras'")||
+             !bootstrap.includes('return protectedRoleMembership(membership, selected || membership.activeRole)'))
+            throw Error('HISTORIAL_AUTHENTICATED_ROLE_BOOTSTRAP_NOT_IN_BUNDLE');
           NODE
-
-      - name: Deploy only existing protected read-only LAB callable
-        run: |
-          set -euo pipefail
-          FROOT="$RUNNER_TEMP/gi-historial-functions"
-          mkdir -p "$FROOT"
-          cp -a "$RUNNER_TEMP/gi-historial-package/bundle/backend" "$FROOT/backend"
-          (cd "$FROOT/backend" && npm ci --ignore-scripts --no-audit --no-fund)
-          printf '{"functions":{"source":"backend"}}\n' > "$FROOT/firebase.json"
-          test "$PROJECT_ID" = 'ays-orbit-360-lab'
-          node "$FIREBASE_CLI_BIN" deploy --only functions:orbit360ScopedPolicyReadPreview --config "$FROOT/firebase.json" --project "$PROJECT_ID" --non-interactive
-          echo 'B4_003_HISTORIAL_ONE_EXISTING_READONLY_LAB_FUNCTION_DEPLOYED_NO_SHARED_RULES_NO_LIVE'
 
       - name: Deploy exactly one isolated seven-day LAB Hosting channel
         id: hosting
@@ -213,7 +207,7 @@ jobs:
             await new Promise(resolve=>setTimeout(resolve,1800));
           }
           if(build?.sourceSha!==process.env.GITHUB_SHA)throw Error('B4_003_LAB_SOURCE_DRIFT');
-          const result={schema:'GI_I65_B4_003_HISTORIAL_LAB_TECHNICAL_READBACK_V1',status:'HOSTING_READBACK_PASS_AUTHENTICATED_UAT_PENDING',sourceSha:process.env.GITHUB_SHA,previewUrl:url,channelId:'gi-i65-b4-'+process.env.GITHUB_RUN_ID,projectId:process.env.PROJECT_ID,callable:'orbit360ScopedPolicyReadPreview',sharedRulesDeployed:false,authIamChanged:false,firestoreWrites:0,liveDeployed:false,securityB4003Released:false};
+          const result={schema:'GI_I65_B4_003_HISTORIAL_ROLE_PARITY_HOSTING_LAB_READBACK_V1',status:'HOSTING_READBACK_PASS_AUTHENTICATED_UAT_PENDING',sourceSha:process.env.GITHUB_SHA,previewUrl:url,channelId:'gi-i65-b4-'+process.env.GITHUB_RUN_ID,projectId:process.env.PROJECT_ID,callable:'orbit360ScopedPolicyReadPreview',callableRedeployed:false,sharedRulesDeployed:false,authIamChanged:false,firestoreWrites:0,liveDeployed:false,securityB4003Released:false};
           fs.writeFileSync(process.env.RUNNER_TEMP+'/gi-historial-readback.json',JSON.stringify(result,null,2)+'\n');
           console.log('B4_003_HISTORIAL_LAB_HOSTING_READBACK=PASS_AUTH_UAT_PENDING');
           console.log('B4_003_HISTORIAL_LAB_PREVIEW_URL='+url);

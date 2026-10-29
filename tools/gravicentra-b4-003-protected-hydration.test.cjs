@@ -82,11 +82,40 @@ assert.equal(chosen.activeRole,'Operativo');
 assert.ok(chosen.modulesVisible.includes('cliente360')&&chosen.modulesVisible.includes('polizas')&&
  chosen.modulesVisible.includes('cobros')&&chosen.modulesVisible.includes('ops')&&
  chosen.modulesVisible.includes('leads'),'OPERATIVO_APPROVED_MODULE_PROJECTION_REQUIRED');
+assert.ok(chosen.modulesVisible.includes('historial'),
+ 'OPERATIVO_HISTORIAL_MUST_MATCH_EXISTING_PROTECTED_SERVER_ROLE_GRANT');
 assert.ok(!chosen.modulesVisible.includes('comisiones'),'RESTRICTED_COMMISSION_NOT_VISIBLE');
 assert.ok(!chosen.modulesVisible.includes('siniestros'),'UNAPPROVED_MODULE_NOT_GRANTED');
 assert.deepEqual(Array.from(initial.modulesVisible),[],'ORIGINAL_MEMBERSHIP_UNMODIFIED');
 const adviserView=membershipCtx.roleMembership(initial,'Asesor');
 assert.ok(adviserView.modulesVisible.includes('cliente360')&&adviserView.modulesVisible.includes('polizas')&&adviserView.modulesVisible.includes('cobros'),'ADVISOR_MUST_RECOMPOSE_APPROVED_MODULES');
+assert.ok(adviserView.modulesVisible.includes('historial'),
+ 'ADVISOR_HISTORIAL_MUST_MATCH_EXISTING_PROTECTED_SERVER_ROLE_GRANT');
+const restrictedHistory=membershipCtx.roleMembership({...initial,modulesRestricted:['historial']},'Operativo');
+assert.ok(!restrictedHistory.modulesVisible.includes('historial'),
+ 'EXPLICIT_HISTORIAL_RESTRICTION_MUST_REMAIN_ENFORCED');
+// Reproduce the authenticated Historial query plan with the actual canonical
+// policy owners. A visible navigation item alone must never authorize a read.
+const historyPlannerCtx={window:{Orbit:{}}};
+for(const path of ['orbit360-platform/core/tenant-access-policy-contract-p0.js',
+  'orbit360-platform/core/tenant-access-policy-effective-p0.js',
+  'orbit360-platform/core/tenant-access-policy-product-p0.js',
+  'orbit360-platform/core/product-query-planner-contract-p0.js'])
+ vm.runInNewContext(fs.readFileSync(path,'utf8'),historyPlannerCtx);
+const policy=historyPlannerCtx.window.Orbit.tenantAccessPolicyProductP0;
+const planner=historyPlannerCtx.window.Orbit.productQueryPlannerP0;
+for(const role of ['Operativo','Asesor']){
+ const member=membershipCtx.roleMembership({...initial,advisorId:'synthetic-advisor',
+  teamId:'synthetic-team'},role);
+ const plan=planner.compile('actividades',member,{accessPolicy:policy});
+ assert.equal(plan.ok,true,'ASSIGNED_HISTORIAL_QUERY_PLAN_MUST_COMPILE_'+role);
+ assert.equal(plan.module,'historial','HISTORIAL_MUST_KEEP_CANONICAL_MODULE_'+role);
+ assert.ok(plan.constraints.some(x=>x.field==='tenantId'&&x.value==='synthetic-tenant'),
+  'HISTORIAL_TENANT_CONSTRAINT_REQUIRED_'+role);
+ const blocked=planner.compile('actividades',membershipCtx.roleMembership({
+  ...member,modulesRestricted:['historial']},role),{accessPolicy:policy});
+ assert.equal(blocked.ok,false,'RESTRICTED_HISTORIAL_QUERY_MUST_STAY_DENIED_'+role);
+}
 assert.ok(!adviserView.modulesVisible.includes('comisiones')&&!adviserView.modulesVisible.includes('equipo'),'ADVISOR_MUST_NOT_INHERIT_DIRECTION_MODULES');
 assert.deepEqual(Array.from(initial.modulesVisible),[],'UNCHANGED_SIGNED_MEMBER');
 const unavailable={window:{Orbit:{}}};
@@ -113,12 +142,17 @@ const savedAdvisor=coldRoleContext.bootRole(coldMember);
 assert.equal(savedAdvisor.activeRole,'Asesor','COLD_RELOAD_ASSIGNED_ROLE_RESTORED_PRE_FETCH');
 assert.ok(savedAdvisor.modulesVisible.includes('polizas')&&savedAdvisor.modulesVisible.includes('cobros'),
  'COLD_RELOAD_RECOMPOSED_ADVISOR_MODULES');
+assert.ok(savedAdvisor.modulesVisible.includes('historial'),
+ 'COLD_RELOAD_ADVISOR_HISTORIAL_RECOMPOSED');
 assert.ok(!savedAdvisor.modulesVisible.includes('comisiones')&&!savedAdvisor.modulesVisible.includes('equipo'),
  'COLD_RELOAD_NO_UNASSIGNED_MODULE_LEAK');
 assert.deepEqual(Array.from(savedAdvisor.countries),['GT','CO'],'COLD_RELOAD_COUNTRIES_UNCHANGED');
 assert.equal(coldMember.activeRole,'Operativo','COLD_RELOAD_MEMBER_SOURCE_UNCHANGED');
 savedRole='Dirección';
-assert.equal(coldRoleContext.bootRole(coldMember),coldMember,'UNASSIGNED_STORED_ROLE_IGNORED');
+const unassignedSavedRole=coldRoleContext.bootRole(coldMember);
+assert.equal(unassignedSavedRole.activeRole,'Operativo','UNASSIGNED_STORED_ROLE_IGNORED');
+assert.ok(unassignedSavedRole.modulesVisible.includes('historial'),
+ 'UNASSIGNED_SAVED_ROLE_CANNOT_SUPPRESS_APPROVED_ACTIVE_ROLE_HISTORIAL');
 savedRole='Asesor';
 assert.match(bootstrap,/if \(options\.protectedReadCandidate === true\)\s+membership = protectedStartupMembership\(membership\)/,
  'NO_LEGACY_DIRECT_STORE_ROLE_CHANGE');
