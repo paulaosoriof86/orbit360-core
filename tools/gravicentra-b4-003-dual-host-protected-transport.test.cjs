@@ -24,16 +24,22 @@ function selectors(hostname,flag){
 const preview=selectors('ays-orbit-360-lab--gi-i65-b4-test.web.app',true);
 const live=selectors('ays-orbit-360-lab.web.app',true);
 const liveAlias=selectors('ays-orbit-360-lab.firebaseapp.com',true);
+const customerLive=selectors('app.aysseguros.com',true);
 assert.equal(preview.protectedReaderName(),'orbit360ScopedPolicyReadPreview');
 assert.equal(live.protectedReaderName(),'orbit360ScopedPolicyRead');
 assert.equal(liveAlias.protectedReaderName(),'orbit360ScopedPolicyRead');
-for(const hostname of ['ays-orbit-360-lab--gi-i65-b4-test.web.app','ays-orbit-360-lab.web.app','ays-orbit-360-lab.firebaseapp.com']){
+assert.equal(customerLive.protectedReaderName(),'orbit360ScopedPolicyRead');
+for(const hostname of ['ays-orbit-360-lab--gi-i65-b4-test.web.app','ays-orbit-360-lab.web.app','ays-orbit-360-lab.firebaseapp.com','app.aysseguros.com']){
   assert.equal(selectors(hostname,false).protectedTransportError(),'PROTECTED_READ_CANDIDATE_DISABLED');
   assert.equal(selectors(hostname,true).protectedTransportError(),'');
 }
 const wrong=selectors('ays-orbit-360-lab--other-test.web.app',true);
 assert.equal(wrong.protectedTransportError(),'PROTECTED_READ_HOST_DENIED');
 assert.throws(()=>wrong.protectedReaderName(),/PROTECTED_READ_HOST_DENIED/);
+for(const wrongHost of ['app.aysseguros.com.evil.example','preview.app.aysseguros.com','app-aysseguros.com','aysseguros.com','ays-orbit-360-lab--gi-i65-hco-unsafe.web.app']){
+  assert.equal(selectors(wrongHost,true).protectedTransportError(),'PROTECTED_READ_HOST_DENIED');
+}
+assert.match(app,/runtimeHost==='app\.aysseguros\.com'/);
 assert.match(app,/protectedReadCandidate:\s*cfg\.scopedReadPreviewCandidate===true\s*&&\s*scopedChannel/);
 assert.match(provider,/return callFunction\(protectedReaderName\(\),outbound,'us-east1'\)/);
 assert.match(provider,/return callFunction\(protectedReaderName\(\),\{tenantId:tenant,mode:mode,uid:uid\|\|undefined\},'us-east1'\)/);
