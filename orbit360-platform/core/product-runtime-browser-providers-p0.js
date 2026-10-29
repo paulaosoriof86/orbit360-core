@@ -16,7 +16,9 @@
   function protectedHostMode(){
     var host=String(window.location&&window.location.hostname||'').toLowerCase();
     if(/^ays-orbit-360-lab--gi-i65-b4-[a-z0-9-]+\.web\.app$/.test(host))return 'preview';
-    if(host==='ays-orbit-360-lab.web.app'||host==='ays-orbit-360-lab.firebaseapp.com')return 'live';
+    // The customer-facing HostDime origin uses the same protected LIVE
+    // callable; the domain is an exact match, never a wildcard or suffix.
+    if(host==='ays-orbit-360-lab.web.app'||host==='ays-orbit-360-lab.firebaseapp.com'||host==='app.aysseguros.com')return 'live';
     return '';
   }
   function protectedTransportError(){
