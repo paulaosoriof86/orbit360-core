@@ -95,3 +95,26 @@ Este addendum **supersede las filas históricas de Dirección GT/Todos marcadas 
 - Commit del ejecutor corregido: `29a29da69345ffc50f5af423dca48b475a50da3f`. GitHub Actions **#40818161842 SUCCESS**; pruebas sintéticas y regresiones PASS, empaquetado canónico confirmado, nuevo Hosting Preview servido con archivo `modules/historial.js` byte-a-byte idéntico al blob `7dfef4b69a9dafffafde5f6f627f81ad27a33c37`; Hosting LIVE conservó bytes antes/después.
 - Preview nueva de siete días: https://ays-orbit-360-lab--gi-i65-hco-40818161842-j7k7r4ll.web.app/ . **No se desplegaron** funciones LIVE, Firestore Rules, Auth, IAM, DNS o datos. La primera corrida #40818000285 falló antes de publicación por ausencia de variables de gate, corregida en la corrida SUCCESS; no hubo publicación parcial.
 - **UI autenticada corregida aún NO CERTIFICADA**: en el nuevo origen el navegador presenta formulario de inicio de sesión, sin heredar sesión Firebase de la Preview anterior. Es necesaria autenticación legítima en esa URL y readback GT/CO/TODOS; no copiar tokens ni interpretar CI como PASS del flujo real. Mantener la sesión de Paula en la Preview antigua sin cerrarla.
+
+
+## Addendum de cierre causal y UAT transversal real — 28-oct-2026, 22:45–23:00 GT (PREVALENTE)
+
+**Causa del falso rechazo de ingreso en la nueva Preview**: el canal `gi-i65-hco-40818161842-j7k7r4ll` no cumple la lista de hosts protegidos `^ays-orbit-360-lab--gi-i65-b4-` implementada por `core/product-runtime-browser-providers-p0.js`, `core/product-app-p0.js` y `core/auth-product-runtime-p0.js`. El proveedor rechaza con `PROTECTED_READ_HOST_DENIED` **antes** de invocar la verificación de credenciales; la interfaz transforma ese rechazo en «No fue posible iniciar sesión». Las capturas del usuario no prueban contraseña incorrecta. Se verificó en Equipo que `finanzasyadmin@aysseguros.com` es Paula: activo, correo verificado, SuperAdmin/Operativo/Asesor, GT+CO. Configuración pública de ambos artefactos apunta al mismo Firebase `ays-orbit-360-lab`. Este diagnóstico reemplaza cualquier hipótesis anterior de correo inexistente o clave errónea.
+
+**Decisión de canal congelada (anti-regresión)**: mientras subsistan esos guards, TODOS los nuevos canales de Preview I6.5/B4-003 deben usar prefijo `gi-i65-b4-`. No reutilizar `gi-i65-hco-` ni pedir reintentos de contraseña sobre él. No retirar controles de host, no copiar tokens ni abrir lecturas Firestore directas. El canal con prefijo incorrecto queda como evidencia técnica, **no apto para UAT**, hasta su expiración.
+
+**Acción material**: Workflow Hosting-only exacto, commit `42d1ffe54f3efc564c30f8f989a3c652ff687cc6`, GitHub Actions [#40819377347](https://github.com/paulaosoriof86/orbit360-core/actions/runs/40819377347) **SUCCESS**; re-publicó en el mismo canal previamente autenticado `gi-i65-b4-40805562769` y obtuvo el mismo URL `https://ays-orbit-360-lab--gi-i65-b4-40805562769-e9si0n0l.web.app/`. El preflight comprobó existencia de la versión anterior; las pruebas y readback del Historial nuevo pasaron, y el Hosting LIVE mantuvo hashes idénticos antes/después. No se desplegaron funciones, Firestore Rules, Auth, IAM, DNS ni migraciones; cero escrituras de negocio.
+
+**UAT interactiva Chrome sobre el artefacto nuevo y el mismo UID autenticado de Paula**, esperando a confirmar la carga por rol:
+
+| Rol activo de Paula | TODOS | GT | CO | Conciliación |
+|---|---:|---:|---:|---|
+| Dirección/SuperAdmin | 35 | 23 | 12 | 23+12=35 PASS |
+| Operativo | 35 | 23 | 12 | 23+12=35 PASS |
+| Asesor | 24 | 17 | 7 | 17+7=24 PASS |
+
+- El selector país segmenta ahora Historial en tres roles; no se volvió a reproducir el error anterior de 35/35 o 24/24 en GT/CO. En Asesor, el subconjunto autorizado del rol es menor que Dirección/Operativo, como corresponde. Todas las cifras son de la fuente actual leída en Preview, **no prueba de identidad Carlos**.
+- Interacción de detalle CO abierta correctamente bajo Asesor CO; se cerró sin escritura. UI de Dirección/TODOS restaurada después.
+- En un cambio rápido inicial de rol y país, la pantalla mostró un estado legítimo de «Consultando historial autorizado» (no se certificó falso cero); tras esperar hidratación y recargar, Operativo CO confirmó 5/5 en Inicio y 12 en Historial. Mantener una espera al estado confirmado como regla de QA; no hacer varios cambios de contexto en cascada mientras hidrata.
+
+**Certificación de este frente**: `HISTORIAL_COUNTRY_SELECTOR_REAL_UAT = PASS (Paula 3 roles × GT/CO/TODOS)`. Conserva como pendientes independientes, NO certificados: Carlos UID real; pruebas de escritura sintética con durabilidad en Cronograma/Aseguradoras; flujo end-to-end Cliente360→Historial→Cobros y regresiones del resto de módulos sobre la misma candidata; backend protegido LIVE y respaldo/PITR; corte y SSL real de `app.aysseguros.com`. La aceptación de Paula de reglas amplias sigue congelada como riesgo específico temporal y endurecimiento **P0 postproducción**; no se reabre ese debate ni se convierte en falso PASS de los otros gates.
