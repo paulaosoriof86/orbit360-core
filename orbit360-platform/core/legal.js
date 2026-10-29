@@ -207,6 +207,17 @@ Orbit.legal = (function () {
     list.forEach(fn => { try { fn(); } catch (e) {} });
   }
 
+  // Leaving a route withdraws its pending presentation, never its legal
+  // requirement. No acceptance is recorded and no success callback runs.
+  // A subsequent gate() must ask again unless real acceptance already exists.
+  function dismiss(scopeId) {
+    const scope = String(scopeId || '');
+    if (!scope) return;
+    pendingScopes[scope] = false;
+    callbacks[scope] = [];
+    removeScopeModal(scope);
+  }
+
   function gate(tipo, scopeId, opts) {
     opts = opts || {};
     const scope = String(scopeId || 'anonymous');
@@ -249,5 +260,5 @@ Orbit.legal = (function () {
     w.document.close(); setTimeout(() => w.print(), 300);
   }
 
-  return { gate, yaAcepto, registrar, aceptaciones, clausulasPara, catalogo, imprimir, pais, __ownerIdempotent: true, __gateState: { pendingScopes, doneScopes } };
+  return { gate, dismiss, yaAcepto, registrar, aceptaciones, clausulasPara, catalogo, imprimir, pais, __ownerIdempotent: true, __gateState: { pendingScopes, doneScopes } };
 })();

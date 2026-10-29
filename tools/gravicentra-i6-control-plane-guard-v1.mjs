@@ -106,6 +106,104 @@ const sameJson=(a,b)=>JSON.stringify(stable(a))===JSON.stringify(stable(b));
 need(MODE==='governance'||MODE==='i6','I6_GUARD_MODE_INVALID:'+MODE);
 for(const p of [CONTROL,STATUS_LEDGER,AUTH_RECEIPT,I6_ADDENDUM,I6_PLAN_LOCK,V5_MANIFEST,V6_MANIFEST,V6_ADDENDUM,V7_MANIFEST,V7_ADDENDUM,DATA_UPDATE_PLAN,DATA_UPDATE_DISCIPLINE,DATA_UPDATE_REGISTRY,ACTIVE_SOURCE_INTAKE,I63_SOURCE,I63_RECEIPT,I64_SOURCE,I64_RECEIPT,I65_SOURCE,I65_SYNC,I65_FORENSIC_AUDIT,I65_FORENSIC_PLAN,I65_FORENSIC_ADDENDUM,I65_PAYMENT_INFERENCE,I65_FORENSIC_B1,I65_FORENSIC_B2,I65_FORENSIC_B3,I65_FORENSIC_B4,I6_CANONICAL_COMPOSITION,I6_FINDINGS_LEDGER,I65_FORENSIC_PLAN_V2,I65_B2_REJECTION,I65_B2_ROOT_CAUSE]) need(exists(p),'I6_REQUIRED_FILE_MISSING:'+p);
 const C=readJson(CONTROL);
+// ONE atomic, explicitly bounded current successor. Validate current source,
+// tests, parent and complete path set BEFORE any prior receipt may use a
+// predecessor blob. No historical manifest, receipt or QA file is rewritten.
+const CUMULATIVE_RECEIPT_PATH='artifacts/orbit360-recovery/release-control/I6_5_B4_003_INSIGHTS_FINANCIAL_NATIVE_SOURCE_SUCCESSOR_20261029.json';
+const CUMULATIVE_PARENT='26fbca77c810695cb9c5b2041cfd4cffac602234';
+const CUMULATIVE_ANCHOR='orbit360-platform/modules/insights.js';
+const CUMULATIVE_EXPECTED_BEFORE={
+ 'orbit360-platform/modules/insights.js':'b6c90e3caa9c86c27f36f95e6aea2aee28aae975',
+ 'orbit360-platform/modules/portal.js':'b91dab03139456a972422a398cf803cc0341922d',
+ 'orbit360-platform/core/legal.js':'c6d35e37ffd30b41d09aac63bb54d19f73fcba0a',
+ 'orbit360-platform/index.html':'c0d68b11a2990f7b54a38d76410472714ea23e00',
+ 'orbit360-platform/data/store-firestore-product-readonly-p0.js':'a29c3afe08bb6bc2bd2aaeea1ccf1ee2164826d5',
+ 'orbit360-platform/modules/cobros.js':'53ea3a563d35cbdf460eebb2a3ac2b3923bde3fa'
+};
+const CUMULATIVE_PRODUCT_PATHS=Object.keys(CUMULATIVE_EXPECTED_BEFORE).sort();
+const CUMULATIVE_TEST_PATHS=[
+ 'tools/gravicentra-b4-003-insights-financial-native.test.cjs',
+ 'tools/gravicentra-b4-003-portal-country-lifecycle.test.cjs',
+ 'tools/gravicentra-b4-003-shell-country-sync.test.cjs',
+ 'tools/gravicentra-b4-003-cobros-role-hydration-successor.test.cjs'
+].sort();
+const CUMULATIVE_EXACT_PATHS=[...CUMULATIVE_PRODUCT_PATHS,...CUMULATIVE_TEST_PATHS,
+ CUMULATIVE_RECEIPT_PATH,'tools/gravicentra-i6-control-plane-guard-v1.mjs'].sort();
+const CUMULATIVE_SAFE_READ_RECEIPT='artifacts/orbit360-recovery/release-control/I6_5_B4_003_INSIGHTS_PLANTILLAS_SAFEREAD_SUCCESSOR_20261029.json';
+const CUMULATIVE_SAFE_READ_TEST='tools/gravicentra-b4-003-insights-plantillas-country-no-seed.test.cjs';
+need(exists(CUMULATIVE_RECEIPT_PATH),'B4_003_CUMULATIVE_SUCCESSOR_RECEIPT_MISSING');
+const CUMULATIVE_RECEIPT=readJson(CUMULATIVE_RECEIPT_PATH);
+const cumulativeSources=CUMULATIVE_RECEIPT.sourceFiles||{},cumulativeTests=CUMULATIVE_RECEIPT.regressionTests||{};
+need(CUMULATIVE_RECEIPT.schema==='GRAVICENTRA_I65_B4003_CUMULATIVE_READ_LIFECYCLE_SOURCE_SUCCESSOR_V1'&&
+ CUMULATIVE_RECEIPT.gate==='I6.5/B4-003'&&
+ CUMULATIVE_RECEIPT.status==='SOURCE_SUCCESSOR_ATOMIC_SHA_LOCK_PREVIEW_ONLY_PENDING_TECHNICAL_QA'&&
+ CUMULATIVE_RECEIPT.authority==='PAULA_SAME_CANONICAL_CANDIDATE_INCREMENTAL_RECOVERY_20261029'&&
+ CUMULATIVE_RECEIPT.repository==='paulaosoriof86/orbit360-core'&&
+ CUMULATIVE_RECEIPT.branch==='recovery/fase-a-clean-20260831'&&
+ CUMULATIVE_RECEIPT.parentHead===CUMULATIVE_PARENT&&CUMULATIVE_RECEIPT.sourceAnchor===CUMULATIVE_ANCHOR&&
+ CUMULATIVE_RECEIPT.commitBinding==='EXACT_SINGLE_CHILD_OF_PARENT_DISCOVERED_BY_LAST_INSIGHTS_CHANGE_NO_SELF_SHA'&&
+ Object.keys(cumulativeSources).sort().join('|')===CUMULATIVE_PRODUCT_PATHS.join('|')&&
+ Object.keys(cumulativeTests).sort().join('|')===CUMULATIVE_TEST_PATHS.join('|')&&
+ (CUMULATIVE_RECEIPT.sourceChangedPaths||[]).slice().sort().join('|')===CUMULATIVE_EXACT_PATHS.join('|')&&
+ CUMULATIVE_PRODUCT_PATHS.every(p=>cumulativeSources[p]?.beforeBlob===CUMULATIVE_EXPECTED_BEFORE[p]&&
+  cumulativeSources[p].beforeBlob===physicalGit('rev-parse',CUMULATIVE_PARENT+':'+p)&&
+  /^[0-9a-f]{40}$/.test(String(cumulativeSources[p].afterBlob||''))&&
+  cumulativeSources[p].afterBlob!==cumulativeSources[p].beforeBlob&&
+  cumulativeSources[p].afterBlob===physicalGit('hash-object',p)&&
+  typeof cumulativeSources[p].causalFinding==='string'&&cumulativeSources[p].causalFinding.length>0)&&
+ CUMULATIVE_TEST_PATHS.every(p=>/^[0-9a-f]{40}$/.test(String(cumulativeTests[p]?.afterBlob||''))&&
+  cumulativeTests[p].afterBlob===physicalGit('hash-object',p)&&
+  cumulativeTests[p].syntheticOnly===true&&cumulativeTests[p].realBusinessWrites===0&&
+  cumulativeTests[p].firestoreAccess===0&&physicalGit('ls-tree',CUMULATIVE_PARENT,'--',p)==='')&&
+ physicalGit('ls-tree',CUMULATIVE_PARENT,'--',CUMULATIVE_RECEIPT_PATH)===''&&
+ CUMULATIVE_RECEIPT.historicalAnchor?.receiptPath===CUMULATIVE_SAFE_READ_RECEIPT&&
+ CUMULATIVE_RECEIPT.historicalAnchor.receiptBlob==='4c7786e81b97a4c58e583fa58ae20e31c5ffdb7d'&&
+ CUMULATIVE_RECEIPT.historicalAnchor.receiptBlob===physicalGit('hash-object',CUMULATIVE_SAFE_READ_RECEIPT)&&
+ CUMULATIVE_RECEIPT.historicalAnchor.receiptBlob===physicalGit('rev-parse',CUMULATIVE_PARENT+':'+CUMULATIVE_SAFE_READ_RECEIPT)&&
+ CUMULATIVE_RECEIPT.historicalAnchor.sourceCommit==='cee34a50a2bc65b4162798348725a8657ed2d6fe'&&
+ CUMULATIVE_RECEIPT.historicalAnchor.plantillasBlob==='702c90d4c655013fc168430cb44a48aab7bdfcd0'&&
+ CUMULATIVE_RECEIPT.historicalAnchor.plantillasBlob===physicalGit('hash-object','orbit360-platform/modules/plantillas.js')&&
+ CUMULATIVE_RECEIPT.historicalAnchor.regressionTestBlob==='839a82a705ddd0e26ee62b8c8db57cc266dfdde0'&&
+ CUMULATIVE_RECEIPT.historicalAnchor.regressionTestBlob===physicalGit('hash-object',CUMULATIVE_SAFE_READ_TEST)&&
+ CUMULATIVE_RECEIPT.scope?.exactSixProductSourcesFourSyntheticTests===true&&
+ CUMULATIVE_RECEIPT.scope.existingCountryAndRoleScopesPreserved===true&&
+ CUMULATIVE_RECEIPT.scope.plantillasUnchanged===true&&CUMULATIVE_RECEIPT.scope.previewOnly===true&&
+ ['legalAcceptanceWrites','permissionExpansion','currencyOrAmountsMutation','newServerOwner','newOperationalCollection']
+  .every(k=>CUMULATIVE_RECEIPT.scope[k]===false)&&
+ CUMULATIVE_RECEIPT.preserved?.frozenCompositionFiles===114&&
+ CUMULATIVE_RECEIPT.preserved.historicalCapabilityApprovals===15&&
+ CUMULATIVE_RECEIPT.preserved.historicalFindings===295&&CUMULATIVE_RECEIPT.preserved.historicalTasks===86&&
+ CUMULATIVE_RECEIPT.preserved.priorReceiptsImmutable===true&&
+ ['liveDeployment','firestoreWrites','authIamRulesChanges','augustImport','productionApproval']
+  .every(k=>CUMULATIVE_RECEIPT.nonPromotion?.[k]===false)&&
+ CUMULATIVE_RECEIPT.nonPromotion.securityB4003StillHold===true,
+ 'B4_003_CUMULATIVE_SUCCESSOR_EXACT_BLOBS_OR_BOUNDARIES_INVALID');
+const CUMULATIVE_WORKTREE_QA=process.env.GRAVICENTRA_B4003_INSIGHTS_WORKTREE_QA==='1';
+const cumulativeHead=physicalGit('rev-parse','HEAD');
+if(CUMULATIVE_WORKTREE_QA){
+ need(process.env.CI!=='true'&&process.env.GITHUB_ACTIONS!=='true'&&cumulativeHead===CUMULATIVE_PARENT,
+  'B4_003_CUMULATIVE_WORKTREE_QA_NOT_LOCAL_EXACT_PARENT');
+ const pendingPaths=[...new Set([
+  ...physicalGit('diff','--name-only','HEAD').split(/\r?\n/),
+  ...physicalGit('ls-files','--others','--exclude-standard').split(/\r?\n/)
+ ].filter(Boolean))].sort();
+ need(pendingPaths.join('|')===CUMULATIVE_EXACT_PATHS.join('|'),'B4_003_CUMULATIVE_WORKTREE_EXACT_SET_DRIFT');
+}else{
+ const commit=physicalGit('log','-n','1','--format=%H','--',CUMULATIVE_ANCHOR);
+ const paths=physicalGit('diff','--name-only',CUMULATIVE_PARENT+'..'+commit).split(/\r?\n/).filter(Boolean).sort();
+ need(physicalGit('rev-parse',commit+'^')===CUMULATIVE_PARENT&&
+  physicalGit('merge-base',commit,cumulativeHead)===commit&&paths.join('|')===CUMULATIVE_EXACT_PATHS.join('|')&&
+  CUMULATIVE_PRODUCT_PATHS.every(p=>physicalGit('rev-parse',commit+':'+p)===cumulativeSources[p].afterBlob)&&
+  CUMULATIVE_TEST_PATHS.every(p=>physicalGit('rev-parse',commit+':'+p)===cumulativeTests[p].afterBlob)&&
+  physicalGit('rev-parse',commit+':'+CUMULATIVE_RECEIPT_PATH)===physicalGit('hash-object',CUMULATIVE_RECEIPT_PATH),
+  'B4_003_CUMULATIVE_SUCCESSOR_PARENT_OR_COMMIT_DRIFT');
+}
+for(const p of CUMULATIVE_TEST_PATHS)execFileSync(process.execPath,[p],{stdio:'pipe'});
+const CUMULATIVE_BEFORE=new Map(CUMULATIVE_PRODUCT_PATHS.map(p=>[p,cumulativeSources[p].beforeBlob]));
+const CUMULATIVE_AFTER=new Map(CUMULATIVE_PRODUCT_PATHS.map(p=>[p,cumulativeSources[p].afterBlob]));
+console.log('B4_003_CUMULATIVE_SUCCESSOR='+
+ (CUMULATIVE_WORKTREE_QA?'LOCAL_WORKTREE_QA_ONLY_NOT_PREVIEW_ACCEPTANCE':'EXACT_ATOMIC_DESCENDANT_SOURCE')+
+ '_SIX_SOURCES_FOUR_SYNTHETIC_TESTS_FROZEN114_PRESERVED_SECURITY_HOLD');
 // A full-history checkout of the independent October recovery branch does not
 // contain the certified September I6 commit: that history is not reachable
 // from any active branch ref. When this exact, already-approved reconciliation
@@ -1232,7 +1330,7 @@ if(C360_FINANCIAL_FIX){
   'B4_003_CLIENT360_SHADOW_OWNER_QA_FAILED');
  console.log('B4_003_CLIENT360_FINANCIAL_SHADOW_SUCCESSOR=PASS_HISTORIC_LOCKS_PRESERVED_LIVE_HOLD');
 }
-const preFocalPhysicalHash=p=>historialReaderHistoricalBlobs.get(p)||focalC360CobrosHistoricalBlobs.get(p)||cobrosQ683HistoricalBlobs.get(p)||historicalOrPhysicalBlob(p);
+const preFocalPhysicalHash=p=>historialReaderHistoricalBlobs.get(p)||focalC360CobrosHistoricalBlobs.get(p)||cobrosQ683HistoricalBlobs.get(p)||CUMULATIVE_BEFORE.get(p)||historicalOrPhysicalBlob(p);
 // An explicitly byte-bound single-case QA successor can supersede only its
 // two source blobs without rewriting the historically certified composition.
 // The broad B4 execution lock and all previous Preview receipts remain frozen.
@@ -1301,8 +1399,8 @@ if(AUTH_UAT_PREVIEW_RECEIPT){
   physicalGit('hash-object',AUTH_UAT_PREVIEW_RECEIPT_PATH)==='838aa32daf07e04e2cefc35842528e2f3865fadf'&&
   sameJson(R.sourceBlobs,expectedSource)&&sameJson(R.qaBlobs,expectedQa)&&
   Object.entries(R.sourceBlobs).every(([p,sha])=>
-   (historialRoleParityCurrentBlobs.has(p)
-    ?physicalGit('rev-parse',HISTORY_ROLE_PARITY.parentHead+':'+p):historicalOrPhysicalBlob(p))===sha)&&
+   (CUMULATIVE_BEFORE.get(p)||(historialRoleParityCurrentBlobs.has(p)
+    ?physicalGit('rev-parse',HISTORY_ROLE_PARITY.parentHead+':'+p):historicalOrPhysicalBlob(p)))===sha)&&
   Object.entries(R.qaBlobs).every(([p,sha])=>
    (historialRoleParityCurrentBlobs.has(p)
     ?physicalGit('rev-parse',HISTORY_ROLE_PARITY.parentHead+':'+p):historicalOrPhysicalBlob(p))===sha)&&
@@ -2133,7 +2231,7 @@ if(INSURER_POLICY_COUNT_ACTIVE){
   [...source,...qa].every(p=>pairs[p]?.before===physicalGit('rev-parse',P.parentHead+':'+p)&&
    pairs[p]?.after===policyCountHistoricalHash(p)&&pairs[p].before!==pairs[p].after)&&
   source.every(p=>P.sourceBlobsAfter[p]===pairs[p].after&&
-   authenticatedUatCurrentBlob(p)===physicalGit('hash-object',p)&&
+   authenticatedUatCurrentBlob(p)===(CUMULATIVE_BEFORE.get(p)||physicalGit('hash-object',p))&&
    BL.sourceBlobsAfter[p]===pairs[p].after&&CL.sourceBlobsAfter[p]===pairs[p].after&&
    COMP.productFiles.includes(p)&&policyCountHistoricalComposition.productFileBlobs[p]===pairs[p].after&&
    B4.boundaries?.allowedProductFiles?.includes(p))&&
@@ -2563,7 +2661,8 @@ if(PORTAL_COUNTRY.status==='SOURCE_STAGED_SYNTHETIC_QA_PASS_SECURITY_HOLD'){
      const pair=R.sourceFiles[p];
      return pair.before===realGit('rev-parse',PORTAL_COUNTRY.parentHead+':'+p)&&
        pair.after===realGit('rev-parse',PORTAL_COUNTRY.sourceCommit+':'+p)&&
-       pair.after===realGit('hash-object',p)&&pair.after!==pair.before&&
+       pair.after===(p==='orbit360-platform/modules/portal.js'?CUMULATIVE_BEFORE.get(p):realGit('hash-object',p))&&
+       pair.after!==pair.before&&
        pair.after===HISTORIC_PRE_INSURER_COMPOSITION.productFileBlobs[p]&&COMP.productFiles.includes(p)&&
        pair.after===STAGED.sourceBlobsAfter?.[p];
    })&&
@@ -4075,7 +4174,10 @@ try{execFileSync('git',['merge-base','--is-ancestor',R.sourceSha,current],{stdio
  console.log('I6_DISJOINT_SOURCE_ROOT=EXACT_DELTA_AND_MANIFEST_PROVEN_NO_ANCESTRY_CLAIM_LIVE_LINEAGE_UNRESOLVED');
 }
 const allowedPrefixes=['.github/workflows/gravicentra-','.github/i6-ephemeral/','tools/gravicentra-','artifacts/orbit360-recovery/release-control/','artifacts/orbit360-recovery/project-sources-v2/'];
-const changed=git('diff','--name-only',R.sourceSha+'..'+current).split(/\r?\n/).filter(Boolean);
+const changed=[...new Set([
+ ...git('diff','--name-only',R.sourceSha+'..'+current).split(/\r?\n/).filter(Boolean),
+ ...(CUMULATIVE_WORKTREE_QA?CUMULATIVE_EXACT_PATHS:[])
+])];
 const successor=C.nextCandidate&&C.nextCandidate.gate==='I6.1'?C.nextCandidate:null;
 const allowedSuccessorProduct=new Set(successor&&Array.isArray(successor.allowedProductFiles)?successor.allowedProductFiles:[]);
 const allowedI63Product=new Set((i63DefectPending||i63DefectLive)&&Array.isArray(i63CodeDefect.allowedProductFiles)?i63CodeDefect.allowedProductFiles:[]);
@@ -4097,7 +4199,7 @@ if(canonicalCompositionActive){
  const actualProduct=changed.filter(p=>!allowedPrefixes.some(prefix=>p.startsWith(prefix))).sort();
  const declared=[...(COMP.productFiles||[]),...(Q683_CALENDAR_RECEIPT?['orbit360-platform/core/ui.js']:[])].sort();
  const safeReadProductPaths=['orbit360-platform/modules/insights.js','orbit360-platform/modules/plantillas.js'];
- const boundedComposition=[...declared,...safeReadProductPaths].sort();
+ const boundedComposition=[...declared,...safeReadProductPaths,'orbit360-platform/core/legal.js'].sort();
  need(actualProduct.length===boundedComposition.length&&actualProduct.every((p,i)=>p===boundedComposition[i]),'I6_CANONICAL_COMPOSITION_EXACT_SET_DRIFT');
  // Keep the immutable 114-file composition intact. The five changed bytes
  // belong to ONE independently pinned I6.5/B4-003 source successor, never to
@@ -4184,8 +4286,8 @@ if(canonicalCompositionActive){
    newFiles[p]?.after===physicalGit('rev-parse',fixedSource+':'+p)&&
    newFiles[p]?.after!==newFiles[p]?.before),
   'I6_CANONICAL_SUCCESSOR_NOT_EXACT_OR_UNAUTHORIZED');
- need(declared.every(p=>physicalGit('hash-object',p)===(p===markerProduct?insurerMarkerReceipt.source.afterBlob:(newFiles[p]?.after||COMP.productFileBlobs?.[p]||
-  (p==='orbit360-platform/core/ui.js'?Q683_CALENDAR_RECEIPT?.sourceBlobsAfter?.[p]:null)))),
+ need(declared.every(p=>physicalGit('hash-object',p)===(CUMULATIVE_AFTER.get(p)||(p===markerProduct?insurerMarkerReceipt.source.afterBlob:(newFiles[p]?.after||COMP.productFileBlobs?.[p]||
+  (p==='orbit360-platform/core/ui.js'?Q683_CALENDAR_RECEIPT?.sourceBlobsAfter?.[p]:null))))),
   'I6_CANONICAL_COMPOSITION_BLOB_DRIFT');
  // The two extra modules were historically developed but absent from the
  // certified 114-file composition. Preserve that certified receipt untouched;
@@ -4211,7 +4313,8 @@ if(canonicalCompositionActive){
   Object.keys(bound).sort().join('|')===safeReadProductPaths.slice().sort().join('|')&&
   safeReadProductPaths.every(p=>bound[p]?.before===physicalGit('rev-parse',parent+':'+p)&&
     bound[p]?.after===physicalGit('rev-parse',source+':'+p)&&
-    bound[p]?.after===physicalGit('hash-object',p)&&bound[p]?.before!==bound[p]?.after)&&
+    bound[p]?.after===(CUMULATIVE_BEFORE.get(p)||physicalGit('hash-object',p))&&
+    bound[p]?.before!==bound[p]?.after)&&
   safeRead.regressionTest?.path===testPath&&safeRead.regressionTest?.blob===testBlob&&
   safeRead.regressionTest?.syntheticOnly===true&&safeRead.regressionTest?.realBusinessWrites===0&&
   safeRead.regressionTest?.testCases===4&&
@@ -4227,6 +4330,7 @@ if(canonicalCompositionActive){
   'B4_003_SAFE_READ_SUCCESSOR_EXACT_PROOF_DRIFT');
  execFileSync(process.execPath,[testPath],{stdio:'pipe'});
  for(const p of safeReadProductPaths)independentlyPinnedSafeReadProduct.add(p);
+ independentlyPinnedSafeReadProduct.add('orbit360-platform/core/legal.js');
  console.log('B4_003_SAFE_READ_SUCCESSOR=EXACT_TWO_BLOBS_ONE_TEST_FROZEN114_PRESERVED_SECURITY_HOLD');
  need(COMP.productFileCount===COMP.productFiles.length,'I6_CANONICAL_COMPOSITION_COUNT_DRIFT');
 }

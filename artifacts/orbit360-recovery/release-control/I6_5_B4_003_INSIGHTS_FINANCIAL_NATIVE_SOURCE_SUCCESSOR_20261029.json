@@ -1,0 +1,138 @@
+{
+  "schema": "GRAVICENTRA_I65_B4003_CUMULATIVE_READ_LIFECYCLE_SOURCE_SUCCESSOR_V1",
+  "gate": "I6.5/B4-003",
+  "status": "SOURCE_SUCCESSOR_ATOMIC_SHA_LOCK_PREVIEW_ONLY_PENDING_TECHNICAL_QA",
+  "authority": "PAULA_SAME_CANONICAL_CANDIDATE_INCREMENTAL_RECOVERY_20261029",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "parentHead": "26fbca77c810695cb9c5b2041cfd4cffac602234",
+  "commitBinding": "EXACT_SINGLE_CHILD_OF_PARENT_DISCOVERED_BY_LAST_INSIGHTS_CHANGE_NO_SELF_SHA",
+  "sourceAnchor": "orbit360-platform/modules/insights.js",
+  "sourceFiles": {
+    "orbit360-platform/modules/insights.js": {
+      "beforeBlob": "b6c90e3caa9c86c27f36f95e6aea2aee28aae975",
+      "afterBlob": "6667535e1995eb1dac7f100d95061c8f215aa7ea",
+      "causalFinding": "NATIVE_FINANCIAL_PROJECTION_COUNTRY_AND_CURRENCY"
+    },
+    "orbit360-platform/modules/portal.js": {
+      "beforeBlob": "b91dab03139456a972422a398cf803cc0341922d",
+      "afterBlob": "dce6a980ea87eb3baab0c98a600edac9c4a8d356",
+      "causalFinding": "PORTAL_COUNTRY_SESSION_REFRESH_AND_ROUTE_OVERLAY_LIFECYCLE"
+    },
+    "orbit360-platform/core/legal.js": {
+      "beforeBlob": "c6d35e37ffd30b41d09aac63bb54d19f73fcba0a",
+      "afterBlob": "4c5ec9b660eb0c8b3f53c1f9a524b8551a2e6d2c",
+      "causalFinding": "PORTAL_LEGAL_GATE_DISMISS_WITHOUT_ACCEPTANCE_OR_CALLBACKS"
+    },
+    "orbit360-platform/index.html": {
+      "beforeBlob": "c0d68b11a2990f7b54a38d76410472714ea23e00",
+      "afterBlob": "a6a396b472cea8a94e2da4fe83f24a2efc0a1314",
+      "causalFinding": "GLOBAL_COUNTRY_SELECTOR_REPAINT_FOLLOWS_CURRENT_SESSION"
+    },
+    "orbit360-platform/data/store-firestore-product-readonly-p0.js": {
+      "beforeBlob": "a29c3afe08bb6bc2bd2aaeea1ccf1ee2164826d5",
+      "afterBlob": "c4324d5218e146cfa60534d3247eb471f28c0610",
+      "causalFinding": "COBROS_ROLE_HYDRATION_DEPENDENCY_ORDER_NO_PERMISSION_EXPANSION"
+    },
+    "orbit360-platform/modules/cobros.js": {
+      "beforeBlob": "53ea3a563d35cbdf460eebb2a3ac2b3923bde3fa",
+      "afterBlob": "bf595453f36bbe2c59969edcae3710654553f930",
+      "causalFinding": "SOURCE_POLICY_CURRENCY_CONFLICT_WARNING_WITHOUT_VALUE_MUTATION"
+    }
+  },
+  "regressionTests": {
+    "tools/gravicentra-b4-003-insights-financial-native.test.cjs": {
+      "afterBlob": "2e9814bd06a9ff7bad1447b065fc3ce60ce8245e",
+      "syntheticOnly": true,
+      "realBusinessWrites": 0,
+      "firestoreAccess": 0
+    },
+    "tools/gravicentra-b4-003-portal-country-lifecycle.test.cjs": {
+      "afterBlob": "3634e64904d055b4ab58dac4cb2ac5788899d68b",
+      "syntheticOnly": true,
+      "realBusinessWrites": 0,
+      "firestoreAccess": 0
+    },
+    "tools/gravicentra-b4-003-shell-country-sync.test.cjs": {
+      "afterBlob": "71c0acfe769eef7e7a7177bb188044b19bfcfb54",
+      "syntheticOnly": true,
+      "realBusinessWrites": 0,
+      "firestoreAccess": 0
+    },
+    "tools/gravicentra-b4-003-cobros-role-hydration-successor.test.cjs": {
+      "afterBlob": "573b08dbf9b963d4dcbc114183a7126c17ddffe6",
+      "syntheticOnly": true,
+      "realBusinessWrites": 0,
+      "firestoreAccess": 0
+    }
+  },
+  "qaStatus": "SYNTHETIC_QA_PASS_TECH_PREVIEW_AND_AUTHENTICATED_UAT_PENDING",
+  "syntheticQaEvidence": {
+    "dateGuatemala": "2026-10-29",
+    "runner": "node --test --test-reporter=spec",
+    "testFiles": 49,
+    "historicalTestFiles": 45,
+    "newTestFiles": 4,
+    "runnerTestsPassed": 120,
+    "runnerTestsFailed": 0,
+    "runnerTestsSkipped": 0,
+    "newTestCases": {
+      "insightsFinancialNative": 26,
+      "portalCountryLifecycle": 10,
+      "shellCountrySync": 8,
+      "cobrosRoleHydration": 16
+    },
+    "sourceAndTestBlobsUnchangedBeforeAfter": 10,
+    "firestoreEmulatorExcluded": true,
+    "networkAccess": false,
+    "businessWrites": 0,
+    "authenticatedUatAcceptance": false
+  },
+  "sourceChangedPaths": [
+    "artifacts/orbit360-recovery/release-control/I6_5_B4_003_INSIGHTS_FINANCIAL_NATIVE_SOURCE_SUCCESSOR_20261029.json",
+    "orbit360-platform/core/legal.js",
+    "orbit360-platform/data/store-firestore-product-readonly-p0.js",
+    "orbit360-platform/index.html",
+    "orbit360-platform/modules/cobros.js",
+    "orbit360-platform/modules/insights.js",
+    "orbit360-platform/modules/portal.js",
+    "tools/gravicentra-b4-003-cobros-role-hydration-successor.test.cjs",
+    "tools/gravicentra-b4-003-insights-financial-native.test.cjs",
+    "tools/gravicentra-b4-003-portal-country-lifecycle.test.cjs",
+    "tools/gravicentra-b4-003-shell-country-sync.test.cjs",
+    "tools/gravicentra-i6-control-plane-guard-v1.mjs"
+  ],
+  "historicalAnchor": {
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_INSIGHTS_PLANTILLAS_SAFEREAD_SUCCESSOR_20261029.json",
+    "receiptBlob": "4c7786e81b97a4c58e583fa58ae20e31c5ffdb7d",
+    "sourceCommit": "cee34a50a2bc65b4162798348725a8657ed2d6fe",
+    "plantillasBlob": "702c90d4c655013fc168430cb44a48aab7bdfcd0",
+    "regressionTestBlob": "839a82a705ddd0e26ee62b8c8db57cc266dfdde0"
+  },
+  "scope": {
+    "exactSixProductSourcesFourSyntheticTests": true,
+    "existingCountryAndRoleScopesPreserved": true,
+    "plantillasUnchanged": true,
+    "previewOnly": true,
+    "legalAcceptanceWrites": false,
+    "permissionExpansion": false,
+    "currencyOrAmountsMutation": false,
+    "newServerOwner": false,
+    "newOperationalCollection": false
+  },
+  "preserved": {
+    "frozenCompositionFiles": 114,
+    "historicalCapabilityApprovals": 15,
+    "historicalFindings": 295,
+    "historicalTasks": 86,
+    "priorReceiptsImmutable": true
+  },
+  "nonPromotion": {
+    "liveDeployment": false,
+    "firestoreWrites": false,
+    "authIamRulesChanges": false,
+    "augustImport": false,
+    "productionApproval": false,
+    "securityB4003StillHold": true
+  }
+}

@@ -41,6 +41,127 @@ Orbit.modules.insights = (function () {
   const esNueva = p => !(p.contadorRenovaciones > 0);
   const netaDe = p => norm(p.primaNeta != null ? p.primaNeta : p.prima, p.moneda);
 
+  // Presentation only: the recovered Queries owner remains the authority for
+  // obligations, confirmed payments, calendar dates and verified amounts.
+  function inInsightsScope(fn) {
+    return Orbit.access && typeof Orbit.access.withScope === 'function'
+      ? Orbit.access.withScope('insights', fn) : fn();
+  }
+  function financeNumber(value) {
+    if (value == null || String(value).trim() === '') return null;
+    const n = U.finiteNumber ? U.finiteNumber(value) : Number(value);
+    return n != null && Number.isFinite(n) ? n : null;
+  }
+  function financialReadiness() {
+    const store = S();
+    if (!store || store.__productReadOnlyP0 !== true || typeof store._productStatus !== 'function') return 'ready';
+    const status = store._productStatus() || {};
+    const names = ['clientes', 'polizas', 'carteraPrimas', 'recibosEsperados', 'cobros'];
+    const confirmed = status.serverConfirmedCollections || [], denied = status.deniedCollections || [];
+    const failed = Object.keys(status.snapshotErrors || {});
+    if (names.some(name => denied.includes(name) || failed.includes(name))) return 'unavailable';
+    return names.every(name => confirmed.includes(name)) ? 'ready' : 'pending';
+  }
+  function financialSnapshot() {
+    return inInsightsScope(() => {
+      const readiness = financialReadiness();
+      const result = { readiness, pending: [], overdue: [], confirmed: [] };
+      if (readiness !== 'ready') return result;
+      // Construct proof context BEFORE local country/adviser filters. Filtering
+      // here would hide duplicate receipt links and invalidate amount provenance.
+      const context = q.portfolioAmountContext();
+      const project = (row, kind) => {
+        const policy = context.policiesById.get(String(row.polizaId || ''));
+        const clientId = policy && policy.clienteId || row.clienteId || '';
+        const client = clientId && S().get('clientes', clientId);
+        const adviser = row.asesorId || policy && policy.asesorId || client && client.asesorId || '';
+        if (!paisOK(registroPais(row)) || !aseOK(adviser)) return null;
+        const key = String(row.reciboId || row.receiptId || '').trim();
+        const linked = key && !context.duplicates.has(key) ? context.receiptsById.get(key) : null;
+        const receipt = linked && String(linked.polizaId || linked.policyId || '') === String(row.polizaId || '') &&
+          (!linked.clienteId || String(linked.clienteId) === String(clientId)) ? linked : null;
+        const fromRow = String(row.moneda || '').trim().toUpperCase();
+        const fromPolicy = String(policy && (policy.moneda || policy.divisa) || '').trim().toUpperCase();
+        const fromSource = String(row.sourceMoneda || '').trim().toUpperCase();
+        const conflict = row.currencyValidation === 'REQUIERE_VALIDACION' ||
+          fromRow && fromPolicy && fromRow !== fromPolicy || fromSource && fromPolicy && fromSource !== fromPolicy;
+        const currency = conflict ? 'SIN_MONEDA' : (fromPolicy || fromRow || 'SIN_MONEDA');
+        const classification = q.portfolioClassification(row);
+        const proof = kind === 'portfolio' ? q.portfolioAmountProof(row, context) : { value: financeNumber(row.monto), source: 'CONFIRMED_PAYMENT' };
+        return {
+          id: row.id, kind, clienteId: clientId, polizaId: row.polizaId, asesorId: adviser,
+          cuota: row.cuota != null ? row.cuota : row.secuencia != null ? row.secuencia : row.serie != null ? row.serie :
+            receipt && (receipt.cuota != null ? receipt.cuota : receipt.secuencia != null ? receipt.secuencia : receipt.serie) != null ?
+              (receipt.cuota != null ? receipt.cuota : receipt.secuencia != null ? receipt.secuencia : receipt.serie) : '—',
+          monto: proof.value, moneda: currency, vence: q.portfolioDue(row),
+          fechaPago: kind === 'payment' ? (row.fechaPago || row.paidDate || '') : '',
+          estado: kind === 'payment' ? 'Pagado' : classification.overdue ? 'Vencido' : classification.unknownDate ? 'Fecha pendiente de validación' : 'Pendiente',
+          daysOverdue: classification.daysOverdue, source: proof.source, row
+        };
+      };
+      result.pending = q.carteraPendienteRows().map(row => project(row, 'portfolio')).filter(Boolean);
+      result.overdue = q.carteraVencidaRows().map(row => project(row, 'portfolio')).filter(Boolean)
+        .sort((a, b) => b.daysOverdue - a.daysOverdue || String(a.id).localeCompare(String(b.id)));
+      result.confirmed = q.cobrosConfirmadosRows().map(row => project(row, 'payment')).filter(Boolean);
+      return result;
+    });
+  }
+  function financeSums(rows) {
+    const sums = {};
+    rows.forEach(row => {
+      if (row.monto == null || row.moneda === 'SIN_MONEDA' || !row.moneda) return;
+      sums[row.moneda] = (sums[row.moneda] || 0) + row.monto;
+    });
+    return sums;
+  }
+  function financeRateRows(snapshot) {
+    const all = snapshot.confirmed.concat(snapshot.pending, snapshot.overdue);
+    const unknownCurrency = all.filter(row => row.moneda === 'SIN_MONEDA' || !row.moneda).length;
+    const confirmed = financeSums(snapshot.confirmed), pending = financeSums(snapshot.pending), overdue = financeSums(snapshot.overdue);
+    return [...new Set(all.map(row => row.moneda).filter(cur => cur && cur !== 'SIN_MONEDA'))].sort().map(moneda => {
+      const missing = unknownCurrency + all.filter(row => row.moneda === moneda && row.monto == null).length;
+      const paid = confirmed[moneda] || 0, pend = pending[moneda] || 0, venc = overdue[moneda] || 0;
+      const denominator = paid + pend + venc;
+      return { moneda, confirmed: paid, pending: pend, overdue: venc, missing,
+        rate: missing || denominator <= 0 ? null : Math.round(paid / denominator * 100) };
+    });
+  }
+  function financeValue(rows, full) {
+    const sums = financeSums(rows), entries = Object.entries(sums).sort();
+    if (!entries.length) return rows.length ? 'Sin monto verificado' : 'Sin registros';
+    return entries.map(([cur, value]) => `<span style="display:block">${full ? U.money(value, cur) : U.moneyShort(value, cur)} <small>${U.esc(cur)}</small></span>`).join('');
+  }
+  function financeRateText(snapshot) {
+    const rates = financeRateRows(snapshot);
+    return rates.length ? rates.map(r => `${U.esc(r.moneda)}: ${r.rate == null ? 'por validar' : r.rate + '%'}`).join(' · ') : 'Sin base para calcular';
+  }
+  function financeWarning(rows) {
+    const missing = rows.filter(r => r.monto == null).length;
+    const currency = rows.filter(r => r.moneda === 'SIN_MONEDA').length;
+    const dates = rows.filter(r => r.kind === 'portfolio' && !r.vence).length;
+    const warnings = [missing ? missing + ' sin monto fuente' : '', currency ? currency + ' con moneda por validar' : '', dates ? dates + ' sin vencimiento validado' : ''].filter(Boolean);
+    return warnings.length ? `<div class="cfg-note" data-insights-finance-warning="1">Importes verificados parciales: ${warnings.join(' · ')}. Los registros siguen visibles; no se sustituyen por cero ni se inventan fechas.</div>` : '';
+  }
+  function financePending(readiness) {
+    return readiness === 'unavailable' ? 'Información no disponible para este acceso.' : 'Esperando confirmación del servidor…';
+  }
+  function financialRowsTable(rows) {
+    return `<div style="overflow-x:auto"><table class="tbl"><thead><tr><th>Cliente</th><th>Cuota</th><th class="num">Monto</th><th>Vence / fecha de pago</th><th>Estado</th></tr></thead><tbody>${rows.map(row => {
+      const client = S().get('clientes', row.clienteId);
+      const href = '#/cliente360?c=' + encodeURIComponent(row.clienteId) + '&t=recibos';
+      const value = row.moneda === 'SIN_MONEDA' ? 'Moneda por validar' : row.monto == null ? 'Sin monto fuente' : U.money(row.monto, row.moneda) + ' ' + row.moneda;
+      const due = row.kind === 'payment' ? row.fechaPago : row.vence;
+      return `<tr><td><a href="${U.esc(href)}" onclick="document.getElementById('ins-drawer')?.remove()">${U.esc(client && client.nombre || row.clienteId || '—')}</a></td><td>${U.esc(String(row.cuota))}</td><td class="num">${U.esc(value)}</td><td>${due ? U.fmtDate(due) : 'Sin fecha validada'}</td><td>${U.esc(row.estado)}</td></tr>`;
+    }).join('') || '<tr><td colspan="5" class="muted">Sin registros.</td></tr>'}</tbody></table></div>`;
+  }
+  function financeBars(rows, keyOf, empty) {
+    const currencies = Object.keys(financeSums(rows)).sort();
+    return currencies.map(cur => {
+      const entries = topAgg(rows.filter(row => row.moneda === cur && row.monto != null), keyOf, row => row.monto, key => U.esc(key || 'Sin dato'), 12);
+      return `<div style="margin-bottom:14px"><b>${U.esc(cur)}</b>${barsH(entries, { money: true, currency: cur })}</div>`;
+    }).join('') || `<div class="muted">${empty || 'Sin importes verificados.'}</div>`;
+  }
+
   /* ---- micro-gráficos ---- */
   function barsH(rows, opts) {
     opts = opts || {};
@@ -49,7 +170,7 @@ Orbit.modules.insights = (function () {
       <div class="ins-bar-row ${r.onclick ? 'clickable' : ''}" ${r.onclick ? `onclick="${r.onclick}"` : ''}>
         <div class="ins-bar-lbl">${r.label}</div>
         <div class="ins-bar-track"><i style="width:${Math.max(2, r.val / max * 100)}%;background:${r.color || 'var(--red)'}"></i></div>
-        <div class="ins-bar-val">${opts.money ? M(r.val) : (opts.fmt ? opts.fmt(r.val) : r.val)}</div>
+        <div class="ins-bar-val">${opts.money ? (opts.currency ? U.moneyShort(r.val, opts.currency) : M(r.val)) : (opts.fmt ? opts.fmt(r.val) : r.val)}</div>
       </div>`).join('')}</div>`;
   }
   function donut(parts, centerTop, centerSub) {
@@ -98,7 +219,7 @@ Orbit.modules.insights = (function () {
   }
   function wireKpis() {
     host.querySelectorAll('[data-kpi]').forEach(el => el.addEventListener('click', () => {
-      const k = kpiStore[+el.dataset.kpi]; if (k && k.detail) insDrawer(k.detail.title, k.detail.sub, typeof k.detail.html === 'function' ? k.detail.html() : k.detail.html);
+      const k = kpiStore[+el.dataset.kpi]; if (k && k.detail) inInsightsScope(() => insDrawer(k.detail.title, k.detail.sub, typeof k.detail.html === 'function' ? k.detail.html() : k.detail.html));
     }));
   }
   function insDrawer(title, sub, html) {
@@ -126,12 +247,6 @@ Orbit.modules.insights = (function () {
         <td>${esNueva(p) ? '<span class="badge ok">Nueva</span>' : '<span class="badge info">Renovada</span>'}</td>
         <td style="text-align:right;color:var(--ink-3)">›</td></tr>`).join('') || '<tr><td colspan="6" class="muted" style="text-align:center;padding:20px">Sin registros.</td></tr>'}</tbody></table>`;
   }
-  function tablaCobros(cobs) {
-    return `<table class="tbl"><thead><tr><th>Cliente</th><th>Cuota</th><th class="num">Monto</th><th>Vence</th><th>Estado</th></tr></thead>
-      <tbody>${cobs.map(c => `<tr class="clickable" onclick="document.getElementById('ins-drawer').remove();Orbit.modules.cobros.detalle('${c.id}')">
-        <td>${K.clienteCell(c.clienteId)}</td><td>${c.cuota}</td><td class="num">${U.money(c.monto, c.moneda)}</td>
-        <td style="font-size:12.5px">${U.fmtDate(c.vence)}</td><td>${U.estadoBadge(c.estado)}</td></tr>`).join('') || '<tr><td colspan="5" class="muted" style="text-align:center;padding:20px">Sin registros.</td></tr>'}</tbody></table>`;
-  }
 
   /* ===================== series temporales (reales) ===================== */
   const MESES = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
@@ -153,32 +268,29 @@ Orbit.modules.insights = (function () {
   /* ===================== VISTAS ===================== */
   function vResumen() {
     const vig = vigentes();
-    const primaVig = vig.reduce((s, p) => s + norm(p.prima, p.moneda), 0);
-    const netaVig = vig.reduce((s, p) => s + netaDe(p), 0);
-    const cob = cobros();
-    const pagados = cob.filter(c => c.estado === 'Pagado');
-    const recaudado = pagados.reduce((s, c) => s + norm(c.monto, c.moneda), 0);
-    const pend = cob.filter(c => c.estado === 'Pendiente'); const pendV = pend.reduce((s, c) => s + norm(c.monto, c.moneda), 0);
-    const venc = cob.filter(c => c.estado === 'Vencido'); const vencV = venc.reduce((s, c) => s + norm(c.monto, c.moneda), 0);
-    const com = comisiones().reduce((s, c) => s + norm(c.monto, c.moneda), 0);
+    const production = vig.map(p => ({ row: p, monto: financeNumber(p.primaNeta != null ? p.primaNeta : p.prima), moneda: String(p.moneda || p.divisa || 'SIN_MONEDA').toUpperCase() }));
+    const commissions = comisiones().map(c => {
+      const policy = S().get('polizas', c.polizaId), own = String(c.moneda || '').toUpperCase(), parent = String(policy && (policy.moneda || policy.divisa) || '').toUpperCase();
+      return { row: c, monto: financeNumber(c.monto), moneda: own && parent && own !== parent ? 'SIN_MONEDA' : parent || own || 'SIN_MONEDA' };
+    });
+    const financial = financialSnapshot(), ready = financial.readiness === 'ready';
+    const { confirmed: pagados, pending: pend, overdue: venc } = financial;
+    const debt = venc.concat(pend), rates = financeRateRows(financial);
+    const waiting = financePending(financial.readiness);
     const nuevas = vig.filter(esNueva), renov = vig.filter(p => !esNueva(p));
-    const tasaRecaudo = recaudado + pendV + vencV > 0 ? Math.round(recaudado / (recaudado + pendV + vencV) * 100) : 0;
-    const ramoAgg = aggBy(vig, p => p.ramo, p => netaDe(p));
-    const ramoParts = Object.entries(ramoAgg).sort((a, b) => b[1] - a[1]).map((e, i) => ({ label: e[0], val: e[1], color: RAMO_COLORS[e[0]] || palette[i % palette.length] }));
-    const estParts = [{ label: 'Recaudado', val: recaudado, color: '#1f8a4c' }, { label: 'Pendiente', val: pendV, color: '#c9821b' }, { label: 'Vencido', val: vencV, color: '#C5162E' }];
     return insKpis([
-      { label: 'Prima neta vigente', val: M(netaVig), color: 'var(--red)', foot: vig.length + ' pólizas activas', detail: { title: 'Pólizas vigentes', sub: vig.length + ' pólizas · prima neta ' + MM(netaVig), html: () => tablaPolizas(vig.slice().sort((a, b) => netaDe(b) - netaDe(a))) } },
-      { label: 'Recaudado', val: M(recaudado), color: 'var(--ok)', foot: tasaRecaudo + '% de la cartera', footTone: 'up', detail: { title: 'Recibos pagados', sub: pagados.length + ' recibos', html: () => tablaCobros(pagados.slice(0, 60)) } },
-      { label: 'Por cobrar', val: M(pendV + vencV), color: 'var(--warn)', foot: M(vencV) + ' vencido', detail: { title: 'Cartera por cobrar', sub: (pend.length + venc.length) + ' recibos', html: () => tablaCobros(venc.concat(pend).slice(0, 80)) } },
+      { label: 'Prima neta vigente', val: financeValue(production), color: 'var(--red)', foot: vig.length + ' pólizas activas · moneda original', detail: { title: 'Pólizas vigentes', sub: vig.length + ' pólizas · importes sin conversión', html: () => tablaPolizas(vig) } },
+      { label: 'Recaudado', val: ready ? financeValue(pagados) : '—', color: 'var(--ok)', foot: ready ? pagados.length + ' pagos confirmados' : waiting, detail: ready ? { title: 'Cobros confirmados', sub: 'Pagos realizados; no obligaciones esperadas', html: () => { const s = financialSnapshot(); return s.readiness === 'ready' ? financialRowsTable(s.confirmed) : financePending(s.readiness); } } : null },
+      { label: 'Por cobrar', val: ready ? financeValue(debt) : '—', color: 'var(--warn)', foot: ready ? debt.length + ' obligaciones · ' + venc.length + ' vencidas' : waiting, detail: ready ? { title: 'Cartera por cobrar', sub: 'Cartera Primas · pendiente y vencida', html: () => { const s = financialSnapshot(); return s.readiness === 'ready' ? financialRowsTable(s.overdue.concat(s.pending)) : financePending(s.readiness); } } : null },
       { label: 'Nuevas vs renovadas', val: nuevas.length + ' / ' + renov.length, color: 'var(--info)', foot: 'pólizas vigentes', detail: { title: 'Producción por tipo', sub: 'Nuevas ' + nuevas.length + ' · Renovadas ' + renov.length, html: () => tablaPolizas(vig.slice().sort((a, b) => esNueva(b) - esNueva(a))) } }
-    ]) + `
+    ]) + (ready ? financeWarning(debt.concat(pagados)) : `<div class="cfg-note" data-insights-finance-readiness="${financial.readiness}">${waiting}</div>`) + `
     <div class="ins-grid-2">
-      ${card('Prima neta vigente por ramo', donut(ramoParts.map(p => ({ ...p, pct: Math.round(p.val / (netaVig || 1) * 100) })), ramoParts.length, 'ramos'), 'distribución de cartera')}
-      ${card('Estado de la cartera', donut(estParts.map(p => ({ ...p, pct: Math.round(p.val / ((recaudado + pendV + vencV) || 1) * 100) })), tasaRecaudo + '%', 'recaudo'), 'pagado / pendiente / vencido')}
+      ${card('Prima neta vigente por ramo', financeBars(production, r => r.row.ramo), 'por moneda de origen')}
+      ${card('Estado de la cartera', ready ? `<div style="overflow-x:auto"><table class="tbl"><thead><tr><th>Moneda</th><th>Confirmado</th><th>Pendiente</th><th>Vencido</th><th>Recaudo</th></tr></thead><tbody>${rates.map(r => `<tr><td>${U.esc(r.moneda)}</td><td>${U.money(r.confirmed, r.moneda)}</td><td>${U.money(r.pending, r.moneda)}</td><td>${U.money(r.overdue, r.moneda)}</td><td>${r.rate == null ? 'Por validar' : r.rate + '%'}</td></tr>`).join('') || '<tr><td colspan="5">Sin registros.</td></tr>'}</tbody></table></div>` : waiting, 'confirmado / (confirmado + cartera abierta); no mezcla monedas')}
     </div>
     <div class="ins-grid-2">
-      ${card('Top aseguradoras por prima neta', barsH(topAgg(vig, p => p.aseguradoraId, p => netaDe(p), id => { const a = q.aseguradora(id); return a ? a.nombre : id; }, 7), { money: true }))}
-      ${card('Comisión generada', `<div style="text-align:center;padding:8px 0"><div style="font-family:var(--f-display);font-weight:800;font-size:30px">${MM(com)}</div><div class="muted" style="font-size:12.5px">devengada en la cartera · ${clientes().length} clientes</div></div>` + barsH(topAgg(comisiones(), c => c.aseguradoraId, c => norm(c.monto, c.moneda), id => { const a = q.aseguradora(id); return a ? a.nombre : id; }, 5), { money: true }))}
+      ${card('Top aseguradoras por prima neta', financeBars(production, r => (q.aseguradora(r.row.aseguradoraId) || {}).nombre || r.row.aseguradoraId), 'por moneda de origen')}
+      ${card('Comisión generada', `<div style="text-align:center;padding:8px 0"><div style="font-family:var(--f-display);font-weight:800;font-size:26px">${financeValue(commissions, true)}</div><div class="muted">devengada en la cartera · ${clientes().length} clientes</div></div>` + financeBars(commissions, r => (q.aseguradora(r.row.aseguradoraId) || {}).nombre || r.row.aseguradoraId))}
     </div>`;
   }
 
@@ -266,23 +378,34 @@ Orbit.modules.insights = (function () {
   }
 
   function vCartera() {
-    const aging = q.agingVencido();
-    const agingRows = Object.entries(aging).map(([k, v], i) => ({ label: k + ' días', val: v, color: ['#c9821b', '#e0701a', '#C5162E', '#7f1020'][i] }));
-    const cob = cobros();
-    const formaRows = Object.entries(aggBy(cob.filter(c => c.estado !== 'Pagado'), c => (S().get('polizas', c.polizaId) || {}).formaPago || '—', c => norm(c.monto, c.moneda))).sort((a, b) => b[1] - a[1]).map((e, i) => ({ label: e[0], val: e[1], color: palette[i % palette.length] }));
-    const venc = q.cobrosVencidos().filter(c => paisOK(clientePais(c.clienteId)));
-    const totVenc = Object.values(aging).reduce((s, v) => s + v, 0);
-    const pend = cob.filter(c => c.estado === 'Pendiente');
-    const porConc = cob.filter(c => c.estado === 'Pagado' && !c.conciliado);
+    const financial = financialSnapshot(), ready = financial.readiness === 'ready';
+    const venc = financial.overdue, pend = financial.pending, debt = venc.concat(pend);
+    const critical = venc.filter(row => row.daysOverdue > 90);
+    const porConc = financial.confirmed.filter(row => row.row.conciliado !== true);
+    const waiting = financePending(financial.readiness);
+    const detail = (title, key) => ready ? { title, sub: 'Consulta de la fuente canónica; sin escrituras', html: () => {
+      const snapshot = financialSnapshot();
+      const rows = key === 'unreconciled' ? snapshot.confirmed.filter(row => row.row.conciliado !== true) : snapshot[key];
+      return snapshot.readiness === 'ready' ? financialRowsTable(rows) : financePending(snapshot.readiness);
+    } } : null;
+    const currencies = Object.keys(financeSums(venc)).sort();
+    const aging = currencies.map(cur => {
+      const buckets = { '1–30': 0, '31–60': 0, '61–90': 0, '90+': 0 };
+      venc.filter(row => row.moneda === cur && row.monto != null).forEach(row => {
+        const key = row.daysOverdue <= 30 ? '1–30' : row.daysOverdue <= 60 ? '31–60' : row.daysOverdue <= 90 ? '61–90' : '90+';
+        buckets[key] += row.monto;
+      });
+      return `<div style="margin-bottom:14px"><b>${U.esc(cur)}</b>${barsH(Object.entries(buckets).map(([key, value], i) => ({ label: key + ' días', val: value, color: ['#c9821b', '#e0701a', '#C5162E', '#7f1020'][i] })), { money: true, currency: cur })}</div>`;
+    }).join('') || '<div class="muted">Sin importes vencidos verificados.</div>';
     return insKpis([
-      { label: 'Cartera vencida', val: M(totVenc), color: 'var(--red)', foot: venc.length + ' recibos', detail: { title: 'Recibos vencidos', sub: venc.length + ' recibos · ' + MM(totVenc), html: () => tablaCobros(venc) } },
-      { label: 'Tramo crítico 90+', val: M(aging['90+']), color: 'var(--danger)', foot: 'mayor riesgo' },
-      { label: 'Pendiente por cobrar', val: M(pend.reduce((s, c) => s + norm(c.monto, c.moneda), 0)), color: 'var(--warn)', foot: pend.length + ' recibos', detail: { title: 'Recibos pendientes', sub: pend.length + ' recibos', html: () => tablaCobros(pend.slice(0, 80)) } },
-      { label: 'Por conciliar', val: porConc.length, color: 'var(--info)', foot: 'pagos sin aplicar', detail: { title: 'Pagos por conciliar', sub: porConc.length + ' recibos pagados sin conciliar', html: () => tablaCobros(porConc.slice(0, 80)) } }
-    ]) + `<div class="ins-grid-2">
-      ${card('Aging de cartera vencida', barsH(agingRows, { money: true }), 'por antigüedad')}
-      ${card('Saldo por forma de pago', barsH(formaRows, { money: true }), 'pendiente + vencido')}
-    </div>` + card('Recibos vencidos prioritarios', tablaCobros(venc.slice(0, 14)));
+      { label: 'Cartera vencida', val: ready ? financeValue(venc) : '—', color: 'var(--red)', foot: ready ? venc.length + ' obligaciones' : waiting, detail: detail('Cartera vencida', 'overdue') },
+      { label: 'Tramo crítico 90+', val: ready ? financeValue(critical) : '—', color: 'var(--danger)', foot: ready ? critical.length + ' obligaciones' : waiting },
+      { label: 'Pendiente por cobrar', val: ready ? financeValue(pend) : '—', color: 'var(--warn)', foot: ready ? pend.length + ' obligaciones no vencidas' : waiting, detail: detail('Cartera pendiente', 'pending') },
+      { label: 'Por conciliar', val: ready ? porConc.length : '—', color: 'var(--info)', foot: ready ? 'pagos confirmados no conciliados' : waiting, detail: detail('Pagos por conciliar', 'unreconciled') }
+    ]) + (ready ? financeWarning(debt.concat(financial.confirmed)) : `<div class="cfg-note" data-insights-finance-readiness="${financial.readiness}">${waiting}</div>`) + `<div class="ins-grid-2">
+      ${card('Aging de cartera vencida', ready ? aging : waiting, 'misma cartera y alcance que el detalle; moneda original')}
+      ${card('Saldo por forma de pago', ready ? financeBars(debt, row => (S().get('polizas', row.polizaId) || {}).formaPago || 'Sin forma de pago') : waiting, 'pendiente + vencido, sin conversión')}
+    </div>` + card('Cartera vencida prioritaria', ready ? financialRowsTable(venc.slice(0, 14)) : waiting, ready ? '14 primeras de ' + venc.length + '; KPI abre el detalle completo' : 'Confirmación del servidor pendiente');
   }
 
   /* ---- COMPARATIVO interanual + intermensual (por concepto) ---- */
@@ -453,10 +576,10 @@ Orbit.modules.insights = (function () {
     const vig = vigentes();
     const netaAcum26 = acumHasta(serieAnual(YEAR).arr, MES), netaAcum25 = acumHasta(serieAnual(PREV).arr, MES);
     const varPct = netaAcum25 > 0 ? Math.round((netaAcum26 - netaAcum25) / netaAcum25 * 100) : 0;
-    const cob = cobros();
-    const recaudado = cob.filter(c => c.estado === 'Pagado').reduce((s, c) => s + norm(c.monto, c.moneda), 0);
-    const totalCart = cob.reduce((s, c) => s + norm(c.monto, c.moneda), 0) || 1;
-    const tasaRecaudo = Math.round(recaudado / totalCart * 100);
+    const financial = financialSnapshot(), ready = financial.readiness === 'ready';
+    const rates = financeRateRows(financial);
+    const lowCollection = rates.filter(r => r.rate != null && r.rate < 80);
+    const incompleteCollection = rates.some(r => r.missing > 0) || financial.pending.concat(financial.overdue, financial.confirmed).some(r => r.moneda === 'SIN_MONEDA');
     const cancel = cancelaciones(); const pols = polizas().filter(p => p.estado !== 'Cancelada');
     const tasaCancel = pols.length ? Math.round(cancel.length / (pols.length + cancel.length) * 100) : 0;
     const venc30 = q.renovacionesProximas(30).filter(p => paisOK(polizaPais(p)) && aseOK(p.asesorId));
@@ -468,21 +591,24 @@ Orbit.modules.insights = (function () {
     const alerts = [];
     if (varPct < 0) alerts.push({ t: 'danger', txt: `Caída del ${Math.abs(varPct)}% en prima neta vs mismo período ${PREV} — ${MM(netaAcum25 - netaAcum26)} menos.` });
     if (tasaCancel > 8) alerts.push({ t: 'warn', txt: `Tasa de cancelación del ${tasaCancel}% — por encima del umbral saludable (8%). Revisar causas por aseguradora.` });
-    if (tasaRecaudo < 70) alerts.push({ t: 'danger', txt: `Recaudo en ${tasaRecaudo}% de la cartera — gestionar cobros pendientes y vencidos.` });
+    if (!ready) alerts.push({ t: 'warn', txt: financePending(financial.readiness) + ' No se calcula recaudo con lecturas incompletas.' });
+    if (ready && !rates.length) alerts.push({ t: 'warn', txt: 'Sin base financiera verificada para calcular una tasa de recaudo.' });
+    if (incompleteCollection) alerts.push({ t: 'warn', txt: 'Cartera con importes o monedas por validar; no se acredita una tasa de recaudo completa.' });
+    rates.filter(r => r.rate != null && r.rate < 70).forEach(r => alerts.push({ t: 'danger', txt: `Recaudo ${U.esc(r.moneda)}: ${r.rate}% — gestionar cartera pendiente y vencida de esa moneda.` }));
     if (asgTop && asgConc >= 35) alerts.push({ t: 'warn', txt: `Concentración en ${asgTop[0]}: ${asgConc}% de la prima vigente — riesgo de dependencia, conviene diversificar aseguradoras.` });
     if (venc30.length) alerts.push({ t: 'warn', txt: `${venc30.length} pólizas vencen en los próximos 30 días (${M(vencPrima)} de prima neta expuesta).` });
     if (!alerts.length) alerts.push({ t: 'ok', txt: 'Indicadores dentro de rangos saludables para el período analizado.' });
     const recs = [];
     if (venc30.length) recs.push(`Activar campaña de renovación para las ${venc30.length} pólizas que vencen este mes.`);
     if (tasaCancel > 8) recs.push('Revisar causas de cancelación por aseguradora y activar retención proactiva.');
-    if (tasaRecaudo < 80) recs.push(`Gestionar la cartera pendiente — ${MM(totalCart - recaudado)} por recuperar.`);
+    lowCollection.forEach(r => recs.push(`Gestionar la cartera ${U.esc(r.moneda)} — ${U.money(r.pending + r.overdue, r.moneda)} de importe verificado por recuperar.`));
     const topAse = q.leaderboard()[0];
     if (topAse) recs.push(`Replicar prácticas del asesor líder (${topAse.asesor.nombre}) en el resto del equipo.`);
     if (asgTop && asgConc >= 35) recs.push(`Diversificar cartera: ${asgTop[0]} concentra ${asgConc}% — abrir producción con otras aseguradoras para reducir dependencia.`);
     const ramoParts = Object.entries(aggBy(vig, p => p.ramo, p => netaDe(p))).sort((a, b) => b[1] - a[1]).map((e, i) => ({ label: e[0], val: e[1], color: RAMO_COLORS[e[0]] || palette[i % palette.length] }));
     return insKpis([
       { label: 'Prima neta acum.', val: M(netaAcum26), color: 'var(--red)', foot: (varPct >= 0 ? '▲ ' : '▼ ') + Math.abs(varPct) + '% vs ' + PREV, footTone: varPct >= 0 ? 'up' : 'down' },
-      { label: 'Tasa de recaudo', val: tasaRecaudo + '%', color: tasaRecaudo >= 80 ? 'var(--ok)' : 'var(--danger)', foot: 'de la cartera' },
+      { label: 'Tasa de recaudo', val: ready ? financeRateText(financial) : '—', color: !ready || incompleteCollection || lowCollection.length ? 'var(--warn)' : 'var(--ok)', foot: ready ? 'por moneda · confirmado / (confirmado + cartera)' : financePending(financial.readiness) },
       { label: 'Tasa de cancelación', val: tasaCancel + '%', color: tasaCancel > 8 ? 'var(--danger)' : 'var(--ok)', foot: cancel.length + ' pólizas' },
       { label: 'Vencen ≤30 d', val: venc30.length, color: 'var(--warn)', foot: M(vencPrima) + ' expuesto', detail: { title: 'Pólizas que vencen en 30 días', sub: venc30.length + ' pólizas', html: () => tablaPolizas(venc30) } }
     ]) + card('⚠ Alertas detectadas (' + alerts.filter(a => a.t !== 'ok').length + ')',
@@ -540,7 +666,8 @@ Orbit.modules.insights = (function () {
   const VISTAS = [['resumen', '📊 Resumen'], ['metas', '🎯 Metas'], ['produccion', '📈 Producción'], ['cartera', '💳 Cartera'], ['comparativo', '🔀 Comparativo'], ['topclientes', '🏆 Top clientes'], ['pipeline', '🎲 Pipeline'], ['renovaciones', '🔄 Renovaciones'], ['critico', '🔎 Análisis crítico']];
   const FN = { resumen: vResumen, metas: vMetas, produccion: vProduccion, cartera: vCartera, comparativo: vComparativo, topclientes: vTopClientes, pipeline: vPipeline, renovaciones: vRenovaciones, critico: vCritico };
 
-  function draw() {
+  function draw() { return inInsightsScope(drawScoped); }
+  function drawScoped() {
     const body = (FN[vista] || vResumen)();
     const paisLbl = (Orbit.PAISES.find(p => p.id === Orbit.pais) || {}).label || 'Todos los países';
     const showMes = ['metas', 'comparativo', 'critico'].includes(vista);
@@ -554,7 +681,7 @@ Orbit.modules.insights = (function () {
       </div>`)}
       <div class="ins-tabs">${VISTAS.map(v => `<button class="ins-tab ${vista === v[0] ? 'active' : ''}" data-v="${v[0]}">${v[1]}</button>`).join('')}</div>
       ${body}
-      <div class="ins-note">Cifras normalizadas a base GTQ para comparar países; cada vista respeta el selector de país. Comisión y producción sobre <b>prima neta</b>. KPIs <b>clicables</b> (⤢) abren el detalle. Datos del CRM en vivo.</div>
+      <div class="ins-note">${['resumen', 'cartera'].includes(vista) ? 'Importes por moneda de origen, sin conversión. Cartera Primas aporta obligaciones; Cobros aporta pagos confirmados.' : 'Cartera y tasas de recaudo usan moneda original. Las series históricas de producción conservan su metodología de comparación.'} Cada vista respeta el país y el acceso efectivo. KPIs <b>clicables</b> (⤢) abren el detalle. Datos del CRM en vivo.</div>
     </div>`;
     host.querySelectorAll('.ins-tab').forEach(b => b.addEventListener('click', () => { vista = b.dataset.v; draw(); }));
     const pSel = host.querySelector('#ins-pais'); if (pSel) pSel.addEventListener('change', () => { Orbit.pais = pSel.value; document.dispatchEvent(new CustomEvent('orbit:pais')); draw(); });

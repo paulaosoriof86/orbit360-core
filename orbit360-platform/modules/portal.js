@@ -10,7 +10,33 @@ window.Orbit = window.Orbit || {};
 Orbit.modules = Orbit.modules || {};
 Orbit.modules.portal = (function () {
   const U = Orbit.ui, S = () => Orbit.store, q = Orbit.q;
-  let host, clienteId, tab = 'inicio';
+  let host, clienteId, tab = 'inicio', legalScope = '', lifecycleBound = false;
+
+  function closePortalOverlays() {
+    if (legalScope && Orbit.legal && typeof Orbit.legal.dismiss === 'function') Orbit.legal.dismiss(legalScope);
+    legalScope = '';
+    ['pt-dr', 'pt-chatw'].forEach(id => { const node = document.getElementById(id); if (node) node.remove(); });
+  }
+  function portalActive() {
+    return !!(host && Orbit.route && Orbit.route.key === 'portal');
+  }
+  function bindLifecycle() {
+    if (lifecycleBound || typeof document.addEventListener !== 'function') return;
+    lifecycleBound = true;
+    const refresh = () => {
+      if (!portalActive()) return;
+      closePortalOverlays();
+      // Preserve the canonical permission/document-viewer wrapper on refresh.
+      Orbit.modules.portal.render(host);
+    };
+    document.addEventListener('orbit:pais', refresh);
+    document.addEventListener('orbit:session', refresh);
+    document.addEventListener('orbit:route-ready', () => { if (!portalActive()) closePortalOverlays(); });
+    if (typeof window.addEventListener === 'function') window.addEventListener('hashchange', () => {
+      const route = String(window.location && window.location.hash || '').replace(/^#\/?/, '').split('?')[0];
+      if (route !== 'portal') closePortalOverlays();
+    });
+  }
 
   function TT(k) { try { const c = S().get('clientes', clienteId) || {}; return (Orbit.termino ? Orbit.termino(k, c.pais) : k); } catch (e) { return k; } }
   function clientes() {
@@ -30,14 +56,22 @@ Orbit.modules.portal = (function () {
 
   function render(h) {
     host = h;
+    bindLifecycle();
+    return Orbit.access && typeof Orbit.access.withScope === 'function'
+      ? Orbit.access.withScope('portal', renderScoped) : renderScoped();
+  }
+  function renderScoped() {
     const visibles = clientes();
     if (!visibles.some(c => String(c.id) === String(clienteId))) {
       clienteId = (visibles[0] || {}).id || '';
       tab = 'inicio';
     }
     const cli = visibles.find(c => String(c.id) === String(clienteId));
-    if (!cli) { host.innerHTML = '<div class="page"><div class="modstate"><div class="ms-ico">🔒</div><h2>Portal del Cliente</h2><p>Sin clientes disponibles para previsualizar en el país y ámbito seleccionados.</p></div></div>'; return; }
-    if (Orbit.legal && Orbit.legal.gate) Orbit.legal.gate('cliente', 'cliente:' + clienteId);
+    if (!cli) { closePortalOverlays(); host.innerHTML = '<div class="page"><div class="modstate"><div class="ms-ico">🔒</div><h2>Portal del Cliente</h2><p>Sin clientes disponibles para previsualizar en el país y ámbito seleccionados.</p></div></div>'; return; }
+    const nextLegalScope = 'cliente:' + clienteId;
+    if (legalScope && legalScope !== nextLegalScope) closePortalOverlays();
+    legalScope = nextLegalScope;
+    if (Orbit.legal && Orbit.legal.gate) Orbit.legal.gate('cliente', legalScope);
     const nl = noLeidas(clienteId);
     host.innerHTML = `<div class="page">
       <div class="pt-preview">👁 Vista previa del <b>Portal del Cliente</b> · viendo a

@@ -412,6 +412,18 @@ Orbit.modules.cobros = (function () {
     const crmDirect = reported.filter(x => x.__crmDirectEvidence), paidReceiptFallback = reported.filter(x => x.__paidReceiptEvidence), advisorReported = reported.filter(x => x.__advisorReportedEvidence), clientReported = reported.filter(x => x.__clientReportedEvidence);
     const allRowsUnfiltered = qaReceipt ? (qaSurfaceRow ? [qaSurfaceRow] : []) : authoritative.concat(portfolioOnly, reported).sort((a, b) => String(a.vence || '').localeCompare(String(b.vence || '')));
     const allRows = qaReceipt ? allRowsUnfiltered.filter(row => receiptIdOf(row) === qaReceipt) : allRowsUnfiltered;
+    // Country is a parent relationship, not a currency conversion rule.
+    // Keep each source amount/currency unchanged and expose actual conflicts.
+    const sourceCurrencyConflicts=allRows.filter(row=>{
+      const policy=indexPolicy(idx,row.polizaId);
+      const source=String(row.sourceMoneda||row.moneda||'').trim().toUpperCase();
+      const parent=String(policy&&(policy.moneda||policy.divisa)||'').trim().toUpperCase();
+      return row.currencyValidation==='REQUIERE_VALIDACION'||!!(source&&parent&&source!==parent);
+    });
+    const sourceCurrencyConflictPairs=Array.from(new Set(sourceCurrencyConflicts.map(row=>{
+      const policy=indexPolicy(idx,row.polizaId);
+      return 'fuente '+String(row.sourceMoneda||row.moneda||'sin moneda')+' / póliza '+String(policy&&(policy.moneda||policy.divisa)||'por confirmar');
+    }))).join(' · ');
     // Visibility contract only: the overdue AMOUNT belongs to Cartera Primas.
     // Compare every visible Vencido row (including projected receipts) by
     // currency, so GTQ overdue cannot conceal a COP mismatch under TODOS.
@@ -455,6 +467,7 @@ Orbit.modules.cobros = (function () {
         { label: 'Por conciliar', val: 'Actualizando datos', color: 'var(--line)', foot: 'confirmando pagos' }
       ])}
       ${unassignedConfirmedCount ? `<div class="card" data-cobros-confirmed-country-unassigned="${unassignedConfirmedCount}" style="padding:12px 14px;margin-bottom:14px;border-left:3px solid var(--warn)"><b>Pagos confirmados con país por verificar</b><div class="muted" style="font-size:12.5px;margin-top:4px">${unassignedConfirmedCount} pago(s) tienen vínculo de póliza/cliente ausente o contradictorio (${unassignedConfirmedBreakdown||'importe por confirmar'}). Se conservan en el origen y se muestran aquí por separado; no se atribuyen a Guatemala, Colombia ni al total validado hasta reconciliar su relación. No se eliminaron ni convirtieron importes.</div></div>` : ''}
+      ${sourceCurrencyConflicts.length ? `<div class="card" data-cobros-currency-source-conflict="${sourceCurrencyConflicts.length}" style="padding:12px 14px;margin-bottom:14px;border-left:3px solid var(--warn)"><b>Moneda fuente por validar</b><div class="muted" style="margin-top:4px">${sourceCurrencyConflicts.length} fila(s) tienen moneda distinta de la póliza vinculada o una validación pendiente (${U.esc(sourceCurrencyConflictPairs)}). El listado conserva los importes y monedas de origen; no los convierte ni los cambia por el país seleccionado. Verifica la fuente y su relación antes de interpretar esas filas como saldo validado.</div></div>` : ''}
       ${overdueUnmatchedWarning ? `<div class="card" data-cobros-aging-universe-mismatch="${overdueUnmatchedCount}" data-cobros-aging-mismatch-currencies="${U.esc(overdueUnmatchedCurrencies.map(([cur])=>cur).join(','))}" style="padding:12px 14px;margin-bottom:14px;border-left:3px solid var(--warn)"><b>Cobros vencidos: correspondencia de cartera por confirmar</b><div class="muted" style="margin-top:4px">${overdueUnmatchedCount} fila(s) marcadas Vencido en Cobros (${U.esc(overdueUnmatchedDescription)}), pero Cartera Primas no registra importe vencido para esas monedas en el alcance seleccionado. El estado operativo y el saldo financiero son fuentes distintas. Verifica las relaciones por recibo y póliza antes de interpretar esto como deuda, duplicidad o pérdida.</div></div>` : ''}
       ${crmDirect.length ? `<div class="card" data-siga-payments-note="1" style="padding:11px 14px;margin-bottom:14px;border-left:3px solid var(--ok)"><b>${crmDirect.length} registros con origen SIGA</b><div class="muted" style="font-size:12px;margin-top:3px">El origen SIGA acredita un reporte, no un pago confirmado. En este subconjunto: <b>${crmDirect.filter(x=>!x.__paidReceiptEvidence).length}</b> pendientes de confirmación; <b>${crmDirect.filter(x=>x.__paidReceiptEvidence&&!x.conciliado).length}</b> confirmados pendientes de conciliación; <b>${crmDirect.filter(x=>x.__paidReceiptEvidence&&x.conciliado).length}</b> confirmados y conciliados.</div></div>` : ''}
       ${advisorReported.length ? `<div class="card" data-advisor-payments-note="1" style="padding:11px 14px;margin-bottom:14px;border-left:3px solid var(--info)"><b>${advisorReported.length} pago(s) reportado(s) por asesor</b><div class="muted" style="font-size:12px;margin-top:3px">El reporte no aplica el pago. Operativo valida la correspondencia desde Ops y luego aplica el mismo pago sin duplicarlo.</div></div>` : ''}

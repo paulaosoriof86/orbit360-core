@@ -65,7 +65,11 @@
       var sel = document.getElementById('pais-sel');
       var paises = Orbit.PAISES || [{id:'TODOS',label:'Todos los países'}];
       sel.innerHTML = paises.map(function(p){return '<option value="'+p.id+'">'+p.label+'</option>';}).join('');
-      sel.value = Orbit.pais || 'TODOS';
+      // Local module selectors emit this event after changing the canonical
+      // country. Mirror it without persisting, rerouting or changing its owner.
+      function paintCountry() { sel.value = Orbit.pais || 'TODOS'; }
+      paintCountry();
+      document.addEventListener('orbit:pais', paintCountry);
       var countryRenderSeq = 0;
       sel.addEventListener('change', function(){
         var next = sel.value || 'TODOS';

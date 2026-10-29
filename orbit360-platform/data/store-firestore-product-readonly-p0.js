@@ -40,6 +40,10 @@
     function queryRef(collection) { if (!paths || typeof paths.dataCollectionPath !== 'function') throw new Error('contrato_rutas_faltante'); var path = paths.dataCollectionPath(state.tenantId, collection), ref = compatCollection(path) || modularCollection(path); if (!ref) throw new Error('firestore_collection_api_unavailable'); var plan = queryPlan(collection); state.queryPlans[collection] = clone(plan); if (plan.hardError) throw new Error((plan.errors || ['query_plan_invalido']).join('|')); if (plan.denied) return { denied: true, ref: null, plan: plan, path: path }; plan.constraints.forEach(function (constraint) { ref = applyConstraint(ref, constraint); }); return { denied: false, ref: ref, plan: plan, path: path }; }
     function docRows(snapshot) { var rows = []; function add(doc) { var data = typeof doc.data === 'function' ? doc.data() : doc.data || {}, physicalId = String(doc.id || '').trim(), legacyId = String(data.id || '').trim(); rows.push(Object.assign({}, data, { id: legacyId || physicalId, canonicalDocumentId: physicalId, legacyDataId: legacyId })); } if (!snapshot) return rows; if (typeof snapshot.forEach === 'function') { snapshot.forEach(add); return rows; } (snapshot.docs || []).forEach(add); return rows; }
     function requiredConfirmed() { return startupCollections.every(function (name) { return state.serverConfirmedCollections.indexOf(name) >= 0; }); }
+    // A former startup source may be denied or fail under the new role. That
+    // source stays unconfirmed; only its scheduling barrier is settled so
+    // independent, permitted current-route sources can still hydrate.
+    function roleRecoveryStartupSettled() { return startupCollections.every(function (name) { return state.serverConfirmedCollections.indexOf(name) >= 0 || state.deniedCollections.indexOf(name) >= 0 || !!state.snapshotErrors[name]; }); }
     function recordError(collection, error, phase) {
       var code=String(error && (error.code || error.message || error) || error);
       state.snapshotErrors[collection]=code;
@@ -94,12 +98,13 @@
     function sameRows(a, b) { if (a === b) return true; if (!Array.isArray(a) || !Array.isArray(b) || a.length !== b.length) return false; for (var i = 0; i < a.length; i += 1) { if (JSON.stringify(a[i]) !== JSON.stringify(b[i])) return false; } return true; }
     function acceptRows(collection, rows, snapshotMeta) { var accepted = [], quarantined = [], fromCache = !!(snapshotMeta && snapshotMeta.fromCache === true), alreadyServerConfirmed = state.serverConfirmedCollections.indexOf(collection) >= 0; if (fromCache && authoritativeFirstReadRequired && alreadyServerConfirmed) { state.snapshotSources[collection] = 'server'; return; } (rows || []).forEach(function (row) { var normalized = Object.assign({}, row); if (!normalized.tenantId) normalized.tenantId = state.tenantId; if (normalized.tenantId !== state.tenantId || !rowId(normalized)) quarantined.push(normalized); else accepted.push(normalized); }); var dataChanged = !sameRows(cache[collection] || [], accepted); cache[collection] = accepted; state.quarantinedRows[collection] = quarantined.map(function (row) { return { id: rowId(row) || '', reason: row.tenantId !== state.tenantId ? 'tenant_mismatch' : 'id_missing' }; }); if (state.observedCollections.indexOf(collection) < 0) state.observedCollections.push(collection); if (state.attachedCollections.indexOf(collection) < 0) state.attachedCollections.push(collection); state.snapshotSources[collection] = fromCache ? 'cache' : 'server'; if (fromCache) { if (state.serverConfirmedCollections.indexOf(collection) < 0 && state.cacheOnlyCollections.indexOf(collection) < 0) state.cacheOnlyCollections.push(collection); } else { if (state.serverConfirmedCollections.indexOf(collection) < 0) state.serverConfirmedCollections.push(collection); state.cacheOnlyCollections = state.cacheOnlyCollections.filter(function (name) { return name !== collection; }); } state.ready = state.serverConfirmedCollections.length > 0; state.status = state.ready ? 'authoritative-snapshots-progress' : 'waiting-authoritative-snapshots'; state.lastSnapshotAt = new Date().toISOString(); if (!alreadyServerConfirmed || dataChanged) emit(collection); maybeAttachDeferred(); maybeDrainProtectedDeferred(); }
     function maybeDrainProtectedDeferred(){
-      if(!protectedMode||!protectedRoleRecovery||!requiredConfirmed())return;
+      if(!protectedMode||!protectedRoleRecovery||!roleRecoveryStartupSettled())return;
       while(protectedDeferredActive.size<2&&protectedDeferredQueue.length){
         var next=protectedDeferredQueue.shift();
         if(attachStarted[next])continue;
         protectedDeferredActive.add(next);
-        attachCollection(next,false);
+        // Denied/invalid plans do not create a request with a finally handler.
+        if(attachCollection(next,false)===false)protectedDeferredActive.delete(next);
       }
       if(!protectedDeferredQueue.length&&!protectedDeferredActive.size)protectedRoleRecovery=false;
     }
@@ -219,7 +224,7 @@
       Promise.resolve().then(function(){return related?protectedRelatedUniverse(collection,epoch):protectedLoad(collection,'',epoch);})
         .then(function(rows){if(epoch===protectedEpoch)acceptRows(collection,rows,{fromCache:false});})
         .catch(function(e){if(epoch===protectedEpoch)recordError(collection,e,'snapshot');})
-        .finally(function(){if(epoch===protectedEpoch&&protectedDeferredActive.delete(collection))maybeDrainProtectedDeferred();});
+        .finally(function(){if(epoch===protectedEpoch){protectedDeferredActive.delete(collection);maybeDrainProtectedDeferred();}});
       return true;
     }
     // The authorized active insurer route must not wait for the former
@@ -249,6 +254,9 @@
       }
       // Preserve required startup readiness without prefetching all modules.
       startupCollections.forEach(function(k){attachCollection(k,true);});
+      // A synchronous store listener may have queued route dependencies
+      // before the startup plan was classified as denied or invalid.
+      maybeDrainProtectedDeferred();
     }
 
     function attachCollection(collection, authoritativeFirst) {
