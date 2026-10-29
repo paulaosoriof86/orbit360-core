@@ -1,0 +1,56 @@
+{
+  "schema": "GI_I65_B4003_DISJOINT_ROOT_SOURCE_DELTA_RECONCILIATION_V1",
+  "gate": "I6.5/B4-003",
+  "status": "SOURCE_DELTA_VERIFIED_HISTORICAL_GIT_ANCESTRY_DISJOINT_LIVE_LINEAGE_UNRESOLVED",
+  "authority": "PAULA_EXPLICIT_SINGLE_TECHNICAL_SOURCE_LINEAGE_RECONCILIATION_20261029",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "remoteHeadAtAuthorization": "c10253356d32e2f1c6985122ee97ff5e39a0bee9",
+  "certifiedHistoricSourceSha": "4bf67a3738751fe2432a130fd23254a6f1c7d16e",
+  "certifiedHistoricSourceTree": "226737288912f7ff296ab1b20a117d949cb66fa3",
+  "independentRecoveryRootSha": "4e6f8579da823650952cbf47840f6415617cfea0",
+  "independentRecoveryRootTree": "cac2c0a3d97a90ded26cfa503dc2213f781fd6c2",
+  "relationship": {
+    "certifiedSourceIsAncestorOfRecovery": false,
+    "gitHistoriesAreDisjoint": true,
+    "fabricatedAncestryOrOursMerge": false,
+    "readOnlyTreeComparisonInsteadOfHistoryRewrite": true,
+    "historicalCertificationPreserved": true,
+    "doesNotClaimSourceByteIdentity": true,
+    "doesNotProveLiveHostingLineage": true
+  },
+  "canonicalComposition": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
+    "reconciledManifestBlobSha": "33bf80768cb6cb311f2975d282a5f50935f680aa",
+    "productFileCount": 114,
+    "declaredProductChangesIncludingExceptionalUi": 115,
+    "uiExceptionPath": "orbit360-platform/core/ui.js",
+    "uiExceptionReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_Q683_CALENDAR_SOURCE_SUCCESSOR_20261027.json",
+    "sourceDeltaDigestAlgorithm": "SHA256_JOIN_SORTED_PATH_BASELINE_GIT_BLOB_OR_ABSENT_CURRENT_PHYSICAL_GIT_BLOB_TAB_LF",
+    "sourceDeltaDigestSha256": "ae10dad0896e6aab4a60f8d7909448b514fe56bc81fe21013b6d6943c8648786",
+    "allDeclaredProductPathsChangedFromCertifiedTree": true,
+    "allCurrentProductFileBlobsMatchManifest": true
+  },
+  "frozenEvidence": {
+    "originalB4CompositionBlobSha": "f9e3cce4f7b802966abdcc4072557821f3f1cac7",
+    "originalB4CompositionCertifyingCommit": "f5d03aa774907815f10408baf6fdb7c493f12b1a",
+    "findingsCount": 295,
+    "frozenTasksCount": 86,
+    "ownerTemporaryFirestoreRulesRiskAcceptanceUnchanged": true,
+    "securityCertificationNotMarkedPass": true,
+    "allHistoricPreviewAndUatReceiptsImmutable": true,
+    "gateSequenceUnchanged": true
+  },
+  "scope": {
+    "sourceAndGovernanceOnly": true,
+    "sameExistingBranch": true,
+    "livePromotionAuthorized": false,
+    "sharedFirestoreRulesDeploymentAuthorized": false,
+    "authOrIamMutationAuthorized": false,
+    "firebaseDataWritesAuthorized": false,
+    "dataReimportAuthorized": false,
+    "backendOrHostingDeploymentAuthorized": false,
+    "productionGoClaimed": false
+  },
+  "next": "FULL_GUARD_AND_CI_THEN_EXACT_PREVIEW_AUTHENTICATED_UAT_B4003_DOWNSTREAM_GATES_AND_SEPARATE_LIVE_LINEAGE_PROOF"
+}

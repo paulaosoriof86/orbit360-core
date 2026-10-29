@@ -32,6 +32,23 @@
     "firestoreRulesDeployAuthorized": false,
     "authIamOrDataMutationAuthorized": false
   },
+  "b4003DisjointRootSourceLineageReconciliation20261029": {
+    "status": "SOURCE_DELTA_VERIFIED_HISTORICAL_GIT_ANCESTRY_DISJOINT_LIVE_LINEAGE_UNRESOLVED",
+    "authority": "PAULA_EXPLICIT_SINGLE_TECHNICAL_SOURCE_LINEAGE_RECONCILIATION_20261029",
+    "gate": "I6.5/B4-003",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_DISJOINT_ROOT_SOURCE_LINEAGE_RECONCILIATION_20261029.json",
+    "receiptBlobSha": "dd581b40249a53541921c852375c2e367fcd5a0a",
+    "sourceManifestBlobSha": "33bf80768cb6cb311f2975d282a5f50935f680aa",
+    "baselineCertifiedSourceSha": "4bf67a3738751fe2432a130fd23254a6f1c7d16e",
+    "independentRecoveryRootSha": "4e6f8579da823650952cbf47840f6415617cfea0",
+    "productDiffCount": 115,
+    "sourceDeltaDigestSha256": "ae10dad0896e6aab4a60f8d7909448b514fe56bc81fe21013b6d6943c8648786",
+    "historicalCertificationsUnchanged": true,
+    "firestoreOwnerRiskExceptionUnchanged": true,
+    "liveLineageStillRequiresIndependentProof": true,
+    "releaseAuthorizedByThisRecord": false,
+    "backendHostingOrDataMutationAuthorized": false
+  },
   "b4003ReleaseShockReconciliation20261028": {
     "status": "OWNER_RULES_RISK_EXCEPTION_ACTIVE_FUNCTIONAL_PRELIVE_GATES_PENDING",
     "recordType": "PREVALENT_READ_ONLY_EVIDENCE_RECONCILIATION_NOT_NEW_GATE",

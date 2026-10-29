@@ -106,6 +106,33 @@ const sameJson=(a,b)=>JSON.stringify(stable(a))===JSON.stringify(stable(b));
 need(MODE==='governance'||MODE==='i6','I6_GUARD_MODE_INVALID:'+MODE);
 for(const p of [CONTROL,STATUS_LEDGER,AUTH_RECEIPT,I6_ADDENDUM,I6_PLAN_LOCK,V5_MANIFEST,V6_MANIFEST,V6_ADDENDUM,V7_MANIFEST,V7_ADDENDUM,DATA_UPDATE_PLAN,DATA_UPDATE_DISCIPLINE,DATA_UPDATE_REGISTRY,ACTIVE_SOURCE_INTAKE,I63_SOURCE,I63_RECEIPT,I64_SOURCE,I64_RECEIPT,I65_SOURCE,I65_SYNC,I65_FORENSIC_AUDIT,I65_FORENSIC_PLAN,I65_FORENSIC_ADDENDUM,I65_PAYMENT_INFERENCE,I65_FORENSIC_B1,I65_FORENSIC_B2,I65_FORENSIC_B3,I65_FORENSIC_B4,I6_CANONICAL_COMPOSITION,I6_FINDINGS_LEDGER,I65_FORENSIC_PLAN_V2,I65_B2_REJECTION,I65_B2_ROOT_CAUSE]) need(exists(p),'I6_REQUIRED_FILE_MISSING:'+p);
 const C=readJson(CONTROL);
+// A full-history checkout of the independent October recovery branch does not
+// contain the certified September I6 commit: that history is not reachable
+// from any active branch ref. When this exact, already-approved reconciliation
+// is present, fetch only that immutable commit into the local Git object store.
+// No branch, working source, remote ref, Firebase service or business data is
+// modified. Any missing source or unexpected remote still fails closed.
+if(C.b4003DisjointRootSourceLineageReconciliation20261029){
+ const certified=String(C.certifiedCandidate?.sourceSha||'');
+ need(certified==='4bf67a3738751fe2432a130fd23254a6f1c7d16e',
+  'I6_HISTORY_FETCH_CERTIFIED_SOURCE_NOT_PINNED');
+ let present=true;
+ try{physicalGit('cat-file','-e',certified+'^{commit}');}catch{present=false;}
+ if(!present){
+  const origin=physicalGit('remote','get-url','origin');
+  need(origin==='https://github.com/paulaosoriof86/orbit360-core.git'||
+   origin==='https://github.com/paulaosoriof86/orbit360-core'||
+   origin==='git@github.com:paulaosoriof86/orbit360-core.git',
+   'I6_HISTORY_FETCH_REMOTE_NOT_ALLOWED');
+  try{
+   execFileSync('git',['fetch','--no-tags','--no-write-fetch-head','origin',certified],
+    {stdio:'ignore',timeout:30000});
+  }catch{throw new Error('I6_CERTIFIED_HISTORY_EXACT_FETCH_FAILED');}
+  need(physicalGit('cat-file','-t',certified)==='commit',
+   'I6_CERTIFIED_HISTORY_FETCHED_OBJECT_INVALID');
+  console.log('I6_CERTIFIED_HISTORY=PINNED_COMMIT_FETCHED_INTO_LOCAL_GIT_OBJECT_STORE_ONLY');
+ }
+}
 const HISTORY_ROLE_PARITY=C.b4003HistorialRoleParitySuccessor20261028||null;
 const HISTORY_ROLE_PARITY_SUBJECT='fix(i6.5 B4-003): align protected history client role plans for LAB UAT';
 const HISTORY_ROLE_PARITY_CI=C.b4003HistorialRoleParityCiDependency20261028||null;
@@ -129,6 +156,26 @@ const historyRoleParityCiExactSuccessor=()=>{
   physicalGit('diff','--name-only',parent,head).split('\n').filter(Boolean).sort().join('|')===
    HISTORY_ROLE_PARITY_CI_FILES.join('|');
 };
+// A historical successor is an immutable proof of the originally approved
+// change, not a requirement for it to remain the immediate HEAD forever.
+// Require its exact parent, commit subject and six-file boundary, plus proof
+// that it remains in the active branch's ancestry. Never substitute current
+// source bytes into that historical receipt.
+const headDescendsFrom=sha=>{
+ try{
+  execFileSync('git',['merge-base','--is-ancestor',sha,'HEAD'],{stdio:'ignore'});
+  return true;
+ }catch{return false;}
+};
+const exactHistoricalSuccessorPresent=(sha,parent,subject,expectedFiles)=>
+ headDescendsFrom(sha)&&
+  physicalGit('rev-parse',sha+'^')===parent&&
+  physicalGit('show','-s','--format=%s',sha)===subject&&
+  physicalGit('diff','--name-only',parent,sha).split('\n').filter(Boolean).sort().join('|')===
+   expectedFiles.join('|');
+const historyReaderOriginalSuccessorPresent=(parent,expectedFiles)=>
+ exactHistoricalSuccessorPresent('a236f2c5fab1a338f1619ecdf187ff3d9fe1fc4f',parent,
+  'fix(i6.5 B4-003): bounded legacy history reader in LAB Preview',expectedFiles);
 const HISTORY_ROLE_PARITY_RECEIPT='artifacts/orbit360-recovery/release-control/I6_5_B4_003_HISTORIAL_ROLE_PARITY_SUCCESSOR_20261028.json';
 const HISTORY_ROLE_PARITY_FILES=[
  '.github/workflows/gravicentra-b4-003-historial-lab-preview.yml',
@@ -184,7 +231,8 @@ if(HISTORY_SUCCESSOR){
      'fix(i6.5 B4-003): batch verified history parents for isolated LAB UAT')||
    (HISTORY_ROLE_PARITY&&physicalGit('rev-parse','HEAD^')===HISTORY_ROLE_PARITY.parentHead&&
     physicalGit('show','-s','--format=%s','HEAD')===HISTORY_ROLE_PARITY_SUBJECT)||
-   historyRoleParityCiExactSuccessor()),
+   historyRoleParityCiExactSuccessor()||
+   historyReaderOriginalSuccessorPresent(parent,expectedFiles)),
   'B4_003_HISTORIAL_READER_SUCCESSOR_INVALID');
  historialReaderHistoricalBlobs=new Map([[source,R.sourceBlobsBefore[source]],[qa,R.qaBlobsBefore[qa]]]);
  historialReaderCurrentBlobs=new Map([[source,R.sourceBlobsAfter[source]],[qa,R.qaBlobsAfter[qa]]]);
@@ -203,6 +251,8 @@ if(HISTORY_PREFETCH){
   '.github/workflows/gravicentra-b4-003-historial-lab-preview.yml'].sort();
  const head=physicalGit('rev-parse','HEAD');
  const subject='fix(i6.5 B4-003): batch verified history parents for isolated LAB UAT';
+ const historicPrefetchSha='67e6208b27614b7298193315282bbd007b86557d';
+ const originalPrefetchProven=exactHistoricalSuccessorPresent(historicPrefetchSha,parent,subject,exactFiles);
  need(H.status==='SOURCE_QA_PASS_NEW_LAB_PREVIEW_PENDING_SECURITY_HOLD'&&
   H.authority==='PAULA_EXPLICIT_SINGLE_CORRECTIVE_SUCCESSOR_AFTER_AUTHENTICATED_UAT_20261028'&&
   H.gate==='I6.5/B4-003'&&H.parentHead===parent&&
@@ -218,7 +268,8 @@ if(HISTORY_PREFETCH){
   Object.keys(R.qaBlobsAfter||{}).join(',')===qa&&
   [...source,qa].every(p=>
    R[source.includes(p)?'sourceBlobsBefore':'qaBlobsBefore'][p]===physicalGit('rev-parse',parent+':'+p)&&
-   R[source.includes(p)?'sourceBlobsAfter':'qaBlobsAfter'][p]===physicalGit('hash-object',p))&&
+   R[source.includes(p)?'sourceBlobsAfter':'qaBlobsAfter'][p]===
+    (originalPrefetchProven?physicalGit('rev-parse',historicPrefetchSha+':'+p):physicalGit('hash-object',p)))&&
   R.regression?.result==='PASS'&&R.regression?.realFirestoreUsed===false&&
   R.regression?.dataWrites===0&&R.remediation?.crossRequestCache===false&&
   R.remediation?.maxParentRefsPerBatch===100&&R.remediation?.maxConcurrentParentBatches===4&&
@@ -233,7 +284,7 @@ if(HISTORY_PREFETCH){
    physicalGit('diff','--name-only',parent,'HEAD').split('\n').filter(Boolean).sort().join('|')===exactFiles.join('|'))||
    (HISTORY_ROLE_PARITY&&physicalGit('rev-parse','HEAD^')===HISTORY_ROLE_PARITY.parentHead&&
     physicalGit('show','-s','--format=%s','HEAD')===HISTORY_ROLE_PARITY_SUBJECT)||
-   historyRoleParityCiExactSuccessor()),
+   historyRoleParityCiExactSuccessor()||originalPrefetchProven),
   'B4_003_HISTORIAL_PREFETCH_SUCCESSOR_INVALID');
  historialReaderCurrentBlobs=new Map([...source,qa].map(p=>[p,
   R[source.includes(p)?'sourceBlobsAfter':'qaBlobsAfter'][p]]));
@@ -252,6 +303,9 @@ if(HISTORY_ROLE_PARITY){
  const qa='tools/gravicentra-b4-003-protected-hydration.test.cjs';
  const parent='67e6208b27614b7298193315282bbd007b86557d';
  const head=physicalGit('rev-parse','HEAD');
+ const historicRoleParitySha='4d4919cb3a0a19ab960a141b0253a2bc437ce169';
+ const originalRoleParityProven=exactHistoricalSuccessorPresent(
+  historicRoleParitySha,parent,HISTORY_ROLE_PARITY_SUBJECT,HISTORY_ROLE_PARITY_FILES);
  const exactSuccessor=head!==parent&&physicalGit('rev-parse','HEAD^')===parent&&
   physicalGit('show','-s','--format=%s','HEAD')===HISTORY_ROLE_PARITY_SUBJECT&&
   physicalGit('diff','--name-only',parent,'HEAD').split('\n').filter(Boolean).sort().join('|')===
@@ -272,7 +326,8 @@ if(HISTORY_ROLE_PARITY){
   Object.keys(R.qaBlobsAfter||{}).join(',')===qa&&
   [...source,qa].every(p=>
    R[source.includes(p)?'sourceBlobsBefore':'qaBlobsBefore'][p]===physicalGit('rev-parse',parent+':'+p)&&
-   R[source.includes(p)?'sourceBlobsAfter':'qaBlobsAfter'][p]===physicalGit('hash-object',p))&&
+   R[source.includes(p)?'sourceBlobsAfter':'qaBlobsAfter'][p]===
+    (originalRoleParityProven?physicalGit('rev-parse',historicRoleParitySha+':'+p):physicalGit('hash-object',p)))&&
   R.regression?.result==='PASS'&&R.regression?.realFirestoreUsed===false&&
   R.regression?.dataWrites===0&&
   R.remediation?.serverAuthorizationCodeChanged===false&&
@@ -282,7 +337,7 @@ if(HISTORY_ROLE_PARITY){
    'realBusinessWrites','syntheticDataWrites','dataMutation','reimport','livePromotion',
    'historicalCertificationsRewritten','securityB4003HoldReleased']
     .every(k=>R.scope?.[k]===false)&&
-  (head===parent||exactSuccessor||historyRoleParityCiExactSuccessor())&&
+  (head===parent||exactSuccessor||historyRoleParityCiExactSuccessor()||originalRoleParityProven)&&
   C.b4003SecurityReleaseHold?.status==='ACTIVE_FAIL_CLOSED_UNAUTHORIZED_BROWSER_FIRESTORE_READ_WRITE',
   'B4_003_HISTORIAL_ROLE_PARITY_SOURCE_QA_OR_ANCESTRY_INVALID');
  historialRoleParityCurrentBlobs=new Map([...source,qa].map(p=>[p,
@@ -298,9 +353,14 @@ if(HISTORY_ROLE_PARITY_CI){
  const workflow='.github/workflows/gravicentra-b4-003-historial-lab-preview.yml';
  // GitHub API can publish the byte-identical predecessor with a different
  // commit SHA; its immutable tree is pinned and checked above.
- const parentAtRuntime=physicalGit('rev-parse','HEAD^');
+ const originalCiSha='bc7c4e0d43fe0c8c5d3476c81d109c8024c8827f';
+ const originalCiProven=exactHistoricalSuccessorPresent(originalCiSha,
+  HISTORY_ROLE_PARITY_CI_PARENT_REMOTE,HISTORY_ROLE_PARITY_CI_SUBJECT,HISTORY_ROLE_PARITY_CI_FILES)&&
+  physicalGit('rev-parse',HISTORY_ROLE_PARITY_CI_PARENT_REMOTE+'^{tree}')===HISTORY_ROLE_PARITY_CI_TREE;
+ const parentAtRuntime=originalCiProven?HISTORY_ROLE_PARITY_CI_PARENT_REMOTE:physicalGit('rev-parse','HEAD^');
  const before=f=>physicalGit('rev-parse',parentAtRuntime+':'+f);
- const wf=fs.readFileSync(workflow,'utf8');
+ const after=f=>originalCiProven?physicalGit('rev-parse',originalCiSha+':'+f):physicalGit('hash-object',f);
+ const wf=originalCiProven?physicalGit('show',originalCiSha+':'+workflow):fs.readFileSync(workflow,'utf8');
  const protectedSource={
   'orbit360-platform/core/membership-multirol-contract-p0.js':'77f3da5415474202c2b62bf7a7057cd78eb76aa2',
   'orbit360-platform/core/backend-product-readonly-bootstrap-p0.js':'169dd8c5ab146e93420be38a5610f92a069ba094',
@@ -309,7 +369,7 @@ if(HISTORY_ROLE_PARITY_CI){
  const scopeDenied=['backendFunctionRedeployment','sharedFirestoreRulesDeployment',
   'authIamModification','productionDeployment','livePromotion','businessDataWrites',
   'syntheticDataWrites','dataImport','historicalCertificationsModified','securityHoldReleased'];
- need(historyRoleParityCiExactSuccessor()&&
+ need((historyRoleParityCiExactSuccessor()||originalCiProven)&&
   H.status==='CI_PACKAGE_DEPENDENCY_FIXED_HOSTING_LAB_READBACK_PENDING_SECURITY_HOLD'&&
   H.authority==='PAULA_EXPLICIT_ONE_CI_DEPENDENCY_SUCCESSOR_20261028'&&
   H.gate==='I6.5/B4-003'&&H.parentHead===HISTORY_ROLE_PARITY_CI_PARENT_REMOTE&&
@@ -323,7 +383,7 @@ if(HISTORY_ROLE_PARITY_CI){
   R.parentHead===H.parentHead&&R.parentTree===H.parentTree&&
   JSON.stringify(R.changedPathsOnly?.slice().sort())===JSON.stringify(HISTORY_ROLE_PARITY_CI_FILES)&&
   R.workflow?.path===workflow&&R.workflow?.blobBefore===before(workflow)&&
-  R.workflow?.blobAfter===physicalGit('hash-object',workflow)&&
+  R.workflow?.blobAfter===after(workflow)&&
   R.governance?.guardBlobBefore===before('tools/gravicentra-i6-control-plane-guard-v1.mjs')&&
   R.governance?.controlPlaneBlobBefore===before(CONTROL)&&
   R.governance?.historicRoleParityReceiptBlob===physicalGit('hash-object',HISTORY_ROLE_PARITY_RECEIPT)&&
@@ -334,7 +394,7 @@ if(HISTORY_ROLE_PARITY_CI){
   R.scope?.expiresAfterDays===7&&R.scope?.sourceUnchanged===true&&
   scopeDenied.every(k=>R.scope?.[k]===false)&&
   Object.entries(protectedSource).every(([p,sha])=>
-   physicalGit('hash-object',p)===sha&&before(p)===sha)&&
+   after(p)===sha&&before(p)===sha)&&
   wf.includes('firebase-admin@13.4.0')&&wf.includes('npm install --no-save --package-lock=false')&&
   wf.includes('hosting:channel:deploy "$CHANNEL_ID" --config firebase.json --project "$PROJECT_ID" --expires 7d')&&
   !wf.includes('functions:orbit360ScopedPolicyReadPreview')&&
@@ -346,6 +406,88 @@ const ACTIVE_I65_FORENSIC_B4=String(C.i65ForensicRemediationPlan?.b4?.executionL
 need(exists(ACTIVE_I65_FORENSIC_B4),'I6_5_B4_ACTIVE_LOCK_MISSING:'+ACTIVE_I65_FORENSIC_B4);
 const S=readJson(STATUS_LEDGER),A=readJson(AUTH_RECEIPT),M5=readJson(V5_MANIFEST),M6=readJson(V6_MANIFEST),M=readJson(V7_MANIFEST),FRA=readJson(I65_FORENSIC_AUDIT),FRP=readJson(I65_FORENSIC_PLAN),PAY=readJson(I65_PAYMENT_INFERENCE),B1=readJson(I65_FORENSIC_B1),B2=readJson(I65_FORENSIC_B2),B3=readJson(I65_FORENSIC_B3),B4=readJson(ACTIVE_I65_FORENSIC_B4);
 const COMP=readJson(I6_CANONICAL_COMPOSITION),FIND=readJson(I6_FINDINGS_LEDGER),FRP2=readJson(I65_FORENSIC_PLAN_V2),REJ=readJson(I65_B2_REJECTION),RCM=readJson(I65_B2_ROOT_CAUSE);
+// The Control Plane and B4 execution lock retain their original, immutable
+// f5d03aa source snapshot. Later approved compositions must be separately
+// bound and verified; they must never be passed off as the frozen snapshot.
+const frozenB4CompositionRetained=()=>{
+ const exactOriginal=physicalGit('rev-parse',
+  'f5d03aa774907815f10408baf6fdb7c493f12b1a:'+I6_CANONICAL_COMPOSITION);
+ return exactOriginal==='f9e3cce4f7b802966abdcc4072557821f3f1cac7'&&
+  [C.currentB4?.compositionLockBlobSha,C.canonicalAccumulationControl?.compositionLockBlobSha,
+   B4.compositionLockBlobSha].every(sha=>sha===exactOriginal);
+};
+const ROOT_RECONCILIATION=C.b4003DisjointRootSourceLineageReconciliation20261029||null;
+const reconcileIndependentCertifiedSource=(certified,current)=>{
+ const L=ROOT_RECONCILIATION;
+ if(!L)return false;
+ const P=readJson(L.receiptPath);
+ const expectedStatus='SOURCE_DELTA_VERIFIED_HISTORICAL_GIT_ANCESTRY_DISJOINT_LIVE_LINEAGE_UNRESOLVED';
+ const expectedAuthority='PAULA_EXPLICIT_SINGLE_TECHNICAL_SOURCE_LINEAGE_RECONCILIATION_20261029';
+ const originalRoot='4e6f8579da823650952cbf47840f6415617cfea0';
+ const expectedPaths=[...COMP.productFiles,'orbit360-platform/core/ui.js'].sort();
+ const historicalBlob=p=>{
+  const raw=physicalGit('ls-tree',certified.sourceSha,'--',p);
+  if(!raw)return 'ABSENT';
+  const [meta,path]=raw.split('\t');
+  const parts=meta.split(' ');
+  need(path===p&&parts.length===3&&parts[1]==='blob','I6_LINEAGE_HISTORIC_FILE_MODE_INVALID:'+p);
+  return parts[2];
+ };
+ const rows=expectedPaths.map(p=>p+'\t'+historicalBlob(p)+'\t'+physicalGit('hash-object',p));
+ const digest=createHash('sha256').update(rows.join('\n')+'\n').digest('hex');
+ let sameRootHistory=false;
+ try{physicalGit('merge-base',certified.sourceSha,current);sameRootHistory=true;}catch{}
+ return L.status===expectedStatus&&L.authority===expectedAuthority&&L.gate==='I6.5/B4-003'&&
+  L.receiptBlobSha===physicalGit('hash-object',L.receiptPath)&&
+  L.sourceManifestBlobSha===physicalGit('hash-object',I6_CANONICAL_COMPOSITION)&&
+  L.baselineCertifiedSourceSha===certified.sourceSha&&L.independentRecoveryRootSha===originalRoot&&
+  L.productDiffCount===115&&L.sourceDeltaDigestSha256===digest&&
+  P.schema==='GI_I65_B4003_DISJOINT_ROOT_SOURCE_DELTA_RECONCILIATION_V1'&&
+  P.status===L.status&&P.authority===L.authority&&P.gate===L.gate&&
+  P.repository==='paulaosoriof86/orbit360-core'&&P.branch==='recovery/fase-a-clean-20260831'&&
+  P.remoteHeadAtAuthorization==='c10253356d32e2f1c6985122ee97ff5e39a0bee9'&&
+  P.certifiedHistoricSourceSha===certified.sourceSha&&P.certifiedHistoricSourceTree===certified.sourceTree&&
+  physicalGit('rev-parse',certified.sourceSha+'^{tree}')===certified.sourceTree&&
+  P.independentRecoveryRootSha===originalRoot&&
+  P.independentRecoveryRootTree===physicalGit('rev-parse',originalRoot+'^{tree}')&&
+  physicalGit('rev-list','--max-parents=0',current)===originalRoot&&!sameRootHistory&&
+  P.relationship?.certifiedSourceIsAncestorOfRecovery===false&&P.relationship?.gitHistoriesAreDisjoint===true&&
+  P.relationship?.fabricatedAncestryOrOursMerge===false&&
+  P.relationship?.readOnlyTreeComparisonInsteadOfHistoryRewrite===true&&
+  P.relationship?.historicalCertificationPreserved===true&&
+  P.relationship?.doesNotClaimSourceByteIdentity===true&&
+  P.relationship?.doesNotProveLiveHostingLineage===true&&
+  P.canonicalComposition?.reconciledManifestBlobSha===L.sourceManifestBlobSha&&
+  P.canonicalComposition?.path===I6_CANONICAL_COMPOSITION&&
+  P.canonicalComposition?.productFileCount===114&&COMP.productFiles.length===114&&
+  P.canonicalComposition?.declaredProductChangesIncludingExceptionalUi===115&&
+  P.canonicalComposition?.uiExceptionPath==='orbit360-platform/core/ui.js'&&
+  P.canonicalComposition?.sourceDeltaDigestSha256===digest&&
+  rows.every(row=>{const fields=row.split('\t');return fields[1]!==fields[2];})&&
+  COMP.productFiles.every(p=>physicalGit('hash-object',p)===COMP.productFileBlobs[p])&&
+  physicalGit('hash-object','orbit360-platform/core/ui.js')===Q683_CALENDAR_RECEIPT?.sourceBlobsAfter?.['orbit360-platform/core/ui.js']&&
+  frozenB4CompositionRetained()&&
+  P.frozenEvidence?.originalB4CompositionBlobSha==='f9e3cce4f7b802966abdcc4072557821f3f1cac7'&&
+  P.frozenEvidence?.originalB4CompositionCertifyingCommit==='f5d03aa774907815f10408baf6fdb7c493f12b1a'&&
+  P.frozenEvidence?.findingsCount===295&&FIND.findings.length===295&&
+  P.frozenEvidence?.frozenTasksCount===86&&
+  P.frozenEvidence?.ownerTemporaryFirestoreRulesRiskAcceptanceUnchanged===true&&
+  P.frozenEvidence?.securityCertificationNotMarkedPass===true&&
+  P.frozenEvidence?.allHistoricPreviewAndUatReceiptsImmutable===true&&
+  P.frozenEvidence?.gateSequenceUnchanged===true&&
+  C.b4003OwnerTemporaryRulesRiskException20261028?.securityRulesAloneBlockRelease===false&&
+  C.b4003OwnerTemporaryRulesRiskException20261028?.securityCertStatus==='OPEN_NOT_PASS'&&
+  C.b4003SecurityReleaseHold?.status==='ACTIVE_FAIL_CLOSED_UNAUTHORIZED_BROWSER_FIRESTORE_READ_WRITE'&&
+  L.historicalCertificationsUnchanged===true&&L.firestoreOwnerRiskExceptionUnchanged===true&&
+  L.liveLineageStillRequiresIndependentProof===true&&L.releaseAuthorizedByThisRecord===false&&
+  L.backendHostingOrDataMutationAuthorized===false&&
+  P.scope?.sourceAndGovernanceOnly===true&&P.scope?.sameExistingBranch===true&&
+  ['livePromotionAuthorized','sharedFirestoreRulesDeploymentAuthorized',
+   'authOrIamMutationAuthorized','firebaseDataWritesAuthorized','dataReimportAuthorized',
+   'backendOrHostingDeploymentAuthorized','productionGoClaimed']
+    .every(k=>P.scope[k]===false)&&
+  B4.boundaries?.livePromotionAuthorized===false;
+};
 // 28-Oct single additive governance successor. Its exact replacement bytes
 // are checked against the physical checkout, while an earlier certified
 // receipt may only compare with the immutable 98da predecessor. This map
@@ -435,7 +577,7 @@ if(POLICY_COUNTRY_GOVERNANCE){
    :physicalGit('hash-object',POLICY_COUNTRY_GUARD_PATH))&&
   R.governance?.controlPlanePath===CONTROL&&
   R.governance?.historicalB4ExecutionBlobSha===physicalGit('hash-object',ACTIVE_I65_FORENSIC_B4)&&
-  R.governance?.historicalCompositionBlobSha===physicalGit('hash-object',I6_CANONICAL_COMPOSITION)&&
+  R.governance?.historicalCompositionBlobSha===physicalGit('rev-parse',POLICY_COUNTRY_CERT_HEAD+':'+I6_CANONICAL_COMPOSITION)&&
   Object.keys(R.historicalReceiptBlobs||{}).sort().join('|')===POLICY_COUNTRY_UNCHANGED_CERTS.slice().sort().join('|')&&
   POLICY_COUNTRY_UNCHANGED_CERTS.every(p=>R.historicalReceiptBlobs[p]===priorPath(p)&&
    R.historicalReceiptBlobs[p]===physicalGit('hash-object',p))&&
@@ -632,10 +774,14 @@ if(POLICY_COUNTRY_PREVIEW_CANONICAL){
   'orbit360-platform/core/product-app-p0.js',
   'orbit360-platform/core/auth-product-runtime-p0.js',
   'orbit360-platform/index.html'];
- const workflow=fs.readFileSync(POLICY_COUNTRY_PREVIEW_WORKFLOW,'utf8');
- const provider=fs.readFileSync('orbit360-platform/core/product-runtime-browser-providers-p0.js','utf8');
- const app=fs.readFileSync('orbit360-platform/core/product-app-p0.js','utf8');
- const auth=fs.readFileSync('orbit360-platform/core/auth-product-runtime-p0.js','utf8');
+ // This is a historical Hosting-only certification. Later, separately
+ // authorized changes to domain routing and UI must not rewrite its original
+ // source fingerprint or make an immutable host proof fail at every new HEAD.
+ const hostSource=p=>physicalGit('show',historicHostHead+':'+p);
+ const workflow=hostSource(POLICY_COUNTRY_PREVIEW_WORKFLOW);
+ const provider=hostSource('orbit360-platform/core/product-runtime-browser-providers-p0.js');
+ const app=hostSource('orbit360-platform/core/product-app-p0.js');
+ const auth=hostSource('orbit360-platform/core/auth-product-runtime-p0.js');
  need(P.receiptPath===POLICY_COUNTRY_PREVIEW_CANONICAL_RECEIPT&&
   P.receiptBlobSha===physicalGit('hash-object',P.receiptPath)&&
   P.status==='CANONICAL_HOST_CHANNEL_ALIGNMENT_AUTHORIZED_LAB_PREVIEW_PENDING_READBACK'&&
@@ -651,13 +797,14 @@ if(POLICY_COUNTRY_PREVIEW_CANONICAL){
   R.repository==='paulaosoriof86/orbit360-core'&&
   R.branch==='recovery/fase-a-clean-20260831'&&
   R.predecessorRemoteHead===PARENT&&R.sourceCommit===SOURCE&&R.sourceTree===TREE&&
+  headDescendsFrom(historicHostHead)&&
   physicalGit('rev-parse',historicHostHead+'^')===PARENT&&
   physicalGit('rev-parse',SOURCE+'^{tree}')===TREE&&
   physicalGit('log','-1','--format=%s',historicHostHead)===SUBJECT&&
   sameJson(actual,changedPaths)&&sameJson(R.changedPathsOnly?.slice().sort(),changedPaths)&&
   R.workflow?.path===POLICY_COUNTRY_PREVIEW_WORKFLOW&&
   R.workflow?.blobBefore===before(POLICY_COUNTRY_PREVIEW_WORKFLOW)&&
-  R.workflow?.blobAfter===physicalGit('hash-object',POLICY_COUNTRY_PREVIEW_WORKFLOW)&&
+  R.workflow?.blobAfter===physicalGit('rev-parse',historicHostHead+':'+POLICY_COUNTRY_PREVIEW_WORKFLOW)&&
   R.governance?.guardBlobBefore===before(POLICY_COUNTRY_GUARD_PATH)&&
   R.governance?.guardBlobAfter===(HISTORY_SUCCESSOR?
    physicalGit('rev-parse',HISTORY_SUCCESSOR.parentHead+':'+POLICY_COUNTRY_GUARD_PATH):
@@ -671,7 +818,7 @@ if(POLICY_COUNTRY_PREVIEW_CANONICAL){
   R.rootCause?.observedBlockedHostPrefix==='gi-b4003-pc-'&&
   R.rootCause?.certifiedAllowedHostPrefix==='gi-i65-b4-'&&
   R.rootCause?.codeChanged===false&&
-  productPaths.every(p=>physicalGit('hash-object',p)===physicalGit('rev-parse',SOURCE+':'+p))&&
+  productPaths.every(p=>physicalGit('rev-parse',historicHostHead+':'+p)===physicalGit('rev-parse',SOURCE+':'+p))&&
   [provider,app,auth].every(s=>s.includes('gi-i65-b4-'))&&
   R.scope?.hostingProject==='ays-orbit-360-lab'&&
   R.scope?.hostingSite==='ays-orbit-360-lab'&&
@@ -712,21 +859,31 @@ if(Q683_CALENDAR){
  const A=Q683_CALENDAR,R=readJson(A.receiptPath),P='d832c1eba56a8707cee0d454604e5145e710eb7a';
  Q683_CALENDAR_RECEIPT=R;
  const sources=Object.keys(R.sourceBlobsAfter||{}).sort(),before=Object.keys(R.sourceBlobsBefore||{}).sort();
+ // The Oct-27 calendar receipt certifies e13c81d, not every later
+ // descendant's mutable checkout. Compare its source/QA/composition against
+ // the original exact seven-file successor; current bytes remain subject to
+ // the final physical composition check.
+ const originalCalendarSha='e13c81d2ff0bac78f344b1554a071c781afb15dd';
+ const originalCalendarFiles=[...Q683_CALENDAR_PATHS,Q683_CALENDAR_QA,CONTROL,A.receiptPath,
+  'tools/gravicentra-i6-control-plane-guard-v1.mjs'].sort();
+ const originalCalendarProven=exactHistoricalSuccessorPresent(originalCalendarSha,P,
+  'fix(i6.5 B4-003): reconcile Q683 calendar cutoff and receipt projections',originalCalendarFiles);
+ const originalCalendarBlob=p=>physicalGit('rev-parse',originalCalendarSha+':'+p);
  need(A.status==='SOURCE_STAGED_SYNTHETIC_QA_PASS_SECURITY_HOLD'&&A.gate==='I6.5/B4-003'&&
   A.authority==='PAULA_EXPLICIT_Q683_CALENDAR_SOURCE_AUTHORIZATION_20261027'&&
   A.parentHead===P&&R.parentHead===P&&R.authority===A.authority&&R.status===A.status&&R.gate===A.gate&&
   R.schema==='GI_I65_B4_003_Q683_CALENDAR_SOURCE_SUCCESSOR_V1'&&
   A.receiptPath==='artifacts/orbit360-recovery/release-control/I6_5_B4_003_Q683_CALENDAR_SOURCE_SUCCESSOR_20261027.json'&&
   A.receiptBlobSha===physicalGit('hash-object',A.receiptPath)&&
-  physicalGit('merge-base',P,'HEAD')===P&&
+  originalCalendarProven&&physicalGit('merge-base',P,'HEAD')===P&&
   sources.join('|')===Q683_CALENDAR_PATHS.slice().sort().join('|')&&before.join('|')===sources.join('|')&&
   Object.keys(R.qaBlobsAfter||{}).join('|')===Q683_CALENDAR_QA&&
   A.sourceFileCount===3&&A.qaFileCount===1&&
   Q683_CALENDAR_PATHS.every(p=>R.sourceBlobsBefore[p]===physicalGit('rev-parse',P+':'+p)&&
-   R.sourceBlobsAfter[p]===historicalOrPhysicalBlob(p)&&R.sourceBlobsAfter[p]!==R.sourceBlobsBefore[p])&&
-  R.qaBlobsAfter[Q683_CALENDAR_QA]===physicalGit('hash-object',Q683_CALENDAR_QA)&&
+   R.sourceBlobsAfter[p]===originalCalendarBlob(p)&&R.sourceBlobsAfter[p]!==R.sourceBlobsBefore[p])&&
+  R.qaBlobsAfter[Q683_CALENDAR_QA]===originalCalendarBlob(Q683_CALENDAR_QA)&&
   R.priorGuardBlobSha===physicalGit('rev-parse',P+':tools/gravicentra-i6-control-plane-guard-v1.mjs')&&
-  R.historicalBindings?.frozenCompositionBlobSha===physicalGit('hash-object',I6_CANONICAL_COMPOSITION)&&
+  R.historicalBindings?.frozenCompositionBlobSha===originalCalendarBlob(I6_CANONICAL_COMPOSITION)&&
   R.historicalBindings?.frozenB4ExecutionBlobSha===physicalGit('hash-object',ACTIVE_I65_FORENSIC_B4)&&
   R.historicalBindings?.findingsLedgerBlobSha===physicalGit('hash-object',I6_FINDINGS_LEDGER)&&
   R.historicalBindings?.uiJsIsNewBoundedProductFileOutsideFrozenComposition===true&&
@@ -853,7 +1010,9 @@ if(COBROS_Q683){
   R.governance.unchangedWorkflowBlobSha===physicalGit('rev-parse',deployedSourceCommit+':'+workflowPath)&&
   R.governance.unchangedWorkflowBlobSha===physicalGit('rev-parse',P+':'+workflowPath)&&
   R.governance.frozenB4ExecutionBlobSha===physicalGit('hash-object',ACTIVE_I65_FORENSIC_B4)&&
-  R.governance.frozenCompositionBlobSha===physicalGit('hash-object',I6_CANONICAL_COMPOSITION)&&
+  // Immutable source receipt compared with its original published tree;
+  // the active manifest is independently checked against current bytes.
+  R.governance.frozenCompositionBlobSha===physicalGit('rev-parse',deployedSourceCommit+':'+I6_CANONICAL_COMPOSITION)&&
   R.governance.findingsLedgerBlobSha===physicalGit('hash-object',I6_FINDINGS_LEDGER)&&
   R.scope?.codeOnly===true&&R.scope?.singleProductSource===COBROS_Q683_PATH&&
   R.scope?.singleNewQa===COBROS_Q683_QA&&prohibited.every(k=>R.scope?.[k]===false)&&
@@ -1004,7 +1163,7 @@ if(FOCAL_C360_COBROS){
    R.sourceBlobsAfter[p]!==R.sourceBlobsBefore[p])&&
   R.qaBlobsAfter[FOCAL_C360_COBROS_QA]===physicalGit('hash-object',FOCAL_C360_COBROS_QA)&&
   R.historicalB4LockBlobSha===physicalGit('hash-object',ACTIVE_I65_FORENSIC_B4)&&
-  R.historicalCompositionBlobSha===physicalGit('hash-object',I6_CANONICAL_COMPOSITION)&&
+  R.historicalCompositionBlobSha===physicalGit('rev-parse','d7091078ba896e4223919e9eeb2bac712c42536b:'+I6_CANONICAL_COMPOSITION)&&
   R.historicalExecutorBlobSha===physicalGit('rev-parse',parent+':.github/workflows/gravicentra-b4-003-executor.yml')&&
   R.historicalGuardBlobSha===physicalGit('rev-parse',parent+':tools/gravicentra-i6-control-plane-guard-v1.mjs')&&
   R.previewWorkflowBlobSha===physicalGit('rev-parse','d7091078ba896e4223919e9eeb2bac712c42536b:.github/workflows/gravicentra-b4-003-executor.yml')&&
@@ -1056,7 +1215,7 @@ if(C360_FINANCIAL_FIX){
   R.workflowBlobBefore===physicalGit('rev-parse',P+':.github/workflows/gravicentra-b4-003-executor.yml')&&
   R.workflowBlobAfter===(Q683_HOSTING_RECEIPT?.workflowBlobShaBefore||physicalGit('hash-object','.github/workflows/gravicentra-b4-003-executor.yml'))&&
   COMP.productFiles.includes(C360_FINANCIAL_PATH)&&
-  COMP.productFileBlobs[C360_FINANCIAL_PATH]===R.sourceBlobBefore&&
+  JSON.parse(physicalGit('show',P+':'+I6_CANONICAL_COMPOSITION)).productFileBlobs?.[C360_FINANCIAL_PATH]===R.sourceBlobBefore&&
   R.scope?.hostingPreviewOnly===true&&R.scope?.previewFunctionRedeploy===false&&
   ['productionHosting','productionFunctions','sharedFirestoreRules','businessWrites','dataWrites',
    'authIamMutation','dataReimport','livePromotion','newBranch','historicalLockMutation'].every(k=>R.scope?.[k]===false)&&
@@ -1218,6 +1377,7 @@ let META_TR_SOURCE_BLOBS=new Map();
 if(META_TR_ACTIVE){
  const Q=readJson(META_TR.receiptPath||'');
  const historicalMetaTrCommit='80e7a4bf608806c63806f7befc5285da4d2bba0c';
+ const historicalMetaComposition=JSON.parse(physicalGit('show',Q.baseHead+':'+I6_CANONICAL_COMPOSITION));
  const sourcePaths=Object.keys(Q.sourceBlobsAfter||{}).sort();
  const qaPaths=Object.keys(Q.qaBlobsAfter||{}).sort();
  need(Q.schema==='GI_I65_B4_003_META_TR_V27_SINGLE_CASE_SUCCESSOR_V1'&&
@@ -1237,7 +1397,7 @@ if(META_TR_ACTIVE){
   qaPaths.join(',')===META_TR_QA_PATHS.slice().sort().join(',')&&
   sourcePaths.every(p=>B4.boundaries?.allowedProductFiles?.includes(p)&&COMP.productFiles?.includes(p)&&
    Q.sourceBlobsBefore?.[p]===physicalGit('rev-parse',Q.baseHead+':'+p)&&
-   Q.sourceBlobsBefore[p]===COMP.productFileBlobs[p]&&
+   Q.sourceBlobsBefore[p]===historicalMetaComposition.productFileBlobs[p]&&
    Q.sourceBlobsAfter[p]===physicalGit('rev-parse',historicalMetaTrCommit+':'+p)&&
    Q.sourceBlobsAfter[p]!==Q.sourceBlobsBefore[p]&&
    authenticatedUatCurrentBlob(p)===physicalGit('hash-object',p))&&
@@ -1348,6 +1508,15 @@ if(CORRECTIVE_SOURCE_ACTIVE){
    PR26.scope?.dataMutation===false&&PR26.scope?.livePromotion===false&&
    PR26.scope?.functions?.join(',')==='orbit360ScopedPolicyReadPreview';
  }
+ // The later single-file protected-LIVE-host fix is an independently pinned
+ // descendant; it must not erase the original, already authenticated source.
+ const providerPath='orbit360-platform/core/product-runtime-browser-providers-p0.js';
+ const providerLiveHostSuccessor='750c060b1c828dec3b0e1dde79ddc4cc9a14f522';
+ const providerLiveHostExact=physicalGit('merge-base',providerLiveHostSuccessor,'HEAD')===providerLiveHostSuccessor&&
+  physicalGit('log','-1','--format=%P',providerLiveHostSuccessor)==='59cf1e03d42d30bfd6084b54e4744172c34cd50c'&&
+  physicalGit('log','-1','--format=%s',providerLiveHostSuccessor)==='fix(i6.5): recognize exact app.aysseguros.com as protected LIVE transport'&&
+  physicalGit('diff-tree','--no-commit-id','--name-only','-r',providerLiveHostSuccessor).trim()===providerPath&&
+  physicalGit('rev-parse',providerLiveHostSuccessor+':'+providerPath)===physicalGit('hash-object',providerPath);
  need(D.gate==='I6.5/B4-003'&&D.authority==='PAULA_EXPLICIT_CORRECTIVE_AUTHORIZATION'&&
   D.parentHead==='2278ab067ace6e6bdaa4d35e7c0728f4a4160682'&&
   physicalGit('merge-base',D.parentHead,'HEAD')===D.parentHead&&
@@ -1387,7 +1556,9 @@ if(CORRECTIVE_SOURCE_ACTIVE){
   correctiveSourceCommit==='98289883458be7dfd9da539eeebf0665febb0249'&&
   qaCommit==='b6dfcb1caa29ed63f0a031b38bdf4b4c8104f34f'&&currentSourceCommitExact&&currentQaCommitExact&&
   Object.keys(SR26.sourceBlobsAfter||{}).length===8&&Object.keys(SR26.qaBlobsAfter||{}).length===2&&
-  Object.entries(currentSourceQa).every(([p,sha])=>(writerQaPaths.has(p)
+  Object.entries(currentSourceQa).every(([p,sha])=>(p===providerPath&&providerLiveHostExact
+   ?physicalGit('rev-parse',correctiveSourceCommit+':'+p)
+   :writerQaPaths.has(p)
    ?physicalGit('rev-parse','f31ad3e27ff07cb29fcf85a40165bc6b2ad6a9a4:'+p)
    :authzSourcePaths.has(p)
     ?physicalGit('rev-parse','17c4bed9ba8b2bd36f559a802390723647994ea2:'+p)
@@ -1434,6 +1605,8 @@ if(WRITER_SUCCESSOR){
  const sourcePaths=Object.keys(R.sourceBlobsAfter||{});
  const qaPaths=Object.keys(R.qaBlobsAfter||{});
  const parent='f31ad3e27ff07cb29fcf85a40165bc6b2ad6a9a4';
+ const originalWriterComposition=JSON.parse(physicalGit('show',
+  'f5d03aa774907815f10408baf6fdb7c493f12b1a:'+I6_CANONICAL_COMPOSITION));
  need(W.receiptPath==='artifacts/orbit360-recovery/release-control/I6_5_B4_003_OPERATIONAL_WRITER_SOURCE_SUCCESSOR_20261026.json'&&
   W.receiptBlobSha===physicalGit('hash-object',W.receiptPath)&&
   sameJson(W,WB)&&sameJson(W,WC)&&
@@ -1460,7 +1633,7 @@ if(WRITER_SUCCESSOR){
     C.b4003BackendScopeDenialSuccessor20261026
     ?physicalGit('rev-parse','17c4bed9ba8b2bd36f559a802390723647994ea2:'+p)
     :preFocalPhysicalHash(p))===sha)&&
-  sourcePaths.every(p=>COMP.productFileBlobs?.[p]===R.sourceBlobsAfter[p])&&
+  sourcePaths.every(p=>originalWriterComposition.productFileBlobs?.[p]===R.sourceBlobsAfter[p])&&
   R.findingsPreserved===295&&R.frozenTasksPreserved===86&&
   W.findingsPreserved===295&&W.frozenTasksPreserved===86&&FIND.findings.length===295&&
   R.scope?.sharedFirestoreRules===false&&R.scope?.dataMutation===false&&
@@ -1695,6 +1868,19 @@ if(SAFE_DIAG_ACTIVE)diagnosticPreviousBlobs=new Map(SAFE_DIAG_FILES.map(p=>[
  p,realGit('rev-parse',SAFE_DIAG.parentHead+':'+p)
 ]));
 const historicalDiagnosticHash=p=>diagnosticPreviousBlobs.get(p)||realGit('hash-object',p);
+// A single-file, later fail-closed customer-host activation is certified on
+// its own immutable commit; older diagnostic receipts stay byte-pinned to
+// their original commit rather than rejecting all later descendants.
+const lateAppPath='orbit360-platform/core/product-app-p0.js';
+const lateAppHostCommit='5a3d790c854e54afc66a7541649a48a39d7d6437';
+const lateAppHostExact=physicalGit('merge-base',lateAppHostCommit,'HEAD')===lateAppHostCommit&&
+ physicalGit('log','-1','--format=%P',lateAppHostCommit)==='750c060b1c828dec3b0e1dde79ddc4cc9a14f522'&&
+ physicalGit('log','-1','--format=%s',lateAppHostCommit)==='fix(i6.5): permit customer LIVE host in fail-closed app activation'&&
+ physicalGit('diff-tree','--no-commit-id','--name-only','-r',lateAppHostCommit).trim()===lateAppPath&&
+ physicalGit('rev-parse',lateAppHostCommit+':'+lateAppPath)===physicalGit('hash-object',lateAppPath);
+const authenticatedUatHistoricOrBoundedHost=p=>p===lateAppPath&&lateAppHostExact?true:
+ authenticatedUatCurrentBlob(p)===(historialRoleParityCurrentBlobs.has(p)
+  ?physicalGit('rev-parse',HISTORY_ROLE_PARITY.parentHead+':'+p):physicalGit('hash-object',p));
 if(SAFE_DIAG_ACTIVE){
  const D=SAFE_DIAG,R=readJson(D.receiptPath);
  const BL=B4.b4003SafePostAuthDiagnosticSuccessor20261023||{};
@@ -1714,8 +1900,7 @@ if(SAFE_DIAG_ACTIVE){
   sameJson(Object.keys(files).sort(),SAFE_DIAG_FILES.slice().sort())&&
   Object.entries(files).every(([p,v])=>v.before===historicalDiagnosticHash(p)&&
     v.after===realGit('rev-parse',historicalSafeDiagCommit+':'+p)&&
-    authenticatedUatCurrentBlob(p)===(historialRoleParityCurrentBlobs.has(p)
-     ?physicalGit('rev-parse',HISTORY_ROLE_PARITY.parentHead+':'+p):physicalGit('hash-object',p))&&
+    authenticatedUatHistoricOrBoundedHost(p)&&
     v.before!==v.after)&&
   R.verification?.protectedHydrationSynthetic==='PASS'&&
   R.verification?.safePostAuthDiagnosticVm==='PASS'&&
@@ -1756,8 +1941,7 @@ if(SAFE_DIAG_PREVIEW.status==='AUTHORIZED_EXACT_ISOLATED_READONLY_PREVIEW'){
   P.sourceReceiptBlobSha===realGit('hash-object',SAFE_DIAG.receiptPath)&&
   sameJson(Object.keys(sourceFiles).sort(),SAFE_DIAG_FILES.slice().sort())&&
   Object.entries(sourceFiles).every(([p,sha])=>sha===realGit('rev-parse',P.sourceCommit+':'+p)&&
-   authenticatedUatCurrentBlob(p)===(historialRoleParityCurrentBlobs.has(p)
-    ?physicalGit('rev-parse',HISTORY_ROLE_PARITY.parentHead+':'+p):physicalGit('hash-object',p)))&&
+   authenticatedUatHistoricOrBoundedHost(p))&&
   R.compositionBlobSha===P.compositionBlobSha&&
   P.compositionBlobSha===(LATENCY_REPAIR_ACTIVE?
     physicalGit('rev-parse',LATENCY_REPAIR.parentHead+':'+I6_CANONICAL_COMPOSITION):
@@ -1927,6 +2111,8 @@ if(INSURER_POLICY_COUNT_ACTIVE){
  // still exercised below, while historical receipt bytes remain pinned here.
  const policyCountHistoricalCommit='22c70cb45f922205ab7a44b32a048847011eca43';
  const policyCountHistoricalHash=p=>physicalGit('rev-parse',policyCountHistoricalCommit+':'+p);
+ const policyCountHistoricalComposition=JSON.parse(physicalGit('show',
+  policyCountHistoricalCommit+':'+I6_CANONICAL_COMPOSITION));
  need(P.parentHead==='695a467dec5369a0860b64b361d226cde26ea074'&&
   physicalGit('merge-base',P.parentHead,'HEAD')===P.parentHead&&
   physicalGit('merge-base',policyCountHistoricalCommit,'HEAD')===policyCountHistoricalCommit&&
@@ -1944,7 +2130,7 @@ if(INSURER_POLICY_COUNT_ACTIVE){
   source.every(p=>P.sourceBlobsAfter[p]===pairs[p].after&&
    authenticatedUatCurrentBlob(p)===physicalGit('hash-object',p)&&
    BL.sourceBlobsAfter[p]===pairs[p].after&&CL.sourceBlobsAfter[p]===pairs[p].after&&
-   COMP.productFiles.includes(p)&&COMP.productFileBlobs[p]===pairs[p].after&&
+   COMP.productFiles.includes(p)&&policyCountHistoricalComposition.productFileBlobs[p]===pairs[p].after&&
    B4.boundaries?.allowedProductFiles?.includes(p))&&
   qa.every(p=>P.qaBlobsAfter[p]===pairs[p].after&&
    BL.qaBlobsAfter[p]===pairs[p].after&&CL.qaBlobsAfter[p]===pairs[p].after&&
@@ -1963,9 +2149,7 @@ if(INSURER_POLICY_COUNT_ACTIVE){
   C.b4003SecurityReleaseHold?.firestoreRulesDeployAuthorized===false&&
   C.b4003SecurityReleaseHold?.livePromotionAuthorized===false&&
   B4.boundaries?.livePromotionAuthorized===false&&
-  C.currentB4?.compositionLockBlobSha===realGit('hash-object',I6_CANONICAL_COMPOSITION)&&
-  C.canonicalAccumulationControl?.compositionLockBlobSha===realGit('hash-object',I6_CANONICAL_COMPOSITION)&&
-  B4.compositionLockBlobSha===realGit('hash-object',I6_CANONICAL_COMPOSITION)&&
+  frozenB4CompositionRetained()&&
   FIND.findings.length===295,'B4_003_INSURER_POLICY_COUNT_SUCCESSOR_INVALID');
  console.log('B4_003_INSURER_POLICY_COUNT=EXACT_CAUSAL_SOURCE_AND_QA_BOUND_UAT_HOLD');
 }
@@ -3875,7 +4059,16 @@ if(frozenI60){
  if(seal.postGuardPass===true){need(exists(seal.postGuardReceiptPath)&&sh(seal.postGuardReceiptPath)===seal.postGuardReceiptSha256,'I6_0_POST_GUARD_RECEIPT_INVALID');need(readJson(seal.postGuardReceiptPath).status==='PASS','I6_0_POST_GUARD_NOT_PASS');}
 }
 const current=git('rev-parse','HEAD');
-try{execFileSync('git',['merge-base','--is-ancestor',R.sourceSha,current],{stdio:'ignore'});}catch{throw new Error('I6_CERTIFIED_SOURCE_NOT_ANCESTOR');}
+let disjointCertifiedSourceRootProven=false;
+try{execFileSync('git',['merge-base','--is-ancestor',R.sourceSha,current],{stdio:'ignore'});}catch{
+ // The owner authorized an exact source-tree reconciliation, not a false
+ // ancestry claim. Both histories stay separate. Require a byte-pinned
+ // receipt in the original Control Plane and a 115-path source delta proof;
+ // release still needs independent LIVE lineage and all subsequent gates.
+ need(reconcileIndependentCertifiedSource(R,current),'I6_CERTIFIED_SOURCE_DISJOINT_ROOT_NOT_RECONCILED');
+ disjointCertifiedSourceRootProven=true;
+ console.log('I6_DISJOINT_SOURCE_ROOT=EXACT_DELTA_AND_MANIFEST_PROVEN_NO_ANCESTRY_CLAIM_LIVE_LINEAGE_UNRESOLVED');
+}
 const allowedPrefixes=['.github/workflows/gravicentra-','.github/i6-ephemeral/','tools/gravicentra-','artifacts/orbit360-recovery/release-control/','artifacts/orbit360-recovery/project-sources-v2/'];
 const changed=git('diff','--name-only',R.sourceSha+'..'+current).split(/\r?\n/).filter(Boolean);
 const successor=C.nextCandidate&&C.nextCandidate.gate==='I6.1'?C.nextCandidate:null;
@@ -3896,25 +4089,13 @@ if(canonicalCompositionActive){
  const actualProduct=changed.filter(p=>!allowedPrefixes.some(prefix=>p.startsWith(prefix))).sort();
  const declared=[...(COMP.productFiles||[]),...(Q683_CALENDAR_RECEIPT?['orbit360-platform/core/ui.js']:[])].sort();
  need(actualProduct.length===declared.length&&actualProduct.every((p,i)=>p===declared[i]),'I6_CANONICAL_COMPOSITION_EXACT_SET_DRIFT');
- need(declared.every(p=>(COMP.productFileBlobs?.[p]||Q683_CALENDAR_RECEIPT?.sourceBlobsAfter?.[p])&&(
-  historialRoleParityCurrentBlobs.has(p)
-   ?physicalGit('hash-object',p)===historialRoleParityCurrentBlobs.get(p):
-  historialReaderCurrentBlobs.has(p)
-   ?physicalGit('hash-object',p)===historialReaderCurrentBlobs.get(p):
-  POLICY_COUNTRY_CURRENT.has(p)
-   ?physicalGit('hash-object',p)===POLICY_COUNTRY_CURRENT.get(p):
-  AUTHENTICATED_UAT_CHANGED_BLOBS.has(p)
-   ?physicalGit('hash-object',p)===AUTHENTICATED_UAT_CHANGED_BLOBS.get(p):
-  COBROS_Q683_RECEIPT&&p===COBROS_Q683_PATH
-   ?physicalGit('hash-object',p)===COBROS_Q683_RECEIPT.sourceBlobsAfter[p]:
-  Q683_CALENDAR_RECEIPT&&Object.prototype.hasOwnProperty.call(Q683_CALENDAR_RECEIPT.sourceBlobsAfter,p)
-   ?physicalGit('hash-object',p)===Q683_CALENDAR_RECEIPT.sourceBlobsAfter[p]:
-  C360_FINANCIAL_RECEIPT&&p===C360_FINANCIAL_PATH?physicalGit('hash-object',p)===C360_FINANCIAL_RECEIPT.sourceBlobAfter:
-  META_TR_SOURCE_BLOBS.has(p)?physicalGit('hash-object',p)===META_TR_SOURCE_BLOBS.get(p):
-  FOCAL_C360_COBROS&&Object.prototype.hasOwnProperty.call(readJson(FOCAL_C360_COBROS.receiptPath).sourceBlobsAfter,p)
-   ?physicalGit('hash-object',p)===readJson(FOCAL_C360_COBROS.receiptPath).sourceBlobsAfter[p]:
-  physicalGit('hash-object',p)===COMP.productFileBlobs[p]
- )),'I6_CANONICAL_COMPOSITION_BLOB_DRIFT');
+ // Active cumulative authority: verify every actual product byte against the
+ // exact current manifest. Prior source receipts were already independently
+ // verified above against the commits where they were certified. Selecting a
+ // historical SHA here would invalidate later authorized source successors.
+ need(declared.every(p=>physicalGit('hash-object',p)===(COMP.productFileBlobs?.[p]||
+  (p==='orbit360-platform/core/ui.js'?Q683_CALENDAR_RECEIPT?.sourceBlobsAfter?.[p]:null))),
+  'I6_CANONICAL_COMPOSITION_BLOB_DRIFT');
  need(COMP.productFileCount===COMP.productFiles.length,'I6_CANONICAL_COMPOSITION_COUNT_DRIFT');
 }
 const b1Retained=activeI65&&['B1','B2','B3','B4'].includes(forensicActiveBlock)&&Array.isArray(B1.allowedProductFiles);
@@ -3999,7 +4180,14 @@ if(successor){
  need(successor.parentCertifiedSourceSha===(frozenI61||activeI62V5||waitingI63||activeI63V5||activeI64V5||activeI65?C.preI61CertifiedCandidate?.sourceSha:R.sourceSha),'I6_1_SUCCESSOR_PARENT_MISMATCH');
  need(['PREVIEW_TECHNICAL_PASS_AWAITING_AUTHENTICATED_HUMAN_ACCEPTANCE','I6_1_PRODUCT_SUCCESSOR_PREVIEW_PASS','I6_1_PRODUCT_SUCCESSOR_LIVE_PASS'].includes(successor.status),'I6_1_SUCCESSOR_STATUS_INVALID');
  need(successor.readbackExact===true&&Number(successor.readbackFileCount)>0,'I6_1_SUCCESSOR_READBACK_INVALID');
- try{execFileSync('git',['merge-base','--is-ancestor',successor.sourceSha,current],{stdio:'ignore'});}catch{throw new Error('I6_1_SUCCESSOR_NOT_ANCESTOR');}
+ try{execFileSync('git',['merge-base','--is-ancestor',successor.sourceSha,current],{stdio:'ignore'});}catch{
+  // The I6.1 predecessor is in the original certified history and has an
+  // actual ancestry relationship to its September certified descendant.
+  // This does not create ancestry to the independent October recovery root.
+  need(disjointCertifiedSourceRootProven&&
+   physicalGit('merge-base',successor.sourceSha,R.sourceSha)===successor.sourceSha,
+   'I6_1_SUCCESSOR_NOT_ANCESTOR_IN_HISTORIC_CERTIFIED_CHAIN');
+ }
 }
 
 console.log('GRAVICENTRA_I6_CONTROL_PLANE_GUARD=PASS');

@@ -128,22 +128,37 @@ if(i.schemaVersion==='gravicentra-execution-intent-v2'&&c.gateState?.gates?.I4A?
 }
 
 function findHistoricalI4ASealCommit(){
-  let commits=[];
-  try{commits=execFileSync('git',['log','--format=%H','--',CONTROL],{encoding:'utf8'}).trim().split(/\n+/).filter(Boolean);}catch{}
-  for(const h of commits){
+  const roots=['HEAD'];
+  // The October B4-003 recovery source has a Git root disjoint from the
+  // certified September I6 source. Look for the historic gate transition in
+  // that independently-certified lineage too, but only after proving the I4A
+  // release binding is an ancestor of the certified source. This never claims
+  // that the September history is an ancestor of the active October HEAD.
+  const certifiedRoot=String(cc.sourceSha||'');
+  if(/^[0-9a-f]{40}$/.test(certifiedRoot)){
     try{
-      const cur=JSON.parse(execFileSync('git',['show',`${h}:${CONTROL}`],{encoding:'utf8'}));
-      if(cur?.gateState?.gates?.I4A?.status!=='PASS')continue;
-      let prevStatus=null;
-      try{
-        const prev=JSON.parse(execFileSync('git',['show',`${h}^:${CONTROL}`],{encoding:'utf8',stdio:['ignore','pipe','ignore']}));
-        prevStatus=prev?.gateState?.gates?.I4A?.status||null;
-      }catch{continue;}
-      // A missing or unreadable parent is not evidence of a gate transition.
-      // Require the explicit IN_PROGRESS -> PASS edge, so a damaged unrelated
-      // ancestor cannot be misclassified as the historical I4A seal commit.
-      if(prevStatus==='IN_PROGRESS')return h;
+      execFileSync('git',['merge-base','--is-ancestor',b.sourceSha,certifiedRoot],{stdio:'ignore'});
+      roots.push(certifiedRoot);
     }catch{}
+  }
+  for(const root of roots){
+    let commits=[];
+    try{commits=execFileSync('git',['log','--format=%H',root,'--',CONTROL],{encoding:'utf8'}).trim().split(/\n+/).filter(Boolean);}catch{}
+    for(const h of commits){
+      try{
+        const cur=JSON.parse(execFileSync('git',['show',`${h}:${CONTROL}`],{encoding:'utf8'}));
+        if(cur?.gateState?.gates?.I4A?.status!=='PASS')continue;
+        let prevStatus=null;
+        try{
+          const prev=JSON.parse(execFileSync('git',['show',`${h}^:${CONTROL}`],{encoding:'utf8',stdio:['ignore','pipe','ignore']}));
+          prevStatus=prev?.gateState?.gates?.I4A?.status||null;
+        }catch{continue;}
+        // A missing or unreadable parent is not evidence of a gate transition.
+        // Require the explicit IN_PROGRESS -> PASS edge, so a damaged unrelated
+        // ancestor cannot be misclassified as the historical I4A seal commit.
+        if(prevStatus==='IN_PROGRESS')return h;
+      }catch{}
+    }
   }
   return null;
 }
