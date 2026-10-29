@@ -19,7 +19,10 @@
     "syntheticOnly": true,
     "realBusinessWrites": 0,
     "externalSends": 0,
-    "firestoreAccess": 0
+    "firestoreAccess": 0,
+    "rootQaPath": "tools/gravicentra-b4-003-insights-plantillas-country-no-seed.test.cjs",
+    "rootQaBeforeBlob": "839a82a705ddd0e26ee62b8c8db57cc266dfdde0",
+    "rootQaAfterBlob": "3111dca6286e0d206b669f0525e30472ff4b527a"
   },
   "compositionBinding": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
@@ -49,6 +52,7 @@
     "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json",
     "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PLANTILLAS_USE_LIFECYCLE_SUCCESSOR_20261029.json",
     "orbit360-platform/modules/plantillas.js",
+    "tools/gravicentra-b4-003-insights-plantillas-country-no-seed.test.cjs",
     "tools/gravicentra-i6-control-plane-guard-v1.mjs"
   ],
   "guard": {

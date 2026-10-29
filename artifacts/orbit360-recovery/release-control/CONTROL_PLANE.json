@@ -16037,7 +16037,7 @@
     "gate": "I6.5/B4-003",
     "authority": "PAULA_EXPLICIT_SCOPED_INTEGRATION_AUTHORIZATION",
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PLANTILLAS_USE_LIFECYCLE_SUCCESSOR_20261029.json",
-    "receiptBlobSha": "8a2223e31f28670d9c0cc4303ceb2b1d2159fde2",
+    "receiptBlobSha": "df2f6ca456a0d62c12f3583f651cd5850c5db8e3",
     "parentHead": "d4a686e5e4e3c8e060a4cb0dc2a7943eba1ad0f9",
     "productPath": "orbit360-platform/modules/plantillas.js",
     "beforeBlob": "702c90d4c655013fc168430cb44a48aab7bdfcd0",
@@ -16059,6 +16059,9 @@
     "securityB4003StillHold": true,
     "previewAuthorizedAfterGuardAndRegressionPass": true,
     "productionPromotionAuthorized": false,
-    "rulesAuthIamOrDataChangesAuthorized": false
+    "rulesAuthIamOrDataChangesAuthorized": false,
+    "regressionRootQaPath": "tools/gravicentra-b4-003-insights-plantillas-country-no-seed.test.cjs",
+    "regressionRootQaBeforeBlob": "839a82a705ddd0e26ee62b8c8db57cc266dfdde0",
+    "regressionRootQaBlob": "3111dca6286e0d206b669f0525e30472ff4b527a"
   }
 }

@@ -164,7 +164,7 @@ need(CUMULATIVE_RECEIPT.schema==='GRAVICENTRA_I65_B4003_CUMULATIVE_READ_LIFECYCL
  CUMULATIVE_RECEIPT.historicalAnchor.plantillasBlob==='702c90d4c655013fc168430cb44a48aab7bdfcd0'&&
  CUMULATIVE_RECEIPT.historicalAnchor.plantillasBlob===physicalGit('rev-parse',CUMULATIVE_RECEIPT.historicalAnchor.sourceCommit+':orbit360-platform/modules/plantillas.js')&&
  CUMULATIVE_RECEIPT.historicalAnchor.regressionTestBlob==='839a82a705ddd0e26ee62b8c8db57cc266dfdde0'&&
- CUMULATIVE_RECEIPT.historicalAnchor.regressionTestBlob===physicalGit('hash-object',CUMULATIVE_SAFE_READ_TEST)&&
+ CUMULATIVE_RECEIPT.historicalAnchor.regressionTestBlob===physicalGit('rev-parse',CUMULATIVE_RECEIPT.historicalAnchor.sourceCommit+':'+CUMULATIVE_SAFE_READ_TEST)&&
  CUMULATIVE_RECEIPT.scope?.exactSixProductSourcesFourSyntheticTests===true&&
  CUMULATIVE_RECEIPT.scope.existingCountryAndRoleScopesPreserved===true&&
  CUMULATIVE_RECEIPT.scope.plantillasUnchanged===true&&CUMULATIVE_RECEIPT.scope.previewOnly===true&&
@@ -4319,7 +4319,7 @@ if(canonicalCompositionActive){
   safeRead.regressionTest?.syntheticOnly===true&&safeRead.regressionTest?.realBusinessWrites===0&&
   safeRead.regressionTest?.testCases===4&&
   physicalGit('rev-parse',source+':'+testPath)===testBlob&&
-  physicalGit('hash-object',testPath)===testBlob&&
+  physicalGit('rev-parse',source+':'+testPath)===testBlob&&
   safeRead.functionalScope?.plantillasServerPersistentCrud==='NOT_AVAILABLE_SECURITY_DEPENDENCY'&&
   safeRead.preserved?.frozenCompositionFiles===114&&safeRead.preserved?.historicalCapabilityApprovals===15&&
   safeRead.preserved?.historicalFindings===295&&safeRead.preserved?.historicalTasks===86&&
@@ -4365,6 +4365,13 @@ if(canonicalCompositionActive){
   physicalGit('rev-parse',current+':'+lifecycleTestPath)===lifecycleReceipt.regression.blob&&
   lifecycleReceipt.regression?.testCases===18&&lifecycleReceipt.regression?.passed===18&&
   lifecycleReceipt.regression?.failed===0&&lifecycleReceipt.regression?.syntheticOnly===true&&
+  lifecycleReceipt.regression?.rootQaPath==='tools/gravicentra-b4-003-insights-plantillas-country-no-seed.test.cjs'&&
+  lifecycleReceipt.regression?.rootQaBeforeBlob==='839a82a705ddd0e26ee62b8c8db57cc266dfdde0'&&
+  lifecycleReceipt.regression?.rootQaBeforeBlob===physicalGit('rev-parse',lifecycleReceipt.expectedParentHead+':tools/gravicentra-b4-003-insights-plantillas-country-no-seed.test.cjs')&&
+  lifecycleReceipt.regression?.rootQaAfterBlob===lifecycle.regressionRootQaBlob&&
+  lifecycleReceipt.regression?.rootQaAfterBlob===physicalGit('hash-object','tools/gravicentra-b4-003-insights-plantillas-country-no-seed.test.cjs')&&
+  lifecycleReceipt.regression?.rootQaAfterBlob===physicalGit('rev-parse',current+':tools/gravicentra-b4-003-insights-plantillas-country-no-seed.test.cjs')&&
+  lifecycleReceipt.regression?.rootQaAfterBlob!==lifecycleReceipt.regression?.rootQaBeforeBlob&&
   lifecycleReceipt.regression?.realBusinessWrites===0&&lifecycleReceipt.regression?.externalSends===0&&
   lifecycleTestOutput.includes('# tests 18')&&lifecycleTestOutput.includes('# pass 18')&&
   lifecycleTestOutput.includes('# fail 0')&&

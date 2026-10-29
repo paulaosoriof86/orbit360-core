@@ -43,8 +43,9 @@ function insightScope(country) {
     pais: country, store, modules: {},
     ui: { finiteNumber: n => Number.isFinite(Number(n)) ? Number(n) : null }
   };
-  const window = { Orbit };
-  const context = vm.createContext({ window, Orbit, Date, Map, Set });
+  const document = { addEventListener() {} };
+  const window = { Orbit, addEventListener() {} };
+  const context = vm.createContext({ window, document, Orbit, Date, Map, Set });
   vm.runInContext(queriesSrc, context, { filename: 'queries.js' });
   const marker = 'return { render, cliente, sugerirMeta,';
   assert.ok(insightsSrc.includes(marker), 'Insights module test hook not found');
