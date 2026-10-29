@@ -317,7 +317,10 @@ Orbit.modules.renovaciones = (function () {
               const cli = S().get('clientes', p.clienteId), asg = q.aseguradora(p.aseguradoraId), life=lifecycleOf(p);
               const overdueFollowup=d<0&&life.bucketEligible&&!life.terminal&&life.reviewOnly&&renewabilityState(p)!=='NO';
               const wa = (cli && cli.telefono || '').replace(/[^0-9]/g, '');
-              const waTxt = encodeURIComponent('Hola ' + (cli ? cli.nombre.split(' ')[0] : '') + ', tu póliza ' + p.ramo + ' (' + p.numero + ') vence el ' + U.fmtDate(p.vigenciaFin) + '. ¿Coordinamos la renovación?');
+              // Un cliente puede existir sin nombre confirmado: evitar "Hola ,"
+              // y no fallar al renderizar por un nombre ausente o vacío.
+              const waName = String(cli && cli.nombre || '').trim().split(/\s+/)[0];
+              const waTxt = encodeURIComponent('Hola' + (waName ? ' ' + waName : '') + ', tu póliza ' + p.ramo + ' (' + p.numero + ') vence el ' + U.fmtDate(p.vigenciaFin) + '. ¿Coordinamos la renovación?');
               return `<div class="renewal-policy-card" data-renewal-policy="${U.esc(p.id)}" data-renewal-country="${U.esc(policyCountry(p))}" style="border:1px solid var(--line);border-radius:var(--r-sm);padding:10px 11px;background:var(--card)">
                 <div class="clickable" onclick="Orbit.modules.cliente360.verPoliza('${p.id}')" style="cursor:pointer">
                   <div style="display:flex;justify-content:space-between;align-items:center;gap:6px">

@@ -361,11 +361,12 @@ Orbit.q = (function () {
     return itemCountry || clientCountry || '';
   }
   function rowPais(row, clients, policies) {
+    // "TODOS" must equal GT + CO, never a third bucket of records with
+    // absent or contradictory verified parents. Quarantine such payments in
+    // an explicit reconciliation counter, without losing their source data.
+    const country = policyLinkedCountry(row, clients, policies);
     const p = paisActivo();
-    if (!p) return true;
-    if (row && row.polizaId != null) return policyLinkedCountry(row, clients, policies) === p;
-    const cli = row && row.clienteId != null ? (clients instanceof Map ? clients.get(row.clienteId) : S().get('clientes', row.clienteId)) : null;
-    return (countryCode(row && row.pais) || countryCode(cli && cli.pais)) === p;
+    return (country === 'GT' || country === 'CO') && (!p || country === p);
   }
   function policyLinkedRowPais(row, clients, policies) {
     if (!row || row.polizaId == null) return false;
@@ -545,7 +546,14 @@ Orbit.q = (function () {
   function carteraGlobalPorMoneda() {
     const clients = clientIndex();
     const policies = new Map((S().all('polizas') || []).filter(p => p && p.id != null).map(p => [p.id, p]));
-    const cob = realizedPaymentRows().filter(c => rowPais(c, clients, policies));
+    const confirmedSource = realizedPaymentRows().filter(confirmedCobro);
+    const cob = confirmedSource.filter(c => rowPais(c, clients, policies));
+    const unassigned = paisActivo() ? [] : confirmedSource.filter(c => !['GT','CO'].includes(policyLinkedCountry(c, clients, policies)));
+    const unassignedConfirmedByCurrency = {};
+    unassigned.forEach(c => {
+      const cur = currencyCodeFor(c, clients, policies);
+      unassignedConfirmedByCurrency[cur] = (unassignedConfirmedByCurrency[cur] || 0) + amount(c.monto);
+    });
     const portfolioSource=S().all('carteraPrimas') || [];
     const car = portfolioSource.filter(c => policyLinkedRowPais(c, clients, policies));
     const finance=portfolioAmountContext({portfolios:portfolioSource,policies:[...policies.values()]});
@@ -573,6 +581,8 @@ Orbit.q = (function () {
       byCurrency,
       currencies: Object.keys(byCurrency).sort(),
       confirmedCount,
+      unassignedConfirmedCount: unassigned.length,
+      unassignedConfirmedByCurrency,
       porConciliarCount,
       reconciledCount: Math.max(0, confirmedCount - porConciliarCount),
       country: paisActivo() || 'TODOS',
