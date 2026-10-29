@@ -30,8 +30,40 @@ Orbit.modules.historial = (function () {
     { id: 'fase', type: 'select', ph: 'Asesor', options: K.asesorOptions() }
   ];
 
+
+  // The global role entitlement is not the selected country. A user may be
+  // authorized for GT and CO but must see only the chosen country's history.
+  // Anchor policy-linked activities to the policy (not the client's domicile).
+  function countryOfActivity(a) {
+    const country = v => {
+      const c = String(v == null ? '' : v).trim().toUpperCase();
+      return c === 'GT' || c === 'CO' ? c : '';
+    };
+    if (!a || typeof a !== 'object') return '';
+    const policyId = a.polizaId || a.policyId;
+    if (policyId) {
+      let policy = null;
+      try { policy = S().get('polizas', policyId); } catch (_) {}
+      return policy ? country(policy.pais || policy.country) : '';
+    }
+    const clientId = a.clienteId || a.clientId;
+    if (clientId) {
+      let client = null;
+      try { client = S().get('clientes', clientId); } catch (_) {}
+      return client ? country(client.pais || client.country) : '';
+    }
+    return country(a.pais || a.country);
+  }
+
+  function visibleActivities() {
+    const selected = String(Orbit.pais || 'TODOS').trim().toUpperCase();
+    const all = S().all('actividades');
+    if (selected !== 'GT' && selected !== 'CO') return all;
+    return all.filter(a => countryOfActivity(a) === selected);
+  }
+
   function rows() {
-    return S().all('actividades').filter(a => {
+    return visibleActivities().filter(a => {
       const cli = S().get('clientes', a.clienteId);
       const txt = (a.titulo + ' ' + a.detalle + ' ' + (cli ? cli.nombre : '')).toLowerCase();
       return (!st.fq || txt.includes(st.fq.toLowerCase())) &&
@@ -47,7 +79,7 @@ Orbit.modules.historial = (function () {
       :sourceState.pending
       ? '<div class="cfg-note" role="status">Consultando historial autorizado…</div>'
       :'';
-    const all = S().all('actividades');
+    const all = visibleActivities();
     const r = rows();
     st.__count = r.length + ' interacciones';
     // por tipo
@@ -105,6 +137,8 @@ Orbit.modules.historial = (function () {
   /* ---- Detalle de la interacción (drawer) ---- */
   function detalle(actId) {
     const a = S().get('actividades', actId); if (!a) return;
+    const selected = String(Orbit.pais || 'TODOS').trim().toUpperCase();
+    if ((selected === 'GT' || selected === 'CO') && countryOfActivity(a) !== selected) return;
     const cli = S().get('clientes', a.clienteId), ase = q.asesor(a.asesorId);
     let back = document.getElementById('hist-det'); if (back) back.remove();
     back = document.createElement('div'); back.id = 'hist-det'; back.className = 'drawer-back open';
