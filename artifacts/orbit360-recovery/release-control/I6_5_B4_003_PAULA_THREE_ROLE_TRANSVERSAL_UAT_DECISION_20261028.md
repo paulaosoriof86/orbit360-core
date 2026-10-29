@@ -29,3 +29,16 @@ URL: https://ays-orbit-360-lab--gi-i65-b4-40805562769-e9si0n0l.web.app/
 ## Próximo movimiento
 
 Una sola candidata acumulativa de funciones/Hosting; completar los casos de lectura transversales pendientes con las dos identidades reales, ejecutar pruebas controladas de persistencia sobre fixtures y promover únicamente con artefacto exacto y comprobaciones de LIVE. No reabrir decisiones ni repetir la matriz completa ya leída.
+
+## Addendum técnico focal — pruebas de recuperación y transporte
+
+Evidencia ejecutada localmente en árbol de fuente B4-003, fixtures sintéticos, sin Firebase externo ni escrituras reales. No equivale a UAT real ni a aprobación LIVE:
+
+- `gravicentra-b4-003-role-context-recovery.test.cjs`: **2/2 grupos PASS**. Al cambiar rol, se invalida la caché previa; lectura prioritaria, reintento transitorio acotado, denegación no reintentada, sin fallback Firestore directo.
+- `gravicentra-b4-003-operational-write-security-regression.test.cjs`: **30/30 PASS**. Incluye aseguradora del país autorizado permitida; país ajeno o faltante denegado. `releaseAccepted:false` declarado por el propio reporte; no es certificación LIVE.
+- `gravicentra-b4-003-scoped-related-reader.test.cjs`: **PASS** en lector protegido, relaciones de historial, filtros de país/rol/tenant, páginas y cuatro colecciones; sin escritura externa.
+- `gravicentra-b4-003-cronograma-durable-task.test.cjs`: **4/4 PASS** en simulación. La anterior incidencia de persistencia de Cronograma en Preview **no queda resuelta** por esta prueba local.
+
+**Dependencia técnica aislada para corte LIVE:** el `functions/bootstrap.js` vigente no exporta `b4-003-scoped-policy-callable`. El empaquetador `tools/gravicentra-i6-1-preview-package.mjs` integra ambos nombres en artefacto efímero, pero el ejecutor autorizado despliega exclusivamente `orbit360ScopedPolicyReadPreview`. El frontend LIVE invoca `orbit360ScopedPolicyRead`, cuya disponibilidad en LIVE no está acreditada. Antes del corte se requiere una promoción específica del backend con lectura exacta de función; no basta transportar Hosting. **La excepción temporal de Firestore Rules aceptada por Paula permanece fuera de esta dependencia y no se reabre.**
+
+**Cobertura pendiente:** Dirección/GT, selector Todos, autorización negativa real cruzando Paula/Carlos, ciclo operativo sintético de Cronograma, edición autorizada de Aseguradoras, y flujo LIVE con readback. El último reintento de Chrome fue interrumpido; no se registra como PASS/FAIL del producto.
