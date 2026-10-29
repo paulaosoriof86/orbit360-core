@@ -15478,6 +15478,192 @@
       "COBROS_PRIMARY_RUNTIME"
     ],
     "acceptedModuleEvidence": [],
+    "liveUatCumulative20261029": {
+      "schema": "GI_I65_B4_003_A63_AUTHENTICATED_UAT_CUMULATIVE_V1",
+      "recordedOn": "2026-10-29",
+      "gate": "I6.5/B4-003",
+      "sourceCommit": "a63a7af5eb066bc87f94131e7b981741b29e4afc",
+      "previewRunId": 40889172816,
+      "browser": "Chrome local connected; authenticated user tab",
+      "identity": {
+        "displayName": "Paula Osorio",
+        "effectiveUiRole": "Dirección",
+        "membershipDefaultRole": "SuperAdmin",
+        "tenant": "alianzas-soluciones"
+      },
+      "evidenceLevel": "AUTHENTICATED_PREVIEW_OBSERVATION_PARTIAL_NOT_FULL_MODULE_ACCEPTANCE",
+      "acceptedModuleCount": 0,
+      "verifiedSubflows": [
+        {
+          "capabilityId": "ASEGURADORAS_OPERATIONAL_DIRECTORY",
+          "route": "#/aseguradoras?ficha=b4003qa_human_insurer_r20",
+          "fixtureId": "b4003qa_human_insurer_r20",
+          "country": "GT",
+          "role": "Dirección",
+          "operation": "Edit synthetic fixture Observaciones; submit reasoned save; reread through reload; restore exact original; reread through reload",
+          "initialAndRestoredValue": "Fixture temporal aislado para validar UI y persistencia en Preview.",
+          "temporarySuffix": "QA-B4003-A63-20261029-01",
+          "results": {
+            "saveAccepted": true,
+            "persistedAfterReload": true,
+            "restoreAccepted": true,
+            "restoredAfterReload": true,
+            "consoleErrorsObserved": 0,
+            "realInsurerModified": false
+          },
+          "status": "SUBFLOW_AUTHENTICATED_WRITE_PERSISTENCE_RESTORE_PASS_NOT_FULL_CAPABILITY_PASS"
+        }
+      ],
+      "crossModuleReads": [
+        {
+          "module": "Inicio",
+          "role": "Dirección",
+          "country": "Todos",
+          "observed": "434 clientes, 1425 pólizas, 5 cobros confirmados GTQ Q2744, hidratación 5/5",
+          "level": "READ_RENDER_PASS"
+        },
+        {
+          "module": "Aseguradoras",
+          "role": "Dirección",
+          "country": "GT",
+          "observed": "33 directorio (29 activas), ficha sintética y secciones operativas presentes",
+          "level": "READ_PLUS_SCOPED_SYNTHETIC_WRITE_PASS"
+        },
+        {
+          "module": "Pólizas",
+          "role": "Dirección",
+          "country": "GT",
+          "observed": "1301 listado país y diagnóstico de 5 pólizas cliente no visible (1 en otro país y 4 no disponibles)",
+          "level": "READ_RENDER_WITH_RELATIONSHIP_GAP"
+        },
+        {
+          "module": "Clientes 360",
+          "role": "Dirección",
+          "country": "GT",
+          "observed": "417 clientes, 1337 universo pólizas vinculadas, GTQ y COP separados",
+          "level": "READ_RENDER_WITH_RELATIONSHIP_GAP"
+        },
+        {
+          "module": "Cobros y cartera",
+          "role": "Dirección",
+          "country": "GT",
+          "observed": "2514 registros; 1195 SIGA sin confirmar; 4 filas Vencido COP no coinciden con saldo vencido COP en cartera país",
+          "level": "READ_RENDER_WITH_RECONCILIATION_GAP"
+        },
+        {
+          "module": "Cobros y cartera",
+          "role": "Dirección",
+          "country": "CO",
+          "observed": "46 registros; 34 SIGA por confirmar; COP conservado",
+          "level": "READ_RENDER_PASS"
+        },
+        {
+          "module": "Cobros y cartera",
+          "role": "Dirección",
+          "country": "Todos",
+          "observed": "2560 registros; 1229 SIGA sin confirmar; GT+CO exacto, importes por moneda sin convertir",
+          "level": "READ_RENDER_PASS"
+        },
+        {
+          "module": "Renovaciones",
+          "role": "Dirección",
+          "country": "GT",
+          "observed": "28 vencidas, 2 próximas <=15 días, 13 de 16–45 días",
+          "level": "READ_RENDER_PASS"
+        },
+        {
+          "module": "Ops / Leads",
+          "role": "Dirección",
+          "country": "GT",
+          "observed": "3 tarjetas cotización/ops enlazadas; 5 leads activos",
+          "level": "READ_RENDER_PASS"
+        },
+        {
+          "module": "Cronograma",
+          "role": "Dirección",
+          "country": "GT",
+          "observed": "calendario octubre con obligaciones y tareas; UAT transaccional previa en candidata anterior, pendiente repetir en a63",
+          "level": "READ_RENDER_PASS"
+        },
+        {
+          "module": "Historial",
+          "role": "Dirección",
+          "country": "GT",
+          "observed": "23 interacciones dentro del país",
+          "level": "READ_RENDER_PASS"
+        },
+        {
+          "module": "Cancelaciones",
+          "role": "Dirección",
+          "country": "GT",
+          "observed": "462 cancelaciones históricas; motivo faltante explícitamente en registros sin fuente",
+          "level": "READ_RENDER_PASS"
+        },
+        {
+          "module": "Siniestros",
+          "role": "Dirección",
+          "country": "GT",
+          "observed": "0 reclamos, estado vacío y controles operativos visibles",
+          "level": "READ_RENDER_PASS"
+        },
+        {
+          "module": "Conciliaciones",
+          "role": "Dirección",
+          "country": "GT",
+          "observed": "6 estados visibles, 0 propuestas formales",
+          "level": "READ_RENDER_PASS"
+        },
+        {
+          "module": "Comisiones",
+          "role": "Dirección",
+          "country": "GT",
+          "observed": "vista por asesor/aseguradora/periodo, 0 comisiones en alcance",
+          "level": "READ_RENDER_PASS"
+        },
+        {
+          "module": "Reportes",
+          "role": "Dirección",
+          "country": "GT",
+          "observed": "Producción 1337 registros, categorías de cartera, comisiones, renovaciones, siniestros, cancelaciones y exportaciones visibles",
+          "level": "READ_RENDER_PASS"
+        },
+        {
+          "module": "Calidad de datos",
+          "role": "Dirección",
+          "country": "GT",
+          "observed": "417 clientes, 72 diferencias de prima/recibos; 163 sin teléfono, sin cambio automático de fuente",
+          "level": "READ_RENDER_WITH_SOURCE_GAPS"
+        },
+        {
+          "module": "Equipo y permisos",
+          "role": "Dirección",
+          "country": "GT",
+          "observed": "7 usuarios; rol predeterminado de Paula SuperAdmin, selector vista Dirección; 4 multirol",
+          "level": "READ_RENDER_PASS"
+        },
+        {
+          "module": "Configuración",
+          "role": "Dirección",
+          "country": "GT",
+          "observed": "identidad A&S, marca, catálogos, roles, integraciones y configuración visible",
+          "level": "READ_RENDER_PASS"
+        }
+      ],
+      "additionalObservations": [
+        "Cobros al alternar a vista Asesor/GT mostró Cargando Cobros y cartera en observaciones repetidas; medir duración y confirmar si es un fallo sostenido antes de cerrar.",
+        "Durante transiciones de rutas algunas instantáneas repetían contenido de ruta anterior; esas lecturas descartadas, se validó URL y cabecera específicas.",
+        "Los módulos listados aquí NO cumplen todavía matriz completa de acciones, permisos multirol, responsive, source/blob, últimas interfaces aprobadas y aceptación visual; acceptedModuleEvidence continúa vacío."
+      ],
+      "openReleaseConditions": [
+        "Completar UAT de operaciones y persistencia por cada capacidad Fase A.",
+        "Reconciliar 5 relaciones póliza-cliente GT sin alterar o reimportar datos.",
+        "Reconciliar 4 filas Vencido COP visibles bajo filtro GT con fuente cartera.",
+        "Investigar carga por rol Asesor y recuperar cierres históricos verificables.",
+        "Verificar seguridad B4-003 lector protegido/producción, sin declarar superado HOLD.",
+        "Consolidar módulos a LATEST_APPROVED_VERSION_PREVIEW_PASS solo con recibo exacto y, después, mismo artifact LIVE y UAT productiva."
+      ],
+      "sourceAndDataChangePolicy": "UAT authorized synthetic fixture only; no real business record changed; no LIVE deployment/data import/rules/Auth/IAM change."
+    },
     "evidenceRequiredForEachCurrentApproval": [
       "capabilityId",
       "status",
@@ -15508,7 +15694,7 @@
       "noSilentMemoryFallback": true,
       "sourceChangeRequiresNewPreviewDigest": true
     },
-    "nextAction": "PAULA_AUTHENTICATES_EXACT_PREVIEW_THEN_INCREMENTALLY_RECORD_UAT_PER_CAPABILITY_WITH_PERSISTENCE_AND_READBACK",
+    "nextAction": "CONTINUE_AUTHENTICATED_MULTI_MODULE_UAT_AND_PROGRESSIVE_EXACT_RECEIPTS_IN_SINGLE_CANONICAL_CONTROL_PLANE",
     "notes": "This freeze records an exact technical candidate, not 15 fresh functional approvals. Module approvals require reproducible current-version UAT; historical I5 and previous B4 receipts remain unmodified."
   }
 }
