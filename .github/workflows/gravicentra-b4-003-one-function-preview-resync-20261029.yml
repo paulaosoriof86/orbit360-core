@@ -1,0 +1,158 @@
+name: Gravicentra B4-003 Exact Operational Command Preview Resync
+
+on:
+  push:
+    branches: [recovery/fase-a-clean-20260831]
+    paths:
+      - .github/workflows/gravicentra-b4-003-one-function-preview-resync-20261029.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: gi-b4003-single-command-preview-resync
+  cancel-in-progress: false
+
+jobs:
+  exact-single-function-lab-only:
+    if: >-
+      github.repository == 'paulaosoriof86/orbit360-core' &&
+      github.ref == 'refs/heads/recovery/fase-a-clean-20260831' &&
+      github.event.head_commit.message == 'build(i6.5 B4-003): resync exact operational command Preview only'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    env:
+      PROJECT_ID: ays-orbit-360-lab
+      SOURCE_SHA: 2909226ce17450d655c09f213776a66ad036b93f
+      EXPECTED_PARENT: 84572a67a2ee02eb4b7e1a67da0e63ddbfebe9be
+      TARGET_FUNCTION: orbit360ProductOperationalCommandPreview
+      TARGET_REGION: us-east1
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+    steps:
+      - name: Checkout single-workflow transport successor
+        uses: actions/checkout@v4
+        with:
+          path: transport
+          fetch-depth: 2
+          persist-credentials: false
+
+      - name: Checkout exact already-certified source
+        uses: actions/checkout@v4
+        with:
+          ref: 2909226ce17450d655c09f213776a66ad036b93f
+          path: candidate
+          fetch-depth: 1
+          persist-credentials: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Prove single-file successor and server task contract
+        run: |
+          set -euo pipefail
+          test "$(git -C transport rev-parse HEAD)" = "$GITHUB_SHA"
+          test "$(git -C transport rev-parse HEAD^)" = "$EXPECTED_PARENT"
+          test "$(git -C transport diff --name-only HEAD^ HEAD)" = '.github/workflows/gravicentra-b4-003-one-function-preview-resync-20261029.yml'
+          test "$(git -C candidate rev-parse HEAD)" = "$SOURCE_SHA"
+          test "$(git -C candidate hash-object functions/product-operational-domain.js)" = '529a76cffaa847c13fdf468bb2bbdf0685e95903'
+          cd candidate
+          node --check functions/product-operational-domain.js
+          node tools/gravicentra-b4-003-cronograma-durable-task.test.cjs
+          node tools/gravicentra-b4-003-operational-write-security-regression.test.cjs
+          node tools/gravicentra-b4-003-before-image-regression.test.cjs
+          node tools/gravicentra-b4-003-scoped-boundary.test.cjs
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const s=fs.readFileSync('functions/product-operational-domain.js','utf8');
+          const b=fs.readFileSync('functions/bootstrap.js','utf8');
+          if(!/tareas:\s*'ops'/.test(s)||!s.includes('orbit360ProductOperationalCommandPreview')||!b.includes("require('./product-operational-domain')"))throw Error('B4003_PREVIEW_TASK_OWNER_MISSING');
+          if(!s.includes("const PREVIEW_REGION = 'us-east1'")||!s.includes('syntheticId'))throw Error('B4003_PREVIEW_SYNTHETIC_GUARD_MISSING');
+          NODE
+
+      - name: Snapshot LAB LIVE Hosting before targeted function deploy
+        run: |
+          set -euo pipefail
+          curl --fail --silent --show-error --location --retry 2 --max-time 30 https://ays-orbit-360-lab.web.app/ | sha256sum > "$RUNNER_TEMP/gi-b4003-live-before.sha256"
+
+      - name: Select existing LAB Firebase service account and pinned CLI
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/gi-b4003-command-auth"
+          python3 - <<'PY'
+          import json,os,pathlib
+          root=pathlib.Path(os.environ['RUNNER_TEMP'])/'gi-b4003-command-auth'
+          paths=[]
+          for n,key in enumerate(('SA_ORBIT360_LAB','SA_ORBIT_360_LAB','SA_DEFAULT')):
+              try: value=json.loads(os.environ.get(key,''))
+              except (ValueError,TypeError): continue
+              if value.get('type')=='service_account' and value.get('project_id')==os.environ['PROJECT_ID'] and value.get('private_key'):
+                  p=root/f'{n}.json';p.write_text(json.dumps(value),encoding='utf8');p.chmod(0o600);paths.append(str(p))
+          if not paths: raise SystemExit('B4003_PREVIEW_LAB_ACCOUNT_MISSING')
+          (root/'candidates').write_text('\n'.join(paths)+'\n',encoding='utf8')
+          PY
+          CLI_ROOT="$RUNNER_TEMP/gi-b4003-command-cli"
+          npm install --prefix "$CLI_ROOT" --no-save --ignore-scripts --no-audit --no-fund firebase-tools@14.10.1 >/dev/null
+          node candidate/tools/gravicentra-firebase-tools-empty-extensions-workaround-v1.mjs "$CLI_ROOT"
+          CLI="$CLI_ROOT/node_modules/firebase-tools/lib/bin/firebase.js"
+          selected=''
+          while IFS= read -r candidate; do
+            if GOOGLE_APPLICATION_CREDENTIALS="$candidate" node "$CLI" functions:list --project "$PROJECT_ID" --non-interactive --json >/dev/null 2>&1; then selected="$candidate"; break; fi
+          done < "$RUNNER_TEMP/gi-b4003-command-auth/candidates"
+          test -n "$selected"
+          cp "$selected" "$RUNNER_TEMP/gi-b4003-command-auth/selected.json"
+          chmod 600 "$RUNNER_TEMP/gi-b4003-command-auth/selected.json"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/gi-b4003-command-auth/selected.json" >> "$GITHUB_ENV"
+          echo "FIREBASE_CLI_BIN=$CLI" >> "$GITHUB_ENV"
+
+      - name: Verify existing target and stage Functions-only package
+        run: |
+          set -euo pipefail
+          node "$FIREBASE_CLI_BIN" functions:list --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/gi-b4003-functions-before.json"
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const doc=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/gi-b4003-functions-before.json','utf8'));
+          const rows=Array.isArray(doc.result)?doc.result:Array.isArray(doc)?doc:[];
+          const matches=rows.filter(r=>[r.entryPoint,r.id,r.name].some(v=>String(v||'').includes('orbit360ProductOperationalCommandPreview')));
+          if(matches.length!==1)throw Error('B4003_PREVIEW_FUNCTION_CARDINALITY_NOT_ONE');
+          const one=matches[0],loc=String(one.region||one.location||one.name||'');
+          if(loc&&/us-central1/.test(loc))throw Error('B4003_WRONG_FUNCTION_REGION');
+          NODE
+          ROOT="$RUNNER_TEMP/gi-b4003-command-package"
+          mkdir -p "$ROOT"
+          cp -a candidate/functions "$ROOT/backend"
+          (cd "$ROOT/backend" && npm ci --ignore-scripts --no-audit --no-fund >/dev/null)
+          printf '{"functions":{"source":"backend","runtime":"nodejs22"}}\n' > "$ROOT/firebase.json"
+          echo "B4003_PACKAGE_ROOT=$ROOT" >> "$GITHUB_ENV"
+
+      - name: Deploy EXACTLY one already-existing LAB Preview function
+        run: |
+          set -euo pipefail
+          node "$FIREBASE_CLI_BIN" deploy --only functions:orbit360ProductOperationalCommandPreview --config "$B4003_PACKAGE_ROOT/firebase.json" --project "$PROJECT_ID" --non-interactive
+
+      - name: Read back function and prove LAB LIVE Hosting unchanged
+        run: |
+          set -euo pipefail
+          node "$FIREBASE_CLI_BIN" functions:list --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/gi-b4003-functions-after.json"
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const doc=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/gi-b4003-functions-after.json','utf8'));
+          const rows=Array.isArray(doc.result)?doc.result:Array.isArray(doc)?doc:[];
+          if(rows.filter(r=>[r.entryPoint,r.id,r.name].some(v=>String(v||'').includes('orbit360ProductOperationalCommandPreview'))).length!==1)throw Error('B4003_PREVIEW_TARGET_ABSENT_AFTER_DEPLOY');
+          NODE
+          status=$(curl --silent --show-error --output /dev/null --write-out '%{http_code}' --max-time 25 --head https://us-east1-ays-orbit-360-lab.cloudfunctions.net/orbit360ProductOperationalCommandPreview)
+          test "$status" = '400'
+          curl --fail --silent --show-error --location --retry 2 --max-time 30 https://ays-orbit-360-lab.web.app/ | sha256sum > "$RUNNER_TEMP/gi-b4003-live-after.sha256"
+          cmp "$RUNNER_TEMP/gi-b4003-live-before.sha256" "$RUNNER_TEMP/gi-b4003-live-after.sha256"
+          printf '{"gate":"I6.5/B4-003","status":"PREVIEW_FUNCTION_RESYNC_TECHNICAL_PASS_UAT_PENDING","sourceSha":"%s","backendFileBlob":"529a76cffaa847c13fdf468bb2bbdf0685e95903","deployedFunction":"%s","region":"us-east1","deploymentTargetCount":1,"liveHostingUnchanged":true,"liveFunctionsDeployed":false,"sharedFirestoreRulesChanged":false,"authIamChanged":false,"businessDataWrites":0,"syntheticWrites":0,"securityGate":"NO_GO","authenticatedUat":"PENDING"}\n' "$SOURCE_SHA" "$TARGET_FUNCTION" > "$RUNNER_TEMP/gi-b4003-command-resync-result.json"
+          printf '%s\n' 'B4-003: one LAB Preview function resynchronized from certified 2909226c source.' 'LIVE Hosting unchanged. No Rules, Auth, IAM or data writes. Authenticated synthetic UAT remains pending.' >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: gi-b4003-one-function-preview-resync-${{ github.run_id }}
+          path: ${{ runner.temp }}/gi-b4003-command-resync-result.json
+          if-no-files-found: warn
+          retention-days: 30
