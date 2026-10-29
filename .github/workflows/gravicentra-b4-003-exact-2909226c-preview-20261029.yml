@@ -1,0 +1,179 @@
+name: Gravicentra I6.5 B4-003 Exact 2909226c LAB Preview 20261029
+
+on:
+  push:
+    branches: [recovery/fase-a-clean-20260831]
+    paths:
+      - .github/workflows/gravicentra-b4-003-exact-2909226c-preview-20261029.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: gi-b4003-exact-2909226c-preview-20261029
+  cancel-in-progress: false
+
+jobs:
+  pinned-hosting-only-preview:
+    if: >-
+      github.repository == 'paulaosoriof86/orbit360-core' &&
+      github.ref == 'refs/heads/recovery/fase-a-clean-20260831' &&
+      github.event.head_commit.message == 'build(i6.5 B4-003): preview pinned 2909226c hosting only'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    env:
+      EXACT_SOURCE_SHA: 2909226ce17450d655c09f213776a66ad036b93f
+      PROJECT_ID: ays-orbit-360-lab
+      HOSTING_SITE: ays-orbit-360-lab
+      TENANT_HINT: alianzas-soluciones
+      RELEASE_GATE: I6.5-B4-003
+      BUILD_PREFIX: gi-i65-b4
+      ENVIRONMENT_REF: firebase-hosting-preview-i6-5-forensic-b4-003
+      GRAVICENTRA_B4_003_SCOPED_PREVIEW: 'true'
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+    steps:
+      - name: Checkout immutable candidate source
+        uses: actions/checkout@v4
+        with:
+          ref: 2909226ce17450d655c09f213776a66ad036b93f
+          fetch-depth: 1
+          persist-credentials: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Freeze source identity and targeted read-only regressions
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$EXACT_SOURCE_SHA"
+          test "$(git hash-object orbit360-platform/core/product-app-p0.js)" = '3e327c4923686262bcbef0bb5f0ad3c083c38cbd'
+          test "$(git hash-object orbit360-platform/core/product-runtime-browser-providers-p0.js)" = '6295631fbc2d1060a2df37e2a408496eb6b7b78b'
+          node tools/gravicentra-b4-003-dual-host-protected-transport.test.cjs
+          node tools/gravicentra-b4-003-historial-country-selection.test.cjs
+          node tools/gravicentra-b4-003-role-context-recovery.test.cjs
+          node tools/gravicentra-b4-003-c360-cobros-currency-overdue.test.cjs
+          node tools/gravicentra-b4-003-cronograma-durable-task.test.cjs
+          node tools/gravicentra-b4-003-insurer-readiness-facade-bridge.test.cjs
+
+      - name: Snapshot public LIVE portadas before isolated Preview
+        run: |
+          set -euo pipefail
+          curl --fail --silent --show-error --location --retry 2 --max-time 30 https://ays-orbit-360-lab.web.app/ | sha256sum > "$RUNNER_TEMP/firebase-live-before.sha256"
+          curl --fail --silent --show-error --location --retry 2 --max-time 30 https://app.aysseguros.com/ | sha256sum > "$RUNNER_TEMP/owner-domain-before.sha256"
+
+      - name: Resolve existing LAB account and pinned Firebase CLI
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/exact-preview-auth"
+          python3 - <<'PY'
+          import json,os,pathlib
+          root=pathlib.Path(os.environ['RUNNER_TEMP'])/'exact-preview-auth'
+          paths=[]
+          for n,k in enumerate(('SA_ORBIT360_LAB','SA_ORBIT_360_LAB','SA_DEFAULT')):
+              try: value=json.loads(os.environ.get(k,''))
+              except (ValueError,TypeError): continue
+              if value.get('type')=='service_account' and value.get('project_id')==os.environ['PROJECT_ID'] and value.get('private_key'):
+                  p=root/f'{n}.json'
+                  p.write_text(json.dumps(value),encoding='utf8')
+                  p.chmod(0o600)
+                  paths.append(str(p))
+          if not paths: raise SystemExit('EXACT_LAB_ACCOUNT_NOT_CONFIGURED')
+          (root/'candidates').write_text('\n'.join(paths)+'\n',encoding='utf8')
+          PY
+          CLI_ROOT="$RUNNER_TEMP/exact-preview-cli"
+          npm install --prefix "$CLI_ROOT" --no-save --ignore-scripts --no-audit --no-fund firebase-tools@14.10.1 >/dev/null
+          node tools/gravicentra-firebase-tools-empty-extensions-workaround-v1.mjs "$CLI_ROOT"
+          CLI="$CLI_ROOT/node_modules/firebase-tools/lib/bin/firebase.js"
+          selected=''
+          while IFS= read -r candidate; do
+            if GOOGLE_APPLICATION_CREDENTIALS="$candidate" node "$CLI" apps:list WEB --project "$PROJECT_ID" --non-interactive --json >/dev/null 2>&1; then
+              selected="$candidate"
+              break
+            fi
+          done < "$RUNNER_TEMP/exact-preview-auth/candidates"
+          test -n "$selected"
+          cp "$selected" "$RUNNER_TEMP/exact-preview-auth/selected.json"
+          chmod 600 "$RUNNER_TEMP/exact-preview-auth/selected.json"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/exact-preview-auth/selected.json" >> "$GITHUB_ENV"
+          echo "FIREBASE_CLI_BIN=$CLI" >> "$GITHUB_ENV"
+          npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund firebase-admin@13.4.0 >/dev/null
+
+      - name: Read public SDK config for LAB only
+        run: |
+          set -euo pipefail
+          node "$FIREBASE_CLI_BIN" apps:list WEB --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/exact-preview-apps.json"
+          export APPS_FILE="$RUNNER_TEMP/exact-preview-apps.json"
+          APP_ID=$(python3 - <<'PY'
+          import json,os
+          result=json.load(open(os.environ['APPS_FILE'])).get('result') or []
+          web=[a for a in result if str(a.get('platform','')).upper() in ('WEB','PLATFORM_WEB','')]
+          if len(web)!=1: raise SystemExit('EXACT_LAB_WEB_APP_CARDINALITY_INVALID')
+          print(web[0].get('appId',''))
+          PY
+          )
+          test -n "$APP_ID"
+          node "$FIREBASE_CLI_BIN" apps:sdkconfig WEB "$APP_ID" --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/exact-preview-sdkconfig.json"
+
+      - name: Materialize Hosting-only package from immutable candidate
+        run: |
+          set -euo pipefail
+          export SOURCE_SHA="$EXACT_SOURCE_SHA"
+          node tools/gravicentra-i6-5-b1-branding-snapshot.mjs "$RUNNER_TEMP/exact-preview-branding.json"
+          export TENANT_BRANDING_SNAPSHOT_FILE="$RUNNER_TEMP/exact-preview-branding.json"
+          node tools/gravicentra-i6-1-preview-package.mjs . "$RUNNER_TEMP/exact-preview-package" "$RUNNER_TEMP/exact-preview-sdkconfig.json" > "$RUNNER_TEMP/exact-preview-package-output.json"
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const root=process.env.RUNNER_TEMP+'/exact-preview-package/bundle';
+          const config=JSON.parse(fs.readFileSync(root+'/firebase.json','utf8'));
+          const meta=JSON.parse(fs.readFileSync(root+'/site/__recovery__/build.json','utf8'));
+          if(Object.keys(config).join(',')!=='hosting'||config.hosting.site!=='ays-orbit-360-lab'||config.hosting.public!=='site')throw Error('HOSTING_ONLY_EXPECTED');
+          if(meta.sourceSha!==process.env.EXACT_SOURCE_SHA||meta.gate!=='I6.5-B4-003')throw Error('EXACT_SOURCE_BUILD_MISMATCH');
+          for(const path of ['core/product-app-p0.js','core/product-runtime-browser-providers-p0.js','modules/historial.js','modules/cronograma.js']){
+            if(!fs.readFileSync('orbit360-platform/'+path).equals(fs.readFileSync(root+'/site/'+path)))throw Error('PRODUCT_BLOB_MISMATCH: '+path);
+          }
+          NODE
+
+      - name: Deploy one isolated seven-day Hosting Preview, never LIVE
+        id: preview
+        run: |
+          set -euo pipefail
+          CHANNEL_ID="gi-i65-b4-2909226c-${GITHUB_RUN_ID}"
+          cd "$RUNNER_TEMP/exact-preview-package/bundle"
+          node "$FIREBASE_CLI_BIN" hosting:channel:deploy "$CHANNEL_ID" --config firebase.json --project "$PROJECT_ID" --expires 7d --non-interactive --json > "$RUNNER_TEMP/exact-preview-deploy.json" 2>&1
+          export CHANNEL_ID
+          PREVIEW_URL=$(python3 - <<'PY'
+          import os,re
+          raw=open(os.environ['RUNNER_TEMP']+'/exact-preview-deploy.json',encoding='utf8').read()
+          prefix='https://ays-orbit-360-lab--'+os.environ['CHANNEL_ID']+'-'
+          urls=sorted(set(u.rstrip('/') for u in re.findall(r'https://[A-Za-z0-9._-]+\.web\.app',raw) if u.startswith(prefix)))
+          if len(urls)!=1: raise SystemExit('EXACT_PREVIEW_URL_NOT_UNIQUE')
+          print(urls[0])
+          PY
+          )
+          test -n "$PREVIEW_URL"
+          echo "url=$PREVIEW_URL" >> "$GITHUB_OUTPUT"
+
+      - name: Verify exact served bytes and both LIVE roots unchanged
+        env:
+          PREVIEW_URL: ${{ steps.preview.outputs.url }}
+        run: |
+          set -euo pipefail
+          ROOT="$RUNNER_TEMP/exact-preview-package/bundle/site"
+          for path in __recovery__/build.json core/product-app-p0.js core/product-runtime-browser-providers-p0.js modules/historial.js modules/cronograma.js; do
+            curl --fail --silent --show-error --location --retry 2 --max-time 30 "$PREVIEW_URL/$path" > "$RUNNER_TEMP/exact-served-$(basename "$path")"
+            cmp "$ROOT/$path" "$RUNNER_TEMP/exact-served-$(basename "$path")"
+          done
+          export META_FILE="$RUNNER_TEMP/exact-served-build.json"
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const m=JSON.parse(fs.readFileSync(process.env.META_FILE,'utf8'));
+          if(m.sourceSha!==process.env.EXACT_SOURCE_SHA||m.gate!=='I6.5-B4-003')throw Error('SERVING_WRONG_CANDIDATE');
+          NODE
+          curl --fail --silent --show-error --location --retry 2 --max-time 30 https://ays-orbit-360-lab.web.app/ | sha256sum > "$RUNNER_TEMP/firebase-live-after.sha256"
+          curl --fail --silent --show-error --location --retry 2 --max-time 30 https://app.aysseguros.com/ | sha256sum > "$RUNNER_TEMP/owner-domain-after.sha256"
+          cmp "$RUNNER_TEMP/firebase-live-before.sha256" "$RUNNER_TEMP/firebase-live-after.sha256"
+          cmp "$RUNNER_TEMP/owner-domain-before.sha256" "$RUNNER_TEMP/owner-domain-after.sha256"
+          printf '%s\n' "I6.5/B4-003 EXACT_SOURCE_HOSTING_PREVIEW_PASS" "Source SHA: $EXACT_SOURCE_SHA" "Preview: $PREVIEW_URL" "Firebase LIVE and app.aysseguros.com unchanged; no Functions, Rules, Auth, IAM or data writes" "Authenticated multi-UID UAT still pending; production remains HOLD" >> "$GITHUB_STEP_SUMMARY"
