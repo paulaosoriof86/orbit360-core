@@ -24,14 +24,19 @@ Orbit.modules.insights = (function () {
   const MES = MES0;            // compat: algunos cálculos usan el mes actual base
 
   /* ---- país + accesos ---- */
-  function paisOK(p) { return !Orbit.pais || Orbit.pais === 'TODOS' || p === Orbit.pais; }
-  function clientePais(cliId) { const c = S().get('clientes', cliId); return c ? c.pais : 'GT'; }
-  function polizas() { return S().all('polizas').filter(p => paisOK(clientePais(p.clienteId)) && aseOK(p.asesorId)); }
+  // Country is verified at the policy/financial-parent boundary. Never send
+  // orphan records to GT or include unverified parents in TODOS.
+  function paisClave(value) { const c = String(value == null ? '' : value).trim().toUpperCase(); return (c === 'GT' || c === 'CO') ? c : ''; }
+  function paisOK(value) { const c = paisClave(value), p = String(Orbit.pais || '').trim().toUpperCase(); return !!c && (!p || p === 'TODOS' || p === c); }
+  function clientePais(cliId) { const c = S().get('clientes', cliId); return paisClave(c && c.pais); }
+  function polizaPais(p) { if (!p) return ''; const own = String(p.pais == null ? '' : p.pais).trim(); return own ? paisClave(own) : clientePais(p.clienteId); }
+  function registroPais(row) { return row && typeof q.policyLinkedCountry === 'function' ? paisClave(q.policyLinkedCountry(row)) : ''; }
+  function polizas() { return S().all('polizas').filter(p => p && paisOK(polizaPais(p)) && aseOK(p.asesorId)); }
   function vigentes() { return polizas().filter(p => p.estado === 'Vigente' || p.estado === 'Por renovar'); }
-  function cobros() { return S().all('cobros').filter(c => paisOK(clientePais(c.clienteId)) && aseOK(c.asesorId)); }
-  function comisiones() { return S().all('comisiones').filter(c => paisOK(clientePais(c.clienteId)) && aseOK(c.asesorId)); }
+  function cobros() { return S().all('cobros').filter(c => paisOK(registroPais(c)) && aseOK(c.asesorId)); }
+  function comisiones() { return S().all('comisiones').filter(c => paisOK(registroPais(c)) && aseOK(c.asesorId)); }
   function negocios() { return (Orbit.ciclo ? Orbit.ciclo.negocios({ ignoreRol: true }) : []); }
-  function cancelaciones() { return S().all('cancelaciones').filter(c => paisOK(clientePais(c.clienteId))); }
+  function cancelaciones() { return S().all('cancelaciones').filter(c => paisOK(registroPais(c))); }
   function clientes() { return S().all('clientes').filter(c => paisOK(c.pais)); }
   const esNueva = p => !(p.contadorRenovaciones > 0);
   const netaDe = p => norm(p.primaNeta != null ? p.primaNeta : p.prima, p.moneda);
@@ -301,9 +306,9 @@ Orbit.modules.insights = (function () {
     const seg = '<div class="ins-seg">' + [['general','General'],['asesor','Por asesor'],['ramo','Por ramo'],['aseguradora','Por aseguradora']].map(o => '<button class="ins-seg-b ' + (criterio === o[0] ? 'active' : '') + '" data-crit="' + o[0] + '">' + o[1] + '</button>').join('') + '</div>';
 
     // New vs Renovated breakdown
-    const polizas = S().all('polizas').filter(p => p && p.vigenciaInicio && p.vigenciaInicio.startsWith(YEAR+''));
-    const nuevas26 = polizas.filter(p => !p.contadorRenovaciones || p.contadorRenovaciones === 0);
-    const renov26 = polizas.filter(p => p.contadorRenovaciones && p.contadorRenovaciones > 0);
+    const polizasDelAno = polizas().filter(p => p && p.vigenciaInicio && p.vigenciaInicio.startsWith(YEAR+''));
+    const nuevas26 = polizasDelAno.filter(p => !p.contadorRenovaciones || p.contadorRenovaciones === 0);
+    const renov26 = polizasDelAno.filter(p => p.contadorRenovaciones && p.contadorRenovaciones > 0);
     const primaNuevas = nuevas26.reduce((s, p) => s + (p.primaTotal || p.prima || 0), 0);
     const primaRenov = renov26.reduce((s, p) => s + (p.primaTotal || p.prima || 0), 0);
 
@@ -423,7 +428,7 @@ Orbit.modules.insights = (function () {
     for (let i = 0; i < 6; i++) { const d = new Date(base.getFullYear(), base.getMonth() + i, 1); meses[d.toISOString().slice(0, 7)] = { label: d.toLocaleDateString('es', { month: 'short', year: '2-digit' }), n: 0, val: 0 }; }
     pols.forEach(p => { const k = (p.vigenciaFin || '').slice(0, 7); if (meses[k]) { meses[k].n++; meses[k].val += netaDe(p); } });
     const rows = Object.values(meses).map((m, i) => ({ label: m.label + ' · ' + m.n, val: m.val, color: palette[i % palette.length] }));
-    const prox = q.renovacionesProximas(60).filter(p => paisOK(clientePais(p.clienteId)));
+    const prox = q.renovacionesProximas(60).filter(p => paisOK(polizaPais(p)) && aseOK(p.asesorId));
     const cancel = cancelaciones();
     const fuga = cancel.reduce((s, c) => { const cli = S().get('clientes', c.clienteId); return s + norm(c.valorPerdido || 0, (cli && cli.moneda) || 'GTQ'); }, 0);
     const tasaCancel = pols.length ? Math.round(cancel.length / (pols.length + cancel.length) * 100) : 0;
@@ -454,7 +459,7 @@ Orbit.modules.insights = (function () {
     const tasaRecaudo = Math.round(recaudado / totalCart * 100);
     const cancel = cancelaciones(); const pols = polizas().filter(p => p.estado !== 'Cancelada');
     const tasaCancel = pols.length ? Math.round(cancel.length / (pols.length + cancel.length) * 100) : 0;
-    const venc30 = q.renovacionesProximas(30).filter(p => paisOK(clientePais(p.clienteId)));
+    const venc30 = q.renovacionesProximas(30).filter(p => paisOK(polizaPais(p)) && aseOK(p.asesorId));
     const vencPrima = venc30.reduce((s, p) => s + netaDe(p), 0);
     // concentración por aseguradora + vendedor con menor índice de recaudo (hallazgos tipo Finanzas)
     const asgAgg = Object.entries(aggBy(vig, p => (q.aseguradora(p.aseguradoraId) || {}).nombre || '—', p => netaDe(p))).sort((a, b) => b[1] - a[1]);
@@ -577,12 +582,12 @@ Orbit.modules.insights = (function () {
       const s26 = serieAnual(YEAR); const s25 = serieAnual(PREV);
       const m = MESES[i]; const v26 = s26.arr[i]||0; const v25 = s25.arr[i]||0;
       const vp = v25>0 ? Math.round((v26-v25)/v25*100) : 0;
-      const pols = S().all('polizas').filter(p => p && p.vigenciaInicio && p.vigenciaInicio.startsWith(YEAR+'-'+String(i+1).padStart(2,'0')));
+      const pols = polizas().filter(p => p && p.vigenciaInicio && p.vigenciaInicio.startsWith(YEAR+'-'+String(i+1).padStart(2,'0')));
       const rows = pols.slice(0,30).map(p => { const c=S().get('clientes',p.clienteId)||{}; return [p.numero||'—',U.esc(c.nombre||'—'),p.ramo||'—',U.money(p.primaTotal||p.prima||0,p.moneda||'GTQ')]; });
       openKpiDetail({ titulo: m+' '+YEAR+' — Detalle de prima neta', rows, headers: ['Póliza','Cliente','Ramo','Prima'] });
     },
     _drillRow: function(label, crit) {
-      const pols = S().all('polizas').filter(p => {
+      const pols = polizas().filter(p => {
         if (!p||!p.vigenciaInicio||!p.vigenciaInicio.startsWith(YEAR+'')) return false;
         if (crit==='asesor') { const a=S().get('asesores',p.asesorId)||{}; return (a.nombre||'—')===label; }
         if (crit==='ramo') return (p.ramo||'—')===label;

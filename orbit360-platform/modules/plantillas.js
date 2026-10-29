@@ -23,37 +23,43 @@ Orbit.modules.plantillas = (function () {
   const CATS = ['Comercial', 'Cobranza', 'Retención', 'Calidad', 'Onboarding', 'Siniestros', 'General'];
   let filtroCanal = '', filtroCat = '', q = '';
 
-  function boot() { if (S().all('plantillas').length) return; const old = S().pref('plantillas_legacy', null); (old && old.length ? old : SEED).forEach(p => S().insert('plantillas', Object.assign({ canal: 'Ambos', cat: 'General', asunto: '' }, p))); }
-  function lista() { return S().all('plantillas').filter(p => (!filtroCanal || p.canal === filtroCanal || (filtroCanal !== 'PDF' && p.canal === 'Ambos')) && (!filtroCat || p.cat === filtroCat) && (!q || (p.nombre + ' ' + p.texto).toLowerCase().includes(q.toLowerCase()))); }
+  // El catálogo histórico puede leerse sin crear registros en el tenant.
+  // En producto, el CRUD requiere un propietario de persistencia autorizado.
+  function puedeEditar() { return !S().__productOperationalWriteP0; }
+  function visibles() { const persisted = S().all('plantillas') || []; return persisted.length ? persisted : SEED.map(p => Object.assign({ __baseSoloLectura: true }, p)); }
+  function obtener(id) { return S().get('plantillas', id) || SEED.find(p => p.id === id) || null; }
+  function lista() { return visibles().filter(p => (!filtroCanal || p.canal === filtroCanal || (filtroCanal !== 'PDF' && p.canal === 'Ambos')) && (!filtroCat || p.cat === filtroCat) && (!q || (p.nombre + ' ' + p.texto).toLowerCase().includes(q.toLowerCase()))); }
   function toast(msg) { const t = document.createElement('div'); t.className = 'ciclo-toast'; t.textContent = msg; document.body.appendChild(t); setTimeout(() => t.remove(), 2600); }
 
   function render(host) {
-    boot();
-    const all = S().all('plantillas');
+    const all = visibles();
+    const baseSoloLectura = all.some(p => p.__baseSoloLectura);
+    const editorActivo = puedeEditar();
     const porCanal = c => all.filter(p => p.canal === c || (c !== 'PDF' && p.canal === 'Ambos')).length;
     host.innerHTML = `<div class="page">
-      ${K.bannerFor('plantillas', `<button class="btn primary" onclick="Orbit.modules.plantillas.editar(null)">+ Nueva plantilla</button>`)}
+      ${K.bannerFor('plantillas', editorActivo ? `<button class="btn primary" onclick="Orbit.modules.plantillas.editar(null)">+ Nueva plantilla</button>` : `<button class="btn ghost" disabled title="Requiere persistencia autorizada del servidor">+ Nueva plantilla · pendiente</button>`)}
       ${K.kpis([
         { label: 'Plantillas', val: all.length, color: 'var(--red)', foot: CATS.filter(c => all.some(p => p.cat === c)).length + ' categorías', onclick: "Orbit.modules.plantillas.setCanal('')" },
         { label: 'WhatsApp', val: porCanal('WhatsApp'), color: 'var(--ok)', foot: 'canal preparado', onclick: "Orbit.modules.plantillas.setCanal('WhatsApp')" },
         { label: 'Correo', val: porCanal('Correo'), color: 'var(--info)', foot: 'con asunto', onclick: "Orbit.modules.plantillas.setCanal('Correo')" },
         { label: 'PDF', val: porCanal('PDF'), color: 'var(--warn)', foot: 'documento', onclick: "Orbit.modules.plantillas.setCanal('PDF')" }
       ])}
-      <div class="cfg-note" style="margin:4px 0 16px">✉ Plantillas reutilizables. WhatsApp Web abre el chat, pero el envío real se confirma en WhatsApp/proveedor.</div>
+      <div class="cfg-note" style="margin:4px 0 16px">✉ ${baseSoloLectura ? 'Se muestran seis plantillas del catálogo histórico en modo consulta: no son registros guardados. ' : ''}${!editorActivo ? 'Alta, edición y duplicación requieren el contrato seguro de persistencia del servidor. ' : ''}WhatsApp Web abre el chat, pero el envío real se confirma en WhatsApp/proveedor.</div>
       <div class="card pad" style="margin-bottom:14px;display:flex;gap:8px;align-items:center;flex-wrap:wrap"><input id="pl-q" class="o-sel" style="flex:1;min-width:180px" placeholder="🔎 Buscar plantilla…" value="${U.esc(q)}"><select id="pl-fcanal" class="o-sel" style="width:auto"><option value="">Todos los canales</option>${CANALES.map(c => `<option ${filtroCanal === c ? 'selected' : ''}>${c}</option>`).join('')}</select><select id="pl-fcat" class="o-sel" style="width:auto"><option value="">Todas las categorías</option>${CATS.map(c => `<option ${filtroCat === c ? 'selected' : ''}>${c}</option>`).join('')}</select></div>
       <div class="pl-grid">${cardsHtml()}</div>
     </div>`;
     const qi = host.querySelector('#pl-q'); if (qi) qi.addEventListener('input', () => { q = qi.value; const g = host.querySelector('.pl-grid'); if (g) g.innerHTML = cardsHtml(); });
     const fc = host.querySelector('#pl-fcanal'); if (fc) fc.addEventListener('change', () => { filtroCanal = fc.value; render(host); });
     const ft = host.querySelector('#pl-fcat'); if (ft) ft.addEventListener('change', () => { filtroCat = ft.value; render(host); });
-    host.querySelectorAll('[data-copy]').forEach(b => b.addEventListener('click', () => { const p = S().get('plantillas', b.dataset.copy); if (navigator.clipboard) navigator.clipboard.writeText(p.texto); b.textContent = '✓ Copiado'; setTimeout(() => b.textContent = '⧉ Copiar', 1200); }));
+    host.querySelectorAll('[data-copy]').forEach(b => b.addEventListener('click', () => { const p = obtener(b.dataset.copy); if (p && navigator.clipboard) navigator.clipboard.writeText(p.texto); b.textContent = '✓ Copiado'; setTimeout(() => b.textContent = '⧉ Copiar', 1200); }));
   }
 
   function cardsHtml() {
-    return lista().map(p => `<div class="pl-card"><div class="pl-h"><span class="pl-ico">${p.icon || '✉'}</span><div style="flex:1"><b>${U.esc(p.nombre)}</b><div class="pl-meta"><span class="badge ${p.canal === 'WhatsApp' ? 'ok' : p.canal === 'Correo' ? 'info' : p.canal === 'PDF' ? 'warn' : 'neutral'}">${p.canal}</span> <span class="badge neutral">${p.cat}</span></div></div></div>${p.canal !== 'WhatsApp' && p.asunto ? `<div style="font-size:11.5px;color:var(--muted);margin:2px 0 6px"><b>Asunto:</b> ${U.esc(p.asunto)}</div>` : ''}<div class="pl-body">${U.esc(p.texto)}</div><div class="pl-actions"><button class="btn ghost sm" data-copy="${p.id}">⧉ Copiar</button><button class="btn ghost sm" onclick="Orbit.modules.plantillas.editar('${p.id}')">✎ Editar</button><button class="btn ghost sm" onclick="Orbit.modules.plantillas.duplicar('${p.id}')">⧉+</button><button class="btn primary sm" onclick="Orbit.modules.plantillas.usar('${p.id}')">Usar</button></div></div>`).join('') || '<div class="muted" style="padding:30px;text-align:center;grid-column:1/-1">Sin plantillas para el filtro. Crea una nueva.</div>';
+    return lista().map(p => `<div class="pl-card"><div class="pl-h"><span class="pl-ico">${p.icon || '✉'}</span><div style="flex:1"><b>${U.esc(p.nombre)}</b><div class="pl-meta"><span class="badge ${p.canal === 'WhatsApp' ? 'ok' : p.canal === 'Correo' ? 'info' : p.canal === 'PDF' ? 'warn' : 'neutral'}">${p.canal}</span> <span class="badge neutral">${p.cat}</span>${p.__baseSoloLectura ? ' <span class="badge neutral">Base · consulta</span>' : ''}</div></div></div>${p.canal !== 'WhatsApp' && p.asunto ? `<div style="font-size:11.5px;color:var(--muted);margin:2px 0 6px"><b>Asunto:</b> ${U.esc(p.asunto)}</div>` : ''}<div class="pl-body">${U.esc(p.texto)}</div><div class="pl-actions"><button class="btn ghost sm" data-copy="${p.id}">⧉ Copiar</button>${puedeEditar() ? `<button class="btn ghost sm" onclick="Orbit.modules.plantillas.editar('${p.id}')">✎ Editar</button><button class="btn ghost sm" onclick="Orbit.modules.plantillas.duplicar('${p.id}')">⧉+</button>` : ''}<button class="btn primary sm" onclick="Orbit.modules.plantillas.usar('${p.id}')">Usar</button></div></div>`).join('') || '<div class="muted" style="padding:30px;text-align:center;grid-column:1/-1">Sin plantillas para el filtro. Crea una nueva.</div>';
   }
 
   function editar(id) {
+    if (!puedeEditar()) { toast('Edición pendiente de contrato seguro de persistencia.'); return; }
     const p = id ? S().get('plantillas', id) : { icon: '✉', nombre: '', canal: 'Ambos', cat: 'General', asunto: '', texto: 'Hola {nombre}, ' };
     let back = document.getElementById('pl-ed'); if (back) back.remove();
     back = document.createElement('div'); back.id = 'pl-ed'; back.className = 'drawer-back open'; back.style.display = 'grid'; back.style.placeItems = 'center'; back.style.zIndex = 97;
@@ -67,7 +73,7 @@ Orbit.modules.plantillas = (function () {
     $('#pe-ok').addEventListener('click', () => { const data = { icon: $('#pe-icon').value || '✉', nombre: $('#pe-nombre').value || 'Plantilla', canal: $('#pe-canal').value, cat: $('#pe-cat').value, asunto: $('#pe-asunto') ? $('#pe-asunto').value : '', texto: $('#pe-texto').value }; if (id) S().update('plantillas', id, data); else S().insert('plantillas', Object.assign({ id: 'pl' + Date.now().toString().slice(-7) }, data)); close(); render(document.getElementById('host')); });
   }
 
-  function duplicar(id) { const p = S().get('plantillas', id); if (!p) return; const cp = Object.assign({}, p, { id: 'pl' + Date.now().toString().slice(-7), nombre: p.nombre + ' (copia)' }); S().insert('plantillas', cp); render(document.getElementById('host')); }
+  function duplicar(id) { if (!puedeEditar()) { toast('Duplicación pendiente de contrato seguro.'); return; } const p = S().get('plantillas', id); if (!p) return; const cp = Object.assign({}, p, { id: 'pl' + Date.now().toString().slice(-7), nombre: p.nombre + ' (copia)' }); S().insert('plantillas', cp); render(document.getElementById('host')); }
 
   function resolver(txt, cli) {
     if (!txt) return '';
@@ -80,8 +86,8 @@ Orbit.modules.plantillas = (function () {
   }
 
   function usar(id) {
-    const p = S().get('plantillas', id); if (!p) return;
-    const clientes = S().all('clientes').slice(0, 400);
+    const p = obtener(id); if (!p) return;
+    const clientes = Orbit.access && typeof Orbit.access.filter === 'function' ? Orbit.access.filter('clientes', S().all('clientes'), 'plantillas').slice(0, 400) : [];
     let back = document.getElementById('pl-use'); if (back) back.remove();
     back = document.createElement('div'); back.id = 'pl-use'; back.className = 'drawer-back open'; back.style.display = 'grid'; back.style.placeItems = 'center'; back.style.zIndex = 97;
     back.innerHTML = `<div class="card" style="width:min(560px,95vw);padding:0"><div style="padding:16px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center"><div><div class="crumb" style="margin-bottom:2px">Usar plantilla</div><b style="font-family:var(--f-display);font-size:16px">${p.icon || '✉'} ${U.esc(p.nombre)}</b></div><button class="imp-x" id="pu-x">✕</button></div><div style="padding:18px 20px;display:grid;gap:12px"><label class="ce-l">Cliente<select id="pu-cli" class="o-sel"><option value="">— Elegir cliente —</option>${clientes.map(c => `<option value="${c.id}">${U.esc(c.nombre)}</option>`).join('')}</select></label>${p.canal !== 'WhatsApp' && p.asunto ? `<div id="pu-asunto" style="font-size:12.5px;background:var(--soft);padding:8px 11px;border-radius:8px"><b>Asunto:</b> <span>${U.esc(p.asunto)}</span></div>` : ''}<div id="pu-prev" style="white-space:pre-wrap;font-size:13.5px;background:var(--soft);padding:12px 13px;border-radius:8px;line-height:1.5;border:1px solid var(--line)">${U.esc(p.texto)}</div><div class="cfg-note">La vista previa se completa con datos del cliente. WhatsApp abre el chat; confirma el envío en WhatsApp.</div></div><div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap"><button class="btn ghost" id="pu-copy">⧉ Copiar</button>${p.canal !== 'Correo' && p.canal !== 'PDF' ? '<button class="btn ghost" id="pu-wa">💬 WhatsApp</button>' : ''}${p.canal !== 'WhatsApp' ? '<button class="btn primary" id="pu-mail">✉ Redactar correo</button>' : ''}</div></div>`;
