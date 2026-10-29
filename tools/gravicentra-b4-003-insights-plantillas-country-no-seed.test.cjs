@@ -95,8 +95,9 @@ function renderTemplates(product, persisted) {
     },
     ui: { esc: value => String(value) }
   };
-  const window = { Orbit };
-  const context = vm.createContext({ window, Orbit, Date, Set, Map });
+  const document = { addEventListener() {} };
+  const window = { Orbit, addEventListener() {} };
+  const context = vm.createContext({ window, document, Orbit, Date, Set, Map });
   vm.runInContext(plantillasSrc, context, { filename: 'plantillas.js' });
   const host = { innerHTML: '', querySelector: () => null, querySelectorAll: () => [] };
   Orbit.modules.plantillas.render(host);

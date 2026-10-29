@@ -22,7 +22,7 @@
     "firestoreAccess": 0,
     "rootQaPath": "tools/gravicentra-b4-003-insights-plantillas-country-no-seed.test.cjs",
     "rootQaBeforeBlob": "839a82a705ddd0e26ee62b8c8db57cc266dfdde0",
-    "rootQaAfterBlob": "3111dca6286e0d206b669f0525e30472ff4b527a"
+    "rootQaAfterBlob": "858ea2c2efebbbbc5e2ff4992543bed21f2090af"
   },
   "compositionBinding": {
     "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
