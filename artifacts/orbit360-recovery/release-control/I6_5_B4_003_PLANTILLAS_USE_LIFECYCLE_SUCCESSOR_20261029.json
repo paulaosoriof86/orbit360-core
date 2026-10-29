@@ -1,0 +1,77 @@
+{
+  "schema": "GRAVICENTRA_I65_B4003_PLANTILLAS_USE_LIFECYCLE_SOURCE_SUCCESSOR_V1",
+  "gate": "I6.5/B4-003",
+  "status": "SOURCE_INTEGRATED_TESTS_BOUND_PREVIEW_PENDING_AUTHENTICATED_UAT",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "expectedParentHead": "d4a686e5e4e3c8e060a4cb0dc2a7943eba1ad0f9",
+  "source": {
+    "path": "orbit360-platform/modules/plantillas.js",
+    "beforeBlob": "702c90d4c655013fc168430cb44a48aab7bdfcd0",
+    "afterBlob": "a7b51d38cb5062485376855541b690e2656dd072"
+  },
+  "regression": {
+    "path": "artifacts/orbit360-recovery/release-control/b4003-uat-20261029/tests/plantillas-use-lifecycle.test.cjs",
+    "blob": "a26aebb69de546c32ac8ae6021449ac2be6223ed",
+    "testCases": 18,
+    "passed": 18,
+    "failed": 0,
+    "syntheticOnly": true,
+    "realBusinessWrites": 0,
+    "externalSends": 0,
+    "firestoreAccess": 0
+  },
+  "compositionBinding": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
+    "blob": "33bf80768cb6cb311f2975d282a5f50935f680aa",
+    "bindingType": "ADDITIVE_SUCCESSOR_OUTSIDE_FROZEN_114_FILES",
+    "frozenProductFileCount": 114,
+    "lockRewritten": false
+  },
+  "uatReturnBinding": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_UAT_PARTIAL_CAUSAL_RETURN_20261029.md",
+    "blob": "783c84592201b81cb502ae03e8bfd85f52157557",
+    "status": "PARTIAL_OBSERVATION_LINKED_NOT_ACCEPTED",
+    "historicalChromeEvidenceReplayed": false
+  },
+  "ledgerBinding": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
+    "blob": "0a6544398da91784da5c331680866a8ec1491449",
+    "findingIds": [
+      "B4-003"
+    ],
+    "preservedFindings": 295,
+    "preservedTasks": 86,
+    "newFindingCreated": false,
+    "existingFindingStatusChanged": false
+  },
+  "atomicCommitPaths": [
+    "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json",
+    "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PLANTILLAS_USE_LIFECYCLE_SUCCESSOR_20261029.json",
+    "orbit360-platform/modules/plantillas.js",
+    "tools/gravicentra-i6-control-plane-guard-v1.mjs"
+  ],
+  "guard": {
+    "historicalSafeReadReceiptImmutable": true,
+    "historicalSourceBlobsVerifiedAgainstOriginalCommit": true,
+    "previousHistoricalChecksDisabled": false
+  },
+  "boundaries": {
+    "previewOnly": true,
+    "livePromotion": false,
+    "firestoreRulesChange": false,
+    "authIamChange": false,
+    "operationalWrites": false,
+    "dataImport": false,
+    "externalMessages": false,
+    "acceptanceGranted": false,
+    "securityB4003StillHold": true
+  },
+  "pending": [
+    "EXACT_PREVIEW_CI_AND_SERVED_READBACK",
+    "AUTHENTICATED_CHROME_PLANTILLAS_LIFECYCLE_UAT",
+    "AUTHORIZED_FIXTURE_AUDIT_AND_BACKEND_VERSION",
+    "FINANCIAL_RESOLUTION_WITH_CANONICAL_CONTRACTS",
+    "INDEPENDENT_CARLOS_UID_UAT"
+  ]
+}

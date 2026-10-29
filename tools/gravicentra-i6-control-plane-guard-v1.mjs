@@ -4313,7 +4313,7 @@ if(canonicalCompositionActive){
   Object.keys(bound).sort().join('|')===safeReadProductPaths.slice().sort().join('|')&&
   safeReadProductPaths.every(p=>bound[p]?.before===physicalGit('rev-parse',parent+':'+p)&&
     bound[p]?.after===physicalGit('rev-parse',source+':'+p)&&
-    bound[p]?.after===(CUMULATIVE_BEFORE.get(p)||physicalGit('hash-object',p))&&
+    bound[p]?.after===physicalGit('rev-parse',source+':'+p)&&
     bound[p]?.before!==bound[p]?.after)&&
   safeRead.regressionTest?.path===testPath&&safeRead.regressionTest?.blob===testBlob&&
   safeRead.regressionTest?.syntheticOnly===true&&safeRead.regressionTest?.realBusinessWrites===0&&
@@ -4332,6 +4332,80 @@ if(canonicalCompositionActive){
  for(const p of safeReadProductPaths)independentlyPinnedSafeReadProduct.add(p);
  independentlyPinnedSafeReadProduct.add('orbit360-platform/core/legal.js');
  console.log('B4_003_SAFE_READ_SUCCESSOR=EXACT_TWO_BLOBS_ONE_TEST_FROZEN114_PRESERVED_SECURITY_HOLD');
+ const lifecycle= C.b4003PlantillasUseLifecycleSuccessor20261029;
+ const lifecycleReceiptPath='artifacts/orbit360-recovery/release-control/I6_5_B4_003_PLANTILLAS_USE_LIFECYCLE_SUCCESSOR_20261029.json';
+ const lifecycleReceipt=readJson(lifecycleReceiptPath);
+ const lifecycleSourcePath='orbit360-platform/modules/plantillas.js';
+ const lifecycleTestPath='artifacts/orbit360-recovery/release-control/b4003-uat-20261029/tests/plantillas-use-lifecycle.test.cjs';
+ const lifecycleParent='d4a686e5e4e3c8e060a4cb0dc2a7943eba1ad0f9';
+ const lifecycleExpectedCommitPaths=['artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json','artifacts/orbit360-recovery/release-control/I6_5_B4_003_PLANTILLAS_USE_LIFECYCLE_SUCCESSOR_20261029.json','orbit360-platform/modules/plantillas.js','tools/gravicentra-i6-control-plane-guard-v1.mjs'].sort();
+ const lifecycleActualCommitPaths=physicalGit('diff','--name-only',lifecycleParent+'..'+current).split(/\r?\n/).filter(Boolean).sort();
+ const lifecycleTestOutput=execFileSync(process.execPath,[lifecycleTestPath],{encoding:'utf8',stdio:'pipe',env:{...process.env,PLANTILLAS_SOURCE:lifecycleSourcePath}});
+ need(lifecycle?.status==='SOURCE_INTEGRATED_TESTS_BOUND_PREVIEW_PENDING_AUTHENTICATED_UAT'&&
+  lifecycle?.gate==='I6.5/B4-003'&&lifecycle?.parentHead===lifecycleParent&&
+  lifecycle?.receiptPath===lifecycleReceiptPath&&
+  /^[0-9a-f]{40}$/.test(String(lifecycle.receiptBlobSha||''))&&
+  physicalGit('rev-parse',current+'^')===lifecycleParent&&
+  lifecycleReceipt.schema==='GRAVICENTRA_I65_B4003_PLANTILLAS_USE_LIFECYCLE_SOURCE_SUCCESSOR_V1'&&
+  lifecycleReceipt.gate==='I6.5/B4-003'&&lifecycleReceipt.status===lifecycle.status&&
+  lifecycleReceipt.repository==='paulaosoriof86/orbit360-core'&&lifecycleReceipt.branch==='recovery/fase-a-clean-20260831'&&
+  lifecycleReceipt.expectedParentHead===lifecycleParent&&
+  lifecycleReceipt.source?.path===lifecycleSourcePath&&
+  lifecycleReceipt.source?.beforeBlob===physicalGit('rev-parse',lifecycleParent+':'+lifecycleSourcePath)&&
+  lifecycleReceipt.source?.beforeBlob==='702c90d4c655013fc168430cb44a48aab7bdfcd0'&&
+  lifecycleReceipt.source?.afterBlob===physicalGit('hash-object',lifecycleSourcePath)&&
+  lifecycleReceipt.source?.afterBlob===physicalGit('rev-parse',current+':'+lifecycleSourcePath)&&
+  lifecycleReceipt.source?.afterBlob===lifecycle.afterBlob&&
+  lifecycleReceipt.regression?.path===lifecycleTestPath&&
+  lifecycleReceipt.regression?.blob===lifecycle.regressionBlob&&
+  lifecycleReceipt.regression?.blob==='a26aebb69de546c32ac8ae6021449ac2be6223ed'&&
+  physicalGit('hash-object',lifecycleTestPath)===lifecycleReceipt.regression.blob&&
+  physicalGit('rev-parse',current+':'+lifecycleTestPath)===lifecycleReceipt.regression.blob&&
+  lifecycleReceipt.regression?.testCases===18&&lifecycleReceipt.regression?.passed===18&&
+  lifecycleReceipt.regression?.failed===0&&lifecycleReceipt.regression?.syntheticOnly===true&&
+  lifecycleReceipt.regression?.realBusinessWrites===0&&lifecycleReceipt.regression?.externalSends===0&&
+  lifecycleTestOutput.includes('# tests 18')&&lifecycleTestOutput.includes('# pass 18')&&
+  lifecycleTestOutput.includes('# fail 0')&&
+  lifecycleReceipt.compositionBinding?.path==='artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json'&&
+  lifecycleReceipt.compositionBinding?.blob===physicalGit('hash-object','artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json')&&
+  lifecycleReceipt.compositionBinding?.blob==='33bf80768cb6cb311f2975d282a5f50935f680aa'&&
+  lifecycleReceipt.compositionBinding?.frozenProductFileCount===114&&
+  lifecycleReceipt.compositionBinding?.lockRewritten===false&&
+  lifecycleReceipt.uatReturnBinding?.path==='artifacts/orbit360-recovery/release-control/I6_5_B4_003_UAT_PARTIAL_CAUSAL_RETURN_20261029.md'&&
+  lifecycleReceipt.uatReturnBinding?.blob===physicalGit('hash-object','artifacts/orbit360-recovery/release-control/I6_5_B4_003_UAT_PARTIAL_CAUSAL_RETURN_20261029.md')&&
+  lifecycleReceipt.uatReturnBinding?.blob==='783c84592201b81cb502ae03e8bfd85f52157557'&&
+  lifecycleReceipt.uatReturnBinding?.status==='PARTIAL_OBSERVATION_LINKED_NOT_ACCEPTED'&&
+  lifecycleReceipt.ledgerBinding?.path==='artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json'&&
+  lifecycleReceipt.ledgerBinding?.blob===physicalGit('hash-object','artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json')&&
+  lifecycleReceipt.ledgerBinding?.blob==='0a6544398da91784da5c331680866a8ec1491449'&&
+  JSON.stringify(lifecycleReceipt.ledgerBinding?.findingIds)===JSON.stringify(['B4-003'])&&
+  (FIND.findings||[]).some(f=>f.id==='B4-003')&&
+  lifecycleReceipt.ledgerBinding?.preservedFindings===295&&
+  lifecycleReceipt.ledgerBinding?.preservedTasks===86&&
+  lifecycleReceipt.ledgerBinding?.newFindingCreated===false&&
+  lifecycleReceipt.ledgerBinding?.existingFindingStatusChanged===false&&
+  lifecycleReceipt.guard?.historicalSafeReadReceiptImmutable===true&&
+  lifecycleReceipt.guard?.historicalSourceBlobsVerifiedAgainstOriginalCommit===true&&
+  lifecycleReceipt.guard?.previousHistoricalChecksDisabled===false&&
+  lifecycleReceipt.boundaries?.previewOnly===true&&lifecycleReceipt.boundaries?.livePromotion===false&&
+  lifecycleReceipt.boundaries?.firestoreRulesChange===false&&lifecycleReceipt.boundaries?.authIamChange===false&&
+  lifecycleReceipt.boundaries?.operationalWrites===false&&lifecycleReceipt.boundaries?.dataImport===false&&
+  lifecycleReceipt.boundaries?.externalMessages===false&&lifecycleReceipt.boundaries?.acceptanceGranted===false&&
+  lifecycleReceipt.boundaries?.securityB4003StillHold===true&&
+  lifecycle.atomicCommitPaths?.slice().sort().join('|')===lifecycleExpectedCommitPaths.join('|')&&
+  lifecycleReceipt.atomicCommitPaths?.slice().sort().join('|')===lifecycleExpectedCommitPaths.join('|')&&
+  lifecycleActualCommitPaths.join('|')===lifecycleExpectedCommitPaths.join('|')&&
+  lifecycle.compositionPath==='artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json'&&lifecycle.compositionBlobSha===lifecycleReceipt.compositionBinding.blob&&
+  lifecycle.uatReturnPath==='artifacts/orbit360-recovery/release-control/I6_5_B4_003_UAT_PARTIAL_CAUSAL_RETURN_20261029.md'&&lifecycle.uatReturnBlobSha===lifecycleReceipt.uatReturnBinding.blob&&
+  lifecycle.linkedExistingLedgerFindingIds?.join('|')==='B4-003'&&
+  lifecycle.preservedFindings===295&&lifecycle.preservedTasks===86&&
+  lifecycle.currentCapabilityAcceptances===0&&lifecycle.securityB4003StillHold===true&&
+  lifecycle.productionPromotionAuthorized===false&&
+  lifecycle.rulesAuthIamOrDataChangesAuthorized===false&&
+  lifecycle.previewAuthorizedAfterGuardAndRegressionPass===true&&
+  physicalGit('rev-parse',current+':'+lifecycleReceiptPath)===lifecycle.receiptBlobSha,
+  'B4_003_PLANTILLAS_USE_LIFECYCLE_SUCCESSOR_INVALID');
+ console.log('B4_003_PLANTILLAS_USE_LIFECYCLE=SOURCE_AND_18_TESTS_ATOMIC_COMPOSITION_BOUND_PARTIAL_UAT_LINKED');
  need(COMP.productFileCount===COMP.productFiles.length,'I6_CANONICAL_COMPOSITION_COUNT_DRIFT');
 }
 const b1Retained=activeI65&&['B1','B2','B3','B4'].includes(forensicActiveBlock)&&Array.isArray(B1.allowedProductFiles);

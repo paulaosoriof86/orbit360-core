@@ -10,9 +10,22 @@
     "authority": "PAULA_EXPLICIT_20261028",
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PAULA_THREE_ROLE_TRANSVERSAL_UAT_DECISION_20261028.md",
     "previewRunId": 40805562769,
-    "paulaUiRoles": ["Direccion", "Operativo", "Asesor"],
-    "carlosPreviouslyObservedRoles": ["Operativo", "Asesor"],
-    "paulaCompletedRoleCountryReads": ["Operativo:GT", "Operativo:CO", "Direccion:CO", "Asesor:GT", "Asesor:CO"],
+    "paulaUiRoles": [
+      "Direccion",
+      "Operativo",
+      "Asesor"
+    ],
+    "carlosPreviouslyObservedRoles": [
+      "Operativo",
+      "Asesor"
+    ],
+    "paulaCompletedRoleCountryReads": [
+      "Operativo:GT",
+      "Operativo:CO",
+      "Direccion:CO",
+      "Asesor:GT",
+      "Asesor:CO"
+    ],
     "requiresIndependentAuthenticatedUidProof": true,
     "noFunctionalPassClaimedBeyondObservedReads": true,
     "releaseAuthorizedByThisUatAlone": false
@@ -16018,5 +16031,34 @@
     },
     "nextAction": "CONTINUE_AUTHENTICATED_MULTI_MODULE_UAT_AND_PROGRESSIVE_EXACT_RECEIPTS_IN_SINGLE_CANONICAL_CONTROL_PLANE",
     "notes": "This freeze records an exact technical candidate, not 15 fresh functional approvals. Module approvals require reproducible current-version UAT; historical I5 and previous B4 receipts remain unmodified."
+  },
+  "b4003PlantillasUseLifecycleSuccessor20261029": {
+    "status": "SOURCE_INTEGRATED_TESTS_BOUND_PREVIEW_PENDING_AUTHENTICATED_UAT",
+    "gate": "I6.5/B4-003",
+    "authority": "PAULA_EXPLICIT_SCOPED_INTEGRATION_AUTHORIZATION",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PLANTILLAS_USE_LIFECYCLE_SUCCESSOR_20261029.json",
+    "receiptBlobSha": "8a2223e31f28670d9c0cc4303ceb2b1d2159fde2",
+    "parentHead": "d4a686e5e4e3c8e060a4cb0dc2a7943eba1ad0f9",
+    "productPath": "orbit360-platform/modules/plantillas.js",
+    "beforeBlob": "702c90d4c655013fc168430cb44a48aab7bdfcd0",
+    "afterBlob": "a7b51d38cb5062485376855541b690e2656dd072",
+    "regressionPath": "artifacts/orbit360-recovery/release-control/b4003-uat-20261029/tests/plantillas-use-lifecycle.test.cjs",
+    "regressionBlob": "a26aebb69de546c32ac8ae6021449ac2be6223ed",
+    "regressionCases": 18,
+    "compositionPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
+    "compositionBlobSha": "33bf80768cb6cb311f2975d282a5f50935f680aa",
+    "compositionBindingType": "ADDITIVE_SUCCESSOR_OUTSIDE_FROZEN_114_FILES",
+    "uatReturnPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_UAT_PARTIAL_CAUSAL_RETURN_20261029.md",
+    "uatReturnBlobSha": "783c84592201b81cb502ae03e8bfd85f52157557",
+    "linkedExistingLedgerFindingIds": [
+      "B4-003"
+    ],
+    "preservedFindings": 295,
+    "preservedTasks": 86,
+    "currentCapabilityAcceptances": 0,
+    "securityB4003StillHold": true,
+    "previewAuthorizedAfterGuardAndRegressionPass": true,
+    "productionPromotionAuthorized": false,
+    "rulesAuthIamOrDataChangesAuthorized": false
   }
 }

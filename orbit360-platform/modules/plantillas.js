@@ -23,6 +23,28 @@ Orbit.modules.plantillas = (function () {
   const CATS = ['Comercial', 'Cobranza', 'Retención', 'Calidad', 'Onboarding', 'Siniestros', 'General'];
   let filtroCanal = '', filtroCat = '', q = '';
 
+  let useLifecycleBound = false;
+  // Only the read-only use dialog belongs to this cleanup. Never dismiss
+  // unrelated drawers, legal gates or editors with unsaved changes.
+  function closeUseDialog() {
+    const back = document.getElementById('pl-use');
+    if (back) back.remove();
+  }
+  function bindUseLifecycle() {
+    if (useLifecycleBound) return;
+    useLifecycleBound = true;
+    document.addEventListener('orbit:route-ready', () => {
+      if (!Orbit.route || Orbit.route.key !== 'plantillas') closeUseDialog();
+    });
+    document.addEventListener('orbit:pais', closeUseDialog);
+    document.addEventListener('orbit:session', closeUseDialog);
+    window.addEventListener('hashchange', () => {
+      const route = String(window.location && window.location.hash || '').replace(/^#\/?/, '').split('?')[0];
+      if (route !== 'plantillas') closeUseDialog();
+    });
+  }
+
+
   // El catálogo histórico puede leerse sin crear registros en el tenant.
   // En producto, el CRUD requiere un propietario de persistencia autorizado.
   function puedeEditar() { return !S().__productOperationalWriteP0; }
@@ -32,6 +54,7 @@ Orbit.modules.plantillas = (function () {
   function toast(msg) { const t = document.createElement('div'); t.className = 'ciclo-toast'; t.textContent = msg; document.body.appendChild(t); setTimeout(() => t.remove(), 2600); }
 
   function render(host) {
+    bindUseLifecycle();
     const all = visibles();
     const baseSoloLectura = all.some(p => p.__baseSoloLectura);
     const editorActivo = puedeEditar();
@@ -86,6 +109,7 @@ Orbit.modules.plantillas = (function () {
   }
 
   function usar(id) {
+    bindUseLifecycle();
     const p = obtener(id); if (!p) return;
     const clientes = Orbit.access && typeof Orbit.access.filter === 'function' ? Orbit.access.filter('clientes', S().all('clientes'), 'plantillas').slice(0, 400) : [];
     let back = document.getElementById('pl-use'); if (back) back.remove();
