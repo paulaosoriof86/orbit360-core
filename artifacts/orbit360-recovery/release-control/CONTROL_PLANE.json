@@ -15892,29 +15892,74 @@
       "authority": "PAULA_FREEZE_ONE_CANONICAL_CANDIDATE_INCREMENTAL_APPROVAL",
       "status": "SOURCE_QA_GOVERNANCE_AND_ISOLATED_PREVIEW_PASS_AUTHENTICATED_UAT_OPEN",
       "originalFrozenPreviewSourcePreserved": "a63a7af5eb066bc87f94131e7b981741b29e4afc",
-      "incrementalSourceCommit": "cee34a50a2bc65b4162798348725a8657ed2d6fe",
-      "incrementalGuardCommit": "1f2d6e2a489ddf988f6fa6fb7a65464027d64b3e",
-      "currentServedSourceCommit": "5ec0bf8c22e6c5b08b876c73220e90b56c9d71e8",
-      "currentTechnicalPreview": {
-        "url": "https://ays-orbit-360-lab--gi-i65-b4-sr-40909475540-l24fpt16.web.app/",
-        "runId": 40909475540,
-        "status": "HOSTING_ONLY_BUILD_BYTE_READBACK_PASS",
+      "incrementalSourceCommit": "779a71495366d8224dfb945ed7d84fee93482020",
+      "incrementalGuardCommit": "779a71495366d8224dfb945ed7d84fee93482020",
+      "currentServedSourceCommit": "95f980719387c042625f5cfeb62340b1066ca361",
+      "previousTechnicalCheckpointPreserved": {
+        "checkpointCommit": "26fbca77c810695cb9c5b2041cfd4cffac602234",
+        "incrementalSourceCommit": "cee34a50a2bc65b4162798348725a8657ed2d6fe",
+        "incrementalGuardCommit": "1f2d6e2a489ddf988f6fa6fb7a65464027d64b3e",
+        "servedSourceCommit": "5ec0bf8c22e6c5b08b876c73220e90b56c9d71e8",
+        "previewRunId": 40909475540,
         "guardRunId": 40909475386,
+        "url": "https://ays-orbit-360-lab--gi-i65-b4-sr-40909475540-l24fpt16.web.app/",
+        "historicalEvidenceUnmodified": true
+      },
+      "sourceSuccessorReceipt": {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_INSIGHTS_FINANCIAL_NATIVE_SOURCE_SUCCESSOR_20261029.json",
+        "blob": "e1bd860f53fdb929487585a244db64005728256c",
+        "exactChangedPaths": 12,
+        "productSources": 6,
+        "newRegressionFiles": 4
+      },
+      "currentTechnicalPreview": {
+        "url": "https://ays-orbit-360-lab--gi-i65-b4-sr-40923629860-q2geokqk.web.app/",
+        "runId": 40923629860,
+        "status": "HOSTING_ONLY_BUILD_BYTE_READBACK_PASS",
+        "buildId": "gi-i65-b4-95f980719387-57f234755dc1",
+        "hostedPayloadDigest": "2a68697679dfda4a8ccf66c296a45c8df4e9942e9c58b828792da45208dc6beb",
+        "bundleDigest": "e618ac17b659ddc4ff55ba28cc9d0af5311a5c5b7f300457c3ca6c5d801af1f1",
+        "hostedFiles": 218,
+        "buildBoundAssetReferences": 138,
+        "guardRunId": 40923629966,
         "guardStatus": "SUCCESS",
+        "i6PostSalidaRunId": 40923630266,
+        "i6PostSalidaStatus": "SUCCESS",
+        "legacyMutationStepsSkipped": 71,
+        "legacyB3006ExecutorMode": "NOOP",
+        "retainedArtifact": {
+          "id": 12919327894,
+          "name": "gi-b4003-cumulative-hosting-40923629860",
+          "zipSha256": "a7e048941b819c08b84e0f1eaf3bc7f158c13dd7c698cf0891a45b53ae164f3a",
+          "expiresDate": "2026-11-05",
+          "includesCredentials": false,
+          "includesBackendFiles": false,
+          "rebuildPerformedForReadback": false
+        },
         "liveHostsUnchanged": true,
         "authIamRulesOrOperationalWrites": false
       },
       "regression": {
         "mode": "SYNTHETIC_OFFLINE_SOURCE_ONLY",
-        "filesExecuted": 45,
-        "testsPassed": 60,
+        "filesExecuted": 49,
+        "historicalFilesPreservedAndExecuted": 45,
+        "newFilesExecuted": 4,
+        "testsPassed": 120,
+        "newTestsPassed": 60,
         "testsFailed": 0,
+        "testsSkipped": 0,
+        "sourceAndTestBlobsIdenticalBeforeAfter": 10,
         "firestoreEmulatorIncluded": false
       },
       "changedModules": {
-        "Insights": "COUNTRY_POLICY_SCOPE_SOURCE_AND_BYTE_PASS_AUTHENTICATED_UAT_PENDING",
+        "Insights": "NATIVE_FINANCIAL_COUNTRY_CURRENCY_SOURCE_AND_BYTE_PASS_AUTHENTICATED_UAT_PENDING",
         "Plantillas": "SIX_HISTORICAL_BASE_CARDS_SAFE_READ_SOURCE_AND_BYTE_PASS_AUTHENTICATED_UAT_PENDING",
-        "PlantillasServerCrud": "SECURE_PERSISTENCE_OWNER_MISSING_HOLD"
+        "PlantillasServerCrud": "DEFERRED_AUTHORIZED_P2_SECURE_SERVER_OWNER_NOT_IMPLEMENTED_NOT_NEW_P0",
+        "Portal": "COUNTRY_SESSION_REFRESH_AND_ROUTE_TEARDOWN_SOURCE_AND_BYTE_PASS_AUTHENTICATED_UAT_PENDING",
+        "LegalPresentation": "DISMISS_WITHOUT_ACCEPTANCE_OR_ACCEPTANCE_CALLBACKS_SOURCE_AND_BYTE_PASS",
+        "ShellCountrySelector": "CANONICAL_COUNTRY_EVENT_REPAINT_SOURCE_AND_BYTE_PASS_AUTHENTICATED_UAT_PENDING",
+        "CobrosRoleRecovery": "PERMITTED_DEPENDENCIES_HYDRATE_WITH_DENIED_STARTUP_PRESERVED_SOURCE_AND_BYTE_PASS_AUTHENTICATED_UAT_PENDING",
+        "CobrosSourceCurrencyWarning": "CONTRADICTORY_DISPLAYED_SOURCE_POLICY_CURRENCY_WARNING_NO_VALUE_MUTATION_SOURCE_AND_BYTE_PASS"
       },
       "historicalCertificationsPreserved": {
         "sourceCompositionFiles": 114,
@@ -15923,7 +15968,9 @@
         "tasks": 86
       },
       "currentFullCapabilityApprovals": 0,
-      "currentBrowserUat": "NOT_COMPLETED_CHROME_EXTENSION_CONTROL_ERROR",
+      "currentBrowserUat": "CURRENT_EXACT_PREVIEW_LOGIN_FORM_OBSERVED_AUTHENTICATED_UAT_NOT_EXECUTED",
+      "currentBrowserConnection": "CHROME_CONNECTED_LOGIN_FORM_READ_CONFIRMED",
+      "browserToolErrorsAreHistorical": true,
       "browserToolErrors": [
         "Runtime.evaluate timeout",
         "DataCloneError while claiming tab"
@@ -15931,11 +15978,29 @@
       "outstanding": [
         "AUTHENTICATED_MULTI_UID_GT_CO_TODOS_FUNCTIONAL_UAT",
         "INSIGHTS_AMOUNT_AND_CURRENCY_READBACK",
-        "PLANTILLAS_SAFE_READ_AND_SERVER_CRUD_DEPENDENCY",
-        "PORTAL_GLOBAL_COUNTRY_STATE_AND_MODAL_TEARDOWN",
-        "COBROS_ASESOR_HYDRATION_AND_COP_PORTFOLIO_RECONCILIATION",
+        "PLANTILLAS_CURRENT_PREVIEW_SAFE_READ_SMOKE_SERVER_CRUD_REMAINS_AUTHORIZED_P2",
+        "PORTAL_COUNTRY_AND_TEARDOWN_AUTHENTICATED_UAT_OF_CORRECTED_SOURCE",
+        "COBROS_ASESOR_HYDRATION_AUTHENTICATED_UAT_AND_SOURCE_CURRENCY_RECONCILIATION",
         "CONTROLLED_BACKUP_RESTORE_EXERCISE_AND_LATER_GATES"
       ],
+      "executionBatchProgress": {
+        "scope": "CURRENT_CUMULATIVE_CORRECTION_BATCH_ONLY_NOT_WHOLE_PRODUCT",
+        "activityUnits": 5,
+        "completedActivityUnits": 4,
+        "percent": 80,
+        "completed": [
+          "CAUSAL_DIAGNOSIS_AND_HISTORICAL_RECOVERY",
+          "CORRECTIONS_AND_SYNTHETIC_REGRESSIONS",
+          "EXACT_COMPOSITION_AND_COMPLETE_GUARD",
+          "SINGLE_IMMUTABLE_PREVIEW_BUILD_AND_SERVED_READBACK"
+        ],
+        "pending": [
+          "AUTHENTICATED_CURRENT_PREVIEW_FUNCTIONAL_UAT"
+        ],
+        "formalI6PercentUnchanged": 50,
+        "newFullCapabilityAcceptances": 0,
+        "historicalApprovalsNotRevoked": true
+      },
       "productionDeployment": false,
       "securityB4003Hold": true
     },

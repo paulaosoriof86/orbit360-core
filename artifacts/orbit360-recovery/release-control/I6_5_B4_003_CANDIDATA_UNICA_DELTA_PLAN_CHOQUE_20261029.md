@@ -55,3 +55,67 @@ Los avances por fila se registrarán como `HISTÓRICO PRESERVADO`, `SOURCE QA PA
 - Después: matriz de 44 áreas y 15 capacidades con `CURRENT_PREVIEW_AUTH_*` acreditado por evidencia, revisión de seguridad/backup/restore en destino aislado, cierre material B4-003 y continuación de los gates originales. Sólo entonces evaluar promoción LIVE con aprobación específica de cambio y rollback verificable.
 
 **Regla de anti-regresión:** toda corrección entra como sucesor del único branch, con prueba, manifestación de hashes, Guard CI, Preview aislada/byte readback y posterior UAT; cada PASS queda asociado al **SHA exacto + UID/rol/país + prueba**. No crear otra candidata lógica ni borrar certificaciones previas.
+
+## 6. Delta acumulativo posterior — cuatro frentes corregidos y Preview exacta
+
+**Corte:** 29 de octubre de 2026, Guatemala. Esta adenda actualiza únicamente el estado técnico y la acción inmediata. Conserva todas las decisiones, aprobaciones y gates anteriores. El punto de reanudación ya no es el error instrumental de Chrome ni la Preview 5ec0bf8c: el navegador conectado abrió la nueva URL y confirmó su formulario de inicio de sesión.
+
+### 6.1 Publicación y prueba material
+
+| Hito | Evidencia exacta | Resultado |
+| --- | --- | --- |
+| Sucesor fuente acumulativo | 779a71495366d8224dfb945ed7d84fee93482020, padre 26fbca77c810695cb9c5b2041cfd4cffac602234 | Exactamente 12 archivos: seis fuentes, cuatro tests, guard y recibo |
+| Activación exclusivamente de transporte | 95f980719387c042625f5cfeb62340b1066ca361 | Un solo archivo YAML; ningún cambio adicional de producto |
+| Regresión sintética conjunta | 49 archivos: 45 históricos y cuatro nuevos | 120/120 pruebas PASS, 0 FAIL y 0 omitidas; diez blobs antes/después idénticos |
+| Guard local y remoto | Run 40923629966 sobre 95f980719387c042625f5cfeb62340b1066ca361 | PASS completo; PRODUCT_SOURCE_DRIFT=false; no se reescribió frozen114 |
+| Build y Hosting Preview | Run 40923629860 | SUCCESS; fuente, transformaciones del index, bytes servidos y raíces LIVE sin cambios verificados |
+| Workflows heredados | I6 Post-Salida 40923630266, 51 jobs terminados | SUCCESS; 71 pasos mutantes omitidos y B3-006 confirmado NOOP |
+
+Preview vigente para esta UAT:
+https://ays-orbit-360-lab--gi-i65-b4-sr-40923629860-q2geokqk.web.app/
+
+BuildId: gi-i65-b4-95f980719387-57f234755dc1.
+
+Hosted payload digest: 2a68697679dfda4a8ccf66c296a45c8df4e9942e9c58b828792da45208dc6beb.
+
+Bundle digest: e618ac17b659ddc4ff55ba28cc9d0af5311a5c5b7f300457c3ca6c5d801af1f1.
+
+Artifact retenido en GitHub: 12919327894, nombre gi-b4003-cumulative-hosting-40923629860, vencimiento informado 5-nov-2026. Contiene el sitio Hosting, su configuración y manifiestos; no contiene credenciales ni archivos de backend. El digest del ZIP es distinto del digest del payload Hosting. No se reconstruyó el build para verificarlo ni se autoriza reconstruirlo como sustituto de una futura promoción exacta.
+
+### 6.2 Correcciones por frente
+
+| Frente | Corrección causal implementada | Prueba nueva | Límite del resultado |
+| --- | --- | --- | --- |
+| Insights financiero | Proyección desde contratos de cartera/recibos/pagos existentes; país por relación validada, importes por moneda nativa, estados de carga explícitos y enlaces al recibo/cliente correcto | 26/26 PASS | UAT de cifras y relaciones reales pendiente; no acredita todos los tabs históricos de analítica |
+| Portal y presentación legal | Refresh por país/sesión dentro de su scope; teardown de overlays propios y dismiss del gate pendiente sin aceptación, almacenamiento ni callbacks de aceptación | 10/10 PASS | No cambia textos ni aprueba su interpretación jurídica GT/CO |
+| Shell/país | El encabezado escucha el evento canónico de país y refleja su valor, sin originar otro cambio ni escritura | 8/8 PASS | UAT transversal del selector pendiente |
+| Cobros/lector protegido | Una fuente de arranque denegada o fallida no bloquea dependencias permitidas; liberación de slots y drenaje al cambiar de rol, conservando denegación, tenant, UID y epoch | 16/16 PASS, incluida advertencia de moneda | UAT Asesor pendiente; el aviso detecta contradicciones de moneda visibles frente a póliza, no todos los posibles metadatos de calidad de origen |
+
+Los importes, monedas y relaciones de negocio no fueron modificados. Tampoco se cambiaron permisos, Rules, Auth, IAM, Functions, datos operativos o envíos externos.
+
+La revisión independiente del scheduler no encontró ampliación de permisos: liberar la cola no convierte una colección denegada en confirmada y cada lectura sigue pasando por el mismo plan de acceso protegido.
+
+### 6.3 Plantillas y prioridad preservada
+
+El blob de Plantillas permanece 702c90d4c655013fc168430cb44a48aab7bdfcd0. En la Preview predecesora 5ec0bf8c se observaron, con Paula/Dirección, seis tarjetas, filtro de renovación, modal de uso y copia de texto con fixture sintético; no hubo envío ni escritura. La variable de vencimiento sin dato del fixture permaneció sin resolver. Esto no acredita una prueba completa del nuevo build.
+
+La observación D-09 del recibo I6_5_B4_003_UAT3_FINDING_PRIORITY_RECONCILIATION_20261008.json está clasificada DEFERRED_AUTHORIZED_P2. No convertir la falta del owner CRUD seguro en un nuevo P0 ni reactivar las escrituras LAB históricas. El bloqueo independiente de cadencias Ops/Leads B4-003-R20-B11 conserva su disposición y no se cierra mediante este cambio.
+
+### 6.4 Medición del avance y reanudación
+
+| Medida | Estado de este corte | Qué significa |
+| --- | --- | --- |
+| I6 formal | 50%, sin cambio | B4-003 sigue abierto; no mide cuánto código se escribió |
+| Bloque correctivo actual | 4/5 actividades, 80% | Causa; código/tests; composición; y build/Preview/readback completos |
+| Actividad restante de este bloque | UAT autenticada de la Preview exacta | No se sustituye con las 120 pruebas sintéticas |
+| Aprobaciones históricas | 15 preservadas | No se reinician ni se extrapolan al nuevo SHA |
+| Nuevas aceptaciones integrales por capacidad | 0 acreditadas en este corte | No equivale a 0% de producto ni invalida certificaciones previas |
+
+La pestaña Chrome de la nueva Preview quedó abierta en Iniciar sesión. Reanudar con autenticación real, sin compartir credenciales por chat:
+
+1. Insights GT/CO/TODOS, moneda nativa y reconciliación con Cliente 360/Cobros.
+2. Cambio de rol desde arranque Aseguradoras a Asesor/Cobros; confirmar carga de lo permitido y denegación de lo no permitido, sin salir y entrar como remedio.
+3. Sincronización país global/local y Portal: entrar, cambiar contexto, salir y regresar sin aceptar términos ni dejar un modal ajeno en otras rutas.
+4. Smoke de Plantillas y regresión dirigida de Inicio, Pólizas, Historial, Cronograma, Renovaciones, Ops/Leads y Aseguradoras; conservar las pruebas anteriores por SHA/rol/país.
+
+Después permanecen los cierres del plan congelado: pruebas con UID independiente, operaciones sintéticas expresamente autorizadas con recarga/restauración, relaciones y exportes pendientes, ensayo de restauración aislada y rollback; B4-004 a B4-007 e I6.6 a I6.9. No hay nueva aceptación productiva ni permiso LIVE implícito en este corte.
