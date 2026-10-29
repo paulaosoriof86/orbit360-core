@@ -1,0 +1,29 @@
+{
+  "schema": "GRAVICENTRA_I65_B4003_EXACT_SOURCE_SUCCESSOR_COMPOSITION_V1",
+  "gate": "I6.5/B4-003",
+  "status": "PREVIEW_TECHNICAL_PASS_SECURITY_HOLD",
+  "parentSha": "3a9e673e60656d9def9cfa9333257e467977cbaf",
+  "sourceSha": "199860dd23cad3db2df581828a45ae9f9e5cc7d8",
+  "sourceTree": "f0f95a727f4a99ebb046fb0c4cee71c3833f6c91",
+  "sourceChangedFiles": [
+    "artifacts/orbit360-recovery/release-control/I6_5_B4_003_RECONCILIACION_TRANSVERSAL_APROBACIONES_READBACK_20261029.md",
+    "orbit360-platform/core/queries.js",
+    "orbit360-platform/core/tenant-access-policy-contract-p0.js",
+    "orbit360-platform/modules/cobros.js",
+    "orbit360-platform/modules/renovaciones.js",
+    "orbit360-platform/product-runtime-config.js",
+    "tools/gravicentra-b4-003-cobros-unassigned-country.test.cjs",
+    "tools/gravicentra-b4-003-cross-module-readback-contract.test.cjs",
+    "tools/gravicentra-b4-003-renovaciones-whatsapp-name.test.cjs"
+  ],
+  "productFiles": {
+    "orbit360-platform/core/queries.js": { "before": "ab3e22bcce37c91d255075890188258576c3dee7", "after": "73a6346dae84c6e3f9635fc55664720c17ba4136" },
+    "orbit360-platform/core/tenant-access-policy-contract-p0.js": { "before": "2eb52557ca9b38f80746527987a66091f1e1b81f", "after": "d7fbfc0642faae3cf75a144856085598f1840d98" },
+    "orbit360-platform/modules/cobros.js": { "before": "0afec98578a6b0fb29d5afd716b06deb90127ef9", "after": "53ea3a563d35cbdf460eebb2a3ac2b3923bde3fa" },
+    "orbit360-platform/modules/renovaciones.js": { "before": "f2bad025390b919ed2589d9429f2a617f87affcf", "after": "e22ce58212a12bb571bae77b648baccbcdda395e" },
+    "orbit360-platform/product-runtime-config.js": { "before": "977f9b7075e420a47d286769f2cdbfffba52b7b0", "after": "cf39b8af1dde64948a3ac5de61cf9ddccdc90aa1" }
+  },
+  "preview": { "runId": 40861280332, "site": "ays-orbit-360-lab", "hostingOnly": true, "readbackExact": true },
+  "nonPromotion": { "livePromotion": false, "dataWrites": false, "authIamChange": false, "firestoreRulesChange": false, "historicalApprovalsRevoked": false, "securityB4003StillHold": true },
+  "preserved": { "capabilityLineages": 15, "findings": 295, "tasks": 86, "formalI6Percent": 50 }
+}

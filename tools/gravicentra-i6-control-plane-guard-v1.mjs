@@ -538,6 +538,9 @@ const POLICY_COUNTRY_PREVIOUS=new Map();
 const POLICY_COUNTRY_CURRENT=new Map();
 if(POLICY_COUNTRY_GOVERNANCE){
  const A=POLICY_COUNTRY_GOVERNANCE,R=readJson(A.receiptPath);
+ // This receipt certifies the immutable Oct-28 successor. Later approved
+ // source changes must have their own attestation, never rewrite these bytes.
+ const certifiedSourceBlob=p=>physicalGit('rev-parse',POLICY_COUNTRY_CERT_HEAD+':'+p);
  const source=POLICY_COUNTRY_SOURCE_PATHS.slice().sort();
  const qa=POLICY_COUNTRY_QA_PATHS.slice().sort();
  const allowedChanged=[...source,...qa,POLICY_COUNTRY_EVIDENCE_PATH,POLICY_COUNTRY_GUARD_PATH,
@@ -562,7 +565,7 @@ if(POLICY_COUNTRY_GOVERNANCE){
   Object.keys(R.qaBlobsBefore||{}).sort().join('|')===qa.join('|')&&
   Object.keys(R.qaBlobsAfter||{}).sort().join('|')===qa.join('|')&&
   source.every(p=>R.sourceBlobsBefore[p]===priorPath(p)&&
-   R.sourceBlobsAfter[p]===physicalGit('hash-object',p)&&
+   R.sourceBlobsAfter[p]===certifiedSourceBlob(p)&&
    R.sourceBlobsAfter[p]!==R.sourceBlobsBefore[p])&&
   qa.every(p=>R.qaBlobsBefore[p]===(p==='tools/gravicentra-b4-003-cartera-bridge-policy-country.test.cjs'?null:priorPath(p))&&
    R.qaBlobsAfter[p]===physicalGit('hash-object',p)&&
@@ -664,7 +667,7 @@ if(POLICY_COUNTRY_PREVIEW){
   R.governance?.controlPlaneBlobBefore===physicalGit('rev-parse',SOURCE+':'+CONTROL)&&
   R.governance?.historicPolicyCountryReceiptBlob===physicalGit('hash-object',POLICY_COUNTRY_RECEIPT_PATH)&&
   sameJson(R.sourceBlobs,requiredSources)&&
-  Object.entries(requiredSources).every(([f,h])=>physicalGit('hash-object',f)===h)&&
+  Object.entries(requiredSources).every(([f,h])=>physicalGit('rev-parse',SOURCE+':'+f)===h)&&
   R.scope?.hostingProject==='ays-orbit-360-lab'&&
   R.scope?.hostingSite==='ays-orbit-360-lab'&&
   R.scope?.previewOnly===true&&R.scope?.hostingOnly===true&&
@@ -1002,7 +1005,7 @@ if(COBROS_Q683){
   Object.keys(R.sourceBlobsAfter||{}).join('|')===COBROS_Q683_PATH&&
   Object.keys(R.qaBlobsAfter||{}).join('|')===COBROS_Q683_QA&&
   R.sourceBlobsBefore[COBROS_Q683_PATH]===physicalGit('rev-parse',P+':'+COBROS_Q683_PATH)&&
-  R.sourceBlobsAfter[COBROS_Q683_PATH]===physicalGit('hash-object',COBROS_Q683_PATH)&&
+  R.sourceBlobsAfter[COBROS_Q683_PATH]===physicalGit('rev-parse',deployedSourceCommit+':'+COBROS_Q683_PATH)&&
   R.sourceBlobsAfter[COBROS_Q683_PATH]!==R.sourceBlobsBefore[COBROS_Q683_PATH]&&
   R.qaBlobsAfter[COBROS_Q683_QA]===physicalGit('hash-object',COBROS_Q683_QA)&&
   R.governance.priorGuardBlobSha===physicalGit('rev-parse',P+':'+guardPath)&&
@@ -1100,7 +1103,7 @@ if(Q683_COBROS_HOSTING_AUTH){
   sameJson(R.sourceBlobs,sourceBlobs)&&sameJson(R.qaBlobs,qaBlobs)&&
   Object.keys(R.sourceBlobs||{}).length===4&&Object.keys(R.qaBlobs||{}).length===2&&
   Object.entries(R.sourceBlobs).every(([p,sha])=>sha===physicalGit('rev-parse',P+':'+p)&&
-    sha===historicalOrPhysicalBlob(p))&&
+    sha===(p===COBROS_Q683_PATH?physicalGit('rev-parse',P+':'+p):historicalOrPhysicalBlob(p)))&&
   Object.entries(R.qaBlobs).every(([p,sha])=>sha===physicalGit('rev-parse',P+':'+p)&&
     sha===historicalOrPhysicalBlob(p))&&
   R.expectedProof?.calendarSyntheticQaChecks===41&&R.expectedProof?.cobrosSyntheticQaChecks===33&&
@@ -4089,11 +4092,51 @@ if(canonicalCompositionActive){
  const actualProduct=changed.filter(p=>!allowedPrefixes.some(prefix=>p.startsWith(prefix))).sort();
  const declared=[...(COMP.productFiles||[]),...(Q683_CALENDAR_RECEIPT?['orbit360-platform/core/ui.js']:[])].sort();
  need(actualProduct.length===declared.length&&actualProduct.every((p,i)=>p===declared[i]),'I6_CANONICAL_COMPOSITION_EXACT_SET_DRIFT');
- // Active cumulative authority: verify every actual product byte against the
- // exact current manifest. Prior source receipts were already independently
- // verified above against the commits where they were certified. Selecting a
- // historical SHA here would invalidate later authorized source successors.
- need(declared.every(p=>physicalGit('hash-object',p)===(COMP.productFileBlobs?.[p]||
+ // Keep the immutable 114-file composition intact. The five changed bytes
+ // belong to ONE independently pinned I6.5/B4-003 source successor, never to
+ // a rewritten prior receipt or an unbounded current working-tree override.
+ const receiptPath='artifacts/orbit360-recovery/release-control/I6_5_B4_003_EXACT_SOURCE_SUCCESSOR_COMPOSITION_20261029.json';
+ need(exists(receiptPath),'I6_CANONICAL_SUCCESSOR_RECEIPT_MISSING');
+ const successorReceipt=readJson(receiptPath),newFiles=successorReceipt.productFiles||{};
+ const fixedSource='199860dd23cad3db2df581828a45ae9f9e5cc7d8';
+ const fixedParent='3a9e673e60656d9def9cfa9333257e467977cbaf';
+ const expectedSourceSet=[
+  'artifacts/orbit360-recovery/release-control/I6_5_B4_003_RECONCILIACION_TRANSVERSAL_APROBACIONES_READBACK_20261029.md',
+  'orbit360-platform/core/queries.js','orbit360-platform/core/tenant-access-policy-contract-p0.js',
+  'orbit360-platform/modules/cobros.js','orbit360-platform/modules/renovaciones.js',
+  'orbit360-platform/product-runtime-config.js',
+  'tools/gravicentra-b4-003-cobros-unassigned-country.test.cjs',
+  'tools/gravicentra-b4-003-cross-module-readback-contract.test.cjs',
+  'tools/gravicentra-b4-003-renovaciones-whatsapp-name.test.cjs'
+ ].sort();
+ const successorProductPaths=[
+  'orbit360-platform/core/queries.js','orbit360-platform/core/tenant-access-policy-contract-p0.js',
+  'orbit360-platform/modules/cobros.js','orbit360-platform/modules/renovaciones.js',
+  'orbit360-platform/product-runtime-config.js'
+ ].sort();
+ const actualSourceSet=physicalGit('diff','--name-only',fixedParent+'..'+fixedSource).split(/\r?\n/).filter(Boolean).sort();
+ need(successorReceipt.schema==='GRAVICENTRA_I65_B4003_EXACT_SOURCE_SUCCESSOR_COMPOSITION_V1'&&
+  successorReceipt.gate==='I6.5/B4-003'&&successorReceipt.status==='PREVIEW_TECHNICAL_PASS_SECURITY_HOLD'&&
+  successorReceipt.parentSha===fixedParent&&successorReceipt.sourceSha===fixedSource&&
+  successorReceipt.sourceTree===physicalGit('rev-parse',fixedSource+'^{tree}')&&
+  physicalGit('rev-parse',fixedSource+'^')===fixedParent&&
+  physicalGit('merge-base',fixedSource,current)===fixedSource&&
+  successorReceipt.preview?.runId===40861280332&&successorReceipt.preview?.hostingOnly===true&&
+  successorReceipt.preview?.readbackExact===true&&
+  successorReceipt.nonPromotion?.livePromotion===false&&
+  successorReceipt.nonPromotion?.dataWrites===false&&
+  successorReceipt.nonPromotion?.securityB4003StillHold===true&&
+  successorReceipt.preserved?.capabilityLineages===15&&
+  successorReceipt.preserved?.findings===295&&successorReceipt.preserved?.tasks===86&&
+  actualSourceSet.join('|')===expectedSourceSet.join('|')&&
+  (successorReceipt.sourceChangedFiles||[]).slice().sort().join('|')===actualSourceSet.join('|')&&
+  Object.keys(newFiles).sort().join('|')===successorProductPaths.join('|')&&
+  successorProductPaths.every(p=>newFiles[p]?.before===COMP.productFileBlobs?.[p]&&
+   newFiles[p]?.before===physicalGit('rev-parse',fixedParent+':'+p)&&
+   newFiles[p]?.after===physicalGit('rev-parse',fixedSource+':'+p)&&
+   newFiles[p]?.after!==newFiles[p]?.before),
+  'I6_CANONICAL_SUCCESSOR_NOT_EXACT_OR_UNAUTHORIZED');
+ need(declared.every(p=>physicalGit('hash-object',p)===(newFiles[p]?.after||COMP.productFileBlobs?.[p]||
   (p==='orbit360-platform/core/ui.js'?Q683_CALENDAR_RECEIPT?.sourceBlobsAfter?.[p]:null))),
   'I6_CANONICAL_COMPOSITION_BLOB_DRIFT');
  need(COMP.productFileCount===COMP.productFiles.length,'I6_CANONICAL_COMPOSITION_COUNT_DRIFT');
