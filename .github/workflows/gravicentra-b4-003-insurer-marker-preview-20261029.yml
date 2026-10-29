@@ -4,7 +4,7 @@ on:
   push:
     branches: [recovery/fase-a-clean-20260831]
     paths:
-      - .github/workflows/gravicentra-b4-003-exact-2909226c-preview-20261029.yml
+      - .github/workflows/gravicentra-b4-003-insurer-marker-preview-20261029.yml
 
 permissions:
   contents: read
@@ -18,7 +18,7 @@ jobs:
     if: >-
       github.repository == 'paulaosoriof86/orbit360-core' &&
       github.ref == 'refs/heads/recovery/fase-a-clean-20260831' &&
-      github.event.head_commit.message == 'build(i6.5 B4-003): isolated insurer marker a63a7af5 hosting only'
+      github.event.head_commit.message == 'build(i6.5 B4-003): trigger isolated insurer marker a63a7af5 hosting only'
     runs-on: ubuntu-24.04
     timeout-minutes: 40
     env:
