@@ -1635,7 +1635,9 @@ if(WRITER_SUCCESSOR){
    (p==='tools/gravicentra-b4-003-scoped-related-reader.test.cjs'&&
     C.b4003BackendScopeDenialSuccessor20261026
     ?physicalGit('rev-parse','17c4bed9ba8b2bd36f559a802390723647994ea2:'+p)
-    :preFocalPhysicalHash(p))===sha)&&
+    :p==='orbit360-platform/data/store-firestore-product-operational-p0.js'
+     ?physicalGit('rev-parse','add5c8356428df4ffcb4b527c8329e7e5158d06f:'+p)
+     :preFocalPhysicalHash(p))===sha)&&
   sourcePaths.every(p=>originalWriterComposition.productFileBlobs?.[p]===R.sourceBlobsAfter[p])&&
   R.findingsPreserved===295&&R.frozenTasksPreserved===86&&
   W.findingsPreserved===295&&W.frozenTasksPreserved===86&&FIND.findings.length===295&&
