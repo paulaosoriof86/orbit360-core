@@ -1,0 +1,33 @@
+{
+  "schema": "GRAVICENTRA_B4003_INSURER_PREVIEW_MARKER_CONTROL_PLANE_CI_RUN_RECEIPT_V1",
+  "gate": "I6.5/B4-003",
+  "sourceCommit": "8193ab69dabde3c8001258e4e8f33860c15418e4",
+  "sourceTree": "13ab0d45b0348076a60ee0a0eb819441ca2b9898",
+  "branch": "recovery/fase-a-clean-20260831",
+  "scope": "READ_ONLY_CONTROL_PLANE_CI_ONLY",
+  "sourceFiles": [
+    {
+      "path": "orbit360-platform/data/store-firestore-product-operational-p0.js",
+      "sha": "8bd608bc5a3aa7cd58feca8e309c97ea19059a91"
+    },
+    {
+      "path": "tools/gravicentra-b4-003-insurer-preview-projection.test.cjs",
+      "sha": "02edb6b02f7a88a705dba5c9b6d0adca838a790d"
+    },
+    {
+      "path": "tools/gravicentra-i6-control-plane-guard-v1.mjs",
+      "sha": "e7534d932f164fcb86f5e4380d8c7476dd595984"
+    },
+    {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_INSURER_SYNTHETIC_PREVIEW_MARKER_SOURCE_SUCCESSOR_20261029.json",
+      "sha": "fd6142420db5f3ebc83757db5f99551ab543cb69"
+    }
+  ],
+  "runResult": "PENDING_NEW_CI_READBACK",
+  "productionPromotion": false,
+  "firestoreWrite": false,
+  "authIamRulesChanges": false,
+  "augustImport": false,
+  "historicApprovalsPreserved": true,
+  "securityB4003HoldPreserved": true
+}
