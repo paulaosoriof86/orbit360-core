@@ -1,4 +1,4 @@
-name: Gravicentra I6.5 B4-003 Exact 2909226c LAB Preview 20261029
+name: Gravicentra I6.5 B4-003 Exact 199860dd LAB Preview 20261029
 
 on:
   push:
@@ -10,7 +10,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: gi-b4003-exact-2909226c-preview-20261029
+  group: gi-b4003-exact-199860dd-preview-20261029
   cancel-in-progress: false
 
 jobs:
@@ -18,11 +18,11 @@ jobs:
     if: >-
       github.repository == 'paulaosoriof86/orbit360-core' &&
       github.ref == 'refs/heads/recovery/fase-a-clean-20260831' &&
-      github.event.head_commit.message == 'build(i6.5 B4-003): preview pinned 2909226c hosting only'
+      github.event.head_commit.message == 'build(i6.5 B4-003): preview pinned 199860dd hosting only'
     runs-on: ubuntu-24.04
     timeout-minutes: 40
     env:
-      EXACT_SOURCE_SHA: 2909226ce17450d655c09f213776a66ad036b93f
+      EXACT_SOURCE_SHA: 199860dd23cad3db2df581828a45ae9f9e5cc7d8
       PROJECT_ID: ays-orbit-360-lab
       HOSTING_SITE: ays-orbit-360-lab
       TENANT_HINT: alianzas-soluciones
@@ -37,7 +37,7 @@ jobs:
       - name: Checkout immutable candidate source
         uses: actions/checkout@v4
         with:
-          ref: 2909226ce17450d655c09f213776a66ad036b93f
+          ref: 199860dd23cad3db2df581828a45ae9f9e5cc7d8
           fetch-depth: 1
           persist-credentials: false
 
@@ -57,6 +57,9 @@ jobs:
           node tools/gravicentra-b4-003-c360-cobros-currency-overdue.test.cjs
           node tools/gravicentra-b4-003-cronograma-durable-task.test.cjs
           node tools/gravicentra-b4-003-insurer-readiness-facade-bridge.test.cjs
+          node tools/gravicentra-b4-003-cross-module-readback-contract.test.cjs
+          node tools/gravicentra-b4-003-renovaciones-whatsapp-name.test.cjs
+          node tools/gravicentra-b4-003-cobros-unassigned-country.test.cjs
 
       - name: Snapshot public LIVE portadas before isolated Preview
         run: |
@@ -131,16 +134,18 @@ jobs:
           const meta=JSON.parse(fs.readFileSync(root+'/site/__recovery__/build.json','utf8'));
           if(Object.keys(config).join(',')!=='hosting'||config.hosting.site!=='ays-orbit-360-lab'||config.hosting.public!=='site')throw Error('HOSTING_ONLY_EXPECTED');
           if(meta.sourceSha!==process.env.EXACT_SOURCE_SHA||meta.gate!=='I6.5-B4-003')throw Error('EXACT_SOURCE_BUILD_MISMATCH');
-          for(const path of ['core/product-app-p0.js','core/product-runtime-browser-providers-p0.js','modules/historial.js','modules/cronograma.js']){
+          for(const path of ['core/product-app-p0.js','core/product-runtime-browser-providers-p0.js','modules/historial.js','modules/cronograma.js','core/queries.js','core/tenant-access-policy-contract-p0.js','modules/cobros.js','modules/renovaciones.js']){
             if(!fs.readFileSync('orbit360-platform/'+path).equals(fs.readFileSync(root+'/site/'+path)))throw Error('PRODUCT_BLOB_MISMATCH: '+path);
           }
+          const runtime=fs.readFileSync(root+'/site/product-runtime-config.js','utf8');
+          if(!runtime.includes('tareas')||!runtime.includes('finmovs'))throw Error('DURABLE_COLLECTION_CONFIG_MISSING');
           NODE
 
       - name: Deploy one isolated seven-day Hosting Preview, never LIVE
         id: preview
         run: |
           set -euo pipefail
-          CHANNEL_ID="gi-i65-b4-2909226c-${GITHUB_RUN_ID}"
+          CHANNEL_ID="gi-i65-b4-199860dd-${GITHUB_RUN_ID}"
           cd "$RUNNER_TEMP/exact-preview-package/bundle"
           node "$FIREBASE_CLI_BIN" hosting:channel:deploy "$CHANNEL_ID" --config firebase.json --project "$PROJECT_ID" --expires 7d --non-interactive --json > "$RUNNER_TEMP/exact-preview-deploy.json" 2>&1
           export CHANNEL_ID
@@ -162,7 +167,7 @@ jobs:
         run: |
           set -euo pipefail
           ROOT="$RUNNER_TEMP/exact-preview-package/bundle/site"
-          for path in __recovery__/build.json core/product-app-p0.js core/product-runtime-browser-providers-p0.js modules/historial.js modules/cronograma.js; do
+          for path in __recovery__/build.json product-runtime-config.js core/product-app-p0.js core/product-runtime-browser-providers-p0.js modules/historial.js modules/cronograma.js core/queries.js core/tenant-access-policy-contract-p0.js modules/cobros.js modules/renovaciones.js; do
             curl --fail --silent --show-error --location --retry 2 --max-time 30 "$PREVIEW_URL/$path" > "$RUNNER_TEMP/exact-served-$(basename "$path")"
             cmp "$ROOT/$path" "$RUNNER_TEMP/exact-served-$(basename "$path")"
           done
