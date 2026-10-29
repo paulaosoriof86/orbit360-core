@@ -4276,6 +4276,54 @@ if(successor){
  }
 }
 
+
+const CANONICAL_20261029=C.b4003CanonicalCandidateFreeze20261029;
+need(CANONICAL_20261029?.schema==='GI_I65_B4_003_SINGLE_CANONICAL_CANDIDATE_FREEZE_V1'&&
+ CANONICAL_20261029.gate==='I6.5/B4-003'&&CANONICAL_20261029.repository==='paulaosoriof86/orbit360-core'&&
+ CANONICAL_20261029.branch==='recovery/fase-a-clean-20260831'&&
+ CANONICAL_20261029.sourceCommit==='a63a7af5eb066bc87f94131e7b981741b29e4afc'&&
+ physicalGit('merge-base',CANONICAL_20261029.sourceCommit,current)===CANONICAL_20261029.sourceCommit,
+ 'B4_003_CANONICAL_FREEZE_SOURCE_IDENTITY_INVALID');
+const CANONICAL_MANIFEST_20261029=readJson(CANONICAL_20261029.capabilityManifestPath);
+const CANONICAL_CAPS_20261029=CANONICAL_20261029.capabilityIds||[];
+need(Array.isArray(CANONICAL_CAPS_20261029)&&CANONICAL_CAPS_20261029.length===15&&
+ CANONICAL_MANIFEST_20261029.capabilities?.length===15&&
+ CANONICAL_CAPS_20261029.every((id,i)=>id===CANONICAL_MANIFEST_20261029.capabilities[i]),
+ 'B4_003_CANONICAL_FREEZE_CAPABILITIES_NOT_MANIFEST_ALIGNED');
+need(CANONICAL_20261029.technicalPreview?.runId===40889172816&&
+ CANONICAL_20261029.technicalPreview?.status==='HOSTING_ONLY_BUILD_AND_BYTE_READBACK_PASS'&&
+ CANONICAL_20261029.technicalPreview?.url==='https://ays-orbit-360-lab--gi-i65-b4-a63a7af5-40889172816-ocai3efe.web.app/'&&
+ CANONICAL_20261029.functionalUatStatus==='PENDING_AUTHENTICATED_ROLE_AND_MODULE_READBACK'&&
+ CANONICAL_20261029.securityHold==='ACTIVE_FAIL_CLOSED'&&
+ CANONICAL_20261029.productionStatus==='NOT_DEPLOYED_NOT_ACCEPTED'&&
+ CANONICAL_20261029.controls?.singleCanonicalCompositionLockPreserved===true&&
+ CANONICAL_20261029.controls?.noProductionDeployment===true&&
+ CANONICAL_20261029.controls?.sourceChangeRequiresNewPreviewDigest===true,
+ 'B4_003_CANONICAL_FREEZE_CI_PREVIEW_OR_BOUNDARIES_INVALID');
+const CANONICAL_APPROVALS_20261029=CANONICAL_20261029.acceptedModuleEvidence;
+need(Array.isArray(CANONICAL_APPROVALS_20261029)&&
+ new Set(CANONICAL_APPROVALS_20261029.map(a=>a.capabilityId)).size===CANONICAL_APPROVALS_20261029.length,
+ 'B4_003_CANONICAL_FREEZE_APPROVAL_DUPLICATE_OR_INVALID');
+for(const a of CANONICAL_APPROVALS_20261029){
+ need(CANONICAL_CAPS_20261029.includes(a.capabilityId)&&
+  a.status==='LATEST_APPROVED_VERSION_PREVIEW_PASS'&&
+  a.sourceCommit===CANONICAL_20261029.sourceCommit&&
+  a.previewRunId===CANONICAL_20261029.technicalPreview.runId&&
+  typeof a.route==='string'&&a.route.startsWith('#/')&&
+  typeof a.effectiveRole==='string'&&a.effectiveRole.length>0&&
+  ['GT','CO','TODOS'].includes(a.country)&&
+  a.recordReadback===true&&a.permissionValidated===true&&
+  a.actionContractValidated===true&&
+  a.persistenceReadbackOrNotApplicable===true&&
+  a.consoleAndRouteErrorsAbsent===true&&
+  /^[0-9a-f]{40}$/.test(String(a.sourceBlobSha||''))&&
+  typeof a.evidenceReceiptPath==='string'&&exists(a.evidenceReceiptPath)&&
+  physicalGit('hash-object',a.evidenceReceiptPath)===a.evidenceReceiptBlobSha&&
+  a.paulaVisualApprovalIfApplicable===true,
+  'B4_003_CANONICAL_FREEZE_MODULE_APPROVAL_MISSING_EXACT_UAT_EVIDENCE:'+String(a.capabilityId));
+}
+console.log('B4_003_CANONICAL_CANDIDATE_FREEZE=ACTIVE_15_HISTORICAL_PRESERVED_CURRENT_ACCEPTANCES='+CANONICAL_APPROVALS_20261029.length);
+
 console.log('GRAVICENTRA_I6_CONTROL_PLANE_GUARD=PASS');
 console.log('CONTROL_STATUS='+C.status);
 console.log('I6_GATE='+g.I6.status);

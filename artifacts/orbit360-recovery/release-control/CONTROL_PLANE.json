@@ -15434,5 +15434,81 @@
     "previewChannelGarbageCollection": false,
     "historicalLocksChanged": false,
     "securityHoldPreserved": true
+  },
+  "b4003CanonicalCandidateFreeze20261029": {
+    "schema": "GI_I65_B4_003_SINGLE_CANONICAL_CANDIDATE_FREEZE_V1",
+    "gate": "I6.5/B4-003",
+    "decisionDate": "2026-10-29",
+    "authority": "PAULA_FREEZE_AND_INCREMENTAL_APPROVAL_IN_SAME_CANONICAL_CANDIDATE",
+    "repository": "paulaosoriof86/orbit360-core",
+    "branch": "recovery/fase-a-clean-20260831",
+    "sourceCommit": "a63a7af5eb066bc87f94131e7b981741b29e4afc",
+    "technicalPreview": {
+      "status": "HOSTING_ONLY_BUILD_AND_BYTE_READBACK_PASS",
+      "runId": 40889172816,
+      "url": "https://ays-orbit-360-lab--gi-i65-b4-a63a7af5-40889172816-ocai3efe.web.app/",
+      "exactSource": true,
+      "ciGuardV5": "SUCCESS",
+      "regressionTests": "10_CI_BATTERIES_WITH_5_OF_5_INSURER_PROJECTION",
+      "noLive": true
+    },
+    "securityHold": "ACTIVE_FAIL_CLOSED",
+    "productionStatus": "NOT_DEPLOYED_NOT_ACCEPTED",
+    "functionalUatStatus": "PENDING_AUTHENTICATED_ROLE_AND_MODULE_READBACK",
+    "historicalPhaseAAcceptance": {
+      "status": "I5_HISTORICAL_PRESERVED_NOT_B4_003_PREVIEW_PASS",
+      "capabilityCount": 15
+    },
+    "capabilityManifestPath": "artifacts/orbit360-recovery/project-sources-v2/v3/03_MANIFIESTO_CAPACIDADES_FASE_A_EVERGREEN_V3.json",
+    "capabilityIds": [
+      "LOGIN_PRIMARY_RUNTIME",
+      "ROLE_SCOPE_RUNTIME",
+      "SINGLE_ENTRYPOINT_SHELL_ROUTER",
+      "STARTUP_PWA_PERFORMANCE",
+      "INICIO_PRIMARY_RUNTIME",
+      "CLIENTE360_PRIMARY_RUNTIME",
+      "VEHICULOS_PRIMARY_RUNTIME",
+      "CROSS_MODULE_RELATIONSHIPS",
+      "ASEGURADORAS_PRIMARY_RUNTIME",
+      "ASEGURADORAS_OPERATIONAL_DIRECTORY",
+      "OPS_PRIMARY_RUNTIME",
+      "LEADS_PRIMARY_RUNTIME",
+      "POLIZAS_PRIMARY_RUNTIME",
+      "RECIBOS_CARTERA_PRIMARY_RUNTIME",
+      "COBROS_PRIMARY_RUNTIME"
+    ],
+    "acceptedModuleEvidence": [],
+    "evidenceRequiredForEachCurrentApproval": [
+      "capabilityId",
+      "status",
+      "sourceCommit",
+      "previewRunId",
+      "route",
+      "effectiveRole",
+      "country",
+      "recordReadback",
+      "permissionValidated",
+      "actionContractValidated",
+      "persistenceReadbackOrNotApplicable",
+      "consoleAndRouteErrorsAbsent",
+      "sourceBlobSha",
+      "evidenceReceiptPath",
+      "evidenceReceiptBlobSha",
+      "paulaVisualApprovalIfApplicable"
+    ],
+    "controls": {
+      "singleCanonicalCompositionLockPreserved": true,
+      "historyImmutable": true,
+      "noNewGate": true,
+      "noNewBranch": true,
+      "noProductionDeployment": true,
+      "noRulesIamAuthMutation": true,
+      "noDataImport": true,
+      "noBusinessDataMutation": true,
+      "noSilentMemoryFallback": true,
+      "sourceChangeRequiresNewPreviewDigest": true
+    },
+    "nextAction": "PAULA_AUTHENTICATES_EXACT_PREVIEW_THEN_INCREMENTALLY_RECORD_UAT_PER_CAPABILITY_WITH_PERSISTENCE_AND_READBACK",
+    "notes": "This freeze records an exact technical candidate, not 15 fresh functional approvals. Module approvals require reproducible current-version UAT; historical I5 and previous B4 receipts remain unmodified."
   }
 }
