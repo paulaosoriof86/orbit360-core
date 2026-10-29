@@ -4098,6 +4098,47 @@ if(canonicalCompositionActive){
  const receiptPath='artifacts/orbit360-recovery/release-control/I6_5_B4_003_EXACT_SOURCE_SUCCESSOR_COMPOSITION_20261029.json';
  need(exists(receiptPath),'I6_CANONICAL_SUCCESSOR_RECEIPT_MISSING');
  const successorReceipt=readJson(receiptPath),newFiles=successorReceipt.productFiles||{};
+
+ const insurerMarkerReceiptPath='artifacts/orbit360-recovery/release-control/I6_5_B4_003_INSURER_SYNTHETIC_PREVIEW_MARKER_SOURCE_SUCCESSOR_20261029.json';
+ need(exists(insurerMarkerReceiptPath),'B4_003_INSURER_QA_MARKER_SUCCESSOR_RECEIPT_MISSING');
+ const insurerMarkerReceipt=readJson(insurerMarkerReceiptPath);
+ const markerProduct='orbit360-platform/data/store-firestore-product-operational-p0.js',markerQa='tools/gravicentra-b4-003-insurer-preview-projection.test.cjs';
+ const markerParent='add5c8356428df4ffcb4b527c8329e7e5158d06f';
+ const markerCommit=physicalGit('log','-n','1','--format=%H','--',markerProduct);
+ const markerChangedPaths=physicalGit('diff','--name-only',markerParent+'..'+markerCommit).split(/\r?\n/).filter(Boolean).sort();
+ const markerExpectedPaths=[markerProduct,markerQa,'tools/gravicentra-i6-control-plane-guard-v1.mjs',insurerMarkerReceiptPath].sort();
+ const markerTest=JSON.parse(execFileSync(process.execPath,[markerQa],{encoding:'utf8'}));
+ need(insurerMarkerReceipt.schema==='GRAVICENTRA_I65_B4003_INSURER_SYNTHETIC_PREVIEW_MARKER_SOURCE_SUCCESSOR_V1'&&
+  insurerMarkerReceipt.gate==='I6.5/B4-003'&&
+  insurerMarkerReceipt.status==='SOURCE_SUCCESSOR_ATOMIC_SHA_LOCK_PREVIEW_ONLY_PENDING_TECHNICAL_QA'&&
+  insurerMarkerReceipt.parentHead===markerParent&&
+  insurerMarkerReceipt.repository==='paulaosoriof86/orbit360-core'&&
+  insurerMarkerReceipt.branch==='recovery/fase-a-clean-20260831'&&
+  physicalGit('rev-parse',markerParent+':'+markerProduct)===insurerMarkerReceipt.source?.beforeBlob&&
+  insurerMarkerReceipt.source?.beforeBlob==='e7b9b4e802972f319d671487ef0a6447989f0ed5'&&
+  insurerMarkerReceipt.source?.afterBlob==='8bd608bc5a3aa7cd58feca8e309c97ea19059a91'&&
+  physicalGit('hash-object',markerProduct)===insurerMarkerReceipt.source.afterBlob&&
+  physicalGit('rev-parse',markerCommit+'^')===markerParent&&
+  physicalGit('merge-base',markerCommit,current)===markerCommit&&
+  physicalGit('rev-parse',markerCommit+':'+markerProduct)===insurerMarkerReceipt.source.afterBlob&&
+  physicalGit('rev-parse',markerCommit+':'+markerQa)===insurerMarkerReceipt.test?.afterBlob&&
+  physicalGit('hash-object',markerQa)===insurerMarkerReceipt.test.afterBlob&&
+  insurerMarkerReceipt.test.afterBlob==='02edb6b02f7a88a705dba5c9b6d0adca838a790d'&&
+  markerTest.gate==='I6.5/B4-003'&&markerTest.passed===5&&markerTest.scenarios===5&&markerTest.previewOnly===true&&
+  markerTest.realWrites===0&&markerTest.firestoreAccess===0&&markerTest.permissionChanges===0&&markerTest.liveDeploy===false&&
+  markerChangedPaths.join('|')===markerExpectedPaths.join('|')&&
+  (insurerMarkerReceipt.sourceChangedPaths||[]).slice().sort().join('|')===markerExpectedPaths.join('|')&&
+  insurerMarkerReceipt.scope?.previewOnly===true&&insurerMarkerReceipt.scope?.syntheticInsurerUpdateOnly===true&&
+  insurerMarkerReceipt.scope?.syntheticIdRequired===true&&insurerMarkerReceipt.scope?.liveUnaffected===true&&
+  insurerMarkerReceipt.scope?.realInsurersUnaffected===true&&insurerMarkerReceipt.scope?.otherCollectionsUnaffected===true&&
+  insurerMarkerReceipt.nonPromotion?.liveDeployment===false&&insurerMarkerReceipt.nonPromotion?.firestoreWrites===false&&
+  insurerMarkerReceipt.nonPromotion?.authIamRulesChanges===false&&insurerMarkerReceipt.nonPromotion?.augustImport===false&&
+  insurerMarkerReceipt.nonPromotion?.securityB4003StillHold===true&&
+  insurerMarkerReceipt.preserved?.lineages===15&&insurerMarkerReceipt.preserved?.findings===295&&
+  insurerMarkerReceipt.preserved?.tasks===86&&insurerMarkerReceipt.preserved?.priorReceiptsImmutable===true&&
+  C.b4003OwnerTemporaryRulesRiskException20261028?.securityCertStatus==='OPEN_NOT_PASS',
+  'B4_003_INSURER_QA_MARKER_SUCCESSOR_DRIFT');
+ 
  const fixedSource='199860dd23cad3db2df581828a45ae9f9e5cc7d8';
  const fixedParent='3a9e673e60656d9def9cfa9333257e467977cbaf';
  const expectedSourceSet=[
@@ -4136,8 +4177,8 @@ if(canonicalCompositionActive){
    newFiles[p]?.after===physicalGit('rev-parse',fixedSource+':'+p)&&
    newFiles[p]?.after!==newFiles[p]?.before),
   'I6_CANONICAL_SUCCESSOR_NOT_EXACT_OR_UNAUTHORIZED');
- need(declared.every(p=>physicalGit('hash-object',p)===(newFiles[p]?.after||COMP.productFileBlobs?.[p]||
-  (p==='orbit360-platform/core/ui.js'?Q683_CALENDAR_RECEIPT?.sourceBlobsAfter?.[p]:null))),
+ need(declared.every(p=>physicalGit('hash-object',p)===(p===markerProduct?insurerMarkerReceipt.source.afterBlob:(newFiles[p]?.after||COMP.productFileBlobs?.[p]||
+  (p==='orbit360-platform/core/ui.js'?Q683_CALENDAR_RECEIPT?.sourceBlobsAfter?.[p]:null)))),
   'I6_CANONICAL_COMPOSITION_BLOB_DRIFT');
  need(COMP.productFileCount===COMP.productFiles.length,'I6_CANONICAL_COMPOSITION_COUNT_DRIFT');
 }

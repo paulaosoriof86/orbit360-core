@@ -273,6 +273,11 @@
     try{
       mutations.forEach(function(input){
         var action=text(input&&input.action),collection=text(input&&input.collection),id=text(input&&input.id),payload=clone(input&&input.payload)||null;
+        // Protected directory projections omit QA-only metadata. Reassert this
+        // Preview-only marker for synthetic insurer updates; never for real IDs.
+        if(previewBatch&&collection==='aseguradoras'&&action==='update'&&syntheticId(id)&&payload){
+          payload.__syntheticQa=true;
+        }
         if(rootSynthetic&&action!=='remove'&&payload&&(syntheticId(id)||linkedSynthetic(payload))){
           payload.__syntheticQa=true;
           if(action==='insert'&&!syntheticId(id)&&['actividades','vehiculos'].includes(collection)&&linkedSynthetic(payload)){
@@ -413,3 +418,4 @@
   }
   window.Orbit.productOperationalWriteP0=Object.freeze({VERSION:VERSION,install:install,status:status,failClosed:true,noFallback:true,urlTenantAllowed:false,labModeAllowed:false,writeTransport:'firebase-functions',workflowSemanticOwner:true});
 })();
+
