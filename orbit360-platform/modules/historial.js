@@ -13,8 +13,14 @@ Orbit.modules.historial = (function () {
     let x={}; try{x=S()?._productStatus?.()||{};}catch(_){}
     const known=Array.isArray(x.serverConfirmedCollections);
     const ready=!known||x.serverConfirmedCollections.includes('actividades');
-    const failed=!!(x.snapshotErrors&&x.snapshotErrors.actividades);
-    return {ready,failed,pending:!ready&&!failed};
+    const raw=String(x.snapshotErrors&&x.snapshotErrors.actividades||'');
+    const failed=!!raw;
+    // Safe, non-sensitive diagnostic code on an existing error banner. It
+    // exposes neither an activity, a user identifier nor a callable response.
+    const code=/^PROTECTED_READ_[A-Z0-9_]+$/.test(raw)||
+      /^functions\/(permission-denied|deadline-exceeded|internal|unauthenticated|unavailable|resource-exhausted)$/.test(raw)
+      ?raw:'HISTORY_READ_UNAVAILABLE';
+    return {ready,failed,pending:!ready&&!failed,code};
   }
 
   const TIPOS = { llamada: 'Llamada', whatsapp: 'WhatsApp', email: 'Correo', correo: 'Correo', reunion: 'Reunión', nota: 'Nota', sistema: 'Sistema', recuperacion: 'Recuperación', siniestro: 'Siniestro' };
@@ -37,7 +43,7 @@ Orbit.modules.historial = (function () {
   function render(host) {
     const sourceState=activityReadiness();
     const notice=sourceState.failed
-      ? '<div class="cfg-note" role="alert">No fue posible consultar el historial autorizado. Vuelve a intentar la carga.</div>'
+      ? '<div class="cfg-note" role="alert" data-history-read-error="'+sourceState.code+'">No fue posible consultar el historial autorizado. Vuelve a intentar la carga.</div>'
       :sourceState.pending
       ? '<div class="cfg-note" role="status">Consultando historial autorizado…</div>'
       :'';

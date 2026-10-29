@@ -1,4 +1,4 @@
-name: Gravicentra B4-003 Historial exact one LAB Preview
+name: Gravicentra B4-003 Historial verified-parent LAB Preview
 
 # One source-bound successor within I6.5/B4-003. Never a security release.
 on:
@@ -9,7 +9,9 @@ on:
       - .github/workflows/gravicentra-b4-003-historial-lab-preview.yml
       - artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json
       - artifacts/orbit360-recovery/release-control/I6_5_B4_003_HISTORIAL_READER_SUCCESSOR_20261028.json
+      - artifacts/orbit360-recovery/release-control/I6_5_B4_003_HISTORIAL_PREFETCH_SUCCESSOR_20261028.json
       - functions/b4-003-scoped-related-reader.js
+      - orbit360-platform/modules/historial.js
       - tools/gravicentra-b4-003-scoped-related-reader.test.cjs
       - tools/gravicentra-i6-control-plane-guard-v1.mjs
 
@@ -25,14 +27,14 @@ jobs:
     if: >-
       github.repository == 'paulaosoriof86/orbit360-core' &&
       github.ref == 'refs/heads/recovery/fase-a-clean-20260831' &&
-      github.event.head_commit.message == 'fix(i6.5 B4-003): bounded legacy history reader in LAB Preview'
+      github.event.head_commit.message == 'fix(i6.5 B4-003): batch verified history parents for isolated LAB UAT'
     runs-on: ubuntu-24.04
     timeout-minutes: 35
     env:
       PROJECT_ID: ays-orbit-360-lab
       HOSTING_SITE: ays-orbit-360-lab
       TENANT_HINT: alianzas-soluciones
-      PARENT_SHA: 9e4fd33a682f19d08b834daf370c73dd17b2b468
+      PARENT_SHA: a236f2c5fab1a338f1619ecdf187ff3d9fe1fc4f
       RELEASE_GATE: I6.5-B4-003
       BUILD_PREFIX: gi-i65-b4
       ENVIRONMENT_REF: firebase-hosting-preview-i6-5-forensic-b4-003
@@ -57,18 +59,20 @@ jobs:
         run: |
           set -euo pipefail
           test "$(git rev-parse HEAD^)" = "$PARENT_SHA"
-          test "$(git show -s --format=%s HEAD)" = 'fix(i6.5 B4-003): bounded legacy history reader in LAB Preview'
+          test "$(git show -s --format=%s HEAD)" = 'fix(i6.5 B4-003): batch verified history parents for isolated LAB UAT'
           git diff --name-only "$PARENT_SHA" HEAD | LC_ALL=C sort > "$RUNNER_TEMP/actual-files"
           printf '%s\n' \
             .github/workflows/gravicentra-b4-003-historial-lab-preview.yml \
             artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json \
-            artifacts/orbit360-recovery/release-control/I6_5_B4_003_HISTORIAL_READER_SUCCESSOR_20261028.json \
+            artifacts/orbit360-recovery/release-control/I6_5_B4_003_HISTORIAL_PREFETCH_SUCCESSOR_20261028.json \
             functions/b4-003-scoped-related-reader.js \
+            orbit360-platform/modules/historial.js \
             tools/gravicentra-b4-003-scoped-related-reader.test.cjs \
             tools/gravicentra-i6-control-plane-guard-v1.mjs | LC_ALL=C sort > "$RUNNER_TEMP/expected-files"
           diff -u "$RUNNER_TEMP/expected-files" "$RUNNER_TEMP/actual-files"
-          test "$(git hash-object functions/b4-003-scoped-related-reader.js)" = '0c8dcec67e7f2316180b37e393cf4a1fd7f57a4c'
-          test "$(git hash-object tools/gravicentra-b4-003-scoped-related-reader.test.cjs)" = '27d6ed768b833afd6580a7a001fecf433ba536be'
+          test "$(git hash-object functions/b4-003-scoped-related-reader.js)" = '30086b675f5d1461e4e5c933d99cda9d636fbb86'
+          test "$(git hash-object orbit360-platform/modules/historial.js)" = '9e281830a6a98a4e42bb26baec68c1ca7a2de164'
+          test "$(git hash-object tools/gravicentra-b4-003-scoped-related-reader.test.cjs)" = '6e4e2b3c15415fef9bebd9c1ba8c6e00fd7692f7'
           node tools/gravicentra-b4-003-scoped-related-reader.test.cjs
           node tools/gravicentra-b4-003-auth-terminal.test.cjs
           node tools/gravicentra-b4-003-dual-host-protected-transport.test.cjs
@@ -147,7 +151,10 @@ jobs:
           const backend=fs.readFileSync(dir+'/backend/b4-003-scoped-related-reader.js','utf8');
           if(Object.keys(conf).join(',')!=='hosting'||conf.hosting.site!=='ays-orbit-360-lab'||conf.hosting.public!=='site')throw Error('HOSTING_LAB_ONLY_CONFIG_REQUIRED');
           if(meta.sourceSha!==process.env.GITHUB_SHA||!runtime.includes('"scopedReadPreviewCandidate":true'))throw Error('HOSTED_SOURCE_OR_PROTECTED_READER_MISMATCH');
-          if(!backend.includes('const parentReads=new Map()')||!backend.includes('MAX_WORKFLOW_CONCURRENCY=25'))throw Error('SCOPED_BACKEND_HISTORIAL_PATCH_MISSING');
+          const history=fs.readFileSync(dir+'/site/modules/historial.js','utf8');
+          if(!backend.includes('const parentReads=new Map()')||!backend.includes('MAX_WORKFLOW_CONCURRENCY=25')||
+            !backend.includes('MAX_PARENT_BATCH=100,MAX_BATCH_WORKERS=4')||
+            !history.includes('data-history-read-error'))throw Error('SCOPED_BACKEND_HISTORIAL_PREFETCH_OR_SAFE_DIAGNOSTIC_MISSING');
           NODE
 
       - name: Deploy only existing protected read-only LAB callable

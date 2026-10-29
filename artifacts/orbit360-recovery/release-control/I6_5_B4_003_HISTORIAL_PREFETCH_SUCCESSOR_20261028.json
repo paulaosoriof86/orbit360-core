@@ -1,0 +1,72 @@
+{
+  "schema": "GI_I65_B4_003_HISTORIAL_PREFETCH_SUCCESSOR_V1",
+  "status": "SOURCE_QA_PASS_NEW_LAB_PREVIEW_PENDING_SECURITY_HOLD",
+  "authority": "PAULA_EXPLICIT_SINGLE_CORRECTIVE_SUCCESSOR_AFTER_AUTHENTICATED_UAT_20261028",
+  "gate": "I6.5/B4-003",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "parentHead": "a236f2c5fab1a338f1619ecdf187ff3d9fe1fc4f",
+  "sourceBlobsBefore": {
+    "functions/b4-003-scoped-related-reader.js": "0c8dcec67e7f2316180b37e393cf4a1fd7f57a4c",
+    "orbit360-platform/modules/historial.js": "6329129526b850a62e645aa9cd384e7d19317365"
+  },
+  "sourceBlobsAfter": {
+    "functions/b4-003-scoped-related-reader.js": "30086b675f5d1461e4e5c933d99cda9d636fbb86",
+    "orbit360-platform/modules/historial.js": "9e281830a6a98a4e42bb26baec68c1ca7a2de164"
+  },
+  "qaBlobsBefore": {
+    "tools/gravicentra-b4-003-scoped-related-reader.test.cjs": "27d6ed768b833afd6580a7a001fecf433ba536be"
+  },
+  "qaBlobsAfter": {
+    "tools/gravicentra-b4-003-scoped-related-reader.test.cjs": "6e4e2b3c15415fef9bebd9c1ba8c6e00fd7692f7"
+  },
+  "observedEvidence": {
+    "previewSourceSha": "a236f2c5fab1a338f1619ecdf187ff3d9fe1fc4f",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-40787947409-ke97i4i3.web.app/",
+    "authenticatedRole": "Carlos Castro / Operativo",
+    "historyErrorBanner": true,
+    "activityCountNotYetVerified": true,
+    "googleCloudLogs": {
+      "slowProtectedRequests": ["9.886s", "11.501s"],
+      "collectionForThoseRequestsNotIndependentlyLogged": true,
+      "independent403Diagnostics": "MODULE_DENIED:cancelaciones",
+      "historial403Claimed": false
+    }
+  },
+  "remediation": {
+    "serverChange": "BOUNDED_ADMIN_FIRESTORE_GETALL_PARENT_PREFETCH_PER_REQUEST",
+    "maxParentRefsPerBatch": 100,
+    "maxConcurrentParentBatches": 4,
+    "crossRequestCache": false,
+    "perRowTenantCountryAdvisorScopeChecksRetained": true,
+    "malformedRelationsRemainQuarantined": true,
+    "batchReadbackIdentityVerified": true,
+    "clientDiagnostic": "SANITIZED_ERROR_CODE_ONLY_ON_EXISTING_HISTORY_ERROR_BANNER",
+    "browserCallTimeoutChanged": false
+  },
+  "regression": {
+    "runner": "node tools/gravicentra-b4-003-scoped-related-reader.test.cjs",
+    "result": "PASS",
+    "syntheticSharedParentActivities": 120,
+    "syntheticUniqueParentActivities": 120,
+    "batchBoundsAndReadbackVerified": true,
+    "roleCountryTenantAndPaginationVerified": true,
+    "malformedLegacyRelationQuarantined": true,
+    "realFirestoreUsed": false,
+    "dataWrites": 0
+  },
+  "scope": {
+    "hosting": "ONE_NEW_ISOLATED_LAB_PREVIEW_CHANNEL_ONLY",
+    "callable": "orbit360ScopedPolicyReadPreview",
+    "sharedFirestoreRulesDeploy": false,
+    "authIamMutation": false,
+    "realBusinessWrites": false,
+    "syntheticDataWrites": false,
+    "dataMutation": false,
+    "reimport": false,
+    "livePromotion": false,
+    "historicalCertificationsRewritten": false,
+    "securityB4003HoldReleased": false
+  },
+  "acceptance": "SOURCE_ONLY_PASS_LAB_AUTHENTICATED_RETEST_REQUIRED_NOT_PRODUCTION_CERTIFIED"
+}

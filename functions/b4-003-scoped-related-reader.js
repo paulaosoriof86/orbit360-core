@@ -447,6 +447,54 @@ async function readScopedRelatedList({db,auth,request}){
        .then(s=>s.exists?s.data()||{}:null));
      return parentReads.get(key);
    }
+   // A cold History screen can contain hundreds of legacy activities with
+   // different parent IDs.  Issuing even 25 concurrent individual get() calls
+   // per wave was observed to approach the browser's protected-call deadline.
+   // Fetch canonical parents in bounded Firestore getAll() groups, preserving
+   // the exact same row-by-row authorization below. The cache lives ONLY for
+   // this authenticated request; missing/foreign parents never grant access.
+   async function warmWorkflowParents(){
+     if(typeof db.getAll!=='function')return;
+     const policies=new Set(),clients=new Set();
+     for(const d of docs){
+       const row=d.data()||{};
+       if(row.tenantId&&row.tenantId!==tenantId)continue;
+       const stated=clean(row.pais||row.country).toUpperCase();
+       if(stated&&stated!==country)continue;
+       if(stated&&clean(row.asesorId||row.advisorId||row.ownerAdvisorId))continue;
+       const pid=clean(row.polizaId||row.policyId);
+       const cid=clean(row.clienteId||row.clientId);
+       try{
+         if(pid)policies.add(safeId(pid,'POLICY'));
+         else if(cid)clients.add(safeId(cid,'CLIENT'));
+       }catch(e){if(!(e instanceof Denied))throw e;}
+     }
+     const MAX_PARENT_BATCH=100,MAX_BATCH_WORKERS=4;
+     const jobs=[];
+     for(const [kind,ids] of [['polizas',policies],['clientes',clients]]){
+       const unique=Array.from(ids);
+       for(let i=0;i<unique.length;i+=MAX_PARENT_BATCH)
+         jobs.push({kind,ids:unique.slice(i,i+MAX_PARENT_BATCH)});
+     }
+     let next=0;
+     async function worker(){
+       while(next<jobs.length){
+         const job=jobs[next++];
+         const refs=job.ids.map(id=>docRef(tenant,job.kind,id));
+         const snapshots=await db.getAll(...refs);
+         if(!Array.isArray(snapshots)||snapshots.length!==refs.length)
+           throw new Denied('WORKFLOW_PARENT_BATCH_READBACK_INVALID');
+         snapshots.forEach((s,i)=>{
+           if(s?.ref?.path&&refs[i]?.path&&s.ref.path!==refs[i].path)
+             throw new Denied('WORKFLOW_PARENT_BATCH_READBACK_INVALID');
+           parentReads.set(job.kind+':'+job.ids[i],
+             Promise.resolve(s&&s.exists?s.data()||{}:null));
+         });
+       }
+     }
+     await Promise.all(Array.from({length:Math.min(MAX_BATCH_WORKERS,jobs.length)},worker));
+   }
+   await warmWorkflowParents();
    async function authorize(d){
      try{
      const row=d.data()||{};

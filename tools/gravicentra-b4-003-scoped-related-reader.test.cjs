@@ -97,6 +97,10 @@ assert.ok(routerSource.includes("historial: ['actividades', 'clientes', 'polizas
   'B4_003_HISTORIAL_ROUTER_REACTIVE_COLLECTIONS_REQUIRED');
 assert.ok(historialSource.includes('function activityReadiness()')&&historialSource.includes('sourceState.ready?all.length'),
   'B4_003_HISTORIAL_MUST_NOT_RENDER_FALSE_ZERO_BEFORE_SERVER_READ');
+assert.ok(historialSource.includes('data-history-read-error')&&
+  historialSource.includes('HISTORY_READ_UNAVAILABLE')&&
+  historialSource.includes('PROTECTED_READ_[A-Z0-9_]+'),
+  'B4_003_HISTORIAL_LAB_FAILURE_MUST_EXPOSE_ONLY_SANITIZED_ERROR_CODE');
 assert.ok(rawReader.includes('Promise.all(anchors.map(async pid=>'),'B4_003_RELATED_ANCHORS_PARALLEL_BOUNDED_REQUIRED');
 assert.ok(rawReader.includes('policyIds.length>10'),'B4_003_MAX_TEN_ANCHORS_PRESERVED');
 const docs={
@@ -132,8 +136,10 @@ const db={collection:x=>{assert.equal(x,'tenants');return{doc:tenant=>{assert.eq
 function queryModel(table,terms=[],after='',cap=100){
  const rows=docs[table]||{};
  return {
-  doc:id=>({get:async()=>{if(table==='clientes'&&id==='c1')historyParentGets++;
-    return {id,exists:!!rows[id],data:()=>rows[id]};}}),
+  doc:id=>({path:`tenants/${tenantId}/data/${table}/items/${id}`,
+   get:async()=>{if(table==='clientes'&&id==='c1')historyParentGets++;
+    return {id,exists:!!rows[id],data:()=>rows[id],
+     ref:{path:`tenants/${tenantId}/data/${table}/items/${id}`}};}}),
   where:(field,op,value)=>queryModel(table,terms.concat([{field,op,value}]),after,cap),
   orderBy:field=>{assert.equal(field,'__name__');return queryModel(table,terms,after,cap);},
   startAfter:doc=>queryModel(table,terms,doc.id,cap),
@@ -309,6 +315,11 @@ async function deny(fn,code){let thrown;try{await fn()}catch(e){thrown=e}assert.
    const id='histLegacy'+String(i).padStart(3,'0');performanceIds.push(id);
    docs.actividades[id]={id,tenantId,clienteId:'c1',tipo:'nota'};
  }
+ const originalGetAll=db.getAll,historyBatchSizes=[];
+ db.getAll=async(...refs)=>{
+   historyBatchSizes.push(refs.length);
+   return Promise.all(refs.map(ref=>ref.get()));
+ };
  historyParentGets=0;
  const activityPage1=await flow('actividades','asesor',{pageSize:50});
  assert.equal(activityPage1.rows.length,50);
@@ -324,9 +335,30 @@ async function deny(fn,code){let thrown;try{await fn()}catch(e){thrown=e}assert.
  assert.equal(countryIsolation.rows.length,0,'HISTORY_FOREIGN_COUNTRY_WITH_GT_PARENT_DENIED');
  const allHistory=await flow('actividades','operativo',{pageSize:50});
  assert.ok(!allHistory.rows.some(x=>['histBadKey','histCrossTenant','histForeignCountry'].includes(x.id)));
+ assert.ok(historyBatchSizes.length>0&&historyBatchSizes.every(n=>n>0&&n<=100),
+   'HISTORY_ADMIN_BATCH_PREFETCH_MUST_BE_BOUNDED');
+ const uniqueClients=[];
+ for(let i=0;i<120;i++){
+   const suffix=String(i).padStart(3,'0'),cid='histClient'+suffix,id='histUnique'+suffix;
+   docs.clientes[cid]={id:cid,tenantId,pais:'GT',asesorId:'a1'};
+   docs.actividades[id]={id,tenantId,clienteId:cid,tipo:'nota'};
+   uniqueClients.push({cid,id});
+ }
+ const batchStart=historyBatchSizes.length;
+ const uniqueHistory=await flow('actividades','operativo',{pageSize:50});
+ assert.equal(uniqueHistory.rows.length,50,'HISTORY_UNIQUE_PARENT_PAGE_SIZE');
+ assert.ok(historyBatchSizes.slice(batchStart).length>=2&&
+   historyBatchSizes.slice(batchStart).some(n=>n===100)&&
+   historyBatchSizes.slice(batchStart).every(n=>n<=100),
+   'HISTORY_120_UNIQUE_PARENTS_SPLIT_INTO_BOUNDED_BATCHES');
+ db.getAll=async(...refs)=>(await Promise.all(refs.map(ref=>ref.get()))).reverse();
+ await deny(()=>flow('actividades','operativo',{pageSize:50}),
+   'WORKFLOW_PARENT_BATCH_READBACK_INVALID');
+ db.getAll=originalGetAll;
+ uniqueClients.forEach(({cid,id})=>{delete docs.clientes[cid];delete docs.actividades[id];});
  for(const id of [...performanceIds,'histBadKey','histCrossTenant','histForeignCountry'])delete docs.actividades[id];
- checks+=7;
- console.log('B4_003_HISTORY_LEGACY_DERIVED_SCOPE_CACHE_PAGINATION_QA_PASS 120_synthetic_rows 1_parent_get_per_request malformed_fk_quarantined no_data_writes');
+ checks+=10;
+ console.log('B4_003_HISTORY_LEGACY_DERIVED_SCOPE_CACHE_PAGINATION_QA_PASS 120_shared_and_120_unique_synthetic_rows getAll_bounded_100 readback_verified malformed_fk_quarantined no_data_writes');
  console.log('B4_003_LEGACY_COUNTRY_RELATION_REGRESSION_PASS checks=3 no_data_writes');
 
  // R23 institutional/individual metas contract against secure B4 list.
