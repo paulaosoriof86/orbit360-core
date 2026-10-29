@@ -1,0 +1,129 @@
+name: Gravicentra I6.5 B4-003 Exact Reader Preview Resync
+
+on:
+  push:
+    branches: [recovery/fase-a-clean-20260831]
+    paths:
+      - .github/workflows/gravicentra-b4-003-reader-preview-resync.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: gi-i65-b4003-reader-preview-resync
+  cancel-in-progress: false
+
+jobs:
+  exact-reader-preview-only:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    env:
+      PROJECT_ID: ays-orbit-360-lab
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+          persist-credentials: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Assert one exact transport-only successor and frozen authority
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = 'recovery/fase-a-clean-20260831'
+          test "$(git rev-parse HEAD^)" = 'c4a94755e80e0c9d77d2c4cb67af4711ce398036'
+          test "$(git diff --name-only HEAD^ HEAD)" = '.github/workflows/gravicentra-b4-003-reader-preview-resync.yml'
+          test "$(git rev-parse HEAD:artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json)" = "$(git rev-parse HEAD^:artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json)"
+          test "$(git rev-parse HEAD:functions/b4-003-scoped-related-reader.js)" = "$(git rev-parse HEAD^:functions/b4-003-scoped-related-reader.js)"
+          test "$(git rev-parse HEAD:functions/b4-003-scoped-policy-callable.js)" = "$(git rev-parse HEAD^:functions/b4-003-scoped-policy-callable.js)"
+          node --check functions/b4-003-scoped-policy-callable.js
+          node --check functions/b4-003-scoped-related-reader.js
+          node tools/gravicentra-b4-003-scoped-related-reader.test.cjs
+          node tools/gravicentra-b4-003-protected-hydration.test.cjs
+          node tools/gravicentra-b4-003-role-context-recovery.test.cjs
+
+      - name: Snapshot LIVE bytes before deployment
+        run: |
+          set -euo pipefail
+          curl --fail --silent --show-error --location --retry 2 --max-time 25 https://ays-orbit-360-lab.web.app/ | sha256sum | cut -d ' ' -f1 > "$RUNNER_TEMP/live-before.sha256"
+
+      - name: Resolve existing Firebase service account and pinned CLI
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/gi-b4003-reader-auth"
+          python3 - <<'PY'
+          import json,os,pathlib
+          out=pathlib.Path(os.environ['RUNNER_TEMP'])/'gi-b4003-reader-auth'
+          files=[]
+          for i,key in enumerate(('SA_DEFAULT','SA_ORBIT360_LAB','SA_ORBIT_360_LAB')):
+              try: data=json.loads(os.environ.get(key,''))
+              except (ValueError,TypeError): continue
+              if data.get('type')!='service_account' or data.get('project_id')!='ays-orbit-360-lab' or not data.get('private_key'): continue
+              p=out/f'{i}.json';p.write_text(json.dumps(data));p.chmod(0o600);files.append(str(p))
+          if not files: raise SystemExit('B4003_PREVIEW_RESYNC_NO_CONFIGURED_SERVICE_ACCOUNT')
+          (out/'candidates').write_text('\n'.join(files)+'\n')
+          PY
+          npm install --prefix "$RUNNER_TEMP/gi-b4003-reader-cli" --ignore-scripts --no-audit --no-fund firebase-tools@14.10.1 >/dev/null
+          node tools/gravicentra-firebase-tools-empty-extensions-workaround-v1.mjs "$RUNNER_TEMP/gi-b4003-reader-cli"
+          CLI="$RUNNER_TEMP/gi-b4003-reader-cli/node_modules/firebase-tools/lib/bin/firebase.js"
+          echo "FIREBASE_CLI_BIN=$CLI" >> "$GITHUB_ENV"
+          selected=''
+          while IFS= read -r file; do
+            if GOOGLE_APPLICATION_CREDENTIALS="$file" node "$CLI" functions:list --project "$PROJECT_ID" --non-interactive --json >/dev/null 2>&1; then selected="$file"; break; fi
+          done < "$RUNNER_TEMP/gi-b4003-reader-auth/candidates"
+          test -n "$selected"
+          cp "$selected" "$RUNNER_TEMP/gi-b4003-reader-service-account.json"
+          chmod 600 "$RUNNER_TEMP/gi-b4003-reader-service-account.json"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/gi-b4003-reader-service-account.json" >> "$GITHUB_ENV"
+
+      - name: Stage the exact existing reader source without product edits
+        run: |
+          set -euo pipefail
+          root="$RUNNER_TEMP/gi-b4003-reader-preview-package"
+          mkdir -p "$root"
+          cp -a functions "$root/backend"
+          node - "$root/backend/bootstrap.js" <<'NODE'
+          const fs=require('node:fs');
+          const file=process.argv[2];
+          const original=fs.readFileSync(file,'utf8');
+          if(original.includes('b4-003-scoped-policy-callable'))throw Error('READER_EXPORT_ALREADY_INTEGRATED_STOP');
+          fs.appendFileSync(file,"\n// Temporary package export: Preview only; production name is NOT deployed.\nObject.assign(module.exports,require('./b4-003-scoped-policy-callable'));\n");
+          NODE
+          (cd "$root/backend" && npm ci --ignore-scripts --no-audit --no-fund >/dev/null)
+          printf '{"functions":{"source":"backend"}}\n' > "$root/firebase.json"
+          echo "B4003_PREVIEW_PACKAGE_ROOT=$root" >> "$GITHUB_ENV"
+
+      - name: Deploy only orbit360ScopedPolicyReadPreview
+        run: |
+          set -euo pipefail
+          node "$FIREBASE_CLI_BIN" deploy --only functions:orbit360ScopedPolicyReadPreview --config "$B4003_PREVIEW_PACKAGE_ROOT/firebase.json" --project "$PROJECT_ID" --non-interactive
+          node "$FIREBASE_CLI_BIN" functions:list --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/gi-b4003-reader-after.json"
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const doc=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/gi-b4003-reader-after.json','utf8'));
+          const functions=Array.isArray(doc.result)?doc.result:Array.isArray(doc)?doc:[];
+          if(!functions.some(x=>[x.entryPoint,x.id,x.name].some(v=>String(v||'').includes('orbit360ScopedPolicyReadPreview'))))throw Error('B4003_PREVIEW_READER_NOT_FOUND_AFTER_DEPLOY');
+          NODE
+
+      - name: Read back Preview and prove LIVE byte stability
+        run: |
+          set -euo pipefail
+          status=$(curl --silent --show-error --output /dev/null --write-out '%{http_code}' --max-time 25 --head https://us-east1-ays-orbit-360-lab.cloudfunctions.net/orbit360ScopedPolicyReadPreview)
+          test "$status" = '400'
+          curl --fail --silent --show-error --location --retry 2 --max-time 25 https://ays-orbit-360-lab.web.app/ | sha256sum | cut -d ' ' -f1 > "$RUNNER_TEMP/live-after.sha256"
+          cmp "$RUNNER_TEMP/live-before.sha256" "$RUNNER_TEMP/live-after.sha256"
+          printf '{"gate":"I6.5/B4-003","status":"PREVIEW_READER_RESYNC_TECHNICAL_PASS","sourceParent":"c4a94755e80e0c9d77d2c4cb67af4711ce398036","deployedFunction":"orbit360ScopedPolicyReadPreview","region":"us-east1","previewHeadStatus":400,"liveHostingBytesUnchanged":true,"liveFunctionDeployed":false,"firestoreRulesChanged":false,"authIamChanged":false,"dataWrites":0,"realUserUat":"PENDING"}\n' > "$RUNNER_TEMP/gi-b4003-reader-resync-result.json"
+          echo 'Preview reader synchronized; LIVE unchanged; authenticated two-UID UAT remains pending.' >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: gi-b4003-preview-reader-resync-${{ github.run_id }}
+          path: ${{ runner.temp }}/gi-b4003-reader-resync-result.json
+          if-no-files-found: warn
+          retention-days: 30
