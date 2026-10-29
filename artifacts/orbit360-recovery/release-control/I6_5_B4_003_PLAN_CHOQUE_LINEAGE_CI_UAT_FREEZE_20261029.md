@@ -102,3 +102,37 @@ Causa reproducida del rechazo `functions/permission-denied` en actualización QA
 5. Preflight de copia/restauración aislada, artefacto único y rollback; promoción controlada solo después de superar gates, con readback LIVE y escrituras expresamente autorizadas. Agosto sigue fuera de alcance hasta aceptación productiva.
 
 **Gobierno de avance:** reportar por lote **versiones reconciliadas, rutas verificadas, defectos causales abiertos/cerrados, builds/CI/Preview/LIVE acreditados**. No convertir el 50% formal I6 ni el 96% histórico de B3 en «porcentaje de módulos funcionando hoy». No repetir aprobaciones previas; limitar UAT a deltas de source/rol/dato realmente afectados.
+
+
+---
+
+## 7. CIERRE TÉCNICO PARCIAL 29-OCT-2026 — PUBLICACIÓN, CI, PREVIEW Y RAÍZ TRANSVERSAL
+
+**No sustituye cierre B4-003 ni PRODUCTION_ACCEPTED.** Adenda de evidencia posterior al apartado 6; conservar la secuencia de recuperación, las 15 capacidades aprobadas y recibos históricos inmutables.
+
+### 7.1 Evidencia de publicación material
+
+1. Documento de plan 29-oct, commit `add5c8356428df4ffcb4b527c8329e7e5158d06f`, blob `452dea66ff11e026bf23f1b80c33c37c770c9ded`, Guard v5 run `40886682710` SUCCESS.
+2. Corrección **solo Preview QA sintética** de Aseguradoras, commit `8193ab69dabde3c8001258e4e8f33860c15418e4`; escritor `orbit360-platform/data/store-firestore-product-operational-p0.js` blob `8bd608bc5a3aa7cd58feca8e309c97ea19059a91`; prueba focal `tools/gravicentra-b4-003-insurer-preview-projection.test.cjs` 5/5 PASS local y en CI. Recupera el marcador `__syntheticQa` que el directorio protegido no proyecta, solo para el update de aseguradora con identificador sintético en canal Preview; no autoriza editar una aseguradora real ni modifica el endpoint LIVE.
+3. Ajuste de control de linaje de recibo histórico sin alterar su contenido, commit `4c06fd22f4eb2e387803a60e982eaee948b7d762`; guard valida blob antiguo en commit pinned y nuevo en sucesor. Activación de CI commit `a63a7af5eb066bc87f94131e7b981741b29e4afc`; Guard v5 run `40888149342` SUCCESS, `SECURITY_RELEASE_HOLD=ACTIVE_FAIL_CLOSED`, 6 P0 aún abiertos.
+4. Workflow aislado Hosting-only commit `e08851199fcfef10aa76348e12554b1f0b8e2ed3` y corrección exclusivamente de disparador commit `f4f3879009594ea32a882540015afae87e097a84`. Guard v5 run `40889172710` SUCCESS.
+5. Despliegue aislado run `40889172816` **SUCCESS**; fuente inmutable `a63a7af5eb066bc87f94131e7b981741b29e4afc`; Preview `https://ays-orbit-360-lab--gi-i65-b4-a63a7af5-40889172816-ocai3efe.web.app/`. CI verificó 10 baterías sintéticas/regresión, archivo de fuente/build y bytes servidos exactos, comparación sin cambios de `ays-orbit-360-lab.web.app` y `app.aysseguros.com`; no despliegue LIVE, Functions, Rules, Auth, IAM ni escrituras operativas.
+6. La inspección interactiva de la nueva URL mostró pantalla de Login; cada subdominio Preview exige sesión propia. **UAT autenticada del cambio de Aseguradoras pendiente**, sin PASS de operación real; Paula fue informada para autenticarse sin compartir credenciales.
+
+### 7.2 Hallazgo sistémico — composición de módulos históricos vs contrato de escritura actual
+
+**Dato primario:** inspección estática de 28 archivos base bajo `orbit360-platform/modules/` en fuente `a63a7af5`, contrastados con el `SURFACE` efectivo del escritor `store-firestore-product-operational-p0.js`. No se ejecutaron writes reales para esta tabla, por lo que son **rutas técnicas de riesgo, no fallos UAT acreditados individualmente**.
+
+- **11 combinaciones módulo/colección con operaciones insert/update/remove fuera del allowlist**: Academia→`cursos`; Correo→`correos`; Finanzas→`facturas`, `presupuesto`, `acreedores`, `conciliacionBanco`; Marketing→`contenidos`; Plantillas→`plantillas`; Portal→`notifs` y `documentos`; Reportes→`reportes_prog`. Agrupan 7 módulos. Pueden tener bridges o rutas alternativas: se exige revisión de llamada activa, backend y última aceptación antes de atribuir regresión general.
+- **7 claves `setPref` en 4 módulos**: Automatizaciones (`aut_cfg`, `aut_log`); Configuración (`planes`, `paises`, `integ_`); Cotizador (`cot_hist`); Notificaciones (`wa_log`). El `setPref` de la fachada activa utiliza exclusivamente `prefOverlay` en memoria. No equivalen a persistencia durable después de recarga; probar impacto real de cada flujo y no elevar a PASS por mostrar toast.
+- **Plantillas: fallo REAL de navegación actual** en Preview `199860dd`: route `#/plantillas` deja contenedor principal vacío y consola `PRODUCT_WRITE_COLLECTION_NOT_AUTHORIZED` (dos errores); la función `boot()` intenta insertar las seis plantillas base al renderizar cuando `S().all('plantillas')` está vacío. El archivo `modules/plantillas.js` tiene el mismo blob `66f570d725e82beebfffad6df4e86aa8ab4ebd08` del commit histórico `15f6224754ec` de 07-jul; el problema es la **composición con el nuevo escritor**, no prueba de que se perdiera el desarrollo/aceptación histórica. No incorporar `plantillas` al allowlist sin backend, rol/tenant y persistencia aprobados; no simular guardados en memoria/localStorage.
+- **Portal:** en navegación de Preview antigua el gate legal global permaneció visible tras abandonar `#/portal` y recorrer otras rutas hasta recargar. Verificar teardown del modal por cambio de ruta; no aceptar términos en nombre de Paula. Está observado, pendiente de caracterización causal y prueba en nueva candidata.
+
+### 7.3 Semáforo tras este lote
+
+- **PUBLICACIÓN DE FUENTE Y CONTROL:** PASS (commits, blobs, dos Guard v5 CI).
+- **BUILD + PREVIEW AISLADA EXACTA:** PASS (run `40889172816`, sin LIVE).
+- **31 RUTAS / 28 ARCHIVOS BASE:** inventario y lectura extensa completados para localizar regresiones; **NO** 31/31 funcional PASS.
+- **UAT escritura Aseguradoras / Plantillas / Portal / Cliente 360 / Cobros / otros:** parcial o pendiente de identidad, contratos y readback; historial de Cronograma sintético conservado.
+- **B4-003, seis P0, aceptación productiva, respaldo/restauración aislada, matriz multi-UID/viewport, agosto:** HOLD / NO ACREDITADOS. No hacer deploy LIVE ni reimportar datos.
+- **Acción inmediata:** Paula autentica la nueva Preview; verificar fixture de Aseguradoras con edición/restore/readback, registrar error exacto; cerrar por causa transversal los flujos de escritura activos fuera de fachada y continuar UAT multi-módulo por rol/país sin reabrir diseños.
