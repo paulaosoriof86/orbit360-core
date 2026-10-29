@@ -32,6 +32,58 @@
     "firestoreRulesDeployAuthorized": false,
     "authIamOrDataMutationAuthorized": false
   },
+  "b4003ReleaseShockReconciliation20261028": {
+    "status": "OWNER_RULES_RISK_EXCEPTION_ACTIVE_FUNCTIONAL_PRELIVE_GATES_PENDING",
+    "recordType": "PREVALENT_READ_ONLY_EVIDENCE_RECONCILIATION_NOT_NEW_GATE",
+    "gate": "I6.5/B4-003",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PAULA_THREE_ROLE_TRANSVERSAL_UAT_DECISION_20261028.md",
+    "authority": "PAULA_20261028_RISK_ACCEPTANCE_PLUS_FROZEN_I6_MASTER_PLAN",
+    "precedence": "THIS_RECONCILIATION_AND_b4003OwnerTemporaryRulesRiskException20261028_SUPERSEDE_STALE_PREFLIGHT_DESCRIPTIONS_ONLY; ALL_HISTORIC_EVIDENCE_PRESERVED",
+    "rulesSecurityFindingStatus": "OPEN_NOT_PASS_OWNER_ACCEPTED_TEMPORARY_RISK",
+    "sameExistingRulesAloneBlockControlledLive": false,
+    "rulesHardening": "P0_URGENT_POSTPRODUCTION_BEFORE_ACCESS_EXPANSION",
+    "lastObservedSourceHead": "8f2848077589bc8fa633917886e2cbbc33c96b36",
+    "liveProtectedReader": {
+      "function": "orbit360ScopedPolicyRead",
+      "deploymentRunId": 40822620839,
+      "deploymentResult": "SUCCESS",
+      "anonymousPostHttpStatus": 401,
+      "authenticatedCrossUidCountryRoleProof": "PENDING"
+    },
+    "firestoreDisasterRecovery": {
+      "pitrObserved": "ENABLED_7_DAYS",
+      "scheduledDailyRetentionDaysObserved": 7,
+      "scheduledWeeklyRetentionDaysObserved": 28,
+      "privateFullExport": "COMPLETED_21290_DOCUMENTS_APPROX_27_76_MB",
+      "restoreDrill": "NOT_PROVEN",
+      "noSourceReimport": true
+    },
+    "authenticatedUatPreserved": {
+      "paulaThreeRolesCountrySelector": "PASS_35_23_12_35_23_12_24_17_7",
+      "paulaHydrationFiveOfFive": "PASS_ON_OBSERVED_ROLE_COUNTRY_READS",
+      "carlosIndependentUidEffectiveScope": "PENDING_CURRENT_EXACT_CANDIDATE",
+      "cronogramaDurableWriteReload": "PENDING_AUTHORIZED_SYNTHETIC_UI_UAT",
+      "insurerAuthorizedEditReload": "PENDING_AUTHORIZED_SYNTHETIC_UI_UAT",
+      "client360HistorialCobrosCrossModuleE2e": "PENDING_EXACT_PREVIEW",
+      "financeCountryParityAnomalies": "PENDING_SOURCE_RECONCILIATION"
+    },
+    "releaseSequenceUnchanged": [
+      "B4-003",
+      "B4-004",
+      "B4-005",
+      "B4-006",
+      "B4-007",
+      "I6.6",
+      "I6.7",
+      "I6.8",
+      "I6.9"
+    ],
+    "formalI6ProgressPercent": 50,
+    "historicalLedgerCountsAreNotCurrentClosureTotals": true,
+    "sourceOnlyReconciliation": true,
+    "additionalLiveDeployAuthorizedByThisRecord": false,
+    "releaseDecision": "NO_GO_PENDING_FUNCTIONAL_GATES_EXACT_ARTIFACT_AND_ROLLBACK"
+  },
   "b4003HistorialRoleParityCiDependency20261028": {
     "status": "CI_PACKAGE_DEPENDENCY_FIXED_HOSTING_LAB_READBACK_PENDING_SECURITY_HOLD",
     "authority": "PAULA_EXPLICIT_ONE_CI_DEPENDENCY_SUCCESSOR_20261028",
