@@ -1,0 +1,131 @@
+name: Gravicentra B4-003 Scoped LIVE Reader Only
+
+# One explicit, owner-authorized backend-only step after a verified full
+# Firestore export. This workflow never deploys Hosting, Rules or other Functions.
+on:
+  push:
+    branches:
+      - recovery/fase-a-clean-20260831
+    paths:
+      - '.github/workflows/gravicentra-b4-003-live-protected-reader-20261029.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: gravicentra-b4-003-live-protected-reader
+  cancel-in-progress: false
+
+jobs:
+  deploy-one-protected-reader:
+    if: github.ref == 'refs/heads/recovery/fase-a-clean-20260831'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    env:
+      PROJECT_ID: ays-orbit-360-lab
+      RELEASE_HEAD: ${{ github.sha }}
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: true
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Fail closed on source or authority drift
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "$RELEASE_HEAD" =~ ^[0-9a-f]{40}$ ]]
+          test "$(git rev-parse HEAD)" = "$RELEASE_HEAD"
+          REMOTE=$(git ls-remote origin refs/heads/recovery/fase-a-clean-20260831 | awk '{print $1}')
+          test "$REMOTE" = "$RELEASE_HEAD"
+          test "$PROJECT_ID" = ays-orbit-360-lab
+          test -f functions/b4-003-scoped-policy-callable.js
+          test -f functions/b4-003-scoped-access-boundary.js
+          test -f functions/b4-003-scoped-policy-reader.js
+          test -f functions/b4-003-scoped-related-reader.js
+          test -f functions/b4-003-scoped-bootstrap-reader.js
+          test -f functions/bootstrap.js
+          grep -Fq 'orbit360ScopedPolicyRead:onCall(opts,handle)' functions/b4-003-scoped-policy-callable.js
+          if grep -Fq "require('./b4-003-scoped-policy-callable')" functions/bootstrap.js; then
+            echo 'B4_003_LIVE_READER_ALREADY_IN_SOURCE_BOOTSTRAP'; exit 1
+          fi
+          node --check functions/b4-003-scoped-policy-callable.js
+          node tools/gravicentra-b4-003-scoped-policy-reader.test.cjs
+          node tools/gravicentra-b4-003-scoped-related-reader.test.cjs
+          node tools/gravicentra-b4-003-role-context-recovery.test.cjs
+          node tools/gravicentra-b4-003-dual-host-protected-transport.test.cjs
+
+      - name: Stage isolated function-only package
+        shell: bash
+        run: |
+          set -euo pipefail
+          TARGET_ROOT="$RUNNER_TEMP/gi-b4003-live-reader-only"
+          mkdir -p "$TARGET_ROOT"
+          cp -a functions "$TARGET_ROOT/backend"
+          node - "$TARGET_ROOT/backend/bootstrap.js" <<'NODE'
+          const fs=require('node:fs');
+          const entry=process.argv[2];
+          const current=fs.readFileSync(entry,'utf8');
+          if(current.includes("require('./b4-003-scoped-policy-callable')"))
+            throw Error('B4_003_DUPLICATE_SOURCE_BOOTSTRAP_DENIED');
+          fs.appendFileSync(entry,"\n// B4-003: stage reader exports; deploy only LIVE target.\nObject.assign(module.exports,require('./b4-003-scoped-policy-callable'));\n");
+          NODE
+          printf '{"functions":{"source":"backend"}}\n' > "$TARGET_ROOT/firebase.json"
+          (cd "$TARGET_ROOT/backend" && npm ci --ignore-scripts --no-audit --no-fund)
+          echo "TARGET_ROOT=$TARGET_ROOT" >> "$GITHUB_ENV"
+
+      - name: Select existing project-scoped deployment identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          AUTH_ROOT="$RUNNER_TEMP/gi-b4003-live-reader-auth"
+          mkdir -p "$AUTH_ROOT"
+          export AUTH_ROOT
+          python3 - <<'PY'
+          import json,os,pathlib
+          root=pathlib.Path(os.environ['AUTH_ROOT']); found=0
+          for label in ('SA_DEFAULT','SA_ORBIT360_LAB','SA_ORBIT_360_LAB'):
+              try: data=json.loads(os.environ.get(label,''))
+              except (ValueError,TypeError): continue
+              if data.get('type')!='service_account' or data.get('project_id')!='ays-orbit-360-lab' or not data.get('private_key'):
+                  continue
+              out=root/(str(found)+'.json');out.write_text(json.dumps(data));out.chmod(0o600)
+              found+=1
+          if found==0: raise SystemExit('B4_003_NO_EXISTING_PROJECT_CREDENTIAL')
+          PY
+          CLI_ROOT="$RUNNER_TEMP/gi-b4003-live-reader-firebase-cli"
+          npm install --prefix "$CLI_ROOT" --ignore-scripts --no-audit --no-fund firebase-tools@14.10.1
+          node tools/gravicentra-firebase-tools-empty-extensions-workaround-v1.mjs "$CLI_ROOT"
+          CLI="$CLI_ROOT/node_modules/firebase-tools/lib/bin/firebase.js"
+          SELECTED=''
+          for F in "$AUTH_ROOT"/*.json; do
+            if GOOGLE_APPLICATION_CREDENTIALS="$F" node "$CLI" functions:list --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/gi-b4003-pre-functions.json" 2>/dev/null; then
+              SELECTED="$F"; break
+            fi
+          done
+          test -n "$SELECTED"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$SELECTED" >> "$GITHUB_ENV"
+          echo "FIREBASE_CLI_BIN=$CLI" >> "$GITHUB_ENV"
+
+      - name: Deploy only orbit360ScopedPolicyRead and verify readback
+        shell: bash
+        run: |
+          set -euo pipefail
+          node "$FIREBASE_CLI_BIN" deploy --only functions:orbit360ScopedPolicyRead --config "$TARGET_ROOT/firebase.json" --project "$PROJECT_ID" --non-interactive
+          node "$FIREBASE_CLI_BIN" functions:list --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/gi-b4003-live-reader-readback.json"
+          node - "$RUNNER_TEMP/gi-b4003-live-reader-readback.json" <<'NODE'
+          const fs=require('node:fs');
+          const data=JSON.parse(fs.readFileSync(process.argv[2],'utf8'));
+          const rows=Array.isArray(data.result)?data.result:Array.isArray(data)?data:[];
+          const matches=rows.filter(r=>String(r.id||r.name||r.function||'').split('/').pop()==='orbit360ScopedPolicyRead');
+          if(matches.length!==1)throw Error('B4_003_LIVE_READER_READBACK_NOT_ONE');
+          console.log('B4_003_LIVE_SCOPED_READER_ONE_FUNCTION_PRESENT; NO_HOSTING_OR_RULES_DEPLOY');
+          NODE
