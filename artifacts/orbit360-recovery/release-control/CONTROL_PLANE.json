@@ -15886,6 +15886,59 @@
       "evidenceReceiptBlobSha",
       "paulaVisualApprovalIfApplicable"
     ],
+    "cumulativeTechnicalUpdate20261029": {
+      "schema": "GI_I65_B4_003_CUMULATIVE_TECHNICAL_DELTA_V1",
+      "gate": "I6.5/B4-003",
+      "authority": "PAULA_FREEZE_ONE_CANONICAL_CANDIDATE_INCREMENTAL_APPROVAL",
+      "status": "SOURCE_QA_GOVERNANCE_AND_ISOLATED_PREVIEW_PASS_AUTHENTICATED_UAT_OPEN",
+      "originalFrozenPreviewSourcePreserved": "a63a7af5eb066bc87f94131e7b981741b29e4afc",
+      "incrementalSourceCommit": "cee34a50a2bc65b4162798348725a8657ed2d6fe",
+      "incrementalGuardCommit": "1f2d6e2a489ddf988f6fa6fb7a65464027d64b3e",
+      "currentServedSourceCommit": "5ec0bf8c22e6c5b08b876c73220e90b56c9d71e8",
+      "currentTechnicalPreview": {
+        "url": "https://ays-orbit-360-lab--gi-i65-b4-sr-40909475540-l24fpt16.web.app/",
+        "runId": 40909475540,
+        "status": "HOSTING_ONLY_BUILD_BYTE_READBACK_PASS",
+        "guardRunId": 40909475386,
+        "guardStatus": "SUCCESS",
+        "liveHostsUnchanged": true,
+        "authIamRulesOrOperationalWrites": false
+      },
+      "regression": {
+        "mode": "SYNTHETIC_OFFLINE_SOURCE_ONLY",
+        "filesExecuted": 45,
+        "testsPassed": 60,
+        "testsFailed": 0,
+        "firestoreEmulatorIncluded": false
+      },
+      "changedModules": {
+        "Insights": "COUNTRY_POLICY_SCOPE_SOURCE_AND_BYTE_PASS_AUTHENTICATED_UAT_PENDING",
+        "Plantillas": "SIX_HISTORICAL_BASE_CARDS_SAFE_READ_SOURCE_AND_BYTE_PASS_AUTHENTICATED_UAT_PENDING",
+        "PlantillasServerCrud": "SECURE_PERSISTENCE_OWNER_MISSING_HOLD"
+      },
+      "historicalCertificationsPreserved": {
+        "sourceCompositionFiles": 114,
+        "approvedCapabilities": 15,
+        "findings": 295,
+        "tasks": 86
+      },
+      "currentFullCapabilityApprovals": 0,
+      "currentBrowserUat": "NOT_COMPLETED_CHROME_EXTENSION_CONTROL_ERROR",
+      "browserToolErrors": [
+        "Runtime.evaluate timeout",
+        "DataCloneError while claiming tab"
+      ],
+      "outstanding": [
+        "AUTHENTICATED_MULTI_UID_GT_CO_TODOS_FUNCTIONAL_UAT",
+        "INSIGHTS_AMOUNT_AND_CURRENCY_READBACK",
+        "PLANTILLAS_SAFE_READ_AND_SERVER_CRUD_DEPENDENCY",
+        "PORTAL_GLOBAL_COUNTRY_STATE_AND_MODAL_TEARDOWN",
+        "COBROS_ASESOR_HYDRATION_AND_COP_PORTFOLIO_RECONCILIATION",
+        "CONTROLLED_BACKUP_RESTORE_EXERCISE_AND_LATER_GATES"
+      ],
+      "productionDeployment": false,
+      "securityB4003Hold": true
+    },
     "controls": {
       "singleCanonicalCompositionLockPreserved": true,
       "historyImmutable": true,
