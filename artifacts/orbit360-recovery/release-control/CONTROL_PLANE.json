@@ -924,7 +924,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "I6_5_B4_003_CLOSEOUT_SUCCESSOR_EXACT_PREVIEW",
+  "nextAction": "I6_5_B4_003_AUTHENTICATED_EXACT_PREVIEW_UAT_AND_P0_CLOSEOUT",
   "postproductionExitProgress": {
     "formalPercent": 50,
     "frozenMiniGates": 5,
@@ -16146,6 +16146,37 @@
     "currentCapabilityAcceptances": 0,
     "securityB4003StillHold": true,
     "productionPromotionAuthorized": false,
-    "rulesAuthIamDataChangesAuthorized": false
+    "rulesAuthIamDataChangesAuthorized": false,
+    "previewState": "EXACT_PREVIEW_BUILD_BYTE_READBACK_PASS_AUTHENTICATED_UAT_PENDING",
+    "previewReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CLOSEOUT_EXACT_PREVIEW_PASS_20261029.json",
+    "previewReceiptBlobSha": "36c750211aeae6657b3ca26d1e886828c3737e53",
+    "previewSourceSha": "49c4e9af7b6ec7eb0a08c365831274c225fba763",
+    "previewRunId": 40991698979,
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-sr-40991698979-8cjwooou.web.app/",
+    "buildId": "gi-i65-b4-49c4e9af7b6e-57f234755dc1"
+  },
+  "b4003CloseoutExactPreview20261029": {
+    "status": "EXACT_PREVIEW_BUILD_BYTE_READBACK_PASS_AUTHENTICATED_UAT_PENDING",
+    "gate": "I6.5/B4-003",
+    "sourceSha": "49c4e9af7b6ec7eb0a08c365831274c225fba763",
+    "transportHead": "b07f4f2dbe36142fb1c9cc97cb50b8c98eaea502",
+    "runId": 40991698979,
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-sr-40991698979-8cjwooou.web.app/",
+    "buildId": "gi-i65-b4-49c4e9af7b6e-57f234755dc1",
+    "hostedFileCount": 218,
+    "hostedPayloadDigest": "e4fe55a444666f3144e6210cc86bd2230f4e7d7dbfa8b3833101031425f2b0a1",
+    "bundleDigest": "5bff16ee57c1ce253a5d489d4c3937ebc2d3423f1eb0527990b179aced1cbf05",
+    "artifactId": 12949870429,
+    "artifactZipSha256": "2da7954fa008ff569d27e096d2d6cb9b6c20c3b290d00200266322f635fee627",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CLOSEOUT_EXACT_PREVIEW_PASS_20261029.json",
+    "receiptBlobSha": "36c750211aeae6657b3ca26d1e886828c3737e53",
+    "productBlobs": {
+      "orbit360-platform/modules/inicio.js": "12a5a1e3293a7d59f993f829071d3bd2b4027a6c",
+      "orbit360-platform/modules/plantillas.js": "460d5f58c377ad48544aa9c4a92a97c1e9077153"
+    },
+    "liveRootsUnchanged": true,
+    "currentCapabilityAcceptances": 0,
+    "securityB4003StillHold": true,
+    "nextAction": "AUTHENTICATED_EXACT_PREVIEW_UAT_AND_PARALLEL_P0_CLOSEOUT"
   }
 }

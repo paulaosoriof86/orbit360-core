@@ -1,0 +1,55 @@
+{
+  "schema": "GRAVICENTRA_I65_B4003_CLOSEOUT_EXACT_PREVIEW_PASS_V1",
+  "gate": "I6.5/B4-003",
+  "status": "EXACT_PREVIEW_BUILD_BYTE_READBACK_PASS_AUTHENTICATED_UAT_PENDING",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "sourceSha": "49c4e9af7b6ec7eb0a08c365831274c225fba763",
+  "transportHead": "b07f4f2dbe36142fb1c9cc97cb50b8c98eaea502",
+  "runId": 40991698979,
+  "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-sr-40991698979-8cjwooou.web.app/",
+  "buildId": "gi-i65-b4-49c4e9af7b6e-57f234755dc1",
+  "hostedFileCount": 218,
+  "buildBoundAssetCount": 138,
+  "reachableProductFiles": 214,
+  "hostedPayloadDigest": "e4fe55a444666f3144e6210cc86bd2230f4e7d7dbfa8b3833101031425f2b0a1",
+  "bundleDigest": "5bff16ee57c1ce253a5d489d4c3937ebc2d3423f1eb0527990b179aced1cbf05",
+  "backendSourceDigest": "3ac3bf7bc777460d7d181bc3241efcc02e420ccfd54ba22b0e91762456c4dd4e",
+  "artifact": {
+    "id": 12949870429,
+    "zipSha256": "2da7954fa008ff569d27e096d2d6cb9b6c20c3b290d00200266322f635fee627",
+    "retainedUntil": "2026-11-06"
+  },
+  "exactProductBlobs": {
+    "orbit360-platform/modules/inicio.js": "12a5a1e3293a7d59f993f829071d3bd2b4027a6c",
+    "orbit360-platform/modules/plantillas.js": "460d5f58c377ad48544aa9c4a92a97c1e9077153"
+  },
+  "proof": {
+    "guardBeforeBuildPass": true,
+    "closeoutRegressionCases": 8,
+    "lifecycleRegressionCases": 18,
+    "criticalServedPathsCompared": 12,
+    "liveRootsUnchanged": true
+  },
+  "boundaries": {
+    "previewOnly": true,
+    "livePromotion": false,
+    "functionsDeploy": false,
+    "rulesAuthIamMutation": false,
+    "operationalWrites": false,
+    "dataImport": false,
+    "externalMessages": false,
+    "securityB4003StillHold": true,
+    "acceptanceGranted": false
+  },
+  "pending": [
+    "AUTHENTICATED_CHROME_UAT_INICIO_PLANTILLAS_AND_TRANSVERSAL_SMOKE",
+    "PERSONAL_COLLECTION_ATTRIBUTION_READBACK",
+    "INSTITUTIONAL_GOAL_WRITE_READBACK_AUDIT",
+    "FREELANCER_CANONICAL_PARTICIPATION_OWNER",
+    "QA_CANCELLED_RUN_FIXTURE_DISPOSITION",
+    "QA_ORPHAN_RENEWAL_DISPOSITION",
+    "INDEPENDENT_CARLOS_UID_UAT",
+    "ASEGURADORAS_AUDIT_BACKEND_READBACK"
+  ]
+}

@@ -4474,6 +4474,35 @@ if(canonicalCompositionActive){
   'B4_003_CLOSEOUT_SOURCE_SUCCESSOR_INVALID');
  execFileSync(process.execPath,['tools/gravicentra-b4-003-closeout-source-successor.test.cjs'],{stdio:'pipe'});
  console.log('B4_003_CLOSEOUT_SOURCE_SUCCESSOR=TWO_PRODUCT_OWNERS_EIGHT_TESTS_PREVIEW_PENDING_SECURITY_HOLD');
+ const closeoutPreview=C.b4003CloseoutExactPreview20261029;
+ const closeoutPreviewReceiptPath='artifacts/orbit360-recovery/release-control/I6_5_B4_003_CLOSEOUT_EXACT_PREVIEW_PASS_20261029.json';
+ const closeoutPreviewReceipt=readJson(closeoutPreviewReceiptPath);
+ need(closeoutPreview?.status==='EXACT_PREVIEW_BUILD_BYTE_READBACK_PASS_AUTHENTICATED_UAT_PENDING'&&
+  closeoutPreview.gate==='I6.5/B4-003'&&closeoutPreview.sourceSha==='49c4e9af7b6ec7eb0a08c365831274c225fba763'&&
+  closeoutPreview.transportHead==='b07f4f2dbe36142fb1c9cc97cb50b8c98eaea502'&&closeoutPreview.runId===40991698979&&
+  closeoutPreview.previewUrl==='https://ays-orbit-360-lab--gi-i65-b4-sr-40991698979-8cjwooou.web.app/'&&
+  closeoutPreview.buildId==='gi-i65-b4-49c4e9af7b6e-57f234755dc1'&&
+  closeoutPreview.hostedFileCount===218&&
+  closeoutPreview.hostedPayloadDigest==='e4fe55a444666f3144e6210cc86bd2230f4e7d7dbfa8b3833101031425f2b0a1'&&
+  closeoutPreview.bundleDigest==='5bff16ee57c1ce253a5d489d4c3937ebc2d3423f1eb0527990b179aced1cbf05'&&
+  closeoutPreview.artifactId===12949870429&&
+  closeoutPreview.artifactZipSha256==='2da7954fa008ff569d27e096d2d6cb9b6c20c3b290d00200266322f635fee627'&&
+  closeoutPreview.receiptBlobSha===physicalGit('hash-object',closeoutPreviewReceiptPath)&&
+  closeoutPreview.productBlobs?.['orbit360-platform/modules/inicio.js']===closeoutReceipt.sourceFiles['orbit360-platform/modules/inicio.js'].afterBlob&&
+  closeoutPreview.productBlobs?.['orbit360-platform/modules/plantillas.js']===closeoutReceipt.sourceFiles['orbit360-platform/modules/plantillas.js'].afterBlob&&
+  closeoutPreviewReceipt.schema==='GRAVICENTRA_I65_B4003_CLOSEOUT_EXACT_PREVIEW_PASS_V1'&&
+  closeoutPreviewReceipt.sourceSha===closeoutPreview.sourceSha&&
+  closeoutPreviewReceipt.transportHead===closeoutPreview.transportHead&&
+  closeoutPreviewReceipt.runId===closeoutPreview.runId&&
+  closeoutPreviewReceipt.buildId===closeoutPreview.buildId&&
+  closeoutPreviewReceipt.proof?.guardBeforeBuildPass===true&&
+  closeoutPreviewReceipt.proof?.liveRootsUnchanged===true&&
+  closeoutPreviewReceipt.boundaries?.previewOnly===true&&
+  closeoutPreviewReceipt.boundaries?.livePromotion===false&&
+  closeoutPreviewReceipt.boundaries?.operationalWrites===false&&
+  closeoutPreviewReceipt.boundaries?.securityB4003StillHold===true,
+  'B4_003_CLOSEOUT_EXACT_PREVIEW_BINDING_INVALID');
+ console.log('B4_003_CLOSEOUT_EXACT_PREVIEW=BUILD_BYTE_READBACK_PASS_AUTH_UAT_PENDING');
  need(COMP.productFileCount===COMP.productFiles.length,'I6_CANONICAL_COMPOSITION_COUNT_DRIFT');
 }
 const b1Retained=activeI65&&['B1','B2','B3','B4'].includes(forensicActiveBlock)&&Array.isArray(B1.allowedProductFiles);
