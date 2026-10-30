@@ -74,9 +74,15 @@ jobs:
            'build(i6.5 B4-003): trigger cumulative safe-read isolated Preview only','TRANSPORT_SUBJECT_MISMATCH');
           need(git('diff','--name-only','HEAD^','HEAD')===workflowPath,'TRANSPORT_MUST_CHANGE_ONLY_EXISTING_WORKFLOW');
           need(S.productPath==='orbit360-platform/modules/plantillas.js','PRODUCT_OWNER_MISMATCH');
-          const source=git('log','-1','--format=%H','--',S.productPath);
-          need(/^[0-9a-f]{40}$/.test(source)&&source===git('rev-parse','HEAD^')&&
-           git('rev-parse',source+'^')===S.parentHead,'EXACT_AUTHORIZED_SOURCE_PARENT_REQUIRED');
+          // The approved binding was sealed through multiple commits. Select
+          // the last authority/receipt change, not the last product-file change.
+          const source=git('log','-1','--format=%H','--',controlPath,S.receiptPath);
+          need(/^[0-9a-f]{40}$/.test(source)&&source!==process.env.TRANSPORT_SHA&&
+           git('merge-base',source,'HEAD')===source&&
+           git('merge-base',S.parentHead,source)===S.parentHead,
+           'EXACT_AUTHORIZED_SOURCE_ANCESTRY_REQUIRED');
+          need(git('diff','--name-only',source,'HEAD')===workflowPath,
+           'SOURCE_TO_TRANSPORT_MUST_CHANGE_ONLY_EXISTING_WORKFLOW');
           const R=JSON.parse(fs.readFileSync(S.receiptPath,'utf8'));
           need(git('hash-object',S.receiptPath)===S.receiptBlobSha&&
            R.expectedParentHead===S.parentHead&&R.gate===S.gate&&R.status===S.status&&
@@ -100,6 +106,7 @@ jobs:
            R.ledgerBinding.preservedFindings===295&&R.ledgerBinding.preservedTasks===86&&
            S.currentCapabilityAcceptances===0,'PRESERVED_EVIDENCE_MISMATCH');
           fs.appendFileSync(process.env.GITHUB_ENV,'EXACT_SOURCE_SHA='+source+'\n');
+          fs.writeFileSync(process.env.RUNNER_TEMP+'/gi-authorized-source.sha',source+'\n');
           fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY,
            'Preview authority: CONTROL_PLANE.b4003PlantillasUseLifecycleSuccessor20261029\n'+
            'Product source: '+source+'\nTransport-only commit: '+process.env.TRANSPORT_SHA+'\n');
@@ -107,7 +114,7 @@ jobs:
           NODE
           node tools/gravicentra-governance-preflight-v1.mjs --mode=i6
           # Build the authorized product commit itself, not the transport commit.
-          SOURCE_SHA=$(git rev-parse HEAD^)
+          SOURCE_SHA=$(cat "$RUNNER_TEMP/gi-authorized-source.sha")
           git checkout --detach "$SOURCE_SHA"
           test "$(git rev-parse HEAD)" = "$SOURCE_SHA"
           node tools/gravicentra-governance-preflight-v1.mjs --mode=i6
