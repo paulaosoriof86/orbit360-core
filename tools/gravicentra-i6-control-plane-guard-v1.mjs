@@ -4337,18 +4337,21 @@ if(canonicalCompositionActive){
  const lifecycleSourcePath='orbit360-platform/modules/plantillas.js';
  const lifecycleTestPath='artifacts/orbit360-recovery/release-control/b4003-uat-20261029/tests/plantillas-use-lifecycle.test.cjs';
  const lifecycleParent='d4a686e5e4e3c8e060a4cb0dc2a7943eba1ad0f9';
+ const lifecycleSourceCommit=String(lifecycle?.sourceCommit||'');
  const lifecycleIntegrationCommit=String(lifecycle?.integrationCommit||'');
- const lifecycleCommit=lifecycleIntegrationCommit;
+ const lifecycleCommit=lifecycleSourceCommit;
  const lifecycleExpectedCommitPaths=['artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json','artifacts/orbit360-recovery/release-control/I6_5_B4_003_PLANTILLAS_USE_LIFECYCLE_SUCCESSOR_20261029.json','orbit360-platform/modules/plantillas.js','tools/gravicentra-b4-003-insights-plantillas-country-no-seed.test.cjs','tools/gravicentra-i6-control-plane-guard-v1.mjs'].sort();
  const lifecycleActualCommitPaths=physicalGit('diff','--name-only',lifecycleParent+'..'+lifecycleIntegrationCommit).split(/\r?\n/).filter(Boolean).sort();
  const lifecycleTestOutput=execFileSync(process.execPath,[lifecycleTestPath],{encoding:'utf8',stdio:'pipe',env:{...process.env,PLANTILLAS_SOURCE:lifecycleSourcePath}});
  need(lifecycle?.status==='SOURCE_INTEGRATED_TESTS_BOUND_PREVIEW_PENDING_AUTHENTICATED_UAT'&&
   lifecycle?.gate==='I6.5/B4-003'&&lifecycle?.parentHead===lifecycleParent&&
+  /^[0-9a-f]{40}$/.test(lifecycleSourceCommit)&&
   /^[0-9a-f]{40}$/.test(lifecycleIntegrationCommit)&&
+  physicalGit('rev-parse',lifecycleSourceCommit+'^')===lifecycleParent&&
+  physicalGit('merge-base',lifecycleSourceCommit,lifecycleIntegrationCommit)===lifecycleSourceCommit&&
   physicalGit('merge-base',lifecycleIntegrationCommit,current)===lifecycleIntegrationCommit&&
   lifecycle?.receiptPath===lifecycleReceiptPath&&
   /^[0-9a-f]{40}$/.test(String(lifecycle.receiptBlobSha||''))&&
-  physicalGit('rev-parse',lifecycleCommit+'^')===lifecycleParent&&
   physicalGit('merge-base',lifecycleCommit,current)===lifecycleCommit&&
   lifecycleReceipt.schema==='GRAVICENTRA_I65_B4003_PLANTILLAS_USE_LIFECYCLE_SOURCE_SUCCESSOR_V1'&&
   lifecycleReceipt.gate==='I6.5/B4-003'&&lifecycleReceipt.status===lifecycle.status&&
@@ -4357,6 +4360,7 @@ if(canonicalCompositionActive){
   lifecycleReceipt.source?.path===lifecycleSourcePath&&
   lifecycleReceipt.source?.beforeBlob===physicalGit('rev-parse',lifecycleParent+':'+lifecycleSourcePath)&&
   lifecycleReceipt.source?.beforeBlob==='702c90d4c655013fc168430cb44a48aab7bdfcd0'&&
+  lifecycleReceipt.source?.afterBlob===physicalGit('rev-parse',lifecycleSourceCommit+':'+lifecycleSourcePath)&&
   lifecycleReceipt.source?.afterBlob===physicalGit('rev-parse',lifecycleIntegrationCommit+':'+lifecycleSourcePath)&&
   lifecycleReceipt.source?.afterBlob===lifecycle.afterBlob&&
   lifecycleReceipt.regression?.path===lifecycleTestPath&&
