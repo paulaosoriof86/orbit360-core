@@ -165,7 +165,44 @@ console.log('B4_003_APPROVED_ROLE_SCOPE_PARITY_PASS Finance Marketing Assistant 
     assert.equal(next.receiptBlobSha,receiptBlob,'Operational successor receipt integrity');
     assert.equal(receipt.parentHead,next.parentHead);
     assert.equal(receipt.sourceBlobsBefore[proof.owner],successor.sourceBlobSha);
-    assert.equal(receipt.sourceBlobsAfter[proof.owner],blob);
+    const metas=control.b4003MetasAtomicPreviewSourceSuccessor20261030;
+    if(metas){
+     // The Oct-26 receipt still binds its original writer. This exact child
+     // receipt extends that chain; neither historic bytes nor tests are rebased.
+     assert.equal(metas.gate,'I6.5/B4-003');
+     assert.equal(metas.status,'SOURCE_AND_SYNTHETIC_QA_PASS_PREVIEW_UAT_PENDING');
+     assert.equal(metas.parentHead,'b5c83cf255afd01cd348c53b904c1c47dbdcb241');
+     assert.equal(metas.sourceAnchor,proof.owner);
+     assert.equal(metas.receiptPath,root+'I6_5_B4_003_METAS_ATOMIC_PREVIEW_SOURCE_SUCCESSOR_20261030.json');
+     const metasBytes=fs.readFileSync(metas.receiptPath),metasReceipt=JSON.parse(metasBytes);
+     const metasBlob=crypto.createHash('sha1').update(Buffer.concat([
+      Buffer.from('blob '+metasBytes.length+'\0'),metasBytes
+     ])).digest('hex');
+     assert.equal(metas.receiptBlobSha,metasBlob,'Metas successor receipt integrity');
+     assert.equal(metasReceipt.gate,metas.gate);
+     assert.equal(metasReceipt.status,metas.status);
+     assert.equal(metasReceipt.parentHead,metas.parentHead);
+     assert.equal(metasReceipt.sourceAnchor,proof.owner);
+     const writer=metasReceipt.sourceFiles[proof.owner];
+     assert.equal(writer.beforeBlob,receipt.sourceBlobsAfter[proof.owner],'Metas must continue the immutable Oct-26 writer');
+     const parentSource=child.spawnSync('git',['rev-parse',metas.parentHead+':'+proof.owner],{encoding:'utf8',timeout:15000,maxBuffer:1024*1024});
+     if(parentSource.error)throw parentSource.error;
+     assert.equal(parentSource.signal,null,'Parent writer lookup was interrupted');
+     assert.equal(parentSource.status,0,'Exact Metas parent writer must exist in git');
+     assert.equal(parentSource.stdout.trim(),writer.beforeBlob,'Metas predecessor must match its actual parent');
+     assert.notEqual(writer.beforeBlob,writer.afterBlob,'Metas successor must identify an actual source change');
+     assert.equal(writer.afterBlob,blob,'Metas successor must bind the physical writer exercised above');
+     assert.equal(metas.productionPromotionAuthorized,false);
+     assert.equal(metas.authIamRulesChangeAuthorized,false);
+     assert.equal(metas.realBusinessWritesAuthorized,false);
+     assert.equal(metas.currentCapabilityAcceptances,0);
+     assert.equal(metasReceipt.boundaries.previewOnly,true);
+     for(const key of ['liveDeployment','authIamRulesChange','authenticatedUatAccepted','capabilityAccepted','productionAccepted','reimport','unrelatedFixtureCleanup'])
+      assert.equal(metasReceipt.boundaries[key],false,'Metas successor boundary: '+key);
+     for(const key of ['realBusinessWrites','newCollections','newEndpoints','newWorkflows'])
+      assert.equal(metasReceipt.boundaries[key],0,'Metas successor boundary: '+key);
+     console.log('B4_003_WRITER_METAS_PREVIEW_SUCCESSOR_EXACT_PARENT_CHAINED_PASS');
+    }else assert.equal(receipt.sourceBlobsAfter[proof.owner],blob);
     assert.equal(next.sharedRulesDeploymentAuthorized,false);
     assert.equal(next.dataMutationAuthorized,false);
     assert.equal(next.livePromotionAuthorized,false);

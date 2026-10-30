@@ -16,6 +16,8 @@ Orbit.modules.equipo = (function () {
   const now = U.NOW ? new Date(U.NOW) : new Date();
   let metaPeriodo = now.toISOString().slice(0, 7);
   let metaPais = (Orbit.pais && Orbit.pais !== 'TODOS') ? Orbit.pais : 'GT';
+  const META_QA_PERIOD='QA-B4-003',META_QA_CONTRACT='gravicentra-metas-preview-session-v1';
+  let metaQa = null, metaQaBusy = false, metaQaProof = '',metaQaChecked='',metaQaVerified=false;
 
   const ROLE_ORDER = ['Dirección', 'SuperAdmin', 'AdminTenant', 'Admin', 'Finanzas', 'Operativo', 'Marketing', 'Asesor', 'Asistente'];
   const LEGACY_ROLE = 'Comercial';
@@ -109,7 +111,7 @@ Orbit.modules.equipo = (function () {
     const tone = role === 'Dirección' ? 'danger' : role === 'Asesor' ? 'info' : role === 'Operativo' ? 'ok' : 'neutral';
     return `<span class="badge ${tone}" style="margin:1px 3px 1px 0">${U.esc(role)}${role === LEGACY_ROLE ? ' · legado' : ''}</span>`;
   }
-  function audit(action, motivo, before, after) {
+  function auditEntry(action, motivo, before, after) {
     const user = (() => { try { return (Orbit.auth && Orbit.auth.user && Orbit.auth.user()) || {}; } catch (e) { return {}; } })();
     const entry = {
       id: 'audit_equipo_' + Date.now() + '_' + Math.random().toString(16).slice(2),
@@ -118,6 +120,10 @@ Orbit.modules.equipo = (function () {
       tenantId: (OrbitBackend && (OrbitBackend.tenantId || OrbitBackend.tenant)) || 'tenant_actual',
       before: before || null, after: after || null
     };
+    return entry;
+  }
+  function audit(action, motivo, before, after) {
+    const entry=auditEntry(action,motivo,before,after);
     try {
       const st = S();
       if (st && st.__productOperationalWriteP0 === true && typeof st.insertDurable === 'function') return st.insertDurable('auditoria', entry).then(() => entry);
@@ -310,7 +316,60 @@ Orbit.modules.equipo = (function () {
     </table></div></div>`;
   }
 
-  function metasStore() { return (S().all('metas') || []).slice(); }
+  function metasStore() { return (S().all('metas') || []).filter(row=>row&&row.__metasPreviewQa!==true); }
+  function isMetaPreview(){const st=S();return !!(st&&typeof st.metaPreviewEnabled==='function'&&st.metaPreviewEnabled()===true);}
+  function metaQaNonce(){return Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,14);}
+  function metaQaActor(){return String(Orbit.auth&&Orbit.auth.productUser&&Orbit.auth.productUser.uid||'');}
+  function metaQaRole(){return String(Orbit.session&&typeof Orbit.session.rol==='function'?Orbit.session.rol():Orbit.auth&&Orbit.auth.productUser&&Orbit.auth.productUser.activeRole||'');}
+  function metaQaScope(){return [metaQaActor(),metaQaRole(),metaPais].join('|');}
+  function metaQaRows(){const st=S();return isMetaPreview()&&st&&typeof st.metaPreviewFixtures==='function'?st.metaPreviewFixtures():[];}
+  function metaQaSession(){
+    if(!isMetaPreview()||!puedeEditarMetaInstitucional()){metaQa=null;return null;}
+    const actorUid=metaQaActor();
+    if(metaQa&&(metaQa.actorUid!==actorUid||metaQa.activeRole!==metaQaRole()||metaQa.pais!==metaPais||metaQa.periodo!==META_QA_PERIOD))metaQa=null;
+    return metaQa;
+  }
+  async function inspectMetaQa(host){
+    if(tab!=='metas'||!isMetaPreview()||!puedeEditarMetaInstitucional()||!metaQaActor())return;
+    const scope=metaQaScope();if(metaQaChecked===scope)return;
+    metaQaChecked=scope;metaQaVerified=false;metaQaBusy=true;metaQa=null;metaQaProof='Comprobando el estado de la prueba en el servidor…';render(host);
+    try{
+      const st=S();if(typeof st.metaPreviewQaInspect!=='function')throw new Error('META_PREVIEW_INSPECT_REQUIRED');
+      const proof=await st.metaPreviewQaInspect({version:1,pais:metaPais,periodo:META_QA_PERIOD});
+      if(metaQaScope()!==scope)return;
+      metaQaVerified=true;
+      if(proof.status==='active'){
+        metaQa={runId:proof.runId,actorUid:metaQaActor(),activeRole:metaQaRole(),pais:proof.pais,periodo:META_QA_PERIOD,contractVersion:proof.contractVersion,recovered:true};
+        metaQaProof='Prueba recuperada y verificada en el servidor. Comprueba los valores y restaura al terminar.';
+      }else metaQaProof='Prueba disponible. Sus valores quedan separados de las metas e indicadores reales.';
+    }catch(error){if(metaQaScope()===scope)metaQaProof='El servidor todavía no confirmó el contrato de prueba y restauración. Vuelve a comprobar antes de iniciar.';}
+    finally{if(metaQaScope()===scope){metaQaBusy=false;render(host);}}
+  }
+  function metaQaMetadata(session,operation){return {version:1,runId:session.runId,operation,pais:session.pais,periodo:session.periodo};}
+  function metaQaMarkers(session){return {__syntheticQa:true,__metasPreviewQa:true,__metasPreviewRunId:session.runId,__metasPreviewActorUid:session.actorUid};}
+  function metaQaAudit(session,action,before,after){
+    return Object.assign(auditEntry(action,'Prueba temporal de metas institucionales',before,after),metaQaMarkers(session),{
+      id:'b4003qa_metas_'+session.runId+'_audit_'+metaQaNonce(),pais:session.pais,periodo:session.periodo,moneda:currencyForCountry(session.pais)
+    });
+  }
+  function requireMetaBatchReadback(result,targets){
+    if(!result||result.canonicalReadback!==true||!Array.isArray(result.readback))throw new Error('META_CANONICAL_READBACK_MISMATCH');
+    targets.forEach(target=>{
+      const row=result.readback.find(row=>row&&row.collection===target.collection&&row.id===target.id&&row.action===target.action);
+      if(!row||row.exists!==(target.action!=='remove'))throw new Error('META_CANONICAL_READBACK_MISMATCH');
+    });
+  }
+  function metaQaPanel(){
+    if(!isMetaPreview()||!puedeEditarMetaInstitucional())return '';
+    const session=metaQaSession(),rows=session?metaQaRows().filter(row=>row.__metasPreviewRunId===session.runId):[];
+    const note=metaQaProof||((session&&session.recovered)?'Prueba recuperada del servidor. Comprueba los valores y restaura al terminar.':'Los valores de esta prueba quedan separados de las metas e indicadores reales.');
+    return `<div class="card pad" data-meta-preview-qa="1" style="margin-bottom:14px">
+      <b>Prueba temporal de metas · ${metaPais}</b><div class="muted">Período reservado de prueba: ${META_QA_PERIOD}</div>
+      <p class="muted" role="status" data-meta-qa-status="1" style="margin:7px 0 12px">${U.esc(note)}</p>
+      ${session?`<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px">${[['prima','Producción de prueba'],['recaudo','Recaudo de prueba']].map(([campo,label])=>{const row=rows.find(row=>row.tipo===campo);return `<label class="ce-l">${label}<div class="ct-inp"><span>${currencyForCountry(metaPais)}</span><input type="number" min="0" value="${row?Number(row.valor)||0:0}" data-meta-prueba="${campo}" ${metaQaBusy?'disabled':''}></div><small class="muted">${row?'Registro de prueba guardado':'Aún no creado'}</small></label>`;}).join('')}</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px"><button class="btn ghost sm" id="meta-qa-audit" ${metaQaBusy?'disabled':''}>Ver historial de cambios</button><button class="btn primary sm" id="meta-qa-restore" ${metaQaBusy?'disabled':''}>${rows.length?'Restaurar prueba':'Cerrar prueba sin cambios'}</button></div>`:`<button class="btn primary sm" id="meta-qa-start" ${metaQaBusy||!metaQaVerified?'disabled':''}>Iniciar prueba de metas</button>${!metaQaBusy&&!metaQaVerified?'<button class="btn ghost sm" id="meta-qa-retry">Volver a comprobar</button>':''}`}
+    </div>`;
+  }
   function metaKey(aseId, periodo, pais, campo) {
     const owner=String(aseId||'').trim()?slug(aseId):'institucional';
     return `meta-equipo-${owner}-${String(periodo || '').replace(/[^0-9-]/g, '')}-${slug(pais)}-${slug(campo)}`;
@@ -332,22 +391,37 @@ Orbit.modules.equipo = (function () {
     if(!['Dirección','SuperAdmin','AdminTenant','Admin'].includes(role))return false;
     return !!(Orbit.access&&typeof Orbit.access.can==='function'&&Orbit.access.can('equipo','edit')===true);
   }
-  async function setMeta(aseId, periodo, pais, campo, val) {
+  async function setMeta(aseId, periodo, pais, campo, val, previewSession) {
     const st=S();
     if (!st || st.__productOperationalWriteP0 !== true || typeof st.batchDurable !== 'function') throw new Error('META_DURABLE_OWNER_REQUIRED');
-    const current=metaRow(aseId,periodo,pais,campo),id=current&&current.id?current.id:metaKey(aseId,periodo,pais,campo);
-    const patch={mes:periodo,periodo,pais,moneda:currencyForCountry(pais),tipo:campo,valor:+val||0};
+    const value=Number(val);
+    if(!Number.isFinite(value)||value<0)throw new Error('META_VALUE_INVALID');
+    if(isMetaPreview()&&!previewSession)throw new Error('META_EXPLICIT_PREVIEW_TEST_REQUIRED');
+    if(previewSession&&(!isMetaPreview()||String(aseId||'')||previewSession.actorUid!==metaQaActor()||previewSession.activeRole!==metaQaRole()||previewSession.contractVersion!==META_QA_CONTRACT||previewSession.pais!==pais||previewSession.periodo!==META_QA_PERIOD||periodo!==META_QA_PERIOD||!['prima','recaudo'].includes(campo)))throw new Error('META_PREVIEW_CONTEXT_MISMATCH');
+    const fixtureId=previewSession?'b4003qa_metas_'+previewSession.runId+'_'+campo:'';
+    const current=previewSession?st.get('metas',fixtureId):metaRow(aseId,periodo,pais,campo),id=fixtureId||(current&&current.id?current.id:metaKey(aseId,periodo,pais,campo));
+    if(previewSession&&current&&(current.__syntheticQa!==true||current.__metasPreviewQa!==true||current.__metasPreviewRunId!==previewSession.runId||current.__metasPreviewActorUid!==previewSession.actorUid))throw new Error('META_PREVIEW_EXISTING_RECORD_FORBIDDEN');
+    const patch={mes:periodo,periodo,pais,moneda:currencyForCountry(pais),tipo:campo,valor:value};
     if(String(aseId||'').trim())patch.asesorId=aseId;
+    if(previewSession)Object.assign(patch,metaQaMarkers(previewSession));
     const action=current?'update':'insert';
-    const result=await st.batchDurable([{action,collection:'metas',id,payload:patch}],{timeoutMs:20000});
-    const confirmed=(result&&Array.isArray(result.readback)?result.readback:[]).find(row =>
-      String(row&&row.collection||'')==='metas' &&
-      String(row&&row.id||'')===id &&
-      String(row&&row.action||'')===action &&
-      row&&row.exists===true
-    );
-    if(!result||result.canonicalReadback!==true||!confirmed) throw new Error('META_CANONICAL_READBACK_MISMATCH');
+    const after=Object.assign({},current||{},{id},patch),auditAction=String(aseId||'').trim()?'editar_meta':'editar_meta_institucional';
+    const entry=previewSession?metaQaAudit(previewSession,auditAction,current||null,after):Object.assign(auditEntry(auditAction,'Meta actualizada desde Equipo',current||null,after),{pais,periodo,moneda:currencyForCountry(pais)});
+    const mutations=[{action,collection:'metas',id,payload:patch},{action:'insert',collection:'auditoria',id:entry.id,payload:entry}];
+    const result=await st.batchDurable(mutations,Object.assign({timeoutMs:20000},previewSession?{metaPreviewQa:metaQaMetadata(previewSession,'write')}:{}));
+    requireMetaBatchReadback(result,mutations);
     return Object.assign({id},patch);
+  }
+  async function restoreMetaQa(session){
+    if(!session||!isMetaPreview()||session.actorUid!==metaQaActor())throw new Error('META_PREVIEW_CONTEXT_MISMATCH');
+    const rows=metaQaRows().filter(row=>row.__metasPreviewRunId===session.runId);
+    if(!rows.length)return {noChanges:true};
+    const entry=metaQaAudit(session,'restaurar_prueba_metas',rows,{restored:true});
+    const mutations=rows.map(row=>({action:'remove',collection:'metas',id:row.id,payload:null}));
+    mutations.push({action:'insert',collection:'auditoria',id:entry.id,payload:entry});
+    const result=await S().batchDurable(mutations,{metaPreviewQa:metaQaMetadata(session,'restore'),timeoutMs:20000});
+    requireMetaBatchReadback(result,mutations);
+    return result;
   }
   function normalizePeriodo(value) {
     if (typeof value === 'number') return `${now.getFullYear()}-${String(value + 1).padStart(2, '0')}`;
@@ -374,21 +448,21 @@ Orbit.modules.equipo = (function () {
     const team = all.filter(a => { const ps = userCountries(a); return !ps.length || ps.includes(metaPais); });
     const cur = currencyForCountry(metaPais);
     const institucional=metaInstitucionalDe(metaPeriodo,metaPais);
-    const canInstitutional=puedeEditarMetaInstitucional();
+    const preview=isMetaPreview(),canInstitutional=puedeEditarMetaInstitucional()&&!preview;
     const totN = team.reduce((s, a) => s + metaDe(a.id, metaPeriodo, metaPais).nueva, 0);
     const totR = team.reduce((s, a) => s + metaDe(a.id, metaPeriodo, metaPais).renovada, 0);
     const totC = team.reduce((s, a) => s + metaDe(a.id, metaPeriodo, metaPais).recaudo, 0);
     const countryOptions = (Orbit.PAISES || []).filter(p => p.id !== 'TODOS');
-    return `<div class="cfg-note" style="margin-bottom:14px">🎯 Metas mensuales por asesor y país: <b>producción nueva</b>, <b>producción de renovación</b> y <b>recaudo</b>, siempre sobre prima neta y sin mezclar monedas. Es la fuente que deben leer Insights y Finanzas.</div>
+    return `<div class="cfg-note" style="margin-bottom:14px">🎯 Metas mensuales por asesor y país: <b>producción nueva</b>, <b>producción de renovación</b> y <b>recaudo</b>, siempre sobre prima neta y sin mezclar monedas. Es la fuente que deben leer Insights y Finanzas.${preview?' <b>En esta preview las metas reales están en consulta; la prueba temporal se realiza en el panel separado.</b>':''}</div>
     <div style="display:flex;gap:10px;align-items:center;margin-bottom:14px;flex-wrap:wrap">
-      <input id="meta-periodo" class="o-sel" type="month" value="${metaPeriodo}" style="width:auto">
-      <select id="meta-pais" class="o-sel" style="width:auto">${countryOptions.map(p => `<option value="${p.id}" ${p.id === metaPais ? 'selected' : ''}>${p.id === 'CO' ? '🇨🇴' : '🇬🇹'} ${p.label} · ${p.moneda}</option>`).join('')}</select>
+      <input id="meta-periodo" class="o-sel" type="month" value="${metaPeriodo}" style="width:auto" ${metaQaBusy?'disabled':''}>
+      <select id="meta-pais" class="o-sel" style="width:auto" ${metaQaBusy?'disabled':''}>${countryOptions.map(p => `<option value="${p.id}" ${p.id === metaPais ? 'selected' : ''}>${p.id === 'CO' ? '🇨🇴' : '🇬🇹'} ${p.label} · ${p.moneda}</option>`).join('')}</select>
       <span class="muted" style="font-size:12.5px"><b>${cur} ${U.moneyShort(totN, cur)}</b> nuevas · <b>${cur} ${U.moneyShort(totR, cur)}</b> renovaciones · <b>${cur} ${U.moneyShort(totC, cur)}</b> recaudo</span>
     </div>
     <div class="card pad" data-meta-institucional-card="1" style="margin-bottom:14px">
       <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-wrap:wrap">
         <div><b>Meta institucional · ${metaPais}</b><div class="muted" style="font-size:12px;margin-top:3px">Objetivo global del tenant; no sustituye ni oculta las metas individuales.</div></div>
-        <span class="badge ${canInstitutional?'ok':'neutral'}">${canInstitutional?'Editable por administración':'Solo lectura'}</span>
+        <span class="badge ${canInstitutional?'ok':'neutral'}">${canInstitutional?'Editable por administración':preview?'Consulta en Preview':'Solo lectura'}</span>
       </div>
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:12px">
         <label class="ce-l">Producción institucional
@@ -401,13 +475,14 @@ Orbit.modules.equipo = (function () {
         </label>
       </div>
     </div>
+    ${metaQaPanel()}
     <div class="card" style="overflow:hidden"><div style="overflow-x:auto"><table class="tbl">
       <thead><tr><th>Asesor</th><th class="num">Producción nueva</th><th class="num">Renovaciones</th><th class="num">Recaudo</th><th class="num">Producción total</th></tr></thead>
       <tbody>${team.map(a => { const m = metaDe(a.id, metaPeriodo, metaPais); return `<tr>
         <td><div style="display:flex;align-items:center;gap:9px">${U.avatar(a.nombre, a.color, 'sm')}<div><b>${U.esc(a.nombre)}</b><div class="muted" style="font-size:10.5px">${m.provisional ? 'valor provisional heredado' : `${metaPeriodo} · ${metaPais}`}</div></div></div></td>
-        <td class="num"><div class="ct-inp" style="justify-content:flex-end"><span>${cur}</span><input type="number" min="0" value="${m.nueva}" data-meta="${a.id}|nueva" style="width:110px"></div></td>
-        <td class="num"><div class="ct-inp" style="justify-content:flex-end"><span>${cur}</span><input type="number" min="0" value="${m.renovada}" data-meta="${a.id}|renovada" style="width:110px"></div></td>
-        <td class="num"><div class="ct-inp" style="justify-content:flex-end"><span>${cur}</span><input type="number" min="0" value="${m.recaudo}" data-meta="${a.id}|recaudo" style="width:110px"></div></td>
+        <td class="num"><div class="ct-inp" style="justify-content:flex-end"><span>${cur}</span><input type="number" min="0" value="${m.nueva}" data-meta="${a.id}|nueva" style="width:110px" ${preview?'disabled':''}></div></td>
+        <td class="num"><div class="ct-inp" style="justify-content:flex-end"><span>${cur}</span><input type="number" min="0" value="${m.renovada}" data-meta="${a.id}|renovada" style="width:110px" ${preview?'disabled':''}></div></td>
+        <td class="num"><div class="ct-inp" style="justify-content:flex-end"><span>${cur}</span><input type="number" min="0" value="${m.recaudo}" data-meta="${a.id}|recaudo" style="width:110px" ${preview?'disabled':''}></div></td>
         <td class="num"><b>${U.money(m.nueva + m.renovada, cur)}</b></td></tr>`; }).join('') || '<tr><td colspan="5" class="muted" style="text-align:center;padding:20px">No hay asesores habilitados para este país.</td></tr>'}
     </table></div></div>`;
   }
@@ -687,21 +762,50 @@ Orbit.modules.equipo = (function () {
     }));
     host.querySelectorAll('[data-meta-institucional]').forEach(inp => inp.addEventListener('change', async () => {
       if(!puedeEditarMetaInstitucional())return inform('Tu rol no puede editar metas institucionales.','Solo lectura');
+      if(isMetaPreview())return inform('Usa el panel de prueba temporal. Las metas reales están en consulta en esta preview.','Solo lectura');
       const campo=inp.dataset.metaInstitucional;
       try{
-        const before=metaInstitucionalDe(metaPeriodo,metaPais);
         await setMeta('',metaPeriodo,metaPais,campo,inp.value);
-        const after=metaInstitucionalDe(metaPeriodo,metaPais);
-        await audit('editar_meta_institucional','Meta institucional actualizada desde Equipo',before,after);
-        toast('✓ Meta institucional guardada y confirmada');render(host);
-      }catch(error){inform('No fue posible confirmar la meta institucional en el servidor.','No guardado');}
+        toast('✓ Meta institucional y auditoría confirmadas');render(host);
+      }catch(error){inform('No fue posible confirmar la operación completa. Recarga y revisa el historial antes de volver a guardar.','Guardado sin confirmar');}
     }));
     host.querySelectorAll('[data-meta]').forEach(inp => inp.addEventListener('change', async () => {
+      if(isMetaPreview())return inform('Las metas reales están en consulta en esta preview.','Solo lectura');
       const [aid,campo]=inp.dataset.meta.split('|');
-      try{const before=Object.assign({asesorId:aid},metaDe(aid,metaPeriodo,metaPais));await setMeta(aid,metaPeriodo,metaPais,campo,inp.value);await audit('editar_meta','Meta actualizada desde Equipo',before,Object.assign({asesorId:aid},metaDe(aid,metaPeriodo,metaPais)));toast('✓ Meta guardada y confirmada');render(host);}catch(error){inform('No fue posible confirmar la meta en el servidor.','No guardado');}
+      try{await setMeta(aid,metaPeriodo,metaPais,campo,inp.value);toast('✓ Meta y auditoría confirmadas');render(host);}catch(error){inform('No fue posible confirmar la operación completa. Recarga y revisa el historial antes de volver a guardar.','Guardado sin confirmar');}
     }));
+    const qaStart=host.querySelector('#meta-qa-start');if(qaStart)qaStart.addEventListener('click',async()=>{
+      if(metaQaBusy||!metaQaVerified||!isMetaPreview()||!puedeEditarMetaInstitucional()||!metaQaActor())return;
+      const candidate={runId:metaQaNonce(),actorUid:metaQaActor(),activeRole:metaQaRole(),pais:metaPais,periodo:META_QA_PERIOD};
+      metaQaBusy=true;metaQaProof='Confirmando la disponibilidad de guardado y restauración…';render(host);
+      try{
+        const st=S();if(typeof st.metaPreviewQaProbe!=='function')throw new Error('META_PREVIEW_PROBE_REQUIRED');
+        const proof=await st.metaPreviewQaProbe(metaQaMetadata(candidate,'probe'));
+        metaQa=Object.assign(candidate,{contractVersion:proof.contractVersion});metaQaProof='Prueba lista. El servidor confirmó el guardado con auditoría y la restauración.';
+      }catch(error){metaQa=null;metaQaVerified=false;metaQaProof='No se inició la prueba: el servidor no confirmó el contrato de guardado y restauración.';await inform(metaQaProof,'Prueba pendiente');}
+      finally{metaQaBusy=false;render(host);}
+    });
+    const qaRetry=host.querySelector('#meta-qa-retry');if(qaRetry)qaRetry.addEventListener('click',()=>{metaQaChecked='';render(host);});
+    host.querySelectorAll('[data-meta-prueba]').forEach(inp=>inp.addEventListener('change',async()=>{
+      if(metaQaBusy||!puedeEditarMetaInstitucional())return;
+      const session=metaQaSession();if(!session)return inform('Inicia una prueba temporal antes de guardar.','Prueba de metas');
+      metaQaBusy=true;metaQaProof='Confirmando meta y auditoría en el servidor…';
+      try{await setMeta('',session.periodo,session.pais,inp.dataset.metaPrueba,inp.value,session);metaQaProof='Meta y auditoría confirmadas en servidor. Puedes recargar y restaurar la prueba.';toast('✓ Prueba de meta y auditoría confirmadas');}
+      catch(error){metaQaProof='No se pudo confirmar la operación. Recarga y revisa el historial antes de reintentar.';await inform(metaQaProof,'Confirmación pendiente');}
+      finally{metaQaBusy=false;render(host);}
+    }));
+    const qaRestore=host.querySelector('#meta-qa-restore');if(qaRestore)qaRestore.addEventListener('click',async()=>{
+      if(metaQaBusy||!puedeEditarMetaInstitucional())return;
+      const session=metaQaSession();if(!session)return;
+      metaQaBusy=true;
+      try{const result=await restoreMetaQa(session);metaQa=null;metaQaProof=result.noChanges?'Prueba cerrada sin cambios.':'Prueba restaurada y auditoría confirmada. Las metas reales se conservaron.';toast('✓ '+metaQaProof);}
+      catch(error){metaQaProof='La restauración no está confirmada. Conserva esta prueba y revisa el historial antes de continuar.';await inform(metaQaProof,'Restauración pendiente');}
+      finally{metaQaBusy=false;render(host);}
+    });
+    const qaAudit=host.querySelector('#meta-qa-audit');if(qaAudit)qaAudit.addEventListener('click',()=>{tab='auditoria';render(host);});
     const mp = host.querySelector('#meta-periodo'); if (mp) mp.addEventListener('change', () => { metaPeriodo = mp.value || metaPeriodo; render(host); });
     const mc = host.querySelector('#meta-pais'); if (mc) mc.addEventListener('change', () => { metaPais = mc.value || metaPais; render(host); });
+    inspectMetaQa(host);
   }
 
   function filtrar(tipo) { userFilter = tipo || 'todos'; const host = document.getElementById('host') || document.getElementById('mod-host'); if (host) render(host); }

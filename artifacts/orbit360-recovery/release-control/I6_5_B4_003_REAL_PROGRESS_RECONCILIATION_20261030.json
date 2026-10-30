@@ -1,0 +1,1028 @@
+{
+  "schema": "GRAVICENTRA_B4003_REAL_PROGRESS_RECONCILIATION_V1",
+  "recordedAtUtc": "2026-10-30T16:51:54Z",
+  "status": "CURRENT_PROGRESS_RECONCILED_ATOMIC_SOURCE_BOUND_UAT_PENDING",
+  "draft": false,
+  "appliedToRepository": true,
+  "recordType": "SUBORDINATE_EVIDENCE_RECONCILIATION_NOT_NEW_GATE_OR_AUTHORITY",
+  "authority": "PAULA_20261030_REQUEST_ACTUAL_PROGRESS_AND_CONTINUE_EXISTING_B4_003",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "gate": "I6.5/B4-003",
+  "observedSourceHead": "b5c83cf255afd01cd348c53b904c1c47dbdcb241",
+  "intendedReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_REAL_PROGRESS_RECONCILIATION_20261030.json",
+  "controlPlaneBinding": {
+    "path": "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json",
+    "gitBlobSha": "c38f0ebf4d919cc59494adbaf81acd08837ac6e3",
+    "observedAtCommit": "b5c83cf255afd01cd348c53b904c1c47dbdcb241",
+    "existingAuthorityPreserved": true
+  },
+  "scope": {
+    "readOnlyReview": true,
+    "currentSourceInspection": true,
+    "latestReceipts": "2026-10-29 and 2026-10-30",
+    "newHistoricalModuleAudit": false,
+    "newFunctionalTestsExecuted": false,
+    "newBrowserUatExecuted": false,
+    "remoteMutations": 0,
+    "sourceChangesByThisReceipt": 0,
+    "businessDataWrites": 0,
+    "livePromotion": false
+  },
+  "conclusion": {
+    "materialImplementationProgressProven": true,
+    "formalPercentageStasisDoesNotMeanZeroImplementationProgress": true,
+    "formalPercentageInsufficientAsSoleProgressReport": true,
+    "fullGlobalImplementationPercent": null,
+    "reason": "The formal 50% counts complete mini-gates only, while real source fixes, technical Preview proofs and authenticated subflows have accumulated within B4-003. Some ledger causes are stale. A real Metas write/audit defect and remaining functional/data acceptance still prevent claiming closure.",
+    "newFullCapabilityAcceptances": 0,
+    "newFindingClosures": 0,
+    "doNotConvertZeroNewFullAcceptancesIntoZeroProductProgress": true
+  },
+  "evidence": {
+    "cp": {
+      "path": "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json",
+      "gitBlobSha": "c38f0ebf4d919cc59494adbaf81acd08837ac6e3",
+      "observedAtCommit": "b5c83cf255afd01cd348c53b904c1c47dbdcb241"
+    },
+    "pendingMaster": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_PENDING_CLOSURE_MASTER_PLAN_LOCK_20261004.json",
+      "gitBlobSha": "71eba786de1236533e0339ae5cb79eeabed8ebaf",
+      "observedAtCommit": "b5c83cf255afd01cd348c53b904c1c47dbdcb241"
+    },
+    "ledger": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
+      "gitBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
+      "observedAtCommit": "b5c83cf255afd01cd348c53b904c1c47dbdcb241"
+    },
+    "historicalCapabilities": {
+      "path": "artifacts/orbit360-recovery/release-control/CAPABILITY_LINEAGE_LOCK.json",
+      "gitBlobSha": "c38e2d9354ea0afffd7d61364e528a590e49643e",
+      "observedAtCommit": "b5c83cf255afd01cd348c53b904c1c47dbdcb241"
+    },
+    "historicalMilestones": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_20260919.json",
+      "gitBlobSha": "54461ef14f5226aa6b633303a51c5a31e16ece6c",
+      "observedAtCommit": "b5c83cf255afd01cd348c53b904c1c47dbdcb241"
+    },
+    "taskPlan86": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_AUDIT_COMPLEMENT_PLAN_FROZEN_20261016.md",
+      "gitBlobSha": "4d617c53f30ff144d0914b7e1978f376d204796b",
+      "observedAtCommit": "b5c83cf255afd01cd348c53b904c1c47dbdcb241"
+    },
+    "releaseCheckpoints": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PREVIEW_GUIDE_AND_RELEASE_PROGRESS_CONTRACT_20261018.json",
+      "gitBlobSha": "cc7bd6f4670e7de6012b1d6ac5a9c2615f45f286",
+      "observedAtCommit": "b5c83cf255afd01cd348c53b904c1c47dbdcb241"
+    },
+    "cumulativeDelta29": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CANDIDATA_UNICA_DELTA_PLAN_CHOQUE_20261029.md",
+      "gitBlobSha": "556797e2967e9f62a5282f660eb0cbd275718da9",
+      "observedAtCommit": "b5c83cf255afd01cd348c53b904c1c47dbdcb241"
+    },
+    "cronogramaAuth29": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CRONOGRAMA_DIRECCION_AUTH_E2E_20261029.md",
+      "gitBlobSha": "8ed63013a10a25d12c165429faa2674000a04e04",
+      "observedAtCommit": "b5c83cf255afd01cd348c53b904c1c47dbdcb241"
+    },
+    "partialUat29": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_UAT_PARTIAL_CAUSAL_RETURN_20261029.md",
+      "gitBlobSha": "783c84592201b81cb502ae03e8bfd85f52157557",
+      "observedAtCommit": "b5c83cf255afd01cd348c53b904c1c47dbdcb241"
+    },
+    "singleCandidateFreeze29": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PLAN_CHOQUE_LINEAGE_CI_UAT_FREEZE_20261029.md",
+      "gitBlobSha": "584eba2cb3ed8ce0adfc96a48856178735866613",
+      "observedAtCommit": "b5c83cf255afd01cd348c53b904c1c47dbdcb241"
+    },
+    "closeoutSource29": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CLOSEOUT_SOURCE_SUCCESSOR_20261029.json",
+      "gitBlobSha": "f9497afb925ed81bc00d23dd0149fd8dec894559",
+      "observedAtCommit": "b5c83cf255afd01cd348c53b904c1c47dbdcb241"
+    },
+    "closeoutPreview29": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CLOSEOUT_EXACT_PREVIEW_PASS_20261029.json",
+      "gitBlobSha": "36c750211aeae6657b3ca26d1e886828c3737e53",
+      "observedAtCommit": "b5c83cf255afd01cd348c53b904c1c47dbdcb241"
+    },
+    "institutionalSource29": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_INSTITUTIONAL_GOALS_SOURCE_SUCCESSOR_20261029.json",
+      "gitBlobSha": "92845dd35a86d5e8b764cd8485c14d295afd99c6",
+      "observedAtCommit": "b5c83cf255afd01cd348c53b904c1c47dbdcb241"
+    },
+    "institutionalPreview30": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_INSTITUTIONAL_GOALS_EXACT_PREVIEW_PASS_20261030.json",
+      "gitBlobSha": "aeb39b03960d75a4738bab71e4309d57666ead23",
+      "observedAtCommit": "b5c83cf255afd01cd348c53b904c1c47dbdcb241"
+    },
+    "personalRecaudoSource12": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R26_PERSONAL_RECAUDO_CAUSAL_SOURCE_FIX_20261012.json",
+      "gitBlobSha": "2061b9f4d7845f8ff99326d2ab59ce28dca2fbee",
+      "observedAtCommit": "b5c83cf255afd01cd348c53b904c1c47dbdcb241"
+    },
+    "workReturn30": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_WORK_UAT_RETURN_CAUSAL_ADJUDICATION_20261030.json",
+      "gitBlobSha": "6e0e195616d0788b21fbf4df8138f2d6b50153ef",
+      "observedAtCommit": "b5c83cf255afd01cd348c53b904c1c47dbdcb241"
+    },
+    "shockArtifactReproof30": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_SHOCK_PLAN_FREEZE_AND_ARTIFACT_REPROOF_20261030.json",
+      "gitBlobSha": "24c9221b2d32fd5ac2c9202aa16cc6b144483a5d",
+      "observedAtCommit": "b5c83cf255afd01cd348c53b904c1c47dbdcb241"
+    },
+    "cumulativeSource29": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_INSIGHTS_FINANCIAL_NATIVE_SOURCE_SUCCESSOR_20261029.json",
+      "gitBlobSha": "e1bd860f53fdb929487585a244db64005728256c",
+      "observedAtCommit": "b5c83cf255afd01cd348c53b904c1c47dbdcb241"
+    },
+    "transversalReconciliation29": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_RECONCILIACION_TRANSVERSAL_APROBACIONES_READBACK_20261029.md",
+      "gitBlobSha": "cc73720491a96b2695fb757b02371de9a14a1fb1",
+      "observedAtCommit": "b5c83cf255afd01cd348c53b904c1c47dbdcb241"
+    },
+    "ownerRulesRisk28": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PAULA_THREE_ROLE_TRANSVERSAL_UAT_DECISION_20261028.md",
+      "gitBlobSha": "f0a48247896cb3250212344f8b4fcd8a97d7b9dc",
+      "observedAtCommit": "b5c83cf255afd01cd348c53b904c1c47dbdcb241"
+    },
+    "queriesSource": {
+      "path": "orbit360-platform/core/queries.js",
+      "gitBlobSha": "73a6346dae84c6e3f9635fc55664720c17ba4136",
+      "observedAtCommit": "b5c83cf255afd01cd348c53b904c1c47dbdcb241"
+    },
+    "inicioSource": {
+      "path": "orbit360-platform/modules/inicio.js",
+      "gitBlobSha": "12a5a1e3293a7d59f993f829071d3bd2b4027a6c",
+      "observedAtCommit": "b5c83cf255afd01cd348c53b904c1c47dbdcb241"
+    },
+    "advisorRosterSource": {
+      "path": "functions/assignable-advisor-roster.js",
+      "gitBlobSha": "75ca53db55e2665123589b0e63253a8e4f8c377c",
+      "observedAtCommit": "b5c83cf255afd01cd348c53b904c1c47dbdcb241"
+    },
+    "equipoSource": {
+      "path": "orbit360-platform/modules/equipo.js",
+      "gitBlobSha": "5ce317a0641709e1a405e61435578de934fa194d",
+      "observedAtCommit": "b5c83cf255afd01cd348c53b904c1c47dbdcb241"
+    },
+    "b4003Contract": {
+      "path": "tools/gravicentra-i6-5-b4-003-contract.mjs",
+      "gitBlobSha": "74870a3da62722a1466916dd42c7e1ad52175a6f",
+      "observedAtCommit": "b5c83cf255afd01cd348c53b904c1c47dbdcb241"
+    },
+    "closeoutRegression": {
+      "path": "tools/gravicentra-b4-003-closeout-source-successor.test.cjs",
+      "gitBlobSha": "8caa893faf8df55a362d751feb3d3c9637c372c9",
+      "observedAtCommit": "b5c83cf255afd01cd348c53b904c1c47dbdcb241"
+    },
+    "institutionalRegression": {
+      "path": "tools/gravicentra-b4-003-institutional-goals-owner.test.cjs",
+      "gitBlobSha": "ca14672a0e63b22bef33aa6d869afb43a24cde7b",
+      "observedAtCommit": "b5c83cf255afd01cd348c53b904c1c47dbdcb241"
+    },
+    "generalAuditHarness": {
+      "path": "tools/gravicentra-b4-003-integral-readonly-audit.cjs",
+      "gitBlobSha": "748f05135165bcbce4121024f425f2323eb1b860",
+      "observedAtCommit": "b5c83cf255afd01cd348c53b904c1c47dbdcb241"
+    }
+  },
+  "indicators": {
+    "formalI6": {
+      "id": "FORMAL_I6_GATE_CLOSURE",
+      "valuePercent": 50,
+      "numerator": 5,
+      "denominator": 10,
+      "formula": "frozenMiniGates / totalMiniGates * 100",
+      "countedUnits": "FULLY_FROZEN_I6_MINI_GATES",
+      "partialCreditAllowed": false,
+      "minimumIncrementPercentagePoints": 10,
+      "lastFrozenMiniGate": "I6.4",
+      "activeMiniGate": "I6.5",
+      "requiredForNextIncrement": "Close I6.5 including existing B4-003 through B4-007; closing B4-003 alone does not increase this metric.",
+      "nextPercent": 60,
+      "previousPercent": 50,
+      "deltaPercentagePoints": 0,
+      "meaning": "Formal closure only; not implementation, effort, elapsed time or current product readiness.",
+      "evidence": [
+        {
+          "ref": "cp",
+          "jsonPointer": "/postproductionExitProgress"
+        },
+        {
+          "ref": "taskPlan86",
+          "section": "4. Secuencia y métricas sin ambigüedad"
+        }
+      ]
+    },
+    "historicalForensicMilestone": {
+      "id": "HISTORICAL_B1_B4_WEIGHTED_MILESTONE",
+      "valuePercent": 96,
+      "formula": "70 baseline + 10 B1 + 10 B2 + 6 B3",
+      "terms": [
+        {
+          "block": "BASELINE",
+          "points": 70
+        },
+        {
+          "block": "B1",
+          "points": 10
+        },
+        {
+          "block": "B2",
+          "points": 10
+        },
+        {
+          "block": "B3",
+          "points": 6
+        }
+      ],
+      "remainingHistoricalMilestone": {
+        "block": "B4",
+        "points": 4,
+        "targetPercent": 100
+      },
+      "previousPercent": 96,
+      "deltaPercentagePoints": 0,
+      "historicalOnly": true,
+      "currentGlobalProductReadiness": false,
+      "remainingEffortPercent": null,
+      "remainingTimeEstimate": null,
+      "meaning": "Preassigned historical milestone weights. Four points remaining do not establish four percent of effort, criteria or time remaining.",
+      "evidence": [
+        {
+          "ref": "historicalMilestones",
+          "jsonPointer": "/releaseReadiness"
+        },
+        {
+          "ref": "cp",
+          "jsonPointer": "/i65ForensicRemediationPlan/currentReadinessPercent"
+        }
+      ]
+    },
+    "cumulativeCorrectionBatch29": {
+      "id": "CURRENT_CUMULATIVE_CORRECTION_BATCH_ONLY_20261029",
+      "valuePercent": 80,
+      "numerator": 4,
+      "denominator": 5,
+      "formula": "completedActivityUnits / activityUnits * 100",
+      "scope": "The cumulative correction batch recorded 2026-10-29; not whole product and not the new Metas atomic successor.",
+      "completed": [
+        "CAUSAL_DIAGNOSIS_AND_HISTORICAL_RECOVERY",
+        "CORRECTIONS_AND_SYNTHETIC_REGRESSIONS",
+        "EXACT_COMPOSITION_AND_COMPLETE_GUARD",
+        "SINGLE_IMMUTABLE_PREVIEW_BUILD_AND_SERVED_READBACK"
+      ],
+      "pending": [
+        "AUTHENTICATED_CURRENT_PREVIEW_FUNCTIONAL_UAT"
+      ],
+      "currentWorkReturnDoesNotClosePendingActivity": true,
+      "transferToNewMetasRepairAllowed": false,
+      "newFullCapabilityAcceptances": 0,
+      "evidence": [
+        {
+          "ref": "cp",
+          "jsonPointer": "/b4003CanonicalCandidateFreeze20261029/cumulativeTechnicalUpdate20261029/executionBatchProgress"
+        },
+        {
+          "ref": "cumulativeDelta29",
+          "section": "6.4 Medición del avance y reanudación"
+        }
+      ]
+    },
+    "historicalReleasePathCheckpointBaseline": {
+      "id": "RELEASE_PATH_B4_003_THROUGH_B4_007",
+      "lastRecordedPercent": 20,
+      "lastRecordedNumerator": 2,
+      "denominator": 10,
+      "formula": "COUNT_PASS_CHECKPOINTS / 10 * 100",
+      "baselineDate": "2026-10-18",
+      "laterCpRecordsThrough": "2026-10-22",
+      "freshWholeProductPercent": null,
+      "recomputedByThisReceipt": false,
+      "denominatorLocked": true,
+      "recordedPassCheckpoints": [
+        "R01_PASS_SOURCE_QA_ONLY",
+        "R02_PASS_TECHNICAL_READ_ONLY_ONLY"
+      ],
+      "notEffortOrTimeEstimate": true,
+      "riskExceptionReconciliation": "The 2026-10-28 owner Rules risk exception supersedes the old claim that the same broad Rules alone block controlled LIVE. It does not prove R03 security or full writer/reader parity, and does not satisfy R04 independent-UID UAT.",
+      "evidence": [
+        {
+          "ref": "releaseCheckpoints",
+          "jsonPointer": "/metric"
+        },
+        {
+          "ref": "ownerRulesRisk28"
+        },
+        {
+          "ref": "cp",
+          "jsonPointer": "/b4003ReleaseShockReconciliation20261028"
+        }
+      ]
+    },
+    "overallCurrentImplementation": {
+      "valuePercent": null,
+      "status": "NOT_DETERMINABLE_FROM_ADJUDICATED_CURRENT_CRITERIA",
+      "knownTaskUnits": 86,
+      "knownGroups": {
+        "C01": 4,
+        "C02": 5,
+        "C03": 6,
+        "C04": 6,
+        "C05": 7,
+        "C06": 7,
+        "C07": 11,
+        "C08": 7,
+        "C09": 4,
+        "C10": 10,
+        "C11": 5,
+        "C12": 5,
+        "C13": 4,
+        "C14": 5
+      },
+      "formulaIfAdjudicated": "Applicable criteria with current evidence / applicable criteria * 100",
+      "actualAcceptedNumerator": null,
+      "actualApplicableDenominator": null,
+      "reason": "The 86-task plan has no complete current per-criterion evidence adjudication. It mixes documentary work, B4-003, B4-004/005/006/007, I6.6-I6.9 and deferred Phase B. The 295-ID ledger and its dated aggregate blockers are not a current unique task-completion denominator.",
+      "noInventedWeights": true,
+      "evidence": [
+        {
+          "ref": "taskPlan86",
+          "section": "3. Plan de 86 tareas; 4. Secuencia y métricas sin ambigüedad"
+        },
+        {
+          "ref": "cp",
+          "jsonPointer": "/b4003ReleaseShockReconciliation20261028/historicalLedgerCountsAreNotCurrentClosureTotals"
+        }
+      ]
+    }
+  },
+  "materialEvidence": {
+    "cumulativeSourceBatch29": {
+      "sourceCommit": "779a71495366d8224dfb945ed7d84fee93482020",
+      "transportCommit": "95f980719387c042625f5cfeb62340b1066ca361",
+      "changedPaths": 12,
+      "productSources": 6,
+      "newTestFiles": 4,
+      "regressionFiles": 49,
+      "regressionPass": 120,
+      "regressionFail": 0,
+      "regressionSkipped": 0,
+      "newRegressionCases": 60,
+      "kind": "SYNTHETIC_SOURCE_TESTS_NOT_REAL_MULTI_UID_UAT",
+      "firestoreEmulatorExcluded": true,
+      "previewRunId": 40923629860,
+      "guardRunId": 40923629966,
+      "hostedFiles": 218,
+      "buildReferencedAssets": 138,
+      "hostedPayloadDigest": "2a68697679dfda4a8ccf66c296a45c8df4e9942e9c58b828792da45208dc6beb",
+      "bundleDigest": "e618ac17b659ddc4ff55ba28cc9d0af5311a5c5b7f300457c3ca6c5d801af1f1",
+      "evidenceRefs": [
+        "cumulativeSource29",
+        "cumulativeDelta29"
+      ]
+    },
+    "authenticatedInsurerSubflow29": {
+      "sourceCommit": "a63a7af5eb066bc87f94131e7b981741b29e4afc",
+      "previewRunId": 40889172816,
+      "fixtureId": "b4003qa_human_insurer_r20",
+      "user": "Paula Osorio",
+      "roleLabel": "Dirección",
+      "country": "GT",
+      "saveAccepted": true,
+      "persistedAfterReload": true,
+      "restoreAccepted": true,
+      "restoredAfterReload": true,
+      "status": "HISTORICAL_SUBFLOW_PASS_NOT_FULL_CAPABILITY_OR_CURRENT_SHA_PASS",
+      "evidenceRefs": [
+        "cp",
+        "partialUat29"
+      ],
+      "cpJsonPointer": "/b4003CanonicalCandidateFreeze20261029/liveUatCumulative20261029/verifiedSubflows/0"
+    },
+    "authenticatedCronogramaSubflow29": {
+      "sourceCommit": "199860dd23cad3db2df581828a45ae9f9e5cc7d8",
+      "previewRunId": 40861280332,
+      "user": "Paula Osorio",
+      "roleLabel": "Dirección",
+      "country": "GT",
+      "allCountriesCreateDenied": true,
+      "syntheticCreateConfirmed": true,
+      "persistedAfterReload": true,
+      "markDoneConfirmedAfterReload": true,
+      "fixtureRemainedCompletedInLab": true,
+      "status": "HISTORICAL_BOUNDED_SUBFLOW_PASS_NOT_B4_004_OR_CURRENT_SHA_PASS",
+      "evidenceRefs": [
+        "cronogramaAuth29"
+      ]
+    },
+    "historicalCapabilities": {
+      "preserved": 15,
+      "totalFrozen": 15,
+      "status": "HISTORICAL_ACCEPTANCE_PRESERVED_NOT_CURRENT_FULL_CAPABILITY_UAT",
+      "evidenceRefs": [
+        "historicalCapabilities",
+        "singleCandidateFreeze29"
+      ]
+    },
+    "historicalRouteSmoke29": {
+      "observed": 31,
+      "renderedContent": 30,
+      "blankRouteAtThatObservation": "plantillas",
+      "scope": "Prior-source route/read smoke only.",
+      "laterPlantillasReadObservation": "Source correction and subsequent authenticated reading exist; do not combine different sources into 31/31 current-candidate acceptance.",
+      "evidenceRefs": [
+        "cp",
+        "cumulativeDelta29",
+        "workReturn30"
+      ]
+    },
+    "workReturn30": {
+      "sourceCommit": "eb9ce731832d236fedc545185ec7c66bd10849bb",
+      "previewRunId": 41066435386,
+      "buildId": "gi-i65-b4-eb9ce731832d-57f234755dc1",
+      "completedAtUtc": "2026-10-30T15:56:09Z",
+      "provenance": "RECOVERED_PRIOR_CONVERSATION_RESULT_ADJUDICATED_IN_CANONICAL_RECEIPT_NOT_A_NEW_BROWSER_EXECUTION",
+      "readSurfaces": 8,
+      "readSurfaceNames": [
+        "Inicio",
+        "Equipo/Metas",
+        "Portal",
+        "Insights",
+        "Cliente 360",
+        "Cobros",
+        "Historial",
+        "Plantillas"
+      ],
+      "boundResourcesReported": 138,
+      "consoleErrorsReported": 0,
+      "metasWrite": "BLOCKED_BEFORE_WRITE",
+      "metasServerReadbackReloadAuditRestore": "NOT_EXECUTED",
+      "independentCarlosUid": "NOT_TESTED",
+      "businessDataWrites": 0,
+      "fullCapabilityAcceptance": false,
+      "evidenceRefs": [
+        "workReturn30",
+        "institutionalPreview30"
+      ]
+    }
+  },
+  "sixPriorityP0Adjudications": [
+    {
+      "findingId": "B4-003-P0-20261012-PERSONAL-COLLECTION",
+      "ledgerStatusPreserved": "OPEN_P0_NOT_ACCEPTED",
+      "operationalStatus": "SOURCE_FIX_RETAINED_SYNTHETIC_CONTRACT_PRESENT_EXACT_AUTHENTICATED_UAT_PENDING",
+      "legacyRootCauseCurrent": false,
+      "sourceInspection": {
+        "refs": [
+          "queriesSource",
+          "inicioSource"
+        ],
+        "observed": [
+          "recaudoMesPorMoneda(monthKey, advisorId) attributes personal collections only through the canonical policy advisor.",
+          "Contradictory declared advisor, unlinked policy, wrong month or out-of-scope country do not become personal collection.",
+          "Inicio binds personal collection and personal goal in the collection dial as well as production."
+        ]
+      },
+      "testEvidence": {
+        "refs": [
+          "b4003Contract",
+          "personalRecaudoSource12"
+        ],
+        "kind": "SOURCE_EXECUTED_VM_CONTRACT_PRESENT_IN_CURRENT_SOURCE",
+        "cases": [
+          "GTQ and COP kept separate",
+          "canonical advisor",
+          "contradictory advisor",
+          "country scope",
+          "month scope",
+          "institutional total preserved"
+        ],
+        "newTestExecutionByThisReceipt": false
+      },
+      "remaining": [
+        "Authenticated server and UI proof with real advisor identity, personal goal and confirmed collections.",
+        "Country/currency parity and reload on the exact current candidate."
+      ],
+      "stillRequiresAcceptance": true,
+      "fullFindingClosed": false,
+      "sourceRootCauseNeedsReimplementation": false
+    },
+    {
+      "findingId": "B4-003-P0-20261012-INSTITUTIONAL-GOALS",
+      "ledgerStatusPreserved": "OPEN_P0_NOT_ACCEPTED",
+      "operationalStatus": "ATOMIC_SOURCE_AND_SYNTHETIC_QA_PASS_EXACT_PREVIEW_UAT_PENDING",
+      "legacyRootCauseCurrent": false,
+      "sourceInspection": {
+        "refs": [
+          "equipoSource",
+          "institutionalSource29"
+        ],
+        "observed": [
+          "Equipo -> Metas has an institutional goal owner and country/month values.",
+          "The old claim that no UI owner exists is superseded; the write/audit/restore contract remains defective."
+        ]
+      },
+      "testEvidence": {
+        "refs": [
+          "institutionalRegression",
+          "institutionalPreview30",
+          "workReturn30"
+        ],
+        "priorSourceChecks": 15,
+        "priorChecksScope": "Projection, authorization and source patterns; not complete UI-to-Preview write/audit contract.",
+        "newTestExecutionByThisReceipt": false
+      },
+      "remaining": [
+        "Deploy and attest the same-source existing Preview callable plus immutable Hosting artifact.",
+        "Authenticated create/edit/server readback/reload/audit/restore on that exact Preview."
+      ],
+      "successor": {
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_METAS_ATOMIC_PREVIEW_SOURCE_SUCCESSOR_20261030.json",
+        "referenceState": "BOUND_IN_SAME_ATOMIC_SOURCE_COMMIT",
+        "status": "SOURCE_AND_SYNTHETIC_QA_PASS_PREVIEW_UAT_PENDING",
+        "sourceCommit": null,
+        "sourcePass": true,
+        "previewPass": false,
+        "authenticatedUatPass": false,
+        "technicalPreviewPass": false
+      },
+      "stillRequiresAcceptance": true,
+      "fullFindingClosed": false,
+      "diagnosedPredecessorOperationalStatus": "UI_OWNER_INTEGRATED_BUT_EXACT_PREVIEW_WRITE_CONTRACT_BLOCKED"
+    },
+    {
+      "findingId": "B4-003-P0-20261012-FREELANCERS-GOAL-SCOPE",
+      "ledgerStatusPreserved": "OPEN_P0_NOT_ACCEPTED",
+      "operationalStatus": "OPEN_CANONICAL_PARTICIPATION_CONTRACT_REQUIRED",
+      "legacyRootCauseCurrent": true,
+      "sourceInspection": {
+        "refs": [
+          "advisorRosterSource",
+          "institutionalSource29",
+          "shockArtifactReproof30"
+        ],
+        "observed": [
+          "The inspected roster uses role/activity eligibility; no proven canonical internal/freelance participation contract was found.",
+          "The institutional-goals successor explicitly preserves the freelancer dependency and does not invent it."
+        ]
+      },
+      "testEvidence": {
+        "status": "NO_CANONICAL_ELIGIBILITY_ACCEPTANCE_PROVEN",
+        "newTestExecutionByThisReceipt": false
+      },
+      "remaining": [
+        "Canonical editable participation source.",
+        "Internal/freelance fixtures with own/team/all permissions and correct goals/KPIs.",
+        "No classification inferred solely from name or role."
+      ],
+      "stillRequiresAcceptance": true,
+      "fullFindingClosed": false
+    },
+    {
+      "findingId": "B4-003-P0-20261012-INICIO-MOTIVATIONAL-TEXTS",
+      "ledgerStatusPreserved": "OPEN_P0_NOT_ACCEPTED",
+      "operationalStatus": "CONTEXTUAL_SOURCE_AND_TECHNICAL_PREVIEW_PROVEN_VISUAL_ACCEPTANCE_PENDING",
+      "legacyRootCauseCurrent": false,
+      "sourceInspection": {
+        "refs": [
+          "inicioSource",
+          "closeoutSource29"
+        ],
+        "observed": [
+          "Inicio copy reacts to role, readiness and country.",
+          "Reflection rotation, explicit button, keyboard behavior and reduced-motion handling exist in current source.",
+          "The old fixed-template cause no longer fully describes current implementation."
+        ]
+      },
+      "testEvidence": {
+        "refs": [
+          "closeoutRegression",
+          "closeoutPreview29",
+          "institutionalPreview30"
+        ],
+        "sharedCloseoutSuiteCases": 8,
+        "newTestExecutionByThisReceipt": false
+      },
+      "remaining": [
+        "Targeted visual acceptance of actual role/period/country contextual copy.",
+        "No fabricated figures or achievements and preservation of accepted design."
+      ],
+      "stillRequiresAcceptance": true,
+      "fullFindingClosed": false,
+      "sourceRootCauseNeedsReimplementation": false
+    },
+    {
+      "findingId": "B4-003-P0-20261012-QA-CANCELLED-RUN-FIXTURES",
+      "ledgerStatusPreserved": "OPEN_P0_NOT_ACCEPTED",
+      "operationalStatus": "HOLD_PROVENANCE_AND_DEPENDENCIES_NOT_ADJUDICATED",
+      "legacyRootCauseCurrent": "REQUIRES_EXACT_RECORD_READBACK",
+      "sourceInspection": {
+        "refs": [
+          "ledger",
+          "shockArtifactReproof30"
+        ],
+        "historicalInterruptedRunId": 38102224750,
+        "historicalSyntheticMarkers": 14,
+        "observed": [
+          "The latest aggregate audit does not establish per-ID provenance or completed cleanup."
+        ]
+      },
+      "testEvidence": {
+        "auditRunId": 41068195712,
+        "artifactId": 12984216364,
+        "aggregateAuditIsCleanupProof": false
+      },
+      "remaining": [
+        "Snapshot exact IDs and dependencies.",
+        "Adjudicate real/legacy/QA provenance.",
+        "Scoped authorized reversible disposition and readback, or retained HOLD where ambiguity remains."
+      ],
+      "cleanupAuthorizedByThisReceipt": false,
+      "stillRequiresAcceptance": true,
+      "fullFindingClosed": false
+    },
+    {
+      "findingId": "B4-003-P0-20261012-QA-ORPHAN-RENEWALS",
+      "ledgerStatusPreserved": "OPEN_P0_NOT_ACCEPTED",
+      "operationalStatus": "HOLD_EXACT_ORIGIN_AND_DEPENDENCY_DISPOSITION_REQUIRED",
+      "legacyRootCauseCurrent": "REQUIRES_EXACT_RECORD_READBACK",
+      "sourceInspection": {
+        "refs": [
+          "ledger",
+          "shockArtifactReproof30"
+        ],
+        "historicalPoliciesWithoutParent": 3,
+        "historicalDependencies": 12,
+        "observed": [
+          "The historical readback recorded parentExists=false and four dependencies for each of three policies.",
+          "No new exact dependency disposition is proved by the aggregate audit."
+        ]
+      },
+      "testEvidence": {
+        "auditRunId": 41068195712,
+        "artifactId": 12984216364,
+        "aggregateAuditIsClosureProof": false
+      },
+      "remaining": [
+        "Read exact origin and twelve dependencies.",
+        "Authorized reversible treatment preserving real obligations, history and integrity."
+      ],
+      "cleanupAuthorizedByThisReceipt": false,
+      "stillRequiresAcceptance": true,
+      "fullFindingClosed": false
+    }
+  ],
+  "scopeAndDenominatorChecks": {
+    "taskPlan86": {
+      "enumerated": 86,
+      "groupCounts": {
+        "C01": 4,
+        "C02": 5,
+        "C03": 6,
+        "C04": 6,
+        "C05": 7,
+        "C06": 7,
+        "C07": 11,
+        "C08": 7,
+        "C09": 4,
+        "C10": 10,
+        "C11": 5,
+        "C12": 5,
+        "C13": 4,
+        "C14": 5
+      },
+      "taskIds": [
+        "C01.01",
+        "C01.02",
+        "C01.03",
+        "C01.04",
+        "C02.01",
+        "C02.02",
+        "C02.03",
+        "C02.04",
+        "C02.05",
+        "C03.01",
+        "C03.02",
+        "C03.03",
+        "C03.04",
+        "C03.05",
+        "C03.06",
+        "C04.01",
+        "C04.02",
+        "C04.03",
+        "C04.04",
+        "C04.05",
+        "C04.06",
+        "C05.01",
+        "C05.02",
+        "C05.03",
+        "C05.04",
+        "C05.05",
+        "C05.06",
+        "C05.07",
+        "C06.01",
+        "C06.02",
+        "C06.03",
+        "C06.04",
+        "C06.05",
+        "C06.06",
+        "C06.07",
+        "C07.01",
+        "C07.02",
+        "C07.03",
+        "C07.04",
+        "C07.05",
+        "C07.06",
+        "C07.07",
+        "C07.08",
+        "C07.09",
+        "C07.10",
+        "C07.11",
+        "C08.01",
+        "C08.02",
+        "C08.03",
+        "C08.04",
+        "C08.05",
+        "C08.06",
+        "C08.07",
+        "C09.01",
+        "C09.02",
+        "C09.03",
+        "C09.04",
+        "C10.01",
+        "C10.02",
+        "C10.03",
+        "C10.04",
+        "C10.05",
+        "C10.06",
+        "C10.07",
+        "C10.08",
+        "C10.09",
+        "C10.10",
+        "C11.01",
+        "C11.02",
+        "C11.03",
+        "C11.04",
+        "C11.05",
+        "C12.01",
+        "C12.02",
+        "C12.03",
+        "C12.04",
+        "C12.05",
+        "C13.01",
+        "C13.02",
+        "C13.03",
+        "C13.04",
+        "C14.01",
+        "C14.02",
+        "C14.03",
+        "C14.04",
+        "C14.05"
+      ],
+      "all86AreImmediateB4003Blockers": false,
+      "scopeIncludes": [
+        "DOCUMENTARY_TASKS",
+        "B4-003",
+        "B4-004",
+        "B4-005",
+        "B4-006",
+        "B4-007",
+        "I6.6",
+        "I6.7",
+        "I6.8",
+        "I6.9",
+        "DEFERRED_PHASE_B"
+      ],
+      "completedTaskCount": null,
+      "reason": "No complete current per-task/per-criterion acceptance adjudication; documentary closure must not be counted as a functional fix."
+    },
+    "ledger": {
+      "preservedIds": 295,
+      "datedAggregateBlockersNotUsedAsCurrentDenominator": true,
+      "datedCountsNotRewritten": true
+    },
+    "sixPriorityP0": {
+      "count": 6,
+      "notExhaustiveReplacementForLedger": true,
+      "closuresGrantedByThisReceipt": 0
+    },
+    "noWeightsInvented": true,
+    "noPercentFromCommitsLinesTestsOrElapsedMonth": true
+  },
+  "currentStrengths": [
+    "Concrete retained source fixes, exact Preview artifacts and synthetic regression coverage.",
+    "Historical approvals and successful authenticated subflows remain preserved.",
+    "Two priority old source-root descriptions are materially outdated; their implementation must not be treated as absent.",
+    "A specific UI-to-Preview write/audit defect has causal reproduction and a scoped repair in progress."
+  ],
+  "remainingMaterialWork": [
+    "Complete the Metas atomic synthetic Preview successor and authenticated write/readback/reload/audit/restore.",
+    "Targeted real-advisor collection/currency/reload proof and contextual Inicio visual acceptance.",
+    "Canonical freelancer participation contract and scope tests.",
+    "Exact QA-residue provenance/dependency adjudication and authorized reversible disposition.",
+    "Independent Carlos UID, effective role/country permissions, and affected financial/commercial acceptance.",
+    "Apply inherited evidence only to unchanged causal dependencies; continue B4-004/005/006/007 after current gate closure."
+  ],
+  "rulesRiskPrecedence": {
+    "ownerExceptionDate": "2026-10-28",
+    "sameExistingRulesAloneBlockControlledLive": false,
+    "securityFindingStatus": "OPEN_NOT_PASS_OWNER_ACCEPTED_TEMPORARY_RISK",
+    "hardening": "P0_URGENT_POSTPRODUCTION_BEFORE_ACCESS_EXPANSION",
+    "independentUidAndBackendParityStillRequired": true,
+    "evidenceRefs": [
+      "ownerRulesRisk28",
+      "cp"
+    ]
+  },
+  "metasSuccessorInProgress": {
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_METAS_ATOMIC_PREVIEW_SOURCE_SUCCESSOR_20261030.json",
+    "referenceState": "EXPECTED_NOT_YET_PRESENT",
+    "status": "SOURCE_WORK_IN_PROGRESS",
+    "sourceCommit": null,
+    "sourcePass": false,
+    "technicalPreviewPass": false,
+    "authenticatedUatPass": false,
+    "newPercentage": null,
+    "notCountedAsClosure": true
+  },
+  "proposedOperationalOverlays": [
+    {
+      "id": "CP_B4_CURRENT_STATUS",
+      "targetDocument": "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json",
+      "targetPath": "/currentB4/status",
+      "observedHistoricalValue": "B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL",
+      "proposedOperationalValue": "B4_003_CAUSAL_METAS_REPAIR_AND_TARGETED_AUTHENTICATED_UAT_PENDING",
+      "reason": "The 30-Oct Work return and causal reproduction show a technical write/audit blocker, so only awaiting Paula visual review is incomplete.",
+      "evidenceRefs": [
+        "workReturn30"
+      ],
+      "applicationMode": "ADDITIVE_CURRENT_OPERATIONAL_OVERLAY_ONLY",
+      "historicalValuePreserved": true,
+      "appliedByThisReceipt": false
+    },
+    {
+      "id": "CP_FORENSIC_B4_STATUS",
+      "targetDocument": "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json",
+      "targetPath": "/i65ForensicRemediationPlan/b4/status",
+      "observedHistoricalValue": "B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL",
+      "proposedOperationalValue": "HISTORICAL_MACHINE_PASS_PRESERVED_CURRENT_B4_003_TECHNICAL_AND_AUTHENTICATED_CLOSURE_PENDING",
+      "reason": "Preserve historical machine PASS while reporting the actual current blocker.",
+      "evidenceRefs": [
+        "workReturn30"
+      ],
+      "applicationMode": "ADDITIVE_CURRENT_OPERATIONAL_OVERLAY_ONLY",
+      "historicalValuePreserved": true,
+      "appliedByThisReceipt": false
+    },
+    {
+      "id": "CP_PERSONAL_RECAUDO_STATUS",
+      "targetDocument": "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json",
+      "targetPath": "/r26PersonalCollection/status",
+      "observedHistoricalValue": "SOURCE_STAGED_ONLY_PREVIEW_AND_PERSONAL_RECAUDO_UAT_REQUIRED",
+      "proposedOperationalValue": "SOURCE_FIX_PRESENT_IN_CURRENT_CUMULATIVE_PREVIEW_AUTHENTICATED_PERSONAL_RECAUDO_UAT_PENDING",
+      "reason": "The source-only staging label is older than the current retained code and cumulative exact Preview; no full acceptance follows.",
+      "evidenceRefs": [
+        "personalRecaudoSource12",
+        "queriesSource",
+        "inicioSource",
+        "institutionalPreview30"
+      ],
+      "applicationMode": "ADDITIVE_CURRENT_OPERATIONAL_OVERLAY_ONLY",
+      "historicalValuePreserved": true,
+      "appliedByThisReceipt": false
+    },
+    {
+      "id": "LEDGER_PERSONAL_ROOT_CAUSE",
+      "targetDocument": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
+      "targetPath": "/findings[id=B4-003-P0-20261012-PERSONAL-COLLECTION]/rootCause",
+      "observedHistoricalValue": "El fallback de splitCountrySummary restringe personal a production; atribución de recaudo pendiente de discriminante.",
+      "proposedOperationalValue": "Historical cause fixed in source; canonical advisor/country/month proof present; real advisor financial UAT/reload remains pending.",
+      "reason": "Retain original cause as history, append current cause/status adjudication.",
+      "evidenceRefs": [
+        "queriesSource",
+        "inicioSource",
+        "b4003Contract"
+      ],
+      "applicationMode": "ADDITIVE_CURRENT_OPERATIONAL_OVERLAY_ONLY",
+      "historicalValuePreserved": true,
+      "appliedByThisReceipt": false
+    },
+    {
+      "id": "LEDGER_INSTITUTIONAL_ROOT_CAUSE",
+      "targetDocument": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
+      "targetPath": "/findings[id=B4-003-P0-20261012-INSTITUTIONAL-GOALS]/rootCause",
+      "observedHistoricalValue": "La proyección r23 reconoce metas globales sin asesorId; no hay aún prueba de owner UI/configuración editable.",
+      "proposedOperationalValue": "Equipo UI owner implemented; exact Preview synthetic write and atomic audit/restore contract blocked; successor source work in progress.",
+      "reason": "An absent UI owner is no longer the current defect.",
+      "evidenceRefs": [
+        "equipoSource",
+        "institutionalSource29",
+        "workReturn30"
+      ],
+      "applicationMode": "ADDITIVE_CURRENT_OPERATIONAL_OVERLAY_ONLY",
+      "historicalValuePreserved": true,
+      "appliedByThisReceipt": false
+    },
+    {
+      "id": "LEDGER_CONTEXTUAL_COPY_ROOT_CAUSE",
+      "targetDocument": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
+      "targetPath": "/findings[id=B4-003-P0-20261012-INICIO-MOTIVATIONAL-TEXTS]/rootCause",
+      "observedHistoricalValue": "El encabezado y mensaje de Inicio se definen de forma fija en la plantilla.",
+      "proposedOperationalValue": "Contextual role/readiness/country copy and rotation implemented and transported; visual acceptance pending.",
+      "reason": "The old fixed-template description understates completed source work.",
+      "evidenceRefs": [
+        "inicioSource",
+        "closeoutSource29",
+        "closeoutPreview29"
+      ],
+      "applicationMode": "ADDITIVE_CURRENT_OPERATIONAL_OVERLAY_ONLY",
+      "historicalValuePreserved": true,
+      "appliedByThisReceipt": false
+    },
+    {
+      "id": "CP_CRONOGRAMA_SUBFLOW",
+      "targetDocument": "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json",
+      "targetPath": "/b4003ReleaseShockReconciliation20261028/authenticatedUatPreserved/cronogramaDurableWriteReload",
+      "observedHistoricalValue": "PENDING_AUTHORIZED_SYNTHETIC_UI_UAT",
+      "proposedOperationalValue": "HISTORICAL_20261029_AUTHENTICATED_SYNTHETIC_CREATE_UPDATE_RELOAD_PASS_CURRENT_CAUSAL_DELTA_ONLY",
+      "reason": "A bounded authenticated success exists after the 28-Oct pending status; it does not close B4-004.",
+      "evidenceRefs": [
+        "cronogramaAuth29"
+      ],
+      "applicationMode": "ADDITIVE_CURRENT_OPERATIONAL_OVERLAY_ONLY",
+      "historicalValuePreserved": true,
+      "appliedByThisReceipt": false
+    },
+    {
+      "id": "CP_INSURER_SUBFLOW",
+      "targetDocument": "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json",
+      "targetPath": "/b4003ReleaseShockReconciliation20261028/authenticatedUatPreserved/insurerAuthorizedEditReload",
+      "observedHistoricalValue": "PENDING_AUTHORIZED_SYNTHETIC_UI_UAT",
+      "proposedOperationalValue": "HISTORICAL_A63_20261029_AUTHENTICATED_SYNTHETIC_EDIT_RELOAD_RESTORE_PASS_CURRENT_CAUSAL_DELTA_ONLY",
+      "reason": "A bounded authenticated success exists after the 28-Oct pending status; audit/history concerns and full capability acceptance remain separate.",
+      "evidenceRefs": [
+        "cp",
+        "partialUat29"
+      ],
+      "applicationMode": "ADDITIVE_CURRENT_OPERATIONAL_OVERLAY_ONLY",
+      "historicalValuePreserved": true,
+      "appliedByThisReceipt": false
+    },
+    {
+      "id": "RELEASE_R03_RISK_EXCEPTION",
+      "targetDocument": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PREVIEW_GUIDE_AND_RELEASE_PROGRESS_CONTRACT_20261018.json",
+      "targetPath": "/metric/checks[id=R03]",
+      "observedHistoricalValue": "HOLD_BLOCKED_SECURITY with currentRulesWide=true",
+      "proposedOperationalValue": "OWNER_TEMPORARY_RULES_RISK_ACCEPTED_SECURITY_NOT_PASS_OTHER_PARITY_AND_AUTHENTICATED_CRITERIA_PENDING",
+      "reason": "The same existing Rules alone no longer block controlled LIVE under the owner's 28-Oct decision. No security PASS or R03 completion is inferred.",
+      "evidenceRefs": [
+        "releaseCheckpoints",
+        "ownerRulesRisk28"
+      ],
+      "applicationMode": "ADDITIVE_CURRENT_OPERATIONAL_OVERLAY_ONLY",
+      "historicalValuePreserved": true,
+      "appliedByThisReceipt": false
+    }
+  ],
+  "preservation": {
+    "singleBranch": true,
+    "singleCandidateLine": true,
+    "controlPlaneAuthority": true,
+    "masterPlan": true,
+    "ledgerIds": 295,
+    "taskUnits": 86,
+    "historicalCapabilities": 15,
+    "historicalReceiptHashesUnchanged": true,
+    "formalGateStatusNotAdvanced": true,
+    "previousApprovalsNotRevoked": true,
+    "noGeneralReaudit": true
+  },
+  "boundaries": {
+    "newAuthority": false,
+    "newGate": false,
+    "newReleasePermission": false,
+    "noProductionAcceptance": true,
+    "noCleanupPermission": true,
+    "noRulesAuthIamMutation": true,
+    "noDataReimport": true,
+    "noMessageSending": true,
+    "noUnprovedGlobalReadinessPercent": true
+  },
+  "integrationState": "INCLUDED_IN_ATOMIC_SOURCE_COMMIT",
+  "integratedAtUtc": "2026-10-30T17:00:34Z",
+  "currentMetasIntervention": {
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_METAS_ATOMIC_PREVIEW_SOURCE_SUCCESSOR_20261030.json",
+    "status": "SOURCE_AND_SYNTHETIC_QA_PASS_PREVIEW_UAT_PENDING",
+    "sourceFiles": 3,
+    "newDiscriminatingTests": 78,
+    "preservedSecurityAndBeforeImageTests": 42,
+    "totalTestsInThisBoundedValidation": 120,
+    "syntheticOnly": true,
+    "externalRequests": 0,
+    "browserUat": false,
+    "productionAcceptance": false,
+    "priorBatch80PercentReused": false,
+    "overallImplementationPercentAssigned": null
+  }
+}

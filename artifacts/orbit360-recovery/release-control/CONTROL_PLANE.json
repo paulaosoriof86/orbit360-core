@@ -16245,5 +16245,353 @@
     "currentCapabilityAcceptances": 0,
     "securityB4003StillHold": true,
     "nextAction": "AUTHENTICATED_EQUIPO_METAS_WRITE_READBACK_RELOAD_AUDIT_RESTORE_AND_PARALLEL_P0_CLOSEOUT"
+  },
+  "b4003MetasAtomicPreviewSourceSuccessor20261030": {
+    "status": "SOURCE_AND_SYNTHETIC_QA_PASS_PREVIEW_UAT_PENDING",
+    "gate": "I6.5/B4-003",
+    "authority": "PAULA_20261030_CONTINUE_CAUSAL_REPAIR_AND_CORRECT_REAL_PROGRESS",
+    "parentHead": "b5c83cf255afd01cd348c53b904c1c47dbdcb241",
+    "sourceAnchor": "functions/product-operational-domain.js",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_METAS_ATOMIC_PREVIEW_SOURCE_SUCCESSOR_20261030.json",
+    "receiptBlobSha": "091b27ee8acb85b0e601b3b048b3d1395740f05b",
+    "atomicCommitPaths": [
+      "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json",
+      "artifacts/orbit360-recovery/release-control/I6_5_B4_003_METAS_ATOMIC_PREVIEW_SOURCE_SUCCESSOR_20261030.json",
+      "artifacts/orbit360-recovery/release-control/I6_5_B4_003_REAL_PROGRESS_RECONCILIATION_20261030.json",
+      "functions/product-operational-domain.js",
+      "orbit360-platform/data/store-firestore-product-operational-p0.js",
+      "orbit360-platform/modules/equipo.js",
+      "tools/gravicentra-b4-003-metas-atomic-ui.test.cjs",
+      "tools/gravicentra-b4-003-metas-preview-projection.test.cjs",
+      "tools/gravicentra-b4-003-metas-preview-session.test.cjs",
+      "tools/gravicentra-b4-003-scoped-boundary.test.cjs",
+      "tools/gravicentra-i6-control-plane-guard-v1.mjs"
+    ],
+    "previewAuthorizedAfterGuardAndRegressionPass": true,
+    "previewFunction": "orbit360ProductOperationalCommandPreview",
+    "previewRegion": "us-east1",
+    "previewProject": "ays-orbit-360-lab",
+    "productionPromotionAuthorized": false,
+    "authIamRulesChangeAuthorized": false,
+    "realBusinessWritesAuthorized": false,
+    "currentCapabilityAcceptances": 0,
+    "syntheticPreviewUatAuthorized": true,
+    "syntheticPeriod": "QA-B4-003",
+    "syntheticActorOwnedRestoreRequired": true,
+    "newTestsPassed": 78,
+    "preservedRegressionTestsPassed": 42,
+    "exactPreviewStatus": "PENDING_EXECUTION",
+    "authenticatedUatStatus": "PENDING"
+  },
+  "b4003RealProgressReconciliation20261030": {
+    "schema": "GRAVICENTRA_B4003_REAL_PROGRESS_OPERATIONAL_OVERLAY_V1",
+    "status": "REAL_PROGRESS_RECONCILED_CURRENT_FUNCTIONAL_CLOSURE_PENDING",
+    "recordType": "ADDITIVE_CURRENT_OPERATIONAL_OVERLAY_SUBORDINATE_TO_EXISTING_CONTROL_PLANE",
+    "preparedAtUtc": "2026-10-30T16:51:54Z",
+    "integrationState": "INCLUDED_IN_ATOMIC_SOURCE_COMMIT",
+    "authority": "PAULA_20261030_REQUEST_ACTUAL_PROGRESS_AND_CONTINUE_EXISTING_B4_003",
+    "gate": "I6.5/B4-003",
+    "observedSourceHead": "b5c83cf255afd01cd348c53b904c1c47dbdcb241",
+    "observedControlPlaneBlob": "c38f0ebf4d919cc59494adbaf81acd08837ac6e3",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_REAL_PROGRESS_RECONCILIATION_20261030.json",
+    "receiptBlobSha": "91f045bb4b34da32fffb9e299b78f972ce0af308",
+    "precedence": "For current progress interpretation and the listed stale operational descriptions only. Preserve all dated receipts, historical statuses, findings, the master plan, source hashes and existing gate authority.",
+    "formalI6Progress": {
+      "percent": 50,
+      "completedMiniGates": 5,
+      "totalMiniGates": 10,
+      "formula": "frozenMiniGates / totalMiniGates * 100",
+      "partialMiniGateCredit": false,
+      "minimumIncrementPercentagePoints": 10,
+      "nextPercent": 60,
+      "nextIncrementRequires": "I6.5 complete, including B4-003 through B4-007; B4-003 alone does not yield 60%.",
+      "previousPercent": 50,
+      "deltaPercentagePoints": 0,
+      "isProductImplementationPercent": false
+    },
+    "historicalForensicMilestone": {
+      "percent": 96,
+      "formula": "70 baseline + 10 B1 + 10 B2 + 6 B3",
+      "historicalOnly": true,
+      "isCurrentGlobalProductReadiness": false,
+      "remainingEffortPercent": null,
+      "remainingTimeEstimate": null,
+      "evidencePath": "artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_REMEDIATION_PLAN_LOCK_20260919.json",
+      "evidenceBlob": "54461ef14f5226aa6b633303a51c5a31e16ece6c"
+    },
+    "cumulativeCorrectionBatch20261029": {
+      "completedActivityUnits": 4,
+      "totalActivityUnits": 5,
+      "percent": 80,
+      "scope": "Cumulative technical correction batch recorded 2026-10-29 only",
+      "completed": [
+        "CAUSAL_DIAGNOSIS_AND_HISTORICAL_RECOVERY",
+        "CORRECTIONS_AND_SYNTHETIC_REGRESSIONS",
+        "EXACT_COMPOSITION_AND_COMPLETE_GUARD",
+        "SINGLE_IMMUTABLE_PREVIEW_BUILD_AND_SERVED_READBACK"
+      ],
+      "pending": [
+        "AUTHENTICATED_CURRENT_PREVIEW_FUNCTIONAL_UAT"
+      ],
+      "newMetasSuccessorExcluded": true,
+      "currentWorkReturnDoesNotClosePendingActivity": true,
+      "evidencePath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CANDIDATA_UNICA_DELTA_PLAN_CHOQUE_20261029.md",
+      "evidenceBlob": "556797e2967e9f62a5282f660eb0cbd275718da9"
+    },
+    "currentOverallImplementation": {
+      "percent": null,
+      "status": "NOT_DETERMINABLE_FROM_ADJUDICATED_CURRENT_CRITERIA",
+      "knownTaskUnits": 86,
+      "currentAcceptedCriteria": null,
+      "currentApplicableCriteria": null,
+      "reason": "The plan mixes multiple gates and deferred work; its current criterion-level evidence has not been fully adjudicated. No weighting or global percent is invented.",
+      "historicalLedgerCountsAreNotCurrentClosureTotals": true
+    },
+    "historicalProductionPathCheckpoints": {
+      "recordedPercent": 20,
+      "recordedPassed": 2,
+      "total": 10,
+      "freshRecomputation": false,
+      "currentGlobalReadinessPercent": null,
+      "evidencePath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PREVIEW_GUIDE_AND_RELEASE_PROGRESS_CONTRACT_20261018.json",
+      "evidenceBlob": "cc7bd6f4670e7de6012b1d6ac5a9c2615f45f286",
+      "ownerRulesRiskExceptionAppliedToInterpretation": true,
+      "sameExistingRulesAloneBlockControlledLive": false,
+      "securityPassInferred": false
+    },
+    "materialProofPreserved": {
+      "cumulativeBatchSource": "779a71495366d8224dfb945ed7d84fee93482020",
+      "cumulativeBatchTransport": "95f980719387c042625f5cfeb62340b1066ca361",
+      "productSourceFilesChanged": 6,
+      "syntheticRegression": {
+        "files": 49,
+        "passed": 120,
+        "failed": 0,
+        "skipped": 0,
+        "firestoreEmulatorExcluded": true,
+        "authenticatedAcceptance": false
+      },
+      "cumulativePreviewRunId": 40923629860,
+      "cumulativeGuardRunId": 40923629966,
+      "historicalCapabilitiesPreserved": 15,
+      "boundedAuthenticatedSubflows": [
+        {
+          "capability": "Aseguradoras",
+          "sourceCommit": "a63a7af5eb066bc87f94131e7b981741b29e4afc",
+          "previewRunId": 40889172816,
+          "status": "SAVE_RELOAD_RESTORE_RELOAD_PASS",
+          "scope": "Synthetic fixture, Paula/Dirección, GT; not full capability/current SHA acceptance."
+        },
+        {
+          "capability": "Cronograma",
+          "sourceCommit": "199860dd23cad3db2df581828a45ae9f9e5cc7d8",
+          "previewRunId": 40861280332,
+          "status": "CREATE_UPDATE_RELOAD_AND_ALL_COUNTRIES_DENIAL_PASS",
+          "scope": "Synthetic task, Paula/Dirección, GT; not full B4-004/current SHA acceptance."
+        }
+      ],
+      "newFullCapabilityAcceptances": 0,
+      "newFindingClosures": 0,
+      "zeroNewFullAcceptancesDoesNotMeanZeroProductProgress": true
+    },
+    "latestWorkReturn": {
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_WORK_UAT_RETURN_CAUSAL_ADJUDICATION_20261030.json",
+      "receiptBlob": "6e0e195616d0788b21fbf4df8138f2d6b50153ef",
+      "sourceCommit": "eb9ce731832d236fedc545185ec7c66bd10849bb",
+      "previewRunId": 41066435386,
+      "readSurfacesReported": 8,
+      "businessDataWrites": 0,
+      "metasWriteUat": "BLOCKED_BEFORE_WRITE",
+      "serverReadbackReloadAuditRestore": "NOT_EXECUTED",
+      "independentCarlosUid": "NOT_TESTED"
+    },
+    "sixPriorityP0OperationalState": [
+      {
+        "findingId": "B4-003-P0-20261012-PERSONAL-COLLECTION",
+        "historicalLedgerStatus": "OPEN_P0_NOT_ACCEPTED",
+        "currentOperationalStatus": "SOURCE_FIX_RETAINED_SYNTHETIC_CONTRACT_PRESENT_EXACT_AUTHENTICATED_UAT_PENDING",
+        "historicalRootCauseStillDescribesCurrentImplementation": false,
+        "fullFindingClosed": false
+      },
+      {
+        "findingId": "B4-003-P0-20261012-INSTITUTIONAL-GOALS",
+        "historicalLedgerStatus": "OPEN_P0_NOT_ACCEPTED",
+        "currentOperationalStatus": "ATOMIC_SOURCE_AND_SYNTHETIC_QA_PASS_EXACT_PREVIEW_UAT_PENDING",
+        "historicalRootCauseStillDescribesCurrentImplementation": false,
+        "fullFindingClosed": false
+      },
+      {
+        "findingId": "B4-003-P0-20261012-FREELANCERS-GOAL-SCOPE",
+        "historicalLedgerStatus": "OPEN_P0_NOT_ACCEPTED",
+        "currentOperationalStatus": "OPEN_CANONICAL_PARTICIPATION_CONTRACT_REQUIRED",
+        "historicalRootCauseStillDescribesCurrentImplementation": true,
+        "fullFindingClosed": false
+      },
+      {
+        "findingId": "B4-003-P0-20261012-INICIO-MOTIVATIONAL-TEXTS",
+        "historicalLedgerStatus": "OPEN_P0_NOT_ACCEPTED",
+        "currentOperationalStatus": "CONTEXTUAL_SOURCE_AND_TECHNICAL_PREVIEW_PROVEN_VISUAL_ACCEPTANCE_PENDING",
+        "historicalRootCauseStillDescribesCurrentImplementation": false,
+        "fullFindingClosed": false
+      },
+      {
+        "findingId": "B4-003-P0-20261012-QA-CANCELLED-RUN-FIXTURES",
+        "historicalLedgerStatus": "OPEN_P0_NOT_ACCEPTED",
+        "currentOperationalStatus": "HOLD_PROVENANCE_AND_DEPENDENCIES_NOT_ADJUDICATED",
+        "historicalRootCauseStillDescribesCurrentImplementation": "REQUIRES_EXACT_RECORD_READBACK",
+        "fullFindingClosed": false
+      },
+      {
+        "findingId": "B4-003-P0-20261012-QA-ORPHAN-RENEWALS",
+        "historicalLedgerStatus": "OPEN_P0_NOT_ACCEPTED",
+        "currentOperationalStatus": "HOLD_EXACT_ORIGIN_AND_DEPENDENCY_DISPOSITION_REQUIRED",
+        "historicalRootCauseStillDescribesCurrentImplementation": "REQUIRES_EXACT_RECORD_READBACK",
+        "fullFindingClosed": false
+      }
+    ],
+    "metasAtomicSuccessor": {
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_METAS_ATOMIC_PREVIEW_SOURCE_SUCCESSOR_20261030.json",
+      "referenceState": "BOUND_IN_SAME_ATOMIC_SOURCE_COMMIT",
+      "status": "SOURCE_AND_SYNTHETIC_QA_PASS_PREVIEW_UAT_PENDING",
+      "sourceCommit": null,
+      "sourcePass": true,
+      "technicalPreviewPass": false,
+      "authenticatedUatPass": false,
+      "countedAsClosure": false,
+      "assignedPercent": null,
+      "sourceCommitResolution": "EXACT_CHILD_OF_PARENT_FROM_SOURCE_ANCHOR"
+    },
+    "staleOperationalFieldAdjudications": [
+      {
+        "id": "CP_B4_CURRENT_STATUS",
+        "targetDocument": "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json",
+        "targetPath": "/currentB4/status",
+        "currentOperationalValue": "B4_003_CAUSAL_METAS_REPAIR_AND_TARGETED_AUTHENTICATED_UAT_PENDING",
+        "historicalValuePreserved": true,
+        "originalFieldMutationProposed": false,
+        "detailsInReceipt": true
+      },
+      {
+        "id": "CP_FORENSIC_B4_STATUS",
+        "targetDocument": "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json",
+        "targetPath": "/i65ForensicRemediationPlan/b4/status",
+        "currentOperationalValue": "HISTORICAL_MACHINE_PASS_PRESERVED_CURRENT_B4_003_TECHNICAL_AND_AUTHENTICATED_CLOSURE_PENDING",
+        "historicalValuePreserved": true,
+        "originalFieldMutationProposed": false,
+        "detailsInReceipt": true
+      },
+      {
+        "id": "CP_PERSONAL_RECAUDO_STATUS",
+        "targetDocument": "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json",
+        "targetPath": "/r26PersonalCollection/status",
+        "currentOperationalValue": "SOURCE_FIX_PRESENT_IN_CURRENT_CUMULATIVE_PREVIEW_AUTHENTICATED_PERSONAL_RECAUDO_UAT_PENDING",
+        "historicalValuePreserved": true,
+        "originalFieldMutationProposed": false,
+        "detailsInReceipt": true
+      },
+      {
+        "id": "LEDGER_PERSONAL_ROOT_CAUSE",
+        "targetDocument": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
+        "targetPath": "/findings[id=B4-003-P0-20261012-PERSONAL-COLLECTION]/rootCause",
+        "currentOperationalValue": "Historical cause fixed in source; canonical advisor/country/month proof present; real advisor financial UAT/reload remains pending.",
+        "historicalValuePreserved": true,
+        "originalFieldMutationProposed": false,
+        "detailsInReceipt": true
+      },
+      {
+        "id": "LEDGER_INSTITUTIONAL_ROOT_CAUSE",
+        "targetDocument": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
+        "targetPath": "/findings[id=B4-003-P0-20261012-INSTITUTIONAL-GOALS]/rootCause",
+        "currentOperationalValue": "Equipo UI owner and atomic goal/audit/restore correction implemented and synthetically proven; exact backend/Hosting Preview and authenticated acceptance pending.",
+        "historicalValuePreserved": true,
+        "originalFieldMutationProposed": false,
+        "detailsInReceipt": true
+      },
+      {
+        "id": "LEDGER_CONTEXTUAL_COPY_ROOT_CAUSE",
+        "targetDocument": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
+        "targetPath": "/findings[id=B4-003-P0-20261012-INICIO-MOTIVATIONAL-TEXTS]/rootCause",
+        "currentOperationalValue": "Contextual role/readiness/country copy and rotation implemented and transported; visual acceptance pending.",
+        "historicalValuePreserved": true,
+        "originalFieldMutationProposed": false,
+        "detailsInReceipt": true
+      },
+      {
+        "id": "CP_CRONOGRAMA_SUBFLOW",
+        "targetDocument": "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json",
+        "targetPath": "/b4003ReleaseShockReconciliation20261028/authenticatedUatPreserved/cronogramaDurableWriteReload",
+        "currentOperationalValue": "HISTORICAL_20261029_AUTHENTICATED_SYNTHETIC_CREATE_UPDATE_RELOAD_PASS_CURRENT_CAUSAL_DELTA_ONLY",
+        "historicalValuePreserved": true,
+        "originalFieldMutationProposed": false,
+        "detailsInReceipt": true
+      },
+      {
+        "id": "CP_INSURER_SUBFLOW",
+        "targetDocument": "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json",
+        "targetPath": "/b4003ReleaseShockReconciliation20261028/authenticatedUatPreserved/insurerAuthorizedEditReload",
+        "currentOperationalValue": "HISTORICAL_A63_20261029_AUTHENTICATED_SYNTHETIC_EDIT_RELOAD_RESTORE_PASS_CURRENT_CAUSAL_DELTA_ONLY",
+        "historicalValuePreserved": true,
+        "originalFieldMutationProposed": false,
+        "detailsInReceipt": true
+      },
+      {
+        "id": "RELEASE_R03_RISK_EXCEPTION",
+        "targetDocument": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PREVIEW_GUIDE_AND_RELEASE_PROGRESS_CONTRACT_20261018.json",
+        "targetPath": "/metric/checks[id=R03]",
+        "currentOperationalValue": "OWNER_TEMPORARY_RULES_RISK_ACCEPTED_SECURITY_NOT_PASS_OTHER_PARITY_AND_AUTHENTICATED_CRITERIA_PENDING",
+        "historicalValuePreserved": true,
+        "originalFieldMutationProposed": false,
+        "detailsInReceipt": true
+      }
+    ],
+    "releaseBlockerInterpretation": {
+      "currentB4Status": "B4_003_CAUSAL_METAS_REPAIR_AND_TARGETED_AUTHENTICATED_UAT_PENDING",
+      "sameExistingRulesAloneBlockControlledLive": false,
+      "rulesSecurityFindingStatus": "OPEN_NOT_PASS_OWNER_ACCEPTED_TEMPORARY_RISK",
+      "canonicalFreelancerParticipation": "PENDING",
+      "qaResidueProvenanceAndDependencies": "PENDING",
+      "independentCarlosUid": "PENDING",
+      "exactAffectedFinancialCommercialUat": "PENDING",
+      "productionAcceptance": false
+    },
+    "preservation": {
+      "existingGateOrder": [
+        "B4-003",
+        "B4-004",
+        "B4-005",
+        "B4-006",
+        "B4-007",
+        "I6.6",
+        "I6.7",
+        "I6.8",
+        "I6.9"
+      ],
+      "masterPlanPreserved": true,
+      "ledgerIdsPreserved": 295,
+      "taskUnitsPreserved": 86,
+      "historicalCapabilitiesPreserved": 15,
+      "historicalReceiptsAndHashesUnchanged": true,
+      "priorApprovalsNotRevoked": true,
+      "newAuthority": false,
+      "newGate": false,
+      "noProductionPermissionAdded": true,
+      "noCleanupPermissionAdded": true,
+      "noReimport": true
+    },
+    "integratedAtUtc": "2026-10-30T17:00:34Z",
+    "currentMetasValidation": {
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_METAS_ATOMIC_PREVIEW_SOURCE_SUCCESSOR_20261030.json",
+      "status": "SOURCE_AND_SYNTHETIC_QA_PASS_PREVIEW_UAT_PENDING",
+      "sourceFiles": 3,
+      "newDiscriminatingTests": 78,
+      "preservedSecurityAndBeforeImageTests": 42,
+      "totalTestsInThisBoundedValidation": 120,
+      "syntheticOnly": true,
+      "externalRequests": 0,
+      "browserUat": false,
+      "productionAcceptance": false,
+      "priorBatch80PercentReused": false,
+      "overallImplementationPercentAssigned": null
+    }
   }
 }

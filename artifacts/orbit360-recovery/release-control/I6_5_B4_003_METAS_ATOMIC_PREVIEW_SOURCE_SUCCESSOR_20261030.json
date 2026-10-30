@@ -1,0 +1,731 @@
+{
+  "schema": "GRAVICENTRA_I65_B4003_METAS_ATOMIC_PREVIEW_SOURCE_SUCCESSOR_V1",
+  "recordedAtUtc": "2026-10-30T17:00:34Z",
+  "status": "SOURCE_AND_SYNTHETIC_QA_PASS_PREVIEW_UAT_PENDING",
+  "gate": "I6.5/B4-003",
+  "authority": "PAULA_20261030_CONTINUE_CAUSAL_REPAIR_AND_CORRECT_REAL_PROGRESS",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "parentHead": "b5c83cf255afd01cd348c53b904c1c47dbdcb241",
+  "sourceAnchor": "functions/product-operational-domain.js",
+  "commitBinding": "EXACT_SINGLE_CHILD_OF_PARENT_DISCOVERED_BY_LAST_BACKEND_CHANGE_NO_SELF_SHA",
+  "atomicCommitPaths": [
+    "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json",
+    "artifacts/orbit360-recovery/release-control/I6_5_B4_003_METAS_ATOMIC_PREVIEW_SOURCE_SUCCESSOR_20261030.json",
+    "artifacts/orbit360-recovery/release-control/I6_5_B4_003_REAL_PROGRESS_RECONCILIATION_20261030.json",
+    "functions/product-operational-domain.js",
+    "orbit360-platform/data/store-firestore-product-operational-p0.js",
+    "orbit360-platform/modules/equipo.js",
+    "tools/gravicentra-b4-003-metas-atomic-ui.test.cjs",
+    "tools/gravicentra-b4-003-metas-preview-projection.test.cjs",
+    "tools/gravicentra-b4-003-metas-preview-session.test.cjs",
+    "tools/gravicentra-b4-003-scoped-boundary.test.cjs",
+    "tools/gravicentra-i6-control-plane-guard-v1.mjs"
+  ],
+  "diagnosticReceipt": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_WORK_UAT_RETURN_CAUSAL_ADJUDICATION_20261030.json",
+    "blob": "6e0e195616d0788b21fbf4df8138f2d6b50153ef",
+    "reproducedFailures": 4,
+    "workCompleted": true,
+    "workMetasUat": "BLOCKED_BEFORE_WRITE"
+  },
+  "sourceFiles": {
+    "functions/product-operational-domain.js": {
+      "beforeBlob": "529a76cffaa847c13fdf468bb2bbdf0685e95903",
+      "afterBlob": "f9fa8132c63b7099a4a72ff1df389f5fb5813d18",
+      "causalFinding": "Explicit Preview session, read-only probe/inspect, atomic audited synthetic write and server-owned original-absence restoration; unchanged normal authorization."
+    },
+    "orbit360-platform/data/store-firestore-product-operational-p0.js": {
+      "beforeBlob": "8bd608bc5a3aa7cd58feca8e309c97ea19059a91",
+      "afterBlob": "b4ccd50b38ae095f2e9aa894c6992a9e36261545",
+      "causalFinding": "Canonical request context and readback, session recovery through same callable, exclude reserved fixtures from business projections."
+    },
+    "orbit360-platform/modules/equipo.js": {
+      "beforeBlob": "5ce317a0641709e1a405e61435578de934fa194d",
+      "afterBlob": "aa89e24f945082805bed2c044f16541716306a8f",
+      "causalFinding": "Explicit Preview test panel and atomic goal plus audit for all goal writes; no false not-saved claim after an uncertain response."
+    }
+  },
+  "regressionTests": {
+    "tools/gravicentra-b4-003-metas-preview-session.test.cjs": {
+      "blob": "12177674325aa94574cecfb80847adf450990bad",
+      "tests": 56,
+      "passed": 56,
+      "syntheticOnly": true,
+      "externalRequests": 0,
+      "result": {
+        "schema": "gravicentra-metas-preview-session-regression-v1",
+        "syntheticOnly": true,
+        "externalRequests": 0,
+        "sourceBlob": "f9fa8132c63b7099a4a72ff1df389f5fb5813d18",
+        "total": 56,
+        "passed": 56,
+        "failed": 0,
+        "tests": [
+          {
+            "id": "probe_contract_read_only",
+            "pass": true
+          },
+          {
+            "id": "inspect_without_session_read_only",
+            "pass": true
+          },
+          {
+            "id": "probe_rejects_mutations",
+            "pass": true
+          },
+          {
+            "id": "inspect_rejects_mutations",
+            "pass": true
+          },
+          {
+            "id": "probe_rejects_country_outside_membership",
+            "pass": true
+          },
+          {
+            "id": "probe_rejects_operator",
+            "pass": true
+          },
+          {
+            "id": "probe_rejects_own_scope",
+            "pass": true
+          },
+          {
+            "id": "probe_rejects_unassigned_active_role",
+            "pass": true
+          },
+          {
+            "id": "live_rejects_read_only_preview_probe",
+            "pass": true
+          },
+          {
+            "id": "create_meta_and_audit_atomic_readback",
+            "pass": true
+          },
+          {
+            "id": "create_two_goals_one_audit",
+            "pass": true
+          },
+          {
+            "id": "update_same_run_durable",
+            "pass": true
+          },
+          {
+            "id": "restore_both_preserves_audit_and_absence",
+            "pass": true
+          },
+          {
+            "id": "retry_write_idempotent",
+            "pass": true
+          },
+          {
+            "id": "retry_restore_idempotent",
+            "pass": true
+          },
+          {
+            "id": "idempotent_replay_cannot_bypass_active_role",
+            "pass": true
+          },
+          {
+            "id": "idempotent_replay_cannot_bypass_institutional_permission",
+            "pass": true
+          },
+          {
+            "id": "audit_conflict_rolls_back_goal_and_session",
+            "pass": true
+          },
+          {
+            "id": "restore_audit_conflict_rolls_back_delete",
+            "pass": true
+          },
+          {
+            "id": "business_id_rejected",
+            "pass": true
+          },
+          {
+            "id": "missing_synthetic_marker_rejected",
+            "pass": true
+          },
+          {
+            "id": "missing_run_marker_rejected",
+            "pass": true
+          },
+          {
+            "id": "forged_actor_marker_rejected",
+            "pass": true
+          },
+          {
+            "id": "country_outside_membership_rejected",
+            "pass": true
+          },
+          {
+            "id": "advisor_cannot_start_institutional_test",
+            "pass": true
+          },
+          {
+            "id": "operator_cannot_start_institutional_test",
+            "pass": true
+          },
+          {
+            "id": "other_actor_cannot_restore",
+            "pass": true
+          },
+          {
+            "id": "calendar_period_cannot_write",
+            "pass": true
+          },
+          {
+            "id": "wrong_period_cannot_restore",
+            "pass": true
+          },
+          {
+            "id": "stale_before_image_cannot_restore",
+            "pass": true
+          },
+          {
+            "id": "stale_extra_field_cannot_restore",
+            "pass": true
+          },
+          {
+            "id": "missing_server_session_cannot_adopt_fixture",
+            "pass": true
+          },
+          {
+            "id": "partial_restore_rejected",
+            "pass": true
+          },
+          {
+            "id": "restored_run_cannot_reopen",
+            "pass": true
+          },
+          {
+            "id": "plain_preview_cannot_mutate_owned_fixture",
+            "pass": true
+          },
+          {
+            "id": "live_cannot_use_preview_contract",
+            "pass": true
+          },
+          {
+            "id": "live_global_goal_delete_still_forbidden",
+            "pass": true
+          },
+          {
+            "id": "extra_collection_rejected",
+            "pass": true
+          },
+          {
+            "id": "missing_audit_rejected_before_commit",
+            "pass": true
+          },
+          {
+            "id": "negative_goal_rejected",
+            "pass": true
+          },
+          {
+            "id": "duplicate_goal_target_rejected",
+            "pass": true
+          },
+          {
+            "id": "existing_business_goal_preserved_during_create_restore",
+            "pass": true
+          },
+          {
+            "id": "inspect_recovers_all_fixtures_without_projected_reader",
+            "pass": true
+          },
+          {
+            "id": "inspect_after_restore_confirms_absence",
+            "pass": true
+          },
+          {
+            "id": "inspect_denies_other_actor_known_run",
+            "pass": true
+          },
+          {
+            "id": "inspect_no_disclosure_to_other_actor_discovery",
+            "pass": true
+          },
+          {
+            "id": "inspect_rejects_changed_fixture",
+            "pass": true
+          },
+          {
+            "id": "restore_denies_missing_marker_before_image",
+            "pass": true
+          },
+          {
+            "id": "restore_denies_changed_assigned_active_role",
+            "pass": true
+          },
+          {
+            "id": "cannot_start_second_active_run_same_actor_country",
+            "pass": true
+          },
+          {
+            "id": "can_start_new_run_after_complete_restore",
+            "pass": true
+          },
+          {
+            "id": "write_returns_canonical_fixture_fields",
+            "pass": true
+          },
+          {
+            "id": "client_cannot_supply_server_evidence",
+            "pass": true
+          },
+          {
+            "id": "request_id_cannot_overwrite_session_pointer",
+            "pass": true
+          },
+          {
+            "id": "live_business_meta_and_audit_atomic_preserved",
+            "pass": true
+          },
+          {
+            "id": "live_business_audit_failure_rolls_back_meta",
+            "pass": true
+          }
+        ],
+        "releaseAccepted": false
+      }
+    },
+    "tools/gravicentra-b4-003-metas-atomic-ui.test.cjs": {
+      "blob": "5b7b77a8f503dd7738b68f256f00fe915aeb22a2",
+      "tests": 17,
+      "passed": 17,
+      "syntheticOnly": true,
+      "externalRequests": 0,
+      "result": {
+        "schema": "gravicentra-metas-atomic-ui-integration-v1",
+        "scope": "offline VM / rendered DOM / canonical owners / memory transaction; not browser UAT",
+        "syntheticOnly": true,
+        "externalRequests": 0,
+        "sourceBindings": {
+          "equipo": {
+            "path": "orbit360-platform/modules/equipo.js",
+            "blob": "aa89e24f945082805bed2c044f16541716306a8f"
+          },
+          "facade": {
+            "path": "orbit360-platform/data/store-firestore-product-operational-p0.js",
+            "blob": "b4ccd50b38ae095f2e9aa894c6992a9e36261545"
+          },
+          "backend": {
+            "path": "functions/product-operational-domain.js",
+            "blob": "f9fa8132c63b7099a4a72ff1df389f5fb5813d18"
+          },
+          "roster": {
+            "path": "functions/assignable-advisor-roster.js",
+            "blob": "75ca53db55e2665123589b0e63253a8e4f8c377c"
+          },
+          "activeRole": {
+            "path": "functions/product-active-role-contract.js",
+            "blob": "09681f536c5cbbd36bcba6514d4829d2494b9387"
+          }
+        },
+        "total": 17,
+        "passed": 17,
+        "failed": 0,
+        "tests": [
+          {
+            "id": "preview_explicit_context_and_real_goals_read_only",
+            "pass": true
+          },
+          {
+            "id": "create_edit_two_fixtures_atomic_with_canonical_audit",
+            "pass": true
+          },
+          {
+            "id": "reload_recovers_via_canonical_inspect_without_projected_markers",
+            "pass": true
+          },
+          {
+            "id": "restore_from_reloaded_ui_removes_only_own_fixtures_and_keeps_history",
+            "pass": true
+          },
+          {
+            "id": "audit_conflict_on_create_prevents_partial_meta_commit_and_false_success",
+            "pass": true
+          },
+          {
+            "id": "audit_conflict_on_update_preserves_prior_value",
+            "pass": true
+          },
+          {
+            "id": "restore_conflict_preserves_fixture_and_recovery_context",
+            "pass": true
+          },
+          {
+            "id": "incomplete_audit_readback_never_displays_success",
+            "pass": true
+          },
+          {
+            "id": "unavailable_contract_blocks_test_without_writes",
+            "pass": true
+          },
+          {
+            "id": "probe_mismatch_blocks_new_test_without_writes",
+            "pass": true
+          },
+          {
+            "id": "business_period_selector_cannot_change_reserved_test_period",
+            "pass": true
+          },
+          {
+            "id": "advisor_ui_has_no_institutional_test_or_inspection",
+            "pass": true
+          },
+          {
+            "id": "country_denied_by_real_backend_prevents_test_start",
+            "pass": true
+          },
+          {
+            "id": "current_secure_roster_does_not_aggregate_noncalendar_fixtures",
+            "pass": true
+          },
+          {
+            "id": "live_business_goal_and_audit_share_one_batch",
+            "pass": true
+          },
+          {
+            "id": "live_audit_failure_has_no_partial_business_goal_commit",
+            "pass": true
+          },
+          {
+            "id": "live_rejects_preview_metadata_locally",
+            "pass": true
+          }
+        ],
+        "releaseAccepted": false
+      }
+    },
+    "tools/gravicentra-b4-003-metas-preview-projection.test.cjs": {
+      "blob": "df8b2ded44c166ece62bbd94717fa66309b94a77",
+      "tests": 5,
+      "passed": 5,
+      "syntheticOnly": true,
+      "externalRequests": 0,
+      "result": {
+        "schema": "gravicentra-metas-preview-projection-isolation-v1",
+        "syntheticOnly": true,
+        "externalRequests": 0,
+        "writerSourceBlob": "f9fa8132c63b7099a4a72ff1df389f5fb5813d18",
+        "unchangedRosterSourceBlob": "75ca53db55e2665123589b0e63253a8e4f8c377c",
+        "calendarQueries": 120000,
+        "total": 5,
+        "passed": 5,
+        "failed": 0,
+        "tests": [
+          {
+            "id": "writer_creates_reserved_period_institutional_fixtures",
+            "pass": true
+          },
+          {
+            "id": "all_120000_valid_calendar_months_exclude_fixtures",
+            "pass": true
+          },
+          {
+            "id": "reserved_period_is_not_a_dashboard_query",
+            "pass": true
+          },
+          {
+            "id": "projection_would_count_calendar_fixture_without_isolation",
+            "pass": true
+          },
+          {
+            "id": "complete_restore_preserves_normal_institutional_projection",
+            "pass": true
+          }
+        ],
+        "releaseAccepted": false
+      }
+    }
+  },
+  "existingRegressionReproof": {
+    "tools/gravicentra-b4-003-operational-write-security-regression.test.cjs": {
+      "blob": "e9d1a504b555d147a741a3717be5b2042305eabd",
+      "result": {
+        "schema": "gravicentra-operational-write-scope-regression-v2",
+        "syntheticOnly": true,
+        "externalRequests": 0,
+        "sourceBlob": "f9fa8132c63b7099a4a72ff1df389f5fb5813d18",
+        "total": 30,
+        "passed": 30,
+        "failed": 0,
+        "tests": [
+          {
+            "id": "missing_member_status_denied",
+            "pass": true
+          },
+          {
+            "id": "pending_member_denied",
+            "pass": true
+          },
+          {
+            "id": "invited_member_denied",
+            "pass": true
+          },
+          {
+            "id": "deleted_member_denied",
+            "pass": true
+          },
+          {
+            "id": "conflicting_status_alias_denied",
+            "pass": true
+          },
+          {
+            "id": "inactivo_flag_denied",
+            "pass": true
+          },
+          {
+            "id": "active_spanish_status_preserved",
+            "pass": true
+          },
+          {
+            "id": "explicit_role_team_replaces_global",
+            "pass": true
+          },
+          {
+            "id": "explicit_role_team_authorized_member",
+            "pass": true
+          },
+          {
+            "id": "absent_role_override_preserves_team",
+            "pass": true
+          },
+          {
+            "id": "invalid_role_team_config_denied",
+            "pass": true
+          },
+          {
+            "id": "derived_team_cannot_bypass_override",
+            "pass": true
+          },
+          {
+            "id": "foreign_to_own_denied",
+            "pass": true
+          },
+          {
+            "id": "foreign_content_denied",
+            "pass": true
+          },
+          {
+            "id": "own_edit_allowed",
+            "pass": true
+          },
+          {
+            "id": "own_to_foreign_denied",
+            "pass": true
+          },
+          {
+            "id": "foreign_country_to_authorized_denied",
+            "pass": true
+          },
+          {
+            "id": "authorized_to_foreign_country_denied",
+            "pass": true
+          },
+          {
+            "id": "missing_member_country_denied",
+            "pass": true
+          },
+          {
+            "id": "missing_document_country_denied",
+            "pass": true
+          },
+          {
+            "id": "unvalidated_document_country_denied",
+            "pass": true
+          },
+          {
+            "id": "insurer_foreign_country_update_denied",
+            "pass": true
+          },
+          {
+            "id": "insurer_missing_country_update_denied",
+            "pass": true
+          },
+          {
+            "id": "insurer_authorized_country_update_preserved",
+            "pass": true
+          },
+          {
+            "id": "all_scope_reassignment_preserved",
+            "pass": true
+          },
+          {
+            "id": "team_member_edit_preserved",
+            "pass": true
+          },
+          {
+            "id": "outsider_to_team_denied",
+            "pass": true
+          },
+          {
+            "id": "mixed_batch_no_partial_commit",
+            "pass": true
+          },
+          {
+            "id": "own_insert_preserved",
+            "pass": true
+          },
+          {
+            "id": "retry_idempotency_preserved",
+            "pass": true
+          }
+        ],
+        "releaseAccepted": false
+      }
+    },
+    "tools/gravicentra-b4-003-before-image-regression.test.cjs": {
+      "blob": "be744e59295f8c313066683262f21ac8854ad555",
+      "result": {
+        "schema": "gravicentra-before-image-regression-v1",
+        "syntheticOnly": true,
+        "externalRequests": 0,
+        "sourceBlob": "f9fa8132c63b7099a4a72ff1df389f5fb5813d18",
+        "total": 12,
+        "passed": 12,
+        "failed": 0,
+        "tests": [
+          {
+            "id": "foreign_to_own_denied",
+            "pass": true
+          },
+          {
+            "id": "foreign_content_denied",
+            "pass": true
+          },
+          {
+            "id": "own_edit_allowed",
+            "pass": true
+          },
+          {
+            "id": "own_to_foreign_denied",
+            "pass": true
+          },
+          {
+            "id": "foreign_country_to_authorized_denied",
+            "pass": true
+          },
+          {
+            "id": "authorized_to_foreign_country_denied",
+            "pass": true
+          },
+          {
+            "id": "all_scope_reassignment_preserved",
+            "pass": true
+          },
+          {
+            "id": "team_member_edit_preserved",
+            "pass": true
+          },
+          {
+            "id": "outsider_to_team_denied",
+            "pass": true
+          },
+          {
+            "id": "mixed_batch_no_partial_commit",
+            "pass": true
+          },
+          {
+            "id": "own_insert_preserved",
+            "pass": true
+          },
+          {
+            "id": "retry_idempotency_preserved",
+            "pass": true
+          }
+        ],
+        "releaseAccepted": false
+      }
+    }
+  },
+  "validation": {
+    "newTestsPassed": 78,
+    "existingRegressionTestsPassed": 42,
+    "totalPassed": 120,
+    "totalFailed": 0,
+    "externalRequests": 0,
+    "browserUatAccepted": false,
+    "scope": "This 120-test bounded repair validation is separate from the older 120-test cumulative batch."
+  },
+  "semantics": {
+    "atomicGoalAndAudit": true,
+    "sameCanonicalWriter": true,
+    "sameMetasCollection": true,
+    "previewPeriod": "QA-B4-003",
+    "calendarMonthProjectionExcluded": true,
+    "canonicalRecoveryAfterReload": true,
+    "preWriteProbeRequired": true,
+    "restoreUsesServerSessionAndDigest": true,
+    "originalAbsenceVerifiedByServer": true,
+    "auditAppendOnly": true,
+    "liveQaContractRejected": true,
+    "unrestrictedGoalDeletion": false,
+    "businessGoalsReadOnlyInPreview": true
+  },
+  "previewTransport": {
+    "existingWorkflow": ".github/workflows/gravicentra-b4-003-cumulative-safe-read-preview-20261029.yml",
+    "project": "ays-orbit-360-lab",
+    "function": "orbit360ProductOperationalCommandPreview",
+    "region": "us-east1",
+    "existingFunctionOnly": true,
+    "hostingPreviewOnly": true,
+    "guardSuccessRequired": true,
+    "buildOnceFromSource": true,
+    "readbackRequired": true,
+    "currentStatus": "PENDING_EXECUTION",
+    "hostingChannelId": "gi-i65-b4-sr-41066435386",
+    "expectedPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b4-sr-41066435386-r09pl1ti.web.app",
+    "predecessorSourceSha": "eb9ce731832d236fedc545185ec7c66bd10849bb",
+    "predecessorBuildId": "gi-i65-b4-eb9ce731832d-57f234755dc1",
+    "reuseExistingChannel": true,
+    "reason": "Preserve the authorized authenticated Chrome session while replacing only the LAB Preview artifact; retain original receipts as point-in-time historical evidence."
+  },
+  "progressReceipt": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_REAL_PROGRESS_RECONCILIATION_20261030.json",
+    "blob": "91f045bb4b34da32fffb9e299b78f972ce0af308"
+  },
+  "composition": {
+    "historical114FileLockUnchanged": true,
+    "lockPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
+    "lockBlob": "33bf80768cb6cb311f2975d282a5f50935f680aa",
+    "currentThreeBlobsIndependentlyPinned": true,
+    "oldInstitutional15ChecksReprovedAgainstExactPredecessorOnly": true,
+    "allHistoricalChecksRetained": true
+  },
+  "boundaries": {
+    "previewOnly": true,
+    "liveDeployment": false,
+    "authIamRulesChange": false,
+    "realBusinessWrites": 0,
+    "newCollections": 0,
+    "newEndpoints": 0,
+    "newWorkflows": 0,
+    "freelancerContractInvented": false,
+    "authenticatedUatAccepted": false,
+    "capabilityAccepted": false,
+    "productionAccepted": false,
+    "reimport": false,
+    "unrelatedFixtureCleanup": false
+  },
+  "preserved": {
+    "historicalCapabilities": 15,
+    "findings": 295,
+    "taskUnits": 86,
+    "gateOrderUnchanged": true,
+    "priorReceiptsUnchanged": true,
+    "ownerTemporaryRulesRiskExceptionUnchanged": true
+  },
+  "requiredCiTestSuccessor": {
+    "path": "tools/gravicentra-b4-003-scoped-boundary.test.cjs",
+    "beforeBlob": "26ba2d9d44c4679b0eef9f61032cd511ea4f7e61",
+    "afterBlob": "ad2dcd823f579df223c9048490125bb4c410efb0",
+    "reason": "Extend the required CI writer receipt chain to the explicitly pinned Metas successor while preserving all historical checks and the original twelve actual-source before-image cases.",
+    "existingAssertionsPreserved": true,
+    "beforeImageCasesStillRequired": 12,
+    "syntheticOnly": true,
+    "externalRequests": 0
+  }
+}

@@ -317,14 +317,137 @@ function verifiedOperationalParentScope(collection,prospective,parents){
   const declaredClient=text(prospective.clienteId||prospective.clientId,180);
   if(declaredClient&&declaredClient!==parents.canonicalClientId)throw new HttpsError('failed-precondition','Cliente vinculado inconsistente.');
 }
-function normalizeMutation(raw) {
+// Only executePreview can construct this context. The existing production
+// command never gains a general right to delete goals or manufacture a QA run.
+const META_QA_SESSION_SCHEMA = 'gravicentra-metas-preview-session-v1';
+// Deliberately not a calendar month: every Inicio query validates YYYY-MM,
+// so its existing raw institutional-goal projection can never count a fixture.
+const META_QA_PERIOD = 'QA-B4-003';
+const META_QA_ID = /^b4003qa_metas_([A-Za-z0-9_-]{8,64})_(prima|recaudo)$/;
+function metaPreviewContextOf(input) {
+  const q=input.metaPreviewQa||{},runId=text(q.runId,80),operation=text(q.operation,20),pais=text(q.pais,8),periodo=text(q.periodo,10);
+  if(q.version!==1||!(operation==='inspect'&&!runId||/^[A-Za-z0-9_-]{8,64}$/.test(runId))||!['probe','inspect','write','restore'].includes(operation)||!['GT','CO'].includes(pais)||periodo!==META_QA_PERIOD)
+    throw new HttpsError('invalid-argument','Contexto de prueba de metas inválido.');
+  return {version:1,runId,operation,pais,periodo};
+}
+function metaPreviewContract(input, mutations, uid) {
+  const context=metaPreviewContextOf(input),{runId,operation,pais,periodo}=context;
+  if(!['write','restore'].includes(operation))throw new HttpsError('invalid-argument','Operación de prueba de metas inválida.');
+  const goals=mutations.filter(m=>m&&m.collection==='metas'),audits=mutations.filter(m=>m&&m.collection==='auditoria');
+  if(goals.length<1||goals.length>2||audits.length!==1||mutations.length!==goals.length+1)
+    throw new HttpsError('invalid-argument','La prueba requiere metas y una auditoría en el mismo lote.');
+  const ids=new Set();
+  for(const m of goals){
+    const id=text(m.id||(m.payload&&m.payload.id),256),match=META_QA_ID.exec(id);
+    if(!match||match[1]!==runId||ids.has(id)||!(operation==='restore'?m.action==='remove':['insert','update'].includes(m.action)))
+      throw new HttpsError('permission-denied','Registro fuera de la prueba de metas.');
+    ids.add(id);
+    if(operation==='write'){
+      const p=m.payload||{};
+      if(p.tipo!==match[2]||p.mes!==periodo||p.moneda!==(pais==='GT'?'GTQ':'COP')||!Number.isFinite(p.valor)||p.valor<0||text(p.asesorId||p.advisorId||p.ownerAdvisorId,180))
+        throw new HttpsError('invalid-argument','Meta institucional sintética inválida.');
+    }
+  }
+  const audit=audits[0],auditId=text(audit.id||(audit.payload&&audit.payload.id),256),auditPrefix='b4003qa_metas_'+runId+'_audit_';
+  if(audit.action!=='insert'||!auditId.startsWith(auditPrefix)||!/^[A-Za-z0-9_-]{8,64}$/.test(auditId.slice(auditPrefix.length))||audit.payload?.modulo!=='equipo'||audit.payload?.accion!==(operation==='restore'?'restaurar_prueba_metas':'editar_meta_institucional'))
+    throw new HttpsError('invalid-argument','Auditoría de prueba de metas inválida.');
+  for(const m of mutations.filter(m=>m.action!=='remove')){
+    const p=m.payload||{};
+    if(p.__syntheticQa!==true||p.__metasPreviewQa!==true||p.__metasPreviewRunId!==runId||p.__metasPreviewActorUid!==uid||p.pais!==pais||p.periodo!==periodo)
+      throw new HttpsError('permission-denied','La prueba requiere actor, país, período y marca sintética explícitos.');
+    if(p.id!==undefined&&p.id!==m.id||p.tenantId!==undefined&&p.tenantId!==input.tenantId||p.__metasPreviewEvidence!==undefined)
+      throw new HttpsError('invalid-argument','Identidad o evidencia canónica de prueba inválida.');
+  }
+  return Object.freeze(Object.assign(context,{goalIds:[...ids].sort(),auditId}));
+}
+const metaSessionRefFor=(tenantId,runId)=>requestRef(tenantId,'qa_metas_session_'+sha(tenantId+'|'+runId).slice(0,32));
+const metaActorRefFor=(tenantId,uid,pais)=>requestRef(tenantId,'qa_metas_actor_'+sha(tenantId+'|'+uid+'|'+pais).slice(0,32));
+function requireMetaPreviewActor(actor,context){
+  if(!TEAM_ROLES.has(norm(actor.activeRole))||!countryAllowed(actor.member,{pais:context.pais})||effectiveScope(actor.member,actor.accessConfig,actor.activeRole,'equipo')!=='all')
+    throw new HttpsError('permission-denied','Rol, país o alcance no autorizado para la prueba institucional.');
+}
+function requireMetaSessionIdentity(session,actor,context){
+  if(session.schemaVersion!==META_QA_SESSION_SCHEMA||session.actorUid!==actor.uid||session.activeRole!==actor.activeRole||session.runId!==context.runId||session.pais!==context.pais||session.periodo!==context.periodo)
+    throw new HttpsError('permission-denied','La prueba pertenece a otro actor o contexto.');
+}
+function metaFixtureFingerprint(row){
+  if(!row)return null;
+  // Server timestamps are the only fields materialized after transaction
+  // evaluation. Every other field must still equal our last committed image.
+  const copy=Object.assign({},row);delete copy.createdAt;delete copy.updatedAt;
+  return digest(copy);
+}
+function metaFixtureImage(row){
+  if(!row)return null;
+  return Object.fromEntries(['id','tenantId','pais','mes','periodo','moneda','tipo','valor','__syntheticQa','__metasPreviewQa','__metasPreviewRunId','__metasPreviewActorUid'].map(k=>[k,row[k]??null]));
+}
+function metaFixtureMatches(row,known,actor,context,id,tenantId){
+  return known&&known.originalExists===false&&row&&row.id===id&&row.tenantId===tenantId&&row.__syntheticQa===true&&row.__metasPreviewQa===true&&row.__metasPreviewActorUid===actor.uid&&row.__metasPreviewRunId===context.runId&&row.pais===context.pais&&row.periodo===context.periodo&&row.mes===META_QA_PERIOD&&metaFixtureFingerprint(row)===known.lastDigest;
+}
+function validateMetaPreviewSession(context, actor, existingSession, reads, tenantId){
+  requireMetaPreviewActor(actor,context);
+  const s=existingSession||{schemaVersion:META_QA_SESSION_SCHEMA,actorUid:actor.uid,activeRole:actor.activeRole,runId:context.runId,pais:context.pais,periodo:context.periodo,status:'active',fixtures:{}};
+  requireMetaSessionIdentity(s,actor,context);
+  if(s.status!=='active')throw new HttpsError('failed-precondition','La prueba ya fue restaurada.');
+  const fixtures=Object.assign({},s.fixtures||{}),changes=[];
+  if(context.operation==='restore'&&(!existingSession||JSON.stringify(Object.keys(fixtures).sort())!==JSON.stringify(context.goalIds)))
+    throw new HttpsError('failed-precondition','La restauración debe incluir todos los registros de la prueba.');
+  for(const {mutation,snap} of reads.filter(x=>x.mutation.collection==='metas')){
+    const before=snap.exists?snap.data():null,known=fixtures[mutation.id];
+    if(mutation.action==='insert'){
+      if(before||known)throw new HttpsError('already-exists','El fixture debe partir de ausencia comprobada.');
+    }else{
+      if(!metaFixtureMatches(before,known,actor,context,mutation.id,tenantId))
+        throw new HttpsError('failed-precondition','El registro cambió o no pertenece a esta prueba; restauración bloqueada.');
+    }
+    const after=mutation.action==='remove'?null:Object.assign({},before||{},mutation.payload,{id:mutation.id,tenantId,updatedByUid:actor.uid});
+    if(after&&!before)after.createdByUid=actor.uid;
+    if(after)fixtures[mutation.id]={originalExists:false,lastDigest:metaFixtureFingerprint(after)};
+    changes.push({id:mutation.id,before:metaFixtureImage(before),after:metaFixtureImage(after),originalExists:false});
+  }
+  return {session:Object.assign({},s,{fixtures,status:context.operation==='restore'?'restored':'active'}),changes};
+}
+async function inspectMetaPreview(request){
+  const input=request.data||{},context=metaPreviewContextOf(input),tenantId=cleanId(input.tenantId,'tenantId');
+  if([].concat(input.mutations||[]).length)throw new HttpsError('invalid-argument','La consulta de prueba no admite escrituras.');
+  const actor=await authorize(request,tenantId,[{collection:'metas'},{collection:'auditoria'}]);
+  requireMetaPreviewActor(actor,context);
+  const proof={version:1,contractVersion:META_QA_SESSION_SCHEMA,runId:context.runId||null,actorUid:actor.uid,activeRole:actor.activeRole,pais:context.pais,periodo:context.periodo,restoreSupported:true,status:'none',fixtureIds:[],fixtures:[]};
+  if(context.operation==='probe')return{ok:true,serverOwned:true,readOnly:true,metaPreviewQa:proof};
+  return db.runTransaction(async tx=>{
+    const pointer=await tx.get(metaActorRefFor(tenantId,actor.uid,context.pais));
+    const pointerRow=pointer.exists?pointer.data():null;
+    const runId=context.runId||pointerRow&&text(pointerRow.runId,80);
+    if(!runId)return{ok:true,serverOwned:true,readOnly:true,metaPreviewQa:proof};
+    const sessionSnap=await tx.get(metaSessionRefFor(tenantId,runId));
+    if(!sessionSnap.exists)throw new HttpsError('failed-precondition','No se encontró la sesión canónica de prueba.');
+    const session=sessionSnap.data()||{},scope=Object.assign({},context,{runId});
+    requireMetaSessionIdentity(session,actor,scope);
+    const ids=Object.keys(session.fixtures||{}).sort(),fixtures=[];
+    if(!['active','restored'].includes(session.status)||ids.length<1||ids.length>2||ids.some(id=>{const match=META_QA_ID.exec(id);return !match||match[1]!==runId;}))
+      throw new HttpsError('failed-precondition','Sesión de prueba inconsistente.');
+    for(const id of ids){
+      const snap=await tx.get(canonicalRef(tenantId,'metas',id));
+      if(session.status==='restored'){
+        if(snap.exists)throw new HttpsError('failed-precondition','Un fixture restaurado reapareció.');
+      }else{
+        const row=snap.exists?snap.data():null;
+        if(!metaFixtureMatches(row,session.fixtures[id],actor,scope,id,tenantId))throw new HttpsError('failed-precondition','El fixture cambió; revisión canónica requerida.');
+        fixtures.push(row);
+      }
+    }
+    return{ok:true,serverOwned:true,readOnly:true,metaPreviewQa:Object.assign(proof,{runId,status:session.status,fixtureIds:ids,fixtures,originalAbsenceVerified:true})};
+  });
+}
+
+function normalizeMutation(raw, allowMetaFixtureRemove = false) {
   const mutation = raw || {};
   const action = norm(mutation.action);
   if (!['insert','update','remove'].includes(action)) throw new HttpsError('invalid-argument', 'Acción operativa inválida.');
   const collection = text(mutation.collection, 80);
   if (!COLLECTION_MODULE[collection]) throw new HttpsError('invalid-argument', 'Colección operativa inválida.');
   if (INSERT_ONLY.has(collection) && action !== 'insert') throw new HttpsError('failed-precondition', 'La auditoría es append-only.');
-  if (action === 'remove' && !REMOVABLE.has(collection)) throw new HttpsError('failed-precondition', 'Borrado físico no autorizado para esta colección.');
+  if (action === 'remove' && !REMOVABLE.has(collection) && !(allowMetaFixtureRemove && collection === 'metas')) throw new HttpsError('failed-precondition', 'Borrado físico no autorizado para esta colección.');
   const id = cleanId(mutation.id || mutation.payload && mutation.payload.id, 'documentId');
   const payload = mutation.payload && typeof mutation.payload === 'object' ? stable(mutation.payload) : null;
   if (action !== 'remove' && !payload) throw new HttpsError('invalid-argument', 'Payload requerido.');
@@ -339,25 +462,42 @@ function mutationPayloadMatches(actual,payload){
   return Object.keys(payload).filter(key=>!ignore.has(key)).every(key=>JSON.stringify(stable(actual[key]))===JSON.stringify(stable(payload[key])));
 }
 
-async function execute(request) {
+async function execute(request, metaPreviewContext = null) {
   const input = request.data || {};
   const tenantId = cleanId(input.tenantId, 'tenantId');
-  const mutations = [].concat(input.mutations || []).map(normalizeMutation);
+  if(!metaPreviewContext&&(input.metaPreviewQa||[].concat(input.mutations||[]).some(m=>m?.payload?.__metasPreviewQa===true)))
+    throw new HttpsError('permission-denied','El modo de prueba de metas está reservado al comando Preview.');
+  const mutations = [].concat(input.mutations || []).map(m=>normalizeMutation(m,metaPreviewContext?.operation==='restore'));
   if (!mutations.length || mutations.length > 80) throw new HttpsError('invalid-argument', 'Lote operativo inválido.');
   const actor = await authorize(request, tenantId, mutations);
-  const payloadDigest = digest(mutations);
+  if(metaPreviewContext)requireMetaPreviewActor(actor,metaPreviewContext);
+  const payloadDigest = digest(metaPreviewContext?{mutations,metaPreviewContext}:mutations);
   const requestId = cleanId(input.requestId || `op_${sha(`${tenantId}|${actor.uid}|${payloadDigest}`).slice(0, 32)}`, 'requestId');
+  if(requestId.startsWith('qa_metas_'))throw new HttpsError('invalid-argument','Identificador reservado para sesión de prueba.');
   const reqRef = requestRef(tenantId, requestId);
   const eventId = `opevt_${sha(`${tenantId}|${requestId}`).slice(0, 28)}`;
+  const metaSessionRef=metaPreviewContext?metaSessionRefFor(tenantId,metaPreviewContext.runId):null;
+  const metaActorRef=metaPreviewContext?metaActorRefFor(tenantId,actor.uid,metaPreviewContext.pais):null;
 
   const committed = await db.runTransaction(async tx => {
     const previous = await tx.get(reqRef);
     if (previous.exists) {
       const row = previous.data() || {};
       if (row.payloadDigest !== payloadDigest) throw new HttpsError('already-exists', 'El requestId corresponde a otro contenido.');
+      if(metaPreviewContext&&(row.result?.metaPreviewQa?.actorUid!==actor.uid||row.result?.metaPreviewQa?.activeRole!==actor.activeRole))
+        throw new HttpsError('permission-denied','El recibo de prueba pertenece a otro actor o rol activo.');
       if (row.status === 'committed') return Object.assign({ reused: true }, row.result || {});
     }
 
+    const metaSessionSnap=metaSessionRef?await tx.get(metaSessionRef):null;
+    const metaActorSnap=metaActorRef?await tx.get(metaActorRef):null;
+    if(metaActorSnap?.exists){
+      const pointer=metaActorSnap.data()||{};
+      if(pointer.schemaVersion!==META_QA_SESSION_SCHEMA||pointer.actorUid!==actor.uid||pointer.pais!==metaPreviewContext.pais||pointer.periodo!==META_QA_PERIOD)
+        throw new HttpsError('failed-precondition','Referencia de prueba inconsistente.');
+      if(pointer.status==='active'&&pointer.runId!==metaPreviewContext.runId)
+        throw new HttpsError('failed-precondition','Restaura la prueba activa de este país antes de iniciar otra.');
+    }
     const reads = [];
     for (const mutation of mutations) {
       const ref = canonicalRef(tenantId, mutation.collection, mutation.id);
@@ -376,9 +516,11 @@ async function execute(request) {
       reads.push({ mutation, ref, snap, parents, linkedMemberRef, linkedMemberSnap });
     }
 
+    const metaProof=metaPreviewContext?validateMetaPreviewSession(metaPreviewContext,actor,metaSessionSnap?.exists?metaSessionSnap.data():null,reads,tenantId):null;
     for (const item of reads) {
       const { mutation, ref, snap, parents, linkedMemberRef, linkedMemberSnap } = item;
       const before = snap.exists ? snap.data() : null;
+      if(!metaPreviewContext&&before?.__metasPreviewQa===true)throw new HttpsError('permission-denied','El fixture requiere su contexto de prueba y actor originales.');
       if (mutation.action === 'insert' && before) throw new HttpsError('already-exists', `${mutation.collection}/${mutation.id} ya existe.`);
       if ((mutation.action === 'update' || mutation.action === 'remove') && !before) throw new HttpsError('not-found', `${mutation.collection}/${mutation.id} no existe.`);
       if(before && !withinScope(actor,mutation.collection,COLLECTION_MODULE[mutation.collection],Object.assign({id:mutation.id,tenantId},before))) throw new HttpsError('permission-denied','No autorizado para modificar el registro original.');
@@ -402,8 +544,9 @@ async function execute(request) {
       });
       if (!before) {
         row.createdAt = row.createdAt || now();
-        row.createdByUid = row.createdByUid || actor.uid;
+        row.createdByUid = metaProof?actor.uid:(row.createdByUid || actor.uid);
       }
+      if(metaProof&&mutation.collection==='auditoria')row.__metasPreviewEvidence={runId:metaPreviewContext.runId,operation:metaPreviewContext.operation,actorUid:actor.uid,activeRole:actor.activeRole,changes:metaProof.changes,serverVerified:true};
       tx.set(ref, row, { merge: mutation.action === 'update' });
       if (mutation.collection === 'asesores' && linkedMemberRef) {
         if (linkedMemberSnap && linkedMemberSnap.exists && text(linkedMemberSnap.data().advisorId, 180) && text(linkedMemberSnap.data().advisorId, 180) !== mutation.id) {
@@ -414,6 +557,11 @@ async function execute(request) {
     }
 
     const result = { ok: true, requestId, eventId, mutationCount: mutations.length, collections: unique(mutations.map(m => m.collection)), writePath: 'tenants/{tenant}/data/{collection}/items', serverOwned: true };
+    if(metaProof){
+      tx.set(metaSessionRef,Object.assign({},metaProof.session,{updatedAt:now(),lastRequestId:requestId,lastAuditId:metaPreviewContext.auditId}),{merge:false});
+      tx.set(metaActorRef,{schemaVersion:META_QA_SESSION_SCHEMA,actorUid:actor.uid,activeRole:actor.activeRole,runId:metaPreviewContext.runId,pais:metaPreviewContext.pais,periodo:META_QA_PERIOD,status:metaProof.session.status,updatedAt:now()},{merge:false});
+      result.metaPreviewQa={version:1,contractVersion:META_QA_SESSION_SCHEMA,runId:metaPreviewContext.runId,status:metaProof.session.status,actorUid:actor.uid,activeRole:actor.activeRole,pais:metaPreviewContext.pais,periodo:metaPreviewContext.periodo,fixtureIds:Object.keys(metaProof.session.fixtures).sort(),originalAbsenceVerified:true,restoreSupported:true};
+    }
     tx.set(eventRef(tenantId, eventId), {
       schemaVersion: VERSION,
       tenantId,
@@ -431,7 +579,7 @@ async function execute(request) {
     return result;
   });
 
-  const readback=[];
+  const readback=[],metaFixtures=[];
   for(const mutation of mutations){
     const snap=await canonicalRef(tenantId,mutation.collection,mutation.id).get();
     if(mutation.action==='remove'){
@@ -442,9 +590,12 @@ async function execute(request) {
     if(!snap.exists)throw new HttpsError('internal',`Canonical readback missing for ${mutation.collection}/${mutation.id}.`);
     const actual=snap.data()||{};
     if(!mutationPayloadMatches(actual,mutation.payload))throw new HttpsError('internal',`Canonical readback mismatch for ${mutation.collection}/${mutation.id}.`);
+    if(metaPreviewContext&&mutation.collection==='metas')metaFixtures.push(actual);
     readback.push({collection:mutation.collection,id:mutation.id,action:mutation.action,exists:true});
   }
-  return Object.assign({},committed,{canonicalReadback:true,canonicalReadbackCount:readback.length,readback});
+  const response=Object.assign({},committed,{canonicalReadback:true,canonicalReadbackCount:readback.length,readback});
+  if(metaPreviewContext)response.metaPreviewQa=Object.assign({},committed.metaPreviewQa,{fixtures:metaFixtures});
+  return response;
 }
 
 async function uploadProductAsset(request, previewOnly) {
@@ -547,6 +698,9 @@ exports.orbit360ProductAssetRead = onCall({ region: REGION, cors: true, timeoutS
 exports.orbit360ProductAssetReadPreview = onCall({ region: PREVIEW_REGION, cors: true, timeoutSeconds: 60, memory: '256MiB' }, request=>readProductAsset(request,true));
 async function executePreview(request) {
   const input=request.data||{},raw=[].concat(input.mutations||[]);
+  // Empty, read-only probe fails closed against an older deployed writer.
+  // Inspection also survives reload without relying on projected row markers.
+  if(['probe','inspect'].includes(input.metaPreviewQa?.operation))return inspectMetaPreview(request);
   const syntheticId=v=>/(?:^|_)(?:b3004qa|b4003qa)_[A-Za-z0-9._:-]+$/i.test(text(v,256));
   if(!raw.length||raw.some(m=>!syntheticId(m&&(m.id||(m.payload&&m.payload.id))))) {
     throw new HttpsError('permission-denied','Preview operativo solo admite fixtures sintéticos autorizados B3-004/B4-003.');
@@ -554,8 +708,9 @@ async function executePreview(request) {
   if(raw.some(m=>norm(m&&m.action)!=='remove'&&(!m.payload||m.payload.__syntheticQa!==true))) {
     throw new HttpsError('permission-denied','Preview operativo requiere marca sintética explícita.');
   }
-  return execute(request);
+  const metaContext=input.metaPreviewQa?metaPreviewContract(input,raw,request.auth&&request.auth.uid):null;
+  return execute(request,metaContext);
 }
-exports.orbit360ProductOperationalCommand = onCall({ region: REGION, cors: true, timeoutSeconds: 60, memory: '256MiB' }, execute);
+exports.orbit360ProductOperationalCommand = onCall({ region: REGION, cors: true, timeoutSeconds: 60, memory: '256MiB' }, request=>execute(request));
 exports.orbit360ProductOperationalCommandPreview = onCall({ region: PREVIEW_REGION, cors: true, timeoutSeconds: 60, memory: '256MiB' }, executePreview);
 exports.__productOperationalDomain = Object.freeze({ VERSION, COLLECTION_MODULE, INSERT_ONLY, REMOVABLE, authorize, authorizeRead, withinScope, canonicalRef, text, cleanId, readProductAsset });
