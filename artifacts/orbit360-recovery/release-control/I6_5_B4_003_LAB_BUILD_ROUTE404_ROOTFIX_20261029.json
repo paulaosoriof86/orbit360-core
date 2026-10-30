@@ -1,0 +1,24 @@
+{
+  "schema": "GRAVICENTRA_I65_B4003_LAB_BUILD_ROUTE404_ROOTFIX_V1",
+  "gate": "I6.5/B4-003",
+  "status": "WORKFLOW_BYTES_PREPARED_YAML_AND_NODE_PASS",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "parentHead": "ef8b17cd7692e5d99107527a98afeed8ac6721b0",
+  "workflowPath": ".github/workflows/gravicentra-b4-003-cumulative-safe-read-preview-20261029.yml",
+  "beforeBlob": "b0477e3b63cdc7666c574db19249e24dc5283327",
+  "afterBlob": "086147a8e66b0b8e25b39449599304db52c411ad",
+  "preparedPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_LAB_BUILD_ROUTE404_ROOTFIX_WORKFLOW_20261029.yml",
+  "failedRunId": 40999897012,
+  "cause": "LAB_LIVE_BUILD_JSON_ROUTE_RETURNS_404",
+  "remediation": "REMOVE_NONEXISTENT_LAB_BUILD_ROUTE; KEEP_EXACT_LAB_LIVE_ROOT, OWNER_RUNTIME_EXACT, OWNER_ROOT_STRUCTURAL_IDENTITY",
+  "boundaries": {
+    "productSourceChanged": false,
+    "livePromotion": false,
+    "dataWrites": false,
+    "rulesAuthIamChanges": false,
+    "externalMessages": false,
+    "securityB4003StillHold": true,
+    "acceptanceGranted": false
+  }
+}
