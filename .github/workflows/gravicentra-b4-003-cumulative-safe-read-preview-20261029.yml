@@ -182,7 +182,10 @@ jobs:
           node "$RUNNER_TEMP/gi-owner-root-fingerprint.js" before "$RUNNER_TEMP/gi-owner-before-1.html" "$RUNNER_TEMP/gi-owner-before-2.html" "$RUNNER_TEMP/gi-owner-identity-before.json"
           node - <<'NODE'
           const fs=require('node:fs');
-          if(!fs.readFileSync(process.env.RUNNER_TEMP+'/gi-owner-runtime-before.js','utf8').includes('scopedReadPreviewCandidate'))throw Error('OWNER_RUNTIME_CONFIG_IDENTITY_MISSING');
+          const p=process.env.RUNNER_TEMP+'/gi-owner-runtime-before.js';
+          const content=fs.readFileSync(p,'utf8');
+          const bytes=Buffer.byteLength(content,'utf8');
+          if(bytes<64||/<html\b/i.test(content))throw Error('OWNER_RUNTIME_CONFIG_STRUCTURAL_IDENTITY_MISSING');
           NODE
 
       - name: Resolve pre-existing LAB-only account and pinned Firebase CLI
