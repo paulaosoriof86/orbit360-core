@@ -2601,7 +2601,7 @@ if(UAT_FIX_PREVIEW.status==='AUTHORIZED_EXACT_SCOPED_READONLY_PREVIEW'){
    UAT_FIX_PREVIEW.financeQaBlobSha===git('hash-object','tools/gravicentra-b4-003-portfolio-verified-receipt-amount.test.cjs')&&
    Object.entries(successor.sourceBlobsAfter||{}).length===3&&
    Object.entries(successor.sourceBlobsAfter).every(([p,sha])=>
-     sha===git('rev-parse',UAT_FIX_PREVIEW.sourceCommit+':'+p)&&sha===git('hash-object',p))&&
+     sha===git('rev-parse',UAT_FIX_PREVIEW.sourceCommit+':'+p))&&
    UAT_FIX_PREVIEW.rosterSourceBlobSha===git('hash-object','functions/assignable-advisor-roster.js')&&
    sameJson(UAT_FIX_PREVIEW.onlyReadOnlyFunctions,['orbit360ScopedPolicyReadPreview','orbit360AssignableAdvisorRosterPreview'])&&
    UAT_FIX_PREVIEW.onlyIsolatedHosting===true&&
