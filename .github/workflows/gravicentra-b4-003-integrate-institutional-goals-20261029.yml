@@ -1,4 +1,4 @@
-name: Gravicentra B4-003 Institutional Preview Transport Preparer
+name: Gravicentra B4-003 Institutional Preview Transport Artifact
 
 on:
   push:
@@ -8,18 +8,18 @@ on:
       - '.github/workflows/gravicentra-b4-003-integrate-institutional-goals-20261029.yml'
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
-  group: gravicentra-b4-003-institutional-preview-preparer
+  group: gravicentra-b4-003-institutional-preview-artifact
   cancel-in-progress: false
 
 jobs:
-  prepare-existing-preview-transport:
+  prepare-existing-preview-transport-artifact:
     if: >-
       github.repository == 'paulaosoriof86/orbit360-core' &&
       github.ref == 'refs/heads/recovery/fase-a-clean-20260831' &&
-      github.event.head_commit.message == 'exec(i6.5 B4-003): prepare institutional Preview transport'
+      github.event.head_commit.message == 'exec(i6.5 B4-003): prepare institutional Preview transport artifact'
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
@@ -27,7 +27,7 @@ jobs:
         with:
           ref: ${{ github.ref_name }}
           fetch-depth: 0
-          persist-credentials: true
+          persist-credentials: false
 
       - uses: actions/setup-node@v4
         with:
@@ -38,35 +38,31 @@ jobs:
           set -euo pipefail
           git fetch origin "$GITHUB_REF_NAME"
           test "$(git rev-parse HEAD)" = "$(git rev-parse origin/$GITHUB_REF_NAME)"
-          test "$(git show -s --format=%s HEAD)" = 'exec(i6.5 B4-003): prepare institutional Preview transport'
+          test "$(git show -s --format=%s HEAD)" = 'exec(i6.5 B4-003): prepare institutional Preview transport artifact'
           test -f tools/gravicentra-b4-003-prepare-institutional-preview-20261029.py
           test "$(git hash-object orbit360-platform/modules/equipo.js)" = '5ce317a0641709e1a405e61435578de934fa194d'
           node tools/gravicentra-governance-preflight-v1.mjs --mode=i6
           git diff --exit-code
           git diff --cached --exit-code
 
-      - name: Patch only the existing cumulative Preview workflow
+      - name: Materialize and validate the one-workflow transport commit locally
         run: |
           set -euo pipefail
           python3 tools/gravicentra-b4-003-prepare-institutional-preview-20261029.py | tee "$RUNNER_TEMP/institutional-preview-transport.json"
           test "$(git show -s --format=%s HEAD)" = 'build(i6.5 B4-003): trigger cumulative safe-read isolated Preview only'
           test "$(git diff --name-only HEAD^ HEAD)" = '.github/workflows/gravicentra-b4-003-cumulative-safe-read-preview-20261029.yml'
-
-      - name: Publish transport-only fast-forward commit
-        run: |
-          set -euo pipefail
-          REMOTE=$(git ls-remote origin "refs/heads/$GITHUB_REF_NAME" | awk '{print $1}')
-          test "$REMOTE" = "$(git rev-parse HEAD^)"
-          git push origin "HEAD:$GITHUB_REF_NAME"
+          git show HEAD:.github/workflows/gravicentra-b4-003-cumulative-safe-read-preview-20261029.yml > "$RUNNER_TEMP/gravicentra-b4-003-cumulative-safe-read-preview-20261029.yml"
+          test "$(git hash-object "$RUNNER_TEMP/gravicentra-b4-003-cumulative-safe-read-preview-20261029.yml")" = '5c05219b0290ee4c00f36ce2256547759229b73f'
           printf '%s\n' \
-            'Existing cumulative Preview workflow updated for the institutional-goals successor.' \
-            'Transport commit changes one workflow only; no product, data, Rules, Auth/IAM or LIVE.' >> "$GITHUB_STEP_SUMMARY"
+            'Prepared exact transport bytes; publication delegated to authorized GitHub connector.' \
+            'No product, data, Rules, Auth/IAM or LIVE mutation occurred.' >> "$GITHUB_STEP_SUMMARY"
 
-      - name: Preserve preparer receipt
-        if: always()
+      - name: Preserve exact workflow bytes and preparation receipt
         uses: actions/upload-artifact@v4
         with:
-          name: gravicentra-b4-003-institutional-preview-preparer-${{ github.run_id }}
-          path: ${{ runner.temp }}/institutional-preview-transport.json
-          if-no-files-found: warn
+          name: gravicentra-b4-003-institutional-preview-workflow-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/institutional-preview-transport.json
+            ${{ runner.temp }}/gravicentra-b4-003-cumulative-safe-read-preview-20261029.yml
+          if-no-files-found: error
           retention-days: 7
