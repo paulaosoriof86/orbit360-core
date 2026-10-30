@@ -1,11 +1,11 @@
 {
   "schema": "GRAVICENTRA_EXISTING_B4003_READONLY_AUDIT_REQUEST_V1",
   "mode": "READ_ONLY_AUDIT_NO_ACCEPTANCE",
-  "requestDate": "2026-10-16",
-  "userInstruction": "Complement the forensic audit across every module, frontend, backend, synchronization, flow and pending finding; consolidate the complete work plan and evidence-based progress.",
+  "requestDate": "2026-10-30",
+  "userInstruction": "Continue the frozen B4-003 shock plan with current read-only evidence for freelancer eligibility, institutional-goal records, independent identities, cancelled-run QA residues, orphan-renewal dependencies and cross-module integrity. Do not write, deploy, reimport, send messages, close findings or advance percentage from this audit alone.",
   "gate": "I6.5/B4-003",
-  "controlPlaneBlob": "a17ca3527ac927533c7db55b8d344e4cb72a0939",
-  "observedSourceHead": "4a022cec65c38eb6513a79d4386e61fad06c65d1",
+  "controlPlaneBlob": "c38f0ebf4d919cc59494adbaf81acd08837ac6e3",
+  "observedSourceHead": "1d4161f8a2670d33012b99d450767448f4c01bc2",
   "existingExecutor": ".github/workflows/gravicentra-b4-003-readonly-diagnostic.yml",
   "auditTool": "tools/gravicentra-b4-003-integral-readonly-audit.cjs",
   "auditToolBlob": "748f05135165bcbce4121024f425f2323eb1b860",
@@ -19,16 +19,36 @@
   "mayCloseFindings": false,
   "mayAdvanceFormalPercent": false,
   "authority": "USER_REQUESTED_READ_ONLY_COMPLEMENT_SUBORDINATE_TO_EXISTING_CONTROL_PLANE",
-  "scope": ["repository ledger and carry reconciliation", "effective Hosting/rules/function metadata", "sanitized existing membership configuration", "bounded operational relationship aggregates", "authenticated read-only navigation with mutation endpoints blocked"],
+  "scope": [
+    "current repository ledger and carry-forward reconciliation",
+    "sanitized membership and advisor identity uniqueness for Paula Carlos Samuel and Fernando",
+    "institutional and individual goal counts periods and types",
+    "freelancer contractual eligibility fields without inventing classification",
+    "cancelled-run QA fixture provenance and dependency aggregates",
+    "three orphan-renewal policies and their twelve dependent rows",
+    "bounded operational relationships and effective rules/function metadata",
+    "authenticated read-only navigation where supported with all mutation endpoints blocked"
+  ],
   "qaOnlyCorrection": {
     "previousRunId": 38970051423,
     "previousArtifactId": 12076144596,
     "preservePreviousEvidence": true,
-    "cause": "Custom-token sign-in did not repeat the product restore path. Auth owner activates through restore/form, not the SDK sign-in alone.",
-    "changes": ["natural reload after transient sign-in", "canonical advisor-to-Auth link for ambiguous name selector", "preserve public callable names in blocked-endpoint diagnostics", "team-list cardinalities", "read-only responsive observation"],
+    "cause": "Refresh the same existing read-only executor against the current Control Plane and exact institutional-goals Preview lineage; no new acceptance method.",
+    "changes": [
+      "current Control Plane blob binding",
+      "current branch head binding",
+      "explicit P0 residue and freelancer evidence scope",
+      "preserve denied failed truncated and untested surfaces"
+    ],
     "selfSyncWriteStillBlocked": true,
     "productSourceChanged": false
   },
-  "remainingAfterThisAudit": ["controlled-write acceptance", "full negative security matrix", "visual and responsive acceptance", "same-artifact LIVE acceptance"],
+  "remainingAfterThisAudit": [
+    "authenticated exact Preview UAT in the originating Chrome context",
+    "controlled synthetic institutional-goal write readback reload audit and restore",
+    "independent Carlos UID functional acceptance",
+    "authorized reversible disposition of QA residues when evidence permits",
+    "visual acceptance and later frozen B4 gates"
+  ],
   "evidencePolicy": "Record denied, failed, truncated and untested surfaces explicitly. No PASS from inventory, Admin reads, empty output, or successful workflow alone."
 }
