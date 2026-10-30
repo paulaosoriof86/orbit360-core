@@ -48,9 +48,14 @@ jobs:
       - name: Build, validate and commit the atomic source successor
         run: |
           set -euo pipefail
-          python3 tools/gravicentra-b4-003-integrate-institutional-goals-20261029.py | tee "$RUNNER_TEMP/institutional-goals-integrator.json"
+          cp tools/gravicentra-b4-003-integrate-institutional-goals-20261029.py "$RUNNER_TEMP/integrate-institutional-goals.py"
+          sed -i "s/I6_5_B4_003_INSTITUTIONAL_GOALS_SUCCESSOR_EXACT_PREVIEW/I6_5_B4_003_CLOSEOUT_SUCCESSOR_EXACT_PREVIEW/" "$RUNNER_TEMP/integrate-institutional-goals.py"
+          grep -q "C\['nextAction'\]='I6_5_B4_003_CLOSEOUT_SUCCESSOR_EXACT_PREVIEW'" "$RUNNER_TEMP/integrate-institutional-goals.py"
+          python3 "$RUNNER_TEMP/integrate-institutional-goals.py" | tee "$RUNNER_TEMP/institutional-goals-integrator.json"
           test "$(git show -s --format=%s HEAD)" = 'fix(i6.5 B4-003): integrate durable institutional goals owner'
           test "$(git diff --name-only HEAD^ HEAD | sort | wc -l)" = '5'
+          git diff --exit-code
+          git diff --cached --exit-code
 
       - name: Publish only the validated fast-forward successor
         run: |
