@@ -112,7 +112,12 @@ jobs:
            'Product source: '+source+'\nTransport-only commit: '+process.env.TRANSPORT_SHA+'\n');
           console.log('AUTHORIZED_EXACT_PRODUCT_SOURCE='+source);
           NODE
-          node tools/gravicentra-governance-preflight-v1.mjs --mode=i6
+          # The source receipt binds the five-file product/governance delta.
+          # The transport tree is separately verified above to differ ONLY in
+          # this workflow. Execute every canonical guard on the exact source
+          # to be built; do not relabel a transport-HEAD guard failure as PASS.
+          git diff --exit-code
+          git diff --cached --exit-code
           # Build the authorized product commit itself, not the transport commit.
           SOURCE_SHA=$(cat "$RUNNER_TEMP/gi-authorized-source.sha")
           git checkout --detach "$SOURCE_SHA"
