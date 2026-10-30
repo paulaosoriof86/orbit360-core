@@ -25,20 +25,7 @@ jobs:
       CONTROL: artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json
       GUARD: tools/gravicentra-i6-control-plane-guard-v1.mjs
       RECEIPT: artifacts/orbit360-recovery/release-control/I6_5_B4_003_INSTITUTIONAL_GOALS_EXACT_PREVIEW_PASS_20261030.json
-      SOURCE_SHA: eb9ce731832d236fedc545185ec7c66bd10849bb
-      TRANSPORT_HEAD: bf9106ac28787b06da0465eb7f99fe3f131a4f4b
-      PREVIEW_RUN_ID: '41066435386'
-      PREVIEW_URL: https://ays-orbit-360-lab--gi-i65-b4-sr-41066435386-r09pl1ti.web.app/
-      BUILD_ID: gi-i65-b4-eb9ce731832d-57f234755dc1
-      HOSTED_FILE_COUNT: '218'
-      HOSTED_PAYLOAD_DIGEST: 93d05a09035a044d400fe0f0e04759bd8c15e111bae93608dff0babdfa883a0a
-      BUNDLE_DIGEST: 9e63077a08b3ef86aa85f5ccd83c866326f708734c33f97e9d4e778e4d2b05ee
-      BACKEND_SOURCE_DIGEST: 3ac3bf7bc777460d7d181bc3241efcc02e420ccfd54ba22b0e91762456c4dd4e
-      ARTIFACT_ID: '12982792336'
-      ARTIFACT_ZIP_SHA256: 62edb540b49d199c2f100335e9677a3f544627a538a35964150e54145302ba52
-      LIVE_IDENTITY_ARTIFACT_ID: '12983501089'
-      LIVE_IDENTITY_ARTIFACT_SHA256: 570beb0c5779c6ea7e38d407a7a406f37c9d7e0b51c34af164273fda64a42759
-      EQUIPO_BLOB: 5ce317a0641709e1a405e61435578de934fa194d
+      FREEZER: tools/gravicentra-b4-003-freeze-institutional-preview-20261030.mjs
     steps:
       - uses: actions/checkout@v4
         with:
@@ -55,71 +42,15 @@ jobs:
           HEAD_NOW=$(git rev-parse HEAD)
           test "$HEAD_NOW" = "$(git rev-parse origin/$GITHUB_REF_NAME)"
           test "$(git show -s --format=%s HEAD)" = 'freeze(i6.5 B4-003): bind institutional goals exact Preview'
-          test "$(git merge-base "$SOURCE_SHA" HEAD)" = "$SOURCE_SHA"
-          test "$(git merge-base "$TRANSPORT_HEAD" HEAD)" = "$TRANSPORT_HEAD"
-          test "$(git rev-parse "$SOURCE_SHA:orbit360-platform/modules/equipo.js")" = "$EQUIPO_BLOB"
           node tools/gravicentra-governance-preflight-v1.mjs --mode=i6
-          node - <<'NODE'
-          const fs=require('node:fs'),cp=require('node:child_process');
-          const git=(...a)=>cp.execFileSync('git',a,{encoding:'utf8'}).trim();
-          const e=process.env;
-          const receipt={
-            schema:'GRAVICENTRA_I65_B4003_INSTITUTIONAL_GOALS_EXACT_PREVIEW_PASS_V1',
-            gate:'I6.5/B4-003',
-            status:'EXACT_PREVIEW_BUILD_BYTE_READBACK_PASS_AUTHENTICATED_UAT_PENDING',
-            repository:'paulaosoriof86/orbit360-core',branch:'recovery/fase-a-clean-20260831',
-            sourceSha:e.SOURCE_SHA,transportHead:e.TRANSPORT_HEAD,runId:Number(e.PREVIEW_RUN_ID),
-            previewUrl:e.PREVIEW_URL,buildId:e.BUILD_ID,
-            hostedFileCount:Number(e.HOSTED_FILE_COUNT),buildBoundAssetCount:138,reachableProductFiles:214,
-            hostedPayloadDigest:e.HOSTED_PAYLOAD_DIGEST,bundleDigest:e.BUNDLE_DIGEST,
-            backendSourceDigest:e.BACKEND_SOURCE_DIGEST,
-            artifact:{id:Number(e.ARTIFACT_ID),zipSha256:e.ARTIFACT_ZIP_SHA256,retainedUntil:'2026-11-06'},
-            liveIdentityReadback:{artifactId:Number(e.LIVE_IDENTITY_ARTIFACT_ID),artifactDigest:'sha256:'+e.LIVE_IDENTITY_ARTIFACT_SHA256,labLiveRootExact:true,ownerRuntimeExact:true,ownerRootStructuralExact:true},
-            exactProductBlobs:{'orbit360-platform/modules/equipo.js':e.EQUIPO_BLOB},
-            proof:{guardBeforeBuildPass:true,institutionalRegressionChecks:15,closeoutRegressionCases:8,lifecycleRegressionCases:18,exactServedBytes:true,liveRootsUnchanged:true,ownerCustomDomainRuntimeUnchanged:true,ownerCustomDomainStructuralIdentityUnchanged:true},
-            boundaries:{previewOnly:true,livePromotion:false,functionsDeploy:false,rulesAuthIamMutation:false,operationalWrites:false,dataImport:false,externalMessages:false,securityB4003StillHold:true,acceptanceGranted:false},
-            pending:['AUTHENTICATED_CHROME_UAT_EQUIPO_METAS','CONTROLLED_SYNTHETIC_WRITE_SERVER_READBACK_RELOAD_AUDIT_RESTORE','INDEPENDENT_CARLOS_UID_UAT','PARALLEL_REMAINING_P0_DISPOSITION']
-          };
-          fs.writeFileSync(e.RECEIPT,JSON.stringify(receipt,null,2)+'\n');
-          const receiptBlob=git('hash-object',e.RECEIPT);
-          const C=JSON.parse(fs.readFileSync(e.CONTROL,'utf8'));
-          const source=C.b4003InstitutionalGoalsSourceSuccessor20261029;
-          if(!source||source.afterBlob!==e.EQUIPO_BLOB||source.status!=='SOURCE_SUCCESSOR_ATOMIC_PREVIEW_PENDING_AUTHENTICATED_UAT')throw Error('INSTITUTIONAL_SOURCE_AUTHORITY_MISMATCH');
-          Object.assign(source,{
-            previewState:receipt.status,previewReceiptPath:e.RECEIPT,previewReceiptBlobSha:receiptBlob,
-            previewSourceSha:e.SOURCE_SHA,previewTransportHead:e.TRANSPORT_HEAD,previewRunId:Number(e.PREVIEW_RUN_ID),
-            previewUrl:e.PREVIEW_URL,buildId:e.BUILD_ID,hostedPayloadDigest:e.HOSTED_PAYLOAD_DIGEST,bundleDigest:e.BUNDLE_DIGEST
-          });
-          C.b4003InstitutionalGoalsExactPreview20261030={
-            status:receipt.status,gate:receipt.gate,sourceSha:e.SOURCE_SHA,transportHead:e.TRANSPORT_HEAD,
-            runId:Number(e.PREVIEW_RUN_ID),previewUrl:e.PREVIEW_URL,buildId:e.BUILD_ID,
-            hostedFileCount:Number(e.HOSTED_FILE_COUNT),hostedPayloadDigest:e.HOSTED_PAYLOAD_DIGEST,
-            bundleDigest:e.BUNDLE_DIGEST,backendSourceDigest:e.BACKEND_SOURCE_DIGEST,
-            artifactId:Number(e.ARTIFACT_ID),artifactZipSha256:e.ARTIFACT_ZIP_SHA256,
-            liveIdentityArtifactId:Number(e.LIVE_IDENTITY_ARTIFACT_ID),liveIdentityArtifactSha256:e.LIVE_IDENTITY_ARTIFACT_SHA256,
-            receiptPath:e.RECEIPT,receiptBlobSha:receiptBlob,
-            productBlobs:{'orbit360-platform/modules/equipo.js':e.EQUIPO_BLOB},
-            liveRootsUnchanged:true,currentCapabilityAcceptances:0,securityB4003StillHold:true,
-            nextAction:'AUTHENTICATED_EQUIPO_METAS_WRITE_READBACK_RELOAD_AUDIT_RESTORE_AND_PARALLEL_P0_CLOSEOUT'
-          };
-          C.nextAction='I6_5_B4_003_AUTHENTICATED_EXACT_PREVIEW_UAT_AND_P0_CLOSEOUT';
-          fs.writeFileSync(e.CONTROL,JSON.stringify(C,null,2)+'\n');
-          let guard=fs.readFileSync(e.GUARD,'utf8');
-          const old=` console.log('B4_003_INSTITUTIONAL_GOALS_SOURCE_SUCCESSOR=EQUIPO_METAS_DURABLE_OWNER_SOURCE_QA_PASS_PREVIEW_UAT_PENDING');\n need(COMP.productFileCount===COMP.productFiles.length,'I6_CANONICAL_COMPOSITION_COUNT_DRIFT');`;
-          const block=` console.log('B4_003_INSTITUTIONAL_GOALS_SOURCE_SUCCESSOR=EQUIPO_METAS_DURABLE_OWNER_SOURCE_QA_PASS_PREVIEW_UAT_PENDING');\n const institutionalPreview=C.b4003InstitutionalGoalsExactPreview20261030;\n const institutionalPreviewReceiptPath='${e.RECEIPT}';\n const institutionalPreviewReceipt=readJson(institutionalPreviewReceiptPath);\n need(institutionalPreview?.status==='EXACT_PREVIEW_BUILD_BYTE_READBACK_PASS_AUTHENTICATED_UAT_PENDING'&&\n  institutionalPreview.gate==='I6.5/B4-003'&&institutionalPreview.sourceSha==='${e.SOURCE_SHA}'&&\n  institutionalPreview.transportHead==='${e.TRANSPORT_HEAD}'&&institutionalPreview.runId===${e.PREVIEW_RUN_ID}&&\n  institutionalPreview.previewUrl==='${e.PREVIEW_URL}'&&institutionalPreview.buildId==='${e.BUILD_ID}'&&\n  institutionalPreview.hostedFileCount===${e.HOSTED_FILE_COUNT}&&institutionalPreview.hostedPayloadDigest==='${e.HOSTED_PAYLOAD_DIGEST}'&&\n  institutionalPreview.bundleDigest==='${e.BUNDLE_DIGEST}'&&institutionalPreview.backendSourceDigest==='${e.BACKEND_SOURCE_DIGEST}'&&\n  institutionalPreview.artifactId===${e.ARTIFACT_ID}&&institutionalPreview.artifactZipSha256==='${e.ARTIFACT_ZIP_SHA256}'&&\n  institutionalPreview.liveIdentityArtifactId===${e.LIVE_IDENTITY_ARTIFACT_ID}&&institutionalPreview.liveIdentityArtifactSha256==='${e.LIVE_IDENTITY_ARTIFACT_SHA256}'&&\n  institutionalPreview.receiptPath===institutionalPreviewReceiptPath&&institutionalPreview.receiptBlobSha===physicalGit('hash-object',institutionalPreviewReceiptPath)&&\n  institutionalPreview.productBlobs?.['orbit360-platform/modules/equipo.js']==='${e.EQUIPO_BLOB}'&&\n  physicalGit('rev-parse',institutionalPreview.sourceSha+':orbit360-platform/modules/equipo.js')===institutionalPreview.productBlobs['orbit360-platform/modules/equipo.js']&&\n  physicalGit('merge-base',institutionalPreview.sourceSha,current)===institutionalPreview.sourceSha&&\n  physicalGit('merge-base',institutionalPreview.transportHead,current)===institutionalPreview.transportHead&&\n  institutionalPreviewReceipt.schema==='GRAVICENTRA_I65_B4003_INSTITUTIONAL_GOALS_EXACT_PREVIEW_PASS_V1'&&\n  institutionalPreviewReceipt.status===institutionalPreview.status&&institutionalPreviewReceipt.sourceSha===institutionalPreview.sourceSha&&\n  institutionalPreviewReceipt.transportHead===institutionalPreview.transportHead&&institutionalPreviewReceipt.runId===institutionalPreview.runId&&\n  institutionalPreviewReceipt.buildId===institutionalPreview.buildId&&institutionalPreviewReceipt.proof?.guardBeforeBuildPass===true&&\n  institutionalPreviewReceipt.proof?.institutionalRegressionChecks===15&&institutionalPreviewReceipt.proof?.exactServedBytes===true&&\n  institutionalPreviewReceipt.proof?.liveRootsUnchanged===true&&institutionalPreviewReceipt.proof?.ownerCustomDomainRuntimeUnchanged===true&&\n  institutionalPreviewReceipt.proof?.ownerCustomDomainStructuralIdentityUnchanged===true&&\n  institutionalPreviewReceipt.boundaries?.previewOnly===true&&institutionalPreviewReceipt.boundaries?.livePromotion===false&&\n  institutionalPreviewReceipt.boundaries?.operationalWrites===false&&institutionalPreviewReceipt.boundaries?.rulesAuthIamMutation===false&&\n  institutionalPreviewReceipt.boundaries?.securityB4003StillHold===true&&institutionalPreview.currentCapabilityAcceptances===0&&\n  institutionalPreview.securityB4003StillHold===true,\n  'B4_003_INSTITUTIONAL_GOALS_EXACT_PREVIEW_BINDING_INVALID');\n console.log('B4_003_INSTITUTIONAL_GOALS_EXACT_PREVIEW=BUILD_BYTE_READBACK_PASS_AUTH_UAT_PENDING');\n need(COMP.productFileCount===COMP.productFiles.length,'I6_CANONICAL_COMPOSITION_COUNT_DRIFT');`;
-          if(guard.split(old).length-1!==1)throw Error('INSTITUTIONAL_PREVIEW_GUARD_MARKER_DRIFT');
-          guard=guard.replace(old,block);
-          fs.writeFileSync(e.GUARD,guard);
-          NODE
-          node --check "$GUARD"
-          node "$GUARD"
-          test "$(git diff --name-only | sort)" = "$(printf '%s\n' "$CONTROL" "$GUARD" "$RECEIPT" | sort)"
+          node "$FREEZER"
+          git add "$CONTROL" "$GUARD" "$RECEIPT"
+          test "$(git diff --cached --name-only | sort)" = "$(printf '%s\n' "$CONTROL" "$GUARD" "$RECEIPT" | sort)"
           git config user.name gravicentra-release-bot
           git config user.email gravicentra-release-bot@users.noreply.github.com
-          git add "$CONTROL" "$GUARD" "$RECEIPT"
           git commit -m 'freeze(i6.5 B4-003): bind institutional goals exact Preview receipt'
           PARENT=$(git rev-parse HEAD^)
           REMOTE=$(git ls-remote origin "refs/heads/$GITHUB_REF_NAME" | awk '{print $1}')
           test "$REMOTE" = "$PARENT"
           git push origin "HEAD:$GITHUB_REF_NAME"
-          printf '%s\n' 'Institutional goals exact Preview receipt: PASS' "Source: $SOURCE_SHA" "Preview: $PREVIEW_URL" 'No rebuild, LIVE promotion, data, Rules, Auth or IAM changes.' >> "$GITHUB_STEP_SUMMARY"
+          printf '%s\n' 'Institutional goals exact Preview receipt: PASS' 'No rebuild, LIVE promotion, data, Rules, Auth or IAM changes.' >> "$GITHUB_STEP_SUMMARY"
