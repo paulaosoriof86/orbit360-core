@@ -51,10 +51,15 @@ jobs:
           import os
           p=Path(os.environ['RUNNER_TEMP'])/'rootfix.py'
           s=p.read_text(encoding='utf8')
-          old='out,n=re.subn(pattern,repl,text,count=1,flags=re.S)'
-          new='out,n=re.subn(pattern,lambda _m:repl,text,count=1,flags=re.S)'
-          if s.count(old)!=1: raise SystemExit('REGEX_REPLACEMENT_FIX_TARGET_MISSING')
-          p.write_text(s.replace(old,new),encoding='utf8')
+          replacements=[
+            ('out,n=re.subn(pattern,repl,text,count=1,flags=re.S)','out,n=re.subn(pattern,lambda _m:repl,text,count=1,flags=re.S)'),
+            ('snapshot="""','snapshot=r"""'),
+            ('verify="""','verify=r"""')
+          ]
+          for old,new in replacements:
+              if s.count(old)!=1: raise SystemExit('GENERATOR_FIX_TARGET_MISSING:'+old)
+              s=s.replace(old,new,1)
+          p.write_text(s,encoding='utf8')
           PY
           python3 "$RUNNER_TEMP/rootfix.py" > "$RUNNER_TEMP/rootfix.json"
           AFTER=$(git hash-object "$WORKFLOW_PATH")
