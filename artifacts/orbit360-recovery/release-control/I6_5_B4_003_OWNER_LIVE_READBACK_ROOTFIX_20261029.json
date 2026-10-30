@@ -1,0 +1,24 @@
+{
+  "schema": "GRAVICENTRA_I65_B4003_OWNER_LIVE_READBACK_ROOTFIX_V1",
+  "gate": "I6.5/B4-003",
+  "status": "WORKFLOW_BYTES_PREPARED_YAML_AND_NODE_PASS",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "parentHead": "f5c6eed39ac8a8c9079b1c618fe42b43277c6766",
+  "workflowPath": ".github/workflows/gravicentra-b4-003-cumulative-safe-read-preview-20261029.yml",
+  "beforeBlob": "b27daac122c7aadc5ab00f1c384217be400ff15e",
+  "afterBlob": "ecc856d57f8bff5bd2b17d193635967b8659583d",
+  "preparedPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_OWNER_LIVE_READBACK_ROOTFIX_WORKFLOW_20261029.yml",
+  "cause": "CUSTOM_OWNER_ROOT_RAW_HTML_VARIED_WHILE_PREVIEW_AND_LAB_LIVE_BYTES_MATCHED",
+  "remediation": "KEEP_EXACT_LAB_LIVE_ROOT_AND_BUILD_COMPARISON; REQUIRE_OWNER_BUILD_RUNTIME_AND_STRUCTURAL_ROOT_IDENTITY",
+  "sourceAnchor": "LAST_COMMIT_TOUCHING_ORBIT360_PLATFORM_MODULES_EQUIPO_JS",
+  "boundaries": {
+    "productSourceChanged": false,
+    "livePromotion": false,
+    "dataWrites": false,
+    "rulesAuthIamChanges": false,
+    "externalMessages": false,
+    "securityB4003StillHold": true,
+    "acceptanceGranted": false
+  }
+}
