@@ -1,0 +1,227 @@
+{
+  "schema": "GRAVICENTRA_B4003_WORK_UAT_RETURN_CAUSAL_ADJUDICATION_V1",
+  "recordedOn": "2026-10-30",
+  "status": "WORK_RETURN_RECOVERED_METAS_WRITE_BLOCK_REPRODUCED_NO_FUNCTIONAL_ACCEPTANCE",
+  "recordType": "SUBORDINATE_IMMUTABLE_EVIDENCE_NOT_NEW_RELEASE_AUTHORITY_OR_GATE",
+  "authority": "PAULA_20261030_REVIEW_LAST_WORK_RESULT_AND_CONTINUE_AGILE_WITH_EVIDENCE",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "gate": "I6.5/B4-003",
+  "observedParentHead": "f67112964ad4e0c94791c7a41218fe926ffaa8ac",
+  "controlPlaneBinding": {
+    "path": "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json",
+    "blobSha": "c38f0ebf4d919cc59494adbaf81acd08837ac6e3",
+    "candidatePointer": "b4003InstitutionalGoalsExactPreview20261030",
+    "nextActionObserved": "I6_5_B4_003_AUTHENTICATED_EXACT_PREVIEW_UAT_AND_P0_CLOSEOUT",
+    "mutatedByThisReceipt": false,
+    "noReleaseOrGateAdvance": true
+  },
+  "candidateObserved": {
+    "sourceSha": "eb9ce731832d236fedc545185ec7c66bd10849bb",
+    "buildId": "gi-i65-b4-eb9ce731832d-57f234755dc1",
+    "previewRunId": 41066435386,
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-sr-41066435386-r09pl1ti.web.app/",
+    "hostedPayloadDigest": "93d05a09035a044d400fe0f0e04759bd8c15e111bae93608dff0babdfa883a0a",
+    "functionsDeployedByThatPreview": false,
+    "backendManifestIsNotDeployedRuntimeProof": true
+  },
+  "recoveredWorkReturn": {
+    "provenance": "PRIOR_CONVERSATION_RESULT_RECOVERED_THIS_SESSION_NOT_NEW_BROWSER_EXECUTION",
+    "title": "GRAVICENTRA INSURANCE — CONTINUIDAD WORK / UAT EXACTA",
+    "completedAtUtc": "2026-10-30T15:56:09Z",
+    "completedAtGuatemala": "2026-10-30T09:56:09-06:00",
+    "identityReported": {
+      "user": "Paula Osorio",
+      "tenant": "Alianzas & Soluciones",
+      "membershipRole": "SuperAdmin",
+      "selectorLabel": "Dirección",
+      "independentRoleAttestationNotInferredFromLabel": true
+    },
+    "exactPreviewAndBuildReported": true,
+    "buildBoundResourcesReported": 138,
+    "consoleErrorsReported": 0,
+    "readOnlySurfacesReported": [
+      "Inicio",
+      "Equipo/Metas",
+      "Portal",
+      "Insights",
+      "Cliente 360",
+      "Cobros",
+      "Historial",
+      "Plantillas"
+    ],
+    "metas": {
+      "period": "2026-10",
+      "country": "GT",
+      "institutionalGoalsReported": "ZERO_OR_NOT_CONFIGURED",
+      "writeUat": "BLOCKED_BEFORE_WRITE",
+      "serverWriteReadbackReloadAuditRestore": "NOT_EXECUTED"
+    },
+    "otherObservationsNotAdjudicatedAsNewRegressions": {
+      "insights": "Importes sin fuente y monedas pendientes; lectura no acredita semantica.",
+      "cobros": "0/5 pagos confirmados y 5 conciliados reportados; no equiparar conciliacion con pago.",
+      "plantillas": "Catalogo historico; creacion deshabilitada; no se acredita flujo completo."
+    },
+    "carlos": {
+      "membershipsReported": [
+        "Operativo",
+        "Asesor"
+      ],
+      "defaultReported": "Operativo",
+      "independentUidLogin": "NOT_TESTED",
+      "effectiveScope": "NOT_PROVEN",
+      "noRoleChanges": true
+    },
+    "businessDataWrites": 0,
+    "sourceChanges": 0,
+    "commits": 0,
+    "deployments": 0,
+    "livePromotion": false,
+    "imports": false,
+    "priorFinalReceiptLocatedInRepository": false,
+    "acceptanceGranted": false
+  },
+  "followingConversation": {
+    "lastRecoveredMessageAtUtc": "2026-10-30T16:00:16Z",
+    "action": "ANNOUNCED_DIAGNOSIS_SEPARATING_HISTORICAL_AND_ACTIVE_HASH_REFERENCES",
+    "completedRepairEvidenceFound": false,
+    "newRemoteCommitAfterWorkBeforeThisSession": false,
+    "unpublishedChangesInOtherUnavailableSession": "NOT_KNOWABLE_FROM_REMOTE_HEAD",
+    "remoteHeadStillObserved": "f67112964ad4e0c94791c7a41218fe926ffaa8ac"
+  },
+  "historicalHashAdjudication": {
+    "conclusion": "LITERAL_INEQUALITY_IS_INTENTIONAL_HISTORICAL_BINDING_NOT_NEW_COMPOSITION_DRIFT",
+    "currentCompositionBlobSha": "33bf80768cb6cb311f2975d282a5f50935f680aa",
+    "preservedHistoricalCompositionBlobSha": "f9e3cce4f7b802966abdcc4072557821f3f1cac7",
+    "historicalCompositionCommit": "f5d03aa774907815f10408baf6fdb7c493f12b1a",
+    "currentB4LockBlobSha": "436f155bae1ccf042d45b398fbb53262f481095c",
+    "preservedParentB4LockBlobSha": "49132b1ff40413ef49e0d44947fe0f8ff4c39651",
+    "parentBindingCommit": "17c4bed9ba8b2bd36f559a802390723647994ea2",
+    "existingAdjudicationPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_DISJOINT_ROOT_SOURCE_LINEAGE_RECONCILIATION_20261029.json",
+    "existingAdjudicationBlobSha": "dd581b40249a53541921c852375c2e367fcd5a0a",
+    "activeReleaseLock": "DEPRECATED_NON_AUTHORITATIVE_TOMBSTONE",
+    "action": "PRESERVE_HISTORICAL_HASHES_AND_EXISTING_GUARD",
+    "liveLineageStillUnresolved": true
+  },
+  "parentGuard": {
+    "runId": 41076392414,
+    "head": "f67112964ad4e0c94791c7a41218fe926ffaa8ac",
+    "conclusion": "success",
+    "verifyControlPlane": "success",
+    "firestoreEmulator": "skipped",
+    "productSourceDrift": false,
+    "currentCapabilityAcceptances": 0,
+    "sixPriorityP0StillOpen": 6
+  },
+  "causalReproduction": {
+    "mode": "OFFLINE_VM_DOM_AND_FIRESTORE_IN_MEMORY_NO_NETWORK",
+    "testPath": "artifacts/orbit360-recovery/release-control/b4003-work-uat-20261030/metas-preview-contract-repro.test.cjs",
+    "testGitBlobSha": "f8f8901b8667aa88432e1efa06ab2dcc9a1ba589",
+    "resultPath": "artifacts/orbit360-recovery/release-control/b4003-work-uat-20261030/metas-contract-reproduction.json",
+    "command": "node artifacts/orbit360-recovery/release-control/b4003-work-uat-20261030/metas-preview-contract-repro.test.cjs .",
+    "originalHarnessPath": "tools/gravicentra-b4-003-operational-write-security-regression.test.cjs",
+    "originalHarnessGitBlobSha": "e9d1a504b555d147a741a3717be5b2042305eabd",
+    "productBlobs": {
+      "orbit360-platform/modules/equipo.js": "5ce317a0641709e1a405e61435578de934fa194d",
+      "orbit360-platform/data/store-firestore-product-operational-p0.js": "8bd608bc5a3aa7cd58feca8e309c97ea19059a91",
+      "functions/product-operational-domain.js": "529a76cffaa847c13fdf468bb2bbdf0685e95903",
+      "functions/product-active-role-contract.js": "09681f536c5cbbd36bcba6514d4829d2494b9387"
+    },
+    "conditionsReproduced": 4,
+    "disposition": "CAUSAL_PROOF_NOT_UAT_PASS",
+    "conclusions": [
+      "New institutional goal UI generates business ID without __syntheticQa; current Preview writer rejects before commit.",
+      "Existing synthetic goal update can commit, then separate audit_equipo_* mutation fails, producing No guardado despite persisted goal in the simulation.",
+      "Preview remove of synthetic metas is rejected by the current removal contract.",
+      "Existing business goal remains unchanged under Preview restrictions."
+    ],
+    "independentSecurityRegression": {
+      "total": 30,
+      "passed": 30,
+      "failed": 0,
+      "syntheticOnly": true,
+      "externalRequests": 0,
+      "resultPath": "artifacts/orbit360-recovery/release-control/b4003-work-uat-20261030/operational-write-security-regression.json"
+    },
+    "realBusinessWrites": 0,
+    "sourcePatched": false,
+    "acceptanceGranted": false
+  },
+  "processFindings": {
+    "previousInstitutionalTests": "15 checks covered read projection, authorization and source patterns, not the end-to-end UI-to-Preview-write-and-audit contract.",
+    "staleGeneralAuditSelector": {
+      "path": "tools/gravicentra-b4-003-integral-readonly-audit.cjs",
+      "blobSha": "748f05135165bcbce4121024f425f2323eb1b860",
+      "stalePointer": "paulaOct16LatestCertifiedReadOnlyPreview",
+      "disposition": "ALREADY_EXCLUDED_BY_FREEZE_RECEIPT_DO_NOT_RERUN_AS_EXACT_UAT",
+      "fixedByThisReceipt": false
+    },
+    "controlPlanePushFanout": {
+      "additionalWorkflowsBeyondGuard": 8,
+      "avoidedForThisEvidenceCapture": true,
+      "reason": "CONTROL_PLANE not changed; evidence-only files remain subordinate.",
+      "notEvidenceOfChatgptCrashCause": true
+    },
+    "continuityGap": "Work return was recoverable from conversation but no final Work receipt was located in repository; this receipt preserves provenance and adjudication.",
+    "contextHandling": "Read current pointer and causally relevant slices; do not dump all historical authority files or rewrite historical hashes."
+  },
+  "chatgptAvailabilityObservation": {
+    "observedAtUtc": "2026-10-30T16:08:27Z",
+    "observedAtGuatemala": "2026-10-30T10:08:27-06:00",
+    "source": "https://status.openai.com/api/v2/summary.json",
+    "components": {
+      "Conversations": "operational",
+      "ChatGPT Work": "operational",
+      "Images": "degraded_performance"
+    },
+    "publicIncident": "Elevated errors for GPT Image 2 API image edits",
+    "incidentStatus": "monitoring",
+    "individualConversationRootCause": "NOT_DIAGNOSED",
+    "operationalAggregateDoesNotExcludeIndividualFailure": true,
+    "officialGuidance": "https://help.openai.com/en/articles/7996703-troubleshooting-chatgpt-error-messages",
+    "guideline": "For a long or many-turn conversation that freezes, a fresh chat is a documented troubleshooting step, not proof of causality.",
+    "noBrowserOrExtensionFaultAttributed": true,
+    "noSupportMessageSent": true
+  },
+  "nextRequiredAction": {
+    "findingId": "B4-003-P0-20261012-INSTITUTIONAL-GOALS",
+    "action": "ONE_ATOMIC_CAUSAL_METAS_PREVIEW_WRITE_AUDIT_RESTORE_SUCCESSOR_WITH_COMPOSITION_AND_DISCRIMINANT_TESTS",
+    "requiredDesign": [
+      "Explicit visible Preview-only synthetic test context, without converting real goals or changing business IDs.",
+      "Goal and audit in the same canonical durable batch and server transaction with readback for both targets.",
+      "Restore limited to synthetic fixture and proven actor/run/before-image; never expand global business deletion.",
+      "Exclude synthetic fixtures from real goal selection and business KPIs.",
+      "Negative cases for real IDs, absent marker, wrong actor/country/role and all-or-nothing audit failure.",
+      "Verify deployed Preview backend bytes, build once, exact readback, then authenticated Chrome create/edit/reload/audit/restore.",
+      "Continue independent Carlos UID and existing affected-module/P0 checks on the same accepted candidate."
+    ],
+    "backendPreviewChangeRequired": true,
+    "backendDeploymentAuthorizedByThisReceipt": false,
+    "noGeneralLineageRediscovery": true,
+    "noHashReplacement": true,
+    "sourceCorrectionCompleted": false
+  },
+  "preservedProgress": {
+    "forensicMilestonePercent": 96,
+    "formalI6Percent": 50,
+    "increment": 0,
+    "newCapabilityAcceptances": 0,
+    "findingsClosed": 0,
+    "remainingTimeEstimate": null
+  },
+  "boundaries": {
+    "productSourceChanged": false,
+    "historicalLocksRewritten": false,
+    "controlPlaneChanged": false,
+    "newBranchRepoFirebaseOrWorkflow": false,
+    "liveDeploy": false,
+    "previewDeploy": false,
+    "authIamRulesMutation": false,
+    "tokensIssued": false,
+    "businessDataWrites": 0,
+    "dataReimport": false,
+    "externalMessages": false,
+    "releaseAcceptanceGranted": false,
+    "existingOwnerFirestoreRiskExceptionPreserved": true
+  }
+}

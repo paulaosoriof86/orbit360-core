@@ -1,0 +1,33 @@
+{
+  "scope": "EXACT_SOURCE_CAUSAL_REPRODUCTION_ONLY_NOT_UAT_PASS",
+  "head": "f67112964ad4e0c94791c7a41218fe926ffaa8ac",
+  "cases": [
+    {
+      "case": "empty_institutional_goal_ui_write",
+      "result": "REPRODUCED_BLOCKED",
+      "id": "meta-equipo-institucional-2026-10-gt-prima",
+      "explicitMarker": false,
+      "serverWrites": 0,
+      "alert": "No fue posible confirmar la meta institucional en el servidor."
+    },
+    {
+      "case": "seeded_synthetic_goal_then_audit",
+      "result": "REPRODUCED_PARTIAL_COMMIT_FALSE_FAILURE",
+      "goalPersisted": true,
+      "auditPersisted": false,
+      "auditIdPrefix": "audit_equipo_",
+      "uiAlert": "No fue posible confirmar la meta institucional en el servidor."
+    },
+    {
+      "case": "synthetic_goal_cleanup",
+      "result": "REPRODUCED_REMOVE_BLOCKED",
+      "serverWrites": 0
+    },
+    {
+      "case": "existing_business_goal_protection",
+      "result": "REPRODUCED_FAIL_CLOSED",
+      "serverWrites": 0,
+      "businessValueUnchanged": true
+    }
+  ]
+}

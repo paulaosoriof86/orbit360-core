@@ -1,0 +1,132 @@
+{
+  "schema": "gravicentra-operational-write-scope-regression-v2",
+  "syntheticOnly": true,
+  "externalRequests": 0,
+  "sourceBlob": "529a76cffaa847c13fdf468bb2bbdf0685e95903",
+  "total": 30,
+  "passed": 30,
+  "failed": 0,
+  "tests": [
+    {
+      "id": "missing_member_status_denied",
+      "pass": true
+    },
+    {
+      "id": "pending_member_denied",
+      "pass": true
+    },
+    {
+      "id": "invited_member_denied",
+      "pass": true
+    },
+    {
+      "id": "deleted_member_denied",
+      "pass": true
+    },
+    {
+      "id": "conflicting_status_alias_denied",
+      "pass": true
+    },
+    {
+      "id": "inactivo_flag_denied",
+      "pass": true
+    },
+    {
+      "id": "active_spanish_status_preserved",
+      "pass": true
+    },
+    {
+      "id": "explicit_role_team_replaces_global",
+      "pass": true
+    },
+    {
+      "id": "explicit_role_team_authorized_member",
+      "pass": true
+    },
+    {
+      "id": "absent_role_override_preserves_team",
+      "pass": true
+    },
+    {
+      "id": "invalid_role_team_config_denied",
+      "pass": true
+    },
+    {
+      "id": "derived_team_cannot_bypass_override",
+      "pass": true
+    },
+    {
+      "id": "foreign_to_own_denied",
+      "pass": true
+    },
+    {
+      "id": "foreign_content_denied",
+      "pass": true
+    },
+    {
+      "id": "own_edit_allowed",
+      "pass": true
+    },
+    {
+      "id": "own_to_foreign_denied",
+      "pass": true
+    },
+    {
+      "id": "foreign_country_to_authorized_denied",
+      "pass": true
+    },
+    {
+      "id": "authorized_to_foreign_country_denied",
+      "pass": true
+    },
+    {
+      "id": "missing_member_country_denied",
+      "pass": true
+    },
+    {
+      "id": "missing_document_country_denied",
+      "pass": true
+    },
+    {
+      "id": "unvalidated_document_country_denied",
+      "pass": true
+    },
+    {
+      "id": "insurer_foreign_country_update_denied",
+      "pass": true
+    },
+    {
+      "id": "insurer_missing_country_update_denied",
+      "pass": true
+    },
+    {
+      "id": "insurer_authorized_country_update_preserved",
+      "pass": true
+    },
+    {
+      "id": "all_scope_reassignment_preserved",
+      "pass": true
+    },
+    {
+      "id": "team_member_edit_preserved",
+      "pass": true
+    },
+    {
+      "id": "outsider_to_team_denied",
+      "pass": true
+    },
+    {
+      "id": "mixed_batch_no_partial_commit",
+      "pass": true
+    },
+    {
+      "id": "own_insert_preserved",
+      "pass": true
+    },
+    {
+      "id": "retry_idempotency_preserved",
+      "pass": true
+    }
+  ],
+  "releaseAccepted": false
+}
