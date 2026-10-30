@@ -2,6 +2,7 @@ name: Gravicentra I6.5 B4-003 Cumulative Safe-Read LAB Preview 20261029
 
 # Transport of the existing single canonical recovery branch, not a new gate.
 # Exactly one immutable seven-day Hosting-only LAB Preview; never LIVE or data.
+# Resolve the approved source from Control Plane; stale transport pins are not authority.
 on:
   push:
     branches: [recovery/fase-a-clean-20260831]
@@ -24,7 +25,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 40
     env:
-      EXACT_SOURCE_SHA: ${{ github.sha }}
+      TRANSPORT_SHA: ${{ github.sha }}
       PROJECT_ID: ays-orbit-360-lab
       HOSTING_SITE: ays-orbit-360-lab
       TENANT_HINT: alianzas-soluciones
@@ -50,26 +51,67 @@ jobs:
       - name: Require exact transport-only successor and preserved canonical security gate
         run: |
           set -euo pipefail
-          test "$(git rev-parse HEAD)" = "$EXACT_SOURCE_SHA"
-          test "$(git rev-parse HEAD^)" = '779a71495366d8224dfb945ed7d84fee93482020'
-          test "$(git diff --name-only HEAD^ HEAD)" = '.github/workflows/gravicentra-b4-003-cumulative-safe-read-preview-20261029.yml'
-          test "$(git show -s --format=%s HEAD)" = 'build(i6.5 B4-003): trigger cumulative safe-read isolated Preview only'
-          test "$(git hash-object orbit360-platform/modules/insights.js)" = '6667535e1995eb1dac7f100d95061c8f215aa7ea'
-          test "$(git hash-object orbit360-platform/modules/portal.js)" = 'dce6a980ea87eb3baab0c98a600edac9c4a8d356'
-          test "$(git hash-object orbit360-platform/core/legal.js)" = '4c5ec9b660eb0c8b3f53c1f9a524b8551a2e6d2c'
-          test "$(git hash-object orbit360-platform/index.html)" = 'a6a396b472cea8a94e2da4fe83f24a2efc0a1314'
-          test "$(git hash-object orbit360-platform/data/store-firestore-product-readonly-p0.js)" = 'c4324d5218e146cfa60534d3247eb471f28c0610'
-          test "$(git hash-object orbit360-platform/modules/cobros.js)" = 'bf595453f36bbe2c59969edcae3710654553f930'
-          test "$(git hash-object tools/gravicentra-b4-003-insights-financial-native.test.cjs)" = '2e9814bd06a9ff7bad1447b065fc3ce60ce8245e'
-          test "$(git hash-object tools/gravicentra-b4-003-portal-country-lifecycle.test.cjs)" = '3634e64904d055b4ab58dac4cb2ac5788899d68b'
-          test "$(git hash-object tools/gravicentra-b4-003-shell-country-sync.test.cjs)" = '71c0acfe769eef7e7a7177bb188044b19bfcfb54'
-          test "$(git hash-object tools/gravicentra-b4-003-cobros-role-hydration-successor.test.cjs)" = '573b08dbf9b963d4dcbc114183a7126c17ddffe6'
-          test "$(git hash-object tools/gravicentra-i6-control-plane-guard-v1.mjs)" = '4a62a71d551e352c3c188cdd68b47fe0f0a3d715'
-          test "$(git hash-object artifacts/orbit360-recovery/release-control/I6_5_B4_003_INSIGHTS_FINANCIAL_NATIVE_SOURCE_SUCCESSOR_20261029.json)" = 'e1bd860f53fdb929487585a244db64005728256c'
-          test "$(git hash-object orbit360-platform/modules/plantillas.js)" = '702c90d4c655013fc168430cb44a48aab7bdfcd0'
-          test "$(git hash-object tools/gravicentra-b4-003-insights-plantillas-country-no-seed.test.cjs)" = '839a82a705ddd0e26ee62b8c8db57cc266dfdde0'
-          test "$(git hash-object orbit360-platform/core/product-app-p0.js)" = '3e327c4923686262bcbef0bb5f0ad3c083c38cbd'
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const {execFileSync}=require('node:child_process');
+          const git=(...args)=>execFileSync('git',args,{encoding:'utf8'}).trim();
+          const need=(ok,code)=>{if(!ok)throw Error(code);};
+          const controlPath='artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json';
+          const workflowPath='.github/workflows/gravicentra-b4-003-cumulative-safe-read-preview-20261029.yml';
+          const C=JSON.parse(fs.readFileSync(controlPath,'utf8'));
+          const S=C.b4003PlantillasUseLifecycleSuccessor20261029;
+          need(S&&S.gate==='I6.5/B4-003'&&
+           S.status==='SOURCE_INTEGRATED_TESTS_BOUND_PREVIEW_PENDING_AUTHENTICATED_UAT'&&
+           S.authority==='PAULA_EXPLICIT_SCOPED_INTEGRATION_AUTHORIZATION'&&
+           S.previewAuthorizedAfterGuardAndRegressionPass===true&&
+           S.productionPromotionAuthorized===false&&
+           S.rulesAuthIamOrDataChangesAuthorized===false&&
+           S.securityB4003StillHold===true,'CONTROL_PLANE_PREVIEW_AUTHORITY_REQUIRED');
+          need(C.repository===process.env.GITHUB_REPOSITORY&&
+           C.branch===process.env.GITHUB_REF_NAME,'REPOSITORY_BRANCH_MISMATCH');
+          need(git('rev-parse','HEAD')===process.env.TRANSPORT_SHA,'TRANSPORT_HEAD_MISMATCH');
+          need(git('show','-s','--format=%s','HEAD')===
+           'build(i6.5 B4-003): trigger cumulative safe-read isolated Preview only','TRANSPORT_SUBJECT_MISMATCH');
+          need(git('diff','--name-only','HEAD^','HEAD')===workflowPath,'TRANSPORT_MUST_CHANGE_ONLY_EXISTING_WORKFLOW');
+          need(S.productPath==='orbit360-platform/modules/plantillas.js','PRODUCT_OWNER_MISMATCH');
+          const source=git('log','-1','--format=%H','--',S.productPath);
+          need(/^[0-9a-f]{40}$/.test(source)&&source===git('rev-parse','HEAD^')&&
+           git('rev-parse',source+'^')===S.parentHead,'EXACT_AUTHORIZED_SOURCE_PARENT_REQUIRED');
+          const R=JSON.parse(fs.readFileSync(S.receiptPath,'utf8'));
+          need(git('hash-object',S.receiptPath)===S.receiptBlobSha&&
+           R.expectedParentHead===S.parentHead&&R.gate===S.gate&&R.status===S.status&&
+           R.repository===C.repository&&R.branch===C.branch,'SUCCESSOR_RECEIPT_MISMATCH');
+          need(R.boundaries?.previewOnly===true&&R.boundaries.livePromotion===false&&
+           R.boundaries.firestoreRulesChange===false&&R.boundaries.authIamChange===false&&
+           R.boundaries.operationalWrites===false&&R.boundaries.dataImport===false&&
+           R.boundaries.externalMessages===false&&R.boundaries.acceptanceGranted===false&&
+           R.boundaries.securityB4003StillHold===true,'SUCCESSOR_BOUNDARY_MISMATCH');
+          const expected=(S.atomicCommitPaths||[]).slice().sort();
+          const actual=git('diff','--name-only',S.parentHead,source).split(/\r?\n/).filter(Boolean).sort();
+          need(expected.length===5&&JSON.stringify(expected)===JSON.stringify(actual)&&
+           JSON.stringify(expected)===JSON.stringify((R.atomicCommitPaths||[]).slice().sort()),'ATOMIC_SOURCE_PATHS_MISMATCH');
+          for(const [path,blob] of [[S.productPath,S.afterBlob],[S.regressionPath,S.regressionBlob],
+           [S.regressionRootQaPath,S.regressionRootQaBlob],[S.compositionPath,S.compositionBlobSha],
+           [S.uatReturnPath,S.uatReturnBlobSha],[R.ledgerBinding.path,R.ledgerBinding.blob]]){
+           need(typeof path==='string'&&/^[0-9a-f]{40}$/.test(blob)&&
+            git('hash-object',path)===blob&&git('rev-parse',source+':'+path)===blob,'BOUND_BLOB_MISMATCH:'+path);
+          }
+          need(S.preservedFindings===295&&S.preservedTasks===86&&
+           R.ledgerBinding.preservedFindings===295&&R.ledgerBinding.preservedTasks===86&&
+           S.currentCapabilityAcceptances===0,'PRESERVED_EVIDENCE_MISMATCH');
+          fs.appendFileSync(process.env.GITHUB_ENV,'EXACT_SOURCE_SHA='+source+'\n');
+          fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY,
+           'Preview authority: CONTROL_PLANE.b4003PlantillasUseLifecycleSuccessor20261029\n'+
+           'Product source: '+source+'\nTransport-only commit: '+process.env.TRANSPORT_SHA+'\n');
+          console.log('AUTHORIZED_EXACT_PRODUCT_SOURCE='+source);
+          NODE
           node tools/gravicentra-governance-preflight-v1.mjs --mode=i6
+          # Build the authorized product commit itself, not the transport commit.
+          SOURCE_SHA=$(git rev-parse HEAD^)
+          git checkout --detach "$SOURCE_SHA"
+          test "$(git rev-parse HEAD)" = "$SOURCE_SHA"
+          node tools/gravicentra-governance-preflight-v1.mjs --mode=i6
+          PLANTILLAS_SOURCE="$PWD/orbit360-platform/modules/plantillas.js" node artifacts/orbit360-recovery/release-control/b4003-uat-20261029/tests/plantillas-use-lifecycle.test.cjs
           node tools/gravicentra-b4-003-insights-financial-native.test.cjs
           node tools/gravicentra-b4-003-portal-country-lifecycle.test.cjs
           node tools/gravicentra-b4-003-shell-country-sync.test.cjs
