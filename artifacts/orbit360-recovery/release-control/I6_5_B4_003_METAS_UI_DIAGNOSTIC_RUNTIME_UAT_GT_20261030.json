@@ -1,0 +1,550 @@
+{
+  "schema": "GRAVICENTRA_I65_B4003_METAS_UI_DIAGNOSTIC_RUNTIME_UAT_GT_V1",
+  "recordType": "ADDITIVE_EXACT_TECHNICAL_AND_SCOPED_AUTHENTICATED_UAT_EVIDENCE",
+  "status": "AUTHENTICATED_METAS_GT_ADMIN_CORE_FLOW_PASS_CROSS_ROLE_AND_GATE_ACCEPTANCE_PENDING",
+  "recordedAtUtc": "2026-10-30T20:46:04.370498+00:00",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "gate": "I6.5/B4-003",
+  "authority": "USER_AUTHORIZED_B4_003_CONTINUATION_AND_GITHUB_TRACEABILITY_20261030",
+  "scope": "Exact UI-only Preview technical readback, authenticated GT/SuperAdmin synthetic Metas core flow, client invalid-value check and same-identity Asesor UI boundary. This receipt grants no capability, gate or production acceptance.",
+  "identity": {
+    "receiptCommitParent": "c76b94ed5fa6f5f6752e469275c0583471c0c3dd",
+    "uiSourceCommit": "a6e403119d9fc05b633e84f2eaa8f50c32ba12d9",
+    "uiSourceTree": "820d25547d6c3467c4816b4d8c5c2ab0f36953cc",
+    "uiSourceParent": "4d919e1683ab5f0f0b7166f2d67b84dd211b7805",
+    "backendSourceCommit": "8bb4fce20bb2af1aa4022573069ff8287679b715",
+    "backendTree": "9f72e9f8814c851ee30808a011b4e57a7f97a382",
+    "transportCommit": "c76b94ed5fa6f5f6752e469275c0583471c0c3dd",
+    "transportTree": "e2e4e2d19d1f4a1d2b3a6b35b8f732cdc1fe0e77",
+    "buildId": "gi-i65-b4-a6e403119d9f-57f234755dc1",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-sr-41066435386-r09pl1ti.web.app",
+    "previewChannelId": "gi-i65-b4-sr-41066435386",
+    "previewChannelReused": true,
+    "sourceBlobs": {
+      "functions/product-operational-domain.js": "f9fa8132c63b7099a4a72ff1df389f5fb5813d18",
+      "orbit360-platform/modules/equipo.js": "43554f646e0e311658fc8e6730c4e45c2920e77d",
+      "orbit360-platform/data/store-firestore-product-operational-p0.js": "b4ccd50b38ae095f2e9aa894c6992a9e36261545"
+    }
+  },
+  "technicalEvidence": {
+    "workflowResultLiteral": "TECHNICAL_EXACT_UI_PREVIEW_EXISTING_BACKEND_UNCHANGED_AUTHENTICATED_UAT_PENDING",
+    "workflowResultScope": "Technical result at workflow completion, before the subsequent authenticated UAT recorded below.",
+    "sourceGuard": {
+      "runId": 41123168901,
+      "conclusion": "success",
+      "url": "https://github.com/paulaosoriof86/orbit360-core/actions/runs/41123168901"
+    },
+    "transportGuard": {
+      "runId": 41123553061,
+      "conclusion": "success",
+      "url": "https://github.com/paulaosoriof86/orbit360-core/actions/runs/41123553061"
+    },
+    "previewRun": {
+      "runId": 41123553239,
+      "jobId": 124296116769,
+      "conclusion": "success",
+      "updatedAtUtc": "2026-10-30T20:31:48Z",
+      "url": "https://github.com/paulaosoriof86/orbit360-core/actions/runs/41123553239"
+    },
+    "hostedPayloadDigest": "72d34458dea66948fcd0b028952c43243f48b9da600b0d3663ba9835b72bcd34",
+    "bundleDigest": "616a8f1f44aafa88d3afa876f14d6e5fa9ec760491978f5bcd2bf1e3c16c98ff",
+    "backend": {
+      "target": "orbit360ProductOperationalCommandPreview",
+      "project": "ays-orbit-360-lab",
+      "region": "us-east1",
+      "deployment": false,
+      "revisionBefore": "orbit360productoperationalcommandpreview-00211-muz",
+      "revisionAfter": "orbit360productoperationalcommandpreview-00211-muz",
+      "noFunctionsChanged": true,
+      "changedFunctionKeys": [],
+      "targetIamUnchanged": true,
+      "sourceReadbackStatus": "DEPLOYED_BACKEND_SOURCE_BYTES_MATCH_EXACT_STAGE",
+      "sourceReadbackErrorHttpStatus": null,
+      "sourceFileCount": 28,
+      "deployedSourceArchiveSha256": "bb8a0d649b944f3361e237402592c5016b595ae6b1238d7aa4dba30196ab7e76"
+    },
+    "liveIdentity": {
+      "labLiveRootExact": true,
+      "ownerRuntimeExact": true,
+      "ownerRootStructuralExact": true
+    },
+    "artifacts": [
+      {
+        "id": 13009513111,
+        "name": "gi-b4003-cumulative-hosting-41123553239",
+        "size_in_bytes": 1490880,
+        "digest": "sha256:c057c90dd395b596a94b70ef3063b7455b87c7c9736b0c1ddfd51546a2a76815",
+        "url": "https://api.github.com/repos/paulaosoriof86/orbit360-core/actions/artifacts/13009513111",
+        "expired": false,
+        "head_sha": "c76b94ed5fa6f5f6752e469275c0583471c0c3dd",
+        "downloadSha256AndBytesIndependentlyVerified": false
+      },
+      {
+        "id": 13009422263,
+        "name": "gi-b4003-metas-backend-source-41123553239",
+        "size_in_bytes": 157489,
+        "digest": "sha256:7f25aef97829b4c8564c5aa9b87733d59b45db441bcf5e370023ca63442d6632",
+        "url": "https://api.github.com/repos/paulaosoriof86/orbit360-core/actions/artifacts/13009422263",
+        "expired": false,
+        "head_sha": "c76b94ed5fa6f5f6752e469275c0583471c0c3dd",
+        "downloadSha256AndBytesIndependentlyVerified": false
+      },
+      {
+        "id": 13008973798,
+        "name": "gi-b4003-live-identity-readback-41123553239",
+        "size_in_bytes": 4641,
+        "digest": "sha256:261eacba18088c3c15d741652e9fcc27903506631c23c7f6cf3bd763d291c0dd",
+        "url": "https://api.github.com/repos/paulaosoriof86/orbit360-core/actions/artifacts/13008973798",
+        "expired": false,
+        "head_sha": "c76b94ed5fa6f5f6752e469275c0583471c0c3dd",
+        "downloadSha256AndBytesIndependentlyVerified": false
+      },
+      {
+        "id": 13008933899,
+        "name": "gi-b4003-metas-exact-preview-readback-41123553239",
+        "size_in_bytes": 18923,
+        "digest": "sha256:7eec9bc2825c4a33aa3dc49228f42bf0542d66d20bfc349f0231ff828edc5464",
+        "url": "https://api.github.com/repos/paulaosoriof86/orbit360-core/actions/artifacts/13008933899",
+        "expired": false,
+        "head_sha": "c76b94ed5fa6f5f6752e469275c0583471c0c3dd",
+        "downloadSha256AndBytesIndependentlyVerified": true
+      }
+    ],
+    "readbackArtifactMembers": [
+      "gi-metas-combined-preview-result.json",
+      "gi-metas-function-readback.json",
+      "gi-metas-source-binding.json"
+    ],
+    "readbackEvidenceLimit": "Combined readback ZIP downloaded and hash/size verified. Other artifact IDs, digests and sizes are GitHub metadata; no new claim that their ZIP bytes were downloaded in this review.",
+    "workflowBoundariesBeforeUiSequence": {
+      "liveDeployment": false,
+      "functionsDeployment": false,
+      "businessDataWrites": 0,
+      "syntheticWrites": 0,
+      "authIamRulesChanges": false
+    }
+  },
+  "authenticatedUat": {
+    "status": "PASS_GT_SUPERADMIN_CORE_FLOW",
+    "authenticatedMetasGtAdminCoreFlowPass": true,
+    "evidenceProvenance": "Authenticated Chrome UI observations and text readback supplied by the coordinating agent in the same authorized session. Technical evidence is additionally bound to the downloaded workflow artifact.",
+    "evidenceForm": "TEXT_OBSERVATIONS_WITHOUT_PERSONAL_IDENTIFIERS_OR_REAL_GOAL_VALUES",
+    "country": "GT",
+    "currency": "GTQ",
+    "effectiveRole": "SuperAdmin",
+    "visibleRoleLabel": "Dirección",
+    "calendarMonth": "2026-10",
+    "reservedQaPeriod": "QA-B4-003",
+    "expectedContractVersionFromExactSource": "gravicentra-metas-preview-session-v1",
+    "runId": null,
+    "fixtureIds": null,
+    "actorUid": null,
+    "unexposedIdentifiersNote": "Run ID, fixture IDs and authenticated UID were not exported or invented.",
+    "startedAtUtc": "2026-10-30T20:33:44Z",
+    "coreCompletedAtUtc": "2026-10-30T20:43:12Z",
+    "negativeRoleCheckCompletedAtUtc": "2026-10-30T20:44:21Z",
+    "coreSteps": [
+      {
+        "id": "01_identity_and_baseline",
+        "status": "PASS",
+        "action": "Confirm authenticated Preview identity, effective role, country, currency and real-goal baseline.",
+        "observedAtUtc": "2026-10-30T20:33:44Z",
+        "observed": {
+          "authenticatedIdentityConfirmed": true,
+          "effectiveRole": "SuperAdmin",
+          "visibleRoleLabel": "Dirección",
+          "country": "GT",
+          "currency": "GTQ",
+          "calendarMonth": "2026-10",
+          "realGoalInputCount": 20,
+          "institutionalInputCount": 2,
+          "advisorInputCount": 18,
+          "advisorCount": 6,
+          "disabledRealGoalInputCount": 20,
+          "rawIdentityAndBusinessValuesRecorded": false
+        },
+        "evidenceKind": "AUTHENTICATED_BROWSER_TEXT_OBSERVATION"
+      },
+      {
+        "id": "02_server_inspect",
+        "status": "PASS",
+        "action": "Inspect the current server-backed test state before starting.",
+        "observedAtUtc": "2026-10-30T20:33:44Z",
+        "observed": {
+          "uiSessionState": "none",
+          "startButtonEnabled": true,
+          "statusText": "Prueba disponible. Sus valores quedan separados de las metas e indicadores reales."
+        },
+        "evidenceKind": "AUTHENTICATED_BROWSER_TEXT_OBSERVATION"
+      },
+      {
+        "id": "03_probe_and_start",
+        "status": "PASS",
+        "action": "Start the test once and receive the server-contract probe confirmation.",
+        "observedAtUtc": null,
+        "observed": {
+          "probeConfirmedInUi": true,
+          "statusText": "Prueba lista. El servidor confirmó el guardado con auditoría y la restauración.",
+          "syntheticProductionAndCollectionInputsAvailable": true,
+          "scope": "Probe availability confirmation; goal persistence is evidenced by subsequent writes and reload."
+        },
+        "evidenceKind": "AUTHENTICATED_BROWSER_TEXT_OBSERVATION"
+      },
+      {
+        "id": "04_create_production_fixture",
+        "status": "PASS",
+        "action": "Create the synthetic production goal through the visible QA field.",
+        "observedAtUtc": null,
+        "observed": {
+          "syntheticValueEntered": 1300,
+          "syntheticValueConfirmed": 1300,
+          "currency": "GTQ",
+          "serverConfirmationDisplayed": true,
+          "statusText": "Meta y auditoría confirmadas en servidor. Puedes recargar y restaurar la prueba.",
+          "visibleAuditTimestampUtc": "2026-10-30T20:34:06Z"
+        },
+        "evidenceKind": "AUTHENTICATED_BROWSER_TEXT_OBSERVATION"
+      },
+      {
+        "id": "05_edit_production_fixture",
+        "status": "PASS",
+        "action": "Edit the same synthetic production goal.",
+        "observedAtUtc": null,
+        "observed": {
+          "previousSyntheticValue": 1300,
+          "syntheticValueEntered": 1350,
+          "syntheticValueConfirmed": 1350,
+          "serverConfirmationDisplayed": true,
+          "visibleAuditTimestampUtc": "2026-10-30T20:34:37Z"
+        },
+        "evidenceKind": "AUTHENTICATED_BROWSER_TEXT_OBSERVATION"
+      },
+      {
+        "id": "06_create_collection_fixture",
+        "status": "PASS",
+        "action": "Create the synthetic collection goal.",
+        "observedAtUtc": null,
+        "observed": {
+          "syntheticValueEntered": 750,
+          "syntheticValueConfirmed": 750,
+          "serverConfirmationDisplayed": true,
+          "visibleAuditTimestampUtc": "2026-10-30T20:34:56Z"
+        },
+        "evidenceKind": "AUTHENTICATED_BROWSER_TEXT_OBSERVATION"
+      },
+      {
+        "id": "07_reload_recovery",
+        "status": "PASS",
+        "action": "Reload normally, return to GT through the visible country control and recover the test.",
+        "observedAtUtc": "2026-10-30T20:36:12Z",
+        "observed": {
+          "reloadStartedAtUtc": "2026-10-30T20:35:26Z",
+          "countryRestoredThroughUi": true,
+          "statusText": "Prueba recuperada y verificada en el servidor. Comprueba los valores y restaura al terminar.",
+          "productionRecovered": 1350,
+          "collectionRecovered": 750,
+          "valuesExactlyMatchConfirmedWrites": true,
+          "runIdExposed": false
+        },
+        "evidenceKind": "AUTHENTICATED_BROWSER_TEXT_OBSERVATION"
+      },
+      {
+        "id": "08_audit_writes",
+        "status": "PASS",
+        "action": "Read the three write audit rows in the visible history.",
+        "observedAtUtc": "2026-10-30T20:36:31Z",
+        "observed": {
+          "matchingWriteRows": 3,
+          "visibleWriteTimestampsUtc": [
+            "2026-10-30T20:34:06Z",
+            "2026-10-30T20:34:37Z",
+            "2026-10-30T20:34:56Z"
+          ],
+          "action": "editar_meta_institucional",
+          "actorMatchesAuthenticatedProfile": true,
+          "rawActorIdentifierRecorded": false,
+          "scope": "Visible audit rows attributed by operation, actor match and execution window; no hidden runId or database-wide completeness claim."
+        },
+        "evidenceKind": "AUTHENTICATED_BROWSER_TEXT_OBSERVATION"
+      },
+      {
+        "id": "09_restore",
+        "status": "PASS",
+        "action": "Restore the recovered synthetic test after actual confirmed writes.",
+        "observedAtUtc": "2026-10-30T20:38:11Z",
+        "observed": {
+          "serverConfirmationDisplayed": true,
+          "statusText": "Prueba restaurada y auditoría confirmada. Las metas reales se conservaron.",
+          "syntheticFixtureControlsRemoved": true,
+          "visibleRestoreAuditTimestampUtc": "2026-10-30T20:37:50Z",
+          "scope": "Confirmation observation time differs from the earlier timestamp later read in the audit row."
+        },
+        "evidenceKind": "AUTHENTICATED_BROWSER_TEXT_OBSERVATION"
+      },
+      {
+        "id": "10_reload_after_restore",
+        "status": "PASS",
+        "action": "Reload after restoration and inspect again.",
+        "observedAtUtc": "2026-10-30T20:40:27Z",
+        "observed": {
+          "statusText": "Prueba disponible. Sus valores quedan separados de las metas e indicadores reales.",
+          "qaInputCount": 0,
+          "startButtonEnabled": true,
+          "restoredSessionRecovered": false,
+          "scope": "Server-backed state exposed by the authenticated UI; no independent full database scan."
+        },
+        "evidenceKind": "AUTHENTICATED_BROWSER_TEXT_OBSERVATION"
+      },
+      {
+        "id": "11_audit_restore_survives",
+        "status": "PASS",
+        "action": "Read restoration and the three prior writes after reload.",
+        "observedAtUtc": "2026-10-30T20:43:12Z",
+        "observed": {
+          "matchingAuditRows": 4,
+          "preservedWriteRows": 3,
+          "restoreRows": 1,
+          "restoreAction": "restaurar_prueba_metas",
+          "visibleRestoreAuditTimestampUtc": "2026-10-30T20:37:50Z",
+          "actorMatchesAuthenticatedProfile": true,
+          "rawActorIdentifierRecorded": false,
+          "priorWriteRowsStillVisible": true
+        },
+        "evidenceKind": "AUTHENTICATED_BROWSER_TEXT_OBSERVATION"
+      },
+      {
+        "id": "12_real_data_unchanged",
+        "status": "PASS",
+        "action": "Compare observed real goal inputs and visible totals with the initial GT/2026-10 baseline.",
+        "observedAtUtc": "2026-10-30T20:41:21Z",
+        "observed": {
+          "firstPostRestoreComparisonAtUtc": "2026-10-30T20:38:22Z",
+          "realGoalInputCount": 20,
+          "matchingAttributeCount": 20,
+          "matchingValueCount": 20,
+          "disabledInputCount": 20,
+          "institutionalInputCount": 2,
+          "advisorInputCount": 18,
+          "advisorCount": 6,
+          "visibleTotalCountCompared": 3,
+          "visibleTotalsUnchanged": true,
+          "rawBusinessValuesRecorded": false,
+          "scope": "The 20 observed inputs and three visible totals only; not global database equality or complete proof of zero business writes."
+        },
+        "evidenceKind": "AUTHENTICATED_BROWSER_TEXT_OBSERVATION"
+      }
+    ],
+    "coreStepsTotal": 12,
+    "coreStepsPassed": 12,
+    "coreStepsFailed": 0,
+    "confirmedSyntheticGoalWriteOperationsViaUi": 3,
+    "syntheticValues": {
+      "productionCreated": 1300,
+      "productionEdited": 1350,
+      "collectionCreated": 750
+    },
+    "matchingVisibleWriteAuditRows": 3,
+    "matchingVisibleRestoreAuditRows": 1,
+    "restorationAfterActualWritesConfirmedInUi": true,
+    "restoredSessionAbsentAfterReloadInUi": true,
+    "restorationAccepted": true,
+    "negativeCases": [
+      {
+        "id": "NEGATIVE_VALUE",
+        "status": "PASS_CLIENT_VALIDATION_ONLY",
+        "observedAtUtc": "2026-10-30T20:37:00Z",
+        "action": "Enter -1 in the synthetic production field.",
+        "input": -1,
+        "diagnosticCode": "SAVE/META_VALUE_INVALID",
+        "afterDialogAcknowledgement": {
+          "production": 1350,
+          "collection": 750,
+          "valuesUnchanged": true
+        },
+        "backendRejectionProven": false,
+        "scope": "Client-side validation observation; not a backend authorization or validation test."
+      },
+      {
+        "id": "SAME_IDENTITY_ADVISOR_UI_BOUNDARY",
+        "status": "PASS_SAME_IDENTITY_ONLY",
+        "observedAtUtc": "2026-10-30T20:44:06Z",
+        "action": "Select Asesor using the visible role selector for the same authenticated identity and inspect Equipo in GT.",
+        "country": "GT",
+        "route": "#/equipo",
+        "visibleRoleLabel": "Asesor",
+        "visibleHeading": "No tienes acceso con el rol activo",
+        "sameAuthenticatedIdentity": true,
+        "backendWriteAttempted": false,
+        "authOrPermissionConfigurationChanged": false,
+        "roleRestoredAtUtc": "2026-10-30T20:44:21Z",
+        "restoredRoleLabel": "Dirección",
+        "restoredCountry": "GT",
+        "restoredHeading": "Equipo y permisos",
+        "independentSecondActorEvidence": false,
+        "scope": "Visible same-identity role boundary only; it does not substitute for independent Carlos UID or backend-denial evidence."
+      }
+    ],
+    "negativeChecksTotal": 2,
+    "negativeChecksPassed": 2,
+    "negativeChecksIncludedInCoreDenominator": false,
+    "independentCarlosUidExecuted": false,
+    "coCountryExecuted": false,
+    "scopeLimitations": [
+      "Core PASS covers one authenticated administrator in GT only.",
+      "UI server-confirmation messages, durable recovered values and visible audit rows support this scoped workflow; no raw transaction trace or database-wide equality is claimed.",
+      "The visible history does not expose hidden run IDs, fixture IDs or before/after payloads.",
+      "The -1 case proves client rejection only.",
+      "Changing the visible role for the same identity does not prove independent second-actor or backend-denial behavior.",
+      "Full screenshots were not saved or exported; personal identifiers and real business values are excluded from this receipt."
+    ]
+  },
+  "realDataComparison": {
+    "country": "GT",
+    "calendarMonth": "2026-10",
+    "realInputCount": 20,
+    "institutionalInputCount": 2,
+    "advisorInputCount": 18,
+    "advisorCount": 6,
+    "matchingValueCount": 20,
+    "matchingAttributeCount": 20,
+    "disabledInputCount": 20,
+    "visibleTotalCountCompared": 3,
+    "visibleTotalsUnchanged": true,
+    "postRestoreChecksAtUtc": [
+      "2026-10-30T20:38:22Z",
+      "2026-10-30T20:41:21Z"
+    ],
+    "rawBusinessValuesRecorded": false,
+    "businessWritesObservedInThisUiSequence": 0,
+    "globalBusinessWriteAbsenceProven": false,
+    "globalDatabaseEqualityProven": false,
+    "scope": "Equality of the 20 observed UI inputs and three visible totals, in the same GT/2026-10 context."
+  },
+  "causalReconciliation": {
+    "previousFailedAttemptReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_METAS_ATOMIC_PREVIEW_RUNTIME_EVIDENCE_20261030.json",
+    "previousFailedAttemptReceiptBlob": "89f0408be711d63fc0d09426a7e0408120491225",
+    "previousFailureStatus": "UNKNOWN_NOT_REPRODUCED_IN_FRESH_AUTHENTICATED_SESSION",
+    "initialExactRootCause": "UNKNOWN",
+    "diagnosticSourceChangeOnly": true,
+    "writeRestoreOrAuthorizationSemanticsChangedByDiagnosticSuccessor": false,
+    "causalFixProven": false,
+    "freshSessionCoreFlowPass": true,
+    "interpretation": "The original failed save remains historical evidence. The diagnostic-only successor and fresh browser session completed the core flow; this does not establish which condition caused the earlier failure or prove a causal product repair.",
+    "chatConversationInterruptionCauseProvenByThisReceipt": false
+  },
+  "progress": {
+    "metasGtAdminCoreFlow": {
+      "completed": 12,
+      "total": 12,
+      "percent": 100,
+      "denominator": "The twelve pre-existing Metas UI core-flow steps, scoped to the observed GT/SuperAdmin execution.",
+      "includesIndependentActorOrCountryParity": false,
+      "equivalentToB4003Closure": false
+    },
+    "additionalNegativeChecks": {
+      "completed": 2,
+      "total": 2,
+      "scopes": [
+        "CLIENT_VALUE_VALIDATION",
+        "SAME_IDENTITY_UI_ROLE_BOUNDARY"
+      ],
+      "backendNegativeAcceptance": false
+    },
+    "formalI6ProgressPercent": 50,
+    "formalI6CompletedMiniGates": 5,
+    "formalI6TotalMiniGates": 10,
+    "formalI6ProgressChanged": false,
+    "overallImplementationPercent": null,
+    "priorCumulativeBatch80PercentReused": false,
+    "currentCapabilityAcceptances": 0,
+    "interpretation": "This is new verified functional progress within Metas. The 100 percent applies only to the twelve scoped core steps; the frozen I6 mini-gate denominator and global implementation denominator are unchanged."
+  },
+  "remainingExistingAcceptanceWork": {
+    "immediateMetasAndCrossRole": [
+      "Independent Carlos UID evidence and effective role/country acceptance on the exact candidate.",
+      "Applicable cross-country and cross-role criteria not covered by the GT administrator core flow.",
+      "Retain the earlier unexplained failure as a diagnostic limitation until a cause is independently established."
+    ],
+    "existingPriorityCriteriaUnchanged": [
+      {
+        "findingId": "B4-003-P0-20261012-PERSONAL-COLLECTION",
+        "remaining": "Authenticated real-advisor collection, currency and reload proof."
+      },
+      {
+        "findingId": "B4-003-P0-20261012-FREELANCERS-GOAL-SCOPE",
+        "remaining": "Canonical editable internal/freelance participation contract and scope acceptance."
+      },
+      {
+        "findingId": "B4-003-P0-20261012-INICIO-MOTIVATIONAL-TEXTS",
+        "remaining": "Targeted visual acceptance of actual role/period/country contextual content."
+      },
+      {
+        "findingId": "B4-003-P0-20261012-QA-CANCELLED-RUN-FIXTURES",
+        "remaining": "Exact provenance and dependency adjudication; authorized reversible disposition or retained HOLD."
+      },
+      {
+        "findingId": "B4-003-P0-20261012-QA-ORPHAN-RENEWALS",
+        "remaining": "Exact origin and dependency disposition preserving real obligations and history."
+      }
+    ],
+    "priorityFindingClosuresGranted": 0,
+    "noSixPriorityClosureClaim": true,
+    "sourceOfExistingCriteria": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_REAL_PROGRESS_RECONCILIATION_20261030.json"
+  },
+  "preservationAndBoundaries": {
+    "historicalReceipts": [
+      {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_METAS_ATOMIC_PREVIEW_SOURCE_SUCCESSOR_20261030.json",
+        "blobSha": "091b27ee8acb85b0e601b3b048b3d1395740f05b",
+        "unchanged": true
+      },
+      {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_REAL_PROGRESS_RECONCILIATION_20261030.json",
+        "blobSha": "91f045bb4b34da32fffb9e299b78f972ce0af308",
+        "unchanged": true
+      },
+      {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_METAS_ATOMIC_PREVIEW_RUNTIME_EVIDENCE_20261030.json",
+        "blobSha": "89f0408be711d63fc0d09426a7e0408120491225",
+        "unchanged": true
+      },
+      {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_METAS_UI_DIAGNOSTIC_SOURCE_SUCCESSOR_20261030.json",
+        "blobSha": "10dbd03996132a15e324df773649116a63c3b774",
+        "unchanged": true
+      }
+    ],
+    "existingControlPlaneValuesUnchanged": true,
+    "sourceUnchangedByThisReceipt": true,
+    "workflowUnchangedByThisReceipt": true,
+    "canonicalFreezeUnchanged": true,
+    "findingsLedgerUnchanged": true,
+    "newAuthority": false,
+    "newGate": false,
+    "newBranch": false,
+    "liveDeployment": false,
+    "productionPromotionAuthorized": false,
+    "authIamRulesChanged": false,
+    "realBusinessWritesAuthorized": false,
+    "unrelatedFixtureCleanupExecuted": false,
+    "auditDeletionExecuted": false,
+    "securityHold": "ACTIVE_FAIL_CLOSED",
+    "rawPersonalIdentifiersIncluded": false,
+    "rawRealGoalValuesIncluded": false
+  },
+  "acceptance": {
+    "authenticatedMetasGtAdminCoreFlowAccepted": true,
+    "exactBackendSourceReadbackAccepted": true,
+    "syntheticRestoreAccepted": true,
+    "clientInvalidValueUiCheckAccepted": true,
+    "sameIdentityAdvisorUiBoundaryAccepted": true,
+    "independentCarlosUidAccepted": false,
+    "independentCrossRoleUatAccepted": false,
+    "coCountryUatAccepted": false,
+    "backendNegativeChecksAccepted": false,
+    "capabilityAccepted": false,
+    "b4003ClosureAccepted": false,
+    "productionAccepted": false
+  }
+}
