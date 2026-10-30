@@ -1,31 +1,32 @@
-name: Gravicentra B4-003 LAB Build Route 404 Rootfix Bytes
+name: Gravicentra B4-003 Owner Root Structural Identity Rootfix
 
 on:
   push:
     branches: [recovery/fase-a-clean-20260831]
     paths:
       - '.github/workflows/gravicentra-b4-003-integrate-institutional-goals-20261029.yml'
+      - 'tools/gravicentra-b4-003-owner-root-structural-identity-rootfix-20261030.py'
 
 permissions:
   contents: write
 
 concurrency:
-  group: gravicentra-b4-003-lab-build-route404-rootfix-bytes
+  group: gravicentra-b4-003-owner-root-structural-identity-rootfix
   cancel-in-progress: false
 
 jobs:
-  preserve-lab-build-route404-rootfix-bytes:
+  apply-transport-rootfix:
     if: >-
       github.repository == 'paulaosoriof86/orbit360-core' &&
       github.ref == 'refs/heads/recovery/fase-a-clean-20260831' &&
-      github.event.head_commit.message == 'exec(i6.5 B4-003): preserve LAB build-route 404 rootfix bytes'
+      github.event.head_commit.message == 'exec(i6.5 B4-003): apply owner root structural identity rootfix'
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     env:
       WORKFLOW_PATH: .github/workflows/gravicentra-b4-003-cumulative-safe-read-preview-20261029.yml
-      PREPARED_PATH: artifacts/orbit360-recovery/release-control/I6_5_B4_003_LAB_BUILD_ROUTE404_ROOTFIX_WORKFLOW_20261029.yml
-      RECEIPT_PATH: artifacts/orbit360-recovery/release-control/I6_5_B4_003_LAB_BUILD_ROUTE404_ROOTFIX_20261029.json
-      EXPECTED_BEFORE: b0477e3b63cdc7666c574db19249e24dc5283327
+      PATCHER_PATH: tools/gravicentra-b4-003-owner-root-structural-identity-rootfix-20261030.py
+      EXPECTED_BEFORE: 086147a8e66b0b8e25b39449599304db52c411ad
+      EXPECTED_PRODUCT: 5ce317a0641709e1a405e61435578de934fa194d
     steps:
       - uses: actions/checkout@v4
         with:
@@ -35,17 +36,17 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Prepare, validate and preserve corrected workflow bytes
+      - name: Apply bounded transport-only correction and trigger exact Preview
         run: |
           set -euo pipefail
           git fetch origin "$GITHUB_REF_NAME"
           PARENT=$(git rev-parse HEAD)
           test "$PARENT" = "$(git rev-parse origin/$GITHUB_REF_NAME)"
-          test "$(git show -s --format=%s HEAD)" = 'exec(i6.5 B4-003): preserve LAB build-route 404 rootfix bytes'
+          test "$(git show -s --format=%s HEAD)" = 'exec(i6.5 B4-003): apply owner root structural identity rootfix'
           test "$(git hash-object "$WORKFLOW_PATH")" = "$EXPECTED_BEFORE"
-          test "$(git hash-object orbit360-platform/modules/equipo.js)" = '5ce317a0641709e1a405e61435578de934fa194d'
+          test "$(git hash-object orbit360-platform/modules/equipo.js)" = "$EXPECTED_PRODUCT"
           node tools/gravicentra-governance-preflight-v1.mjs --mode=i6
-          python3 tools/gravicentra-b4-003-lab-build-route404-rootfix-20261029.py > "$RUNNER_TEMP/rootfix.json"
+          python3 "$PATCHER_PATH" "$WORKFLOW_PATH" > "$RUNNER_TEMP/rootfix.json"
           AFTER=$(git hash-object "$WORKFLOW_PATH")
           test "$AFTER" != "$EXPECTED_BEFORE"
           ruby -e "require 'yaml'; YAML.load_file(ARGV[0]); puts 'YAML_PASS'" "$WORKFLOW_PATH"
@@ -68,37 +69,24 @@ jobs:
           Path(os.environ['RUNNER_TEMP']+'/node-blocks.list').write_text('\n'.join(map(str,blocks))+'\n')
           PY
           while IFS= read -r js; do node --check "$js"; done < "$RUNNER_TEMP/node-blocks.list"
-          ! grep -q 'gi-live-build-before.json' "$WORKFLOW_PATH"
-          ! grep -q 'gi-live-build-after.json' "$WORKFLOW_PATH"
-          ! grep -q 'labLiveBuildExact' "$WORKFLOW_PATH"
-          grep -q 'gi-live-before.html' "$WORKFLOW_PATH"
-          grep -q 'gi-owner-runtime-before.js' "$WORKFLOW_PATH"
-          grep -q 'OWNER_ROOT_STRUCTURAL_IDENTITY_CHANGED' "$WORKFLOW_PATH"
-          grep -q 'gi-b4003-live-identity-readback' "$WORKFLOW_PATH"
-          cp "$WORKFLOW_PATH" "$RUNNER_TEMP/prepared-workflow.yml"
-          git reset --hard "$PARENT"
-          mkdir -p "$(dirname "$PREPARED_PATH")"
-          cp "$RUNNER_TEMP/prepared-workflow.yml" "$PREPARED_PATH"
-          test "$(git hash-object "$PREPARED_PATH")" = "$AFTER"
-          python3 - <<'PY'
-          import json,os,pathlib
-          receipt={'schema':'GRAVICENTRA_I65_B4003_LAB_BUILD_ROUTE404_ROOTFIX_V1','gate':'I6.5/B4-003','status':'WORKFLOW_BYTES_PREPARED_YAML_AND_NODE_PASS','repository':'paulaosoriof86/orbit360-core','branch':os.environ['GITHUB_REF_NAME'],'parentHead':os.environ['PARENT'],'workflowPath':os.environ['WORKFLOW_PATH'],'beforeBlob':os.environ['EXPECTED_BEFORE'],'afterBlob':os.environ['AFTER'],'preparedPath':os.environ['PREPARED_PATH'],'failedRunId':40999897012,'cause':'LAB_LIVE_BUILD_JSON_ROUTE_RETURNS_404','remediation':'REMOVE_NONEXISTENT_LAB_BUILD_ROUTE; KEEP_EXACT_LAB_LIVE_ROOT, OWNER_RUNTIME_EXACT, OWNER_ROOT_STRUCTURAL_IDENTITY','boundaries':{'productSourceChanged':False,'livePromotion':False,'dataWrites':False,'rulesAuthIamChanges':False,'externalMessages':False,'securityB4003StillHold':True,'acceptanceGranted':False}}
-          pathlib.Path(os.environ['RECEIPT_PATH']).write_text(json.dumps(receipt,indent=2)+'\n',encoding='utf8')
-          PY
+          ! grep -q 'OWNER_ROOT_STABLE_IDENTITY_MISSING' "$WORKFLOW_PATH"
+          grep -q 'OWNER_ROOT_STRUCTURAL_IDENTITY_MISSING' "$WORKFLOW_PATH"
+          grep -q "Buffer.byteLength(html,'utf8')>=512" "$WORKFLOW_PATH"
+          test "$(git diff --name-only | sort)" = "$WORKFLOW_PATH"
           git config user.name gravicentra-release-bot
           git config user.email gravicentra-release-bot@users.noreply.github.com
-          git add "$PREPARED_PATH" "$RECEIPT_PATH"
-          test "$(git diff --cached --name-only | sort | wc -l)" = '2'
-          git commit -m 'prep(i6.5 B4-003): preserve LAB build-route 404 rootfix workflow bytes'
+          git add "$WORKFLOW_PATH"
+          test "$(git diff --cached --name-only)" = "$WORKFLOW_PATH"
+          git commit -m 'build(i6.5 B4-003): trigger cumulative safe-read isolated Preview only'
           REMOTE=$(git ls-remote origin "refs/heads/$GITHUB_REF_NAME" | awk '{print $1}')
           test "$REMOTE" = "$PARENT"
           git push origin "HEAD:$GITHUB_REF_NAME"
-          printf '%s\n' "LAB build-route 404 rootfix workflow blob: $AFTER" 'YAML and all embedded Node blocks: PASS' 'No product, LIVE, data, Rules, Auth/IAM or external messages.' >> "$GITHUB_STEP_SUMMARY"
-      - name: Preserve patcher diagnostic
+          printf '%s\n' "Transport rootfix blob: $AFTER" 'YAML and embedded Node blocks: PASS' 'Same institutional-goals source will be rebuilt; no product, LIVE, data, Rules or Auth/IAM changes.' >> "$GITHUB_STEP_SUMMARY"
+      - name: Preserve rootfix diagnostic
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: gravicentra-b4-003-lab-build-route404-rootfix-${{ github.run_id }}
+          name: gravicentra-b4-003-owner-root-structural-rootfix-${{ github.run_id }}
           path: ${{ runner.temp }}/rootfix.json
           if-no-files-found: warn
           retention-days: 7
