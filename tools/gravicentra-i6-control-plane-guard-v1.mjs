@@ -4196,6 +4196,8 @@ if(canonicalCompositionActive){
  const actualProduct=changed.filter(p=>!allowedPrefixes.some(prefix=>p.startsWith(prefix))).sort();
  const declared=[...(COMP.productFiles||[]),...(Q683_CALENDAR_RECEIPT?['orbit360-platform/core/ui.js']:[])].sort();
  const safeReadProductPaths=['orbit360-platform/modules/insights.js','orbit360-platform/modules/plantillas.js'];
+ const CLOSEOUT_CURRENT=C.b4003CloseoutSourceSuccessor20261029||{};
+ const CLOSEOUT_AFTER=new Map(Object.entries(CLOSEOUT_CURRENT.sourceFiles||{}).map(([p,v])=>[p,String(v&&v.afterBlob||'')]));
  const boundedComposition=[...declared,...safeReadProductPaths,'orbit360-platform/core/legal.js'].sort();
  need(actualProduct.length===boundedComposition.length&&actualProduct.every((p,i)=>p===boundedComposition[i]),'I6_CANONICAL_COMPOSITION_EXACT_SET_DRIFT');
  // Keep the immutable 114-file composition intact. The five changed bytes
@@ -4283,7 +4285,7 @@ if(canonicalCompositionActive){
    newFiles[p]?.after===physicalGit('rev-parse',fixedSource+':'+p)&&
    newFiles[p]?.after!==newFiles[p]?.before),
   'I6_CANONICAL_SUCCESSOR_NOT_EXACT_OR_UNAUTHORIZED');
- need(declared.every(p=>physicalGit('hash-object',p)===(CUMULATIVE_AFTER.get(p)||(p===markerProduct?insurerMarkerReceipt.source.afterBlob:(newFiles[p]?.after||COMP.productFileBlobs?.[p]||
+ need(declared.every(p=>physicalGit('hash-object',p)===(CLOSEOUT_AFTER.get(p)||CUMULATIVE_AFTER.get(p)||(p===markerProduct?insurerMarkerReceipt.source.afterBlob:(newFiles[p]?.after||COMP.productFileBlobs?.[p]||
   (p==='orbit360-platform/core/ui.js'?Q683_CALENDAR_RECEIPT?.sourceBlobsAfter?.[p]:null))))),
   'I6_CANONICAL_COMPOSITION_BLOB_DRIFT');
  // The two extra modules were historically developed but absent from the
