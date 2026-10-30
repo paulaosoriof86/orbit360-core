@@ -1,0 +1,60 @@
+{
+  "schema": "GRAVICENTRA_I65_B4003_INSTITUTIONAL_GOALS_EXACT_PREVIEW_PASS_V1",
+  "gate": "I6.5/B4-003",
+  "status": "EXACT_PREVIEW_BUILD_BYTE_READBACK_PASS_AUTHENTICATED_UAT_PENDING",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "sourceSha": "eb9ce731832d236fedc545185ec7c66bd10849bb",
+  "transportHead": "bf9106ac28787b06da0465eb7f99fe3f131a4f4b",
+  "runId": 41066435386,
+  "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-sr-41066435386-r09pl1ti.web.app/",
+  "buildId": "gi-i65-b4-eb9ce731832d-57f234755dc1",
+  "hostedFileCount": 218,
+  "buildBoundAssetCount": 138,
+  "reachableProductFiles": 214,
+  "hostedPayloadDigest": "93d05a09035a044d400fe0f0e04759bd8c15e111bae93608dff0babdfa883a0a",
+  "bundleDigest": "9e63077a08b3ef86aa85f5ccd83c866326f708734c33f97e9d4e778e4d2b05ee",
+  "backendSourceDigest": "3ac3bf7bc777460d7d181bc3241efcc02e420ccfd54ba22b0e91762456c4dd4e",
+  "artifact": {
+    "id": 12982792336,
+    "zipSha256": "62edb540b49d199c2f100335e9677a3f544627a538a35964150e54145302ba52",
+    "retainedUntil": "2026-11-06"
+  },
+  "liveIdentityReadback": {
+    "artifactId": 12983501089,
+    "artifactDigest": "sha256:570beb0c5779c6ea7e38d407a7a406f37c9d7e0b51c34af164273fda64a42759",
+    "labLiveRootExact": true,
+    "ownerRuntimeExact": true,
+    "ownerRootStructuralExact": true
+  },
+  "exactProductBlobs": {
+    "orbit360-platform/modules/equipo.js": "5ce317a0641709e1a405e61435578de934fa194d"
+  },
+  "proof": {
+    "guardBeforeBuildPass": true,
+    "institutionalRegressionChecks": 15,
+    "closeoutRegressionCases": 8,
+    "lifecycleRegressionCases": 18,
+    "exactServedBytes": true,
+    "liveRootsUnchanged": true,
+    "ownerCustomDomainRuntimeUnchanged": true,
+    "ownerCustomDomainStructuralIdentityUnchanged": true
+  },
+  "boundaries": {
+    "previewOnly": true,
+    "livePromotion": false,
+    "functionsDeploy": false,
+    "rulesAuthIamMutation": false,
+    "operationalWrites": false,
+    "dataImport": false,
+    "externalMessages": false,
+    "securityB4003StillHold": true,
+    "acceptanceGranted": false
+  },
+  "pending": [
+    "AUTHENTICATED_CHROME_UAT_EQUIPO_METAS",
+    "CONTROLLED_SYNTHETIC_WRITE_SERVER_READBACK_RELOAD_AUDIT_RESTORE",
+    "INDEPENDENT_CARLOS_UID_UAT",
+    "PARALLEL_REMAINING_P0_DISPOSITION"
+  ]
+}
