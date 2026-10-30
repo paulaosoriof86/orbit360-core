@@ -1,0 +1,966 @@
+{
+  "schema": "GRAVICENTRA_I65_B4003_METAS_CO_AND_INICIO_CONTEXTUAL_RUNTIME_UAT_V1",
+  "recordType": "ADDITIVE_METAS_CO_CORE_AND_INICIO_CONTEXTUAL_AUTHENTICATED_UAT_EVIDENCE",
+  "status": "AUTHENTICATED_METAS_GT_CO_ADMIN_CORE_AND_INICIO_CONTEXTUAL_FUNCTIONAL_PASS_IDENTITY_AND_HUMAN_ACCEPTANCE_PENDING",
+  "recordedAtUtc": "2026-10-30T22:30:23.328863+00:00",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "gate": "I6.5/B4-003",
+  "authority": "PAULA_20261030_CONTINUE_AUTHENTICATED_SESSION_AND_EXISTING_B4_003_ACCEPTANCE_WORK",
+  "scope": "New authenticated CO/SuperAdmin synthetic Metas core flow, two same-identity CO UI role boundaries and nine focal Inicio role/country contextual cases on the unchanged exact Preview. Prior GT Metas evidence is preserved, not rerun. No complete capability, finding, gate or production acceptance is granted.",
+  "identity": {
+    "receiptCommitParent": "c8e80691f954f829d03dee01800ca86c8f029b02",
+    "uiSourceCommit": "a6e403119d9fc05b633e84f2eaa8f50c32ba12d9",
+    "uiSourceTree": "820d25547d6c3467c4816b4d8c5c2ab0f36953cc",
+    "uiSourceParent": "4d919e1683ab5f0f0b7166f2d67b84dd211b7805",
+    "backendSourceCommit": "8bb4fce20bb2af1aa4022573069ff8287679b715",
+    "backendTree": "9f72e9f8814c851ee30808a011b4e57a7f97a382",
+    "transportCommit": "c76b94ed5fa6f5f6752e469275c0583471c0c3dd",
+    "transportTree": "e2e4e2d19d1f4a1d2b3a6b35b8f732cdc1fe0e77",
+    "buildId": "gi-i65-b4-a6e403119d9f-57f234755dc1",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-sr-41066435386-r09pl1ti.web.app",
+    "previewChannelId": "gi-i65-b4-sr-41066435386",
+    "previewChannelReused": true,
+    "sourceBlobs": {
+      "functions/product-operational-domain.js": "f9fa8132c63b7099a4a72ff1df389f5fb5813d18",
+      "orbit360-platform/modules/equipo.js": "43554f646e0e311658fc8e6730c4e45c2920e77d",
+      "orbit360-platform/data/store-firestore-product-operational-p0.js": "b4ccd50b38ae095f2e9aa894c6992a9e36261545",
+      "orbit360-platform/modules/inicio.js": "12a5a1e3293a7d59f993f829071d3bd2b4027a6c"
+    },
+    "previewRunId": 41123553239
+  },
+  "technicalEvidence": {
+    "status": "INHERITED_EXACT_PREVIEW_TECHNICAL_EVIDENCE_UNCHANGED",
+    "sourceReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_METAS_UI_DIAGNOSTIC_RUNTIME_UAT_GT_20261030.json",
+    "sourceReceiptCommit": "c8e80691f954f829d03dee01800ca86c8f029b02",
+    "sourceReceiptBlobSha": "2bdee68026a99da098741852b32414340dd78f96",
+    "previewRunId": 41123553239,
+    "previewRunConclusion": "success",
+    "sameObservedBuildId": "gi-i65-b4-a6e403119d9f-57f234755dc1",
+    "exactBackendSourceReadbackPreviouslyAccepted": true,
+    "sourceGuardRunId": 41123168901,
+    "transportGuardRunId": 41123553061,
+    "newTechnicalArtifactDownloadOrHashCheckClaimed": false,
+    "newBuildOrDeploymentExecutedByThisReceipt": false,
+    "scope": "Technical deployment, hashes and backend equality remain the evidence recorded in the preserved GT receipt; this receipt adds a browser UAT in CO, not a new deployment."
+  },
+  "evidenceProvenance": {
+    "primaryObserver": "COORDINATING_AGENT_IN_AUTHORIZED_CHROME_SESSION",
+    "draftPreparedFrom": "Exact structured observations supplied by the coordinating agent; the drafting agent did not independently operate Chrome.",
+    "evidenceForm": "PRIVATE_AUTHENTICATED_UI_OBSERVATIONS_SUMMARIZED_WITHOUT_PERSONAL_IDENTIFIERS_OR_REAL_VALUES",
+    "rawPrivateDomBaselinesExported": false,
+    "screenshotsExported": false,
+    "hiddenStateOrCredentialsRead": false,
+    "rawActorUidRunIdOrFixtureIdsInvented": false,
+    "limitations": "UI messages, recovered values and visible audit rows support this scoped workflow. No raw transaction trace, hidden session identifiers or whole-database comparison is asserted."
+  },
+  "authenticatedUat": {
+    "status": "PASS_CO_SUPERADMIN_CORE_FLOW",
+    "authenticatedMetasCoAdminCoreFlowPass": true,
+    "country": "CO",
+    "currency": "COP",
+    "effectiveRole": "SuperAdmin",
+    "visibleRoleLabel": "Dirección",
+    "calendarMonth": "2026-10",
+    "reservedQaPeriod": "QA-B4-003",
+    "expectedContractVersionFromExactSource": "gravicentra-metas-preview-session-v1",
+    "runId": null,
+    "fixtureIds": null,
+    "actorUid": null,
+    "unexposedIdentifiersNote": "Run ID, fixture IDs and authenticated UID were not exported or invented.",
+    "startedAtUtc": "2026-10-30T21:25:20.547Z",
+    "coreCompletedAtUtc": "2026-10-30T21:29:12.889Z",
+    "negativeRoleCheckCompletedAtUtc": "2026-10-30T21:29:25.690Z",
+    "coreSteps": [
+      {
+        "id": "01_identity_and_baseline",
+        "status": "PASS",
+        "action": "Confirm the same authenticated Preview identity, administrator role, CO context and real-goal baseline.",
+        "observedAtUtc": "2026-10-30T21:25:20.547Z",
+        "observed": {
+          "authenticatedIdentityConfirmed": true,
+          "sameAuthenticatedIdentityAsPriorGtUat": true,
+          "effectiveRole": "SuperAdmin",
+          "visibleRoleLabel": "Dirección",
+          "country": "CO",
+          "currency": "COP",
+          "calendarMonth": "2026-10",
+          "realGoalInputCount": 14,
+          "institutionalInputCount": 2,
+          "advisorInputCount": 12,
+          "advisorCount": 4,
+          "disabledRealGoalInputCount": 14,
+          "rawIdentityAndBusinessValuesRecorded": false
+        },
+        "evidenceKind": "COORDINATING_AGENT_AUTHENTICATED_BROWSER_TEXT_OBSERVATION"
+      },
+      {
+        "id": "02_server_inspect",
+        "status": "PASS",
+        "action": "Inspect the server-backed test state before starting the CO test.",
+        "observedAtUtc": "2026-10-30T21:25:20.547Z",
+        "observed": {
+          "uiSessionState": "none",
+          "serverBackedInspectionCompleted": true,
+          "startButtonEnabled": true,
+          "statusText": "Prueba disponible. Sus valores quedan separados de las metas e indicadores reales."
+        },
+        "evidenceKind": "COORDINATING_AGENT_AUTHENTICATED_BROWSER_TEXT_OBSERVATION"
+      },
+      {
+        "id": "03_probe_and_start",
+        "status": "PASS",
+        "action": "Start the CO test once and observe the server-contract probe confirmation.",
+        "observedAtUtc": null,
+        "observed": {
+          "probeConfirmedInUi": true,
+          "syntheticProductionAndCollectionInputsAvailable": true,
+          "observationTimePrecision": "APPROXIMATE_NO_EXACT_TIMESTAMP_ASSIGNED",
+          "scope": "Availability probe confirmation only; subsequent writes and reload establish scoped persistence."
+        },
+        "evidenceKind": "COORDINATING_AGENT_AUTHENTICATED_BROWSER_TEXT_OBSERVATION"
+      },
+      {
+        "id": "04_create_production_fixture",
+        "status": "PASS",
+        "action": "Create the synthetic CO production goal through the visible QA field.",
+        "observedAtUtc": "2026-10-30T21:25:59.212Z",
+        "observed": {
+          "syntheticValueEntered": 1300000,
+          "syntheticValueConfirmed": 1300000,
+          "currency": "COP",
+          "serverConfirmationDisplayed": true,
+          "visibleAuditTimestampUtc": "2026-10-30T21:25:49Z"
+        },
+        "evidenceKind": "COORDINATING_AGENT_AUTHENTICATED_BROWSER_TEXT_OBSERVATION"
+      },
+      {
+        "id": "05_edit_production_fixture",
+        "status": "PASS",
+        "action": "Edit the same synthetic CO production goal.",
+        "observedAtUtc": "2026-10-30T21:26:16.663Z",
+        "observed": {
+          "previousSyntheticValue": 1300000,
+          "syntheticValueEntered": 1350000,
+          "syntheticValueConfirmed": 1350000,
+          "currency": "COP",
+          "serverConfirmationDisplayed": true,
+          "visibleAuditTimestampUtc": "2026-10-30T21:26:15Z"
+        },
+        "evidenceKind": "COORDINATING_AGENT_AUTHENTICATED_BROWSER_TEXT_OBSERVATION"
+      },
+      {
+        "id": "06_create_collection_fixture",
+        "status": "PASS",
+        "action": "Create the synthetic CO collection goal.",
+        "observedAtUtc": "2026-10-30T21:26:20.588Z",
+        "observed": {
+          "syntheticValueEntered": 750000,
+          "syntheticValueConfirmed": 750000,
+          "currency": "COP",
+          "serverConfirmationDisplayed": true,
+          "visibleAuditTimestampUtc": "2026-10-30T21:26:18Z"
+        },
+        "evidenceKind": "COORDINATING_AGENT_AUTHENTICATED_BROWSER_TEXT_OBSERVATION"
+      },
+      {
+        "id": "07_reload_recovery",
+        "status": "PASS",
+        "action": "Reload normally, reselect CO in the global header and local Metas controls, then recover the synthetic test.",
+        "observedAtUtc": "2026-10-30T21:27:08Z",
+        "observed": {
+          "reloadStartedAtUtc": "2026-10-30T21:26:34Z",
+          "globalHeaderAndLocalMetasSelectorsReselected": true,
+          "countryRestoredThroughUi": true,
+          "statusTextPrefix": "Prueba recuperada",
+          "productionRecovered": 1350000,
+          "collectionRecovered": 750000,
+          "valuesExactlyMatchConfirmedWrites": true,
+          "restoreButtonEnabled": true,
+          "runIdExposed": false,
+          "countrySelectionPersistenceClaimed": false
+        },
+        "evidenceKind": "COORDINATING_AGENT_AUTHENTICATED_BROWSER_TEXT_OBSERVATION"
+      },
+      {
+        "id": "08_audit_writes",
+        "status": "PASS",
+        "action": "Read the three CO write audit rows in the visible history.",
+        "observedAtUtc": "2026-10-30T21:27:44.390Z",
+        "observed": {
+          "matchingWriteRows": 3,
+          "visibleWriteTimestampsUtc": [
+            "2026-10-30T21:25:49Z",
+            "2026-10-30T21:26:15Z",
+            "2026-10-30T21:26:18Z"
+          ],
+          "action": "editar_meta_institucional",
+          "actorConsistentAcrossRows": true,
+          "actorMatchesPriorGtUiActor": true,
+          "rawActorIdentifierRecorded": false,
+          "scope": "Visible audit rows attributed by operation, actor consistency and execution window; no hidden runId or database-wide completeness claim."
+        },
+        "evidenceKind": "COORDINATING_AGENT_AUTHENTICATED_BROWSER_TEXT_OBSERVATION"
+      },
+      {
+        "id": "09_restore",
+        "status": "PASS",
+        "action": "Restore the recovered CO synthetic test after confirmed writes.",
+        "observedAtUtc": "2026-10-30T21:28:14.791Z",
+        "observed": {
+          "serverConfirmationDisplayed": true,
+          "syntheticFixtureControlsRemoved": true,
+          "visibleRestoreAuditTimestampUtc": "2026-10-30T21:28:12Z",
+          "scope": "UI confirmation time and visible audit timestamp are recorded separately."
+        },
+        "evidenceKind": "COORDINATING_AGENT_AUTHENTICATED_BROWSER_TEXT_OBSERVATION"
+      },
+      {
+        "id": "10_reload_after_restore",
+        "status": "PASS",
+        "action": "Reload after restoration, reselect the local CO context and inspect again.",
+        "observedAtUtc": "2026-10-30T21:28:47.424Z",
+        "observed": {
+          "reloadStartedAtUtc": "2026-10-30T21:28:36Z",
+          "statusTextPrefix": "Prueba disponible",
+          "qaInputCount": 0,
+          "startButtonEnabled": true,
+          "restoredSessionRecovered": false,
+          "localMetasCountry": "CO",
+          "scope": "Server-backed state exposed by the authenticated UI; no independent full database scan."
+        },
+        "evidenceKind": "COORDINATING_AGENT_AUTHENTICATED_BROWSER_TEXT_OBSERVATION"
+      },
+      {
+        "id": "11_audit_restore_survives",
+        "status": "PASS",
+        "action": "Read the CO restoration audit and the three preserved writes after reload.",
+        "observedAtUtc": "2026-10-30T21:29:12.889Z",
+        "observed": {
+          "matchingAuditRows": 4,
+          "preservedWriteRows": 3,
+          "restoreRows": 1,
+          "restoreAction": "restaurar_prueba_metas",
+          "visibleRestoreAuditTimestampUtc": "2026-10-30T21:28:12Z",
+          "actorConsistentAcrossRows": true,
+          "actorMatchesPriorGtUiActor": true,
+          "rawActorIdentifierRecorded": false,
+          "priorWriteRowsStillVisible": true
+        },
+        "evidenceKind": "COORDINATING_AGENT_AUTHENTICATED_BROWSER_TEXT_OBSERVATION"
+      },
+      {
+        "id": "12_real_data_unchanged",
+        "status": "PASS",
+        "action": "Compare observed CO real-goal inputs and visible totals with the initial CO/2026-10 baseline.",
+        "observedAtUtc": "2026-10-30T21:28:47.424Z",
+        "observed": {
+          "firstPostRestoreComparisonAtUtc": "2026-10-30T21:28:25.477Z",
+          "realGoalInputCount": 14,
+          "matchingAttributeCount": 14,
+          "matchingValueCount": 14,
+          "disabledInputCount": 14,
+          "institutionalInputCount": 2,
+          "advisorInputCount": 12,
+          "advisorCount": 4,
+          "visibleTotalCountCompared": 3,
+          "visibleTotalsUnchanged": true,
+          "rawBusinessValuesRecorded": false,
+          "scope": "The 14 observed inputs and three visible totals only; not global database equality or complete proof of zero business writes."
+        },
+        "evidenceKind": "COORDINATING_AGENT_AUTHENTICATED_BROWSER_TEXT_OBSERVATION"
+      }
+    ],
+    "coreStepsTotal": 12,
+    "coreStepsPassed": 12,
+    "coreStepsFailed": 0,
+    "confirmedSyntheticGoalWriteOperationsViaUi": 3,
+    "syntheticValues": {
+      "productionCreated": 1300000,
+      "productionEdited": 1350000,
+      "collectionCreated": 750000
+    },
+    "matchingVisibleWriteAuditRows": 3,
+    "matchingVisibleRestoreAuditRows": 1,
+    "restorationAfterActualWritesConfirmedInUi": true,
+    "restoredSessionAbsentAfterReloadInUi": true,
+    "restorationAccepted": true,
+    "negativeCases": [
+      {
+        "id": "SAME_IDENTITY_OPERATIVO_CO_UI_BOUNDARY",
+        "status": "PASS_SAME_IDENTITY_UI_ONLY",
+        "observedAtUtc": "2026-10-30T21:29:13.406Z",
+        "action": "Select Operativo through the visible role control for the same authenticated identity and inspect Equipo in CO.",
+        "country": "CO",
+        "route": "#/equipo",
+        "visibleRoleLabel": "Operativo",
+        "visibleHeading": "No tienes acceso con el rol activo",
+        "sameAuthenticatedIdentity": true,
+        "backendWriteAttempted": false,
+        "backendDenialProven": false,
+        "authOrPermissionConfigurationChanged": false,
+        "independentSecondActorEvidence": false,
+        "scope": "Visible same-identity UI boundary; not a substitute for independent actor or authenticated backend-denial evidence."
+      },
+      {
+        "id": "SAME_IDENTITY_ASESOR_CO_UI_BOUNDARY",
+        "status": "PASS_SAME_IDENTITY_UI_ONLY",
+        "observedAtUtc": "2026-10-30T21:29:23.716Z",
+        "action": "Select Asesor through the visible role control for the same authenticated identity and inspect Equipo in CO.",
+        "country": "CO",
+        "route": "#/equipo",
+        "visibleRoleLabel": "Asesor",
+        "visibleHeading": "No tienes acceso con el rol activo",
+        "sameAuthenticatedIdentity": true,
+        "backendWriteAttempted": false,
+        "backendDenialProven": false,
+        "authOrPermissionConfigurationChanged": false,
+        "independentSecondActorEvidence": false,
+        "scope": "Visible same-identity UI boundary; not a substitute for independent actor or authenticated backend-denial evidence."
+      }
+    ],
+    "negativeChecksTotal": 2,
+    "negativeChecksPassed": 2,
+    "negativeChecksIncludedInCoreDenominator": false,
+    "finalRoleRestoration": {
+      "observedAtUtc": "2026-10-30T21:29:25.690Z",
+      "visibleRoleLabel": "Dirección",
+      "sameAuthenticatedIdentity": true
+    },
+    "independentCarlosUidExecuted": false,
+    "independentSamuelUidExecuted": false,
+    "scopeLimitations": [
+      "CO administrator core only; not all CO roles/modules.",
+      "Changing role for the same identity does not prove independent UID or backend denial.",
+      "Country selectors were explicitly reselected after reload; persistence of the selected country is not asserted.",
+      "Real-data equality applies only to observed inputs and totals.",
+      "Prior GT UAT was not rerun."
+    ]
+  },
+  "realDataComparison": {
+    "country": "CO",
+    "calendarMonth": "2026-10",
+    "realInputCount": 14,
+    "institutionalInputCount": 2,
+    "advisorInputCount": 12,
+    "advisorCount": 4,
+    "matchingValueCount": 14,
+    "matchingAttributeCount": 14,
+    "disabledInputCount": 14,
+    "visibleTotalCountCompared": 3,
+    "visibleTotalsUnchanged": true,
+    "postRestoreChecksAtUtc": [
+      "2026-10-30T21:28:25.477Z",
+      "2026-10-30T21:28:47.424Z"
+    ],
+    "rawBusinessValuesRecorded": false,
+    "businessWritesObservedInThisUiSequence": 0,
+    "globalBusinessWriteAbsenceProven": false,
+    "globalDatabaseEqualityProven": false,
+    "scope": "Equality of the fourteen observed UI inputs and three visible totals in the same CO/2026-10 context."
+  },
+  "countrySelectionSemantics": {
+    "globalHeaderSelectorAndLocalMetasSelectorIndependent": true,
+    "sourcePath": "orbit360-platform/modules/equipo.js",
+    "sourceBlobSha": "43554f646e0e311658fc8e6730c4e45c2920e77d",
+    "sourceInspectionProvenance": "COORDINATING_AGENT_SOURCE_REVIEW",
+    "localMetasCountryExplicitlySelectedForRecovery": true,
+    "fixtureCountryPersistenceAccepted": true,
+    "uiCountrySelectionPersistenceAccepted": false,
+    "interpretation": "The test proves recovery of the CO fixtures after explicit selection of the local CO context; independent header/local selectors are documented as existing behavior, not silently counted as automatic selection persistence."
+  },
+  "priorGtAcceptancePreserved": {
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_METAS_UI_DIAGNOSTIC_RUNTIME_UAT_GT_20261030.json",
+    "receiptCommit": "c8e80691f954f829d03dee01800ca86c8f029b02",
+    "receiptBlobSha": "2bdee68026a99da098741852b32414340dd78f96",
+    "coreStepsPassed": 12,
+    "coreStepsTotal": 12,
+    "country": "GT",
+    "role": "SuperAdmin",
+    "rerunInThisIntervention": false,
+    "historicalReceiptUnchanged": true,
+    "syntheticRestoreAccepted": true
+  },
+  "sourceRegressionEvidencePreserved": {
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_METAS_ATOMIC_PREVIEW_SOURCE_SUCCESSOR_20261030.json",
+    "newSyntheticChecksPassed": 78,
+    "existingRegressionChecksPassed": 42,
+    "totalSyntheticChecksPassed": 120,
+    "regressionsRerunByThisReceipt": false,
+    "sourceNegativeAuthorizationCasesRetained": true,
+    "authenticatedBackendNegativeUatInferred": false,
+    "interpretation": "Preserved source/synthetic PASS remains valid evidence within its original scope; lack of new authenticated backend-negative UAT does not revoke it."
+  },
+  "causalReconciliation": {
+    "previousFailedAttemptReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_METAS_ATOMIC_PREVIEW_RUNTIME_EVIDENCE_20261030.json",
+    "previousFailedAttemptReceiptBlob": "89f0408be711d63fc0d09426a7e0408120491225",
+    "previousFailureStatus": "UNKNOWN_NOT_REPRODUCED_IN_FRESH_AUTHENTICATED_SESSION",
+    "initialExactRootCause": "UNKNOWN",
+    "diagnosticSourceChangeOnly": true,
+    "writeRestoreOrAuthorizationSemanticsChangedByDiagnosticSuccessor": false,
+    "causalFixProven": false,
+    "freshSessionCoreFlowPass": true,
+    "interpretation": "The original failed save remains historical evidence. The diagnostic-only successor and fresh browser session completed the core flow; this does not establish which condition caused the earlier failure or prove a causal product repair.",
+    "chatConversationInterruptionCauseProvenByThisReceipt": false,
+    "newBlockingAcceptanceCriterionCreated": false,
+    "scopeNote": "The unknown initial save is retained as an evidence limitation; establishing its cause is not introduced as a new mandatory acceptance task by this receipt."
+  },
+  "progress": {
+    "metasGtAdminCoreFlow": {
+      "completed": 12,
+      "total": 12,
+      "percent": 100,
+      "evidence": "PRESERVED_PREVIOUS_RECEIPT",
+      "rerun": false
+    },
+    "metasCoAdminCoreFlow": {
+      "completed": 12,
+      "total": 12,
+      "percent": 100,
+      "evidence": "NEW_AUTHENTICATED_CO_UI_OBSERVATIONS"
+    },
+    "combinedAdminCountryCoreFlows": {
+      "completed": 24,
+      "total": 24,
+      "percent": 100,
+      "countriesCompleted": [
+        "GT",
+        "CO"
+      ],
+      "countryCountCompleted": 2,
+      "countryCountTotal": 2,
+      "countryCoveragePercent": 100,
+      "denominator": "The same twelve pre-existing Metas core-flow steps applied to GT and CO for the same authenticated administrator.",
+      "newCasesThisIntervention": 12,
+      "preservedCases": 12,
+      "includesIndependentIdentity": false,
+      "includesCompleteBackendNegativeUat": false,
+      "equivalentToFullMetasCapabilityAcceptance": false,
+      "equivalentToB4003Closure": false
+    },
+    "newAdditionalNegativeUiChecks": {
+      "completed": 2,
+      "total": 2,
+      "scopes": [
+        "SAME_IDENTITY_OPERATIVO_CO_UI_BOUNDARY",
+        "SAME_IDENTITY_ASESOR_CO_UI_BOUNDARY"
+      ],
+      "includedInCoreDenominator": false,
+      "authenticatedBackendNegativeAcceptance": false
+    },
+    "formalI6ProgressPercent": 50,
+    "formalI6CompletedMiniGates": 5,
+    "formalI6TotalMiniGates": 10,
+    "formalI6ProgressChanged": false,
+    "overallImplementationPercent": null,
+    "currentCapabilityAcceptances": 0,
+    "priorCumulativeBatch80PercentReused": false,
+    "interpretation": "Metas: twelve new CO core cases plus twelve preserved GT core cases, 24/24 and two administrator-country flows. Inicio: nine separate contextual functional cases. These denominators are not combined into a global product percentage; independent identity and targeted human acceptance remain explicit.",
+    "inicioContextualFunctionalMatrix": {
+      "completed": 9,
+      "total": 9,
+      "percent": 100,
+      "denominator": "Three existing Paula role views multiplied by GT, CO and TODOS on Inicio, after final 5/5 source readiness.",
+      "excludedTransientLoadingObservations": 1,
+      "independentIdentityCovered": false,
+      "paulaVisualAcceptanceGranted": false,
+      "equivalentToFullFindingClosure": false,
+      "combinedWithMetasOrGlobalProjectPercent": false
+    }
+  },
+  "remainingExistingAcceptanceWork": {
+    "sourceOfExistingCriteria": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_REAL_PROGRESS_RECONCILIATION_20261030.json",
+    "immediateMetasAndCrossRole": [
+      "Independent Carlos UID and effective authorized role/country evidence on the exact candidate.",
+      "Remaining cross-identity and authenticated backend-negative criteria in the existing frozen transversal matrix."
+    ],
+    "existingPriorityCriteriaUnchanged": [
+      {
+        "findingId": "B4-003-P0-20261012-PERSONAL-COLLECTION",
+        "remaining": "Authenticated real-advisor collection, currency and reload proof."
+      },
+      {
+        "findingId": "B4-003-P0-20261012-FREELANCERS-GOAL-SCOPE",
+        "remaining": "Canonical editable internal/freelance participation contract and scope acceptance."
+      },
+      {
+        "findingId": "B4-003-P0-20261012-INICIO-MOTIVATIONAL-TEXTS",
+        "remaining": "Functional role/country contextual UAT is now PASS for nine same-identity cases. Targeted Paula visual acceptance and existing finding-closure reconciliation remain.",
+        "operationalStatus": "FUNCTIONAL_CONTEXTUAL_UAT_PASS_PAULA_TARGETED_VISUAL_ACCEPTANCE_PENDING"
+      },
+      {
+        "findingId": "B4-003-P0-20261012-QA-CANCELLED-RUN-FIXTURES",
+        "remaining": "Exact provenance and dependency adjudication; authorized reversible disposition or retained HOLD."
+      },
+      {
+        "findingId": "B4-003-P0-20261012-QA-ORPHAN-RENEWALS",
+        "remaining": "Exact origin and dependency disposition preserving real obligations and history."
+      }
+    ],
+    "priorityFindingClosuresGranted": 0,
+    "noSixPriorityClosureClaim": true,
+    "independentActorAvailabilityObserved": {
+      "exposedChromeProfiles": 1,
+      "activeIdentityRole": "SuperAdmin",
+      "independentCarlosSessionObserved": false,
+      "independentSamuelSessionObserved": false,
+      "status": "NOT_TESTED_INDEPENDENT_IDENTITY",
+      "scope": "Only the profile exposed to the current browser connection; not a claim that other accounts or sessions cannot exist elsewhere."
+    }
+  },
+  "rulesRiskPrecedence": {
+    "sourceControlPlaneKey": "b4003OwnerTemporaryRulesRiskException20261028",
+    "status": "OWNER_RISK_ACCEPTED_NON_BLOCKING_FOR_CONTROLLED_LIVE",
+    "securityFindingStatus": "OPEN_NOT_PASS",
+    "historicalSecurityHoldPreserved": true,
+    "sameExistingRulesAloneBlockControlledLive": false,
+    "rulesAuthIamMutationAuthorizedByThisReceipt": false,
+    "releaseAuthorizationByThisExceptionAlone": false,
+    "independentUidAndBackendParityStillRequired": true
+  },
+  "preservationAndBoundaries": {
+    "historicalReceiptsUnchanged": true,
+    "existingControlPlaneValuesUnchanged": true,
+    "sourceUnchangedByThisReceipt": true,
+    "workflowUnchangedByThisReceipt": true,
+    "canonicalFreezeUnchanged": true,
+    "findingsLedgerUnchanged": true,
+    "newAuthority": false,
+    "newGate": false,
+    "newBranch": false,
+    "liveDeployment": false,
+    "productionPromotionAuthorized": false,
+    "authIamRulesChanged": false,
+    "realBusinessWritesAuthorized": false,
+    "unrelatedFixtureCleanupExecuted": false,
+    "auditDeletionExecuted": false,
+    "rawPersonalIdentifiersIncluded": false,
+    "rawRealGoalValuesIncluded": false,
+    "gtCoreUatRepeated": false
+  },
+  "acceptance": {
+    "authenticatedMetasGtAdminCoreFlowAccepted": true,
+    "authenticatedMetasCoAdminCoreFlowAccepted": true,
+    "gtAndCoAdminCoreFlowsAccepted": true,
+    "coCountryMetasAdminCoreFlowAccepted": true,
+    "exactBackendSourceReadbackAcceptancePreserved": true,
+    "syntheticRestoreAccepted": true,
+    "sameIdentityOperativoCoUiBoundaryAccepted": true,
+    "sameIdentityAdvisorCoUiBoundaryAccepted": true,
+    "independentCarlosUidAccepted": false,
+    "independentSamuelUidAccepted": false,
+    "independentCrossRoleUatAccepted": false,
+    "completeCoCountryCrossRoleUatAccepted": false,
+    "backendNegativeAuthenticatedUatAccepted": false,
+    "capabilityAccepted": false,
+    "b4003ClosureAccepted": false,
+    "productionAccepted": false,
+    "inicioContextualFunctionalUatAccepted": true,
+    "inicioRoleCountryCasesAccepted": 9,
+    "inicioPaulaTargetedVisualAcceptanceGranted": false,
+    "inicioFullFindingClosed": false,
+    "fullResponsiveAcceptanceGranted": false
+  },
+  "inicioContextualUat": {
+    "status": "FUNCTIONAL_CONTEXTUAL_UAT_PASS_PAULA_TARGETED_VISUAL_ACCEPTANCE_PENDING",
+    "findingId": "B4-003-P0-20261012-INICIO-MOTIVATIONAL-TEXTS",
+    "route": "#/inicio",
+    "sourcePath": "orbit360-platform/modules/inicio.js",
+    "sourceBlobSha": "12a5a1e3293a7d59f993f829071d3bd2b4027a6c",
+    "sourceUnchangedByThisIntervention": true,
+    "sourceCorrectionReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CLOSEOUT_SOURCE_SUCCESSOR_20261029.json",
+    "historicalRegression": {
+      "path": "tools/gravicentra-b4-003-closeout-source-successor.test.cjs",
+      "blobSha": "8caa893faf8df55a362d751feb3d3c9637c372c9",
+      "sharedSuiteCasesPassed": 8,
+      "sharedSuiteAlsoCoversPlantillas": true,
+      "preserved": true,
+      "rerunByThisReceipt": false,
+      "authenticatedUatInferredFromSourceTests": false
+    },
+    "actorScope": "SAME_AUTHENTICATED_ADMINISTRATOR_USING_THREE_EXISTING_ROLE_VIEWS",
+    "calendarMonth": "2026-10",
+    "roles": [
+      "SuperAdmin",
+      "Operativo",
+      "Asesor"
+    ],
+    "visibleSuperAdminRoleLabel": "Dirección",
+    "countries": [
+      "GT",
+      "CO",
+      "TODOS"
+    ],
+    "cases": [
+      {
+        "country": "CO",
+        "daysLeft": "Faltan 1 días para cerrar el mes",
+        "headings": [
+          "Inicio · Revisa metas institucionales, cuando estén configuradas, y pendientes autorizados en Colombia.",
+          "Avance real del mes"
+        ],
+        "hydration": "5 de 5 fuentes confirmadas · País CO",
+        "message": "Los mejores resultados nacen de decisiones informadas y compromisos cumplidos.",
+        "observedAtUtc": "2026-10-30T21:31:58.660Z",
+        "primaryCountryUnresolvedCount": 2,
+        "role": "SuperAdmin",
+        "id": "INICIO_SUPERADMIN_CO",
+        "status": "PASS_CONTEXTUAL_FUNCTIONAL_UI",
+        "confirmedSourceCount": 5,
+        "totalSourceCount": 5,
+        "confirmationBasis": "VISIBLE_HYDRATION_TEXT_PREFIX_5_DE_5",
+        "evidenceKind": "COORDINATING_AGENT_AUTHENTICATED_RENDERED_DOM_OBSERVATION",
+        "sameAuthenticatedIdentity": true
+      },
+      {
+        "confirmedSources": "5",
+        "country": "CO",
+        "currencyCodesShown": [
+          "COP"
+        ],
+        "daysLeft": "Faltan 1 días para cerrar el mes",
+        "headings": [
+          "Inicio · Revisa metas institucionales, cuando estén configuradas, y pendientes autorizados en Colombia.",
+          "Avance real del mes"
+        ],
+        "hydration": "5 de 5 fuentes confirmadas · País CO",
+        "message": "Un equipo que comparte prioridades transforma los datos en protección real.",
+        "observedAtUtc": "2026-10-30T21:32:52.773Z",
+        "primaryCountryUnresolvedCount": 2,
+        "role": "Operativo",
+        "totalSources": "5",
+        "id": "INICIO_OPERATIVO_CO",
+        "status": "PASS_CONTEXTUAL_FUNCTIONAL_UI",
+        "confirmedSourceCount": 5,
+        "totalSourceCount": 5,
+        "confirmationBasis": "DOM_ATTRIBUTE_AND_VISIBLE_HYDRATION_TEXT",
+        "evidenceKind": "COORDINATING_AGENT_AUTHENTICATED_RENDERED_DOM_OBSERVATION",
+        "sameAuthenticatedIdentity": true
+      },
+      {
+        "confirmedSources": "5",
+        "country": "GT",
+        "currencyCodesShown": [
+          "GTQ"
+        ],
+        "daysLeft": "Faltan 1 días para cerrar el mes",
+        "headings": [
+          "Inicio · Consulta las metas individuales disponibles y tus seguimientos autorizados en Guatemala.",
+          "Avance real del mes"
+        ],
+        "hydration": "5 de 5 fuentes confirmadas · País GT",
+        "message": "Un equipo que comparte prioridades transforma los datos en protección real.",
+        "observedAtUtc": "2026-10-30T21:33:39.111Z",
+        "primaryCountryUnresolvedCount": 0,
+        "role": "Asesor",
+        "totalSources": "5",
+        "id": "INICIO_ASESOR_GT",
+        "status": "PASS_CONTEXTUAL_FUNCTIONAL_UI",
+        "confirmedSourceCount": 5,
+        "totalSourceCount": 5,
+        "confirmationBasis": "DOM_ATTRIBUTE_AND_VISIBLE_HYDRATION_TEXT",
+        "evidenceKind": "COORDINATING_AGENT_AUTHENTICATED_RENDERED_DOM_OBSERVATION",
+        "sameAuthenticatedIdentity": true
+      },
+      {
+        "confirmedSources": "5",
+        "country": "CO",
+        "currencyCodesShown": [
+          "COP"
+        ],
+        "daysLeft": "Faltan 1 días para cerrar el mes",
+        "headings": [
+          "Inicio · Consulta las metas individuales disponibles y tus seguimientos autorizados en Colombia.",
+          "Avance real del mes"
+        ],
+        "hydration": "5 de 5 fuentes confirmadas · País CO",
+        "message": "Renovar la confianza de un cliente es tan importante como renovar su cobertura.",
+        "observedAtUtc": "2026-10-30T21:34:38.490Z",
+        "primaryCountryUnresolvedCount": 2,
+        "role": "Asesor",
+        "totalSources": "5",
+        "id": "INICIO_ASESOR_CO",
+        "status": "PASS_CONTEXTUAL_FUNCTIONAL_UI",
+        "confirmedSourceCount": 5,
+        "totalSourceCount": 5,
+        "confirmationBasis": "DOM_ATTRIBUTE_AND_VISIBLE_HYDRATION_TEXT",
+        "evidenceKind": "COORDINATING_AGENT_AUTHENTICATED_RENDERED_DOM_OBSERVATION",
+        "sameAuthenticatedIdentity": true
+      },
+      {
+        "confirmedSources": "5",
+        "country": "TODOS",
+        "currencyCodesShown": [
+          "GTQ",
+          "COP"
+        ],
+        "daysLeft": "Faltan 1 días para cerrar el mes",
+        "headings": [
+          "Inicio · Consulta las metas individuales disponibles y tus seguimientos autorizados en Guatemala y Colombia.",
+          "Avance real del mes"
+        ],
+        "hydration": "5 de 5 fuentes confirmadas · GTQ y COP sin conversión",
+        "message": "Cada póliza representa una promesa de protección. Liderar es convertirla en confianza.",
+        "observedAtUtc": "2026-10-30T21:35:18.800Z",
+        "primaryCountryUnresolvedCount": 0,
+        "role": "Asesor",
+        "totalSources": "5",
+        "id": "INICIO_ASESOR_TODOS",
+        "status": "PASS_CONTEXTUAL_FUNCTIONAL_UI",
+        "confirmedSourceCount": 5,
+        "totalSourceCount": 5,
+        "confirmationBasis": "DOM_ATTRIBUTE_AND_VISIBLE_HYDRATION_TEXT",
+        "evidenceKind": "COORDINATING_AGENT_AUTHENTICATED_RENDERED_DOM_OBSERVATION",
+        "sameAuthenticatedIdentity": true
+      },
+      {
+        "confirmedSources": "5",
+        "country": "TODOS",
+        "currencyCodesShown": [
+          "GTQ",
+          "COP"
+        ],
+        "daysLeft": "Faltan 1 días para cerrar el mes",
+        "headings": [
+          "Inicio · Revisa metas institucionales, cuando estén configuradas, y pendientes autorizados en Guatemala y Colombia.",
+          "Avance real del mes"
+        ],
+        "hydration": "5 de 5 fuentes confirmadas · GTQ y COP sin conversión",
+        "message": "Los mejores resultados nacen de decisiones informadas y compromisos cumplidos.",
+        "observedAtUtc": "2026-10-30T21:36:26.116Z",
+        "primaryCountryUnresolvedCount": 0,
+        "role": "Operativo",
+        "totalSources": "5",
+        "id": "INICIO_OPERATIVO_TODOS",
+        "status": "PASS_CONTEXTUAL_FUNCTIONAL_UI",
+        "confirmedSourceCount": 5,
+        "totalSourceCount": 5,
+        "confirmationBasis": "DOM_ATTRIBUTE_AND_VISIBLE_HYDRATION_TEXT",
+        "evidenceKind": "COORDINATING_AGENT_AUTHENTICATED_RENDERED_DOM_OBSERVATION",
+        "sameAuthenticatedIdentity": true
+      },
+      {
+        "confirmedSources": "5",
+        "country": "GT",
+        "currencyCodesShown": [
+          "GTQ"
+        ],
+        "daysLeft": "Faltan 1 días para cerrar el mes",
+        "headings": [
+          "Inicio · Revisa metas institucionales, cuando estén configuradas, y pendientes autorizados en Guatemala.",
+          "Avance real del mes"
+        ],
+        "hydration": "5 de 5 fuentes confirmadas · País GT",
+        "message": "Un equipo que comparte prioridades transforma los datos en protección real.",
+        "observedAtUtc": "2026-10-30T21:37:02.838Z",
+        "primaryCountryUnresolvedCount": 0,
+        "role": "Operativo",
+        "totalSources": "5",
+        "id": "INICIO_OPERATIVO_GT",
+        "status": "PASS_CONTEXTUAL_FUNCTIONAL_UI",
+        "confirmedSourceCount": 5,
+        "totalSourceCount": 5,
+        "confirmationBasis": "DOM_ATTRIBUTE_AND_VISIBLE_HYDRATION_TEXT",
+        "evidenceKind": "COORDINATING_AGENT_AUTHENTICATED_RENDERED_DOM_OBSERVATION",
+        "sameAuthenticatedIdentity": true
+      },
+      {
+        "confirmedSources": "5",
+        "country": "GT",
+        "currencyCodesShown": [
+          "GTQ"
+        ],
+        "daysLeft": "Faltan 1 días para cerrar el mes",
+        "headings": [
+          "Inicio · Revisa metas institucionales, cuando estén configuradas, y pendientes autorizados en Guatemala.",
+          "Avance real del mes"
+        ],
+        "hydration": "5 de 5 fuentes confirmadas · País GT",
+        "message": "Los mejores resultados nacen de decisiones informadas y compromisos cumplidos.",
+        "observedAtUtc": "2026-10-30T21:38:14.908Z",
+        "primaryCountryUnresolvedCount": 0,
+        "role": "SuperAdmin",
+        "totalSources": "5",
+        "id": "INICIO_SUPERADMIN_GT",
+        "status": "PASS_CONTEXTUAL_FUNCTIONAL_UI",
+        "confirmedSourceCount": 5,
+        "totalSourceCount": 5,
+        "confirmationBasis": "DOM_ATTRIBUTE_AND_VISIBLE_HYDRATION_TEXT",
+        "evidenceKind": "COORDINATING_AGENT_AUTHENTICATED_RENDERED_DOM_OBSERVATION",
+        "sameAuthenticatedIdentity": true
+      },
+      {
+        "confirmedSources": "5",
+        "country": "TODOS",
+        "currencyCodesShown": [
+          "GTQ",
+          "COP"
+        ],
+        "daysLeft": "Faltan 1 días para cerrar el mes",
+        "headings": [
+          "Inicio · Revisa metas institucionales, cuando estén configuradas, y pendientes autorizados en Guatemala y Colombia.",
+          "Avance real del mes"
+        ],
+        "hydration": "5 de 5 fuentes confirmadas · GTQ y COP sin conversión",
+        "message": "Medir con rigor, actuar con criterio y acompañar con cercanía: así crecemos.",
+        "observedAtUtc": "2026-10-30T21:38:59.635Z",
+        "primaryCountryUnresolvedCount": 0,
+        "role": "SuperAdmin",
+        "totalSources": "5",
+        "id": "INICIO_SUPERADMIN_TODOS",
+        "status": "PASS_CONTEXTUAL_FUNCTIONAL_UI",
+        "confirmedSourceCount": 5,
+        "totalSourceCount": 5,
+        "confirmationBasis": "DOM_ATTRIBUTE_AND_VISIBLE_HYDRATION_TEXT",
+        "evidenceKind": "COORDINATING_AGENT_AUTHENTICATED_RENDERED_DOM_OBSERVATION",
+        "sameAuthenticatedIdentity": true
+      }
+    ],
+    "casesTotal": 9,
+    "casesPassed": 9,
+    "casesFailed": 0,
+    "transientObservations": [
+      {
+        "confirmedSources": "2",
+        "country": "CO",
+        "currencyCodesShown": [],
+        "daysLeft": "Faltan 1 días para cerrar el mes",
+        "headings": [
+          "Inicio · Verificando datos y permisos del alcance seleccionado para mostrar prioridades reales.",
+          "Avance real del mes"
+        ],
+        "hydration": "2 de 5 fuentes confirmadas · País CO",
+        "message": "Un equipo que comparte prioridades transforma los datos en protección real.",
+        "observedAtUtc": "2026-10-30T21:33:08.007Z",
+        "primaryCountryUnresolvedCount": 0,
+        "role": "Asesor",
+        "totalSources": "5",
+        "status": "TRANSIENT_LOADING_LATER_COMPLETED",
+        "includedInCompletedCaseDenominator": false,
+        "productFailureAdjudicated": false,
+        "completedCaseId": "INICIO_ASESOR_CO",
+        "completionObservedAtUtc": "2026-10-30T21:34:38.490Z"
+      }
+    ],
+    "quoteControlCheck": {
+      "observedAtUtc": "2026-10-30T21:39:35.042Z",
+      "clickedControl": "Otra reflexión",
+      "before": "Los mejores resultados nacen de decisiones informadas y compromisos cumplidos.",
+      "after": "Renovar la confianza de un cliente es tan importante como renovar su cobertura.",
+      "messageChanged": true,
+      "visibleFinancialMetricTextsUnchanged": true
+    },
+    "quoteControlCheckInterpretation": "The visible reflection changed after the existing button was clicked; the visible financial metric texts compared by the coordinating agent remained unchanged. This does not establish complete financial-data correctness.",
+    "visualReview": {
+      "performedBy": "COORDINATING_AGENT",
+      "method": "INTERNAL_BROWSER_SCREENSHOT",
+      "scope": "Asesor/TODOS desktop viewport; header, month, reflection and personal cards",
+      "finding": "Observed content visible with no overlap or clipping in this viewport. Other contexts verified with rendered DOM.",
+      "screenshotExported": false,
+      "fullResponsiveAcceptance": false,
+      "paulaVisualAcceptance": false
+    },
+    "contextualContentAssessment": {
+      "readyBannerVariesByEffectiveRoleAndCountry": true,
+      "transientReadinessMessageObserved": true,
+      "institutionalBannerConditionedOnGoalsBeingConfigured": true,
+      "advisorBannerRefersToAvailableIndividualGoals": true,
+      "calendarContextObserved": true,
+      "fabricatedQuantifiedAchievementsObserved": false,
+      "scope": "Observed contextual banner/reflection content. Financial balances, goal correctness and advisor attribution are separate acceptance criteria."
+    },
+    "existingSourceDataCaveat": {
+      "unresolvedPrimaryCountrySignalsObserved": true,
+      "observedOnlyInReadyCoCases": true,
+      "realRecordIdentifiersExported": false,
+      "sourceDataReclassificationOrRepairClaimed": false,
+      "interpretation": "The retained observations include unresolved-country indicators. This receipt tests truthful contextual text and does not certify the entire financial or country-source data model."
+    },
+    "evidenceProvenance": "Private authenticated Chrome DOM observations supplied by the coordinating agent; one internal screenshot sample for Asesor/TODOS desktop was inspected and not exported.",
+    "scopeLimitations": [
+      "All nine cases use one authenticated identity; no independent Carlos or Samuel session is proven.",
+      "The screenshot inspection covers only the Asesor/TODOS desktop sample; other cases were checked through rendered DOM.",
+      "No global responsive acceptance or complete design regression matrix is claimed.",
+      "The transitory Asesor/CO 2/5 loading observation is preserved outside the nine completed cases and is not counted as a product failure.",
+      "The generic grammatical wording of observed text is retained verbatim; this receipt does not assert exhaustive copyediting.",
+      "No write, financial reconciliation or personal-recaudo acceptance is implied by contextual text UAT."
+    ],
+    "acceptanceAdjudication": {
+      "functionalContextualCriterionSatisfied": true,
+      "sourceAndTechnicalEvidencePreserved": true,
+      "agentVisualSampleReviewed": true,
+      "priorUnaffectedDesignApprovalPreserved": true,
+      "paulaTargetedVisualAcceptance": false,
+      "fullResponsiveAcceptance": false,
+      "findingFullyClosed": false,
+      "newSourceChangeRequiredForObservedContextualBehavior": false,
+      "fullMatrixRerunRequiredByThisReceipt": false
+    },
+    "existingAcceptanceAuthorities": [
+      {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_P0_FINDINGS_DECISIONS_FREEZE_20261012.md",
+        "scope": "Contextual truthful copy and preservation of accepted premium design; human visual acceptance when applicable; exact evidence, ledger/carry and guard."
+      },
+      {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_VISUAL_ACCEPTANCE_GOVERNANCE_REPAIR_20261003.json",
+        "scope": "Machine evidence is preserved; targeted Paula visual acceptance remains distinct before advancement to B4-004."
+      },
+      {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_REAL_PROGRESS_RECONCILIATION_20261030.json",
+        "scope": "Contextual implementation already exists; targeted visual acceptance remains, without reimplementing the old fixed-copy cause."
+      }
+    ],
+    "remainingForThisFinding": [
+      "Targeted visual acceptance by Paula of the concrete contextual result, preserving the accepted unaffected design.",
+      "Reconcile the same finding ID in existing ledger/carry authorities and run the required guard when full closure is granted."
+    ]
+  },
+  "publicationRecovery": {
+    "status": "LOCAL_RECEIPT_RECOVERED_REMOTE_PUBLICATION_STILL_PENDING",
+    "recoveredAtUtc": "2026-10-30T22:30:23.328863+00:00",
+    "sourceEvidenceFiles": [
+      {
+        "name": "gi-metas-co-uat-20261030.json",
+        "bytes": 25363,
+        "sha256": "3a2f6c9f7244fb3682af9a8d4b0708351280c09c40843821aa175cabdca2f7ba"
+      },
+      {
+        "name": "gi-inicio-contextual-ui-observations-20261030.json",
+        "bytes": 7395,
+        "sha256": "eb567205d3b069533223772ae54383fddd3132cba8666bc2560e679c395cbf5e"
+      }
+    ],
+    "interruptedPublication": {
+      "operation": "GitHub create_tree",
+      "reportedWaitSeconds": 2515,
+      "callAborted": true,
+      "observationProvenance": "COORDINATING_AGENT_REPORTED_GITHUB_READBACK_AFTER_INTERRUPTION",
+      "remoteBranchHeadAfterInterruption": "c8e80691f954f829d03dee01800ca86c8f029b02",
+      "remoteBranchChangedByInterruptedAttempt": false,
+      "unpublishedLocalReceiptBlob": "1e2df1999c2834e2d829725ea3bab99a4f2e72bc",
+      "unpublishedLocalControlPlaneBlob": "097168acc9948a3e7138f302d3fab9dbaed616c1",
+      "attemptedBlobLookupsReportedHttpStatus": 404,
+      "scope": "The coordinator verified the branch still at the prior receipt commit and the two attempted blobs unavailable. No successful publication is claimed. Unobserved server-side transient objects are not asserted absent."
+    },
+    "previousLocalValidation": {
+      "command": "NODE_OPTIONS=--test-reporter=tap node tools/gravicentra-i6-control-plane-guard-v1.mjs",
+      "logName": "gi-metas-co-inicio-guard-20261030.log",
+      "logSha256": "f768430019cd2e77270030fde430e7ca8936a7c8f015f31890d1de71761964dd",
+      "controlPlaneGuard": "PASS",
+      "productSourceDrift": false,
+      "historicalSecurityHoldOutput": "ACTIVE_FAIL_CLOSED",
+      "validationScope": "The previously integrated local two-file receipt and Control Plane addition before workspace loss; preserved log is evidence of that prior execution.",
+      "newGuardExecutionForRecoveredReceiptClaimed": false
+    },
+    "recoveryBoundaries": {
+      "oldWorkspaceAccessed": false,
+      "controlPlaneWrittenByRecovery": false,
+      "gitRepositoryModifiedByRecovery": false,
+      "remoteWriteExecutedByRecovery": false,
+      "uiUatRepeated": false,
+      "previewOrBackendRedeployed": false,
+      "sourceAndWorkflowChanges": false
+    },
+    "interpretation": "The remote branch and published product candidate remained at the existing checkpoint. This reconstructed receipt preserves completed browser observations, changes its own recording metadata and adds recovery provenance. A different receipt blob is expected; completed UAT is not repeated solely because publication was interrupted."
+  }
+}
