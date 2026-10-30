@@ -924,7 +924,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_R20_TARGETED_PAULA_VISUAL",
+  "nextAction": "I6_5_B4_003_AUTHENTICATED_EXACT_PREVIEW_UAT_AND_P0_CLOSEOUT",
   "postproductionExitProgress": {
     "formalPercent": 50,
     "frozenMiniGates": 5,
@@ -16069,6 +16069,37 @@
       "orbit360-platform/modules/plantillas.js",
       "tools/gravicentra-b4-003-insights-plantillas-country-no-seed.test.cjs",
       "tools/gravicentra-i6-control-plane-guard-v1.mjs"
-    ]
+    ],
+    "integrationCommit": "6349134a4f62455b76a43d1c7c3c3aef6c5455b2",
+    "previewState": "EXACT_PREVIEW_BUILD_BYTE_READBACK_PASS_AUTHENTICATED_UAT_PENDING",
+    "previewReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PLANTILLAS_USE_LIFECYCLE_PREVIEW_PASS_20261029.json",
+    "previewReceiptBlobSha": "3b738b2b39e859102832c8b82ab3fa1ac1a896f7",
+    "previewRunId": 40983938799,
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-sr-40983938799-ig21wnve.web.app/",
+    "buildId": "gi-i65-b4-6349134a4f62-57f234755dc1",
+    "hostedPayloadDigest": "1a973dd58e7e8a35be102acd32d4e18e7dada3c439fa29bd450a08bcb773f343",
+    "bundleDigest": "38db6a1fac13ab8e7c50b5d371fd5177981dc67e2104fbe38bb86c5ed692bc36"
+  },
+  "b4003PlantillasUseLifecyclePreview20261029": {
+    "status": "EXACT_PREVIEW_BUILD_BYTE_READBACK_PASS_AUTHENTICATED_UAT_PENDING",
+    "gate": "I6.5/B4-003",
+    "sourceSha": "6349134a4f62455b76a43d1c7c3c3aef6c5455b2",
+    "transportHead": "2788c1e969ab1df9256ece53b55c24d37bc2aa33",
+    "previewRunId": 40983938799,
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-sr-40983938799-ig21wnve.web.app/",
+    "buildId": "gi-i65-b4-6349134a4f62-57f234755dc1",
+    "hostedFileCount": 218,
+    "hostedPayloadDigest": "1a973dd58e7e8a35be102acd32d4e18e7dada3c439fa29bd450a08bcb773f343",
+    "bundleDigest": "38db6a1fac13ab8e7c50b5d371fd5177981dc67e2104fbe38bb86c5ed692bc36",
+    "artifactId": 12946326374,
+    "artifactZipSha256": "b5561fdf8d629fff2659b1a36d2d18436aece204d610bc3c29792cdce9d3c457",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PLANTILLAS_USE_LIFECYCLE_PREVIEW_PASS_20261029.json",
+    "receiptBlobSha": "3b738b2b39e859102832c8b82ab3fa1ac1a896f7",
+    "liveHostsUnchanged": true,
+    "productSourceMutated": false,
+    "rulesAuthIamOrOperationalWrites": false,
+    "currentCapabilityAcceptances": 0,
+    "securityB4003StillHold": true,
+    "nextAction": "AUTHENTICATED_EXACT_PREVIEW_UAT_PLUS_PARALLEL_B4_003_P0_CLOSEOUT"
   }
 }

@@ -4339,11 +4339,14 @@ if(canonicalCompositionActive){
  const lifecycleCommit=physicalGit('log','-n','1','--format=%H','--',lifecycleSourcePath);
  const lifecycleTestPath='artifacts/orbit360-recovery/release-control/b4003-uat-20261029/tests/plantillas-use-lifecycle.test.cjs';
  const lifecycleParent='d4a686e5e4e3c8e060a4cb0dc2a7943eba1ad0f9';
+ const lifecycleIntegrationCommit=String(lifecycle?.integrationCommit||'');
  const lifecycleExpectedCommitPaths=['artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json','artifacts/orbit360-recovery/release-control/I6_5_B4_003_PLANTILLAS_USE_LIFECYCLE_SUCCESSOR_20261029.json','orbit360-platform/modules/plantillas.js','tools/gravicentra-b4-003-insights-plantillas-country-no-seed.test.cjs','tools/gravicentra-i6-control-plane-guard-v1.mjs'].sort();
- const lifecycleActualCommitPaths=physicalGit('diff','--name-only',lifecycleParent+'..'+current).split(/\r?\n/).filter(Boolean).sort();
+ const lifecycleActualCommitPaths=physicalGit('diff','--name-only',lifecycleParent+'..'+lifecycleIntegrationCommit).split(/\r?\n/).filter(Boolean).sort();
  const lifecycleTestOutput=execFileSync(process.execPath,[lifecycleTestPath],{encoding:'utf8',stdio:'pipe',env:{...process.env,PLANTILLAS_SOURCE:lifecycleSourcePath}});
  need(lifecycle?.status==='SOURCE_INTEGRATED_TESTS_BOUND_PREVIEW_PENDING_AUTHENTICATED_UAT'&&
   lifecycle?.gate==='I6.5/B4-003'&&lifecycle?.parentHead===lifecycleParent&&
+  /^[0-9a-f]{40}$/.test(lifecycleIntegrationCommit)&&
+  physicalGit('merge-base',lifecycleIntegrationCommit,current)===lifecycleIntegrationCommit&&
   lifecycle?.receiptPath===lifecycleReceiptPath&&
   /^[0-9a-f]{40}$/.test(String(lifecycle.receiptBlobSha||''))&&
   physicalGit('rev-parse',lifecycleCommit+'^')===lifecycleParent&&
@@ -4356,13 +4359,13 @@ if(canonicalCompositionActive){
   lifecycleReceipt.source?.beforeBlob===physicalGit('rev-parse',lifecycleParent+':'+lifecycleSourcePath)&&
   lifecycleReceipt.source?.beforeBlob==='702c90d4c655013fc168430cb44a48aab7bdfcd0'&&
   lifecycleReceipt.source?.afterBlob===physicalGit('hash-object',lifecycleSourcePath)&&
-  lifecycleReceipt.source?.afterBlob===physicalGit('rev-parse',current+':'+lifecycleSourcePath)&&
+  lifecycleReceipt.source?.afterBlob===physicalGit('rev-parse',lifecycleIntegrationCommit+':'+lifecycleSourcePath)&&
   lifecycleReceipt.source?.afterBlob===lifecycle.afterBlob&&
   lifecycleReceipt.regression?.path===lifecycleTestPath&&
   lifecycleReceipt.regression?.blob===lifecycle.regressionBlob&&
   lifecycleReceipt.regression?.blob==='a26aebb69de546c32ac8ae6021449ac2be6223ed'&&
   physicalGit('hash-object',lifecycleTestPath)===lifecycleReceipt.regression.blob&&
-  physicalGit('rev-parse',current+':'+lifecycleTestPath)===lifecycleReceipt.regression.blob&&
+  physicalGit('rev-parse',lifecycleIntegrationCommit+':'+lifecycleTestPath)===lifecycleReceipt.regression.blob&&
   lifecycleReceipt.regression?.testCases===18&&lifecycleReceipt.regression?.passed===18&&
   lifecycleReceipt.regression?.failed===0&&lifecycleReceipt.regression?.syntheticOnly===true&&
   lifecycleReceipt.regression?.rootQaPath==='tools/gravicentra-b4-003-insights-plantillas-country-no-seed.test.cjs'&&
@@ -4370,7 +4373,7 @@ if(canonicalCompositionActive){
   lifecycleReceipt.regression?.rootQaBeforeBlob===physicalGit('rev-parse',lifecycleReceipt.expectedParentHead+':tools/gravicentra-b4-003-insights-plantillas-country-no-seed.test.cjs')&&
   lifecycleReceipt.regression?.rootQaAfterBlob===lifecycle.regressionRootQaBlob&&
   lifecycleReceipt.regression?.rootQaAfterBlob===physicalGit('hash-object','tools/gravicentra-b4-003-insights-plantillas-country-no-seed.test.cjs')&&
-  lifecycleReceipt.regression?.rootQaAfterBlob===physicalGit('rev-parse',current+':tools/gravicentra-b4-003-insights-plantillas-country-no-seed.test.cjs')&&
+  lifecycleReceipt.regression?.rootQaAfterBlob===physicalGit('rev-parse',lifecycleIntegrationCommit+':tools/gravicentra-b4-003-insights-plantillas-country-no-seed.test.cjs')&&
   lifecycleReceipt.regression?.rootQaAfterBlob!==lifecycleReceipt.regression?.rootQaBeforeBlob&&
   lifecycleReceipt.regression?.realBusinessWrites===0&&lifecycleReceipt.regression?.externalSends===0&&
   lifecycleTestOutput.includes('# tests 18')&&lifecycleTestOutput.includes('# pass 18')&&
@@ -4412,9 +4415,29 @@ if(canonicalCompositionActive){
   lifecycle.productionPromotionAuthorized===false&&
   lifecycle.rulesAuthIamOrDataChangesAuthorized===false&&
   lifecycle.previewAuthorizedAfterGuardAndRegressionPass===true&&
-  physicalGit('rev-parse',current+':'+lifecycleReceiptPath)===lifecycle.receiptBlobSha,
+  physicalGit('rev-parse',lifecycleIntegrationCommit+':'+lifecycleReceiptPath)===lifecycle.receiptBlobSha,
   'B4_003_PLANTILLAS_USE_LIFECYCLE_SUCCESSOR_INVALID');
  console.log('B4_003_PLANTILLAS_USE_LIFECYCLE=SOURCE_AND_18_TESTS_ATOMIC_COMPOSITION_BOUND_PARTIAL_UAT_LINKED');
+ const lifecyclePreview=C.b4003PlantillasUseLifecyclePreview20261029;
+ const lifecyclePreviewReceiptPath='artifacts/orbit360-recovery/release-control/I6_5_B4_003_PLANTILLAS_USE_LIFECYCLE_PREVIEW_PASS_20261029.json';
+ const lifecyclePreviewReceipt=readJson(lifecyclePreviewReceiptPath);
+ need(lifecyclePreview?.status==='EXACT_PREVIEW_BUILD_BYTE_READBACK_PASS_AUTHENTICATED_UAT_PENDING'&&
+  lifecyclePreview.gate==='I6.5/B4-003'&&lifecyclePreview.sourceSha===lifecycleIntegrationCommit&&
+  lifecyclePreview.transportHead==='2788c1e969ab1df9256ece53b55c24d37bc2aa33'&&lifecyclePreview.previewRunId===40983938799&&
+  lifecyclePreview.previewUrl==='https://ays-orbit-360-lab--gi-i65-b4-sr-40983938799-ig21wnve.web.app/'&&lifecyclePreview.buildId==='gi-i65-b4-6349134a4f62-57f234755dc1'&&
+  lifecyclePreview.hostedFileCount===218&&lifecyclePreview.hostedPayloadDigest==='1a973dd58e7e8a35be102acd32d4e18e7dada3c439fa29bd450a08bcb773f343'&&
+  lifecyclePreview.bundleDigest==='38db6a1fac13ab8e7c50b5d371fd5177981dc67e2104fbe38bb86c5ed692bc36'&&lifecyclePreview.artifactId===12946326374&&
+  lifecyclePreview.artifactZipSha256==='b5561fdf8d629fff2659b1a36d2d18436aece204d610bc3c29792cdce9d3c457'&&
+  lifecyclePreview.receiptPath===lifecyclePreviewReceiptPath&&
+  lifecyclePreview.receiptBlobSha===physicalGit('hash-object',lifecyclePreviewReceiptPath)&&
+  lifecyclePreviewReceipt.schema==='GRAVICENTRA_I65_B4003_PLANTILLAS_USE_LIFECYCLE_EXACT_PREVIEW_PASS_V1'&&
+  lifecyclePreviewReceipt.sourceSha===lifecycleIntegrationCommit&&lifecyclePreviewReceipt.transportHead==='2788c1e969ab1df9256ece53b55c24d37bc2aa33'&&
+  lifecyclePreviewReceipt.previewRunId===40983938799&&lifecyclePreviewReceipt.buildId==='gi-i65-b4-6349134a4f62-57f234755dc1'&&
+  lifecyclePreviewReceipt.readback?.exactServedBytes===true&&lifecyclePreviewReceipt.readback?.liveRootsUnchanged===true&&
+  lifecyclePreviewReceipt.boundaries?.livePromotion===false&&lifecyclePreviewReceipt.boundaries?.operationalWrites===false&&
+  lifecyclePreviewReceipt.boundaries?.securityB4003StillHold===true,
+  'B4_003_PLANTILLAS_USE_LIFECYCLE_PREVIEW_BINDING_INVALID');
+ console.log('B4_003_PLANTILLAS_USE_LIFECYCLE_PREVIEW=EXACT_BUILD_BYTE_READBACK_PASS_AUTH_UAT_PENDING');
  need(COMP.productFileCount===COMP.productFiles.length,'I6_CANONICAL_COMPOSITION_COUNT_DRIFT');
 }
 const b1Retained=activeI65&&['B1','B2','B3','B4'].includes(forensicActiveBlock)&&Array.isArray(B1.allowedProductFiles);
