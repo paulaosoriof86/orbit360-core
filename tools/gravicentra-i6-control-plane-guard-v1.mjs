@@ -2568,11 +2568,11 @@ if(UAT_FIX_ACTIVE){
    source.length===3&&qa.length===2&&
    sameJson(receipt.sourceFiles,Object.fromEntries(source.map(p=>[p,{before:staged.sourceBlobsBefore?.[p],after:staged.sourceBlobsAfter?.[p]}])))&&
    source.every(p=>receipt.sourceFiles[p].before===preUatFixBlob(p)&&
-     receipt.sourceFiles[p].after===git('hash-object',p)&&
+     receipt.sourceFiles[p].after===realGit('rev-parse',UAT_FIX.sourceCommit+':'+p)&&
      receipt.sourceFiles[p].after===HISTORIC_PRE_INSURER_COMPOSITION.productFileBlobs?.[p]&&
      COMP.productFiles.includes(p)&&B4.boundaries?.allowedProductFiles?.includes(p))&&
    sameJson(receipt.qaFiles,UAT_FIX.qaFiles)&&
-   qa.every(p=>receipt.qaFiles[p]===git('hash-object',p)&&
+   qa.every(p=>receipt.qaFiles[p]===realGit('rev-parse',UAT_FIX.sourceCommit+':'+p)&&
      B4.boundaries?.allowedQaFiles?.includes(p))&&
    receipt.qa.testedLocally===true&&receipt.qa.focusedTestsFailed===0&&
    receipt.historicalProof.untouched===true&&receipt.historicalProof.noRetroactivePass===true&&
