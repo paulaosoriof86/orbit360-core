@@ -108,6 +108,91 @@ const sameJson=(a,b)=>JSON.stringify(stable(a))===JSON.stringify(stable(b));
 need(MODE==='governance'||MODE==='i6','I6_GUARD_MODE_INVALID:'+MODE);
 for(const p of [CONTROL,STATUS_LEDGER,AUTH_RECEIPT,I6_ADDENDUM,I6_PLAN_LOCK,V5_MANIFEST,V6_MANIFEST,V6_ADDENDUM,V7_MANIFEST,V7_ADDENDUM,DATA_UPDATE_PLAN,DATA_UPDATE_DISCIPLINE,DATA_UPDATE_REGISTRY,ACTIVE_SOURCE_INTAKE,I63_SOURCE,I63_RECEIPT,I64_SOURCE,I64_RECEIPT,I65_SOURCE,I65_SYNC,I65_FORENSIC_AUDIT,I65_FORENSIC_PLAN,I65_FORENSIC_ADDENDUM,I65_PAYMENT_INFERENCE,I65_FORENSIC_B1,I65_FORENSIC_B2,I65_FORENSIC_B3,I65_FORENSIC_B4,I6_CANONICAL_COMPOSITION,I6_FINDINGS_LEDGER,I65_FORENSIC_PLAN_V2,I65_B2_REJECTION,I65_B2_ROOT_CAUSE]) need(exists(p),'I6_REQUIRED_FILE_MISSING:'+p);
 const C=readJson(CONTROL);
+// A bounded UI diagnostics successor preserves the exact deployed Metas
+// backend/writer and every older receipt. Validate its current physical bytes
+// before permitting the historical 8bb source to use its own equipo.js blob.
+const METAS_UI_PARENT='4d919e1683ab5f0f0b7166f2d67b84dd211b7805';
+const METAS_UI_BASE='8bb4fce20bb2af1aa4022573069ff8287679b715';
+const METAS_UI_PRODUCT='orbit360-platform/modules/equipo.js';
+const METAS_UI_TEST='tools/gravicentra-b4-003-metas-ui-diagnostic.test.cjs';
+const METAS_UI_RECEIPT_PATH='artifacts/orbit360-recovery/release-control/I6_5_B4_003_METAS_UI_DIAGNOSTIC_SOURCE_SUCCESSOR_20261030.json';
+const METAS_UI_RUNTIME_PATH='artifacts/orbit360-recovery/release-control/I6_5_B4_003_METAS_ATOMIC_PREVIEW_RUNTIME_EVIDENCE_20261030.json';
+const METAS_UI_GUARD='tools/gravicentra-i6-control-plane-guard-v1.mjs';
+const METAS_UI_EXPECTED=[METAS_UI_PRODUCT,METAS_UI_TEST,METAS_UI_RECEIPT_PATH,CONTROL,METAS_UI_GUARD].sort();
+const METAS_UI_AUTH=C.b4003MetasUiDiagnosticSourceSuccessor20261030;
+need(METAS_UI_AUTH&&exists(METAS_UI_RECEIPT_PATH)&&exists(METAS_UI_TEST),'B4_003_METAS_UI_DIAGNOSTIC_AUTHORITY_REQUIRED');
+const METAS_UI_R=readJson(METAS_UI_RECEIPT_PATH);
+const METAS_UI_COMMIT=physicalGit('log','-n','1','--format=%H','--',METAS_UI_PRODUCT);
+const METAS_UI_BEFORE=new Map(),METAS_UI_AFTER=new Map();
+need(METAS_UI_AUTH.gate==='I6.5/B4-003'&&
+ METAS_UI_AUTH.status==='SOURCE_AND_SYNTHETIC_QA_PASS_PREVIEW_UAT_PENDING'&&
+ METAS_UI_AUTH.parentHead===METAS_UI_PARENT&&METAS_UI_AUTH.baseMetasSourceSha===METAS_UI_BASE&&
+ METAS_UI_AUTH.receiptPath===METAS_UI_RECEIPT_PATH&&
+ METAS_UI_AUTH.receiptBlobSha===physicalGit('hash-object',METAS_UI_RECEIPT_PATH)&&
+ METAS_UI_AUTH.receiptBlobSha===physicalGit('rev-parse',METAS_UI_COMMIT+':'+METAS_UI_RECEIPT_PATH)&&
+ METAS_UI_R.schema==='GRAVICENTRA_I65_B4003_METAS_UI_DIAGNOSTIC_SOURCE_SUCCESSOR_V1'&&
+ METAS_UI_R.repository==='paulaosoriof86/orbit360-core'&&METAS_UI_R.branch==='recovery/fase-a-clean-20260831'&&
+ METAS_UI_R.gate===METAS_UI_AUTH.gate&&METAS_UI_R.status===METAS_UI_AUTH.status&&
+ METAS_UI_R.parentHead===METAS_UI_PARENT&&METAS_UI_R.baseMetasSourceSha===METAS_UI_BASE&&
+ physicalGit('rev-parse',METAS_UI_COMMIT+'^')===METAS_UI_PARENT&&
+ physicalGit('merge-base',METAS_UI_BASE,METAS_UI_PARENT)===METAS_UI_BASE&&
+ physicalGit('merge-base',METAS_UI_COMMIT,'HEAD')===METAS_UI_COMMIT&&
+ physicalGit('diff','--name-only',METAS_UI_PARENT,METAS_UI_COMMIT).split(/\r?\n/).filter(Boolean).sort().join('|')===METAS_UI_EXPECTED.join('|')&&
+ sameJson(METAS_UI_AUTH.atomicCommitPaths.slice().sort(),METAS_UI_EXPECTED)&&
+ sameJson(METAS_UI_R.atomicCommitPaths.slice().sort(),METAS_UI_EXPECTED)&&
+ physicalGit('hash-object',METAS_UI_GUARD)===physicalGit('rev-parse',METAS_UI_COMMIT+':'+METAS_UI_GUARD),
+ 'B4_003_METAS_UI_DIAGNOSTIC_EXACT_SOURCE_BINDING_INVALID');
+const metasUiSource=METAS_UI_R.source;
+need(metasUiSource?.path===METAS_UI_PRODUCT&&
+ metasUiSource.beforeBlob==='aa89e24f945082805bed2c044f16541716306a8f'&&
+ metasUiSource.beforeBlob===physicalGit('rev-parse',METAS_UI_BASE+':'+METAS_UI_PRODUCT)&&
+ metasUiSource.beforeBlob===physicalGit('rev-parse',METAS_UI_PARENT+':'+METAS_UI_PRODUCT)&&
+ metasUiSource.afterBlob===physicalGit('rev-parse',METAS_UI_COMMIT+':'+METAS_UI_PRODUCT)&&
+ metasUiSource.afterBlob===physicalGit('hash-object',METAS_UI_PRODUCT)&&
+ metasUiSource.afterBlob!==metasUiSource.beforeBlob&&
+ physicalGit('rev-parse',METAS_UI_BASE+':functions')===physicalGit('rev-parse',METAS_UI_COMMIT+':functions')&&
+ physicalGit('rev-parse',METAS_UI_BASE+':orbit360-platform/data/store-firestore-product-operational-p0.js')===
+ physicalGit('hash-object','orbit360-platform/data/store-firestore-product-operational-p0.js'),
+ 'B4_003_METAS_UI_DIAGNOSTIC_PRODUCT_OR_BACKEND_DRIFT');
+METAS_UI_BEFORE.set(METAS_UI_PRODUCT,metasUiSource.beforeBlob);
+METAS_UI_AFTER.set(METAS_UI_PRODUCT,metasUiSource.afterBlob);
+const metasUiQa=METAS_UI_R.regression;
+need(metasUiQa?.path===METAS_UI_TEST&&metasUiQa.blob===physicalGit('hash-object',METAS_UI_TEST)&&
+ metasUiQa.blob===physicalGit('rev-parse',METAS_UI_COMMIT+':'+METAS_UI_TEST)&&
+ physicalGit('ls-tree',METAS_UI_PARENT,'--',METAS_UI_TEST)===''&&
+ Number.isInteger(metasUiQa.tests)&&metasUiQa.tests>0&&metasUiQa.syntheticOnly===true&&metasUiQa.externalRequests===0,
+ 'B4_003_METAS_UI_DIAGNOSTIC_QA_BINDING_INVALID');
+const metasUiQaResult=JSON.parse(execFileSync(process.execPath,[METAS_UI_TEST],{encoding:'utf8',stdio:'pipe'}));
+need(metasUiQaResult.total===metasUiQa.tests&&metasUiQaResult.passed===metasUiQa.tests&&metasUiQaResult.failed===0&&
+ metasUiQaResult.syntheticOnly===true&&metasUiQaResult.externalRequests===0,
+ 'B4_003_METAS_UI_DIAGNOSTIC_QA_FAILED');
+const metasUiParentControl=JSON.parse(physicalGit('show',METAS_UI_PARENT+':'+CONTROL));
+const metasUiSourceControl=JSON.parse(physicalGit('show',METAS_UI_COMMIT+':'+CONTROL));
+const metasUiRuntime=METAS_UI_R.runtimeEvidenceReceipt;
+need(Object.keys(metasUiParentControl).every(k=>sameJson(metasUiParentControl[k],metasUiSourceControl[k]))&&
+ Object.keys(metasUiSourceControl).filter(k=>!(k in metasUiParentControl)).join('|')==='b4003MetasUiDiagnosticSourceSuccessor20261030'&&
+ sameJson(METAS_UI_AUTH,metasUiSourceControl.b4003MetasUiDiagnosticSourceSuccessor20261030)&&
+ metasUiRuntime?.path===METAS_UI_RUNTIME_PATH&&metasUiRuntime.blob===physicalGit('hash-object',METAS_UI_RUNTIME_PATH)&&
+ metasUiRuntime.blob===physicalGit('rev-parse',METAS_UI_PARENT+':'+METAS_UI_RUNTIME_PATH)&&
+ METAS_UI_AUTH.previewAuthorizedAfterGuardAndRegressionPass===true&&
+ METAS_UI_AUTH.productionPromotionAuthorized===false&&METAS_UI_AUTH.authIamRulesChangeAuthorized===false&&
+ METAS_UI_AUTH.realBusinessWritesAuthorized===false&&METAS_UI_AUTH.backendDeploymentAuthorized===false&&
+ METAS_UI_AUTH.currentCapabilityAcceptances===0&&
+ METAS_UI_R.semantics?.diagnosticOnly===true&&METAS_UI_R.semantics?.allowlistedCodesOnly===true&&
+ METAS_UI_R.semantics?.noExceptionMessages===true&&METAS_UI_R.semantics?.noStackOrPayload===true&&
+ METAS_UI_R.semantics?.noAutoRetry===true&&
+ METAS_UI_R.boundaries?.backendDeployment===false&&METAS_UI_R.boundaries?.backendSourceMutation===false&&
+ METAS_UI_R.boundaries?.liveDeployment===false&&METAS_UI_R.boundaries?.authIamRulesChange===false&&
+ METAS_UI_R.boundaries?.realBusinessWrites===0&&METAS_UI_R.boundaries?.newCollections===0&&
+ METAS_UI_R.boundaries?.newEndpoints===0&&METAS_UI_R.boundaries?.newWorkflows===0&&
+ METAS_UI_R.boundaries?.authenticatedUatAccepted===false&&
+ METAS_UI_R.previewTransport?.reuseExistingChannel===true&&
+ METAS_UI_R.previewTransport?.hostingChannelId==='gi-i65-b4-sr-41066435386'&&
+ METAS_UI_R.previewTransport?.expectedPreviewUrl==='https://ays-orbit-360-lab--gi-i65-b4-sr-41066435386-r09pl1ti.web.app'&&
+ METAS_UI_R.previewTransport?.predecessorSourceSha===METAS_UI_BASE&&
+ METAS_UI_R.previewTransport?.predecessorBuildId==='gi-i65-b4-8bb4fce20bb2-57f234755dc1',
+ 'B4_003_METAS_UI_DIAGNOSTIC_HISTORY_OR_BOUNDARY_CHANGED');
+console.log('B4_003_METAS_UI_DIAGNOSTIC=EXACT_UI_ONLY_SUCCESSOR_QA_PASS_BACKEND_UNCHANGED_AUTHENTICATED_UAT_PENDING');
 // The 30-Oct Metas repair is one exact child of the diagnosed source. Current
 // source/tests are checked before immutable older proofs may use its parent.
 // This binding does not close B4-003 or authorize any production deployment.
@@ -154,7 +239,8 @@ for(const p of METAS_PRODUCTS){
  const pair=METAS_RECEIPT.sourceFiles[p];
  need(pair.beforeBlob===physicalGit('rev-parse',METAS_PARENT+':'+p)&&
   pair.afterBlob===physicalGit('rev-parse',METAS_COMMIT+':'+p)&&
-  pair.afterBlob===physicalGit('hash-object',p)&&pair.afterBlob!==pair.beforeBlob&&
+  (METAS_UI_BEFORE.get(p)||pair.afterBlob)===pair.afterBlob&&
+  (METAS_UI_AFTER.get(p)||pair.afterBlob)===physicalGit('hash-object',p)&&pair.afterBlob!==pair.beforeBlob&&
   typeof pair.causalFinding==='string'&&pair.causalFinding.length>0,
   'B4_003_METAS_ATOMIC_PRODUCT_DRIFT:'+p);
  METAS_BEFORE.set(p,pair.beforeBlob);METAS_AFTER.set(p,pair.afterBlob);
@@ -219,7 +305,7 @@ function metasHistoricalInstitutionalProof(testPath){
   return execFileSync(process.execPath,[testPath],{cwd:root,encoding:'utf8',stdio:'pipe'});
  }finally{fs.rmSync(root,{recursive:true,force:true});}
 }
-console.log('B4_003_METAS_ATOMIC=EXACT_THREE_SOURCE_THREE_QA_CURRENT_BYTES_PASS_PREVIEW_UAT_PENDING');
+console.log('B4_003_METAS_ATOMIC=HISTORICAL_SOURCE_FROZEN_CURRENT_UI_SUCCESSOR_AND_ALL_QA_PASS_PREVIEW_UAT_PENDING');
 // ONE atomic, explicitly bounded current successor. Validate current source,
 // tests, parent and complete path set BEFORE any prior receipt may use a
 // predecessor blob. No historical manifest, receipt or QA file is rewritten.
@@ -4401,7 +4487,7 @@ if(canonicalCompositionActive){
    newFiles[p]?.after===physicalGit('rev-parse',fixedSource+':'+p)&&
    newFiles[p]?.after!==newFiles[p]?.before),
   'I6_CANONICAL_SUCCESSOR_NOT_EXACT_OR_UNAUTHORIZED');
- need(declared.every(p=>physicalGit('hash-object',p)===(METAS_AFTER.get(p)||INSTITUTIONAL_GOALS_AFTER.get(p)||CLOSEOUT_AFTER.get(p)||CUMULATIVE_AFTER.get(p)||(p===markerProduct?insurerMarkerReceipt.source.afterBlob:(newFiles[p]?.after||COMP.productFileBlobs?.[p]||
+ need(declared.every(p=>physicalGit('hash-object',p)===(METAS_UI_AFTER.get(p)||METAS_AFTER.get(p)||INSTITUTIONAL_GOALS_AFTER.get(p)||CLOSEOUT_AFTER.get(p)||CUMULATIVE_AFTER.get(p)||(p===markerProduct?insurerMarkerReceipt.source.afterBlob:(newFiles[p]?.after||COMP.productFileBlobs?.[p]||
   (p==='orbit360-platform/core/ui.js'?Q683_CALENDAR_RECEIPT?.sourceBlobsAfter?.[p]:null))))),
   'I6_CANONICAL_COMPOSITION_BLOB_DRIFT');
  // The two extra modules were historically developed but absent from the

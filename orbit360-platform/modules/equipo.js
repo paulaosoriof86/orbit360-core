@@ -329,6 +329,48 @@ Orbit.modules.equipo = (function () {
     if(metaQa&&(metaQa.actorUid!==actorUid||metaQa.activeRole!==metaQaRole()||metaQa.pais!==metaPais||metaQa.periodo!==META_QA_PERIOD))metaQa=null;
     return metaQa;
   }
+  function metaQaErrorCode(error){
+    // Display only fixed diagnostic codes; never arbitrary messages or stacks.
+    const localCodes=new Set([
+      'AUTH_USER_NOT_AVAILABLE','METAS_PREVIEW_CONTEXT_FORBIDDEN_ON_LIVE','METAS_PREVIEW_CONTEXT_INVALID',
+      'METAS_PREVIEW_SERVER_CONTRACT_REQUIRED','METAS_PREVIEW_SERVER_FIXTURE_INVALID','METAS_PREVIEW_SERVER_STATE_INVALID',
+      'META_CANONICAL_READBACK_MISMATCH','META_DURABLE_OWNER_REQUIRED','META_EXPLICIT_PREVIEW_TEST_REQUIRED',
+      'META_PREVIEW_CONTEXT_MISMATCH','META_PREVIEW_EXISTING_RECORD_FORBIDDEN','META_PREVIEW_INSPECT_REQUIRED',
+      'META_PREVIEW_PROBE_REQUIRED','META_VALUE_INVALID','PRODUCT_BATCH_DUPLICATE_TARGET',
+      'PRODUCT_BATCH_FAILED','PRODUCT_BATCH_INSERT_ALREADY_EXISTS','PRODUCT_BATCH_INVALID',
+      'PRODUCT_BATCH_MUTATION_INVALID','PRODUCT_BATCH_REMOVE_NOT_FOUND','PRODUCT_BATCH_UPDATE_NOT_FOUND',
+      'PRODUCT_FUNCTION_NAME_INVALID','PRODUCT_RUNTIME_NOT_CONFIGURED','PRODUCT_SERVER_CANONICAL_READBACK_REQUIRED',
+      'PRODUCT_SERVER_CANONICAL_READBACK_TARGET_MISSING','PRODUCT_SERVER_CANONICAL_DELETE_NOT_CONFIRMED',
+      'PRODUCT_SERVER_CANONICAL_WRITE_NOT_CONFIRMED','PROTECTED_READ_CANDIDATE_DISABLED','PROTECTED_READ_HOST_DENIED',
+      'PRODUCT_WRITE_ACCESS_DENIED','PRODUCT_WRITE_ACCESS_OWNER_MISSING','PRODUCT_WRITE_AUTH_CONTEXT_MISMATCH',
+      'PRODUCT_WRITE_COLLECTION_NOT_AUTHORIZED','PRODUCT_WRITE_FAILED','PRODUCT_WRITE_ID_REQUIRED',
+      'PRODUCT_WRITE_MEMBERSHIP_REQUIRED','PRODUCT_WRITE_PROVIDER_MISSING_OR_UNSAFE','PRODUCT_WRITE_READ_AUTHORITY_INVALID',
+      'PRODUCT_WRITE_READ_AUTHORITY_NOT_READY','PRODUCT_WRITE_RECORD_NOT_FOUND','PRODUCT_WRITE_RECORD_SCOPE_DENIED',
+      'PRODUCT_WRITE_RESEED_FORBIDDEN','PRODUCT_WRITE_SECURE_INSURER_OWNER_REQUIRED','PRODUCT_WRITE_SERVER_TRANSPORT_REQUIRED',
+      'PRODUCT_WRITE_WORKFLOW_OPERATION_UNRESOLVED'
+    ]);
+    const transportCodes=new Set([
+      'functions/cancelled','functions/unknown','functions/invalid-argument',
+      'functions/deadline-exceeded','functions/not-found','functions/already-exists',
+      'functions/permission-denied','functions/resource-exhausted','functions/failed-precondition',
+      'functions/aborted','functions/out-of-range','functions/unimplemented',
+      'functions/internal','functions/unavailable','functions/data-loss',
+      'functions/unauthenticated','auth/network-request-failed','auth/user-token-expired',
+      'auth/invalid-user-token','auth/user-disabled','auth/internal-error'
+    ]);
+    const candidates=[error&&error.code,error&&error.message];
+    // A local code may have a colon followed by a record path. Keep only the
+    // allowlisted prefix, so no record identifier or arbitrary suffix is shown.
+    for(const value of candidates){
+      const code=typeof value==='string'?value.split(':',1)[0].trim():'';
+      if(localCodes.has(code))return code;
+    }
+    const transportCode=error&&typeof error.code==='string'?error.code.split(':',1)[0].trim():'';
+    if(transportCodes.has(transportCode))return transportCode;
+    const names={TypeError:'CLIENT_TYPE_ERROR',ReferenceError:'CLIENT_REFERENCE_ERROR',RangeError:'CLIENT_RANGE_ERROR',SyntaxError:'CLIENT_SYNTAX_ERROR',SecurityError:'CLIENT_SECURITY_ERROR',NetworkError:'CLIENT_NETWORK_ERROR',AbortError:'CLIENT_ABORT_ERROR',TimeoutError:'CLIENT_TIMEOUT_ERROR'};
+    return error&&Object.prototype.hasOwnProperty.call(names,error.name)?names[error.name]:'UNCLASSIFIED_ERROR';
+  }
+  function metaQaFailure(message,error,stage){return message+' Código de diagnóstico: '+stage+'/'+metaQaErrorCode(error)+'.';}
   async function inspectMetaQa(host){
     if(tab!=='metas'||!isMetaPreview()||!puedeEditarMetaInstitucional()||!metaQaActor())return;
     const scope=metaQaScope();if(metaQaChecked===scope)return;
@@ -342,7 +384,7 @@ Orbit.modules.equipo = (function () {
         metaQa={runId:proof.runId,actorUid:metaQaActor(),activeRole:metaQaRole(),pais:proof.pais,periodo:META_QA_PERIOD,contractVersion:proof.contractVersion,recovered:true};
         metaQaProof='Prueba recuperada y verificada en el servidor. Comprueba los valores y restaura al terminar.';
       }else metaQaProof='Prueba disponible. Sus valores quedan separados de las metas e indicadores reales.';
-    }catch(error){if(metaQaScope()===scope)metaQaProof='El servidor todavía no confirmó el contrato de prueba y restauración. Vuelve a comprobar antes de iniciar.';}
+    }catch(error){if(metaQaScope()===scope)metaQaProof=metaQaFailure('El servidor todavía no confirmó el contrato de prueba y restauración. Vuelve a comprobar antes de iniciar.',error,'INSPECT');}
     finally{if(metaQaScope()===scope){metaQaBusy=false;render(host);}}
   }
   function metaQaMetadata(session,operation){return {version:1,runId:session.runId,operation,pais:session.pais,periodo:session.periodo};}
@@ -782,7 +824,7 @@ Orbit.modules.equipo = (function () {
         const st=S();if(typeof st.metaPreviewQaProbe!=='function')throw new Error('META_PREVIEW_PROBE_REQUIRED');
         const proof=await st.metaPreviewQaProbe(metaQaMetadata(candidate,'probe'));
         metaQa=Object.assign(candidate,{contractVersion:proof.contractVersion});metaQaProof='Prueba lista. El servidor confirmó el guardado con auditoría y la restauración.';
-      }catch(error){metaQa=null;metaQaVerified=false;metaQaProof='No se inició la prueba: el servidor no confirmó el contrato de guardado y restauración.';await inform(metaQaProof,'Prueba pendiente');}
+      }catch(error){metaQa=null;metaQaVerified=false;metaQaProof=metaQaFailure('No se inició la prueba: el servidor no confirmó el contrato de guardado y restauración.',error,'START');await inform(metaQaProof,'Prueba pendiente');}
       finally{metaQaBusy=false;render(host);}
     });
     const qaRetry=host.querySelector('#meta-qa-retry');if(qaRetry)qaRetry.addEventListener('click',()=>{metaQaChecked='';render(host);});
@@ -791,7 +833,7 @@ Orbit.modules.equipo = (function () {
       const session=metaQaSession();if(!session)return inform('Inicia una prueba temporal antes de guardar.','Prueba de metas');
       metaQaBusy=true;metaQaProof='Confirmando meta y auditoría en el servidor…';
       try{await setMeta('',session.periodo,session.pais,inp.dataset.metaPrueba,inp.value,session);metaQaProof='Meta y auditoría confirmadas en servidor. Puedes recargar y restaurar la prueba.';toast('✓ Prueba de meta y auditoría confirmadas');}
-      catch(error){metaQaProof='No se pudo confirmar la operación. Recarga y revisa el historial antes de reintentar.';await inform(metaQaProof,'Confirmación pendiente');}
+      catch(error){metaQaProof=metaQaFailure('No se pudo confirmar la operación. Recarga y revisa el historial antes de reintentar.',error,'SAVE');await inform(metaQaProof,'Confirmación pendiente');}
       finally{metaQaBusy=false;render(host);}
     }));
     const qaRestore=host.querySelector('#meta-qa-restore');if(qaRestore)qaRestore.addEventListener('click',async()=>{
@@ -799,7 +841,7 @@ Orbit.modules.equipo = (function () {
       const session=metaQaSession();if(!session)return;
       metaQaBusy=true;
       try{const result=await restoreMetaQa(session);metaQa=null;metaQaProof=result.noChanges?'Prueba cerrada sin cambios.':'Prueba restaurada y auditoría confirmada. Las metas reales se conservaron.';toast('✓ '+metaQaProof);}
-      catch(error){metaQaProof='La restauración no está confirmada. Conserva esta prueba y revisa el historial antes de continuar.';await inform(metaQaProof,'Restauración pendiente');}
+      catch(error){metaQaProof=metaQaFailure('La restauración no está confirmada. Conserva esta prueba y revisa el historial antes de continuar.',error,'RESTORE');await inform(metaQaProof,'Restauración pendiente');}
       finally{metaQaBusy=false;render(host);}
     });
     const qaAudit=host.querySelector('#meta-qa-audit');if(qaAudit)qaAudit.addEventListener('click',()=>{tab='auditoria';render(host);});

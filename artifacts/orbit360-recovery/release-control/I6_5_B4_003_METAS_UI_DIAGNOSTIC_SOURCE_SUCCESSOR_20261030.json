@@ -1,0 +1,86 @@
+{
+  "schema": "GRAVICENTRA_I65_B4003_METAS_UI_DIAGNOSTIC_SOURCE_SUCCESSOR_V1",
+  "status": "SOURCE_AND_SYNTHETIC_QA_PASS_PREVIEW_UAT_PENDING",
+  "gate": "I6.5/B4-003",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "parentHead": "4d919e1683ab5f0f0b7166f2d67b84dd211b7805",
+  "baseMetasSourceSha": "8bb4fce20bb2af1aa4022573069ff8287679b715",
+  "atomicCommitPaths": [
+    "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json",
+    "artifacts/orbit360-recovery/release-control/I6_5_B4_003_METAS_UI_DIAGNOSTIC_SOURCE_SUCCESSOR_20261030.json",
+    "orbit360-platform/modules/equipo.js",
+    "tools/gravicentra-b4-003-metas-ui-diagnostic.test.cjs",
+    "tools/gravicentra-i6-control-plane-guard-v1.mjs"
+  ],
+  "source": {
+    "path": "orbit360-platform/modules/equipo.js",
+    "beforeBlob": "aa89e24f945082805bed2c044f16541716306a8f",
+    "afterBlob": "43554f646e0e311658fc8e6730c4e45c2920e77d"
+  },
+  "regression": {
+    "path": "tools/gravicentra-b4-003-metas-ui-diagnostic.test.cjs",
+    "blob": "147fe567d3e09e100a781e54e5f129dc770795e2",
+    "tests": 31,
+    "syntheticOnly": true,
+    "externalRequests": 0,
+    "coverage": [
+      "Allowlisted local codes and Firebase codes are displayed with QA operation stage.",
+      "Non-allowlisted messages, record-path suffixes, tokens, e-mails, HTML and stack content are not reflected.",
+      "Known client error classes map to fixed safe labels; unknown errors have a fixed fallback.",
+      "Inspection, probe, write and restore error paths preserve failure state and do not trigger automatic retry."
+    ]
+  },
+  "runtimeEvidenceReceipt": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_METAS_ATOMIC_PREVIEW_RUNTIME_EVIDENCE_20261030.json",
+    "blob": "89f0408be711d63fc0d09426a7e0408120491225"
+  },
+  "semantics": {
+    "diagnosticOnly": true,
+    "allowlistedCodesOnly": true,
+    "noExceptionMessages": true,
+    "noStackOrPayload": true,
+    "noAutoRetry": true
+  },
+  "boundaries": {
+    "backendDeployment": false,
+    "backendSourceMutation": false,
+    "liveDeployment": false,
+    "authIamRulesChange": false,
+    "realBusinessWrites": 0,
+    "newCollections": 0,
+    "newEndpoints": 0,
+    "newWorkflows": 0,
+    "authenticatedUatAccepted": false
+  },
+  "previewTransport": {
+    "reuseExistingChannel": true,
+    "hostingChannelId": "gi-i65-b4-sr-41066435386",
+    "expectedPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b4-sr-41066435386-r09pl1ti.web.app",
+    "predecessorSourceSha": "8bb4fce20bb2af1aa4022573069ff8287679b715",
+    "predecessorBuildId": "gi-i65-b4-8bb4fce20bb2-57f234755dc1"
+  },
+  "recordedAtUtc": "2026-10-30T20:11:37.745190Z",
+  "authority": "PAULA_AUTHORIZED_CONTINUITY_AND_GITHUB_TRACEABILITY_20261030",
+  "diagnosticContext": {
+    "observedFailure": "First authenticated synthetic Metas write showed pending confirmation without a server-confirmed result.",
+    "causalStatus": "UNKNOWN_NOT_REPRODUCED_IN_SYNTHETIC_INTEGRATION",
+    "preRpcInference": "No callable POST was observed in the save attempt window; this is an inference and does not identify the failing client statement.",
+    "uiChange": "Expose only operation stage plus a fixed allowlisted code or generic client error class on QA inspect, probe, write and restore failures.",
+    "messagePrivacy": "Only an allowlisted local-code prefix may be extracted from an exception message; arbitrary message suffixes, identifiers, stacks and payloads are never displayed.",
+    "completionClaim": "Diagnostics instrumented; the failed write is not claimed repaired and authenticated UAT remains pending."
+  },
+  "preserved": {
+    "backendSourceSha": "8bb4fce20bb2af1aa4022573069ff8287679b715",
+    "functionsTreeSha": "9f72e9f8814c851ee30808a011b4e57a7f97a382",
+    "operationalWriterBlob": "b4ccd50b38ae095f2e9aa894c6992a9e36261545",
+    "originalMetasSourceReceiptBlob": "091b27ee8acb85b0e601b3b048b3d1395740f05b",
+    "originalProgressReceiptBlob": "91f045bb4b34da32fffb9e299b78f972ce0af308",
+    "oldMetasRegressions": 78,
+    "securityAndBeforeImageRegressions": 42,
+    "businessGoalControlsReadOnlyInPreview": true,
+    "currentCapabilityAcceptances": 0,
+    "b4003Closed": false,
+    "globalImplementationPercent": null
+  }
+}
