@@ -1,0 +1,73 @@
+name: Gravicentra B4-003 Institutional Goals Atomic Integrator
+
+on:
+  push:
+    branches:
+      - recovery/fase-a-clean-20260831
+    paths:
+      - '.github/workflows/gravicentra-b4-003-integrate-institutional-goals-20261029.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: gravicentra-b4-003-institutional-goals-integrator
+  cancel-in-progress: false
+
+jobs:
+  integrate-atomic-successor:
+    if: >-
+      github.repository == 'paulaosoriof86/orbit360-core' &&
+      github.ref == 'refs/heads/recovery/fase-a-clean-20260831' &&
+      github.event.head_commit.message == 'exec(i6.5 B4-003): integrate institutional goals successor'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+          fetch-depth: 0
+          persist-credentials: true
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Verify bounded executor identity
+        run: |
+          set -euo pipefail
+          git fetch origin "$GITHUB_REF_NAME"
+          test "$(git rev-parse HEAD)" = "$(git rev-parse origin/$GITHUB_REF_NAME)"
+          test "$(git show -s --format=%s HEAD)" = 'exec(i6.5 B4-003): integrate institutional goals successor'
+          test -f tools/gravicentra-b4-003-integrate-institutional-goals-20261029.py
+          test -f artifacts/orbit360-recovery/release-control/b4003-institutional-goals-prepared-20261029/institutional-goals.test.cjs
+          test "$(git hash-object orbit360-platform/modules/equipo.js)" = '9e76fbcb70d5a19b8b58aeb72b9fad7acd0bbecf'
+          git diff --exit-code
+          git diff --cached --exit-code
+
+      - name: Build, validate and commit the atomic source successor
+        run: |
+          set -euo pipefail
+          python3 tools/gravicentra-b4-003-integrate-institutional-goals-20261029.py | tee "$RUNNER_TEMP/institutional-goals-integrator.json"
+          test "$(git show -s --format=%s HEAD)" = 'fix(i6.5 B4-003): integrate durable institutional goals owner'
+          test "$(git diff --name-only HEAD^ HEAD | sort | wc -l)" = '5'
+
+      - name: Publish only the validated fast-forward successor
+        run: |
+          set -euo pipefail
+          REMOTE=$(git ls-remote origin "refs/heads/$GITHUB_REF_NAME" | awk '{print $1}')
+          test "$REMOTE" = "$(git rev-parse HEAD^)"
+          git push origin "HEAD:$GITHUB_REF_NAME"
+          printf '%s\n' \
+            'B4-003 institutional goals source successor pushed.' \
+            'No LIVE, data, Rules, Auth/IAM or external messages.' \
+            'Exact Preview and authenticated UAT remain required.' >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Preserve executor receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gravicentra-b4-003-institutional-goals-integrator-${{ github.run_id }}
+          path: ${{ runner.temp }}/institutional-goals-integrator.json
+          if-no-files-found: warn
+          retention-days: 7
