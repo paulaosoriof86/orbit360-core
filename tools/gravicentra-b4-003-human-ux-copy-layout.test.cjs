@@ -7,7 +7,7 @@ assert.ok(!i.includes('const greeting=nowHour<12?'),'NO_TIME_GREETING_IN_LEADERS
 assert.ok(!i.includes('Doble clic para cambiar el mensaje'),'NO_TECHNICAL_INSTRUCTIONS');
 assert.ok(i.includes('Cada póliza representa una promesa de protección'),'INSURANCE_LEADERSHIP_COPY_REQUIRED');
 assert.ok(i.includes('gi-leadership-card')&&i.includes('gi-insurance-analysis'),'EXECUTIVE_DASHBOARD_REQUIRED');
-assert.ok(!i.includes('Verificando datos y permisos del alcance seleccionado'));
+assert.ok(i.includes('Verificando datos y permisos del alcance seleccionado')&&i.includes('Consulta las metas individuales disponibles y tus seguimientos autorizados')&&i.includes('Revisa metas institucionales, cuando estén configuradas'),'CONTEXTUAL_ROLE_READINESS_COPY_REQUIRED');
 assert.ok(i.includes('splitCountrySummary')&&i.includes('openFinancialKpi'));
 assert.ok(!i.includes('width:118px;min-height:118px'));
 assert.ok(r.includes('Confirma si renovó o no')&&r.includes('Revisa el resultado de la renovación'));
