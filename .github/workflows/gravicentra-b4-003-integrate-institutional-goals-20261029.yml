@@ -2,8 +2,7 @@ name: Gravicentra B4-003 Owner LIVE Readback Rootfix Bytes
 
 on:
   push:
-    branches:
-      - recovery/fase-a-clean-20260831
+    branches: [recovery/fase-a-clean-20260831]
     paths:
       - '.github/workflows/gravicentra-b4-003-integrate-institutional-goals-20261029.yml'
 
@@ -33,12 +32,10 @@ jobs:
           ref: ${{ github.ref_name }}
           fetch-depth: 0
           persist-credentials: true
-
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-
-      - name: Prepare and validate exact workflow bytes
+      - name: Prepare, validate and preserve exact workflow bytes
         run: |
           set -euo pipefail
           git fetch origin "$GITHUB_REF_NAME"
@@ -48,7 +45,18 @@ jobs:
           test "$(git hash-object "$WORKFLOW_PATH")" = "$EXPECTED_BEFORE"
           test "$(git hash-object orbit360-platform/modules/equipo.js)" = '5ce317a0641709e1a405e61435578de934fa194d'
           node tools/gravicentra-governance-preflight-v1.mjs --mode=i6
-          python3 tools/gravicentra-b4-003-owner-live-readback-rootfix-20261029.py > "$RUNNER_TEMP/rootfix.json"
+          cp tools/gravicentra-b4-003-owner-live-readback-rootfix-20261029.py "$RUNNER_TEMP/rootfix.py"
+          python3 - <<'PY'
+          from pathlib import Path
+          import os
+          p=Path(os.environ['RUNNER_TEMP'])/'rootfix.py'
+          s=p.read_text(encoding='utf8')
+          old='out,n=re.subn(pattern,repl,text,count=1,flags=re.S)'
+          new='out,n=re.subn(pattern,lambda _m:repl,text,count=1,flags=re.S)'
+          if s.count(old)!=1: raise SystemExit('REGEX_REPLACEMENT_FIX_TARGET_MISSING')
+          p.write_text(s.replace(old,new),encoding='utf8')
+          PY
+          python3 "$RUNNER_TEMP/rootfix.py" > "$RUNNER_TEMP/rootfix.json"
           AFTER=$(git hash-object "$WORKFLOW_PATH")
           test "$AFTER" != "$EXPECTED_BEFORE"
           ruby -e "require 'yaml'; YAML.load_file(ARGV[0]); puts 'YAML_PASS'" "$WORKFLOW_PATH"
@@ -57,13 +65,11 @@ jobs:
           from pathlib import Path
           import os
           s=Path(os.environ['WORKFLOW_PATH']).read_text(encoding='utf8')
-          blocks=[];pos=0
-          marker="<<'NODE'\n"
+          blocks=[];pos=0;marker="<<'NODE'\n"
           while True:
               i=s.find(marker,pos)
               if i<0: break
-              start=i+len(marker)
-              end=s.find('\n          NODE',start)
+              start=i+len(marker);end=s.find('\n          NODE',start)
               if end<0: raise SystemExit('UNTERMINATED_NODE_HEREDOC')
               lines=s[start:end].splitlines()
               js='\n'.join(line[10:] if line.startswith('          ') else line for line in lines)+'\n'
@@ -84,18 +90,7 @@ jobs:
           test "$(git hash-object "$PREPARED_PATH")" = "$AFTER"
           python3 - <<'PY'
           import json,os,pathlib
-          receipt={
-            'schema':'GRAVICENTRA_I65_B4003_OWNER_LIVE_READBACK_ROOTFIX_V1',
-            'gate':'I6.5/B4-003','status':'WORKFLOW_BYTES_PREPARED_YAML_AND_NODE_PASS',
-            'repository':'paulaosoriof86/orbit360-core','branch':os.environ['GITHUB_REF_NAME'],
-            'parentHead':os.environ['PARENT'],'workflowPath':os.environ['WORKFLOW_PATH'],
-            'beforeBlob':os.environ['EXPECTED_BEFORE'],'afterBlob':os.environ['AFTER'],
-            'preparedPath':os.environ['PREPARED_PATH'],
-            'cause':'CUSTOM_OWNER_ROOT_RAW_HTML_VARIED_WHILE_PREVIEW_AND_LAB_LIVE_BYTES_MATCHED',
-            'remediation':'KEEP_EXACT_LAB_LIVE_ROOT_AND_BUILD_COMPARISON; REQUIRE_OWNER_BUILD_RUNTIME_AND_STRUCTURAL_ROOT_IDENTITY',
-            'sourceAnchor':'LAST_COMMIT_TOUCHING_ORBIT360_PLATFORM_MODULES_EQUIPO_JS',
-            'boundaries':{'productSourceChanged':False,'livePromotion':False,'dataWrites':False,'rulesAuthIamChanges':False,'externalMessages':False,'securityB4003StillHold':True,'acceptanceGranted':False}
-          }
+          receipt={'schema':'GRAVICENTRA_I65_B4003_OWNER_LIVE_READBACK_ROOTFIX_V1','gate':'I6.5/B4-003','status':'WORKFLOW_BYTES_PREPARED_YAML_AND_NODE_PASS','repository':'paulaosoriof86/orbit360-core','branch':os.environ['GITHUB_REF_NAME'],'parentHead':os.environ['PARENT'],'workflowPath':os.environ['WORKFLOW_PATH'],'beforeBlob':os.environ['EXPECTED_BEFORE'],'afterBlob':os.environ['AFTER'],'preparedPath':os.environ['PREPARED_PATH'],'cause':'CUSTOM_OWNER_ROOT_RAW_HTML_VARIED_WHILE_PREVIEW_AND_LAB_LIVE_BYTES_MATCHED','remediation':'KEEP_EXACT_LAB_LIVE_ROOT_AND_BUILD_COMPARISON; REQUIRE_OWNER_BUILD_RUNTIME_AND_STRUCTURAL_ROOT_IDENTITY','sourceAnchor':'LAST_COMMIT_TOUCHING_ORBIT360_PLATFORM_MODULES_EQUIPO_JS','boundaries':{'productSourceChanged':False,'livePromotion':False,'dataWrites':False,'rulesAuthIamChanges':False,'externalMessages':False,'securityB4003StillHold':True,'acceptanceGranted':False}}
           pathlib.Path(os.environ['RECEIPT_PATH']).write_text(json.dumps(receipt,indent=2)+'\n',encoding='utf8')
           PY
           git config user.name gravicentra-release-bot
@@ -106,11 +101,7 @@ jobs:
           REMOTE=$(git ls-remote origin "refs/heads/$GITHUB_REF_NAME" | awk '{print $1}')
           test "$REMOTE" = "$PARENT"
           git push origin "HEAD:$GITHUB_REF_NAME"
-          printf '%s\n' \
-            "Owner LIVE readback workflow blob: $AFTER" \
-            'YAML and all embedded Node blocks: PASS' \
-            'No product, LIVE, data, Rules, Auth/IAM or external messages.' >> "$GITHUB_STEP_SUMMARY"
-
+          printf '%s\n' "Owner LIVE readback workflow blob: $AFTER" 'YAML and all embedded Node blocks: PASS' 'No product, LIVE, data, Rules, Auth/IAM or external messages.' >> "$GITHUB_STEP_SUMMARY"
       - name: Preserve patcher diagnostic
         if: always()
         uses: actions/upload-artifact@v4
