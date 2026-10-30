@@ -1,0 +1,16 @@
+{
+  "schema": "GRAVICENTRA_I65_B4003_INSTITUTIONAL_GOALS_POST_GUARD_REQUEST_V1",
+  "gate": "I6.5/B4-003",
+  "status": "CENTRAL_GUARD_REQUESTED_AFTER_ATOMIC_SOURCE_SUCCESSOR",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "sourceCommit": "eb9ce731832d236fedc545185ec7c66bd10849bb",
+  "sourceReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_INSTITUTIONAL_GOALS_SOURCE_SUCCESSOR_20261029.json",
+  "findingId": "B4-003-P0-20261012-INSTITUTIONAL-GOALS",
+  "productMutationInThisRequest": false,
+  "dataMutation": false,
+  "rulesAuthIamMutation": false,
+  "livePromotion": false,
+  "acceptanceGranted": false,
+  "requiredNext": "CENTRAL_GUARD_PASS_THEN_EXACT_PREVIEW"
+}
