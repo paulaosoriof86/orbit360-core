@@ -311,15 +311,33 @@ Orbit.modules.equipo = (function () {
   }
 
   function metasStore() { return (S().all('metas') || []).slice(); }
-  function metaKey(aseId, periodo, pais, campo) { return `meta-equipo-${slug(aseId)}-${String(periodo || '').replace(/[^0-9-]/g, '')}-${slug(pais)}-${slug(campo)}`; }
+  function metaKey(aseId, periodo, pais, campo) {
+    const owner=String(aseId||'').trim()?slug(aseId):'institucional';
+    return `meta-equipo-${owner}-${String(periodo || '').replace(/[^0-9-]/g, '')}-${slug(pais)}-${slug(campo)}`;
+  }
   function metaRow(aseId, periodo, pais, campo) {
-    return metasStore().find(m => String(m.asesorId || '') === String(aseId || '') && String(m.mes || m.periodo || '') === String(periodo || '') && String(m.pais || '') === String(pais || '') && String(m.tipo || '') === String(campo || ''));
+    return metasStore().find(m => String(m.asesorId || m.advisorId || '') === String(aseId || '') && String(m.mes || m.periodo || '') === String(periodo || '') && String(m.pais || '') === String(pais || '') && String(m.tipo || '') === String(campo || ''));
+  }
+  function metaInstitucionalDe(periodo,pais){
+    const p=pais||metaPais||'GT',per=normalizePeriodo(periodo);
+    const prima=metaRow('',per,p,'prima'),recaudo=metaRow('',per,p,'recaudo');
+    return {
+      prima:prima&&Number.isFinite(Number(prima.valor))?Number(prima.valor):0,
+      recaudo:recaudo&&Number.isFinite(Number(recaudo.valor))?Number(recaudo.valor):0,
+      explicitPrima:!!prima,explicitRecaudo:!!recaudo,pais:p,moneda:currencyForCountry(p),periodo:per
+    };
+  }
+  function puedeEditarMetaInstitucional(){
+    const role=String(Orbit.session&&typeof Orbit.session.rol==='function'?Orbit.session.rol():(Orbit.auth&&Orbit.auth.productUser&&Orbit.auth.productUser.activeRole)||'');
+    if(!['Dirección','SuperAdmin','AdminTenant','Admin'].includes(role))return false;
+    return !!(Orbit.access&&typeof Orbit.access.can==='function'&&Orbit.access.can('equipo','edit')===true);
   }
   async function setMeta(aseId, periodo, pais, campo, val) {
     const st=S();
     if (!st || st.__productOperationalWriteP0 !== true || typeof st.batchDurable !== 'function') throw new Error('META_DURABLE_OWNER_REQUIRED');
     const current=metaRow(aseId,periodo,pais,campo),id=current&&current.id?current.id:metaKey(aseId,periodo,pais,campo);
-    const patch={mes:periodo,periodo,pais,moneda:currencyForCountry(pais),tipo:campo,asesorId:aseId,valor:+val||0};
+    const patch={mes:periodo,periodo,pais,moneda:currencyForCountry(pais),tipo:campo,valor:+val||0};
+    if(String(aseId||'').trim())patch.asesorId=aseId;
     const action=current?'update':'insert';
     const result=await st.batchDurable([{action,collection:'metas',id,payload:patch}],{timeoutMs:20000});
     const confirmed=(result&&Array.isArray(result.readback)?result.readback:[]).find(row =>
@@ -355,6 +373,8 @@ Orbit.modules.equipo = (function () {
     const all = teamRows().filter(a => hasRole(a, 'Asesor'));
     const team = all.filter(a => { const ps = userCountries(a); return !ps.length || ps.includes(metaPais); });
     const cur = currencyForCountry(metaPais);
+    const institucional=metaInstitucionalDe(metaPeriodo,metaPais);
+    const canInstitutional=puedeEditarMetaInstitucional();
     const totN = team.reduce((s, a) => s + metaDe(a.id, metaPeriodo, metaPais).nueva, 0);
     const totR = team.reduce((s, a) => s + metaDe(a.id, metaPeriodo, metaPais).renovada, 0);
     const totC = team.reduce((s, a) => s + metaDe(a.id, metaPeriodo, metaPais).recaudo, 0);
@@ -364,6 +384,22 @@ Orbit.modules.equipo = (function () {
       <input id="meta-periodo" class="o-sel" type="month" value="${metaPeriodo}" style="width:auto">
       <select id="meta-pais" class="o-sel" style="width:auto">${countryOptions.map(p => `<option value="${p.id}" ${p.id === metaPais ? 'selected' : ''}>${p.id === 'CO' ? '🇨🇴' : '🇬🇹'} ${p.label} · ${p.moneda}</option>`).join('')}</select>
       <span class="muted" style="font-size:12.5px"><b>${cur} ${U.moneyShort(totN, cur)}</b> nuevas · <b>${cur} ${U.moneyShort(totR, cur)}</b> renovaciones · <b>${cur} ${U.moneyShort(totC, cur)}</b> recaudo</span>
+    </div>
+    <div class="card pad" data-meta-institucional-card="1" style="margin-bottom:14px">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-wrap:wrap">
+        <div><b>Meta institucional · ${metaPais}</b><div class="muted" style="font-size:12px;margin-top:3px">Objetivo global del tenant; no sustituye ni oculta las metas individuales.</div></div>
+        <span class="badge ${canInstitutional?'ok':'neutral'}">${canInstitutional?'Editable por administración':'Solo lectura'}</span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:12px">
+        <label class="ce-l">Producción institucional
+          <div class="ct-inp"><span>${cur}</span><input type="number" min="0" value="${institucional.prima}" data-meta-institucional="prima" ${canInstitutional?'':'disabled'}></div>
+          <small class="muted">${institucional.explicitPrima?'Configurada en servidor':'Sin meta institucional configurada'}</small>
+        </label>
+        <label class="ce-l">Recaudo institucional
+          <div class="ct-inp"><span>${cur}</span><input type="number" min="0" value="${institucional.recaudo}" data-meta-institucional="recaudo" ${canInstitutional?'':'disabled'}></div>
+          <small class="muted">${institucional.explicitRecaudo?'Configurada en servidor':'Sin meta institucional configurada'}</small>
+        </label>
+      </div>
     </div>
     <div class="card" style="overflow:hidden"><div style="overflow-x:auto"><table class="tbl">
       <thead><tr><th>Asesor</th><th class="num">Producción nueva</th><th class="num">Renovaciones</th><th class="num">Recaudo</th><th class="num">Producción total</th></tr></thead>
@@ -649,6 +685,17 @@ Orbit.modules.equipo = (function () {
     host.querySelectorAll('[data-vval]').forEach(inp => inp.addEventListener('change', async () => {
       try{await Orbit.comeng.setVendValor(inp.dataset.vval,inp.value);await audit('editar_comision','Valor de comisión actualizado',null,{asesorId:inp.dataset.vval,comValor:+inp.value||0});toast('✓ Comisión guardada y confirmada');}catch(error){inform('No fue posible confirmar la comisión en el servidor.','No guardado');}
     }));
+    host.querySelectorAll('[data-meta-institucional]').forEach(inp => inp.addEventListener('change', async () => {
+      if(!puedeEditarMetaInstitucional())return inform('Tu rol no puede editar metas institucionales.','Solo lectura');
+      const campo=inp.dataset.metaInstitucional;
+      try{
+        const before=metaInstitucionalDe(metaPeriodo,metaPais);
+        await setMeta('',metaPeriodo,metaPais,campo,inp.value);
+        const after=metaInstitucionalDe(metaPeriodo,metaPais);
+        await audit('editar_meta_institucional','Meta institucional actualizada desde Equipo',before,after);
+        toast('✓ Meta institucional guardada y confirmada');render(host);
+      }catch(error){inform('No fue posible confirmar la meta institucional en el servidor.','No guardado');}
+    }));
     host.querySelectorAll('[data-meta]').forEach(inp => inp.addEventListener('change', async () => {
       const [aid,campo]=inp.dataset.meta.split('|');
       try{const before=Object.assign({asesorId:aid},metaDe(aid,metaPeriodo,metaPais));await setMeta(aid,metaPeriodo,metaPais,campo,inp.value);await audit('editar_meta','Meta actualizada desde Equipo',before,Object.assign({asesorId:aid},metaDe(aid,metaPeriodo,metaPais)));toast('✓ Meta guardada y confirmada');render(host);}catch(error){inform('No fue posible confirmar la meta en el servidor.','No guardado');}
@@ -658,5 +705,5 @@ Orbit.modules.equipo = (function () {
   }
 
   function filtrar(tipo) { userFilter = tipo || 'todos'; const host = document.getElementById('host') || document.getElementById('mod-host'); if (host) render(host); }
-  return { render, editar: editarUsuario, metaDe, filtrar };
+  return { render, editar: editarUsuario, metaDe, metaInstitucionalDe, puedeEditarMetaInstitucional, filtrar };
 })();

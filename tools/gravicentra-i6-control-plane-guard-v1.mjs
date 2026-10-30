@@ -4198,6 +4198,8 @@ if(canonicalCompositionActive){
  const safeReadProductPaths=['orbit360-platform/modules/insights.js','orbit360-platform/modules/plantillas.js'];
  const CLOSEOUT_CURRENT=C.b4003CloseoutSourceSuccessor20261029||{};
  const CLOSEOUT_AFTER=new Map(Object.entries(CLOSEOUT_CURRENT.sourceFiles||{}).map(([p,v])=>[p,String(v&&v.afterBlob||'')]));
+ const INSTITUTIONAL_GOALS_CURRENT=C.b4003InstitutionalGoalsSourceSuccessor20261029||{};
+ const INSTITUTIONAL_GOALS_AFTER=new Map([[String(INSTITUTIONAL_GOALS_CURRENT.productPath||''),String(INSTITUTIONAL_GOALS_CURRENT.afterBlob||'')]]);
  const boundedComposition=[...declared,...safeReadProductPaths,'orbit360-platform/core/legal.js'].sort();
  need(actualProduct.length===boundedComposition.length&&actualProduct.every((p,i)=>p===boundedComposition[i]),'I6_CANONICAL_COMPOSITION_EXACT_SET_DRIFT');
  // Keep the immutable 114-file composition intact. The five changed bytes
@@ -4285,7 +4287,7 @@ if(canonicalCompositionActive){
    newFiles[p]?.after===physicalGit('rev-parse',fixedSource+':'+p)&&
    newFiles[p]?.after!==newFiles[p]?.before),
   'I6_CANONICAL_SUCCESSOR_NOT_EXACT_OR_UNAUTHORIZED');
- need(declared.every(p=>physicalGit('hash-object',p)===(CLOSEOUT_AFTER.get(p)||CUMULATIVE_AFTER.get(p)||(p===markerProduct?insurerMarkerReceipt.source.afterBlob:(newFiles[p]?.after||COMP.productFileBlobs?.[p]||
+ need(declared.every(p=>physicalGit('hash-object',p)===(INSTITUTIONAL_GOALS_AFTER.get(p)||CLOSEOUT_AFTER.get(p)||CUMULATIVE_AFTER.get(p)||(p===markerProduct?insurerMarkerReceipt.source.afterBlob:(newFiles[p]?.after||COMP.productFileBlobs?.[p]||
   (p==='orbit360-platform/core/ui.js'?Q683_CALENDAR_RECEIPT?.sourceBlobsAfter?.[p]:null))))),
   'I6_CANONICAL_COMPOSITION_BLOB_DRIFT');
  // The two extra modules were historically developed but absent from the
@@ -4503,6 +4505,16 @@ if(canonicalCompositionActive){
   closeoutPreviewReceipt.boundaries?.securityB4003StillHold===true,
   'B4_003_CLOSEOUT_EXACT_PREVIEW_BINDING_INVALID');
  console.log('B4_003_CLOSEOUT_EXACT_PREVIEW=BUILD_BYTE_READBACK_PASS_AUTH_UAT_PENDING');
+ const institutionalGoals=C.b4003InstitutionalGoalsSourceSuccessor20261029;
+ const institutionalReceiptPath='artifacts/orbit360-recovery/release-control/I6_5_B4_003_INSTITUTIONAL_GOALS_SOURCE_SUCCESSOR_20261029.json';
+ const institutionalTestPath='tools/gravicentra-b4-003-institutional-goals-owner.test.cjs';
+ const institutionalReceipt=readJson(institutionalReceiptPath);
+ const institutionalCommit=physicalGit('log','-n','1','--format=%H','--','orbit360-platform/modules/equipo.js');
+ const institutionalExpected=(institutionalGoals.atomicCommitPaths||[]).slice().sort();
+ const institutionalActual=physicalGit('diff','--name-only',institutionalGoals.parentHead+'..'+institutionalCommit).split(/\r?\n/).filter(Boolean).sort();
+ const institutionalTestOutput=execFileSync(process.execPath,[institutionalTestPath],{encoding:'utf8',stdio:'pipe'});
+ need(institutionalGoals?.status==='SOURCE_SUCCESSOR_ATOMIC_PREVIEW_PENDING_AUTHENTICATED_UAT'&&institutionalGoals.gate==='I6.5/B4-003'&&institutionalGoals.findingId==='B4-003-P0-20261012-INSTITUTIONAL-GOALS'&&/^[0-9a-f]{40}$/.test(String(institutionalGoals.parentHead||''))&&institutionalGoals.receiptPath===institutionalReceiptPath&&institutionalGoals.receiptBlobSha===physicalGit('hash-object',institutionalReceiptPath)&&institutionalReceipt.schema==='GRAVICENTRA_I65_B4003_INSTITUTIONAL_GOALS_SOURCE_SUCCESSOR_V1'&&institutionalReceipt.status===institutionalGoals.status&&institutionalReceipt.parentHead===institutionalGoals.parentHead&&physicalGit('rev-parse',institutionalCommit+'^')===institutionalGoals.parentHead&&physicalGit('merge-base',institutionalCommit,current)===institutionalCommit&&institutionalExpected.length===5&&institutionalActual.join('|')===institutionalExpected.join('|')&&institutionalReceipt.atomicCommitPaths.slice().sort().join('|')===institutionalExpected.join('|')&&institutionalReceipt.source.path==='orbit360-platform/modules/equipo.js'&&institutionalReceipt.source.beforeBlob==='9e76fbcb70d5a19b8b58aeb72b9fad7acd0bbecf'&&institutionalReceipt.source.afterBlob==='5ce317a0641709e1a405e61435578de934fa194d'&&institutionalGoals.beforeBlob===institutionalReceipt.source.beforeBlob&&institutionalGoals.afterBlob===institutionalReceipt.source.afterBlob&&physicalGit('rev-parse',institutionalGoals.parentHead+':orbit360-platform/modules/equipo.js')===institutionalReceipt.source.beforeBlob&&physicalGit('rev-parse',institutionalCommit+':orbit360-platform/modules/equipo.js')===institutionalReceipt.source.afterBlob&&institutionalReceipt.regression.path===institutionalTestPath&&institutionalReceipt.regression.blob===institutionalGoals.regressionBlob&&physicalGit('rev-parse',institutionalCommit+':'+institutionalTestPath)===institutionalReceipt.regression.blob&&institutionalReceipt.regression.checks===15&&institutionalReceipt.regression.syntheticOnly===true&&institutionalReceipt.regression.realBusinessWrites===0&&institutionalReceipt.semantics.sameMetasCollection===true&&institutionalReceipt.semantics.sameBatchDurableWriter===true&&institutionalReceipt.semantics.globalGoalHasNoAdvisorId===true&&institutionalReceipt.semantics.individualGoalsPreserved===true&&institutionalReceipt.compositionBinding?.frozenProductFileCount===114&&institutionalReceipt.compositionBinding?.lockRewritten===false&&institutionalReceipt.boundaries.freelancerContractInvented===false&&institutionalReceipt.boundaries.freelancerFindingClosed===false&&institutionalReceipt.boundaries.livePromotion===false&&institutionalReceipt.boundaries.operationalWrites===false&&institutionalReceipt.boundaries.securityB4003StillHold===true&&institutionalGoals.currentCapabilityAcceptances===0&&institutionalGoals.productionPromotionAuthorized===false&&institutionalTestOutput.includes('B4_003_INSTITUTIONAL_GOALS_LOCAL_QA_PASS checks=15'),'B4_003_INSTITUTIONAL_GOALS_SOURCE_SUCCESSOR_INVALID');
+ console.log('B4_003_INSTITUTIONAL_GOALS_SOURCE_SUCCESSOR=EQUIPO_METAS_DURABLE_OWNER_SOURCE_QA_PASS_PREVIEW_UAT_PENDING');
  need(COMP.productFileCount===COMP.productFiles.length,'I6_CANONICAL_COMPOSITION_COUNT_DRIFT');
 }
 const b1Retained=activeI65&&['B1','B2','B3','B4'].includes(forensicActiveBlock)&&Array.isArray(B1.allowedProductFiles);

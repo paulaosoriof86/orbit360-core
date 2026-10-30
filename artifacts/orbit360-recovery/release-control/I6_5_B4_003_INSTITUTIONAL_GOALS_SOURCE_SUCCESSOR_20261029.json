@@ -1,0 +1,68 @@
+{
+  "schema": "GRAVICENTRA_I65_B4003_INSTITUTIONAL_GOALS_SOURCE_SUCCESSOR_V1",
+  "gate": "I6.5/B4-003",
+  "status": "SOURCE_SUCCESSOR_ATOMIC_PREVIEW_PENDING_AUTHENTICATED_UAT",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "parentHead": "de2edf00b89c36167df2dcaad5fa701ccf01ba6a",
+  "findingId": "B4-003-P0-20261012-INSTITUTIONAL-GOALS",
+  "source": {
+    "path": "orbit360-platform/modules/equipo.js",
+    "beforeBlob": "9e76fbcb70d5a19b8b58aeb72b9fad7acd0bbecf",
+    "afterBlob": "5ce317a0641709e1a405e61435578de934fa194d"
+  },
+  "regression": {
+    "path": "tools/gravicentra-b4-003-institutional-goals-owner.test.cjs",
+    "blob": "ca14672a0e63b22bef33aa6d869afb43a24cde7b",
+    "checks": 15,
+    "syntheticOnly": true,
+    "firestoreAccess": 0,
+    "realBusinessWrites": 0
+  },
+  "semantics": {
+    "sameMetasCollection": true,
+    "sameBatchDurableWriter": true,
+    "globalGoalHasNoAdvisorId": true,
+    "institutionalTypes": [
+      "prima",
+      "recaudo"
+    ],
+    "individualGoalsPreserved": true,
+    "administrativeUiRoles": [
+      "Dirección",
+      "SuperAdmin",
+      "AdminTenant",
+      "Admin"
+    ],
+    "serverScopeStillAuthoritative": true
+  },
+  "compositionBinding": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
+    "frozenProductFileCount": 114,
+    "lockRewritten": false,
+    "productPathAlreadyDeclared": true
+  },
+  "boundaries": {
+    "previewOnly": true,
+    "livePromotion": false,
+    "dataImport": false,
+    "operationalWrites": false,
+    "authIamRulesChange": false,
+    "freelancerContractInvented": false,
+    "freelancerFindingClosed": false,
+    "securityB4003StillHold": true,
+    "acceptanceGranted": false
+  },
+  "atomicCommitPaths": [
+    "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json",
+    "artifacts/orbit360-recovery/release-control/I6_5_B4_003_INSTITUTIONAL_GOALS_SOURCE_SUCCESSOR_20261029.json",
+    "orbit360-platform/modules/equipo.js",
+    "tools/gravicentra-b4-003-institutional-goals-owner.test.cjs",
+    "tools/gravicentra-i6-control-plane-guard-v1.mjs"
+  ],
+  "preserved": {
+    "findings": 295,
+    "tasks": 86,
+    "historicalApprovals": 15
+  }
+}

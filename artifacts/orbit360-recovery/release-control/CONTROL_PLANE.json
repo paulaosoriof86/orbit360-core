@@ -924,7 +924,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "I6_5_B4_003_AUTHENTICATED_EXACT_PREVIEW_UAT_AND_P0_CLOSEOUT",
+  "nextAction": "I6_5_B4_003_CLOSEOUT_SUCCESSOR_EXACT_PREVIEW",
   "postproductionExitProgress": {
     "formalPercent": 50,
     "frozenMiniGates": 5,
@@ -16178,5 +16178,36 @@
     "currentCapabilityAcceptances": 0,
     "securityB4003StillHold": true,
     "nextAction": "AUTHENTICATED_EXACT_PREVIEW_UAT_AND_PARALLEL_P0_CLOSEOUT"
+  },
+  "b4003InstitutionalGoalsSourceSuccessor20261029": {
+    "status": "SOURCE_SUCCESSOR_ATOMIC_PREVIEW_PENDING_AUTHENTICATED_UAT",
+    "gate": "I6.5/B4-003",
+    "parentHead": "de2edf00b89c36167df2dcaad5fa701ccf01ba6a",
+    "findingId": "B4-003-P0-20261012-INSTITUTIONAL-GOALS",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_INSTITUTIONAL_GOALS_SOURCE_SUCCESSOR_20261029.json",
+    "receiptBlobSha": "92845dd35a86d5e8b764cd8485c14d295afd99c6",
+    "productPath": "orbit360-platform/modules/equipo.js",
+    "beforeBlob": "9e76fbcb70d5a19b8b58aeb72b9fad7acd0bbecf",
+    "afterBlob": "5ce317a0641709e1a405e61435578de934fa194d",
+    "regressionPath": "tools/gravicentra-b4-003-institutional-goals-owner.test.cjs",
+    "regressionBlob": "ca14672a0e63b22bef33aa6d869afb43a24cde7b",
+    "regressionChecks": 15,
+    "atomicCommitPaths": [
+      "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json",
+      "artifacts/orbit360-recovery/release-control/I6_5_B4_003_INSTITUTIONAL_GOALS_SOURCE_SUCCESSOR_20261029.json",
+      "orbit360-platform/modules/equipo.js",
+      "tools/gravicentra-b4-003-institutional-goals-owner.test.cjs",
+      "tools/gravicentra-i6-control-plane-guard-v1.mjs"
+    ],
+    "preservedFindings": 295,
+    "preservedTasks": 86,
+    "currentCapabilityAcceptances": 0,
+    "institutionalGoalOwner": "Equipo → Metas / metas collection / product operational writer",
+    "freelancerContractInvented": false,
+    "freelancerFindingStatus": "OPEN_DEPENDENCY_CANONICAL_CONTRACT_FIELD_REQUIRED",
+    "previewAuthorizedAfterGuardAndRegressionPass": true,
+    "productionPromotionAuthorized": false,
+    "rulesAuthIamDataChangesAuthorized": false,
+    "securityB4003StillHold": true
   }
 }
