@@ -1,0 +1,2229 @@
+{
+  "schema": "GI_I65_B4_003_EXACT_QA_RESIDUE_DEPENDENCY_ADJUDICATION_V1",
+  "recordedOn": "2026-10-30",
+  "status": "PHYSICAL_READBACK_COMPLETE_EXACT_RECORD_DISPOSITION_HOLD",
+  "gate": "I6.5/B4-003",
+  "recordType": "ADDITIVE_PHYSICAL_EVIDENCE_AND_FOCAL_ADJUDICATION_NO_NEW_PLAN_OR_FINDING_CLOSURE",
+  "findingIds": [
+    "B4-003-P0-20261012-QA-CANCELLED-RUN-FIXTURES",
+    "B4-003-P0-20261012-QA-ORPHAN-RENEWALS"
+  ],
+  "sourceExecution": {
+    "repository": "paulaosoriof86/orbit360-core",
+    "branch": "recovery/fase-a-clean-20260831",
+    "sourceHead": "b10ef805b075b1c37e2c8da5940b408b39d6a9c3",
+    "workflowPath": ".github/workflows/gravicentra-b4-003-readonly-diagnostic.yml",
+    "workflowRunId": 41144205677,
+    "workflowUrl": "https://github.com/paulaosoriof86/orbit360-core/actions/runs/41144205677",
+    "workflowConclusion": "success",
+    "workflowConclusionAndArtifactIdentitySource": "ROOT_VERIFIED_RUN_AND_DOWNLOADED_ARTIFACT",
+    "artifactId": 13019409947,
+    "artifactArchiveSha256": "e4e4184debb72194b298a3308bba9e319a83b0d20bb1a60fbf2f61706edf6d11",
+    "readbackPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_EXACT_QA_RESIDUE_DEPENDENCIES_READBACK_20261030.json",
+    "readbackBytes": 227554,
+    "readbackSha256": "d8966ca82695f97e27a9b6e6a0f9d95eb19a79c954e7a7371267103450eefb4b",
+    "readbackGitBlob": "5a6bca677b5a127436fd5382163481a08e462f70",
+    "readbackCopiedByteForByte": true,
+    "readbackIsAlreadySanitizedProjection": true,
+    "rawFirestoreDocumentSnapshot": false,
+    "controlPlaneBlobAtExecution": "e5df1df940c27d76a37244714a161169c2bb2731",
+    "diagnosticToolBlob": "c539dde8b9922f42ea7107ea69462f044395e10f",
+    "requestBlob": "89ecbc70ed853e9051451951cd0b603c028b38cb",
+    "contractSha256": "86209bf04cd5707d992c1b7ded50f575d7587f4c0ac1d34d2f677ab06296ea29",
+    "readWindow": {
+      "startedAt": "2026-10-30T23:26:54.412Z",
+      "completedAt": "2026-10-30T23:27:06.793Z",
+      "atomicSnapshot": false
+    }
+  },
+  "actualProgress": {
+    "completedSubtask": "CURRENT_EXACT_SEVENTEEN_ROOTS_AND_DECLARED_DEPENDENCIES_READBACK",
+    "previousGapResolved": "Aggregate counts were replaced with exact current document identifiers, relation edges, existence and projected provenance.",
+    "rootsRequested": 17,
+    "rootsSuccessfullyRead": 17,
+    "rootsPresent": 17,
+    "recordsObserved": 65,
+    "recordsPresent": 56,
+    "referencedParentsConfirmedAbsent": 9,
+    "declaredRelationEdges": 147,
+    "boundedQueries": 127,
+    "failedQueries": 0,
+    "truncatedQueries": 0,
+    "recordedIssues": 0,
+    "declaredRelationCoverageComplete": true,
+    "universalDependencyGraphComplete": false,
+    "fullFindingClosures": 0,
+    "newProductAcceptance": false,
+    "formalPercentIncrement": 0
+  },
+  "evidenceReferences": {
+    "frozenFindings": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_P0_FINDINGS_DECISIONS_FREEZE_20261012.md",
+      "gitBlob": "2760d2aeb961bac5a0ce11e326c689143d2cc083"
+    },
+    "historicalMachineProof": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R20_MACHINE_PROOF_20261007.json",
+      "gitBlob": "03e79f67a5efe061ca514b671c729a40c9a7b750"
+    },
+    "historicalOrphanDisposition": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R19_B2_QA_RESIDUE_ADJUDICATION_20261005.json",
+      "gitBlob": "ebdf879d50fd6a32962564c2ce3701b282f6669c"
+    },
+    "currentProgressBeforeThisReadback": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_REAL_PROGRESS_RECONCILIATION_20261030.json",
+      "gitBlob": "91f045bb4b34da32fffb9e299b78f972ce0af308"
+    },
+    "client360ReadReuseOctober27": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CLIENT360_FINANCIAL_OWNER_UAT_RECONCILIATION_20261027.json",
+      "gitBlob": "f47d04be653c56642fb539fce56dfb8f0172487c"
+    },
+    "collaborationWriteReuseOctober28": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_AUTHENTICATED_INTEGRAL_WRITE_UAT_DELTA_20261028.md",
+      "gitBlob": "3cf1acb105715c8962e39e698129564e00a9d9a0"
+    }
+  },
+  "findings": [
+    {
+      "findingId": "B4-003-P0-20261012-QA-CANCELLED-RUN-FIXTURES",
+      "ledgerStatusPreserved": "OPEN_P0_NOT_ACCEPTED",
+      "operationalAdjudication": "CURRENT_EXACT_SYNTHETIC_LINEAGE_MAPPED_RETAINED_HOLD_DISPOSITION_PENDING",
+      "originalRunId": 38102224750,
+      "rootRecords": [
+        {
+          "document": "data/aseguradoras/items/b4003qa_insurer_38102224750",
+          "collection": "aseguradoras",
+          "id": "b4003qa_insurer_38102224750",
+          "exists": true,
+          "documentSha256": "57421ec1f50cac7d0566e4f93d9d4e7d94507d54245a1496e12d4b6b24a2a5a8",
+          "syntheticMarkers": {
+            "explicit": true,
+            "alternate": false,
+            "previewWrite": false
+          },
+          "tenantMatches": true,
+          "createdAt": "2026-10-11T01:37:30.311Z",
+          "updatedAt": "2026-10-11T01:37:30.311Z",
+          "updateTime": "2026-10-11T01:37:30.336Z",
+          "relations": {},
+          "status": {
+            "estado": "activa",
+            "estadoOperativo": null,
+            "status": null,
+            "exigibilidad": null,
+            "carteraActiva": null,
+            "pagoConfirmado": null
+          },
+          "currency": "GTQ",
+          "positiveAmountFields": [],
+          "commentsCount": 0,
+          "historyCount": 0
+        },
+        {
+          "document": "data/cancelaciones/items/b4003qa_cancel_38102224750",
+          "collection": "cancelaciones",
+          "id": "b4003qa_cancel_38102224750",
+          "exists": true,
+          "documentSha256": "ee9961fe472a20181abd1ffbf2f45a6bd5002b05e2f1234f117f79a0c7bfa7c0",
+          "syntheticMarkers": {
+            "explicit": true,
+            "alternate": false,
+            "previewWrite": false
+          },
+          "tenantMatches": true,
+          "createdAt": null,
+          "updatedAt": "2026-10-12T19:18:12.912Z",
+          "updateTime": "2026-10-12T19:18:12.953Z",
+          "relations": {
+            "clienteId": "b4003qa_client_38102224750",
+            "polizaId": "b4003qa_policy_cancel_38102224750"
+          },
+          "status": {
+            "estado": null,
+            "estadoOperativo": null,
+            "status": null,
+            "exigibilidad": null,
+            "carteraActiva": null,
+            "pagoConfirmado": null
+          },
+          "currency": "GTQ",
+          "positiveAmountFields": [],
+          "commentsCount": 0,
+          "historyCount": 0
+        },
+        {
+          "document": "data/clientes/items/b4003qa_client_38102224750",
+          "collection": "clientes",
+          "id": "b4003qa_client_38102224750",
+          "exists": true,
+          "documentSha256": "15e5af7e509dd13e5c3e3af39f43e45334a86b254247e359dc97bc37f9badb79",
+          "syntheticMarkers": {
+            "explicit": true,
+            "alternate": false,
+            "previewWrite": false
+          },
+          "tenantMatches": true,
+          "createdAt": null,
+          "updatedAt": "2026-10-11T01:38:23.545Z",
+          "updateTime": "2026-10-11T01:38:23.583Z",
+          "relations": {},
+          "status": {
+            "estado": "activo",
+            "estadoOperativo": "activo",
+            "status": null,
+            "exigibilidad": null,
+            "carteraActiva": null,
+            "pagoConfirmado": null
+          },
+          "currency": "GTQ",
+          "positiveAmountFields": [],
+          "commentsCount": 0,
+          "historyCount": 0
+        },
+        {
+          "document": "data/negocios/items/b4003qa_business_collab_38102224750",
+          "collection": "negocios",
+          "id": "b4003qa_business_collab_38102224750",
+          "exists": true,
+          "documentSha256": "3733cbd1caffb9ef6e80043086a6ce5354ef9ec276ef3e4b7dbcbaa49a246d48",
+          "syntheticMarkers": {
+            "explicit": true,
+            "alternate": false,
+            "previewWrite": true
+          },
+          "tenantMatches": true,
+          "createdAt": "2026-10-11T01:37:30.406Z",
+          "updatedAt": "2026-10-28T18:14:24.409Z",
+          "updateTime": "2026-10-28T18:14:24.458Z",
+          "relations": {
+            "clienteId": "b4003qa_client_38102224750"
+          },
+          "status": {
+            "estado": "cotizando",
+            "estadoOperativo": null,
+            "status": null,
+            "exigibilidad": null,
+            "carteraActiva": null,
+            "pagoConfirmado": null
+          },
+          "currency": "GTQ",
+          "positiveAmountFields": [],
+          "commentsCount": 4,
+          "historyCount": 4
+        },
+        {
+          "document": "data/negocios/items/b4003qa_business_collab_noclient_38102224750",
+          "collection": "negocios",
+          "id": "b4003qa_business_collab_noclient_38102224750",
+          "exists": true,
+          "documentSha256": "62220818c9ab5b51269bb5c8d008327deeb57d523dbe43c5b40be1bb7a4451bd",
+          "syntheticMarkers": {
+            "explicit": true,
+            "alternate": false,
+            "previewWrite": true
+          },
+          "tenantMatches": true,
+          "createdAt": "2026-10-11T01:37:30.497Z",
+          "updatedAt": "2026-10-11T01:37:30.497Z",
+          "updateTime": "2026-10-11T01:37:30.518Z",
+          "relations": {},
+          "status": {
+            "estado": "cotizando",
+            "estadoOperativo": null,
+            "status": null,
+            "exigibilidad": null,
+            "carteraActiva": null,
+            "pagoConfirmado": null
+          },
+          "currency": "GTQ",
+          "positiveAmountFields": [],
+          "commentsCount": 0,
+          "historyCount": 0
+        },
+        {
+          "document": "data/polizas/items/b4003qa_policy_cancel_38102224750",
+          "collection": "polizas",
+          "id": "b4003qa_policy_cancel_38102224750",
+          "exists": true,
+          "documentSha256": "7b9b631d4f8278eff9994193bb29a7da9b49da2e1d638c386a67384339c8001b",
+          "syntheticMarkers": {
+            "explicit": true,
+            "alternate": false,
+            "previewWrite": false
+          },
+          "tenantMatches": true,
+          "createdAt": "2026-10-11T01:37:29.580Z",
+          "updatedAt": "2026-10-11T01:37:29.580Z",
+          "updateTime": "2026-10-11T01:37:29.607Z",
+          "relations": {
+            "clienteId": "b4003qa_client_38102224750"
+          },
+          "status": {
+            "estado": "cancelada",
+            "estadoOperativo": null,
+            "status": null,
+            "exigibilidad": null,
+            "carteraActiva": null,
+            "pagoConfirmado": null
+          },
+          "currency": "GTQ",
+          "positiveAmountFields": [
+            "prima"
+          ],
+          "commentsCount": 0,
+          "historyCount": 0
+        },
+        {
+          "document": "data/polizas/items/b4003qa_policy_expired_renew_38102224750",
+          "collection": "polizas",
+          "id": "b4003qa_policy_expired_renew_38102224750",
+          "exists": true,
+          "documentSha256": "4d0c9381c7941c61f9768be3db9ac7d376c283135f54a81854d34a098b976261",
+          "syntheticMarkers": {
+            "explicit": true,
+            "alternate": false,
+            "previewWrite": false
+          },
+          "tenantMatches": true,
+          "createdAt": "2026-10-11T01:37:29.274Z",
+          "updatedAt": "2026-10-11T01:37:29.274Z",
+          "updateTime": "2026-10-11T01:37:29.300Z",
+          "relations": {
+            "clienteId": "b4003qa_client_38102224750"
+          },
+          "status": {
+            "estado": "vencida",
+            "estadoOperativo": null,
+            "status": null,
+            "exigibilidad": null,
+            "carteraActiva": null,
+            "pagoConfirmado": null
+          },
+          "currency": "GTQ",
+          "positiveAmountFields": [
+            "prima"
+          ],
+          "commentsCount": 0,
+          "historyCount": 0
+        },
+        {
+          "document": "data/polizas/items/b4003qa_policy_health_38102224750",
+          "collection": "polizas",
+          "id": "b4003qa_policy_health_38102224750",
+          "exists": true,
+          "documentSha256": "8a825d5465e8791e1bcfd3acb5085b0bca4d686d776e9e8bb650d529d6e216f8",
+          "syntheticMarkers": {
+            "explicit": true,
+            "alternate": false,
+            "previewWrite": false
+          },
+          "tenantMatches": true,
+          "createdAt": "2026-10-11T01:37:29.686Z",
+          "updatedAt": "2026-10-11T01:37:29.686Z",
+          "updateTime": "2026-10-11T01:37:29.715Z",
+          "relations": {
+            "clienteId": "b4003qa_client_38102224750"
+          },
+          "status": {
+            "estado": "vigente",
+            "estadoOperativo": null,
+            "status": null,
+            "exigibilidad": null,
+            "carteraActiva": null,
+            "pagoConfirmado": null
+          },
+          "currency": "GTQ",
+          "positiveAmountFields": [
+            "primaTotal",
+            "prima"
+          ],
+          "commentsCount": 0,
+          "historyCount": 0
+        },
+        {
+          "document": "data/polizas/items/b4003qa_policy_renew_38102224750",
+          "collection": "polizas",
+          "id": "b4003qa_policy_renew_38102224750",
+          "exists": true,
+          "documentSha256": "8bbe76688d437404c073ddf9d4e8b55d133240ec5b1442088670dee4653d2f40",
+          "syntheticMarkers": {
+            "explicit": true,
+            "alternate": false,
+            "previewWrite": false
+          },
+          "tenantMatches": true,
+          "createdAt": null,
+          "updatedAt": "2026-10-11T01:38:54.912Z",
+          "updateTime": "2026-10-11T01:38:54.942Z",
+          "relations": {
+            "clienteId": "b4003qa_client_38102224750"
+          },
+          "status": {
+            "estado": "vigente",
+            "estadoOperativo": null,
+            "status": null,
+            "exigibilidad": null,
+            "carteraActiva": null,
+            "pagoConfirmado": null
+          },
+          "currency": "GTQ",
+          "positiveAmountFields": [
+            "prima"
+          ],
+          "commentsCount": 0,
+          "historyCount": 0
+        },
+        {
+          "document": "data/polizas/items/b4003qa_policy_renewwrite_38102224750",
+          "collection": "polizas",
+          "id": "b4003qa_policy_renewwrite_38102224750",
+          "exists": true,
+          "documentSha256": "15e9447770acab640b741b353fe92334910086063e23897c6883585d0ab317c3",
+          "syntheticMarkers": {
+            "explicit": true,
+            "alternate": false,
+            "previewWrite": false
+          },
+          "tenantMatches": true,
+          "createdAt": null,
+          "updatedAt": "2026-10-11T01:38:21.635Z",
+          "updateTime": "2026-10-11T01:38:21.693Z",
+          "relations": {
+            "clienteId": "b4003qa_client_38102224750",
+            "aseguradoraId": "b4003qa_human_insurer_r20"
+          },
+          "status": {
+            "estado": "vigente",
+            "estadoOperativo": null,
+            "status": null,
+            "exigibilidad": null,
+            "carteraActiva": null,
+            "pagoConfirmado": null
+          },
+          "currency": "GTQ",
+          "positiveAmountFields": [
+            "primaTotal",
+            "prima"
+          ],
+          "commentsCount": 0,
+          "historyCount": 0
+        },
+        {
+          "document": "data/polizas/items/b4003qa_policy_unknown_38102224750",
+          "collection": "polizas",
+          "id": "b4003qa_policy_unknown_38102224750",
+          "exists": true,
+          "documentSha256": "47119924d534570bad7cd02f1b98678e7a146bf4c5ffb928e1422a5a335cd26b",
+          "syntheticMarkers": {
+            "explicit": true,
+            "alternate": false,
+            "previewWrite": false
+          },
+          "tenantMatches": true,
+          "createdAt": "2026-10-11T01:37:29.370Z",
+          "updatedAt": "2026-10-11T01:37:29.370Z",
+          "updateTime": "2026-10-11T01:37:29.395Z",
+          "relations": {
+            "clienteId": "b4003qa_client_38102224750"
+          },
+          "status": {
+            "estado": "vigente",
+            "estadoOperativo": null,
+            "status": null,
+            "exigibilidad": null,
+            "carteraActiva": null,
+            "pagoConfirmado": null
+          },
+          "currency": "GTQ",
+          "positiveAmountFields": [
+            "prima"
+          ],
+          "commentsCount": 0,
+          "historyCount": 0
+        },
+        {
+          "document": "data/recibosEsperados/items/b4003qa_receipt_health_1_38102224750",
+          "collection": "recibosEsperados",
+          "id": "b4003qa_receipt_health_1_38102224750",
+          "exists": true,
+          "documentSha256": "b15c911a72f5cea13948b52daffcbf739fc705759ca67423f2af74487792bad9",
+          "syntheticMarkers": {
+            "explicit": true,
+            "alternate": false,
+            "previewWrite": false
+          },
+          "tenantMatches": true,
+          "createdAt": "2026-10-11T01:37:29.788Z",
+          "updatedAt": "2026-10-11T01:37:29.788Z",
+          "updateTime": "2026-10-11T01:37:29.813Z",
+          "relations": {
+            "clienteId": "b4003qa_client_38102224750",
+            "polizaId": "b4003qa_policy_health_38102224750"
+          },
+          "status": {
+            "estado": "pendiente",
+            "estadoOperativo": null,
+            "status": null,
+            "exigibilidad": null,
+            "carteraActiva": null,
+            "pagoConfirmado": null
+          },
+          "currency": "GTQ",
+          "positiveAmountFields": [
+            "monto",
+            "montoTotal",
+            "primaTotal"
+          ],
+          "commentsCount": 0,
+          "historyCount": 0
+        },
+        {
+          "document": "data/recibosEsperados/items/b4003qa_receipt_health_2_38102224750",
+          "collection": "recibosEsperados",
+          "id": "b4003qa_receipt_health_2_38102224750",
+          "exists": true,
+          "documentSha256": "a90f934d56257db5edb550892e330f18de365ad7441fe72c8f061c580927b77a",
+          "syntheticMarkers": {
+            "explicit": true,
+            "alternate": false,
+            "previewWrite": false
+          },
+          "tenantMatches": true,
+          "createdAt": "2026-10-11T01:37:29.882Z",
+          "updatedAt": "2026-10-11T01:37:29.882Z",
+          "updateTime": "2026-10-11T01:37:29.905Z",
+          "relations": {
+            "clienteId": "b4003qa_client_38102224750",
+            "polizaId": "b4003qa_policy_health_38102224750"
+          },
+          "status": {
+            "estado": "pendiente",
+            "estadoOperativo": null,
+            "status": null,
+            "exigibilidad": null,
+            "carteraActiva": null,
+            "pagoConfirmado": null
+          },
+          "currency": "GTQ",
+          "positiveAmountFields": [
+            "monto",
+            "montoTotal",
+            "primaTotal"
+          ],
+          "commentsCount": 0,
+          "historyCount": 0
+        },
+        {
+          "document": "data/recibosEsperados/items/b4003qa_receipt_health_shadow_38102224750",
+          "collection": "recibosEsperados",
+          "id": "b4003qa_receipt_health_shadow_38102224750",
+          "exists": true,
+          "documentSha256": "b528fa5503099a4fbe98854d5db4a6d0232fe238463dd67dc1318e8137c9f166",
+          "syntheticMarkers": {
+            "explicit": true,
+            "alternate": false,
+            "previewWrite": false
+          },
+          "tenantMatches": true,
+          "createdAt": "2026-10-11T01:37:29.985Z",
+          "updatedAt": "2026-10-11T01:37:29.985Z",
+          "updateTime": "2026-10-11T01:37:30.013Z",
+          "relations": {
+            "clienteId": "b4003qa_client_38102224750",
+            "polizaId": "b4003qa_policy_health_38102224750"
+          },
+          "status": {
+            "estado": "pendiente",
+            "estadoOperativo": null,
+            "status": null,
+            "exigibilidad": null,
+            "carteraActiva": null,
+            "pagoConfirmado": null
+          },
+          "currency": "GTQ",
+          "positiveAmountFields": [
+            "monto",
+            "montoTotal",
+            "primaTotal"
+          ],
+          "commentsCount": 0,
+          "historyCount": 0
+        }
+      ],
+      "originalRootCount": 14,
+      "originalRootsPresent": 14,
+      "originalRootsExplicitSynthetic": 14,
+      "additionalDeclaredDependents": {
+        "count": 23,
+        "syntheticOperationalDerivativesCount": 5,
+        "syntheticOperationalDerivatives": [
+          {
+            "document": "data/actividades/items/act_ren_b4003qa_policy_renew_38102224750_20261011",
+            "collection": "actividades",
+            "id": "act_ren_b4003qa_policy_renew_38102224750_20261011",
+            "exists": true,
+            "documentSha256": "fd487137e7c9c34ab17ae9f6ed05c2e1bb4691b3ee15b35ef06c62c9cacca067",
+            "syntheticMarkers": {
+              "explicit": true,
+              "alternate": false,
+              "previewWrite": false
+            },
+            "tenantMatches": true,
+            "createdAt": "2026-10-11T01:38:54.269Z",
+            "updatedAt": "2026-10-11T01:38:54.912Z",
+            "updateTime": "2026-10-11T01:38:54.942Z",
+            "relations": {
+              "clienteId": "b4003qa_client_38102224750"
+            },
+            "status": {
+              "estado": null,
+              "estadoOperativo": null,
+              "status": null,
+              "exigibilidad": null,
+              "carteraActiva": null,
+              "pagoConfirmado": null
+            },
+            "currency": null,
+            "positiveAmountFields": [],
+            "commentsCount": 0,
+            "historyCount": 0
+          },
+          {
+            "document": "data/actividades/items/b4003qa_actividades_act_polupd_mv35max4_mr2xi",
+            "collection": "actividades",
+            "id": "b4003qa_actividades_act_polupd_mv35max4_mr2xi",
+            "exists": true,
+            "documentSha256": "c0065f1e077b1fdb4d87b6b48e9fe397cba713772a67bb25e18cc895de3181f9",
+            "syntheticMarkers": {
+              "explicit": true,
+              "alternate": false,
+              "previewWrite": false
+            },
+            "tenantMatches": true,
+            "createdAt": "2026-10-11T01:38:19.850Z",
+            "updatedAt": "2026-10-11T01:38:21.635Z",
+            "updateTime": "2026-10-11T01:38:21.693Z",
+            "relations": {
+              "clienteId": "b4003qa_client_38102224750"
+            },
+            "status": {
+              "estado": null,
+              "estadoOperativo": null,
+              "status": null,
+              "exigibilidad": null,
+              "carteraActiva": null,
+              "pagoConfirmado": null
+            },
+            "currency": null,
+            "positiveAmountFields": [],
+            "commentsCount": 0,
+            "historyCount": 0
+          },
+          {
+            "document": "data/carteraPrimas/items/car_cob_b4003qa_policy_renewwrite_38102224750_001",
+            "collection": "carteraPrimas",
+            "id": "car_cob_b4003qa_policy_renewwrite_38102224750_001",
+            "exists": true,
+            "documentSha256": "2a086affac92d4666fd3188e08371c0630dfaf3c22ef3bcecdec5320bf5843ae",
+            "syntheticMarkers": {
+              "explicit": true,
+              "alternate": false,
+              "previewWrite": false
+            },
+            "tenantMatches": true,
+            "createdAt": "2026-10-11T01:38:19.848Z",
+            "updatedAt": "2026-10-11T01:38:21.635Z",
+            "updateTime": "2026-10-11T01:38:21.693Z",
+            "relations": {
+              "clienteId": "b4003qa_client_38102224750",
+              "polizaId": "b4003qa_policy_renewwrite_38102224750",
+              "reciboId": "cob_b4003qa_policy_renewwrite_38102224750_001",
+              "aseguradoraId": "b4003qa_human_insurer_r20"
+            },
+            "status": {
+              "estado": "pendiente",
+              "estadoOperativo": "futuro_pendiente",
+              "status": null,
+              "exigibilidad": "futura",
+              "carteraActiva": true,
+              "pagoConfirmado": null
+            },
+            "currency": "GTQ",
+            "positiveAmountFields": [
+              "monto",
+              "montoTotal",
+              "primaTotal"
+            ],
+            "commentsCount": 0,
+            "historyCount": 0
+          },
+          {
+            "document": "data/recibosEsperados/items/cob_b4003qa_policy_renewwrite_38102224750_001",
+            "collection": "recibosEsperados",
+            "id": "cob_b4003qa_policy_renewwrite_38102224750_001",
+            "exists": true,
+            "documentSha256": "163bf4c6a834d9103a696411827ae20ea994f95a30f79c501df4d01675842091",
+            "syntheticMarkers": {
+              "explicit": true,
+              "alternate": false,
+              "previewWrite": false
+            },
+            "tenantMatches": true,
+            "createdAt": "2026-10-11T01:38:19.845Z",
+            "updatedAt": "2026-10-11T01:38:21.635Z",
+            "updateTime": "2026-10-11T01:38:21.693Z",
+            "relations": {
+              "clienteId": "b4003qa_client_38102224750",
+              "polizaId": "b4003qa_policy_renewwrite_38102224750",
+              "aseguradoraId": "b4003qa_human_insurer_r20"
+            },
+            "status": {
+              "estado": "pendiente",
+              "estadoOperativo": null,
+              "status": null,
+              "exigibilidad": null,
+              "carteraActiva": true,
+              "pagoConfirmado": null
+            },
+            "currency": "GTQ",
+            "positiveAmountFields": [
+              "monto",
+              "montoTotal"
+            ],
+            "commentsCount": 0,
+            "historyCount": 0
+          },
+          {
+            "document": "data/vehiculos/items/b4003qa_vehiculos_veh_mv35mayd",
+            "collection": "vehiculos",
+            "id": "b4003qa_vehiculos_veh_mv35mayd",
+            "exists": true,
+            "documentSha256": "966540dbb19e2e6dd7ad7ed2ee3aaefc52019b5fd2bcf3081f1b3d060c5a2653",
+            "syntheticMarkers": {
+              "explicit": true,
+              "alternate": false,
+              "previewWrite": false
+            },
+            "tenantMatches": true,
+            "createdAt": "2026-10-11T01:38:19.842Z",
+            "updatedAt": "2026-10-11T01:38:21.635Z",
+            "updateTime": "2026-10-11T01:38:21.693Z",
+            "relations": {
+              "clienteId": "b4003qa_client_38102224750",
+              "polizaId": "b4003qa_policy_renewwrite_38102224750"
+            },
+            "status": {
+              "estado": null,
+              "estadoOperativo": null,
+              "status": null,
+              "exigibilidad": null,
+              "carteraActiva": null,
+              "pagoConfirmado": null
+            },
+            "currency": null,
+            "positiveAmountFields": [],
+            "commentsCount": 0,
+            "historyCount": 0
+          }
+        ],
+        "workflowAuditCount": 18,
+        "workflowAuditCountsByCollection": {
+          "previewNotificationOutbox": 6,
+          "previewWorkflowEvents": 6,
+          "previewWorkflowRequests": 6
+        },
+        "workflowAuditRecords": [
+          {
+            "document": "previewNotificationOutbox/evt_377813b0c9f546d504f3312c8663",
+            "collection": "previewNotificationOutbox",
+            "id": "evt_377813b0c9f546d504f3312c8663",
+            "exists": true,
+            "documentSha256": "5d2abe9eced00e481d810693dfd93a93993a90a629be297d286c12636c2b3233",
+            "syntheticMarkers": {
+              "explicit": false,
+              "alternate": false,
+              "previewWrite": true
+            },
+            "tenantMatches": true,
+            "createdAt": "2026-10-28T18:14:24.409Z",
+            "updatedAt": null,
+            "updateTime": "2026-10-28T18:14:24.458Z",
+            "relations": {
+              "entityId": "b4003qa_business_collab_38102224750",
+              "eventId": "evt_377813b0c9f546d504f3312c8663"
+            },
+            "status": {
+              "estado": null,
+              "estadoOperativo": null,
+              "status": "pending_provider",
+              "exigibilidad": null,
+              "carteraActiva": null,
+              "pagoConfirmado": null
+            },
+            "currency": null,
+            "positiveAmountFields": [],
+            "commentsCount": 0,
+            "historyCount": 0
+          },
+          {
+            "document": "previewNotificationOutbox/evt_4f43d5ab2a20415b50767d96380b",
+            "collection": "previewNotificationOutbox",
+            "id": "evt_4f43d5ab2a20415b50767d96380b",
+            "exists": true,
+            "documentSha256": "c72b9fb375eceecfa4e0406abcc1251efe78ff9212f6affc287c3f5ebf402cc2",
+            "syntheticMarkers": {
+              "explicit": false,
+              "alternate": false,
+              "previewWrite": true
+            },
+            "tenantMatches": true,
+            "createdAt": "2026-10-14T23:24:34.703Z",
+            "updatedAt": null,
+            "updateTime": "2026-10-14T23:24:34.749Z",
+            "relations": {
+              "entityId": "b4003qa_business_collab_38102224750",
+              "eventId": "evt_4f43d5ab2a20415b50767d96380b"
+            },
+            "status": {
+              "estado": null,
+              "estadoOperativo": null,
+              "status": "pending_provider",
+              "exigibilidad": null,
+              "carteraActiva": null,
+              "pagoConfirmado": null
+            },
+            "currency": null,
+            "positiveAmountFields": [],
+            "commentsCount": 0,
+            "historyCount": 0
+          },
+          {
+            "document": "previewNotificationOutbox/evt_9eebdf281a3e1e46f9d325536ad6",
+            "collection": "previewNotificationOutbox",
+            "id": "evt_9eebdf281a3e1e46f9d325536ad6",
+            "exists": true,
+            "documentSha256": "064f78978dc3a9d263e6e05e2f26514ba189058d851090f450819b8f82e3cd7d",
+            "syntheticMarkers": {
+              "explicit": false,
+              "alternate": false,
+              "previewWrite": true
+            },
+            "tenantMatches": true,
+            "createdAt": "2026-10-11T15:09:51.202Z",
+            "updatedAt": null,
+            "updateTime": "2026-10-11T15:09:51.248Z",
+            "relations": {
+              "entityId": "b4003qa_business_collab_38102224750",
+              "eventId": "evt_9eebdf281a3e1e46f9d325536ad6"
+            },
+            "status": {
+              "estado": null,
+              "estadoOperativo": null,
+              "status": "pending_provider",
+              "exigibilidad": null,
+              "carteraActiva": null,
+              "pagoConfirmado": null
+            },
+            "currency": null,
+            "positiveAmountFields": [],
+            "commentsCount": 0,
+            "historyCount": 0
+          },
+          {
+            "document": "previewNotificationOutbox/evt_b772f6ea579332d15b397169f2a5",
+            "collection": "previewNotificationOutbox",
+            "id": "evt_b772f6ea579332d15b397169f2a5",
+            "exists": true,
+            "documentSha256": "d1dee5cb25ae7c795e7a06d844f12ddcfa8d25fe2fe680aa09d8b9306632717c",
+            "syntheticMarkers": {
+              "explicit": false,
+              "alternate": false,
+              "previewWrite": true
+            },
+            "tenantMatches": true,
+            "createdAt": "2026-10-14T23:26:03.738Z",
+            "updatedAt": null,
+            "updateTime": "2026-10-14T23:26:03.790Z",
+            "relations": {
+              "entityId": "b4003qa_business_collab_38102224750",
+              "eventId": "evt_b772f6ea579332d15b397169f2a5"
+            },
+            "status": {
+              "estado": null,
+              "estadoOperativo": null,
+              "status": "pending_provider",
+              "exigibilidad": null,
+              "carteraActiva": null,
+              "pagoConfirmado": null
+            },
+            "currency": null,
+            "positiveAmountFields": [],
+            "commentsCount": 0,
+            "historyCount": 0
+          },
+          {
+            "document": "previewNotificationOutbox/evt_bb7095a46f99dab2a3004ae0c78d",
+            "collection": "previewNotificationOutbox",
+            "id": "evt_bb7095a46f99dab2a3004ae0c78d",
+            "exists": true,
+            "documentSha256": "5985746a470aa28e47e1fd35ea0da0261c11994da5499c69a09fca6cdd06f0b8",
+            "syntheticMarkers": {
+              "explicit": false,
+              "alternate": false,
+              "previewWrite": true
+            },
+            "tenantMatches": true,
+            "createdAt": "2026-10-12T18:44:48.566Z",
+            "updatedAt": null,
+            "updateTime": "2026-10-12T18:44:48.602Z",
+            "relations": {
+              "entityId": "b4003qa_business_collab_38102224750",
+              "eventId": "evt_bb7095a46f99dab2a3004ae0c78d"
+            },
+            "status": {
+              "estado": null,
+              "estadoOperativo": null,
+              "status": "pending_provider",
+              "exigibilidad": null,
+              "carteraActiva": null,
+              "pagoConfirmado": null
+            },
+            "currency": null,
+            "positiveAmountFields": [],
+            "commentsCount": 0,
+            "historyCount": 0
+          },
+          {
+            "document": "previewNotificationOutbox/evt_d907eaa93bbbd931bee2d4b1f653",
+            "collection": "previewNotificationOutbox",
+            "id": "evt_d907eaa93bbbd931bee2d4b1f653",
+            "exists": true,
+            "documentSha256": "792938a534143fcd360c48a5e603591efdd2967f6336832efabfee02963cc1ba",
+            "syntheticMarkers": {
+              "explicit": false,
+              "alternate": false,
+              "previewWrite": true
+            },
+            "tenantMatches": true,
+            "createdAt": "2026-10-11T15:17:42.822Z",
+            "updatedAt": null,
+            "updateTime": "2026-10-11T15:17:42.857Z",
+            "relations": {
+              "entityId": "b4003qa_business_collab_38102224750",
+              "eventId": "evt_d907eaa93bbbd931bee2d4b1f653"
+            },
+            "status": {
+              "estado": null,
+              "estadoOperativo": null,
+              "status": "pending_provider",
+              "exigibilidad": null,
+              "carteraActiva": null,
+              "pagoConfirmado": null
+            },
+            "currency": null,
+            "positiveAmountFields": [],
+            "commentsCount": 0,
+            "historyCount": 0
+          },
+          {
+            "document": "previewWorkflowEvents/evt_377813b0c9f546d504f3312c8663",
+            "collection": "previewWorkflowEvents",
+            "id": "evt_377813b0c9f546d504f3312c8663",
+            "exists": true,
+            "documentSha256": "be3b967427139c66180b82e1aea493d8b0419cbe1c9c0185f6686ac7e4f46108",
+            "syntheticMarkers": {
+              "explicit": false,
+              "alternate": false,
+              "previewWrite": true
+            },
+            "tenantMatches": true,
+            "createdAt": "2026-10-28T18:14:24.409Z",
+            "updatedAt": null,
+            "updateTime": "2026-10-28T18:14:24.458Z",
+            "relations": {
+              "entityId": "b4003qa_business_collab_38102224750",
+              "requestId": "wf_79a53e3beb92f18de224f7bae3a7"
+            },
+            "status": {
+              "estado": null,
+              "estadoOperativo": null,
+              "status": null,
+              "exigibilidad": null,
+              "carteraActiva": null,
+              "pagoConfirmado": null
+            },
+            "currency": null,
+            "positiveAmountFields": [],
+            "commentsCount": 0,
+            "historyCount": 0
+          },
+          {
+            "document": "previewWorkflowEvents/evt_4f43d5ab2a20415b50767d96380b",
+            "collection": "previewWorkflowEvents",
+            "id": "evt_4f43d5ab2a20415b50767d96380b",
+            "exists": true,
+            "documentSha256": "b4e26cee85d2c53497ff5643748cf97601fa9304d96dd1a44afcf8f807c4bea6",
+            "syntheticMarkers": {
+              "explicit": false,
+              "alternate": false,
+              "previewWrite": true
+            },
+            "tenantMatches": true,
+            "createdAt": "2026-10-14T23:24:34.703Z",
+            "updatedAt": null,
+            "updateTime": "2026-10-14T23:24:34.749Z",
+            "relations": {
+              "entityId": "b4003qa_business_collab_38102224750",
+              "requestId": "wf_306db0d36cd235993f2f7b5f8802"
+            },
+            "status": {
+              "estado": null,
+              "estadoOperativo": null,
+              "status": null,
+              "exigibilidad": null,
+              "carteraActiva": null,
+              "pagoConfirmado": null
+            },
+            "currency": null,
+            "positiveAmountFields": [],
+            "commentsCount": 0,
+            "historyCount": 0
+          },
+          {
+            "document": "previewWorkflowEvents/evt_9eebdf281a3e1e46f9d325536ad6",
+            "collection": "previewWorkflowEvents",
+            "id": "evt_9eebdf281a3e1e46f9d325536ad6",
+            "exists": true,
+            "documentSha256": "2c1291d645d31dde7cb805279eb86536b1f2bdd04ccddb26d67bff22eda81b34",
+            "syntheticMarkers": {
+              "explicit": false,
+              "alternate": false,
+              "previewWrite": true
+            },
+            "tenantMatches": true,
+            "createdAt": "2026-10-11T15:09:51.202Z",
+            "updatedAt": null,
+            "updateTime": "2026-10-11T15:09:51.248Z",
+            "relations": {
+              "entityId": "b4003qa_business_collab_38102224750",
+              "requestId": "wf_4448620e92f879165d9a583007ac"
+            },
+            "status": {
+              "estado": null,
+              "estadoOperativo": null,
+              "status": null,
+              "exigibilidad": null,
+              "carteraActiva": null,
+              "pagoConfirmado": null
+            },
+            "currency": null,
+            "positiveAmountFields": [],
+            "commentsCount": 0,
+            "historyCount": 0
+          },
+          {
+            "document": "previewWorkflowEvents/evt_b772f6ea579332d15b397169f2a5",
+            "collection": "previewWorkflowEvents",
+            "id": "evt_b772f6ea579332d15b397169f2a5",
+            "exists": true,
+            "documentSha256": "69d87b70bfa68f9c4be9de8ac19fa5fc9c6ccba02b8dda63a74ee8263e017a5d",
+            "syntheticMarkers": {
+              "explicit": false,
+              "alternate": false,
+              "previewWrite": true
+            },
+            "tenantMatches": true,
+            "createdAt": "2026-10-14T23:26:03.738Z",
+            "updatedAt": null,
+            "updateTime": "2026-10-14T23:26:03.790Z",
+            "relations": {
+              "entityId": "b4003qa_business_collab_38102224750",
+              "requestId": "wf_df6abadd7a7768ebe312fbff7968"
+            },
+            "status": {
+              "estado": null,
+              "estadoOperativo": null,
+              "status": null,
+              "exigibilidad": null,
+              "carteraActiva": null,
+              "pagoConfirmado": null
+            },
+            "currency": null,
+            "positiveAmountFields": [],
+            "commentsCount": 0,
+            "historyCount": 0
+          },
+          {
+            "document": "previewWorkflowEvents/evt_bb7095a46f99dab2a3004ae0c78d",
+            "collection": "previewWorkflowEvents",
+            "id": "evt_bb7095a46f99dab2a3004ae0c78d",
+            "exists": true,
+            "documentSha256": "57f5473a6086ef65d8899123844e4974e977af07969f50ecd00a6f2abd97344b",
+            "syntheticMarkers": {
+              "explicit": false,
+              "alternate": false,
+              "previewWrite": true
+            },
+            "tenantMatches": true,
+            "createdAt": "2026-10-12T18:44:48.566Z",
+            "updatedAt": null,
+            "updateTime": "2026-10-12T18:44:48.602Z",
+            "relations": {
+              "entityId": "b4003qa_business_collab_38102224750",
+              "requestId": "wf_fa27c01afc1be9a1571a6708c9aa"
+            },
+            "status": {
+              "estado": null,
+              "estadoOperativo": null,
+              "status": null,
+              "exigibilidad": null,
+              "carteraActiva": null,
+              "pagoConfirmado": null
+            },
+            "currency": null,
+            "positiveAmountFields": [],
+            "commentsCount": 0,
+            "historyCount": 0
+          },
+          {
+            "document": "previewWorkflowEvents/evt_d907eaa93bbbd931bee2d4b1f653",
+            "collection": "previewWorkflowEvents",
+            "id": "evt_d907eaa93bbbd931bee2d4b1f653",
+            "exists": true,
+            "documentSha256": "707fc9c41623b6044516a6003067493e9cb0720de7a90a8863c9c328797c047f",
+            "syntheticMarkers": {
+              "explicit": false,
+              "alternate": false,
+              "previewWrite": true
+            },
+            "tenantMatches": true,
+            "createdAt": "2026-10-11T15:17:42.822Z",
+            "updatedAt": null,
+            "updateTime": "2026-10-11T15:17:42.857Z",
+            "relations": {
+              "entityId": "b4003qa_business_collab_38102224750",
+              "requestId": "wf_50416cc55396556090ca86f77adf"
+            },
+            "status": {
+              "estado": null,
+              "estadoOperativo": null,
+              "status": null,
+              "exigibilidad": null,
+              "carteraActiva": null,
+              "pagoConfirmado": null
+            },
+            "currency": null,
+            "positiveAmountFields": [],
+            "commentsCount": 0,
+            "historyCount": 0
+          },
+          {
+            "document": "previewWorkflowRequests/wf_306db0d36cd235993f2f7b5f8802",
+            "collection": "previewWorkflowRequests",
+            "id": "wf_306db0d36cd235993f2f7b5f8802",
+            "exists": true,
+            "documentSha256": "dfbb3fa03794c6250467d96127fbceaa8aa67b1d3ca4852fe7997c2d7ab197b3",
+            "syntheticMarkers": {
+              "explicit": false,
+              "alternate": false,
+              "previewWrite": false
+            },
+            "tenantMatches": null,
+            "createdAt": null,
+            "updatedAt": null,
+            "updateTime": "2026-10-14T23:24:34.749Z",
+            "relations": {
+              "entityId": "b4003qa_business_collab_38102224750",
+              "eventId": "evt_4f43d5ab2a20415b50767d96380b"
+            },
+            "status": {
+              "estado": null,
+              "estadoOperativo": null,
+              "status": "committed",
+              "exigibilidad": null,
+              "carteraActiva": null,
+              "pagoConfirmado": null
+            },
+            "currency": null,
+            "positiveAmountFields": [],
+            "commentsCount": 0,
+            "historyCount": 0
+          },
+          {
+            "document": "previewWorkflowRequests/wf_4448620e92f879165d9a583007ac",
+            "collection": "previewWorkflowRequests",
+            "id": "wf_4448620e92f879165d9a583007ac",
+            "exists": true,
+            "documentSha256": "dbe9cb491cdcd7e52aa60c117cd0f1d7186cd9a40e46d079645f6d56835b7198",
+            "syntheticMarkers": {
+              "explicit": false,
+              "alternate": false,
+              "previewWrite": false
+            },
+            "tenantMatches": null,
+            "createdAt": null,
+            "updatedAt": null,
+            "updateTime": "2026-10-11T15:09:51.248Z",
+            "relations": {
+              "entityId": "b4003qa_business_collab_38102224750",
+              "eventId": "evt_9eebdf281a3e1e46f9d325536ad6"
+            },
+            "status": {
+              "estado": null,
+              "estadoOperativo": null,
+              "status": "committed",
+              "exigibilidad": null,
+              "carteraActiva": null,
+              "pagoConfirmado": null
+            },
+            "currency": null,
+            "positiveAmountFields": [],
+            "commentsCount": 0,
+            "historyCount": 0
+          },
+          {
+            "document": "previewWorkflowRequests/wf_50416cc55396556090ca86f77adf",
+            "collection": "previewWorkflowRequests",
+            "id": "wf_50416cc55396556090ca86f77adf",
+            "exists": true,
+            "documentSha256": "5950e6ddeb58e66fe69ac6e0e9de387f5ea605ac0b222066b87a97e84e38cea1",
+            "syntheticMarkers": {
+              "explicit": false,
+              "alternate": false,
+              "previewWrite": false
+            },
+            "tenantMatches": null,
+            "createdAt": null,
+            "updatedAt": null,
+            "updateTime": "2026-10-11T15:17:42.857Z",
+            "relations": {
+              "entityId": "b4003qa_business_collab_38102224750",
+              "eventId": "evt_d907eaa93bbbd931bee2d4b1f653"
+            },
+            "status": {
+              "estado": null,
+              "estadoOperativo": null,
+              "status": "committed",
+              "exigibilidad": null,
+              "carteraActiva": null,
+              "pagoConfirmado": null
+            },
+            "currency": null,
+            "positiveAmountFields": [],
+            "commentsCount": 0,
+            "historyCount": 0
+          },
+          {
+            "document": "previewWorkflowRequests/wf_79a53e3beb92f18de224f7bae3a7",
+            "collection": "previewWorkflowRequests",
+            "id": "wf_79a53e3beb92f18de224f7bae3a7",
+            "exists": true,
+            "documentSha256": "0a655ead5fd983e6df91e67d12d007685bedb60b89a160afb2f69ee9266b0418",
+            "syntheticMarkers": {
+              "explicit": false,
+              "alternate": false,
+              "previewWrite": false
+            },
+            "tenantMatches": null,
+            "createdAt": null,
+            "updatedAt": null,
+            "updateTime": "2026-10-28T18:14:24.458Z",
+            "relations": {
+              "entityId": "b4003qa_business_collab_38102224750",
+              "eventId": "evt_377813b0c9f546d504f3312c8663"
+            },
+            "status": {
+              "estado": null,
+              "estadoOperativo": null,
+              "status": "committed",
+              "exigibilidad": null,
+              "carteraActiva": null,
+              "pagoConfirmado": null
+            },
+            "currency": null,
+            "positiveAmountFields": [],
+            "commentsCount": 0,
+            "historyCount": 0
+          },
+          {
+            "document": "previewWorkflowRequests/wf_df6abadd7a7768ebe312fbff7968",
+            "collection": "previewWorkflowRequests",
+            "id": "wf_df6abadd7a7768ebe312fbff7968",
+            "exists": true,
+            "documentSha256": "46647249b0848c4778cc7e5faac61dd04d309a37233a9eb005e6f4eaa9c67f1f",
+            "syntheticMarkers": {
+              "explicit": false,
+              "alternate": false,
+              "previewWrite": false
+            },
+            "tenantMatches": null,
+            "createdAt": null,
+            "updatedAt": null,
+            "updateTime": "2026-10-14T23:26:03.790Z",
+            "relations": {
+              "entityId": "b4003qa_business_collab_38102224750",
+              "eventId": "evt_b772f6ea579332d15b397169f2a5"
+            },
+            "status": {
+              "estado": null,
+              "estadoOperativo": null,
+              "status": "committed",
+              "exigibilidad": null,
+              "carteraActiva": null,
+              "pagoConfirmado": null
+            },
+            "currency": null,
+            "positiveAmountFields": [],
+            "commentsCount": 0,
+            "historyCount": 0
+          },
+          {
+            "document": "previewWorkflowRequests/wf_fa27c01afc1be9a1571a6708c9aa",
+            "collection": "previewWorkflowRequests",
+            "id": "wf_fa27c01afc1be9a1571a6708c9aa",
+            "exists": true,
+            "documentSha256": "507d2ac29386a7297073db939fee8d8d82a83e180586e60eb5b30aeb7a7a9199",
+            "syntheticMarkers": {
+              "explicit": false,
+              "alternate": false,
+              "previewWrite": false
+            },
+            "tenantMatches": null,
+            "createdAt": null,
+            "updatedAt": null,
+            "updateTime": "2026-10-12T18:44:48.602Z",
+            "relations": {
+              "entityId": "b4003qa_business_collab_38102224750",
+              "eventId": "evt_bb7095a46f99dab2a3004ae0c78d"
+            },
+            "status": {
+              "estado": null,
+              "estadoOperativo": null,
+              "status": "committed",
+              "exigibilidad": null,
+              "carteraActiva": null,
+              "pagoConfirmado": null
+            },
+            "currency": null,
+            "positiveAmountFields": [],
+            "commentsCount": 0,
+            "historyCount": 0
+          }
+        ]
+      },
+      "separatelyRetainedSharedParent": [
+        {
+          "document": "data/aseguradoras/items/b4003qa_human_insurer_r20",
+          "collection": "aseguradoras",
+          "id": "b4003qa_human_insurer_r20",
+          "exists": true,
+          "documentSha256": "3be4062a555c51c0a782d205f178bc788165a154bbf959c14b482bead49f0be3",
+          "syntheticMarkers": {
+            "explicit": true,
+            "alternate": false,
+            "previewWrite": true
+          },
+          "tenantMatches": true,
+          "createdAt": "2026-10-07T13:38:13.026Z",
+          "updatedAt": "2026-10-30T23:25:14.139Z",
+          "updateTime": "2026-10-30T23:25:14.180Z",
+          "relations": {},
+          "status": {
+            "estado": "activa",
+            "estadoOperativo": null,
+            "status": null,
+            "exigibilidad": null,
+            "carteraActiva": null,
+            "pagoConfirmado": null
+          },
+          "currency": "GTQ",
+          "positiveAmountFields": [],
+          "commentsCount": 0,
+          "historyCount": 0
+        }
+      ],
+      "groupCounts": {
+        "roots": 14,
+        "operationalDerivativesOutsideOriginalFourteen": 5,
+        "workflowAuditRecords": 18,
+        "referencedSharedParentInsurers": 1,
+        "distinctRecordsIncludingSharedParent": 38
+      },
+      "reuseAdjudication": {
+        "october27": {
+          "sourceRef": "client360ReadReuseOctober27",
+          "scope": "PRIOR_AUTHENTICATED_UI_READ_REUSE_NOT_A_NEW_WRITE_ON_OCTOBER27",
+          "policyId": "b4003qa_policy_renewwrite_38102224750",
+          "receiptId": "cob_b4003qa_policy_renewwrite_38102224750_001",
+          "currentExactPortfolioId": "car_cob_b4003qa_policy_renewwrite_38102224750_001",
+          "currentReceiptAndPortfolioExist": true,
+          "currentReceiptAndPortfolioExplicitSynthetic": true,
+          "currentReceiptAndPortfolioPendingAndActive": true,
+          "currentCurrency": "GTQ",
+          "currentAmountsPositiveWithoutExportedValues": true,
+          "currentRawDueDateOrPaymentReconciliationNotRead": true
+        },
+        "october28": {
+          "sourceRef": "collaborationWriteReuseOctober28",
+          "businessId": "b4003qa_business_collab_38102224750",
+          "currentCommentsCount": 4,
+          "currentHistoryCount": 4,
+          "currentBusinessUpdatedAt": "2026-10-28T18:14:24.409Z",
+          "exactEventDocument": "previewWorkflowEvents/evt_377813b0c9f546d504f3312c8663",
+          "exactRequestDocument": "previewWorkflowRequests/wf_79a53e3beb92f18de224f7bae3a7",
+          "exactOutboxDocument": "previewNotificationOutbox/evt_377813b0c9f546d504f3312c8663",
+          "eventCreatedAt": "2026-10-28T18:14:24.409Z",
+          "requestStatus": "committed",
+          "outboxStatus": "pending_provider",
+          "currentActorNameOrUidNotExported": true,
+          "providerDeliveryProved": false,
+          "identityAttributionComesFromPriorAuthenticatedUatNotThisAdminRead": true
+        }
+      },
+      "decision": "RETAIN_ORIGINAL_FOURTEEN_PLUS_FIVE_DERIVATIVES_AND_EIGHTEEN_AUDIT_RECORDS;_SHARED_QA_INSURER_IS_NOT_A_CLEANUP_TARGET",
+      "cleanupAuthorized": false,
+      "fullFindingClosed": false,
+      "nextAction": "Use this exact inventory to choose retained QA fixtures or a scoped reversible disposition after their current UAT purpose is finished. Preserve collaboration audit/request/outbox history; do not delete only the original fourteen and do not include the shared insurer in a blanket cleanup."
+    },
+    {
+      "findingId": "B4-003-P0-20261012-QA-ORPHAN-RENEWALS",
+      "ledgerStatusPreserved": "OPEN_P0_NOT_ACCEPTED",
+      "operationalAdjudication": "EXACT_CURRENT_DEPENDENCIES_IDENTIFIED_CONDITIONAL_ZERO_DEPENDENTS_REQUIREMENT_NOT_SATISFIED",
+      "policies": [
+        {
+          "policy": {
+            "document": "data/polizas/items/pol_mulsmxsk",
+            "collection": "polizas",
+            "id": "pol_mulsmxsk",
+            "exists": true,
+            "documentSha256": "8f076aee2da1d2a28e933cca5ea7602a14007ff4349aa21c1d3d86b38b8cb318",
+            "syntheticMarkers": {
+              "explicit": false,
+              "alternate": false,
+              "previewWrite": false
+            },
+            "tenantMatches": true,
+            "createdAt": "2026-09-28T22:02:49.513Z",
+            "updatedAt": "2026-09-28T22:02:49.973Z",
+            "updateTime": "2026-09-28T22:02:50.042Z",
+            "relations": {
+              "clienteId": "b2-r9195-client-36489784713",
+              "renuevaDe": "b2-r9195-policy-36489784713",
+              "aseguradoraId": "b2-r9195-insurer-36489784713"
+            },
+            "status": {
+              "estado": "vigente",
+              "estadoOperativo": null,
+              "status": null,
+              "exigibilidad": null,
+              "carteraActiva": null,
+              "pagoConfirmado": null
+            },
+            "currency": "GTQ",
+            "positiveAmountFields": [
+              "primaTotal",
+              "prima"
+            ],
+            "commentsCount": 0,
+            "historyCount": 0
+          },
+          "financialDependents": [
+            {
+              "document": "data/carteraPrimas/items/car_cob_pol_mulsmxsk_001",
+              "collection": "carteraPrimas",
+              "id": "car_cob_pol_mulsmxsk_001",
+              "exists": true,
+              "documentSha256": "bd589252b19661c3949d87dd5fd60f66f77d427123752280c32fa29fb9f0b846",
+              "syntheticMarkers": {
+                "explicit": false,
+                "alternate": false,
+                "previewWrite": false
+              },
+              "tenantMatches": true,
+              "createdAt": "2026-09-28T22:02:49.522Z",
+              "updatedAt": "2026-09-28T22:02:49.973Z",
+              "updateTime": "2026-09-28T22:02:50.042Z",
+              "relations": {
+                "clienteId": "b2-r9195-client-36489784713",
+                "polizaId": "pol_mulsmxsk",
+                "reciboId": "cob_pol_mulsmxsk_001",
+                "aseguradoraId": "b2-r9195-insurer-36489784713"
+              },
+              "status": {
+                "estado": "pendiente",
+                "estadoOperativo": "futuro_pendiente",
+                "status": null,
+                "exigibilidad": "futura",
+                "carteraActiva": true,
+                "pagoConfirmado": null
+              },
+              "currency": "GTQ",
+              "positiveAmountFields": [
+                "monto",
+                "montoTotal",
+                "primaTotal"
+              ],
+              "commentsCount": 0,
+              "historyCount": 0
+            },
+            {
+              "document": "data/carteraPrimas/items/car_cob_pol_mulsmxsk_002",
+              "collection": "carteraPrimas",
+              "id": "car_cob_pol_mulsmxsk_002",
+              "exists": true,
+              "documentSha256": "3c6c290dcbeaab046f457191f273e396e343fbf849b8368e545270d5f379b0d4",
+              "syntheticMarkers": {
+                "explicit": false,
+                "alternate": false,
+                "previewWrite": false
+              },
+              "tenantMatches": true,
+              "createdAt": "2026-09-28T22:02:49.524Z",
+              "updatedAt": "2026-09-28T22:02:49.973Z",
+              "updateTime": "2026-09-28T22:02:50.042Z",
+              "relations": {
+                "clienteId": "b2-r9195-client-36489784713",
+                "polizaId": "pol_mulsmxsk",
+                "reciboId": "cob_pol_mulsmxsk_002",
+                "aseguradoraId": "b2-r9195-insurer-36489784713"
+              },
+              "status": {
+                "estado": "pendiente",
+                "estadoOperativo": "futuro_pendiente",
+                "status": null,
+                "exigibilidad": "futura",
+                "carteraActiva": true,
+                "pagoConfirmado": null
+              },
+              "currency": "GTQ",
+              "positiveAmountFields": [
+                "monto",
+                "montoTotal",
+                "primaTotal"
+              ],
+              "commentsCount": 0,
+              "historyCount": 0
+            },
+            {
+              "document": "data/recibosEsperados/items/cob_pol_mulsmxsk_001",
+              "collection": "recibosEsperados",
+              "id": "cob_pol_mulsmxsk_001",
+              "exists": true,
+              "documentSha256": "d33477ba11bebaeb8130954cc03cb7468196c5deaee31a7cdf01905e88c7e12c",
+              "syntheticMarkers": {
+                "explicit": false,
+                "alternate": false,
+                "previewWrite": false
+              },
+              "tenantMatches": true,
+              "createdAt": "2026-09-28T22:02:49.517Z",
+              "updatedAt": "2026-09-28T22:02:49.973Z",
+              "updateTime": "2026-09-28T22:02:50.042Z",
+              "relations": {
+                "clienteId": "b2-r9195-client-36489784713",
+                "polizaId": "pol_mulsmxsk",
+                "aseguradoraId": "b2-r9195-insurer-36489784713"
+              },
+              "status": {
+                "estado": "pendiente",
+                "estadoOperativo": null,
+                "status": null,
+                "exigibilidad": null,
+                "carteraActiva": true,
+                "pagoConfirmado": null
+              },
+              "currency": "GTQ",
+              "positiveAmountFields": [
+                "monto",
+                "montoTotal"
+              ],
+              "commentsCount": 0,
+              "historyCount": 0
+            },
+            {
+              "document": "data/recibosEsperados/items/cob_pol_mulsmxsk_002",
+              "collection": "recibosEsperados",
+              "id": "cob_pol_mulsmxsk_002",
+              "exists": true,
+              "documentSha256": "796ed147242e432f4a4785017ec5198ecf3d03acf8d5f596fc1870e9e37e748e",
+              "syntheticMarkers": {
+                "explicit": false,
+                "alternate": false,
+                "previewWrite": false
+              },
+              "tenantMatches": true,
+              "createdAt": "2026-09-28T22:02:49.519Z",
+              "updatedAt": "2026-09-28T22:02:49.973Z",
+              "updateTime": "2026-09-28T22:02:50.042Z",
+              "relations": {
+                "clienteId": "b2-r9195-client-36489784713",
+                "polizaId": "pol_mulsmxsk",
+                "aseguradoraId": "b2-r9195-insurer-36489784713"
+              },
+              "status": {
+                "estado": "pendiente",
+                "estadoOperativo": null,
+                "status": null,
+                "exigibilidad": null,
+                "carteraActiva": true,
+                "pagoConfirmado": null
+              },
+              "currency": "GTQ",
+              "positiveAmountFields": [
+                "monto",
+                "montoTotal"
+              ],
+              "commentsCount": 0,
+              "historyCount": 0
+            }
+          ],
+          "activityDependents": [
+            {
+              "document": "data/actividades/items/act_mulsn0qc",
+              "collection": "actividades",
+              "id": "act_mulsn0qc",
+              "exists": true,
+              "documentSha256": "f9227571f5d2a69e5716359eff7460fd4ebee2e514885925a84c3db7090db201",
+              "syntheticMarkers": {
+                "explicit": false,
+                "alternate": false,
+                "previewWrite": false
+              },
+              "tenantMatches": true,
+              "createdAt": "2026-09-28T22:02:53.172Z",
+              "updatedAt": "2026-09-28T22:02:53.361Z",
+              "updateTime": "2026-09-28T22:02:53.528Z",
+              "relations": {
+                "clienteId": "b2-r9195-client-36489784713",
+                "polizaId": "pol_mulsmxsk"
+              },
+              "status": {
+                "estado": null,
+                "estadoOperativo": null,
+                "status": null,
+                "exigibilidad": null,
+                "carteraActiva": null,
+                "pagoConfirmado": null
+              },
+              "currency": null,
+              "positiveAmountFields": [],
+              "commentsCount": 0,
+              "historyCount": 0
+            }
+          ],
+          "missingReferencedParents": [
+            {
+              "document": "data/aseguradoras/items/b2-r9195-insurer-36489784713",
+              "exists": false
+            },
+            {
+              "document": "data/clientes/items/b2-r9195-client-36489784713",
+              "exists": false
+            },
+            {
+              "document": "data/polizas/items/b2-r9195-policy-36489784713",
+              "exists": false
+            }
+          ],
+          "declaredInboundDependentCount": 5,
+          "financialDependentCount": 4,
+          "activityDependentCount": 1,
+          "allDependentsShareRootOwnerDigest": true,
+          "ownerIdentityExported": false,
+          "disposition": "RETAIN_ALL_RECORDS_HOLD_UNTIL_SCOPED_REVERSIBLE_TREATMENT_IS_DECIDED"
+        },
+        {
+          "policy": {
+            "document": "data/polizas/items/pol_mulssmuz",
+            "collection": "polizas",
+            "id": "pol_mulssmuz",
+            "exists": true,
+            "documentSha256": "b73f0b0831787b8d207142af5b57b4cb9d4c215c271aed01d34ece41d8c427a1",
+            "syntheticMarkers": {
+              "explicit": false,
+              "alternate": false,
+              "previewWrite": false
+            },
+            "tenantMatches": true,
+            "createdAt": "2026-09-28T22:07:15.321Z",
+            "updatedAt": "2026-09-28T22:07:16.038Z",
+            "updateTime": "2026-09-28T22:07:16.115Z",
+            "relations": {
+              "clienteId": "b2-r9195-client-36490245512",
+              "renuevaDe": "b2-r9195-policy-36490245512",
+              "aseguradoraId": "b2-r9195-insurer-36490245512"
+            },
+            "status": {
+              "estado": "vigente",
+              "estadoOperativo": null,
+              "status": null,
+              "exigibilidad": null,
+              "carteraActiva": null,
+              "pagoConfirmado": null
+            },
+            "currency": "GTQ",
+            "positiveAmountFields": [
+              "primaTotal",
+              "prima"
+            ],
+            "commentsCount": 0,
+            "historyCount": 0
+          },
+          "financialDependents": [
+            {
+              "document": "data/carteraPrimas/items/car_cob_pol_mulssmuz_001",
+              "collection": "carteraPrimas",
+              "id": "car_cob_pol_mulssmuz_001",
+              "exists": true,
+              "documentSha256": "7bb5770f6cd7251354ec6d9d6ab49aea5711ad417b2940fe12f77f54c83ae26d",
+              "syntheticMarkers": {
+                "explicit": false,
+                "alternate": false,
+                "previewWrite": false
+              },
+              "tenantMatches": true,
+              "createdAt": "2026-09-28T22:07:15.336Z",
+              "updatedAt": "2026-09-28T22:07:16.038Z",
+              "updateTime": "2026-09-28T22:07:16.115Z",
+              "relations": {
+                "clienteId": "b2-r9195-client-36490245512",
+                "polizaId": "pol_mulssmuz",
+                "reciboId": "cob_pol_mulssmuz_001",
+                "aseguradoraId": "b2-r9195-insurer-36490245512"
+              },
+              "status": {
+                "estado": "pendiente",
+                "estadoOperativo": "futuro_pendiente",
+                "status": null,
+                "exigibilidad": "futura",
+                "carteraActiva": true,
+                "pagoConfirmado": null
+              },
+              "currency": "GTQ",
+              "positiveAmountFields": [
+                "monto",
+                "montoTotal",
+                "primaTotal"
+              ],
+              "commentsCount": 0,
+              "historyCount": 0
+            },
+            {
+              "document": "data/carteraPrimas/items/car_cob_pol_mulssmuz_002",
+              "collection": "carteraPrimas",
+              "id": "car_cob_pol_mulssmuz_002",
+              "exists": true,
+              "documentSha256": "2e2902c784bd1ebc823595a0e9d36738b6775c5bb1106ebfcfb265ea32388a3d",
+              "syntheticMarkers": {
+                "explicit": false,
+                "alternate": false,
+                "previewWrite": false
+              },
+              "tenantMatches": true,
+              "createdAt": "2026-09-28T22:07:15.341Z",
+              "updatedAt": "2026-09-28T22:07:16.038Z",
+              "updateTime": "2026-09-28T22:07:16.115Z",
+              "relations": {
+                "clienteId": "b2-r9195-client-36490245512",
+                "polizaId": "pol_mulssmuz",
+                "reciboId": "cob_pol_mulssmuz_002",
+                "aseguradoraId": "b2-r9195-insurer-36490245512"
+              },
+              "status": {
+                "estado": "pendiente",
+                "estadoOperativo": "futuro_pendiente",
+                "status": null,
+                "exigibilidad": "futura",
+                "carteraActiva": true,
+                "pagoConfirmado": null
+              },
+              "currency": "GTQ",
+              "positiveAmountFields": [
+                "monto",
+                "montoTotal",
+                "primaTotal"
+              ],
+              "commentsCount": 0,
+              "historyCount": 0
+            },
+            {
+              "document": "data/recibosEsperados/items/cob_pol_mulssmuz_001",
+              "collection": "recibosEsperados",
+              "id": "cob_pol_mulssmuz_001",
+              "exists": true,
+              "documentSha256": "a7f34cb9724ac90c4b0a490a22495867b353d0a205ed4215b4cb270c4bc716fa",
+              "syntheticMarkers": {
+                "explicit": false,
+                "alternate": false,
+                "previewWrite": false
+              },
+              "tenantMatches": true,
+              "createdAt": "2026-09-28T22:07:15.327Z",
+              "updatedAt": "2026-09-28T22:07:16.038Z",
+              "updateTime": "2026-09-28T22:07:16.115Z",
+              "relations": {
+                "clienteId": "b2-r9195-client-36490245512",
+                "polizaId": "pol_mulssmuz",
+                "aseguradoraId": "b2-r9195-insurer-36490245512"
+              },
+              "status": {
+                "estado": "pendiente",
+                "estadoOperativo": null,
+                "status": null,
+                "exigibilidad": null,
+                "carteraActiva": true,
+                "pagoConfirmado": null
+              },
+              "currency": "GTQ",
+              "positiveAmountFields": [
+                "monto",
+                "montoTotal"
+              ],
+              "commentsCount": 0,
+              "historyCount": 0
+            },
+            {
+              "document": "data/recibosEsperados/items/cob_pol_mulssmuz_002",
+              "collection": "recibosEsperados",
+              "id": "cob_pol_mulssmuz_002",
+              "exists": true,
+              "documentSha256": "f984b0f4b1c2b5b4284b74a7198764cb8af9098c734eb227c9f1e3c44c472676",
+              "syntheticMarkers": {
+                "explicit": false,
+                "alternate": false,
+                "previewWrite": false
+              },
+              "tenantMatches": true,
+              "createdAt": "2026-09-28T22:07:15.332Z",
+              "updatedAt": "2026-09-28T22:07:16.038Z",
+              "updateTime": "2026-09-28T22:07:16.115Z",
+              "relations": {
+                "clienteId": "b2-r9195-client-36490245512",
+                "polizaId": "pol_mulssmuz",
+                "aseguradoraId": "b2-r9195-insurer-36490245512"
+              },
+              "status": {
+                "estado": "pendiente",
+                "estadoOperativo": null,
+                "status": null,
+                "exigibilidad": null,
+                "carteraActiva": true,
+                "pagoConfirmado": null
+              },
+              "currency": "GTQ",
+              "positiveAmountFields": [
+                "monto",
+                "montoTotal"
+              ],
+              "commentsCount": 0,
+              "historyCount": 0
+            }
+          ],
+          "activityDependents": [
+            {
+              "document": "data/actividades/items/act_mulssq5v",
+              "collection": "actividades",
+              "id": "act_mulssq5v",
+              "exists": true,
+              "documentSha256": "40443e3174f4344132872e9c5c028d27016274a1a6e955c56ed118a0883b1965",
+              "syntheticMarkers": {
+                "explicit": false,
+                "alternate": false,
+                "previewWrite": false
+              },
+              "tenantMatches": true,
+              "createdAt": "2026-09-28T22:07:19.411Z",
+              "updatedAt": "2026-09-28T22:07:19.739Z",
+              "updateTime": "2026-09-28T22:07:19.769Z",
+              "relations": {
+                "clienteId": "b2-r9195-client-36490245512",
+                "polizaId": "pol_mulssmuz"
+              },
+              "status": {
+                "estado": null,
+                "estadoOperativo": null,
+                "status": null,
+                "exigibilidad": null,
+                "carteraActiva": null,
+                "pagoConfirmado": null
+              },
+              "currency": null,
+              "positiveAmountFields": [],
+              "commentsCount": 0,
+              "historyCount": 0
+            }
+          ],
+          "missingReferencedParents": [
+            {
+              "document": "data/aseguradoras/items/b2-r9195-insurer-36490245512",
+              "exists": false
+            },
+            {
+              "document": "data/clientes/items/b2-r9195-client-36490245512",
+              "exists": false
+            },
+            {
+              "document": "data/polizas/items/b2-r9195-policy-36490245512",
+              "exists": false
+            }
+          ],
+          "declaredInboundDependentCount": 5,
+          "financialDependentCount": 4,
+          "activityDependentCount": 1,
+          "allDependentsShareRootOwnerDigest": true,
+          "ownerIdentityExported": false,
+          "disposition": "RETAIN_ALL_RECORDS_HOLD_UNTIL_SCOPED_REVERSIBLE_TREATMENT_IS_DECIDED"
+        },
+        {
+          "policy": {
+            "document": "data/polizas/items/pol_mulsxofx",
+            "collection": "polizas",
+            "id": "pol_mulsxofx",
+            "exists": true,
+            "documentSha256": "07ad75229bc7e347c8c2345e0856054c6fbbe38541ec3202bcaaec6d2bd787cd",
+            "syntheticMarkers": {
+              "explicit": false,
+              "alternate": false,
+              "previewWrite": false
+            },
+            "tenantMatches": true,
+            "createdAt": "2026-09-28T22:11:10.665Z",
+            "updatedAt": "2026-09-28T22:11:11.263Z",
+            "updateTime": "2026-09-28T22:11:11.410Z",
+            "relations": {
+              "clienteId": "b2-r9195-client-36490640789",
+              "renuevaDe": "b2-r9195-policy-36490640789",
+              "aseguradoraId": "b2-r9195-insurer-36490640789"
+            },
+            "status": {
+              "estado": "vigente",
+              "estadoOperativo": null,
+              "status": null,
+              "exigibilidad": null,
+              "carteraActiva": null,
+              "pagoConfirmado": null
+            },
+            "currency": "GTQ",
+            "positiveAmountFields": [
+              "primaTotal",
+              "prima"
+            ],
+            "commentsCount": 0,
+            "historyCount": 0
+          },
+          "financialDependents": [
+            {
+              "document": "data/carteraPrimas/items/car_cob_pol_mulsxofx_001",
+              "collection": "carteraPrimas",
+              "id": "car_cob_pol_mulsxofx_001",
+              "exists": true,
+              "documentSha256": "efda4c8e98a1a41a62a7eaa9ae9b38dea318a734f1d4d3b065ce1d2e5cb76bcd",
+              "syntheticMarkers": {
+                "explicit": false,
+                "alternate": false,
+                "previewWrite": false
+              },
+              "tenantMatches": true,
+              "createdAt": "2026-09-28T22:11:10.673Z",
+              "updatedAt": "2026-09-28T22:11:11.263Z",
+              "updateTime": "2026-09-28T22:11:11.410Z",
+              "relations": {
+                "clienteId": "b2-r9195-client-36490640789",
+                "polizaId": "pol_mulsxofx",
+                "reciboId": "cob_pol_mulsxofx_001",
+                "aseguradoraId": "b2-r9195-insurer-36490640789"
+              },
+              "status": {
+                "estado": "pendiente",
+                "estadoOperativo": "futuro_pendiente",
+                "status": null,
+                "exigibilidad": "futura",
+                "carteraActiva": true,
+                "pagoConfirmado": null
+              },
+              "currency": "GTQ",
+              "positiveAmountFields": [
+                "monto",
+                "montoTotal",
+                "primaTotal"
+              ],
+              "commentsCount": 0,
+              "historyCount": 0
+            },
+            {
+              "document": "data/carteraPrimas/items/car_cob_pol_mulsxofx_002",
+              "collection": "carteraPrimas",
+              "id": "car_cob_pol_mulsxofx_002",
+              "exists": true,
+              "documentSha256": "c1f7b8d33c69f0c625d77eab6f9e5a5264296af1bfac1a64ef4eacb8cc9f6fc9",
+              "syntheticMarkers": {
+                "explicit": false,
+                "alternate": false,
+                "previewWrite": false
+              },
+              "tenantMatches": true,
+              "createdAt": "2026-09-28T22:11:10.676Z",
+              "updatedAt": "2026-09-28T22:11:11.263Z",
+              "updateTime": "2026-09-28T22:11:11.410Z",
+              "relations": {
+                "clienteId": "b2-r9195-client-36490640789",
+                "polizaId": "pol_mulsxofx",
+                "reciboId": "cob_pol_mulsxofx_002",
+                "aseguradoraId": "b2-r9195-insurer-36490640789"
+              },
+              "status": {
+                "estado": "pendiente",
+                "estadoOperativo": "futuro_pendiente",
+                "status": null,
+                "exigibilidad": "futura",
+                "carteraActiva": true,
+                "pagoConfirmado": null
+              },
+              "currency": "GTQ",
+              "positiveAmountFields": [
+                "monto",
+                "montoTotal",
+                "primaTotal"
+              ],
+              "commentsCount": 0,
+              "historyCount": 0
+            },
+            {
+              "document": "data/recibosEsperados/items/cob_pol_mulsxofx_001",
+              "collection": "recibosEsperados",
+              "id": "cob_pol_mulsxofx_001",
+              "exists": true,
+              "documentSha256": "1dd5958a8721ae004dcf469648872f0f80f62fbcfef883111e9325623780111d",
+              "syntheticMarkers": {
+                "explicit": false,
+                "alternate": false,
+                "previewWrite": false
+              },
+              "tenantMatches": true,
+              "createdAt": "2026-09-28T22:11:10.669Z",
+              "updatedAt": "2026-09-28T22:11:11.263Z",
+              "updateTime": "2026-09-28T22:11:11.410Z",
+              "relations": {
+                "clienteId": "b2-r9195-client-36490640789",
+                "polizaId": "pol_mulsxofx",
+                "aseguradoraId": "b2-r9195-insurer-36490640789"
+              },
+              "status": {
+                "estado": "pendiente",
+                "estadoOperativo": null,
+                "status": null,
+                "exigibilidad": null,
+                "carteraActiva": true,
+                "pagoConfirmado": null
+              },
+              "currency": "GTQ",
+              "positiveAmountFields": [
+                "monto",
+                "montoTotal"
+              ],
+              "commentsCount": 0,
+              "historyCount": 0
+            },
+            {
+              "document": "data/recibosEsperados/items/cob_pol_mulsxofx_002",
+              "collection": "recibosEsperados",
+              "id": "cob_pol_mulsxofx_002",
+              "exists": true,
+              "documentSha256": "84ece8460dc9f58272210d04039e6601fdd74a928e8d3a90d6f42824e02d85a1",
+              "syntheticMarkers": {
+                "explicit": false,
+                "alternate": false,
+                "previewWrite": false
+              },
+              "tenantMatches": true,
+              "createdAt": "2026-09-28T22:11:10.671Z",
+              "updatedAt": "2026-09-28T22:11:11.263Z",
+              "updateTime": "2026-09-28T22:11:11.410Z",
+              "relations": {
+                "clienteId": "b2-r9195-client-36490640789",
+                "polizaId": "pol_mulsxofx",
+                "aseguradoraId": "b2-r9195-insurer-36490640789"
+              },
+              "status": {
+                "estado": "pendiente",
+                "estadoOperativo": null,
+                "status": null,
+                "exigibilidad": null,
+                "carteraActiva": true,
+                "pagoConfirmado": null
+              },
+              "currency": "GTQ",
+              "positiveAmountFields": [
+                "monto",
+                "montoTotal"
+              ],
+              "commentsCount": 0,
+              "historyCount": 0
+            }
+          ],
+          "activityDependents": [
+            {
+              "document": "data/actividades/items/act_mulsxrbr",
+              "collection": "actividades",
+              "id": "act_mulsxrbr",
+              "exists": true,
+              "documentSha256": "10d4a4a63ecd32a6c172a546802ee82d66709249eabd8fccce37d7444eb10aac",
+              "syntheticMarkers": {
+                "explicit": false,
+                "alternate": false,
+                "previewWrite": false
+              },
+              "tenantMatches": true,
+              "createdAt": "2026-09-28T22:11:14.199Z",
+              "updatedAt": "2026-09-28T22:11:14.713Z",
+              "updateTime": "2026-09-28T22:11:14.744Z",
+              "relations": {
+                "clienteId": "b2-r9195-client-36490640789",
+                "polizaId": "pol_mulsxofx"
+              },
+              "status": {
+                "estado": null,
+                "estadoOperativo": null,
+                "status": null,
+                "exigibilidad": null,
+                "carteraActiva": null,
+                "pagoConfirmado": null
+              },
+              "currency": null,
+              "positiveAmountFields": [],
+              "commentsCount": 0,
+              "historyCount": 0
+            }
+          ],
+          "missingReferencedParents": [
+            {
+              "document": "data/aseguradoras/items/b2-r9195-insurer-36490640789",
+              "exists": false
+            },
+            {
+              "document": "data/clientes/items/b2-r9195-client-36490640789",
+              "exists": false
+            },
+            {
+              "document": "data/polizas/items/b2-r9195-policy-36490640789",
+              "exists": false
+            }
+          ],
+          "declaredInboundDependentCount": 5,
+          "financialDependentCount": 4,
+          "activityDependentCount": 1,
+          "allDependentsShareRootOwnerDigest": true,
+          "ownerIdentityExported": false,
+          "disposition": "RETAIN_ALL_RECORDS_HOLD_UNTIL_SCOPED_REVERSIBLE_TREATMENT_IS_DECIDED"
+        }
+      ],
+      "counts": {
+        "policies": 3,
+        "financialDependents": 12,
+        "expectedReceipts": 6,
+        "portfolioRows": 6,
+        "additionalActivityDependents": 3,
+        "allDeclaredDependents": 15,
+        "existingPoliciesAndDependents": 18,
+        "missingReferencedParents": 9
+      },
+      "financialFacts": {
+        "allTwelveFinancialRowsPresent": true,
+        "allTwelveCurrency": "GTQ",
+        "allTwelveState": "pendiente",
+        "allTwelveCarteraActiva": true,
+        "allTwelveHavePositiveNumericAmount": true,
+        "allSixPortfolioEstadoOperativo": "futuro_pendiente",
+        "allSixPortfolioExigibilidad": "futura",
+        "explicitSyntheticFlagsPresentOnPoliciesOrDependents": 0,
+        "previewWriteFlagsPresentOnPoliciesOrDependents": 0,
+        "paymentConfirmationNotProvedByNullField": true,
+        "exactMoneyValuesAndDueDatesNotCollected": true,
+        "financialRowsAreNotCertifiedRealDebtOrCertifiedDisposableQaByThisReadback": true
+      },
+      "provenanceAssessment": {
+        "facts": [
+          "The three policies and all fifteen declared dependent rows have creation dates on 2026-09-28.",
+          "Each policy and its five dependent rows share the same observed owner digest.",
+          "Each policy references the same historical B2 run-specific client, insurer and original-policy identifiers recorded in earlier evidence.",
+          "The nine referenced client/insurer/original-policy documents are absent at their exact canonical paths."
+        ],
+        "inference": "The matching lineage, dates and owner digests are consistent with the historical B2 QA cohort; this does not establish that every financial row may be removed or that obligations can be discarded.",
+        "ownerIdentityDisclosed": false,
+        "noNameOnlyClassification": true
+      },
+      "historicalCountReconciliation": {
+        "previousFinancialDependents": 12,
+        "currentFinancialDependents": 12,
+        "newlyIncludedHistoricalActivities": 3,
+        "increaseInFinancialDependentCount": 0,
+        "activityCreationDate": "2026-09-28",
+        "interpretation": "The current total of fifteen includes three previously unenumerated activity records. It is a coverage expansion, not evidence that three new financial obligations were created."
+      },
+      "conditionalDeleteAuthority": {
+        "authorityKey": "b4003HistoricalQaCleanupConditionalAuthorization",
+        "requiredClassification": "PROVEN_B2_QA_LINEAGE_NO_DEPENDENTS",
+        "requiresZeroDependentRows": true,
+        "observedFinancialDependencies": 12,
+        "observedAllDeclaredDependencies": 15,
+        "prerequisiteSatisfied": false,
+        "historicallyAllowedDeletionIfSatisfied": "Only the three exact policy documents; no client, payment, receipt, management or other record deletion.",
+        "dependentDeletionAuthorized": false
+      },
+      "decision": "RETAIN_THREE_POLICIES_TWELVE_FINANCIAL_ROWS_AND_THREE_ACTIVITIES_WITH_REFERENTIAL_HISTORY;_NO_DELETE",
+      "cleanupAuthorized": false,
+      "fullFindingClosed": false,
+      "nextAction": "Adjudicate a record-specific reversible treatment for this eighteen-record cohort using the existing B2 execution provenance and the now-identified dependencies. Maintain HOLD until the treatment preserves the twelve financial rows and three history records or an explicit scoped replacement disposition is established. Do not repeat the aggregate audit or invoke the old zero-dependent conditional deletion."
+    }
+  ],
+  "limitations": {
+    "readMethod": "SERVER_ADMIN_READS_USING_EXISTING_CI_SERVICE_ACCOUNT",
+    "authenticatedHumanUat": false,
+    "roleCountryNegativeSecurityProof": false,
+    "atomicSnapshot": false,
+    "readWindowSeconds": 12.381,
+    "fullRestorationBackup": false,
+    "sanitizedProjectionCannotRestoreFullDocuments": true,
+    "unscannedScope": [
+      "Legacy operational batch events without entity identifiers",
+      "Unindexed nested references",
+      "Unrelated records behind outgoing referenced parents"
+    ],
+    "noInferenceOfNoPaymentsFromEmptyOrNullFields": true,
+    "noGlobalDataIntegrityAcceptance": true,
+    "businessDatasetChangedByAdjudication": false
+  },
+  "nextAction": {
+    "code": "EXACT_RECORD_DISPOSITION_USING_CURRENT_SNAPSHOT_NO_REPEAT_INVENTORY",
+    "readyNow": [
+      "Preserve this immutable current readback and its exact dependency identifiers.",
+      "Use the two separate cohort decisions above; do not merge the fourteen marked fixtures with the unmarked B2 financial cohort.",
+      "Continue already-authorized product UAT without re-running this completed inventory."
+    ],
+    "notAuthorizedByThisReceipt": [
+      "Physical deletion",
+      "Changing flags, dates, monetary amounts, states or relations in Firestore",
+      "Reimport or restoring business data",
+      "Auth, membership, IAM or Rules changes",
+      "Production deployment",
+      "Closing either finding or changing formal progress solely from the successful read"
+    ],
+    "requiresNewGeneralAudit": false
+  },
+  "preservation": {
+    "controlPlaneChangedByThisReceipt": false,
+    "ledgerChangedByThisReceipt": false,
+    "carryRegisterChangedByThisReceipt": false,
+    "newFindingsCreated": 0,
+    "historicalEvidenceRewritten": false,
+    "operationalWrites": 0,
+    "authWrites": 0,
+    "userTokensMinted": 0,
+    "membershipReads": 0,
+    "browserSessions": 0,
+    "deploys": 0,
+    "cleanupActions": 0,
+    "deletedRecords": 0,
+    "fullFindingClosures": 0,
+    "productionAccepted": false
+  }
+}

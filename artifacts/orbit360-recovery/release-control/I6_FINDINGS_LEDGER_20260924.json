@@ -21,11 +21,11 @@
   "counts": {
     "total": 295,
     "b2HumanFindings": 61,
-    "currentBlocking": 117,
+    "currentBlocking": null,
     "countingNote": "UAT3 observations reconciled to 60 existing IDs; no new finding identity created. P0/P1/P2/PRESERVED_PASS is a business-priority layer and does not convert open findings into PASS.",
     "currentBlockingB2B3": 0,
     "lastReconciledAt": "2026-10-12",
-    "currentBlockingB4003": 76,
+    "currentBlockingB4003": null,
     "uat3Observations": 52,
     "uat3LinkedExistingFindingIds": 60,
     "uat3NewFindingIds": 0,
@@ -34,7 +34,9 @@
       "BLOCKING_P0": 29,
       "PRESERVED_PASS": 2,
       "DEFERRED_AUTHORIZED_P2": 1
-    }
+    },
+    "currentBlockingStatus": "NOT_DETERMINABLE_FROM_CURRENT_ADJUDICATED_CRITERIA",
+    "currentBlockingScopeNote": "The 12-Oct counts are preserved in the dated snapshot. This successor adjudicates one of six priority P0 findings only; it does not recompute the full ledger or reopen sealed B2/B3 gates."
   },
   "findings": [
     {
@@ -12063,7 +12065,7 @@
       "source": "PAULA_REQUEST_AND_REPO_CAUSAL_AUDIT_20261012",
       "surface": "Configuración / Metas institucionales",
       "priority": "BLOCKING_P0",
-      "blocking": true,
+      "blocking": false,
       "owner": [
         "functions/assignable-advisor-roster.js",
         "orbit360-platform/modules/inicio.js"
@@ -12071,12 +12073,19 @@
       "finding": "Certificar alta, edición y persistencia institucional de metas por país, mes y tipo.",
       "rootCause": "La proyección r23 reconoce metas globales sin asesorId; no hay aún prueba de owner UI/configuración editable.",
       "closureCondition": "UI Admin/Dirección configura meta institucional con server commit/readback, auditoría, reload, sin borrar meta individual.",
-      "status": "OPEN_P0_NOT_ACCEPTED",
+      "status": "RESOLVED_AUTHENTICATED_RUNTIME_PASS",
       "mayDisappearWithoutDisposition": false,
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_P0_FINDINGS_DECISIONS_FREEZE_20261012.md",
       "receiptBlobSha": "2760d2aeb961bac5a0ce11e326c689143d2cc083",
       "machineProofRunId": 38282275915,
-      "visualPassDoesNotClose": true
+      "visualPassDoesNotClose": true,
+      "closureProof": {
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_INSTITUTIONAL_GOALS_FUNCTIONAL_CLOSURE_20261030.json",
+        "receiptBlobSha": "f6330cce90ef95a43eedc724d2aceec84458cda9",
+        "previousStatus": "OPEN_P0_NOT_ACCEPTED",
+        "previousBlocking": true,
+        "scope": "INSTITUTIONAL_GOALS_FUNCTIONAL_ONLY"
+      }
     },
     {
       "id": "B4-003-P0-20261012-FREELANCERS-GOAL-SCOPE",
@@ -13171,5 +13180,59 @@
       "B4-003-P0-20261012-QA-ORPHAN-RENEWALS"
     ],
     "machineProofRunId": 38282275915
+  },
+  "countsSnapshotBeforeInstitutionalGoalsClosure20261030": {
+    "recordType": "HISTORICAL_COUNTS_SNAPSHOT",
+    "asOf": "2026-10-12",
+    "sourceCommit": "7c8946fa8a8bf63f50a292f81c2d1005361f43f2",
+    "sourceLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
+    "counts": {
+      "total": 295,
+      "b2HumanFindings": 61,
+      "currentBlocking": 117,
+      "countingNote": "UAT3 observations reconciled to 60 existing IDs; no new finding identity created. P0/P1/P2/PRESERVED_PASS is a business-priority layer and does not convert open findings into PASS.",
+      "currentBlockingB2B3": 0,
+      "lastReconciledAt": "2026-10-12",
+      "currentBlockingB4003": 76,
+      "uat3Observations": 52,
+      "uat3LinkedExistingFindingIds": 60,
+      "uat3NewFindingIds": 0,
+      "uat3ClassificationCounts": {
+        "PARALLEL_NONBLOCKING_P1": 20,
+        "BLOCKING_P0": 29,
+        "PRESERVED_PASS": 2,
+        "DEFERRED_AUTHORIZED_P2": 1
+      }
+    }
+  },
+  "currentSixPriorityP0Closure": {
+    "scope": "SIX_PRIORITY_P0_FINDINGS_FROZEN_20261012_ONLY",
+    "findingIds": [
+      "B4-003-P0-20261012-PERSONAL-COLLECTION",
+      "B4-003-P0-20261012-INSTITUTIONAL-GOALS",
+      "B4-003-P0-20261012-FREELANCERS-GOAL-SCOPE",
+      "B4-003-P0-20261012-INICIO-MOTIVATIONAL-TEXTS",
+      "B4-003-P0-20261012-QA-CANCELLED-RUN-FIXTURES",
+      "B4-003-P0-20261012-QA-ORPHAN-RENEWALS"
+    ],
+    "total": 6,
+    "resolved": 1,
+    "open": 5,
+    "resolvedFindingIds": [
+      "B4-003-P0-20261012-INSTITUTIONAL-GOALS"
+    ],
+    "openFindingIds": [
+      "B4-003-P0-20261012-PERSONAL-COLLECTION",
+      "B4-003-P0-20261012-FREELANCERS-GOAL-SCOPE",
+      "B4-003-P0-20261012-INICIO-MOTIVATIONAL-TEXTS",
+      "B4-003-P0-20261012-QA-CANCELLED-RUN-FIXTURES",
+      "B4-003-P0-20261012-QA-ORPHAN-RENEWALS"
+    ],
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_INSTITUTIONAL_GOALS_FUNCTIONAL_CLOSURE_20261030.json",
+    "receiptBlobSha": "f6330cce90ef95a43eedc724d2aceec84458cda9",
+    "fullLedgerAcceptanceReconciled": false,
+    "b4003Closed": false,
+    "overallImplementationPercent": null,
+    "formalI6ProgressPercent": 50
   }
 }

@@ -1,0 +1,214 @@
+{
+  "schema": "GRAVICENTRA_I65_B4003_INSTITUTIONAL_GOALS_FUNCTIONAL_CLOSURE_V1",
+  "recordType": "EVIDENCE_BACKED_SINGLE_EXISTING_FINDING_DISPOSITION",
+  "recordedAtUtc": "2026-10-30T23:26:53.580039Z",
+  "status": "RESOLVED_AUTHENTICATED_RUNTIME_PASS",
+  "findingId": "B4-003-P0-20261012-INSTITUTIONAL-GOALS",
+  "gate": "I6.5/B4-003",
+  "authority": "PAULA_CONTINUE_EXISTING_B4_003_AND_EVIDENCE_BACKED_FINDING_RECONCILIATION_20261030",
+  "authorityBaseHead": "7c8946fa8a8bf63f50a292f81c2d1005361f43f2",
+  "parentHead": "b10ef805b075b1c37e2c8da5940b408b39d6a9c3",
+  "scope": "INSTITUTIONAL_GOALS_FUNCTIONAL_ONLY",
+  "baseLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
+  "baseCarryBlobSha": "2b935d0f0859075cc951a2e0a6cfcd0a8d958a02",
+  "evidence": {
+    "gt": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_METAS_UI_DIAGNOSTIC_RUNTIME_UAT_GT_20261030.json",
+      "blobSha": "2bdee68026a99da098741852b32414340dd78f96"
+    },
+    "co": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_METAS_UI_DIAGNOSTIC_RUNTIME_UAT_CO_20261030.json",
+      "blobSha": "76164eca65b96b5fce2cd2135821e6ef23abdedb"
+    },
+    "carlos": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CARLOS_AUTHENTICATED_CONTINUITY_UAT_20261030.json",
+      "blobSha": "695c91dbacf09cadbc653e47b77888ec90089564"
+    }
+  },
+  "accepted": {
+    "adminCorePassed": 24,
+    "adminCoreTotal": 24,
+    "adminCountries": [
+      "GT",
+      "CO"
+    ],
+    "carlosUiRoleCasesPassed": 6,
+    "carlosUiRoleCasesTotal": 6,
+    "individualGoalsPreserved": true,
+    "restoreAuditDurable": true
+  },
+  "originalCondition": {
+    "sourceLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
+    "sourceLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
+    "condition": "UI Admin/Dirección configura meta institucional con server commit/readback, auditoría, reload, sin borrar meta individual.",
+    "freezePath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_P0_FINDINGS_DECISIONS_FREEZE_20261012.md",
+    "freezeBlobSha": "2760d2aeb961bac5a0ce11e326c689143d2cc083",
+    "statusBefore": "OPEN_P0_NOT_ACCEPTED",
+    "blockingBefore": true,
+    "statusAfter": "RESOLVED_AUTHENTICATED_RUNTIME_PASS",
+    "blockingAfter": false,
+    "scopeNotExpanded": "The existing functional condition is adjudicated separately from the transversal R04 backend-negative matrix and from overall B4 targeted human visual acceptance."
+  },
+  "exactCandidate": {
+    "buildId": "gi-i65-b4-a6e403119d9f-57f234755dc1",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-sr-41066435386-r09pl1ti.web.app",
+    "uiSourceCommit": "a6e403119d9fc05b633e84f2eaa8f50c32ba12d9",
+    "backendSourceCommit": "8bb4fce20bb2af1aa4022573069ff8287679b715",
+    "transportCommit": "c76b94ed5fa6f5f6752e469275c0583471c0c3dd",
+    "previewRunId": 41123553239,
+    "sourceBlobs": {
+      "functions/product-operational-domain.js": "f9fa8132c63b7099a4a72ff1df389f5fb5813d18",
+      "orbit360-platform/modules/equipo.js": "43554f646e0e311658fc8e6730c4e45c2920e77d",
+      "orbit360-platform/data/store-firestore-product-operational-p0.js": "b4ccd50b38ae095f2e9aa894c6992a9e36261545"
+    },
+    "productSourceChangedByDisposition": false,
+    "rebuildRequiredByDisposition": false
+  },
+  "criteriaAdjudication": [
+    {
+      "criterion": "Canonical administrator UI owner exists and binds country and goal type.",
+      "result": "PASS",
+      "evidence": [
+        "gt",
+        "co"
+      ],
+      "basis": "Equipo → Metas on the exact Preview exposes institutional production and collection controls in the authorized reserved test panel; real individual and institutional inputs remain visible and readonly."
+    },
+    {
+      "criterion": "Authenticated institutional create and edit commit, with readback.",
+      "result": "PASS",
+      "evidence": [
+        "gt",
+        "co"
+      ],
+      "basis": "In each country the administrator created production, edited that production value and created collection. The UI confirmed the goal and its audit on the server."
+    },
+    {
+      "criterion": "Saved state survives a normal reload.",
+      "result": "PASS",
+      "evidence": [
+        "gt",
+        "co"
+      ],
+      "basis": "Each active test was recovered through the server after reload with the final production and collection values. Country selectors were explicitly reselected; selector persistence is not claimed."
+    },
+    {
+      "criterion": "Auditable writes and restoration persist.",
+      "result": "PASS",
+      "evidence": [
+        "gt",
+        "co"
+      ],
+      "basis": "Each country showed three write audit rows and a restoration row; restoration and closed-session state survived reload."
+    },
+    {
+      "criterion": "Administrative access differs from the independent nonadministrator roles.",
+      "result": "PASS_UI_BOUNDARY_ONLY",
+      "evidence": [
+        "carlos"
+      ],
+      "basis": "Carlos was independently authenticated. Operativo and Asesor in GT, CO and TODOS showed access denial and no institutional QA controls. This is not labeled authenticated backend denial."
+    },
+    {
+      "criterion": "Preserve the observed individual goals and real totals.",
+      "result": "PASS_OBSERVED_UI_SCOPE",
+      "evidence": [
+        "gt",
+        "co"
+      ],
+      "basis": "GT preserved 20 real inputs, including 18 individual inputs; CO preserved 14, including 12 individual inputs. Three visible totals in each country were unchanged. No whole-database equality is asserted."
+    }
+  ],
+  "countryPeriodAndTypeScope": {
+    "countries": {
+      "GT": "GTQ",
+      "CO": "COP"
+    },
+    "calendarMonthRead": "2026-10",
+    "writePeriod": "QA-B4-003",
+    "writeTypes": [
+      "prima",
+      "recaudo"
+    ],
+    "testDataExcludedFromRealIndicators": true,
+    "actualCalendarMonthBusinessGoalsConfigured": false,
+    "scopeNote": "Runtime writes used the authorized reserved period and server-owned restore contract. The current calendar-month values were preserved; this disposition does not claim that real monthly business targets were configured."
+  },
+  "counterDisposition": {
+    "priorCountsPreservedAsDatedSnapshot": true,
+    "priorCountsSourceLedgerBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
+    "obsoleteCurrentBlockingTotals": "RETIRED_TO_NULL_NOT_DETERMINABLE",
+    "currentSixPriorityP0Closure": {
+      "total": 6,
+      "resolved": 1,
+      "open": 5
+    },
+    "fullLedgerAcceptanceRecomputed": false,
+    "formalI6ProgressPercent": 50,
+    "overallImplementationPercent": null,
+    "carryInventoryCount": 295,
+    "carryAttentionCount": 166,
+    "carryAttentionMeaning": "FOLLOW_UP_INVENTORY_COUNT_NOT_CURRENT_OPEN_FINDING_COUNT"
+  },
+  "remainingOutsideThisFinding": [
+    "B4-003-P0-20261012-PERSONAL-COLLECTION",
+    "B4-003-P0-20261012-FREELANCERS-GOAL-SCOPE",
+    "B4-003-P0-20261012-INICIO-MOTIVATIONAL-TEXTS",
+    "B4-003-P0-20261012-QA-CANCELLED-RUN-FIXTURES",
+    "B4-003-P0-20261012-QA-ORPHAN-RENEWALS",
+    "R04 authenticated backend-negative and remaining transversal scope criteria",
+    "B4-003 overall closure and targeted human visual acceptance",
+    "B4-004 through B4-007 and later frozen gates"
+  ],
+  "boundaries": {
+    "realGoalConfigurationApplied": false,
+    "wholeDatabaseEqualityAsserted": false,
+    "backendNegativeAuthenticatedAccepted": false,
+    "paulaVisualAcceptanceGranted": false,
+    "inicioFindingClosed": false,
+    "personalCollectionFindingClosed": false,
+    "freelancerFindingClosed": false,
+    "b4003Closed": false,
+    "b4004Authorized": false,
+    "productionAccepted": false,
+    "newPreviewDeployed": false,
+    "authIamRulesChanged": false,
+    "historicalReceiptsChanged": false
+  },
+  "preservation": {
+    "findingIds": 295,
+    "taskUnits": 86,
+    "historicalCapabilityApprovals": 15,
+    "newFullCapabilityAcceptances": 0,
+    "singleFindingStatusChanged": true,
+    "existingControlPlaneKeysPreserved": 417,
+    "historicalReceiptsAndHashesUnchanged": true,
+    "newBranch": false,
+    "newGate": false,
+    "realBusinessWritesByDisposition": 0,
+    "cleanupAuthorized": false,
+    "rulesRiskExceptionPreserved": true
+  },
+  "governanceSources": {
+    "guard": {
+      "path": "tools/gravicentra-i6-control-plane-guard-v1.mjs",
+      "beforeBlobSha": "6855387553ba493c6919e73b745fb8a567518c57",
+      "blobSha": "ba65d33c9a53de764d34b1e96d24f9fd4c84c069"
+    },
+    "validator": {
+      "path": "tools/gravicentra-b4-003-institutional-goals-closure.mjs",
+      "blobSha": "709f65c4ee612711222b2e509ef0ec226c760847"
+    },
+    "test": {
+      "path": "tools/gravicentra-b4-003-institutional-goals-closure.test.mjs",
+      "blobSha": "657b9915bc5a34235ed9791543e04762d95dfbeb"
+    }
+  },
+  "governanceReconciliation": {
+    "historicalDiagnosticGuardCommit": "a6e403119d9fc05b633e84f2eaa8f50c32ba12d9",
+    "historicalGuardBlob": "6855387553ba493c6919e73b745fb8a567518c57",
+    "reason": "The historical diagnostic receipt pins its original Guard. The new one-finding governance successor has separately bound Guard, validator and tests; historical source and UAT receipts stay unchanged.",
+    "checksRemoved": false,
+    "scopeExpanded": false
+  }
+}

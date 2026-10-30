@@ -3,6 +3,8 @@ import {execFileSync} from 'node:child_process';
 import {createHash} from 'node:crypto';
 import os from 'node:os';
 import path from 'node:path';
+import {institutionalGoalsClosureContract, validateInstitutionalGoalsClosure}
+  from './gravicentra-b4-003-institutional-goals-closure.mjs';
 
 const CONTROL='artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json';
 const STATUS_LEDGER='artifacts/orbit360-recovery/release-control/CAPABILITY_STATUS_LEDGER.json';
@@ -124,6 +126,22 @@ need(METAS_UI_AUTH&&exists(METAS_UI_RECEIPT_PATH)&&exists(METAS_UI_TEST),'B4_003
 const METAS_UI_R=readJson(METAS_UI_RECEIPT_PATH);
 const METAS_UI_COMMIT=physicalGit('log','-n','1','--format=%H','--',METAS_UI_PRODUCT);
 const METAS_UI_BEFORE=new Map(),METAS_UI_AFTER=new Map();
+// The original diagnostic Guard remains byte-pinned. A later governance-only
+// successor may have different Guard bytes only through its own bound receipt;
+// its complete one-finding transition is independently validated below.
+const metasClosureGuardSuccessorBound=()=>{
+ const k=institutionalGoalsClosureContract,p=C[k.controlKey];
+ if(!p||p.receiptPath!==k.receiptPath||!exists(k.receiptPath))return false;
+ const r=readJson(k.receiptPath),binding=r.governanceSources?.guard;
+ return p.authorityBaseHead===k.authorityBaseHead&&r.authorityBaseHead===k.authorityBaseHead&&
+   p.receiptBlobSha===physicalGit('hash-object',k.receiptPath)&&
+   r.schema==='GRAVICENTRA_I65_B4003_INSTITUTIONAL_GOALS_FUNCTIONAL_CLOSURE_V1'&&
+   r.findingId===k.findingId&&r.scope===k.scope&&
+   binding?.path===METAS_UI_GUARD&&binding.beforeBlobSha===k.guardBeforeBlob&&
+   binding.beforeBlobSha===physicalGit('rev-parse',METAS_UI_COMMIT+':'+METAS_UI_GUARD)&&
+   binding.beforeBlobSha===physicalGit('rev-parse',k.authorityBaseHead+':'+METAS_UI_GUARD)&&
+   binding.blobSha===physicalGit('hash-object',METAS_UI_GUARD);
+};
 need(METAS_UI_AUTH.gate==='I6.5/B4-003'&&
  METAS_UI_AUTH.status==='SOURCE_AND_SYNTHETIC_QA_PASS_PREVIEW_UAT_PENDING'&&
  METAS_UI_AUTH.parentHead===METAS_UI_PARENT&&METAS_UI_AUTH.baseMetasSourceSha===METAS_UI_BASE&&
@@ -140,7 +158,8 @@ need(METAS_UI_AUTH.gate==='I6.5/B4-003'&&
  physicalGit('diff','--name-only',METAS_UI_PARENT,METAS_UI_COMMIT).split(/\r?\n/).filter(Boolean).sort().join('|')===METAS_UI_EXPECTED.join('|')&&
  sameJson(METAS_UI_AUTH.atomicCommitPaths.slice().sort(),METAS_UI_EXPECTED)&&
  sameJson(METAS_UI_R.atomicCommitPaths.slice().sort(),METAS_UI_EXPECTED)&&
- physicalGit('hash-object',METAS_UI_GUARD)===physicalGit('rev-parse',METAS_UI_COMMIT+':'+METAS_UI_GUARD),
+ (physicalGit('hash-object',METAS_UI_GUARD)===physicalGit('rev-parse',METAS_UI_COMMIT+':'+METAS_UI_GUARD)||
+   metasClosureGuardSuccessorBound()),
  'B4_003_METAS_UI_DIAGNOSTIC_EXACT_SOURCE_BINDING_INVALID');
 const metasUiSource=METAS_UI_R.source;
 need(metasUiSource?.path===METAS_UI_PRODUCT&&
@@ -704,6 +723,49 @@ const ACTIVE_I65_FORENSIC_B4=String(C.i65ForensicRemediationPlan?.b4?.executionL
 need(exists(ACTIVE_I65_FORENSIC_B4),'I6_5_B4_ACTIVE_LOCK_MISSING:'+ACTIVE_I65_FORENSIC_B4);
 const S=readJson(STATUS_LEDGER),A=readJson(AUTH_RECEIPT),M5=readJson(V5_MANIFEST),M6=readJson(V6_MANIFEST),M=readJson(V7_MANIFEST),FRA=readJson(I65_FORENSIC_AUDIT),FRP=readJson(I65_FORENSIC_PLAN),PAY=readJson(I65_PAYMENT_INFERENCE),B1=readJson(I65_FORENSIC_B1),B2=readJson(I65_FORENSIC_B2),B3=readJson(I65_FORENSIC_B3),B4=readJson(ACTIVE_I65_FORENSIC_B4);
 const COMP=readJson(I6_CANONICAL_COMPOSITION),FIND=readJson(I6_FINDINGS_LEDGER),FRP2=readJson(I65_FORENSIC_PLAN_V2),REJ=readJson(I65_B2_REJECTION),RCM=readJson(I65_B2_ROOT_CAUSE);
+// A functional finding may progress after its dated source receipts. Preserve
+// those historical proofs and require a separately bound, exact one-row
+// ledger/carry transition. This is not a waiver of R04, visual or LIVE gates.
+const METAS_CLOSURE_K= institutionalGoalsClosureContract;
+const METAS_CLOSURE_POINTER=C[METAS_CLOSURE_K.controlKey]||null;
+let metasClosureParentVerified=false,metasClosureReceipt=null,metasClosureEvidence=null;
+let metasClosureBaselineControl=null,metasClosureBaselineLedger=null,metasClosureBaselineCarry=null;
+if(METAS_CLOSURE_POINTER){
+ const k=METAS_CLOSURE_K,p=METAS_CLOSURE_POINTER;
+ need(/^[0-9a-f]{40}$/.test(String(p.parentHead||''))&&
+   p.authorityBaseHead===k.authorityBaseHead&&p.receiptPath===k.receiptPath,
+   'B4_003_METAS_CLOSURE_PARENT_OR_PATH_INVALID');
+ need(physicalGit('merge-base',k.authorityBaseHead,p.parentHead)===k.authorityBaseHead&&
+   physicalGit('rev-parse',k.authorityBaseHead+':'+k.ledgerPath)===k.ledgerBeforeBlob&&
+   physicalGit('rev-parse',k.authorityBaseHead+':'+k.carryPath)===k.carryBeforeBlob&&
+   physicalGit('rev-parse',p.parentHead+':'+k.ledgerPath)===k.ledgerBeforeBlob&&
+   physicalGit('rev-parse',p.parentHead+':'+k.carryPath)===k.carryBeforeBlob,
+   'B4_003_METAS_CLOSURE_AUTHORITY_BASE_DRIFT');
+ metasClosureBaselineControl=JSON.parse(physicalGit('show',k.authorityBaseHead+':'+CONTROL));
+ metasClosureBaselineLedger=JSON.parse(physicalGit('show',k.authorityBaseHead+':'+k.ledgerPath));
+ metasClosureBaselineCarry=JSON.parse(physicalGit('show',k.authorityBaseHead+':'+k.carryPath));
+ metasClosureReceipt=readJson(k.receiptPath);
+ metasClosureEvidence={gt:readJson(k.gtPath),co:readJson(k.coPath),carlos:readJson(k.carlosPath)};
+ const closureCommits=physicalGit('log','--all','--format=%H','--',k.receiptPath).split(/\r?\n/).filter(Boolean);
+ const exactClosureCommit=closureCommits.find(commit=>
+   physicalGit('rev-parse',commit+':'+k.receiptPath)===p.receiptBlobSha);
+ // Before publication verify the actual parent checkout. Once published, bind
+ // the immutable receipt commit's parent and ancestry rather than mutable HEAD.
+ metasClosureParentVerified=exactClosureCommit
+   ?physicalGit('rev-parse',exactClosureCommit+'^')===p.parentHead&&
+      physicalGit('merge-base',exactClosureCommit,'HEAD')===exactClosureCommit
+   :physicalGit('rev-parse','HEAD')===p.parentHead;
+}
+const METAS_FUNCTIONAL_CLOSURE_VERIFIED=validateInstitutionalGoalsClosure({
+ control:C,baselineControl:metasClosureBaselineControl,ledger:FIND,
+ carry:readJson(METAS_CLOSURE_K.carryPath),baselineLedger:metasClosureBaselineLedger,
+ baselineCarry:metasClosureBaselineCarry,receipt:metasClosureReceipt,evidence:metasClosureEvidence,
+ blobAtPath:p=>physicalGit('hash-object',p),parentBindingVerified:metasClosureParentVerified
+});
+if(METAS_FUNCTIONAL_CLOSURE_VERIFIED){
+ execFileSync(process.execPath,['--test','tools/gravicentra-b4-003-institutional-goals-closure.test.mjs'],{stdio:'pipe'});
+ console.log('B4_003_INSTITUTIONAL_GOALS=RESOLVED_AUTHENTICATED_RUNTIME_PASS_ONE_FINDING_R04_AND_B4_STILL_OPEN');
+}
 // The Control Plane and B4 execution lock retain their original, immutable
 // f5d03aa source snapshot. Later approved compositions must be separately
 // bound and verified; they must never be passed off as the frozen snapshot.
@@ -1186,7 +1248,7 @@ if(Q683_CALENDAR){
   R.priorGuardBlobSha===physicalGit('rev-parse',P+':tools/gravicentra-i6-control-plane-guard-v1.mjs')&&
   R.historicalBindings?.frozenCompositionBlobSha===originalCalendarBlob(I6_CANONICAL_COMPOSITION)&&
   R.historicalBindings?.frozenB4ExecutionBlobSha===physicalGit('hash-object',ACTIVE_I65_FORENSIC_B4)&&
-  R.historicalBindings?.findingsLedgerBlobSha===physicalGit('hash-object',I6_FINDINGS_LEDGER)&&
+  R.historicalBindings?.findingsLedgerBlobSha===originalCalendarBlob(I6_FINDINGS_LEDGER)&&
   R.historicalBindings?.uiJsIsNewBoundedProductFileOutsideFrozenComposition===true&&
   !COMP.productFiles.includes('orbit360-platform/core/ui.js')&&
   Q683_CALENDAR_PATHS.slice(1).every(p=>COMP.productFiles.includes(p))&&
@@ -1314,7 +1376,7 @@ if(COBROS_Q683){
   // Immutable source receipt compared with its original published tree;
   // the active manifest is independently checked against current bytes.
   R.governance.frozenCompositionBlobSha===physicalGit('rev-parse',deployedSourceCommit+':'+I6_CANONICAL_COMPOSITION)&&
-  R.governance.findingsLedgerBlobSha===physicalGit('hash-object',I6_FINDINGS_LEDGER)&&
+  R.governance.findingsLedgerBlobSha===physicalGit('rev-parse',deployedSourceCommit+':'+I6_FINDINGS_LEDGER)&&
   R.scope?.codeOnly===true&&R.scope?.singleProductSource===COBROS_Q683_PATH&&
   R.scope?.singleNewQa===COBROS_Q683_QA&&prohibited.every(k=>R.scope?.[k]===false)&&
   R.verification?.authenticatedFunctionalRetestPendingNewPreview===true&&
@@ -3753,7 +3815,10 @@ if(String(C.i65ForensicRemediationPlan?.currentBlock||'')==='B4' &&
  need(FIND.findings.length===295 &&
    FIND.findings.some(x=>x.id===hold.originatingFindingId&&x.status==='OPEN_P0_NOT_ACCEPTED') &&
    Array.isArray(hold.additionalP0)&&hold.additionalP0.length===5 &&
-   hold.additionalP0.every(id=>FIND.findings.some(x=>x.id===id&&x.status==='OPEN_P0_NOT_ACCEPTED')),
+   hold.additionalP0.every(id=>FIND.findings.some(x=>x.id===id&&
+     (x.status==='OPEN_P0_NOT_ACCEPTED'||
+       (METAS_FUNCTIONAL_CLOSURE_VERIFIED&&id===METAS_CLOSURE_K.findingId&&
+        x.status===METAS_CLOSURE_K.status&&x.blocking===false)))),
    'I65_B4_003_SECURITY_FINDING_LOSS');
  need(C.i6Execution?.productMutationAuthorized===false &&
    C.i6Execution?.dataMutationAuthorized===false &&
@@ -3988,7 +4053,9 @@ if(String(C.i65ForensicRemediationPlan?.currentBlock||'')==='B4' &&
   console.log('B4_003_UAT5_EXACT_PREVIEW_TECHNICAL_READBACK=PASS_AUTH_UAT_HOLD');
  }else console.log('B4_003_UAT5_SOURCE_QA_PENDING_NO_RELEASE');
  }
- console.log('B4_003_P0_STILL_OPEN=6');
+ console.log(METAS_FUNCTIONAL_CLOSURE_VERIFIED
+   ?'B4_003_PRIORITY_P0_FUNCTIONALLY_RESOLVED=1_REMAINING=5_HISTORICAL_SIX_IDS_PRESERVED'
+   :'B4_003_P0_STILL_OPEN=6');
 }
 const P=readJson(DATA_UPDATE_PLAN),D=readJson(DATA_UPDATE_DISCIPLINE),RGT=readJson(DATA_UPDATE_REGISTRY),SRC=readJson(ACTIVE_SOURCE_INTAKE),SRC3=readJson(I63_SOURCE),R63=readJson(I63_RECEIPT),SRC4=readJson(I64_SOURCE),R64=readJson(I64_RECEIPT),SRC5=readJson(I65_SOURCE),SYNC5=readJson(I65_SYNC);
 need(C.schemaVersion==='gravicentra-control-plane-v2','I6_CONTROL_SCHEMA_INVALID');
@@ -4592,7 +4659,7 @@ if(canonicalCompositionActive){
   lifecycleReceipt.uatReturnBinding?.blob==='783c84592201b81cb502ae03e8bfd85f52157557'&&
   lifecycleReceipt.uatReturnBinding?.status==='PARTIAL_OBSERVATION_LINKED_NOT_ACCEPTED'&&
   lifecycleReceipt.ledgerBinding?.path==='artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json'&&
-  lifecycleReceipt.ledgerBinding?.blob===physicalGit('hash-object','artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json')&&
+  lifecycleReceipt.ledgerBinding?.blob===physicalGit('rev-parse',lifecycleIntegrationCommit+':'+I6_FINDINGS_LEDGER)&&
   lifecycleReceipt.ledgerBinding?.blob==='0a6544398da91784da5c331680866a8ec1491449'&&
   JSON.stringify(lifecycleReceipt.ledgerBinding?.findingIds)===JSON.stringify(['B4-003'])&&
   (FIND.findings||[]).some(f=>f.id==='B4-003')&&

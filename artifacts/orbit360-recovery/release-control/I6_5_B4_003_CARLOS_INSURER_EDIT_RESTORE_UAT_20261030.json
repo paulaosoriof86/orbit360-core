@@ -1,0 +1,122 @@
+{
+  "schema": "GRAVICENTRA_I65_B4003_CARLOS_INSURER_EDIT_RESTORE_UAT_V1",
+  "recordedAtUtc": "2026-10-30T23:32:04.934Z",
+  "gate": "I6.5/B4-003",
+  "status": "AUTHENTICATED_SYNTHETIC_EDIT_RELOAD_RESTORE_PASS_AUDIT_VISIBILITY_NOT_ACCEPTED",
+  "preview": {
+    "url": "https://ays-orbit-360-lab--gi-i65-b4-sr-41066435386-r09pl1ti.web.app",
+    "buildId": "gi-i65-b4-a6e403119d9f-57f234755dc1",
+    "uiSourceSha": "a6e403119d9fc05b633e84f2eaa8f50c32ba12d9",
+    "backendSourceSha": "8bb4fce20bb2af1aa4022573069ff8287679b715",
+    "previewRunId": 41123553239,
+    "newDeployment": false
+  },
+  "actor": "Carlos Castro",
+  "role": "Operativo",
+  "country": "GT",
+  "fixtureId": "b4003qa_human_insurer_r20",
+  "baselineObservedAtUtc": "2026-10-30T23:05:51.316Z",
+  "baselineObservation": "Fixture temporal aislado para validar UI y persistencia en Preview.",
+  "buildId": "gi-i65-b4-a6e403119d9f-57f234755dc1",
+  "syntheticOnly": true,
+  "steps": [
+    {
+      "id": "save_visible",
+      "observedAtUtc": "2026-10-30T23:08:33.227Z",
+      "editModeClosed": true,
+      "submittedObservationVisible": true,
+      "changedFieldsShown": [
+        "Observaciones"
+      ]
+    },
+    {
+      "id": "reload_after_write",
+      "observedAtUtc": "2026-10-30T23:23:51.021Z",
+      "submittedObservationPersisted": true,
+      "fixtureIdConfirmedInUrl": true
+    },
+    {
+      "id": "restore_visible",
+      "observedAtUtc": "2026-10-30T23:25:38.730Z",
+      "baselineVisible": false,
+      "editModeClosed": true
+    },
+    {
+      "id": "reload_after_restore",
+      "observedAtUtc": "2026-10-30T23:27:24.195Z",
+      "baselineVisibleAfterReload": true,
+      "fixtureIdConfirmedInUrl": true
+    }
+  ],
+  "finalBaselineExact": true,
+  "otherVisibleFieldsUnchanged": true,
+  "otherVisibleFieldsCompared": 12,
+  "auditVisibleAfterReload": false,
+  "auditPanelObservedAtUtc": "2026-10-30T23:30:34.871Z",
+  "auditPanelShownDocumentItems": 2,
+  "auditPanelShownEditRestoreItems": 0,
+  "syntheticObservationWrites": 2,
+  "businessWrites": 0,
+  "acceptedScope": [
+    "Carlos independently authenticated as Operativo in GT",
+    "Existing named synthetic fixture edited only in Observaciones, with reason",
+    "Submitted observation persisted through a full reload",
+    "Original baseline restored with a second reason and persisted through another reload",
+    "Twelve other compared visible form fields unchanged"
+  ],
+  "auditLimitation": {
+    "status": "ACTIVITY_EDIT_AND_RESTORE_ENTRIES_NOT_VISIBLE_AFTER_RELOAD",
+    "observedDocumentActivityItems": 2,
+    "observedEditRestoreActivityItems": 0,
+    "globalHistoryUsedAsSubstitute": false,
+    "wholeDatabaseAuditRetentionProven": false,
+    "relatedExistingFindingId": "B4-003-R18-14-INSURER-ACTIVITY-KNOWLEDGE-EVENT-CONVERGENCE",
+    "existingFindingClosed": false,
+    "newFindingCreated": false,
+    "sourceReview": [
+      {
+        "path": "orbit360-platform/modules/aseguradoras.js",
+        "blobSha": "018ed999cbcf4d621c84c36c081cb455b1a01fb6",
+        "finding": "guardarDraft records the reason and changed fields in the insurer's actividad array through log(before), sends it in the same durable batch, and tabActividad combines that array with documentary knowledge sources."
+      },
+      {
+        "path": "functions/b4-003-scoped-bootstrap-reader.js",
+        "blobSha": "356d36e0679a5e499c05632a981b9ef3f1ffb9ec",
+        "finding": "The viewDirectory insurer projection does not include actividad. A fresh browser reload therefore does not receive insurer edit activity."
+      }
+    ],
+    "inference": "A later edit using a projected insurer without its prior actividad array can replace the prior history with the newly constructed list. This is a source-level retention risk; the surviving backend history was not read directly in this UAT.",
+    "nextExistingWork": "Repair and verify the insurer activity owner and protected read projection within the existing finding, preserving server-owned prior history. Do not repeat the approved edit/reload/restore steps merely to diagnose this projection."
+  },
+  "transientObservations": [
+    {
+      "case": "Initial directory load",
+      "observed": "The page temporarily labelled Operativo read-only before its directory read completed; edit controls appeared after readiness.",
+      "productFailureClaimed": false
+    },
+    {
+      "case": "Immediate restoration visibility probe",
+      "observed": false,
+      "subsequentEvidence": "Full reload and a fresh editor read confirmed exact baseline restoration. The false immediate probe is retained above.",
+      "instantRestoreConfirmationClaimed": false
+    }
+  ],
+  "preservedEvidence": {
+    "priorPaulaInsurerEditRestorePassRetained": true,
+    "carlosReadAndMetasBoundaryReceipt": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CARLOS_AUTHENTICATED_CONTINUITY_UAT_20261030.json",
+    "carlosReadAndMetasBoundaryBlob": "695c91dbacf09cadbc653e47b77888ec90089564"
+  },
+  "boundaries": {
+    "realInsurerModified": false,
+    "contactsModified": false,
+    "logoModified": false,
+    "documentsUploaded": false,
+    "notificationsSent": false,
+    "authIamRulesChanged": false,
+    "fullDatabaseEqualityAsserted": false,
+    "auditVisibilityAccepted": false,
+    "wholeAseguradorasCapabilityClosed": false,
+    "b4003Closed": false,
+    "productionAccepted": false
+  }
+}

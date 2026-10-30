@@ -4,7 +4,7 @@
   "authority": "FAIL_CLOSED_FINDING_CONTINUITY",
   "sourceLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
   "sourceLedgerPreviousBlobSha": "b923461bc7b0bbff0df597187f0053228029e7b4",
-  "expectedLedgerNextBlobSha": "0a6544398da91784da5c331680866a8ec1491449",
+  "expectedLedgerNextBlobSha": "333963e16a21d9abe58274091c0f61a53473c71f",
   "policy": {
     "allLedgerFindingsMustAppearExactlyOnce": true,
     "newHumanFindingsMustBeIndividualLedgerEntries": true,
@@ -12016,7 +12016,7 @@
       "source": "PAULA_REQUEST_AND_REPO_CAUSAL_AUDIT_20261012",
       "surface": "Configuración / Metas institucionales",
       "priority": "BLOCKING_P0",
-      "blocking": true,
+      "blocking": false,
       "owner": [
         "functions/assignable-advisor-roster.js",
         "orbit360-platform/modules/inicio.js"
@@ -12024,12 +12024,19 @@
       "finding": "Certificar alta, edición y persistencia institucional de metas por país, mes y tipo.",
       "rootCause": "La proyección r23 reconoce metas globales sin asesorId; no hay aún prueba de owner UI/configuración editable.",
       "closureCondition": "UI Admin/Dirección configura meta institucional con server commit/readback, auditoría, reload, sin borrar meta individual.",
-      "status": "OPEN_P0_NOT_ACCEPTED",
+      "status": "RESOLVED_AUTHENTICATED_RUNTIME_PASS",
       "mayDisappearWithoutDisposition": false,
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_P0_FINDINGS_DECISIONS_FREEZE_20261012.md",
       "receiptBlobSha": "2760d2aeb961bac5a0ce11e326c689143d2cc083",
       "machineProofRunId": 38282275915,
-      "visualPassDoesNotClose": true
+      "visualPassDoesNotClose": true,
+      "closureProof": {
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_INSTITUTIONAL_GOALS_FUNCTIONAL_CLOSURE_20261030.json",
+        "receiptBlobSha": "f6330cce90ef95a43eedc724d2aceec84458cda9",
+        "previousStatus": "OPEN_P0_NOT_ACCEPTED",
+        "previousBlocking": true,
+        "scope": "INSTITUTIONAL_GOALS_FUNCTIONAL_ONLY"
+      }
     },
     {
       "id": "B4-003-P0-20261012-FREELANCERS-GOAL-SCOPE",
@@ -13320,5 +13327,36 @@
       "B4-003-P0-20261012-QA-ORPHAN-RENEWALS"
     ],
     "ledgerBlobSha": "b923461bc7b0bbff0df597187f0053228029e7b4"
-  }
+  },
+  "currentSixPriorityP0Closure": {
+    "scope": "SIX_PRIORITY_P0_FINDINGS_FROZEN_20261012_ONLY",
+    "findingIds": [
+      "B4-003-P0-20261012-PERSONAL-COLLECTION",
+      "B4-003-P0-20261012-INSTITUTIONAL-GOALS",
+      "B4-003-P0-20261012-FREELANCERS-GOAL-SCOPE",
+      "B4-003-P0-20261012-INICIO-MOTIVATIONAL-TEXTS",
+      "B4-003-P0-20261012-QA-CANCELLED-RUN-FIXTURES",
+      "B4-003-P0-20261012-QA-ORPHAN-RENEWALS"
+    ],
+    "total": 6,
+    "resolved": 1,
+    "open": 5,
+    "resolvedFindingIds": [
+      "B4-003-P0-20261012-INSTITUTIONAL-GOALS"
+    ],
+    "openFindingIds": [
+      "B4-003-P0-20261012-PERSONAL-COLLECTION",
+      "B4-003-P0-20261012-FREELANCERS-GOAL-SCOPE",
+      "B4-003-P0-20261012-INICIO-MOTIVATIONAL-TEXTS",
+      "B4-003-P0-20261012-QA-CANCELLED-RUN-FIXTURES",
+      "B4-003-P0-20261012-QA-ORPHAN-RENEWALS"
+    ],
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_INSTITUTIONAL_GOALS_FUNCTIONAL_CLOSURE_20261030.json",
+    "receiptBlobSha": "f6330cce90ef95a43eedc724d2aceec84458cda9",
+    "fullLedgerAcceptanceReconciled": false,
+    "b4003Closed": false,
+    "overallImplementationPercent": null,
+    "formalI6ProgressPercent": 50
+  },
+  "attentionCountInterpretation": "FOLLOW_UP_INVENTORY_COUNT_NOT_CURRENT_OPEN_FINDING_COUNT"
 }

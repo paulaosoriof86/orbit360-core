@@ -16760,5 +16760,121 @@
     "sameExistingRulesAloneBlockControlledLive": false,
     "rulesSecurityFindingStatus": "OPEN_NOT_PASS_OWNER_ACCEPTED_TEMPORARY_RISK",
     "newAuthority": false
+  },
+  "b4003InstitutionalGoalsClosure20261030": {
+    "schema": "GRAVICENTRA_I65_B4003_INSTITUTIONAL_GOALS_CLOSURE_POINTER_V1",
+    "status": "RESOLVED_AUTHENTICATED_RUNTIME_PASS",
+    "findingId": "B4-003-P0-20261012-INSTITUTIONAL-GOALS",
+    "authorityBaseHead": "7c8946fa8a8bf63f50a292f81c2d1005361f43f2",
+    "parentHead": "b10ef805b075b1c37e2c8da5940b408b39d6a9c3",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_INSTITUTIONAL_GOALS_FUNCTIONAL_CLOSURE_20261030.json",
+    "receiptBlobSha": "f6330cce90ef95a43eedc724d2aceec84458cda9",
+    "ledgerBlobSha": "333963e16a21d9abe58274091c0f61a53473c71f",
+    "carryBlobSha": "3cdedb0c3aa1c4a39545229fb4781e79326c945c",
+    "priorityFindingClosuresGranted": 1,
+    "b4003Closed": false,
+    "productionAccepted": false
+  },
+  "b4003CarlosContinuationAndQaDisposition20261030": {
+    "schema": "GRAVICENTRA_I65_B4003_CARLOS_AND_QA_CONTINUITY_POINTER_V1",
+    "recordedAtUtc": "2026-10-30T23:35:24.046414Z",
+    "status": "CARLOS_READ_RELOAD_AND_METAS_UI_BOUNDARY_PASS_INSURER_WRITE_RESTORE_PASS_QA_DEPENDENCIES_MAPPED_REMAINING_HOLDS",
+    "gate": "I6.5/B4-003",
+    "parentHead": "b10ef805b075b1c37e2c8da5940b408b39d6a9c3",
+    "previewBuildId": "gi-i65-b4-a6e403119d9f-57f234755dc1",
+    "evidence": [
+      {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CARLOS_AUTHENTICATED_CONTINUITY_UAT_20261030.json",
+        "blobSha": "695c91dbacf09cadbc653e47b77888ec90089564"
+      },
+      {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CARLOS_INSURER_EDIT_RESTORE_UAT_20261030.json",
+        "blobSha": "bd918367ce7db0d9da0771140509b2fd0e0fccf9"
+      },
+      {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_EXACT_QA_RESIDUE_DEPENDENCIES_READBACK_20261030.json",
+        "blobSha": "5a6bca677b5a127436fd5382163481a08e462f70"
+      },
+      {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_EXACT_QA_RESIDUE_DEPENDENCIES_ADJUDICATION_20261030.json",
+        "blobSha": "a329186d192057a462162959a8dd5b998d194130"
+      }
+    ],
+    "institutionalGoalsClosurePointer": "b4003InstitutionalGoalsClosure20261030",
+    "carlos": {
+      "independentAuthenticatedIdentity": true,
+      "roles": [
+        "Operativo",
+        "Asesor"
+      ],
+      "countries": [
+        "GT",
+        "CO",
+        "TODOS"
+      ],
+      "readReloadCasesPassed": 6,
+      "readReloadCasesTotal": 6,
+      "confirmedSourcesPerCase": 5,
+      "metasUiRoleBoundaryPassed": 6,
+      "metasUiRoleBoundaryTotal": 6,
+      "backendNegativeAuthenticatedAccepted": false
+    },
+    "personalCollection": {
+      "currentAuthenticatedEmptyCasePass": true,
+      "positivePaymentAndConfiguredGoalCaseAccepted": false,
+      "fullFindingClosed": false
+    },
+    "insurer": {
+      "syntheticEditReloadRestorePass": true,
+      "otherVisibleFieldsPreserved": 12,
+      "baselineRestored": true,
+      "auditVisibleAfterReload": false,
+      "relatedExistingFindingId": "B4-003-R18-14-INSURER-ACTIVITY-KNOWLEDGE-EVENT-CONVERGENCE",
+      "fullCapabilityAccepted": false
+    },
+    "qaResidues": {
+      "workflowRunId": 41144205677,
+      "workflowConclusion": "success",
+      "artifactId": 13019409947,
+      "diagnosticSourceHead": "b10ef805b075b1c37e2c8da5940b408b39d6a9c3",
+      "rootRecordsPresent": 17,
+      "rootRecordsRequested": 17,
+      "observedDocumentsOrReferences": 65,
+      "existingDocuments": 56,
+      "missingReferencedParents": 9,
+      "cancelledRunAdditionalDependents": 23,
+      "orphanFinancialDependents": 12,
+      "orphanAdditionalHistoricalActivities": 3,
+      "declaredRelationsReadComplete": true,
+      "universalGraphCompletenessClaimed": false,
+      "disposition": "HOLD_PRESERVE_EXACT_RECORDS_NO_CLEANUP",
+      "cleanupAuthorized": false,
+      "findingsClosed": 0,
+      "requiresRepeatGeneralInventory": false
+    },
+    "progress": {
+      "unit": "SIX_FROZEN_PRIORITY_P0_FINDINGS_FROM_20261012",
+      "total": 6,
+      "resolved": 1,
+      "open": 5,
+      "percentOfThisSixFindingScope": 16.67,
+      "formalI6MiniGatesCompleted": 5,
+      "formalI6MiniGatesTotal": 10,
+      "formalI6Percent": 50,
+      "overallImplementationPercent": null,
+      "overallImplementationPercentReason": "NO_ACCEPTED_CURRENT_GLOBAL_DENOMINATOR",
+      "wholeB4003Accepted": false
+    },
+    "preservation": {
+      "previousControlPlaneKeysUnchanged": 418,
+      "existingFindingIdsPreserved": 295,
+      "newFindingIds": 0,
+      "historicalReceiptsRewritten": false,
+      "productSourceChanged": false,
+      "newPreviewDeployed": false,
+      "authIamRulesChanged": false,
+      "productionAccepted": false,
+      "existingRulesRiskExceptionUnchanged": true
+    }
   }
 }

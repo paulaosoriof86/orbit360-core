@@ -1,0 +1,315 @@
+{
+  "schema": "GRAVICENTRA_I65_B4003_CARLOS_AUTHENTICATED_CONTINUITY_UAT_V1",
+  "recordedAtUtc": "2026-10-30T23:02:23.989Z",
+  "gate": "I6.5/B4-003",
+  "status": "AUTHENTICATED_CARLOS_READ_RELOAD_AND_METAS_UI_ROLE_BOUNDARY_PASS_PERSONAL_COLLECTION_POSITIVE_CASE_PENDING",
+  "authorityBaseHead": "7c8946fa8a8bf63f50a292f81c2d1005361f43f2",
+  "preview": {
+    "url": "https://ays-orbit-360-lab--gi-i65-b4-sr-41066435386-r09pl1ti.web.app",
+    "buildId": "gi-i65-b4-a6e403119d9f-57f234755dc1",
+    "uiSourceSha": "a6e403119d9fc05b633e84f2eaa8f50c32ba12d9",
+    "backendSourceSha": "8bb4fce20bb2af1aa4022573069ff8287679b715",
+    "transportSha": "c76b94ed5fa6f5f6752e469275c0583471c0c3dd",
+    "previewRunId": 41123553239,
+    "servedBuildObservedInDomScriptUrls": true,
+    "newDeployment": false
+  },
+  "identity": {
+    "actor": "Carlos Castro",
+    "authentication": "EXISTING_USER_OPENED_CHROME_SESSION",
+    "observedAccountLabel": "Carlos Castro",
+    "availableRoles": [
+      "Operativo",
+      "Asesor"
+    ],
+    "independentFromPriorPaulaSession": true,
+    "evidenceBasis": "Authenticated account label and canonical available roles on the user-opened Preview; not a role switch within Paula's account.",
+    "rawUidExported": false,
+    "passwordOrTokenAccessed": false,
+    "authOrMembershipModified": false
+  },
+  "calendarMonth": "2026-10",
+  "readMatrix": {
+    "status": "SIX_AUTHENTICATED_CONTEXTS_WITH_RELOAD_PASS",
+    "casesPassed": 6,
+    "casesTotal": 6,
+    "cases": [
+      {
+        "role": "Operativo",
+        "country": "GT",
+        "observedAtUtc": "2026-10-30T22:59:11.166Z",
+        "reloadedObservedAtUtc": "2026-10-30T22:59:39.824Z",
+        "actorIsCarlos": true,
+        "selectedContextVerified": true,
+        "confirmedSourcesBefore": 5,
+        "confirmedSourcesAfter": 5,
+        "requiredSources": 5,
+        "ownCountry": null,
+        "ownCollectionAmountObserved": null,
+        "personalGoalConfigured": null,
+        "ownPercentageWithheld": null,
+        "primaryCountryNoticeCount": 2,
+        "personalCardsCountries": [],
+        "confirmedPaymentCount": 0,
+        "overdueObligationsExist": false,
+        "overdueNotCountedAsCollection": null,
+        "visibleFinancialStateEqualAfterReload": true,
+        "headingContext": "Inicio · Revisa metas institucionales, cuando estén configuradas, y pendientes autorizados en Guatemala.",
+        "backendAcceptedWrite": false
+      },
+      {
+        "role": "Operativo",
+        "country": "CO",
+        "observedAtUtc": "2026-10-30T22:58:06.852Z",
+        "reloadedObservedAtUtc": "2026-10-30T22:58:28.601Z",
+        "actorIsCarlos": true,
+        "selectedContextVerified": true,
+        "confirmedSourcesBefore": 5,
+        "confirmedSourcesAfter": 5,
+        "requiredSources": 5,
+        "ownCountry": "CO",
+        "ownCollectionAmountObserved": 0,
+        "personalGoalConfigured": false,
+        "ownPercentageWithheld": true,
+        "primaryCountryNoticeCount": 0,
+        "personalCardsCountries": [
+          "CO"
+        ],
+        "confirmedPaymentCount": 0,
+        "overdueObligationsExist": true,
+        "overdueNotCountedAsCollection": true,
+        "visibleFinancialStateEqualAfterReload": true,
+        "headingContext": "Inicio · Revisa metas institucionales, cuando estén configuradas, y pendientes autorizados en Colombia.",
+        "backendAcceptedWrite": false
+      },
+      {
+        "role": "Operativo",
+        "country": "TODOS",
+        "observedAtUtc": "2026-10-30T22:57:11.307Z",
+        "reloadedObservedAtUtc": "2026-10-30T22:57:36.398Z",
+        "actorIsCarlos": true,
+        "selectedContextVerified": true,
+        "confirmedSourcesBefore": 5,
+        "confirmedSourcesAfter": 5,
+        "requiredSources": 5,
+        "ownCountry": "CO",
+        "ownCollectionAmountObserved": 0,
+        "personalGoalConfigured": false,
+        "ownPercentageWithheld": true,
+        "primaryCountryNoticeCount": 0,
+        "personalCardsCountries": [
+          "CO"
+        ],
+        "confirmedPaymentCount": 0,
+        "overdueObligationsExist": true,
+        "overdueNotCountedAsCollection": true,
+        "visibleFinancialStateEqualAfterReload": true,
+        "headingContext": "Inicio · Revisa metas institucionales, cuando estén configuradas, y pendientes autorizados en Guatemala y Colombia.",
+        "backendAcceptedWrite": false
+      },
+      {
+        "role": "Asesor",
+        "country": "GT",
+        "observedAtUtc": "2026-10-30T22:54:43.353Z",
+        "reloadedObservedAtUtc": "2026-10-30T22:55:37.971Z",
+        "actorIsCarlos": true,
+        "selectedContextVerified": true,
+        "confirmedSourcesBefore": 5,
+        "confirmedSourcesAfter": 5,
+        "requiredSources": 5,
+        "ownCountry": null,
+        "ownCollectionAmountObserved": null,
+        "personalGoalConfigured": null,
+        "ownPercentageWithheld": null,
+        "primaryCountryNoticeCount": 2,
+        "personalCardsCountries": [],
+        "confirmedPaymentCount": 0,
+        "overdueObligationsExist": false,
+        "overdueNotCountedAsCollection": null,
+        "visibleFinancialStateEqualAfterReload": true,
+        "headingContext": "Inicio · Consulta las metas individuales disponibles y tus seguimientos autorizados en Guatemala.",
+        "backendAcceptedWrite": false
+      },
+      {
+        "role": "Asesor",
+        "country": "CO",
+        "observedAtUtc": "2026-10-30T22:52:50.932Z",
+        "reloadedObservedAtUtc": "2026-10-30T22:53:57.355Z",
+        "actorIsCarlos": true,
+        "selectedContextVerified": true,
+        "confirmedSourcesBefore": 5,
+        "confirmedSourcesAfter": 5,
+        "requiredSources": 5,
+        "ownCountry": "CO",
+        "ownCollectionAmountObserved": 0,
+        "personalGoalConfigured": false,
+        "ownPercentageWithheld": true,
+        "primaryCountryNoticeCount": 0,
+        "personalCardsCountries": [
+          "CO"
+        ],
+        "confirmedPaymentCount": 0,
+        "overdueObligationsExist": true,
+        "overdueNotCountedAsCollection": true,
+        "visibleFinancialStateEqualAfterReload": true,
+        "headingContext": "Inicio · Consulta las metas individuales disponibles y tus seguimientos autorizados en Colombia.",
+        "backendAcceptedWrite": false
+      },
+      {
+        "role": "Asesor",
+        "country": "TODOS",
+        "observedAtUtc": "2026-10-30T22:55:42.600Z",
+        "reloadedObservedAtUtc": "2026-10-30T22:56:32.243Z",
+        "actorIsCarlos": true,
+        "selectedContextVerified": true,
+        "confirmedSourcesBefore": 5,
+        "confirmedSourcesAfter": 5,
+        "requiredSources": 5,
+        "ownCountry": "CO",
+        "ownCollectionAmountObserved": 0,
+        "personalGoalConfigured": false,
+        "ownPercentageWithheld": true,
+        "primaryCountryNoticeCount": 0,
+        "personalCardsCountries": [
+          "CO"
+        ],
+        "confirmedPaymentCount": 0,
+        "overdueObligationsExist": true,
+        "overdueNotCountedAsCollection": true,
+        "visibleFinancialStateEqualAfterReload": true,
+        "headingContext": "Inicio · Consulta las metas individuales disponibles y tus seguimientos autorizados en Guatemala y Colombia.",
+        "backendAcceptedWrite": false
+      }
+    ],
+    "scope": "Current Carlos session, Operativo/Asesor x GT/CO/TODOS, five confirmed sources and stable visible own financial state after reload."
+  },
+  "institutionalGoalsRoleBoundary": {
+    "independentAuthenticatedIdentity": true,
+    "actor": "Carlos Castro",
+    "buildId": "gi-i65-b4-a6e403119d9f-57f234755dc1",
+    "cases": [
+      {
+        "role": "Operativo",
+        "country": "GT",
+        "observedAtUtc": "2026-10-30T23:00:12.037Z",
+        "actorIsCarlos": true,
+        "uiAccessDenied": true,
+        "qaControlsAbsent": true,
+        "backendDenialTested": false
+      },
+      {
+        "role": "Operativo",
+        "country": "CO",
+        "observedAtUtc": "2026-10-30T23:00:13.535Z",
+        "actorIsCarlos": true,
+        "uiAccessDenied": true,
+        "qaControlsAbsent": true,
+        "backendDenialTested": false
+      },
+      {
+        "role": "Operativo",
+        "country": "TODOS",
+        "observedAtUtc": "2026-10-30T23:00:14.785Z",
+        "actorIsCarlos": true,
+        "uiAccessDenied": true,
+        "qaControlsAbsent": true,
+        "backendDenialTested": false
+      },
+      {
+        "role": "Asesor",
+        "country": "TODOS",
+        "observedAtUtc": "2026-10-30T23:00:36.478Z",
+        "actorIsCarlos": true,
+        "uiAccessDenied": true,
+        "qaControlsAbsent": true,
+        "backendDenialTested": false
+      },
+      {
+        "role": "Asesor",
+        "country": "CO",
+        "observedAtUtc": "2026-10-30T23:00:37.879Z",
+        "actorIsCarlos": true,
+        "uiAccessDenied": true,
+        "qaControlsAbsent": true,
+        "backendDenialTested": false
+      },
+      {
+        "role": "Asesor",
+        "country": "GT",
+        "observedAtUtc": "2026-10-30T23:00:39.863Z",
+        "actorIsCarlos": true,
+        "uiAccessDenied": true,
+        "qaControlsAbsent": true,
+        "backendDenialTested": false
+      }
+    ]
+  },
+  "confirmedCollectionDrilldown": {
+    "observedAtUtc": "2026-10-30T22:53:17.304Z",
+    "role": "Asesor",
+    "country": "CO",
+    "heading": "Cobros confirmados · 0",
+    "tableHeaders": [
+      "Cliente",
+      "Cuota",
+      "Monto",
+      "Fecha efectiva",
+      "Estado"
+    ],
+    "emptyState": "Sin registros.",
+    "operationalWrites": 0
+  },
+  "personalCollectionAdjudication": {
+    "findingId": "B4-003-P0-20261012-PERSONAL-COLLECTION",
+    "status": "AUTHENTICATED_EMPTY_AND_UNCONFIGURED_GOAL_CASE_PASS_POSITIVE_CASE_PENDING",
+    "ownCountry": "CO",
+    "ownCurrency": "COP",
+    "confirmedPaymentsObserved": 0,
+    "personalGoalConfigured": false,
+    "percentageNotInvented": true,
+    "overduePortfolioNotTreatedAsCollectedMoney": true,
+    "gtCountryMismatchDoesNotBorrowCoPersonalValues": true,
+    "reloadPassed": true,
+    "positivePaymentAndConfiguredGoalCaseTested": false,
+    "fullFindingClosed": false,
+    "nextExistingCriterion": "Demonstrate the existing positive personal-goal and confirmed-payment case for an authorized canonical advisor, without creating real business data solely to force acceptance."
+  },
+  "transientObservations": [
+    {
+      "stage": "Asesor_to_Operativo_TODOS",
+      "result": "Locator timed out before follow-up snapshot confirmed selected role Operativo, correct heading and 5/5 sources.",
+      "notCountedAsProductFailure": true
+    }
+  ],
+  "preservedPriorEvidence": [
+    {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_METAS_UI_DIAGNOSTIC_RUNTIME_UAT_GT_20261030.json",
+      "blobSha": "2bdee68026a99da098741852b32414340dd78f96",
+      "adminCorePassed": 12,
+      "adminCoreTotal": 12
+    },
+    {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_METAS_UI_DIAGNOSTIC_RUNTIME_UAT_CO_20261030.json",
+      "blobSha": "76164eca65b96b5fce2cd2135821e6ef23abdedb",
+      "adminCorePassed": 12,
+      "adminCoreTotal": 12,
+      "inicioContextualCasesPassed": 9
+    }
+  ],
+  "boundaries": {
+    "businessWrites": 0,
+    "syntheticWrites": 0,
+    "operationalDataDeleted": 0,
+    "authIamRulesChanged": false,
+    "backendNegativeAuthenticatedAccepted": false,
+    "wholeDatabaseEqualityAsserted": false,
+    "rawClientDataExported": false,
+    "fullCarlosTransversalMatrixAccepted": false,
+    "inicioHumanVisualAcceptanceGranted": false,
+    "personalCollectionFindingClosed": false,
+    "b4003Closed": false,
+    "b4004Authorized": false,
+    "productionAccepted": false
+  },
+  "interpretation": "These observations complete the independent Carlos UI role boundary required by the institutional-goals functional finding. They do not claim a direct authenticated server-denial test, a positive personal-collection calculation, complete R04 acceptance, human visual approval, or LIVE readiness."
+}
