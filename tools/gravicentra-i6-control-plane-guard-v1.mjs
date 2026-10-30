@@ -4072,7 +4072,7 @@ if(activeI65){
       const b4R20RenewabilityApplyAuthorized=C.nextAction==='I6_5_FORENSIC_REMEDIATION_B4_003_R20_RENEWABILITY_APPLY'&&B4.status==='B4_003_R20_RENEWABILITY_APPLY_AUTHORIZED'&&B4.r20RenewabilityApplyAuthorization?.status==='AUTHORIZED_PENDING_APPLY'&&B4.r20RenewabilityApplyAuthorization?.ruleId==='PAULA_R20_RENEWABILITY_RULE_20261006'&&Number(B4.r20RenewabilityApplyAuthorization?.maxWrites||0)>0&&B4.boundaries?.dataMutationAuthorized===true;
       const b4R20RenewalCutoffApplyAuthorized=C.nextAction==='I6_5_FORENSIC_REMEDIATION_B4_003_R20_RENEWAL_CUTOFF_APPLY'&&B4.status==='B4_003_R20_RENEWAL_CUTOFF_APPLY_AUTHORIZED'&&B4.r20RenewalCutoffApplyAuthorization?.status==='AUTHORIZED_PENDING_APPLY'&&B4.r20RenewalCutoffApplyAuthorization?.ruleId==='PAULA_EXPIRED_CUTOFF_20261007'&&B4.r20RenewalCutoffApplyAuthorization?.targetDigest==='744f6f26139f272fa3a26ab35e889a9d011833e802d1495286147734ec7b4d1d'&&Number(B4.r20RenewalCutoffApplyAuthorization?.maxWrites)===583&&B4.boundaries?.renewalCutoffDataMutationAuthorized===true&&B4.boundaries?.dataMutationAuthorized===true;
       need(B4.block==='B4'&&(B4.boundaries?.dataMutationAuthorized===false||b4RenewalApplyAuthorized||b4R20RenewabilityApplyAuthorized||b4R20RenewalCutoffApplyAuthorized)&&B4.boundaries?.reimportAuthorized===false&&B4.boundaries?.livePromotionAuthorized===false,'I6_5_B4_BOUNDARY_INVALID');
-      need(['I6_5_FORENSIC_REMEDIATION_B4_001_DIAGNOSTIC','I6_5_FORENSIC_REMEDIATION_B4_001_CONTRACT_AND_EXACT_PREVIEW','I6_5_FORENSIC_REMEDIATION_B4_002_DIAGNOSTIC','I6_5_FORENSIC_REMEDIATION_B4_002_SOURCE_FIX','I6_5_FORENSIC_REMEDIATION_B4_002_CONTRACT_AND_EXACT_PREVIEW','I6_5_FORENSIC_REMEDIATION_B4_003_DIAGNOSTIC','I6_5_FORENSIC_REMEDIATION_B4_003_SOURCE_FIX','I6_5_FORENSIC_REMEDIATION_B4_003_CONTRACT_AND_EXACT_PREVIEW','I6_5_FORENSIC_REMEDIATION_B4_003_RENEWAL_DATA_AUTHORIZATION_OR_CONFLICT_RESOLUTION','I6_5_FORENSIC_REMEDIATION_B4_003_RENEWAL_DETERMINISTIC_APPLY','I6_5_FORENSIC_REMEDIATION_B4_003_TARGETED_PAULA_VISUAL','I6_5_FORENSIC_REMEDIATION_B4_003_R18_AUTHENTICATED_HARNESS_READBACK','I6_5_FORENSIC_REMEDIATION_B4_003_R18_SOURCE_FIX','I6_5_FORENSIC_REMEDIATION_B4_003_R18_CONTRACT_AND_EXACT_PREVIEW','I6_5_FORENSIC_REMEDIATION_B4_003_R18_TARGETED_PAULA_VISUAL','I6_5_FORENSIC_REMEDIATION_B4_003_R19_DIAGNOSTIC','I6_5_FORENSIC_REMEDIATION_B4_003_R19_SOURCE_FIX','I6_5_FORENSIC_REMEDIATION_B4_003_R19_CONTRACT_AND_EXACT_PREVIEW','I6_5_FORENSIC_REMEDIATION_B4_003_R19_TARGETED_PAULA_VISUAL','I6_5_FORENSIC_REMEDIATION_B4_003_R20_CAUSAL_DIAGNOSTIC_OWNER_MATRIX','I6_5_FORENSIC_REMEDIATION_B4_003_R20_RENEWABILITY_DRY_RUN_AND_SOURCE_FIX','I6_5_FORENSIC_REMEDIATION_B4_003_R20_RENEWABILITY_APPLY','I6_5_FORENSIC_REMEDIATION_B4_003_R20_RENEWAL_CUTOFF_APPLY','I6_5_B4_003_RENEWALS_EXACT_PREVIEW_AUTHORIZATION','I6_5_FORENSIC_REMEDIATION_B4_003_RENEWALS_RECENT24_SOURCE_FIX','I6_5_FORENSIC_REMEDIATION_B4_003_RENEWALS_PRIORITY_EXACT_PREVIEW','I6_5_B4_003_RENEWALS_EXACT_PREVIEW_VISUAL','I6_5_FORENSIC_REMEDIATION_B4_003_R20_SOURCE_FIX','I6_5_FORENSIC_REMEDIATION_B4_003_R20_CONTRACT_AND_EXACT_PREVIEW','I6_5_FORENSIC_REMEDIATION_B4_003_R20_TARGETED_PAULA_VISUAL','I6_5_FORENSIC_REMEDIATION_B4_003_R20_SECOND_REVIEW_SINGLE_CUMULATIVE_SOURCE_FIX','I6_5_FORENSIC_REMEDIATION_B4_004_DIAGNOSTIC','I6_5_FORENSIC_REMEDIATION_B4_003_R23_CONTRACT_AND_EXACT_PREVIEW','I6_5_B4_003_AUTHENTICATED_EXACT_PREVIEW_UAT_AND_P0_CLOSEOUT'].includes(C.nextAction),'I6_5_FORENSIC_B4_ACTION_INVALID');
+      need(['I6_5_FORENSIC_REMEDIATION_B4_001_DIAGNOSTIC','I6_5_FORENSIC_REMEDIATION_B4_001_CONTRACT_AND_EXACT_PREVIEW','I6_5_FORENSIC_REMEDIATION_B4_002_DIAGNOSTIC','I6_5_FORENSIC_REMEDIATION_B4_002_SOURCE_FIX','I6_5_FORENSIC_REMEDIATION_B4_002_CONTRACT_AND_EXACT_PREVIEW','I6_5_FORENSIC_REMEDIATION_B4_003_DIAGNOSTIC','I6_5_FORENSIC_REMEDIATION_B4_003_SOURCE_FIX','I6_5_FORENSIC_REMEDIATION_B4_003_CONTRACT_AND_EXACT_PREVIEW','I6_5_FORENSIC_REMEDIATION_B4_003_RENEWAL_DATA_AUTHORIZATION_OR_CONFLICT_RESOLUTION','I6_5_FORENSIC_REMEDIATION_B4_003_RENEWAL_DETERMINISTIC_APPLY','I6_5_FORENSIC_REMEDIATION_B4_003_TARGETED_PAULA_VISUAL','I6_5_FORENSIC_REMEDIATION_B4_003_R18_AUTHENTICATED_HARNESS_READBACK','I6_5_FORENSIC_REMEDIATION_B4_003_R18_SOURCE_FIX','I6_5_FORENSIC_REMEDIATION_B4_003_R18_CONTRACT_AND_EXACT_PREVIEW','I6_5_FORENSIC_REMEDIATION_B4_003_R18_TARGETED_PAULA_VISUAL','I6_5_FORENSIC_REMEDIATION_B4_003_R19_DIAGNOSTIC','I6_5_FORENSIC_REMEDIATION_B4_003_R19_SOURCE_FIX','I6_5_FORENSIC_REMEDIATION_B4_003_R19_CONTRACT_AND_EXACT_PREVIEW','I6_5_FORENSIC_REMEDIATION_B4_003_R19_TARGETED_PAULA_VISUAL','I6_5_FORENSIC_REMEDIATION_B4_003_R20_CAUSAL_DIAGNOSTIC_OWNER_MATRIX','I6_5_FORENSIC_REMEDIATION_B4_003_R20_RENEWABILITY_DRY_RUN_AND_SOURCE_FIX','I6_5_FORENSIC_REMEDIATION_B4_003_R20_RENEWABILITY_APPLY','I6_5_FORENSIC_REMEDIATION_B4_003_R20_RENEWAL_CUTOFF_APPLY','I6_5_B4_003_RENEWALS_EXACT_PREVIEW_AUTHORIZATION','I6_5_FORENSIC_REMEDIATION_B4_003_RENEWALS_RECENT24_SOURCE_FIX','I6_5_FORENSIC_REMEDIATION_B4_003_RENEWALS_PRIORITY_EXACT_PREVIEW','I6_5_B4_003_RENEWALS_EXACT_PREVIEW_VISUAL','I6_5_FORENSIC_REMEDIATION_B4_003_R20_SOURCE_FIX','I6_5_FORENSIC_REMEDIATION_B4_003_R20_CONTRACT_AND_EXACT_PREVIEW','I6_5_FORENSIC_REMEDIATION_B4_003_R20_TARGETED_PAULA_VISUAL','I6_5_FORENSIC_REMEDIATION_B4_003_R20_SECOND_REVIEW_SINGLE_CUMULATIVE_SOURCE_FIX','I6_5_FORENSIC_REMEDIATION_B4_004_DIAGNOSTIC','I6_5_FORENSIC_REMEDIATION_B4_003_R23_CONTRACT_AND_EXACT_PREVIEW','I6_5_B4_003_AUTHENTICATED_EXACT_PREVIEW_UAT_AND_P0_CLOSEOUT','I6_5_B4_003_CLOSEOUT_SUCCESSOR_EXACT_PREVIEW'].includes(C.nextAction),'I6_5_FORENSIC_B4_ACTION_INVALID');
     }else{
       need(C.nextAction===expectedI65Action,'I6_5_NEXT_ACTION_INVALID');
     }
@@ -4333,10 +4333,10 @@ if(canonicalCompositionActive){
  const lifecycleReceiptPath='artifacts/orbit360-recovery/release-control/I6_5_B4_003_PLANTILLAS_USE_LIFECYCLE_SUCCESSOR_20261029.json';
  const lifecycleReceipt=readJson(lifecycleReceiptPath);
  const lifecycleSourcePath='orbit360-platform/modules/plantillas.js';
- const lifecycleCommit=physicalGit('log','-n','1','--format=%H','--',lifecycleSourcePath);
  const lifecycleTestPath='artifacts/orbit360-recovery/release-control/b4003-uat-20261029/tests/plantillas-use-lifecycle.test.cjs';
  const lifecycleParent='d4a686e5e4e3c8e060a4cb0dc2a7943eba1ad0f9';
  const lifecycleIntegrationCommit=String(lifecycle?.integrationCommit||'');
+ const lifecycleCommit=lifecycleIntegrationCommit;
  const lifecycleExpectedCommitPaths=['artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json','artifacts/orbit360-recovery/release-control/I6_5_B4_003_PLANTILLAS_USE_LIFECYCLE_SUCCESSOR_20261029.json','orbit360-platform/modules/plantillas.js','tools/gravicentra-b4-003-insights-plantillas-country-no-seed.test.cjs','tools/gravicentra-i6-control-plane-guard-v1.mjs'].sort();
  const lifecycleActualCommitPaths=physicalGit('diff','--name-only',lifecycleParent+'..'+lifecycleIntegrationCommit).split(/\r?\n/).filter(Boolean).sort();
  const lifecycleTestOutput=execFileSync(process.execPath,[lifecycleTestPath],{encoding:'utf8',stdio:'pipe',env:{...process.env,PLANTILLAS_SOURCE:lifecycleSourcePath}});
@@ -4355,7 +4355,6 @@ if(canonicalCompositionActive){
   lifecycleReceipt.source?.path===lifecycleSourcePath&&
   lifecycleReceipt.source?.beforeBlob===physicalGit('rev-parse',lifecycleParent+':'+lifecycleSourcePath)&&
   lifecycleReceipt.source?.beforeBlob==='702c90d4c655013fc168430cb44a48aab7bdfcd0'&&
-  lifecycleReceipt.source?.afterBlob===physicalGit('hash-object',lifecycleSourcePath)&&
   lifecycleReceipt.source?.afterBlob===physicalGit('rev-parse',lifecycleIntegrationCommit+':'+lifecycleSourcePath)&&
   lifecycleReceipt.source?.afterBlob===lifecycle.afterBlob&&
   lifecycleReceipt.regression?.path===lifecycleTestPath&&
@@ -4435,6 +4434,40 @@ if(canonicalCompositionActive){
   lifecyclePreviewReceipt.boundaries?.securityB4003StillHold===true,
   'B4_003_PLANTILLAS_USE_LIFECYCLE_PREVIEW_BINDING_INVALID');
  console.log('B4_003_PLANTILLAS_USE_LIFECYCLE_PREVIEW=EXACT_BUILD_BYTE_READBACK_PASS_AUTH_UAT_PENDING');
+ const closeout=C.b4003CloseoutSourceSuccessor20261029;
+ const closeoutReceiptPath='artifacts/orbit360-recovery/release-control/I6_5_B4_003_CLOSEOUT_SOURCE_SUCCESSOR_20261029.json';
+ const closeoutReceipt=readJson(closeoutReceiptPath);
+ const closeoutCommit=physicalGit('log','-n','1','--format=%H','--','orbit360-platform/modules/inicio.js');
+ const closeoutPaths=(closeout.atomicCommitPaths||[]).slice().sort();
+ const closeoutActual=physicalGit('diff','--name-only',closeout.parentHead+'..'+closeoutCommit).split(/\r?\n/).filter(Boolean).sort();
+ need(closeout?.status==='SOURCE_SUCCESSOR_ATOMIC_PREVIEW_PENDING_AUTHENTICATED_UAT'&&
+  closeout.gate==='I6.5/B4-003'&&closeout.parentHead==='e62f1272c47d62e0f9ebcce13bdbe332c3473728'&&
+  closeout.receiptPath===closeoutReceiptPath&&closeout.receiptBlobSha===physicalGit('hash-object',closeoutReceiptPath)&&
+  closeoutReceipt.schema==='GRAVICENTRA_I65_B4003_CLOSEOUT_SOURCE_SUCCESSOR_V1'&&
+  closeoutReceipt.status===closeout.status&&closeoutReceipt.parentHead===closeout.parentHead&&
+  physicalGit('rev-parse',closeoutCommit+'^')===closeout.parentHead&&
+  physicalGit('merge-base',closeoutCommit,current)===closeoutCommit&&
+  closeoutPaths.length===6&&closeoutActual.join('|')===closeoutPaths.join('|')&&
+  closeoutReceipt.atomicCommitPaths.slice().sort().join('|')===closeoutPaths.join('|')&&
+  closeoutReceipt.sourceFiles['orbit360-platform/modules/inicio.js'].beforeBlob==='168a1d2648fbd98c550530144eea0876cb464192'&&
+  closeoutReceipt.sourceFiles['orbit360-platform/modules/inicio.js'].afterBlob==='12a5a1e3293a7d59f993f829071d3bd2b4027a6c'&&
+  physicalGit('rev-parse',closeout.parentHead+':orbit360-platform/modules/inicio.js')==='168a1d2648fbd98c550530144eea0876cb464192'&&
+  physicalGit('rev-parse',closeoutCommit+':orbit360-platform/modules/inicio.js')==='12a5a1e3293a7d59f993f829071d3bd2b4027a6c'&&
+  closeoutReceipt.sourceFiles['orbit360-platform/modules/plantillas.js'].beforeBlob==='a7b51d38cb5062485376855541b690e2656dd072'&&
+  closeoutReceipt.sourceFiles['orbit360-platform/modules/plantillas.js'].afterBlob==='460d5f58c377ad48544aa9c4a92a97c1e9077153'&&
+  physicalGit('rev-parse',closeout.parentHead+':orbit360-platform/modules/plantillas.js')==='a7b51d38cb5062485376855541b690e2656dd072'&&
+  physicalGit('rev-parse',closeoutCommit+':orbit360-platform/modules/plantillas.js')==='460d5f58c377ad48544aa9c4a92a97c1e9077153'&&
+  closeoutReceipt.regression.path==='tools/gravicentra-b4-003-closeout-source-successor.test.cjs'&&closeoutReceipt.regression.blob==='8caa893faf8df55a362d751feb3d3c9637c372c9'&&
+  physicalGit('rev-parse',closeoutCommit+':tools/gravicentra-b4-003-closeout-source-successor.test.cjs')==='8caa893faf8df55a362d751feb3d3c9637c372c9'&&
+  closeoutReceipt.regression.testCases===8&&closeoutReceipt.regression.syntheticOnly===true&&
+  closeoutReceipt.regression.realBusinessWrites===0&&closeoutReceipt.regression.externalSends===0&&
+  closeoutReceipt.boundaries.previewOnly===true&&closeoutReceipt.boundaries.livePromotion===false&&
+  closeoutReceipt.boundaries.operationalWrites===false&&closeoutReceipt.boundaries.dataImport===false&&
+  closeoutReceipt.boundaries.freelancerContractInvented===false&&closeoutReceipt.boundaries.qaResidueDeleted===false&&
+  closeoutReceipt.boundaries.securityB4003StillHold===true,
+  'B4_003_CLOSEOUT_SOURCE_SUCCESSOR_INVALID');
+ execFileSync(process.execPath,['tools/gravicentra-b4-003-closeout-source-successor.test.cjs'],{stdio:'pipe'});
+ console.log('B4_003_CLOSEOUT_SOURCE_SUCCESSOR=TWO_PRODUCT_OWNERS_EIGHT_TESTS_PREVIEW_PENDING_SECURITY_HOLD');
  need(COMP.productFileCount===COMP.productFiles.length,'I6_CANONICAL_COMPOSITION_COUNT_DRIFT');
 }
 const b1Retained=activeI65&&['B1','B2','B3','B4'].includes(forensicActiveBlock)&&Array.isArray(B1.allowedProductFiles);

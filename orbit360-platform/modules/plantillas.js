@@ -98,13 +98,90 @@ Orbit.modules.plantillas = (function () {
 
   function duplicar(id) { if (!puedeEditar()) { toast('Duplicación pendiente de contrato seguro.'); return; } const p = S().get('plantillas', id); if (!p) return; const cp = Object.assign({}, p, { id: 'pl' + Date.now().toString().slice(-7), nombre: p.nombre + ' (copia)' }); S().insert('plantillas', cp); render(document.getElementById('host')); }
 
-  function resolver(txt, cli) {
+  function policiesFor(cli) {
+    return cli ? S().where('polizas', p => String(p.clienteId || '') === String(cli.id || '')) : [];
+  }
+  function rowKey(row) {
+    return String(row && (row.id || row.reciboId || row.receiptId || row.cobroId || row.paymentId) || '').trim();
+  }
+  function policyFor(cli, policyId) {
+    const rows = policiesFor(cli);
+    if (policyId) return rows.find(p => String(p.id) === String(policyId)) || null;
+    return rows.length === 1 ? rows[0] : null;
+  }
+  function obligationRows(cli, policyId) {
+    if (!cli || !Orbit.q) return [];
+    const rows = []
+      .concat(typeof Orbit.q.carteraVencidaDe === 'function' ? Orbit.q.carteraVencidaDe(cli.id) : [])
+      .concat(typeof Orbit.q.carteraPendienteDe === 'function' ? Orbit.q.carteraPendienteDe(cli.id) : []);
+    return rows.filter(r => !policyId || String(r.polizaId || r.policyId || '') === String(policyId));
+  }
+  function confirmedRows(cli, policyId) {
+    if (!cli || !Orbit.q || typeof Orbit.q.cobrosConfirmadosRows !== 'function') return [];
+    const policies = new Map(policiesFor(cli).map(p => [String(p.id), p]));
+    return Orbit.q.cobrosConfirmadosRows().filter(r => {
+      const pid = String(r && (r.polizaId || r.policyId) || '');
+      const clientId = String(r && r.clienteId || '');
+      const belongs = clientId ? clientId === String(cli.id) : policies.has(pid);
+      return belongs && (!policyId || pid === String(policyId));
+    });
+  }
+  function uniqueSelectable(rows) {
+    const keyed = rows.map(row => ({ row, key: rowKey(row) })).filter(x => x.key);
+    const counts = new Map();
+    keyed.forEach(x => counts.set(x.key, (counts.get(x.key) || 0) + 1));
+    return keyed.filter(x => counts.get(x.key) === 1);
+  }
+  function resolveItem(rows, itemId) {
+    const selectable = uniqueSelectable(rows);
+    if (itemId) return (selectable.find(x => x.key === String(itemId)) || {}).row || null;
+    return selectable.length === 1 && rows.length === 1 ? selectable[0].row : null;
+  }
+  function compatibleCurrency(row, pol) {
+    const a = String(pol && (pol.moneda || pol.divisa) || '').trim().toUpperCase();
+    const b = String(row && row.moneda || '').trim().toUpperCase();
+    if (a && b && a !== b) return '';
+    if (String(row && row.currencyValidation || '').toUpperCase() === 'REQUIERE_VALIDACION') return '';
+    return a || b || '';
+  }
+  function financialContext(plantilla, cli, policyId, itemId) {
+    const pol = policyFor(cli, policyId);
+    if (!cli) return { pol: null, item: null, kind: '' };
+    if (plantilla && plantilla.id === 'pl-prima') {
+      const rows = obligationRows(cli, pol && pol.id);
+      return { pol, item: resolveItem(rows, itemId), kind: 'obligation', rows };
+    }
+    if (plantilla && plantilla.id === 'pl-pago-ok') {
+      const rows = confirmedRows(cli, pol && pol.id);
+      return { pol, item: resolveItem(rows, itemId), kind: 'payment', rows };
+    }
+    return { pol, item: null, kind: '', rows: [] };
+  }
+  function resolver(txt, cli, opts) {
     if (!txt) return '';
-    const pol = cli ? S().where('polizas', p => p.clienteId === cli.id)[0] : null;
+    opts = opts || {};
+    const plantilla = opts.plantilla || (opts.plantillaId ? obtener(opts.plantillaId) : null);
+    const ctx = financialContext(plantilla, cli, opts.policyId, opts.itemId);
+    const pol = ctx.pol;
     const aseg = pol ? S().get('aseguradoras', pol.aseguradoraId) : null;
     const asesor = cli && cli.asesorId ? S().get('asesores', cli.asesorId) : null;
-    const rec = pol ? S().where('cobros', c => c.polizaId === pol.id && (c.estado === 'Pendiente' || c.estado === 'Vencido'))[0] : null;
-    const map = { '{nombre}': cli ? cli.nombre : '{nombre}', '{poliza}': pol ? pol.numero : '{poliza}', '{ramo}': pol ? (pol.ramo || '') : '{ramo}', '{aseguradora}': aseg ? aseg.nombre : '{aseguradora}', '{asesor}': asesor ? asesor.nombre : '{asesor}', '{placa}': (pol && pol.placa) || '{placa}', '{monto}': rec ? U.money(rec.monto, rec.moneda) : '{monto}', '{vence}': rec ? U.fmtDate(rec.vence) : '{vence}', '{pendientes}': '{pendientes}' };
+    let amountText = '{monto}', dueText = '{vence}';
+    if (ctx.kind === 'obligation' && ctx.item && pol && Orbit.q) {
+      const proof = typeof Orbit.q.portfolioAmountProof === 'function'
+        ? Orbit.q.portfolioAmountProof(ctx.item, typeof Orbit.q.portfolioAmountContext === 'function' ? Orbit.q.portfolioAmountContext() : undefined)
+        : { value: null };
+      const cur = compatibleCurrency(ctx.item, pol);
+      if (proof && proof.value != null && cur) amountText = U.money(proof.value, cur);
+      const due = typeof Orbit.q.portfolioDue === 'function' ? Orbit.q.portfolioDue(ctx.item) : (ctx.item.fechaLimite || ctx.item.fechaVencimiento || ctx.item.vence || '');
+      if (due) dueText = U.fmtDate(due);
+    } else if (ctx.kind === 'payment' && ctx.item && pol) {
+      const n = Number(ctx.item.monto), cur = compatibleCurrency(ctx.item, pol);
+      if (Number.isFinite(n) && cur) amountText = U.money(n, cur);
+    } else if (pol && plantilla && plantilla.id === 'pl-renov') {
+      const due = pol.vigenciaFin || pol.fechaFin || '';
+      if (due) dueText = U.fmtDate(due);
+    }
+    const map = { '{nombre}': cli ? cli.nombre : '{nombre}', '{poliza}': pol ? pol.numero : '{poliza}', '{ramo}': pol ? (pol.ramo || '') : '{ramo}', '{aseguradora}': aseg ? aseg.nombre : '{aseguradora}', '{asesor}': asesor ? asesor.nombre : '{asesor}', '{placa}': (pol && pol.placa) || '{placa}', '{monto}': amountText, '{vence}': dueText, '{pendientes}': '{pendientes}' };
     return txt.replace(/\{[a-z]+\}/g, m => map[m] !== undefined ? map[m] : m);
   }
 
@@ -114,13 +191,40 @@ Orbit.modules.plantillas = (function () {
     const clientes = Orbit.access && typeof Orbit.access.filter === 'function' ? Orbit.access.filter('clientes', S().all('clientes'), 'plantillas').slice(0, 400) : [];
     let back = document.getElementById('pl-use'); if (back) back.remove();
     back = document.createElement('div'); back.id = 'pl-use'; back.className = 'drawer-back open'; back.style.display = 'grid'; back.style.placeItems = 'center'; back.style.zIndex = 97;
-    back.innerHTML = `<div class="card" style="width:min(560px,95vw);padding:0"><div style="padding:16px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center"><div><div class="crumb" style="margin-bottom:2px">Usar plantilla</div><b style="font-family:var(--f-display);font-size:16px">${p.icon || '✉'} ${U.esc(p.nombre)}</b></div><button class="imp-x" id="pu-x">✕</button></div><div style="padding:18px 20px;display:grid;gap:12px"><label class="ce-l">Cliente<select id="pu-cli" class="o-sel"><option value="">— Elegir cliente —</option>${clientes.map(c => `<option value="${c.id}">${U.esc(c.nombre)}</option>`).join('')}</select></label>${p.canal !== 'WhatsApp' && p.asunto ? `<div id="pu-asunto" style="font-size:12.5px;background:var(--soft);padding:8px 11px;border-radius:8px"><b>Asunto:</b> <span>${U.esc(p.asunto)}</span></div>` : ''}<div id="pu-prev" style="white-space:pre-wrap;font-size:13.5px;background:var(--soft);padding:12px 13px;border-radius:8px;line-height:1.5;border:1px solid var(--line)">${U.esc(p.texto)}</div><div class="cfg-note">La vista previa se completa con datos del cliente. WhatsApp abre el chat; confirma el envío en WhatsApp.</div></div><div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap"><button class="btn ghost" id="pu-copy">⧉ Copiar</button>${p.canal !== 'Correo' && p.canal !== 'PDF' ? '<button class="btn ghost" id="pu-wa">💬 WhatsApp</button>' : ''}${p.canal !== 'WhatsApp' ? '<button class="btn primary" id="pu-mail">✉ Redactar correo</button>' : ''}</div></div>`;
+    back.innerHTML = `<div class="card" style="width:min(560px,95vw);padding:0"><div style="padding:16px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center"><div><div class="crumb" style="margin-bottom:2px">Usar plantilla</div><b style="font-family:var(--f-display);font-size:16px">${p.icon || '✉'} ${U.esc(p.nombre)}</b></div><button class="imp-x" id="pu-x">✕</button></div><div style="padding:18px 20px;display:grid;gap:12px"><label class="ce-l">Cliente<select id="pu-cli" class="o-sel"><option value="">— Elegir cliente —</option>${clientes.map(c => `<option value="${c.id}">${U.esc(c.nombre)}</option>`).join('')}</select></label><div id="pu-context" style="display:grid;gap:10px"></div>${p.canal !== 'WhatsApp' && p.asunto ? `<div id="pu-asunto" style="font-size:12.5px;background:var(--soft);padding:8px 11px;border-radius:8px"><b>Asunto:</b> <span>${U.esc(p.asunto)}</span></div>` : ''}<div id="pu-prev" style="white-space:pre-wrap;font-size:13.5px;background:var(--soft);padding:12px 13px;border-radius:8px;line-height:1.5;border:1px solid var(--line)">${U.esc(p.texto)}</div><div class="cfg-note">La vista previa se completa con datos del cliente. WhatsApp abre el chat; confirma el envío en WhatsApp.</div></div><div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap"><button class="btn ghost" id="pu-copy">⧉ Copiar</button>${p.canal !== 'Correo' && p.canal !== 'PDF' ? '<button class="btn ghost" id="pu-wa">💬 WhatsApp</button>' : ''}${p.canal !== 'WhatsApp' ? '<button class="btn primary" id="pu-mail">✉ Redactar correo</button>' : ''}</div></div>`;
     document.body.appendChild(back);
     const $ = s => back.querySelector(s), close = () => back.remove();
     back.addEventListener('click', e => { if (e.target === back) close(); }); $('#pu-x').addEventListener('click', close);
     const cur = () => { const cid = $('#pu-cli').value; return cid ? S().get('clientes', cid) : null; };
-    const refresh = () => { const cli = cur(); $('#pu-prev').textContent = resolver(p.texto, cli); const asu = $('#pu-asunto'); if (asu) asu.querySelector('span').textContent = resolver(p.asunto, cli); };
-    $('#pu-cli').addEventListener('change', refresh);
+    let selectedPolicyId = '', selectedItemId = '';
+    const renderResolved = () => {
+      const cli = cur(), opts = { plantilla: p, policyId: selectedPolicyId, itemId: selectedItemId };
+      $('#pu-prev').textContent = resolver(p.texto, cli, opts);
+      const asu = $('#pu-asunto'); if (asu) asu.querySelector('span').textContent = resolver(p.asunto, cli, opts);
+    };
+    const renderContext = () => {
+      const cli = cur(), wrap = $('#pu-context'), policies = policiesFor(cli);
+      if (!policies.some(x => String(x.id) === selectedPolicyId)) selectedPolicyId = policies.length === 1 ? String(policies[0].id) : '';
+      const pol = policyFor(cli, selectedPolicyId);
+      const finRows = !pol && policies.length > 1 ? [] : p.id === 'pl-prima' ? obligationRows(cli, pol && pol.id) : p.id === 'pl-pago-ok' ? confirmedRows(cli, pol && pol.id) : [];
+      const selectable = uniqueSelectable(finRows);
+      if (!selectable.some(x => x.key === selectedItemId)) selectedItemId = selectable.length === 1 && finRows.length === 1 ? selectable[0].key : '';
+      const policyField = policies.length > 1
+        ? '<label class="ce-l">Póliza<select id="pu-pol" class="o-sel"><option value="">— Elegir póliza —</option>'+policies.map(x=>'<option value="'+U.esc(String(x.id))+'" '+(String(x.id)===selectedPolicyId?'selected':'')+'>'+U.esc(String(x.numero||x.id))+' · '+U.esc(String(x.ramo||''))+'</option>').join('')+'</select></label>'
+        : policies.length === 1 ? '<div class="cfg-note">Póliza: <b>'+U.esc(String(policies[0].numero||policies[0].id))+'</b></div>' : '';
+      const itemLabel = p.id === 'pl-pago-ok' ? 'Pago confirmado' : 'Cuota / obligación';
+      const itemField = finRows.length > 1
+        ? '<label class="ce-l">'+itemLabel+'<select id="pu-item" class="o-sel"><option value="">— Elegir registro —</option>'+selectable.map(x=>{const r=x.row,d=p.id==='pl-pago-ok'?(r.fechaPago||r.paidDate||''):(Orbit.q&&Orbit.q.portfolioDue?Orbit.q.portfolioDue(r):(r.vence||r.fechaLimite||'')),n=Number(r.monto!=null?r.monto:r.saldo),polx=pol||S().get('polizas',r.polizaId),cur=compatibleCurrency(r,polx);return '<option value="'+U.esc(x.key)+'" '+(x.key===selectedItemId?'selected':'')+'>'+U.esc(String(d||'Sin fecha'))+(Number.isFinite(n)&&cur?' · '+U.esc(U.money(n,cur)):'')+'</option>';}).join('')+'</select></label>'
+        : '';
+      const unresolved = (p.id==='pl-prima'||p.id==='pl-pago-ok') && finRows.length > 1 && !selectedItemId
+        ? '<div class="cfg-note" data-plantilla-financial-ambiguity="1">Hay más de un registro posible. Selecciona el correcto; no se completarán monto ni fecha por inferencia.</div>' : '';
+      wrap.innerHTML = policyField + itemField + unresolved;
+      const ps = $('#pu-pol'); if (ps) ps.addEventListener('change',()=>{selectedPolicyId=ps.value;selectedItemId='';renderContext();});
+      const isel = $('#pu-item'); if (isel) isel.addEventListener('change',()=>{selectedItemId=isel.value;renderResolved();});
+      renderResolved();
+    };
+    $('#pu-cli').addEventListener('change',()=>{selectedPolicyId='';selectedItemId='';renderContext();});
+    renderContext();
     $('#pu-copy').addEventListener('click', () => { if (navigator.clipboard) navigator.clipboard.writeText($('#pu-prev').textContent); $('#pu-copy').textContent = '✓ Copiado'; setTimeout(() => $('#pu-copy').textContent = '⧉ Copiar', 1200); });
     if ($('#pu-wa')) $('#pu-wa').addEventListener('click', () => {
       const cli = cur(); if (!cli) { toast('Selecciona un cliente.'); return; }
@@ -132,7 +236,7 @@ Orbit.modules.plantillas = (function () {
       toast('Chat abierto en WhatsApp Web; confirma el envío en WhatsApp.');
       close();
     });
-    if ($('#pu-mail')) $('#pu-mail').addEventListener('click', () => { const cli = cur(); close(); if (Orbit.modules.correo && Orbit.modules.correo.redactar) Orbit.modules.correo.redactar({ para: cli ? (cli.email || '') : '', clienteId: cli ? cli.id : '', asunto: resolver(p.asunto || p.nombre, cli), cuerpo: resolver(p.texto, cli) }); else location.hash = '#/correo'; });
+    if ($('#pu-mail')) $('#pu-mail').addEventListener('click', () => { const cli = cur(), opts={plantilla:p,policyId:selectedPolicyId,itemId:selectedItemId}; close(); if (Orbit.modules.correo && Orbit.modules.correo.redactar) Orbit.modules.correo.redactar({ para: cli ? (cli.email || '') : '', clienteId: cli ? cli.id : '', asunto: resolver(p.asunto || p.nombre, cli, opts), cuerpo: resolver(p.texto, cli, opts) }); else location.hash = '#/correo'; });
   }
 
   function setCanal(c) { filtroCanal = c; const h = document.getElementById('host'); if (h) render(h); }

@@ -261,6 +261,13 @@ Orbit.modules.inicio = (function () {
     const advisorView=/asesor|comercial/i.test(currentRole);
     const validCountry=activeCountry==='GT'?'Guatemala':activeCountry==='CO'?'Colombia':'Guatemala y Colombia';
     const boardReadiness=advisorReadiness==='ready'?'Datos de metas confirmados por servidor':advisorReadiness==='unavailable'?'Metas pendientes de validación':'Sincronizando metas';
+    const bannerNote=policyReadiness==='unavailable'||paymentReadiness==='unavailable'||advisorReadiness==='unavailable'
+      ? 'No fue posible confirmar todas las fuentes de información autorizadas. Reintenta la consulta antes de tomar decisiones.'
+      : policyReadiness!=='ready'||paymentReadiness!=='ready'||advisorReadiness!=='ready'
+        ? 'Verificando datos y permisos del alcance seleccionado para mostrar prioridades reales.'
+        : advisorView
+          ? 'Consulta las metas individuales disponibles y tus seguimientos autorizados en '+validCountry+'.'
+          : 'Revisa metas institucionales, cuando estén configuradas, y pendientes autorizados en '+validCountry+'.';
     const contextMessage=leadershipMessages[motivationIndex];
     const analysisRows=[
       {id:'renovaciones',label:'Renovaciones próximas (45 días)',state:policyReadiness,count:renov.length,route:'renovaciones',tone:'renew'},
@@ -290,7 +297,7 @@ Orbit.modules.inicio = (function () {
       :'No se certifica el cumplimiento de asesores sin metas y producción confirmadas.');
     const evidenceCount=[clientReadiness,policyReadiness,portfolioReadiness,paymentReadiness,advisorReadiness].filter(v=>v==='ready').length;
     host.innerHTML=`<div class="page" data-inicio-reality-ready="1">
-      ${Orbit.kit.banner({icon:'🌅',title:'Inicio',sub:'Visión general y prioridades',features:['Metas verificadas','Cartera y cobros','Seguimientos'],actions:`<button class="btn primary" onclick="location.hash='#/cliente360'">Abrir Cliente 360 →</button>`})}
+      ${Orbit.kit.banner({icon:'🌅',title:'Inicio',sub:bannerNote,features:['Metas verificadas','Cartera y cobros','Seguimientos'],actions:`<button class="btn primary" onclick="location.hash='#/cliente360'">Abrir Cliente 360 →</button>`})}
       <div class="card gi-executive-board" data-inicio-premium="20261011" data-gi-dashboard="insurance-live-v1" style="margin-top:18px;padding:18px 20px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:12px;align-items:start;border-top:3px solid var(--red)">
         <section class="gi-leadership-card" aria-label="Liderazgo y protección">
           <div class="gi-month-eyebrow">Metas del mes · ${U.monthLabel()}</div>

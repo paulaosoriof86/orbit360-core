@@ -924,7 +924,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "I6_5_B4_003_AUTHENTICATED_EXACT_PREVIEW_UAT_AND_P0_CLOSEOUT",
+  "nextAction": "I6_5_B4_003_CLOSEOUT_SUCCESSOR_EXACT_PREVIEW",
   "postproductionExitProgress": {
     "formalPercent": 50,
     "frozenMiniGates": 5,
@@ -16101,5 +16101,50 @@
     "currentCapabilityAcceptances": 0,
     "securityB4003StillHold": true,
     "nextAction": "AUTHENTICATED_EXACT_PREVIEW_UAT_PLUS_PARALLEL_B4_003_P0_CLOSEOUT"
+  },
+  "b4003CloseoutSourceSuccessor20261029": {
+    "status": "SOURCE_SUCCESSOR_ATOMIC_PREVIEW_PENDING_AUTHENTICATED_UAT",
+    "gate": "I6.5/B4-003",
+    "authority": "PAULA_CONTINUE_FROZEN_SHOCK_PLAN_20261029",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CLOSEOUT_SOURCE_SUCCESSOR_20261029.json",
+    "receiptBlobSha": "f9497afb925ed81bc00d23dd0149fd8dec894559",
+    "parentHead": "e62f1272c47d62e0f9ebcce13bdbe332c3473728",
+    "sourceAnchor": "orbit360-platform/modules/inicio.js",
+    "sourceFiles": {
+      "orbit360-platform/modules/inicio.js": {
+        "beforeBlob": "168a1d2648fbd98c550530144eea0876cb464192",
+        "afterBlob": "12a5a1e3293a7d59f993f829071d3bd2b4027a6c",
+        "findingIds": [
+          "B4-003-P0-20261012-INICIO-MOTIVATIONAL-TEXTS"
+        ],
+        "scope": "ROLE_READINESS_COUNTRY_CONTEXTUAL_COPY_ONLY"
+      },
+      "orbit360-platform/modules/plantillas.js": {
+        "beforeBlob": "a7b51d38cb5062485376855541b690e2656dd072",
+        "afterBlob": "460d5f58c377ad48544aa9c4a92a97c1e9077153",
+        "findingIds": [
+          "B4-003"
+        ],
+        "scope": "CANONICAL_OBLIGATION_OR_CONFIRMED_PAYMENT_RESOLUTION_WITH_EXPLICIT_AMBIGUITY_SELECTION"
+      }
+    },
+    "regressionPath": "tools/gravicentra-b4-003-closeout-source-successor.test.cjs",
+    "regressionBlobSha": "8caa893faf8df55a362d751feb3d3c9637c372c9",
+    "regressionCases": 8,
+    "atomicCommitPaths": [
+      "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json",
+      "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CLOSEOUT_SOURCE_SUCCESSOR_20261029.json",
+      "orbit360-platform/modules/inicio.js",
+      "orbit360-platform/modules/plantillas.js",
+      "tools/gravicentra-b4-003-closeout-source-successor.test.cjs",
+      "tools/gravicentra-i6-control-plane-guard-v1.mjs"
+    ],
+    "previousExactPreviewSource": "6349134a4f62455b76a43d1c7c3c3aef6c5455b2",
+    "previewRequired": true,
+    "authenticatedUatRequired": true,
+    "currentCapabilityAcceptances": 0,
+    "securityB4003StillHold": true,
+    "productionPromotionAuthorized": false,
+    "rulesAuthIamDataChangesAuthorized": false
   }
 }
