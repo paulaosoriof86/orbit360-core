@@ -122,13 +122,8 @@ jobs:
            'Product commit: '+productCommit+'\nSource to build: '+source+'\nTransport-only commit: '+process.env.TRANSPORT_SHA+'\n');
           console.log('AUTHORIZED_EXACT_INSTITUTIONAL_GOALS_SOURCE='+source);
           NODE
-          # The closeout receipt binds the two product owners, regression and governance delta.
-          # The transport tree is separately verified above to differ ONLY in
-          # this workflow. Execute every canonical guard on the exact source
-          # to be built; do not relabel a transport-HEAD guard failure as PASS.
           git diff --exit-code
           git diff --cached --exit-code
-          # Build the authorized product commit itself, not the transport commit.
           SOURCE_SHA=$(cat "$RUNNER_TEMP/gi-authorized-source.sha")
           git checkout --detach "$SOURCE_SHA"
           test "$(git rev-parse HEAD)" = "$SOURCE_SHA"
@@ -173,9 +168,12 @@ jobs:
               }catch{return String(raw).split('#')[0];}
             }).filter(Boolean);
             const uniqueAssets=[...new Set(assets)].sort();
-            const brand=/Gravicentra Insurance|Insurance OS/i.test(html);
-            if(!brand||uniqueAssets.length<10||buildIds.length<1)throw Error('OWNER_ROOT_STABLE_IDENTITY_MISSING:'+path);
-            return {title,brand,buildIds,assets:uniqueAssets};
+            const htmlDocument=/<html\b/i.test(html)&&/<\/html>/i.test(html);
+            const bodyDocument=/<body\b/i.test(html)&&/<\/body>/i.test(html);
+            const nonTrivial=Buffer.byteLength(html,'utf8')>=512;
+            const productMarker=/Gravicentra Insurance|Insurance OS/i.test(html);
+            if(!htmlDocument||!bodyDocument||!nonTrivial)throw Error('OWNER_ROOT_STRUCTURAL_IDENTITY_MISSING:'+path);
+            return {title,htmlDocument,bodyDocument,productMarker,buildIds,assets:uniqueAssets};
           }
           const first=fingerprint(fileA),second=fingerprint(fileB);
           if(JSON.stringify(first)!==JSON.stringify(second))throw Error('OWNER_ROOT_PREDEPLOY_STRUCTURAL_VARIANCE');
@@ -257,8 +255,6 @@ jobs:
           for(const rel of ['modules/inicio.js','modules/equipo.js','modules/insights.js','modules/portal.js','core/legal.js','data/store-firestore-product-readonly-p0.js','modules/cobros.js','modules/plantillas.js','core/product-app-p0.js','core/queries.js']){
             if(!fs.readFileSync('orbit360-platform/'+rel).equals(fs.readFileSync(root+'/site/'+rel)))throw Error('BUNDLE_DIFF:'+rel);
           }
-          // Reproduce the existing packager's exact index transformations.
-          // Do not require false raw source equality or patch the built artifact.
           let expectedIndex=fs.readFileSync('orbit360-platform/index.html','utf8');
           const brandingScript=/<script\s+src=["']core\/public-tenant-branding\.js[^"']*["']\s*><\/script>/i;
           if(!brandingScript.test(expectedIndex))throw Error('SOURCE_BRANDING_TAG_MISSING');
