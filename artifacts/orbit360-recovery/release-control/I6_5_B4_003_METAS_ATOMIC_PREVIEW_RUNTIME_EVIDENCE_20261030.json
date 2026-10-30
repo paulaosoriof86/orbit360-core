@@ -1,0 +1,338 @@
+{
+  "schema": "GRAVICENTRA_I65_B4003_METAS_ATOMIC_PREVIEW_RUNTIME_EVIDENCE_V1",
+  "status": "TECHNICAL_EXACT_PREVIEW_PASS_AUTHENTICATED_UAT_BLOCKED_FIRST_WRITE",
+  "recordType": "DERIVED_RUNTIME_EVIDENCE_AND_OPERATIONAL_RECONCILIATION",
+  "recordedAtUtc": "2026-10-30T20:02:19.968876+00:00",
+  "gate": "I6.5/B4-003",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "authority": "USER_AUTHORIZED_B4_003_CONTINUATION_AND_GITHUB_TRACEABILITY_20261030",
+  "scope": "Exact technical Preview evidence and the first authenticated synthetic Metas write attempt; no capability, gate or production acceptance.",
+  "identity": {
+    "sourceCommit": "8bb4fce20bb2af1aa4022573069ff8287679b715",
+    "sourceTree": "7a662fede306fead4cc2e5d4bcb575cf388cb240",
+    "sourceParent": "b5c83cf255afd01cd348c53b904c1c47dbdcb241",
+    "transportCommit": "3613809fbff617cee9b9942c5618b41a08d4c425",
+    "transportTree": "1e053d58ca6edbefe19a45eba1206f7734c3390c",
+    "receiptCommitParent": "3613809fbff617cee9b9942c5618b41a08d4c425",
+    "buildId": "gi-i65-b4-8bb4fce20bb2-57f234755dc1",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-sr-41066435386-r09pl1ti.web.app",
+    "previewChannelId": "gi-i65-b4-sr-41066435386",
+    "previewChannelReused": true,
+    "sourceReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_METAS_ATOMIC_PREVIEW_SOURCE_SUCCESSOR_20261030.json",
+    "sourceReceiptBlobSha": "091b27ee8acb85b0e601b3b048b3d1395740f05b"
+  },
+  "technicalEvidence": {
+    "status": "TECHNICAL_EXACT_BACKEND_HOSTING_READBACK_PASS_AUTHENTICATED_UAT_PENDING",
+    "sourceGuard": {
+      "runId": 41117679305,
+      "conclusion": "success",
+      "completedAtUtc": "2026-10-30T19:45:21Z",
+      "url": "https://github.com/paulaosoriof86/orbit360-core/actions/runs/41117679305",
+      "confirmation": "Source Guard success confirmed in the session and required by the successful exact-source transport preflight."
+    },
+    "transportGuard": {
+      "runId": 41117934059,
+      "jobId": 124276901120,
+      "conclusion": "success",
+      "emulatorJobConclusion": "skipped",
+      "url": "https://github.com/paulaosoriof86/orbit360-core/actions/runs/41117934059"
+    },
+    "previewRun": {
+      "runId": 41117934060,
+      "jobId": 124276900599,
+      "conclusion": "success",
+      "lastLogTimestampUtc": "2026-10-30T19:49:22.8228011Z",
+      "url": "https://github.com/paulaosoriof86/orbit360-core/actions/runs/41117934060",
+      "jobUrl": "https://github.com/paulaosoriof86/orbit360-core/actions/runs/41117934060/job/124276900599"
+    },
+    "artifacts": [
+      {
+        "kind": "readback",
+        "artifactId": 13006563636,
+        "sha256": "0d40643f0f3ab3e6e7be89eb41e90ddd8fe765a0833f2eae16421e8fc57b780f",
+        "bytes": 18933,
+        "apiUrl": "https://api.github.com/repos/paulaosoriof86/orbit360-core/actions/artifacts/13006563636",
+        "downloadSha256Verified": true
+      },
+      {
+        "kind": "hosting",
+        "artifactId": 13007461112,
+        "sha256": "cb3e8e24657e5d6132697a2966ce88e86267d1ca93c62079e55f831622279cef",
+        "bytes": 1489595,
+        "apiUrl": "https://api.github.com/repos/paulaosoriof86/orbit360-core/actions/artifacts/13007461112",
+        "downloadSha256Verified": true
+      },
+      {
+        "kind": "backend-source",
+        "artifactId": 13007730412,
+        "sha256": "b1aeb1cac3002d3aad01a07fe1e09ecb87f9c0ad8e7abd9061cf4d7ff3fd0b28",
+        "bytes": 157347,
+        "apiUrl": "https://api.github.com/repos/paulaosoriof86/orbit360-core/actions/artifacts/13007730412",
+        "downloadSha256Verified": true
+      },
+      {
+        "kind": "live-identity",
+        "artifactId": 13007660772,
+        "sha256": "6e6a75ac399cb32db67db17d11ac0de87250f2b3baf876dc45dc0fb34fa21d59",
+        "bytes": 4642,
+        "apiUrl": "https://api.github.com/repos/paulaosoriof86/orbit360-core/actions/artifacts/13007660772",
+        "downloadSha256Verified": true
+      }
+    ],
+    "combinedResultArtifactMember": "gi-metas-combined-preview-result.json",
+    "functionReadbackArtifactMember": "gi-metas-function-readback.json",
+    "sourceBindingArtifactMember": "gi-metas-source-binding.json",
+    "hosting": {
+      "buildBoundAssetCount": 138,
+      "hostedFileCount": 218,
+      "hostedFileCountIndependentlyCountedInExtractedArtifact": 218,
+      "reachableProductFiles": 214,
+      "bundleFileCount": 253,
+      "hostedPayloadDigest": "64838a091854780518bd0df8abc8df28f811846335423a064cca0a4e31974f92",
+      "bundleDigest": "63d6336193a2cc15d6a58aeab23492d37eba80dad1f3f65fea72c9d8bf86a5af",
+      "criticalServedFilesCompared": 14,
+      "criticalServedFilesPassed": 14,
+      "criticalFilePaths": [
+        "index.html",
+        "__recovery__/build.json",
+        "product-runtime-config.js",
+        "modules/inicio.js",
+        "modules/equipo.js",
+        "modules/insights.js",
+        "modules/portal.js",
+        "core/legal.js",
+        "data/store-firestore-product-readonly-p0.js",
+        "modules/cobros.js",
+        "modules/plantillas.js",
+        "core/product-app-p0.js",
+        "core/queries.js",
+        "data/store-firestore-product-operational-p0.js"
+      ],
+      "criticalReadbackEvidence": "Successful workflow step 16 executes the recorded fail-fast curl --fail and cmp loop for all 14 paths. The workflow does not retain separate per-file served copies or result JSON. This receipt does not claim fresh individual HTTP readback of all 138 assets.",
+      "packageMetadataMember": "evidence/package-output.json",
+      "buildIdentityMember": "bundle/site/__recovery__/build.json"
+    },
+    "backend": {
+      "function": "orbit360ProductOperationalCommandPreview",
+      "project": "ays-orbit-360-lab",
+      "region": "us-east1",
+      "functionReadbackStatus": "TARGET_ONLY_DEPLOY_AND_SOURCE_READBACK_PASS",
+      "sourceReadbackStatus": "DEPLOYED_BACKEND_SOURCE_BYTES_MATCH_EXACT_STAGE",
+      "sourceReadbackErrorHttpStatus": null,
+      "verifiedDeploymentSourceFileCount": 28,
+      "packagerBackendFileCount": 33,
+      "revisionBefore": "orbit360productoperationalcommandpreview-00210-dec",
+      "revisionAfter": "orbit360productoperationalcommandpreview-00211-muz",
+      "onlyTargetFunctionChanged": true,
+      "changedFunctionKeys": [
+        "us-east1/orbit360ProductOperationalCommandPreview"
+      ],
+      "targetIamUnchanged": true,
+      "scopeNote": "The 33 backend files in packager metadata and 28 verified target-deployment source files describe different packaging scopes."
+    },
+    "liveIdentityReadback": {
+      "labLiveRootExact": true,
+      "ownerRuntimeExact": true,
+      "ownerRootStructuralExact": true,
+      "artifactMember": "gi-live-identity-readback.json"
+    },
+    "workflowBoundarySnapshot": {
+      "scope": "Workflow execution before the subsequent authenticated UI attempt; not a claim about all later activity.",
+      "liveDeployment": false,
+      "liveFunctionsDeployed": false,
+      "businessDataWrites": 0,
+      "syntheticWrites": 0,
+      "authenticatedUatAtWorkflowCompletion": "PENDING_CREATE_EDIT_RELOAD_AUDIT_RESTORE_AND_NEGATIVE_CASES"
+    }
+  },
+  "authenticatedUat": {
+    "status": "BLOCKED_FIRST_WRITE_NO_SERVER_CONFIRMATION",
+    "observationProvenance": "Authenticated browser and Cloud Logging UI observations supplied by the coordinating agent in the same authorized session; recorded without raw account identifiers, personal data or real goal values.",
+    "country": "GT",
+    "period": "QA-B4-003",
+    "contractVersion": "gravicentra-metas-preview-session-v1",
+    "runId": null,
+    "runIdEvidence": "Not exposed in the retained UI observations; no runId invented.",
+    "observations": [
+      {
+        "id": "UAT01",
+        "atUtc": "2026-10-30T19:50:32Z",
+        "action": "Inspect current Metas test session",
+        "result": "PASS",
+        "httpStatus": 200,
+        "canonicalSessionStatus": "none"
+      },
+      {
+        "id": "UAT02",
+        "atUtc": "2026-10-30T19:51:03Z",
+        "action": "Start test and pre-write probe",
+        "result": "PASS",
+        "httpStatus": 200,
+        "scope": "Probe confirmation only; not a saved goal or an accepted write UAT."
+      },
+      {
+        "id": "UAT03",
+        "atUtc": null,
+        "action": "Preliminary input fill to synthetic production value 1250",
+        "result": "DOM_VALUE_ONLY_NO_EFFECTIVE_CHANGE_EVENT",
+        "saved": false,
+        "scope": "Not counted as a successful save or as a completed write attempt."
+      },
+      {
+        "id": "UAT04",
+        "fromUtc": "2026-10-30T19:51:53Z",
+        "toUtc": "2026-10-30T19:51:57Z",
+        "action": "Native keyboard entry of synthetic production value 1300 followed by Tab",
+        "result": "SAVE_NOT_CONFIRMED_ERROR_MODAL",
+        "message": "No se pudo confirmar la operación. Recarga y revisa el historial antes de reintentar.",
+        "dialogButton": "Entendido",
+        "serverCommitConfirmed": false
+      },
+      {
+        "id": "UAT05",
+        "atUtc": "2026-10-30T19:53:48Z",
+        "action": "Acknowledge modal, reload and inspect again",
+        "httpStatus": 200,
+        "canonicalSessionStatus": "none",
+        "uiState": "Prueba disponible",
+        "activeSessionFound": false
+      },
+      {
+        "id": "UAT06",
+        "atUtc": null,
+        "action": "Inspect visible change history after reload",
+        "visibleRowCount": 27,
+        "latestVisibleRowDate": "2026-10-02",
+        "visibleRowsDated20261030": 0,
+        "scope": "Visible history observation only; not a proof of global audit collection absence."
+      },
+      {
+        "id": "UAT07",
+        "atUtc": null,
+        "action": "Compare observed real goal input attributes and values with the pre-attempt baseline",
+        "inputCount": 20,
+        "institutionalInputCount": 2,
+        "advisorInputCount": 18,
+        "advisorCount": 6,
+        "matchingAttributeCount": 20,
+        "matchingValueCount": 20,
+        "disabledInputCount": 20,
+        "visibleValuesAndAttributesUnchanged": true,
+        "realValuesRecorded": false,
+        "scope": "Equality of the 20 observed UI inputs; not a full-database equality claim."
+      }
+    ],
+    "confirmedSuccessfulSyntheticGoalWrites": 0,
+    "confirmedSuccessfulSyntheticGoalWritesScope": "No synthetic goal write was confirmed by this attempted UI sequence. This is an observation/confirmation count, not a separately proven global write count.",
+    "finalCanonicalSessionStatus": "none",
+    "activeSessionFoundAfterReload": false,
+    "restoreExecuted": false,
+    "restoreAcceptance": false,
+    "remainingProofs": [
+      "Successful first synthetic production write",
+      "Edit and collection write",
+      "Durable value recovery after reload",
+      "New write audit records",
+      "Server-confirmed restoration after actual writes",
+      "Absence after restoration and reload",
+      "Applicable negative cases",
+      "Independent cross-role evidence"
+    ],
+    "capabilityAccepted": false,
+    "b4003Closed": false,
+    "productionAccepted": false,
+    "independentSecondActorUidEvidence": "NOT_EXECUTED"
+  },
+  "causalDiagnosticEvidence": {
+    "status": "EXACT_CAUSE_UNKNOWN",
+    "cloudLoggingObservation": {
+      "surface": "Cloud Logging UI",
+      "access": "READ_ONLY",
+      "query": "SEARCH(\"orbit360productoperationalcommandpreview\")",
+      "windowFromUtc": "2026-10-30T19:49:00Z",
+      "windowToUtc": "2026-10-30T19:54:00Z",
+      "matchingEntryCount": 9,
+      "post200Count": 3,
+      "options204Count": 3,
+      "authDebugEntryCount": 3,
+      "post200OperationsObserved": [
+        "inspect before attempt",
+        "probe",
+        "inspect after reload"
+      ],
+      "postObservedInSaveWindow": false,
+      "saveWindowFromUtc": "2026-10-30T19:51:53Z",
+      "saveWindowToUtc": "2026-10-30T19:51:57Z",
+      "limitation": "No write POST appeared in this function-filtered UI query and time window. This observation does not by itself prove the complete transport path or identify the exact client error."
+    },
+    "readOnlyPermissionInspection": {
+      "surface": "GCP data inspection UI",
+      "dataScopes": {
+        "default": "todos",
+        "modules": {}
+      },
+      "scopeDatos": "todos",
+      "countryCodes": [
+        "GT",
+        "CO"
+      ],
+      "restrictionsObserved": false,
+      "personalIdentifiersRecorded": false,
+      "authIamRulesChanged": false,
+      "ownScopeHypothesis": "DISCARDED_FOR_THE_OBSERVED_CONFIGURATION",
+      "scopeLimitation": "The observed stored configuration does not set own-only scope; no new claim is made about unobserved runtime authorization internals."
+    },
+    "workingHypothesis": "LOCAL_REJECTION_BEFORE_PREVIEW_RPC",
+    "hypothesisStatus": "INFERENCE_FROM_UI_ERROR_AND_ABSENT_WRITE_POST_NOT_CONFIRMED_ROOT_CAUSE",
+    "exactRootCause": "UNKNOWN",
+    "nextAction": "Diagnose the client validation/event-to-RPC path for the first Metas mutation, preserving the completed exact technical readback and the failed-attempt evidence."
+  },
+  "operationalReconciliation": {
+    "priorReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_REAL_PROGRESS_RECONCILIATION_20261030.json",
+    "priorReceiptBlobSha": "91f045bb4b34da32fffb9e299b78f972ce0af308",
+    "precedence": "Additional current execution evidence only. Preserve dated source and progress receipts, their hashes, existing gate authority and historical acceptances.",
+    "sourcePublication": "COMPLETED_EXACT_TREE",
+    "sourceGuard": "SUCCESS",
+    "transportGuard": "SUCCESS",
+    "previewBackendAndHosting": "EXACT_READBACK_PASS",
+    "authenticatedMetasUat": "BLOCKED_FIRST_WRITE_NO_SERVER_CONFIRMATION",
+    "formalI6ProgressPercent": 50,
+    "formalI6ProgressChanged": false,
+    "formalI6ProgressBasis": "5 of 10 frozen mini-gates; this isolated Metas intervention does not complete I6.5.",
+    "currentOverallImplementationPercent": null,
+    "previousCorrectionBatch80PercentReused": false,
+    "currentCapabilityAcceptances": 0,
+    "newBlocker": "First synthetic Metas save produces a confirmation error; no matching write POST observed in the inspected function log window; exact cause remains unknown."
+  },
+  "preservationAndBoundaries": {
+    "historicalReceiptsImmutable": true,
+    "sourceReceiptUnchanged": true,
+    "progressReceiptUnchanged": true,
+    "existingControlPlaneValuesUnchanged": true,
+    "canonicalFreezeUnchanged": true,
+    "findingsLedgerUnchanged": true,
+    "productSourceUnchangedByThisReceipt": true,
+    "workflowUnchangedByThisReceipt": true,
+    "newAuthority": false,
+    "newGate": false,
+    "newBranch": false,
+    "securityHold": "ACTIVE_FAIL_CLOSED",
+    "productionPromotionAuthorized": false,
+    "authIamRulesChangeAuthorized": false,
+    "realBusinessWritesAuthorized": false,
+    "businessWriteAbsenceAfterUiAttempt": "NOT_GLOBALLY_PROVEN; twenty observed real UI inputs remained equal and disabled.",
+    "syntheticCleanupExecuted": false,
+    "reimportExecuted": false,
+    "rawRealGoalValuesIncluded": false,
+    "personalDataOrUidIncluded": false
+  },
+  "acceptance": {
+    "authenticatedMetasUatAccepted": false,
+    "restoreAccepted": false,
+    "independentCrossRoleUatAccepted": false,
+    "capabilityAccepted": false,
+    "b4003ClosureAccepted": false,
+    "productionAccepted": false
+  }
+}
