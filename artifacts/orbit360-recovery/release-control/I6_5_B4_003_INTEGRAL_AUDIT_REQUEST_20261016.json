@@ -2,13 +2,13 @@
   "schema": "GRAVICENTRA_EXISTING_B4003_READONLY_AUDIT_REQUEST_V1",
   "mode": "READ_ONLY_AUDIT_NO_ACCEPTANCE",
   "requestDate": "2026-10-30",
-  "userInstruction": "Continue the frozen B4-003 shock plan with current read-only evidence for freelancer eligibility, institutional-goal records, independent identities, cancelled-run QA residues, orphan-renewal dependencies and cross-module integrity. Do not write, deploy, reimport, send messages, close findings or advance percentage from this audit alone.",
+  "userInstruction": "Continue authorized B4-003 adjudication of the seventeen exact historical QA roots and their current declared canonical dependencies. Use the existing CI service account for bounded reads only, without user impersonation, Auth calls, membership reads, browser execution, generic inventory, data changes, cleanup or deploy. Preserve subsequent QA collaboration and financial history.",
   "gate": "I6.5/B4-003",
-  "controlPlaneBlob": "c38f0ebf4d919cc59494adbaf81acd08837ac6e3",
-  "observedSourceHead": "1d4161f8a2670d33012b99d450767448f4c01bc2",
+  "controlPlaneBlob": "e5df1df940c27d76a37244714a161169c2bb2731",
+  "observedSourceHead": "7c8946fa8a8bf63f50a292f81c2d1005361f43f2",
   "existingExecutor": ".github/workflows/gravicentra-b4-003-readonly-diagnostic.yml",
   "auditTool": "tools/gravicentra-b4-003-integral-readonly-audit.cjs",
-  "auditToolBlob": "748f05135165bcbce4121024f425f2323eb1b860",
+  "auditToolBlob": "c539dde8b9922f42ea7107ea69462f044395e10f",
   "productWrites": false,
   "dataWrites": false,
   "deploy": false,
@@ -20,35 +20,120 @@
   "mayAdvanceFormalPercent": false,
   "authority": "USER_REQUESTED_READ_ONLY_COMPLEMENT_SUBORDINATE_TO_EXISTING_CONTROL_PLANE",
   "scope": [
-    "current repository ledger and carry-forward reconciliation",
-    "sanitized membership and advisor identity uniqueness for Paula Carlos Samuel and Fernando",
-    "institutional and individual goal counts periods and types",
-    "freelancer contractual eligibility fields without inventing classification",
-    "cancelled-run QA fixture provenance and dependency aggregates",
-    "three orphan-renewal policies and their twelve dependent rows",
-    "bounded operational relationships and effective rules/function metadata",
-    "authenticated read-only navigation where supported with all mutation endpoints blocked"
+    "B4-003-P0-20261012-QA-CANCELLED-RUN-FIXTURES: exact fourteen roots and their current canonical references",
+    "B4-003-P0-20261012-QA-ORPHAN-RENEWALS: exact three policies, parent existence and dependent record identifiers",
+    "Bounded event/request/outbox references linked to these records, preserving October 27 and 28 reuse",
+    "No general repository, membership, rules, deployment or authenticated browser audit"
   ],
   "qaOnlyCorrection": {
-    "previousRunId": 38970051423,
-    "previousArtifactId": 12076144596,
+    "previousRequestBlob": "3924752367daa4da4c188450c151c4f99a11a2c1",
+    "previousRunId": 41068195712,
+    "previousArtifactId": 12984216364,
     "preservePreviousEvidence": true,
-    "cause": "Refresh the same existing read-only executor against the current Control Plane and exact institutional-goals Preview lineage; no new acceptance method.",
+    "cause": "The previous aggregate audit did not retain the exact dependency identifiers needed for disposition. The new explicit submode exits before the historical broad inventory and authenticated-browser sections.",
     "changes": [
-      "current Control Plane blob binding",
-      "current branch head binding",
-      "explicit P0 residue and freelancer evidence scope",
-      "preserve denied failed truncated and untested surfaces"
+      "Bind to current Control Plane and exact diagnostic owner bytes",
+      "Read the allowlisted seventeen roots and bounded canonical dependency graph",
+      "Export identifiers, relation edges, factual provenance indicators and digests; no raw document snapshots or personal values",
+      "Retain denied, failed, truncated and structurally unindexed relationships as HOLD"
     ],
     "selfSyncWriteStillBlocked": true,
-    "productSourceChanged": false
+    "productSourceChanged": false,
+    "workflowChanged": false
   },
   "remainingAfterThisAudit": [
-    "authenticated exact Preview UAT in the originating Chrome context",
-    "controlled synthetic institutional-goal write readback reload audit and restore",
-    "independent Carlos UID functional acceptance",
-    "authorized reversible disposition of QA residues when evidence permits",
-    "visual acceptance and later frozen B4 gates"
+    "Adjudicate the exact returned dependencies before any cleanup decision",
+    "Preserve real obligations, history and ambiguous records",
+    "No automatic finding closure, release acceptance or formal percentage increase from Admin reads"
   ],
-  "evidencePolicy": "Record denied, failed, truncated and untested surfaces explicitly. No PASS from inventory, Admin reads, empty output, or successful workflow alone."
+  "evidencePolicy": "Persist bounded projected evidence after every root and query. Record errors, truncation, incomplete expansion and limits explicitly. No raw snapshots, personal names, email, telephone, messages, URLs or credentials. IDs describe linked canonical documents only. No PASS from inventory, Admin access, empty output or workflow success alone.",
+  "executionScope": "EXACT_QA_RESIDUE_DEPENDENCIES",
+  "authWrites": false,
+  "mintUserTokens": false,
+  "browserUat": false,
+  "membershipReads": false,
+  "cleanup": false,
+  "exactQaResidue": {
+    "projectId": "ays-orbit-360-lab",
+    "tenantId": "alianzas-soluciones",
+    "roots": [
+      {
+        "collection": "clientes",
+        "id": "b4003qa_client_38102224750"
+      },
+      {
+        "collection": "polizas",
+        "id": "b4003qa_policy_renew_38102224750"
+      },
+      {
+        "collection": "polizas",
+        "id": "b4003qa_policy_expired_renew_38102224750"
+      },
+      {
+        "collection": "polizas",
+        "id": "b4003qa_policy_unknown_38102224750"
+      },
+      {
+        "collection": "polizas",
+        "id": "b4003qa_policy_renewwrite_38102224750"
+      },
+      {
+        "collection": "polizas",
+        "id": "b4003qa_policy_cancel_38102224750"
+      },
+      {
+        "collection": "polizas",
+        "id": "b4003qa_policy_health_38102224750"
+      },
+      {
+        "collection": "recibosEsperados",
+        "id": "b4003qa_receipt_health_1_38102224750"
+      },
+      {
+        "collection": "recibosEsperados",
+        "id": "b4003qa_receipt_health_2_38102224750"
+      },
+      {
+        "collection": "recibosEsperados",
+        "id": "b4003qa_receipt_health_shadow_38102224750"
+      },
+      {
+        "collection": "cancelaciones",
+        "id": "b4003qa_cancel_38102224750"
+      },
+      {
+        "collection": "aseguradoras",
+        "id": "b4003qa_insurer_38102224750"
+      },
+      {
+        "collection": "negocios",
+        "id": "b4003qa_business_collab_38102224750"
+      },
+      {
+        "collection": "negocios",
+        "id": "b4003qa_business_collab_noclient_38102224750"
+      },
+      {
+        "collection": "polizas",
+        "id": "pol_mulsmxsk"
+      },
+      {
+        "collection": "polizas",
+        "id": "pol_mulssmuz"
+      },
+      {
+        "collection": "polizas",
+        "id": "pol_mulsxofx"
+      }
+    ],
+    "limits": {
+      "perQuery": 100,
+      "maxDocuments": 500,
+      "maxQueries": 250,
+      "maxRounds": 4,
+      "batchSize": 10,
+      "maxParentReads": 100
+    },
+    "contractSha256": "86209bf04cd5707d992c1b7ded50f575d7587f4c0ac1d34d2f677ab06296ea29"
+  }
 }
