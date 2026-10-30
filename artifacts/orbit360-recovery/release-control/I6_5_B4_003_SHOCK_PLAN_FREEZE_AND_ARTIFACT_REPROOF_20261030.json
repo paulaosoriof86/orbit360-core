@@ -1,0 +1,177 @@
+{
+  "schema": "GRAVICENTRA_B4003_APPROVED_CONTINUATION_AND_ARTIFACT_REPROOF_V1",
+  "recordedOn": "2026-10-30",
+  "status": "EXECUTION_DECISION_FROZEN_TECHNICAL_REPROOF_ONLY_AUTHENTICATED_UAT_PENDING",
+  "authority": "PAULA_EXPLICIT_FREEZE_AND_CONTINUE_20261030",
+  "userInstruction": "perfecto, congela urgente y avancemos, de hoy yno puede pasar la salida a producción",
+  "targetDate": "2026-10-30",
+  "targetDateIsNotAcceptanceOrPermissionToBypassGates": true,
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "observedParentHead": "9dd7f5d8b107849ff33209c5144cd4d9cd4bbecb",
+  "gate": "I6.5/B4-003",
+  "recordType": "SUBORDINATE_IMMUTABLE_DECISION_AND_EVIDENCE_RECEIPT_NOT_NEW_PLAN_GATE_OR_RELEASE_AUTHORITY",
+  "controlPlaneBinding": {
+    "path": "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json",
+    "blobSha": "c38f0ebf4d919cc59494adbaf81acd08837ac6e3",
+    "candidatePointer": "b4003InstitutionalGoalsExactPreview20261030",
+    "nextActionObserved": "I6_5_B4_003_AUTHENTICATED_EXACT_PREVIEW_UAT_AND_P0_CLOSEOUT",
+    "mutatedByThisReceipt": false,
+    "noReleaseOrGateAdvance": true
+  },
+  "existingAuthoritiesPreserved": {
+    "compositionPath": "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json",
+    "compositionBlobSha": "33bf80768cb6cb311f2975d282a5f50935f680aa",
+    "masterPlanPath": "artifacts/orbit360-recovery/release-control/I6_PENDING_CLOSURE_MASTER_PLAN_LOCK_20261004.json",
+    "findingLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
+    "carryRegisterPath": "artifacts/orbit360-recovery/release-control/I6_5_OPEN_FINDINGS_CARRY_FORWARD_REGISTER_20261003.json",
+    "capabilityLineagePath": "artifacts/orbit360-recovery/release-control/CAPABILITY_LINEAGE_LOCK.json",
+    "capabilityStatusPath": "artifacts/orbit360-recovery/release-control/CAPABILITY_STATUS_LEDGER.json",
+    "findingIdsPreserved": 295,
+    "findingsClosedByThisReceipt": 0,
+    "newFullCapabilityAcceptances": 0,
+    "historicalApprovalsReopened": 0
+  },
+  "candidateObservedNotNewAuthority": {
+    "sourceSha": "eb9ce731832d236fedc545185ec7c66bd10849bb",
+    "buildId": "gi-i65-b4-eb9ce731832d-57f234755dc1",
+    "previewRunId": 41066435386,
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-sr-41066435386-r09pl1ti.web.app/",
+    "artifactId": 12982792336,
+    "artifactZipSha256": "62edb540b49d199c2f100335e9677a3f544627a538a35964150e54145302ba52",
+    "hostedPayloadDigest": "93d05a09035a044d400fe0f0e04759bd8c15e111bae93608dff0babdfa883a0a",
+    "bundleManifestDigest": "9e63077a08b3ef86aa85f5ccd83c866326f708734c33f97e9d4e778e4d2b05ee",
+    "backendManifestDigest": "3ac3bf7bc777460d7d181bc3241efcc02e420ccfd54ba22b0e91762456c4dd4e"
+  },
+  "artifactReproof": {
+    "mode": "DOWNLOADED_EXISTING_ARTIFACT_OFFLINE_NO_REBUILD_NO_DEPLOY",
+    "archiveSha256Verified": true,
+    "buildMarkerSourceAndBuildExact": true,
+    "hostedFilesChecked": 218,
+    "hostedFilesPassed": 218,
+    "missingHostedFiles": 0,
+    "extraHostedFiles": 0,
+    "manifestDigestVerified": true,
+    "freshHttpReadbackPerformedThisSession": false,
+    "backendBytesIncludedInHostingArchive": false,
+    "backendRuntimeAcceptedByManifestAlone": false,
+    "productBlobsVerified": {
+      "orbit360-platform/modules/equipo.js": "5ce317a0641709e1a405e61435578de934fa194d",
+      "orbit360-platform/modules/inicio.js": "12a5a1e3293a7d59f993f829071d3bd2b4027a6c",
+      "orbit360-platform/modules/plantillas.js": "460d5f58c377ad48544aa9c4a92a97c1e9077153"
+    },
+    "syntheticRegressions": [
+      {
+        "path": "tools/gravicentra-b4-003-institutional-goals-owner.test.cjs",
+        "gitBlobSha": "ca14672a0e63b22bef33aa6d869afb43a24cde7b",
+        "harnessBytesVerified": true,
+        "checksPassed": 15,
+        "exitCode": 0,
+        "stdoutSha256": "cc314e80f956b847114e931d6f92104254d499ad328d51c8a8310ba827507120"
+      },
+      {
+        "path": "tools/gravicentra-b4-003-closeout-source-successor.test.cjs",
+        "gitBlobSha": "8caa893faf8df55a362d751feb3d3c9637c372c9",
+        "harnessBytesVerified": true,
+        "testsPassed": 8,
+        "testsFailed": 0,
+        "exitCode": 0,
+        "stdoutSha256": "a2f18ef8df348d69c7a9634b4722b02bc64a1e2466bdcea4a35aa2c7753e8c8c"
+      },
+      {
+        "path": "artifacts/orbit360-recovery/release-control/b4003-uat-20261029/tests/plantillas-use-lifecycle.test.cjs",
+        "gitBlobSha": "a26aebb69de546c32ac8ae6021449ac2be6223ed",
+        "harnessBytesVerified": true,
+        "testsPassed": 18,
+        "testsFailed": 0,
+        "exitCode": 0,
+        "stdoutSha256": "41164e88d5b9b60c79a4884779e692180909aac2213a84a2312a880797d67636"
+      }
+    ],
+    "runtime": "Node v22.16.0, offline VM fixtures, exact downloaded product owner bytes",
+    "harnessAutopatch": false,
+    "firebaseAccess": false,
+    "realBusinessWrites": 0,
+    "authenticatedChromeUat": false
+  },
+  "auditEvidenceAdjudication": {
+    "runId": 41068195712,
+    "artifactId": 12984216364,
+    "archiveSha256": "8d2d1949c07e7e9f88fe1b1413305f181d8e7147fd5ea5c2a64469e8983a9711",
+    "archiveIntegrityVerified": true,
+    "embeddedControlPlaneBlobMatches": true,
+    "retainedEvidence": [
+      "295 ledger IDs and 295 carry IDs reconciled with no missing ID or status mismatch",
+      "Server membership configuration is not independent-user functional acceptance",
+      "Six individual goals and zero institutional goals at audit time"
+    ],
+    "excludedFromCurrentCandidateAcceptance": {
+      "section": "authenticated_ui_readonly",
+      "observedBuildId": "gi-i65-b4-61e3cd0bbb25-57f234755dc1",
+      "expectedBuildId": "gi-i65-b4-eb9ce731832d-57f234755dc1",
+      "reason": "DIFFERENT_BUILD_AND_FOUR_USERS_NOT_VERIFIED",
+      "authDiagnostic": "firebaseSession=false, productUserPresent=false; TimeoutError",
+      "sourceCauseObserved": "tools/gravicentra-b4-003-integral-readonly-audit.cjs selects cp.paulaOct16LatestCertifiedReadOnlyPreview for Hosting marker and browser UAT",
+      "auditHarnessFixedByThisReceipt": false,
+      "repeatSameGeneralAuditForbiddenAsSubstituteForExactUat": true
+    },
+    "residueDisposition": "HOLD_PROVENANCE_AND_DEPENDENCIES_NOT_PROVEN_BY_AGGREGATES",
+    "freelancerEligibilityDisposition": "HOLD_CANONICAL_PARTICIPATION_CONTRACT_NOT_PROVEN",
+    "cleanupAuthorizedByThisReceipt": false
+  },
+  "frozenContinuation": {
+    "sameExistingPlan": true,
+    "activeWorkOnly": "B4-003 exact authenticated UAT and causal P0 closeout",
+    "firstAction": "Connect originating Chrome in Work; verify exact origin, build, authenticated UID, tenant, assigned role and country before any UI test or synthetic write",
+    "mandatoryUat": [
+      "Equipo/Metas institutional synthetic create-edit-server-readback-reload-audit-restore while preserving individual goals",
+      "Personal collection versus individual goal, GTQ and COP separately",
+      "Canonical freelancer participation and contextual Inicio text",
+      "Independent Carlos UID scope and insurer authorized edit/readback",
+      "Affected Plantillas, Portal, Insights, Cliente360, Cobros and Historial checks on the exact candidate"
+    ],
+    "sixPriorityIdsNotAnExhaustiveReplacementForLedger": [
+      "B4-003-P0-20261012-PERSONAL-COLLECTION",
+      "B4-003-P0-20261012-INSTITUTIONAL-GOALS",
+      "B4-003-P0-20261012-FREELANCERS-GOAL-SCOPE",
+      "B4-003-P0-20261012-INICIO-MOTIVATIONAL-TEXTS",
+      "B4-003-P0-20261012-QA-CANCELLED-RUN-FIXTURES",
+      "B4-003-P0-20261012-QA-ORPHAN-RENEWALS"
+    ],
+    "laterGatesOnlyAfterCurrentGateClosed": ["B4-004", "B4-005", "B4-006", "B4-007", "I6.6", "I6.7", "I6.8", "I6.9"],
+    "dataReadinessParallel": "Source inventory, fingerprints and deterministic read-only delta preparation; no September/October apply until the corresponding gate opens",
+    "noGeneralLineageRediscovery": true,
+    "noRebuildWithoutCausalProductChange": true,
+    "sameAcceptedArtifactPreviewToLive": true
+  },
+  "progressSnapshotNotAuthority": {
+    "forensicMilestonePercentBefore": 96,
+    "forensicMilestonePercentAfter": 96,
+    "formalI6PercentBefore": 50,
+    "formalI6PercentAfter": 50,
+    "increment": 0,
+    "note": "Milestone percentages are not remaining-time estimates or complete operational readiness. No acceptance points from this receipt or synthetic tests."
+  },
+  "executionLimitations": {
+    "connectedChrome": "Browser.list_tabs rejected this session: originating browser context required",
+    "localChromeTestsExecuted": false,
+    "fallbackRemoteBrowserCountedAsChrome": false,
+    "localGitClone": "Unavailable: runtime could not resolve github.com; GitHub connector remained available",
+    "guardAfterPublication": "REQUIRED_CHECK_GITHUB_RUN_NOT_PRECLAIMED"
+  },
+  "boundaries": {
+    "productSourceChanged": false,
+    "historicalLocksRewritten": false,
+    "newBranchRepoFirebaseOrWorkflow": false,
+    "liveDeploy": false,
+    "authIamRulesMutation": false,
+    "realUserTokensIssued": false,
+    "businessDataWrites": 0,
+    "dataReimport": false,
+    "externalMessages": false,
+    "existingOwnerFirestoreRiskExceptionPreserved": true,
+    "existingRulesAloneReopenedAsReleaseBlocker": false,
+    "securityCertifiedPass": false,
+    "releaseAcceptanceGranted": false
+  }
+}
