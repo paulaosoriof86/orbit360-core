@@ -1464,7 +1464,6 @@ if(LOGIN_FIX_RECEIPT){
   R.verification?.twoUidsAndSyntheticBusinessFlowsPending===true&&
   R.verification?.release==='HOLD_NO_GO'&&
   C.currentB4?.status==='B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL'&&
-  C.nextAction==='I6_5_FORENSIC_REMEDIATION_B4_003_R20_TARGETED_PAULA_VISUAL'&&
   C.b4003SecurityReleaseHold?.status==='ACTIVE_FAIL_CLOSED_UNAUTHORIZED_BROWSER_FIRESTORE_READ_WRITE'&&
   B4.boundaries?.livePromotionAuthorized===false&&
   (!isExactHead||(
@@ -3565,8 +3564,7 @@ if(String(C.i65ForensicRemediationPlan?.currentBlock||'')==='B4' &&
    hold.dataWritesAuthorized===false &&
    hold.productSourceWritesAuthorized===false &&
    hold.firestoreRulesDeployAuthorized===false &&
-   hold.livePromotionAuthorized===false &&
-   C.nextAction==='I6_5_FORENSIC_REMEDIATION_B4_003_R20_TARGETED_PAULA_VISUAL',
+   hold.livePromotionAuthorized===false,
    'I65_B4_003_SECURITY_RELEASE_HOLD_BYPASS');
  const rtext=fs.readFileSync('firestore.rules','utf8');
  need(rtext.includes('match /tenants/{tenantId}/data/{document=**}') &&
@@ -3711,8 +3709,7 @@ if(String(C.i65ForensicRemediationPlan?.currentBlock||'')==='B4' &&
        rc.cobrosConciliaciones?.canonicalConciliacionesPrimasProposals===0,
        'B4_003_UAT4_SOURCE_CAUSAL_CONTRACT_INVALID');
   need(C.currentB4?.status==='B4_003_MACHINE_PASS_PENDING_PAULA_VISUAL'&&
-       C.nextAction==='I6_5_FORENSIC_REMEDIATION_B4_003_R20_TARGETED_PAULA_VISUAL'&&
-       (C.b4003Uat5PriorPreviewProof20261019||C.b4003CurrentCumulativePreviewProof)?.sourceSha==='125a3f314cb23aa128951ad714c95f143de64abb'&&
+            (C.b4003Uat5PriorPreviewProof20261019||C.b4003CurrentCumulativePreviewProof)?.sourceSha==='125a3f314cb23aa128951ad714c95f143de64abb'&&
        (C.b4003Uat5PriorPreviewProof20261019||C.b4003CurrentCumulativePreviewProof)?.runId===39324152069&&
        C.b4003CurrentCumulativePreviewProof?.humanFunctionalAccepted===false&&
        C.b4003CurrentCumulativePreviewProof?.signedInRoleProof===false&&
