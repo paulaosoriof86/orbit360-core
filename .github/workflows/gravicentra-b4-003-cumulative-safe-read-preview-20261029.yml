@@ -1,7 +1,7 @@
 name: Gravicentra I6.5 B4-003 Cumulative Safe-Read LAB Preview 20261029
 
 # Transport of the existing single canonical recovery branch, not a new gate.
-# One existing LAB Preview callable plus one immutable build on the existing seven-day Preview channel; preserve origin/session, never LIVE or data.
+# UI-only immutable build on the existing seven-day Preview channel; verify the existing backend without deployment, preserve origin/session.
 # Resolve the approved source from Control Plane; stale transport pins are not authority.
 on:
   push:
@@ -29,11 +29,13 @@ jobs:
       TRANSPORT_SHA: ${{ github.sha }}
       PREVIEW_CHANNEL_ID: gi-i65-b4-sr-41066435386
       EXPECTED_PREVIEW_URL: https://ays-orbit-360-lab--gi-i65-b4-sr-41066435386-r09pl1ti.web.app
-      PREDECESSOR_SOURCE_SHA: eb9ce731832d236fedc545185ec7c66bd10849bb
-      PREDECESSOR_BUILD_ID: gi-i65-b4-eb9ce731832d-57f234755dc1
+      PREDECESSOR_SOURCE_SHA: 8bb4fce20bb2af1aa4022573069ff8287679b715
+      PREDECESSOR_BUILD_ID: gi-i65-b4-8bb4fce20bb2-57f234755dc1
       TARGET_FUNCTION: orbit360ProductOperationalCommandPreview
       TARGET_REGION: us-east1
-      EXPECTED_SOURCE_PARENT: b5c83cf255afd01cd348c53b904c1c47dbdcb241
+      EXPECTED_SOURCE_PARENT: 4d919e1683ab5f0f0b7166f2d67b84dd211b7805
+      BACKEND_SOURCE_SHA: 8bb4fce20bb2af1aa4022573069ff8287679b715
+      EXPECTED_BACKEND_REVISION: orbit360productoperationalcommandpreview-00211-muz
       PROJECT_ID: ays-orbit-360-lab
       HOSTING_SITE: ays-orbit-360-lab
       TENANT_HINT: alianzas-soluciones
@@ -56,7 +58,7 @@ jobs:
         with:
           node-version: '22'
 
-      - name: Require exact eleven-file Metas source, one-file transport and source Guard PASS
+      - name: Require exact UI-only successor, immutable backend, one-file transport and source Guard PASS
         env:
           GH_READ_TOKEN: ${{ github.token }}
         run: |
@@ -67,60 +69,54 @@ jobs:
           const need=(ok,code)=>{if(!ok)throw Error(code);};
           const controlPath='artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json';
           const workflowPath='.github/workflows/gravicentra-b4-003-cumulative-safe-read-preview-20261029.yml';
-          const receiptPath='artifacts/orbit360-recovery/release-control/I6_5_B4_003_METAS_ATOMIC_PREVIEW_SOURCE_SUCCESSOR_20261030.json';
-          const progressPath='artifacts/orbit360-recovery/release-control/I6_5_B4_003_REAL_PROGRESS_RECONCILIATION_20261030.json';
-          const sources=['functions/product-operational-domain.js','orbit360-platform/modules/equipo.js','orbit360-platform/data/store-firestore-product-operational-p0.js'];
-          const tests=['tools/gravicentra-b4-003-metas-preview-session.test.cjs','tools/gravicentra-b4-003-metas-atomic-ui.test.cjs','tools/gravicentra-b4-003-metas-preview-projection.test.cjs'];
-          const expectedTests={ [tests[0]]:56,[tests[1]]:17,[tests[2]]:5 };
-          const ciTestPath='tools/gravicentra-b4-003-scoped-boundary.test.cjs';
-          const expected=[...sources,...tests,ciTestPath,controlPath,'tools/gravicentra-i6-control-plane-guard-v1.mjs',receiptPath,progressPath].sort();
-          const C=JSON.parse(fs.readFileSync(controlPath,'utf8')),S=C.b4003MetasAtomicPreviewSourceSuccessor20261030;
+          const receiptPath='artifacts/orbit360-recovery/release-control/I6_5_B4_003_METAS_UI_DIAGNOSTIC_SOURCE_SUCCESSOR_20261030.json';
+          const sourcePath='orbit360-platform/modules/equipo.js';
+          const testPath='tools/gravicentra-b4-003-metas-ui-diagnostic.test.cjs';
+          const expected=[sourcePath,testPath,receiptPath,controlPath,'tools/gravicentra-i6-control-plane-guard-v1.mjs'].sort();
+          const C=JSON.parse(fs.readFileSync(controlPath,'utf8')),S=C.b4003MetasUiDiagnosticSourceSuccessor20261030;
           need(S&&S.gate==='I6.5/B4-003'&&S.status==='SOURCE_AND_SYNTHETIC_QA_PASS_PREVIEW_UAT_PENDING'&&
-           S.previewAuthorizedAfterGuardAndRegressionPass===true&&S.previewFunction===process.env.TARGET_FUNCTION&&
-           S.previewRegion===process.env.TARGET_REGION&&S.previewProject===process.env.PROJECT_ID&&
-           S.productionPromotionAuthorized===false&&S.authIamRulesChangeAuthorized===false&&
-           S.realBusinessWritesAuthorized===false&&S.currentCapabilityAcceptances===0,'METAS_EXACT_PREVIEW_AUTHORITY_REQUIRED');
+           S.previewAuthorizedAfterGuardAndRegressionPass===true&&S.baseMetasSourceSha===process.env.BACKEND_SOURCE_SHA&&
+           S.backendDeploymentAuthorized===false&&S.productionPromotionAuthorized===false&&
+           S.authIamRulesChangeAuthorized===false&&S.realBusinessWritesAuthorized===false&&S.currentCapabilityAcceptances===0,
+           'METAS_UI_ONLY_PREVIEW_AUTHORITY_REQUIRED');
           need(C.repository===process.env.GITHUB_REPOSITORY&&C.branch===process.env.GITHUB_REF_NAME,'REPOSITORY_BRANCH_MISMATCH');
           need(git('rev-parse','HEAD')===process.env.TRANSPORT_SHA&&git('show','-s','--format=%s','HEAD')===
            'build(i6.5 B4-003): trigger cumulative safe-read isolated Preview only','EXACT_TRANSPORT_MISMATCH');
           need(git('diff','--name-only','HEAD^','HEAD')===workflowPath,'TRANSPORT_MUST_CHANGE_ONLY_EXISTING_WORKFLOW');
-          const source=git('log','-1','--format=%H','--',sources[0]);
+          const source=git('log','-1','--format=%H','--',sourcePath);
           need(/^[0-9a-f]{40}$/.test(source)&&git('rev-parse','HEAD^')===source&&
-           S.parentHead===process.env.EXPECTED_SOURCE_PARENT&&git('rev-parse',source+'^')===S.parentHead,
-           'SOURCE_MUST_BE_DIRECT_CHILD_OF_B5_AND_DIRECT_PARENT_OF_TRANSPORT');
-          need(S.receiptPath===receiptPath&&git('hash-object',receiptPath)===S.receiptBlobSha,'METAS_RECEIPT_BINDING_MISMATCH');
+           S.parentHead===process.env.EXPECTED_SOURCE_PARENT&&git('rev-parse',source+'^')===S.parentHead&&
+           git('merge-base',process.env.BACKEND_SOURCE_SHA,S.parentHead)===process.env.BACKEND_SOURCE_SHA,
+           'UI_SOURCE_EXACT_PARENT_AND_TRANSPORT_BINDING_REQUIRED');
+          need(S.receiptPath===receiptPath&&git('hash-object',receiptPath)===S.receiptBlobSha&&
+           git('rev-parse',source+':'+receiptPath)===S.receiptBlobSha,'METAS_UI_RECEIPT_BINDING_MISMATCH');
           const R=JSON.parse(fs.readFileSync(receiptPath,'utf8'));
-          need(R.schema==='GRAVICENTRA_I65_B4003_METAS_ATOMIC_PREVIEW_SOURCE_SUCCESSOR_V1'&&
-           R.gate===S.gate&&R.status===S.status&&R.parentHead===S.parentHead&&R.repository===C.repository&&R.branch===C.branch,
-           'METAS_RECEIPT_IDENTITY_MISMATCH');
+          need(R.schema==='GRAVICENTRA_I65_B4003_METAS_UI_DIAGNOSTIC_SOURCE_SUCCESSOR_V1'&&
+           R.gate===S.gate&&R.status===S.status&&R.parentHead===S.parentHead&&R.baseMetasSourceSha===process.env.BACKEND_SOURCE_SHA&&
+           R.repository===C.repository&&R.branch===C.branch,'METAS_UI_RECEIPT_IDENTITY_MISMATCH');
           const b=R.boundaries||{};
-          need(b.liveDeployment===false&&b.authIamRulesChange===false&&b.realBusinessWrites===0&&b.newCollections===0&&
-           b.newEndpoints===0&&b.newWorkflows===0&&b.freelancerContractInvented===false&&b.authenticatedUatAccepted===false,
-           'METAS_BOUNDARY_MISMATCH');
+          need(b.backendDeployment===false&&b.backendSourceMutation===false&&b.liveDeployment===false&&b.authIamRulesChange===false&&
+           b.realBusinessWrites===0&&b.newCollections===0&&b.newEndpoints===0&&b.newWorkflows===0&&b.authenticatedUatAccepted===false,
+           'METAS_UI_BOUNDARY_MISMATCH');
           const P=R.previewTransport||{};
           need(P.reuseExistingChannel===true&&P.hostingChannelId===process.env.PREVIEW_CHANNEL_ID&&
            String(P.expectedPreviewUrl||'').replace(/\/$/,'')===process.env.EXPECTED_PREVIEW_URL&&
            P.predecessorSourceSha===process.env.PREDECESSOR_SOURCE_SHA&&P.predecessorBuildId===process.env.PREDECESSOR_BUILD_ID,
-           'SESSION_PRESERVING_EXISTING_PREVIEW_TRANSPORT_REQUIRED');
+           'EXISTING_PREVIEW_TRANSPORT_REQUIRED');
           const actual=git('diff','--name-only',S.parentHead,source).split(/\r?\n/).filter(Boolean).sort();
           for(const list of [actual,S.atomicCommitPaths||[],R.atomicCommitPaths||[]])
-           need(JSON.stringify(list.slice().sort())===JSON.stringify(expected)&&list.length===11,'EXACT_ELEVEN_ATOMIC_PATHS_REQUIRED');
-          need(JSON.stringify(Object.keys(R.sourceFiles||{}).sort())===JSON.stringify(sources.slice().sort()),'EXACT_THREE_SOURCE_PATHS_REQUIRED');
-          for(const p of sources){const v=R.sourceFiles[p];need(v&&v.causalFinding&&
-           git('rev-parse',S.parentHead+':'+p)===v.beforeBlob&&git('rev-parse',source+':'+p)===v.afterBlob&&
-           git('hash-object',p)===v.afterBlob,'SOURCE_BLOB_MISMATCH:'+p);}
-          need(JSON.stringify(Object.keys(R.regressionTests||{}).sort())===JSON.stringify(tests.slice().sort()),'EXACT_THREE_NEW_REGRESSION_BINDINGS_REQUIRED');
-          for(const p of tests){const v=R.regressionTests[p];need(v&&v.syntheticOnly===true&&v.externalRequests===0&&
-           Number.isInteger(v.tests)&&v.tests===expectedTests[p]&&git('rev-parse',source+':'+p)===v.blob&&git('hash-object',p)===v.blob,'REGRESSION_BINDING_MISMATCH:'+p);}
-          const T=R.requiredCiTestSuccessor;
-          need(T&&T.path===ciTestPath&&T.beforeBlob==='26ba2d9d44c4679b0eef9f61032cd511ea4f7e61'&&
-           T.afterBlob==='ad2dcd823f579df223c9048490125bb4c410efb0'&&typeof T.reason==='string'&&T.reason.trim().length>0&&
-           git('rev-parse',S.parentHead+':'+ciTestPath)===T.beforeBlob&&
-           git('rev-parse',source+':'+ciTestPath)===T.afterBlob&&git('hash-object',ciTestPath)===T.afterBlob,
-           'REQUIRED_CI_SCOPED_BOUNDARY_SUCCESSOR_BINDING_MISMATCH');
-          const backend=fs.readFileSync(sources[0],'utf8');
-          need(backend.includes("const PREVIEW_REGION = 'us-east1'")&&backend.includes('exports.orbit360ProductOperationalCommandPreview')&&
-           fs.readFileSync('functions/bootstrap.js','utf8').includes("require('./product-operational-domain')"),'EXISTING_PREVIEW_EXPORT_REQUIRED');
+           need(JSON.stringify(list.slice().sort())===JSON.stringify(expected)&&list.length===5,'EXACT_FIVE_UI_SOURCE_PATHS_REQUIRED');
+          need(R.source?.path===sourcePath&&R.source.beforeBlob==='aa89e24f945082805bed2c044f16541716306a8f'&&
+           git('rev-parse',S.parentHead+':'+sourcePath)===R.source.beforeBlob&&git('rev-parse',source+':'+sourcePath)===R.source.afterBlob&&
+           git('hash-object',sourcePath)===R.source.afterBlob&&R.source.afterBlob!==R.source.beforeBlob,'UI_SOURCE_BLOB_MISMATCH');
+          need(R.regression?.path===testPath&&R.regression.syntheticOnly===true&&R.regression.externalRequests===0&&
+           Number.isInteger(R.regression.tests)&&R.regression.tests>0&&git('rev-parse',source+':'+testPath)===R.regression.blob&&
+           git('hash-object',testPath)===R.regression.blob,'UI_REGRESSION_BINDING_MISMATCH');
+          need(git('rev-parse',source+':functions')===git('rev-parse',process.env.BACKEND_SOURCE_SHA+':functions'),
+           'BACKEND_TREE_MUST_MATCH_EXISTING_EXACT_DEPLOYMENT');
+          const immutableWriter='orbit360-platform/data/store-firestore-product-operational-p0.js';
+          need(git('hash-object',immutableWriter)===git('rev-parse',process.env.BACKEND_SOURCE_SHA+':'+immutableWriter),
+           'METAS_OPERATIONAL_WRITER_MUST_REMAIN_FROZEN');
           (async()=>{
             const url='https://api.github.com/repos/'+C.repository+'/actions/workflows/gravicentra-release-lock-sync.yml/runs?head_sha='+source+'&per_page=100';
             const response=await fetch(url,{headers:{Authorization:'Bearer '+process.env.GH_READ_TOKEN,Accept:'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'}});
@@ -128,11 +124,12 @@ jobs:
             const body=await response.json();
             const runs=(body.workflow_runs||[]).filter(r=>r.head_sha===source&&r.head_branch===C.branch).sort((a,b)=>b.id-a.id);
             need(runs[0]&&runs[0].status==='completed'&&runs[0].conclusion==='success','LATEST_EXACT_SOURCE_GUARD_SUCCESS_REQUIRED');
-            const binding={sourceSha:source,sourceParent:S.parentHead,transportSha:process.env.TRANSPORT_SHA,guardRunId:runs[0].id,sourceBlobs:Object.fromEntries(sources.map(p=>[p,R.sourceFiles[p].afterBlob])),receiptPath,receiptBlobSha:S.receiptBlobSha};
+            const sources=['functions/product-operational-domain.js',sourcePath,immutableWriter];
+            const binding={sourceSha:source,sourceParent:S.parentHead,backendSourceSha:process.env.BACKEND_SOURCE_SHA,backendTreeSha:git('rev-parse',source+':functions'),transportSha:process.env.TRANSPORT_SHA,guardRunId:runs[0].id,sourceBlobs:Object.fromEntries(sources.map(p=>[p,git('rev-parse',source+':'+p)])),receiptPath,receiptBlobSha:S.receiptBlobSha,backendDeployment:false};
             fs.writeFileSync(process.env.RUNNER_TEMP+'/gi-metas-source-binding.json',JSON.stringify(binding,null,2)+'\n');
             fs.writeFileSync(process.env.RUNNER_TEMP+'/gi-authorized-source.sha',source+'\n');
             fs.appendFileSync(process.env.GITHUB_ENV,'EXACT_SOURCE_SHA='+source+'\n');
-            fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY,'Exact Metas source: '+source+'\nSource Guard SUCCESS: '+runs[0].id+'\nExisting LAB callable only: '+process.env.TARGET_FUNCTION+' / '+process.env.TARGET_REGION+'\n');
+            fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY,'Exact UI source: '+source+'\nSource Guard SUCCESS: '+runs[0].id+'\nExisting backend source retained: '+process.env.BACKEND_SOURCE_SHA+'\nBackend deployment: false\n');
           })().catch(e=>{console.error(String(e.message||e));process.exitCode=1;});
           NODE
           git diff --exit-code
@@ -143,6 +140,7 @@ jobs:
           node tools/gravicentra-governance-preflight-v1.mjs --mode=i6
           node tools/gravicentra-b4-003-metas-preview-session.test.cjs
           node tools/gravicentra-b4-003-metas-atomic-ui.test.cjs
+          node tools/gravicentra-b4-003-metas-ui-diagnostic.test.cjs
           node tools/gravicentra-b4-003-metas-preview-projection.test.cjs
           node tools/gravicentra-b4-003-operational-write-security-regression.test.cjs
           node tools/gravicentra-b4-003-before-image-regression.test.cjs
@@ -326,7 +324,8 @@ jobs:
           retention-days: 30
           if-no-files-found: error
 
-      - name: Stage exact backend source and capture existing target metadata
+      - name: Stage frozen backend for readback and capture existing target metadata
+        id: backend_snapshot
         run: |
           set -euo pipefail
           BACKEND_ROOT="$RUNNER_TEMP/gi-metas-backend"
@@ -343,7 +342,7 @@ jobs:
           const git=(...args)=>execFileSync('git',args,{encoding:'utf8'}).trim();
           const files=git('ls-tree','-r','--name-only',process.env.EXACT_SOURCE_SHA,'--','functions/').split(/\r?\n/).filter(Boolean);
           const manifest=files.map(path=>{const staged=fs.readFileSync(process.env.BACKEND_ROOT+'/'+path),expected=execFileSync('git',['show',process.env.EXACT_SOURCE_SHA+':'+path]);if(!staged.equals(expected))throw Error('BACKEND_STAGE_DIFF:'+path);return {path,gitBlobSha:git('rev-parse',process.env.EXACT_SOURCE_SHA+':'+path),sha256:sha(staged),bytes:staged.length};});
-          fs.writeFileSync(process.env.RUNNER_TEMP+'/gi-metas-backend-source-manifest.json',JSON.stringify({sourceSha:process.env.EXACT_SOURCE_SHA,target:process.env.TARGET_FUNCTION,region:process.env.TARGET_REGION,archiveSha256:sha(fs.readFileSync(process.env.RUNNER_TEMP+'/gi-metas-backend-source.tar')),files:manifest},null,2)+'\n');
+          fs.writeFileSync(process.env.RUNNER_TEMP+'/gi-metas-backend-source-manifest.json',JSON.stringify({sourceSha:process.env.EXACT_SOURCE_SHA,backendSourceSha:process.env.BACKEND_SOURCE_SHA,backendDeployment:false,target:process.env.TARGET_FUNCTION,region:process.env.TARGET_REGION,archiveSha256:sha(fs.readFileSync(process.env.RUNNER_TEMP+'/gi-metas-backend-source.tar')),files:manifest},null,2)+'\n');
           NODE
           cat > "$RUNNER_TEMP/gi-metas-function-snapshot.cjs" <<'NODE'
           'use strict';
@@ -367,8 +366,10 @@ jobs:
             const svc=f.serviceConfig||{},build=f.buildConfig||{};
             const resolved=build.sourceProvenance?.resolvedStorageSource||build.source?.storageSource||null;
             const targetMetadata={name:f.name,environment:f.environment,state:f.state,updateTime:f.updateTime||null,build:build.build||null,runtime:build.runtime||null,entryPoint:build.entryPoint,sourceStorage:resolved,revision:svc.revision||null,service:svc.service||null,uri:svc.uri||null,codeHash:f.labels?.['firebase-functions-hash']||null,labels:f.labels||{},serviceAccountEmail:svc.serviceAccountEmail||null,ingressSettings:svc.ingressSettings||null,environmentVariablesSha256:hash(svc.environmentVariables||{}),secretEnvironmentVariablesSha256:hash(svc.secretEnvironmentVariables||[]),serviceConfigNonRevisionSha256:hash(Object.fromEntries(Object.entries(svc).filter(([k])=>k!=='revision')))};
+            if(targetMetadata.revision!==process.env.EXPECTED_BACKEND_REVISION)throw Error('EXISTING_BACKEND_REVISION_MISMATCH');
             let iam={status:'NOT_AVAILABLE',policySha256:null};
             if(svc.service){try{const {data:p}=await client.request({url:'https://run.googleapis.com/v2/'+svc.service+':getIamPolicy'});iam={status:'READ',policySha256:hash({version:p.version||0,bindings:(p.bindings||[]).map(b=>({...b,members:(b.members||[]).slice().sort()})).sort((a,b)=>JSON.stringify(stable(a)).localeCompare(JSON.stringify(stable(b))))})};}catch(e){iam.httpStatus=Number(e.response?.status||0);}}
+            if(iam.status!=='READ')throw Error('EXISTING_BACKEND_IAM_READBACK_REQUIRED');
             const result={phase,observedAt:new Date().toISOString(),functions:summary,target:targetMetadata,iam};
             fs.writeFileSync(tmp+'/gi-metas-function-'+phase+'-snapshot.json',JSON.stringify(result,null,2)+'\n');
             if(phase==='after'){
@@ -376,7 +377,8 @@ jobs:
               if(JSON.stringify(before.functions.map(r=>r.key))!==JSON.stringify(summary.map(r=>r.key)))throw Error('FUNCTION_CREATED_OR_DELETED');
               const key=process.env.TARGET_REGION+'/'+process.env.TARGET_FUNCTION;
               const changed=summary.filter((r,i)=>r.metadataSha256!==before.functions[i].metadataSha256).map(r=>r.key);
-              if(changed.some(k=>k!==key))throw Error('NON_TARGET_FUNCTION_CHANGED:'+changed.filter(k=>k!==key).join(','));
+              if(changed.length)throw Error('FUNCTION_METADATA_CHANGED_DURING_HOSTING_ONLY:'+changed.join(','));
+              if(hash(before.target)!==hash(targetMetadata))throw Error('EXISTING_BACKEND_TARGET_CHANGED_DURING_HOSTING_ONLY');
               for(const field of ['serviceAccountEmail','ingressSettings','environmentVariablesSha256','secretEnvironmentVariablesSha256','serviceConfigNonRevisionSha256','service','uri'])if(before.target[field]!==targetMetadata[field])throw Error('TARGET_NON_SOURCE_CONFIGURATION_CHANGED:'+field);
               if(before.iam.status==='READ'&&iam.status==='READ'&&before.iam.policySha256!==iam.policySha256)throw Error('TARGET_RUN_IAM_CHANGED');
               const proof={status:'SOURCE_STORAGE_READBACK_UNAVAILABLE',storageSource:resolved,objectSha256:null,sourceFiles:[],errorHttpStatus:null};
@@ -394,9 +396,8 @@ jobs:
                   proof.status='DEPLOYED_BACKEND_SOURCE_BYTES_MATCH_EXACT_STAGE';
                 }catch(e){if(e.response?.status===403||e.response?.status===404){proof.errorHttpStatus=e.response.status;}else throw Error('DEPLOYED_SOURCE_READBACK_FAILED:'+String(e.stderr||e.message||e));}
               }
-              const identityChanged=['revision','build','codeHash','updateTime'].some(k=>before.target[k]&&targetMetadata[k]&&before.target[k]!==targetMetadata[k]);
-              if(!identityChanged&&proof.status!=='DEPLOYED_BACKEND_SOURCE_BYTES_MATCH_EXACT_STAGE')throw Error('TARGET_NO_CHANGED_REVISION_OR_EXACT_SOURCE_PROOF');
-              fs.writeFileSync(tmp+'/gi-metas-function-readback.json',JSON.stringify({status:proof.status==='DEPLOYED_BACKEND_SOURCE_BYTES_MATCH_EXACT_STAGE'?'TARGET_ONLY_DEPLOY_AND_SOURCE_READBACK_PASS':'TARGET_ONLY_DEPLOY_PASS_SOURCE_READBACK_UNPROVEN',onlyTargetChanged:true,changedFunctionKeys:changed,inventoryCount:summary.length,before:before.target,after:targetMetadata,iamUnchanged:before.iam.status==='READ'&&iam.status==='READ'?before.iam.policySha256===iam.policySha256:null,sourceProof:proof,authenticatedUat:'PENDING'},null,2)+'\n');
+              if(proof.status!=='DEPLOYED_BACKEND_SOURCE_BYTES_MATCH_EXACT_STAGE')throw Error('EXISTING_BACKEND_EXACT_SOURCE_READBACK_REQUIRED');
+              fs.writeFileSync(tmp+'/gi-metas-function-readback.json',JSON.stringify({status:'EXISTING_BACKEND_UNCHANGED_AND_EXACT_SOURCE_READBACK_PASS',backendDeployment:false,noFunctionsChanged:true,changedFunctionKeys:changed,inventoryCount:summary.length,before:before.target,after:targetMetadata,iamUnchanged:before.iam.status==='READ'&&iam.status==='READ'?before.iam.policySha256===iam.policySha256:null,sourceProof:proof,authenticatedUat:'PENDING'},null,2)+'\n');
             }
           })().catch(e=>{console.error(String(e.message||e));process.exitCode=1;});
           NODE
@@ -416,24 +417,6 @@ jobs:
             ${{ runner.temp }}/gi-metas-function-before-snapshot.json
           retention-days: 30
           if-no-files-found: error
-
-      - name: Deploy only the existing exact LAB operational Preview callable
-        id: backend_deploy
-        run: |
-          set -euo pipefail
-          test "$TARGET_FUNCTION" = 'orbit360ProductOperationalCommandPreview'
-          test "$TARGET_REGION" = 'us-east1'
-          test "$PROJECT_ID" = 'ays-orbit-360-lab'
-          node "$FIREBASE_CLI_BIN" deploy --only functions:orbit360ProductOperationalCommandPreview --config "$BACKEND_ROOT/firebase.json" --project "$PROJECT_ID" --non-interactive > "$RUNNER_TEMP/gi-metas-function-deploy.log" 2>&1
-
-      - name: Verify target revision, source generation and unchanged other functions
-        if: ${{ always() && steps.backend_deploy.outcome != 'skipped' }}
-        run: |
-          set -euo pipefail
-          node "$FIREBASE_CLI_BIN" functions:list --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/gi-metas-functions-after.json"
-          node "$RUNNER_TEMP/gi-metas-function-snapshot.cjs" after
-          status=$(curl --silent --show-error --output /dev/null --write-out '%{http_code}' --max-time 25 --head https://us-east1-ays-orbit-360-lab.cloudfunctions.net/orbit360ProductOperationalCommandPreview)
-          test "$status" = '400'
 
       - name: Update only the existing isolated seven-day LAB Preview channel, preserve session origin
         id: deploy
@@ -456,6 +439,15 @@ jobs:
           )
           test "$PREVIEW_URL" = "$EXPECTED_PREVIEW_URL"
           echo "url=$PREVIEW_URL" >> "$GITHUB_OUTPUT"
+
+      - name: Verify unchanged backend inventory, target, IAM and exact source after Hosting update
+        if: ${{ always() && steps.backend_snapshot.outcome == 'success' && steps.deploy.outcome != 'skipped' }}
+        run: |
+          set -euo pipefail
+          node "$FIREBASE_CLI_BIN" functions:list --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/gi-metas-functions-after.json"
+          node "$RUNNER_TEMP/gi-metas-function-snapshot.cjs" after
+          status=$(curl --silent --show-error --output /dev/null --write-out '%{http_code}' --max-time 25 --head https://us-east1-ays-orbit-360-lab.cloudfunctions.net/orbit360ProductOperationalCommandPreview)
+          test "$status" = '400'
 
       - name: Verify served bytes and unchanged LIVE identities
         env:
@@ -491,7 +483,7 @@ jobs:
           fs.writeFileSync(process.env.RUNNER_TEMP+'/gi-live-identity-readback.json',JSON.stringify(report,null,2)+'\n');
           fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY,'Owner root raw bytes stable before: '+before.rawByteStable+'\nOwner root raw bytes stable after: '+after.rawByteStable+'\nOwner stable runtime/structural identity: PASS\n');
           NODE
-          printf '%s\n' "I6.5/B4-003 cumulative source/byte/readback PASS" "Source: $EXACT_SOURCE_SHA" "Preview: $PREVIEW_URL" "LAB LIVE root exact; owner runtime and structural identity unchanged. Only the existing LAB Preview callable was updated; no LIVE function, Rules, Auth or business data operation." "Authenticated multi-role full-UAT still pending; B4-003 production HOLD." >> "$GITHUB_STEP_SUMMARY"
+          printf '%s\n' "I6.5/B4-003 cumulative source/byte/readback PASS" "Source: $EXACT_SOURCE_SHA" "Preview: $PREVIEW_URL" "LAB LIVE root exact; owner runtime and structural identity unchanged. The existing LAB Preview callable, inventory and IAM remained unchanged; no Functions deployment, LIVE, Rules, Auth or business data operation." "Authenticated multi-role full-UAT still pending; B4-003 production HOLD." >> "$GITHUB_STEP_SUMMARY"
 
       - name: Record combined exact-source Preview result and remaining UAT
         env:
@@ -502,7 +494,8 @@ jobs:
           const fs=require('node:fs');const read=n=>JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/'+n,'utf8'));
           const binding=read('gi-metas-source-binding.json'),backend=read('gi-metas-function-readback.json'),pack=read('gi-preview-package-output.json'),meta=read('gi-served-build.json'),live=read('gi-live-identity-readback.json');
           if(binding.sourceSha!==meta.sourceSha||meta.sourceSha!==process.env.EXACT_SOURCE_SHA)throw Error('COMBINED_SOURCE_MISMATCH');
-          const result={schema:'GRAVICENTRA_I65_B4003_METAS_EXACT_BACKEND_HOSTING_PREVIEW_RESULT_V1',status:backend.sourceProof.status==='DEPLOYED_BACKEND_SOURCE_BYTES_MATCH_EXACT_STAGE'?'TECHNICAL_EXACT_BACKEND_HOSTING_READBACK_PASS_AUTHENTICATED_UAT_PENDING':'HOSTING_EXACT_BACKEND_DEPLOYED_SOURCE_READBACK_UNPROVEN_UAT_PENDING',gate:'I6.5/B4-003',sourceSha:binding.sourceSha,sourceParent:binding.sourceParent,transportSha:binding.transportSha,sourceBlobs:binding.sourceBlobs,guardRunId:binding.guardRunId,buildId:meta.buildId,hostedPayloadDigest:pack.hostedPayloadDigest,bundleDigest:pack.bundleDigest,previewUrl:process.env.PREVIEW_URL,previewChannelId:process.env.PREVIEW_CHANNEL_ID,previewChannelReused:true,predecessorPreview:read('gi-preview-predecessor-identity.json'),channelExpiry:'7d',functionTarget:process.env.TARGET_FUNCTION,functionRegion:process.env.TARGET_REGION,functionProject:process.env.PROJECT_ID,functionBefore:backend.before,functionAfter:backend.after,backendReadback:backend.sourceProof,onlyTargetFunctionChanged:backend.onlyTargetChanged,changedFunctionKeys:backend.changedFunctionKeys,targetIamUnchanged:backend.iamUnchanged,liveHostingIdentity:live,liveDeployment:false,liveFunctionsDeployed:false,rulesAuthIamMutationRequested:false,businessDataWrites:0,syntheticWrites:0,newEndpoints:0,newWorkflows:0,currentCapabilityAcceptances:0,authenticatedUat:'PENDING_CREATE_EDIT_RELOAD_AUDIT_RESTORE_AND_NEGATIVE_CASES'};
+          if(backend.noFunctionsChanged!==true||backend.backendDeployment!==false||backend.iamUnchanged!==true||backend.changedFunctionKeys.length!==0||backend.sourceProof.status!=='DEPLOYED_BACKEND_SOURCE_BYTES_MATCH_EXACT_STAGE')throw Error('COMBINED_BACKEND_UNCHANGED_EXACT_PROOF_REQUIRED');
+          const result={schema:'GRAVICENTRA_I65_B4003_METAS_UI_ONLY_EXACT_PREVIEW_RESULT_V1',status:'TECHNICAL_EXACT_UI_PREVIEW_EXISTING_BACKEND_UNCHANGED_AUTHENTICATED_UAT_PENDING',gate:'I6.5/B4-003',sourceSha:binding.sourceSha,sourceParent:binding.sourceParent,backendSourceSha:binding.backendSourceSha,backendTreeSha:binding.backendTreeSha,backendDeployment:false,transportSha:binding.transportSha,sourceBlobs:binding.sourceBlobs,guardRunId:binding.guardRunId,buildId:meta.buildId,hostedPayloadDigest:pack.hostedPayloadDigest,bundleDigest:pack.bundleDigest,previewUrl:process.env.PREVIEW_URL,previewChannelId:process.env.PREVIEW_CHANNEL_ID,previewChannelReused:true,predecessorPreview:read('gi-preview-predecessor-identity.json'),channelExpiry:'7d',functionTarget:process.env.TARGET_FUNCTION,functionRegion:process.env.TARGET_REGION,functionProject:process.env.PROJECT_ID,functionBefore:backend.before,functionAfter:backend.after,backendReadback:backend.sourceProof,noFunctionsChanged:backend.noFunctionsChanged,changedFunctionKeys:backend.changedFunctionKeys,targetIamUnchanged:backend.iamUnchanged,liveHostingIdentity:live,liveDeployment:false,liveFunctionsDeployed:false,rulesAuthIamMutationRequested:false,businessDataWrites:0,syntheticWrites:0,newEndpoints:0,newWorkflows:0,currentCapabilityAcceptances:0,authenticatedUat:'PENDING_CREATE_EDIT_RELOAD_AUDIT_RESTORE_AND_NEGATIVE_CASES'};
           fs.writeFileSync(process.env.RUNNER_TEMP+'/gi-metas-combined-preview-result.json',JSON.stringify(result,null,2)+'\n');
           fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY,'Combined Preview result: '+result.status+'\nBackend revision before: '+String(backend.before.revision)+'\nBackend revision after: '+String(backend.after.revision)+'\nBackend source proof: '+backend.sourceProof.status+'\nAuthenticated Metas and cross-role UAT remains pending.\n');
           NODE
