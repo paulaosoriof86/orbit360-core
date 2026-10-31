@@ -191,7 +191,34 @@ console.log('B4_003_APPROVED_ROLE_SCOPE_PARITY_PASS Finance Marketing Assistant 
      assert.equal(parentSource.status,0,'Exact Metas parent writer must exist in git');
      assert.equal(parentSource.stdout.trim(),writer.beforeBlob,'Metas predecessor must match its actual parent');
      assert.notEqual(writer.beforeBlob,writer.afterBlob,'Metas successor must identify an actual source change');
-     assert.equal(writer.afterBlob,blob,'Metas successor must bind the physical writer exercised above');
+     const insurer=control.b4003InsurerActivitySourceSuccessor20261030;
+     if(insurer){
+      // A current insurer repair must extend, never rewrite, the 8bb Metas
+      // writer proof. The twelve cases above still exercise current bytes.
+      assert.equal(insurer.parentHead,'c3e922c75ec8082dfd6030be5f79b9e2fa71f778');
+      assert.equal(insurer.gate,'I6.5/B4-003');
+      assert.equal(insurer.status,'SOURCE_AND_SYNTHETIC_QA_PASS_PREVIEW_UAT_PENDING');
+      assert.equal(insurer.receiptPath,root+'I6_5_B4_003_INSURER_ACTIVITY_SOURCE_SUCCESSOR_20261030.json');
+      const insurerBytes=fs.readFileSync(insurer.receiptPath),insurerReceipt=JSON.parse(insurerBytes);
+      const insurerBlob=crypto.createHash('sha1').update(Buffer.concat([
+       Buffer.from('blob '+insurerBytes.length+'\0'),insurerBytes
+      ])).digest('hex');
+      assert.equal(insurer.receiptBlobSha,insurerBlob,'Insurer successor receipt integrity');
+      assert.equal(insurerReceipt.parentHead,insurer.parentHead);
+      assert.equal(insurerReceipt.schema,'GRAVICENTRA_I65_B4003_INSURER_ACTIVITY_SOURCE_SUCCESSOR_V1');
+      const insurerWriter=insurerReceipt.sourceFiles[proof.owner];
+      assert.equal(insurerWriter.beforeBlob,writer.afterBlob,'Preserve the exact Metas writer predecessor');
+      const insurerParent=child.spawnSync('git',['rev-parse',insurer.parentHead+':'+proof.owner],{encoding:'utf8',timeout:15000,maxBuffer:1024*1024});
+      if(insurerParent.error)throw insurerParent.error;
+      assert.equal(insurerParent.status,0);
+      assert.equal(insurerParent.stdout.trim(),insurerWriter.beforeBlob);
+      assert.equal(insurerWriter.afterBlob,blob,'Insurer successor binds the actual writer under the twelve cases');
+      for(const key of ['productionPromotionAuthorized','authIamRulesChangeAuthorized','realBusinessWritesAuthorized'])
+       assert.equal(insurer[key],false,'Insurer successor boundary: '+key);
+      for(const key of ['liveDeployment','authIamRulesChange','membershipChange','realBusinessWrites','dataImport','cleanup','findingClosed','b4003Closed','productionAccepted'])
+       assert.equal(insurerReceipt.boundaries[key],false,'Insurer receipt boundary: '+key);
+      console.log('B4_003_WRITER_INSURER_ACTIVITY_SUCCESSOR_EXACT_PARENT_CHAINED_PASS');
+     }else assert.equal(writer.afterBlob,blob,'Metas successor must bind the physical writer exercised above');
      assert.equal(metas.productionPromotionAuthorized,false);
      assert.equal(metas.authIamRulesChangeAuthorized,false);
      assert.equal(metas.realBusinessWritesAuthorized,false);

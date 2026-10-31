@@ -102,9 +102,10 @@
   function pendingBucket(collection){return pending[collection]||(pending[collection]={});}
   function expectationBucket(collection){return pendingExpected[collection]||(pendingExpected[collection]={});}
   function deletedBucket(collection){return deleted[collection]||(deleted[collection]={});}
-  function expectedPatch(input){
+  function expectedPatch(input,collection){
     var out={},src=clone(input)||{};
     Object.keys(src).forEach(function(k){
+      if(collection==='aseguradoras'&&(k==='actividad'||k==='actividadTotal'||k==='__syntheticQa'))return;
       if(k==='updatedAt'||k==='updatedByUid'||k==='updatedByEmail'||k==='createdAt'||k==='ownerUid'||k==='ownerEmail'||k==='tenantId'||k==='canonicalDocumentId'||k==='legacyDataId')return;
       out[k]=clone(src[k]);
     });
@@ -120,7 +121,8 @@
     if(expectation.kind==='update'){
       if(!row)return false;
       var patch=expectation.patch||{};
-      return Object.keys(patch).every(function(k){return sameValue(row[k],patch[k]);});
+      return Object.keys(patch).every(function(k){return sameValue(row[k],patch[k]);})&&
+        (!expectation.insurerActivityEventId||[].concat(row.actividad||[]).some(function(entry){return entry&&entry.eventId===expectation.insurerActivityEventId&&entry.serverOwned===true;}));
     }
     if(expectation.kind==='soft-remove')return !!row&&row.archivado===true;
     return false;
@@ -278,9 +280,15 @@
         return p.callFunction(previewWorkflow?WORKFLOW_PREVIEW_COMMAND:WORKFLOW_COMMAND,{tenantId:m.tenantId,activeRole:m.activeRole,operation:operation,entityId:id,payload:clone(payload)||{},reason:workflowReason(operation,prior,payload)},previewWorkflow?'us-east1':'us-central1');
       }
       var previewGeneral=isB2PreviewHost();
-      return p.callFunction(previewGeneral?GENERAL_PREVIEW_COMMAND:GENERAL_COMMAND,{tenantId:m.tenantId,activeRole:m.activeRole,mutations:[{action:action,collection:collection,id:id,payload:action==='remove'?null:clone(payload)}]},previewGeneral?'us-east1':'us-central1');
+      var mutation={action:action,collection:collection,id:id,payload:action==='remove'?null:clone(payload)};
+      if(collection==='aseguradoras'&&action!=='remove'){
+        mutation.auditReason=insurerAuditReason(payload,prior);
+        mutation.payload=insurerWritePayload(action,payload,prior);
+      }
+      return p.callFunction(previewGeneral?GENERAL_PREVIEW_COMMAND:GENERAL_COMMAND,{tenantId:m.tenantId,activeRole:m.activeRole,mutations:[mutation]},previewGeneral?'us-east1':'us-central1');
     }).then(function(result){
       if(!workflow||action==='insert')requireServerReadback(result,[{collection:collection,id:id,action:action}]);
+      if(collection==='aseguradoras'&&action!=='remove')acceptInsurerActivity(result,{collection:collection,id:id,action:action});
       if(workflow&&payload&&payload.deleted===true){
         var dr=result&&result.deleteAuditReadback||null;
         if(!dr||dr.deleted!==true||dr.eliminado!==true||dr.archivado!==true||text(dr.deleteReason)!==text(payload.deleteReason||payload.motivoEliminacion)||!text(dr.deletedAt))throw new Error('PRODUCT_WORKFLOW_DELETE_DURABLE_READBACK_REQUIRED');
@@ -315,6 +323,34 @@
     });
     return result.readback;
   }
+  function insurerAuditReason(payload,prior){
+    var incoming=payload&&Array.isArray(payload.actividad)&&payload.actividad[0];
+    var previous=prior&&Array.isArray(prior.actividad)&&prior.actividad[0];
+    return incoming&&!sameValue(incoming,previous)&&typeof incoming.motivo==='string'?incoming.motivo:'';
+  }
+  function insurerWritePayload(action,payload,prior){
+    var clean={};
+    Object.keys(payload||{}).forEach(function(key){
+      if(key==='actividad'||key==='actividadTotal'||key==='canonicalDocumentId'||key==='legacyDataId')return;
+      if(action==='update'&&key!=='__syntheticQa'&&sameValue(payload[key],prior&&prior[key]))return;
+      clean[key]=clone(payload[key]);
+    });
+    return clean;
+  }
+  function acceptInsurerActivity(result,target){
+    var readback=result&&Array.isArray(result.readback)&&result.readback.find(function(row){return row&&row.collection==='aseguradoras'&&row.id===target.id&&row.action===target.action;});
+    var proof=readback&&readback.insurerActivity;
+    if(!proof||proof.version!==1||proof.serverOwned!==true||!Array.isArray(proof.rows)||proof.rows.length>60||!Number.isInteger(proof.total)||proof.total<proof.rows.length||
+       (proof.eventId!==null&&(!text(proof.eventId)||!proof.rows.some(function(row){return row&&row.eventId===proof.eventId&&row.serverOwned===true;}))))
+      error('PRODUCT_INSURER_ACTIVITY_READBACK_REQUIRED');
+    var row=(pending.aseguradoras||{})[target.id];
+    if(row){
+      row.actividad=clone(proof.rows);row.actividadTotal=proof.total;
+      var expectation=(pendingExpected.aseguradoras||{})[target.id];
+      if(expectation&&proof.eventId)expectation.insurerActivityEventId=proof.eventId;
+    }
+    emit('aseguradoras');
+  }
   function batchDurable(mutations,options){
     options=options||{};
     if(!Array.isArray(mutations)||!mutations.length||mutations.length>80)return Promise.reject(new Error('PRODUCT_BATCH_INVALID'));
@@ -342,13 +378,18 @@
         }
         if(!['insert','update','remove'].includes(action)||!collection||!id)error('PRODUCT_BATCH_MUTATION_INVALID');
         var key=collection+'|'+id;if(seen[key])error('PRODUCT_BATCH_DUPLICATE_TARGET');seen[key]=true;
-        var prior=get(collection,id),row=null;
+        var prior=get(collection,id),row=null,auditReason;
+        if(collection==='aseguradoras'&&action!=='remove'){
+          auditReason=input.auditReason===undefined?insurerAuditReason(payload,prior):input.auditReason;
+          if(typeof auditReason!=='string')error('PRODUCT_INSURER_AUDIT_REASON_INVALID');
+          payload=insurerWritePayload(action,payload,prior);
+        }
         if(action==='insert'){if(prior)error('PRODUCT_BATCH_INSERT_ALREADY_EXISTS');row=payload||{};row.id=id;row.tenantId=text(m.tenantId);row.createdAt=row.createdAt||new Date().toISOString();row.updatedAt=new Date().toISOString();row.ownerUid=row.ownerUid||text(m.uid);row.ownerEmail=row.ownerEmail||text(m.email);scopedMutationRow(collection,row,m);authorize(collection,'insert',row);}
         else if(action==='update'){if(!prior)error('PRODUCT_BATCH_UPDATE_NOT_FOUND');row=Object.assign({},prior,payload||{},{id:id,tenantId:text(m.tenantId),updatedAt:new Date().toISOString(),updatedByUid:text(m.uid),updatedByEmail:text(m.email)});scopedMutationRow(collection,row,m);authorize(collection,'update',row);}
         else{if(!prior)error('PRODUCT_BATCH_REMOVE_NOT_FOUND');authorize(collection,'remove',prior);}
         var pb=pendingBucket(collection),eb=expectationBucket(collection),db=deletedBucket(collection);
         backups.push({collection:collection,id:id,pendingHad:Object.prototype.hasOwnProperty.call(pb,id),pendingValue:clone(pb[id]),expectationHad:Object.prototype.hasOwnProperty.call(eb,id),expectationValue:clone(eb[id]),deletedHad:Object.prototype.hasOwnProperty.call(db,id),deletedValue:db[id]});
-        prepared.push({action:action,collection:collection,id:id,row:row,prior:prior,expected:action==='insert'?{kind:'insert'}:action==='update'?{kind:'update',patch:expectedPatch(payload||{})}:null});
+        prepared.push({action:action,collection:collection,id:id,row:row,prior:prior,payload:payload,auditReason:auditReason,expected:action==='insert'?{kind:'insert'}:action==='update'?{kind:'update',patch:expectedPatch(payload||{},collection)}:null});
       });
       prepared.forEach(function(x){if(x.action==='remove'){deletedBucket(x.collection)[x.id]=true;clearPending(x.collection,x.id);}else{setPending(x.collection,x.id,x.row,x.expected);}});
       [...new Set(prepared.map(function(x){return x.collection;}))].forEach(emit);
@@ -359,13 +400,21 @@
       if(provider.browserFirestoreWriteAuthorized!==false||provider.serverWriteTransport!=='firebase-functions'||provider.noFallback!==true||typeof provider.callFunction!=='function')throw new Error('PRODUCT_WRITE_SERVER_TRANSPORT_REQUIRED');
       var requestId=text(options.requestId)||('batch_'+Date.now()+'_'+Math.random().toString(36).slice(2,8));
       var previewGeneral=isB2PreviewHost();
-      var input={tenantId:m.tenantId,activeRole:m.activeRole,requestId:requestId,mutations:prepared.map(function(x){return{action:x.action,collection:x.collection,id:x.id,payload:x.action==='remove'?null:clone(x.row)};})};
+      var input={tenantId:m.tenantId,activeRole:m.activeRole,requestId:requestId,mutations:prepared.map(function(x){
+        var mutation={action:x.action,collection:x.collection,id:x.id,payload:x.action==='remove'?null:clone(x.row)};
+        if(x.collection==='aseguradoras'&&x.action!=='remove'){
+          mutation.payload=x.action==='update'?clone(x.payload):insurerWritePayload(x.action,x.row,x.prior);
+          mutation.auditReason=x.auditReason;
+        }
+        return mutation;
+      })};
       if(metaPreviewQa)input.metaPreviewQa=metaPreviewQa;
       return provider.callFunction(previewGeneral?GENERAL_PREVIEW_COMMAND:GENERAL_COMMAND,input,previewGeneral?'us-east1':'us-central1');
     }).then(function(result){
       serverCommitted=true;
       var targets=prepared.map(function(x){return{collection:x.collection,id:x.id,action:x.action};});
       var readback=requireServerReadback(result,targets);
+      prepared.filter(function(x){return x.collection==='aseguradoras'&&x.action!=='remove';}).forEach(function(x){acceptInsurerActivity(result,x);});
       if(metaPreviewQa){
         acceptMetaPreviewResponse(result,metaPreviewQa,m,false);
         prepared.filter(function(x){return x.collection==='metas';}).forEach(function(x){clearPending(x.collection,x.id);});
@@ -396,7 +445,7 @@
     scopedMutationRow(collection,row,m);authorize(collection,'update',row);
     var optimistic=clone(row);
     if(collection==='negocios'&&text(prior.etapa)!=='emitido'&&text(row.etapa)==='emitido'&&!text(row.clienteIdCreado))optimistic.clienteIdCreado=text(row.clienteId)||SERVER_EMISSION_GUARD;
-    setPending(collection,id,optimistic,{kind:'update',patch:expectedPatch(patch||{})});emit(collection);
+    setPending(collection,id,optimistic,{kind:'update',patch:expectedPatch(patch||{},collection)});emit(collection);
     callDurable('update',collection,id,row,prior).catch(function(){});
     return clone(row);
   }
@@ -426,7 +475,7 @@
     id=text(id);if(!id)error('PRODUCT_WRITE_ID_REQUIRED');
     var prior=get(collection,id);if(!prior)error('PRODUCT_WRITE_RECORD_NOT_FOUND');
     var m=member(),row=Object.assign({},prior,clone(patch)||{},{id:id,tenantId:text(m.tenantId),updatedAt:new Date().toISOString(),updatedByUid:text(m.uid),updatedByEmail:text(m.email)});
-    scopedMutationRow(collection,row,m);authorize(collection,'update',row);setPending(collection,id,row,{kind:'update',patch:expectedPatch(patch||{})});emit(collection);
+    scopedMutationRow(collection,row,m);authorize(collection,'update',row);setPending(collection,id,row,{kind:'update',patch:expectedPatch(patch||{},collection)});emit(collection);
     return callDurable('update',collection,id,row,prior).then(function(){return clone(row);});
   }
   function removeDurable(collection,id){

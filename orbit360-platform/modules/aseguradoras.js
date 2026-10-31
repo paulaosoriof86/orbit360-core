@@ -760,10 +760,11 @@ Orbit.modules.aseguradoras = (function () {
       if (secureCount) { await persistSecureCredentialChanges(id, st); confirmedSideEffects.push('credenciales'); }
       cambios = diffResumen(before, st.draft);
       if (cambios.length) {
-        const patch = Object.assign({}, st.draft, { actividad: log(before, { cambio: 'Actualización de ficha (' + cambios.join(', ') + ')', motivo, camposCambiados: cambios }) });
-        delete patch.id;
+        // Send only the edited fields. The server owns actor/date/history and
+        // appends to its current before-image, including edits from other tabs.
+        const patch = Object.fromEntries(cambios.map(key=>[key,st.draft[key]===undefined?null:st.draft[key]]));
         if (!S().batchDurable) throw new Error('PRODUCT_INSURER_DURABLE_BATCH_MISSING');
-        await S().batchDurable([{ action: 'update', collection: 'aseguradoras', id, payload: patch }], { requestId: 'asg_edit_' + id + '_' + Date.now().toString(36), timeoutMs: 20000 });
+        await S().batchDurable([{ action: 'update', collection: 'aseguradoras', id, payload: patch, auditReason: motivo }], { requestId: 'asg_edit_' + id + '_' + Date.now().toString(36), timeoutMs: 20000 });
         const driveProvider=Orbit.productDriveDocumentProviderP0;
         if(driveProvider&&typeof driveProvider.pendingDocument==='function'&&typeof driveProvider.finalize==='function'){
           for(const req of [].concat(st.draft.docsRequeridos||[])){
@@ -1162,6 +1163,7 @@ Orbit.modules.aseguradoras = (function () {
     return `<div class="asg-sec insurer-knowledge-section" data-knowledge-order="7-activity">
       <div class="asg-sec-t">🕒 Actividad y auditoría</div>
       <div class="cfg-note" style="margin-bottom:9px"><b>Qué ocurrió y quién lo hizo:</b> aquí se registran cambios de la ficha y acciones documentales que modifican información. Consultar un archivo no crea una actividad nueva.</div>
+      ${Number(a.actividadTotal)>hist.length?'<div class="muted" style="margin-bottom:9px">Se muestran los últimos '+hist.length+' cambios de la ficha. El historial anterior se conserva.</div>':''}
       ${rows.length ? rows.map(h => {const type=h.kind==='fuente'?'Documento':'Ficha',icon=h.kind==='fuente'?'📄':'✏️',tone=h.kind==='fuente'?'info':'neutral';const changed=[].concat(h.camposCambiados||[]).map(humanScope).filter(Boolean);return `<div class="insurer-activity-row ${h.kind==='fuente'?'documental':''}"><div class="insurer-activity-head"><span class="insurer-activity-icon">${icon}</span><b>${U.esc(humanScope(h.cambio||'Actualización'))}</b><span class="badge ${tone}">${type}</span><span class="muted insurer-activity-time">${h.fecha ? new Date(h.fecha).toLocaleString('es-GT') : 'Fecha no registrada'}</span></div><div class="muted">Hecho por: ${U.esc(humanScope(h.responsable||'Equipo'))}</div>${h.motivo ? '<div class="muted">Documento / motivo: ' + U.esc(humanScope(h.motivo)) + '</div>' : ''}${changed.length ? '<div class="muted">Se actualizó: ' + changed.map(U.esc).join(' · ') + '</div>' : ''}</div>`;}).join('') : '<div class="muted" style="font-size:12px">Sin actividad registrada.</div>'}
     </div>`;
   }

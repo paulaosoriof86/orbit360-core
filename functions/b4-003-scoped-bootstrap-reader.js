@@ -94,6 +94,30 @@ const sanitize=(v,depth=0)=>{
  }
  return v;
 };
+// Activity is a display projection, not an editable snapshot of the insurer.
+// Keep legacy dates when verifiable; never invent one for an undated event.
+function projectInsurerActivity(value){
+ const history=Array.isArray(value)?value:[];
+ const scalar=(v,max)=>typeof v==='string'?v.replace(/\u0000/g,'').slice(0,max):'';
+ const date=v=>{
+  if(v==null||v==='')return '';
+  try{
+   const ms=typeof v?.toMillis==='function'?v.toMillis():
+    typeof v?.toDate==='function'?v.toDate().getTime():
+    typeof v==='object'&&Number.isFinite(v._seconds??v.seconds)?Number(v._seconds??v.seconds)*1000:
+    typeof v==='string'||typeof v==='number'?new Date(v).getTime():NaN;
+   return Number.isFinite(ms)?new Date(ms).toISOString():'';
+  }catch(_error){return '';}
+ };
+ const rows=history.filter(row=>row&&typeof row==='object'&&!Array.isArray(row)).slice(0,60).map(row=>{
+  const out={fecha:date(row.fecha),responsable:scalar(row.responsable,500),cambio:scalar(row.cambio,2000),motivo:scalar(row.motivo,2000),
+   camposCambiados:(Array.isArray(row.camposCambiados)?row.camposCambiados:[]).filter(x=>typeof x==='string').slice(0,100).map(x=>scalar(x,120))};
+  if(typeof row.eventId==='string')out.eventId=scalar(row.eventId,180);
+  if(row.serverOwned===true)out.serverOwned=true;
+  return out;
+ });
+ return {rows,total:history.length};
+}
 const viewDirectory=(coll,row,id,country,tenantId)=>{
  const base={id,canonicalDocumentId:id,tenantId,pais:country};
  if(coll==='asesores')return Object.assign(sanitize(pick(row,['nombre','displayName','name','activo','active','inactivo','estado','status','paises','countries','paisDefault','countryDefault','teamId','equipoId','roles','rol','rolDefault','tipo','metaPrima','metaRecaudo','email','telefono','tel','cargo','color','foto','avatar','scopeDatos','dataScopes','modulosExtra','modulosRestringidos','modulesExtra','modulesRestricted','comModo','shareCom','comValor','accessProvisioned','invitacionEstado','authUid','uid','userId','equipoAsesorIds'])),base);
@@ -108,6 +132,8 @@ const viewDirectory=(coll,row,id,country,tenantId)=>{
   if(Array.isArray(row[key]))a[key]=row[key].map(x=>pick(x,keys));
   else if(key==='facturacion'&&row[key]&&typeof row[key]==='object')a[key]=pick(row[key],keys);
  }
+ const activity=projectInsurerActivity(row.actividad);
+ a.actividad=activity.rows;a.actividadTotal=activity.total;
  return Object.assign(sanitize(a),base);
 };
 async function readProtectedDirectory({db,auth,request}){
@@ -157,4 +183,4 @@ async function readProtectedDirectory({db,auth,request}){
    vaultCredentialTransport:'separate_authorized_provider',boundedScan:true};
 }
 
-module.exports={readBootstrap,readProtectedDirectory};
+module.exports={readBootstrap,readProtectedDirectory,projectInsurerActivity};

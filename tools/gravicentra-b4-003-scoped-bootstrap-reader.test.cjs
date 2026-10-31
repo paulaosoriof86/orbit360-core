@@ -69,6 +69,7 @@ async function denied(fn,code){let e;try{await fn()}catch(err){e=err}
  const directories={
   aseguradoras:[
    {id:'insGT',tenantId,pais:'GT',nombre:'Aseguradora GT',password:'SECRET_TOP',
+    actividad:[{fecha:'2026-10-30T12:00:00Z',responsable:'Actor de prueba · Operativo',cambio:'Actualización de ficha (observaciones)',motivo:'QA',camposCambiados:['observaciones'],actorUid:'DO_NOT_RETURN_UID',actorEmail:'DO_NOT_RETURN_EMAIL',before:{password:'SECRET_AUDIT_BEFORE'},after:{privateKey:'SECRET_AUDIT_AFTER'},eventId:'insact_synthetic',serverOwned:true}],
     portales:[{id:'p1',nombre:'Portal',usuario:'operador',password:'SECRET_PORTAL',credentialRef:'cred_sample'}],
     cuentas:[{banco:'Banco',tipo:'Monetaria',numero:'001122',moneda:'GTQ'}]},
    {id:'insCO',tenantId,pais:'CO',nombre:'Aseguradora CO'}],
@@ -104,6 +105,8 @@ async function denied(fn,code){let e;try{await fn()}catch(err){e=err}
  assert.equal(gt.rows[0].portales[0].credentialRef,'cred_sample');directoryChecks++;
  assert.equal(gt.rows[0].cuentas[0].numero,'001122');directoryChecks++;
  assert.equal(JSON.stringify(gt).includes('SECRET_'),false);directoryChecks++;
+ assert.equal(gt.rows[0].actividad.length,1);assert.equal(gt.rows[0].actividad[0].fecha,'2026-10-30T12:00:00.000Z');assert.equal(gt.rows[0].actividad[0].responsable,'Actor de prueba · Operativo');assert.equal(gt.rows[0].actividadTotal,1);directoryChecks++;
+ assert.equal(JSON.stringify(gt).includes('DO_NOT_RETURN'),false);assert.deepEqual(gt.rows[0].actividad[0].camposCambiados,['observaciones']);directoryChecks++;
  await denied(()=>dir('aseguradoras','GT','Asesor'),'DIRECTORY_DENIED');directoryChecks++;
  const one=await dir('asesores','GT','Admin',{pageSize:1});
  assert.deepEqual(one.rows.map(x=>x.id),['a1']);assert.equal(one.nextCursor,'a1');directoryChecks++;

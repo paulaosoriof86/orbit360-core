@@ -22,7 +22,7 @@ async function scenario({host,collection='aseguradoras',id=qaId,action='update',
       if(host.includes('--gi-') && (!/(?:^|_)(?:b3004qa|b4003qa)_[A-Za-z0-9._:-]+$/i.test(mutation.id)||mutation.payload?.__syntheticQa!==true)){
         const e=new Error('Preview requires synthetic marker');e.code='permission-denied';throw e;
       }
-      return {canonicalReadback:true,canonicalReadbackCount:1,readback:[{collection:mutation.collection,id:mutation.id,action:mutation.action,exists:mutation.action!=='remove'}]};
+      return {canonicalReadback:true,canonicalReadbackCount:1,readback:[{collection:mutation.collection,id:mutation.id,action:mutation.action,exists:mutation.action!=='remove',...(mutation.collection==='aseguradoras'&&mutation.action!=='remove'?{insurerActivity:{version:1,serverOwned:true,eventId:null,rows:[],total:0}}:{})}]};
     }
   };
   const window={Orbit:{auth:{productUser:member},session:{rol:()=>role},

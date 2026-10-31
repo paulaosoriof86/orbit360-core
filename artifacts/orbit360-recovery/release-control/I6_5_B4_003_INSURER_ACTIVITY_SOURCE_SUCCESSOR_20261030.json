@@ -1,0 +1,199 @@
+{
+  "schema": "GRAVICENTRA_I65_B4003_INSURER_ACTIVITY_SOURCE_SUCCESSOR_V1",
+  "status": "SOURCE_AND_SYNTHETIC_QA_PASS_PREVIEW_UAT_PENDING",
+  "gate": "I6.5/B4-003",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "parentHead": "c3e922c75ec8082dfd6030be5f79b9e2fa71f778",
+  "findingId": "B4-003-R18-14-INSURER-ACTIVITY-KNOWLEDGE-EVENT-CONVERGENCE",
+  "scope": "INSURER_OBSERVATIONS_AUDIT_PRESERVATION_AND_RELOAD_PROJECTION_ONLY",
+  "authority": "PAULA_AUTHORIZED_CONTINUE_CAUSAL_REPAIR_EXISTING_GITHUB_BRANCH_AND_LAB_PREVIEW_20261030",
+  "recordedAtUtc": "2026-10-31T00:06:05.770539+00:00",
+  "atomicCommitPaths": [
+    "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json",
+    "artifacts/orbit360-recovery/release-control/I6_5_B4_003_INSURER_ACTIVITY_CURRENT_COMPOSITION_20261030.json",
+    "artifacts/orbit360-recovery/release-control/I6_5_B4_003_INSURER_ACTIVITY_SOURCE_SUCCESSOR_20261030.json",
+    "functions/b4-003-scoped-bootstrap-reader.js",
+    "functions/product-operational-domain.js",
+    "orbit360-platform/data/store-firestore-product-operational-p0.js",
+    "orbit360-platform/modules/aseguradoras.js",
+    "tools/gravicentra-b4-003-insurer-activity-audit.test.cjs",
+    "tools/gravicentra-b4-003-insurer-activity-successor.mjs",
+    "tools/gravicentra-b4-003-insurer-activity-successor.test.mjs",
+    "tools/gravicentra-b4-003-insurer-preview-projection.test.cjs",
+    "tools/gravicentra-b4-003-scoped-bootstrap-reader.test.cjs",
+    "tools/gravicentra-b4-003-scoped-boundary.test.cjs",
+    "tools/gravicentra-i6-control-plane-guard-v1.mjs"
+  ],
+  "sourceFiles": {
+    "functions/b4-003-scoped-bootstrap-reader.js": {
+      "beforeBlob": "356d36e0679a5e499c05632a981b9ef3f1ffb9ec",
+      "afterBlob": "9d71b82fd972590a6bbac21e43406734861d6687",
+      "causalFinding": "Bounded non-sensitive insurer activity projection and event identity survive authenticated reload."
+    },
+    "functions/product-operational-domain.js": {
+      "beforeBlob": "f9fa8132c63b7099a4a72ff1df389f5fb5813d18",
+      "afterBlob": "0b84555fd0918735f9fc4dc9bbe594a908437eeb",
+      "causalFinding": "Canonical server-owned insurer audit event, append/preserve existing history, trusted actor/time and stale-write protection."
+    },
+    "orbit360-platform/data/store-firestore-product-operational-p0.js": {
+      "beforeBlob": "b4ccd50b38ae095f2e9aa894c6992a9e36261545",
+      "afterBlob": "97d8316df21a79bac6c3f75802eef3d1551b42bf",
+      "causalFinding": "Preserve existing synthetic Preview boundary and send reason and server-confirmed audit receipt through the canonical operational facade."
+    },
+    "orbit360-platform/modules/aseguradoras.js": {
+      "beforeBlob": "018ed999cbcf4d621c84c36c081cb455b1a01fb6",
+      "afterBlob": "09be1762fc5392cc4daba8ad963f4b9ae7ba4db1",
+      "causalFinding": "Send a reason and server audit contract through the existing durable editor without client-owned audit overwrite."
+    }
+  },
+  "regressionTests": {
+    "tools/gravicentra-b4-003-insurer-activity-audit.test.cjs": {
+      "beforeBlob": null,
+      "afterBlob": "8836d5a0787ed651d4f257641f8f4c8ac7da2e9d",
+      "syntheticOnly": true,
+      "externalRequests": 0,
+      "tests": 29,
+      "passed": 29
+    },
+    "tools/gravicentra-b4-003-insurer-preview-projection.test.cjs": {
+      "beforeBlob": "02edb6b02f7a88a705dba5c9b6d0adca838a790d",
+      "afterBlob": "008fd1df8ab8e934cc616f405d0b5986267a9c99",
+      "syntheticOnly": true,
+      "externalRequests": 0,
+      "tests": 5,
+      "passed": 5
+    },
+    "tools/gravicentra-b4-003-scoped-bootstrap-reader.test.cjs": {
+      "beforeBlob": "bd6bc37c4e7785475392f216709f7bc8424aea9e",
+      "afterBlob": "81409ef4a19e985ee9621e213398bcb3ac6ce782",
+      "syntheticOnly": true,
+      "externalRequests": 0,
+      "tests": 47,
+      "passed": 47
+    },
+    "tools/gravicentra-b4-003-scoped-boundary.test.cjs": {
+      "beforeBlob": "ad2dcd823f579df223c9048490125bb4c410efb0",
+      "afterBlob": "0b30cc139ef3c842c1989ae811bfab597eb85ed7",
+      "syntheticOnly": true,
+      "externalRequests": 0,
+      "tests": 12,
+      "passed": 12
+    }
+  },
+  "governanceSources": {
+    "guard": {
+      "path": "tools/gravicentra-i6-control-plane-guard-v1.mjs",
+      "blobSha": "46355685181589c49ab056e723250bae8232a72f",
+      "beforeBlobSha": "ba65d33c9a53de764d34b1e96d24f9fd4c84c069"
+    },
+    "validator": {
+      "path": "tools/gravicentra-b4-003-insurer-activity-successor.mjs",
+      "blobSha": "9b7d5281b9f765dc57c4fc8a77bad272005dcd8d",
+      "beforeBlobSha": null
+    },
+    "test": {
+      "path": "tools/gravicentra-b4-003-insurer-activity-successor.test.mjs",
+      "blobSha": "c62f243e28c9f289aa33ead5928be93dc801709e",
+      "beforeBlobSha": null
+    }
+  },
+  "composition": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_INSURER_ACTIVITY_CURRENT_COMPOSITION_20261030.json",
+    "blobSha": "bcb79e7b7af565e63bf2dc646401a9c380d92b97",
+    "fullCurrentProductMap": true,
+    "historicalCompositionUnchanged": true
+  },
+  "requiredCurrentRegressions": [
+    "tools/gravicentra-b4-003-before-image-regression.test.cjs",
+    "tools/gravicentra-b4-003-insurer-activity-audit.test.cjs",
+    "tools/gravicentra-b4-003-insurer-activity-successor.test.mjs",
+    "tools/gravicentra-b4-003-insurer-preview-projection.test.cjs",
+    "tools/gravicentra-b4-003-metas-atomic-ui.test.cjs",
+    "tools/gravicentra-b4-003-metas-preview-projection.test.cjs",
+    "tools/gravicentra-b4-003-metas-preview-session.test.cjs",
+    "tools/gravicentra-b4-003-metas-ui-diagnostic.test.cjs",
+    "tools/gravicentra-b4-003-operational-write-security-regression.test.cjs",
+    "tools/gravicentra-b4-003-scoped-bootstrap-reader.test.cjs",
+    "tools/gravicentra-b4-003-scoped-boundary.test.cjs"
+  ],
+  "historicalProof": {
+    "parentHead": "c3e922c75ec8082dfd6030be5f79b9e2fa71f778",
+    "parentGuardBlobSha": "ba65d33c9a53de764d34b1e96d24f9fd4c84c069",
+    "execution": "EXACT_IMMUTABLE_PARENT_WORKTREE_FULL_GUARD_THEN_CURRENT_SOURCE_REGRESSIONS",
+    "currentSourceNotSubstitutedIntoHistoricReceipts": true,
+    "guardBodyUnchanged": true
+  },
+  "previewTransport": {
+    "workflowPath": ".github/workflows/gravicentra-b4-003-cumulative-safe-read-preview-20261029.yml",
+    "transportWorkflowAfterBlob": "e66c12344eeb07189d85cafe3a3db2da20b7530b",
+    "reuseExistingChannel": true,
+    "hostingChannelId": "gi-i65-b4-sr-41066435386",
+    "expectedPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b4-sr-41066435386-r09pl1ti.web.app",
+    "predecessorSourceSha": "a6e403119d9fc05b633e84f2eaa8f50c32ba12d9",
+    "predecessorBuildId": "gi-i65-b4-a6e403119d9f-57f234755dc1",
+    "targetFunctions": [
+      {
+        "name": "orbit360ProductOperationalCommandPreview",
+        "region": "us-east1"
+      },
+      {
+        "name": "orbit360ScopedPolicyReadPreview",
+        "region": "us-east1"
+      }
+    ],
+    "project": "ays-orbit-360-lab",
+    "backendStage": "IMMUTABLE_EXISTING_PREVIEW_PACKAGE_BUILDER",
+    "builderPath": "tools/gravicentra-i6-1-preview-package.mjs",
+    "builderBlobSha": "245ca9140941d93c069f9229b0e9c82364eeff2f",
+    "newFunctionsAuthorized": false,
+    "deterministicBuilderTransform": "Existing scoped Preview callable bootstrap export and existing five private academy package files only; exact stage readback required for both targets."
+  },
+  "allowedEvidenceSuccessor": {
+    "controlKey": "b4003InsurerActivityPreviewEvidence20261030",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_INSURER_ACTIVITY_PREVIEW_EVIDENCE_20261030.json",
+    "exactChangedPaths": [
+      "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json",
+      "artifacts/orbit360-recovery/release-control/I6_5_B4_003_INSURER_ACTIVITY_PREVIEW_EVIDENCE_20261030.json"
+    ],
+    "directChildOfExactTransport": true,
+    "sourceControlKeysPreserved": 420,
+    "priorSourceAndGovernanceBytesImmutable": true,
+    "fullFindingClosureAuthorized": false
+  },
+  "boundaries": {
+    "existingLabPreviewOnly": true,
+    "syntheticQaWithRestorationOnly": true,
+    "liveDeployment": false,
+    "authIamRulesChange": false,
+    "membershipChange": false,
+    "realBusinessWrites": false,
+    "dataImport": false,
+    "cleanup": false,
+    "newEndpoints": false,
+    "newWorkflows": false,
+    "newCollections": false,
+    "findingClosed": false,
+    "b4003Closed": false,
+    "paulaVisualAccepted": false,
+    "productionAccepted": false
+  },
+  "preserved": {
+    "priorControlKeys": 419,
+    "findings": 295,
+    "priorityP0Resolved": 1,
+    "priorityP0Open": 5,
+    "metasFunctionalClosureUnchanged": true,
+    "formalI6Percent": 50,
+    "overallImplementationPercent": null,
+    "ownerTemporaryRulesRiskExceptionUnchanged": true,
+    "priorReceiptBytesUnchanged": true
+  },
+  "causalEvidence": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CARLOS_INSURER_EDIT_RESTORE_UAT_20261030.json",
+    "blobSha": "bd918367ce7db0d9da0771140509b2fd0e0fccf9",
+    "observed": "Observations persist and restore; inline activity absent after reload. Reader omitted actividad; client-origin overwrite risk.",
+    "historicDataLossAsserted": false,
+    "broaderDocumentaryLifecycleCriterionStillOpen": true
+  }
+}

@@ -16876,5 +16876,37 @@
       "productionAccepted": false,
       "existingRulesRiskExceptionUnchanged": true
     }
+  },
+  "b4003InsurerActivitySourceSuccessor20261030": {
+    "schema": "GRAVICENTRA_I65_B4003_INSURER_ACTIVITY_SOURCE_POINTER_V1",
+    "status": "SOURCE_AND_SYNTHETIC_QA_PASS_PREVIEW_UAT_PENDING",
+    "gate": "I6.5/B4-003",
+    "parentHead": "c3e922c75ec8082dfd6030be5f79b9e2fa71f778",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_INSURER_ACTIVITY_SOURCE_SUCCESSOR_20261030.json",
+    "receiptBlobSha": "5d1750e260b50f9bfbd213235cd110683298d514",
+    "compositionPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_INSURER_ACTIVITY_CURRENT_COMPOSITION_20261030.json",
+    "compositionBlobSha": "bcb79e7b7af565e63bf2dc646401a9c380d92b97",
+    "atomicCommitPaths": [
+      "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json",
+      "artifacts/orbit360-recovery/release-control/I6_5_B4_003_INSURER_ACTIVITY_CURRENT_COMPOSITION_20261030.json",
+      "artifacts/orbit360-recovery/release-control/I6_5_B4_003_INSURER_ACTIVITY_SOURCE_SUCCESSOR_20261030.json",
+      "functions/b4-003-scoped-bootstrap-reader.js",
+      "functions/product-operational-domain.js",
+      "orbit360-platform/data/store-firestore-product-operational-p0.js",
+      "orbit360-platform/modules/aseguradoras.js",
+      "tools/gravicentra-b4-003-insurer-activity-audit.test.cjs",
+      "tools/gravicentra-b4-003-insurer-activity-successor.mjs",
+      "tools/gravicentra-b4-003-insurer-activity-successor.test.mjs",
+      "tools/gravicentra-b4-003-insurer-preview-projection.test.cjs",
+      "tools/gravicentra-b4-003-scoped-bootstrap-reader.test.cjs",
+      "tools/gravicentra-b4-003-scoped-boundary.test.cjs",
+      "tools/gravicentra-i6-control-plane-guard-v1.mjs"
+    ],
+    "previewAuthorizedAfterGuardAndRegressionPass": true,
+    "backendDeploymentAuthorized": true,
+    "authIamRulesChangeAuthorized": false,
+    "productionPromotionAuthorized": false,
+    "realBusinessWritesAuthorized": false,
+    "currentCapabilityAcceptances": 0
   }
 }

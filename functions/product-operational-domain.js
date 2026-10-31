@@ -6,6 +6,7 @@ const { getFirestore, FieldValue } = require('firebase-admin/firestore');
 const { getStorage } = require('firebase-admin/storage');
 const { HttpsError, onCall } = require('firebase-functions/v2/https');
 const { resolveProductActiveRole } = require('./product-active-role-contract');
+const { projectInsurerActivity } = require('./b4-003-scoped-bootstrap-reader');
 
 const REGION = process.env.ORBIT360_FUNCTIONS_REGION || 'us-central1';
 const PREVIEW_REGION = 'us-east1';
@@ -451,9 +452,58 @@ function normalizeMutation(raw, allowMetaFixtureRemove = false) {
   const id = cleanId(mutation.id || mutation.payload && mutation.payload.id, 'documentId');
   const payload = mutation.payload && typeof mutation.payload === 'object' ? stable(mutation.payload) : null;
   if (action !== 'remove' && !payload) throw new HttpsError('invalid-argument', 'Payload requerido.');
+  let auditReason;
+  if(mutation.auditReason!==undefined&&collection!=='aseguradoras')throw new HttpsError('invalid-argument','El motivo de aseguradoras no corresponde a esta colección.');
+  if(collection==='aseguradoras'&&action!=='remove'){
+    if(mutation.auditReason!==undefined&&typeof mutation.auditReason!=='string')throw new HttpsError('invalid-argument','Motivo de cambio inválido.');
+    const legacyReason=Array.isArray(payload.actividad)&&typeof payload.actividad[0]?.motivo==='string'?payload.actividad[0].motivo:'';
+    auditReason=text(mutation.auditReason===undefined?legacyReason:mutation.auditReason,2000);
+    // A stale or forged client history can never replace the transaction's
+    // canonical history. Display counts are read-only projection metadata.
+    delete payload.actividad;delete payload.actividadTotal;
+  }
   const secret = containsSecret(payload);
   if (secret) throw new HttpsError('failed-precondition', `Material secreto no permitido en dato operativo: ${secret}`);
-  return { action, collection, id, payload };
+  return Object.assign({ action, collection, id, payload },auditReason===undefined?{}:{auditReason});
+}
+
+const INSURER_ACTIVITY_SCHEMA='gravicentra-insurer-activity-v1';
+const INSURER_AUDIT_METADATA=new Set(['id','tenantId','canonicalDocumentId','legacyDataId','createdAt','createdByUid','updatedAt','updatedByUid','updatedByEmail','ownerUid','ownerEmail','actividad','actividadTotal']);
+function humanInsurerActorName(value,actor,advisorId){
+  if(typeof value!=='string')return '';
+  const name=text(value,220);
+  if(!name||name.includes('@')||name===actor.uid||name===advisorId||/^(?:admin|admintenant|superadmin|direccion|operativo|asesor|comercial|unknown|undefined|uid[:_-].*)$/i.test(norm(name)))return '';
+  return name;
+}
+async function insurerActivityActor(tx,tenantId,actor,auth){
+  // Same approved display authority/order as product-ops-leads-domain:
+  // membership -> canonical linked advisor -> verified authentication name.
+  // Read only this actor's declared advisor, in the transaction's read phase.
+  const advisorId=text(actor.member.advisorId||actor.member.asesorId,180);
+  const human=value=>humanInsurerActorName(value,actor,advisorId);
+  let name=human(actor.member.nombre)||human(actor.member.displayName)||human(actor.member.name),source='membership';
+  if(!name&&ID_RE.test(advisorId)){
+    const snap=await tx.get(canonicalRef(tenantId,'asesores',advisorId));
+    if(snap.exists){
+      const row=snap.data()||{},linkedUid=text(row.authUid||row.uid||row.userId,180);
+      if((!row.tenantId||row.tenantId===tenantId)&&(!row.id||row.id===advisorId)&&(!linkedUid||linkedUid===actor.uid)){
+        name=human(row.nombre)||human(row.displayName)||human(row.name);source='canonical-advisor';
+      }
+    }
+  }
+  if(!name){name=human(auth?.token?.name);source='authenticated-token';}
+  if(!name){name='Usuario autorizado';source='unresolved';}
+  return Object.assign({},actor,{activityName:name,activityNameSource:source});
+}
+function insurerActivityEntry(mutation,before,actor,eventId,fecha){
+  if(before?.actividad!=null&&!Array.isArray(before.actividad))throw new HttpsError('failed-precondition','El historial canónico requiere revisión antes de guardar.');
+  const changes=Object.keys(mutation.payload||{}).filter(key=>!INSURER_AUDIT_METADATA.has(key)&&!key.startsWith('__')&&
+    JSON.stringify(stable(before?.[key]))!==JSON.stringify(stable(mutation.payload[key]))).sort();
+  if(mutation.action==='update'&&!changes.length)return null;
+  return {schemaVersion:INSURER_ACTIVITY_SCHEMA,eventId:'insact_'+sha(eventId+'|'+mutation.id).slice(0,32),fecha,
+    responsable:actor.activityName+' · '+text(actor.activeRole,100),actorNameSource:actor.activityNameSource,
+    cambio:mutation.action==='insert'?'Aseguradora creada':'Actualización de ficha ('+changes.join(', ')+')',
+    motivo:mutation.auditReason||'',camposCambiados:changes,actorUid:actor.uid,activeRole:actor.activeRole,serverOwned:true};
 }
 
 function mutationPayloadMatches(actual,payload){
@@ -469,6 +519,8 @@ async function execute(request, metaPreviewContext = null) {
     throw new HttpsError('permission-denied','El modo de prueba de metas está reservado al comando Preview.');
   const mutations = [].concat(input.mutations || []).map(m=>normalizeMutation(m,metaPreviewContext?.operation==='restore'));
   if (!mutations.length || mutations.length > 80) throw new HttpsError('invalid-argument', 'Lote operativo inválido.');
+  const insurerMutations=mutations.filter(m=>m.collection==='aseguradoras');
+  if(new Set(insurerMutations.map(m=>m.id)).size!==insurerMutations.length)throw new HttpsError('invalid-argument','Una aseguradora solo puede cambiar una vez por lote.');
   const actor = await authorize(request, tenantId, mutations);
   if(metaPreviewContext)requireMetaPreviewActor(actor,metaPreviewContext);
   const payloadDigest = digest(metaPreviewContext?{mutations,metaPreviewContext}:mutations);
@@ -476,6 +528,7 @@ async function execute(request, metaPreviewContext = null) {
   if(requestId.startsWith('qa_metas_'))throw new HttpsError('invalid-argument','Identificador reservado para sesión de prueba.');
   const reqRef = requestRef(tenantId, requestId);
   const eventId = `opevt_${sha(`${tenantId}|${requestId}`).slice(0, 28)}`;
+  const insurerActivityDate=new Date().toISOString();
   const metaSessionRef=metaPreviewContext?metaSessionRefFor(tenantId,metaPreviewContext.runId):null;
   const metaActorRef=metaPreviewContext?metaActorRefFor(tenantId,actor.uid,metaPreviewContext.pais):null;
 
@@ -484,6 +537,8 @@ async function execute(request, metaPreviewContext = null) {
     if (previous.exists) {
       const row = previous.data() || {};
       if (row.payloadDigest !== payloadDigest) throw new HttpsError('already-exists', 'El requestId corresponde a otro contenido.');
+      if(insurerMutations.length&&(row.insurerActor?.uid!==actor.uid||row.insurerActor?.activeRole!==actor.activeRole))
+        throw new HttpsError('permission-denied','El recibo de aseguradora pertenece a otro actor o rol activo.');
       if(metaPreviewContext&&(row.result?.metaPreviewQa?.actorUid!==actor.uid||row.result?.metaPreviewQa?.activeRole!==actor.activeRole))
         throw new HttpsError('permission-denied','El recibo de prueba pertenece a otro actor o rol activo.');
       if (row.status === 'committed') return Object.assign({ reused: true }, row.result || {});
@@ -498,6 +553,7 @@ async function execute(request, metaPreviewContext = null) {
       if(pointer.status==='active'&&pointer.runId!==metaPreviewContext.runId)
         throw new HttpsError('failed-precondition','Restaura la prueba activa de este país antes de iniciar otra.');
     }
+    const insurerActor=insurerMutations.some(m=>m.action!=='remove')?await insurerActivityActor(tx,tenantId,actor,request.auth):actor;
     const reads = [];
     for (const mutation of mutations) {
       const ref = canonicalRef(tenantId, mutation.collection, mutation.id);
@@ -516,6 +572,7 @@ async function execute(request, metaPreviewContext = null) {
       reads.push({ mutation, ref, snap, parents, linkedMemberRef, linkedMemberSnap });
     }
 
+    const insurerActivityEvents=[],insurerActivities=[];
     const metaProof=metaPreviewContext?validateMetaPreviewSession(metaPreviewContext,actor,metaSessionSnap?.exists?metaSessionSnap.data():null,reads,tenantId):null;
     for (const item of reads) {
       const { mutation, ref, snap, parents, linkedMemberRef, linkedMemberSnap } = item;
@@ -546,6 +603,14 @@ async function execute(request, metaPreviewContext = null) {
         row.createdAt = row.createdAt || now();
         row.createdByUid = metaProof?actor.uid:(row.createdByUid || actor.uid);
       }
+      if(mutation.collection==='aseguradoras'){
+        const entry=insurerActivityEntry(mutation,before,insurerActor,eventId,insurerActivityDate);
+        // No slice: existing canonical entries survive stale tabs and every
+        // subsequent edit. The bounded directory projection is separate.
+        row.actividad=entry?[entry,...(before?.actividad||[])]:before?.actividad||[];
+        insurerActivityEvents.push({id:mutation.id,eventId:entry?.eventId||null,entryDigest:entry?digest(entry):null});
+        if(entry)insurerActivities.push({entityId:mutation.id,entry});
+      }
       if(metaProof&&mutation.collection==='auditoria')row.__metasPreviewEvidence={runId:metaPreviewContext.runId,operation:metaPreviewContext.operation,actorUid:actor.uid,activeRole:actor.activeRole,changes:metaProof.changes,serverVerified:true};
       tx.set(ref, row, { merge: mutation.action === 'update' });
       if (mutation.collection === 'asesores' && linkedMemberRef) {
@@ -557,12 +622,13 @@ async function execute(request, metaPreviewContext = null) {
     }
 
     const result = { ok: true, requestId, eventId, mutationCount: mutations.length, collections: unique(mutations.map(m => m.collection)), writePath: 'tenants/{tenant}/data/{collection}/items', serverOwned: true };
+    if(insurerMutations.length)result.insurerActivityEvents=insurerActivityEvents;
     if(metaProof){
       tx.set(metaSessionRef,Object.assign({},metaProof.session,{updatedAt:now(),lastRequestId:requestId,lastAuditId:metaPreviewContext.auditId}),{merge:false});
       tx.set(metaActorRef,{schemaVersion:META_QA_SESSION_SCHEMA,actorUid:actor.uid,activeRole:actor.activeRole,runId:metaPreviewContext.runId,pais:metaPreviewContext.pais,periodo:META_QA_PERIOD,status:metaProof.session.status,updatedAt:now()},{merge:false});
       result.metaPreviewQa={version:1,contractVersion:META_QA_SESSION_SCHEMA,runId:metaPreviewContext.runId,status:metaProof.session.status,actorUid:actor.uid,activeRole:actor.activeRole,pais:metaPreviewContext.pais,periodo:metaPreviewContext.periodo,fixtureIds:Object.keys(metaProof.session.fixtures).sort(),originalAbsenceVerified:true,restoreSupported:true};
     }
-    tx.set(eventRef(tenantId, eventId), {
+    tx.set(eventRef(tenantId, eventId), Object.assign({
       schemaVersion: VERSION,
       tenantId,
       eventId,
@@ -574,8 +640,9 @@ async function execute(request, metaPreviewContext = null) {
       collections: result.collections,
       createdAt: now(),
       containsSecrets: false
-    });
-    tx.set(reqRef, { status: 'committed', payloadDigest, result, committedAt: now() }, { merge: true });
+    },insurerActivities.length?{insurerActivities}:{}));
+    tx.set(reqRef, Object.assign({ status: 'committed', payloadDigest, result, committedAt: now() },
+      insurerMutations.length?{insurerActor:{uid:actor.uid,activeRole:actor.activeRole}}:{}), { merge: true });
     return result;
   });
 
@@ -591,7 +658,17 @@ async function execute(request, metaPreviewContext = null) {
     const actual=snap.data()||{};
     if(!mutationPayloadMatches(actual,mutation.payload))throw new HttpsError('internal',`Canonical readback mismatch for ${mutation.collection}/${mutation.id}.`);
     if(metaPreviewContext&&mutation.collection==='metas')metaFixtures.push(actual);
-    readback.push({collection:mutation.collection,id:mutation.id,action:mutation.action,exists:true});
+    const proof={collection:mutation.collection,id:mutation.id,action:mutation.action,exists:true};
+    if(mutation.collection==='aseguradoras'){
+      const binding=committed.insurerActivityEvents?.find(item=>item.id===mutation.id);
+      if(!binding)throw new HttpsError('internal','Falta el recibo canónico de actividad.');
+      if(binding.eventId){
+        const entry=(Array.isArray(actual.actividad)?actual.actividad:[]).find(item=>item?.eventId===binding.eventId);
+        if(!entry||digest(entry)!==binding.entryDigest)throw new HttpsError('internal','La actividad no coincide con el commit canónico.');
+      }
+      proof.insurerActivity=Object.assign({version:1,serverOwned:true,eventId:binding.eventId},projectInsurerActivity(actual.actividad));
+    }
+    readback.push(proof);
   }
   const response=Object.assign({},committed,{canonicalReadback:true,canonicalReadbackCount:readback.length,readback});
   if(metaPreviewContext)response.metaPreviewQa=Object.assign({},committed.metaPreviewQa,{fixtures:metaFixtures});

@@ -1,3 +1,6 @@
+import {runInsurerActivitySuccessorGuard} from './gravicentra-b4-003-insurer-activity-successor.mjs';
+if (runInsurerActivitySuccessorGuard()) process.exit(0);
+
 import fs from 'node:fs';
 import {execFileSync} from 'node:child_process';
 import {createHash} from 'node:crypto';
