@@ -17078,5 +17078,26 @@
     "historicalClosureAttestationPreserved": true,
     "newFindingIds": 0,
     "newGateOrReleaseAuthorization": false
+  },
+  "b4003InsurerActivityPreviewEvidence20261030": {
+    "schema": "GRAVICENTRA_I65_B4003_INSURER_ACTIVITY_PREVIEW_EVIDENCE_POINTER_V1",
+    "status": "TECHNICAL_EXACT_PREVIEW_PASS_SCOPED_UAT_SEPARATE_B4_003_HOLD",
+    "recordType": "ADDITIVE_RETROSPECTIVE_PROTECTED_TECHNICAL_EVIDENCE",
+    "authorization": "PAULA_EXPLICIT_20261031_BOUNDED_DOCUMENTARY_GOVERNANCE_SUCCESSOR",
+    "gate": "I6.5/B4-003",
+    "parentHead": "42dc7e6e5648d0bf8da710c791889d54ff2651c7",
+    "sourceCommit": "bcb54435788e1ace50325f347d1d9c0ee4a222e5",
+    "transportCommit": "2cea88d4fd2de841c6e5e81a51a85afdd66f84e6",
+    "previewRunId": 41222963524,
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_INSURER_ACTIVITY_PREVIEW_EVIDENCE_20261030.json",
+    "receiptBlobSha": "e7b858c5360621d05a2427b8fd247f52374ebf05",
+    "previousControlKeysPreserved": 427,
+    "technicalPreviewPass": true,
+    "authenticatedUatFullyAccepted": false,
+    "fullInsurerCapabilityAccepted": false,
+    "findingClosed": false,
+    "b4003Closed": false,
+    "productionAccepted": false,
+    "newReleaseAuthority": false
   }
 }
