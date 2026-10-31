@@ -16908,5 +16908,29 @@
     "productionPromotionAuthorized": false,
     "realBusinessWritesAuthorized": false,
     "currentCapabilityAcceptances": 0
+  },
+  "b4003InsurerPreviewEnvironmentRestoreResume20261030": {
+    "schema": "GRAVICENTRA_I65_B4003_INSURER_PREVIEW_RESUME_POINTER_V1",
+    "status": "EXACT_READER_ENV_RESTORE_AND_IMMUTABLE_HOSTING_RESUME_AUTHORIZED",
+    "gate": "I6.5/B4-003",
+    "parentHead": "7b1c13c507aba0787ee385483c7256033043af44",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_INSURER_PREVIEW_ENV_RESTORE_AND_HOSTING_RESUME_20261030.json",
+    "receiptBlobSha": "2736c017137490b0a0f6af1f6e4ca16f46b0c6ed",
+    "atomicCommitPaths": [
+      "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json",
+      "artifacts/orbit360-recovery/release-control/I6_5_B4_003_INSURER_PREVIEW_ENV_RESTORE_AND_HOSTING_RESUME_20261030.json",
+      "tools/gravicentra-b4-003-insurer-preview-resume.mjs",
+      "tools/gravicentra-b4-003-insurer-preview-resume.test.mjs",
+      "tools/gravicentra-b4-003-insurer-reader-env-repair.cjs",
+      "tools/gravicentra-b4-003-insurer-reader-env-repair.test.cjs",
+      "tools/gravicentra-i6-control-plane-guard-v1.mjs"
+    ],
+    "environmentRestoreAuthorized": true,
+    "existingHostingResumeAuthorized": true,
+    "backendCodeRedeployAuthorized": false,
+    "hostingRebuildAuthorized": false,
+    "authIamRulesChangeAuthorized": false,
+    "realBusinessWritesAuthorized": false,
+    "productionPromotionAuthorized": false
   }
 }

@@ -1,3 +1,6 @@
+import {runInsurerPreviewResumeGuard} from './gravicentra-b4-003-insurer-preview-resume.mjs';
+if (runInsurerPreviewResumeGuard()) process.exit(0);
+
 import {runInsurerActivitySuccessorGuard} from './gravicentra-b4-003-insurer-activity-successor.mjs';
 if (runInsurerActivitySuccessorGuard()) process.exit(0);
 

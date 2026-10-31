@@ -1,0 +1,156 @@
+{
+  "schema": "GRAVICENTRA_I65_B4003_INSURER_PREVIEW_ENV_RESTORE_AND_HOSTING_RESUME_V1",
+  "status": "EXACT_READER_ENV_RESTORE_AND_IMMUTABLE_HOSTING_RESUME_AUTHORIZED",
+  "gate": "I6.5/B4-003",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "parentHead": "7b1c13c507aba0787ee385483c7256033043af44",
+  "sourceSha": "bcb54435788e1ace50325f347d1d9c0ee4a222e5",
+  "sourceGuardRunId": 41150390700,
+  "initialTransportSha": "7b1c13c507aba0787ee385483c7256033043af44",
+  "initialRunId": 41150545623,
+  "recordedAtUtc": "2026-10-31T00:48:01.719969+00:00",
+  "authority": "CORRECT_ONLY_ENVIRONMENT_DRIFT_CAUSED_BY_OUR_AUTHORIZED_LAB_PREVIEW_DEPLOYMENT",
+  "cause": "EXISTING_READER_ENVIRONMENT_CHANGED_BY_OWN_PREVIEW_DEPLOYMENT",
+  "atomicCommitPaths": [
+    "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json",
+    "artifacts/orbit360-recovery/release-control/I6_5_B4_003_INSURER_PREVIEW_ENV_RESTORE_AND_HOSTING_RESUME_20261030.json",
+    "tools/gravicentra-b4-003-insurer-preview-resume.mjs",
+    "tools/gravicentra-b4-003-insurer-preview-resume.test.mjs",
+    "tools/gravicentra-b4-003-insurer-reader-env-repair.cjs",
+    "tools/gravicentra-b4-003-insurer-reader-env-repair.test.cjs",
+    "tools/gravicentra-i6-control-plane-guard-v1.mjs"
+  ],
+  "driftEvidence": {
+    "failedStep": "Verify both target source generations and unchanged other functions",
+    "error": "TARGET_NON_SOURCE_CONFIGURATION_CHANGED:orbit360ScopedPolicyReadPreview:environmentVariablesSha256",
+    "beforeSnapshotSha256": "d2867dec1adc78290de19bcfb541e7cff3bd6d9e03bc16bab4c85aa9d830b2f3",
+    "afterSnapshotSha256": "3c2f7839fed90ec11846750aef00a08415b7df7ab41a2d96798e9d10164827f4",
+    "deploymentStepSucceeded": true,
+    "hostingStepSkipped": true,
+    "originalRunReclassifiedAsSuccess": false,
+    "initialInventoryUnchanged": true,
+    "initialIamPoliciesUnchanged": true,
+    "changedFunctionsOnly": [
+      "orbit360ProductOperationalCommandPreview",
+      "orbit360ScopedPolicyReadPreview"
+    ]
+  },
+  "environmentRestore": {
+    "project": "ays-orbit-360-lab",
+    "region": "us-east1",
+    "function": "orbit360ScopedPolicyReadPreview",
+    "baselineRevision": "orbit360scopedpolicyreadpreview-00066-rur",
+    "expectedCurrentRevision": "orbit360scopedpolicyreadpreview-00067-pib",
+    "baselineEnvironmentSha256": "1e10a234c2e389484714e5f55f394f0ec816d146180dbcee1e34dfae4cce069b",
+    "observedEnvironmentSha256": "36ca53029bfbf51b6b7053a22426acc64622dcc4b3bdb1b72b50620b2d9641e6",
+    "expectedCodeHash": "dc40ebe72b3ea545313ff3771b9d6dae71b11c5b",
+    "sourceGeneration": "1793406873066093",
+    "patchMask": "serviceConfig.environmentVariables",
+    "recoverMapFromExactHistoricalRevision": true,
+    "exactBaselineMapHashRequiredBeforePatch": true,
+    "codeStorageAndImageMustRemainUnchanged": true,
+    "onlyExistingReaderEnvironmentRestore": true,
+    "exportEnvironmentValues": false,
+    "iamPolicyMutation": false,
+    "idempotentAlreadyRestoredReadback": true,
+    "newSourceDeploy": false
+  },
+  "artifacts": {
+    "hosting": {
+      "id": 13023285501,
+      "digest": "sha256:6f9ecc3e254be0cefcb86964e00ce74b3abd54223a8774e87bdcfd2cede4b2ba"
+    },
+    "backend": {
+      "id": 13023370282,
+      "digest": "sha256:97e730f44d6a4045b9d75f76c435dc97845505889699b44bcabbe5d6c3e87c7c"
+    },
+    "snapshots": {
+      "id": 13023550013,
+      "digest": "sha256:df0deeb1363e2182d81045da821970e500d5fb0cad0207f7b26ac05d93101325"
+    }
+  },
+  "rebuildForbidden": true,
+  "redeployBackendCodeForbidden": true,
+  "governanceSources": {
+    "guard": {
+      "path": "tools/gravicentra-i6-control-plane-guard-v1.mjs",
+      "blobSha": "82ccd4e27aa7137ee299799c10885447a6905d8f"
+    },
+    "validator": {
+      "path": "tools/gravicentra-b4-003-insurer-preview-resume.mjs",
+      "blobSha": "60bf9cf639cab9136c0f867235b75b2e1b43d73a"
+    },
+    "test": {
+      "path": "tools/gravicentra-b4-003-insurer-preview-resume.test.mjs",
+      "blobSha": "4e2294a146e4cae7f3ec60e64275737b957a8288"
+    },
+    "repair": {
+      "path": "tools/gravicentra-b4-003-insurer-reader-env-repair.cjs",
+      "blobSha": "ddf25e0ddc649db690ce97a0722f02c2a9735eac"
+    },
+    "repairTest": {
+      "path": "tools/gravicentra-b4-003-insurer-reader-env-repair.test.cjs",
+      "blobSha": "b680320d1233da2b569986cca74472face8fa6f7"
+    }
+  },
+  "regression": {
+    "guardDiscriminants": 24,
+    "helperTests": 30,
+    "syntheticOnly": true,
+    "externalRequests": 0,
+    "liveExecutionNotClaimed": true
+  },
+  "previewTransport": {
+    "workflowPath": ".github/workflows/gravicentra-b4-003-cumulative-safe-read-preview-20261029.yml",
+    "transportWorkflowAfterBlob": "02dcaa84093abcb9590a0e5e5fd8e672ceb9bb62",
+    "hostingChannelId": "gi-i65-b4-sr-41066435386",
+    "expectedPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b4-sr-41066435386-r09pl1ti.web.app",
+    "reuseExistingChannel": true,
+    "sourceSha": "bcb54435788e1ace50325f347d1d9c0ee4a222e5",
+    "rebuild": false,
+    "backendCodeDeploy": false,
+    "exactArtifactDigestsRequired": true
+  },
+  "allowedEvidenceSuccessor": {
+    "controlKey": "b4003InsurerActivityPreviewEvidence20261030",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_INSURER_ACTIVITY_PREVIEW_EVIDENCE_20261030.json",
+    "exactChangedPaths": [
+      "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json",
+      "artifacts/orbit360-recovery/release-control/I6_5_B4_003_INSURER_ACTIVITY_PREVIEW_EVIDENCE_20261030.json"
+    ],
+    "directChildOfRecoveryTransport": true,
+    "priorKeysPreserved": 421,
+    "originalFailedTransportAndRunPreserved": true,
+    "originalSourceShaPreserved": true
+  },
+  "boundaries": {
+    "liveDeployment": false,
+    "authIamRulesChange": false,
+    "membershipChange": false,
+    "realBusinessWrites": false,
+    "dataImport": false,
+    "cleanup": false,
+    "newEndpoints": false,
+    "newWorkflows": false,
+    "newCollections": false,
+    "findingClosed": false,
+    "b4003Closed": false,
+    "paulaVisualAccepted": false,
+    "productionAccepted": false
+  },
+  "preserved": {
+    "priorControlKeys": 420,
+    "currentProductFiles": 118,
+    "findings": 295,
+    "metasFunctionalClosure": true,
+    "sixPriorityResolved": 1,
+    "sixPriorityOpen": 5,
+    "formalI6Percent": 50,
+    "overallImplementationPercent": null,
+    "originalSourceReceiptBlobSha": "5d1750e260b50f9bfbd213235cd110683298d514",
+    "originalCompositionBlobSha": "bcb79e7b7af565e63bf2dc646401a9c380d92b97",
+    "ownerRiskExceptionUnchanged": true,
+    "allPriorReceiptsUnchanged": true
+  }
+}
