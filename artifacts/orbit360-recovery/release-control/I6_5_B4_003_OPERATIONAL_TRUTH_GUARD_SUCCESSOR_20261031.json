@@ -1,0 +1,78 @@
+{
+  "schema": "GRAVICENTRA_I65_B4003_OPERATIONAL_TRUTH_GUARD_SUCCESSOR_V1",
+  "status": "EXACT_GOVERNANCE_SUCCESSOR_PRESERVES_FROZEN_PREDECESSOR",
+  "recordedAtUtc": "2026-10-31T20:32:19.764Z",
+  "gate": "I6.5/B4-003",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "baselineHead": "2cea88d4fd2de841c6e5e81a51a85afdd66f84e6",
+  "progressCommit": "9edd576a07e58217e0b25758b6d13bf111343c7a",
+  "guardPreviousBlobSha": "b5e29a876a974f462eb5d588a7eebfc9b00d8bf6",
+  "progressReceiptBlobSha": "d63f30380181f9f760b95b7f1bb177064fc705d3",
+  "dashboardBlobSha": "5e00b120f3608649ec4f1b13dc6c2ffb8d12c850",
+  "originalControlBlobSha": "4fa5df46cef2e9110227760c6873389f241840db",
+  "currentControlBlobSha": "b34414963b1883d32e54c8882340ceda8981d899",
+  "ledgerBlobSha": "333963e16a21d9abe58274091c0f61a53473c71f",
+  "carryBlobSha": "3cdedb0c3aa1c4a39545229fb4781e79326c945c",
+  "masterPlanBlobSha": "71eba786de1236533e0339ae5cb79eeabed8ebaf",
+  "compositionBlobSha": "33bf80768cb6cb311f2975d282a5f50935f680aa",
+  "expectedSourcePaths": [
+    "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json",
+    "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CURRENT_OPERATIONAL_DASHBOARD_20261031.md",
+    "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CURRENT_OPERATIONAL_TRUTH_SYNC_20261031.json"
+  ],
+  "expectedGuardPaths": [
+    "artifacts/orbit360-recovery/release-control/I6_5_B4_003_OPERATIONAL_TRUTH_GUARD_SUCCESSOR_20261031.json",
+    "tools/gravicentra-b4-003-operational-truth-guard-successor.mjs",
+    "tools/gravicentra-b4-003-operational-truth-guard-successor.test.mjs",
+    "tools/gravicentra-i6-control-plane-guard-v1.mjs"
+  ],
+  "governanceBlobs": {
+    "tools/gravicentra-i6-control-plane-guard-v1.mjs": "33118affeace82d8fca93b12a842e3a2065b3c1e",
+    "tools/gravicentra-b4-003-operational-truth-guard-successor.mjs": "7ebe5c1ed8856e964237e16b1d3649245d3957e5",
+    "tools/gravicentra-b4-003-operational-truth-guard-successor.test.mjs": "9acd65b1bf8b651af68ab3ace0f12a3d186d3192"
+  },
+  "triggerAndCausalRepair": {
+    "preliminaryDocsCommit": "9edd576a07e58217e0b25758b6d13bf111343c7a",
+    "priorGuardFailureRunId": 41238930640,
+    "exactFailureCode": "B4_003_INSURER_TRANSPORT_TEST_ROUTE_PREVIOUS_CONTROL_NOT_FROZEN",
+    "cause": "The prior insurer transport guard certifies exactly 426 control keys and an exact workflow-only transport. The additive current status read model adds one top-level key and two receipts, so it cannot be evaluated as the old immutable transition.",
+    "correction": "New narrowly scoped outer guard verifies the exact two-commit docs/governance lineage, all old control key values and ledger/carry/locks unchanged, exact blob bindings, exact file diff, and reruns the old guard at its certified 2cea HEAD.",
+    "priorCertifiedGuardRunId": 41222963479,
+    "priorCertifiedGuardResult": "SUCCESS",
+    "partialDocsCommitValidatedByStandaloneSourceChecks": true,
+    "newSuccessorExpectedToRunCanonicalGuard": true
+  },
+  "assertions": {
+    "baselineControlKeys": 426,
+    "currentControlKeys": 427,
+    "findingIdsPreserved": 295,
+    "resolvedSixPriorityP0": 1,
+    "totalSixPriorityP0": 6,
+    "formalI6ClosedMiniGates": 5,
+    "formalI6MiniGatesTotal": 10,
+    "formalI6Percent": 50,
+    "overallProductImplementationPercent": null,
+    "oldGuardExecutedAtCertifiedHeadRequired": true,
+    "mainGuardSourceEqualsExactPrefixPlusFrozenOriginal": true,
+    "officialWorkflowRequiredForAcceptance": true
+  },
+  "boundaries": {
+    "livePromotion": false,
+    "businessDataWrite": false,
+    "authIamRulesChange": false,
+    "findingClosure": false,
+    "frozenArtifactRewrite": false,
+    "productSourceChanged": false,
+    "workflowChanged": false
+  },
+  "preservation": {
+    "noNewPlan": true,
+    "noNewGate": true,
+    "noProductionAcceptance": true,
+    "institutionalGoalsClosureAttestationMustRemainValid": true,
+    "oldGuardChecksNotWeakened": true,
+    "noSecurityAuthorizationAdded": true,
+    "noCleanupAuthorizationAdded": true
+  }
+}

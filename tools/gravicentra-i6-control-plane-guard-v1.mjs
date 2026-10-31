@@ -1,3 +1,6 @@
+import {runB4003OperationalTruthGuardSuccessor} from './gravicentra-b4-003-operational-truth-guard-successor.mjs';
+if (runB4003OperationalTruthGuardSuccessor()) process.exit(0);
+
 import {runInsurerTransportTestGuard} from './gravicentra-b4-003-insurer-transport-test-successor.mjs';
 if (runInsurerTransportTestGuard()) process.exit(0);
 
