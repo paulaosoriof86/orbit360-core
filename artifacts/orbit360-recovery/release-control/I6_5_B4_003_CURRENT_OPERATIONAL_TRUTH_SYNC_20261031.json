@@ -1,0 +1,306 @@
+{
+  "schema": "GRAVICENTRA_I65_B4003_CURRENT_OPERATIONAL_TRUTH_SYNC_V1",
+  "status": "CURRENT_EVIDENCE_SYNCHRONIZED_RELEASE_HOLD_NO_GATE_ADVANCE",
+  "recordType": "ADDITIVE_OPERATIONAL_READ_MODEL_ONLY_NO_NEW_PLAN_OR_AUTHORITY",
+  "recordedAtUtc": "2026-10-31T20:25:31.542Z",
+  "project": "Gravicentra Insurance / Orbit 360",
+  "gate": "I6.5/B4-003",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "baseHead": "2cea88d4fd2de841c6e5e81a51a85afdd66f84e6",
+  "binding": {
+    "controlPlanePath": "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json",
+    "controlPlaneBeforeBlobSha": "4fa5df46cef2e9110227760c6873389f241840db",
+    "controlPlaneKeyCountBefore": 426,
+    "ledgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
+    "ledgerBlobSha": "333963e16a21d9abe58274091c0f61a53473c71f",
+    "ledgerFindingCount": 295,
+    "carryPath": "artifacts/orbit360-recovery/release-control/I6_5_OPEN_FINDINGS_CARRY_FORWARD_REGISTER_20261003.json",
+    "carryBlobSha": "3cdedb0c3aa1c4a39545229fb4781e79326c945c",
+    "frozenMasterPlanPath": "artifacts/orbit360-recovery/release-control/I6_PENDING_CLOSURE_MASTER_PLAN_LOCK_20261004.json",
+    "frozenMasterPlanBlobSha": "71eba786de1236533e0339ae5cb79eeabed8ebaf",
+    "controlGuardPath": "tools/gravicentra-i6-control-plane-guard-v1.mjs",
+    "controlGuardBlobSha": "b5e29a876a974f462eb5d588a7eebfc9b00d8bf6",
+    "previousOperationalOverlayKey": "b4003RealProgressReconciliation20261030",
+    "previousOperationalOverlayReceipt": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_REAL_PROGRESS_RECONCILIATION_20261030.json",
+    "previousOperationalOverlayReceiptBlobSha": "91f045bb4b34da32fffb9e299b78f972ce0af308"
+  },
+  "changeCause": {
+    "independentEvidenceButStaleHistoricalStatuses": true,
+    "explanation": "Nine proposed operational field overlays from 2026-10-30 were not mutations of frozen historical fields. Later institutional goals closure and current Preview UAT were not reflected by that older operational snapshot.",
+    "nineHistoricalFieldInterpretationsSupersededForCurrentReadOnlyStatus": [
+      {
+        "id": "CP_B4_CURRENT_STATUS",
+        "targetDocument": "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json",
+        "targetPath": "/currentB4/status",
+        "wasAppliedToHistoricalField": false
+      },
+      {
+        "id": "CP_FORENSIC_B4_STATUS",
+        "targetDocument": "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json",
+        "targetPath": "/i65ForensicRemediationPlan/b4/status",
+        "wasAppliedToHistoricalField": false
+      },
+      {
+        "id": "CP_PERSONAL_RECAUDO_STATUS",
+        "targetDocument": "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json",
+        "targetPath": "/r26PersonalCollection/status",
+        "wasAppliedToHistoricalField": false
+      },
+      {
+        "id": "LEDGER_PERSONAL_ROOT_CAUSE",
+        "targetDocument": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
+        "targetPath": "/findings[id=B4-003-P0-20261012-PERSONAL-COLLECTION]/rootCause",
+        "wasAppliedToHistoricalField": false
+      },
+      {
+        "id": "LEDGER_INSTITUTIONAL_ROOT_CAUSE",
+        "targetDocument": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
+        "targetPath": "/findings[id=B4-003-P0-20261012-INSTITUTIONAL-GOALS]/rootCause",
+        "wasAppliedToHistoricalField": false
+      },
+      {
+        "id": "LEDGER_CONTEXTUAL_COPY_ROOT_CAUSE",
+        "targetDocument": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
+        "targetPath": "/findings[id=B4-003-P0-20261012-INICIO-MOTIVATIONAL-TEXTS]/rootCause",
+        "wasAppliedToHistoricalField": false
+      },
+      {
+        "id": "CP_CRONOGRAMA_SUBFLOW",
+        "targetDocument": "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json",
+        "targetPath": "/b4003ReleaseShockReconciliation20261028/authenticatedUatPreserved/cronogramaDurableWriteReload",
+        "wasAppliedToHistoricalField": false
+      },
+      {
+        "id": "CP_INSURER_SUBFLOW",
+        "targetDocument": "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json",
+        "targetPath": "/b4003ReleaseShockReconciliation20261028/authenticatedUatPreserved/insurerAuthorizedEditReload",
+        "wasAppliedToHistoricalField": false
+      },
+      {
+        "id": "RELEASE_R03_RISK_EXCEPTION",
+        "targetDocument": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PREVIEW_GUIDE_AND_RELEASE_PROGRESS_CONTRACT_20261018.json",
+        "targetPath": "/metric/checks[id=R03]",
+        "wasAppliedToHistoricalField": false
+      }
+    ],
+    "frozenHistoricalFieldsMustNotBeOverwritten": true,
+    "canonicalCurrentReadModelIsThisNewControlPlanePointer": true
+  },
+  "metrics": {
+    "formalI6": {
+      "closed": 5,
+      "total": 10,
+      "percent": 50,
+      "unit": "FROZEN_MINIGATES",
+      "nextPercent": 60,
+      "requires": "I6.5 including B4-003 through B4-007"
+    },
+    "priorityP0": {
+      "closed": 1,
+      "open": 5,
+      "total": 6,
+      "percentClosed": 16.67,
+      "unit": "SIX_PRIORITIZED_FINDINGS_NOT_GLOBAL_READINESS"
+    },
+    "forensicB1B3Historical": {
+      "percent": 96,
+      "currentProductReadiness": false,
+      "weightingHistoricalOnly": true
+    },
+    "globalImplementation": {
+      "percent": null,
+      "reason": "NO_ADJUDICATED_CURRENT_CRITERION_DENOMINATOR_OR_WEIGHTS"
+    },
+    "fullLedger": {
+      "findingIdentitiesPreserved": 295,
+      "fullAcceptanceReconciled": false
+    },
+    "operationalScope": {
+      "visibleAdvisorProfiles": 7,
+      "personalGoalsConfigured": 1,
+      "percentForMissingGoals": null
+    }
+  },
+  "priorityP0": [
+    {
+      "id": "B4-003-P0-20261012-PERSONAL-COLLECTION",
+      "ledgerStatus": "OPEN_P0_NOT_ACCEPTED",
+      "ledgerBlocking": true,
+      "fullFindingClosed": false,
+      "operational": "SOURCE_FIX_RETAINED_SYNTHETIC_PROOF_PASS_POSITIVE_CURRENT_PREVIEW_UAT_PENDING",
+      "proofs": [
+        "canonical_policy_advisor_source_filter",
+        "synthetic_country_currency_month_contract",
+        "2026_10_UI_ZERO_CASE_WITH_JULY_ONLY_GLOBAL_PAYMENTS"
+      ],
+      "next": "AUTHENTICATED_POSITIVE_SAME_PERIOD_PAYMENT_AND_GOAL_GTQ_COP_SERVER_RELOAD"
+    },
+    {
+      "id": "B4-003-P0-20261012-INSTITUTIONAL-GOALS",
+      "ledgerStatus": "RESOLVED_AUTHENTICATED_RUNTIME_PASS",
+      "ledgerBlocking": false,
+      "fullFindingClosed": true,
+      "operational": "CLOSED_FUNCTIONAL_GT_CO_AUTH_RUNTIME_AND_SYNTHETIC_RESTORE",
+      "proofs": [
+        "2026_10_30_GT_CO_FUNCTIONAL_CLOSURE",
+        "2026_10_31_ADDITIONAL_GT_READBACK_AUDIT_RESTORE"
+      ],
+      "next": "REUSE_CLOSURE_DO_NOT_REPEAT_OR_COUNT_TWICE"
+    },
+    {
+      "id": "B4-003-P0-20261012-FREELANCERS-GOAL-SCOPE",
+      "ledgerStatus": "OPEN_P0_NOT_ACCEPTED",
+      "ledgerBlocking": true,
+      "fullFindingClosed": false,
+      "operational": "CANONICAL_INTERNAL_FREELANCE_PARTICIPATION_RULE_MISSING",
+      "proofs": [
+        "ROLE_AND_ACTIVE_ASSIGNABILITY_SOURCE_INSPECTED"
+      ],
+      "next": "OWNER_DEFINE_PARTICIPATION_CONTRACT_THEN_SOURCE_TEST_OWN_TEAM_ALL"
+    },
+    {
+      "id": "B4-003-P0-20261012-INICIO-MOTIVATIONAL-TEXTS",
+      "ledgerStatus": "OPEN_P0_NOT_ACCEPTED",
+      "ledgerBlocking": true,
+      "fullFindingClosed": false,
+      "operational": "CONTEXTUAL_SOURCE_AND_PARTIAL_VISUAL_UAT_PASS_FULL_VISUAL_ACCEPTANCE_PENDING",
+      "proofs": [
+        "GT_CO_ROLE_CONTEXT_OBSERVED",
+        "2026_10_GOAL_CONFIG_DIFFERENTIATED_1_OF_7"
+      ],
+      "next": "FINAL_ROLE_COUNTRY_PERIOD_VISUAL_ACCEPTANCE"
+    },
+    {
+      "id": "B4-003-P0-20261012-QA-CANCELLED-RUN-FIXTURES",
+      "ledgerStatus": "OPEN_P0_NOT_ACCEPTED",
+      "ledgerBlocking": true,
+      "fullFindingClosed": false,
+      "operational": "EXACT_SYNTHETIC_COHORT_MAPPED_DISPOSITION_HOLD",
+      "proofs": [
+        "14_EXPLICIT_SYNTHETIC_ROOTS",
+        "5_DERIVATIVES",
+        "18_AUDIT_WORKFLOW_RECORDS"
+      ],
+      "next": "EXACT_ID_REVERSIBLE_DISPOSITION_PRESERVE_SHARED_INSURER_AND_HISTORY"
+    },
+    {
+      "id": "B4-003-P0-20261012-QA-ORPHAN-RENEWALS",
+      "ledgerStatus": "OPEN_P0_NOT_ACCEPTED",
+      "ledgerBlocking": true,
+      "fullFindingClosed": false,
+      "operational": "THREE_ORPHAN_RENEWALS_15_PRESENT_DEPENDENCIES_HOLD",
+      "proofs": [
+        "3_POLICIES",
+        "12_POSITIVE_PENDING_FINANCIAL_ROWS",
+        "3_ACTIVITY_ROWS",
+        "9_ABSENT_PARENTS"
+      ],
+      "next": "RECORD_SPECIFIC_REVERSIBLE_ADJUDICATION_PRESERVING_OBLIGATIONS"
+    }
+  ],
+  "currentCandidate": {
+    "sourceHead": "2cea88d4fd2de841c6e5e81a51a85afdd66f84e6",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-sr-41066435386-r09pl1ti.web.app/",
+    "technicalPreviewRunId": 41222963524,
+    "technicalPreviewRunConclusion": "success",
+    "deployedPreviewBackendComparisons": 66,
+    "sameHeadReadback": true,
+    "currentHumanUatRecord": "https://github.com/paulaosoriof86/orbit360-core/issues/154#issuecomment-6548602920",
+    "currentAuthenticatedIndependentCarlosBackendDenial": false,
+    "currentPaulaAsesorDirectEquipAccessDeniedAfterReload": true,
+    "currentPaulaCountryScopesObserved": [
+      "TODOS",
+      "CO"
+    ],
+    "currentPaulaSessionRestored": {
+      "activeRole": "Operativo",
+      "country": "TODOS",
+      "route": "inicio"
+    },
+    "currentPositivePersonalPaymentUat": false
+  },
+  "evidence": {
+    "institutionGoalsClosure": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_INSTITUTIONAL_GOALS_FUNCTIONAL_CLOSURE_20261030.json",
+      "sha": "f6330cce90ef95a43eedc724d2aceec84458cda9",
+      "status": "FUNCTIONAL_RESOLVED_GT_CO"
+    },
+    "carlosIndependentOlderPreview": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CARLOS_AUTHENTICATED_CONTINUITY_UAT_20261030.json",
+      "sha": "695c91dbacf09cadbc653e47b77888ec90089564",
+      "readReloadCasesPass": 6,
+      "backendDenyNotProved": true
+    },
+    "qaResidues": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_EXACT_QA_RESIDUE_DEPENDENCIES_ADJUDICATION_20261030.json",
+      "sha": "a329186d192057a462162959a8dd5b998d194130",
+      "cleanupAuthorized": false
+    },
+    "previousProgress": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_REAL_PROGRESS_RECONCILIATION_20261030.json",
+      "sha": "91f045bb4b34da32fffb9e299b78f972ce0af308"
+    },
+    "currentHumanUat": "https://github.com/paulaosoriof86/orbit360-core/issues/154",
+    "roleTeamEmulatorProofPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_ROLE_TEAM_NONESCALATION_EMULATOR_PROOF_20261013.json",
+    "roleTeamEmulatorPass": 52,
+    "frozenInstitutionGoalsLedgerSha": "333963e16a21d9abe58274091c0f61a53473c71f"
+  },
+  "boundedSecondaryProofs": [
+    {
+      "capability": "Aseguradoras",
+      "status": "SYNTHETIC_EDIT_RELOAD_RESTORE_AUDIT_PASS",
+      "scope": "BOUND_TO_SYNTHETIC_FIXTURE_NOT_FULL_MODULE_RELEASE"
+    },
+    {
+      "capability": "Cronograma",
+      "status": "AUTHENTICATED_SYNTHETIC_CREATE_EDIT_RELOAD_PASS",
+      "scope": "HISTORICAL_2026_10_29_BOUND_NOT_B4_004_ACCEPTANCE"
+    },
+    {
+      "capability": "Inicio",
+      "status": "CONTEXTUAL_ROLE_COUNTRY_TEXT_VISUAL_PARTIAL_PASS",
+      "scope": "NO_FINAL_VISUAL_ACCEPTANCE"
+    },
+    {
+      "capability": "Security",
+      "status": "EMULATOR_52_CASES_PASS_PAULA_UI_DENIAL_PASS",
+      "scope": "NO_CURRENT_BACKEND_DENY_WITH_INDEPENDENT_UID"
+    }
+  ],
+  "exactPendingSequence": [
+    "B4_003_PERSONAL_COLLECTION_POSITIVE_AUTHENTICATED_CASE",
+    "B4_003_CURRENT_CANDIDATE_CARLOS_UID_BACKEND_NEGATIVE_ROLE_COUNTRY",
+    "B4_003_CANONICAL_FREELANCER_PARTICIPATION_CONTRACT",
+    "B4_003_INICIO_VISUAL_FINAL",
+    "B4_003_QA_CANCELLED_RUN_EXACT_DISPOSITION",
+    "B4_003_ORPHAN_RENEWAL_EXACT_REVERSIBLE_DISPOSITION",
+    "B4_003_TRANSVERSAL_FUNCTIONAL_SECURITY_CLOSEOUT",
+    "B4_004_THROUGH_B4_007_FROZEN_SEQUENCE",
+    "I6_5_FORMAL_CLOSURE_THEN_NEXT_FROZEN_MINIGATE"
+  ],
+  "dashboard": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CURRENT_OPERATIONAL_DASHBOARD_20261031.md",
+    "blobSha": "5e00b120f3608649ec4f1b13dc6c2ffb8d12c850",
+    "kind": "HUMAN_READABLE_READ_MODEL_NOT_NEW_PLAN"
+  },
+  "protection": {
+    "historicalControlPlaneKeysRetained": true,
+    "ledgerByteIdentical": true,
+    "carryByteIdentical": true,
+    "certifiedInstitutionalGoalsClosureRetained": true,
+    "frozenMasterPlanUnchanged": true,
+    "compositionLockUnchanged": true,
+    "mainGuardUnchanged": true,
+    "existingFindingIdsUnchanged": true,
+    "historicalStatusesRetained": true,
+    "productSourceChanged": false,
+    "productionPromotionAuthorized": false,
+    "authOrIamOrFirestoreRulesMutationAuthorized": false,
+    "firebaseBusinessDataMutationAuthorized": false,
+    "cleanupAuthorized": false,
+    "deploymentAuthorized": false,
+    "fullGateClosed": false,
+    "percentArtificiallyIncreased": false
+  }
+}

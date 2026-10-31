@@ -17043,5 +17043,40 @@
     "newProductionPermission": false,
     "newP0Closure": false,
     "priorControlKeysPreserved": 425
+  },
+  "b4003CurrentOperationalTruth20261031": {
+    "schema": "GRAVICENTRA_B4003_CURRENT_OPERATIONAL_TRUTH_POINTER_V1",
+    "status": "CURRENT_EVIDENCE_RECONCILED_B4_003_AND_NEW_LIVE_PROMOTION_HOLD",
+    "recordType": "ADDITIVE_CURRENT_STATUS_READ_MODEL_NOT_REPLACEMENT_OF_HISTORICAL_LOCKS",
+    "recordedAtUtc": "2026-10-31T20:25:31.542Z",
+    "sourceHeadBeforeSuccessor": "2cea88d4fd2de841c6e5e81a51a85afdd66f84e6",
+    "existingControlPlaneBlobBeforeSuccessor": "4fa5df46cef2e9110227760c6873389f241840db",
+    "priorOperationalOverlayKey": "b4003RealProgressReconciliation20261030",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CURRENT_OPERATIONAL_TRUTH_SYNC_20261031.json",
+    "receiptBlobSha": "d63f30380181f9f760b95b7f1bb177064fc705d3",
+    "dashboardPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CURRENT_OPERATIONAL_DASHBOARD_20261031.md",
+    "dashboardBlobSha": "5e00b120f3608649ec4f1b13dc6c2ffb8d12c850",
+    "currentInterpretation": {
+      "activeGate": "I6.5/B4-003",
+      "status": "B4_003_PARTIAL_AUTHENTICATED_UAT_AND_P0_CLOSEOUT_HOLD",
+      "formallyClosedI6MiniGates": 5,
+      "formalI6TotalMiniGates": 10,
+      "formalPercent": 50,
+      "priorityP0Closed": 1,
+      "priorityP0Total": 6,
+      "priorityP0PercentClosed": 16.67,
+      "forensicHistoricalPercent": 96,
+      "currentGlobalImplementationPercent": null,
+      "institutionalGoalsFunctionalAccepted": true,
+      "independentDeployedBackendNegativeUatAccepted": false,
+      "exactQaResidueDispositionAccepted": false,
+      "controlledLivePromotionAuthorized": false
+    },
+    "frozenHistoricalFieldMutation": false,
+    "previouslyExistingControlKeysPreserved": 426,
+    "frozenLedgerStatusAndBlobPreserved": true,
+    "historicalClosureAttestationPreserved": true,
+    "newFindingIds": 0,
+    "newGateOrReleaseAuthorization": false
   }
 }
