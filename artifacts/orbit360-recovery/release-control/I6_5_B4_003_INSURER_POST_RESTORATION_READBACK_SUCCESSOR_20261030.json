@@ -1,0 +1,1194 @@
+{
+  "schema": "GRAVICENTRA_I65_B4003_INSURER_POST_RESTORATION_READBACK_SUCCESSOR_V1",
+  "status": "GET_ONLY_OPERATION_BOUND_CONTENT_VERIFICATION_AUTHORIZED",
+  "gate": "I6.5/B4-003",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "parentHead": "a4c3d37dc8d9a4bf11451d9b9b61b3a66e439825",
+  "recordedAtUtc": "2026-10-31T01:25:40.070410+00:00",
+  "authority": "READ_KNOWN_RESTORATION_OPERATION_AND_EXACT_SOURCE_VERIFY_THEN_SAME_HOSTING",
+  "sourceSha": "bcb54435788e1ace50325f347d1d9c0ee4a222e5",
+  "sourceGuardRunId": 41150390700,
+  "initialTransportSha": "7b1c13c507aba0787ee385483c7256033043af44",
+  "initialRunId": 41150545623,
+  "failedRecoveryTransportSha": "850b156f7c00080d933b0af8ba16837a89f76160",
+  "failedRecoveryRunId": 41152465200,
+  "postPatchFailureTransportSha": "a4c3d37dc8d9a4bf11451d9b9b61b3a66e439825",
+  "postPatchFailureRunId": 41153515829,
+  "postPatchFailureHistory": [
+    {
+      "runId": 41153515829,
+      "attempt": 1,
+      "transportSha": "a4c3d37dc8d9a4bf11451d9b9b61b3a66e439825",
+      "status": "FAILURE",
+      "failureCode": "CURRENT_FUNCTION_SOURCE_CHANGED",
+      "patchRequests": 1,
+      "reportSha256": "f674cfb499a98bf0f3a6e75cdf2e5d40c4c51d86b25b64f68593200f0499d60e"
+    },
+    {
+      "runId": 41153515829,
+      "attempt": 2,
+      "transportSha": "a4c3d37dc8d9a4bf11451d9b9b61b3a66e439825",
+      "status": "FAILURE",
+      "failureCode": "CURRENT_FUNCTION_SOURCE_CHANGED",
+      "patchRequests": 0,
+      "reportSha256": "5746c896933bbaebabc3f826ba346b8e7dfe05a519e061f7b8ae8cc53d95567a"
+    }
+  ],
+  "failedAttemptReports": [
+    {
+      "attempt": 1,
+      "reportSha256": "f674cfb499a98bf0f3a6e75cdf2e5d40c4c51d86b25b64f68593200f0499d60e",
+      "report": {
+        "schema": "gravicentra-insurer-reader-env-restoration-v1",
+        "status": "HOLD",
+        "target": "orbit360ScopedPolicyReadPreview",
+        "project": "ays-orbit-360-lab",
+        "region": "us-east1",
+        "sourceRunId": 41150545623,
+        "startedAt": "2026-10-31T01:05:10.073Z",
+        "patchAttempted": true,
+        "patchRequests": 1,
+        "updateMask": "serviceConfig.environmentVariables",
+        "envValuesExported": false,
+        "literalEnvironmentValuesUsedInMemory": true,
+        "secretManagerValuesRead": false,
+        "secretEnvironmentSourcesResolved": false,
+        "sourceRedeployed": false,
+        "iamMutated": false,
+        "authMutated": false,
+        "rulesMutated": false,
+        "businessDataMutated": false,
+        "revisionIdentityReads": [
+          {
+            "stage": "PREVIOUS_BASELINE",
+            "requestedResourceName": "projects/ays-orbit-360-lab/locations/us-east1/services/orbit360scopedpolicyreadpreview/revisions/orbit360scopedpolicyreadpreview-00066-rur",
+            "expectedServiceResourceName": "projects/ays-orbit-360-lab/locations/us-east1/services/orbit360scopedpolicyreadpreview",
+            "expectedServiceShortName": "orbit360scopedpolicyreadpreview",
+            "observedName": {
+              "type": "string",
+              "length": 138,
+              "sha256": "423ba790c2bac5c71fe3ee82de0ffea366c3ec2763ec185fbb2837f52e74fd0a",
+              "format": "RESOURCE_NAME",
+              "value": "projects/ays-orbit-360-lab/locations/us-east1/services/orbit360scopedpolicyreadpreview/revisions/orbit360scopedpolicyreadpreview-00066-rur"
+            },
+            "observedService": {
+              "type": "string",
+              "length": 31,
+              "sha256": "f87b2399a6ee794f87c4f805e8041cb8e2199c8a551f45251ca1ccea54ec3781",
+              "format": "SHORT_NAME",
+              "value": "orbit360scopedpolicyreadpreview"
+            },
+            "nameMatchesExactResource": true,
+            "serviceMatchesExactResource": false,
+            "serviceMatchesExactShortName": true,
+            "deleteTimePresent": false,
+            "deleteTimePopulated": false
+          },
+          {
+            "stage": "DEPLOYED_SOURCE",
+            "requestedResourceName": "projects/ays-orbit-360-lab/locations/us-east1/services/orbit360scopedpolicyreadpreview/revisions/orbit360scopedpolicyreadpreview-00067-pib",
+            "expectedServiceResourceName": "projects/ays-orbit-360-lab/locations/us-east1/services/orbit360scopedpolicyreadpreview",
+            "expectedServiceShortName": "orbit360scopedpolicyreadpreview",
+            "observedName": {
+              "type": "string",
+              "length": 138,
+              "sha256": "63278263939da8e4d39999ad104dc6b8ebf9ad2454daf2e50eda3fdbd9736aab",
+              "format": "RESOURCE_NAME",
+              "value": "projects/ays-orbit-360-lab/locations/us-east1/services/orbit360scopedpolicyreadpreview/revisions/orbit360scopedpolicyreadpreview-00067-pib"
+            },
+            "observedService": {
+              "type": "string",
+              "length": 31,
+              "sha256": "f87b2399a6ee794f87c4f805e8041cb8e2199c8a551f45251ca1ccea54ec3781",
+              "format": "SHORT_NAME",
+              "value": "orbit360scopedpolicyreadpreview"
+            },
+            "nameMatchesExactResource": true,
+            "serviceMatchesExactResource": false,
+            "serviceMatchesExactShortName": true,
+            "deleteTimePresent": false,
+            "deleteTimePopulated": false
+          }
+        ],
+        "previousRevision": "orbit360scopedpolicyreadpreview-00066-rur",
+        "deployedRevision": "orbit360scopedpolicyreadpreview-00067-pib",
+        "observedRevision": "orbit360scopedpolicyreadpreview-00067-pib",
+        "previousRevisionEnvironmentNames": [
+          "EVENTARC_CLOUD_EVENT_SOURCE",
+          "FIREBASE_CONFIG",
+          "FUNCTION_TARGET",
+          "GCLOUD_PROJECT",
+          "LOG_EXECUTION_ID"
+        ],
+        "deployedRevisionEnvironmentNames": [
+          "EVENTARC_CLOUD_EVENT_SOURCE",
+          "FIREBASE_CONFIG",
+          "FUNCTION_SIGNATURE_TYPE",
+          "FUNCTION_TARGET",
+          "GCLOUD_PROJECT",
+          "LOG_EXECUTION_ID"
+        ],
+        "revisionEnvironmentChanges": [
+          {
+            "name": "FUNCTION_SIGNATURE_TYPE",
+            "beforeSha256": null,
+            "afterSha256": "e0603c499aae47eb89343ad0ef3178e044c62e70ae2309b35591d1d49a3211ec"
+          }
+        ],
+        "currentEnvironmentSha256": "36ca53029bfbf51b6b7053a22426acc64622dcc4b3bdb1b72b50620b2d9641e6",
+        "currentServiceConfigNonRevisionSha256": "20bb4aba5674f0d09cba92a30f6d8708e702eafbc6e693921419ca57b16164e9",
+        "newCodeHash": "dc40ebe72b3ea545313ff3771b9d6dae71b11c5b",
+        "newSourceStorage": {
+          "bucket": "gcf-v2-sources-646761409743-us-east1",
+          "object": "orbit360ScopedPolicyReadPreview/function-source.zip",
+          "generation": "1793406873066093"
+        },
+        "newBuild": "projects/646761409743/locations/us-east1/builds/dfc20065-31dd-4dd7-a80f-54fac47bb9d9",
+        "reconstruction": {
+          "methods": [
+            "OLD_MINUS_PROVEN_CURRENT_PLATFORM_NAMES",
+            "OLD_CURRENT_FUNCTION_NAMES_ONLY",
+            "OLD_COMPLETE_LITERAL_MAP"
+          ],
+          "platformNames": [],
+          "candidateHashes": [
+            {
+              "method": "OLD_MINUS_PROVEN_CURRENT_PLATFORM_NAMES",
+              "sha256": "1e10a234c2e389484714e5f55f394f0ec816d146180dbcee1e34dfae4cce069b",
+              "names": [
+                "EVENTARC_CLOUD_EVENT_SOURCE",
+                "FIREBASE_CONFIG",
+                "FUNCTION_TARGET",
+                "GCLOUD_PROJECT",
+                "LOG_EXECUTION_ID"
+              ]
+            },
+            {
+              "method": "OLD_CURRENT_FUNCTION_NAMES_ONLY",
+              "sha256": "1e10a234c2e389484714e5f55f394f0ec816d146180dbcee1e34dfae4cce069b",
+              "names": [
+                "EVENTARC_CLOUD_EVENT_SOURCE",
+                "FIREBASE_CONFIG",
+                "FUNCTION_TARGET",
+                "GCLOUD_PROJECT",
+                "LOG_EXECUTION_ID"
+              ]
+            },
+            {
+              "method": "OLD_COMPLETE_LITERAL_MAP",
+              "sha256": "1e10a234c2e389484714e5f55f394f0ec816d146180dbcee1e34dfae4cce069b",
+              "names": [
+                "EVENTARC_CLOUD_EVENT_SOURCE",
+                "FIREBASE_CONFIG",
+                "FUNCTION_TARGET",
+                "GCLOUD_PROJECT",
+                "LOG_EXECUTION_ID"
+              ]
+            }
+          ],
+          "verifiedEnvironmentSha256": "1e10a234c2e389484714e5f55f394f0ec816d146180dbcee1e34dfae4cce069b"
+        },
+        "functionEnvironmentChanges": [
+          {
+            "name": "FUNCTION_SIGNATURE_TYPE",
+            "beforeSha256": null,
+            "afterSha256": "e0603c499aae47eb89343ad0ef3178e044c62e70ae2309b35591d1d49a3211ec"
+          }
+        ],
+        "projectedServiceConfigNonRevisionSha256": "9cf40283fe806e06350ae094bca9c4e3611311ee098589ab5aed8ffffe6019fc",
+        "operationName": "projects/ays-orbit-360-lab/locations/us-east1/operations/operation-1793408711390-65f18812df446-eb3d2d80-cd121490",
+        "pollCount": 5,
+        "failureCode": "CURRENT_FUNCTION_SOURCE_CHANGED",
+        "finishedAt": "2026-10-31T01:05:54.167Z"
+      }
+    },
+    {
+      "attempt": 2,
+      "reportSha256": "5746c896933bbaebabc3f826ba346b8e7dfe05a519e061f7b8ae8cc53d95567a",
+      "report": {
+        "schema": "gravicentra-insurer-reader-env-restoration-v1",
+        "status": "HOLD",
+        "target": "orbit360ScopedPolicyReadPreview",
+        "project": "ays-orbit-360-lab",
+        "region": "us-east1",
+        "sourceRunId": 41150545623,
+        "startedAt": "2026-10-31T01:10:25.688Z",
+        "patchAttempted": false,
+        "patchRequests": 0,
+        "updateMask": "serviceConfig.environmentVariables",
+        "envValuesExported": false,
+        "literalEnvironmentValuesUsedInMemory": true,
+        "secretManagerValuesRead": false,
+        "secretEnvironmentSourcesResolved": false,
+        "sourceRedeployed": false,
+        "iamMutated": false,
+        "authMutated": false,
+        "rulesMutated": false,
+        "businessDataMutated": false,
+        "failureCode": "CURRENT_FUNCTION_SOURCE_CHANGED",
+        "finishedAt": "2026-10-31T01:10:26.242Z"
+      }
+    }
+  ],
+  "causalDisposition": {
+    "observedEnvironmentDrift": "The original deploy added FUNCTION_SIGNATURE_TYPE; the prior exact environment and full service configuration hashes were proven before the only PATCH.",
+    "observedFirstAttempt": "A single environment-only PATCH was submitted; polling stopped at CURRENT_FUNCTION_SOURCE_CHANGED after five reads.",
+    "observedSecondAttempt": "The one controlled retry stopped at CURRENT_FUNCTION_SOURCE_CHANGED before submitting any PATCH.",
+    "currentConfigurationOutcome": "NOT_YET_ADJUDICATED_BY_THIS_RECEIPT",
+    "metadataAssumptionCorrection": "A provider-generated build, storage generation or image change after that exact operation may coexist with identical packaged source content. Acceptance requires its completed Function response to equal the current function and all 33 original source files for each target to match.",
+    "pastFailuresReclassifiedAsSuccess": false,
+    "furtherConfigurationWritesAuthorized": false,
+    "sourceContentPassClaimedBeforeReadback": false
+  },
+  "atomicCommitPaths": [
+    "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json",
+    "artifacts/orbit360-recovery/release-control/I6_5_B4_003_INSURER_POST_RESTORATION_READBACK_SUCCESSOR_20261030.json",
+    "tools/gravicentra-b4-003-insurer-preview-resume.mjs",
+    "tools/gravicentra-b4-003-insurer-preview-resume.test.mjs",
+    "tools/gravicentra-b4-003-insurer-reader-postpatch-readback.cjs",
+    "tools/gravicentra-b4-003-insurer-reader-postpatch-readback.test.cjs"
+  ],
+  "governanceSources": {
+    "validator": {
+      "path": "tools/gravicentra-b4-003-insurer-preview-resume.mjs",
+      "beforeBlobSha": "75af7eb7f024833b79d97adbe1e7d7ef7d0b5814",
+      "blobSha": "37765062784c1f22c3dbce868636e558741755d3"
+    },
+    "test": {
+      "path": "tools/gravicentra-b4-003-insurer-preview-resume.test.mjs",
+      "beforeBlobSha": "f69122701da726be3bdd55fd9baef9b5eb067890",
+      "blobSha": "9ba242294b6069fd8132e04e9427a5c693d4bc63"
+    },
+    "readback": {
+      "path": "tools/gravicentra-b4-003-insurer-reader-postpatch-readback.cjs",
+      "beforeBlobSha": null,
+      "blobSha": "e18f9c1489d4ba336ffe246efa9ccc07ab078f4b"
+    },
+    "readbackTest": {
+      "path": "tools/gravicentra-b4-003-insurer-reader-postpatch-readback.test.cjs",
+      "beforeBlobSha": null,
+      "blobSha": "e066b48715b201f2ed1c7acc8e3f75c7aa4689cd"
+    }
+  },
+  "historicalAuthoritiesPreserved": [
+    {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_INSURER_ACTIVITY_SOURCE_SUCCESSOR_20261030.json",
+      "blobSha": "5d1750e260b50f9bfbd213235cd110683298d514"
+    },
+    {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_INSURER_PREVIEW_ENV_RESTORE_AND_HOSTING_RESUME_20261030.json",
+      "blobSha": "2736c017137490b0a0f6af1f6e4ca16f46b0c6ed"
+    },
+    {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_INSURER_READER_REVISION_IDENTITY_SUCCESSOR_20261030.json",
+      "blobSha": "51447fb7218480832b0b61d619440dea8939d461"
+    }
+  ],
+  "readOnlyRecovery": {
+    "operationName": "projects/ays-orbit-360-lab/locations/us-east1/operations/operation-1793408711390-65f18812df446-eb3d2d80-cd121490",
+    "allowedHttpMethods": [
+      "GET"
+    ],
+    "operationDoneRequired": true,
+    "operationResponseFunctionMustEqualCurrent": true,
+    "maximumFurtherConfigurationWrites": 0,
+    "backendCodeDeploymentRequested": false,
+    "originalRepairHelperInvocationForbidden": true,
+    "baselineEnvironmentSha256": "1e10a234c2e389484714e5f55f394f0ec816d146180dbcee1e34dfae4cce069b",
+    "baselineServiceConfigNonRevisionSha256": "9cf40283fe806e06350ae094bca9c4e3611311ee098589ab5aed8ffffe6019fc",
+    "codeHash": "dc40ebe72b3ea545313ff3771b9d6dae71b11c5b",
+    "iamUnchangedRequired": true,
+    "runtimeLabelsAndEntryPointUnchangedRequired": true,
+    "providerMetadataDifferencesAllowedOnlyAfterOperationBinding": [
+      "build",
+      "sourceStorage",
+      "containerImage"
+    ],
+    "metadataDifferencesMustBeRecorded": true,
+    "metadataPassIsSourceBytesPending": true,
+    "exactSourceFilesPerTarget": 33,
+    "exactSourceComparisonsRequired": 66,
+    "exactSourceBytesBeforeHostingRequired": true,
+    "sourceIdentityMeaning": "ALL_33_STAGED_PRODUCT_SOURCE_FILES_PER_TARGET_IDENTICAL_NOT_METADATA_IDENTITY",
+    "writerIdentityMustEqualOriginalDeploymentSnapshot": true,
+    "readerNonSourceConfigurationAndIamRemainFixed": true,
+    "cliAuthorizationEnvironment": "GI_READER_POSTPATCH_READBACK_AUTHORIZATION=READ_KNOWN_OPERATION_AND_CONFIGURATION_ONLY"
+  },
+  "artifacts": {
+    "hosting": {
+      "id": 13023285501,
+      "digest": "sha256:6f9ecc3e254be0cefcb86964e00ce74b3abd54223a8774e87bdcfd2cede4b2ba"
+    },
+    "backend": {
+      "id": 13023370282,
+      "digest": "sha256:97e730f44d6a4045b9d75f76c435dc97845505889699b44bcabbe5d6c3e87c7c"
+    },
+    "snapshots": {
+      "id": 13023550013,
+      "digest": "sha256:df0deeb1363e2182d81045da821970e500d5fb0cad0207f7b26ac05d93101325"
+    }
+  },
+  "patchSubmissionArtifact": {
+    "id": 13024615471,
+    "bytes": 16359,
+    "digest": "sha256:ba67c529382cdb987612939f4f743cafbd6405c96b84fe967821cdf9ab6e5091"
+  },
+  "backendManifestSha256": "508cbecd62cba2facd22484a94482ac1fb081fde1e2c3d42fb17fa1d35ba0526",
+  "backendManifest": {
+    "sourceSha": "bcb54435788e1ace50325f347d1d9c0ee4a222e5",
+    "targets": [
+      "orbit360ProductOperationalCommandPreview",
+      "orbit360ScopedPolicyReadPreview"
+    ],
+    "region": "us-east1",
+    "stageMatchesImmutableBuilder": true,
+    "files": [
+      {
+        "path": "functions/assignable-advisor-roster.js",
+        "gitBlobSha": "75ca53db55e2665123589b0e63253a8e4f8c377c",
+        "transformation": "NONE",
+        "sha256": "f2b0110d06e867316dcbe5ad4aefbdb532a5fcc3b1bcb001055dbd5fa89404e7",
+        "bytes": 12589
+      },
+      {
+        "path": "functions/b4-003-scoped-access-boundary.js",
+        "gitBlobSha": "8f93b300a6316189198e860a640b6cb8cf61e4ce",
+        "transformation": "NONE",
+        "sha256": "080a3d71bff0fa7337085580967fea4430fefc637a17c1c1d076a24f0ccdc194",
+        "bytes": 8658
+      },
+      {
+        "path": "functions/b4-003-scoped-bootstrap-reader.js",
+        "gitBlobSha": "9d71b82fd972590a6bbac21e43406734861d6687",
+        "transformation": "NONE",
+        "sha256": "12b0b751bc67e5b8081b3c41361982cd0c4e6f6da1c47fba913cff863b2cbb5c",
+        "bytes": 11861
+      },
+      {
+        "path": "functions/b4-003-scoped-policy-callable.js",
+        "gitBlobSha": "743ed2a9bd9776cbd5d70ffe0669770b491b27aa",
+        "transformation": "NONE",
+        "sha256": "f114799471e7065d6ce2994a7cfd170e0ef6f43fc15176262b59a5f62d664eb0",
+        "bytes": 3216
+      },
+      {
+        "path": "functions/b4-003-scoped-policy-reader.js",
+        "gitBlobSha": "24546aa40f26d818aef7f1714c2a21deda63a550",
+        "transformation": "NONE",
+        "sha256": "7af35ba91c96e54df0c3f3a9e1afb39f1d212baf29577744703cff82a6a24252",
+        "bytes": 4157
+      },
+      {
+        "path": "functions/b4-003-scoped-related-reader.js",
+        "gitBlobSha": "30086b675f5d1461e4e5c933d99cda9d636fbb86",
+        "transformation": "NONE",
+        "sha256": "6d599d160c1285e7c30c7037a0cd5b629ab6005396cc49ec0ce5a9277f336c33",
+        "bytes": 33584
+      },
+      {
+        "path": "functions/bank-accounts.js",
+        "gitBlobSha": "856bb654ba233c13a3ffac41b8a3e11206094a5d",
+        "transformation": "NONE",
+        "sha256": "322e5fc1899abfcda199828a0f58b0457ff4fa3dcd1df2913a50ef10182b000a",
+        "bytes": 13400
+      },
+      {
+        "path": "functions/bootstrap.js",
+        "gitBlobSha": "42fd05b81a02d428e590c36e3feb32be202f4965",
+        "transformation": "EXISTING_IMMUTABLE_BUILDER_SCOPED_EXPORT",
+        "sha256": "bab198f9ac995a10ea96aad08a288b2b886e485cc8ce32033b5cfb51fd314ab6",
+        "bytes": 751
+      },
+      {
+        "path": "functions/cobros-ledger-contract.js",
+        "gitBlobSha": "4aa76e65d7c43018f0b2b65108ce8b49756b4711",
+        "transformation": "NONE",
+        "sha256": "769a4420fb4202586b73661057dc4787b846943a8d0093fafa5db11ca104de0b",
+        "bytes": 3974
+      },
+      {
+        "path": "functions/cobros-reconciliation-domain.js",
+        "gitBlobSha": "5b27038d1c8380e4d2d0ed044996c1570d8c3767",
+        "transformation": "NONE",
+        "sha256": "826a83e7690fcad90be6f3b2090eace727c67d8d416e87266c5fef9aef0a8f3f",
+        "bytes": 53492
+      },
+      {
+        "path": "functions/cotcomp-workflow-owner-patch.test.js",
+        "gitBlobSha": "f09315b416e95415ade2d811c4d7e52baba8904d",
+        "transformation": "NONE",
+        "sha256": "f0acac98f1d5b67bc6b65052666da0dd996e47a2c49ea877da957aa17b450f86",
+        "bytes": 2202
+      },
+      {
+        "path": "functions/document-drive-domain.js",
+        "gitBlobSha": "928dc218aa09be4648552f84502e50f4c0d65227",
+        "transformation": "NONE",
+        "sha256": "f3c96262c727e8438cc1a8dac801b07a965cd87b1d5b6cf51d54e8942f34cb91",
+        "bytes": 49736
+      },
+      {
+        "path": "functions/index.js",
+        "gitBlobSha": "aadd9dedff6bc7ce1858a3ffe8507765713d620b",
+        "transformation": "NONE",
+        "sha256": "434ff1c9cbb3fc734d944bd03bb48525cf5f662c33aef2897cab0514d4754dab",
+        "bytes": 15060
+      },
+      {
+        "path": "functions/notification-outbox-processor.js",
+        "gitBlobSha": "ce31ae776beb5945741ef0f9f9dbf53075d03910",
+        "transformation": "NONE",
+        "sha256": "b724714e4bcead8beaf9a1dd267cc3cd909d81cda08e8b1cf69f6833cadfb68e",
+        "bytes": 13655
+      },
+      {
+        "path": "functions/ops-advisor-inbox.js",
+        "gitBlobSha": "a26aeefdb27344bf91f978ca054ae9c1bfa8c3f7",
+        "transformation": "NONE",
+        "sha256": "e8f75eec6539c56fc1cd13b2eaedad89678459b39aeb875b719cf79a662bbbe2",
+        "bytes": 20794
+      },
+      {
+        "path": "functions/ops-leads-domain.js",
+        "gitBlobSha": "1ceab5d1c65eb97c965304e417ee638fbc9ba309",
+        "transformation": "NONE",
+        "sha256": "592adacd02b3b5ae28f26f878ca677f4be7b41fa436f21087b89128b57605117",
+        "bytes": 20575
+      },
+      {
+        "path": "functions/package-lock.json",
+        "gitBlobSha": "868690d441b0073c550aea2de56c35950fafa9d1",
+        "transformation": "NONE",
+        "sha256": "2dc0b61445e2d80d0c2ff85697c3a62bd6101f1f1780ac7db5661c856d040ab1",
+        "bytes": 134703
+      },
+      {
+        "path": "functions/package.json",
+        "gitBlobSha": "a016a9f9d6a48ab44d45dedc88611cff083091ef",
+        "transformation": "NONE",
+        "sha256": "68e0019c621feab89517e27eaff8da9e862be9c1b1451c0186921c76549c6e90",
+        "bytes": 1202
+      },
+      {
+        "path": "functions/payment-inference-engine.js",
+        "gitBlobSha": "16bf21177364fbb94f39fab5b8e8ec8506bbd071",
+        "transformation": "NONE",
+        "sha256": "e1e6acd4793cd6cdfc563ca1d3417cbe3be15056fbd70efe36bafce8eae3b54a",
+        "bytes": 13116
+      },
+      {
+        "path": "functions/product-active-role-contract.js",
+        "gitBlobSha": "09681f536c5cbbd36bcba6514d4829d2494b9387",
+        "transformation": "NONE",
+        "sha256": "e3ef80f9eb6c2621892e19a48c517ae89d65c63fa4a036b8e42ac1e8c4d36f91",
+        "bytes": 1592
+      },
+      {
+        "path": "functions/product-insurer-credentials.js",
+        "gitBlobSha": "04e681fdba71ee8438429dda11ae50edf9a40c8e",
+        "transformation": "NONE",
+        "sha256": "ba77be61727e126e642bd5bf2eb86b03759b8a4f2c2b07b3c4fba6c6d570e5d2",
+        "bytes": 10539
+      },
+      {
+        "path": "functions/product-operational-domain.js",
+        "gitBlobSha": "0b84555fd0918735f9fc4dc9bbe594a908437eeb",
+        "transformation": "NONE",
+        "sha256": "2ba8bae8b353f9f8ffbf54fb21fb1c1a51ed1fcc79f6a9c5406e853f366a36a7",
+        "bytes": 58854
+      },
+      {
+        "path": "functions/product-ops-leads-domain.js",
+        "gitBlobSha": "2fb2ec7aef5d9942acdb1ecc4604040febb33123",
+        "transformation": "NONE",
+        "sha256": "21b40f8c93a996c8d2d73b763e53477e1c0f0ac35eccbd6c9b1ec43cc909b58f",
+        "bytes": 41158
+      },
+      {
+        "path": "functions/recurring-insurance-import.js",
+        "gitBlobSha": "9a5c7046e8ce737b5d345f86e1890019a322886a",
+        "transformation": "NONE",
+        "sha256": "8b144460da3f9be0016bda1e9d3d70de9b7543080f58e494c9f5efb3e36b80db",
+        "bytes": 20813
+      },
+      {
+        "path": "functions/secure-academia-manuals/capacitacion-crm.html",
+        "gitBlobSha": null,
+        "transformation": "EXISTING_PRIVATE_ACADEMY_PACKAGING",
+        "sha256": "eec5d7d2130b4ea7d56d3e5619ef06ee54e83472d1d19238cfbbc276415fba79",
+        "bytes": 29302
+      },
+      {
+        "path": "functions/secure-academia-manuals/capacitacion-tecnica-interna.html",
+        "gitBlobSha": null,
+        "transformation": "EXISTING_PRIVATE_ACADEMY_PACKAGING",
+        "sha256": "0eee117969e7caca846a755af2b7c969f04a765a18d0018965d856bebd2c2590",
+        "bytes": 10121
+      },
+      {
+        "path": "functions/secure-academia-manuals/comparativa-ia.html",
+        "gitBlobSha": null,
+        "transformation": "EXISTING_PRIVATE_ACADEMY_PACKAGING",
+        "sha256": "08b2b1ce059b6c10ff666ea54df2014c5da5334b98afa79fc3662ac216a9b92b",
+        "bytes": 6579
+      },
+      {
+        "path": "functions/secure-academia-manuals/manual-integraciones.html",
+        "gitBlobSha": null,
+        "transformation": "EXISTING_PRIVATE_ACADEMY_PACKAGING",
+        "sha256": "7f36d288a170d466c0f519eb1856cd62d6b9e1cc20e7bbe9cb64851d56d08b7e",
+        "bytes": 8017
+      },
+      {
+        "path": "functions/secure-academia-manuals/manual-maestro.html",
+        "gitBlobSha": null,
+        "transformation": "EXISTING_PRIVATE_ACADEMY_PACKAGING",
+        "sha256": "3682091699f7112f4e1354e1230b357bf26a64ea70b900d6a27a5f971f00735d",
+        "bytes": 27587
+      },
+      {
+        "path": "functions/tenant-branding.js",
+        "gitBlobSha": "d3c3dcd191951f91a40eb17b7cc560dc535a2a3c",
+        "transformation": "NONE",
+        "sha256": "0d5ddf624bc27c53212fcf789a5ebf46376d97fe6ce47faf8ec79d5929f4e9ff",
+        "bytes": 4252
+      },
+      {
+        "path": "functions/tenant-domain-config.js",
+        "gitBlobSha": "231fb2f106a6c139bb83c367f0f5e1a1c8924823",
+        "transformation": "NONE",
+        "sha256": "85ec982a8dc979d74db3c76ab8943c593c1510f03d8f32bde0d362a5a7c77461",
+        "bytes": 25707
+      },
+      {
+        "path": "functions/user-credential-selfservice.js",
+        "gitBlobSha": "13d70f404dbdce17f3bbfde30fce2b69bbc5d075",
+        "transformation": "NONE",
+        "sha256": "c3c3451ebbd9527df55d8191e6ce51a86f102972571f386d92d602cb7df693b5",
+        "bytes": 6740
+      },
+      {
+        "path": "functions/user-onboarding.js",
+        "gitBlobSha": "6512d49e4a01c4257e578652b0728f688cd063d1",
+        "transformation": "NONE",
+        "sha256": "14b6aa80c2c455dd038da5c0fcefa093832e2a40b05a352c9ecd5107b1ea935c",
+        "bytes": 27246
+      }
+    ]
+  },
+  "initialDeploymentSnapshotSha256": "3c2f7839fed90ec11846750aef00a08415b7df7ab41a2d96798e9d10164827f4",
+  "initialDeploymentSnapshot": {
+    "phase": "after",
+    "observedAt": "2026-10-31T00:34:45.256Z",
+    "functions": [
+      {
+        "id": "cotcompApprovedVisualPreviewS487",
+        "region": "us-central1",
+        "key": "us-central1/cotcompApprovedVisualPreviewS487",
+        "metadataSha256": "8e78b9f85236139b3dfb88b58d793a88ea96965a790d574521afa7a7adb2abdf"
+      },
+      {
+        "id": "cotcompAuthorizedFidelityPreviewS493",
+        "region": "us-central1",
+        "key": "us-central1/cotcompAuthorizedFidelityPreviewS493",
+        "metadataSha256": "b47b407b75225e28dc42317775def1f7dd84d29eb791435c9643bfc8a3128e2f"
+      },
+      {
+        "id": "cotcompDashboardWorkspacePreviewS490",
+        "region": "us-central1",
+        "key": "us-central1/cotcompDashboardWorkspacePreviewS490",
+        "metadataSha256": "95f97e8945c3c8e95c4fb88754b4f0e60188a66f8d8c2df2d105ee60d31186e1"
+      },
+      {
+        "id": "cotcompExactOwnerApprovedPreviewS488",
+        "region": "us-central1",
+        "key": "us-central1/cotcompExactOwnerApprovedPreviewS488",
+        "metadataSha256": "e75263c2e40d2b5f01ac4979aead08c7ed02626c1006e45dbc5878b76d339cd8"
+      },
+      {
+        "id": "cotcompExactPromotedPreviewS488",
+        "region": "us-central1",
+        "key": "us-central1/cotcompExactPromotedPreviewS488",
+        "metadataSha256": "3c6918d5901846c4fff99778b1e297d08cc3db0b6f9fb102fe6a6dc160aa4343"
+      },
+      {
+        "id": "cotcompFetchComparableProposals",
+        "region": "us-central1",
+        "key": "us-central1/cotcompFetchComparableProposals",
+        "metadataSha256": "4f3e00a4612c7acc9aa2e7eceed181c2655b9733b7dfc8e9a25eada9cf84a631"
+      },
+      {
+        "id": "cotcompFrontendRecoveryPreviewS496B",
+        "region": "us-central1",
+        "key": "us-central1/cotcompFrontendRecoveryPreviewS496B",
+        "metadataSha256": "f4ca0c44175928ff6df3f0d1ffc12160119191faab67e95c15de4fe8e98bb9c3"
+      },
+      {
+        "id": "cotcompOwnerAuthorizedComparativePreviewS492",
+        "region": "us-central1",
+        "key": "us-central1/cotcompOwnerAuthorizedComparativePreviewS492",
+        "metadataSha256": "d895fc7740a1c7526e6d654a182c7a48230525c89e473d5db761a9e2293935ce"
+      },
+      {
+        "id": "cotcompOwnerReviewS498",
+        "region": "us-central1",
+        "key": "us-central1/cotcompOwnerReviewS498",
+        "metadataSha256": "84c1f6d3394756acbf8df55fb2b3db5da44354f6d498a10a4f6180478c1b8160"
+      },
+      {
+        "id": "cotcompOwnerReviewS499",
+        "region": "us-central1",
+        "key": "us-central1/cotcompOwnerReviewS499",
+        "metadataSha256": "be48c2375379f34eae0d21ccf67e01cdd949883a6742e74a0c5c6fcc0cc4b92d"
+      },
+      {
+        "id": "cotcompOwnerReviewS500",
+        "region": "us-central1",
+        "key": "us-central1/cotcompOwnerReviewS500",
+        "metadataSha256": "078dac6e95759c6689a59654b405b0774155a75dd4e4d799f37fa80d1b6f8f16"
+      },
+      {
+        "id": "cotcompOwnerReviewS501",
+        "region": "us-central1",
+        "key": "us-central1/cotcompOwnerReviewS501",
+        "metadataSha256": "cb2a112a3ca99ef90c0fdfe4210ebc6e09bc18bbc6c27cc48cde7228e0cff75d"
+      },
+      {
+        "id": "cotcompOwnerReviewS504",
+        "region": "us-central1",
+        "key": "us-central1/cotcompOwnerReviewS504",
+        "metadataSha256": "28abfb23f77f4af9fb780ebc80c539fbb2747ea9cba19d0248f724710e0c46b2"
+      },
+      {
+        "id": "cotcompOwnerReviewS505",
+        "region": "us-central1",
+        "key": "us-central1/cotcompOwnerReviewS505",
+        "metadataSha256": "2cc82bf43028010cd33750abc61f6afdfebb278f88c0885c3601cf2de49b803b"
+      },
+      {
+        "id": "cotcompOwnerReviewS506",
+        "region": "us-central1",
+        "key": "us-central1/cotcompOwnerReviewS506",
+        "metadataSha256": "246331e53a79026d71ae449b2c2a531722728fbbe1371280ce5a9b93a5af78bc"
+      },
+      {
+        "id": "cotcompPilotIntakeS467",
+        "region": "us-central1",
+        "key": "us-central1/cotcompPilotIntakeS467",
+        "metadataSha256": "3516ebd3a9be4525f9c4ae6dc1c4bac5f6f423d136707bc804a9ac119e3b4ef4"
+      },
+      {
+        "id": "cotcompPilotProposalValidationS471",
+        "region": "us-central1",
+        "key": "us-central1/cotcompPilotProposalValidationS471",
+        "metadataSha256": "39e3eedae8685d1d86e279d20b6764d329aeb3b70a6c36e04385a7be1d4d1f28"
+      },
+      {
+        "id": "cotcompPremiumJourneyPreviewS496",
+        "region": "us-central1",
+        "key": "us-central1/cotcompPremiumJourneyPreviewS496",
+        "metadataSha256": "1de681937c8e8efa0239e98497b8f9ce2be80037823792a522be273531ced85b"
+      },
+      {
+        "id": "cotcompPremiumVisualPreviewS494",
+        "region": "us-central1",
+        "key": "us-central1/cotcompPremiumVisualPreviewS494",
+        "metadataSha256": "36e567b95f3289afcb4815b0848d3348b561a416ba4d7d10e389521c91a9f087"
+      },
+      {
+        "id": "cotcompPremiumVisualPreviewS495",
+        "region": "us-central1",
+        "key": "us-central1/cotcompPremiumVisualPreviewS495",
+        "metadataSha256": "a178bbf5d5e69b7da01a0613517c6afa92884f804abe8036a6db2679dd2bfdb3"
+      },
+      {
+        "id": "cotcompProductFamilyCompletenessPreviewS486",
+        "region": "us-central1",
+        "key": "us-central1/cotcompProductFamilyCompletenessPreviewS486",
+        "metadataSha256": "74fa092f3ecab08c63f854d118d1e59809f97d8ed4711173c2b7523eda234837"
+      },
+      {
+        "id": "cotcompPublicInboundS505",
+        "region": "us-central1",
+        "key": "us-central1/cotcompPublicInboundS505",
+        "metadataSha256": "684dda02ec18f1b289f1c88b4d704488d3eee8cb9068deb49fd940cfdb0e1bdf"
+      },
+      {
+        "id": "cotcompRealCustomerPilotS508",
+        "region": "us-central1",
+        "key": "us-central1/cotcompRealCustomerPilotS508",
+        "metadataSha256": "e613975f4ae35e2f99c377503b432e15fa51dc46450f9ef3aa49b2a5db8c6765"
+      },
+      {
+        "id": "cotcompSchemaDrivenIntakePreviewS485",
+        "region": "us-central1",
+        "key": "us-central1/cotcompSchemaDrivenIntakePreviewS485",
+        "metadataSha256": "7bd2ff0a30fc7d10a9ca4379f4722434b40d98ad68e7db8dd9bb11ef84e3e35b"
+      },
+      {
+        "id": "cotcompSelectProposal",
+        "region": "us-central1",
+        "key": "us-central1/cotcompSelectProposal",
+        "metadataSha256": "b1f1593e7896833411ac0179af6b9cc7c4359caf7c0c8aa2e67f847b7c6d9f98"
+      },
+      {
+        "id": "cotcompSubmitHandoff",
+        "region": "us-central1",
+        "key": "us-central1/cotcompSubmitHandoff",
+        "metadataSha256": "c9943aaf744838bfe2d590c3561979995b9b7a13fbb2fd8f5aeee257545281ef"
+      },
+      {
+        "id": "cotcompValidateDraft",
+        "region": "us-central1",
+        "key": "us-central1/cotcompValidateDraft",
+        "metadataSha256": "5bcab7e751e330a59f73792693b2f45b51a5fdc6a84578c96e38463f21170aa1"
+      },
+      {
+        "id": "cotcompVehicleCatalogS479",
+        "region": "us-central1",
+        "key": "us-central1/cotcompVehicleCatalogS479",
+        "metadataSha256": "31122c58e64fa16d1cd687f2464b60aa898a72da7dce6a826469b310e9b3a36e"
+      },
+      {
+        "id": "cotcompVehicleComboboxPreviewS480A",
+        "region": "us-central1",
+        "key": "us-central1/cotcompVehicleComboboxPreviewS480A",
+        "metadataSha256": "1574404293ee339ed1ce9a0aca93cef5e004b8c72f26b4af1cce8c4e5546e203"
+      },
+      {
+        "id": "cotcompVehicleDropdownPreviewS480",
+        "region": "us-central1",
+        "key": "us-central1/cotcompVehicleDropdownPreviewS480",
+        "metadataSha256": "119ec971f99ed857b957760347a2dec91da86fdd65dbd39aa6561cfbceae6bae"
+      },
+      {
+        "id": "orbit360AdvisorLeadAttentionS509",
+        "region": "us-central1",
+        "key": "us-central1/orbit360AdvisorLeadAttentionS509",
+        "metadataSha256": "31f267337982994e0e44788fc8861d8bdd8b20f3cc4eed686d8ebbfc5de73372"
+      },
+      {
+        "id": "orbit360BankAccountStatus",
+        "region": "us-central1",
+        "key": "us-central1/orbit360BankAccountStatus",
+        "metadataSha256": "3ab36ba0f104984867daa10d4262a8228b019eb79f1088ea2674b0ecfbe0b65c"
+      },
+      {
+        "id": "orbit360CobrosReconciliationCommand",
+        "region": "us-central1",
+        "key": "us-central1/orbit360CobrosReconciliationCommand",
+        "metadataSha256": "290701b791d3102609f8ad425a78c1800c6046b8a79b267a308b72ee221b08a5"
+      },
+      {
+        "id": "orbit360CobrosReconciliationCommandLabV20260804",
+        "region": "us-central1",
+        "key": "us-central1/orbit360CobrosReconciliationCommandLabV20260804",
+        "metadataSha256": "005e08cb7825a8375724280719bfffc1a886093c86e7730c25bf26ab98b52a93"
+      },
+      {
+        "id": "orbit360CobrosReconciliationCommandPreview",
+        "region": "us-central1",
+        "key": "us-central1/orbit360CobrosReconciliationCommandPreview",
+        "metadataSha256": "94404e13acd46739817ee3ef464e44c5b71236d72fe30a38d940b36527f5d107"
+      },
+      {
+        "id": "orbit360CopyInsurerBankAccount",
+        "region": "us-central1",
+        "key": "us-central1/orbit360CopyInsurerBankAccount",
+        "metadataSha256": "ecf3e6bb3196a47a892de1ade5af228af8f0f70ec7968ee46a52fc1563b9a78f"
+      },
+      {
+        "id": "orbit360CopyInsurerCredential",
+        "region": "us-central1",
+        "key": "us-central1/orbit360CopyInsurerCredential",
+        "metadataSha256": "24cf5392051279570fb71c7a2e099d7f1789057c1deffc31464c43225ef9d180"
+      },
+      {
+        "id": "orbit360CredentialStatus",
+        "region": "us-central1",
+        "key": "us-central1/orbit360CredentialStatus",
+        "metadataSha256": "53a522695282014384492a55de916ea98e28d011692b8662198f6d623d495a90"
+      },
+      {
+        "id": "orbit360GetAdvisorOpsInbox",
+        "region": "us-central1",
+        "key": "us-central1/orbit360GetAdvisorOpsInbox",
+        "metadataSha256": "49e65dda5d8a1e3605c88d348c7f9857c3e9627668ac8066a70d1e02bd55d3ad"
+      },
+      {
+        "id": "orbit360GetAdvisorOpsInboxLabV20260804",
+        "region": "us-central1",
+        "key": "us-central1/orbit360GetAdvisorOpsInboxLabV20260804",
+        "metadataSha256": "926d11af4e9d889e431ecfc5ee33b048d83264d023ea1bb446d1b5642f7d6bdf"
+      },
+      {
+        "id": "orbit360ImportInsurerBankAccounts",
+        "region": "us-central1",
+        "key": "us-central1/orbit360ImportInsurerBankAccounts",
+        "metadataSha256": "33f743af3aa0d2e5bd444a9ed7a7548d0f0894e2a7e8b4a54a5e237bda9cc6ce"
+      },
+      {
+        "id": "orbit360ImportInsurerCredentials",
+        "region": "us-central1",
+        "key": "us-central1/orbit360ImportInsurerCredentials",
+        "metadataSha256": "e4dc86d8ee780240f63ec432d1315eca9445607d1e63c01edab5be7970a72fc8"
+      },
+      {
+        "id": "orbit360OpsLeadsCommand",
+        "region": "us-central1",
+        "key": "us-central1/orbit360OpsLeadsCommand",
+        "metadataSha256": "82dec4ac6209697bda6dd85c87eb1b1737c22eb284f4a091ed08190922d8072d"
+      },
+      {
+        "id": "orbit360OpsLeadsCommandLabV20260804",
+        "region": "us-central1",
+        "key": "us-central1/orbit360OpsLeadsCommandLabV20260804",
+        "metadataSha256": "465d64b428ffad12c793ae7b17aa439b554b6b80aaa285b768e82aa9df56bb2e"
+      },
+      {
+        "id": "orbit360ProductInsurerCredentialCommand",
+        "region": "us-central1",
+        "key": "us-central1/orbit360ProductInsurerCredentialCommand",
+        "metadataSha256": "c2afb879492acd16c6913de6f1832d602e02c0717e1579c3f7b6ccaddfddb0ae"
+      },
+      {
+        "id": "orbit360ProductOperationalCommand",
+        "region": "us-central1",
+        "key": "us-central1/orbit360ProductOperationalCommand",
+        "metadataSha256": "c508190e65b2331b6c31911b23174a48acc88a06b6840d4cb51cdeca37c081ae"
+      },
+      {
+        "id": "orbit360ProvisionTeamAccess",
+        "region": "us-central1",
+        "key": "us-central1/orbit360ProvisionTeamAccess",
+        "metadataSha256": "3a6c813e23d5d530d0ddc5e9e11840426cf03fd792f0874d98ae326de4a196fc"
+      },
+      {
+        "id": "orbit360RecurringInsuranceImportLabV20260804",
+        "region": "us-central1",
+        "key": "us-central1/orbit360RecurringInsuranceImportLabV20260804",
+        "metadataSha256": "4c912ec07287ce4b95b04528f413af037015f464285f8028590e33bcc01db176"
+      },
+      {
+        "id": "orbit360RevealInsurerBankAccount",
+        "region": "us-central1",
+        "key": "us-central1/orbit360RevealInsurerBankAccount",
+        "metadataSha256": "b6d0ef42144efca6a2d685f7207da9f3c32d5399c89a36f73a95383e5da453e3"
+      },
+      {
+        "id": "orbit360RevealInsurerCredential",
+        "region": "us-central1",
+        "key": "us-central1/orbit360RevealInsurerCredential",
+        "metadataSha256": "bc0ac163b807036feb280a6e25146ebeec9eeb878e8d6f2fed6c5e307e52c0c3"
+      },
+      {
+        "id": "orbit360TenantBranding",
+        "region": "us-central1",
+        "key": "us-central1/orbit360TenantBranding",
+        "metadataSha256": "146ea9088d3f1bdc346b862e670d479f02c26c273c2844eb67278f0b34ab9787"
+      },
+      {
+        "id": "orbit360TenantDomainConfig",
+        "region": "us-central1",
+        "key": "us-central1/orbit360TenantDomainConfig",
+        "metadataSha256": "58502c10ec09226f414c170a05a45d3790496d4b8ea287ee18d98e0335771d10"
+      },
+      {
+        "id": "portalP01ReadOnlyS511E",
+        "region": "us-central1",
+        "key": "us-central1/portalP01ReadOnlyS511E",
+        "metadataSha256": "cc818dc11d882c846f99b79a3a06cf83fb002fc5fc9a8367e78612d9b3d18ce2"
+      },
+      {
+        "id": "siniestrosPublicResolverS512D",
+        "region": "us-central1",
+        "key": "us-central1/siniestrosPublicResolverS512D",
+        "metadataSha256": "fff5d9980d21d15d47f0bfa689a838caf0e90452f9d2bf2896ce8bcde73ad121"
+      },
+      {
+        "id": "orbit360AcademiaManualReadPreview",
+        "region": "us-east1",
+        "key": "us-east1/orbit360AcademiaManualReadPreview",
+        "metadataSha256": "81f2190f2a77fc8cd7fbdaa06d7e980afad1b24e05f2e32bd66fedeea1dea242"
+      },
+      {
+        "id": "orbit360AssignableAdvisorRosterPreview",
+        "region": "us-east1",
+        "key": "us-east1/orbit360AssignableAdvisorRosterPreview",
+        "metadataSha256": "da67dae47e1c3742452978928a423c2662b5b7c72a622e0cf4d59e9ee46133c5"
+      },
+      {
+        "id": "orbit360DocumentDriveBootstrapPreview",
+        "region": "us-east1",
+        "key": "us-east1/orbit360DocumentDriveBootstrapPreview",
+        "metadataSha256": "dd928bace7692bd6bceb766f42ba465d839a59f47216b5ac8831369113276f29"
+      },
+      {
+        "id": "orbit360DocumentDriveCleanupPreview",
+        "region": "us-east1",
+        "key": "us-east1/orbit360DocumentDriveCleanupPreview",
+        "metadataSha256": "5082c799d2e355663ce67c1e76ee45ad4f53b6a234389b99e486394e8a0f2898"
+      },
+      {
+        "id": "orbit360DocumentDriveDownloadPreview",
+        "region": "us-east1",
+        "key": "us-east1/orbit360DocumentDriveDownloadPreview",
+        "metadataSha256": "24f5cdc7276b746ed1e80f1131ebccdaffe00e3083d461e95b5e1172c638a1f6"
+      },
+      {
+        "id": "orbit360DocumentDriveFinalizePreview",
+        "region": "us-east1",
+        "key": "us-east1/orbit360DocumentDriveFinalizePreview",
+        "metadataSha256": "d33b7179577df829e23cc53b9bd7d5e00f43dc38f28212f781a0f2d3e6089da6"
+      },
+      {
+        "id": "orbit360DocumentDriveListFolderPreview",
+        "region": "us-east1",
+        "key": "us-east1/orbit360DocumentDriveListFolderPreview",
+        "metadataSha256": "3772e642b835b49a804a727e04b275b0081c1ed536e8e19bc1edb5298c0f958e"
+      },
+      {
+        "id": "orbit360DocumentDriveQuarantinePreview",
+        "region": "us-east1",
+        "key": "us-east1/orbit360DocumentDriveQuarantinePreview",
+        "metadataSha256": "d510e3e1bb03fd45ae7fcd0632f5b2045affc8a1d3cf5d0e090b02b7ff874037"
+      },
+      {
+        "id": "orbit360DocumentDriveReadDossierPreview",
+        "region": "us-east1",
+        "key": "us-east1/orbit360DocumentDriveReadDossierPreview",
+        "metadataSha256": "39f3aca83bf5a09cd041d51062c0295aa07bf7a9e32342d41ab26a90a32a3cc9"
+      },
+      {
+        "id": "orbit360DocumentDriveReadPreview",
+        "region": "us-east1",
+        "key": "us-east1/orbit360DocumentDriveReadPreview",
+        "metadataSha256": "416170d148f0454b11b04c19492f91c6bcf87572cc6b417f7d9f35fd848d4c8b"
+      },
+      {
+        "id": "orbit360DocumentDriveStatusPreview",
+        "region": "us-east1",
+        "key": "us-east1/orbit360DocumentDriveStatusPreview",
+        "metadataSha256": "f4572a8831f7f9b6c54e0e447acc59055c9b2a4a3521038f75d83ed77b37b1df"
+      },
+      {
+        "id": "orbit360DocumentDriveUploadPreview",
+        "region": "us-east1",
+        "key": "us-east1/orbit360DocumentDriveUploadPreview",
+        "metadataSha256": "46b1f4434aeaf1a6dacaa209837ad10b18dd50c91f6cc391d2ddbb1846477368"
+      },
+      {
+        "id": "orbit360GetAdvisorOpsInboxPreview",
+        "region": "us-east1",
+        "key": "us-east1/orbit360GetAdvisorOpsInboxPreview",
+        "metadataSha256": "6a9b54f9ae7ed84a7de8b5d6a0076445185f3a219a36347663719a6b343cdfe4"
+      },
+      {
+        "id": "orbit360NotificationOutboxPreviewCreated",
+        "region": "us-east1",
+        "key": "us-east1/orbit360NotificationOutboxPreviewCreated",
+        "metadataSha256": "69257712871437d1a2f6db2688fe583281c85c5e8d3ba0738338800acdf36662"
+      },
+      {
+        "id": "orbit360OpsLeadsCommandPreview",
+        "region": "us-east1",
+        "key": "us-east1/orbit360OpsLeadsCommandPreview",
+        "metadataSha256": "4c3a7ed48c5535afb0d914950f74db54c6c16509d3d7e834e368127a9e611eaf"
+      },
+      {
+        "id": "orbit360ProductAssetReadPreview",
+        "region": "us-east1",
+        "key": "us-east1/orbit360ProductAssetReadPreview",
+        "metadataSha256": "67328b45a75b5689cfdd1cdcb242f41beb5bb136e1e314718c33f87c7d23b0f0"
+      },
+      {
+        "id": "orbit360ProductAssetUploadPreview",
+        "region": "us-east1",
+        "key": "us-east1/orbit360ProductAssetUploadPreview",
+        "metadataSha256": "4d7d688e5355bedcec5020e1d3212b2be29e05cb5ba89f29dcc6821aa7c4a6b1"
+      },
+      {
+        "id": "orbit360ProductInsurerCredentialCommandPreview",
+        "region": "us-east1",
+        "key": "us-east1/orbit360ProductInsurerCredentialCommandPreview",
+        "metadataSha256": "e522df222139314553cb4f333db41a36b743fb269b0e20cce284d41fb4c6dde6"
+      },
+      {
+        "id": "orbit360ProductOperationalCommandPreview",
+        "region": "us-east1",
+        "key": "us-east1/orbit360ProductOperationalCommandPreview",
+        "metadataSha256": "955010e064cb349d132c385063783221311cbac2e9b0c63d9514beb5b6e05422"
+      },
+      {
+        "id": "orbit360RetryNotificationOutboxPreview",
+        "region": "us-east1",
+        "key": "us-east1/orbit360RetryNotificationOutboxPreview",
+        "metadataSha256": "1341a172e77d9558d89d7ab155f7b56ed703633f5026ebfa810177a90bbf6667"
+      },
+      {
+        "id": "orbit360ScopedPolicyRead",
+        "region": "us-east1",
+        "key": "us-east1/orbit360ScopedPolicyRead",
+        "metadataSha256": "c5b2a52a53ece5d2cf56813fcf419990d52298fe538e211c51d2643c06e42114"
+      },
+      {
+        "id": "orbit360ScopedPolicyReadPreview",
+        "region": "us-east1",
+        "key": "us-east1/orbit360ScopedPolicyReadPreview",
+        "metadataSha256": "b7dbb096707bc46e705929f2e19b75766a6a1b726d92afa9fad4c525628b59a8"
+      },
+      {
+        "id": "orbit360TenantDomainConfigPreview",
+        "region": "us-east1",
+        "key": "us-east1/orbit360TenantDomainConfigPreview",
+        "metadataSha256": "fda30feafe6a1e8cf08e5e3932048f5fae7ca406988b99e6b7325fe7f5b083e3"
+      },
+      {
+        "id": "orbit360UpdateAdvisorOpsInboxStatePreview",
+        "region": "us-east1",
+        "key": "us-east1/orbit360UpdateAdvisorOpsInboxStatePreview",
+        "metadataSha256": "7c1a50f52469d42acc0314b3132e8d0133fe65533eec0b4a8a4bdda2840fe5b4"
+      }
+    ],
+    "targets": [
+      {
+        "target": "orbit360ProductOperationalCommandPreview",
+        "identity": {
+          "name": "projects/ays-orbit-360-lab/locations/us-east1/functions/orbit360ProductOperationalCommandPreview",
+          "environment": "GEN_2",
+          "state": "ACTIVE",
+          "updateTime": "2026-10-31T00:34:37.655877455Z",
+          "build": "projects/646761409743/locations/us-east1/builds/dfc20065-31dd-4dd7-a80f-54fac47bb9d9",
+          "runtime": "nodejs22",
+          "entryPoint": "orbit360ProductOperationalCommandPreview",
+          "sourceStorage": {
+            "bucket": "gcf-v2-sources-646761409743-us-east1",
+            "object": "orbit360ProductOperationalCommandPreview/function-source.zip",
+            "generation": "1793406833933917"
+          },
+          "revision": "orbit360productoperationalcommandpreview-00212-qok",
+          "service": "projects/ays-orbit-360-lab/locations/us-east1/services/orbit360productoperationalcommandpreview",
+          "uri": "https://orbit360productoperationalcommandpreview-3se5xwcsnq-ue.a.run.app",
+          "codeHash": "dc40ebe72b3ea545313ff3771b9d6dae71b11c5b",
+          "labels": {
+            "deployment-tool": "cli-firebase",
+            "deployment-callable": "true",
+            "firebase-functions-hash": "dc40ebe72b3ea545313ff3771b9d6dae71b11c5b"
+          },
+          "serviceAccountEmail": "646761409743-compute@developer.gserviceaccount.com",
+          "ingressSettings": "ALLOW_ALL",
+          "environmentVariablesSha256": "dac9b186b4555278aa904ea07196e6c1aaaec69d2313d4071ad4d488f13492bf",
+          "secretEnvironmentVariablesSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "serviceConfigNonRevisionSha256": "ef9e9d59babbab37a712bb491026040b2e33f55e4c940279c193a55d97112ef2"
+        },
+        "iam": {
+          "status": "READ",
+          "policySha256": "b9a6087bad291d0bb96d7e1784d459b1521d258707c63f93933d3148c60391cb"
+        }
+      },
+      {
+        "target": "orbit360ScopedPolicyReadPreview",
+        "identity": {
+          "name": "projects/ays-orbit-360-lab/locations/us-east1/functions/orbit360ScopedPolicyReadPreview",
+          "environment": "GEN_2",
+          "state": "ACTIVE",
+          "updateTime": "2026-10-31T00:34:40.610074451Z",
+          "build": "projects/646761409743/locations/us-east1/builds/dfc20065-31dd-4dd7-a80f-54fac47bb9d9",
+          "runtime": "nodejs22",
+          "entryPoint": "orbit360ScopedPolicyReadPreview",
+          "sourceStorage": {
+            "bucket": "gcf-v2-sources-646761409743-us-east1",
+            "object": "orbit360ScopedPolicyReadPreview/function-source.zip",
+            "generation": "1793406873066093"
+          },
+          "revision": "orbit360scopedpolicyreadpreview-00067-pib",
+          "service": "projects/ays-orbit-360-lab/locations/us-east1/services/orbit360scopedpolicyreadpreview",
+          "uri": "https://orbit360scopedpolicyreadpreview-3se5xwcsnq-ue.a.run.app",
+          "codeHash": "dc40ebe72b3ea545313ff3771b9d6dae71b11c5b",
+          "labels": {
+            "deployment-tool": "cli-firebase",
+            "deployment-callable": "true",
+            "firebase-functions-hash": "dc40ebe72b3ea545313ff3771b9d6dae71b11c5b"
+          },
+          "serviceAccountEmail": "orbit360-secrets-lab@ays-orbit-360-lab.iam.gserviceaccount.com",
+          "ingressSettings": "ALLOW_ALL",
+          "environmentVariablesSha256": "36ca53029bfbf51b6b7053a22426acc64622dcc4b3bdb1b72b50620b2d9641e6",
+          "secretEnvironmentVariablesSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "serviceConfigNonRevisionSha256": "20bb4aba5674f0d09cba92a30f6d8708e702eafbc6e693921419ca57b16164e9"
+        },
+        "iam": {
+          "status": "READ",
+          "policySha256": "b9a6087bad291d0bb96d7e1784d459b1521d258707c63f93933d3148c60391cb"
+        }
+      }
+    ]
+  },
+  "rebuildForbidden": true,
+  "redeployBackendCodeForbidden": true,
+  "previewTransport": {
+    "workflowPath": ".github/workflows/gravicentra-b4-003-cumulative-safe-read-preview-20261029.yml",
+    "transportWorkflowAfterBlob": "ef9156f50f1b114319127f14dc1f3b936f59386f",
+    "sourceSha": "bcb54435788e1ace50325f347d1d9c0ee4a222e5",
+    "reuseExistingChannel": true,
+    "hostingChannelId": "gi-i65-b4-sr-41066435386",
+    "expectedPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b4-sr-41066435386-r09pl1ti.web.app",
+    "rebuild": false,
+    "backendCodeDeploy": false,
+    "configurationWrite": false,
+    "exactArtifactDigestsRequired": true,
+    "commitMessage": "build(i6.5 B4-003): trigger cumulative safe-read isolated Preview only",
+    "sourceGuardPassRequired": true,
+    "singleWorkflowChildRequired": true
+  },
+  "regression": {
+    "currentGuardDiscriminants": 33,
+    "getOnlyHelperTests": 43,
+    "externalRequestsInTests": 0,
+    "immutableParentFullGuardRequired": true,
+    "historicalGuardEnvironmentUnchanged": true
+  },
+  "allowedEvidenceSuccessor": {
+    "controlKey": "b4003InsurerActivityPreviewEvidence20261030",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_INSURER_ACTIVITY_PREVIEW_EVIDENCE_20261030.json",
+    "exactChangedPaths": [
+      "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json",
+      "artifacts/orbit360-recovery/release-control/I6_5_B4_003_INSURER_ACTIVITY_PREVIEW_EVIDENCE_20261030.json"
+    ],
+    "priorKeysPreserved": 423,
+    "directChildOfReadOnlyTransport": true,
+    "failedAttemptsAndOriginalLineageMustRemain": true,
+    "metadataPassAloneCannotAcceptSourceOrUat": true,
+    "technicalPassRequires66OriginalFileComparisons": true,
+    "blockedPartialFailedResultsMustRemainTruthful": true
+  },
+  "preservation": {
+    "priorControlKeys": 422,
+    "currentProductFiles": 118,
+    "ledgerIds": 295,
+    "institutionalGoalsClosure": "RESOLVED_AUTHENTICATED_RUNTIME_PASS",
+    "priorityP0Resolved": 1,
+    "priorityP0Total": 6,
+    "formalI6ProgressPercent": 50,
+    "overallImplementationPercent": null,
+    "broaderR1814Acceptance": "OPEN",
+    "findingClosuresGranted": 0,
+    "originalPatchHelperPhysicallyUnchanged": true
+  },
+  "boundaries": {
+    "liveDeployment": false,
+    "authIamRulesChange": false,
+    "membershipChange": false,
+    "realBusinessWrites": false,
+    "dataImport": false,
+    "cleanup": false,
+    "newEndpoints": false,
+    "newWorkflows": false,
+    "newCollections": false,
+    "furtherConfigurationWrites": false,
+    "findingClosed": false,
+    "b4003Closed": false,
+    "paulaVisualAccepted": false,
+    "productionAccepted": false
+  }
+}

@@ -16952,5 +16952,27 @@
     "backendCodeRedeployAuthorized": false,
     "hostingRebuildAuthorized": false,
     "authIamRulesChangeAuthorized": false
+  },
+  "b4003InsurerPostRestorationReadbackSuccessor20261030": {
+    "schema": "GRAVICENTRA_I65_B4003_INSURER_POST_RESTORATION_POINTER_V1",
+    "status": "GET_ONLY_OPERATION_BOUND_CONTENT_VERIFICATION_AUTHORIZED",
+    "gate": "I6.5/B4-003",
+    "parentHead": "a4c3d37dc8d9a4bf11451d9b9b61b3a66e439825",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_INSURER_POST_RESTORATION_READBACK_SUCCESSOR_20261030.json",
+    "receiptBlobSha": "ffb07fe7d71aa071022389b89d3ed969e9279d0b",
+    "atomicCommitPaths": [
+      "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json",
+      "artifacts/orbit360-recovery/release-control/I6_5_B4_003_INSURER_POST_RESTORATION_READBACK_SUCCESSOR_20261030.json",
+      "tools/gravicentra-b4-003-insurer-preview-resume.mjs",
+      "tools/gravicentra-b4-003-insurer-preview-resume.test.mjs",
+      "tools/gravicentra-b4-003-insurer-reader-postpatch-readback.cjs",
+      "tools/gravicentra-b4-003-insurer-reader-postpatch-readback.test.cjs"
+    ],
+    "readOnlyBackendVerificationAuthorized": true,
+    "furtherConfigurationWritesAuthorized": false,
+    "backendCodeDeploymentAuthorized": false,
+    "authIamRulesChangeAuthorized": false,
+    "currentCapabilityAcceptances": 0,
+    "priorControlKeysPreserved": 422
   }
 }
