@@ -1,0 +1,169 @@
+name: Gravicentra B4-003 Goals Exact LAB Preview
+on:
+  push:
+    branches: [transport/gi-b4003-goals-0a25-preview]
+    paths: [.github/workflows/gravicentra-b4-003-goals-isolated-preview-20261031.yml]
+permissions:
+  contents: read
+concurrency:
+  group: gi-b4003-goals-0a25-transport
+  cancel-in-progress: false
+jobs:
+  exact-goals-lab:
+    if: >-
+      github.repository == 'paulaosoriof86/orbit360-core' &&
+      github.ref == 'refs/heads/transport/gi-b4003-goals-0a25-preview' &&
+      github.event.head_commit.message == 'build(i6.5 B4-003): exact Goals LAB Preview from certified 0a25c5a2'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    env:
+      SOURCE_SHA: 0a25c5a2bf58bbe06537be42388b8530802f9c49
+      PROJECT_ID: ays-orbit-360-lab
+      HOSTING_SITE: ays-orbit-360-lab
+      TENANT_HINT: alianzas-soluciones
+      RELEASE_GATE: I6.5-B4-003
+      BUILD_PREFIX: gi-i65-b4
+      ENVIRONMENT_REF: firebase-hosting-preview-i6-5-b4-003-goals
+      GRAVICENTRA_B4_003_SCOPED_PREVIEW: 'true'
+      SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: transport
+          fetch-depth: 2
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          ref: 0a25c5a2bf58bbe06537be42388b8530802f9c49
+          path: candidate
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify exact transport and protected source
+        run: |
+          set -euo pipefail
+          test "$(git -C transport rev-parse HEAD^)" = "$SOURCE_SHA"
+          test "$(git -C candidate rev-parse HEAD)" = "$SOURCE_SHA"
+          test "$(git -C transport show --pretty=format: --name-only HEAD | sed '/^$/d')" = '.github/workflows/gravicentra-b4-003-goals-isolated-preview-20261031.yml'
+          cd candidate
+          node tools/gravicentra-i6-control-plane-guard-v1.mjs
+          node tests/goal-participation-isolated-routing.test.cjs
+          node tests/goal-participation-preview-boundary.test.cjs
+          node tests/goal-participation-modal.test.cjs
+          node - <<'NODE'
+          const c=require('./artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json');
+          const p=c.b4003GoalParticipationSourceSuccessor20261031;
+          if(p?.sourceCommit!=='fc463d73e3a4cdbe5911b8927df8ddcd0c69ea60'||p.previewDeployed!==false||p.productionAuthorized!==false||p.advisorRecordsClassified!==0||p.businessDataWrites!==0||p.formalI6Percent!==50||p.priorityP0Closed!==1)throw Error('GOALS_PREVIEW_AUTHORITY_MISMATCH');
+          NODE
+      - name: Snapshot LIVE roots before Preview
+        run: |
+          set -euo pipefail
+          curl -fsSL --retry 2 --max-time 30 https://ays-orbit-360-lab.web.app/ | sha256sum > "$RUNNER_TEMP/lab-live-before"
+          curl -fsSL --retry 2 --max-time 30 https://app.aysseguros.com/ | sha256sum > "$RUNNER_TEMP/owner-live-before"
+      - name: Select existing LAB service account and pinned Firebase CLI
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/gi-auth"
+          python3 - <<'PY'
+          import json,os,pathlib
+          root=pathlib.Path(os.environ['RUNNER_TEMP'])/'gi-auth';paths=[]
+          for n,k in enumerate(('SA_ORBIT360_LAB','SA_ORBIT_360_LAB','SA_DEFAULT')):
+              try:v=json.loads(os.environ.get(k,''))
+              except Exception:continue
+              if v.get('type')=='service_account' and v.get('project_id')==os.environ['PROJECT_ID'] and v.get('private_key'):
+                  p=root/f'{n}.json';p.write_text(json.dumps(v));p.chmod(0o600);paths.append(str(p))
+          if not paths:raise SystemExit('GOALS_LAB_ACCOUNT_MISSING')
+          (root/'candidates').write_text('\n'.join(paths)+'\n')
+          PY
+          CLI_ROOT="$RUNNER_TEMP/gi-cli"
+          npm install --prefix "$CLI_ROOT" --no-save --ignore-scripts --no-audit --no-fund firebase-tools@14.10.1 >/dev/null
+          node candidate/tools/gravicentra-firebase-tools-empty-extensions-workaround-v1.mjs "$CLI_ROOT"
+          CLI="$CLI_ROOT/node_modules/firebase-tools/lib/bin/firebase.js"
+          selected=''
+          while IFS= read -r f; do
+            if GOOGLE_APPLICATION_CREDENTIALS="$f" node "$CLI" apps:list WEB --project "$PROJECT_ID" --non-interactive --json >/dev/null 2>&1 && GOOGLE_APPLICATION_CREDENTIALS="$f" node "$CLI" functions:list --project "$PROJECT_ID" --non-interactive --json >/dev/null 2>&1; then selected="$f";break;fi
+          done < "$RUNNER_TEMP/gi-auth/candidates"
+          test -n "$selected"
+          cp "$selected" "$RUNNER_TEMP/gi-auth/selected.json"
+          chmod 600 "$RUNNER_TEMP/gi-auth/selected.json"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/gi-auth/selected.json" >> "$GITHUB_ENV"
+          echo "FIREBASE_CLI_BIN=$CLI" >> "$GITHUB_ENV"
+          npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund firebase-admin@13.4.0 >/dev/null
+      - name: Deploy only two additive synthetic-protected Preview callables
+        run: |
+          set -euo pipefail
+          node "$FIREBASE_CLI_BIN" functions:list --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/functions-before.json"
+          node - <<'NODE'
+          const d=require(process.env.RUNNER_TEMP+'/functions-before.json'),rows=Array.isArray(d.result)?d.result:Array.isArray(d)?d:[];
+          for(const t of ['orbit360AssignableAdvisorRosterGoalsPreview','orbit360ProductOperationalCommandGoalsPreview'])if(rows.some(r=>[r.id,r.name,r.entryPoint].some(x=>String(x||'').includes(t))))throw Error('GOALS_TARGET_ALREADY_EXISTS:'+t);
+          NODE
+          FROOT="$RUNNER_TEMP/gi-functions"
+          mkdir -p "$FROOT"
+          cp -a candidate/functions "$FROOT/backend"
+          node - "$FROOT/backend/bootstrap.js" <<'NODE'
+          const fs=require('node:fs');
+          fs.writeFileSync(process.argv[2],"'use strict';\nmodule.exports={orbit360AssignableAdvisorRosterGoalsPreview:require('./assignable-advisor-roster').orbit360AssignableAdvisorRosterGoalsPreview,orbit360ProductOperationalCommandGoalsPreview:require('./product-operational-domain').orbit360ProductOperationalCommandGoalsPreview};\n");
+          NODE
+          printf '{"functions":{"source":"backend","runtime":"nodejs22"}}\n' > "$FROOT/firebase.json"
+          (cd "$FROOT/backend" && npm ci --ignore-scripts --no-audit --no-fund >/dev/null)
+          export FROOT
+          node - <<'NODE'
+          const f=require(process.env.FROOT+'/backend/bootstrap.js'),a=Object.keys(f).sort();
+          if(JSON.stringify(a)!==JSON.stringify(['orbit360AssignableAdvisorRosterGoalsPreview','orbit360ProductOperationalCommandGoalsPreview']))throw Error('GOALS_ONLY_TWO_FUNCTIONS_REQUIRED');
+          NODE
+          node "$FIREBASE_CLI_BIN" deploy --only functions:orbit360AssignableAdvisorRosterGoalsPreview,functions:orbit360ProductOperationalCommandGoalsPreview --config "$FROOT/firebase.json" --project "$PROJECT_ID" --non-interactive
+      - name: Build immutable Hosting-only package with exact opt-in
+        run: |
+          set -euo pipefail
+          node "$FIREBASE_CLI_BIN" apps:list WEB --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/apps.json"
+          APP_ID=$(python3 - <<'PY'
+          import json,os
+          d=json.load(open(os.environ['RUNNER_TEMP']+'/apps.json'))
+          w=[x for x in (d.get('result') or []) if str(x.get('platform','')).upper() in ('WEB','PLATFORM_WEB','')]
+          if len(w)!=1:raise SystemExit('GOALS_WEB_APP_CARDINALITY_INVALID')
+          print(w[0].get('appId',''))
+          PY
+          )
+          node "$FIREBASE_CLI_BIN" apps:sdkconfig WEB "$APP_ID" --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/sdk.json"
+          cd candidate
+          node tools/gravicentra-i6-5-b1-branding-snapshot.mjs "$RUNNER_TEMP/branding.json"
+          export TENANT_BRANDING_SNAPSHOT_FILE="$RUNNER_TEMP/branding.json"
+          node tools/gravicentra-i6-1-preview-package.mjs . "$RUNNER_TEMP/gi-package" "$RUNNER_TEMP/sdk.json" > "$RUNNER_TEMP/package-out.json"
+          node - <<'NODE'
+          const fs=require('node:fs'),vm=require('node:vm'),root=process.env.RUNNER_TEMP+'/gi-package/bundle',site=root+'/site';
+          const cfg=JSON.parse(fs.readFileSync(root+'/firebase.json')),meta=JSON.parse(fs.readFileSync(site+'/__recovery__/build.json'));
+          if(Object.keys(cfg).join(',')!=='hosting'||meta.sourceSha!==process.env.SOURCE_SHA||meta.gate!=='I6.5-B4-003')throw Error('GOALS_HOSTING_ONLY_EXACT_SOURCE_REQUIRED');
+          for(const f of ['index.html','modules/equipo.js','modules/inicio.js','modules/finanzas.js','modules/insights.js','core/assignable-advisor-roster-client.js','data/store-firestore-product-operational-p0.js'])if(!fs.readFileSync('orbit360-platform/'+f).equals(fs.readFileSync(site+'/'+f)))throw Error('GOALS_PRODUCT_BYTE_DRIFT:'+f);
+          const p=site+'/product-runtime-config.js',ctx={window:{}};vm.runInNewContext(fs.readFileSync(p,'utf8'),ctx,{timeout:1000});
+          const c=ctx.window.__ORBIT360_PRODUCT_PUBLIC_CONFIG__;
+          if(c?.sourceSha!==process.env.SOURCE_SHA||c.scopedReadPreviewCandidate!==true)throw Error('GOALS_RUNTIME_PREVIEW_BINDING_REQUIRED');
+          fs.writeFileSync(p,'/* LAB isolated goals Preview */\nwindow.__ORBIT360_PRODUCT_PUBLIC_CONFIG__ = Object.freeze('+JSON.stringify({...c,goalParticipationPreviewCandidate:true})+');\n');
+          NODE
+      - name: Deploy one seven-day Hosting Preview and read back exact bytes
+        run: |
+          set -euo pipefail
+          CHANNEL_ID="gi-i65-b4-goals-0a25c5a2-$GITHUB_RUN_ID"
+          cd "$RUNNER_TEMP/gi-package/bundle"
+          node "$FIREBASE_CLI_BIN" hosting:channel:deploy "$CHANNEL_ID" --config firebase.json --project "$PROJECT_ID" --expires 7d --non-interactive --json > "$RUNNER_TEMP/deploy.json" 2>&1
+          export CHANNEL_ID
+          URL=$(python3 - <<'PY'
+          import os,re
+          s=open(os.environ['RUNNER_TEMP']+'/deploy.json').read();prefix='https://ays-orbit-360-lab--'+os.environ['CHANNEL_ID']+'-'
+          u=sorted(set(x.rstrip('/') for x in re.findall(r'https://[A-Za-z0-9._-]+\.web\.app',s) if x.startswith(prefix)))
+          if len(u)!=1:raise SystemExit('GOALS_PREVIEW_URL_NOT_UNIQUE')
+          print(u[0])
+          PY
+          )
+          for path in __recovery__/build.json product-runtime-config.js index.html modules/equipo.js modules/inicio.js modules/finanzas.js modules/insights.js core/assignable-advisor-roster-client.js data/store-firestore-product-operational-p0.js; do
+            curl -fsSL --retry 2 --max-time 30 "$URL/$path" > "$RUNNER_TEMP/served-$(basename "$path")"
+            cmp "site/$path" "$RUNNER_TEMP/served-$(basename "$path")"
+          done
+          curl -fsSL --retry 2 --max-time 30 https://ays-orbit-360-lab.web.app/ | sha256sum > "$RUNNER_TEMP/lab-live-after"
+          curl -fsSL --retry 2 --max-time 30 https://app.aysseguros.com/ | sha256sum > "$RUNNER_TEMP/owner-live-after"
+          cmp "$RUNNER_TEMP/lab-live-before" "$RUNNER_TEMP/lab-live-after"
+          cmp "$RUNNER_TEMP/owner-live-before" "$RUNNER_TEMP/owner-live-after"
+          printf '%s\n' "GOALS_PREVIEW_EXACT_TECHNICAL_PASS_UAT_PENDING" "Source: $SOURCE_SHA" "URL: $URL" "Only two additive LAB Preview callables and one temporary Hosting channel; no LIVE Hosting, Rules or business writes. B4-003 remains HOLD." >> "$GITHUB_STEP_SUMMARY"
