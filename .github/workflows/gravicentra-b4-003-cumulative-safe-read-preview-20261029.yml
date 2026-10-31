@@ -1,28 +1,22 @@
+# Resume only the exact failed LAB Preview run 41150545623.
+# Restore the prior reader environment, retain deployed code, reuse immutable Hosting bytes.
 name: Gravicentra I6.5 B4-003 Cumulative Safe-Read LAB Preview 20261029
-
-# Transport of the existing single canonical recovery branch, not a new gate.
-# Two existing LAB Preview callables plus one immutable build on the existing seven-day Preview channel; preserve origin/session, never LIVE or data.
-# Resolve the approved source from Control Plane; stale transport pins are not authority.
-on:
+'on':
   push:
-    branches: [recovery/fase-a-clean-20260831]
+    branches:
+    - recovery/fase-a-clean-20260831
     paths:
-      - .github/workflows/gravicentra-b4-003-cumulative-safe-read-preview-20261029.yml
-
+    - .github/workflows/gravicentra-b4-003-cumulative-safe-read-preview-20261029.yml
 permissions:
   contents: read
   actions: read
-
 concurrency:
   group: gi-b4003-cumulative-safe-read-preview-20261029
   cancel-in-progress: false
-
 jobs:
   exact-existing-callable-and-hosting-preview:
-    if: >-
-      github.repository == 'paulaosoriof86/orbit360-core' &&
-      github.ref == 'refs/heads/recovery/fase-a-clean-20260831' &&
-      github.event.head_commit.message == 'build(i6.5 B4-003): trigger cumulative safe-read isolated Preview only'
+    if: 'github.repository == ''paulaosoriof86/orbit360-core'' && github.ref == ''refs/heads/recovery/fase-a-clean-20260831'' && github.event.head_commit.message
+      == ''build(i6.5 B4-003): trigger cumulative safe-read isolated Preview only'''
     runs-on: ubuntu-24.04
     timeout-minutes: 60
     env:
@@ -33,7 +27,6 @@ jobs:
       PREDECESSOR_BUILD_ID: gi-i65-b4-a6e403119d9f-57f234755dc1
       TARGET_FUNCTIONS: '["orbit360ProductOperationalCommandPreview","orbit360ScopedPolicyReadPreview"]'
       TARGET_REGION: us-east1
-      EXPECTED_SOURCE_PARENT: c3e922c75ec8082dfd6030be5f79b9e2fa71f778
       PROJECT_ID: ays-orbit-360-lab
       HOSTING_SITE: ays-orbit-360-lab
       TENANT_HINT: alianzas-soluciones
@@ -44,490 +37,442 @@ jobs:
       SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
       SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
       SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      EXACT_SOURCE_SHA: bcb54435788e1ace50325f347d1d9c0ee4a222e5
+      INITIAL_TRANSPORT_SHA: 7b1c13c507aba0787ee385483c7256033043af44
+      INITIAL_RUN_ID: '41150545623'
     steps:
-      - name: Checkout exact single-branch candidate with complete governance ancestry
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ github.sha }}
-          fetch-depth: 0
-          persist-credentials: false
+    - name: Checkout exact single-branch candidate with complete governance ancestry
+      uses: actions/checkout@v4
+      with:
+        ref: ${{ github.sha }}
+        fetch-depth: 0
+        persist-credentials: false
+    - uses: actions/setup-node@v4
+      with:
+        node-version: '22'
+    - name: Require exact recovery successor, immutable product and source Guards PASS
+      env:
+        GH_READ_TOKEN: ${{ github.token }}
+      run: |
+        set -euo pipefail
+        node --input-type=module - <<'NODE'
+        import fs from 'node:fs';
+        import {execFileSync} from 'node:child_process';
+        import {collectInsurerPreviewResumeModel,validateInsurerPreviewResumeModel,insurerResumeContract} from './tools/gravicentra-b4-003-insurer-preview-resume.mjs';
+        const k=insurerResumeContract,m=collectInsurerPreviewResumeModel();
+        validateInsurerPreviewResumeModel(m);
+        const need=(ok,code)=>{if(!ok)throw Error(code);};
+        const git=(...args)=>execFileSync('git',args,{encoding:'utf8'}).trim();
+        need(m.transport?.sha===process.env.TRANSPORT_SHA&&m.head===process.env.TRANSPORT_SHA&&git('rev-parse','HEAD^')===m.sourceCommit,'EXACT_RESUME_TRANSPORT_REQUIRED');
+        need(process.env.EXACT_SOURCE_SHA===k.source&&process.env.INITIAL_TRANSPORT_SHA===k.parent&&String(k.initialRunId)===process.env.INITIAL_RUN_ID,'EXACT_ORIGINAL_SOURCE_REQUIRED');
+        const request=async route=>{const r=await fetch('https://api.github.com/repos/'+process.env.GITHUB_REPOSITORY+'/'+route,{headers:{Authorization:'Bearer '+process.env.GH_READ_TOKEN,Accept:'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'}});need(r.ok,'GUARD_READ_FAILED_HTTP_'+r.status);return r.json();};
+        const original=await request('actions/runs/'+k.sourceGuardRunId);
+        need(original.head_sha===k.source&&original.head_branch===process.env.GITHUB_REF_NAME&&original.status==='completed'&&original.conclusion==='success','ORIGINAL_EXACT_SOURCE_GUARD_REQUIRED');
+        const failed=await request('actions/runs/'+k.initialRunId);
+        need(failed.head_sha===k.parent&&failed.head_branch===process.env.GITHUB_REF_NAME&&failed.status==='completed'&&failed.conclusion==='failure','EXACT_INITIAL_FAILURE_REQUIRED');
+        const runs=await request('actions/workflows/gravicentra-release-lock-sync.yml/runs?head_sha='+m.sourceCommit+'&per_page=100');
+        const candidates=(runs.workflow_runs||[]).filter(r=>r.head_sha===m.sourceCommit&&r.head_branch===process.env.GITHUB_REF_NAME).sort((a,b)=>b.id-a.id);
+        need(candidates[0]?.status==='completed'&&candidates[0]?.conclusion==='success','EXACT_RECOVERY_SOURCE_GUARD_REQUIRED');
+        const result={schema:'GRAVICENTRA_I65_B4003_INSURER_PREVIEW_RECOVERY_BINDING_V1',sourceSha:k.source,sourceGuardRunId:k.sourceGuardRunId,initialTransportSha:k.parent,initialRunId:k.initialRunId,recoverySourceSha:m.sourceCommit,recoveryGuardRunId:candidates[0].id,recoveryTransportSha:process.env.TRANSPORT_SHA,recoveryRunId:Number(process.env.GITHUB_RUN_ID),artifacts:k.artifacts,receiptPath:k.receipt,receiptBlobSha:git('hash-object',k.receipt),workflowBlobSha:git('hash-object',k.workflow),backendCodeRedeploy:false,hostingRebuild:false};
+        fs.writeFileSync(process.env.RUNNER_TEMP+'/gi-insurer-recovery-binding.json',JSON.stringify(result,null,2)+'\n');
+        fs.appendFileSync(process.env.GITHUB_ENV,'RECOVERY_SOURCE_SHA='+m.sourceCommit+'\n');
+        fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY,'Original product source: '+k.source+'\nRecovery source Guard SUCCESS: '+candidates[0].id+'\nInitial backend deployment and immutable Hosting package: '+k.initialRunId+'\n');
+        NODE
+        git diff --exit-code
+        git diff --cached --exit-code
+        node tools/gravicentra-b4-003-insurer-reader-env-repair.test.cjs
+        node --test tools/gravicentra-b4-003-insurer-preview-resume.test.mjs
+    - name: Recover and verify the three exact original artifacts without rebuilding
+      env:
+        GH_READ_TOKEN: ${{ github.token }}
+      run: |
+        set -euo pipefail
+        python3 - <<'PY'
+        import os,json,pathlib,urllib.request,urllib.error,urllib.parse,hashlib,zipfile,tarfile,shutil
+        root=pathlib.Path(os.environ['RUNNER_TEMP']);api='https://api.github.com/repos/'+os.environ['GITHUB_REPOSITORY']
+        pins=[('hosting',13023285501,1491734,'6f9ecc3e254be0cefcb86964e00ce74b3abd54223a8774e87bdcfd2cede4b2ba'),('backend',13023370282,185439,'97e730f44d6a4045b9d75f76c435dc97845505889699b44bcabbe5d6c3e87c7c'),('snapshots',13023550013,12940,'df0deeb1363e2182d81045da821970e500d5fb0cad0207f7b26ac05d93101325')]
+        headers={'Authorization':'Bearer '+os.environ['GH_READ_TOKEN'],'Accept':'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'}
+        class NoRedirect(urllib.request.HTTPRedirectHandler):
+         def redirect_request(self,req,fp,code,msg,headers,newurl): return None
+        opener=urllib.request.build_opener(NoRedirect)
+        def safe_name(name):
+         p=pathlib.PurePosixPath(name)
+         if not name or chr(92) in name or p.is_absolute() or '..' in p.parts: raise RuntimeError('UNSAFE_ARCHIVE_PATH')
+         return p
+        proof=[]
+        try:
+         for label,artifact_id,size,digest in pins:
+          endpoint=api+'/actions/artifacts/'+str(artifact_id)
+          with urllib.request.urlopen(urllib.request.Request(endpoint,headers=headers),timeout=45) as response: meta=json.load(response)
+          if meta.get('id')!=artifact_id or meta.get('expired') is not False or meta.get('size_in_bytes')!=size or meta.get('digest')!='sha256:'+digest or meta.get('workflow_run',{}).get('id')!=41150545623 or meta.get('workflow_run',{}).get('head_sha')!=os.environ['INITIAL_TRANSPORT_SHA']: raise RuntimeError('EXACT_ARTIFACT_METADATA_REQUIRED')
+          try:
+           response=opener.open(urllib.request.Request(endpoint+'/zip',headers=headers),timeout=45)
+           response.close();raise RuntimeError('SIGNED_ARTIFACT_REDIRECT_REQUIRED')
+          except urllib.error.HTTPError as error:
+           if error.code not in (301,302,303,307,308): raise RuntimeError('ARTIFACT_DOWNLOAD_REDIRECT_FAILED')
+           signed=error.headers.get('Location','')
+          parsed=urllib.parse.urlparse(signed)
+          if parsed.scheme!='https' or not parsed.hostname or parsed.username or parsed.password: raise RuntimeError('SIGNED_HTTPS_ARTIFACT_REQUIRED')
+          # The external signed URL is fetched without the GitHub Authorization header.
+          with urllib.request.urlopen(urllib.request.Request(signed),timeout=60) as response: data=response.read(10*1024*1024)
+          if len(data)!=size or hashlib.sha256(data).hexdigest()!=digest: raise RuntimeError('IMMUTABLE_ARTIFACT_ZIP_DIGEST_MISMATCH')
+          archive=root/('gi-resume-'+label+'.zip');archive.write_bytes(data)
+          out=root/('gi-resume-'+label);out.mkdir()
+          with zipfile.ZipFile(archive) as z:
+           seen=set();infos=z.infolist()
+           if sum(x.file_size for x in infos)>100*1024*1024: raise RuntimeError('ARCHIVE_SIZE_BOUND_EXCEEDED')
+           for info in infos:
+            p=safe_name(info.filename)
+            if info.filename in seen or (info.external_attr>>16)&0o170000==0o120000: raise RuntimeError('DUPLICATE_OR_SYMLINK_ARCHIVE_MEMBER')
+            seen.add(info.filename)
+            dest=out.joinpath(*p.parts)
+            if info.is_dir(): dest.mkdir(parents=True,exist_ok=True)
+            else:
+             dest.parent.mkdir(parents=True,exist_ok=True);dest.write_bytes(z.read(info))
+          proof.append({'label':label,'artifactId':artifact_id,'runId':41150545623,'zipBytes':size,'zipSha256':digest,'files':len(infos),'digestVerified':True})
+         backend=root/'gi-resume-backend';snap=root/'gi-resume-snapshots';hosting=root/'gi-resume-hosting'
+         for name in ['gi-insurer-function-before-snapshot.json','gi-insurer-source-binding.json','gi-preview-predecessor-build.json','gi-preview-predecessor-identity.json']:
+          if (backend/name).read_bytes()!=(snap/name).read_bytes(): raise RuntimeError('CROSS_ARTIFACT_BINDING_MISMATCH')
+         for name in ['gi-insurer-backend-source-manifest.json','gi-insurer-source-binding.json','gi-insurer-function-before-snapshot.json']:
+          shutil.copyfile(backend/name,root/name)
+         shutil.copyfile(snap/'gi-insurer-function-after-snapshot.json',root/'gi-insurer-function-initial-after-snapshot.json')
+         shutil.copytree(hosting,root/'gi-preview-package')
+         shutil.copyfile(hosting/'evidence/package-output.json',root/'gi-preview-package-output.json')
+         stage=root/'gi-insurer-backend';stage.mkdir()
+         with tarfile.open(backend/'gi-insurer-backend-source.tar') as archive:
+          seen=set()
+          for member in archive.getmembers():
+           p=safe_name(member.name)
+           if member.name in seen or not (member.isfile() or member.isdir()) or not (member.name=='firebase.json' or p.parts[0]=='functions'): raise RuntimeError('UNSAFE_BACKEND_TAR_MEMBER')
+           seen.add(member.name);dest=stage.joinpath(*p.parts)
+           if member.isdir(): dest.mkdir(parents=True,exist_ok=True)
+           else:
+            dest.parent.mkdir(parents=True,exist_ok=True);dest.write_bytes(archive.extractfile(member).read())
+         manifest=json.loads((root/'gi-insurer-backend-source-manifest.json').read_text())
+         actual={str(p.relative_to(stage)) for p in (stage/'functions').rglob('*') if p.is_file()}
+         if manifest['sourceSha']!=os.environ['EXACT_SOURCE_SHA'] or actual!={x['path'] for x in manifest['files']}: raise RuntimeError('EXACT_BACKEND_MANIFEST_REQUIRED')
+         for item in manifest['files']:
+          data=(stage/item['path']).read_bytes()
+          if len(data)!=item['bytes'] or hashlib.sha256(data).hexdigest()!=item['sha256']: raise RuntimeError('BACKEND_MANIFEST_BYTES_MISMATCH')
+         site=hosting/'bundle/site';listed=set()
+         for line in (hosting/'evidence/site-manifest.sha256').read_text().splitlines():
+          digest,rel=line.split('  ',1);safe_name(rel);listed.add(rel)
+          if hashlib.sha256((site/rel).read_bytes()).hexdigest()!=digest: raise RuntimeError('HOSTING_MANIFEST_BYTES_MISMATCH')
+         if listed!={str(p.relative_to(site)) for p in site.rglob('*') if p.is_file()} or len(listed)!=218: raise RuntimeError('EXACT_HOSTING_FILE_SET_REQUIRED')
+         meta=json.loads((site/'__recovery__/build.json').read_text());config=json.loads((hosting/'bundle/firebase.json').read_text())
+         if meta['sourceSha']!=os.environ['EXACT_SOURCE_SHA'] or meta['buildId']!='gi-i65-b4-bcb54435788e-57f234755dc1' or meta['gate']!='I6.5-B4-003': raise RuntimeError('IMMUTABLE_HOSTING_SOURCE_MISMATCH')
+         if list(config)!=['hosting'] or config['hosting']['site']!='ays-orbit-360-lab' or config['hosting']['public']!='site': raise RuntimeError('IMMUTABLE_HOSTING_ONLY_CONFIG_REQUIRED')
+         binding=json.loads((root/'gi-insurer-source-binding.json').read_text())
+         if binding['sourceSha']!=os.environ['EXACT_SOURCE_SHA'] or binding['transportSha']!=os.environ['INITIAL_TRANSPORT_SHA'] or binding['guardRunId']!=41150390700: raise RuntimeError('INITIAL_SOURCE_BINDING_MISMATCH')
+         (root/'gi-insurer-artifact-reuse.json').write_text(json.dumps({'status':'THREE_ORIGINAL_IMMUTABLE_ARTIFACTS_VERIFIED','artifacts':proof,'hostingFiles':len(listed),'backendFiles':len(actual),'backendCodeRedeployed':False,'hostingRebuilt':False},indent=2)+'\n')
+         with open(os.environ['GITHUB_ENV'],'a') as target: target.write('BACKEND_ROOT='+str(stage)+'\n')
+         print('IMMUTABLE_HOSTING_BACKEND_AND_SNAPSHOT_ARTIFACTS_VERIFIED')
+        except Exception as error:
+         if isinstance(error,RuntimeError): print(str(error))
+         else: print('ARTIFACT_REUSE_FAILED:'+type(error).__name__)
+         raise SystemExit(1)
+        PY
+    - name: Capture exact existing Preview origin and predecessor before any deployment
+      run: |
+        set -euo pipefail
+        test "$PREVIEW_CHANNEL_ID" = 'gi-i65-b4-sr-41066435386'
+        test "$EXPECTED_PREVIEW_URL" = 'https://ays-orbit-360-lab--gi-i65-b4-sr-41066435386-r09pl1ti.web.app'
+        curl --fail --silent --show-error --location --retry 2 --max-time 30 "$EXPECTED_PREVIEW_URL/__recovery__/build.json" > "$RUNNER_TEMP/gi-preview-predecessor-build.json"
+        node - <<'NODE'
+        const fs=require('node:fs'),crypto=require('node:crypto');
+        const raw=fs.readFileSync(process.env.RUNNER_TEMP+'/gi-preview-predecessor-build.json'),meta=JSON.parse(raw);
+        if(meta.sourceSha!==process.env.PREDECESSOR_SOURCE_SHA||meta.buildId!==process.env.PREDECESSOR_BUILD_ID||meta.gate!=='I6.5-B4-003')throw Error('EXISTING_PREVIEW_PREDECESSOR_IDENTITY_MISMATCH');
+        const record={observedAtUtc:new Date().toISOString(),previewUrl:process.env.EXPECTED_PREVIEW_URL,channelId:process.env.PREVIEW_CHANNEL_ID,sourceSha:meta.sourceSha,buildId:meta.buildId,buildMarkerSha256:crypto.createHash('sha256').update(raw).digest('hex'),sameOriginPreservesExistingBrowserSession:true,hostingLive:false,previousReceiptRemainsHistorical:true};
+        fs.writeFileSync(process.env.RUNNER_TEMP+'/gi-preview-predecessor-identity.json',JSON.stringify(record,null,2)+'\n');
+        NODE
+    - name: Snapshot public LIVE identities before preview
+      run: |
+        set -euo pipefail
+        curl --fail --silent --show-error --location --retry 2 --max-time 30 https://ays-orbit-360-lab.web.app/ > "$RUNNER_TEMP/gi-live-before.html"
+        for n in 1 2; do
+          curl --fail --silent --show-error --location --retry 2 --max-time 30 -D "$RUNNER_TEMP/gi-owner-before-$n.headers" https://app.aysseguros.com/ > "$RUNNER_TEMP/gi-owner-before-$n.html"
+        done
+        curl --fail --silent --show-error --location --retry 2 --max-time 30 https://app.aysseguros.com/product-runtime-config.js > "$RUNNER_TEMP/gi-owner-runtime-before.js"
+        cat > "$RUNNER_TEMP/gi-owner-root-fingerprint.js" <<'NODE'
+        'use strict';
+        const fs=require('node:fs'),crypto=require('node:crypto');
+        const [phase,fileA,fileB,out]=process.argv.slice(2);
+        const sha=p=>crypto.createHash('sha256').update(fs.readFileSync(p)).digest('hex');
+        function fingerprint(path){
+          const html=fs.readFileSync(path,'utf8');
+          const title=((html.match(/<title[^>]*>([\s\S]*?)<\/title>/i)||[])[1]||'').replace(/\s+/g,' ').trim();
+          const buildIds=[...new Set([...html.matchAll(/orbitBuild=([^&"'<>\s]+)/g)].map(m=>decodeURIComponent(m[1])))].sort();
+          const assets=[...html.matchAll(/<(?:script|link)\b[^>]*(?:src|href)=["']([^"']+)["']/gi)].map(m=>m[1]).map(raw=>{
+            try{
+              const u=new URL(raw,'https://app.aysseguros.com/');
+              if(u.origin==='https://app.aysseguros.com'&&u.pathname.startsWith('/cdn-cgi/'))return '';
+              const build=u.searchParams.get('orbitBuild');
+              return (u.origin==='https://app.aysseguros.com'?'':u.origin)+u.pathname+(build?'?orbitBuild='+build:'');
+            }catch{return String(raw).split('#')[0];}
+          }).filter(Boolean);
+          const uniqueAssets=[...new Set(assets)].sort();
+          const htmlDocument=/<html\b/i.test(html)&&/<\/html>/i.test(html);
+          const bodyDocument=/<body\b/i.test(html)&&/<\/body>/i.test(html);
+          const nonTrivial=Buffer.byteLength(html,'utf8')>=512;
+          const productMarker=/Gravicentra Insurance|Insurance OS/i.test(html);
+          if(!htmlDocument||!bodyDocument||!nonTrivial)throw Error('OWNER_ROOT_STRUCTURAL_IDENTITY_MISSING:'+path);
+          return {title,htmlDocument,bodyDocument,productMarker,buildIds,assets:uniqueAssets};
+        }
+        const first=fingerprint(fileA),second=fingerprint(fileB);
+        if(JSON.stringify(first)!==JSON.stringify(second))throw Error('OWNER_ROOT_PREDEPLOY_STRUCTURAL_VARIANCE');
+        fs.writeFileSync(out,JSON.stringify({phase,rawHashes:[sha(fileA),sha(fileB)],rawByteStable:sha(fileA)===sha(fileB),fingerprint:first},null,2)+'\n');
+        NODE
+        node "$RUNNER_TEMP/gi-owner-root-fingerprint.js" before "$RUNNER_TEMP/gi-owner-before-1.html" "$RUNNER_TEMP/gi-owner-before-2.html" "$RUNNER_TEMP/gi-owner-identity-before.json"
+        node - <<'NODE'
+        const fs=require('node:fs');
+        const p=process.env.RUNNER_TEMP+'/gi-owner-runtime-before.js';
+        const content=fs.readFileSync(p,'utf8');
+        const bytes=Buffer.byteLength(content,'utf8');
+        if(bytes<64||/<html\b/i.test(content))throw Error('OWNER_RUNTIME_CONFIG_STRUCTURAL_IDENTITY_MISSING');
+        NODE
+    - name: Resolve pre-existing LAB-only account and pinned Firebase CLI
+      run: |
+        set -euo pipefail
+        mkdir -p "$RUNNER_TEMP/gi-preview-auth"
+        python3 - <<'PY'
+        import json,os,pathlib
+        root=pathlib.Path(os.environ['RUNNER_TEMP'])/'gi-preview-auth'
+        matches=[]
+        for n,k in enumerate(('SA_ORBIT360_LAB','SA_ORBIT_360_LAB','SA_DEFAULT')):
+            try: val=json.loads(os.environ.get(k,''))
+            except (ValueError,TypeError): continue
+            if val.get('type')=='service_account' and val.get('project_id')==os.environ['PROJECT_ID'] and val.get('private_key'):
+                p=root/f'{n}.json'
+                p.write_text(json.dumps(val),encoding='utf8')
+                p.chmod(0o600)
+                matches.append(str(p))
+        if not matches: raise SystemExit('EXISTING_LAB_ACCOUNT_NOT_CONFIGURED')
+        (root/'candidates').write_text('\n'.join(matches)+'\n',encoding='utf8')
+        PY
+        CLI_ROOT="$RUNNER_TEMP/gi-preview-cli"
+        npm install --prefix "$CLI_ROOT" --no-save --ignore-scripts --no-audit --no-fund firebase-tools@14.10.1 >/dev/null
+        node tools/gravicentra-firebase-tools-empty-extensions-workaround-v1.mjs "$CLI_ROOT"
+        CLI="$CLI_ROOT/node_modules/firebase-tools/lib/bin/firebase.js"
+        selected=''
+        while IFS= read -r candidate; do
+          if GOOGLE_APPLICATION_CREDENTIALS="$candidate" node "$CLI" functions:list --project "$PROJECT_ID" --non-interactive --json >/dev/null 2>&1; then
+            selected="$candidate"
+            break
+          fi
+        done < "$RUNNER_TEMP/gi-preview-auth/candidates"
+        test -n "$selected"
+        cp "$selected" "$RUNNER_TEMP/gi-preview-auth/selected.json"
+        chmod 600 "$RUNNER_TEMP/gi-preview-auth/selected.json"
+        echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/gi-preview-auth/selected.json" >> "$GITHUB_ENV"
+        echo "FIREBASE_CLI_BIN=$CLI" >> "$GITHUB_ENV"
+    - name: Restore only the proven previous environment of the existing LAB reader
+      id: environment_restore
+      env:
+        GI_READER_ENV_REPAIR_AUTHORIZATION: RESTORE_PROVEN_BASELINE_ENV_ONLY
+      run: |
+        set -euo pipefail
+        (cd "$BACKEND_ROOT/functions" && npm ci --ignore-scripts --no-audit --no-fund >/dev/null)
+        node "$FIREBASE_CLI_BIN" functions:list --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/gi-insurer-functions-resume-before.json"
+        node - <<'NODE'
+        const fs=require('node:fs'),crypto=require('node:crypto');
+        const stable=x=>Array.isArray(x)?x.map(stable):x&&typeof x==='object'?Object.fromEntries(Object.keys(x).sort().map(k=>[k,stable(x[k])])):x;
+        const hash=x=>crypto.createHash('sha256').update(JSON.stringify(stable(x))).digest('hex');
+        const raw=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/gi-insurer-functions-resume-before.json','utf8'));
+        const rows=Array.isArray(raw.result)?raw.result:Array.isArray(raw)?raw:[];
+        const summary=rows.map(r=>{const id=String(r.id||r.entryPoint||r.name||'').split('/').pop(),region=String(r.region||r.location||((String(r.name||'').match(/\/locations\/([^/]+)/)||[])[1])||'').split('/').pop();return{id,region,key:region+'/'+id,metadataSha256:hash(r)};}).sort((a,b)=>a.key.localeCompare(b.key));
+        const initial=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/gi-insurer-function-initial-after-snapshot.json','utf8'));
+        if(!summary.length||JSON.stringify(summary.map(r=>r.key))!==JSON.stringify(initial.functions.map(r=>r.key)))throw Error('FUNCTION_INVENTORY_CHANGED_SINCE_INITIAL_FAILURE');
+        for(let i=0;i<summary.length;i++)if(summary[i].key!=='us-east1/orbit360ScopedPolicyReadPreview'&&summary[i].metadataSha256!==initial.functions[i].metadataSha256)throw Error('OTHER_FUNCTION_CHANGED_SINCE_INITIAL_FAILURE');
+        NODE
+        node tools/gravicentra-b4-003-insurer-reader-env-repair.cjs "$RUNNER_TEMP/gi-insurer-function-before-snapshot.json" "$RUNNER_TEMP/gi-insurer-function-initial-after-snapshot.json" "$RUNNER_TEMP/gi-insurer-reader-env-restoration.json"
+    - name: Verify restored configuration, original backend bytes, inventory and both IAM policies
+      run: |
+        set -euo pipefail
+        cat > "$RUNNER_TEMP/gi-insurer-function-snapshot.cjs" <<'NODE'
+        'use strict';
+        const fs=require('node:fs'),crypto=require('node:crypto'),{execFileSync}=require('node:child_process');
+        const {GoogleAuth}=require(process.env.BACKEND_ROOT+'/functions/node_modules/google-auth-library');
+        const phase=process.argv[2],tmp=process.env.RUNNER_TEMP;
+        const targets=JSON.parse(process.env.TARGET_FUNCTIONS||'[]');
+        if(JSON.stringify(targets)!==JSON.stringify(['orbit360ProductOperationalCommandPreview','orbit360ScopedPolicyReadPreview'])||process.env.TARGET_REGION!=='us-east1'||process.env.PROJECT_ID!=='ays-orbit-360-lab')throw Error('EXACT_TWO_EXISTING_PREVIEW_TARGETS_REQUIRED');
+        if(!['before','after'].includes(phase))throw Error('INVALID_SNAPSHOT_PHASE');
+        const stable=x=>Array.isArray(x)?x.map(stable):x&&typeof x==='object'?Object.fromEntries(Object.keys(x).sort().map(k=>[k,stable(x[k])])):x;
+        const hash=x=>crypto.createHash('sha256').update(typeof x==='string'?x:JSON.stringify(stable(x))).digest('hex');
+        const doc=JSON.parse(fs.readFileSync(tmp+'/gi-insurer-functions-'+phase+'.json','utf8'));
+        const rows=Array.isArray(doc.result)?doc.result:Array.isArray(doc)?doc:[];
+        const summary=rows.map(r=>{const id=String(r.id||r.entryPoint||r.name||'').split('/').pop(),region=String(r.region||r.location||((String(r.name||'').match(/\/locations\/([^/]+)/)||[])[1])||'').split('/').pop();return{id,region,key:region+'/'+id,metadataSha256:hash(r)};}).sort((a,b)=>a.key.localeCompare(b.key));
+        if(!summary.length||summary.some(r=>!r.id||!r.region)||new Set(summary.map(r=>r.key)).size!==summary.length)throw Error('FUNCTION_INVENTORY_IDENTITY_INCOMPLETE');
+        for(const target of targets)if(summary.filter(r=>r.id===target&&r.region===process.env.TARGET_REGION).length!==1||summary.filter(r=>r.id===target).length!==1)throw Error('EXISTING_EXACT_TARGET_CARDINALITY_REQUIRED:'+target);
+        (async()=>{
+         const auth=new GoogleAuth({scopes:['https://www.googleapis.com/auth/cloud-platform']});
+         const client=await auth.getClient();
+         const metadata=await Promise.all(targets.map(async target=>{
+          const name='projects/'+process.env.PROJECT_ID+'/locations/'+process.env.TARGET_REGION+'/functions/'+target;
+          const {data:f}=await client.request({url:'https://cloudfunctions.googleapis.com/v2/'+name});
+          if(f.name!==name||f.buildConfig?.entryPoint!==target||f.environment!=='GEN_2'||f.state!=='ACTIVE'||f.buildConfig?.runtime!=='nodejs22')throw Error('TARGET_METADATA_IDENTITY_OR_STATE_MISMATCH:'+target);
+          const svc=f.serviceConfig||{},build=f.buildConfig||{};
+          const resolved=build.sourceProvenance?.resolvedStorageSource||build.source?.storageSource||null;
+          const identity={name:f.name,environment:f.environment,state:f.state,updateTime:f.updateTime||null,build:build.build||null,runtime:build.runtime||null,entryPoint:build.entryPoint,sourceStorage:resolved,revision:svc.revision||null,service:svc.service||null,uri:svc.uri||null,codeHash:f.labels?.['firebase-functions-hash']||null,labels:f.labels||{},serviceAccountEmail:svc.serviceAccountEmail||null,ingressSettings:svc.ingressSettings||null,environmentVariablesSha256:hash(svc.environmentVariables||{}),secretEnvironmentVariablesSha256:hash(svc.secretEnvironmentVariables||[]),serviceConfigNonRevisionSha256:hash(Object.fromEntries(Object.entries(svc).filter(([k])=>k!=='revision')))};
+          let iam={status:'NOT_AVAILABLE',policySha256:null};
+          if(svc.service){try{const {data:p}=await client.request({url:'https://run.googleapis.com/v2/'+svc.service+':getIamPolicy'});iam={status:'READ',policySha256:hash({version:p.version||0,bindings:(p.bindings||[]).map(b=>({...b,members:(b.members||[]).slice().sort()})).sort((a,b)=>JSON.stringify(stable(a)).localeCompare(JSON.stringify(stable(b))))})};}catch(e){iam.httpStatus=Number(e.response?.status||0);}}
+          return {target,identity,iam};
+         }));
+         const result={phase,observedAt:new Date().toISOString(),functions:summary,targets:metadata};
+         fs.writeFileSync(tmp+'/gi-insurer-function-'+phase+'-snapshot.json',JSON.stringify(result,null,2)+'\n');
+         if(phase==='before')return;
+         const before=JSON.parse(fs.readFileSync(tmp+'/gi-insurer-function-before-snapshot.json','utf8'));
+         if(JSON.stringify(before.functions.map(r=>r.key))!==JSON.stringify(summary.map(r=>r.key)))throw Error('FUNCTION_CREATED_OR_DELETED');
+         const allowed=targets.map(t=>process.env.TARGET_REGION+'/'+t);
+         const changed=summary.filter((r,i)=>r.metadataSha256!==before.functions[i].metadataSha256).map(r=>r.key);
+         if(changed.some(k=>!allowed.includes(k)))throw Error('NON_TARGET_FUNCTION_CHANGED');
+         const proofs=[];
+         const manifest=JSON.parse(fs.readFileSync(tmp+'/gi-insurer-backend-source-manifest.json','utf8'));
+         for(const current of metadata){
+          const prev=before.targets.find(x=>x.target===current.target);
+          if(!prev)throw Error('TARGET_PREDECESSOR_MISSING');
+          for(const field of ['serviceAccountEmail','ingressSettings','environmentVariablesSha256','secretEnvironmentVariablesSha256','serviceConfigNonRevisionSha256','service','uri'])if(prev.identity[field]!==current.identity[field])throw Error('TARGET_NON_SOURCE_CONFIGURATION_CHANGED:'+current.target+':'+field);
+          if(prev.iam.status==='READ'&&current.iam.status==='READ'&&prev.iam.policySha256!==current.iam.policySha256)throw Error('TARGET_RUN_IAM_CHANGED:'+current.target);
+          const resolved=current.identity.sourceStorage;
+          if(!resolved?.bucket||!resolved?.object)throw Error('DEPLOYED_SOURCE_GENERATION_MISSING:'+current.target);
+          const u='https://storage.googleapis.com/storage/v1/b/'+encodeURIComponent(resolved.bucket)+'/o/'+encodeURIComponent(resolved.object)+'?alt=media'+(resolved.generation?'&generation='+encodeURIComponent(resolved.generation):'');
+          let bytes;
+          try {const {data}=await client.request({url:u,responseType:'arraybuffer'});bytes=Buffer.from(data);}catch(e){throw Error('DEPLOYED_SOURCE_READBACK_UNAVAILABLE:'+current.target+':HTTP_'+Number(e.response?.status||0));}
+          const archive=tmp+'/gi-insurer-deployed-'+current.target+'.zip';fs.writeFileSync(archive,bytes);
+          const py="import json,sys,zipfile,pathlib,hashlib\nz=zipfile.ZipFile(sys.argv[1]);root=pathlib.Path(sys.argv[2]);files=json.loads(sys.argv[3]);out=[]\nfor rel in files:\n names=[n for n in z.namelist() if n==rel or n.endswith('/'+rel)]\n if len(names)!=1: raise SystemExit('DEPLOYED_SOURCE_PATH_CARDINALITY:'+rel)\n b=z.read(names[0]);expected=(root/rel).read_bytes()\n if b!=expected: raise SystemExit('DEPLOYED_SOURCE_BYTES_MISMATCH:'+rel)\n out.append({'path':rel,'sha256':hashlib.sha256(b).hexdigest()})\nprint(json.dumps(out))";
+          const executableFiles=manifest.files.map(x=>x.path.replace(/^functions\//,''));
+          if(!['product-operational-domain.js','b4-003-scoped-bootstrap-reader.js','b4-003-scoped-policy-callable.js','bootstrap.js'].every(p=>executableFiles.includes(p)))throw Error('BACKEND_MANIFEST_EXECUTABLE_SOURCE_MISSING');
+          const sourceFiles=JSON.parse(execFileSync('python3',['-c',py,archive,process.env.BACKEND_ROOT+'/functions',JSON.stringify(executableFiles)],{encoding:'utf8'}));
+          proofs.push({target:current.target,region:process.env.TARGET_REGION,before:prev.identity,after:current.identity,iamUnchanged:prev.iam.status==='READ'&&current.iam.status==='READ'?prev.iam.policySha256===current.iam.policySha256:null,sourceProof:{status:'DEPLOYED_BACKEND_SOURCE_BYTES_MATCH_EXACT_STAGE',scope:'ALL_STAGED_FUNCTION_FILES',storageSource:resolved,objectSha256:crypto.createHash('sha256').update(bytes).digest('hex'),sourceFiles}});
+         }
+         fs.writeFileSync(tmp+'/gi-insurer-function-readback.json',JSON.stringify({status:'TWO_EXISTING_TARGETS_ONLY_DEPLOY_AND_EXACT_SOURCE_READBACK_PASS',onlyAuthorizedTargetsChanged:true,changedFunctionKeys:changed,inventoryCount:summary.length,targets:proofs,authenticatedUat:'PENDING'},null,2)+'\n');
+        })().catch(e=>{console.error(String(e.message||e));process.exitCode=1;});
+        NODE
+        node "$FIREBASE_CLI_BIN" functions:list --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/gi-insurer-functions-after.json"
+        node "$RUNNER_TEMP/gi-insurer-function-snapshot.cjs" after
+        node - <<'NODE'
+        const fs=require('node:fs'),crypto=require('node:crypto');
+        const read=n=>JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/'+n,'utf8'));
+        const initial=read('gi-insurer-function-initial-after-snapshot.json'),current=read('gi-insurer-function-after-snapshot.json'),proof=read('gi-insurer-function-readback.json'),restore=read('gi-insurer-reader-env-restoration.json');
+        const stable=x=>Array.isArray(x)?x.map(stable):x&&typeof x==='object'?Object.fromEntries(Object.keys(x).sort().map(k=>[k,stable(x[k])])):x;
+        const same=(a,b)=>JSON.stringify(stable(a))===JSON.stringify(stable(b));
+        if(!['BASELINE_ENV_RESTORED_EXACT_READBACK_PASS','BASELINE_ENV_RESTORED_RESPONSE_LOST_READBACK_PASS','BASELINE_ENV_ALREADY_RESTORED_NOOP'].includes(restore.status)||restore.finalEnvironmentSha256!=='1e10a234c2e389484714e5f55f394f0ec816d146180dbcee1e34dfae4cce069b'||restore.iamUnchanged!==true||restore.sourcePreserved!==true)throw Error('EXACT_READER_CONFIGURATION_RECOVERY_REQUIRED');
+        for(const row of current.targets){
+         const prior=initial.targets.find(r=>r.target===row.target);
+         if(!prior)throw Error('INITIAL_DEPLOYED_TARGET_REQUIRED');
+         for(const field of ['name','environment','runtime','entryPoint','sourceStorage','build','codeHash','labels'])if(!same(prior.identity[field],row.identity[field]))throw Error('INITIAL_BACKEND_SOURCE_CHANGED:'+row.target+':'+field);
+         if(row.target==='orbit360ProductOperationalCommandPreview'&&prior.identity.revision!==row.identity.revision)throw Error('WRITER_REVISION_CHANGED_DURING_READER_RECOVERY');
+         if(row.iam.status!=='READ'||prior.iam.status!=='READ'||row.iam.policySha256!==prior.iam.policySha256)throw Error('UNCHANGED_BOTH_TARGET_IAM_READBACK_REQUIRED');
+        }
+        if(proof.targets.length!==2||proof.targets.some(t=>t.iamUnchanged!==true||t.sourceProof.status!=='DEPLOYED_BACKEND_SOURCE_BYTES_MATCH_EXACT_STAGE'))throw Error('BOTH_TARGET_SOURCE_AND_IAM_PROOFS_REQUIRED');
+        proof.recoveryEnvironmentRestored=true;proof.recoveredEnvironmentSha256=restore.finalEnvironmentSha256;proof.recoveredReaderRevision=restore.finalRevision;proof.backendCodeRedeployed=false;proof.initialBackendSourceUnchanged=true;proof.hostingRebuilt=false;
+        fs.writeFileSync(process.env.RUNNER_TEMP+'/gi-insurer-function-readback.json',JSON.stringify(proof,null,2)+'\n');
+        NODE
+        for target in orbit360ProductOperationalCommandPreview orbit360ScopedPolicyReadPreview; do
+          status=$(curl --silent --show-error --output /dev/null --write-out '%{http_code}' --max-time 25 --head "https://us-east1-ays-orbit-360-lab.cloudfunctions.net/$target")
+          test "$status" = '400'
+        done
+    - name: Update only the existing isolated seven-day LAB Preview channel, preserve session origin
+      id: deploy
+      run: |
+        set -euo pipefail
+        CHANNEL_ID="$PREVIEW_CHANNEL_ID"
+        curl --fail --silent --show-error --location --retry 2 --max-time 30 "$EXPECTED_PREVIEW_URL/__recovery__/build.json" > "$RUNNER_TEMP/gi-preview-predecessor-immediate.json"
+        cmp "$RUNNER_TEMP/gi-preview-predecessor-build.json" "$RUNNER_TEMP/gi-preview-predecessor-immediate.json"
+        cd "$RUNNER_TEMP/gi-preview-package/bundle"
+        node "$FIREBASE_CLI_BIN" hosting:channel:deploy "$CHANNEL_ID" --config firebase.json --project "$PROJECT_ID" --expires 7d --non-interactive --json > "$RUNNER_TEMP/gi-preview-deploy.json" 2>&1
+        export CHANNEL_ID
+        PREVIEW_URL=$(python3 - <<'PY'
+        import os,re
+        raw=open(os.environ['RUNNER_TEMP']+'/gi-preview-deploy.json',encoding='utf8').read()
+        prefix='https://ays-orbit-360-lab--'+os.environ['CHANNEL_ID']+'-'
+        urls=sorted(set(u.rstrip('/') for u in re.findall(r'https://[A-Za-z0-9._-]+\.web\.app',raw) if u.startswith(prefix)))
+        if len(urls)!=1: raise SystemExit('EXACTLY_ONE_ISOLATED_PREVIEW_URL_REQUIRED')
+        print(urls[0])
+        PY
+        )
+        test "$PREVIEW_URL" = "$EXPECTED_PREVIEW_URL"
+        echo "url=$PREVIEW_URL" >> "$GITHUB_OUTPUT"
+    - name: Verify served bytes and unchanged LIVE identities
+      env:
+        PREVIEW_URL: ${{ steps.deploy.outputs.url }}
+      run: |
+        set -euo pipefail
+        ROOT="$RUNNER_TEMP/gi-preview-package/bundle/site"
+        for rel in index.html __recovery__/build.json product-runtime-config.js modules/aseguradoras.js modules/inicio.js modules/equipo.js modules/insights.js modules/portal.js core/legal.js data/store-firestore-product-readonly-p0.js modules/cobros.js modules/plantillas.js core/product-app-p0.js core/queries.js data/store-firestore-product-operational-p0.js; do
+          curl --fail --silent --show-error --location --retry 2 --max-time 30 "$PREVIEW_URL/$rel" > "$RUNNER_TEMP/gi-served-$(basename "$rel")"
+          cmp "$ROOT/$rel" "$RUNNER_TEMP/gi-served-$(basename "$rel")"
+        done
+        export META_FILE="$RUNNER_TEMP/gi-served-build.json"
+        node - <<'NODE'
+        const fs=require('node:fs');
+        const meta=JSON.parse(fs.readFileSync(process.env.META_FILE,'utf8'));
+        if(meta.sourceSha!==process.env.EXACT_SOURCE_SHA||meta.gate!=='I6.5-B4-003')throw Error('SERVED_SOURCE_MISMATCH');
+        NODE
+        curl --fail --silent --show-error --location --retry 2 --max-time 30 https://ays-orbit-360-lab.web.app/ > "$RUNNER_TEMP/gi-live-after.html"
+        for n in 1 2; do
+          curl --fail --silent --show-error --location --retry 2 --max-time 30 -D "$RUNNER_TEMP/gi-owner-after-$n.headers" https://app.aysseguros.com/ > "$RUNNER_TEMP/gi-owner-after-$n.html"
+        done
+        curl --fail --silent --show-error --location --retry 2 --max-time 30 https://app.aysseguros.com/product-runtime-config.js > "$RUNNER_TEMP/gi-owner-runtime-after.js"
+        cmp "$RUNNER_TEMP/gi-live-before.html" "$RUNNER_TEMP/gi-live-after.html"
+        cmp "$RUNNER_TEMP/gi-owner-runtime-before.js" "$RUNNER_TEMP/gi-owner-runtime-after.js"
+        node "$RUNNER_TEMP/gi-owner-root-fingerprint.js" after "$RUNNER_TEMP/gi-owner-after-1.html" "$RUNNER_TEMP/gi-owner-after-2.html" "$RUNNER_TEMP/gi-owner-identity-after.json"
+        node - <<'NODE'
+        const fs=require('node:fs'),crypto=require('node:crypto');
+        const read=p=>JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/'+p,'utf8'));
+        const before=read('gi-owner-identity-before.json'),after=read('gi-owner-identity-after.json');
+        if(JSON.stringify(before.fingerprint)!==JSON.stringify(after.fingerprint))throw Error('OWNER_ROOT_STRUCTURAL_IDENTITY_CHANGED');
+        const hash=p=>crypto.createHash('sha256').update(fs.readFileSync(process.env.RUNNER_TEMP+'/'+p)).digest('hex');
+        const report={schema:'GRAVICENTRA_OWNER_LIVE_IDENTITY_READBACK_V1',labLiveRootExact:true,ownerRuntimeExact:true,ownerRootStructuralExact:true,ownerRootRawByteStableBefore:before.rawByteStable,ownerRootRawByteStableAfter:after.rawByteStable,ownerRootRawHashesBefore:before.rawHashes,ownerRootRawHashesAfter:after.rawHashes,ownerRuntimeSha256:hash('gi-owner-runtime-after.js'),previewSource:process.env.EXACT_SOURCE_SHA,previewUrl:process.env.PREVIEW_URL,livePromotion:false};
+        fs.writeFileSync(process.env.RUNNER_TEMP+'/gi-live-identity-readback.json',JSON.stringify(report,null,2)+'\n');
+        fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY,'Owner root raw bytes stable before: '+before.rawByteStable+'\nOwner root raw bytes stable after: '+after.rawByteStable+'\nOwner stable runtime/structural identity: PASS\n');
+        NODE
+        printf '%s\n' "I6.5/B4-003 cumulative source/byte/readback PASS" "Source: $EXACT_SOURCE_SHA" "Preview: $PREVIEW_URL" "LAB LIVE root exact; owner runtime and structural identity unchanged. The existing reader environment was restored; original backend code was retained. No LIVE function, Rules, Auth or business data operation." "Targeted authenticated insurer activity UAT still pending; B4-003 production HOLD." >> "$GITHUB_STEP_SUMMARY"
+    - name: Record resumed immutable Preview and configuration recovery evidence
+      env:
+        PREVIEW_URL: ${{ steps.deploy.outputs.url }}
+      run: |
+        set -euo pipefail
+        node - <<'NODE'
+        const fs=require('node:fs');const read=n=>JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/'+n,'utf8'));
+        const binding=read('gi-insurer-source-binding.json'),recovery=read('gi-insurer-recovery-binding.json'),backend=read('gi-insurer-function-readback.json'),pack=read('gi-preview-package-output.json'),meta=read('gi-served-build.json'),live=read('gi-live-identity-readback.json'),restore=read('gi-insurer-reader-env-restoration.json'),reuse=read('gi-insurer-artifact-reuse.json');
+        if(binding.sourceSha!==meta.sourceSha||meta.sourceSha!==process.env.EXACT_SOURCE_SHA||recovery.sourceSha!==meta.sourceSha)throw Error('COMBINED_SOURCE_MISMATCH');
+        if(backend.status!=='TWO_EXISTING_TARGETS_ONLY_DEPLOY_AND_EXACT_SOURCE_READBACK_PASS'||backend.targets.length!==2||backend.targets.some(t=>t.sourceProof.status!=='DEPLOYED_BACKEND_SOURCE_BYTES_MATCH_EXACT_STAGE'||t.iamUnchanged!==true)||backend.recoveryEnvironmentRestored!==true||backend.initialBackendSourceUnchanged!==true)throw Error('BOTH_BACKEND_EXACT_READBACKS_AND_RECOVERY_REQUIRED');
+        const result={schema:'GRAVICENTRA_I65_B4003_INSURER_ACTIVITY_EXACT_BACKEND_HOSTING_PREVIEW_RESULT_V1',status:'TECHNICAL_EXACT_BACKEND_HOSTING_READBACK_PASS_AUTHENTICATED_UAT_PENDING',gate:'I6.5/B4-003',sourceSha:binding.sourceSha,sourceParent:binding.sourceParent,transportSha:recovery.recoveryTransportSha,sourceBlobs:binding.sourceBlobs,guardRunId:binding.guardRunId,initialTransportSha:recovery.initialTransportSha,initialRunId:recovery.initialRunId,recoverySourceSha:recovery.recoverySourceSha,recoveryGuardRunId:recovery.recoveryGuardRunId,recoveryTransportSha:recovery.recoveryTransportSha,recoveryRunId:recovery.recoveryRunId,buildId:meta.buildId,hostedPayloadDigest:pack.hostedPayloadDigest,bundleDigest:pack.bundleDigest,backendSourceDigest:pack.backendSourceDigest,previewUrl:process.env.PREVIEW_URL,previewChannelId:process.env.PREVIEW_CHANNEL_ID,previewChannelReused:true,predecessorPreview:read('gi-preview-predecessor-identity.json'),channelExpiry:'7d',functionTargets:backend.targets,functionRegion:process.env.TARGET_REGION,functionProject:process.env.PROJECT_ID,onlyAuthorizedTargetFunctionsChanged:backend.onlyAuthorizedTargetsChanged,changedFunctionKeys:backend.changedFunctionKeys,recoveryEnvironmentRestored:true,recoveredEnvironmentSha256:restore.finalEnvironmentSha256,recoveredReaderRevision:restore.finalRevision,environmentRestore:restore,initialBackendSourceUnchanged:true,backendCodeRedeployed:false,hostingRebuilt:false,immutableArtifactReuse:reuse,liveHostingIdentity:live,liveDeployment:false,liveFunctionsDeployed:false,rulesAuthIamMutationRequested:false,businessDataWrites:0,syntheticWrites:0,newEndpoints:0,newWorkflows:0,currentCapabilityAcceptances:0,authenticatedUat:'PENDING_SYNTHETIC_INSURER_EDIT_RELOAD_AUDIT_RESTORE_RELOAD'};
+        fs.writeFileSync(process.env.RUNNER_TEMP+'/gi-insurer-combined-preview-result.json',JSON.stringify(result,null,2)+'\n');
+        fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY,'Combined Preview result: '+result.status+'\nReader environment restored exactly; original backend code and immutable Hosting artifact retained.\n'+backend.targets.map(t=>t.target+': '+t.after.revision+'; '+t.sourceProof.status).join('\n')+'\nTargeted authenticated insurer activity UAT remains pending. Existing accepted Metas evidence is preserved.\n');
+        NODE
+    - name: Preserve combined Preview readback and sanitized backend evidence
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: gi-b4003-insurer-activity-exact-preview-readback-${{ github.run_id }}
+        path: |
+          ${{ runner.temp }}/gi-preview-predecessor-build.json
+          ${{ runner.temp }}/gi-preview-predecessor-identity.json
+          ${{ runner.temp }}/gi-insurer-combined-preview-result.json
+          ${{ runner.temp }}/gi-insurer-function-before-snapshot.json
+          ${{ runner.temp }}/gi-insurer-function-after-snapshot.json
+          ${{ runner.temp }}/gi-insurer-function-readback.json
+          ${{ runner.temp }}/gi-insurer-source-binding.json
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-
-      - name: Require exact insurer successor, two existing LAB targets, one-file transport and source Guard PASS
-        env:
-          GH_READ_TOKEN: ${{ github.token }}
-        run: |
-          set -euo pipefail
-          node - <<'NODE'
-          const fs=require('node:fs'),{execFileSync}=require('node:child_process');
-          const git=(...args)=>execFileSync('git',args,{encoding:'utf8'}).trim();
-          const need=(ok,code)=>{if(!ok)throw Error(code);};
-          const controlPath='artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json';
-          const workflowPath='.github/workflows/gravicentra-b4-003-cumulative-safe-read-preview-20261029.yml';
-          const receiptPath='artifacts/orbit360-recovery/release-control/I6_5_B4_003_INSURER_ACTIVITY_SOURCE_SUCCESSOR_20261030.json';
-          const sourcePaths=['functions/product-operational-domain.js','functions/b4-003-scoped-bootstrap-reader.js','orbit360-platform/modules/aseguradoras.js','orbit360-platform/data/store-firestore-product-operational-p0.js'].sort();
-          const C=JSON.parse(fs.readFileSync(controlPath,'utf8')),S=C.b4003InsurerActivitySourceSuccessor20261030;
-          need(S&&S.gate==='I6.5/B4-003'&&S.status==='SOURCE_AND_SYNTHETIC_QA_PASS_PREVIEW_UAT_PENDING'&&
-            S.previewAuthorizedAfterGuardAndRegressionPass===true&&S.backendDeploymentAuthorized===true&&
-            S.productionPromotionAuthorized===false&&S.authIamRulesChangeAuthorized===false&&
-            S.realBusinessWritesAuthorized===false&&S.currentCapabilityAcceptances===0,'EXACT_INSURER_PREVIEW_AUTHORITY_REQUIRED');
-          need(C.repository===process.env.GITHUB_REPOSITORY&&C.branch===process.env.GITHUB_REF_NAME,'REPOSITORY_BRANCH_MISMATCH');
-          need(git('rev-parse','HEAD')===process.env.TRANSPORT_SHA&&git('show','-s','--format=%s','HEAD')===
-            'build(i6.5 B4-003): trigger cumulative safe-read isolated Preview only','EXACT_TRANSPORT_MISMATCH');
-          need(git('diff','--name-only','HEAD^','HEAD')===workflowPath,'TRANSPORT_MUST_CHANGE_ONLY_EXISTING_WORKFLOW');
-          const source=git('log','-1','--format=%H','--',receiptPath);
-          need(/^[0-9a-f]{40}$/.test(source)&&git('rev-parse','HEAD^')===source&&
-            S.parentHead===process.env.EXPECTED_SOURCE_PARENT&&git('rev-parse',source+'^')===S.parentHead,
-            'SOURCE_EXACT_PARENT_AND_TRANSPORT_BINDING_REQUIRED');
-          need(S.receiptPath===receiptPath&&git('hash-object',receiptPath)===S.receiptBlobSha&&
-            git('rev-parse',source+':'+receiptPath)===S.receiptBlobSha,'INSURER_RECEIPT_BINDING_MISMATCH');
-          const R=JSON.parse(fs.readFileSync(receiptPath,'utf8'));
-          need(R.schema==='GRAVICENTRA_I65_B4003_INSURER_ACTIVITY_SOURCE_SUCCESSOR_V1'&&
-            R.gate===S.gate&&R.status===S.status&&R.parentHead===S.parentHead&&
-            R.repository===C.repository&&R.branch===C.branch,'INSURER_RECEIPT_IDENTITY_MISMATCH');
-          const P=R.previewTransport||{};
-          const targets=[{name:'orbit360ProductOperationalCommandPreview',region:'us-east1'},{name:'orbit360ScopedPolicyReadPreview',region:'us-east1'}];
-          need(P.workflowPath===workflowPath&&P.transportWorkflowAfterBlob===git('hash-object',workflowPath)&&
-            P.reuseExistingChannel===true&&P.hostingChannelId===process.env.PREVIEW_CHANNEL_ID&&
-            String(P.expectedPreviewUrl||'').replace(/\/$/,'')===process.env.EXPECTED_PREVIEW_URL&&
-            P.predecessorSourceSha===process.env.PREDECESSOR_SOURCE_SHA&&P.predecessorBuildId===process.env.PREDECESSOR_BUILD_ID&&
-            P.project===process.env.PROJECT_ID&&JSON.stringify(P.targetFunctions)===JSON.stringify(targets),
-            'EXACT_EXISTING_PREVIEW_TRANSPORT_REQUIRED');
-          const actual=git('diff','--name-only',S.parentHead,source).split(/\r?\n/).filter(Boolean).sort();
-          need(JSON.stringify(actual)===JSON.stringify((R.atomicCommitPaths||[]).slice().sort())&&actual.length===14&&
-            JSON.stringify(actual)===JSON.stringify((S.atomicCommitPaths||[]).slice().sort()),'EXACT_SOURCE_DELTA_REQUIRED');
-          need(JSON.stringify(Object.keys(R.sourceFiles||{}).sort())===JSON.stringify(sourcePaths),'FOUR_CAUSAL_SOURCE_PATHS_REQUIRED');
-          for(const p of sourcePaths){const b=R.sourceFiles[p];need(b.beforeBlob!==b.afterBlob&&
-            git('rev-parse',S.parentHead+':'+p)===b.beforeBlob&&git('rev-parse',source+':'+p)===b.afterBlob&&
-            git('hash-object',p)===b.afterBlob,'SOURCE_BLOB_MISMATCH:'+p);}
-          for(const [p,b] of Object.entries(R.regressionTests||{})) need(b.syntheticOnly===true&&b.externalRequests===0&&
-            b.tests===b.passed&&b.passed>0&&git('hash-object',p)===b.afterBlob,'REGRESSION_BLOB_MISMATCH:'+p);
-          (async()=>{
-            const url='https://api.github.com/repos/'+C.repository+'/actions/workflows/gravicentra-release-lock-sync.yml/runs?head_sha='+source+'&per_page=100';
-            const response=await fetch(url,{headers:{Authorization:'Bearer '+process.env.GH_READ_TOKEN,Accept:'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'}});
-            need(response.ok,'SOURCE_GUARD_API_READ_FAILED_HTTP_'+response.status);
-            const body=await response.json();
-            const runs=(body.workflow_runs||[]).filter(r=>r.head_sha===source&&r.head_branch===C.branch).sort((a,b)=>b.id-a.id);
-            need(runs[0]&&runs[0].status==='completed'&&runs[0].conclusion==='success','LATEST_EXACT_SOURCE_GUARD_SUCCESS_REQUIRED');
-            const binding={sourceSha:source,sourceParent:S.parentHead,backendSourceSha:source,backendTreeSha:git('rev-parse',source+':functions'),transportSha:process.env.TRANSPORT_SHA,guardRunId:runs[0].id,sourceBlobs:Object.fromEntries(sourcePaths.map(p=>[p,git('rev-parse',source+':'+p)])),receiptPath,receiptBlobSha:S.receiptBlobSha,backendDeployment:true,targetFunctions:targets};
-            fs.writeFileSync(process.env.RUNNER_TEMP+'/gi-insurer-source-binding.json',JSON.stringify(binding,null,2)+'\n');
-            fs.writeFileSync(process.env.RUNNER_TEMP+'/gi-authorized-source.sha',source+'\n');
-            fs.appendFileSync(process.env.GITHUB_ENV,'EXACT_SOURCE_SHA='+source+'\n');
-            fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY,'Exact insurer source: '+source+'\nSource Guard SUCCESS: '+runs[0].id+'\nExisting LAB targets: '+targets.map(x=>x.name).join(', ')+'\n');
-          })().catch(e=>{console.error(String(e.message||e));process.exitCode=1;});
-          NODE
-          git diff --exit-code
-          git diff --cached --exit-code
-          SOURCE_SHA=$(cat "$RUNNER_TEMP/gi-authorized-source.sha")
-          git checkout --detach "$SOURCE_SHA"
-          test "$(git rev-parse HEAD)" = "$SOURCE_SHA"
-          node tools/gravicentra-governance-preflight-v1.mjs --mode=i6
-          node tools/gravicentra-b4-003-insurer-activity-successor.test.mjs
-          node tools/gravicentra-b4-003-insurer-activity-audit.test.cjs
-          node tools/gravicentra-b4-003-scoped-bootstrap-reader.test.cjs
-          node tools/gravicentra-b4-003-insurer-preview-projection.test.cjs
-          node tools/gravicentra-b4-003-metas-preview-session.test.cjs
-          node tools/gravicentra-b4-003-metas-atomic-ui.test.cjs
-          node tools/gravicentra-b4-003-metas-preview-projection.test.cjs
-          node tools/gravicentra-b4-003-operational-write-security-regression.test.cjs
-          node tools/gravicentra-b4-003-before-image-regression.test.cjs
-          node tools/gravicentra-b4-003-scoped-boundary.test.cjs
-          node tools/gravicentra-b4-003-cronograma-durable-task.test.cjs
-
-      - name: Capture exact existing Preview origin and predecessor before any deployment
-        run: |
-          set -euo pipefail
-          test "$PREVIEW_CHANNEL_ID" = 'gi-i65-b4-sr-41066435386'
-          test "$EXPECTED_PREVIEW_URL" = 'https://ays-orbit-360-lab--gi-i65-b4-sr-41066435386-r09pl1ti.web.app'
-          curl --fail --silent --show-error --location --retry 2 --max-time 30 "$EXPECTED_PREVIEW_URL/__recovery__/build.json" > "$RUNNER_TEMP/gi-preview-predecessor-build.json"
-          node - <<'NODE'
-          const fs=require('node:fs'),crypto=require('node:crypto');
-          const raw=fs.readFileSync(process.env.RUNNER_TEMP+'/gi-preview-predecessor-build.json'),meta=JSON.parse(raw);
-          if(meta.sourceSha!==process.env.PREDECESSOR_SOURCE_SHA||meta.buildId!==process.env.PREDECESSOR_BUILD_ID||meta.gate!=='I6.5-B4-003')throw Error('EXISTING_PREVIEW_PREDECESSOR_IDENTITY_MISMATCH');
-          const record={observedAtUtc:new Date().toISOString(),previewUrl:process.env.EXPECTED_PREVIEW_URL,channelId:process.env.PREVIEW_CHANNEL_ID,sourceSha:meta.sourceSha,buildId:meta.buildId,buildMarkerSha256:crypto.createHash('sha256').update(raw).digest('hex'),sameOriginPreservesExistingBrowserSession:true,hostingLive:false,previousReceiptRemainsHistorical:true};
-          fs.writeFileSync(process.env.RUNNER_TEMP+'/gi-preview-predecessor-identity.json',JSON.stringify(record,null,2)+'\n');
-          NODE
-
-      - name: Snapshot public LIVE identities before preview
-        run: |
-          set -euo pipefail
-          curl --fail --silent --show-error --location --retry 2 --max-time 30 https://ays-orbit-360-lab.web.app/ > "$RUNNER_TEMP/gi-live-before.html"
-          for n in 1 2; do
-            curl --fail --silent --show-error --location --retry 2 --max-time 30 -D "$RUNNER_TEMP/gi-owner-before-$n.headers" https://app.aysseguros.com/ > "$RUNNER_TEMP/gi-owner-before-$n.html"
-          done
-          curl --fail --silent --show-error --location --retry 2 --max-time 30 https://app.aysseguros.com/product-runtime-config.js > "$RUNNER_TEMP/gi-owner-runtime-before.js"
-          cat > "$RUNNER_TEMP/gi-owner-root-fingerprint.js" <<'NODE'
-          'use strict';
-          const fs=require('node:fs'),crypto=require('node:crypto');
-          const [phase,fileA,fileB,out]=process.argv.slice(2);
-          const sha=p=>crypto.createHash('sha256').update(fs.readFileSync(p)).digest('hex');
-          function fingerprint(path){
-            const html=fs.readFileSync(path,'utf8');
-            const title=((html.match(/<title[^>]*>([\s\S]*?)<\/title>/i)||[])[1]||'').replace(/\s+/g,' ').trim();
-            const buildIds=[...new Set([...html.matchAll(/orbitBuild=([^&"'<>\s]+)/g)].map(m=>decodeURIComponent(m[1])))].sort();
-            const assets=[...html.matchAll(/<(?:script|link)\b[^>]*(?:src|href)=["']([^"']+)["']/gi)].map(m=>m[1]).map(raw=>{
-              try{
-                const u=new URL(raw,'https://app.aysseguros.com/');
-                if(u.origin==='https://app.aysseguros.com'&&u.pathname.startsWith('/cdn-cgi/'))return '';
-                const build=u.searchParams.get('orbitBuild');
-                return (u.origin==='https://app.aysseguros.com'?'':u.origin)+u.pathname+(build?'?orbitBuild='+build:'');
-              }catch{return String(raw).split('#')[0];}
-            }).filter(Boolean);
-            const uniqueAssets=[...new Set(assets)].sort();
-            const htmlDocument=/<html\b/i.test(html)&&/<\/html>/i.test(html);
-            const bodyDocument=/<body\b/i.test(html)&&/<\/body>/i.test(html);
-            const nonTrivial=Buffer.byteLength(html,'utf8')>=512;
-            const productMarker=/Gravicentra Insurance|Insurance OS/i.test(html);
-            if(!htmlDocument||!bodyDocument||!nonTrivial)throw Error('OWNER_ROOT_STRUCTURAL_IDENTITY_MISSING:'+path);
-            return {title,htmlDocument,bodyDocument,productMarker,buildIds,assets:uniqueAssets};
-          }
-          const first=fingerprint(fileA),second=fingerprint(fileB);
-          if(JSON.stringify(first)!==JSON.stringify(second))throw Error('OWNER_ROOT_PREDEPLOY_STRUCTURAL_VARIANCE');
-          fs.writeFileSync(out,JSON.stringify({phase,rawHashes:[sha(fileA),sha(fileB)],rawByteStable:sha(fileA)===sha(fileB),fingerprint:first},null,2)+'\n');
-          NODE
-          node "$RUNNER_TEMP/gi-owner-root-fingerprint.js" before "$RUNNER_TEMP/gi-owner-before-1.html" "$RUNNER_TEMP/gi-owner-before-2.html" "$RUNNER_TEMP/gi-owner-identity-before.json"
-          node - <<'NODE'
-          const fs=require('node:fs');
-          const p=process.env.RUNNER_TEMP+'/gi-owner-runtime-before.js';
-          const content=fs.readFileSync(p,'utf8');
-          const bytes=Buffer.byteLength(content,'utf8');
-          if(bytes<64||/<html\b/i.test(content))throw Error('OWNER_RUNTIME_CONFIG_STRUCTURAL_IDENTITY_MISSING');
-          NODE
-
-      - name: Resolve pre-existing LAB-only account and pinned Firebase CLI
-        run: |
-          set -euo pipefail
-          mkdir -p "$RUNNER_TEMP/gi-preview-auth"
-          python3 - <<'PY'
-          import json,os,pathlib
-          root=pathlib.Path(os.environ['RUNNER_TEMP'])/'gi-preview-auth'
-          matches=[]
-          for n,k in enumerate(('SA_ORBIT360_LAB','SA_ORBIT_360_LAB','SA_DEFAULT')):
-              try: val=json.loads(os.environ.get(k,''))
-              except (ValueError,TypeError): continue
-              if val.get('type')=='service_account' and val.get('project_id')==os.environ['PROJECT_ID'] and val.get('private_key'):
-                  p=root/f'{n}.json'
-                  p.write_text(json.dumps(val),encoding='utf8')
-                  p.chmod(0o600)
-                  matches.append(str(p))
-          if not matches: raise SystemExit('EXISTING_LAB_ACCOUNT_NOT_CONFIGURED')
-          (root/'candidates').write_text('\n'.join(matches)+'\n',encoding='utf8')
-          PY
-          CLI_ROOT="$RUNNER_TEMP/gi-preview-cli"
-          npm install --prefix "$CLI_ROOT" --no-save --ignore-scripts --no-audit --no-fund firebase-tools@14.10.1 >/dev/null
-          node tools/gravicentra-firebase-tools-empty-extensions-workaround-v1.mjs "$CLI_ROOT"
-          CLI="$CLI_ROOT/node_modules/firebase-tools/lib/bin/firebase.js"
-          selected=''
-          while IFS= read -r candidate; do
-            if GOOGLE_APPLICATION_CREDENTIALS="$candidate" node "$CLI" functions:list --project "$PROJECT_ID" --non-interactive --json >/dev/null 2>&1; then
-              selected="$candidate"
-              break
-            fi
-          done < "$RUNNER_TEMP/gi-preview-auth/candidates"
-          test -n "$selected"
-          cp "$selected" "$RUNNER_TEMP/gi-preview-auth/selected.json"
-          chmod 600 "$RUNNER_TEMP/gi-preview-auth/selected.json"
-          echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/gi-preview-auth/selected.json" >> "$GITHUB_ENV"
-          echo "FIREBASE_CLI_BIN=$CLI" >> "$GITHUB_ENV"
-          npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund firebase-admin@13.4.0 >/dev/null
-
-      - name: Read only public LAB web configuration
-        run: |
-          set -euo pipefail
-          node "$FIREBASE_CLI_BIN" apps:list WEB --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/gi-preview-apps.json"
-          export APPS_FILE="$RUNNER_TEMP/gi-preview-apps.json"
-          APP_ID=$(python3 - <<'PY'
-          import json,os
-          apps=json.load(open(os.environ['APPS_FILE'])).get('result') or []
-          web=[a for a in apps if str(a.get('platform','')).upper() in ('WEB','PLATFORM_WEB','')]
-          if len(web)!=1: raise SystemExit('EXACT_ONE_LAB_WEB_APP_REQUIRED')
-          print(web[0].get('appId',''))
-          PY
-          )
-          test -n "$APP_ID"
-          node "$FIREBASE_CLI_BIN" apps:sdkconfig WEB "$APP_ID" --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/gi-preview-sdkconfig.json"
-
-      - name: Package exact cumulative candidate with isolated Preview routing
-        run: |
-          set -euo pipefail
-          export SOURCE_SHA="$EXACT_SOURCE_SHA"
-          node tools/gravicentra-i6-5-b1-branding-snapshot.mjs "$RUNNER_TEMP/gi-preview-branding.json"
-          export TENANT_BRANDING_SNAPSHOT_FILE="$RUNNER_TEMP/gi-preview-branding.json"
-          node tools/gravicentra-i6-1-preview-package.mjs . "$RUNNER_TEMP/gi-preview-package" "$RUNNER_TEMP/gi-preview-sdkconfig.json" > "$RUNNER_TEMP/gi-preview-package-output.json"
-          node - <<'NODE'
-          const fs=require('node:fs');
-          const root=process.env.RUNNER_TEMP+'/gi-preview-package/bundle';
-          const conf=JSON.parse(fs.readFileSync(root+'/firebase.json','utf8'));
-          const meta=JSON.parse(fs.readFileSync(root+'/site/__recovery__/build.json','utf8'));
-          if(Object.keys(conf).join(',')!=='hosting'||conf.hosting.site!=='ays-orbit-360-lab'||conf.hosting.public!=='site')throw Error('HOSTING_ONLY_REQUIRED');
-          if(meta.sourceSha!==process.env.EXACT_SOURCE_SHA||meta.gate!=='I6.5-B4-003')throw Error('SOURCE_GATE_MISMATCH');
-          for(const rel of ['modules/aseguradoras.js','modules/inicio.js','modules/equipo.js','modules/insights.js','modules/portal.js','core/legal.js','data/store-firestore-product-readonly-p0.js','modules/cobros.js','modules/plantillas.js','core/product-app-p0.js','core/queries.js','data/store-firestore-product-operational-p0.js']){
-            if(!fs.readFileSync('orbit360-platform/'+rel).equals(fs.readFileSync(root+'/site/'+rel)))throw Error('BUNDLE_DIFF:'+rel);
-          }
-          let expectedIndex=fs.readFileSync('orbit360-platform/index.html','utf8');
-          const brandingScript=/<script\s+src=["']core\/public-tenant-branding\.js[^"']*["']\s*><\/script>/i;
-          if(!brandingScript.test(expectedIndex))throw Error('SOURCE_BRANDING_TAG_MISSING');
-          expectedIndex=expectedIndex.replace(brandingScript,'<script src="data/tenant-public-branding-snapshot.generated.js"></script>\n$&');
-          let bound=0;
-          const bind=url=>{
-            const raw=String(url||'');
-            if(!raw||/^(?:https?:|data:|blob:|\/\/|#)/i.test(raw)||!/.(?:js|css)(?:[?#]|$)/i.test(raw))return raw;
-            const hashAt=raw.indexOf('#'),hash=hashAt>=0?raw.slice(hashAt):'',base=hashAt>=0?raw.slice(0,hashAt):raw;
-            const next=/([?&])orbitBuild=[^&#]*/.test(base)
-              ?base.replace(/([?&])orbitBuild=[^&#]*/,'$1orbitBuild='+encodeURIComponent(meta.buildId))
-              :base+(base.includes('?')?'&':'?')+'orbitBuild='+encodeURIComponent(meta.buildId);
-            bound++;return next+hash;
-          };
-          expectedIndex=expectedIndex.replace(/(<script\b[^>]*\bsrc=["'])([^"']+)(["'])/gi,(m,a,u,z)=>a+bind(u)+z);
-          expectedIndex=expectedIndex.replace(/(<link\b[^>]*\brel=["']stylesheet["'][^>]*\bhref=["'])([^"']+)(["'])/gi,(m,a,u,z)=>a+bind(u)+z);
-          expectedIndex=expectedIndex.replace(/(<link\b[^>]*\bhref=["'])([^"']+\.css(?:[^"']*)?)(["'][^>]*\brel=["']stylesheet["'])/gi,(m,a,u,z)=>a+bind(u)+z);
-          if(bound<10||fs.readFileSync(root+'/site/index.html','utf8')!==expectedIndex)throw Error('INDEX_DETERMINISTIC_PACKAGE_TRANSFORM_DIFF');
-          const runtime=fs.readFileSync(root+'/site/product-runtime-config.js','utf8');
-          if(!runtime.includes('"scopedReadPreviewCandidate":true'))throw Error('PROTECTED_PREVIEW_CONFIG_REQUIRED');
-          const evidence=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/gi-preview-package-output.json','utf8'));
-          fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY,'Build: '+evidence.buildId+'\nHosted payload digest: '+evidence.hostedPayloadDigest+'\nBundle digest: '+evidence.bundleDigest+'\n');
-          NODE
-
-      - name: Retain the exact immutable Hosting build and manifests, never credentials
-        uses: actions/upload-artifact@v4
-        with:
-          name: gi-b4003-cumulative-hosting-${{ github.run_id }}
-          path: |
-            ${{ runner.temp }}/gi-preview-package/bundle/site/
-            ${{ runner.temp }}/gi-preview-package/bundle/firebase.json
-            ${{ runner.temp }}/gi-preview-package/evidence/
-          retention-days: 30
-          if-no-files-found: error
-
-      - name: Stage the immutable builder backend and capture both existing target identities
-        run: |
-          set -euo pipefail
-          BACKEND_ROOT="$RUNNER_TEMP/gi-insurer-backend"
-          mkdir -p "$BACKEND_ROOT"
-          cp -a "$RUNNER_TEMP/gi-preview-package/bundle/backend" "$BACKEND_ROOT/functions"
-          printf '{"functions":{"source":"functions","runtime":"nodejs22","ignore":["node_modules",".git","firebase-debug.log","firebase-debug.*.log","*.local"]}}\n' > "$BACKEND_ROOT/firebase.json"
-          export BACKEND_ROOT
-          echo "BACKEND_ROOT=$BACKEND_ROOT" >> "$GITHUB_ENV"
-          node - <<'NODE'
-          const fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto'),{execFileSync}=require('node:child_process');
-          const sha=b=>crypto.createHash('sha256').update(b).digest('hex');
-          const git=(...args)=>execFileSync('git',args,{encoding:'utf8'}).trim();
-          const files=git('ls-tree','-r','--name-only',process.env.EXACT_SOURCE_SHA,'--','functions/').split(/\r?\n/).filter(Boolean).filter(p=>!p.endsWith('.local')&&!p.includes('/node_modules/'));
-          const expected=new Map(files.map(p=>[p,execFileSync('git',['show',process.env.EXACT_SOURCE_SHA+':'+p])]));
-          const sourceBootstrap=expected.get('functions/bootstrap.js').toString('utf8');
-          if(sourceBootstrap.includes('b4-003-scoped-policy-callable'))throw Error('UNEXPECTED_ALREADY_INTEGRATED_BOOTSTRAP');
-          const bootstrapSuffix="\n// B4-003 dual-name source; executor deploys Preview only.\nObject.assign(module.exports,require('./b4-003-scoped-policy-callable'));\n";
-          expected.set('functions/bootstrap.js',Buffer.from(sourceBootstrap+bootstrapSuffix));
-          const academy=['manual-maestro.html','capacitacion-tecnica-interna.html','capacitacion-crm.html','manual-integraciones.html','comparativa-ia.html'];
-          for(const name of academy)expected.set('functions/secure-academia-manuals/'+name,fs.readFileSync('orbit360-platform/docs/'+name));
-          const actual=[];function walk(dir){for(const e of fs.readdirSync(dir,{withFileTypes:true})){const p=path.join(dir,e.name);if(e.isSymbolicLink())throw Error('BACKEND_SYMLINK_FORBIDDEN');if(e.isDirectory())walk(p);else if(e.isFile())actual.push(path.relative(process.env.BACKEND_ROOT,p).split(path.sep).join('/'));}}
-          walk(process.env.BACKEND_ROOT+'/functions');actual.sort();
-          if(JSON.stringify(actual)!==JSON.stringify([...expected.keys()].sort()))throw Error('BACKEND_EXACT_FILE_SET_MISMATCH');
-          const manifest=actual.map(p=>{const b=fs.readFileSync(process.env.BACKEND_ROOT+'/'+p);if(!b.equals(expected.get(p)))throw Error('BACKEND_STAGE_DIFF:'+p);const sourcePath=files.includes(p)?p:null;return{path:p,gitBlobSha:sourcePath?git('rev-parse',process.env.EXACT_SOURCE_SHA+':'+sourcePath):null,transformation:p==='functions/bootstrap.js'?'EXISTING_IMMUTABLE_BUILDER_SCOPED_EXPORT':sourcePath?'NONE':'EXISTING_PRIVATE_ACADEMY_PACKAGING',sha256:sha(b),bytes:b.length};});
-          fs.writeFileSync(process.env.RUNNER_TEMP+'/gi-insurer-backend-source-manifest.json',JSON.stringify({sourceSha:process.env.EXACT_SOURCE_SHA,targets:JSON.parse(process.env.TARGET_FUNCTIONS),region:process.env.TARGET_REGION,stageMatchesImmutableBuilder:true,files:manifest},null,2)+'\n');
-          NODE
-          tar -cf "$RUNNER_TEMP/gi-insurer-backend-source.tar" -C "$BACKEND_ROOT" functions firebase.json
-          (cd "$BACKEND_ROOT/functions" && npm ci --ignore-scripts --no-audit --no-fund >/dev/null)
-          cat > "$RUNNER_TEMP/gi-insurer-function-snapshot.cjs" <<'NODE'
-          'use strict';
-          const fs=require('node:fs'),crypto=require('node:crypto'),{execFileSync}=require('node:child_process');
-          const {GoogleAuth}=require(process.env.BACKEND_ROOT+'/functions/node_modules/google-auth-library');
-          const phase=process.argv[2],tmp=process.env.RUNNER_TEMP;
-          const targets=JSON.parse(process.env.TARGET_FUNCTIONS||'[]');
-          if(JSON.stringify(targets)!==JSON.stringify(['orbit360ProductOperationalCommandPreview','orbit360ScopedPolicyReadPreview'])||process.env.TARGET_REGION!=='us-east1'||process.env.PROJECT_ID!=='ays-orbit-360-lab')throw Error('EXACT_TWO_EXISTING_PREVIEW_TARGETS_REQUIRED');
-          if(!['before','after'].includes(phase))throw Error('INVALID_SNAPSHOT_PHASE');
-          const stable=x=>Array.isArray(x)?x.map(stable):x&&typeof x==='object'?Object.fromEntries(Object.keys(x).sort().map(k=>[k,stable(x[k])])):x;
-          const hash=x=>crypto.createHash('sha256').update(typeof x==='string'?x:JSON.stringify(stable(x))).digest('hex');
-          const doc=JSON.parse(fs.readFileSync(tmp+'/gi-insurer-functions-'+phase+'.json','utf8'));
-          const rows=Array.isArray(doc.result)?doc.result:Array.isArray(doc)?doc:[];
-          const summary=rows.map(r=>{const id=String(r.id||r.entryPoint||r.name||'').split('/').pop(),region=String(r.region||r.location||((String(r.name||'').match(/\/locations\/([^/]+)/)||[])[1])||'').split('/').pop();return{id,region,key:region+'/'+id,metadataSha256:hash(r)};}).sort((a,b)=>a.key.localeCompare(b.key));
-          if(!summary.length||summary.some(r=>!r.id||!r.region)||new Set(summary.map(r=>r.key)).size!==summary.length)throw Error('FUNCTION_INVENTORY_IDENTITY_INCOMPLETE');
-          for(const target of targets)if(summary.filter(r=>r.id===target&&r.region===process.env.TARGET_REGION).length!==1||summary.filter(r=>r.id===target).length!==1)throw Error('EXISTING_EXACT_TARGET_CARDINALITY_REQUIRED:'+target);
-          (async()=>{
-           const auth=new GoogleAuth({scopes:['https://www.googleapis.com/auth/cloud-platform']});
-           const client=await auth.getClient();
-           const metadata=await Promise.all(targets.map(async target=>{
-            const name='projects/'+process.env.PROJECT_ID+'/locations/'+process.env.TARGET_REGION+'/functions/'+target;
-            const {data:f}=await client.request({url:'https://cloudfunctions.googleapis.com/v2/'+name});
-            if(f.name!==name||f.buildConfig?.entryPoint!==target||f.environment!=='GEN_2'||f.state!=='ACTIVE'||f.buildConfig?.runtime!=='nodejs22')throw Error('TARGET_METADATA_IDENTITY_OR_STATE_MISMATCH:'+target);
-            const svc=f.serviceConfig||{},build=f.buildConfig||{};
-            const resolved=build.sourceProvenance?.resolvedStorageSource||build.source?.storageSource||null;
-            const identity={name:f.name,environment:f.environment,state:f.state,updateTime:f.updateTime||null,build:build.build||null,runtime:build.runtime||null,entryPoint:build.entryPoint,sourceStorage:resolved,revision:svc.revision||null,service:svc.service||null,uri:svc.uri||null,codeHash:f.labels?.['firebase-functions-hash']||null,labels:f.labels||{},serviceAccountEmail:svc.serviceAccountEmail||null,ingressSettings:svc.ingressSettings||null,environmentVariablesSha256:hash(svc.environmentVariables||{}),secretEnvironmentVariablesSha256:hash(svc.secretEnvironmentVariables||[]),serviceConfigNonRevisionSha256:hash(Object.fromEntries(Object.entries(svc).filter(([k])=>k!=='revision')))};
-            let iam={status:'NOT_AVAILABLE',policySha256:null};
-            if(svc.service){try{const {data:p}=await client.request({url:'https://run.googleapis.com/v2/'+svc.service+':getIamPolicy'});iam={status:'READ',policySha256:hash({version:p.version||0,bindings:(p.bindings||[]).map(b=>({...b,members:(b.members||[]).slice().sort()})).sort((a,b)=>JSON.stringify(stable(a)).localeCompare(JSON.stringify(stable(b))))})};}catch(e){iam.httpStatus=Number(e.response?.status||0);}}
-            return {target,identity,iam};
-           }));
-           const result={phase,observedAt:new Date().toISOString(),functions:summary,targets:metadata};
-           fs.writeFileSync(tmp+'/gi-insurer-function-'+phase+'-snapshot.json',JSON.stringify(result,null,2)+'\n');
-           if(phase==='before')return;
-           const before=JSON.parse(fs.readFileSync(tmp+'/gi-insurer-function-before-snapshot.json','utf8'));
-           if(JSON.stringify(before.functions.map(r=>r.key))!==JSON.stringify(summary.map(r=>r.key)))throw Error('FUNCTION_CREATED_OR_DELETED');
-           const allowed=targets.map(t=>process.env.TARGET_REGION+'/'+t);
-           const changed=summary.filter((r,i)=>r.metadataSha256!==before.functions[i].metadataSha256).map(r=>r.key);
-           if(changed.some(k=>!allowed.includes(k)))throw Error('NON_TARGET_FUNCTION_CHANGED');
-           const proofs=[];
-           const manifest=JSON.parse(fs.readFileSync(tmp+'/gi-insurer-backend-source-manifest.json','utf8'));
-           for(const current of metadata){
-            const prev=before.targets.find(x=>x.target===current.target);
-            if(!prev)throw Error('TARGET_PREDECESSOR_MISSING');
-            for(const field of ['serviceAccountEmail','ingressSettings','environmentVariablesSha256','secretEnvironmentVariablesSha256','serviceConfigNonRevisionSha256','service','uri'])if(prev.identity[field]!==current.identity[field])throw Error('TARGET_NON_SOURCE_CONFIGURATION_CHANGED:'+current.target+':'+field);
-            if(prev.iam.status==='READ'&&current.iam.status==='READ'&&prev.iam.policySha256!==current.iam.policySha256)throw Error('TARGET_RUN_IAM_CHANGED:'+current.target);
-            const resolved=current.identity.sourceStorage;
-            if(!resolved?.bucket||!resolved?.object)throw Error('DEPLOYED_SOURCE_GENERATION_MISSING:'+current.target);
-            const u='https://storage.googleapis.com/storage/v1/b/'+encodeURIComponent(resolved.bucket)+'/o/'+encodeURIComponent(resolved.object)+'?alt=media'+(resolved.generation?'&generation='+encodeURIComponent(resolved.generation):'');
-            let bytes;
-            try {const {data}=await client.request({url:u,responseType:'arraybuffer'});bytes=Buffer.from(data);}catch(e){throw Error('DEPLOYED_SOURCE_READBACK_UNAVAILABLE:'+current.target+':HTTP_'+Number(e.response?.status||0));}
-            const archive=tmp+'/gi-insurer-deployed-'+current.target+'.zip';fs.writeFileSync(archive,bytes);
-            const py="import json,sys,zipfile,pathlib,hashlib\nz=zipfile.ZipFile(sys.argv[1]);root=pathlib.Path(sys.argv[2]);files=json.loads(sys.argv[3]);out=[]\nfor rel in files:\n names=[n for n in z.namelist() if n==rel or n.endswith('/'+rel)]\n if len(names)!=1: raise SystemExit('DEPLOYED_SOURCE_PATH_CARDINALITY:'+rel)\n b=z.read(names[0]);expected=(root/rel).read_bytes()\n if b!=expected: raise SystemExit('DEPLOYED_SOURCE_BYTES_MISMATCH:'+rel)\n out.append({'path':rel,'sha256':hashlib.sha256(b).hexdigest()})\nprint(json.dumps(out))";
-            const executableFiles=manifest.files.map(x=>x.path.replace(/^functions\//,''));
-            if(!['product-operational-domain.js','b4-003-scoped-bootstrap-reader.js','b4-003-scoped-policy-callable.js','bootstrap.js'].every(p=>executableFiles.includes(p)))throw Error('BACKEND_MANIFEST_EXECUTABLE_SOURCE_MISSING');
-            const sourceFiles=JSON.parse(execFileSync('python3',['-c',py,archive,process.env.BACKEND_ROOT+'/functions',JSON.stringify(executableFiles)],{encoding:'utf8'}));
-            proofs.push({target:current.target,region:process.env.TARGET_REGION,before:prev.identity,after:current.identity,iamUnchanged:prev.iam.status==='READ'&&current.iam.status==='READ'?prev.iam.policySha256===current.iam.policySha256:null,sourceProof:{status:'DEPLOYED_BACKEND_SOURCE_BYTES_MATCH_EXACT_STAGE',scope:'ALL_STAGED_FUNCTION_FILES',storageSource:resolved,objectSha256:crypto.createHash('sha256').update(bytes).digest('hex'),sourceFiles}});
-           }
-           fs.writeFileSync(tmp+'/gi-insurer-function-readback.json',JSON.stringify({status:'TWO_EXISTING_TARGETS_ONLY_DEPLOY_AND_EXACT_SOURCE_READBACK_PASS',onlyAuthorizedTargetsChanged:true,changedFunctionKeys:changed,inventoryCount:summary.length,targets:proofs,authenticatedUat:'PENDING'},null,2)+'\n');
-          })().catch(e=>{console.error(String(e.message||e));process.exitCode=1;});
-          NODE
-          node "$FIREBASE_CLI_BIN" functions:list --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/gi-insurer-functions-before.json"
-          node "$RUNNER_TEMP/gi-insurer-function-snapshot.cjs" before
-
-      - name: Retain exact backend archive and source manifest without credentials
-        uses: actions/upload-artifact@v4
-        with:
-          name: gi-b4003-insurer-activity-backend-source-${{ github.run_id }}
-          path: |
-            ${{ runner.temp }}/gi-preview-predecessor-build.json
-            ${{ runner.temp }}/gi-preview-predecessor-identity.json
-            ${{ runner.temp }}/gi-insurer-backend-source.tar
-            ${{ runner.temp }}/gi-insurer-backend-source-manifest.json
-            ${{ runner.temp }}/gi-insurer-source-binding.json
-            ${{ runner.temp }}/gi-insurer-function-before-snapshot.json
-          retention-days: 30
-          if-no-files-found: error
-
-      - name: Deploy only the two existing exact LAB Preview callables
-        id: backend_deploy
-        run: |
-          set -euo pipefail
-          test "$TARGET_FUNCTIONS" = '["orbit360ProductOperationalCommandPreview","orbit360ScopedPolicyReadPreview"]'
-          test "$TARGET_REGION" = 'us-east1'
-          test "$PROJECT_ID" = 'ays-orbit-360-lab'
-          node "$FIREBASE_CLI_BIN" deploy --only functions:orbit360ProductOperationalCommandPreview,functions:orbit360ScopedPolicyReadPreview --config "$BACKEND_ROOT/firebase.json" --project "$PROJECT_ID" --non-interactive > "$RUNNER_TEMP/gi-insurer-function-deploy.log" 2>&1
-
-      - name: Verify both target source generations and unchanged other functions
-        if: ${{ always() && steps.backend_deploy.outcome != 'skipped' }}
-        run: |
-          set -euo pipefail
-          node "$FIREBASE_CLI_BIN" functions:list --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/gi-insurer-functions-after.json"
-          node "$RUNNER_TEMP/gi-insurer-function-snapshot.cjs" after
-          for target in orbit360ProductOperationalCommandPreview orbit360ScopedPolicyReadPreview; do
-            status=$(curl --silent --show-error --output /dev/null --write-out '%{http_code}' --max-time 25 --head "https://us-east1-ays-orbit-360-lab.cloudfunctions.net/$target")
-            test "$status" = '400'
-          done
-
-      - name: Update only the existing isolated seven-day LAB Preview channel, preserve session origin
-        id: deploy
-        run: |
-          set -euo pipefail
-          CHANNEL_ID="$PREVIEW_CHANNEL_ID"
-          curl --fail --silent --show-error --location --retry 2 --max-time 30 "$EXPECTED_PREVIEW_URL/__recovery__/build.json" > "$RUNNER_TEMP/gi-preview-predecessor-immediate.json"
-          cmp "$RUNNER_TEMP/gi-preview-predecessor-build.json" "$RUNNER_TEMP/gi-preview-predecessor-immediate.json"
-          cd "$RUNNER_TEMP/gi-preview-package/bundle"
-          node "$FIREBASE_CLI_BIN" hosting:channel:deploy "$CHANNEL_ID" --config firebase.json --project "$PROJECT_ID" --expires 7d --non-interactive --json > "$RUNNER_TEMP/gi-preview-deploy.json" 2>&1
-          export CHANNEL_ID
-          PREVIEW_URL=$(python3 - <<'PY'
-          import os,re
-          raw=open(os.environ['RUNNER_TEMP']+'/gi-preview-deploy.json',encoding='utf8').read()
-          prefix='https://ays-orbit-360-lab--'+os.environ['CHANNEL_ID']+'-'
-          urls=sorted(set(u.rstrip('/') for u in re.findall(r'https://[A-Za-z0-9._-]+\.web\.app',raw) if u.startswith(prefix)))
-          if len(urls)!=1: raise SystemExit('EXACTLY_ONE_ISOLATED_PREVIEW_URL_REQUIRED')
-          print(urls[0])
-          PY
-          )
-          test "$PREVIEW_URL" = "$EXPECTED_PREVIEW_URL"
-          echo "url=$PREVIEW_URL" >> "$GITHUB_OUTPUT"
-
-      - name: Verify served bytes and unchanged LIVE identities
-        env:
-          PREVIEW_URL: ${{ steps.deploy.outputs.url }}
-        run: |
-          set -euo pipefail
-          ROOT="$RUNNER_TEMP/gi-preview-package/bundle/site"
-          for rel in index.html __recovery__/build.json product-runtime-config.js modules/aseguradoras.js modules/inicio.js modules/equipo.js modules/insights.js modules/portal.js core/legal.js data/store-firestore-product-readonly-p0.js modules/cobros.js modules/plantillas.js core/product-app-p0.js core/queries.js data/store-firestore-product-operational-p0.js; do
-            curl --fail --silent --show-error --location --retry 2 --max-time 30 "$PREVIEW_URL/$rel" > "$RUNNER_TEMP/gi-served-$(basename "$rel")"
-            cmp "$ROOT/$rel" "$RUNNER_TEMP/gi-served-$(basename "$rel")"
-          done
-          export META_FILE="$RUNNER_TEMP/gi-served-build.json"
-          node - <<'NODE'
-          const fs=require('node:fs');
-          const meta=JSON.parse(fs.readFileSync(process.env.META_FILE,'utf8'));
-          if(meta.sourceSha!==process.env.EXACT_SOURCE_SHA||meta.gate!=='I6.5-B4-003')throw Error('SERVED_SOURCE_MISMATCH');
-          NODE
-          curl --fail --silent --show-error --location --retry 2 --max-time 30 https://ays-orbit-360-lab.web.app/ > "$RUNNER_TEMP/gi-live-after.html"
-          for n in 1 2; do
-            curl --fail --silent --show-error --location --retry 2 --max-time 30 -D "$RUNNER_TEMP/gi-owner-after-$n.headers" https://app.aysseguros.com/ > "$RUNNER_TEMP/gi-owner-after-$n.html"
-          done
-          curl --fail --silent --show-error --location --retry 2 --max-time 30 https://app.aysseguros.com/product-runtime-config.js > "$RUNNER_TEMP/gi-owner-runtime-after.js"
-          cmp "$RUNNER_TEMP/gi-live-before.html" "$RUNNER_TEMP/gi-live-after.html"
-          cmp "$RUNNER_TEMP/gi-owner-runtime-before.js" "$RUNNER_TEMP/gi-owner-runtime-after.js"
-          node "$RUNNER_TEMP/gi-owner-root-fingerprint.js" after "$RUNNER_TEMP/gi-owner-after-1.html" "$RUNNER_TEMP/gi-owner-after-2.html" "$RUNNER_TEMP/gi-owner-identity-after.json"
-          node - <<'NODE'
-          const fs=require('node:fs'),crypto=require('node:crypto');
-          const read=p=>JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/'+p,'utf8'));
-          const before=read('gi-owner-identity-before.json'),after=read('gi-owner-identity-after.json');
-          if(JSON.stringify(before.fingerprint)!==JSON.stringify(after.fingerprint))throw Error('OWNER_ROOT_STRUCTURAL_IDENTITY_CHANGED');
-          const hash=p=>crypto.createHash('sha256').update(fs.readFileSync(process.env.RUNNER_TEMP+'/'+p)).digest('hex');
-          const report={schema:'GRAVICENTRA_OWNER_LIVE_IDENTITY_READBACK_V1',labLiveRootExact:true,ownerRuntimeExact:true,ownerRootStructuralExact:true,ownerRootRawByteStableBefore:before.rawByteStable,ownerRootRawByteStableAfter:after.rawByteStable,ownerRootRawHashesBefore:before.rawHashes,ownerRootRawHashesAfter:after.rawHashes,ownerRuntimeSha256:hash('gi-owner-runtime-after.js'),previewSource:process.env.EXACT_SOURCE_SHA,previewUrl:process.env.PREVIEW_URL,livePromotion:false};
-          fs.writeFileSync(process.env.RUNNER_TEMP+'/gi-live-identity-readback.json',JSON.stringify(report,null,2)+'\n');
-          fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY,'Owner root raw bytes stable before: '+before.rawByteStable+'\nOwner root raw bytes stable after: '+after.rawByteStable+'\nOwner stable runtime/structural identity: PASS\n');
-          NODE
-          printf '%s\n' "I6.5/B4-003 cumulative source/byte/readback PASS" "Source: $EXACT_SOURCE_SHA" "Preview: $PREVIEW_URL" "LAB LIVE root exact; owner runtime and structural identity unchanged. Only the two existing LAB Preview callables were updated; no LIVE function, Rules, Auth or business data operation." "Targeted authenticated insurer activity UAT still pending; B4-003 production HOLD." >> "$GITHUB_STEP_SUMMARY"
-
-      - name: Record combined exact-source Preview result and targeted runtime work
-        env:
-          PREVIEW_URL: ${{ steps.deploy.outputs.url }}
-        run: |
-          set -euo pipefail
-          node - <<'NODE'
-          const fs=require('node:fs');const read=n=>JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/'+n,'utf8'));
-          const binding=read('gi-insurer-source-binding.json'),backend=read('gi-insurer-function-readback.json'),pack=read('gi-preview-package-output.json'),meta=read('gi-served-build.json'),live=read('gi-live-identity-readback.json');
-          if(binding.sourceSha!==meta.sourceSha||meta.sourceSha!==process.env.EXACT_SOURCE_SHA)throw Error('COMBINED_SOURCE_MISMATCH');
-          if(backend.status!=='TWO_EXISTING_TARGETS_ONLY_DEPLOY_AND_EXACT_SOURCE_READBACK_PASS'||backend.targets.length!==2||backend.targets.some(t=>t.sourceProof.status!=='DEPLOYED_BACKEND_SOURCE_BYTES_MATCH_EXACT_STAGE'))throw Error('BOTH_BACKEND_EXACT_READBACKS_REQUIRED');
-          const result={schema:'GRAVICENTRA_I65_B4003_INSURER_ACTIVITY_EXACT_BACKEND_HOSTING_PREVIEW_RESULT_V1',status:'TECHNICAL_EXACT_BACKEND_HOSTING_READBACK_PASS_AUTHENTICATED_UAT_PENDING',gate:'I6.5/B4-003',sourceSha:binding.sourceSha,sourceParent:binding.sourceParent,transportSha:binding.transportSha,sourceBlobs:binding.sourceBlobs,guardRunId:binding.guardRunId,buildId:meta.buildId,hostedPayloadDigest:pack.hostedPayloadDigest,bundleDigest:pack.bundleDigest,backendSourceDigest:pack.backendSourceDigest,previewUrl:process.env.PREVIEW_URL,previewChannelId:process.env.PREVIEW_CHANNEL_ID,previewChannelReused:true,predecessorPreview:read('gi-preview-predecessor-identity.json'),channelExpiry:'7d',functionTargets:backend.targets,functionRegion:process.env.TARGET_REGION,functionProject:process.env.PROJECT_ID,onlyAuthorizedTargetFunctionsChanged:backend.onlyAuthorizedTargetsChanged,changedFunctionKeys:backend.changedFunctionKeys,liveHostingIdentity:live,liveDeployment:false,liveFunctionsDeployed:false,rulesAuthIamMutationRequested:false,businessDataWrites:0,syntheticWrites:0,newEndpoints:0,newWorkflows:0,currentCapabilityAcceptances:0,authenticatedUat:'PENDING_SYNTHETIC_INSURER_EDIT_RELOAD_AUDIT_RESTORE_RELOAD'};
-          fs.writeFileSync(process.env.RUNNER_TEMP+'/gi-insurer-combined-preview-result.json',JSON.stringify(result,null,2)+'\n');
-          fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY,'Combined Preview result: '+result.status+'\n'+backend.targets.map(t=>t.target+': '+t.before.revision+' -> '+t.after.revision+'; '+t.sourceProof.status).join('\n')+'\nTargeted authenticated insurer activity UAT remains pending. Existing accepted Metas evidence is preserved.\n');
-          NODE
-
-      - name: Preserve combined Preview readback and sanitized backend evidence
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: gi-b4003-insurer-activity-exact-preview-readback-${{ github.run_id }}
-          path: |
-            ${{ runner.temp }}/gi-preview-predecessor-build.json
-            ${{ runner.temp }}/gi-preview-predecessor-identity.json
-            ${{ runner.temp }}/gi-insurer-combined-preview-result.json
-            ${{ runner.temp }}/gi-insurer-function-before-snapshot.json
-            ${{ runner.temp }}/gi-insurer-function-after-snapshot.json
-            ${{ runner.temp }}/gi-insurer-function-readback.json
-            ${{ runner.temp }}/gi-insurer-source-binding.json
-          retention-days: 30
-          if-no-files-found: warn
-
-      - name: Preserve LIVE identity readback evidence
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: gi-b4003-live-identity-readback-${{ github.run_id }}
-          path: |
-            ${{ runner.temp }}/gi-live-identity-readback.json
-            ${{ runner.temp }}/gi-owner-identity-before.json
-            ${{ runner.temp }}/gi-owner-identity-after.json
-            ${{ runner.temp }}/gi-owner-before-1.headers
-            ${{ runner.temp }}/gi-owner-before-2.headers
-            ${{ runner.temp }}/gi-owner-after-1.headers
-            ${{ runner.temp }}/gi-owner-after-2.headers
-          retention-days: 30
-          if-no-files-found: warn
+          ${{ runner.temp }}/gi-insurer-function-initial-after-snapshot.json
+          ${{ runner.temp }}/gi-insurer-recovery-binding.json
+          ${{ runner.temp }}/gi-insurer-reader-env-restoration.json
+          ${{ runner.temp }}/gi-insurer-artifact-reuse.json
+        retention-days: 30
+        if-no-files-found: warn
+    - name: Preserve LIVE identity readback evidence
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: gi-b4003-live-identity-readback-${{ github.run_id }}
+        path: |
+          ${{ runner.temp }}/gi-live-identity-readback.json
+          ${{ runner.temp }}/gi-owner-identity-before.json
+          ${{ runner.temp }}/gi-owner-identity-after.json
+          ${{ runner.temp }}/gi-owner-before-1.headers
+          ${{ runner.temp }}/gi-owner-before-2.headers
+          ${{ runner.temp }}/gi-owner-after-1.headers
+          ${{ runner.temp }}/gi-owner-after-2.headers
+        retention-days: 30
+        if-no-files-found: warn
