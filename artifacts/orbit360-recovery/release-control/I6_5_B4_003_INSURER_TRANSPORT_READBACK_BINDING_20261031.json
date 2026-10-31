@@ -1,0 +1,66 @@
+{
+  "schema": "GRAVICENTRA_I65_B4003_INSURER_TRANSPORT_BINDING_SUCCESSOR_V1",
+  "status": "EXACT_PREVIEW_TRANSPORT_MODEL_FIELD_BINDING_REPAIRED_READ_ONLY_RETRY_PENDING",
+  "gate": "I6.5/B4-003",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "parentHead": "c7bbe49144e27f86b61ac0172ebb25f992afd2d1",
+  "recordType": "ADDITIVE_PREVIEW_WORKFLOW_PRECHECK_FIELD_RECONCILIATION",
+  "priorReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_INSURER_OPERATION_TIMESTAMP_READBACK_20261031.json",
+  "priorReceiptBlobSha": "7463fd355b6b21967ba9ff2cdd98a97109eef69e",
+  "parentGuardBlobSha": "966606bd1cc8304a300f6b1ec0c1b23a4e741041",
+  "atomicSourcePaths": [
+    "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json",
+    "artifacts/orbit360-recovery/release-control/I6_5_B4_003_INSURER_TRANSPORT_READBACK_BINDING_20261031.json",
+    "tools/gravicentra-b4-003-insurer-transport-binding-successor.mjs",
+    "tools/gravicentra-b4-003-insurer-transport-binding-successor.test.mjs",
+    "tools/gravicentra-i6-control-plane-guard-v1.mjs"
+  ],
+  "failedAttempt": {
+    "runId": 41221868357,
+    "transportHead": "c7bbe49144e27f86b61ac0172ebb25f992afd2d1",
+    "sourceHead": "b37c1e3950bc1b10615cb8e3e365955cfacd2ac7",
+    "workflowStep": "Require exact recovery successor, immutable product and source Guards PASS",
+    "failureCode": "EXACT_RESUME_TRANSPORT_REQUIRED",
+    "reason": "The prior additive read-only model returned transport.head, but the existing workflow precheck expected transport.sha. The invariant was valid but its selector used the wrong property; no preview resource calls were made.",
+    "remoteMutationRequests": 0,
+    "backendReadbackStarted": false,
+    "hostingDeployed": false,
+    "productionTouched": false
+  },
+  "correction": {
+    "previousTransportField": "head",
+    "requiredTransportField": "sha",
+    "sourceFileChangeForbidden": true,
+    "workflowChangesRestrictedToTwoBindings": true,
+    "readOnlyBackendProofPreserved": true,
+    "exactSourceBytesRequired": 66,
+    "policy": "Use the same pinned read-only verifier, artifacts, known operation, non-production target and exact Hosting; only bridge the transport selector within the existing Preview workflow.",
+    "oldSuccessorAndFailedRunRemainHistorical": true,
+    "newP0ClosureGranted": false,
+    "newFormalI6CreditGranted": false
+  },
+  "governanceBlobs": {
+    "tools/gravicentra-i6-control-plane-guard-v1.mjs": "b7cf54f942ee3339b83085c445d93f90ec4d84f9",
+    "tools/gravicentra-b4-003-insurer-transport-binding-successor.mjs": "5929b6139bbac3d2deafdfb2bd84e7f9b47b1d77",
+    "tools/gravicentra-b4-003-insurer-transport-binding-successor.test.mjs": "e68e259dac11bfb01be6e6d966b2bdfc4f7fa192"
+  },
+  "progressPreserved": {
+    "formalI6Percent": 50,
+    "priorityP0Resolved": 1,
+    "priorityP0Total": 6,
+    "currentGlobalProductPercent": null,
+    "productionAccepted": false
+  },
+  "boundaries": {
+    "livePromotion": false,
+    "authIamRules": false,
+    "configPatch": false,
+    "backendDeployment": false,
+    "businessWrites": false,
+    "cleanup": false,
+    "findingClosure": false,
+    "b4003Closure": false,
+    "productionAcceptance": false
+  }
+}

@@ -17006,5 +17006,24 @@
     "productionPromotionAuthorized": false,
     "authIamRulesChangeAuthorized": false,
     "configurationPatchAuthorized": false
+  },
+  "b4003InsurerTransportReadbackBinding20261031": {
+    "schema": "GRAVICENTRA_I65_B4003_INSURER_TRANSPORT_BINDING_POINTER_V1",
+    "status": "EXACT_PREVIEW_TRANSPORT_MODEL_FIELD_BINDING_REPAIRED_READ_ONLY_RETRY_PENDING",
+    "gate": "I6.5/B4-003",
+    "parentHead": "c7bbe49144e27f86b61ac0172ebb25f992afd2d1",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_INSURER_TRANSPORT_READBACK_BINDING_20261031.json",
+    "receiptBlobSha": "1d7152851bf5ea4507d284297301d63359ffb575",
+    "atomicSourcePaths": [
+      "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json",
+      "artifacts/orbit360-recovery/release-control/I6_5_B4_003_INSURER_TRANSPORT_READBACK_BINDING_20261031.json",
+      "tools/gravicentra-b4-003-insurer-transport-binding-successor.mjs",
+      "tools/gravicentra-b4-003-insurer-transport-binding-successor.test.mjs",
+      "tools/gravicentra-i6-control-plane-guard-v1.mjs"
+    ],
+    "previousRealProgressPointerPreserved": true,
+    "backendMutationAuthorized": false,
+    "livePromotionAuthorized": false,
+    "priorControlKeysPreserved": 424
   }
 }

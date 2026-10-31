@@ -1,3 +1,6 @@
+import {runInsurerTransportBindingGuard} from './gravicentra-b4-003-insurer-transport-binding-successor.mjs';
+if (runInsurerTransportBindingGuard()) process.exit(0);
+
 import {runInsurerTimestampSuccessorGuard} from './gravicentra-b4-003-insurer-timestamp-successor.mjs';
 if (runInsurerTimestampSuccessorGuard()) process.exit(0);
 
