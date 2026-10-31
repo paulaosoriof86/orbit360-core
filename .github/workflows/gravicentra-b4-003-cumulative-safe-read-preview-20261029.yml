@@ -58,9 +58,10 @@ jobs:
         node --input-type=module - <<'NODE'
         import fs from 'node:fs';
         import {execFileSync} from 'node:child_process';
-        import {collectInsurerPreviewResumeModel,validateInsurerPreviewResumeModel,insurerResumeContract} from './tools/gravicentra-b4-003-insurer-preview-resume.mjs';
-        const k=insurerResumeContract,m=collectInsurerPreviewResumeModel();
-        validateInsurerPreviewResumeModel(m);
+        import {insurerResumeContract} from './tools/gravicentra-b4-003-insurer-preview-resume.mjs';
+        import {collectInsurerTimestampSuccessorModel,validateInsurerTimestampSuccessorModel} from './tools/gravicentra-b4-003-insurer-timestamp-successor.mjs';
+        const k=insurerResumeContract,m=collectInsurerTimestampSuccessorModel();
+        validateInsurerTimestampSuccessorModel(m);
         const need=(ok,code)=>{if(!ok)throw Error(code);};
         const git=(...args)=>execFileSync('git',args,{encoding:'utf8'}).trim();
         need(m.transport?.sha===process.env.TRANSPORT_SHA&&m.head===process.env.TRANSPORT_SHA&&git('rev-parse','HEAD^')===m.sourceCommit,'EXACT_RESUME_TRANSPORT_REQUIRED');
@@ -85,7 +86,7 @@ jobs:
         git diff --exit-code
         git diff --cached --exit-code
         node tools/gravicentra-b4-003-insurer-reader-postpatch-readback.test.cjs
-        node --test tools/gravicentra-b4-003-insurer-preview-resume.test.mjs
+        node --test tools/gravicentra-b4-003-insurer-timestamp-successor.test.mjs
     - name: Recover exact original artifacts and the single known PATCH report without rebuilding
       env:
         GH_READ_TOKEN: ${{ github.token }}
