@@ -1,3 +1,6 @@
+import {runInsurerPreviewEvidenceGuard} from './gravicentra-b4-003-insurer-preview-evidence-successor.mjs';
+if (runInsurerPreviewEvidenceGuard()) process.exit(0);
+
 import {runB4003OperationalTruthGuardSuccessor} from './gravicentra-b4-003-operational-truth-guard-successor.mjs';
 if (runB4003OperationalTruthGuardSuccessor()) process.exit(0);
 

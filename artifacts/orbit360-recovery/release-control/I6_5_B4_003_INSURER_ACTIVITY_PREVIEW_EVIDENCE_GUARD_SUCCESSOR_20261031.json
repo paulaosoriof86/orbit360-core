@@ -1,0 +1,59 @@
+{
+  "schema": "GRAVICENTRA_I65_B4003_INSURER_ACTIVITY_PREVIEW_EVIDENCE_GUARD_SUCCESSOR_V1",
+  "status": "EXACT_RETROSPECTIVE_TECHNICAL_READBACK_PROTECTED",
+  "gate": "I6.5/B4-003",
+  "governanceMode": "DOCUMENTARY_GOVERNANCE_SUCCESSOR_ONLY",
+  "authorization": "PAULA_EXPLICIT_20261031_BOUNDED_DOCUMENTARY_GOVERNANCE_SUCCESSOR",
+  "baseHead": "42dc7e6e5648d0bf8da710c791889d54ff2651c7",
+  "baseControlBlob": "b34414963b1883d32e54c8882340ceda8981d899",
+  "baseGuardBlob": "33118affeace82d8fca93b12a842e3a2065b3c1e",
+  "sourceControlBlob": "769d32ec0a90567a920f4178f5f183ca64cebf50",
+  "evidenceBlob": "e7b858c5360621d05a2427b8fd247f52374ebf05",
+  "sourcePaths": [
+    "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json",
+    "artifacts/orbit360-recovery/release-control/I6_5_B4_003_INSURER_ACTIVITY_PREVIEW_EVIDENCE_20261030.json"
+  ],
+  "guardPaths": [
+    "artifacts/orbit360-recovery/release-control/I6_5_B4_003_INSURER_ACTIVITY_PREVIEW_EVIDENCE_GUARD_SUCCESSOR_20261031.json",
+    "tools/gravicentra-b4-003-insurer-preview-evidence-successor.mjs",
+    "tools/gravicentra-b4-003-insurer-preview-evidence-successor.test.mjs",
+    "tools/gravicentra-i6-control-plane-guard-v1.mjs"
+  ],
+  "governanceBlobs": {
+    "tools/gravicentra-i6-control-plane-guard-v1.mjs": "bda5199482bffb659443c7a56a3513296aadbab6",
+    "tools/gravicentra-b4-003-insurer-preview-evidence-successor.mjs": "857aa02554fa5381b533b45f4a763a0621554b19",
+    "tools/gravicentra-b4-003-insurer-preview-evidence-successor.test.mjs": "42b3f5e2b866b3de2f3f843da63796114ac17181"
+  },
+  "frozenBlobs": {
+    "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json": "333963e16a21d9abe58274091c0f61a53473c71f",
+    "artifacts/orbit360-recovery/release-control/I6_5_OPEN_FINDINGS_CARRY_FORWARD_REGISTER_20261003.json": "3cdedb0c3aa1c4a39545229fb4781e79326c945c",
+    "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json": "33bf80768cb6cb311f2975d282a5f50935f680aa",
+    "artifacts/orbit360-recovery/release-control/I6_PENDING_CLOSURE_MASTER_PLAN_LOCK_20261004.json": "71eba786de1236533e0339ae5cb79eeabed8ebaf"
+  },
+  "sourceProof": {
+    "insurerPreviewRunId": 41222963524,
+    "combinedArtifactId": 13050682964,
+    "combinedArtifactZipSha256": "f1f3c84da0fbf55de5939bd659d2b0aa4e069136f7850878386590f6d34258a5",
+    "verifiedBackendSourceComparisons": 66,
+    "backendSourceUnchanged": true,
+    "operationReadbackCurrent": true
+  },
+  "currentFormalI6Percent": 50,
+  "currentP0Closed": 1,
+  "currentP0Total": 6,
+  "newReleaseAuthority": false,
+  "boundaries": {
+    "functionalCodeChange": false,
+    "backendDeployment": false,
+    "productionPromotion": false,
+    "authIamRulesChange": false,
+    "businessDataMutation": false,
+    "newEndpoint": false,
+    "newWorkflow": false,
+    "cleanup": false,
+    "findingClosure": false,
+    "gateClosure": false,
+    "newReleaseAuthority": false,
+    "sourceProofBypass": false
+  }
+}
