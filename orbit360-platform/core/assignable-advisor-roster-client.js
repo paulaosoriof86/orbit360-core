@@ -1,8 +1,8 @@
 /* Gravicentra Insurance · assignable advisor roster client v1 */
 (function(){'use strict';window.Orbit=window.Orbit||{};
-const VERSION='gravicentra-assignable-advisor-roster-client-v1',PROD='orbit360AssignableAdvisorRoster',PREVIEW='orbit360AssignableAdvisorRosterPreview',cache=new Map(),meta=new Map(),inflight=new Map();
+const VERSION='gravicentra-assignable-advisor-roster-client-v1',PROD='orbit360AssignableAdvisorRoster',PREVIEW='orbit360AssignableAdvisorRosterPreview',GOALS_PREVIEW='orbit360AssignableAdvisorRosterGoalsPreview',cache=new Map(),meta=new Map(),inflight=new Map();
 const text=v=>String(v==null?'':v).trim(),tenant=()=>text((window.__ORBIT360_PRODUCT_PUBLIC_CONFIG__||{}).tenantHint||(window.OrbitBackend&&(OrbitBackend.tenantId||OrbitBackend.tenant))||(Orbit.tenant&&Orbit.tenant.get&&Orbit.tenant.get().id)),role=()=>text(Orbit.session&&Orbit.session.rol?Orbit.session.rol():'');
-const preview=()=>/--/.test(String(location.hostname||'')),fn=()=>preview()?PREVIEW:PROD,region=()=>preview()?'us-east1':text((window.OrbitBackend||{}).functionsRegion||'us-central1');
+const preview=()=>/--/.test(String(location.hostname||'')),goalsPreview=()=>/^ays-orbit-360-lab--gi-i65-b4-goals-[a-z0-9-]+\.web\.app$/i.test(String(location.hostname||''))&&(window.__ORBIT360_PRODUCT_PUBLIC_CONFIG__||{}).goalParticipationPreviewCandidate===true,fn=()=>preview()?(goalsPreview()?GOALS_PREVIEW:PREVIEW):PROD,region=()=>preview()?'us-east1':text((window.OrbitBackend||{}).functionsRegion||'us-central1');
 const provider=()=>Orbit.productRuntimeBrowserProvidersP0&&typeof Orbit.productRuntimeBrowserProvidersP0.callFunction==='function'?Orbit.productRuntimeBrowserProvidersP0:null;
 const compat=()=>{try{return window.firebase&&typeof firebase.functions==='function'?firebase.app().functions(region()).httpsCallable(fn()):null;}catch(e){return null;}};
 async function call(payload){const p=provider();if(p)return p.callFunction(fn(),payload,region());const f=compat();if(!f)throw Error('ASSIGNABLE_ADVISOR_ROSTER_BACKEND_REQUIRED');const r=await f(payload);return r&&r.data?r.data:r;}
@@ -21,7 +21,9 @@ async function dashboardList(country,month){
  for(const c of paises){const source=r.metas?.[c]||{},m={};for(const f of ['nueva','renovada','recaudo','produccion']){const n=Number(source[f]);if(!Number.isFinite(n)||n<0)throw Error('INICIO_R23_META_INVALID');m[f]=n;}metas[c]={...m,explicit:source.explicit===true};}
  const primaryCountry=text(r.primaryCountry).toUpperCase();
  if(primaryCountry&&!paises.includes(primaryCountry))throw Error('INICIO_PRIMARY_ADVISOR_COUNTRY_INVALID');
- const legacy=Number(r.metaPrima);rows.push({id,nombre,paises,primaryCountry,metas,activo:r.activo===true,metaPrima:Number.isFinite(legacy)&&legacy>0?legacy:null});}
+ const tipo=String(r.tipoVinculacion||'sin_clasificar');
+ if(typeof r.roleEligible!=='boolean'||!['sin_clasificar','interno','freelance'].includes(tipo)||typeof r.participaMetas!=='boolean'||typeof r.pendienteClasificacion!=='boolean'||r.pendienteClasificacion!==(tipo==='sin_clasificar')||(r.participaMetas!==(tipo==='interno'||(tipo==='freelance'&&r.participaMetas===true))))throw Error('INICIO_R23_GOAL_PARTICIPATION_CONTRACT_INVALID');
+ const legacy=Number(r.metaPrima);rows.push({id,nombre,paises,primaryCountry,metas,activo:r.activo===true,roleEligible:r.roleEligible===true,metaPrima:Number.isFinite(legacy)&&legacy>0?legacy:null,tipoVinculacion:tipo,participaMetas:r.participaMetas,pendienteClasificacion:r.pendienteClasificacion});}
  const globalMetas={};
  if(data.scope==='all'){for(const c of ['GT','CO']){
   const source=data.globalMetas?.[c];if(!source)continue;

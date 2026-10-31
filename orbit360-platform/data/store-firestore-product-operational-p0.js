@@ -8,6 +8,7 @@
   var VERSION='fase-a-i2-product-operational-write-20260930.5-r8-receipt-scope-owner';
   var GENERAL_COMMAND='orbit360ProductOperationalCommand';
   var GENERAL_PREVIEW_COMMAND='orbit360ProductOperationalCommandPreview';
+  var GOALS_PREVIEW_COMMAND='orbit360ProductOperationalCommandGoalsPreview';
   var WORKFLOW_COMMAND='orbit360OpsLeadsCommand';
   var WORKFLOW_PREVIEW_COMMAND='orbit360OpsLeadsCommandPreview';
   var META_QA_CONTRACT='gravicentra-metas-preview-session-v1',META_QA_PERIOD='QA-B4-003';
@@ -212,7 +213,7 @@
     return provider.initialize().then(function(ctx){
       if(!ctx||!ctx.auth||!ctx.auth.currentUser||text(ctx.auth.currentUser.uid)!==text(m.uid))error('PRODUCT_WRITE_AUTH_CONTEXT_MISMATCH');
       if(provider.browserFirestoreWriteAuthorized!==false||provider.serverWriteTransport!=='firebase-functions'||provider.noFallback!==true)error('PRODUCT_WRITE_SERVER_TRANSPORT_REQUIRED');
-      return provider.callFunction(GENERAL_PREVIEW_COMMAND,{tenantId:m.tenantId,activeRole:m.activeRole,metaPreviewQa:context,mutations:[]},'us-east1');
+      return provider.callFunction(previewGeneralCommand(),{tenantId:m.tenantId,activeRole:m.activeRole,metaPreviewQa:context,mutations:[]},'us-east1');
     }).then(function(result){return acceptMetaPreviewResponse(result,context,m,true);});
   }
   function get(collection,id){
@@ -255,6 +256,10 @@
   function isB2PreviewHost(){
     try{return /^ays-orbit-360-lab--gi-i(?:3|61|65-b[1-4])-[a-z0-9-]+\.web\.app$/i.test(String(location&&location.hostname||''));}catch(e){return false;}
   }
+  function previewGeneralCommand(){
+    return isB2PreviewHost()&&/^ays-orbit-360-lab--gi-i65-b4-goals-[a-z0-9-]+\.web\.app$/i.test(String(location&&location.hostname||''))&&(window.__ORBIT360_PRODUCT_PUBLIC_CONFIG__||{}).goalParticipationPreviewCandidate===true
+      ?GOALS_PREVIEW_COMMAND:GENERAL_PREVIEW_COMMAND;
+  }
   function workflowReason(operation,prior,row){
     if(operation==='transition_business')return'Transición de negocio '+text(prior&&prior.etapa)+' → '+text(row&&row.etapa);
     if(operation==='create_business')return'Creación de negocio desde Orbit.store';
@@ -285,7 +290,7 @@
         mutation.auditReason=insurerAuditReason(payload,prior);
         mutation.payload=insurerWritePayload(action,payload,prior);
       }
-      return p.callFunction(previewGeneral?GENERAL_PREVIEW_COMMAND:GENERAL_COMMAND,{tenantId:m.tenantId,activeRole:m.activeRole,mutations:[mutation]},previewGeneral?'us-east1':'us-central1');
+      return p.callFunction(previewGeneral?previewGeneralCommand():GENERAL_COMMAND,{tenantId:m.tenantId,activeRole:m.activeRole,mutations:[mutation]},previewGeneral?'us-east1':'us-central1');
     }).then(function(result){
       if(!workflow||action==='insert')requireServerReadback(result,[{collection:collection,id:id,action:action}]);
       if(collection==='aseguradoras'&&action!=='remove')acceptInsurerActivity(result,{collection:collection,id:id,action:action});
@@ -409,7 +414,7 @@
         return mutation;
       })};
       if(metaPreviewQa)input.metaPreviewQa=metaPreviewQa;
-      return provider.callFunction(previewGeneral?GENERAL_PREVIEW_COMMAND:GENERAL_COMMAND,input,previewGeneral?'us-east1':'us-central1');
+      return provider.callFunction(previewGeneral?previewGeneralCommand():GENERAL_COMMAND,input,previewGeneral?'us-east1':'us-central1');
     }).then(function(result){
       serverCommitted=true;
       var targets=prepared.map(function(x){return{collection:x.collection,id:x.id,action:x.action};});
@@ -487,7 +492,7 @@
   }
   function status(){
     var bs=base&&typeof base._productStatus==='function'?base._productStatus():{};
-    return Object.assign({},state,{ready:installed===true&&bs.ready===true&&bs.status==='ready-read-only',readAuthority:'store-firestore-product-readonly-p0',writeAuthority:'product-operational-write-p0',writeTransport:'firebase-functions',generalCommand:GENERAL_COMMAND,generalPreviewCommand:GENERAL_PREVIEW_COMMAND,workflowCommand:WORKFLOW_COMMAND,browserFirestoreWriteAuthorized:false,workflowSemanticOwner:true,urlTenantAllowed:false,labModeAllowed:false,seedFallback:false,localStorageBusinessPersistence:false,pendingReconcile:'expected-field-match',noFallback:true});
+    return Object.assign({},state,{ready:installed===true&&bs.ready===true&&bs.status==='ready-read-only',readAuthority:'store-firestore-product-readonly-p0',writeAuthority:'product-operational-write-p0',writeTransport:'firebase-functions',generalCommand:GENERAL_COMMAND,generalPreviewCommand:previewGeneralCommand(),workflowCommand:WORKFLOW_COMMAND,browserFirestoreWriteAuthorized:false,workflowSemanticOwner:true,urlTenantAllowed:false,labModeAllowed:false,seedFallback:false,localStorageBusinessPersistence:false,pendingReconcile:'expected-field-match',noFallback:true});
   }
   function install(readStore){
     if(installed)return status();
@@ -530,4 +535,3 @@
   }
   window.Orbit.productOperationalWriteP0=Object.freeze({VERSION:VERSION,install:install,status:status,failClosed:true,noFallback:true,urlTenantAllowed:false,labModeAllowed:false,writeTransport:'firebase-functions',workflowSemanticOwner:true});
 })();
-

@@ -3,6 +3,7 @@ const {getApps,initializeApp}=require('firebase-admin/app');
 const {getFirestore}=require('firebase-admin/firestore');
 const {HttpsError,onCall}=require('firebase-functions/v2/https');
 const {resolveProductActiveRole}=require('./product-active-role-contract');
+const {estadoParticipacion}=require('./goal-participation-contract');
 const REGION=process.env.ORBIT360_FUNCTIONS_REGION||'us-central1',PREVIEW_REGION=process.env.ORBIT360_PREVIEW_FUNCTIONS_REGION||'us-east1';
 const VERSION='gravicentra-assignable-advisor-roster-v1',DASHBOARD_CONTRACT='gi-i65-b4-003-executive-read-v1',db=getFirestore(getApps()[0]||initializeApp());
 const FULL=new Set(['superadmin','super_admin','superadministrador','admintenant','admin_tenant','admin','direccion','operativo']),SELF=new Set(['asesor','comercial']);
@@ -35,7 +36,7 @@ async function authz(request){
  if(FULL.has(role))return{tenantId,mode:'full',member,access};if(SELF.has(role))return{tenantId,mode:'self',member,access};
  throw new HttpsError('permission-denied','El rol activo no puede asignar responsables.');
 }
-function project(doc){const r=doc.data()||{},rr=roles(r),ps=countries(r),eligible=rr.includes('asesor')||rr.includes('comercial');return{id:text(r.canonicalDocumentId||r.id||doc.id,160),nombre:text(r.nombre||r.name||r.displayName),activo:active(r),assignable:active(r)&&eligible,roleEligible:eligible,paises:ps};}
+function project(doc){const r=doc.data()||{},rr=roles(r),ps=countries(r),eligible=rr.includes('asesor')||rr.includes('comercial');return{id:text(r.canonicalDocumentId||r.id||doc.id,160),nombre:text(r.nombre||r.name||r.displayName),activo:active(r),assignable:active(r)&&eligible,roleEligible:eligible,paises:ps,...estadoParticipacion(r)};}
 async function execute(request){
  if(request.data?.purpose==='inicio')return r23Dashboard(request);
  const a=await authz(request),wanted=text(request.data?.country,8).toUpperCase(),snap=await db.collection('tenants').doc(a.tenantId).collection('data').doc('asesores').collection('items').get(),rows=[],seen=new Set();
@@ -89,7 +90,7 @@ async function r23Dashboard(request){
  const explicitPrimary=text(raw.paisPrincipal||raw.primaryCountry||raw.paisDefault||raw.countryDefault,8).toUpperCase();
  const primaryCountry=paises.includes(explicitPrimary)?explicitPrimary:(!explicitPrimary&&paises.length===1?paises[0]:'');
  const metas={};paises.forEach(c=>metas[c]=goals.get(a.id+'|'+c)||{nueva:0,renovada:0,recaudo:0,produccion:0,explicit:false});
- const legacy=Number(raw.metaPrima);rows.push({id:a.id,nombre:a.nombre,activo:a.activo,paises,primaryCountry,metas,metaPrima:Number.isFinite(legacy)&&legacy>0&&paises.length===1?legacy:null});
+ const legacy=Number(raw.metaPrima);rows.push({id:a.id,nombre:a.nombre,activo:a.activo,roleEligible:a.roleEligible,paises,primaryCountry,metas,metaPrima:Number.isFinite(legacy)&&legacy>0&&paises.length===1?legacy:null,tipoVinculacion:a.tipoVinculacion,participaMetas:a.participaMetas,pendienteClasificacion:a.pendienteClasificacion});
  }rows.sort((a,b)=>a.nombre.localeCompare(b.nombre,'es',{sensitivity:'base'})||a.id.localeCompare(b.id));
  const globalMetas={};for(const [c,g] of globalGoals)globalMetas[c]={prima:g.prima>0?g.prima:g.nueva+g.renovada,recaudo:g.recaudo,explicitPrima:g.explicitPrima,explicitRecaudo:g.explicitRecaudo};
  const ownSource=as.docs.find(d=>d.id===own),ownData=ownSource&&ownSource.data()||{};
@@ -102,4 +103,6 @@ async function r23Dashboard(request){
 
 exports.orbit360AssignableAdvisorRoster=onCall({region:REGION,cors:true},execute);
 exports.orbit360AssignableAdvisorRosterPreview=onCall({region:PREVIEW_REGION,cors:true},execute);
+// Additive isolated Preview endpoint: never modifies the certified Preview callable.
+exports.orbit360AssignableAdvisorRosterGoalsPreview=onCall({region:PREVIEW_REGION,cors:true},execute);
 exports.__assignableAdvisorRoster=Object.freeze({VERSION,FULL,SELF});

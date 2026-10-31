@@ -33,6 +33,7 @@ const context={exports:{},process:{env:{}},Set,Map,Date,Number,Object,Array,
  :id==='firebase-admin/firestore'?{getFirestore:()=>db}
  :id==='firebase-functions/v2/https'?{HttpsError,onCall:(_opts,fn)=>fn}
  :id==='./product-active-role-contract'?require('../functions/product-active-role-contract')
+ :id==='./goal-participation-contract'?require('../functions/goal-participation-contract')
  :(()=>{throw Error('UNEXPECTED_IMPORT_'+id)})()};
 vm.runInNewContext(source,context,{timeout:1000});
 const call=(role='Operativo',country='GT')=>context.exports.orbit360AssignableAdvisorRosterPreview({

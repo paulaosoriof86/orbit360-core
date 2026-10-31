@@ -6,6 +6,7 @@ const { getFirestore, FieldValue } = require('firebase-admin/firestore');
 const { getStorage } = require('firebase-admin/storage');
 const { HttpsError, onCall } = require('firebase-functions/v2/https');
 const { resolveProductActiveRole } = require('./product-active-role-contract');
+const { validarCambioParticipacion } = require('./goal-participation-contract');
 const { projectInsurerActivity } = require('./b4-003-scoped-bootstrap-reader');
 
 const REGION = process.env.ORBIT360_FUNCTIONS_REGION || 'us-central1';
@@ -581,7 +582,15 @@ async function execute(request, metaPreviewContext = null) {
       if (mutation.action === 'insert' && before) throw new HttpsError('already-exists', `${mutation.collection}/${mutation.id} ya existe.`);
       if ((mutation.action === 'update' || mutation.action === 'remove') && !before) throw new HttpsError('not-found', `${mutation.collection}/${mutation.id} no existe.`);
       if(before && !withinScope(actor,mutation.collection,COLLECTION_MODULE[mutation.collection],Object.assign({id:mutation.id,tenantId},before))) throw new HttpsError('permission-denied','No autorizado para modificar el registro original.');
-      const scopeRow=Object.assign({},before||{},mutation.payload||{},{id:mutation.id,tenantId});
+      let participationChange=null;
+       if(mutation.collection==='asesores'&&mutation.action!=='remove'){
+         try{participationChange=validarCambioParticipacion(before,mutation.payload,actor.activeRole);}
+         catch(error){
+           throw new HttpsError(error?.code==='DIRECCION_REQUERIDA'?'permission-denied':'invalid-argument',
+             'Cambio de vinculación o participación no autorizado: '+String(error?.code||'INVALIDO'));
+         }
+       }
+       const scopeRow=Object.assign({},before||{},mutation.payload||{},{id:mutation.id,tenantId});
       verifiedOperationalParentScope(mutation.collection,scopeRow,parents);
       if(!withinScope(actor,mutation.collection,COLLECTION_MODULE[mutation.collection],scopeRow))throw new HttpsError('permission-denied',`El alcance activo no autoriza ${mutation.collection}/${mutation.id}.`);
       if (mutation.action === 'remove') {
@@ -613,6 +622,16 @@ async function execute(request, metaPreviewContext = null) {
       }
       if(metaProof&&mutation.collection==='auditoria')row.__metasPreviewEvidence={runId:metaPreviewContext.runId,operation:metaPreviewContext.operation,actorUid:actor.uid,activeRole:actor.activeRole,changes:metaProof.changes,serverVerified:true};
       tx.set(ref, row, { merge: mutation.action === 'update' });
+       if(participationChange){
+         const auditId='audit_equipo_metas_'+sha(tenantId+'|'+eventId+'|'+mutation.id).slice(0,32);
+         tx.set(canonicalRef(tenantId,'auditoria',auditId),{
+           id:auditId,tenantId,modulo:'equipo',accion:'editar_participacion_metas',
+           motivo:'Clasificación o habilitación explícita de Dirección',
+           usuario:actor.uid,actorUid:actor.uid,activeRole:actor.activeRole,serverOwned:true,
+           advisorId:mutation.id,before:participationChange.before,after:participationChange.after,
+           fecha:insurerActivityDate,createdAt:now()
+         },{merge:false});
+       }
       if (mutation.collection === 'asesores' && linkedMemberRef) {
         if (linkedMemberSnap && linkedMemberSnap.exists && text(linkedMemberSnap.data().advisorId, 180) && text(linkedMemberSnap.data().advisorId, 180) !== mutation.id) {
           throw new HttpsError('failed-precondition', 'La identidad está vinculada a otro usuario del equipo.');
@@ -790,4 +809,6 @@ async function executePreview(request) {
 }
 exports.orbit360ProductOperationalCommand = onCall({ region: REGION, cors: true, timeoutSeconds: 60, memory: '256MiB' }, request=>execute(request));
 exports.orbit360ProductOperationalCommandPreview = onCall({ region: PREVIEW_REGION, cors: true, timeoutSeconds: 60, memory: '256MiB' }, executePreview);
+// Additive isolated Preview endpoint retains the synthetic-only executePreview gate.
+exports.orbit360ProductOperationalCommandGoalsPreview = onCall({ region: PREVIEW_REGION, cors: true, timeoutSeconds: 60, memory: '256MiB' }, executePreview);
 exports.__productOperationalDomain = Object.freeze({ VERSION, COLLECTION_MODULE, INSERT_ONLY, REMOVABLE, authorize, authorizeRead, withinScope, canonicalRef, text, cleanId, readProductAsset });

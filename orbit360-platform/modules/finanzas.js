@@ -397,29 +397,37 @@ Orbit.modules.finanzas = (function () {
   function metaVal(mesKey, tipo, ambitoId, fallback) { const m = metaGet(mesKey, tipo, ambitoId); return (m && +m.valor) || fallback || 0; }
 
   function metas() {
-    const p = paisFin() || 'GT', cur = p === 'CO' ? 'COP' : 'GTQ';
+    const p=paisFin();
+    if(!['GT','CO'].includes(p))return '<div class="cfg-note" data-fin-goal-country-required="1">Selecciona Guatemala o Colombia para comparar metas sin mezclar monedas.</div>';
+    const cur = p === 'CO' ? 'COP' : 'GTQ';
     const mk = mesSel, lbl = MESES[+mk.slice(5) - 1] + ' ' + mk.slice(0, 4);
     const M2 = n => U.money(n, cur);
-    // EMPRESA
-    const primaReal = primaNetaMes(mk), recReal = recaudoMes(mk);
-    const primaMeta = metaVal(mk, 'prima', '', promedioPrima(mk, null, 3) ? Math.round(promedioPrima(mk, null, 3) * 1.1) : 0);
-    const recMeta = metaVal(mk, 'recaudo', '', Math.round(primaMeta * 0.85));
-    const pP = primaMeta ? Math.round(primaReal / primaMeta * 100) : 0;
-    const pR = recMeta ? Math.round(recReal / recMeta * 100) : 0;
-    const barra = (real, meta, pct) => `<div class="bar" style="margin-top:8px;height:12px"><i style="width:${Math.min(100, pct)}%;background:${pct >= 100 ? 'linear-gradient(90deg,#1f8a4c,#34b96a)' : pct >= 70 ? 'linear-gradient(90deg,#c9821b,#e0a53a)' : 'linear-gradient(90deg,#a01828,#C5162E)'}"></i></div>`;
+    // EMPRESA: solo datos y metas explícitas de asesores participantes.
+    const team=S().all('asesores')||[],status=S()._productStatus&&S()._productStatus()||{};
+    const confirmed=['asesores','metas','polizas','cobros'].every(c=>(status.serverConfirmedCollections||[]).includes(c));
+    const advisers=team.filter(a=>a&&!a.inactivo&&a.activo!==false&&([].concat(a.paises||a.pais||[])).includes(p)&&([].concat(a.roles||a.rol||[])).some(role=>['Asesor','Comercial'].includes(role)));
+    const pending=advisers.some(a=>!['interno','freelance'].includes(a.tipoVinculacion));
+    const eligible=advisers.filter(a=>a.tipoVinculacion==='interno'||(a.tipoVinculacion==='freelance'&&a.participaMetas===true));
+    const eligibleIds=new Set(eligible.map(a=>a.id)),ready=confirmed&&!pending;
+    const primaReal=primaNetaMes(mk,po=>eligibleIds.has(po.asesorId)),recReal=recaudoMes(mk,po=>eligibleIds.has(po.asesorId));
+    const exact=(tipo,id='')=>{const row=(S().all('metas')||[]).find(m=>String(m.mes||'')===mk&&m.pais===p&&m.tipo===tipo&&String(m.asesorId||m.aseguradoraId||'')===String(id));return row&&Number.isFinite(Number(row.valor))&&Number(row.valor)>0?Number(row.valor):null;};
+    const goalN=exact('nueva'),goalR=exact('renovada'),primaMeta=exact('prima')||(goalN!=null&&goalR!=null?goalN+goalR:null),recMeta=exact('recaudo');
+    const pP=ready&&primaMeta?Math.round(primaReal/primaMeta*100):null,pR=ready&&recMeta?Math.round(recReal/recMeta*100):null;
+    const barra = (real, meta, pct) => `<div class="bar" style="margin-top:8px;height:12px"><i style="width:${pct==null?0:Math.min(100,pct)}%;background:${pct!=null&&pct >= 100 ? 'linear-gradient(90deg,#1f8a4c,#34b96a)' : pct!=null&&pct >= 70 ? 'linear-gradient(90deg,#c9821b,#e0a53a)' : 'linear-gradient(90deg,#a01828,#C5162E)'}"></i></div>`;
     // ASESORES
-    const ases = S().all('asesores').map(a => {
+    const ases = advisers.map(a => {
       const real = primaNetaMes(mk, po => po.asesorId === a.id);
       const rec = recaudoMes(mk, po => po.asesorId === a.id);
-      const meta = metaVal(mk, 'prima', a.id, promedioPrima(mk, po => po.asesorId === a.id, 3) ? Math.round(promedioPrima(mk, po => po.asesorId === a.id, 3) * 1.1) : 0);
+      const aN=exact('nueva',a.id),aR=exact('renovada',a.id),meta=exact('prima',a.id)||(aN!=null&&aR!=null?aN+aR:null);
       const prevReal = primaNetaMes((function () { let y = +mk.slice(0, 4), m = +mk.slice(5) - 2; while (m < 0) { m += 12; y--; } return y + '-' + String(m + 1).padStart(2, '0'); })(), po => po.asesorId === a.id);
-      const pct = meta ? Math.round(real / meta * 100) : 0;
+      const participa=a.tipoVinculacion==='interno'||(a.tipoVinculacion==='freelance'&&a.participaMetas===true);
+       const pct=ready&&participa&&meta?Math.round(real/meta*100):null;
       const tend = prevReal ? Math.round((real / prevReal - 1) * 100) : 0;
-      return { a, real, rec, meta, pct, tend };
+      return { a, real, rec, meta, pct, tend, participa };
     }).sort((x, y) => y.real - x.real);
     // ASEGURADORAS
     const asgs = S().all('aseguradoras').map(g => {
-      const real = primaNetaMes(mk, po => po.aseguradoraId === g.id);
+      const real = primaNetaMes(mk, po => po.aseguradoraId === g.id&&eligibleIds.has(po.asesorId));
       const meta = metaVal(mk, 'prima', g.id, 0);
       const pct = meta ? Math.round(real / meta * 100) : 0;
       return { g, real, meta, pct };
@@ -432,14 +440,14 @@ Orbit.modules.finanzas = (function () {
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px">
       <div class="card pad">
-        <div style="display:flex;justify-content:space-between;align-items:center"><b style="font-family:var(--f-display);font-size:15px">${semaforo(pP)} Ventas empresa (prima neta)</b><span class="mono" style="font-size:13px;color:${semColor(pP)}">${pP}%</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:center"><b style="font-family:var(--f-display);font-size:15px">${pP==null?'⚪':semaforo(pP)} Ventas empresa (prima neta)</b><span class="mono" style="font-size:13px;color:${pP==null?'var(--ink-3)':semColor(pP)}">${pP==null?'—':pP+'%'}</span></div>
         ${barra(primaReal, primaMeta, pP)}
-        <div class="muted" style="font-size:12.5px;margin-top:8px">Real <b>${M2(primaReal)}</b> · Meta <b>${M2(primaMeta)}</b> · ${primaMeta ? (primaReal >= primaMeta ? 'Superada por ' + M2(primaReal - primaMeta) : 'Faltan ' + M2(primaMeta - primaReal)) : 'sin meta — usa sugerir'}</div>
+        <div class="muted" style="font-size:12.5px;margin-top:8px">Real <b>${M2(primaReal)}</b> · Meta <b>${primaMeta==null?'Por confirmar':M2(primaMeta)}</b> · ${!ready?'Clasificación o lectura pendientes':primaMeta ? (primaReal >= primaMeta ? 'Superada por ' + M2(primaReal - primaMeta) : 'Faltan ' + M2(primaMeta - primaReal)) : 'Sin meta explícita'}</div>
       </div>
       <div class="card pad">
-        <div style="display:flex;justify-content:space-between;align-items:center"><b style="font-family:var(--f-display);font-size:15px">${semaforo(pR)} Recaudo empresa</b><span class="mono" style="font-size:13px;color:${semColor(pR)}">${pR}%</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:center"><b style="font-family:var(--f-display);font-size:15px">${pR==null?'⚪':semaforo(pR)} Recaudo empresa</b><span class="mono" style="font-size:13px;color:${pR==null?'var(--ink-3)':semColor(pR)}">${pR==null?'—':pR+'%'}</span></div>
         ${barra(recReal, recMeta, pR)}
-        <div class="muted" style="font-size:12.5px;margin-top:8px">Real <b>${M2(recReal)}</b> · Meta <b>${M2(recMeta)}</b> · índice recaudo/venta <b>${primaReal ? Math.round(recReal / primaReal * 100) : 0}%</b></div>
+        <div class="muted" style="font-size:12.5px;margin-top:8px">Real <b>${M2(recReal)}</b> · Meta <b>${recMeta==null?'Por confirmar':M2(recMeta)}</b> · índice recaudo/venta <b>${ready&&primaReal>0?Math.round(recReal/primaReal*100)+'%':'—'}</b></div>
       </div>
     </div>
     <div class="card" style="overflow:hidden;margin-bottom:16px"><div style="padding:11px 14px;border-bottom:1px solid var(--line);font-family:var(--f-display);font-weight:800;font-size:14px">👥 Cumplimiento por asesor · ${lbl}</div>
@@ -450,17 +458,17 @@ Orbit.modules.finanzas = (function () {
         <td class="num">${r.meta ? M2(r.meta) : '<span class="muted">—</span>'}</td>
         <td class="num"><b>${M2(r.real)}</b></td>
         <td class="num" style="color:var(--info)">${M2(r.rec)}</td>
-        <td><div style="display:flex;align-items:center;gap:8px"><span>${semaforo(r.pct)}</span><div class="bar" style="width:80px"><i style="width:${Math.min(100, r.pct)}%;background:${semColor(r.pct)}"></i></div><span class="mono" style="font-size:12px;color:${semColor(r.pct)}">${r.pct}%</span></div></td>
+        <td>${r.pct==null?'<span class="muted">'+(r.a.tipoVinculacion==='sin_clasificar'||!r.a.tipoVinculacion?'Sin clasificar':!r.participa?'No participa':'—')+'</span>':'<div style="display:flex;align-items:center;gap:8px"><span>'+semaforo(r.pct)+'</span><div class="bar" style="width:80px"><i style="width:'+Math.min(100,r.pct)+'%;background:'+semColor(r.pct)+'"></i></div><span class="mono" style="font-size:12px;color:'+semColor(r.pct)+'">'+r.pct+'%</span></div>'}</td>
         <td class="num" style="color:${r.tend >= 0 ? 'var(--ok)' : 'var(--danger)'}">${r.tend >= 0 ? '▲' : '▼'} ${Math.abs(r.tend)}%</td></tr>`).join('') || '<tr><td colspan="6" class="muted" style="text-align:center;padding:20px">Sin producción en el mes.</td></tr>'}</tbody>
     </table></div></div>
     <div class="card" style="overflow:hidden"><div style="padding:11px 14px;border-bottom:1px solid var(--line);font-family:var(--f-display);font-weight:800;font-size:14px">🏛️ Cumplimiento por aseguradora · ${lbl}</div>
       <div style="overflow-x:auto"><table class="tbl">
       <thead><tr><th>Aseguradora</th><th class="num">Meta neta</th><th class="num">Real neto</th><th class="num">% del total</th><th>Avance</th></tr></thead>
-      <tbody>${asgs.map(r => { const share = primaReal ? Math.round(r.real / primaReal * 100) : 0; return `<tr>
+      <tbody>${asgs.map(r => { const share = ready&&primaReal>0 ? Math.round(r.real / primaReal * 100) : null; return `<tr>
         <td>${r.g ? `<span style="display:flex;align-items:center;gap:8px"><span class="dot-s" style="background:${r.g.color || '#888'}"></span><b>${U.esc(r.g.nombre)}</b></span>` : '—'}</td>
         <td class="num">${r.meta ? M2(r.meta) : '<span class="muted">—</span>'}</td>
         <td class="num"><b>${M2(r.real)}</b></td>
-        <td class="num">${share}%</td>
+        <td class="num">${share==null?'—':share+'%'}</td>
         <td>${r.meta ? `<div style="display:flex;align-items:center;gap:8px"><span>${semaforo(r.pct)}</span><span class="mono" style="font-size:12px;color:${semColor(r.pct)}">${r.pct}%</span></div>` : '<span class="muted">sin meta</span>'}</td></tr>`; }).join('') || '<tr><td colspan="5" class="muted" style="text-align:center;padding:20px">Sin producción en el mes.</td></tr>'}</tbody>
     </table></div></div>`;
   }

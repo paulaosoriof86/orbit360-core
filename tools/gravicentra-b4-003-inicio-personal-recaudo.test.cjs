@@ -5,7 +5,9 @@ const fs=require('node:fs'),vm=require('node:vm');
 const src=fs.readFileSync('orbit360-platform/modules/inicio.js','utf8');
 let role='Operativo',global=true,goal=true,ownId='a1',scope='GT';
 const id='u1',month='2026-10',monthMap={GT:'GTQ',CO:'COP'};
+let vinculo='interno';
 const row=()=>({id:'a1',nombre:'Persona QA',activo:true,paises:['GT'],metaPrima:null,
+ tipoVinculacion:vinculo,participaMetas:vinculo==='interno',pendienteClasificacion:vinculo==='sin_clasificar',roleEligible:true,
  metas:{GT:goal?{produccion:120,recaudo:100,explicit:true}:{
  produccion:0,recaudo:0,explicit:false}}});
 const ui={
@@ -65,6 +67,12 @@ assert.match(html,/data-inicio-own-contribution="recaudo" data-inicio-own-countr
 assert.match(html,/Meta individual por configurar/);checks++;
 ownId='';html=render();
 assert.doesNotMatch(html,/data-inicio-own-contribution=/);checks++;
+// Unclassified advisors are not included in institutional denominators or given a made-up percentage.
+ownId='a1';role='Operativo';global=true;goal=true;vinculo='sin_clasificar';
+html=render();
+assert.match(html,/Clasificación pendiente/);checks++;
+assert.match(html,/data-inicio-own-goal="" data-inicio-own-pct=""/);checks++;
+assert.doesNotMatch(html,/data-inicio-own-pct="90"/);checks++;
 console.log('B4_003_INICIO_PERSONAL_RECAUDO_UI_QA_PASS checks='+checks+' mock_only no_real_writes');
 assert.match(src,/data-inicio-days-left/, 'MONTH_END_COUNTDOWN_PRESERVED');
 assert.doesNotMatch(src,/Doble clic para cambiar el mensaje/, 'NO_INTERNAL_INTERACTION_INSTRUCTIONS');

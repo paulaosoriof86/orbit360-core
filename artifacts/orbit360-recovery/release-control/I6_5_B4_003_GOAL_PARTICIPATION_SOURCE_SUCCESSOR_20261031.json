@@ -1,0 +1,132 @@
+{
+  "schema": "GRAVICENTRA_I65_B4003_GOAL_PARTICIPATION_SOURCE_SUCCESSOR_V1",
+  "status": "SOURCE_QA_PASS_PREVIEW_NOT_DEPLOYED_B4_003_HOLD",
+  "recordType": "ADDITIVE_SOURCE_EVIDENCE_SUBORDINATE_TO_CONTROL_PLANE",
+  "date": "2026-10-31",
+  "gate": "I6.5/B4-003",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "parentHead": "f1ef4db50401763096a81429fabc116963dabd2f",
+  "previousControlPlaneBlob": "769d32ec0a90567a920f4178f5f183ca64cebf50",
+  "sourceFiles": {
+    "functions/assignable-advisor-roster.js": {
+      "beforeBlob": "75ca53db55e2665123589b0e63253a8e4f8c377c",
+      "afterBlob": "bc59e9d7be17154aa54f6c58593cc45af2d72503"
+    },
+    "functions/goal-participation-contract.js": {
+      "beforeBlob": null,
+      "afterBlob": "77b6f8e2b656af659b32f03b133c5166cfbc802f"
+    },
+    "functions/product-operational-domain.js": {
+      "beforeBlob": "0b84555fd0918735f9fc4dc9bbe594a908437eeb",
+      "afterBlob": "b3d0059457142659633498c9c52c6b84ea68200f"
+    },
+    "orbit360-platform/core/assignable-advisor-roster-client.js": {
+      "beforeBlob": "123f90ab2bce500f7a89338ae6e3de0b82811fe3",
+      "afterBlob": "7203a318e0ff87e3142ccb1e44aae3c142a356a1"
+    },
+    "orbit360-platform/data/store-firestore-product-operational-p0.js": {
+      "beforeBlob": "97d8316df21a79bac6c3f75802eef3d1551b42bf",
+      "afterBlob": "3d90d86bf86e6fa9098909936ec19851d82db574"
+    },
+    "orbit360-platform/index.html": {
+      "beforeBlob": "a6a396b472cea8a94e2da4fe83f24a2efc0a1314",
+      "afterBlob": "737e359b6c07dd8210754c9384fd67c0beaaeb0e"
+    },
+    "orbit360-platform/modules/equipo.js": {
+      "beforeBlob": "43554f646e0e311658fc8e6730c4e45c2920e77d",
+      "afterBlob": "8bdc51f015991e19f66a62ec0adc38e18b4f5bb3"
+    },
+    "orbit360-platform/modules/finanzas.js": {
+      "beforeBlob": "66e40ad29bdfd9a71ddf386c1c3c876dec0249dc",
+      "afterBlob": "c12d7324928f08d8127e60d2029f80928e5a0ed3"
+    },
+    "orbit360-platform/modules/inicio.js": {
+      "beforeBlob": "12a5a1e3293a7d59f993f829071d3bd2b4027a6c",
+      "afterBlob": "1d84679ed230c753d5633486949893e13c2681f4"
+    },
+    "orbit360-platform/modules/insights.js": {
+      "beforeBlob": "6667535e1995eb1dac7f100d95061c8f215aa7ea",
+      "afterBlob": "69ec461beeeaa66448287e269eeb92ffc1d81df8"
+    },
+    "tests/goal-participation-isolated-routing.test.cjs": {
+      "beforeBlob": null,
+      "afterBlob": "a96789a55b8af15a9a565ede3a2aa64c93452695"
+    },
+    "tests/goal-participation-modal.test.cjs": {
+      "beforeBlob": null,
+      "afterBlob": "4481736bf124028c9ba57eb93f1d79ce5b2f0f65"
+    },
+    "tests/goal-participation-preview-boundary.test.cjs": {
+      "beforeBlob": null,
+      "afterBlob": "7c5c522cccb83372bad4f8365767cd1d80dd2c2c"
+    },
+    "tests/goal-participation.test.cjs": {
+      "beforeBlob": null,
+      "afterBlob": "e02ce16792a0ac3e0cbacbc20b71265a99af2b94"
+    },
+    "tools/gravicentra-b4-003-inicio-personal-recaudo.test.cjs": {
+      "beforeBlob": "a68498f92f517e3cd8d3f64386a92cb3717a1175",
+      "afterBlob": "3cf330a01ea07a397982c98177e8cab861b62028"
+    },
+    "tools/gravicentra-b4-003-inicio-role-country-team.test.cjs": {
+      "beforeBlob": "26518654b5f2559bfceef66e2c92077012febe0f",
+      "afterBlob": "a7de157980f2f9be7f51bd2f8297348c88f997d9"
+    }
+  },
+  "tests": {
+    "goalParticipationAssertions": 63,
+    "legacyFirstPaintTeamRegressionAssertions": 120,
+    "legacyPersonalCollectionUIAssertions": 13,
+    "legacyRoleCountryBackendAssertions": 19,
+    "independentChromeOlderCertifiedPreview": "CURRENT_CERTIFIED_PREVIEW_READ_ONLY_OBSERVED_NOT_THIS_SOURCE",
+    "currentCandidateBrowserUat": "PENDING",
+    "fullLegacySuite": "NOT_CLAIMED"
+  },
+  "decision": {
+    "sevenAdvisorProfilesAutoClassified": 0,
+    "preliminaryFreelancerNames": [
+      "Johanna",
+      "Nicole",
+      "Braulio"
+    ],
+    "preliminaryNamesWrittenToRecords": false,
+    "directionControlsClassification": true,
+    "freelancersIncludedOnlyExplicitly": true,
+    "unidentifiedGlobalPercentInvented": false
+  },
+  "previewIsolation": {
+    "separateBackendFunctions": [
+      "orbit360AssignableAdvisorRosterGoalsPreview",
+      "orbit360ProductOperationalCommandGoalsPreview"
+    ],
+    "exactHostnamePrefix": "ays-orbit-360-lab--gi-i65-b4-goals-",
+    "requiresPublicFlag": "goalParticipationPreviewCandidate === true",
+    "bothConditionsRequired": true,
+    "syntheticOnlyBackendMutations": true,
+    "realAdvisorMutationPreviewAllowed": false,
+    "oldCertifiedPreviewAltered": false,
+    "liveAltered": false
+  },
+  "frozenBlobs": {
+    "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json": "333963e16a21d9abe58274091c0f61a53473c71f",
+    "artifacts/orbit360-recovery/release-control/I6_5_OPEN_FINDINGS_CARRY_FORWARD_REGISTER_20261003.json": "3cdedb0c3aa1c4a39545229fb4781e79326c945c",
+    "artifacts/orbit360-recovery/release-control/I6_CANONICAL_ACCUMULATIVE_COMPOSITION_LOCK_20260924.json": "33bf80768cb6cb311f2975d282a5f50935f680aa",
+    "artifacts/orbit360-recovery/release-control/I6_PENDING_CLOSURE_MASTER_PLAN_LOCK_20261004.json": "71eba786de1236533e0339ae5cb79eeabed8ebaf"
+  },
+  "boundaries": {
+    "dataWrites": 0,
+    "prodHostingDeploy": false,
+    "prodFunctionsDeploy": false,
+    "previewDeploy": false,
+    "authIamRulesMutation": false,
+    "marketingCommunicationSent": false,
+    "classifiedAdvisorRecordsChanged": false,
+    "existingPreviewFunctionRedeployed": false,
+    "institutionalGoalsClosedP0Before": true,
+    "newP0Closure": false,
+    "b4003Closed": false,
+    "i65Closed": false,
+    "productionAuthorized": false
+  }
+}

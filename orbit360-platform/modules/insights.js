@@ -301,26 +301,42 @@ Orbit.modules.insights = (function () {
 
   /* ---- METAS: producción nueva vs renovada con metas separadas ---- */
   function vMetas() {
-    const vig = vigentes();
+    const mesKey = YEAR + '-' + String(mesSel + 1).padStart(2, '0');
+    const country=String(Orbit.pais||'').toUpperCase();
+    if(!['GT','CO'].includes(country)) return '<div class="cfg-note" data-insights-goal-country-required="1">Selecciona Guatemala o Colombia para consultar el cumplimiento de metas sin mezclar monedas.</div>';
+    const users=S().all('asesores')||[];
+    const st=S()._productStatus&&S()._productStatus()||{};
+    const confirmed=['asesores','metas','polizas'].every(c=>(st.serverConfirmedCollections||[]).includes(c));
+    const relevant=users.filter(a=>a&&!a.inactivo&&a.activo!==false&&a.estado!=='inactivo'&&([].concat(a.paises||a.pais||[])).includes(country)&&([].concat(a.roles||a.rol||[])).some(role=>['Asesor','Comercial'].includes(role)));
+    const pending=relevant.some(a=>!['interno','freelance'].includes(a.tipoVinculacion));
+    const eligible=relevant.filter(a=>(!asesorSel||a.id===asesorSel)&&(a.tipoVinculacion==='interno'||(a.tipoVinculacion==='freelance'&&a.participaMetas===true)));
+    const eligibleIds=new Set(eligible.map(a=>a.id));
+    const ready=confirmed&&!pending;
+    const vig = vigentes().filter(p=>String(p.vigenciaInicio||'').slice(0,7)===mesKey&&eligibleIds.has(p.asesorId));
     const nuevas = vig.filter(esNueva), renov = vig.filter(p => !esNueva(p));
     const netaNueva = nuevas.reduce((s, p) => s + netaDe(p), 0);
     const netaRenov = renov.reduce((s, p) => s + netaDe(p), 0);
     // metas (autoadministrables) — lee la colección 'metas' del mes seleccionado (empresa); fallback al split por asesor
-    const mesKey = YEAR + '-' + String(mesSel + 1).padStart(2, '0');
-    const metasCol = (S().all('metas') || []).filter(mm => (mm.mes || '') === mesKey && !mm.asesorId);
+    const metasCol = (S().all('metas') || []).filter(mm => (mm.mes || '') === mesKey && mm.pais===country && !mm.asesorId);
     const gMeta = (tipo) => { const r = metasCol.find(mm => mm.tipo === tipo); return r && r.valor ? +r.valor : null; };
-    const metaTotal = S().all('asesores').reduce((s, a) => s + (a.metaPrima || 0), 0);
-    const metaNueva = gMeta('nueva') != null ? gMeta('nueva') : Math.round(metaTotal * 0.45);
-    const metaRenov = gMeta('renovada') != null ? gMeta('renovada') : Math.round(metaTotal * 0.55);
-    const metaAuto = metasCol.length > 0;
-    const pctN = Math.round(netaNueva / (metaNueva || 1) * 100), pctR = Math.round(netaRenov / (metaRenov || 1) * 100);
+    const explicitAdvisorGoal=tipo=>{
+      const rows=S().all('metas')||[];
+      if(!eligible.length)return null;
+      const amounts=eligible.map(a=>rows.find(m=>String(m.asesorId||'')===String(a.id)&&String(m.mes||'')===mesKey&&m.pais===country&&m.tipo===tipo));
+      return amounts.every(Boolean)&&amounts.every(m=>Number.isFinite(Number(m.valor))&&Number(m.valor)>=0)
+        ?amounts.reduce((sum,m)=>sum+Number(m.valor),0):null;
+    };
+    const metaNueva=!asesorSel&&gMeta('nueva')!=null?gMeta('nueva'):explicitAdvisorGoal('nueva');
+    const metaRenov=!asesorSel&&gMeta('renovada')!=null?gMeta('renovada'):explicitAdvisorGoal('renovada');
+    const metaAuto=metasCol.length>0;
+    const pctN=ready&&metaNueva>0?Math.round(netaNueva/metaNueva*100):null,pctR=ready&&metaRenov>0?Math.round(netaRenov/metaRenov*100):null;
     // series mensuales nueva/renov para acumulado y mes seleccionado
     const sN = serieAnual(YEAR, 'nueva').arr, sR = serieAnual(YEAR, 'renov').arr;
     const mesN = sN[mesSel] || 0, mesR = sR[mesSel] || 0, acN = acumHasta(sN, mesSel), acR = acumHasta(sR, mesSel);
     const metaBar = (label, val, meta, pct, color) => `
       <div class="ins-meta-block">
-        <div class="ins-meta-top"><b>${label}</b><span class="mono">${MM(val)} <span class="muted">/ ${MM(meta)}</span></span></div>
-        <div class="ins-meta-bar big"><i style="width:${Math.min(100, pct)}%;background:${pct >= 100 ? 'var(--ok)' : pct >= 70 ? 'var(--warn)' : color}"></i><span>${pct}%</span></div>
+        <div class="ins-meta-top"><b>${label}</b><span class="mono">${MM(val)} <span class="muted">/ ${meta==null?'Meta pendiente':MM(meta)}</span></span></div>
+        <div class="ins-meta-bar big"><i style="width:${pct==null?0:Math.min(100,pct)}%;background:${pct != null&&pct >= 100 ? 'var(--ok)' : pct != null&&pct >= 70 ? 'var(--warn)' : color}"></i><span>${pct==null?'—':pct+'%'}</span></div>
       </div>`;
     // nuevas vs renovadas por ramo (comparación real)
     const ramos = [...new Set(vig.map(p => p.ramo))];
@@ -329,9 +345,9 @@ Orbit.modules.insights = (function () {
     return insKpis([
       { label: 'PN NUEVA · ' + MESES[mesSel], val: M(mesN), color: 'var(--ok)', foot: 'acum. ' + M(acN), footTone: 'up', detail: { title: 'Pólizas nuevas (vigentes)', sub: nuevas.length + ' pólizas · ' + MM(netaNueva), html: () => tablaPolizas(nuevas.slice().sort((a, b) => netaDe(b) - netaDe(a))) } },
       { label: 'PN RENOVADA · ' + MESES[mesSel], val: M(mesR), color: 'var(--info)', foot: 'acum. ' + M(acR), detail: { title: 'Pólizas renovadas (vigentes)', sub: renov.length + ' pólizas · ' + MM(netaRenov), html: () => tablaPolizas(renov.slice().sort((a, b) => netaDe(b) - netaDe(a))) } },
-      { label: 'Cumplimiento nuevas', val: pctN + '%', color: 'var(--red)', foot: 'acum. vs meta', footTone: pctN >= 100 ? 'up' : 'down' },
-      { label: 'Cumplimiento renov.', val: pctR + '%', color: 'var(--warn)', foot: 'acum. vs meta', footTone: pctR >= 100 ? 'up' : 'down' }
-    ]) + card('Avance de metas (acumulado del año · prima neta)', `<div style="display:flex;justify-content:flex-end;margin-bottom:12px"><button class="btn primary sm" onclick="Orbit.modules.insights.sugerirMeta()">✨ Sugerir metas del próximo mes</button></div>` + metaBar('Producción NUEVA', netaNueva, metaNueva, pctN, 'var(--red)') + metaBar('Producción RENOVADA', netaRenov, metaRenov, pctR, 'var(--red)'), (metaAuto ? '✅ metas de ' + MESES[mesSel] + ' ' + YEAR + ' cargadas desde la colección editable' : 'usando metas base por asesor — asigna metas del mes en Equipo o con “Sugerir metas”') + ' · se asignan en Equipo y permisos / Configuración') +
+      { label: 'Cumplimiento nuevas', val: pctN==null?'—':pctN+'%', color: 'var(--red)', foot: pctN==null?'Clasificación o meta por validar':'mes vs meta', footTone: pctN==null?'neutral':pctN>=100?'up':'down' },
+      { label: 'Cumplimiento renov.', val: pctR==null?'—':pctR+'%', color: 'var(--warn)', foot: pctR==null?'Clasificación o meta por validar':'mes vs meta', footTone: pctR==null?'neutral':pctR>=100?'up':'down' }
+    ]) + card('Avance de metas (acumulado del año · prima neta)', `<div style="display:flex;justify-content:flex-end;margin-bottom:12px"><button class="btn primary sm" onclick="Orbit.modules.insights.sugerirMeta()">✨ Sugerir metas del próximo mes</button></div>` + metaBar('Producción NUEVA', netaNueva, metaNueva, pctN, 'var(--red)') + metaBar('Producción RENOVADA', netaRenov, metaRenov, pctR, 'var(--red)'), (ready?(metaAuto?'Metas institucionales explícitas por país':'Metas individuales explícitas · sin reparto sintético'):'Porcentaje pendiente hasta confirmar clasificaciones y lectura de servidor') + ' · se asignan en Equipo y permisos / Configuración') +
       card('Producción mensual ' + YEAR + ' · nuevas vs renovadas', colsDual(MESES, sN, sR, 'Nuevas', 'Renovadas'), 'prima neta por mes · clic en Mes para acumular') +
       `<div class="ins-grid-2">
       ${card('Meta por asesor (prima neta)', `<table class="tbl"><thead><tr><th>Asesor</th><th>Avance</th><th class="num">Neta</th><th class="num">Meta</th></tr></thead><tbody>${asesorMetaRows()}</tbody></table>`)}
@@ -339,13 +355,20 @@ Orbit.modules.insights = (function () {
     </div>`;
   }
   function asesorMetaRows() {
-    return S().all('asesores').map(a => {
-      const pol = vigentes().filter(p => p.asesorId === a.id);
+    const country=String(Orbit.pais||'').toUpperCase(),mk=YEAR+'-'+String(mesSel+1).padStart(2,'0');
+    const st=S()._productStatus&&S()._productStatus()||{};
+    const ready=['asesores','metas','polizas'].every(c=>(st.serverConfirmedCollections||[]).includes(c))
+      &&(S().all('asesores')||[]).filter(a=>a&&!a.inactivo&&a.activo!==false&&([].concat(a.paises||a.pais||[])).includes(country)&&([].concat(a.roles||a.rol||[])).some(role=>['Asesor','Comercial'].includes(role))).every(a=>['interno','freelance'].includes(a.tipoVinculacion));
+    return S().all('asesores').filter(a=>([].concat(a.paises||a.pais||[])).includes(country)&&([].concat(a.roles||a.rol||[])).some(role=>['Asesor','Comercial'].includes(role))).map(a => {
+      const pol = vigentes().filter(p => p.asesorId === a.id&&String(p.vigenciaInicio||'').slice(0,7)===mk);
       const neta = pol.reduce((s, p) => s + netaDe(p), 0);
-      const pct = Math.min(140, Math.round(neta / (a.metaPrima || 1) * 100));
+      const participa=a.tipoVinculacion==='interno'||(a.tipoVinculacion==='freelance'&&a.participaMetas===true);
+      const metas=(S().all('metas')||[]).filter(m=>m.asesorId===a.id&&m.pais===country&&m.mes===mk&&['nueva','renovada'].includes(m.tipo));
+      const goal=metas.length===2?metas.reduce((sum,m)=>sum+Number(m.valor||0),0):null;
+      const pct=ready&&participa&&goal>0?Math.min(140,Math.round(neta/goal*100)):null;
       return `<tr><td style="min-width:150px"><span style="display:flex;align-items:center;gap:8px">${U.avatar(a.nombre, a.color, 'sm')}${U.esc(a.nombre)}</span></td>
-        <td style="width:40%"><div class="ins-meta-bar"><i style="width:${Math.min(100, pct)}%;background:${pct >= 100 ? 'var(--ok)' : pct >= 70 ? 'var(--warn)' : 'var(--red)'}"></i><span>${pct}%</span></div></td>
-        <td class="num"><b>${M(neta)}</b></td><td class="num muted">${M(a.metaPrima)}</td></tr>`;
+        <td style="width:40%"><div class="ins-meta-bar"><i style="width:${pct==null?0:Math.min(100,pct)}%;background:${pct != null&&pct >= 100 ? 'var(--ok)' : pct != null&&pct >= 70 ? 'var(--warn)' : 'var(--red)'}"></i><span>${pct==null?(a.tipoVinculacion==='sin_clasificar'||!a.tipoVinculacion?'Sin clasificar':!participa?'No participa':'—'):pct+'%'}</span></div></td>
+        <td class="num"><b>${M(neta)}</b></td><td class="num muted">${goal==null?'—':M(goal)}</td></tr>`;
     }).join('');
   }
   function ramoNuevaRenov() {

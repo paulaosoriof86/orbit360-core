@@ -54,6 +54,16 @@ Orbit.modules.equipo = (function () {
   function hasAnyRole(a, roles) { return roles.some(r => hasRole(a, r)); }
   function isAdministrative(a) { return hasAnyRole(a, ['Dirección', 'SuperAdmin', 'AdminTenant', 'Admin', 'Finanzas']); }
   function active(a) { return !(a && (a.inactivo || a.activo === false || a.estado === 'inactivo')); }
+  function vinculacionDe(a) { return ['interno','freelance'].includes(a&&a.tipoVinculacion)?a.tipoVinculacion:'sin_clasificar'; }
+  function participacionDe(a) {
+    const tipo=vinculacionDe(a);
+    return {tipo,participa:tipo==='interno'||(tipo==='freelance'&&a&&a.participaMetas===true),
+      pendiente:tipo==='sin_clasificar'};
+  }
+  function puedeConfigurarParticipacion() {
+    const role=String(Orbit.session&&typeof Orbit.session.rol==='function'?Orbit.session.rol():(Orbit.auth?.productUser?.activeRole||''));
+    return role==='Dirección'&&!!(Orbit.access&&typeof Orbit.access.can==='function'&&Orbit.access.can('equipo','edit')===true);
+  }
   function slug(v) {
     return String(v || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
       .replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'usuario';
@@ -140,7 +150,7 @@ Orbit.modules.equipo = (function () {
     const getter=typeof m.getDocFromServer==='function'?m.getDocFromServer:m.getDoc;
     const snap=await getter(ref); if(!snap||!snap.exists()) throw new Error('EQUIPO_CANONICAL_READBACK_NOT_FOUND');
     const row=snap.data()||{}, eq=(a,b)=>JSON.stringify([].concat(a||[]).map(String).sort())===JSON.stringify([].concat(b||[]).map(String).sort());
-    if(String(row.nombre||'')!==String(expected.nombre||'')||String(row.email||'').toLowerCase()!==String(expected.email||'').toLowerCase()||!eq(row.roles,expected.roles)||!eq(row.paises,expected.paises)||String(row.rolDefault||'')!==String(expected.rolDefault||'')||String(row.scopeDatos||'')!==String(expected.scopeDatos||'')) throw new Error('EQUIPO_CANONICAL_READBACK_MISMATCH');
+    if(String(row.nombre||'')!==String(expected.nombre||'')||String(row.email||'').toLowerCase()!==String(expected.email||'').toLowerCase()||!eq(row.roles,expected.roles)||!eq(row.paises,expected.paises)||String(row.rolDefault||'')!==String(expected.rolDefault||'')||String(row.scopeDatos||'')!==String(expected.scopeDatos||'')||(Object.prototype.hasOwnProperty.call(expected,'tipoVinculacion')&&String(row.tipoVinculacion||'sin_clasificar')!==String(expected.tipoVinculacion))||(Object.prototype.hasOwnProperty.call(expected,'participaMetas')&&Boolean(row.participaMetas)!==expected.participaMetas)) throw new Error('EQUIPO_CANONICAL_READBACK_MISMATCH');
     return row;
   }
   function toast(text) {
@@ -204,7 +214,7 @@ Orbit.modules.equipo = (function () {
     ])}
     ${userFilter !== 'todos' ? `<div class="cfg-note" style="margin:0 0 10px">Filtro activo: <b>${U.esc(userFilter)}</b> · <a style="cursor:pointer;color:var(--red)" onclick="Orbit.modules.equipo.filtrar('todos')">Ver todos</a></div>` : ''}
     <div class="card" style="overflow:hidden"><div style="overflow-x:auto"><table class="tbl">
-      <thead><tr><th>Usuario</th><th>Roles</th><th>Rol predeterminado</th><th>País(es)</th><th>Acceso</th><th>Estado</th><th></th></tr></thead>
+      <thead><tr><th>Usuario</th><th>Roles</th><th>Rol predeterminado</th><th>País(es)</th><th>Vinculación / metas</th><th>Acceso</th><th>Estado</th><th></th></tr></thead>
       <tbody>${shown.map(a => {
         const roles = rolesOf(a);
         const paises = userCountries(a);
@@ -217,10 +227,11 @@ Orbit.modules.equipo = (function () {
           <td>${roles.map(roleBadge).join('') || '<span class="badge warn">Sin rol</span>'}</td>
           <td>${roleBadge(a.rolDefault || a.rol || 'Sin definir')}</td>
           <td>${paises.map(p => `<span class="badge neutral">${p === 'CO' ? '🇨🇴 CO' : '🇬🇹 GT'}</span>`).join(' ') || '<span class="badge warn">Sin país</span>'}</td>
+          <td><span class="badge ${participacionDe(a).pendiente?'warn':participacionDe(a).participa?'ok':'neutral'}">${participacionDe(a).pendiente?'Sin clasificar':participacionDe(a).tipo==='interno'?'Interno':participacionDe(a).participa?'Freelance · participa':'Freelance · excluido'}</span></td>
           <td><span class="badge ${accessInfo.tone}">${U.esc(accessInfo.label)}</span><div class="muted" style="font-size:10.5px;margin-top:3px">${U.esc(accessInfo.detail || '')}</div></td>
           <td><span class="badge ${active(a) ? 'ok' : 'neutral'}">${active(a) ? 'Activo' : 'Inactivo'}</span></td>
           <td style="text-align:right;color:var(--ink-3)">${writable ? '›' : '<span class="badge neutral">Sincronizando…</span>'}</td></tr>`;
-      }).join('') || '<tr><td colspan="7" class="muted" style="text-align:center;padding:22px">No hay usuarios para este filtro.</td></tr>'}</tbody>
+      }).join('') || '<tr><td colspan="8" class="muted" style="text-align:center;padding:22px">No hay usuarios para este filtro.</td></tr>'}</tbody>
     </table></div></div>`;
   }
 
@@ -491,15 +502,17 @@ Orbit.modules.equipo = (function () {
     const cur = currencyForCountry(metaPais);
     const institucional=metaInstitucionalDe(metaPeriodo,metaPais);
     const preview=isMetaPreview(),canInstitutional=puedeEditarMetaInstitucional()&&!preview;
-    const totN = team.reduce((s, a) => s + metaDe(a.id, metaPeriodo, metaPais).nueva, 0);
-    const totR = team.reduce((s, a) => s + metaDe(a.id, metaPeriodo, metaPais).renovada, 0);
-    const totC = team.reduce((s, a) => s + metaDe(a.id, metaPeriodo, metaPais).recaudo, 0);
+    const participantes=team.filter(a=>active(a)&&participacionDe(a).participa);
+    const pendientes=team.filter(a=>active(a)&&participacionDe(a).pendiente).length;
+    const totN = participantes.reduce((s, a) => s + metaDe(a.id, metaPeriodo, metaPais).nueva, 0);
+    const totR = participantes.reduce((s, a) => s + metaDe(a.id, metaPeriodo, metaPais).renovada, 0);
+    const totC = participantes.reduce((s, a) => s + metaDe(a.id, metaPeriodo, metaPais).recaudo, 0);
     const countryOptions = (Orbit.PAISES || []).filter(p => p.id !== 'TODOS');
     return `<div class="cfg-note" style="margin-bottom:14px">🎯 Metas mensuales por asesor y país: <b>producción nueva</b>, <b>producción de renovación</b> y <b>recaudo</b>, siempre sobre prima neta y sin mezclar monedas. Es la fuente que deben leer Insights y Finanzas.${preview?' <b>En esta preview las metas reales están en consulta; la prueba temporal se realiza en el panel separado.</b>':''}</div>
     <div style="display:flex;gap:10px;align-items:center;margin-bottom:14px;flex-wrap:wrap">
       <input id="meta-periodo" class="o-sel" type="month" value="${metaPeriodo}" style="width:auto" ${metaQaBusy?'disabled':''}>
       <select id="meta-pais" class="o-sel" style="width:auto" ${metaQaBusy?'disabled':''}>${countryOptions.map(p => `<option value="${p.id}" ${p.id === metaPais ? 'selected' : ''}>${p.id === 'CO' ? '🇨🇴' : '🇬🇹'} ${p.label} · ${p.moneda}</option>`).join('')}</select>
-      <span class="muted" style="font-size:12.5px"><b>${cur} ${U.moneyShort(totN, cur)}</b> nuevas · <b>${cur} ${U.moneyShort(totR, cur)}</b> renovaciones · <b>${cur} ${U.moneyShort(totC, cur)}</b> recaudo</span>
+      <span class="muted" style="font-size:12.5px">${pendientes?`<b>Parcial · ${pendientes} clasificación(es) pendiente(s)</b> · `:""}<b>${cur} ${U.moneyShort(totN, cur)}</b> nuevas · <b>${cur} ${U.moneyShort(totR, cur)}</b> renovaciones · <b>${cur} ${U.moneyShort(totC, cur)}</b> recaudo</span>
     </div>
     <div class="card pad" data-meta-institucional-card="1" style="margin-bottom:14px">
       <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-wrap:wrap">
@@ -519,12 +532,12 @@ Orbit.modules.equipo = (function () {
     </div>
     ${metaQaPanel()}
     <div class="card" style="overflow:hidden"><div style="overflow-x:auto"><table class="tbl">
-      <thead><tr><th>Asesor</th><th class="num">Producción nueva</th><th class="num">Renovaciones</th><th class="num">Recaudo</th><th class="num">Producción total</th></tr></thead>
-      <tbody>${team.map(a => { const m = metaDe(a.id, metaPeriodo, metaPais); return `<tr>
-        <td><div style="display:flex;align-items:center;gap:9px">${U.avatar(a.nombre, a.color, 'sm')}<div><b>${U.esc(a.nombre)}</b><div class="muted" style="font-size:10.5px">${m.provisional ? 'valor provisional heredado' : `${metaPeriodo} · ${metaPais}`}</div></div></div></td>
-        <td class="num"><div class="ct-inp" style="justify-content:flex-end"><span>${cur}</span><input type="number" min="0" value="${m.nueva}" data-meta="${a.id}|nueva" style="width:110px" ${preview?'disabled':''}></div></td>
-        <td class="num"><div class="ct-inp" style="justify-content:flex-end"><span>${cur}</span><input type="number" min="0" value="${m.renovada}" data-meta="${a.id}|renovada" style="width:110px" ${preview?'disabled':''}></div></td>
-        <td class="num"><div class="ct-inp" style="justify-content:flex-end"><span>${cur}</span><input type="number" min="0" value="${m.recaudo}" data-meta="${a.id}|recaudo" style="width:110px" ${preview?'disabled':''}></div></td>
+      <thead><tr><th>Asesor y participación</th><th class="num">Producción nueva</th><th class="num">Renovaciones</th><th class="num">Recaudo</th><th class="num">Producción total</th></tr></thead>
+      <tbody>${team.map(a => { const m = metaDe(a.id, metaPeriodo, metaPais),p=participacionDe(a),readonly=preview||!p.participa; return `<tr>
+        <td><div style="display:flex;align-items:center;gap:9px">${U.avatar(a.nombre, a.color, 'sm')}<div><b>${U.esc(a.nombre)}</b><div class="muted" style="font-size:10.5px">${m.provisional ? 'valor provisional heredado' : `${metaPeriodo} · ${metaPais}`}</div><div class="muted" style="font-size:10.5px">${p.pendiente?'Clasificación pendiente':p.participa?p.tipo==='interno'?'Interno · participa':'Freelance habilitado':'Freelance · no participa'}</div></div></div></td>
+        <td class="num"><div class="ct-inp" style="justify-content:flex-end"><span>${cur}</span><input type="number" min="0" value="${m.nueva}" data-meta="${a.id}|nueva" style="width:110px" ${readonly?'disabled':''}></div></td>
+        <td class="num"><div class="ct-inp" style="justify-content:flex-end"><span>${cur}</span><input type="number" min="0" value="${m.renovada}" data-meta="${a.id}|renovada" style="width:110px" ${readonly?'disabled':''}></div></td>
+        <td class="num"><div class="ct-inp" style="justify-content:flex-end"><span>${cur}</span><input type="number" min="0" value="${m.recaudo}" data-meta="${a.id}|recaudo" style="width:110px" ${readonly?'disabled':''}></div></td>
         <td class="num"><b>${U.money(m.nueva + m.renovada, cur)}</b></td></tr>`; }).join('') || '<tr><td colspan="5" class="muted" style="text-align:center;padding:20px">No hay asesores habilitados para este país.</td></tr>'}
     </table></div></div>`;
   }
@@ -566,11 +579,12 @@ Orbit.modules.equipo = (function () {
       nombre: a.nombre || '', email: a.email || '', telefono: a.telefono || '', roles: rolesOf(a),
       rolDefault: a.rolDefault || a.rol || '', scopeDatos: a.scopeDatos || 'propios',
       paises: userCountries(a), paisDefault: a.paisDefault || a.pais || '',
-      modulosExtra: uniq(a.modulosExtra), modulosRestringidos: uniq(a.modulosRestringidos), inactivo: !!a.inactivo
+      modulosExtra: uniq(a.modulosExtra), modulosRestringidos: uniq(a.modulosRestringidos), inactivo: !!a.inactivo,
+       tipoVinculacion: vinculacionDe(a), participaMetas: !!(a && a.participaMetas === true)
     };
   }
   function sensitiveChanged(before, after) {
-    const fields = ['roles', 'rolDefault', 'scopeDatos', 'paises', 'paisDefault', 'modulosExtra', 'modulosRestringidos', 'inactivo'];
+    const fields = ['roles', 'rolDefault', 'scopeDatos', 'paises', 'paisDefault', 'modulosExtra', 'modulosRestringidos', 'inactivo', 'tipoVinculacion', 'participaMetas'];
     return fields.some(k => JSON.stringify(before[k] || null) !== JSON.stringify(after[k] || null));
   }
   function canonicalAdvisorId(row, fallback) {
@@ -638,6 +652,23 @@ Orbit.modules.equipo = (function () {
           <div style="display:flex;gap:8px;flex-wrap:wrap">${activeCountries.map(p => `<label class="chiprole"><input type="checkbox" class="eu-pais" value="${p.id}" ${initialCountries.includes(p.id) ? 'checked' : ''}> ${p.id === 'CO' ? '🇨🇴' : '🇬🇹'} ${p.label} · ${p.moneda}</label>`).join('')}</div>
           <label class="ce-l" style="margin-top:8px">País predeterminado<select id="eu-pais-default" class="o-sel" style="max-width:260px"></select></label>
         </div>
+        <div class="cfg-note" data-equipo-participacion="1">
+          <div class="ce-l" style="margin-bottom:7px"><b>Vinculación y participación en metas</b> <span class="muted">(configurable por Dirección)</span></div>
+          <div class="cgrid">
+            <label class="ce-l">Tipo de vinculación
+              <select id="eu-vinculacion" class="o-sel" ${puedeConfigurarParticipacion()&&!isMetaPreview()?'':'disabled'}>
+                <option value="sin_clasificar" ${vinculacionDe(a)==='sin_clasificar'?'selected':''}>Sin clasificar</option>
+                <option value="interno" ${vinculacionDe(a)==='interno'?'selected':''}>Interno</option>
+                <option value="freelance" ${vinculacionDe(a)==='freelance'?'selected':''}>Freelance</option>
+              </select>
+            </label>
+            <label class="ce-l ck" style="align-self:center">
+              <input type="checkbox" id="eu-participa-metas" ${vinculacionDe(a)==='freelance'&&a.participaMetas===true?'checked':''} ${puedeConfigurarParticipacion()&&!isMetaPreview()&&vinculacionDe(a)==='freelance'?'':'disabled'}>
+              Incluir freelance en metas institucionales
+            </label>
+          </div>
+          <div class="muted" style="font-size:11.5px;margin-top:7px">Interno participa por defecto. Freelance solo participa si Dirección marca la autorización. Sin clasificar no se presume interno ni contribuye al porcentaje; en Preview los cambios reales están bloqueados.</div>
+        </div>
         <details id="eu-mod-details">
           <summary style="cursor:pointer;font-weight:700;font-size:13px;font-family:var(--f-display)">⚙ Módulos visibles para este usuario <span class="muted" style="font-weight:400">(base por roles + excepciones)</span></summary>
           <div style="display:flex;justify-content:flex-end;margin-top:8px"><button type="button" class="btn ghost sm" id="eu-reset-mod">Aplicar estándar de roles</button></div>
@@ -668,6 +699,11 @@ Orbit.modules.equipo = (function () {
       const current = $('#eu-pais-default').value || a.paisDefault || a.pais || ps[0] || '';
       $('#eu-pais-default').innerHTML = ps.map(p => `<option value="${p}" ${p === current ? 'selected' : ''}>${p === 'CO' ? 'Colombia · COP' : 'Guatemala · GTQ'}</option>`).join('') || '<option value="">Selecciona país primero</option>';
     };
+    const refreshParticipacion = () => {
+       const tipo=$('#eu-vinculacion').value;
+       if(tipo!=='freelance') $('#eu-participa-metas').checked=false;
+       $('#eu-participa-metas').disabled=!puedeConfigurarParticipacion()||isMetaPreview()||tipo!=='freelance';
+    };
     const refreshModuleHints = (reset) => {
       const base = new Set(baseModules(selectedRoles()));
       $$('.eu-mod').forEach(c => {
@@ -685,10 +721,11 @@ Orbit.modules.equipo = (function () {
     $('#eu-cancel').addEventListener('click', () => close(false));
     $$('.eu-role').forEach(c => c.addEventListener('change', () => { markDirty(); refreshRoleDefault(); if (!modulesTouched) refreshModuleHints(true); }));
     $$('.eu-pais').forEach(c => c.addEventListener('change', () => { markDirty(); refreshCountryDefault(); }));
+    $('#eu-vinculacion').addEventListener('change', () => { markDirty(); refreshParticipacion(); });
     $$('.eu-mod').forEach(c => c.addEventListener('change', () => { modulesTouched = true; markDirty(); refreshModuleHints(false); }));
     back.querySelectorAll('input,select').forEach(el => el.addEventListener('change', markDirty));
     $('#eu-reset-mod').addEventListener('click', () => { modulesTouched = false; refreshModuleHints(true); markDirty(); });
-    refreshRoleDefault(); refreshCountryDefault(); refreshModuleHints(false);
+    refreshRoleDefault(); refreshCountryDefault(); refreshParticipacion(); refreshModuleHints(false);
 
     if (id && $('#eu-delete')) $('#eu-delete').addEventListener('click', async () => {
       const advisorId = canonicalAdvisorId(a, id);
@@ -732,8 +769,12 @@ Orbit.modules.equipo = (function () {
         roles, rol: rolDefault, rolDefault, scopeDatos: $('#eu-scope').value, teamId: $('#eu-team').value.trim(), equipoId: $('#eu-team').value.trim(), paises, pais: paisDefault, paisDefault,
         modulosExtra: selectedMods.filter(m => !base.includes(m)), modulosRestringidos: base.filter(m => !selectedMods.includes(m)), modulosOverride: selectedMods,
         inactivo: $('#eu-inact').checked, estado: $('#eu-inact').checked ? 'inactivo' : 'activo', activo: !$('#eu-inact').checked, updatedAt: new Date().toISOString() };
-      const after = userSnapshot(data); let motivo = 'Alta manual desde Equipo';
-      if (id && sensitiveChanged(before, after)) { motivo = Orbit.ui && Orbit.ui.prompt ? await Orbit.ui.prompt('Indica el motivo del cambio de roles, permisos, países, alcance o estado:', { title: 'Motivo del cambio' }) : ''; if (String(motivo || '').trim().length < 5) return inform('Indica un motivo claro de al menos 5 caracteres.', 'Motivo requerido'); }
+      if (puedeConfigurarParticipacion()&&!isMetaPreview()) {
+         data.tipoVinculacion=$('#eu-vinculacion').value;
+         data.participaMetas=data.tipoVinculacion==='freelance'&&$('#eu-participa-metas').checked;
+       }
+       const after = userSnapshot(Object.assign({},a,data)); let motivo = 'Alta manual desde Equipo';
+      if (id && sensitiveChanged(before, after)) { motivo = Orbit.ui && Orbit.ui.prompt ? await Orbit.ui.prompt('Indica el motivo del cambio de permisos, clasificación, participación o estado:', { title: 'Motivo del cambio' }) : ''; if (String(motivo || '').trim().length < 5) return inform('Indica un motivo claro de al menos 5 caracteres.', 'Motivo requerido'); }
       const advisorId = id ? canonicalAdvisorId(a, id) : nextStableId(nombre);
       if (id && !advisorId) return toast('No fue posible resolver la identidad canónica del usuario.');
       if (!id) { data.id = advisorId; data.iniciales = nombre.split(' ').map(x => x[0]).slice(0, 2).join('').toUpperCase(); data.comModo = 'comision'; data.shareCom = 50; data.accessProvisioned = false; data.invitacionEstado = 'pendiente_habilitacion'; data.createdAt = new Date().toISOString(); }
@@ -744,7 +785,8 @@ Orbit.modules.equipo = (function () {
           else { if (typeof st.insertDurable !== 'function') throw new Error('PRODUCT_TEAM_DURABLE_INSERT_MISSING'); await st.insertDurable('asesores', data); }
           await canonicalAdvisorReadback(advisorId, data);
         } else { throw new Error('PRODUCT_TEAM_SERVER_WRITE_REQUIRED'); }
-        await audit(id ? 'editar_usuario' : 'crear_usuario', id ? (motivo || 'Actualización de datos de contacto') : motivo, id ? before : null, userSnapshot(data));
+        await audit(id ? 'editar_usuario' : 'crear_usuario', id ? (motivo || 'Actualización de datos de contacto') : motivo, id ? before : null, userSnapshot(Object.assign({},a,data)));
+        if(Orbit.assignableAdvisorRoster&&typeof Orbit.assignableAdvisorRoster.invalidate==='function') Orbit.assignableAdvisorRoster.invalidate();
         document.dispatchEvent(new CustomEvent('orbit:equipo:save-committed', { detail: { advisorId, created: !id, syncRequested: !!back.querySelector('#eu-sync-access')?.checked } }));
         toast(id ? '✓ Usuario actualizado y confirmado' : '✓ Usuario creado y confirmado');
         dirty = false; close(true); render(document.getElementById('host') || document.getElementById('mod-host'));
