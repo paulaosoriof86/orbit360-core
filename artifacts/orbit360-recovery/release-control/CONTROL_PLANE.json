@@ -16932,5 +16932,25 @@
     "authIamRulesChangeAuthorized": false,
     "realBusinessWritesAuthorized": false,
     "productionPromotionAuthorized": false
+  },
+  "b4003InsurerReaderRevisionIdentitySuccessor20261030": {
+    "schema": "GRAVICENTRA_I65_B4003_INSURER_REVISION_IDENTITY_POINTER_V1",
+    "status": "BOUNDED_REVISION_IDENTITY_COMPATIBILITY_DIAGNOSTIC_RESUME_AUTHORIZED",
+    "gate": "I6.5/B4-003",
+    "parentHead": "850b156f7c00080d933b0af8ba16837a89f76160",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_INSURER_READER_REVISION_IDENTITY_SUCCESSOR_20261030.json",
+    "receiptBlobSha": "51447fb7218480832b0b61d619440dea8939d461",
+    "atomicCommitPaths": [
+      "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json",
+      "artifacts/orbit360-recovery/release-control/I6_5_B4_003_INSURER_READER_REVISION_IDENTITY_SUCCESSOR_20261030.json",
+      "tools/gravicentra-b4-003-insurer-preview-resume.mjs",
+      "tools/gravicentra-b4-003-insurer-preview-resume.test.mjs",
+      "tools/gravicentra-b4-003-insurer-reader-env-repair.cjs",
+      "tools/gravicentra-b4-003-insurer-reader-env-repair.test.cjs"
+    ],
+    "existingRestorationScopeUnchanged": true,
+    "backendCodeRedeployAuthorized": false,
+    "hostingRebuildAuthorized": false,
+    "authIamRulesChangeAuthorized": false
   }
 }

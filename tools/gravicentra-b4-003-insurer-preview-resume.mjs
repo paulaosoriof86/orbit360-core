@@ -52,6 +52,7 @@ const tree=ref=>Object.fromEntries(lines(git('ls-tree','-r',ref)).map(l=>{const 
 const product=p=>!['.github/workflows/gravicentra-','.github/i6-ephemeral/','tools/gravicentra-',D,'artifacts/orbit360-recovery/project-sources-v2/'].some(prefix=>p.startsWith(prefix));
 
 export function collectInsurerPreviewResumeModel(){
+  if(json(k.control)[identityContract.key]||fs.existsSync(identityContract.receipt))return collectIdentityModel();
   const control=json(k.control),receipt=json(k.receipt),composition=json(k.composition),parentTree=tree(k.parent);
   const parentControl=JSON.parse(git('show',k.parent+':'+k.control)),head=git('rev-parse','HEAD');
   const sourceCommit=lines(git('log','--all','--format=%H','--',k.receipt)).find(c=>git('rev-parse',c+':'+k.receipt)===hash(k.receipt))||null;
@@ -78,6 +79,7 @@ export function collectInsurerPreviewResumeModel(){
 }
 
 export function validateInsurerPreviewResumeModel(m){
+  if(m.kind==='INSURER_REVISION_IDENTITY_SUCCESSOR'||m.control?.[identityContract.key])return validateIdentityModel(m);
   const C=m.control,B=m.parentControl,SC=m.sourceControl,R=m.receipt,S=C[k.key];
   need(m.parentVerified&&m.parentTree[k.guard]===k.parentGuardBlob&&m.parentTree[k.control]===k.parentControlBlob,
     'EXACT_FAILED_TRANSPORT_PARENT_REQUIRED');
@@ -220,7 +222,8 @@ function frozenParentGuard(){
   }finally{if(added)execFileSync('git',['worktree','remove','--force',dir],{stdio:'pipe'});else fs.rmSync(dir,{recursive:true,force:true});}
 }
 export function runInsurerPreviewResumeGuard(){
-  const C=json(k.control);if(!C[k.key]&&!fs.existsSync(k.receipt))return false;
+  const C=json(k.control);
+  if(C[identityContract.key]||fs.existsSync(identityContract.receipt))return runIdentityGuard();if(!C[k.key]&&!fs.existsSync(k.receipt))return false;
   need(C[k.key]&&fs.existsSync(k.receipt),'POINTER_OR_RECEIPT_MISSING');
   const mode=(process.argv.find(v=>v.startsWith('--mode='))||'--mode=governance').slice(7);
   need(['governance','governance:1','i6'].includes(mode),'MODE_INVALID');
@@ -231,5 +234,140 @@ export function runInsurerPreviewResumeGuard(){
   validateInsurerPreviewResumeModel(collectInsurerPreviewResumeModel());
   console.log('B4_003_INSURER_RESUME_CURRENT='+JSON.stringify(result));
   console.log('B4_003_INSURER_ACTIVITY_STATUS='+(m.evidence?.status||k.status));
+  console.log('GRAVICENTRA_I6_CONTROL_PLANE_GUARD=PASS');console.log('PRODUCT_SOURCE_DRIFT=false');return true;
+}
+
+// A separate, exact six-file successor for the failed identity read. The
+// original restoration recipe, original Guard and every product byte remain
+// immutable. A short service field is not claimed as the observed root cause.
+export const identityContract=Object.freeze({
+  parent:'850b156f7c00080d933b0af8ba16837a89f76160',
+  parentControlBlob:'02261fe4112dcbd6f28122e5ef665ee5473f8b61',
+  guardBlob:'82ccd4e27aa7137ee299799c10885447a6905d8f',
+  previousReceiptBlob:'2736c017137490b0a0f6af1f6e4ca16f46b0c6ed',
+  key:'b4003InsurerReaderRevisionIdentitySuccessor20261030',
+  receipt:D+'I6_5_B4_003_INSURER_READER_REVISION_IDENTITY_SUCCESSOR_20261030.json',
+  status:'BOUNDED_REVISION_IDENTITY_COMPATIBILITY_DIAGNOSTIC_RESUME_AUTHORIZED',
+  failedRecoveryRunId:41152465200,
+  failureReportSha256:'4d8b10abac2c12b0fec1725d8baf29ad0eaaabe5c4e939bbc9121f6fe5bb867b'
+});
+export const identityAtomicPaths=[k.control,identityContract.receipt,k.validator,k.test,k.repair,k.repairTest].sort();
+
+function collectIdentityModel(){
+  const n=identityContract,C=json(k.control),R=json(n.receipt),P=tree(n.parent),head=git('rev-parse','HEAD');
+  const sourceCommit=lines(git('log','--all','--format=%H','--',n.receipt)).find(c=>git('rev-parse',c+':'+n.receipt)===hash(n.receipt))||null;
+  const untracked=lines(git('ls-files','--others','--exclude-standard'));
+  const deltaPaths=sorted([...new Set([...lines(git('diff','--name-only',n.parent)),...untracked])]);
+  const composition=json(k.composition),productPaths=sorted([...new Set([...lines(git('diff','--name-only',composition.certifiedBaseline)),...untracked])].filter(product));
+  const all=[...new Set([...deltaPaths,...productPaths,k.guard,k.workflow,k.receipt,k.composition,k.sourceReceipt])];
+  const currentBlobs=Object.fromEntries(all.map(p=>[p,fs.existsSync(p)&&fs.lstatSync(p).isFile()&&!fs.lstatSync(p).isSymbolicLink()?hash(p):'ABSENT_OR_NONREGULAR']));
+  const evidence=fs.existsSync(k.evidencePath)?json(k.evidencePath):null;
+  const evidenceCommit=evidence?lines(git('log','--all','--format=%H','--',k.evidencePath)).find(c=>git('rev-parse',c+':'+k.evidencePath)===hash(k.evidencePath))||null:null;
+  const transportRef=evidence?.transportSha||(head!==n.parent&&head!==sourceCommit?head:null);
+  return {kind:'INSURER_REVISION_IDENTITY_SUCCESSOR',control:C,receipt:R,previousReceipt:json(k.receipt),
+    authorityReceiptPath:n.receipt,authorityReceiptBlobSha:currentBlobs[n.receipt],parentTree:P,
+    parentControl:JSON.parse(git('show',n.parent+':'+k.control)),sourceControl:sourceCommit?JSON.parse(git('show',sourceCommit+':'+k.control)):C,
+    composition,head,sourceCommit,currentBlobs,productPaths,deltaPaths,untracked,parentVerified:git('merge-base',n.parent,head)===n.parent,
+    sourceParent:sourceCommit?git('rev-parse',sourceCommit+'^'):null,sourceAncestor:sourceCommit?git('merge-base',sourceCommit,head)===sourceCommit:false,
+    sourceTree:sourceCommit?tree(sourceCommit):null,sourceDelta:sourceCommit?sorted(lines(git('diff','--name-only',n.parent,sourceCommit))):deltaPaths,
+    transport:transportRef?{sha:transportRef,parent:git('rev-parse',transportRef+'^'),message:git('show','-s','--format=%s',transportRef),
+      paths:sorted(lines(git('diff','--name-only',transportRef+'^',transportRef))),workflowBlob:git('rev-parse',transportRef+':'+k.workflow)}:null,
+    evidence,evidenceCommit,evidenceParent:evidenceCommit?git('rev-parse',evidenceCommit+'^'):null,
+    evidenceDelta:evidenceCommit?sorted(lines(git('diff','--name-only',evidenceCommit+'^',evidenceCommit))):null};
+}
+
+function validateIdentityModel(m){
+  const n=identityContract,C=m.control,B=m.parentControl,SC=m.sourceControl,R=m.receipt,S=C[n.key];
+  need(m.kind==='INSURER_REVISION_IDENTITY_SUCCESSOR'&&m.parentVerified&&m.parentTree[k.control]===n.parentControlBlob&&
+    m.currentBlobs[k.guard]===n.guardBlob&&m.parentTree[k.guard]===n.guardBlob,'IDENTITY_EXACT_PARENT_AND_FROZEN_GUARD_REQUIRED');
+  const extras=m.evidence?[n.key,k.evidenceKey].sort():[n.key];
+  need(Object.keys(B).length===421&&Object.keys(SC).length===422&&Object.keys(C).length===421+extras.length&&
+    Object.keys(B).every(p=>same(C[p],B[p])&&same(SC[p],B[p]))&&
+    same(sorted(Object.keys(C).filter(p=>!(p in B))),extras)&&same(S,SC[n.key]),'IDENTITY_PRIOR_CONTROL_OR_KEYS_CHANGED');
+  need(S?.schema==='GRAVICENTRA_I65_B4003_INSURER_REVISION_IDENTITY_POINTER_V1'&&S.status===n.status&&S.gate==='I6.5/B4-003'&&
+    S.parentHead===n.parent&&S.receiptPath===n.receipt&&S.receiptBlobSha===m.currentBlobs[n.receipt]&&
+    m.authorityReceiptPath===n.receipt&&m.authorityReceiptBlobSha===S.receiptBlobSha&&
+    same(S.atomicCommitPaths,identityAtomicPaths)&&S.existingRestorationScopeUnchanged===true&&
+    S.backendCodeRedeployAuthorized===false&&S.hostingRebuildAuthorized===false&&S.authIamRulesChangeAuthorized===false,
+    'IDENTITY_CURRENT_AUTHORITY_POINTER_INVALID');
+  need(R.schema==='GRAVICENTRA_I65_B4003_INSURER_READER_REVISION_IDENTITY_SUCCESSOR_V1'&&R.status===n.status&&R.gate===S.gate&&
+    R.parentHead===n.parent&&R.repository===C.repository&&R.branch===C.branch&&R.sourceSha===k.source&&
+    R.sourceGuardRunId===k.sourceGuardRunId&&R.initialTransportSha===k.parent&&R.initialRunId===k.initialRunId&&
+    R.failedRecoveryTransportSha===n.parent&&R.failedRecoveryRunId===n.failedRecoveryRunId&&same(R.atomicCommitPaths,identityAtomicPaths),
+    'IDENTITY_RECEIPT_INVALID');
+  const F=R.failedRecovery;
+  need(F?.error==='REVISION_IDENTITY_MISMATCH'&&F.patchRequests===0&&F.patchAttempted===false&&
+    F.failureReportSha256===n.failureReportSha256&&F.observedFailingIdentityFieldKnown===false&&
+    F.shortServiceRepresentationConfirmed===false&&F.originalRunReclassifiedAsSuccess===false,
+    'IDENTITY_FAILED_READ_MISREPRESENTED');
+  need(m.currentBlobs[k.receipt]===n.previousReceiptBlob&&R.previousRecoveryReceipt?.path===k.receipt&&
+    R.previousRecoveryReceipt.blobSha===n.previousReceiptBlob&&
+    same(R.environmentRestore,m.previousReceipt.environmentRestore)&&same(R.artifacts,k.artifacts)&&
+    R.rebuildForbidden===true&&R.redeployBackendCodeForbidden===true,'IDENTITY_PREVIOUS_RECIPE_OR_SCOPE_CHANGED');
+  need(m.currentBlobs[k.composition]===k.compositionBlob&&m.currentBlobs[k.sourceReceipt]===k.sourceReceiptBlob&&
+    m.productPaths.length===118&&same(m.productPaths,m.composition.productFiles)&&
+    m.composition.rows.every(r=>m.currentBlobs[r.path]===r.currentBlob&&m.parentTree[r.path]===r.currentBlob),
+    'IDENTITY_PRODUCT_COMPOSITION_CHANGED');
+  for(const [name,p] of [['validator',k.validator],['test',k.test],['repair',k.repair],['repairTest',k.repairTest]]){
+    const v=R.governanceSources?.[name];need(v?.path===p&&v.beforeBlobSha===m.parentTree[p]&&
+      v.blobSha===m.currentBlobs[p]&&sha(v.blobSha)&&v.blobSha!==v.beforeBlobSha,'IDENTITY_CURRENT_TOOL_BINDING_INVALID:'+name);
+  }
+  const Q=R.identityCompatibility;
+  need(Q?.completeRevisionNameStillExact===true&&Q.onlyExactParentServiceShortNameAdded===true&&
+    Q.alreadyPinnedProjectNumberAliasUnchanged===true&&Q.absentNullForeignServiceRejected===true&&
+    Q.identityDiagnosticBeforeValidation===true&&Q.environmentValuesExported===false&&
+    Q.networkEndpointsChanged===false&&Q.hashesMasksAndTargetsUnchanged===true,'IDENTITY_COMPATIBILITY_SCOPE_EXPANDED');
+  const P=R.previewTransport;
+  need(P?.workflowPath===k.workflow&&sha(P.transportWorkflowAfterBlob)&&P.sourceSha===k.source&&
+    P.reuseExistingChannel===true&&P.hostingChannelId==='gi-i65-b4-sr-41066435386'&&
+    P.expectedPreviewUrl==='https://ays-orbit-360-lab--gi-i65-b4-sr-41066435386-r09pl1ti.web.app'&&
+    P.rebuild===false&&P.backendCodeDeploy===false&&P.exactArtifactDigestsRequired===true,'IDENTITY_TRANSPORT_INVALID');
+  need(['liveDeployment','authIamRulesChange','membershipChange','realBusinessWrites','dataImport','cleanup','newEndpoints',
+    'newWorkflows','newCollections','findingClosed','b4003Closed','paulaVisualAccepted','productionAccepted']
+    .every(p=>R.boundaries?.[p]===false),'IDENTITY_BOUNDARIES_EXPANDED');
+  need(R.allowedEvidenceSuccessor?.controlKey===k.evidenceKey&&R.allowedEvidenceSuccessor.receiptPath===k.evidencePath&&
+    same(R.allowedEvidenceSuccessor.exactChangedPaths,[k.control,k.evidencePath].sort())&&
+    R.allowedEvidenceSuccessor.priorKeysPreserved===422&&R.allowedEvidenceSuccessor.directChildOfRecoveryTransport===true,
+    'IDENTITY_EVIDENCE_SUCCESSOR_INVALID');
+  if(m.sourceCommit){
+    need(m.sourceParent===n.parent&&m.sourceAncestor&&same(m.sourceDelta,identityAtomicPaths),'IDENTITY_ATOMIC_SOURCE_INVALID');
+    need(identityAtomicPaths.filter(p=>!m.evidence||p!==k.control).every(p=>m.currentBlobs[p]===m.sourceTree[p]),'IDENTITY_CURRENT_BYTES_CHANGED');
+    if(m.transport){
+      need(m.transport.parent===m.sourceCommit&&m.transport.message===k.transportMessage&&same(m.transport.paths,[k.workflow])&&
+        m.transport.workflowBlob===P.transportWorkflowAfterBlob&&m.currentBlobs[k.workflow]===P.transportWorkflowAfterBlob&&
+        same(m.deltaPaths,sorted([...identityAtomicPaths,k.workflow,...(m.evidence?[k.evidencePath]:[])])),
+        'IDENTITY_EXACT_TRANSPORT_REQUIRED');
+      if(m.evidence){
+        need(m.evidence.failedRecoveryTransportSha===n.parent&&m.evidence.failedRecoveryRunId===n.failedRecoveryRunId&&
+          m.control[k.evidenceKey]?.failedRecoveryTransportSha===n.parent&&
+          m.control[k.evidenceKey]?.failedRecoveryRunId===n.failedRecoveryRunId,'IDENTITY_FAILED_RECOVERY_LINEAGE_LOST');
+        validateResumeEvidence(m);
+      }else need(m.head===m.transport.sha,'IDENTITY_TRANSPORT_HEAD_INVALID');
+    }else need(m.head===m.sourceCommit&&same(m.deltaPaths,identityAtomicPaths)&&m.currentBlobs[k.workflow]===m.parentTree[k.workflow],
+      'IDENTITY_SOURCE_STATE_INVALID');
+    need(m.untracked.length===0||(m.evidence&&!m.evidenceCommit&&same(m.untracked,[k.evidencePath])),'IDENTITY_UNTRACKED_FILES');
+  }else need(m.head===n.parent&&same(m.deltaPaths,identityAtomicPaths)&&m.currentBlobs[k.workflow]===m.parentTree[k.workflow],
+    'IDENTITY_PREPUBLICATION_DELTA_NOT_EXACT');
+  return {status:'EXACT_REVISION_IDENTITY_COMPATIBILITY_VALIDATED',productFilesPreserved:118,priorKeysPreserved:421,
+    revisionShapeObservedCauseClaimed:false,backendCodeRedeploy:false,hostingRebuild:false,findingsChanged:false};
+}
+
+function runIdentityGuard(){
+  const n=identityContract,C=json(k.control);need(C[n.key]&&fs.existsSync(n.receipt),'IDENTITY_AUTHORITY_MISSING');
+  const mode=(process.argv.find(v=>v.startsWith('--mode='))||'--mode=governance').slice(7);
+  need(['governance','governance:1','i6'].includes(mode),'MODE_INVALID');
+  const m=collectIdentityModel(),result=validateIdentityModel(m);
+  const dir=fs.mkdtempSync(path.join(os.tmpdir(),'gi-insurer-identity-parent-'));let added=false;
+  try{
+    execFileSync('git',['worktree','add','--detach',dir,n.parent],{stdio:'pipe',maxBuffer:8*1024*1024});added=true;
+    const out=execFileSync(process.execPath,[k.guard],{cwd:dir,env:process.env,encoding:'utf8',maxBuffer:16*1024*1024});
+    need(out.includes('GRAVICENTRA_I6_CONTROL_PLANE_GUARD=PASS')&&out.includes('PRODUCT_SOURCE_DRIFT=false'),'IDENTITY_IMMUTABLE_PARENT_GUARD_FAILED');
+    console.log('B4_003_INSURER_IDENTITY_PARENT=EXACT_850_SOURCE_AND_ALL_PRIOR_PROOFS_PASS');
+  }finally{if(added)execFileSync('git',['worktree','remove','--force',dir],{stdio:'pipe'});else fs.rmSync(dir,{recursive:true,force:true});}
+  for(const p of [k.repairTest,k.test])execFileSync(process.execPath,p.endsWith('.mjs')?['--test',p]:[p],
+    {encoding:'utf8',stdio:'pipe',maxBuffer:8*1024*1024});
+  validateIdentityModel(collectIdentityModel());
+  console.log('B4_003_INSURER_IDENTITY_CURRENT='+JSON.stringify(result));
+  console.log('B4_003_INSURER_ACTIVITY_STATUS='+(m.evidence?.status||n.status));
   console.log('GRAVICENTRA_I6_CONTROL_PLANE_GUARD=PASS');console.log('PRODUCT_SOURCE_DRIFT=false');return true;
 }

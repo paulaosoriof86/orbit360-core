@@ -1,9 +1,65 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {collectInsurerPreviewResumeModel,validateInsurerPreviewResumeModel,
-  insurerResumeContract as k,insurerResumeAtomicPaths} from './gravicentra-b4-003-insurer-preview-resume.mjs';
+  insurerResumeContract as k,insurerResumeAtomicPaths,identityContract as n,identityAtomicPaths} from './gravicentra-b4-003-insurer-preview-resume.mjs';
 
 const valid=collectInsurerPreviewResumeModel();
+if(valid.kind==='INSURER_REVISION_IDENTITY_SUCCESSOR'){
+ const reject=(name,edit,code)=>test(name,()=>{const m=structuredClone(valid);edit(m);assert.throws(()=>validateInsurerPreviewResumeModel(m),code);});
+ test('exact six-file identity successor preserves all product and prior authority',()=>{
+  const r=validateInsurerPreviewResumeModel(valid);assert.equal(r.productFilesPreserved,118);assert.equal(r.priorKeysPreserved,421);
+ });
+ reject('current authority path must identify the new receipt',m=>{m.authorityReceiptPath=k.receipt;},/IDENTITY_CURRENT_AUTHORITY_POINTER_INVALID/);
+ reject('current authority blob must match the current Control Plane',m=>{m.authorityReceiptBlobSha='1'.repeat(40);},/IDENTITY_CURRENT_AUTHORITY_POINTER_INVALID/);
+ reject('cannot rewrite the prior restoration authorization',m=>{m.control.b4003InsurerPreviewEnvironmentRestoreResume20261030.environmentRestoreAuthorized=false;},/IDENTITY_PRIOR_CONTROL_OR_KEYS_CHANGED/);
+ reject('cannot add another unrelated control key',m=>{m.control.unbound=true;},/IDENTITY_PRIOR_CONTROL_OR_KEYS_CHANGED/);
+ reject('cannot change the already deployed product',m=>{m.currentBlobs[m.productPaths[0]]='2'.repeat(40);},/IDENTITY_PRODUCT_COMPOSITION_CHANGED/);
+ reject('the existing Guard stays physically frozen',m=>{m.currentBlobs[k.guard]='3'.repeat(40);},/IDENTITY_EXACT_PARENT_AND_FROZEN_GUARD_REQUIRED/);
+ reject('cannot broaden the original environment patch mask',m=>{m.receipt.environmentRestore.patchMask='serviceConfig';},/IDENTITY_PREVIOUS_RECIPE_OR_SCOPE_CHANGED/);
+ reject('short service is not falsely documented as the observed cause',m=>{m.receipt.failedRecovery.shortServiceRepresentationConfirmed=true;},/IDENTITY_FAILED_READ_MISREPRESENTED/);
+ reject('the failed read must preserve zero patch attempts',m=>{m.receipt.failedRecovery.patchRequests=1;},/IDENTITY_FAILED_READ_MISREPRESENTED/);
+ reject('short parent service cannot weaken full revision identity',m=>{m.receipt.identityCompatibility.completeRevisionNameStillExact=false;},/IDENTITY_COMPATIBILITY_SCOPE_EXPANDED/);
+ reject('cannot relax hashes or permitted API mask',m=>{m.receipt.identityCompatibility.hashesMasksAndTargetsUnchanged=false;},/IDENTITY_COMPATIBILITY_SCOPE_EXPANDED/);
+ reject('cannot substitute unbound helper bytes',m=>{m.receipt.governanceSources.repair.blobSha='4'.repeat(40);},/IDENTITY_CURRENT_TOOL_BINDING_INVALID/);
+ reject('cannot add a seventh source file',m=>{m.sourceDelta.push('extra.js');m.sourceDelta.sort();m.deltaPaths.push('extra.js');m.deltaPaths.sort();},/IDENTITY_ATOMIC_SOURCE_INVALID|IDENTITY_PREPUBLICATION_DELTA_NOT_EXACT|IDENTITY_EXACT_TRANSPORT_REQUIRED/);
+ reject('cannot omit the exact resumed workflow hash',m=>{m.receipt.previewTransport.transportWorkflowAfterBlob=null;},/IDENTITY_TRANSPORT_INVALID/);
+ function evidence(){
+  const m=structuredClone(valid),resume='a'.repeat(40),transport='b'.repeat(40),blob='c'.repeat(40);
+  delete m.control[k.evidenceKey];m.sourceControl=structuredClone(m.control);
+  m.sourceCommit=resume;m.sourceParent=n.parent;m.sourceAncestor=true;m.head=transport;
+  m.sourceDelta=[...identityAtomicPaths];m.sourceTree={...m.currentBlobs};m.untracked=[k.evidencePath];
+  m.evidenceCommit=null;m.evidenceParent=null;m.evidenceDelta=null;
+  m.currentBlobs[k.workflow]=m.receipt.previewTransport.transportWorkflowAfterBlob;
+  m.transport={sha:transport,parent:resume,message:k.transportMessage,paths:[k.workflow],workflowBlob:m.currentBlobs[k.workflow]};
+  m.deltaPaths=[...identityAtomicPaths,k.workflow,k.evidencePath].sort();m.currentBlobs[k.evidencePath]=blob;
+  const buildId='gi-i65-b4-'+k.source.slice(0,12)+'-57f234755dc1';
+  const E=m.evidence={schema:'GRAVICENTRA_I65_B4003_INSURER_ACTIVITY_PREVIEW_EVIDENCE_V1',status:'TECHNICAL_PREVIEW_PASS_AUTHENTICATED_AUDIT_PASS',
+   gate:'I6.5/B4-003',sourceSha:k.source,sourceGuardRunId:k.sourceGuardRunId,initialTransportSha:k.parent,initialRunId:k.initialRunId,
+   failedRecoveryTransportSha:n.parent,failedRecoveryRunId:n.failedRecoveryRunId,transportSha:transport,parentHead:transport,transportRunId:102,
+   recoverySourceSha:resume,recoveryGuardRunId:101,recoveryTransportSha:transport,recoveryRunId:102,previewUrl:m.receipt.previewTransport.expectedPreviewUrl,buildId,
+   technical:{status:'PASS',newFunctionsCreated:0,backendCodeRedeployed:false,hostingRebuilt:false,backendExactSourceReadback:true,hostingBytesExact:true,
+    liveIdentityUnchanged:true,iamUnchanged:true,recoveryEnvironmentRestored:true,recoveredEnvironmentSha256:k.baselineEnvironmentSha256,
+    initialBackendSourceUnchanged:true,recoveredReaderRevision:'orbit360scopedpolicyreadpreview-00068-test',targetFunctions:[
+      {name:'orbit360ProductOperationalCommandPreview',region:'us-east1'},{name:'orbit360ScopedPolicyReadPreview',region:'us-east1'}]},
+   authenticatedUat:{status:'PASS',fixtureId:'b4003qa_human_insurer_r20',actor:'Carlos Castro',role:'Operativo',country:'GT',buildId,
+    syntheticWrites:2,restored:true,priorActivityRetained:true,newAuditRowsAfterReload:2,observationsRestoredExactly:true,
+    otherVisibleFieldsCompared:12,otherVisibleFieldsUnchanged:true,auditRows:['edit','restore'].map((phase,i)=>({phase,visibleActor:'Carlos Castro',
+     visibleRole:'operativo',reason:'QA reason '+phase,matchesSubmittedReason:true,changedFields:['observaciones'],rowDigestSha256:String(i+1).repeat(64),dateTimeText:'30/10/2026, 18:50:00'}))},
+   boundaries:Object.fromEntries(['liveDeployment','authIamRulesChange','membershipChange','realBusinessWrites','dataImport','cleanup','findingClosed',
+    'b4003Closed','paulaVisualAccepted','productionAccepted'].map(p=>[p,false]))};
+  m.control[k.evidenceKey]={schema:'GRAVICENTRA_I65_B4003_INSURER_ACTIVITY_EVIDENCE_POINTER_V1',status:E.status,gate:E.gate,
+   receiptPath:k.evidencePath,receiptBlobSha:blob,sourceSha:E.sourceSha,transportSha:E.transportSha,sourceGuardRunId:E.sourceGuardRunId,
+   transportRunId:E.transportRunId,previewUrl:E.previewUrl,buildId,currentCapabilityAcceptances:0,recoverySourceSha:E.recoverySourceSha,
+   recoveryGuardRunId:E.recoveryGuardRunId,recoveryTransportSha:E.recoveryTransportSha,recoveryRunId:E.recoveryRunId,
+   failedRecoveryTransportSha:n.parent,failedRecoveryRunId:n.failedRecoveryRunId};
+  return m;
+ }
+ test('final evidence preserves original source and both failed transports',()=>{assert.equal(validateInsurerPreviewResumeModel(evidence()).findingsChanged,false);});
+ test('final evidence cannot omit the failed identity read',()=>{const m=evidence();delete m.evidence.failedRecoveryRunId;assert.throws(()=>validateInsurerPreviewResumeModel(m),/IDENTITY_FAILED_RECOVERY_LINEAGE_LOST/);});
+ test('final evidence cannot replace the original product source',()=>{const m=evidence();m.evidence.sourceSha='d'.repeat(40);assert.throws(()=>validateInsurerPreviewResumeModel(m),/EVIDENCE_IDENTITY_INVALID/);});
+ test('final evidence still requires exact restoration of observations',()=>{const m=evidence();m.evidence.authenticatedUat.observationsRestoredExactly=false;assert.throws(()=>validateInsurerPreviewResumeModel(m),/AUTHENTICATED_AUDIT_PASS_INCOMPLETE/);});
+ test('final evidence cannot hide a source redeployment',()=>{const m=evidence();m.evidence.technical.backendCodeRedeployed=true;assert.throws(()=>validateInsurerPreviewResumeModel(m),/EVIDENCE_TARGETS_INVALID/);});
+}else{
 const reject=(name,edit,code)=>test(name,()=>{const m=structuredClone(valid);edit(m);assert.throws(()=>validateInsurerPreviewResumeModel(m),code);});
 test('exact governance-only repair preserves the complete deployed product',()=>{
   const r=validateInsurerPreviewResumeModel(valid);assert.equal(r.productFilesPreserved,118);
@@ -93,3 +149,5 @@ test('failed recovery can be recorded without false acceptance',()=>{
   m.evidence.technical.status='FAILED';m.evidence.authenticatedUat={status:'NOT_RUN'};
   assert.equal(validateInsurerPreviewResumeModel(m).findingsChanged,false);
 });
+
+}

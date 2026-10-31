@@ -1,0 +1,166 @@
+{
+  "schema": "GRAVICENTRA_I65_B4003_INSURER_READER_REVISION_IDENTITY_SUCCESSOR_V1",
+  "status": "BOUNDED_REVISION_IDENTITY_COMPATIBILITY_DIAGNOSTIC_RESUME_AUTHORIZED",
+  "gate": "I6.5/B4-003",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "parentHead": "850b156f7c00080d933b0af8ba16837a89f76160",
+  "sourceSha": "bcb54435788e1ace50325f347d1d9c0ee4a222e5",
+  "sourceGuardRunId": 41150390700,
+  "initialTransportSha": "7b1c13c507aba0787ee385483c7256033043af44",
+  "initialRunId": 41150545623,
+  "failedRecoveryTransportSha": "850b156f7c00080d933b0af8ba16837a89f76160",
+  "failedRecoveryRunId": 41152465200,
+  "recordedAtUtc": "2026-10-31T00:59:09.644091+00:00",
+  "authority": "CONTINUE_ONLY_EXISTING_READER_ENV_RESTORATION_AND_SAME_IMMUTABLE_HOSTING_ARTIFACT_WITH_BOUNDED_IDENTITY_COMPATIBILITY",
+  "atomicCommitPaths": [
+    "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json",
+    "artifacts/orbit360-recovery/release-control/I6_5_B4_003_INSURER_READER_REVISION_IDENTITY_SUCCESSOR_20261030.json",
+    "tools/gravicentra-b4-003-insurer-preview-resume.mjs",
+    "tools/gravicentra-b4-003-insurer-preview-resume.test.mjs",
+    "tools/gravicentra-b4-003-insurer-reader-env-repair.cjs",
+    "tools/gravicentra-b4-003-insurer-reader-env-repair.test.cjs"
+  ],
+  "failedRecovery": {
+    "error": "REVISION_IDENTITY_MISMATCH",
+    "patchRequests": 0,
+    "patchAttempted": false,
+    "failureReportSha256": "4d8b10abac2c12b0fec1725d8baf29ad0eaaabe5c4e939bbc9121f6fe5bb867b",
+    "artifactId": 13023428313,
+    "artifactDigest": "sha256:e277d595d2041c2cc10e402d4aeddd3cd1bddb543fcd03ba2ec942eaf0f2af6e",
+    "observedFailingIdentityFieldKnown": false,
+    "shortServiceRepresentationConfirmed": false,
+    "originalRunReclassifiedAsSuccess": false,
+    "observation": "The first exact Cloud Run revision identity read was rejected before any PATCH. Returned identity fields were not recorded by that version; the failing field remains unknown."
+  },
+  "previousRecoveryReceipt": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_INSURER_PREVIEW_ENV_RESTORE_AND_HOSTING_RESUME_20261030.json",
+    "blobSha": "2736c017137490b0a0f6af1f6e4ca16f46b0c6ed"
+  },
+  "environmentRestore": {
+    "project": "ays-orbit-360-lab",
+    "region": "us-east1",
+    "function": "orbit360ScopedPolicyReadPreview",
+    "baselineRevision": "orbit360scopedpolicyreadpreview-00066-rur",
+    "expectedCurrentRevision": "orbit360scopedpolicyreadpreview-00067-pib",
+    "baselineEnvironmentSha256": "1e10a234c2e389484714e5f55f394f0ec816d146180dbcee1e34dfae4cce069b",
+    "observedEnvironmentSha256": "36ca53029bfbf51b6b7053a22426acc64622dcc4b3bdb1b72b50620b2d9641e6",
+    "expectedCodeHash": "dc40ebe72b3ea545313ff3771b9d6dae71b11c5b",
+    "sourceGeneration": "1793406873066093",
+    "patchMask": "serviceConfig.environmentVariables",
+    "recoverMapFromExactHistoricalRevision": true,
+    "exactBaselineMapHashRequiredBeforePatch": true,
+    "codeStorageAndImageMustRemainUnchanged": true,
+    "onlyExistingReaderEnvironmentRestore": true,
+    "exportEnvironmentValues": false,
+    "iamPolicyMutation": false,
+    "idempotentAlreadyRestoredReadback": true,
+    "newSourceDeploy": false
+  },
+  "artifacts": {
+    "hosting": {
+      "id": 13023285501,
+      "digest": "sha256:6f9ecc3e254be0cefcb86964e00ce74b3abd54223a8774e87bdcfd2cede4b2ba"
+    },
+    "backend": {
+      "id": 13023370282,
+      "digest": "sha256:97e730f44d6a4045b9d75f76c435dc97845505889699b44bcabbe5d6c3e87c7c"
+    },
+    "snapshots": {
+      "id": 13023550013,
+      "digest": "sha256:df0deeb1363e2182d81045da821970e500d5fb0cad0207f7b26ac05d93101325"
+    }
+  },
+  "rebuildForbidden": true,
+  "redeployBackendCodeForbidden": true,
+  "governanceSources": {
+    "validator": {
+      "path": "tools/gravicentra-b4-003-insurer-preview-resume.mjs",
+      "beforeBlobSha": "60bf9cf639cab9136c0f867235b75b2e1b43d73a",
+      "blobSha": "75af7eb7f024833b79d97adbe1e7d7ef7d0b5814"
+    },
+    "test": {
+      "path": "tools/gravicentra-b4-003-insurer-preview-resume.test.mjs",
+      "beforeBlobSha": "4e2294a146e4cae7f3ec60e64275737b957a8288",
+      "blobSha": "f69122701da726be3bdd55fd9baef9b5eb067890"
+    },
+    "repair": {
+      "path": "tools/gravicentra-b4-003-insurer-reader-env-repair.cjs",
+      "beforeBlobSha": "ddf25e0ddc649db690ce97a0722f02c2a9735eac",
+      "blobSha": "e9f529373fe0ccf1ff1f4f24ec9a3dac87cc74d2"
+    },
+    "repairTest": {
+      "path": "tools/gravicentra-b4-003-insurer-reader-env-repair.test.cjs",
+      "beforeBlobSha": "b680320d1233da2b569986cca74472face8fa6f7",
+      "blobSha": "a882681f6be5f952eecfd785201190f851cfd530"
+    }
+  },
+  "identityCompatibility": {
+    "completeRevisionNameStillExact": true,
+    "onlyExactParentServiceShortNameAdded": true,
+    "alreadyPinnedProjectNumberAliasUnchanged": true,
+    "absentNullForeignServiceRejected": true,
+    "identityDiagnosticBeforeValidation": true,
+    "environmentValuesExported": false,
+    "networkEndpointsChanged": false,
+    "hashesMasksAndTargetsUnchanged": true,
+    "knownCompatibilityHypothesis": "Revision.service may be represented by the exact short parent service name while Revision.name still proves the full expected resource; this is not asserted as the observed failure cause."
+  },
+  "regression": {
+    "currentGuardDiscriminants": 20,
+    "helperTests": 48,
+    "originalHelperCasesPreserved": 30,
+    "addedHelperCases": 18,
+    "syntheticOnly": true,
+    "externalRequests": 0
+  },
+  "previewTransport": {
+    "workflowPath": ".github/workflows/gravicentra-b4-003-cumulative-safe-read-preview-20261029.yml",
+    "transportWorkflowAfterBlob": "246350161e93d7389e46e26c7264670c329f41f7",
+    "hostingChannelId": "gi-i65-b4-sr-41066435386",
+    "expectedPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b4-sr-41066435386-r09pl1ti.web.app",
+    "reuseExistingChannel": true,
+    "sourceSha": "bcb54435788e1ace50325f347d1d9c0ee4a222e5",
+    "rebuild": false,
+    "backendCodeDeploy": false,
+    "exactArtifactDigestsRequired": true
+  },
+  "allowedEvidenceSuccessor": {
+    "controlKey": "b4003InsurerActivityPreviewEvidence20261030",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_INSURER_ACTIVITY_PREVIEW_EVIDENCE_20261030.json",
+    "exactChangedPaths": [
+      "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json",
+      "artifacts/orbit360-recovery/release-control/I6_5_B4_003_INSURER_ACTIVITY_PREVIEW_EVIDENCE_20261030.json"
+    ],
+    "directChildOfRecoveryTransport": true,
+    "priorKeysPreserved": 422,
+    "failedInitialAndRecoveryRunsPreserved": true
+  },
+  "boundaries": {
+    "liveDeployment": false,
+    "authIamRulesChange": false,
+    "membershipChange": false,
+    "realBusinessWrites": false,
+    "dataImport": false,
+    "cleanup": false,
+    "newEndpoints": false,
+    "newWorkflows": false,
+    "newCollections": false,
+    "findingClosed": false,
+    "b4003Closed": false,
+    "paulaVisualAccepted": false,
+    "productionAccepted": false
+  },
+  "preserved": {
+    "priorControlKeys": 421,
+    "currentProductFiles": 118,
+    "findings": 295,
+    "metasFunctionalClosure": true,
+    "existingGuardBlobSha": "82ccd4e27aa7137ee299799c10885447a6905d8f",
+    "previousRecoveryReceiptUnchanged": true,
+    "sourceReceiptUnchanged": true,
+    "compositionUnchanged": true,
+    "ownerRiskExceptionUnchanged": true,
+    "priorProofsRunOnImmutable850Parent": true
+  }
+}

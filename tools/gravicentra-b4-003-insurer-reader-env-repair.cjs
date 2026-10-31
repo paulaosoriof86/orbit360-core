@@ -1,6 +1,9 @@
 'use strict';
 // One existing LAB reader only. No source deployment, IAM/Auth/Rules change,
 // Secret Manager call, function invocation or business-data operation.
+// Run 41152465200 stopped before PATCH without recording the returned revision
+// identity. A short Revision.service is an interoperability hypothesis, not a
+// diagnosed runtime cause; the next read records bounded identity diagnostics.
 // Primary API contracts:
 // https://docs.cloud.google.com/functions/docs/reference/rest/v2/projects.locations.functions/patch
 // https://docs.cloud.google.com/run/docs/reference/rest/v2/projects.locations.services.revisions/get
@@ -9,6 +12,7 @@ const fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypt
 const PROJECT='ays-orbit-360-lab',REGION='us-east1',TARGET='orbit360ScopedPolicyReadPreview';
 const NAME=`projects/${PROJECT}/locations/${REGION}/functions/${TARGET}`;
 const SERVICE=`projects/${PROJECT}/locations/${REGION}/services/orbit360scopedpolicyreadpreview`;
+const SERVICE_SHORT_NAME='orbit360scopedpolicyreadpreview';
 const FUNCTION_URL='https://cloudfunctions.googleapis.com/v2/'+NAME;
 const MASK='serviceConfig.environmentVariables';
 const PIN=Object.freeze({
@@ -60,11 +64,36 @@ function validateFunction(f,pair,pin=PIN){
  requireThat(hash(svc.secretEnvironmentVariables||[])===expected.secretEnvironmentVariablesSha256,'CURRENT_SECRET_REFERENCES_CHANGED');
  strictMap(svc.environmentVariables||{});
 }
-function revisionData(revision,shortName){
- requireThat(/^orbit360scopedpolicyreadpreview-[a-z0-9-]+$/.test(shortName),'REVISION_NAME_INVALID');
- // GCP resource names may use the project ID or its already pinned number.
+function identityField(value){
+ const type=value===null?'null':Array.isArray(value)?'array':typeof value;
+ if(type!=='string')return {type,present:value!==undefined};
+ const diagnostic={type,length:value.length,sha256:hash(value)};
+ // Only resource-name-shaped strings may leave memory. Malformed responses,
+ // arbitrary error text and objects are represented by type/length/digest only.
+ const resource=/^projects\/[a-z0-9-]{1,63}\/locations\/[a-z0-9-]{1,63}\/services\/[a-z0-9-]{1,63}(?:\/revisions\/[a-z0-9-]{1,63})?$/;
+ if(resource.test(value)){diagnostic.format='RESOURCE_NAME';diagnostic.value=value;}
+ else if(/^[a-z][a-z0-9-]{0,62}$/.test(value)){diagnostic.format='SHORT_NAME';diagnostic.value=value;}
+ else diagnostic.format='UNRECOGNIZED_REDACTED';
+ return diagnostic;
+}
+function revisionIdentity(revision,shortName){
+ // The GET URI and returned Revision.name retain the complete pinned resource
+ // identity. Only its already-known project-number alias is normalized.
  const canonical=value=>typeof value==='string'?value.replace(/^projects\/646761409743\//,'projects/'+PROJECT+'/'):value;
- requireThat(canonical(revision?.name)===SERVICE+'/revisions/'+shortName&&canonical(revision.service)===SERVICE&&!revision.deleteTime,'REVISION_IDENTITY_MISMATCH');
+ const requestedResourceName=SERVICE+'/revisions/'+shortName;
+ return {requestedResourceName,expectedServiceResourceName:SERVICE,expectedServiceShortName:SERVICE_SHORT_NAME,
+  observedName:identityField(revision?.name),observedService:identityField(revision?.service),
+  nameMatchesExactResource:canonical(revision?.name)===requestedResourceName,
+  serviceMatchesExactResource:canonical(revision?.service)===SERVICE,
+  serviceMatchesExactShortName:revision?.service===SERVICE_SHORT_NAME,
+  deleteTimePresent:revision?.deleteTime!==undefined,deleteTimePopulated:Boolean(revision?.deleteTime)};
+}
+function revisionData(revision,shortName,recordIdentity=()=>{}){
+ requireThat(/^orbit360scopedpolicyreadpreview-[a-z0-9-]+$/.test(shortName),'REVISION_NAME_INVALID');
+ const identity=revisionIdentity(revision,shortName);recordIdentity(identity);
+ // Revision.service is the parent service name. Accept its exact short name as
+ // well as the full resource name, but never relax the complete Revision.name.
+ requireThat(identity.nameMatchesExactResource&&(identity.serviceMatchesExactResource||identity.serviceMatchesExactShortName)&&!identity.deleteTimePopulated,'REVISION_IDENTITY_MISMATCH');
  requireThat(Array.isArray(revision.containers)&&revision.containers.length===1,'REVISION_CONTAINER_CARDINALITY');
  const container=revision.containers[0],entries=container.env||[],names=new Set(),map={};
  requireThat(Array.isArray(entries)&&entries.length<=128&&typeof container.image==='string'&&container.image.length>0,'REVISION_CONTAINER_INVALID');
@@ -105,13 +134,14 @@ async function repair({client,before,after,pin=PIN,persist=()=>{},wait=ms=>new P
  const getFunction=()=>get(FUNCTION_URL,'FUNCTION_READ_FAILED');
  const getPolicy=()=>get('https://run.googleapis.com/v2/'+SERVICE+':getIamPolicy','IAM_READ_FAILED');
  const getRevision=shortName=>get('https://run.googleapis.com/v2/'+SERVICE+'/revisions/'+shortName,'REVISION_READ_FAILED');
+ const readRevision=async(shortName,stage)=>revisionData(await getRevision(shortName),shortName,identity=>{(report.revisionIdentityReads||=[]).push({stage,...identity});save();});
  try{
   const pair=validateSnapshots(before,after,pin);
   let current=await getFunction();validateFunction(current,pair,pin);
   requireThat(current.state==='ACTIVE','CURRENT_FUNCTION_NOT_ACTIVE');
   const policyBefore=await getPolicy();requireThat(iamHash(policyBefore)===pin.iamSha256,'CURRENT_IAM_CHANGED');
-  const oldRevision=revisionData(await getRevision(pin.previousRevision),pin.previousRevision);
-  const deployedRevision=revisionData(await getRevision(pin.deployedRevision),pin.deployedRevision);
+  const oldRevision=await readRevision(pin.previousRevision,'PREVIOUS_BASELINE');
+  const deployedRevision=await readRevision(pin.deployedRevision,'DEPLOYED_SOURCE');
   report.previousRevision=pin.previousRevision;report.deployedRevision=pin.deployedRevision;report.observedRevision=current.serviceConfig.revision;
   report.previousRevisionEnvironmentNames=Object.keys(oldRevision.map).sort();report.deployedRevisionEnvironmentNames=Object.keys(deployedRevision.map).sort();
   report.revisionEnvironmentChanges=changes(oldRevision.map,deployedRevision.map);
@@ -121,7 +151,7 @@ async function repair({client,before,after,pin=PIN,persist=()=>{},wait=ms=>new P
   // issue another PATCH or require the pre-restoration revision to be current.
   if(report.currentEnvironmentSha256===pin.previousEnvSha256){
    requireThat(svcHash(current)===pin.previousServiceSha256,'ALREADY_RESTORED_OTHER_CONFIG_CHANGED');
-   const active=revisionData(await getRevision(current.serviceConfig.revision),current.serviceConfig.revision);
+   const active=await readRevision(current.serviceConfig.revision,'ALREADY_RESTORED');
    requireThat(active.image===deployedRevision.image,'ALREADY_RESTORED_IMAGE_CHANGED');
    for(const [key,value]of Object.entries(current.serviceConfig.environmentVariables||{}))requireThat(active.map[key]===value,'ALREADY_RESTORED_REVISION_ENV_MISMATCH');
    report.status='BASELINE_ENV_ALREADY_RESTORED_NOOP';report.finalRevision=current.serviceConfig.revision;report.finalEnvironmentSha256=pin.previousEnvSha256;report.finalServiceConfigNonRevisionSha256=svcHash(current);report.iamUnchanged=true;report.sourcePreserved=true;report.containerImageUnchanged=true;report.finishedAt=new Date().toISOString();save();return report;
@@ -165,7 +195,7 @@ async function repair({client,before,after,pin=PIN,persist=()=>{},wait=ms=>new P
    if(n+1<maxPolls)await wait(10000);
   }
   requireThat(complete,responseLost?'PATCH_RESPONSE_LOST_RESTORATION_NOT_PROVEN':'RESTORATION_READBACK_TIMEOUT');
-  const finalRevision=revisionData(await getRevision(current.serviceConfig.revision),current.serviceConfig.revision);
+  const finalRevision=await readRevision(current.serviceConfig.revision,'FINAL_READBACK');
   requireThat(finalRevision.image===deployedRevision.image,'RESTORATION_CONTAINER_IMAGE_CHANGED');
   for(const [key,value]of Object.entries(reconstructed.map))requireThat(finalRevision.map[key]===value,'RESTORATION_REVISION_ENV_MISMATCH');
   requireThat(iamHash(await getPolicy())===pin.iamSha256,'RESTORATION_IAM_CHANGED');
@@ -183,5 +213,5 @@ async function main(){
  const report=await repair({client,before,after,persist:r=>fs.writeFileSync(out,JSON.stringify(r,null,2)+'\n',{mode:0o600})});
  console.log(JSON.stringify({status:report.status,target:TARGET,patchRequests:report.patchRequests,finalEnvironmentSha256:report.finalEnvironmentSha256,finalRevision:report.finalRevision,valuesExported:false}));
 }
-module.exports={PIN,PROJECT,REGION,TARGET,NAME,SERVICE,FUNCTION_URL,MASK,stable,hash,svcHash,iamHash,strictMap,validateSnapshots,validateFunction,revisionData,reconstruct,repair};
+module.exports={PIN,PROJECT,REGION,TARGET,NAME,SERVICE,SERVICE_SHORT_NAME,FUNCTION_URL,MASK,stable,hash,svcHash,iamHash,strictMap,validateSnapshots,validateFunction,identityField,revisionIdentity,revisionData,reconstruct,repair};
 if(require.main===module)main().catch(error=>{console.error('INSURER_READER_ENV_REPAIR_HOLD:'+(error.safeCode||'UNEXPECTED_INTERNAL_FAILURE'));process.exitCode=1;});
