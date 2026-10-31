@@ -17025,5 +17025,23 @@
     "backendMutationAuthorized": false,
     "livePromotionAuthorized": false,
     "priorControlKeysPreserved": 424
+  },
+  "b4003InsurerPreviewTransportTestRoute20261031": {
+    "schema": "GRAVICENTRA_I65_B4003_INSURER_PREVIEW_TEST_ROUTE_POINTER_V1",
+    "status": "CURRENT_SUCCESSOR_TEST_ROUTE_FOR_EXACT_READ_ONLY_PREVIEW",
+    "gate": "I6.5/B4-003",
+    "parentHead": "68695847f0eafeb6fec6f48977b09488952f052b",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_INSURER_PREVIEW_TRANSPORT_TEST_ROUTE_20261031.json",
+    "receiptBlobSha": "7c6bc30e395a33f26d626c74635a1a58ef435f6e",
+    "atomicPaths": [
+      "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json",
+      "artifacts/orbit360-recovery/release-control/I6_5_B4_003_INSURER_PREVIEW_TRANSPORT_TEST_ROUTE_20261031.json",
+      "tools/gravicentra-b4-003-insurer-transport-test-successor.mjs",
+      "tools/gravicentra-b4-003-insurer-transport-test-successor.test.mjs",
+      "tools/gravicentra-i6-control-plane-guard-v1.mjs"
+    ],
+    "newProductionPermission": false,
+    "newP0Closure": false,
+    "priorControlKeysPreserved": 425
   }
 }

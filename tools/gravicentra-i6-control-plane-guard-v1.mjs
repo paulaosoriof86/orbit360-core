@@ -1,3 +1,6 @@
+import {runInsurerTransportTestGuard} from './gravicentra-b4-003-insurer-transport-test-successor.mjs';
+if (runInsurerTransportTestGuard()) process.exit(0);
+
 import {runInsurerTransportBindingGuard} from './gravicentra-b4-003-insurer-transport-binding-successor.mjs';
 if (runInsurerTransportBindingGuard()) process.exit(0);
 

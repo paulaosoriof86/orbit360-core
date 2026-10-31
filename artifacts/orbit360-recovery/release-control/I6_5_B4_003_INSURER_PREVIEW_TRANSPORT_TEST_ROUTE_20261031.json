@@ -1,0 +1,64 @@
+{
+  "schema": "GRAVICENTRA_I65_B4003_INSURER_PREVIEW_TEST_ROUTE_V1",
+  "status": "CURRENT_SUCCESSOR_TEST_ROUTE_FOR_EXACT_READ_ONLY_PREVIEW",
+  "gate": "I6.5/B4-003",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "parentHead": "68695847f0eafeb6fec6f48977b09488952f052b",
+  "recordType": "ADDITIVE_WORKFLOW_TEST_ROUTING_REPAIR",
+  "priorReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_INSURER_TRANSPORT_READBACK_BINDING_20261031.json",
+  "priorReceiptBlobSha": "1d7152851bf5ea4507d284297301d63359ffb575",
+  "parentGuardBlobSha": "b7cf54f942ee3339b83085c445d93f90ec4d84f9",
+  "atomicPaths": [
+    "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json",
+    "artifacts/orbit360-recovery/release-control/I6_5_B4_003_INSURER_PREVIEW_TRANSPORT_TEST_ROUTE_20261031.json",
+    "tools/gravicentra-b4-003-insurer-transport-test-successor.mjs",
+    "tools/gravicentra-b4-003-insurer-transport-test-successor.test.mjs",
+    "tools/gravicentra-i6-control-plane-guard-v1.mjs"
+  ],
+  "knownPrevalidationFailure": {
+    "runId": 41221868357,
+    "code": "EXACT_RESUME_TRANSPORT_REQUIRED",
+    "metadataOnlyFixNotAccepted": true,
+    "insurerUatRan": false,
+    "followupObservation": "The unmodified timestamp-specific test on a future control head expects exactly 424 old keys and rejects the newly added current successor key. Source tests must be routed to the exact current guard, not masquerade as historical execution."
+  },
+  "correction": {
+    "transportShaFieldBound": true,
+    "testRunsAgainstCurrentSuccessor": true,
+    "sourceProductAndBackendUnchanged": true,
+    "exactWorkflowReplacements": 3,
+    "workflowScope": "Replace only the active source model import, the model validation invocation, and the obsolete predecessor test command in the same safe-read Preview workflow.",
+    "historicalTestsRemainRerunnableOnTheirFrozenExactAncestors": true,
+    "knownOperationRemainsPinned": true,
+    "sourceBytesProofStillRequired": 66,
+    "noBackendDeploymentOrConfigurationWrite": true,
+    "noHostedArtifactRebuild": true
+  },
+  "governanceBlobs": {
+    "tools/gravicentra-i6-control-plane-guard-v1.mjs": "b5e29a876a974f462eb5d588a7eebfc9b00d8bf6",
+    "tools/gravicentra-b4-003-insurer-transport-test-successor.mjs": "fd1060e6bec770477f33c98c60d7ce4cec3324eb",
+    "tools/gravicentra-b4-003-insurer-transport-test-successor.test.mjs": "4ab3dac3127a9522bf21e812c11c7863c821b0b1"
+  },
+  "currentProgressCarriedWithoutFalseClosure": {
+    "formalI6Percent": 50,
+    "priorityP0Resolved": 1,
+    "priorityP0Total": 6,
+    "historicalForensicPercent": 96,
+    "globalProductReadinessPercent": null,
+    "newP0Closure": false,
+    "productionAccepted": false
+  },
+  "boundaries": {
+    "liveDeployment": false,
+    "authIamRules": false,
+    "configurationPatch": false,
+    "backendDeployment": false,
+    "realBusinessWrites": false,
+    "cleanup": false,
+    "findingClosure": false,
+    "b4003Closure": false,
+    "productionAcceptance": false,
+    "sourceProofBypass": false
+  }
+}
