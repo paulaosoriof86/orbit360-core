@@ -1,5 +1,5 @@
-# Continue exact recovery 41152465200 after strict Cloud Run parent-name compatibility repair.
-# Keep original source, artifact digests, configuration hashes and both failed runs.
+# Read the known previous configuration operation; no configuration or backend code mutation.
+# Hosting resumes only after exact operation binding, baseline configuration/IAM and all 66 source comparisons.
 name: Gravicentra I6.5 B4-003 Cumulative Safe-Read LAB Preview 20261029
 'on':
   push:
@@ -72,19 +72,21 @@ jobs:
         need(failed.head_sha===k.parent&&failed.head_branch===process.env.GITHUB_REF_NAME&&failed.status==='completed'&&failed.conclusion==='failure','EXACT_INITIAL_FAILURE_REQUIRED');
         const paused=await request('actions/runs/41152465200');
         need(paused.head_sha==='850b156f7c00080d933b0af8ba16837a89f76160'&&paused.head_branch===process.env.GITHUB_REF_NAME&&paused.status==='completed'&&paused.conclusion==='failure','EXACT_PREVIOUS_RECOVERY_FAILURE_REQUIRED');
+        const postPatchAttempts=[];
+        for(const attempt of [1,2]){const run=await request('actions/runs/41153515829/attempts/'+attempt);need(run.head_sha==='a4c3d37dc8d9a4bf11451d9b9b61b3a66e439825'&&run.run_attempt===attempt&&run.status==='completed'&&run.conclusion==='failure','EXACT_POST_PATCH_FAILURE_ATTEMPT_REQUIRED');postPatchAttempts.push({runId:run.id,runAttempt:run.run_attempt,headSha:run.head_sha,status:run.status,conclusion:run.conclusion});}
         const runs=await request('actions/workflows/gravicentra-release-lock-sync.yml/runs?head_sha='+m.sourceCommit+'&per_page=100');
         const candidates=(runs.workflow_runs||[]).filter(r=>r.head_sha===m.sourceCommit&&r.head_branch===process.env.GITHUB_REF_NAME).sort((a,b)=>b.id-a.id);
         need(candidates[0]?.status==='completed'&&candidates[0]?.conclusion==='success','EXACT_RECOVERY_SOURCE_GUARD_REQUIRED');
-        const result={schema:'GRAVICENTRA_I65_B4003_INSURER_PREVIEW_RECOVERY_BINDING_V1',sourceSha:k.source,sourceGuardRunId:k.sourceGuardRunId,initialTransportSha:k.parent,initialRunId:k.initialRunId,failedRecoveryTransportSha:'850b156f7c00080d933b0af8ba16837a89f76160',failedRecoveryRunId:41152465200,recoverySourceSha:m.sourceCommit,recoveryGuardRunId:candidates[0].id,recoveryTransportSha:process.env.TRANSPORT_SHA,recoveryRunId:Number(process.env.GITHUB_RUN_ID),artifacts:k.artifacts,receiptPath:m.authorityReceiptPath,receiptBlobSha:m.authorityReceiptBlobSha,previousRecoveryReceiptPath:k.receipt,previousRecoveryReceiptBlobSha:git('hash-object',k.receipt),workflowBlobSha:git('hash-object',k.workflow),backendCodeRedeploy:false,hostingRebuild:false};
+        const result={schema:'GRAVICENTRA_I65_B4003_INSURER_PREVIEW_RECOVERY_BINDING_V1',sourceSha:k.source,sourceGuardRunId:k.sourceGuardRunId,initialTransportSha:k.parent,initialRunId:k.initialRunId,failedRecoveryTransportSha:'850b156f7c00080d933b0af8ba16837a89f76160',failedRecoveryRunId:41152465200,postPatchFailureRunId:41153515829,postPatchFailureTransportSha:'a4c3d37dc8d9a4bf11451d9b9b61b3a66e439825',postPatchFailureHistory:postPatchAttempts,recoverySourceSha:m.sourceCommit,recoveryGuardRunId:candidates[0].id,recoveryTransportSha:process.env.TRANSPORT_SHA,recoveryRunId:Number(process.env.GITHUB_RUN_ID),artifacts:k.artifacts,receiptPath:m.authorityReceiptPath,receiptBlobSha:m.authorityReceiptBlobSha,previousRecoveryReceiptPath:k.receipt,previousRecoveryReceiptBlobSha:git('hash-object',k.receipt),workflowBlobSha:git('hash-object',k.workflow),backendCodeRedeploy:false,hostingRebuild:false};
         fs.writeFileSync(process.env.RUNNER_TEMP+'/gi-insurer-recovery-binding.json',JSON.stringify(result,null,2)+'\n');
         fs.appendFileSync(process.env.GITHUB_ENV,'RECOVERY_SOURCE_SHA='+m.sourceCommit+'\n');
         fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY,'Original product source: '+k.source+'\nRecovery source Guard SUCCESS: '+candidates[0].id+'\nInitial backend deployment and immutable Hosting package: '+k.initialRunId+'\n');
         NODE
         git diff --exit-code
         git diff --cached --exit-code
-        node tools/gravicentra-b4-003-insurer-reader-env-repair.test.cjs
+        node tools/gravicentra-b4-003-insurer-reader-postpatch-readback.test.cjs
         node --test tools/gravicentra-b4-003-insurer-preview-resume.test.mjs
-    - name: Recover and verify the three exact original artifacts without rebuilding
+    - name: Recover exact original artifacts and the single known PATCH report without rebuilding
       env:
         GH_READ_TOKEN: ${{ github.token }}
       run: |
@@ -92,7 +94,8 @@ jobs:
         python3 - <<'PY'
         import os,json,pathlib,urllib.request,urllib.error,urllib.parse,hashlib,zipfile,tarfile,shutil
         root=pathlib.Path(os.environ['RUNNER_TEMP']);api='https://api.github.com/repos/'+os.environ['GITHUB_REPOSITORY']
-        pins=[('hosting',13023285501,1491734,'6f9ecc3e254be0cefcb86964e00ce74b3abd54223a8774e87bdcfd2cede4b2ba'),('backend',13023370282,185439,'97e730f44d6a4045b9d75f76c435dc97845505889699b44bcabbe5d6c3e87c7c'),('snapshots',13023550013,12940,'df0deeb1363e2182d81045da821970e500d5fb0cad0207f7b26ac05d93101325')]
+        initial_sha=os.environ['INITIAL_TRANSPORT_SHA']
+        pins=[('hosting',13023285501,1491734,'6f9ecc3e254be0cefcb86964e00ce74b3abd54223a8774e87bdcfd2cede4b2ba',41150545623,initial_sha),('backend',13023370282,185439,'97e730f44d6a4045b9d75f76c435dc97845505889699b44bcabbe5d6c3e87c7c',41150545623,initial_sha),('snapshots',13023550013,12940,'df0deeb1363e2182d81045da821970e500d5fb0cad0207f7b26ac05d93101325',41150545623,initial_sha),('patch',13024615471,16359,'ba67c529382cdb987612939f4f743cafbd6405c96b84fe967821cdf9ab6e5091',41153515829,'a4c3d37dc8d9a4bf11451d9b9b61b3a66e439825')]
         headers={'Authorization':'Bearer '+os.environ['GH_READ_TOKEN'],'Accept':'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'}
         class NoRedirect(urllib.request.HTTPRedirectHandler):
          def redirect_request(self,req,fp,code,msg,headers,newurl): return None
@@ -103,10 +106,10 @@ jobs:
          return p
         proof=[]
         try:
-         for label,artifact_id,size,digest in pins:
+         for label,artifact_id,size,digest,run_id,head_sha in pins:
           endpoint=api+'/actions/artifacts/'+str(artifact_id)
           with urllib.request.urlopen(urllib.request.Request(endpoint,headers=headers),timeout=45) as response: meta=json.load(response)
-          if meta.get('id')!=artifact_id or meta.get('expired') is not False or meta.get('size_in_bytes')!=size or meta.get('digest')!='sha256:'+digest or meta.get('workflow_run',{}).get('id')!=41150545623 or meta.get('workflow_run',{}).get('head_sha')!=os.environ['INITIAL_TRANSPORT_SHA']: raise RuntimeError('EXACT_ARTIFACT_METADATA_REQUIRED')
+          if meta.get('id')!=artifact_id or meta.get('expired') is not False or meta.get('size_in_bytes')!=size or meta.get('digest')!='sha256:'+digest or meta.get('workflow_run',{}).get('id')!=run_id or meta.get('workflow_run',{}).get('head_sha')!=head_sha: raise RuntimeError('EXACT_ARTIFACT_METADATA_REQUIRED')
           try:
            response=opener.open(urllib.request.Request(endpoint+'/zip',headers=headers),timeout=45)
            response.close();raise RuntimeError('SIGNED_ARTIFACT_REDIRECT_REQUIRED')
@@ -131,13 +134,14 @@ jobs:
             if info.is_dir(): dest.mkdir(parents=True,exist_ok=True)
             else:
              dest.parent.mkdir(parents=True,exist_ok=True);dest.write_bytes(z.read(info))
-          proof.append({'label':label,'artifactId':artifact_id,'runId':41150545623,'zipBytes':size,'zipSha256':digest,'files':len(infos),'digestVerified':True})
+          proof.append({'label':label,'artifactId':artifact_id,'runId':run_id,'zipBytes':size,'zipSha256':digest,'files':len(infos),'digestVerified':True})
          backend=root/'gi-resume-backend';snap=root/'gi-resume-snapshots';hosting=root/'gi-resume-hosting'
          for name in ['gi-insurer-function-before-snapshot.json','gi-insurer-source-binding.json','gi-preview-predecessor-build.json','gi-preview-predecessor-identity.json']:
           if (backend/name).read_bytes()!=(snap/name).read_bytes(): raise RuntimeError('CROSS_ARTIFACT_BINDING_MISMATCH')
          for name in ['gi-insurer-backend-source-manifest.json','gi-insurer-source-binding.json','gi-insurer-function-before-snapshot.json']:
           shutil.copyfile(backend/name,root/name)
          shutil.copyfile(snap/'gi-insurer-function-after-snapshot.json',root/'gi-insurer-function-initial-after-snapshot.json')
+         shutil.copyfile(root/'gi-resume-patch/gi-insurer-reader-env-restoration.json',root/'gi-insurer-reader-patch-attempt1.json')
          shutil.copytree(hosting,root/'gi-preview-package')
          shutil.copyfile(hosting/'evidence/package-output.json',root/'gi-preview-package-output.json')
          stage=root/'gi-insurer-backend';stage.mkdir()
@@ -166,7 +170,7 @@ jobs:
          if list(config)!=['hosting'] or config['hosting']['site']!='ays-orbit-360-lab' or config['hosting']['public']!='site': raise RuntimeError('IMMUTABLE_HOSTING_ONLY_CONFIG_REQUIRED')
          binding=json.loads((root/'gi-insurer-source-binding.json').read_text())
          if binding['sourceSha']!=os.environ['EXACT_SOURCE_SHA'] or binding['transportSha']!=os.environ['INITIAL_TRANSPORT_SHA'] or binding['guardRunId']!=41150390700: raise RuntimeError('INITIAL_SOURCE_BINDING_MISMATCH')
-         (root/'gi-insurer-artifact-reuse.json').write_text(json.dumps({'status':'THREE_ORIGINAL_IMMUTABLE_ARTIFACTS_VERIFIED','artifacts':proof,'hostingFiles':len(listed),'backendFiles':len(actual),'backendCodeRedeployed':False,'hostingRebuilt':False},indent=2)+'\n')
+         (root/'gi-insurer-artifact-reuse.json').write_text(json.dumps({'status':'ORIGINAL_IMMUTABLE_ARTIFACTS_AND_EXACT_PATCH_REPORT_VERIFIED','artifacts':proof,'hostingFiles':len(listed),'backendFiles':len(actual),'backendCodeRedeployed':False,'hostingRebuilt':False},indent=2)+'\n')
          with open(os.environ['GITHUB_ENV'],'a') as target: target.write('BACKEND_ROOT='+str(stage)+'\n')
          print('IMMUTABLE_HOSTING_BACKEND_AND_SNAPSHOT_ARTIFACTS_VERIFIED')
         except Exception as error:
@@ -267,10 +271,10 @@ jobs:
         chmod 600 "$RUNNER_TEMP/gi-preview-auth/selected.json"
         echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/gi-preview-auth/selected.json" >> "$GITHUB_ENV"
         echo "FIREBASE_CLI_BIN=$CLI" >> "$GITHUB_ENV"
-    - name: Restore only the proven previous environment of the existing LAB reader
-      id: environment_restore
+    - name: Read the known completed restoration operation and reader configuration without mutation
+      id: postpatch_readback
       env:
-        GI_READER_ENV_REPAIR_AUTHORIZATION: RESTORE_PROVEN_BASELINE_ENV_ONLY
+        GI_READER_POSTPATCH_READBACK_AUTHORIZATION: READ_KNOWN_OPERATION_AND_CONFIGURATION_ONLY
       run: |
         set -euo pipefail
         (cd "$BACKEND_ROOT/functions" && npm ci --ignore-scripts --no-audit --no-fund >/dev/null)
@@ -286,8 +290,8 @@ jobs:
         if(!summary.length||JSON.stringify(summary.map(r=>r.key))!==JSON.stringify(initial.functions.map(r=>r.key)))throw Error('FUNCTION_INVENTORY_CHANGED_SINCE_INITIAL_FAILURE');
         for(let i=0;i<summary.length;i++)if(summary[i].key!=='us-east1/orbit360ScopedPolicyReadPreview'&&summary[i].metadataSha256!==initial.functions[i].metadataSha256)throw Error('OTHER_FUNCTION_CHANGED_SINCE_INITIAL_FAILURE');
         NODE
-        node tools/gravicentra-b4-003-insurer-reader-env-repair.cjs "$RUNNER_TEMP/gi-insurer-function-before-snapshot.json" "$RUNNER_TEMP/gi-insurer-function-initial-after-snapshot.json" "$RUNNER_TEMP/gi-insurer-reader-env-restoration.json"
-    - name: Verify restored configuration, original backend bytes, inventory and both IAM policies
+        node tools/gravicentra-b4-003-insurer-reader-postpatch-readback.cjs "$RUNNER_TEMP/gi-insurer-function-before-snapshot.json" "$RUNNER_TEMP/gi-insurer-function-initial-after-snapshot.json" "$RUNNER_TEMP/gi-insurer-reader-patch-attempt1.json" "$RUNNER_TEMP/gi-insurer-backend-source-manifest.json" "$RUNNER_TEMP/gi-insurer-reader-postpatch-readback.json"
+    - name: Verify all 66 backend source comparisons, baseline configuration, inventory and both IAM policies
       run: |
         set -euo pipefail
         cat > "$RUNNER_TEMP/gi-insurer-function-snapshot.cjs" <<'NODE'
@@ -354,19 +358,30 @@ jobs:
         node - <<'NODE'
         const fs=require('node:fs'),crypto=require('node:crypto');
         const read=n=>JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/'+n,'utf8'));
-        const initial=read('gi-insurer-function-initial-after-snapshot.json'),current=read('gi-insurer-function-after-snapshot.json'),proof=read('gi-insurer-function-readback.json'),restore=read('gi-insurer-reader-env-restoration.json');
+        const initial=read('gi-insurer-function-initial-after-snapshot.json'),current=read('gi-insurer-function-after-snapshot.json'),proof=read('gi-insurer-function-readback.json'),post=read('gi-insurer-reader-postpatch-readback.json');
         const stable=x=>Array.isArray(x)?x.map(stable):x&&typeof x==='object'?Object.fromEntries(Object.keys(x).sort().map(k=>[k,stable(x[k])])):x;
         const same=(a,b)=>JSON.stringify(stable(a))===JSON.stringify(stable(b));
-        if(!['BASELINE_ENV_RESTORED_EXACT_READBACK_PASS','BASELINE_ENV_RESTORED_RESPONSE_LOST_READBACK_PASS','BASELINE_ENV_ALREADY_RESTORED_NOOP'].includes(restore.status)||restore.finalEnvironmentSha256!=='1e10a234c2e389484714e5f55f394f0ec816d146180dbcee1e34dfae4cce069b'||restore.iamUnchanged!==true||restore.sourcePreserved!==true)throw Error('EXACT_READER_CONFIGURATION_RECOVERY_REQUIRED');
+        if(post.status!=='EXPECTED_METADATA_PASS_SOURCE_BYTES_PENDING'||post.operationDone!==true||post.operationResponseBindsCurrent!==true||post.iamUnchanged!==true||post.patchRequests!==0||post.remoteMutationRequests!==0||post.sourceBytesProofRequired!==true||post.sourceBytesProofCompleted!==false||post.expectedBackendFileCount!==33||post.finalEnvironmentSha256!=='1e10a234c2e389484714e5f55f394f0ec816d146180dbcee1e34dfae4cce069b'||post.finalServiceConfigNonRevisionSha256!=='9cf40283fe806e06350ae094bca9c4e3611311ee098589ab5aed8ffffe6019fc')throw Error('KNOWN_OPERATION_AND_EXACT_READER_CONFIGURATION_READBACK_REQUIRED');
         for(const row of current.targets){
          const prior=initial.targets.find(r=>r.target===row.target);
          if(!prior)throw Error('INITIAL_DEPLOYED_TARGET_REQUIRED');
-         for(const field of ['name','environment','runtime','entryPoint','sourceStorage','build','codeHash','labels'])if(!same(prior.identity[field],row.identity[field]))throw Error('INITIAL_BACKEND_SOURCE_CHANGED:'+row.target+':'+field);
-         if(row.target==='orbit360ProductOperationalCommandPreview'&&prior.identity.revision!==row.identity.revision)throw Error('WRITER_REVISION_CHANGED_DURING_READER_RECOVERY');
+         for(const field of ['name','environment','runtime','entryPoint','codeHash','labels'])if(!same(prior.identity[field],row.identity[field]))throw Error('INITIAL_BACKEND_PRODUCT_IDENTITY_CHANGED:'+row.target+':'+field);
+         if(row.target==='orbit360ProductOperationalCommandPreview'){
+          for(const field of ['revision','sourceStorage','build'])if(!same(prior.identity[field],row.identity[field]))throw Error('WRITER_CHANGED_DURING_READER_CONFIGURATION_OPERATION');
+         }else{
+          const bound=post.currentFunctionIdentity;
+          for(const field of ['name','state','runtime','entryPoint','codeHash','sourceStorage','build','revision','updateTime'])if(!same(bound[field],row.identity[field]))throw Error('READER_NOT_BOUND_TO_OBSERVED_COMPLETED_OPERATION:'+field);
+          if(row.identity.revision!==post.finalRevision||row.identity.environmentVariablesSha256!==post.finalEnvironmentSha256||row.identity.serviceConfigNonRevisionSha256!==post.finalServiceConfigNonRevisionSha256)throw Error('READER_CONFIGURATION_CHANGED_AFTER_READBACK');
+         }
          if(row.iam.status!=='READ'||prior.iam.status!=='READ'||row.iam.policySha256!==prior.iam.policySha256)throw Error('UNCHANGED_BOTH_TARGET_IAM_READBACK_REQUIRED');
         }
-        if(proof.targets.length!==2||proof.targets.some(t=>t.iamUnchanged!==true||t.sourceProof.status!=='DEPLOYED_BACKEND_SOURCE_BYTES_MATCH_EXACT_STAGE'))throw Error('BOTH_TARGET_SOURCE_AND_IAM_PROOFS_REQUIRED');
-        proof.recoveryEnvironmentRestored=true;proof.recoveredEnvironmentSha256=restore.finalEnvironmentSha256;proof.recoveredReaderRevision=restore.finalRevision;proof.backendCodeRedeployed=false;proof.initialBackendSourceUnchanged=true;proof.hostingRebuilt=false;
+        if(proof.targets.length!==2||proof.targets.some(t=>t.iamUnchanged!==true||t.sourceProof.status!=='DEPLOYED_BACKEND_SOURCE_BYTES_MATCH_EXACT_STAGE'||t.sourceProof.sourceFiles.length!==33))throw Error('ALL_66_BACKEND_SOURCE_FILE_COMPARISONS_AND_IAM_REQUIRED');
+        proof.recoveryEnvironmentRestored=true;proof.recoveredEnvironmentSha256=post.finalEnvironmentSha256;proof.recoveredReaderRevision=post.finalRevision;proof.backendCodeRedeployed=false;proof.initialBackendSourceUnchanged=true;proof.hostingRebuilt=false;
+        proof.sourceIdentityMeaning='ALL_33_STAGED_PRODUCT_SOURCE_FILES_PER_TARGET_IDENTICAL_NOT_METADATA_IDENTITY';
+        proof.status='TWO_EXISTING_TARGETS_EXACT_SOURCE_READBACK_AFTER_CONFIGURATION_OPERATION_PASS';
+        proof.backendCodeDeploymentRequested=false;proof.backendSourceContentUnchanged=true;
+        proof.knownOperationDone=true;proof.operationResponseBindsCurrent=true;proof.sourceBytesProofCompleted=true;proof.backendSourceComparisons=66;proof.currentConfigurationPatchRequests=0;
+        proof.platformBuildChanged=post.platformBuildChanged;proof.platformStorageChanged=post.platformStorageChanged;proof.platformImageChanged=post.platformImageChanged;proof.postpatchReadbackStatus=post.status;
         fs.writeFileSync(process.env.RUNNER_TEMP+'/gi-insurer-function-readback.json',JSON.stringify(proof,null,2)+'\n');
         NODE
         for target in orbit360ProductOperationalCommandPreview orbit360ScopedPolicyReadPreview; do
@@ -428,7 +443,7 @@ jobs:
         fs.writeFileSync(process.env.RUNNER_TEMP+'/gi-live-identity-readback.json',JSON.stringify(report,null,2)+'\n');
         fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY,'Owner root raw bytes stable before: '+before.rawByteStable+'\nOwner root raw bytes stable after: '+after.rawByteStable+'\nOwner stable runtime/structural identity: PASS\n');
         NODE
-        printf '%s\n' "I6.5/B4-003 cumulative source/byte/readback PASS" "Source: $EXACT_SOURCE_SHA" "Preview: $PREVIEW_URL" "LAB LIVE root exact; owner runtime and structural identity unchanged. The existing reader environment was restored; original backend code was retained. No LIVE function, Rules, Auth or business data operation." "Targeted authenticated insurer activity UAT still pending; B4-003 production HOLD." >> "$GITHUB_STEP_SUMMARY"
+        printf '%s\n' "I6.5/B4-003 cumulative source/byte/readback PASS" "Source: $EXACT_SOURCE_SHA" "Preview: $PREVIEW_URL" "LAB LIVE root exact; owner runtime and structural identity unchanged. The prior reader restoration was verified by read-only requests and exact source bytes; Hosting reused the original package. No LIVE function, Rules, Auth or business data operation." "Targeted authenticated insurer activity UAT still pending; B4-003 production HOLD." >> "$GITHUB_STEP_SUMMARY"
     - name: Record resumed immutable Preview and configuration recovery evidence
       env:
         PREVIEW_URL: ${{ steps.deploy.outputs.url }}
@@ -436,12 +451,12 @@ jobs:
         set -euo pipefail
         node - <<'NODE'
         const fs=require('node:fs');const read=n=>JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/'+n,'utf8'));
-        const binding=read('gi-insurer-source-binding.json'),recovery=read('gi-insurer-recovery-binding.json'),backend=read('gi-insurer-function-readback.json'),pack=read('gi-preview-package-output.json'),meta=read('gi-served-build.json'),live=read('gi-live-identity-readback.json'),restore=read('gi-insurer-reader-env-restoration.json'),reuse=read('gi-insurer-artifact-reuse.json');
+        const binding=read('gi-insurer-source-binding.json'),recovery=read('gi-insurer-recovery-binding.json'),backend=read('gi-insurer-function-readback.json'),pack=read('gi-preview-package-output.json'),meta=read('gi-served-build.json'),live=read('gi-live-identity-readback.json'),post=read('gi-insurer-reader-postpatch-readback.json'),patch=read('gi-insurer-reader-patch-attempt1.json'),reuse=read('gi-insurer-artifact-reuse.json');
         if(binding.sourceSha!==meta.sourceSha||meta.sourceSha!==process.env.EXACT_SOURCE_SHA||recovery.sourceSha!==meta.sourceSha)throw Error('COMBINED_SOURCE_MISMATCH');
-        if(backend.status!=='TWO_EXISTING_TARGETS_ONLY_DEPLOY_AND_EXACT_SOURCE_READBACK_PASS'||backend.targets.length!==2||backend.targets.some(t=>t.sourceProof.status!=='DEPLOYED_BACKEND_SOURCE_BYTES_MATCH_EXACT_STAGE'||t.iamUnchanged!==true)||backend.recoveryEnvironmentRestored!==true||backend.initialBackendSourceUnchanged!==true)throw Error('BOTH_BACKEND_EXACT_READBACKS_AND_RECOVERY_REQUIRED');
-        const result={schema:'GRAVICENTRA_I65_B4003_INSURER_ACTIVITY_EXACT_BACKEND_HOSTING_PREVIEW_RESULT_V1',status:'TECHNICAL_EXACT_BACKEND_HOSTING_READBACK_PASS_AUTHENTICATED_UAT_PENDING',gate:'I6.5/B4-003',sourceSha:binding.sourceSha,sourceParent:binding.sourceParent,transportSha:recovery.recoveryTransportSha,sourceBlobs:binding.sourceBlobs,guardRunId:binding.guardRunId,initialTransportSha:recovery.initialTransportSha,initialRunId:recovery.initialRunId,failedRecoveryTransportSha:recovery.failedRecoveryTransportSha,failedRecoveryRunId:recovery.failedRecoveryRunId,recoverySourceSha:recovery.recoverySourceSha,recoveryGuardRunId:recovery.recoveryGuardRunId,recoveryTransportSha:recovery.recoveryTransportSha,recoveryRunId:recovery.recoveryRunId,buildId:meta.buildId,hostedPayloadDigest:pack.hostedPayloadDigest,bundleDigest:pack.bundleDigest,backendSourceDigest:pack.backendSourceDigest,previewUrl:process.env.PREVIEW_URL,previewChannelId:process.env.PREVIEW_CHANNEL_ID,previewChannelReused:true,predecessorPreview:read('gi-preview-predecessor-identity.json'),channelExpiry:'7d',functionTargets:backend.targets,functionRegion:process.env.TARGET_REGION,functionProject:process.env.PROJECT_ID,onlyAuthorizedTargetFunctionsChanged:backend.onlyAuthorizedTargetsChanged,changedFunctionKeys:backend.changedFunctionKeys,recoveryEnvironmentRestored:true,recoveredEnvironmentSha256:restore.finalEnvironmentSha256,recoveredReaderRevision:restore.finalRevision,environmentRestore:restore,initialBackendSourceUnchanged:true,backendCodeRedeployed:false,hostingRebuilt:false,immutableArtifactReuse:reuse,liveHostingIdentity:live,liveDeployment:false,liveFunctionsDeployed:false,rulesAuthIamMutationRequested:false,businessDataWrites:0,syntheticWrites:0,newEndpoints:0,newWorkflows:0,currentCapabilityAcceptances:0,authenticatedUat:'PENDING_SYNTHETIC_INSURER_EDIT_RELOAD_AUDIT_RESTORE_RELOAD'};
+        if(backend.status!=='TWO_EXISTING_TARGETS_EXACT_SOURCE_READBACK_AFTER_CONFIGURATION_OPERATION_PASS'||backend.targets.length!==2||backend.targets.some(t=>t.sourceProof.status!=='DEPLOYED_BACKEND_SOURCE_BYTES_MATCH_EXACT_STAGE'||t.iamUnchanged!==true||t.sourceProof.sourceFiles.length!==33)||backend.recoveryEnvironmentRestored!==true||backend.initialBackendSourceUnchanged!==true||backend.sourceBytesProofCompleted!==true||backend.knownOperationDone!==true||backend.operationResponseBindsCurrent!==true||backend.backendCodeDeploymentRequested!==false||backend.backendSourceContentUnchanged!==true||post.patchRequests!==0||post.remoteMutationRequests!==0)throw Error('COMPLETE_SOURCE_CONFIGURATION_OPERATION_AND_IAM_PROOFS_REQUIRED');
+        const result={schema:'GRAVICENTRA_I65_B4003_INSURER_ACTIVITY_EXACT_BACKEND_HOSTING_PREVIEW_RESULT_V1',status:'TECHNICAL_EXACT_BACKEND_HOSTING_READBACK_PASS_AUTHENTICATED_UAT_PENDING',gate:'I6.5/B4-003',sourceSha:binding.sourceSha,sourceParent:binding.sourceParent,transportSha:recovery.recoveryTransportSha,sourceBlobs:binding.sourceBlobs,guardRunId:binding.guardRunId,initialTransportSha:recovery.initialTransportSha,initialRunId:recovery.initialRunId,failedRecoveryTransportSha:recovery.failedRecoveryTransportSha,failedRecoveryRunId:recovery.failedRecoveryRunId,postPatchFailureRunId:recovery.postPatchFailureRunId,postPatchFailureTransportSha:recovery.postPatchFailureTransportSha,postPatchFailureHistory:recovery.postPatchFailureHistory,recoverySourceSha:recovery.recoverySourceSha,recoveryGuardRunId:recovery.recoveryGuardRunId,recoveryTransportSha:recovery.recoveryTransportSha,recoveryRunId:recovery.recoveryRunId,buildId:meta.buildId,hostedPayloadDigest:pack.hostedPayloadDigest,bundleDigest:pack.bundleDigest,backendSourceDigest:pack.backendSourceDigest,previewUrl:process.env.PREVIEW_URL,previewChannelId:process.env.PREVIEW_CHANNEL_ID,previewChannelReused:true,predecessorPreview:read('gi-preview-predecessor-identity.json'),channelExpiry:'7d',functionTargets:backend.targets,functionRegion:process.env.TARGET_REGION,functionProject:process.env.PROJECT_ID,onlyAuthorizedTargetFunctionsChanged:backend.onlyAuthorizedTargetsChanged,changedFunctionKeys:backend.changedFunctionKeys,recoveryEnvironmentRestored:true,recoveredEnvironmentSha256:post.finalEnvironmentSha256,recoveredReaderRevision:post.finalRevision,postRestorationReadback:post,originalPatchAttempt:patch,initialBackendSourceUnchanged:true,sourceIdentityMeaning:backend.sourceIdentityMeaning,sourceBytesProofCompleted:true,backendSourceComparisons:66,knownOperationDone:true,operationResponseBindsCurrent:true,currentConfigurationPatchRequests:0,platformBuildChanged:post.platformBuildChanged,platformStorageChanged:post.platformStorageChanged,platformImageChanged:post.platformImageChanged,backendCodeRedeployed:false,backendCodeDeploymentRequested:false,backendSourceContentUnchanged:true,hostingRebuilt:false,immutableArtifactReuse:reuse,liveHostingIdentity:live,liveDeployment:false,liveFunctionsDeployed:false,rulesAuthIamMutationRequested:false,businessDataWrites:0,syntheticWrites:0,newEndpoints:0,newWorkflows:0,currentCapabilityAcceptances:0,authenticatedUat:'PENDING_SYNTHETIC_INSURER_EDIT_RELOAD_AUDIT_RESTORE_RELOAD'};
         fs.writeFileSync(process.env.RUNNER_TEMP+'/gi-insurer-combined-preview-result.json',JSON.stringify(result,null,2)+'\n');
-        fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY,'Combined Preview result: '+result.status+'\nReader environment restored exactly; original backend code and immutable Hosting artifact retained.\n'+backend.targets.map(t=>t.target+': '+t.after.revision+'; '+t.sourceProof.status).join('\n')+'\nTargeted authenticated insurer activity UAT remains pending. Existing accepted Metas evidence is preserved.\n');
+        fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY,'Combined Preview result: '+result.status+'\nKnown completed restoration operation bound to current function; 66 source file comparisons PASS; zero configuration PATCH in this run.\nPlatform build metadata changed: '+post.platformBuildChanged+'; storage locator changed: '+post.platformStorageChanged+'; container image changed: '+post.platformImageChanged+'\n'+backend.targets.map(t=>t.target+': '+t.after.revision+'; '+t.sourceProof.status).join('\n')+'\nTargeted authenticated insurer activity UAT remains pending. Existing accepted Metas evidence is preserved.\n');
         NODE
     - name: Preserve combined Preview readback and sanitized backend evidence
       if: always()
@@ -461,6 +476,8 @@ jobs:
           ${{ runner.temp }}/gi-insurer-recovery-binding.json
           ${{ runner.temp }}/gi-insurer-reader-env-restoration.json
           ${{ runner.temp }}/gi-insurer-artifact-reuse.json
+          ${{ runner.temp }}/gi-insurer-reader-postpatch-readback.json
+          ${{ runner.temp }}/gi-insurer-reader-patch-attempt1.json
         retention-days: 30
         if-no-files-found: warn
     - name: Preserve LIVE identity readback evidence
