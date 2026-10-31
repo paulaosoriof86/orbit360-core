@@ -1,0 +1,82 @@
+{
+  "schema": "GRAVICENTRA_I65_B4003_INSURER_OPERATION_TIMESTAMP_SUCCESSOR_V1",
+  "status": "TIMESTAMP_SNAPSHOT_FALSE_HOLD_CORRECTED_READ_ONLY_PREVIEW_PENDING",
+  "gate": "I6.5/B4-003",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "parentHead": "dec47b170dce38baf80d3092736963120100ecfe",
+  "recordType": "ADDITIVE_READ_ONLY_CAUSAL_REPAIR_AND_REAL_PROGRESS_POINTER",
+  "reason": "A completed Cloud Functions operation returned a stable function snapshot with an older updateTime than a later GET. Strict equality of that one timestamp caused a false HOLD. All meaningful function fields compared equal. The prior failure and proof contract remain preserved; only timestamp chronology is corrected in this successor.",
+  "priorReadbackReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_INSURER_POST_RESTORATION_READBACK_SUCCESSOR_20261030.json",
+  "priorReadbackReceiptBlobSha": "ffb07fe7d71aa071022389b89d3ed969e9279d0b",
+  "previousGuardBlobSha": "82ccd4e27aa7137ee299799c10885447a6905d8f",
+  "exactSourcePaths": [
+    "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json",
+    "artifacts/orbit360-recovery/release-control/I6_5_B4_003_INSURER_OPERATION_TIMESTAMP_READBACK_20261031.json",
+    "tools/gravicentra-b4-003-insurer-reader-postpatch-readback.cjs",
+    "tools/gravicentra-b4-003-insurer-reader-postpatch-readback.test.cjs",
+    "tools/gravicentra-b4-003-insurer-timestamp-successor.mjs",
+    "tools/gravicentra-b4-003-insurer-timestamp-successor.test.mjs",
+    "tools/gravicentra-i6-control-plane-guard-v1.mjs"
+  ],
+  "failureEvidence": {
+    "runId": 41155578413,
+    "headSha": "dec47b170dce38baf80d3092736963120100ecfe",
+    "artifactId": 13024808884,
+    "artifactSha256": "1e1bc58f0ed849bc80e2f79207cbaaabb9cfc3bbf5f9b8b4cb66cfad3499eb9e",
+    "failureCode": "OPERATION_RESPONSE_DOES_NOT_BIND_CURRENT",
+    "operationDone": true,
+    "operationResponsePresent": true,
+    "operationResponseUpdateTime": "2026-10-31T01:05:12.368285930Z",
+    "currentFunctionUpdateTime": "2026-10-31T01:05:54.833741414Z",
+    "differingFields": ["updateTime"],
+    "otherResponseComparisonsTrue": ["name", "state", "environment", "buildConfig", "serviceConfig", "labels"],
+    "currentAndOperationFunctionInvariantComparisonsTrue": true,
+    "remoteMutationRequests": 0,
+    "sourceBytesProofCompleted": false,
+    "technicalPreviewPass": false,
+    "authenticatedInsurerAuditUatPass": false
+  },
+  "correctedContract": {
+    "operationName": "projects/ays-orbit-360-lab/locations/us-east1/operations/operation-1793408711390-65f18812df446-eb3d2d80-cd121490",
+    "operationResponseRequiresAllStableFunctionFieldsEqual": true,
+    "updateTimeRequiresValidMonotonicTimestamp": true,
+    "timestampComparison": "OPERATION_UPDATE_TIME_LESS_THAN_OR_EQUAL_TO_LATER_CURRENT_FUNCTION_UPDATE_TIME; EXACT_NANOSECOND_ORDER; FULL_FUNCTION_EXCEPT_UPDATE_TIME_MUST_EQUAL",
+    "finalLiveFunctionMustStayByteStableDuringReadback": true,
+    "exactBackendSourceComparisonsRequired": 66,
+    "immutableHostingFilesReused": 218,
+    "readOnlyMethodsOnly": true,
+    "fallbackToMetadataOnlyAccepted": false,
+    "sameKnownOperationOnly": true,
+    "sourceBytesProofRequiredBeforeHosting": true,
+    "historicalStrictTimestampEqualitySupersededOnlyHere": true
+  },
+  "governanceBlobs": {
+    "tools/gravicentra-i6-control-plane-guard-v1.mjs": "966606bd1cc8304a300f6b1ec0c1b23a4e741041",
+    "tools/gravicentra-b4-003-insurer-timestamp-successor.mjs": "9a2dae8baf41aa9d610f4a087f8100841fbc3da6",
+    "tools/gravicentra-b4-003-insurer-timestamp-successor.test.mjs": "f4b807454c71254daca6292d3eb7a1ec594605a7",
+    "tools/gravicentra-b4-003-insurer-reader-postpatch-readback.cjs": "4d5d986458384f6256bc6b27e7a4a2a2e88d5369",
+    "tools/gravicentra-b4-003-insurer-reader-postpatch-readback.test.cjs": "2b5ac03affe8607c4d456b954bf2d1a13ebbb37b"
+  },
+  "progressScope": {
+    "formalI6MiniGates": "5/10=50%; no new mini-gate closed",
+    "sixPriorityP0": "1/6=16.67% fully closed; 5/6=83.33% open",
+    "historicalForensicMilestones": "96% historical only; must not be used as release readiness",
+    "currentGlobalProductPercent": null,
+    "reasonGlobalNull": "No audited denominator of applicable current release criteria with consistent weights. It would be false precision to assign a global product/production percentage.",
+    "releaseReadiness": "HOLD; backend/Hosting exact readback and current authenticated functional UAT remain unproven"
+  },
+  "boundaries": {
+    "productionPromotion": false,
+    "liveDeployment": false,
+    "authIamRulesChange": false,
+    "businessDataWrites": false,
+    "backendCodeDeployment": false,
+    "configurationPatch": false,
+    "cleanup": false,
+    "findingClosed": false,
+    "b4003Closed": false,
+    "productionAccepted": false,
+    "authenticatedUatAccepted": false
+  }
+}

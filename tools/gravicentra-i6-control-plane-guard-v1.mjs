@@ -1,3 +1,6 @@
+import {runInsurerTimestampSuccessorGuard} from './gravicentra-b4-003-insurer-timestamp-successor.mjs';
+if (runInsurerTimestampSuccessorGuard()) process.exit(0);
+
 import {runInsurerPreviewResumeGuard} from './gravicentra-b4-003-insurer-preview-resume.mjs';
 if (runInsurerPreviewResumeGuard()) process.exit(0);
 

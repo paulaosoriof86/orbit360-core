@@ -16974,5 +16974,37 @@
     "authIamRulesChangeAuthorized": false,
     "currentCapabilityAcceptances": 0,
     "priorControlKeysPreserved": 422
+  },
+  "b4003InsurerOperationTimestampReadback20261031": {
+    "schema": "GRAVICENTRA_I65_B4003_INSURER_OPERATION_TIMESTAMP_SUCCESSOR_V1",
+    "status": "TIMESTAMP_SNAPSHOT_FALSE_HOLD_CORRECTED_READ_ONLY_PREVIEW_PENDING",
+    "gate": "I6.5/B4-003",
+    "parentHead": "dec47b170dce38baf80d3092736963120100ecfe",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_INSURER_OPERATION_TIMESTAMP_READBACK_20261031.json",
+    "receiptBlobSha": "7463fd355b6b21967ba9ff2cdd98a97109eef69e",
+    "exactSourcePaths": [
+      "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json",
+      "artifacts/orbit360-recovery/release-control/I6_5_B4_003_INSURER_OPERATION_TIMESTAMP_READBACK_20261031.json",
+      "tools/gravicentra-b4-003-insurer-reader-postpatch-readback.cjs",
+      "tools/gravicentra-b4-003-insurer-reader-postpatch-readback.test.cjs",
+      "tools/gravicentra-b4-003-insurer-timestamp-successor.mjs",
+      "tools/gravicentra-b4-003-insurer-timestamp-successor.test.mjs",
+      "tools/gravicentra-i6-control-plane-guard-v1.mjs"
+    ],
+    "progress": {
+      "formalI6MiniGates": {"completed": 5, "total": 10, "percent": 50, "interpretation": "Frozen formal mini-gates, not product implementation"},
+      "priorityP0": {"closed": 1, "open": 5, "total": 6, "percentClosed": 16.67, "percentOpen": 83.33},
+      "historicalForensicPercent": 96,
+      "historicalForensicIsCurrentReadiness": false,
+      "currentOverallImplementationPercent": null,
+      "currentB4003Closed": false,
+      "productionAccepted": false,
+      "progressInterpretation": "Current auditable denominators only. Technical readback repair is not a P0 or mini-gate closure; a global product percent would require adjudicated current criteria."
+    },
+    "priorControlKeysPreserved": 423,
+    "readOnlyBackendVerificationAuthorized": true,
+    "productionPromotionAuthorized": false,
+    "authIamRulesChangeAuthorized": false,
+    "configurationPatchAuthorized": false
   }
 }

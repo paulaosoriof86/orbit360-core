@@ -71,9 +71,19 @@ function responseBinding(response,current){
  const responsePresent=Boolean(response&&typeof response==='object'&&!Array.isArray(response));
  const responseTypeValid=responsePresent&&(response['@type']===undefined||response['@type']==='type.googleapis.com/google.cloud.functions.v2.Function');
  const comparisons={};
- for(const key of ['name','state','environment','buildConfig','serviceConfig','labels','updateTime'])comparisons[key]=responsePresent&&same(response[key],current?.[key]);
- const withoutType=value=>value&&typeof value==='object'?Object.fromEntries(Object.entries(value).filter(([key])=>key!=='@type')):null;
- comparisons.completeFunction=responsePresent&&same(withoutType(response),withoutType(current));
+ for(const key of ['name','state','environment','buildConfig','serviceConfig','labels'])comparisons[key]=responsePresent&&same(response[key],current?.[key]);
+ // A completed operation is a snapshot; the provider may advance updateTime
+ // before a subsequent GET even when the complete functional resource is stable.
+ const timestamp=value=>{
+  if(typeof value!=='string')return null;
+  const parts=/^(\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d)(?:\.(\d{1,9}))?Z$/.exec(value);
+  if(!parts||!Number.isFinite(Date.parse(value)))return null;
+  return parts[1]+'.'+(parts[2]||'').padEnd(9,'0')+'Z';
+ };
+ const responseAt=timestamp(response?.updateTime),currentAt=timestamp(current?.updateTime);
+ comparisons.updateTime=responsePresent&&responseAt!==null&&currentAt!==null&&responseAt<=currentAt;
+ const stableResource=value=>value&&typeof value==='object'?Object.fromEntries(Object.entries(value).filter(([key])=>key!=='@type'&&key!=='updateTime')):null;
+ comparisons.completeFunction=responsePresent&&same(stableResource(response),stableResource(current));
  return {responsePresent,responseTypeValid,comparisons,bindsCurrent:responsePresent&&responseTypeValid&&Object.values(comparisons).every(Boolean)};
 }
 function imageIdentity(value){
