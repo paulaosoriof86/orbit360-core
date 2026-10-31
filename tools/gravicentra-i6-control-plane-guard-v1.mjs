@@ -1,3 +1,6 @@
+import {runGoalParticipationSuccessorGuard} from './gravicentra-b4-003-goal-participation-successor.mjs';
+if (runGoalParticipationSuccessorGuard()) process.exit(0);
+
 import {runInsurerPreviewEvidenceGuard} from './gravicentra-b4-003-insurer-preview-evidence-successor.mjs';
 if (runInsurerPreviewEvidenceGuard()) process.exit(0);
 

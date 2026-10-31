@@ -212,7 +212,25 @@ console.log('B4_003_APPROVED_ROLE_SCOPE_PARITY_PASS Finance Marketing Assistant 
       if(insurerParent.error)throw insurerParent.error;
       assert.equal(insurerParent.status,0);
       assert.equal(insurerParent.stdout.trim(),insurerWriter.beforeBlob);
-      assert.equal(insurerWriter.afterBlob,blob,'Insurer successor binds the actual writer under the twelve cases');
+      const goals=control.b4003GoalParticipationSourceSuccessor20261031;
+      if(goals){
+       assert.equal(goals.schema,'GRAVICENTRA_I65_B4003_GOAL_PARTICIPATION_POINTER_V1');
+       assert.equal(goals.parentHead,'f1ef4db50401763096a81429fabc116963dabd2f');
+       const goalsReceiptPath=root+'I6_5_B4_003_GOAL_PARTICIPATION_SOURCE_SUCCESSOR_20261031.json';
+       assert.equal(goals.sourceReceiptPath,goalsReceiptPath);
+       const goalsBytes=fs.readFileSync(goalsReceiptPath);
+       const goalsBlob=crypto.createHash('sha1').update(Buffer.concat([
+        Buffer.from('blob '+goalsBytes.length+'\0'),goalsBytes
+       ])).digest('hex');
+       assert.equal(goals.sourceReceiptBlob,goalsBlob,'Goals source receipt must be byte-bound');
+       const goalsSource=JSON.parse(goalsBytes),goalsWriter=goalsSource.sourceFiles[proof.owner];
+       assert.equal(goalsWriter.beforeBlob,insurerWriter.afterBlob,'Frozen insurer writer is exact predecessor');
+       assert.equal(goalsWriter.afterBlob,blob,'Goals successor binds the actual writer under the twelve cases');
+       assert.equal(goals.previewDeployed,false);
+       assert.equal(goals.productionAuthorized,false);
+       assert.equal(goals.businessDataWrites,0);
+       assert.equal(goals.advisorRecordsClassified,0);
+      }else assert.equal(insurerWriter.afterBlob,blob,'Insurer successor binds the actual writer under the twelve cases');
       for(const key of ['productionPromotionAuthorized','authIamRulesChangeAuthorized','realBusinessWritesAuthorized'])
        assert.equal(insurer[key],false,'Insurer successor boundary: '+key);
       for(const key of ['liveDeployment','authIamRulesChange','membershipChange','realBusinessWrites','dataImport','cleanup','findingClosed','b4003Closed','productionAccepted'])
