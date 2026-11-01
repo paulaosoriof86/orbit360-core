@@ -59,4 +59,26 @@ historialModule.detalle('gt'); // a direct cross-country drawer must not open
 
 orbit.pais = 'TODOS';
 assertPresent(['ACT_GT', 'ACT_CO', 'ACT_POLICY_CO', 'ACT_STANDALONE_CO', 'ACT_UNRESOLVED'], [], 5);
+
+// Carlos UAT (2026-11-01): after an authenticated role switch or cold reload,
+// the protected server can confirm actividades before the optional polizas /
+// clientes sources finish hydrating. The server has already checked the role,
+// country and scope and projected a canonical pais for each returned activity.
+// A second local join must not turn those confirmed rows into a false zero.
+orbit.store._protectedCandidate = true;
+data.actividades = [
+  { id: 'protected-co', pais: 'CO', polizaId: 'pco', clienteId: 'cg', fecha: '2026-11-01', tipo: 'nota', titulo: 'ACT_PROTECTED_CO', detalle: '', icon: '*' },
+  { id: 'protected-foreign', pais: 'GT', polizaId: 'pco', clienteId: 'cg', fecha: '2026-11-01', tipo: 'nota', titulo: 'ACT_PROTECTED_GT', detalle: '', icon: '*' },
+  { id: 'protected-unknown', polizaId: 'pco', fecha: '2026-11-01', tipo: 'nota', titulo: 'ACT_UNCONFIRMED_COUNTRY', detalle: '', icon: '*' }
+];
+data.polizas = []; // unrelated source not hydrated yet: exactly Carlos's cold path
+data.clientes = [];
+orbit.pais = 'CO';
+assertPresent(['ACT_PROTECTED_CO'], ['ACT_PROTECTED_GT', 'ACT_UNCONFIRMED_COUNTRY'], 1);
+data.polizas = policies; // a subsequent relation readback must not change count
+data.clientes = clients;
+assertPresent(['ACT_PROTECTED_CO'], ['ACT_PROTECTED_GT', 'ACT_UNCONFIRMED_COUNTRY'], 1);
+orbit.pais = 'GT';
+assertPresent(['ACT_PROTECTED_GT'], ['ACT_PROTECTED_CO', 'ACT_UNCONFIRMED_COUNTRY'], 1);
+
 console.log('PASS historial country selection: GT/CO/TODOS, policy-owned country, deny foreign drawer, read-only');

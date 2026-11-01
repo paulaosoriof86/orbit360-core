@@ -40,6 +40,13 @@ Orbit.modules.historial = (function () {
       return c === 'GT' || c === 'CO' ? c : '';
     };
     if (!a || typeof a !== 'object') return '';
+    // Protected Preview: the scoped server verified each returned activity
+    // against the active role/country and projected its canonical country.
+    // Related policies and clients hydrate independently and may be absent
+    // on a cold reload or immediately after a role change. Re-resolving the
+    // country from those incomplete local caches caused a false zero in the
+    // authenticated Carlos UAT. Never infer a missing protected country.
+    if (S()?._protectedCandidate === true) return country(a.pais || a.country);
     const policyId = a.polizaId || a.policyId;
     if (policyId) {
       let policy = null;
