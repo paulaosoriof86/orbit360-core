@@ -156,10 +156,20 @@ jobs:
           PREVIEW_URL=$(python3 - <<'PY'
           import os,re
           raw=open(os.environ['RUNNER_TEMP']+'/goals-uat-deploy.json',encoding='utf8').read()
-          prefix='https://ays-orbit-360-lab--'+os.environ['CHANNEL_ID']+'-'
-          urls=sorted(set(u.rstrip('/') for u in re.findall(r'https://[A-Za-z0-9._-]+\.web\.app',raw) if u.startswith(prefix)))
-          if len(urls)!=1: raise SystemExit('PREVIEW_URL_NOT_UNIQUE')
-          print(urls[0])
+          wanted='ays-orbit-360-lab--'+os.environ['CHANNEL_ID']
+          urls=sorted(set(u.rstrip('/') for u in re.findall(r'https://[A-Za-z0-9._-]+\.(?:web\.app|firebaseapp\.com)',raw)))
+          candidates=[u for u in urls if wanted in u]
+          preferred=[u for u in candidates if u.endswith('.web.app')]
+          if len(preferred)==1: print(preferred[0])
+          elif len(candidates)==1: print(candidates[0])
+          else:
+              print('PREVIEW_URL_DISCOVERY_CANDIDATES='+repr(urls),file=__import__('sys').stderr)
+              try:
+                  parsed=__import__('json').loads(raw)
+                  shape=list(parsed) if isinstance(parsed,dict) else [type(parsed).__name__]
+              except (ValueError,TypeError): shape=['non_json',len(raw)]
+              print('PREVIEW_URL_DISCOVERY_RAW_SHAPE='+repr(shape),file=__import__('sys').stderr)
+              raise SystemExit('PREVIEW_URL_NOT_UNIQUE')
           PY
           )
           test -n "$PREVIEW_URL"
