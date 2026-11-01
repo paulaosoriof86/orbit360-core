@@ -1,3 +1,6 @@
+import {runB4003AuthenticatedUatSuccessorGuard} from './gravicentra-b4-003-authenticated-uat-successor.mjs';
+if (runB4003AuthenticatedUatSuccessorGuard()) process.exit(0);
+
 import {runGoalParticipationSuccessorGuard} from './gravicentra-b4-003-goal-participation-successor.mjs';
 if (runGoalParticipationSuccessorGuard()) process.exit(0);
 
