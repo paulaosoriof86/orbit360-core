@@ -25,7 +25,7 @@ jobs:
       - name: Checkout only the exact unmerged correction commit
         uses: actions/checkout@v4
         with:
-          ref: 843be2cf49faf1f8b9441edb5507472bedf68779
+          ref: 3644429f08f6bbdbec3ae023e287ad97c4616001
           fetch-depth: 0
           persist-credentials: false
       - uses: actions/setup-node@v4
@@ -34,10 +34,10 @@ jobs:
       - name: Prove two-file diff and RED-to-GREEN real source tests
         run: |
           set -euo pipefail
-          test "$(git rev-parse HEAD)" = '843be2cf49faf1f8b9441edb5507472bedf68779'
+          test "$(git rev-parse HEAD)" = '3644429f08f6bbdbec3ae023e287ad97c4616001'
           git merge-base --is-ancestor ce50d1fc6cc66ad0fc451b25f01b6aeb18aa5064 HEAD
           test "$(git diff --name-only ce50d1fc6cc66ad0fc451b25f01b6aeb18aa5064 HEAD | sort)" = "$(printf '%s\n' orbit360-platform/core/product-hydration-required-optional-p0.js tests/b4-003-forbidden-route-bootstrap.test.cjs | sort)"
           node --test tests/b4-003-forbidden-route-bootstrap.test.cjs
           node --test tests/*.test.cjs
           node tools/gravicentra-b4-003-policy-client-scope-link.test.cjs
-          printf '%s\n' "B4-003 FORBIDDEN-ROUTE SOURCE QA PASS" "Source=843be2cf49faf1f8b9441edb5507472bedf68779" "Two files only. No deployments or data writes. Control Plane and release HOLD unchanged." >> "$GITHUB_STEP_SUMMARY"
+          printf '%s\n' "B4-003 FORBIDDEN-ROUTE SOURCE QA PASS" "Source=3644429f08f6bbdbec3ae023e287ad97c4616001" "Two files only. No deployments or data writes. Control Plane and release HOLD unchanged." >> "$GITHUB_STEP_SUMMARY"
