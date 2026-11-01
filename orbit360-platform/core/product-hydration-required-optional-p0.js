@@ -78,7 +78,14 @@
         var plan=policy&&typeof policy.queryConstraints==='function'
           ?policy.queryConstraints(collection,membership||{},{tenantId:text(membership&&membership.tenantId)})
           :null;
-        return !!(plan&&plan.ok===true&&plan.scope!=='none'&&!(plan.constraints||[]).some(function(x){return x&&x.field==='__deny__';}));
+        // Route-primary readiness must honor the same effective module gate
+        // as the protected query planner. A denied deep link can never force
+        // a required server snapshot that the active role cannot read.
+        var moduleKey=text(plan&&plan.module);
+        return !!(plan&&plan.ok===true&&plan.scope!=='none'&&
+          !(plan.constraints||[]).some(function(x){return x&&x.field==='__deny__';})&&
+          (!moduleKey||(typeof policy.moduleVisible==='function'&&
+            policy.moduleVisible(membership,moduleKey)===true)));
       }catch(error){return false;}
     }
     var allConfigured=unique(required.concat(optional));
