@@ -1,0 +1,81 @@
+{
+  "schema": "GRAVICENTRA_I65_B4003_COLD_DETAIL_SOURCE_SUCCESSOR_V1",
+  "gate": "I6.5/B4-003",
+  "recordType": "ADDITIVE_COLD_DETAIL_SOURCE_REPAIR_NO_RELEASE_AUTHORITY",
+  "status": "SOURCE_QA_PASS_PROTECTED_HOSTING_PREVIEW_AND_CARLOS_UAT_PENDING",
+  "recordedDate": "2026-11-01",
+  "repository": "paulaosoriof86/orbit360-core",
+  "canonicalBranch": "recovery/fase-a-clean-20260831",
+  "canonicalParentHead": "9f2b978704912fff64593a6e51a31d2cd30583a6",
+  "reviewSourceParent": "5b66682eaca3c0684786ade48960915bba32122a",
+  "sourceCommit": "ae5fb39612f7dd30e2f9ca875da5800d2bf251dc",
+  "sourceBlobs": {
+    "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js": "9e9a3f44f862e4be6cdc2d4658be39dddfd3e652",
+    "tools/gravicentra-b4-003-policy-client-scope-link.test.cjs": "250116244c6a708c4e194ce8adc732b6ec0a4465"
+  },
+  "existingPrNumber": 159,
+  "priorReviewBranch": "fix/b4-003-policy-client-scope-20261101",
+  "preservedHistoricals": [
+    "CONTROL_PLANE prior fields",
+    "finding ledger",
+    "canonical composition lock",
+    "closure master lock",
+    "previous B4-003 guard"
+  ],
+  "previousPreview": {
+    "runId": 41265194465,
+    "sourceSha": "9f2b978704912fff64593a6e51a31d2cd30583a6",
+    "exactSourceReadback": true,
+    "productionModified": false
+  },
+  "authenticatedCarlosUat": {
+    "mode": "read_only",
+    "roleCountries": [
+      "Operativo/CO",
+      "Asesor/CO",
+      "Operativo/GT",
+      "Asesor/GT",
+      "Operativo/Todos"
+    ],
+    "vehicleColdReloadFailureObserved": true,
+    "historyCoColdReloadPass": true,
+    "inicioFourOfFivePending": true,
+    "policyClientScopeDifferent": true,
+    "clientRecordPhysicalLossNotProven": true
+  },
+  "fix": {
+    "scope": "protected policy and vehicle deep-link loading/confirmed-absent/denied tri-state; no Cliente360 fallback on cold hydration",
+    "sourcePaths": [
+      "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
+      "tools/gravicentra-b4-003-policy-client-scope-link.test.cjs"
+    ],
+    "regressionCasesPassed": 19,
+    "verificationIdentity": "synthetic_only",
+    "sourceCodeSyntaxPass": true,
+    "productPathDiffOnly": true,
+    "byteExactSourceBlobs": true,
+    "dataWrites": 0
+  },
+  "blockedFirstPreview": {
+    "runId": 41268591670,
+    "reason": "B4_003_POLICY_CLIENT_SCOPE_GUARD_GOVERNANCE_PATH_SCOPE_CHANGED",
+    "guardStoppedBeforeHosting": true,
+    "productRegressionsPass": true
+  },
+  "releaseBoundary": {
+    "temporaryRulesRiskExceptionPreserved": true,
+    "securityCertifiedPass": false,
+    "backendNegativeUidUatPass": false,
+    "restoreDrillAccepted": false,
+    "newSourcePreviewUatPass": false,
+    "productionAuthorized": false,
+    "b4003Closed": false,
+    "dataWrites": 0,
+    "rulesAuthIamChanged": false,
+    "functionsOrLiveDeployed": false,
+    "formalI6Percent": 50,
+    "priorityP0Closed": 1,
+    "priorityP0Total": 6
+  },
+  "nextAction": "GOVERNANCE_GUARD_ON_NEW_ADDITIVE_SOURCE_THEN_EXACT_HOSTING_ONLY_PREVIEW_AND_CARLOS_UAT"
+}

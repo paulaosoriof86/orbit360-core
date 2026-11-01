@@ -20,7 +20,7 @@ jobs:
     if: >-
       github.repository == 'paulaosoriof86/orbit360-core' &&
       github.ref == 'refs/heads/fix/b4-003-policy-client-scope-20261101' &&
-      github.event.head_commit.message == 'test(i6.5 B4-003): cold-detail ae5f isolated Hosting Preview'
+      github.event.head_commit.message == 'build(i6.5 B4-003): guarded cold-detail ae5f Hosting Preview'
     runs-on: ubuntu-24.04
     timeout-minutes: 40
     env:
@@ -50,7 +50,8 @@ jobs:
         run: |
           set -euo pipefail
           test "$(git merge-base "$EXACT_SOURCE_SHA" HEAD)" = "$EXACT_SOURCE_SHA"
-          test "$(git diff --name-only "$EXACT_SOURCE_SHA" HEAD)" = '.github/workflows/gravicentra-b4-003-cold-detail-hosting-preview-20261101.yml'
+          test "$(git diff --name-only "$EXACT_SOURCE_SHA" HEAD | sort)" = "$(printf '%s\n' artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json artifacts/orbit360-recovery/release-control/I6_5_B4_003_COLD_DETAIL_ROUTE_SOURCE_SUCCESSOR_20261101.json tools/gravicentra-b4-003-cold-detail-route-successor.mjs tools/gravicentra-i6-control-plane-guard-v1.mjs .github/workflows/gravicentra-b4-003-cold-detail-hosting-preview-20261101.yml | sort)"
+          node tools/gravicentra-governance-preflight-v1.mjs --mode=governance
           git checkout --detach "$EXACT_SOURCE_SHA"
           test "$(git rev-parse HEAD)" = "$EXACT_SOURCE_SHA"
           node --check orbit360-platform/modules/policy-receipts-v1199-detail-guard.js
@@ -58,7 +59,6 @@ jobs:
           node tools/gravicentra-b4-003-scoped-related-reader.test.cjs
           node tools/gravicentra-b4-003-historial-country-selection.test.cjs
           node --test tests/*.test.cjs
-          node tools/gravicentra-governance-preflight-v1.mjs --mode=governance
 
       - name: Snapshot both LIVE portals (GET only)
         run: |
