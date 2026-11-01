@@ -1,0 +1,158 @@
+name: Gravicentra B4-003 canonical client-policy ID join READ-ONLY
+
+# Inspect only canonical tenant clients/policies field projections; emit aggregates, no PII.
+on:
+  push:
+    branches: [qa/b4-003-9f2b-hosting-preview-20261101]
+    paths:
+      - .github/workflows/gravicentra-b4-003-canonical-client-join-readonly-20261101.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: gi-b4003-canonical-client-join-readonly-20261101
+  cancel-in-progress: false
+
+jobs:
+  canonical-join-aggregates:
+    if: >-
+      github.repository == 'paulaosoriof86/orbit360-core' &&
+      github.ref == 'refs/heads/qa/b4-003-9f2b-hosting-preview-20261101' &&
+      github.event.head_commit.message == 'test(i6.5 B4-003): read-only physical client-policy ID join'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 16
+    env:
+      EXACT_SOURCE_SHA: 9f2b978704912fff64593a6e51a31d2cd30583a6
+      PROJECT_ID: ays-orbit-360-lab
+      TENANT_ID: alianzas-soluciones
+      SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Assert one-off workflow-only ancestry and active security HOLD
+        run: |
+          set -euo pipefail
+          test "$(git merge-base "$EXACT_SOURCE_SHA" HEAD)" = "$EXACT_SOURCE_SHA"
+          test "$(git diff --name-only HEAD^ HEAD)" = '.github/workflows/gravicentra-b4-003-canonical-client-join-readonly-20261101.yml'
+          test "$(git diff --name-only "$EXACT_SOURCE_SHA" HEAD | LC_ALL=C sort)" = "$(printf '%s\n' .github/workflows/gravicentra-b4-003-canonical-9f2b-hosting-preview-20261101.yml .github/workflows/gravicentra-b4-003-canonical-client-join-readonly-20261101.yml | LC_ALL=C sort)"
+          git checkout --detach "$EXACT_SOURCE_SHA"
+          node - <<'NODE'
+          const c=require('./artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json');
+          if(c.b4003SecurityReleaseHold?.status!=='ACTIVE_FAIL_CLOSED_UNAUTHORIZED_BROWSER_FIRESTORE_READ_WRITE'||c.i6Execution?.dataMutationAuthorized!==false)throw Error('READONLY_RELEASE_HOLD_CHANGED');
+          console.log('B4_003_PHYSICAL_JOIN_AUTHORITY=READ_ONLY_HOLD_CANONICAL_9F2B');
+          NODE
+
+      - name: Prepare only existing project-matched LAB credentials
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/client-join-auth"
+          python3 - <<'PY'
+          import json,os,pathlib
+          target=pathlib.Path(os.environ['RUNNER_TEMP'])/'client-join-auth'/'selected.json'
+          for key in ('SA_ORBIT360_LAB','SA_ORBIT_360_LAB','SA_DEFAULT'):
+              try: d=json.loads(os.environ.get(key,''))
+              except (ValueError,TypeError): continue
+              if d.get('type')=='service_account' and d.get('project_id')==os.environ['PROJECT_ID'] and d.get('private_key'):
+                  target.write_text(json.dumps(d),encoding='utf8')
+                  target.chmod(0o600)
+                  break
+          if not target.exists(): raise SystemExit('LAB_AUTH_UNAVAILABLE_FOR_READ_ONLY_AUDIT')
+          PY
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/client-join-auth/selected.json" >> "$GITHUB_ENV"
+          npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund firebase-admin@13.4.0 >/dev/null
+
+      - name: Read projected Firestore fields, count unique links, emit non-PII aggregates
+        run: |
+          set -euo pipefail
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const {initializeApp,applicationDefault,deleteApp}=require('firebase-admin/app');
+          const {getFirestore}=require('firebase-admin/firestore');
+          const expected='ays-orbit-360-lab';
+          const project=process.env.PROJECT_ID;
+          const tenant=process.env.TENANT_ID;
+          if(project!==expected||tenant!=='alianzas-soluciones')throw Error('PROJECT_TENANT_NOT_AUTHORIZED');
+          const cred=JSON.parse(fs.readFileSync(process.env.GOOGLE_APPLICATION_CREDENTIALS,'utf8'));
+          if(cred.type!=='service_account'||cred.project_id!==project)throw Error('SERVICE_ACCOUNT_PROJECT_MISMATCH');
+          const app=initializeApp({credential:applicationDefault(),projectId:project});
+          const db=getFirestore(app);
+          const txt=v=>String(v==null?'':v).trim();
+          const country=v=>txt(v).toUpperCase()||'UNSPECIFIED';
+          const path=k=>db.collection('tenants').doc(tenant).collection('data').doc(k).collection('items');
+          const category=(p,c,pc)=>{
+            if(!txt(p.clienteId))return 'POLICY_EMPTY_CLIENT_ID';
+            if(!c)return 'CLIENT_ID_UNMATCHED_IN_CANONICAL_COLLECTION';
+            if(c.fusionado===true||txt(c.mergedIntoClientId))return 'CLIENT_EXISTS_MERGED';
+            const cc=country(c.pais);
+            if(cc===pc)return 'CLIENT_EXISTS_COUNTRY_MATCH';
+            if(['GT','CO'].includes(cc))return 'CLIENT_EXISTS_OTHER_COUNTRY';
+            return 'CLIENT_EXISTS_COUNTRY_UNRESOLVED';
+          };
+          (async()=>{
+            // Firestore field masks prevent fetching client names, contacts, financials or documents.
+            const [cs,ps]=await Promise.all([
+              path('clientes').select('id','pais','fusionado','mergedIntoClientId').get(),
+              path('polizas').select('id','clienteId','pais','estado').get()
+            ]);
+            const clients=new Map(),canonicalClientDocs=[];
+            for(const doc of cs.docs){
+              const d=doc.data()||{};
+              canonicalClientDocs.push(d);
+              clients.set(doc.id,d);
+              if(txt(d.id))clients.set(txt(d.id),d);
+            }
+            const counts={GT:{},CO:{},UNSPECIFIED:{}};
+            const unique={GT:{},CO:{},UNSPECIFIED:{}};
+            const policyTotals={GT:0,CO:0,UNSPECIFIED:0};
+            const clientCountryTotals={GT:0,CO:0,UNSPECIFIED:0};
+            const mergedClientCountryTotals={GT:0,CO:0,UNSPECIFIED:0};
+            for(const c of canonicalClientDocs){
+              const cc=country(c.pais),k=['GT','CO'].includes(cc)?cc:'UNSPECIFIED';
+              clientCountryTotals[k]++;
+              if(c.fusionado===true||txt(c.mergedIntoClientId))mergedClientCountryTotals[k]++;
+            }
+            for(const doc of ps.docs){
+              const p=doc.data()||{};
+              const client=clients.get(txt(p.clienteId));
+              const pc=country(p.pais||client?.pais);
+              const k=['GT','CO'].includes(pc)?pc:'UNSPECIFIED';
+              const reason=category(p,client,pc);
+              policyTotals[k]++;
+              counts[k][reason]=(counts[k][reason]||0)+1;
+              if(!unique[k][reason])unique[k][reason]=new Set();
+              if(txt(p.clienteId))unique[k][reason].add(txt(p.clienteId));
+            }
+            const out={schema:'GRAVICENTRA_I65_B4003_PHYSICAL_CLIENT_POLICY_JOIN_AGGREGATES_V1',
+              status:'READ_ONLY_UNACCEPTED_EVIDENCE',sourceSha:process.env.EXACT_SOURCE_SHA,
+              projectId:project,tenantLabel:tenant,source:'FIRESTORE_ADMIN_FIELD_PROJECTION',
+              canonicalClientsDocCount:cs.size,canonicalPoliciesDocCount:ps.size,
+              clientCountryTotals,mergedClientCountryTotals,
+              policyCountryTotals:policyTotals,policyRelationCounts:counts,
+              uniqueClientForeignKeyCounts:Object.fromEntries(Object.keys(unique).map(k=>[k,Object.fromEntries(Object.entries(unique[k]).map(([reason,ids])=>[reason,ids.size]))])),
+              caveats:['Admin raw storage does not assert Carlos signed-in role scope or permission','Observed 112 UI unavailable counts policies, not unique client records','Unmatched ID does not prove physical deletion; investigate legacy IDs before mutation'],
+              controls:{sourcePinned:true,queries:2,fieldMasks:true,personalFieldsExported:false,firestoreWrites:0,rulesWrites:0,hostingWrites:0,liveWrites:0,productionApproved:false}
+            };
+            fs.writeFileSync(process.env.RUNNER_TEMP+'/client-join-aggregates.json',JSON.stringify(out,null,2)+'\n',{mode:0o600});
+            console.log('B4_003_CLIENT_POLICY_PHYSICAL_JOIN_AGGREGATES='+JSON.stringify({clientDocs:cs.size,policyDocs:ps.size,clientCountryTotals,mergedClientCountryTotals,policyCountryTotals:policyTotals,relations:counts,uniqueClientForeignKeys:out.uniqueClientForeignKeyCounts}));
+            console.log('B4_003_PHYSICAL_JOIN_WRITE_COUNT=0 PRODUCTION_HOLD');
+            await deleteApp(app);
+          })().catch(async e=>{console.error('B4003_READONLY_AUDIT_FAILED:'+String(e.message||e));await deleteApp(app);process.exitCode=1;});
+          NODE
+
+      - name: Preserve only aggregated receipt
+        uses: actions/upload-artifact@v4
+        with:
+          name: gi-b4003-client-policy-join-aggregates-${{ github.run_id }}
+          path: ${{ runner.temp }}/client-join-aggregates.json
+          if-no-files-found: error
+          retention-days: 7
