@@ -1,0 +1,64 @@
+name: Gravicentra B4-003 Goals Published Preview Exact Readback NO DEPLOY
+on:
+  push:
+    branches: [transport/gi-b4003-goals-0a25-hosting]
+    paths: [.github/workflows/gravicentra-b4-003-goals-hosted-readback-only-20261101.yml]
+permissions:
+  contents: read
+concurrency:
+  group: gi-b4003-goals-0a25-hosted-readback
+  cancel-in-progress: false
+jobs:
+  certified-readback:
+    if: >-
+      github.repository == 'paulaosoriof86/orbit360-core' &&
+      github.ref == 'refs/heads/transport/gi-b4003-goals-0a25-hosting' &&
+      github.event.head_commit.message == 'test(i6.5 B4-003): read back published exact Goals Preview without deployment'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    env:
+      SOURCE_SHA: 0a25c5a2bf58bbe06537be42388b8530802f9c49
+      PROJECT_ID: ays-orbit-360-lab
+      PREVIEW_URL: https://ays-orbit-360-lab--gi-i65-b4-goals-0a25c5a2-4125511708-kkkvh71b.web.app
+    steps:
+      - name: Read exact certified source; never checkout transport as product
+        uses: actions/checkout@v4
+        with:
+          ref: 0a25c5a2bf58bbe06537be42388b8530802f9c49
+          path: source
+          fetch-depth: 1
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Compare already-hosted files byte for byte; strictly read-only
+        run: |
+          set -euo pipefail
+          test "$(git -C source rev-parse HEAD)" = "$SOURCE_SHA"
+          SITE="$RUNNER_TEMP/goals-served-readback"
+          mkdir -p "$SITE"
+          for f in __recovery__/build.json product-runtime-config.js index.html modules/equipo.js modules/inicio.js modules/finanzas.js modules/insights.js core/assignable-advisor-roster-client.js data/store-firestore-product-operational-p0.js; do
+            mkdir -p "$(dirname "$SITE/$f")"
+            curl -fsSL --retry 3 --retry-all-errors --max-time 30 "$PREVIEW_URL/$f" -o "$SITE/$f"
+            test -s "$SITE/$f"
+          done
+          for f in modules/equipo.js modules/inicio.js modules/finanzas.js modules/insights.js core/assignable-advisor-roster-client.js data/store-firestore-product-operational-p0.js; do
+            cmp "source/orbit360-platform/$f" "$SITE/$f"
+          done
+          export SITE
+          node - <<'NODE'
+          const fs=require('node:fs'),vm=require('node:vm'),path=require('node:path');
+          const root=process.env.SITE,read=f=>fs.readFileSync(path.join(root,f),'utf8');
+          const b=JSON.parse(read('__recovery__/build.json')),ctx={window:{}};
+          vm.runInNewContext(read('product-runtime-config.js'),ctx,{timeout:1000});
+          const c=ctx.window.__ORBIT360_PRODUCT_PUBLIC_CONFIG__;
+          if(b.sourceSha!==process.env.SOURCE_SHA||b.gate!=='I6.5-B4-003'||!b.buildId?.startsWith('gi-i65-b4-'))throw Error('GOALS_HOSTED_BUILD_IDENTITY_MISMATCH');
+          if(c?.sourceSha!==b.sourceSha||c?.buildId!==b.buildId||c?.projectId!==process.env.PROJECT_ID||c?.enabled!==true||c?.scopedReadPreviewCandidate!==true||c?.goalParticipationPreviewCandidate!==true)throw Error('GOALS_HOSTED_RUNTIME_CONFIG_MISMATCH');
+          const html=read('index.html');
+          if(!html.includes('data/tenant-public-branding-snapshot.generated.js')||!html.includes('orbitBuild='+encodeURIComponent(b.buildId))||!html.includes('modules/equipo.js')||!html.includes('modules/inicio.js'))throw Error('GOALS_HOSTED_INDEX_BUILD_BINDING_MISMATCH');
+          console.log('GOALS_EXACT_PUBLIC_READBACK_PASS',JSON.stringify({sourceSha:b.sourceSha,buildId:b.buildId,projectId:c.projectId,goalOptIn:c.goalParticipationPreviewCandidate}));
+          NODE
+          for f in modules/equipo.js modules/inicio.js modules/finanzas.js modules/insights.js core/assignable-advisor-roster-client.js data/store-firestore-product-operational-p0.js; do
+            sha256sum "$SITE/$f"
+          done
+          printf '%s\n' "GOALS_PUBLISHED_PREVIEW_EXACT_READBACK_PASS" "Source: $SOURCE_SHA" "URL: $PREVIEW_URL" "6 changed product modules: source/Hosting byte-identical; index build-bound; runtime Preview flags and source exact." "NO DEPLOY; NO FIREBASE SERVICE ACCOUNT; NO DATA WRITES; NO LIVE PROMOTION; AUTHENTICATED UAT STILL PENDING; B4-003 HOLD." >> "$GITHUB_STEP_SUMMARY"
