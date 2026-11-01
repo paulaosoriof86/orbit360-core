@@ -1,0 +1,79 @@
+{
+  "schema": "GRAVICENTRA_I65_B4003_AUTHENTICATED_UAT_GOVERNANCE_SUCCESSOR_V1",
+  "recordType": "ADDITIVE_RELEASE_HOLD_WITH_REPRODUCIBLE_UAT_SOURCE",
+  "status": "THREE_OF_THREE_AUTHENTICATED_UAT_PASS_PRODUCTION_NO_GO",
+  "recordedDate": "2026-11-01",
+  "repository": "paulaosoriof86/orbit360-core",
+  "canonicalBranch": "recovery/fase-a-clean-20260831",
+  "gate": "I6.5/B4-003",
+  "canonicalParentHead": "0a25c5a2bf58bbe06537be42388b8530802f9c49",
+  "verifiedSourceCommit": "f598a65f7cdbbfe358ba54d71e48598aa6174107",
+  "verifiedPreviewWorkflowHead": "1a43289b1648bfb5ff936c3c63dadda85770ff71",
+  "sourceDeltaPaths": [
+    "orbit360-platform/modules/equipo-onboarding-v20260804-bridge.js",
+    "orbit360-platform/modules/equipo.js",
+    "orbit360-platform/modules/inicio.js",
+    "tests/goal-participation-uat-regressions.test.cjs"
+  ],
+  "sourceBlobs": {
+    "orbit360-platform/modules/equipo-onboarding-v20260804-bridge.js": "7b0e5cee941f8289a32fc53d2081f1a381fb6974",
+    "orbit360-platform/modules/equipo.js": "411b8200a29dedf734e1640576319ccb88fc5c1a",
+    "orbit360-platform/modules/inicio.js": "51eeabf680f219f50b4784a030aff8a5b55c9720",
+    "tests/goal-participation-uat-regressions.test.cjs": "eaabd90816631b199a440bd93115e5d829a13010"
+  },
+  "isolatedPreview": {
+    "workflowPath": ".github/workflows/gravicentra-b4-003-uat-successor-preview-20261101.yml",
+    "workflowBlob": "29ef8ee9f54d29cdd35ee58811c98fa524b1088b",
+    "workflowCommitHead": "1a43289b1648bfb5ff936c3c63dadda85770ff71",
+    "runId": 41257740341,
+    "runConclusion": "success",
+    "url": "https://ays-orbit-360-lab--gi-i65-b4-goals-f598a65f-4125748800-qjmp86cw.web.app/",
+    "sourceBytesMatchReadback": true,
+    "liveOriginsBeforeAfterUnchanged": true,
+    "hostingOnly": true,
+    "ttlDays": 7
+  },
+  "authenticatedUat": {
+    "verifiedScenarios": [
+      "EQUIPO_VINCULACION_REMAINS_SEVEN_UNCLASSIFIED_AUTH_BADGE_ONLY_IN_ACCESS",
+      "METAS_OCTOBER_GT_LOCAL_MONTH_AND_PAULA_40000_40000_50000_READ_ONLY",
+      "INICIO_ONE_OF_SEVEN_CONFIGURED_ZERO_OF_SEVEN_ELIGIBLE_FIVE_OF_FIVE_SOURCES"
+    ],
+    "passed": 3,
+    "total": 3,
+    "independentCarlosSamuelUidProof": false,
+    "issue": 154,
+    "issueCommentId": 6551126535
+  },
+  "automation": {
+    "nodeTestFile": "tests/goal-participation-uat-regressions.test.cjs",
+    "suiteCommand": "node --test tests/*.test.cjs",
+    "passing": 5,
+    "total": 5,
+    "writeScope": "SYNTHETIC_LOCAL_ONLY"
+  },
+  "frozenGovernance": {
+    "controlPlaneBeforeBlob": "9962b3bfee0099470107b23c37f0245a672806f7",
+    "guardBeforeBlob": "d329eed6679196d2ec34f75868e6fee663250cd9",
+    "previousControlKeys": 429,
+    "priorReceiptsRewritten": false
+  },
+  "releaseBoundary": {
+    "formalI6Percent": 50,
+    "priorityP0Closed": 1,
+    "priorityP0Total": 6,
+    "globalImplementationPercent": null,
+    "advisorClassificationsChanged": 0,
+    "freelancersPreliminaryOnly": ["Johanna", "Nicole", "Braulio"],
+    "businessDataWrites": 0,
+    "sharedRulesAuthIamChanged": false,
+    "functionsDeployed": false,
+    "liveHostingDeployed": false,
+    "securityRulesP0Closed": false,
+    "independentUidUatPassed": false,
+    "restoreDrillAccepted": false,
+    "b4003Closed": false,
+    "productionAuthorized": false
+  },
+  "nextGate": "SCOPED_CODE_CANONICAL_CI_THEN_P0_SECURITY_INDEPENDENT_UID_UAT_AND_RECOVERY_SIGNOFF"
+}

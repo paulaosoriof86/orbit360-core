@@ -183,7 +183,24 @@ Orbit.modules.inicio = (function () {
     const cart=paymentReadiness==='ready'&&q.carteraGlobalPorMoneda?q.carteraGlobalPorMoneda():{byCurrency:{},currencies:[]};
     const renov=policyReadiness==='ready'?renewalRows45():[], venc=portfolioReadiness==='ready'&&q.carteraVencidaRows?q.carteraVencidaRows():[];
     const board=productionReadiness==='ready'&&advisorReadiness==='ready'
-      ?(secureRoster.rows.flatMap(a=>{const totals=q.produccionMesPorMoneda?q.produccionMesPorMoneda(mesKey,a.id):{};return a.paises.filter(c=>c===a.primaryCountry&&(activeCountry==='TODOS'||activeCountry===c)).map(c=>{const currency=c==='GT'?'GTQ':'COP',g=a.metas?.[c],goal=g?.explicit===true?(U.finiteNumber(g.produccion)>0?g.produccion:null):(a.paises.length===1&&U.finiteNumber(a.metaPrima)>0?a.metaPrima:null),actual=U.finiteNumber(totals[currency]),participa=a.participaMetas===true;return{asesor:{...a,nombre:a.nombre+(a.paises.length>1?' · '+c:'')},byCurrency:{[currency]:totals[currency]||0},pct:!participa||goal==null?null:Math.max(0,Math.min(140,Math.round((actual==null?0:actual)/goal*100))),metaDisponible:participa&&goal!=null,pais:c,participaMetas:participa,pendienteClasificacion:a.pendienteClasificacion===true};});}) ):[];
+      ?secureRoster.rows.flatMap(a=>{
+        const totals=q.produccionMesPorMoneda?q.produccionMesPorMoneda(mesKey,a.id):{};
+        return a.paises.filter(c=>c===a.primaryCountry&&(activeCountry==='TODOS'||activeCountry===c)).map(c=>{
+          const currency=c==='GT'?'GTQ':'COP',g=a.metas?.[c];
+          const goal=g?.explicit===true
+            ?(U.finiteNumber(g.produccion)>0?g.produccion:null)
+            :(a.paises.length===1&&U.finiteNumber(a.metaPrima)>0?a.metaPrima:null);
+          const actual=U.finiteNumber(totals[currency]),participa=a.participaMetas===true;
+          return{
+            asesor:{...a,nombre:a.nombre+(a.paises.length>1?' · '+c:'')},
+            byCurrency:{[currency]:totals[currency]||0},
+            pct:!participa||goal==null?null:Math.max(0,Math.min(140,Math.round((actual==null?0:actual)/goal*100))),
+            metaConfigurada:goal!=null,
+            metaDisponible:participa&&goal!=null,
+            pais:c,participaMetas:participa,pendienteClasificacion:a.pendienteClasificacion===true
+          };
+        });
+      }):[];
     const clientes=q.clientesScoped?q.clientesScoped():Orbit.store.all('clientes'), polizas=q.polizasScoped?q.polizasScoped():Orbit.store.all('polizas');
     const metasMes=[]; // Inicio metas originate only from the authorized server projection.
     const advisors=secureRoster.rows;
@@ -302,9 +319,10 @@ Orbit.modules.inicio = (function () {
       ?(venc.length?'Hay '+venc.length+' obligaciones vencidas visibles; revisa su gestión y aplicación.':
         'No se registran obligaciones vencidas en el alcance visible confirmado.')
       :'La cartera aún no tiene una lectura completa y no se calcula un saldo provisional.');
+    const configuredAdvisorGoals=board.filter(item=>item.metaConfigurada).length;
     const verifiedAdvisorGoals=board.filter(item=>item.metaDisponible).length;
     criticalInsights.push(advisorReadiness==='ready'&&productionReadiness==='ready'&&board.length
-      ? verifiedAdvisorGoals+' de '+board.length+' perfiles del alcance tienen meta individual verificable.'
+      ? configuredAdvisorGoals+' de '+board.length+' perfiles tienen meta de producción configurada; '+verifiedAdvisorGoals+' de '+board.length+' habilitados para calcular cumplimiento según clasificación.'
       :'No se certifica el cumplimiento de asesores sin metas y producción confirmadas.');
     const evidenceCount=[clientReadiness,policyReadiness,portfolioReadiness,paymentReadiness,advisorReadiness].filter(v=>v==='ready').length;
     host.innerHTML=`<div class="page" data-inicio-reality-ready="1">
