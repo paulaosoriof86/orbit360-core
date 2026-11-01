@@ -142,6 +142,12 @@ Orbit.modules = Orbit.modules || {};
     const status=store._productStatus() || {}, confirmed=status.serverConfirmedCollections || [];
     return confirmed.indexOf(name) >= 0;
   }
+  function canOpenClientRecord(rawClient) {
+    try {
+      return !!(rawClient&&Orbit.access&&typeof Orbit.access.canView==='function'&&
+        Orbit.access.canView('clientes',rawClient,'cliente360'));
+    } catch (_e) { return false; }
+  }
   function ensureDetailCollections(names) {
     const store=S();
     if (!store || typeof store._ensureCollections !== 'function') return;
@@ -399,6 +405,10 @@ Orbit.modules = Orbit.modules || {};
     }
     const vehiclesReady=collectionConfirmed('vehiculos'), receiptsReady=collectionConfirmed('recibosEsperados');
     const p = policyVisual(p0), cli = rawClient || {}, asg = S().get('aseguradoras', p.aseguradoraId) || {}, ase = S().get('asesores', p.asesorId) || {};
+    // Policy scope and client scope are independent. A valid policy may link to
+    // a client outside this role/country or not present in the authorized read.
+    // Never offer a client deep-link that the CRM guard will refuse.
+    const clientLinkAllowed=canOpenClientRecord(rawClient);
     const linkedVehicles=vehiclesReady ? (S().all('vehiculos') || []).filter(v => v && safe(v.polizaId) === safe(p.id)) : [];
     const contextVehicle=vehiclesReady&&contextVehicleId?S().get('vehiculos',contextVehicleId):null;
     const vehicle=contextVehicle&&safe(contextVehicle.polizaId)===safe(p.id)?contextVehicle:linkedVehicles[0];
@@ -411,17 +421,23 @@ Orbit.modules = Orbit.modules || {};
     const pb = premiumBreakdown(p);
     const ivaLabel = p.ivaPct != null ? `IVA / impuestos (${p.ivaPct}%)` : 'IVA / impuestos';
     const back = `#/cliente360?c=${encodeURIComponent(p.clienteId)}&t=polizas`;
+    const clientAction=clientLinkAllowed
+      ? `<a class="btn ghost" href="${back}">👤 Cliente 360</a>`
+      : '<span class="badge neutral" data-policy-client-unavailable="1">Ficha del cliente fuera de alcance</span>';
+    const clientDetailAction=clientLinkAllowed
+      ? `<a class="btn ghost" href="${back}">Abrir ficha del cliente</a>`
+      : '<div class="cfg-note" data-policy-client-scope-note="1">La póliza está disponible en tu alcance, pero la ficha del cliente no está autorizada o no figura en la lectura confirmada. No se han cambiado países, relaciones ni permisos.</div>';
     const scheduleDelta = receiptsReady && pb.total != null && pb.scheduleTotal != null ? pb.scheduleTotal - pb.total : null;
     const scheduleTolerance = reconciliationTolerance();
     const canManage = canEditVehicle();
     const renewAction = renewalEligible(p) ? `<button class="btn primary" onclick="Orbit.policyVehicleReadModelV1199c.startRenewal('${esc(p.id)}')">🔄 Renovar</button>` : '';
     const deleteAction = canManage ? `<button class="btn ghost" style="color:var(--danger,var(--red))" onclick="Orbit.policyVehicleReadModelV1199c.deletePolicy('${esc(p.id)}')">Eliminar</button>` : '';
     host.innerHTML = `<div class="page orbit-policy-fullpage" data-policy-fullpage="1" data-policy-context-vehicle="${esc(contextVehicleId||'')}">
-      <div class="crumb" style="margin-bottom:14px"><a style="cursor:pointer;color:var(--red)" href="${back}">‹ ${esc(cli.nombre || 'Cliente 360')}</a> / Póliza ${esc(p.numero || '')}</div>
+      <div class="crumb" style="margin-bottom:14px"><a style="cursor:pointer;color:var(--red)" href="${clientLinkAllowed?back:'#/polizas'}">‹ ${clientLinkAllowed?esc(cli.nombre || 'Cliente 360'):'Pólizas'}</a> / Póliza ${esc(p.numero || '')}</div>
       <div class="card gi-policy-hero" style="overflow:hidden;margin-bottom:16px">
         <div style="padding:20px 22px;background:linear-gradient(120deg,var(--graph),#10141a);display:flex;align-items:flex-start;gap:18px;justify-content:space-between;flex-wrap:wrap">
           <div style="min-width:0;display:flex;gap:14px;align-items:flex-start"><div class="gi-hero-icon">📑</div><div><div class="muted" style="color:rgba(255,255,255,.7);font-size:11px;text-transform:uppercase;letter-spacing:.12em">Póliza · ${esc(p.tipoPoliza)}</div><h2 style="color:#fff;margin:4px 0 3px;font-family:var(--f-display);font-size:24px;overflow-wrap:anywhere">${esc(p.ramo || 'Póliza')} · ${esc(p.producto || p.subramo || 'Detalle')}</h2><div class="mono" style="color:rgba(255,255,255,.86)">${esc(p.numero || 'Número pendiente')} · ${esc(asg.nombre || 'Aseguradora pendiente')} · ${esc(fmtDate(p.vigenciaInicio))} → ${esc(fmtDate(p.vigenciaFin))}</div></div></div>
-          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">${badge(p.estado)}${renewAction}<button class="btn primary" onclick="Orbit.modules.cliente360.editarPoliza('${esc(p.id)}')">✏️ Editar póliza</button><button class="btn ghost" onclick="Orbit.ciclo&&Orbit.ciclo.solicitarGestion&&Orbit.ciclo.solicitarGestion('${esc(p.clienteId)}','${esc(p.id)}',false,{tipo:'Gestión de póliza',lista:'Gestiones Admin',origen:'Póliza'})">🗂 Gestión</button>${deleteAction}<a class="btn ghost" href="${back}">👤 Cliente 360</a></div>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">${badge(p.estado)}${renewAction}<button class="btn primary" onclick="Orbit.modules.cliente360.editarPoliza('${esc(p.id)}')">✏️ Editar póliza</button><button class="btn ghost" onclick="Orbit.ciclo&&Orbit.ciclo.solicitarGestion&&Orbit.ciclo.solicitarGestion('${esc(p.clienteId)}','${esc(p.id)}',false,{tipo:'Gestión de póliza',lista:'Gestiones Admin',origen:'Póliza'})">🗂 Gestión</button>${deleteAction}${clientAction}</div>
         </div>
       </div>
       ${versionContext}
@@ -460,7 +476,7 @@ Orbit.modules = Orbit.modules || {};
         <div style="display:grid;gap:16px;min-width:0">
           ${section('📌 Resumen', `<div style="display:grid;gap:10px">${field('Prima total', moneyDetail(pb.total,cur))}${field('Vigencia', `${fmtDate(p.vigenciaInicio)} → ${fmtDate(p.vigenciaFin)}`)}${field('Forma de pago', p.formaPago)}${field('Estado', p.estado)}</div>`)}
           ${section('🕘 Historial y endosos', (p.historial || []).length ? `<div style="display:grid;gap:10px">${(p.historial || []).slice().reverse().map(e=>`<div style="border-left:2px solid var(--line);padding-left:10px"><b>${esc(first(e.t,e.tipo,'Actualización'))}</b><div class="muted" style="font-size:12px">${esc(fmtDate(e.fecha))}${e.d?' · '+esc(e.d):''}</div></div>`).join('')}</div>` : '<div class="muted">Sin movimientos adicionales registrados.</div>')}
-          ${section('⚡ Acciones', `<div style="display:grid;gap:8px"><a class="btn ghost" href="${back}">Abrir ficha del cliente</a>${vehicle ? `<a class="btn ghost" href="#/cliente360?c=${encodeURIComponent(p.clienteId)}&v=${encodeURIComponent(vehicle.id)}">Ver vehículo completo</a>` : ''}</div>`)}
+          ${section('⚡ Acciones', `<div style="display:grid;gap:8px">${clientDetailAction}${vehicle ? `<a class="btn ghost" href="#/cliente360?c=${encodeURIComponent(p.clienteId)}&v=${encodeURIComponent(vehicle.id)}">Ver vehículo completo</a>` : ''}</div>`)}
         </div>
       </div>
     </div>`;
@@ -468,14 +484,23 @@ Orbit.modules = Orbit.modules || {};
 
   function renderVehiclePage(host, vehicleId) {
     applyVisualAliasesInPlace();
+    ensureDetailCollections(['vehiculos','clientes','polizas']);
     const v0 = S().get('vehiculos', vehicleId);
     if (!v0) { host.innerHTML = '<div class="page"><div class="card pad">Vehículo no disponible.</div></div>'; return; }
-    const v = vehicleVisual(v0), p = policyVisual(S().get('polizas', v.polizaId) || {}), cli = S().get('clientes', v.clienteId) || {}, asg = S().get('aseguradoras', v.aseguradoraId || p.aseguradoraId) || {};
+    const v = vehicleVisual(v0), p = policyVisual(S().get('polizas', v.polizaId) || {}), rawClient=S().get('clientes', v.clienteId), cli = rawClient || {}, asg = S().get('aseguradoras', v.aseguradoraId || p.aseguradoraId) || {};
+    if (!rawClient && !collectionConfirmed('clientes')) {
+      host.innerHTML = '<div class="page" data-vehicle-detail-loading="client"><div class="card pad">Confirmando el alcance del cliente y las relaciones del vehículo…</div></div>';
+      return;
+    }
     const cur = p.moneda || cli.moneda || '';
     const back = `#/cliente360?c=${encodeURIComponent(v.clienteId)}&t=vehiculos`;
+    const clientLinkAllowed=canOpenClientRecord(rawClient);
+    const vehicleClientAction=clientLinkAllowed
+      ? `<a class="btn ghost" href="${back}">👤 Cliente 360</a>`
+      : '<span class="badge neutral" data-vehicle-client-unavailable="1">Ficha del cliente fuera de alcance</span>';
     host.innerHTML = `<div class="page orbit-vehicle-fullpage" data-vehicle-fullpage="1">
-      <div class="crumb" style="margin-bottom:14px"><a href="${back}" style="color:var(--red)">‹ ${esc(cli.nombre || 'Cliente 360')}</a> / Vehículo</div>
-      <div class="card gi-vehicle-hero" style="overflow:hidden;margin-bottom:16px"><div style="padding:20px 22px;background:linear-gradient(120deg,#1f3a5f,#142840);display:flex;justify-content:space-between;gap:16px;align-items:flex-start;flex-wrap:wrap"><div style="display:flex;gap:14px;align-items:flex-start"><div class="gi-hero-icon">🚘</div><div><div style="color:rgba(255,255,255,.68);text-transform:uppercase;letter-spacing:.12em;font-size:11px">Vehículo asegurado</div><h2 style="color:#fff;margin:4px 0;font-family:var(--f-display)">${esc(shown(v.marca))} ${esc(shown(v.linea))} ${esc(shown(v.anio))}</h2><div class="mono" style="color:rgba(255,255,255,.85)">${esc(shown(v.placa))}${p.numero?' · póliza '+esc(p.numero):''}</div></div></div><div style="display:flex;gap:8px;flex-wrap:wrap">${canEditVehicle() ? `<button class="btn primary" onclick="Orbit.modules.cliente360.editarVehiculo('${esc(v.id)}')">✏️ Editar vehículo</button><button class="btn ghost" style="color:var(--danger,var(--red))" onclick="Orbit.policyVehicleReadModelV1199c.deleteVehicle('${esc(v.id)}')">Eliminar</button>` : ''}<a class="btn ghost" href="${back}">👤 Cliente 360</a></div></div></div>
+      <div class="crumb" style="margin-bottom:14px"><a href="${clientLinkAllowed?back:'#/polizas'}" style="color:var(--red)">‹ ${clientLinkAllowed?esc(cli.nombre || 'Cliente 360'):'Pólizas'}</a> / Vehículo</div>
+      <div class="card gi-vehicle-hero" style="overflow:hidden;margin-bottom:16px"><div style="padding:20px 22px;background:linear-gradient(120deg,#1f3a5f,#142840);display:flex;justify-content:space-between;gap:16px;align-items:flex-start;flex-wrap:wrap"><div style="display:flex;gap:14px;align-items:flex-start"><div class="gi-hero-icon">🚘</div><div><div style="color:rgba(255,255,255,.68);text-transform:uppercase;letter-spacing:.12em;font-size:11px">Vehículo asegurado</div><h2 style="color:#fff;margin:4px 0;font-family:var(--f-display)">${esc(shown(v.marca))} ${esc(shown(v.linea))} ${esc(shown(v.anio))}</h2><div class="mono" style="color:rgba(255,255,255,.85)">${esc(shown(v.placa))}${p.numero?' · póliza '+esc(p.numero):''}</div></div></div><div style="display:flex;gap:8px;flex-wrap:wrap">${canEditVehicle() ? `<button class="btn primary" onclick="Orbit.modules.cliente360.editarVehiculo('${esc(v.id)}')">✏️ Editar vehículo</button><button class="btn ghost" style="color:var(--danger,var(--red))" onclick="Orbit.policyVehicleReadModelV1199c.deleteVehicle('${esc(v.id)}')">Eliminar</button>` : ''}${vehicleClientAction}</div></div></div>
       <div class="orbit-detail-layout" style="display:grid;grid-template-columns:minmax(0,1.25fr) minmax(300px,.75fr);gap:16px;align-items:start">
         ${section('🚘 Detalle completo del vehículo', vehicleCard(v, cur, v.polizaId, v.clienteId))}
         <div style="display:grid;gap:16px">${section('📑 Póliza vinculada', grid([field('Póliza', p.numero || '—',{mono:true}),field('Aseguradora',asg.nombre || '—'),field('Estado',p.estado || '—'),field('Vigencia',`${fmtDate(p.vigenciaInicio)} → ${fmtDate(p.vigenciaFin)}`),field('Prima total',moneyDetail(first(p.primaTotal,p.prima),cur)),field('Suma asegurada',moneyDetail(first(v.sumaAsegurada,p.sumaAsegurada),cur))],2)+`<div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap"><a class="btn primary" href="#/cliente360?c=${encodeURIComponent(v.clienteId)}&p=${encodeURIComponent(v.polizaId)}&v=${encodeURIComponent(v.id)}">Abrir póliza completa</a>${canEditVehicle() ? `<button class="btn ghost" onclick="Orbit.modules.cliente360.editarVehiculo('${esc(v.id)}')">Editar vehículo</button>` : ''}</div>`)}</div>

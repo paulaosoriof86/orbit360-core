@@ -1,0 +1,72 @@
+{
+  "schema": "GRAVICENTRA_I65_B4003_POLICY_CLIENT_SCOPE_LINK_SUCCESSOR_V1",
+  "gate": "I6.5/B4-003",
+  "recordType": "ADDITIVE_SCOPED_NAVIGATION_FIX_NO_RELEASE_AUTHORITY",
+  "recordedDate": "2026-11-01",
+  "status": "SOURCE_REGRESSIONS_PASS_PREVIEW_NOT_YET_VERIFIED_RELEASE_HOLD",
+  "repository": "paulaosoriof86/orbit360-core",
+  "canonicalBranch": "recovery/fase-a-clean-20260831",
+  "canonicalParentHead": "79f7992626ec3e2ab6ab5a81b53cff575bb0213f",
+  "sourceCommit": "0fbbed87f5b6d5d7533264f169c46592fb1aa04c",
+  "transport": {
+    "method": "AUTHORIZED_GITHUB_GIT_DATABASE_CONNECTOR",
+    "originalLocalSourceCommit": "fd78b874f7af149aae80ba60073148c74259b421",
+    "remoteSourceCommit": "0fbbed87f5b6d5d7533264f169c46592fb1aa04c",
+    "exactSourceTreeSha": "1acf8db89b20e0aa28dbf27dcab5417c29c1646a",
+    "sourceBlobBytesIdentical": true,
+    "differentCommitMetadataAcknowledged": true
+  },
+  "sourceBlobs": {
+    "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js": "64d8ab2faac0524b8670fc06f2cea5d0cb306041",
+    "tools/gravicentra-b4-003-policy-client-scope-link.test.cjs": "15667f79efde1d93fbaeff9cf77ab84bad0abada"
+  },
+  "observedReadOnlyUat": {
+    "identity": "Carlos Castro",
+    "role": "Operativo",
+    "selectedCountry": "CO",
+    "previousAuthenticatedLabPreviewOnly": true,
+    "policiesVisible": 124,
+    "activePoliciesVisible": 27,
+    "policyLinkedClientsOutsideSameCountryList": 124,
+    "linkedClientsVisibleInAnotherCountry": 12,
+    "linkedClientsUnavailableInCurrentScope": 112,
+    "physicalClientRecordAbsenceProven": false,
+    "policyDetailOpens": true,
+    "clientDeepLinkDeniedReproduced": true,
+    "vehicleDetailOpens": true,
+    "newFixAuthenticatedUatPassed": false,
+    "newFixHostingPreviewPublished": false,
+    "recentHistoryPreviewCarlosRerunVerified": false
+  },
+  "fix": {
+    "policyLinkGuard": "only_read_confirmed_and_client360_canView",
+    "vehicleLinkGuard": "only_read_confirmed_and_client360_canView",
+    "missingClient": "retain_policy_and_vehicle_detail_and_show_non_clickable_scope_note",
+    "clientLoading": "do_not_mislabel_loading_as_restricted",
+    "authorizedClient": "preserve_client_navigation",
+    "regressionCasesPassed": 10,
+    "serverScopeMockChecksPassed": 132,
+    "goalParticipationTestCountPassed": 5,
+    "testIdentity": "synthetic_only",
+    "dataWrites": 0,
+    "identityOrClassificationWrites": 0,
+    "securityRuleOrIAMChanges": false,
+    "firebaseHostingOrFunctionsDeployed": false
+  },
+  "remainingReleaseGates": {
+    "sourceMergedIntoCanonical": false,
+    "newFixAuthenticatedRoleCountryUat": false,
+    "physicalPolicyClientJoinAudit": false,
+    "independentNegativeUidBackendUat": false,
+    "firestoreRulesP0Closed": false,
+    "restoreDrillAccepted": false,
+    "sevenAdvisorsClassified": false,
+    "productionAuthorized": false,
+    "b4003Closed": false,
+    "formalI6Percent": 50,
+    "priorityP0Closed": 1,
+    "priorityP0Total": 6,
+    "globalImplementationPercent": null
+  },
+  "nextAction": "GUARDED_SOURCE_MERGE_THEN_AUTHENTICATED_HOSTING_PREVIEW_AND_PHYSICAL_JOIN_READONLY_EVIDENCE_BEFORE_PRODUCTION"
+}
