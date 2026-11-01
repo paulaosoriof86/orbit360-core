@@ -1,0 +1,43 @@
+name: Gravicentra B4-003 Forbidden Route Cold Bootstrap Source-only QA
+
+on:
+  push:
+    branches: [transport/gi-b4003-routeboot-qa-20261101]
+    paths:
+      - .github/workflows/gravicentra-b4-003-routeboot-source-qa-20261101.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: gi-b4003-routeboot-source-a682c1
+  cancel-in-progress: false
+
+jobs:
+  exact-source-qa:
+    if: >-
+      github.repository == 'paulaosoriof86/orbit360-core' &&
+      github.ref == 'refs/heads/transport/gi-b4003-routeboot-qa-20261101' &&
+      github.event.head_commit.message == 'test(b4-003): isolated forbidden-route source-only regression'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Checkout only the exact unmerged correction commit
+        uses: actions/checkout@v4
+        with:
+          ref: a682c1c39bdf33b0fce0b991332e77d5efa97743
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Prove two-file diff and RED-to-GREEN real source tests
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = 'a682c1c39bdf33b0fce0b991332e77d5efa97743'
+          git merge-base --is-ancestor ce50d1fc6cc66ad0fc451b25f01b6aeb18aa5064 HEAD
+          test "$(git diff --name-only ce50d1fc6cc66ad0fc451b25f01b6aeb18aa5064 HEAD | sort)" = "$(printf '%s\n' orbit360-platform/core/product-hydration-required-optional-p0.js tests/b4-003-forbidden-route-bootstrap.test.cjs | sort)"
+          node --test tests/b4-003-forbidden-route-bootstrap.test.cjs
+          node --test tests/*.test.cjs
+          node tools/gravicentra-b4-003-policy-client-scope-link.test.cjs
+          printf '%s\n' "B4-003 FORBIDDEN-ROUTE SOURCE QA PASS" "Source=a682c1c39bdf33b0fce0b991332e77d5efa97743" "Two files only. No deployments or data writes. Control Plane and release HOLD unchanged." >> "$GITHUB_STEP_SUMMARY"
