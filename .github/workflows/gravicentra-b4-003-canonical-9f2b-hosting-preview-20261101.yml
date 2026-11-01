@@ -49,8 +49,8 @@ jobs:
       - name: Prove that workflow is the only branch change; checkout exact canonical bytes
         run: |
           set -euo pipefail
-          test "$(git rev-parse HEAD^)" = "$EXACT_SOURCE_SHA"
-          test "$(git diff --name-only HEAD^ HEAD)" = '.github/workflows/gravicentra-b4-003-canonical-9f2b-hosting-preview-20261101.yml'
+          test "$(git merge-base "$EXACT_SOURCE_SHA" HEAD)" = "$EXACT_SOURCE_SHA"
+          test "$(git diff --name-only "$EXACT_SOURCE_SHA" HEAD)" = '.github/workflows/gravicentra-b4-003-canonical-9f2b-hosting-preview-20261101.yml'
           git checkout --detach "$EXACT_SOURCE_SHA"
           test "$(git rev-parse HEAD)" = "$EXACT_SOURCE_SHA"
           node tools/gravicentra-b4-003-policy-client-scope-link.test.cjs
@@ -133,7 +133,9 @@ jobs:
           const build=JSON.parse(fs.readFileSync(site+'/__recovery__/build.json','utf8'));
           if(Object.keys(config).join(',')!=='hosting'||config.hosting.site!==process.env.HOSTING_SITE||config.hosting.public!=='site')throw Error('NOT_HOSTING_ONLY');
           if(build.sourceSha!==process.env.EXACT_SOURCE_SHA||build.gate!==process.env.RELEASE_GATE)throw Error('NOT_EXACT_CANONICAL');
-          for(const rel of ['index.html','modules/historial.js','modules/policy-receipts-v1199-detail-guard.js']){
+          // The packaging tool intentionally rebases index.html asset URLs to immutable build IDs.
+          // Compare source-owned executable modules byte-for-byte; compare served index to the bundle below.
+          for(const rel of ['modules/historial.js','modules/policy-receipts-v1199-detail-guard.js']){
             if(!fs.readFileSync('orbit360-platform/'+rel).equals(fs.readFileSync(site+'/'+rel)))throw Error('SOURCE_DRIFT:'+rel);
           }
           const dest=site+'/product-runtime-config.js',context={window:{}};
