@@ -116,8 +116,9 @@
       if (!match) return;
       const record = store().get('asesores', match[1]) || {};
       const info = accessInfo(record);
-      const cells = row.querySelectorAll('td');
-      const accessCell = cells.length >= 7 ? cells[4] : null;
+      // A stable semantic target prevents newly added columns (e.g. vinculación)
+      // from being overwritten by this legacy onboarding decorator.
+      const accessCell = row.querySelector('[data-equipo-access-cell="1"]');
       if (accessCell) {
         accessCell.innerHTML = `<span class="badge ${info.tone}">${Orbit.ui.esc(info.label)}</span><div class="muted" style="font-size:10.5px;margin-top:3px">${Orbit.ui.esc(info.detail)}</div>`;
       }

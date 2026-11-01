@@ -14,7 +14,10 @@ Orbit.modules.equipo = (function () {
   let userFilter = 'todos';
   let accessConfigCache = null, accessConfigLoading = null;
   const now = U.NOW ? new Date(U.NOW) : new Date();
-  let metaPeriodo = now.toISOString().slice(0, 7);
+  // Use the product calendar month, never UTC ISO month at a local month boundary.
+  let metaPeriodo = typeof U.monthKey === 'function'
+    ? U.monthKey()
+    : `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
   let metaPais = (Orbit.pais && Orbit.pais !== 'TODOS') ? Orbit.pais : 'GT';
   const META_QA_PERIOD='QA-B4-003',META_QA_CONTRACT='gravicentra-metas-preview-session-v1';
   let metaQa = null, metaQaBusy = false, metaQaProof = '',metaQaChecked='',metaQaVerified=false;
@@ -227,8 +230,8 @@ Orbit.modules.equipo = (function () {
           <td>${roles.map(roleBadge).join('') || '<span class="badge warn">Sin rol</span>'}</td>
           <td>${roleBadge(a.rolDefault || a.rol || 'Sin definir')}</td>
           <td>${paises.map(p => `<span class="badge neutral">${p === 'CO' ? '🇨🇴 CO' : '🇬🇹 GT'}</span>`).join(' ') || '<span class="badge warn">Sin país</span>'}</td>
-          <td><span class="badge ${participacionDe(a).pendiente?'warn':participacionDe(a).participa?'ok':'neutral'}">${participacionDe(a).pendiente?'Sin clasificar':participacionDe(a).tipo==='interno'?'Interno':participacionDe(a).participa?'Freelance · participa':'Freelance · excluido'}</span></td>
-          <td><span class="badge ${accessInfo.tone}">${U.esc(accessInfo.label)}</span><div class="muted" style="font-size:10.5px;margin-top:3px">${U.esc(accessInfo.detail || '')}</div></td>
+          <td data-equipo-participation-cell="1"><span class="badge ${participacionDe(a).pendiente?'warn':participacionDe(a).participa?'ok':'neutral'}">${participacionDe(a).pendiente?'Sin clasificar':participacionDe(a).tipo==='interno'?'Interno':participacionDe(a).participa?'Freelance · participa':'Freelance · excluido'}</span></td>
+          <td data-equipo-access-cell="1"><span class="badge ${accessInfo.tone}">${U.esc(accessInfo.label)}</span><div class="muted" style="font-size:10.5px;margin-top:3px">${U.esc(accessInfo.detail || '')}</div></td>
           <td><span class="badge ${active(a) ? 'ok' : 'neutral'}">${active(a) ? 'Activo' : 'Inactivo'}</span></td>
           <td style="text-align:right;color:var(--ink-3)">${writable ? '›' : '<span class="badge neutral">Sincronizando…</span>'}</td></tr>`;
       }).join('') || '<tr><td colspan="8" class="muted" style="text-align:center;padding:22px">No hay usuarios para este filtro.</td></tr>'}</tbody>
