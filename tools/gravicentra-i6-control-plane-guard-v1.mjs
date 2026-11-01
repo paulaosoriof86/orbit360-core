@@ -1,3 +1,6 @@
+import {runB4003CarlosHistoryHydrationSuccessorGuard} from './gravicentra-b4-003-carlos-history-hydration-successor.mjs';
+if (runB4003CarlosHistoryHydrationSuccessorGuard()) process.exit(0);
+
 import {runB4003AuthenticatedUatSuccessorGuard} from './gravicentra-b4-003-authenticated-uat-successor.mjs';
 if (runB4003AuthenticatedUatSuccessorGuard()) process.exit(0);
 
