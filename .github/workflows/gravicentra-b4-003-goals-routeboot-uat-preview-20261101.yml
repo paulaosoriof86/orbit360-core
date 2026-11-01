@@ -10,7 +10,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: gi-b4003-goals-routeboot-843be2cf
+  group: gi-b4003-goals-routeboot-3644429f
   cancel-in-progress: false
 
 jobs:
@@ -22,7 +22,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 40
     env:
-      EXACT_SOURCE_SHA: 843be2cf49faf1f8b9441edb5507472bedf68779
+      EXACT_SOURCE_SHA: 3644429f08f6bbdbec3ae023e287ad97c4616001
       PR159_PREDECESSOR_SHA: ce50d1fc6cc66ad0fc451b25f01b6aeb18aa5064
       BASE_SHA: 9f2b978704912fff64593a6e51a31d2cd30583a6
       PROJECT_ID: ays-orbit-360-lab
@@ -39,7 +39,7 @@ jobs:
       - name: Checkout consolidated PR 159 source candidate
         uses: actions/checkout@v4
         with:
-          ref: 843be2cf49faf1f8b9441edb5507472bedf68779
+          ref: 3644429f08f6bbdbec3ae023e287ad97c4616001
           fetch-depth: 0
           persist-credentials: false
 
@@ -53,7 +53,7 @@ jobs:
           test "$(git rev-parse HEAD)" = "$EXACT_SOURCE_SHA"
           git merge-base --is-ancestor "$PR159_PREDECESSOR_SHA" "$EXACT_SOURCE_SHA"
           test "$(git diff --name-only "$PR159_PREDECESSOR_SHA" "$EXACT_SOURCE_SHA" | sort)" = "$(printf '%s\n' orbit360-platform/core/product-hydration-required-optional-p0.js tests/b4-003-forbidden-route-bootstrap.test.cjs | sort)"
-          test "$(git hash-object orbit360-platform/core/product-hydration-required-optional-p0.js)" = 'e7e22827625c2e9cafc55381cd506912eef16f13'
+          test "$(git hash-object orbit360-platform/core/product-hydration-required-optional-p0.js)" = '4eb68250d46f11f1c8e9c139d03f0ec005d81401'
           git diff --quiet "$PR159_PREDECESSOR_SHA" "$EXACT_SOURCE_SHA" -- artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json tools/gravicentra-i6-control-plane-guard-v1.mjs
           PRED_DIR="$(mktemp -d)"
           git worktree add --detach "$PRED_DIR" "$PR159_PREDECESSOR_SHA"
