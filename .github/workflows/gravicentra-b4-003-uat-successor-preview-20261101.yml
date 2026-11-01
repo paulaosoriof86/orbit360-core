@@ -149,7 +149,9 @@ jobs:
         id: preview
         run: |
           set -euo pipefail
-          CHANNEL_ID="gi-i65-b4-goals-f598a65f-${GITHUB_RUN_ID}"
+          # Firebase truncates long channel IDs silently. Pin below that limit.
+          CHANNEL_ID="gi-i65-b4-goals-f5-${GITHUB_RUN_ID}"
+          test "${#CHANNEL_ID}" -le 32
           cd "$RUNNER_TEMP/goals-uat-package/bundle"
           node "$FIREBASE_CLI_BIN" hosting:channel:deploy "$CHANNEL_ID" --config firebase.json --project "$PROJECT_ID" --expires 7d --non-interactive --json > "$RUNNER_TEMP/goals-uat-deploy.json" 2>&1
           export CHANNEL_ID
