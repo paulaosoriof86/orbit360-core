@@ -74,6 +74,16 @@
     };
     function readable(collection){
       try{
+        // Server authority in functions/b4-003-scoped-access-boundary.js:
+        // insurerDirectoryRoles is narrower than module visibility for Asesor.
+        // Deep-link boot must never require a directory the callable will deny.
+        if(collection==='aseguradoras'){
+          var role=text(membership.activeRole).normalize('NFD')
+            .replace(/[\u0300-\u036f]/g,'').toLowerCase()
+            .replace(/[^a-z0-9]+/g,'_').replace(/^_+|_+$/g,'');
+          if(['operativo','admin','admintenant','admin_tenant','superadmin','super_admin','direccion']
+            .indexOf(role)<0)return false;
+        }
         var policy=window.Orbit.tenantAccessPolicyProductP0;
         var plan=policy&&typeof policy.queryConstraints==='function'
           ?policy.queryConstraints(collection,membership||{},{tenantId:text(membership&&membership.tenantId)})
