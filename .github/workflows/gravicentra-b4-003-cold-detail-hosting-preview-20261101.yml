@@ -1,0 +1,191 @@
+name: Gravicentra B4-003 cold-detail ae5f Hosting-only UAT Preview
+
+# One-off, source-pinned QA for the exact cold-detail successor commit on an existing authorized review branch.
+# This branch never promotes or touches LIVE, Functions, Rules, IAM or Firestore data.
+on:
+  push:
+    branches: [fix/b4-003-policy-client-scope-20261101]
+    paths:
+      - .github/workflows/gravicentra-b4-003-cold-detail-hosting-preview-20261101.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: gravicentra-b4003-cold-detail-ae5f-preview
+  cancel-in-progress: false
+
+jobs:
+  isolated-hosting-only:
+    if: >-
+      github.repository == 'paulaosoriof86/orbit360-core' &&
+      github.ref == 'refs/heads/fix/b4-003-policy-client-scope-20261101' &&
+      github.event.head_commit.message == 'test(i6.5 B4-003): cold-detail ae5f isolated Hosting Preview'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    env:
+      EXACT_SOURCE_SHA: ae5fb39612f7dd30e2f9ca875da5800d2bf251dc
+      PROJECT_ID: ays-orbit-360-lab
+      HOSTING_SITE: ays-orbit-360-lab
+      TENANT_HINT: alianzas-soluciones
+      RELEASE_GATE: I6.5-B4-003
+      BUILD_PREFIX: gi-i65-b4
+      ENVIRONMENT_REF: firebase-hosting-preview-i6-5-forensic-b4-003
+      GRAVICENTRA_B4_003_SCOPED_PREVIEW: 'true'
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+    steps:
+      - name: Checkout one-off workflow branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Prove that workflow is the only branch change; checkout exact source bytes
+        run: |
+          set -euo pipefail
+          test "$(git merge-base "$EXACT_SOURCE_SHA" HEAD)" = "$EXACT_SOURCE_SHA"
+          test "$(git diff --name-only "$EXACT_SOURCE_SHA" HEAD)" = '.github/workflows/gravicentra-b4-003-cold-detail-hosting-preview-20261101.yml'
+          git checkout --detach "$EXACT_SOURCE_SHA"
+          test "$(git rev-parse HEAD)" = "$EXACT_SOURCE_SHA"
+          node --check orbit360-platform/modules/policy-receipts-v1199-detail-guard.js
+          node tools/gravicentra-b4-003-policy-client-scope-link.test.cjs
+          node tools/gravicentra-b4-003-scoped-related-reader.test.cjs
+          node tools/gravicentra-b4-003-historial-country-selection.test.cjs
+          node --test tests/*.test.cjs
+          node tools/gravicentra-governance-preflight-v1.mjs --mode=governance
+
+      - name: Snapshot both LIVE portals (GET only)
+        run: |
+          set -euo pipefail
+          curl --fail --silent --show-error --location --retry 2 --max-time 30 https://ays-orbit-360-lab.web.app/ | sha256sum > "$RUNNER_TEMP/live-before.sha256"
+          curl --fail --silent --show-error --location --retry 2 --max-time 30 https://app.aysseguros.com/ | sha256sum > "$RUNNER_TEMP/domain-before.sha256"
+
+      - name: Select existing LAB service account and pinned Hosting CLI
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/b4003-auth"
+          python3 - <<'PY'
+          import json,os,pathlib
+          root=pathlib.Path(os.environ['RUNNER_TEMP'])/'b4003-auth'
+          paths=[]
+          for n,k in enumerate(('SA_ORBIT360_LAB','SA_ORBIT_360_LAB','SA_DEFAULT')):
+              try: candidate=json.loads(os.environ.get(k,''))
+              except (ValueError,TypeError): continue
+              if candidate.get('type')=='service_account' and candidate.get('project_id')==os.environ['PROJECT_ID'] and candidate.get('private_key'):
+                  p=root/f'{n}.json'
+                  p.write_text(json.dumps(candidate),encoding='utf8')
+                  p.chmod(0o600)
+                  paths.append(str(p))
+          if not paths: raise SystemExit('B4003_LAB_SERVICE_ACCOUNT_UNAVAILABLE')
+          (root/'candidates').write_text('\n'.join(paths)+'\n',encoding='utf8')
+          PY
+          CLI_ROOT="$RUNNER_TEMP/b4003-cli"
+          npm install --prefix "$CLI_ROOT" --no-save --ignore-scripts --no-audit --no-fund firebase-tools@14.10.1 >/dev/null
+          node tools/gravicentra-firebase-tools-empty-extensions-workaround-v1.mjs "$CLI_ROOT"
+          CLI="$CLI_ROOT/node_modules/firebase-tools/lib/bin/firebase.js"
+          SELECTED=''
+          while IFS= read -r candidate; do
+            if GOOGLE_APPLICATION_CREDENTIALS="$candidate" node "$CLI" apps:list WEB --project "$PROJECT_ID" --non-interactive --json >/dev/null 2>&1; then
+              SELECTED="$candidate"
+              break
+            fi
+          done < "$RUNNER_TEMP/b4003-auth/candidates"
+          test -n "$SELECTED"
+          cp "$SELECTED" "$RUNNER_TEMP/b4003-auth/selected.json"
+          chmod 600 "$RUNNER_TEMP/b4003-auth/selected.json"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/b4003-auth/selected.json" >> "$GITHUB_ENV"
+          echo "FIREBASE_CLI_BIN=$CLI" >> "$GITHUB_ENV"
+          npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund firebase-admin@13.4.0 >/dev/null
+
+      - name: Resolve public LAB web configuration (GET only)
+        run: |
+          set -euo pipefail
+          node "$FIREBASE_CLI_BIN" apps:list WEB --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/b4003-apps.json"
+          export APPS_FILE="$RUNNER_TEMP/b4003-apps.json"
+          APP_ID=$(python3 - <<'PY'
+          import json,os
+          result=json.load(open(os.environ['APPS_FILE'])).get('result') or []
+          apps=[a for a in result if str(a.get('platform','')).upper() in ('WEB','PLATFORM_WEB','')]
+          if len(apps)!=1: raise SystemExit('B4003_LAB_WEB_APP_CARDINALITY_INVALID')
+          print(apps[0].get('appId',''))
+          PY
+          )
+          test -n "$APP_ID"
+          node "$FIREBASE_CLI_BIN" apps:sdkconfig WEB "$APP_ID" --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/b4003-sdkconfig.json"
+
+      - name: Assemble immutable source-pinned Hosting-only package
+        run: |
+          set -euo pipefail
+          export SOURCE_SHA="$EXACT_SOURCE_SHA"
+          node tools/gravicentra-i6-5-b1-branding-snapshot.mjs "$RUNNER_TEMP/b4003-branding.json"
+          export TENANT_BRANDING_SNAPSHOT_FILE="$RUNNER_TEMP/b4003-branding.json"
+          node tools/gravicentra-i6-1-preview-package.mjs . "$RUNNER_TEMP/b4003-package" "$RUNNER_TEMP/b4003-sdkconfig.json" > "$RUNNER_TEMP/b4003-package-output.json"
+          node - <<'NODE'
+          const fs=require('node:fs'),vm=require('node:vm');
+          const root=process.env.RUNNER_TEMP+'/b4003-package/bundle';
+          const site=root+'/site';
+          const config=JSON.parse(fs.readFileSync(root+'/firebase.json','utf8'));
+          const build=JSON.parse(fs.readFileSync(site+'/__recovery__/build.json','utf8'));
+          if(Object.keys(config).join(',')!=='hosting'||config.hosting.site!==process.env.HOSTING_SITE||config.hosting.public!=='site')throw Error('NOT_HOSTING_ONLY');
+          if(build.sourceSha!==process.env.EXACT_SOURCE_SHA||build.gate!==process.env.RELEASE_GATE)throw Error('NOT_EXACT_SOURCE');
+          // The packaging tool intentionally rebases index.html asset URLs to immutable build IDs.
+          // Compare source-owned executable modules byte-for-byte; compare served index to the bundle below.
+          for(const rel of ['modules/historial.js','modules/policy-receipts-v1199-detail-guard.js']){
+            if(!fs.readFileSync('orbit360-platform/'+rel).equals(fs.readFileSync(site+'/'+rel)))throw Error('SOURCE_DRIFT:'+rel);
+          }
+          const dest=site+'/product-runtime-config.js',context={window:{}};
+          vm.runInNewContext(fs.readFileSync(dest,'utf8'),context,{timeout:1000});
+          const publicCfg=context.window.__ORBIT360_PRODUCT_PUBLIC_CONFIG__;
+          if(!publicCfg||publicCfg.enabled!==true||publicCfg.projectId!==process.env.PROJECT_ID||publicCfg.scopedReadPreviewCandidate!==true||publicCfg.sourceSha!==process.env.EXACT_SOURCE_SHA)throw Error('PROTECTED_PREVIEW_CONFIG_MISMATCH');
+          const out={...publicCfg,goalParticipationPreviewCandidate:true,historyHydrationPreviewCandidate:true};
+          fs.writeFileSync(dest,'/* Source-pinned B4-003 authenticated UAT. Hosting-only. */\nwindow.__ORBIT360_PRODUCT_PUBLIC_CONFIG__ = Object.freeze('+JSON.stringify(out)+');\n');
+          NODE
+
+      - name: Deploy exactly one isolated seven-day LAB Hosting channel
+        id: preview
+        run: |
+          set -euo pipefail
+          CHANNEL_ID="gi-i65-b4-ae5f-${GITHUB_RUN_ID}"
+          test "${#CHANNEL_ID}" -le 32
+          cd "$RUNNER_TEMP/b4003-package/bundle"
+          node "$FIREBASE_CLI_BIN" hosting:channel:deploy "$CHANNEL_ID" --config firebase.json --project "$PROJECT_ID" --expires 7d --non-interactive --json > "$RUNNER_TEMP/b4003-deploy.json" 2>&1
+          export CHANNEL_ID
+          PREVIEW_URL=$(python3 - <<'PY'
+          import os,re
+          raw=open(os.environ['RUNNER_TEMP']+'/b4003-deploy.json',encoding='utf8').read()
+          prefix='https://ays-orbit-360-lab--'+os.environ['CHANNEL_ID']+'-'
+          urls=sorted(set(u.rstrip('/') for u in re.findall(r'https://[A-Za-z0-9._-]+\.web\.app',raw) if u.startswith(prefix)))
+          if len(urls)!=1: raise SystemExit('B4003_PREVIEW_URL_NOT_UNIQUE')
+          print(urls[0])
+          PY
+          )
+          test -n "$PREVIEW_URL"
+          echo "url=$PREVIEW_URL" >> "$GITHUB_OUTPUT"
+
+      - name: Verify published build and source bytes, and LIVE unchanged
+        env:
+          PREVIEW_URL: ${{ steps.preview.outputs.url }}
+        run: |
+          set -euo pipefail
+          ROOT="$RUNNER_TEMP/b4003-package/bundle/site"
+          for rel in __recovery__/build.json product-runtime-config.js index.html modules/historial.js modules/policy-receipts-v1199-detail-guard.js; do
+            mkdir -p "$RUNNER_TEMP/served/$(dirname "$rel")"
+            curl --fail --silent --show-error --location --retry 3 --max-time 30 "$PREVIEW_URL/$rel" > "$RUNNER_TEMP/served/$rel"
+            cmp "$ROOT/$rel" "$RUNNER_TEMP/served/$rel"
+          done
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const m=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/served/__recovery__/build.json','utf8'));
+          if(m.sourceSha!==process.env.EXACT_SOURCE_SHA||m.gate!==process.env.RELEASE_GATE)throw Error('HOSTED_SOURCE_NOT_CANONICAL');
+          NODE
+          curl --fail --silent --show-error --location --retry 2 --max-time 30 https://ays-orbit-360-lab.web.app/ | sha256sum > "$RUNNER_TEMP/live-after.sha256"
+          curl --fail --silent --show-error --location --retry 2 --max-time 30 https://app.aysseguros.com/ | sha256sum > "$RUNNER_TEMP/domain-after.sha256"
+          cmp "$RUNNER_TEMP/live-before.sha256" "$RUNNER_TEMP/live-after.sha256"
+          cmp "$RUNNER_TEMP/domain-before.sha256" "$RUNNER_TEMP/domain-after.sha256"
+          printf '%s\n' 'B4-003 COLD DETAIL HOSTING PREVIEW=PASS' "Source: $EXACT_SOURCE_SHA" "Preview: $PREVIEW_URL" 'Hosted index, History and policy-client guard: exact source bytes PASS' 'LIVE, Functions, Rules, Auth, IAM and Firestore data: NO WRITES' 'Authenticated Carlos UAT and security P0: PENDING; production HOLD' >> "$GITHUB_STEP_SUMMARY"
