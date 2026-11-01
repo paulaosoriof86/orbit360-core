@@ -1,0 +1,77 @@
+{
+  "schema": "GRAVICENTRA_I65_B4003_CARLOS_HISTORY_HYDRATION_SUCCESSOR_V1",
+  "recordType": "ADDITIVE_VERIFIED_HISTORY_SOURCE_AND_HOSTING_PREVIEW",
+  "status": "HISTORY_COLD_HYDRATION_FIXED_LAB_PREVIEW_PRODUCTION_HOLD",
+  "recordedDate": "2026-11-01",
+  "gate": "I6.5/B4-003",
+  "repository": "paulaosoriof86/orbit360-core",
+  "canonicalBranch": "recovery/fase-a-clean-20260831",
+  "canonicalParentHead": "f2ff33506aae4dcc9556ef8b063169bbdac4ecf2",
+  "sourceCommit": "bde43a5ea982e832bc937d6ba0f85352d6f64a7f",
+  "previewWorkflowHead": "04600fcd3db340749fc65e7b77e9c62878e42d64",
+  "sourcePaths": [
+    "orbit360-platform/modules/historial.js",
+    "tools/gravicentra-b4-003-historial-country-selection.test.cjs"
+  ],
+  "sourceBlobs": {
+    "orbit360-platform/modules/historial.js": "4db071720d4df5a167d3b246e6581e49267e4e73",
+    "tools/gravicentra-b4-003-historial-country-selection.test.cjs": "e308e4c97da9a8a882410ed0fd0ddcb29bdf56cb"
+  },
+  "preview": {
+    "workflowPath": ".github/workflows/gravicentra-b4-003-carlos-historial-hydration-preview-20261101.yml",
+    "workflowBlob": "24e771f21f6010962c63d0dcf2e2936e47d3a366",
+    "runId": 41261663411,
+    "runConclusion": "success",
+    "url": "https://ays-orbit-360-lab--gi-i65-b4-hist-41261663411-ppw05yhl.web.app/",
+    "hostingOnly": true,
+    "sourceBytesMatchReadback": true,
+    "liveOriginsBeforeAfterUnchanged": true,
+    "ttlDays": 7,
+    "sharedRulesDeployed": false,
+    "functionsDeployed": false,
+    "liveHostingDeployed": false,
+    "businessDataWrites": 0
+  },
+  "regression": {
+    "name": "CARLOS_COLD_ROLE_COUNTRY_HISTORY_HYDRATION",
+    "reproducedBefore": 0,
+    "fixedAfter": 1,
+    "protectedCanonicalCountryOnly": true,
+    "legacyUnprotectedRelationPriorityUnchanged": true,
+    "syntheticOnly": true,
+    "firebaseWrites": 0,
+    "additionalTestsPassing": [
+      "gravicentra-b4-003-scoped-related-reader.test.cjs",
+      "gravicentra-b4-003-protected-hydration.test.cjs",
+      "tests/goal-participation-*.test.cjs"
+    ],
+    "remainingDataInconsistency": "Policy-country vs client-country: Asesor CO 25 policies, 0 CO clients; Operativo CO 124 policies, 0 CO clients. Existing reconciliation banner identifies verified out-of-scope relationships; no country migration authorized."
+  },
+  "carlosUat": {
+    "independentAuthenticationPassed": true,
+    "oldPreviewHistorialColdZeroReproduced": true,
+    "newPreviewRerunVerified": false,
+    "newPreviewLoginRequired": true,
+    "oldPreviewPolicyClientScopeGapHeld": true,
+    "oldPreviewRoleCountryContextsChecked": 4,
+    "issue": 154,
+    "note": "The new isolated Hosting domain has independent browser auth storage. No password or token was copied and no synthetic sign-in was used. Browser UAT remains pending Carlos sign-in on this exact URL."
+  },
+  "releaseBoundary": {
+    "formalI6Percent": 50,
+    "priorityP0Closed": 1,
+    "priorityP0Total": 6,
+    "globalImplementationPercent": null,
+    "advisorClassificationsChanged": 0,
+    "preliminaryFreelancersNotWritten": ["Johanna", "Nicole", "Braulio"],
+    "realBusinessWrites": 0,
+    "sharedRulesAuthIamChanged": false,
+    "functionsDeployed": false,
+    "liveHostingDeployed": false,
+    "backendNegativeUidAccepted": false,
+    "restoreDrillAccepted": false,
+    "b4003Closed": false,
+    "productionAuthorized": false
+  },
+  "nextGate": "CANONICAL_GUARD_AND_CI_THEN_CARLOS_NEW_PREVIEW_AUTHENTICATED_HISTORY_RETENTION_AND_BACKEND_CROSS_UID_NEGATIVE_PLUS_SECURITY_RESTORE_SIGNOFF"
+}
