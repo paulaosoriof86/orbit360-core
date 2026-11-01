@@ -50,7 +50,7 @@ jobs:
         run: |
           set -euo pipefail
           test "$(git rev-parse HEAD)" = "$EXACT_SOURCE_SHA"
-          git merge-base --is-ancestor "$BASE_SHA" "$EXACT_SOURCE_SHA"
+          test "$(git merge-base "$BASE_SHA" "$EXACT_SOURCE_SHA")" = "5b66682eaca3c0684786ade48960915bba32122a"
           test "$(git diff --name-only "$BASE_SHA" "$EXACT_SOURCE_SHA" | sort)" = "$(printf '%s\n' artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json artifacts/orbit360-recovery/release-control/I6_5_B4_003_COLD_DETAIL_ROUTE_SOURCE_SUCCESSOR_20261101.json orbit360-platform/modules/policy-receipts-v1199-detail-guard.js tools/gravicentra-b4-003-cold-detail-route-successor.mjs tools/gravicentra-b4-003-policy-client-scope-link.test.cjs tools/gravicentra-i6-control-plane-guard-v1.mjs | sort)"
           node tools/gravicentra-i6-control-plane-guard-v1.mjs --mode=governance
           node --test tests/*.test.cjs
