@@ -21,6 +21,9 @@ function startup(source,route,role,visibility){
       createFirestoreProductReadOnlyStoreP0:function(){return {};},
       tenantAccessPolicyProductP0:{
         queryConstraints:function(collection,member){
+          // Equipo is server-denied to Asesor; never promote it to required.
+          if(collection==='asesores'&&member.activeRole==='Asesor')
+            return {ok:false,scope:'none',module:'equipo',constraints:[{field:'__deny__',op:'==',value:true}]};
           const module={clientes:'cliente360',polizas:'polizas',aseguradoras:'aseguradoras'}[collection];
           return {ok:true,scope:'tenant',module,
             constraints:[{field:'tenantId',op:'==',value:member.tenantId}]};
