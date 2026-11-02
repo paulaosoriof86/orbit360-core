@@ -1,0 +1,117 @@
+name: Gravicentra B4-003 Client Country Index Dry Run (Read Only)
+
+on:
+  push:
+    branches: [recovery/fase-a-clean-20260831]
+    paths:
+      - .github/workflows/gravicentra-b4-003-client-index-dryrun-readonly-20261102.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: gravicentra-b4003-country-index-dryrun
+  cancel-in-progress: false
+
+jobs:
+  country-index-aggregate-only:
+    if: github.repository == 'paulaosoriof86/orbit360-core' && github.ref == 'refs/heads/recovery/fase-a-clean-20260831'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    env:
+      PROJECT_ID: ays-orbit-360-lab
+      SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+    steps:
+      - name: Checkout exact canonical SHA without persisted credentials
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Check source, fail-closed bounds and canonicity
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "${GITHUB_SHA}"
+          test "${GITHUB_REF_NAME}" = 'recovery/fase-a-clean-20260831'
+          node --check tools/gravicentra-b4-003-client-country-index-dryrun-readonly.cjs
+          node tools/gravicentra-b4-003-client-country-index-dryrun-readonly.test.cjs
+          node tools/gravicentra-b4-003-operativo-client-read-front-back-parity.test.cjs
+          timeout -k 3s 35s node tools/gravicentra-i6-control-plane-guard-v1.mjs --mode=i6
+
+      - name: Resolve preexisting LAB read credentials without displaying secrets
+        shell: bash
+        run: |
+          set -euo pipefail
+          node - <<'NODE'
+          const fs=require('node:fs'),path=require('node:path');
+          let selected=null;
+          for(const key of ['SA_ORBIT360_LAB','SA_ORBIT_360_LAB','SA_DEFAULT']){
+            try{
+              const value=JSON.parse(process.env[key]||'');
+              if(value.type==='service_account'&&value.project_id===process.env.PROJECT_ID&&
+                 typeof value.private_key==='string'&&value.private_key.includes('PRIVATE KEY')){
+                selected=value;break;
+              }
+            }catch(_){/* Redact every missing/invalid secret. */}
+          }
+          if(!selected)throw Error('LAB_READ_SERVICE_ACCOUNT_NOT_CONFIGURED');
+          const file=path.join(process.env.RUNNER_TEMP,'b4-003-index-dryrun-readonly-credential.json');
+          fs.writeFileSync(file,JSON.stringify(selected),{mode:0o600,flag:'wx'});
+          fs.appendFileSync(process.env.GITHUB_ENV,'GOOGLE_APPLICATION_CREDENTIALS='+file+'\n');
+          console.log('LAB_READ_CREDENTIAL_PROJECT_VERIFIED credentials_redacted=true');
+          NODE
+
+      - name: Install pinned read client without repository changes
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund firebase-admin@13.4.0 >/dev/null
+
+      - name: Read physical country-index delta and publish non-identifying aggregates
+        shell: bash
+        run: |
+          set -euo pipefail
+          timeout -k 3s 180s node tools/gravicentra-b4-003-client-country-index-dryrun-readonly.cjs --real-readonly | tee "$RUNNER_TEMP/b4-003-client-index-dryrun-aggregate.txt"
+          test -s "$RUNNER_TEMP/b4-003-client-index-dryrun-aggregate.txt"
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const raw=fs.readFileSync(process.env.RUNNER_TEMP+'/b4-003-client-index-dryrun-aggregate.txt','utf8');
+          const line=raw.split(/\r?\n/).find(x=>x.startsWith('B4_003_COUNTRY_INDEX_DRYRUN_READONLY='));
+          if(!line)throw Error('DRYRUN_AGGREGATE_MISSING');
+          const d=JSON.parse(line.slice('B4_003_COUNTRY_INDEX_DRYRUN_READONLY='.length));
+          if(d.schema!=='GRAVICENTRA_B4003_CLIENT_COUNTRY_INDEX_DRYRUN_AGGREGATE_V1'||
+             d.tenant!=='alianzas-soluciones'||d.counts.clients!==443||
+             d.counts.policies!==1425||d.counts.insurers!==33||
+             d.writes!==0||d.authWrites!==0||d.rulesWrites!==0||
+             d.applyAuthorized!==false||d.executablePatchesExported!==false||
+             d.gate!=='B4_003_HOLD'||d.production!=='NO_GO')
+            throw Error('DRYRUN_COUNT_OR_RELEASE_HOLD_INVALID');
+          const indexed=d.indexedAlready,updates=d.indexUpdateCandidates;
+          const unresolved=Object.values(d.unresolvable).reduce((a,b)=>a+b,0);
+          fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY,
+            '### B4-003 · ensayo del índice de país (solo lectura)\n'+
+            '- Ya indexados GT/CO: '+indexed.GT+'/'+indexed.CO+'\n'+
+            '- Candidatos de corrección GT/CO: '+updates.GT+'/'+updates.CO+'\n'+
+            '- País no resoluble: '+unresolved+'\n'+
+            '- Referencias a clientes inexistentes: '+d.distinctPolicyRefsMissingClient+'\n'+
+            '- **HOLD / NO-GO**: ninguna escritura ni cambio de producción.\n');
+          console.log('B4_003_INDEX_DRYRUN_AGGREGATE_CONTRACT=PASS no_identifiers_exported=true writes=0');
+          NODE
+
+      - name: Preserve aggregate-only receipt for independent evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gravicentra-b4003-index-dryrun-aggregate-${{ github.run_id }}
+          path: ${{ runner.temp }}/b4-003-client-index-dryrun-aggregate.txt
+          if-no-files-found: ignore
+          retention-days: 30
