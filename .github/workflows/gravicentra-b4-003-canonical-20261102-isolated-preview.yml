@@ -21,11 +21,11 @@ jobs:
     if: >-
       github.repository == 'paulaosoriof86/orbit360-core' &&
       github.ref == 'refs/heads/recovery/fase-a-clean-20260831' &&
-      github.event.head_commit.message == 'build(i6.5 B4-003): certify B2 QA quarantine and C360 labels in exact Preview'
+      github.event.head_commit.message == 'build(i6.5 B4-003): certify E8 and C360 QA financial source in exact Preview'
     runs-on: ubuntu-24.04
     timeout-minutes: 55
     env:
-      SOURCE_SHA: 4ea47bfe5e2719a422a1d20debed8267e4cb959f
+      SOURCE_SHA: 51486141f168e57d3292e2dffbc0b75dd1840447
       PROJECT_ID: ays-orbit-360-lab
       HOSTING_SITE: ays-orbit-360-lab
       TENANT_HINT: alianzas-soluciones
@@ -48,7 +48,7 @@ jobs:
       - name: Checkout frozen canonical source, no product divergence
         uses: actions/checkout@v4
         with:
-          ref: 4ea47bfe5e2719a422a1d20debed8267e4cb959f
+          ref: 51486141f168e57d3292e2dffbc0b75dd1840447
           fetch-depth: 0
           persist-credentials: false
           path: candidate
@@ -68,10 +68,11 @@ jobs:
           test "$(git -C candidate hash-object functions/b4-003-scoped-policy-callable.js)" = '743ed2a9bd9776cbd5d70ffe0669770b491b27aa'
           test "$(git -C candidate hash-object functions/b4-003-scoped-policy-reader.js)" = '1d654b5590fb71279b6bcaaa8eb8625af07c52a4'
           test "$(git -C candidate hash-object orbit360-platform/modules/polizas.js)" = '7fb5fd9d99344e8b67dd144c1c1e0befa5e827e7'
-          test "$(git -C candidate hash-object orbit360-platform/modules/reportes.js)" = '3f9f78c0c056db7580e29c317c7738e78b388c5a'
-          test "$(git -C candidate hash-object orbit360-platform/modules/cliente360.js)" = '4f4b6adbdef7dc980cf3de2b6b4b9f18bc8ed422'
+          test "$(git -C candidate hash-object orbit360-platform/modules/reportes.js)" = '5da83dcf5df971822e1926c47e1d62db69f45177'
+          test "$(git -C candidate hash-object orbit360-platform/modules/cliente360.js)" = 'a98f940c14aac7ff3554ca5e93b0c2bf47f5f3c8'
+          test "$(git -C candidate hash-object orbit360-platform/modules/calidad.js)" = '4043b4ce2d05397ff79615c51ccf8ffe7a939e15'
           test "$(git -C candidate hash-object orbit360-platform/core/queries.js)" = 'd6d39599cda2198e6f23ec69ee8a92bf01cec4e0'
-          test "$(git -C candidate hash-object tools/gravicentra-b4-003-reportes-e4-transversal.test.cjs)" = '2178d95056d56f3a16e6827f89149fc9dcd697b8'
+          test "$(git -C candidate hash-object tools/gravicentra-b4-003-reportes-e4-transversal.test.cjs)" = '7f09636ce7d7537e4dadaed37f06d9886e80d7ef'
           test "$(git -C candidate hash-object tools/gravicentra-i6-1-preview-package.mjs)" = 'd42337f326637d669834664289cb3cce36b56342'
           test "$(git -C candidate hash-object functions/assignable-advisor-roster.js)" = 'bc59e9d7be17154aa54f6c58593cc45af2d72503'
           test "$(git -C candidate hash-object functions/product-operational-domain.js)" = 'b3d0059457142659633498c9c52c6b84ea68200f'
@@ -236,7 +237,7 @@ jobs:
         run: |
           set -euo pipefail
           ROOT="$RUNNER_TEMP/gi-canonical-hosting/bundle/site"
-          for rel in __recovery__/build.json product-runtime-config.js core/tenant-access-policy-effective-p0.js core/assignable-advisor-roster-client.js modules/polizas.js modules/reportes.js modules/cliente360.js core/queries.js; do
+          for rel in __recovery__/build.json product-runtime-config.js core/tenant-access-policy-effective-p0.js core/assignable-advisor-roster-client.js modules/polizas.js modules/reportes.js modules/cliente360.js modules/calidad.js core/queries.js; do
             dest="$RUNNER_TEMP/readback-$(basename "$rel")"
             curl --fail --silent --show-error --location --retry 2 --max-time 30 "$PREVIEW_URL/$rel" > "$dest"
             cmp "$ROOT/$rel" "$dest"
@@ -245,9 +246,9 @@ jobs:
           curl --fail --silent --show-error --location --retry 2 --max-time 30 https://app.aysseguros.com/ | sha256sum > "$RUNNER_TEMP/domain-after.sha"
           cmp "$RUNNER_TEMP/live-before.sha" "$RUNNER_TEMP/live-after.sha"
           cmp "$RUNNER_TEMP/domain-before.sha" "$RUNNER_TEMP/domain-after.sha"
-          printf '%s\n' "B4-003 CANONICAL LAB PREVIEW SYNCHRONIZED" "Source: $SOURCE_SHA" "Preview: $PREVIEW_URL" 'B2 QA firme is excluded from commercial KPIs and E4 exports; Cliente 360 advisor labels use authorized policy projection; isolated goals backend unchanged. Deployed two isolated GoalsPreview callables; old Preview/LIVE endpoints unchanged; new expiring Hosting channel. No LIVE, Rules, IAM, data writes or reimport. Physical 443 clients = 440 currently visible + three prior merged markers (physical recount pending). Authenticated new-Preview E4 plus Carlos/Samuel positive/negative UID UAT remain OPEN.' >> "$GITHUB_STEP_SUMMARY"
+          printf '%s\n' "B4-003 CANONICAL LAB PREVIEW SYNCHRONIZED" "Source: $SOURCE_SHA" "Preview: $PREVIEW_URL" 'B2 QA and B4-003 fixtures are excluded from E4/E8/C360 commercial KPIs; E8 self-hydrates receipts; Ramo unknowns display pending; advisor labels use authorized policy projection; isolated goals backend unchanged. Deployed two isolated GoalsPreview callables; old Preview/LIVE endpoints unchanged; new expiring Hosting channel. No LIVE, Rules, IAM, data writes or reimport. Physical 443 clients = 440 currently visible + three prior merged markers (physical recount pending). Authenticated new-Preview E4 plus Carlos/Samuel positive/negative UID UAT remain OPEN.' >> "$GITHUB_STEP_SUMMARY"
           node - <<'NODE'
-          const fs=require('node:fs');const proof={schema:'B4003_CANONICAL_PREVIEW_20261102_V1',sourceSha:process.env.SOURCE_SHA,previewUrl:process.env.PREVIEW_URL,previewFunction:'orbit360ScopedPolicyReadPreview',goalsPreviewFunctions:['orbit360AssignableAdvisorRosterGoalsPreview','orbit360ProductOperationalCommandGoalsPreview'],goalsPreviewFlag:true,hostingLiveChanged:false,rulesChanged:false,authIamChanged:false,physicalClientIndexUpdatesInThisWorkflow:0,priorLabCountryCorrections:35,priorCountryApplyRunId:41478387493,clientProjection:{physical:443,activeVisible:440,previousMergedReadback:3,physicalMergedRecountPending:true},e4QaSourceFix:'PASS_B2_PROVENANCE_INSURER_READINESS_C360_SOURCE_PREVIEW_UAT_PENDING',advisorCrossBorderSourceQa:'PASS_PENDING_AUTHENTICATED_UAT',authenticatedUat:'PENDING_AUTHENTICATED_GOALS_PREVIEW_PAULA_CARLOS_SAMUEL',production:'HOLD'};
+          const fs=require('node:fs');const proof={schema:'B4003_CANONICAL_PREVIEW_20261102_V1',sourceSha:process.env.SOURCE_SHA,previewUrl:process.env.PREVIEW_URL,previewFunction:'orbit360ScopedPolicyReadPreview',goalsPreviewFunctions:['orbit360AssignableAdvisorRosterGoalsPreview','orbit360ProductOperationalCommandGoalsPreview'],goalsPreviewFlag:true,hostingLiveChanged:false,rulesChanged:false,authIamChanged:false,physicalClientIndexUpdatesInThisWorkflow:0,priorLabCountryCorrections:35,priorCountryApplyRunId:41478387493,clientProjection:{physical:443,activeVisible:440,previousMergedReadback:3,physicalMergedRecountPending:true},e4QaSourceFix:'PASS_B2_PROVENANCE_INSURER_READINESS_C360_SOURCE_PREVIEW_UAT_PENDING',advisorCrossBorderSourceQa:'PASS_PENDING_AUTHENTICATED_UAT',qualityE8SourceQa:'PASS_SOURCE_PENDING_AUTHENTICATED_UAT',client360KpiQa:'PASS_SOURCE_PENDING_AUTHENTICATED_UAT',authenticatedUat:'PENDING_AUTHENTICATED_GOALS_PREVIEW_PAULA_CARLOS_SAMUEL',production:'HOLD'};
           fs.writeFileSync(process.env.RUNNER_TEMP+'/canonical-preview-readback.json',JSON.stringify(proof,null,2)+'\n');
           NODE
 
