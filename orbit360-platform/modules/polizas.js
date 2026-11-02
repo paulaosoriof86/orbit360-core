@@ -99,6 +99,10 @@ Orbit.modules.polizas = (function () {
   const ACTIVE_STATES = new Set(['Vigente', 'Por renovar']);
   const HISTORICAL_STATES = new Set(['Renovada', 'Cancelada', 'Histórica', 'No Renovada', 'Reexpedida', 'Vencida', 'Anulada', 'Rechazada']);
   const isActivePolicy = p => !!p && ACTIVE_STATES.has(p.estado);
+  const isSyntheticQaPolicy = p => !!p && (
+    (typeof q.isSyntheticQaRecord === 'function' && q.isSyntheticQaRecord(p)) ||
+    p.__syntheticQa === true || p.syntheticQa === true ||
+    /^B2 QA firme(?:\s|$)/i.test(String(p.sourceRef || '').trim()));
   const isHistoricalNoPortfolio = p => !!p && HISTORICAL_STATES.has(p.estado);
   const renewabilityState = p => {
     if (!p || !Object.prototype.hasOwnProperty.call(p, 'renovable') || p.renovable == null || String(p.renovable).trim() === '') return 'UNKNOWN';
@@ -118,7 +122,7 @@ Orbit.modules.polizas = (function () {
   };
   const premiumByCurrency = (policies, I) => {
     const out = {};
-    (policies || []).filter(isActivePolicy).forEach(p => {
+    (policies || []).filter(p => isActivePolicy(p) && !isSyntheticQaPolicy(p)).forEach(p => {
       const n = policyPremiumNet(p);
       if (n == null) return;
       const cli = I && I.clientsById ? (I.clientsById.get(p.clienteId) || {}) : (PC(p.clienteId) || {});
@@ -272,7 +276,10 @@ Orbit.modules.polizas = (function () {
     const vehicle=query ? ensureVehicleSearchIndex(I) : null;
     return (source || I.policies || []).filter(p => {
       const searchOk=!query || String(basic.get(p.id)||'').includes(query) || String(vehicle.get(p.id)||'').includes(query);
-      const grouped = !st.fkind || (st.fkind === 'renewals45' ? isRenewalWithin45Days(p) : st.fkind === 'historical' ? isHistoricalNoPortfolio(p) : st.fkind === 'active' ? isActivePolicy(p) : st.fkind === 'countryClientGap' ? !!(countryGapIds&&countryGapIds.has(String(p.id))) : true);
+      const commercialGroup=['renewals45','historical','active'].includes(st.fkind);
+      const grouped = st.fkind === 'qa' ? isSyntheticQaPolicy(p) :
+        (!commercialGroup || !isSyntheticQaPolicy(p)) &&
+        (!st.fkind || (st.fkind === 'renewals45' ? isRenewalWithin45Days(p) : st.fkind === 'historical' ? isHistoricalNoPortfolio(p) : st.fkind === 'active' ? isActivePolicy(p) : st.fkind === 'countryClientGap' ? !!(countryGapIds&&countryGapIds.has(String(p.id))) : true));
       return grouped && searchOk &&
         (!st.framo || p.ramo === st.framo) &&
         (!st.fasg || p.aseguradoraId === st.fasg) &&
@@ -295,13 +302,15 @@ Orbit.modules.polizas = (function () {
       fullAdvisorDirectoryAuthorized()?((advisorStatus.deniedCollections||[]).includes('asesores')||!!(advisorStatus.snapshotErrors||{}).asesores):
        advisorRosterState==='blocked');
     const all = policiesForActiveCountry(I);
-    const countryGap=countryClientJoinGap(all,I.clientsById,Orbit.pais);
+    const auditQa=all.filter(isSyntheticQaPolicy);
+    const commercial=all.filter(p=>!isSyntheticQaPolicy(p));
+    const countryGap=countryClientJoinGap(commercial,I.clientsById,Orbit.pais);
     const defs = FDEFS(I);
-    const vig = all.filter(isActivePolicy);
-    const primaVigentePorMoneda = premiumByCurrency(all,I);
-    const renovaciones45 = all.filter(isRenewalWithin45Days);
-    const historicasSinCartera = all.filter(isHistoricalNoPortfolio);
-    const otherPolicyCount = Math.max(0, all.length - vig.length - historicasSinCartera.length);
+    const vig = commercial.filter(isActivePolicy);
+    const primaVigentePorMoneda = premiumByCurrency(commercial,I);
+    const renovaciones45 = commercial.filter(isRenewalWithin45Days);
+    const historicasSinCartera = commercial.filter(isHistoricalNoPortfolio);
+    const otherPolicyCount = Math.max(0, commercial.length - vig.length - historicasSinCartera.length);
     const r = rows(I, all, countryGap.policyIds);
     const pages = Math.max(1, Math.ceil(r.length / PAGE_SIZE));
     if (st.page >= pages) st.page = 0;
@@ -309,14 +318,18 @@ Orbit.modules.polizas = (function () {
     const shown = r.slice(start, start + PAGE_SIZE).slice(0, PAGE_SIZE);
     st.__count = r.length + ' de ' + all.length;
 
-    host.innerHTML = `<div class="page" data-polizas-kpi-ready="1" data-polizas-total="${all.length}" data-polizas-active="${vig.length}" data-polizas-renew45="${renovaciones45.length}" data-polizas-historical="${historicasSinCartera.length}">
+    host.innerHTML = `<div class="page" data-polizas-kpi-ready="1" data-polizas-total="${all.length}" data-polizas-commercial-total="${commercial.length}" data-polizas-qa-quarantine="${auditQa.length}" data-polizas-active="${vig.length}" data-polizas-renew45="${renovaciones45.length}" data-polizas-historical="${historicasSinCartera.length}">
       ${K.bannerFor('polizas', `<button class="btn primary" onclick="Orbit.modules.cliente360.nuevaPoliza()">+ Nueva póliza</button>`)}
       ${K.kpis([
-        { label: 'Pólizas activas', val: vig.length + ' <small>/ ' + all.length + '</small>', color: 'var(--red)', foot: 'Vigente + Por renovar' + (otherPolicyCount ? ' · ' + otherPolicyCount + ' otros/validar' : ''), onclick: "Orbit.modules.polizas.filtrarGrupo('active')" },
-        { label: 'Prima neta vigente', val: premiumByCurrencyHtml(primaVigentePorMoneda), color: 'var(--ok)', foot: 'separada por moneda · no se suman GTQ y COP', onclick: "Orbit.modules.polizas.filtrarEstado('Vigente')" },
+        { label: 'Pólizas activas', val: vig.length + ' <small>/ ' + commercial.length + '</small>', color: 'var(--red)', foot: 'Vigente + Por renovar · sin pruebas QA' + (otherPolicyCount ? ' · ' + otherPolicyCount + ' otros/validar' : ''), onclick: "Orbit.modules.polizas.filtrarGrupo('active')" },
+        { label: 'Prima neta vigente', val: premiumByCurrencyHtml(primaVigentePorMoneda), color: 'var(--ok)', foot: 'sin pruebas QA · monedas separadas', onclick: "Orbit.modules.polizas.filtrarGrupo('active')" },
         { label: 'Vencen ≤45 d', val: renovaciones45.length, color: 'var(--warn)', foot: 'activas con vencimiento en 0–45 días', onclick: "Orbit.modules.polizas.filtrarGrupo('renewals45')" },
         { label: 'Histórico / sin cartera', onclick: "Orbit.modules.polizas.filtrarGrupo('historical')", val: historicasSinCartera.length, color: 'var(--danger)', foot: 'ediciones no vigentes sin cartera activa' }
       ])}
+      ${auditQa.length?`<div class="cfg-note" data-polizas-qa-source-count="${auditQa.length}" style="margin-bottom:12px;line-height:1.6">
+        🧪 <b>${auditQa.length} pólizas de prueba QA</b> identificadas por su origen. No se incluyen en producción, prima ni renovaciones comerciales; permanecen consultables para auditoría.
+        <button class="btn ghost sm" onclick="Orbit.modules.polizas.filtrarGrupo('qa')" style="margin-left:6px">${st.fkind==='qa'?'Ver cartera completa':'Ver pruebas QA'}</button>
+      </div>`:''}
       ${countryGap.total?`<div class="cfg-note" data-polizas-client-country-gap="${countryGap.total}" data-polizas-client-country-gap-active="${countryGap.active}" style="margin-bottom:12px;line-height:1.6">
         <b>Conciliación Pólizas / Cliente 360 (${U.esc(countryCode(Orbit.pais))}):</b> ${countryGap.total} pólizas pertenecen al universo de este país, pero su cliente no figura en la lista de clientes de este mismo país.
         ${countryGap.reasons.otherCountry?'Cliente visible de otro país: '+countryGap.reasons.otherCountry+'. ':''}${countryGap.reasons.unavailable?'Cliente no disponible en este alcance: '+countryGap.reasons.unavailable+'. ':''}${countryGap.reasons.merged?'Cliente fusionado: '+countryGap.reasons.merged+'. ':''}${countryGap.reasons.unknownCountry?'País del cliente sin confirmar: '+countryGap.reasons.unknownCountry+'. ':''}

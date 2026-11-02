@@ -71,7 +71,9 @@ Orbit.modules.reportes = (function () {
   // never count them as commercial source in production, financial or pilot
   // reports. The source-of-truth flag is already used by Renovaciones.
   // Classify linked child records and policies belonging to a QA client too.
-  const hasSyntheticFlag = row => !!row && (row.__syntheticQa === true || row.syntheticQa === true);
+  const hasSyntheticFlag = row => !!row && (
+    (typeof q.isSyntheticQaRecord === 'function' && q.isSyntheticQaRecord(row)) ||
+    row.__syntheticQa === true || row.syntheticQa === true);
   function isSyntheticRecord(row) {
     if (!row) return false;
     if (hasSyntheticFlag(row)) return true;

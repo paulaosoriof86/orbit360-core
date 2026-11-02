@@ -93,6 +93,7 @@ Orbit.modules.cliente360 = (function () {
   let listRenderSeq = 0;
   let listWaitingForReady = false;
   let listReadyTimer = null;
+  let advisorListRefreshTimer = null;
   const perfNow = () => (typeof performance !== 'undefined' && performance.now ? performance.now() : Date.now());
   function dataReadiness(names) {
     const store = S();
@@ -178,6 +179,19 @@ Orbit.modules.cliente360 = (function () {
     const collection = event && event.detail && event.detail.collection;
     if (!collection || ['*','clientes','polizas','carteraPrimas','cobros','asesores'].includes(collection)) scheduleClientListReadyRender(0);
   });
+  // C360's client scope may forbid reading Equipo. The authorized policy
+  // projection already carries verified adviser labels; repaint when it arrives
+  // rather than leaving an entire Operativo table with permanent dashes.
+  window.addEventListener('orbit:store:emit', event => {
+    const collection = event && event.detail && event.detail.collection;
+    if (!['polizas','asesores'].includes(collection) || listWaitingForReady || shownCid ||
+        !host || !host.isConnected || !host.querySelector ||
+        !host.querySelector('[data-c360-list-ready]') || advisorListRefreshTimer) return;
+    advisorListRefreshTimer = setTimeout(() => {
+      advisorListRefreshTimer = null;
+      if (!shownCid && host && host.isConnected && /^#\/cliente360(?:[?\/]|$)/.test(location.hash || '')) lista();
+    }, 120);
+  });
   window.addEventListener('orbit:lab:canonical-view-hydrated', () => scheduleClientListReadyRender(0));
 
   // ---------- entry ----------
@@ -240,7 +254,14 @@ Orbit.modules.cliente360 = (function () {
     // remain visible for validation instead of silently dropping client history.
     const policiesForList = policiesRaw;
     const asesores = S().all('asesores');
-    const advisorById = new Map(asesores.filter(a => a && a.id != null).map(a => [a.id, a]));
+    // Only names attached to already-authorized policy documents are projected
+    // for Operativo; never expand the sensitive Equipo/asesores collection.
+    const policyAdvisorLabels = policiesForList.filter(p => p && p.asesorId &&
+      typeof p.asesorNombreVerificado === 'string' && p.asesorNombreVerificado.trim())
+      .map(p => ({ id: p.asesorId, nombre: p.asesorNombreVerificado }));
+    const advisorById = new Map([...policyAdvisorLabels, ...asesores.filter(a => a && a.id != null)]
+      .map(a => [a.id, a]));
+    const advisorOptions = [...advisorById.values()].sort((a, b) => String(a.nombre || '').localeCompare(String(b.nombre || '')));
     const policyByClient = new Map();
     const addRelated = (map, clientId, row) => {
       if (clientId == null) return;
@@ -352,7 +373,7 @@ Orbit.modules.cliente360 = (function () {
           <select id="f-tipo" class="o-sel"><option value="">Tipo</option><option ${f.tipo === 'Persona' ? 'selected' : ''}>Persona</option><option ${f.tipo === 'Empresa' ? 'selected' : ''}>Empresa</option></select>
           <select id="f-pais" class="o-sel"><option value="">País</option><option value="GT" ${f.pais === 'GT' ? 'selected' : ''}>Guatemala</option><option value="CO" ${f.pais === 'CO' ? 'selected' : ''}>Colombia</option></select>
           <select id="f-seg" class="o-sel"><option value="">Segmento</option>${['Premium', 'Recurrente', 'Estándar', 'Nuevo'].map(s => `<option ${f.seg === s ? 'selected' : ''}>${s}</option>`).join('')}</select>
-          <select id="f-ase" class="o-sel"><option value="">Asesor</option>${asesores.map(a => `<option value="${a.id}" ${f.asesor === a.id ? 'selected' : ''}>${U.esc(a.nombre)}</option>`).join('')}</select>
+          <select id="f-ase" class="o-sel"><option value="">Asesor</option>${advisorOptions.map(a => `<option value="${U.esc(a.id)}" ${f.asesor === a.id ? 'selected' : ''}>${U.esc(a.nombre)}</option>`).join('')}</select>
           <span class="muted" style="margin-left:auto;font-size:12.5px">${rows.length} de ${clientes.length}</span>
         </div>
         <div style="overflow-x:auto">
@@ -433,7 +454,10 @@ Orbit.modules.cliente360 = (function () {
     const c = Orbit.clientProjection && typeof Orbit.clientProjection.project === 'function'
       ? Orbit.clientProjection.project(rawClient, { policyClientIds: new Set((r.pol || []).map(p => String(p && p.clienteId || '')).filter(Boolean)) })
       : rawClient;
-    const ase = q.asesor(c.asesorId);
+    const verifiedClientAdvisor = (r.pol || []).find(p => p && p.asesorId === c.asesorId &&
+      typeof p.asesorNombreVerificado === 'string' && p.asesorNombreVerificado.trim());
+    const ase = q.asesor(c.asesorId) || (verifiedClientAdvisor ?
+      { id: c.asesorId, nombre: verifiedClientAdvisor.asesorNombreVerificado } : null);
     const tabs = [
       ['resumen', 'Resumen', '📊'], ['polizas', 'Pólizas', '📑'], ['vehiculos', 'Vehículos', '🚗'], ['cobros', 'Cobros', '💳'],
       ['recibos', 'Recibos y pagos', '🧾'], ['renovaciones', 'Renovaciones', '🔄'], ['siniestros', 'Siniestros', '🚨'], ['documentos', 'Documentos', '📎'], ['comisiones', 'Comisiones', '💼'], ['correos', 'Correos', '✉'], ['historial', 'Historial', '📝']
@@ -1408,7 +1432,9 @@ Orbit.modules.cliente360 = (function () {
   /* ---- Detalle de póliza (drawer) ---- */
   function verPoliza(polId) {
     const p = Orbit.store.get('polizas', polId); if (!p) return;
-    const cid = p.clienteId, asg = q.aseguradora(p.aseguradoraId), ase = q.asesor(p.asesorId);
+    const cid = p.clienteId, asg = q.aseguradora(p.aseguradoraId);
+    const ase = q.asesor(p.asesorId) || (typeof p.asesorNombreVerificado === 'string' && p.asesorNombreVerificado.trim()
+      ? { id: p.asesorId, nombre: p.asesorNombreVerificado } : null);
     const veh = q.vehiculoDePoliza(polId);
     const cob = Orbit.store.where('cobros', c => c.polizaId === polId).sort((a, b) => String(a.vence||'').localeCompare(String(b.vence||'')));
     const d = U.daysFromNow(p.vigenciaFin);

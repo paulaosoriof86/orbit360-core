@@ -389,6 +389,14 @@ Orbit.q = (function () {
     const clients = clientIndex();
     return (S().all('polizas') || []).filter(p => polPais(p, clients));
   }
+  // B4-003: preserve fixture rows for audit and access testing, but never
+  // present them as commercial production. "B2 QA firme" is the literal source
+  // provenance confirmed on the three orphaned B2-REN policies in Chrome.
+  function isSyntheticQaRecord(row) {
+    if (!row) return false;
+    if (row.__syntheticQa === true || row.syntheticQa === true) return true;
+    return /^B2 QA firme(?:\s|$)/i.test(String(row.sourceRef || '').trim());
+  }
   function realizedPaymentRows() {
     const cobros = (S().all('cobros') || []).filter(confirmedCobro);
     const linkedReceiptIds = new Set(cobros.map(c => String(c && (c.reciboId || c.receiptId) || '').trim()).filter(Boolean));
@@ -441,6 +449,7 @@ Orbit.q = (function () {
     polizasScoped().forEach(p => {
       if (!p || String(p.vigenciaInicio || '').slice(0, 7) !== key) return;
       if (advisorId && p.asesorId !== advisorId) return;
+      if (isSyntheticQaRecord(p) || isSyntheticQaRecord(S().get('clientes', p.clienteId))) return;
       const n = finite(p.primaNeta != null ? p.primaNeta : p.prima);
       if (n == null) return;
       const cli = p.clienteId != null ? S().get('clientes', p.clienteId) : null;
@@ -459,6 +468,8 @@ Orbit.q = (function () {
     const requestedAdvisor = String(advisorId == null ? '' : advisorId).trim();
     realizedPaymentRows().filter(r => rowPais(r, clients, policies)).forEach(r => {
       if (paymentBusinessDate(r).slice(0, 7) !== key) return;
+      if (isSyntheticQaRecord(r) || isSyntheticQaRecord(policies.get(r.polizaId)) ||
+          isSyntheticQaRecord(S().get('clientes', r.clienteId))) return;
       if (requestedAdvisor) {
         const policy = r.polizaId != null ? policies.get(r.polizaId) : null;
         const policyAdvisor = String(policy && policy.asesorId || '').trim();
@@ -622,7 +633,8 @@ Orbit.q = (function () {
   }
   function primaVigenteGlobal() {
     const clients = clientIndex();
-    return S().where('polizas', p => (p.estado === 'Vigente' || p.estado === 'Por renovar') && polPais(p, clients))
+    return S().where('polizas', p => !isSyntheticQaRecord(p) && !isSyntheticQaRecord(S().get('clientes', p.clienteId)) &&
+      (p.estado === 'Vigente' || p.estado === 'Por renovar') && polPais(p, clients))
       .reduce((s, p) => s + norm(p.primaTotal, p.moneda), 0);
   }
   function renovacionesProximas(dias) {
@@ -630,7 +642,8 @@ Orbit.q = (function () {
     const clients = clientIndex();
     return S().where('polizas', p => {
       const d = U.daysFromNow(p.vigenciaFin);
-      return polPais(p, clients) && (p.estado === 'Vigente' || p.estado === 'Por renovar') && d != null && d >= 0 && d <= dias;
+      return !isSyntheticQaRecord(p) && !isSyntheticQaRecord(S().get('clientes', p.clienteId)) &&
+        polPais(p, clients) && (p.estado === 'Vigente' || p.estado === 'Por renovar') && d != null && d >= 0 && d <= dias;
     }).sort((a, b) => String(a.vigenciaFin||'').localeCompare(String(b.vigenciaFin||'')));
   }
   /** Nombre conservado por compatibilidad: retorna obligaciones esperadas vencidas, no Cobros reales. */
@@ -643,7 +656,8 @@ Orbit.q = (function () {
     const policies = S().all('polizas') || [];
     const commissions = S().all('comisiones') || [];
     return (S().all('asesores') || []).map(a => {
-      const pol = policies.filter(p => p.asesorId === a.id && (p.estado === 'Vigente' || p.estado === 'Por renovar') && polPais(p, clients));
+      const pol = policies.filter(p => !isSyntheticQaRecord(p) && !isSyntheticQaRecord(S().get('clientes', p.clienteId)) &&
+        p.asesorId === a.id && (p.estado === 'Vigente' || p.estado === 'Por renovar') && polPais(p, clients));
       const prima = pol.reduce((s, p) => s + norm(p.prima, p.moneda), 0);
       const com = commissions.filter(c => c.asesorId === a.id).reduce((s, c) => s + norm(c.monto, c.moneda), 0);
       const metaPrima = Number(a && a.metaPrima);
@@ -690,7 +704,7 @@ Orbit.q = (function () {
   return {
     asesor, aseguradora, polizasDe, recibosEsperadosDe, carteraPrimasDe, carteraPendienteDe, carteraVencidaDe, cobrosDe, comisionesDe, actividadesDe, cancelacionesDe,
     clienteResumen, clientesResumenIndex, saludCliente, carteraGlobal, carteraPendienteRows, carteraVencidaRows, cobrosConfirmadosRows, carteraGlobalPorMoneda, primaVigenteGlobal, renovacionesProximas, cobrosVencidos, leaderboard,
-    clientesScoped, polizasScoped, realizedPaymentRows, currentMonthKey, produccionMesPorMoneda, recaudoMesPorMoneda, metaAdvisorMes, leaderboardMes,
+    clientesScoped, polizasScoped, isSyntheticQaRecord, realizedPaymentRows, currentMonthKey, produccionMesPorMoneda, recaudoMesPorMoneda, metaAdvisorMes, leaderboardMes,
     agingVencido, agingVencidoPorMoneda, portfolioAmountProof, portfolioAmountContext, portfolioValuedRowsCount, portfolioDue, portfolioOpen, portfolioClassification, portfolioIsOverdue, expectedReceiptClassification, expectedReceiptIsOverdue, comisionesPor, clienteNombre, norm, monedaPais, policyLinkedClientId, policyLinkedCountry, vehiculosDe, vehiculoDePoliza, postRecaudo
   };
 })();

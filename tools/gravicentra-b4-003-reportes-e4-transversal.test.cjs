@@ -11,6 +11,8 @@ const root = path.resolve(__dirname, '..');
 const source = rel => fs.readFileSync(path.join(root, rel), 'utf8');
 const queries = source('orbit360-platform/core/queries.js');
 const reportes = source('orbit360-platform/modules/reportes.js');
+const polizas = source('orbit360-platform/modules/polizas.js');
+const cliente360 = source('orbit360-platform/modules/cliente360.js');
 
 const rows = {
   clientes: [
@@ -31,6 +33,7 @@ const rows = {
     { id: 'gtNew', numero: 'GT-2026', clienteId: 'clientGT', aseguradoraId: 'insGT', pais: 'GT', moneda: 'GTQ', vigenciaInicio: '2026-05-01', vigenciaFin: '2026-12-26', primaNeta: 50, estado: 'Vigente' },
     { id: 'qaCO', numero: 'B4-003-CAN-38102224750', clienteId: 'clientCO', aseguradoraId: 'insCO', pais: 'CO', moneda: 'COP', vigenciaInicio: '2026-05-02', vigenciaFin: '2026-12-27', primaNeta: 45000, estado: 'Vigente', __syntheticQa: true },
     { id: 'qaGT', numero: 'B4-003-HEALTH-38102224750', clienteId: 'clientGT', aseguradoraId: 'insGT', pais: 'GT', moneda: 'GTQ', vigenciaInicio: '2026-05-03', vigenciaFin: '2026-12-27', primaNeta: 60000, estado: 'Vigente', syntheticQa: true },
+    { id: 'qaB2SourceGT', numero: 'B2-REN-SOURCE', clienteId: 'clientGT', aseguradoraId: 'insGT', pais: 'GT', moneda: 'GTQ', vigenciaInicio: '2026-10-01', vigenciaFin: '2027-10-01', primaNeta: 1000, estado: 'Vigente', sourceRef: 'B2 QA firme 36489784713' },
     { id: 'qaInherited', numero: 'QA-CLIENT-INHERITED', clienteId: 'clientQA', aseguradoraId: 'insCO', pais: 'CO', moneda: 'COP', vigenciaInicio: '2026-05-04', vigenciaFin: '2026-12-27', primaNeta: 70000, estado: 'Vigente' },
     { id: 'wrongInsurer', numero: 'INCONSISTENT', clienteId: 'clientGT', aseguradoraId: 'insCO', pais: 'GT', moneda: 'GTQ', vigenciaInicio: '2026-06-01', primaNeta: 90000 },
     { id: 'orphanQA', numero: 'B2-REN-TEST', clienteId: 'missingPhysicalClient', aseguradoraId: 'insGT', pais: 'GT', moneda: 'GTQ', vigenciaInicio: '2026-06-01', primaNeta: 80000 },
@@ -176,10 +179,22 @@ test('E4 GT does not display Colombian insurers, even when the client domicile i
   assert.doesNotMatch(html, /2026000098/);
   assert.doesNotMatch(html, /Aseguradora Colombia/);
   assert.doesNotMatch(html, /B2-REN-TEST/);
+  assert.doesNotMatch(html, /B2-REN-SOURCE/);
   assert.match(html, /data-report-country-quarantine="2"/);
   html = app.event('#rep-anio', '2026');
   assert.doesNotMatch(html, /GT-2026-LOOKALIKE/);
   assert.match(html, /GT-2026/);
+});
+
+test('Explicit B2 QA firme source is retained in the policy store but not counted as commercial production', () => {
+  const app = setup('GT');
+  const html = app.render();
+  assert.doesNotMatch(html, /B2-REN-SOURCE/);
+  assert.match(html, /data-report-qa-quarantine="4"/);
+  assert.ok(app.Orbit.q.polizasScoped().some(p => p.numero === 'B2-REN-SOURCE'), 'QA source must remain available for audit');
+  assert.equal(app.Orbit.q.isSyntheticQaRecord(rows.polizas.find(p => p.id === 'qaB2SourceGT')), true);
+  assert.equal(app.Orbit.q.produccionMesPorMoneda('2026-10').GTQ || 0, 0, 'QA source leaked into GT October production');
+  assert.equal(app.writes(), 0);
 });
 
 test('E4 all six reports inherit the same country and period rule', () => {
@@ -213,8 +228,8 @@ test('E4 QA provenance is excluded in six reports, while retained and counted fo
   const app = setup('CO');
   let html = app.render();
   assert.doesNotMatch(html, /B4-003-CAN-38102224750|QA-CLIENT-INHERITED/);
-  assert.match(html, /data-report-qa-quarantine="3"/);
-  assert.match(html, /3 registros sintéticos QA excluidos/);
+  assert.match(html, /data-report-qa-quarantine="4"/);
+  assert.match(html, /4 registros sintéticos QA excluidos/);
   assert.match(html, /2026000098/);
   for (const [kind, forbidden] of [
     ['cartera', /pmtQA|pmtMarkedQA/],
@@ -244,4 +259,80 @@ test('E4 exact source contract never guesses numeric amount from rendered string
   assert.doesNotMatch(reportes, /paisOK\(p\.clienteId\)/);
   assert.match(reportes, /q\.policyLinkedCountry\(row\)/);
   assert.match(reportes, /moneyCols:\s*\[5\]/);
+});
+
+test('Pólizas GT separates three source-proven QA policies from commercial KPIs and client-country gaps', () => {
+  let writes = 0;
+  const clients = [
+    { id: 'gtCustomer', pais: 'GT', nombre: 'Cliente GT', moneda: 'GTQ' },
+    { id: 'coCustomer', pais: 'CO', nombre: 'Cliente CO', moneda: 'COP' }
+  ];
+  const policies = [
+    { id: 'realGT', numero: 'GT-REAL', clienteId: 'gtCustomer', pais: 'GT', moneda: 'GTQ', primaNeta: 100, primaTotal: 110, asesorId: 'adviser', estado: 'Vigente', vigenciaFin: '2027-12-01' },
+    { id: 'crossClientGT', numero: 'GT-CROSS-REAL', clienteId: 'coCustomer', pais: 'GT', moneda: 'GTQ', primaNeta: 200, estado: 'Cancelada', vigenciaFin: '2027-12-01' },
+    ...[1, 2, 3].map(i => ({ id: 'qa' + i, numero: 'B2-REN-' + i, clienteId: 'unlinked', pais: 'GT', moneda: 'GTQ', primaNeta: 1000, primaTotal: 1221,
+      asesorId: 'adviser', estado: 'Vigente', vigenciaFin: '2027-10-01', sourceRef: 'B2 QA firme ' + i }))
+  ];
+  const table = { polizas: policies, clientes: clients, asesores: [{ id: 'adviser', nombre: 'Paula Osorio' }], aseguradoras: [], vehiculos: [] };
+  const store = { all: k => table[k] || [], get: (k, id) => (table[k] || []).find(row => row.id === id) || null,
+    _ensureCollections() {}, _productStatus: () => ({ serverConfirmedCollections: ['polizas', 'clientes', 'asesores'] }),
+    insert() { writes++; throw Error('QA_LIST_WRITE'); }, remove() { writes++; throw Error('QA_LIST_DELETE'); } };
+  const U = { esc: v => String(v ?? ''), finiteNumber: v => Number(v), money: (v, cur) => cur + ' ' + v,
+    fmtDate: v => String(v || ''), daysFromNow: () => 365, avatar: v => String(v), estadoBadge: v => String(v) };
+  const K = { bannerFor: () => '', filterBar: () => '', wireFilters() {},
+    kpis: defs => defs.map(d => '<p>' + d.label + ':' + d.val + '</p>').join('') };
+  const host = { innerHTML: '', isConnected: true };
+  const Orbit = { ui: U, kit: K, store, pais: 'GT', modules: {}, clientProjection: { get: () => null },
+    session: { rol: () => 'Dirección' }, auth: { user: () => ({ uid: 'paula', countries: ['GT'] }) },
+    access: { activeRole: () => 'Dirección' } };
+  const browserWindow = { Orbit, addEventListener() {} };
+  const document = { addEventListener() {}, getElementById: id => id === 'host' ? host : null };
+  const context = vm.createContext({ Orbit, window: browserWindow, document, location: { hash: '#/polizas' }, Map, Set, Date, console });
+  vm.runInContext(queries, context, { filename: 'queries.js' });
+  vm.runInContext(polizas, context, { filename: 'polizas.js' });
+  Orbit.modules.polizas.render(host);
+  assert.match(host.innerHTML, /data-polizas-total="5"/);
+  assert.match(host.innerHTML, /data-polizas-commercial-total="2"/);
+  assert.match(host.innerHTML, /data-polizas-qa-quarantine="3"/);
+  assert.match(host.innerHTML, /data-polizas-active="1"/);
+  assert.match(host.innerHTML, /data-polizas-client-country-gap="1"/);
+  assert.doesNotMatch(host.innerHTML, /GTQ 3,000/);
+  assert.match(host.innerHTML, /3 pólizas de prueba QA/);
+  Orbit.modules.polizas.filtrarGrupo('qa');
+  assert.match(host.innerHTML, /B2-REN-1/);
+  assert.doesNotMatch(host.innerHTML, /GT-REAL/);
+  Orbit.modules.polizas.filtrarGrupo('qa');
+  Orbit.modules.polizas.filtrarGrupo('active');
+  assert.match(host.innerHTML, /GT-REAL/);
+  assert.doesNotMatch(host.innerHTML, /B2-REN-1/);
+  assert.equal(writes, 0);
+});
+
+test('Cliente 360 Operativo uses only verified policy advisor labels without reading privileged Equipo', () => {
+  let writes=0;
+  const table={
+    clientes:[{id:'clientCO',nombre:'Cliente Colombiano',tipo:'Persona',pais:'CO',moneda:'COP',asesorId:'advisorHistorico'}],
+    polizas:[{id:'policyCO',numero:'CO-123',clienteId:'clientCO',pais:'CO',moneda:'COP',primaTotal:300,primaNeta:270,
+      asesorId:'advisorHistorico',asesorNombreVerificado:'Johanna Salgado',estado:'Vigente'}],
+    asesores:[], carteraPrimas:[]
+  };
+  const store={__productReadOnlyP0:true,all:k=>table[k]||[],get:(k,id)=>(table[k]||[]).find(x=>x.id===id)||null,
+    _productStatus:()=>({serverConfirmedCollections:['clientes','polizas','carteraPrimas'],deniedCollections:['asesores'],snapshotErrors:{}}),
+    _ensureCollections(){},insert(){writes++;throw Error('NO_CLIENT_WRITE');},remove(){writes++;throw Error('NO_CLIENT_DELETE');}};
+  const ui={esc:v=>String(v??''),text:(v,d)=>v||d,avatar:v=>'Avatar '+v,finiteNumber:v=>Number(v),
+    money:(n,c)=>c+' '+n,moneyShort:(n,c)=>c+' '+n,daysFromNow:()=>365};
+  const diagnostics={};
+  const host={innerHTML:'',isConnected:true,querySelectorAll:()=>[],querySelector:()=>null};
+  const Orbit={store,ui,kit:{bannerFor:()=>''},modules:{},pais:'CO',route:{params:{}},
+    session:{rol:()=> 'Operativo'},clientProjection:{withReadBatch:fn=>fn?fn():null},q:{}};
+  const browserWindow={Orbit,OrbitRuntimeDiagnostics:diagnostics,addEventListener(){}};
+  const document={addEventListener(){},getElementById:id=>id==='c360-client-name-case-style'?{}:null};
+  const ctx=vm.createContext({Orbit,OrbitRuntimeDiagnostics:diagnostics,window:browserWindow,document,location:{hash:'#/cliente360'},Date,Map,Set,console,setTimeout,clearTimeout});
+  vm.runInContext(cliente360,ctx,{filename:'cliente360.js'});
+  Orbit.modules.cliente360.render(host);
+  assert.match(host.innerHTML,/data-c360-list-ready="1"/);
+  assert.match(host.innerHTML,/Johanna Salgado/);
+  assert.match(host.innerHTML,/<option value="advisorHistorico"[^>]*>Johanna Salgado<\/option>/);
+  assert.doesNotMatch(host.innerHTML, /Asesor sin coincidencia/);
+  assert.equal(writes,0);
 });
