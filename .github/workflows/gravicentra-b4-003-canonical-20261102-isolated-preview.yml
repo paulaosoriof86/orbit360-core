@@ -21,11 +21,11 @@ jobs:
     if: >-
       github.repository == 'paulaosoriof86/orbit360-core' &&
       github.ref == 'refs/heads/recovery/fase-a-clean-20260831' &&
-      github.event.head_commit.message == 'build(i6.5 B4-003): refresh cumulative Preview and frozen shock plan'
+      github.event.head_commit.message == 'build(i6.5 B4-003): refresh exact Preview with policy-bound advisor labels'
     runs-on: ubuntu-24.04
     timeout-minutes: 55
     env:
-      SOURCE_SHA: 2482af7b61eefb739117412fb154a42c622f07c0
+      SOURCE_SHA: ddf5821399a6c2e41901fd0bc57ffe145a036ceb
       PROJECT_ID: ays-orbit-360-lab
       HOSTING_SITE: ays-orbit-360-lab
       TENANT_HINT: alianzas-soluciones
@@ -47,7 +47,7 @@ jobs:
       - name: Checkout frozen canonical source, no product divergence
         uses: actions/checkout@v4
         with:
-          ref: 2482af7b61eefb739117412fb154a42c622f07c0
+          ref: ddf5821399a6c2e41901fd0bc57ffe145a036ceb
           fetch-depth: 0
           persist-credentials: false
           path: candidate
@@ -65,11 +65,14 @@ jobs:
           test "$(git -C candidate hash-object functions/b4-003-scoped-access-boundary.js)" = '5cd90582db17d6989b13117e629ed4bc985ff1cf'
           test "$(git -C candidate hash-object orbit360-platform/core/tenant-access-policy-effective-p0.js)" = '0f7f37e67eff15a4286b0202599830899b02a754'
           test "$(git -C candidate hash-object functions/b4-003-scoped-policy-callable.js)" = '743ed2a9bd9776cbd5d70ffe0669770b491b27aa'
+          test "$(git -C candidate hash-object functions/b4-003-scoped-policy-reader.js)" = '1d654b5590fb71279b6bcaaa8eb8625af07c52a4'
+          test "$(git -C candidate hash-object orbit360-platform/modules/polizas.js)" = '7b2ab978918908b0e16e56ae04e86d816414d0ab'
           cd candidate
           timeout -k 3s 55s node tools/gravicentra-i6-control-plane-guard-v1.mjs --mode=i6
           node tools/gravicentra-b4-003-client-country-authority.test.cjs
           node tools/gravicentra-b4-003-client-country-index-dryrun-readonly.test.cjs
           node tools/gravicentra-b4-003-scoped-boundary.test.cjs
+          node tools/gravicentra-b4-003-scoped-policy-reader.test.cjs
           node tools/gravicentra-b4-003-scoped-related-reader.test.cjs
           node tools/gravicentra-b4-003-polizas-context-cache.test.cjs
           node tools/gravicentra-b4-003-polizas-advisor-hydration-20261102.test.cjs
@@ -211,9 +214,9 @@ jobs:
           curl --fail --silent --show-error --location --retry 2 --max-time 30 https://app.aysseguros.com/ | sha256sum > "$RUNNER_TEMP/domain-after.sha"
           cmp "$RUNNER_TEMP/live-before.sha" "$RUNNER_TEMP/live-after.sha"
           cmp "$RUNNER_TEMP/domain-before.sha" "$RUNNER_TEMP/domain-after.sha"
-          printf '%s\n' "B4-003 CANONICAL LAB PREVIEW SYNCHRONIZED" "Source: $SOURCE_SHA" "Preview: $PREVIEW_URL" 'Preview callable + expiring Hosting channel only; no LIVE, Rules, IAM or new client writes. Earlier LAB run 41478387493 applied 35 authorized country fields with backup/restore; 443-vs-439 projection discrepancy, advisor labels and authenticated cross-UID UAT remain OPEN.' >> "$GITHUB_STEP_SUMMARY"
+          printf '%s\n' "B4-003 CANONICAL LAB PREVIEW SYNCHRONIZED" "Source: $SOURCE_SHA" "Preview: $PREVIEW_URL" 'Preview policy reader now projects minimal policy-bound advisor names after per-policy authorization (source QA only until authenticated UAT). Preview callable + expiring Hosting channel only; no LIVE, Rules, IAM or new client writes. Earlier LAB run 41478387493 applied 35 authorized country fields with backup/restore; 443-vs-439 projection discrepancy and authenticated Carlos/Samuel UAT remain OPEN.' >> "$GITHUB_STEP_SUMMARY"
           node - <<'NODE'
-          const fs=require('node:fs');const proof={schema:'B4003_CANONICAL_PREVIEW_20261102_V1',sourceSha:process.env.SOURCE_SHA,previewUrl:process.env.PREVIEW_URL,previewFunction:'orbit360ScopedPolicyReadPreview',hostingLiveChanged:false,rulesChanged:false,authIamChanged:false,physicalClientIndexUpdatesInThisWorkflow:0,priorLabCountryCorrections:35,priorCountryApplyRunId:41478387493,unresolvedClientProjectionDifference:4,authenticatedUat:'PENDING',production:'HOLD'};
+          const fs=require('node:fs');const proof={schema:'B4003_CANONICAL_PREVIEW_20261102_V1',sourceSha:process.env.SOURCE_SHA,previewUrl:process.env.PREVIEW_URL,previewFunction:'orbit360ScopedPolicyReadPreview',hostingLiveChanged:false,rulesChanged:false,authIamChanged:false,physicalClientIndexUpdatesInThisWorkflow:0,priorLabCountryCorrections:35,priorCountryApplyRunId:41478387493,unresolvedClientProjectionDifference:4,advisorCrossBorderSourceQa:'PASS_PENDING_AUTHENTICATED_UAT',authenticatedUat:'PENDING_CARLOS_SAMUEL_AND_NEW_PREVIEW_PAULA',production:'HOLD'};
           fs.writeFileSync(process.env.RUNNER_TEMP+'/canonical-preview-readback.json',JSON.stringify(proof,null,2)+'\n');
           NODE
 
