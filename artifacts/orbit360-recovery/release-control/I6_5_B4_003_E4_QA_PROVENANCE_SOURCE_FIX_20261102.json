@@ -1,0 +1,52 @@
+{
+  "schema": "GRAVICENTRA_B4003_E4_QA_PROVENANCE_SOURCE_FIX_V1",
+  "recordedAt": "2026-11-02",
+  "gate": "I6.5/B4-003",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "predecessor": "b33d8986a2d1e67bdc0eaf6ce5b322af01cc893e",
+  "previewObservedSource": "ddf5821399a6c2e41901fd0bc57ffe145a036ceb",
+  "causalReadback": {
+    "PaulaDireccionTodosPolicies": 1425,
+    "PaulaOperativoColombiaPolicies": 124,
+    "PaulaOperativoColombiaMissingAdvisorNames": 0,
+    "e4GT2026SyntheticRowsVisibleAtLeast": 5,
+    "exactQaReadback20261030": "I6_5_B4_003_EXACT_QA_RESIDUE_DEPENDENCIES_READBACK_20261030.json",
+    "qaPoliciesWithExplicitFlagInPhysicalEvidence": 6
+  },
+  "cause": "Reportes E4 validates country, period, currency, policy/client joins but lacks the explicit __syntheticQa boundary already used by Renovaciones.",
+  "change": {
+    "source": "orbit360-platform/modules/reportes.js",
+    "test": "tools/gravicentra-b4-003-reportes-e4-transversal.test.cjs",
+    "scope": "Six report types, their grouping/export datasets and visible source QA quarantine count; inherits linked policy and client QA marker.",
+    "classification": "Only exact boolean __syntheticQa/syntheticQa true on record, linked policy, or linked client. Never filter by free-form names or broad ID prefix.",
+    "quarantineForMissingClientOrUnverifiedCountry": "preserved"
+  },
+  "localProof": {
+    "command": "node tools/gravicentra-b4-003-reportes-e4-transversal.test.cjs",
+    "tests": 6,
+    "passed": 6,
+    "failed": 0,
+    "syntheticOnly": true,
+    "noNetwork": true,
+    "noFirestoreWrites": true
+  },
+  "notProven": [
+    "Immutable new Preview build and served byte readback",
+    "Authenticated GT/CO/TODOS UAT for E4 using real UID",
+    "Independent Carlos/Samuel positive and negative Firestore Rules tests",
+    "Physical commercial denominator reconciliation across all KPI modules",
+    "Any production PASS"
+  ],
+  "unchanged": {
+    "controlPlaneGate": "I6.5/B4-003",
+    "formalI6Percent": 50,
+    "production": "HOLD",
+    "singleCandidate": true,
+    "reimport": false,
+    "roles": false,
+    "data": false,
+    "live": false
+  },
+  "nextAction": "BUILD_EXACT_CANONICAL_PREVIEW_AND_AUTHENTICATED_E4_READBACK_WITH_TEST_MARKERS_EXCLUDED"
+}

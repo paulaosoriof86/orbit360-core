@@ -16,6 +16,7 @@ const rows = {
   clientes: [
     { id: 'clientGT', pais: 'GT', nombre: 'Cliente Guatemala' },
     { id: 'clientCO', pais: 'CO', nombre: 'Cliente Colombia' },
+    { id: 'clientQA', pais: 'CO', nombre: 'Cliente sintético QA', __syntheticQa: true },
     { id: 'clientAmb', pais: 'REQUIERE_VALIDACION', nombre: 'Cliente con país inferible' }
   ],
   aseguradoras: [
@@ -28,6 +29,9 @@ const rows = {
     { id: 'ambiguousPolicy', numero: 'CO-AMB', clienteId: 'clientCO', aseguradoraId: 'insCO', pais: 'REQUIERE_VALIDACION', moneda: 'COP', vigenciaInicio: '2026-04-01', vigenciaFin: '2026-12-24', primaNeta: 300, estado: 'Vigente' },
     { id: 'gtOld', numero: 'GT-2026-LOOKALIKE', clienteId: 'clientGT', aseguradoraId: 'insGT', pais: 'GT', moneda: 'GTQ', vigenciaInicio: '2025-02-01', vigenciaFin: '2026-12-25', primaNeta: 90, estado: 'Vigente' },
     { id: 'gtNew', numero: 'GT-2026', clienteId: 'clientGT', aseguradoraId: 'insGT', pais: 'GT', moneda: 'GTQ', vigenciaInicio: '2026-05-01', vigenciaFin: '2026-12-26', primaNeta: 50, estado: 'Vigente' },
+    { id: 'qaCO', numero: 'B4-003-CAN-38102224750', clienteId: 'clientCO', aseguradoraId: 'insCO', pais: 'CO', moneda: 'COP', vigenciaInicio: '2026-05-02', vigenciaFin: '2026-12-27', primaNeta: 45000, estado: 'Vigente', __syntheticQa: true },
+    { id: 'qaGT', numero: 'B4-003-HEALTH-38102224750', clienteId: 'clientGT', aseguradoraId: 'insGT', pais: 'GT', moneda: 'GTQ', vigenciaInicio: '2026-05-03', vigenciaFin: '2026-12-27', primaNeta: 60000, estado: 'Vigente', syntheticQa: true },
+    { id: 'qaInherited', numero: 'QA-CLIENT-INHERITED', clienteId: 'clientQA', aseguradoraId: 'insCO', pais: 'CO', moneda: 'COP', vigenciaInicio: '2026-05-04', vigenciaFin: '2026-12-27', primaNeta: 70000, estado: 'Vigente' },
     { id: 'wrongInsurer', numero: 'INCONSISTENT', clienteId: 'clientGT', aseguradoraId: 'insCO', pais: 'GT', moneda: 'GTQ', vigenciaInicio: '2026-06-01', primaNeta: 90000 },
     { id: 'orphanQA', numero: 'B2-REN-TEST', clienteId: 'missingPhysicalClient', aseguradoraId: 'insGT', pais: 'GT', moneda: 'GTQ', vigenciaInicio: '2026-06-01', primaNeta: 80000 },
     { id: 'unknownYear', numero: 'POL-202699', clienteId: 'clientCO', aseguradoraId: 'insCO', pais: 'CO', moneda: 'COP', primaNeta: 999 },
@@ -37,19 +41,24 @@ const rows = {
     { id: 'pmtCross', polizaId: 'cross', clienteId: 'clientGT', pais: 'CO', moneda: 'COP', vence: '2026-05-01', monto: 600, estado: 'Pagado' },
     { id: 'pmtCountryContradiction', polizaId: 'cross', clienteId: 'clientGT', pais: 'GT', moneda: 'COP', vence: '2026-05-01', monto: 888, estado: 'Pagado' },
     { id: 'pmtOrphan', polizaId: 'missing', clienteId: 'clientGT', pais: 'GT', moneda: 'GTQ', vence: '2026-05-01', monto: 888, estado: 'Pagado' },
-    { id: 'pmtGT', polizaId: 'gtNew', clienteId: 'clientGT', pais: 'GT', moneda: 'GTQ', vence: '2026-05-02', monto: 100, estado: 'Pagado' }
+    { id: 'pmtGT', polizaId: 'gtNew', clienteId: 'clientGT', pais: 'GT', moneda: 'GTQ', vence: '2026-05-02', monto: 100, estado: 'Pagado' },
+    { id: 'pmtQA', polizaId: 'qaCO', clienteId: 'clientCO', pais: 'CO', moneda: 'COP', vence: '2026-05-03', monto: 99999, estado: 'Pagado' },
+    { id: 'pmtMarkedQA', polizaId: 'cross', clienteId: 'clientGT', pais: 'CO', moneda: 'COP', vence: '2026-05-03', monto: 99998, estado: 'Pagado', __syntheticQa: true }
   ],
   comisiones: [
     { id: 'commissionCO', polizaId: 'cross', clienteId: 'clientGT', pais: 'CO', moneda: 'COP', periodo: '2026-06', base: 600, monto: 60, pct: 10, estado: 'Liquidada' },
-    { id: 'commissionGT', polizaId: 'gtNew', clienteId: 'clientGT', pais: 'GT', moneda: 'GTQ', periodo: '2026-06', base: 100, monto: 10, pct: 10, estado: 'Liquidada' }
+    { id: 'commissionGT', polizaId: 'gtNew', clienteId: 'clientGT', pais: 'GT', moneda: 'GTQ', periodo: '2026-06', base: 100, monto: 10, pct: 10, estado: 'Liquidada' },
+    { id: 'commissionQA', polizaId: 'qaCO', clienteId: 'clientCO', pais: 'CO', moneda: 'COP', periodo: '2026-06', base: 99999, monto: 9999, pct: 10, estado: 'Liquidada' }
   ],
   reclamos: [
     { id: 'claimCO', polizaId: 'cross', clienteId: 'clientGT', aseguradoraId: 'insCO', pais: 'CO', moneda: 'COP', fecha: '2026-06-05', numero: 'S-01', montoReclamado: 1000, montoAprobado: 500 },
-    { id: 'claimGT', polizaId: 'gtNew', clienteId: 'clientGT', aseguradoraId: 'insGT', pais: 'GT', moneda: 'GTQ', fecha: '2026-06-05', numero: 'S-02', montoReclamado: 20, montoAprobado: 15 }
+    { id: 'claimGT', polizaId: 'gtNew', clienteId: 'clientGT', aseguradoraId: 'insGT', pais: 'GT', moneda: 'GTQ', fecha: '2026-06-05', numero: 'S-02', montoReclamado: 20, montoAprobado: 15 },
+    { id: 'claimQA', polizaId: 'qaCO', clienteId: 'clientCO', aseguradoraId: 'insCO', pais: 'CO', moneda: 'COP', fecha: '2026-06-05', numero: 'QA-S-01', montoReclamado: 90000, montoAprobado: 80000 }
   ],
   cancelaciones: [
     { id: 'cancelCO', polizaId: 'cross', clienteId: 'clientGT', pais: 'CO', moneda: 'COP', fecha: '2026-06-05', valorPerdido: 100 },
-    { id: 'cancelGT', polizaId: 'gtNew', clienteId: 'clientGT', pais: 'GT', moneda: 'GTQ', fecha: '2026-06-05', valorPerdido: 20 }
+    { id: 'cancelGT', polizaId: 'gtNew', clienteId: 'clientGT', pais: 'GT', moneda: 'GTQ', fecha: '2026-06-05', valorPerdido: 20 },
+    { id: 'cancelQA', polizaId: 'qaCO', clienteId: 'clientCO', pais: 'CO', moneda: 'COP', fecha: '2026-06-05', valorPerdido: 90000 }
   ],
   reportes_prog: []
 };
@@ -165,6 +174,35 @@ test('E4 all six reports inherit the same country and period rule', () => {
     html = app.event('#rep-anio', '2026');
     assert.match(html, new RegExp(yes));
   }
+  assert.equal(app.writes(), 0);
+});
+
+test('E4 QA provenance is excluded in six reports, while retained and counted for audit', () => {
+  const app = setup('CO');
+  let html = app.render();
+  assert.doesNotMatch(html, /B4-003-CAN-38102224750|QA-CLIENT-INHERITED/);
+  assert.match(html, /data-report-qa-quarantine="3"/);
+  assert.match(html, /3 registros sintéticos QA excluidos/);
+  assert.match(html, /2026000098/);
+  for (const [kind, forbidden] of [
+    ['cartera', /pmtQA|pmtMarkedQA/],
+    ['comisiones', /commissionQA/],
+    ['renovaciones', /B4-003-CAN-38102224750|QA-CLIENT-INHERITED/],
+    ['siniestros', /QA-S-01/],
+    ['cancelaciones', /cancelQA/]
+  ]) {
+    const marker = "return { render, quitarProg, verFila };";
+    const instrument = reportes.replace(marker, "return { render, quitarProg, verFila, __qaSelect: key => { sel = key; } };");
+    const Orbit = app.Orbit;
+    vm.runInNewContext(instrument, { Orbit, window: { Orbit }, Date }, { filename: 'reportes-e4-test-synthetic.js' });
+    Orbit.modules.reportes.__qaSelect(kind);
+    html = app.render();
+    assert.doesNotMatch(html, forbidden, 'QA leaked into ' + kind);
+    assert.match(html, /data-report-qa-quarantine=/);
+  }
+  app.Orbit.pais = 'GT';
+  html = app.render();
+  assert.doesNotMatch(html, /B4-003-HEALTH-38102224750/);
   assert.equal(app.writes(), 0);
 });
 

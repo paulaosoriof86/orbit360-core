@@ -5,6 +5,24 @@
   "productBrand": "Gravicentra Insurance",
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
+  "b4003E4QaProvenanceSourceFix20261102": {
+    "schema": "GRAVICENTRA_B4003_E4_QA_CLASSIFICATION_SOURCE_POINTER_V1",
+    "status": "SOURCE_PATCH_LOCAL_6_OF_6_PASS_EXACT_PREVIEW_AND_SIGNED_UID_UAT_PENDING",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_E4_QA_PROVENANCE_SOURCE_FIX_20261102.json",
+    "sourcePaths": [
+      "orbit360-platform/modules/reportes.js",
+      "tools/gravicentra-b4-003-reportes-e4-transversal.test.cjs"
+    ],
+    "classification": "EXPLICIT___syntheticQa_OR_syntheticQa_TRUE_OR_SYNTHETIC_PARENT_CLIENT",
+    "allSixReports": true,
+    "qaRecordDeletion": false,
+    "operationalDataWrites": false,
+    "firestoreRulesChanged": false,
+    "liveDeployed": false,
+    "formalI6Percent": 50,
+    "b4003Closed": false,
+    "productionAuthorized": false
+  },
   "b4003PaulaChromeReadback20261102": {
     "schema": "GRAVICENTRA_B4003_PAULA_CHROME_READBACK_POINTER_V1",
     "status": "AUTH_PAULA_PARTIAL_UAT_ADVISOR_PASS_QA_REPORT_FAIL_B4003_HOLD",
