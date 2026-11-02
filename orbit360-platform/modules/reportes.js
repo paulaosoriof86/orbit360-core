@@ -8,26 +8,67 @@ window.Orbit = window.Orbit || {};
 Orbit.modules = Orbit.modules || {};
 Orbit.modules.reportes = (function () {
   const U = Orbit.ui, K = Orbit.kit, S = () => Orbit.store, q = Orbit.q;
-  let host, sel = 'produccion', groupBy = '', anioSel = '', progOpen = false;
-  const parseNum = s => { const n = parseFloat(String(s).replace(/[^0-9.\-]/g, '')); return isNaN(n) ? null : n; };
-  function paisOK(cid) { const c = S().get('clientes', cid); return !Orbit.pais || Orbit.pais === 'TODOS' || (c && c.pais === Orbit.pais); }
+  let host, sel = 'produccion', groupBy = '', anioSel = '';
+  const countryCode = v => { const p = String(v == null ? '' : v).trim().toUpperCase(); return p === 'GT' || p === 'CO' ? p : ''; };
+  const currencyFor = p => p === 'CO' ? 'COP' : p === 'GT' ? 'GTQ' : '';
+  const currentCountry = () => countryCode(Orbit.pais);
+  const paisOK = p => !!p && (!currentCountry() || p === currentCountry());
+  const insurerCountry = row => countryCode(row && row.aseguradoraId && (S().get('aseguradoras', row.aseguradoraId) || {}).pais);
+  // A policy's verified country takes precedence over the client's domicile.
+  // Contradictory policy/insurer evidence is quarantined in EVERY report, not
+  // silently assigned to Guatemala or included in the global universe.
+  function policyCountry(p) {
+    if (!p || !p.clienteId || !S().get('clientes', p.clienteId)) return '';
+    const own = countryCode(p.pais || p.country), insurer = insurerCountry(p);
+    return own && insurer && own !== insurer ? '' : (own || insurer);
+  }
+  function linkedCountry(row) {
+    if (!row) return '';
+    const pol = row.polizaId ? S().get('polizas', row.polizaId) : null;
+    if (row.polizaId && !pol) return '';
+    if (pol) {
+      const parent = policyCountry(pol), own = countryCode(row.pais || row.country), insurer = insurerCountry(row);
+      if (!parent || (row.clienteId && String(row.clienteId) !== String(pol.clienteId)) ||
+          (own && own !== parent) || (insurer && insurer !== parent)) return '';
+      // Reuse the financial-parent verifier, including its fail-closed handling
+      // of child/parent inconsistencies and unresolved policy references.
+      if (typeof q.policyLinkedCountry === 'function' && countryCode(q.policyLinkedCountry(row)) !== parent) return '';
+      return parent;
+    }
+    const own = countryCode(row.pais || row.country), insurer = insurerCountry(row);
+    const client = countryCode((S().get('clientes', row.clienteId) || {}).pais);
+    if ((own && insurer && own !== insurer) || (own && client && !insurer && own !== client)) return '';
+    return own || insurer || client;
+  }
+  function yearOf(value) {
+    const str = String(value == null ? '' : value).trim();
+    const m = /^(\d{4})-(0[1-9]|1[0-2])(?:-(0[1-9]|[12]\d|3[01]))?(?:$|T)/.exec(str);
+    if (!m) return '';
+    if (m[3] && new Date(Date.UTC(+m[1], +m[2] - 1, +m[3])).toISOString().slice(0, 10) !== str.slice(0, 10)) return '';
+    return m[1];
+  }
+  const moneySource = value => value == null || value === '' || !Number.isFinite(Number(value)) ? null : Number(value);
+  const moneyCell = (value, currency) => { const amount = moneySource(value); return amount == null ? '—' : U.money(amount, currency); };
+  function rowData(id, cells, date, currency, amounts) {
+    return { id, cells, year: yearOf(date), currency: String(currency || '').toUpperCase(), amounts: amounts || {} };
+  }
   function monedaCliente(cid) {
     const c = S().get('clientes', cid) || {};
-    return c.moneda || (c.pais === 'CO' ? 'COP' : 'GTQ');
+    return c.moneda || currencyFor(countryCode(c.pais));
   }
   function monedaPoliza(polId, cid) {
     const p = S().get('polizas', polId) || {};
-    return p.moneda || monedaCliente(cid || p.clienteId);
+    return p.moneda || currencyFor(policyCountry(p)) || monedaCliente(cid || p.clienteId);
   }
   function monedaMixtaActiva() { return !Orbit.pais || Orbit.pais === 'TODOS'; }
 
   const REPORTES = {
-    produccion: { t: 'Producción', icon: '📈', desc: 'Pólizas emitidas con prima neta, por asesor y aseguradora.', cols: ['Póliza', 'Cliente', 'Ramo', 'Aseguradora', 'Asesor', 'Prima neta', 'Estado'], nav: id => `#/cliente360?c=${(S().get('polizas', id) || {}).clienteId || ''}`, rows: () => S().all('polizas').filter(p => paisOK(p.clienteId)).map(p => ({ id: p.id, cells: [p.numero, (S().get('clientes', p.clienteId) || {}).nombre || '', p.ramo, (q.aseguradora(p.aseguradoraId) || {}).nombre || '', (q.asesor(p.asesorId) || {}).nombre || '', U.money(p.primaNeta || p.prima, p.moneda), p.estado] })) },
-    cartera: { t: 'Cartera y cobros', icon: '💳', desc: 'Recibos por estado, con vencimiento y conciliación.', cols: ['Recibo', 'Cliente', 'Cuota', 'Monto', 'Vence', 'Estado', 'Conciliado'], nav: id => { const c = S().get('cobros', id) || {}; return `#/cliente360?c=${c.clienteId || ''}`; }, act: id => Orbit.modules.cobros && Orbit.modules.cobros.detalle(id), rows: () => S().all('cobros').filter(c => c.estado !== 'Anulado' && paisOK(c.clienteId)).map(c => ({ id: c.id, cells: ['REC-' + c.id.slice(-5).toUpperCase(), (S().get('clientes', c.clienteId) || {}).nombre || '', c.cuota, U.money(c.monto, c.moneda || monedaCliente(c.clienteId)), U.fmtDate(c.vence), c.estado, c.conciliado ? 'Sí' : 'No'] })) },
-    comisiones: { t: 'Comisiones', icon: '💵', desc: 'Comisión generada por póliza, periodo y estado.', cols: ['Periodo', 'Cliente', 'Póliza', 'Base neta', '%', 'Comisión', 'Estado'], nav: id => `#/cliente360?c=${(S().get('comisiones', id) || {}).clienteId || ''}`, rows: () => S().all('comisiones').filter(c => paisOK(c.clienteId)).map(c => ({ id: c.id, cells: [c.periodo || '', (S().get('clientes', c.clienteId) || {}).nombre || '', (S().get('polizas', c.polizaId) || {}).numero || '', U.money(c.base, c.moneda || monedaCliente(c.clienteId)), c.pct + '%', U.money(c.monto, c.moneda || monedaCliente(c.clienteId)), c.estado] })) },
-    renovaciones: { t: 'Renovaciones', icon: '🔄', desc: 'Pólizas por vencer en los próximos 60 días.', cols: ['Póliza', 'Cliente', 'Ramo', 'Aseguradora', 'Prima', 'Vence'], nav: id => `#/cliente360?c=${(S().get('polizas', id) || {}).clienteId || ''}`, rows: () => q.renovacionesProximas(60).filter(p => paisOK(p.clienteId)).map(p => ({ id: p.id, cells: [p.numero, (S().get('clientes', p.clienteId) || {}).nombre || '', p.ramo, (q.aseguradora(p.aseguradoraId) || {}).nombre || '', U.money(p.prima, p.moneda || monedaCliente(p.clienteId)), U.fmtDate(p.vigenciaFin)] })) },
-    siniestros: { t: 'Siniestros', icon: '🚨', desc: 'Reclamos con estado, montos y aseguradora.', cols: ['N.º', 'Cliente', 'Tipo', 'Aseguradora', 'Reclamado', 'Aprobado', 'Estado'], nav: id => `#/cliente360?c=${(S().get('reclamos', id) || {}).clienteId || ''}`, rows: () => S().all('reclamos').filter(r => paisOK(r.clienteId)).map(r => { const cur = r.moneda || monedaCliente(r.clienteId); return { id: r.id, cells: [r.numero, (S().get('clientes', r.clienteId) || {}).nombre || '', r.tipo, (q.aseguradora(r.aseguradoraId) || {}).nombre || '', U.money(r.montoReclamado, cur), U.money(r.montoAprobado || 0, cur), r.estado] }; }) },
-    cancelaciones: { t: 'Cancelaciones', icon: '✕', desc: 'Pólizas canceladas con motivo y valor perdido.', cols: ['Fecha', 'Cliente', 'Póliza', 'Motivo', 'Valor perdido'], nav: id => `#/cliente360?c=${(S().get('cancelaciones', id) || {}).clienteId || ''}`, rows: () => S().all('cancelaciones').filter(c => paisOK(c.clienteId)).map(c => { const pol = S().get('polizas', c.polizaId) || {}; const cur = c.moneda || pol.moneda || monedaCliente(c.clienteId); return { id: c.id, cells: [U.fmtDate(c.fecha), (S().get('clientes', c.clienteId) || {}).nombre || '', pol.numero || '', c.motivo, U.money(c.valorPerdido, cur)] }; }) }
+    produccion: { t: 'Producción', icon: '📈', desc: 'Pólizas por emisión o inicio de vigencia, con prima neta.', yearLabel: 'emisión / inicio de vigencia', moneyCols: [5], countryMode: 'policy', sourceRows: () => S().all('polizas'), cols: ['Póliza', 'Cliente', 'Ramo', 'Aseguradora', 'Asesor', 'Prima neta', 'Estado'], nav: id => `#/cliente360?c=${(S().get('polizas', id) || {}).clienteId || ''}`, rows: () => S().all('polizas').filter(p => paisOK(policyCountry(p))).map(p => { const cur = p.moneda || currencyFor(policyCountry(p)); const prima = p.primaNeta != null ? p.primaNeta : p.prima; return rowData(p.id, [p.numero, (S().get('clientes', p.clienteId) || {}).nombre || '', p.ramo, (q.aseguradora(p.aseguradoraId) || {}).nombre || '', (q.asesor(p.asesorId) || {}).nombre || '', moneyCell(prima, cur), p.estado], p.emisionEn || p.fechaEmision || p.vigenciaInicio || p.vigenciaIni, cur, { 5: moneySource(prima) }); }) },
+    cartera: { t: 'Cartera y cobros', icon: '💳', desc: 'Recibos por estado, con vencimiento y conciliación.', yearLabel: 'vencimiento', moneyCols: [3], sourceRows: () => S().all('cobros').filter(c => c.estado !== 'Anulado'), cols: ['Recibo', 'Cliente', 'Cuota', 'Monto', 'Vence', 'Estado', 'Conciliado'], nav: id => { const c = S().get('cobros', id) || {}; return `#/cliente360?c=${c.clienteId || ''}`; }, act: id => Orbit.modules.cobros && Orbit.modules.cobros.detalle(id), rows: () => S().all('cobros').filter(c => c.estado !== 'Anulado' && paisOK(linkedCountry(c))).map(c => { const cur = c.moneda || monedaPoliza(c.polizaId, c.clienteId); return rowData(c.id, ['REC-' + c.id.slice(-5).toUpperCase(), (S().get('clientes', c.clienteId) || {}).nombre || '', c.cuota, moneyCell(c.monto, cur), U.fmtDate(c.vence), c.estado, c.conciliado ? 'Sí' : 'No'], c.vence || c.fechaLimite, cur, { 3: moneySource(c.monto) }); }) },
+    comisiones: { t: 'Comisiones', icon: '💵', desc: 'Comisión generada por póliza, periodo y estado.', yearLabel: 'periodo de comisión', moneyCols: [3, 5], sourceRows: () => S().all('comisiones'), cols: ['Periodo', 'Cliente', 'Póliza', 'Base neta', '%', 'Comisión', 'Estado'], nav: id => `#/cliente360?c=${(S().get('comisiones', id) || {}).clienteId || ''}`, rows: () => S().all('comisiones').filter(c => paisOK(linkedCountry(c))).map(c => { const cur = c.moneda || monedaPoliza(c.polizaId, c.clienteId); return rowData(c.id, [c.periodo || '', (S().get('clientes', c.clienteId) || {}).nombre || '', (S().get('polizas', c.polizaId) || {}).numero || '', moneyCell(c.base, cur), c.pct == null ? '—' : c.pct + '%', moneyCell(c.monto, cur), c.estado], c.periodo || c.fecha, cur, { 3: moneySource(c.base), 5: moneySource(c.monto) }); }) },
+    renovaciones: { t: 'Renovaciones', icon: '🔄', desc: 'Pólizas por vencer en los próximos 60 días.', yearLabel: 'fin de vigencia', moneyCols: [4], countryMode: 'policy', sourceRows: () => q.renovacionesProximas(60), cols: ['Póliza', 'Cliente', 'Ramo', 'Aseguradora', 'Prima', 'Vence'], nav: id => `#/cliente360?c=${(S().get('polizas', id) || {}).clienteId || ''}`, rows: () => q.renovacionesProximas(60).filter(p => paisOK(policyCountry(p))).map(p => { const cur = p.moneda || currencyFor(policyCountry(p)); return rowData(p.id, [p.numero, (S().get('clientes', p.clienteId) || {}).nombre || '', p.ramo, (q.aseguradora(p.aseguradoraId) || {}).nombre || '', moneyCell(p.prima, cur), U.fmtDate(p.vigenciaFin)], p.vigenciaFin, cur, { 4: moneySource(p.prima) }); }) },
+    siniestros: { t: 'Siniestros', icon: '🚨', desc: 'Reclamos con estado, montos y aseguradora.', yearLabel: 'reporte del siniestro', moneyCols: [4, 5], sourceRows: () => S().all('reclamos'), cols: ['N.º', 'Cliente', 'Tipo', 'Aseguradora', 'Reclamado', 'Aprobado', 'Estado'], nav: id => `#/cliente360?c=${(S().get('reclamos', id) || {}).clienteId || ''}`, rows: () => S().all('reclamos').filter(r => paisOK(linkedCountry(r))).map(r => { const cur = r.moneda || monedaPoliza(r.polizaId, r.clienteId); return rowData(r.id, [r.numero, (S().get('clientes', r.clienteId) || {}).nombre || '', r.tipo, (q.aseguradora(r.aseguradoraId) || {}).nombre || '', moneyCell(r.montoReclamado, cur), moneyCell(r.montoAprobado, cur), r.estado], r.fecha || r.fechaReclamo, cur, { 4: moneySource(r.montoReclamado), 5: moneySource(r.montoAprobado) }); }) },
+    cancelaciones: { t: 'Cancelaciones', icon: '✕', desc: 'Pólizas canceladas con motivo y valor perdido.', yearLabel: 'cancelación', moneyCols: [4], sourceRows: () => S().all('cancelaciones'), cols: ['Fecha', 'Cliente', 'Póliza', 'Motivo', 'Valor perdido'], nav: id => `#/cliente360?c=${(S().get('cancelaciones', id) || {}).clienteId || ''}`, rows: () => S().all('cancelaciones').filter(c => paisOK(linkedCountry(c))).map(c => { const pol = S().get('polizas', c.polizaId) || {}; const cur = c.moneda || pol.moneda || monedaPoliza(c.polizaId, c.clienteId); return rowData(c.id, [U.fmtDate(c.fecha), (S().get('clientes', c.clienteId) || {}).nombre || '', pol.numero || '', c.motivo, moneyCell(c.valorPerdido, cur)], c.fecha, cur, { 4: moneySource(c.valorPerdido) }); }) }
   };
   // compat: build() devuelve solo las celdas (para export)
   Object.values(REPORTES).forEach(r => { r.build = () => r.rows().map(x => x.cells); });
@@ -36,20 +77,35 @@ Orbit.modules.reportes = (function () {
     host = h;
     const r = REPORTES[sel];
     let rows2 = r.rows();
-    let data = rows2.map(x => x.cells);
     const paisLbl = (Orbit.PAISES.find(p => p.id === (Orbit.pais || 'TODOS')) || {}).label || 'Todos los países';
-    // filtro de periodo (año) — aplica si alguna columna contiene el año
-    if (anioSel) { rows2 = rows2.filter(x => x.cells.some(c => String(c).includes(anioSel))); data = rows2.map(x => x.cells); }
+    const unverifiedCountryRows = r.sourceRows().filter(row => !(r.countryMode === 'policy' ? policyCountry(row) : linkedCountry(row))).length;
+    // An actual source date/period, NEVER text from an insurer, policy number
+    // or money cell, controls the selected year. Unknown dates are not guessed.
+    const missingYear = rows2.filter(x => !x.year).length;
+    if (anioSel) rows2 = rows2.filter(x => x.year === anioSel);
+    const data = rows2.map(x => x.cells);
     // agrupación general→particular
     const gi = groupBy ? r.cols.indexOf(groupBy) : -1;
+    const expectedCurrency = currencyFor(currentCountry());
     let resumen = null;
     if (gi >= 0) {
       // En vista multipaís no se suman columnas monetarias: GTQ y COP se mantienen separadas por filtro.
       const mixedMoney = monedaMixtaActiva();
-      const numCols = mixedMoney ? [] : r.cols.map((c, i) => data.some(row => parseNum(row[i]) !== null) && i !== gi ? i : -1).filter(i => i >= 0);
+      const numCols = mixedMoney ? [] : r.moneyCols.filter(i => i !== gi);
       const grp = {};
-      data.forEach(row => { const k = row[gi] || '—'; grp[k] = grp[k] || { n: 0, sums: {} }; grp[k].n++; numCols.forEach(ci => { const v = parseNum(row[ci]); if (v !== null) grp[k].sums[ci] = (grp[k].sums[ci] || 0) + v; }); });
-      resumen = { rows: Object.entries(grp).sort((a, b) => b[1].n - a[1].n), numCols, mixedMoney };
+      let nonSummable = 0;
+      rows2.forEach(row => {
+        const k = row.cells[gi] || '—';
+        grp[k] = grp[k] || { n: 0, sums: {}, counts: {} };
+        grp[k].n++;
+        numCols.forEach(ci => {
+          const v = row.amounts[ci];
+          if (row.currency !== expectedCurrency || v == null) { nonSummable++; return; }
+          grp[k].sums[ci] = (grp[k].sums[ci] || 0) + v;
+          grp[k].counts[ci] = (grp[k].counts[ci] || 0) + 1;
+        });
+      });
+      resumen = { rows: Object.entries(grp).sort((a, b) => b[1].n - a[1].n), numCols, mixedMoney, nonSummable };
     }
     const prog = S().all('reportes_prog') || [];
     host.innerHTML = `<div class="page">
@@ -66,11 +122,13 @@ Orbit.modules.reportes = (function () {
           <div class="card pad" style="margin-top:12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
             <label style="font-size:12px;color:var(--muted)">Agrupar por</label>
             <select id="rep-group" class="o-sel" style="width:auto"><option value="">Sin agrupar (general)</option>${r.cols.map(c => `<option ${groupBy === c ? 'selected' : ''}>${c}</option>`).join('')}</select>
-            <label style="font-size:12px;color:var(--muted);margin-left:8px">Año</label>
+            <label style="font-size:12px;color:var(--muted);margin-left:8px">Año (${U.esc(r.yearLabel)})</label>
             <select id="rep-anio" class="o-sel" style="width:auto"><option value="">Todos</option>${['2024', '2025', '2026'].map(y => `<option ${anioSel === y ? 'selected' : ''}>${y}</option>`).join('')}</select>
             ${groupBy ? `<span class="badge info" style="margin-left:auto">Resumen de ${resumen.rows.length} grupos</span>` : ''}
           </div>
-          ${resumen ? `<div class="card" style="overflow:hidden;margin-top:12px"><div style="padding:9px 13px;background:var(--soft);font-weight:700;font-size:13px">📊 Resumen por ${U.esc(groupBy)}${resumen.mixedMoney ? ' <span class="badge warn" style="font-size:10px;margin-left:8px">Monedas separadas: filtra por país para sumar</span>' : ''}</div><div style="overflow-x:auto"><table class="tbl"><thead><tr><th>${U.esc(groupBy)}</th><th class="num">Registros</th>${resumen.numCols.map(ci => `<th class="num">Σ ${U.esc(r.cols[ci])}</th>`).join('')}</tr></thead><tbody>${resumen.rows.map(([k, v]) => `<tr><td><b>${U.esc(k)}</b></td><td class="num">${v.n}</td>${resumen.numCols.map(ci => `<td class="num">${v.sums[ci] ? U.money(v.sums[ci], Orbit.q.monedaPais()) : '—'}</td>`).join('')}</tr>`).join('')}</tbody></table></div></div>` : ''}
+          ${anioSel && missingYear ? `<div class="cfg-note" data-report-unknown-period="${missingYear}">⚠ ${missingYear} registros sin fecha de ${U.esc(r.yearLabel)} verificable; no se imputan al año ${U.esc(anioSel)}.</div>` : ''}
+          ${unverifiedCountryRows ? `<div class="cfg-note" data-report-country-quarantine="${unverifiedCountryRows}">⚠ ${unverifiedCountryRows} registros de origen no se contabilizan por país, aseguradora o vínculo cliente/póliza sin verificar. Se mantienen en su fuente para conciliación.</div>` : ''}
+          ${resumen ? `<div class="card" style="overflow:hidden;margin-top:12px"><div style="padding:9px 13px;background:var(--soft);font-weight:700;font-size:13px">📊 Resumen por ${U.esc(groupBy)}${resumen.mixedMoney ? ' <span class="badge warn" style="font-size:10px;margin-left:8px">Monedas separadas: filtra por país para sumar</span>' : ''}${resumen.nonSummable ? ` <span class="badge warn" data-report-unverified-amounts="${resumen.nonSummable}">${resumen.nonSummable} importes sin moneda/monto compatible omitidos de sumas</span>` : ''}</div><div style="overflow-x:auto"><table class="tbl"><thead><tr><th>${U.esc(groupBy)}</th><th class="num">Registros</th>${resumen.numCols.map(ci => `<th class="num">Σ ${U.esc(r.cols[ci])}</th>`).join('')}</tr></thead><tbody>${resumen.rows.map(([k, v]) => `<tr><td><b>${U.esc(k)}</b></td><td class="num">${v.n}</td>${resumen.numCols.map(ci => `<td class="num">${v.counts[ci] ? U.money(v.sums[ci], expectedCurrency) : '—'}</td>`).join('')}</tr>`).join('')}</tbody></table></div></div>` : ''}
           <div class="card" style="overflow:hidden;margin-top:14px"><div style="overflow-x:auto;max-height:520px"><table class="tbl">
             <thead><tr>${r.cols.map(c => `<th>${c}</th>`).join('')}</tr></thead>
             <tbody>${rows2.slice(0, 200).map(x => `<tr class="clickable" onclick="Orbit.modules.reportes.verFila('${x.id}')" title="Ver detalle del registro">${x.cells.map((cell, i) => `<td${i >= r.cols.length - 2 ? ' class="num"' : ''} style="font-size:12.5px">${U.esc(String(cell))}</td>`).join('')}</tr>`).join('') || `<tr><td colspan="${r.cols.length}" class="muted" style="text-align:center;padding:24px">Sin datos.</td></tr>`}</tbody>
@@ -147,13 +205,14 @@ Orbit.modules.reportes = (function () {
   }
 
   /* ---- Análisis IA del reporte: lectura ejecutiva + acciones (centralizado en Orbit.ia) ---- */
-  function ctxReporte(r, data) {
-    const numCols = monedaMixtaActiva() ? [] : r.cols.map((c, i) => data.some(row => parseNum(row[i]) !== null) ? i : -1).filter(i => i >= 0);
-    const totales = numCols.map(ci => ({ col: r.cols[ci], sum: data.reduce((s, row) => s + (parseNum(row[ci]) || 0), 0) }));
+  function ctxReporte(r, rows) {
+    const expectedCurrency = currencyFor(currentCountry());
+    const numCols = monedaMixtaActiva() ? [] : r.moneyCols;
+    const totales = numCols.map(ci => ({ col: r.cols[ci], sum: rows.reduce((s, row) => s + (row.currency === expectedCurrency ? (row.amounts[ci] || 0) : 0), 0) }));
     const catIdx = Math.max(0, r.cols.findIndex((c, i) => numCols.indexOf(i) < 0));
-    const grp = {}; data.forEach(row => { const k = row[catIdx] || '—'; grp[k] = (grp[k] || 0) + 1; });
+    const grp = {}; rows.forEach(row => { const k = row.cells[catIdx] || '—'; grp[k] = (grp[k] || 0) + 1; });
     const top = Object.entries(grp).sort((a, b) => b[1] - a[1]).slice(0, 6);
-    return { numCols, totales, catIdx, top, catLbl: r.cols[catIdx], mixedMoney: monedaMixtaActiva() };
+    return { numCols, totales, catIdx, top, catLbl: r.cols[catIdx], mixedMoney: monedaMixtaActiva(), excluded: monedaMixtaActiva() ? 0 : rows.filter(row => row.currency !== expectedCurrency || numCols.some(ci => row.amounts[ci] == null)).length };
   }
   function fallbackAnalisis(r, data, ctx) {
     const tot = ctx.totales.map(t => t.col + ' ≈ ' + U.money(t.sum, Orbit.q.monedaPais())).join(' · ');
@@ -185,10 +244,11 @@ Orbit.modules.reportes = (function () {
     const close = () => back.remove();
     back.addEventListener('click', e => { if (e.target === back) close(); });
     back.querySelector('#ria-x').onclick = close; back.querySelector('#ria-close').onclick = close;
-    const ctx = ctxReporte(r, data);
+    const rows = r.rows().filter(row => !anioSel || row.year === anioSel);
+    const ctx = ctxReporte(r, rows);
     let out = '';
     if (disponible) {
-      const resumen = 'Reporte: ' + r.t + '\nRegistros: ' + data.length + '\nTotales: ' + (ctx.mixedMoney ? 'No se suman importes en vista multipaís' : ctx.totales.map(t => t.col + '=' + Math.round(t.sum)).join(', ')) + '\nTop ' + ctx.catLbl + ': ' + ctx.top.map(([k, n]) => k + '(' + n + ')').join(', ');
+      const resumen = 'Reporte: ' + r.t + '\nRegistros: ' + data.length + '\nTotales: ' + (ctx.mixedMoney ? 'No se suman importes en vista multipaís' : ctx.totales.map(t => t.col + '=' + Math.round(t.sum)).join(', ')) + '\nImportes parciales o no validados: ' + ctx.excluded + '\nTop ' + ctx.catLbl + ': ' + ctx.top.map(([k, n]) => k + '(' + n + ')').join(', ');
       const prompt = 'Eres analista de un corredor de seguros. Con base en este resumen de un reporte en vivo, responde en español y en formato markdown con EXACTAMENTE dos secciones: "**Lectura ejecutiva**" (2-3 frases sobre qué está pasando y por qué importa) y "**Acciones sugeridas**" (3 acciones concretas y priorizadas, numeradas). Sé específico con los datos. Datos:\n' + resumen;
       try { out = await Promise.race([Orbit.ia.complete(prompt), new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 15000))]); } catch (e) {}
     }
