@@ -51,13 +51,15 @@ listeners['orbit:store:emit']({detail:{collection:'asesores'}});
 assert.notEqual(host.innerHTML,before,'subsequent advisor update must rerender');
 assert.match(host.innerHTML,/Asesora QA actualizada/);
 
-async function roleScopedRoster(role,memberCountries,selectedCountry,expectedCountries){
+async function roleScopedRoster(role,memberCountries,selectedCountry,expectedCountries,crossBorder=false){
  const called=[],requested=[],events={};
  let defs=[];
  const h={isConnected:true,innerHTML:'',querySelector(sel){return this.innerHTML.includes(sel.slice(1,-1))?{}:null;}};
  const countries=memberCountries.slice(),recordsByCountry=['GT','CO'].map(country=>({
   id:'qa-'+country,numero:'QA-'+country,clienteId:'qa-client-'+country,
-  aseguradoraId:'qa-ins',asesorId:'advisor-'+country,pais:country,moneda:country==='GT'?'GTQ':'COP',
+  aseguradoraId:'qa-ins',asesorId:crossBorder&&country==='CO'?'advisor-GT':'advisor-'+country,
+  asesorNombreVerificado:crossBorder&&country==='CO'?'Asesor GT (histórico)':'',
+  pais:country,moneda:country==='GT'?'GTQ':'COP',
   estado:'Vigente',vigenciaFin:'2026-12-15',primaTotal:100,primaNeta:80,ramo:'Auto'
  }));
  const kit={...K,filterBar:ds=>{defs=ds;return '';}};
@@ -91,8 +93,12 @@ async function roleScopedRoster(role,memberCountries,selectedCountry,expectedCou
  assert.deepEqual(called.sort(),expectedCountries.slice().sort(),
   role+' must request roster for exactly the membership-authorized selected countries');
  if(expectedCountries.length){
-  assert.equal(defs.find(d=>d.id==='fase').options.length,expectedCountries.length);
-  for(const c of expectedCountries)assert.match(h.innerHTML,new RegExp('Asesor '+c));
+  assert.equal(defs.find(d=>d.id==='fase').options.length,expectedCountries.length+(crossBorder?1:0));
+  if(crossBorder){
+   assert.match(h.innerHTML,/Asesor GT \(histórico\)/);
+   assert.ok(defs.find(d=>d.id==='fase').options.some(o=>o.t==='Asesor GT (histórico)'),
+    'historical adviser must be searchable without a GT roster call');
+  }else for(const c of expectedCountries)assert.match(h.innerHTML,new RegExp('Asesor '+c));
   assert.doesNotMatch(h.innerHTML,/Confirmando asesor…/);
  }else assert.match(h.innerHTML,/data-polizas-advisor-readiness="blocked"/);
 }
@@ -102,5 +108,6 @@ Promise.resolve().then(async()=>{
  await roleScopedRoster('Operativo',['GT','CO'],'CO',['CO']);
  await roleScopedRoster('Asesor',['GT'],'GT',['GT']);
  await roleScopedRoster('Operativo',[],'TODOS',[]);
- console.log('B4_003_POLIZAS_ADVISOR_HYDRATION=PASS directEntry=PASS advisorEventRefresh=PASS operativoGTCO=PASS rosterMinimal=PASS noUnauthorizedCountryCalls=PASS restrictedTeamDirectory=DENIED firestoreWrites=0');
+ await roleScopedRoster('Operativo',['CO'],'CO',['CO'],true);
+ console.log('B4_003_POLIZAS_ADVISOR_HYDRATION=PASS directEntry=PASS advisorEventRefresh=PASS operativoGTCO=PASS rosterMinimal=PASS crossBorderPolicyName=PASS noUnauthorizedCountryCalls=PASS restrictedTeamDirectory=DENIED firestoreWrites=0');
 }).catch(error=>{console.error(error);process.exitCode=1;});
