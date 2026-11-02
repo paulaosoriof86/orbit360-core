@@ -255,3 +255,74 @@ jobs:
           path: ${{ runner.temp }}/canonical-preview-readback.json
           if-no-files-found: warn
           retention-days: 30
+
+  isolated-hosting-readback:
+    # Recovery of the previous run's independent public-domain hash race.
+    # Read-only: no build, no deploy, no Firebase credential, no LIVE writes.
+    if: >-
+      github.repository == 'paulaosoriof86/orbit360-core' &&
+      github.ref == 'refs/heads/recovery/fase-a-clean-20260831' &&
+      github.event.head_commit.message == 'verify(i6.5 B4-003): isolated E4 served bytes and live stability'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      SOURCE_SHA: 2eae48df4a83454cc2d4df991249c7b73362f899
+      BUILD_ID: gi-i65-b4-2eae48df4a83-57f234755dc1
+      PREVIEW_URL: https://ays-orbit-360-lab--gi-i65-b4-goals-41517127126-w4q3ldru.web.app
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: 2eae48df4a83454cc2d4df991249c7b73362f899
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify pinned source and actual hosted bytes, without rebuilding
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$SOURCE_SHA"
+          test "$(git hash-object orbit360-platform/modules/reportes.js)" = '21375ce419a482d84495326d9396b9a7aee334cc'
+          test "$(git hash-object tools/gravicentra-b4-003-reportes-e4-transversal.test.cjs)" = '0b3c3ad7a1f060b78d9564038783e3ad5c18b419'
+          node --check orbit360-platform/modules/reportes.js
+          node tools/gravicentra-b4-003-reportes-e4-transversal.test.cjs
+          curl -fsSL --retry 2 --max-time 25 "$PREVIEW_URL/__recovery__/build.json" > "$RUNNER_TEMP/gi-build.json"
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const b=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/gi-build.json','utf8'));
+          if(b.sourceSha!==process.env.SOURCE_SHA||b.buildId!==process.env.BUILD_ID||b.gate!=='I6.5-B4-003')throw Error('SERVED_PREVIEW_BUILD_MISMATCH');
+          NODE
+          curl -fsSL --retry 2 --max-time 25 "$PREVIEW_URL/modules/reportes.js" > "$RUNNER_TEMP/gi-reportes.js"
+          cmp orbit360-platform/modules/reportes.js "$RUNNER_TEMP/gi-reportes.js"
+          curl -fsSL --retry 2 --max-time 25 "$PREVIEW_URL/core/tenant-access-policy-effective-p0.js" > "$RUNNER_TEMP/gi-policy.js"
+          cmp orbit360-platform/core/tenant-access-policy-effective-p0.js "$RUNNER_TEMP/gi-policy.js"
+          curl -fsSL --retry 2 --max-time 25 "$PREVIEW_URL/product-runtime-config.js" > "$RUNNER_TEMP/gi-runtime.js"
+          grep -Fq '"scopedReadPreviewCandidate":true' "$RUNNER_TEMP/gi-runtime.js"
+          grep -Fq '"goalParticipationPreviewCandidate":true' "$RUNNER_TEMP/gi-runtime.js"
+      - name: Reprove two stable independent LIVE fingerprints
+        run: |
+          set -euo pipefail
+          LAB_A="$(curl -fsSL --retry 2 --max-time 25 https://ays-orbit-360-lab.web.app/ | sha256sum | cut -d' ' -f1)"
+          DOMAIN_A="$(curl -fsSL --retry 2 --max-time 25 https://app.aysseguros.com/ | sha256sum | cut -d' ' -f1)"
+          LAB_B="$(curl -fsSL --retry 2 --max-time 25 https://ays-orbit-360-lab.web.app/ | sha256sum | cut -d' ' -f1)"
+          DOMAIN_B="$(curl -fsSL --retry 2 --max-time 25 https://app.aysseguros.com/ | sha256sum | cut -d' ' -f1)"
+          test -n "$LAB_A"
+          test -n "$DOMAIN_A"
+          test "$LAB_A" = "$LAB_B"
+          test "$DOMAIN_A" = "$DOMAIN_B"
+          echo "GI_READBACK_LAB_SHA=$LAB_B" >> "$GITHUB_ENV"
+          echo "GI_READBACK_DOMAIN_SHA=$DOMAIN_B" >> "$GITHUB_ENV"
+      - name: Record independent readback, prior failure retained
+        run: |
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const result={schema:'B4003_ISOLATED_E4_SERVING_READBACK_V1',sourceSha:process.env.SOURCE_SHA,buildId:process.env.BUILD_ID,previewUrl:process.env.PREVIEW_URL,servedReportesExact:true,servedAccessPolicyExact:true,liveLabStableDuringReproof:true,liveAppDomainStableDuringReproof:true,liveLabSha256:process.env.GI_READBACK_LAB_SHA,liveAppDomainSha256:process.env.GI_READBACK_DOMAIN_SHA,originalPublishRunId:41517127126,originalPublishRunConclusion:'FAIL_DOMAIN_FINGERPRINT_DIFFERED_IN_TIME',priorFailureNotErased:true,buildsInThisRun:0,deploysInThisRun:0,production:'HOLD',authenticatedUat:'PENDING'};
+          fs.writeFileSync(process.env.RUNNER_TEMP+'/gi-b4003-e4-readback.json',JSON.stringify(result,null,2)+'\n');
+          NODE
+          echo 'B4-003 E4 source, served Preview artifact and LIVE stability readback: PASS (no deployment). The earlier dynamic-domain mismatch remains preserved in run 41517127126. Authenticated UAT and production gate remain HOLD.' >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: gi-b4003-e4-readback-${{ github.run_id }}
+          path: ${{ runner.temp }}/gi-b4003-e4-readback.json
+          if-no-files-found: warn
+          retention-days: 30
