@@ -1,0 +1,142 @@
+name: Gravicentra B4-003 owner-approved 32 country indexes LAB guarded apply
+
+# Owner instruction 2026-11-02: transport resolved GT/CO country corrections
+# transversally. This is a one-shot controlled LAB data migration, not Hosting,
+# Functions, shared Rules, IAM, Auth, production acceptance or reassignment of
+# the three human-only country decisions. No client IDs/names are logged.
+on:
+  push:
+    branches: [fix/b4-003-country-index-safe-apply-20261102]
+    paths:
+      - .github/workflows/gravicentra-b4-003-country-index-guarded-apply-20261102.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: gi-b4003-20261102-32-country-index-owner-apply
+  cancel-in-progress: false
+
+jobs:
+  bounded-lab-country-index:
+    if: >-
+      github.repository == 'paulaosoriof86/orbit360-core' &&
+      github.ref == 'refs/heads/fix/b4-003-country-index-safe-apply-20261102' &&
+      github.event.head_commit.message == 'build(i6.5 B4-003): guarded apply 32 country indexes in LAB with private restore'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    env:
+      PROJECT_ID: ays-orbit-360-lab
+      TENANT_ID: alianzas-soluciones
+      SOURCE_SHA: 43da054e64d93338a655998e2e82ef529c5fe064
+      EXPECTED_TRANSPORT_PARENT: 0b23b92b9fc754d86ea3e7ff930af6864a8cfa6c
+      SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_LAB_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Prove unique canonical ancestry, exact transport and regression
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD^)" = "$EXPECTED_TRANSPORT_PARENT"
+          test "$(git merge-base "$SOURCE_SHA" HEAD)" = "$SOURCE_SHA"
+          test "$(git diff --name-only HEAD^ HEAD)" = '.github/workflows/gravicentra-b4-003-country-index-guarded-apply-20261102.yml'
+          test "$(git rev-parse "$SOURCE_SHA":functions/b4-003-client-country-authority.js)" = "$(git hash-object functions/b4-003-client-country-authority.js)"
+          test "$(git rev-parse "$SOURCE_SHA":tools/gravicentra-b4-003-client-country-index-dryrun-readonly.cjs)" = "$(git hash-object tools/gravicentra-b4-003-client-country-index-dryrun-readonly.cjs)"
+          test "$(git rev-parse "$SOURCE_SHA":artifacts/orbit360-recovery/release-control/I6_5_B4_003_REAL_COUNTRY_INDEX_DRYRUN_AGGREGATE_20261102.json)" = "$(git hash-object artifacts/orbit360-recovery/release-control/I6_5_B4_003_REAL_COUNTRY_INDEX_DRYRUN_AGGREGATE_20261102.json)"
+          node --check tools/gravicentra-b4-003-client-country-index-guarded-apply.cjs
+          node tools/gravicentra-b4-003-client-country-index-guarded-apply.test.cjs
+          node tools/gravicentra-b4-003-client-country-index-dryrun-readonly.test.cjs
+          node tools/gravicentra-b4-003-client-country-authority.test.cjs
+          timeout -k 3s 55s node tools/gravicentra-i6-control-plane-guard-v1.mjs --mode=i6
+
+      - name: Ensure root backup vault is client-denied in Rules source
+        run: |
+          set -euo pipefail
+          node - <<'NODE'
+          const fs=require('node:fs');const r=fs.readFileSync('firestore.rules','utf8');
+          if(!r.includes('match /{document=**} {')||!r.includes('allow read, write: if false;'))throw Error('PRIVATE_VAULT_ROOT_RULES_DENY_NOT_PROVEN');
+          if(r.includes('__gravicentraPrivateMigrationVault'))throw Error('PRIVATE_VAULT_RULES_EXCEPTION_NOT_ALLOWED');
+          NODE
+          curl --fail --silent --show-error --location --retry 2 --max-time 30 https://ays-orbit-360-lab.web.app/ | sha256sum > "$RUNNER_TEMP/live-before.sha"
+          curl --fail --silent --show-error --location --retry 2 --max-time 30 https://app.aysseguros.com/ | sha256sum > "$RUNNER_TEMP/domain-before.sha"
+
+      - name: Select only an existing LAB service account and pinned Admin SDK
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/gi-b4003-country-auth"
+          python3 - <<'PY'
+          import json,os,pathlib
+          root=pathlib.Path(os.environ['RUNNER_TEMP'])/'gi-b4003-country-auth';items=[]
+          for n,key in enumerate(('SA_LAB','SA_LAB_ALT','SA_DEFAULT')):
+            try: raw=json.loads(os.environ.get(key,''))
+            except (TypeError,ValueError):continue
+            if raw.get('type')=='service_account' and raw.get('project_id')==os.environ['PROJECT_ID'] and raw.get('private_key'):
+              p=root/f'{n}.json';p.write_text(json.dumps(raw));p.chmod(0o600);items.append(str(p))
+          if not items:raise SystemExit('LAB_SERVICE_ACCOUNT_NOT_PRESENT')
+          (root/'candidates').write_text('\n'.join(items)+'\n')
+          PY
+          npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund firebase-admin@13.4.0 >/dev/null
+          selected=''
+          while IFS= read -r file; do
+            if GOOGLE_APPLICATION_CREDENTIALS="$file" node tools/gravicentra-b4-003-client-country-index-guarded-apply.cjs --real-lab-preflight-readonly >/dev/null 2>&1; then selected="$file";break;fi
+          done < "$RUNNER_TEMP/gi-b4003-country-auth/candidates"
+          test -n "$selected" || { echo 'COUNTRY_INDEX_LAB_CREDENTIAL_READ_PREFLIGHT_FAILED' >&2; exit 2; }
+          cp "$selected" "$RUNNER_TEMP/gi-b4003-country-auth/selected.json"
+          chmod 600 "$RUNNER_TEMP/gi-b4003-country-auth/selected.json"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/gi-b4003-country-auth/selected.json" >> "$GITHUB_ENV"
+
+      - name: Independent frozen aggregate dry-run immediately before mutation
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-b4-003-client-country-index-guarded-apply.cjs --real-lab-preflight-readonly
+
+      - name: Owner-authorized private backup restore drill and 32-field atomic apply
+        env:
+          GRAVICENTRA_B4003_OWNER_COUNTRY_APPLY_20261102: APPROVED
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-b4-003-client-country-index-guarded-apply.cjs --real-lab-owner-approved-apply-20261102
+
+      - name: Independently verify zero remaining country candidates and unchanged LIVE HTML
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-b4-003-client-country-index-dryrun-readonly.cjs --real-readonly > "$RUNNER_TEMP/country-readback.txt"
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const raw=fs.readFileSync(process.env.RUNNER_TEMP+'/country-readback.txt','utf8');
+          const line=raw.split(/\r?\n/).find(s=>s.startsWith('B4_003_COUNTRY_INDEX_DRYRUN_READONLY='));
+          if(!line)throw Error('COUNTRY_POST_READBACK_MISSING');
+          const a=JSON.parse(line.split('=',2)[1]);
+          if(a.counts.clients!==443||a.indexedAlready.GT!==392||a.indexedAlready.CO!==48||
+             a.indexUpdateCandidates.GT!==0||a.indexUpdateCandidates.CO!==0||
+             a.unresolvable.COMPLETE_POLICY_RELATION_REQUIRED!==3||
+             a.distinctPolicyRefsMissingClient!==3||a.writes!==0)throw Error('COUNTRY_POST_READBACK_NOT_EXACT');
+          fs.writeFileSync(process.env.RUNNER_TEMP+'/country-migration-public-receipt.json',JSON.stringify({
+           schema:'B4003_COUNTRY_INDEX_20261102_AGGREGATE_ONLY_RECEIPT_V1',project:'ays-orbit-360-lab',
+           sourceSha:process.env.SOURCE_SHA,previouslyIndexed:408,updatedGT:1,updatedCO:31,
+           currentlyIndexed:440,unresolvedHuman:3,orphanB2QaReferences:3,
+           privateBackupVerified:true,isolatedRestoreDrillPassed:true,
+           noClientIdentityExported:true,production:'HOLD'},null,2)+'\n');
+          NODE
+          curl --fail --silent --show-error --location --retry 2 --max-time 30 https://ays-orbit-360-lab.web.app/ | sha256sum > "$RUNNER_TEMP/live-after.sha"
+          curl --fail --silent --show-error --location --retry 2 --max-time 30 https://app.aysseguros.com/ | sha256sum > "$RUNNER_TEMP/domain-after.sha"
+          cmp "$RUNNER_TEMP/live-before.sha" "$RUNNER_TEMP/live-after.sha"
+          cmp "$RUNNER_TEMP/domain-before.sha" "$RUNNER_TEMP/domain-after.sha"
+          printf '%s\n' 'B4-003 REAL LAB COUNTRY INDEX ATOMIC MIGRATION PASS' '32 exact fields updated, 440/443 indexed; 3 await Paula; 3 orphan references remain QA B2.' 'Private preimages and isolated restoration verified; LIVE Hosting unchanged; production remains HOLD.' >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: gi-b4003-country-index-aggregate-only-${{ github.run_id }}
+          path: ${{ runner.temp }}/country-migration-public-receipt.json
+          if-no-files-found: warn
+          retention-days: 30
