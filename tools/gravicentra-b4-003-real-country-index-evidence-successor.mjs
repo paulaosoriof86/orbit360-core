@@ -7,6 +7,11 @@ import {execFileSync} from 'node:child_process';
 
 const BASE='bcb909ae3f34d16880ec5289a7963fc2c41624f9';
 const BASE_TREE='a3a7c3bf0e73c7ca1d64b4d0fd3ca602b900a816';
+// The evidence successor was CERTIFIED at this immutable commit. All later
+// canonical commits must descend from it, but their own changed-file sets
+// must NOT be mistaken for the single historical receipt's changed-file set.
+const CERTIFIED='9d1839da8717757baf9adbf1fdfad83cddc41791';
+const CERTIFIED_TREE='433b096bc755fe35b2ab032cc9a45e5350a00deb';
 const ROOT='artifacts/orbit360-recovery/release-control/';
 const CONTROL=ROOT+'CONTROL_PLANE.json';
 const RECEIPT=ROOT+'I6_5_B4_003_REAL_COUNTRY_INDEX_DRYRUN_EVIDENCE_SUCCESSOR_20261102.json';
@@ -30,6 +35,13 @@ const changed=(a,b)=>git('diff','--name-only',a,b).split(/\r?\n/).filter(Boolean
 const stable=x=>x===null||typeof x!=='object'?x:Array.isArray(x)?x.map(stable):
  Object.fromEntries(Object.keys(x).sort().map(k=>[k,stable(x[k])]));
 const same=(a,b)=>JSON.stringify(stable(a))===JSON.stringify(stable(b));
+// Only historical entries are owned by this guard. Other successor guards
+// independently authorize new keys; preserving them must not regress B4-003.
+export function frozenEntriesUnchanged(frozen,current){
+ return !!frozen&&!!current&&typeof frozen==='object'&&typeof current==='object'&&
+  Object.keys(frozen).every(k=>Object.prototype.hasOwnProperty.call(current,k)&&
+   same(frozen[k],current[k]));
+}
 function verifyAggregate(){
  const a=json(AGGREGATE),bytes=fs.readFileSync(AGGREGATE);
  need(hash(AGGREGATE)===AGG_BLOB&&
@@ -69,13 +81,15 @@ function verifyAggregate(){
   'PHYSICAL_AUTHORITY_443_RECONCILIATION_FAILED');
 }
 function verifyControl(){
- const before=JSON.parse(show(BASE,CONTROL)),after=json(CONTROL),p=after[KEY];
- need(Object.keys(before).length===441&&Object.keys(after).length===442,
-  'CONTROL_APPEND_CARDINALITY');
- need(Object.keys(before).every(k=>same(before[k],after[k])),
-  'HISTORICAL_CONTROL_CHANGED');
- need(same(Object.keys(after).filter(k=>!(k in before)),[KEY]),
-  'UNAUTHORIZED_NEW_CONTROL_KEY');
+ const before=JSON.parse(show(BASE,CONTROL));
+ const certified=JSON.parse(show(CERTIFIED,CONTROL));
+ const after=json(CONTROL),p=after[KEY];
+ need(Object.keys(before).length===441&&Object.keys(certified).length===442&&
+  Object.keys(after).length>=442,'CERTIFIED_CONTROL_APPEND_CARDINALITY');
+ need(frozenEntriesUnchanged(before,certified)&&
+  frozenEntriesUnchanged(certified,after),'HISTORICAL_CONTROL_CHANGED');
+ need(same(Object.keys(certified).filter(k=>!(k in before)),[KEY]),
+  'CERTIFIED_CONTROL_KEY_SET_INVALID');
  const expected={
   schema:'GRAVICENTRA_I65_B4003_REAL_COUNTRY_INDEX_DRYRUN_EVIDENCE_POINTER_V1',
   gate:'I6.5/B4-003',recordedDate:'2026-11-02',
@@ -140,10 +154,14 @@ export function runB4003RealCountryIndexEvidenceSuccessorGuard(){
  need(['governance','governance:1','i6'].includes(mode),'MODE_DENIED');
  const head=git('rev-parse','HEAD');
  need(git('rev-parse',BASE+'^{tree}')===BASE_TREE,'PREDECESSOR_TREE_DRIFT');
+ need(git('rev-parse',CERTIFIED+'^{tree}')===CERTIFIED_TREE,'CERTIFIED_EVIDENCE_TREE_DRIFT');
  need(git('merge-base',BASE,head)===BASE,'CANONICAL_PREDECESSOR_NOT_ANCESTOR');
- need(same(changed(BASE,head),GOV_PATHS),'GOVERNANCE_ONLY_SCOPE_CHANGED');
- need(fs.readFileSync(GUARD,'utf8')===PREFIX+show(BASE,GUARD),
-  'HISTORICAL_GUARD_NOT_APPEND_ONLY');
+ need(git('merge-base',CERTIFIED,head)===CERTIFIED,'CERTIFIED_EVIDENCE_NOT_ANCESTOR');
+ need(same(changed(BASE,CERTIFIED),GOV_PATHS),'FROZEN_EVIDENCE_COMMIT_SCOPE_DRIFT');
+ need(show(CERTIFIED,GUARD)===PREFIX+show(BASE,GUARD),
+  'CERTIFIED_HISTORICAL_GUARD_NOT_APPEND_ONLY');
+ for(const file of [RECEIPT,AGGREGATE])
+  need(blob(head,file)===blob(CERTIFIED,file),'FROZEN_EVIDENCE_MUTATED:'+file);
  for(const file of GOV_PATHS)
   need(blob(head,file)===hash(file),'UNCOMMITTED_GOVERNANCE_DRIFT:'+file);
  need(!git('ls-files','--others','--exclude-standard'),'UNTRACKED_SOURCE');
