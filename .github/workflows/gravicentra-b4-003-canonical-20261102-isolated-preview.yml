@@ -25,7 +25,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 55
     env:
-      SOURCE_SHA: 874edc119206f00a5203d51244bf0302c7b91470
+      SOURCE_SHA: 264a28cd2dd8096e19ba0a0661ab43f8e33b71bf
       PROJECT_ID: ays-orbit-360-lab
       HOSTING_SITE: ays-orbit-360-lab
       TENANT_HINT: alianzas-soluciones
@@ -48,7 +48,7 @@ jobs:
       - name: Checkout frozen canonical source, no product divergence
         uses: actions/checkout@v4
         with:
-          ref: 874edc119206f00a5203d51244bf0302c7b91470
+          ref: 264a28cd2dd8096e19ba0a0661ab43f8e33b71bf
           fetch-depth: 0
           persist-credentials: false
           path: candidate
@@ -67,7 +67,7 @@ jobs:
           test "$(git -C candidate hash-object orbit360-platform/core/tenant-access-policy-effective-p0.js)" = '0f7f37e67eff15a4286b0202599830899b02a754'
           test "$(git -C candidate hash-object functions/b4-003-scoped-policy-callable.js)" = '743ed2a9bd9776cbd5d70ffe0669770b491b27aa'
           test "$(git -C candidate hash-object functions/b4-003-scoped-policy-reader.js)" = '1d654b5590fb71279b6bcaaa8eb8625af07c52a4'
-          test "$(git -C candidate hash-object orbit360-platform/modules/polizas.js)" = '7fb5fd9d99344e8b67dd144c1c1e0befa5e827e7'
+          test "$(git -C candidate hash-object orbit360-platform/modules/polizas.js)" = 'fda98c1cd670d3b0648e4ff0f818238069845de8'
           test "$(git -C candidate hash-object orbit360-platform/modules/reportes.js)" = '5da83dcf5df971822e1926c47e1d62db69f45177'
           test "$(git -C candidate hash-object orbit360-platform/modules/cliente360.js)" = 'a98f940c14aac7ff3554ca5e93b0c2bf47f5f3c8'
           test "$(git -C candidate hash-object orbit360-platform/modules/calidad.js)" = '4043b4ce2d05397ff79615c51ccf8ffe7a939e15'
@@ -85,6 +85,7 @@ jobs:
           node tools/gravicentra-b4-003-scoped-related-reader.test.cjs
           node tools/gravicentra-b4-003-polizas-context-cache.test.cjs
           node tools/gravicentra-b4-003-polizas-advisor-hydration-20261102.test.cjs
+          node --test tests/b4-003-polizas-scope-filter.test.cjs
           node tools/gravicentra-b4-003-reportes-e4-transversal.test.cjs
           node tests/goal-participation-isolated-routing.test.cjs
           node tests/goal-participation-preview-boundary.test.cjs
