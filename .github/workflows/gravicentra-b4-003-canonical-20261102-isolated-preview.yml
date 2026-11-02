@@ -21,11 +21,11 @@ jobs:
     if: >-
       github.repository == 'paulaosoriof86/orbit360-core' &&
       github.ref == 'refs/heads/recovery/fase-a-clean-20260831' &&
-      github.event.head_commit.message == 'build(i6.5 B4-003): isolate updated advisor roster in exact Preview'
+      github.event.head_commit.message == 'build(i6.5 B4-003): certify E4 insurer hydration in exact Preview'
     runs-on: ubuntu-24.04
     timeout-minutes: 55
     env:
-      SOURCE_SHA: 7e6d4b83b8df1e8b34981f130fe7f7e89c7eb9ce
+      SOURCE_SHA: 2eae48df4a83454cc2d4df991249c7b73362f899
       PROJECT_ID: ays-orbit-360-lab
       HOSTING_SITE: ays-orbit-360-lab
       TENANT_HINT: alianzas-soluciones
@@ -48,7 +48,7 @@ jobs:
       - name: Checkout frozen canonical source, no product divergence
         uses: actions/checkout@v4
         with:
-          ref: 7e6d4b83b8df1e8b34981f130fe7f7e89c7eb9ce
+          ref: 2eae48df4a83454cc2d4df991249c7b73362f899
           fetch-depth: 0
           persist-credentials: false
           path: candidate
@@ -68,7 +68,7 @@ jobs:
           test "$(git -C candidate hash-object functions/b4-003-scoped-policy-callable.js)" = '743ed2a9bd9776cbd5d70ffe0669770b491b27aa'
           test "$(git -C candidate hash-object functions/b4-003-scoped-policy-reader.js)" = '1d654b5590fb71279b6bcaaa8eb8625af07c52a4'
           test "$(git -C candidate hash-object orbit360-platform/modules/polizas.js)" = '7b2ab978918908b0e16e56ae04e86d816414d0ab'
-          test "$(git -C candidate hash-object orbit360-platform/modules/reportes.js)" = '988e6c53f85a4fe27c9ed1cbd23aed61f7ee47c8'
+          test "$(git -C candidate hash-object orbit360-platform/modules/reportes.js)" = '21375ce419a482d84495326d9396b9a7aee334cc'
           test "$(git -C candidate hash-object tools/gravicentra-i6-1-preview-package.mjs)" = 'd42337f326637d669834664289cb3cce36b56342'
           test "$(git -C candidate hash-object functions/assignable-advisor-roster.js)" = 'bc59e9d7be17154aa54f6c58593cc45af2d72503'
           test "$(git -C candidate hash-object functions/product-operational-domain.js)" = 'b3d0059457142659633498c9c52c6b84ea68200f'
@@ -242,9 +242,9 @@ jobs:
           curl --fail --silent --show-error --location --retry 2 --max-time 30 https://app.aysseguros.com/ | sha256sum > "$RUNNER_TEMP/domain-after.sha"
           cmp "$RUNNER_TEMP/live-before.sha" "$RUNNER_TEMP/live-after.sha"
           cmp "$RUNNER_TEMP/domain-before.sha" "$RUNNER_TEMP/domain-after.sha"
-          printf '%s\n' "B4-003 CANONICAL LAB PREVIEW SYNCHRONIZED" "Source: $SOURCE_SHA" "Preview: $PREVIEW_URL" 'E4 excludes synthetic QA; Inicio advisor/goal participation backend now matches frontend contract. Deployed two isolated GoalsPreview callables; old Preview/LIVE endpoints unchanged; new expiring Hosting channel. No LIVE, Rules, IAM, data writes or reimport. Physical 443 clients = 440 currently visible + three prior merged markers (physical recount pending). Authenticated new-Preview E4 plus Carlos/Samuel positive/negative UID UAT remain OPEN.' >> "$GITHUB_STEP_SUMMARY"
+          printf '%s\n' "B4-003 CANONICAL LAB PREVIEW SYNCHRONIZED" "Source: $SOURCE_SHA" "Preview: $PREVIEW_URL" 'E4 waits for insurer confirmation before grouping/export; synthetic QA remains excluded; Inicio advisor/goal backend unchanged. Deployed two isolated GoalsPreview callables; old Preview/LIVE endpoints unchanged; new expiring Hosting channel. No LIVE, Rules, IAM, data writes or reimport. Physical 443 clients = 440 currently visible + three prior merged markers (physical recount pending). Authenticated new-Preview E4 plus Carlos/Samuel positive/negative UID UAT remain OPEN.' >> "$GITHUB_STEP_SUMMARY"
           node - <<'NODE'
-          const fs=require('node:fs');const proof={schema:'B4003_CANONICAL_PREVIEW_20261102_V1',sourceSha:process.env.SOURCE_SHA,previewUrl:process.env.PREVIEW_URL,previewFunction:'orbit360ScopedPolicyReadPreview',goalsPreviewFunctions:['orbit360AssignableAdvisorRosterGoalsPreview','orbit360ProductOperationalCommandGoalsPreview'],goalsPreviewFlag:true,hostingLiveChanged:false,rulesChanged:false,authIamChanged:false,physicalClientIndexUpdatesInThisWorkflow:0,priorLabCountryCorrections:35,priorCountryApplyRunId:41478387493,clientProjection:{physical:443,activeVisible:440,previousMergedReadback:3,physicalMergedRecountPending:true},e4QaSourceFix:'PASS_SYNTHETIC_ONLY_PREVIEW_UAT_PENDING',advisorCrossBorderSourceQa:'PASS_PENDING_AUTHENTICATED_UAT',authenticatedUat:'PENDING_AUTHENTICATED_GOALS_PREVIEW_PAULA_CARLOS_SAMUEL',production:'HOLD'};
+          const fs=require('node:fs');const proof={schema:'B4003_CANONICAL_PREVIEW_20261102_V1',sourceSha:process.env.SOURCE_SHA,previewUrl:process.env.PREVIEW_URL,previewFunction:'orbit360ScopedPolicyReadPreview',goalsPreviewFunctions:['orbit360AssignableAdvisorRosterGoalsPreview','orbit360ProductOperationalCommandGoalsPreview'],goalsPreviewFlag:true,hostingLiveChanged:false,rulesChanged:false,authIamChanged:false,physicalClientIndexUpdatesInThisWorkflow:0,priorLabCountryCorrections:35,priorCountryApplyRunId:41478387493,clientProjection:{physical:443,activeVisible:440,previousMergedReadback:3,physicalMergedRecountPending:true},e4QaSourceFix:'PASS_SYNTHETIC_AND_INSURER_READINESS_PREVIEW_UAT_PENDING',advisorCrossBorderSourceQa:'PASS_PENDING_AUTHENTICATED_UAT',authenticatedUat:'PENDING_AUTHENTICATED_GOALS_PREVIEW_PAULA_CARLOS_SAMUEL',production:'HOLD'};
           fs.writeFileSync(process.env.RUNNER_TEMP+'/canonical-preview-readback.json',JSON.stringify(proof,null,2)+'\n');
           NODE
 
