@@ -1,3 +1,6 @@
+import {runB4003TransversalClientListSuccessorGuard} from './gravicentra-b4-003-client-list-transversal-successor.mjs';
+if (runB4003TransversalClientListSuccessorGuard()) process.exit(0);
+
 import {runB4003ClientCountryAuthoritySuccessorGuard} from './gravicentra-b4-003-client-country-authority-successor.mjs';
 if (runB4003ClientCountryAuthoritySuccessorGuard()) process.exit(0);
 

@@ -36,12 +36,18 @@ function resolveClientCountry({client,clientId,tenantId,policies,insurers,comple
  const insurerById=insurers instanceof Map?insurers:new Map(Object.entries(insurers||{}));
  const countries=new Set();
  for(const policy of policies){
-   if(!policy||clean(policy.clienteId||policy.clientId)!==id||
+   if(!policy||policy._sourceIdMismatch===true||
+      policy.clienteId&&policy.clientId&&clean(policy.clienteId)!==clean(policy.clientId)||
+      clean(policy.clienteId||policy.clientId)!==id||
       policy.tenantId&&clean(policy.tenantId)!==tenant)
      return resolution('unresolved','POLICY_RELATION_INVALID');
+   if(policy.aseguradoraId&&policy.insurerId&&
+      clean(policy.aseguradoraId)!==clean(policy.insurerId))
+     return resolution('unresolved','POLICY_INSURER_ID_CONFLICT');
    const insurerId=clean(policy.aseguradoraId||policy.insurerId);
    const insurer=insurerById.get(insurerId);
-   if(!insurerId||!insurer||insurer.id&&clean(insurer.id)!==insurerId||
+   if(!insurerId||!insurer||insurer._sourceIdMismatch===true||
+      insurer.id&&clean(insurer.id)!==insurerId||
       insurer.tenantId&&clean(insurer.tenantId)!==tenant)
      return resolution('unresolved','INSURER_NOT_VERIFIED');
    const insurerFields=fields(insurer);
