@@ -59,7 +59,7 @@ jobs:
 
       - name: Prove exact canonical predecessor, product hashes and boundary
         run: |
-          set -euo pipefail
+          set -euxo pipefail
           test "$(git -C transport merge-base HEAD "$SOURCE_SHA")" = "$SOURCE_SHA"
           test "$(git -C transport diff --name-only "$SOURCE_SHA" HEAD)" = '.github/workflows/gravicentra-b4-003-canonical-20261102-isolated-preview.yml'
           test "$(git -C candidate rev-parse HEAD)" = "$SOURCE_SHA"
