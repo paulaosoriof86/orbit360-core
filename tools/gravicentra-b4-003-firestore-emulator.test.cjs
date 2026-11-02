@@ -199,7 +199,8 @@ async function run(){
     });
     const relatedOwn=await readRelated('clientes','c_own');
     assert.equal(relatedOwn.row.id,'c_own');relatedCount++;
-    await denyRelated(()=>readRelated('clientes','c_foreign'),'RECORD_NOT_FOUND_OR_DENIED');relatedCount++;
+    const relatedOtherAdvisor=await readRelated('clientes','c_foreign');
+    assert.equal(relatedOtherAdvisor.row.id,'c_foreign');relatedCount++;
     const receipt=await readRelated('recibosEsperados','r_own');
     assert.equal(receipt.row.id,'r_own');relatedCount++;
     await denyRelated(()=>readRelated('recibosEsperados','r_foreign'),'RECORD_NOT_FOUND_OR_DENIED');relatedCount++;
@@ -220,7 +221,7 @@ async function run(){
         ...(Object.prototype.hasOwnProperty.call(opts,'policyIds')?{policyIds:opts.policyIds}:{})}
     });
     for(const [uid,role,collection,policyId,expected] of [
-      ['opGT','operativo','clientes','',['c_own']],
+      ['opGT','operativo','clientes','',['c_foreign','c_own']],
       ['advisorGT','asesor','clientes','',['c_foreign']],
       ['opGT','operativo','vehiculos','own',['v_own']],
       ['opGT','operativo','carteraPrimas','own',['d_own']],

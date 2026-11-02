@@ -74,7 +74,7 @@ test('own list tenant constraint',()=>assert.ok(ownList.requiredConstraints.some
 test('own list country constraint',()=>assert.ok(ownList.requiredConstraints.some(x=>x.field==='country')));
 test('own list advisor constraint',()=>assert.ok(ownList.requiredConstraints.some(x=>x.field==='advisorId'&&x.value==='advisor-1')));
 test('team list allowed',()=>assert.equal(teamList.allowed,true));
-test('team list team constraint',()=>assert.ok(teamList.requiredConstraints.some(x=>x.field==='teamId'&&x.value==='team-main')));
+test('operativo all-client list without team constraint',()=>assert.equal(teamList.requiredConstraints.some(x=>['advisorId','teamId'].includes(x.field)),false));
 test('all list allowed',()=>assert.equal(allList.allowed,true));
 test('all list no owner constraint',()=>assert.equal(allList.requiredConstraints.some(x=>['advisorId','teamId'].includes(x.field)),false));
 test('none list blocked',()=>assert.equal(noneList.allowed,false));
@@ -83,7 +83,7 @@ test('data collection get blocked',()=>assert.equal(evalCase({operation:'get',pa
 test('own document allowed advisor',()=>assert.equal(evalCase({operation:'get',path:'tenants/tenant-test/data/clientes/items/cli-own',membership:asesor,record:ownClient}).allowed,true));
 test('team document allowed operativo',()=>assert.equal(evalCase({operation:'get',path:'tenants/tenant-test/data/clientes/items/cli-team',membership:operativo,record:teamClient}).allowed,true));
 test('other document blocked advisor',()=>assert.equal(evalCase({operation:'get',path:'tenants/tenant-test/data/clientes/items/cli-other',membership:asesor,record:otherClient}).allowed,false));
-test('other team blocked operativo',()=>assert.equal(evalCase({operation:'get',path:'tenants/tenant-test/data/clientes/items/cli-other',membership:operativo,record:otherClient}).allowed,false));
+test('other team client allowed operativo',()=>assert.equal(evalCase({operation:'get',path:'tenants/tenant-test/data/clientes/items/cli-other',membership:operativo,record:otherClient}).allowed,true));
 test('other document allowed direction',()=>assert.equal(evalCase({operation:'get',path:'tenants/tenant-test/data/clientes/items/cli-other',membership:direction,record:otherClient}).allowed,true));
 test('record tenant mismatch blocked',()=>assert.equal(evalCase({operation:'get',path:'tenants/tenant-test/data/clientes/items/cli-own',membership:asesor,record:{...ownClient,tenantId:'other-tenant'}}).allowed,false));
 test('record id mismatch blocked',()=>assert.equal(evalCase({operation:'get',path:'tenants/tenant-test/data/clientes/items/cli-own',membership:asesor,record:{...ownClient,id:'wrong'}}).allowed,false));

@@ -90,7 +90,9 @@ function derive(c,policies,extra={}){return resolveClientCountry({client:c,clien
  const explicit=await read('explicitGT','GT');assert.equal(explicit.row.pais,'GT');checks++;
  await denied(()=>read('missingGT','CO'));checks++;
  await denied(()=>read('missingCO','GT'));checks++;
- await denied(()=>read('foreignOwner','CO'));checks++;
+ const operativeOtherAdvisor=await read('foreignOwner','CO');
+ assert.equal(operativeOtherAdvisor.row.pais,'CO',
+  'Operativo can read every verified client in the authorized country regardless of advisor');checks++;
  await denied(()=>read('mixed','GT'));checks++;
  await denied(()=>read('mixed','CO'));checks++;
  await denied(()=>read('unknownInsurer','GT'));checks++;
@@ -114,7 +116,8 @@ function derive(c,policies,extra={}){return resolveClientCountry({client:c,clien
  assert.equal(physical.clientCountryAuthority.unresolved.MULTI_INSURER_COUNTRY_CONFLICT,1);checks++;
  assert.ok(physical.physicalJoin.linkedClientInsurerFallbackEligible>=100);checks++;
  assert.ok(physical.effectiveScopeMatrix.some(m=>m.role==='Operativo'&&m.country==='GT'&&
-  m.policyScope==='own'&&m.clientScope==='own'&&m.policyLinks.clientRequiresCountryIndex>0));checks++;
+  m.policyScope==='own'&&m.clientScope==='all'&&m.policyLinks.clientRequiresCountryIndex>0),
+  'Only Operativo client READ scope expands; its policy scope stays unchanged');checks++;
  assert.ok(!JSON.stringify(physical).includes('missingGT')&&!JSON.stringify(physical).includes('u1'),
   'Aggregate-only audit must never export row or user identifiers');checks++;
  assert.equal(physical.writes,0);checks++;

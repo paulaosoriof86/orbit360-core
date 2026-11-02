@@ -105,6 +105,25 @@
     return !!(base && typeof base.recordWithinScope === 'function' && base.recordWithinScope(input, record, moduleKey));
   }
 
+  // Client-list READ reconciliation only. A legacy Operativo membership may
+  // carry own/team as its default while the tenant grants the operational role
+  // all clients. Keep every other module (and ALL writes) on the original
+  // membership. An explicit cliente360/clientes=none stays denied.
+  function clientReadMembership(input) {
+    var m = normalizeMembership(input);
+    if (text(m.activeRole).toLowerCase() !== 'operativo') return input;
+    var scopes = m.moduleScopes || {};
+    var explicit = Object.prototype.hasOwnProperty.call(scopes, 'cliente360')
+      ? scopes.cliente360 : scopes.clientes;
+    if (['none', 'ninguno', 'sin_acceso'].indexOf(text(explicit).toLowerCase()) >= 0) return input;
+    return Object.assign({}, input || {}, {
+      dataScopes: {
+        default: m.defaultScope,
+        modules: Object.assign({}, scopes, { cliente360: 'all', clientes: 'all' })
+      }
+    });
+  }
+
   function canRead(collection, record, membership, context) {
     var base = basePolicy();
     if (!base || typeof base.canRead !== 'function') return unavailable();
@@ -113,7 +132,9 @@
       var allowed = canUseTeamDirectory(m) && sameTenant(m, record || { tenantId: context && context.tenantId });
       return { ok: allowed, allowed: allowed, writeAuthorized: false, code: allowed ? (collection === 'auditoria' ? 'auditoria_equipo_tenant_permitida' : 'directorio_equipo_tenant_permitido') : 'equipo_tenant_bloqueado', module: 'equipo', scope: 'tenant' };
     }
-    return base.canRead(collection, record, membership, contextWithOverrides(context));
+    return base.canRead(collection, record,
+      collection === 'clientes' ? clientReadMembership(membership) : membership,
+      contextWithOverrides(context));
   }
 
   function canWrite(collection, action, record, patch, membership, context) {
@@ -156,7 +177,9 @@
       if (!allowed) constraints.push({ field: '__deny__', op: '==', value: true });
       return { ok: allowed, writeAuthorized: false, collection: collection, module: 'equipo', scope: allowed ? 'tenant' : 'none', constraints: constraints, countryFiltered: false };
     }
-    return base.queryConstraints(collection, membership, contextWithOverrides(context));
+    return base.queryConstraints(collection,
+      collection === 'clientes' ? clientReadMembership(membership) : membership,
+      contextWithOverrides(context));
   }
 
   function delegate(name) {
