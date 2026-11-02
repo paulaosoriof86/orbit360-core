@@ -2,6 +2,7 @@
 // B4-003 staged protected document-read owner for related operational collections.
 // Read-only. Preview-only candidate; NO Firebase export or rule deploy.
 const {resolve,allowRow,Denied}=require('./b4-003-scoped-access-boundary');
+const {clientCountryNeedsInsurer,resolveClientCountry}=require('./b4-003-client-country-authority');
 const collections=new Set(['clientes','vehiculos','recibosEsperados','carteraPrimas','cobros','comisiones','finmovs','tareas','negocios','gestiones','actividades','metas','cancelaciones','reclamos','auditoria']);
 const workflowCollections=new Set(['negocios','gestiones','actividades']);
 const financeCollections=new Set(['vehiculos','recibosEsperados','carteraPrimas','cobros','comisiones']);
@@ -25,6 +26,34 @@ function verifiedLinkedClient(ctx,client,policy){
 }
 function docRef(tenant,collection,id){
  return tenant.collection('data').doc(collection).collection('items').doc(id);
+}
+async function verifiedClientCountryView(ctx,tenant,client,id){
+ if(!clientCountryNeedsInsurer(client))return client;
+ // A country inference is only safe after examining *every* linked policy,
+ // including policies not visible to the active advisor. No such policy is
+ // returned to the caller; only the final client authorization is projected.
+ const MAX_POLICIES=100;
+ const target=tenant.collection('data').doc('polizas').collection('items');
+ const ss=await target.where('clienteId','==',id).limit(MAX_POLICIES+1).get();
+ const docs=Array.isArray(ss.docs)?ss.docs:[];
+ if(!docs.length||docs.length>MAX_POLICIES)throw new Denied('CLIENT_COUNTRY_RELATION_UNRESOLVED');
+ const policies=docs.map(d=>d.data()||{}),ids=[...new Set(policies.map(p=>clean(p.aseguradoraId||p.insurerId)).filter(Boolean))];
+ if(!ids.length||ids.length>MAX_POLICIES)throw new Denied('CLIENT_INSURER_UNRESOLVED');
+ const insurers=new Map();
+ for(let i=0;i<ids.length;i+=10){
+   const batch=await Promise.all(ids.slice(i,i+10).map(async insurerId=>{
+     const snap=await docRef(tenant,'aseguradoras',safeId(insurerId,'INSURER')).get();
+     return [insurerId,snap.exists?snap.data()||{}:null];
+   }));
+   batch.forEach(([key,value])=>insurers.set(key,value));
+ }
+ const result=resolveClientCountry({client,clientId:id,tenantId:ctx.tenantId,
+   policies,insurers,completePolicySet:true});
+ if(result.status!=='resolved'||result.source!=='insurer')throw new Denied('CLIENT_COUNTRY_UNRESOLVED');
+ // Canonical *read projection* only. The stored country, owner and all policy
+ // documents remain untouched; allowRow must still check the current advisor.
+ return Object.assign({},client,{pais:result.country,country:result.country,
+   paisEfectivo:result.country,paisOrigenEfectivo:'aseguradora_verificada'});
 }
 // Enforce authorization on the verified canonical parent; historical child
 // country/advisor fields are not an independent grant or veto of that scope.
@@ -191,6 +220,12 @@ async function readScopedRelatedDocument({db,auth,request}){
  try{
    verifiedLinkedClient(ctx,client,policy);
    if(financeCollections.has(collection))projected=financialView(ctx,row,policy,client,tenantId,documentId);
+   else if(collection==='clientes'){
+     const canonical=await verifiedClientCountryView(ctx,tenant,row,documentId);
+     allowRow(ctx,canonical);
+     projected=Object.assign({},canonical,{id:documentId,canonicalDocumentId:documentId,
+       tenantId:row.tenantId||tenantId});
+   }
    else{
      allowRow(ctx,row,policy?[policy]:client?[client]:[]);
      projected=Object.assign({},row,{id:row.id||documentId,canonicalDocumentId:documentId,
