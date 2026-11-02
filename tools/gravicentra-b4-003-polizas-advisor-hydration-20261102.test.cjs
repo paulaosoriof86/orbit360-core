@@ -50,4 +50,57 @@ advisors=[{id:'qa-adv',nombre:'Asesora QA actualizada'}];
 listeners['orbit:store:emit']({detail:{collection:'asesores'}});
 assert.notEqual(host.innerHTML,before,'subsequent advisor update must rerender');
 assert.match(host.innerHTML,/Asesora QA actualizada/);
-console.log('B4_003_POLIZAS_ADVISOR_HYDRATION=PASS directEntry=PASS advisorEventRefresh=PASS rolesUnaltered=true firestoreWrites=0');
+
+async function roleScopedRoster(role,memberCountries,selectedCountry,expectedCountries){
+ const called=[],requested=[],events={};
+ let defs=[];
+ const h={isConnected:true,innerHTML:'',querySelector(sel){return this.innerHTML.includes(sel.slice(1,-1))?{}:null;}};
+ const countries=memberCountries.slice(),recordsByCountry=['GT','CO'].map(country=>({
+  id:'qa-'+country,numero:'QA-'+country,clienteId:'qa-client-'+country,
+  aseguradoraId:'qa-ins',asesorId:'advisor-'+country,pais:country,moneda:country==='GT'?'GTQ':'COP',
+  estado:'Vigente',vigenciaFin:'2026-12-15',primaTotal:100,primaNeta:80,ramo:'Auto'
+ }));
+ const kit={...K,filterBar:ds=>{defs=ds;return '';}};
+ const user={uid:'qa-user-'+role,productReadOnly:true,countries};
+ const state={modules:{},ui:U,kit,q:{},pais:selectedCountry,
+  auth:{user:()=>user,productUser:user},session:{rol:()=>role},
+  access:{tenantId:()=> 'qa-tenant',dataScope:()=>role==='Operativo'?'all':'own',
+   activeRole:()=>role,actorAdvisor:()=>({}),actorAdvisorId:()=> 'advisor-GT',assignedRoles:()=>[role]},
+  assignableAdvisorRoster:{list:async c=>{
+   called.push(c);
+   return [{id:'advisor-'+c,nombre:'Asesor '+c}];
+  }},
+  store:{all:collection=>{
+   if(collection==='polizas')return recordsByCountry.filter(p=>countries.includes(p.pais)&&
+    (selectedCountry==='TODOS'||p.pais===selectedCountry));
+   if(collection==='clientes')return recordsByCountry.filter(p=>countries.includes(p.pais)).map(p=>({id:p.clienteId,pais:p.pais,nombre:'Cliente QA'}));
+   if(collection==='aseguradoras')return [{id:'qa-ins',nombre:'Aseguradora QA'}];
+   if(collection==='asesores')throw Error('TEAM_DIRECTORY_MUST_NOT_BE_READ_BY_'+role);
+   return [];
+  },_ensureCollections:cols=>{requested.push(cols);},
+   _productStatus:()=>({serverConfirmedCollections:['polizas','clientes']})}
+ };
+ const doc={addEventListener:(event,fn)=>{events[event]=fn;},getElementById:id=>id==='host'?h:null};
+ const win={Orbit:state,addEventListener:(event,fn)=>{events[event]=fn;}};
+ vm.runInNewContext(source,{Orbit:state,window:win,document:doc,setTimeout,clearTimeout},
+  {filename:'polizas.js',timeout:3000});
+ state.modules.polizas.render(h);
+ assert.ok(requested.some(cols=>cols.includes('polizas')&&cols.includes('clientes')&&!cols.includes('asesores')),
+  'restricted role must never request admin Team collection');
+ for(let attempt=0;attempt<8;attempt++)await Promise.resolve();
+ assert.deepEqual(called.sort(),expectedCountries.slice().sort(),
+  role+' must request roster for exactly the membership-authorized selected countries');
+ if(expectedCountries.length){
+  assert.equal(defs.find(d=>d.id==='fase').options.length,expectedCountries.length);
+  for(const c of expectedCountries)assert.match(h.innerHTML,new RegExp('Asesor '+c));
+  assert.doesNotMatch(h.innerHTML,/Confirmando asesor…/);
+ }else assert.match(h.innerHTML,/data-polizas-advisor-readiness="blocked"/);
+}
+Promise.resolve().then(async()=>{
+ await roleScopedRoster('Operativo',['GT','CO'],'TODOS',['GT','CO']);
+ await roleScopedRoster('Operativo',['GT'],'TODOS',['GT']);
+ await roleScopedRoster('Operativo',['GT','CO'],'CO',['CO']);
+ await roleScopedRoster('Asesor',['GT'],'GT',['GT']);
+ await roleScopedRoster('Operativo',[],'TODOS',[]);
+ console.log('B4_003_POLIZAS_ADVISOR_HYDRATION=PASS directEntry=PASS advisorEventRefresh=PASS operativoGTCO=PASS rosterMinimal=PASS noUnauthorizedCountryCalls=PASS restrictedTeamDirectory=DENIED firestoreWrites=0');
+}).catch(error=>{console.error(error);process.exitCode=1;});
