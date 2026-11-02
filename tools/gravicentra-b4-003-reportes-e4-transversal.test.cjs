@@ -385,7 +385,7 @@ test('E8 independently hydrates financial data, quarantines QA from workflows an
   assert.match(host.innerHTML,/data-quality-financial-readiness="PENDING"/);
   assert.match(host.innerHTML,/data-quality-qa-quarantine="1"/);
   assert.doesNotMatch(host.innerHTML,/B4-003 QA Cliente/);
-  assert.match(host.innerHTML,/de 1 en alcance/);
+  assert.match(host.innerHTML,/Expedientes incompletos: 1/);
   assert.ok(ensure.includes('recibosEsperados'));
   assert.ok(ensure.includes('polizas'));
   assert.equal(financeIds.length,0,'financial figures must not materialize before server confirmation');
