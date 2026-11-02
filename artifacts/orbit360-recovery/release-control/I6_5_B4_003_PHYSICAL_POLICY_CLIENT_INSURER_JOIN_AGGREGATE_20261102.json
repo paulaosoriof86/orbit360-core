@@ -1,0 +1,341 @@
+{
+  "schema": "GRAVICENTRA_B4_003_PHYSICAL_POLICY_CLIENT_JOIN_READONLY_V1",
+  "project": "ays-orbit-360-lab",
+  "tenant": "alianzas-soluciones",
+  "mode": "PHYSICAL_READ_AGGREGATES_AND_SYNTHETIC_SCOPE_EVALUATION",
+  "counts": {
+    "clients": 443,
+    "policies": 1425,
+    "insurers": 33,
+    "memberships": 8,
+    "roleCountryContexts": 31,
+    "distinctPolicyClientRefs": 408,
+    "distinctMissingPhysicalClientRefs": 3
+  },
+  "clientCountryAuthority": {
+    "explicit": {
+      "GT": 359,
+      "CO": 17
+    },
+    "inferred": {
+      "GT": 33,
+      "CO": 31
+    },
+    "unresolved": {
+      "COMPLETE_POLICY_RELATION_REQUIRED": 3
+    },
+    "readProjectionBoundExceeded": 0
+  },
+  "physicalJoin": {
+    "policies": 1425,
+    "clientIdMissing": 0,
+    "physicalClientMissing": 3,
+    "linkedClientExplicitSameCountry": 1292,
+    "linkedClientExplicitOtherCountry": 1,
+    "linkedClientInsurerFallbackEligible": 129,
+    "linkedClientCountryUnresolved": 0
+  },
+  "effectiveScopeMatrix": [
+    {
+      "role": "AdminTenant",
+      "country": "CO",
+      "policyScope": "all",
+      "clientScope": "all",
+      "contexts": 1,
+      "authorizedPolicies": 124,
+      "authorizedClientRows": 17,
+      "policyLinks": {
+        "clientReadable": 75,
+        "clientOtherCountry": 0,
+        "clientWrongAdvisorOrModule": 0,
+        "clientMissingPhysical": 0,
+        "clientRequiresCountryIndex": 49,
+        "clientUnresolved": 0
+      }
+    },
+    {
+      "role": "AdminTenant",
+      "country": "CO",
+      "policyScope": "team",
+      "clientScope": "all",
+      "contexts": 1,
+      "authorizedPolicies": 0,
+      "authorizedClientRows": 17,
+      "policyLinks": {
+        "clientReadable": 0,
+        "clientOtherCountry": 0,
+        "clientWrongAdvisorOrModule": 0,
+        "clientMissingPhysical": 0,
+        "clientRequiresCountryIndex": 0,
+        "clientUnresolved": 0
+      }
+    },
+    {
+      "role": "AdminTenant",
+      "country": "GT",
+      "policyScope": "all",
+      "clientScope": "all",
+      "contexts": 1,
+      "authorizedPolicies": 1301,
+      "authorizedClientRows": 420,
+      "policyLinks": {
+        "clientReadable": 1296,
+        "clientOtherCountry": 1,
+        "clientWrongAdvisorOrModule": 0,
+        "clientMissingPhysical": 3,
+        "clientRequiresCountryIndex": 1,
+        "clientUnresolved": 0
+      }
+    },
+    {
+      "role": "AdminTenant",
+      "country": "GT",
+      "policyScope": "team",
+      "clientScope": "all",
+      "contexts": 1,
+      "authorizedPolicies": 1,
+      "authorizedClientRows": 420,
+      "policyLinks": {
+        "clientReadable": 1,
+        "clientOtherCountry": 0,
+        "clientWrongAdvisorOrModule": 0,
+        "clientMissingPhysical": 0,
+        "clientRequiresCountryIndex": 0,
+        "clientUnresolved": 0
+      }
+    },
+    {
+      "role": "Asesor",
+      "country": "CO",
+      "policyScope": "own",
+      "clientScope": "own",
+      "contexts": 5,
+      "authorizedPolicies": 211,
+      "authorizedClientRows": 34,
+      "policyLinks": {
+        "clientReadable": 150,
+        "clientOtherCountry": 0,
+        "clientWrongAdvisorOrModule": 5,
+        "clientMissingPhysical": 0,
+        "clientRequiresCountryIndex": 56,
+        "clientUnresolved": 0
+      }
+    },
+    {
+      "role": "Asesor",
+      "country": "GT",
+      "policyScope": "own",
+      "clientScope": "own",
+      "contexts": 7,
+      "authorizedPolicies": 2451,
+      "authorizedClientRows": 797,
+      "policyLinks": {
+        "clientReadable": 2355,
+        "clientOtherCountry": 2,
+        "clientWrongAdvisorOrModule": 86,
+        "clientMissingPhysical": 6,
+        "clientRequiresCountryIndex": 2,
+        "clientUnresolved": 0
+      }
+    },
+    {
+      "role": "Asistente",
+      "country": "GT",
+      "policyScope": "own",
+      "clientScope": "own",
+      "contexts": 1,
+      "authorizedPolicies": 123,
+      "authorizedClientRows": 24,
+      "policyLinks": {
+        "clientReadable": 83,
+        "clientOtherCountry": 0,
+        "clientWrongAdvisorOrModule": 40,
+        "clientMissingPhysical": 0,
+        "clientRequiresCountryIndex": 0,
+        "clientUnresolved": 0
+      }
+    },
+    {
+      "role": "Dirección",
+      "country": "CO",
+      "policyScope": "all",
+      "clientScope": "all",
+      "contexts": 1,
+      "authorizedPolicies": 124,
+      "authorizedClientRows": 17,
+      "policyLinks": {
+        "clientReadable": 75,
+        "clientOtherCountry": 0,
+        "clientWrongAdvisorOrModule": 0,
+        "clientMissingPhysical": 0,
+        "clientRequiresCountryIndex": 49,
+        "clientUnresolved": 0
+      }
+    },
+    {
+      "role": "Dirección",
+      "country": "GT",
+      "policyScope": "all",
+      "clientScope": "all",
+      "contexts": 1,
+      "authorizedPolicies": 1301,
+      "authorizedClientRows": 420,
+      "policyLinks": {
+        "clientReadable": 1296,
+        "clientOtherCountry": 1,
+        "clientWrongAdvisorOrModule": 0,
+        "clientMissingPhysical": 3,
+        "clientRequiresCountryIndex": 1,
+        "clientUnresolved": 0
+      }
+    },
+    {
+      "role": "Operativo",
+      "country": "CO",
+      "policyScope": "all",
+      "clientScope": "all",
+      "contexts": 2,
+      "authorizedPolicies": 248,
+      "authorizedClientRows": 34,
+      "policyLinks": {
+        "clientReadable": 150,
+        "clientOtherCountry": 0,
+        "clientWrongAdvisorOrModule": 0,
+        "clientMissingPhysical": 0,
+        "clientRequiresCountryIndex": 98,
+        "clientUnresolved": 0
+      }
+    },
+    {
+      "role": "Operativo",
+      "country": "CO",
+      "policyScope": "all",
+      "clientScope": "own",
+      "contexts": 1,
+      "authorizedPolicies": 124,
+      "authorizedClientRows": 0,
+      "policyLinks": {
+        "clientReadable": 0,
+        "clientOtherCountry": 0,
+        "clientWrongAdvisorOrModule": 104,
+        "clientMissingPhysical": 0,
+        "clientRequiresCountryIndex": 20,
+        "clientUnresolved": 0
+      }
+    },
+    {
+      "role": "Operativo",
+      "country": "CO",
+      "policyScope": "team",
+      "clientScope": "all",
+      "contexts": 1,
+      "authorizedPolicies": 0,
+      "authorizedClientRows": 17,
+      "policyLinks": {
+        "clientReadable": 0,
+        "clientOtherCountry": 0,
+        "clientWrongAdvisorOrModule": 0,
+        "clientMissingPhysical": 0,
+        "clientRequiresCountryIndex": 0,
+        "clientUnresolved": 0
+      }
+    },
+    {
+      "role": "Operativo",
+      "country": "GT",
+      "policyScope": "all",
+      "clientScope": "all",
+      "contexts": 2,
+      "authorizedPolicies": 2602,
+      "authorizedClientRows": 840,
+      "policyLinks": {
+        "clientReadable": 2592,
+        "clientOtherCountry": 2,
+        "clientWrongAdvisorOrModule": 0,
+        "clientMissingPhysical": 6,
+        "clientRequiresCountryIndex": 2,
+        "clientUnresolved": 0
+      }
+    },
+    {
+      "role": "Operativo",
+      "country": "GT",
+      "policyScope": "all",
+      "clientScope": "own",
+      "contexts": 1,
+      "authorizedPolicies": 1301,
+      "authorizedClientRows": 8,
+      "policyLinks": {
+        "clientReadable": 0,
+        "clientOtherCountry": 1,
+        "clientWrongAdvisorOrModule": 1297,
+        "clientMissingPhysical": 3,
+        "clientRequiresCountryIndex": 0,
+        "clientUnresolved": 0
+      }
+    },
+    {
+      "role": "Operativo",
+      "country": "GT",
+      "policyScope": "team",
+      "clientScope": "all",
+      "contexts": 1,
+      "authorizedPolicies": 1,
+      "authorizedClientRows": 420,
+      "policyLinks": {
+        "clientReadable": 1,
+        "clientOtherCountry": 0,
+        "clientWrongAdvisorOrModule": 0,
+        "clientMissingPhysical": 0,
+        "clientRequiresCountryIndex": 0,
+        "clientUnresolved": 0
+      }
+    },
+    {
+      "role": "SuperAdmin",
+      "country": "CO",
+      "policyScope": "all",
+      "clientScope": "all",
+      "contexts": 2,
+      "authorizedPolicies": 248,
+      "authorizedClientRows": 34,
+      "policyLinks": {
+        "clientReadable": 150,
+        "clientOtherCountry": 0,
+        "clientWrongAdvisorOrModule": 0,
+        "clientMissingPhysical": 0,
+        "clientRequiresCountryIndex": 98,
+        "clientUnresolved": 0
+      }
+    },
+    {
+      "role": "SuperAdmin",
+      "country": "GT",
+      "policyScope": "all",
+      "clientScope": "all",
+      "contexts": 2,
+      "authorizedPolicies": 2602,
+      "authorizedClientRows": 840,
+      "policyLinks": {
+        "clientReadable": 2592,
+        "clientOtherCountry": 2,
+        "clientWrongAdvisorOrModule": 0,
+        "clientMissingPhysical": 6,
+        "clientRequiresCountryIndex": 2,
+        "clientUnresolved": 0
+      }
+    }
+  ],
+  "caveats": [
+    "Admin SDK does not prove signed token authorization",
+    "Effective-scope matrix policy/link counts are member-context evaluations, not globally distinct records",
+    "Historical policy ownership may differ from current client ownership",
+    "Valid client country is not overwritten by insurer country",
+    "Insurer-inferred country is not yet indexed by the protected list query"
+  ],
+  "gate": "B4_003_HOLD",
+  "production": "NO_GO",
+  "writes": 0,
+  "authWrites": 0,
+  "securityChanges": 0
+}

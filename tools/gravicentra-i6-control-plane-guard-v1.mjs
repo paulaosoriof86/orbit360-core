@@ -1,3 +1,6 @@
+import {runB4003PhysicalJoinEvidenceSuccessorGuard} from './gravicentra-b4-003-physical-join-evidence-successor.mjs';
+if (runB4003PhysicalJoinEvidenceSuccessorGuard()) process.exit(0);
+
 import {runB4003ClientJoinWorkflowContextRepairGuard} from './gravicentra-b4-003-client-join-workflow-context-repair-successor.mjs';
 if (runB4003ClientJoinWorkflowContextRepairGuard()) process.exit(0);
 

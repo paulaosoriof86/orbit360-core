@@ -1,0 +1,106 @@
+{
+  "schema": "GRAVICENTRA_I65_B4003_PHYSICAL_JOIN_AUDIT_EVIDENCE_SUCCESSOR_V1",
+  "gate": "I6.5/B4-003",
+  "recordType": "ADDITIVE_VERIFIED_PHYSICAL_SOURCE_AGGREGATES_NO_DATA_OR_PRODUCT_MUTATION",
+  "status": "REAL_READONLY_JOIN_PASS_COUNTRY_AND_SCOPE_CAUSES_QUANTIFIED_RELEASE_HOLD",
+  "recordedDate": "2026-11-02",
+  "repository": "paulaosoriof86/orbit360-core",
+  "canonicalBranch": "recovery/fase-a-clean-20260831",
+  "canonicalParentHead": "e576728c7e171ecaa78e30a88a5df747163731ae",
+  "githubActionsRun": {
+    "id": 41389449069,
+    "url": "https://github.com/paulaosoriof86/orbit360-core/actions/runs/41389449069",
+    "event": "push",
+    "headSha": "e576728c7e171ecaa78e30a88a5df747163731ae",
+    "status": "completed",
+    "conclusion": "success",
+    "readOnlyAggregateStepPassed": true,
+    "projectVerified": "ays-orbit-360-lab",
+    "exportedPii": false,
+    "realAuthTokenOrNegativeUidUat": false,
+    "writes": 0
+  },
+  "archive": {
+    "artifactId": 13116865695,
+    "name": "gravicentra-b4003-physical-join-aggregate-41389449069",
+    "zipSha256": "6f54c13df5321f18187e307ed14321d516450756c1f6488ed3fe08eb7c86b03d",
+    "expiresAt": "2026-12-02T04:37:13Z",
+    "exactAggregatePath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PHYSICAL_POLICY_CLIENT_INSURER_JOIN_AGGREGATE_20261102.json",
+    "aggregateGitBlobSha": "0fa6674201a0f33bec1fd08ea84d3bfadeaa5409",
+    "aggregateSha256": "7a842713f7edc95f305b0f4647d07917160ed4c1801cc06567766f30f6a85439",
+    "schema": "GRAVICENTRA_B4_003_PHYSICAL_POLICY_CLIENT_JOIN_READONLY_V1",
+    "fullAggregatePermanentlyPreserved": true
+  },
+  "physicalRootCause": {
+    "counts": {
+      "clients": 443,
+      "policies": 1425,
+      "insurers": 33,
+      "memberships": 8,
+      "roleCountryContexts": 31,
+      "distinctPolicyClientRefs": 408,
+      "distinctMissingPhysicalClientRefs": 3
+    },
+    "clientCountryAuthority": {
+      "explicitGT": 359,
+      "explicitCO": 17,
+      "inferredInsurerGT": 33,
+      "inferredInsurerCO": 31,
+      "unresolvedWithoutCompletePolicyRelation": 3,
+      "readProjectionBoundExceeded": 0
+    },
+    "policyJoin": {
+      "clientIdMissing": 0,
+      "physicalClientMissing": 3,
+      "linkedClientExplicitSameCountry": 1292,
+      "linkedClientExplicitOtherCountry": 1,
+      "linkedClientInsurerFallbackEligible": 129,
+      "linkedClientCountryUnresolved": 0
+    },
+    "operativoCOScopeAllPoliciesOwnClients": {
+      "contexts": 1,
+      "authorizedPolicies": 124,
+      "indexedClientRowsVisible": 0,
+      "policyLinksOutsideClientAdvisorOrModule": 104,
+      "policyLinksNeedingClientCountryIndex": 20,
+      "notEvidenceOfPhysicalClientLoss": true,
+      "cannotAttributeToNamedUidFromAggregateOnly": true
+    },
+    "direccionCOScopeAllPoliciesAllClients": {
+      "contexts": 1,
+      "authorizedPolicies": 124,
+      "indexedClientRows": 17,
+      "policyLinksAlreadyReadable": 75,
+      "policyLinksNeedingClientCountryIndex": 49
+    },
+    "datasetVsRoleScopeIsTwoIndependentCauses": true,
+    "roleMatrixCountsCanRepeatAcrossMembers": true
+  },
+  "governanceDecision": {
+    "countryRule": "Client explicit valid unambiguous domicile; else all verified linked insurers same country; otherwise quarantine",
+    "doNotOverrideValidCrossBorderClientDomicile": true,
+    "neverConflatePolicyKpiWithClientKpi": true,
+    "neverWidenAdvisorScopeSilently": true,
+    "needBusinessAuthorizationForOperativoCountryClientScope": true,
+    "indexMaterializationStillRequiresDryrunBackupRollbackAndExplicitApproval": true,
+    "previewFunctionNotDeployedByThisAudit": true,
+    "productionDataNotMutated": true,
+    "userVisibleI6ProgressNotInflated": true
+  },
+  "releaseHold": {
+    "formalI6Percent": 50,
+    "priorityP0Closed": 1,
+    "priorityP0Total": 6,
+    "B4003Closed": false,
+    "signedInPaulaAndCarlosPreviewUatPass": false,
+    "independentNegativeUidUatPass": false,
+    "indexedCountryWriterAndReaderProven": false,
+    "firestoreRulesP0Closed": false,
+    "restoreDrillAccepted": false,
+    "sevenAdvisorsClassified": false,
+    "dataWrites": 0,
+    "liveFunctionsOrHostingChanged": false,
+    "productionAuthorized": false
+  },
+  "nextAction": "DEFINE_AND_APPROVE_OPERATIVO_CLIENT_SCOPE_THEN_BOUNDED_INDEX_MATERIALIZATION_DRYRUN_AND_CONTROLLED_PREVIEW_UAT"
+}
