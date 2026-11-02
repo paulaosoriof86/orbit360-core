@@ -1,0 +1,72 @@
+{
+  "schema": "GRAVICENTRA_I65_B4003_COUNTRY_INDEX_REAL_LAB_APPLY_SUCCESSOR_V1",
+  "recordedDate": "2026-11-02",
+  "purpose": "Record a later owner-directed bounded LAB data write, preserving the immutable read-only snapshot and original Control Plane pointer.",
+  "repository": "paulaosoriof86/orbit360-core",
+  "canonicalBranch": "recovery/fase-a-clean-20260831",
+  "sourcePredecessorSha": "43da054e64d93338a655998e2e82ef529c5fe064",
+  "ownerInstruction": "2026-11-02: corregir y trasladar transversalmente las referencias de país inferibles; consultar a Paula las que no pueden determinarse con evidencia",
+  "physicalProject": "ays-orbit-360-lab",
+  "physicalTenant": "alianzas-soluciones",
+  "workflowRun": {
+    "id": 41470704734,
+    "conclusion": "success",
+    "url": "https://github.com/paulaosoriof86/orbit360-core/actions/runs/41470704734",
+    "transportCommit": "13966c42f7d20e0e313fe549fbeb9fd8c25b090b",
+    "artifactId": 13153923409,
+    "artifactZipSha256": "20efa8367b89d580f782dbb335263135787e29817ec6cbeaee78ea6ddb5223ef",
+    "artifactContainsIdentifiers": false
+  },
+  "preflight": {
+    "originalReadOnlyRun": 41462171976,
+    "clients": 443,
+    "policies": 1425,
+    "insurers": 33,
+    "previouslyIndexed": 408,
+    "exactCountryUpdates": 32,
+    "GT": 1,
+    "CO": 31,
+    "frozenAggregateMatchedBeforeMutation": true
+  },
+  "safety": {
+    "privateRootVault": "__gravicentraPrivateMigrationVault/b4003-country-index-20261102",
+    "clientRulesDenyRootVault": true,
+    "preimagesStoredPrivately": 32,
+    "preimageReadback": "PASS",
+    "isolatedRestoreDrillRecords": 32,
+    "isolatedRestoreDrill": "PASS",
+    "realClientRollbackExecuted": false,
+    "guardedRollbackAvailable": true,
+    "pitrObservedEnabledDays": 7,
+    "transactionalClientFieldUpdate": true,
+    "clientDocumentFieldsChanged": ["pais"],
+    "publicClientIdentifiersExported": false
+  },
+  "postApplyPhysicalReadback": {
+    "conclusion": "PASS",
+    "indexedGT": 392,
+    "indexedCO": 48,
+    "indexedTotal": 440,
+    "countryCandidatesRemainingGT": 0,
+    "countryCandidatesRemainingCO": 0,
+    "ownerCountryDecisionsPending": 3,
+    "unresolvedReason": "COMPLETE_POLICY_RELATION_REQUIRED",
+    "distinctB2QaOrphanReferences": 3,
+    "qaOrphanCleanupAuthorized": false,
+    "liveHostingChanged": false,
+    "domainHostingChanged": false,
+    "functionsChanged": false,
+    "rulesAuthIamChanged": false
+  },
+  "gates": {
+    "dataCountryIndexSubgate": "APPLY_AND_READBACK_PASS",
+    "authenticatedPaulaAndIndependentUidMatrix": "PENDING",
+    "thesisPilotCurrentPreview": "PENDING",
+    "humanCountryDecisions": "PENDING",
+    "b4003": "HOLD",
+    "production": "NO_GO",
+    "formalI6Percent": 50,
+    "priorityP0Closed": 1,
+    "priorityP0Total": 6
+  }
+}
