@@ -74,11 +74,28 @@
     };
     function readable(collection){
       try{
+        // Server authority in functions/b4-003-scoped-access-boundary.js:
+        // insurerDirectoryRoles is narrower than module visibility for Asesor.
+        // Deep-link boot must never require a directory the callable will deny.
+        if(collection==='aseguradoras'){
+          var role=text(membership.activeRole).normalize('NFD')
+            .replace(/[\u0300-\u036f]/g,'').toLowerCase()
+            .replace(/[^a-z0-9]+/g,'_').replace(/^_+|_+$/g,'');
+          if(['operativo','admin','admintenant','admin_tenant','superadmin','super_admin','direccion']
+            .indexOf(role)<0)return false;
+        }
         var policy=window.Orbit.tenantAccessPolicyProductP0;
         var plan=policy&&typeof policy.queryConstraints==='function'
           ?policy.queryConstraints(collection,membership||{},{tenantId:text(membership&&membership.tenantId)})
           :null;
-        return !!(plan&&plan.ok===true&&plan.scope!=='none'&&!(plan.constraints||[]).some(function(x){return x&&x.field==='__deny__';}));
+        // Route-primary readiness must honor the same effective module gate
+        // as the protected query planner. A denied deep link can never force
+        // a required server snapshot that the active role cannot read.
+        var moduleKey=text(plan&&plan.module);
+        return !!(plan&&plan.ok===true&&plan.scope!=='none'&&
+          !(plan.constraints||[]).some(function(x){return x&&x.field==='__deny__';})&&
+          (!moduleKey||(typeof policy.moduleVisible==='function'&&
+            policy.moduleVisible(membership,moduleKey)===true)));
       }catch(error){return false;}
     }
     var allConfigured=unique(required.concat(optional));
