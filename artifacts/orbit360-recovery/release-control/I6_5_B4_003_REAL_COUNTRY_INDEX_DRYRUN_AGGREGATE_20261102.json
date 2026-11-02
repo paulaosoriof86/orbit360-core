@@ -1,0 +1,39 @@
+{
+  "schema": "GRAVICENTRA_B4003_CLIENT_COUNTRY_INDEX_DRYRUN_AGGREGATE_V1",
+  "mode": "REAL_READONLY_OR_SYNTHETIC_PLAN_NO_APPLY",
+  "tenant": "alianzas-soluciones",
+  "counts": {
+    "clients": 443,
+    "policies": 1425,
+    "insurers": 33
+  },
+  "indexedAlready": {
+    "GT": 391,
+    "CO": 17
+  },
+  "indexUpdateCandidates": {
+    "GT": 1,
+    "CO": 31
+  },
+  "candidateAuthority": {
+    "client": 376,
+    "insurer": 64
+  },
+  "unresolvable": {
+    "COMPLETE_POLICY_RELATION_REQUIRED": 3
+  },
+  "perClientPolicyBoundExceeded": 0,
+  "distinctPolicyRefsMissingClient": 3,
+  "sourceCountryNotCanonical": 5,
+  "crossBorderClientExplicitPreserved": 1,
+  "requiresBackupAndRollback": true,
+  "requiresSignedRoleCountryUat": true,
+  "applyAuthorized": false,
+  "executablePatchesExported": false,
+  "writes": 0,
+  "authWrites": 0,
+  "rulesWrites": 0,
+  "hostingDeploys": 0,
+  "gate": "B4_003_HOLD",
+  "production": "NO_GO"
+}
