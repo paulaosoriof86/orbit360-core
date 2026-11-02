@@ -1,0 +1,61 @@
+{
+  "schema": "GRAVICENTRA_I65_B4003_CLIENT_COUNTRY_INDEX_DRYRUN_LIMIT_REPAIR_V1",
+  "repository": "paulaosoriof86/orbit360-core",
+  "canonicalBranch": "recovery/fase-a-clean-20260831",
+  "recordedDate": "2026-11-02",
+  "gate": "I6.5/B4-003",
+  "status": "REAL_READONLY_INDEX_RUN_FAILED_PRE_READ_LIMIT_BUG_FIXED_SOURCE_PASS_RERUN_PENDING_HOLD",
+  "canonicalParentHead": "796b1b5cf788cdc6d8bfd03401f889b4ee5a631f",
+  "sourceCommit": "76121163570b30909b99c0fe08e05f3f43861a02",
+  "sourceTree": "678119f7797eee8f5498b58d9b0f2334b18ce781",
+  "failedWorkflowRun": {
+    "id": 41461434671,
+    "url": "https://github.com/paulaosoriof86/orbit360-core/actions/runs/41461434671",
+    "conclusion": "failure",
+    "sourceHead": "796b1b5cf788cdc6d8bfd03401f889b4ee5a631f",
+    "checkoutAndControlGuardPassed": true,
+    "existingLabCredentialResolved": true,
+    "pinnedAdminClientInstallPassed": true,
+    "failureStep": "Read physical country-index delta and publish non-identifying aggregates",
+    "sanitizedError": "Value for argument limit is not a valid integer",
+    "failureBeforeFirestoreGet": true,
+    "anyRealClientRecordReadByFailedStep": false,
+    "dataWrites": 0,
+    "rulesAuthIamChanged": false,
+    "liveDeployed": false
+  },
+  "rootCauseAndFix": {
+    "cause": "The dry-run's physical loop used Spanish collection names (clientes, polizas, aseguradoras), but accidentally indexed an English logical limit object (clients, policies, insurers). Firestore .limit(undefined+1) failed prior to the .get call.",
+    "fix": "Explicit immutable Spanish physical collection to numeric bounded limit map with guarded unknown-collection rejection, used for both .limit and post-read bound.",
+    "sourceBlobs": {
+      "tools/gravicentra-b4-003-client-country-index-dryrun-readonly.cjs": "3185d6b99f76457fed60238c31c1c86a75fe9a85",
+      "tools/gravicentra-b4-003-client-country-index-dryrun-readonly.test.cjs": "9e9ccb287b87147bb86a0dba0d66677e050414c1",
+      ".github/workflows/gravicentra-b4-003-client-index-dryrun-readonly-20261102.yml": "a85dea65fa018b8aff947a35d81c2b9daf3d6961"
+    },
+    "testedPhysicalReadLimits": { "clientes": 2500, "polizas": 5000, "aseguradoras": 1000 },
+    "dryrunSyntheticCases": 22,
+    "workflowSourceChangeTriggersFreshCanonicalPushRun": true
+  },
+  "notYetProven": {
+    "realIndexDryrunCompleted": false,
+    "physicalCandidateGT": null,
+    "physicalCandidateCO": null,
+    "multiUidAuthenticatedPreviewUatPassed": false,
+    "independentBackendNegativeUidUatPassed": false,
+    "firestoreRulesP0Closed": false,
+    "restoreDrillAccepted": false,
+    "sevenAdvisorsClassified": false
+  },
+  "releaseHold": {
+    "productionAuthorized": false,
+    "B4003Closed": false,
+    "formalI6Percent": 50,
+    "priorityP0Closed": 1,
+    "priorityP0Total": 6,
+    "dataWrites": 0,
+    "sharedRulesAuthIamMutation": false,
+    "liveHostingDeployed": false,
+    "liveFunctionsDeployed": false
+  },
+  "nextAction": "Merge the repaired workflow source, inspect fresh read-only aggregate-only run, archive verified result, and leave migration and LIVE blocked pending separate authorization."
+}

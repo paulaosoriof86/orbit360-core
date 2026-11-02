@@ -1,7 +1,7 @@
 'use strict';
 // Fake identities; never opens Firebase or outputs client identifiers.
 const assert=require('node:assert/strict');
-const {planCountryIndex}=require('./gravicentra-b4-003-client-country-index-dryrun-readonly.cjs');
+const {planCountryIndex,physicalReadLimit}=require('./gravicentra-b4-003-client-country-index-dryrun-readonly.cjs');
 const tenantId='synthetic-tenant';
 const clients=[
  {id:'gt-normal',tenantId,pais:'GT'},
@@ -37,4 +37,8 @@ assert.throws(()=>planCountryIndex({clients,policies,insurers:[...insurers,insur
 assert.throws(()=>planCountryIndex({clients,policies:[...policies,{id:'x',tenantId}],insurers,tenantId}),/POLICY_CLIENT_REQUIRED/);
 assert.equal(planCountryIndex({clients:[{...clients[0],_sourceIdMismatch:true}],policies:[],insurers,tenantId})
  .unresolvable.CLIENT_DOCUMENT_ID_CONFLICT,1);
-console.log('B4_003_CLIENT_COUNTRY_INDEX_DRYRUN_PASS cases=18 zero_writes=true no_identifiers_exported=true');
+assert.equal(physicalReadLimit('clientes'),2500);
+assert.equal(physicalReadLimit('polizas'),5000);
+assert.equal(physicalReadLimit('aseguradoras'),1000);
+assert.throws(()=>physicalReadLimit('non_allowlisted_collection'),/NOT_ALLOWLISTED/);
+console.log('B4_003_CLIENT_COUNTRY_INDEX_DRYRUN_PASS cases=22 zero_writes=true no_identifiers_exported=true');

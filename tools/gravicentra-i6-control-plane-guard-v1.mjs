@@ -1,3 +1,6 @@
+import {runB4003ClientIndexLimitRepairSuccessorGuard} from './gravicentra-b4-003-client-index-limit-repair-successor.mjs';
+if (runB4003ClientIndexLimitRepairSuccessorGuard()) process.exit(0);
+
 import {runB4003CountryIndexDryrunWorkflowSuccessorGuard} from './gravicentra-b4-003-country-index-dryrun-workflow-successor.mjs';
 if (runB4003CountryIndexDryrunWorkflowSuccessorGuard()) process.exit(0);
 

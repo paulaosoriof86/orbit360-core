@@ -44,6 +44,7 @@ jobs:
           test "${GITHUB_REF_NAME}" = 'recovery/fase-a-clean-20260831'
           node --check tools/gravicentra-b4-003-client-country-index-dryrun-readonly.cjs
           node tools/gravicentra-b4-003-client-country-index-dryrun-readonly.test.cjs
+          node -e 'const {physicalReadLimit}=require("./tools/gravicentra-b4-003-client-country-index-dryrun-readonly.cjs"); if(physicalReadLimit("clientes")!==2500||physicalReadLimit("polizas")!==5000||physicalReadLimit("aseguradoras")!==1000) process.exit(1)'
           node tools/gravicentra-b4-003-operativo-client-read-front-back-parity.test.cjs
           timeout -k 3s 35s node tools/gravicentra-i6-control-plane-guard-v1.mjs --mode=i6
 
