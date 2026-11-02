@@ -1,0 +1,160 @@
+{
+  "schema": "GRAVICENTRA_I65_B4003_CHROME_AUTH_ADVISOR_CLIENT_QA_READBACK_V1",
+  "date": "2026-11-02",
+  "timezone": "America/Guatemala",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "gate": "I6.5/B4-003",
+  "status": "AUTH_PAULA_PARTIAL_UAT_ADVISOR_COUNTRY_PASS_CLIENT_PROJECTION_RECONCILED_QA_REPORTING_FAIL_B4003_HOLD",
+  "recordType": "ADDITIVE_READONLY_UAT_RECEIPT_SUBORDINATE_TO_CONTROL_PLANE_NOT_NEW_PLAN_OR_RELEASE",
+  "candidate": {
+    "transportHead": "66b1ccec7f5967ba88bbf127fe8580cbfe84a42c",
+    "productSourceSha": "ddf5821399a6c2e41901fd0bc57ffe145a036ceb",
+    "buildId": "gi-i65-b4-ddf5821399a6-57f234755dc1",
+    "runId": 41490460157,
+    "runConclusion": "success",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-ca-41490460157-iweih7vv.web.app/",
+    "previewBuildJsonReadback": "EXACT_SOURCE_SHA_AND_BUILD_ID",
+    "previewArtifactId": 13164975442,
+    "previewOnlyCallableAndHosting": "CI_STEPS_PASS",
+    "liveHostingMutation": "NONE_BY_RUN"
+  },
+  "authenticatedUat": {
+    "identity": "Paula Osorio",
+    "uidRecordedInPublicRepo": false,
+    "tenant": "alianzas-soluciones",
+    "roleSelectorIsNotIndependentUidProof": true,
+    "policies": {
+      "direction": {
+        "TODOS": 1425,
+        "GT": 1301,
+        "CO": 124
+      },
+      "operativo": {
+        "TODOS": 1425,
+        "GT": 1301,
+        "CO": 124,
+        "GTFirstPageAdvisorMissing": 0,
+        "COFirstPageAdvisorMissing": 0,
+        "COSecondPageAdvisorMissing": 0,
+        "COPageSizeChecks": [
+          100,
+          24
+        ],
+        "historicalCrossBorderAdvisorNameVisibleCount": 5,
+        "advisorFilterMatchedExactly": 5,
+        "roleCountryReloadRetained": true,
+        "reloadedCOFirstPageAdvisorNameCount": 5
+      }
+    },
+    "advisorVerdict": "AUTH_PAULA_OPERATIVO_CO_ADVISOR_DISPLAY_AND_FILTER_PASS_ONLY",
+    "independentCarlosUid": "NOT_TESTED_CURRENT_BUILD",
+    "independentSamuelUid": "NOT_TESTED_CURRENT_BUILD",
+    "backendSignedNegativeUat": "NOT_TESTED"
+  },
+  "sourceDataReconciliation": {
+    "physicalAudit": {
+      "clients": 443,
+      "policies": 1425,
+      "insurers": 33,
+      "receipt": "I6_5_B4_003_PHYSICAL_JOIN_AUDIT_EVIDENCE_SUCCESSOR_20261102.json"
+    },
+    "countryIndexApply": {
+      "authorizedUpdates": 35,
+      "ownerCountryDecisions": [
+        "GT",
+        "GT",
+        "CO"
+      ],
+      "runId": 41478387493,
+      "backupAndIsolatedRestore": "REPORTED_PASS_IN_FROZEN_RECEIPT",
+      "repeatedByThisReceipt": false
+    },
+    "cliente360": {
+      "operativo": {
+        "CO": 49,
+        "GT": 391,
+        "TODOS": 440
+      },
+      "direccion": {
+        "TODOS": 440
+      },
+      "visibleSumByCountry": 440,
+      "linkedPolicies": 1422,
+      "explicitPolicyWithoutVisibleClientNote": 3
+    },
+    "merged": {
+      "previousReadOnlyAuditExcludedAsMerged": 3,
+      "sourceCode": "orbit360-platform/modules/cliente360.js",
+      "sourceExclusion": "fusionado === true OR nonempty mergedIntoClientId",
+      "currentPhysicalMergedFlagRecount": "NOT_EXECUTED",
+      "inference": "443 physical - 3 previously audited merged = 440 current routable; no physical loss evidenced"
+    },
+    "orphanSynthetic": {
+      "count": 3,
+      "knownSource": "B2-renewals QA",
+      "businessPolicyNumber": false,
+      "ids": [
+        "B2-REN-36489784713",
+        "B2-REN-36490245512",
+        "B2-REN-36490640789"
+      ],
+      "deleteOrReimportAuthorized": false
+    }
+  },
+  "residuals": {
+    "inicio": {
+      "countShown": 443,
+      "cliente360Count": 440,
+      "semanticMismatch": "physical includes previously audited merged; UI presents undifferentiated clientes",
+      "readinessAtObservation": "4/5",
+      "goals": "syncing_or_country_goal_pending",
+      "mustDiagnoseRatherThanInflate": true
+    },
+    "quality": {
+      "inScopeClients": 440,
+      "countryPending": 0,
+      "policyPremiumReceiptDifferences": 74,
+      "clientCompleteness": "0/440",
+      "longTermSpinnerAtStableView": "NOT_OBSERVED"
+    },
+    "e4ProductionGT2026": {
+      "rowsShown": 202,
+      "knownVisibleSyntheticQaPolicies": 5,
+      "qaClientValid": true,
+      "orphanQaPoliciesExcludedSeparately": 3,
+      "verdict": "FAIL_SYNTHETIC_RECORDS_WITH_VALID_CLIENT_INCLUDED_IN_COMMERCIAL_REPORT",
+      "provenanceFixRequired": "Explicit verified QA origin/classifier across reports and commercial KPI read models; retain QA in forensic inventory and do not classify by display name",
+      "sourceModule": "orbit360-platform/modules/reportes.js"
+    },
+    "financialClientView": {
+      "policyReadModel": 1425,
+      "cliente360Linked": 1422,
+      "sourceCause": "three missing physical client references are B2 QA fixtures, not commercial policy identifiers"
+    }
+  },
+  "frozenNextActions": [
+    "Use same canonical branch and active B4-003 gate; no parallel methodology",
+    "Reconcile source-backed business-active vs merged count labels in Inicio/Cliente360/Calidad without editing physical client docs",
+    "Implement explicit immutable synthetic provenance exclusion across commercial KPIs/E4 and E8 with negative/positive counterexamples, retain QA audit access",
+    "Independent signed UID UAT Carlos Operativo GT/CO/TODOS full policy/client access and Asesor negative; Samuel AdminTenant/Operativo/Asesor; reload and backend Firestore/callable denials",
+    "Validate six historical P0 IDs, reversible synthetic CRUD, restore, roles, navigation, and latest approved capability matrix",
+    "Only after B4-003 material pass progress B4-004 through B4-007 and same artifact preview-to-live; thesis pilot screenshots and tests owned by separate thesis project"
+  ],
+  "preservedPlan": {
+    "findingIds": 295,
+    "tasks": 86,
+    "areas": 44,
+    "capabilities": 15,
+    "priorityP0HistoricalTotal": 6,
+    "priorityP0HistoricalClosedFromPriorReceipt": 1,
+    "formalI6Percent": 50,
+    "gateB4003": "HOLD",
+    "production": "NO_GO",
+    "businessDataWritesThisReceipt": 0,
+    "authRulesIamWritesThisReceipt": 0,
+    "liveDeployThisReceipt": false,
+    "sourceProductChangeThisReceipt": false
+  },
+  "assurance": "Chrome observation is exact UI on Paula identity; independent UIDs, effective backend negative security, business-data provenance classification, and current physical merged recount are not inferred as PASS."
+}
