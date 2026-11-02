@@ -87,6 +87,8 @@ copyTree(FUNCTIONS_SRC,BACKEND);
 // B4-003: stage the two callable names in ONE immutable backend package.
 // The executor deploys ONLY the Preview target; LIVE stays undeployed until I5.
 const SCOPED_PREVIEW=process.env.GRAVICENTRA_B4_003_SCOPED_PREVIEW==='true';
+const GOALS_PREVIEW=process.env.GRAVICENTRA_B4_003_GOALS_PREVIEW==='true';
+if(GOALS_PREVIEW&&!SCOPED_PREVIEW)throw new Error('B4_003_GOALS_PREVIEW_REQUIRES_SCOPED_PREVIEW');
 if(SCOPED_PREVIEW){
  if(RELEASE_GATE!=='I6.5-B4-003'||BUILD_PREFIX!=='gi-i65-b4'||!ENVIRONMENT_REF.includes('preview'))
   throw new Error('B4_003_SCOPED_PREVIEW_BOUNDARY_DENIED');
@@ -126,7 +128,7 @@ if(cfg.projectId!==PROJECT_ID)throw new Error('PUBLIC_FIREBASE_PROJECT_MISMATCH'
 const canonical=Object.fromEntries(['apiKey','authDomain','projectId','appId','storageBucket'].map(k=>[k,cfg[k]||'']));
 const cfgHash=crypto.createHash('sha256').update(JSON.stringify(Object.fromEntries(Object.entries(canonical).sort()))).digest('hex');
 const buildId=`${BUILD_PREFIX}-${SOURCE_SHA.slice(0,12)}-${cfgHash.slice(0,12)}`;
-const payload={scopedReadPreviewCandidate:SCOPED_PREVIEW,enabled:true,environmentRef:ENVIRONMENT_REF,tenantHint:TENANT_HINT,projectId:cfg.projectId,authDomain:cfg.authDomain,appId:cfg.appId,apiKey:cfg.apiKey,storageBucket:cfg.storageBucket||'',buildId,sourceSha:SOURCE_SHA,hydrationContractVersion:'fase-a-i2-20260919.5-team-canonical-required',hydrationContractSource:'recovery/fase-a-clean-20260831',requiredCollections:canonicalRequired,optionalCollections:runtimeOptional};
+const payload={scopedReadPreviewCandidate:SCOPED_PREVIEW,goalParticipationPreviewCandidate:GOALS_PREVIEW,enabled:true,environmentRef:ENVIRONMENT_REF,tenantHint:TENANT_HINT,projectId:cfg.projectId,authDomain:cfg.authDomain,appId:cfg.appId,apiKey:cfg.apiKey,storageBucket:cfg.storageBucket||'',buildId,sourceSha:SOURCE_SHA,hydrationContractVersion:'fase-a-i2-20260919.5-team-canonical-required',hydrationContractSource:'recovery/fase-a-clean-20260831',requiredCollections:canonicalRequired,optionalCollections:runtimeOptional};
 fs.writeFileSync(path.join(SITE,'product-runtime-config.js'),'/* Generated only inside the certified I6.1 successor artifact. Public Firebase Web config; no secrets. */\nwindow.__ORBIT360_PRODUCT_PUBLIC_CONFIG__ = Object.freeze('+JSON.stringify(payload)+');\n');
 fs.writeFileSync(path.join(EVIDENCE,'hydration-configuration-binding.json'),
  JSON.stringify({schema:'GRAVICENTRA_HYDRATION_SOURCE_BINDING_V1',sourceSha:SOURCE_SHA,required:canonicalRequired,
