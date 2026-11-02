@@ -1,0 +1,57 @@
+{
+  "schema": "GRAVICENTRA_I65_B4003_FORBIDDEN_ROUTE_BOOT_SOURCE_SUCCESSOR_V1",
+  "gate": "I6.5/B4-003",
+  "recordType": "CUMULATIVE_SOURCE_ONLY_GOVERNANCE_SUCCESSOR_NO_RELEASE",
+  "status": "SOURCE_QA_PASS_HOSTING_PREVIEW_PARTIAL_UAT_RELEASE_HOLD",
+  "recordedDate": "2026-11-02",
+  "repository": "paulaosoriof86/orbit360-core",
+  "canonicalBranch": "recovery/fase-a-clean-20260831",
+  "canonicalBaseHead": "0fa860638809c4a8beb82c25158434bcac884d01",
+  "reviewSourceParent": "ce50d1fc6cc66ad0fc451b25f01b6aeb18aa5064",
+  "sourceCommit": "3644429f08f6bbdbec3ae023e287ad97c4616001",
+  "existingPrNumber": 160,
+  "sourceBlobs": {
+    "orbit360-platform/core/product-hydration-required-optional-p0.js": "4eb68250d46f11f1c8e9c139d03f0ec005d81401",
+    "tests/b4-003-forbidden-route-bootstrap.test.cjs": "c65385a99967719f3f3b7ef7b77580423ffaf446"
+  },
+  "regression": {
+    "path": "tests/b4-003-forbidden-route-bootstrap.test.cjs",
+    "tests": 9,
+    "passed": 9,
+    "syntheticOnly": true,
+    "serverRoleMatrixAsserted": true,
+    "predecessorRedCaseAsserted": true,
+    "noFirebaseNoWrites": true
+  },
+  "previousHostingOnlyPreview": {
+    "runId": 41339702566,
+    "sourceSha": "3644429f08f6bbdbec3ae023e287ad97c4616001",
+    "workflowResult": "SUCCESS",
+    "productionDeployment": false,
+    "chromeCarlosAdvisorCoForbiddenRouteAndColdReload": "PASS_ON_OBSERVED_CASES",
+    "client360CountryParity": "NOT_PROVEN"
+  },
+  "causalFinding": {
+    "code": "DIRECTORY_DENIED_ROUTE_PRIMARY_BOOTSTRAP_MISMATCH",
+    "rootCause": "Frontend route-primary planner trusted module query visibility while the server excluded advisor roles from the insurer directory. Cold reload promoted the forbidden collection into a required snapshot and caused a false login reset.",
+    "correction": "Use the server directory role ceiling and effective module gate to select an authorized startup collection. Preserve route denial and every backend rule.",
+    "transversalRoleBasedNotUidSpecific": true
+  },
+  "releaseBoundary": {
+    "formalI6Percent": 50,
+    "priorityP0Closed": 1,
+    "priorityP0Total": 6,
+    "temporaryRulesRiskExceptionPreserved": true,
+    "securityCertifiedPass": false,
+    "backendNegativeUidUatPass": false,
+    "restoreDrillAccepted": false,
+    "countryClient360ReconciliationPass": false,
+    "fullAuthenticatedUatPass": false,
+    "productionAuthorized": false,
+    "b4003Closed": false,
+    "dataWrites": 0,
+    "rulesAuthIamChanged": false,
+    "functionsOrLiveDeployed": false
+  },
+  "nextAction": "INTEGRATE_ONLY_AFTER_FULL_GOVERNANCE_GUARD_AND_SOURCE_REGRESSIONS_PASS; KEEP_RELEASE_HOLD"
+}
