@@ -3,7 +3,7 @@
 // Firestore writes, or real users are contacted by this test.
 const assert=require('node:assert/strict');
 const {readScopedRelatedList,readScopedRelatedDocument}=require('../functions/b4-003-scoped-related-reader');
-const {Denied}=require('../functions/b4-003-scoped-access-boundary');
+const {Denied,resolve,allowRow}=require('../functions/b4-003-scoped-access-boundary');
 const tenantId='test-tenant';
 const client=(id,pais,asesorId,extra={})=>({id,tenantId,asesorId,...(pais?{pais}:{}),...extra});
 const policy=(id,clienteId,pais,aseguradoraId,extra={})=>({id,tenantId,clienteId,pais,aseguradoraId,...extra});
@@ -61,6 +61,10 @@ const members={
  ana:{uid:'ana',tenantId,status:'active',roles:['Asesor'],countries:['GT','CO'],dataScopes:{default:'own'},advisorId:'aCO'},
  guillermo:{uid:'guillermo',tenantId,status:'active',roles:['Asesor'],countries:['GT','CO'],dataScopes:{default:'own'},advisorId:'aGT'},
  marketing:{uid:'marketing',tenantId,status:'active',roles:['Marketing'],countries:['GT','CO'],dataScopes:{default:'team'},advisorId:'aCO'},
+ opLegacyOwn:{uid:'opLegacyOwn',tenantId,status:'active',roles:['Operativo'],countries:['GT','CO'],dataScopes:{default:'own'},advisorId:'aGT'},
+ opModuleOwn:{uid:'opModuleOwn',tenantId,status:'active',roles:['Operativo'],countries:['CO'],dataScopes:{default:'own',modules:{cliente360:'own'}},advisorId:'aGT'},
+ opModuleNone:{uid:'opModuleNone',tenantId,status:'active',roles:['Operativo'],countries:['CO'],dataScopes:{default:'all',modules:{cliente360:'none'}},advisorId:'aCO'},
+ opRestricted:{uid:'opRestricted',tenantId,status:'active',roles:['Operativo'],countries:['CO'],modulesRestricted:['cliente360'],dataScopes:{default:'all'},advisorId:'aCO'},
  blocked:{uid:'blocked',tenantId,status:'blocked',roles:['Operativo'],countries:['GT','CO'],dataScopes:{default:'all'},advisorId:'aCO'}
 };
 const config={roleScopes:{operativo:'all',direccion:'all',asesor:'own',marketing:'team'}};
@@ -105,6 +109,10 @@ const denied=async(fn,code)=>assert.rejects(fn,e=>e instanceof Denied&&e.code===
   const expected=['coAmbiguous','coCountryAlias','coExplicit','coMissing','coOtherAdvisor','coPolicyAlias'];
   const carlos=await list('carlos','Operativo','CO');
   assert.deepEqual(ids(carlos),expected,'one transversal list reconciles all verified CO clients');checks++;
+  assert.deepEqual(ids(await list('opLegacyOwn','Operativo','CO')),expected,
+   'Every Operativo, including legacy default=own members, reads the same country catalog');checks++;
+  assert.deepEqual(ids(await list('opModuleOwn','Operativo','CO')),expected,
+   'Legacy cliente360=own is superseded for all Operativo client reads');checks++;
   assert.equal(carlos.anchoring,'server_verified_explicit_or_complete_insurer_country_and_advisor');checks++;
   assert.ok(carlos.rows.every(row=>row.pais==='CO'&&row.country==='CO'&&row.paisEfectivo==='CO'));checks++;
   assert.equal(carlos.rows.find(c=>c.id==='coMissing').paisOrigenEfectivo,'aseguradora_verificada');checks++;
@@ -126,12 +134,28 @@ const denied=async(fn,code)=>assert.rejects(fn,e=>e instanceof Denied&&e.code===
   assert.equal(coThird.nextCursor,null);checks++;
   await denied(()=>list('ana','Asesor','CO',{cursor:'coOtherAdvisor'}),'CURSOR_DENIED');checks++;
   await denied(()=>list('marketing','Marketing','CO'),'MODULE_DENIED');checks++;
+  await denied(()=>list('opModuleNone','Operativo','CO'),'SCOPE_NONE');checks++;
+  await denied(()=>list('opRestricted','Operativo','CO'),'MODULE_DENIED');checks++;
+  await denied(()=>list('opModuleOwn','Operativo','GT'),'COUNTRY_DENIED');checks++;
   await denied(()=>list('blocked','Operativo','CO'),'MEMBERSHIP_DENIED');checks++;
   await denied(()=>list('ana','Operativo','CO'),'ROLE_DENIED');checks++;
   await denied(()=>readScopedRelatedList({db,auth:{uid:'carlos',token:{giActiveRole:'asesor'}},
    request:{tenantId,collection:'clientes',activeRole:'Operativo',country:'CO'}}),
    'SIGNED_ACTIVE_ROLE_MISMATCH');checks++;
   await denied(()=>doc('ana','Asesor','CO','coOtherAdvisor'),'RECORD_NOT_FOUND_OR_DENIED');checks++;
+  const scopeFor=(uid,collection='clientes',policy=config)=>resolve({auth:{uid,token:{}},
+   member:members[uid],config:policy,tenantId,activeRole:'Operativo',collection,country:'CO'});
+  assert.equal(scopeFor('opLegacyOwn').scope,'all');checks++;
+  assert.equal(scopeFor('opModuleOwn').scope,'all');checks++;
+  assert.equal(scopeFor('opLegacyOwn','polizas').scope,'own',
+   'Other collections retain their former member scope');checks++;
+  assert.equal(scopeFor('opModuleOwn','reclamos').scope,'own',
+   'Another collection sharing module cliente360 must not widen');checks++;
+  assert.equal(scopeFor('opLegacyOwn','clientes',{roleScopes:{operativo:'team'}}).scope,'own',
+   'Explicit central role ceiling not silently overridden');checks++;
+  assert.equal(allowRow(scopeFor('opLegacyOwn'),{tenantId,pais:'CO',asesorId:'aOther'}),true);checks++;
+  assert.throws(()=>allowRow(scopeFor('opLegacyOwn'),{tenantId,pais:'GT',asesorId:'aOther'}),
+   e=>e instanceof Denied&&e.code==='COUNTRY_DENIED');checks++;
   assert.equal((await doc('ana','Asesor','CO','coPolicyAlias')).row.pais,'CO',
    'individual read recognizes legacy clientId/insurerId policy aliases');checks++;
   assert.equal((await doc('ana','Asesor','CO','coExplicit')).row.pais,'CO',
@@ -159,6 +183,6 @@ const denied=async(fn,code)=>assert.rejects(fn,e=>e instanceof Denied&&e.code===
   else process.env.GRAVICENTRA_B4_003_CLIENT_LIST_RECONCILE_READONLY=previous;
  }
  console.log('B4_003_TRANSVERSAL_CLIENT_LIST_READONLY_PASS checks='+checks+
-  ' synthetic_uids=6 roles=4 countries=2 explicit_and_insurer_fallback=true cross_tenant_advisor_denied=true');
+  ' synthetic_uids='+Object.keys(members).length+' roles=4 countries=2 explicit_and_insurer_fallback=true cross_tenant_advisor_denied=true');
  console.log('B4_003_CLIENT_LIST=SOURCE_PASS_PREVIEW_UNVERIFIED B4_003_PRODUCTION=NO_GO writes=0');
 })().catch(e=>{console.error(e);process.exitCode=1;});

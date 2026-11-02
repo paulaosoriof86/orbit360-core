@@ -1,0 +1,97 @@
+{
+  "schema": "GRAVICENTRA_I65_B4003_OPERATIVO_CLIENT_READ_AND_INDEX_DRYRUN_SUCCESSOR_V1",
+  "repository": "paulaosoriof86/orbit360-core",
+  "canonicalBranch": "recovery/fase-a-clean-20260831",
+  "recordedDate": "2026-11-02",
+  "gate": "I6.5/B4-003",
+  "status": "SOURCE_MULTIPLE_UID_ROLE_COUNTRY_REGRESSIONS_PASS_REAL_INDEX_DRYRUN_AND_AUTHENTICATED_PREVIEW_PENDING_RELEASE_HOLD",
+  "canonicalParentHead": "a318f8a75ae40e00f9a9d03612916fc4af80fa6d",
+  "sourceCommit": "965c745105333aef2f731e064599c40360a8552e",
+  "sourceTree": "4fedd7890f0f0972a7d1b1d348ecd531aeb38485",
+  "sourceFilesChanged": 10,
+  "rootCause": [
+    "The original server client read scope inherited per-member own/team despite an affirmative tenant Operativo=all role policy, while the same role could read all policies.",
+    "The product-side Cliente 360 query plan independently reused the legacy member scope.",
+    "The physical protected country index uses raw client.pais rather than complete, insurer-verified effective country; 64 clients are recoverable by read inference."
+  ],
+  "rolePolicyDecision": {
+    "authorization": "User approved transversal Operativo all-client READ in each authorized country on 2026-11-02, Asesor own unchanged.",
+    "collection": "clientes",
+    "role": "Operativo",
+    "scope": "all",
+    "preconditions": [
+      "active server-owned membership and assigned/signed role",
+      "affirmative central roleScopes.operativo=all policy",
+      "cliente360 module not restricted or explicitly ver=false",
+      "explicit per-module scope none remains denied",
+      "requested country belongs to membership; tenant isolation verified"
+    ],
+    "unchanged": [
+      "Asesor own scope",
+      "polizas and all other collection read scopes",
+      "all write authorizations and direct Firestore rules",
+      "tenants, countries, roles and restricted modules"
+    ]
+  },
+  "sourceQa": {
+    "clientCountryAuthoritySyntheticChecks": 38,
+    "clientListTransversalSyntheticChecks": 39,
+    "frontBackReadParitySyntheticChecks": 35,
+    "countryIndexDryrunSyntheticCases": 18,
+    "relatedReaderSyntheticChecks": 132,
+    "effectiveRouteRuleMatrixSyntheticChecks": 66,
+    "effectiveProductSmokeCatalogSyntheticChecks": 51,
+    "repositoryCoreTestsPassed": 14,
+    "firestoreEmulatorSourceFixtureUpdated": true,
+    "firestoreEmulatorActuallyExecuted": false,
+    "realMultiUidUatActuallyExecuted": false,
+    "dataWrites": 0
+  },
+  "priorRealEvidenceImmutable": {
+    "exactPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PHYSICAL_POLICY_CLIENT_INSURER_JOIN_AGGREGATE_20261102.json",
+    "physicalClients": 443,
+    "physicalPolicies": 1425,
+    "physicalInsurers": 33,
+    "insurerInferredClients": 64,
+    "countryUnresolvedClients": 3,
+    "physicalPolicyReferencesMissingClients": 3,
+    "scopeAsymmetryPreviouslyObserved": true,
+    "reflectsPreviousSourceOnly": true
+  },
+  "countryIndexDryrun": {
+    "script": "tools/gravicentra-b4-003-client-country-index-dryrun-readonly.cjs",
+    "mode": "--real-readonly",
+    "projectAllowlist": "ays-orbit-360-lab",
+    "tenantAllowlist": "alianzas-soluciones",
+    "boundedPhysicalReadOnly": true,
+    "exportsOnlyAggregatesNoIdentifiers": true,
+    "realRunCompleted": false,
+    "executablePatchesExported": false,
+    "applyAuthorized": false,
+    "migrationPrerequisites": [
+      "one fresh exact count and no-PII diff report",
+      "verified backup with restore and rollback plan",
+      "separate explicit approval for each physical update set",
+      "authenticated GT/CO and Asesor/Operativo/Direccion UAT",
+      "independent wrong UID, tenant, role, country and module negative UAT"
+    ]
+  },
+  "releaseHold": {
+    "productionAuthorized": false,
+    "B4003Closed": false,
+    "formalI6Percent": 50,
+    "priorityP0Closed": 1,
+    "priorityP0Total": 6,
+    "currentGlobalImplementationPercent": null,
+    "hostingPreviewVerified": false,
+    "independentBackendNegativeUidUatPassed": false,
+    "firestoreRulesP0Closed": false,
+    "restoreDrillAccepted": false,
+    "sevenAdvisorsClassified": false,
+    "dataWrites": 0,
+    "rulesAuthIamMutations": false,
+    "liveHostingDeployed": false,
+    "liveFunctionsDeployed": false
+  },
+  "nextAction": "Merge this guarded source into ONE canonical candidate; run physical read-only index delta; deploy isolated Preview only after controlled release-workflow authorization and execute signed role-country UAT; no mass write or LIVE release."
+}

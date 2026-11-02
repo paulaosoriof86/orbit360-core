@@ -1,3 +1,6 @@
+import {runB4003OperativoClientReadSuccessorGuard} from './gravicentra-b4-003-operativo-client-read-successor.mjs';
+if (runB4003OperativoClientReadSuccessorGuard()) process.exit(0);
+
 import {runB4003PhysicalJoinEvidenceSuccessorGuard} from './gravicentra-b4-003-physical-join-evidence-successor.mjs';
 if (runB4003PhysicalJoinEvidenceSuccessorGuard()) process.exit(0);
 

@@ -66,7 +66,7 @@ test('advisor required no platforms',()=>assert.equal(a.requiredCollections.some
 test('advisor bank compile direct allowed',()=>assert.equal(api.compileCollection('cuentasBancariasAseguradora',asesor,opts).ok,true));
 test('operativo bank compile direct allowed',()=>assert.equal(api.compileCollection('cuentasBancariasAseguradora',operativo,opts).ok,true));
 test('advisor own constraint',()=>assert.ok(a.requiredCollections.find(x=>x.collection==='clientes').constraints.some(x=>x.field==='advisorId')));
-test('operativo team constraint',()=>assert.ok(o.requiredCollections.find(x=>x.collection==='clientes').constraints.some(x=>x.field==='teamId')));
+test('operativo client catalog all within tenant and country',()=>assert.equal(o.requiredCollections.find(x=>x.collection==='clientes').constraints.some(x=>['advisorId','teamId'].includes(x.field)),false));
 test('direction no scope field',()=>assert.equal(d.requiredCollections.find(x=>x.collection==='clientes').constraints.some(x=>['advisorId','teamId'].includes(x.field)),false));
 test('all required have tenant',()=>assert.ok([...d.requiredCollections,...o.requiredCollections,...a.requiredCollections].every(x=>x.constraints.some(c=>c.field==='tenantId'))));
 test('all required have country',()=>assert.ok([...d.requiredCollections,...o.requiredCollections,...a.requiredCollections].every(x=>x.constraints.some(c=>c.field==='country'))));

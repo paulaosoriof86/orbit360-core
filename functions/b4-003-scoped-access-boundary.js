@@ -79,12 +79,19 @@ function resolve({auth,member,config,tenantId,activeRole,collection,country}){
   // Asesor's cancellation permission is read-own only. Explicit role matrix
   // denial or user restriction still prevails. No tenant-wide advisor grants.
   if(collection==='cancelaciones'&&!full.has(role)&&!self.has(role))deny('MODULE_DENIED');
-  const ds=m.dataScopes||{},requested=scope(get(ds.modules,moduleKey)||ds.default||m.scopeDatos||m.dataScope);
+  const ds=m.dataScopes||{},moduleRequested=scope(get(ds.modules,moduleKey));
+  const requested=scope(get(ds.modules,moduleKey)||ds.default||m.scopeDatos||m.dataScope);
   const configured=scope(get(config?.roleScopes,role));
   const maxScope=self.has(role)?'own':teamScopedRoles.has(role)?'team':(configured||'none');
   const ceiling=configured&&order[configured]<order[maxScope]?configured:maxScope;
   effective=requested?(order[requested]<=order[ceiling]?requested:ceiling):
     (configured?ceiling:(collection==='cancelaciones'&&self.has(role)?'own':'none'));
+  // The tenant's affirmative Operativo=all policy owns CLIENT READ scope.
+  // Legacy per-member own/team/default scopes cannot make Cliente 360 narrower
+  // than the policy list while policies are all. Do not widen other collections,
+  // explicit module `none`, module restrictions, countries or tenant boundaries.
+  if(collection==='clientes'&&role==='operativo'&&configured==='all'&&moduleRequested!=='none')
+    effective='all';
  }
  if(effective==='none')deny('SCOPE_NONE');
  const advisor=clean(m.advisorId||m.asesorId);
