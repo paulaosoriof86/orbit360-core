@@ -1,0 +1,42 @@
+{
+  "schema": "GI_I6_5_B4_003_E4_TRANSVERSAL_SOURCE_SUCCESSOR_V1",
+  "recordedAt": "2026-11-02",
+  "lineage": {
+    "canonicalRepo": "paulaosoriof86/orbit360-core",
+    "canonicalBranch": "recovery/fase-a-clean-20260831",
+    "singleProductCandidate": true,
+    "previousCertifiedSourceSha": "9d1839da8717757baf9adbf1fdfad83cddc41791",
+    "historicalPilotE4Evidence": "PILOTV6_E4_CT01_CT02_20261009_CLOSURE.json",
+    "sourceFile": "orbit360-platform/modules/reportes.js",
+    "testFile": "tools/gravicentra-b4-003-reportes-e4-transversal.test.cjs"
+  },
+  "causalFailuresCorrectedInSource": [
+    "Year selection previously searched presentation cells, so policy number or customer text contaminated time scope and a real 2026 date with no visible date cell was dropped",
+    "All six report types previously filtered only client domicile, so a Colombian policy or insurer could appear in Guatemala",
+    "Generic display-string parsing added policy identifiers, receipt numbers and percentages as money",
+    "Policy references without a physical client and policy-insurer country contradictions were silently included in quantitative totals"
+  ],
+  "crossCuttingContract": {
+    "country": "Policy with verified insurer-country consistency; insurer fallback when policy country absent/invalid; policy-linked child must agree with parent; unresolved/orphan references quarantined with visible count",
+    "year": "Actual ISO date or period on the underlying record, with explicit semantics for each report type; unknown years are not invented",
+    "money": "Only designated financial measures from raw source fields, matched to the filtered country's currency; GTQ/COP never summed together; incomplete sums flagged",
+    "scope": "The same rule across Produccion, Cartera, Comisiones, Renovaciones, Siniestros and Cancelaciones",
+    "dataMutation": false,
+    "privilegeMutation": false,
+    "historicalCertificationsInvalidated": false
+  },
+  "localEvidence": {
+    "e4SourceTests": 5,
+    "e4SourceTestResult": "PASS_SYNTHETIC_ONLY",
+    "relatedCountryAndCrossModuleSuites": 4,
+    "relatedSuitesResult": "PASS_SYNTHETIC_ONLY"
+  },
+  "gatesStillPending": [
+    "Merge exact source to canonical recovery branch and verify CI",
+    "Publish new expiring LAB Preview based on merged source and verify served bytes",
+    "Authenticated CT01 and CT02 two-UID GT/CO/TODOS year/grouping export UAT on the same Preview",
+    "Reconcile denominator, dates and currencies with physical source before treating E4 as quantitative thesis evidence"
+  ],
+  "pilotE4Status": "SOURCE_FIXED_UAT_PENDING",
+  "production": "HOLD"
+}
