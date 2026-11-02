@@ -1,0 +1,114 @@
+name: Gravicentra B4-003 Physical Client-Policy-Insurer Join (Read Only)
+
+on:
+  push:
+    branches: [recovery/fase-a-clean-20260831]
+    paths:
+      - .github/workflows/gravicentra-b4-003-client-country-physical-readonly-20261102.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: gravicentra-b4003-client-physical-readonly
+  cancel-in-progress: false
+
+jobs:
+  physical-join-aggregate-only:
+    if: github.repository == 'paulaosoriof86/orbit360-core' && github.ref == 'refs/heads/recovery/fase-a-clean-20260831'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    env:
+      PROJECT_ID: ays-orbit-360-lab
+      SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      B4_003_JOIN_AUDIT_OUT: ${{ runner.temp }}/b4-003-physical-join-aggregate.json
+    steps:
+      - name: Checkout the exact canonical source (never a second release candidate)
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Verify source and read-only scope
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "${GITHUB_SHA}"
+          test "${GITHUB_REF_NAME}" = 'recovery/fase-a-clean-20260831'
+          node --check tools/gravicentra-b4-003-policy-client-join-audit-readonly.cjs
+          node --check functions/b4-003-scoped-related-reader.js
+          node tools/gravicentra-b4-003-client-list-transversal-readonly.test.cjs
+          node tools/gravicentra-b4-003-client-country-authority.test.cjs
+          timeout -k 3s 35s node tools/gravicentra-i6-control-plane-guard-v1.mjs --mode=i6
+
+      - name: Resolve existing LAB reader credentials without logging secrets
+        shell: bash
+        run: |
+          set -euo pipefail
+          node - <<'NODE'
+          const fs=require('node:fs'),path=require('node:path');
+          const candidates=['SA_ORBIT360_LAB','SA_ORBIT_360_LAB','SA_DEFAULT'];
+          let selected=null;
+          for(const key of candidates){
+            try{
+              const value=JSON.parse(process.env[key]||'');
+              if(value.type==='service_account'&&value.project_id===process.env.PROJECT_ID&&
+                 typeof value.private_key==='string'&&value.private_key.includes('PRIVATE KEY')){
+                selected=value;break;
+              }
+            }catch(_){/* Missing/invalid secret never printed. */}
+          }
+          if(!selected)throw Error('LAB_SERVICE_ACCOUNT_NOT_CONFIGURED');
+          const credential=path.join(process.env.RUNNER_TEMP,'b4-003-physical-readonly-credential.json');
+          fs.writeFileSync(credential,JSON.stringify(selected),{mode:0o600,flag:'wx'});
+          fs.appendFileSync(process.env.GITHUB_ENV,'GOOGLE_APPLICATION_CREDENTIALS='+credential+'\n');
+          console.log('LAB_READER_PROJECT_CONFIRMED credentials_redacted=true');
+          NODE
+
+      - name: Install the pinned admin read-only client
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund firebase-admin@13.4.0 >/dev/null
+
+      - name: Execute one bounded physical join and export aggregates only
+        shell: bash
+        run: |
+          set -euo pipefail
+          timeout -k 3s 180s node tools/gravicentra-b4-003-policy-client-join-audit-readonly.cjs --real-readonly
+          test -s "$B4_003_JOIN_AUDIT_OUT"
+          node - <<'NODE'
+          const fs=require('node:fs'),report=JSON.parse(fs.readFileSync(process.env.B4_003_JOIN_AUDIT_OUT,'utf8'));
+          if(report.project!==process.env.PROJECT_ID||report.tenant!=='alianzas-soluciones'||
+             report.schema!=='GRAVICENTRA_B4_003_PHYSICAL_POLICY_CLIENT_JOIN_READONLY_V1'||
+             report.writes!==0||report.authWrites!==0||report.securityChanges!==0||
+             report.gate!=='B4_003_HOLD'||report.production!=='NO_GO')
+            throw Error('AUDIT_CONTRACT_OR_RELEASE_HOLD_INVALID');
+          const c=report.counts,j=report.physicalJoin;
+          fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY,
+            '### B4-003 – auditoría física solo lectura\n'+
+            '- Clientes físicos: '+c.clients+'; pólizas: '+c.policies+'; aseguradoras: '+c.insurers+'\n'+
+            '- Pólizas sin documento de cliente: '+j.physicalClientMissing+'\n'+
+            '- Clientes distintos no encontrados físicamente: '+c.distinctMissingPhysicalClientRefs+'\n'+
+            '- Relaciones elegibles para inferencia por aseguradora: '+j.linkedClientInsurerFallbackEligible+'\n'+
+            '- Registros con país no resuelto: '+j.linkedClientCountryUnresolved+'\n'+
+            '- Producción: **NO-GO**. No se modificaron datos, reglas, identidades ni Hosting.\n');
+          console.log('B4_003_PHYSICAL_READONLY_AUDIT_PASS aggregate_only=true user_identifiers_exported=false');
+          NODE
+
+      - name: Preserve non-identifying result for source reconciliation
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gravicentra-b4003-physical-join-aggregate-${{ github.run_id }}
+          path: ${{ runner.temp }}/b4-003-physical-join-aggregate.json
+          if-no-files-found: ignore
+          retention-days: 30

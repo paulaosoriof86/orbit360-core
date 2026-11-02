@@ -9,18 +9,24 @@ const clean=v=>String(v==null?'':v).trim();
 const country=v=>String(v==null?'':v).trim().toUpperCase();
 const increment=(obj,key)=>{obj[key]=(obj[key]||0)+1;};
 const permitted=(ctx,row)=>{try{return !!allowRow(ctx,row);}catch(e){if(e instanceof Denied)return false;throw e;}};
-const roleList=member=>[...new Set([...(member.roles||[]),...(member.rolesAsignados||[]),
- member.rol,member.role,member.defaultRole].map(clean).filter(Boolean))];
+const asArray=value=>Array.isArray(value)?value:value==null?[]:[value];
+const roleList=member=>[...new Set([...asArray(member.roles),...asArray(member.rolesAsignados),
+ member.rol,member.role,member.defaultRole,member.rolDefault].map(clean).filter(Boolean))];
 function auditDataset({clients=[],policies=[],insurers=[],members=[],config={},tenantId=TENANT}){
  const byClient=new Map(clients.map(c=>[clean(c.id),c]));
  const byInsurer=new Map(insurers.map(a=>[clean(a.id),a]));
  const linked=new Map();
+ const missingPhysicalIds=new Set(),referencedClientIds=new Set();
  for(const p of policies){const id=clean(p.clienteId||p.clientId);if(!linked.has(id))linked.set(id,[]);linked.get(id).push(p);}
- const authority=new Map(),clientCountries={explicit:{},inferred:{},unresolved:{}};
+ const authority=new Map(),clientCountries={explicit:{},inferred:{},unresolved:{},
+   readProjectionBoundExceeded:0};
  for(const client of clients){
-   const result=resolveClientCountry({client,clientId:clean(client.id),tenantId,
+   const clientId=clean(client.id);
+   const result=resolveClientCountry({client,clientId,tenantId,
      policies:linked.get(clean(client.id))||[],insurers:byInsurer,completePolicySet:true});
    authority.set(clean(client.id),result);
+   if(clientCountryNeedsInsurer(client)&&(linked.get(clientId)||[]).length>100)
+    clientCountries.readProjectionBoundExceeded++;
    const type=result.status==='unresolved'?'unresolved':result.source==='insurer'?'inferred':'explicit';
    increment(clientCountries[type],type==='unresolved'?result.reason:result.country);
  }
@@ -30,8 +36,9 @@ function auditDataset({clients=[],policies=[],insurers=[],members=[],config={},t
  for(const p of policies){
    const id=clean(p.clienteId||p.clientId);
    if(!id){join.clientIdMissing++;continue;}
+   referencedClientIds.add(id);
    const client=byClient.get(id);
-   if(!client){join.physicalClientMissing++;continue;}
+   if(!client){join.physicalClientMissing++;missingPhysicalIds.add(id);continue;}
    const result=authority.get(id);
    if(result.status!=='resolved'){join.linkedClientCountryUnresolved++;continue;}
    if(result.source==='insurer'){join.linkedClientInsurerFallbackEligible++;continue;}
@@ -72,24 +79,25 @@ function auditDataset({clients=[],policies=[],insurers=[],members=[],config={},t
        if(actual.status!=='resolved'){m.policyLinks.clientUnresolved++;continue;}
        if(actual.country!==selectedCountry){m.policyLinks.clientOtherCountry++;continue;}
        if(!cc){m.policyLinks.clientWrongAdvisorOrModule++;continue;}
-       if(clientCountryNeedsInsurer(client)){
-         const resolved={...client,pais:actual.country,country:actual.country};
-         if(permitted(cc,resolved))m.policyLinks.clientRequiresCountryIndex++;
-         else m.policyLinks.clientWrongAdvisorOrModule++;
-       }else if(permitted(cc,client))m.policyLinks.clientReadable++;
-       else m.policyLinks.clientWrongAdvisorOrModule++;
+       const resolved={...client,pais:actual.country,country:actual.country};
+       if(!permitted(cc,resolved))m.policyLinks.clientWrongAdvisorOrModule++;
+       else if(country(client.pais)!==selectedCountry)m.policyLinks.clientRequiresCountryIndex++;
+       else m.policyLinks.clientReadable++;
      }
    }
  }
  return {schema:'GRAVICENTRA_B4_003_PHYSICAL_POLICY_CLIENT_JOIN_READONLY_V1',
    project:PROJECT,tenant:tenantId,mode:'PHYSICAL_READ_AGGREGATES_AND_SYNTHETIC_SCOPE_EVALUATION',
    counts:{clients:clients.length,policies:policies.length,insurers:insurers.length,
-     memberships:members.length,roleCountryContexts:verifiedRoleCountryContexts},
+     memberships:members.length,roleCountryContexts:verifiedRoleCountryContexts,
+     distinctPolicyClientRefs:referencedClientIds.size,
+     distinctMissingPhysicalClientRefs:missingPhysicalIds.size},
    clientCountryAuthority:clientCountries,physicalJoin:join,
    effectiveScopeMatrix:[...matrices.values()].sort((a,b)=>
      [a.role,a.country,a.policyScope,a.clientScope].join('|').localeCompare(
        [b.role,b.country,b.policyScope,b.clientScope].join('|'))),
    caveats:['Admin SDK does not prove signed token authorization',
+     'Effective-scope matrix policy/link counts are member-context evaluations, not globally distinct records',
      'Historical policy ownership may differ from current client ownership',
      'Valid client country is not overwritten by insurer country',
      'Insurer-inferred country is not yet indexed by the protected list query'],
@@ -109,7 +117,10 @@ async function runReadOnly(){
  const fetch=async collection=>{
    const ss=await tenant.collection('data').doc(collection).collection('items').limit(5001).get();
    if(ss.size>5000)throw Error('READONLY_COLLECTION_BOUND_EXCEEDED');
-   return ss.docs.map(d=>({...(d.data()||{}),id:d.id}));
+   return ss.docs.map(d=>{
+    const row=d.data()||{};
+    return {...row,id:d.id,_sourceIdMismatch:!!(row.id&&clean(row.id)!==clean(d.id))};
+   });
  };
  const [clients,policies,insurers,membersSnap,accessSnap]=await Promise.all([
    fetch('clientes'),fetch('polizas'),fetch('aseguradoras'),

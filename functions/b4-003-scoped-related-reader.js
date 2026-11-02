@@ -3,6 +3,7 @@
 // Read-only. Preview-only candidate; NO Firebase export or rule deploy.
 const {resolve,allowRow,Denied}=require('./b4-003-scoped-access-boundary');
 const {clientCountryNeedsInsurer,resolveClientCountry}=require('./b4-003-client-country-authority');
+const {projectScopedClientList}=require('./b4-003-client-country-list-projection');
 const collections=new Set(['clientes','vehiculos','recibosEsperados','carteraPrimas','cobros','comisiones','finmovs','tareas','negocios','gestiones','actividades','metas','cancelaciones','reclamos','auditoria']);
 const workflowCollections=new Set(['negocios','gestiones','actividades']);
 const financeCollections=new Set(['vehiculos','recibosEsperados','carteraPrimas','cobros','comisiones']);
@@ -28,22 +29,37 @@ function docRef(tenant,collection,id){
  return tenant.collection('data').doc(collection).collection('items').doc(id);
 }
 async function verifiedClientCountryView(ctx,tenant,client,id){
- if(!clientCountryNeedsInsurer(client))return client;
+ if(!clientCountryNeedsInsurer(client)){
+  const resolved=resolveClientCountry({client,clientId:id,tenantId:ctx.tenantId,
+   policies:[],insurers:new Map(),completePolicySet:false});
+  if(resolved.status!=='resolved')throw new Denied('CLIENT_COUNTRY_UNRESOLVED');
+  return {...client,pais:resolved.country,country:resolved.country,
+   paisEfectivo:resolved.country,paisOrigenEfectivo:'cliente_explicito'};
+ }
  // A country inference is only safe after examining *every* linked policy,
  // including policies not visible to the active advisor. No such policy is
  // returned to the caller; only the final client authorization is projected.
  const MAX_POLICIES=100;
  const target=tenant.collection('data').doc('polizas').collection('items');
- const ss=await target.where('clienteId','==',id).limit(MAX_POLICIES+1).get();
- const docs=Array.isArray(ss.docs)?ss.docs:[];
+ const [primary,alias]=await Promise.all([
+  target.where('clienteId','==',id).limit(MAX_POLICIES+1).get(),
+  target.where('clientId','==',id).limit(MAX_POLICIES+1).get()
+ ]);
+ const docs=[...new Map([...(primary.docs||[]),...(alias.docs||[])]
+  .map(d=>[d.id,d])).values()];
  if(!docs.length||docs.length>MAX_POLICIES)throw new Denied('CLIENT_COUNTRY_RELATION_UNRESOLVED');
- const policies=docs.map(d=>d.data()||{}),ids=[...new Set(policies.map(p=>clean(p.aseguradoraId||p.insurerId)).filter(Boolean))];
+ const policies=docs.map(d=>{
+  const row=d.data()||{};
+  return {...row,_sourceIdMismatch:!!(row.id&&clean(row.id)!==clean(d.id))};
+ }),ids=[...new Set(policies.map(p=>clean(p.aseguradoraId||p.insurerId)).filter(Boolean))];
  if(!ids.length||ids.length>MAX_POLICIES)throw new Denied('CLIENT_INSURER_UNRESOLVED');
  const insurers=new Map();
  for(let i=0;i<ids.length;i+=10){
    const batch=await Promise.all(ids.slice(i,i+10).map(async insurerId=>{
      const snap=await docRef(tenant,'aseguradoras',safeId(insurerId,'INSURER')).get();
-     return [insurerId,snap.exists?snap.data()||{}:null];
+     if(!snap.exists)return [insurerId,null];
+     const row=snap.data()||{};
+     return [insurerId,{...row,_sourceIdMismatch:!!(row.id&&clean(row.id)!==insurerId)}];
    }));
    batch.forEach(([key,value])=>insurers.set(key,value));
  }
@@ -262,6 +278,49 @@ async function readScopedRelatedList({db,auth,request}){
  const ctx=resolve({auth,member:ms.data()||{},config:cs.exists?cs.data()||{}:{},
    tenantId,activeRole:role,country,collection:coll});
  const target=tenant.collection('data').doc(coll).collection('items');
+
+ // The indexed `where(pais == country)` query cannot return a physically
+ // present client with missing/ambiguous country. Reconcile every client with
+ // its complete insurer links, then authorize each *projected client* against
+ // the server-resolved role, country and advisor. This bounded read-only path
+ // requires an explicit server environment gate on a dedicated preview
+ // callable: the existing indexed production reader remains fast and unchanged
+ // until a materialized country index is independently verified.
+ if(coll==='clientes'&&process.env.GRAVICENTRA_B4_003_CLIENT_LIST_RECONCILE_READONLY==='true'){
+  if(policyId||hasBatch)throw new Denied('POLICY_ANCHOR_UNEXPECTED');
+  const MAX_CLIENTS=2500,MAX_POLICIES=5000,MAX_INSURERS=1000;
+  const clientSnap=await target.orderBy('__name__').limit(MAX_CLIENTS+1).get();
+  const clientDocs=Array.isArray(clientSnap.docs)?clientSnap.docs:[];
+  if(clientDocs.length>MAX_CLIENTS)throw new Denied('CLIENT_CATALOG_SCAN_BOUND_EXCEEDED');
+  const clientRows=clientDocs.map(d=>{
+   const row=d.data()||{};
+   return {...row,id:d.id,_sourceIdMismatch:!!(row.id&&clean(row.id)!==clean(d.id))};
+  });
+  let policies=[],insurers=[];
+  if(clientRows.some(clientCountryNeedsInsurer)){
+   const fetch=async(name,bound)=>{
+    const snap=await tenant.collection('data').doc(name).collection('items')
+     .orderBy('__name__').limit(bound+1).get();
+    const docs=Array.isArray(snap.docs)?snap.docs:[];
+    if(docs.length>bound)throw new Denied('CLIENT_COUNTRY_'+name.toUpperCase()+'_SCAN_BOUND_EXCEEDED');
+    return docs.map(d=>{
+     const row=d.data()||{};
+     return {...row,id:d.id,_sourceIdMismatch:!!(row.id&&clean(row.id)!==clean(d.id))};
+    });
+   };
+   [policies,insurers]=await Promise.all([
+    fetch('polizas',MAX_POLICIES),fetch('aseguradoras',MAX_INSURERS)
+   ]);
+  }
+  const authorized=projectScopedClientList({clients:clientRows,policies,insurers,tenantId,ctx});
+  const after=cursor?authorized.findIndex(row=>row.canonicalDocumentId===cursor):-1;
+  if(cursor&&after<0)throw new Denied('CURSOR_DENIED');
+  const rows=authorized.slice(after+1,after+1+pageSize);
+  return {ok:true,serverScoped:true,collection:coll,country,scope:ctx.scope,rows,
+   nextCursor:authorized.length>after+1+pageSize?
+    rows[rows.length-1].canonicalDocumentId:null,
+   anchoring:'server_verified_explicit_or_complete_insurer_country_and_advisor'};
+ }
 
 
  if(scopedOperationalCollections.has(coll)){
@@ -618,6 +677,8 @@ async function readScopedRelatedList({db,auth,request}){
    query=hasBatch?target.where('polizaId','in',policyIds):target.where('polizaId','==',policyId);
  }
  function checkedRow(row,documentId){
+   if(coll==='clientes'&&row.id&&clean(row.id)!==documentId)
+    throw new Denied('CLIENT_RECORD_ID_MISMATCH');
    let parent=null,relatedClient=null;
    if(coll!=='clientes'&&!workflowCollections.has(coll)){
      const linked=clean(row.polizaId||row.policyId);
