@@ -42,6 +42,15 @@ Orbit.modules.polizas = (function () {
   window.addEventListener('orbit:store:emit', event => {
     const collection = event && event.detail && event.detail.collection;
     if (!collection || ['*','polizas','clientes','vehiculos','aseguradoras','asesores'].includes(collection)) invalidateIndexes();
+    // B4-003: the adviser directory is a live cross-module dependency. It may
+    // arrive after the first policy paint; an invalidated cache by itself does
+    // not repaint the table/filter. Never require a detour through Equipo.
+    if (!collection || collection === '*' || collection === 'asesores') {
+      const host = document.getElementById && document.getElementById('host');
+      if (host && host.isConnected && host.querySelector &&
+          (host.querySelector('[data-polizas-kpi-ready]') || host.querySelector('[data-polizas-relations-loading]')))
+        rerender(host);
+    }
   });
   document.addEventListener('orbit:session', invalidateIndexes);
 
@@ -110,6 +119,9 @@ Orbit.modules.polizas = (function () {
     const clients = S().all('clientes') || [];
     const insurers = S().all('aseguradoras') || [];
     const advisors = S().all('asesores') || [];
+    const readStatus=S()&&typeof S()._productStatus==='function'?S()._productStatus()||{}:{};
+    const advisorDirectoryReady=!S()||typeof S()._productStatus!=='function'||
+      (readStatus.serverConfirmedCollections||[]).includes('asesores');
     const clientsById = new Map();
     clients.forEach(c => { if (c && c.id != null) clientsById.set(c.id, c); });
     const insurersById = new Map(insurers.filter(x=>x&&x.id!=null).map(x=>[x.id,x]));
@@ -118,7 +130,7 @@ Orbit.modules.polizas = (function () {
     const insurerOptions=insurers.filter(a=>a&&a.id!=null).map(a=>({v:a.id,t:a.nombre||a.displayName||a.id}));
     const advisorOptions=advisors.filter(a=>a&&a.id!=null).map(a=>({v:a.id,t:a.nombre||a.id}));
     indexCache = {
-      policies, clientsById, insurersById, advisorsById,
+      policies, clientsById, insurersById, advisorsById, advisorDirectoryReady,
       ramoOptions, insurerOptions, advisorOptions,
       basicSearchIndex:null, vehicleSearchIndex:null
     };
@@ -206,7 +218,9 @@ Orbit.modules.polizas = (function () {
     return '<span style="display:flex;align-items:center;gap:7px"><span class="dot-s" style="background:'+U.esc(a.color||'')+'"></span>'+U.esc(a.nombre||a.displayName||'—')+'</span>';
   }
   function advisorCell(id,I) {
-    const a=I.advisorsById.get(id); if(!a) return '—';
+    if (!id) return '<span class="muted">Sin asesor en póliza</span>';
+    const a=I.advisorsById.get(id);
+    if(!a) return '<span class="muted">'+(I.advisorDirectoryReady?'Asesor sin coincidencia':'Confirmando asesor…')+'</span>';
     return '<span style="display:flex;align-items:center;gap:7px"><span class="dot-s" style="background:'+U.esc(a.color||'')+'"></span>'+U.esc(a.nombre||'—')+'</span>';
   }
 
@@ -226,12 +240,15 @@ Orbit.modules.polizas = (function () {
   }
 
   function render(host) {
-    try { if(S()&&typeof S()._ensureCollections==='function') S()._ensureCollections(['polizas','clientes']); } catch (_) {}
+    try { if(S()&&typeof S()._ensureCollections==='function') S()._ensureCollections(['polizas','clientes','asesores']); } catch (_) {}
     if (!relationDataReady()) {
       host.innerHTML = '<div class="page" data-polizas-relations-loading="1"><div class="card pad"><b>Cargando pólizas…</b><div class="muted" style="margin-top:5px">Estamos preparando clientes y relaciones para mostrar la cartera sin datos incompletos.</div></div></div>';
       return;
     }
     const I = buildIndexes();
+    const advisorStatus=S()&&typeof S()._productStatus==='function'?S()._productStatus()||{}:{};
+    const advisorUnavailable=!I.advisorDirectoryReady&&
+      ((advisorStatus.deniedCollections||[]).includes('asesores')||!!(advisorStatus.snapshotErrors||{}).asesores);
     const all = policiesForActiveCountry(I);
     const countryGap=countryClientJoinGap(all,I.clientsById,Orbit.pais);
     const defs = FDEFS(I);
@@ -262,6 +279,7 @@ Orbit.modules.polizas = (function () {
         Esta diferencia de criterio no acredita pérdida ni autoriza cambiar el país de los datos.
         <button class="btn ghost sm" onclick="Orbit.modules.polizas.filtrarGrupo('countryClientGap')" style="margin-left:6px">${st.fkind==='countryClientGap'?'Ver cartera completa':'Ver pólizas de la diferencia'}</button>
       </div>`:''}
+      ${!I.advisorDirectoryReady?`<div class="cfg-note" data-polizas-advisor-readiness="${advisorUnavailable?'blocked':'loading'}" style="margin-bottom:12px">${advisorUnavailable?'No fue posible confirmar el directorio de asesores autorizado; el listado no se certifica hasta resolver la lectura.':'Confirmando los asesores con el servidor… Los nombres y el filtro se completarán al finalizar la lectura autorizada.'}</div>`:''}
       <div class="card" style="overflow:hidden">
         ${K.filterBar(defs, st)}
         <div style="overflow-x:auto"><table class="tbl">
