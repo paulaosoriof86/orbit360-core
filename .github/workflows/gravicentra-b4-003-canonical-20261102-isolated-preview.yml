@@ -21,11 +21,11 @@ jobs:
     if: >-
       github.repository == 'paulaosoriof86/orbit360-core' &&
       github.ref == 'refs/heads/recovery/fase-a-clean-20260831' &&
-      github.event.head_commit.message == 'build(i6.5 B4-003): certify E8 and C360 QA financial source in exact Preview'
+      github.event.head_commit.message == 'build(i6.5 B4-003): certify E8 and C360 QA financial readback in exact Preview'
     runs-on: ubuntu-24.04
     timeout-minutes: 55
     env:
-      SOURCE_SHA: 51486141f168e57d3292e2dffbc0b75dd1840447
+      SOURCE_SHA: 874edc119206f00a5203d51244bf0302c7b91470
       PROJECT_ID: ays-orbit-360-lab
       HOSTING_SITE: ays-orbit-360-lab
       TENANT_HINT: alianzas-soluciones
@@ -48,7 +48,7 @@ jobs:
       - name: Checkout frozen canonical source, no product divergence
         uses: actions/checkout@v4
         with:
-          ref: 51486141f168e57d3292e2dffbc0b75dd1840447
+          ref: 874edc119206f00a5203d51244bf0302c7b91470
           fetch-depth: 0
           persist-credentials: false
           path: candidate
@@ -72,7 +72,7 @@ jobs:
           test "$(git -C candidate hash-object orbit360-platform/modules/cliente360.js)" = 'a98f940c14aac7ff3554ca5e93b0c2bf47f5f3c8'
           test "$(git -C candidate hash-object orbit360-platform/modules/calidad.js)" = '4043b4ce2d05397ff79615c51ccf8ffe7a939e15'
           test "$(git -C candidate hash-object orbit360-platform/core/queries.js)" = 'd6d39599cda2198e6f23ec69ee8a92bf01cec4e0'
-          test "$(git -C candidate hash-object tools/gravicentra-b4-003-reportes-e4-transversal.test.cjs)" = '7f09636ce7d7537e4dadaed37f06d9886e80d7ef'
+          test "$(git -C candidate hash-object tools/gravicentra-b4-003-reportes-e4-transversal.test.cjs)" = 'a128c10b91b7a50bef83175d3ff86bc4a2a0e774'
           test "$(git -C candidate hash-object tools/gravicentra-i6-1-preview-package.mjs)" = 'd42337f326637d669834664289cb3cce36b56342'
           test "$(git -C candidate hash-object functions/assignable-advisor-roster.js)" = 'bc59e9d7be17154aa54f6c58593cc45af2d72503'
           test "$(git -C candidate hash-object functions/product-operational-domain.js)" = 'b3d0059457142659633498c9c52c6b84ea68200f'
