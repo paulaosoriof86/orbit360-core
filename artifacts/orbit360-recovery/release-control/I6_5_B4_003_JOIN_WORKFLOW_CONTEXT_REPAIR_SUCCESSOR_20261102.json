@@ -1,0 +1,64 @@
+{
+  "schema": "GRAVICENTRA_I65_B4003_CLIENT_JOIN_WORKFLOW_CONTEXT_REPAIR_SUCCESSOR_V1",
+  "gate": "I6.5/B4-003",
+  "recordType": "ADDITIVE_GITHUB_ACTIONS_RUNNER_CONTEXT_LOCATION_ONLY_NO_RELEASE_AUTHORITY",
+  "status": "READONLY_ACTIONS_WORKFLOW_CONTEXT_REPAIRED_REAL_JOIN_RETRY_PENDING",
+  "recordedDate": "2026-11-02",
+  "repository": "paulaosoriof86/orbit360-core",
+  "canonicalBranch": "recovery/fase-a-clean-20260831",
+  "canonicalParentHead": "eb87295e97a292b0f5b17b0865445df6500b083b",
+  "sourceCommit": "1a1ae425f7fe2e18351612b5d4fb350f7658d216",
+  "transport": {
+    "method": "AUTHORIZED_GITHUB_GIT_DATABASE_CONNECTOR",
+    "originalLocalSourceCommit": "9452ebf8c",
+    "remoteSourceCommit": "1a1ae425f7fe2e18351612b5d4fb350f7658d216",
+    "exactSourceTreeSha": "9a40a7aad08a7a827edf95816a3fb7d1cf35c925",
+    "sourceBlobBytesIdentical": true,
+    "differentCommitMetadataAcknowledged": true
+  },
+  "sourceBlobs": {
+    ".github/workflows/gravicentra-b4-003-client-country-physical-readonly-20261102.yml": "54af99c94548ff9a2dd1c6eddc941bf78bb0f291"
+  },
+  "previousFailureEvidence": {
+    "runId": 41388870022,
+    "url": "https://github.com/paulaosoriof86/orbit360-core/actions/runs/41388870022",
+    "headSha": "eb87295e97a292b0f5b17b0865445df6500b083b",
+    "event": "push",
+    "conclusion": "failure",
+    "jobsReturned": 0,
+    "diagnosis": "GitHub Actions runner context was used in jobs.<job_id>.env before a runner existed; this workflow-level expression is unavailable there.",
+    "primaryReference": "https://docs.github.com/en/actions/reference/workflows-and-actions/contexts",
+    "unrelatedToClientCountryAndNoFirebaseCodeRun": true
+  },
+  "sourceFix": {
+    "change": "MOVE_B4_003_JOIN_AUDIT_OUT_FROM_JOB_ENV_TO_EXECUTION_STEP_ENV",
+    "validatedContext": "jobs.<job_id>.steps.env permits runner, jobs.<job_id>.env does not",
+    "exactChangedSourceFiles": 1,
+    "productCodeChanged": false,
+    "clientCountryAuthorityChanged": false,
+    "firestoreReadScriptChanged": false,
+    "secretsOrCredentialsPrinted": false,
+    "noFirebaseMutations": true,
+    "newClientListChecksStillPassed": 27,
+    "existingCountryChecksStillPassed": 38,
+    "existingServerReaderChecksStillPassed": 132
+  },
+  "releaseHold": {
+    "correctedRealPhysicalJoinRunCompleted": false,
+    "authenticatedPreviewMultiUidUatPassed": false,
+    "productionIndexedCountryValidated": false,
+    "independentBackendNegativeUidUatPassed": false,
+    "firestoreRulesP0Closed": false,
+    "restoreDrillAccepted": false,
+    "sevenAdvisorsClassified": false,
+    "formalI6Percent": 50,
+    "priorityP0Closed": 1,
+    "priorityP0Total": 6,
+    "dataWrites": 0,
+    "rulesAuthIamChanges": false,
+    "hostingOrFunctionsLiveDeployed": false,
+    "productionAuthorized": false,
+    "b4003Closed": false
+  },
+  "nextAction": "CANONICAL_PUSH_TRIGGERS_SAME_BOUNDED_READONLY_WORKFLOW_NO_PRODUCTION_PROMOTION"
+}
