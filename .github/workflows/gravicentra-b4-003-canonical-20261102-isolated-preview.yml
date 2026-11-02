@@ -71,7 +71,7 @@ jobs:
           test "$(git -C candidate hash-object orbit360-platform/modules/reportes.js)" = '988e6c53f85a4fe27c9ed1cbd23aed61f7ee47c8'
           test "$(git -C candidate hash-object tools/gravicentra-i6-1-preview-package.mjs)" = 'd42337f326637d669834664289cb3cce36b56342'
           test "$(git -C candidate hash-object functions/assignable-advisor-roster.js)" = 'bc59e9d7be17154aa54f6c58593cc45af2d72503'
-          test "$(git -C candidate hash-object functions/product-operational-domain.js)" = 'b3d0059457142659633498c9e52c6b84ea68200f'
+          test "$(git -C candidate hash-object functions/product-operational-domain.js)" = 'b3d0059457142659633498c9c52c6b84ea68200f'
           cd candidate
           timeout -k 3s 55s node tools/gravicentra-i6-control-plane-guard-v1.mjs --mode=i6
           node tools/gravicentra-b4-003-client-country-authority.test.cjs
