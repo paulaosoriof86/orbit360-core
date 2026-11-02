@@ -11,7 +11,13 @@ Orbit.modules.polizas = (function () {
   const PC = id => (window.Orbit && Orbit.clientProjection && Orbit.clientProjection.get(id)) || S().get('clientes', id);
   let st = { fq: '', framo: '', fasg: '', fase: '', fest: '', sort: 'vence', page: 0 };
   let indexCache = null, indexCacheKey = null, searchTimer = null;
+  let advisorRosterKey = null, advisorRosterState = 'pending', advisorRosterRows = [];
   function invalidateIndexes() { indexCache = null; indexCacheKey = null; }
+  const cleanRole = role => String(role || '').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'_');
+  function fullAdvisorDirectoryAuthorized() {
+    const role=cleanRole(Orbit.access && Orbit.access.activeRole && Orbit.access.activeRole() || Orbit.session?.rol?.());
+    return ['direccion','superadmin','super_admin','admintenant','admin_tenant','admin'].includes(role);
+  }
   // A scoped facade may change with role, country, tenant or membership before
   // orbit:session / orbit:store is emitted. Never reuse rows from that old scope.
   function indexContextKey() {
@@ -22,7 +28,7 @@ Orbit.modules.polizas = (function () {
     const role = call(access.activeRole, call(Orbit.session && Orbit.session.rol, ''));
     const scope = call(() => access.dataScope && access.dataScope(MODULE_KEY), '');
     const teams = scope === 'team' ? call(access.teamAdvisorIds, []) : [];
-    const countries = [].concat(actor.countries || actor.paises || actor.paisesAutorizados || []);
+    const countries = [].concat(user.countries || user.paises || actor.countries || actor.paises || actor.paisesAutorizados || []);
     const roles = call(access.assignedRoles, []);
     return JSON.stringify([
       String(call(access.tenantId, '') || ''), String(user.uid || user.id || ''),
@@ -31,6 +37,34 @@ Orbit.modules.polizas = (function () {
       [].concat(roles || []).map(String).sort(),
       countries.map(String).sort(), [].concat(teams || []).map(String).sort()
     ]);
+  }
+  // Operativo and Asesor cannot read the sensitive Equipo collection. For
+  // policy labels they use the existing, server-owned minimal assignable
+  // roster, queried only for countries in the authenticated membership.
+  // It is never a client-side substitute for policy document authorization.
+  function hydrateAllowedAdvisorNames(host) {
+    if (fullAdvisorDirectoryAuthorized()) return;
+    const key=indexContextKey();
+    if(advisorRosterKey===key&&['loading','ready','blocked'].includes(advisorRosterState))return;
+    advisorRosterKey=key;advisorRosterState='loading';advisorRosterRows=[];invalidateIndexes();
+    const user=Orbit.auth && Orbit.auth.productUser || {};
+    const countries=[...new Set([].concat(user.countries||[]).map(x=>String(x||'').toUpperCase()).filter(x=>['GT','CO'].includes(x)))];
+    const selected=String(Orbit.pais||'TODOS').toUpperCase();
+    const wanted=selected==='TODOS'?countries:countries.filter(x=>x===selected);
+    const roster=Orbit.assignableAdvisorRoster;
+    if(!wanted.length||!roster||typeof roster.list!=='function'){
+      advisorRosterState='blocked';return;
+    }
+    Promise.all(wanted.map(country=>roster.list(country))).then(groups=>{
+      if(advisorRosterKey!==key||indexContextKey()!==key)return;
+      const byId=new Map();
+      groups.flat().forEach(row=>{if(row&&row.id&&row.nombre&&!byId.has(row.id))
+        byId.set(row.id,{id:row.id,nombre:row.nombre});});
+      advisorRosterRows=[...byId.values()];advisorRosterState='ready';invalidateIndexes();rerender(host);
+    }).catch(()=>{
+      if(advisorRosterKey!==key||indexContextKey()!==key)return;
+      advisorRosterRows=[];advisorRosterState='blocked';invalidateIndexes();rerender(host);
+    });
   }
   function rerender(host) {
     if (!host || !host.isConnected) return;
@@ -118,10 +152,12 @@ Orbit.modules.polizas = (function () {
     const policies = S().all('polizas') || [];
     const clients = S().all('clientes') || [];
     const insurers = S().all('aseguradoras') || [];
-    const advisors = S().all('asesores') || [];
+    const teamDirectory=fullAdvisorDirectoryAuthorized();
+    const advisors = teamDirectory ? (S().all('asesores') || []) : advisorRosterRows;
     const readStatus=S()&&typeof S()._productStatus==='function'?S()._productStatus()||{}:{};
-    const advisorDirectoryReady=!S()||typeof S()._productStatus!=='function'||
-      (readStatus.serverConfirmedCollections||[]).includes('asesores');
+    const advisorDirectoryReady=teamDirectory ?
+      (!S()||typeof S()._productStatus!=='function'||(readStatus.serverConfirmedCollections||[]).includes('asesores')) :
+      (advisorRosterState==='ready'&&advisorRosterKey===contextKey);
     const clientsById = new Map();
     clients.forEach(c => { if (c && c.id != null) clientsById.set(c.id, c); });
     const insurersById = new Map(insurers.filter(x=>x&&x.id!=null).map(x=>[x.id,x]));
@@ -240,15 +276,18 @@ Orbit.modules.polizas = (function () {
   }
 
   function render(host) {
-    try { if(S()&&typeof S()._ensureCollections==='function') S()._ensureCollections(['polizas','clientes','asesores']); } catch (_) {}
+    try { if(S()&&typeof S()._ensureCollections==='function') S()._ensureCollections(
+      fullAdvisorDirectoryAuthorized()?['polizas','clientes','asesores']:['polizas','clientes']); } catch (_) {}
+    hydrateAllowedAdvisorNames(host);
     if (!relationDataReady()) {
       host.innerHTML = '<div class="page" data-polizas-relations-loading="1"><div class="card pad"><b>Cargando pólizas…</b><div class="muted" style="margin-top:5px">Estamos preparando clientes y relaciones para mostrar la cartera sin datos incompletos.</div></div></div>';
       return;
     }
     const I = buildIndexes();
     const advisorStatus=S()&&typeof S()._productStatus==='function'?S()._productStatus()||{}:{};
-    const advisorUnavailable=!I.advisorDirectoryReady&&
-      ((advisorStatus.deniedCollections||[]).includes('asesores')||!!(advisorStatus.snapshotErrors||{}).asesores);
+    const advisorUnavailable=!I.advisorDirectoryReady&&(
+      fullAdvisorDirectoryAuthorized()?((advisorStatus.deniedCollections||[]).includes('asesores')||!!(advisorStatus.snapshotErrors||{}).asesores):
+       advisorRosterState==='blocked');
     const all = policiesForActiveCountry(I);
     const countryGap=countryClientJoinGap(all,I.clientsById,Orbit.pais);
     const defs = FDEFS(I);
