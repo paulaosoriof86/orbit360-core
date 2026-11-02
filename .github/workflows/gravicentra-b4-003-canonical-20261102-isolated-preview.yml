@@ -1,8 +1,9 @@
 name: Gravicentra B4-003 canonical 20261102 isolated UAT Preview
 
 # Transport-only workflow. Product source is pinned to the one cumulative
-# recovery candidate. Deploy ONLY the already-existing LAB Preview reader and
-# a new expiring Hosting channel; never the LIVE reader, Rules, Auth or data.
+# recovery candidate. Reuse the verified LAB Preview reader without redeploying
+# its unchanged backend; publish only a new expiring Hosting channel.
+# Never write LIVE, Rules, Auth or operational data.
 on:
   push:
     branches: [recovery/fase-a-clean-20260831]
@@ -21,11 +22,11 @@ jobs:
     if: >-
       github.repository == 'paulaosoriof86/orbit360-core' &&
       github.ref == 'refs/heads/recovery/fase-a-clean-20260831' &&
-      github.event.head_commit.message == 'build(i6.5 B4-003): refresh exact Preview with policy-bound advisor labels'
+      github.event.head_commit.message == 'build(i6.5 B4-003): refresh exact Preview after E4 QA exclusion'
     runs-on: ubuntu-24.04
     timeout-minutes: 55
     env:
-      SOURCE_SHA: ddf5821399a6c2e41901fd0bc57ffe145a036ceb
+      SOURCE_SHA: 33849e326162e03667dfb829992b56b703f61cc5
       PROJECT_ID: ays-orbit-360-lab
       HOSTING_SITE: ays-orbit-360-lab
       TENANT_HINT: alianzas-soluciones
@@ -47,7 +48,7 @@ jobs:
       - name: Checkout frozen canonical source, no product divergence
         uses: actions/checkout@v4
         with:
-          ref: ddf5821399a6c2e41901fd0bc57ffe145a036ceb
+          ref: 33849e326162e03667dfb829992b56b703f61cc5
           fetch-depth: 0
           persist-credentials: false
           path: candidate
@@ -67,6 +68,7 @@ jobs:
           test "$(git -C candidate hash-object functions/b4-003-scoped-policy-callable.js)" = '743ed2a9bd9776cbd5d70ffe0669770b491b27aa'
           test "$(git -C candidate hash-object functions/b4-003-scoped-policy-reader.js)" = '1d654b5590fb71279b6bcaaa8eb8625af07c52a4'
           test "$(git -C candidate hash-object orbit360-platform/modules/polizas.js)" = '7b2ab978918908b0e16e56ae04e86d816414d0ab'
+          test "$(git -C candidate hash-object orbit360-platform/modules/reportes.js)" = '988e6c53f85a4fe27c9ed1cbd23aed61f7ee47c8'
           cd candidate
           timeout -k 3s 55s node tools/gravicentra-i6-control-plane-guard-v1.mjs --mode=i6
           node tools/gravicentra-b4-003-client-country-authority.test.cjs
@@ -118,7 +120,7 @@ jobs:
           echo "FIREBASE_CLI_BIN=$CLI" >> "$GITHUB_ENV"
           npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund firebase-admin@13.4.0 >/dev/null
 
-      - name: Readback existing Preview function identity before targeted deploy
+      - name: Readback retained LAB Preview function identity
         run: |
           set -euo pipefail
           node "$FIREBASE_CLI_BIN" functions:list --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/functions-before.json"
@@ -131,7 +133,10 @@ jobs:
           if(region.includes('us-central1'))throw Error('PREVIEW_READER_WRONG_REGION');
           NODE
 
+      # E4 changes browser-only source; preserve the previously verified Preview
+      # callable. A backend redeploy would add risk without changing semantics.
       - name: Stage only the Preview callable from canonical backend
+        if: ${{ false }}
         run: |
           set -euo pipefail
           cp -a candidate/functions "$RUNNER_TEMP/gi-canonical-backend"
@@ -147,6 +152,7 @@ jobs:
           printf '{"functions":{"source":"backend","runtime":"nodejs22"}}\n' > "$RUNNER_TEMP/gi-canonical-func-package/firebase.json"
 
       - name: Deploy exactly ONE existing LAB Preview callable, never LIVE
+        if: ${{ false }}
         run: |
           set -euo pipefail
           node "$FIREBASE_CLI_BIN" deploy --only functions:orbit360ScopedPolicyReadPreview --config "$RUNNER_TEMP/gi-canonical-func-package/firebase.json" --project "$PROJECT_ID" --non-interactive
@@ -205,7 +211,7 @@ jobs:
         run: |
           set -euo pipefail
           ROOT="$RUNNER_TEMP/gi-canonical-hosting/bundle/site"
-          for rel in __recovery__/build.json product-runtime-config.js core/tenant-access-policy-effective-p0.js core/assignable-advisor-roster-client.js modules/polizas.js; do
+          for rel in __recovery__/build.json product-runtime-config.js core/tenant-access-policy-effective-p0.js core/assignable-advisor-roster-client.js modules/polizas.js modules/reportes.js; do
             dest="$RUNNER_TEMP/readback-$(basename "$rel")"
             curl --fail --silent --show-error --location --retry 2 --max-time 30 "$PREVIEW_URL/$rel" > "$dest"
             cmp "$ROOT/$rel" "$dest"
@@ -214,9 +220,9 @@ jobs:
           curl --fail --silent --show-error --location --retry 2 --max-time 30 https://app.aysseguros.com/ | sha256sum > "$RUNNER_TEMP/domain-after.sha"
           cmp "$RUNNER_TEMP/live-before.sha" "$RUNNER_TEMP/live-after.sha"
           cmp "$RUNNER_TEMP/domain-before.sha" "$RUNNER_TEMP/domain-after.sha"
-          printf '%s\n' "B4-003 CANONICAL LAB PREVIEW SYNCHRONIZED" "Source: $SOURCE_SHA" "Preview: $PREVIEW_URL" 'Preview policy reader now projects minimal policy-bound advisor names after per-policy authorization (source QA only until authenticated UAT). Preview callable + expiring Hosting channel only; no LIVE, Rules, IAM or new client writes. Earlier LAB run 41478387493 applied 35 authorized country fields with backup/restore; 443-vs-439 projection discrepancy and authenticated Carlos/Samuel UAT remain OPEN.' >> "$GITHUB_STEP_SUMMARY"
+          printf '%s\n' "B4-003 CANONICAL LAB PREVIEW SYNCHRONIZED" "Source: $SOURCE_SHA" "Preview: $PREVIEW_URL" 'E4 source excludes explicit synthetic QA in six reports, while all original records remain auditable. Reused verified LAB Preview callable without redeploy; a NEW expiring Hosting channel only. No LIVE, Rules, IAM, data writes or reimport. Physical 443 clients = 440 currently visible + three prior merged markers (physical recount pending). Authenticated new-Preview E4 plus Carlos/Samuel positive/negative UID UAT remain OPEN.' >> "$GITHUB_STEP_SUMMARY"
           node - <<'NODE'
-          const fs=require('node:fs');const proof={schema:'B4003_CANONICAL_PREVIEW_20261102_V1',sourceSha:process.env.SOURCE_SHA,previewUrl:process.env.PREVIEW_URL,previewFunction:'orbit360ScopedPolicyReadPreview',hostingLiveChanged:false,rulesChanged:false,authIamChanged:false,physicalClientIndexUpdatesInThisWorkflow:0,priorLabCountryCorrections:35,priorCountryApplyRunId:41478387493,unresolvedClientProjectionDifference:4,advisorCrossBorderSourceQa:'PASS_PENDING_AUTHENTICATED_UAT',authenticatedUat:'PENDING_CARLOS_SAMUEL_AND_NEW_PREVIEW_PAULA',production:'HOLD'};
+          const fs=require('node:fs');const proof={schema:'B4003_CANONICAL_PREVIEW_20261102_V1',sourceSha:process.env.SOURCE_SHA,previewUrl:process.env.PREVIEW_URL,previewFunction:'orbit360ScopedPolicyReadPreview',hostingLiveChanged:false,rulesChanged:false,authIamChanged:false,physicalClientIndexUpdatesInThisWorkflow:0,priorLabCountryCorrections:35,priorCountryApplyRunId:41478387493,clientProjection:{physical:443,activeVisible:440,previousMergedReadback:3,physicalMergedRecountPending:true},e4QaSourceFix:'PASS_SYNTHETIC_ONLY_PREVIEW_UAT_PENDING',advisorCrossBorderSourceQa:'PASS_PENDING_AUTHENTICATED_UAT',authenticatedUat:'PENDING_CARLOS_SAMUEL_AND_NEW_PREVIEW_PAULA',production:'HOLD'};
           fs.writeFileSync(process.env.RUNNER_TEMP+'/canonical-preview-readback.json',JSON.stringify(proof,null,2)+'\n');
           NODE
 
