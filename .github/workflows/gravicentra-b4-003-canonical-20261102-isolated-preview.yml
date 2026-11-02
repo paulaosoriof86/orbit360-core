@@ -1,0 +1,223 @@
+name: Gravicentra B4-003 canonical 20261102 isolated UAT Preview
+
+# Transport-only workflow. Product source is pinned to the one cumulative
+# recovery candidate. Deploy ONLY the already-existing LAB Preview reader and
+# a new expiring Hosting channel; never the LIVE reader, Rules, Auth or data.
+on:
+  push:
+    branches: [fix/b4-003-canonical-uat-preview-20261102]
+    paths:
+      - .github/workflows/gravicentra-b4-003-canonical-20261102-isolated-preview.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: gi-b4003-canonical-20261102-preview
+  cancel-in-progress: false
+
+jobs:
+  exact-canonical-preview:
+    if: >-
+      github.repository == 'paulaosoriof86/orbit360-core' &&
+      github.ref == 'refs/heads/fix/b4-003-canonical-uat-preview-20261102' &&
+      github.event.head_commit.message == 'build(i6.5 B4-003): sync canonical LAB Preview reader and Hosting only'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 55
+    env:
+      SOURCE_SHA: 9d1839da8717757baf9adbf1fdfad83cddc41791
+      PROJECT_ID: ays-orbit-360-lab
+      HOSTING_SITE: ays-orbit-360-lab
+      TENANT_HINT: alianzas-soluciones
+      RELEASE_GATE: I6.5-B4-003
+      BUILD_PREFIX: gi-i65-b4
+      ENVIRONMENT_REF: firebase-hosting-preview-i6-5-forensic-b4-003
+      GRAVICENTRA_B4_003_SCOPED_PREVIEW: 'true'
+      SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_LAB_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+    steps:
+      - name: Checkout one-file transport
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+          persist-credentials: false
+          path: transport
+
+      - name: Checkout frozen canonical source, no product divergence
+        uses: actions/checkout@v4
+        with:
+          ref: 9d1839da8717757baf9adbf1fdfad83cddc41791
+          fetch-depth: 0
+          persist-credentials: false
+          path: candidate
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Prove exact canonical predecessor, product hashes and boundary
+        run: |
+          set -euo pipefail
+          test "$(git -C transport rev-parse HEAD^)" = "$SOURCE_SHA"
+          test "$(git -C transport diff --name-only HEAD^ HEAD)" = '.github/workflows/gravicentra-b4-003-canonical-20261102-isolated-preview.yml'
+          test "$(git -C candidate rev-parse HEAD)" = "$SOURCE_SHA"
+          test "$(git -C candidate hash-object functions/b4-003-scoped-access-boundary.js)" = '5cd90582db17d6989b13117e629ed4bc985ff1cf'
+          test "$(git -C candidate hash-object orbit360-platform/core/tenant-access-policy-effective-p0.js)" = '0f7f37e67eff15a4286b0202599830899b02a754'
+          test "$(git -C candidate hash-object functions/b4-003-scoped-policy-callable.js)" = '743ed2a9bd9776cbd5d70ffe0669770b491b27aa'
+          cd candidate
+          timeout -k 3s 55s node tools/gravicentra-i6-control-plane-guard-v1.mjs --mode=i6
+          node tools/gravicentra-b4-003-client-country-authority.test.cjs
+          node tools/gravicentra-b4-003-client-country-index-dryrun-readonly.test.cjs
+          node tools/gravicentra-b4-003-scoped-boundary.test.cjs
+          node tools/gravicentra-b4-003-scoped-related-reader.test.cjs
+
+      - name: Fingerprint both LIVE sites, no LIVE modification
+        run: |
+          set -euo pipefail
+          curl --fail --silent --show-error --location --retry 2 --max-time 30 https://ays-orbit-360-lab.web.app/ | sha256sum > "$RUNNER_TEMP/live-before.sha"
+          curl --fail --silent --show-error --location --retry 2 --max-time 30 https://app.aysseguros.com/ | sha256sum > "$RUNNER_TEMP/domain-before.sha"
+
+      - name: Select existing LAB credential and pinned Firebase CLI
+        working-directory: candidate
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/gi-canonical-auth"
+          python3 - <<'PY'
+          import json,os,pathlib
+          root=pathlib.Path(os.environ['RUNNER_TEMP'])/'gi-canonical-auth'
+          paths=[]
+          for n,key in enumerate(('SA_LAB','SA_LAB_ALT','SA_DEFAULT')):
+            try: value=json.loads(os.environ.get(key,''))
+            except (ValueError,TypeError): continue
+            if value.get('type')=='service_account' and value.get('project_id')==os.environ['PROJECT_ID'] and value.get('private_key'):
+              p=root/f'{n}.json';p.write_text(json.dumps(value));p.chmod(0o600);paths.append(str(p))
+          if not paths: raise SystemExit('LAB_SERVICE_ACCOUNT_NOT_CONFIGURED')
+          (root/'candidates').write_text('\n'.join(paths)+'\n')
+          PY
+          npm install --prefix "$RUNNER_TEMP/gi-canonical-cli" --no-save --ignore-scripts --no-audit --no-fund firebase-tools@14.10.1 >/dev/null
+          node tools/gravicentra-firebase-tools-empty-extensions-workaround-v1.mjs "$RUNNER_TEMP/gi-canonical-cli"
+          CLI="$RUNNER_TEMP/gi-canonical-cli/node_modules/firebase-tools/lib/bin/firebase.js"
+          selected=''
+          while IFS= read -r candidate; do
+            if GOOGLE_APPLICATION_CREDENTIALS="$candidate" node "$CLI" apps:list WEB --project "$PROJECT_ID" --non-interactive --json >/dev/null 2>&1 &&
+               GOOGLE_APPLICATION_CREDENTIALS="$candidate" node "$CLI" functions:list --project "$PROJECT_ID" --non-interactive --json >/dev/null 2>&1; then
+              selected="$candidate";break
+            fi
+          done < "$RUNNER_TEMP/gi-canonical-auth/candidates"
+          test -n "$selected"
+          cp "$selected" "$RUNNER_TEMP/gi-canonical-auth/selected.json"
+          chmod 600 "$RUNNER_TEMP/gi-canonical-auth/selected.json"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/gi-canonical-auth/selected.json" >> "$GITHUB_ENV"
+          echo "FIREBASE_CLI_BIN=$CLI" >> "$GITHUB_ENV"
+          npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund firebase-admin@13.4.0 >/dev/null
+
+      - name: Readback existing Preview function identity before targeted deploy
+        run: |
+          set -euo pipefail
+          node "$FIREBASE_CLI_BIN" functions:list --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/functions-before.json"
+          node - <<'NODE'
+          const fs=require('node:fs');const doc=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/functions-before.json','utf8'));
+          const rows=Array.isArray(doc.result)?doc.result:Array.isArray(doc)?doc:[];
+          const target=rows.filter(r=>[r.entryPoint,r.id,r.name].some(v=>String(v||'').includes('orbit360ScopedPolicyReadPreview')));
+          if(target.length!==1)throw Error('PREVIEW_READER_FUNCTION_CARDINALITY_NOT_ONE');
+          const region=String(target[0].region||target[0].location||target[0].name||'');
+          if(region.includes('us-central1'))throw Error('PREVIEW_READER_WRONG_REGION');
+          NODE
+
+      - name: Stage only the Preview callable from canonical backend
+        run: |
+          set -euo pipefail
+          cp -a candidate/functions "$RUNNER_TEMP/gi-canonical-backend"
+          node - <<'NODE'
+          const fs=require('node:fs');const f=process.env.RUNNER_TEMP+'/gi-canonical-backend/bootstrap.js';
+          const src=fs.readFileSync(f,'utf8');
+          if(src.includes('b4-003-scoped-policy-callable'))throw Error('DUPLICATE_PREVIEW_EXPORT');
+          fs.appendFileSync(f,"\n// LAB-only: deploy exclusively the Preview callable selected by Firebase CLI.\nObject.assign(module.exports,require('./b4-003-scoped-policy-callable'));\n");
+          NODE
+          (cd "$RUNNER_TEMP/gi-canonical-backend" && npm ci --ignore-scripts --no-audit --no-fund >/dev/null)
+          mkdir -p "$RUNNER_TEMP/gi-canonical-func-package"
+          mv "$RUNNER_TEMP/gi-canonical-backend" "$RUNNER_TEMP/gi-canonical-func-package/backend"
+          printf '{"functions":{"source":"backend","runtime":"nodejs22"}}\n' > "$RUNNER_TEMP/gi-canonical-func-package/firebase.json"
+
+      - name: Deploy exactly ONE existing LAB Preview callable, never LIVE
+        run: |
+          set -euo pipefail
+          node "$FIREBASE_CLI_BIN" deploy --only functions:orbit360ScopedPolicyReadPreview --config "$RUNNER_TEMP/gi-canonical-func-package/firebase.json" --project "$PROJECT_ID" --non-interactive
+          node "$FIREBASE_CLI_BIN" functions:list --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/functions-after.json"
+          node - <<'NODE'
+          const fs=require('node:fs');const a=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/functions-after.json','utf8'));
+          const rows=Array.isArray(a.result)?a.result:Array.isArray(a)?a:[];
+          if(rows.filter(r=>[r.entryPoint,r.id,r.name].some(v=>String(v||'').includes('orbit360ScopedPolicyReadPreview'))).length!==1)throw Error('PREVIEW_FUNCTION_READBACK_MISSING');
+          NODE
+
+      - name: Read public Firebase config and build immutable canonical Hosting
+        working-directory: candidate
+        run: |
+          set -euo pipefail
+          node "$FIREBASE_CLI_BIN" apps:list WEB --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/apps.json"
+          APP_ID=$(node -e "const x=require(process.env.RUNNER_TEMP+'/apps.json');const a=(x.result||[]).filter(y=>['WEB','PLATFORM_WEB',''].includes(String(y.platform||'').toUpperCase()));if(a.length!==1)process.exit(2);process.stdout.write(a[0].appId)")
+          test -n "$APP_ID"
+          node "$FIREBASE_CLI_BIN" apps:sdkconfig WEB "$APP_ID" --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/sdkconfig.json"
+          node tools/gravicentra-i6-5-b1-branding-snapshot.mjs "$RUNNER_TEMP/branding.json"
+          export TENANT_BRANDING_SNAPSHOT_FILE="$RUNNER_TEMP/branding.json"
+          node tools/gravicentra-i6-1-preview-package.mjs . "$RUNNER_TEMP/gi-canonical-hosting" "$RUNNER_TEMP/sdkconfig.json" > "$RUNNER_TEMP/package-output.json"
+          node - <<'NODE'
+          const fs=require('node:fs'),r=process.env.RUNNER_TEMP+'/gi-canonical-hosting/bundle';
+          const c=JSON.parse(fs.readFileSync(r+'/firebase.json','utf8'));
+          const b=JSON.parse(fs.readFileSync(r+'/site/__recovery__/build.json','utf8'));
+          const p=fs.readFileSync(r+'/site/product-runtime-config.js','utf8');
+          if(Object.keys(c).join(',')!=='hosting'||c.hosting.site!==process.env.HOSTING_SITE||c.hosting.public!=='site')throw Error('HOSTING_ONLY_LAB_CONFIG_REQUIRED');
+          if(b.sourceSha!==process.env.SOURCE_SHA||b.gate!=='I6.5-B4-003'||!p.includes('"scopedReadPreviewCandidate":true'))throw Error('CANONICAL_HOSTING_PREVIEW_SOURCE_INVALID');
+          if(!fs.readFileSync(r+'/site/core/tenant-access-policy-effective-p0.js').equals(fs.readFileSync('orbit360-platform/core/tenant-access-policy-effective-p0.js')))throw Error('FRONTEND_CANONICAL_BYTES_DRIFT');
+          NODE
+
+      - name: Deploy a NEW expiring LAB Hosting channel only
+        id: hosting
+        run: |
+          set -euo pipefail
+          CHANNEL_ID="gi-i65-b4-ca-${GITHUB_RUN_ID}"
+          test "${#CHANNEL_ID}" -le 32
+          cd "$RUNNER_TEMP/gi-canonical-hosting/bundle"
+          node "$FIREBASE_CLI_BIN" hosting:channel:deploy "$CHANNEL_ID" --config firebase.json --project "$PROJECT_ID" --expires 7d --non-interactive --json > "$RUNNER_TEMP/hosting-result.json" 2>&1
+          export CHANNEL_ID
+          PREVIEW_URL=$(python3 - <<'PY'
+          import os,re
+          raw=open(os.environ['RUNNER_TEMP']+'/hosting-result.json').read()
+          prefix='https://ays-orbit-360-lab--'+os.environ['CHANNEL_ID']+'-'
+          urls=sorted(set(u.rstrip('/') for u in re.findall(r'https://[A-Za-z0-9._-]+\.web\.app',raw) if u.startswith(prefix)))
+          if len(urls)!=1:raise SystemExit('CANONICAL_PREVIEW_URL_NOT_UNIQUE')
+          print(urls[0])
+          PY
+          )
+          echo "url=$PREVIEW_URL" >> "$GITHUB_OUTPUT"
+          echo "channel=$CHANNEL_ID" >> "$GITHUB_OUTPUT"
+
+      - name: Verify served canonical bytes and identical LIVE Hosting
+        env:
+          PREVIEW_URL: ${{ steps.hosting.outputs.url }}
+        run: |
+          set -euo pipefail
+          ROOT="$RUNNER_TEMP/gi-canonical-hosting/bundle/site"
+          for rel in __recovery__/build.json product-runtime-config.js core/tenant-access-policy-effective-p0.js; do
+            dest="$RUNNER_TEMP/readback-$(basename "$rel")"
+            curl --fail --silent --show-error --location --retry 2 --max-time 30 "$PREVIEW_URL/$rel" > "$dest"
+            cmp "$ROOT/$rel" "$dest"
+          done
+          curl --fail --silent --show-error --location --retry 2 --max-time 30 https://ays-orbit-360-lab.web.app/ | sha256sum > "$RUNNER_TEMP/live-after.sha"
+          curl --fail --silent --show-error --location --retry 2 --max-time 30 https://app.aysseguros.com/ | sha256sum > "$RUNNER_TEMP/domain-after.sha"
+          cmp "$RUNNER_TEMP/live-before.sha" "$RUNNER_TEMP/live-after.sha"
+          cmp "$RUNNER_TEMP/domain-before.sha" "$RUNNER_TEMP/domain-after.sha"
+          printf '%s\n' "B4-003 CANONICAL LAB PREVIEW SYNCHRONIZED" "Source: $SOURCE_SHA" "Preview: $PREVIEW_URL" 'Preview callable + expiring Hosting channel only; no LIVE, Rules, IAM or client writes. Authenticated cross-UID UAT and 32-country-index backup/apply remain open.' >> "$GITHUB_STEP_SUMMARY"
+          node - <<'NODE'
+          const fs=require('node:fs');const proof={schema:'B4003_CANONICAL_PREVIEW_20261102_V1',sourceSha:process.env.SOURCE_SHA,previewUrl:process.env.PREVIEW_URL,previewFunction:'orbit360ScopedPolicyReadPreview',hostingLiveChanged:false,rulesChanged:false,authIamChanged:false,physicalClientIndexUpdates:0,authenticatedUat:'PENDING',production:'HOLD'};
+          fs.writeFileSync(process.env.RUNNER_TEMP+'/canonical-preview-readback.json',JSON.stringify(proof,null,2)+'\n');
+          NODE
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: gi-b4003-canonical-preview-${{ github.run_id }}
+          path: ${{ runner.temp }}/canonical-preview-readback.json
+          if-no-files-found: warn
+          retention-days: 30
