@@ -1,0 +1,91 @@
+{
+  "schema": "GRAVICENTRA_I65_B4003_CLIENT_COUNTRY_AUTHORITY_SOURCE_SUCCESSOR_V1",
+  "gate": "I6.5/B4-003",
+  "recordType": "ADDITIVE_TRANSVERSAL_INSURER_COUNTRY_DOCUMENT_FIX_NO_RELEASE_AUTHORITY",
+  "status": "SOURCE_QA_PASS_COUNTRY_CLIENT_LIST_AND_PHYSICAL_JOIN_HOLD",
+  "recordedDate": "2026-11-02",
+  "repository": "paulaosoriof86/orbit360-core",
+  "canonicalBranch": "recovery/fase-a-clean-20260831",
+  "canonicalParentHead": "209ad2f38a9e0b0e1855f651665e4ac6fab09603",
+  "sourceCommit": "ddc5929db6c5d2a8eabad421b1ff496d9ac58f31",
+  "transport": {
+    "method": "AUTHORIZED_GITHUB_GIT_DATABASE_CONNECTOR",
+    "originalLocalSourceCommit": "a0492e4b2",
+    "remoteSourceCommit": "ddc5929db6c5d2a8eabad421b1ff496d9ac58f31",
+    "exactSourceTreeSha": "bb81a9d0308fb2dc135e45fcd8aeebbc2f87067f",
+    "sourceBlobBytesIdentical": true,
+    "differentCommitMetadataAcknowledged": true
+  },
+  "sourceBlobs": {
+    "functions/b4-003-client-country-authority.js": "7e6caf8ed1acd0324fda9a64293c870ce97f28bf",
+    "functions/b4-003-scoped-related-reader.js": "09698be31c4669e0413f4ef5fde524beb8a08e88",
+    "tools/gravicentra-b4-003-client-country-authority.test.cjs": "8ab5137ef81f29401cfbab4151b79a96818e6755",
+    "tools/gravicentra-b4-003-policy-client-join-audit-readonly.cjs": "e8a3207b29571a0547f6a360ded83e95f36d4884"
+  },
+  "observedAuthenticatedPreviewReadOnly": {
+    "identity": "Carlos Castro",
+    "role": "Operativo",
+    "countryCO": {
+      "policies": 124,
+      "cliente360Clients": 0
+    },
+    "countryGT": {
+      "cliente360Clients": 8
+    },
+    "newFixHostedPreviewTested": false,
+    "sourceClassification": "The policies and client lists use distinct country and role scope rules; aggregate equality is not proof of authorization or data loss"
+  },
+  "existingAuthenticatedEvidence20261101": {
+    "countryCOPolicies": 124,
+    "policyLinkedClientsVisibleInOtherCountry": 12,
+    "policyLinkedClientsUnavailableWithinCurrentScope": 112,
+    "physicalClientRecordAbsenceProven": false,
+    "receipt": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_POLICY_CLIENT_SCOPE_LINK_SUCCESSOR_20261101.json"
+  },
+  "existingSourceReadback20261019": {
+    "clientsRaw": 443,
+    "clientsExcludedAsMerged": 3,
+    "clientsNotRoutableByCountry": 6,
+    "clientsVisibleGT": 417,
+    "clientsVisibleCO": 17,
+    "historicalNotCurrentReadback": true,
+    "receipt": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_UAT4_CHROME_CAUSAL_RECONCILIATION_20261019.json"
+  },
+  "sourceFix": {
+    "contract": "valid client domicile > complete linked insurer country if missing or ambiguous > explicit unresolved quarantine",
+    "serverClientDocumentReadProjectionOnly": true,
+    "serverClientListFallbackEnabled": false,
+    "historicalPolicyCountryAuthorityPreserved": true,
+    "insurerDirectoryVerifiedPerTenant": true,
+    "allLinkedPoliciesRequired": true,
+    "invalidOrMultipleInsurerCountryFailsClosed": true,
+    "foreignRoleOrAdvisorFailsClosed": true,
+    "realSourceDataMutation": false,
+    "realPhysicalJoinAuditToolPrepared": true,
+    "realPhysicalJoinAuditExecuted": false,
+    "auditMode": "bounded_aggregate_readonly_no_PII_no_tokens",
+    "newSyntheticContractChecks": 38,
+    "existingServerRelatedReaderChecks": 132,
+    "existingPolicyClientNavigationCases": 19,
+    "existingScopeRegressionCases": 12
+  },
+  "releaseHold": {
+    "countryClientListFallbackClosed": false,
+    "realPhysicalPolicyClientInsurerJoinReconciled": false,
+    "productionScaleMaterializedIndexProven": false,
+    "newFixAuthenticatedMultiUidRoleCountryUatPassed": false,
+    "independentBackendNegativeUidUatPassed": false,
+    "firestoreRulesP0Closed": false,
+    "restoreDrillAccepted": false,
+    "sevenAdvisorsClassified": false,
+    "formalI6Percent": 50,
+    "priorityP0Closed": 1,
+    "priorityP0Total": 6,
+    "dataWrites": 0,
+    "rulesAuthIamChanges": false,
+    "hostingOrFunctionsLiveDeployed": false,
+    "productionAuthorized": false,
+    "b4003Closed": false
+  },
+  "nextAction": "EXECUTE_REAL_AGGREGATE_JOIN_READONLY_WITH_EXISTING_APPROVED_CREDENTIAL_AND_DESIGN_INDEXED_CLIENT_LIST_FALLBACK_THEN_MULTI_UID_UAT_WITHOUT_DATA_MUTATION"
+}
