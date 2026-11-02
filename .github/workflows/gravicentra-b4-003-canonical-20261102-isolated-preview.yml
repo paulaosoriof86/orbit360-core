@@ -48,7 +48,7 @@ jobs:
       - name: Checkout frozen canonical source, no product divergence
         uses: actions/checkout@v4
         with:
-          ref: 33849e326162e03667dfb829992b56b703f61cc5
+          ref: 7e6d4b83b8df1e8b34981f130fe7f7e89c7eb9ce
           fetch-depth: 0
           persist-credentials: false
           path: candidate
@@ -59,7 +59,7 @@ jobs:
 
       - name: Prove exact canonical predecessor, product hashes and boundary
         run: |
-          set -euxo pipefail
+          set -euo pipefail
           test "$(git -C transport merge-base HEAD "$SOURCE_SHA")" = "$SOURCE_SHA"
           test "$(git -C transport diff --name-only "$SOURCE_SHA" HEAD)" = '.github/workflows/gravicentra-b4-003-canonical-20261102-isolated-preview.yml'
           test "$(git -C candidate rev-parse HEAD)" = "$SOURCE_SHA"
