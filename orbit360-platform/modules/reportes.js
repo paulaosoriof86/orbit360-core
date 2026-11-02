@@ -9,6 +9,33 @@ Orbit.modules = Orbit.modules || {};
 Orbit.modules.reportes = (function () {
   const U = Orbit.ui, K = Orbit.kit, S = () => Orbit.store, q = Orbit.q;
   let host, sel = 'produccion', groupBy = '', anioSel = '';
+  let insurerLookupStore = null, unsubscribeInsurerLookup = null;
+  // Reportes is often opened before the deferred insurer directory is ready.
+  // Never group rows under an empty insurer or export incomplete names.
+  function insurerLookupReadiness() {
+    const store = S();
+    if (!store || typeof store._productStatus !== 'function') return { ready: true, blocked: false };
+    const status = store._productStatus() || {};
+    const confirmed = (status.serverConfirmedCollections || []).includes('aseguradoras');
+    const denied = (status.deniedCollections || []).includes('aseguradoras');
+    const error = !!(status.snapshotErrors || {}).aseguradoras;
+    return { ready: confirmed, blocked: denied || error };
+  }
+  function ensureInsurerLookup() {
+    const store = S();
+    if (!store) return;
+    if (store !== insurerLookupStore) {
+      if (typeof unsubscribeInsurerLookup === 'function') unsubscribeInsurerLookup();
+      insurerLookupStore = store;
+      unsubscribeInsurerLookup = typeof store.on === 'function' ? store.on('aseguradoras', changed => {
+        if (changed !== 'aseguradoras' && changed !== '*') return;
+        if (!host || !host.isConnected) return;
+        if (typeof location !== 'undefined' && !/^#\/reportes(?:[?\/]|$)/.test(location.hash || '')) return;
+        render(host);
+      }) : null;
+    }
+    if (typeof store._ensureCollections === 'function') store._ensureCollections(['aseguradoras']);
+  }
   const countryCode = v => { const p = String(v == null ? '' : v).trim().toUpperCase(); return p === 'GT' || p === 'CO' ? p : ''; };
   const currencyFor = p => p === 'CO' ? 'COP' : p === 'GT' ? 'GTQ' : '';
   const currentCountry = () => countryCode(Orbit.pais);
@@ -89,6 +116,21 @@ Orbit.modules.reportes = (function () {
   function render(h) {
     host = h;
     const r = REPORTES[sel];
+    if (r.cols.includes('Aseguradora')) {
+      // Fail closed only on insurer-dependent reports. Other reports can still
+      // render without making the entire report center depend on this source.
+      ensureInsurerLookup();
+      const insurerStatus = insurerLookupReadiness();
+      if (!insurerStatus.ready) {
+        host.innerHTML = `<div class="page" data-report-insurer-readiness="${insurerStatus.blocked ? 'blocked' : 'loading'}">
+          ${K.banner({ icon: '📊', title: 'Orbit Reportes', sub: 'Reportes exportables sobre datos en vivo' })}
+          <div class="cfg-note" role="status">${insurerStatus.blocked
+            ? 'No fue posible confirmar el directorio de aseguradoras autorizado. No se muestran cifras incompletas ni se habilitan exportes.'
+            : 'Confirmando aseguradoras con el servidor… El reporte y sus exportes aparecerán cuando los nombres estén verificados.'}</div>
+        </div>`;
+        return;
+      }
+    }
     let rows2 = r.rows();
     const paisLbl = (Orbit.PAISES.find(p => p.id === (Orbit.pais || 'TODOS')) || {}).label || 'Todos los países';
     const sourceRows = r.sourceRows();

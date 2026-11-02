@@ -63,12 +63,18 @@ const rows = {
   reportes_prog: []
 };
 
-function setup(country) {
+function setup(country, options = {}) {
   let writes = 0;
+  let insurersReady = options.deferInsurers !== true && options.blockInsurers !== true;
+  const insurerListeners = new Set(), ensureRequests = [];
   const store = {
-    all: k => rows[k] || [],
-    get: (k, id) => (rows[k] || []).find(x => String(x.id) === String(id)) || null,
+    all: k => k === 'aseguradoras' && !insurersReady ? [] : rows[k] || [],
+    get: (k, id) => store.all(k).find(x => String(x.id) === String(id)) || null,
     where: (k, f) => (rows[k] || []).filter(f),
+    _productStatus: () => ({ serverConfirmedCollections: insurersReady ? ['aseguradoras'] : [],
+      deniedCollections: options.blockInsurers ? ['aseguradoras'] : [], snapshotErrors: {} }),
+    _ensureCollections: names => { ensureRequests.push(...names); return names; },
+    on: (_, cb) => { insurerListeners.add(cb); return () => insurerListeners.delete(cb); },
     insert() { writes++; throw Error('READ_ONLY_REPORT_RENDER_MUST_NOT_WRITE'); },
     remove() { writes++; throw Error('READ_ONLY_REPORT_RENDER_MUST_NOT_DELETE'); }
   };
@@ -80,13 +86,14 @@ function setup(country) {
     kit: { banner: () => '<div>Reporte</div>' },
     PAISES: [{ id: 'GT', label: 'Guatemala' }, { id: 'CO', label: 'Colombia' }, { id: 'TODOS', label: 'Todos' }]
   };
-  const context = vm.createContext({ Orbit, window: { Orbit }, Date, Map, Set, console });
+  const context = vm.createContext({ Orbit, window: { Orbit }, location: { hash: '#/reportes' }, Date, Map, Set, console });
   vm.runInContext(queries, context, { filename: 'queries.js' });
   Orbit.q.renovacionesProximas = () => rows.polizas;
   vm.runInContext(reportes, context, { filename: 'reportes.js' });
   let handlers = new Map();
   const host = {
     innerHTML: '',
+    isConnected: true,
     querySelectorAll: () => [],
     querySelector: selector => ({ addEventListener: (type, cb) => handlers.set(selector + ':' + type, cb) })
   };
@@ -97,8 +104,33 @@ function setup(country) {
     callback({ target: { value } });
     return host.innerHTML;
   }
-  return { Orbit, render, event, writes: () => writes };
+  return { Orbit, render, event, writes: () => writes, ensureRequests,
+    confirmInsurers: () => { insurersReady = true; for (const cb of insurerListeners) cb('aseguradoras'); return host.innerHTML; } };
 }
+
+test('E4 waits for deferred insurer directory, refreshes on server confirmation and blocks premature export', () => {
+  const app = setup('CO', { deferInsurers: true });
+  const pending = app.render();
+  assert.match(pending, /data-report-insurer-readiness="loading"/);
+  assert.match(pending, /Confirmando aseguradoras con el servidor/);
+  assert.doesNotMatch(pending, /id="rep-exp"|id="rep-excel"|id="rep-pdf"/);
+  assert.doesNotMatch(pending, /2026000098/);
+  assert.ok(app.ensureRequests.includes('aseguradoras'));
+  const confirmed = app.confirmInsurers();
+  assert.match(confirmed, /Aseguradora Colombia/);
+  assert.match(confirmed, /2026000098/);
+  assert.match(confirmed, /id="rep-exp"/);
+  assert.doesNotMatch(confirmed, /data-report-insurer-readiness="loading"/);
+  assert.equal(app.writes(), 0);
+});
+
+test('E4 does not expose incomplete insurer-dependent reports after a scope denial', () => {
+  const app = setup('CO', { blockInsurers: true });
+  const html = app.render();
+  assert.match(html, /data-report-insurer-readiness="blocked"/);
+  assert.doesNotMatch(html, /id="rep-exp"|id="rep-excel"|id="rep-pdf"/);
+  assert.equal(app.writes(), 0);
+});
 
 test('E4 production: country of policy+insurer, no GT fallback, no QA orphan, no year-from-policy-number', () => {
   const app = setup('CO');
