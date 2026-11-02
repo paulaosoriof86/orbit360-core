@@ -24,7 +24,6 @@ jobs:
       SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
       SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
       SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-      B4_003_JOIN_AUDIT_OUT: ${{ runner.temp }}/b4-003-physical-join-aggregate.json
     steps:
       - name: Checkout the exact canonical source (never a second release candidate)
         uses: actions/checkout@v4
@@ -81,6 +80,8 @@ jobs:
 
       - name: Execute one bounded physical join and export aggregates only
         shell: bash
+        env:
+          B4_003_JOIN_AUDIT_OUT: ${{ runner.temp }}/b4-003-physical-join-aggregate.json
         run: |
           set -euo pipefail
           timeout -k 3s 180s node tools/gravicentra-b4-003-policy-client-join-audit-readonly.cjs --real-readonly
