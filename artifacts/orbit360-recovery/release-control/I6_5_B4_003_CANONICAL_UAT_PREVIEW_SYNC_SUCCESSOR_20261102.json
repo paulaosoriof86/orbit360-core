@@ -1,0 +1,55 @@
+{
+  "schema": "GRAVICENTRA_I65_B4003_CANONICAL_UAT_PREVIEW_SYNC_V1",
+  "date": "2026-11-02",
+  "gate": "I6.5/B4-003",
+  "production": "NO_GO",
+  "source": {
+    "canonicalBranch": "recovery/fase-a-clean-20260831",
+    "sourceSha": "9d1839da8717757baf9adbf1fdfad83cddc41791",
+    "frontendCountryAndRoleBlob": "0f7f37e67eff15a4286b0202599830899b02a754",
+    "backendAccessBoundaryBlob": "5cd90582db17d6989b13117e629ed4bc985ff1cf"
+  },
+  "transport": {
+    "branch": "fix/b4-003-canonical-uat-preview-20261102",
+    "commit": "21cc79103df0d0b7173c0250b36afcd47676bf82",
+    "workflowRunId": 41467740294,
+    "workflowConclusion": "success",
+    "workflowUrl": "https://github.com/paulaosoriof86/orbit360-core/actions/runs/41467740294",
+    "artifactId": 13154256079,
+    "artifactZipSha256": "952971242f2355af790f1ef9346d9e1681b3931117fd4c7c06e582a693f6d2d5"
+  },
+  "deployment": {
+    "project": "ays-orbit-360-lab",
+    "tenant": "alianzas-soluciones",
+    "functionUpdated": "orbit360ScopedPolicyReadPreview",
+    "functionsLiveUpdated": false,
+    "hostingPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b4-ca-41467740294-0m0aj1d3.web.app",
+    "hostingPreviewExpiresWithinDays": 7,
+    "servedByteReadback": "PASS",
+    "liveHostingMutated": false,
+    "rulesMutated": false,
+    "authIamMutated": false,
+    "physicalClientWrites": 0
+  },
+  "chromeReadback": {
+    "publicLoginForm": "OBSERVED",
+    "authenticatedUat": "PENDING_USER_SIGN_IN",
+    "independentSecondUid": "PENDING",
+    "signedNegativeSecurityMatrix": "PENDING"
+  },
+  "data": {
+    "dryRunId": 41462171976,
+    "clients": 443,
+    "policies": 1425,
+    "insurers": 33,
+    "clientIndexAlreadyAligned": 408,
+    "indexUpdatesGT": 1,
+    "indexUpdatesCO": 31,
+    "humanCountryDecisionsPending": 3,
+    "orphanReferencesConfirmedB2Qa": 3,
+    "qaFixtureQuarantineApplied": false,
+    "backupAndIsolatedRestoreProven": false
+  },
+  "releaseDiscipline": "SINGLE_PRODUCT_CANDIDATE_PREVIEW_UAT_AND_BACKUP_PENDING",
+  "authorizesProduction": false
+}
