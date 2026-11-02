@@ -161,10 +161,16 @@ Orbit.modules.polizas = (function () {
     const clientsById = new Map();
     clients.forEach(c => { if (c && c.id != null) clientsById.set(c.id, c); });
     const insurersById = new Map(insurers.filter(x=>x&&x.id!=null).map(x=>[x.id,x]));
-    const advisorsById = new Map(advisors.filter(x=>x&&x.id!=null).map(x=>[x.id,x]));
+    // The protected policy reader projects only the name of the adviser on
+    // each already-authorized policy. Unlike the assignable roster, this also
+    // covers historical cross-border assignments (e.g. a GT adviser on a CO
+    // policy), without granting Operativo/Asesor access to Equipo.
+    const policyAdvisorLabels=policies.filter(p=>p&&p.asesorId&&typeof p.asesorNombreVerificado==='string'&&p.asesorNombreVerificado.trim())
+      .map(p=>({id:p.asesorId,nombre:p.asesorNombreVerificado}));
+    const advisorsById = new Map([...policyAdvisorLabels,...advisors.filter(x=>x&&x.id!=null)].map(x=>[x.id,x]));
     const ramoOptions=[...new Set(policies.map(p=>p&&p.ramo).filter(Boolean))].sort().map(r=>({v:r,t:r}));
     const insurerOptions=insurers.filter(a=>a&&a.id!=null).map(a=>({v:a.id,t:a.nombre||a.displayName||a.id}));
-    const advisorOptions=advisors.filter(a=>a&&a.id!=null).map(a=>({v:a.id,t:a.nombre||a.id}));
+    const advisorOptions=[...advisorsById.values()].map(a=>({v:a.id,t:a.nombre||a.id}));
     indexCache = {
       policies, clientsById, insurersById, advisorsById, advisorDirectoryReady,
       ramoOptions, insurerOptions, advisorOptions,
