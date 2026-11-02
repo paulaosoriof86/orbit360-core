@@ -6,8 +6,16 @@ const fs=require('node:fs');
 const {country,resolveClientCountry}=require('../functions/b4-003-client-country-authority');
 const PROJECT='ays-orbit-360-lab',TENANT='alianzas-soluciones';
 const MAX={clients:2500,policies:5000,insurers:1000,policiesPerClient:100};
+const PHYSICAL_READ_LIMITS=Object.freeze({
+ clientes:MAX.clients,polizas:MAX.policies,aseguradoras:MAX.insurers
+});
 const clean=x=>String(x==null?'':x).trim();
 const inc=(obj,key)=>{obj[key]=(obj[key]||0)+1;};
+function physicalReadLimit(collection){
+ const limit=PHYSICAL_READ_LIMITS[collection];
+ if(!Number.isSafeInteger(limit)||limit<1)throw Error('DRYRUN_READ_COLLECTION_NOT_ALLOWLISTED');
+ return limit;
+}
 function planCountryIndex({clients,policies,insurers,tenantId}){
  for(const [key,rows] of Object.entries({clients,policies,insurers})){
   if(!Array.isArray(rows)||rows.length>MAX[key])throw Error('DRYRUN_READ_BOUND_'+key.toUpperCase());
@@ -88,9 +96,10 @@ async function runRealReadOnly(){
  try{
   const tenant=getFirestore(app).collection('tenants').doc(TENANT);
   const read=async name=>{
+   const limit=physicalReadLimit(name);
    const snapshot=await tenant.collection('data').doc(name).collection('items')
-    .limit(MAX[name]+1).get();
-   if(snapshot.size>MAX[name])throw Error('DRYRUN_READ_BOUND_'+name.toUpperCase());
+    .limit(limit+1).get();
+   if(snapshot.size>limit)throw Error('DRYRUN_READ_BOUND_'+name.toUpperCase());
    return snapshot.docs.map(doc=>({...(doc.data()||{}),id:doc.id,
     _sourceIdMismatch:!!(doc.data()?.id&&clean(doc.data().id)!==doc.id)}));
   };
@@ -110,4 +119,4 @@ if(require.main===module){
  });
  else{console.error('B4_003_COUNTRY_INDEX_DRYRUN_REQUIRES_REAL_READONLY_FLAG');process.exitCode=2;}
 }
-module.exports=Object.freeze({planCountryIndex});
+module.exports=Object.freeze({planCountryIndex,physicalReadLimit});
