@@ -21,11 +21,11 @@ jobs:
     if: >-
       github.repository == 'paulaosoriof86/orbit360-core' &&
       github.ref == 'refs/heads/recovery/fase-a-clean-20260831' &&
-      github.event.head_commit.message == 'build(i6.5 B4-003): refresh canonical Preview after advisor hydration'
+      github.event.head_commit.message == 'build(i6.5 B4-003): refresh cumulative Preview and frozen shock plan'
     runs-on: ubuntu-24.04
     timeout-minutes: 55
     env:
-      SOURCE_SHA: 53c4796c45930d42283b3a751aee0f75fa71c8f6
+      SOURCE_SHA: 2482af7b61eefb739117412fb154a42c622f07c0
       PROJECT_ID: ays-orbit-360-lab
       HOSTING_SITE: ays-orbit-360-lab
       TENANT_HINT: alianzas-soluciones
@@ -47,7 +47,7 @@ jobs:
       - name: Checkout frozen canonical source, no product divergence
         uses: actions/checkout@v4
         with:
-          ref: 53c4796c45930d42283b3a751aee0f75fa71c8f6
+          ref: 2482af7b61eefb739117412fb154a42c622f07c0
           fetch-depth: 0
           persist-credentials: false
           path: candidate
@@ -202,7 +202,7 @@ jobs:
         run: |
           set -euo pipefail
           ROOT="$RUNNER_TEMP/gi-canonical-hosting/bundle/site"
-          for rel in __recovery__/build.json product-runtime-config.js core/tenant-access-policy-effective-p0.js; do
+          for rel in __recovery__/build.json product-runtime-config.js core/tenant-access-policy-effective-p0.js core/assignable-advisor-roster-client.js modules/polizas.js; do
             dest="$RUNNER_TEMP/readback-$(basename "$rel")"
             curl --fail --silent --show-error --location --retry 2 --max-time 30 "$PREVIEW_URL/$rel" > "$dest"
             cmp "$ROOT/$rel" "$dest"
@@ -211,9 +211,9 @@ jobs:
           curl --fail --silent --show-error --location --retry 2 --max-time 30 https://app.aysseguros.com/ | sha256sum > "$RUNNER_TEMP/domain-after.sha"
           cmp "$RUNNER_TEMP/live-before.sha" "$RUNNER_TEMP/live-after.sha"
           cmp "$RUNNER_TEMP/domain-before.sha" "$RUNNER_TEMP/domain-after.sha"
-          printf '%s\n' "B4-003 CANONICAL LAB PREVIEW SYNCHRONIZED" "Source: $SOURCE_SHA" "Preview: $PREVIEW_URL" 'Preview callable + expiring Hosting channel only; no LIVE, Rules, IAM or client writes. Authenticated cross-UID UAT and 32-country-index backup/apply remain open.' >> "$GITHUB_STEP_SUMMARY"
+          printf '%s\n' "B4-003 CANONICAL LAB PREVIEW SYNCHRONIZED" "Source: $SOURCE_SHA" "Preview: $PREVIEW_URL" 'Preview callable + expiring Hosting channel only; no LIVE, Rules, IAM or new client writes. Earlier LAB run 41478387493 applied 35 authorized country fields with backup/restore; 443-vs-439 projection discrepancy, advisor labels and authenticated cross-UID UAT remain OPEN.' >> "$GITHUB_STEP_SUMMARY"
           node - <<'NODE'
-          const fs=require('node:fs');const proof={schema:'B4003_CANONICAL_PREVIEW_20261102_V1',sourceSha:process.env.SOURCE_SHA,previewUrl:process.env.PREVIEW_URL,previewFunction:'orbit360ScopedPolicyReadPreview',hostingLiveChanged:false,rulesChanged:false,authIamChanged:false,physicalClientIndexUpdates:0,authenticatedUat:'PENDING',production:'HOLD'};
+          const fs=require('node:fs');const proof={schema:'B4003_CANONICAL_PREVIEW_20261102_V1',sourceSha:process.env.SOURCE_SHA,previewUrl:process.env.PREVIEW_URL,previewFunction:'orbit360ScopedPolicyReadPreview',hostingLiveChanged:false,rulesChanged:false,authIamChanged:false,physicalClientIndexUpdatesInThisWorkflow:0,priorLabCountryCorrections:35,priorCountryApplyRunId:41478387493,unresolvedClientProjectionDifference:4,authenticatedUat:'PENDING',production:'HOLD'};
           fs.writeFileSync(process.env.RUNNER_TEMP+'/canonical-preview-readback.json',JSON.stringify(proof,null,2)+'\n');
           NODE
 
