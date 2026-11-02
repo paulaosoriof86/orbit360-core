@@ -142,6 +142,26 @@ Orbit.modules = Orbit.modules || {};
     const status=store._productStatus() || {}, confirmed=status.serverConfirmedCollections || [];
     return confirmed.indexOf(name) >= 0;
   }
+  // A direct policy/vehicle URL must wait for its own protected collection.
+  // Falling through to the Cliente 360 owner while that collection is still
+  // hydrating incorrectly makes a legitimate policy detail depend on access
+  // to the linked client (whose role/country scope may be different).
+  function directDetailReadiness(name) {
+    const store=S();
+    if (!store || typeof store._productStatus !== 'function') return 'ready';
+    const status=store._productStatus() || {};
+    if ((status.deniedCollections || []).indexOf(name) >= 0 || (status.snapshotErrors || {})[name]) return 'unavailable';
+    return (status.serverConfirmedCollections || []).indexOf(name) >= 0 ? 'ready' : 'pending';
+  }
+  function renderDirectDetailUnavailable(host, kind, state) {
+    const policy=kind==='policy';
+    const name=policy?'Póliza':'Vehículo';
+    if (state==='pending') {
+      host.innerHTML='<div class="page"><div class="card pad" data-direct-detail-loading="'+kind+'"><b>Cargando '+name.toLowerCase()+'…</b><div class="muted" style="margin-top:5px">Confirmando la lectura autorizada de este registro.</div></div></div>';
+      return;
+    }
+    host.innerHTML='<div class="page"><div class="card pad" data-direct-detail-unavailable="'+kind+'">'+name+' no disponible en tu alcance.</div></div>';
+  }
   function canOpenClientRecord(rawClient) {
     try {
       return !!(rawClient&&Orbit.access&&typeof Orbit.access.canView==='function'&&
@@ -567,8 +587,20 @@ Orbit.modules = Orbit.modules || {};
     mod.render = function (host) {
       applyVisualAliasesInPlace();
       const params = (Orbit.route && Orbit.route.params) || {};
-      if (params.p && S().get('polizas', params.p)) { renderPolicyPage(host, params.p, params.v || ''); return; }
-      if (params.v && S().get('vehiculos', params.v)) { renderVehiclePage(host, params.v); return; }
+      if (params.p) {
+        ensureDetailCollections(['polizas','clientes','vehiculos','recibosEsperados','aseguradoras','asesores']);
+        const state=directDetailReadiness('polizas');
+        if (state!=='unavailable' && S().get('polizas', params.p)) renderPolicyPage(host, params.p, params.v || '');
+        else renderDirectDetailUnavailable(host, 'policy', state);
+        return;
+      }
+      if (params.v) {
+        ensureDetailCollections(['vehiculos','clientes','polizas']);
+        const state=directDetailReadiness('vehiculos');
+        if (state!=='unavailable' && S().get('vehiculos', params.v)) renderVehiclePage(host, params.v);
+        else renderDirectDetailUnavailable(host, 'vehicle', state);
+        return;
+      }
       const out=originalRender(host);
       setTimeout(()=>{ patchLegacyCards(); patchClientPremiumLabels(); },0);
       return out;
@@ -682,3 +714,4 @@ Orbit.modules = Orbit.modules || {};
 
   install();
 })();
+

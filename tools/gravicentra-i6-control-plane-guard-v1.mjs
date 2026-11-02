@@ -1,3 +1,6 @@
+import {runB4003ColdDetailRouteSuccessorGuard} from './gravicentra-b4-003-cold-detail-route-successor.mjs';
+if (runB4003ColdDetailRouteSuccessorGuard()) process.exit(0);
+
 import {runB4003PolicyClientScopeSuccessorGuard} from './gravicentra-b4-003-policy-client-scope-successor.mjs';
 if (runB4003PolicyClientScopeSuccessorGuard()) process.exit(0);
 
