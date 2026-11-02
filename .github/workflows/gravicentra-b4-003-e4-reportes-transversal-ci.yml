@@ -1,0 +1,38 @@
+name: Gravicentra B4-003 E4 Reportes transversal regression
+
+on:
+  pull_request:
+    branches: [recovery/fase-a-clean-20260831]
+    paths:
+      - orbit360-platform/modules/reportes.js
+      - tools/gravicentra-b4-003-reportes-e4-transversal.test.cjs
+      - .github/workflows/gravicentra-b4-003-e4-reportes-transversal-ci.yml
+  push:
+    branches: [recovery/fase-a-clean-20260831]
+    paths:
+      - orbit360-platform/modules/reportes.js
+      - tools/gravicentra-b4-003-reportes-e4-transversal.test.cjs
+      - .github/workflows/gravicentra-b4-003-e4-reportes-transversal-ci.yml
+
+permissions:
+  contents: read
+
+jobs:
+  e4-source-and-cross-module:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check exact product source syntax
+        run: node --check orbit360-platform/modules/reportes.js
+      - name: E4 all report types, GT/CO/TODOS, date and monetary lineage
+        run: node tools/gravicentra-b4-003-reportes-e4-transversal.test.cjs
+      - name: Preserve Insights, Plantillas and transversal country authority
+        run: |
+          node tools/gravicentra-b4-003-insights-plantillas-country-no-seed.test.cjs
+          node tools/gravicentra-b4-003-client-country-authority.test.cjs
+          node tools/gravicentra-b4-003-client-list-transversal-readonly.test.cjs
+          node tools/gravicentra-b4-003-cross-module-readback-contract.test.cjs
