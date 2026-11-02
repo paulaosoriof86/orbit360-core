@@ -41,7 +41,7 @@ jobs:
       - name: Checkout one-file transport
         uses: actions/checkout@v4
         with:
-          fetch-depth: 2
+          fetch-depth: 0
           persist-credentials: false
           path: transport
 
