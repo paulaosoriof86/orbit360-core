@@ -1,3 +1,6 @@
+import {runB4003RealCountryIndexEvidenceSuccessorGuard} from './gravicentra-b4-003-real-country-index-evidence-successor.mjs';
+if (runB4003RealCountryIndexEvidenceSuccessorGuard()) process.exit(0);
+
 import {runB4003ClientIndexLimitRepairSuccessorGuard} from './gravicentra-b4-003-client-index-limit-repair-successor.mjs';
 if (runB4003ClientIndexLimitRepairSuccessorGuard()) process.exit(0);
 
