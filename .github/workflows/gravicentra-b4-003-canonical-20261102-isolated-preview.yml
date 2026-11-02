@@ -1,9 +1,8 @@
 name: Gravicentra B4-003 canonical 20261102 isolated UAT Preview
 
-# Transport-only workflow. Product source is pinned to the one cumulative
-# recovery candidate. Reuse the verified LAB Preview reader without redeploying
-# its unchanged backend; publish only a new expiring Hosting channel.
-# Never write LIVE, Rules, Auth or operational data.
+# One cumulative B4-003 successor. Deploy ONLY two isolated GoalsPreview
+# callables, never replace old Preview or LIVE endpoints. Hosting is built
+# from canonical source once and proven by exact readback; zero business writes.
 on:
   push:
     branches: [recovery/fase-a-clean-20260831]
@@ -22,11 +21,11 @@ jobs:
     if: >-
       github.repository == 'paulaosoriof86/orbit360-core' &&
       github.ref == 'refs/heads/recovery/fase-a-clean-20260831' &&
-      github.event.head_commit.message == 'build(i6.5 B4-003): refresh exact Preview after E4 QA exclusion'
+      github.event.head_commit.message == 'build(i6.5 B4-003): isolate updated advisor roster in exact Preview'
     runs-on: ubuntu-24.04
     timeout-minutes: 55
     env:
-      SOURCE_SHA: 33849e326162e03667dfb829992b56b703f61cc5
+      SOURCE_SHA: 7e6d4b83b8df1e8b34981f130fe7f7e89c7eb9ce
       PROJECT_ID: ays-orbit-360-lab
       HOSTING_SITE: ays-orbit-360-lab
       TENANT_HINT: alianzas-soluciones
@@ -34,6 +33,7 @@ jobs:
       BUILD_PREFIX: gi-i65-b4
       ENVIRONMENT_REF: firebase-hosting-preview-i6-5-forensic-b4-003
       GRAVICENTRA_B4_003_SCOPED_PREVIEW: 'true'
+      GRAVICENTRA_B4_003_GOALS_PREVIEW: 'true'
       SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
       SA_LAB_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
       SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
@@ -69,6 +69,9 @@ jobs:
           test "$(git -C candidate hash-object functions/b4-003-scoped-policy-reader.js)" = '1d654b5590fb71279b6bcaaa8eb8625af07c52a4'
           test "$(git -C candidate hash-object orbit360-platform/modules/polizas.js)" = '7b2ab978918908b0e16e56ae04e86d816414d0ab'
           test "$(git -C candidate hash-object orbit360-platform/modules/reportes.js)" = '988e6c53f85a4fe27c9ed1cbd23aed61f7ee47c8'
+          test "$(git -C candidate hash-object tools/gravicentra-i6-1-preview-package.mjs)" = 'd42337f326637d669834664289cb3cce36b56342'
+          test "$(git -C candidate hash-object functions/assignable-advisor-roster.js)" = 'bc59e9d7be17154aa54f6c58593cc45af2d72503'
+          test "$(git -C candidate hash-object functions/product-operational-domain.js)" = 'b3d0059457142659633498c9e52c6b84ea68200f'
           cd candidate
           timeout -k 3s 55s node tools/gravicentra-i6-control-plane-guard-v1.mjs --mode=i6
           node tools/gravicentra-b4-003-client-country-authority.test.cjs
@@ -79,6 +82,10 @@ jobs:
           node tools/gravicentra-b4-003-polizas-context-cache.test.cjs
           node tools/gravicentra-b4-003-polizas-advisor-hydration-20261102.test.cjs
           node tools/gravicentra-b4-003-reportes-e4-transversal.test.cjs
+          node tests/goal-participation-isolated-routing.test.cjs
+          node tests/goal-participation-preview-boundary.test.cjs
+          node tests/goal-participation.test.cjs
+          node tools/gravicentra-b4-003-inicio-role-country-team.test.cjs
 
       - name: Fingerprint both LIVE sites, no LIVE modification
         run: |
@@ -133,34 +140,49 @@ jobs:
           if(region.includes('us-central1'))throw Error('PREVIEW_READER_WRONG_REGION');
           NODE
 
-      # E4 changes browser-only source; preserve the previously verified Preview
-      # callable. A backend redeploy would add risk without changing semantics.
-      - name: Stage only the Preview callable from canonical backend
-        if: ${{ false }}
+      # Isolated, additive us-east1 endpoints; old Preview and LIVE untouched.
+      - name: Stage exact isolated goals backend from canonical source
+        working-directory: candidate
         run: |
           set -euo pipefail
-          cp -a candidate/functions "$RUNNER_TEMP/gi-canonical-backend"
+          mkdir -p "$RUNNER_TEMP/gi-goals-function-package"
+          cp -a functions "$RUNNER_TEMP/gi-goals-function-package/backend"
           node - <<'NODE'
-          const fs=require('node:fs');const f=process.env.RUNNER_TEMP+'/gi-canonical-backend/bootstrap.js';
-          const src=fs.readFileSync(f,'utf8');
-          if(src.includes('b4-003-scoped-policy-callable'))throw Error('DUPLICATE_PREVIEW_EXPORT');
-          fs.appendFileSync(f,"\n// LAB-only: deploy exclusively the Preview callable selected by Firebase CLI.\nObject.assign(module.exports,require('./b4-003-scoped-policy-callable'));\n");
+          const fs=require('node:fs'),p=process.env.RUNNER_TEMP+'/gi-goals-function-package/backend/bootstrap.js';
+          const body="'use strict';\n"+
+            "const roster=require('./assignable-advisor-roster');\n"+
+            "const operational=require('./product-operational-domain');\n"+
+            "module.exports={orbit360AssignableAdvisorRosterGoalsPreview:roster.orbit360AssignableAdvisorRosterGoalsPreview,orbit360ProductOperationalCommandGoalsPreview:operational.orbit360ProductOperationalCommandGoalsPreview};\n";
+          fs.writeFileSync(p,body);
           NODE
-          (cd "$RUNNER_TEMP/gi-canonical-backend" && npm ci --ignore-scripts --no-audit --no-fund >/dev/null)
-          mkdir -p "$RUNNER_TEMP/gi-canonical-func-package"
-          mv "$RUNNER_TEMP/gi-canonical-backend" "$RUNNER_TEMP/gi-canonical-func-package/backend"
-          printf '{"functions":{"source":"backend","runtime":"nodejs22"}}\n' > "$RUNNER_TEMP/gi-canonical-func-package/firebase.json"
+          npm ci --prefix "$RUNNER_TEMP/gi-goals-function-package/backend" --ignore-scripts --no-audit --no-fund >/dev/null
+          printf '{"functions":{"source":"backend","runtime":"nodejs22"}}\n' > "$RUNNER_TEMP/gi-goals-function-package/firebase.json"
+          node --check "$RUNNER_TEMP/gi-goals-function-package/backend/bootstrap.js"
+          node --check "$RUNNER_TEMP/gi-goals-function-package/backend/assignable-advisor-roster.js"
+          node --check "$RUNNER_TEMP/gi-goals-function-package/backend/product-operational-domain.js"
 
-      - name: Deploy exactly ONE existing LAB Preview callable, never LIVE
-        if: ${{ false }}
+      - name: Deploy exactly two additive GoalsPreview callables
         run: |
           set -euo pipefail
-          node "$FIREBASE_CLI_BIN" deploy --only functions:orbit360ScopedPolicyReadPreview --config "$RUNNER_TEMP/gi-canonical-func-package/firebase.json" --project "$PROJECT_ID" --non-interactive
+          node "$FIREBASE_CLI_BIN" deploy --only functions:orbit360AssignableAdvisorRosterGoalsPreview,functions:orbit360ProductOperationalCommandGoalsPreview --config "$RUNNER_TEMP/gi-goals-function-package/firebase.json" --project "$PROJECT_ID" --non-interactive
           node "$FIREBASE_CLI_BIN" functions:list --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/functions-after.json"
           node - <<'NODE'
-          const fs=require('node:fs');const a=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/functions-after.json','utf8'));
-          const rows=Array.isArray(a.result)?a.result:Array.isArray(a)?a:[];
-          if(rows.filter(r=>[r.entryPoint,r.id,r.name].some(v=>String(v||'').includes('orbit360ScopedPolicyReadPreview'))).length!==1)throw Error('PREVIEW_FUNCTION_READBACK_MISSING');
+          const fs=require('node:fs');
+          const before=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/functions-before.json','utf8'));
+          const after=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/functions-after.json','utf8'));
+          const list=v=>Array.isArray(v.result)?v.result:Array.isArray(v)?v:[];
+          const name=v=>String(v.entryPoint||v.id||v.name||'');
+          for(const id of ['orbit360AssignableAdvisorRosterGoalsPreview','orbit360ProductOperationalCommandGoalsPreview']){
+            const found=list(after).filter(r=>name(r).endsWith(id));
+            if(found.length!==1)throw Error('GOALS_PREVIEW_FUNCTION_CARDINALITY:'+id);
+            const region=String(found[0].region||found[0].location||found[0].name||'');
+            if(region.includes('us-central1'))throw Error('GOALS_PREVIEW_WRONG_REGION:'+id);
+          }
+          for(const id of ['orbit360AssignableAdvisorRosterPreview','orbit360ProductOperationalCommandPreview','orbit360AssignableAdvisorRoster','orbit360ProductOperationalCommand']){
+            const b=list(before).find(r=>name(r).endsWith(id)),a=list(after).find(r=>name(r).endsWith(id));
+            if(!!b!==!!a)throw Error('PREVIOUS_OR_LIVE_FUNCTION_EXISTENCE_CHANGED:'+id);
+            if(b&&String(b.region||b.location||'')!==String(a.region||a.location||''))throw Error('PREVIOUS_OR_LIVE_FUNCTION_REGION_CHANGED:'+id);
+          }
           NODE
 
       - name: Read public Firebase config and build immutable canonical Hosting
@@ -180,7 +202,7 @@ jobs:
           const b=JSON.parse(fs.readFileSync(r+'/site/__recovery__/build.json','utf8'));
           const p=fs.readFileSync(r+'/site/product-runtime-config.js','utf8');
           if(Object.keys(c).join(',')!=='hosting'||c.hosting.site!==process.env.HOSTING_SITE||c.hosting.public!=='site')throw Error('HOSTING_ONLY_LAB_CONFIG_REQUIRED');
-          if(b.sourceSha!==process.env.SOURCE_SHA||b.gate!=='I6.5-B4-003'||!p.includes('"scopedReadPreviewCandidate":true'))throw Error('CANONICAL_HOSTING_PREVIEW_SOURCE_INVALID');
+          if(b.sourceSha!==process.env.SOURCE_SHA||b.gate!=='I6.5-B4-003'||!p.includes('"scopedReadPreviewCandidate":true')||!p.includes('"goalParticipationPreviewCandidate":true'))throw Error('CANONICAL_GOALS_PREVIEW_SOURCE_INVALID');
           if(!fs.readFileSync(r+'/site/core/tenant-access-policy-effective-p0.js').equals(fs.readFileSync('orbit360-platform/core/tenant-access-policy-effective-p0.js')))throw Error('FRONTEND_CANONICAL_BYTES_DRIFT');
           NODE
 
@@ -188,7 +210,7 @@ jobs:
         id: hosting
         run: |
           set -euo pipefail
-          CHANNEL_ID="gi-i65-b4-ca-${GITHUB_RUN_ID}"
+          CHANNEL_ID="gi-i65-b4-goals-${GITHUB_RUN_ID}"
           test "${#CHANNEL_ID}" -le 32
           cd "$RUNNER_TEMP/gi-canonical-hosting/bundle"
           node "$FIREBASE_CLI_BIN" hosting:channel:deploy "$CHANNEL_ID" --config firebase.json --project "$PROJECT_ID" --expires 7d --non-interactive --json > "$RUNNER_TEMP/hosting-result.json" 2>&1
@@ -220,9 +242,9 @@ jobs:
           curl --fail --silent --show-error --location --retry 2 --max-time 30 https://app.aysseguros.com/ | sha256sum > "$RUNNER_TEMP/domain-after.sha"
           cmp "$RUNNER_TEMP/live-before.sha" "$RUNNER_TEMP/live-after.sha"
           cmp "$RUNNER_TEMP/domain-before.sha" "$RUNNER_TEMP/domain-after.sha"
-          printf '%s\n' "B4-003 CANONICAL LAB PREVIEW SYNCHRONIZED" "Source: $SOURCE_SHA" "Preview: $PREVIEW_URL" 'E4 source excludes explicit synthetic QA in six reports, while all original records remain auditable. Reused verified LAB Preview callable without redeploy; a NEW expiring Hosting channel only. No LIVE, Rules, IAM, data writes or reimport. Physical 443 clients = 440 currently visible + three prior merged markers (physical recount pending). Authenticated new-Preview E4 plus Carlos/Samuel positive/negative UID UAT remain OPEN.' >> "$GITHUB_STEP_SUMMARY"
+          printf '%s\n' "B4-003 CANONICAL LAB PREVIEW SYNCHRONIZED" "Source: $SOURCE_SHA" "Preview: $PREVIEW_URL" 'E4 excludes synthetic QA; Inicio advisor/goal participation backend now matches frontend contract. Deployed two isolated GoalsPreview callables; old Preview/LIVE endpoints unchanged; new expiring Hosting channel. No LIVE, Rules, IAM, data writes or reimport. Physical 443 clients = 440 currently visible + three prior merged markers (physical recount pending). Authenticated new-Preview E4 plus Carlos/Samuel positive/negative UID UAT remain OPEN.' >> "$GITHUB_STEP_SUMMARY"
           node - <<'NODE'
-          const fs=require('node:fs');const proof={schema:'B4003_CANONICAL_PREVIEW_20261102_V1',sourceSha:process.env.SOURCE_SHA,previewUrl:process.env.PREVIEW_URL,previewFunction:'orbit360ScopedPolicyReadPreview',hostingLiveChanged:false,rulesChanged:false,authIamChanged:false,physicalClientIndexUpdatesInThisWorkflow:0,priorLabCountryCorrections:35,priorCountryApplyRunId:41478387493,clientProjection:{physical:443,activeVisible:440,previousMergedReadback:3,physicalMergedRecountPending:true},e4QaSourceFix:'PASS_SYNTHETIC_ONLY_PREVIEW_UAT_PENDING',advisorCrossBorderSourceQa:'PASS_PENDING_AUTHENTICATED_UAT',authenticatedUat:'PENDING_CARLOS_SAMUEL_AND_NEW_PREVIEW_PAULA',production:'HOLD'};
+          const fs=require('node:fs');const proof={schema:'B4003_CANONICAL_PREVIEW_20261102_V1',sourceSha:process.env.SOURCE_SHA,previewUrl:process.env.PREVIEW_URL,previewFunction:'orbit360ScopedPolicyReadPreview',goalsPreviewFunctions:['orbit360AssignableAdvisorRosterGoalsPreview','orbit360ProductOperationalCommandGoalsPreview'],goalsPreviewFlag:true,hostingLiveChanged:false,rulesChanged:false,authIamChanged:false,physicalClientIndexUpdatesInThisWorkflow:0,priorLabCountryCorrections:35,priorCountryApplyRunId:41478387493,clientProjection:{physical:443,activeVisible:440,previousMergedReadback:3,physicalMergedRecountPending:true},e4QaSourceFix:'PASS_SYNTHETIC_ONLY_PREVIEW_UAT_PENDING',advisorCrossBorderSourceQa:'PASS_PENDING_AUTHENTICATED_UAT',authenticatedUat:'PENDING_AUTHENTICATED_GOALS_PREVIEW_PAULA_CARLOS_SAMUEL',production:'HOLD'};
           fs.writeFileSync(process.env.RUNNER_TEMP+'/canonical-preview-readback.json',JSON.stringify(proof,null,2)+'\n');
           NODE
 
