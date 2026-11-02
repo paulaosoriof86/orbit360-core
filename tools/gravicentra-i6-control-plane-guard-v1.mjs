@@ -1,3 +1,6 @@
+import {runB4003CountryIndexDryrunWorkflowSuccessorGuard} from './gravicentra-b4-003-country-index-dryrun-workflow-successor.mjs';
+if (runB4003CountryIndexDryrunWorkflowSuccessorGuard()) process.exit(0);
+
 import {runB4003OperativoClientReadSuccessorGuard} from './gravicentra-b4-003-operativo-client-read-successor.mjs';
 if (runB4003OperativoClientReadSuccessorGuard()) process.exit(0);
 

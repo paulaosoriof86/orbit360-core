@@ -1,0 +1,62 @@
+{
+  "schema": "GRAVICENTRA_I65_B4003_CLIENT_COUNTRY_INDEX_DRYRUN_CI_SUCCESSOR_V1",
+  "repository": "paulaosoriof86/orbit360-core",
+  "canonicalBranch": "recovery/fase-a-clean-20260831",
+  "recordedDate": "2026-11-02",
+  "gate": "I6.5/B4-003",
+  "status": "GUARDED_CANONICAL_ONLY_LAB_READONLY_INDEX_DELTA_WORKFLOW_READY_RUN_PENDING_HOLD",
+  "canonicalParentHead": "6db3bc1e3c6064f0b9ef2464a154b6cd5814c0cd",
+  "workflowSourceCommit": "fdae20214f4db3169222c4584c606d5cc123752c",
+  "workflowSourceTree": "292e51a0887aa3be1f999ea5e92f672265cfa7e0",
+  "workflowPath": ".github/workflows/gravicentra-b4-003-client-index-dryrun-readonly-20261102.yml",
+  "workflowGitBlobSha": "ba813b2b176b977c290c86192f9085bfc2ebb21d",
+  "why": "The already merged role correction is source-only. Real physical country index changes require a bounded, no-PII run before any migration proposal, so an exact canonical-branch-only CI invocation is prepared instead of silently guessing a count.",
+  "preexistingPhysicalReadAuthority": {
+    "project": "ays-orbit-360-lab",
+    "tenant": "alianzas-soluciones",
+    "sameCredentialFamilyAsSucceededPhysicalJoinRun": 41389449069,
+    "newCredentialAuthorized": false,
+    "noNewIdentityOrSecretCreated": true
+  },
+  "restrictions": {
+    "workflowTriggers": ["push on the new workflow file inside canonical branch", "manual workflow_dispatch"],
+    "permissions": "contents:read",
+    "checkoutPersistCredentials": false,
+    "projectAllowlisted": true,
+    "tenantAllowlisted": true,
+    "sourceFrozenCountsRequired": { "clients": 443, "policies": 1425, "insurers": 33 },
+    "readsBounded": true,
+    "aggregateOnlyNoNamesEmailsOrIds": true,
+    "boundedTimeoutSeconds": 180,
+    "artifactRetentionDays": 30,
+    "firestoreWrites": 0,
+    "rulesWrites": 0,
+    "authWrites": 0,
+    "hostingDeploys": 0,
+    "liveFunctionsDeploys": 0,
+    "migrationApplyAuthorized": false,
+    "requiresSeparateApprovalForPhysicalIndexChanges": true
+  },
+  "notYetProven": {
+    "realIndexDryrunCompleted": false,
+    "physicalCandidateGT": null,
+    "physicalCandidateCO": null,
+    "multiUidAuthenticatedPreviewUatPassed": false,
+    "independentBackendNegativeUidUatPassed": false,
+    "firestoreRulesP0Closed": false,
+    "restoreDrillAccepted": false,
+    "sevenAdvisorsClassified": false
+  },
+  "releaseHold": {
+    "productionAuthorized": false,
+    "B4003Closed": false,
+    "formalI6Percent": 50,
+    "priorityP0Closed": 1,
+    "priorityP0Total": 6,
+    "dataWrites": 0,
+    "sharedRulesAuthIamMutation": false,
+    "liveHostingDeployed": false,
+    "liveFunctionsDeployed": false
+  },
+  "nextAction": "Merge the one guarded CI workflow into canonical, inspect run and archive exact aggregate evidence without changing client records, then schedule isolated authenticated Preview and negative scope checks."
+}
