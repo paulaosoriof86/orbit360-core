@@ -87,3 +87,23 @@ Los **seis hallazgos P0 del ledger del 12-oct** son un inventario distinto de lo
 3. **Secuencia inmediata de mínimo retrabajo:** (a) CI y Preview con fuente actual para Asesor; (b) cotejo **privado y read-only** de los 4 clientes ausentes + QA; (c) UAT de Paula y luego UID real Carlos y Samuel, positivos/negativos GT/CO/TODOS y asesor; (d) corregir sólo causas transversales observadas, subirlas a **misma candidata**, nuevo digest/Preview si cambia source; (e) recorridos tesis/finanzas, writes sintéticos y restore; (f) cierre de los seis P0, 15 capacidades y siguientes B4. Cada arreglo vuelve al mismo gate, nunca crea otro plan/branch/Preview divergente.
 4. **Seguridad/producción:** Paula aceptó el 28-oct el riesgo temporal de Rules existentes para LIVE controlado; **no** es `SECURITY_PASS`, ni autoriza despliegue Rules o cambio IAM. Tampoco exonera negativos de endpoint, SDK, tenant ni rollback. No enviar WhatsApp/correos reales, no importar agosto, no tocar LIVE ni fabricar valores.
 5. **Estado que manda al reanudar:** el control plane puede contener recibos antiguos con `PRODUCTION_ACCEPTED` histórico; **no se traslada ese rótulo** a la candidata actual sin la cadena inmutable de Preview→LIVE y la matriz de 15 capacidades. El registro operativo de este lote es **B4-003 HOLD / I6 50% / piloto HOLD / LIVE NO-GO**. El siguiente movimiento verificable es Preview del commit que contiene el fix de Asesor y esta adenda, seguido de cotejo 443/439 y UAT real.
+
+---
+
+## Adenda de hallazgo reproducido con Paula autenticada — 2-nov-2026
+
+**Preview exacta probada (NO certificada):** source `2482af7b61eefb739117412fb154a42c622f07c0`, [Actions 41484802675](https://github.com/paulaosoriof86/orbit360-core/actions/runs/41484802675), Hosting `https://ays-orbit-360-lab--gi-i65-b4-ca-41484802675-9jbsg4tf.web.app/`. El transporte técnico, build/readback de bytes y comparación LIVE finalizaron en `SUCCESS`. La prueba de UI a continuación usó sesión **real autenticada de Paula** sobre este origen, sin sustituirla por un mock.
+
+| Escenario de Pólizas con UID de Paula | País | Conteo visible | Asesor en primeras 100 filas | Dictamen limitado |
+| --- | --- | ---: | --- | --- |
+| Rol activo Dirección | TODOS | **1.425** | Filtro completo, nombres visibles | `AUTH_READ_OBSERVED` en ese UID/rol |
+| Rol activo Dirección | GT | **1.301** | Nombres visibles | `AUTH_READ_OBSERVED` |
+| Rol activo Dirección | CO | **124** | Las cinco filas de contraste sí tienen el nombre real de su asesora histórica GT | `AUTH_READ_OBSERVED` |
+| Mismo UID Paula, rol activo Operativo | GT | **1.301** | Nombres presentes, seis asesores seleccionables | `AUTH_READ_OBSERVED`, **NO** equivale a Carlos |
+| Mismo UID Paula, rol activo Operativo | CO | **124** | **5/100** muestran `Asesor sin coincidencia`; corresponden a la misma asesora histórica GT | `BLOCKED_CAUSAL`, NO PASS |
+
+**Causa raíz transversal demostrada:** el lector mínimo `assignableAdvisorRoster.list('CO')` devuelve asesores **asignables** para CO; no representa la relación histórica de una póliza CO cuyo asesor reside en el catálogo GT. Dirección podía resolver el mismo `asesorId` vía Equipo completo; Operativo no debe abrir ese directorio. La misma lógica falla para cualquier asesor cross-border, sin tratamiento por nombre ni UID individual. No es error del campo país del cliente ni motivo para reimportar.
+
+**Corrección de contrato, pendiente de nueva Preview/UAT:** el `scopedPolicyRead` del servidor, **después** de autorizar UID, tenant, país, rol y cada póliza, añade exclusivamente `asesorNombreVerificado` consultando por ID de asesor vinculado a esas filas; no enumera Equipo ni devuelve credenciales. Pólizas combina ese nombre con el roster asignable para la celda y el filtro. Pruebas de fuente con mock cubren Colombia-only/asesor GT-only, denegación de GT, ausencia de lectura global de Equipo y campo sensible no proyectado; ver el SHA de la próxima candidata. Hasta build/readback y prueba real, mantener `SOURCE_QA_PASS / AUTH_CO_ADVISOR_PENDING`, no `LATEST_APPROVED_VERSION_PREVIEW_PASS`.
+
+**Invariantes aún abiertos:** (1) entrar con los UIDs **independientes** de Carlos Castro y Samuel Daza, comprobar Operativo GT+CO completo y Asesor restrictivo con readback y negativos; (2) explicar por ID y valor **crudo** los cuatro clientes de `443` físicos frente a `439` visibles, en privado y read-only; (3) aislar fixtures QA de KPIs/E4; (4) retestar E4/E8/S5/S6/S7 y cadena Cliente 360→Póliza→Recibo/Cobro→Renovación en misma candidata; (5) cerrar seis P0, writes reversibles, matriz 15 capacidades/44 áreas, B4-004…B4-007 y aceptación del mismo digest LIVE. Se conserva el plan congelado y no nace ningún bloque nuevo.
