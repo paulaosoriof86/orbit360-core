@@ -12,6 +12,10 @@ Orbit.modules.calidad = (function () {
   const U = Orbit.ui, q = Orbit.q, K = Orbit.kit, S = () => Orbit.store, A = Orbit.access || {};
   let st = { q: '', pais: '', ffalta: '', soloVig: false, asesor: '', page: 1, pageSize: 50 };
   let searchTimer = null;
+  let financialPendingOff = null, financialPendingStore = null, financialRefreshTimer = null;
+  const isQa = row => !!row && typeof q.isSyntheticQaRecord === 'function' && q.isSyntheticQaRecord(row);
+  const commercialClient = row => !!row && !isQa(row);
+  const commercialPolicy = row => !!row && !isQa(row) && !isQa(S().get('clientes', row.clienteId));
 
   function clean(v) { return String(v == null ? '' : v).trim(); }
   function fold(v){return clean(v).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();}
@@ -49,7 +53,7 @@ Orbit.modules.calidad = (function () {
   }
 
   function tieneVigente(cid) {
-    try { return q.polizasDe(cid).some(p => p.estado === 'Vigente' || p.estado === 'Por renovar' || ['vigente','porrenovar'].includes(String(p.estado || '').toLowerCase().replace(/\s+/g,''))); }
+    try { return q.polizasDe(cid).some(p => commercialPolicy(p) && (p.estado === 'Vigente' || p.estado === 'Por renovar' || ['vigente','porrenovar'].includes(String(p.estado || '').toLowerCase().replace(/\s+/g,'')))); }
     catch (e) { return false; }
   }
   function scopeLabel() {
@@ -70,11 +74,32 @@ Orbit.modules.calidad = (function () {
     if(needed.some(name=>denied.includes(name)||failed.includes(name)))return{status:'UNAVAILABLE',issues:[]};
     if(!needed.every(name=>confirmed.includes(name)))return{status:'PENDING',issues:[]};
     try {
-      const policies=(store.all('polizas')||[]).filter(p=>p&&inActiveCountry(p));
+      const policies=(store.all('polizas')||[]).filter(p=>commercialPolicy(p)&&inActiveCountry(p));
       const issues=rm.financialIntegrityBatch(policies);
       if(!Array.isArray(issues))return{status:'UNAVAILABLE',issues:[]};
       return{status:issues.length?'READY_WITH_FINDINGS':'READY_WITH_ZERO',issues};
     }catch(_error){return{status:'UNAVAILABLE',issues:[]};}
+  }
+  // B4-003: E8 hydrates its own receipts; browsing Cobros first is not required.
+  function ensureFinancialReadiness(host) {
+    const store=S(); if(!store)return;
+    if(financialPendingStore!==store){
+      if(typeof financialPendingOff==='function')financialPendingOff();
+      financialPendingOff=null; financialPendingStore=store;
+    }
+    if(!financialPendingOff&&typeof store.on==='function'){
+      financialPendingOff=store.on('*',()=>{
+        if(financialIntegritySnapshot().status==='PENDING')return;
+        const off=financialPendingOff;financialPendingOff=null;
+        if(typeof off==='function')off();
+        if(financialRefreshTimer)clearTimeout(financialRefreshTimer);
+        financialRefreshTimer=setTimeout(()=>{
+          financialRefreshTimer=null;
+          if(host&&host.isConnected&&/^#\/calidad(?:[?\/]|$)/.test(location.hash||'')&&!document.getElementById('q-inline'))render(host);
+        },70);
+      });
+    }
+    try{if(typeof store._ensureCollections==='function')store._ensureCollections(['polizas','recibosEsperados']);}catch(_error){}
   }
   function financialIntegrityIssues(){return financialIntegritySnapshot().issues;}
   function sourceLabel(value){const raw=clean(value);if(!raw)return 'Origen de la prima no identificado';if(/^I\d+[_-]|PRIMARY_POLICY_UNIVERSE|SOURCE[_-]UNIVERSE|LINEAGE/i.test(raw))return 'Prima tomada de la póliza importada';return raw.replace(/_/g,' ');}
@@ -123,12 +148,14 @@ Orbit.modules.calidad = (function () {
   }
 
   function render(host) {
-    const clients = (S().all('clientes') || []).filter(inActiveCountry);
+    const clientsInScope = (S().all('clientes') || []).filter(inActiveCountry);
+    const qaClientsExcluded = clientsInScope.filter(c => !commercialClient(c)).length;
+    const clients = clientsInScope.filter(commercialClient);
     const clientsById = new Map(clients.map(c => [c.id, c]));
     const clientIds = new Set(clients.map(c => c.id).filter(Boolean));
     const vigenteClientIds = new Set();
     (S().all('polizas') || []).forEach(p => {
-      if (!p || !clientIds.has(p.clienteId)) return;
+      if (!commercialPolicy(p) || !clientIds.has(p.clienteId)) return;
       const state=clean(p.estado).toLowerCase().replace(/\s+/g,'');
       if (state==='vigente' || state==='porrenovar') vigenteClientIds.add(p.clienteId);
     });
@@ -155,6 +182,7 @@ Orbit.modules.calidad = (function () {
     const completePct = clients.length ? (completeCount / clients.length) * 100 : 100;
     const ownScope = A.dataScope && A.dataScope('calidad') === 'own';
     const financialSnapshot = financialIntegritySnapshot(), financialIssues = financialSnapshot.issues;
+    if(financialSnapshot.status==='PENDING')ensureFinancialReadiness(host);
     const pageSize = st.pageSize || 50, pageCount = Math.max(1, Math.ceil(rows.length / pageSize));
     st.page = Math.max(1, Math.min(st.page || 1, pageCount));
     const pageStart = (st.page - 1) * pageSize, visibleRows = rows.slice(pageStart, pageStart + pageSize), pageEnd = Math.min(rows.length, pageStart + visibleRows.length);
@@ -162,6 +190,7 @@ Orbit.modules.calidad = (function () {
     host.innerHTML = `<div class="page">
       ${K.bannerFor('calidad', `<button class="btn primary" onclick="Orbit.modules.calidad.campana()">📣 Preparar actualización</button>`)}
       <div class="cfg-note" style="margin-bottom:14px"><b>${U.esc(scopeLabel())}:</b> País y moneda se corrigen aquí con fuente y auditoría. Las pólizas o cobros vinculados pueden aportar una sugerencia, pero nunca cambian el país silenciosamente.</div>
+      ${qaClientsExcluded ? `<div class="cfg-note" data-quality-qa-quarantine="${qaClientsExcluded}" style="margin-bottom:14px"><b>Pruebas QA:</b> ${qaClientsExcluded} expediente(s) sintético(s) excluido(s) de indicadores y campañas; conservado(s) en Cliente 360 para auditoría.</div>` : ''}
       ${K.kpis([
         { label: ownScope ? 'Mis expedientes incompletos' : 'Expedientes incompletos', val: all.length, color: 'var(--warn)', foot: 'de ' + clients.length + ' en alcance' },
         { label: 'País por validar', val: pendingCountry, color: 'var(--danger)', foot: suggestedCountry + ' con evidencia sugerida', footTone: pendingCountry ? 'down' : 'up' },
@@ -281,7 +310,7 @@ Orbit.modules.calidad = (function () {
   }
 
   function campana() {
-    const rows = (S().all('clientes') || []).map(c => ({ c, f: faltantes(c) })).filter(x => x.f.length);
+    const rows = (S().all('clientes') || []).filter(c => commercialClient(c) && inActiveCountry(c)).map(c => ({ c, f: faltantes(c) })).filter(x => x.f.length);
     const wa = rows.filter(x => clean(x.c.whatsapp || x.c.telefono)).length;
     const mail = rows.filter(x => !clean(x.c.whatsapp || x.c.telefono) && clean(x.c.email)).length;
     U.toast('Actualización preparada:\n\n• ' + wa + ' por WhatsApp Web/canal pendiente de confirmación\n• ' + mail + ' por correo preparado\n• ' + (rows.length - wa - mail) + ' sin canal — requieren gestión.\n\nNo se ha confirmado ningún envío.');

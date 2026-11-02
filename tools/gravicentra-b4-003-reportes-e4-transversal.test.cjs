@@ -313,7 +313,9 @@ test('Cliente 360 Operativo uses only verified policy advisor labels without rea
   const table={
     clientes:[{id:'clientCO',nombre:'Cliente Colombiano',tipo:'Persona',pais:'CO',moneda:'COP',asesorId:'advisorHistorico'}],
     polizas:[{id:'policyCO',numero:'CO-123',clienteId:'clientCO',pais:'CO',moneda:'COP',primaTotal:300,primaNeta:270,
-      asesorId:'advisorHistorico',asesorNombreVerificado:'Johanna Salgado',estado:'Vigente'}],
+      asesorId:'advisorHistorico',asesorNombreVerificado:'Johanna Salgado',estado:'Vigente'},
+      {id:'qaB4',numero:'B4-003-QA',clienteId:'clientCO',pais:'CO',moneda:'COP',primaTotal:5000,primaNeta:4500,
+        asesorId:'advisorHistorico',asesorNombreVerificado:'Johanna Salgado',estado:'Vigente',__syntheticQa:true}],
     asesores:[], carteraPrimas:[]
   };
   const store={__productReadOnlyP0:true,all:k=>table[k]||[],get:(k,id)=>(table[k]||[]).find(x=>x.id===id)||null,
@@ -324,7 +326,8 @@ test('Cliente 360 Operativo uses only verified policy advisor labels without rea
   const diagnostics={};
   const host={innerHTML:'',isConnected:true,querySelectorAll:()=>[],querySelector:()=>null};
   const Orbit={store,ui,kit:{bannerFor:()=>''},modules:{},pais:'CO',route:{params:{}},
-    session:{rol:()=> 'Operativo'},clientProjection:{withReadBatch:fn=>fn?fn():null},q:{}};
+    session:{rol:()=> 'Operativo'},clientProjection:{withReadBatch:fn=>fn?fn():null},
+    q:{isSyntheticQaRecord:row=>!!row&&row.__syntheticQa===true}};
   const browserWindow={Orbit,OrbitRuntimeDiagnostics:diagnostics,addEventListener(){}};
   const document={addEventListener(){},getElementById:id=>id==='c360-client-name-case-style'?{}:null};
   const ctx=vm.createContext({Orbit,OrbitRuntimeDiagnostics:diagnostics,window:browserWindow,document,location:{hash:'#/cliente360'},Date,Map,Set,console,setTimeout,clearTimeout});
@@ -334,5 +337,65 @@ test('Cliente 360 Operativo uses only verified policy advisor labels without rea
   assert.match(host.innerHTML,/Johanna Salgado/);
   assert.match(host.innerHTML,/<option value="advisorHistorico"[^>]*>Johanna Salgado<\/option>/);
   assert.doesNotMatch(host.innerHTML, /Asesor sin coincidencia/);
+  assert.match(host.innerHTML,/data-c360-kpi-active-count="1"/);
+  assert.match(host.innerHTML,/data-c360-kpi-policy-count="1"/);
+  assert.match(host.innerHTML,/COP 270/);
+  assert.doesNotMatch(host.innerHTML,/COP 4,770/);
+  assert.equal(writes,0);
+});
+
+
+test('E4 never renders literal undefined in Ramo; unknown source is explicitly pending', () => {
+  const app=setup('GT');
+  const html=app.render();
+  assert.match(html,/Pendiente de clasificar/);
+  assert.doesNotMatch(html,/>undefined</i);
+});
+
+test('E8 independently hydrates financial data, quarantines QA from workflows and repaints on confirmation', async () => {
+  const calidad=source('orbit360-platform/modules/calidad.js');
+  const table={
+    clientes:[{id:'real',nombre:'Cliente real',pais:'GT',tipo:'Persona',asesorId:'ad'},
+      {id:'qa',nombre:'B4-003 QA Cliente',pais:'GT',tipo:'Persona',asesorId:'ad',__syntheticQa:true,email:'qa@example.invalid'}],
+    polizas:[{id:'realP',clienteId:'real',pais:'GT',estado:'Vigente'},
+      {id:'qaP',clienteId:'qa',pais:'GT',estado:'Vigente',__syntheticQa:true}],
+    asesores:[{id:'ad',nombre:'Paula'}]
+  };
+  let ready=false,writes=0,toast='';
+  const ensure=[],subscriptions=[],financeIds=[];
+  const store={__productReadOnlyP0:true,all:k=>table[k]||[],get:(k,id)=>(table[k]||[]).find(x=>x.id===id)||null,
+    _productStatus:()=>({serverConfirmedCollections:ready?['polizas','recibosEsperados']:['polizas'],deniedCollections:[],snapshotErrors:{}}),
+    _ensureCollections:collections=>ensure.push(...collections),
+    on:(_key,cb)=>{subscriptions.push(cb);return()=>{const n=subscriptions.indexOf(cb);if(n>=0)subscriptions.splice(n,1);}},
+    updateDurable(){writes++;throw Error('NO_QUALITY_WRITE');}
+  };
+  const Orbit={modules:{},pais:'GT',store,
+    q:{isSyntheticQaRecord:row=>!!row&&row.__syntheticQa===true,polizasDe:cid=>table.polizas.filter(p=>p.clienteId===cid)},
+    policyVehicleReadModelV1199c:{financialIntegrityBatch:pol=>{financeIds.push(pol.map(p=>p.id).join(','));return [];}},
+    ui:{esc:v=>String(v??''),avatar:()=>'<span>avatar</span>',toast:message=>{toast=message;}},
+    kit:{bannerFor:()=>'',kpis:defs=>defs.map(d=>'<div>'+d.label+': '+d.val+'</div>').join(''),asesorCell:()=>'<span>Paula</span>'},
+    access:{dataScope:()=> 'all'}
+  };
+  const document={getElementById:()=>null};
+  const location={hash:'#/calidad'};
+  const context=vm.createContext({Orbit,window:{Orbit},document,location,Date,Map,Set,console,setTimeout,clearTimeout});
+  vm.runInContext(calidad,context,{filename:'calidad.js'});
+  const host={innerHTML:'',isConnected:true,querySelector:()=>null};
+  Orbit.modules.calidad.render(host);
+  assert.match(host.innerHTML,/data-quality-financial-readiness="PENDING"/);
+  assert.match(host.innerHTML,/data-quality-qa-quarantine="1"/);
+  assert.doesNotMatch(host.innerHTML,/B4-003 QA Cliente/);
+  assert.match(host.innerHTML,/de 1 en alcance/);
+  assert.ok(ensure.includes('recibosEsperados'));
+  assert.ok(ensure.includes('polizas'));
+  assert.equal(financeIds.length,0,'financial figures must not materialize before server confirmation');
+  ready=true;
+  for(const cb of [...subscriptions])cb('recibosEsperados');
+  await new Promise(resolve=>setTimeout(resolve,130));
+  assert.match(host.innerHTML,/data-quality-financial-readiness="READY_WITH_ZERO"/);
+  assert.deepEqual(financeIds,['realP','realP']);
+  Orbit.modules.calidad.campana();
+  assert.match(toast,/1 sin canal/);
+  assert.doesNotMatch(toast,/1 por correo preparado/);
   assert.equal(writes,0);
 });

@@ -282,7 +282,10 @@ Orbit.modules.cliente360 = (function () {
       (!f.seg || c.segmento === f.seg)
     );
     const kpiClientIds = new Set(rows.map(c => String(c && c.id || '')).filter(Boolean));
-    const policiesForKpi = policiesForList.filter(p => p && kpiClientIds.has(String(p.clienteId || '')));
+    // QA fixtures remain in authorized client details, not commercial KPIs.
+    const isQaRecord = row => typeof q.isSyntheticQaRecord === 'function' && q.isSyntheticQaRecord(row);
+    const policiesForKpi = policiesForList.filter(p => p && !isQaRecord(p) &&
+      !isQaRecord(S().get('clientes', p.clienteId)) && kpiClientIds.has(String(p.clienteId || '')));
     const pageCount = Math.max(1, Math.ceil(rows.length / LIST_PAGE_SIZE));
     if (listPage > pageCount) listPage = pageCount;
     if (listPage < 1) listPage = 1;
