@@ -5,7 +5,7 @@ name: Gravicentra B4-003 canonical 20261102 isolated UAT Preview
 # a new expiring Hosting channel; never the LIVE reader, Rules, Auth or data.
 on:
   push:
-    branches: [fix/b4-003-canonical-uat-preview-20261102]
+    branches: [recovery/fase-a-clean-20260831]
     paths:
       - .github/workflows/gravicentra-b4-003-canonical-20261102-isolated-preview.yml
 
@@ -20,12 +20,12 @@ jobs:
   exact-canonical-preview:
     if: >-
       github.repository == 'paulaosoriof86/orbit360-core' &&
-      github.ref == 'refs/heads/fix/b4-003-canonical-uat-preview-20261102' &&
-      github.event.head_commit.message == 'build(i6.5 B4-003): sync canonical LAB Preview reader and Hosting only'
+      github.ref == 'refs/heads/recovery/fase-a-clean-20260831' &&
+      github.event.head_commit.message == 'build(i6.5 B4-003): refresh canonical Preview after advisor hydration'
     runs-on: ubuntu-24.04
     timeout-minutes: 55
     env:
-      SOURCE_SHA: 9d1839da8717757baf9adbf1fdfad83cddc41791
+      SOURCE_SHA: 53c4796c45930d42283b3a751aee0f75fa71c8f6
       PROJECT_ID: ays-orbit-360-lab
       HOSTING_SITE: ays-orbit-360-lab
       TENANT_HINT: alianzas-soluciones
@@ -47,7 +47,7 @@ jobs:
       - name: Checkout frozen canonical source, no product divergence
         uses: actions/checkout@v4
         with:
-          ref: 9d1839da8717757baf9adbf1fdfad83cddc41791
+          ref: 53c4796c45930d42283b3a751aee0f75fa71c8f6
           fetch-depth: 0
           persist-credentials: false
           path: candidate
@@ -71,6 +71,9 @@ jobs:
           node tools/gravicentra-b4-003-client-country-index-dryrun-readonly.test.cjs
           node tools/gravicentra-b4-003-scoped-boundary.test.cjs
           node tools/gravicentra-b4-003-scoped-related-reader.test.cjs
+          node tools/gravicentra-b4-003-polizas-context-cache.test.cjs
+          node tools/gravicentra-b4-003-polizas-advisor-hydration-20261102.test.cjs
+          node tools/gravicentra-b4-003-reportes-e4-transversal.test.cjs
 
       - name: Fingerprint both LIVE sites, no LIVE modification
         run: |
