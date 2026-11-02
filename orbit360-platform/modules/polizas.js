@@ -9,7 +9,9 @@ Orbit.modules.polizas = (function () {
   const PAGE_SIZE = 100;
   const MODULE_KEY = 'polizas';
   const PC = id => (window.Orbit && Orbit.clientProjection && Orbit.clientProjection.get(id)) || S().get('clientes', id);
-  let st = { fq: '', framo: '', fasg: '', fase: '', fest: '', sort: 'vence', page: 0 };
+  const defaultFilters = () => ({ fq: '', framo: '', fasg: '', fase: '', fest: '', sort: 'vence', page: 0 });
+  let st = defaultFilters();
+  let filtersContextKey = null;
   let indexCache = null, indexCacheKey = null, searchTimer = null;
   let advisorRosterKey = null, advisorRosterState = 'pending', advisorRosterRows = [];
   function invalidateIndexes() { indexCache = null; indexCacheKey = null; }
@@ -289,6 +291,15 @@ Orbit.modules.polizas = (function () {
   }
 
   function render(host) {
+    // B4-003: a previous advisor filter must not remain invisibly selected
+    // after changing UID, role, tenant, authorized countries or active country.
+    // Otherwise KPI reads are correct but the table can falsely show 0 rows.
+    const nextFiltersContextKey = indexContextKey();
+    if (filtersContextKey !== null && filtersContextKey !== nextFiltersContextKey) {
+      st = defaultFilters();
+      if (searchTimer) { clearTimeout(searchTimer); searchTimer = null; }
+    }
+    filtersContextKey = nextFiltersContextKey;
     try { if(S()&&typeof S()._ensureCollections==='function') S()._ensureCollections(
       fullAdvisorDirectoryAuthorized()?['polizas','clientes','asesores']:['polizas','clientes']); } catch (_) {}
     hydrateAllowedAdvisorNames(host);
