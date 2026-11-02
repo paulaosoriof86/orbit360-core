@@ -1,0 +1,145 @@
+name: Gravicentra B4-003 owner country GT GT CO closure LAB canonical
+
+# Direction 2026-11-02: Kerlyn GT, Aura GT, Luz Dary CO. A single bounded
+# canonical-branch migration with exact-identity hashes, private preimages,
+# restore drill, transaction and independently verified aggregate readback.
+# No raw client IDs, names or record content leave Firestore private vault.
+# No production Hosting, Auth, Rules, IAM, or data refresh beyond three fields.
+on:
+  push:
+    branches: [recovery/fase-a-clean-20260831]
+    paths:
+      - .github/workflows/gravicentra-b4-003-owner-country-closure-20261102.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: gravicentra-b4003-direction-owner-country-20261102
+  cancel-in-progress: false
+
+jobs:
+  exact-owner-country-closure:
+    if: >-
+      github.repository == 'paulaosoriof86/orbit360-core' &&
+      github.ref == 'refs/heads/recovery/fase-a-clean-20260831' &&
+      github.event.head_commit.message == 'fix(i6.5 B4-003): execute three verified Direction country decisions in LAB'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    env:
+      PROJECT_ID: ays-orbit-360-lab
+      SOURCE_SHA: 38174e75612d0d63e3c315d20192805e1eff0c4b
+      SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_LAB_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Prove canonical product unchanged and synthetic contract tests
+        run: |
+          set -euo pipefail
+          test "$(git diff --name-only HEAD^ HEAD)" = '.github/workflows/gravicentra-b4-003-owner-country-closure-20261102.yml'
+          git merge-base --is-ancestor "$SOURCE_SHA" HEAD
+          git diff --name-only "$SOURCE_SHA" HEAD | sort > "$RUNNER_TEMP/actual-delta.txt"
+          printf '%s\n' \
+            '.github/workflows/gravicentra-b4-003-owner-country-closure-20261102.yml' \
+            'tools/gravicentra-b4-003-owner-country-closure-20261102.cjs' \
+            'tools/gravicentra-b4-003-owner-country-closure-20261102.test.cjs' | sort > "$RUNNER_TEMP/expected-delta.txt"
+          cmp "$RUNNER_TEMP/actual-delta.txt" "$RUNNER_TEMP/expected-delta.txt"
+          node --check tools/gravicentra-b4-003-owner-country-closure-20261102.cjs
+          node tools/gravicentra-b4-003-owner-country-closure-20261102.test.cjs
+          node tools/gravicentra-b4-003-client-country-authority.test.cjs
+          node tools/gravicentra-b4-003-client-country-index-dryrun-readonly.test.cjs
+          timeout -k 3s 55s node tools/gravicentra-i6-control-plane-guard-v1.mjs --mode=i6
+
+      - name: Prove private Firestore vault denied by client Rules and snapshot LIVE hashes
+        run: |
+          set -euo pipefail
+          node - <<'NODE'
+          const fs=require('node:fs');const s=fs.readFileSync('firestore.rules','utf8');
+          if(!s.includes('match /{document=**} {')||!s.includes('allow read, write: if false;')||
+             s.includes('__gravicentraPrivateMigrationVault'))throw Error('VAULT_ROOT_RULES_DENY_NOT_PROVEN');
+          NODE
+          curl --fail --silent --show-error --location --retry 2 --max-time 30 https://ays-orbit-360-lab.web.app/ | sha256sum > "$RUNNER_TEMP/lab-live-before.sha"
+          curl --fail --silent --show-error --location --retry 2 --max-time 30 https://app.aysseguros.com/ | sha256sum > "$RUNNER_TEMP/domain-live-before.sha"
+
+      - name: Select existing LAB service account and pinned Admin SDK
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/gi-b4003-direction-country-auth"
+          python3 - <<'PY'
+          import json,os,pathlib
+          root=pathlib.Path(os.environ['RUNNER_TEMP'])/'gi-b4003-direction-country-auth';items=[]
+          for n,key in enumerate(('SA_LAB','SA_LAB_ALT','SA_DEFAULT')):
+            try: raw=json.loads(os.environ.get(key,''))
+            except (TypeError,ValueError):continue
+            if raw.get('type')=='service_account' and raw.get('project_id')==os.environ['PROJECT_ID'] and raw.get('private_key'):
+              p=root/f'{n}.json';p.write_text(json.dumps(raw));p.chmod(0o600);items.append(str(p))
+          if not items:raise SystemExit('LAB_SERVICE_ACCOUNT_NOT_PRESENT')
+          (root/'candidates').write_text('\n'.join(items)+'\n')
+          PY
+          npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund firebase-admin@13.4.0 >/dev/null
+          selected=''
+          while IFS= read -r file; do
+            if GOOGLE_APPLICATION_CREDENTIALS="$file" node tools/gravicentra-b4-003-owner-country-closure-20261102.cjs --preflight-readonly >/dev/null 2>&1; then selected="$file";break;fi
+          done < "$RUNNER_TEMP/gi-b4003-direction-country-auth/candidates"
+          test -n "$selected" || { echo 'B4_003_OWNER_COUNTRY_LAB_CREDENTIAL_READ_PREFLIGHT_FAILED' >&2; exit 2; }
+          cp "$selected" "$RUNNER_TEMP/gi-b4003-direction-country-auth/selected.json"
+          chmod 600 "$RUNNER_TEMP/gi-b4003-direction-country-auth/selected.json"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/gi-b4003-direction-country-auth/selected.json" >> "$GITHUB_ENV"
+
+      - name: Confirm frozen counts and all three exact owner identities before any write
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-b4-003-owner-country-closure-20261102.cjs --preflight-readonly
+
+      - name: Private before images, restoration drill, and guarded single atomic transaction
+        env:
+          GRAVICENTRA_B4003_DIRECTION_COUNTRY_APPROVAL_20261102: GT_GT_CO_APPROVED
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-b4-003-owner-country-closure-20261102.cjs --owner-approved-apply
+
+      - name: Independent Firestore readback and LIVE non-mutation verification
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-b4-003-client-country-index-dryrun-readonly.cjs --real-readonly > "$RUNNER_TEMP/country-readback.txt"
+          node - <<'NODE'
+          const fs=require('node:fs');const lines=fs.readFileSync(process.env.RUNNER_TEMP+'/country-readback.txt','utf8').split(/\r?\n/);
+          const source=lines.find(x=>x.startsWith('B4_003_COUNTRY_INDEX_DRYRUN_READONLY='));
+          if(!source)throw Error('INDEPENDENT_READBACK_MISSING');
+          const x=JSON.parse(source.slice('B4_003_COUNTRY_INDEX_DRYRUN_READONLY='.length));
+          if(x.counts.clients!==443||x.counts.policies!==1425||x.counts.insurers!==33||
+            x.indexedAlready.GT!==394||x.indexedAlready.CO!==49||
+            x.indexUpdateCandidates.GT!==0||x.indexUpdateCandidates.CO!==0||
+            Object.keys(x.unresolvable).length!==0||x.distinctPolicyRefsMissingClient!==3||
+            x.candidateAuthority.client!==379||x.candidateAuthority.insurer!==64||x.writes!==0)
+             throw Error('INDEPENDENT_POST_READBACK_NOT_EXACT');
+          fs.writeFileSync(process.env.RUNNER_TEMP+'/country-closure-public-receipt.json',JSON.stringify({
+           schema:'B4003_OWNER_GT_GT_CO_COUNTRY_CLOSURE_V1',environment:'ays-orbit-360-lab',
+           decisionsApplied:3,GT:2,CO:1,clientsCorrectlyIndexed:443,clientsUnresolved:0,
+           syntheticOrphanPolicyReferences:3,restoreDrillVerified:true,privateBackupVerified:true,
+           realUserRoleUAT:'PENDING',production:'HOLD',identitiesExported:false},null,2)+'\n');
+          NODE
+          curl --fail --silent --show-error --location --retry 2 --max-time 30 https://ays-orbit-360-lab.web.app/ | sha256sum > "$RUNNER_TEMP/lab-live-after.sha"
+          curl --fail --silent --show-error --location --retry 2 --max-time 30 https://app.aysseguros.com/ | sha256sum > "$RUNNER_TEMP/domain-live-after.sha"
+          cmp "$RUNNER_TEMP/lab-live-before.sha" "$RUNNER_TEMP/lab-live-after.sha"
+          cmp "$RUNNER_TEMP/domain-live-before.sha" "$RUNNER_TEMP/domain-live-after.sha"
+          printf '%s\n' 'B4-003 three Direction decisions: country correction PASS (GT 2, CO 1)' \
+            '443/443 clients indexed; zero country unresolved; 3 synthetic B2 orphan policy references tracked separately.' \
+            'Production remains HOLD until authenticated UID-specific UAT and I6 release gates.' >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: gi-b4003-direction-country-closure-${{ github.run_id }}
+          path: ${{ runner.temp }}/country-closure-public-receipt.json
+          if-no-files-found: warn
+          retention-days: 30
