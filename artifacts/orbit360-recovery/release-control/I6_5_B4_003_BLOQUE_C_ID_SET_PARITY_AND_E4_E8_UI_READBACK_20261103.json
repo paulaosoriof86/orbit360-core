@@ -1,0 +1,103 @@
+{
+  "schema": "GRAVICENTRA_I65_B4003_BLOQUE_C_ID_SET_AND_E4_E8_OBSERVED_READBACK_V1",
+  "date": "2026-11-03",
+  "timezone": "America/Guatemala",
+  "gate": "I6.5/B4-003",
+  "status": "PHYSICAL_ID_SET_PARITY_PASS_E4_E8_AUTH_UI_READONLY_PARTIAL_RELEASE_HOLD",
+  "repo": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "auditCodeCommit": "1cc4757b18a537921186475877314014a76cfc72",
+  "auditRun": {
+    "id": 41695224177,
+    "conclusion": "success",
+    "job": "physical-join-aggregate-only",
+    "artifactId": 13261720241,
+    "artifactDigest": "sha256:9ea7be7ddf44a3b3d1bc415c15e97ae31c3459a7f3ce1e6a357f813491c498db"
+  },
+  "guardRun": {
+    "id": 41695223954,
+    "conclusion": "success",
+    "subjobEmulator": "skipped_NOT_counted_as_emulator_PASS"
+  },
+  "readOnlyIntegrity": {
+    "realLabProject": "ays-orbit-360-lab",
+    "tenant": "alianzas-soluciones",
+    "boundedReadOnly": true,
+    "physicalClients": 443,
+    "mergedClients": 3,
+    "nonMergedClients": 440,
+    "commercialClientsGT": 391,
+    "commercialClientsCO": 49,
+    "physicalPolicies": 1425,
+    "physicalInsurers": 33,
+    "countryCOAllPolicies": 124,
+    "clientCentricCOPolicies": 125,
+    "sharedPolicyIds": 124,
+    "onlyClientCentricPolicyIds": 1,
+    "onlyPolicyCountryIds": 0,
+    "qaPoliciesExplicit": 6,
+    "qaPoliciesB2": 3,
+    "qaOverlap": 0,
+    "qaUnion": 9,
+    "syntheticParityCasesPassed": 2,
+    "transversalReaderChecksPassed": 41,
+    "originalRawIdentifiersExported": false,
+    "realDataWrites": 0,
+    "authWrites": 0,
+    "securityRulesWrites": 0
+  },
+  "previewUiReadback": {
+    "source": "Browser Chrome conectado; nueva pestaña; usuaria autenticada Paula Osorio / Dirección",
+    "url": "https://ays-orbit-360-lab--gi-i65-b4-goals-41660779936-vauqd86b.web.app/",
+    "productBuildId": "gi-i65-b4-004324dcac1f-57f234755dc1",
+    "productSourceSha": "004324dcac1faa694f5057a35753fc514103e19b",
+    "productAssetMutated": false,
+    "e4Reportes": {
+      "year": 2026,
+      "scope": "Producción",
+      "todos": 223,
+      "guatemala": 197,
+      "colombia": 26,
+      "qaExcludedBanner": 9,
+      "recordWithoutVerifiableDateNotImputed": 1,
+      "renderedRowsPageCap": 200,
+      "exportBytesReadback": false,
+      "status": "AUTHENTICATED_UI_COUNTS_OBSERVED_EXPORT_NOT_CERTIFIED"
+    },
+    "e8Calidad": {
+      "inScope": 439,
+      "syntheticQaClientsExcludedBanner": 1,
+      "allCountryPendingValidation": 0,
+      "activePolicyPriority": 166,
+      "noPhoneWhatsApp": 168,
+      "premiumVsScheduledReceiptsDifferences": 73,
+      "completeRecords": 0,
+      "consoleErrorsOrWarningsObserved": 0,
+      "status": "AUTHENTICATED_UI_COUNTS_OBSERVED_FINANCIAL_SOURCE_NOT_RECONCILED"
+    }
+  },
+  "causalAccounting": {
+    "commercialClientList": "443 physical minus 3 merged = 440 nonmerged; UI Client360 440",
+    "e8Quality": "440 nonmerged minus 1 QA = 439 in E8 quality scope",
+    "coPolicyDifference": "125 client-centric CO links = 124 CO-country policies + 1 cross-country policy attached to a CO client",
+    "qaPolicyDifference": "9 synthetic QA policies = 6 explicit flags + 3 B2 provenance; no overlap"
+  },
+  "caveats": [
+    "UI QA banners describe exclusion; CSV/Excel/PDF export bytes not inspected",
+    "Backend negative tests with independent signed UIDs were not run",
+    "Country-client linked policy extra was compared internally by exact IDs, no document IDs exported",
+    "14 cancellation fixtures and 12 B2 renewal dependencies remain to be adjudicated",
+    "Live Firestore Rules and production not modified or certified",
+    "This is evidence added to current gate, not a new release candidate"
+  ],
+  "formalProgress": {
+    "i6Completed": 5,
+    "i6Total": 10,
+    "i6Percent": 50,
+    "historicalP0Closed": 1,
+    "historicalP0Total": 6,
+    "b4003": "HOLD",
+    "production": "NO_GO"
+  },
+  "next": "Complete E4 all report families/export readback and E8 QA/financial contractual checks; then D six P0, reversible CRUD, signed backend negative UAT, LIVE security and release gates"
+}
