@@ -1,0 +1,145 @@
+{
+  "schema": "gravicentra-i6-5-b4-003-e4-samuel-signed-scope-uat-v1",
+  "dateGuatemala": "2026-11-03",
+  "product": "Gravicentra Insurance",
+  "branch": "recovery/fase-a-clean-20260831",
+  "sourceSha": "8ccbf641cbbbd8fe470d3ba8d5e22dd4645f3abb",
+  "buildId": "gi-i65-b4-8ccbf641cbbb-57f234755dc1",
+  "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-e4-41711238558-wrf29bx0.web.app/#/polizas",
+  "recordType": "ADDITIVE_SIGNED_UAT_EVIDENCE_NOT_ROLE_OR_GATE_ACCEPTANCE",
+  "overallStatus": "PARTIAL_WITH_PROFILE_SCOPE_RECONCILIATION_REQUIRED",
+  "signedAccount": {
+    "person": "Samuel Daza",
+    "actualSignedSession": true,
+    "initialRole": "Operativo",
+    "availableViewRoles": [
+      "Administración",
+      "Operativo",
+      "Asesor"
+    ],
+    "testedRole": "Asesor",
+    "testedCountries": [
+      "TODOS",
+      "CO",
+      "GT"
+    ],
+    "loginAndLegalAcceptancePerformedByUser": true
+  },
+  "checks": [
+    {
+      "id": "SAMUEL_E4_SIGNED_IDENTITY",
+      "status": "PASS_SIGNED_UI",
+      "evidence": "Banner Cuenta Samuel Daza · Operativo al abrir, luego Samuel Daza · Asesor al seleccionar explícitamente vista Asesor. No credenciales compartidas."
+    },
+    {
+      "id": "SAMUEL_E4_ROLE_SWITCH_ISOLATION",
+      "status": "PASS_FOCAL_UI",
+      "evidence": "Tras cambio Operativo→Asesor los datos volvieron a hidratar; vista TODOS se redujo de universo general a 1 cliente y 1 póliza, sin conservar 1425 pólizas del modo anterior. No equivale a prueba de aislamiento backend."
+    },
+    {
+      "id": "SAMUEL_E4_ADVISOR_COUNTRY_CO",
+      "status": "HOLD_EXPECTED_POSITIVE_NOT_DEMONSTRATED",
+      "observed": {
+        "country": "CO",
+        "policies": 0,
+        "clients360": 0,
+        "cobrosRows": 0
+      },
+      "evidence": "Con Asesor + Colombia, tres módulos confirmaron conjuntos vacíos: Pólizas 0 de 0, Cliente 360 0 de 0, Cobros 0 registros tras hidratar. No hay caso positivo de póliza real CO de Samuel para certificar."
+    },
+    {
+      "id": "SAMUEL_E4_ADVISOR_COUNTRY_GT",
+      "status": "REQUIRES_ENTITLEMENT_RECONCILIATION",
+      "observed": {
+        "country": "GT",
+        "policies": 1,
+        "activePolicies": 1,
+        "policyNumber": "VA125-00010478",
+        "advisor": "Samuel Daza",
+        "premiumNetGTQ2600": 2600
+      },
+      "evidence": "Pólizas GT bajo Asesor muestra 1 póliza real asignada a Samuel. No declarar acceso ilegal sin cotejar países/roles aprobados; el escenario de prueba congelado era Comercial Colombia."
+    },
+    {
+      "id": "SAMUEL_E4_ASEGURADORAS_DIRECT_ROUTE",
+      "status": "PASS_NEGATIVE_UI_ONLY",
+      "evidence": "Con rol activo Asesor y país CO, navegación directa a #/aseguradoras muestra candado 'No tienes acceso con el rol activo'; la vista completa del directorio no se renderizó. Firestore Rules/backend no probado."
+    },
+    {
+      "id": "SAMUEL_E4_INICIO_COUNTRY",
+      "status": "HOLD_ADVISOR_ROSTER",
+      "observed": {
+        "confirmedSourceCount4": 4,
+        "totalSources5": 5
+      },
+      "evidence": "Inicio en Operativo y Asesor repite aviso 4 de 5 fuentes y Avance por asesor no disponible; misma candidata y defecto focal previamente observado con Carlos. No se reabren sus PASS históricos."
+    },
+    {
+      "id": "SAMUEL_E4_CONSOLE",
+      "status": "PASS_FOCAL_LOGS",
+      "evidence": "Consulta de registros warn/error de Chrome al terminar pruebas de módulos CO devolvió [] en la sesión firmada."
+    }
+  ],
+  "governance": {
+    "expectedTarget": "Samuel Comercial/Asesor Colombia en contrato B4-003",
+    "entitlementAmbiguity": "El selector permite Administración, Operativo y Asesor; se necesita comparar grants efectivos y país/asesor aprobados antes de llamar bug a un perfil multirrol.",
+    "dataAmbiguity": "Sin pólizas CO asignadas observables, un cero puede ser alcance correcto o asignación incompleta; no reimportar, cambiar país, propietario ni asesor para fabricar un PASS.",
+    "negativeLimit": "Denegación de navegación Aseguradoras no prueba denegación de lectura directa Firestore ni backend multi-UID."
+  },
+  "unresolved": [
+    {
+      "id": "SAMUEL_CO_ADVISOR_POSITIVE_FIXTURE_OR_MAPPING",
+      "status": "HOLD",
+      "next": "Conciliar id asesor, grants GT/CO y propietario de pólizas en fuente rectora; si no tiene cartera CO real, usar caso QA sintético explícito con before/after y restauración."
+    },
+    {
+      "id": "SAMUEL_EXTRA_VIEW_ROLES",
+      "status": "HOLD_CLASSIFICATION",
+      "next": "Verificar si Administración y Operativo son atribuciones realmente autorizadas de Samuel. No revocar ni otorgar permisos sin decisión de Dirección."
+    },
+    {
+      "id": "BACKEND_NEGATIVE_UID_SCOPE",
+      "status": "HOLD",
+      "next": "Probar lectura directa prohibida por UID/tenant/pais/asesor y escritura denegada en backend, con recibo de rechazo; no basta el guard UI."
+    },
+    {
+      "id": "E4_INICIO_ROSTER_4_OF_5",
+      "status": "HOLD",
+      "next": "Investigar falla real del dashboardList de asesores/metas, registrar causa segura de excepción sin inventar cifras."
+    },
+    {
+      "id": "GT_COUNT_DELTA_13_AND_EXPORTS",
+      "status": "HOLD",
+      "next": "Preservar del recibo Paula/Carlos: 2516 Cobros GT vs2503 Reportes GT, 13 IDs por clasificar; CSV/Excel/PDF binario y PDF source slice(0,500) no certificados."
+    },
+    {
+      "id": "QA_SYNTHETIC_WRITES_RESTORE_RELEASE",
+      "status": "HOLD",
+      "next": "Faltan pruebas de writes QA, recarga, before/after, restauración y Control Plane gates antes de cualquier despliegue LIVE."
+    }
+  ],
+  "priorProofsPreserved": [
+    "Carlos E4 signed positive Operativo GT+CO",
+    "Paula E4 signed Dirección GT/CO",
+    "Fusiones 443→440, 439 en Calidad",
+    "Pólizas país CO 124, vinculaciones cliente CO 125, 9 pólizas QA"
+  ],
+  "writeScope": {
+    "firestoreWrites": 0,
+    "sourceChanges": 0,
+    "hostingDeploys": 0,
+    "securityRulesDeploys": 0,
+    "productionDeploys": 0
+  },
+  "formalMetrics": {
+    "i6MiniGatesPassed": 5,
+    "i6MiniGatesTotal": 10,
+    "i6Percent": 50,
+    "p0Closed": 1,
+    "p0Total": 6,
+    "p0Percent": 16.67,
+    "b4003": "HOLD",
+    "production": "NO_GO"
+  },
+  "nextAction": "No repetir login o pruebas de Carlos/Samuel ya observadas; resolver expectativa/grants/pólizas CO del asesor Samuel y hacer prueba negativa backend; despues cierre causal roster 4/5, delta GT13 y exportes. No generar otra Preview por documentos."
+}
