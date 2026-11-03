@@ -116,8 +116,8 @@ function derive(c,policies,extra={}){return resolveClientCountry({client:c,clien
  assert.equal(physical.clientCountryAuthority.unresolved.MULTI_INSURER_COUNTRY_CONFLICT,1);checks++;
  assert.ok(physical.physicalJoin.linkedClientInsurerFallbackEligible>=100);checks++;
  assert.ok(physical.effectiveScopeMatrix.some(m=>m.role==='Operativo'&&m.country==='GT'&&
-  m.policyScope==='own'&&m.clientScope==='all'&&m.policyLinks.clientRequiresCountryIndex>0),
-  'Only Operativo client READ scope expands; its policy scope stays unchanged');checks++;
+  m.policyScope==='all'&&m.clientScope==='all'&&m.policyLinks.clientRequiresCountryIndex>0),
+  'Operativo country-wide policy/client READ now align; missing indexes remain pending');checks++;
  assert.ok(!JSON.stringify(physical).includes('missingGT')&&!JSON.stringify(physical).includes('u1'),
   'Aggregate-only audit must never export row or user identifiers');checks++;
  assert.equal(physical.writes,0);checks++;
