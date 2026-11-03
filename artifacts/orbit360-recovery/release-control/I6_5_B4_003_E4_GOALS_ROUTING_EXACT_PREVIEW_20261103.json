@@ -114,7 +114,8 @@
     "currencyAttributionForAtypicalCORows": true,
     "carlosSamuelNewBuildSignedPositiveNegativeBackend": true,
     "inicioOtherActionsAndRoles": true,
-    "productionPromotionAfterGateAcceptance": true
+    "productionPromotionAfterGateAcceptance": true,
+    "advisorPolicyClientReadScopeFiveRealBusinessIds": true
   },
   "progress": {
     "formalI6MiniGatesClosed": 5,
@@ -125,7 +126,7 @@
     "b4003Closed": false,
     "productionAuthorized": false
   },
-  "nextAction": "CARLOS_OPERATIVO_GT_CO_POLIZAS_CLIENTE360_ASEGURADORAS_SIGNED_READONLY_FOCAL_PASS; KEEP_GATE_HOLD; SAMUEL_SIGNED_ROLE_BACKEND_POSITIVE_NEGATIVE; CLASSIFY_GT_13_BUSINESS_KEYS; EXPORT_AND_CONTROLLED_WRITE_RESTORE; NO_REIMPORT_NO_NEW_PREVIEW",
+  "nextAction": "CARLOS_OPERATIVO_GT_CO_READONLY_AND_ASESOR_UI_SCOPE_PROVED; REVIEW_FIVE_EXACT_POLICY_CLIENT_JOINS_WITH_SOURCE_AUTHORITY_NO_ROLE_WIDENING_WITHOUT_APPROVAL; SAMUEL_SIGNED_JWT_POSITIVE_NEGATIVE; GT13_FINANCE_IDS; EXPORT_AND_RESTORE; HOLD",
   "carlosSignedOperationalReadOnlyUat": {
     "status": "FOCAL_READONLY_PASS_FULL_ROLE_BACKEND_UAT_HOLD",
     "dateLocal": "2026-11-03",
@@ -184,6 +185,45 @@
       "productionDeploy": false
     },
     "browserControlNote": "Navigation toward Aseguradoras briefly stalled; route ultimately loaded and both country list KPIs were read from signed Chrome. Browser control interruption is not classified as app error.",
-    "decision": "DO_NOT_COUNT_FULL_ROLE_UAT_OR_B4003_PASS"
+    "decision": "DO_NOT_COUNT_FULL_ROLE_UAT_OR_B4003_PASS",
+    "advisorScopeComparison": {
+      "status": "SIGNED_UI_ROLE_BOUNDARY_FOCAL_PASS_RELATIONAL_CLIENT_SCOPE_GAP_HOLD",
+      "colombiaAdvisorPolicies": 25,
+      "colombiaAdvisorActivePolicies": 16,
+      "guatemalaAdvisorPolicies": 0,
+      "advisorColombiaClient360VisibleClients": 12,
+      "advisorColombiaClient360PoliciesLinked": 20,
+      "advisorColombiaClient360ActivePolicies": 15,
+      "advisorColombiaPolicyGrossNetCOP": 99974357,
+      "advisorColombiaClient360NetCOP": 99838917,
+      "missingClientScopePolicyCount": 5,
+      "missingClientScopeActivePolicyCount": 1,
+      "missingClientScopeActivePolicyNetCOP": 135440,
+      "exactCommercialPolicyNumbers": [
+        "AB004914",
+        "AB006053",
+        "3333125002363",
+        "1522105733301",
+        "AIPL-260299999-1"
+      ],
+      "operativeSameAdvisorFilterCanShowPolicyClientNames": true,
+      "operativePoliciesForFourSharedCustomer": [
+        "AB004914",
+        "AB006053",
+        "3333125002363",
+        "AIPL-260299999-1"
+      ],
+      "operativeSharedCustomerName": "Carlos Eduardo Castro Buitrago",
+      "operativeOtherClientName": "Maria Teresa Lopez",
+      "operativeMariaTeresaInColombiaClient360": true,
+      "operativeMariaTeresaClientAssignedAdvisor": "Paula Osorio",
+      "operativeCarlosEduardoInVisibleColombiaClient360": false,
+      "asesorDeniedAseguradorasModule": true,
+      "sourceHypothesis": "Client read scope filters by client-owned advisor; policy read scope filters by policy advisor. Resolve source country/client identity vs authorized policy-linked read exceptions without owner/country mutation.",
+      "positiveRoleViewNotBackendNegativeJWT": true,
+      "backendNegativeJwt": "NOT_EXECUTED",
+      "approvalToWidenAdvisorClientScope": "NOT_ASSUMED",
+      "businessDataWrites": 0
+    }
   }
 }
