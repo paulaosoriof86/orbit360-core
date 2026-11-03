@@ -10,6 +10,44 @@ Orbit.modules.reportes = (function () {
   const U = Orbit.ui, K = Orbit.kit, S = () => Orbit.store, q = Orbit.q;
   let host, sel = 'produccion', groupBy = '', anioSel = '';
   let insurerLookupStore = null, unsubscribeInsurerLookup = null;
+  let readinessStore = null, unsubscribeReadiness = null, readinessRefreshTimer = null;
+  // B4-003 E4: an empty cache before Firestore confirmation is NOT a zero.
+  // No partial counts or export controls until the active report's sources settle.
+  const REPORT_REQUIRED_COLLECTIONS = {
+    produccion: ['polizas', 'clientes'],
+    cartera: ['cobros', 'polizas', 'clientes'],
+    comisiones: ['comisiones', 'polizas', 'clientes'],
+    renovaciones: ['polizas', 'clientes'],
+    siniestros: ['reclamos', 'polizas', 'clientes'],
+    cancelaciones: ['cancelaciones', 'polizas', 'clientes']
+  };
+  function routeIsReport() {
+    return !!host && host.isConnected && typeof location !== 'undefined' &&
+      /^#\/reportes(?:[?\/]|$)/.test(location.hash || '');
+  }
+  function reportDataReadiness(kind) {
+    const store = S();
+    if (!store || typeof store._productStatus !== 'function') return { ready: true, blocked: false, missing: [] };
+    if (store !== readinessStore) {
+      if (typeof unsubscribeReadiness === 'function') unsubscribeReadiness();
+      readinessStore = store;
+      unsubscribeReadiness = typeof store.on === 'function' ? store.on('*', changed => {
+        if (changed !== '*' && !(REPORT_REQUIRED_COLLECTIONS[sel] || []).includes(changed)) return;
+        if (!routeIsReport() || readinessRefreshTimer) return;
+        readinessRefreshTimer = setTimeout(() => {
+          readinessRefreshTimer = null;
+          if (routeIsReport()) render(host);
+        }, 45);
+      }) : null;
+    }
+    const status = store._productStatus() || {};
+    const confirmed = Array.isArray(status.serverConfirmedCollections) ? status.serverConfirmedCollections : [];
+    const missing = (REPORT_REQUIRED_COLLECTIONS[kind] || []).filter(name => !confirmed.includes(name));
+    if (missing.length && typeof store._ensureCollections === 'function') store._ensureCollections(missing);
+    const blocked = missing.some(name =>
+      (status.deniedCollections || []).includes(name) || !!(status.snapshotErrors || {})[name]);
+    return { ready: !missing.length, blocked, missing };
+  }
   // Reportes is often opened before the deferred insurer directory is ready.
   // Never group rows under an empty insurer or export incomplete names.
   function insurerLookupReadiness() {
@@ -125,6 +163,17 @@ Orbit.modules.reportes = (function () {
   function render(h) {
     host = h;
     const r = REPORTES[sel];
+    const sourceStatus = reportDataReadiness(sel);
+    if (!sourceStatus.ready) {
+      const pending = !sourceStatus.blocked;
+      host.innerHTML = '<div class="page" data-report-source-readiness="' + (pending ? 'loading' : 'blocked') + '">' +
+        K.banner({ icon: '📊', title: 'Orbit Reportes', sub: 'Reportes exportables sobre datos en vivo' }) +
+        '<div class="cfg-note" role="status">' + (pending
+          ? 'Confirmando con el servidor las fuentes de ' + U.esc(r.t) + ': ' + sourceStatus.missing.map(U.esc).join(', ') + '. Las cifras y exportes aparecerán cuando finalice la carga.'
+          : 'No se pudo confirmar una fuente autorizada de ' + U.esc(r.t) + '. No se presentan cifras ni exportes incompletos.') +
+        '</div></div>';
+      return;
+    }
     // Fail closed when the source owner is not registered: zero records must
     // never masquerade as a certified empty cancellation report.
     if (sel === 'cancelaciones' && !cancellationOwnerReady()) {

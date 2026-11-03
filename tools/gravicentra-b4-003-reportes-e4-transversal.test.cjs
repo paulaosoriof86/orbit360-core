@@ -70,13 +70,18 @@ const rows = {
 function setup(country, options = {}) {
   let writes = 0;
   let insurersReady = options.deferInsurers !== true && options.blockInsurers !== true;
+  let policiesReady = options.deferPolicies !== true && options.blockPolicies !== true;
   const insurerListeners = new Set(), ensureRequests = [];
   const store = {
-    all: k => k === 'aseguradoras' && !insurersReady ? [] : rows[k] || [],
+    all: k => (k === 'aseguradoras' && !insurersReady) || (k === 'polizas' && !policiesReady) ? [] : rows[k] || [],
     get: (k, id) => store.all(k).find(x => String(x.id) === String(id)) || null,
     where: (k, f) => (rows[k] || []).filter(f),
-    _productStatus: () => ({ serverConfirmedCollections: insurersReady ? ['aseguradoras'] : [],
-      deniedCollections: options.blockInsurers ? ['aseguradoras'] : [], snapshotErrors: {} }),
+    _productStatus: () => ({
+      serverConfirmedCollections: ['clientes', 'cobros', 'comisiones', 'reclamos', 'cancelaciones']
+        .concat(policiesReady ? ['polizas'] : []).concat(insurersReady ? ['aseguradoras'] : []),
+      deniedCollections: (options.blockInsurers ? ['aseguradoras'] : [])
+        .concat(options.blockPolicies ? ['polizas'] : []), snapshotErrors: {}
+    }),
     _ensureCollections: names => { ensureRequests.push(...names); return names; },
     on: (_, cb) => { insurerListeners.add(cb); return () => insurerListeners.delete(cb); },
     insert() { writes++; throw Error('READ_ONLY_REPORT_RENDER_MUST_NOT_WRITE'); },
@@ -90,7 +95,7 @@ function setup(country, options = {}) {
     kit: { banner: () => '<div>Reporte</div>' },
     PAISES: [{ id: 'GT', label: 'Guatemala' }, { id: 'CO', label: 'Colombia' }, { id: 'TODOS', label: 'Todos' }]
   };
-  const context = vm.createContext({ Orbit, window: { Orbit }, location: { hash: '#/reportes' }, Date, Map, Set, console });
+  const context = vm.createContext({ Orbit, window: { Orbit }, location: { hash: '#/reportes' }, Date, Map, Set, console, setTimeout, clearTimeout });
   vm.runInContext(queries, context, { filename: 'queries.js' });
   Orbit.q.renovacionesProximas = () => rows.polizas;
   vm.runInContext(cancelaciones, context, { filename: 'cancelaciones.js' });
@@ -110,8 +115,36 @@ function setup(country, options = {}) {
     return host.innerHTML;
   }
   return { Orbit, render, event, writes: () => writes, ensureRequests,
-    confirmInsurers: () => { insurersReady = true; for (const cb of insurerListeners) cb('aseguradoras'); return host.innerHTML; } };
+    confirmInsurers: () => { insurersReady = true; for (const cb of insurerListeners) cb('aseguradoras'); return host.innerHTML; },
+    confirmPolicies: async () => {
+      policiesReady = true;
+      for (const cb of insurerListeners) cb('polizas');
+      await new Promise(resolve => setTimeout(resolve, 85));
+      return host.innerHTML;
+    } };
 }
+
+test('E4 pending policies do not impersonate zero production or offer an incomplete export', async () => {
+  const app = setup('CO', { deferPolicies: true });
+  const pending = app.render();
+  assert.match(pending, /data-report-source-readiness="loading"/);
+  assert.match(pending, /Confirmando con el servidor las fuentes de Producción/);
+  assert.doesNotMatch(pending, /0<\/b> registros|id="rep-exp"|id="rep-excel"|id="rep-pdf"/);
+  assert.ok(app.ensureRequests.includes('polizas'));
+  const confirmed = await app.confirmPolicies();
+  assert.match(confirmed, /2026000098/);
+  assert.match(confirmed, /id="rep-exp"/);
+  assert.doesNotMatch(confirmed, /data-report-source-readiness/);
+  assert.equal(app.writes(), 0);
+});
+
+test('E4 denied policy source never presents a commercial zero or export', () => {
+  const app = setup('CO', { blockPolicies: true });
+  const html = app.render();
+  assert.match(html, /data-report-source-readiness="blocked"/);
+  assert.doesNotMatch(html, /id="rep-exp"|id="rep-excel"|id="rep-pdf"/);
+  assert.equal(app.writes(), 0);
+});
 
 test('E4 waits for deferred insurer directory, refreshes on server confirmation and blocks premature export', () => {
   const app = setup('CO', { deferInsurers: true });
