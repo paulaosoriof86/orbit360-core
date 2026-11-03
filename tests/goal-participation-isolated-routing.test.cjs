@@ -7,6 +7,7 @@ const root=path.resolve(__dirname,'..');
 const source=p=>fs.readFileSync(path.join(root,p),'utf8');
 const oldHost='ays-orbit-360-lab--gi-i65-b4-sr-41066435386-r09pl1ti.web.app';
 const goalsHost='ays-orbit-360-lab--gi-i65-b4-goals-1031-ab1234.web.app';
+const e4Host='ays-orbit-360-lab--gi-i65-b4-e4-41711238558-wrf29bx0.web.app';
 const liveHost='ays-orbit-360-lab.web.app';
 let n=0;
 function same(a,b,label){assert.equal(a,b,label);n++;}
@@ -25,10 +26,14 @@ same(functionsFor(oldHost,false).roster,'orbit360AssignableAdvisorRosterPreview'
 same(functionsFor(oldHost,true).roster,'orbit360AssignableAdvisorRosterPreview','Flag no activa endpoint en Preview antigua');
 same(functionsFor(goalsHost,false).roster,'orbit360AssignableAdvisorRosterPreview','Nuevo canal sin flag no altera la ruta');
 same(functionsFor(goalsHost,true).roster,'orbit360AssignableAdvisorRosterGoalsPreview','El canal exacto y el flag seleccionan endpoint nuevo');
+same(functionsFor(e4Host,false).roster,'orbit360AssignableAdvisorRosterPreview','E4 sin flag conserva endpoint previo');
+same(functionsFor(e4Host,true).roster,'orbit360AssignableAdvisorRosterGoalsPreview','E4 con flag requiere backend GoalsPreview exacto');
 same(functionsFor(liveHost,true).writer,'orbit360ProductOperationalCommandPreview','Estado Preview no cambia en LIVE');
 same(functionsFor(oldHost,true).writer,'orbit360ProductOperationalCommandPreview','Preview antigua conserva función original');
 same(functionsFor(goalsHost,false).writer,'orbit360ProductOperationalCommandPreview','Sin flag la candidata falla cerrada');
 same(functionsFor(goalsHost,true).writer,'orbit360ProductOperationalCommandGoalsPreview','Canal nuevo usa callable aislado');
+same(functionsFor(e4Host,false).writer,'orbit360ProductOperationalCommandPreview','E4 sin flag conserva comando previo');
+same(functionsFor(e4Host,true).writer,'orbit360ProductOperationalCommandGoalsPreview','E4 con flag selecciona comando GoalsPreview aislado');
 const backendRoster=source('functions/assignable-advisor-roster.js');
 const backendWriter=source('functions/product-operational-domain.js');
 assert.match(backendRoster,/exports\.orbit360AssignableAdvisorRosterGoalsPreview=onCall/);n++;
