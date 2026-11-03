@@ -149,3 +149,24 @@ Este registro es **delta de evidencia dentro de B4-003**, no crea plan, gate, ra
 **Decisión que falta, sin presumirla:** confirmar si el límite individual `equipo` de `QA-SD02` debe conservarse, aunque el rol Operativo admita `all`; o si la aceptación exige visibilidad de cartera completa de ambos países para esa persona. La primera opción hace que CO=0 pueda ser legítimo en Pólizas pero obliga a explicar Cliente 360=49 y sus relaciones; la segunda sería **un cambio de acceso material**, sujeto a autorización expresa y prueba multi-UID de mínimo privilegio. No usar el conteo de Clientes para ampliar Pólizas por inferencia.
 
 **Falta para cerrar P0-2:** lectura firmada de servidor bajo UID efectivo (callable y SDK directo), positivas/negativas país/tenant/rol/asesor/vehículo, recarga directa, UAT propia de Carlos en el mismo artifact, y pruebas de no fuga. Este delta no crea mini-gate ni cambia el ledger. **I6 5/10 = 50%; P0 históricos 1/6; B4-003 HOLD; tesis HOLD; producción NO-GO.**
+
+
+## Adenda de decisión de alcance por ROL — 2-nov-2026 | ejecución de fuente, no UAT
+
+**Decisión expresa de Paula (posterior a la adenda UID anterior):** la regla debe ser transversal por **rol**, nunca por la identidad de Samuel o Carlos. `Operativo` debe poder **leer toda la cartera de Pólizas, Vehículos y Clientes** de **cada país efectivo autorizado a su membresía**, incluido GT/CO si ambos están asignados. `AdminTenant` conserva la lectura completa dentro del tenant y países autorizados; `Asesor/Comercial` no adquieren acceso global. Esta decisión sustituye únicamente la pregunta de alcance que quedó abierta en el apartado anterior; no cambia roles, países, propietarios, expedientes, historial de octubre ni compuertas.
+
+**Causa raíz de fuente, comprobable:** en `functions/b4-003-scoped-access-boundary.js` el tenant declara `roleScopes.Operativo=all`, pero `dataScopes.modules.polizas=equipo` reducía la lectura de Pólizas a team. El módulo `clientes` tenía una excepción exclusiva, lo que divergía del módulo `polizas`. El runtime `orbit360-platform/core/access-scope.js` repetía la reducción en la UI, mientras la política efectiva solo reparaba Cliente 360.
+
+**Corrección sistémica propuesta dentro del único gate B4-003:** aplicar la precedencia del rol tenant `all` a la *lectura* de `clientes`, `polizas` y `vehiculos` para `Operativo/AdminTenant`, solo cuando ese alcance está afirmativamente configurado y el módulo no está negado. Conservar control server-side de UID asignado, rol firmado, estado activo, módulo autorizado, países y tenant, además de denegación de país ausente/pendiente. No cambiar el contrato de `canWrite` de la política efectiva ni ejecutar escrituras de datos. El test cubre dos roles y distintos scopes heredados (own/team), sin codificar UIDs de personas reales.
+
+| Prueba de fuente | Esperado | Obtenido en harness local aislado | Dictamen |
+| --- | --- | --- | --- |
+| Lector server-side sintético de Pólizas | Operativo ve toda cartera GT/CO autorizada; Asesor solo propia | 27 comprobaciones, sin escrituras | PASS técnico de fuente, no Firebase UAT |
+| Contrato server-side rol/país/tenant/módulo | Operativo y AdminTenant completos; negativas se mantienen | 16 comprobaciones positivas/negativas | PASS técnico de fuente, no Firebase UAT |
+| Scope frontend con membresías sintéticas | Operativo/AdminTenant all, Asesor own, país exacto | Harness local aislado, sin navegador autenticado | PASS técnico de fuente, no UAT |
+| Política efectiva lectura/escritura | Lectura portfolio all; `canWrite` no recibe membresía elevada | Harness local aislado, sin persistencia | PASS técnico de fuente, no UAT |
+| Preview nueva + UID real Paula/Carlos/Samuel + cold reload + callables | Autorización backend y ausencia de fuga en ambos países | Aún no ejecutada sobre estos nuevos bytes | **NO EJECUTADO/HOLD** |
+
+**Salvaguardas:** las pruebas no alteran Firestore, miembros, countries, owner, Rules, Hosting LIVE ni recursos operativos. No se reetiquetan aprobaciones anteriores de Carlos ni se certifica Samuel. Es obligatorio producir nuevo digest de build, Preview aislada de estos bytes y readback backend real antes de actualizar el ledger; la Preview `gi-i65-b4-264a28cd2dd8-57f234755dc1` solo demuestra los bytes anteriores. **I6=5/10 (50 %), P0 históricos=1/6, B4-003 HOLD, producción NO-GO.**
+
+**Recibo inmutable de la decisión y pruebas de fuente:** `artifacts/orbit360-recovery/release-control/I6_5_B4_003_ROLE_BASED_PORTFOLIO_SCOPE_SOURCE_SUCCESSOR_20261102.json` (blob Git `c8c9fb7fdbcfdc2194640e96883db87a05474109`). El Control Plane añade un *pointer* de candidata de código sin modificar la autoridad de la release publicada ni aprobar producción.

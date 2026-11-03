@@ -43,16 +43,23 @@ for(const [label,role,collection,allow,code] of moduleSecurityCases){
      'SERVER_NEGATIVE_MODULE_'+label);
  }positiveModuleChecks++;
 }
-// Same authorized B4-003 security QA: Spanish legacy scope literals
-// must never acquire a wider role scope when module-specific values exist.
+// B4-003 approved role policy: Spanish legacy own/team must no longer
+// fragment the authorized Operativo country portfolio. A tenant role
+// configured as team still stays team, and per-module none still denies.
 const legacyOwn=secureCase('Operativo','polizas',{},
  {dataScopes:{default:'propios',modules:{polizas:'propios'}}});
-assert.equal(resolveSecureModule(legacyOwn).scope,'own',
- 'LEGACY_PROPIOS_MUST_NEVER_FALL_THROUGH_TO_OPERATIVO_ALL');
+assert.equal(resolveSecureModule(legacyOwn).scope,'all','OPERATIVO_ROLE_ALL_OVERRIDES_LEGACY_OWN');
+const teamTenant=secureCase('Operativo','polizas',
+ {roleScopes:{Operativo:'team'}},{dataScopes:{default:'equipo',modules:{polizas:'equipo'}}});
+assert.equal(resolveSecureModule(teamTenant).scope,'team','TENANT_TEAM_POLICY_REMAINS_TEAM');
+const explicitNone=secureCase('Operativo','polizas',{},
+ {dataScopes:{default:'todos',modules:{polizas:'none'}}});
+assert.throws(()=>resolveSecureModule(explicitNone),e=>e instanceof Denied&&e.code==='SCOPE_NONE',
+ 'EXPLICIT_MODULE_NONE_VETO');
 const legacyAll=secureCase('Operativo','polizas',{},
  {dataScopes:{default:'todos',modules:{polizas:'todos'}}});
 assert.equal(resolveSecureModule(legacyAll).scope,'all','CANONICAL_TODOS_RETAINED');
-console.log('B4_003_LEGACY_PROPIOS_FAIL_CLOSED_PASS checks=2 synthetic_only no_writes');
+console.log('B4_003_ROLE_SCOPE_LEGACY_RECONCILED_PASS checks=4 synthetic_only no_writes');
 
 const selectedAdvisor=secureCase('Asesor','auditoria',{},{
  roles:['Dirección','Asesor'],modulesVisible:['*','equipo']

@@ -19,6 +19,37 @@ assert.throws(()=>allowRow(teamCtx,{pais:'GT',asesorId:'a2'}),e=>e.code==='FOREI
 assert.throws(()=>allowRow(teamCtx,{pais:'GT',asesorId:'a3'}),e=>e.code==='FOREIGN_RECORD_DENIED');
 assert.throws(()=>resolve({...teamCase,member:{...teamCase.member,roleVisibleAdvisorIds:{operativo:'a2'}}}),e=>e.code==='ROLE_TEAM_CONFIG_INVALID');
 
+// B4-003 role contract: both operative identities inherit each authorized
+// country's complete portfolio, even with legacy own/team member scopes.
+const rolePortfolio={...teamCase,config:{roleScopes:{operativo:'all',admintenant:'all'}}};
+let rolePortfolioChecks=0;
+for(const role of ['operativo','admintenant']){
+ for(const legacy of ['own','team']){
+  for(const collection of ['clientes','polizas','vehiculos']){
+   const input={...rolePortfolio,activeRole:role,collection,
+    member:{...rolePortfolio.member,roles:['operativo','admintenant','asesor'],
+     countries:['GT','CO'],dataScopes:{default:legacy,modules:{polizas:legacy,cliente360:legacy}}}};
+   const all=resolve(input);
+   assert.equal(all.scope,'all',role+'_'+collection+'_'+legacy);
+   assert.equal(allowRow(all,{tenantId:'t',pais:'GT',asesorId:'unrelated-adviser'}),true);
+   assert.throws(()=>allowRow(all,{tenantId:'t',pais:'CO',asesorId:'unrelated-adviser'}),e=>e.code==='COUNTRY_DENIED');
+   assert.throws(()=>allowRow(all,{tenantId:'other',pais:'GT',asesorId:'unrelated-adviser'}),e=>e.code==='TENANT_DENIED');
+   rolePortfolioChecks++;
+  }
+ }
+}
+const limitedRole={...rolePortfolio,member:{...rolePortfolio.member,countries:['CO']}};
+assert.throws(()=>resolve(limitedRole),e=>e.code==='COUNTRY_DENIED');rolePortfolioChecks++;
+const deniedModule={...rolePortfolio,member:{...rolePortfolio.member,
+ dataScopes:{default:'team',modules:{polizas:'none'}}}};
+assert.throws(()=>resolve(deniedModule),e=>e.code==='SCOPE_NONE');rolePortfolioChecks++;
+const denyMatrix={...rolePortfolio,config:{roleScopes:{operativo:'all'},
+ rolePermissions:{operativo:{polizas:{ver:false}}}}};
+assert.throws(()=>resolve(denyMatrix),e=>e.code==='MODULE_DENIED');rolePortfolioChecks++;
+assert.equal(resolve({...rolePortfolio,config:{roleScopes:{operativo:'team'}},
+ member:{...rolePortfolio.member,dataScopes:{default:'team'}}}).scope,'team');rolePortfolioChecks++;
+console.log('B4_003_ROLE_PORTFOLIO_COUNTRY_BOUNDARY_PASS checks='+rolePortfolioChecks+' synthetic_only_no_writes');
+
 const membershipStatusCases=[
  {name:'missing_status',patch:{status:undefined,estado:undefined},allow:false},
  {name:'suspended',patch:{status:'suspended'},allow:false},

@@ -71,7 +71,14 @@ const denied=async(fn,code)=>{
  await denied(()=>scopedPolicyRead({...req('operativo'),auth:{uid:'u1',token:{giActiveRole:'asesor'}}}),'SIGNED_ACTIVE_ROLE_MISMATCH');count++;
  activeMember={...activeMember,dataScopes:{default:'team'}};
  const team=await scopedPolicyRead({...req('operativo'),auth:{uid:'u1',token:{giActiveRole:'operativo'}}});
- assert.deepEqual(team.rows.map(x=>x.id),['p1','p2']);count++;
+ assert.deepEqual(team.rows.map(x=>x.id),['p1','p2','p4'],
+  'Operativo=all must not depend on individual teamAdvisorIds');count++;
+ activeMember={...activeMember,dataScopes:{default:'own',modules:{polizas:'team'}}};
+ const legacyModule=await scopedPolicyRead(req('operativo','list',{pageSize:200}));
+ assert.deepEqual(legacyModule.rows.map(x=>x.id),['p1','p2','p4'],
+  'member-specific team must not narrow authorized operational country');count++;
+ activeMember={...activeMember,dataScopes:{default:'own',modules:{polizas:'none'}}};
+ await denied(()=>scopedPolicyRead(req('operativo')),'SCOPE_NONE');count++;
  activeMember={...activeMember,dataScopes:{default:'all'}};
  const first=await scopedPolicyRead(req('operativo','list',{pageSize:1}));
  assert.deepEqual(first.rows.map(x=>x.id),['p1']);assert.equal(first.nextCursor,'p1');count++;

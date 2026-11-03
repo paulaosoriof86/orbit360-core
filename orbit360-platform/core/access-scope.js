@@ -130,7 +130,12 @@ Orbit.access = (function () {
     var role = activeRole();
     try {
       var ac=accessConfig(),rs=ac.roleScopes||{},configured=normalizeScope(rs[role]);
-      if(configured)return configured;
+      // Personal adviser roles must stay own even if tenant config is broader.
+      if(configured) {
+        if ((OWN_ROLES.indexOf(role) >= 0 || /Asesor/i.test(role)) &&
+            scopeLevel(configured) > scopeLevel('own')) return 'own';
+        return configured;
+      }
       var def = Orbit.ROLES && Orbit.ROLES[role];
       if (def && def.scopes && def.scopes[moduleKey] != null) {
         var fromRole = normalizeScope(def.scopes[moduleKey]);
@@ -168,11 +173,20 @@ Orbit.access = (function () {
     } catch (e) {}
     return '';
   }
+  function roleWidePortfolioScope(moduleKey) {
+    var role = activeRole(), scopes = accessConfig().roleScopes || {};
+    return (role === 'Operativo' || role === 'AdminTenant') &&
+      (moduleKey === 'polizas' || moduleKey === 'cliente360') &&
+      normalizeScope(scopes[role]) === 'all';
+  }
   function dataScope(moduleKey) {
     if (!roleIsAssigned()) return 'none';
     var a = actorAdvisor();
     if (a && (a.inactivo || a.status === 'blocked' || a.status === 'suspended')) return 'none';
     var ex = normalizeScope(explicitScope(moduleKey));
+    // Role-wide portfolio, never a per-user exception. An affirmative tenant
+    // roleScope=all and active, allowed module are still required.
+    if (roleWidePortfolioScope(moduleKey) && ex !== 'none') return 'all';
     return applyRoleScopeCeiling(ex, moduleKey);
   }
   function scopeCanon(moduleKey) { return dataScope(moduleKey); }
@@ -302,7 +316,11 @@ Orbit.access = (function () {
     record = record || {}; opts = opts || {};
     try {
       if (!puedeVerModulo(moduleKey)) return false;
-      if (!countryAllowed(Object.assign({}, record, { pais: opts.pais || record.pais }))) return false;
+      var country = clean(opts.pais || record.pais);
+      // A missing/unresolved country is never part of a full role portfolio.
+      if (roleWidePortfolioScope(moduleKey) &&
+          (!permittedCountries().length || permittedCountries().indexOf(country) < 0)) return false;
+      if (!countryAllowed(Object.assign({}, record, { pais: country }))) return false;
       var scope = dataScope(moduleKey);
       if (scope === 'none') return false;
       if (scope === 'all') return true;
@@ -342,6 +360,8 @@ Orbit.access = (function () {
       if (scope === 'none') return [];
       function countryOk(rec) {
         var pais = clean(rec && rec.pais);
+        if (roleWidePortfolioScope(effectiveModule))
+          return !!pais && allowedCountries.length > 0 && allowedCountries.indexOf(pais) >= 0;
         return !allowedCountries.length || !pais || allowedCountries.indexOf(pais) >= 0 || unresolvedCountryValue(pais);
       }
       if (scope === 'all') {

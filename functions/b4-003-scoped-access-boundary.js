@@ -86,12 +86,12 @@ function resolve({auth,member,config,tenantId,activeRole,collection,country}){
   const ceiling=configured&&order[configured]<order[maxScope]?configured:maxScope;
   effective=requested?(order[requested]<=order[ceiling]?requested:ceiling):
     (configured?ceiling:(collection==='cancelaciones'&&self.has(role)?'own':'none'));
-  // The tenant's affirmative Operativo=all policy owns CLIENT READ scope.
-  // Legacy per-member own/team/default scopes cannot make Cliente 360 narrower
-  // than the policy list while policies are all. Do not widen other collections,
-  // explicit module `none`, module restrictions, countries or tenant boundaries.
-  if(collection==='clientes'&&role==='operativo'&&configured==='all'&&moduleRequested!=='none')
-    effective='all';
+  // Tenant role=all owns the portfolio READ scope even when a legacy
+  // membership contains own/team. No other modules or countries are widened.
+  // The scoped reader is read-only; durable writers retain separate guards.
+  if(['clientes','polizas','vehiculos'].includes(collection) &&
+     ['operativo','admintenant','admin_tenant'].includes(role) &&
+     configured==='all' && moduleRequested!=='none') effective='all';
  }
  if(effective==='none')deny('SCOPE_NONE');
  const advisor=clean(m.advisorId||m.asesorId);

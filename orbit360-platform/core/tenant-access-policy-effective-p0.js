@@ -105,21 +105,31 @@
     return !!(base && typeof base.recordWithinScope === 'function' && base.recordWithinScope(input, record, moduleKey));
   }
 
-  // Client-list READ reconciliation only. A legacy Operativo membership may
-  // carry own/team as its default while the tenant grants the operational role
-  // all clients. Keep every other module (and ALL writes) on the original
-  // membership. An explicit cliente360/clientes=none stays denied.
-  function clientReadMembership(input) {
-    var m = normalizeMembership(input);
-    if (text(m.activeRole).toLowerCase() !== 'operativo') return input;
+  // READ only: the authorized portfolio is governed by role, not member team.
+  // Explicit module none remains denied; country, tenant and writer gates
+  // remain in the underlying policy. Asesor/Comercial are never elevated.
+  function portfolioReadMembership(input, collection) {
+    var m = normalizeMembership(input), role = text(m.activeRole).toLowerCase();
+    if (role !== 'operativo' && role !== 'admintenant') return input;
+    var byCollection = {
+      clientes: ['cliente360', 'clientes'],
+      polizas: ['polizas'],
+      vehiculos: ['polizas', 'vehiculos']
+    };
+    var keys = byCollection[collection];
+    if (!keys) return input;
     var scopes = m.moduleScopes || {};
-    var explicit = Object.prototype.hasOwnProperty.call(scopes, 'cliente360')
-      ? scopes.cliente360 : scopes.clientes;
-    if (['none', 'ninguno', 'sin_acceso'].indexOf(text(explicit).toLowerCase()) >= 0) return input;
+    var denied = keys.some(function (key) {
+      return Object.prototype.hasOwnProperty.call(scopes, key) &&
+        ['none', 'ninguno', 'sin_acceso'].indexOf(text(scopes[key]).toLowerCase()) >= 0;
+    });
+    if (denied) return input;
+    var granted = {};
+    keys.forEach(function (key) { granted[key] = 'all'; });
     return Object.assign({}, input || {}, {
       dataScopes: {
         default: m.defaultScope,
-        modules: Object.assign({}, scopes, { cliente360: 'all', clientes: 'all' })
+        modules: Object.assign({}, scopes, granted)
       }
     });
   }
@@ -133,7 +143,7 @@
       return { ok: allowed, allowed: allowed, writeAuthorized: false, code: allowed ? (collection === 'auditoria' ? 'auditoria_equipo_tenant_permitida' : 'directorio_equipo_tenant_permitido') : 'equipo_tenant_bloqueado', module: 'equipo', scope: 'tenant' };
     }
     return base.canRead(collection, record,
-      collection === 'clientes' ? clientReadMembership(membership) : membership,
+      portfolioReadMembership(membership, collection),
       contextWithOverrides(context));
   }
 
@@ -178,7 +188,7 @@
       return { ok: allowed, writeAuthorized: false, collection: collection, module: 'equipo', scope: allowed ? 'tenant' : 'none', constraints: constraints, countryFiltered: false };
     }
     return base.queryConstraints(collection,
-      collection === 'clientes' ? clientReadMembership(membership) : membership,
+      portfolioReadMembership(membership, collection),
       contextWithOverrides(context));
   }
 

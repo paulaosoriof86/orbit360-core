@@ -1,0 +1,73 @@
+{
+  "schema": "GRAVICENTRA_I65_B4003_ROLE_PORTFOLIO_SCOPE_SOURCE_SUCCESSOR_V1",
+  "gate": "I6.5/B4-003",
+  "status": "SOURCE_STAGED_SYNTHETIC_QA_PASS_PREVIEW_AND_SIGNED_UID_UAT_PENDING",
+  "recordType": "ADDITIVE_CAUSAL_SUCCESSOR_NO_RELEASE_ACCEPTANCE",
+  "canonicalParentHead": "0957e6a1e17a6d26e764f9c159606fffcaa27d4c",
+  "pr159AlreadyMerged": true,
+  "scopeDecisionByUser": "Operate role-wide for each authorized country, not for one user",
+  "affectedCollections": [
+    "clientes",
+    "polizas",
+    "vehiculos"
+  ],
+  "affectedRoles": [
+    "Operativo",
+    "AdminTenant"
+  ],
+  "advisorScope": "own",
+  "multiUserExceptions": false,
+  "explicitModuleNoneStillDenied": true,
+  "countryTenantUidMembershipModuleGuardsPreserved": true,
+  "sourceBlobShas": {
+    "functions/b4-003-scoped-access-boundary.js": "b2928e7ce12daaba21913459bc7373ba83946942",
+    "orbit360-platform/core/access-scope.js": "2732879d87da8dfbedad208c7139af8629272bbb",
+    "orbit360-platform/core/tenant-access-policy-effective-p0.js": "12e4fa38de5d2fdd04855150597865cd519bbb79",
+    "tools/gravicentra-b4-003-scoped-boundary.test.cjs": "3393fee5c5dc4ccdb1d1eba07e96f26baa67214a",
+    "tools/gravicentra-b4-003-scoped-policy-reader.test.cjs": "31bc7b123193c2c1beb4c5831334a3e4fb4fdf45",
+    "tools/gravicentra-b4-003-scoped-related-reader.test.cjs": "4674a1bbe1a525022b193928d70c50c703b8c077",
+    "tools/gravicentra-b4-003-front-scope-quickcheck.cjs": "6de1b586338fb1ef3215fcefac5d851d8e556bd8",
+    "tools/gravicentra-b4-003-effective-policy-quickcheck.cjs": "b785013d69d1f745d7e8db8baf509d501527b552"
+  },
+  "qaLocal": {
+    "scopedPolicyReader": {
+      "passed": true,
+      "checks": 27,
+      "synthetic": true
+    },
+    "backendRoleCountryBoundary": {
+      "passed": true,
+      "checks": 16,
+      "synthetic": true
+    },
+    "frontScope": {
+      "passed": true,
+      "synthetic": true,
+      "strictCountry": true,
+      "advisorCeiling": true
+    },
+    "readWriteSplit": {
+      "passed": true,
+      "synthetic": true,
+      "writeContractUntouched": true
+    },
+    "fullRepositoryGuard": "NOT_YET_EXECUTED",
+    "signedUidPreview": "NOT_EXECUTED",
+    "independentUat": "NOT_EXECUTED"
+  },
+  "previousPreviewBuildId": "gi-i65-b4-264a28cd2dd8-57f234755dc1",
+  "previousPreviewNotNewSource": true,
+  "firestoreDataWrites": 0,
+  "operationalChanges": 0,
+  "roleMembershipCountryOwnerChanges": 0,
+  "firestoreRulesChanged": false,
+  "liveDeploy": false,
+  "b4003Gate": "HOLD",
+  "productionDecision": "NO_GO",
+  "formalI6MiniGates": {
+    "closed": 5,
+    "total": 10,
+    "percent": 50
+  },
+  "nextAction": "RUN_CANONICAL_GUARD_THEN_NEW_IMMUTABLE_PREVIEW_BUILD_AND_SIGNED_MULTI_UID_POSITIVE_NEGATIVE_UAT"
+}
