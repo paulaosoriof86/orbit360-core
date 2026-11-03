@@ -111,11 +111,8 @@ Las consultas de consola de esta pestaña no devolvieron errores durante los rec
 | B-CC-LEGAL · Puerta legal | Carlos Castro · Operativo | Continuar tras consentimiento personal del usuario | **BLOQUEO EXTERNO AL TEST**: diálogo «Acuerdos legales», aceptación sin marcar y botón continuar deshabilitado. Ninguna aceptación hecha por el asistente. |
 | B-CC-01 · Revalidación focal | Carlos Castro · Operativo · GT/CO | Carteras completas autorizadas, fichas de asesor ajeno, links y recarga, negativos país/tenant | **NO EJECUTADO** tras la pantalla legal. |
 | B-CC-02 · Asesor | Carlos Castro · Asesor · GT/CO | Únicamente cartera propia; fichas ajenas negadas, recarga y negative backend | **NO EJECUTADO** tras la pantalla legal. |
-| B-GR-00 · Tercera identidad independiente | Germán Reyes · **solo Asesor** · países de membresía | Verificar que cuenta vigente tenga exclusivamente Asesor, sin acceso a selector Operativo/Admin | **NO EJECUTADO**; rol exclusivo comunicado por Dirección, pendiente confirmación de la membresía autenticada. |
-| B-GR-01 · Sin cartera y no escalación | Germán Reyes · Asesor sin ventas actuales | Cero pólizas/clientes propios, ninguna visibilidad ajena, no acceso a módulos/campos ajenos | **NO EJECUTADO**; cero ventas es expectativa, no prueba ni causa para conceder acceso. |
-| B-GR-02 · Negativos firmados | Germán Reyes · Asesor exclusivo | Backend/Rules/callable rechazan acceso a póliza/cliente ajenos, país no autorizado, tenant ajeno y módulo negado | **NO EJECUTADO**; una vista vacía o denegación de UI sola no certifica el servidor. |
 
-**Conservación de método:** un único source `004324dcac1faa694f5057a35753fc514103e19b`, build `gi-i65-b4-004324dcac1f-57f234755dc1`, [Preview exacta](https://ays-orbit-360-lab--gi-i65-b4-goals-41660779936-vauqd86b.web.app/). No repetir pruebas Samuel ya documentadas, no modificar datos de Germán, no hacer firmar términos ajenos, no promover producción. El spinner inicial «Acceso confirmado · preparando tus datos» observado en otra pestaña superó un flujo de arranque razonable; al abrir una pestaña nueva se obtuvo Carlos con legal gate. **Causa de demora NO determinada; registrar como performance/startup focal sin adjudicar al navegador.**
+**Conservación de método:** un único source `004324dcac1faa694f5057a35753fc514103e19b`, build `gi-i65-b4-004324dcac1f-57f234755dc1`, [Preview exacta](https://ays-orbit-360-lab--gi-i65-b4-goals-41660779936-vauqd86b.web.app/). No repetir pruebas Samuel ya documentadas ni hacer firmar términos ajenos; la tercera identidad adicional se retiró del alcance por decisión de Dirección. El spinner inicial «Acceso confirmado · preparando tus datos» observado en otra pestaña superó un flujo de arranque razonable; al abrir una pestaña nueva se obtuvo Carlos con legal gate. Causa de demora NO determinada. No promover producción.
 
 **Estado inalterado:** B4-003 HOLD, I6 50 %, P0 1/6, producción NO-GO.
 
@@ -131,7 +128,13 @@ Las consultas de consola de esta pestaña no devolvieron errores durante los rec
 | B-PO-04 | Cliente360 CO | 49 clientes, 27 pólizas activas, 125 vínculos versus 124 en Pólizas | **PARCIAL / HALLAZGO C conocido**, no editar fuentes |
 | B-PO-05 | Aseguradoras Todos | 33 fichas incluyendo 2 QA, 31 no QA. Ficha real El Roble con Plataformas (7 controles revelar) y Bancos y pagos | **PASS UI focal** de lectura; revelado/copiar/CRUD y autorización backend NO PROBADOS |
 | B-PO-06 | Cobros CO | 56 registros, 42 SIGA pendientes, 0 cobros confirmados, vencido COP 109875840; consola local sin errores/warnings devueltos | **PASS UI focal** de clasificación/lectura; GT/Todos y write no probado |
-| B-GR-03 | Germán Reyes, solo asesor | Paula indicó intento de ingreso fallido; mensaje y etapa no observados por QA | **BLOQUEADO / CAUSA NO DETERMINADA**, no atribuir fallo del rol |
 | B-PO-07 | Seguridad Rules firmada y CRUD persistente | Sin ejercicio real en esta iteración | **NO EJECUTADO**, B4-003 HOLD |
 
 **Sin mutaciones:** no se cambiaron usuarios, membresías, roles, países, pólizas, contraseñas, cuentas o pagos; no se creó nueva preview. I6 5/10, P0 1/6; sin nuevos PASS de gate. Las intermitencias del control de Chrome no se clasifican automáticamente como defectos funcionales de la candidata.
+
+
+---
+
+## Decisión de alcance y recepción Bloque C · 3-nov-2026
+
+Por instrucción de Dirección se retiró la identidad adicional que no era parte de la matriz original; no constituye bloqueo de producto ni del release. Se mantienen la UAT observada Samuel/Paula, Carlos con acuerdo legal propio pendiente y los negativos backend por rol×país×tenant con cuentas efectivas. La conciliación 443 físicos/440 comerciales y 125 vínculos Cliente360 CO/124 pólizas CO avanza como cotejo de causa de universo: diferencias lógicas identificadas, readback por ID y QA/E4/E8 pendientes. Ninguna escritura Firestore ni nuevo build. I6 50 %, B4-003 HOLD, producción NO-GO.
