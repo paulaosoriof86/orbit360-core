@@ -3,6 +3,34 @@
   "controlPlaneId": "GRAVICENTRA-INSURANCE-FASE-A",
   "status": "PRODUCTION_ACCEPTED",
   "productBrand": "Gravicentra Insurance",
+  "b4003SamuelCurrentGrantsOwnerDecision20261103": {
+    "status": "OWNER_APPROVED_KEEP_CURRENT_ACCESS_UNCHANGED",
+    "recordType": "ADDITIVE_BUSINESS_DECISION_NOT_SECURITY_PASS",
+    "gate": "I6.5/B4-003",
+    "decisionReceipt": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_SAMUEL_CURRENT_GRANTS_OWNER_DECISION_20261103.json",
+    "authority": "PAULA_EXPLICIT_2026_11_03",
+    "person": "Samuel Daza",
+    "approvedExistingRoleViews": [
+      "Administración",
+      "Operativo",
+      "Asesor"
+    ],
+    "approvedExistingCountrySelectors": [
+      "Guatemala",
+      "Colombia",
+      "TODOS"
+    ],
+    "noGrantChanges": true,
+    "signedUatRemainsPartial": true,
+    "backendNegativeScope": "HOLD",
+    "advisorColombiaPositive": "HOLD",
+    "sourceSha": "8ccbf641cbbbd8fe470d3ba8d5e22dd4645f3abb",
+    "formalI6Percent": 50,
+    "p0Closed": 1,
+    "p0Total": 6,
+    "b4003Closed": false,
+    "productionAuthorized": false
+  },
   "b4003SamuelE4SignedScopeUat20261103": {
     "status": "PARTIAL_WITH_PROFILE_SCOPE_RECONCILIATION_REQUIRED",
     "recordType": "ADDITIVE_SIGNED_UAT_NOT_ROLE_SECURITY_ACCEPTANCE",
