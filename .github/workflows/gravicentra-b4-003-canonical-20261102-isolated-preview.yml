@@ -21,11 +21,11 @@ jobs:
     if: >-
       github.repository == 'paulaosoriof86/orbit360-core' &&
       github.ref == 'refs/heads/recovery/fase-a-clean-20260831' &&
-      github.event.head_commit.message == 'build(i6.5 B4-003): certify E8 and C360 QA financial readback in exact Preview'
+      github.event.head_commit.message == 'build(b4-003): isolated role-wide authorized-country UAT Preview'
     runs-on: ubuntu-24.04
     timeout-minutes: 55
     env:
-      SOURCE_SHA: 264a28cd2dd8096e19ba0a0661ab43f8e33b71bf
+      SOURCE_SHA: adff22f5395d4eef9c9e9fca3a66ea9a3e6962f1
       PROJECT_ID: ays-orbit-360-lab
       HOSTING_SITE: ays-orbit-360-lab
       TENANT_HINT: alianzas-soluciones
@@ -48,7 +48,7 @@ jobs:
       - name: Checkout frozen canonical source, no product divergence
         uses: actions/checkout@v4
         with:
-          ref: 264a28cd2dd8096e19ba0a0661ab43f8e33b71bf
+          ref: adff22f5395d4eef9c9e9fca3a66ea9a3e6962f1
           fetch-depth: 0
           persist-credentials: false
           path: candidate
@@ -61,10 +61,10 @@ jobs:
         run: |
           set -euo pipefail
           test "$(git -C transport merge-base HEAD "$SOURCE_SHA")" = "$SOURCE_SHA"
-          test "$(git -C transport diff --name-only "$SOURCE_SHA" HEAD)" = '.github/workflows/gravicentra-b4-003-canonical-20261102-isolated-preview.yml'
+          test "$(git -C transport diff --name-only "$SOURCE_SHA" HEAD)" = "$(printf '%s\n' '.github/workflows/gravicentra-b4-003-canonical-20261102-isolated-preview.yml' '.github/workflows/gravicentra-b4-003-reader-preview-resync.yml')"
           test "$(git -C candidate rev-parse HEAD)" = "$SOURCE_SHA"
-          test "$(git -C candidate hash-object functions/b4-003-scoped-access-boundary.js)" = '5cd90582db17d6989b13117e629ed4bc985ff1cf'
-          test "$(git -C candidate hash-object orbit360-platform/core/tenant-access-policy-effective-p0.js)" = '0f7f37e67eff15a4286b0202599830899b02a754'
+          test "$(git -C candidate hash-object functions/b4-003-scoped-access-boundary.js)" = 'b2928e7ce12daaba21913459bc7373ba83946942'
+          test "$(git -C candidate hash-object orbit360-platform/core/tenant-access-policy-effective-p0.js)" = '12e4fa38de5d2fdd04855150597865cd519bbb79'
           test "$(git -C candidate hash-object functions/b4-003-scoped-policy-callable.js)" = '743ed2a9bd9776cbd5d70ffe0669770b491b27aa'
           test "$(git -C candidate hash-object functions/b4-003-scoped-policy-reader.js)" = '1d654b5590fb71279b6bcaaa8eb8625af07c52a4'
           test "$(git -C candidate hash-object orbit360-platform/modules/polizas.js)" = 'fda98c1cd670d3b0648e4ff0f818238069845de8'
@@ -76,7 +76,10 @@ jobs:
           test "$(git -C candidate hash-object tools/gravicentra-i6-1-preview-package.mjs)" = 'd42337f326637d669834664289cb3cce36b56342'
           test "$(git -C candidate hash-object functions/assignable-advisor-roster.js)" = 'bc59e9d7be17154aa54f6c58593cc45af2d72503'
           test "$(git -C candidate hash-object functions/product-operational-domain.js)" = 'b3d0059457142659633498c9c52c6b84ea68200f'
+          test "$(git -C candidate hash-object orbit360-platform/core/access-scope.js)" = '2732879d87da8dfbedad208c7139af8629272bbb'
           cd candidate
+          node tools/gravicentra-b4-003-front-scope-quickcheck.cjs
+          node tools/gravicentra-b4-003-effective-policy-quickcheck.cjs
           timeout -k 3s 55s node tools/gravicentra-i6-control-plane-guard-v1.mjs --mode=i6
           node tools/gravicentra-b4-003-client-country-authority.test.cjs
           node tools/gravicentra-b4-003-client-country-index-dryrun-readonly.test.cjs
