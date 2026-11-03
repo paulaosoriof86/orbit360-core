@@ -1,0 +1,79 @@
+{
+  "schema": "GRAVICENTRA_B4003_E4_CARTERA_OWNER_SOURCE_AND_SERVED_READBACK_V1",
+  "recordType": "ADDITIVE_VERIFIED_SOURCE_EVIDENCE_NOT_GATE_ACCEPTANCE",
+  "dateLocal": "2026-11-03",
+  "branch": "recovery/fase-a-clean-20260831",
+  "gate": "I6.5/B4-003",
+  "status": "SOURCE_AND_SERVING_READBACK_PASS_AUTHENTICATED_UAT_PENDING",
+  "source": {
+    "commit": "8ccbf641cbbbd8fe470d3ba8d5e22dd4645f3abb",
+    "reportesBlob": "a4315cfab30af1903f8dfabe0ab5d1f75404b0c6",
+    "cobrosBlob": "22d2ddf0e796be3a65a800882b13d50c8c252846",
+    "e4TestBlob": "1fa7ccf0cdd0f2b9e1899515c31bb0a43d593f2a"
+  },
+  "tests": {
+    "localSourceRegression": "19/19 PASS",
+    "githubSourceRunId": 41710769641,
+    "githubSourceConclusion": "success",
+    "guardRunId": 41710769521,
+    "guardConclusion": "success"
+  },
+  "transport": {
+    "isolatedHostingPublishRunId": 41711238558,
+    "publishRunConclusion": "failure_immediate_404_readback_after_successful_hosting_deploy",
+    "artifactBuildSourceSha": "8ccbf641cbbbd8fe470d3ba8d5e22dd4645f3abb",
+    "buildId": "gi-i65-b4-8ccbf641cbbb-57f234755dc1",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-e4-41711238558-wrf29bx0.web.app/",
+    "independentReadbackRunId": 41711784293,
+    "independentReadbackConclusion": "success",
+    "independentArtifactId": 13268165815,
+    "servedReportesAndCobrosExact": true,
+    "independentLiveHostingFingerprintsStable": true,
+    "readbackDeploys": 0,
+    "backendFunctionDeploys": 0,
+    "sharedRulesWrites": 0,
+    "authIamWrites": 0,
+    "businessDataWrites": 0
+  },
+  "semantics": {
+    "owner": "orbit360-platform/modules/cobros.js",
+    "consumer": "orbit360-platform/modules/reportes.js",
+    "streams": [
+      "confirmed_or_registered_cobros",
+      "open_portfolio_projected",
+      "source_payment_evidence_pending_confirmation"
+    ],
+    "sigaPendingIsPaid": false,
+    "qaCommercialExcluded": true,
+    "scopeByVerifiedPolicyAndAuthorizedStore": true,
+    "missingFinancialCollectionsFailClosed": true,
+    "reportProjectedRowsNavigateToRealClient": true
+  },
+  "previouslyClosed": {
+    "countryIndexCorrections": 35,
+    "countryIndexBackupApplyRunId": 41478387493,
+    "repeatedCountryWrites": 0,
+    "clientPhysical443Merged3Visible440QaExcluded1Quality439": true,
+    "colombiaPolicy124ClientLinked125DifferenceOneCrossCountry": true,
+    "syntheticPoliciesExplicit6B2Historical3Total9": true
+  },
+  "pending": {
+    "signedPaulaUatOnThisExactPreview": true,
+    "signedCarlosAndSamuelPositiveNegativeJwt": true,
+    "realBackendRulesNegative": true,
+    "exportCsvExcelPdfByteReadback": true,
+    "syntheticWriteRestoreReadback": true,
+    "finalModuleRoleViewportAcceptance": true,
+    "productionPromotion": true
+  },
+  "release": {
+    "formalI6FrozenMiniGates": 5,
+    "formalI6TotalMiniGates": 10,
+    "formalI6Percent": 50,
+    "priorityP0Closed": 1,
+    "priorityP0Total": 6,
+    "b4003Closed": false,
+    "production": "NO_GO"
+  },
+  "nextAction": "SAME_EXACT_PREVIEW_AUTHENTICATED_PAULA_REPORTES_COBROS_GT_CO_THEN_CARLOS_SAMUEL_NEGATIVE_TESTS_NO_NEW_SOURCE_OR_DATA_IMPORT"
+}
