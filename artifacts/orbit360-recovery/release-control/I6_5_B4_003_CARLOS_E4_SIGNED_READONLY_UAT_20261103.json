@@ -1,0 +1,197 @@
+{
+  "schema": "gravicentra-i6-5-b4-003-e4-carlos-signed-uat-readonly-v1",
+  "dateGuatemala": "2026-11-03",
+  "product": "Gravicentra Insurance",
+  "branch": "recovery/fase-a-clean-20260831",
+  "sourceSha": "8ccbf641cbbbd8fe470d3ba8d5e22dd4645f3abb",
+  "buildId": "gi-i65-b4-8ccbf641cbbb-57f234755dc1",
+  "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-e4-41711238558-wrf29bx0.web.app/#/polizas",
+  "recordType": "ADDITIVE_SIGNED_UAT_EVIDENCE_NOT_GATE_CLOSURE",
+  "authenticatedUi": {
+    "person": "Carlos Castro",
+    "activeRole": "Operativo",
+    "countryOptions": [
+      "TODOS",
+      "GT",
+      "CO"
+    ],
+    "actualSignedSession": true,
+    "legalAcceptanceConfirmedByUser": true,
+    "sessionReusedWithoutCredentials": true
+  },
+  "checks": [
+    {
+      "id": "CARLOS_E4_IDENTITY_SCOPE",
+      "status": "PASS_FOCAL_SIGNED_UI",
+      "evidence": "Cuenta Carlos Castro, rol Operativo seleccionado, selector GT/CO/TODOS; bloqueo legal resuelto tras aceptación personal comunicada por usuaria."
+    },
+    {
+      "id": "CARLOS_E4_POLIZAS_ALL_GT_CO",
+      "status": "PASS_FOCAL_READ",
+      "observed": {
+        "allTotal1425": 1425,
+        "allCommercial1416": 1416,
+        "allQaExcluded9": 9,
+        "guatemala1301": 1301,
+        "guatemalaCommercial1292": 1292,
+        "colombia124": 124,
+        "colombiaActive27": 27
+      },
+      "evidence": "Carlos Operativo navega listados de ambos países. Se preserva denominador comercial sin sumar QA."
+    },
+    {
+      "id": "CARLOS_E4_CO_ADVISOR_COLUMN",
+      "status": "PASS_FOCAL_READ",
+      "observed": {
+        "page1Rows100": 100,
+        "page2Rows24": 24,
+        "advisorsPopulated124": 124
+      },
+      "evidence": "Columna Asesor presente en listado Colombia, 100/100 primera página y 24/24 segunda con asesor no vacío; incluye pólizas de otros asesores bajo rol Operativo."
+    },
+    {
+      "id": "CARLOS_E4_CLIENT360_COUNTRY_SCOPE",
+      "status": "PASS_FOCAL_READ",
+      "observed": {
+        "gtClients391": 391,
+        "coClients49": 49,
+        "coClientLinkedPolicyRelations125": 125,
+        "coCountryPolicyRows124": 124
+      },
+      "evidence": "Carlos Operativo visualiza Cliente 360 en GT y CO; 125 relaciones centradas en cliente CO frente a 124 pólizas país CO es diferencia de semántica ya conciliada, no regresión ni solicitud de reimportación."
+    },
+    {
+      "id": "CARLOS_E4_CO_CLIENT_RELATION_CHAIN",
+      "status": "PASS_FOCAL_READ",
+      "observed": {
+        "policyNumber": "1522174456201",
+        "advisor": "Carlos Castro",
+        "insurance": "Seguros Bolívar",
+        "policyState": "Vigente",
+        "premiumRoundedCOP1040902": 1040902,
+        "premiumSourceCOP1040901_51": 1040901.51,
+        "confirmedPayments0": 0
+      },
+      "evidence": "Expediente CO enlaza Pólizas, Cobros, Recibos y pagos e Historial. Cobro desde SIGA aparece pendiente de conciliación, no cobro confirmado; cuota vencida con fecha de exigibilidad y monto fuente; no se ejecutó Conciliar, Aplicar pago ni Registrar interacción."
+    },
+    {
+      "id": "CARLOS_E4_COBROS_CO",
+      "status": "PASS_READ_WITH_CAUTION",
+      "observed": {
+        "rows56": 56,
+        "pendingSiga42": 42,
+        "confirmedPayments0": 0,
+        "overdueCOP109875840": 109875840
+      },
+      "evidence": "Paridad de visibilidad de rol con UAT previa Paula Dirección; no mezcla GTQ en KPI de cartera CO."
+    },
+    {
+      "id": "CARLOS_E4_COBROS_GT",
+      "status": "PASS_READ_WITH_WARNINGS",
+      "observed": {
+        "rows2516": 2516,
+        "pendingSiga1196": 1196,
+        "confirmedPayments5": 5,
+        "confirmedTotalGTQ2744": 2744,
+        "agingGTQ227808": 227808,
+        "sourceCurrencyMismatchWarnings12": 12,
+        "operationalCOPVencidosNotInAging4": 4
+      },
+      "evidence": "Cobros GT visibles sin estrechamiento por asesor; warnings financieros continúan abiertos; 2516 vs 2503 en Reportes GT no clasificados por ID."
+    },
+    {
+      "id": "CARLOS_E4_HISTORIAL_SCOPE",
+      "status": "PASS_FOCAL_READ",
+      "observed": {
+        "gtInteractions0": 0,
+        "coInteractions6": 6,
+        "allInteractions6": 6,
+        "consoleErrorsOnCheckedRoute0": 0
+      },
+      "evidence": "Historial y actividades abre con rol Operativo; filtro GT=0 y CO=6, TODOS=6; captura de consola tras GT sin error/warn. Cliente 360 Historial abre sin error, sin registrar actividad."
+    },
+    {
+      "id": "CARLOS_E4_ASEGURADORAS_SCOPE",
+      "status": "PASS_FOCAL_READ_NO_SECRET_REVEAL",
+      "observed": {
+        "allDirectoryRows33": 33,
+        "allActive29": 29,
+        "allAccessAvailable7": 7,
+        "coDirectoryRows17": 17,
+        "coActive13": 13
+      },
+      "evidence": "Directorio Aseguradoras accesible a Operativo en CO y TODOS. No se revelaron contraseñas ni se ejecutaron ediciones; composición de posibles fixtures QA requiere clasificación antes de comparar con 31 histórico."
+    },
+    {
+      "id": "CARLOS_E4_INICIO_HYDRATION",
+      "status": "PARTIAL_WARNING",
+      "observed": {
+        "sourcesConfirmed4": 4,
+        "sourcesTotal5": 5
+      },
+      "evidence": "Inicio mostró 4/5 fuentes confirmadas, banner de fuente autorizada no confirmada y metas de asesor no disponibles; requiere causa focal, no atribuir PASS de hidratación plena."
+    }
+  ],
+  "unresolved": [
+    {
+      "id": "BACKEND_NEGATIVE_ACCESS",
+      "status": "HOLD",
+      "description": "Rol Operativo Carlos GT/CO positivo a nivel UI; falta prueba independiente de negativas reales de Firestore/Rules/UID y matrices por recurso, no confundir UI con seguridad."
+    },
+    {
+      "id": "SAMUEL_SIGNED_UAT",
+      "status": "HOLD",
+      "description": "Falta UAT focal firmada en E4 con Samuel Comercial CO, positivos y denegaciones GT/otras carteras."
+    },
+    {
+      "id": "GT_COUNT_DELTA_13",
+      "status": "HOLD_CLASSIFICATION",
+      "description": "Reportes Cartera GT 2503 versus Cobros GT 2516; clasificar 13 IDs por QA, anulados y relación padres/hijos antes de corregir."
+    },
+    {
+      "id": "GT_FINANCIAL_WARNINGS",
+      "status": "HOLD",
+      "description": "12 alertas moneda de origen COP/póliza GTQ y 4 vencidos operativos COP sin aging financiero; no convertir monedas ni crear pagos ficticios."
+    },
+    {
+      "id": "INICIO_4_OF_5",
+      "status": "HOLD_DIAGNOSIS",
+      "description": "Fuente autorizada sin confirmación al iniciar y metas de asesor no disponibles; distinguir datos, permisos y latencia."
+    },
+    {
+      "id": "E4_EXPORTS",
+      "status": "HOLD",
+      "description": "CSV/Excel/PDF sin readback binario de filas, monedas ni truncamiento; PDF fuente con límite de 500 filas por estudiar/corregir causalmente."
+    },
+    {
+      "id": "QA_SYNTHETIC_WRITES_AND_RESTORE",
+      "status": "HOLD",
+      "description": "Persistencia, recarga, before/after, restauración, rollback y pruebas de autorización de escritura no ejecutadas en esta UAT solo lectura."
+    }
+  ],
+  "priorPassPreserved": [
+    "443→440 clientes por fusión; 439 calidad sin cliente QA",
+    "125 vínculos cliente CO frente a 124 pólizas de país CO",
+    "9 pólizas QA excluidas de métricas comerciales",
+    "35 índices de país aplicados, sin reimportación"
+  ],
+  "writeScope": {
+    "firestoreWrites": 0,
+    "hostingDeploys": 0,
+    "rulesDeploys": 0,
+    "productionDeploys": 0,
+    "productSourceChanges": 0
+  },
+  "formalMetrics": {
+    "i6MiniGatesPassed": 5,
+    "i6MiniGatesTotal": 10,
+    "i6Percent": 50,
+    "p0Closed": 1,
+    "p0Total": 6,
+    "p0Percent": 16.67,
+    "b4003": "HOLD",
+    "production": "NO_GO"
+  },
+  "nextAction": "No repetir la UAT de lectura Carlos ya acreditada; clasificar delta 13 con IDs, ejecutar export readback, probar denegaciones backend con dos UIDs reales y Samuel E4; solventar 4/5 Inicio; pruebas sintéticas + restauración y guard de release previo a LIVE.",
+  "thesisPilot": "Preparación parcial: cadena real CO Cliente 360→Póliza→Recibo→Cobros→Historial comprobada en lectura con Carlos; piloto académico externo conserva pruebas propias TR-01..TR-07, K-06 verde, GT/CO, Ops/Leads, E4/E8 y E5/E6 sin envíos externos; no autorizar segunda ola sin fronteras de permisos y datos."
+}
