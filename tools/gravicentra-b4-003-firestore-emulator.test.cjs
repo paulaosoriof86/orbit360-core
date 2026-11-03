@@ -175,15 +175,21 @@ async function run(){
     let positiveCount=0;
     const allowedOwn=await get('opGT','operativo','own');
     assert.deepEqual(allowedOwn.rows.map(x=>x.id),['own']);positiveCount++;
+    // Operativo has an affirmative tenant-wide portfolio for GT/CO even if
+    // its legacy membership requests own. This is a role contract, not a UID grant.
     const ownList=await list('opGT','operativo');
-    assert.deepEqual(ownList.rows.map(x=>x.id),['own']);positiveCount++;
+    assert.deepEqual(ownList.rows.map(x=>x.id),['foreign','own']);positiveCount++;
+    const allowedRolePeer=await get('opGT','operativo','foreign');
+    assert.deepEqual(allowedRolePeer.rows.map(x=>x.id),['foreign']);positiveCount++;
     const deniedServer=async(fn,code)=>{
       let error=null;try{await fn();}catch(e){error=e;}
       assert.ok(error instanceof Denied,'server must deny restricted request');
       assert.equal(error.code,code);
       positiveCount++;
     };
-    await deniedServer(()=>get('opGT','operativo','foreign'),'POLICY_NOT_FOUND_OR_DENIED');
+    // The same foreign record must remain denied to an Asesor whose own
+    // advisorId differs; country GT cannot be used to view a CO policy.
+    await deniedServer(()=>get('advisorGT','asesor','own'),'POLICY_NOT_FOUND_OR_DENIED');
     await deniedServer(()=>get('opGT','operativo','co'),'POLICY_NOT_FOUND_OR_DENIED');
     await deniedServer(()=>list('opGT','asesor'),'ROLE_DENIED');
     const advisory=await list('advisorGT','asesor');
@@ -238,7 +244,8 @@ async function run(){
     assert.deepEqual(globalVehicleList.rows.map(x=>x.id),['v_own']);listProof++;
     const advisorVehicleList=await listRelated('advisorGT','asesor','vehiculos');
     assert.deepEqual(advisorVehicleList.rows.map(x=>x.id),[]);listProof++;
-    await denyRelated(()=>listRelated('opGT','operativo','vehiculos','foreign'),'POLICY_NOT_FOUND_OR_DENIED');listProof++;
+    const emptyAuthorizedPeer=await listRelated('opGT','operativo','vehiculos','foreign');
+    assert.deepEqual(emptyAuthorizedPeer.rows.map(x=>x.id),[]);listProof++;
     const filteredReceiptList=await listRelated('opGT','operativo','recibosEsperados','own');
     assert.deepEqual(filteredReceiptList.rows.map(x=>x.id),['r_own']);listProof++;
     await denyRelated(()=>listRelated('opGT','asesor','clientes'),'ROLE_DENIED');listProof++;
@@ -259,7 +266,9 @@ async function run(){
     const verifiedBatch=await listRelated('opGT','operativo','vehiculos','',{policyIds:['own']});
     assert.deepEqual(verifiedBatch.rows.map(x=>x.id),['v_own','v_own2']);
     assert.ok(verifiedBatch.rows.every(x=>x.pais==='GT'&&x.tenantId===tenant));batchChecks++;
-    await denyRelated(()=>listRelated('opGT','operativo','vehiculos','',{policyIds:['own','foreign']}),'POLICY_NOT_FOUND_OR_DENIED');batchChecks++;
+    const rolePortfolioBatch=await listRelated('opGT','operativo','vehiculos','',{policyIds:['own','foreign']});
+    assert.deepEqual(rolePortfolioBatch.rows.map(x=>x.id),['v_own','v_own2']);batchChecks++;
+    await denyRelated(()=>listRelated('opGT','operativo','vehiculos','',{policyIds:['own','co']}),'POLICY_NOT_FOUND_OR_DENIED');batchChecks++;
     const validBatch=await listRelated('opGT','operativo','recibosEsperados','',{policyIds:['own']});
     assert.deepEqual(validBatch.rows.map(x=>x.id),['r_own']);batchChecks++;
     await denyRelated(()=>listRelated('opGT','operativo','vehiculos','',{policyIds:['own','own']}),'POLICY_BATCH_INVALID');batchChecks++;
@@ -327,7 +336,11 @@ async function run(){
     console.log('B4_003_EMULATOR_CANCEL_AUDIT_SERVER_ROLE_COUNTRY_PASS assertions='+restrictedServerChecks+' synthetic_only no_deploy');
 
 
+    // Exercise team narrowing only when the *tenant role ceiling* is team.
+    // RoleScopes=all must keep the complete Operativo portfolio regardless of
+    // per-user team hints (the prior expectation contradicted this contract).
     await env.withSecurityRulesDisabled(async context=>{
+      await setDoc(doc(context.firestore(),`tenants/${tenant}/config/access`),{roleScopes:{operativo:'team',asesor:'own'}});
       await setDoc(doc(context.firestore(),member('opGT')),{uid:'opGT',tenantId:tenant,status:'active',
         roles:['Operativo'],advisorId:'advisor-own',countries:['GT','CO'],
         dataScopes:{default:'team'},teamAdvisorIds:['advisor-other']});
@@ -343,9 +356,10 @@ async function run(){
     });
     const roleScopedTeam=await list('opGT','operativo');
     assert.deepEqual(roleScopedTeam.rows.map(x=>x.id),['own']);positiveCount++;
-    console.log('B4_003_EMULATOR_ROLE_TEAM_NONESCALATION_PASS assertions=1 synthetic_only');
+    console.log('B4_003_EMULATOR_ROLE_TEAM_NONESCALATION_PASS assertions=1 roleScopes_team synthetic_only');
 
     await env.withSecurityRulesDisabled(async context=>{
+      await setDoc(doc(context.firestore(),`tenants/${tenant}/config/access`),{roleScopes:{operativo:'all',asesor:'own'}});
       await setDoc(doc(context.firestore(),member('opGT')),{uid:'opGT',tenantId:tenant,status:'active',
         roles:['Operativo'],advisorId:'advisor-own',countries:['GT','CO'],
         dataScopes:{default:'all'},teamAdvisorIds:['advisor-other']});
@@ -368,7 +382,7 @@ async function run(){
       await setDoc(doc(context.firestore(),`tenants/${tenant}/config/access`),{roleScopes:{operativo:'none',asesor:'own'}});
     });
     await deniedServer(()=>get('opGT','operativo','own'),'SCOPE_NONE');
-    assert.equal(positiveCount,11);
+    assert.equal(positiveCount,12);
     console.log('B4_003_FIRESTORE_EMULATOR_SERVER_SCOPED_POSITIVE_AND_NEGATIVE_PASS assertions='+positiveCount+' synthetic_only no_production');
   }finally{await deleteApp(adminApp);}
 
