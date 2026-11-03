@@ -107,3 +107,24 @@ Los **seis hallazgos P0 del ledger del 12-oct** son un inventario distinto de lo
 **Corrección de contrato, pendiente de nueva Preview/UAT:** el `scopedPolicyRead` del servidor, **después** de autorizar UID, tenant, país, rol y cada póliza, añade exclusivamente `asesorNombreVerificado` consultando por ID de asesor vinculado a esas filas; no enumera Equipo ni devuelve credenciales. Pólizas combina ese nombre con el roster asignable para la celda y el filtro. Pruebas de fuente con mock cubren Colombia-only/asesor GT-only, denegación de GT, ausencia de lectura global de Equipo y campo sensible no proyectado; ver el SHA de la próxima candidata. Hasta build/readback y prueba real, mantener `SOURCE_QA_PASS / AUTH_CO_ADVISOR_PENDING`, no `LATEST_APPROVED_VERSION_PREVIEW_PASS`.
 
 **Invariantes aún abiertos:** (1) entrar con los UIDs **independientes** de Carlos Castro y Samuel Daza, comprobar Operativo GT+CO completo y Asesor restrictivo con readback y negativos; (2) explicar por ID y valor **crudo** los cuatro clientes de `443` físicos frente a `439` visibles, en privado y read-only; (3) aislar fixtures QA de KPIs/E4; (4) retestar E4/E8/S5/S6/S7 y cadena Cliente 360→Póliza→Recibo/Cobro→Renovación en misma candidata; (5) cerrar seis P0, writes reversibles, matriz 15 capacidades/44 áreas, B4-004…B4-007 y aceptación del mismo digest LIVE. Se conserva el plan congelado y no nace ningún bloque nuevo.
+
+---
+
+## Adenda de evidencia funcional — 2-nov-2026 | Preview exacta 41532284588
+
+Este registro es **delta de evidencia dentro de B4-003**, no crea plan, gate, rama ni certificación global. La candidata inmutable de producto es source `264a28cd2dd8096e19ba0a0661ab43f8e33b71bf`; transporte del workflow `15e9954d4bd1c89cebb655f35beb45b0690d2477`. [Run 41532284588](https://github.com/paulaosoriof86/orbit360-core/actions/runs/41532284588) = `completed/success`. Hosting Preview aislado: `https://ays-orbit-360-lab--gi-i65-b4-goals-41532284588-rqhp38r5.web.app/`. Sin promoción LIVE.
+
+**Chrome autenticado, UID de Paula solamente:** el banner de cuenta mostró `Paula Osorio`; cambiar el selector de rol **no equivale a ingresar con Carlos ni Samuel**.
+
+| Prueba focal en este artifact | Resultado observado | Estado limitado |
+| --- | --- | --- |
+| Paula Dirección · Colombia · Pólizas | 124 totales; página 1 con 100 y página 2 con 24; **0 asesores vacíos de 124** | `AUTH_READ_OBSERVED_PAULA` |
+| Paula Dirección · Colombia · Cliente 360 | 49 clientes; 27 pólizas activas vinculadas en KPI; 440 visibles GT+CO en lectura previa, frente a 443 físicos (3 `merged` excluidos según auditoría anterior; recuento físico actual de flags pendiente) | `AUTH_READ_OBSERVED_PAULA`, no cierre de todo P0-3 |
+| Regresión filtro oculto · Paula | Filtrar Johanna Salgado en CO: 5 coincidencias. Cambiar Dirección→Asesor: filtro Asesor vuelve a vacío; muestra **92/92 pólizas propias**, 10 activas y 0 nombres de asesor vacíos. La recarga conserva rol Asesor y país CO | `UI_FILTER_CONTEXT_RESET_PREVIEW_PASS_PAULA` |
+| Restricción de módulo · Paula Asesor | Navegación directa a `#/aseguradoras` muestra `No tienes acceso con el rol activo` | `UI_ROLE_DENIAL_PREVIEW_PASS_PAULA`; **no** acredita negación backend |
+| Aseguradoras · Paula Dirección/Operativo | CO 17 aseguradoras, GT 16; botones `+ Aseguradora` e `Importar` disponibles después de hidratar | `AUTH_READ_OBSERVED_PAULA`; persistencia/credenciales pendientes |
+| Pólizas GT · Paula Operativo | 1.301 físicas; primeras 100 filas con 0 asesores vacíos; KPI comercial 1.292 sin 9 QA | `AUTH_READ_OBSERVED_PAULA`, no certificación Carlos |
+
+**Límites de prueba:** Console errores/warnings no observados durante el escenario focal; no se ejecutaron escrituras operativas, verificaciones signed callable/SDK negativas ni restauración. Chrome también enumeró otra pestaña de esta Preview, pero esa pestaña no fue controlable; **no se acreditó la sesión independiente de Samuel**, aunque Paula confirmó su ingreso. La prueba de Carlos con cuenta propia del artifact anterior se conserva como histórica pero no se eleva automáticamente a PASS de este build.
+
+**Siguiente gate incompleto (sin reabrir los PASS):** P0-2 con sesiones reales independientes Carlos y Samuel y negativas backend/tenant/país/rol; después QA/provenance E4/E8, flujos piloto, CRUD sintético/restore y seis P0 históricos. **B4-003 HOLD; I6 50%; LIVE NO-GO.** El defecto del filtro contextual de Carlos queda **corregido y observado en Paula**; sólo una diferencia reproducida bajo UID Carlos justificaría reabrirlo.
