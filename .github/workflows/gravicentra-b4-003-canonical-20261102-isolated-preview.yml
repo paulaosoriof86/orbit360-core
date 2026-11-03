@@ -344,11 +344,11 @@ jobs:
     if: >-
       github.repository == 'paulaosoriof86/orbit360-core' &&
       github.ref == 'refs/heads/recovery/fase-a-clean-20260831' &&
-      github.event.head_commit.message == 'build(b4-003): isolated E4 hydration Preview'
+      github.event.head_commit.message == 'build(b4-003): isolated E4 full cartera owner Preview'
     runs-on: ubuntu-24.04
     timeout-minutes: 35
     env:
-      SOURCE_SHA: cdaa9463ed0a384858f1204f554ca919c4023bc0
+      SOURCE_SHA: 8ccbf641cbbbd8fe470d3ba8d5e22dd4645f3abb
       PROJECT_ID: ays-orbit-360-lab
       TENANT_HINT: alianzas-soluciones
       HOSTING_SITE: ays-orbit-360-lab
@@ -368,7 +368,7 @@ jobs:
           path: transport
       - uses: actions/checkout@v4
         with:
-          ref: cdaa9463ed0a384858f1204f554ca919c4023bc0
+          ref: 8ccbf641cbbbd8fe470d3ba8d5e22dd4645f3abb
           fetch-depth: 0
           persist-credentials: false
           path: candidate
@@ -382,14 +382,16 @@ jobs:
           test "$(git -C transport diff --name-only "$SOURCE_SHA" HEAD)" = '.github/workflows/gravicentra-b4-003-canonical-20261102-isolated-preview.yml'
           test "$(git -C candidate rev-parse HEAD)" = "$SOURCE_SHA"
           test "$(git -C candidate hash-object orbit360-platform/modules/cancelaciones.js)" = 'c9f6934beea57136daca0a3292451ad0792181c1'
-          test "$(git -C candidate hash-object orbit360-platform/modules/reportes.js)" = '4578b1abdb4df958556cadaf4bbd02f9c9a3cdf5'
+          test "$(git -C candidate hash-object orbit360-platform/modules/reportes.js)" = 'a4315cfab30af1903f8dfabe0ab5d1f75404b0c6'
+           test "$(git -C candidate hash-object orbit360-platform/modules/cobros.js)" = '22d2ddf0e796be3a65a800882b13d50c8c252846'
           test "$(git -C candidate hash-object orbit360-platform/modules/renovaciones.js)" = 'e3eecb72e7642d4c572338d89f119ae98135f6c1'
           test "$(git -C candidate hash-object tools/gravicentra-b4-003-renovaciones-qa-provenance.test.cjs)" = 'c00b6b71deecaeeb11ec99d9e22443b85a5d830f'
-          test "$(git -C candidate hash-object tools/gravicentra-b4-003-reportes-e4-transversal.test.cjs)" = 'fe849dd85430e267eb7a00a4bbb7c5f057de09d1'
+          test "$(git -C candidate hash-object tools/gravicentra-b4-003-reportes-e4-transversal.test.cjs)" = '1fa7ccf0cdd0f2b9e1899515c31bb0a43d593f2a'
           test "$(git -C candidate hash-object orbit360-platform/index.html)" = 'daf1d382500146f7d273cf4501d6901cf39afed9'
           cd candidate
           node --check orbit360-platform/modules/cancelaciones.js
           node --check orbit360-platform/modules/reportes.js
+           node --check orbit360-platform/modules/cobros.js
           node --check orbit360-platform/modules/renovaciones.js
           node tools/gravicentra-b4-003-reportes-e4-transversal.test.cjs
           node tools/gravicentra-b4-003-renovaciones-qa-provenance.test.cjs
@@ -447,6 +449,7 @@ jobs:
           test "$(git rev-parse HEAD)" = "$SOURCE_SHA"
           cmp orbit360-platform/modules/cancelaciones.js "$ROOT/modules/cancelaciones.js"
           cmp orbit360-platform/modules/reportes.js "$ROOT/modules/reportes.js"
+           cmp orbit360-platform/modules/cobros.js "$ROOT/modules/cobros.js"
           cmp orbit360-platform/modules/renovaciones.js "$ROOT/modules/renovaciones.js"
           node - <<'NODE'
           const fs=require('node:fs'),r=process.env.RUNNER_TEMP+'/gi-e4-canonical-hosting/bundle';
@@ -482,7 +485,7 @@ jobs:
         run: |
           set -euo pipefail
           ROOT="$RUNNER_TEMP/gi-e4-canonical-hosting/bundle/site"
-          for rel in __recovery__/build.json product-runtime-config.js index.html modules/cancelaciones.js modules/reportes.js modules/renovaciones.js core/tenant-access-policy-effective-p0.js core/access-scope.js core/queries.js; do
+          for rel in __recovery__/build.json product-runtime-config.js index.html modules/cancelaciones.js modules/reportes.js modules/cobros.js modules/renovaciones.js core/tenant-access-policy-effective-p0.js core/access-scope.js core/queries.js; do
             mkdir -p "$RUNNER_TEMP/gi-e4-readback/$(dirname "$rel")"
             curl -fsSL --retry 2 --max-time 30 "$PREVIEW_URL/$rel" > "$RUNNER_TEMP/gi-e4-readback/$rel"
             cmp "$ROOT/$rel" "$RUNNER_TEMP/gi-e4-readback/$rel"
@@ -499,7 +502,7 @@ jobs:
           const proof={
             schema:'I6_5_B4_003_E4_HYDRATION_EXACT_PREVIEW_V1',
             sourceSha:process.env.SOURCE_SHA,buildId:b.buildId,previewUrl:process.env.PREVIEW_URL,
-            reportesSha256:digest('modules/reportes.js'),cancelacionesSha256:digest('modules/cancelaciones.js'),
+            reportesSha256:digest('modules/reportes.js'),cobrosSha256:digest('modules/cobros.js'),cancelacionesSha256:digest('modules/cancelaciones.js'),
              renovacionesSha256:digest('modules/renovaciones.js'),qaResidueRegression:'SOURCE_TEST_PASS',
             indexSha256:digest('index.html'),servedArtifactExact:true,
             hostingDeploy:'new_expiring_preview_only',backendFunctionsDeployed:0,
@@ -509,7 +512,7 @@ jobs:
           };
           fs.writeFileSync(process.env.RUNNER_TEMP+'/gi-e4-exact-preview.json',JSON.stringify(proof,null,2)+'\n');
           NODE
-          echo "B4-003 E4 Preview source and exact readback: PASS. Isolated Hosting only; LIVE unchanged; signed Paula UAT on this new Preview remains pending." >> "$GITHUB_STEP_SUMMARY"
+          echo "B4-003 E4 full cartera owner Preview source and exact readback: PASS. Isolated Hosting only; LIVE unchanged; signed Paula/Carlos/Samuel UAT on this new Preview remains pending." >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@v4
         if: always()
         with:
