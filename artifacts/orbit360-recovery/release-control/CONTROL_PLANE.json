@@ -3,6 +3,29 @@
   "controlPlaneId": "GRAVICENTRA-INSURANCE-FASE-A",
   "status": "PRODUCTION_ACCEPTED",
   "productBrand": "Gravicentra Insurance",
+  "b4003CarlosE4SignedReadOnlyUat20261103": {
+    "status": "PARTIAL_SIGNED_UAT_READONLY",
+    "recordType": "ADDITIVE_EVIDENCE_NOT_GATE_CLOSURE",
+    "receipt": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CARLOS_E4_SIGNED_READONLY_UAT_20261103.json",
+    "sourceSha": "8ccbf641cbbbd8fe470d3ba8d5e22dd4645f3abb",
+    "buildId": "gi-i65-b4-8ccbf641cbbb-57f234755dc1",
+    "gate": "I6.5/B4-003",
+    "person": "Carlos Castro",
+    "role": "Operativo",
+    "countriesObserved": [
+      "GT",
+      "CO"
+    ],
+    "signedUiReadTestsPassed": true,
+    "backendNegativeTestsPassed": false,
+    "syntheticWriteTestsPassed": false,
+    "i6Percent": 50,
+    "p0Closed": 1,
+    "p0Total": 6,
+    "b4003Closed": false,
+    "productionAuthorized": false,
+    "next": "Samuel CO signed UI/negative backend; GT13 ID classification; exports and startup 4/5; synthetic restore."
+  },
   "b4003PaulaE4SignedReadOnlyUat20261103": {
     "status": "PARTIAL_SIGNED_UAT",
     "receipt": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PAULA_E4_SIGNED_READONLY_UAT_20261103.json",
