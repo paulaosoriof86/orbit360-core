@@ -252,3 +252,20 @@ Este registro es **delta de evidencia dentro de B4-003**, no crea plan, gate, ra
 - **Dictamen vigente:** `B4-003 HOLD / LIVE NO-GO`. La meta de velocidad modifica la secuencia y disciplina de verificación, **no relaja los criterios de seguridad, datos, consentimiento ni aceptación**.
 
 **Primer movimiento ejecutable después de esta revisión:** lote **A**; la divergencia concreta entre lista y ficha en `Operativo/CO` se convierte en una prueba contrafactual **por rol** y corrección causal del owner compartido, seguida de CI, Preview exacta y UAT en lote **B**. No se requieren nuevas decisiones de rol ni credenciales de Paula para comenzar análisis/source QA.
+
+
+---
+## Bloque A · contrato frontal por rol, país y ficha — 3-nov-2026
+
+**Alcance inmutable:** etapa de código para I6.5/B4-003, rama canónica única, sin otro plan ni gate. No crea excepción por UID, no altera roles, países de cuentas, Firestore, Rules, Functions LIVE ni Hosting LIVE.
+
+**Divergencia confirmada en fuente (clase PRODUCT, fronteras front/backend):** el lector protegido construye el ámbito de país desde la membresía autenticada, mientras `core/access-scope.js` calculaba `permittedCountries()` exclusivamente desde el perfil histórico de asesor. Esa doble fuente puede dejar que una lista autorizada por el servidor contenga una fila que `A.canView` rechaza al abrir su ficha. Es una causa reproducible de desalineación local, **sin atribuir todavía las tres fallas exactas de Samuel a esta única causa**.
+
+**Corrección transversal (solo owner compartido):**
+- En sesión de producto `productReadOnly`, obtener los países del `Orbit.auth.productUser` emitido por el bootstrap de membresía validada, no del registro legacy de asesor; conservar el modo legacy solo fuera de la sesión de producto.
+- Mantener equivalencia de filtrado de país para `filter`, `canView` y `scopedStore().get`; si el producto carece de países autorizados explícitos, denegar; normalizar códigos de país a mayúsculas.
+- Preservar `Asesor=own`; `Operativo/AdminTenant=all` únicamente cuando el tenant `roleScopes` lo concede. Ningún cambio a `canWrite` ni a la validación independiente del callable y Rules.
+
+**Regresión incorporada en el mismo cambio:** `tools/gravicentra-b4-003-front-scope-quickcheck.cjs`. Prueba de Node/V8 ejecutada **PASS** con dos UIDs sintéticos Operativo de mismo rol y países GT+CO pero metadatos legacy divergentes; lista y `get` de Pólizas/Clientes coinciden. También prueba AdminTenant CO, Asesor propios sin acceso ajeno, país CO negado a miembro solo GT y membresía sin países denegada. Todo sintético, **cero escrituras**.
+
+**Compuerta restante:** ejecutar guard CI completo y Firestore Emulator sin trabajo omitido; nuevo build/digest y Preview del mismo source, readback de Hosting + Functions; UAT real independiente de Samuel y Carlos con lista → ficha → enlace frío, incluidos negativos firmados de backend. La prueba sintética no certifica a Samuel, ni libera B4-003 ni altera el ledger. **I6 sigue 5/10 = 50 %; P0 históricos 1/6; producción NO-GO**.

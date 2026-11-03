@@ -36,4 +36,59 @@ for(const role of ['Operativo','AdminTenant']){
 }
 assert.equal(mock('Asesor','all').access.dataScope('polizas'),'own',
  'Asesor must never inherit tenant-wide scope even on broad misconfiguration');
-console.log('B4_003_FRONT_SCOPE_ROLE_PARITY_PASS synthetic_only_no_writes');
+// I6.5 Block A: two different identities with the same role and signed country
+// membership must get the same list/get answers, regardless of stale legacy
+// adviser country fields. No Firestore access, privileged token or writes.
+function productCase(role,uid,memberCountries,legacyCountries,requested,advisorId) {
+ const advisor={id:advisorId,countries:legacyCountries,
+  dataScopes:{default:requested,modules:{polizas:requested,cliente360:requested}}};
+ const rows={
+  polizas:[{id:'p-co',pais:'CO',asesorId:'other'}, {id:'p-gt',pais:'GT',asesorId:advisorId}],
+  clientes:[{id:'c-co',pais:'CO',asesorId:'other'}, {id:'c-gt',pais:'GT',asesorId:advisorId}]
+ };
+ const store={
+  get:(collection,id)=>collection==='asesores'?(id===advisorId?advisor:null):(rows[collection]||[]).find(r=>r.id===id)||null,
+  all:collection=>rows[collection]||[]
+ };
+ const Orbit={
+  store,session:{rol:()=>role,rolesAsignados:()=>[role],asesorId:()=>advisorId,canSee:()=>true},
+  tenant:{get:()=>({tenantId:'t'})},domainConfig:{peek:()=>({roleScopes:{[role]:'all'}})},
+  auth:{user:()=>({uid,rol:role}),productUser:{uid,tenantId:'t',roles:[role],
+   countries:memberCountries,productReadOnly:true}},
+  ROLES:{[role]:{modulos:['polizas','cliente360'],scopes:{polizas:'all',cliente360:'all'}}}
+ };
+ vm.runInNewContext(source,{Orbit,window:{Orbit},console});
+ return {access:Orbit.access,store};
+}
+const operativeA=productCase('Operativo','u-a',['GT','CO'],['GT'],'team','a-a');
+const operativeB=productCase('Operativo','u-b',['GT','CO'],['CO'],'own','a-b');
+for(const [name,example] of [['A',operativeA],['B',operativeB]]) {
+ for(const [collection,moduleName,recordId] of [
+  ['polizas','polizas','p-co'],['clientes','cliente360','c-co']
+ ]) {
+  const list=example.access.filter(collection,example.store.all(collection),moduleName);
+  assert.equal(list.length,2,'Operativo '+name+' '+collection+' signed membership list');
+  assert.equal(example.access.scopedStore(moduleName).get(collection,recordId)?.id,recordId,
+   'Operativo '+name+' '+collection+' signed membership detail');
+ }
+}
+const restricted=productCase('Operativo','u-c',['GT'],['GT','CO'],'team','a-c');
+assert.deepEqual(Array.from(restricted.access.filter('polizas',restricted.store.all('polizas'),'polizas').map(r=>r.id)),['p-gt'],
+ 'signed country restriction prevails over legacy countries');
+assert.equal(restricted.access.scopedStore('polizas').get('polizas','p-co'),null,
+ 'signed country negative on protected detail');
+const adminTenant=productCase('AdminTenant','u-d',['GT','CO'],[],'own','a-d');
+assert.equal(adminTenant.access.scopedStore('cliente360').get('clientes','c-co')?.id,'c-co',
+ 'AdminTenant signed countries admit authorized detail');
+const advisor=productCase('Asesor','u-e',['GT','CO'],['GT','CO'],'all','a-e');
+assert.equal(advisor.access.dataScope('polizas'),'own','Asesor has mandatory own ceiling');
+assert.deepEqual(Array.from(advisor.access.filter('polizas',advisor.store.all('polizas'),'polizas').map(r=>r.id)),['p-gt'],
+ 'Asesor list excludes foreign policy');
+assert.equal(advisor.access.scopedStore('polizas').get('polizas','p-co'),null,
+ 'Asesor direct lookup excludes foreign policy');
+const absent=productCase('Operativo','u-f',[],['GT','CO'],'team','a-f');
+assert.equal(absent.access.filter('polizas',absent.store.all('polizas'),'polizas').length,0,
+ 'authenticated product user with no membership countries remains denied');
+assert.equal(absent.access.scopedStore('polizas').get('polizas','p-gt'),null,
+ 'missing membership countries deny direct lookup');
+console.log('B4_003_FRONT_SCOPE_ROLE_PARITY_PASS signed_membership_two_UIDs_list_get_denials_synthetic_only_no_writes');

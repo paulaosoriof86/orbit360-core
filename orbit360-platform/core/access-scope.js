@@ -194,18 +194,34 @@ Orbit.access = (function () {
     return { own: 'propia', team: 'equipo', all: 'todo', none: 'ninguno' }[dataScope(moduleKey)] || 'ninguno';
   }
 
+  function signedProductMembership() {
+    try {
+      var member = Orbit.auth && Orbit.auth.productUser;
+      return member && member.productReadOnly === true ? member : null;
+    } catch (e) { return null; }
+  }
   function permittedCountries() {
-    var a = actorAdvisor();
-    return [].concat(a.countries || a.paises || a.paisesAutorizados || []).map(clean).filter(Boolean);
+    // The product reader and signed server boundary use the authenticated
+    // membership. A legacy asesor profile can be stale or role-specific and
+    // must never override membership countries in an authenticated session.
+    var member = signedProductMembership(), a = member ? null : actorAdvisor();
+    var values = member ? member.countries : (a.countries || a.paises || a.paisesAutorizados);
+    return Array.from(new Set([].concat(values || []).map(function (v) {
+      return clean(v).toUpperCase();
+    }).filter(Boolean)));
   }
   function unresolvedCountryValue(value) {
     var marker = norm(value).replace(/_+/g, '');
     return marker === 'requierevalidacion' || marker === 'porvalidar' || marker === 'pendiente';
   }
   function countryAllowed(record) {
-    var allowed = permittedCountries();
+    var allowed = permittedCountries(), member = signedProductMembership();
+    // An authenticated product session without explicit membership countries
+    // cannot acquire country access through a legacy profile or empty list.
+    if (member && !allowed.length) return false;
     if (!allowed.length) return true;
-    var pais = clean(record && record.pais);
+    var pais = clean(record && record.pais).toUpperCase();
+    if (member) return !!pais && allowed.indexOf(pais) >= 0;
     return !pais || allowed.indexOf(pais) >= 0 || unresolvedCountryValue(pais);
   }
   function teamAdvisorIds() {
@@ -359,13 +375,13 @@ Orbit.access = (function () {
       var scope = dataScope(effectiveModule);
       if (scope === 'none') return [];
       function countryOk(rec) {
-        var pais = clean(rec && rec.pais);
+        var pais = clean(rec && rec.pais).toUpperCase();
         if (roleWidePortfolioScope(effectiveModule))
           return !!pais && allowedCountries.length > 0 && allowedCountries.indexOf(pais) >= 0;
-        return !allowedCountries.length || !pais || allowedCountries.indexOf(pais) >= 0 || unresolvedCountryValue(pais);
+        return countryAllowed(rec);
       }
       if (scope === 'all') {
-        if (!allowedCountries.length) return list.slice();
+        if (!allowedCountries.length && !signedProductMembership()) return list.slice();
         return list.filter(countryOk);
       }
       var ownAdvisorId = actorAdvisorId();
