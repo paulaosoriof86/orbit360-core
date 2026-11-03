@@ -147,8 +147,12 @@ const denied=async(fn,code)=>assert.rejects(fn,e=>e instanceof Denied&&e.code===
    member:members[uid],config:policy,tenantId,activeRole:'Operativo',collection,country:'CO'});
   assert.equal(scopeFor('opLegacyOwn').scope,'all');checks++;
   assert.equal(scopeFor('opModuleOwn').scope,'all');checks++;
-  assert.equal(scopeFor('opLegacyOwn','polizas').scope,'own',
-   'Other collections retain their former member scope');checks++;
+  assert.equal(scopeFor('opLegacyOwn','polizas').scope,'all',
+   'Operativo policy portfolio is all in every authorized country');checks++;
+  assert.equal(scopeFor('opLegacyOwn','vehiculos').scope,'all',
+   'Operativo vehicle portfolio matches the approved policy scope');checks++;
+  assert.equal(scopeFor('opLegacyOwn','recibosEsperados').scope,'own',
+   'Non-portfolio collections preserve their former member scope');checks++;
   assert.equal(scopeFor('opModuleOwn','reclamos').scope,'own',
    'Another collection sharing module cliente360 must not widen');checks++;
   assert.equal(scopeFor('opLegacyOwn','clientes',{roleScopes:{operativo:'team'}}).scope,'own',

@@ -7,6 +7,7 @@ on:
       - .github/workflows/gravicentra-b4-003-client-country-physical-readonly-20261102.yml
       - tools/gravicentra-b4-003-policy-client-join-audit-readonly.cjs
       - tools/gravicentra-b4-003-policy-client-join-parity.test.cjs
+      - tools/gravicentra-b4-003-client-list-transversal-readonly.test.cjs
   workflow_dispatch:
 
 permissions:
