@@ -11,11 +11,12 @@ Orbit.modules.reportes = (function () {
   let host, sel = 'produccion', groupBy = '', anioSel = '';
   let insurerLookupStore = null, unsubscribeInsurerLookup = null;
   let readinessStore = null, unsubscribeReadiness = null, readinessRefreshTimer = null;
+  let financialRowsCache = null;
   // B4-003 E4: an empty cache before Firestore confirmation is NOT a zero.
   // No partial counts or export controls until the active report's sources settle.
   const REPORT_REQUIRED_COLLECTIONS = {
     produccion: ['polizas', 'clientes'],
-    cartera: ['cobros', 'polizas', 'clientes'],
+    cartera: ['cobros', 'recibosEsperados', 'carteraPrimas', 'polizas', 'clientes'],
     comisiones: ['comisiones', 'polizas', 'clientes'],
     renovaciones: ['polizas', 'clientes'],
     siniestros: ['reclamos', 'polizas', 'clientes'],
@@ -149,9 +150,59 @@ Orbit.modules.reportes = (function () {
     return !!(Orbit.modules && Orbit.modules.cancelaciones && typeof Orbit.modules.cancelaciones.effectiveRows === 'function');
   }
 
+  // Read from the Cobros owner; never label an absent source as zero.
+  function financialSourceRows() {
+    if (financialRowsCache) return financialRowsCache;
+    const owner = Orbit.modules && Orbit.modules.cobros;
+    if (!owner || typeof owner.reportableRows !== 'function') return null;
+    const source = owner.reportableRows();
+    if (!Array.isArray(source)) return null;
+    financialRowsCache = source;
+    return source;
+  }
+  function financialOwnerReady() { return Array.isArray(financialSourceRows()); }
+  function financialRowLabel(c) {
+    const policy = S().get('polizas', c.polizaId) || {};
+    const receipt = S().get('recibosEsperados', c.receiptId || c.reciboId) || {};
+    const verifiedNumber = String(c.numeroRecibo || receipt.numeroRecibo || receipt.numero || '').trim();
+    const policyNumber = String(policy.numero || '').trim();
+    const cuota = String(c.cuota == null ? '' : c.cuota).trim();
+    return verifiedNumber || [policyNumber, cuota ? 'Cuota ' + cuota : ''].filter(Boolean).join(' · ') || 'Recibo sin número fuente';
+  }
+
   const REPORTES = {
     produccion: { t: 'Producción', icon: '📈', desc: 'Pólizas por emisión o inicio de vigencia, con prima neta.', yearLabel: 'emisión / inicio de vigencia', moneyCols: [5], countryMode: 'policy', sourceRows: () => S().all('polizas'), cols: ['Póliza', 'Cliente', 'Ramo', 'Aseguradora', 'Asesor', 'Prima neta', 'Estado'], nav: id => `#/cliente360?c=${(S().get('polizas', id) || {}).clienteId || ''}`, rows: () => S().all('polizas').filter(p => !isSyntheticRecord(p) && paisOK(policyCountry(p))).map(p => { const cur = p.moneda || currencyFor(policyCountry(p)); const prima = p.primaNeta != null ? p.primaNeta : p.prima; return rowData(p.id, [p.numero, (S().get('clientes', p.clienteId) || {}).nombre || '', sourceLabelOrPending(p.ramo), (q.aseguradora(p.aseguradoraId) || {}).nombre || '', (q.asesor(p.asesorId) || {}).nombre || '', moneyCell(prima, cur), p.estado], p.emisionEn || p.fechaEmision || p.vigenciaInicio || p.vigenciaIni, cur, { 5: moneySource(prima) }); }) },
-    cartera: { t: 'Cartera y cobros', icon: '💳', desc: 'Recibos por estado, con vencimiento y conciliación.', yearLabel: 'vencimiento', moneyCols: [3], sourceRows: () => S().all('cobros').filter(c => c.estado !== 'Anulado'), cols: ['Recibo', 'Cliente', 'Cuota', 'Monto', 'Vence', 'Estado', 'Conciliado'], nav: id => { const c = S().get('cobros', id) || {}; return `#/cliente360?c=${c.clienteId || ''}`; }, act: id => Orbit.modules.cobros && Orbit.modules.cobros.detalle(id), rows: () => S().all('cobros').filter(c => c.estado !== 'Anulado' && !isSyntheticRecord(c) && paisOK(linkedCountry(c))).map(c => { const cur = c.moneda || monedaPoliza(c.polizaId, c.clienteId); return rowData(c.id, ['REC-' + c.id.slice(-5).toUpperCase(), (S().get('clientes', c.clienteId) || {}).nombre || '', c.cuota, moneyCell(c.monto, cur), U.fmtDate(c.vence), c.estado, c.conciliado ? 'Sí' : 'No'], c.vence || c.fechaLimite, cur, { 3: moneySource(c.monto) }); }) },
+    cartera: {
+      t: 'Cartera y cobros', icon: '💳',
+      desc: 'Cartera abierta, cobros registrados y evidencia de pago por confirmar; no equivale a pagos confirmados.',
+      yearLabel: 'vencimiento', moneyCols: [3],
+      sourceRows: financialSourceRows,
+      cols: ['Póliza / recibo', 'Cliente', 'Cuota', 'Monto', 'Vence', 'Estado', 'Conciliado'],
+      nav: id => {
+        const row = (financialSourceRows() || []).find(c => String(c.id) === String(id)) || {};
+        return '#/cliente360?c=' + (row.clienteId || '');
+      },
+      act: id => {
+        if (!S().get('cobros', id)) return false;
+        const owner = Orbit.modules && Orbit.modules.cobros;
+        if (!owner || typeof owner.detalle !== 'function') return false;
+        owner.detalle(id);
+        return true;
+      },
+      rows: () => (financialSourceRows() || [])
+        .filter(c => !isSyntheticRecord(c) && paisOK(linkedCountry(c)))
+        .map(c => {
+          const cur = c.moneda || monedaPoliza(c.polizaId, c.clienteId);
+          const owner = Orbit.modules && Orbit.modules.cobros;
+          const state = owner && typeof owner.reportStatusLabel === 'function' ? owner.reportStatusLabel(c) : sourceLabelOrPending(c.estado);
+          return rowData(c.id, [
+            financialRowLabel(c),
+            (S().get('clientes', c.clienteId) || {}).nombre || '',
+            c.cuota, moneyCell(c.monto, cur), U.fmtDate(c.vence), state,
+            c.conciliado ? 'Sí' : 'No'
+          ], c.vence || c.fechaLimite, cur, { 3: moneySource(c.monto) });
+        })
+    },
     comisiones: { t: 'Comisiones', icon: '💵', desc: 'Comisión generada por póliza, periodo y estado.', yearLabel: 'periodo de comisión', moneyCols: [3, 5], sourceRows: () => S().all('comisiones'), cols: ['Periodo', 'Cliente', 'Póliza', 'Base neta', '%', 'Comisión', 'Estado'], nav: id => `#/cliente360?c=${(S().get('comisiones', id) || {}).clienteId || ''}`, rows: () => S().all('comisiones').filter(c => !isSyntheticRecord(c) && paisOK(linkedCountry(c))).map(c => { const cur = c.moneda || monedaPoliza(c.polizaId, c.clienteId); return rowData(c.id, [c.periodo || '', (S().get('clientes', c.clienteId) || {}).nombre || '', (S().get('polizas', c.polizaId) || {}).numero || '', moneyCell(c.base, cur), c.pct == null ? '—' : c.pct + '%', moneyCell(c.monto, cur), c.estado], c.periodo || c.fecha, cur, { 3: moneySource(c.base), 5: moneySource(c.monto) }); }) },
     renovaciones: { t: 'Renovaciones', icon: '🔄', desc: 'Pólizas por vencer en los próximos 60 días.', yearLabel: 'fin de vigencia', moneyCols: [4], countryMode: 'policy', sourceRows: () => q.renovacionesProximas(60), cols: ['Póliza', 'Cliente', 'Ramo', 'Aseguradora', 'Prima', 'Vence'], nav: id => `#/cliente360?c=${(S().get('polizas', id) || {}).clienteId || ''}`, rows: () => q.renovacionesProximas(60).filter(p => !isSyntheticRecord(p) && paisOK(policyCountry(p))).map(p => { const cur = p.moneda || currencyFor(policyCountry(p)); return rowData(p.id, [p.numero, (S().get('clientes', p.clienteId) || {}).nombre || '', sourceLabelOrPending(p.ramo), (q.aseguradora(p.aseguradoraId) || {}).nombre || '', moneyCell(p.prima, cur), U.fmtDate(p.vigenciaFin)], p.vigenciaFin, cur, { 4: moneySource(p.prima) }); }) },
     siniestros: { t: 'Siniestros', icon: '🚨', desc: 'Reclamos con estado, montos y aseguradora.', yearLabel: 'reporte del siniestro', moneyCols: [4, 5], sourceRows: () => S().all('reclamos'), cols: ['N.º', 'Cliente', 'Tipo', 'Aseguradora', 'Reclamado', 'Aprobado', 'Estado'], nav: id => `#/cliente360?c=${(S().get('reclamos', id) || {}).clienteId || ''}`, rows: () => S().all('reclamos').filter(r => !isSyntheticRecord(r) && paisOK(linkedCountry(r))).map(r => { const cur = r.moneda || monedaPoliza(r.polizaId, r.clienteId); return rowData(r.id, [r.numero, (S().get('clientes', r.clienteId) || {}).nombre || '', r.tipo, (q.aseguradora(r.aseguradoraId) || {}).nombre || '', moneyCell(r.montoReclamado, cur), moneyCell(r.montoAprobado, cur), r.estado], r.fecha || r.fechaReclamo, cur, { 4: moneySource(r.montoReclamado), 5: moneySource(r.montoAprobado) }); }) },
@@ -161,6 +212,7 @@ Orbit.modules.reportes = (function () {
   Object.values(REPORTES).forEach(r => { r.build = () => r.rows().map(x => x.cells); });
 
   function render(h) {
+    financialRowsCache = null;
     host = h;
     const r = REPORTES[sel];
     const sourceStatus = reportDataReadiness(sel);
@@ -176,6 +228,12 @@ Orbit.modules.reportes = (function () {
     }
     // Fail closed when the source owner is not registered: zero records must
     // never masquerade as a certified empty cancellation report.
+    if (sel === 'cartera' && !financialOwnerReady()) {
+      host.innerHTML = '<div class="page" data-report-financial-owner-readiness="blocked">' +
+        K.banner({ icon: '📊', title: 'Orbit Reportes', sub: 'Reportes exportables sobre datos en vivo' }) +
+        '<div class="cfg-note" role="status">No se pudo confirmar el universo canónico de cartera y cobros. No se presentan cifras ni exportes incompletos.</div></div>';
+      return;
+    }
     if (sel === 'cancelaciones' && !cancellationOwnerReady()) {
       host.innerHTML = `<div class="page" data-report-cancel-owner-readiness="blocked">
         ${K.banner({ icon: '📊', title: 'Orbit Reportes', sub: 'Reportes exportables sobre datos en vivo' })}
@@ -299,7 +357,7 @@ Orbit.modules.reportes = (function () {
 
   function verFila(id) {
     const r = REPORTES[sel];
-    if (r.act) { const done = r.act(id); if (done !== undefined || sel === 'cartera') return; }
+    if (r.act && r.act(id) === true) return;
     const route = r.nav ? r.nav(id) : '';
     if (route && !route.endsWith('c=')) location.hash = route;
     else toast('Registro sin ficha asociada');

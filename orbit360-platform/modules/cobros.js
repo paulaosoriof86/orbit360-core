@@ -197,6 +197,7 @@ Orbit.modules.cobros = (function () {
         const clientPending = !applied && originKind === 'CLIENT_PORTAL';
         return {
           id: 'receipt-payment:' + r.id, receiptId: r.id, __receiptPaymentEvidence: true,
+          __syntheticQa: r.__syntheticQa === true || r.syntheticQa === true,
           __crmDirectEvidence: crmDirect,
           __paidReceiptEvidence: applied,
           __advisorReportedEvidence: advisorPending,
@@ -265,6 +266,7 @@ Orbit.modules.cobros = (function () {
       if ((classification && classification.unknownDate) || op === 'requiere_validacion_estado' || op === 'no_pendiente_segun_aseguradora') { estado = 'Requiere validación'; requiereValidacion = true; }
       return {
         id: 'portfolio:' + receiptId, receiptId, __portfolioReceipt: true,
+        __syntheticQa: r.__syntheticQa === true || r.syntheticQa === true || receipt.__syntheticQa === true || receipt.syntheticQa === true,
         clienteId: receipt.clienteId || r.clienteId || (p && p.clienteId) || '',
         polizaId: receipt.polizaId || r.polizaId || '',
         asesorId: receipt.asesorId || r.asesorId || (p && p.asesorId) || '',
@@ -937,5 +939,22 @@ Orbit.modules.cobros = (function () {
     paint();
   }
 
-  return { render, detalle, reportarPago, aplicarPago, validarReporte, conciliarFactura, resolveReceiptId, lote, pagina, kpi };
+  // Read-only bridge to Reportes: complete finance universe, independent of
+  // the Cobros screen's local filters. Use the authenticated store and
+  // canonical policy/country scope, and never expose a partial hydration.
+  function reportableRows() {
+    const readiness = hydrationState();
+    if (!readiness.coreReady || !readiness.financialReady) return null;
+    const originalFilters = st;
+    try {
+      st = { fq: '', fest: '', fase: '', sort: 'vence', page: 1 };
+      const idx = buildIndex();
+      return rows(idx).concat(portfolioPaymentRows(idx), reportedRows(idx))
+        .filter(row => row && row.estado !== 'Anulado');
+    } finally {
+      st = originalFilters;
+    }
+  }
+
+  return { render, detalle, reportarPago, aplicarPago, validarReporte, conciliarFactura, resolveReceiptId, lote, pagina, kpi, reportableRows, reportStatusLabel: estadoValidacion };
 })();

@@ -12,6 +12,7 @@ const source = rel => fs.readFileSync(path.join(root, rel), 'utf8');
 const queries = source('orbit360-platform/core/queries.js');
 const cancelaciones = source('orbit360-platform/modules/cancelaciones.js');
 const reportes = source('orbit360-platform/modules/reportes.js');
+const cobrosOwner = source('orbit360-platform/modules/cobros.js');
 const polizas = source('orbit360-platform/modules/polizas.js');
 const cliente360 = source('orbit360-platform/modules/cliente360.js');
 
@@ -64,6 +65,8 @@ const rows = {
     { id: 'cancelGT', polizaId: 'gtNew', clienteId: 'clientGT', pais: 'GT', moneda: 'GTQ', fecha: '2026-06-05', valorPerdido: 20 },
     { id: 'cancelQA', polizaId: 'qaCO', clienteId: 'clientCO', pais: 'CO', moneda: 'COP', fecha: '2026-06-05', valorPerdido: 90000 }
   ],
+  recibosEsperados: [],
+  carteraPrimas: [],
   reportes_prog: []
 };
 
@@ -77,7 +80,7 @@ function setup(country, options = {}) {
     get: (k, id) => store.all(k).find(x => String(x.id) === String(id)) || null,
     where: (k, f) => (rows[k] || []).filter(f),
     _productStatus: () => ({
-      serverConfirmedCollections: ['clientes', 'cobros', 'comisiones', 'reclamos', 'cancelaciones']
+      serverConfirmedCollections: ['clientes', 'cobros', 'recibosEsperados', 'carteraPrimas', 'comisiones', 'reclamos', 'cancelaciones']
         .concat(policiesReady ? ['polizas'] : []).concat(insurersReady ? ['aseguradoras'] : []),
       deniedCollections: (options.blockInsurers ? ['aseguradoras'] : [])
         .concat(options.blockPolicies ? ['polizas'] : []), snapshotErrors: {}
@@ -89,7 +92,7 @@ function setup(country, options = {}) {
   };
   const Orbit = {
     pais: country, store, modules: {},
-    ui: { esc: v => String(v == null ? '' : v), fmtDate: v => String(v || ''),
+    ui: { esc: v => String(v == null ? '' : v), text: (v,d) => v == null || v === '' ? d : String(v), fmtDate: v => String(v || ''),
       money: (v, cur) => String(cur) + ' ' + Number(v).toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
       finiteNumber: v => Number.isFinite(Number(v)) ? Number(v) : null },
     kit: { banner: () => '<div>Reporte</div>' },
@@ -99,6 +102,7 @@ function setup(country, options = {}) {
   vm.runInContext(queries, context, { filename: 'queries.js' });
   Orbit.q.renovacionesProximas = () => rows.polizas;
   vm.runInContext(cancelaciones, context, { filename: 'cancelaciones.js' });
+  vm.runInContext(cobrosOwner, context, { filename: 'cobros.js' });
   vm.runInContext(reportes, context, { filename: 'reportes.js' });
   let handlers = new Map();
   const host = {
@@ -512,4 +516,93 @@ test('E4 cancellation report fails closed without the canonical cancellation own
   assert.doesNotMatch(html, /id="rep-exp"|id="rep-excel"|id="rep-pdf"/);
   assert.doesNotMatch(html, /Sin datos/);
   assert.equal(app.writes(), 0);
+});
+
+test('E4 Cartera includes projected receipts and SIGA source evidence without claiming a paid receipt or leaking QA', () => {
+  const initialReceipts=rows.recibosEsperados.length,initialPortfolio=rows.carteraPrimas.length,initialPolicies=rows.polizas.length;
+  try {
+    rows.polizas.push({ id:'verifiedFinancialCO',numero:'CO-VERIFIED-2026',clienteId:'clientCO',aseguradoraId:'insCO',pais:'CO',moneda:'COP',estado:'Vigente' });
+    rows.recibosEsperados.push(
+      { id: 'coProjectedReceipt', polizaId: 'verifiedFinancialCO', clienteId: 'clientCO', pais: 'CO',
+        moneda: 'COP', cuota: 2, primaTotal: 375, fechaLimite: '2026-08-11', estadoOperativo: 'pendiente_vencido' },
+      { id: 'coSigaReceipt', polizaId: 'verifiedFinancialCO', clienteId: 'clientCO', pais: 'CO',
+        moneda: 'COP', cuota: 3, primaTotal: 415, fechaLimite: '2026-09-12',
+        estado: 'Pendiente', estadoOperativo: 'pago_reportado', paymentOrigin: 'siga',
+        paymentState: 'SOURCE_PENDING_CONFIRMATION' },
+      { id: 'coQaReceipt', polizaId: 'qaCO', clienteId: 'clientCO', pais: 'CO',
+        moneda: 'COP', cuota: 8, primaTotal: 90000, fechaLimite: '2026-08-11',
+        estadoOperativo: 'pendiente_vencido', __syntheticQa: true }
+    );
+    rows.carteraPrimas.push(
+      { id: 'portfolioOpenCO', reciboId: 'coProjectedReceipt', polizaId: 'verifiedFinancialCO',
+        clienteId: 'clientCO', pais: 'CO', moneda: 'COP', carteraActiva: true, fechaLimite: '2026-08-11' },
+      { id: 'portfolioQaCO', reciboId: 'coQaReceipt', polizaId: 'qaCO',
+        clienteId: 'clientCO', pais: 'CO', moneda: 'COP', carteraActiva: true, fechaLimite: '2026-08-11',
+        __syntheticQa: true }
+    );
+    const app=setup('CO');
+    // Test the actual Cobros owner, not a duplicate projection in the report.
+    app.Orbit.q.portfolioClassification = row => ({
+      open: true, overdue: true, unknownDate: false, dueDate: row.fechaLimite
+    });
+    const marker='return { render, quitarProg, verFila };';
+    assert.ok(reportes.includes(marker), 'E4 instrument contract changed');
+    const instrument=reportes.replace(marker,
+      "return { render, quitarProg, verFila, __qaSelect: key => { sel = key; } };");
+    const loc={ hash:'#/reportes' };
+    vm.runInNewContext(instrument, { Orbit:app.Orbit, window:{Orbit:app.Orbit},
+      location:loc,Date,Map,Set,console },{filename:'reportes-e4-financial-bridge.js'});
+    app.Orbit.modules.reportes.__qaSelect('cartera');
+    let html=app.render();
+    assert.match(html,/CO-VERIFIED-2026 · Cuota 2/,'Open premium portfolio must appear in E4');
+    assert.match(html,/CO-VERIFIED-2026 · Cuota 3/,'SIGA source evidence must appear in E4');
+    assert.match(html,/Registro de origen SIGA · pago pendiente de confirmación/,
+      'SIGA pending origin must not impersonate payment applied');
+    assert.doesNotMatch(html,/Pago confirmado según fuente SIGA/);
+    assert.doesNotMatch(html,/Cuota 8/,'QA portfolio receipts must remain quarantined');
+    assert.match(html,/data-report-qa-quarantine=/);
+    assert.match(html,/id="rep-exp"/);
+    const projected=app.Orbit.modules.cobros.reportableRows();
+    assert.equal(projected.filter(row=>row.id==='portfolio:coProjectedReceipt').length,1);
+    assert.equal(projected.filter(row=>row.id==='receipt-payment:coSigaReceipt').length,1);
+    const siga=projected.find(row=>row.id==='receipt-payment:coSigaReceipt');
+    assert.notEqual(siga.estado,'Pagado');
+    assert.equal(siga.paymentState,'SOURCE_PENDING_CONFIRMATION');
+    app.Orbit.modules.reportes.verFila('portfolio:coProjectedReceipt');
+    assert.equal(loc.hash,'#/cliente360?c=clientCO','Projected row links to real client');
+    app.Orbit.pais='GT';
+    html=app.render();
+    assert.doesNotMatch(html,/CO-VERIFIED-2026 · Cuota 2|CO-VERIFIED-2026 · Cuota 3/,
+      'Country-scope change must not retain Colombian projection');
+    assert.equal(app.writes(),0,'Read-only integration must not mutate the financial store');
+  } finally {
+    rows.recibosEsperados.splice(initialReceipts);
+    rows.carteraPrimas.splice(initialPortfolio);
+    rows.polizas.splice(initialPolicies);
+  }
+});
+
+test('E4 financial report fails closed when projected sources or owner are unavailable', () => {
+  const app=setup('CO');
+  const marker='return { render, quitarProg, verFila };';
+  const instrument=reportes.replace(marker,
+    "return { render, quitarProg, verFila, __qaSelect: key => { sel = key; } };");
+  vm.runInNewContext(instrument,{Orbit:app.Orbit,window:{Orbit:app.Orbit},
+    location:{hash:'#/reportes'},Date,Map,Set,console},
+    {filename:'reportes-e4-financial-guard.js'});
+  app.Orbit.modules.reportes.__qaSelect('cartera');
+  const status=app.Orbit.store._productStatus;
+  app.Orbit.store._productStatus=()=>({
+    ...status(),
+    serverConfirmedCollections:status().serverConfirmedCollections.filter(name=>name!=='carteraPrimas')
+  });
+  let html=app.render();
+  assert.match(html,/data-report-source-readiness="loading"/);
+  assert.doesNotMatch(html,/id="rep-exp"|id="rep-excel"|id="rep-pdf"/);
+  app.Orbit.store._productStatus=status;
+  delete app.Orbit.modules.cobros;
+  html=app.render();
+  assert.match(html,/data-report-financial-owner-readiness="blocked"/);
+  assert.doesNotMatch(html,/id="rep-exp"|id="rep-excel"|id="rep-pdf"|Sin datos/);
+  assert.equal(app.writes(),0);
 });
