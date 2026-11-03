@@ -1,0 +1,149 @@
+{
+  "schema": "GRAVICENTRA_B4003_C4_REPORTES_HYDRATION_PARTIAL_AUTH_UAT_V1",
+  "recordType": "ADDITIVE_CURRENT_GATE_EVIDENCE_NOT_RELEASE_ACCEPTANCE",
+  "date": "2026-11-03",
+  "timezone": "America/Guatemala",
+  "gate": "I6.5/B4-003",
+  "status": "SOURCE_TEST_AND_ISOLATED_HOSTING_READBACK_PASS_SIGNED_NEW_PREVIEW_UAT_PENDING",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "canonicalSourceSha": "cdaa9463ed0a384858f1204f554ca919c4023bc0",
+  "releaseWorkflowCommit": "cec6b90ac769241676869d65e2fbf722a2891864",
+  "sourceFixes": [
+    {
+      "name": "Renovaciones QA origin classifier",
+      "sourceCommit": "8af8400df46096c8cfe184e4b5e83c2fdaf32ce1",
+      "scope": "B2_QA_AND_EXPLICIT_QA_FILTER_NO_DATA_WRITE"
+    },
+    {
+      "name": "E4 Reportes server hydration fail-closed and reactive refresh",
+      "sourceCommit": "cdaa9463ed0a384858f1204f554ca919c4023bc0",
+      "sourceBlob": "4578b1abdb4df958556cadaf4bbd02f9c9a3cdf5",
+      "regressionBlob": "fe849dd85430e267eb7a00a4bbb7c5f057de09d1",
+      "scope": "NO_PREMATURE_ZERO_OR_EXPORT_WHILE_REQUIRED_SOURCE_PENDING_OR_DENIED"
+    }
+  ],
+  "verification": {
+    "reportRegression": {
+      "runId": 41704721236,
+      "result": "success",
+      "allRegressionSteps": "success"
+    },
+    "pinnedPreview": {
+      "runId": 41704895620,
+      "result": "success",
+      "url": "https://ays-orbit-360-lab--gi-i65-b4-e4-41704895620-ymyc6u11.web.app/",
+      "sourceSha": "cdaa9463ed0a384858f1204f554ca919c4023bc0",
+      "servedArtifactExact": true,
+      "hostingOnly": true,
+      "liveLabFingerprintStable": true,
+      "liveAppDomainFingerprintStable": true
+    },
+    "controlPlaneGuard": {
+      "runId": 41704895372,
+      "result": "success",
+      "firestoreEmulatorJob": "skipped_not_certified"
+    }
+  },
+  "priorPreviewSignedPaulaReadOnly": {
+    "previewRunId": 41702460188,
+    "previewSource": "8af8400df46096c8cfe184e4b5e83c2fdaf32ce1",
+    "role": "Direccion_real_Paula",
+    "signed": true,
+    "observedPolicies": {
+      "physical": 1425,
+      "commercial": 1416,
+      "syntheticQaExcluded": 9,
+      "activeCommercial": 223
+    },
+    "reportes": {
+      "produccion": {
+        "TODOS": 1416,
+        "GT": 1292,
+        "CO": 124
+      },
+      "cancelaciones": {
+        "TODOS": 489,
+        "GT": 461,
+        "CO": 28,
+        "syntheticQaExcluded": 1
+      },
+      "renovaciones": {
+        "TODOS": 34,
+        "GT": 30,
+        "CO": 4
+      },
+      "carteraCobros": {
+        "TODOS": 5,
+        "GT": 5,
+        "CO": 0
+      },
+      "comisionesObserved": {
+        "TODOS": 0,
+        "GT": 0,
+        "CO": 0,
+        "sourceCompletenessCertified": false
+      },
+      "siniestrosObserved": {
+        "TODOS": 0,
+        "GT": 0,
+        "CO": 0,
+        "sourceCompletenessCertified": false
+      }
+    },
+    "calidadDatos": {
+      "TODOS": {
+        "inScope": 439,
+        "countryToValidate": 0,
+        "activePolicyClients": 166,
+        "missingPhone": 168,
+        "premiumReceiptDifferences": 73,
+        "syntheticQaClientsExcluded": 1
+      },
+      "CO": {
+        "inScope": 49,
+        "activePolicyClients": 19,
+        "missingPhone": 30,
+        "premiumReceiptDifferences": 2
+      }
+    },
+    "transientZeroOnInitialSignedReportMountReproduced": true,
+    "refreshedSourceAfterReloadProduction": 1416,
+    "exportsFileContentReadback": "PENDING",
+    "reloadedCountrySwitch": "PARTIAL_PASS",
+    "negativeRoleUat": "PENDING",
+    "consoleAndResponsive": "PENDING"
+  },
+  "physicalReadOnlyProvenance": {
+    "clientsPhysical": 443,
+    "knownQaRootsExplicit": 14,
+    "knownB2QaOrphans": 3,
+    "qaFinancialChildLinks": 12,
+    "commercialPolicyCount": 1416,
+    "clientCountryIndexCandidates": 32,
+    "clientCountryUnresolved": 3
+  },
+  "formalProgress": {
+    "i6MiniGatesClosed": 5,
+    "i6MiniGatesTotal": 10,
+    "i6Percent": 50,
+    "historicalPriorityP0Closed": 1,
+    "historicalPriorityP0Total": 6,
+    "productionAcceptedThisGate": false
+  },
+  "outstanding": [
+    "AUTHENTICATED_NEW_SOURCE_E4_INITIAL_LOAD_GT_CO_ALL_EXPORT_READBACK",
+    "E8_ROLE_AND_SOURCE_PARITY",
+    "CARLOS_AND_SAMUEL_INDEPENDENT_REAL_UID_NEGATIVE_AND_POSITIVE_UAT",
+    "32_COUNTRY_INDEX_BACKUP_RESTORE_AND_SAFE_APPLY_WITH_GUARDS",
+    "3_UNRESOLVED_CUSTOMER_COUNTRIES",
+    "CONTROLLED_WRITE_RELOAD_ROLLBACK",
+    "FULL_PHASE_A_PREVIEW_MATRIX"
+  ],
+  "identityScope": "PAULA_CARLOS_SAMUEL_ONLY_GERMAN_REMOVED_FROM_ACTIVE_UAT_NO_BLOCKER_LABEL",
+  "dataWrites": 0,
+  "productionDeploy": false,
+  "rolesModified": false,
+  "reimport": false,
+  "livePromotionAuthorized": false
+}
