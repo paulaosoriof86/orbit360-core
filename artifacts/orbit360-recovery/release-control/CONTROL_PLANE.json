@@ -3,6 +3,33 @@
   "controlPlaneId": "GRAVICENTRA-INSURANCE-FASE-A",
   "status": "PRODUCTION_ACCEPTED",
   "productBrand": "Gravicentra Insurance",
+  "b4003SamuelE4SignedScopeUat20261103": {
+    "status": "PARTIAL_WITH_PROFILE_SCOPE_RECONCILIATION_REQUIRED",
+    "recordType": "ADDITIVE_SIGNED_UAT_NOT_ROLE_SECURITY_ACCEPTANCE",
+    "receipt": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_SAMUEL_E4_SIGNED_SCOPE_UAT_20261103.json",
+    "sourceSha": "8ccbf641cbbbd8fe470d3ba8d5e22dd4645f3abb",
+    "buildId": "gi-i65-b4-8ccbf641cbbb-57f234755dc1",
+    "person": "Samuel Daza",
+    "roleTested": "Asesor",
+    "scopeExpected": "CO Comercial",
+    "countryCO": {
+      "clients": 0,
+      "policies": 0,
+      "cobros": 0
+    },
+    "countryGT": {
+      "policies": 1,
+      "realPolicyNumber": "VA125-00010478"
+    },
+    "negativeUiAseguradoras": "PASS_UI_ONLY",
+    "backendNegativeDenial": "HOLD",
+    "grantReconciliation": "HOLD",
+    "formalI6Percent": 50,
+    "p0Closed": 1,
+    "p0Total": 6,
+    "b4003Closed": false,
+    "productionAuthorized": false
+  },
   "b4003CarlosE4SignedReadOnlyUat20261103": {
     "status": "PARTIAL_SIGNED_UAT_READONLY",
     "recordType": "ADDITIVE_EVIDENCE_NOT_GATE_CLOSURE",
