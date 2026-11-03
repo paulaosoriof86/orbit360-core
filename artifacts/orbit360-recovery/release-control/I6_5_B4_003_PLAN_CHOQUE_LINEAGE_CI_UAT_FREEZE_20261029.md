@@ -175,3 +175,18 @@ Recibo: `I6_5_B4_003_SAMUEL_E4_SIGNED_SCOPE_UAT_20261103.json` (misma carpeta), 
 6. **Fronteras y métricas:** `0` escrituras Firestore, `0` modificaciones source, `0` despliegues. **I6 5/10 (50%)**, **P0 1/6 (16,67%)**, **B4-003 HOLD**, **nueva producción NO-GO**.
 
 **Retorno al plan sin bucles:** preservar pruebas positivas de Paula/Carlos y las de Samuel indicadas arriba. Resolver en orden (a) grants/país/asesor del usuario Samuel frente al contrato Comercial CO; (b) negativa backend con UID real + fixture CO sintética si procede; (c) falla 4/5 de proyección asesor; (d) 13 filas GT y exportes/500 PDF; (e) writes QA before/after/restauración/rollback y release guard. El proyecto de tesis conserva su propia UAT TR-01..TR-07 y no debe presentar como aprobado el rol Samuel CO hasta obtener un caso positivo autorizado.
+
+---
+
+## 10. DECISIÓN DIRECCIÓN 03-NOV-2026 — C9 SAMUEL CONSERVA SUS ACCESOS ACTUALES
+
+**Autoridad explícita:** Paula Andrea Osorio Franco respondió «si, Samuel debe conservar sus accesos actuales» a la disyuntiva sobre limitarlo exclusivamente a Comercial Colombia o conservar las vistas y países disponibles en la Preview E4.
+
+- **CERRADO POR DECISIÓN EMPRESARIAL:** `SAMUEL_EXTRA_VIEW_ROLES`. Conservar como actualmente configuradas las vistas **Administración, Operativo y Asesor** y los selectores **Guatemala, Colombia y TODOS** observados en la sesión real. No revocar, restringir, ampliar, reasignar ni modificar membership, cliente, país, póliza o asesor por esta decisión.
+- **Recibo aditivo:** `I6_5_B4_003_SAMUEL_CURRENT_GRANTS_OWNER_DECISION_20261103.json`. El UAT firmado de Samuel `I6_5_B4_003_SAMUEL_E4_SIGNED_SCOPE_UAT_20261103.json` permanece inmutable y **PARCIAL**, como evidencia de lo observado antes de la decisión.
+- **No inferir cartera:** la vista **Asesor Colombia = 0 pólizas, 0 clientes, 0 cobros** sigue requiriendo conciliación de asignación o fixture QA reversible para demostrar un positivo, si existe. La póliza **GT VA125-00010478** en Asesor Guatemala ya no constituye por sí misma un conflicto de autorización empresarial; deben comprobarse permisos efectivos en servidor.
+- **Permanece HOLD:** denegación backend Firestore por UID/rol/país/asesor y permisos de escritura, Inicio **4/5** fuentes, delta **13** Cobros/Reportes GT, exportes CSV/Excel/PDF, writes QA con before/after/restauración y gates de composición/release. La negativa de UI a Aseguradoras **no** es prueba de Rules.
+- **Candidata sin cambios:** source `8ccbf641cbbbd8fe470d3ba8d5e22dd4645f3abb`; build `gi-i65-b4-8ccbf641cbbb-57f234755dc1`; Preview E4 ya autenticada. No rebuild, no despliegue, no cambio de grants ni datos.
+- **Porcentaje formal sin aumento:** I6 **5/10 = 50%**; P0 **1/6 = 16,67%**; **B4-003 HOLD**; **producción NO-GO**. La autorización de roles actualiza clasificación empresarial, no equivale a certificación técnica ni habilita segunda ola de tesis sin los controles correspondientes.
+
+**Siguiente bloque no repetitivo:** aislar con UIDs reales las lecturas y escrituras no autorizadas, cotejar asignación Asesor CO sin editar datos comerciales y cerrar causalmente la proyección `dashboardList` del Inicio. Reutilizar Paula/Carlos/Samuel UAT E4 ya firmadas; no crear otra Preview por el cambio documental.
