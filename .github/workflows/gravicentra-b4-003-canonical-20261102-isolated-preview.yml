@@ -335,3 +335,178 @@ jobs:
           path: ${{ runner.temp }}/gi-b4003-e4-readback.json
           if-no-files-found: warn
           retention-days: 30
+
+
+  e4-cancel-owner-hosting-preview:
+    # One causal E4 successor inside the existing B4-003 Preview workflow.
+    # Product source is pinned to the passing E4 bridge commit, never rebuilt
+    # from a moving HEAD. Only a NEW expiring Hosting channel is deployed.
+    if: >-
+      github.repository == 'paulaosoriof86/orbit360-core' &&
+      github.ref == 'refs/heads/recovery/fase-a-clean-20260831' &&
+      github.event.head_commit.message == 'build(b4-003): isolated E4 cancellation-owner Preview'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    env:
+      SOURCE_SHA: 50f0dd277b2a68c42d4c64f9f77505b1ec8b8704
+      PROJECT_ID: ays-orbit-360-lab
+      HOSTING_SITE: ays-orbit-360-lab
+      RELEASE_GATE: I6.5-B4-003
+      BUILD_PREFIX: gi-i65-b4
+      GRAVICENTRA_B4_003_SCOPED_PREVIEW: 'true'
+      GRAVICENTRA_B4_003_GOALS_PREVIEW: 'true'
+      SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_LAB_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+    steps:
+      - name: Checkout transport and frozen product source
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+          path: transport
+      - uses: actions/checkout@v4
+        with:
+          ref: 50f0dd277b2a68c42d4c64f9f77505b1ec8b8704
+          fetch-depth: 0
+          persist-credentials: false
+          path: candidate
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Prove one owner, exact source and E4 regression
+        run: |
+          set -euo pipefail
+          test "$(git -C transport merge-base HEAD "$SOURCE_SHA")" = "$SOURCE_SHA"
+          test "$(git -C transport diff --name-only "$SOURCE_SHA" HEAD)" = '.github/workflows/gravicentra-b4-003-canonical-20261102-isolated-preview.yml'
+          test "$(git -C candidate rev-parse HEAD)" = "$SOURCE_SHA"
+          test "$(git -C candidate hash-object orbit360-platform/modules/cancelaciones.js)" = 'c9f6934beea57136daca0a3292451ad0792181c1'
+          test "$(git -C candidate hash-object orbit360-platform/modules/reportes.js)" = 'a084cb31eb5d2478f0cad345766113d7bcb860dc'
+          test "$(git -C candidate hash-object tools/gravicentra-b4-003-reportes-e4-transversal.test.cjs)" = '983e43b48e9d3b969cd9f0616c112d996097a82e'
+          test "$(git -C candidate hash-object orbit360-platform/index.html)" = 'daf1d382500146f7d273cf4501d6901cf39afed9'
+          cd candidate
+          node --check orbit360-platform/modules/cancelaciones.js
+          node --check orbit360-platform/modules/reportes.js
+          node tools/gravicentra-b4-003-reportes-e4-transversal.test.cjs
+          node tools/gravicentra-b4-003-cross-module-readback-contract.test.cjs
+          timeout -k 3s 55s node tools/gravicentra-i6-control-plane-guard-v1.mjs --mode=i6
+      - name: Freeze LIVE fingerprints before isolated Preview
+        run: |
+          set -euo pipefail
+          curl -fsSL --retry 2 --max-time 30 https://ays-orbit-360-lab.web.app/ | sha256sum > "$RUNNER_TEMP/gi-e4-live-before.sha"
+          curl -fsSL --retry 2 --max-time 30 https://app.aysseguros.com/ | sha256sum > "$RUNNER_TEMP/gi-e4-domain-before.sha"
+      - name: Reuse configured LAB credential and install pinned Firebase CLI
+        working-directory: candidate
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/gi-e4-auth"
+          python3 - <<'PY'
+          import json,os,pathlib
+          root=pathlib.Path(os.environ['RUNNER_TEMP'])/'gi-e4-auth'
+          paths=[]
+          for n,key in enumerate(('SA_LAB','SA_LAB_ALT','SA_DEFAULT')):
+            try: value=json.loads(os.environ.get(key,''))
+            except (ValueError,TypeError): continue
+            if value.get('type')=='service_account' and value.get('project_id')==os.environ['PROJECT_ID'] and value.get('private_key'):
+              p=root/f'{n}.json';p.write_text(json.dumps(value));p.chmod(0o600);paths.append(str(p))
+          if not paths: raise SystemExit('LAB_SERVICE_ACCOUNT_NOT_CONFIGURED')
+          (root/'candidates').write_text('\n'.join(paths)+'\n')
+          PY
+          npm install --prefix "$RUNNER_TEMP/gi-e4-cli" --no-save --ignore-scripts --no-audit --no-fund firebase-tools@14.10.1 >/dev/null
+          node tools/gravicentra-firebase-tools-empty-extensions-workaround-v1.mjs "$RUNNER_TEMP/gi-e4-cli"
+          CLI="$RUNNER_TEMP/gi-e4-cli/node_modules/firebase-tools/lib/bin/firebase.js"
+          selected=''
+          while IFS= read -r candidate; do
+            if GOOGLE_APPLICATION_CREDENTIALS="$candidate" node "$CLI" apps:list WEB --project "$PROJECT_ID" --non-interactive --json >/dev/null 2>&1; then
+              selected="$candidate";break
+            fi
+          done < "$RUNNER_TEMP/gi-e4-auth/candidates"
+          test -n "$selected"
+          cp "$selected" "$RUNNER_TEMP/gi-e4-auth/selected.json"
+          chmod 600 "$RUNNER_TEMP/gi-e4-auth/selected.json"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/gi-e4-auth/selected.json" >> "$GITHUB_ENV"
+          echo "FIREBASE_CLI_BIN=$CLI" >> "$GITHUB_ENV"
+          npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund firebase-admin@13.4.0 >/dev/null
+      - name: Build immutable exact E4 Hosting package once
+        working-directory: candidate
+        run: |
+          set -euo pipefail
+          node "$FIREBASE_CLI_BIN" apps:list WEB --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/gi-e4-apps.json"
+          APP_ID=$(node -e "const x=require(process.env.RUNNER_TEMP+'/gi-e4-apps.json');const a=(x.result||[]).filter(y=>['WEB','PLATFORM_WEB',''].includes(String(y.platform||'').toUpperCase()));if(a.length!==1)process.exit(2);process.stdout.write(a[0].appId)")
+          test -n "$APP_ID"
+          node "$FIREBASE_CLI_BIN" apps:sdkconfig WEB "$APP_ID" --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/gi-e4-sdkconfig.json"
+          node tools/gravicentra-i6-5-b1-branding-snapshot.mjs "$RUNNER_TEMP/gi-e4-branding.json"
+          export TENANT_BRANDING_SNAPSHOT_FILE="$RUNNER_TEMP/gi-e4-branding.json"
+          node tools/gravicentra-i6-1-preview-package.mjs . "$RUNNER_TEMP/gi-e4-canonical-hosting" "$RUNNER_TEMP/gi-e4-sdkconfig.json" > "$RUNNER_TEMP/gi-e4-package-output.json"
+          ROOT="$RUNNER_TEMP/gi-e4-canonical-hosting/bundle/site"
+          test "$(git rev-parse HEAD)" = "$SOURCE_SHA"
+          cmp orbit360-platform/modules/cancelaciones.js "$ROOT/modules/cancelaciones.js"
+          cmp orbit360-platform/modules/reportes.js "$ROOT/modules/reportes.js"
+          node - <<'NODE'
+          const fs=require('node:fs'),r=process.env.RUNNER_TEMP+'/gi-e4-canonical-hosting/bundle';
+          const c=JSON.parse(fs.readFileSync(r+'/firebase.json','utf8'));
+          const b=JSON.parse(fs.readFileSync(r+'/site/__recovery__/build.json','utf8'));
+          const p=fs.readFileSync(r+'/site/product-runtime-config.js','utf8');
+          if(Object.keys(c).join(',')!=='hosting'||c.hosting.site!==process.env.HOSTING_SITE||c.hosting.public!=='site')throw Error('HOSTING_ONLY_EXISTING_LAB_REQUIRED');
+          if(b.sourceSha!==process.env.SOURCE_SHA||b.gate!=='I6.5-B4-003'||!p.includes('"scopedReadPreviewCandidate":true')||!p.includes('"goalParticipationPreviewCandidate":true'))throw Error('CANONICAL_E4_PREVIEW_SOURCE_INVALID');
+          NODE
+      - name: Deploy ONLY a new expiring Hosting Preview channel
+        id: hosting
+        run: |
+          set -euo pipefail
+          CHANNEL_ID="gi-i65-b4-e4-$GITHUB_RUN_ID"
+          test "${#CHANNEL_ID}" -le 32
+          cd "$RUNNER_TEMP/gi-e4-canonical-hosting/bundle"
+          node "$FIREBASE_CLI_BIN" hosting:channel:deploy "$CHANNEL_ID" --config firebase.json --project "$PROJECT_ID" --expires 7d --non-interactive --json > "$RUNNER_TEMP/gi-e4-hosting-result.json" 2>&1
+          export CHANNEL_ID
+          PREVIEW_URL=$(python3 - <<'PY'
+          import os,re
+          raw=open(os.environ['RUNNER_TEMP']+'/gi-e4-hosting-result.json').read()
+          prefix='https://ays-orbit-360-lab--'+os.environ['CHANNEL_ID']+'-'
+          urls=sorted(set(u.rstrip('/') for u in re.findall(r'https://[A-Za-z0-9._-]+\.web\.app',raw) if u.startswith(prefix)))
+          if len(urls)!=1:raise SystemExit('E4_PREVIEW_URL_NOT_UNIQUE')
+          print(urls[0])
+          PY
+          )
+          echo "url=$PREVIEW_URL" >> "$GITHUB_OUTPUT"
+          echo "channel=$CHANNEL_ID" >> "$GITHUB_OUTPUT"
+      - name: Verify exact served artifact, preserve both LIVE sites
+        env:
+          PREVIEW_URL: ${{ steps.hosting.outputs.url }}
+        run: |
+          set -euo pipefail
+          ROOT="$RUNNER_TEMP/gi-e4-canonical-hosting/bundle/site"
+          for rel in __recovery__/build.json product-runtime-config.js index.html modules/cancelaciones.js modules/reportes.js core/tenant-access-policy-effective-p0.js core/access-scope.js core/queries.js; do
+            mkdir -p "$RUNNER_TEMP/gi-e4-readback/$(dirname "$rel")"
+            curl -fsSL --retry 2 --max-time 30 "$PREVIEW_URL/$rel" > "$RUNNER_TEMP/gi-e4-readback/$rel"
+            cmp "$ROOT/$rel" "$RUNNER_TEMP/gi-e4-readback/$rel"
+          done
+          curl -fsSL --retry 2 --max-time 30 https://ays-orbit-360-lab.web.app/ | sha256sum > "$RUNNER_TEMP/gi-e4-live-after.sha"
+          curl -fsSL --retry 2 --max-time 30 https://app.aysseguros.com/ | sha256sum > "$RUNNER_TEMP/gi-e4-domain-after.sha"
+          cmp "$RUNNER_TEMP/gi-e4-live-before.sha" "$RUNNER_TEMP/gi-e4-live-after.sha"
+          cmp "$RUNNER_TEMP/gi-e4-domain-before.sha" "$RUNNER_TEMP/gi-e4-domain-after.sha"
+          node - <<'NODE'
+          const fs=require('node:fs'),crypto=require('node:crypto');
+          const root=process.env.RUNNER_TEMP+'/gi-e4-canonical-hosting/bundle/site';
+          const b=JSON.parse(fs.readFileSync(root+'/__recovery__/build.json','utf8'));
+          const digest=rel=>crypto.createHash('sha256').update(fs.readFileSync(root+'/'+rel)).digest('hex');
+          const proof={
+            schema:'I6_5_B4_003_E4_CANCEL_OWNER_EXACT_PREVIEW_V1',
+            sourceSha:process.env.SOURCE_SHA,buildId:b.buildId,previewUrl:process.env.PREVIEW_URL,
+            reportesSha256:digest('modules/reportes.js'),cancelacionesSha256:digest('modules/cancelaciones.js'),
+            indexSha256:digest('index.html'),servedArtifactExact:true,
+            hostingDeploy:'new_expiring_preview_only',backendFunctionsDeployed:0,
+            dataWrites:0,firestoreRulesWrites:0,authIamChanges:0,productionDeploy:false,
+            liveLabStable:true,liveAppDomainStable:true,authenticatedUat:'PENDING',
+            gate:'I6.5/B4-003',production:'HOLD'
+          };
+          fs.writeFileSync(process.env.RUNNER_TEMP+'/gi-e4-exact-preview.json',JSON.stringify(proof,null,2)+'\n');
+          NODE
+          echo "B4-003 E4 Preview source and exact readback: PASS. Isolated Hosting only; LIVE unchanged; signed Paula UAT remains pending." >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: gi-b4003-e4-owner-preview-${{ github.run_id }}
+          path: ${{ runner.temp }}/gi-e4-exact-preview.json
+          if-no-files-found: warn
+          retention-days: 30
