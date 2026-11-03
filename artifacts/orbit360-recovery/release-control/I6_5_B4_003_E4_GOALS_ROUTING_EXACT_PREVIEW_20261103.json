@@ -1,0 +1,128 @@
+{
+  "schema": "GRAVICENTRA_B4003_E4_GOALS_ROUTING_EXACT_PREVIEW_V1",
+  "recordType": "ADDITIVE_SOURCE_AND_SERVING_RECEIPT_NOT_SIGNED_UAT_OR_RELEASE_ACCEPTANCE",
+  "dateLocal": "2026-11-03",
+  "product": "Gravicentra Insurance",
+  "branch": "recovery/fase-a-clean-20260831",
+  "gate": "I6.5/B4-003",
+  "status": "SOURCE_CI_AND_EXACT_HOSTING_PREVIEW_PASS_SIGNED_ROLE_UAT_HOLD",
+  "cause": "E4 hostname did not match the goals preview routing selector, despite goalParticipationPreviewCandidate=true; old legacy Preview callable selected.",
+  "source": {
+    "sha": "9a0b8794c56f350fc47e754a045f693c84d0054c",
+    "patchCommit": "4817e711fe294943b73c8d351f2b7ed9f787a421",
+    "ciCommit": "9a0b8794c56f350fc47e754a045f693c84d0054c",
+    "pathsBlobs": {
+      "orbit360-platform/core/assignable-advisor-roster-client.js": "d56166f0e1b6d53cc4728f7098fa5e4ec6fabfa0",
+      "orbit360-platform/data/store-firestore-product-operational-p0.js": "fb14f43d527abfdaf4cb9ca14e74d64dda1a6acf",
+      "tests/goal-participation-isolated-routing.test.cjs": "8fb555c6e9389521086b436b53bc716bffef84b6"
+    },
+    "hostSelector": "gi-i65-b4-(goals|e4)-*",
+    "otherPreviewAndLiveSelectorsUnchanged": true,
+    "isolatedLocalHostFlagMatrix": "8/8_PASS"
+  },
+  "regression": {
+    "sourceRunId": 41737442961,
+    "sourceRunConclusion": "success",
+    "stepsExecutedNotSkipped": true,
+    "sourceGuardRunId": 41737443000,
+    "sourceGuardConclusion": "success",
+    "transportGuardRunId": 41737972305,
+    "transportGuardConclusion": "success"
+  },
+  "transport": {
+    "workflow": "gravicentra-b4-003-canonical-20261102-isolated-preview.yml",
+    "transportCommit": "6aea10665edf9665c4aed7d119afcf57c683ce41",
+    "runId": 41737972469,
+    "conclusion": "success",
+    "job": "e4-cancel-owner-hosting-preview",
+    "allEffectiveStepsSuccess": true,
+    "channelId": "gi-i65-b4-e4-41737972469",
+    "url": "https://ays-orbit-360-lab--gi-i65-b4-e4-41737972469-2elawj35.web.app/",
+    "buildId": "gi-i65-b4-9a0b8794c56f-57f234755dc1",
+    "hostedSourceSha": "9a0b8794c56f350fc47e754a045f693c84d0054c",
+    "sourceAndServedByteReadback": true,
+    "artifactId": 13279746827,
+    "artifactArchiveDigest": "sha256:c332b92bebcae96b30893baa861b8c9bfeb8cae935272cb4d1dbc1e892632805",
+    "bothLiveSitesUnchanged": true,
+    "backendFunctionsDeployed": 0,
+    "firestoreRulesWrites": 0,
+    "authIamWrites": 0,
+    "businessDataWrites": 0,
+    "productionDeployed": false
+  },
+  "browserReadOnly": {
+    "chromeOpenedExactPreview": true,
+    "buildJsonVerified": true,
+    "unauthenticatedLoginScreen": true,
+    "unauthenticatedPolicyDeepLinkShowsLogin": true,
+    "paulaSignedInOnExactBuild": true,
+    "role": "Dirección",
+    "inicio": {
+      "status": "FOCAL_PASS",
+      "sourcesConfirmed": "5/5",
+      "gtqCopSeparated": true,
+      "totalsVisible": true
+    },
+    "polizas": {
+      "status": "READONLY_GT_CO_PASS",
+      "gtVisibleUniverse": 1301,
+      "gtCommercial": 1292,
+      "gtQa": 9,
+      "coVisibleUniverse": 124,
+      "coActive": 27,
+      "advisorColumnVisible": true,
+      "coPortfolioCurrencyKpi": "COP 175456570",
+      "coRowCurrencyLabelsIncludeUSDAtypical": "SOURCE_VALIDATION_REQUIRED_NOT_ADJUDICATED"
+    },
+    "cliente360": {
+      "status": "READONLY_CO_PASS",
+      "coClientsVisible": 49,
+      "coPoliciesLinked": 125,
+      "oneKnownCrossCountryLinkPreserved": true,
+      "coAdvisorColumnVisible": true
+    },
+    "reportes": {
+      "status": "READONLY_PARTIAL_PASS_GT_VARIANCE_HOLD",
+      "coCarteraRows": 56,
+      "coPendingSourceEvidenceDistinctFromConfirmed": true,
+      "gtCarteraRows": 2503,
+      "gtCobrosComparatorPreviouslyRecorded": 2516,
+      "gt13BusinessIdReconciliation": "HOLD"
+    },
+    "backendNegativeDenials": "NOT_EXECUTED",
+    "writeReloadRestore": "NOT_EXECUTED",
+    "fullRoleUat": "HOLD",
+    "browserExtensionControlInterruptedAfterPartialReadback": true
+  },
+  "preserved": {
+    "samuelCurrentGrantsUnchanged": true,
+    "noDataReimport": true,
+    "noCountryChange": true,
+    "previousSignedE4ObservationsPreservedWithoutClaimingPassOnThisBuild": true,
+    "temporaryFirestoreRulesRiskAcceptedByOwnerPostproductionButNotSecurityPass": true,
+    "thesisPilotOutOfScope": true
+  },
+  "pending": {
+    "goalParticipationRuntimeReadback": true,
+    "reportesGT13BusinessIdClassification": true,
+    "exportCsvXlsxPdfReadback": true,
+    "syntheticWritePersistenceReloadAndRestore": true,
+    "otherOpenModuleAndRoleViewportGates": true,
+    "b4003Close": true,
+    "paulaFullModuleRoleUat": true,
+    "currencyAttributionForAtypicalCORows": true,
+    "carlosSamuelNewBuildSignedPositiveNegativeBackend": true,
+    "inicioOtherActionsAndRoles": true,
+    "productionPromotionAfterGateAcceptance": true
+  },
+  "progress": {
+    "formalI6MiniGatesClosed": 5,
+    "total": 10,
+    "formalI6Percent": 50,
+    "priorityP0Closed": 1,
+    "priorityP0Total": 6,
+    "b4003Closed": false,
+    "productionAuthorized": false
+  },
+  "nextAction": "PRESERVE_NEW_PREVIEW_READONLY_PAULA_UAT; EXTRACT_GT_13_SOURCE_KEYS; RUN_CARLOS_SAMUEL_ROLE_POSITIVE_NEGATIVE_AND_SYNTHETIC_RESTORE_WHEN_BROWSER_CONTROL_RECOVERS; NO_NEW_PREVIEW_OR_REIMPORT"
+}
