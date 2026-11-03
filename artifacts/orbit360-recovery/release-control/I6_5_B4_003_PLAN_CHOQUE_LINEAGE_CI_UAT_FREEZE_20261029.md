@@ -136,3 +136,22 @@ Causa reproducida del rechazo `functions/permission-denied` en actualización QA
 - **UAT escritura Aseguradoras / Plantillas / Portal / Cliente 360 / Cobros / otros:** parcial o pendiente de identidad, contratos y readback; historial de Cronograma sintético conservado.
 - **B4-003, seis P0, aceptación productiva, respaldo/restauración aislada, matriz multi-UID/viewport, agosto:** HOLD / NO ACREDITADOS. No hacer deploy LIVE ni reimportar datos.
 - **Acción inmediata:** Paula autentica la nueva Preview; verificar fixture de Aseguradoras con edición/restore/readback, registrar error exacto; cerrar por causa transversal los flujos de escritura activos fuera de fachada y continuar UAT multi-módulo por rol/país sin reabrir diseños.
+
+---
+
+## 8. EVIDENCIA ACUMULATIVA 03-NOV-2026 — C7 CARLOS / OPERATIVO GT+CO / PREVIEW E4
+
+**Estado:** UAT firmada de lectura **PARCIAL** en la misma candidata E4; **no** cierra B4-003, no modifica el release, no sustituye aceptaciones históricas, no despliega LIVE.
+
+- Fuente inmutable: `8ccbf641cbbbd8fe470d3ba8d5e22dd4645f3abb`; build `gi-i65-b4-8ccbf641cbbb-57f234755dc1`. Preview `https://ays-orbit-360-lab--gi-i65-b4-e4-41711238558-wrf29bx0.web.app/`.
+- Recibo por identidad real: `I6_5_B4_003_CARLOS_E4_SIGNED_READONLY_UAT_20261103.json` (misma carpeta). Carlos aceptó personalmente el acceso legal y Chrome mostró `Carlos Castro · Operativo` con GT, CO y TODOS. No se solicitó contraseña.
+- Pólizas: **GT 1301**, **CO 124**, total **1425** con **9 QA** separados de **1416 comerciales**; columna Asesor **124/124 CO** en dos páginas; **27 activas CO**. Prueba positiva de alcance transversal de Operativo en UI, **no** prueba de denegación backend.
+- Cliente 360: **GT 391**, **CO 49**; en CO el vínculo **125** relaciones centradas en cliente vs **124** pólizas por país conserva conciliación anterior. Se abrió expediente asignado a Carlos y se cotejó póliza real `1522174456201` con tabs Pólizas, Cobros, Recibos/ pagos e Historial. Pago origen SIGA **pendiente de conciliación** permanece sin atribución de cobro confirmado. No se pulsaron acciones de escritura.
+- Cobros: CO **56** registros, **42 SIGA pendientes**, **0 pagos confirmados**, vencidos **COP 109875840**. GT **2516**, **1196 SIGA pendientes**, **5 confirmados por Q2744**, vencidos **Q227808**; persisten **12** avisos de discrepancia de moneda fuente/póliza y **4** vencidos operativos COP fuera del aging financiero. Sigue sin clasificar delta GT **2516−2503=13** respecto de Reportes.
+- Historial: CO **6** actividades, GT **0**, TODOS **6**; ruta y pestaña de cliente abrieron con Operativo, cero errores de consola en captura focal. Aseguradoras: CO **17**, TODOS **33**, de las que 7 mostraron acceso disponible; no revelar ni cambiar secretos, no equiparar sin clasificación el 33 con directorio histórico 31. 
+- Inicio: **HOLD causal focal** por `4/5` fuentes confirmadas, aviso de fuente autorizada no confirmada y metas de asesor no disponibles.
+- **PENDIENTES CRÍTICOS:** matriz negativa Firestore/Rules con UIDs reales; Samuel Comercial CO E4; delta 13 GT por IDs; lectura binaria CSV/Excel/PDF (incluido límite PDF de 500 filas); aviso 4/5 y warnings financieros; writes QA con before/after/recarga/restauración y rollback; gates de composición y release.
+- **Métrica formal sin cambio:** I6 **5/10 = 50%**; controles P0 **1/6 = 16,67%**; **B4-003 HOLD**, **producción NO-GO**. No convertir pruebas de lectura en cierre de seguridad ni afirmar salida productiva.
+- **Piloto académico:** ya existe lectura focal de la ruta CO Cliente360→Póliza→Recibo→Cobros→Historial; la tesis conserva su propio protocolo de repetición TR-01..TR-07 y K-06 verde, GT/CO, Ops/Leads, E4/E8 y E5/E6 sin envíos externos. La segunda ola continúa condicionada a integridad y permisos; no reconstruir tesis ni volver a los casos previamente certificados sin cambio causal.
+
+**Regla de la siguiente iteración:** reconocer como superadas las comprobaciones focales anteriores. Concentrarse en un único cierre causal del conjunto exacto de 13 GT y el bloqueo de 4/5 fuentes, seguido de Samuel y pruebas negativas, exportes y writes sintéticos; cualquier cambio productivo nuevo exige nuevo source/build/digest y nueva certificación.
