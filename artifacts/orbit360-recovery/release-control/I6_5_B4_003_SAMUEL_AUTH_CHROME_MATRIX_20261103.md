@@ -81,3 +81,21 @@ Esta sección **no sobrescribe** la matriz histórica del build `a94bc13` ni afi
 **Límite de evidencia:** los nueve escenarios **pasan su expectativa visual** en el navegador; no se ejecutaron negativas firmadas con UID independiente exclusivo ni ensayo de mutación/rollback. No extrapolar a todas las fichas ni a otros usuarios. Sigue pendiente **Carlos en este mismo build** bajo Operativo/GT+CO y Asesor, controles de servidor en usuarios diferenciados, negativos país/tenant/módulo, integridad E4/E8, seis P0 históricos y aceptación Dirección. El guard de emulador anterior (12 grupos/162 comprobaciones sintéticas) no acredita Rules LIVE.
 
 **Estado de programa, inalterado:** **B4-003 HOLD; I6 5/10 = 50 %; P0 históricos 1/6 = 16,67 %; producción NO-GO**. Se registra progreso de UAT positiva, no avance ficticio del porcentaje formal. Próximo paso: autenticación de Carlos en esta Preview y contraste rol-wide, seguido de firmados negativos.
+
+
+### Comprobación adicional de acceso de módulos (Samuel Operativo, misma Preview)
+
+Lectura sin escrituras ni revelado de contraseñas. **SMOKE UI**, no cumplimiento de las pruebas completas de módulo `LATEST_APPROVED_VERSION_PREVIEW_PASS`:
+
+| Ruta/país | Lectura observada | Limitación |
+| --- | --- | --- |
+| Aseguradoras / GT | Directorio 16 fichas (incluye fichas QA), 16 activas; pantalla y acciones de administración visibles para Operativo | No se probaron CRUD, revelado/copy de secreto ni autorizaciones servidor |
+| Aseguradoras / CO | Directorio 17 fichas (incluye 4 inactivas); ficha de aseguradora, pestañas de contactos, plataformas y pagos accesibles; contraseñas ocultas, sin revelar | Solo lectura; no certificación de credenciales ni API |
+| Cobros / CO | Módulo y cartera visibles; 0 cobros en filtro actual; la propia app indica Preview segura sin escritura real | Cero registros no valida CRUD, conciliación ni totales de otros países |
+| Renovaciones / CO | Pipeline visible: 3 vencidas, 1 en 16–45 días; tarjetas y rutas de gestión visibles | No se activó campaña, WhatsApp ni acciones de renovación |
+| Ops / CO | Kanban visible, 1 gestión en tramo de renovación, sincronización declarada con Leads | No se escribió ni comprobó persistencia/flujo real |
+| Leads / CO | Pipeline visible, 0 leads activos; sincronización declarada con Ops | Sin alta/conversión/guardado |
+
+Las consultas de consola de esta pestaña no devolvieron errores durante los recorridos focales. Esto **no** demuestra ausencia absoluta de errores en todas las rutas ni certifica estos módulos. Se preserva su estado/lineage previo; solo se registra que las rutas afectadas por el contexto compartido de rol/país cargaron bajo esta sesión.
+
+**Compuertas vigentes sin cambio:** validación independiente Carlos y firmados negativos, reconciliación de datos, seis P0, seguridad LIVE, aceptación Dirección y rollback. I6 `5/10` = `50 %`; B4-003 HOLD; producción NO-GO.
