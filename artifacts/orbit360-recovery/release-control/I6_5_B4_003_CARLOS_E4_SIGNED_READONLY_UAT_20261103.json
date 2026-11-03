@@ -112,15 +112,17 @@
     },
     {
       "id": "CARLOS_E4_ASEGURADORAS_SCOPE",
-      "status": "PASS_FOCAL_READ_NO_SECRET_REVEAL",
+      "status": "PASS_FOCAL_READ_QA_SEPARATED",
       "observed": {
         "allDirectoryRows33": 33,
         "allActive29": 29,
         "allAccessAvailable7": 7,
         "coDirectoryRows17": 17,
-        "coActive13": 13
+        "coActive13": 13,
+        "qaFixtureRowsExplicitlyLabeled2": 2,
+        "nonQaRowsInferred31": 31
       },
-      "evidence": "Directorio Aseguradoras accesible a Operativo en CO y TODOS. No se revelaron contraseñas ni se ejecutaron ediciones; composición de posibles fixtures QA requiere clasificación antes de comparar con 31 histórico."
+      "evidence": "Directorio Aseguradoras Operativo CO 17 y TODOS 33. En lista TODOS se observan dos fixtures señaladas explícitamente B4 R20 Aseguradora QA y PRUEBA PREVIEW · Aseguradora; 33−2=31, coherente con directorio histórico 31. Cálculo de 31 no sustituye un diff formal por ID. No se revelaron ni editaron secretos."
     },
     {
       "id": "CARLOS_E4_INICIO_HYDRATION",
@@ -129,7 +131,7 @@
         "sourcesConfirmed4": 4,
         "sourcesTotal5": 5
       },
-      "evidence": "Inicio mostró 4/5 fuentes confirmadas, banner de fuente autorizada no confirmada y metas de asesor no disponibles; requiere causa focal, no atribuir PASS de hidratación plena."
+      "evidence": "Inicio 4/5; faltan metas/asesores. Un único click de Reintentar consulta pasó a sincronización y retornó a 4/5 + Avance por asesor no disponible. Inspección source inicio.js muestra las cinco fuentes [clientes,pólizas,cartera,pagos,roster de asesores], y la quinta depende de Orbit.assignableAdvisorRoster.dashboardList. Inferencia causal: lectura del roster no confirmada; el catch actual descarta la excepción y aún no distingue permiso/red/función. No es PASS."
     }
   ],
   "unresolved": [
@@ -156,7 +158,7 @@
     {
       "id": "INICIO_4_OF_5",
       "status": "HOLD_DIAGNOSIS",
-      "description": "Fuente autorizada sin confirmación al iniciar y metas de asesor no disponibles; distinguir datos, permisos y latencia."
+      "description": "Reproducido tras un retry de lectura en sesión Carlos; quinta fuente probablemente roster/asesores (source inicio.js); dashboardList falla o no confirma, catch actual oculta la causa técnica. Diagnosticar endpoint/Rules/función por evidencia antes de corregir."
     },
     {
       "id": "E4_EXPORTS",
@@ -167,6 +169,11 @@
       "id": "QA_SYNTHETIC_WRITES_AND_RESTORE",
       "status": "HOLD",
       "description": "Persistencia, recarga, before/after, restauración, rollback y pruebas de autorización de escritura no ejecutadas en esta UAT solo lectura."
+    },
+    {
+      "id": "INICIO_CLIENT_COUNT_DENOMINATOR",
+      "status": "NEEDS_SEMANTIC_RECONCILIATION",
+      "description": "En Inicio Carlos se observó contador 440 antes de reintento y 443 después, mientras Cliente 360 lógico GT391+CO49=440; distinguir clientes físicos 443 de 440 no fusionados. No reimportar ni modificar país."
     }
   ],
   "priorPassPreserved": [
