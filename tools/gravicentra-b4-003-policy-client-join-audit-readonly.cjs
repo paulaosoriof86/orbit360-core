@@ -12,6 +12,60 @@ const permitted=(ctx,row)=>{try{return !!allowRow(ctx,row);}catch(e){if(e instan
 const asArray=value=>Array.isArray(value)?value:value==null?[]:[value];
 const roleList=member=>[...new Set([...asArray(member.roles),...asArray(member.rolesAsignados),
  member.rol,member.role,member.defaultRole,member.rolDefault].map(clean).filter(Boolean))];
+// C gate: compare the *exact document-ID sets* inside the privileged bounded
+// reader. Export only aggregate counts and deterministic digests, never IDs.
+function auditCountryClientParity({clients=[],policies=[]}){
+ const crypto=require('node:crypto');
+ const id=v=>clean(v&&v.id);
+ const isMerged=c=>!!c&&(c.fusionado===true||!!clean(c.mergedIntoClientId));
+ const isQa=x=>!!x&&(x.__syntheticQa===true||x.syntheticQa===true||
+   /^B2 QA firme(?:\s|$)/i.test(clean(x.sourceRef)));
+ const physicalClientById=new Map(clients.map(c=>[id(c),c]));
+ const commercialClients=clients.filter(c=>!isMerged(c));
+ const coClientIds=new Set(commercialClients.filter(c=>country(c.pais)==='CO').map(id));
+ const byCountry={GT:0,CO:0,OTHER:0};
+ for(const c of commercialClients){const k=country(c.pais);byCountry[k==='GT'||k==='CO'?k:'OTHER']++;}
+ const pc=p=>country(p.pais||p.country||
+   physicalClientById.get(clean(p.clienteId||p.clientId))?.pais);
+ const policyId=p=>id(p);
+ const policyQa=p=>isQa(p)||isQa(physicalClientById.get(clean(p.clienteId||p.clientId)));
+ const coCountryPolicies=policies.filter(p=>pc(p)==='CO');
+ const coCountryCommercial=coCountryPolicies.filter(p=>!policyQa(p));
+ const coClientLinkedAll=policies.filter(p=>coClientIds.has(clean(p.clienteId||p.clientId)));
+ const coClientLinkedCommercial=coClientLinkedAll.filter(p=>!policyQa(p));
+ const coAllCountrySet=new Set(coCountryPolicies.map(policyId));
+ const coAllClientSet=new Set(coClientLinkedAll.map(policyId));
+ const coCountrySet=new Set(coCountryCommercial.map(policyId));
+ const coClientSet=new Set(coClientLinkedCommercial.map(policyId));
+ const onlyClient=[...coClientSet].filter(x=>!coCountrySet.has(x));
+ const onlyPolicy=[...coCountrySet].filter(x=>!coClientSet.has(x));
+ const same=[...coCountrySet].filter(x=>coClientSet.has(x));
+ const digest=rows=>crypto.createHash('sha256').update([...rows].sort().join('\n')).digest('hex');
+ const qaExplicit=policies.filter(p=>p.__syntheticQa===true||p.syntheticQa===true);
+ const qaB2=policies.filter(p=>/^B2 QA firme(?:\s|$)/i.test(clean(p.sourceRef)));
+ const qaUnion=new Set([...qaExplicit,...qaB2].map(policyId));
+ const qaOverlap=qaExplicit.filter(p=>qaB2.some(q=>id(q)===id(p))).length;
+ return {
+  schema:'GRAVICENTRA_B4003_COUNTRY_CLIENT_POLICY_ID_SET_PARITY_V1',
+  mode:'EXACT_ID_COMPARISON_AGGREGATE_ONLY_NO_IDENTIFIERS',
+  clientUniverse:{physical:clients.length,merged:clients.length-commercialClients.length,
+    commercial:commercialClients.length,commercialByCountry:byCountry},
+  policyUniverse:{physical:policies.length,countryCOAll:coCountryPolicies.length,
+    countryCOCommercial:coCountryCommercial.length,coClientLinkedAll:coClientLinkedAll.length,
+    coClientLinkedCommercial:coClientLinkedCommercial.length},
+  setParityCOAll:{intersection:[...coAllCountrySet].filter(x=>coAllClientSet.has(x)).length,
+    onlyInClientCentric:[...coAllClientSet].filter(x=>!coAllCountrySet.has(x)).length,
+    onlyInPolicyCountry:[...coAllCountrySet].filter(x=>!coAllClientSet.has(x)).length,
+    policyCountryDigest:digest(coAllCountrySet),clientCentricDigest:digest(coAllClientSet)},
+  setParityCO:{intersection:same.length,onlyInClientCentric:onlyClient.length,
+    onlyInPolicyCountry:onlyPolicy.length,symmetricDifference:onlyClient.length+onlyPolicy.length,
+    policyCountryDigest:digest(coCountrySet),clientCentricDigest:digest(coClientSet)},
+  qaProvenance:{explicit:qaExplicit.length,b2Source:qaB2.length,
+    overlap:qaOverlap,union:qaUnion.size},
+  roleSignedUat:false,recordIdentifiersExported:false,writes:0,authWrites:0,securityChanges:0
+ };
+}
+
 function auditDataset({clients=[],policies=[],insurers=[],members=[],config={},tenantId=TENANT}){
  const byClient=new Map(clients.map(c=>[clean(c.id),c]));
  const byInsurer=new Map(insurers.map(a=>[clean(a.id),a]));
@@ -93,6 +147,7 @@ function auditDataset({clients=[],policies=[],insurers=[],members=[],config={},t
      distinctPolicyClientRefs:referencedClientIds.size,
      distinctMissingPhysicalClientRefs:missingPhysicalIds.size},
    clientCountryAuthority:clientCountries,physicalJoin:join,
+   countryClientIdSetParity:auditCountryClientParity({clients,policies}),
    effectiveScopeMatrix:[...matrices.values()].sort((a,b)=>
      [a.role,a.country,a.policyScope,a.clientScope].join('|').localeCompare(
        [b.role,b.country,b.policyScope,b.clientScope].join('|'))),
@@ -134,6 +189,7 @@ async function runReadOnly(){
  fs.writeFileSync(out,JSON.stringify(result,null,2)+'\n',{mode:0o600,flag:'wx'});
  console.log('B4_003_READONLY_JOIN_AUDIT='+JSON.stringify({counts:result.counts,
    join:result.physicalJoin,country:result.clientCountryAuthority}));
+ console.log('B4_003_ID_SET_PARITY_READONLY='+JSON.stringify(result.countryClientIdSetParity));
  console.log('B4_003_PRODUCTION=NO_GO writes=0 signed_uid_uat=NOT_EXECUTED');
 }
 if(require.main===module){
@@ -142,4 +198,4 @@ if(require.main===module){
  });
  else{console.error('B4_003_JOIN_AUDIT_REQUIRES_EXPLICIT_REAL_READONLY_FLAG');process.exitCode=2;}
 }
-module.exports=Object.freeze({auditDataset});
+module.exports=Object.freeze({auditDataset,auditCountryClientParity});

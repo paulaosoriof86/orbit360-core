@@ -5,6 +5,8 @@ on:
     branches: [recovery/fase-a-clean-20260831]
     paths:
       - .github/workflows/gravicentra-b4-003-client-country-physical-readonly-20261102.yml
+      - tools/gravicentra-b4-003-policy-client-join-audit-readonly.cjs
+      - tools/gravicentra-b4-003-policy-client-join-parity.test.cjs
   workflow_dispatch:
 
 permissions:
@@ -43,6 +45,7 @@ jobs:
           test "$(git rev-parse HEAD)" = "${GITHUB_SHA}"
           test "${GITHUB_REF_NAME}" = 'recovery/fase-a-clean-20260831'
           node --check tools/gravicentra-b4-003-policy-client-join-audit-readonly.cjs
+          node tools/gravicentra-b4-003-policy-client-join-parity.test.cjs
           node --check functions/b4-003-scoped-related-reader.js
           node tools/gravicentra-b4-003-client-list-transversal-readonly.test.cjs
           node tools/gravicentra-b4-003-client-country-authority.test.cjs
@@ -94,6 +97,11 @@ jobs:
              report.gate!=='B4_003_HOLD'||report.production!=='NO_GO')
             throw Error('AUDIT_CONTRACT_OR_RELEASE_HOLD_INVALID');
           const c=report.counts,j=report.physicalJoin;
+          const p=report.countryClientIdSetParity;
+          if(!p||p.schema!=='GRAVICENTRA_B4003_COUNTRY_CLIENT_POLICY_ID_SET_PARITY_V1'||
+             p.recordIdentifiersExported!==false||p.writes!==0||p.authWrites!==0||
+             p.securityChanges!==0||p.roleSignedUat!==false)
+            throw Error('READONLY_ID_SET_PARITY_CONTRACT_INVALID');
           fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY,
             '### B4-003 – auditoría física solo lectura\n'+
             '- Clientes físicos: '+c.clients+'; pólizas: '+c.policies+'; aseguradoras: '+c.insurers+'\n'+
@@ -101,6 +109,10 @@ jobs:
             '- Clientes distintos no encontrados físicamente: '+c.distinctMissingPhysicalClientRefs+'\n'+
             '- Relaciones elegibles para inferencia por aseguradora: '+j.linkedClientInsurerFallbackEligible+'\n'+
             '- Registros con país no resuelto: '+j.linkedClientCountryUnresolved+'\n'+
+            '- Clientes físicos/comerciales/fusionados: '+p.clientUniverse.physical+'/'+p.clientUniverse.commercial+'/'+p.clientUniverse.merged+'\n'+
+            '- CO (físico): pólizas por país / vínculo por cliente / solo cliente / solo póliza: '+p.policyUniverse.countryCOAll+'/'+p.policyUniverse.coClientLinkedAll+'/'+p.setParityCOAll.onlyInClientCentric+'/'+p.setParityCOAll.onlyInPolicyCountry+'\n'+
+            '- CO (comercial sin QA): país / cliente / solo cliente / solo póliza: '+p.policyUniverse.countryCOCommercial+'/'+p.policyUniverse.coClientLinkedCommercial+'/'+p.setParityCO.onlyInClientCentric+'/'+p.setParityCO.onlyInPolicyCountry+'\n'+
+            '- QA explícita / B2 / unión: '+p.qaProvenance.explicit+'/'+p.qaProvenance.b2Source+'/'+p.qaProvenance.union+'\n'+
             '- Producción: **NO-GO**. No se modificaron datos, reglas, identidades ni Hosting.\n');
           console.log('B4_003_PHYSICAL_READONLY_AUDIT_PASS aggregate_only=true user_identifiers_exported=false');
           NODE
