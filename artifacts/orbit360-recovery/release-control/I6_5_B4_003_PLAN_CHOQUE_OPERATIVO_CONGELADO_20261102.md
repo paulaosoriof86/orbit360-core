@@ -128,3 +128,24 @@ Este registro es **delta de evidencia dentro de B4-003**, no crea plan, gate, ra
 **Límites de prueba:** Console errores/warnings no observados durante el escenario focal; no se ejecutaron escrituras operativas, verificaciones signed callable/SDK negativas ni restauración. Chrome también enumeró otra pestaña de esta Preview, pero esa pestaña no fue controlable; **no se acreditó la sesión independiente de Samuel**, aunque Paula confirmó su ingreso. La prueba de Carlos con cuenta propia del artifact anterior se conserva como histórica pero no se eleva automáticamente a PASS de este build.
 
 **Siguiente gate incompleto (sin reabrir los PASS):** P0-2 con sesiones reales independientes Carlos y Samuel y negativas backend/tenant/país/rol; después QA/provenance E4/E8, flujos piloto, CRUD sintético/restore y seis P0 históricos. **B4-003 HOLD; I6 50%; LIVE NO-GO.** El defecto del filtro contextual de Carlos queda **corregido y observado en Paula**; sólo una diferencia reproducida bajo UID Carlos justificaría reabrirlo.
+
+
+---
+
+## Adenda de comprobación privada UID/membresía — 2-nov-2026 | sin SECURITY_PASS
+
+**Evidencia ejecutada en modo solo lectura; sin publicar UIDs, correos ni PII.** En Chrome autenticado de Dirección se verificó en Firebase Authentication del proyecto LAB una cuenta individual `QA-SD02` con acceso del 2-nov y su UID exacto concordante con el documento `tenants/alianzas-soluciones/members/{uid}` de Firestore. La pantalla de la Preview exacta identificó a Samuel, pero no expuso el token firmado/UID de esa sesión: **correlación administrativa de identidad sí; prueba criptográfica del token de navegador y negativas del callable/SDK aún NO EJECUTADAS**. El contraste `QA-CC02` se leyó en consola solamente, sin nueva sesión UAT Carlos.
+
+| Comprobación focal | Evidencia saneada | Disposición |
+| --- | --- | --- |
+| Candidata | Source `264a28cd2dd8096e19ba0a0661ab43f8e33b71bf`; Preview `https://ays-orbit-360-lab--gi-i65-b4-goals-41532284588-rqhp38r5.web.app/`; HEAD documental posterior `5fab0b6` sin drift de producto | `PREVIEW_TECH_PASS` histórico preservado |
+| Cuenta y membresía `QA-SD02` | UID de Firebase Auth coincide con documento Firestore; `status=active`, `tenantId=alianzas-soluciones`, roles `AdminTenant/Operativo/Asesor`, países `GT/CO`; `advisorId` vinculado; sin lista adicional de equipo | `BACKEND_ADMIN_READ_ONLY_IDENTITY_MEMBERSHIP_PASS`, no prueba signed callable |
+| Scope contractual vigente | `config/access.roleScopes.Operativo=all`, `AdminTenant=all`, `Asesor=own`, pero `QA-SD02.dataScopes.modules.polizas=equipo`. `functions/b4-003-scoped-access-boundary.js` aplica mínimo permiso, dejando Pólizas en `team`; para `clientes` de Operativo existe override explícito a `all` | **`BLOCKED_CAUSAL_SCOPE_ASYMMETRY`**; no cambiar permisos silenciosamente |
+| Contrafactual `QA-CC02` | Membresía active, roles Operativo/Asesor, países CO/GT, `dataScopes.modules.polizas=todos` | Configuración distinta explica por qué Carlos puede tener visibilidad mayor; **no** equivale a recertificación autenticada de Carlos en este build |
+| Preview `QA-SD02` | Operativo GT: **1/1** pólizas; Operativo CO: **0/0**; AdminTenant CO: **0/0**; Asesor GT: **1/1**; Asesor CO: **0/0**. Cliente 360 Operativo CO: **49 clientes** y **0 pólizas vinculadas**. No deducir 0 registros físicos ni baja de país | `AUTH_UI_READ_OBSERVED` parcial; reconciliación de universos/contrato pendiente |
+| Recarga y acceso UI | Sesión etiquetada Samuel conservó Asesor/Colombia y `0/0` tras reload en frío. Ruta directa `#/aseguradoras` bajo Asesor mostró «No tienes acceso con el rol activo», sin errores de consola observados | `UI_ROLE_DENIAL_PREVIEW_PASS` limitado a interfaz; **NO** `BACKEND_NEGATIVE_PASS` |
+| Integridad del ensayo | No hubo cambios de datos, membresías, Roles/Rules/IAM, funciones, Hosting LIVE ni cobros/comunicaciones; se restauró la vista de la Preview a Administración/Guatemala | `READ_ONLY` |
+
+**Decisión que falta, sin presumirla:** confirmar si el límite individual `equipo` de `QA-SD02` debe conservarse, aunque el rol Operativo admita `all`; o si la aceptación exige visibilidad de cartera completa de ambos países para esa persona. La primera opción hace que CO=0 pueda ser legítimo en Pólizas pero obliga a explicar Cliente 360=49 y sus relaciones; la segunda sería **un cambio de acceso material**, sujeto a autorización expresa y prueba multi-UID de mínimo privilegio. No usar el conteo de Clientes para ampliar Pólizas por inferencia.
+
+**Falta para cerrar P0-2:** lectura firmada de servidor bajo UID efectivo (callable y SDK directo), positivas/negativas país/tenant/rol/asesor/vehículo, recarga directa, UAT propia de Carlos en el mismo artifact, y pruebas de no fuga. Este delta no crea mini-gate ni cambia el ledger. **I6 5/10 = 50%; P0 históricos 1/6; B4-003 HOLD; tesis HOLD; producción NO-GO.**
