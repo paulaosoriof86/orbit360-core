@@ -311,3 +311,23 @@ Este registro es **delta de evidencia dentro de B4-003**, no crea plan, gate, ra
 **Próximos pasos en orden:** Carlos lee y acepta personalmente su acuerdo, si decide hacerlo; concluir en ese UID Operativo GT+CO, lista→ficha→enlace y Asesor propio/negativas. Después autenticar a Germán en la **misma candidata exacta** y verificar que únicamente tenga Asesor, cero cartera propia y ninguna visibilidad ajena; pruebas de servidor firmadas y distintas de un simple selector cliente. Si Germán no está provisionado, registrar `NO EJECUTADO` hasta autorización administrativa; no crearlo ni cambiar roles automáticamente. Mantener E4/E8, P0, seguridad LIVE, integridad y rollback en el gate único.
 
 **Indicadores oficiales siguen sin alteración:** I6 `5/10=50 %`, P0 `1/6=16,67 %`, B4-003 HOLD, LIVE NO-GO. La ampliación de muestra no invalida los PASS de Samuel ni los 162 checks emulados.
+
+
+---
+
+## Bloque B · continuación UAT autenticada Paula/Dirección · 3-nov-2026
+
+**Identidad y build sin cambios:** sesión en Chrome de Paula Osorio con selector Dirección y país Todos los países; la sesión entró inicialmente mostrando Operativo y se cambió solo la vista de rol a Dirección. Preview original con source 004324dcac1faa694f5057a35753fc514103e19b / build gi-i65-b4-004324dcac1f-57f234755dc1. No hay nueva candidata, despliegue, mutation de backend ni datos importados.
+
+**Pruebas de lectura realmente ejecutadas:**
+1. Inicio/Dirección: autenticación de Paula, selector de rol, menú extendido y KPIs que se hidrataron progresivamente (se observó 3/5 y 4/5, no se certificó el cierre 5/5 en esta iteración).
+2. Pólizas/Dirección/Todos: 1.425 filas consultables; 9 marcadas QA y 1.416 comerciales; 223 activas según tarjeta que excluye pruebas. En Colombia, 124 filas, 27 activas. Se abrió desglose y detalle real de la póliza 101005491, con asesor, cliente, país, moneda y vehículo visibles; el vínculo hacia Cliente 360 funcionó tras latencia del control de Chrome. Ninguna edición.
+3. Cliente 360/Dirección: listado Todos con 440 clientes; Colombia con 49 clientes, 27 pólizas activas y 125 vínculos a pólizas. La diferencia **125 vínculos CO vs 124 pólizas CO** persiste: hallazgo ya conocido y abierto en Bloque C, NO abrir una investigación duplicada ni cambiar país o propietario para forzar conteo. El cliente vinculado desde la póliza abrió su expediente y la póliza 101005491 estaba entre sus filas.
+4. Aseguradoras/Dirección/Todos: 33 fichas visibles, de ellas 2 QA identificadas por nombre (31 no QA); 29 activas. La ficha real SEGUROS EL ROBLE mostró Resumen, Plataformas y Bancos y pagos. Había siete botones de revelado temporal de contraseña, usuarios mostrados y cuentas bancarias; NO se copiaron credenciales ni se certificó el revelado o CRUD. Leer un control visible no prueba reglas de backend.
+5. Cobros/Dirección/Colombia: módulo abierto con 56 registros, 42 de origen SIGA **pendientes de confirmar**, 0 cobros confirmados y vencido por COP 109.875.840. El sistema distinguió reporte SIGA de pago conciliado; no se ejecutaron writes ni pagos. La lectura de consola en esa pantalla devolvió 0 errores/warnings observados, sin extenderlo a todos los módulos.
+
+**Germán Reyes:** Dirección reportó que no logró ingresar; no se vio el mensaje ni etapa del fallo, por lo que se registra **INICIO DE SESIÓN NO CERTIFICADO / causa no establecida**, nunca FAIL generalizado del rol Asesor. La tercera identidad exclusiva continúa pendiente, sin ventas ni permisos creados por QA.
+
+**Limitación instrumental separada del producto:** acciones de la extensión de Chrome sobre esa pestaña agotaron tiempos de control intermitentemente; algunas se aplicaron pese al error de herramienta (se verificó readback al volver). No atribuir regresión funcional ni éxito a acciones sin readback. **No hubo pruebas de escritura**, 4B E2E firmada completa, backend Rules LIVE, aceptación ni promoción.
+
+**Decisión de retorno al plan:** conservar los PASS de Samuel y las pruebas lectura Paula; el Bloque B solo suma evidencia focal y el Bloque C conserva el hallazgo 125/124. Prioridad siguiente: recuperar captura del intento de login Germán y su estado de membresía, cerrar UAT autenticada firmada de permisos positivos/negativos por rol×país×tenant en cuentas distintas, terminar P0/Cliente360/cartera, writes QA y readback Rules; después Go/No-Go con MISMO artifact. **I6 5/10=50%; P0 1/6; B4-003 HOLD; producción NO-GO**.

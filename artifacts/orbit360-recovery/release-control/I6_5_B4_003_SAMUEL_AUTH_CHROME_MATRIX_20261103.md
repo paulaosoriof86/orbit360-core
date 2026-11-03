@@ -118,3 +118,20 @@ Las consultas de consola de esta pestaña no devolvieron errores durante los rec
 **Conservación de método:** un único source `004324dcac1faa694f5057a35753fc514103e19b`, build `gi-i65-b4-004324dcac1f-57f234755dc1`, [Preview exacta](https://ays-orbit-360-lab--gi-i65-b4-goals-41660779936-vauqd86b.web.app/). No repetir pruebas Samuel ya documentadas, no modificar datos de Germán, no hacer firmar términos ajenos, no promover producción. El spinner inicial «Acceso confirmado · preparando tus datos» observado en otra pestaña superó un flujo de arranque razonable; al abrir una pestaña nueva se obtuvo Carlos con legal gate. **Causa de demora NO determinada; registrar como performance/startup focal sin adjudicar al navegador.**
 
 **Estado inalterado:** B4-003 HOLD, I6 50 %, P0 1/6, producción NO-GO.
+
+---
+## Matriz complementaria B-PO · Paula autenticada / Dirección · 3-nov-2026
+
+| ID | Escenario | Evidencia | Dictamen |
+| --- | --- | --- | --- |
+| B-PO-00 | Login y rol Dirección / Todos | Banner Paula Osorio; selector Dirección y país Todos; menú de Dirección completo | **PASS UI focal**, no validación backend |
+| B-PO-01 | Inicio e hidratación | Metas y tarjetas alcanzaron 3/5 y 4/5 fuentes, sin lectura final de 5/5 | **PARCIAL**, no certificar KPIs |
+| B-PO-02 | Pólizas Todos y CO | 1425 listadas; 9 QA, 1416 comerciales; 223 activas. CO 124, 27 activas. Póliza real 101005491 abrió desglose/detalle | **PASS UI focal de lectura** |
+| B-PO-03 | Relación póliza a Cliente360 | Enlace desde detalle abrió expediente con póliza 101005491 incluida | **PASS UI focal**, persistencia write no probada |
+| B-PO-04 | Cliente360 CO | 49 clientes, 27 pólizas activas, 125 vínculos versus 124 en Pólizas | **PARCIAL / HALLAZGO C conocido**, no editar fuentes |
+| B-PO-05 | Aseguradoras Todos | 33 fichas incluyendo 2 QA, 31 no QA. Ficha real El Roble con Plataformas (7 controles revelar) y Bancos y pagos | **PASS UI focal** de lectura; revelado/copiar/CRUD y autorización backend NO PROBADOS |
+| B-PO-06 | Cobros CO | 56 registros, 42 SIGA pendientes, 0 cobros confirmados, vencido COP 109875840; consola local sin errores/warnings devueltos | **PASS UI focal** de clasificación/lectura; GT/Todos y write no probado |
+| B-GR-03 | Germán Reyes, solo asesor | Paula indicó intento de ingreso fallido; mensaje y etapa no observados por QA | **BLOQUEADO / CAUSA NO DETERMINADA**, no atribuir fallo del rol |
+| B-PO-07 | Seguridad Rules firmada y CRUD persistente | Sin ejercicio real en esta iteración | **NO EJECUTADO**, B4-003 HOLD |
+
+**Sin mutaciones:** no se cambiaron usuarios, membresías, roles, países, pólizas, contraseñas, cuentas o pagos; no se creó nueva preview. I6 5/10, P0 1/6; sin nuevos PASS de gate. Las intermitencias del control de Chrome no se clasifican automáticamente como defectos funcionales de la candidata.
