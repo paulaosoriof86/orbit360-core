@@ -157,3 +157,21 @@ Causa reproducida del rechazo `functions/permission-denied` en actualización QA
 **Regla de la siguiente iteración:** reconocer como superadas las comprobaciones focales anteriores. Concentrarse en un único cierre causal del conjunto exacto de 13 GT y el bloqueo de 4/5 fuentes, seguido de Samuel y pruebas negativas, exportes y writes sintéticos; cualquier cambio productivo nuevo exige nuevo source/build/digest y nueva certificación.
 
 **C7 readback focal adicional (mismo source y sesión, sin nuevo build):** en Aseguradoras TODOS se identificaron visualmente **dos fixtures QA nominativas** (`B4 R20 Aseguradora QA` y `PRUEBA PREVIEW · Aseguradora`): las 33 filas visibles equivalen aritméticamente a **31 más 2 QA**, sin afirmar diff físico por ID. En Inicio, un único `Reintentar consulta` devolvió nuevamente `4/5` y `Avance por asesor no disponible`; el source `modules/inicio.js` define exactamente cinco evidencias y la pendiente se orienta a la proyección `assignableAdvisorRoster.dashboardList`, cuya captura de error no distingue aún causa de denegación/red. También se observó el conteo **440→443** en Inicio tras retry, mientras Cliente 360 conserva 440 lógica: diferenciar 443 físicos/440 no fusionados antes de tocar fuente o datos. Son hallazgos focales, no degradan las lecturas PASS ya acreditadas ni autorizan LIVE.
+
+
+---
+
+## 9. EVIDENCIA ACUMULATIVA 03-NOV-2026 — C8 SAMUEL / COMERCIAL CO / PREVIEW E4
+
+**Tipo:** UAT firmada **PARCIAL** con discrepancia perfil–alcance a conciliar, no aceptación de seguridad ni cierre B4-003. Conserva íntegramente C7 Carlos y el plan congelado. Misma fuente `8ccbf641cbbbd8fe470d3ba8d5e22dd4645f3abb`, build `gi-i65-b4-8ccbf641cbbb-57f234755dc1`, sin build, sin release ni escritura de datos.
+
+Recibo: `I6_5_B4_003_SAMUEL_E4_SIGNED_SCOPE_UAT_20261103.json` (misma carpeta), leído y firmado por Samuel Daza con su sesión real; no se transmitieron credenciales.
+
+1. **Identidad y roles:** la sesión abrió en **Operativo** y ofrece las vistas **Administración, Operativo y Asesor**. Para probar la asignación congelada `Samuel Comercial CO` se seleccionó explícitamente **Asesor**. La existencia de varias vistas exige reconciliar grants aprobados, no asumir ni revocar permisos automáticamente.
+2. **Asesor Colombia:** Pólizas **0/0**, Cliente 360 **0/0** y Cobros **0** tras hidratar. Es una prueba válida de vacío bajo este rol/país pero **no acredita lectura positiva de una póliza propia CO**. Requiere cotejar IDs de asesor/póliza/país con fuente operativa; si realmente no hay cartera CO, usar QA sintética autorizada sin alterar registros comerciales.
+3. **Asesor Guatemala:** Pólizas **1/1**, póliza real **`VA125-00010478`**, asesor Samuel Daza; no afirmar fuga ni que es país prohibido sin cotejar grants aprobados. La vista Asesor no conservó el universo amplio previo de Operativo, una señal focal positiva del cambio de rol, **no** denegación backend.
+4. **Negativa UI Aseguradoras:** con Samuel **Asesor + CO**, apertura directa de `#/aseguradoras` presentó candado **«No tienes acceso con el rol activo»**, sin renderizar el directorio. **PASS_UI_ONLY**, no sustituye prueba Rules/Firestore directa multi-UID.
+5. **Inicio:** el aviso **4/5 fuentes** y metas de asesores sin confirmar permanece, reproduciendo el hallazgo C7 con otra identidad. En consulta focal de consola no aparecieron warnings/errors.
+6. **Fronteras y métricas:** `0` escrituras Firestore, `0` modificaciones source, `0` despliegues. **I6 5/10 (50%)**, **P0 1/6 (16,67%)**, **B4-003 HOLD**, **nueva producción NO-GO**.
+
+**Retorno al plan sin bucles:** preservar pruebas positivas de Paula/Carlos y las de Samuel indicadas arriba. Resolver en orden (a) grants/país/asesor del usuario Samuel frente al contrato Comercial CO; (b) negativa backend con UID real + fixture CO sintética si procede; (c) falla 4/5 de proyección asesor; (d) 13 filas GT y exportes/500 PDF; (e) writes QA before/after/restauración/rollback y release guard. El proyecto de tesis conserva su propia UAT TR-01..TR-07 y no debe presentar como aprobado el rol Samuel CO hasta obtener un caso positivo autorizado.
