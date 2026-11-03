@@ -1,6 +1,6 @@
 {
   "schema": "GRAVICENTRA_B4003_E4_GOALS_ROUTING_EXACT_PREVIEW_V1",
-  "recordType": "ADDITIVE_SOURCE_AND_SERVING_RECEIPT_NOT_SIGNED_UAT_OR_RELEASE_ACCEPTANCE",
+  "recordType": "ADDITIVE_SOURCE_SERVING_AND_SIGNED_READONLY_FOCAL_UAT_NOT_FULL_ROLE_OR_RELEASE_ACCEPTANCE",
   "dateLocal": "2026-11-03",
   "product": "Gravicentra Insurance",
   "branch": "recovery/fase-a-clean-20260831",
@@ -92,7 +92,8 @@
     "backendNegativeDenials": "NOT_EXECUTED",
     "writeReloadRestore": "NOT_EXECUTED",
     "fullRoleUat": "HOLD",
-    "browserExtensionControlInterruptedAfterPartialReadback": true
+    "browserExtensionControlInterruptedAfterPartialReadback": true,
+    "carlosSignedInOnExactBuild": true
   },
   "preserved": {
     "samuelCurrentGrantsUnchanged": true,
@@ -124,5 +125,65 @@
     "b4003Closed": false,
     "productionAuthorized": false
   },
-  "nextAction": "PRESERVE_NEW_PREVIEW_READONLY_PAULA_UAT; EXTRACT_GT_13_SOURCE_KEYS; RUN_CARLOS_SAMUEL_ROLE_POSITIVE_NEGATIVE_AND_SYNTHETIC_RESTORE_WHEN_BROWSER_CONTROL_RECOVERS; NO_NEW_PREVIEW_OR_REIMPORT"
+  "nextAction": "CARLOS_OPERATIVO_GT_CO_POLIZAS_CLIENTE360_ASEGURADORAS_SIGNED_READONLY_FOCAL_PASS; KEEP_GATE_HOLD; SAMUEL_SIGNED_ROLE_BACKEND_POSITIVE_NEGATIVE; CLASSIFY_GT_13_BUSINESS_KEYS; EXPORT_AND_CONTROLLED_WRITE_RESTORE; NO_REIMPORT_NO_NEW_PREVIEW",
+  "carlosSignedOperationalReadOnlyUat": {
+    "status": "FOCAL_READONLY_PASS_FULL_ROLE_BACKEND_UAT_HOLD",
+    "dateLocal": "2026-11-03",
+    "accountDisplay": "Carlos Castro",
+    "role": "Operativo",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-e4-41737972469-2elawj35.web.app/",
+    "sourceSha": "9a0b8794c56f350fc47e754a045f693c84d0054c",
+    "buildId": "gi-i65-b4-9a0b8794c56f-57f234755dc1",
+    "inicio": {
+      "confirmedSources": "5/5",
+      "totalClients": 440,
+      "totalPolicyRows": 1425,
+      "overdueObligations": 672
+    },
+    "polizas": {
+      "todosVisible": 1425,
+      "commercialUniverse": 1416,
+      "qaIdentifiedExcluded": 9,
+      "guatemalaVisible": 1301,
+      "guatemalaCommercial": 1292,
+      "guatemalaActive": 196,
+      "colombiaVisible": 124,
+      "colombiaActive": 27,
+      "advisorColumnVisibleBothCountries": true
+    },
+    "cliente360": {
+      "guatemalaClients": 391,
+      "guatemalaPoliciesLinked": 1291,
+      "colombiaClients": 49,
+      "colombiaPoliciesLinked": 125,
+      "knownCountryCrossLinkDoesNotAuthorizeMutation": true,
+      "advisorColumnVisibleBothCountries": true
+    },
+    "aseguradoras": {
+      "guatemalaDirectoryRows": 16,
+      "guatemalaActive": 16,
+      "guatemalaAccessAvailable": 7,
+      "colombiaDirectoryRows": 17,
+      "colombiaActive": 13,
+      "colombiaAccessAvailable": 0,
+      "portalCredentialValueAndReveal": "NOT_TESTED_SENSITIVE",
+      "sourceTruthForMissingCOAccess": "NOT_ADJUDICATED"
+    },
+    "permissions": {
+      "operativeCountrySelectorGTCOAndAll": "UI_PASS",
+      "advisorRoleSwitch": "NOT_TESTED_ON_THIS_BUILD",
+      "backendPositiveNegativeJwt": "NOT_EXECUTED",
+      "writeReloadRestore": "NOT_EXECUTED"
+    },
+    "unchanged": {
+      "credentialsReadOrRevealed": false,
+      "businessDataMutated": false,
+      "countryChanges": false,
+      "dataReimport": false,
+      "newBranchOrPreview": false,
+      "productionDeploy": false
+    },
+    "browserControlNote": "Navigation toward Aseguradoras briefly stalled; route ultimately loaded and both country list KPIs were read from signed Chrome. Browser control interruption is not classified as app error.",
+    "decision": "DO_NOT_COUNT_FULL_ROLE_UAT_OR_B4003_PASS"
+  }
 }
