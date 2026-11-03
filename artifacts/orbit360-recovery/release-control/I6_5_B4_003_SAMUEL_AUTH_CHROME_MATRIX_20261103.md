@@ -51,3 +51,33 @@
 **B4-003 HOLD / LIVE NO-GO. Formal I6 5/10 = 50% (cambio formal de esta sesión: 0 puntos). P0 históricos 1/6 = 16,67%. Avance global de implementación: indeterminado, sin denominador validado.** Responsable técnico de la observación: asistente automatizado. **No hay aceptación UAT humana.**
 
 **Corrección causal siguiente en rama canónica:** prueba determinista de `all → get → deeplink` bajo Operativo/AdminTenant con los dos países autorizados, exclusión de otro tenant/país, rol Asesor y módulo negado, contra UID servidor; corregir únicamente el owner real, ejecutar CI, nuevo digest/Preview sólo si cambia source, y repetir estos FAIL. Después Carlos independiente, E4, recorrido piloto y fixture sintético con restore, más los P0 históricos. No desplegar producción antes de compuertas restantes.
+
+
+---
+
+## Adenda de UAT focal · nueva candidata exacta · 3-nov-2026 (bloque B, Samuel)
+
+Esta sección **no sobrescribe** la matriz histórica del build `a94bc13` ni afirma certificación de servidor; documenta el resultado observado en Chrome **después** de la corrección transversal del Bloque A.
+
+- **Preview publicada:** https://ays-orbit-360-lab--gi-i65-b4-goals-41660779936-vauqd86b.web.app/ 
+- **Fuente:** `004324dcac1faa694f5057a35753fc514103e19b`; **buildId:** `gi-i65-b4-004324dcac1f-57f234755dc1`, lectura exacta de build/Hosting previamente acreditada en [run 41660779936](https://github.com/paulaosoriof86/orbit360-core/actions/runs/41660779936). Código productivo y backend LIVE sin nueva modificación en esta UAT.
+- **Sesión real en Chrome:** banner `Samuel Daza`; selector `Ver como` administrado por la aplicación: Administración, Operativo, Asesor. Recurso observado en modo lectura; sin escritura de datos, sin cambiar permisos, sin importación, sin correo/WA.
+- **Privacidad:** los clientes reales, pólizas y rutas con IDs internos observados quedan con seudónimos y sin transcribir sus datos personales o identificadores persistentes al repositorio.
+
+| ID delta de interfaz | Rol/país | Acción concretamente observada en este build | Resultado de interfaz |
+| --- | --- | --- | --- |
+| B-SD-01 | Operativo/CO | Pólizas: 124/124, 27 activas; asesor visible en tabla | **PASS UI** (universo listado) |
+| B-SD-02 | Operativo/CO | Abrir desde Pólizas una ficha CO de asesora distinta y pasar a su Cliente 360 | **PASS UI** (sin «Acceso restringido» ni «Póliza no disponible») |
+| B-SD-03 | Operativo/CO | Recargar en frío Cliente 360 de esa asesora; tras hidratación permanecen cliente, 21 pólizas relacionadas y ficha detallada | **PASS UI** (incluye recarga) |
+| B-SD-04 | Operativo/CO | Desde Cliente 360 abrir póliza vinculada vigente distinta, validar país CO y divisa de origen | **PASS UI** (lista → ficha → póliza) |
+| B-SD-05 | Operativo/CO | Cliente 360: 49/49 clientes, 27 pólizas activas / 125 vínculos; abrir cliente asignado a otro asesor distinto | **PASS UI** de lista y ficha (la conciliación 125/124 sigue pendiente) |
+| B-SD-06 | Asesor/CO | Al cambiar rol desde ficha ajena aparece «Acceso restringido»; Pólizas muestra 0/0 | **PASS UI negativo** (no equivale a DENIED firmado backend por UID Asesor exclusivo) |
+| B-SD-07 | Asesor/GT | Pólizas 1/1 propia, ficha de póliza y vehículo vinculado, recarga fría de vehículo con ficha disponible | **PASS UI**; **dato discrepante**: asesor del listado `Samuel Daza` vs ficha `Pendiente de completar` |
+| B-SD-08 | Operativo/GT | Pólizas: 1.301 listadas, 1.292 sin nueve QA, 196 activas/1.292; abrir póliza de asesor ajeno | **PASS UI**; hay **1 vinculación entre país de póliza y cliente no coincidente** ya señalada por la aplicación; no corregir país por inferencia |
+| B-SD-09 | Asesor/GT | Cambiar rol desde ficha de póliza GT ajena y recargar esa URL: «Póliza no disponible en tu alcance» en ambos pasos | **PASS UI negativo** tras recarga (no equivale a denegación firmada por UID Asesor exclusivo) |
+
+**Observación de calidad:** el formulario de póliza propia GT muestra aseguradora y asesor como «Pendiente de completar» aunque la tabla sí consigna asesor; el desfase es **preexistente y distinto del P0 list→get por país**. El listado GT advierte un vínculo a cliente de otro país; preservar los países físicos y no reimportar. La observación CO conserva 124 pólizas frente a 125 relaciones en Cliente 360, cuya reconciliación causal corresponde a Bloque C. No cerrar E4/E8 por mostrar importes o cuentas.
+
+**Límite de evidencia:** los nueve escenarios **pasan su expectativa visual** en el navegador; no se ejecutaron negativas firmadas con UID independiente exclusivo ni ensayo de mutación/rollback. No extrapolar a todas las fichas ni a otros usuarios. Sigue pendiente **Carlos en este mismo build** bajo Operativo/GT+CO y Asesor, controles de servidor en usuarios diferenciados, negativos país/tenant/módulo, integridad E4/E8, seis P0 históricos y aceptación Dirección. El guard de emulador anterior (12 grupos/162 comprobaciones sintéticas) no acredita Rules LIVE.
+
+**Estado de programa, inalterado:** **B4-003 HOLD; I6 5/10 = 50 %; P0 históricos 1/6 = 16,67 %; producción NO-GO**. Se registra progreso de UAT positiva, no avance ficticio del porcentaje formal. Próximo paso: autenticación de Carlos en esta Preview y contraste rol-wide, seguido de firmados negativos.

@@ -283,3 +283,18 @@ Este registro es **delta de evidencia dentro de B4-003**, no crea plan, gate, ra
 **UAT autenticada — NO EJECUTADA en este build:** nueva Preview en Chrome mostró login de equipo sin errores de consola, no transfirió la sesión de la URL anterior. Samuel y Carlos deben ingresar **independientemente** para validar las fichas CO que fallaron, enlaces directos con recarga, GT/CO rol Operativo; Asesor propios; negativas reales por UID/módulo/país y callable. No usar la presencia del formulario ni el emulador sintético como certificación humana. El RUN de funciones usa solo endpoints Preview aditivos; LIVE y datos reales permanecen intactos.
 
 **Cierre:** Bloque A = **SOURCE_QA/CI/EMULATOR PASS**; Bloque B = **PREVIEW_EXACT PASS, SIGNED_UID_UAT HOLD**; C/D/E pendientes según matriz original. El `CONTROL_PLANE` y ledger no se promocionan: **I6 5/10 (50 %), P0 históricos 1/6 (16,67 %), B4-003 HOLD, producción NO-GO**. Estado de seguridad LIVE separado: guard señala Rules LIVE inseguras; las Rules candidatas probadas en emulador **no están desplegadas**.
+
+
+---
+
+## Bloque B · avance de UAT autenticada en Chrome — Samuel (3-nov-2026)
+
+**La solicitud de iniciar sesión fue satisfecha:** banner de la Preview nueva = Samuel Daza; fuente y build exactos de [run 41660779936](https://github.com/paulaosoriof86/orbit360-core/actions/runs/41660779936) sin modificación ulterior del código productivo.
+
+**Resultado ejecutado:** 9 escenarios focales **PASS UI** en la candidata exacta, con Operativo/CO (124 pólizas, 49 clientes, dos detalles de distintos asesores, ruta póliza→cliente→póliza y recarga), Operativo/GT (1.301 filas, ficha de póliza de otro asesor), Asesor/CO (0 pólizas, cliente ajeno restringido) y Asesor/GT (1 póliza propia y vehículo vinculado con recarga, póliza ajena restringida incluso tras recarga). El contraste operativo se realizó sobre **mismo código transversal por rol**, sin excepciones Samuel/Carlos.
+
+**No confundir alcances:** el selector de rol dentro de un UID multirrol no prueba un `DENIED` servidor bajo UID independiente de Asesor exclusivo. El contrato de servidor se probó en emulador (162 comprobaciones sintéticas), pero los controles reales firmados, el ingreso independiente de Carlos en **este mismo digest**, y el resto de las compuertas siguen sin certificar.
+
+**Pendientes nuevos sin cerrar por inferencia:** (a) en una póliza propia GT, tabla indica asesor Samuel pero el detalle muestra «Pendiente de completar»; aseguradora sin resolver en la ficha; (b) GT presenta 1 relación con cliente visible en país distinto; (c) CO conserva 125 vínculos vs 124 pólizas, a reconciliar como Bloque C. Se conservaron datos y países. El [registro UAT Samuel](./I6_5_B4_003_SAMUEL_AUTH_CHROME_MATRIX_20261103.md) contiene escenarios seudonimizados y observaciones. No se emitieron comunicaciones ni escrituras.
+
+**Rendición de cuentas:** A técnica PASS, B transporte PASS, **B UAT Samuel positiva/negativa de UI parcial**; B firmado/segundo UID, C integridad, D P0 y E salida **HOLD**. I6 sigue **5/10=50%** (0 pp oficiales nuevos); P0 históricos **1/6**; B4-003 y producción **NO-GO**. La próxima certificación requiere Carlos con sesión independiente y negativos reales; no repetir CI emulador ni source ya aprobado sin invalidación causal.
