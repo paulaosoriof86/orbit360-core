@@ -348,7 +348,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 35
     env:
-      SOURCE_SHA: 50f0dd277b2a68c42d4c64f9f77505b1ec8b8704
+      SOURCE_SHA: 8af8400df46096c8cfe184e4b5e83c2fdaf32ce1
       PROJECT_ID: ays-orbit-360-lab
       TENANT_HINT: alianzas-soluciones
       HOSTING_SITE: ays-orbit-360-lab
@@ -368,7 +368,7 @@ jobs:
           path: transport
       - uses: actions/checkout@v4
         with:
-          ref: 50f0dd277b2a68c42d4c64f9f77505b1ec8b8704
+          ref: 8af8400df46096c8cfe184e4b5e83c2fdaf32ce1
           fetch-depth: 0
           persist-credentials: false
           path: candidate
@@ -383,12 +383,16 @@ jobs:
           test "$(git -C candidate rev-parse HEAD)" = "$SOURCE_SHA"
           test "$(git -C candidate hash-object orbit360-platform/modules/cancelaciones.js)" = 'c9f6934beea57136daca0a3292451ad0792181c1'
           test "$(git -C candidate hash-object orbit360-platform/modules/reportes.js)" = 'a084cb31eb5d2478f0cad345766113d7bcb860dc'
+          test "$(git -C candidate hash-object orbit360-platform/modules/renovaciones.js)" = 'e3eecb72e7642d4c572338d89f119ae98135f6c1'
+          test "$(git -C candidate hash-object tools/gravicentra-b4-003-renovaciones-qa-provenance.test.cjs)" = 'c00b6b71deecaeeb11ec99d9e22443b85a5d830f'
           test "$(git -C candidate hash-object tools/gravicentra-b4-003-reportes-e4-transversal.test.cjs)" = '983e43b48e9d3b969cd9f0616c112d996097a82e'
           test "$(git -C candidate hash-object orbit360-platform/index.html)" = 'daf1d382500146f7d273cf4501d6901cf39afed9'
           cd candidate
           node --check orbit360-platform/modules/cancelaciones.js
           node --check orbit360-platform/modules/reportes.js
+          node --check orbit360-platform/modules/renovaciones.js
           node tools/gravicentra-b4-003-reportes-e4-transversal.test.cjs
+          node tools/gravicentra-b4-003-renovaciones-qa-provenance.test.cjs
           node tools/gravicentra-b4-003-cross-module-readback-contract.test.cjs
           timeout -k 3s 55s node tools/gravicentra-i6-control-plane-guard-v1.mjs --mode=i6
       - name: Freeze LIVE fingerprints before isolated Preview
@@ -443,6 +447,7 @@ jobs:
           test "$(git rev-parse HEAD)" = "$SOURCE_SHA"
           cmp orbit360-platform/modules/cancelaciones.js "$ROOT/modules/cancelaciones.js"
           cmp orbit360-platform/modules/reportes.js "$ROOT/modules/reportes.js"
+          cmp orbit360-platform/modules/renovaciones.js "$ROOT/modules/renovaciones.js"
           node - <<'NODE'
           const fs=require('node:fs'),r=process.env.RUNNER_TEMP+'/gi-e4-canonical-hosting/bundle';
           const c=JSON.parse(fs.readFileSync(r+'/firebase.json','utf8'));
@@ -477,7 +482,7 @@ jobs:
         run: |
           set -euo pipefail
           ROOT="$RUNNER_TEMP/gi-e4-canonical-hosting/bundle/site"
-          for rel in __recovery__/build.json product-runtime-config.js index.html modules/cancelaciones.js modules/reportes.js core/tenant-access-policy-effective-p0.js core/access-scope.js core/queries.js; do
+          for rel in __recovery__/build.json product-runtime-config.js index.html modules/cancelaciones.js modules/reportes.js modules/renovaciones.js core/tenant-access-policy-effective-p0.js core/access-scope.js core/queries.js; do
             mkdir -p "$RUNNER_TEMP/gi-e4-readback/$(dirname "$rel")"
             curl -fsSL --retry 2 --max-time 30 "$PREVIEW_URL/$rel" > "$RUNNER_TEMP/gi-e4-readback/$rel"
             cmp "$ROOT/$rel" "$RUNNER_TEMP/gi-e4-readback/$rel"
@@ -495,6 +500,7 @@ jobs:
             schema:'I6_5_B4_003_E4_CANCEL_OWNER_EXACT_PREVIEW_V1',
             sourceSha:process.env.SOURCE_SHA,buildId:b.buildId,previewUrl:process.env.PREVIEW_URL,
             reportesSha256:digest('modules/reportes.js'),cancelacionesSha256:digest('modules/cancelaciones.js'),
+             renovacionesSha256:digest('modules/renovaciones.js'),qaResidueRegression:'SOURCE_TEST_PASS',
             indexSha256:digest('index.html'),servedArtifactExact:true,
             hostingDeploy:'new_expiring_preview_only',backendFunctionsDeployed:0,
             dataWrites:0,firestoreRulesWrites:0,authIamChanges:0,productionDeploy:false,
