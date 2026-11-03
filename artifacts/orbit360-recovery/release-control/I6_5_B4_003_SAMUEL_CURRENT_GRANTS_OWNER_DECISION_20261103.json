@@ -1,0 +1,84 @@
+{
+  "schema": "gravicentra-b4003-samuel-current-grants-owner-decision-v1",
+  "dateGuatemala": "2026-11-03",
+  "product": "Gravicentra Insurance",
+  "gate": "I6.5/B4-003",
+  "recordType": "ADDITIVE_OWNER_BUSINESS_AUTHORIZATION_NOT_SECURITY_OR_RELEASE_CERTIFICATION",
+  "authority": {
+    "person": "Paula Andrea Osorio Franco",
+    "role": "Dirección",
+    "userConfirmationLiteral": "si, Samuel debe conservar sus accesos actuales",
+    "context": "Explicit response to the question whether Samuel should retain current Administracion, Operativo and Asesor views with Guatemala/Colombia country access or be limited to Comercial Colombia."
+  },
+  "person": "Samuel Daza",
+  "decision": {
+    "status": "OWNER_APPROVED_KEEP_CURRENT_ACCESS_UNCHANGED",
+    "rolesVisibleInE4": [
+      "Administración",
+      "Operativo",
+      "Asesor"
+    ],
+    "countriesSelectableInE4": [
+      "Guatemala",
+      "Colombia",
+      "TODOS"
+    ],
+    "action": "Preserve currently configured effective grants; do not revoke, downgrade, expand, reassign, or rewrite membership based on the previous label Comercial CO.",
+    "limit": "Approval applies to currently configured access observed in signed E4 UI; does not approve any new role, territory, tenant or record ownership."
+  },
+  "priorSignedEvidence": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_SAMUEL_E4_SIGNED_SCOPE_UAT_20261103.json",
+  "exactCandidate": {
+    "sourceSha": "8ccbf641cbbbd8fe470d3ba8d5e22dd4645f3abb",
+    "buildId": "gi-i65-b4-8ccbf641cbbb-57f234755dc1",
+    "preview": "https://ays-orbit-360-lab--gi-i65-b4-e4-41711238558-wrf29bx0.web.app/"
+  },
+  "resolved": [
+    {
+      "id": "SAMUEL_EXTRA_VIEW_ROLES",
+      "status": "CLOSED_BY_OWNER_BUSINESS_DECISION",
+      "not": "Not a backend permission PASS"
+    }
+  ],
+  "remainsHold": [
+    {
+      "id": "SAMUEL_CO_ADVISOR_POSITIVE_FIXTURE_OR_MAPPING",
+      "status": "HOLD",
+      "detail": "Asesor Colombia shows zero clients/policies/cobros. Determine actual assignment or use approved reversible QA fixture; zero alone is not a bug."
+    },
+    {
+      "id": "BACKEND_NEGATIVE_UID_SCOPE",
+      "status": "HOLD",
+      "detail": "Prove positive and negative server denials for real identities/roles/country/advisor, including unexpected direct Firestore read/write; UI guard insufficient."
+    },
+    {
+      "id": "E4_INICIO_ROSTER_4_OF_5",
+      "status": "HOLD"
+    },
+    {
+      "id": "GT_COUNT_DELTA_13_AND_EXPORTS",
+      "status": "HOLD"
+    },
+    {
+      "id": "QA_SYNTHETIC_WRITES_RESTORE_RELEASE",
+      "status": "HOLD"
+    }
+  ],
+  "actionsThisDecision": {
+    "userMembershipWrites": 0,
+    "firestoreWrites": 0,
+    "productionDeploys": 0,
+    "previewDeploys": 0,
+    "sourceBuilds": 0
+  },
+  "formalMetrics": {
+    "i6Passed": 5,
+    "i6Total": 10,
+    "i6Percent": 50,
+    "b4003P0Passed": 1,
+    "b4003P0Total": 6,
+    "b4003P0Percent": 16.67,
+    "b4003": "HOLD",
+    "production": "NO_GO"
+  },
+  "next": "Treat multiple Samuel roles as approved. Continue remaining backend role/country/UID scope negatives and focused source/data discrepancies without repeating prior signed UAT."
+}
