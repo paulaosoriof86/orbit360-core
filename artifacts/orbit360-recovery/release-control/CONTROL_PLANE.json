@@ -3,6 +3,16 @@
   "controlPlaneId": "GRAVICENTRA-INSURANCE-FASE-A",
   "status": "PRODUCTION_ACCEPTED",
   "productBrand": "Gravicentra Insurance",
+  "b4003PaulaE4SignedReadOnlyUat20261103": {
+    "status": "PARTIAL_SIGNED_UAT",
+    "receipt": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PAULA_E4_SIGNED_READONLY_UAT_20261103.json",
+    "sourceSha": "8ccbf641cbbbd8fe470d3ba8d5e22dd4645f3abb",
+    "buildId": "gi-i65-b4-8ccbf641cbbb-57f234755dc1",
+    "gate": "I6.5/B4-003",
+    "p0Closed": 1,
+    "p0Total": 6,
+    "next": "Classify 13 GT rows, E4 exports, Carlos/Samuel signed negative access, synthetic restore"
+  },
   "b4003C4ReportesHydrationAndReadOnlyUat20261103": {
     "schema": "GRAVICENTRA_B4003_C4_REPORTES_HYDRATION_POINTER_V1",
     "recordType": "ADDITIVE_EVIDENCE_POINTER_NOT_RELEASE_ACCEPTANCE",

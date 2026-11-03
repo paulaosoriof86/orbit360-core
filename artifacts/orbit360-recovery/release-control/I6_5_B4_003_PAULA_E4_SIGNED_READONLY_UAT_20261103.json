@@ -1,0 +1,103 @@
+{
+  "schema": "gravicentra-i6-5-b4-003-e4-signed-uat-readonly-v1",
+  "dateGuatemala": "2026-11-03",
+  "product": "Gravicentra Insurance",
+  "branch": "recovery/fase-a-clean-20260831",
+  "sourceSha": "8ccbf641cbbbd8fe470d3ba8d5e22dd4645f3abb",
+  "buildId": "gi-i65-b4-8ccbf641cbbb-57f234755dc1",
+  "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-e4-41711238558-wrf29bx0.web.app/#/reportes",
+  "authenticatedUi": {
+    "person": "Paula Osorio",
+    "activeRole": "Dirección",
+    "scopeOptions": [
+      "TODOS",
+      "GT",
+      "CO"
+    ],
+    "actualSignedSession": true
+  },
+  "checks": [
+    {
+      "id": "E4_PRODUCTION_ALL",
+      "status": "PASS_FOCAL_READ",
+      "evidence": "Reportes Producción TODOS 1416 pólizas comerciales; 9 QA excluidas."
+    },
+    {
+      "id": "E4_COBROS_CO_PARITY",
+      "status": "PASS_FOCAL_READ",
+      "evidence": "Paula/Dirección: Reportes Cartera CO 56 filas; Cobros CO 56; 42 SIGA origen sin confirmar, 14 vencidas, pagos confirmados 0; COP 109875840 cartera vencida, sin mezcla GTQ."
+    },
+    {
+      "id": "E4_REPORTES_GT_COUNT",
+      "status": "PARTIAL",
+      "evidence": "Reportes Cartera GT 2503 comerciales; banner 1 QA excluida; sin aviso de país sin verificar; Cobros GT 2516 filas."
+    },
+    {
+      "id": "E4_COBROS_GT_DETAIL",
+      "status": "PASS_READ_WITH_WARNINGS",
+      "evidence": "Cobros GT 2516 filas, 1196 origen SIGA pendiente; 5 pagos confirmados Q2744 GTQ; aging vencido Q227808 GTQ; advertencias 12 origen COP/póliza GTQ y 4 vencidos COP sin saldo vencido en Cartera Primas."
+    },
+    {
+      "id": "E4_COBROS_ALL",
+      "status": "PARTIAL",
+      "evidence": "Reportes Cartera TODOS 2559 comerciales, CO56 y GT2503; 1 QA excluida. No inferir que Cobros TODOS equivale a 2559."
+    },
+    {
+      "id": "E4_CONSOLE_READ",
+      "status": "PASS_FOCAL",
+      "evidence": "Consulta de errores de consola Chrome en Reportes y Cobros CO/GT: 0 entradas error en capturas ejecutadas."
+    },
+    {
+      "id": "E4_EXPORT_CSV",
+      "status": "HOLD_NO_READBACK",
+      "evidence": "Intento de CSV desde Reportes GT terminó en timeout del control de navegador; no se obtuvo archivo ni se comprobó filas/exportación. No declarar PASS."
+    }
+  ],
+  "unresolved": [
+    {
+      "id": "GT_COUNT_DELTA_13",
+      "status": "HOLD_CLASSIFICATION",
+      "description": "Cobros GT 2516 vs Reportes GT 2503; separar QA, anulados y consistencia parent/child por IDs antes de aceptar o modificar el source; nunca reimportar ni alterar moneda."
+    },
+    {
+      "id": "E4_EXPORTS",
+      "status": "HOLD",
+      "description": "Cotejo CSV/Excel/PDF contra alcance por país, QA y monedas no ejecutado con readback de bytes."
+    },
+    {
+      "id": "ROLE_BACKEND_DENIALS",
+      "status": "HOLD",
+      "description": "Carlos Operativo GT/CO y Samuel Comercial CO, dos UIDs reales, positivos/negativos de backend, switch/recarga y permisos por módulo pendientes en la candidata exacta."
+    },
+    {
+      "id": "QA_SYNTHETIC_WRITES",
+      "status": "HOLD",
+      "description": "Before/after, persistencia recarga, auditoría, restauración sintética y rollback/Rules aun pendientes."
+    }
+  ],
+  "priorPassPreserved": [
+    "443-440-439 clientes vs Calidad",
+    "125 vínculos/124 pólizas CO",
+    "9 pólizas QA",
+    "35 índices de país aplicados"
+  ],
+  "writeScope": {
+    "firestoreWrites": 0,
+    "hostingDeploys": 0,
+    "rulesDeploys": 0,
+    "productionDeploys": 0,
+    "sourceChanges": 0
+  },
+  "formalMetrics": {
+    "i6MiniGatesPassed": 5,
+    "i6MiniGatesTotal": 10,
+    "i6Percent": 50,
+    "p0Closed": 1,
+    "p0Total": 6,
+    "p0Percent": 16.67,
+    "b4003": "HOLD",
+    "production": "NO_GO"
+  },
+  "nextAction": "Clasificar 13 GT por conjunto de IDs, probar exportes E4, firmar Carlos y Samuel en la misma Preview; no alterar fuente por diferencias no demostradas.",
+  "thesisPilot": "Separado del cierre B4: TR-01..TR-07 y K-06 verde con Cliente360→Póliza→Cartera→Cobros/Conciliación→Renovaciones→Historial GT/CO, Ops/Leads RACI, E4/E8, E5/E6 sin envíos externos, Q683 sintético controlado; conservar S5/S6/S7 históricos y revalidar solo deltas."
+}
