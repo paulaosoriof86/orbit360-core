@@ -172,3 +172,15 @@ Este registro es **delta de evidencia dentro de B4-003**, no crea plan, gate, ra
 **Recibo inmutable de la decisión y pruebas de fuente:** `artifacts/orbit360-recovery/release-control/I6_5_B4_003_ROLE_BASED_PORTFOLIO_SCOPE_SOURCE_SUCCESSOR_20261102.json` (blob Git `c8c9fb7fdbcfdc2194640e96883db87a05474109`). El Control Plane añade un *pointer* de candidata de código sin modificar la autoridad de la release publicada ni aprobar producción.
 
 **Corrección causal de expectativa CI (misma iteración):** la primera construcción Hosting del rol-wide source se detuvo sin desplegar en [run 41577450329](https://github.com/paulaosoriof86/orbit360-core/actions/runs/41577450329): la prueba antigua `gravicentra-b4-003-client-country-authority.test.cjs` seguía exigiendo `policyScope=own` para Operativo, contradiciendo la decisión autorizada. Solo se actualiza esa aserción para `policyScope=all` + `clientScope=all`; se conserva `clientRequiresCountryIndex>0` y todas las denegaciones de país/tenant. El harness aislado corrigió y ejecutó **38/38 comprobaciones**, sin escritura; el indexado físico y UAT siguen abiertos. No interpretar la falla previa como fallo de producto ni como evidencia de certificación.
+
+
+## Adenda Preview exacta de alcance por rol — 2-nov-2026 | evidencia nueva y HOLD
+
+| Escenario | Fuente exacta / LAB | Evidencia | Resultado | Pendiente |
+| --- | --- | --- | --- | --- |
+| P0-ROL-CARTERA, lectura servidor con scopes heredados | `adff22f`; lector Preview run 41577265648 | 27/27 lector; 16/16 rol/país; 38/38 país-cliente; 132/132 relacionados | **PASS técnico sintético y despliegue de función Preview** | JWT real de Samuel y Carlos, negativas de UID, país y módulo |
+| P0-ROL-UI, build con backend actualizado | `a94bc13`; `gi-i65-b4-a94bc1399189-57f234755dc1`; [Preview](https://ays-orbit-360-lab--gi-i65-b4-goals-41577785514-uzbik3js.web.app/) | Run 41577785514 SUCCESS; build JSON y assets exactos; Chrome mostró login en carga directa de Pólizas; nueva regla `roleWidePortfolioScope` servida | **PASS técnico de transporte; NO EJECUTADO UAT** | Sign-in independiente, filtros CO/GT, Cliente360/vehículos, cold reload |
+| P0-ROL-NEGATIVAS | Mismo build y Preview | Matriz sintética niega país/tenant/módulo, `Asesor=own`; `canWrite` efectivo no elevado | **PASS sintético; NO EJECUTADO sobre JWT** | Negativas autenticadas backend y Firebase Rules |
+| Retención LIVE | Hosting run 41577785514; lector run 41577265648 | Comparación de hashes LIVE LAB + app.aysseguros.com sin cambio; Rules/Auth/IAM/datos no escritos | **PASS técnico de inmutabilidad LIVE** | No equivale a GO-LIVE |
+
+**Recibo exacto:** `artifacts/orbit360-recovery/release-control/I6_5_B4_003_ROLE_PORTFOLIO_PREVIEW_TECHNICAL_READBACK_20261102.json` (blob `afb486049aeca3b277bf0628a6a9860c693809a1`). **Usuario aceptante:** ninguno; la automatización no representa a Paula, Carlos ni Samuel. Una vez autenticados en esta Preview, añadir UAT de UID/país/rol con prueba negativa sin cambiar membresías. **B4-003 HOLD; I6 5/10=50 %; producción NO-GO.**
