@@ -4,6 +4,9 @@ on:
   pull_request:
     branches: [recovery/fase-a-clean-20260831]
     paths:
+      - orbit360-platform/core/assignable-advisor-roster-client.js
+      - orbit360-platform/data/store-firestore-product-operational-p0.js
+      - tests/goal-participation-isolated-routing.test.cjs
       - orbit360-platform/modules/cancelaciones.js
       - orbit360-platform/modules/reportes.js
       - orbit360-platform/modules/renovaciones.js
@@ -13,6 +16,9 @@ on:
   push:
     branches: [recovery/fase-a-clean-20260831]
     paths:
+      - orbit360-platform/core/assignable-advisor-roster-client.js
+      - orbit360-platform/data/store-firestore-product-operational-p0.js
+      - tests/goal-participation-isolated-routing.test.cjs
       - orbit360-platform/modules/cancelaciones.js
       - orbit360-platform/modules/reportes.js
       - orbit360-platform/modules/renovaciones.js
@@ -41,6 +47,11 @@ jobs:
         run: |
           node tools/gravicentra-b4-003-reportes-e4-transversal.test.cjs
           node tools/gravicentra-b4-003-renovaciones-qa-provenance.test.cjs
+      - name: E4 backend routing and prior Preview isolation
+        run: |
+          node --check orbit360-platform/core/assignable-advisor-roster-client.js
+          node --check orbit360-platform/data/store-firestore-product-operational-p0.js
+          node tests/goal-participation-isolated-routing.test.cjs
       - name: Preserve Insights, Plantillas and transversal country authority
         run: |
           node tools/gravicentra-b4-003-insights-plantillas-country-no-seed.test.cjs
