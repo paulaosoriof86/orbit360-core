@@ -9,6 +9,10 @@ on:
     paths:
       - '.github/workflows/gravicentra-*'
       - 'tools/gravicentra-*'
+      - 'orbit360-platform/core/access-scope.js'
+      - 'orbit360-platform/core/backend-product-readonly-bootstrap-p0.js'
+      - 'orbit360-platform/data/store-firestore-product-readonly-p0.js'
+      - 'functions/b4-003-scoped-*'
       - 'artifacts/orbit360-recovery/release-control/**'
       - 'artifacts/orbit360-recovery/project-sources-v2/**'
 
@@ -60,6 +64,8 @@ jobs:
           node tools/gravicentra-b4-003-auth-terminal.test.cjs
           node --check orbit360-platform/data/store-firestore-product-readonly-p0.js
           node tools/gravicentra-b4-003-relation-cache-accessors.test.cjs
+          node --check orbit360-platform/core/access-scope.js
+          node tools/gravicentra-b4-003-front-scope-quickcheck.cjs
           node --check orbit360-platform/modules/inicio.js
           node tools/gravicentra-b4-003-inicio-personal-recaudo.test.cjs
           node tools/gravicentra-b4-003-human-ux-copy-layout.test.cjs
@@ -112,7 +118,7 @@ jobs:
 
   b4003-firestore-emulator:
     # Isolated security test within the existing B4 governance flow, no production credentials.
-    if: ${{ github.event_name == 'push' && startsWith(github.event.head_commit.message, 'test(i6.5 B4-003 security-emulator)') }}
+    if: ${{ github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && (startsWith(github.event.head_commit.message, 'test(i6.5 B4-003 security-emulator)') || startsWith(github.event.head_commit.message, 'fix(b4003)'))) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     permissions:
