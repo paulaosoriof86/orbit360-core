@@ -25,7 +25,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 55
     env:
-      SOURCE_SHA: adff22f5395d4eef9c9e9fca3a66ea9a3e6962f1
+      SOURCE_SHA: a94bc13991892ed7060dbd50318021d3c7baba16
       PROJECT_ID: ays-orbit-360-lab
       HOSTING_SITE: ays-orbit-360-lab
       TENANT_HINT: alianzas-soluciones
@@ -48,7 +48,7 @@ jobs:
       - name: Checkout frozen canonical source, no product divergence
         uses: actions/checkout@v4
         with:
-          ref: adff22f5395d4eef9c9e9fca3a66ea9a3e6962f1
+          ref: a94bc13991892ed7060dbd50318021d3c7baba16
           fetch-depth: 0
           persist-credentials: false
           path: candidate
@@ -61,7 +61,7 @@ jobs:
         run: |
           set -euo pipefail
           test "$(git -C transport merge-base HEAD "$SOURCE_SHA")" = "$SOURCE_SHA"
-          test "$(git -C transport diff --name-only "$SOURCE_SHA" HEAD)" = "$(printf '%s\n' '.github/workflows/gravicentra-b4-003-canonical-20261102-isolated-preview.yml' '.github/workflows/gravicentra-b4-003-reader-preview-resync.yml')"
+          test "$(git -C transport diff --name-only "$SOURCE_SHA" HEAD)" = '.github/workflows/gravicentra-b4-003-canonical-20261102-isolated-preview.yml'
           test "$(git -C candidate rev-parse HEAD)" = "$SOURCE_SHA"
           test "$(git -C candidate hash-object functions/b4-003-scoped-access-boundary.js)" = 'b2928e7ce12daaba21913459bc7373ba83946942'
           test "$(git -C candidate hash-object orbit360-platform/core/tenant-access-policy-effective-p0.js)" = '12e4fa38de5d2fdd04855150597865cd519bbb79'
