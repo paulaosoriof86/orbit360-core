@@ -184,3 +184,10 @@ Este registro es **delta de evidencia dentro de B4-003**, no crea plan, gate, ra
 | Retención LIVE | Hosting run 41577785514; lector run 41577265648 | Comparación de hashes LIVE LAB + app.aysseguros.com sin cambio; Rules/Auth/IAM/datos no escritos | **PASS técnico de inmutabilidad LIVE** | No equivale a GO-LIVE |
 
 **Recibo exacto:** `artifacts/orbit360-recovery/release-control/I6_5_B4_003_ROLE_PORTFOLIO_PREVIEW_TECHNICAL_READBACK_20261102.json` (blob `afb486049aeca3b277bf0628a6a9860c693809a1`). **Usuario aceptante:** ninguno; la automatización no representa a Paula, Carlos ni Samuel. Una vez autenticados en esta Preview, añadir UAT de UID/país/rol con prueba negativa sin cambiar membresías. **B4-003 HOLD; I6 5/10=50 %; producción NO-GO.**
+
+
+---
+
+## Adenda de resultados focales Samuel — 3-nov-2026 | HOLD sin cambiar el plan
+
+**Evidencia única:** [matriz de 28 escenarios y comprobaciones](I6_5_B4_003_SAMUEL_AUTH_CHROME_MATRIX_20261103.md), commit documental `47495ab407f0d95f580f197cf6883eee4c5eaf4a`, build productivo de Preview **sin cambios** `gi-i65-b4-a94bc1399189-57f234755dc1` (source `a94bc13991892ed7060dbd50318021d3c7baba16`). Samuel autenticado: **Operativo/CO Pólizas 124/124 y Cliente360 49/49**, ambos con recarga de lista; **FAIL fichas individualizadas** CO en el rol Operativo, mientras Administración logra lectura. Asesor GT muestra una póliza propia con ficha de vehículo y recarga positiva; el selector no certifica denegaciones servidor. E4/CO/2026 muestra 26 filas en rol AdminTenant y mantiene conciliación abierta. **Sin captura anonimizadora publicable ni JWT/SDK negativo, UAT firmada no certificada, sin escrituras ni LIVE.** Corregir el límite lista→GET→deep-link por rol/país bajo contrato fail-closed y revalidar en nuevo digest solo después de CI. **I6 5/10=50%; P0 históricos 1/6; B4-003 HOLD; producción NO-GO.**
