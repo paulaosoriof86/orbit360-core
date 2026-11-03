@@ -350,6 +350,7 @@ jobs:
     env:
       SOURCE_SHA: 50f0dd277b2a68c42d4c64f9f77505b1ec8b8704
       PROJECT_ID: ays-orbit-360-lab
+      TENANT_HINT: alianzas-soluciones
       HOSTING_SITE: ays-orbit-360-lab
       RELEASE_GATE: I6.5-B4-003
       BUILD_PREFIX: gi-i65-b4
