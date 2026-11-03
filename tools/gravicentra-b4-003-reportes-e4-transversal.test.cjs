@@ -10,6 +10,7 @@ const vm = require('node:vm');
 const root = path.resolve(__dirname, '..');
 const source = rel => fs.readFileSync(path.join(root, rel), 'utf8');
 const queries = source('orbit360-platform/core/queries.js');
+const cancelaciones = source('orbit360-platform/modules/cancelaciones.js');
 const reportes = source('orbit360-platform/modules/reportes.js');
 const polizas = source('orbit360-platform/modules/polizas.js');
 const cliente360 = source('orbit360-platform/modules/cliente360.js');
@@ -92,6 +93,7 @@ function setup(country, options = {}) {
   const context = vm.createContext({ Orbit, window: { Orbit }, location: { hash: '#/reportes' }, Date, Map, Set, console });
   vm.runInContext(queries, context, { filename: 'queries.js' });
   Orbit.q.renovacionesProximas = () => rows.polizas;
+  vm.runInContext(cancelaciones, context, { filename: 'cancelaciones.js' });
   vm.runInContext(reportes, context, { filename: 'reportes.js' });
   let handlers = new Map();
   const host = {
@@ -398,4 +400,83 @@ test('E8 independently hydrates financial data, quarantines QA from workflows an
   assert.match(toast,/1 sin canal/);
   assert.doesNotMatch(toast,/1 por correo preparado/);
   assert.equal(writes,0);
+});
+
+
+function selectCancellationReport(app) {
+  const marker = 'return { render, quitarProg, verFila };';
+  assert.ok(reportes.includes(marker), 'E4_REPORTES_SELECT_INSTRUMENT_MISSING');
+  const instrument = reportes.replace(marker,
+    "return { render, quitarProg, verFila, __qaSelect: key => { sel = key; } };");
+  const loc = { hash: '#/reportes' };
+  vm.runInNewContext(instrument,
+    { Orbit: app.Orbit, window: { Orbit: app.Orbit }, location: loc, Date, Map, Set, console },
+    { filename: 'reportes-e4-cancel-owner-bridge.js' });
+  app.Orbit.modules.reportes.__qaSelect('cancelaciones');
+  return loc;
+}
+
+test('E4 cancellation report shares the operational owner: projections, explicit dedup, GT/CO, QA and unknown-year', () => {
+  const originalPolicies = rows.polizas.length;
+  const originalCancelations = rows.cancelaciones.length;
+  try {
+    rows.polizas.push(
+      { id: 'cancelProjectedGT', numero: 'POL-CAN-GT', clienteId: 'clientGT', aseguradoraId: 'insGT',
+        pais: 'GT', moneda: 'GTQ', estado: 'Cancelada', fechaCancelacion: '2026-02-10', prima: 125 },
+      { id: 'cancelProjectedCO', numero: 'POL-CAN-CO-UNDATED', clienteId: 'clientCO', aseguradoraId: 'insCO',
+        pais: 'CO', moneda: 'COP', status: 'Anulada', primaNeta: 175 },
+      { id: 'cancelExplicitPol', numero: 'POL-CAN-EXPLICIT', clienteId: 'clientGT', aseguradoraId: 'insGT',
+        pais: 'GT', moneda: 'GTQ', estado: 'Cancelada', prima: 999 },
+      { id: 'qaProjectedCO', numero: 'POL-CAN-QA', clienteId: 'clientQA', aseguradoraId: 'insCO',
+        pais: 'CO', moneda: 'COP', estado: 'Cancelada', prima: 85000 },
+      { id: 'cancelCountryConflict', numero: 'POL-CAN-INVALID-COUNTRY', clienteId: 'clientGT', aseguradoraId: 'insCO',
+        pais: 'GT', moneda: 'GTQ', estado: 'Cancelada', fechaCancelacion: '2026-02-11', prima: 75000 }
+    );
+    rows.cancelaciones.push(
+      { id: 'cancelExplicit', polizaId: 'cancelExplicitPol', clienteId: 'clientGT',
+        pais: 'GT', moneda: 'GTQ', fecha: '2026-03-10', motivo: 'Baja solicitada', valorPerdido: 30 }
+    );
+    const app = setup('GT');
+    const loc = selectCancellationReport(app);
+    const owner = app.Orbit.modules.cancelaciones;
+    assert.equal(owner.effectiveRows().filter(c => c.polizaId === 'cancelExplicitPol').length, 1,
+      'An explicit cancellation must supersede the policy-state projection');
+    let html = app.render();
+    assert.match(html, /POL-CAN-GT/);
+    assert.match(html, /POL-CAN-EXPLICIT/);
+    assert.equal((html.match(/POL-CAN-EXPLICIT/g) || []).length, 1, 'Duplicate policy cancellation');
+    assert.doesNotMatch(html, /POL-CAN-CO-UNDATED|POL-CAN-QA|POL-CAN-INVALID-COUNTRY/);
+    assert.match(html, /data-report-country-quarantine="1"/);
+    assert.match(html, /GTQ 125/);
+    app.Orbit.modules.reportes.verFila('can_pol_cancelProjectedGT');
+    assert.equal(loc.hash, '#/cliente360?c=clientGT', 'Projected report row must link to its real client');
+    html = app.event('#rep-anio', '2026');
+    assert.match(html, /POL-CAN-GT/);
+    assert.match(html, /POL-CAN-EXPLICIT/, 'A dated explicit cancellation remains in 2026');
+    // Read both country slices without inventing a cancellation date.
+    app.Orbit.pais = 'CO';
+    html = app.event('#rep-anio', '');
+    assert.match(html, /POL-CAN-CO-UNDATED/);
+    assert.doesNotMatch(html, /POL-CAN-GT|POL-CAN-QA|POL-CAN-INVALID-COUNTRY/);
+    assert.match(html, /data-report-qa-quarantine="2"/,
+      'Both explicit QA and projected QA-inherited cancellations must be quarantined');
+    html = app.event('#rep-anio', '2026');
+    assert.doesNotMatch(html, /POL-CAN-CO-UNDATED/, 'Unknown cancellation dates must not be imputed');
+    assert.match(html, /data-report-unknown-period="1"/);
+    assert.equal(app.writes(), 0);
+  } finally {
+    rows.polizas.splice(originalPolicies);
+    rows.cancelaciones.splice(originalCancelations);
+  }
+});
+
+test('E4 cancellation report fails closed without the canonical cancellation owner', () => {
+  const app = setup('GT');
+  selectCancellationReport(app);
+  delete app.Orbit.modules.cancelaciones;
+  const html = app.render();
+  assert.match(html, /data-report-cancel-owner-readiness="blocked"/);
+  assert.doesNotMatch(html, /id="rep-exp"|id="rep-excel"|id="rep-pdf"/);
+  assert.doesNotMatch(html, /Sin datos/);
+  assert.equal(app.writes(), 0);
 });

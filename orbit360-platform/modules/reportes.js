@@ -104,6 +104,12 @@ Orbit.modules.reportes = (function () {
     return p.moneda || currencyFor(policyCountry(p)) || monedaCliente(cid || p.clienteId);
   }
   function monedaMixtaActiva() { return !Orbit.pais || Orbit.pais === 'TODOS'; }
+  // The Cancelaciones module owns historical policy-state projections and
+  // deduplicates them against explicit cancellations. Reports only reads them.
+  function cancellationSourceRows() { return Orbit.modules.cancelaciones.effectiveRows(); }
+  function cancellationOwnerReady() {
+    return !!(Orbit.modules && Orbit.modules.cancelaciones && typeof Orbit.modules.cancelaciones.effectiveRows === 'function');
+  }
 
   const REPORTES = {
     produccion: { t: 'Producción', icon: '📈', desc: 'Pólizas por emisión o inicio de vigencia, con prima neta.', yearLabel: 'emisión / inicio de vigencia', moneyCols: [5], countryMode: 'policy', sourceRows: () => S().all('polizas'), cols: ['Póliza', 'Cliente', 'Ramo', 'Aseguradora', 'Asesor', 'Prima neta', 'Estado'], nav: id => `#/cliente360?c=${(S().get('polizas', id) || {}).clienteId || ''}`, rows: () => S().all('polizas').filter(p => !isSyntheticRecord(p) && paisOK(policyCountry(p))).map(p => { const cur = p.moneda || currencyFor(policyCountry(p)); const prima = p.primaNeta != null ? p.primaNeta : p.prima; return rowData(p.id, [p.numero, (S().get('clientes', p.clienteId) || {}).nombre || '', sourceLabelOrPending(p.ramo), (q.aseguradora(p.aseguradoraId) || {}).nombre || '', (q.asesor(p.asesorId) || {}).nombre || '', moneyCell(prima, cur), p.estado], p.emisionEn || p.fechaEmision || p.vigenciaInicio || p.vigenciaIni, cur, { 5: moneySource(prima) }); }) },
@@ -111,7 +117,7 @@ Orbit.modules.reportes = (function () {
     comisiones: { t: 'Comisiones', icon: '💵', desc: 'Comisión generada por póliza, periodo y estado.', yearLabel: 'periodo de comisión', moneyCols: [3, 5], sourceRows: () => S().all('comisiones'), cols: ['Periodo', 'Cliente', 'Póliza', 'Base neta', '%', 'Comisión', 'Estado'], nav: id => `#/cliente360?c=${(S().get('comisiones', id) || {}).clienteId || ''}`, rows: () => S().all('comisiones').filter(c => !isSyntheticRecord(c) && paisOK(linkedCountry(c))).map(c => { const cur = c.moneda || monedaPoliza(c.polizaId, c.clienteId); return rowData(c.id, [c.periodo || '', (S().get('clientes', c.clienteId) || {}).nombre || '', (S().get('polizas', c.polizaId) || {}).numero || '', moneyCell(c.base, cur), c.pct == null ? '—' : c.pct + '%', moneyCell(c.monto, cur), c.estado], c.periodo || c.fecha, cur, { 3: moneySource(c.base), 5: moneySource(c.monto) }); }) },
     renovaciones: { t: 'Renovaciones', icon: '🔄', desc: 'Pólizas por vencer en los próximos 60 días.', yearLabel: 'fin de vigencia', moneyCols: [4], countryMode: 'policy', sourceRows: () => q.renovacionesProximas(60), cols: ['Póliza', 'Cliente', 'Ramo', 'Aseguradora', 'Prima', 'Vence'], nav: id => `#/cliente360?c=${(S().get('polizas', id) || {}).clienteId || ''}`, rows: () => q.renovacionesProximas(60).filter(p => !isSyntheticRecord(p) && paisOK(policyCountry(p))).map(p => { const cur = p.moneda || currencyFor(policyCountry(p)); return rowData(p.id, [p.numero, (S().get('clientes', p.clienteId) || {}).nombre || '', sourceLabelOrPending(p.ramo), (q.aseguradora(p.aseguradoraId) || {}).nombre || '', moneyCell(p.prima, cur), U.fmtDate(p.vigenciaFin)], p.vigenciaFin, cur, { 4: moneySource(p.prima) }); }) },
     siniestros: { t: 'Siniestros', icon: '🚨', desc: 'Reclamos con estado, montos y aseguradora.', yearLabel: 'reporte del siniestro', moneyCols: [4, 5], sourceRows: () => S().all('reclamos'), cols: ['N.º', 'Cliente', 'Tipo', 'Aseguradora', 'Reclamado', 'Aprobado', 'Estado'], nav: id => `#/cliente360?c=${(S().get('reclamos', id) || {}).clienteId || ''}`, rows: () => S().all('reclamos').filter(r => !isSyntheticRecord(r) && paisOK(linkedCountry(r))).map(r => { const cur = r.moneda || monedaPoliza(r.polizaId, r.clienteId); return rowData(r.id, [r.numero, (S().get('clientes', r.clienteId) || {}).nombre || '', r.tipo, (q.aseguradora(r.aseguradoraId) || {}).nombre || '', moneyCell(r.montoReclamado, cur), moneyCell(r.montoAprobado, cur), r.estado], r.fecha || r.fechaReclamo, cur, { 4: moneySource(r.montoReclamado), 5: moneySource(r.montoAprobado) }); }) },
-    cancelaciones: { t: 'Cancelaciones', icon: '✕', desc: 'Pólizas canceladas con motivo y valor perdido.', yearLabel: 'cancelación', moneyCols: [4], sourceRows: () => S().all('cancelaciones'), cols: ['Fecha', 'Cliente', 'Póliza', 'Motivo', 'Valor perdido'], nav: id => `#/cliente360?c=${(S().get('cancelaciones', id) || {}).clienteId || ''}`, rows: () => S().all('cancelaciones').filter(c => !isSyntheticRecord(c) && paisOK(linkedCountry(c))).map(c => { const pol = S().get('polizas', c.polizaId) || {}; const cur = c.moneda || pol.moneda || monedaPoliza(c.polizaId, c.clienteId); return rowData(c.id, [U.fmtDate(c.fecha), (S().get('clientes', c.clienteId) || {}).nombre || '', pol.numero || '', c.motivo, moneyCell(c.valorPerdido, cur)], c.fecha, cur, { 4: moneySource(c.valorPerdido) }); }) }
+    cancelaciones: { t: 'Cancelaciones', icon: '✕', desc: 'Pólizas canceladas con motivo y valor perdido.', yearLabel: 'cancelación', moneyCols: [4], sourceRows: cancellationSourceRows, cols: ['Fecha', 'Cliente', 'Póliza', 'Motivo', 'Valor perdido'], nav: id => `#/cliente360?c=${(cancellationSourceRows().find(c => String(c.id) === String(id)) || {}).clienteId || ''}`, rows: () => cancellationSourceRows().filter(c => !isSyntheticRecord(c) && paisOK(linkedCountry(c))).map(c => { const pol = S().get('polizas', c.polizaId) || {}; const cur = c.moneda || pol.moneda || monedaPoliza(c.polizaId, c.clienteId); return rowData(c.id, [U.fmtDate(c.fecha), (S().get('clientes', c.clienteId) || {}).nombre || '', pol.numero || '', c.motivo, moneyCell(c.valorPerdido, cur)], c.fecha, cur, { 4: moneySource(c.valorPerdido) }); }) }
   };
   // compat: build() devuelve solo las celdas (para export)
   Object.values(REPORTES).forEach(r => { r.build = () => r.rows().map(x => x.cells); });
@@ -119,6 +125,15 @@ Orbit.modules.reportes = (function () {
   function render(h) {
     host = h;
     const r = REPORTES[sel];
+    // Fail closed when the source owner is not registered: zero records must
+    // never masquerade as a certified empty cancellation report.
+    if (sel === 'cancelaciones' && !cancellationOwnerReady()) {
+      host.innerHTML = `<div class="page" data-report-cancel-owner-readiness="blocked">
+        ${K.banner({ icon: '📊', title: 'Orbit Reportes', sub: 'Reportes exportables sobre datos en vivo' })}
+        <div class="cfg-note" role="status">No se pudo confirmar la fuente canónica de cancelaciones. No se presentan cifras ni exportes incompletos.</div>
+      </div>`;
+      return;
+    }
     if (r.cols.includes('Aseguradora')) {
       // Fail closed only on insurer-dependent reports. Other reports can still
       // render without making the entire report center depend on this source.

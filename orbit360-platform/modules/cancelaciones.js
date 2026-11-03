@@ -487,5 +487,8 @@ Orbit.modules.cancelaciones = (function () {
   }
 
   function filtrarMotivo(m) { st.fmot = m; const host = document.getElementById('host'); if (host) render(host); }
-  return { render, detalle, detalleKpi, filtrarMotivo };
+  // Read-only owner bridge for commercial reports. Keep all projections,
+  // explicit-policy deduplication and active-country authority in one place.
+  function effectiveRows() { return effectiveCancelations(relationIndex()); }
+  return { render, detalle, detalleKpi, filtrarMotivo, effectiveRows };
 })();
