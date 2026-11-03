@@ -25,7 +25,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 55
     env:
-      SOURCE_SHA: a94bc13991892ed7060dbd50318021d3c7baba16
+      SOURCE_SHA: 004324dcac1faa694f5057a35753fc514103e19b
       PROJECT_ID: ays-orbit-360-lab
       HOSTING_SITE: ays-orbit-360-lab
       TENANT_HINT: alianzas-soluciones
@@ -48,7 +48,7 @@ jobs:
       - name: Checkout frozen canonical source, no product divergence
         uses: actions/checkout@v4
         with:
-          ref: a94bc13991892ed7060dbd50318021d3c7baba16
+          ref: 004324dcac1faa694f5057a35753fc514103e19b
           fetch-depth: 0
           persist-credentials: false
           path: candidate
@@ -76,8 +76,9 @@ jobs:
           test "$(git -C candidate hash-object tools/gravicentra-i6-1-preview-package.mjs)" = 'd42337f326637d669834664289cb3cce36b56342'
           test "$(git -C candidate hash-object functions/assignable-advisor-roster.js)" = 'bc59e9d7be17154aa54f6c58593cc45af2d72503'
           test "$(git -C candidate hash-object functions/product-operational-domain.js)" = 'b3d0059457142659633498c9c52c6b84ea68200f'
-          test "$(git -C candidate hash-object orbit360-platform/core/access-scope.js)" = '2732879d87da8dfbedad208c7139af8629272bbb'
+          test "$(git -C candidate hash-object orbit360-platform/core/access-scope.js)" = '25f4a07637bf45961dd6224298e863ff2ff3f36a'
           cd candidate
+          test "$(git -C candidate hash-object tools/gravicentra-b4-003-front-scope-quickcheck.cjs)" = '6768e15e83f33baece4c27f4315f295846d087dd'
           node tools/gravicentra-b4-003-front-scope-quickcheck.cjs
           node tools/gravicentra-b4-003-effective-policy-quickcheck.cjs
           timeout -k 3s 55s node tools/gravicentra-i6-control-plane-guard-v1.mjs --mode=i6
@@ -241,7 +242,7 @@ jobs:
         run: |
           set -euo pipefail
           ROOT="$RUNNER_TEMP/gi-canonical-hosting/bundle/site"
-          for rel in __recovery__/build.json product-runtime-config.js core/tenant-access-policy-effective-p0.js core/assignable-advisor-roster-client.js modules/polizas.js modules/reportes.js modules/cliente360.js modules/calidad.js core/queries.js; do
+          for rel in __recovery__/build.json product-runtime-config.js core/tenant-access-policy-effective-p0.js core/access-scope.js core/assignable-advisor-roster-client.js modules/polizas.js modules/reportes.js modules/cliente360.js modules/calidad.js core/queries.js; do
             dest="$RUNNER_TEMP/readback-$(basename "$rel")"
             curl --fail --silent --show-error --location --retry 2 --max-time 30 "$PREVIEW_URL/$rel" > "$dest"
             cmp "$ROOT/$rel" "$dest"
