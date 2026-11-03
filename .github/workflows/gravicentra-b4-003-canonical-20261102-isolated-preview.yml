@@ -343,7 +343,7 @@ jobs:
 
   e4-cancel-owner-hosting-preview:
     # One causal E4 successor inside the existing B4-003 Preview workflow.
-    # Product source is pinned to the passing E4 bridge commit, never rebuilt
+    # Product source is pinned to the E4 goals routing-certified commit, never rebuilt
     # from a moving HEAD. Only a NEW expiring Hosting channel is deployed.
     if: >-
       github.repository == 'paulaosoriof86/orbit360-core' &&
@@ -352,7 +352,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 35
     env:
-      SOURCE_SHA: 8ccbf641cbbbd8fe470d3ba8d5e22dd4645f3abb
+      SOURCE_SHA: 9a0b8794c56f350fc47e754a045f693c84d0054c
       PROJECT_ID: ays-orbit-360-lab
       TENANT_HINT: alianzas-soluciones
       HOSTING_SITE: ays-orbit-360-lab
@@ -372,7 +372,7 @@ jobs:
           path: transport
       - uses: actions/checkout@v4
         with:
-          ref: 8ccbf641cbbbd8fe470d3ba8d5e22dd4645f3abb
+          ref: 9a0b8794c56f350fc47e754a045f693c84d0054c
           fetch-depth: 0
           persist-credentials: false
           path: candidate
@@ -392,11 +392,17 @@ jobs:
           test "$(git -C candidate hash-object tools/gravicentra-b4-003-renovaciones-qa-provenance.test.cjs)" = 'c00b6b71deecaeeb11ec99d9e22443b85a5d830f'
           test "$(git -C candidate hash-object tools/gravicentra-b4-003-reportes-e4-transversal.test.cjs)" = '1fa7ccf0cdd0f2b9e1899515c31bb0a43d593f2a'
           test "$(git -C candidate hash-object orbit360-platform/index.html)" = 'daf1d382500146f7d273cf4501d6901cf39afed9'
+          test "$(git -C candidate hash-object orbit360-platform/core/assignable-advisor-roster-client.js)" = 'd56166f0e1b6d53cc4728f7098fa5e4ec6fabfa0'
+          test "$(git -C candidate hash-object orbit360-platform/data/store-firestore-product-operational-p0.js)" = 'fb14f43d527abfdaf4cb9ca14e74d64dda1a6acf'
+          test "$(git -C candidate hash-object tests/goal-participation-isolated-routing.test.cjs)" = '8fb555c6e9389521086b436b53bc716bffef84b6'
           cd candidate
           node --check orbit360-platform/modules/cancelaciones.js
           node --check orbit360-platform/modules/reportes.js
            node --check orbit360-platform/modules/cobros.js
           node --check orbit360-platform/modules/renovaciones.js
+          node --check orbit360-platform/core/assignable-advisor-roster-client.js
+          node --check orbit360-platform/data/store-firestore-product-operational-p0.js
+          node tests/goal-participation-isolated-routing.test.cjs
           node tools/gravicentra-b4-003-reportes-e4-transversal.test.cjs
           node tools/gravicentra-b4-003-renovaciones-qa-provenance.test.cjs
           node tools/gravicentra-b4-003-cross-module-readback-contract.test.cjs
@@ -455,6 +461,8 @@ jobs:
           cmp orbit360-platform/modules/reportes.js "$ROOT/modules/reportes.js"
            cmp orbit360-platform/modules/cobros.js "$ROOT/modules/cobros.js"
           cmp orbit360-platform/modules/renovaciones.js "$ROOT/modules/renovaciones.js"
+          cmp orbit360-platform/core/assignable-advisor-roster-client.js "$ROOT/core/assignable-advisor-roster-client.js"
+          cmp orbit360-platform/data/store-firestore-product-operational-p0.js "$ROOT/data/store-firestore-product-operational-p0.js"
           node - <<'NODE'
           const fs=require('node:fs'),r=process.env.RUNNER_TEMP+'/gi-e4-canonical-hosting/bundle';
           const c=JSON.parse(fs.readFileSync(r+'/firebase.json','utf8'));
@@ -489,7 +497,7 @@ jobs:
         run: |
           set -euo pipefail
           ROOT="$RUNNER_TEMP/gi-e4-canonical-hosting/bundle/site"
-          for rel in __recovery__/build.json product-runtime-config.js index.html modules/cancelaciones.js modules/reportes.js modules/cobros.js modules/renovaciones.js core/tenant-access-policy-effective-p0.js core/access-scope.js core/queries.js; do
+          for rel in __recovery__/build.json product-runtime-config.js index.html modules/cancelaciones.js modules/reportes.js modules/cobros.js modules/renovaciones.js core/assignable-advisor-roster-client.js data/store-firestore-product-operational-p0.js core/tenant-access-policy-effective-p0.js core/access-scope.js core/queries.js; do
             mkdir -p "$RUNNER_TEMP/gi-e4-readback/$(dirname "$rel")"
             curl -fsSL --retry 2 --max-time 30 "$PREVIEW_URL/$rel" > "$RUNNER_TEMP/gi-e4-readback/$rel"
             cmp "$ROOT/$rel" "$RUNNER_TEMP/gi-e4-readback/$rel"
@@ -508,6 +516,8 @@ jobs:
             sourceSha:process.env.SOURCE_SHA,buildId:b.buildId,previewUrl:process.env.PREVIEW_URL,
             reportesSha256:digest('modules/reportes.js'),cobrosSha256:digest('modules/cobros.js'),cancelacionesSha256:digest('modules/cancelaciones.js'),
              renovacionesSha256:digest('modules/renovaciones.js'),qaResidueRegression:'SOURCE_TEST_PASS',
+            rosterClientSha256:digest('core/assignable-advisor-roster-client.js'),
+            writerFacadeSha256:digest('data/store-firestore-product-operational-p0.js'),
             indexSha256:digest('index.html'),servedArtifactExact:true,
             hostingDeploy:'new_expiring_preview_only',backendFunctionsDeployed:0,
             dataWrites:0,firestoreRulesWrites:0,authIamChanges:0,productionDeploy:false,
@@ -516,7 +526,7 @@ jobs:
           };
           fs.writeFileSync(process.env.RUNNER_TEMP+'/gi-e4-exact-preview.json',JSON.stringify(proof,null,2)+'\n');
           NODE
-          echo "B4-003 E4 full cartera owner Preview source and exact readback: PASS. Isolated Hosting only; LIVE unchanged; signed Paula/Carlos/Samuel UAT on this new Preview remains pending." >> "$GITHUB_STEP_SUMMARY"
+          echo "B4-003 E4 goals routing + full cartera owner Preview source and exact readback: PASS. Isolated Hosting only; LIVE unchanged; signed Paula/Carlos/Samuel UAT on this new Preview remains pending." >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@v4
         if: always()
         with:
