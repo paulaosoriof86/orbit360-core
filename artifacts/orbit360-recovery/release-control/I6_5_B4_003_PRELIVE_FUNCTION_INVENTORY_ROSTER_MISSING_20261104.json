@@ -1,0 +1,39 @@
+{
+  "schema": "I6_5_B4_003_PRELIVE_FUNCTION_INVENTORY_V1",
+  "recordDate": "2026-11-04",
+  "canonicalBranch": "recovery/fase-a-clean-20260831",
+  "gate": "I6.5/B4-003",
+  "status": "REAL_80_FUNCTION_INVENTORY_READ_ONLY_PROD_ROSTER_ABSENT_B4003_RELEASE_HOLD",
+  "sourceCandidate": {
+    "sourceSha": "66012815b42c0cc26cb372c19f74d52bddba953d",
+    "buildId": "gi-i65-b4-66012815b42c-57f234755dc1",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-rc-41765742748-neoi3u7r.web.app/",
+    "retainedArtifactId": 13311178353
+  },
+  "readOnlyVerification": {
+    "githubRunId": 41812797774,
+    "githubRunConclusion": "failure_expected_missing_required_production_callable",
+    "functionsInventoried": 80,
+    "productionRoster": "orbit360AssignableAdvisorRoster",
+    "productionRosterExists": false,
+    "productionWriter": "orbit360ProductOperationalCommand",
+    "productionWriterExists": true,
+    "productionWriterSourceParityProven": false,
+    "goalsPreviewRosterExists": true,
+    "goalsPreviewWriterExists": true,
+    "scopedPolicyReaderExists": true,
+    "authSecretValuesRead": false,
+    "hostingChanged": false,
+    "backendFunctionsChanged": false,
+    "firestoreRulesChanged": false,
+    "memberOrBusinessDataChanged": false
+  },
+  "causalConsequence": "The same immutable Hosting package uses production callable names on live host; without deploying and testing the missing production roster, moving Preview Hosting bytes would reproduce 4/5 or unavailable advisor progress. Hosting-only is NOT a safe live promotion.",
+  "nextActions": [
+    "Freeze this exact inventory; do not repeat broad diagnostics.",
+    "Complete reviewed latest production read-only roster target function package and backend role/UAT controls; do not copy isolated preview callables or weaken auth.",
+    "Verify the source parity of existing production ProductOperationalCommand and deploy exact validated production target only if missing latest source.",
+    "Treat remaining five P0 with explicit owner disposition; do not delete unmarked financial dependents.",
+    "Only then clone the existing preview Hosting release to live with identical digest, run signed live matrix, preserve rollback."
+  ]
+}

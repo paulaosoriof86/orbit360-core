@@ -18152,5 +18152,23 @@
     "p0Closed": 1,
     "p0Total": 6,
     "priorControlKeysPreserved": true
+  },
+  "b4003PreliveFunctionInventory20261104": {
+    "schema": "I6_5_B4_003_PRELIVE_BACKEND_INVENTORY_POINTER_V1",
+    "gate": "I6.5/B4-003",
+    "status": "PRODUCTION_ROSTER_CALLABLE_ABSENT_HOLD",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PRELIVE_FUNCTION_INVENTORY_ROSTER_MISSING_20261104.json",
+    "sourceCandidateSha": "66012815b42c0cc26cb372c19f74d52bddba953d",
+    "inventoryRunId": 41812797774,
+    "functionsInventoried": 80,
+    "productionAssignableAdvisorRosterExists": false,
+    "productionProductOperationalCommandExists": true,
+    "writerSourceParityCertified": false,
+    "hostingOnlyProductionPromotionAllowed": false,
+    "productionDeploymentExecuted": false,
+    "b4003Closed": false,
+    "formalI6Percent": 50,
+    "p0Closed": 1,
+    "p0Total": 6
   }
 }
