@@ -266,22 +266,22 @@ jobs:
           retention-days: 30
 
   isolated-hosting-readback:
-    # Read back the already-deployed E4 owner candidate after the immediate 404.
+    # Re-read same already-deployed Preview after initial 404 propagation, no rebuild.
     # Read-only: no build, no deploy, no Firebase credential, no LIVE writes.
     if: >-
       github.repository == 'paulaosoriof86/orbit360-core' &&
       github.ref == 'refs/heads/recovery/fase-a-clean-20260831' &&
-      github.event.head_commit.message == 'verify(i6.5 B4-003): isolated E4 served bytes and live stability'
+      github.event.head_commit.message == 'verify(i6.5 B4-003): finance transversal Preview exact served bytes'
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     env:
-      SOURCE_SHA: 8ccbf641cbbbd8fe470d3ba8d5e22dd4645f3abb
-      BUILD_ID: gi-i65-b4-8ccbf641cbbb-57f234755dc1
-      PREVIEW_URL: https://ays-orbit-360-lab--gi-i65-b4-e4-41711238558-wrf29bx0.web.app
+      SOURCE_SHA: 7c78fda204831630bf9336213f67a3f56e437e4e
+      BUILD_ID: gi-i65-b4-7c78fda20483-57f234755dc1
+      PREVIEW_URL: https://ays-orbit-360-lab--gi-i65-b4-e4-41752197966-3dhqau7k.web.app
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: 8ccbf641cbbbd8fe470d3ba8d5e22dd4645f3abb
+          ref: 7c78fda204831630bf9336213f67a3f56e437e4e
           persist-credentials: false
       - uses: actions/setup-node@v4
         with:
@@ -295,6 +295,7 @@ jobs:
           test "$(git hash-object tools/gravicentra-b4-003-reportes-e4-transversal.test.cjs)" = '1fa7ccf0cdd0f2b9e1899515c31bb0a43d593f2a'
           node --check orbit360-platform/modules/reportes.js
            node --check orbit360-platform/modules/cobros.js
+          node tools/gravicentra-b4-003-financial-role-scope-transversal.test.cjs
           node tools/gravicentra-b4-003-reportes-e4-transversal.test.cjs
           curl -fsSL --retry 2 --max-time 25 "$PREVIEW_URL/__recovery__/build.json" > "$RUNNER_TEMP/gi-build.json"
           node - <<'NODE'
@@ -308,6 +309,8 @@ jobs:
            cmp orbit360-platform/modules/cobros.js "$RUNNER_TEMP/gi-cobros.js"
           curl -fsSL --retry 2 --max-time 25 "$PREVIEW_URL/core/tenant-access-policy-effective-p0.js" > "$RUNNER_TEMP/gi-policy.js"
           cmp orbit360-platform/core/tenant-access-policy-effective-p0.js "$RUNNER_TEMP/gi-policy.js"
+          curl -fsSL --retry 3 --retry-delay 2 --max-time 25 "$PREVIEW_URL/core/access-scope.js" > "$RUNNER_TEMP/gi-access.js"
+          cmp orbit360-platform/core/access-scope.js "$RUNNER_TEMP/gi-access.js"
           curl -fsSL --retry 2 --max-time 25 "$PREVIEW_URL/product-runtime-config.js" > "$RUNNER_TEMP/gi-runtime.js"
           grep -Fq '"scopedReadPreviewCandidate":true' "$RUNNER_TEMP/gi-runtime.js"
           grep -Fq '"goalParticipationPreviewCandidate":true' "$RUNNER_TEMP/gi-runtime.js"
@@ -328,10 +331,10 @@ jobs:
         run: |
           node - <<'NODE'
           const fs=require('node:fs');
-          const result={schema:'B4003_ISOLATED_E4_SERVING_READBACK_V1',sourceSha:process.env.SOURCE_SHA,buildId:process.env.BUILD_ID,previewUrl:process.env.PREVIEW_URL,servedReportesExact:true,servedAccessPolicyExact:true,liveLabStableDuringReproof:true,liveAppDomainStableDuringReproof:true,liveLabSha256:process.env.GI_READBACK_LAB_SHA,liveAppDomainSha256:process.env.GI_READBACK_DOMAIN_SHA,originalPublishRunId:41711238558,originalPublishRunConclusion:'FAIL_IMMEDIATE_404_READBACK_AFTER_HOSTING_DEPLOY',priorFailureNotErased:true,buildsInThisRun:0,deploysInThisRun:0,production:'HOLD',authenticatedUat:'PENDING'};
+          const result={schema:'B4003_ISOLATED_E4_SERVING_READBACK_V1',sourceSha:process.env.SOURCE_SHA,buildId:process.env.BUILD_ID,previewUrl:process.env.PREVIEW_URL,servedReportesExact:true,servedAccessPolicyExact:true,liveLabStableDuringReproof:true,liveAppDomainStableDuringReproof:true,liveLabSha256:process.env.GI_READBACK_LAB_SHA,liveAppDomainSha256:process.env.GI_READBACK_DOMAIN_SHA,originalPublishRunId:41752197966,originalPublishRunConclusion:'FAIL_IMMEDIATE_404_READBACK_AFTER_HOSTING_DEPLOY',priorFailureNotErased:true,buildsInThisRun:0,deploysInThisRun:0,production:'HOLD',authenticatedUat:'PENDING'};
           fs.writeFileSync(process.env.RUNNER_TEMP+'/gi-b4003-e4-readback.json',JSON.stringify(result,null,2)+'\n');
           NODE
-          echo 'B4-003 E4 full cartera owner source and served Preview artifact readback: PASS (no build or deployment). Immediate 404 failure remains preserved in run 41711238558. Authenticated UAT and production gate remain HOLD.' >> "$GITHUB_STEP_SUMMARY"
+          echo 'B4-003 E4 financial portfolio role scope source and served Preview artifact readback: PASS (no build or deployment). Immediate 404 failure remains preserved in run 41752197966. Authenticated UAT and production gate remain HOLD.' >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@v4
         if: always()
         with:
