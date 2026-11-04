@@ -10,7 +10,7 @@
   "branch": "recovery/fase-a-clean-20260831",
   "forensicOriginSha": "9c95f31461f2eabe9804625b5659bee772f5602a",
   "createdAtUtc": "2026-08-31T18:00:00Z",
-  "updatedAtUtc": "2026-11-02T17:13:27Z",
+  "updatedAtUtc": "2026-11-04T02:49:48.464Z",
   "status": "ITERATION_2_SOURCE_MATERIALIZED_VALIDATION_PENDING",
   "currentIteration": 2,
   "lastCompletedIteration": 1,
@@ -187,7 +187,7 @@
     "phaseAIterationStatuses": "HISTORICAL_FIELDS_ABOVE_PRESERVED_UNTIL_FORMAL_GATE_EVIDENCE;_NO_NEW_PASS_INFERRED",
     "labDataWriteScope": "ONLY_35_AUTHORIZED_COUNTRY_FIELDS;_NO_AUGUST_REFRESH"
   },
-  "nextAction": "I6_5_B4_003_DEPLOY_EXACT_POLICY_BOUND_ADVISOR_SOURCE_IN_ISOLATED_PREVIEW_READBACK_THEN_AUTH_UAT_PAULA_CARLOS_SAMUEL_AND_READ_ONLY_443_VS_439_ROOT_CAUSE",
+  "nextAction": "I6.5/B4-003: run immutable exact Hosting Preview for E4 PDF full-row fix 2f9eec5, verify deployed bytes and retained artifact, then focal Paula/Samuel signed UAT, reconcile 13 GT Reportes/Cobros IDs and CO client links; retain Carlos signed UAT, no reimport, no Firestore Rules waiver reversal; LIVE only after exact gates.",
   "sourceOfTruth": {
     "projectBoundaryPrevalentAddendum": "orbit360-platform/docs/recovery/ADDENDUM_PREVALENTE_CHATGPT_PROJECT_BOUNDARY_20260831.md",
     "mutableState": "orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json",
@@ -196,5 +196,24 @@
     "antiDerailment": "orbit360-platform/docs/recovery/ORBIT360-RECOVERY-ANTI-DERAILMENT-ADDENDUM-20260831.md",
     "moduleValidationMatrix": "orbit360-platform/docs/recovery/ORBIT360-FASE-A-MODULE-VALIDATION-MATRIX-v1.md",
     "chatGPTProjectInstructions": "orbit360-platform/docs/recovery/INSTRUCCIONES-PROYECTO-CHATGPT-GRAVICENTRA-INSURANCE-RECOVERY-20260831.txt"
+  },
+  "b4003DecisionFreezeE4Source20261103": {
+    "type": "ADDITIVE_CUMULATIVE_GATE_EVIDENCE",
+    "sourceCommit": "2f9eec5ca1d2b67d55282e718a4a074a801af781",
+    "sourceCiRunId": 41762448894,
+    "sourceCiConclusion": "SUCCESS",
+    "controlPlaneGuardRunId": 41762448937,
+    "controlPlaneGuardConclusion": "SUCCESS",
+    "newFunctionalDelta": "REPORTES_PDF_FULL_DATASET_AND_CELL_ESCAPE",
+    "previousSignedCarlosUatPreserved": true,
+    "knownRulesRisk": "PREVIOUS_OWNER_ACCEPTED_OPEN_NOT_PASS_FOR_CONTROLLED_LIVE_HARDEN_POSTPROD",
+    "firestoreRulesReopenedAsNewBlocker": false,
+    "productionAccepted": false,
+    "previewBuildAndByteReadback": "PENDING",
+    "focalPaulaSamuelUat": "PENDING",
+    "liveDeployInThisChange": false,
+    "dataWritesInThisChange": 0,
+    "createdUtc": "2026-11-04T02:49:48.464Z",
+    "condition": "CURRENT_GATE_B4_003_NO_HISTORICAL_PASS_OVERWRITE"
   }
 }
