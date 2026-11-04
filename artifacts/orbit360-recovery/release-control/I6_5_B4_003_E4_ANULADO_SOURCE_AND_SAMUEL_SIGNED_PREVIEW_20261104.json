@@ -96,7 +96,7 @@
   },
   "releaseRemainder": {
     "gtReportesSignedUi": "PASS_ON_EXACT_BUILD_3bf9996da14f",
-    "exportCsvExcelPdfRealBytes": "PENDING",
+    "exportCsvExcelPdfRealBytes": "HOLD_FOR_ACTUAL_SIGNED_BROWSER_FILE_CAPTURE; SOURCE_SERIALIZERS_PASS_233_SYNTHETIC_ROWS",
     "independentBackendNegativeUidScope": "PENDING",
     "approvedSyntheticWriteReloadRestore": "PENDING",
     "agingCop4Exceptions": "NOT_CLOSED_BY_THIS_FOCAL_FIX",
@@ -113,5 +113,38 @@
     "b4003Closed": false,
     "productionAuthorized": false
   },
-  "nextAction": "COMPLETE_REMAINING_FOCAL_SIGNED_UI_AND_EXPORT_BYTES_THEN_BACKEND_NEGATIVE_AND_SYNTHETIC_WRITE_WITH_CONTROLLED_READBACK; REUSE_THIS_EXACT_BUNDLE_FOR_LIVE_IF_ACCEPTED"
+  "nextAction": "COMPLETE_REMAINING_FOCAL_SIGNED_UI_AND_EXPORT_BYTES_THEN_BACKEND_NEGATIVE_AND_SYNTHETIC_WRITE_WITH_CONTROLLED_READBACK; REUSE_THIS_EXACT_BUNDLE_FOR_LIVE_IF_ACCEPTED",
+  "exportSourceSerializationProof": {
+    "method": "READ_ONLY_LOCAL_VM_HARNESS_EXACT_IMMUTABLE_REPORTES_JS_DIGEST_SYNTHETIC_233_ROWS",
+    "rows": 233,
+    "realCustomerRowsExported": false,
+    "reportesJsSha256": "0cb25b98f3aa60abd5a3aa0bf291c0327377990264a8635ea2ebef154705b364",
+    "csv": {
+      "sourceSerialization": "PASS",
+      "bytes": 13119,
+      "sha256": "da0bf8506441a072b0f57941c39cbf8a92422fab53a7dfa7b77d48a086d2fdcb",
+      "utf8Bom": true,
+      "specialCharactersEscaped": true,
+      "lastRowPresent": true
+    },
+    "excel": {
+      "sourceSerialization": "PASS_HTML_XLS",
+      "bytes": 21141,
+      "sha256": "02df72a4cee501af2fd0b291f3141df7ac0d886175132dc9f6b528ab9088b4e3",
+      "allRowsPresent": true
+    },
+    "pdf": {
+      "printHtmlGeneration": "PASS_NOT_REAL_PDF_BYTES",
+      "htmlBytes": 21502,
+      "rowsInHtml": 233,
+      "headersRepeatStyle": true
+    },
+    "browserCsvClick": {
+      "action": "CLICKED_IN_SIGNED_SAMUEL_CO_REPORTES",
+      "downloadEvent": "TIMED_OUT_7000_MS",
+      "browserFileBytes": "NOT_CAPTURED",
+      "consoleErrorCountAfterClick": 0
+    },
+    "releaseAdjudication": "SOURCE_SERIALIZATION_PASS_IS_NOT_EQUIVALENT_TO_SIGNED_BROWSER_DOWNLOAD_BYTES_PASS"
+  }
 }
