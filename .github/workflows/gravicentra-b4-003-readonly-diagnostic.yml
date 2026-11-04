@@ -20,6 +20,7 @@ on:
       - 'tools/gravicentra-b4-003-integral-readonly-audit.cjs'
       - 'tools/gravicentra-b4-003-auth-activation-readonly.cjs'
       - 'tools/gravicentra-b4-003-uat4-source-reconciliation-readonly.cjs'
+      - 'tools/gravicentra-b4-003-real-uid-server-negatives.cjs'
 
 permissions:
   contents: write
