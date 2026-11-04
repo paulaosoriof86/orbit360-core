@@ -38,11 +38,33 @@ const context={exports:{},process:{env:{}},Set,Map,Date,Number,Object,Array,
 vm.runInNewContext(source,context,{timeout:1000});
 const call=(role='Operativo',country='GT')=>context.exports.orbit360AssignableAdvisorRosterPreview({
  auth:{uid},data:{tenantId,activeRole:role,country,month:'2026-10',purpose:'inicio'}});
+const roster=(role='Operativo',country='TODOS')=>context.exports.orbit360AssignableAdvisorRosterPreview({
+ auth:{uid},data:{tenantId,activeRole:role,country,purpose:'asignacion'}});
 let checks=0;
 const eq=(got,want)=>{assert.equal(got,want);checks++;};
 const denied=async fn=>{let error;try{await fn()}catch(e){error=e}
  assert.equal(error&&error.code,'permission-denied');checks++;};
 (async()=>{
+ // Independent assignment-roster contract: every full role is limited by
+ // authorized membership countries, even when it asks for TODOS.
+ let rv=await roster();eq(rv.scope,'full');eq(rv.rows.map(x=>x.id).join(','),'a4,a2,a3,a1');
+ rv=await roster('Asesor');eq(rv.scope,'self');eq(rv.rows.map(x=>x.id).join(','),'a1');
+ membership.countries=['GT'];await denied(()=>roster('Operativo','CO'));
+ rv=await roster();eq(rv.rows.map(x=>x.id).join(','),'a2,a3,a1');
+ rv=await roster('Operativo','GT');eq(rv.rows.length,3);
+ membership.countries=['CO'];await denied(()=>roster('Operativo','GT'));
+ rv=await roster();eq(rv.rows.map(x=>x.id).join(','),'a4');
+ rv=await roster('Asesor');eq(rv.rows.length,0);
+ membership.countries=[];await denied(()=>roster());
+ membership.countries=['GT','CO'];
+ membership.roles=['Operativo','Asesor','Dirección','AdminTenant','SuperAdmin'];
+ for(const role of ['Dirección','AdminTenant','SuperAdmin']){
+  rv=await roster(role,'TODOS');eq(rv.scope,'full');eq(rv.rows.length,4);
+  membership.countries=['GT'];await denied(()=>roster(role,'CO'));
+  rv=await roster(role,'TODOS');eq(rv.rows.length,3);
+  membership.countries=['GT','CO'];
+ }
+ membership.roles=['Operativo','Asesor'];
  let v=await call();eq(v.dashboardContract,'gi-i65-b4-003-executive-read-v1');eq(v.scope,'team');
  eq(v.rows.map(x=>x.id).sort().join(','),'a1,a3');
  eq(Object.keys(v.globalMetas).length,0);
