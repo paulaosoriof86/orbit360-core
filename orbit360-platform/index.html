@@ -163,6 +163,31 @@
           });
       }
       function routeRow(row){if(!row)return;var id=row.entityId||'',type=row.entityType||'',surface=row.targetSurface||(row.direction==='operations'?'ops':'leads');if(type==='negocios'){location.hash=surface==='ops'?'#/ops':'#/leads';setTimeout(function(){Orbit.ciclo&&Orbit.ciclo.openNegocio&&Orbit.ciclo.openNegocio(id);},160);}else{location.hash='#/ops';setTimeout(function(){Orbit.ciclo&&Orbit.ciclo.openGestion&&Orbit.ciclo.openGestion(id);},160);}}
+      /* B4-003: one shared human-identity formatter for Ops/Leads task authors and resolvers.
+         Use only already-authorized session/store data; historical technical or
+         unidentified actors remain neutral, never attributed to an invented person. */
+      function inboxHumanIdentity(raw,uid){
+        var label=String(raw==null?'':raw).trim(),id=String(uid||'').trim();
+        function valid(value){
+          var x=String(value==null?'':value).trim();
+          return !!x&&!x.includes('@')
+            &&!/^(?:AdminTenant|SuperAdmin|Direcci[oó]n|Operativo|Asesor|Comercial|Admin|unknown|undefined|Usuario autenticado|Usuario del equipo|Usuario autorizado|Orbit(?:\s*360)?\s*LAB|QA|LAB|Test)$/i.test(x)
+            &&!/^(?:uid|auth|member|user)[:_-]/i.test(x)
+            &&!/^[A-Za-z0-9_-]{24,}$/.test(x);
+        }
+        function proper(user){return user&&String(user.nombre||user.displayName||user.name||'').trim()||'';}
+        if(id){
+          var me=Orbit.auth&&Orbit.auth.productUser||{};
+          if(String(me.uid||'')===id&&valid(proper(me)))return proper(me);
+          var store=Orbit.store;
+          if(store&&typeof store.get==='function'){
+            for(var collections=['usuarios','users','members','asesores'],i=0;i<collections.length;i++){
+              try{var found=store.get(collections[i],id),candidate=proper(found);if(valid(candidate))return candidate;}catch(_e){}
+            }
+          }
+        }
+        return valid(label)?label:'Usuario del equipo';
+      }
       function open(){
         var back=document.getElementById('ops-inbox-back'),dr=document.getElementById('ops-inbox-drawer');
         if(!back){back=document.createElement('div');back.id='ops-inbox-back';back.className='drawer-back';dr=document.createElement('div');dr.id='ops-inbox-drawer';dr.className='drawer';document.body.appendChild(back);document.body.appendChild(dr);back.addEventListener('click',function(){back.classList.remove('open');dr.classList.remove('open');});}
@@ -171,9 +196,9 @@
           '<div class="inbox-toolbar" style="flex-wrap:wrap;gap:8px"><span class="inbox-active-count"><b>'+active.length+'</b><span>activas</span></span><span class="muted">'+resolved.length+' resueltas sin archivar</span><button class="btn ghost sm" id="ops-inbox-home" type="button">Ir a Inicio</button><button class="btn ghost sm" id="ops-inbox-archive-resolved">Archivar resueltas</button></div>'+ 
           '<div class="imp-body"><div class="cfg-note" style="margin-bottom:10px"><b>Estados separados:</b> “Reconocida por ti” es personal. “Resuelta para todos” cierra la tarea compartida para sus destinatarios.</div><div class="inbox-list" data-inbox-render-count="'+visible.length+'">'+(visible.length?visible.map(function(n){
             var resolved=!!n.globalResolved,cls=resolved?'inbox-attended':n.acknowledged?'inbox-read':n.read?'inbox-read':'inbox-new',status=n.statusLabel||resolved&&'Resuelta para todos'||n.acknowledged&&'Reconocida por ti'||n.read&&'Vista por ti'||'Nueva';
-            var actor=(function(){  var raw=String(n.actorName||''),me=Orbit.auth&&Orbit.auth.productUser||{},person=String(me.nombre||me.displayName||me.name||'');  if(n.actorUid&&String(me.uid||'')===String(n.actorUid)&&person&&!person.includes('@'))return person;  if(raw&&!raw.includes('@')&&!/^(uid[:_-]|AdminTenant|SuperAdmin|Direccion|Dirección|Operativo|Asesor|Comercial)$/i.test(raw))return raw;  return 'Usuario del equipo';})(),recipient=n.targetType==='advisor'?'Asesor asignado':n.targetType==='role'?'Equipo operativo':'Destinatario autorizado',owner=n.targetType==='advisor'?'Asesor responsable':'Equipo autorizado';
+            var actor=inboxHumanIdentity(n.actorName,n.actorUid),recipient=n.targetType==='advisor'?'Asesor asignado':n.targetType==='role'?'Equipo operativo':'Destinatario autorizado',owner=n.targetType==='advisor'?'Asesor responsable':'Equipo autorizado';
             var duplicate=n.semanticDuplicateCandidate?'<span class="badge warn" title="Se conservan todos los eventos; solo se marca la coincidencia para revisión">Posible duplicado · '+esc(String(n.semanticDuplicateCount||2))+'</span>':'';
-            var resolvedBy=resolved?'<div class="muted" style="font-size:11.5px;margin-top:5px">Resuelta por '+esc(n.resolvedByName&&!String(n.resolvedByName).includes('@')?n.resolvedByName:'usuario autorizado')+'.</div>':'';
+            var resolvedBy=resolved?'<div class="muted" style="font-size:11.5px;margin-top:5px">Resuelta por '+esc(inboxHumanIdentity(n.resolvedByName,n.resolvedByUid))+'.</div>':'';
             return '<article class="card pad inbox-card '+cls+'" data-notice-event="'+esc(n.eventId||'')+'"><button type="button" class="inbox-open" data-inbox-event="'+esc(n.eventId||'')+'"><div class="inbox-card-head"><b>'+esc(n.title||'Actualización')+'</b><span class="badge '+(resolved?'ok':n.acknowledged?'info':n.read?'neutral':'danger')+'">'+esc(status)+'</span></div><div class="inbox-message">'+esc(n.message||'')+'</div><div class="muted" style="font-size:11px;margin-top:7px">Autor: '+esc(actor)+' · Destinatario: '+esc(recipient)+' · Responsable: '+esc(owner)+'</div>'+resolvedBy+'<div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:7px">'+duplicate+'</div></button><div class="inbox-card-actions" style="flex-wrap:wrap"><button class="btn ghost sm" data-inbox-ack="'+esc(n.eventId||'')+'" '+(n.acknowledged?'disabled':'')+'>'+(n.acknowledged?'✓ Reconocida':'Reconocer para mí')+'</button><button class="btn ghost sm" data-inbox-resolve="'+esc(n.eventId||'')+'" '+(resolved?'disabled':'')+'>'+(resolved?'✓ Resuelta para todos':'Resolver para todos')+'</button><button class="btn ghost sm" data-inbox-archive="'+esc(n.eventId||'')+'">Archivar para mí</button></div></article>';
           }).join(''):'<div class="empty">'+(refreshState==='error'?'No se pudo consultar las solicitudes. Vuelve a abrir para reintentar.':refreshState==='loading'?'Cargando solicitudes compartidas…':'No tienes solicitudes internas pendientes.')+'</div>')+'</div></div>';
         dr.querySelector('#ops-inbox-x').onclick=function(){back.classList.remove('open');dr.classList.remove('open');};
