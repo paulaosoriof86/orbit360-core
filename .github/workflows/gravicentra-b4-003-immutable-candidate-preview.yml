@@ -50,8 +50,16 @@ jobs:
         run: |
           set -euo pipefail
           test "$(git rev-parse HEAD)" = "$SOURCE_SHA"
+          test "$(git rev-parse HEAD^)" = "d0a17a264981b0ff1fb2570799cbb4d77684be47"
+          test "$(git diff --name-only HEAD^ HEAD)" = ".github/workflows/gravicentra-b4-003-immutable-candidate-preview.yml"
           test -f artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json
           test -f orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json
+          node --check functions/b4-003-scoped-policy-reader.js
+          node --check orbit360-platform/modules/polizas.js
+          node --check orbit360-platform/modules/policy-receipts-v1199-detail-guard.js
+          node tools/gravicentra-b4-003-scoped-policy-reader.test.cjs
+          node tools/gravicentra-b4-003-polizas-advisor-hydration-20261102.test.cjs
+          node tools/gravicentra-b4-003-policy-client-scope-link.test.cjs
           node --check orbit360-platform/modules/reportes.js
           node --check orbit360-platform/modules/cobros.js
           node --check orbit360-platform/modules/cancelaciones.js
@@ -114,6 +122,9 @@ jobs:
           node tools/gravicentra-i6-1-preview-package.mjs . "$RUNNER_TEMP/gi-e4-canonical-hosting" "$RUNNER_TEMP/gi-e4-sdkconfig.json" > "$RUNNER_TEMP/gi-e4-package-output.json"
           ROOT="$RUNNER_TEMP/gi-e4-canonical-hosting/bundle/site"
           test "$(git rev-parse HEAD)" = "$SOURCE_SHA"
+          cmp functions/b4-003-scoped-policy-reader.js "$RUNNER_TEMP/gi-e4-canonical-hosting/bundle/backend/b4-003-scoped-policy-reader.js"
+          cmp orbit360-platform/modules/polizas.js "$ROOT/modules/polizas.js"
+          cmp orbit360-platform/modules/policy-receipts-v1199-detail-guard.js "$ROOT/modules/policy-receipts-v1199-detail-guard.js"
           cmp orbit360-platform/modules/cancelaciones.js "$ROOT/modules/cancelaciones.js"
           cmp orbit360-platform/modules/reportes.js "$ROOT/modules/reportes.js"
           cmp orbit360-platform/core/access-scope.js "$ROOT/core/access-scope.js"
@@ -176,7 +187,7 @@ jobs:
         run: |
           set -euo pipefail
           ROOT="$RUNNER_TEMP/gi-e4-canonical-hosting/bundle/site"
-          for rel in __recovery__/build.json product-runtime-config.js index.html modules/cancelaciones.js modules/reportes.js modules/cobros.js modules/renovaciones.js core/assignable-advisor-roster-client.js data/store-firestore-product-operational-p0.js core/tenant-access-policy-effective-p0.js core/access-scope.js core/queries.js; do
+          for rel in __recovery__/build.json product-runtime-config.js index.html modules/polizas.js modules/policy-receipts-v1199-detail-guard.js modules/cancelaciones.js modules/reportes.js modules/cobros.js modules/renovaciones.js core/assignable-advisor-roster-client.js data/store-firestore-product-operational-p0.js core/tenant-access-policy-effective-p0.js core/access-scope.js core/queries.js; do
             mkdir -p "$RUNNER_TEMP/gi-e4-readback/$(dirname "$rel")"
             curl -fsSL --retry 12 --retry-all-errors --retry-delay 5 --max-time 25 "$PREVIEW_URL/$rel" > "$RUNNER_TEMP/gi-e4-readback/$rel"
             cmp "$ROOT/$rel" "$RUNNER_TEMP/gi-e4-readback/$rel"
@@ -205,7 +216,7 @@ jobs:
           };
           fs.writeFileSync(process.env.RUNNER_TEMP+'/gi-e4-exact-preview.json',JSON.stringify(proof,null,2)+'\n');
           NODE
-          echo "B4-003 exact immutable Hosting Preview readback PASS; retained artifact is required for same-byte LIVE promotion. Only E4 is new, other UAT unchanged; LIVE unchanged." >> "$GITHUB_STEP_SUMMARY"
+          echo "B4-003 exact immutable Hosting Preview readback PASS; retained artifact is required for same-byte LIVE promotion. E4 and verified policy-bound display labels are included; other certified UAT preserved; LIVE unchanged." >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@v4
         if: always()
         with:
