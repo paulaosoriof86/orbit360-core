@@ -134,11 +134,19 @@ async function main(){
     for(const country of [...actor.countries,'TODOS']){
      const result=await invoke(token,{tenantId:TENANT,activeRole:role,country});
      const rows=result.result?.rows;
+     // A country filter selects an advisor who works in that country; the
+     // advisor's other *authorized* countries remain visible in paises.
+     // Requiring every paises element to equal the filter produces a false
+     // failure on legitimate GT+CO advisor rows.
      const inCountry=Array.isArray(rows)&&rows.every(r=>Array.isArray(r.paises)&&
-       r.paises.every(x=>actor.countries.includes(x)&&(country==='TODOS'||country===x)));
-     pass(result.ok&&result.result?.ok===true&&result.result.scope===scope&&inCountry,
+       r.paises.every(x=>actor.countries.includes(x))&&
+       (country==='TODOS'||r.paises.includes(country)));
+     const valid=result.ok&&result.result?.ok===true&&result.result.scope===scope&&inCountry;
+     a.positives.push({role:desired,country,scope,http:result.status,
+       errorStatus:result.errorStatus,returnedScope:result.result?.scope||null,
+       count:Array.isArray(rows)?rows.length:null,pass:valid});
+     pass(valid,
        'POSITIVE_READ_SCOPE_FAILED_'+label+'_'+desired+'_'+country,label);
-     a.positives.push({role:desired,country,scope,count:rows.length,pass:true});
     }
     if(desired==='asesor'){
      const home=await invoke(token,{tenantId:TENANT,activeRole:role,country:'TODOS'});
