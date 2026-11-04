@@ -1,0 +1,97 @@
+# B4-003 canonical-branch PRELIVE function inventory; read-only and no deploy.
+# This is a diagnostic step inside I6.5/B4-003, not a new release candidate.
+name: Gravicentra B4-003 PRELIVE Functions Read-Only
+on:
+  push:
+    branches: [recovery/fase-a-clean-20260831]
+    paths: ['.github/workflows/gravicentra-b4-003-prelive-functions-readonly-20261104.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: gi-b4003-prelive-functions-readonly
+  cancel-in-progress: false
+jobs:
+  snapshot-existing-functions:
+    if: github.repository == 'paulaosoriof86/orbit360-core' && github.ref == 'refs/heads/recovery/fase-a-clean-20260831'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 18
+    env:
+      PROJECT_ID: ays-orbit-360-lab
+      SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_LAB_LEGACY: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify frozen candidate binding and unchanged code after source commit
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          test "$(git rev-parse 66012815b42c0cc26cb372c19f74d52bddba953d:orbit360-platform/core/assignable-advisor-roster-client.js)" = "$(git rev-parse HEAD:orbit360-platform/core/assignable-advisor-roster-client.js)"
+          test "$(git rev-parse 66012815b42c0cc26cb372c19f74d52bddba953d:orbit360-platform/data/store-firestore-product-operational-p0.js)" = "$(git rev-parse HEAD:orbit360-platform/data/store-firestore-product-operational-p0.js)"
+          test "$(git rev-parse 66012815b42c0cc26cb372c19f74d52bddba953d:functions/assignable-advisor-roster.js)" = "$(git rev-parse HEAD:functions/assignable-advisor-roster.js)"
+          test "$(git rev-parse 66012815b42c0cc26cb372c19f74d52bddba953d:functions/product-operational-domain.js)" = "$(git rev-parse HEAD:functions/product-operational-domain.js)"
+      - name: Inventory only; never read or print service-account payload
+        shell: bash
+        run: |
+          set -euo pipefail
+          AUTH_DIR="$RUNNER_TEMP/gi-b4003-prelive-auth"
+          mkdir -p "$AUTH_DIR"
+          export AUTH_DIR
+          python3 - <<'PY'
+          import json,os,pathlib
+          root=pathlib.Path(os.environ['AUTH_DIR'])
+          found=0
+          for field in ('SA_LAB','SA_LAB_LEGACY','SA_DEFAULT'):
+              try: cred=json.loads(os.environ.get(field,''))
+              except (ValueError,TypeError): continue
+              if cred.get('type')=='service_account' and cred.get('project_id')=='ays-orbit-360-lab' and cred.get('private_key'):
+                  p=root/(str(found)+'.json');p.write_text(json.dumps(cred));p.chmod(0o600)
+                  found+=1
+          if not found: raise SystemExit('B4003_PRELIVE_NO_EXISTING_AUTH')
+          PY
+          CLI_ROOT="$RUNNER_TEMP/gi-b4003-prelive-cli"
+          npm install --prefix "$CLI_ROOT" --no-audit --no-fund --ignore-scripts firebase-tools@14.10.1 >/dev/null
+          node tools/gravicentra-firebase-tools-empty-extensions-workaround-v1.mjs "$CLI_ROOT"
+          CLI="$CLI_ROOT/node_modules/firebase-tools/lib/bin/firebase.js"
+          FOUND=false
+          for AUTH_FILE in "$AUTH_DIR"/*.json; do
+            if GOOGLE_APPLICATION_CREDENTIALS="$AUTH_FILE" node "$CLI" functions:list --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/gi-b4003-function-raw.json" 2>/dev/null; then
+              FOUND=true; break
+            fi
+          done
+          test "$FOUND" = true
+          node - <<'NODE'
+          const fs=require('fs');
+          const data=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/gi-b4003-function-raw.json','utf8'));
+          const rows=Array.isArray(data.result)?data.result:Array.isArray(data)?data:[];
+          const names=['orbit360AssignableAdvisorRoster','orbit360AssignableAdvisorRosterPreview','orbit360AssignableAdvisorRosterGoalsPreview','orbit360ProductOperationalCommand','orbit360ProductOperationalCommandPreview','orbit360ProductOperationalCommandGoalsPreview','orbit360ScopedPolicyRead'];
+          const result=names.map(name=>{
+            const m=rows.find(r=>String(r.id||r.name||r.function||'').split('/').pop()===name);
+            return {name,present:!!m,region:String(m?.region||m?.location||''),runtime:String(m?.runtime||''),status:String(m?.status||m?.state||''),updatedAt:String(m?.updateTime||m?.updatedAt||''),generation:String(m?.platform||m?.generation||'')};
+          });
+          const snapshot={schema:'B4003_PRELIVE_EXISTING_FUNCTIONS_READONLY_V1',gate:'I6.5/B4-003',recordedAt:new Date().toISOString(),
+            candidateSourceSha:'66012815b42c0cc26cb372c19f74d52bddba953d',candidateBuildId:'gi-i65-b4-66012815b42c-57f234755dc1',
+            projectId:process.env.PROJECT_ID,mode:'READ_ONLY_NO_DEPLOY',
+            functions:result,prodNamesPresent:result.filter(x=>['orbit360AssignableAdvisorRoster','orbit360ProductOperationalCommand'].includes(x.name)).every(x=>x.present),
+            codeParityProven:false,backendWrites:0,rulesWrites:0,hostingWrites:0,dataWrites:0,livePromotion:false,
+            nextStep:'Use dates/revisions to determine whether production callable needs exact source deployment; inventory cannot attest code parity.'};
+          const path=process.env.RUNNER_TEMP+'/gi-b4003-prelive-readonly.json';
+          fs.writeFileSync(path,JSON.stringify(snapshot,null,2)+'\n');
+          console.log(JSON.stringify({gate:snapshot.gate,mode:snapshot.mode,productionNamesPresent:snapshot.prodNamesPresent,functions:result.map(x=>({name:x.name,present:x.present,updatedAt:x.updatedAt}))}));
+          if(!snapshot.prodNamesPresent)process.exitCode=1;
+          NODE
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: gi-b4003-prelive-functions-readonly-${{ github.run_id }}
+          path: ${{ runner.temp }}/gi-b4003-prelive-readonly.json
+          if-no-files-found: warn
+          retention-days: 30
