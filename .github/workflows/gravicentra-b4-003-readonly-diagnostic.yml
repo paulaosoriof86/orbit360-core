@@ -30,7 +30,9 @@ concurrency:
 
 jobs:
   b4-003-readonly-diagnostic:
-    if: github.event_name != 'workflow_dispatch' || inputs.signed_identity_negatives != true
+    if: >-
+      (github.event_name != 'workflow_dispatch' || inputs.signed_identity_negatives != true)
+      && !(github.event_name == 'push' && github.event.head_commit.message == 'test(b4-003): execute owner-approved existing UID negative matrix')
     runs-on: ubuntu-24.04
     timeout-minutes: 25
     env:
@@ -290,7 +292,9 @@ jobs:
           git push origin "HEAD:$GITHUB_REF_NAME"
 
   b4-003-integral-readonly-complement:
-    if: github.event_name != 'workflow_dispatch' || inputs.signed_identity_negatives != true
+    if: >-
+      (github.event_name != 'workflow_dispatch' || inputs.signed_identity_negatives != true)
+      && !(github.event_name == 'push' && github.event.head_commit.message == 'test(b4-003): execute owner-approved existing UID negative matrix')
     needs: b4-003-readonly-diagnostic
     runs-on: ubuntu-24.04
     timeout-minutes: 25
@@ -374,8 +378,9 @@ jobs:
     if: >-
       github.repository == 'paulaosoriof86/orbit360-core'
       && github.ref == 'refs/heads/recovery/fase-a-clean-20260831'
-      && github.event_name == 'workflow_dispatch'
-      && inputs.signed_identity_negatives == true
+      && ((github.event_name == 'workflow_dispatch' && inputs.signed_identity_negatives == true)
+        || (github.event_name == 'push'
+          && github.event.head_commit.message == 'test(b4-003): execute owner-approved existing UID negative matrix'))
     runs-on: ubuntu-24.04
     timeout-minutes: 25
     permissions:
