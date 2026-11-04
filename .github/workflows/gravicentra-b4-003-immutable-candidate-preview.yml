@@ -1,6 +1,7 @@
 # B4-003 same-artifact release lane (reusable); does not touch LIVE, Rules, Auth or business data.
 # 2026-11-04: exact same-channel candidate after Inicio signed-advisor first-paint fix.
 # 2026-11-04: same-channel causal rerun after Inicio event-listener VM compatibility guard.
+# 2026-11-04: repackage after witnessed Inicio 1 póliza/obligación grammar bug and regressions.
 # Reusable in the same canonical branch when a causal source fix invalidates
 # the former immutable candidate; never patch or promote the older bundle.
 name: Gravicentra B4-003 Immutable Candidate Hosting Preview
@@ -80,6 +81,7 @@ jobs:
           node --check orbit360-platform/core/ciclo.js
           node --check orbit360-platform/data/store-firestore-product-operational-p0.js
           node tools/gravicentra-b4-003-inicio-role-country-team.test.cjs
+          node tools/gravicentra-b4-003-inicio-personal-recaudo.test.cjs
           node tools/gravicentra-b4-003-ops-leads-role-scopes.test.cjs
           node tools/gravicentra-b4-003-ops-leads-advisor-r38.test.cjs
           node tools/gravicentra-b4-003-operational-write-security-regression.test.cjs >/dev/null
