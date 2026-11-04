@@ -1,0 +1,161 @@
+# B4-003 causal missing source parity on the existing production writer.
+# One reviewed target, exact deployed-source byte readback and rollback to
+# the exact prior Cloud Functions source archive if post-deploy checks fail.
+name: Gravicentra B4-003 LIVE Writer Parity Exact
+on:
+  push:
+    branches: [recovery/fase-a-clean-20260831]
+    paths: ['.github/workflows/gravicentra-b4-003-live-writer-parity-20261104.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+concurrency:
+  group: gi-b4003-live-product-writer-exact
+  cancel-in-progress: false
+
+jobs:
+  certify-and-upgrade-only-existing-writer:
+    if: github.repository == 'paulaosoriof86/orbit360-core' && github.ref == 'refs/heads/recovery/fase-a-clean-20260831'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    env:
+      PROJECT_ID: ays-orbit-360-lab
+      GI_TARGET_FUNCTION: orbit360ProductOperationalCommand
+      EXACT_WRITER_GIT_BLOB: b3d0059457142659633498c9c52c6b84ea68200f
+      FIXED_ROSTER_GIT_BLOB: 9778d74b6d305ff56caf73bb68be3dadac4b14ce
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_LAB_LEGACY: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate immutable latest writer and causal contract/regression tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          test "$PROJECT_ID" = 'ays-orbit-360-lab'
+          test "$(git rev-parse HEAD:functions/product-operational-domain.js)" = "$EXACT_WRITER_GIT_BLOB"
+          test "$(git rev-parse HEAD:functions/assignable-advisor-roster.js)" = "$FIXED_ROSTER_GIT_BLOB"
+          test "$(git rev-parse 66012815b42c0cc26cb372c19f74d52bddba953d:functions/product-operational-domain.js)" = "$EXACT_WRITER_GIT_BLOB"
+          node --check functions/product-operational-domain.js
+          node tools/gravicentra-b4-003-operational-write-security-regression.test.cjs >/dev/null
+          node tools/gravicentra-b4-003-insurer-activity-audit.test.cjs >/dev/null
+          node tools/gravicentra-b4-003-inicio-role-country-team.test.cjs
+          node tools/gravicentra-b4-003-ops-leads-role-scopes.test.cjs
+          node tools/gravicentra-b4-003-financial-role-scope-transversal.test.cjs
+          node tools/gravicentra-b4-003-role-first-paint-and-team-regression.test.cjs
+      - name: Prepare single existing Firebase project and staged writer package
+        shell: bash
+        run: |
+          set -euo pipefail
+          STAGE_ROOT="$RUNNER_TEMP/gi-b4003-live-writer-parity"
+          mkdir -p "$STAGE_ROOT"
+          cp -a functions "$STAGE_ROOT/backend"
+          printf '{"functions":{"source":"backend","runtime":"nodejs22"}}\n' > "$STAGE_ROOT/firebase.json"
+          (cd "$STAGE_ROOT/backend" && npm ci --ignore-scripts --no-audit --no-fund)
+          echo "STAGE_ROOT=$STAGE_ROOT" >> "$GITHUB_ENV"
+          echo "GI_DEPS_DIR=$STAGE_ROOT/backend/node_modules" >> "$GITHUB_ENV"
+          AUTH_ROOT="$RUNNER_TEMP/gi-b4003-live-writer-auth"
+          mkdir -p "$AUTH_ROOT"
+          export AUTH_ROOT
+          python3 - <<'PY'
+          import json,os,pathlib
+          root=pathlib.Path(os.environ['AUTH_ROOT']);count=0
+          for key in ('SA_LAB','SA_LAB_LEGACY','SA_DEFAULT'):
+              try:obj=json.loads(os.environ.get(key,''))
+              except (ValueError,TypeError):continue
+              if obj.get('type')!='service_account' or obj.get('project_id')!='ays-orbit-360-lab' or not obj.get('private_key'):continue
+              p=root/f'{count}.json';p.write_text(json.dumps(obj));p.chmod(0o600);count+=1
+          if not count:raise SystemExit('EXISTING_PROJECT_CREDENTIALS_MISSING')
+          PY
+          CLI_ROOT="$RUNNER_TEMP/gi-b4003-live-writer-cli"
+          npm install --prefix "$CLI_ROOT" --no-audit --no-fund --ignore-scripts firebase-tools@14.10.1 >/dev/null
+          node tools/gravicentra-firebase-tools-empty-extensions-workaround-v1.mjs "$CLI_ROOT"
+          CLI="$CLI_ROOT/node_modules/firebase-tools/lib/bin/firebase.js"
+          SELECTED=''
+          for AUTH_FILE in "$AUTH_ROOT"/*.json; do
+            if GOOGLE_APPLICATION_CREDENTIALS="$AUTH_FILE" node "$CLI" functions:list --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/gi-b4003-writer-before.json" 2>/dev/null; then
+              SELECTED="$AUTH_FILE";break
+            fi
+          done
+          test -n "$SELECTED"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$SELECTED" >> "$GITHUB_ENV"
+          echo "FIREBASE_CLI_BIN=$CLI" >> "$GITHUB_ENV"
+      - name: Save exact previous writer source and untouched roster metadata BEFORE
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-b4-003-live-backend-source-readback.cjs before
+          node - <<'NODE'
+          const fs=require('fs'),tmp=process.env.RUNNER_TEMP;
+          const before=JSON.parse(fs.readFileSync(tmp+'/gi-b4003-live-sources-before.json','utf8'));
+          if(before.functions[0].name!=='orbit360AssignableAdvisorRoster'||before.functions[1].name!==process.env.GI_TARGET_FUNCTION||!before.rosterSourceMatchesCurrent||before.writerSourceMatchesCurrent)throw Error('EXPECTED_ROSTER_CURRENT_AND_WRITER_STALE_PREDECESSOR_REQUIRED');
+          const x=JSON.parse(fs.readFileSync(tmp+'/gi-b4003-writer-before.json','utf8'));
+          const raw=x.result??x,v=typeof raw==='string'?JSON.parse(raw):raw,rows=Array.isArray(v)?v:Array.isArray(v.functions)?v.functions:[];
+          const names=rows.map(r=>String(r.id||r.name||r.function||'').split('/').pop()).sort();
+          if(names.length!==81||!names.includes(process.env.GI_TARGET_FUNCTION))throw Error('PRELIVE_EXACT_81_FUNCTION_INVENTORY_DRIFT');
+          fs.writeFileSync(tmp+'/gi-b4003-writer-before-names.json',JSON.stringify(names));
+          NODE
+          export RESTORE_ROOT="$RUNNER_TEMP/gi-b4003-live-writer-previous"
+          mkdir -p "$RESTORE_ROOT"
+          python3 - <<'PY'
+          import os,pathlib,zipfile,shutil
+          src=pathlib.Path(os.environ['RUNNER_TEMP'])/'gi-b4003-before-orbit360ProductOperationalCommand.zip'
+          dst=pathlib.Path(os.environ['RESTORE_ROOT']);ex=dst/'extract';ex.mkdir()
+          with zipfile.ZipFile(src) as z:z.extractall(ex)
+          dirs=[p.parent for p in ex.rglob('package.json') if (p.parent/'product-operational-domain.js').is_file() and (p.parent/'bootstrap.js').is_file() and (p.parent/'package-lock.json').is_file()]
+          if len(dirs)!=1:raise SystemExit('PREDECESSOR_WRITER_BACKUP_INCOMPLETE')
+          shutil.copytree(dirs[0],dst/'backend')
+          (dst/'firebase.json').write_text('{"functions":{"source":"backend","runtime":"nodejs22"}}\n')
+          PY
+          (cd "$RESTORE_ROOT/backend" && npm ci --ignore-scripts --no-audit --no-fund)
+          echo "RESTORE_ROOT=$RESTORE_ROOT" >> "$GITHUB_ENV"
+      - name: Upgrade ONLY existing operational writer and verify source/inventory parity
+        id: deploy_and_readback
+        shell: bash
+        run: |
+          set -euo pipefail
+          node "$FIREBASE_CLI_BIN" deploy --only functions:orbit360ProductOperationalCommand --config "$STAGE_ROOT/firebase.json" --project "$PROJECT_ID" --non-interactive
+          node tools/gravicentra-b4-003-live-backend-source-readback.cjs after
+          node "$FIREBASE_CLI_BIN" functions:list --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/gi-b4003-writer-after.json"
+          node - <<'NODE'
+          const fs=require('fs'),tmp=process.env.RUNNER_TEMP;
+          const before=JSON.parse(fs.readFileSync(tmp+'/gi-b4003-writer-before-names.json','utf8'));
+          const x=JSON.parse(fs.readFileSync(tmp+'/gi-b4003-writer-after.json','utf8'));
+          const raw=x.result??x,v=typeof raw==='string'?JSON.parse(raw):raw,rows=Array.isArray(v)?v:Array.isArray(v.functions)?v.functions:[];
+          const after=rows.map(r=>String(r.id||r.name||r.function||'').split('/').pop()).sort();
+          if(JSON.stringify(after)!==JSON.stringify(before))throw Error('NON_TARGET_FUNCTION_LIST_MUTATED');
+          const readback=JSON.parse(fs.readFileSync(tmp+'/gi-b4003-live-sources-after.json','utf8'));
+          if(!readback.writerSourceMatchesCurrent||!readback.rosterSourceMatchesCurrent)throw Error('LIVE_BOTH_BACKEND_REQUIRED_BYTE_PARITIES_NOT_MET');
+          fs.writeFileSync(tmp+'/gi-b4003-writer-exact-result.json',JSON.stringify({gate:'I6.5/B4-003',status:'LIVE_EXACT_PRODUCT_WRITER_SOURCE_BYTES_PASS_FUNCTIONAL_SIGNED_NEGATIVES_AND_HOSTING_NOT_YET_CERTIFIED',runId:process.env.GITHUB_RUN_ID,
+            commit:process.env.GITHUB_SHA,sourceGitBlob:process.env.EXACT_WRITER_GIT_BLOB,functionCountBefore:before.length,functionCountAfter:after.length,onlyDeployed:'orbit360ProductOperationalCommand',readOnlyRosterSourceUnchanged:true,
+            hostingChanged:false,rulesChanged:false,operationalDataWritten:false,productionAccepted:false},null,2)+'\n');
+          NODE
+      - name: Restore exact previous operational writer if deploy/readback fails
+        if: failure() && steps.deploy_and_readback.outcome == 'failure'
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f "$RESTORE_ROOT/backend/product-operational-domain.js"
+          node "$FIREBASE_CLI_BIN" deploy --only functions:orbit360ProductOperationalCommand --config "$RESTORE_ROOT/firebase.json" --project "$PROJECT_ID" --non-interactive
+          node tools/gravicentra-b4-003-live-backend-source-readback.cjs rollback
+          echo 'B4_003_EXACT_WRITER_PREDECESSOR_RECOVERED'
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: gi-b4003-live-writer-parity-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/gi-b4003-live-sources-before.json
+            ${{ runner.temp }}/gi-b4003-live-sources-after.json
+            ${{ runner.temp }}/gi-b4003-live-sources-rollback.json
+            ${{ runner.temp }}/gi-b4003-writer-exact-result.json
+          if-no-files-found: warn
+          retention-days: 30
