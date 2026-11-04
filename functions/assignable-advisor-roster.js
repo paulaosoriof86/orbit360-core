@@ -12,6 +12,9 @@ const norm=v=>text(v,120).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowe
 const unique=a=>Array.from(new Set([].concat(a||[]).map(v=>text(v)).filter(Boolean)));
 const roles=r=>unique([...(Array.isArray(r&&r.roles)?r.roles:[]),...(Array.isArray(r&&r.rolesAsignados)?r.rolesAsignados:[]),r&&r.rol,r&&r.role,r&&r.rolDefault,r&&r.defaultRole]).map(norm);
 const countries=r=>unique([...(Array.isArray(r&&r.paises)?r.paises:[]),...(Array.isArray(r&&r.countries)?r.countries:[]),r&&r.pais,r&&r.country,r&&r.paisDefault,r&&r.countryDefault]).map(v=>text(v,8).toUpperCase());
+// The current membership's explicit country scope is authoritative. Never
+// expand it with stale alternative fields or a target advisor's countries.
+const memberCountries=member=>unique(member&&(member.countries??member.paises??member.paisesAutorizados)).map(v=>text(v,8).toUpperCase()).filter(v=>v==='GT'||v==='CO');
 // Roster rows may have only an activo flag; signed-in membership needs affirmative status.
 const active=r=>!!r&&r.activo!==false&&r.active!==false&&r.inactivo!==true&&!['inactivo','inactive','blocked','bloqueado','eliminado','deleted','pending','pendiente','invited','invitado','suspended','suspendido'].includes(norm(r.estado||r.status));
 function activeMember(member) {
@@ -32,15 +35,17 @@ async function authz(request){
  let role;
  try{role=resolveProductActiveRole(member,request.data?.activeRole).activeRole;}
  catch(_){throw new HttpsError('permission-denied','El rol activo no está asignado.');}
+ const cc=memberCountries(member),wanted=text(request.data?.country,8).toUpperCase();
+ if(!cc.length||wanted&&wanted!=='TODOS'&&!cc.includes(wanted))throw new HttpsError('permission-denied','País no autorizado.');
  const ops=moduleCanAssign(member,access,role,'ops'),leads=moduleCanAssign(member,access,role,'leads');if(!ops&&!leads)throw new HttpsError('permission-denied','El rol activo no puede asignar trabajo en Ops/Leads.');
- if(FULL.has(role))return{tenantId,mode:'full',member,access};if(SELF.has(role))return{tenantId,mode:'self',member,access};
+ if(FULL.has(role))return{tenantId,mode:'full',member,access,countries:cc};if(SELF.has(role))return{tenantId,mode:'self',member,access,countries:cc};
  throw new HttpsError('permission-denied','El rol activo no puede asignar responsables.');
 }
 function project(doc){const r=doc.data()||{},rr=roles(r),ps=countries(r),eligible=rr.includes('asesor')||rr.includes('comercial');return{id:text(r.canonicalDocumentId||r.id||doc.id,160),nombre:text(r.nombre||r.name||r.displayName),activo:active(r),assignable:active(r)&&eligible,roleEligible:eligible,paises:ps,...estadoParticipacion(r)};}
 async function execute(request){
  if(request.data?.purpose==='inicio')return r23Dashboard(request);
  const a=await authz(request),wanted=text(request.data?.country,8).toUpperCase(),snap=await db.collection('tenants').doc(a.tenantId).collection('data').doc('asesores').collection('items').get(),rows=[],seen=new Set();
- for(const doc of snap.docs){const r=project(doc);if(!r.id||!r.nombre||!r.assignable)continue;if(wanted&&wanted!=='TODOS'&&r.paises.length&&!r.paises.includes(wanted))continue;if(a.mode==='self'){const self=text(a.member.advisorId||a.member.asesorId,160);if(!self||r.id!==self)continue;}if(seen.has(r.id))continue;seen.add(r.id);rows.push(r);}
+ for(const doc of snap.docs){const r=project(doc);if(!r.id||!r.nombre||!r.assignable)continue;r.paises=r.paises.filter(country=>a.countries.includes(country));if(!r.paises.length||wanted&&wanted!=='TODOS'&&!r.paises.includes(wanted))continue;if(a.mode==='self'){const self=text(a.member.advisorId||a.member.asesorId,160);if(!self||r.id!==self)continue;}if(seen.has(r.id))continue;seen.add(r.id);rows.push(r);}
  rows.sort((x,y)=>x.nombre.localeCompare(y.nombre,'es',{sensitivity:'base'}));return{ok:true,schemaVersion:VERSION,country:wanted||'',scope:a.mode,rows};
 }
 
@@ -64,7 +69,7 @@ async function r23Dashboard(request){
  const ceiling=SELF.has(role)?(configured&&R23_SCOPE[configured]<R23_SCOPE.own?configured:'own'):(configured||'all');
  const scope=wanted&&R23_SCOPE[wanted]<=R23_SCOPE[ceiling]?wanted:ceiling;
  if(scope==='none')throw new HttpsError('permission-denied','Sin alcance de Inicio');
- const cc=unique(member.countries||member.paises||member.paisesAutorizados).map(v=>text(v,8).toUpperCase()).filter(v=>v==='GT'||v==='CO');
+ const cc=memberCountries(member);
  if(!cc.length||country!=='TODOS'&&!cc.includes(country))throw new HttpsError('permission-denied','País no autorizado');
  const mapping=member.roleVisibleAdvisorIds&&typeof member.roleVisibleAdvisorIds==='object'&&!Array.isArray(member.roleVisibleAdvisorIds)?member.roleVisibleAdvisorIds:{};
  const rm=Object.keys(mapping).find(k=>norm(k)===role),explicitRoleTeam=rm!==undefined;
