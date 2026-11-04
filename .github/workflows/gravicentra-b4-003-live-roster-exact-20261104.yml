@@ -50,7 +50,7 @@ jobs:
             functions/bootstrap.js; do
             test "$(git rev-parse "$SOURCE_ANCHOR:$PATH_IN_SOURCE")" = "$(git rev-parse "HEAD:$PATH_IN_SOURCE")"
           done
-          test "$(rg -c "require\('./assignable-advisor-roster'\)" functions/bootstrap.js)" = '1'
+          test "$(grep -Fc "require('./assignable-advisor-roster')" functions/bootstrap.js)" = '1'
           node --check functions/bootstrap.js
           node --check functions/assignable-advisor-roster.js
           node tools/gravicentra-b4-003-inicio-role-country-team.test.cjs
