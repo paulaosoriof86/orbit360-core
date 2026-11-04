@@ -1488,7 +1488,7 @@ Orbit.ciclo = (function () {
   function chkRow(ns, i, c) { return `<label class="chk-row"><input type="checkbox" data-chk="${i}" ${c.done ? 'checked' : ''}><span class="${c.done ? 'done' : ''}">${U.esc(c.t)}</span></label>`; }
   function humanCommentAuthor(c){
     const raw=String(c&&(c.actorName||c.user)||'').trim(),uid=String(c&&c.actorUid||'').trim();
-    const validName=n=>{const x=String(n||'').trim();return x&&!x.includes('@')&&!/^(AdminTenant|SuperAdmin|Direcci[oó]n|Operativo|Asesor|Comercial|Admin|unknown|undefined|Usuario autenticado|Usuario del equipo|Usuario autorizado|Orbit(?:\s*360)?\s*LAB|QA|LAB|Test)$/i.test(x)&&!/^(?:uid|auth|member|user)[:_-]/i.test(x)&&!/^[A-Za-z0-9_-]{24,}$/.test(x);};
+    const validName=n=>{const x=String(n||'').trim();return x&&!x.includes('@')&&!/^(AdminTenant|SuperAdmin|Direcci[oó]n|Operativo|Asesor|Comercial|Admin|unknown|undefined|Usuario autenticado|Usuario del equipo)$/i.test(x)&&!/^(?:uid|auth|member|user)[:_-]/i.test(x)&&!/^[A-Za-z0-9_-]{24,}$/.test(x);};
     if(uid){try{const me=currentUserIdentity();if(me.uid===uid&&validName(me.name))return me.name;}catch(_){}}
     for(const coll of ['usuarios','users','members','asesores']){
       try{const u=uid?S().get(coll,uid):null;const direct=u&&(u.nombre||u.displayName||u.name);if(validName(direct))return String(direct).trim();
