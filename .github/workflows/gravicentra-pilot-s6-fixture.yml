@@ -2,6 +2,16 @@ name: Gravicentra Pilot S6 Synthetic Fixture
 
 on:
   workflow_dispatch:
+    inputs:
+      b4003_mode:
+        description: 'B4-003 reusable human QA fixture for frozen Preview; choose create or cleanup'
+        required: true
+        type: choice
+        default: none
+        options:
+          - none
+          - create
+          - cleanup
   push:
     branches:
       - recovery/fase-a-clean-20260831
@@ -113,3 +123,142 @@ jobs:
           if-no-files-found: error
           compression-level: 0
           retention-days: 14
+
+  b4003-frozen-preview-synthetic:
+    # Extension of the EXISTING synthetic-fixture workflow; no product build, rules or LIVE deployment.
+    if: github.event_name == 'workflow_dispatch' && (inputs.b4003_mode == 'create' || inputs.b4003_mode == 'cleanup')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    env:
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      B3_004_HUMAN_FIXTURE_MODE: ${{ inputs.b4003_mode }}
+      B3_004_HUMAN_FIXTURE_OUT: ${{ runner.temp }}/b4003-fixture-result.json
+      B3_PREVIEW_URL: https://ays-orbit-360-lab--gi-i65-b4-rc-41765742748-neoi3u7r.web.app
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 1
+          persist-credentials: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Fail closed on exact canonical gate and frozen artifact
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = 'recovery/fase-a-clean-20260831'
+          test "$PROJECT_ID" = 'ays-orbit-360-lab'
+          test "$TENANT_HINT" = 'alianzas-soluciones'
+          node --check tools/gravicentra-i6-5-b3-004-human-fixture.mjs
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const c=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json','utf8'));
+          const f=c.b4003DecisionFreezeAndSingleCertificationCursor20261103;
+          const q=f?.currentCandidate;
+          if(f?.status!=='FROZEN_ACTIVE_FOR_CURRENT_B4_003_CONTROLLED_LIVE_DECISION' ||
+             q?.sourceSha!=='3bf9996da14fa1799dd3671581aad706d754d218' ||
+             q?.buildId!=='gi-i65-b4-3bf9996da14f-57f234755dc1' ||
+             q?.previewUrl!=='https://ays-orbit-360-lab--gi-i65-b4-rc-41765742748-neoi3u7r.web.app/' ||
+             f?.metrics?.b4003Closed!==false ||
+             f?.metrics?.productionAuthorized!==false)throw Error('B4003_FROZEN_GATE_OR_CANDIDATE_DRIFT');
+          console.log('B4003_FROZEN_ARTIFACT_GATE=PASS');
+          NODE
+
+      - name: Select existing LAB identity without printing credentials
+        run: |
+          set -euo pipefail
+          node - <<'NODE'
+          const fs=require('node:fs'),path=require('node:path');
+          let selected;
+          for(const k of ['SA_ORBIT360_LAB','SA_ORBIT_360_LAB','SA_DEFAULT']){
+            try{const c=JSON.parse(process.env[k]||'');if(c?.type==='service_account'&&c.project_id==='ays-orbit-360-lab'&&c.private_key?.includes('PRIVATE KEY')){selected=c;break;}}catch(_){}
+          }
+          if(!selected)throw Error('B4003_LAB_IDENTITY_NOT_AVAILABLE');
+          const p=path.join(process.env.RUNNER_TEMP,'b4003-fixture-identity.json');
+          fs.writeFileSync(p,JSON.stringify(selected),{mode:0o600,flag:'wx'});
+          fs.appendFileSync(process.env.GITHUB_ENV,'GOOGLE_APPLICATION_CREDENTIALS='+p+'\n');
+          console.log('B4003_EXACT_LAB_IDENTITY_READY');
+          NODE
+
+      - name: Install existing fixture dependency
+        run: npm install --no-save --package-lock=false firebase-admin@13.4.0 >/dev/null
+
+      - name: Preflight only four reserved IDs and direct QA-linked evidence
+        run: |
+          set -euo pipefail
+          node --input-type=module - <<'NODE'
+          import {initializeApp,applicationDefault} from 'firebase-admin/app';
+          import {getFirestore} from 'firebase-admin/firestore';
+          const a=initializeApp({credential:applicationDefault(),projectId:'ays-orbit-360-lab'}),db=getFirestore(a);
+          const tenant=db.collection('tenants').doc('alianzas-soluciones'),root=tenant.collection('data');
+          const receiptIds=['b3004human_receipt_r11','b3004human_receipt_r12'];
+          for(const rev of ['r11','r12']){
+            for(const [entity,collection] of [['client','clientes'],['policy','polizas'],['receipt','recibosEsperados'],['portfolio','carteraPrimas']]){
+              const id='b3004human_'+entity+'_'+rev,s=await root.doc(collection).collection('items').doc(id).get();
+              if(s.exists && s.data()?.__syntheticHumanQa!==true)throw Error('B4003_NON_SYNTHETIC_ID_COLLISION');
+            }
+          }
+          for(const rid of receiptIds){
+            const snaps=await Promise.all([
+              root.doc('cobros').collection('items').where('reciboId','==',rid).get(),
+              tenant.collection('reconciliationRequests').where('reciboId','==',rid).get(),
+              tenant.collection('reconciliationRequests').where('result.receiptId','==',rid).get(),
+              tenant.collection('reconciliationEvents').where('receiptId','==',rid).get()
+            ]);
+            if(snaps.some(s=>s.size>10))throw Error('B4003_QA_EVIDENCE_UNEXPECTED_VOLUME');
+          }
+          console.log('B4003_FOUR_RESERVED_IDS_AND_DIRECT_EVIDENCE_PREFLIGHT=PASS');
+          NODE
+
+      - name: Create or clean only original B3-004 R12 synthetic fixture
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-i6-5-b3-004-human-fixture.mjs
+          node --input-type=module - <<'NODE'
+          import fs from 'node:fs';
+          import {initializeApp,applicationDefault} from 'firebase-admin/app';
+          import {getFirestore} from 'firebase-admin/firestore';
+          const a=initializeApp({credential:applicationDefault(),projectId:'ays-orbit-360-lab'}),db=getFirestore(a);
+          const tenant=db.collection('tenants').doc('alianzas-soluciones'),root=tenant.collection('data');
+          const x=JSON.parse(fs.readFileSync(process.env.B3_004_HUMAN_FIXTURE_OUT,'utf8'));
+          const mode=process.env.B3_004_HUMAN_FIXTURE_MODE;
+          const checks={};
+          for(const rev of ['r11','r12']){
+            for(const [entity,collection] of [['client','clientes'],['policy','polizas'],['receipt','recibosEsperados'],['portfolio','carteraPrimas']]){
+              const id='b3004human_'+entity+'_'+rev,s=await root.doc(collection).collection('items').doc(id).get();
+              checks[id]=s.exists;
+              if(s.exists && s.data()?.__syntheticHumanQa!==true)throw Error('B4003_NON_SYNTHETIC_POSTCONDITION');
+              if(mode==='cleanup'&&s.exists)throw Error('B4003_CLEANUP_RESIDUE');
+              if(mode==='create'&&rev==='r12'&&!s.exists)throw Error('B4003_CREATE_NOT_PERSISTED');
+            }
+          }
+          const linked=[];
+          for(const rev of ['r11','r12']){
+            const rid='b3004human_receipt_'+rev;
+            const snaps=await Promise.all([
+              root.doc('cobros').collection('items').where('reciboId','==',rid).get(),
+              tenant.collection('reconciliationRequests').where('reciboId','==',rid).get(),
+              tenant.collection('reconciliationRequests').where('result.receiptId','==',rid).get(),
+              tenant.collection('reconciliationEvents').where('receiptId','==',rid).get()
+            ]);
+            linked.push(...snaps.map(s=>s.size));
+          }
+          if(mode==='cleanup'&&linked.some(n=>n!==0))throw Error('B4003_QA_LINKED_RESIDUE');
+          const result={schema:'GI_B4003_FROZEN_CANDIDATE_SYNTHETIC_FIXTURE_READBACK_V1',mode,status:mode==='create'?'READY':'CLEANED',sourceSha:'3bf9996da14fa1799dd3671581aad706d754d218',buildId:'gi-i65-b4-3bf9996da14f-57f234755dc1',ids:x.ids,amount:mode==='create'?x.amount:0,actualDocuments:checks,linkedEvidenceCounts:linked,operationalDataTouched:false,liveDeployed:false,readbackPass:true,runId:process.env.GITHUB_RUN_ID};
+          fs.writeFileSync(process.env.B3_004_HUMAN_FIXTURE_OUT,JSON.stringify(result,null,2)+'\n');
+          console.log('B4003_SYNTHETIC_'+result.status+'_READBACK=PASS');
+          NODE
+
+      - name: Preserve synthetic fixture evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gravicentra-b4003-frozen-fixture-${{ inputs.b4003_mode }}-${{ github.run_id }}
+          path: ${{ runner.temp }}/b4003-fixture-result.json
+          if-no-files-found: warn
+          compression-level: 0
+          retention-days: 30
