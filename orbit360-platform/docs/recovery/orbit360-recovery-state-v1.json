@@ -10,7 +10,7 @@
   "branch": "recovery/fase-a-clean-20260831",
   "forensicOriginSha": "9c95f31461f2eabe9804625b5659bee772f5602a",
   "createdAtUtc": "2026-08-31T18:00:00Z",
-  "updatedAtUtc": "2026-11-04T02:49:48.464Z",
+  "updatedAtUtc": "2026-11-04T10:38:27.426Z",
   "status": "ITERATION_2_SOURCE_MATERIALIZED_VALIDATION_PENDING",
   "currentIteration": 2,
   "lastCompletedIteration": 1,
@@ -18,7 +18,7 @@
   "targetProductionDate": "2026-08-31",
   "dataRefreshIteration": 6,
   "productionAccepted": false,
-  "productionTouchedByRecovery": false,
+  "productionTouchedByRecovery": true,
   "dataTouchedByRecovery": true,
   "dataCutoff": "2026-07-31",
   "dataRefreshFrom": "2026-08-01",
@@ -187,7 +187,7 @@
     "phaseAIterationStatuses": "HISTORICAL_FIELDS_ABOVE_PRESERVED_UNTIL_FORMAL_GATE_EVIDENCE;_NO_NEW_PASS_INFERRED",
     "labDataWriteScope": "ONLY_35_AUTHORIZED_COUNTRY_FIELDS;_NO_AUGUST_REFRESH"
   },
-  "nextAction": "I6.5/B4-003: run immutable exact Hosting Preview for E4 PDF full-row fix 2f9eec5, verify deployed bytes and retained artifact, then focal Paula/Samuel signed UAT, reconcile 13 GT Reportes/Cobros IDs and CO client links; retain Carlos signed UAT, no reimport, no Firestore Rules waiver reversal; LIVE only after exact gates.",
+  "nextAction": "ACTIVE I6.5/B4-003 (2026-11-04): production read-only roster exactly deployed and read back 80→81 in GitHub Actions run 41814805932; do not redeploy or re-audit it. Reuse signed Carlos/Samuel Preview UAT and synthetic write/restore. Next only: independent authenticated backend cross-UID role/country/team negative tests and production writer source parity; adjudicate remaining five P0 and transversal Ops/Leads human-name partial; if release gates truly pass, promote frozen 66012815 exact Hosting artifact 13311178353 and certify each module LIVE, with rollback. Firestore Rules owner-accepted risk is not a security PASS and alone is not current gate. No data reimport, new candidate, branch, or routine preview.",
   "sourceOfTruth": {
     "projectBoundaryPrevalentAddendum": "orbit360-platform/docs/recovery/ADDENDUM_PREVALENTE_CHATGPT_PROJECT_BOUNDARY_20260831.md",
     "mutableState": "orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json",
@@ -215,5 +215,32 @@
     "dataWritesInThisChange": 0,
     "createdUtc": "2026-11-04T02:49:48.464Z",
     "condition": "CURRENT_GATE_B4_003_NO_HISTORICAL_PASS_OVERWRITE"
+  },
+  "b4003LiveRosterAndActiveCursor20261104": {
+    "gate": "I6.5/B4-003",
+    "status": "LIVE_READONLY_ROSTER_ONE_FUNCTION_PASS_ENTIRE_B4_HOLD",
+    "latestSourceSha": "66012815b42c0cc26cb372c19f74d52bddba953d",
+    "buildId": "gi-i65-b4-66012815b42c-57f234755dc1",
+    "immutablePreviewUrl": "https://ays-orbit-360-lab--gi-i65-b4-rc-41765742748-neoi3u7r.web.app/",
+    "immutableHostingArtifactId": 13311178353,
+    "liveBackendRoster": {
+      "name": "orbit360AssignableAdvisorRoster",
+      "deploymentRun": 41814805932,
+      "receipt": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_LIVE_READONLY_ROSTER_DEPLOY_SUCCESS_20261104.json",
+      "beforeFunctions": 80,
+      "afterFunctions": 81,
+      "unchangedHosting": true,
+      "unchangedRules": true,
+      "unchangedBusinessData": true
+    },
+    "signedFunctionalUat": "REUSE_PREVIOUS_CARLOS_SAMUEL_AND_SYNTHETIC_WRITES_NO_REPEAT",
+    "opsLeadsIdentity": "PARTIAL_NOT_TRANSVERSAL_PASS",
+    "backendAuthenticatedNegatives": "PENDING",
+    "liveOperationalWriterParity": "PENDING",
+    "historicalP0": "1_OF_6_CLOSED",
+    "formalI6Percent": 50,
+    "ownerTemporaryRulesException": "ACCEPTED_TEMPORARILY_NOT_SECURITY_PASS",
+    "productionAccepted": false,
+    "controlPlanePointer": "b4003ActiveResumeCursor20261104"
   }
 }
