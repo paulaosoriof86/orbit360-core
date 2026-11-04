@@ -151,8 +151,8 @@ const denied=async(fn,code)=>assert.rejects(fn,e=>e instanceof Denied&&e.code===
    'Operativo policy portfolio is all in every authorized country');checks++;
   assert.equal(scopeFor('opLegacyOwn','vehiculos').scope,'all',
    'Operativo vehicle portfolio matches the approved policy scope');checks++;
-  assert.equal(scopeFor('opLegacyOwn','recibosEsperados').scope,'own',
-   'Non-portfolio collections preserve their former member scope');checks++;
+  assert.equal(scopeFor('opLegacyOwn','recibosEsperados').scope,'all',
+   'Confirmed financial portfolio: Operativo reads authorized-country expected receipts');checks++;
   assert.equal(scopeFor('opModuleOwn','reclamos').scope,'own',
    'Another collection sharing module cliente360 must not widen');checks++;
   assert.equal(scopeFor('opLegacyOwn','clientes',{roleScopes:{operativo:'team'}}).scope,'own',

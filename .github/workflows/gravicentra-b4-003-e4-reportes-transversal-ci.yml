@@ -14,6 +14,7 @@ on:
       - orbit360-platform/core/tenant-access-policy-effective-p0.js
       - functions/b4-003-scoped-access-boundary.js
       - tools/gravicentra-b4-003-financial-role-scope-transversal.test.cjs
+      - tools/gravicentra-b4-003-client-list-transversal-readonly.test.cjs
       - tools/gravicentra-b4-003-reportes-e4-transversal.test.cjs
       - tools/gravicentra-b4-003-renovaciones-qa-provenance.test.cjs
       - .github/workflows/gravicentra-b4-003-e4-reportes-transversal-ci.yml
@@ -30,6 +31,7 @@ on:
       - orbit360-platform/core/tenant-access-policy-effective-p0.js
       - functions/b4-003-scoped-access-boundary.js
       - tools/gravicentra-b4-003-financial-role-scope-transversal.test.cjs
+      - tools/gravicentra-b4-003-client-list-transversal-readonly.test.cjs
       - tools/gravicentra-b4-003-reportes-e4-transversal.test.cjs
       - tools/gravicentra-b4-003-renovaciones-qa-provenance.test.cjs
       - .github/workflows/gravicentra-b4-003-e4-reportes-transversal-ci.yml
