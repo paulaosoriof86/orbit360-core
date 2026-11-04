@@ -258,11 +258,11 @@ jobs:
       - name: Prove single-file transport successor and immutable source parent
         run: |
           set -euo pipefail
-          test "$(git rev-parse HEAD^)" = '46c78421ef800b4949ac93d5ceef70b5427c5279'
-          test "$(git diff --name-only "$SOURCE_SHA" HEAD)" = '.github/workflows/gravicentra-b4-003-immutable-candidate-preview.yml'
-          test "$(git rev-parse "$SOURCE_SHA":functions/b4-003-scoped-policy-reader.js)" = '8589c7da6e118c7a32232125fb0ab0383ff581c8'
-          test "$(git rev-parse "$SOURCE_SHA":orbit360-platform/modules/polizas.js)" = '7fbb84ce77ffba0c0ffb8c3051ca579c5989d70f'
-          test "$(git rev-parse "$SOURCE_SHA":orbit360-platform/modules/policy-receipts-v1199-detail-guard.js)" = 'c3d4f685638b27bfe2ef75b6f2d3759b4083bc83'
+          test "$(git rev-parse HEAD^)" = 'd41f35c20f4dc6f3228e094b16051d159ac26d37'
+          test "$(git diff --name-only HEAD^ HEAD)" = '.github/workflows/gravicentra-b4-003-immutable-candidate-preview.yml'
+          test "$(git rev-parse HEAD^:functions/b4-003-scoped-policy-reader.js)" = '8589c7da6e118c7a32232125fb0ab0383ff581c8'
+          test "$(git rev-parse HEAD^:orbit360-platform/modules/polizas.js)" = '7fbb84ce77ffba0c0ffb8c3051ca579c5989d70f'
+          test "$(git rev-parse HEAD^:orbit360-platform/modules/policy-receipts-v1199-detail-guard.js)" = 'c3d4f685638b27bfe2ef75b6f2d3759b4083bc83'
       - name: Recover EXACT retained 41789586526 bundle; do not rebuild
         uses: actions/download-artifact@v4
         with:
