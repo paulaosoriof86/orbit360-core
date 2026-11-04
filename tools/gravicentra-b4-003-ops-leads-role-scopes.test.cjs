@@ -106,3 +106,15 @@ assert.equal(accessAdmin.canManage(multi,'access','operativo'),false,'CONFIG_OPE
 assert.equal(accessAdmin.canManage(multi,'access','admin'),true,'CONFIG_APPROVED_ADMIN_PRESERVED');
 securityChecks+=3;
 console.log('B4_003_C03_FOUR_OWNER_MEMBERSHIP_QA_PASS checks='+securityChecks+' mock_only_no_writes');
+
+// Shared actor identity across every Ops/Leads card: no role/email as author.
+const actor=grab('orbit360-platform/core/ciclo.js','function currentUserIdentity(){','function currentUserName(){','currentUserIdentity',{
+ Orbit:{auth:{productUser:{uid:'u123',email:'technical@example.test'}}},document:{querySelector:()=>null}
+});
+assert.equal(actor.currentUserIdentity().uid,'u123');
+assert.equal(actor.currentUserIdentity().name,'Usuario del equipo','UNKNOWN_HUMAN_NAME_NEVER_FALLS_BACK_TO_EMAIL');
+assert.doesNotMatch(sourceCycle,/user:\s*\(Orbit\.session\s*\?\s*Orbit\.session\.rol\(\)/,'ROLE_LABEL_CANNOT_BE_COLLABORATIVE_AUTHOR');
+assert.match(sourceCycle,/campo: 'Checklist'.*actorUid:actor\.uid,actorName:actor\.name|actorUid:actor\.uid,actorName:actor\.name, campo: 'Checklist'/,'OPS_CHECKLIST_AUDIT_HAS_HUMAN_ACTOR');
+assert.match(sourceCycle,/actorUid:actor\.uid,actorName:actor\.name, campo: 'Nota'/,'OPS_NOTE_AUDIT_HAS_HUMAN_ACTOR');
+assert.match(sourceCycle,/email: o\.email \|\| '', actorUid:actor\.uid,actorName:actor\.name/,'OPS_NOTICES_HAVE_HUMAN_ACTOR_IDENTITY');
+console.log('B4_003_OPS_LEADS_HUMAN_ACTOR_TRANSVERSAL_SOURCE_PASS checks=6 synthetic_only_historical_names_still_need_signed_uat');
