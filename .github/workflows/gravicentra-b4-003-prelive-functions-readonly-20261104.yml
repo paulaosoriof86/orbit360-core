@@ -72,21 +72,23 @@ jobs:
           node - <<'NODE'
           const fs=require('fs');
           const data=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/gi-b4003-function-raw.json','utf8'));
-          const rows=Array.isArray(data.result)?data.result:Array.isArray(data)?data:[];
+          const raw=data.result??data; const decoded=typeof raw==='string'?JSON.parse(raw):raw;
+          const rows=Array.isArray(decoded)?decoded:Array.isArray(decoded?.functions)?decoded.functions:Array.isArray(decoded?.result)?decoded.result:[];
+          const functionName=r=>String(r.id||r.name||r.function||r.entryPoint||'').split('/').pop();
           const names=['orbit360AssignableAdvisorRoster','orbit360AssignableAdvisorRosterPreview','orbit360AssignableAdvisorRosterGoalsPreview','orbit360ProductOperationalCommand','orbit360ProductOperationalCommandPreview','orbit360ProductOperationalCommandGoalsPreview','orbit360ScopedPolicyRead'];
           const result=names.map(name=>{
-            const m=rows.find(r=>String(r.id||r.name||r.function||'').split('/').pop()===name);
+            const m=rows.find(r=>functionName(r).toLowerCase()===name.toLowerCase());
             return {name,present:!!m,region:String(m?.region||m?.location||''),runtime:String(m?.runtime||''),status:String(m?.status||m?.state||''),updatedAt:String(m?.updateTime||m?.updatedAt||''),generation:String(m?.platform||m?.generation||'')};
           });
           const snapshot={schema:'B4003_PRELIVE_EXISTING_FUNCTIONS_READONLY_V1',gate:'I6.5/B4-003',recordedAt:new Date().toISOString(),
             candidateSourceSha:'66012815b42c0cc26cb372c19f74d52bddba953d',candidateBuildId:'gi-i65-b4-66012815b42c-57f234755dc1',
             projectId:process.env.PROJECT_ID,mode:'READ_ONLY_NO_DEPLOY',
-            functions:result,prodNamesPresent:result.filter(x=>['orbit360AssignableAdvisorRoster','orbit360ProductOperationalCommand'].includes(x.name)).every(x=>x.present),
+            inventoryShape:{outerKeys:Object.keys(data),innerKeys:Array.isArray(decoded)?[]:Object.keys(decoded??{}),rawCount:rows.length,discoveredFunctionNames:rows.map(functionName).slice(0,140)},functions:result,prodNamesPresent:result.filter(x=>['orbit360AssignableAdvisorRoster','orbit360ProductOperationalCommand'].includes(x.name)).every(x=>x.present),
             codeParityProven:false,backendWrites:0,rulesWrites:0,hostingWrites:0,dataWrites:0,livePromotion:false,
             nextStep:'Use dates/revisions to determine whether production callable needs exact source deployment; inventory cannot attest code parity.'};
           const path=process.env.RUNNER_TEMP+'/gi-b4003-prelive-readonly.json';
           fs.writeFileSync(path,JSON.stringify(snapshot,null,2)+'\n');
-          console.log(JSON.stringify({gate:snapshot.gate,mode:snapshot.mode,productionNamesPresent:snapshot.prodNamesPresent,functions:result.map(x=>({name:x.name,present:x.present,updatedAt:x.updatedAt}))}));
+          console.log(JSON.stringify({gate:snapshot.gate,mode:snapshot.mode,inventoryShape:snapshot.inventoryShape,productionNamesPresent:snapshot.prodNamesPresent,functions:result.map(x=>({name:x.name,present:x.present,updatedAt:x.updatedAt}))}));
           if(!snapshot.prodNamesPresent)process.exitCode=1;
           NODE
       - uses: actions/upload-artifact@v4
