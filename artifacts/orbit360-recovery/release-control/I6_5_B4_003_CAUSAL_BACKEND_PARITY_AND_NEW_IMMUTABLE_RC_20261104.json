@@ -1,0 +1,105 @@
+{
+  "schema": "I6_5_B4_003_CAUSAL_BACKEND_PARITY_AND_NEW_IMMUTABLE_RC_V1",
+  "recordDate": "2026-11-04",
+  "gate": "I6.5/B4-003",
+  "status": "BACKEND_SINGLE_FUNCTION_PARITY_AND_NEW_PREVIEW_BYTES_PASS_B4003_REMAINING_HOLD",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "backend": {
+    "prodRoster": {
+      "function": "orbit360AssignableAdvisorRoster",
+      "originalDeployRun": 41814805932,
+      "countryScopeFixRun": 41816232334,
+      "status": "PASS_EXACT_SOURCE_READBACK",
+      "gitBlob": "9778d74b6d305ff56caf73bb68be3dadac4b14ce",
+      "roleCountrySyntheticChecks": 42
+    },
+    "prodWriter": {
+      "function": "orbit360ProductOperationalCommand",
+      "originalDeployedGitBlob": "83750fd2d0b10402b5ebcf646c532bf68e857cd6",
+      "currentDeployedGitBlob": "b3d0059457142659633498c9c52c6b84ea68200f",
+      "parityDeployRun": 41817078148,
+      "status": "PASS_EXACT_SOURCE_READBACK",
+      "targetOnly": true,
+      "predecessorRollbackPreparedNotUsed": true
+    },
+    "functionsBeforeAndAfter": 81,
+    "otherFunctionChangedByTheseDeploys": false,
+    "hostingChangedByTheseDeploys": false,
+    "firestoreRulesChanged": false,
+    "authIamOrBusinessDataChanged": false,
+    "independentSignedUidBackendNegativeCertified": false
+  },
+  "latestImmutableHosting": {
+    "sourceSha": "b094619281c1f2ccef7e08335adedc76cf878bbc",
+    "buildId": "gi-i65-b4-b094619281c1-57f234755dc1",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-rc-41765742748-neoi3u7r.web.app/",
+    "workflowRunId": 41817684940,
+    "workflowConclusion": "success",
+    "retainedArtifactId": 13315537234,
+    "retainedArtifactZipSha256": "9747c1ef0127df6ae711b6dca1c257d27dec4ed9f493458ae48d7bb00cf75429",
+    "previewReadbackArtifactId": 13314689622,
+    "previewReadbackPass": true,
+    "serverFilesByteCompared": [
+      "__recovery__/build.json",
+      "product-runtime-config.js",
+      "index.html",
+      "core/ciclo.js",
+      "core/assignable-advisor-roster-client.js",
+      "modules/polizas.js",
+      "modules/cobros.js",
+      "modules/reportes.js",
+      "modules/renovaciones.js",
+      "modules/cancelaciones.js"
+    ],
+    "previousArtifact": "13311178353 SUPERSEDED for release because source changed after build",
+    "productionHostingChanged": false,
+    "productionDomainChanged": false
+  },
+  "newlyAuthenticatedCarlosPreviewReadOnly": {
+    "actor": "Carlos Castro",
+    "uid": "SIGNED_REAL_USER_BROWSER_UID_NOT_LOGGED",
+    "activeRole": "Operativo",
+    "country": "TODOS",
+    "inicioHydration": "5_OF_5_SOURCE_CONFIRMED",
+    "clientesVisible": 440,
+    "polizasVisible": 1425,
+    "cobrosConfirmados": 5,
+    "overdueObligationsVisible": 677,
+    "opsLeadsSameOpportunity": "B4-003 QA colaboración",
+    "collaborationAuthorsVisible": [
+      "Carlos Castro",
+      "Paula Osorio",
+      "Paula Osorio",
+      "Usuario del equipo"
+    ],
+    "historicUnknownAuthorCount": 1,
+    "technicalIdsOrEmailsShownForTheseAuthors": 0,
+    "latestCicloSourceEnsuresFutureNoteChecklistNoticeActorUidAndActorName": true,
+    "note": "This is positive real signed UI only, not live production or independent negative backend certification."
+  },
+  "acceptance": {
+    "b4003Closed": false,
+    "formalI6Percent": 50,
+    "p0Closed": 1,
+    "p0Total": 6,
+    "remainingFiveHistoricalP0": [
+      "B4-003-P0-20261012-PERSONAL-COLLECTION",
+      "B4-003-P0-20261012-FREELANCERS-GOAL-SCOPE",
+      "B4-003-P0-20261012-INICIO-MOTIVATIONAL-TEXTS",
+      "B4-003-P0-20261012-QA-CANCELLED-RUN-FIXTURES",
+      "B4-003-P0-20261012-QA-ORPHAN-RENEWALS"
+    ],
+    "ownerRulesException": "TEMPORARILY_ACCEPTED_NOT_A_SECURITY_PASS_AND_NOT_REOPENED",
+    "e4ExportByteInspection": "OWNER_DEFERRED_POSTPRODUCTION_NOT_RELEASE_BLOCKER",
+    "syntheticWriteReloadRestore": "PREVIOUS_PASS_WITH_ZERO_RESIDUE_REUSED",
+    "notYetPassed": [
+      "independent signed backend negative permissions for effective UID role country team",
+      "authenticated affected Ops/Leads future human-name write reload and historic unknown-author disposition",
+      "5 P0 direct dispositions",
+      "same retained artifact production Hosting promotion",
+      "postdeploy live module-by-module readbacks with actual writes, integrity, rollback"
+    ]
+  },
+  "nextCursor": "CONCLUDE_ONLY_REMAINING_INDEPENDENT_AUTHENTICATED_NEGATIVES_AND_FIVE_P0_DISPOSITIONS; IF ACTUALLY_ACCEPTED_PROMOTE_ARTIFACT_13315537234_EXACT_SAME_BYTES_AND_EXECUTE_LIVE_MODULE_MATRIX; NO_ROUTINE_NEW_PREVIEW_OR_BROAD_REAUDIT"
+}
