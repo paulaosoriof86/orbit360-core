@@ -90,11 +90,12 @@
       }
     ],
     "coReportesCarteraCobros": 56,
-    "gtReportesCarteraCobros": "2503 PHYSICAL SOURCE CI, UI IN HEAVY TABLE LOAD NOT CERTIFIED",
-    "mutationCount": 0
+    "gtReportesCarteraCobros": 2503,
+    "mutationCount": 0,
+    "gtReportesReadback": "SIGNED_SAMUEL_CHROME_GT_COUNTRY_REPORTES_2503_PASS"
   },
   "releaseRemainder": {
-    "gtReportesSignedUi": "PENDING_CHROME_HEAVY_RENDER",
+    "gtReportesSignedUi": "PASS_ON_EXACT_BUILD_3bf9996da14f",
     "exportCsvExcelPdfRealBytes": "PENDING",
     "independentBackendNegativeUidScope": "PENDING",
     "approvedSyntheticWriteReloadRestore": "PENDING",
