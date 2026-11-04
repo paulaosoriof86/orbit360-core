@@ -125,6 +125,27 @@ function audit(data) {
   const privateFindings = [];
   for (const country of ['GT', 'CO', 'TODOS']) {
     const out = runtime(data, country);
+    // Cobros screen is NOT the same stream as its Reportes bridge: the latter
+    // explicitly removes 'Anulado'. This was the unclassified GT delta.
+    const ownerIdCounts = new Map();
+    out.bridge.forEach(row => {
+      const id = clean(row.id);
+      ownerIdCounts.set(id, (ownerIdCounts.get(id) || 0) + 1);
+    });
+    const screenOnly = out.listed.filter(row => {
+      const id = clean(row.id), available = ownerIdCounts.get(id) || 0;
+      if (!available) return true;
+      ownerIdCounts.set(id, available - 1);
+      return false;
+    });
+    const screenOnlyByKind = {};
+    const screenOnlyByState = {};
+    for (const row of screenOnly) {
+      const kind = row.__receiptPaymentEvidence ? 'receipt_evidence' : row.__portfolioReceipt ? 'portfolio_projection' : 'direct_cobro';
+      const state = clean(row.estado) || 'UNSET';
+      screenOnlyByKind[kind] = (screenOnlyByKind[kind] || 0) + 1;
+      screenOnlyByState[state] = (screenOnlyByState[state] || 0) + 1;
+    }
     const reportIds = out.renderedReport.map(x => clean(x.id));
     const reportIdCounts = new Map();
     reportIds.forEach(id => reportIdCounts.set(id, (reportIdCounts.get(id) || 0) + 1));
@@ -143,6 +164,8 @@ function audit(data) {
       cobrosListed: out.listed.length, direct: out.direct.length, portfolio: out.portfolio.length,
       receiptEvidence: out.reported.length, ownerBridge: out.bridge.length,
       reportesCommercial: out.renderedReport.length,
+      onlyInCobrosScreen: screenOnly.length,
+      screenOnlyByState, screenOnlyByKind,
       onlyInCobrosOwner: missing.length, onlyInReportes: onlyReport,
       exclusionsByCause: causes,
       previewCountsMatchSigned: country === 'GT' ? out.listed.length === 2516 && out.renderedReport.length === 2503
@@ -151,11 +174,29 @@ function audit(data) {
       duplicateCobrosIds: out.listed.length - new Set(out.listed.map(x => clean(x.id))).size
     };
     summary.result[country] = counts;
+    for (const row of screenOnly) {
+      if (privateFindings.length >= 150) continue;
+      const policy = row.polizaId ? out.Orbit.store.get('polizas', row.polizaId) : null;
+      const receipt = row.receiptId ? out.Orbit.store.get('recibosEsperados', row.receiptId) : null;
+      privateFindings.push({
+        stage: 'COBROS_SCREEN_TO_OWNER_BRIDGE', inView: country,
+        classification: row.estado === 'Anulado' ? 'ANULADO_ONLY_SCREEN' : 'OTHER_BRIDGE_EXCLUSION',
+        itemId: clean(row.id), kind: row.__receiptPaymentEvidence ? 'receipt_evidence' : row.__portfolioReceipt ? 'portfolio_projection' : 'direct_cobro',
+        receiptId: clean(row.receiptId || row.reciboId), policyNumber: clean(policy && policy.numero),
+        policyId: clean(row.polizaId), clientId: clean(row.clienteId),
+        state: clean(row.estado), receiptState: clean(receipt && receipt.estado),
+        receiptOperationalState: clean(receipt && receipt.estadoOperativo),
+        receiptSourceType: clean(receipt && receipt.sourceType),
+        sourceCountry: clean(row.pais), policyCountry: clean(policy && policy.pais),
+        synthetic: !!(row.__syntheticQa || row.syntheticQa)
+      });
+    }
     for (const { row, classification } of missing) {
       if (privateFindings.length >= 150) continue;
       const policy = row.polizaId ? out.Orbit.store.get('polizas', row.polizaId) : null;
       const insurer = row.aseguradoraId ? out.Orbit.store.get('aseguradoras', row.aseguradoraId) : null;
       privateFindings.push({
+        stage: 'OWNER_BRIDGE_TO_COMMERCIAL_REPORT',
         inView: country, classification,
         itemId: clean(row.id), itemKind: row.__portfolioReceipt ? 'projected_portfolio' : row.__receiptPaymentEvidence ? 'receipt_evidence' : 'cobro',
         receiptId: clean(row.receiptId || row.reciboId), policyNumber: clean(policy && policy.numero),
@@ -168,7 +209,8 @@ function audit(data) {
     }
   }
   summary.allSignedCountsReproduced = Object.values(summary.result).every(item => item.previewCountsMatchSigned);
-  summary.exactExcludedCount = privateFindings.filter(x => x.inView === 'GT').length;
+  summary.gtScreenToOwnerExcluded = summary.result.GT.onlyInCobrosScreen;
+  summary.gtOwnerToReportExcluded = summary.result.GT.onlyInCobrosOwner;
   summary.encryptedItemDetailsCount = privateFindings.length;
   return { summary, privateFindings };
 }
@@ -209,16 +251,20 @@ function selfTest() {
     aseguradoras: [{ id: 'ig', pais: 'GT' }, { id: 'ic', pais: 'CO' }],
     polizas: [{ id: 'pg', pais: 'GT', clienteId: 'gt', aseguradoraId: 'ig', numero: 'TEST-A' }, { id: 'pc', pais: 'CO', clienteId: 'co', aseguradoraId: 'ic', numero: 'TEST-B' }, { id: 'pq', pais: 'GT', clienteId: 'qa', aseguradoraId: 'ig', numero: 'QA' }],
     cobros: [{ id: 'a', pais: 'GT', polizaId: 'pg', clienteId: 'gt', estado: 'Pendiente' }, { id: 'b', pais: 'CO', polizaId: 'pc', clienteId: 'co', estado: 'Pendiente' }, { id: 'c', pais: 'GT', polizaId: 'pq', clienteId: 'qa', estado: 'Pendiente' }],
-    carteraPrimas: [], recibosEsperados: []
+    carteraPrimas: [],
+    recibosEsperados: [{ id: 'receiptAnulado', pais: 'GT', polizaId: 'pg', clienteId: 'gt', estado: 'Anulado', estadoOperativo: 'pago_reportado', sourceType: 'client_portal' }]
   };
   const { summary, privateFindings } = audit(rows);
-  assert.equal(summary.result.GT.cobrosListed, 2);
+  assert.equal(summary.result.GT.cobrosListed, 3);
+  assert.equal(summary.result.GT.onlyInCobrosScreen, 1);
+  assert.equal(summary.result.GT.screenOnlyByState.Anulado, 1);
+  assert.equal(summary.result.GT.screenOnlyByKind.receipt_evidence, 1);
   assert.equal(summary.result.GT.reportesCommercial, 1);
   assert.equal(summary.result.GT.exclusionsByCause.SYNTHETIC_QA_OR_LINKED_QA, 1);
   assert.equal(summary.result.CO.cobrosListed, 1);
   assert.equal(summary.result.CO.reportesCommercial, 1);
-  assert.equal(privateFindings.filter(x => x.inView === 'GT').length, 1);
-  assert.equal(summary.result.TODOS.cobrosListed, 3);
+  assert.equal(privateFindings.filter(x => x.inView === 'GT').length, 2);
+  assert.equal(summary.result.TODOS.cobrosListed, 4);
   console.log('B4003_E4_SYNTHETIC_SOURCE_READONLY_SELFTEST_PASS');
 }
 
