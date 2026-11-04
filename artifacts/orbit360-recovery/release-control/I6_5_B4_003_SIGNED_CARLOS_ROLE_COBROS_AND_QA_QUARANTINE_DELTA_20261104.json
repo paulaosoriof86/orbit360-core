@@ -1,0 +1,107 @@
+{
+  "schema": "GI_I65_B4003_SIGNED_CARLOS_ROLE_COBROS_AND_QA_QUARANTINE_DELTA_V1",
+  "recordDate": "2026-11-04",
+  "gate": "I6.5/B4-003",
+  "status": "NEW_SIGNED_UI_SCOPE_READ_AND_QA_VISUAL_QUARANTINE_EVIDENCE_PARTIAL_GATE_HOLD",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "immutablePreview": {
+    "sourceSha": "b094619281c1f2ccef7e08335adedc76cf878bbc",
+    "buildId": "gi-i65-b4-b094619281c1-57f234755dc1",
+    "retainedHostingArtifactId": 13315537234,
+    "url": "https://ays-orbit-360-lab--gi-i65-b4-rc-41765742748-neoi3u7r.web.app/",
+    "byteReadbackWorkflowRun": 41817684940
+  },
+  "evidenceMethod": {
+    "surface": "connected Chrome authenticated user interface",
+    "actor": "Carlos Castro",
+    "uidEffective": "REAL_SESSION_VISIBLE_UID_NOT_EXTRACTED_OR_LOGGED",
+    "rolesConfirmedByApp": ["Operativo", "Asesor"],
+    "countriesConfirmedByApp": ["GT", "CO", "TODOS"],
+    "readOnly": true,
+    "actorImpersonationTokenMinted": false,
+    "firebaseAuthOrIamChanged": false,
+    "backendIndependentSignedNegativeRun": false,
+    "authenticationClaim": "SIGNED_BROWSER_USER_NOT_A_SERVER_NEGATIVE_PROOF"
+  },
+  "newPreviewUat": {
+    "cobros": {
+      "operativo": {
+        "TODOS": 2560,
+        "GT": 2504,
+        "CO": 56,
+        "countrySumMatchesTodos": true,
+        "allCountryConfirmedPayments": 5,
+        "GTConfirmedPayments": 5,
+        "COConfirmedPayments": 0
+      },
+      "asesor": {
+        "TODOS": 37,
+        "GT": 0,
+        "CO": 37,
+        "ownCOOverdueCurrency": "COP",
+        "ownCOOverdueAmount": 101654210,
+        "ownCOConfirmedPayments": 0,
+        "coldReloadRetainedRoleCountryAnd37Rows": true
+      },
+      "result": "AUTHENTICATED_UI_ROLE_AND_COUNTRY_PROJECTION_PASS_NOT_BACKEND_NEGATIVE_OR_POSITIVE_NONZERO_PERSONAL_RECAUDO_ACCEPTANCE",
+      "financialGuard": "SIGA report rows are explicitly not counted as confirmed payments; GTQ/COP separate"
+    },
+    "aseguradoras": {
+      "asesorDirectRoute": "UI_DENIED_NO_ACCESS_WITH_ACTIVE_ROLE",
+      "operativoCoDirectoryCount": 17,
+      "operativoGtDirectoryCount": 16,
+      "operativoAddAndImportControlsVisible": true,
+      "credentialRevealAndWritePersistenceTested": false,
+      "result": "SIGNED_ROLE_UI_SCOPING_PASS_DIRECTORY_READ_ONLY_PARTIAL"
+    },
+    "polizasGt": {
+      "operativoPhysicalCount": 1301,
+      "commercialCountDisplayed": 1292,
+      "qaAuditCountDisplayed": 9,
+      "qaPlusCommercialReconciles": true,
+      "qaAuditEntriesFromCancelledRunObserved": 6,
+      "b2RenewalQaNumbersObserved": [
+        "B2-REN-36489784713",
+        "B2-REN-36490245512",
+        "B2-REN-36490640789"
+      ],
+      "qaStatusFromUi": "Excluded from commercial production, premium and renewals; visible only in explicit QA audit filter",
+      "historicalReferencedClientCrossCountryDifference": 1,
+      "noDeleteOrPhysicalQaMutation": true,
+      "result": "P0_QA_ORPHAN_COMMERCIAL_DISPLAY_QUARANTINE_OBSERVED_PHYSICAL_DEPENDENCY_DISPOSITION_STILL_OPEN"
+    },
+    "consoleErrorsObservedInFocusedTab": 0
+  },
+  "preservedWithoutRepeating": {
+    "backendRosterAndWriterReadback": [41816232334, 41817078148],
+    "roleCountryRosterSyntheticChecks": 42,
+    "syntheticWriteReloadRestore": "PREVIOUS_PASS_ZERO_RESIDUE",
+    "firestoreRulesException": "OWNER_TEMPORARY_ACCEPTANCE_NOT_SECURITY_PASS_AND_NOT_AN_INDEPENDENT_REBLOCK",
+    "e4DownloadByteInspection": "OWNER_DEFERRED_POSTPRODUCTION"
+  },
+  "stillOpen": {
+    "independentRealJwtBackendUidRoleCountryTeamNegatives": true,
+    "personalCollectionNonzeroPositiveOwnedPaymentAttribution": true,
+    "freelancerAndUnclassifiedAdvisorActualBusinessClassification": true,
+    "inicioMotivationalExactOwnerVisualAcceptance": true,
+    "cancelledRun14RootsPlusDependentDisposition": true,
+    "orphanThreeB2PoliciesAndTwelveFinancialPlusThreeActivityDependencyDisposition": true,
+    "opsLeadsHistoricUnknownAuthorAndFutureNewNoteWriteReload": true,
+    "promoteExactSameArtifactToLive": true,
+    "moduleByModuleLiveAcceptanceAndRollback": true
+  },
+  "gating": {
+    "formalI6Percent": 50,
+    "p0Closed": 1,
+    "p0Total": 6,
+    "newP0ClosedByThisUiOnlyReceipt": 0,
+    "b4003Closed": false,
+    "productionAccepted": false,
+    "hostingLivePromotedThisTurn": false,
+    "productionBackendOrRulesChangedThisTurn": false,
+    "operationalDataChangedThisTurn": false,
+    "noProductSourceOrImmutableArtifactModified": true
+  },
+  "nextAction": "KEEP_NEW_SIGNED_CARLOS_ROLE_SCOPE_READ_AND_QA_FILTER_EVIDENCE; FINISH_INDEPENDENT_AUTHENTICATED_SERVER_NEGATIVES_WITH_EXPLICIT_IDENTITY_PROOF_AUTHORITY_AND_FIVE_P0_DISPOSITIONS; ONLY_AFTER_GO_PROMOTE_ARTIFACT_13315537234_AND_RUN_LIVE_MODULE_MATRIX"
+}
