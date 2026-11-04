@@ -136,7 +136,7 @@ jobs:
       SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
       SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
       B3_004_HUMAN_FIXTURE_MODE: ${{ inputs.b4003_mode }}
-      B3_004_HUMAN_FIXTURE_OUT: ${{ runner.temp }}/b4003-fixture-result.json
+      B3_004_HUMAN_FIXTURE_OUT: /tmp/b4003-fixture-result.json
       B3_PREVIEW_URL: https://ays-orbit-360-lab--gi-i65-b4-rc-41765742748-neoi3u7r.web.app
     steps:
       - uses: actions/checkout@v4
