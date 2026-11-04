@@ -89,7 +89,7 @@ function resolve({auth,member,config,tenantId,activeRole,collection,country}){
   // Tenant role=all owns the portfolio READ scope even when a legacy
   // membership contains own/team. No other modules or countries are widened.
   // The scoped reader is read-only; durable writers retain separate guards.
-  if(['clientes','polizas','vehiculos'].includes(collection) &&
+  if(['clientes','polizas','vehiculos','cobros','carteraPrimas','recibosEsperados'].includes(collection) &&
      ['operativo','admintenant','admin_tenant'].includes(role) &&
      configured==='all' && moduleRequested!=='none') effective='all';
  }

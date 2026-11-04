@@ -10,6 +10,10 @@ on:
       - orbit360-platform/modules/cancelaciones.js
       - orbit360-platform/modules/reportes.js
       - orbit360-platform/modules/renovaciones.js
+      - orbit360-platform/core/access-scope.js
+      - orbit360-platform/core/tenant-access-policy-effective-p0.js
+      - functions/b4-003-scoped-access-boundary.js
+      - tools/gravicentra-b4-003-financial-role-scope-transversal.test.cjs
       - tools/gravicentra-b4-003-reportes-e4-transversal.test.cjs
       - tools/gravicentra-b4-003-renovaciones-qa-provenance.test.cjs
       - .github/workflows/gravicentra-b4-003-e4-reportes-transversal-ci.yml
@@ -22,6 +26,10 @@ on:
       - orbit360-platform/modules/cancelaciones.js
       - orbit360-platform/modules/reportes.js
       - orbit360-platform/modules/renovaciones.js
+      - orbit360-platform/core/access-scope.js
+      - orbit360-platform/core/tenant-access-policy-effective-p0.js
+      - functions/b4-003-scoped-access-boundary.js
+      - tools/gravicentra-b4-003-financial-role-scope-transversal.test.cjs
       - tools/gravicentra-b4-003-reportes-e4-transversal.test.cjs
       - tools/gravicentra-b4-003-renovaciones-qa-provenance.test.cjs
       - .github/workflows/gravicentra-b4-003-e4-reportes-transversal-ci.yml
@@ -43,6 +51,16 @@ jobs:
           node --check orbit360-platform/modules/cancelaciones.js
           node --check orbit360-platform/modules/reportes.js
           node --check orbit360-platform/modules/renovaciones.js
+      - name: B4-003 confirmed financial scope across role/country/collections
+        run: |
+          node --check orbit360-platform/core/access-scope.js
+          node --check orbit360-platform/core/tenant-access-policy-effective-p0.js
+          node --check functions/b4-003-scoped-access-boundary.js
+          node --check tools/gravicentra-b4-003-financial-role-scope-transversal.test.cjs
+          node tools/gravicentra-b4-003-financial-role-scope-transversal.test.cjs
+          node tools/gravicentra-b4-003-effective-policy-quickcheck.cjs
+          node tools/gravicentra-b4-003-scoped-boundary.test.cjs
+          node tools/gravicentra-b4-003-scoped-related-reader.test.cjs
       - name: E4 all report types, GT/CO/TODOS, date and monetary lineage
         run: |
           node tools/gravicentra-b4-003-reportes-e4-transversal.test.cjs

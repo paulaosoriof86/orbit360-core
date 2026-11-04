@@ -114,7 +114,11 @@
     var byCollection = {
       clientes: ['cliente360', 'clientes'],
       polizas: ['polizas'],
-      vehiculos: ['polizas', 'vehiculos']
+      vehiculos: ['polizas', 'vehiculos'],
+      // Three independent financial collections, one Cobros module authorization.
+      cobros: ['cobros'],
+      carteraPrimas: ['cobros', 'carteraPrimas'],
+      recibosEsperados: ['cobros', 'recibosEsperados']
     };
     var keys = byCollection[collection];
     if (!keys) return input;

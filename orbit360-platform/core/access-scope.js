@@ -176,7 +176,7 @@ Orbit.access = (function () {
   function roleWidePortfolioScope(moduleKey) {
     var role = activeRole(), scopes = accessConfig().roleScopes || {};
     return (role === 'Operativo' || role === 'AdminTenant') &&
-      (moduleKey === 'polizas' || moduleKey === 'cliente360') &&
+      (moduleKey === 'polizas' || moduleKey === 'cliente360' || moduleKey === 'cobros') &&
       normalizeScope(scopes[role]) === 'all';
   }
   function dataScope(moduleKey) {
@@ -562,15 +562,23 @@ Orbit.access = (function () {
     var base = S();
     if (!base) return base;
     var facade = Object.create(base);
+    // Financial read scope belongs to Cobros even on Inicio / Reportes.
+    // Keep the rendering route entitlement as an additional gate.
+    function readModule(collection) {
+      var owner = OP_COLLS[collection] || collection;
+      return owner === 'cobros' ? owner : (moduleKey || owner);
+    }
     facade.all = function (collection) {
+      if (moduleKey && !puedeVerModulo(moduleKey)) return [];
       var rows = base.all(collection) || [];
-      return OP_COLLS[collection] ? filter(collection, rows, moduleKey || OP_COLLS[collection]) : rows;
+      return OP_COLLS[collection] ? filter(collection, rows, readModule(collection)) : rows;
     };
     facade.where = function (collection, predicate) { return facade.all(collection).filter(predicate); };
     facade.find = function (collection, predicate) { return facade.all(collection).find(predicate); };
     facade.get = function (collection, id) {
+      if (moduleKey && !puedeVerModulo(moduleKey)) return null;
       var rec = base.get(collection, id);
-      return !rec || !OP_COLLS[collection] || canView(collection, rec, moduleKey || OP_COLLS[collection]) ? rec : null;
+      return !rec || !OP_COLLS[collection] || canView(collection, rec, readModule(collection)) ? rec : null;
     };
     facade.insert = function (collection, row) {
       if (OP_COLLS[collection] && !canAccessRecord(row || {}, moduleKey || OP_COLLS[collection], { collection: collection })) return null;
