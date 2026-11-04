@@ -1,0 +1,36 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_FROZEN_SYNTHETIC_QA_REQUEST_V1",
+  "status": "REQUESTED",
+  "mode": "create",
+  "recordedAtUtc": "2026-11-04T09:25:50.188Z",
+  "gate": "I6.5/B4-003",
+  "authority": "PAULA_EXPLICIT_20261104_SYNTHETIC_WRITE_RELOAD_RESTORE_AND_CONTROLLED_RELEASE",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "sourceSha": "3bf9996da14fa1799dd3671581aad706d754d218",
+  "buildId": "gi-i65-b4-3bf9996da14f-57f234755dc1",
+  "artifactId": 13308088829,
+  "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-rc-41765742748-neoi3u7r.web.app/",
+  "tenantId": "alianzas-soluciones",
+  "syntheticOnly": true,
+  "liveDeploy": false,
+  "realBusinessWrites": false,
+  "amount": 111.11,
+  "currency": "GTQ",
+  "ids": {
+    "client": "b3004human_client_r12",
+    "policy": "b3004human_policy_r12",
+    "receipt": "b3004human_receipt_r12",
+    "portfolio": "b3004human_portfolio_r12"
+  },
+  "purpose": "Reuse existing exact historic synthetic case for real UI write, reload, reconcile and zero-residue restore on the frozen B4-003 Preview; never mutate real clients, policies, receipts, payments or live Hosting.",
+  "allowedEffects": [
+    "create_four_reserved_synthetic_docs",
+    "controlled_UI_payment_on_reserved_QA_receipt",
+    "controlled_UI_reconciliation_of_same_QA_payment",
+    "delete_reserved_QA_docs_and_direct_QA_linked_events"
+  ],
+  "mustCleanup": true,
+  "exportByteReadbackDisposition": "OWNER_DEFERRED_TO_POSTPRODUCTION_20261104",
+  "productionReleaseDisposition": "NOT_GRANTED_BY_THIS_QA_REQUEST"
+}
