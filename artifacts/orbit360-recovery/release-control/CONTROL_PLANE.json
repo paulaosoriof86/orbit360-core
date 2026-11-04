@@ -18170,5 +18170,82 @@
     "formalI6Percent": 50,
     "p0Closed": 1,
     "p0Total": 6
+  },
+  "b4003LiveReadOnlyRosterExact20261104": {
+    "schema": "I6_5_B4_003_LIVE_ROSTER_SINGLE_FUNCTION_EVIDENCE_POINTER_V1",
+    "gate": "I6.5/B4-003",
+    "status": "PRODUCTION_BACKEND_ROSTER_DEPLOY_PASS_B4003_STILL_HOLD",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_LIVE_READONLY_ROSTER_DEPLOY_SUCCESS_20261104.json",
+    "receiptCommit": "7b8eb2f3b7036ab845067b4d83c555dfb3bf6dc9",
+    "workflowRunId": 41814805932,
+    "jobConclusion": "success",
+    "productionFunctionsBefore": 80,
+    "productionFunctionsAfter": 81,
+    "onlyAdded": [
+      "orbit360AssignableAdvisorRoster"
+    ],
+    "removed": [],
+    "productionHostingChanged": false,
+    "firestoreRulesChanged": false,
+    "operationalDataChanged": false,
+    "backendIndependentNegativesPassed": false,
+    "productionWriterSourceParityProven": false,
+    "sourceSha": "66012815b42c0cc26cb372c19f74d52bddba953d",
+    "buildId": "gi-i65-b4-66012815b42c-57f234755dc1",
+    "immutableHostingArtifactId": 13311178353,
+    "b4003Closed": false,
+    "formalI6Percent": 50,
+    "p0Closed": 1,
+    "p0Total": 6
+  },
+  "b4003OpsLeadsHumanNameObserved20261104": {
+    "schema": "I6_5_B4_003_OPS_LEADS_COLLAB_HUMAN_NAME_OBSERVATION_V1",
+    "status": "PARTIAL_REAL_AUTHENTICATED_CARLOS_UI_NOT_TRANSVERSAL_PASS",
+    "observedIn": "RC 66012815 Preview signed Carlos Operativo; same shared collaboration in Ops and Leads",
+    "observedNames": [
+      "Carlos Castro",
+      "Paula Osorio",
+      "Samuel Daza"
+    ],
+    "historicalCollaborationAuthorWithoutResolvedFullName": 1,
+    "observedSharedInboxCards": 25,
+    "visibleNamedAuthors": 22,
+    "visibleGenericAuthorLabels": 1,
+    "resolvedGenericActorLabels": 4,
+    "technicalOrEmailAuthorLabelsVisible": 0,
+    "sourceCausalRisks": [
+      "historical author profile unresolved displays Usuario del equipo",
+      "legacy Ops bitacora uses role string instead of actor full name",
+      "actor fallback may use email without displayName",
+      "resolvedByName may remain Usuario autenticado"
+    ],
+    "certifiedTransversalByRole": false,
+    "fixConstraint": "CORRECT_CENTRAL_IDENTITY_RESOLVER_ALL_OPS_LEADS_NOT_SINGLE_UID; IF SOURCE CHANGES GENERATE_NEW_IMMUTABLE_BUILD_AND_RECERTIFY_AFFECTED_SURFACES; DO_NOT_MISATTRIBUTE_HISTORICAL_UNIDENTIFIED_AUTHOR"
+  },
+  "b4003ActiveResumeCursor20261104": {
+    "schema": "I6_5_B4_003_SINGLE_LATEST_RESUME_CURSOR_AFTER_DEPLOY_V1",
+    "gate": "I6.5/B4-003",
+    "status": "ACTIVE_NEXT_UNCERTIFIED_GATES_ONLY_NO_PASS_RETEST",
+    "predecessor": "b4003DecisionFreezeAndSingleCertificationCursor20261103",
+    "preserveOwnerRulesException": true,
+    "currentCandidateSourceSha": "66012815b42c0cc26cb372c19f74d52bddba953d",
+    "currentBuildId": "gi-i65-b4-66012815b42c-57f234755dc1",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-rc-41765742748-neoi3u7r.web.app/",
+    "hostingArtifactId": 13311178353,
+    "latestBackendStep": "PROD_ROSTER_80_TO_81_EXACT_PASS_RUN_41814805932",
+    "previouslySignedUat": "REUSE_CARLOS_AND_SAMUEL_EXISTING_APPROVED_EVIDENCE",
+    "lastSyntheticWriteRestore": "PASS_AND_ZERO_RESIDUE_PREVIEW",
+    "latestUIHumanName": "PARTIAL_NOT_PASS",
+    "next": "CERTIFY_CAUSAL_SIGNED_BACKEND_UID_ROLE_COUNTRY_TEAM_NEGATIVES_AND_LIVE_WRITER_PARITY; ADJUDICATE_5_OPEN_P0; PROMOTE_ONLY_IF_GATES_PASS_USING_FROZEN_SAME_ARTIFACT_THEN_LIVE_MODULE_BY_MODULE_UAT",
+    "noNewBranchOrRoutinePreview": true,
+    "noDataReimport": true,
+    "noFirestoreRulesRedeploy": true,
+    "noSilentRebuild": true,
+    "releaseB4003": "HOLD",
+    "formalI6Percent": 50,
+    "p0Closed": 1,
+    "p0Total": 6,
+    "securityRulesRisk": "ACCEPTED_TEMPORARILY_NOT_SECURITY_PASS",
+    "historicalGlobalProductionAccepted": "NOT_B4003_ACCEPTANCE"
   }
 }
