@@ -93,7 +93,9 @@ jobs:
           node tools/gravicentra-b4-003-e4-anulado-projection.test.cjs
           node tools/gravicentra-b4-003-renovaciones-qa-provenance.test.cjs
           node tools/gravicentra-b4-003-cross-module-readback-contract.test.cjs
-          node tests/goal-participation-isolated-routing.test.cjs
+          node --check functions/goal-participation-contract.js
+          node --check orbit360-platform/modules/equipo.js
+          node --test tests/goal-participation*.test.cjs
           timeout -k 3s 55s node tools/gravicentra-i6-control-plane-guard-v1.mjs --mode=i6
       - name: Freeze LIVE fingerprints before isolated Preview
         run: |
