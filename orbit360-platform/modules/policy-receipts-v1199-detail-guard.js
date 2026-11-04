@@ -173,6 +173,17 @@ Orbit.modules = Orbit.modules || {};
     if (!store || typeof store._ensureCollections !== 'function') return;
     try { store._ensureCollections(names || []); } catch (e) {}
   }
+  function ensurePolicyDetailCollections() {
+    const role=String((Orbit.access&&typeof Orbit.access.activeRole==='function'&&Orbit.access.activeRole())||
+      (Orbit.session&&typeof Orbit.session.rol==='function'&&Orbit.session.rol())||'')
+      .normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'_');
+    const names=['polizas','clientes','vehiculos','recibosEsperados'];
+    if(['operativo','direccion','admin','admintenant','admin_tenant','superadmin','super_admin'].includes(role))
+      names.push('aseguradoras');
+    if(['direccion','admin','admintenant','admin_tenant','superadmin','super_admin'].includes(role))
+      names.push('asesores');
+    ensureDetailCollections(names);
+  }
 
   function applyVisualAliasesInPlace() {
     if (!S() || typeof S().all !== 'function') return;
@@ -414,7 +425,7 @@ Orbit.modules = Orbit.modules || {};
 
   function renderPolicyPage(host, policyId, contextVehicleId) {
     applyVisualAliasesInPlace();
-    ensureDetailCollections(['polizas','clientes','vehiculos','recibosEsperados','aseguradoras','asesores']);
+    ensurePolicyDetailCollections();
     const p0 = S().get('polizas', policyId);
     if (!p0) { host.innerHTML = '<div class="page"><div class="card pad">Póliza no disponible.</div></div>'; return; }
     const clientReady=collectionConfirmed('clientes');
@@ -425,6 +436,11 @@ Orbit.modules = Orbit.modules || {};
     }
     const vehiclesReady=collectionConfirmed('vehiculos'), receiptsReady=collectionConfirmed('recibosEsperados');
     const p = policyVisual(p0), cli = rawClient || {}, asg = S().get('aseguradoras', p.aseguradoraId) || {}, ase = S().get('asesores', p.asesorId) || {};
+    // The protected policy reader projects only policy-bound, verified public
+    // display names. Restricted roles must never read insurer credentials or
+    // the full Equipo directory just to render this policy's labels.
+    const insurerName = asg.nombre || asg.displayName || p.aseguradoraNombreVerificado || p.aseguradoraFuenteNombre;
+    const advisorName = p.asesorNombreVerificado || ase.nombre || ase.displayName || p.asesorFuenteNombre;
     // Policy scope and client scope are independent. A valid policy may link to
     // a client outside this role/country or not present in the authorized read.
     // Never offer a client deep-link that the CRM guard will refuse.
@@ -470,7 +486,7 @@ Orbit.modules = Orbit.modules || {};
       <div class="orbit-detail-layout" style="display:grid;grid-template-columns:minmax(0,1.35fr) minmax(320px,.65fr);gap:16px;align-items:start">
         <div style="display:grid;gap:16px;min-width:0">
           ${section('📋 Datos de la póliza', grid([
-            field('Cliente / asegurado', cli.nombre || p.aseguradoNombreFuente), field('Aseguradora', asg.nombre || p.aseguradoraFuenteNombre), field('Asesor', ase.nombre || p.asesorFuenteNombre),
+            field('Cliente / asegurado', cli.nombre || p.aseguradoNombreFuente), field('Aseguradora', insurerName), field('Asesor', advisorName),
             field('N.º de póliza', p.numero, {mono:true}), field('Estado', p.estado), field('País / moneda', `${p.pais || cli.pais || '—'} · ${cur || '—'}`),
             field('Ramo', p.ramo), field('Subramo / producto', p.subramo || p.producto), field('Tipo de póliza', p.tipoPoliza),
             field('Inicio de vigencia', fmtDate(p.vigenciaInicio)), field('Fin de vigencia', fmtDate(p.vigenciaFin)), field('Renovación', renewabilityHtml(p), {html:true}),
@@ -523,7 +539,7 @@ Orbit.modules = Orbit.modules || {};
       <div class="card gi-vehicle-hero" style="overflow:hidden;margin-bottom:16px"><div style="padding:20px 22px;background:linear-gradient(120deg,#1f3a5f,#142840);display:flex;justify-content:space-between;gap:16px;align-items:flex-start;flex-wrap:wrap"><div style="display:flex;gap:14px;align-items:flex-start"><div class="gi-hero-icon">🚘</div><div><div style="color:rgba(255,255,255,.68);text-transform:uppercase;letter-spacing:.12em;font-size:11px">Vehículo asegurado</div><h2 style="color:#fff;margin:4px 0;font-family:var(--f-display)">${esc(shown(v.marca))} ${esc(shown(v.linea))} ${esc(shown(v.anio))}</h2><div class="mono" style="color:rgba(255,255,255,.85)">${esc(shown(v.placa))}${p.numero?' · póliza '+esc(p.numero):''}</div></div></div><div style="display:flex;gap:8px;flex-wrap:wrap">${canEditVehicle() ? `<button class="btn primary" onclick="Orbit.modules.cliente360.editarVehiculo('${esc(v.id)}')">✏️ Editar vehículo</button><button class="btn ghost" style="color:var(--danger,var(--red))" onclick="Orbit.policyVehicleReadModelV1199c.deleteVehicle('${esc(v.id)}')">Eliminar</button>` : ''}${vehicleClientAction}</div></div></div>
       <div class="orbit-detail-layout" style="display:grid;grid-template-columns:minmax(0,1.25fr) minmax(300px,.75fr);gap:16px;align-items:start">
         ${section('🚘 Detalle completo del vehículo', vehicleCard(v, cur, v.polizaId, v.clienteId))}
-        <div style="display:grid;gap:16px">${section('📑 Póliza vinculada', grid([field('Póliza', p.numero || '—',{mono:true}),field('Aseguradora',asg.nombre || '—'),field('Estado',p.estado || '—'),field('Vigencia',`${fmtDate(p.vigenciaInicio)} → ${fmtDate(p.vigenciaFin)}`),field('Prima total',moneyDetail(first(p.primaTotal,p.prima),cur)),field('Suma asegurada',moneyDetail(first(v.sumaAsegurada,p.sumaAsegurada),cur))],2)+`<div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap"><a class="btn primary" href="#/cliente360?c=${encodeURIComponent(v.clienteId)}&p=${encodeURIComponent(v.polizaId)}&v=${encodeURIComponent(v.id)}">Abrir póliza completa</a>${canEditVehicle() ? `<button class="btn ghost" onclick="Orbit.modules.cliente360.editarVehiculo('${esc(v.id)}')">Editar vehículo</button>` : ''}</div>`)}</div>
+        <div style="display:grid;gap:16px">${section('📑 Póliza vinculada', grid([field('Póliza', p.numero || '—',{mono:true}),field('Aseguradora',asg.nombre || asg.displayName || p.aseguradoraNombreVerificado || '—'),field('Estado',p.estado || '—'),field('Vigencia',`${fmtDate(p.vigenciaInicio)} → ${fmtDate(p.vigenciaFin)}`),field('Prima total',moneyDetail(first(p.primaTotal,p.prima),cur)),field('Suma asegurada',moneyDetail(first(v.sumaAsegurada,p.sumaAsegurada),cur))],2)+`<div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap"><a class="btn primary" href="#/cliente360?c=${encodeURIComponent(v.clienteId)}&p=${encodeURIComponent(v.polizaId)}&v=${encodeURIComponent(v.id)}">Abrir póliza completa</a>${canEditVehicle() ? `<button class="btn ghost" onclick="Orbit.modules.cliente360.editarVehiculo('${esc(v.id)}')">Editar vehículo</button>` : ''}</div>`)}</div>
       </div>
     </div>`;
   }
@@ -588,7 +604,7 @@ Orbit.modules = Orbit.modules || {};
       applyVisualAliasesInPlace();
       const params = (Orbit.route && Orbit.route.params) || {};
       if (params.p) {
-        ensureDetailCollections(['polizas','clientes','vehiculos','recibosEsperados','aseguradoras','asesores']);
+        ensurePolicyDetailCollections();
         const state=directDetailReadiness('polizas');
         if (state!=='unavailable' && S().get('polizas', params.p)) renderPolicyPage(host, params.p, params.v || '');
         else renderDirectDetailUnavailable(host, 'policy', state);

@@ -59,6 +59,7 @@ async function roleScopedRoster(role,memberCountries,selectedCountry,expectedCou
   id:'qa-'+country,numero:'QA-'+country,clienteId:'qa-client-'+country,
   aseguradoraId:'qa-ins',asesorId:crossBorder&&country==='CO'?'advisor-GT':'advisor-'+country,
   asesorNombreVerificado:crossBorder&&country==='CO'?'Asesor GT (histórico)':'',
+  aseguradoraNombreVerificado:'Aseguradora QA autorizada',
   pais:country,moneda:country==='GT'?'GTQ':'COP',
   estado:'Vigente',vigenciaFin:'2026-12-15',primaTotal:100,primaNeta:80,ramo:'Auto'
  }));
@@ -76,7 +77,7 @@ async function roleScopedRoster(role,memberCountries,selectedCountry,expectedCou
    if(collection==='polizas')return recordsByCountry.filter(p=>countries.includes(p.pais)&&
     (selectedCountry==='TODOS'||p.pais===selectedCountry));
    if(collection==='clientes')return recordsByCountry.filter(p=>countries.includes(p.pais)).map(p=>({id:p.clienteId,pais:p.pais,nombre:'Cliente QA'}));
-   if(collection==='aseguradoras')return [{id:'qa-ins',nombre:'Aseguradora QA'}];
+   if(collection==='aseguradoras')return role==='Asesor'?[]:[{id:'qa-ins',nombre:'Aseguradora QA'}];
    if(collection==='asesores')throw Error('TEAM_DIRECTORY_MUST_NOT_BE_READ_BY_'+role);
    return [];
   },_ensureCollections:cols=>{requested.push(cols);},
@@ -93,6 +94,7 @@ async function roleScopedRoster(role,memberCountries,selectedCountry,expectedCou
  assert.deepEqual(called.sort(),expectedCountries.slice().sort(),
   role+' must request roster for exactly the membership-authorized selected countries');
  if(expectedCountries.length){
+  assert.match(h.innerHTML,/Aseguradora QA/,'insurer display should survive role-restricted directory reads');
   assert.equal(defs.find(d=>d.id==='fase').options.length,expectedCountries.length+(crossBorder?1:0));
   if(crossBorder){
    assert.match(h.innerHTML,/Asesor GT \(histórico\)/);
@@ -109,5 +111,6 @@ Promise.resolve().then(async()=>{
  await roleScopedRoster('Asesor',['GT'],'GT',['GT']);
  await roleScopedRoster('Operativo',[],'TODOS',[]);
  await roleScopedRoster('Operativo',['CO'],'CO',['CO'],true);
- console.log('B4_003_POLIZAS_ADVISOR_HYDRATION=PASS directEntry=PASS advisorEventRefresh=PASS operativoGTCO=PASS rosterMinimal=PASS crossBorderPolicyName=PASS noUnauthorizedCountryCalls=PASS restrictedTeamDirectory=DENIED firestoreWrites=0');
+ console.log('B4_003_POLIZAS_ADVISOR_HYDRATION=PASS directEntry=PASS advisorEventRefresh=PASS operativoGTCO=PASS rosterMinimal=PASS scopedInsurerLabel=PASS crossBorderPolicyName=PASS noUnauthorizedCountryCalls=PASS restrictedTeamDirectory=DENIED firestoreWrites=0');
 }).catch(error=>{console.error(error);process.exitCode=1;});
+

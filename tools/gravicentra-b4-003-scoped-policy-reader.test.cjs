@@ -4,16 +4,19 @@ const {scopedPolicyRead,validateArguments}=require('../functions/b4-003-scoped-p
 const {Denied}=require('../functions/b4-003-scoped-access-boundary');
 const tenantId='alianzas-soluciones';
 const policies=[
-{id:'p1',tenantId,pais:'GT',asesorId:'a1',numero:'A'},
-{id:'p2',tenantId,pais:'GT',asesorId:'a2',numero:'B'},
-{id:'p3',tenantId,pais:'CO',asesorId:'a1',numero:'C',asesorNombreVerificado:'FALSO'},
-{id:'p4',tenantId,pais:'GT',asesorId:'a3',numero:'D'}
+{id:'p1',tenantId,pais:'GT',asesorId:'a1',aseguradoraId:'i1',numero:'A'},
+{id:'p2',tenantId,pais:'GT',asesorId:'a2',aseguradoraId:'i2',numero:'B'},
+{id:'p3',tenantId,pais:'CO',asesorId:'a1',aseguradoraId:'i1',numero:'C',asesorNombreVerificado:'FALSO',aseguradoraNombreVerificado:'FALSO'},
+{id:'p4',tenantId,pais:'GT',asesorId:'a3',aseguradoraId:'i3',numero:'D'}
 ];
 let activeMember={uid:'u1',tenantId,status:'active',roles:['Asesor','Operativo'],advisorId:'a1',countries:['GT','CO'],dataScopes:{default:'own'},teamAdvisorIds:['a2']};
 const access={roleScopes:{asesor:'own',operativo:'all'}};
 const advisers=[{id:'a1',nombre:'Asesora GT',paises:['GT'],usuario:'SECRETO'},
  {id:'a2',nombre:'Asesor B',paises:['GT']},{id:'a3',nombre:'Asesora C',paises:['CO']}];
-let advisorDocumentReads=0;
+const insurers=[{id:'i1',nombre:'Aseguradora Rural',usuario:'SECRETO',password:'NO_REVELAR',cuentas:[{numero:'SECRETO'}]},
+ {id:'i2',nombre:'Aseguradora B'}, {id:'i3',nombre:'Aseguradora C'}];
+let advisorDocumentReads=0,insurerDocumentReads=0;
+const insurerIdsRead=[];
 const doc=(data,id)=>({id,exists:!!data,data:()=>data});
 function collectionOfPolicies(rows){
  const build=(constraints=[],cursor='',cap=99)=>({
@@ -40,10 +43,13 @@ const data={
     if(key==='members')return {doc:uid=>({get:async()=>doc(uid==='u1'?activeMember:null,uid)})};
     if(key==='config')return {doc:()=>({get:async()=>doc(access,'access')})};
     if(key==='data')return {doc:table=>{
-     assert.ok(['polizas','asesores'].includes(table));
+     assert.ok(['polizas','asesores','aseguradoras'].includes(table));
      return {collection:items=>{assert.equal(items,'items');
       if(table==='polizas')return collectionOfPolicies(policies);
-      return {doc:id=>({get:async()=>{advisorDocumentReads++;return doc(advisers.find(x=>x.id===id),id);}}),
+      return {doc:id=>({get:async()=>{
+       if(table==='asesores'){advisorDocumentReads++;return doc(advisers.find(x=>x.id===id),id);}
+       insurerDocumentReads++;insurerIdsRead.push(id);return doc(insurers.find(x=>x.id===id),id);
+      }}),
        get:()=>{throw Error('FULL_TEAM_DIRECTORY_READ_FORBIDDEN');}};
      }};
     }};
@@ -62,7 +68,11 @@ const denied=async(fn,code)=>{
  let count=0;
  const own=await scopedPolicyRead(req('asesor'));assert.deepEqual(own.rows.map(x=>x.id),['p1']);
  assert.equal(own.rows[0].asesorNombreVerificado,'Asesora GT');
+ assert.equal(own.rows[0].aseguradoraNombreVerificado,'Aseguradora Rural');
  assert.equal(own.rows[0].usuario,undefined,'policy-bound label must never project sensitive Team fields');count++;
+ assert.equal(own.rows[0].password,undefined,'no insurer credentials may be projected');
+ assert.equal(own.rows[0].cuentas,undefined,'no insurer bank accounts may be projected');
+ assert.deepEqual(insurerIdsRead,['i1'],'Asesor can read public name only for own policy insurer');count++;
  const assignedRoleWithoutSpecialClaim=await scopedPolicyRead({...req('asesor'),auth:{uid:'u1',token:{}}});assert.deepEqual(assignedRoleWithoutSpecialClaim.rows.map(x=>x.id),['p1']);count++;
 
  const p1=await scopedPolicyRead(req('asesor','get',{policyId:'p1'}));assert.equal(p1.rows[0].id,'p1');count++;
@@ -97,7 +107,10 @@ const denied=async(fn,code)=>{
  assert.deepEqual(colombia.rows.map(x=>x.id),['p3']);assert.equal(colombia.nextCursor,null);count++;
  assert.equal(colombia.rows[0].asesorNombreVerificado,'Asesora GT',
   'a CO policy must include its actual GT adviser label with no GT-roster grant');count++;
+ assert.equal(colombia.rows[0].aseguradoraNombreVerificado,'Aseguradora Rural',
+  'policy-bound insurer name must work across permitted countries');count++;
  assert.equal(advisorDocumentReads>0,true,'lookups must be bounded to advisers of authorized policies');count++;
+ assert.equal(insurerDocumentReads>0,true,'insurer names must use bounded document reads, not full directory');count++;
  activeMember={...activeMember,countries:['CO']};
  const colombiaOnly=await scopedPolicyRead(req('operativo','list',{country:'CO'}));
  assert.deepEqual(colombiaOnly.rows.map(x=>x.id),['p3']);
@@ -113,5 +126,6 @@ const denied=async(fn,code)=>{
  activeMember={...activeMember,status:'inactive'};
  await denied(()=>scopedPolicyRead(req('asesor')),'MEMBERSHIP_DENIED');count++;
  assert.equal(validateArguments({tenantId,country:'CO',activeRole:'asesor',mode:'get',policyId:'p3'}).country,'CO');count++;
- console.log('B4_003_SCOPED_POLICY_READ_CONTRACT_PASS checks='+count+' policyBoundAdvisorLabels=PASS crossBorderCOGT=PASS noTeamList=PASS mock_only_no_firestore_writes');
+ console.log('B4_003_SCOPED_POLICY_READ_CONTRACT_PASS checks='+count+' policyBoundAdvisorAndInsurerLabels=PASS crossBorderCOGT=PASS noDirectorySecrets=PASS noFullDirectoryRead=PASS mock_only_no_firestore_writes');
 })().catch(e=>{console.error(e);process.exitCode=1;});
+

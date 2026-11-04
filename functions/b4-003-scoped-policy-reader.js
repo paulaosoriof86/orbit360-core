@@ -23,31 +23,39 @@ function validateArguments(input){
 function dataCollection(db,tenantId){
  return db.collection('tenants').doc(tenantId).collection('data').doc('polizas').collection('items');
 }
-// A policy reader may reveal the minimal name of that policy's OWN adviser,
-// after the policy itself passes the server role/tenant/country/owner guard.
-// Do not expose Equipo, assignment eligibility, credentials, goals or unrelated
-// advisers. This also resolves cross-border historic advisers whose home country
-// is not the country of an otherwise authorized policy.
-async function withPolicyBoundAdvisorLabels(tenant,authorizedRows,tenantId){
- const ids=[...new Set(authorizedRows.map(r=>parseText(r.asesorId||r.advisorId||r.ownerAdvisorId))
-   .filter(id=>id&&!/[/\u0000-\u001f]/.test(id)))];
- if(ids.length>200)throw new Denied('POLICY_ADVISOR_LABEL_BOUND_EXCEEDED');
- const source=tenant.collection('data').doc('asesores').collection('items');
- const names=new Map();
- for(let i=0;i<ids.length;i+=20){
-  const resolved=await Promise.all(ids.slice(i,i+20).map(async id=>{
-   try{const snap=await source.doc(id).get();
-    if(!snap.exists)return null;
-    const row=snap.data()||{};
-    if(row.tenantId&&parseText(row.tenantId)!==tenantId)return null;
-    const name=parseText(row.nombre||row.name||row.displayName,180);
-    return name?{id,name}:null;
-   }catch(_){return null;} // Optional label failure cannot hide permitted policies.
-  }));
-  resolved.forEach(x=>{if(x)names.set(x.id,x.name);});
+// Reveal only the two public display NAMES attached to an already-authorized
+// policy. Never expose the underlying Equipo or Aseguradoras directory, account
+// credentials, bank information, assignment eligibility, or unrelated records.
+// Resolve cross-border/historical references by ID, AFTER allowRow has passed.
+async function withPolicyBoundDisplayLabels(tenant,authorizedRows,tenantId){
+ const adviserId=row=>parseText(row.asesorId||row.advisorId||row.ownerAdvisorId);
+ const insurerId=row=>parseText(row.aseguradoraId||row.insurerId);
+ async function namesFor(collection,ids){
+  const unique=[...new Set(ids.filter(id=>id&&!/[/\u0000-\u001f]/.test(id)))];
+  if(unique.length>200)throw new Denied('POLICY_DISPLAY_LABEL_BOUND_EXCEEDED');
+  const source=tenant.collection('data').doc(collection).collection('items');
+  const names=new Map();
+  for(let i=0;i<unique.length;i+=20){
+   const resolved=await Promise.all(unique.slice(i,i+20).map(async id=>{
+    try{const snap=await source.doc(id).get();
+     if(!snap.exists)return null;
+     const row=snap.data()||{};
+     if(row.tenantId&&parseText(row.tenantId)!==tenantId)return null;
+     const name=parseText(row.nombre||row.name||row.displayName,180);
+     return name?{id,name}:null;
+    }catch(_){return null;} // Optional labels must not suppress authorized policies.
+   }));
+   resolved.forEach(x=>{if(x)names.set(x.id,x.name);});
+  }
+  return names;
  }
+ const [advisors,insurers]=await Promise.all([
+  namesFor('asesores',authorizedRows.map(adviserId)),
+  namesFor('aseguradoras',authorizedRows.map(insurerId))
+ ]);
  return authorizedRows.map(row=>Object.assign({},row,{
-  asesorNombreVerificado:names.get(parseText(row.asesorId||row.advisorId||row.ownerAdvisorId))||''
+  asesorNombreVerificado:advisors.get(adviserId(row))||'',
+  aseguradoraNombreVerificado:insurers.get(insurerId(row))||''
  }));
 }
 async function scopedPolicyRead({db,auth,request}){
@@ -70,7 +78,7 @@ async function scopedPolicyRead({db,auth,request}){
    try{allowRow(scope,row)}catch(e){if(e instanceof Denied)throw new Denied('POLICY_NOT_FOUND_OR_DENIED');throw e;}
    const authorized=[Object.assign({},row,{id:row.id||doc.id,canonicalDocumentId:doc.id})];
    return {ok:true,collection:'polizas',country:v.country,scope:scope.scope,
-     rows:await withPolicyBoundAdvisorLabels(tenant,authorized,v.tenantId),
+     rows:await withPolicyBoundDisplayLabels(tenant,authorized,v.tenantId),
      nextCursor:null,serverScoped:true};
  }
  let query=collection.where('pais','==',v.country);
@@ -95,7 +103,7 @@ async function scopedPolicyRead({db,auth,request}){
    allowRow(scope,row);
    return Object.assign({},row,{id:row.id||doc.id,canonicalDocumentId:doc.id});
  });
- const rows=await withPolicyBoundAdvisorLabels(tenant,verified.slice(0,v.pageSize),v.tenantId);
+ const rows=await withPolicyBoundDisplayLabels(tenant,verified.slice(0,v.pageSize),v.tenantId);
  return {ok:true,collection:'polizas',country:v.country,scope:scope.scope,
    rows,nextCursor:verified.length>v.pageSize&&rows.length?docs[v.pageSize-1].id:null,serverScoped:true};
 }

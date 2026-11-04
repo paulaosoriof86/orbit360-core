@@ -261,9 +261,12 @@ Orbit.modules.polizas = (function () {
       '<span style="min-width:0"><span style="font-weight:600;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:180px">'+U.esc(nombre)+'</span>'+
       '<span class="muted" style="font-size:11px">'+meta+'</span></span></a>';
   }
-  function insurerCell(id,I) {
-    const a=I.insurersById.get(id); if(!a) return '—';
-    return '<span style="display:flex;align-items:center;gap:7px"><span class="dot-s" style="background:'+U.esc(a.color||'')+'"></span>'+U.esc(a.nombre||a.displayName||'—')+'</span>';
+  function insurerCell(p,I) {
+    const a=I.insurersById.get(p.aseguradoraId);
+    const verified=typeof p.aseguradoraNombreVerificado==='string'?p.aseguradoraNombreVerificado.trim():'';
+    const name=(a&&(a.nombre||a.displayName))||verified;
+    if(!name) return '<span class="muted">Aseguradora sin coincidencia</span>';
+    return '<span style="display:flex;align-items:center;gap:7px"><span class="dot-s" style="background:'+U.esc(a&&a.color||'')+'"></span>'+U.esc(name)+'</span>';
   }
   function advisorCell(id,I) {
     if (!id) return '<span class="muted">Sin asesor en póliza</span>';
@@ -357,7 +360,7 @@ Orbit.modules.polizas = (function () {
             <td><span class="mono" style="font-size:12.5px;font-weight:600">${U.esc(p.numero || '')}</span><div class="muted" style="font-size:11px">${U.esc(p.formaPago || p.forma || p.frecuencia || '—')}</div></td>
             <td>${clientCell(p.clienteId,I)}</td>
             <td><b>${U.esc(p.ramo || '—')}</b><div class="muted" style="font-size:12px">${U.esc(p.producto || p.subramo || '—')}</div></td>
-            <td>${insurerCell(p.aseguradoraId,I)}</td>
+            <td>${insurerCell(p,I)}</td>
             <td>${advisorCell(p.asesorId,I)}</td>
             <td class="num">${M(policyPremiumTotal(p), p.moneda)}</td>
             <td style="font-size:12.5px">${U.fmtDate(p.vigenciaFin)}</td>
