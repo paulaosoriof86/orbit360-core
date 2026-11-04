@@ -36,12 +36,13 @@ jobs:
         run: |
           set -euo pipefail
           test "$GITHUB_REF_NAME" = 'recovery/fase-a-clean-20260831'
-          test "$(git rev-parse HEAD^)" = 'db10ae8a7a581fcf0e4f37b52d8c91be6eba75b1'
+          test "$(git rev-parse HEAD^)" = 'a554b2effd2bda5b3d45144636720a6d8e362d2a'
           test "$(git diff --name-only HEAD^ HEAD)" = '.github/workflows/gravicentra-b4-003-reader-preview-resync.yml'
           test "$(git rev-parse HEAD:artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json)" = "$(git rev-parse HEAD^:artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json)"
           test "$(git rev-parse HEAD:functions/b4-003-scoped-related-reader.js)" = "$(git rev-parse HEAD^:functions/b4-003-scoped-related-reader.js)"
           test "$(git rev-parse HEAD:functions/b4-003-scoped-policy-callable.js)" = "$(git rev-parse HEAD^:functions/b4-003-scoped-policy-callable.js)"
           test "$(git hash-object functions/b4-003-scoped-access-boundary.js)" = '97b650d9234a9de2fb5d1430fde598123364a796'
+          test "$(git hash-object functions/b4-003-scoped-policy-reader.js)" = '8589c7da6e118c7a32232125fb0ab0383ff581c8'
           test "$(git hash-object orbit360-platform/core/access-scope.js)" = 'a51598b5b1d31b6ee20673f9d9581ac445e5de37'
           test "$(git hash-object orbit360-platform/core/tenant-access-policy-effective-p0.js)" = 'a07c3bd78729093b86f99af9347f8b13ca11523d'
           node tools/gravicentra-b4-003-financial-role-scope-transversal.test.cjs
@@ -124,8 +125,8 @@ jobs:
           test "$status" = '400'
           curl --fail --silent --show-error --location --retry 2 --max-time 25 https://ays-orbit-360-lab.web.app/ | sha256sum | cut -d ' ' -f1 > "$RUNNER_TEMP/live-after.sha256"
           cmp "$RUNNER_TEMP/live-before.sha256" "$RUNNER_TEMP/live-after.sha256"
-          printf '{"gate":"I6.5/B4-003","status":"PREVIEW_READER_RESYNC_TECHNICAL_PASS","sourceParent":"db10ae8a7a581fcf0e4f37b52d8c91be6eba75b1","deployedFunction":"orbit360ScopedPolicyReadPreview","region":"us-east1","previewHeadStatus":400,"liveHostingBytesUnchanged":true,"liveFunctionDeployed":false,"firestoreRulesChanged":false,"authIamChanged":false,"dataWrites":0,"realUserUat":"PENDING"}\n' > "$RUNNER_TEMP/gi-b4003-reader-resync-result.json"
-          echo 'Preview reader synchronized; LIVE unchanged; authenticated two-UID UAT remains pending.' >> "$GITHUB_STEP_SUMMARY"
+          printf '{"gate":"I6.5/B4-003","status":"PREVIEW_READER_RESYNC_TECHNICAL_PASS","sourceParent":"a554b2effd2bda5b3d45144636720a6d8e362d2a","deployedFunction":"orbit360ScopedPolicyReadPreview","region":"us-east1","previewHeadStatus":400,"liveHostingBytesUnchanged":true,"liveFunctionDeployed":false,"firestoreRulesChanged":false,"authIamChanged":false,"dataWrites":0,"realUserUat":"PENDING"}\n' > "$RUNNER_TEMP/gi-b4003-reader-resync-result.json"
+          echo 'Preview reader with policy-bound display names synchronized; LIVE unchanged; authenticated two-UID UAT remains pending.' >> "$GITHUB_STEP_SUMMARY"
 
       - uses: actions/upload-artifact@v4
         if: always()
