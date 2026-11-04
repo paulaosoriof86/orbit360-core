@@ -31,9 +31,9 @@ assert.equal(broken('Orbit LAB','not-loaded'),'Usuario del equipo','NO_NETWORK_F
 const marker='function humanCommentAuthor(c)';
 const cstart=ciclo.indexOf(marker);
 const nameStart=ciclo.indexOf('const validName=n=>',cstart);
-const nameEnd=ciclo.indexOf(';',nameStart);
+const nameEnd=ciclo.indexOf('    if(uid){',nameStart);
 assert.ok(cstart>=0&&nameStart>cstart&&nameEnd>nameStart,'CICLO_VALIDATOR_NOT_FOUND');
-const valid=vm.runInNewContext(ciclo.slice(nameStart,nameEnd+1)+'; validName;');
+const valid=vm.runInNewContext(ciclo.slice(nameStart,nameEnd)+' validName;');
 assert.equal(valid('Carlos Castro'),true,'OPS_LEADS_CARD_REAL_PERSON_PRESERVED');
 assert.equal(valid('carlos@example.test'),false,'OPS_LEADS_CARD_EMAIL_REJECTED');
 console.log('PASS I6.5/B4-003 transversal inbox and Ops/Leads human identities 18+ checks');
