@@ -312,11 +312,11 @@ Orbit.modules.inicio = (function () {
     }).join('');
     const criticalInsights=[];
     criticalInsights.push(policyReadiness==='ready'
-      ?(renov.length?'Hay '+renov.length+' pólizas que vencen dentro de 45 días y requieren priorización.':
+      ?(renov.length?'Hay '+renov.length+(renov.length===1?' póliza que vence dentro de 45 días y requiere priorización.':' pólizas que vencen dentro de 45 días y requieren priorización.'):
         'No se detectaron vencimientos en el universo de pólizas confirmado.')
       :'El universo de vencimientos aún no está confirmado por el servidor.');
     criticalInsights.push(portfolioReadiness==='ready'
-      ?(venc.length?'Hay '+venc.length+' obligaciones vencidas visibles; revisa su gestión y aplicación.':
+      ?(venc.length?'Hay '+venc.length+(venc.length===1?' obligación vencida visible; revisa su gestión y aplicación.':' obligaciones vencidas visibles; revisa su gestión y aplicación.'):
         'No se registran obligaciones vencidas en el alcance visible confirmado.')
       :'La cartera aún no tiene una lectura completa y no se calcula un saldo provisional.');
     const configuredAdvisorGoals=board.filter(item=>item.metaConfigurada).length;
