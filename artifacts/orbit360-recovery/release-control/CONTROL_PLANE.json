@@ -18035,7 +18035,7 @@
     "nextAction": "SAME_EXACT_PREVIEW_AUTHENTICATED_PAULA_REPORTES_COBROS_GT_CO_THEN_CARLOS_SAMUEL_NEGATIVE_TESTS_NO_NEW_SOURCE_OR_DATA_IMPORT"
   },
   "b4003E4Gt13CategoryReconciliation20261104": {
-    "status": "CATEGORY_CAUSE_RECONCILED_EXACT_BUSINESS_IDS_AND_EXPORT_BYTES_HOLD",
+    "status": "CORRECTED_EXACT_NON_QA_12_IDS_AND_CAUSE_HOLD_EXPORT_BYTES_HOLD",
     "recordType": "ADDITIVE_SIGNED_UI_PLUS_SOURCE_CAUSAL_EVIDENCE_NOT_FULL_E4_PASS",
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_E4_GT13_CATEGORY_RECONCILIATION_20261104.json",
     "sourceSha": "cbca01be13f795a7469c5e9af59769337559688f",
@@ -18046,7 +18046,7 @@
     "coBoth": 56,
     "allCobros": 2572,
     "allReportesCommercial": 2559,
-    "anuladoAggregate": 12,
+    "anuladoAggregate": 0,
     "qaExcluded": 1,
     "exactBusinessIdsVerified": false,
     "exportBytesVerified": false,
@@ -18055,6 +18055,17 @@
     "formalI6Percent": 50,
     "p0Closed": 1,
     "p0Total": 6,
-    "b4003Closed": false
+    "b4003Closed": false,
+    "syntheticQaExcluded": 1,
+    "unclassifiedNonQaGtDelta": 12,
+    "falseAnuladoCauseRetracted": true,
+    "causeCorrectionSourceSha": "cbca01be13f795a7469c5e9af59769337559688f",
+    "signedGtAnuladoFilterCount": 0,
+    "independentBackendNegativePassed": false,
+    "transportCurrentImmutablePreview200ExactBuildPass": true,
+    "transportHistorical404NotIndependentCurrentBlocker": true,
+    "syntheticPriorFixtureAbsentOnCurrentPreview": true,
+    "syntheticWriteRestorePassed": false,
+    "metadataOnlyCorrection": true
   }
 }
