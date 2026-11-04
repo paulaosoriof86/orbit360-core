@@ -127,7 +127,8 @@ jobs:
 
   b4003-frozen-preview-synthetic:
     # Extension of the EXISTING synthetic-fixture workflow; no product build, rules or LIVE deployment.
-    if: (github.event_name == 'workflow_dispatch' && (inputs.b4003_mode == 'create' || inputs.b4003_mode == 'cleanup')) || (github.event_name == 'push' && startsWith(github.event.head_commit.message, 'test(B4-003): request '))
+    if: >-
+      (github.event_name == 'workflow_dispatch' && (inputs.b4003_mode == 'create' || inputs.b4003_mode == 'cleanup')) || (github.event_name == 'push' && startsWith(github.event.head_commit.message, 'test(B4-003): request '))
     runs-on: ubuntu-24.04
     timeout-minutes: 12
     env:
