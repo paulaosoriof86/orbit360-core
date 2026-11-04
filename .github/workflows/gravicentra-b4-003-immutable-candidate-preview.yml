@@ -52,8 +52,11 @@ jobs:
         run: |
           set -euo pipefail
           test "$(git rev-parse HEAD)" = "$SOURCE_SHA"
-          test "$(git rev-parse HEAD^)" = "d0a17a264981b0ff1fb2570799cbb4d77684be47"
-          test "$(git diff --name-only HEAD^ HEAD)" = ".github/workflows/gravicentra-b4-003-immutable-candidate-preview.yml"
+          test "$(git rev-parse HEAD^)" = "4c1963c5b980b5a8420c1b41b6e8e99a60b7daab"
+          test "$(git diff --name-only HEAD^ HEAD)" = "$(printf '%s\n' \
+            '.github/workflows/gravicentra-b4-003-immutable-candidate-preview.yml' \
+            'orbit360-platform/modules/policy-receipts-v1199-detail-guard.js' \
+            'tools/gravicentra-b4-003-policy-client-scope-link.test.cjs')"
           test -f artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json
           test -f orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json
           node --check functions/b4-003-scoped-policy-reader.js
@@ -163,11 +166,11 @@ jobs:
             ${{ runner.temp }}/gi-b4003-immutable-release-bundle.sha256
           if-no-files-found: error
           retention-days: 30
-      - name: Deploy ONLY a new expiring Hosting Preview channel from retained exact bundle
+      - name: Deploy ONLY existing isolated Hosting Preview channel from retained exact bundle
         id: hosting
         run: |
           set -euo pipefail
-          CHANNEL_ID="gi-i65-b4-rc-$GITHUB_RUN_ID"
+          CHANNEL_ID="gi-i65-b4-rc-41765742748"
           test "${#CHANNEL_ID}" -le 32
           cd "$RUNNER_TEMP/gi-e4-canonical-hosting/bundle"
           node "$FIREBASE_CLI_BIN" hosting:channel:deploy "$CHANNEL_ID" --config firebase.json --project "$PROJECT_ID" --expires 7d --non-interactive --json > "$RUNNER_TEMP/gi-e4-hosting-result.json" 2>&1
@@ -189,6 +192,22 @@ jobs:
         run: |
           set -euo pipefail
           ROOT="$RUNNER_TEMP/gi-e4-canonical-hosting/bundle/site"
+          mkdir -p "$RUNNER_TEMP/gi-e4-readback/__recovery__"
+          # Hosting CDN propagation may lag a successful deploy. Readiness requires
+          # the expected exact build bytes, not just HTTP 200 from an older release.
+          READY=0
+          for attempt in $(seq 1 55); do
+            if curl -fsSL --max-time 20 "$PREVIEW_URL/__recovery__/build.json" -o "$RUNNER_TEMP/gi-e4-readback/__recovery__/build.json" 2>/dev/null &&
+               cmp -s "$ROOT/__recovery__/build.json" "$RUNNER_TEMP/gi-e4-readback/__recovery__/build.json"; then
+              READY=1
+              break
+            fi
+            if [ "$attempt" -lt 55 ]; then sleep 5; fi
+          done
+          if [ "$READY" -ne 1 ]; then
+            echo 'PREVIEW_EXACT_BUILD_NOT_PROPAGATED_BEFORE_BOUNDED_DEADLINE' >&2
+            exit 1
+          fi
           for rel in __recovery__/build.json product-runtime-config.js index.html modules/polizas.js modules/policy-receipts-v1199-detail-guard.js modules/cancelaciones.js modules/reportes.js modules/cobros.js modules/renovaciones.js core/assignable-advisor-roster-client.js data/store-firestore-product-operational-p0.js core/tenant-access-policy-effective-p0.js core/access-scope.js core/queries.js; do
             mkdir -p "$RUNNER_TEMP/gi-e4-readback/$(dirname "$rel")"
             curl -fsSL --retry 12 --retry-all-errors --retry-delay 5 --max-time 25 "$PREVIEW_URL/$rel" > "$RUNNER_TEMP/gi-e4-readback/$rel"
@@ -211,7 +230,7 @@ jobs:
             rosterClientSha256:digest('core/assignable-advisor-roster-client.js'),
             writerFacadeSha256:digest('data/store-firestore-product-operational-p0.js'),
             indexSha256:digest('index.html'),servedArtifactExact:true,
-            hostingDeploy:'new_expiring_preview_only',bundleArtifact:'gi-b4003-immutable-release-bundle-'+process.env.GITHUB_RUN_ID,backendFunctionsDeployed:0,
+            hostingDeploy:'reused_isolated_preview_only',bundleArtifact:'gi-b4003-immutable-release-bundle-'+process.env.GITHUB_RUN_ID,backendFunctionsDeployed:0,
             dataWrites:0,firestoreRulesWrites:0,authIamChanges:0,productionDeploy:false,
             liveLabStable:true,liveAppDomainStable:true,authenticatedUat:'PENDING',
             gate:'I6.5/B4-003',production:'HOLD'

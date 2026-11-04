@@ -47,6 +47,8 @@ assert.ok(requestedCollections.some(names=>names.includes('aseguradoras')&&names
  'Dirección retains both fully authorized directory reads');
 activeRole='Asesor';
 assert.match(host.innerHTML,/Aseguradora autorizada/,'full-page policy detail uses scoped verified insurer label when directory denied');
+assert.match(host.innerHTML,/P-001 · Aseguradora autorizada ·/,'policy hero must show the same verified insurer as the body, not a false pending label');
+assert.doesNotMatch(host.innerHTML,/P-001 · Aseguradora pendiente ·/,'hero must not regress to an unverified directory-only name');
 assert.match(host.innerHTML,/Asesora autorizada/,'full-page policy detail uses scoped verified adviser label when directory denied');
 assert.doesNotMatch(host.innerHTML,/SECRETO|NO_REVELAR/,'public labels must not reveal unrelated directory fields');
 assert.match(host.innerHTML,/Abrir ficha del cliente/);
