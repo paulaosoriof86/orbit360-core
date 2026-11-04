@@ -18293,5 +18293,70 @@
     "ownerDeferredExportByteQaRetained": true,
     "priorSyntheticWriteRestoreRetained": true,
     "next": "SIGNED_INDEPENDENT_UID_ROLE_COUNTRY_TEAM_NEGATIVES_THEN_5_OPEN_P0_DISPOSITIONS; IF_PASS_PROMOTE_ONLY_ARTIFACT_13315537234_SAME_BYTES_AND_PROVE_LIVE_MODULE_MATRIX"
+  },
+  "b4003SignedCarlosCobrosRolesAndQaDisplay20261104": {
+    "recordType": "ADDITIVE_UAT_POINTER_NO_GATE_PROMOTION",
+    "gate": "I6.5/B4-003",
+    "sourceSha": "b094619281c1f2ccef7e08335adedc76cf878bbc",
+    "immutableArtifactId": 13315537234,
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_SIGNED_CARLOS_ROLE_COBROS_AND_QA_QUARANTINE_DELTA_20261104.json",
+    "carlosOperativoCobrosByCountry": {
+      "GT": 2504,
+      "CO": 56,
+      "TODOS": 2560
+    },
+    "carlosAsesorCobrosByCountry": {
+      "GT": 0,
+      "CO": 37,
+      "TODOS": 37
+    },
+    "coldReloadSameRoleAndCountryPass": true,
+    "asesorAseguradorasDirectRouteDeniedInUi": true,
+    "operativoAseguradorasByCountry": {
+      "GT": 16,
+      "CO": 17
+    },
+    "polizasGtCommercial": 1292,
+    "polizasGtQaAudit": 9,
+    "b2OrphanThreeVisibleInQaNotCommercial": true,
+    "independentSignedBackendNegatives": "PENDING",
+    "historicalP0Closed": 1,
+    "historicalP0Total": 6,
+    "formalI6Percent": 50,
+    "b4003Closed": false,
+    "productionAccepted": false,
+    "sourceOrHostingLiveModifiedByThisReceipt": false
+  },
+  "b4003SignedRealUidCallableMatrix20261104": {
+    "schema": "I6_5_B4_003_SIGNED_REAL_UID_CALLABLE_MATRIX_CANONICAL_POINTER_V1",
+    "status": "PASS_30_OF_30_REAL_UID_SIGNED_CALLABLE_ONLY_B4003_REMAINING_HOLD",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_SIGNED_REAL_UID_CALLABLE_NEGATIVES_PASS_20261104.json",
+    "workflowRunId": 41853402508,
+    "workflowConclusion": "success",
+    "artifactId": 13335512955,
+    "artifactDigest": "sha256:8ca3925316632588d5e02a640af82f51ed4a55a6f410b83a1d195cdacd519bca",
+    "sourceSha": "b094619281c1f2ccef7e08335adedc76cf878bbc",
+    "buildId": "gi-i65-b4-b094619281c1-57f234755dc1",
+    "retainedHostingArtifactId": 13315537234,
+    "identities": [
+      "Paula",
+      "Carlos",
+      "Samuel"
+    ],
+    "signedCustomTokenAndIdentityTokenCount": 3,
+    "positiveAndNegativeChecks": "30_OF_30_PASS",
+    "callableBackend": "orbit360AssignableAdvisorRoster",
+    "anonymousRoleCountryTenantAndAdvisorSpoofDenied": true,
+    "operationalWrites": 0,
+    "hostingRebuildOrDeploy": false,
+    "firestoreRulesModified": false,
+    "firestoreDirectSdkRulesNegativeAcceptance": "OWNER_TEMPORARILY_ACCEPTED_RISK_NOT_SECURITY_PASS",
+    "previousIndependentSignedBackendNegativesPending": "SUPERSEDED_BY_THIS_NEW_SIGNED_RECEIPT_ONLY_FOR_CALLABLE_ROSTER",
+    "historicalP0Closed": 1,
+    "historicalP0Total": 6,
+    "formalI6Percent": 50,
+    "fullB4003Closed": false,
+    "productionAccepted": false,
+    "next": "ADJUDICATE_ONLY_FIVE_REMAINING_P0_AND_OPS_LEADS_HUMAN_AUTHOR_READBACK; THEN_PROMOTE_EXACT_ARTIFACT_13315537234_IF_PASS_AND_CERTIFY_LIVE_MODULES"
   }
 }
