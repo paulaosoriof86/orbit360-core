@@ -22,7 +22,7 @@ jobs:
     if: >-
       github.repository == 'paulaosoriof86/orbit360-core' &&
       github.ref == 'refs/heads/recovery/fase-a-clean-20260831' &&
-      github.event.head_commit.message != 'transport(b4-003): serve retained 41789586526 artifact in Preview only'
+      github.event.head_commit.message != 'transport(b4-003): reuse existing isolated Preview channel under quota'
     runs-on: ubuntu-24.04
     timeout-minutes: 35
     env:
@@ -234,14 +234,14 @@ jobs:
       github.repository == 'paulaosoriof86/orbit360-core' &&
       github.ref == 'refs/heads/recovery/fase-a-clean-20260831' &&
       github.event_name == 'push' &&
-      github.event.head_commit.message == 'transport(b4-003): serve retained 41789586526 artifact in Preview only'
+      github.event.head_commit.message == 'transport(b4-003): reuse existing isolated Preview channel under quota'
     runs-on: ubuntu-24.04
     timeout-minutes: 25
     env:
       SOURCE_SHA: a48bfee0ac2824a82727a36a3900c6bda4caf484
       SOURCE_RUN: '41789586526'
       SOURCE_ARTIFACT_ID: '13302801760'
-      CHANNEL_ID: gi-i65-b4-rc-41789586526
+      CHANNEL_ID: gi-i65-b4-rc-41765742748
       PROJECT_ID: ays-orbit-360-lab
       HOSTING_SITE: ays-orbit-360-lab
       SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
@@ -258,11 +258,11 @@ jobs:
       - name: Prove single-file transport successor and immutable source parent
         run: |
           set -euo pipefail
-          test "$(git rev-parse HEAD^)" = "$SOURCE_SHA"
-          test "$(git diff --name-only HEAD^ HEAD)" = '.github/workflows/gravicentra-b4-003-immutable-candidate-preview.yml'
-          test "$(git rev-parse HEAD^:functions/b4-003-scoped-policy-reader.js)" = '8589c7da6e118c7a32232125fb0ab0383ff581c8'
-          test "$(git rev-parse HEAD^:orbit360-platform/modules/polizas.js)" = '7fbb84ce77ffba0c0ffb8c3051ca579c5989d70f'
-          test "$(git rev-parse HEAD^:orbit360-platform/modules/policy-receipts-v1199-detail-guard.js)" = 'c3d4f685638b27bfe2ef75b6f2d3759b4083bc83'
+          test "$(git rev-parse HEAD^)" = '46c78421ef800b4949ac93d5ceef70b5427c5279'
+          test "$(git diff --name-only "$SOURCE_SHA" HEAD)" = '.github/workflows/gravicentra-b4-003-immutable-candidate-preview.yml'
+          test "$(git rev-parse "$SOURCE_SHA":functions/b4-003-scoped-policy-reader.js)" = '8589c7da6e118c7a32232125fb0ab0383ff581c8'
+          test "$(git rev-parse "$SOURCE_SHA":orbit360-platform/modules/polizas.js)" = '7fbb84ce77ffba0c0ffb8c3051ca579c5989d70f'
+          test "$(git rev-parse "$SOURCE_SHA":orbit360-platform/modules/policy-receipts-v1199-detail-guard.js)" = 'c3d4f685638b27bfe2ef75b6f2d3759b4083bc83'
       - name: Recover EXACT retained 41789586526 bundle; do not rebuild
         uses: actions/download-artifact@v4
         with:
@@ -330,7 +330,7 @@ jobs:
           chmod 600 "$RUNNER_TEMP/gi-b4003-retained-auth/selected.json"
           echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/gi-b4003-retained-auth/selected.json" >> "$GITHUB_ENV"
           echo "FIREBASE_CLI_BIN=$CLI" >> "$GITHUB_ENV"
-      - name: Transport ONLY retained bundle to one expiring Preview; expose diagnostic on failure
+      - name: Replace ONLY existing isolated Preview channel; no new channel quota
         run: |
           set -euo pipefail
           cd "$RUNNER_TEMP/gi-b4003-retained-expanded/bundle"
@@ -369,7 +369,7 @@ jobs:
           node - <<'NODE'
           const fs=require('node:fs'),path=process.env.RUNNER_TEMP+'/gi-b4003-retained-proof.json';
           const b=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/gi-b4003-retained-expanded/bundle/site/__recovery__/build.json','utf8'));
-          fs.writeFileSync(path,JSON.stringify({gate:'I6.5/B4-003',status:'RETAINED_HOSTING_PREVIEW_EXACT_PASS',sourceSha:b.sourceSha,buildId:b.buildId,previewUrl:process.env.PREVIEW_URL,sourceRun:41789586526,sourceArtifactId:13302801760,bundleSha256:process.env.RETAINED_BUNDLE_SHA256,servedExact:true,hostingPreviewOnly:true,backendFunctionsDeployed:0,firestoreRulesChanged:false,dataWrites:0,liveLabStable:true,liveAppDomainStable:true,authenticatedUat:'PENDING',production:'HOLD'},null,2)+'\n');
+          fs.writeFileSync(path,JSON.stringify({gate:'I6.5/B4-003',status:'RETAINED_HOSTING_PREVIEW_EXACT_PASS',sourceSha:b.sourceSha,buildId:b.buildId,previewUrl:process.env.PREVIEW_URL,sourceRun:41789586526,sourceArtifactId:13302801760,bundleSha256:process.env.RETAINED_BUNDLE_SHA256,servedExact:true,hostingPreviewOnly:true,reusedExistingChannel:true,backendFunctionsDeployed:0,firestoreRulesChanged:false,dataWrites:0,liveLabStable:true,liveAppDomainStable:true,authenticatedUat:'PENDING',production:'HOLD'},null,2)+'\n');
           NODE
       - uses: actions/upload-artifact@v4
         if: always()
