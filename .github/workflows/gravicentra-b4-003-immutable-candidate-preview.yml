@@ -56,7 +56,7 @@ jobs:
           git merge-base --is-ancestor 66012815b42c0cc26cb372c19f74d52bddba953d HEAD
           test "$(git rev-parse HEAD:functions/assignable-advisor-roster.js)" = '9778d74b6d305ff56caf73bb68be3dadac4b14ce'
           test "$(git rev-parse HEAD:functions/product-operational-domain.js)" = 'b3d0059457142659633498c9c52c6b84ea68200f'
-          test "$(git rev-parse HEAD:orbit360-platform/core/ciclo.js)" = '2fd8007fb0979262c87e71f79505ebe47d3e836a'
+          test "$(git rev-parse HEAD:orbit360-platform/core/ciclo.js)" = '81a15a32cf7422952486e7fb773a1e8ed0742df0'
           test "$(git rev-parse HEAD:orbit360-platform/modules/cobros.js)" = '34dd080d88fe764d7858813843b7184c64d4cdc2'
           test "$(git rev-parse HEAD:tools/gravicentra-b4-003-e4-anulado-projection.test.cjs)" = '3f471893daabc44e3d226b6983393114d568c1f8'
           test -f artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json
@@ -76,6 +76,7 @@ jobs:
           node --check orbit360-platform/data/store-firestore-product-operational-p0.js
           node tools/gravicentra-b4-003-inicio-role-country-team.test.cjs
           node tools/gravicentra-b4-003-ops-leads-role-scopes.test.cjs
+          node tools/gravicentra-b4-003-ops-leads-advisor-r38.test.cjs
           node tools/gravicentra-b4-003-operational-write-security-regression.test.cjs >/dev/null
           node tools/gravicentra-b4-003-financial-role-scope-transversal.test.cjs
           node tools/gravicentra-b4-003-reportes-e4-transversal.test.cjs

@@ -28,6 +28,12 @@ Orbit.ciclo = (function () {
     }catch(e){return{uid:'',name:'Usuario del equipo',email:''};}
   }
   function currentUserName(){return currentUserIdentity().name;}
+  // The persisted advisor always wins over an unconfirmed first-paint option.
+  // A deliberate user change is accepted only if the server roster contains it.
+  function selectAdvisorIdFromRoster(persistedId, displayedId, userChanged, roster){
+    const desired=String(userChanged?displayedId:persistedId||'').trim();
+    return desired&&Array.isArray(roster)&&roster.some(a=>String(a&&a.id||'').trim()===desired)?desired:'';
+  }
   function displayStamp(value){
     const raw=String(value||'').trim();if(!raw)return'';
     const d=new Date(raw);if(Number.isNaN(d.getTime()))return raw;
@@ -161,7 +167,8 @@ Orbit.ciclo = (function () {
   /* ===================== transiciones ===================== */
   function log(rec, campo, de, a, origen) {
     rec.bitacora = rec.bitacora || [];
-    rec.bitacora.push({ ts: stamp(), user: currentUserName(), campo, de: de || '', a: a || '', origen: origen || 'manual' });
+    const actor=currentUserIdentity();
+    rec.bitacora.push({ ts: stamp(), user: actor.name, actorUid:actor.uid, actorName:actor.name, campo, de: de || '', a: a || '', origen: origen || 'manual' });
   }
   const PROB = { nuevo: 10, contactado: 25, cotizando: 45, propuesta: 65, negociacion: 78, inspeccion: 85, emision: 92, emitido: 100, perdido: 0 };
 
@@ -238,12 +245,13 @@ Orbit.ciclo = (function () {
   function gestionPayload(g) {
     let activeAdvisor = '';
     try { activeAdvisor = Orbit.session && Orbit.session.asesorId ? (Orbit.session.asesorId() || '') : ''; } catch (e) {}
+    const creatorIdentity=currentUserIdentity();
     const base = {
       id: 'ges' + Date.now().toString().slice(-7), lista: 'Gestiones Admin', tipo: '', titulo: '',
       clienteId: '', polizaId: '', asesorId: activeAdvisor, aseguradoraId: '', ramo: '',
       estado: 'Pendiente', prioridad: 'Media', vence: '', proximaAccion: 'Pendiente de definir',
       checklist: [], nota: '', notas: '', origen: 'manual',
-      bitacora: [{ ts: stamp(), user: currentUserName(), campo: 'Creación', de: '', a: 'Gestión creada', origen: 'manual' }],
+      bitacora: [{ ts: stamp(), user: creatorIdentity.name, actorUid:creatorIdentity.uid, actorName:creatorIdentity.name, campo: 'Creación', de: '', a: 'Gestión creada', origen: 'manual' }],
       comentarios: [], creado: today(), actualizado: today(), archivado: false
     };
     const out = Object.assign(base, g || {});
@@ -399,8 +407,8 @@ Orbit.ciclo = (function () {
     // First paint must not wait on catalog or roster network hydration.
     if(Orbit.cat&&typeof Orbit.cat.ensure==='function')Orbit.cat.ensure().catch(()=>{});
     const n = S().get('negocios', id); if (!n) return;
-    const ase = q.asesor(n.asesorId), asg = q.aseguradora(n.aseguradoraId), ei = etapaInfo(n.etapa), prob = U.finiteNumber(n.prob);
-    let asesores = ase&&ase.id?[ase]:[], asgs = insurersForCountry(n.pais);
+    const asg = q.aseguradora(n.aseguradoraId), ei = etapaInfo(n.etapa), prob = U.finiteNumber(n.prob);
+    let asesores = [], asgs = insurersForCountry(n.pais);
     let selectedInsurerIds=[...new Set([].concat(n.aseguradoraIds||[],n.aseguradoraId||[]).filter(Boolean))].filter(id=>asgs.some(a=>a.id===id));
     const enOps = !!ei.ops;
     const previewProtectedUpload=/--/.test(String(location.hostname||''))&&!(n.previewWrite===true&&/^b4003qa[_:-]/i.test(String(n.id||id)));
@@ -449,7 +457,7 @@ Orbit.ciclo = (function () {
               ${fSelect('Plan', 'ng-plan', commercialPlans(n.pais,n.ramo,selectedInsurerIds), n.plan || '')}
               ${fSelectCat('Segmento', 'ng-segmento', 'segmentos', n.segmento || '')}
               <div class="ce-l"><span>Aseguradoras de interés</span><div id="ng-asg" class="insurer-multicheck" data-country-scope="${U.esc(n.pais||'')}">${insurerChecklistHtml(asgs,selectedInsurerIds)}</div><small class="muted" style="display:block;margin-top:4px">Marca una o varias aseguradoras. Solo se muestran las habilitadas para el país del negocio.</small></div>
-              ${fSelectOpt('Asesor responsable', 'ng-ase', asesores.map(a => [a.id, a.nombre]), n.asesorId)}
+              <label class="ce-l">Asesor responsable<select id="ng-ase" class="o-sel" disabled><option value="">Confirmando responsable del servidor…</option></select></label>
               ${fInput('Prima estimada', 'ng-prima', n.primaEst, 'number')}
               ${fSelectCat('Prioridad', 'ng-prio', 'prioridades', n.prioridad)}
               ${fInput('N.º cotización', 'ng-cot', n.nroCotizacion)}
@@ -506,13 +514,42 @@ Orbit.ciclo = (function () {
     const pieceReadback=back.querySelector('#ng-pieza-view');if(pieceReadback){pieceReadback.readOnly=true;pieceReadback.title='Origen de pieza registrado al crear el negocio; se conserva para trazabilidad.';}
     try{requestAnimationFrame(()=>{const finished=window.performance&&typeof performance.now==='function'?performance.now():Date.now(),duration=Math.max(0,finished-openedAt);back.dataset.firstPaintMs=String(Math.round(duration));if(window.performance&&performance.mark&&performance.measure){performance.mark(markId+'-paint');performance.measure(markId,markId+'-start',markId+'-paint');}document.dispatchEvent(new CustomEvent('orbit:timing',{detail:{surface:'business-card',phase:'first-paint',durationMs:duration}}));});}catch(_e){}
     const countrySelect=back.querySelector('#ng-pais'),insurerSelect=back.querySelector('#ng-asg'),advisorSelect=back.querySelector('#ng-ase'),ramoSelect=back.querySelector('#ng-ramo'),productSelect=back.querySelector('#ng-prod'),planSelect=back.querySelector('#ng-plan');
-    // Hydrate the canonical assignable roster after first paint; preserve current selection.
-    assignableAdvisors(n.pais).then(rows=>{
-      if(!advisorSelect||!Array.isArray(rows)||!rows.length)return;
-      asesores=rows;const current=advisorSelect.value||n.asesorId;
-      advisorSelect.innerHTML=rows.map(a=>'<option value="'+U.esc(a.id)+'">'+U.esc(a.nombre)+'</option>').join('');
-      if(rows.some(a=>a.id===current))advisorSelect.value=current;
-    }).catch(()=>{});
+    // Keep the selector read-only until BOTH the business snapshot and the
+    // canonical role/country roster are authoritative. Never select row zero.
+    let advisorTouched=false,rosterCountry='',advisorRoster=null;
+    const businessConfirmed=()=>{
+      const status=typeof S()._productStatus==='function'?S()._productStatus():null;
+      return !!status&&Array.isArray(status.serverConfirmedCollections)&&status.serverConfirmedCollections.includes('negocios');
+    };
+    const paintAdvisor=()=>{
+      if(!advisorSelect||!back.isConnected)return;
+      const ready=businessConfirmed()&&rosterCountry===countrySelect.value&&Array.isArray(advisorRoster)&&advisorRoster.length>0;
+      if(!ready){
+        advisorSelect.disabled=true;advisorSelect.dataset.rosterReady='false';
+        advisorSelect.innerHTML='<option value="">Confirmando responsable del servidor…</option>';
+        return;
+      }
+      const live=S().get('negocios',id);
+      if(!live){advisorSelect.disabled=true;advisorSelect.dataset.rosterReady='false';return;}
+      const displayed=advisorSelect.value;
+      const selected=selectAdvisorIdFromRoster(live.asesorId,displayed,advisorTouched,advisorRoster);
+      advisorSelect.innerHTML='<option value="">Selecciona un asesor responsable</option>'+advisorRoster.map(a=>'<option value="'+U.esc(a.id)+'">'+U.esc(a.nombre)+'</option>').join('');
+      advisorSelect.value=selected;
+      advisorSelect.disabled=false;advisorSelect.dataset.rosterReady='true';
+    };
+    advisorSelect.addEventListener('change',()=>{advisorTouched=true;});
+    const stopWatch=S().on('negocios',()=>{
+      if(!back.isConnected){stopWatch();return;}
+      if(!advisorTouched)paintAdvisor();
+    });
+    back.querySelectorAll('[data-close]').forEach(btn=>btn.addEventListener('click',stopWatch,{once:true}));
+    const loadAdvisorCountry=async country=>{
+      rosterCountry=country;advisorRoster=null;paintAdvisor();
+      const rows=await assignableAdvisors(country);
+      if(country!==countrySelect.value||!back.isConnected)return;
+      advisorRoster=rows;asesores=rows;paintAdvisor();
+    };
+    loadAdvisorCountry(n.pais).catch(()=>{paintAdvisor();});
     const refreshCommercialDependencies=()=>{
       const country=countrySelect.value,ramo=ramoSelect&&ramoSelect.value,priorProduct=productSelect&&productSelect.value,priorPlan=planSelect&&planSelect.value;
       paintSelect(productSelect,commercialProducts(country,ramo),priorProduct,'— Seleccionar producto —');
@@ -526,7 +563,7 @@ Orbit.ciclo = (function () {
       const priorInsurers=insurerSelect?checkedInsurerIds(insurerSelect):[];
       asgs=insurersForCountry(country);
       if(insurerSelect){const kept=priorInsurers.filter(id=>asgs.some(a=>a.id===id));insurerSelect.innerHTML=insurerChecklistHtml(asgs,kept);insurerSelect.dataset.countryScope=country;}
-      const currentAdvisor=advisorSelect&&advisorSelect.value;asesores=await assignableAdvisors(country);if(advisorSelect){advisorSelect.innerHTML=asesores.map(a=>'<option value="'+U.esc(a.id)+'">'+U.esc(a.nombre)+'</option>').join('');if(asesores.some(a=>a.id===currentAdvisor))advisorSelect.value=currentAdvisor;else if(asesores.length)advisorSelect.value=asesores[0].id;}
+      await loadAdvisorCountry(country);
       const priorRamo=ramoSelect&&ramoSelect.value,rows=Orbit.cat.ramosDe(country);if(ramoSelect){paintSelect(ramoSelect,rows,rows.includes(priorRamo)?priorRamo:(rows[0]||''),null);}
       refreshCommercialDependencies();
     };
@@ -661,12 +698,18 @@ Orbit.ciclo = (function () {
     back.querySelector('#ng-save').addEventListener('click', async () => {
       const save = back.querySelector('#ng-save'), g = sid => (back.querySelector('#' + sid) || {}).value;
       const insurerIds=checkedInsurerIds(back.querySelector('#ng-asg'));
+      const live=S().get('negocios',id);
+      const selectedAdvisor=selectAdvisorIdFromRoster(live&&live.asesorId,advisorSelect&&advisorSelect.value,advisorTouched,advisorRoster);
+      if(!businessConfirmed()||!live||!advisorSelect||advisorSelect.disabled||advisorSelect.dataset.rosterReady!=='true'||!selectedAdvisor||selectedAdvisor!==advisorSelect.value)
+        return U.toast('Confirma el asesor responsable autorizado antes de guardar. No se cambió el negocio.');
+      if(String(live.asesorId||'')!==String(n.asesorId||''))
+        return U.toast('El responsable se actualizó durante la carga. Cierra y vuelve a abrir la ficha para guardar sobre datos confirmados.');
       if (save.disabled) return; save.disabled = true; const saveLabel=save.textContent; save.textContent='Guardando…'; save.setAttribute('aria-busy','true');
       try {
         await S().updateDurable('negocios', id, {
           nombre: g('ng-nombre') || n.nombre, tipo: g('ng-tipo'), telefono: g('ng-tel'), email: g('ng-email'),
           pais: g('ng-pais'), moneda: g('ng-pais') === 'CO' ? 'COP' : 'GTQ', canal: g('ng-canal'),
-          producto: g('ng-prod'), plan: g('ng-plan'), ramo: g('ng-ramo'), segmento: g('ng-segmento'), aseguradoraIds: insurerIds, aseguradoraId: insurerIds[0] || '', asesorId: g('ng-ase'),
+          producto: g('ng-prod'), plan: g('ng-plan'), ramo: g('ng-ramo'), segmento: g('ng-segmento'), aseguradoraIds: insurerIds, aseguradoraId: insurerIds[0] || '', asesorId: selectedAdvisor,
           primaEst: +g('ng-prima') || n.primaEst, prioridad: g('ng-prio'), nroCotizacion: g('ng-cot'),
           proximoToque: g('ng-toque') || n.proximoToque, descripcion: g('ng-desc'), colLeads: (back.querySelector('#ng-col') || {}).value || '', actualizado: today()
         });
@@ -1268,7 +1311,7 @@ Orbit.ciclo = (function () {
           ${fSelectCat('Segmento', 'nn-segmento', 'segmentos', prefill.segmento||Orbit.cat.get('segmentos')[0]||'')}
           ${fSelectCat('Prioridad', 'nn-prioridad', 'prioridades', prefill.prioridad||Orbit.cat.get('prioridades')[0]||'')}
           ${fInput('Prima estimada', 'nn-prima', 0, 'number')}
-          ${fSelectOpt('Asesor', 'nn-ase', asesores.map(a => [a.id, a.nombre]), prefill.asesorId||(Orbit.session&&Orbit.session.asesorId?Orbit.session.asesorId()||'':''))}
+          ${fSelectOpt('Asesor', 'nn-ase', [['','Selecciona un asesor responsable']].concat(asesores.map(a => [a.id, a.nombre])), prefill.asesorId||(Orbit.session&&Orbit.session.asesorId?Orbit.session.asesorId()||'':''))}
         </div>
         <div class="ce-l"><span>Aseguradoras de interés</span><div id="nn-asg" class="insurer-multicheck" data-country-scope="${U.esc(initialCountry)}">${insurerChecklistHtml(asgs,[])}</div><small class="muted" style="display:block;margin-top:4px">Marca una o varias aseguradoras. Solo se muestran las habilitadas para el país seleccionado.</small></div>
         ${fSelectOpt('Punto de ingreso', 'nn-ingreso', entryOptions.map(p=>[p.id,p.label]), defaultEntry)}
@@ -1285,7 +1328,7 @@ Orbit.ciclo = (function () {
     };
     const refreshCountry=async()=>{
       const current=advisorSelect.value||(prefill.asesorId||'');asesores=await assignableAdvisors(countrySelect.value);
-      advisorSelect.innerHTML=asesores.map(a=>'<option value="'+U.esc(a.id)+'">'+U.esc(a.nombre)+'</option>').join('');if(asesores.some(a=>a.id===current))advisorSelect.value=current;else if(asesores.length)advisorSelect.value=asesores[0].id;
+      advisorSelect.innerHTML='<option value="">Selecciona un asesor responsable</option>'+asesores.map(a=>'<option value="'+U.esc(a.id)+'">'+U.esc(a.nombre)+'</option>').join('');advisorSelect.value=selectAdvisorIdFromRoster(current,current,false,asesores);
       advisorSelect.dataset.assignableAdvisorRoster='server-owned-minimal';advisorSelect.dataset.assignableCount=String(asesores.length);
       const priorRamo=ramoSelect.value,rows=Orbit.cat.ramosDe(countrySelect.value);paintSelect(ramoSelect,rows,rows.includes(priorRamo)?priorRamo:(rows[0]||''),null);
       asgs=insurersForCountry(countrySelect.value);insurerSelect.innerHTML=insurerChecklistHtml(asgs,[]);insurerSelect.dataset.countryScope=countrySelect.value;
@@ -1299,7 +1342,7 @@ Orbit.ciclo = (function () {
       const v=sid=>(back.querySelector('#'+sid)||{}).value;
       const ingreso=Orbit.cat.puntoIngreso(v('nn-ingreso'));if(!ingreso)return U.toast('Selecciona un punto de ingreso válido.');
       const ingresoOps=ingreso.origen==='Ops',pais=v('nn-pais'),asesorId=v('nn-ase'),insurerIds=checkedInsurerIds(insurerSelect);
-      if(!asesorId)return U.toast('Selecciona un asesor responsable.');
+      if(!asesorId||!asesores.some(a=>String(a.id)===String(asesorId)))return U.toast('Selecciona un asesor responsable confirmado para este país y rol.');
       const metaQa=metaQaPreview&&back.querySelector('#nn-meta-qa')?.checked===true;
       if(metaQa&&(pais!=='GT'||ingresoOps||ingreso.etapa!=='nuevo'))return U.toast('La prueba Meta requiere Guatemala y el punto de ingreso Leads / Nuevo.');
       const id=metaQa?'b4003qa_meta_tr_v27_20261025_01':'neg'+Date.now().toString().slice(-7),identityId=prefill.commercialIdentityId||id;
