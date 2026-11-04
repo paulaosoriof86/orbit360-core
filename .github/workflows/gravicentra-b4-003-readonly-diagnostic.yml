@@ -389,7 +389,6 @@ jobs:
       SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
       SA_LAB_LEGACY: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
       SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-      B4003_SIGNED_RECEIPT: ${{ runner.temp }}/gi-b4003-existing-uid-signed-negatives.json
     steps:
       - uses: actions/checkout@v4
         with:
@@ -416,6 +415,8 @@ jobs:
           npm install --prefix "$DEP_ROOT" --no-save --package-lock=false --ignore-scripts --no-audit --no-fund firebase-admin@13.4.0 >/dev/null
           echo "NODE_PATH=$DEP_ROOT/node_modules" >> "$GITHUB_ENV"
       - name: Execute read-only signed callable positive and negative matrix
+        env:
+          B4003_SIGNED_RECEIPT: ${{ runner.temp }}/gi-b4003-existing-uid-signed-negatives.json
         run: node tools/gravicentra-b4-003-real-uid-server-negatives.cjs
       - name: Preserve non-sensitive evidence even if a denial fails
         if: always()
