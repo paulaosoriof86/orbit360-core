@@ -123,6 +123,28 @@ Orbit.ciclo = (function () {
   }
   const COLLAB_TYPES=['Comentario comercial','Observación operativa','Solicitar información al asesor','Respuesta del asesor','Devuelto a asesor','Reenviado a Operaciones','Nota interna'];
   async function assignableAdvisors(country){if(!Orbit.assignableAdvisorRoster?.list)return[];try{return await Orbit.assignableAdvisorRoster.list(country);}catch(e){return[];}}
+  // R38: use the signed role/country roster as the display identity owner.
+  const advisorRosterRequested=new Set();
+  function ensureAdvisorRoster(countries){
+    const roster=Orbit.assignableAdvisorRoster;
+    if(!roster||typeof roster.list!=='function'||typeof roster.peek!=='function')return;
+    const role=String(Orbit.session?.rol?.()||'').toLowerCase(),uid=String(Orbit.auth?.productUser?.uid||'');
+    [...new Set([].concat(countries||[]).map(x=>String(x||'').toUpperCase()).filter(x=>x==='GT'||x==='CO'))].forEach(country=>{
+      const key=uid+'|'+role+'|'+country;
+      if(advisorRosterRequested.has(key)||roster.peek(country).length)return;
+      advisorRosterRequested.add(key);
+      Promise.resolve().then(()=>roster.list(country)).then(()=>{
+        document.dispatchEvent(new CustomEvent('orbit:ciclo',{detail:{reason:'advisor-identity-readback',country}}));
+      }).catch(()=>{/* show unverified, not another person's name */});
+    });
+  }
+  function verifiedAdvisor(id,country){
+    if(!id)return null;
+    const roster=Orbit.assignableAdvisorRoster;
+    const row=roster&&typeof roster.peek==='function'?roster.peek(country).find(a=>String(a.id)===String(id)):null;
+    return row?Object.assign({},q.asesor(id,country)||{},{id:row.id,nombre:row.nombre}):
+      {id,nombre:'Responsable por verificar',color:'#999'};
+  }
   function membershipProjection(){try{return Orbit.auth&&Orbit.auth.productUser&&Orbit.auth.productUser.productReadOnly===true?Orbit.auth.productUser:null;}catch(e){return null;}}
   function advisorIdentity(){try{return Orbit.session&&Orbit.session.asesorId?String(Orbit.session.asesorId()||'').trim():'';}catch(e){return'';}}
   function normalizedScope(value){value=String(value==null?'':value).trim().toLowerCase();if(['own','propios','propio'].includes(value))return'own';if(['team','equipo'].includes(value))return'team';if(['none','ninguno'].includes(value))return'none';if(['all','todos'].includes(value))return'all';return'';}
@@ -154,16 +176,20 @@ Orbit.ciclo = (function () {
     // totals or role filters before the negocios snapshot is server confirmed.
     const status=typeof S()._productStatus==='function'?S()._productStatus():null;
     if(status&&(!Array.isArray(status.serverConfirmedCollections)||!status.serverConfirmedCollections.includes('negocios')))return[];
-    return S().all('negocios').filter(n =>
+    const visible=S().all('negocios').filter(n =>
       (opts.incArchivado ? true : !n.archivado) &&
       paisOK(n.pais) &&
       (opts.ignoreRol ? true : scopeAllows(n.asesorId,surface)));
+    ensureAdvisorRoster(visible.map(n=>n.pais));
+    return visible;
   }
   function gestiones(opts) {
     opts=opts||{};const surface=opts.surface||'ops';
-    return S().all('gestiones').filter(g => !g.archivado &&
+    const visible=S().all('gestiones').filter(g => !g.archivado &&
       (() => { const c = S().get('clientes', g.clienteId); return !c || paisOK(c.pais); })() &&
       scopeAllows(g.asesorId,surface));
+    ensureAdvisorRoster(visible.map(g=>(S().get('clientes',g.clienteId)||{}).pais||g.pais));
+    return visible;
   }
   function primaShort(n) { return U.moneyShort(n.primaEst, n.moneda); }
   function flag(pais) { return pais === 'GT' ? '🇬🇹' : pais === 'CO' ? '🇨🇴' : '🌎'; }
@@ -337,7 +363,7 @@ Orbit.ciclo = (function () {
   }
   function cardNegocio(n, opts) {
     opts = opts || {};
-    const ase = q.asesor(n.asesorId), ei = etapaInfo(n.etapa);
+    const ase = verifiedAdvisor(n.asesorId,n.pais), ei = etapaInfo(n.etapa);
     const d = U.daysFromNow(n.proximoToque), prob = U.finiteNumber(n.prob);
     const done = (n.checklist || []).filter(c => c.done).length, tot = (n.checklist || []).length;
     const pr = { Alta: 'danger', Media: 'warn', Baja: 'neutral' }[n.prioridad] || 'neutral';
@@ -368,7 +394,7 @@ Orbit.ciclo = (function () {
     </div>`;
   }
   function cardGestion(g) {
-    const cli = S().get('clientes', g.clienteId), ase = q.asesor(g.asesorId), asg = q.aseguradora(g.aseguradoraId);
+    const cli = S().get('clientes', g.clienteId), ase = verifiedAdvisor(g.asesorId,(S().get('clientes',g.clienteId)||{}).pais||g.pais), asg = q.aseguradora(g.aseguradoraId);
     const d = U.daysFromNow(g.vence);
     const done = (g.checklist || []).filter(c => c.done).length, tot = (g.checklist || []).length;
     const pr = { Alta: 'danger', Media: 'warn', Baja: 'neutral' }[g.prioridad] || 'neutral';

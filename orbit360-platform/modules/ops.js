@@ -61,7 +61,15 @@ Orbit.modules.ops = (function () {
     const totNeg = board.filter(c => c.def.kind === 'negocio').reduce((s, c) => s + c.items.length, 0);
     const totGes = board.filter(c => c.def.kind === 'gestion').reduce((s, c) => s + c.items.length, 0);
     const asegs = Orbit.store.all('aseguradoras').filter(a => a.vinculada !== false);
-    const ases = Orbit.store.all('asesores').filter(a => !a.inactivo);
+    // Signed role/country roster is the authority for display names and filter labels.
+    const roster=Orbit.assignableAdvisorRoster;
+    const advisorRows=roster&&typeof roster.peek==='function'?
+      ['GT','CO'].flatMap(country=>roster.peek(country)):[];
+    const seenAdvisors=new Set();
+    const ases=advisorRows.filter(a=>{
+      if(!a||!a.id||!a.nombre||seenAdvisors.has(a.id))return false;
+      seenAdvisors.add(a.id);return a.activo!==false;
+    });
     const actions = advisor ? '' : '<button class="btn ghost" id="op-lists">⚙ Listas</button><button class="btn ghost" id="op-new-ges">+ Gestión</button><button class="btn primary" id="op-new-neg">+ Nuevo ingreso</button>';
     host.innerHTML = `<div class="page">
       ${K.bannerFor('ops', actions)}

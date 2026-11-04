@@ -13,7 +13,17 @@ Orbit.q = (function () {
   const amount = v => { const n = finite(v); return n == null ? 0 : n; };
   const textNorm = v => String(v == null ? '' : v).trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 
-  function asesor(id) { return S().get('asesores', id); }
+  function asesor(id,country) {
+    const legacy=S().get('asesores',id),roster=Orbit.assignableAdvisorRoster;
+    if(id&&roster&&typeof roster.peek==='function'){
+      const countries=country?[String(country).toUpperCase()]:['GT','CO'];
+      for(const c of countries){
+        const verified=roster.peek(c).find(a=>String(a.id)===String(id));
+        if(verified)return Object.assign({},legacy||{},{id:verified.id,nombre:verified.nombre});
+      }
+    }
+    return legacy;
+  }
   function aseguradora(id) { return S().get('aseguradoras', id); }
 
   // ---- por cliente ----
