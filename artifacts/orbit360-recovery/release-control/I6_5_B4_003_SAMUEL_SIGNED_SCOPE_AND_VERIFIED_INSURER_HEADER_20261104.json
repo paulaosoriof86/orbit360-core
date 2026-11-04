@@ -1,0 +1,104 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_SAMUEL_SIGNED_SCOPE_INSURER_HEADER_EXACT_PREVIEW_V1",
+  "dateGuatemala": "2026-11-04",
+  "gate": "I6.5/B4-003",
+  "product": "Gravicentra Insurance",
+  "recordType": "ADDITIVE_SIGNED_READ_ONLY_FUNCTIONAL_UAT_NOT_FULL_GATE_OR_PRODUCTION_ACCEPTANCE",
+  "source": {
+    "repo": "paulaosoriof86/orbit360-core",
+    "branch": "recovery/fase-a-clean-20260831",
+    "sourceSha": "cbca01be13f795a7469c5e9af59769337559688f",
+    "buildId": "gi-i65-b4-cbca01be13f7-57f234755dc1",
+    "codeFixCommit": "cbca01be13f795a7469c5e9af59769337559688f",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-rc-41765742748-neoi3u7r.web.app/",
+    "reusedChannel": "gi-i65-b4-rc-41765742748"
+  },
+  "verifiedRelease": {
+    "workflowRunId": 41793877796,
+    "conclusion": "SUCCESS",
+    "readbackArtifactId": 13304611684,
+    "retainedBundleArtifactId": 13304468225,
+    "retainedTarSha256": "32d6f1706c196d6c07cef8ca2932750f4cc210548f607e2f4ffbd0725086958c",
+    "exactFilesCompared": 14,
+    "servedArtifactExact": true,
+    "newChannelCreated": false,
+    "functionsDeployed": 0,
+    "firestoreRulesWrites": 0,
+    "dataWrites": 0,
+    "authIamChanges": 0,
+    "productionDeploy": false,
+    "liveLabStable": true,
+    "liveAppDomainStable": true
+  },
+  "signedChromeUat": {
+    "actor": "Samuel Daza",
+    "session": "SIGNED_SAMUEL_UID_DISPLAYED",
+    "testMode": "READ_ONLY_UI_NO_FORM_SAVE",
+    "roleCountryCases": [
+      {
+        "role": "Asesor",
+        "country": "Guatemala",
+        "clients": 1,
+        "policies": 1,
+        "knownPolicyNumber": "VA125-00010478",
+        "verified": true
+      },
+      {
+        "role": "Asesor",
+        "country": "Colombia",
+        "clients": 0,
+        "policies": 0,
+        "verified": true
+      },
+      {
+        "role": "Operativo",
+        "country": "Colombia",
+        "policies": 124,
+        "activePolicies": 27,
+        "clients360": 49,
+        "client360LinkedPolicyCount": 125,
+        "verified": true
+      },
+      {
+        "role": "Operativo",
+        "country": "Guatemala",
+        "commercialPolicies": 1292,
+        "qaOriginMarkedPolicies": 9,
+        "totalListedPolicies": 1301,
+        "verified": true
+      }
+    ],
+    "focalPolicy": {
+      "businessPolicyNumber": "VA125-00010478",
+      "client": "BAYRON ESTUARDO CONTRERAS PORTILLO",
+      "country": "GT",
+      "insurer": "ASEGURADORA RURAL",
+      "advisor": "Samuel Daza",
+      "before": "DETAIL_BODY_INSURER_VERIFIED_BUT_HERO_FALSE_PENDING",
+      "after": "HERO_AND_DETAIL_BOTH_SHOW_VERIFIED_INSURER_SAMUEL_ROLE_AS_GT",
+      "status": "PASS_AFTER_REBUILD_DEPLOY_AND_SIGNED_BROWSER_READBACK"
+    },
+    "client360ColombiaHistoricalZero": "NOT_REPRODUCED_49_CLIENTS_SIGNED_OPERATIVO_CO",
+    "co124ListVs125Client360Linked": "OPEN_CARDINALITY_RECONCILIATION_NO_ASSUMED_DUPLICATE_NO_COUNTRY_MUTATION"
+  },
+  "preservedEvidence": [
+    "CARLOS_OPERATIVO_GT_CO_AND_ASESOR_CO_SIGNED_READ_ONLY_FUNCTIONAL_UAT_20261103",
+    "PAULA_PARTIAL_READ_ONLY_UAT_20261103",
+    "PRIOR_E4_EXPORT_AND_FINANCE_EXCEPTIONS_UNCHANGED_UNLESS_SEPARATELY_CLOSED"
+  ],
+  "stillOpen": [
+    "CO_124_VS_125_RELATION_SOURCE_CLASSIFICATION",
+    "GT_13_REPORTES_COBROS_BUSINESS_ID_DIFFERENCE",
+    "CO_12_POLICIES_4_AGING_EXCEPTIONS",
+    "E4_EXPORT_BYTE_READBACK",
+    "AUTHORIZED_SYNTHETIC_WRITE_RELOAD_RESTORE",
+    "INDEPENDENT_FUNCTIONAL_P0_AND_SAME_ARTIFACT_CONTROLLED_LIVE_MODULE_READBACK"
+  ],
+  "formalI6Percent": 50,
+  "p0Closed": 1,
+  "p0Total": 6,
+  "b4003Closed": false,
+  "productionAuthorized": false,
+  "rules": "OWNER_TEMPORARY_BROAD_RULES_RISK_ACCEPTED_NOT_AN_INDEPENDENT_NEW_BLOCKER_AND_NOT_SECURITY_PASS",
+  "next": "CLASSIFY_REMAINING_EXACT_BUSINESS_ID_DIFFERENCES_REUSE_APPROVED_SAMUEL_CARLOS_PAULA_ROLE_EVIDENCE_THEN_SINGLE_CONTROLLED_RELEASE_BATCH"
+}

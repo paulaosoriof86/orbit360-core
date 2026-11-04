@@ -32,8 +32,8 @@
     "currentCandidate": {
       "repository": "paulaosoriof86/orbit360-core",
       "branch": "recovery/fase-a-clean-20260831",
-      "sourceSha": "a48bfee0ac2824a82727a36a3900c6bda4caf484",
-      "buildId": "gi-i65-b4-a48bfee0ac28-57f234755dc1",
+      "sourceSha": "cbca01be13f795a7469c5e9af59769337559688f",
+      "buildId": "gi-i65-b4-cbca01be13f7-57f234755dc1",
       "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-rc-41765742748-neoi3u7r.web.app/",
       "createNewPreviewByRoutine": false
     },
@@ -41,6 +41,7 @@
       "CARLOS_OPERATIVO_GT_CO_AND_ASESOR_CO_SIGNED_READ_ONLY_FUNCTIONAL_UAT_20261103",
       "PAULA_PARTIAL_READ_ONLY_UAT_20261103",
       "SAMUEL_PARTIAL_SIGNED_SCOPE_UAT_AND_OWNER_GRANTS_UNCHANGED_20261103",
+      "SAMUEL_SIGNED_SCOPE_GT_CO_AND_VERIFIED_INSURER_HEADER_AFTER_REBUILD_20261104",
       "SOURCE_123_SYNTHETIC_TESTS_PASS_41751634200",
       "PROTECTED_READER_DEPLOY_41752044098"
     ],
@@ -74,6 +75,27 @@
       "securityPassed": false
     },
     "mutationScope": "CONTROL_PLANE_METADATA_ONLY_NO_PRODUCT_FIRESTORE_RULES_AUTH_IAM_OR_LIVE_DEPLOY"
+  },
+  "b4003SamuelVerifiedPreviewUat20261104": {
+    "status": "SIGNED_SCOPE_AND_FOCAL_INSURER_HEADER_PASS_OTHER_RELEASE_REQUIREMENTS_OPEN",
+    "recordType": "ADDITIVE_EVIDENCE_POINTER_NOT_FULL_B4_003_OR_PRODUCTION_ACCEPTANCE",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_SAMUEL_SIGNED_SCOPE_AND_VERIFIED_INSURER_HEADER_20261104.json",
+    "sourceSha": "cbca01be13f795a7469c5e9af59769337559688f",
+    "buildId": "gi-i65-b4-cbca01be13f7-57f234755dc1",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-rc-41765742748-neoi3u7r.web.app/",
+    "runId": 41793877796,
+    "exactReadbackPassed": true,
+    "authSamuelAsesorGtCoAndOperativoGtCoVerified": true,
+    "coClient360VisibleClients": 49,
+    "coPolicyList": 124,
+    "coClient360LinkedPolicies": 125,
+    "falseInsurerPendingHeaderResolved": true,
+    "unresolvedClientPolicyCountVariance": true,
+    "formalI6Percent": 50,
+    "p0Closed": 1,
+    "p0Total": 6,
+    "b4003Closed": false,
+    "productionAuthorized": false
   },
   "b4003CarlosFinanceTransversalSignedUat20261103": {
     "status": "PARTIAL_SIGNED_FUNCTIONAL_UAT_BACKEND_NEGATIVE_HOLD",
