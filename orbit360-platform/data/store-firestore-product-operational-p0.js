@@ -257,7 +257,7 @@
     try{return /^ays-orbit-360-lab--gi-i(?:3|61|65-b[1-4])-[a-z0-9-]+\.web\.app$/i.test(String(location&&location.hostname||''));}catch(e){return false;}
   }
   function previewGeneralCommand(){
-    return isB2PreviewHost()&&/^ays-orbit-360-lab--gi-i65-b4-(?:goals|e4)-[a-z0-9-]+\.web\.app$/i.test(String(location&&location.hostname||''))&&(window.__ORBIT360_PRODUCT_PUBLIC_CONFIG__||{}).goalParticipationPreviewCandidate===true
+    return isB2PreviewHost()&&/^ays-orbit-360-lab--gi-i65-b4-(?:goals|e4|rc)-[a-z0-9-]+\.web\.app$/i.test(String(location&&location.hostname||''))&&(window.__ORBIT360_PRODUCT_PUBLIC_CONFIG__||{}).goalParticipationPreviewCandidate===true
       ?GOALS_PREVIEW_COMMAND:GENERAL_PREVIEW_COMMAND;
   }
   function workflowReason(operation,prior,row){
