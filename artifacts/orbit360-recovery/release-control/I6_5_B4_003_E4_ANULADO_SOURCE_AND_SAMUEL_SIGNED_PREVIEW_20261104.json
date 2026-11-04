@@ -1,0 +1,116 @@
+{
+  "schema": "GRAVICENTRA_I65_B4_003_E4_ANULADO_CAUSAL_FIX_AND_SIGNED_SAMUEL_UAT_V1",
+  "dateLocal": "2026-11-04",
+  "gate": "I6.5/B4-003",
+  "recordType": "ADDITIVE_FOCAL_E4_SOURCE_CI_IMMUTABLE_PREVIEW_AND_SIGNED_USER_UAT_NOT_FULL_GATE_ACCEPTANCE",
+  "status": "E4_ANULADO_CAUSE_FIXED_AND_SIGNED_COUNTS_PASS_WITH_RELEASE_REMAINDER_HOLD",
+  "supersedesForThisFinding": "b4003E4Gt13CategoryReconciliation20261104 falseAnuladoCauseRetracted and 12 unresolved category; accurate physical source diagnostic established after that earlier historical record",
+  "frozenRiskDecision": "b4003DecisionFreezeAndSingleCertificationCursor20261103 remains in force; same accepted temporary Firestore risk not a new independent block",
+  "candidate": {
+    "repository": "paulaosoriof86/orbit360-core",
+    "branch": "recovery/fase-a-clean-20260831",
+    "sourceSha": "3bf9996da14fa1799dd3671581aad706d754d218",
+    "codeFixSha": "eaf3cd1902f85ab9e0202c4d025a1f103035a0ae",
+    "buildId": "gi-i65-b4-3bf9996da14f-57f234755dc1",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-rc-41765742748-neoi3u7r.web.app/",
+    "immutableBundleArtifactId": 13308088829,
+    "immutableBundleName": "gi-b4003-immutable-release-bundle-41802851192",
+    "bundleArchiveSha256": "5256a9775d6d95b3727ec5d71805bbe6ba05c93655b6e8a9591f0a5bb1143dd1",
+    "sameArtifactForProductionRequired": true
+  },
+  "sourceFinding": {
+    "previousSignedCounts": {
+      "gtCobros": 2516,
+      "gtReportes": 2503,
+      "coCobros": 56,
+      "coReportes": 56,
+      "allCobros": 2572,
+      "allReportes": 2559
+    },
+    "physicalSourceDiagnosticRunId": 41802123401,
+    "allSignedCountsReproduced": true,
+    "exactCause": {
+      "twelveAnuladoReceiptEvidenceProjectionsNotBelongingToDefaultOpenList": 12,
+      "policies": [
+        {
+          "realPolicyNumber": "AUTO39012",
+          "anuladoReceipts": 10
+        },
+        {
+          "realPolicyNumber": "VA125-00010478",
+          "anuladoReceipts": 2
+        }
+      ],
+      "syntheticQaExplicitCommercialExclusion": 1,
+      "actualCommercialDifference": 13
+    },
+    "handling": "Keep Anulado inspectable by explicit state filter, exclude from default active list; keep one synthetic QA case excluded commercially; no source receipt or country/owner mutation"
+  },
+  "sourceVerification": {
+    "newCobrosBlob": "34dd080d88fe764d7858813843b7184c64d4cdc2",
+    "regressionTestPath": "tools/gravicentra-b4-003-e4-anulado-projection.test.cjs",
+    "redOldSource": "FAIL EXPECTED 14 versus 2",
+    "greenNewSource": "PASS",
+    "sourceRegressionCiRunId": 41802654591,
+    "controlPlaneGuardCiRunId": 41802654545,
+    "countryRegressionCiRunId": 41802654630,
+    "allCiConclusion": "success"
+  },
+  "transport": {
+    "immutablePreviewRunId": 41802851192,
+    "readbackProofArtifactId": 13308826060,
+    "servedArtifactExact": true,
+    "reportesSha256": "0cb25b98f3aa60abd5a3aa0bf291c0327377990264a8635ea2ebef154705b364",
+    "cobrosSha256": "672d31786902c0661f700a22432c6b54c45dada7fb31b799cf16648b53da7a77",
+    "reusedExistingIsolatedChannel": true,
+    "frontendBuildCount": 1,
+    "backendFunctionDeploys": 0,
+    "firestoreRulesChanges": 0,
+    "authIamChanges": 0,
+    "dataWrites": 0,
+    "productionDeploy": false
+  },
+  "signedSamuelUat": {
+    "verifiedAccount": "Samuel Daza",
+    "selectedRole": "AdminTenant (Administración)",
+    "sourceCandidateExact": true,
+    "financialReadiness": "ready",
+    "allCobros": 2560,
+    "gtCobros": 2504,
+    "coCobros": 56,
+    "allAnuladoFilter": 12,
+    "anuladoPolicyDistribution": [
+      {
+        "policy": "AUTO39012",
+        "count": 10
+      },
+      {
+        "policy": "VA125-00010478",
+        "count": 2
+      }
+    ],
+    "coReportesCarteraCobros": 56,
+    "gtReportesCarteraCobros": "2503 PHYSICAL SOURCE CI, UI IN HEAVY TABLE LOAD NOT CERTIFIED",
+    "mutationCount": 0
+  },
+  "releaseRemainder": {
+    "gtReportesSignedUi": "PENDING_CHROME_HEAVY_RENDER",
+    "exportCsvExcelPdfRealBytes": "PENDING",
+    "independentBackendNegativeUidScope": "PENDING",
+    "approvedSyntheticWriteReloadRestore": "PENDING",
+    "agingCop4Exceptions": "NOT_CLOSED_BY_THIS_FOCAL_FIX",
+    "finalRoleModuleViewportAcceptance": "PENDING",
+    "sameImmutableArtifactLivePromotionAndModuleReadback": "NOT_EXECUTED",
+    "production": "HOLD"
+  },
+  "formalProgress": {
+    "i6CompletedMiniGates": 5,
+    "i6TotalMiniGates": 10,
+    "formalI6Percent": 50,
+    "priorityP0Closed": 1,
+    "priorityP0Total": 6,
+    "b4003Closed": false,
+    "productionAuthorized": false
+  },
+  "nextAction": "COMPLETE_REMAINING_FOCAL_SIGNED_UI_AND_EXPORT_BYTES_THEN_BACKEND_NEGATIVE_AND_SYNTHETIC_WRITE_WITH_CONTROLLED_READBACK; REUSE_THIS_EXACT_BUNDLE_FOR_LIVE_IF_ACCEPTED"
+}
