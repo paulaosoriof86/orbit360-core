@@ -22,8 +22,10 @@ Orbit.ciclo = (function () {
       const uid=String(p.uid||u.uid||'').trim(),email=String(p.email||u.email||'').trim();
       let name=String(p.nombre||p.displayName||p.name||u.displayName||u.nombre||u.name||'').trim();
       if(!name){const top=document.querySelector('#tb-user .who b');if(top&&String(top.textContent||'').trim()&&String(top.textContent||'').trim()!=='Usuario')name=String(top.textContent||'').trim();}
-      return{uid,name:name||email||'Usuario',email};
-    }catch(e){return{uid:'',name:'Usuario',email:''};}
+      // A mail address is not a human display name. Keep the UID separately
+      // for later membership resolution; never render the email as the author.
+      return{uid,name:name||'Usuario del equipo',email};
+    }catch(e){return{uid:'',name:'Usuario del equipo',email:''};}
   }
   function currentUserName(){return currentUserIdentity().name;}
   function displayStamp(value){
@@ -821,7 +823,7 @@ Orbit.ciclo = (function () {
     back.querySelectorAll('[data-chk]').forEach(c => c.addEventListener('change', async () => {
       const i = +c.dataset.chk, before = !!g.checklist[i].done, next = !!c.checked, item = g.checklist[i] || {};
       c.disabled = true; g.checklist[i].done = next; g.bitacora = g.bitacora || [];
-      g.bitacora.push({ ts: stamp(), user: (Orbit.session ? Orbit.session.rol() : 'Equipo'), campo: 'Checklist', de: before ? 'Completado' : 'Pendiente', a: next ? 'Completado' : 'Pendiente', origen: 'manual', detalle: item.t || '' });
+      const actor=currentUserIdentity();g.bitacora.push({ ts: stamp(), user: actor.name,actorUid:actor.uid,actorName:actor.name, campo: 'Checklist', de: before ? 'Completado' : 'Pendiente', a: next ? 'Completado' : 'Pendiente', origen: 'manual', detalle: item.t || '' });
       try {
         await S().updateDurable('gestiones', id, { checklist: g.checklist, bitacora: g.bitacora, actualizado: today() });
         const resp = S().get('asesores', g.asesorId), cl = S().get('clientes', g.clienteId);
@@ -881,7 +883,7 @@ Orbit.ciclo = (function () {
       const nuevoAse = v('gs-ase'), nuevaNota = v('gs-nota');
       const cambioAse = nuevoAse && nuevoAse !== g.asesorId;
       const cambioNota = (nuevaNota || '') !== (g.nota || g.notas || '');
-      if (cambioNota) { g.bitacora = g.bitacora || []; g.bitacora.push({ ts: stamp(), user: (Orbit.session ? Orbit.session.rol() : 'Equipo'), campo: 'Nota', de: '', a: 'Nota actualizada', origen: 'manual' }); }
+      if (cambioNota) { const actor=currentUserIdentity();g.bitacora = g.bitacora || []; g.bitacora.push({ ts: stamp(), user: actor.name,actorUid:actor.uid,actorName:actor.name, campo: 'Nota', de: '', a: 'Nota actualizada', origen: 'manual' }); }
       try {
         await S().updateDurable('gestiones', id, {
           lista: v('gs-lista'), tipo: v('gs-tipo'), titulo: v('gs-tipo'), estado: v('gs-estado'), prioridad: v('gs-prio'),
@@ -1323,7 +1325,8 @@ Orbit.ciclo = (function () {
   /* ===================== notificaciones (WhatsApp / correo) ===================== */
   function notify(o) {
     o = o || {};
-    try { S().insert('avisos', { id: 'av' + Date.now() + Math.floor(Math.random() * 99), tipo: o.tipo || 'aviso', titulo: o.titulo || 'Notificación', detalle: o.detalle || '', para: o.para || '', tel: o.tel || '', email: o.email || '', fecha: today(), leida: false }); } catch (e) {}
+    const actor=currentUserIdentity();
+    try { S().insert('avisos', { id: 'av' + Date.now() + Math.floor(Math.random() * 99), tipo: o.tipo || 'aviso', titulo: o.titulo || 'Notificación', detalle: o.detalle || '', para: o.para || '', tel: o.tel || '', email: o.email || '', actorUid:actor.uid,actorName:actor.name, fecha: today(), leida: false }); } catch (e) {}
     const waNum = (o.tel || '').replace(/[^0-9]/g, '');
     const msg = encodeURIComponent((o.titulo || '') + (o.detalle ? ' — ' + o.detalle : ''));
     const t = document.createElement('div'); t.className = 'ciclo-toast notif';
@@ -1412,7 +1415,7 @@ Orbit.ciclo = (function () {
   function chkRow(ns, i, c) { return `<label class="chk-row"><input type="checkbox" data-chk="${i}" ${c.done ? 'checked' : ''}><span class="${c.done ? 'done' : ''}">${U.esc(c.t)}</span></label>`; }
   function humanCommentAuthor(c){
     const raw=String(c&&(c.actorName||c.user)||'').trim(),uid=String(c&&c.actorUid||'').trim();
-    const validName=n=>{const x=String(n||'').trim();return x&&!x.includes('@')&&!/^(AdminTenant|SuperAdmin|Direcci[oó]n|Operativo|Asesor|Comercial|Admin|unknown|undefined)$/i.test(x)&&!/^uid[:_-]/i.test(x);};
+    const validName=n=>{const x=String(n||'').trim();return x&&!x.includes('@')&&!/^(AdminTenant|SuperAdmin|Direcci[oó]n|Operativo|Asesor|Comercial|Admin|unknown|undefined|Usuario autenticado|Usuario del equipo)$/i.test(x)&&!/^(?:uid|auth|member|user)[:_-]/i.test(x)&&!/^[A-Za-z0-9_-]{24,}$/.test(x);};
     if(uid){try{const me=currentUserIdentity();if(me.uid===uid&&validName(me.name))return me.name;}catch(_){}}
     for(const coll of ['usuarios','users','members','asesores']){
       try{const u=uid?S().get(coll,uid):null;const direct=u&&(u.nombre||u.displayName||u.name);if(validName(direct))return String(direct).trim();
