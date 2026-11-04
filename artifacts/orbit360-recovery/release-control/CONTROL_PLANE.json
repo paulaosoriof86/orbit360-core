@@ -17528,8 +17528,19 @@
       "tools/gravicentra-i6-control-plane-guard-v1.mjs"
     ],
     "progress": {
-      "formalI6MiniGates": {"completed": 5, "total": 10, "percent": 50, "interpretation": "Frozen formal mini-gates, not product implementation"},
-      "priorityP0": {"closed": 1, "open": 5, "total": 6, "percentClosed": 16.67, "percentOpen": 83.33},
+      "formalI6MiniGates": {
+        "completed": 5,
+        "total": 10,
+        "percent": 50,
+        "interpretation": "Frozen formal mini-gates, not product implementation"
+      },
+      "priorityP0": {
+        "closed": 1,
+        "open": 5,
+        "total": 6,
+        "percentClosed": 16.67,
+        "percentOpen": 83.33
+      },
       "historicalForensicPercent": 96,
       "historicalForensicIsCurrentReadiness": false,
       "currentOverallImplementationPercent": null,
@@ -18022,5 +18033,28 @@
       "production": "NO_GO"
     },
     "nextAction": "SAME_EXACT_PREVIEW_AUTHENTICATED_PAULA_REPORTES_COBROS_GT_CO_THEN_CARLOS_SAMUEL_NEGATIVE_TESTS_NO_NEW_SOURCE_OR_DATA_IMPORT"
+  },
+  "b4003E4Gt13CategoryReconciliation20261104": {
+    "status": "CATEGORY_CAUSE_RECONCILED_EXACT_BUSINESS_IDS_AND_EXPORT_BYTES_HOLD",
+    "recordType": "ADDITIVE_SIGNED_UI_PLUS_SOURCE_CAUSAL_EVIDENCE_NOT_FULL_E4_PASS",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_E4_GT13_CATEGORY_RECONCILIATION_20261104.json",
+    "sourceSha": "cbca01be13f795a7469c5e9af59769337559688f",
+    "buildId": "gi-i65-b4-cbca01be13f7-57f234755dc1",
+    "observedSameSignedAccount": true,
+    "gtCobros": 2516,
+    "gtReportesCommercial": 2503,
+    "coBoth": 56,
+    "allCobros": 2572,
+    "allReportesCommercial": 2559,
+    "anuladoAggregate": 12,
+    "qaExcluded": 1,
+    "exactBusinessIdsVerified": false,
+    "exportBytesVerified": false,
+    "sourceOrDataMutated": false,
+    "productionAuthorized": false,
+    "formalI6Percent": 50,
+    "p0Closed": 1,
+    "p0Total": 6,
+    "b4003Closed": false
   }
 }

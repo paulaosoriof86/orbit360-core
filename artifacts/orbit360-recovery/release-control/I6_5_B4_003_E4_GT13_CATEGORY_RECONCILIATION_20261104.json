@@ -1,0 +1,114 @@
+{
+  "schema": "GRAVICENTRA_I65_B4003_E4_GT13_CATEGORY_RECONCILIATION_V1",
+  "dateGuatemala": "2026-11-04",
+  "product": "Gravicentra Insurance",
+  "gate": "I6.5/B4-003",
+  "recordType": "ADDITIVE_SIGNED_UI_PLUS_SOURCE_CAUSAL_EVIDENCE_NOT_FULL_E4_PASS",
+  "status": "CATEGORY_CAUSE_RECONCILED_EXACT_BUSINESS_IDS_AND_EXPORT_BYTES_HOLD",
+  "branch": "recovery/fase-a-clean-20260831",
+  "observedBranchHead": "d5c4a4e5975d24e50c41452014e8fee338dc2ef1",
+  "immutableCandidate": {
+    "sourceSha": "cbca01be13f795a7469c5e9af59769337559688f",
+    "buildId": "gi-i65-b4-cbca01be13f7-57f234755dc1",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-rc-41765742748-neoi3u7r.web.app/"
+  },
+  "authenticatedBrowser": {
+    "account": "Samuel Daza",
+    "selectedRole": "Administración / AdminTenant",
+    "signedAccount": true,
+    "preview": true
+  },
+  "observedSameCandidate": {
+    "cobrosGT": 2516,
+    "cobrosCO": 56,
+    "cobrosTodos": 2572,
+    "reportesCarteraGT": 2503,
+    "reportesCarteraCO": 56,
+    "reportesCarteraTodos": 2559,
+    "reportesQaExcluded": 1,
+    "reportesUnverifiedCountryWarningDisplayed": false,
+    "cobrosGTUnconfirmedSiga": 1196,
+    "cobrosTodosUnconfirmedSiga": 1238,
+    "cobrosGtSourceCurrencyCOPvsPolicyGTQ": 12,
+    "cobrosGtOverdueCOPWithoutFinancialAging": 4
+  },
+  "accounting": {
+    "cobrosTotalMinusReportesCommercial": 13,
+    "reportesCommercialPlusQa": 2560,
+    "cobrosMinusReportesPreQaSource": 12,
+    "verifiedStructuralCause": "Cobros default list renders rows(idx)+portfolioPaymentRows(idx)+reportedRows(idx); owner reportableRows() builds the same streams and filters row.estado !== 'Anulado' before Reportes, which additionally excludes synthetic QA. Total cross-country 2572 vs 2559+1 gives 12 excluded by the owner filter and one QA excluded from commercial report.",
+    "GTCategorySplitAggregate": {
+      "anuladoExcludedByReportableOwner": 12,
+      "syntheticQaExcludedByReportes": 1,
+      "COdelta": 0
+    },
+    "individualBusinessIdsEnumerated": false,
+    "caveat": "The 12 filtered Anulado IDs and the one QA ID were not extracted as a verified 13-ID ledger in this iteration; no underlying business record was changed. This aggregate causal classification cannot replace exact ID set certification."
+  },
+  "codeEvidence": [
+    {
+      "path": "orbit360-platform/modules/cobros.js",
+      "function": "reportableRows",
+      "logic": "rows(idx).concat(portfolioPaymentRows(idx),reportedRows(idx)).filter(row => row && row.estado !== 'Anulado')"
+    },
+    {
+      "path": "orbit360-platform/modules/cobros.js",
+      "function": "render",
+      "logic": "default allRows formed from the same three streams without the reportableRows Anulado filter"
+    },
+    {
+      "path": "orbit360-platform/modules/reportes.js",
+      "function": "cartera.rows",
+      "logic": "(financialSourceRows()||[]).filter(c => !isSyntheticRecord(c) && paisOK(linkedCountry(c)))"
+    },
+    {
+      "path": "orbit360-platform/modules/reportes.js",
+      "function": "exportPDF",
+      "logic": "opens a print HTML tab with data.map(all rows), then browser print dialog; not generated PDF bytes"
+    },
+    {
+      "path": "orbit360-platform/modules/reportes.js",
+      "function": "exportCSV/exportExcel",
+      "logic": "Blob and detached anchor download; API-level download event did not produce a byte-readable file"
+    }
+  ],
+  "exportReadback": {
+    "csv": "HOLD_BROWSER_DOWNLOAD_EVENT_TIMEOUT_15000MS_NO_BINARY_READBACK",
+    "excel": "HOLD_NOT_REPROBED_NO_BINARY_READBACK",
+    "pdf": "PARTIAL_PRINT_TAB_OPENED_AND_CLOSED_NO_PDF_BYTE_FILE",
+    "previewExportControlsSourceReady": true,
+    "fullRowsPrintSourceUsesDataMapNotSlice": true
+  },
+  "preserved": [
+    "Carlos Operativo GT+CO and Asesor CO signed scope read-only PASS",
+    "Paula Dirección read-only E4 GT/CO signed evidence",
+    "Samuel current grants and policy GT insurer header signed focal PASS",
+    "125 Colombia client linked vs 124 Colombia policy-country rows reconciled as cross-country scope different anchors",
+    "Owner temporary broad Firestore rules risk accepted; no recurrent independent blocker"
+  ],
+  "outstandingExact": [
+    "Enumerate business IDs of 12 Anulado excluded and one synthetic QA record, document source/category and expected visibility",
+    "E4 CSV/Excel/PDF file-byte and full-row readback with a causal download path",
+    "Independent positive and negative backend UID/tenant/role/country permission probes as approved",
+    "One controlled synthetic write/reload/restore plus signed before/after and same-artifact live acceptance"
+  ],
+  "productionDecision": "NO_GO_NO_NEW_PRODUCTION_DEPLOY",
+  "formalMetrics": {
+    "i6Passed": 5,
+    "i6Total": 10,
+    "i6Percent": 50,
+    "p0Closed": 1,
+    "p0Total": 6,
+    "p0Percent": 16.67,
+    "b4003Closed": false
+  },
+  "mutations": {
+    "businessDataWrites": 0,
+    "firestoreRules": 0,
+    "authIam": 0,
+    "sourceChanges": 0,
+    "hostingDeploys": 0,
+    "productionDeploys": 0
+  },
+  "nextAction": "Retain same candidate. Classify exact 13 IDs through authorized read-only source evidence; certify export bytes with a downloadable artifact mechanism, then controlled synthetic restore. No reimport and no new Preview unless source changed causally."
+}
