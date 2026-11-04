@@ -3,6 +3,78 @@
   "controlPlaneId": "GRAVICENTRA-INSURANCE-FASE-A",
   "status": "PRODUCTION_ACCEPTED",
   "productBrand": "Gravicentra Insurance",
+  "b4003DecisionFreezeAndSingleCertificationCursor20261103": {
+    "schema": "GRAVICENTRA_I65_B4003_OWNER_DECISION_PRECEDENCE_AND_SINGLE_CERTIFICATION_CURSOR_V1",
+    "status": "FROZEN_ACTIVE_FOR_CURRENT_B4_003_CONTROLLED_LIVE_DECISION",
+    "authority": "PAULA_EXPLICIT_OWNER_RISK_ACCEPTANCE_20261028_RECONFIRMED_20261103",
+    "effectiveDateLocal": "2026-11-03",
+    "gate": "I6.5/B4-003",
+    "precedence": "USE_THIS_ACTIVE_ADJUDICATION_OVER_PRE_20261028_HISTORICAL_SECURITY_RELEASE_HOLD_WORDING_AND_STALE_NEXT_ACTION; KEEP_HISTORICAL_PROOF_UNCHANGED",
+    "authoritativeOwnerExceptionKey": "b4003OwnerTemporaryRulesRiskException20261028",
+    "authoritativeOwnerExceptionReceipt": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PAULA_OWNER_TEMPORARY_FIRESTORE_RISK_ACCEPTANCE_20261028.md",
+    "firestoreRulesRisk": {
+      "existingBroadTenantMemberReadWrite": "OPEN_OWNER_ACCEPTED_TEMPORARILY",
+      "securityCertified": "NO_OPEN_NOT_PASS",
+      "sameKnownRulesAloneBlockControlledLive": false,
+      "hardening": "P0_URGENT_POSTPRODUCTION_BEFORE_NEW_USER_OR_TENANT_ACCESS",
+      "doNotRepeatAsIndependentGate": true,
+      "noRulesDeployAuthorized": true,
+      "noAuthIamOrOperationalDataWritesAuthorized": true,
+      "revisitOnlyFor": "NEW_MATERIAL_RISK_OR_SCOPE_EXPANSION_OR_OWNER_REVOCATION"
+    },
+    "independentReleaseRequirementsUnaffected": [
+      "FUNCTIONAL_ROLE_COUNTRY_ADVISOR_SCOPE_IN_APPROVED_UI_AND_PROTECTED_READER",
+      "FINANCIAL_REPORTS_COUNTRY_CURRENCY_AND_RECORD_INTEGRITY",
+      "EXACT_ARTIFACT_BUILD_PREVIEW_LIVE_PARITY_AND_STARTUP",
+      "CONTROLLED_SYNTHETIC_WRITE_RELOAD_RESTORE_IF_APPROVED",
+      "LIVE_MODULE_BY_MODULE_READBACK_AND_ROLLBACK"
+    ],
+    "currentCandidate": {
+      "repository": "paulaosoriof86/orbit360-core",
+      "branch": "recovery/fase-a-clean-20260831",
+      "sourceSha": "7c78fda204831630bf9336213f67a3f56e437e4e",
+      "buildId": "gi-i65-b4-7c78fda20483-57f234755dc1",
+      "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-e4-41752197966-3dhqau7k.web.app/",
+      "createNewPreviewByRoutine": false
+    },
+    "existingAcceptedEvidenceReuse": [
+      "CARLOS_OPERATIVO_GT_CO_AND_ASESOR_CO_SIGNED_READ_ONLY_FUNCTIONAL_UAT_20261103",
+      "PAULA_PARTIAL_READ_ONLY_UAT_20261103",
+      "SAMUEL_PARTIAL_SIGNED_SCOPE_UAT_AND_OWNER_GRANTS_UNCHANGED_20261103",
+      "SOURCE_123_SYNTHETIC_TESTS_PASS_41751634200",
+      "PROTECTED_READER_DEPLOY_41752044098"
+    ],
+    "oneConsolidatedCertificationBatch": [
+      "SAMUEL_FOCAL_CURRENT_GRANTS_GT_CO_ROLE_POSITIVE_RECONCILIATION_AND_PAULA_AFFECTED_ONLY",
+      "CLASSIFY_13_GT_REPORTES_COBROS_ID_DIFFERENCE_AND_12_COP_4_AGING_EXCEPTIONS_WITH_EXACT_BUSINESS_IDS",
+      "E4_EXPORT_BYTE_READBACK_WITHOUT_REOPENING_APPROVED_REPORTS",
+      "ONE_AUTHORIZED_SYNTHETIC_WRITE_RELOAD_RESTORE_AND_READBACK",
+      "RESOLVE_RUNNER_404_VERSUS_CHROME_200_EXACT_TRANSPORT_PROOF_ON_SAME_ARTIFACT",
+      "RECHECK_INDEPENDENT_FUNCTIONAL_P0_ACCEPTANCE_THEN_CONTROLLED_SAME_DIGEST_LIVE_MODULE_READBACK_AND_ROLLBACK"
+    ],
+    "legacyNextActionSuperseded": "VERIFY_ADVISOR_REASSIGNMENT_SERVER_COMMIT_READBACK_AND_RELOAD_TWO_UIDS",
+    "thesisPositivePilot": {
+      "status": "READY_TO_START_READ_ONLY_ON_CURRENT_PREVIEW_SEPARATE_FROM_B4_RELEASE",
+      "ownerProject": "TESIS",
+      "initialCase": "CARLOS_CT02_OPERATIVO_CO_CLIENTE360_49_CLIENTES_124_POLIZAS",
+      "excludeFirstWave": [
+        "E4_EXPORT",
+        "COBROS_WRITE",
+        "FIRESTORE_NEGATIVE_TESTS",
+        "OPERATIVE_DATA_MUTATION"
+      ],
+      "screenshotsAndThesisEditsBelongTo": "TESIS_PROJECT"
+    },
+    "metrics": {
+      "formalI6Percent": 50,
+      "p0Closed": 1,
+      "p0Total": 6,
+      "b4003Closed": false,
+      "productionAuthorized": false,
+      "securityPassed": false
+    },
+    "mutationScope": "CONTROL_PLANE_METADATA_ONLY_NO_PRODUCT_FIRESTORE_RULES_AUTH_IAM_OR_LIVE_DEPLOY"
+  },
   "b4003CarlosFinanceTransversalSignedUat20261103": {
     "status": "PARTIAL_SIGNED_FUNCTIONAL_UAT_BACKEND_NEGATIVE_HOLD",
     "recordType": "ADDITIVE_EVIDENCE_POINTER_NOT_RELEASE_ACCEPTANCE",
@@ -10292,7 +10364,7 @@
     "noLive": true,
     "noRealBusinessWrites": true
   },
-  "nextB4003WorkWithinCurrentGate": "VERIFY_ADVISOR_REASSIGNMENT_SERVER_COMMIT_READBACK_AND_RELOAD_TWO_UIDS",
+  "nextB4003WorkWithinCurrentGate": "ONE_CONSOLIDATED_CERTIFICATION_BATCH_AS_b4003DecisionFreezeAndSingleCertificationCursor20261103",
   "b4003QaContinuation20261012": {
     "status": "EXACT_PREVIEW_DISPATCH_PENDING",
     "qaProofBlobSha": "9ab7eb3e5ddf32e76d2bebe644fad4d69ab4265a",
