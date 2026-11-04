@@ -76,7 +76,7 @@ function setup(country, options = {}) {
   let policiesReady = options.deferPolicies !== true && options.blockPolicies !== true;
   const insurerListeners = new Set(), ensureRequests = [];
   const store = {
-    all: k => (k === 'aseguradoras' && !insurersReady) || (k === 'polizas' && !policiesReady) ? [] : rows[k] || [],
+    all: k => (k === 'aseguradoras' && !insurersReady) || (k === 'polizas' && !policiesReady) ? [] : (k === 'polizas' && Array.isArray(options.extraPolicies) ? rows.polizas.concat(options.extraPolicies) : rows[k] || []),
     get: (k, id) => store.all(k).find(x => String(x.id) === String(id)) || null,
     where: (k, f) => (rows[k] || []).filter(f),
     _productStatus: () => ({
@@ -99,6 +99,11 @@ function setup(country, options = {}) {
     PAISES: [{ id: 'GT', label: 'Guatemala' }, { id: 'CO', label: 'Colombia' }, { id: 'TODOS', label: 'Todos' }]
   };
   const context = vm.createContext({ Orbit, window: { Orbit }, location: { hash: '#/reportes' }, Date, Map, Set, console, setTimeout, clearTimeout });
+  const pdfCaptured = [];
+  if (options.capturePdf) {
+    context.window.open = () => ({ document: { write(value) { pdfCaptured.push(String(value)); }, close() {} }, print() {} });
+    context.document = { createElement: () => ({ className: '', textContent: '', remove() {} }), body: { appendChild() {} } };
+  }
   vm.runInContext(queries, context, { filename: 'queries.js' });
   Orbit.q.renovacionesProximas = () => rows.polizas;
   vm.runInContext(cancelaciones, context, { filename: 'cancelaciones.js' });
@@ -118,7 +123,9 @@ function setup(country, options = {}) {
     callback({ target: { value } });
     return host.innerHTML;
   }
-  return { Orbit, render, event, writes: () => writes, ensureRequests,
+  return { Orbit, render, event,
+    click: selector => { const callback = handlers.get(selector + ':click'); assert.ok(callback, 'MISSING_CLICK_HANDLER_' + selector); callback(); return pdfCaptured.join(''); },
+    writes: () => writes, ensureRequests,
     confirmInsurers: () => { insurersReady = true; for (const cb of insurerListeners) cb('aseguradoras'); return host.innerHTML; },
     confirmPolicies: async () => {
       policiesReady = true;
@@ -605,4 +612,25 @@ test('E4 financial report fails closed when projected sources or owner are unava
   assert.match(html,/data-report-financial-owner-readiness="blocked"/);
   assert.doesNotMatch(html,/id="rep-exp"|id="rep-excel"|id="rep-pdf"|Sin datos/);
   assert.equal(app.writes(),0);
+});
+
+test('E4 PDF export includes every row beyond 500 and escapes untrusted cells', () => {
+  const extraPolicies = Array.from({ length: 525 }, (_, i) => ({
+    id: 'e4pdf-' + i,
+    numero: i === 524 ? 'GT-PDF-<script>alert("x")</script>' : 'GT-PDF-' + i,
+    clienteId: 'clientGT', aseguradoraId: 'insGT', pais: 'GT', moneda: 'GTQ',
+    vigenciaInicio: '2026-06-01', primaNeta: 5, estado: 'Vigente'
+  }));
+  const app = setup('GT', { extraPolicies, capturePdf: true });
+  const html = app.render();
+  assert.match(html, /Mostrando 200 de/);
+  const pdf = app.click('#rep-pdf');
+  const match = /Registros incluidos: (\d+)/.exec(pdf);
+  assert.ok(match, 'PDF must declare its complete row count');
+  const expected = Number(match[1]);
+  assert.ok(expected > 500, 'fixture must exceed the old 500-row cap');
+  assert.equal((pdf.match(/<tr>/g) || []).length, expected + 1, 'all report rows plus one header');
+  assert.match(pdf, /GT-PDF-&lt;script&gt;alert\(&quot;x&quot;\)&lt;\/script&gt;/);
+  assert.doesNotMatch(pdf, /<script>/);
+  assert.equal(app.writes(), 0);
 });

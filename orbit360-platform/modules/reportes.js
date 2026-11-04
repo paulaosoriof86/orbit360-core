@@ -382,8 +382,24 @@ Orbit.modules.reportes = (function () {
     toast('✓ Reporte exportado (Excel)');
   }
   function exportPDF(r, data) {
-    const w = window.open('', '_blank'); if (!w) return;
-    w.document.write(`<html><head><title>${r.t}</title><style>@page{size:A4 landscape;margin:12mm}body{font-family:sans-serif;font-size:11px}table{width:100%;border-collapse:collapse}th{background:#1E2227;color:#fff;padding:7px;text-align:left}td{padding:6px;border-bottom:1px solid #eee}h2{color:#C5162E}</style></head><body><h2>${r.icon} ${r.t}</h2><table><thead><tr>${r.cols.map(c => `<th>${c}</th>`).join('')}</tr></thead><tbody>${data.slice(0, 500).map(row => `<tr>${row.map(c => `<td>${String(c)}</td>`).join('')}</tr>`).join('')}</tbody></table></body></html>`);
+    const w = window.open('', '_blank');
+    if (!w) { toast('No se pudo abrir la impresión PDF. Verifica las ventanas emergentes.'); return; }
+    const esc = value => String(value == null ? '' : value)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    // Preserve the entire certified report universe, including rows beyond the
+    // 200-row on-screen preview. Repeated headers and nonbreaking rows allow
+    // the browser to paginate a large report instead of silently dropping data.
+    const header = r.cols.map(c => `<th>${esc(c)}</th>`).join('');
+    const body = data.map(row => `<tr>${row.map(c => `<td>${esc(c)}</td>`).join('')}</tr>`).join('');
+    w.document.write(`<html><head><meta charset="UTF-8"><title>${esc(r.t)}</title>
+      <style>@page{size:A4 landscape;margin:12mm}body{font-family:sans-serif;font-size:11px}
+      table{width:100%;border-collapse:collapse;table-layout:fixed}thead{display:table-header-group}
+      tr{break-inside:avoid;page-break-inside:avoid}th{background:#1E2227;color:#fff;padding:7px;text-align:left}
+      td{padding:6px;border-bottom:1px solid #eee;overflow-wrap:anywhere;vertical-align:top}
+      h2{color:#C5162E}</style></head><body><h2>${esc(r.icon)} ${esc(r.t)}</h2>
+      <p>Registros incluidos: ${data.length}</p><table><thead><tr>${header}</tr></thead>
+      <tbody>${body}</tbody></table></body></html>`);
     w.document.close(); setTimeout(() => w.print(), 300);
     toast('🖨 Abre el diálogo de impresión — selecciona "Guardar como PDF"');
   }
