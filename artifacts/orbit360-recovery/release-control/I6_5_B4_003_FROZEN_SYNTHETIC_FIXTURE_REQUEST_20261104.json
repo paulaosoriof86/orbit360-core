@@ -1,6 +1,6 @@
 {
   "schema": "GRAVICENTRA_I6_5_B4_003_FROZEN_SYNTHETIC_QA_REQUEST_V1",
-  "status": "REQUESTED",
+  "status": "CLOSED_CLEANED",
   "mode": "cleanup",
   "recordedAtUtc": "2026-11-04T09:25:50.188Z",
   "gate": "I6.5/B4-003",
@@ -53,5 +53,16 @@
     "stableAfterReload": true,
     "uiRow": "QA-HUMANA-B3-004-R12 | Q111.11 | 04 nov 2026 | Pago confirmado | Conciliado",
     "status": "BROWSER_SIGNED_PREVIEW_PASS_PENDING_CLEANUP_READBACK"
-  }
+  },
+  "closedAtUtc": "2026-11-04T09:32:01.288Z",
+  "createRunId": 41807435779,
+  "cleanupRunId": 41807875649,
+  "cleanupReadbackPass": true,
+  "firestoreSyntheticResidue": 0,
+  "postCleanupBrowserCounts": {
+    "confirmed": 5,
+    "reconciled": 5,
+    "pendingReconcile": 0
+  },
+  "certificationReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_FROZEN_SYNTHETIC_WRITE_RELOAD_RESTORE_PASS_20261104.json"
 }
