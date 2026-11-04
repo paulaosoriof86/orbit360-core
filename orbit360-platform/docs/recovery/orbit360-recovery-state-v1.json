@@ -10,7 +10,7 @@
   "branch": "recovery/fase-a-clean-20260831",
   "forensicOriginSha": "9c95f31461f2eabe9804625b5659bee772f5602a",
   "createdAtUtc": "2026-08-31T18:00:00Z",
-  "updatedAtUtc": "2026-11-04T10:38:27.426Z",
+  "updatedAtUtc": "2026-11-04T11:03:16.661Z",
   "status": "ITERATION_2_SOURCE_MATERIALIZED_VALIDATION_PENDING",
   "currentIteration": 2,
   "lastCompletedIteration": 1,
@@ -187,7 +187,7 @@
     "phaseAIterationStatuses": "HISTORICAL_FIELDS_ABOVE_PRESERVED_UNTIL_FORMAL_GATE_EVIDENCE;_NO_NEW_PASS_INFERRED",
     "labDataWriteScope": "ONLY_35_AUTHORIZED_COUNTRY_FIELDS;_NO_AUGUST_REFRESH"
   },
-  "nextAction": "ACTIVE I6.5/B4-003 (2026-11-04): production read-only roster exactly deployed and read back 80→81 in GitHub Actions run 41814805932; do not redeploy or re-audit it. Reuse signed Carlos/Samuel Preview UAT and synthetic write/restore. Next only: independent authenticated backend cross-UID role/country/team negative tests and production writer source parity; adjudicate remaining five P0 and transversal Ops/Leads human-name partial; if release gates truly pass, promote frozen 66012815 exact Hosting artifact 13311178353 and certify each module LIVE, with rollback. Firestore Rules owner-accepted risk is not a security PASS and alone is not current gate. No data reimport, new candidate, branch, or routine preview.",
+  "nextAction": "ACTIVE B4-003 2026-11-04: exact production roster and operational writer source bytes proven (runs 41816232334 and 41817078148), one new immutable successor Preview b094619281c1 build gi-i65-b4-b094619281c1-57f234755dc1 readback PASS, artifact 13315537234 retained; signed Carlos Operativo TODOS Inicio 5/5 and Ops/Leads names 3 of 4 historic named. DO NOT repeat certified CI, promote old artifact, or change Rules/import. NEXT only: independent signed backend role-country-team negative UAT, five open P0 dispositions, historical unknown author if resolvable without invented attribution; THEN if accepted promote exact artifact 13315537234 to LIVE and module-by-module writes/reload integrity rollback. B4 HOLD, I6 50%, 1/6 P0, owner Rules risk exception retained.",
   "sourceOfTruth": {
     "projectBoundaryPrevalentAddendum": "orbit360-platform/docs/recovery/ADDENDUM_PREVALENTE_CHATGPT_PROJECT_BOUNDARY_20260831.md",
     "mutableState": "orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json",
@@ -242,5 +242,29 @@
     "ownerTemporaryRulesException": "ACCEPTED_TEMPORARILY_NOT_SECURITY_PASS",
     "productionAccepted": false,
     "controlPlanePointer": "b4003ActiveResumeCursor20261104"
+  },
+  "b4003LatestCausalParityAndSuccessor20261104": {
+    "gate": "I6.5/B4-003",
+    "status": "EXACT_LIVE_BACKEND_ROSTER_WRITER_SOURCE_PARITY_PASS_NEW_HOSTING_PREVIEW_PASS_FULL_B4_HOLD",
+    "sourceSha": "b094619281c1f2ccef7e08335adedc76cf878bbc",
+    "buildId": "gi-i65-b4-b094619281c1-57f234755dc1",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-rc-41765742748-neoi3u7r.web.app/",
+    "artifactId": 13315537234,
+    "previewAndArtifactRun": 41817684940,
+    "rosterProductionRun": 41816232334,
+    "writerProductionRun": 41817078148,
+    "functionCount": 81,
+    "liveHostingChanged": false,
+    "dataChanged": false,
+    "firestoreRulesChanged": false,
+    "CarlosLatestPreview": "5/5_INICIO_440_CLIENTS_1425_POLICIES_5_PAYMENTS",
+    "opsLeadsHumanNames": "PARTIAL_3_OF_4_HISTORICAL_NOTES_NAMED",
+    "formalI6Percent": 50,
+    "p0Closed": 1,
+    "p0Total": 6,
+    "independentSignedBackendNegatives": "PENDING",
+    "productionAccepted": false,
+    "ownerTemporaryRulesException": "OPEN_ACCEPTED_NOT_SECURITY_PASS",
+    "receipt": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CAUSAL_BACKEND_PARITY_AND_NEW_IMMUTABLE_RC_20261104.json"
   }
 }
