@@ -104,5 +104,19 @@
   "classificationOnly": {
     "co124Vs125": "CLOSED_AS_NOT_DIRECTLY_COMPARABLE_COUNTS",
     "otherSignedUatAndPriorCrossCountryBusinessIdVariances": "UNCHANGED_OPEN_WHERE_INDEPENDENTLY_DOCUMENTED"
+  },
+  "e4SignedAdminUiPartial": {
+    "actor": "Samuel Daza",
+    "role": "Administración/AdminTenant",
+    "previewBuildId": "gi-i65-b4-cbca01be13f7-57f234755dc1",
+    "productionReportColombiaRecords": 124,
+    "productionReportGuatemalaRecords": 1292,
+    "qaExclusionBanner": "9_ORIGIN_MARKED_QA_IGNORED_IN_COMMERCIAL_EXPORT_INPUT",
+    "csvButtonClickedUnderCO": true,
+    "csvDownloadEvent": "WAITFOREVENT_DOWNLOAD_TIMED_OUT_NO_FILE_PATH",
+    "csvExactByteVerification": false,
+    "gtCarteraCobros": "PENDING_SERVER_HYDRATION_BEFORE_BROWSER_CONTROL_INTERRUPTION",
+    "browserControlStop": "CONNECTED_BROWSER_APPROVAL_SESSION_FAILED_TOOL_NOT_REPLAYED",
+    "conclusion": "PARTIAL_SIGNED_UI_ONLY_NO_EXPORT_BYTE_CERTIFICATION_NO_COBROS_RELEASE_PASS"
   }
 }
