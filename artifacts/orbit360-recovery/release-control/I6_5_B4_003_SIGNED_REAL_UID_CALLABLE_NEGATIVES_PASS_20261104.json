@@ -1,0 +1,351 @@
+{
+  "schema": "GI_I65_B4003_SIGNED_EXISTING_UID_SERVER_NEGATIVES_V1",
+  "gate": "I6.5/B4-003",
+  "ownerAuthorization": "EXPLICIT_2026-11-04_EXISTING_UID_EPHEMERAL_READ_ONLY",
+  "projectId": "ays-orbit-360-lab",
+  "tenantId": "alianzas-soluciones",
+  "sourceSha": "b094619281c1f2ccef7e08335adedc76cf878bbc",
+  "buildId": "gi-i65-b4-b094619281c1-57f234755dc1",
+  "immutableHostingArtifactId": 13315537234,
+  "backend": "orbit360AssignableAdvisorRoster",
+  "status": "SIGNED_EXISTING_UID_CALLABLE_ROLE_COUNTRY_TENANT_NEGATIVES_PASS",
+  "identityCount": 3,
+  "distinctIdentities": true,
+  "actors": [
+    {
+      "name": "Samuel",
+      "assignedRolesVerified": [
+        "admintenant",
+        "operativo",
+        "asesor"
+      ],
+      "countriesAuthorized": [
+        "GT",
+        "CO"
+      ],
+      "positives": [
+        {
+          "role": "admintenant",
+          "country": "GT",
+          "scope": "full",
+          "http": 200,
+          "errorStatus": "",
+          "returnedScope": "full",
+          "count": 6,
+          "pass": true
+        },
+        {
+          "role": "admintenant",
+          "country": "CO",
+          "scope": "full",
+          "http": 200,
+          "errorStatus": "",
+          "returnedScope": "full",
+          "count": 4,
+          "pass": true
+        },
+        {
+          "role": "admintenant",
+          "country": "TODOS",
+          "scope": "full",
+          "http": 200,
+          "errorStatus": "",
+          "returnedScope": "full",
+          "count": 7,
+          "pass": true
+        },
+        {
+          "role": "operativo",
+          "country": "GT",
+          "scope": "full",
+          "http": 200,
+          "errorStatus": "",
+          "returnedScope": "full",
+          "count": 6,
+          "pass": true
+        },
+        {
+          "role": "operativo",
+          "country": "CO",
+          "scope": "full",
+          "http": 200,
+          "errorStatus": "",
+          "returnedScope": "full",
+          "count": 4,
+          "pass": true
+        },
+        {
+          "role": "operativo",
+          "country": "TODOS",
+          "scope": "full",
+          "http": 200,
+          "errorStatus": "",
+          "returnedScope": "full",
+          "count": 7,
+          "pass": true
+        },
+        {
+          "role": "asesor",
+          "country": "GT",
+          "scope": "self",
+          "http": 200,
+          "errorStatus": "",
+          "returnedScope": "self",
+          "count": 1,
+          "pass": true
+        },
+        {
+          "role": "asesor",
+          "country": "CO",
+          "scope": "self",
+          "http": 200,
+          "errorStatus": "",
+          "returnedScope": "self",
+          "count": 1,
+          "pass": true
+        },
+        {
+          "role": "asesor",
+          "country": "TODOS",
+          "scope": "self",
+          "http": 200,
+          "errorStatus": "",
+          "returnedScope": "self",
+          "count": 1,
+          "pass": true
+        }
+      ],
+      "negatives": [
+        {
+          "type": "advisor-scope-spoof",
+          "pass": true,
+          "withoutSensitiveRows": true
+        },
+        {
+          "type": "unassigned-role",
+          "http": 403,
+          "errorStatus": "PERMISSION_DENIED",
+          "pass": true
+        },
+        {
+          "type": "unauthorized-country",
+          "http": 403,
+          "errorStatus": "PERMISSION_DENIED",
+          "pass": true
+        },
+        {
+          "type": "cross-tenant",
+          "http": 403,
+          "errorStatus": "PERMISSION_DENIED",
+          "pass": true
+        }
+      ]
+    },
+    {
+      "name": "Carlos",
+      "assignedRolesVerified": [
+        "operativo",
+        "asesor"
+      ],
+      "countriesAuthorized": [
+        "CO",
+        "GT"
+      ],
+      "positives": [
+        {
+          "role": "operativo",
+          "country": "CO",
+          "scope": "full",
+          "http": 200,
+          "errorStatus": "",
+          "returnedScope": "full",
+          "count": 4,
+          "pass": true
+        },
+        {
+          "role": "operativo",
+          "country": "GT",
+          "scope": "full",
+          "http": 200,
+          "errorStatus": "",
+          "returnedScope": "full",
+          "count": 6,
+          "pass": true
+        },
+        {
+          "role": "operativo",
+          "country": "TODOS",
+          "scope": "full",
+          "http": 200,
+          "errorStatus": "",
+          "returnedScope": "full",
+          "count": 7,
+          "pass": true
+        },
+        {
+          "role": "asesor",
+          "country": "CO",
+          "scope": "self",
+          "http": 200,
+          "errorStatus": "",
+          "returnedScope": "self",
+          "count": 1,
+          "pass": true
+        },
+        {
+          "role": "asesor",
+          "country": "GT",
+          "scope": "self",
+          "http": 200,
+          "errorStatus": "",
+          "returnedScope": "self",
+          "count": 1,
+          "pass": true
+        },
+        {
+          "role": "asesor",
+          "country": "TODOS",
+          "scope": "self",
+          "http": 200,
+          "errorStatus": "",
+          "returnedScope": "self",
+          "count": 1,
+          "pass": true
+        }
+      ],
+      "negatives": [
+        {
+          "type": "advisor-scope-spoof",
+          "pass": true,
+          "withoutSensitiveRows": true
+        },
+        {
+          "type": "unassigned-role",
+          "http": 403,
+          "errorStatus": "PERMISSION_DENIED",
+          "pass": true
+        },
+        {
+          "type": "unauthorized-country",
+          "http": 403,
+          "errorStatus": "PERMISSION_DENIED",
+          "pass": true
+        },
+        {
+          "type": "cross-tenant",
+          "http": 403,
+          "errorStatus": "PERMISSION_DENIED",
+          "pass": true
+        }
+      ]
+    },
+    {
+      "name": "Paula",
+      "assignedRolesVerified": [
+        "superadmin",
+        "operativo",
+        "asesor"
+      ],
+      "countriesAuthorized": [
+        "GT",
+        "CO"
+      ],
+      "positives": [
+        {
+          "role": "superadmin",
+          "country": "GT",
+          "scope": "full",
+          "http": 200,
+          "errorStatus": "",
+          "returnedScope": "full",
+          "count": 6,
+          "pass": true
+        },
+        {
+          "role": "superadmin",
+          "country": "CO",
+          "scope": "full",
+          "http": 200,
+          "errorStatus": "",
+          "returnedScope": "full",
+          "count": 4,
+          "pass": true
+        },
+        {
+          "role": "superadmin",
+          "country": "TODOS",
+          "scope": "full",
+          "http": 200,
+          "errorStatus": "",
+          "returnedScope": "full",
+          "count": 7,
+          "pass": true
+        }
+      ],
+      "negatives": [
+        {
+          "type": "unassigned-role",
+          "http": 403,
+          "errorStatus": "PERMISSION_DENIED",
+          "pass": true
+        },
+        {
+          "type": "unauthorized-country",
+          "http": 403,
+          "errorStatus": "PERMISSION_DENIED",
+          "pass": true
+        },
+        {
+          "type": "cross-tenant",
+          "http": 403,
+          "errorStatus": "PERMISSION_DENIED",
+          "pass": true
+        }
+      ]
+    }
+  ],
+  "anonymousDenial": {
+    "http": 401,
+    "errorStatus": "UNAUTHENTICATED"
+  },
+  "realUserCustomTokensIssued": 3,
+  "realUserIdTokensExchanged": 3,
+  "tests": 30,
+  "passes": 30,
+  "failures": [],
+  "sensitiveTokensPersisted": false,
+  "uidOrEmailLogged": false,
+  "operationalWrites": 0,
+  "authUserWrites": 0,
+  "membershipWrites": 0,
+  "rulesDeployed": false,
+  "hostingDeployed": false,
+  "functionDeployed": false,
+  "firestoreDirectRulesNegativeAcceptance": "NOT_TESTED_OWNER_TEMPORARY_EXCEPTION",
+  "notes": "Signed callable checks are not evidence of independent Firestore SDK Rules acceptance.",
+  "recordDate": "2026-11-04",
+  "provenance": {
+    "canonicalRepo": "paulaosoriof86/orbit360-core",
+    "branch": "recovery/fase-a-clean-20260831",
+    "commit": "9374d4de313ab08e5a4a1f0e50bcaa3ff0de65f0",
+    "workflowRunId": 41853402508,
+    "workflowUrl": "https://github.com/paulaosoriof86/orbit360-core/actions/runs/41853402508",
+    "workflowConclusion": "success",
+    "jobId": 126655425686,
+    "artifactId": 13335512955,
+    "artifactDigest": "sha256:8ca3925316632588d5e02a640af82f51ed4a55a6f410b83a1d195cdacd519bca"
+  },
+  "releaseInterpretation": {
+    "certified": "INDEPENDENT_EXISTING_UID_SIGNED_CALLABLE_ROSTER_POSITIVE_NEGATIVE_MATRIX_30_OF_30",
+    "notCertified": [
+      "FIRESTORE_SDK_DIRECT_RULES_DENIAL_OWNER_TEMPORARY_EXCEPTION_NOT_PASS",
+      "FIVE_HISTORICAL_P0_FULL_ACCEPTANCE",
+      "AUTHENTICATED_FUTURE_OPS_LEADS_HUMAN_NAME_WRITE_RELOAD",
+      "SAME_IMMUTABLE_HOSTING_ARTIFACT_PRODUCTION_PROMOTION",
+      "POSTDEPLOY_LIVE_MODULE_BY_MODULE_ACCEPTANCE"
+    ],
+    "formalI6PercentUnchanged": 50,
+    "historicalP0ClosedUnchanged": "1_OF_6",
+    "b4003Gate": "HOLD_UNTIL_REMAINING_CAUSAL_GATES"
+  }
+}
