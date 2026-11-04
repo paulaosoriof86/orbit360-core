@@ -3,8 +3,8 @@
   "dateGuatemala": "2026-11-04",
   "product": "Gravicentra Insurance",
   "gate": "I6.5/B4-003",
-  "recordType": "ADDITIVE_SIGNED_UI_PLUS_SOURCE_CAUSAL_EVIDENCE_NOT_FULL_E4_PASS",
-  "status": "CATEGORY_CAUSE_RECONCILED_EXACT_BUSINESS_IDS_AND_EXPORT_BYTES_HOLD",
+  "recordType": "ADDITIVE_CORRECTION_OF_PRELIMINARY_CAUSAL_ATTRIBUTION_NO_E4_PASS",
+  "status": "CORRECTED_13_GT_COUNT_DELTA_EXACT_IDS_AND_CAUSE_HOLD",
   "branch": "recovery/fase-a-clean-20260831",
   "observedBranchHead": "d5c4a4e5975d24e50c41452014e8fee338dc2ef1",
   "immutableCandidate": {
@@ -36,14 +36,15 @@
     "cobrosTotalMinusReportesCommercial": 13,
     "reportesCommercialPlusQa": 2560,
     "cobrosMinusReportesPreQaSource": 12,
-    "verifiedStructuralCause": "Cobros default list renders rows(idx)+portfolioPaymentRows(idx)+reportedRows(idx); owner reportableRows() builds the same streams and filters row.estado !== 'Anulado' before Reportes, which additionally excludes synthetic QA. Total cross-country 2572 vs 2559+1 gives 12 excluded by the owner filter and one QA excluded from commercial report.",
+    "verifiedStructuralCause": "RETRACTED_20261104: Both Cobros default rows(idx) and owner reportableRows() exclude Anulado under default filters; no 12 Anulado can explain the 13-count GT delta. Reportes applies additional isSyntheticRecord() and paisOK(linkedCountry()) checks. The exact 12 non-QA records and reasons remain unverified.",
     "GTCategorySplitAggregate": {
-      "anuladoExcludedByReportableOwner": 12,
+      "anuladoExcludedByReportableOwner": 0,
       "syntheticQaExcludedByReportes": 1,
+      "remainingGapUnclassified": 12,
       "COdelta": 0
     },
     "individualBusinessIdsEnumerated": false,
-    "caveat": "The 12 filtered Anulado IDs and the one QA ID were not extracted as a verified 13-ID ledger in this iteration; no underlying business record was changed. This aggregate causal classification cannot replace exact ID set certification."
+    "caveat": "Correction after signed GT filter Anulado yielded 0, corroborated by source cbca01be. The 12 not-QA delta requires exact ID-set and fail-closed cause proof; its category is NOT certified. Zero actual customer data changes."
   },
   "codeEvidence": [
     {
@@ -54,7 +55,7 @@
     {
       "path": "orbit360-platform/modules/cobros.js",
       "function": "render",
-      "logic": "default allRows formed from the same three streams without the reportableRows Anulado filter"
+      "logic": "Default Cobros rows(idx) already excludes c.estado==='Anulado' unless explicit Anulado filter; rendering no additional cancellation filter does not imply 12 annulled rows in default UI."
     },
     {
       "path": "orbit360-platform/modules/reportes.js",
@@ -87,7 +88,7 @@
     "Owner temporary broad Firestore rules risk accepted; no recurrent independent blocker"
   ],
   "outstandingExact": [
-    "Enumerate business IDs of 12 Anulado excluded and one synthetic QA record, document source/category and expected visibility",
+    "Identify exact 12 non-QA GT rows excluded by reportableRows/Reportes linkedCountry/isSyntheticRecord comparison, plus one observed QA exclusion, with verified individual IDs and categories; NOT presumed Anulado.",
     "E4 CSV/Excel/PDF file-byte and full-row readback with a causal download path",
     "Independent positive and negative backend UID/tenant/role/country permission probes as approved",
     "One controlled synthetic write/reload/restore plus signed before/after and same-artifact live acceptance"
@@ -110,5 +111,22 @@
     "hostingDeploys": 0,
     "productionDeploys": 0
   },
-  "nextAction": "Retain same candidate. Classify exact 13 IDs through authorized read-only source evidence; certify export bytes with a downloadable artifact mechanism, then controlled synthetic restore. No reimport and no new Preview unless source changed causally."
+  "nextAction": "Retain same candidate. Classify exact 13 IDs through authorized read-only source evidence; certify export bytes with a downloadable artifact mechanism, then controlled synthetic restore. No reimport and no new Preview unless source changed causally.",
+  "correction20261104": {
+    "status": "PASS_PRELIMINARY_CAUSAL_CLAIM_RETRACTED; HOLD_EXACT_ID_PROOF",
+    "signedBrowserAccount": "Samuel Daza",
+    "role": "Administración",
+    "country": "GT",
+    "stateFilter": "Anulado",
+    "result": "0 registros · Sin cobros",
+    "sourceSha": "cbca01be13f795a7469c5e9af59769337559688f",
+    "sourceCausalProof": "rows(idx) excludes Anulado with default st.fest; reportableRows() resets st.fest to '' and starts with rows(idx), so cannot additionally remove 12 annulled records from same default universe",
+    "newFunctionalRegression": false,
+    "sourceChanged": false,
+    "dataChanged": false,
+    "productDeployChanged": false,
+    "ownerRiskExceptionUnchanged": true,
+    "exactCause": "HOLD",
+    "independentReleaseBlockersUnchanged": true
+  }
 }
