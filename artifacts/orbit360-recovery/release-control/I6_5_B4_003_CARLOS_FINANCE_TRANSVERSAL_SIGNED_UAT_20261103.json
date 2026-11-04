@@ -1,0 +1,200 @@
+{
+  "schema": "gravicentra-i6-5-b4-003-carlos-transversal-role-finance-signed-uat-v1",
+  "dateGuatemala": "2026-11-03",
+  "product": "Gravicentra Insurance",
+  "recordType": "ADDITIVE_SIGNED_BROWSER_EVIDENCE_NOT_GATE_CLOSURE",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "branchHeadObservedBeforeReceipt": "f1b38bfd8e6327d77bd45cb150f1f6c6e0eef3d6",
+  "sourceSha": "7c78fda204831630bf9336213f67a3f56e437e4e",
+  "buildId": "gi-i65-b4-7c78fda20483-57f234755dc1",
+  "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-e4-41752197966-3dhqau7k.web.app/",
+  "authentication": {
+    "person": "Carlos Castro",
+    "realSignedSession": true,
+    "roleOptionsObserved": [
+      "Operativo",
+      "Asesor"
+    ],
+    "authorizedCountryOptions": [
+      "GT",
+      "CO",
+      "TODOS"
+    ],
+    "userConfirmedReady": true,
+    "credentialsRequested": false
+  },
+  "checks": [
+    {
+      "id": "OP_POLIZAS_GT_CO",
+      "status": "PASS_SIGNED_READ",
+      "observed": {
+        "all": 1425,
+        "GT": 1301,
+        "GTQaExcluded": 9,
+        "CO": 124,
+        "advisorColumnVisible": true,
+        "COActive": 27,
+        "GTActive": 196
+      },
+      "limits": "No se realizó prueba de escritura o negativa de backend."
+    },
+    {
+      "id": "OP_CLIENT360_GT_CO",
+      "status": "PASS_SIGNED_READ",
+      "observed": {
+        "GTClients": 391,
+        "COClients": 49,
+        "COLinkedPolicies": 125,
+        "COPolicyCountryUniverse": 124
+      },
+      "limits": "Diferencia semántica 125/124 explicada por un vínculo transfronterizo, no autoriza reimportación."
+    },
+    {
+      "id": "OP_COBROS_GT",
+      "status": "PASS_SIGNED_READ_WITH_DATA_WARNINGS",
+      "observed": {
+        "rows": 2516,
+        "SigaUnconfirmed": 1196,
+        "confirmedPayments": 5,
+        "confirmedGTQ": 2744,
+        "pendingGTQ": 2638,
+        "agingOverdueGTQ": 227808,
+        "currencyMismatches": 12,
+        "operationalOverdueCOPWithoutFinancialAging": 4
+      },
+      "limits": "SIGA no es pago confirmado; COP no se convierte ni suma con GTQ; 13 ID delta con Reportes sigue sin clasificación exacta."
+    },
+    {
+      "id": "OP_COBROS_CO",
+      "status": "PASS_SIGNED_READ_WITH_PROVENANCE",
+      "observed": {
+        "rows": 56,
+        "SigaUnconfirmed": 42,
+        "confirmedPayments": 0,
+        "agingOverdueCOP": 109875840
+      },
+      "limits": "No se confirmó ningún pago y no se modificaron fuentes."
+    },
+    {
+      "id": "OP_INICIO",
+      "status": "PASS_FOCAL_SIGNED_READ",
+      "observed": {
+        "hydrationSourcesReady": 5,
+        "hydrationSourcesExpected": 5
+      },
+      "limits": "No sustituye prueba de arranque frío/errores bajo todos los roles y viewports."
+    },
+    {
+      "id": "ADVISOR_CO_CLIENT360",
+      "status": "PASS_SIGNED_UI_SCOPE",
+      "observed": {
+        "clients": 12,
+        "linkedPolicies": 20,
+        "activePolicies": 15,
+        "activePremiumCOP": 99838917,
+        "operativeClients": 49
+      },
+      "limits": "Comparación de mismo UID con rol visible Asesor vs Operativo; no equivale a denegación de servidor ni a perfil Samuel."
+    },
+    {
+      "id": "ADVISOR_CO_POLIZAS",
+      "status": "PASS_SIGNED_UI_SCOPE",
+      "observed": {
+        "advisorPolicyRows": 25,
+        "operativeCountryRows": 124,
+        "advisorActivePolicies": 16,
+        "advisorClientUnavailableWithinScope": 5,
+        "advisorActiveUnlinkedPolicyPremiumCOP": 135440
+      },
+      "limits": "Cinco vínculos cliente no visibles en rol Asesor requieren clasificación, no cambio automático de país."
+    },
+    {
+      "id": "ADVISOR_CO_COBROS",
+      "status": "PASS_SIGNED_UI_SCOPE",
+      "observed": {
+        "advisorRows": 37,
+        "advisorSigaUnconfirmed": 27,
+        "operativeRows": 56,
+        "advisorOverdueCOP": 101654210
+      },
+      "limits": "La reducción UI es positiva de scope, falta negar la consulta no permitida directamente en backend."
+    },
+    {
+      "id": "GT_CROSS_COUNTRY_POLICY_LINK",
+      "status": "EXCEPTION_IDENTIFIED_REAL_POLICY",
+      "observed": {
+        "policyNumber": "02-01-858-601-0",
+        "policyCountryUniverse": "GT",
+        "linkedClientCountry": "CO",
+        "policyStatus": "Cancelada",
+        "advisor": "Paula Osorio"
+      },
+      "limits": "La diferencia no acredita pérdida; no alterar país ni propietario para hacer cuadrar números."
+    },
+    {
+      "id": "OPERATIVE_SESSION_RESTORED",
+      "status": "PASS_UI_HANDOFF",
+      "observed": {
+        "person": "Carlos Castro",
+        "role": "Operativo",
+        "country": "GT",
+        "page": "Polizas"
+      },
+      "limits": "Vista de usuario restaurada al rol original; pestaña preservada."
+    }
+  ],
+  "technicalEvidence": {
+    "focalSyntheticChecks": 123,
+    "sourceCiRunId": 41751634200,
+    "isolatedScopedReaderFunctionDeployRunId": 41752044098,
+    "hostingPreviewRunId": 41752197966,
+    "hostingRunnerReadbackStatus": "HOLD_RUNNER_404_AFTER_DEPLOY",
+    "independentReproofRunId": 41752689550,
+    "independentReproofStatus": "HOLD_RUNNER_404",
+    "chromeSignedPreviewLoads": true,
+    "independentExactServedAssetBlobParityObserved": true,
+    "sourceArtifactMutatedAfterBuild": false,
+    "productionDeployment": false
+  },
+  "unresolved": [
+    "Backend negative role-country-advisor query/get denial by independent signed UID",
+    "Samuel signed UAT specifically on source 7c78fda finance and own CO scope, recognizing previous 8ccbf641 partial",
+    "Paula Direction signed final cross-role spotcheck on same build",
+    "Classify GT Reportes 2503 vs Cobros 2516 13 underlying IDs",
+    "Classify 12 currency provenance and 4 operational overdue COP no matching financial aging in GT view",
+    "Classify 5 advisor-scope CO client links and GT real policy cross-border link",
+    "Read back E4 CSV/Excel/PDF exports by bytes and full row count",
+    "Controlled synthetic write/reload/restore and rollback",
+    "Resolve runner 404 vs served Chrome 200 for artifact certification",
+    "Explicit release authorization after functional and security/release remaining gates"
+  ],
+  "security": {
+    "existingOwnerTemporaryRulesRiskException": "OWNER_RISK_ACCEPTED_NON_BLOCKING_FOR_CONTROLLED_LIVE_NOT_SECURITY_PASS",
+    "backendSecurityCertification": "HOLD",
+    "firestoreRulesChanged": false
+  },
+  "thesisPilot": {
+    "technicalReadiness": "PARTIAL_POSITIVE_SIGNED_READ",
+    "academicCertification": "NOT_EXECUTED_IN_THIS_PROJECT",
+    "independentTR01ToTR07AndEvidence": "THESIS_PROJECT_OWNS",
+    "pilotLaunchAuthorization": false
+  },
+  "formalMetrics": {
+    "i6Percent": 50,
+    "i6MiniGatesPassed": 5,
+    "i6MiniGatesTotal": 10,
+    "b4003P0Closed": 1,
+    "b4003P0Total": 6,
+    "b4003Closed": false,
+    "currentCandidateProductionAuthorized": false
+  },
+  "writeScope": {
+    "businessDataWrites": 0,
+    "rolesGrantsChanges": 0,
+    "productCodeChanges": 0,
+    "hostingOrFunctionsProductionDeploys": 0,
+    "sourceBranchChangesBeforeThisReceipt": 0
+  },
+  "next": "Continue current I6.5/B4-003 only. Do not repeat passed Carlos read matrices without causal invalidation. Run signed negative backend + targeted Samuel/Paula, E4 export and 13 IDs, synthetic restore, exact artifact guard and controlled LIVE."
+}
