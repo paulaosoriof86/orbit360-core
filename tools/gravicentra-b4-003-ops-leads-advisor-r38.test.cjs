@@ -44,4 +44,5 @@ assert.equal(icontext.resolve('', 'GT'),null,'INICIO_NO_DEFAULT_ADVISOR');
 assert.match(inicio,/const ase = followupAdvisor\(n\.asesorId,n\.pais\)/,'INICIO_CARD_USES_SIGNED_NAME');
 assert.match(inicio,/Orbit\.ciclo\.negocios\(\{ surface: 'ops' \}\)/,'INICIO_FOLLOWUPS_OBEY_ROLE_SCOPE');
 assert.match(inicio,/advisor-identity-readback[\s\S]*Orbit\.router\.go\('inicio'\)/,'INICIO_REPAINTS_AFTER_SIGNED_ROSTER');
-console.log('B4_003_R38_ADVISOR_AND_AUTHOR_SOURCE_PASS checks=27 synthetic_only_no_writes');
+assert.ok(inicio.includes("typeof document.addEventListener==='function'"),'INICIO_EVENT_LISTENER_VM_GUARD');
+console.log('B4_003_R38_ADVISOR_AND_AUTHOR_SOURCE_PASS checks=28 synthetic_only_no_writes');

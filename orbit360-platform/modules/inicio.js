@@ -402,7 +402,7 @@ Orbit.modules.inicio = (function () {
   }
   // ciclo loads this signed roster asynchronously. Refresh Inicio only after
   // the verified roster returns, never re-fetch or trust provisional names.
-  document.addEventListener('orbit:ciclo',event=>{
+  if(typeof document!=='undefined'&&typeof document.addEventListener==='function')document.addEventListener('orbit:ciclo',event=>{
     if(event?.detail?.reason!=='advisor-identity-readback'||Orbit.route?.key!=='inicio')return;
     if(Orbit.router&&typeof Orbit.router.go==='function')Orbit.router.go('inicio');
   });
