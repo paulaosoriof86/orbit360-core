@@ -225,5 +225,34 @@
       "approvalToWidenAdvisorClientScope": "NOT_ASSUMED",
       "businessDataWrites": 0
     }
+  },
+  "samuelSignedReadOnlyUat": {
+    "dateLocal": "2026-11-03",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-e4-41737972469-2elawj35.web.app/",
+    "buildId": "gi-i65-b4-9a0b8794c56f-57f234755dc1",
+    "identityShown": "Samuel Daza",
+    "authentication": "CONFIRMED_UI",
+    "visibleRoleViews": [
+      "Administración",
+      "Operativo",
+      "Asesor"
+    ],
+    "visibleCountryViews": [
+      "Todos los países",
+      "Guatemala",
+      "Colombia"
+    ],
+    "initialSelectedRole": "Operativo",
+    "initialSelectedCountry": "Todos los países",
+    "startupObservation": "Initial session restoration remained on 'Acceso confirmado · preparando tus datos…' and a controlled single reload recovered to app shell; no definitive root cause assigned.",
+    "blockingGate": "First-login legal agreements visible; 'He leído y acepto íntegramente los acuerdos anteriores' unchecked and 'Aceptar y continuar' disabled; Samuel's personal acceptance required. Agent did not accept or bypass.",
+    "moduleByRoleByCountryCertification": "NOT_EXECUTED_PENDING_INDIVIDUAL_LEGAL_ACCEPTANCE",
+    "negativeBackendPermissionCertification": "NOT_EXECUTED",
+    "accessChange": false,
+    "productionChange": false,
+    "dataMutation": false,
+    "formalPassesAwarded": 0,
+    "conclusion": "SIGNED_AUTHENTICATION_AND_VISIBLE_ROLE_COUNTRY_SELECTORS_ONLY__FUNCTIONAL_UAT_HOLD",
+    "nextAction": "After Samuel personally accepts legal terms, perform role×country×module read-only matrix against same exact E4 build; preserve current grants and record separate backend negative tests."
   }
 }
