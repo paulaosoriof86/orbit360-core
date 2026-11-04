@@ -64,8 +64,9 @@ Orbit.modules.equipo = (function () {
       pendiente:tipo==='sin_clasificar'};
   }
   function puedeConfigurarParticipacion() {
-    const role=String(Orbit.session&&typeof Orbit.session.rol==='function'?Orbit.session.rol():(Orbit.auth?.productUser?.activeRole||''));
-    return role==='Dirección'&&!!(Orbit.access&&typeof Orbit.access.can==='function'&&Orbit.access.can('equipo','edit')===true);
+    const role=String(Orbit.session&&typeof Orbit.session.rol==='function'?Orbit.session.rol():(Orbit.auth?.productUser?.activeRole||''))
+      .trim().normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+    return ['direccion','superadmin','super_admin'].includes(role)&&!!(Orbit.access&&typeof Orbit.access.can==='function'&&Orbit.access.can('equipo','edit')===true);
   }
   function slug(v) {
     return String(v || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()

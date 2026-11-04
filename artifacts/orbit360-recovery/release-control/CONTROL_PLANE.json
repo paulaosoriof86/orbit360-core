@@ -18358,5 +18358,29 @@
     "fullB4003Closed": false,
     "productionAccepted": false,
     "next": "ADJUDICATE_ONLY_FIVE_REMAINING_P0_AND_OPS_LEADS_HUMAN_AUTHOR_READBACK; THEN_PROMOTE_EXACT_ARTIFACT_13315537234_IF_PASS_AND_CERTIFY_LIVE_MODULES"
+  },
+  "b4003GoalParticipationRoleParity20261104": {
+    "status": "OWNER_AUTHORIZED_SOURCE_ONLY_LOCAL_PREFLIGHT_PASS_CI_PENDING",
+    "gate": "I6.5/B4-003",
+    "decision": "DIRECCION_AND_SUPERADMIN_WITH_EQUIPO_EDIT_AND_TENANT_COUNTRY_SCOPE",
+    "parentSourceHead": "87441b968158a005cb0cfd914eba954c4e8e3458",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_GOAL_PARTICIPATION_ROLE_PARITY_20261104.json",
+    "sourceBlobs": {
+      "functions/goal-participation-contract.js": "ff86fa441fd6cb4ec6254e2dc5078a37bf68fc36",
+      "orbit360-platform/modules/equipo.js": "ab0fc0dab4d9e4fb19f5ae165018c536259443a1"
+    },
+    "tests": {
+      "tests/goal-participation.test.cjs": "e018a5edd025650cf1f4c749386e932641a324f3",
+      "tests/goal-participation-modal.test.cjs": "d350047a403f951a00d7ea6a4661c11643c221b3"
+    },
+    "liveDataWrites": 0,
+    "advisorRecordsClassified": 0,
+    "artifactRequiresRebuild": true,
+    "previousImmutableArtifactUnmodified": true,
+    "noProductionAuthorization": true,
+    "formalI6Percent": 50,
+    "p0Closed": 1,
+    "p0Total": 6,
+    "b4003Closed": false
   }
 }

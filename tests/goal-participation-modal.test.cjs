@@ -5,13 +5,13 @@ const path=require('node:path');
 const vm=require('node:vm');
 
 const source=fs.readFileSync(path.join(__dirname,'../orbit360-platform/modules/equipo.js'),'utf8');
-function renderModal({role='Dirección',preview=false,tipoVinculacion,participaMetas=false,name='Johanna'}={}){
+function renderModal({role='Dirección',preview=false,tipoVinculacion,participaMetas=false,name='Johanna',country='GT',canEdit=true}={}){
   let markup=null;
   const stop=new Error('GOAL_MODAL_CAPTURED');
   const dummy={id:'',className:'',style:{},dataset:{},set innerHTML(value){markup=value;throw stop;}};
   const document={getElementById:()=>null,createElement:()=>dummy};
   const advisor={id:'ase-prueba',nombre:name,email:'prueba@example.test',roles:['Asesor'],
-    rol:'Asesor',rolDefault:'Asesor',paises:['GT'],pais:'GT',paisDefault:'GT',scopeDatos:'propios',
+    rol:'Asesor',rolDefault:'Asesor',paises:[country],pais:country,paisDefault:country,scopeDatos:'propios',
     ...(tipoVinculacion===undefined?{}:{tipoVinculacion}),participaMetas};
   const store={get:(collection,id)=>collection==='asesores'&&id==='ase-prueba'?advisor:null,
     all:()=>[advisor],metaPreviewEnabled:()=>preview};
@@ -19,8 +19,8 @@ function renderModal({role='Dirección',preview=false,tipoVinculacion,participaM
     ui:{NOW:'2026-10-31T12:00:00Z',esc:value=>String(value??''),
       avatar:()=>'<span>Avatar</span>'},
     kit:{},auth:{productUser:{uid:'uid-demo',activeRole:role}},
-    session:{rol:()=>role},access:{can:(module,action)=>module==='equipo'&&action==='edit'},
-    tenant:{get:()=>({paises:['GT']})},pais:'GT',
+    session:{rol:()=>role},access:{can:(module,action)=>canEdit&&module==='equipo'&&action==='edit'},
+    tenant:{get:()=>({paises:[country]})},pais:country,
     PAISES:[{id:'GT',label:'Guatemala',moneda:'GTQ'}],
     ROLES:{},MODULE_TITLES:{},productRoleTaxonomyP0:null};
   vm.runInNewContext(source,{Orbit,window:{Orbit},document,OrbitBackend:{},console},
@@ -47,6 +47,19 @@ assert.doesNotMatch(check(freelance),/checked/,'Freelance comienza deshabilitado
 const habilitado=renderModal({name:'Braulio',tipoVinculacion:'freelance',participaMetas:true});
 assert.match(check(habilitado),/checked/,'Un estado explícito se refleja');
 
+const superadminGt=renderModal({role:'SuperAdmin',tipoVinculacion:'freelance'});
+assert.doesNotMatch(select(superadminGt),/disabled/,'SuperAdmin GT con equipo.edit puede clasificar');
+assert.doesNotMatch(check(superadminGt),/disabled/,'SuperAdmin GT con equipo.edit puede habilitar freelancer');
+const superadminCo=renderModal({role:'SuperAdmin',country:'CO',tipoVinculacion:'freelance'});
+assert.doesNotMatch(select(superadminCo),/disabled/,'SuperAdmin CO con equipo.edit no queda restringido a GT');
+const superadminSinEdit=renderModal({role:'SuperAdmin',tipoVinculacion:'freelance',canEdit:false});
+assert.match(select(superadminSinEdit),/disabled/,'SuperAdmin sin equipo.edit no puede clasificar');
+assert.match(check(superadminSinEdit),/disabled/,'SuperAdmin sin equipo.edit no puede habilitar');
+for(const role of ['AdminTenant','Operativo','Asesor']){
+  const denied=renderModal({role,tipoVinculacion:'freelance'});
+  assert.match(select(denied),/disabled/,role+' no puede clasificar');
+  assert.match(check(denied),/disabled/,role+' no puede habilitar');
+}
 const admin=renderModal({role:'Admin',tipoVinculacion:'freelance'});
 assert.match(select(admin),/disabled/,'Admin no puede clasificar');
 assert.match(check(admin),/disabled/,'Admin no puede habilitar');

@@ -1,0 +1,54 @@
+{
+  "schemaVersion": "gravicentra-b4003-goal-participation-role-parity-v1",
+  "recordType": "ADDITIVE_CAUSAL_SOURCE_ONLY_NOT_RELEASE_PASS",
+  "gate": "I6.5/B4-003",
+  "dateLocal": "2026-11-04",
+  "status": "OWNER_AUTHORIZED_SOURCE_PATCH_LOCAL_PREFLIGHT_PASS_CI_AND_SIGNED_PREVIEW_PENDING",
+  "ownerDecision": "Dirección y SuperAdmin con permiso equipo.edit pueden configurar participación; alcance de tenant y país se conserva; denegar AdminTenant, Admin, Operativo, Asesor y otros.",
+  "ownerAuthorization": "2026-11-04: AUTORIZO, confirmación expresa en conversación Gravicentra Insurance",
+  "genericRolePredicate": [
+    "direccion",
+    "superadmin",
+    "super_admin"
+  ],
+  "mustAlsoHave": "equipo.edit",
+  "mustAlsoEnforce": [
+    "tenant",
+    "country",
+    "effectiveScope",
+    "assigned active role"
+  ],
+  "recordClassificationRule": {
+    "interno": "participa por defecto",
+    "freelance": "excluido salvo habilitación individual autorizada",
+    "sin_clasificar": "no participa"
+  },
+  "sourceFiles": {
+    "functions/goal-participation-contract.js": "ff86fa441fd6cb4ec6254e2dc5078a37bf68fc36",
+    "orbit360-platform/modules/equipo.js": "ab0fc0dab4d9e4fb19f5ae165018c536259443a1"
+  },
+  "testFiles": {
+    "tests/goal-participation.test.cjs": "e018a5edd025650cf1f4c749386e932641a324f3",
+    "tests/goal-participation-modal.test.cjs": "d350047a403f951a00d7ea6a4661c11643c221b3"
+  },
+  "baselineSourceSha": "87441b968158a005cb0cfd914eba954c4e8e3458",
+  "localPreflight": {
+    "backendContractRoleCases": 9,
+    "uiRoleCountryAndPreviewCases": 14,
+    "jsSyntaxFiles": 4,
+    "method": "ephemeral V8 execution with mock data; not GitHub CI"
+  },
+  "guardTests": "PENDING_WORKFLOW",
+  "hostingPreview": "PREVIOUS_CERTIFIED_ARTIFACT_NOT_VALID_FOR_MODIFIED_SOURCE",
+  "operationalAdvisorRecordsClassified": 0,
+  "liveDataWrites": 0,
+  "firebaseDeploys": 0,
+  "firestoreRulesChanges": 0,
+  "noPromotionAuthorizedByThisReceipt": true,
+  "nextActions": [
+    "Run existing goal-participation tests and guard on new HEAD",
+    "Build and publish new immutable Preview using exact same artifact for eventual live",
+    "Read signed role/country team data and classify real advisor records through authorized operational writer with before/after/reload",
+    "Complete remaining B4-003 P0 and signed matrix before live"
+  ]
+}

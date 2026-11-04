@@ -22,7 +22,11 @@ same(validarCambioParticipacion({tipoVinculacion:'freelance',participaMetas:fals
 same(validarCambioParticipacion({tipoVinculacion:'freelance',participaMetas:true},{tipoVinculacion:'interno',participaMetas:false},'Dirección').after.participaMetas,true,'Interno siempre participa');
 same(validarCambioParticipacion({tipoVinculacion:'interno',participaMetas:false},{tipoVinculacion:'interno',participaMetas:false},'Dirección'),null,'Repetir un dato igual no genera falso evento');
 fails(()=>validarCambioParticipacion({}, {tipoVinculacion:'interno'},'Admin'),'DIRECCION_REQUERIDA');
-fails(()=>validarCambioParticipacion({}, {participaMetas:true},'SuperAdmin'),'DIRECCION_REQUERIDA');
+same(validarCambioParticipacion({tipoVinculacion:'sin_clasificar'}, {tipoVinculacion:'interno',participaMetas:false},'SuperAdmin').after.participaMetas,true,'SuperAdmin clasifica interno por rol');
+same(validarCambioParticipacion({tipoVinculacion:'freelance',participaMetas:false}, {participaMetas:true},'super_admin').after.participaMetas,true,'Alias canónico de SuperAdmin habilita freelance');
+fails(()=>validarCambioParticipacion({}, {participaMetas:true},'AdminTenant'),'DIRECCION_REQUERIDA');
+fails(()=>validarCambioParticipacion({}, {participaMetas:true},'Operativo'),'DIRECCION_REQUERIDA');
+fails(()=>validarCambioParticipacion({}, {participaMetas:true},'Asesor'),'DIRECCION_REQUERIDA');
 fails(()=>validarCambioParticipacion({}, {tipoVinculacion:'otro'},'Dirección'),'VINCULACION_INVALIDA');
 fails(()=>validarCambioParticipacion({}, {participaMetas:'true'},'Dirección'),'HABILITACION_INVALIDA');
 fails(()=>validarCambioParticipacion({}, {tipoVinculacion:'interno',participaMetas:true},'Dirección'),'HABILITACION_SOLO_FREELANCE');
@@ -37,7 +41,7 @@ yes(server.includes('validarCambioParticipacion(before,mutation.payload,actor.ac
 yes(server.includes("accion:'editar_participacion_metas'"),'Auditoría de servidor');
 yes(roster.includes('...estadoParticipacion(r)'),'El roster nunca infiere por nombres');
 yes(ui.includes('id="eu-vinculacion"')&&ui.includes('id="eu-participa-metas"'),'Controles visibles en ficha');
-yes(ui.includes('puedeConfigurarParticipacion()&&!isMetaPreview()'),'Control editable solo Dirección fuera de Preview');
+yes(ui.includes('puedeConfigurarParticipacion()&&!isMetaPreview()'),'Control editable solo autoridad de Dirección/SuperAdmin fuera de Preview');
 yes(ui.includes("tipoVinculacion=data")===false,'Las clasificaciones no se infieren del perfil');
 yes(dashboard.includes('institucionClasificada')&&dashboard.includes('participacionInstitucional'),'Porcentaje institucional a partir de elegibles');
 yes(insights.includes('Clasificación o meta por validar')&&insights.includes('eligibleIds'),'Insights no inventa metas ni participantes');

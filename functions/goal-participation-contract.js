@@ -20,7 +20,8 @@ class ParticipacionInvalida extends Error {
 }
 function validarCambioParticipacion(before,payload,activeRole){
   if(!has(payload,'tipoVinculacion')&&!has(payload,'participaMetas'))return null;
-  if(String(activeRole||'').trim().normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase()!=='direccion')
+  const role=String(activeRole||'').trim().normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+  if(!['direccion','superadmin','super_admin'].includes(role))
     throw new ParticipacionInvalida('DIRECCION_REQUERIDA');
   if(has(payload,'tipoVinculacion')&&!TYPES.has(payload.tipoVinculacion))
     throw new ParticipacionInvalida('VINCULACION_INVALIDA');
