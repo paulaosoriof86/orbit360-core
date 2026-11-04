@@ -1,0 +1,52 @@
+{
+  "schemaVersion": "GI_I65_B4_003_OWNER_AUTHORIZED_DEPLOY_SINGLE_WRITER_GOAL_CONTRACT_V1",
+  "recordType": "ADDITIVE_INTENT_NOT_LIVE_PASS",
+  "gate": "I6.5/B4-003",
+  "dateLocal": "2026-11-04",
+  "ownerAuthorization": "Paula autorizó actualizar exclusivamente orbit360ProductOperationalCommand con pruebas, verificación y rollback, sin tocar Hosting LIVE, Firestore Rules ni datos operativos.",
+  "singleTarget": "orbit360ProductOperationalCommand",
+  "firebaseProject": "ays-orbit-360-lab",
+  "region": "us-central1",
+  "branch": "recovery/fase-a-clean-20260831",
+  "baseHead": "06395f36ad3e38c0846bf136cbf0e1e2cf10b1ef",
+  "dependencySource": {
+    "path": "functions/goal-participation-contract.js",
+    "gitBlob": "ff86fa441fd6cb4ec6254e2dc5078a37bf68fc36"
+  },
+  "writerSource": {
+    "path": "functions/product-operational-domain.js",
+    "gitBlob": "b3d0059457142659633498c9c52c6b84ea68200f",
+    "unchanged": true
+  },
+  "rosterSource": {
+    "path": "functions/assignable-advisor-roster.js",
+    "gitBlob": "9778d74b6d305ff56caf73bb68be3dadac4b14ce",
+    "untouched": true
+  },
+  "frontendSource": {
+    "path": "orbit360-platform/modules/equipo.js",
+    "gitBlob": "ab0fc0dab4d9e4fb19f5ae165018c536259443a1"
+  },
+  "guards": [
+    "all 5 goal participation suites",
+    "backend and UI syntax",
+    "active role assigned",
+    "equipo.edit",
+    "tenant and authorized country",
+    "before exact archive with old goal dependency",
+    "after deployed source/dependency byte comparison",
+    "81-function count unchanged",
+    "non-target roster revision unchanged",
+    "rollback old dependency and writer on postdeploy failure"
+  ],
+  "noBusinessDataWrites": true,
+  "noHostingLiveWrites": true,
+  "noFirestoreRulesWrites": true,
+  "noAuthIamWrites": true,
+  "backendFunctionalSignedUidUat": "PENDING_AFTER_SOURCE_PARITY",
+  "requiresSameImmutablePreviewArtifactNewHead": true,
+  "releaseGateClosed": false,
+  "formalI6Percent": 50,
+  "p0Closed": 1,
+  "p0Total": 6
+}

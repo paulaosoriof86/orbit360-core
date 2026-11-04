@@ -21,20 +21,28 @@ async function source(client,name){
  if(buffer.byteLength<1000)throw Error('DEPLOYED_ARCHIVE_TOO_SMALL:'+name);
  const archive=path.join(tmp,'gi-b4003-'+phase+'-'+name+'.zip');fs.writeFileSync(archive,buffer);
  const names=execFileSync('unzip',['-Z1',archive],{encoding:'utf8'}).trim().split('\n');
+ const readOne=file=>{
+  const matches=names.filter(n=>n===file||n.endsWith('/'+file));
+  if(matches.length!==1)throw Error('DEPLOYED_SOURCE_FILE_CARDINALITY:'+name+':'+file+':'+matches.length);
+  return execFileSync('unzip',['-p',archive,matches[0]],{maxBuffer:10_000_000});
+ };
  const file=name===roster?'assignable-advisor-roster.js':'product-operational-domain.js';
- const matches=names.filter(n=>n===file||n.endsWith('/'+file));
- if(matches.length!==1)throw Error('DEPLOYED_SOURCE_FILE_CARDINALITY:'+name+':'+matches.length);
- const sourceBytes=execFileSync('unzip',['-p',archive,matches[0]],{maxBuffer:10_000_000});
- return {name,archive,archiveSha256:sha(buffer),sourceSha256:sha(sourceBytes),sourceGitBlobSha:crypto.createHash('sha1').update(Buffer.concat([Buffer.from('blob '+sourceBytes.length+'\u0000'),sourceBytes])).digest('hex'),
+ const sourceBytes=readOne(file);
+ const goalBytes=name===writer?readOne('goal-participation-contract.js'):null;
+ const gitBlob=b=>crypto.createHash('sha1').update(Buffer.concat([Buffer.from('blob '+b.length+'\u0000'),b])).digest('hex');
+ return {name,archive,archiveSha256:sha(buffer),sourceSha256:sha(sourceBytes),sourceGitBlobSha:gitBlob(sourceBytes),
+  goalParticipationContractSha256:goalBytes?sha(goalBytes):null,
+  goalParticipationContractGitBlobSha:goalBytes?gitBlob(goalBytes):null,
   generation:src.generation||null,sourceBucket:src.bucket,sourceObject:src.object,revision:meta.serviceConfig?.revision||null,updateTime:meta.updateTime||null,
   deployedCodeHash:meta.labels?.['firebase-functions-hash']||null,bytes:sourceBytes.length};
 }
 (async()=>{
  const client=await new GoogleAuth({scopes:['https://www.googleapis.com/auth/cloud-platform']}).getClient();
  const deployed=await Promise.all([roster,writer].map(n=>source(client,n)));
- const local={roster:sha(fs.readFileSync('functions/assignable-advisor-roster.js')),writer:sha(fs.readFileSync('functions/product-operational-domain.js'))};
+ const local={roster:sha(fs.readFileSync('functions/assignable-advisor-roster.js')),writer:sha(fs.readFileSync('functions/product-operational-domain.js')),goalParticipationContract:sha(fs.readFileSync('functions/goal-participation-contract.js'))};
  const result={phase,target,observedAtUtc:new Date().toISOString(),project,region:'us-central1',functions:deployed.map(({archive,...rest})=>rest),
   expectedCurrentCodeSha256:local,rosterSourceMatchesCurrent:deployed[0].sourceSha256===local.roster,writerSourceMatchesCurrent:deployed[1].sourceSha256===local.writer,
+  writerGoalParticipationContractMatchesCurrent:deployed[1].goalParticipationContractSha256===local.goalParticipationContract,
   readOnly:true,noAuthIamOrDataWrites:true,noHostingRulesWrites:true};
  const beforePath=path.join(tmp,'gi-b4003-live-sources-before.json');
  if(phase!=='before'){
@@ -42,10 +50,10 @@ async function source(client,name){
   const changed=target===roster?0:1,untouched=1-changed;
   if(before.functions[untouched].sourceSha256!==deployed[untouched].sourceSha256||before.functions[untouched].revision!==deployed[untouched].revision)throw Error('NON_TARGET_PRODUCTION_FUNCTION_CHANGED');
   if(phase==='after'){
-   if(changed===0&&!result.rosterSourceMatchesCurrent||changed===1&&!result.writerSourceMatchesCurrent)throw Error('DEPLOYED_TARGET_SOURCE_BYTES_MISMATCH');
+   if(changed===0&&!result.rosterSourceMatchesCurrent||changed===1&&(!result.writerSourceMatchesCurrent||!result.writerGoalParticipationContractMatchesCurrent))throw Error('DEPLOYED_TARGET_AND_GOAL_CONTRACT_BYTES_MISMATCH');
    if(before.functions[changed].revision===deployed[changed].revision)throw Error('TARGET_REVISION_DID_NOT_MOVE');
-  } else if(before.functions[changed].sourceSha256!==deployed[changed].sourceSha256)throw Error('ROLLBACK_TARGET_SOURCE_NOT_RESTORED');
+  } else if(before.functions[changed].sourceSha256!==deployed[changed].sourceSha256||before.functions[changed].goalParticipationContractSha256!==deployed[changed].goalParticipationContractSha256)throw Error('ROLLBACK_TARGET_SOURCE_OR_GOAL_CONTRACT_NOT_RESTORED');
  }
  const output=path.join(tmp,'gi-b4003-live-sources-'+phase+'.json');fs.writeFileSync(output,JSON.stringify(result,null,2)+'\n');
- console.log(JSON.stringify({phase,status:'DEPLOYED_BACKEND_SOURCE_BYTES_READBACK',rosterSourceMatchesCurrent:result.rosterSourceMatchesCurrent,writerSourceMatchesCurrent:result.writerSourceMatchesCurrent,rosterGitBlob:deployed[0].sourceGitBlobSha,writerGitBlob:deployed[1].sourceGitBlobSha}));
+ console.log(JSON.stringify({phase,status:'DEPLOYED_BACKEND_SOURCE_BYTES_READBACK',rosterSourceMatchesCurrent:result.rosterSourceMatchesCurrent,writerSourceMatchesCurrent:result.writerSourceMatchesCurrent,writerGoalParticipationContractMatchesCurrent:result.writerGoalParticipationContractMatchesCurrent,rosterGitBlob:deployed[0].sourceGitBlobSha,writerGitBlob:deployed[1].sourceGitBlobSha,goalContractGitBlob:deployed[1].goalParticipationContractGitBlobSha}));
 })().catch(e=>{console.error('B4_003_BACKEND_SOURCE_READBACK_HOLD:'+String(e.message||e));process.exitCode=41;});

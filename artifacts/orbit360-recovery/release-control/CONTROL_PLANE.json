@@ -18382,5 +18382,27 @@
     "p0Closed": 1,
     "p0Total": 6,
     "b4003Closed": false
+  },
+  "b4003OwnerAuthorizedSingleWriterGoalContractDeploy20261104": {
+    "recordType": "ADDITIVE_SOURCE_ONLY_PENDING_DEPLOY_AND_READBACK",
+    "gate": "I6.5/B4-003",
+    "status": "OWNER_AUTHORIZED_TARGETED_WRITER_GOAL_DEPENDENCY_TRANSPORT_TESTS_PENDING",
+    "ownerAuthorized": true,
+    "targetFunction": "orbit360ProductOperationalCommand",
+    "project": "ays-orbit-360-lab",
+    "authorizedScope": "ONLY_EXISTING_FUNCTION_GOAL_PARTICIPATION_DEPENDENCY_WITH_ROLLBACK",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_GOAL_ROLE_BACKEND_OWNER_AUTHORIZED_INTENT_20261104.json",
+    "previousPreviewHead": "06395f36ad3e38c0846bf136cbf0e1e2cf10b1ef",
+    "expectedGoalContractGitBlob": "ff86fa441fd6cb4ec6254e2dc5078a37bf68fc36",
+    "expectedWriterGitBlob": "b3d0059457142659633498c9c52c6b84ea68200f",
+    "expectedRosterGitBlob": "9778d74b6d305ff56caf73bb68be3dadac4b14ce",
+    "allowHostingLiveChanges": false,
+    "allowBusinessDataWrites": false,
+    "allowFirestoreRuleChanges": false,
+    "productionAccepted": false,
+    "b4003Closed": false,
+    "formalI6Percent": 50,
+    "p0Closed": 1,
+    "p0Total": 6
   }
 }

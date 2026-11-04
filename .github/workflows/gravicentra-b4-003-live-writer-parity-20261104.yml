@@ -24,6 +24,8 @@ jobs:
       GI_TARGET_FUNCTION: orbit360ProductOperationalCommand
       EXACT_WRITER_GIT_BLOB: b3d0059457142659633498c9c52c6b84ea68200f
       FIXED_ROSTER_GIT_BLOB: 9778d74b6d305ff56caf73bb68be3dadac4b14ce
+      EXACT_GOAL_CONTRACT_GIT_BLOB: ff86fa441fd6cb4ec6254e2dc5078a37bf68fc36
+      EXACT_EQUIPO_UI_GIT_BLOB: ab0fc0dab4d9e4fb19f5ae165018c536259443a1
       SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
       SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
       SA_LAB_LEGACY: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
@@ -44,8 +46,14 @@ jobs:
           test "$PROJECT_ID" = 'ays-orbit-360-lab'
           test "$(git rev-parse HEAD:functions/product-operational-domain.js)" = "$EXACT_WRITER_GIT_BLOB"
           test "$(git rev-parse HEAD:functions/assignable-advisor-roster.js)" = "$FIXED_ROSTER_GIT_BLOB"
+          test "$(git rev-parse HEAD:functions/goal-participation-contract.js)" = "$EXACT_GOAL_CONTRACT_GIT_BLOB"
+          test "$(git rev-parse HEAD:orbit360-platform/modules/equipo.js)" = "$EXACT_EQUIPO_UI_GIT_BLOB"
           test "$(git rev-parse 66012815b42c0cc26cb372c19f74d52bddba953d:functions/product-operational-domain.js)" = "$EXACT_WRITER_GIT_BLOB"
           node --check functions/product-operational-domain.js
+          node --check functions/goal-participation-contract.js
+          node --check orbit360-platform/modules/equipo.js
+          node --check tools/gravicentra-b4-003-live-backend-source-readback.cjs
+          node --test tests/goal-participation*.test.cjs
           node tools/gravicentra-b4-003-operational-write-security-regression.test.cjs >/dev/null
           node tools/gravicentra-b4-003-insurer-activity-audit.test.cjs >/dev/null
           node tools/gravicentra-b4-003-inicio-role-country-team.test.cjs
@@ -97,7 +105,7 @@ jobs:
           node - <<'NODE'
           const fs=require('fs'),tmp=process.env.RUNNER_TEMP;
           const before=JSON.parse(fs.readFileSync(tmp+'/gi-b4003-live-sources-before.json','utf8'));
-          if(before.functions[0].name!=='orbit360AssignableAdvisorRoster'||before.functions[1].name!==process.env.GI_TARGET_FUNCTION||!before.rosterSourceMatchesCurrent||before.writerSourceMatchesCurrent)throw Error('EXPECTED_ROSTER_CURRENT_AND_WRITER_STALE_PREDECESSOR_REQUIRED');
+          if(before.functions[0].name!=='orbit360AssignableAdvisorRoster'||before.functions[1].name!==process.env.GI_TARGET_FUNCTION||!before.rosterSourceMatchesCurrent||!before.writerSourceMatchesCurrent||before.writerGoalParticipationContractMatchesCurrent||!before.functions[1].goalParticipationContractSha256)throw Error('EXPECTED_ROSTER_AND_WRITER_CURRENT_BUT_GOAL_CONTRACT_OLD_PREDECESSOR_REQUIRED');
           const x=JSON.parse(fs.readFileSync(tmp+'/gi-b4003-writer-before.json','utf8'));
           const raw=x.result??x,v=typeof raw==='string'?JSON.parse(raw):raw,rows=Array.isArray(v)?v:Array.isArray(v.functions)?v.functions:[];
           const names=rows.map(r=>String(r.id||r.name||r.function||'').split('/').pop()).sort();
@@ -134,9 +142,9 @@ jobs:
           const after=rows.map(r=>String(r.id||r.name||r.function||'').split('/').pop()).sort();
           if(JSON.stringify(after)!==JSON.stringify(before))throw Error('NON_TARGET_FUNCTION_LIST_MUTATED');
           const readback=JSON.parse(fs.readFileSync(tmp+'/gi-b4003-live-sources-after.json','utf8'));
-          if(!readback.writerSourceMatchesCurrent||!readback.rosterSourceMatchesCurrent)throw Error('LIVE_BOTH_BACKEND_REQUIRED_BYTE_PARITIES_NOT_MET');
-          fs.writeFileSync(tmp+'/gi-b4003-writer-exact-result.json',JSON.stringify({gate:'I6.5/B4-003',status:'LIVE_EXACT_PRODUCT_WRITER_SOURCE_BYTES_PASS_FUNCTIONAL_SIGNED_NEGATIVES_AND_HOSTING_NOT_YET_CERTIFIED',runId:process.env.GITHUB_RUN_ID,
-            commit:process.env.GITHUB_SHA,sourceGitBlob:process.env.EXACT_WRITER_GIT_BLOB,functionCountBefore:before.length,functionCountAfter:after.length,onlyDeployed:'orbit360ProductOperationalCommand',readOnlyRosterSourceUnchanged:true,
+          if(!readback.writerSourceMatchesCurrent||!readback.rosterSourceMatchesCurrent||!readback.writerGoalParticipationContractMatchesCurrent)throw Error('LIVE_WRITER_GOAL_DEPENDENCY_AND_ROSTER_REQUIRED_BYTE_PARITIES_NOT_MET');
+          fs.writeFileSync(tmp+'/gi-b4003-writer-exact-result.json',JSON.stringify({gate:'I6.5/B4-003',status:'LIVE_EXACT_PRODUCT_WRITER_AND_GOAL_CONTRACT_BYTES_PASS_SIGNED_ROLE_UAT_PENDING_HOSTING_UNCHANGED',runId:process.env.GITHUB_RUN_ID,
+            commit:process.env.GITHUB_SHA,sourceGitBlob:process.env.EXACT_WRITER_GIT_BLOB,goalContractGitBlob:process.env.EXACT_GOAL_CONTRACT_GIT_BLOB,functionCountBefore:before.length,functionCountAfter:after.length,onlyDeployed:'orbit360ProductOperationalCommand',readOnlyRosterSourceUnchanged:true,
             hostingChanged:false,rulesChanged:false,operationalDataWritten:false,productionAccepted:false},null,2)+'\n');
           NODE
       - name: Restore exact previous operational writer if deploy/readback fails

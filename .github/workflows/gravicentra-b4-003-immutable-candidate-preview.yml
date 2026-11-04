@@ -59,6 +59,8 @@ jobs:
           git merge-base --is-ancestor 66012815b42c0cc26cb372c19f74d52bddba953d HEAD
           test "$(git rev-parse HEAD:functions/assignable-advisor-roster.js)" = '9778d74b6d305ff56caf73bb68be3dadac4b14ce'
           test "$(git rev-parse HEAD:functions/product-operational-domain.js)" = 'b3d0059457142659633498c9c52c6b84ea68200f'
+          test "$(git rev-parse HEAD:functions/goal-participation-contract.js)" = 'ff86fa441fd6cb4ec6254e2dc5078a37bf68fc36'
+          test "$(git rev-parse HEAD:orbit360-platform/modules/equipo.js)" = 'ab0fc0dab4d9e4fb19f5ae165018c536259443a1'
           test "$(git rev-parse HEAD:orbit360-platform/core/ciclo.js)" = 'b795d9fdcf29d7c9e110e89ae56f3044835ac81a'
           test "$(git rev-parse HEAD:orbit360-platform/modules/ops.js)" = 'eadc3ffd5ce9eb8c3c696870a8a7069f78908dc1'
           test "$(git rev-parse HEAD:orbit360-platform/modules/leads.js)" = 'f4af7b02d79890ca7ab8c39fb9f0269dac772b93'
