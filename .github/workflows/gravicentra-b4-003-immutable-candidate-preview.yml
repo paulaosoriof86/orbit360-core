@@ -56,7 +56,9 @@ jobs:
           git merge-base --is-ancestor 66012815b42c0cc26cb372c19f74d52bddba953d HEAD
           test "$(git rev-parse HEAD:functions/assignable-advisor-roster.js)" = '9778d74b6d305ff56caf73bb68be3dadac4b14ce'
           test "$(git rev-parse HEAD:functions/product-operational-domain.js)" = 'b3d0059457142659633498c9c52c6b84ea68200f'
-          test "$(git rev-parse HEAD:orbit360-platform/core/ciclo.js)" = '81a15a32cf7422952486e7fb773a1e8ed0742df0'
+          test "$(git rev-parse HEAD:orbit360-platform/core/ciclo.js)" = 'e5c631fa417f0fde6c731eab12dc53c195251040'
+          test "$(git rev-parse HEAD:orbit360-platform/modules/ops.js)" = 'ad8d6502c7ae96d0993ce61f605b1642e8d5471c'
+          test "$(git rev-parse HEAD:orbit360-platform/modules/leads.js)" = 'f4af7b02d79890ca7ab8c39fb9f0269dac772b93'
           test "$(git rev-parse HEAD:orbit360-platform/modules/cobros.js)" = '34dd080d88fe764d7858813843b7184c64d4cdc2'
           test "$(git rev-parse HEAD:tools/gravicentra-b4-003-e4-anulado-projection.test.cjs)" = '3f471893daabc44e3d226b6983393114d568c1f8'
           test -f artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json

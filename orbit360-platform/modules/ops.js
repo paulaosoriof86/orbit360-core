@@ -28,6 +28,8 @@ Orbit.modules.ops = (function () {
       document.addEventListener('orbit:session', f);
        document.addEventListener('orbit:inbox-state', f);
       unsub = () => { u1(); document.removeEventListener('orbit:ciclo', f); document.removeEventListener('orbit:pais', f); document.removeEventListener('orbit:session', f); document.removeEventListener('orbit:inbox-state', f); };
+      // Reconcile a server snapshot that could have arrived between first draw and subscription.
+      Promise.resolve().then(re);
     }
   }
 

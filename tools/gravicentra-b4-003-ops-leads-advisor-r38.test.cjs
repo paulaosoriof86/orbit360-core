@@ -18,4 +18,9 @@ assert.match(src,/String\(live\.asesorId\|\|''\)!==String\(n\.asesorId\|\|''\)/,
 assert.doesNotMatch(src,/advisorSelect\.value=asesores\[0\]\.id/,'NO_SILENT_REASSIGNMENT_ON_COUNTRY_CHANGE');
 assert.match(src,/rec\.bitacora\.push\(\{ ts: stamp\(\), user: actor\.name, actorUid:actor\.uid, actorName:actor\.name/,'TRANSITIONS_HAVE_VERIFIABLE_HUMAN_AUTHOR');
 assert.match(src,/user: creatorIdentity\.name, actorUid:creatorIdentity\.uid, actorName:creatorIdentity\.name/,'NEW_MANAGEMENT_HAS_VERIFIABLE_HUMAN_AUTHOR');
-console.log('B4_003_R38_ADVISOR_AND_AUTHOR_SOURCE_PASS checks=12 synthetic_only_no_writes');
+const ops=fs.readFileSync('orbit360-platform/modules/ops.js','utf8');
+const leads=fs.readFileSync('orbit360-platform/modules/leads.js','utf8');
+assert.match(src,/if\(status&&\(!Array\.isArray\(status\.serverConfirmedCollections\)\|\|!status\.serverConfirmedCollections\.includes\('negocios'\)\)\)return\[\];/,'NO_PROVISIONAL_BUSINESS_CARDS_OR_ROLE_FILTERS');
+assert.match(ops,/Promise\.resolve\(\)\.then\(re\)/,'OPS_REFRESH_AFTER_SUBSCRIPTION_RACE');
+assert.match(leads,/Promise\.resolve\(\)\.then\(re\)/,'LEADS_REFRESH_AFTER_SUBSCRIPTION_RACE');
+console.log('B4_003_R38_ADVISOR_AND_AUTHOR_SOURCE_PASS checks=15 synthetic_only_no_writes');

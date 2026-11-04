@@ -150,6 +150,10 @@ Orbit.ciclo = (function () {
   }
   function negocios(opts) {
     opts = opts || {};const surface=opts.surface||'ops';
+    // A cached provisional advisor must not drive either Ops or Leads cards,
+    // totals or role filters before the negocios snapshot is server confirmed.
+    const status=typeof S()._productStatus==='function'?S()._productStatus():null;
+    if(status&&(!Array.isArray(status.serverConfirmedCollections)||!status.serverConfirmedCollections.includes('negocios')))return[];
     return S().all('negocios').filter(n =>
       (opts.incArchivado ? true : !n.archivado) &&
       paisOK(n.pais) &&
