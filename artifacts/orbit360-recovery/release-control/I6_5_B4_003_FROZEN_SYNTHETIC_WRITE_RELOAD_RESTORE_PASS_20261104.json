@@ -1,0 +1,87 @@
+{
+  "schema": "GI_I65_B4_003_FROZEN_ARTIFACT_SYNTHETIC_WRITE_RELOAD_CONCILIATE_RESTORE_CERTIFICATION_V1",
+  "recordedAtUtc": "2026-11-04T09:31:14.054Z",
+  "gate": "I6.5/B4-003",
+  "status": "PREVIEW_SYNTHETIC_WRITE_RELOAD_RECONCILE_RESTORE_PASS",
+  "authority": "PAULA_20261104_SYNTHETIC_WRITE_RELOAD_RESTORE",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "candidate": {
+    "sourceSha": "3bf9996da14fa1799dd3671581aad706d754d218",
+    "buildId": "gi-i65-b4-3bf9996da14f-57f234755dc1",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-rc-41765742748-neoi3u7r.web.app/",
+    "buildArtifactId": 13308088829,
+    "productArtifactRebuilt": false,
+    "liveDeployed": false
+  },
+  "qa": {
+    "actor": "Samuel Daza",
+    "activeRole": "Administración/AdminTenant",
+    "country": "Todos los países",
+    "syntheticReceiptId": "b3004human_receipt_r12",
+    "syntheticPolicyNumber": "QA-HUMANA-B3-004-R12",
+    "amountGTQ": 111.11,
+    "clientNotification": false,
+    "paymentDate": "2026-11-04",
+    "method": "Transferencia bancaria",
+    "applicationDate": "2026-11-04",
+    "before": {
+      "paymentsConfirmed": 5,
+      "paymentsReconciled": 5,
+      "pendingReconcile": 0,
+      "qaReceiptAbsent": true
+    },
+    "afterCreate": {
+      "syntheticRecords": 4,
+      "firestoreReadbackPass": true
+    },
+    "afterPaymentAndReload": {
+      "paymentsConfirmed": 6,
+      "paymentsReconciled": 5,
+      "pendingReconcile": 1,
+      "syntheticReceiptStatus": "Pago confirmado",
+      "samePaymentIdGuard": true
+    },
+    "afterReconcileAndReload": {
+      "paymentsConfirmed": 6,
+      "paymentsReconciled": 6,
+      "pendingReconcile": 0,
+      "syntheticReceiptStatus": "Pago confirmado / Conciliado",
+      "samePaymentEnriched": true
+    },
+    "afterCleanupAndReload": {
+      "paymentsConfirmed": 5,
+      "paymentsReconciled": 5,
+      "pendingReconcile": 0,
+      "qaReceiptAbsent": true,
+      "allReservedSyntheticIdsAbsent": true,
+      "linkedQaPaymentAndReconciliationResidue": 0
+    }
+  },
+  "evidence": {
+    "createWorkflowRunId": 41807435779,
+    "createJobStatus": "success",
+    "cleanupWorkflowRunId": 41807875649,
+    "cleanupJobStatus": "success",
+    "cleanupJobLogMarker": "B4003_SYNTHETIC_CLEANED_READBACK=PASS",
+    "browser": "connected Chrome extension, human UI, two separate full reloads",
+    "workflowPath": ".github/workflows/gravicentra-pilot-s6-fixture.yml",
+    "reusedFixturePath": "tools/gravicentra-i6-5-b3-004-human-fixture.mjs",
+    "requestPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_FROZEN_SYNTHETIC_FIXTURE_REQUEST_20261104.json"
+  },
+  "ownerDecision": {
+    "exportBytesInspection": "POSTPRODUCTION_NON_BLOCKING_OWNER_ACCEPTANCE_20261104",
+    "e4PreviouslySignedExports": "FUNCTIONAL_DOWNLOAD_UI_OBSERVED_BY_OWNER",
+    "securityExistingTenantRules": "PREVIOUS_OWNER_TEMPORARY_RISK_EXCEPTION_STILL_ACTIVE_NOT_REOPENED"
+  },
+  "gating": {
+    "B4003Closed": false,
+    "productionAccepted": false,
+    "formalI6Percent": 50,
+    "p0Closed": 1,
+    "p0Total": 6,
+    "next": "INDEPENDENT_P0_SCOPED_BACKEND_NEGATIVE_AND_SAME_ARTIFACT_LIVE_RELEASE_READBACK_WITH_ROLLBACK",
+    "doNotRepeatApprovedCases": true,
+    "noRealBusinessWrites": true
+  }
+}
