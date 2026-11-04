@@ -1,0 +1,67 @@
+{
+  "schema": "gravicentra-i6-5-b4-003-retained-preview-http-exact-readback-v1",
+  "dateGuatemala": "2026-11-04",
+  "product": "Gravicentra Insurance",
+  "gate": "I6.5/B4-003",
+  "recordType": "ADDITIVE_TRANSPORT_EVIDENCE_NOT_FUNCTIONAL_UAT_OR_PRODUCTION_ACCEPTANCE",
+  "repository": "paulaosoriof86/orbit360-core",
+  "canonicalBranch": "recovery/fase-a-clean-20260831",
+  "immutableCandidate": {
+    "sourceSha": "a48bfee0ac2824a82727a36a3900c6bda4caf484",
+    "buildId": "gi-i65-b4-a48bfee0ac28-57f234755dc1",
+    "sourceRunId": 41789586526,
+    "sourceArtifactId": 13302801760,
+    "bundleSha256": "b604398e59b761ebfcbac2c7215890dcdcc3fff652f9c938d17e05013ded84da",
+    "newBuildExecutedForTransport": false
+  },
+  "hostingPreview": {
+    "firebaseProject": "ays-orbit-360-lab",
+    "hostingSite": "ays-orbit-360-lab",
+    "reusedChannelId": "gi-i65-b4-rc-41765742748",
+    "url": "https://ays-orbit-360-lab--gi-i65-b4-rc-41765742748-neoi3u7r.web.app/",
+    "expiresAtUtc": "2026-11-11T07:14:19.594730768Z",
+    "transportRunId": 41790802822,
+    "firebaseCliTransport": "SUCCESS",
+    "githubRunConclusion": "FAIL_POST_TRANSPORT_EARLY_HTTP_404",
+    "earlyAutomatedReadback": "HOLD_HTTP_404_BEFORE_PROPAGATION",
+    "subsequentIndependentReadback": "PASS_7_OF_7_BYTE_EXACT_HTTPS_200",
+    "interpretation": "The same channel and URL returned 404 at 07:14:24-07:14:36 UTC and later served all seven expected files byte-exact. Delayed Hosting/CDN propagation is a plausible inference; no second deploy occurred between observations."
+  },
+  "exactHttpsReadback": [
+    { "path": "__recovery__/build.json", "sha256": "c390b833147c456b9b4265fa9bdddecaa3018ef56bc367b69be8ae2e7069efbf", "status": "PASS" },
+    { "path": "index.html", "sha256": "b5276812189226bba7a01e2e59f66d10d3dd0798492f3bac765ee13eab4da0b7", "status": "PASS" },
+    { "path": "product-runtime-config.js", "sha256": "202375a8dc6726361325cd54afce2fa7594ab15aad4afff88315f020906780d0", "status": "PASS" },
+    { "path": "modules/polizas.js", "sha256": "56b20e1a1116627183f0f4b8feee5e615a75eb63c2e7b034a26c9b2344999b8e", "status": "PASS" },
+    { "path": "modules/policy-receipts-v1199-detail-guard.js", "sha256": "17dd83454b7353e83dbd800d6ed1c4ca9ea2f13dcfba0ee29785d3293ad3dc48", "status": "PASS" },
+    { "path": "modules/reportes.js", "sha256": "0cb25b98f3aa60abd5a3aa0bf291c0327377990264a8635ea2ebef154705b364", "status": "PASS" },
+    { "path": "modules/cobros.js", "sha256": "5040661e7892231c993f0e23bab515844d9fb35ff525b6b0362bb7fb951b333e", "status": "PASS" }
+  ],
+  "preservedScopes": {
+    "newFirebaseProject": false,
+    "newHostingChannel": false,
+    "functionsDeployedInThisTransport": false,
+    "firestoreRulesDeployed": false,
+    "authIamModified": false,
+    "operationalDataMutated": false,
+    "productionHostingDeployed": false,
+    "productionBeforeAfterHttpDigestCertified": false
+  },
+  "authenticationAndRelease": {
+    "chromeExistingSignedTabsDiscovered": true,
+    "signedTabClaimAndNewTabNavigation": "HOLD_BROWSER_CONTROL_TIMEOUT",
+    "samuelCorrectedPolicyDetailUat": "PENDING",
+    "otherE4ExceptionsAndExportByteReadback": "OPEN_AS_IN_CONTROL_PLANE",
+    "syntheticWriteReloadRestore": "PENDING_OWNER_GATED",
+    "formalI6Percent": 50,
+    "b4003P0Closed": 1,
+    "b4003P0Total": 6,
+    "production": "NOT_AUTHORIZED_NOT_DEPLOYED"
+  },
+  "evidence": {
+    "backendPreviewDeployRun": "https://github.com/paulaosoriof86/orbit360-core/actions/runs/41789216970",
+    "immutableArtifactBuildRun": "https://github.com/paulaosoriof86/orbit360-core/actions/runs/41789586526",
+    "reusedChannelTransportRun": "https://github.com/paulaosoriof86/orbit360-core/actions/runs/41790802822",
+    "sameChannelTransportJsonArtifactId": 13303790639
+  },
+  "nextExactAction": "SIGNED_SAMUEL_ROLE_SCOPE_AND_POLICY_DETAIL_UAT_ON_SAME_PREVIEW_AFTER_BROWSER_CONTROL_RECONNECTS; THEN_OPEN_E4_EXCEPTION_AND_EXPORT_READBACK_BATCH; DO_NOT_REOPEN_ACCEPTED_RULES_EXCEPTION_OR_REBUILD_ARTIFACT_FOR_SAME_SOURCE"
+}

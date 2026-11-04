@@ -32,9 +32,9 @@
     "currentCandidate": {
       "repository": "paulaosoriof86/orbit360-core",
       "branch": "recovery/fase-a-clean-20260831",
-      "sourceSha": "7c78fda204831630bf9336213f67a3f56e437e4e",
-      "buildId": "gi-i65-b4-7c78fda20483-57f234755dc1",
-      "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-e4-41752197966-3dhqau7k.web.app/",
+      "sourceSha": "a48bfee0ac2824a82727a36a3900c6bda4caf484",
+      "buildId": "gi-i65-b4-a48bfee0ac28-57f234755dc1",
+      "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-rc-41765742748-neoi3u7r.web.app/",
       "createNewPreviewByRoutine": false
     },
     "existingAcceptedEvidenceReuse": [
