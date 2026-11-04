@@ -266,5 +266,25 @@
     "productionAccepted": false,
     "ownerTemporaryRulesException": "OPEN_ACCEPTED_NOT_SECURITY_PASS",
     "receipt": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CAUSAL_BACKEND_PARITY_AND_NEW_IMMUTABLE_RC_20261104.json"
+  },
+  "b4003NewSignedCarlosFocusedAcceptance20261104": {
+    "recordType": "ADDITIVE_SIGNED_UI_EVIDENCE_NO_BACKEND_NEGATIVE_PASS",
+    "status": "CARLOS_COBROS_ROLE_COUNTRY_COLD_RELOAD_AND_ASEGURADORAS_UI_SCOPE_PASS_QA_DISPLAY_PARTIAL",
+    "sourceSha": "b094619281c1f2ccef7e08335adedc76cf878bbc",
+    "immutableArtifactId": 13315537234,
+    "receipt": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_SIGNED_CARLOS_ROLE_COBROS_AND_QA_QUARANTINE_DELTA_20261104.json",
+    "carlosOperativoCobros": {"GT":2504,"CO":56,"TODOS":2560},
+    "carlosAsesorCobros": {"GT":0,"CO":37,"TODOS":37},
+    "coldReloadAsesorCo37": true,
+    "aseguradorasOperativo": {"GT":16,"CO":17},
+    "aseguradorasAsesorDirectRouteUiDenied": true,
+    "polizasGtCommercial": 1292,
+    "polizasGtQaAudit": 9,
+    "threeB2OrphansQaAuditOnly": true,
+    "independentRealJwtBackendNegativesPassed": false,
+    "historicalP0Closed": 1,
+    "historicalP0Total": 6,
+    "formalI6Percent": 50,
+    "productionAccepted": false
   }
 }
