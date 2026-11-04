@@ -16,6 +16,7 @@ on:
       - tools/gravicentra-b4-003-financial-role-scope-transversal.test.cjs
       - tools/gravicentra-b4-003-client-list-transversal-readonly.test.cjs
       - tools/gravicentra-b4-003-reportes-e4-transversal.test.cjs
+      - tools/gravicentra-b4-003-e4-finance-exact-readonly.cjs
       - tools/gravicentra-b4-003-renovaciones-qa-provenance.test.cjs
       - .github/workflows/gravicentra-b4-003-e4-reportes-transversal-ci.yml
   push:
@@ -33,6 +34,7 @@ on:
       - tools/gravicentra-b4-003-financial-role-scope-transversal.test.cjs
       - tools/gravicentra-b4-003-client-list-transversal-readonly.test.cjs
       - tools/gravicentra-b4-003-reportes-e4-transversal.test.cjs
+      - tools/gravicentra-b4-003-e4-finance-exact-readonly.cjs
       - tools/gravicentra-b4-003-renovaciones-qa-provenance.test.cjs
       - .github/workflows/gravicentra-b4-003-e4-reportes-transversal-ci.yml
 
@@ -81,3 +83,82 @@ jobs:
           node tools/gravicentra-b4-003-client-country-authority.test.cjs
           node tools/gravicentra-b4-003-client-list-transversal-readonly.test.cjs
           node tools/gravicentra-b4-003-cross-module-readback-contract.test.cjs
+
+  e4-finance-exact-physical-readonly:
+    # Single execution inside the existing E4 gate; not a new preview or release.
+    if: github.repository == 'paulaosoriof86/orbit360-core' && github.ref == 'refs/heads/recovery/fase-a-clean-20260831' && startsWith(github.event.head_commit.message, 'B4-003 E4 exact count reconciliation one-shot')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    env:
+      PROJECT_ID: ays-orbit-360-lab
+      SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      B4_003_E4_AUDIT_PUBLIC_KEY_DER_B64: MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAuBGz2Fvue5rbzBZlYTmYrfw4fBUuu9eJSBEptu+NxyXCBCUW5q+BUqKibLzjiyGpPJHajm71s5TVL1TDe+ir6gHMpbPThz2HIIWpoyY5oA/bB3LhjbmNHVN1z83QNkCrve35aQeHSWqPQRd/m0cmB2DPCgw8+s1UUdHNR5MyTd7IMkZ/SPlty4UcPLmbHHCx+QH2VS8geFRw9u2NoBhfFbSj3acTn95AsyAbaaDtV8I6Tx5fyS6/Y+n9TIdztYS17VP/EhfXYcs1AJhy+brVPa5wWSVyuDdUTUXXpqzVpeMv2UIbfW5x8cKOVaOCzDcPNnFQZfX79ZEDvb80hvj9EwIDAQAB
+    steps:
+      - name: Checkout canonical HEAD
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Prove exact finance source blobs and the still-active frozen gate
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "${GITHUB_SHA}"
+          test "$(git rev-parse HEAD:orbit360-platform/modules/cobros.js)" = '22d2ddf0e796be3a65a800882b13d50c8c252846'
+          test "$(git rev-parse HEAD:orbit360-platform/modules/reportes.js)" = 'e00cdbaef2207b6e48c6507c0039161afa07c4e0'
+          test "$(git rev-parse HEAD:orbit360-platform/core/queries.js)" = 'd6d39599cda2198e6f23ec69ee8a92bf01cec4e0'
+          node --check tools/gravicentra-b4-003-e4-finance-exact-readonly.cjs
+          node tools/gravicentra-b4-003-e4-finance-exact-readonly.cjs --selftest
+          node - <<'NODE'
+          const fs=require('node:fs'),s=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json'));
+          if(s.b4003DecisionFreezeAndSingleCertificationCursor20261103?.currentCandidate?.sourceSha!=='cbca01be13f795a7469c5e9af59769337559688f'||s.b4003E4Gt13CategoryReconciliation20261104?.exactBusinessIdsVerified!==false)throw Error('FROZEN_GATE_DRIFT');
+          NODE
+      - name: Resolve existing LAB credentials without exposing secret values
+        shell: bash
+        run: |
+          set -euo pipefail
+          node - <<'NODE'
+          const fs=require('node:fs'),path=require('node:path');
+          let selected;
+          for(const key of ['SA_ORBIT360_LAB','SA_ORBIT_360_LAB','SA_DEFAULT']){try{const c=JSON.parse(process.env[key]||'');if(c?.type==='service_account'&&c.project_id==='ays-orbit-360-lab'&&c.private_key?.includes('PRIVATE KEY')){selected=c;break;}}catch(_){}}
+          if(!selected)throw Error('EXISTING_LAB_READER_ACCOUNT_MISSING');
+          const file=path.join(process.env.RUNNER_TEMP,'b4003-e4-readonly.json');
+          fs.writeFileSync(file,JSON.stringify(selected),{mode:0o600,flag:'wx'});
+          fs.appendFileSync(process.env.GITHUB_ENV,'GOOGLE_APPLICATION_CREDENTIALS='+file+'\n');
+          console.log('B4003_LAB_READER_MATCHED credentials_redacted=true');
+          NODE
+      - name: Install pinned Firebase Admin read-only client
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund firebase-admin@13.4.0 >/dev/null
+      - name: Compare exact Cobros and Reportes using physical Firestore reads
+        shell: bash
+        env:
+          B4_003_E4_AUDIT_OUT: ${{ runner.temp }}/b4003-e4-physical-aggregate.json
+        run: |
+          set -euo pipefail
+          timeout -k 3s 210s node tools/gravicentra-b4-003-e4-finance-exact-readonly.cjs --real-readonly
+          test -s "$B4_003_E4_AUDIT_OUT"
+          node - <<'NODE'
+          const fs=require('node:fs'),r=JSON.parse(fs.readFileSync(process.env.B4_003_E4_AUDIT_OUT,'utf8'));
+          if(r.schema!=='GRAVICENTRA_B4003_E4_EXACT_OWNER_CONSUMER_PHYSICAL_READONLY_V1'||r.project!=='ays-orbit-360-lab'||r.writes!==0||r.rolesCertified!==false||r.productionAccepted!==false||r.reportIdExportedPlaintext!==false)throw Error('READONLY_CONTRACT_INVALID');
+          const lines=['### B4-003 E4 – datos físicos, solo lectura',...['GT','CO','TODOS'].map(k=>{const v=r.result[k];return '- '+k+': Cobros '+v.cobrosListed+', Reportes '+v.reportesCommercial+', excluidos '+v.onlyInCobrosOwner+' ('+JSON.stringify(v.exclusionsByCause)+')';}),'- UAT signed counts reproduced: '+r.allSignedCountsReproduced,'- No writes/deploy. Production NO-GO.'];
+          fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY,lines.join('\n')+'\n');
+          NODE
+      - name: Preserve only aggregates in an artifact (IDs ciphertext in job log)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gravicentra-b4003-e4-finance-readonly-aggregate-${{ github.run_id }}
+          path: ${{ runner.temp }}/b4003-e4-physical-aggregate.json
+          retention-days: 5
+          if-no-files-found: ignore
