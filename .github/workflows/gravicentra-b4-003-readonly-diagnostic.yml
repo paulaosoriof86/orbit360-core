@@ -403,9 +403,11 @@ jobs:
           set -euo pipefail
           test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
           test "$(git ls-remote origin refs/heads/recovery/fase-a-clean-20260831 | awk '{print $1}')" = "$GITHUB_SHA"
-          for owner in functions/assignable-advisor-roster.js functions/product-active-role-contract.js functions/goal-participation-contract.js; do
-            test "$(git rev-parse 66012815b42c0cc26cb372c19f74d52bddba953d:"$owner")" = "$(git rev-parse HEAD:"$owner")"
-          done
+          # Exact approved owner blobs, independently read back from canonical GitHub.
+          # Avoid referencing an older tree that predates these new functions.
+          test "$(git rev-parse HEAD:functions/assignable-advisor-roster.js)" = "9778d74b6d305ff56caf73bb68be3dadac4b14ce"
+          test "$(git rev-parse HEAD:functions/product-active-role-contract.js)" = "09681f536c5cbbd36bcba6514d4829d2494b9387"
+          test "$(git rev-parse HEAD:functions/goal-participation-contract.js)" = "77b6f8e2b656af659b32f03b133c5166cfbc802f"
           node --check tools/gravicentra-b4-003-real-uid-server-negatives.cjs
       - name: Install existing-project admin client only in temporary runner folder
         shell: bash
