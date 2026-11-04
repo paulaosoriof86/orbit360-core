@@ -28,14 +28,16 @@ async function qaActor(){
 const refsOf=x=>({client:root.doc('clientes').collection('items').doc(x.client),policy:root.doc('polizas').collection('items').doc(x.policy),receipt:root.doc('recibosEsperados').collection('items').doc(x.receipt),portfolio:root.doc('carteraPrimas').collection('items').doc(x.portfolio)});
 async function cleanupSet(x){
   const refs=refsOf(x);
-  const [cobros,reqs,events]=await Promise.all([
+  const [cobros,reqs,reqsByResult,events]=await Promise.all([
     root.doc('cobros').collection('items').where('reciboId','==',x.receipt).get(),
+    tenant.collection('reconciliationRequests').where('reciboId','==',x.receipt).get().catch(()=>({docs:[]})),
     tenant.collection('reconciliationRequests').where('result.receiptId','==',x.receipt).get().catch(()=>({docs:[]})),
     tenant.collection('reconciliationEvents').where('receiptId','==',x.receipt).get().catch(()=>({docs:[]}))
   ]);
   const batch=db.batch();
   cobros.docs.forEach(d=>batch.delete(d.ref));
   (reqs.docs||[]).forEach(d=>batch.delete(d.ref));
+  (reqsByResult.docs||[]).forEach(d=>batch.delete(d.ref));
   (events.docs||[]).forEach(d=>batch.delete(d.ref));
   Object.values(refs).forEach(r=>batch.delete(r));
   await batch.commit();
