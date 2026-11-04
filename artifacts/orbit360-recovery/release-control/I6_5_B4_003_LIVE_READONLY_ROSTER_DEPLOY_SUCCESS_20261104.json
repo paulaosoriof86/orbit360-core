@@ -1,0 +1,60 @@
+{
+  "schema": "I6_5_B4_003_LIVE_READONLY_ROSTER_EXACT_DEPLOY_RECEIPT_V1",
+  "recordDate": "2026-11-04",
+  "gate": "I6.5/B4-003",
+  "status": "ONE_PRODUCTION_BACKEND_READ_ONLY_ROSTER_DEPLOY_PASS_REST_OF_B4003_HOLD",
+  "repository": "paulaosoriof86/orbit360-core",
+  "canonicalBranch": "recovery/fase-a-clean-20260831",
+  "deployWorkflowPath": ".github/workflows/gravicentra-b4-003-live-roster-exact-20261104.yml",
+  "workflowRunId": 41814805932,
+  "workflowRunUrl": "https://github.com/paulaosoriof86/orbit360-core/actions/runs/41814805932",
+  "workflowCommit": "27b064182259f144f6da5be92f619ce061b891a7",
+  "workflowJobId": 126522759331,
+  "workflowConclusion": "success",
+  "receiptArtifactId": 13313663002,
+  "receiptArtifactZipSHA256": "3bd0f388672502a16dbaf458fc4230d70ae4a1e4d17638ed0ccead919daa1513",
+  "frozenSourceCandidate": {
+    "sourceSha": "66012815b42c0cc26cb372c19f74d52bddba953d",
+    "buildId": "gi-i65-b4-66012815b42c-57f234755dc1",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-rc-41765742748-neoi3u7r.web.app/",
+    "hostingArtifactId": 13311178353
+  },
+  "action": {
+    "productionFirebaseProject": "ays-orbit-360-lab",
+    "region": "us-central1",
+    "deployedFunctionsOnly": [
+      "orbit360AssignableAdvisorRoster"
+    ],
+    "preExistingFunctionCount": 80,
+    "postFunctionCount": 81,
+    "onlyAdded": [
+      "orbit360AssignableAdvisorRoster"
+    ],
+    "removed": [],
+    "hostingChanged": false,
+    "firestoreRulesChanged": false,
+    "operationalDataChanged": false,
+    "rollbackNotNeeded": true,
+    "verifiedBy": "GITHUB_ACTIONS_DEPLOY_LOG_AND_FUNCTIONS_INVENTORY_READBACK"
+  },
+  "signedUiReused": {
+    "carlos": "existing approved evidence, not rerun by this workflow",
+    "samuel": "existing approved evidence, not rerun by this workflow"
+  },
+  "notCertifiedByThisAction": [
+    "independent signed backend cross-UID and unauthorized country/team negatives",
+    "production writer source parity of orbit360ProductOperationalCommand",
+    "remaining five historical functional P0 issues",
+    "same Hosting artifact live promotion and postdeploy module/role live UAT",
+    "full notifications/Ops/Leads author names in all historical cards"
+  ],
+  "governance": {
+    "b4003Status": "HOLD",
+    "i6FormalPercent": 50,
+    "p0Closed": 1,
+    "p0Total": 6,
+    "securityRulesStatus": "OPEN_OWNER_ACCEPTED_TEMPORARILY_NOT_PASS",
+    "productionAcceptedForB4003": false
+  },
+  "nextSingleCursor": "INDEPENDENT_AUTHENTICATED_BACKEND_ROLE_COUNTRY_ADVISOR_NEGATIVES_AND_LIVE_WRITER_PARITY; RESOLVE_FIVE_OPEN_P0_DISPOSITIONS; IF PASS PROMOTE_UNCHANGED_FROZEN_HOSTING_ARTIFACT_THEN_LIVE_MODULE_BY_MODULE_READBACK"
+}
