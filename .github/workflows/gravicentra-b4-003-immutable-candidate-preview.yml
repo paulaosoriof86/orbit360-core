@@ -139,7 +139,8 @@ jobs:
           tar --sort=name --mtime='@0' --owner=0 --group=0 --numeric-owner -czf "$RUNNER_TEMP/gi-b4003-immutable-release-bundle.tar.gz" -C "$RUNNER_TEMP/gi-e4-canonical-hosting" bundle
           sha256sum "$RUNNER_TEMP/gi-b4003-immutable-release-bundle.tar.gz" > "$RUNNER_TEMP/gi-b4003-immutable-release-bundle.sha256"
           test -s "$RUNNER_TEMP/gi-b4003-immutable-release-bundle.tar.gz"
-          tar -tzf "$RUNNER_TEMP/gi-b4003-immutable-release-bundle.tar.gz" | grep -qx 'bundle/site/modules/reportes.js'
+          tar -tzf "$RUNNER_TEMP/gi-b4003-immutable-release-bundle.tar.gz" > "$RUNNER_TEMP/gi-b4003-immutable-bundle-entries.txt"
+          grep -Fxq 'bundle/site/modules/reportes.js' "$RUNNER_TEMP/gi-b4003-immutable-bundle-entries.txt"
       - name: Retain exact artifact for same-byte LIVE promotion after gate approval
         uses: actions/upload-artifact@v4
         with:
