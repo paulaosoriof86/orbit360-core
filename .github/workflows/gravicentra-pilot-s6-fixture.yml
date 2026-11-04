@@ -19,6 +19,7 @@ on:
       - 'artifacts/orbit360-recovery/release-control/PILOTV6_S6_CT02_20261008_01_REQUEST.json'
       - 'tools/gravicentra-pilot-s6-fixture.mjs'
       - '.github/workflows/gravicentra-pilot-s6-fixture.yml'
+      - 'artifacts/orbit360-recovery/release-control/I6_5_B4_003_FROZEN_SYNTHETIC_FIXTURE_REQUEST_20261104.json'
 
 permissions:
   contents: read
@@ -126,7 +127,7 @@ jobs:
 
   b4003-frozen-preview-synthetic:
     # Extension of the EXISTING synthetic-fixture workflow; no product build, rules or LIVE deployment.
-    if: github.event_name == 'workflow_dispatch' && (inputs.b4003_mode == 'create' || inputs.b4003_mode == 'cleanup')
+    if: (github.event_name == 'workflow_dispatch' && (inputs.b4003_mode == 'create' || inputs.b4003_mode == 'cleanup')) || (github.event_name == 'push' && startsWith(github.event.head_commit.message, 'test(B4-003): request '))
     runs-on: ubuntu-24.04
     timeout-minutes: 12
     env:
@@ -165,6 +166,16 @@ jobs:
              q?.previewUrl!=='https://ays-orbit-360-lab--gi-i65-b4-rc-41765742748-neoi3u7r.web.app/' ||
              f?.metrics?.b4003Closed!==false ||
              f?.metrics?.productionAuthorized!==false)throw Error('B4003_FROZEN_GATE_OR_CANDIDATE_DRIFT');
+          if(process.env.GITHUB_EVENT_NAME==='push'){
+            const rp='artifacts/orbit360-recovery/release-control/I6_5_B4_003_FROZEN_SYNTHETIC_FIXTURE_REQUEST_20261104.json';
+            const r=JSON.parse(fs.readFileSync(rp,'utf8'));
+            if(r.status!=='REQUESTED'||!['create','cleanup'].includes(r.mode)||
+               r.sourceSha!==q.sourceSha||r.buildId!==q.buildId||r.previewUrl!==q.previewUrl||
+               r.tenantId!=='alianzas-soluciones'||r.syntheticOnly!==true||r.liveDeploy!==false||
+               r.realBusinessWrites!==false||r.artifactId!==13308088829)
+              throw Error('B4003_REQUEST_NOT_EXACT_OR_NOT_AUTHORIZED');
+            fs.appendFileSync(process.env.GITHUB_ENV,'B3_004_HUMAN_FIXTURE_MODE='+r.mode+'\n');
+          }
           console.log('B4003_FROZEN_ARTIFACT_GATE=PASS');
           NODE
 
