@@ -220,6 +220,12 @@ Orbit.modules.cobros = (function () {
   function reportedRows(idx) {
     return receiptPaymentEvidence(idx).filter(c => {
       if (!matchTxt(c, idx)) return false;
+      // E4/B4-003: a cancelled expected receipt must never masquerade as an
+      // active payment projection in the default list. Keep it inspectable
+      // under the explicit "Anulado" filter, matching the Cobros owner and
+      // Reportes commercial exclusion contract. Never mutate source data.
+      if (c.estado === 'Anulado') return st.fest === 'Anulado';
+      if (st.fest === 'Anulado') return false;
       if (!st.fest) return true;
       if (st.fest === 'Pago registrado en SIGA') return c.__crmDirectEvidence;
       if (st.fest === 'Pagado') return c.estado === 'Pagado';
