@@ -18247,5 +18247,51 @@
     "p0Total": 6,
     "securityRulesRisk": "ACCEPTED_TEMPORARILY_NOT_SECURITY_PASS",
     "historicalGlobalProductionAccepted": "NOT_B4003_ACCEPTANCE"
+  },
+  "b4003BackendParityAndSuccessorImmutableRc20261104": {
+    "schema": "I6_5_B4_003_LATEST_CAUSAL_REPAIR_AND_PREVIEW_POINTER_V1",
+    "gate": "I6.5/B4-003",
+    "status": "TWO_LIVE_BACKEND_FUNCTION_SOURCE_PARITIES_PASS_ONE_NEW_PREVIEW_IMMUTABLE_PASS_FULL_RELEASE_HOLD",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CAUSAL_BACKEND_PARITY_AND_NEW_IMMUTABLE_RC_20261104.json",
+    "rosterSourceGitBlob": "9778d74b6d305ff56caf73bb68be3dadac4b14ce",
+    "rosterDeployRuns": [
+      41814805932,
+      41816232334
+    ],
+    "writerSourceGitBlob": "b3d0059457142659633498c9c52c6b84ea68200f",
+    "writerParityRun": 41817078148,
+    "productionFunctionsCount": 81,
+    "productionHostingChanged": false,
+    "firestoreRulesChanged": false,
+    "operationalDataChanged": false,
+    "successor": {
+      "sourceSha": "b094619281c1f2ccef7e08335adedc76cf878bbc",
+      "buildId": "gi-i65-b4-b094619281c1-57f234755dc1",
+      "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-rc-41765742748-neoi3u7r.web.app/",
+      "buildAndExactReadbackRun": 41817684940,
+      "retainedArtifactId": 13315537234,
+      "artifactZipSHA256": "9747c1ef0127df6ae711b6dca1c257d27dec4ed9f493458ae48d7bb00cf75429",
+      "supersedesArtifactId": 13311178353
+    },
+    "signedCarlosLatestPreview": {
+      "role": "Operativo",
+      "country": "TODOS",
+      "inicioSources": "5/5",
+      "clientes": 440,
+      "polizas": 1425,
+      "cobrosConfirmados": 5,
+      "opsLeadsHumanAuthors": "3 named plus 1 historic unknown",
+      "fullHumanIdentityPass": false
+    },
+    "independentSignedBackendNegativesPass": false,
+    "remainingP0": 5,
+    "p0Closed": 1,
+    "p0Total": 6,
+    "formalI6Percent": 50,
+    "b4003Closed": false,
+    "ownerTemporaryRulesExceptionRetained": true,
+    "ownerDeferredExportByteQaRetained": true,
+    "priorSyntheticWriteRestoreRetained": true,
+    "next": "SIGNED_INDEPENDENT_UID_ROLE_COUNTRY_TEAM_NEGATIVES_THEN_5_OPEN_P0_DISPOSITIONS; IF_PASS_PROMOTE_ONLY_ARTIFACT_13315537234_SAME_BYTES_AND_PROVE_LIVE_MODULE_MATRIX"
   }
 }
