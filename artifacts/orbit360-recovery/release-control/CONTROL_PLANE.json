@@ -18135,5 +18135,22 @@
     "formalI6Percent": 50,
     "p0Closed": 1,
     "p0Total": 6
+  },
+  "b4003Rc66012815ImmutablePreviewAndSamuelFocalUat20261104": {
+    "schema": "I6_5_B4_003_RC_FOCAL_UAT_POINTER_V1",
+    "gate": "I6.5/B4-003",
+    "status": "EXACT_PREVIEW_TECHNICAL_PASS_SAMUEL_FOCAL_UAT_PASS_B4_003_HOLD",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_RC_66012815_SAMUEL_AUTH_FOCAL_AND_PRELIVE_BLOCKERS_20261104.json",
+    "releaseSourceSha": "66012815b42c0cc26cb372c19f74d52bddba953d",
+    "buildId": "gi-i65-b4-66012815b42c-57f234755dc1",
+    "workflowRunId": 41810204840,
+    "productionPromotionAuthorized": false,
+    "unresolvedPersonalGoalsAndFreelance": true,
+    "productionCallableParityVerified": false,
+    "b4003Closed": false,
+    "formalI6Percent": 50,
+    "p0Closed": 1,
+    "p0Total": 6,
+    "priorControlKeysPreserved": true
   }
 }

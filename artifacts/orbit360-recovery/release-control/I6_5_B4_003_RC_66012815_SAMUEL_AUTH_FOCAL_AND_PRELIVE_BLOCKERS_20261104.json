@@ -1,0 +1,139 @@
+{
+  "schema": "I6_5_B4_003_RC_IMMUTABLE_PREVIEW_AND_SAMUEL_AUTH_UAT_RECEIPT_V1",
+  "recordDate": "2026-11-04",
+  "project": "Gravicentra Insurance",
+  "repository": "paulaosoriof86/orbit360-core",
+  "canonicalBranch": "recovery/fase-a-clean-20260831",
+  "gate": "I6.5/B4-003",
+  "status": "NEW_RC_HOSTING_PREVIEW_TECHNICAL_PASS_SAMUEL_AUTHENTICATED_FOCAL_UAT_PASS_B4003_HOLD",
+  "immutableCandidate": {
+    "sourceSha": "66012815b42c0cc26cb372c19f74d52bddba953d",
+    "sourceFixCommit": "4f4ae3390c6c3f5ac758c1406835b54f310324b7",
+    "workflowCommit": "66012815b42c0cc26cb372c19f74d52bddba953d",
+    "buildId": "gi-i65-b4-66012815b42c-57f234755dc1",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-rc-41765742748-neoi3u7r.web.app/",
+    "githubRunId": 41810204840,
+    "retainedArtifactId": 13311178353,
+    "readbackArtifactId": 13310484572,
+    "retainedArchiveSha256": "d20be9c8dd7e3c530abbea6370a52bdc72bd42490259c9421f07aa4bc73b3d6c",
+    "immutableBundleSha256": "6b07a53c26f5710429bdf6bb2869f7dd00dc5e2e386e3780dac29f81b12ff6d6",
+    "indexSha256": "98b17ef2d06ab55824313c4f6f73421142bf7b882ecd5cd5d2ecd9d6e799f868",
+    "rosterClientSha256": "af1510ac92e39ab73a49b207a70ebd7ca48b09d6ecefd82bd14f2c99c3ee6419",
+    "writerFacadeSha256": "567f9055dd31d1b8ecf8d1020b0c65674c70264fac75e2c6563230046f4e9aeb",
+    "servedArtifactExact": true,
+    "hostingPreviewOnly": true,
+    "backendFunctionsDeployed": 0,
+    "firestoreRulesWrites": 0,
+    "authIamChanges": 0,
+    "productionDeploy": false
+  },
+  "causalFix": {
+    "rootCause": "GoalsPreview callables were routed only on goals/e4 host tokens while immutable candidate hostname uses gi-i65-b4-rc-*; Inicio showed 4/5 sources until host-agnostic canonical RC route repair.",
+    "changedFiles": [
+      "orbit360-platform/core/assignable-advisor-roster-client.js",
+      "orbit360-platform/data/store-firestore-product-operational-p0.js",
+      "tests/goal-participation-isolated-routing.test.cjs"
+    ],
+    "newTestScope": "RC hostname GoalsPreview routing plus preserved existing goals/e4 and ordinary LIVE behavior"
+  },
+  "authenticatedFocalUat": [
+    {
+      "actor": "Samuel Daza",
+      "viewAs": "Administración",
+      "country": "GT",
+      "module": "Inicio",
+      "status": "PASS_FOCAL",
+      "sources": "5/5",
+      "metrics": {
+        "clientes": 391,
+        "polizas": 1301,
+        "cobrosConfirmados": 5
+      },
+      "advisorProgress": "VISIBLE"
+    },
+    {
+      "actor": "Samuel Daza",
+      "viewAs": "Administración",
+      "country": "CO",
+      "module": "Inicio",
+      "status": "PASS_FOCAL",
+      "sources": "5/5",
+      "metrics": {
+        "clientes": 49,
+        "polizas": 124,
+        "vencidos": 14
+      },
+      "advisorProgress": "VISIBLE"
+    },
+    {
+      "actor": "Samuel Daza",
+      "viewAs": "Asesor",
+      "country": "GT",
+      "module": "Inicio",
+      "status": "PASS_FOCAL_VIEW_AS_ONLY_NOT_INDEPENDENT_UID",
+      "sources": "5/5",
+      "metrics": {
+        "clientes": 1,
+        "polizas": 1,
+        "recibos": 10
+      },
+      "advisorProgress": "SELF_ONLY"
+    },
+    {
+      "actor": "Samuel Daza",
+      "viewAs": "Asesor",
+      "country": "CO",
+      "module": "Inicio",
+      "status": "PASS_FOCAL_VIEW_AS_ONLY_NOT_INDEPENDENT_UID",
+      "sources": "5/5",
+      "metrics": {
+        "clientes": 0,
+        "polizas": 0
+      },
+      "advisorProgress": "NO_CROSS_COUNTRY_LEAK"
+    }
+  ],
+  "existingProofPreserved": {
+    "syntheticCobroQ111_11": "PREVIOUS_CANDIDATE_CREATE_RELOAD_RECONCILE_CLEANUP_RESTORED",
+    "createRunId": 41807435779,
+    "cleanupRunId": 41807875649,
+    "oldCandidateSourceSha": "3bf9996da14fa1799dd3671581aad706d754d218",
+    "repeatPolicy": "No re-run without causally affected Cobros path"
+  },
+  "realOwnerTeamReadback": {
+    "teamProfiles": 7,
+    "participationClassification": "ALL_UNCLASSIFIED_IN_TEAM_GOALS_SOURCE",
+    "ownerNotes": "Johanna, Nicole and Braulio are asserted freelance by Director; no business-data classification write authorized or executed in this receipt",
+    "personalGoalCasesCertified": false,
+    "freelancerExclusionCertified": false
+  },
+  "carryWithoutRegression": {
+    "exportByteInspection": "OWNER_DEFERRED_POSTPRODUCTION",
+    "firestoreRules": "PRIOR_TEMPORARY_RISK_EXCEPTION_REMAINS_NOT_A_SECURITY_PASS",
+    "unresolvedQaResidue": "14 cancelled-run synthetic rows plus dependencies; three B2 orphaned renewals plus dependents; no cleanup authorized",
+    "remainingP0": [
+      "B4-003-P0-20261012-PERSONAL-COLLECTION",
+      "B4-003-P0-20261012-FREELANCERS-GOAL-SCOPE",
+      "B4-003-P0-20261012-INICIO-MOTIVATIONAL-TEXTS",
+      "B4-003-P0-20261012-QA-CANCELLED-RUN-FIXTURES",
+      "B4-003-P0-20261012-QA-ORPHAN-RENEWALS"
+    ],
+    "previouslyClosedP0": "B4-003-P0-20261012-INSTITUTIONAL-GOALS"
+  },
+  "releaseIntegrity": {
+    "productionCurrentAcceptedI5Preserved": true,
+    "productionCallableParityWithNewRC": "NOT_VERIFIED_PRELIVE",
+    "sameArtifactLivePromotion": "NOT_EXECUTED",
+    "productionAcceptedForB4003": false,
+    "b4003Closed": false,
+    "formalI6ProgressPercent": 50,
+    "p0Closed": 1,
+    "p0Total": 6
+  },
+  "nextExactActions": [
+    "Verify production backend callable parity for RC functions without data writes or LIVE mutation.",
+    "Complete only causally open individual role/scope and goal/freelancer UAT, preserve prior PASS.",
+    "Obtain scoped reversible QA residue treatment disposition, no destructive cleanup without explicit authorization.",
+    "Promote immutable identical Hosting artifact and compatible backend only after owner-authorized release criteria; verify live readback, role access and rollback."
+  ]
+}
