@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_I6_5_B4_003_FROZEN_SYNTHETIC_QA_REQUEST_V1",
   "status": "REQUESTED",
-  "mode": "create",
+  "mode": "cleanup",
   "recordedAtUtc": "2026-11-04T09:25:50.188Z",
   "gate": "I6.5/B4-003",
   "authority": "PAULA_EXPLICIT_20261104_SYNTHETIC_WRITE_RELOAD_RESTORE_AND_CONTROLLED_RELEASE",
@@ -32,5 +32,26 @@
   ],
   "mustCleanup": true,
   "exportByteReadbackDisposition": "OWNER_DEFERRED_TO_POSTPRODUCTION_20261104",
-  "productionReleaseDisposition": "NOT_GRANTED_BY_THIS_QA_REQUEST"
+  "productionReleaseDisposition": "NOT_GRANTED_BY_THIS_QA_REQUEST",
+  "cleanupRequestedAtUtc": "2026-11-04T09:29:06.787Z",
+  "writeReloadReconciliationEvidence": {
+    "browser": "Chrome connected, Samuel Daza authenticated Admin",
+    "previewBuildId": "gi-i65-b4-3bf9996da14f-57f234755dc1",
+    "receiptId": "b3004human_receipt_r12",
+    "amountQ": 111.11,
+    "method": "Transferencia bancaria",
+    "paymentDate": "2026-11-04",
+    "insurerApplicationDate": "2026-11-04",
+    "clientNotification": false,
+    "initialPaidCount": 5,
+    "postPaymentReloadPaidCount": 6,
+    "postPaymentReloadPendingReconcileCount": 1,
+    "postReconciliationReloadPaidCount": 6,
+    "postReconciliationReloadConciledCount": 6,
+    "postReconciliationReloadPendingReconcileCount": 0,
+    "samePaymentEnriched": true,
+    "stableAfterReload": true,
+    "uiRow": "QA-HUMANA-B3-004-R12 | Q111.11 | 04 nov 2026 | Pago confirmado | Conciliado",
+    "status": "BROWSER_SIGNED_PREVIEW_PASS_PENDING_CLEANUP_READBACK"
+  }
 }
