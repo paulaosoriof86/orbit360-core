@@ -343,16 +343,16 @@ jobs:
 
   e4-cancel-owner-hosting-preview:
     # One causal E4 successor inside the existing B4-003 Preview workflow.
-    # Product source is pinned to the E4 goals routing-certified commit, never rebuilt
+    # Product source is pinned to the role/finance-scoped CI-validated commit, never rebuilt
     # from a moving HEAD. Only a NEW expiring Hosting channel is deployed.
     if: >-
       github.repository == 'paulaosoriof86/orbit360-core' &&
       github.ref == 'refs/heads/recovery/fase-a-clean-20260831' &&
-      github.event.head_commit.message == 'build(b4-003): isolated E4 full cartera owner Preview'
+      github.event.head_commit.message == 'build(b4-003): isolated E4 finance transversal scope Preview'
     runs-on: ubuntu-24.04
     timeout-minutes: 35
     env:
-      SOURCE_SHA: 9a0b8794c56f350fc47e754a045f693c84d0054c
+      SOURCE_SHA: 7c78fda204831630bf9336213f67a3f56e437e4e
       PROJECT_ID: ays-orbit-360-lab
       TENANT_HINT: alianzas-soluciones
       HOSTING_SITE: ays-orbit-360-lab
@@ -372,7 +372,7 @@ jobs:
           path: transport
       - uses: actions/checkout@v4
         with:
-          ref: 9a0b8794c56f350fc47e754a045f693c84d0054c
+          ref: 7c78fda204831630bf9336213f67a3f56e437e4e
           fetch-depth: 0
           persist-credentials: false
           path: candidate
@@ -392,6 +392,8 @@ jobs:
           test "$(git -C candidate hash-object tools/gravicentra-b4-003-renovaciones-qa-provenance.test.cjs)" = 'c00b6b71deecaeeb11ec99d9e22443b85a5d830f'
           test "$(git -C candidate hash-object tools/gravicentra-b4-003-reportes-e4-transversal.test.cjs)" = '1fa7ccf0cdd0f2b9e1899515c31bb0a43d593f2a'
           test "$(git -C candidate hash-object orbit360-platform/index.html)" = 'daf1d382500146f7d273cf4501d6901cf39afed9'
+          test "$(git -C candidate hash-object orbit360-platform/core/access-scope.js)" = 'a51598b5b1d31b6ee20673f9d9581ac445e5de37'
+          test "$(git -C candidate hash-object orbit360-platform/core/tenant-access-policy-effective-p0.js)" = 'a07c3bd78729093b86f99af9347f8b13ca11523d'
           test "$(git -C candidate hash-object orbit360-platform/core/assignable-advisor-roster-client.js)" = 'd56166f0e1b6d53cc4728f7098fa5e4ec6fabfa0'
           test "$(git -C candidate hash-object orbit360-platform/data/store-firestore-product-operational-p0.js)" = 'fb14f43d527abfdaf4cb9ca14e74d64dda1a6acf'
           test "$(git -C candidate hash-object tests/goal-participation-isolated-routing.test.cjs)" = '8fb555c6e9389521086b436b53bc716bffef84b6'
@@ -403,6 +405,7 @@ jobs:
           node --check orbit360-platform/core/assignable-advisor-roster-client.js
           node --check orbit360-platform/data/store-firestore-product-operational-p0.js
           node tests/goal-participation-isolated-routing.test.cjs
+          node tools/gravicentra-b4-003-financial-role-scope-transversal.test.cjs
           node tools/gravicentra-b4-003-reportes-e4-transversal.test.cjs
           node tools/gravicentra-b4-003-renovaciones-qa-provenance.test.cjs
           node tools/gravicentra-b4-003-cross-module-readback-contract.test.cjs
@@ -459,6 +462,8 @@ jobs:
           test "$(git rev-parse HEAD)" = "$SOURCE_SHA"
           cmp orbit360-platform/modules/cancelaciones.js "$ROOT/modules/cancelaciones.js"
           cmp orbit360-platform/modules/reportes.js "$ROOT/modules/reportes.js"
+          cmp orbit360-platform/core/access-scope.js "$ROOT/core/access-scope.js"
+          cmp orbit360-platform/core/tenant-access-policy-effective-p0.js "$ROOT/core/tenant-access-policy-effective-p0.js"
            cmp orbit360-platform/modules/cobros.js "$ROOT/modules/cobros.js"
           cmp orbit360-platform/modules/renovaciones.js "$ROOT/modules/renovaciones.js"
           cmp orbit360-platform/core/assignable-advisor-roster-client.js "$ROOT/core/assignable-advisor-roster-client.js"
