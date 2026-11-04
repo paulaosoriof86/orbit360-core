@@ -2,6 +2,12 @@ name: Gravicentra B4-003 R18 Readonly Forensic
 
 on:
   workflow_dispatch:
+    inputs:
+      signed_identity_negatives:
+        description: 'Owner-approved existing Paula/Carlos/Samuel UID signed callable negative tests only; no writes, deploy or rebuild'
+        type: boolean
+        required: false
+        default: false
   push:
     branches:
       - recovery/fase-a-clean-20260831
@@ -24,6 +30,7 @@ concurrency:
 
 jobs:
   b4-003-readonly-diagnostic:
+    if: github.event_name != 'workflow_dispatch' || inputs.signed_identity_negatives != true
     runs-on: ubuntu-24.04
     timeout-minutes: 25
     env:
@@ -283,6 +290,7 @@ jobs:
           git push origin "HEAD:$GITHUB_REF_NAME"
 
   b4-003-integral-readonly-complement:
+    if: github.event_name != 'workflow_dispatch' || inputs.signed_identity_negatives != true
     needs: b4-003-readonly-diagnostic
     runs-on: ubuntu-24.04
     timeout-minutes: 25
@@ -358,3 +366,57 @@ jobs:
       - name: Remove transient credential
         if: always()
         run: rm -f "$RUNNER_TEMP/gi-integral-readonly-credential.json"
+
+  b4-003-owner-authorized-existing-uid-negatives:
+    # The owner's explicit 2026-11-04 approval is scoped to temporary
+    # authentication as these three existing identities. No Auth user,
+    # membership, rules, data, Hosting or Function writes are authorized.
+    if: >-
+      github.repository == 'paulaosoriof86/orbit360-core'
+      && github.ref == 'refs/heads/recovery/fase-a-clean-20260831'
+      && github.event_name == 'workflow_dispatch'
+      && inputs.signed_identity_negatives == true
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    permissions:
+      contents: read
+    env:
+      SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_LAB_LEGACY: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      B4003_SIGNED_RECEIPT: ${{ runner.temp }}/gi-b4003-existing-uid-signed-negatives.json
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate immutable product owners and read-only test contract
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          test "$(git ls-remote origin refs/heads/recovery/fase-a-clean-20260831 | awk '{print $1}')" = "$GITHUB_SHA"
+          for owner in functions/assignable-advisor-roster.js functions/product-active-role-contract.js functions/goal-participation-contract.js; do
+            test "$(git rev-parse 66012815b42c0cc26cb372c19f74d52bddba953d:"$owner")" = "$(git rev-parse HEAD:"$owner")"
+          done
+          node --check tools/gravicentra-b4-003-real-uid-server-negatives.cjs
+      - name: Install existing-project admin client only in temporary runner folder
+        shell: bash
+        run: |
+          set -euo pipefail
+          DEP_ROOT="$RUNNER_TEMP/gi-b4003-existing-uid-deps"
+          npm install --prefix "$DEP_ROOT" --no-save --package-lock=false --ignore-scripts --no-audit --no-fund firebase-admin@13.4.0 >/dev/null
+          echo "NODE_PATH=$DEP_ROOT/node_modules" >> "$GITHUB_ENV"
+      - name: Execute read-only signed callable positive and negative matrix
+        run: node tools/gravicentra-b4-003-real-uid-server-negatives.cjs
+      - name: Preserve non-sensitive evidence even if a denial fails
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gi-b4003-existing-uid-signed-negatives-${{ github.run_id }}
+          path: ${{ runner.temp }}/gi-b4003-existing-uid-signed-negatives.json
+          if-no-files-found: warn
+          retention-days: 30
