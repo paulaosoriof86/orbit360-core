@@ -389,10 +389,28 @@ Orbit.modules.inicio = (function () {
     }
   }
 
+  // Use the signed role/country roster even on Inicio's first render; never
+  // mislabel an advisor with a stale legacy catalog name during hydration.
+  function followupAdvisor(id,country){
+    const advisorId=String(id||'').trim();
+    if(!advisorId)return null;
+    const roster=Orbit.assignableAdvisorRoster;
+    const entries=roster&&typeof roster.peek==='function'?roster.peek(country):[];
+    const verified=entries.find(a=>a&&String(a.id)===advisorId&&a.nombre);
+    return verified?Object.assign({},q.asesor(advisorId,country)||{},{id:advisorId,nombre:verified.nombre}):
+      {id:advisorId,nombre:'Responsable por verificar',color:'#999'};
+  }
+  // ciclo loads this signed roster asynchronously. Refresh Inicio only after
+  // the verified roster returns, never re-fetch or trust provisional names.
+  document.addEventListener('orbit:ciclo',event=>{
+    if(event?.detail?.reason!=='advisor-identity-readback'||Orbit.route?.key!=='inicio')return;
+    if(Orbit.router&&typeof Orbit.router.go==='function')Orbit.router.go('inicio');
+  });
+
   /* Seguimientos pendientes (sin automatizar) → gestionar por WhatsApp Web / correo */
   function seguimientosHoy() {
     if (!Orbit.ciclo) return '';
-    const negs = Orbit.ciclo.negocios({ ignoreRol: true })
+    const negs = Orbit.ciclo.negocios({ surface: 'ops' })
       .filter(n => ['nuevo', 'contactado', 'cotizando', 'propuesta', 'negociacion'].includes(n.etapa) && !n.cadenciaActiva && U.daysFromNow(n.proximoToque) <= 1)
       .sort((a, b) => (a.proximoToque || '').localeCompare(b.proximoToque || '')).slice(0, 6);
     if (!negs.length) return '';
@@ -403,7 +421,7 @@ Orbit.modules.inicio = (function () {
       </div>
       <div style="margin-top:12px;display:grid;gap:9px">
         ${negs.map(n => {
-          const ase = q.asesor(n.asesorId);
+          const ase = followupAdvisor(n.asesorId,n.pais);
           const wa = (n.telefono || '').replace(/[^0-9]/g, '');
           const msg = encodeURIComponent('Hola ' + (n.nombre || '').split(' ')[0] + ', te damos seguimiento a tu ' + n.producto + '.');
           const d = U.daysFromNow(n.proximoToque);

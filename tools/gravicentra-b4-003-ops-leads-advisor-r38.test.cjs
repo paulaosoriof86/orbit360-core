@@ -33,4 +33,15 @@ assert.equal(qctx.resolve('ase-samuel-daza','CO').nombre,'Paula Osorio','NO_UNAU
 assert.match(src,/const ase = verifiedAdvisor\(n\.asesorId,n\.pais\)/,'SHARED_OPS_LEADS_CARD_VERIFIES_NAME');
 assert.match(ops,/\['GT','CO'\]\.flatMap\(country=>roster\.peek\(country\)\)/,'OPS_FILTER_CANONICAL_ROSTER');
 assert.match(src,/ensureAdvisorRoster\(visible\.map\(n=>n\.pais\)\)/,'ROSTER_SCOPE_ONLY_VISIBLE_BUSINESS_COUNTRIES');
-console.log('B4_003_R38_ADVISOR_AND_AUTHOR_SOURCE_PASS checks=20 synthetic_only_no_writes');
+const inicio=fs.readFileSync('orbit360-platform/modules/inicio.js','utf8');
+const istart=inicio.indexOf('  function followupAdvisor(id,country)'),iend=inicio.indexOf('  /* Seguimientos pendientes',istart);
+assert.ok(istart>=0&&iend>istart,'INICIO_SIGNED_ADVISOR_RESOLVER_PRESENT');
+const icontext={String,Object,Orbit:{assignableAdvisorRoster:{peek:c=>c==='GT'?[{id:'ase-samuel-daza',nombre:'Samuel Daza'}]:[]}},q:{asesor:id=>({id,nombre:'Paula Osorio',color:'#f00'})}};
+vm.runInNewContext(inicio.slice(istart,iend).split('  // ciclo loads')[0]+'\nthis.resolve=followupAdvisor;',icontext);
+assert.equal(icontext.resolve('ase-samuel-daza','GT').nombre,'Samuel Daza','INICIO_SIGNED_GT_NAME_BEATS_STALE_PAULA');
+assert.equal(icontext.resolve('ase-samuel-daza','CO').nombre,'Responsable por verificar','INICIO_NO_WRONG_COUNTRY_NAME');
+assert.equal(icontext.resolve('', 'GT'),null,'INICIO_NO_DEFAULT_ADVISOR');
+assert.match(inicio,/const ase = followupAdvisor\(n\.asesorId,n\.pais\)/,'INICIO_CARD_USES_SIGNED_NAME');
+assert.match(inicio,/Orbit\.ciclo\.negocios\(\{ surface: 'ops' \}\)/,'INICIO_FOLLOWUPS_OBEY_ROLE_SCOPE');
+assert.match(inicio,/advisor-identity-readback[\s\S]*Orbit\.router\.go\('inicio'\)/,'INICIO_REPAINTS_AFTER_SIGNED_ROSTER');
+console.log('B4_003_R38_ADVISOR_AND_AUTHOR_SOURCE_PASS checks=27 synthetic_only_no_writes');

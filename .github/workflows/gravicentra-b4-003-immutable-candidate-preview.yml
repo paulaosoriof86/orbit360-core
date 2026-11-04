@@ -1,4 +1,5 @@
 # B4-003 same-artifact release lane (reusable); does not touch LIVE, Rules, Auth or business data.
+# 2026-11-04: exact same-channel candidate after Inicio signed-advisor first-paint fix.
 # Reusable in the same canonical branch when a causal source fix invalidates
 # the former immutable candidate; never patch or promote the older bundle.
 name: Gravicentra B4-003 Immutable Candidate Hosting Preview
