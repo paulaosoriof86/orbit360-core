@@ -39,7 +39,7 @@ jobs:
       - name: Checkout and certify exact canonical source and E4 regression
         uses: actions/checkout@v4
         with:
-          fetch-depth: 1
+          fetch-depth: 0
           persist-credentials: false
           path: candidate
       - uses: actions/setup-node@v4
