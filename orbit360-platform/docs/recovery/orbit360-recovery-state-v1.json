@@ -10,7 +10,7 @@
   "branch": "recovery/fase-a-clean-20260831",
   "forensicOriginSha": "9c95f31461f2eabe9804625b5659bee772f5602a",
   "createdAtUtc": "2026-08-31T18:00:00Z",
-  "updatedAtUtc": "2026-11-04T11:03:16.661Z",
+  "updatedAtUtc": "2026-11-04T15:06:51.171Z",
   "status": "ITERATION_2_SOURCE_MATERIALIZED_VALIDATION_PENDING",
   "currentIteration": 2,
   "lastCompletedIteration": 1,
@@ -285,6 +285,27 @@
     "historicalP0Closed": 1,
     "historicalP0Total": 6,
     "formalI6Percent": 50,
+    "productionAccepted": false
+  },
+  "b4003SignedRealUidCallableMatrix20261104": {
+    "gate": "I6.5/B4-003",
+    "status": "PASS_30_OF_30_ROSTER_SIGNED_REAL_UID_BACKEND_SCOPE_ONLY",
+    "sourceSha": "b094619281c1f2ccef7e08335adedc76cf878bbc",
+    "buildId": "gi-i65-b4-b094619281c1-57f234755dc1",
+    "immutableHostingArtifactId": 13315537234,
+    "workflowRun": 41853402508,
+    "artifactId": 13335512955,
+    "receipt": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_SIGNED_REAL_UID_CALLABLE_NEGATIVES_PASS_20261104.json",
+    "distinctVerifiedExistingUserIdentities": 3,
+    "signedPositiveAndNegativeChecks": "30_OF_30_PASS",
+    "retainedUnchangedHostingAndData": true,
+    "previousPendingSignedCallableEvidence": "SUPERSEDED_BY_THIS_PASS_FOR_THE_ROSTER_CALLABLE_ONLY",
+    "firestoreDirectRulesCertification": "NOT_PASSED_OWNER_EXCEPTION",
+    "historicalP0Closed": 1,
+    "historicalP0Total": 6,
+    "formalI6Percent": 50,
+    "next": "FIVE_P0_DISPOSITIONS_AND_OPS_LEADS_AUTHOR_NAME_FOCAL; THEN_EXACT_ARTIFACT_LIVE_PROMOTION_AND_MODULE_ACCEPTANCE",
+    "b4003FullGateClosed": false,
     "productionAccepted": false
   }
 }
