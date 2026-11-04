@@ -1,5 +1,6 @@
 # B4-003 same-artifact release lane (reusable); does not touch LIVE, Rules, Auth or business data.
-# Created within the single canonical recovery branch following causal E4 source correction.
+# Reusable in the same canonical branch when a causal source fix invalidates
+# the former immutable candidate; never patch or promote the older bundle.
 name: Gravicentra B4-003 Immutable Candidate Hosting Preview
 on:
   workflow_dispatch:
@@ -52,8 +53,10 @@ jobs:
         run: |
           set -euo pipefail
           test "$(git rev-parse HEAD)" = "$SOURCE_SHA"
-          test "$(git rev-parse HEAD^)" = "4f4ae3390c6c3f5ac758c1406835b54f310324b7"
-          test "$(git diff --name-only HEAD^ HEAD)" = '.github/workflows/gravicentra-b4-003-immutable-candidate-preview.yml'
+          git merge-base --is-ancestor 66012815b42c0cc26cb372c19f74d52bddba953d HEAD
+          test "$(git rev-parse HEAD:functions/assignable-advisor-roster.js)" = '9778d74b6d305ff56caf73bb68be3dadac4b14ce'
+          test "$(git rev-parse HEAD:functions/product-operational-domain.js)" = 'b3d0059457142659633498c9c52c6b84ea68200f'
+          test "$(git rev-parse HEAD:orbit360-platform/core/ciclo.js)" = '2fd8007fb0979262c87e71f79505ebe47d3e836a'
           test "$(git rev-parse HEAD:orbit360-platform/modules/cobros.js)" = '34dd080d88fe764d7858813843b7184c64d4cdc2'
           test "$(git rev-parse HEAD:tools/gravicentra-b4-003-e4-anulado-projection.test.cjs)" = '3f471893daabc44e3d226b6983393114d568c1f8'
           test -f artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json
@@ -69,7 +72,11 @@ jobs:
           node --check orbit360-platform/modules/cancelaciones.js
           node --check orbit360-platform/modules/renovaciones.js
           node --check orbit360-platform/core/assignable-advisor-roster-client.js
+          node --check orbit360-platform/core/ciclo.js
           node --check orbit360-platform/data/store-firestore-product-operational-p0.js
+          node tools/gravicentra-b4-003-inicio-role-country-team.test.cjs
+          node tools/gravicentra-b4-003-ops-leads-role-scopes.test.cjs
+          node tools/gravicentra-b4-003-operational-write-security-regression.test.cjs >/dev/null
           node tools/gravicentra-b4-003-financial-role-scope-transversal.test.cjs
           node tools/gravicentra-b4-003-reportes-e4-transversal.test.cjs
           node tools/gravicentra-b4-003-e4-anulado-projection.test.cjs
@@ -137,6 +144,7 @@ jobs:
            cmp orbit360-platform/modules/cobros.js "$ROOT/modules/cobros.js"
           cmp orbit360-platform/modules/renovaciones.js "$ROOT/modules/renovaciones.js"
           cmp orbit360-platform/core/assignable-advisor-roster-client.js "$ROOT/core/assignable-advisor-roster-client.js"
+          cmp orbit360-platform/core/ciclo.js "$ROOT/core/ciclo.js"
           cmp orbit360-platform/data/store-firestore-product-operational-p0.js "$ROOT/data/store-firestore-product-operational-p0.js"
           node - <<'NODE'
           const fs=require('node:fs'),r=process.env.RUNNER_TEMP+'/gi-e4-canonical-hosting/bundle';
@@ -208,7 +216,7 @@ jobs:
             echo 'PREVIEW_EXACT_BUILD_NOT_PROPAGATED_BEFORE_BOUNDED_DEADLINE' >&2
             exit 1
           fi
-          for rel in __recovery__/build.json product-runtime-config.js index.html modules/polizas.js modules/policy-receipts-v1199-detail-guard.js modules/cancelaciones.js modules/reportes.js modules/cobros.js modules/renovaciones.js core/assignable-advisor-roster-client.js data/store-firestore-product-operational-p0.js core/tenant-access-policy-effective-p0.js core/access-scope.js core/queries.js; do
+          for rel in __recovery__/build.json product-runtime-config.js index.html modules/polizas.js modules/policy-receipts-v1199-detail-guard.js modules/cancelaciones.js modules/reportes.js modules/cobros.js modules/renovaciones.js core/assignable-advisor-roster-client.js core/ciclo.js data/store-firestore-product-operational-p0.js core/tenant-access-policy-effective-p0.js core/access-scope.js core/queries.js; do
             mkdir -p "$RUNNER_TEMP/gi-e4-readback/$(dirname "$rel")"
             curl -fsSL --retry 12 --retry-all-errors --retry-delay 5 --max-time 25 "$PREVIEW_URL/$rel" > "$RUNNER_TEMP/gi-e4-readback/$rel"
             cmp "$ROOT/$rel" "$RUNNER_TEMP/gi-e4-readback/$rel"
