@@ -99,7 +99,27 @@
       "productionAuthorized": false,
       "securityPassed": false
     },
-    "mutationScope": "CONTROL_PLANE_METADATA_ONLY_NO_PRODUCT_FIRESTORE_RULES_AUTH_IAM_OR_LIVE_DEPLOY"
+    "mutationScope": "CONTROL_PLANE_METADATA_ONLY_NO_PRODUCT_FIRESTORE_RULES_AUTH_IAM_OR_LIVE_DEPLOY",
+    "latestSignedSyntheticQa": {
+      "status": "PASS",
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_FROZEN_SYNTHETIC_WRITE_RELOAD_RESTORE_PASS_20261104.json",
+      "receiptBlobSha": "9724c335ddc7d4ef7642ed64acbde3b436ce4d5a",
+      "createRunId": 41807435779,
+      "cleanupRunId": 41807875649,
+      "browserPaymentAndReconcileAfterReload": true,
+      "firestoreZeroResidueAfterCleanup": true,
+      "baseline5PaymentsAnd5ReconciledRestored": true,
+      "noRealCustomerWrites": true,
+      "noLiveDeploy": true
+    },
+    "ownerE4ExportBytesDisposition20261104": {
+      "status": "OWNER_DEFERRED_TO_POSTPRODUCTION_NON_BLOCKING",
+      "downloadsObservedOnOwnersPc": true,
+      "automatedByteInspectionNotCertified": true,
+      "authority": "PAULA_EXPLICIT_20261104",
+      "noRepeatApprovedExports": true
+    },
+    "nextSingleCertificationCursor": "REUSE_EXISTING_SIGNED_MODULE_ROLE_UAT_AND_CAUSAL_BACKEND_NEGATIVES_THEN_SAME_FROZEN_ARTIFACT_CONTROLLED_LIVE_RELEASE_WITH_READBACK_AND_ROLLBACK"
   },
   "b4003SamuelVerifiedPreviewUat20261104": {
     "status": "SIGNED_SCOPE_AND_FOCAL_INSURER_HEADER_PASS_OTHER_RELEASE_REQUIREMENTS_OPEN",
@@ -18092,5 +18112,28 @@
     "syntheticPriorFixtureAbsentOnCurrentPreview": true,
     "syntheticWriteRestorePassed": false,
     "metadataOnlyCorrection": true
+  },
+  "b4003FrozenSyntheticWriteReloadRestoreCertification20261104": {
+    "schema": "GI_I65_B4_003_FROZEN_ARTIFACT_SYNTHETIC_WRITE_RELOAD_CONCILIATE_RESTORE_CERTIFICATION_V1",
+    "status": "PREVIEW_SYNTHETIC_WRITE_RELOAD_RECONCILE_RESTORE_PASS",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_FROZEN_SYNTHETIC_WRITE_RELOAD_RESTORE_PASS_20261104.json",
+    "receiptBlobSha": "9724c335ddc7d4ef7642ed64acbde3b436ce4d5a",
+    "sourceSha": "3bf9996da14fa1799dd3671581aad706d754d218",
+    "buildId": "gi-i65-b4-3bf9996da14f-57f234755dc1",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-rc-41765742748-neoi3u7r.web.app/",
+    "createRunId": 41807435779,
+    "cleanupRunId": 41807875649,
+    "appliedPaymentPersistedAfterReload": true,
+    "samePaymentReconciledAfterReload": true,
+    "cleanedAllReservedQaIdsAndDirectEvidence": true,
+    "realBusinessWrites": 0,
+    "liveDeployed": false,
+    "ownerDeferredExportByteInspection": true,
+    "previousTemporaryRulesExceptionStillInForce": true,
+    "productionAccepted": false,
+    "b4003Closed": false,
+    "formalI6Percent": 50,
+    "p0Closed": 1,
+    "p0Total": 6
   }
 }
