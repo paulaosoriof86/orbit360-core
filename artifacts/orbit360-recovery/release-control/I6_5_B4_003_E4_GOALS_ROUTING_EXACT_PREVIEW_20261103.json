@@ -253,6 +253,111 @@
     "dataMutation": false,
     "formalPassesAwarded": 0,
     "conclusion": "SIGNED_AUTHENTICATION_AND_VISIBLE_ROLE_COUNTRY_SELECTORS_ONLY__FUNCTIONAL_UAT_HOLD",
-    "nextAction": "After Samuel personally accepts legal terms, perform role×country×module read-only matrix against same exact E4 build; preserve current grants and record separate backend negative tests."
+    "nextAction": "After Samuel personally accepts legal terms, perform role×country×module read-only matrix against same exact E4 build; preserve current grants and record separate backend negative tests.",
+    "continuationAfterIndividualAcceptance": "Paula confirmed Samuel personally accepted; exact same authenticated E4 session showed normal app and no legal modal, 2026-11-03 Guatemala time."
+  },
+  "samuelCrossRoleMatrixUatNov3": {
+    "dateLocal": "2026-11-03",
+    "identity": "Samuel Daza",
+    "exactPreview": "https://ays-orbit-360-lab--gi-i65-b4-e4-41737972469-2elawj35.web.app/",
+    "sourceSha": "9a0b8794c56f350fc47e754a045f693c84d0054c",
+    "buildId": "gi-i65-b4-9a0b8794c56f-57f234755dc1",
+    "readOnlySignedObservations": {
+      "initialActiveRole": "Operativo",
+      "initialCountry": "TODOS",
+      "restoredActiveRole": "Operativo",
+      "restoredCountry": "TODOS",
+      "restoredRoute": "#/inicio",
+      "legalAgreement": "ACCEPTED_BY_SAMUEL_AND_MODAL_GONE",
+      "inicioOperativoTodos": "5/5 confirmed source banners",
+      "Operativo": {
+        "TODOS": {
+          "polizas": 1425,
+          "nota": "9 synthetic QA included for audit; 1416 non-QA"
+        },
+        "GT": {
+          "polizas": 1301,
+          "commercialPolizas": 1292,
+          "syntheticQaPolizas": 9,
+          "activePolizas": 196,
+          "cliente360": 391,
+          "cliente360LinkedPolizas": 1291,
+          "aseguradoras": 16,
+          "cobrosRows": 14,
+          "cobrosOriginSigaPending": 2
+        },
+        "CO": {
+          "polizas": 124,
+          "activePolizas": 27,
+          "cliente360": 49,
+          "cliente360LinkedPolizas": 125,
+          "aseguradoras": 17,
+          "cobrosRows": 0
+        }
+      },
+      "Administración": {
+        "GT": {
+          "polizas": 1301,
+          "activePolizas": 196,
+          "cliente360": 391,
+          "cliente360LinkedPolizas": 1291,
+          "aseguradoras": 16,
+          "cobrosRows": 14
+        },
+        "CO": {
+          "polizas": 124,
+          "activePolizas": 27,
+          "cliente360": 49,
+          "cliente360LinkedPolizas": 125,
+          "aseguradoras": 17
+        }
+      },
+      "Asesor": {
+        "GT": {
+          "polizas": 1,
+          "activePolizas": 1,
+          "cliente360": 1,
+          "cliente360LinkedPolizas": 1,
+          "netPremiumGTQ": 2600,
+          "realPolicyNumber": "VA125-00010478",
+          "policyAdvisor": "Samuel Daza",
+          "cobrosRows": 14,
+          "aseguradorasModule": "DENIED_UI_ROLE_GUARD"
+        },
+        "CO": {
+          "polizas": 0,
+          "cliente360": 0
+        }
+      }
+    },
+    "positiveUxConclusion": "PARTIAL_PASS_PÓLIZAS_CLIENTE360_ASEGURADORAS_READONLY_ROLE_COUNTRY_MATRIX; NOT FULL MODULE OR BACKEND CERTIFICATION",
+    "newFinding": {
+      "id": "B4-003-SAMUEL-E4-FINANCE-CROSS-ROLE-P0",
+      "status": "HOLD_CAUSAL_CORRECTION_REQUIRED",
+      "evidence": "Under same Samuel GT signed identity and same E4 build, Cobros lists exactly 14 rows in Administración, Operativo and Asesor, with two SIGA reports pending confirmation; but Operativo/Admin Pólizas and Cliente 360 show full authorized GT portfolios. CO Operativo Cobros lists zero while CO Pólizas=124 and Cliente 360 linked=125.",
+      "sourceAnalysis": {
+        "path": "orbit360-platform/core/access-scope.js",
+        "observation": "roleWidePortfolioScope(moduleKey) lines 176–180 overrides the advisor's explicit own scope only for 'polizas' and 'cliente360', not 'cobros'. The record filtering code then applies ownAdvisorId to financial records under 'cobros'.",
+        "classification": "PLAUSIBLE_CAUSAL_SOURCE_MECHANISM_NOT_YET_PROVEN_AGAINST_LIVE_ACCESS_CONFIG",
+        "needs": "Reconcile approved financial all-country scope for Operativo/AdminTenant, validate verified policy parent country, maintain Asesor own and backend JWT negative denials before any scoped source change. Never broaden user grants or import data to fix view."
+      }
+    },
+    "negativeAndUnverified": {
+      "aseguradorasAsesorDeniedUI": "PASS_NEGATIVE_UI_ONLY",
+      "directBackendUIDCountryAdvisorNegative": "NOT_EXECUTED",
+      "financeRealDataWrites": "NOT_EXECUTED",
+      "exports": "NOT_EXECUTED",
+      "browserModuleViewportFullQA": "NOT_EXECUTED"
+    },
+    "changeScope": {
+      "roleGrants": 0,
+      "businessDataWrites": 0,
+      "firestoreRulesWrites": 0,
+      "hostingPublishes": 0,
+      "productionPublishes": 0,
+      "sourceCodeEdits": 0
+    },
+    "gateDisposition": "B4-003_OPEN_HOLD_UNCHANGED_5_OF_10",
+    "nextAction": "Bounded role-scoped financial read parity fix under current B4 gate only if existing approved role permissions confirm Operativo/AdminTenant all; then synthetic negatives, same-source immutable E4 successor preview, signed Samuel+Carlos UAT. No new branch, no data reimport, no thesis pilot here."
   }
 }
