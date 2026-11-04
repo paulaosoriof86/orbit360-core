@@ -1,0 +1,157 @@
+# B4-003: deploy ONLY the previously proven read-only production roster callable.
+# This is the missing PRELIVE dependency for the frozen RC. No Hosting, Rules,
+# identity changes, operational data writes, or broad Function deployments.
+name: Gravicentra B4-003 LIVE Read-Only Roster Exact
+on:
+  push:
+    branches: [recovery/fase-a-clean-20260831]
+    paths: ['.github/workflows/gravicentra-b4-003-live-roster-exact-20261104.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+concurrency:
+  group: gi-b4003-live-roster-exact
+  cancel-in-progress: false
+
+jobs:
+  deploy-one-readonly-roster:
+    if: github.repository == 'paulaosoriof86/orbit360-core' && github.ref == 'refs/heads/recovery/fase-a-clean-20260831'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    env:
+      PROJECT_ID: ays-orbit-360-lab
+      SOURCE_ANCHOR: 66012815b42c0cc26cb372c19f74d52bddba953d
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_LAB_LEGACY: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Verify unchanged RC backend owners and role-country tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          test "$(git ls-remote origin refs/heads/recovery/fase-a-clean-20260831 | awk '{print $1}')" = "$GITHUB_SHA"
+          test "$PROJECT_ID" = 'ays-orbit-360-lab'
+          for PATH_IN_SOURCE in \
+            functions/assignable-advisor-roster.js \
+            functions/product-operational-domain.js \
+            functions/product-active-role-contract.js \
+            functions/goal-participation-contract.js \
+            functions/bootstrap.js; do
+            test "$(git rev-parse "$SOURCE_ANCHOR:$PATH_IN_SOURCE")" = "$(git rev-parse "HEAD:$PATH_IN_SOURCE")"
+          done
+          test "$(rg -c "require\('./assignable-advisor-roster'\)" functions/bootstrap.js)" = '1'
+          node --check functions/bootstrap.js
+          node --check functions/assignable-advisor-roster.js
+          node tools/gravicentra-b4-003-inicio-role-country-team.test.cjs
+          node tools/gravicentra-b4-003-ops-leads-role-scopes.test.cjs
+          node tools/gravicentra-b4-003-financial-role-scope-transversal.test.cjs
+          node tools/gravicentra-b4-003-role-first-paint-and-team-regression.test.cjs
+
+      - name: Stage exact single-project backend package (outside Hosting tree)
+        shell: bash
+        run: |
+          set -euo pipefail
+          STAGE_ROOT="$RUNNER_TEMP/gi-b4003-live-roster-exact"
+          mkdir -p "$STAGE_ROOT"
+          cp -a functions "$STAGE_ROOT/backend"
+          printf '{"functions":{"source":"backend","runtime":"nodejs22"}}\n' > "$STAGE_ROOT/firebase.json"
+          (cd "$STAGE_ROOT/backend" && npm ci --ignore-scripts --no-audit --no-fund)
+          node --check "$STAGE_ROOT/backend/bootstrap.js"
+          echo "STAGE_ROOT=$STAGE_ROOT" >> "$GITHUB_ENV"
+
+      - name: Select existing project-scoped identity and inspect BEFORE
+        shell: bash
+        run: |
+          set -euo pipefail
+          AUTH_ROOT="$RUNNER_TEMP/gi-b4003-live-roster-auth"
+          mkdir -p "$AUTH_ROOT"
+          export AUTH_ROOT
+          python3 - <<'PY'
+          import json,os,pathlib
+          root=pathlib.Path(os.environ['AUTH_ROOT']);found=0
+          for key in ('SA_LAB','SA_LAB_LEGACY','SA_DEFAULT'):
+              try: data=json.loads(os.environ.get(key,''))
+              except (ValueError,TypeError): continue
+              if data.get('type')!='service_account' or data.get('project_id')!='ays-orbit-360-lab' or not data.get('private_key'):continue
+              p=root/(str(found)+'.json');p.write_text(json.dumps(data));p.chmod(0o600);found+=1
+          if not found:raise SystemExit('B4003_EXISTING_PROJECT_IDENTITY_MISSING')
+          PY
+          CLI_ROOT="$RUNNER_TEMP/gi-b4003-live-roster-cli"
+          npm install --prefix "$CLI_ROOT" --no-audit --no-fund --ignore-scripts firebase-tools@14.10.1 >/dev/null
+          node tools/gravicentra-firebase-tools-empty-extensions-workaround-v1.mjs "$CLI_ROOT"
+          CLI="$CLI_ROOT/node_modules/firebase-tools/lib/bin/firebase.js"
+          SELECTED=''
+          for AUTH_FILE in "$AUTH_ROOT"/*.json; do
+            if GOOGLE_APPLICATION_CREDENTIALS="$AUTH_FILE" node "$CLI" functions:list --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/gi-b4003-roster-before.json" 2>/dev/null; then
+              SELECTED="$AUTH_FILE";break
+            fi
+          done
+          test -n "$SELECTED"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$SELECTED" >> "$GITHUB_ENV"
+          echo "FIREBASE_CLI_BIN=$CLI" >> "$GITHUB_ENV"
+          node - <<'NODE'
+          const f=require('fs'),p=process.env.RUNNER_TEMP+'/gi-b4003-roster-before.json';
+          const x=JSON.parse(f.readFileSync(p,'utf8')),raw=x.result??x,v=typeof raw==='string'?JSON.parse(raw):raw;
+          const rows=Array.isArray(v)?v:Array.isArray(v.functions)?v.functions:Array.isArray(v.result)?v.result:[];
+          const names=rows.map(r=>String(r.id||r.name||r.function||'').split('/').pop());
+          if(names.includes('orbit360AssignableAdvisorRoster'))throw Error('LIVE_ROSTER_ALREADY_PRESENT_DO_NOT_REDEPLOY');
+          if(!names.includes('orbit360ProductOperationalCommand'))throw Error('EXISTING_LIVE_WRITER_NOT_FOUND');
+          if(!names.includes('orbit360AssignableAdvisorRosterGoalsPreview'))throw Error('PROVEN_PREVIEW_ROSTER_NOT_FOUND');
+          f.writeFileSync(process.env.RUNNER_TEMP+'/gi-b4003-roster-before-names.json',JSON.stringify(names.sort()));
+          console.log(JSON.stringify({beforeFunctionCount:names.length,liveRosterPresent:false,liveWriterPresent:true,previewRosterPresent:true}));
+          NODE
+
+      - name: Deploy ONLY production read-only roster and compare function inventory
+        id: deploy_roster
+        shell: bash
+        run: |
+          set -euo pipefail
+          node "$FIREBASE_CLI_BIN" deploy --only functions:orbit360AssignableAdvisorRoster --config "$STAGE_ROOT/firebase.json" --project "$PROJECT_ID" --non-interactive
+          node "$FIREBASE_CLI_BIN" functions:list --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/gi-b4003-roster-after.json"
+          node - <<'NODE'
+          const f=require('fs'),b=JSON.parse(f.readFileSync(process.env.RUNNER_TEMP+'/gi-b4003-roster-before-names.json','utf8'));
+          const x=JSON.parse(f.readFileSync(process.env.RUNNER_TEMP+'/gi-b4003-roster-after.json','utf8'));
+          const raw=x.result??x,v=typeof raw==='string'?JSON.parse(raw):raw;
+          const rows=Array.isArray(v)?v:Array.isArray(v.functions)?v.functions:Array.isArray(v.result)?v.result:[];
+          const name=r=>String(r.id||r.name||r.function||'').split('/').pop(),a=rows.map(name);
+          const added=a.filter(n=>!b.includes(n)),removed=b.filter(n=>!a.includes(n));
+          const roster=rows.find(r=>name(r)==='orbit360AssignableAdvisorRoster');
+          if(added.join(',')!=='orbit360AssignableAdvisorRoster'||removed.length||!roster)throw Error('LIVE_FUNCTION_INVENTORY_UNEXPECTED_DELTA');
+          const region=String(roster.region||roster.location||'');if(region&&region!=='us-central1')throw Error('LIVE_ROSTER_REGION_MISMATCH');
+          const proof={gate:'I6.5/B4-003',status:'ONE_LIVE_READ_ONLY_ROSTER_DEPLOYED_FUNCTION_LIST_READBACK_NOT_SIGNED_UAT',sourceAnchor:process.env.SOURCE_ANCHOR,
+            deploymentCommit:process.env.GITHUB_SHA,projectId:process.env.PROJECT_ID,functionName:name(roster),region,
+            beforeCount:b.length,afterCount:a.length,onlyAdded:added,removed,hostingDeployed:false,rulesDeployed:false,operationalDataWrites:0,
+            next:'Independent signed UID backend negatives and module LIVE readback still required before B4-003 closure.'};
+          f.writeFileSync(process.env.RUNNER_TEMP+'/gi-b4003-roster-deploy-readback.json',JSON.stringify(proof,null,2)+'\n');
+          console.log(JSON.stringify(proof));
+          NODE
+      - name: Revert only newly introduced roster if deployment or readback failed
+        if: failure() && steps.deploy_roster.outcome == 'failure'
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f "$RUNNER_TEMP/gi-b4003-roster-before-names.json"
+          node - <<'NODE'
+          const names=require(process.env.RUNNER_TEMP+'/gi-b4003-roster-before-names.json');
+          if(names.includes('orbit360AssignableAdvisorRoster'))throw Error('ROSTER_PREEXISTED_NO_ROLLBACK');
+          NODE
+          node "$FIREBASE_CLI_BIN" functions:delete orbit360AssignableAdvisorRoster --region us-central1 --project "$PROJECT_ID" --force --non-interactive
+          echo 'B4003_LIVE_ROSTER_ROLLBACK_TO_ABSENT_TARGET_COMPLETE'
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: gi-b4003-live-roster-exact-${{ github.run_id }}
+          path: ${{ runner.temp }}/gi-b4003-roster-deploy-readback.json
+          if-no-files-found: warn
+          retention-days: 30
