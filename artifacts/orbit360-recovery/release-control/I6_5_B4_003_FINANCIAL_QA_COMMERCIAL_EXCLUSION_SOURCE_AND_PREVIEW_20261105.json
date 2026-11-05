@@ -1,0 +1,156 @@
+{
+  "schema": "GI_B4003_FINANCIAL_QA_COMMERCIAL_EXCLUSION_SOURCE_AND_PREVIEW_20261105_V1",
+  "gate": "I6.5/B4-003",
+  "dateLocal": "2026-11-05",
+  "recordType": "ADDITIVE_FOCAL_SOURCE_AND_EXACT_PREVIEW_EVIDENCE_NOT_MODULE_ACCEPTANCE_OR_GATE_PASS",
+  "authority": {
+    "repository": "paulaosoriof86/orbit360-core",
+    "branch": "recovery/fase-a-clean-20260831",
+    "sourceCommit": "4de6663ba3b3ca15c51d1c6332ffaa0cf501f589",
+    "sourcePath": "orbit360-platform/core/queries.js",
+    "priorBlob": "d9255d9c55517078b7458532b0b684dd8b1717b8",
+    "newBlob": "391d6c7df59b5d6fbb64adb419cb240c078545b8",
+    "issueComment": "https://github.com/paulaosoriof86/orbit360-core/issues/154#issuecomment-6670875915"
+  },
+  "correction": {
+    "classification": "COMMERCIAL_MODEL_QA_EXCLUSION",
+    "scope": [
+      "Cartera",
+      "Cobros",
+      "aging",
+      "Inicio counters",
+      "Renovaciones/Polizas/Cliente360 related consumers"
+    ],
+    "mechanisms": [
+      "explicit QA markers",
+      "historical B2 QA firme provenance",
+      "parent policy/client ancestry",
+      "country scoping GT/CO/TODOS",
+      "verified financial parent required for commercial aggregation"
+    ],
+    "explicitAuditMode": {
+      "supported": true,
+      "requires": "mode=audit and includeSyntheticQa=true",
+      "preservesHistory": true
+    },
+    "confirmedCobros": "continues to require existing confirmedCobro semantics; pending and inferred values are not confirmed collections",
+    "roleOrPermissionChanges": false,
+    "dataChanges": false,
+    "targetQaRecordDisposition": "retained; no physical deletion or financial obligation/payment/country/relation/history/permission mutation"
+  },
+  "residueBoundary": {
+    "reusedReceipts": [
+      "artifacts/orbit360-recovery/release-control/I6_5_B4_003_EXACT_QA_RESIDUE_DEPENDENCIES_READBACK_20261030.json",
+      "artifacts/orbit360-recovery/release-control/I6_5_B4_003_EXACT_QA_RESIDUE_DEPENDENCIES_ADJUDICATION_20261030.json"
+    ],
+    "batchesPreserved": [
+      "14 original + 5 derived + 18 audit records (shared insurer excluded from deletion)",
+      "3 historical B2 policies + 12 financial dependencies + 3 activities"
+    ],
+    "deletion": "none"
+  },
+  "sourceTests": {
+    "status": "PASS",
+    "isolatedTestsPassed": 5,
+    "isolatedTestsFailed": 0,
+    "writes": 0,
+    "countries": [
+      "GT",
+      "CO",
+      "TODOS"
+    ],
+    "currencies": [
+      "GTQ",
+      "COP"
+    ],
+    "covered": [
+      "QA excluded from commercial indicators",
+      "legitimate business rows retained",
+      "pending/overdue/confirmed/inferred separation",
+      "currency separation",
+      "country aggregation without double count",
+      "explicit audit visibility",
+      "parentless/unresolved financial rows fail closed"
+    ],
+    "workflowRunId": 42122546474,
+    "jobId": 127578355312,
+    "jobConclusion": "success",
+    "log": "https://github.com/paulaosoriof86/orbit360-core/actions/runs/42122546474"
+  },
+  "immutablePreview": {
+    "status": "EXACT_ARTIFACT_SERVED_PREVIEW_PASS",
+    "url": "https://ays-orbit-360-lab--gi-i65-b4-rc-41765742748-neoi3u7r.web.app",
+    "buildId": "gi-i65-b4-4de6663ba3b3-57f234755dc1",
+    "sourceCommit": "4de6663ba3b3ca15c51d1c6332ffaa0cf501f589",
+    "workflowRunId": 42122546474,
+    "buildArtifactId": 13460181737,
+    "artifactZipSha256": "5923659b8cb2cf0d2a29ccc4f769e17e0f3c0fe9761358b324e6cb85efe92347",
+    "readbackArtifactId": 13458607901,
+    "readbackArtifactSha256": "88605f364a7e9dc0f8c33e7beb4b8fa4c1dc3c2d3465a7772bd34e7aaf4a48fb",
+    "servedArtifactExact": true,
+    "indexSha256": "cb247b83288392c5d636fcf8a6f757e9811d88592748bd9948a1a3be804c97a1",
+    "deployment": "existing isolated Hosting Preview only",
+    "functionsDeployed": 0,
+    "productionHostingChanged": false,
+    "livePromotion": false
+  },
+  "inicio": {
+    "sourceQa": {
+      "dashboardBackendDigestContract": "PASS",
+      "roleCountryTeamChecks": 42,
+      "personalCollectionUiChecks": 28,
+      "workflowRunId": 42122546474,
+      "evidence": "synthetic/mock-only; no real financial writes"
+    },
+    "historicalAuthenticatedReadback": {
+      "month": "2026-10",
+      "person": "Paula",
+      "personalGtNetProduction": "Q11,000 / Q80,000 meta = 14%",
+      "personalConfirmedCollection": "Q0 / Q50,000 meta = 0%",
+      "note": "five cobros totaling Q2,744 were dated 2026-07 and are not October collections"
+    },
+    "unresolved": [
+      "authenticated current advisor-attributed collection compared with canonical advisor target and currency",
+      "institutional value and individual contribution independently reconciled on the exact candidate",
+      "motivational copy, role-specific messages, source states and visual presentation signed by human",
+      "visual and role UAT on this exact Preview"
+    ],
+    "sourceQaDoesNotImplyAuthenticatedOrVisualAcceptance": true
+  },
+  "equipo": {
+    "priorWriterRunId": 42059870732,
+    "result": "EXACT_WRITER_AND_GOAL_CONTRACT_ALREADY_DEPLOYED_NOOP",
+    "operationalWrites": 0,
+    "currentReadback": "7 SIN_CLASIFICAR; classifications and inclusion toggle not editable in existing Preview",
+    "classificationsRepeated": false,
+    "acceptance": "pending user-facing writer/role UAT; no false completion claim"
+  },
+  "statuses": {
+    "sourcePass": true,
+    "isolatedTestPass": true,
+    "exactPreviewPass": true,
+    "latestApprovedVersionPreviewPass": false,
+    "livePass": false,
+    "formalAcceptance": false,
+    "productionAccepted": false
+  },
+  "governance": {
+    "historicalPassesPreserved": true,
+    "formalI6PercentPreserved": 50,
+    "p0ClosedPreserved": 1,
+    "p0Total": 6,
+    "b4003Closed": false,
+    "noDataReimport": true,
+    "noRulesChanges": true,
+    "noAuthChanges": true,
+    "noProductionDeployment": true,
+    "noProductionAcceptance": true,
+    "controlPlaneHistoricalTopLevelStatusConflict": "preserved without mutation; recovery state and currentB4 continue to govern the active HOLD"
+  },
+  "next": {
+    "financial": "authenticated exact-candidate readback by authorized role/country, including legitimate before/after, reload, and currency-separated reconciliation",
+    "inicio": "signed UAT for advisor attribution/meta/currency, institutional-vs-personal values, role copy/source status and visual presentation",
+    "equipo": "resume only when an authorized user-facing writer path exists; do not rerun classification writes absent that capability",
+    "release": "continue current B4-003 gate; no LIVE before all applicable gate evidence"
+  }
+}
