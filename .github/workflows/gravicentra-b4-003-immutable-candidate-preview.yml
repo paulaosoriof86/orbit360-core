@@ -1,6 +1,7 @@
 # B4-003 same-artifact release lane (reusable); does not touch LIVE, Rules, Auth or business data.
 # 2026-11-05: causal same-channel rebuild for source/runtime resource reconciliation (no LIVE/data changes).
 # 2026-11-05: final anti-drift commit - every canonical push runs governance; guarded from path-filter regressions.
+# 2026-11-05: advisor visibility selector and exact Inicio/Equipo served-byte readback.
 # 2026-11-05: final canonical HEAD after exact deployed goal-writer no-op and certification ledger sync.
 # 2026-11-04: exact same-channel candidate after Inicio signed-advisor first-paint fix.
 # 2026-11-04: same-channel causal rerun after Inicio event-listener VM compatibility guard.
@@ -234,7 +235,7 @@ jobs:
             echo 'PREVIEW_EXACT_BUILD_NOT_PROPAGATED_BEFORE_BOUNDED_DEADLINE' >&2
             exit 1
           fi
-          for rel in __recovery__/build.json product-runtime-config.js index.html modules/ops.js modules/leads.js modules/polizas.js modules/policy-receipts-v1199-detail-guard.js modules/cancelaciones.js modules/reportes.js modules/cobros.js modules/renovaciones.js core/assignable-advisor-roster-client.js core/ciclo.js data/store-firestore-product-operational-p0.js core/tenant-access-policy-effective-p0.js core/access-scope.js core/queries.js; do
+          for rel in __recovery__/build.json product-runtime-config.js index.html modules/inicio.js modules/equipo.js modules/ops.js modules/leads.js modules/polizas.js modules/policy-receipts-v1199-detail-guard.js modules/cancelaciones.js modules/reportes.js modules/cobros.js modules/renovaciones.js core/assignable-advisor-roster-client.js core/ciclo.js data/store-firestore-product-operational-p0.js core/tenant-access-policy-effective-p0.js core/access-scope.js core/queries.js; do
             mkdir -p "$RUNNER_TEMP/gi-e4-readback/$(dirname "$rel")"
             curl -fsSL --retry 12 --retry-all-errors --retry-delay 5 --max-time 25 "$PREVIEW_URL/$rel" > "$RUNNER_TEMP/gi-e4-readback/$rel"
             cmp "$ROOT/$rel" "$RUNNER_TEMP/gi-e4-readback/$rel"
@@ -251,6 +252,7 @@ jobs:
           const proof={
             schema:'I6_5_B4_003_IMMUTABLE_PREVIEW_RELEASE_BUNDLE_V1',
             sourceSha:process.env.SOURCE_SHA,buildId:b.buildId,previewUrl:process.env.PREVIEW_URL,
+            inicioSha256:digest('modules/inicio.js'),equipoSha256:digest('modules/equipo.js'),
             reportesSha256:digest('modules/reportes.js'),cobrosSha256:digest('modules/cobros.js'),cancelacionesSha256:digest('modules/cancelaciones.js'),
              renovacionesSha256:digest('modules/renovaciones.js'),qaResidueRegression:'SOURCE_TEST_PASS',
             rosterClientSha256:digest('core/assignable-advisor-roster-client.js'),
