@@ -99,6 +99,7 @@ jobs:
           echo "GOOGLE_APPLICATION_CREDENTIALS=$SELECTED" >> "$GITHUB_ENV"
           echo "FIREBASE_CLI_BIN=$CLI" >> "$GITHUB_ENV"
       - name: Save exact previous writer source and untouched roster metadata BEFORE
+        id: assess
         shell: bash
         run: |
           set -euo pipefail
@@ -106,13 +107,87 @@ jobs:
           node - <<'NODE'
           const fs=require('fs'),tmp=process.env.RUNNER_TEMP;
           const before=JSON.parse(fs.readFileSync(tmp+'/gi-b4003-live-sources-before.json','utf8'));
-          if(before.functions[0].name!=='orbit360AssignableAdvisorRoster'||before.functions[1].name!==process.env.GI_TARGET_FUNCTION||!before.rosterSourceMatchesCurrent||!before.writerSourceMatchesCurrent||before.writerGoalParticipationContractMatchesCurrent||!before.functions[1].goalParticipationContractSha256)throw Error('EXPECTED_ROSTER_AND_WRITER_CURRENT_BUT_GOAL_CONTRACT_OLD_PREDECESSOR_REQUIRED');
+          if(before.functions[0].name!=='orbit360AssignableAdvisorRoster'||before.functions[1].name!==process.env.GI_TARGET_FUNCTION||!before.rosterSourceMatchesCurrent||!before.writerSourceMatchesCurrent||!before.functions[1].goalParticipationContractSha256)throw Error('EXPECTED_EXACT_ROSTER_AND_WRITER_SOURCE_BYTES_REQUIRED');
           const x=JSON.parse(fs.readFileSync(tmp+'/gi-b4003-writer-before.json','utf8'));
           const raw=x.result??x,v=typeof raw==='string'?JSON.parse(raw):raw,rows=Array.isArray(v)?v:Array.isArray(v.functions)?v.functions:[];
           const names=rows.map(r=>String(r.id||r.name||r.function||'').split('/').pop()).sort();
           if(names.length!==81||!names.includes(process.env.GI_TARGET_FUNCTION))throw Error('PRELIVE_EXACT_81_FUNCTION_INVENTORY_DRIFT');
           fs.writeFileSync(tmp+'/gi-b4003-writer-before-names.json',JSON.stringify(names));
+          const alreadyExact=before.writerGoalParticipationContractMatchesCurrent===true;
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'needs_deploy='+(alreadyExact?'false':'true')+'\n');
+          if(alreadyExact) {
+            fs.writeFileSync(tmp+'/gi-b4003-writer-exact-result.json',JSON.stringify({
+              gate:'I6.5/B4-003',status:'EXACT_WRITER_AND_GOAL_CONTRACT_ALREADY_DEPLOYED_NOOP',
+              runId:process.env.GITHUB_RUN_ID,commit:process.env.GITHUB_SHA,
+              sourceGitBlob:process.env.EXACT_WRITER_GIT_BLOB,
+              goalContractGitBlob:process.env.EXACT_GOAL_CONTRACT_GIT_BLOB,
+              functionCountBefore:names.length,functionCountAfter:names.length,
+              onlyDeployed:null,readOnlyRosterSourceUnchanged:true,
+              hostingChanged:false,rulesChanged:false,operationalDataWritten:false,
+              productionAccepted:false,signedRoleUatPending:true
+            },null,2)+'\n');
+          }
           NODE
+          if grep -q '^needs_deploy=false"$RUNNER_TEMP/gi-b4003-live-writer-previous"
+          mkdir -p "$RESTORE_ROOT"
+          python3 - <<'PY'
+          import os,pathlib,zipfile,shutil
+          src=pathlib.Path(os.environ['RUNNER_TEMP'])/'gi-b4003-before-orbit360ProductOperationalCommand.zip'
+          dst=pathlib.Path(os.environ['RESTORE_ROOT']);ex=dst/'extract';ex.mkdir()
+          with zipfile.ZipFile(src) as z:z.extractall(ex)
+          dirs=[p.parent for p in ex.rglob('package.json') if (p.parent/'product-operational-domain.js').is_file() and (p.parent/'bootstrap.js').is_file() and (p.parent/'package-lock.json').is_file()]
+          if len(dirs)!=1:raise SystemExit('PREDECESSOR_WRITER_BACKUP_INCOMPLETE')
+          shutil.copytree(dirs[0],dst/'backend')
+          (dst/'firebase.json').write_text('{"functions":{"source":"backend","runtime":"nodejs22"}}\n')
+          PY
+          (cd "$RESTORE_ROOT/backend" && npm ci --ignore-scripts --no-audit --no-fund)
+          echo "RESTORE_ROOT=$RESTORE_ROOT" >> "$GITHUB_ENV"
+      - name: Upgrade ONLY existing operational writer and verify source/inventory parity
+        id: deploy_and_readback
+        if: steps.assess.outputs.needs_deploy == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          node "$FIREBASE_CLI_BIN" deploy --only functions:orbit360ProductOperationalCommand --config "$STAGE_ROOT/firebase.json" --project "$PROJECT_ID" --non-interactive
+          node tools/gravicentra-b4-003-live-backend-source-readback.cjs after
+          node "$FIREBASE_CLI_BIN" functions:list --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/gi-b4003-writer-after.json"
+          node - <<'NODE'
+          const fs=require('fs'),tmp=process.env.RUNNER_TEMP;
+          const before=JSON.parse(fs.readFileSync(tmp+'/gi-b4003-writer-before-names.json','utf8'));
+          const x=JSON.parse(fs.readFileSync(tmp+'/gi-b4003-writer-after.json','utf8'));
+          const raw=x.result??x,v=typeof raw==='string'?JSON.parse(raw):raw,rows=Array.isArray(v)?v:Array.isArray(v.functions)?v.functions:[];
+          const after=rows.map(r=>String(r.id||r.name||r.function||'').split('/').pop()).sort();
+          if(JSON.stringify(after)!==JSON.stringify(before))throw Error('NON_TARGET_FUNCTION_LIST_MUTATED');
+          const readback=JSON.parse(fs.readFileSync(tmp+'/gi-b4003-live-sources-after.json','utf8'));
+          if(!readback.writerSourceMatchesCurrent||!readback.rosterSourceMatchesCurrent||!readback.writerGoalParticipationContractMatchesCurrent)throw Error('LIVE_WRITER_GOAL_DEPENDENCY_AND_ROSTER_REQUIRED_BYTE_PARITIES_NOT_MET');
+          fs.writeFileSync(tmp+'/gi-b4003-writer-exact-result.json',JSON.stringify({gate:'I6.5/B4-003',status:'LIVE_EXACT_PRODUCT_WRITER_AND_GOAL_CONTRACT_BYTES_PASS_SIGNED_ROLE_UAT_PENDING_HOSTING_UNCHANGED',runId:process.env.GITHUB_RUN_ID,
+            commit:process.env.GITHUB_SHA,sourceGitBlob:process.env.EXACT_WRITER_GIT_BLOB,goalContractGitBlob:process.env.EXACT_GOAL_CONTRACT_GIT_BLOB,functionCountBefore:before.length,functionCountAfter:after.length,onlyDeployed:'orbit360ProductOperationalCommand',readOnlyRosterSourceUnchanged:true,
+            hostingChanged:false,rulesChanged:false,operationalDataWritten:false,productionAccepted:false},null,2)+'\n');
+          NODE
+      - name: Restore exact previous operational writer if deploy/readback fails
+        if: failure() && steps.deploy_and_readback.outcome == 'failure'
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f "$RESTORE_ROOT/backend/product-operational-domain.js"
+          node "$FIREBASE_CLI_BIN" deploy --only functions:orbit360ProductOperationalCommand --config "$RESTORE_ROOT/firebase.json" --project "$PROJECT_ID" --non-interactive
+          node tools/gravicentra-b4-003-live-backend-source-readback.cjs rollback
+          echo 'B4_003_EXACT_WRITER_PREDECESSOR_RECOVERED'
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: gi-b4003-live-writer-parity-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/gi-b4003-live-sources-before.json
+            ${{ runner.temp }}/gi-b4003-live-sources-after.json
+            ${{ runner.temp }}/gi-b4003-live-sources-rollback.json
+            ${{ runner.temp }}/gi-b4003-writer-exact-result.json
+          if-no-files-found: warn
+          retention-days: 30
+ "$GITHUB_OUTPUT"; then
+            echo 'B4_003_ALREADY_EXACT_NOOP_PASS: no backend redeployment'
+            exit 0
+          fi
           export RESTORE_ROOT="$RUNNER_TEMP/gi-b4003-live-writer-previous"
           mkdir -p "$RESTORE_ROOT"
           python3 - <<'PY'
