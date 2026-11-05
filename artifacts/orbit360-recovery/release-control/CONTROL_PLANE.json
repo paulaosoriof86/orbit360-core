@@ -18455,5 +18455,124 @@
     "formalI6Percent": 50,
     "p0Closed": 1,
     "p0Total": 6
+  },
+  "b4003CertificationInventory20261105": {
+    "schema": "GRAVICENTRA_I6_5_B4_003_CERTIFICATION_INVENTORY_AND_SYNC_20261105_V1",
+    "gate": "I6.5/B4-003",
+    "recordType": "ADDITIVE_RELEASE_SCOPED_CERTIFICATION_INDEX_NOT_GATE_PASS",
+    "status": "PRESERVE_HISTORICAL_PASSES_CURRENT_FOCAL_PASSES_FULL_B4003_HOLD",
+    "dateLocal": "2026-11-05",
+    "authority": "CONTROL_PLANE_CURRENT_B4003_POINTER_AND_PHYSICAL_RECEIPTS",
+    "historicalEvergreenCapabilities": {
+      "count": 15,
+      "previewAccepted": 15,
+      "liveAccepted": 15,
+      "status": "PRESERVED_HISTORICAL_CERTIFIED_CANDIDATE_NOT_CURRENT_B4003_REACCEPTANCE",
+      "ledgerPath": "artifacts/orbit360-recovery/release-control/CAPABILITY_STATUS_LEDGER.json",
+      "ledgerBlobSha": "7b7a14d834c31f5e6f1d5142dc92532119b9f437",
+      "sourceSha": "4bf67a3738751fe2432a130fd23254a6f1c7d16e",
+      "buildId": "gi-i65-4bf67a373875-57f234755dc1",
+      "doNotReopenWithoutCausalChange": true
+    },
+    "currentB4003Evidence": [
+      {
+        "id": "SIGNED_REAL_UID_ROSTER_CALLABLE",
+        "status": "PASS_SCOPE_ONLY",
+        "signedChecks": 30,
+        "totalChecks": 30,
+        "identities": [
+          "Paula",
+          "Carlos",
+          "Samuel"
+        ],
+        "workflowRunId": 41853402508,
+        "sourceSha": "b094619281c1f2ccef7e08335adedc76cf878bbc",
+        "sourceBinding": "CALLABLE_ROSTER_ONLY",
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_SIGNED_REAL_UID_CALLABLE_NEGATIVES_PASS_20261104.json"
+      },
+      {
+        "id": "SYNTHETIC_PAYMENT_WRITE_RELOAD_RECONCILE_RESTORE",
+        "status": "PASS_SCOPE_ONLY",
+        "createRunId": 41807435779,
+        "cleanupRunId": 41807875649,
+        "sourceSha": "3bf9996da14fa1799dd3671581aad706d754d218",
+        "zeroResidue": true,
+        "doesNotRequireNewRealNovemberCobro": true,
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_FROZEN_SYNTHETIC_WRITE_RELOAD_RESTORE_PASS_20261104.json"
+      },
+      {
+        "id": "INICIO_AUTH_PAULA_DIRECCION_SOURCE_READINESS_COUNTRY",
+        "status": "PREVIEW_FOCAL_PASS_SCOPE_ONLY",
+        "previewSourceCommit": "d67c67638c849083523cb2640d2a11ec3249bc36",
+        "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-rc-41765742748-neoi3u7r.web.app/",
+        "checks": [
+          {
+            "country": "TODOS",
+            "sourcesConfirmed": "5/5"
+          },
+          {
+            "country": "GUATEMALA",
+            "sourcesConfirmed": "5/5"
+          },
+          {
+            "country": "COLOMBIA",
+            "sourcesConfirmed": "5/5"
+          }
+        ],
+        "selectedCountryRestored": "TODOS",
+        "backendService": "orbit360scopedpolicyreadpreview",
+        "backendActualConfigVerified": "1GiB_memory_maxInstances4_concurrency4",
+        "doesNotProveOtherRolesOrAllModules": true
+      },
+      {
+        "id": "SIGNED_CARLOS_AND_SAMUEL_PREVIOUS_ROLE_UAT",
+        "status": "PARTIAL_SIGNED_PREVIEW_EVIDENCE_PRESERVED",
+        "scope": "ONLY_PREVIOUSLY_PROVEN_ROLES_COUNTRIES_AND_MODULES",
+        "notAutomaticFullCurrentReleasePass": true
+      },
+      {
+        "id": "OPS_LEADS_HUMAN_AUTHOR_LABELS",
+        "status": "PARTIAL_REAL_UI_OBSERVATION_NOT_TRANSVERSAL_PASS",
+        "namedAuthorsObserved": 3,
+        "unresolvedHistoricalAuthorsAtLeast": 1,
+        "referenceControlKey": "b4003OpsLeadsHumanNameObserved20261104"
+      }
+    ],
+    "currentReleaseBinding": {
+      "latestProductSourceChangeCommit": "e41b957fa27a5164d6d53a96bbd808b1d1e797c7",
+      "hostingSourceCommit": "d67c67638c849083523cb2640d2a11ec3249bc36",
+      "difference": "ONE_BACKEND_FUNCTION_RESOURCE_CONFIG_SOURCE_FILE",
+      "artifactAndCurrentProductSourceIdentical": false,
+      "noSameArtifactPromotionUntilReconciled": true,
+      "backendServiceRuntimeRepairedForReadiness": true
+    },
+    "openClosure": {
+      "formalI6Percent": 50,
+      "p0Closed": 1,
+      "p0Total": 6,
+      "b4003Closed": false,
+      "productionPromotionAuthorized": false,
+      "remainingEvidenceRequired": [
+        "B4_003_CURRENT_SOURCE_ARTIFACT_DIGEST_PARITY",
+        "SIGN_INDEPENDENT_ROLE_COUNTRY_ADVISOR_SCOPES_ON_CURRENT_CANDIDATE",
+        "FIVE_REMAINING_P0_DECISIONS_AND_EXACT_EVIDENCE",
+        "GOAL_PARTICIPATION_TARGETED_WRITER_DEPLOY_AND_READBACK",
+        "OPS_LEADS_AUTHOR_RESOLVER_TRANSVERSAL",
+        "FULL_CURRENT_MODULE_MATRIX_PREVIEW_THEN_SAME_ARTIFACT_LIVE_READBACK"
+      ]
+    },
+    "projectSources": {
+      "package": "GRAVICENTRA_PROJECT_SOURCES_EVERGREEN_V7",
+      "exactCanonicalFiles": 9,
+      "verifiedMatches": 9,
+      "controlFlagCleared": true,
+      "guardedByRunId": 42051099728,
+      "guardConclusion": "success"
+    },
+    "noRealBusinessWrites": true,
+    "noDataReimport": true,
+    "noRulesRedeploy": true,
+    "noLivePromotion": true,
+    "certificatesOnlyReopenedByCausalInvalidation": true
   }
 }
