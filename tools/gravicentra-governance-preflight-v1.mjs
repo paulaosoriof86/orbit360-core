@@ -12,6 +12,13 @@ function run(cmd,args){
   if(r.status!==0) throw new Error('GRAVICENTRA_PREFLIGHT_COMMAND_FAILED:'+cmd+' '+args.join(' ')+':'+String(r.status));
 }
 
+// Preserve a universal governance trigger. A path-filter here silently skipped
+// Inicio/Equipo changes while allowing older release proof to look current.
+const workflowTrigger=fs.readFileSync('.github/workflows/gravicentra-release-lock-sync.yml','utf8').split(/^permissions:/m)[0];
+const canonicalPush='  push:\n    branches:\n      - recovery/fase-a-clean-20260831\n';
+if(!workflowTrigger.includes(canonicalPush)||/^    paths(?:-ignore)?:/m.test(workflowTrigger))
+  throw new Error('GRAVICENTRA_CANONICAL_GUARD_PUSH_PATH_FILTER_FORBIDDEN');
+
 const node=process.execPath;
 const controlPath='artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json';
 const control=JSON.parse(fs.readFileSync(controlPath,'utf8'));
