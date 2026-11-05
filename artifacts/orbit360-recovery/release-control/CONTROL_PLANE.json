@@ -18574,5 +18574,77 @@
     "noRulesRedeploy": true,
     "noLivePromotion": true,
     "certificatesOnlyReopenedByCausalInvalidation": true
+  },
+  "b4003SameCandidateWriterNoopContinuity20261105": {
+    "schema": "GI_B4003_CANDIDATE_WRITER_SYNC_20261105_V1",
+    "gate": "I6.5/B4-003",
+    "dateLocal": "2026-11-05",
+    "recordType": "ADDITIVE_CAUSAL_READBACK_NOT_GATE_PASS",
+    "existingIsolatedPreview": {
+      "url": "https://ays-orbit-360-lab--gi-i65-b4-rc-41765742748-neoi3u7r.web.app/",
+      "sourceSha": "bdc2e645e1f95d907d6ffa4aa431bbb2b5a384b0",
+      "buildId": "gi-i65-b4-bdc2e645e1f9-57f234755dc1",
+      "immutableWorkflowRunId": 42058026446,
+      "conclusion": "success",
+      "bundleArtifactId": 13429149099,
+      "artifactZipDigestSha256": "176be5d082b27125741ba9bad866c4e6ae40b02cd2a57f75553751eda55677a7",
+      "readbackArtifactId": 13428964635,
+      "servedSelectedFileBytesExact": true,
+      "previousLiveHostingSiteUnchanged": true,
+      "customLiveDomainUnchanged": true
+    },
+    "signedPaulaDireccionInicio": {
+      "state": "PREVIEW_FOCAL_PASS_CURRENT_CANDIDATE_NOT_GLOBAL_GATE",
+      "country": "TODOS",
+      "sourcesConfirmed": "5/5",
+      "previousCountryEvidence": [
+        "GUATEMALA_5_OF_5",
+        "COLOMBIA_5_OF_5"
+      ],
+      "recargaCompletaSinAvisoRojo": true,
+      "freelanceAdvisorSelectorStillAbsent": true
+    },
+    "existingBackendWriterNoop": {
+      "verifiedRunId": 42059870732,
+      "conclusion": "success",
+      "status": "EXACT_WRITER_AND_GOAL_CONTRACT_ALREADY_DEPLOYED_NOOP",
+      "sourceReadback": {
+        "rosterMatchesCurrent": true,
+        "writerMatchesCurrent": true,
+        "goalParticipationContractMatchesCurrent": true
+      },
+      "rosterGitBlob": "9778d74b6d305ff56caf73bb68be3dadac4b14ce",
+      "writerGitBlob": "b3d0059457142659633498c9c52c6b84ea68200f",
+      "contractGitBlob": "ff86fa441fd6cb4ec6254e2dc5078a37bf68fc36",
+      "functionCount": 81,
+      "functionsDeployed": 0,
+      "hostingChanges": 0,
+      "operationalDataWrites": 0,
+      "rulesChanges": 0,
+      "staleAssumptionGuardRepairedByCommit": "d085797c02e667b5e95d30e0eb0608460f38a82f"
+    },
+    "teamReadback": {
+      "signedUser": "Paula Dirección",
+      "advisorsVisible": 7,
+      "participationClassifications": "7 SIN_CLASIFICAR",
+      "classificationsEditableInPreview": false,
+      "inclusionToggleEditableInPreview": false,
+      "why": "PREVIEW_FAIL_CLOSED_WRITE_BLOCK",
+      "personalManualEditRequested": false,
+      "backendParityDoesNotImplyUserFacingWriteAcceptance": true
+    },
+    "governance": {
+      "evergreenSourceExactMatches": "9/9",
+      "historicalCertifiedPreviewCount": 15,
+      "historicalCertifiedLiveCount": 15,
+      "historicalPassesPreserved": true,
+      "currentB4003Status": "HOLD",
+      "formalI6Percent": 50,
+      "sixPriorityP0Resolved": 1,
+      "sixPriorityP0Total": 6,
+      "sameBuildLivePromotion": false,
+      "noProductionAccepted": true,
+      "next": "AFTER_THIS_CP_UPDATE_REBUILD_ONE_FINAL_HEAD_IMMUTABLE_BUNDLE_IN_SAME_PREVIEW_THEN_SIGNED_ROLE_COUNTRY_UAT_WITHOUT_REOPENING_HISTORIC_PASS"
+    }
   }
 }
