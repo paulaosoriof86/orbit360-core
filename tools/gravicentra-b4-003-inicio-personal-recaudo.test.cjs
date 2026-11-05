@@ -85,9 +85,9 @@ assert.match(html,/Hay 2 pólizas que vencen dentro de 45 días y requieren prio
 assert.match(html,/Hay 2 obligaciones vencidas visibles; revisa su gestión y aplicación\./);checks++;
 // Advisor display selection is a client-side view filter, never a financial or goal mutation.
 roster.dashboardPeek=()=>[
- {...row(),id:'a1',nombre:'Interno QA',tipoVinculacion:'interno',participaMetas:true,pendienteClasificacion:false},
- {...row(),id:'a2',nombre:'Freelance QA',tipoVinculacion:'freelance',participaMetas:false,pendienteClasificacion:false},
- {...row(),id:'a3',nombre:'Por clasificar QA',tipoVinculacion:'sin_clasificar',participaMetas:false,pendienteClasificacion:true}
+ {...row(),id:'a1',primaryCountry:'GT',nombre:'Interno QA',tipoVinculacion:'interno',participaMetas:true,pendienteClasificacion:false},
+ {...row(),id:'a2',primaryCountry:'GT',nombre:'Freelance QA',tipoVinculacion:'freelance',participaMetas:false,pendienteClasificacion:false},
+ {...row(),id:'a3',primaryCountry:'GT',nombre:'Por clasificar QA',tipoVinculacion:'sin_clasificar',participaMetas:false,pendienteClasificacion:true}
 ];
 role='Operativo';scope='GT';vinculo='interno';
 html=render();
