@@ -39,7 +39,7 @@ function fixture(country){
     {id:'unparentedPayment',pais:'GT',moneda:'GTQ',monto:50,estado:'Pagado',fechaPago:'2026-11-05',conciliado:true},
     {id:'inferredPayment',polizaId:'pGT',clienteId:'cGT',pais:'GT',moneda:'GTQ',monto:2500,estado:'Pagado',fechaPago:'2026-11-05',paymentState:'PAID_INFERRED'}
   ];
-  const collections={clientes,polizas:policies,carteraPrimas:cartera,cobros:payments,recibosEsperados:[],vehiculos:[],asesores:[],comisiones:[],cancelaciones:[],actividades:[],metas:[]};
+  const collections={clientes:clients,polizas:policies,carteraPrimas:cartera,cobros:payments,recibosEsperados:[],vehiculos:[],asesores:[],comisiones:[],cancelaciones:[],actividades:[],metas:[]};
   let writes=0;
   const store={
     all:key=>collections[key]||[],
