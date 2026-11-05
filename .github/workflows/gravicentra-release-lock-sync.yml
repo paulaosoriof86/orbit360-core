@@ -1,20 +1,12 @@
 name: Gravicentra Control Plane Guard v5
-# B4-003 Meta TR v27: trigger governance-only readback of the immutable single-case successor.
+# B4-003 anti-drift: governance runs for EVERY canonical commit; no path-filter bypass.
+# This is read-only CI. Preview/production transport remains separate and source-digest bound.
 
 on:
   workflow_dispatch:
   push:
     branches:
       - recovery/fase-a-clean-20260831
-    paths:
-      - '.github/workflows/gravicentra-*'
-      - 'tools/gravicentra-*'
-      - 'orbit360-platform/core/access-scope.js'
-      - 'orbit360-platform/core/backend-product-readonly-bootstrap-p0.js'
-      - 'orbit360-platform/data/store-firestore-product-readonly-p0.js'
-      - 'functions/b4-003-scoped-*'
-      - 'artifacts/orbit360-recovery/release-control/**'
-      - 'artifacts/orbit360-recovery/project-sources-v2/**'
 
 permissions:
   contents: read
