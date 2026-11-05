@@ -767,8 +767,8 @@
     "manifestBlobSha": "b598fdd65a88a6fc20d0b9ea34caccfdf21dc9f5",
     "deltaAddendumPath": "artifacts/orbit360-recovery/project-sources-v2/v5/07_ADDENDUM_ACTUALIZACION_INCREMENTAL_DELTA_EVERGREEN_V5_2026-09-16.md",
     "deltaAddendumBlobSha": "637556b30de4dc346ef55e284c83175fabb921b8",
-    "staticSourceUpdateRequired": true,
-    "reason": "Repository-side Evergreen V7 package is materialized. ChatGPT Project sources still require catch-up synchronization: retain canonical V3-V5/V4 sources, add V6 canonical-composition/findings addendum and V7 payment/cobro/date semantics addendum; only then may this flag be cleared after readback.",
+    "staticSourceUpdateRequired": false,
+    "reason": null,
     "operationalStateChangesDoNotRequireReplacement": true,
     "notificationRequiredWhenFlagTrue": true,
     "compositionModel": "IMMUTABLE_RETAINED_V6_PLUS_V7_PAYMENT_DATE_ADDENDUM",
@@ -795,11 +795,8 @@
       "requiresEvergreenSuccessorOnlyAfterAdjudication": true
     },
     "projectSynchronization": {
-      "status": "REPO_V7_GUARD_PASS_PROJECT_SOURCE_SYNC_PENDING",
-      "requiredAdds": [
-        "09_ADDENDUM_COMPOSICION_CANONICA_Y_LEDGER_HALLAZGOS_EVERGREEN_V6_2026-09-24.md",
-        "11_ADDENDUM_PAGOS_COBROS_CONCILIACION_FECHAS_INFERENCIA_EVERGREEN_V7_2026-09-26.md"
-      ],
+      "status": "REPO_V7_PROJECT_SOURCE_READBACK_9_OF_9_PASS_20261105",
+      "requiredAdds": [],
       "duplicateCleanupAfterReadback": true,
       "staticSourceUpdateRequiredMayClearOnlyAfterProjectReadback": true,
       "productSourceChanged": false,
@@ -815,6 +812,60 @@
         "receiptBlobSha": "88038c5e696e697b96d5e552006b5dc9cc9021f9",
         "keepExistingSources": true,
         "readbackRequiredBeforeClearingFlag": true
+      },
+      "resolvedAdds": [
+        "09_ADDENDUM_COMPOSICION_CANONICA_Y_LEDGER_HALLAZGOS_EVERGREEN_V6_2026-09-24.md",
+        "11_ADDENDUM_PAGOS_COBROS_CONCILIACION_FECHAS_INFERENCIA_EVERGREEN_V7_2026-09-26.md"
+      ],
+      "projectReadback20261105": {
+        "status": "PASS",
+        "dateLocal": "2026-11-05",
+        "sourceCount": 9,
+        "exactGitBlobMatches": 9,
+        "manifestBlobSha": "b598fdd65a88a6fc20d0b9ea34caccfdf21dc9f5",
+        "projectSourceSnapshot": "ATTACHED_PROJECT_SOURCES_CURRENT_WORKSPACE",
+        "files": [
+          {
+            "name": "00_DOCUMENTO_MAESTRO_EVERGREEN_V3.md",
+            "blobSha": "02104f71e91f5b87b770c06076c0be73904a4e0e"
+          },
+          {
+            "name": "01_ADDENDUM_GOBIERNO_SINCRONIZACION_Y_NOTIFICACION_V3.md",
+            "blobSha": "52e8120c696a22520aa2a5629b1727bb185d4444"
+          },
+          {
+            "name": "02_MATRIZ_CRITERIOS_FASE_A_EVERGREEN_V3.md",
+            "blobSha": "ef7a98f0b0a7ac5c88a382dcb7593a5b81cea6fc"
+          },
+          {
+            "name": "03_MANIFIESTO_CAPACIDADES_FASE_A_EVERGREEN_V3.json",
+            "blobSha": "245636b29bd1e1dd6e28b79b01390a9983f3b0a8"
+          },
+          {
+            "name": "04_LEEME_REANUDACION_Y_AUTORIDAD_V3.md",
+            "blobSha": "805cffe8ccc3cf21cfca7cde0c471c3dfbed8e0d"
+          },
+          {
+            "name": "06_ADDENDUM_FASE_A_POSTSALIDA_I6_EVERGREEN_V4.md",
+            "blobSha": "4bcb87748e3fa425a5870238572c56e399bc01ac"
+          },
+          {
+            "name": "07_ADDENDUM_ACTUALIZACION_INCREMENTAL_DELTA_EVERGREEN_V5_2026-09-16.md",
+            "blobSha": "637556b30de4dc346ef55e284c83175fabb921b8"
+          },
+          {
+            "name": "09_ADDENDUM_COMPOSICION_CANONICA_Y_LEDGER_HALLAZGOS_EVERGREEN_V6_2026-09-24.md",
+            "blobSha": "40b57682f89fc134bc95c5806b71a34bc4119882"
+          },
+          {
+            "name": "11_ADDENDUM_PAGOS_COBROS_CONCILIACION_FECHAS_INFERENCIA_EVERGREEN_V7_2026-09-26.md",
+            "blobSha": "b51eb0f37f48a4fcab0336b8b300c559b0f76714"
+          }
+        ],
+        "extraProjectSourcesDisposition": "PRESERVE_UNLESS_VERIFIED_EXACT_DUPLICATE_AND_SEPARATELY_AUTHORIZED",
+        "noProductSourceChange": true,
+        "noOperationalDataWrite": true,
+        "controlScope": "PROJECT_SOURCES_STATIC_SYNC_ONLY"
       }
     }
   },
