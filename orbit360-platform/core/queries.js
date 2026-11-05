@@ -266,7 +266,7 @@ Orbit.q = (function () {
     const comisionGen = com.reduce((s, c) => s + amount(c.monto), 0);
     const porRenovar = pol.filter(p => p.estado === 'Por renovar').length;
     const salud = saludCliente(cli, vigentes, vencido);
-    const policyIndex = new Map(pol.filter(p => p && p.id != null).map(p => [String(p.id), p]));
+    const policyIndex = new Map(pol.filter(p => p && p.id != null).map(p => [p.id, p]));
     const currencySummary = clientMoneyBreakdown(pol, car, realized, com, amountIndex, policyIndex);
     return {
       cli, pol, rec, car, cob, com,
@@ -407,6 +407,35 @@ Orbit.q = (function () {
     if (row.__syntheticQa === true || row.syntheticQa === true) return true;
     return /^B2 QA firme(?:\s|$)/i.test(String(row.sourceRef || '').trim());
   }
+  // Commercial financial totals require a resolvable policy/client lineage.
+  // QA markers are inherited from either parent; only an explicit audit
+  // request may include those rows, without changing country or parent scope.
+  function financeParentContext(row, clients, policies) {
+    if (!row) return {verified:false,policy:null,client:null,policyClient:null};
+    const policyId = row.polizaId == null || String(row.polizaId).trim()==='' ? null : row.polizaId;
+    const clientId = row.clienteId == null || String(row.clienteId).trim()==='' ? null : row.clienteId;
+    const lookup = (index,id) => index instanceof Map ? (index.get(id) || index.get(String(id))) : S().get('clientes',id);
+    const policy = policyId == null ? null : (policies instanceof Map ? (policies.get(policyId) || policies.get(String(policyId))) : S().get('polizas',policyId));
+    const client = clientId == null ? null : lookup(clients,clientId);
+    if (policyId != null && !policy) return {verified:false,policy:null,client,policyClient:null};
+    if (clientId != null && !client) return {verified:false,policy,client:null,policyClient:null};
+    const parentClientId = policy && policy.clienteId != null && String(policy.clienteId).trim()!=='' ? String(policy.clienteId) : null;
+    const policyClient = parentClientId == null ? null : lookup(clients,parentClientId);
+    if (policy && (!parentClientId || !policyClient)) return {verified:false,policy,client,policyClient};
+    if (policy && client && String(client.id) !== String(policyClient.id)) return {verified:false,policy,client,policyClient};
+    return {verified:!!(policy || client),policy,client,policyClient};
+  }
+  function isCommercialQaRecord(row, clients, policies) {
+    if (isSyntheticQaRecord(row)) return true;
+    const parents=financeParentContext(row,clients,policies);
+    return isSyntheticQaRecord(parents.policy) || isSyntheticQaRecord(parents.client) ||
+      isSyntheticQaRecord(parents.policyClient);
+  }
+  function commercialFinanceRow(row, clients, policies, options) {
+    if (!financeParentContext(row,clients,policies).verified) return false;
+    const auditQa=!!(options && options.mode==='audit' && options.includeSyntheticQa===true);
+    return auditQa || !isCommercialQaRecord(row,clients,policies);
+  }
   function realizedPaymentRows() {
     const cobros = (S().all('cobros') || []).filter(confirmedCobro);
     const linkedReceiptIds = new Set(cobros.map(c => String(c && (c.reciboId || c.receiptId) || '').trim()).filter(Boolean));
@@ -476,10 +505,9 @@ Orbit.q = (function () {
     // A personal recaudo is attributable only to the canonical policy advisor.
     // Preserve the existing institution-wide total when advisorId is omitted.
     const requestedAdvisor = String(advisorId == null ? '' : advisorId).trim();
-    realizedPaymentRows().filter(r => rowPais(r, clients, policies)).forEach(r => {
+    realizedPaymentRows().filter(r => rowPais(r, clients, policies) &&
+      commercialFinanceRow(r,clients,policies)).forEach(r => {
       if (paymentBusinessDate(r).slice(0, 7) !== key) return;
-      if (isSyntheticQaRecord(r) || isSyntheticQaRecord(policies.get(r.polizaId)) ||
-          isSyntheticQaRecord(S().get('clientes', r.clienteId))) return;
       if (requestedAdvisor) {
         const policy = r.polizaId != null ? policies.get(r.polizaId) : null;
         const policyAdvisor = String(policy && policy.asesorId || '').trim();
@@ -530,28 +558,34 @@ Orbit.q = (function () {
   function carteraVencidaDe(cliId) {
     return carteraPrimasDe(cliId).filter(portfolioIsOverdue);
   }
-  function carteraRowsScoped() {
+  function carteraRowsScoped(options) {
     const clients = clientIndex();
-    const policies = new Map((S().all('polizas') || []).filter(p => p && p.id != null).map(p => [p.id, p]));
-    return (S().all('carteraPrimas') || []).filter(c => policyLinkedRowPais(c, clients, policies));
+    const policies = new Map((S().all('polizas') || []).filter(p => p && p.id != null).map(p => [String(p.id), p]));
+    return (S().all('carteraPrimas') || []).filter(c =>
+      policyLinkedRowPais(c, clients, policies) && commercialFinanceRow(c,clients,policies,options));
   }
-  function carteraPendienteRows() { return carteraRowsScoped().filter(r => portfolioOpen(r) && !portfolioIsOverdue(r)); }
-  function carteraVencidaRows() { return carteraRowsScoped().filter(portfolioIsOverdue); }
-  function cobrosConfirmadosRows() {
+  function carteraPendienteRows(options) {
+    return carteraRowsScoped(options).filter(r => portfolioOpen(r) && !portfolioIsOverdue(r));
+  }
+  function carteraVencidaRows(options) {
+    return carteraRowsScoped(options).filter(portfolioIsOverdue);
+  }
+  function cobrosConfirmadosRows(options) {
     const clients = clientIndex();
-    const policies = new Map((S().all('polizas') || []).filter(p => p && p.id != null).map(p => [p.id, p]));
-    return realizedPaymentRows().filter(r => rowPais(r, clients, policies) && confirmedCobro(r));
+    const policies = new Map((S().all('polizas') || []).filter(p => p && p.id != null).map(p => [String(p.id), p]));
+    return realizedPaymentRows().filter(r => rowPais(r, clients, policies) &&
+      commercialFinanceRow(r,clients,policies,options) && confirmedCobro(r));
   }
-
   /** Cartera Primas es la autoridad de pendiente/vencido; Cobros solo aporta recaudo confirmado. */
-  function carteraGlobal() {
+  function carteraGlobal(options) {
     const clients = clientIndex();
-    const policies = new Map((S().all('polizas') || []).filter(p => p && p.id != null).map(p => [p.id, p]));
-    const cob = realizedPaymentRows().filter(c => rowPais(c, clients, policies));
-    const pendingRows = carteraPendienteRows();
-    const overdueRows = carteraVencidaRows();
+    const policies = new Map((S().all('polizas') || []).filter(p => p && p.id != null).map(p => [String(p.id), p]));
+    const cob = realizedPaymentRows().filter(c => rowPais(c, clients, policies) &&
+      commercialFinanceRow(c,clients,policies,options) && confirmedCobro(c));
+    const pendingRows = carteraPendienteRows(options);
+    const overdueRows = carteraVencidaRows(options);
     const finance=portfolioAmountContext();
-    const alDia = cob.filter(confirmedCobro).reduce((s, c) => s + norm(c.monto, c.moneda), 0);
+    const alDia = cob.reduce((s, c) => s + norm(c.monto, c.moneda), 0);
     const pend = pendingRows.reduce((s, r) => s + norm(portfolioAmountValue(r,finance), currencyCodeFor(r,clients,policies)), 0);
     const venc = overdueRows.reduce((s, r) => s + norm(portfolioAmountValue(r,finance), currencyCodeFor(r,clients,policies)), 0);
     return { alDia, pend, venc, moneda: monedaPais(), source: 'cobros+carteraPrimas' };
@@ -564,10 +598,11 @@ Orbit.q = (function () {
     return String((policy && (policy.moneda || policy.divisa)) || row.moneda || (client && client.moneda) || '').trim().toUpperCase() || 'SIN_MONEDA';
   }
   function emptyPortfolioCurrency() { return { alDia: 0, pend: 0, venc: 0, porConciliar: 0 }; }
-  function carteraGlobalPorMoneda() {
+  function carteraGlobalPorMoneda(options) {
     const clients = clientIndex();
-    const policies = new Map((S().all('polizas') || []).filter(p => p && p.id != null).map(p => [p.id, p]));
-    const confirmedSource = realizedPaymentRows().filter(confirmedCobro);
+    const policies = new Map((S().all('polizas') || []).filter(p => p && p.id != null).map(p => [String(p.id), p]));
+    const confirmedSource = realizedPaymentRows().filter(c => confirmedCobro(c) &&
+      commercialFinanceRow(c,clients,policies,options));
     const cob = confirmedSource.filter(c => rowPais(c, clients, policies));
     const unassigned = paisActivo() ? [] : confirmedSource.filter(c => !['GT','CO'].includes(policyLinkedCountry(c, clients, policies)));
     const unassignedConfirmedByCurrency = {};
@@ -576,7 +611,8 @@ Orbit.q = (function () {
       unassignedConfirmedByCurrency[cur] = (unassignedConfirmedByCurrency[cur] || 0) + amount(c.monto);
     });
     const portfolioSource=S().all('carteraPrimas') || [];
-    const car = portfolioSource.filter(c => policyLinkedRowPais(c, clients, policies));
+    const car = portfolioSource.filter(c => policyLinkedRowPais(c, clients, policies) &&
+      commercialFinanceRow(c,clients,policies,options));
     const finance=portfolioAmountContext({portfolios:portfolioSource,policies:[...policies.values()]});
     const byCurrency = {};
     let confirmedCount = 0, porConciliarCount = 0;
@@ -612,14 +648,14 @@ Orbit.q = (function () {
       fxAuthorityUsed: false
     };
   }
-  function agingVencidoPorMoneda() {
+  function agingVencidoPorMoneda(options) {
     const clients = clientIndex();
-    const policies = new Map((S().all('polizas') || []).filter(p => p && p.id != null).map(p => [p.id, p]));
+    const policies = new Map((S().all('polizas') || []).filter(p => p && p.id != null).map(p => [String(p.id), p]));
     const byCurrency = {},portfolioSource=S().all('carteraPrimas')||[];
     const finance=portfolioAmountContext({portfolios:portfolioSource,policies:[...policies.values()]});
     const ensure = cur => byCurrency[cur] || (byCurrency[cur] = { '1-30': 0, '31-60': 0, '61-90': 0, '90+': 0 });
     portfolioSource
-      .filter(r => policyLinkedRowPais(r, clients, policies))
+      .filter(r => policyLinkedRowPais(r, clients, policies) && commercialFinanceRow(r,clients,policies,options))
       .filter(portfolioIsOverdue)
       .forEach(r => {
         const due = portfolioDue(r);

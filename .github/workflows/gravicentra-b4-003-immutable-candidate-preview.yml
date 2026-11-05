@@ -15,6 +15,8 @@ on:
     branches: [recovery/fase-a-clean-20260831]
     paths:
       - .github/workflows/gravicentra-b4-003-immutable-candidate-preview.yml
+      - orbit360-platform/core/queries.js
+      - tools/gravicentra-b4-003-financial-qa-commercial-exclusion.test.cjs
 
 permissions:
   contents: read
@@ -68,7 +70,7 @@ jobs:
           test "$(git rev-parse HEAD:orbit360-platform/core/ciclo.js)" = 'b795d9fdcf29d7c9e110e89ae56f3044835ac81a'
           test "$(git rev-parse HEAD:orbit360-platform/modules/ops.js)" = 'eadc3ffd5ce9eb8c3c696870a8a7069f78908dc1'
           test "$(git rev-parse HEAD:orbit360-platform/modules/leads.js)" = 'f4af7b02d79890ca7ab8c39fb9f0269dac772b93'
-          test "$(git rev-parse HEAD:orbit360-platform/core/queries.js)" = 'd9255d9c55517078b7458532b0b684dd8b1717b8'
+          test "$(git rev-parse HEAD:orbit360-platform/core/queries.js)" = '391d6c7df59b5d6fbb64adb419cb240c078545b8'
           test "$(git rev-parse HEAD:orbit360-platform/modules/cobros.js)" = '34dd080d88fe764d7858813843b7184c64d4cdc2'
           test "$(git rev-parse HEAD:tools/gravicentra-b4-003-e4-anulado-projection.test.cjs)" = '3f471893daabc44e3d226b6983393114d568c1f8'
           test -f artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json
@@ -88,6 +90,7 @@ jobs:
           node --check orbit360-platform/data/store-firestore-product-operational-p0.js
           node tools/gravicentra-b4-003-inicio-role-country-team.test.cjs
           node tools/gravicentra-b4-003-inicio-personal-recaudo.test.cjs
+          node tools/gravicentra-b4-003-financial-qa-commercial-exclusion.test.cjs
           node tools/gravicentra-b4-003-ops-leads-role-scopes.test.cjs
           node tools/gravicentra-b4-003-ops-leads-advisor-r38.test.cjs
           # Keep the certified ciclo.js SHA unchanged; inbox author formatting is a separate presentation owner.
@@ -159,6 +162,7 @@ jobs:
           cmp orbit360-platform/modules/cancelaciones.js "$ROOT/modules/cancelaciones.js"
           cmp orbit360-platform/modules/reportes.js "$ROOT/modules/reportes.js"
           cmp orbit360-platform/core/access-scope.js "$ROOT/core/access-scope.js"
+          cmp orbit360-platform/core/queries.js "$ROOT/core/queries.js"
           cmp orbit360-platform/core/tenant-access-policy-effective-p0.js "$ROOT/core/tenant-access-policy-effective-p0.js"
            cmp orbit360-platform/modules/cobros.js "$ROOT/modules/cobros.js"
           cmp orbit360-platform/modules/renovaciones.js "$ROOT/modules/renovaciones.js"
