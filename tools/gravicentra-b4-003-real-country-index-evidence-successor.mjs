@@ -90,7 +90,7 @@ function verifyProjectSourceReadback(after){
  need(ps.reason===null,'PROJECT_SOURCE_FALSE_FLAG_REASON_INVALID');
  need(Array.isArray(ps.projectSynchronization?.requiredAdds)&&
   ps.projectSynchronization.requiredAdds.length===0,'PROJECT_SOURCE_PENDING_ADDS_REMAIN');
- const records=Object.entries(ps.projectSynchronization||{}).filter(([k])=>/^projectReadback\\d{8}$/.test(k));
+ const records=Object.entries(ps.projectSynchronization||{}).filter(([k])=>/^projectReadback[0-9]{8}$/.test(k));
  const latest=records.sort(([a],[b])=>a.localeCompare(b)).at(-1)?.[1];
  const manifest=json(ps.manifestPath);
  need(latest?.status==='PASS'&&latest.manifestBlobSha===hash(ps.manifestPath)&&
