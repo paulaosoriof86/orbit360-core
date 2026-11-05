@@ -1,5 +1,6 @@
 # B4-003 same-artifact release lane (reusable); does not touch LIVE, Rules, Auth or business data.
 # 2026-11-05: causal same-channel rebuild for source/runtime resource reconciliation (no LIVE/data changes).
+# 2026-11-05: final anti-drift commit - every canonical push runs governance; guarded from path-filter regressions.
 # 2026-11-05: final canonical HEAD after exact deployed goal-writer no-op and certification ledger sync.
 # 2026-11-04: exact same-channel candidate after Inicio signed-advisor first-paint fix.
 # 2026-11-04: same-channel causal rerun after Inicio event-listener VM compatibility guard.
