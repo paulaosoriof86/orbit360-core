@@ -53,7 +53,10 @@ async function handle(request){
     throw new HttpsError('internal','SCOPED_DOCUMENT_READ_UNAVAILABLE');
   }
 }
-const opts={region:REGION,cors:true,maxInstances:2,memory:'256MiB'};
+// B4-003 2026-11-05: Preview reader hit 256 MiB OOM (Cloud Run revision
+// orbit360scopedpolicyreadpreview-00076-baw). Bound concurrent scans per instance.
+// The same options apply to the LIVE export only when its independently gated deploy occurs.
+const opts={region:REGION,cors:true,maxInstances:4,memory:'1GiB',concurrency:4};
 module.exports={
   orbit360ScopedPolicyReadPreview:onCall(opts,handle),
   orbit360ScopedPolicyRead:onCall(opts,handle)
