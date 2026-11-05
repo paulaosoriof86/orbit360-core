@@ -80,14 +80,43 @@ function verifyAggregate(){
   a.unresolvable.COMPLETE_POLICY_RELATION_REQUIRED===a.counts.clients,
   'PHYSICAL_AUTHORITY_443_RECONCILIATION_FAILED');
 }
+// Project-source state is intentionally MUTABLE under the Evergreen manifest;
+// the historical country-index receipt and every other certified control key
+// remain immutable. A verified 9/9 project readback cannot be blocked by the
+// old historical snapshot's update-required flag.
+function verifyProjectSourceReadback(after){
+ const ps=after.projectSources||{};
+ if(ps.staticSourceUpdateRequired!==false)return;
+ need(ps.reason===null,'PROJECT_SOURCE_FALSE_FLAG_REASON_INVALID');
+ need(Array.isArray(ps.projectSynchronization?.requiredAdds)&&
+  ps.projectSynchronization.requiredAdds.length===0,'PROJECT_SOURCE_PENDING_ADDS_REMAIN');
+ const records=Object.entries(ps.projectSynchronization||{}).filter(([k])=>/^projectReadback\\d{8}$/.test(k));
+ const latest=records.sort(([a],[b])=>a.localeCompare(b)).at(-1)?.[1];
+ const manifest=json(ps.manifestPath);
+ need(latest?.status==='PASS'&&latest.manifestBlobSha===hash(ps.manifestPath)&&
+  latest.sourceCount===manifest.canonicalFiles.length&&
+  latest.exactGitBlobMatches===manifest.canonicalFiles.length&&
+  Array.isArray(latest.files)&&latest.files.length===manifest.canonicalFiles.length,
+  'PROJECT_SOURCE_READBACK_EVIDENCE_MISSING_OR_UNBOUND');
+ const expected=new Map(manifest.canonicalFiles.map(f=>[f.path.split('/').at(-1),f.gitBlobSha]));
+ const seen=new Set();
+ for(const f of latest.files){
+  need(expected.get(f.name)===f.blobSha&&!seen.has(f.name),'PROJECT_SOURCE_READBACK_BLOB_DRIFT:'+f.name);
+  seen.add(f.name);
+ }
+ need(seen.size===expected.size,'PROJECT_SOURCE_READBACK_COVERAGE_DRIFT');
+}
 function verifyControl(){
  const before=JSON.parse(show(BASE,CONTROL));
  const certified=JSON.parse(show(CERTIFIED,CONTROL));
  const after=json(CONTROL),p=after[KEY];
  need(Object.keys(before).length===441&&Object.keys(certified).length===442&&
   Object.keys(after).length>=442,'CERTIFIED_CONTROL_APPEND_CARDINALITY');
+ const stableCertified={...certified};
+ delete stableCertified.projectSources;
  need(frozenEntriesUnchanged(before,certified)&&
-  frozenEntriesUnchanged(certified,after),'HISTORICAL_CONTROL_CHANGED');
+  frozenEntriesUnchanged(stableCertified,after),'HISTORICAL_CONTROL_CHANGED');
+ verifyProjectSourceReadback(after);
  need(same(Object.keys(certified).filter(k=>!(k in before)),[KEY]),
   'CERTIFIED_CONTROL_KEY_SET_INVALID');
  const expected={
