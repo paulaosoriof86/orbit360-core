@@ -10,6 +10,42 @@ Orbit.modules.inicio = (function () {
   const U = Orbit.ui, q = Orbit.q;
   const rosterRequested = new Set(), rosterFailures = new Set(), rosterAttempts=new Map(), rosterRetryAt=new Map();
   let motivationIndex=0, motivationTimer=null,financeStageTimer=null;
+  // Visibility preference is local to the signed user, role and country.
+  // It never changes institutional goals, production or advisor permissions.
+  const advisorSelectionMemory=new Map();
+  let advisorSelectionOpen=false;
+  function advisorSelectionKey(country){
+    const actor=String(Orbit.auth?.productUser?.uid||'anonymous');
+    const role=String(Orbit.session?.rol?.()||'').toLowerCase();
+    const tenant=String(Orbit.auth?.productUser?.tenantId||Orbit.tenantId||'');
+    return ['gi-inicio-asesores-v1',tenant,actor,role,String(country||'TODOS')].join('|');
+  }
+  function advisorSelection(board,country){
+    const key=advisorSelectionKey(country);
+    const allowed=new Set(board.map(b=>String(b.asesor.id||'')));
+    let stored=advisorSelectionMemory.get(key);
+    if(stored===undefined){
+      stored=null;
+      try{
+        const raw=window.localStorage?.getItem(key);
+        if(raw!=null){const parsed=JSON.parse(raw);if(Array.isArray(parsed))stored=parsed.filter(v=>typeof v==='string');}
+      }catch(_){}
+      advisorSelectionMemory.set(key,stored);
+    }
+    // Never infer freelance status from names. Unknown classifications remain visible.
+    const defaults=board.filter(b=>b.asesor.tipoVinculacion!=='freelance').map(b=>String(b.asesor.id||''));
+    const requested=Array.isArray(stored)?stored:defaults;
+    return {key,selected:new Set(requested.filter(id=>allowed.has(id)))};
+  }
+  function saveAdvisorSelection(key,ids){
+    const selected=Array.from(new Set(ids.map(String)));
+    advisorSelectionMemory.set(key,selected);
+    try{window.localStorage?.setItem(key,JSON.stringify(selected));}catch(_){}
+  }
+  function resetAdvisorSelection(key){
+    advisorSelectionMemory.set(key,null);
+    try{window.localStorage?.removeItem(key);}catch(_){}
+  }
   function stageMonthlyFinancialRead(){
     // A user's first paint and role switch must not wait for portfolio scans.
     if(financeStageTimer)return;
@@ -201,6 +237,8 @@ Orbit.modules.inicio = (function () {
           };
         });
       }):[];
+    const advisorSelectionState=advisorSelection(board,activeCountry);
+    const visibleBoard=board.filter(b=>advisorSelectionState.selected.has(String(b.asesor.id||'')));
     const clientes=q.clientesScoped?q.clientesScoped():Orbit.store.all('clientes'), polizas=q.polizasScoped?q.polizasScoped():Orbit.store.all('polizas');
     const metasMes=[]; // Inicio metas originate only from the authorized server projection.
     const advisors=secureRoster.rows;
@@ -279,11 +317,22 @@ Orbit.modules.inicio = (function () {
     const valuedCount=rows=>q.portfolioValuedRowsCount(rows,portfolioCountContext);
     const diasMes=new Date(U.now().getFullYear(),U.now().getMonth()+1,0).getDate()-U.now().getDate();
     const readinessCount=(state,readyText,loadingText)=>state==='ready'?readyText:state==='unavailable'?'No disponible':loadingText;
+    const advisorFilterHtml=productionReadiness==='ready'&&advisorReadiness==='ready'&&board.length
+      ? '<details data-inicio-advisor-selection '+(advisorSelectionOpen?'open':'')+' style="margin-bottom:10px;border:1px solid var(--line-2);border-radius:12px;padding:8px 11px;background:var(--card)">'
+        +'<summary style="cursor:pointer;font-weight:600;font-size:12px">Elegir asesores · '+visibleBoard.length+' de '+board.length+' visibles</summary>'
+        +'<div role="group" aria-label="Asesores visibles en Inicio" style="padding-top:12px;display:grid;gap:9px">'
+        +board.map(b=>{const a=b.asesor,id=String(a.id||''),tipo=String(a.tipoVinculacion||'sin_clasificar');
+          const estado=tipo==='freelance'?'Freelance':tipo==='interno'?'Equipo interno':'Sin clasificar';
+          return '<label style="display:flex;align-items:center;gap:8px;font-size:12px"><input type="checkbox" data-inicio-advisor-toggle="'+U.esc(id)+'" '+(advisorSelectionState.selected.has(id)?'checked':'')+'><span>'+U.esc(a.nombre)+'</span><small class="muted" style="margin-left:auto">'+estado+'</small></label>';
+        }).join('')
+        +'<div style="display:flex;gap:8px;flex-wrap:wrap;padding-top:8px"><button class="btn ghost sm" type="button" data-inicio-advisor-select-all>Mostrar todos</button><button class="btn ghost sm" type="button" data-inicio-advisor-select-default>Sin freelance</button></div>'
+        +'</div></details>'
+      : '';
     const advisorBoardHtml=productionReadiness==='unavailable'||advisorReadiness==='unavailable'
       ? '<div class="cfg-note" data-inicio-advisor-readiness="unavailable"><b>Avance por asesor no disponible.</b><div class="muted" style="margin-top:4px">No fue posible confirmar el listado autorizado o la producción. No se inventan asesores ni metas.</div><button class="btn ghost sm" type="button" onclick="Orbit.modules.inicio.retryAdvisorRoster()">Reintentar consulta</button></div>'
       : productionReadiness!=='ready'||advisorReadiness!=='ready'
         ? '<div class="muted" data-inicio-advisor-readiness="pending" style="padding:14px 0">Consultando asesores autorizados y producción…</div>'
-        : (board.length?board.map(b=>{const pct=metaReadiness==='ready'&&b.pct!=null?b.pct:null,metaState=metaReadiness!=='ready'?'unavailable':b.pendienteClasificacion?'unclassified':!b.participaMetas?'excluded':b.metaDisponible?'configured':'missing',amountHtml=moneyMap(b.byCurrency||{});return `<div class="clickable" data-inicio-advisor-id="${U.esc(b.asesor.id||'')}" data-values="${escAttr(b.byCurrency||{})}" data-meta-state="${metaState}" data-pct="${pct==null?'':pct}" onclick="location.hash='#/insights'" style="display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid var(--line-2);cursor:pointer">${U.avatar(b.asesor.nombre,b.asesor.color,'md')}<div style="flex:1;min-width:0"><div style="display:flex;justify-content:space-between;font-size:13.5px;gap:8px"><b>${U.esc(b.asesor.nombre)}</b><span class="mono" style="text-align:right">${amountHtml}</span></div><div class="bar" style="margin-top:6px"><i style="width:${pct==null?0:Math.min(100,pct)}%"></i></div>${pct==null?'<div class="muted" style="font-size:10.5px;margin-top:3px">'+(metaReadiness!=='ready'?'Meta sin acceso de lectura':b.pendienteClasificacion?'Clasificación pendiente':!b.participaMetas?'No participa en metas':'Meta no configurada')+'</div>':''}</div><span class="badge ${pct==null?'neutral':pct>=100?'ok':pct>=70?'warn':'neutral'}" style="min-width:46px;justify-content:center">${pct==null?'—':pct+'%'}</span></div>`;}).join(''):'<div class="cfg-note" data-inicio-advisor-readiness="ready-empty">No hay asesores autorizados confirmados para el alcance seleccionado.</div>');
+        : (visibleBoard.length?visibleBoard.map(b=>{const pct=metaReadiness==='ready'&&b.pct!=null?b.pct:null,metaState=metaReadiness!=='ready'?'unavailable':b.pendienteClasificacion?'unclassified':!b.participaMetas?'excluded':b.metaDisponible?'configured':'missing',amountHtml=moneyMap(b.byCurrency||{});return `<div class="clickable" data-inicio-advisor-id="${U.esc(b.asesor.id||'')}" data-values="${escAttr(b.byCurrency||{})}" data-meta-state="${metaState}" data-pct="${pct==null?'':pct}" onclick="location.hash='#/insights'" style="display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid var(--line-2);cursor:pointer">${U.avatar(b.asesor.nombre,b.asesor.color,'md')}<div style="flex:1;min-width:0"><div style="display:flex;justify-content:space-between;font-size:13.5px;gap:8px"><b>${U.esc(b.asesor.nombre)}</b><span class="mono" style="text-align:right">${amountHtml}</span></div><div class="bar" style="margin-top:6px"><i style="width:${pct==null?0:Math.min(100,pct)}%"></i></div>${pct==null?'<div class="muted" style="font-size:10.5px;margin-top:3px">'+(metaReadiness!=='ready'?'Meta sin acceso de lectura':b.pendienteClasificacion?'Clasificación pendiente':!b.participaMetas?'No participa en metas':'Meta no configurada')+'</div>':''}</div><span class="badge ${pct==null?'neutral':pct>=100?'ok':pct>=70?'warn':'neutral'}" style="min-width:46px;justify-content:center">${pct==null?'—':pct+'%'}</span></div>`;}).join(''):(board.length?'<div class="cfg-note" data-inicio-advisor-readiness="none-selected">No has seleccionado asesores para mostrar.</div>':'<div class="cfg-note" data-inicio-advisor-readiness="ready-empty">No hay asesores autorizados confirmados para el alcance seleccionado.</div>'));
 
     const currentRole=Orbit.session&&typeof Orbit.session.rol==='function'?String(Orbit.session.rol()||''):'';
     const advisorView=/asesor|comercial/i.test(currentRole);
@@ -367,6 +416,7 @@ Orbit.modules.inicio = (function () {
       </section>
       <div class="inicio-main-grid" style="display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:18px;margin-top:18px">
         <div class="card pad"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px"><b style="font-family:var(--f-display);font-size:16px">Avance por asesor</b><span class="muted" style="font-size:12px">producción neta del mes vs meta configurada</span></div>
+          ${advisorFilterHtml}
           ${advisorBoardHtml}
         </div>
         <div class="card pad"><b style="font-family:var(--f-display);font-size:16px">Prioridades</b><div style="margin-top:12px;display:grid;gap:9px">${renov.slice(0,4).map(p=>{const cli=Orbit.store.get('clientes',p.clienteId),d=U.daysFromNow(p.vigenciaFin);return `<div class="clickable" onclick="location.hash='#/cliente360?c=${p.clienteId}'" style="display:flex;align-items:center;gap:10px;padding:9px 11px;background:var(--warn-soft);border-radius:var(--r-sm);cursor:pointer"><span style="font-size:16px">🔄</span><div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600">${U.esc(cli?cli.nombre:'—')}</div><div class="muted" style="font-size:11.5px">${U.esc(p.ramo)} · renueva en ${d} d</div></div></div>`;}).join('')}${venc.slice(0,3).map(c=>{const cli=Orbit.store.get('clientes',c.clienteId);return `<div class="clickable" onclick="location.hash='#/cliente360?c=${c.clienteId}'" style="display:flex;align-items:center;gap:10px;padding:9px 11px;background:var(--danger-soft);border-radius:var(--r-sm);cursor:pointer"><span style="font-size:16px">⚠</span><div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600">${U.esc(cli?cli.nombre:'—')}</div><div class="muted" style="font-size:11.5px">cuota ${U.esc(U.text(c.cuota))} vencida · ${U.money(c.monto,c.moneda)}</div></div></div>`;}).join('')}</div></div>
@@ -375,6 +425,20 @@ Orbit.modules.inicio = (function () {
     </div>`;
     stageMonthlyFinancialRead();
     if(typeof host.querySelectorAll==='function')host.querySelectorAll('[data-inicio-analysis-bar]').forEach(button=>button.addEventListener('click',()=>{const route=button.getAttribute('data-route');if(route==='renovaciones'||route==='cobros')location.hash='#/'+route;}));
+    if(typeof host.querySelectorAll==='function'){
+      const chooser=typeof host.querySelector==='function'?host.querySelector('[data-inicio-advisor-selection]'):null;
+      if(chooser)chooser.addEventListener('toggle',()=>{advisorSelectionOpen=chooser.open;});
+      const apply=ids=>{saveAdvisorSelection(advisorSelectionState.key,ids);advisorSelectionOpen=true;render(host);};
+      host.querySelectorAll('[data-inicio-advisor-toggle]').forEach(input=>input.addEventListener('change',()=>{
+        const chosen=new Set(advisorSelectionState.selected),id=String(input.getAttribute('data-inicio-advisor-toggle')||'');
+        if(input.checked)chosen.add(id);else chosen.delete(id);
+        apply([...chosen]);
+      }));
+      const all=typeof host.querySelector==='function'?host.querySelector('[data-inicio-advisor-select-all]'):null;
+      if(all)all.addEventListener('click',()=>apply(board.map(b=>String(b.asesor.id||''))));
+      const defaults=typeof host.querySelector==='function'?host.querySelector('[data-inicio-advisor-select-default]'):null;
+      if(defaults)defaults.addEventListener('click',()=>{resetAdvisorSelection(advisorSelectionState.key);advisorSelectionOpen=true;render(host);});
+    }
     if(motivationTimer!==null){clearInterval(motivationTimer);motivationTimer=null;}
     const message=typeof host.querySelector==='function'?host.querySelector('[data-inicio-context-message]'):null;
     const quoteButton=typeof host.querySelector==='function'?host.querySelector('[data-inicio-next-quote]'):null;
