@@ -95,7 +95,7 @@ test('GT, CO and TODOS preserve country scope and TODOS equals GT plus CO withou
 test('explicit audit mode can inspect QA rows while retaining country filters and parent verification',()=>{
   const gt=fixture('GT').q,co=fixture('CO').q,all=fixture('TODOS').q;
   const ga=gt.carteraGlobalPorMoneda(audit),ca=co.carteraGlobalPorMoneda(audit),aa=all.carteraGlobalPorMoneda(audit);
-  assert.equal(ga.byCurrency.GTQ.pend,629); // 456 + B2 123; explicit-child pending is overdue.
+  assert.equal(ga.byCurrency.GTQ.pend,579); // 456 + B2 123; explicit-child pending is overdue.
   assert.equal(ga.byCurrency.GTQ.venc,350); // 300 + explicit-child 50.
   assert.equal(ga.byCurrency.GTQ.alDia,943); // 100 + explicit, B2 QA payments.
   assert.equal(ca.byCurrency.COP.pend,555); // 321 + QA parent 234.
