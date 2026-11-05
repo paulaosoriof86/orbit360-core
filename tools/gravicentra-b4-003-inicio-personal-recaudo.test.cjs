@@ -83,6 +83,40 @@ overdueCandidates.push({id:'test-due-2',monto:20,moneda:'GTQ'});
 html=render();
 assert.match(html,/Hay 2 pólizas que vencen dentro de 45 días y requieren priorización\./);checks++;
 assert.match(html,/Hay 2 obligaciones vencidas visibles; revisa su gestión y aplicación\./);checks++;
+// Advisor display selection is a client-side view filter, never a financial or goal mutation.
+roster.dashboardPeek=()=>[
+ {...row(),id:'a1',nombre:'Interno QA',tipoVinculacion:'interno',participaMetas:true,pendienteClasificacion:false},
+ {...row(),id:'a2',nombre:'Freelance QA',tipoVinculacion:'freelance',participaMetas:false,pendienteClasificacion:false},
+ {...row(),id:'a3',nombre:'Por clasificar QA',tipoVinculacion:'sin_clasificar',participaMetas:false,pendienteClasificacion:true}
+];
+role='Operativo';scope='GT';vinculo='interno';
+html=render();
+assert.match(html,/data-inicio-advisor-selection/);checks++;
+assert.match(html,/Elegir asesores · 2 de 3 visibles/);checks++;
+assert.match(html,/data-inicio-advisor-id="a1"/);checks++;
+assert.doesNotMatch(html,/data-inicio-advisor-id="a2"/);checks++;
+assert.match(html,/data-inicio-advisor-id="a3"/);checks++;
+assert.match(html,/data-inicio-advisor-toggle="a2"/);checks++;
+const selectedHandlers=new Map();
+const toggler={
+ checked:true,
+ getAttribute:key=>key==='data-inicio-advisor-toggle'?'a2':null,
+ addEventListener:(event,handler)=>{if(event==='change')selectedHandlers.set('change',handler);}
+};
+const selectionHost={
+ innerHTML:'',isConnected:true,
+ querySelectorAll:key=>key==='[data-inicio-advisor-toggle]'?[toggler]:[],
+ querySelector:()=>null
+};
+Orbit.modules.inicio.render(selectionHost);
+assert.equal(typeof selectedHandlers.get('change'),'function');checks++;
+selectedHandlers.get('change')();
+assert.match(selectionHost.innerHTML,/Elegir asesores · 3 de 3 visibles/);checks++;
+assert.match(selectionHost.innerHTML,/data-inicio-advisor-id="a2"/);checks++;
+role='Asesor';html=render();
+assert.match(html,/Elegir asesores · 2 de 3 visibles/);checks++; // isolated by role
+role='Operativo';html=render();
+assert.match(html,/Elegir asesores · 3 de 3 visibles/);checks++; // persisted in same signed view
 console.log('B4_003_INICIO_PERSONAL_RECAUDO_UI_QA_PASS checks='+checks+' mock_only no_real_writes');
 assert.match(src,/data-inicio-days-left/, 'MONTH_END_COUNTDOWN_PRESERVED');
 assert.doesNotMatch(src,/Doble clic para cambiar el mensaje/, 'NO_INTERNAL_INTERACTION_INSTRUCTIONS');
