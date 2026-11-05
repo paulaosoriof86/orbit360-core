@@ -84,9 +84,22 @@ function verifyAggregate(){
 // the historical country-index receipt and every other certified control key
 // remain immutable. A verified 9/9 project readback cannot be blocked by the
 // old historical snapshot's update-required flag.
-function verifyProjectSourceReadback(after){
+function verifyProjectSourceReadback(frozen,after){
  const ps=after.projectSources||{};
- if(ps.staticSourceUpdateRequired!==false)return;
+ if(same(frozen,ps))return;
+ need(ps.staticSourceUpdateRequired===false,'PROJECT_SOURCES_UNEXPECTED_MUTATION');
+ const clone=JSON.parse(JSON.stringify(ps));
+ clone.staticSourceUpdateRequired=frozen.staticSourceUpdateRequired;
+ clone.reason=frozen.reason;
+ const prior=frozen.projectSynchronization||{},scrub=JSON.parse(JSON.stringify(ps.projectSynchronization||{}));
+ const permitted=new Set(['status','requiredAdds','resolvedAdds']);
+ for(const k of Object.keys(scrub))if(/^projectReadback[0-9]{8}$/.test(k))permitted.add(k);
+ for(const k of permitted){
+  if(Object.prototype.hasOwnProperty.call(prior,k))scrub[k]=prior[k];
+  else delete scrub[k];
+ }
+ clone.projectSynchronization=scrub;
+ need(same(clone,frozen),'PROJECT_SOURCES_MUTABLE_FIELD_SCOPE_VIOLATION');
  need(ps.reason===null,'PROJECT_SOURCE_FALSE_FLAG_REASON_INVALID');
  need(Array.isArray(ps.projectSynchronization?.requiredAdds)&&
   ps.projectSynchronization.requiredAdds.length===0,'PROJECT_SOURCE_PENDING_ADDS_REMAIN');
@@ -116,7 +129,7 @@ function verifyControl(){
  delete stableCertified.projectSources;
  need(frozenEntriesUnchanged(before,certified)&&
   frozenEntriesUnchanged(stableCertified,after),'HISTORICAL_CONTROL_CHANGED');
- verifyProjectSourceReadback(after);
+ verifyProjectSourceReadback(certified.projectSources,after);
  need(same(Object.keys(certified).filter(k=>!(k in before)),[KEY]),
   'CERTIFIED_CONTROL_KEY_SET_INVALID');
  const expected={
