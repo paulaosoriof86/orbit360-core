@@ -1,4 +1,5 @@
 # B4-003 causal missing source parity on the existing production writer.
+# 2026-11-05: owner-authorized targeted goal participation writer parity, exact readback and rollback.
 # One reviewed target, exact deployed-source byte readback and rollback to
 # the exact prior Cloud Functions source archive if post-deploy checks fail.
 name: Gravicentra B4-003 LIVE Writer Parity Exact
