@@ -1,0 +1,46 @@
+{
+  "schema": "GRAVICENTRA_I65_B4003_TEAM_CLASSIFICATION_SIGNED_READBACK_V1",
+  "dateLocalGuatemala": "2026-11-05",
+  "gate": "I6.5/B4-003",
+  "sourceCandidateSha": "b6710416dac0c719edaa05c84784a76ac1a46ea6",
+  "sourceBranch": "recovery/fase-a-clean-20260831",
+  "singlePreviewChannel": "gi-i65-b4-rc-41765742748",
+  "buildIdReadBack": "gi-i65-b4-b6710416dac0-57f234755dc1",
+  "immutablePreviewRunId": 42140743852,
+  "immutablePreviewResult": "SUCCESS",
+  "protectedTeamReaderPreviewRunId": 42139912631,
+  "protectedTeamReaderPreviewResult": "SUCCESS",
+  "singleLiveBackendWriterRunId": 42140743795,
+  "singleLiveBackendWriterResult": "SUCCESS_WITH_EXACT_SOURCE_ARCHIVE_READBACK_AND_ROLLBACK_GUARD",
+  "browser": "Chrome authenticated with owner Direction role",
+  "realDataOperations": "OWNER_AUTHORIZED_SEVEN_TEAM_CLASSIFICATION_WRITES_ONLY",
+  "results": {
+    "signedBackendWritesWithCanonicalDocumentReadback": 7,
+    "browserReloadRowsMatchingOwnerDecision": 7,
+    "internal": 4,
+    "freelance": 3,
+    "freelanceIncludedInInstitutionalGoals": 0,
+    "noLongerUnclassified": 7,
+    "activeTeamRowsBeforeAndAfter": 7,
+    "operationalTeamRowsBeforeAndAfter": 3,
+    "multiRoleTeamRowsBeforeAndAfter": 4,
+    "countriesOrRolesIntentionallyChanged": 0,
+    "newMembershipOrAuthAccountsIntentionallyCreated": 0
+  },
+  "errorCausesCorrected": [
+    "Protected Equipo reader had omitted tipoVinculacion and participaMetas",
+    "Existing signed operational writer required singular pais for explicitly multi-country staff rows"
+  ],
+  "separationOfCertification": {
+    "teamClassificationSevenSignedWrites": "PASS",
+    "fullTeamModulePreviewUat": "PENDING_OTHER_CAPABILITIES",
+    "fullB4003Gate": "HOLD",
+    "liveProductHostingPromotion": "NOT_EXECUTED",
+    "latestApprovedVersionLivePass": "NOT_CERTIFIED",
+    "productionAccepted": false,
+    "controlPlaneGuardOnCandidate": "HISTORICAL_PIN_RECONCILED_IN_SOURCE_PENDING_CI",
+    "firestoreRulesException": "OWNER_ACCEPTED_POSTPRODUCTION_RISK_NOT_SECURITY_PASS"
+  },
+  "privateIdentityFieldsIncluded": false,
+  "repeatRealWritesNecessary": false
+}

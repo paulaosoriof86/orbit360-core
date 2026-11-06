@@ -24,6 +24,7 @@ on:
       - functions/product-operational-domain.js
       - tools/gravicentra-b4-003-scoped-bootstrap-reader.test.cjs
       - tools/gravicentra-b4-003-operational-write-security-regression.test.cjs
+      - tools/gravicentra-b4-003-scoped-boundary.test.cjs
       - tools/gravicentra-b4-003-financial-qa-commercial-exclusion.test.cjs
 
 permissions:

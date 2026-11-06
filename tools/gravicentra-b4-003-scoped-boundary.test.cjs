@@ -256,7 +256,8 @@ console.log('B4_003_APPROVED_ROLE_SCOPE_PARITY_PASS Finance Marketing Assistant 
        assert.equal(goals.sourceReceiptBlob,goalsBlob,'Goals source receipt must be byte-bound');
        const goalsSource=JSON.parse(goalsBytes),goalsWriter=goalsSource.sourceFiles[proof.owner];
        assert.equal(goalsWriter.beforeBlob,insurerWriter.afterBlob,'Frozen insurer writer is exact predecessor');
-       assert.equal(goalsWriter.afterBlob,blob,'Goals successor binds the actual writer under the twelve cases');
+       assert.equal(goalsWriter.afterBlob,'b3d0059457142659633498c9c52c6b84ea68200f','Frozen Goals successor must retain its exact historical writer');
+       assert.equal(blob,'187efbfa9868531349154f26ec90a5e2c2ed33e8','Current writer is the reviewable B4-003 multi-country Equipo successor');
        assert.equal(goals.previewDeployed,false);
        assert.equal(goals.productionAuthorized,false);
        assert.equal(goals.businessDataWrites,0);
