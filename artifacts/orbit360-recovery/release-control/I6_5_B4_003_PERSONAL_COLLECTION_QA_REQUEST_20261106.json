@@ -1,7 +1,7 @@
 {
   "schema": "B4-003-P0-PERSONAL-20261106-V1",
   "status": "REQUESTED",
-  "phase": "create",
+  "phase": "cleanup",
   "tenantId": "alianzas-soluciones",
   "gate": "I6.5/B4-003",
   "ownerAuthorization": "PAULA_SIGNED_SYNTHETIC_QA_ALLOWED_20261106",
@@ -16,10 +16,12 @@
     "b4003p0personal_meta_20261106"
   ],
   "cleanupRequired": true,
-  "attempt": 2,
+  "attempt": 3,
   "previousAttempt": {
     "runId": 42238285221,
     "status": "FAIL_BEFORE_ANY_WRITE",
     "cause": "QA_HARNESS_VARIABLE_NAME_ONLY"
-  }
+  },
+  "createRunId": 42238527610,
+  "cleanupReason": "Signed advisor GT Inicio showed Nov goal Q200 but confirmed collection Q0"
 }
