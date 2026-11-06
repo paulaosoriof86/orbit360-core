@@ -187,7 +187,7 @@
     "phaseAIterationStatuses": "HISTORICAL_FIELDS_ABOVE_PRESERVED_UNTIL_FORMAL_GATE_EVIDENCE;_NO_NEW_PASS_INFERRED",
     "labDataWriteScope": "ONLY_35_AUTHORIZED_COUNTRY_FIELDS;_NO_AUGUST_REFRESH"
   },
-  "nextAction": "B4-003 2026-11-06 CURRENT EXACT CANDIDATE: immutable Preview run 42263222517 SUCCESS, source f3e4503afbc7f3a67086d0e8ad0cc1b623743c39, build gi-i65-b4-f3e4503afbc7-57f234755dc1, archive artifact 13524899745 sha256 8811936a2ea12d482356d3a2ae179ff93a36ee96856b3135dbac9252c3f42ea2, served readback artifact 13526316484. Signed Paula Dirección TODOS plus Cliente360 country GT 390 commercial clients/196 active/1291 commercial policies, CO 49/27/125, GT+CO parity with TODOS 439/223/1416, selector restored TODOS. Signed Paula Dirección TODOS focal Cobros QA B4-003/B2-REN search 0 with unchanged commercial KPIs; Cliente 360 QA removed from CLIENT COUNT 439 commercial/1 QA audit/440 all, 223 active policies/1416 commercial, GTQ632719 and COP175456570 commercial premium, QA orphan-policy warning excluded, zero commercial unmatched, QA still audit-visible. Two QA cohorts physical cleanup owner-authorized POSTPRODUCTION, 4 functional P0 PASS +2 OWNER_DEFERRED, 0 real data edits/deletions/reimports. NEXT Ops/Leads historical author human-name provenance (new Samuel name works, old fallback generic open), full current module×role×country×viewport Preview certification and retained same artifact LIVE module by module with rollback. Formal I6 50%; B4-003 gate HOLD; LIVE production NO-GO; no Rules/Auth/data deploy.",
+  "nextAction": "B4-003 2026-11-06 CURRENT EXACT CANDIDATE: immutable Preview run 42266346904 SUCCESS, source b01dceafc1ec2b1e786626116251e248be1e23f4 (last product source change 50bf069aaf3386bfc2c5f3dd25dc0776567b130f), build gi-i65-b4-b01dceafc1ec-57f234755dc1, archive artifact 13527102882 tar.sha256 a5c0853e39a4ec6c601565b57c505cd3bbbf565564dc02076166acf3a1295621, readback artifact 13528110095. Signed Paula Operativo-mode TODOS Inicio hydrated commercial indicators 439 clients/1416 policies, previously raw 440/1425 QA-inclusive; same served build source readback; QA retained physically (6 B4+3 B2), zero deletion/reimport. Prior signed Paula Direccion TODOS Cliente360 439 commercial clients/223 active/1416 policies, GT+CO parity; Cobros QA searches 0 and commercial sums protected. Asesor simulation denied insurers direct route, Operativo exposed directory/edit/accounts/username/masked password controls (reveal success and actual admin principals not yet certified). Formal I6 50%, 4 functional P0 PASS+2 OWNER_DEFERRED (not PASS); B4-003 HOLD; NEXT historical Ops/Leads human author provenance, remaining current module x role x country x viewport Preview actions and persistence, then ONLY same retained artifact LIVE byte check/controlled writes/rollback. NO production promotion, Rules/Auth/data writes.",
   "sourceOfTruth": {
     "projectBoundaryPrevalentAddendum": "orbit360-platform/docs/recovery/ADDENDUM_PREVALENTE_CHATGPT_PROJECT_BOUNDARY_20260831.md",
     "mutableState": "orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json",
@@ -408,6 +408,37 @@
       "Samuel Daza"
     ],
     "noTechnicalEmailsAsAuthors": true,
+    "noDataWrites": true
+  },
+  "b4003InicioCommercialQaCountsSignedReadback20261106": {
+    "status": "FOCAL_PREVIEW_PASS_NOT_FULL_MODULE_PASS",
+    "signedUser": "Paula Osorio",
+    "simulatedRole": "Operativo",
+    "country": "TODOS",
+    "sourceSha": "b01dceafc1ec2b1e786626116251e248be1e23f4",
+    "buildId": "gi-i65-b4-b01dceafc1ec-57f234755dc1",
+    "workflowRunId": 42266346904,
+    "immutableArtifactId": 13527102882,
+    "readbackArtifactId": 13528110095,
+    "rawClientsBefore": 440,
+    "commercialClientsAfter": 439,
+    "rawPoliciesBefore": 1425,
+    "commercialPoliciesAfter": 1416,
+    "qaDeletion": 0,
+    "noDataWrites": true,
+    "noRulesOrAuthDeploy": true,
+    "noLiveDeploy": true,
+    "otherRolesActionsLiveRemainHOLD": true
+  },
+  "b4003AseguradorasRoleReadOnlyReadback20261106": {
+    "status": "PARTIAL_ROLE_SURFACE_READ_ONLY",
+    "signedUser": "Paula Osorio",
+    "country": "TODOS",
+    "asesorDirectRouteBlocked": true,
+    "operativoDirectoryVisible": true,
+    "operativoEditAndCredentialsControlsVisible": true,
+    "actualPasswordRevealNotCertified": true,
+    "otherRolePrincipalsNotCertified": true,
     "noDataWrites": true
   }
 }
