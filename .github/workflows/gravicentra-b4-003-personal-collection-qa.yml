@@ -153,7 +153,7 @@ jobs:
               syntheticOnly:true,createdByGate:'I6.5/B4-003'};
             const batch=db.batch();
             batch.create(refs.client,{...common,id:ids.client,pais:country,moneda:currency,
-              nombre:'PRUEBA TEMPORAL B4-003 — NO CLIENTE REAL',activo:true});
+              nombre:'PRUEBA TEMPORAL B4-003 — NO CLIENTE REAL',activo:true,asesorId:advisorId});
             batch.create(refs.policy,{...common,id:ids.policy,clienteId:ids.client,
               asesorId:advisorId,pais:country,moneda:currency,numero:'QA-P0-PERSONAL-20261106',
               estado:'Vigente',vigenciaInicio:'2026-09-01',vigenciaFin:'2027-08-31',primaNeta:amount});
