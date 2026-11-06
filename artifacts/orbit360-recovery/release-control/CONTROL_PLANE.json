@@ -18791,21 +18791,190 @@
     "productAndBackendSourceChangedSinceLatestPreview": false,
     "exactPreviewEvidence": "WORKFLOW_SOURCE_TEST_BUILD_RETENTION_HOSTING_EXACT_BYTES_AND_LIVE_STABILITY_ALL_SUCCESS",
     "readerDeploymentScope": "EXISTING_PREVIEW_SCOPED_READER_ONLY",
-    "signedDeployedPersonalCollectionP0Accepted": false,
+    "signedDeployedPersonalCollectionP0Accepted": true,
     "signedRoleCountryMatrixAccepted": false,
     "bundleDigestIndependentDownloadCheck": "PENDING_FINAL_LIVE_PROMOTION",
     "doNotRebuildForMetadataOnlyCommits": true,
     "reusePreviousSevenSignedTeamClassifications": true,
     "teamSignedReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_TEAM_CLASSIFICATIONS_SIGNED_READBACK_20261105.json",
-    "openP0": 5,
-    "closedP0": 1,
+    "openP0": 4,
+    "closedP0": 2,
     "formalI6Percent": 50,
     "productionPromotionAuthorized": false,
     "b4003Closed": false,
-    "nextExactCheck": "SIGNED_DEPLOYED_READER_PERSONAL_RECAUDO_WITH_5_OF_5_UI_AND_ROLE_COUNTRY_MATRIX; ADJUDICATE_OPEN_P0; RETAIN_AND_PROMOTE_SAME_ARCHIVE_ONLY_AFTER_APPROVAL",
-    "chromeUIAtThisReview": "BROWSER_EXTENSION_REPORTED_ZERO_ACCESSIBLE_TABS_NO_NEW_SIGNED_UAT_CLAIM",
+    "nextExactCheck": "FREELANCERS_GOAL_SCOPE_CROSS_ROLE_AND_COUNTRY_WITH_EXISTING_SIGNED_TEAM_CLASSIFICATIONS; THEN_OTHER_3_OPEN_P0_AND_CURRENT_MODULE_MATRIX",
+    "chromeUIAtThisReview": "PAULA_SIGNED_CHROME_AS_ASESOR_5_OF_5_GT_FIXTURE_111_11_GTQ_VS_GOAL_200_GTQ_AND_EXACT_5_DOC_CLEANUP; CO_0_COP_AND_TODOS_SEPARATE",
     "noRealBusinessWrites": true,
     "noRulesDeploy": true,
     "noLivePromotion": true
+  },
+  "b4003CertificationInventory20261106": {
+    "schema": "GRAVICENTRA_I6_5_B4_003_CERTIFICATION_INVENTORY_AND_SYNC_20261106_V2",
+    "gate": "I6.5/B4-003",
+    "recordType": "ADDITIVE_RELEASE_SCOPED_CERTIFICATION_INDEX_NOT_GATE_PASS",
+    "status": "PERSONAL_COLLECTION_P0_SIGNED_PASS_OTHER_P0_AND_FULL_GATE_HOLD",
+    "dateLocal": "2026-11-06",
+    "authority": "CONTROL_PLANE_CURRENT_B4003_POINTER_AND_PHYSICAL_RECEIPTS",
+    "historicalEvergreenCapabilities": {
+      "count": 15,
+      "previewAccepted": 15,
+      "liveAccepted": 15,
+      "status": "PRESERVED_HISTORICAL_CERTIFIED_CANDIDATE_NOT_CURRENT_B4003_REACCEPTANCE",
+      "ledgerPath": "artifacts/orbit360-recovery/release-control/CAPABILITY_STATUS_LEDGER.json",
+      "ledgerBlobSha": "7b7a14d834c31f5e6f1d5142dc92532119b9f437",
+      "sourceSha": "4bf67a3738751fe2432a130fd23254a6f1c7d16e",
+      "buildId": "gi-i65-4bf67a373875-57f234755dc1",
+      "doNotReopenWithoutCausalChange": true
+    },
+    "currentB4003Evidence": [
+      {
+        "id": "SIGNED_REAL_UID_ROSTER_CALLABLE",
+        "status": "PASS_SCOPE_ONLY",
+        "signedChecks": 30,
+        "totalChecks": 30,
+        "identities": [
+          "Paula",
+          "Carlos",
+          "Samuel"
+        ],
+        "workflowRunId": 41853402508,
+        "sourceSha": "b094619281c1f2ccef7e08335adedc76cf878bbc",
+        "sourceBinding": "CALLABLE_ROSTER_ONLY",
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_SIGNED_REAL_UID_CALLABLE_NEGATIVES_PASS_20261104.json"
+      },
+      {
+        "id": "SYNTHETIC_PAYMENT_WRITE_RELOAD_RECONCILE_RESTORE",
+        "status": "PASS_SCOPE_ONLY",
+        "createRunId": 41807435779,
+        "cleanupRunId": 41807875649,
+        "sourceSha": "3bf9996da14fa1799dd3671581aad706d754d218",
+        "zeroResidue": true,
+        "doesNotRequireNewRealNovemberCobro": true,
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_FROZEN_SYNTHETIC_WRITE_RELOAD_RESTORE_PASS_20261104.json"
+      },
+      {
+        "id": "INICIO_AUTH_PAULA_DIRECCION_SOURCE_READINESS_COUNTRY",
+        "status": "PREVIEW_FOCAL_PASS_SCOPE_ONLY",
+        "previewSourceCommit": "d67c67638c849083523cb2640d2a11ec3249bc36",
+        "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-rc-41765742748-neoi3u7r.web.app/",
+        "checks": [
+          {
+            "country": "TODOS",
+            "sourcesConfirmed": "5/5"
+          },
+          {
+            "country": "GUATEMALA",
+            "sourcesConfirmed": "5/5"
+          },
+          {
+            "country": "COLOMBIA",
+            "sourcesConfirmed": "5/5"
+          }
+        ],
+        "selectedCountryRestored": "TODOS",
+        "backendService": "orbit360scopedpolicyreadpreview",
+        "backendActualConfigVerified": "1GiB_memory_maxInstances4_concurrency4",
+        "doesNotProveOtherRolesOrAllModules": true
+      },
+      {
+        "id": "SIGNED_CARLOS_AND_SAMUEL_PREVIOUS_ROLE_UAT",
+        "status": "PARTIAL_SIGNED_PREVIEW_EVIDENCE_PRESERVED",
+        "scope": "ONLY_PREVIOUSLY_PROVEN_ROLES_COUNTRIES_AND_MODULES",
+        "notAutomaticFullCurrentReleasePass": true
+      },
+      {
+        "id": "OPS_LEADS_HUMAN_AUTHOR_LABELS",
+        "status": "PARTIAL_REAL_UI_OBSERVATION_NOT_TRANSVERSAL_PASS",
+        "namedAuthorsObserved": 3,
+        "unresolvedHistoricalAuthorsAtLeast": 1,
+        "referenceControlKey": "b4003OpsLeadsHumanNameObserved20261104"
+      },
+      {
+        "id": "SIGNED_DEPLOYED_PERSONAL_COLLECTION_AND_EXACT_RESTORATION",
+        "status": "RESOLVED_AUTHENTICATED_RUNTIME_PASS_SCOPE_ONLY",
+        "signedRole": "Paula_Asesor",
+        "signedReadiness": "5_OF_5",
+        "personalGTQBefore": 0,
+        "personalGTQFixture": 111.11,
+        "personalGTQAfter": 0,
+        "syntheticPersonalGoalGTQ": 200,
+        "fixtureCobrosPayments": 4,
+        "finalCobrosPayments": 3,
+        "sourceReadRunId": 42243486854,
+        "createRunId": 42252540995,
+        "cleanupRunId": 42252887414,
+        "syntheticDocumentsRemoved": 5,
+        "currencyIsolationValidated": "GT_GTQ_AND_CO_COP_PLUS_TODOS_NO_CONVERSION",
+        "ledgerFindingId": "B4-003-P0-20261012-PERSONAL-COLLECTION"
+      }
+    ],
+    "currentReleaseBinding": {
+      "latestProductSourceChangeCommit": "3e87722d54871198a02d9b0909971fa2f4f913af",
+      "hostingSourceCommit": "3e87722d54871198a02d9b0909971fa2f4f913af",
+      "comparison": "NO_PRODUCT_BACKEND_SOURCE_CHANGE_THROUGH_HEAD_4F6262_AFTER_IMMUTABLE_PREVIEW",
+      "artifactAndCurrentProductSourceIdentical": true,
+      "sameImmutablePreviewArtifactId": 13472898683,
+      "exactReadbackArtifactId": 13473713426,
+      "doNotRebuildForMetadataOnlyCommits": true
+    },
+    "openClosure": {
+      "formalI6Percent": 50,
+      "p0Closed": 2,
+      "p0Total": 6,
+      "b4003Closed": false,
+      "productionPromotionAuthorized": false,
+      "remainingEvidenceRequired": [
+        "B4_003_CURRENT_SOURCE_ARTIFACT_DIGEST_PARITY",
+        "SIGN_INDEPENDENT_ROLE_COUNTRY_ADVISOR_SCOPES_ON_CURRENT_CANDIDATE",
+        "FOUR_REMAINING_P0_DECISIONS_AND_EXACT_EVIDENCE",
+        "GOAL_PARTICIPATION_TARGETED_WRITER_DEPLOY_AND_READBACK",
+        "OPS_LEADS_AUTHOR_RESOLVER_TRANSVERSAL",
+        "FULL_CURRENT_MODULE_MATRIX_PREVIEW_THEN_SAME_ARTIFACT_LIVE_READBACK"
+      ],
+      "fullGateRemainsHold": true
+    },
+    "projectSources": {
+      "package": "GRAVICENTRA_PROJECT_SOURCES_EVERGREEN_V7",
+      "exactCanonicalFiles": 9,
+      "verifiedMatches": 9,
+      "controlFlagCleared": true,
+      "guardedByRunId": 42051099728,
+      "guardConclusion": "success"
+    },
+    "noRealBusinessWrites": true,
+    "noDataReimport": true,
+    "noRulesRedeploy": true,
+    "noLivePromotion": true,
+    "certificatesOnlyReopenedByCausalInvalidation": true
+  },
+  "b4003PersonalCollectionP0SignedClosure20261106": {
+    "schema": "GI_B4003_SIGNED_PERSONAL_COLLECTION_FUNCTIONAL_CLOSURE_20261106_V1",
+    "gate": "I6.5/B4-003",
+    "status": "ONE_P0_RESOLVED_CURRENT_FULL_GATE_HOLD",
+    "ledgerFindingId": "B4-003-P0-20261012-PERSONAL-COLLECTION",
+    "sourceCommit": "3e87722d54871198a02d9b0909971fa2f4f913af",
+    "previewRunId": 42154167581,
+    "sourceReaderRunId": 42243486854,
+    "fixtureCreateRunId": 42252540995,
+    "fixtureCleanupRunId": 42252887414,
+    "checks": [
+      "SIGNED_PAULA_ASESOR_GT_5_OF_5",
+      "SYNTHETIC_PERSONAL_RECAUDO_GTQ_111_11",
+      "PERSONAL_GOAL_GTQ_200_AND_56_PERCENT",
+      "CONFIRMED_COBROS_DELTA_3_TO_4",
+      "EXACT_SERVER_CLEANUP_5_DOCS_AND_ZERO_RESIDUE",
+      "SIGNED_RELOAD_GT_5_OF_5_PERSONAL_RECAUDO_BACK_TO_Q0",
+      "SIGNED_CO_5_OF_5_COBROS_0_COP",
+      "SIGNED_TODOS_5_OF_5_GTQ_AND_COP_NOT_CONVERTED_AND_ORIGINAL_3_PAYMENTS"
+    ],
+    "remainingP0Count": 4,
+    "closedP0Count": 2,
+    "totalP0Count": 6,
+    "formalI6PercentPreservedWithoutInventedRecalc": 50,
+    "noRealDataChanged": true,
+    "noRulesRedeploy": true,
+    "noProductRebuild": true,
+    "noProductionPromotion": true,
+    "authoritativeLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json"
   }
 }
