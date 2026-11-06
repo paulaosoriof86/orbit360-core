@@ -65,10 +65,12 @@ assert.match(select(admin),/disabled/,'Admin no puede clasificar');
 assert.match(check(admin),/disabled/,'Admin no puede habilitar');
 
 const preview=renderModal({role:'Dirección',preview:true,tipoVinculacion:'freelance'});
-assert.match(select(preview),/disabled/,'Preview no permite mutar asesores reales');
-assert.match(check(preview),/disabled/,'Preview no permite habilitar freelancers reales');
+assert.doesNotMatch(select(preview),/disabled/,'Dirección puede seleccionar clasificación focal en Preview');
+assert.doesNotMatch(check(preview),/disabled/,'Dirección puede habilitar freelancers con ruta focal firmada');
+assert.match(preview,/id="eu-save-classification"/,'Preview muestra la acción explícita de clasificación real');
+assert.match(source,/classifyAdvisorDurable\(advisorId,classification,true\)/,'La UI llama exclusivamente al escritor acotado con consentimiento');
 
 assert.match(source,/\$\$\('\.eu-pais'\)\.forEach\(/,'El formulario enlaza todos los selectores de país mediante querySelectorAll');
 assert.doesNotMatch(source,/(?<!\$)\$\('\.eu-pais'\)\.forEach\(/,'No se invoca forEach sobre un único elemento');
 
-process.stdout.write('PASS: 15 aserciones de formulario real, enlace de eventos, roles y bloqueo Preview (sin cambios de datos).\n');
+process.stdout.write('PASS: formulario real, roles y guardado focal confirmado de clasificación en Preview; otros cambios no se habilitan.\n');

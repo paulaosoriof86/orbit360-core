@@ -660,18 +660,18 @@ Orbit.modules.equipo = (function () {
           <div class="ce-l" style="margin-bottom:7px"><b>Vinculación y participación en metas</b> <span class="muted">(configurable por Dirección)</span></div>
           <div class="cgrid">
             <label class="ce-l">Tipo de vinculación
-              <select id="eu-vinculacion" class="o-sel" ${puedeConfigurarParticipacion()&&!isMetaPreview()?'':'disabled'}>
+              <select id="eu-vinculacion" class="o-sel" ${puedeConfigurarParticipacion()?'':'disabled'}>
                 <option value="sin_clasificar" ${vinculacionDe(a)==='sin_clasificar'?'selected':''}>Sin clasificar</option>
                 <option value="interno" ${vinculacionDe(a)==='interno'?'selected':''}>Interno</option>
                 <option value="freelance" ${vinculacionDe(a)==='freelance'?'selected':''}>Freelance</option>
               </select>
             </label>
             <label class="ce-l ck" style="align-self:center">
-              <input type="checkbox" id="eu-participa-metas" ${vinculacionDe(a)==='freelance'&&a.participaMetas===true?'checked':''} ${puedeConfigurarParticipacion()&&!isMetaPreview()&&vinculacionDe(a)==='freelance'?'':'disabled'}>
+              <input type="checkbox" id="eu-participa-metas" ${vinculacionDe(a)==='freelance'&&a.participaMetas===true?'checked':''} ${puedeConfigurarParticipacion()&&vinculacionDe(a)==='freelance'?'':'disabled'}>
               Incluir freelance en metas institucionales
             </label>
           </div>
-          <div class="muted" style="font-size:11.5px;margin-top:7px">Interno participa por defecto. Freelance solo participa si Dirección marca la autorización. Sin clasificar no se presume interno ni contribuye al porcentaje; en Preview los cambios reales están bloqueados.</div>
+          <div class="muted" style="font-size:11.5px;margin-top:7px">Interno participa por defecto. Freelance solo participa si Dirección marca la autorización. Sin clasificar no contribuye al porcentaje. La acción «Guardar clasificación» actualiza únicamente estos dos campos, con confirmación y lectura directa del servidor, incluso en Preview.</div>
         </div>
         <details id="eu-mod-details">
           <summary style="cursor:pointer;font-weight:700;font-size:13px;font-family:var(--f-display)">⚙ Módulos visibles para este usuario <span class="muted" style="font-weight:400">(base por roles + excepciones)</span></summary>
@@ -685,6 +685,7 @@ Orbit.modules.equipo = (function () {
       </div>
       <div id="eu-actions" class="eu-actions" style="padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end">
         ${id ? '<button class="btn ghost" id="eu-delete" style="margin-right:auto;color:var(--red)">Eliminar usuario</button>' : ''}
+        ${id&&puedeConfigurarParticipacion()?'<button class="btn ghost" id="eu-save-classification" type="button">Guardar clasificación</button>':''}
         <button class="btn ghost" id="eu-cancel">Cancelar</button><button class="btn primary" id="eu-ok">Guardar</button></div>
     </div>`;
     document.body.appendChild(back);
@@ -706,7 +707,7 @@ Orbit.modules.equipo = (function () {
     const refreshParticipacion = () => {
        const tipo=$('#eu-vinculacion').value;
        if(tipo!=='freelance') $('#eu-participa-metas').checked=false;
-       $('#eu-participa-metas').disabled=!puedeConfigurarParticipacion()||isMetaPreview()||tipo!=='freelance';
+       $('#eu-participa-metas').disabled=!puedeConfigurarParticipacion()||tipo!=='freelance';
     };
     const refreshModuleHints = (reset) => {
       const base = new Set(baseModules(selectedRoles()));
@@ -730,6 +731,29 @@ Orbit.modules.equipo = (function () {
     back.querySelectorAll('input,select').forEach(el => el.addEventListener('change', markDirty));
     $('#eu-reset-mod').addEventListener('click', () => { modulesTouched = false; refreshModuleHints(true); markDirty(); });
     refreshRoleDefault(); refreshCountryDefault(); refreshParticipacion(); refreshModuleHints(false);
+
+    if(id&&$('#eu-save-classification'))$('#eu-save-classification').addEventListener('click',async()=>{
+      const st=S(),advisorId=canonicalAdvisorId(a,id),tipo=$('#eu-vinculacion').value;
+      const classification={tipoVinculacion:tipo,participaMetas:tipo==='freelance'&&$('#eu-participa-metas').checked};
+      if(!advisorId||!puedeConfigurarParticipacion()||!st||typeof st.classifyAdvisorDurable!=='function')return inform('No hay una vía operativa autorizada para esta clasificación.','No guardado');
+      if(!['interno','freelance','sin_clasificar'].includes(tipo))return inform('Selecciona una vinculación válida.');
+      if(vinculacionDe(a)===tipo&&Boolean(a.participaMetas)===classification.participaMetas)return inform('Esta clasificación ya coincide con el registro consultado.');
+      const message='Se modificará la clasificación REAL de «'+U.esc(a.nombre||'usuario')+'» en Firestore. No cambiarán roles, permisos, países, contacto ni historial anterior. ¿Confirmas?';
+      const ok=Orbit.ui&&Orbit.ui.confirm?await Orbit.ui.confirm(message,{title:'Confirmar escritura real de Equipo'}):window.confirm(message);
+      if(!ok)return;
+      const button=$('#eu-save-classification');button.disabled=true;button.textContent='Confirmando en servidor…';
+      try{
+        await st.classifyAdvisorDurable(advisorId,classification,true);
+        const row=await canonicalAdvisorReadback(advisorId,Object.assign({},a,classification));
+        if(String(row.tipoVinculacion||'sin_clasificar')!==tipo||Boolean(row.participaMetas)!==classification.participaMetas)throw new Error('EQUIPO_CLASSIFICATION_READBACK_MISMATCH');
+        if(Orbit.assignableAdvisorRoster&&typeof Orbit.assignableAdvisorRoster.invalidate==='function')Orbit.assignableAdvisorRoster.invalidate();
+        toast('✓ Clasificación real guardada y verificada');
+        dirty=false;close(true);render(document.getElementById('host')||document.getElementById('mod-host'));
+      }catch(error){
+        button.disabled=false;button.textContent='Guardar clasificación';
+        toast('No fue posible verificar la clasificación: '+String(error&&error.code||error&&error.message||'SERVER_WRITE_FAILED').replace(/^functions\//,''));
+      }
+    });
 
     if (id && $('#eu-delete')) $('#eu-delete').addEventListener('click', async () => {
       const advisorId = canonicalAdvisorId(a, id);

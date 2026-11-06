@@ -483,6 +483,40 @@
     scopedMutationRow(collection,row,m);authorize(collection,'update',row);setPending(collection,id,row,{kind:'update',patch:expectedPatch(patch||{},collection)});emit(collection);
     return callDurable('update',collection,id,row,prior).then(function(){return clone(row);});
   }
+  // Explicit administrative classification is the only real-data write available
+  // from an isolated B4 Preview. All ordinary Preview mutations remain synthetic.
+  // The server is the final role/scope/participation authority and audits changes.
+  function classifyAdvisorDurable(id,classification,explicitRealDataConsent){
+    var m,prior,patch,role;
+    try{
+      if(explicitRealDataConsent!==true)error('PRODUCT_TEAM_REAL_DATA_CONFIRMATION_REQUIRED');
+      m=member();id=text(id);role=text(m.activeRole).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+      if(!['direccion','superadmin','super_admin'].includes(role))error('PRODUCT_TEAM_CLASSIFICATION_ROLE_DENIED');
+      if(!id||!classification||typeof classification!=='object'||Object.keys(classification).some(function(k){return !['tipoVinculacion','participaMetas'].includes(k);}))error('PRODUCT_TEAM_CLASSIFICATION_FIELDS_INVALID');
+      if(!['interno','freelance','sin_clasificar'].includes(classification.tipoVinculacion)||typeof classification.participaMetas!=='boolean'||(classification.tipoVinculacion!=='freelance'&&classification.participaMetas))error('PRODUCT_TEAM_CLASSIFICATION_INVALID');
+      prior=get('asesores',id);
+      if(!prior||prior.projectionOnly===true||text(prior.canonicalDocumentId||prior.id)!==id)error('PRODUCT_TEAM_CANONICAL_ADVISOR_REQUIRED');
+      patch={tipoVinculacion:classification.tipoVinculacion,participaMetas:classification.participaMetas};
+      authorize('asesores','update',Object.assign({},prior,patch));
+    }catch(e){return Promise.reject(e);}
+    state.pending+=1;state.tenantId=text(m.tenantId);state.lastError='';
+    return provider.initialize().then(function(ctx){
+      if(!ctx||!ctx.auth||!ctx.auth.currentUser||text(ctx.auth.currentUser.uid)!==text(m.uid))error('PRODUCT_WRITE_AUTH_CONTEXT_MISMATCH');
+      if(provider.browserFirestoreWriteAuthorized!==false||provider.serverWriteTransport!=='firebase-functions'||provider.noFallback!==true||typeof provider.callFunction!=='function')error('PRODUCT_WRITE_SERVER_TRANSPORT_REQUIRED');
+      // This deliberate owner-authorized path uses the real, signed operational
+      // command even on Preview. No other collection or payload is eligible.
+      return provider.callFunction(GENERAL_COMMAND,{tenantId:m.tenantId,activeRole:m.activeRole,
+        mutations:[{action:'update',collection:'asesores',id:id,payload:clone(patch)}]},'us-central1');
+    }).then(function(result){
+      requireServerReadback(result,[{action:'update',collection:'asesores',id:id}]);
+      state.pending=Math.max(0,state.pending-1);state.committed+=1;state.lastCommittedAt=new Date().toISOString();state.lastError='';
+      try{window.dispatchEvent(new CustomEvent('orbit:operational-write:committed',{detail:{collection:'asesores',id:id,action:'update',classificationOnly:true,serverOwned:true,canonicalReadback:true}}));}catch(e){}
+      return {ok:true,classificationOnly:true,canonicalReadback:true,id:id};
+    }).catch(function(e){
+      state.pending=Math.max(0,state.pending-1);state.failed+=1;state.lastError=text(e&&e.message||e)||'PRODUCT_TEAM_CLASSIFICATION_FAILED';
+      throw e;
+    });
+  }
   function removeDurable(collection,id){
     id=text(id);if(!id)error('PRODUCT_WRITE_ID_REQUIRED');
     var prior=get(collection,id);if(!prior)error('PRODUCT_WRITE_RECORD_NOT_FOUND');
@@ -507,6 +541,7 @@
     facade={
       all:mergedAll,get:get,where:where,find:find,insert:insert,update:update,remove:remove,
       insertDurable:insertDurable,updateDurable:updateDurable,removeDurable:removeDurable,batchDurable:batchDurable,
+      classifyAdvisorDurable:classifyAdvisorDurable,
       metaPreviewEnabled:isB2PreviewHost,metaPreviewFixtures:metaPreviewFixtures,
       metaPreviewQaProbe:function(input){return metaPreviewQaRead(input,'probe');},metaPreviewQaInspect:function(input){return metaPreviewQaRead(input,'inspect');},
       on:function(collection,callback){if(typeof collection==='function'){callback=collection;}if(typeof callback!=='function')return function(){};listeners.push(callback);return function(){listeners=listeners.filter(function(x){return x!==callback;});};},
