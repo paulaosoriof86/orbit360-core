@@ -12378,20 +12378,57 @@
       "targetGate": "B4-003",
       "source": "PAULA_REQUEST_AND_REPO_CAUSAL_AUDIT_20261012",
       "surface": "QA / Residuos de prueba interrumpida",
-      "priority": "BLOCKING_P0",
-      "blocking": true,
+      "priority": "DEFERRED_POSTPRODUCTION_OWNER_AUTHORIZED",
+      "blocking": false,
       "owner": [
         "tools/gravicentra-i6-5-b4-003-preview-proof.mjs"
       ],
       "finding": "Adjudicar 14 filas sintéticas del run cancelado 38102224750, con limpieza permitida solo tras provenance.",
       "rootCause": "Run 38102224750 fue interrumpido; read-only inventario detectó 14 marcadores sintéticos.",
       "closureCondition": "Snapshot IDs y dependencias; autorización scoped de eliminación si procede, cleanup y readback íntegro o HOLD por ambigüedad.",
-      "status": "OPEN_P0_NOT_ACCEPTED",
+      "status": "OWNER_AUTHORIZED_POSTPRODUCTION_PHYSICAL_RETENTION_NOT_DELETED",
       "mayDisappearWithoutDisposition": false,
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_P0_FINDINGS_DECISIONS_FREEZE_20261012.md",
       "receiptBlobSha": "2760d2aeb961bac5a0ce11e326c689143d2cc083",
       "machineProofRunId": 38282275915,
-      "visualPassDoesNotClose": true
+      "visualPassDoesNotClose": true,
+      "ownerDecision20261106": {
+        "owner": "Paula Andrea Osorio Franco",
+        "dateLocal": "2026-11-06",
+        "authorization": "Deferir únicamente limpieza física de ambos grupos QA; no borrar ni modificar registros; condicionado a exclusión verificable de indicadores comerciales",
+        "status": "KPI_EXCLUSION_VERIFIED_SCOPE_ONLY_RETAINED_SAFELY",
+        "preservation": "NO_DELETE_NO_UPDATE_NO_REIMPORT",
+        "exactReadbackRunId": 41144205677,
+        "readbackReceipt": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_EXACT_QA_RESIDUE_DEPENDENCIES_ADJUDICATION_20261030.json",
+        "signedBrowser": {
+          "preview": "https://ays-orbit-360-lab--gi-i65-b4-rc-41765742748-neoi3u7r.web.app/",
+          "sourceCommit": "3e87722d54871198a02d9b0909971fa2f4f913af",
+          "role": "Paula_Direccion_TODOS",
+          "policyTotal": 1425,
+          "policyCommercialTotal": 1416,
+          "policyQaAuditTotal": 9,
+          "policyAuditIncludesThreeB2AndSixB4": true,
+          "policyCommercialActive": 223,
+          "policyNetPremium": "GTQ_632719_AND_COP_175456570_EXCLUDING_QA",
+          "cobrosKpiConfirmed": "5_PAYMENTS_2744_GTQ",
+          "cobrosKpiPending": "2396_GTQ",
+          "cobrosKpiOverdue": "109875840_COP_AND_227367_GTQ",
+          "cobrosQueryB2Ren": "ZERO_COMMERCIAL_ROWS",
+          "cobrosQueryB4003": "ONE_QA_PORTFOLIO_ROW_683_20_GTQ_VISIBLE_IN_LIST_NOT_FINANCIAL_KPI",
+          "cobrosKpisUnchangedUnderQueries": true
+        },
+        "ci": {
+          "runId": 42154167581,
+          "financialQaTests": "5_PASS_ZERO_FAIL",
+          "pipelineQaTests": "11_PASS_ZERO_FAIL",
+          "queryOwnerBlob": "391d6c7df59b5d6fbb64adb419cb240c078545b8"
+        },
+        "limitation": "Cobros operational list still shows one cancelled-run QA due portfolio projection; separate B4-003 UI acceptance defect OPEN, not a KPI payment or a certification PASS.",
+        "gate": "I6.5/B4-003_FULL_HOLD",
+        "postproductionAction": "EXACT_REVERSIBLE_OWNER_REVIEW_AFTER_LIVE_ACCEPTANCE",
+        "nonblockingScope": "ONLY_PHYSICAL_QA_CLEANUP_AND_IDENTIFIED_QA_P0_FINDING",
+        "notProductionAccepted": true
+      }
     },
     {
       "id": "B4-003-P0-20261012-QA-ORPHAN-RENEWALS",
@@ -12399,20 +12436,57 @@
       "targetGate": "B4-003",
       "source": "PAULA_REQUEST_AND_REPO_CAUSAL_AUDIT_20261012",
       "surface": "QA / Renovaciones huérfanas y cartera",
-      "priority": "BLOCKING_P0",
-      "blocking": true,
+      "priority": "DEFERRED_POSTPRODUCTION_OWNER_AUTHORIZED",
+      "blocking": false,
       "owner": [
         "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R19_B2_QA_RESIDUE_ADJUDICATION_20261005.json"
       ],
       "finding": "Adjudicar tres pólizas B2 QA sin padre con 12 relaciones financieras antes de cualquier cleanup.",
       "rootCause": "El último readback confirma parentExists=false y cuatro dependencias por cada una de tres pólizas.",
       "closureCondition": "Readback exacto de origen y 12 dependencias; tratamiento autorizado y reversible con integridad sin eliminar obligaciones reales.",
-      "status": "OPEN_P0_NOT_ACCEPTED",
+      "status": "OWNER_AUTHORIZED_POSTPRODUCTION_PHYSICAL_RETENTION_NOT_DELETED",
       "mayDisappearWithoutDisposition": false,
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_P0_FINDINGS_DECISIONS_FREEZE_20261012.md",
       "receiptBlobSha": "2760d2aeb961bac5a0ce11e326c689143d2cc083",
       "machineProofRunId": 38282275915,
-      "visualPassDoesNotClose": true
+      "visualPassDoesNotClose": true,
+      "ownerDecision20261106": {
+        "owner": "Paula Andrea Osorio Franco",
+        "dateLocal": "2026-11-06",
+        "authorization": "Deferir únicamente limpieza física de ambos grupos QA; no borrar ni modificar registros; condicionado a exclusión verificable de indicadores comerciales",
+        "status": "KPI_EXCLUSION_VERIFIED_SCOPE_ONLY_RETAINED_SAFELY",
+        "preservation": "NO_DELETE_NO_UPDATE_NO_REIMPORT",
+        "exactReadbackRunId": 41144205677,
+        "readbackReceipt": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_EXACT_QA_RESIDUE_DEPENDENCIES_ADJUDICATION_20261030.json",
+        "signedBrowser": {
+          "preview": "https://ays-orbit-360-lab--gi-i65-b4-rc-41765742748-neoi3u7r.web.app/",
+          "sourceCommit": "3e87722d54871198a02d9b0909971fa2f4f913af",
+          "role": "Paula_Direccion_TODOS",
+          "policyTotal": 1425,
+          "policyCommercialTotal": 1416,
+          "policyQaAuditTotal": 9,
+          "policyAuditIncludesThreeB2AndSixB4": true,
+          "policyCommercialActive": 223,
+          "policyNetPremium": "GTQ_632719_AND_COP_175456570_EXCLUDING_QA",
+          "cobrosKpiConfirmed": "5_PAYMENTS_2744_GTQ",
+          "cobrosKpiPending": "2396_GTQ",
+          "cobrosKpiOverdue": "109875840_COP_AND_227367_GTQ",
+          "cobrosQueryB2Ren": "ZERO_COMMERCIAL_ROWS",
+          "cobrosQueryB4003": "ONE_QA_PORTFOLIO_ROW_683_20_GTQ_VISIBLE_IN_LIST_NOT_FINANCIAL_KPI",
+          "cobrosKpisUnchangedUnderQueries": true
+        },
+        "ci": {
+          "runId": 42154167581,
+          "financialQaTests": "5_PASS_ZERO_FAIL",
+          "pipelineQaTests": "11_PASS_ZERO_FAIL",
+          "queryOwnerBlob": "391d6c7df59b5d6fbb64adb419cb240c078545b8"
+        },
+        "limitation": "Cobros operational list still shows one cancelled-run QA due portfolio projection; separate B4-003 UI acceptance defect OPEN, not a KPI payment or a certification PASS.",
+        "gate": "I6.5/B4-003_FULL_HOLD",
+        "postproductionAction": "EXACT_REVERSIBLE_OWNER_REVIEW_AFTER_LIVE_ACCEPTANCE",
+        "nonblockingScope": "ONLY_PHYSICAL_QA_CLEANUP_AND_IDENTIFIED_QA_P0_FINDING",
+        "notProductionAccepted": true
+      }
     }
   ],
   "phaseBBacklog": [
@@ -13476,5 +13550,19 @@
     "b4003Closed": false,
     "overallImplementationPercent": null,
     "formalI6ProgressPercent": 50
+  },
+  "currentSixPriorityP0Disposition20261106": {
+    "recordType": "CURRENT_ADDITIVE_OWNER_DEFERRED_NOT_HISTORICAL_COUNT_REWRITE",
+    "dateLocal": "2026-11-06",
+    "closedFunctionalP0": 4,
+    "ownerAuthorizedDeferredQaP0": 2,
+    "remainingQaCleanupBlockingP0": 0,
+    "totalFrozenP0": 6,
+    "qaPhysicalRecordsPreserved": true,
+    "qaCommercialKpisVerifiedBySourceTestsAndSignedPreview": true,
+    "cobrosQaOperationalListLeakOpen": true,
+    "formalI6ProgressPercent": 50,
+    "fullB4003Hold": true,
+    "productionAccepted": false
   }
 }
