@@ -10,7 +10,7 @@
   "branch": "recovery/fase-a-clean-20260831",
   "forensicOriginSha": "9c95f31461f2eabe9804625b5659bee772f5602a",
   "createdAtUtc": "2026-08-31T18:00:00Z",
-  "updatedAtUtc": "2026-11-04T15:06:51.171Z",
+  "updatedAtUtc": "2026-11-06T16:38:04.611Z",
   "status": "ITERATION_2_SOURCE_MATERIALIZED_VALIDATION_PENDING",
   "currentIteration": 2,
   "lastCompletedIteration": 1,
@@ -187,7 +187,7 @@
     "phaseAIterationStatuses": "HISTORICAL_FIELDS_ABOVE_PRESERVED_UNTIL_FORMAL_GATE_EVIDENCE;_NO_NEW_PASS_INFERRED",
     "labDataWriteScope": "ONLY_35_AUTHORIZED_COUNTRY_FIELDS;_NO_AUGUST_REFRESH"
   },
-  "nextAction": "B4-003 current 2026-11-06: latest exact isolated Preview at product source 3e87722d54871198a02d9b0909971fa2f4f913af, CI 42154167581 PASS (immutable artifact 13472898683; readback 13473713426). Canonical head after metadata-only reconciliation 12cbc7415eb67d106efaacc4bf313f50b00d5dcd; no product/backend code diff since Preview. Seven Equipo classifications signed persisted/reload 7/7 and must NOT be repeated. Control Plane pointer b4003LatestImmutablePreviewParity20261106 governs this readback. Active gate still HOLD: I6 50%, one of six P0 closed. NEXT FIRST: signed deployed Preview personal collection 5/5 sources and independent role/country advisor scope on same candidate; adjudicate freelancers participation, Inicio motivational texts, 14 interrupted QA fixtures, three B2 orphan policies plus 12 finance dependencies, and Ops/Leads historical human-author resolver. Preserve owner temporary Rules risk exception, no reimports, no unrelated repeated QA, no new preview build for metadata changes. Only after all P0 and current module-matrix preview PASS, promote exact retained artifact with independent digest and live module-by-module validation/rollback before PRODUCTION_ACCEPTED.",
+  "nextAction": "B4-003 current 2026-11-06: signed deployed Preview personal collection P0 RESOLVED with Paula Asesor GT 5/5 sources, exact synthetic GTQ111.11 vs goal GTQ200 (56%), 4 confirmed cobros with fixture; after exact five-document cleanup workflow 42252887414 PASS, full signed reload 5/5 returned personal Q0 and 3 confirmed cobros (Q2,306 GTQ), CO $0 COP isolated, TODOS 5/5 GTQ/COP no conversion. Source scoped reader 7/7 via workflow 42243486854; create run 42252540995. Formal ledger closure commit 4f6262ed349e52d170bfa9ba2238a01f42372ac0; CONTROL_PLANE successor inventory commit ecc3f1af9e11495eb68987dca2fbfaa32b3d3bba. Current I6 50% unchanged pending authoritative recomputation; now TWO_OF_SIX P0 closed, FOUR_OF_SIX P0 open, B4-003 HOLD and production NO-GO. NEXT FIRST: freelancers/goal participation P0: use seven already signed persisted team classifications (do not reclassify), verify real Dirección GT and cross-role eligibility in same immutable Preview source 3e87722d54871198a02d9b0909971fa2f4f913af, no new build for metadata; then contextual Inicio texts, 14 canceled-run QA fixtures, 3 orphan B2 policies plus 12 financial dependencies and Ops/Leads human author resolver. Do not change countries, reimport data, Rules or real rows; promote only after current module-matrix preview PASS and exact retained artifact digest with live module-by-module readback.",
   "sourceOfTruth": {
     "projectBoundaryPrevalentAddendum": "orbit360-platform/docs/recovery/ADDENDUM_PREVALENTE_CHATGPT_PROJECT_BOUNDARY_20260831.md",
     "mutableState": "orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json",
@@ -273,10 +273,21 @@
     "sourceSha": "b094619281c1f2ccef7e08335adedc76cf878bbc",
     "immutableArtifactId": 13315537234,
     "receipt": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_SIGNED_CARLOS_ROLE_COBROS_AND_QA_QUARANTINE_DELTA_20261104.json",
-    "carlosOperativoCobros": {"GT":2504,"CO":56,"TODOS":2560},
-    "carlosAsesorCobros": {"GT":0,"CO":37,"TODOS":37},
+    "carlosOperativoCobros": {
+      "GT": 2504,
+      "CO": 56,
+      "TODOS": 2560
+    },
+    "carlosAsesorCobros": {
+      "GT": 0,
+      "CO": 37,
+      "TODOS": 37
+    },
     "coldReloadAsesorCo37": true,
-    "aseguradorasOperativo": {"GT":16,"CO":17},
+    "aseguradorasOperativo": {
+      "GT": 16,
+      "CO": 17
+    },
     "aseguradorasAsesorDirectRouteUiDenied": true,
     "polizasGtCommercial": 1292,
     "polizasGtQaAudit": 9,
