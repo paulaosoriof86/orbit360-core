@@ -182,7 +182,19 @@ async function getChannel(id){
   return channel;
 }
 function versionName(channel){
-  const name=channel?.release?.version?.name;
+  const raw=channel?.release?.version?.name;
+  let name=raw;
+  // Observed in diagnostic 42314060136: Firebase returns project-qualified
+  // names. Normalize only the observed project and the already pinned site.
+  const qualified=typeof raw==='string'?/^projects\/([^/]+)\/(sites\/([^/]+)\/versions\/[A-Za-z0-9_-]+)$/.exec(raw):null;
+  if(qualified){
+    exact(qualified[1],'646761409743','HOSTING_VERSION_PROJECT_MISMATCH');
+    exact(qualified[3],binding.site,'HOSTING_VERSION_SITE_MISMATCH');
+    requireValue(typeof channel?.name==='string' &&
+      channel.name.startsWith('projects/646761409743/sites/'+binding.site+'/channels/'),
+      'HOSTING_CHANNEL_PROJECT_OR_SITE_MISMATCH');
+    name=qualified[2];
+  }
   requireValue(typeof name==='string' &&
     new RegExp('^sites/'+binding.site+'/versions/[A-Za-z0-9_-]+$').test(name),'HOSTING_VERSION_NAME_MISSING_OR_WRONG_SITE');
   return name;

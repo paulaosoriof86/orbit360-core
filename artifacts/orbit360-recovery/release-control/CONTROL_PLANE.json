@@ -661,8 +661,8 @@
       "productionPromotionAuthorized": false
     },
     "retainedHostingPreflight20261106": {
-      "recordedAtUtc": "2026-11-06T23:46:26Z",
-      "status": "CANONICAL_ARTIFACT_PASS_HOSTING_METADATA_PARSER_AND_CERTIFIED_CHANNEL_LOOKUP_UNRESOLVED",
+      "recordedAtUtc": "2026-11-06T23:53:21Z",
+      "status": "STRICT_OBSERVED_PROJECT_VERSION_FORMAT_CORRECTED_FULL_PREFLIGHT_READBACK_PENDING_CERTIFIED_ROLLBACK_CHANNEL_404",
       "productSourceSha": "857f1222f360a42a06e012810a1c01bce155a26f",
       "artifactId": 13549460562,
       "attempts": [
@@ -707,11 +707,86 @@
           "functionsDeployment": false,
           "rulesOrAuthChange": false,
           "oldPreviewJobsSkipped": true
+        },
+        {
+          "runId": 42314060136,
+          "runnerCommit": "ddbd99d6f2100dd1a89ac63bf45536f0e9210349",
+          "artifactId": 13549353918,
+          "artifactZipSha256": "9ffbc32b5ee05c5596d3761601f6d92dbfe6ec0f54ab25f112d596436026ac7a",
+          "result": "OBSERVED_PROJECT_QUALIFIED_VERSION_FORMAT_CAUSAL_PARSER_FIX_REQUIRED_ROLLBACK_CHANNEL_404",
+          "observedPreview": {
+            "requestedSite": "ays-orbit-360-lab",
+            "requestedChannelId": "gi-i65-b4-rc-41765742748",
+            "name": "projects/646761409743/sites/ays-orbit-360-lab/channels/gi-i65-b4-rc-41765742748",
+            "url": "https://ays-orbit-360-lab--gi-i65-b4-rc-41765742748-neoi3u7r.web.app",
+            "release": {
+              "name": "projects/646761409743/sites/ays-orbit-360-lab/channels/gi-i65-b4-rc-41765742748/releases/1794007641461000",
+              "versionType": "object",
+              "versionName": "projects/646761409743/sites/ays-orbit-360-lab/versions/c5e1ae001fae793b"
+            }
+          },
+          "observedLive": {
+            "requestedSite": "ays-orbit-360-lab",
+            "requestedChannelId": "live",
+            "name": "projects/646761409743/sites/ays-orbit-360-lab/channels/live",
+            "url": "https://ays-orbit-360-lab.web.app",
+            "release": {
+              "name": "projects/646761409743/sites/ays-orbit-360-lab/channels/live/releases/1791398188833000",
+              "versionType": "object",
+              "versionName": "projects/646761409743/sites/ays-orbit-360-lab/versions/3087fabd2db9b639"
+            }
+          },
+          "publicLiveProbes": {
+            "origins": [
+              {
+                "base": "https://ays-orbit-360-lab.web.app",
+                "probes": [
+                  {
+                    "path": "index.html",
+                    "status": 200,
+                    "sha256": "07571bf25485b07042f8a07d7510a323990f21d3cf809a76f99f5d39c454e7d0",
+                    "byteCount": 15768
+                  },
+                  {
+                    "path": "__recovery__/build.json",
+                    "status": 404,
+                    "sha256": "a5209717d04e1213c517d38211b545d82963a4880c6524eb29713b8c4972df36",
+                    "byteCount": 21376
+                  }
+                ]
+              },
+              {
+                "base": "https://app.aysseguros.com",
+                "probes": [
+                  {
+                    "path": "index.html",
+                    "status": 200,
+                    "sha256": "125b24a3fc215a368a7183a107cd55eb5a6332fc8a7f8354ed94e3169340ec4e",
+                    "byteCount": 16893
+                  },
+                  {
+                    "path": "__recovery__/build.json",
+                    "status": 500,
+                    "sha256": "07e2c9e80962ab9ff4072c4d192e5b5e51d993d7e100c5af563c2eeff21cc002",
+                    "byteCount": 712
+                  }
+                ]
+              }
+            ]
+          },
+          "hostingMutation": false,
+          "dataWrites": 0,
+          "functionsDeployment": false,
+          "rulesOrAuthChange": false
         }
       ],
-      "nextReadOnlyAction": "Persist safe actual channel/version fields and independent public LIVE build probes before strict parser; identify certified rollback from retained Hosting evidence without a new channel or weaker hash checks.",
+      "nextReadOnlyAction": "Rerun same retained preflight with exact parser. Recover certified rollback version from existing I5 run35416730679/retained Hosting evidence. Existing LIVE965/marker404 drift is already governed by b4003LiveHostingIntegrityHold and causal attribution; do not create a new finding, weaken hashes, clone or create channels.",
       "rollbackCertifiedByThisAttempt": false,
-      "productionPromotionAuthorized": false
+      "productionPromotionAuthorized": false,
+      "parserFix": "Normalize only observed projects/646761409743/ qualified version resources after exact project/site/channel validation; retain original observed names.",
+      "existingLiveIntegrityHoldPreserved": true,
+      "hostingOnlyPromotionEligibilityNotYetGranted": true,
+      "backendParityAuthorityReconciliationPending": true
     }
   },
   "b4003LeadsCurrent40ProspectiveHumanActorFocal20261106": {
