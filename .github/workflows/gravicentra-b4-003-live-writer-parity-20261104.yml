@@ -1,5 +1,5 @@
 # B4-003 causal missing source parity on the existing production writer.
-# 2026-11-05: owner-authorized targeted goal participation writer parity, exact readback and rollback.
+# 2026-11-05: owner-authorized goal classification for multi-country Equipo rows; exact source readback and rollback.
 # One reviewed target, exact deployed-source byte readback and rollback to
 # the exact prior Cloud Functions source archive if post-deploy checks fail.
 name: Gravicentra B4-003 LIVE Writer Parity Exact
@@ -23,10 +23,11 @@ jobs:
     env:
       PROJECT_ID: ays-orbit-360-lab
       GI_TARGET_FUNCTION: orbit360ProductOperationalCommand
-      EXACT_WRITER_GIT_BLOB: b3d0059457142659633498c9c52c6b84ea68200f
+      EXACT_WRITER_GIT_BLOB: 187efbfa9868531349154f26ec90a5e2c2ed33e8
+      PREVIOUS_WRITER_GIT_BLOB: b3d0059457142659633498c9c52c6b84ea68200f
       FIXED_ROSTER_GIT_BLOB: 9778d74b6d305ff56caf73bb68be3dadac4b14ce
       EXACT_GOAL_CONTRACT_GIT_BLOB: ff86fa441fd6cb4ec6254e2dc5078a37bf68fc36
-      EXACT_EQUIPO_UI_GIT_BLOB: ab0fc0dab4d9e4fb19f5ae165018c536259443a1
+      EXACT_EQUIPO_UI_GIT_BLOB: 1bd7881ed29f6d7488bb806a96a0ab52c5c5c3b8
       SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
       SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
       SA_LAB_LEGACY: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
@@ -49,7 +50,7 @@ jobs:
           test "$(git rev-parse HEAD:functions/assignable-advisor-roster.js)" = "$FIXED_ROSTER_GIT_BLOB"
           test "$(git rev-parse HEAD:functions/goal-participation-contract.js)" = "$EXACT_GOAL_CONTRACT_GIT_BLOB"
           test "$(git rev-parse HEAD:orbit360-platform/modules/equipo.js)" = "$EXACT_EQUIPO_UI_GIT_BLOB"
-          test "$(git rev-parse 66012815b42c0cc26cb372c19f74d52bddba953d:functions/product-operational-domain.js)" = "$EXACT_WRITER_GIT_BLOB"
+          test "$(git rev-parse 66012815b42c0cc26cb372c19f74d52bddba953d:functions/product-operational-domain.js)" = "$PREVIOUS_WRITER_GIT_BLOB"
           node --check functions/product-operational-domain.js
           node --check functions/goal-participation-contract.js
           node --check orbit360-platform/modules/equipo.js
@@ -107,13 +108,14 @@ jobs:
           node - <<'NODE'
           const fs=require('fs'),tmp=process.env.RUNNER_TEMP;
           const before=JSON.parse(fs.readFileSync(tmp+'/gi-b4003-live-sources-before.json','utf8'));
-          if(before.functions[0].name!=='orbit360AssignableAdvisorRoster'||before.functions[1].name!==process.env.GI_TARGET_FUNCTION||!before.rosterSourceMatchesCurrent||!before.writerSourceMatchesCurrent||!before.functions[1].goalParticipationContractSha256)throw Error('EXPECTED_EXACT_ROSTER_AND_WRITER_SOURCE_BYTES_REQUIRED');
+          if(before.functions[0].name!=='orbit360AssignableAdvisorRoster'||before.functions[1].name!==process.env.GI_TARGET_FUNCTION||!before.rosterSourceMatchesCurrent||!before.writerGoalParticipationContractMatchesCurrent||!before.functions[1].goalParticipationContractSha256)throw Error('EXPECTED_ROSTER_AND_GOAL_CONTRACT_SOURCE_BYTES_REQUIRED');
+          if(![process.env.PREVIOUS_WRITER_GIT_BLOB,process.env.EXACT_WRITER_GIT_BLOB].includes(before.functions[1].sourceGitBlobSha))throw Error('UNRECOGNIZED_PREVIOUS_PRODUCTION_WRITER_DENIED');
           const x=JSON.parse(fs.readFileSync(tmp+'/gi-b4003-writer-before.json','utf8'));
           const raw=x.result??x,v=typeof raw==='string'?JSON.parse(raw):raw,rows=Array.isArray(v)?v:Array.isArray(v.functions)?v.functions:[];
           const names=rows.map(r=>String(r.id||r.name||r.function||'').split('/').pop()).sort();
           if(names.length!==81||!names.includes(process.env.GI_TARGET_FUNCTION))throw Error('PRELIVE_EXACT_81_FUNCTION_INVENTORY_DRIFT');
           fs.writeFileSync(tmp+'/gi-b4003-writer-before-names.json',JSON.stringify(names));
-          const alreadyExact=before.writerGoalParticipationContractMatchesCurrent===true;
+          const alreadyExact=before.writerSourceMatchesCurrent===true&&before.writerGoalParticipationContractMatchesCurrent===true;
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'needs_deploy='+(alreadyExact?'false':'true')+'\n');
           if(alreadyExact) {
             fs.writeFileSync(tmp+'/gi-b4003-writer-exact-result.json',JSON.stringify({

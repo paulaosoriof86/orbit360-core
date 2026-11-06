@@ -21,7 +21,9 @@ on:
       - orbit360-platform/data/store-firestore-product-operational-p0.js
       - tests/goal-participation-classification-writer.test.cjs
       - functions/b4-003-scoped-bootstrap-reader.js
+      - functions/product-operational-domain.js
       - tools/gravicentra-b4-003-scoped-bootstrap-reader.test.cjs
+      - tools/gravicentra-b4-003-operational-write-security-regression.test.cjs
       - tools/gravicentra-b4-003-financial-qa-commercial-exclusion.test.cjs
 
 permissions:
@@ -70,7 +72,7 @@ jobs:
           test "$(git rev-parse HEAD)" = "$SOURCE_SHA"
           git merge-base --is-ancestor 66012815b42c0cc26cb372c19f74d52bddba953d HEAD
           test "$(git rev-parse HEAD:functions/assignable-advisor-roster.js)" = '9778d74b6d305ff56caf73bb68be3dadac4b14ce'
-          test "$(git rev-parse HEAD:functions/product-operational-domain.js)" = 'b3d0059457142659633498c9c52c6b84ea68200f'
+          test "$(git rev-parse HEAD:functions/product-operational-domain.js)" = '187efbfa9868531349154f26ec90a5e2c2ed33e8'
           test "$(git rev-parse HEAD:functions/goal-participation-contract.js)" = 'ff86fa441fd6cb4ec6254e2dc5078a37bf68fc36'
           test "$(git rev-parse HEAD:orbit360-platform/modules/equipo.js)" = '1bd7881ed29f6d7488bb806a96a0ab52c5c5c3b8'
           test "$(git rev-parse HEAD:orbit360-platform/core/ciclo.js)" = 'b795d9fdcf29d7c9e110e89ae56f3044835ac81a'

@@ -211,6 +211,21 @@ function countryAllowed(member,row){
   const country=text(row&&(row.pais||row.country),8).toUpperCase();
   return allowed.length>0&&['GT','CO'].includes(country)&&allowed.includes(country);
 }
+// Staff records can legitimately belong to both countries. For Equipo only,
+// check EVERY explicitly assigned country against the signed membership; do
+// not require an unrelated singular policy/customer `pais` field. Unclassified
+// and foreign countries remain denied, and all other collections keep their
+// existing strict single-country authorization.
+function advisorCountriesAllowed(member,row){
+  const assigned=Array.isArray(row?.paises)&&row.paises.length?row.paises:
+    Array.isArray(row?.countries)&&row.countries.length?row.countries:null;
+  if(!assigned)return countryAllowed(member,row);
+  const allowed=unique(member&&member.countries).map(v=>text(v,8).toUpperCase());
+  const countries=unique(assigned).map(v=>text(v,8).toUpperCase());
+  const singular=text(row&&(row.pais||row.country),8).toUpperCase();
+  return allowed.length>0&&countries.length>0&&countries.every(v=>['GT','CO'].includes(v)&&allowed.includes(v))&&
+    (!singular||countries.includes(singular));
+}
 // Aseguradoras are global by *advisor*, never by *country*. The generic
 // unscoped shortcut previously allowed a CO-only administrator to edit a GT
 // insurer (or an unclassified insurer) through the server callable.
@@ -224,7 +239,8 @@ function rowAdvisorId(collection,row){if(collection==='asesores')return text(row
 const UNSCOPED_COLLECTIONS=new Set(['aseguradoras','auditoria','auditoriaAsegExterna']);
 function withinScope(actor,collection,moduleKey,row){
   if(collection==='aseguradoras'&&!insurerCountryAllowed(actor.member,row))return false;
-  if(UNSCOPED_COLLECTIONS.has(collection))return true; if(!countryAllowed(actor.member,row))return false;
+  if(UNSCOPED_COLLECTIONS.has(collection))return true;
+  if(!(collection==='asesores'?advisorCountriesAllowed(actor.member,row):countryAllowed(actor.member,row)))return false;
   if(collection==='tareas'&&!rowAdvisorId(collection,row))return false;
   const scope=effectiveScope(actor.member,actor.accessConfig,actor.activeRole,moduleKey); if(scope==='none')return false; if(scope==='all')return true;
   if(collection==='finmovs')return false; // Reader requires finance + country + all-scope.
