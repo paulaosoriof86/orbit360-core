@@ -98,6 +98,12 @@ test('commercial pending, overdue and confirmed values exclude explicit, inherit
   assert.match(cobrosSource,/portfolioPaymentRows\(idx\)\.filter\(row => commercialCobrosRow/);
   assert.match(cobrosSource,/reportedRows\(idx\)\.filter\(row => commercialCobrosRow/);
   assert.match(cobrosSource,/countryMatches\(c, idx\) && commercialCobrosRow\(c, idx\)/);
+  // Inicio banner also displays commercial metrics; raw store totals must not count retained QA.
+  const inicioSource=fs.readFileSync('orbit360-platform/modules/inicio.js','utf8');
+  assert.ok(inicioSource.includes('const clientes=scopedClientes.filter(c=>!qaAuditOnly(c));'),'INICIO_CLIENTS_MUST_EXCLUDE_QA');
+  assert.ok(inicioSource.includes("const polizas=scopedPolizas.filter(p=>!qaAuditOnly(p)&&!qaAuditOnly(Orbit.store.get('clientes',p.clienteId)));"),'INICIO_POLICIES_AND_QA_CLIENT_PARENTS_MUST_BE_EXCLUDED');
+  assert.ok(inicioSource.includes('data-inicio-count="clientes"'),'INICIO_COMMERCIAL_CLIENT_COUNTER_MISSING');
+  assert.ok(inicioSource.includes('data-inicio-count="polizas"'),'INICIO_COMMERCIAL_POLICY_COUNTER_MISSING');
   // Cliente 360 keeps QA records audit-visible, never in the commercial client counter.
   const cliente360Source=fs.readFileSync('orbit360-platform/modules/cliente360.js','utf8');
   assert.match(cliente360Source,/const commercialClientRows = rows\.filter\(c => !isQaRecord\(c\)\)/);
