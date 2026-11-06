@@ -106,6 +106,8 @@ test('commercial pending, overdue and confirmed values exclude explicit, inherit
   assert.match(cliente360Source,/Clientes comerciales<\/div><div class="k-val">\$\{commercialClientRows\.length\}/);
   assert.match(cliente360Source,/data-c360-qa-audit="\$\{isQaAudit/);
   assert.match(cliente360Source,/QA · solo auditoría/);
+  assert.ok(cliente360Source.includes("const commercialPoliciesForGap=policiesForList.filter(p=>p && !isQaRecord(p) && !isQaRecord(S().get('clientes',p.clienteId)))"),'QA_MUST_NOT_INFLATE_UNMATCHED_POLICY_GAP');
+  assert.ok(cliente360Source.includes('visiblePolicyGap(commercialPoliciesForGap,kpiClientIds'),'ORPHAN_POLICY_GAP_MUST_BE_COMMERCIAL_ONLY');
   assert.equal(q.isSyntheticQaRecord({id:'qaClient',__syntheticQa:true}),true);
   assert.equal(q.isSyntheticQaRecord({id:'b2',sourceRef:'B2 QA firme — histórico'}),true);
   assert.equal(q.isSyntheticQaRecord({id:'commercial',nombre:'Cliente real'}),false);
