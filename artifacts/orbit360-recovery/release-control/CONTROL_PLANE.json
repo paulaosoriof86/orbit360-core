@@ -18808,10 +18808,16 @@
     "noRulesDeploy": true,
     "noLivePromotion": true,
     "signedFocusedFreelancersP0Accepted": true,
-    "signedContextualInicioP0Accepted": true
+    "signedContextualInicioP0Accepted": true,
+    "supersededForNextExactPromotionBy": {
+      "sourceSha": "f3e4503afbc7f3a67086d0e8ad0cc1b623743c39",
+      "artifactId": 13524899745,
+      "readbackArtifactId": 13526316484,
+      "runId": 42263222517
+    }
   },
   "b4003CertificationInventory20261106": {
-    "schema": "GRAVICENTRA_I6_5_B4_003_CERTIFICATION_INVENTORY_AND_SYNC_20261106_V6",
+    "schema": "GRAVICENTRA_I6_5_B4_003_CERTIFICATION_INVENTORY_AND_SYNC_20261106_V7",
     "gate": "I6.5/B4-003",
     "recordType": "ADDITIVE_RELEASE_SCOPED_CERTIFICATION_INDEX_NOT_GATE_PASS",
     "status": "FOUR_FUNCTIONAL_P0_PASS_TWO_QA_OWNER_DEFERRED_FULL_GATE_HOLD",
@@ -18972,18 +18978,45 @@
         },
         "doesNotProveAllRolesOrLive": true,
         "noDataMutation": true
+      },
+      {
+        "id": "CLIENTE360_COMMERCIAL_CLIENT_QA_KPI_ISOLATION_SIGNED_PREVIEW",
+        "status": "PREVIEW_FOCAL_PASS_SCOPE_ONLY_NOT_FULL_MODULE_ACCEPTANCE",
+        "dateLocal": "2026-11-06",
+        "signedRole": "Paula_Direccion_TODOS",
+        "sourceSha": "f3e4503afbc7f3a67086d0e8ad0cc1b623743c39",
+        "buildId": "gi-i65-b4-f3e4503afbc7-57f234755dc1",
+        "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-rc-41765742748-neoi3u7r.web.app/#/cliente360",
+        "immutableWorkflowRunId": 42263222517,
+        "artifactId": 13524899745,
+        "readbackArtifactId": 13526316484,
+        "commercialClients": 439,
+        "syntheticQaClientAuditVisible": 1,
+        "rawClientRows": 440,
+        "syntheticQaBadge": "QA · solo auditoría",
+        "commercialActivePolicies": 223,
+        "commercialPolicies": 1416,
+        "commercialNetPremiumGTQ": 632719,
+        "commercialNetPremiumCOP": 175456570,
+        "commercialUnmatchedPolicyWarning": 0,
+        "previousPreFixUnmatchedQaWarning": 3,
+        "preFixClientsKpiIncludingQA": 440,
+        "scope": "SIGNED_DIRECCION_TODOS_FIRST_PAINT_PLUS_HYDRATED_KPIS",
+        "preservedRealRows": true,
+        "qaRecordPhysicalChanges": 0,
+        "doesNotProveAllRolesOrPersistenceWritesOrLive": true
       }
     ],
     "currentReleaseBinding": {
-      "latestProductSourceChangeCommit": "423a3ca29fe9558bc4f3460aa0d65c27e923774c",
-      "hostingSourceCommit": "0f196e1cdd1962af81d979f5e63999c6411cd855",
-      "comparison": "SAME_SCOPED_BUILD_EXACT_PREVIEW_SOURCE_BLOB_COBROS_ED8E23F47F31401012DDC4632E75386F30DDA158",
+      "latestProductSourceChangeCommit": "b058eea5c6743fd76e806ce6eaffc47dcbeeece0",
+      "hostingSourceCommit": "f3e4503afbc7f3a67086d0e8ad0cc1b623743c39",
+      "comparison": "EXACT_SIGNED_PREVIEW_B4_COBROS_AND_CLIENT360_QA_KPI_ISOLATION_FROM_SAME_IMMUTABLE_ARTIFACT",
       "artifactAndCurrentProductSourceIdentical": true,
-      "sameImmutablePreviewArtifactId": 13524672844,
-      "exactReadbackArtifactId": 13524308622,
-      "archiveSha256": "38a5653da5910d6290ab4664d8e021e4775aebbadba139fc8ae38abadc3b1568",
-      "buildId": "gi-i65-b4-0f196e1cdd19-57f234755dc1",
-      "runId": 42260955450,
+      "sameImmutablePreviewArtifactId": 13524899745,
+      "exactReadbackArtifactId": 13526316484,
+      "archiveSha256": "8811936a2ea12d482356d3a2ae179ff93a36ee96856b3135dbac9252c3f42ea2",
+      "buildId": "gi-i65-b4-f3e4503afbc7-57f234755dc1",
+      "runId": 42263222517,
       "doNotRebuildForMetadataOnlyCommits": true
     },
     "openClosure": {
@@ -19004,7 +19037,8 @@
       "qaPhysicalCleanupBlocking": false,
       "qaKpiExcludedFromCommerceVerified": true,
       "cobrosQaOperationalListLeakStillOpen": false,
-      "cobrosQaOperationalListFocalPreviewPass": true
+      "cobrosQaOperationalListFocalPreviewPass": true,
+      "cliente360QaClientCountKpiFocalPreviewPass": true
     },
     "projectSources": {
       "package": "GRAVICENTRA_PROJECT_SOURCES_EVERGREEN_V7",
@@ -19164,10 +19198,23 @@
     "noDataReimport": true,
     "noRulesDeploy": true,
     "noNewBranchOrPreview": true,
-    "latestQaIsolationSourceSha": "0f196e1cdd1962af81d979f5e63999c6411cd855",
-    "latestQaIsolationBuildId": "gi-i65-b4-0f196e1cdd19-57f234755dc1",
-    "latestQaIsolationRunId": 42260955450,
-    "latestQaIsolationSignedPreviewStatus": "PASS_0_B4_ROWS_0_B2_REN_ROWS_9_QA_PRESERVED_COMMERCIAL_KPIS_UNCHANGED"
+    "latestQaIsolationSourceSha": "f3e4503afbc7f3a67086d0e8ad0cc1b623743c39",
+    "latestQaIsolationBuildId": "gi-i65-b4-f3e4503afbc7-57f234755dc1",
+    "latestQaIsolationRunId": 42263222517,
+    "latestQaIsolationSignedPreviewStatus": "PASS_0_B4_ROWS_0_B2_REN_ROWS_9_QA_PRESERVED_COMMERCIAL_KPIS_UNCHANGED",
+    "cliente360": {
+      "rawClients": 440,
+      "commercialClients": 439,
+      "qaAuditClients": 1,
+      "qaAuditBadge": true,
+      "commercialOrphanWarning": 0,
+      "previousQaOnlyOrphanWarning": 3,
+      "commercialActivePolicies": 223,
+      "commercialPolicies": 1416,
+      "commercialNetPremiumGTQ": 632719,
+      "commercialNetPremiumCOP": 175456570,
+      "noPhysicalMutation": true
+    }
   },
   "b4003CobrosQaSignedPreviewClosure20261106": {
     "schema": "GI_B4003_COBROS_QA_COHORTS_SIGNED_SOURCE_AND_PREVIEW_FOCAL_CLOSURE_V1",
@@ -19193,6 +19240,38 @@
     "noRealDataWrites": true,
     "ownerAuthorizedPhysicalQaRetentionPostproduction": true,
     "b4003Closed": false,
-    "productionDeployed": false
+    "productionDeployed": false,
+    "successorRetainedBundle": {
+      "sourceSha": "f3e4503afbc7f3a67086d0e8ad0cc1b623743c39",
+      "artifactId": 13524899745,
+      "readbackArtifactId": 13526316484,
+      "reason": "CLIENT360_CAUSAL_QA_KPI_CHANGE_COBROS_MODULE_BLOB_UNCHANGED",
+      "cobrosBlobSha": "ed8e23f47f31401012ddc4632e75386f30dda158"
+    }
+  },
+  "b4003Cliente360QaCommercialKpiSignedPreviewClosure20261106": {
+    "schema": "GI_B4003_CLIENT360_QA_COUNT_AND_ORPHAN_WARNING_SIGNED_PREVIEW_FOCAL_PASS_V1",
+    "signedRole": "Paula_Direccion_TODOS",
+    "dateLocal": "2026-11-06",
+    "status": "FOCAL_PREVIEW_PASS_NOT_FULL_MODULE_PASS",
+    "sourceSha": "f3e4503afbc7f3a67086d0e8ad0cc1b623743c39",
+    "buildId": "gi-i65-b4-f3e4503afbc7-57f234755dc1",
+    "workflowRunId": 42263222517,
+    "workflowConclusion": "success",
+    "immutableArtifactId": 13524899745,
+    "artifactSha256": "8811936a2ea12d482356d3a2ae179ff93a36ee96856b3135dbac9252c3f42ea2",
+    "readbackArtifactId": 13526316484,
+    "commercialClients": 439,
+    "qaClientStillAuditable": 1,
+    "allClientsStillStored": 440,
+    "commercialPolicies": 1416,
+    "activeCommercialPolicies": 223,
+    "commercialNetPremiumGTQ": 632719,
+    "commercialNetPremiumCOP": 175456570,
+    "qaOnlyOrphanRenewalGapExcluded": true,
+    "readbackUnmatchedCommercialPolicies": 0,
+    "noDataWrites": true,
+    "fullGate": "HOLD",
+    "liveDeploy": false
   }
 }
