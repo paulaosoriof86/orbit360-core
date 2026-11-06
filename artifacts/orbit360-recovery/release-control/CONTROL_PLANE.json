@@ -3,6 +3,7 @@
   "controlPlaneId": "GRAVICENTRA-INSURANCE-FASE-A",
   "status": "PRODUCTION_ACCEPTED",
   "productBrand": "Gravicentra Insurance",
+  "b4003HistorialCurrent40OperativoCountryMatrixFocal20261106": {"dateLocal":"2026-11-06","status":"ONE_CURRENT_CANDIDATE_READ_ONLY_MATRIX_DELTA_PREVIEW_PASS_SCOPE_ONLY","receiptPath":"artifacts/orbit360-recovery/release-control/I6_5_B4_003_CURRENT40_HISTORIAL_OPERATIVO_COUNTRY_SCOPE_BROWSER_DELTA_20261106.json","receiptBlobSha":"3010cb55b2202dc5f7b2712fea173d44b461177f","sourceSha":"b01dceafc1ec2b1e786626116251e248be1e23f4","buildId":"gi-i65-b4-b01dceafc1ec-57f234755dc1","artifactId":13527102882,"principal":"Paula (Ver como Operativo)","module":"Historial","GT":23,"CO":13,"TODOS":36,"advisorTodos":24,"noWrite":true,"doesNotProveFullMatrix":true,"releaseGateUnchanged":true},
   "b4003E4GtCobrosReportesSameScopeCurrentCandidate20261106": {"dateLocal":"2026-11-06","status":"FOCAL_PREVIEW_PASS_SCOPE_ONLY_NOT_FULL_GATE","receiptPath":"artifacts/orbit360-recovery/release-control/I6_5_B4_003_E4_GT_COBROS_REPORTES_CURRENT_CANDIDATE_20261106.json","receiptBlobSha":"ab12c69a460798273abe22db09f3311ea5678a2e","sourceSha":"b01dceafc1ec2b1e786626116251e248be1e23f4","buildId":"gi-i65-b4-b01dceafc1ec-57f234755dc1","immutableArtifactId":13527102882,"role":"Paula Dirección","country":"GT","period":"Todos","filters":"Todos","cobros":2503,"reportes":2503,"anulado":12,"qaExcluded":1,"releaseGateUnchanged":true},
   "b4003E4AnuladoRootFixSignedPreview20261104": {
     "status": "SOURCE_CI_EXACT_PREVIEW_AND_SAMUEL_COUNTS_PASS_RELEASE_REMAINDER_HOLD",
@@ -18836,6 +18837,7 @@
       "doNotReopenWithoutCausalChange": true
     },
     "currentB4003Evidence": [
+      {"id":"HISTORIAL_CURRENT40_OPERATIVO_GT_CO_TODOS_COUNTRY_SUM","status":"FOCAL_PREVIEW_READ_ONLY_PASS_SCOPE_ONLY","sourceSha":"b01dceafc1ec2b1e786626116251e248be1e23f4","buildId":"gi-i65-b4-b01dceafc1ec-57f234755dc1","artifactId":13527102882,"role":"Paula_VerComo_Operativo","countryCounts":{"GT":23,"CO":13,"TODOS":36},"advisorTodosReadOnly":24,"receiptPath":"artifacts/orbit360-recovery/release-control/I6_5_B4_003_CURRENT40_HISTORIAL_OPERATIVO_COUNTRY_SCOPE_BROWSER_DELTA_20261106.json","doesNotProveAllRolesViewportsOrLive":true},
       {"id":"E4_GT_COBROS_REPORTES_CURRENT_40_SAME_SCOPE_2503","status":"FOCAL_PREVIEW_PASS_SCOPE_ONLY","sourceSha":"b01dceafc1ec2b1e786626116251e248be1e23f4","buildId":"gi-i65-b4-b01dceafc1ec-57f234755dc1","artifactId":13527102882,"role":"Paula_Direccion_GT","period":"TODOS","cobros":2503,"reportes":2503,"anuladoCausal":12,"receiptPath":"artifacts/orbit360-recovery/release-control/I6_5_B4_003_E4_GT_COBROS_REPORTES_CURRENT_CANDIDATE_20261106.json","doesNotProveFullMatrixOrLive":true},
       {
         "id": "SIGNED_REAL_UID_ROSTER_CALLABLE",
