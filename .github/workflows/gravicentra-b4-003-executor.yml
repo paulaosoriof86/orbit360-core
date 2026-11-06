@@ -40,6 +40,7 @@ on:
       - recovery/fase-a-clean-20260831
     paths:
       - '.github/workflows/gravicentra-b4-003-executor.yml'
+      - 'tools/gravicentra-b4-003-retained-hosting-preflight.mjs'
       - 'tools/gravicentra-i6-5-b4-003-preview-proof.mjs'
       - 'tools/gravicentra-b4-003-protected-hydration.test.cjs'
       - 'tools/gravicentra-b4-003-role-context-recovery.test.cjs'
@@ -71,6 +72,8 @@ concurrency:
 
 jobs:
   b4-003-renewals-cancelations-preview:
+    # The exact retained-preflight request must not build or deploy the old Preview.
+    if: "!(github.event_name == 'push' && github.event.head_commit.message == 'test(b4-003): retained artifact Hosting preflight')"
     runs-on: ubuntu-24.04
     timeout-minutes: 45
     env:
@@ -3768,3 +3771,132 @@ jobs:
           name: gravicentra-b4-003-renewals-readonly-${{ github.run_id }}
           path: ${{ runner.temp }}/gravicentra-b4-003-renewals-readonly.json
           if-no-files-found: warn
+
+  # Retained artifact preflight only. Product source is pinned independently of
+  # this documentary/executor commit. No promotion/deploy path is implemented.
+  b4-003-retained-hosting-preflight:
+    if: "github.event_name == 'push' && github.event.head_commit.message == 'test(b4-003): retained artifact Hosting preflight'"
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      actions: read
+    env:
+      PROJECT_ID: ays-orbit-360-lab
+      HOSTING_SITE: ays-orbit-360-lab
+      CONTROL: artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json
+      B4_CURSOR_KEY: b4003ActiveCertificationCursor20261106
+      # Evidence-bound candidate 42. Replace only from the next candidate's
+      # actual successful run, artifact metadata and immutable readback receipt.
+      RETAINED_SOURCE_SHA: 857f1222f360a42a06e012810a1c01bce155a26f
+      RETAINED_BUILD_ID: gi-i65-b4-857f1222f360-57f234755dc1
+      RETAINED_RUN_ID: '42311921400'
+      RETAINED_ARTIFACT_ID: '13549460562'
+      RETAINED_ZIP_SHA256: ca67ec470e521a159201eb914675835efa4f2c614cb1fc47d5162fdf379d3c97
+      RETAINED_TAR_SHA256: 5af8e1e6e98e861c5c1a2e25324841ac9dfb07fffae0524c1cabc1a6282ad338
+      RETAINED_PREVIEW_CHANNEL: gi-i65-b4-rc-41765742748
+      RETAINED_PREVIEW_URL: https://ays-orbit-360-lab--gi-i65-b4-rc-41765742748-neoi3u7r.web.app
+      ROLLBACK_SOURCE_SHA: 4bf67a3738751fe2432a130fd23254a6f1c7d16e
+      ROLLBACK_BUILD_ID: gi-i65-4bf67a373875-57f234755dc1
+      ROLLBACK_CHANNEL: gi-i5-rb-34723814583
+      ROLLBACK_FILE_COUNT: '209'
+      ROLLBACK_PAYLOAD_SHA256: 84a74f46498618ca36c142ff844dbfe670df5a64501a1ceca22d5cd069e62767
+      RETAINED_ARCHIVE_DIR: ${{ runner.temp }}/gi-b4003-retained-archive
+      B4_PREFLIGHT_OUT: ${{ runner.temp }}/gi-b4003-retained-preflight
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 1
+          persist-credentials: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Initialize retained read-only receipt
+        run: |
+          set -euo pipefail
+          mkdir -p "$B4_PREFLIGHT_OUT"
+          python3 - <<'PY'
+          import json,os,pathlib
+          target=pathlib.Path(os.environ['B4_PREFLIGHT_OUT'])/'preflight.json'
+          target.write_text(json.dumps({
+            'schema':'B4_003_RETAINED_HOSTING_PREFLIGHT_V1',
+            'status':'PREFLIGHT_NOT_STARTED',
+            'runnerCommit':os.environ['GITHUB_SHA'],
+            'runId':os.environ['GITHUB_RUN_ID'],
+            'remoteReadsOnly':True,
+            'productionPromotionAuthorizedByThisReceipt':False,
+            'b4003Closed':False
+          },indent=2)+'\n')
+          PY
+
+      - name: Download the existing immutable artifact by exact ID
+        uses: actions/download-artifact@v4
+        with:
+          artifact-ids: ${{ env.RETAINED_ARTIFACT_ID }}
+          run-id: ${{ env.RETAINED_RUN_ID }}
+          github-token: ${{ github.token }}
+          repository: paulaosoriof86/orbit360-core
+          merge-multiple: true
+          path: ${{ env.RETAINED_ARCHIVE_DIR }}
+
+      - name: Reuse existing LAB credential and pinned CLI for read-only preflight
+        env:
+          SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+          SA_LAB_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+          SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/gi-b4003-retained-auth"
+          python3 - <<'PY'
+          import json,os,pathlib
+          root=pathlib.Path(os.environ['RUNNER_TEMP'])/'gi-b4003-retained-auth'
+          paths=[]
+          for n,key in enumerate(('SA_LAB','SA_LAB_ALT','SA_DEFAULT')):
+            try: value=json.loads(os.environ.get(key,''))
+            except (ValueError,TypeError): continue
+            if value.get('type')=='service_account' and value.get('project_id')==os.environ['PROJECT_ID'] and value.get('private_key'):
+              p=root/f'{n}.json';p.write_text(json.dumps(value));p.chmod(0o600);paths.append(str(p))
+          if not paths: raise SystemExit('LAB_SERVICE_ACCOUNT_NOT_CONFIGURED')
+          (root/'candidates').write_text('\n'.join(paths)+'\n')
+          PY
+          npm install --prefix "$RUNNER_TEMP/gi-b4003-retained-cli" --no-save --ignore-scripts --no-audit --no-fund firebase-tools@14.10.1 >/dev/null
+          node tools/gravicentra-firebase-tools-empty-extensions-workaround-v1.mjs "$RUNNER_TEMP/gi-b4003-retained-cli"
+          CLI="$RUNNER_TEMP/gi-b4003-retained-cli/node_modules/firebase-tools/lib/bin/firebase.js"
+          selected=''
+          while IFS= read -r candidate; do
+            if GOOGLE_APPLICATION_CREDENTIALS="$candidate" node "$CLI" hosting:channel:list --site "$HOSTING_SITE" --project "$PROJECT_ID" --non-interactive --json >/dev/null 2>&1; then
+              selected="$candidate";break
+            fi
+          done < "$RUNNER_TEMP/gi-b4003-retained-auth/candidates"
+          test -n "$selected"
+          cp "$selected" "$RUNNER_TEMP/gi-b4003-retained-auth/selected.json"
+          chmod 600 "$RUNNER_TEMP/gi-b4003-retained-auth/selected.json"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/gi-b4003-retained-auth/selected.json" >> "$GITHUB_ENV"
+          echo "FIREBASE_CLI_PACKAGE=$RUNNER_TEMP/gi-b4003-retained-cli/node_modules/firebase-tools/package.json" >> "$GITHUB_ENV"
+
+      - name: Verify retained artifact, Preview bytes and certified rollback using GET only
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-b4-003-retained-hosting-preflight.mjs
+
+      - name: Retain exact preflight proof, including a failure receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gi-b4003-retained-hosting-preflight-${{ github.run_id }}
+          path: |
+            ${{ env.B4_PREFLIGHT_OUT }}/*.json
+            ${{ env.B4_PREFLIGHT_OUT }}/*.sha256
+          if-no-files-found: error
+          retention-days: 90
+
+      - name: Remove temporary service-account files
+        if: always()
+        run: |
+          rm -rf -- "$RUNNER_TEMP/gi-b4003-retained-auth"
+

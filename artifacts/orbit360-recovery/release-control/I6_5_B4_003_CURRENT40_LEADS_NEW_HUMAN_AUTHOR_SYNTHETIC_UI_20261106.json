@@ -455,7 +455,7 @@
     "commercialWrite": {
       "role": "Operativo",
       "newSingleQaFixtureCreated": true,
-      "fixtureId": "PENDING_CANONICAL_DOCUMENT_ID_READBACK",
+      "fixtureId": "b4003qa_user_mw5lmd7r_nu0l4r",
       "beforeComments": 0,
       "afterComments": 2,
       "commercialComment": "Certificación B4-003 C41 · Samuel · comentario comercial · 06/11/2026. Prueba sintética de autor humano y persistencia.",
@@ -465,7 +465,8 @@
       "immediateCommentAndBitacoraAuthor": "Samuel Daza",
       "newReaderReloadPending": true,
       "attachments": 0,
-      "realBusinessChanges": 0
+      "realBusinessChanges": 0,
+      "canonicalReadbackStatus": "ACTUAL_WRITER_UI_AND_CANONICAL_HUMAN_IDENTITY_PERSISTENCE_PASS_SECOND_UID_UI_PENDING"
     },
     "fixtureException": {
       "reason": "Two earlier fixtures are only reopenable from advisor-targeted notices under Asesor; existing lockAdvisorModal removes write controls; no business deep-link or QA board entry exists. One additional fixture uses the already-authorized isolated UI workflow for actual Operativo write and cross-UID read; no source or permission bypass.",
@@ -520,7 +521,172 @@
       "change": "Two-line scoped single-column override for Inicio KPI row at max-width 500px; preserves desktop and author source.",
       "postFixUiPass": false
     },
-    "remaining": "Finish existing fixture archive readbacks, identify new controlled fixture, complete Paula cross-UID read/reload and response, Samuel final read/reload, new fixture archive; verify 320/390 on CSS successor. No new author retest matrix or source change.",
+    "remaining": "Resolve current native archive confirmation; canonical archivado:true readback for current interrupted fixture, then original fixture. Paula actual Direccion reload and read both Samuel comments/bitacora and operations notice on new existing fixture; archive that fixture and verify canonical archivado:true. Reconcile formal exact Preview acceptance, retained Hosting/rollback preflight, then same-artifact LIVE promotion and actual required LIVE module/write/reload/integrity checks.",
+    "b4003Closed": false,
+    "productionPromotionAuthorized": false
+  },
+  "immutableSuccessor42PreviewReadback20261106": {
+    "recordedAtUtc": "2026-11-06T23:38:56Z",
+    "status": "EXACT_IMMUTABLE_PREVIEW_SOURCE_SERVED_BYTES_AND_RESPONSIVE_FOCAL_PASS_CROSS_UID_AND_CLEANUP_PENDING",
+    "candidateNumber": 42,
+    "sourceSha": "857f1222f360a42a06e012810a1c01bce155a26f",
+    "buildId": "gi-i65-b4-857f1222f360-57f234755dc1",
+    "runId": 42311921400,
+    "workflowConclusion": "success",
+    "guardRunId": 42311921742,
+    "guardConclusion": "success",
+    "artifactId": 13549460562,
+    "artifactZipSha256": "ca67ec470e521a159201eb914675835efa4f2c614cb1fc47d5162fdf379d3c97",
+    "archiveSha256": "5af8e1e6e98e861c5c1a2e25324841ac9dfb07fffae0524c1cabc1a6282ad338",
+    "readbackArtifactId": 13549350747,
+    "readbackZipSha256": "391bdef72466590f197e0efb56042f484f1743007dde08a56be9c673cc73f01b",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-rc-41765742748-neoi3u7r.web.app",
+    "previewChannelId": "gi-i65-b4-rc-41765742748",
+    "immutableBundleDownloadedIndependently": true,
+    "artifactTarHashMatchesStoredSidecar": true,
+    "exactServedReadbackPassed": true,
+    "hostedFileCount": 218,
+    "hostedPayloadDigest": "308b669105c380294177f1a8d2350216af95fec31f800955d611e607542b42da",
+    "infraGitBlobSha": "788570e8f490dc5232bf8b4d6ff6fe5e87fb9bb2",
+    "infraSha256": "08b12b573b65cd7ba2d3c6669376dece1e89173b03f54936c0b3aa1c4348f365",
+    "sourceChangesVs41": [
+      "orbit360-platform/styles/infra.css"
+    ],
+    "authorSourceOwnersUnchanged": true,
+    "backendSourceChanged": false,
+    "actualBackendDeployments": 0,
+    "backendDeploymentOmittedBecauseSourceMatchesVerifiedRun": 42308894583,
+    "liveLabStable": true,
+    "liveAppDomainStable": true,
+    "productionPromoted": false,
+    "b4003Closed": false,
+    "browserVisibleBuildMarkerExact": true,
+    "responsive": {
+      "principal": "Samuel Daza",
+      "role": "Operativo",
+      "country": "TODOS",
+      "actualAuthenticatedPrincipal": true,
+      "status": "ACTUAL_320_390_FULL_CURRENCY_LAYOUT_PASS",
+      "tested": [
+        {
+          "requestedWidth": 320,
+          "clientWidth": 305,
+          "scrollWidth": 305,
+          "height": 844,
+          "cardsSingleColumn": true,
+          "allThreeCardsAmountsAndCurrenciesUnclipped": true,
+          "screenshotPath": "artifacts/orbit360-recovery/release-control/evidence/SAMUEL_C42_INICIO_320_20261106.jpg",
+          "screenshotBlobSha": "1969df498ee67c5a52327251a9f0ef2493560510",
+          "screenshotSha256": "b438e8d2e9ec76cbd74a4ecd1325414950ccda978746f690e6939e71112b5cb5"
+        },
+        {
+          "requestedWidth": 390,
+          "clientWidth": 375,
+          "scrollWidth": 375,
+          "height": 844,
+          "cardsSingleColumn": true,
+          "allThreeCardsAmountsAndCurrenciesUnclipped": true,
+          "screenshotPath": "artifacts/orbit360-recovery/release-control/evidence/SAMUEL_C42_INICIO_390_20261106.jpg",
+          "screenshotBlobSha": "d6e675c787009bcd320de15fc469518bc85f7269",
+          "screenshotSha256": "0021e704c6a8acd54a55f404eec26e37feec7b44b3a9a9ff5b11cbef453015a4"
+        }
+      ],
+      "valuesShown": {
+        "confirmedGTQ": 2744,
+        "confirmedCOP": 0,
+        "pendingGTQ": 2396,
+        "pendingCOP": 0,
+        "overdueGTQDisplay": "Q227K GTQ",
+        "overdueCOPDisplay": "$109.9M COP"
+      },
+      "browserErrorsAndWarningsObserved": 0,
+      "viewportRestored": true,
+      "unaffectedSignedDesktopPreserved": true
+    }
+  },
+  "samuelCanonicalCommercialWriterReadback20261106": {
+    "recordedAtUtc": "2026-11-06T23:38:56Z",
+    "source": "AUTHENTICATED_FIRESTORE_CONSOLE_VISIBLE_DOCUMENT_FIELDS_READ_ONLY",
+    "fixtureId": "b4003qa_user_mw5lmd7r_nu0l4r",
+    "path": "tenants/alianzas-soluciones/data/negocios/items/b4003qa_user_mw5lmd7r_nu0l4r",
+    "createdAtLocal": "2026-11-06 17:21:39 UTC-6",
+    "createdByUid": "NvzM3e7NR9dXWtTrzKkVsiYbgd43",
+    "actorName": "Samuel Daza",
+    "actualWriterRole": "Operativo",
+    "previewWrite": true,
+    "archivado": false,
+    "attachments": 0,
+    "comments": [
+      {
+        "eventId": "collab_mw5ln07d_pp3tw",
+        "type": "Comentario comercial",
+        "direction": "",
+        "timestamp": "2026-11-06T23:22:01.033Z",
+        "actorName": "Samuel Daza",
+        "user": "Samuel Daza",
+        "actorUid": "NvzM3e7NR9dXWtTrzKkVsiYbgd43",
+        "matchingBitacora": true
+      },
+      {
+        "eventId": "collab_mw5lnqia_s0ajs",
+        "type": "Reenviado a Operaciones",
+        "direction": "operations",
+        "timestamp": "2026-11-06T23:22:40.812Z",
+        "actorName": "Samuel Daza",
+        "user": "Samuel Daza",
+        "actorUid": "NvzM3e7NR9dXWtTrzKkVsiYbgd43",
+        "matchingBitacora": true
+      }
+    ],
+    "status": "ACTUAL_WRITER_UI_AND_CANONICAL_HUMAN_IDENTITY_PERSISTENCE_PASS_SECOND_UID_UI_PENDING",
+    "nextOnly": "Paula actual Direccion reloads and opens operations-directed notice for this fixture; verifies both Samuel comments, bitacora and corresponding notice name. No additional response or reverse reload required for existing finding."
+  },
+  "currentThreeFixtureCleanup20261106": {
+    "recordedAtUtc": "2026-11-06T23:38:56Z",
+    "status": "THREE_CURRENT_SYNTHETIC_FIXTURES_ARCHIVE_READBACK_PENDING",
+    "currentFixtureIds": [
+      "b4003qa_user_mw5eas6v_lphfrl",
+      "b4003qa_user_mw5htkgl_31u61t",
+      "b4003qa_user_mw5lmd7r_nu0l4r"
+    ],
+    "attemptedFixtureId": "b4003qa_user_mw5htkgl_31u61t",
+    "openedFromNotice": "evt_f555d031193cd498d6bb7e7be75c",
+    "openedAs": "Samuel Asesor",
+    "roleChangedByNormalSelectorTo": "Operativo",
+    "cleanupButtonEnabled": true,
+    "cleanupClickAttempted": true,
+    "toolOutcome": "Native confirmation initiated; click/getJsDialog/screenshot control timed out; no archive success observed.",
+    "nativePromptSourceText": "¿Limpiar los archivos de prueba y archivar este negocio sintético?",
+    "nativePromptBeforeAnyWrite": true,
+    "archiveReadbackRequired": true,
+    "archivePass": false,
+    "backendOperation": "archive_business",
+    "expectedTerminalField": "archivado:true",
+    "retainsDocumentAndHistory": true,
+    "attachmentsInCurrentFixtures": 0,
+    "historicalQaCohortsRemainOwnerDeferred": true,
+    "noRealBusinessDeletion": true
+  },
+  "minimumRemainingPlan20261106": {
+    "recordedAtUtc": "2026-11-06T23:38:56Z",
+    "existingFindingId": "B4-003-UAT-20261011-03",
+    "completed": [
+      "Samuel actual Asesor reads original Paula author in notice/comment/bitacora after reload on41.",
+      "Samuel actual Operativo registers commercial and operations-directed comments; two canonical comments and bitacora contain human Samuel name and correct UID.",
+      "Samuel actual Operativo Cliente360 GT/CO/TODOS commercial counts and QA segregation match signed Paula evidence.",
+      "Exact immutable42 readback plus actual320/390 complete currencies responsive PASS; unchanged author owners retain41 evidence."
+    ],
+    "next": [
+      "Resolve current native archive confirmation; canonical archivado:true readback for current interrupted fixture, then original fixture.",
+      "Paula actual Direccion reload and read both Samuel comments/bitacora and operations notice on new existing fixture; archive that fixture and verify canonical archivado:true.",
+      "Reconcile formal exact Preview acceptance, retained Hosting/rollback preflight, then same-artifact LIVE promotion and actual required LIVE module/write/reload/integrity checks."
+    ],
+    "noNewFixtures": true,
+    "noAdditionalPaulaResponseRequired": true,
+    "noAdditionalSamuelReverseReloadRequired": true,
+    "rationale": "Prior suggested reply/reverse reload was only a navigation workaround to reopen Samuel's own QA fixture. Canonical persistence and actual Paula post-reload cross-UID read complete author criterion without extra writes.",
+    "preservedHistoricalCertificates": 15,
+    "cartesianDenominatorNotInvented": true,
     "b4003Closed": false,
     "productionPromotionAuthorized": false
   }

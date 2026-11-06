@@ -187,7 +187,7 @@
     "phaseAIterationStatuses": "HISTORICAL_FIELDS_ABOVE_PRESERVED_UNTIL_FORMAL_GATE_EVIDENCE;_NO_NEW_PASS_INFERRED",
     "labDataWriteScope": "ONLY_35_AUTHORIZED_COUNTRY_FIELDS;_NO_AUGUST_REFRESH"
   },
-  "nextAction": "B4-003 active cursor: CONTROL_PLANE.b4003ActiveCertificationCursor20261106. Actual Samuel Asesor on41 after reload sees Paula Osorio in original notice/comment/bitacora: PASS. Samuel Operativo Cliente360 GT/CO/TODOS matches prior approved commercial+QA country counts: PASS. One necessary additional isolated fixture was created through existing UI (17:22 local), with two Samuel-name comments/bitacora; other-UID read/reload remains pending. Do not create further fixtures. A real 320px Inicio card currency clipping was found; two-line CSS-only fix now requires immutable successor42, same channel; do not reopen unchanged author/C360 proofs. Finish existing fixture archive readbacks, identify new controlled fixture, complete Paula cross-UID read/reload and response, Samuel final read/reload, new fixture archive; verify 320/390 on CSS successor. No new author retest matrix or source change. B4-003 not closed, formal production authorization false.",
+  "nextAction": "B4-003 active cursor: CONTROL_PLANE.b4003ActiveCertificationCursor20261106. Exact retained candidate42 857f1222f360a42a06e012810a1c01bce155a26f / gi-i65-b4-857f1222f360-57f234755dc1 artifact13549460562; 320/390 Inicio full currencies PASS. Preserve41 actual Samuel original Paula-author reader and Cliente360 second-principal country deltas. New fixture b4003qa_user_mw5lmd7r_nu0l4r has two durably human Samuel comments and matching bitacora. Resolve current native archive confirmation; canonical archivado:true readback for current interrupted fixture, then original fixture. Paula actual Direccion reload and read both Samuel comments/bitacora and operations notice on new existing fixture; archive that fixture and verify canonical archivado:true. Reconcile formal exact Preview acceptance, retained Hosting/rollback preflight, then same-artifact LIVE promotion and actual required LIVE module/write/reload/integrity checks. No new fixtures or extra reply/reverse reload. B4-003 not closed; formal production authorization false.",
   "sourceOfTruth": {
     "projectBoundaryPrevalentAddendum": "orbit360-platform/docs/recovery/ADDENDUM_PREVALENTE_CHATGPT_PROJECT_BOUNDARY_20260831.md",
     "mutableState": "orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json",
@@ -443,7 +443,7 @@
     "noDataWrites": true
   },
   "b4003ActiveCertificationResume20261106": {
-    "recordedAtUtc": "2026-11-06T23:25:14Z",
+    "recordedAtUtc": "2026-11-06T23:38:56Z",
     "authorityPath": "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json",
     "cursorKey": "b4003ActiveCertificationCursor20261106",
     "inventoryKey": "b4003CertificationInventory20261106",
@@ -451,25 +451,37 @@
     "existingFindingId": "B4-003-UAT-20261011-03",
     "latestInterruptedFixtureId": "b4003qa_user_mw5htkgl_31u61t",
     "priorCommentFixtureId": "b4003qa_user_mw5eas6v_lphfrl",
-    "releaseStatus": "B4-003_AUTHOR_READER_C360_DELTA_PASS_CSS_SUCCESSOR_PENDING",
+    "releaseStatus": "CURRENT42_RESPONSIVE_AND_SAMUEL_CANONICAL_WRITER_PASS_PAULA_CROSS_UID_AND_CURRENT_CLEANUP_PENDING",
     "historicalTopLevelIterationFieldsAreNotActiveGate": true,
     "b4003Closed": false,
     "productionPromotionAuthorized": false,
-    "nextRequiredPrincipal": "Samuel Daza",
-    "nextRequiredRole": "Asesor",
+    "nextRequiredPrincipal": "Paula Osorio",
+    "nextRequiredRole": "Dirección",
     "exactReopenNoticeId": "evt_facd26eb0fcdee8d3ced6d20888e",
     "durableOutboxHumanAuthors": "3_OF_3_PAULA_OSORIO",
     "recipientNoticeUiPass": true,
-    "recipientCommentAndBitacoraPass": false,
+    "recipientCommentAndBitacoraPass": true,
     "causalFixRequired": false,
-    "activeSourceSha": "131d346a3b2d857ee043f2feb590f4608f450e55",
-    "activeBuildId": "gi-i65-b4-131d346a3b2d-57f234755dc1",
-    "activeArtifactId": 13548166231,
-    "activeReadbackArtifactId": 13547228473,
+    "activeSourceSha": "857f1222f360a42a06e012810a1c01bce155a26f",
+    "activeBuildId": "gi-i65-b4-857f1222f360-57f234755dc1",
+    "activeArtifactId": 13549460562,
+    "activeReadbackArtifactId": 13549350747,
     "sourceFixCommitted": true,
     "causalFixSignedUiPending": false,
     "browserReconnectionRequired": false,
     "reverseWriterCrossReadPending": true,
-    "cssSuccessorRequired": true
+    "cssSuccessorRequired": false,
+    "nextCrossUidFixtureId": "b4003qa_user_mw5lmd7r_nu0l4r",
+    "responsive320390Pass": true,
+    "newSamuelCanonicalWriterPass": true,
+    "nativeArchiveConfirmationUnresolved": true,
+    "fixtureCleanupReadbackPending": true,
+    "extraResponseAndReverseReloadRequired": false,
+    "minimumNext": [
+      "Resolve current native archive confirmation; canonical archivado:true readback for current interrupted fixture, then original fixture.",
+      "Paula actual Direccion reload and read both Samuel comments/bitacora and operations notice on new existing fixture; archive that fixture and verify canonical archivado:true.",
+      "Reconcile formal exact Preview acceptance, retained Hosting/rollback preflight, then same-artifact LIVE promotion and actual required LIVE module/write/reload/integrity checks."
+    ],
+    "evidenceReceiptBlobSha": "e4ddfec6e784c665bb2387a1a7e034d6c8fc95d2"
   }
 }
