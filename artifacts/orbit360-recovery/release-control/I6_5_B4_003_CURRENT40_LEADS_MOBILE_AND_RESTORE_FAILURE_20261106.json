@@ -1,0 +1,88 @@
+{
+  "schema": "GRAVICENTRA_B4_003_CURRENT40_FINAL_PREVIEW_SMOKE_AND_RESTORE_FAILURE_20261106_V1",
+  "asOfLocal": "2026-11-06",
+  "gate": "I6.5/B4-003",
+  "candidate": {
+    "sourceSha": "b01dceafc1ec2b1e786626116251e248be1e23f4",
+    "buildId": "gi-i65-b4-b01dceafc1ec-57f234755dc1",
+    "immutableArtifactId": 13527102882,
+    "preview": "https://ays-orbit-360-lab--gi-i65-b4-rc-41765742748-neoi3u7r.web.app/"
+  },
+  "scope": "Paula signed-in, Chrome connected, Leads read-only, 390x844 mobile viewport and reload, no new build or deployment",
+  "evidence": [
+    {
+      "id": "LEADS_FRESH_SESSION_READBACK",
+      "status": "FOCAL_PASS",
+      "commercialLeadsTodos": 3,
+      "GT": 2,
+      "CO": 1,
+      "labelsGT": [
+        "Auto Total",
+        "Vida Temporal"
+      ],
+      "labelsCO": [
+        "Salud Familiar"
+      ],
+      "syntheticQaInCommercialPipeline": false,
+      "syntheticFixturePhysicalDeletionProven": false
+    },
+    {
+      "id": "LEADS_MOBILE_390",
+      "status": "FIRST_FOLD_VISUAL_SMOKE_PASS_NOT_FULL_RESPONSIVE_CERTIFICATION",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "visible": "header role/country control, Leads heading/actions, KPI grid, pipeline opening",
+      "note": "Screenshot inspected; viewport reset to default after test"
+    },
+    {
+      "id": "ROLE_SELECTOR_UNRESOLVED",
+      "status": "NOT_CERTIFIED",
+      "simulatedOperativoCoCount": 0,
+      "subsequentDireccionGtCountTransient": 0,
+      "reason": "Sequential UI role/country change observed zero; reload failed before reconciliation, so no role regression asserted or PASS granted"
+    },
+    {
+      "id": "RELOAD_RESTORE_FAILURE",
+      "status": "REPRODUCED_TWICE_PRODUCTION_PROMOTION_HOLD",
+      "failureCode": "STORE_SNAPSHOT_ERROR",
+      "detailCode": "FUNCTION_DEADLINE_EXCEEDED",
+      "followOn": "RESTORE_ACTIVATION_FAILED PRODUCT_READONLY_BOOTSTRAP_NOT_READY",
+      "timesUTC": [
+        "2026-11-06T20:54:24.997Z",
+        "2026-11-06T20:56:44.521Z"
+      ],
+      "browserText": "Tu sesión sigue activa, pero no fue posible cargar la plataforma. Puedes volver a intentar el acceso.",
+      "provenancePaths": [
+        "orbit360-platform/core/product-app-p0.js",
+        "orbit360-platform/core/backend-product-readonly-bootstrap-p0.js"
+      ],
+      "codeFacts": [
+        "protected release candidate sets snapshotTimeoutMs=24000",
+        "backend categorizes functions/deadline-exceeded as FUNCTION_DEADLINE_EXCEEDED",
+        "fail-closed behavior kept, no fallback"
+      ],
+      "rootCause": "UNRESOLVED: server snapshot function deadline returned; distinguish backend outage/latency from UI/role-race with targeted authorized trace, do not patch timeout as a substitute"
+    }
+  ],
+  "preservedPriorSignedTests": true,
+  "notRepeated": [
+    "E4 GT Cobros-Reportes 2503/2503",
+    "Inicio",
+    "Equipo",
+    "Cliente360",
+    "Cobros",
+    "Aseguradoras historical signed"
+  ],
+  "gateDecision": "HOLD_CURRENT40_PREVIEW_FINAL_CERTIFICATION_NO_LIVE_PROMOTION",
+  "nextOnly": [
+    "Resolve or rule out protected snapshot backend function deadline in current #40 and verify authenticated cold reload",
+    "Reconcile sequential role-country selector zero count after readback; no new data import",
+    "Finish remaining Preview role-country-viewport delta and prospective author transversal readback, then same immutable artifact LIVE certification"
+  ],
+  "noCodeChanged": true,
+  "noDataChanged": true,
+  "noNewPreview": true,
+  "noReleasePassInferred": true
+}
