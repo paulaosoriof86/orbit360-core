@@ -12043,7 +12043,7 @@
       "source": "PAULA_REQUEST_AND_REPO_CAUSAL_AUDIT_20261012",
       "surface": "Inicio / Recaudo personal",
       "priority": "BLOCKING_P0",
-      "blocking": true,
+      "blocking": false,
       "owner": [
         "orbit360-platform/modules/inicio.js",
         "functions/assignable-advisor-roster.js"
@@ -12051,13 +12051,24 @@
       "finding": "Separar y verificar recaudo confirmado personal frente a meta individual.",
       "rootCause": "El fallback de splitCountrySummary restringe personal a production; atribución de recaudo pendiente de discriminante.",
       "closureCondition": "Prueba servidor+UI con asesor real, meta personal, recibos/cobros confirmados, GTQ/COP separados, permisos y reload.",
-      "status": "OPEN_P0_NOT_ACCEPTED",
+      "status": "RESOLVED_AUTHENTICATED_RUNTIME_PASS",
       "mayDisappearWithoutDisposition": false,
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_P0_FINDINGS_DECISIONS_FREEZE_20261012.md",
       "receiptBlobSha": "2760d2aeb961bac5a0ce11e326c689143d2cc083",
       "machineProofRunId": 38282275915,
       "visualPassDoesNotClose": true,
       "latestTargetedEvidence20261106": {
+        "kind": "SIGNED_DEPLOYED_PREVIEW_UI_SOURCE_RELOAD_SCOPE_COUNTRY_AND_EXACT_CLEANUP_PASS",
+        "signed5of5": true,
+        "sourceReaderSevenOfSeven": true,
+        "formalP0Closed": true,
+        "createRunId": 42252540995,
+        "cleanupRunId": 42252887414,
+        "zeroResidue": true,
+        "requiresNewProductBuild": false,
+        "otherP0StillOpen": 4
+      },
+      "previousPartialProofBeforeSignedUi20261106": {
         "date": "2026-11-06",
         "kind": "EXACT_MEMBER_SCOPED_SERVER_READER_SYNTHETIC_NO_SIGNED_DEPLOYED_PARITY",
         "sourceReaderSevenOfSeven": true,
@@ -12072,6 +12083,75 @@
         "reference": "https://github.com/paulaosoriof86/orbit360-core/issues/154#issuecomment-6688171274",
         "nextCheck": "AUTHENTICATED_DEPLOYED_READER_AND_FIVE_OF_FIVE_UI_PARITY",
         "noFalsePass": true
+      },
+      "closureProof": {
+        "scope": "PERSONAL_COLLECTION_FUNCTIONAL_P0_ONLY_NO_B4003_GATE_CLOSURE",
+        "dateLocal": "2026-11-06",
+        "immutablePreviewSourceSha": "3e87722d54871198a02d9b0909971fa2f4f913af",
+        "immutablePreviewRunId": 42154167581,
+        "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-rc-41765742748-neoi3u7r.web.app/",
+        "signedUser": "Paula",
+        "authenticatedRole": "Asesor",
+        "sessionCountryAfterTest": "TODOS",
+        "sessionPeriod": "2026-11",
+        "sourceReadiness": "5_OF_5_SIGNED_CHROME",
+        "scopedServerReadRunId": 42243486854,
+        "scopedServerReadCount": "7_OF_7",
+        "createSyntheticRunId": 42252540995,
+        "createSyntheticConclusion": "success",
+        "createdSyntheticDocuments": 5,
+        "syntheticAmountGTQ": 111.11,
+        "syntheticPersonalGoalGTQ": 200,
+        "previewReadbackWithSynthetic": {
+          "country": "GT",
+          "personalConfirmedGTQ": 111.11,
+          "personalGoalGTQ": 200,
+          "percentageVisible": 56,
+          "cobrosConfirmedCount": 4,
+          "aggregateCobrosGTQVisibleRounded": 2417,
+          "sourceReadiness": "5_OF_5"
+        },
+        "cleanupSyntheticRunId": 42252887414,
+        "cleanupSyntheticConclusion": "success",
+        "serverExactSyntheticCleanup": "PASS_REMOVED_5",
+        "finalSignedPreviewReload": {
+          "country": "GT",
+          "sources": "5_OF_5",
+          "personalConfirmedVisible": "Q0",
+          "personalGoal": "NOT_CONFIGURED",
+          "aggregateCobrosGTQVisible": 2306,
+          "aggregateCobrosCount": 3
+        },
+        "crossCountryAuthenticatedPreviewReadback": {
+          "country": "CO",
+          "sources": "5_OF_5",
+          "aggregateCobrosCOP": 0,
+          "aggregateCobrosCount": 0,
+          "currency": "COP"
+        },
+        "bothCountriesAfterRestore": {
+          "country": "TODOS",
+          "sources": "5_OF_5",
+          "currencies": "GTQ_AND_COP_NO_CONVERSION",
+          "aggregateCobrosGTQ": 2306,
+          "aggregateCobrosCOP": 0,
+          "aggregateCobrosCount": 3,
+          "personalConfirmedVisible": "Q0"
+        },
+        "residualSyntheticDocuments": 0,
+        "operationalDataReimport": false,
+        "firestoreRulesRedeploy": false,
+        "productRebuild": false,
+        "noProductionPromotion": true,
+        "doesNotClose": [
+          "FREELANCERS_GOAL_SCOPE",
+          "INICIO_MOTIVATIONAL_TEXTS",
+          "CANCELLED_RUN_QA_RESIDUE",
+          "ORPHAN_RENEWALS_QA_RESIDUE",
+          "OPS_LEADS_HUMAN_AUTHOR_RESOLVER",
+          "FULL_MODULE_ROLE_VIEWPORT_MATRIX",
+          "CURRENT_ARTIFACT_LIVE_READBACK"
+        ]
       }
     },
     {
