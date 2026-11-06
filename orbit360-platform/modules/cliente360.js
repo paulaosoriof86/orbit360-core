@@ -328,7 +328,8 @@ Orbit.modules.cliente360 = (function () {
     const renewals45Count = policyReadiness === 'ready' ? renewals45Policies.length : null;
     const selectedRole=Orbit.session&&typeof Orbit.session.rol==='function'?Orbit.session.rol():'';
     const hasFilters=Boolean(f.q||f.pais||f.tipo||f.asesor||f.seg);
-    const policyGap=policyReadiness==='ready'?visiblePolicyGap(policiesForList,kpiClientIds,selectedRole,globalCountry,hasFilters):null;
+    const commercialPoliciesForGap=policiesForList.filter(p=>p && !isQaRecord(p) && !isQaRecord(S().get('clientes',p.clienteId)));
+    const policyGap=policyReadiness==='ready'?visiblePolicyGap(commercialPoliciesForGap,kpiClientIds,selectedRole,globalCountry,hasFilters):null;
     const policyGapNote=policyGap&&policyGap.unmatched>0?policyGap.unmatched+' pólizas sin cliente visible':'';
     const summaryAggregateMs = perfNow() - summaryAggregateStartedAt;
 
