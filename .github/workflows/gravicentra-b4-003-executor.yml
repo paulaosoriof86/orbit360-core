@@ -3801,8 +3801,8 @@ jobs:
       ROLLBACK_CHANNEL: gi-i5-rb-34723814583
       ROLLBACK_FILE_COUNT: '209'
       ROLLBACK_PAYLOAD_SHA256: 84a74f46498618ca36c142ff844dbfe670df5a64501a1ceca22d5cd069e62767
-      RETAINED_ARCHIVE_DIR: ${{ runner.temp }}/gi-b4003-retained-archive
-      B4_PREFLIGHT_OUT: ${{ runner.temp }}/gi-b4003-retained-preflight
+      RETAINED_ARCHIVE_DIR: ${{ github.workspace }}/.b4-preflight-temp/archive
+      B4_PREFLIGHT_OUT: ${{ github.workspace }}/.b4-preflight-temp/evidence
     steps:
       - uses: actions/checkout@v4
         with:
