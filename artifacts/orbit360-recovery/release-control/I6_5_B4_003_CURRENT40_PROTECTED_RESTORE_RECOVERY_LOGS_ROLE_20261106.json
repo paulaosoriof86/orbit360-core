@@ -64,6 +64,38 @@
         "resuelta": "Renovación aceptada"
       },
       "doesNotProveFullModuleMatrix": true
+    },
+    {
+      "id": "OPS_COUNTRY_ROLE_DELTA",
+      "status": "FOCAL_READ_ONLY_SIMULATED_ROLE_PASS",
+      "countryCountsDireccion": {
+        "GT": {
+          "negociosEnFlujo": 0,
+          "gestiones": 1
+        },
+        "CO": {
+          "negociosEnFlujo": 1,
+          "gestiones": 1
+        },
+        "TODOS": {
+          "negociosEnFlujo": 1,
+          "gestiones": 2
+        }
+      },
+      "roleSimulatedOperativoTodos": {
+        "negociosEnFlujo": 1,
+        "gestiones": 2
+      },
+      "returnDireccionTodos": {
+        "negociosEnFlujo": 1,
+        "gestiones": 2
+      },
+      "invariants": [
+        "GT+CO counts equal TODOS",
+        "temporary zero after role change rehydrated without reload; not persistent regression"
+      ],
+      "scopeLimit": "Paula role simulation, not independent authenticated Carlos/Samuel",
+      "sourceArtifactUnchanged": true
     }
   ],
   "historicalSignedTestsPreserved": true,
