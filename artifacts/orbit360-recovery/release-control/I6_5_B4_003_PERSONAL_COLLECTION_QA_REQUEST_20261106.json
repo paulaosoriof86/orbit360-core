@@ -1,7 +1,7 @@
 {
   "schema": "B4-003-P0-PERSONAL-20261106-V1",
   "status": "REQUESTED",
-  "phase": "cleanup",
+  "phase": "create",
   "tenantId": "alianzas-soluciones",
   "gate": "I6.5/B4-003",
   "ownerAuthorization": "PAULA_SIGNED_SYNTHETIC_QA_ALLOWED_20261106",
@@ -16,16 +16,16 @@
     "b4003p0personal_meta_20261106"
   ],
   "cleanupRequired": true,
-  "attempt": 5,
+  "attempt": 6,
   "previousAttempt": {
     "runId": 42238285221,
     "status": "FAIL_BEFORE_ANY_WRITE",
     "cause": "QA_HARNESS_VARIABLE_NAME_ONLY"
   },
   "createRunId": 42239715489,
-  "previousCleanupRunId": 42238990652,
+  "previousCleanupRunId": 42243853571,
   "secondProof": "CLIENT_ADVISOR_SCOPE_CORRECTED",
   "secondProofResult": "GOAL_Q200_VISIBLE_PERSONAL_COLLECTION_Q0_5_OF_5_SOURCES_GT",
-  "probe": "MEMBERSHIP_BACKED_SERVER_SCOPED_READER_CLIENT_RECEIPT_COBRO_META_PARITY_V1",
-  "cleanupReason": "AFTER_MEMBERSHIP_SCOPED_READ_PARITY_AND_SIGNED_CHROME_PARTIAL_RELOAD"
+  "probe": "SIGNED_PREVIEW_PAULA_ASESOR_GT_NOV_5_OF_5_PERSONAL_COLLECTION_Q111_11_VS_META_Q200",
+  "cleanupReason": "IMMEDIATE_EXACT_ID_RESTORE_AFTER_ONE_SIGNED_FIVE_OF_FIVE_CHROME_READBACK"
 }
