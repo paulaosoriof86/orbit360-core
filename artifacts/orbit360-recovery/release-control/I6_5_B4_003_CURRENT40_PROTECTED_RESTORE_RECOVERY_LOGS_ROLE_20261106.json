@@ -1,0 +1,84 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_003_CURRENT40_PROTECTED_RESTORE_RECOVERY_AND_FOCAL_QA_20261106_V1",
+  "dateLocal": "2026-11-06",
+  "gate": "I6.5/B4-003",
+  "candidate": {
+    "sourceSha": "b01dceafc1ec2b1e786626116251e248be1e23f4",
+    "buildId": "gi-i65-b4-b01dceafc1ec-57f234755dc1",
+    "immutableArtifactId": 13527102882,
+    "preview": "https://ays-orbit-360-lab--gi-i65-b4-rc-41765742748-neoi3u7r.web.app/"
+  },
+  "focus": "One existing #40 Preview, authenticated Paula Dirección, no product or data write, browser/Cloud Logging read-only",
+  "findings": [
+    {
+      "id": "RECOVERY_AFTER_TRANSIENT_DEADLINE",
+      "status": "FOCAL_RESTORE_RECOVERY_3_OF_3_PASS_WITH_INTERMITTENT_HISTORY_PRESERVED",
+      "failedPreviousAttempts": 2,
+      "consecutiveSuccessfulColdReloadsNow": 3,
+      "afterRestore": {
+        "user": "Paula Osorio",
+        "role": "Dirección",
+        "country": "GT",
+        "leads": 2,
+        "labels": [
+          "Auto Total",
+          "Vida Temporal"
+        ]
+      },
+      "browserWarningsAfterSuccess": "No new warnings observed; prior warnings at 2026-11-06T20:54:24.997Z and 20:56:44.521Z remain in tab history",
+      "limitation": "Three successes do not establish root cause or guarantee production reliability; keep alert if reoccurs"
+    },
+    {
+      "id": "CLOUD_RUN_PROTECTED_READER_LOG_QUERY",
+      "status": "FOCAL_SERVER_ERRORS_NOT_OBSERVED",
+      "project": "ays-orbit-360-lab",
+      "service": "orbit360scopedpolicyreadpreview",
+      "region": "us-east1",
+      "query": "resource.type=\"cloud_run_revision\" AND resource.labels.service_name=\"orbit360scopedpolicyreadpreview\" AND timestamp>=\"2026-11-06T20:45:00Z\" AND (httpRequest.status>=400 OR severity>=ERROR)",
+      "matchedErrorResults": 0,
+      "unfilteredTotalRecordsVisibleInUI": 222,
+      "observedSample": "HTTP POST 200 and OPTIONS 204 for the callable between 14:51 and 14:56 Guatemala, sampled completed request latencies 86 ms–1.392 s",
+      "inference": "No server HTTP error demonstrated in the selected log window; client-side functions/deadline-exceeded remains intermittent and cannot be ascribed to backend failure without correlated request trace"
+    },
+    {
+      "id": "ROLE_SWITCH_COUNTRY_GT",
+      "status": "FOCAL_SIMULATED_SCOPE_PASS_ONLY",
+      "roleScenarioCounts": {
+        "Direccion": 2,
+        "Operativo": 0,
+        "Asesor": 0
+      },
+      "directionRestoredAfterLoad": true,
+      "transientZeroAfterSwitch": "Observed while hydration pending, replaced by 2 in next snapshot without reload",
+      "doesNotProveIndependentAuthenticatedRoles": true
+    },
+    {
+      "id": "RESPONSIVE_OPS_READ_ONLY",
+      "status": "FOCAL_PREVIEW_READ_ONLY_PASS",
+      "leadsViewport1024": "First-fold visual screenshot inspected; KPI/header/kanban scrollable with no observed overlap",
+      "leadsViewport390": "Preserved prior first-fold PASS",
+      "viewportReset": true,
+      "opsDireccionGT": {
+        "gestiones": 1,
+        "negociosEnFlujo": 0,
+        "resuelta": "Renovación aceptada"
+      },
+      "doesNotProveFullModuleMatrix": true
+    }
+  ],
+  "historicalSignedTestsPreserved": true,
+  "authorsHistoricalNotReopened": true,
+  "insurerCredentialVaultNotReopened": true,
+  "syntheticFixturePhysicalCleanup": "UNVERIFIED_DEFERRED_OWNER_QA",
+  "fullB4003Status": "HOLD_UNTIL_FINAL_MATRIX_AND_LIVE",
+  "promotionAuthorized": false,
+  "notNewReleaseGate": true,
+  "noCodeChange": true,
+  "noDataWrite": true,
+  "noNewBuildOrPreview": true,
+  "nextOnly": [
+    "Complete missing current #40 role/actor cross-session and focused Preview matrix receipts; no repeat signed tests",
+    "Preserve intermittent reload incident as watch and repro-only investigation, no automatic new blocker if 3/3 recovery persists",
+    "After final Preview acceptance promote same immutable artifact and conduct LIVE digest/write/readback/rollback certification"
+  ]
+}
