@@ -1,0 +1,168 @@
+# B4-003 existing-gate signed personal collection discriminant.
+# No Hosting, Functions, Rules, Auth, IAM or real business-data deployment.
+# A temporary exact-ID synthetic proof, with separate exact-ID cleanup mode.
+name: Gravicentra B4-003 Personal Collection QA
+on:
+  workflow_dispatch:
+    inputs:
+      phase:
+        description: 'Exact synthetic P0 proof: create or cleanup'
+        required: true
+        type: choice
+        options: [create, cleanup]
+        default: cleanup
+permissions:
+  contents: read
+concurrency:
+  group: gi-b4003-personal-collection-exact-fixture
+  cancel-in-progress: false
+jobs:
+  scoped-personal-collection:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      PROJECT_ID: ays-orbit-360-lab
+      TENANT_ID: alianzas-soluciones
+      QA_PHASE: ${{ inputs.phase }}
+      SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_LAB_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Guard canonical branch and frozen B4-003 owner authorization
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = 'recovery/fase-a-clean-20260831'
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          node - <<'NODE'
+          const c=require('./artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json');
+          const f=c.b4003DecisionFreezeAndSingleCertificationCursor20261103;
+          if(f?.status!=='FROZEN_ACTIVE_FOR_CURRENT_B4_003_CONTROLLED_LIVE_DECISION'||
+             f?.metrics?.b4003Closed!==false||f?.metrics?.productionAuthorized!==false||
+             !['create','cleanup'].includes(process.env.QA_PHASE))
+            throw Error('B4_003_QA_OWNER_GATE_NOT_CURRENT');
+          console.log('B4_003_P0_PERSONAL_FROZEN_GATE=PASS');
+          NODE
+      - name: Select existing LAB authority, no credentials in logs
+        run: |
+          set -euo pipefail
+          node - <<'NODE'
+          const fs=require('node:fs'),path=require('node:path');
+          let credential;
+          for(const name of ['SA_LAB','SA_LAB_ALT','SA_DEFAULT']){
+            try{const value=JSON.parse(process.env[name]||'');
+              if(value.type==='service_account'&&value.project_id===process.env.PROJECT_ID&&value.private_key){credential=value;break;}
+            }catch(_){}
+          }
+          if(!credential)throw Error('EXISTING_LAB_CREDENTIAL_NOT_AVAILABLE');
+          const target=path.join(process.env.RUNNER_TEMP,'gi-b4003-personal-credential.json');
+          fs.writeFileSync(target,JSON.stringify(credential),{mode:0o600,flag:'wx'});
+          fs.appendFileSync(process.env.GITHUB_ENV,'GOOGLE_APPLICATION_CREDENTIALS='+target+'\n');
+          console.log('EXISTING_LAB_AUTHORITY=READY');
+          NODE
+      - name: Install pinned Firebase Admin dependency
+        run: npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund firebase-admin@13.4.0 >/dev/null
+      - name: Exact synthetic create or verified cleanup
+        run: |
+          set -euo pipefail
+          node --input-type=module - <<'NODE'
+          import fs from 'node:fs';
+          import {initializeApp,applicationDefault} from 'firebase-admin/app';
+          import {getFirestore} from 'firebase-admin/firestore';
+
+          const phase=process.env.QA_PHASE,qaKey='B4-003-P0-PERSONAL-20261106-V1';
+          const month='2026-11',country='GT',currency='GTQ',amount=111.11,goal=200;
+          const ids={client:'b4003p0personal_client_20261106',
+            policy:'b4003p0personal_policy_20261106',
+            receipt:'b4003p0personal_receipt_20261106',
+            payment:'b4003p0personal_payment_20261106',
+            meta:'b4003p0personal_meta_20261106'};
+          const collections={client:'clientes',policy:'polizas',receipt:'recibosEsperados',
+            payment:'cobros',meta:'metas'};
+          const db=getFirestore(initializeApp({credential:applicationDefault(),projectId:process.env.PROJECT_ID}));
+          const tenant=db.collection('tenants').doc(process.env.TENANT_ID);
+          const data=tenant.collection('data');
+          const refs=Object.fromEntries(Object.entries(ids).map(([k,id])=>
+            [k,data.doc(collections[k]).collection('items').doc(id)]));
+          const snaps=await Promise.all(Object.values(refs).map(ref=>ref.get()));
+          const keys=Object.keys(refs),before=Object.fromEntries(keys.map((k,i)=>[k,snaps[i].exists]));
+          const validFixture=s=>s.exists&&s.data()?.__syntheticPersonalQa===true&&s.data()?.qaKey===qaKey;
+          for(const s of snaps)if(s.exists&&!validFixture(s))throw Error('EXACT_QA_ID_COLLISION_ABORT');
+          if(phase==='cleanup'){
+            const batch=db.batch();
+            snaps.forEach((s,i)=>{if(s.exists)batch.delete(refs[keys[i]]);});
+            await batch.commit();
+            const after=await Promise.all(Object.values(refs).map(ref=>ref.get()));
+            if(after.some(s=>s.exists))throw Error('EXACT_QA_CLEANUP_RESIDUE');
+            const r={schema:qaKey,phase,status:'CLEANED',before,
+              removed:snaps.filter(s=>s.exists).length,afterTotal:0,noRealBusinessWrites:true};
+            fs.writeFileSync(process.env.RUNNER_TEMP+'/gi-b4003-personal-result.json',JSON.stringify(r,null,2));
+            console.log('B4_003_P0_PERSONAL_CLEANUP_READBACK=PASS removed='+r.removed);
+          }else{
+            if(snaps.some(s=>s.exists))throw Error('EXACT_QA_FIXTURE_ALREADY_EXISTS_CLEANUP_FIRST');
+            const norm=x=>String(x??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+            const members=await tenant.collection('members').get();
+            const potential=members.docs.filter(d=>{
+              const m=d.data()||{},roles=[].concat(m.roles||[],m.rol||[],m.activeRole||[]).map(norm);
+              const countries=[].concat(m.countries||m.paises||[]).map(x=>String(x).toUpperCase());
+              return roles.includes('direccion')&&roles.includes('asesor')&&countries.includes(country)&&
+                !!(m.advisorId||m.asesorId)&&m.active!==false&&m.activo!==false&&norm(m.status||'active')!=='inactive';
+            });
+            if(potential.length!==1)throw Error('EXACT_SIGNED_DIRECTION_ADVISOR_NOT_UNIQUE');
+            const member=potential[0].data(),advisorId=String(member.advisorId||member.asesorId);
+            const advisors=await data.doc('asesores').collection('items').get();
+            const a=advisors.docs.filter(d=>{
+              const r=d.data()||{};
+              return String(r.canonicalDocumentId||r.id||d.id)===advisorId;
+            });
+            if(a.length!==1)throw Error('CANONICAL_ADVISOR_NOT_UNIQUE');
+            const advisor=a[0].data()||{},countries=[].concat(advisor.paises||advisor.pais||[]).map(x=>String(x).toUpperCase());
+            if(!countries.includes(country)||advisor.tipoVinculacion!=='interno'||advisor.activo===false)
+              throw Error('SIGNED_INTERNAL_ADVISOR_NOT_ELIGIBLE');
+            const existing=await data.doc('metas').collection('items').where('asesorId','==',advisorId).get();
+            if(existing.docs.some(d=>{
+              const g=d.data()||{};return String(g.mes||g.periodo||'').slice(0,7)===month&&
+                String(g.pais||'').toUpperCase()===country&&String(g.tipo||'').toLowerCase()==='recaudo';
+            }))throw Error('REAL_PERSONAL_GOAL_EXISTS_ABORT_NO_OVERWRITE');
+            const common={qaKey,__syntheticPersonalQa:true,__syntheticHumanQa:true,
+              syntheticOnly:true,createdByGate:'I6.5/B4-003'};
+            const batch=db.batch();
+            batch.create(refs.client,{...common,id:ids.client,pais:country,moneda:currency,
+              nombre:'PRUEBA TEMPORAL B4-003 — NO CLIENTE REAL',activo:true});
+            batch.create(refs.policy,{...common,id:ids.policy,clienteId:ids.client,
+              asesorId,pais:country,moneda:currency,numero:'QA-P0-PERSONAL-20261106',
+              estado:'Vigente',vigenciaInicio:'2026-09-01',vigenciaFin:'2027-08-31',primaNeta:amount});
+            batch.create(refs.receipt,{...common,id:ids.receipt,clienteId:ids.client,
+              polizaId:ids.policy,asesorId,pais:country,moneda:currency,monto:amount,
+              estado:'Pagado',fechaPago:'2026-11-06'});
+            batch.create(refs.payment,{...common,id:ids.payment,reciboId:ids.receipt,
+              clienteId:ids.client,polizaId:ids.policy,asesorId,pais:country,
+              moneda:currency,monto:amount,fechaPago:'2026-11-06',estado:'Conciliado',
+              conciliado:true,paymentState:'PAID_DIRECT',applicationState:'APPLIED_DIRECT',
+              sourceType:'CRM_DIRECT'});
+            batch.create(refs.meta,{...common,id:ids.meta,asesorId,mes:month,
+              periodo:month,pais:country,moneda:currency,tipo:'recaudo',valor:goal});
+            await batch.commit();
+            const after=await Promise.all(Object.values(refs).map(ref=>ref.get()));
+            if(after.some(s=>!validFixture(s)))throw Error('EXACT_QA_CREATE_READBACK_FAIL_CLEANUP_REQUIRED');
+            const r={schema:qaKey,phase,status:'READY',before,afterTotal:after.length,
+              month,country,currency,amount,goal,expectedPersonalPercent:Math.round(amount/goal*100),
+              noRealBusinessWrites:true,cleanupRequired:true,explicitQaOnly:true};
+            fs.writeFileSync(process.env.RUNNER_TEMP+'/gi-b4003-personal-result.json',JSON.stringify(r,null,2));
+            console.log('B4_003_P0_PERSONAL_CREATE_READBACK=PASS five_exact_synthetic_documents');
+          }
+          NODE
+      - name: Preserve non-identifying readback receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gi-b4003-personal-collection-${{ inputs.phase }}-${{ github.run_id }}
+          path: ${{ runner.temp }}/gi-b4003-personal-result.json
+          if-no-files-found: warn
+          retention-days: 14
