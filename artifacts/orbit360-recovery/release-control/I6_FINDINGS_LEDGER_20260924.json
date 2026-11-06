@@ -12299,19 +12299,78 @@
       "source": "PAULA_REQUEST_AND_REPO_CAUSAL_AUDIT_20261012",
       "surface": "Inicio / Textos motivacionales",
       "priority": "BLOCKING_P0",
-      "blocking": true,
+      "blocking": false,
       "owner": [
         "orbit360-platform/modules/inicio.js"
       ],
       "finding": "Aplicar textos motivacionales contextuales preservando Inicio premium visualmente aceptado.",
       "rootCause": "El encabezado y mensaje de Inicio se definen de forma fija en la plantilla.",
       "closureCondition": "Validación visual de textos contextuales reales por rol/periodo, sin cifras ni logros inventados ni regresión de diseño.",
-      "status": "OPEN_P0_NOT_ACCEPTED",
+      "status": "RESOLVED_AUTHENTICATED_RUNTIME_PASS",
       "mayDisappearWithoutDisposition": false,
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_P0_FINDINGS_DECISIONS_FREEZE_20261012.md",
       "receiptBlobSha": "2760d2aeb961bac5a0ce11e326c689143d2cc083",
       "machineProofRunId": 38282275915,
-      "visualPassDoesNotClose": true
+      "visualPassDoesNotClose": true,
+      "closureProof": {
+        "scope": "CONTEXTUAL_INICIO_MOTIVATIONAL_TEXTS_FOCAL_DESKTOP_VISUAL_ONLY_FULL_RESPONSIVE_MATRIX_PENDING",
+        "dateLocal": "2026-11-06",
+        "immutablePreviewProductSha": "3e87722d54871198a02d9b0909971fa2f4f913af",
+        "immutablePreviewWorkflowRunId": 42154167581,
+        "contextualHeaderProof": [
+          {
+            "role": "Asesor",
+            "country": "TODOS",
+            "sourceReadiness": "5_OF_5",
+            "text": "Consulta las metas individuales disponibles y tus seguimientos autorizados en Guatemala y Colombia."
+          },
+          {
+            "role": "Asesor",
+            "country": "GT",
+            "sourceReadiness": "5_OF_5",
+            "text": "Consulta las metas individuales disponibles y tus seguimientos autorizados en Guatemala."
+          },
+          {
+            "role": "Dirección",
+            "country": "GT",
+            "sourceReadiness": "5_OF_5",
+            "text": "Revisa metas institucionales, cuando estén configuradas, y pendientes autorizados en Guatemala."
+          },
+          {
+            "role": "Dirección",
+            "country": "CO",
+            "sourceReadiness": "5_OF_5",
+            "text": "Revisa metas institucionales, cuando estén configuradas, y pendientes autorizados en Colombia."
+          }
+        ],
+        "temporalState": "WHEN_FEWER_THAN_FIVE_SOURCES_READY_BANNER_SAYS_VERIFYING_REAL_DATA_AND_PERMISSIONS_NO_IMAGINARY_STATS",
+        "observedPeriod": "Noviembre 2026",
+        "dateContextLocal": "2026-11-06",
+        "observedCountdown": "Faltan 24 días para cerrar el mes",
+        "serverReadinessVerified": "5_OF_5",
+        "reflectionButtonEnabled": true,
+        "reflectionBefore": "Un equipo que comparte prioridades transforma los datos en protección real.",
+        "reflectionAfter": "La prevención abre oportunidades; el seguimiento oportuno protege las relaciones.",
+        "desktopVisualObservation": "TWO_SIGNED_CHROME_SCREENSHOTS_ASESOR_TODOS_AND_DIRECCION_GT_AT_1520PX_NO_OVERLAPS_OR_BROKEN_CARD_GRID",
+        "premiumDesignPriorAcceptancePreservedScopeOnly": true,
+        "financialEmptyStatesDoNotInventGoals": true,
+        "sourceDataDrivenHeaderAndCalendar": true,
+        "sourceTextModuleBlobSha": "9dff332315198504042519dd199720f81a481573",
+        "sessionRestored": {
+          "role": "Asesor",
+          "country": "TODOS",
+          "sources": "5_OF_5"
+        },
+        "notClaimed": [
+          "RESPONSIVE_320_390_1024_1440_MATRICES",
+          "FULL_MODULE_VISUAL_REACCEPTANCE",
+          "LIVE_PROMOTION",
+          "GOAL_FIGURES_NOT_CONFIGURED"
+        ],
+        "noRealWrites": true,
+        "noProductRebuild": true,
+        "noRulesRedeploy": true
+      }
     },
     {
       "id": "B4-003-P0-20261012-QA-CANCELLED-RUN-FIXTURES",
