@@ -239,7 +239,12 @@ Orbit.modules.inicio = (function () {
       }):[];
     const advisorSelectionState=advisorSelection(board,activeCountry);
     const visibleBoard=board.filter(b=>advisorSelectionState.selected.has(String(b.asesor.id||'')));
-    const clientes=q.clientesScoped?q.clientesScoped():Orbit.store.all('clientes'), polizas=q.polizasScoped?q.polizasScoped():Orbit.store.all('polizas');
+    // B4-003: Inicio commercial counters exclude the two retained QA cohorts; audit records remain untouched.
+    const scopedClientes=q.clientesScoped?q.clientesScoped():Orbit.store.all('clientes');
+    const scopedPolizas=q.polizasScoped?q.polizasScoped():Orbit.store.all('polizas');
+    const qaAuditOnly=row=>!!(q.isSyntheticQaRecord&&q.isSyntheticQaRecord(row));
+    const clientes=scopedClientes.filter(c=>!qaAuditOnly(c));
+    const polizas=scopedPolizas.filter(p=>!qaAuditOnly(p)&&!qaAuditOnly(Orbit.store.get('clientes',p.clienteId)));
     const metasMes=[]; // Inicio metas originate only from the authorized server projection.
     const advisors=secureRoster.rows;
     const mapKeys=map=>Object.keys(map||{}).filter(cur=>Math.abs(Number(map[cur])||0)>0), singleCurrency=map=>{const k=mapKeys(map);return k.length===1?k[0]:'';};
