@@ -155,17 +155,17 @@ jobs:
             batch.create(refs.client,{...common,id:ids.client,pais:country,moneda:currency,
               nombre:'PRUEBA TEMPORAL B4-003 — NO CLIENTE REAL',activo:true});
             batch.create(refs.policy,{...common,id:ids.policy,clienteId:ids.client,
-              asesorId,pais:country,moneda:currency,numero:'QA-P0-PERSONAL-20261106',
+              asesorId:advisorId,pais:country,moneda:currency,numero:'QA-P0-PERSONAL-20261106',
               estado:'Vigente',vigenciaInicio:'2026-09-01',vigenciaFin:'2027-08-31',primaNeta:amount});
             batch.create(refs.receipt,{...common,id:ids.receipt,clienteId:ids.client,
-              polizaId:ids.policy,asesorId,pais:country,moneda:currency,monto:amount,
+              polizaId:ids.policy,asesorId:advisorId,pais:country,moneda:currency,monto:amount,
               estado:'Pagado',fechaPago:'2026-11-06'});
             batch.create(refs.payment,{...common,id:ids.payment,reciboId:ids.receipt,
-              clienteId:ids.client,polizaId:ids.policy,asesorId,pais:country,
+              clienteId:ids.client,polizaId:ids.policy,asesorId:advisorId,pais:country,
               moneda:currency,monto:amount,fechaPago:'2026-11-06',estado:'Conciliado',
               conciliado:true,paymentState:'PAID_DIRECT',applicationState:'APPLIED_DIRECT',
               sourceType:'CRM_DIRECT'});
-            batch.create(refs.meta,{...common,id:ids.meta,asesorId,mes:month,
+            batch.create(refs.meta,{...common,id:ids.meta,asesorId:advisorId,mes:month,
               periodo:month,pais:country,moneda:currency,tipo:'recaudo',valor:goal});
             await batch.commit();
             const after=await Promise.all(Object.values(refs).map(ref=>ref.get()));
