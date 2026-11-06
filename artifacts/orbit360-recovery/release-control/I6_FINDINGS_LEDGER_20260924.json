@@ -12056,7 +12056,23 @@
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_P0_FINDINGS_DECISIONS_FREEZE_20261012.md",
       "receiptBlobSha": "2760d2aeb961bac5a0ce11e326c689143d2cc083",
       "machineProofRunId": 38282275915,
-      "visualPassDoesNotClose": true
+      "visualPassDoesNotClose": true,
+      "latestTargetedEvidence20261106": {
+        "date": "2026-11-06",
+        "kind": "EXACT_MEMBER_SCOPED_SERVER_READER_SYNTHETIC_NO_SIGNED_DEPLOYED_PARITY",
+        "sourceReaderSevenOfSeven": true,
+        "sourceReaderRunId": 42243486854,
+        "signedBrowserFreshReadback": "ONLY_3_OF_5_SOURCES_BEFORE_CDP_TIMEOUT",
+        "signedFullFinanceResult": "NOT_OBSERVED",
+        "cleanupRunId": 42243853571,
+        "serverExactCleanupRemovedFive": true,
+        "syntheticResidue": 0,
+        "realDataChanged": false,
+        "formalP0Closed": false,
+        "reference": "https://github.com/paulaosoriof86/orbit360-core/issues/154#issuecomment-6688171274",
+        "nextCheck": "AUTHENTICATED_DEPLOYED_READER_AND_FIVE_OF_FIVE_UI_PARITY",
+        "noFalsePass": true
+      }
     },
     {
       "id": "B4-003-P0-20261012-INSTITUTIONAL-GOALS",
