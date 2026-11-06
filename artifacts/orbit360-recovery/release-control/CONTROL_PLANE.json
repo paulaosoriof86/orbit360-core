@@ -12,9 +12,9 @@
       "b4003CertificationInventory20261105"
     ],
     "historicalSnapshotsPreservedNotReopened": true,
-    "activeSourceSha": "b01dceafc1ec2b1e786626116251e248be1e23f4",
-    "activeBuildId": "gi-i65-b4-b01dceafc1ec-57f234755dc1",
-    "activeImmutableArtifactId": 13527102882,
+    "activeSourceSha": "131d346a3b2d857ee043f2feb590f4608f450e55",
+    "activeBuildId": "gi-i65-b4-131d346a3b2d-57f234755dc1",
+    "activeImmutableArtifactId": 13548166231,
     "activeEvidenceCount": 16,
     "recentlyBoundEvidenceIDs": [
       "E4_GT_COBROS_REPORTES_CURRENT_40_SAME_SCOPE_2503",
@@ -61,13 +61,21 @@
       "currentPaulaSessionCannotProveOwnNoticeRecipient": true,
       "durableEmailFieldAloneIsNotVisibleAuthorRegression": true,
       "recipientNoticeUiPass": true,
-      "recipientCommentAndBitacora": "FAIL_SAMUEL_GENERIC_AUTHOR_REAL_CURRENT_COMMENT"
+      "recipientCommentAndBitacora": "FAIL_SAMUEL_GENERIC_AUTHOR_REAL_CURRENT_COMMENT",
+      "currentCandidate": 41,
+      "currentPostFixUiPending": true
     },
     "historicalOpsLeadsGenericAuthors": "NO_RETROACTIVE_REWRITE_NOT_RELEASE_BLOCKING",
     "insurerCredentialPreviewVault": "SEPARATE_FROM_LIVE; HISTORICAL_CREDENTIAL_TESTS_3_OF_3_PRESERVED; LIVE_RECHECK_AFTER_SAME_ARTIFACT_PROMOTION",
     "nextOnly": [
-      "Build/read back exact successor; reload Samuel actual Asesor session and open same original notice; prove matching human author in comment and bitacora. Complete already-authorized new write/reload and cleanup only on the two existing fixtures, then only unsigned affected Preview deltas and LIVE gate.",
-      "Retain all unaffected signed approvals and owner-deferred historical QA; no routine Rules/Auth work; no source or artifact mutation after successor build."
+      "Reconnect existing Chrome Preview tab with Samuel session, then reload build gi-i65-b4-131d346a3b2d-57f234755dc1. Do not create another fixture.",
+      "C04_SAMUEL_READ_ORIGINAL: After reconnect/reload, confirm build 41; open original existing notice evt_facd26eb0fcdee8d3ced6d20888e; verify Paula Osorio in notice, original comment and bitacora, repeat after reload.",
+      "C04_SAMUEL_NEW_WRITE: Use existing latest fixture b4003qa_user_mw5htkgl_31u61t; controlled comment, server confirmation and reload; verify human author and matching bitacora. Asesor modal is intentionally locked by existing bridge; do not claim an Asesor write.",
+      "C04_SECOND_UID_READ: Read the exact new Samuel event as another authenticated UID and reload. A role switch is not a second principal. No specific requirement for a new Carlos write was found.",
+      "CURRENT_FIXTURE_CLEANUP: Archive/clean only the two exact current author fixtures and verify durable archived state. Historical QA cohorts remain owner-deferred.",
+      "INICIO_RESPONSIVE_DELTA: Preserve signed desktop; complete unsigned applicable 390/320 layout checks. Do not invent every role x country x viewport combination.",
+      "CLIENTE360_SECOND_PRINCIPAL_DELTA: Complete other-principal commercial list/KPI and QA-exclusion proof in authorized scopes, preserving Paula Direccion GT/CO/TODOS evidence.",
+      "FORMAL_PREVIEW_AND_LIVE: Reconcile applicable signed evidence and obtain formal exact Preview acceptance; then validate certified rollback, promote same retained artifact, exact LIVE readback and required approved write/reload/integrity tests. No new source build for documentary commits."
     ],
     "doNotRebuildForMetadata": true,
     "firestoreRulesNoRoutineBlocker": true,
@@ -150,7 +158,7 @@
       "actualDurableCommentActorFieldsRequireProspectiveReview": true,
       "continuityReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CURRENT40_LEADS_NEW_HUMAN_AUTHOR_SYNTHETIC_UI_20261106.json"
     },
-    "asOfUtc": "2026-11-06T23:01:00Z",
+    "asOfUtc": "2026-11-06T23:06:00Z",
     "continuityRecovery20261106": {
       "recordedAtUtc": "2026-11-06T22:03:41Z",
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CURRENT40_LEADS_NEW_HUMAN_AUTHOR_SYNTHETIC_UI_20261106.json",
@@ -166,7 +174,7 @@
       "fullInterruptedTranscriptRecovered": false,
       "stateNextActionSynchronized": true,
       "noGatePassInferred": true,
-      "receiptBlobSha": "d489a40656850701d63969bbfd62d851bd5bb5ec"
+      "receiptBlobSha": "26e79a1e527f682688a80b1f9c1a051796703396"
     },
     "prospectiveOutboxReadback20261106": {
       "recordedAtUtc": "2026-11-06T22:30:17Z",
@@ -180,7 +188,7 @@
       "recipientUiPass": true,
       "sourceChanged": false,
       "gateChanged": false,
-      "receiptBlobSha": "d489a40656850701d63969bbfd62d851bd5bb5ec",
+      "receiptBlobSha": "26e79a1e527f682688a80b1f9c1a051796703396",
       "recipientUiPassScope": "NOTICE_NAMES_ONLY_COMMENT_AND_BITACORA_FAIL"
     },
     "samuelRecipientCausalFix20261106": {
@@ -254,14 +262,146 @@
       "noRulesOrAuthChange": true,
       "noHistoricalActorRewrite": true,
       "noNewFixture": true,
-      "nextOnly": "Build/read back exact successor; reload Samuel actual Asesor session and open same original notice; prove matching human author in comment and bitacora. Complete already-authorized new write/reload and cleanup only on the two existing fixtures, then only unsigned affected Preview deltas and LIVE gate."
-    }
+      "nextOnly": "Build/read back exact successor; reload Samuel actual Asesor session and open same original notice; prove matching human author in comment and bitacora. Complete already-authorized new write/reload and cleanup only on the two existing fixtures, then only unsigned affected Preview deltas and LIVE gate.",
+      "successorBuildCompleted": true,
+      "successorRunId": 42308894583,
+      "successorArtifactId": 13548166231
+    },
+    "predecessorReproductionBinding": {
+      "sourceSha": "b01dceafc1ec2b1e786626116251e248be1e23f4",
+      "buildId": "gi-i65-b4-b01dceafc1ec-57f234755dc1",
+      "artifactId": 13527102882,
+      "disposition": "CURRENT40_HUMAN_AUTHOR_RECIPIENT_FAILURE_REPRODUCED_PRESERVE_AS_EVIDENCE"
+    },
+    "activeImmutableReadbackArtifactId": 13547228473,
+    "immutableSuccessor41PreviewReadback20261106": {
+      "recordedAtUtc": "2026-11-06T23:06:00Z",
+      "status": "EXACT_IMMUTABLE_PREVIEW_SOURCE_TEST_AND_SERVED_BYTES_PASS_AUTHENTICATED_UAT_PENDING",
+      "candidateNumber": 41,
+      "sourceSha": "131d346a3b2d857ee043f2feb590f4608f450e55",
+      "buildId": "gi-i65-b4-131d346a3b2d-57f234755dc1",
+      "runId": 42308894583,
+      "workflowConclusion": "success",
+      "guardRunId": 42308894577,
+      "guardConclusion": "success",
+      "artifactId": 13548166231,
+      "artifactZipSha256": "a2a88aa72bffdafa97a0e3e3d4eafd34becb99ce2761c094cde8b94fff66bb60",
+      "archiveSha256": "580e6c0a8ef80be845e9f6ec32efda12cc0f573f7494dd0726aed317b7c117f7",
+      "readbackArtifactId": 13547228473,
+      "readbackZipSha256": "5830581d554a8c9387870de69ddc4b984b5acbb6faa039ba64c798f030c45477",
+      "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-rc-41765742748-neoi3u7r.web.app",
+      "previewChannelId": "gi-i65-b4-rc-41765742748",
+      "immutableBundleDownloadedIndependently": true,
+      "artifactTarHashMatchesStoredSidecar": true,
+      "compiledCicloGitBlobSha": "7068c028419c7c13d9dc12b0fb715dd7bb3ce8c1",
+      "cicloSha256": "6707a5669eb39f4f1281cc2cb2c4e73eea5dbf254a0cfc0321cc1f5665849ea7",
+      "indexSha256": "e8f968e7b15a5a6cffdbae40480ca0b5b3db479963cdf1cdcec773bd218840e8",
+      "exactServedReadbackPassed": true,
+      "liveLabStable": true,
+      "liveAppDomainStable": true,
+      "automatedIdentityBehaviorChecks": 24,
+      "baselineFailureReproduced": true,
+      "sourceChangedOnlyFrontendOwners": [
+        "orbit360-platform/index.html",
+        "orbit360-platform/core/ciclo.js"
+      ],
+      "backendSourceChanged": false,
+      "actualPreviewFunctionDeployment": {
+        "function": "orbit360ScopedPolicyReadPreview",
+        "region": "us-east1",
+        "sourceUnchanged": true,
+        "successfulUpdateAtUtc": "2026-11-06T23:03:31.7891355Z",
+        "count": 1,
+        "receiptFieldCorrection": "Generated exact-preview receipt backendFunctionsDeployed:0 is a historical literal; job logs prove one existing Preview reader was redeployed. No production function, Rules or Auth deployment occurred."
+      },
+      "browserContinuation": {
+        "principalLastObserved": "Samuel Daza",
+        "activeRoleLastObserved": "Asesor",
+        "tabIdLastObserved": "1088561299",
+        "fixtureOpenLastObserved": "b4003qa_user_mw5eas6v_lphfrl",
+        "lastBrowserBuildObserved": "CURRENT40_BEFORE_NEW_BUILD",
+        "toolError": "No connected browser was found for the originating browser instance.",
+        "consecutiveAttempts": 3,
+        "postFixUiObserved": false,
+        "manualUserReconnectionRequired": true
+      },
+      "supersedesCandidate40ForNextRelease": true,
+      "oldCandidate40RetainedAsFailureEvidence": true,
+      "unaffectedSignedApprovalsPreserved": true,
+      "newFixtureCreated": false,
+      "realBusinessWrites": false,
+      "productionPromoted": false,
+      "b4003Closed": false,
+      "minimumRemainingDeltaPlan": [
+        {
+          "id": "C04_SAMUEL_READ_ORIGINAL",
+          "principal": "Samuel Daza",
+          "role": "Asesor",
+          "action": "After reconnect/reload, confirm build 41; open original existing notice evt_facd26eb0fcdee8d3ced6d20888e; verify Paula Osorio in notice, original comment and bitacora, repeat after reload."
+        },
+        {
+          "id": "C04_SAMUEL_NEW_WRITE",
+          "principal": "Samuel Daza",
+          "role": "Operativo (already granted; same UID)",
+          "action": "Use existing latest fixture b4003qa_user_mw5htkgl_31u61t; controlled comment, server confirmation and reload; verify human author and matching bitacora. Asesor modal is intentionally locked by existing bridge; do not claim an Asesor write."
+        },
+        {
+          "id": "C04_SECOND_UID_READ",
+          "principal": "Paula Direccion OR Carlos Operativo",
+          "action": "Read the exact new Samuel event as another authenticated UID and reload. A role switch is not a second principal. No specific requirement for a new Carlos write was found."
+        },
+        {
+          "id": "CURRENT_FIXTURE_CLEANUP",
+          "action": "Archive/clean only the two exact current author fixtures and verify durable archived state. Historical QA cohorts remain owner-deferred."
+        },
+        {
+          "id": "INICIO_RESPONSIVE_DELTA",
+          "action": "Preserve signed desktop; complete unsigned applicable 390/320 layout checks. Do not invent every role x country x viewport combination."
+        },
+        {
+          "id": "CLIENTE360_SECOND_PRINCIPAL_DELTA",
+          "principal": "Samuel Operativo",
+          "action": "Complete other-principal commercial list/KPI and QA-exclusion proof in authorized scopes, preserving Paula Direccion GT/CO/TODOS evidence."
+        },
+        {
+          "id": "FORMAL_PREVIEW_AND_LIVE",
+          "action": "Reconcile applicable signed evidence and obtain formal exact Preview acceptance; then validate certified rollback, promote same retained artifact, exact LIVE readback and required approved write/reload/integrity tests. No new source build for documentary commits."
+        }
+      ],
+      "minimumPlanAuthority": [
+        {
+          "path": "artifacts/orbit360-recovery/project-sources-v2/v3/02_MATRIZ_CRITERIOS_FASE_A_EVERGREEN_V3.md",
+          "blobSha": "ef7a98f0b0a7ac5c88a382dcb7593a5b81cea6fc"
+        },
+        {
+          "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PLAN_INTEGRAL_CICLO_COMERCIAL_TRAZABILIDAD_Y_RECUPERACION_20261011.md",
+          "blobSha": "85e265172204ba5e9f0655871ddbe64ab9926ce2",
+          "criteria": [
+            "C03",
+            "C04",
+            "C12",
+            "T04",
+            "T06",
+            "T16",
+            "T18",
+            "T19"
+          ]
+        },
+        {
+          "path": "orbit360-platform/modules/ops-workflows-v1201-bridge.js",
+          "blobSha": "de8af1c093edeea995b065b17295b811a9c609a0",
+          "function": "lockAdvisorModal"
+        }
+      ],
+      "totalPendingCartesianCellCount": "NOT_ENUMERATED_IN_PHYSICAL_AUTHORITY; DO_NOT_INVENT"
+    },
+    "historicalTopLevelNextCandidateAndOldNextB4003WorkAreSupersededForExecution": true
   },
   "b4003LeadsCurrent40ProspectiveHumanActorFocal20261106": {
     "dateLocal": "2026-11-06",
-    "status": "PARTIAL_EMITTER_UI_AND_RECIPIENT_NOTICE_PASS_RECIPIENT_COMMENT_AND_BITACORA_FAIL_CAUSAL_SUCCESSOR_PENDING",
+    "status": "CURRENT40_RECIPIENT_AUTHOR_FAILURE_REPRODUCED_CURRENT41_EXACT_PREVIEW_TECHNICAL_PASS_SIGNED_UI_PENDING",
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CURRENT40_LEADS_NEW_HUMAN_AUTHOR_SYNTHETIC_UI_20261106.json",
-    "receiptBlobSha": "d489a40656850701d63969bbfd62d851bd5bb5ec",
+    "receiptBlobSha": "26e79a1e527f682688a80b1f9c1a051796703396",
     "sourceSha": "b01dceafc1ec2b1e786626116251e248be1e23f4",
     "buildId": "gi-i65-b4-b01dceafc1ec-57f234755dc1",
     "artifactId": 13527102882,
@@ -287,7 +427,10 @@
     "recipientSignedUiPending": false,
     "recipientNoticeUiPass": true,
     "recipientCommentAndBitacoraPass": false,
-    "currentCausalSuccessorRequired": true
+    "currentCausalSuccessorRequired": true,
+    "causalSuccessorArtifactId": 13548166231,
+    "causalSuccessorSourceSha": "131d346a3b2d857ee043f2feb590f4608f450e55",
+    "currentPostFixUiPending": true
   },
   "b4003HistorialCurrent40OperativoCountryMatrixFocal20261106": {"dateLocal":"2026-11-06","status":"ONE_CURRENT_CANDIDATE_READ_ONLY_MATRIX_DELTA_PREVIEW_PASS_SCOPE_ONLY","receiptPath":"artifacts/orbit360-recovery/release-control/I6_5_B4_003_CURRENT40_HISTORIAL_OPERATIVO_COUNTRY_SCOPE_BROWSER_DELTA_20261106.json","receiptBlobSha":"3010cb55b2202dc5f7b2712fea173d44b461177f","sourceSha":"b01dceafc1ec2b1e786626116251e248be1e23f4","buildId":"gi-i65-b4-b01dceafc1ec-57f234755dc1","artifactId":13527102882,"principal":"Paula (Ver como Operativo)","module":"Historial","GT":23,"CO":13,"TODOS":36,"advisorTodos":24,"noWrite":true,"doesNotProveFullMatrix":true,"releaseGateUnchanged":true},
   "b4003E4GtCobrosReportesSameScopeCurrentCandidate20261106": {"dateLocal":"2026-11-06","status":"FOCAL_PREVIEW_PASS_SCOPE_ONLY_NOT_FULL_GATE","receiptPath":"artifacts/orbit360-recovery/release-control/I6_5_B4_003_E4_GT_COBROS_REPORTES_CURRENT_CANDIDATE_20261106.json","receiptBlobSha":"ab12c69a460798273abe22db09f3311ea5678a2e","sourceSha":"b01dceafc1ec2b1e786626116251e248be1e23f4","buildId":"gi-i65-b4-b01dceafc1ec-57f234755dc1","immutableArtifactId":13527102882,"role":"Paula Dirección","country":"GT","period":"Todos","filters":"Todos","cobros":2503,"reportes":2503,"anulado":12,"qaExcluded":1,"releaseGateUnchanged":true},
@@ -19108,7 +19251,7 @@
     "schema": "GRAVICENTRA_I6_5_B4_003_CERTIFICATION_INVENTORY_AND_SYNC_20261106_V7",
     "gate": "I6.5/B4-003",
     "recordType": "ADDITIVE_RELEASE_SCOPED_CERTIFICATION_INDEX_NOT_GATE_PASS",
-    "status": "CURRENT40_CAUSAL_RECIPIENT_AUTHOR_FAIL_SUCCESSOR_BUILD_PENDING_UNAFFECTED_APPROVALS_PRESERVED",
+    "status": "CURRENT41_EXACT_IMMUTABLE_PREVIEW_TECHNICAL_PASS_SIGNED_AUTHOR_AND_REMAINING_DELTAS_PENDING",
     "dateLocal": "2026-11-06",
     "authority": "CONTROL_PLANE_CURRENT_B4003_POINTER_AND_PHYSICAL_RECEIPTS",
     "historicalEvergreenCapabilities": {
@@ -19175,7 +19318,7 @@
       },
       {
         "id": "LEADS_CURRENT40_PROSPECTIVE_HUMAN_NAME_SYNTHETIC_PAULA",
-        "status": "PARTIAL_EMITTER_UI_AND_RECIPIENT_NOTICE_PASS_RECIPIENT_COMMENT_AND_BITACORA_FAIL_CAUSAL_SUCCESSOR_PENDING",
+        "status": "CURRENT40_RECIPIENT_AUTHOR_FAILURE_REPRODUCED_CURRENT41_EXACT_PREVIEW_TECHNICAL_PASS_SIGNED_UI_PENDING",
         "sourceSha": "b01dceafc1ec2b1e786626116251e248be1e23f4",
         "artifactId": 13527102882,
         "role": "Paula_Direccion_GT",
@@ -19194,16 +19337,19 @@
         "latestFixtureComments": 0,
         "existingFindingId": "B4-003-UAT-20261011-03",
         "recoveredReadbackRecordedAtUtc": "2026-11-06T22:03:41Z",
-        "receiptBlobSha": "d489a40656850701d63969bbfd62d851bd5bb5ec",
+        "receiptBlobSha": "26e79a1e527f682688a80b1f9c1a051796703396",
         "outboxActorNames": "3_OF_3_DURABLE_PAULA_OSORIO",
         "outboxRecipient": "advisor:ase-samuel-daza",
         "recipientUiAcceptancePending": true,
-        "currentNextProof": "Build/read back exact successor; reload Samuel actual Asesor session and open same original notice; prove matching human author in comment and bitacora. Complete already-authorized new write/reload and cleanup only on the two existing fixtures, then only unsigned affected Preview deltas and LIVE gate.",
+        "currentNextProof": "RECONNECT_SAMUEL_AND_REPEAT_SAME_ORIGINAL_COMMENT_ON_CANDIDATE41_THEN_CONTROLLED_WRITE_CROSS_UID_RELOAD_AND_CLEANUP",
         "recipientNoticeUiPass": true,
         "recipientCommentAuthor": "Usuario del equipo",
         "recipientBitacoraAuthor": "Usuario del equipo",
         "recipientPrincipal": "Samuel Daza",
-        "recipientRole": "Asesor"
+        "recipientRole": "Asesor",
+        "causalSuccessorSourceSha": "131d346a3b2d857ee043f2feb590f4608f450e55",
+        "causalSuccessorBuildId": "gi-i65-b4-131d346a3b2d-57f234755dc1",
+        "causalSuccessorArtifactId": 13548166231
       },
       {
         "id": "HISTORIAL_CURRENT40_OPERATIVO_GT_CO_TODOS_COUNTRY_SUM",
@@ -19456,18 +19602,32 @@
       }
     ],
     "currentReleaseBinding": {
-      "latestProductSourceChangeCommit": "50bf069aaf3386bfc2c5f3dd25dc0776567b130f",
-      "hostingSourceCommit": "b01dceafc1ec2b1e786626116251e248be1e23f4",
-      "comparison": "EXACT_SIGNED_PREVIEW_B4_QA_COBROS_CLIENTE360_AND_INICIO_COMMERCIAL_COUNTER_SEGREGATION",
+      "latestProductSourceChangeCommit": "131d346a3b2d857ee043f2feb590f4608f450e55",
+      "hostingSourceCommit": "131d346a3b2d857ee043f2feb590f4608f450e55",
+      "comparison": "EXACT_CAUSAL_HUMAN_AUTHOR_SUCCESSOR41_RETAINS_UNAFFECTED_APPROVALS",
       "artifactAndCurrentProductSourceIdentical": true,
-      "sameImmutablePreviewArtifactId": 13527102882,
-      "exactReadbackArtifactId": 13528110095,
-      "archiveSha256": "a5c0853e39a4ec6c601565b57c505cd3bbbf565564dc02076166acf3a1295621",
-      "buildId": "gi-i65-b4-b01dceafc1ec-57f234755dc1",
-      "runId": 42266346904,
+      "sameImmutablePreviewArtifactId": 13548166231,
+      "exactReadbackArtifactId": 13547228473,
+      "archiveSha256": "580e6c0a8ef80be845e9f6ec32efda12cc0f573f7494dd0726aed317b7c117f7",
+      "buildId": "gi-i65-b4-131d346a3b2d-57f234755dc1",
+      "runId": 42308894583,
       "doNotRebuildForMetadataOnlyCommits": true,
-      "artifactZipDigestSha256": "5785ea24a810edca0d635346cd98b45b91c854619df131f9250abfcf67032017",
-      "readbackZipDigestSha256": "fa2d9698505e92a7923e576cd38119f2b7462b5371e344caab0da99d9bf0446e"
+      "artifactZipDigestSha256": "a2a88aa72bffdafa97a0e3e3d4eafd34becb99ce2761c094cde8b94fff66bb60",
+      "readbackZipDigestSha256": "5830581d554a8c9387870de69ddc4b984b5acbb6faa039ba64c798f030c45477",
+      "previousCandidate40Binding": {
+        "latestProductSourceChangeCommit": "50bf069aaf3386bfc2c5f3dd25dc0776567b130f",
+        "hostingSourceCommit": "b01dceafc1ec2b1e786626116251e248be1e23f4",
+        "comparison": "EXACT_SIGNED_PREVIEW_B4_QA_COBROS_CLIENTE360_AND_INICIO_COMMERCIAL_COUNTER_SEGREGATION",
+        "artifactAndCurrentProductSourceIdentical": true,
+        "sameImmutablePreviewArtifactId": 13527102882,
+        "exactReadbackArtifactId": 13528110095,
+        "archiveSha256": "a5c0853e39a4ec6c601565b57c505cd3bbbf565564dc02076166acf3a1295621",
+        "buildId": "gi-i65-b4-b01dceafc1ec-57f234755dc1",
+        "runId": 42266346904,
+        "doNotRebuildForMetadataOnlyCommits": true,
+        "artifactZipDigestSha256": "5785ea24a810edca0d635346cd98b45b91c854619df131f9250abfcf67032017",
+        "readbackZipDigestSha256": "fa2d9698505e92a7923e576cd38119f2b7462b5371e344caab0da99d9bf0446e"
+      }
     },
     "openClosure": {
       "formalI6Percent": 50,

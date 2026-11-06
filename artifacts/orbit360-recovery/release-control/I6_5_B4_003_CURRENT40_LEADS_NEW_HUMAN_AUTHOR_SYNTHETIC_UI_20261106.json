@@ -41,7 +41,7 @@
     "cleanupSucceeded": false,
     "evidenceBoundary": "Cleanup was attempted earlier; readback now proves archivado:false, not successful archival. No inference about unobserved intermediate cleanup steps."
   },
-  "status": "PARTIAL_EMITTER_UI_AND_RECIPIENT_NOTICE_PASS_RECIPIENT_COMMENT_AND_BITACORA_FAIL_CAUSAL_SUCCESSOR_PENDING",
+  "status": "CURRENT40_RECIPIENT_AUTHOR_FAILURE_REPRODUCED_CURRENT41_EXACT_PREVIEW_TECHNICAL_PASS_SIGNED_UI_PENDING",
   "notProven": [
     "Same fixture in product UI after full page reload",
     "Cross-role authorized reader (Carlos, Samuel)",
@@ -308,5 +308,126 @@
     "noHistoricalActorRewrite": true,
     "noNewFixture": true,
     "nextOnly": "Build/read back exact successor; reload Samuel actual Asesor session and open same original notice; prove matching human author in comment and bitacora. Complete already-authorized new write/reload and cleanup only on the two existing fixtures, then only unsigned affected Preview deltas and LIVE gate."
+  },
+  "immutableSuccessor41PreviewReadback20261106": {
+    "recordedAtUtc": "2026-11-06T23:06:00Z",
+    "status": "EXACT_IMMUTABLE_PREVIEW_SOURCE_TEST_AND_SERVED_BYTES_PASS_AUTHENTICATED_UAT_PENDING",
+    "candidateNumber": 41,
+    "sourceSha": "131d346a3b2d857ee043f2feb590f4608f450e55",
+    "buildId": "gi-i65-b4-131d346a3b2d-57f234755dc1",
+    "runId": 42308894583,
+    "workflowConclusion": "success",
+    "guardRunId": 42308894577,
+    "guardConclusion": "success",
+    "artifactId": 13548166231,
+    "artifactZipSha256": "a2a88aa72bffdafa97a0e3e3d4eafd34becb99ce2761c094cde8b94fff66bb60",
+    "archiveSha256": "580e6c0a8ef80be845e9f6ec32efda12cc0f573f7494dd0726aed317b7c117f7",
+    "readbackArtifactId": 13547228473,
+    "readbackZipSha256": "5830581d554a8c9387870de69ddc4b984b5acbb6faa039ba64c798f030c45477",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-rc-41765742748-neoi3u7r.web.app",
+    "previewChannelId": "gi-i65-b4-rc-41765742748",
+    "immutableBundleDownloadedIndependently": true,
+    "artifactTarHashMatchesStoredSidecar": true,
+    "compiledCicloGitBlobSha": "7068c028419c7c13d9dc12b0fb715dd7bb3ce8c1",
+    "cicloSha256": "6707a5669eb39f4f1281cc2cb2c4e73eea5dbf254a0cfc0321cc1f5665849ea7",
+    "indexSha256": "e8f968e7b15a5a6cffdbae40480ca0b5b3db479963cdf1cdcec773bd218840e8",
+    "exactServedReadbackPassed": true,
+    "liveLabStable": true,
+    "liveAppDomainStable": true,
+    "automatedIdentityBehaviorChecks": 24,
+    "baselineFailureReproduced": true,
+    "sourceChangedOnlyFrontendOwners": [
+      "orbit360-platform/index.html",
+      "orbit360-platform/core/ciclo.js"
+    ],
+    "backendSourceChanged": false,
+    "actualPreviewFunctionDeployment": {
+      "function": "orbit360ScopedPolicyReadPreview",
+      "region": "us-east1",
+      "sourceUnchanged": true,
+      "successfulUpdateAtUtc": "2026-11-06T23:03:31.7891355Z",
+      "count": 1,
+      "receiptFieldCorrection": "Generated exact-preview receipt backendFunctionsDeployed:0 is a historical literal; job logs prove one existing Preview reader was redeployed. No production function, Rules or Auth deployment occurred."
+    },
+    "browserContinuation": {
+      "principalLastObserved": "Samuel Daza",
+      "activeRoleLastObserved": "Asesor",
+      "tabIdLastObserved": "1088561299",
+      "fixtureOpenLastObserved": "b4003qa_user_mw5eas6v_lphfrl",
+      "lastBrowserBuildObserved": "CURRENT40_BEFORE_NEW_BUILD",
+      "toolError": "No connected browser was found for the originating browser instance.",
+      "consecutiveAttempts": 3,
+      "postFixUiObserved": false,
+      "manualUserReconnectionRequired": true
+    },
+    "supersedesCandidate40ForNextRelease": true,
+    "oldCandidate40RetainedAsFailureEvidence": true,
+    "unaffectedSignedApprovalsPreserved": true,
+    "newFixtureCreated": false,
+    "realBusinessWrites": false,
+    "productionPromoted": false,
+    "b4003Closed": false,
+    "minimumRemainingDeltaPlan": [
+      {
+        "id": "C04_SAMUEL_READ_ORIGINAL",
+        "principal": "Samuel Daza",
+        "role": "Asesor",
+        "action": "After reconnect/reload, confirm build 41; open original existing notice evt_facd26eb0fcdee8d3ced6d20888e; verify Paula Osorio in notice, original comment and bitacora, repeat after reload."
+      },
+      {
+        "id": "C04_SAMUEL_NEW_WRITE",
+        "principal": "Samuel Daza",
+        "role": "Operativo (already granted; same UID)",
+        "action": "Use existing latest fixture b4003qa_user_mw5htkgl_31u61t; controlled comment, server confirmation and reload; verify human author and matching bitacora. Asesor modal is intentionally locked by existing bridge; do not claim an Asesor write."
+      },
+      {
+        "id": "C04_SECOND_UID_READ",
+        "principal": "Paula Direccion OR Carlos Operativo",
+        "action": "Read the exact new Samuel event as another authenticated UID and reload. A role switch is not a second principal. No specific requirement for a new Carlos write was found."
+      },
+      {
+        "id": "CURRENT_FIXTURE_CLEANUP",
+        "action": "Archive/clean only the two exact current author fixtures and verify durable archived state. Historical QA cohorts remain owner-deferred."
+      },
+      {
+        "id": "INICIO_RESPONSIVE_DELTA",
+        "action": "Preserve signed desktop; complete unsigned applicable 390/320 layout checks. Do not invent every role x country x viewport combination."
+      },
+      {
+        "id": "CLIENTE360_SECOND_PRINCIPAL_DELTA",
+        "principal": "Samuel Operativo",
+        "action": "Complete other-principal commercial list/KPI and QA-exclusion proof in authorized scopes, preserving Paula Direccion GT/CO/TODOS evidence."
+      },
+      {
+        "id": "FORMAL_PREVIEW_AND_LIVE",
+        "action": "Reconcile applicable signed evidence and obtain formal exact Preview acceptance; then validate certified rollback, promote same retained artifact, exact LIVE readback and required approved write/reload/integrity tests. No new source build for documentary commits."
+      }
+    ],
+    "minimumPlanAuthority": [
+      {
+        "path": "artifacts/orbit360-recovery/project-sources-v2/v3/02_MATRIZ_CRITERIOS_FASE_A_EVERGREEN_V3.md",
+        "blobSha": "ef7a98f0b0a7ac5c88a382dcb7593a5b81cea6fc"
+      },
+      {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PLAN_INTEGRAL_CICLO_COMERCIAL_TRAZABILIDAD_Y_RECUPERACION_20261011.md",
+        "blobSha": "85e265172204ba5e9f0655871ddbe64ab9926ce2",
+        "criteria": [
+          "C03",
+          "C04",
+          "C12",
+          "T04",
+          "T06",
+          "T16",
+          "T18",
+          "T19"
+        ]
+      },
+      {
+        "path": "orbit360-platform/modules/ops-workflows-v1201-bridge.js",
+        "blobSha": "de8af1c093edeea995b065b17295b811a9c609a0",
+        "function": "lockAdvisorModal"
+      }
+    ],
+    "totalPendingCartesianCellCount": "NOT_ENUMERATED_IN_PHYSICAL_AUTHORITY; DO_NOT_INVENT"
   }
 }
