@@ -19103,7 +19103,69 @@
     "noDataReimport": true,
     "noRulesRedeploy": true,
     "noLivePromotion": true,
-    "certificatesOnlyReopenedByCausalInvalidation": true
+    "certificatesOnlyReopenedByCausalInvalidation": true,
+    "decisionFreeze20261106": {
+      "dateLocal": "2026-11-06",
+      "directive": "B4-003 CLOSURE ONLY—NO GENERAL REAUDIT OR HISTORICAL PASS REOPEN",
+      "sourceOfAuthority": "Paula owner request to freeze repeated decisions and accelerate B4-003",
+      "canonicalPreviewSourceSha": "b01dceafc1ec2b1e786626116251e248be1e23f4",
+      "canonicalBuildId": "gi-i65-b4-b01dceafc1ec-57f234755dc1",
+      "immutableArtifactId": 13527102882,
+      "preservedPriorApprovals": "15/15 historical capability preview/live certificates remain inherited unless causal invalidation demonstrated; do not confuse them with new B4-003 acceptance",
+      "qaPhysicalCleanup": "OWNER_DEFERRED_POSTPROD_BOTH_QA_COHORTS_NO_DELETE_NO_MODIFY_AFTER_COMMERCIAL_EXCLUSION_SIGNED",
+      "countryReadModelDifference": {
+        "inicioSignedPaulaDireccionPreview": {
+          "GT": {
+            "commercialClients": 390,
+            "commercialPoliciesByPolicyCountry": 1292
+          },
+          "CO": {
+            "commercialClients": 49,
+            "commercialPoliciesByPolicyCountry": 124
+          },
+          "TODOS": {
+            "commercialClients": 439,
+            "commercialPolicies": 1416
+          }
+        },
+        "cliente360PriorSignedPaulaDireccionPreview": {
+          "GT": {
+            "commercialClients": 390,
+            "commercialPoliciesByClientCountry": 1291
+          },
+          "CO": {
+            "commercialClients": 49,
+            "commercialPoliciesByClientCountry": 125
+          },
+          "TODOS": {
+            "commercialClients": 439,
+            "commercialPolicies": 1416
+          }
+        },
+        "sourceExplanation": "Inicio uses q.polizasScoped(); Cliente360 scopes client rows by c.pais and then includes all client-linked policies regardless of policy.pais (source explicitly states this). Country subtotals reflect different attribution dimensions; 1416 total stable; no evidence of missing policies or data corruption.",
+        "resolution": "DIFFERENT_METRIC_SCOPES_NOT_AN_UNVERIFIED_NEW_P0; do not alter countries or reimport; preserve intended client-centric history; investigate cross-country access only with demonstrated role boundary leak",
+        "readOnlyVerification": true
+      },
+      "authorLabels": {
+        "currentWriter": "Ops/Leads persists actorUid and actorName on new comments/bitacora; present signed UAT showed Samuel Daza",
+        "legacy": "Older records with unresolvable author identity render Usuario del equipo; do not fabricate identity or substitute email",
+        "acceptance": "PROSPECTIVE_TRANSVERSAL_ROLE_READ_WRITE_RELOAD_FOCAL_PENDING; legacy provenance separately documented"
+      },
+      "nextExecutionOnly": [
+        "Use current #40 exact artifact; gather already-authorized current-candidate delta matrix evidence, reusing unaffected 15 historical certificates",
+        "Close prospective Ops/Leads author role proof and focal Aseguradoras credential reveal where not previously signed",
+        "Promote same retained artifact only after applicable preview PASS, then exact LIVE digest/readback, controlled writes/reload/restore and gate acceptance"
+      ],
+      "prohibitions": [
+        "NO new branch/repository/Firebase/channel",
+        "NO new build merely to revise metadata",
+        "NO second generic audit",
+        "NO Firestore rules/Auth/IAM work by routine",
+        "NO countries rewriting or data reimport",
+        "NO fabricated PASS or production claim"
+      ],
+      "releaseGateUnchanged": true
+    }
   },
   "b4003PersonalCollectionP0SignedClosure20261106": {
     "schema": "GI_B4003_SIGNED_PERSONAL_COLLECTION_FUNCTIONAL_CLOSURE_20261106_V1",
