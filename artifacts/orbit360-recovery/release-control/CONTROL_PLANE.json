@@ -18811,7 +18811,7 @@
     "signedContextualInicioP0Accepted": true
   },
   "b4003CertificationInventory20261106": {
-    "schema": "GRAVICENTRA_I6_5_B4_003_CERTIFICATION_INVENTORY_AND_SYNC_20261106_V5",
+    "schema": "GRAVICENTRA_I6_5_B4_003_CERTIFICATION_INVENTORY_AND_SYNC_20261106_V6",
     "gate": "I6.5/B4-003",
     "recordType": "ADDITIVE_RELEASE_SCOPED_CERTIFICATION_INDEX_NOT_GATE_PASS",
     "status": "FOUR_FUNCTIONAL_P0_PASS_TWO_QA_OWNER_DEFERRED_FULL_GATE_HOLD",
@@ -18940,15 +18940,50 @@
         "clientRestore": "ASESOR_TODOS_5_OF_5",
         "otherViewportMatrixStillPending": true,
         "ledgerFindingId": "B4-003-P0-20261012-INICIO-MOTIVATIONAL-TEXTS"
+      },
+      {
+        "id": "COBROS_QA_OPERATIONAL_UI_ISOLATION_SIGNED_PREVIEW",
+        "status": "PREVIEW_FOCAL_PASS_SCOPE_ONLY_NOT_FULL_MODULE_ACCEPTANCE",
+        "dateLocal": "2026-11-06",
+        "signedAccount": "Paula_Direccion_TODOS",
+        "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-rc-41765742748-neoi3u7r.web.app/#/cobros",
+        "sourceSha": "0f196e1cdd1962af81d979f5e63999c6411cd855",
+        "buildId": "gi-i65-b4-0f196e1cdd19-57f234755dc1",
+        "immutableWorkflowRunId": 42260955450,
+        "artifactId": 13524672844,
+        "readbackArtifactId": 13524308622,
+        "archiveSha256": "38a5653da5910d6290ab4664d8e021e4775aebbadba139fc8ae38abadc3b1568",
+        "sourceTests": "5_OF_5_FINANCIAL_QA_AND_11_OF_11_COMMERCIAL_PIPELINE",
+        "b4SearchRows": 0,
+        "b2RenSearchRows": 0,
+        "previousB4QaRowGTQ": 683.2,
+        "commercialKPIsUnchanged": {
+          "confirmedGTQ": 2744,
+          "confirmedPayments": 5,
+          "pendingGTQ": 2396,
+          "overdueGTQ": 227367,
+          "overdueCOP": 109875840
+        },
+        "policies": {
+          "all": 1425,
+          "qaPreserved": 9,
+          "commercial": 1416,
+          "activeCommercial": 223
+        },
+        "doesNotProveAllRolesOrLive": true,
+        "noDataMutation": true
       }
     ],
     "currentReleaseBinding": {
-      "latestProductSourceChangeCommit": "3e87722d54871198a02d9b0909971fa2f4f913af",
-      "hostingSourceCommit": "3e87722d54871198a02d9b0909971fa2f4f913af",
-      "comparison": "NO_PRODUCT_BACKEND_SOURCE_CHANGE_THROUGH_HEAD_4F6262_AFTER_IMMUTABLE_PREVIEW",
+      "latestProductSourceChangeCommit": "423a3ca29fe9558bc4f3460aa0d65c27e923774c",
+      "hostingSourceCommit": "0f196e1cdd1962af81d979f5e63999c6411cd855",
+      "comparison": "SAME_SCOPED_BUILD_EXACT_PREVIEW_SOURCE_BLOB_COBROS_ED8E23F47F31401012DDC4632E75386F30DDA158",
       "artifactAndCurrentProductSourceIdentical": true,
-      "sameImmutablePreviewArtifactId": 13472898683,
-      "exactReadbackArtifactId": 13473713426,
+      "sameImmutablePreviewArtifactId": 13524672844,
+      "exactReadbackArtifactId": 13524308622,
+      "archiveSha256": "38a5653da5910d6290ab4664d8e021e4775aebbadba139fc8ae38abadc3b1568",
+      "buildId": "gi-i65-b4-0f196e1cdd19-57f234755dc1",
+      "runId": 42260955450,
       "doNotRebuildForMetadataOnlyCommits": true
     },
     "openClosure": {
@@ -18958,7 +18993,6 @@
       "b4003Closed": false,
       "productionPromotionAuthorized": false,
       "remainingEvidenceRequired": [
-        "COBROS_QA_PORTFOLIO_ROW_VISIBLE_IN_COMMERCIAL_LIST_REQUIRES_FOCAL_UI_ISOLATION_BEFORE_MODULE_ACCEPTANCE",
         "OPS_LEADS_HUMAN_AUTHOR_TRANSVERSAL_RESOLVER",
         "FULL_CURRENT_MODULE_ROLE_COUNTRY_VIEWPORT_PREVIEW_MATRIX_NOT_ONLY_FOCAL_UAT",
         "SAME_RETAINED_ARTIFACT_INDEPENDENT_LIVE_DIGEST_AND_MODULE_BY_MODULE_READBACK"
@@ -18969,7 +19003,8 @@
       "p0DeferredWithOwnerAuthorization": 2,
       "qaPhysicalCleanupBlocking": false,
       "qaKpiExcludedFromCommerceVerified": true,
-      "cobrosQaOperationalListLeakStillOpen": true
+      "cobrosQaOperationalListLeakStillOpen": false,
+      "cobrosQaOperationalListFocalPreviewPass": true
     },
     "projectSources": {
       "package": "GRAVICENTRA_PROJECT_SOURCES_EVERGREEN_V7",
@@ -19096,10 +19131,16 @@
       "kpiOverdueGTQ": 227367,
       "kpiOverdueCOP": 109875840,
       "b2RenQueryCommercialRows": 0,
-      "b4QueryCommercialRows": 1,
+      "b4QueryCommercialRows": 0,
       "b4QaRowGtt": 683.2,
       "kpiValuesInvariantUnderSearch": true,
-      "operationalListQaLeak": "OPEN_MODULE_UX_DEFECT_NOT_KPI_PASS"
+      "operationalListQaLeak": "CLOSED_FOCAL_SIGNED_PREVIEW_ONLY_NOT_FULL_COBROS_MODULE_ACCEPTANCE",
+      "previousQaRowLeakBeforeFix": {
+        "search": "B4-003",
+        "operationalRows": 1,
+        "qaAmountGTQ": 683.2,
+        "sourceSha": "3e87722d54871198a02d9b0909971fa2f4f913af"
+      }
     },
     "exactReadback": {
       "workflowRun": 41144205677,
@@ -19122,6 +19163,36 @@
     "noDataMutation": true,
     "noDataReimport": true,
     "noRulesDeploy": true,
-    "noNewBranchOrPreview": true
+    "noNewBranchOrPreview": true,
+    "latestQaIsolationSourceSha": "0f196e1cdd1962af81d979f5e63999c6411cd855",
+    "latestQaIsolationBuildId": "gi-i65-b4-0f196e1cdd19-57f234755dc1",
+    "latestQaIsolationRunId": 42260955450,
+    "latestQaIsolationSignedPreviewStatus": "PASS_0_B4_ROWS_0_B2_REN_ROWS_9_QA_PRESERVED_COMMERCIAL_KPIS_UNCHANGED"
+  },
+  "b4003CobrosQaSignedPreviewClosure20261106": {
+    "schema": "GI_B4003_COBROS_QA_COHORTS_SIGNED_SOURCE_AND_PREVIEW_FOCAL_CLOSURE_V1",
+    "dateLocal": "2026-11-06",
+    "signedRole": "Paula_Direccion_TODOS",
+    "status": "FOCAL_PREVIEW_PASS_NOT_ENTIRE_GATE_PASS",
+    "sourceSha": "0f196e1cdd1962af81d979f5e63999c6411cd855",
+    "buildId": "gi-i65-b4-0f196e1cdd19-57f234755dc1",
+    "artifactId": 13524672844,
+    "artifactArchiveSha256": "38a5653da5910d6290ab4664d8e021e4775aebbadba139fc8ae38abadc3b1568",
+    "readbackArtifactId": 13524308622,
+    "workflowRunId": 42260955450,
+    "workflowConclusion": "success",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-rc-41765742748-neoi3u7r.web.app/",
+    "cobrosB4SearchRows": 0,
+    "cobrosB2RenSearchRows": 0,
+    "confirmedPayments": 5,
+    "confirmedGTQ": 2744,
+    "pendingGTQ": 2396,
+    "qaPoliciesRemain": 9,
+    "commercialPoliciesRemain": 1416,
+    "allPoliciesRemain": 1425,
+    "noRealDataWrites": true,
+    "ownerAuthorizedPhysicalQaRetentionPostproduction": true,
+    "b4003Closed": false,
+    "productionDeployed": false
   }
 }
