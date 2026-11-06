@@ -19033,19 +19033,41 @@
           "signedCountryRestored": "TODOS",
           "otherPrincipalsStillNeedUat": true
         }
+      },
+      {
+        "id": "INICIO_COMMERCIAL_CLIENT_AND_POLICY_QA_COUNTERS_SIGNED_PREVIEW",
+        "status": "FOCAL_PREVIEW_PASS_NOT_FULL_MODULE_PASS",
+        "dateLocal": "2026-11-06",
+        "sourceSha": "b01dceafc1ec2b1e786626116251e248be1e23f4",
+        "buildId": "gi-i65-b4-b01dceafc1ec-57f234755dc1",
+        "immutableWorkflowRunId": 42266346904,
+        "artifactId": 13527102882,
+        "readbackArtifactId": 13528110095,
+        "signedRole": "Operativo (Ver como)",
+        "commercialClients": 439,
+        "commercialPolicies": 1416,
+        "previousRawCounts": {
+          "clients": 440,
+          "policies": 1425
+        },
+        "physicalQaChanges": 0,
+        "provenance": "SIGNED_CHROME_AFTER_COMPLETE_HYDRATION",
+        "doesNotProveFullRoleCountryViewportMatrix": true
       }
     ],
     "currentReleaseBinding": {
-      "latestProductSourceChangeCommit": "b058eea5c6743fd76e806ce6eaffc47dcbeeece0",
-      "hostingSourceCommit": "f3e4503afbc7f3a67086d0e8ad0cc1b623743c39",
-      "comparison": "EXACT_SIGNED_PREVIEW_B4_COBROS_AND_CLIENT360_QA_KPI_ISOLATION_FROM_SAME_IMMUTABLE_ARTIFACT",
+      "latestProductSourceChangeCommit": "50bf069aaf3386bfc2c5f3dd25dc0776567b130f",
+      "hostingSourceCommit": "b01dceafc1ec2b1e786626116251e248be1e23f4",
+      "comparison": "EXACT_SIGNED_PREVIEW_B4_QA_COBROS_CLIENTE360_AND_INICIO_COMMERCIAL_COUNTER_SEGREGATION",
       "artifactAndCurrentProductSourceIdentical": true,
-      "sameImmutablePreviewArtifactId": 13524899745,
-      "exactReadbackArtifactId": 13526316484,
-      "archiveSha256": "8811936a2ea12d482356d3a2ae179ff93a36ee96856b3135dbac9252c3f42ea2",
-      "buildId": "gi-i65-b4-f3e4503afbc7-57f234755dc1",
-      "runId": 42263222517,
-      "doNotRebuildForMetadataOnlyCommits": true
+      "sameImmutablePreviewArtifactId": 13527102882,
+      "exactReadbackArtifactId": 13528110095,
+      "archiveSha256": "a5c0853e39a4ec6c601565b57c505cd3bbbf565564dc02076166acf3a1295621",
+      "buildId": "gi-i65-b4-b01dceafc1ec-57f234755dc1",
+      "runId": 42266346904,
+      "doNotRebuildForMetadataOnlyCommits": true,
+      "artifactZipDigestSha256": "5785ea24a810edca0d635346cd98b45b91c854619df131f9250abfcf67032017",
+      "readbackZipDigestSha256": "fa2d9698505e92a7923e576cd38119f2b7462b5371e344caab0da99d9bf0446e"
     },
     "openClosure": {
       "formalI6Percent": 50,
@@ -19066,7 +19088,8 @@
       "qaKpiExcludedFromCommerceVerified": true,
       "cobrosQaOperationalListLeakStillOpen": false,
       "cobrosQaOperationalListFocalPreviewPass": true,
-      "cliente360QaClientCountKpiFocalPreviewPass": true
+      "cliente360QaClientCountKpiFocalPreviewPass": true,
+      "inicioCommercialQaCountersFocalPreviewPass": true
     },
     "projectSources": {
       "package": "GRAVICENTRA_PROJECT_SOURCES_EVERGREEN_V7",
@@ -19366,5 +19389,55 @@
     "doNotInferHistoricalIdentity": true,
     "notTransversalPass": true,
     "noDataMutation": true
+  },
+  "b4003InicioCommercialQaCountsSignedPreviewClosure20261106": {
+    "schema": "GI_B4003_INICIO_COMMERCIAL_QA_COUNTER_SIGNED_PREVIEW_FOCAL_PASS_V1",
+    "dateLocal": "2026-11-06",
+    "status": "FOCAL_PREVIEW_PASS_NOT_FULL_MODULE_PASS",
+    "signedPrincipal": "Paula Osorio",
+    "activeRole": "Operativo (Ver como)",
+    "country": "TODOS",
+    "sourceChangeCommit": "50bf069aaf3386bfc2c5f3dd25dc0776567b130f",
+    "sourceSha": "b01dceafc1ec2b1e786626116251e248be1e23f4",
+    "buildId": "gi-i65-b4-b01dceafc1ec-57f234755dc1",
+    "runId": 42266346904,
+    "workflowConclusion": "success",
+    "retainedArtifactId": 13527102882,
+    "readbackArtifactId": 13528110095,
+    "retainedArchiveSha256": "a5c0853e39a4ec6c601565b57c505cd3bbbf565564dc02076166acf3a1295621",
+    "exactServedBuildReadback": true,
+    "sourceTests": "SOURCE_TEST_PASS",
+    "commercialClientsBeforeRaw": 440,
+    "commercialClientsNow": 439,
+    "commercialPoliciesBeforeRaw": 1425,
+    "commercialPoliciesNow": 1416,
+    "retainedQaPoliciesNotDeleted": 9,
+    "priorSignedCliente360CommercialCountParity": true,
+    "noDataWrites": true,
+    "noRulesOrAuthWrites": true,
+    "noLivePromotion": true,
+    "otherRolesCountriesViewportsActionsRemainOpen": true
+  },
+  "b4003AseguradorasRoleSurfaceReadOnly20261106": {
+    "status": "PARTIAL_ROLE_SURFACE_READ_ONLY_NO_FULL_MODULE_ACCEPTANCE",
+    "signedPrincipal": "Paula Osorio",
+    "country": "TODOS",
+    "directoryRawRows": 33,
+    "knownQaFixturesVisible": 2,
+    "asAsesor": {
+      "directRouteBlocked": true,
+      "fullDirectoryVisible": false
+    },
+    "asOperativo": {
+      "directRouteVisible": true,
+      "editButtonVisible": true,
+      "tabs": "Resumen, Contactos, Plataformas, Bancos y pagos, Productos y planes, Documentos y Drive, Tarifas y conocimiento, Actividad",
+      "usernameAndMaskedPasswordPresent": true,
+      "temporaryRevealControlPresent": true,
+      "revealSuccessNotYetCertified": true
+    },
+    "adminAndSuperadminRealUserUatNotDone": true,
+    "noDataWrites": true,
+    "sourceBuildAtRead": "gi-i65-b4-f3e4503afbc7-57f234755dc1"
   }
 }
