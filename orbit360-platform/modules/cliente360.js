@@ -281,9 +281,11 @@ Orbit.modules.cliente360 = (function () {
       (!f.asesor || c.asesorId === f.asesor) &&
       (!f.seg || c.segmento === f.seg)
     );
-    const kpiClientIds = new Set(rows.map(c => String(c && c.id || '')).filter(Boolean));
-    // QA fixtures remain in authorized client details, not commercial KPIs.
+    // QA fixtures remain browsable as audit records, but do not enter commercial client KPIs.
     const isQaRecord = row => typeof q.isSyntheticQaRecord === 'function' && q.isSyntheticQaRecord(row);
+    const commercialClientRows = rows.filter(c => !isQaRecord(c));
+    const qaAuditClientCount = rows.length - commercialClientRows.length;
+    const kpiClientIds = new Set(commercialClientRows.map(c => String(c && c.id || '')).filter(Boolean));
     const policiesForKpi = policiesForList.filter(p => p && !isQaRecord(p) &&
       !isQaRecord(S().get('clientes', p.clienteId)) && kpiClientIds.has(String(p.clienteId || '')));
     const pageCount = Math.max(1, Math.ceil(rows.length / LIST_PAGE_SIZE));
@@ -333,6 +335,7 @@ Orbit.modules.cliente360 = (function () {
     const rowsBuildStartedAt = perfNow();
     const rowsHtml = visibleRows.map(c => {
             const r = resumenDe(c);
+            const isQaAudit = isQaRecord(c);
             const ase = advisorById.get(c.asesorId) || null;
             const financialReady = r.salud != null && r.vencido != null;
             const cartera = !financialReady
@@ -341,10 +344,10 @@ Orbit.modules.cliente360 = (function () {
             const salud = financialReady
               ? `<div data-c360-list-health="1" data-readiness="ready" data-value="${r.salud}" style="display:flex;align-items:center;gap:8px"><div class="bar" style="width:54px"><i style="width:${r.salud}%;background:${r.salud >= 70 ? 'linear-gradient(90deg,#1f8a4c,#34b96a)' : r.salud >= 45 ? 'linear-gradient(90deg,#c9821b,#e0a23c)' : 'linear-gradient(90deg,#a01828,#C5162E)'}"></i></div><span class="mono" style="font-size:12px">${r.salud}</span></div>`
               : `<span class="muted" data-c360-list-health="1" data-readiness="${portfolioReadiness}">${portfolioReadiness === 'unavailable' ? 'No disponible' : 'Calculando'}</span>`;
-            return `<tr class="clickable" onclick="location.hash='#/cliente360?c=${c.id}'">
+            return `<tr class="clickable" data-c360-qa-audit="${isQaAudit ? '1' : '0'}" onclick="location.hash='#/cliente360?c=${c.id}'">
               <td><div style="display:flex;align-items:center;gap:11px">
                 ${U.avatar(c.nombre, tipoClienteVisible(c.tipo) === 'Empresa' ? '#1E2227' : '#C5162E', 'md')}
-                <div><div class="c360-client-name" style="font-weight:700">${U.esc(c.nombre)}</div>
+                <div><div class="c360-client-name" style="font-weight:700">${U.esc(c.nombre)}${isQaAudit ? ' <span class="badge neutral">🧪 QA · solo auditoría</span>' : ''}</div>
                 <div class="muted" style="font-size:11.5px">${U.esc(U.text(tipoClienteVisible(c.tipo), 'Pendiente de completar'))} · ${U.esc(U.text(c.ciudad, 'Pendiente de completar'))} · ${U.esc(U.text(c.pais, 'Pendiente de completar'))}</div></div>
               </div></td>
               <td><div style="display:flex;align-items:center;gap:7px"><span class="dot-s" style="background:${ase ? ase.color : '#999'}"></span>${U.esc(ase ? ase.nombre : '—')}</div></td>
@@ -361,8 +364,8 @@ Orbit.modules.cliente360 = (function () {
     host.innerHTML = `<div class="page" data-c360-list-ready="1" data-c360-base-authority="server-confirmed-store">
       ${Orbit.kit.bannerFor('cliente360', `<button class="btn primary" onclick="Orbit.modules.cliente360.nuevoCliente()">+ Nuevo cliente</button>`)}
 
-      <div class="kpi-row" data-c360-kpi-scope="${globalCountry}" data-c360-filter-country="${f.pais || ''}" data-c360-kpi-client-count="${rows.length}" data-c360-kpi-active-count="${activePolicyCount==null?'':activePolicyCount}" data-c360-kpi-policy-count="${totalPolicyCount==null?'':totalPolicyCount}" data-c360-kpi-renew-count="${renewals45Count==null?'':renewals45Count}" style="grid-template-columns:repeat(4,1fr);margin-bottom:16px">
-        <button class="kpi kpi-click" data-c360-kpi="clients" title="Ver clientes del universo actual"><div class="k-accent"></div><div class="k-label">Clientes</div><div class="k-val">${rows.length}</div><div class="k-foot muted">${rows.filter(c => tipoClienteVisible(c.tipo) === 'Empresa').length} empresas · ${rows.filter(c => tipoClienteVisible(c.tipo) === 'Persona').length} personas ›</div></button>
+      <div class="kpi-row" data-c360-kpi-scope="${globalCountry}" data-c360-filter-country="${f.pais || ''}" data-c360-kpi-client-count="${commercialClientRows.length}" data-c360-kpi-active-count="${activePolicyCount==null?'':activePolicyCount}" data-c360-kpi-policy-count="${totalPolicyCount==null?'':totalPolicyCount}" data-c360-kpi-renew-count="${renewals45Count==null?'':renewals45Count}" style="grid-template-columns:repeat(4,1fr);margin-bottom:16px">
+        <button class="kpi kpi-click" data-c360-kpi="clients" title="Ver clientes del universo actual"><div class="k-accent"></div><div class="k-label">Clientes comerciales</div><div class="k-val">${commercialClientRows.length}</div><div class="k-foot muted">${commercialClientRows.filter(c => tipoClienteVisible(c.tipo) === 'Empresa').length} empresas · ${commercialClientRows.filter(c => tipoClienteVisible(c.tipo) === 'Persona').length} personas ›${qaAuditClientCount ? ' · ' + qaAuditClientCount + ' QA aparte' : ''}</div></button>
         <button class="kpi kpi-click" data-c360-kpi="active" title="Ver pólizas activas"><div class="k-accent" style="background:var(--info)"></div><div class="k-label">Pólizas activas</div><div class="k-val">${policyReadiness === 'ready' ? activePolicyCount : '—'}</div><div class="k-foot muted">${policyReadiness === 'ready' ? 'de ' + totalPolicyCount + ' vinculadas a estos clientes ›' + (policyGapNote ? ' · '+ policyGapNote : '') : 'Actualizando pólizas'}</div></button>
         <button class="kpi kpi-click" data-c360-kpi="premium" title="Ver detalle de prima vigente"><div class="k-accent" style="background:var(--ok)"></div><div class="k-label">Prima neta vigente</div><div class="k-val">${primaNetaVigenteHtml}</div><div class="k-foot muted">Separada por moneda; no se suman GTQ y COP ›</div></button>
         <button class="kpi kpi-click" data-c360-kpi="renewals" title="Ver renovaciones próximas"><div class="k-accent" style="background:var(--warn)"></div><div class="k-label">Vencen ≤45 d</div><div class="k-val">${policyReadiness === 'ready' ? renewals45Count : '—'}</div><div class="k-foot muted">${policyReadiness === 'ready' ? 'requieren gestión ›' : 'Actualizando pólizas'}</div></button>
