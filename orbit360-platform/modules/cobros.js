@@ -291,6 +291,22 @@ Orbit.modules.cobros = (function () {
     }).sort((a, b) => String(a.vence || '').localeCompare(String(b.vence || '')));
   }
 
+  // B4-003: commercial Cobros rows must share the same QA provenance
+  // exclusion as financial KPIs. Keep QA source records intact for audit.
+  function commercialCobrosRow(c, idx) {
+    if (!c) return false;
+    const policy = indexPolicy(idx, c.polizaId);
+    const client = indexClient(idx, c.clienteId);
+    const policyClient = policy ? indexClient(idx, policy.clienteId) : null;
+    const isQa = row => {
+      if (!row) return false;
+      if (q && typeof q.isSyntheticQaRecord === 'function') return q.isSyntheticQaRecord(row);
+      return row.__syntheticQa === true || row.syntheticQa === true ||
+        /^B2 QA firme(?:\s|$)/i.test(String(row.sourceRef || '').trim());
+    };
+    return ![c, policy, client, policyClient].some(isQa);
+  }
+
   function rows(idx) {
     return (S().all('cobros') || []).filter(c => {
       if (!countryMatches(c, idx)) return false;
@@ -416,7 +432,9 @@ Orbit.modules.cobros = (function () {
     const unassignedConfirmedBreakdown = hyd.financialReady ? Object.entries(cart.unassignedConfirmedByCurrency || {})
       .map(([currency, value]) => U.esc(safeMoney(value, currency, false))).join(' · ') : '';
     const qaSurfaceRow = qaReceipt ? qaReceiptSurfaceRow(qaReceipt) : null;
-    const authoritative = qaReceipt ? [] : rows(idx), portfolioOnly = qaReceipt || !hyd.financialReady ? [] : portfolioPaymentRows(idx), reported = qaReceipt || !hyd.financialReady ? [] : reportedRows(idx);
+    const authoritative = qaReceipt ? [] : rows(idx).filter(row => commercialCobrosRow(row, idx));
+    const portfolioOnly = qaReceipt || !hyd.financialReady ? [] : portfolioPaymentRows(idx).filter(row => commercialCobrosRow(row, idx));
+    const reported = qaReceipt || !hyd.financialReady ? [] : reportedRows(idx).filter(row => commercialCobrosRow(row, idx));
     const crmDirect = reported.filter(x => x.__crmDirectEvidence), paidReceiptFallback = reported.filter(x => x.__paidReceiptEvidence), advisorReported = reported.filter(x => x.__advisorReportedEvidence), clientReported = reported.filter(x => x.__clientReportedEvidence);
     const allRowsUnfiltered = qaReceipt ? (qaSurfaceRow ? [qaSurfaceRow] : []) : authoritative.concat(portfolioOnly, reported).sort((a, b) => String(a.vence || '').localeCompare(String(b.vence || '')));
     const allRows = qaReceipt ? allRowsUnfiltered.filter(row => receiptIdOf(row) === qaReceipt) : allRowsUnfiltered;
@@ -897,7 +915,7 @@ Orbit.modules.cobros = (function () {
   /* ---- Preparación de cobro por LOTE (selecciona recibos pendientes/vencidos) ---- */
   function lote() {
     const idx = buildIndex();
-    const arr = S().all('cobros').filter(c => (c.estado === 'Pendiente' || c.estado === 'Vencido') && countryMatches(c, idx)).sort((a, b) => (a.vence || '').localeCompare(b.vence || ''));
+    const arr = S().all('cobros').filter(c => (c.estado === 'Pendiente' || c.estado === 'Vencido') && countryMatches(c, idx) && commercialCobrosRow(c, idx)).sort((a, b) => (a.vence || '').localeCompare(b.vence || ''));
     const incl = new Set(arr.map(c => c.id));
     let back = document.getElementById('cob-lote'); if (back) back.remove();
     back = document.createElement('div'); back.id = 'cob-lote'; back.className = 'drawer-back open';
