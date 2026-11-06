@@ -1,0 +1,59 @@
+{
+  "schema": "GRAVICENTRA_I65_B4_003_CURRENT_40_HISTORIAL_ROLE_COUNTRY_READ_ONLY_DELTA_V1",
+  "dateLocal": "2026-11-06",
+  "recordType": "ADDITIVE_BROWSER_FOCAL_PREVIEW_MATRIX_DELTA_NOT_FULL_CERTIFICATION",
+  "gate": "I6.5/B4-003",
+  "sourceSha": "b01dceafc1ec2b1e786626116251e248be1e23f4",
+  "buildId": "gi-i65-b4-b01dceafc1ec-57f234755dc1",
+  "artifactId": 13527102882,
+  "readbackArtifactId": 13528110095,
+  "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-rc-41765742748-neoi3u7r.web.app/#/historial",
+  "principal": "Paula authenticated, using UI Ver como role switch, not independently authenticated Carlos/Samuel",
+  "verifiedReadOnly": {
+    "module": "Historial y actividades",
+    "role": "Operativo",
+    "countryCounts": {
+      "Colombia": 13,
+      "Guatemala": 23,
+      "Todos": 36
+    },
+    "sumInvariant": "13+23=36",
+    "status": "FOCAL_PREVIEW_READ_ONLY_PASS_ROLE_AND_COUNTRY_HYDRATED",
+    "dataLoadedFromAuthorizedServer": true,
+    "regionDataExamples": {
+      "Colombia": "Renovación enviada a cotización / SUPERIOR ENERGY SERV ICES COLOMBIA LLC",
+      "Guatemala": "Póliza actualizada AUTO39012"
+    },
+    "roleScopeContrast": {
+      "role": "Asesor",
+      "country": "Todos",
+      "interactions": 24,
+      "operativoTodos": 36,
+      "interpretation": "Role-specific read model differs; this does not establish authenticated advisor access security by itself"
+    }
+  },
+  "adjacentOpsLeadsObservationNotCertified": {
+    "role": "Asesor",
+    "country": "Todos",
+    "opsGestiones": 1,
+    "leadsActive": 0,
+    "comparisonOperativoOpsGestiones": 2,
+    "commentAuthor": "Legacy Ops card contains Usuario del equipo in 2026 historical bitácora; explicitly deferred per Paula; no new write performed",
+    "note": "Country selection for Ops was not certified here; no PASS on country scope or on prospective comment author writer"
+  },
+  "sessionRestored": {
+    "role": "Dirección",
+    "country": "Todos",
+    "route": "Inicio"
+  },
+  "limits": [
+    "No individual real user Carlos/Samuel authenticated in this iteration",
+    "No mobile viewport, console, full module actions, or current-candidate all-module matrix signed",
+    "No UI writes or persistence/reload; no LIVE promotion",
+    "Historical QA audit events observed in Historico; physical cleanup owner-deferred postprod, no deletions"
+  ],
+  "conclusion": "ONE_ADDITIONAL_PREVIEW_MATRIX_FOCAL_CELL_SIGNED_HISTORIAL_OPERATIVO_COUNTRY_COUNT_SUM_ONLY",
+  "noDataMutation": true,
+  "noSourceChange": true,
+  "productionGateStillHold": true
+}
