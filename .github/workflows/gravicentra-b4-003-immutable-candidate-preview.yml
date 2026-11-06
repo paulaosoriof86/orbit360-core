@@ -18,6 +18,8 @@ on:
       - .github/workflows/gravicentra-b4-003-immutable-candidate-preview.yml
       - orbit360-platform/core/queries.js
       - orbit360-platform/core/ciclo.js
+      - orbit360-platform/index.html
+      - tools/gravicentra-b4-003-inbox-human-identity.test.cjs
       - tools/gravicentra-b4-003-commercial-pipeline-qa-isolation.test.cjs
       - orbit360-platform/modules/equipo.js
       - orbit360-platform/data/store-firestore-product-operational-p0.js
@@ -78,7 +80,8 @@ jobs:
           test "$(git rev-parse HEAD:functions/product-operational-domain.js)" = '187efbfa9868531349154f26ec90a5e2c2ed33e8'
           test "$(git rev-parse HEAD:functions/goal-participation-contract.js)" = 'ff86fa441fd6cb4ec6254e2dc5078a37bf68fc36'
           test "$(git rev-parse HEAD:orbit360-platform/modules/equipo.js)" = '1bd7881ed29f6d7488bb806a96a0ab52c5c5c3b8'
-          test "$(git rev-parse HEAD:orbit360-platform/core/ciclo.js)" = '4ea4c9c366d23900faee7033ca2283804f714b65'
+          test "$(git rev-parse HEAD:orbit360-platform/core/ciclo.js)" = '7068c028419c7c13d9dc12b0fb715dd7bb3ce8c1'
+          test "$(git rev-parse HEAD:orbit360-platform/index.html)" = '867c5e108988b68ca49702e494e96fa9f01afd71'
           test "$(git rev-parse HEAD:orbit360-platform/modules/ops.js)" = 'eadc3ffd5ce9eb8c3c696870a8a7069f78908dc1'
           test "$(git rev-parse HEAD:orbit360-platform/modules/leads.js)" = 'f4af7b02d79890ca7ab8c39fb9f0269dac772b93'
           test "$(git rev-parse HEAD:orbit360-platform/core/queries.js)" = '391d6c7df59b5d6fbb64adb419cb240c078545b8'

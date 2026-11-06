@@ -41,7 +41,7 @@
     "cleanupSucceeded": false,
     "evidenceBoundary": "Cleanup was attempted earlier; readback now proves archivado:false, not successful archival. No inference about unobserved intermediate cleanup steps."
   },
-  "status": "FOCAL_NEW_LEADS_AUTHOR_WRITE_UI_PASS_ONLY_CLEANUP_AND_CROSS_ROLE_RELOAD_PENDING",
+  "status": "PARTIAL_EMITTER_UI_AND_RECIPIENT_NOTICE_PASS_RECIPIENT_COMMENT_AND_BITACORA_FAIL_CAUSAL_SUCCESSOR_PENDING",
   "notProven": [
     "Same fixture in product UI after full page reload",
     "Cross-role authorized reader (Carlos, Samuel)",
@@ -50,7 +50,7 @@
     "LIVE"
   ],
   "productionGateStillHold": true,
-  "noSourceEdit": true,
+  "noSourceEdit": false,
   "noRealBusinessMutation": true,
   "continuityRecovery20261106": {
     "recordedAtUtc": "2026-11-06T22:03:41Z",
@@ -235,5 +235,78 @@
     "noBuild": true,
     "noNewFixture": true,
     "noRealBusinessWrites": true
+  },
+  "samuelRecipientUiCausalFailure20261106": {
+    "recordedAtUtc": "2026-11-06T23:01:00Z",
+    "existingFindingId": "B4-003-UAT-20261011-03",
+    "status": "CURRENT40_REAL_CROSS_PRINCIPAL_AUTHOR_FAILURE_CAUSAL_FRONTEND_SUCCESSOR_REQUIRED",
+    "principal": "Samuel Daza",
+    "activeRole": "Asesor",
+    "country": "TODOS",
+    "actualAuthenticatedPrincipal": true,
+    "noticeUi": [
+      {
+        "eventId": "evt_d424cc8c1f8a45fad4cba845f114",
+        "actorName": "Paula Osorio"
+      },
+      {
+        "eventId": "evt_facd26eb0fcdee8d3ced6d20888e",
+        "actorName": "Paula Osorio"
+      },
+      {
+        "eventId": "evt_f555d031193cd498d6bb7e7be75c",
+        "actorName": "Paula Osorio"
+      }
+    ],
+    "originalFixtureId": "b4003qa_user_mw5eas6v_lphfrl",
+    "originalCommentText": "B4-003 #40 prueba aislada de autor visible, recarga y limpieza; 06/11/2026.",
+    "observedCommentAuthor": "Usuario del equipo",
+    "observedBitacoraAuthor": "Usuario del equipo",
+    "originalUpdateNoticeOpened": true,
+    "onlyRemoteMutation": "PERSONAL_NOTICE_READ_ACKNOWLEDGEMENT",
+    "businessDataWritten": false,
+    "sourceCause": "Recipient sees an authorized human actorName in inbox; comment UI cannot reuse that scoped identity and has no local membership for another principal. currentUserIdentity also stopped on an email-valued primary field.",
+    "fixScope": [
+      "existing inbox in-memory projection gains actorNameFor(uid) guarded by tenant/reader UID/active role and ready state, rejects conflicting names",
+      "existing comment and bitacora resolver consumes authorized identity; updates only mounted author labels",
+      "future UI writers choose first valid human field, then authorized topbar, without reconstructing names"
+    ],
+    "sourceOwners": [
+      {
+        "path": "orbit360-platform/core/ciclo.js",
+        "beforeBlobSha": "4ea4c9c366d23900faee7033ca2283804f714b65",
+        "afterBlobSha": "7068c028419c7c13d9dc12b0fb715dd7bb3ce8c1"
+      },
+      {
+        "path": "orbit360-platform/index.html",
+        "beforeBlobSha": "b84b85348f4fda81491bb2e00d655f77d8854f1a",
+        "afterBlobSha": "867c5e108988b68ca49702e494e96fa9f01afd71"
+      }
+    ],
+    "tests": {
+      "file": "tools/gravicentra-b4-003-inbox-human-identity.test.cjs",
+      "blobSha": "336b26b5362e95aba3eabcc1bcba94a0348055c3",
+      "behaviorChecks": 24,
+      "result": "PASS",
+      "baselineReproducedFailure": true,
+      "sourceSyntax": "PASS",
+      "syntheticOnly": true,
+      "noNetwork": true
+    },
+    "servedCandidateAtReproduction": {
+      "sourceSha": "b01dceafc1ec2b1e786626116251e248be1e23f4",
+      "buildId": "gi-i65-b4-b01dceafc1ec-57f234755dc1",
+      "artifactId": 13527102882
+    },
+    "successor": "BUILD_ONCE_NEW_IMMUTABLE_ARTIFACT_SAME_EXISTING_PREVIEW_CHANNEL; NEVER_PATCH_CERTIFIED_40",
+    "previewUiFixed": false,
+    "b4003Closed": false,
+    "productionPromotionAuthorized": false,
+    "unaffectedSignedApprovalsPreserved": true,
+    "noBackendCodeChange": true,
+    "noRulesOrAuthChange": true,
+    "noHistoricalActorRewrite": true,
+    "noNewFixture": true,
+    "nextOnly": "Build/read back exact successor; reload Samuel actual Asesor session and open same original notice; prove matching human author in comment and bitacora. Complete already-authorized new write/reload and cleanup only on the two existing fixtures, then only unsigned affected Preview deltas and LIVE gate."
   }
 }

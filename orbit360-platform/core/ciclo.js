@@ -20,11 +20,12 @@ Orbit.ciclo = (function () {
     try{
       const p=Orbit.auth&&Orbit.auth.productUser||{},u=Orbit.auth&&typeof Orbit.auth.user==='function'?Orbit.auth.user()||{}:{};
       const uid=String(p.uid||u.uid||'').trim(),email=String(p.email||u.email||'').trim();
-      let name=String(p.nombre||p.displayName||p.name||u.displayName||u.nombre||u.name||'').trim();
-      if(!name){const top=document.querySelector('#tb-user .who b');if(top&&String(top.textContent||'').trim()&&String(top.textContent||'').trim()!=='Usuario')name=String(top.textContent||'').trim();}
+      const validName=n=>{const x=String(n||'').trim();return x&&!x.includes('@')&&!/^(AdminTenant|SuperAdmin|Direcci[oó]n|Operativo|Asesor|Comercial|Admin|unknown|undefined|Usuario|Usuario autenticado|Usuario del equipo|Usuario autorizado|Orbit(?:\s*360)?\s*LAB|QA|LAB|Test)$/i.test(x)&&!/^(?:uid|auth|member|user)[:_-]/i.test(x)&&!/^[A-Za-z0-9_-]{24,}$/.test(x);};
+      let name=[p.nombre,p.displayName,p.name,u.displayName,u.nombre,u.name].find(validName);
+      if(!name){const top=document.querySelector('#tb-user .who b');if(top&&validName(top.textContent))name=top.textContent;}
       // A mail address is not a human display name. Keep the UID separately
       // for later membership resolution; never render the email as the author.
-      return{uid,name:name||'Usuario del equipo',email};
+      return{uid,name:String(name||'Usuario del equipo').trim(),email};
     }catch(e){return{uid:'',name:'Usuario del equipo',email:''};}
   }
   function currentUserName(){return currentUserIdentity().name;}
@@ -1506,10 +1507,21 @@ Orbit.ciclo = (function () {
         if(raw.includes('@')){const a=(S().all(coll)||[]).find(x=>x&&String(x.email||x.correo||'').toLowerCase()===raw.toLowerCase());const n=a&&(a.nombre||a.displayName||a.name);if(validName(n))return String(n).trim();}
       }catch(_){}
     }
+    if(uid){try{const projection=Orbit.sharedInboxState;const name=projection&&typeof projection.actorNameFor==='function'?projection.actorNameFor(uid):'';if(validName(name))return String(name).trim();}catch(_){}}
     return validName(raw)?raw:'Usuario del equipo';
   }
-  function comRow(c) { const a=c&&c.attachment||{},ref=a.documentRef||a.driveUrl||'',direction=String(c&&c.direction||''),stateClass=direction?' collab-'+direction:'';return `<div class="com-row${stateClass}"><div class="com-h"><b>${U.esc(humanCommentAuthor(c))}</b><span class="muted">${U.esc(displayStamp(c.ts))}</span></div>${c.tipo?'<span class="badge info collab-type" style="font-size:10px;margin-bottom:5px">'+U.esc(c.tipo)+'</span>':''}<div class="collab-message">${U.esc(c.texto)}</div>${ref?'<button type="button" class="btn ghost sm collab-doc" data-collab-doc="'+U.esc(ref)+'" style="margin-top:7px">📎 '+U.esc(a.nombre||'Abrir adjunto')+'</button>':''}</div>`; }
-  function bitRow(b) { return `<div class="bit-row"><span class="bit-dot ${b.origen === 'auto' ? 'auto' : ''}"></span><div><div class="bit-t"><b>${U.esc(b.campo)}</b> ${b.de ? '· ' + U.esc(b.de) + ' → ' : ''}${U.esc(b.a)}</div><div class="muted" style="font-size:10.5px">${U.esc(displayStamp(b.ts))} · ${U.esc(humanCommentAuthor(b))}${b.origen === 'auto' ? ' · automático' : ''}</div></div></div>`; }
+  function humanAuthorLabel(c){
+    return '<span data-collab-author-uid="'+U.esc(String(c&&c.actorUid||''))+'" data-collab-author-name="'+U.esc(String(c&&(c.actorName||c.user)||''))+'">'+U.esc(humanCommentAuthor(c))+'</span>';
+  }
+  function refreshHumanAuthorLabels(){
+    document.querySelectorAll('[data-collab-author-uid]').forEach(function(label){
+      label.textContent=humanCommentAuthor({actorUid:label.getAttribute('data-collab-author-uid'),actorName:label.getAttribute('data-collab-author-name')});
+    });
+  }
+  // One listener for mounted labels only: never rebuild a modal or discard a draft.
+  document.addEventListener('orbit:inbox-state',refreshHumanAuthorLabels);
+  function comRow(c) { const a=c&&c.attachment||{},ref=a.documentRef||a.driveUrl||'',direction=String(c&&c.direction||''),stateClass=direction?' collab-'+direction:'';return `<div class="com-row${stateClass}"><div class="com-h"><b>${humanAuthorLabel(c)}</b><span class="muted">${U.esc(displayStamp(c.ts))}</span></div>${c.tipo?'<span class="badge info collab-type" style="font-size:10px;margin-bottom:5px">'+U.esc(c.tipo)+'</span>':''}<div class="collab-message">${U.esc(c.texto)}</div>${ref?'<button type="button" class="btn ghost sm collab-doc" data-collab-doc="'+U.esc(ref)+'" style="margin-top:7px">📎 '+U.esc(a.nombre||'Abrir adjunto')+'</button>':''}</div>`; }
+  function bitRow(b) { return `<div class="bit-row"><span class="bit-dot ${b.origen === 'auto' ? 'auto' : ''}"></span><div><div class="bit-t"><b>${U.esc(b.campo)}</b> ${b.de ? '· ' + U.esc(b.de) + ' → ' : ''}${U.esc(b.a)}</div><div class="muted" style="font-size:10.5px">${U.esc(displayStamp(b.ts))} · ${humanAuthorLabel(b)}${b.origen === 'auto' ? ' · automático' : ''}</div></div></div>`; }
 
   return {
     ETAPAS, E, FLUJO, opsListas, leadsListas, etapaInfo, flag,
@@ -1542,3 +1554,4 @@ if (!window.__orbitOtroSel) {
     }
   });
 }
+

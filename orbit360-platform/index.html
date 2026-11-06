@@ -114,8 +114,23 @@
       function publishInboxProjection(){
         const scope=inboxScope(),ready=refreshState==='ready';
         const projection=new Map(rows.filter(r=>r&&r.eventId).map(r=>[String(r.eventId),{known:true,globalResolved:r.globalResolved===true}]));
-        const signature=scope+'|'+String(ready)+'|'+[...projection.entries()].map(([id,v])=>id+':'+String(v.globalResolved)).sort().join(',');
-        Orbit.sharedInboxState=Object.freeze({scope,ready,lookup:function(id){return ready&&projection.has(String(id))?projection.get(String(id)):{known:false,globalResolved:false};}});
+        // Names come only from notices already authorized for this reader and role.
+        // Keep them in this projection, never in persistent or cross-session storage.
+        const actorNames=new Map();
+        rows.forEach(function(row){
+          const uid=String(row&&row.actorUid||'').trim();
+          if(!uid)return;
+          const name=inboxHumanIdentity(row.actorName,uid);
+          if(name==='Usuario del equipo')return;
+          if(!actorNames.has(uid))actorNames.set(uid,name);
+          else if(actorNames.get(uid)!==name)actorNames.set(uid,'');
+        });
+        const current=function(){return ready&&refreshState==='ready'&&scope===inboxScope();};
+        const signature=JSON.stringify([scope,ready,[...projection.entries()].sort(),[...actorNames.entries()].sort()]);
+        Orbit.sharedInboxState=Object.freeze({scope,ready,
+          lookup:function(id){return current()&&projection.has(String(id))?projection.get(String(id)):{known:false,globalResolved:false};},
+          actorNameFor:function(uid){return current()?actorNames.get(String(uid||'').trim())||'':'';}
+        });
         if(signature!==lastPublishedInboxSignature){
           lastPublishedInboxSignature=signature;
           try{document.dispatchEvent(new CustomEvent('orbit:inbox-state',{detail:{scope,ready}}));}catch(_e){}
@@ -134,7 +149,7 @@
         var key=inboxScope();
         if(!force&&refreshFlight&&refreshKey===key)return refreshFlight;
         if(key!==lastRenderedScope){rows=[];lastRenderedScope=key;refreshState='loading';paint();var d=document.getElementById('ops-inbox-drawer');if(d?.classList.contains('open'))open();}
-        var seq=++refreshSequence,role=activeRole();refreshKey=key;refreshState='loading';
+        var seq=++refreshSequence,role=activeRole();refreshKey=key;refreshState='loading';publishInboxProjection();
         var flight=call(preview()?'orbit360GetAdvisorOpsInboxPreview':'orbit360GetAdvisorOpsInbox',{tenantId:tenant(),activeRole:role,limit:100,includeArchived:true})
           .then(function(out){
             if(seq!==refreshSequence||key!==inboxScope())return rows;
@@ -142,7 +157,7 @@
             var dr=document.getElementById('ops-inbox-drawer');if(dr?.classList.contains('open'))open();
             return rows;
           }).catch(function(e){
-            if(seq===refreshSequence){refreshState='error';var dr=document.getElementById('ops-inbox-drawer');if(dr?.classList.contains('open'))open();}
+            if(seq===refreshSequence){refreshState='error';publishInboxProjection();var dr=document.getElementById('ops-inbox-drawer');if(dr?.classList.contains('open'))open();}
             try{console.warn('[Gravicentra Inbox]',e&&e.message||e);}catch(x){}return rows;
           }).finally(function(){if(seq===refreshSequence){refreshFlight=null;refreshKey='';}});
         refreshFlight=flight;return flight;
@@ -245,3 +260,4 @@
   </script>
 </body>
 </html>
+

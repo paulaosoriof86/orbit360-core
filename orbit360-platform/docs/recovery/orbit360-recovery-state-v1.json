@@ -187,7 +187,7 @@
     "phaseAIterationStatuses": "HISTORICAL_FIELDS_ABOVE_PRESERVED_UNTIL_FORMAL_GATE_EVIDENCE;_NO_NEW_PASS_INFERRED",
     "labDataWriteScope": "ONLY_35_AUTHORIZED_COUNTRY_FIELDS;_NO_AUGUST_REFRESH"
   },
-  "nextAction": "B4-003 CURRENT OPERATIONAL AUTHORITY: CONTROL_PLANE.json#b4003ActiveCertificationCursor20261106 and #b4003CertificationInventory20261106. Preserve current #40 source b01dceafc1ec2b1e786626116251e248be1e23f4, build gi-i65-b4-b01dceafc1ec-57f234755dc1, immutable artifact 13527102882, readback artifact 13528110095. NEXT exact action: authenticate Samuel as Asesor in current Preview and open existing Tareas compartidas notice evt_f555d031193cd498d6bb7e7be75c. All three exact-fixture outbox rows durably name Paula Osorio and target advisor:ase-samuel-daza; recipient UI is still unproved, and the emitter Paula cannot substitute for that proof. Resume prospective Ops/Leads author proof using latest existing fixture b4003qa_user_mw5htkgl_31u61t (creation persisted, zero comments) and original author fixture b4003qa_user_mw5eas6v_lphfrl (comment persisted, immediate human UI label; durable actorName/user email-valued). Both remain archivado:false; successful cleanup is pending and is not covered automatically by the deferred old QA cohorts. Prove required authenticated actor write/read/reload and remaining current Preview module x role x country x viewport deltas. Preserve all unaffected signed tests, four functional P0 PASS and two owner-deferred QA items (not PASS), formal I6 50%. Historical unresolved authors require no retroactive rewrite and are not release blockers. Preserve Aseguradoras historical 3/3; separate Preview vault is not a new general blocker; real LIVE reveal/copy retest follows same-artifact promotion. Prior product snapshot deadlines are WATCH after 3/3 recovery; browser focus automation timeouts are separate. B4-003 remains HOLD, productionPromotionAuthorized=false. Same retained artifact may be promoted only after applicable Preview formal PASS and authorized gate, followed by exact LIVE readback, controlled write/reload/restore, integrity and rollback. No reimport or routine Rules/Auth work.",
+  "nextAction": "B4-003 active authority remains CONTROL_PLANE.json#b4003ActiveCertificationCursor20261106 and #b4003CertificationInventory20261106. Samuel actual Asesor received all 3 exact notices with Paula Osorio, but original recent fixture comment AND bitacora render Usuario del equipo. This is a reproduced current-candidate failure under existing finding B4-003-UAT-20261011-03, authorizing a minimal causal frontend correction and NEW immutable artifact on the SAME existing Preview channel. Build/read back exact successor; reload Samuel actual Asesor session and open same original notice; prove matching human author in comment and bitacora. Complete already-authorized new write/reload and cleanup only on the two existing fixtures, then only unsigned affected Preview deltas and LIVE gate. Existing #40 remains the served reproduction baseline until exact successor readback; never patch or promote #40 as fixed. Preserve 15 historical certificates, 16 evidence entries, four functional P0 PASS, two owner-deferred QA (not PASS), formal I6 50%. No new fixture, reimport, historical author rewrite, routine Rules/Auth, or LIVE promotion before applicable Preview PASS.",
   "sourceOfTruth": {
     "projectBoundaryPrevalentAddendum": "orbit360-platform/docs/recovery/ADDENDUM_PREVALENTE_CHATGPT_PROJECT_BOUNDARY_20260831.md",
     "mutableState": "orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json",
@@ -443,7 +443,7 @@
     "noDataWrites": true
   },
   "b4003ActiveCertificationResume20261106": {
-    "recordedAtUtc": "2026-11-06T22:30:17Z",
+    "recordedAtUtc": "2026-11-06T23:01:00Z",
     "authorityPath": "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json",
     "cursorKey": "b4003ActiveCertificationCursor20261106",
     "inventoryKey": "b4003CertificationInventory20261106",
@@ -451,13 +451,16 @@
     "existingFindingId": "B4-003-UAT-20261011-03",
     "latestInterruptedFixtureId": "b4003qa_user_mw5htkgl_31u61t",
     "priorCommentFixtureId": "b4003qa_user_mw5eas6v_lphfrl",
-    "releaseStatus": "B4-003_HOLD",
+    "releaseStatus": "B4-003_HOLD_CAUSAL_AUTHOR_SUCCESSOR_PENDING",
     "historicalTopLevelIterationFieldsAreNotActiveGate": true,
     "b4003Closed": false,
     "productionPromotionAuthorized": false,
     "nextRequiredPrincipal": "Samuel Daza",
     "nextRequiredRole": "Asesor",
-    "exactReopenNoticeId": "evt_f555d031193cd498d6bb7e7be75c",
-    "durableOutboxHumanAuthors": "3_OF_3_PAULA_OSORIO"
+    "exactReopenNoticeId": "evt_facd26eb0fcdee8d3ced6d20888e",
+    "durableOutboxHumanAuthors": "3_OF_3_PAULA_OSORIO",
+    "recipientNoticeUiPass": true,
+    "recipientCommentAndBitacoraPass": false,
+    "causalFixRequired": true
   }
 }
