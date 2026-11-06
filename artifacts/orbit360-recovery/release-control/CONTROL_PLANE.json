@@ -629,7 +629,13 @@
       "retainsDocumentAndHistory": true,
       "attachmentsInCurrentFixtures": 0,
       "historicalQaCohortsRemainOwnerDeferred": true,
-      "noRealBusinessDeletion": true
+      "noRealBusinessDeletion": true,
+      "remoteBrowserControlBlocked": true,
+      "lastTabMetadataObserved": {
+        "id": "1088561443",
+        "url": "https://ays-orbit-360-lab--gi-i65-b4-rc-41765742748-neoi3u7r.web.app/?utm_source=chatgpt.com#/leads"
+      },
+      "nextUiAction": "User resolves native archive confirmation in existing Samuel session; canonical readback still required, not inferred."
     },
     "minimumRemainingDeltaPlan20261106": {
       "recordedAtUtc": "2026-11-06T23:38:56Z",
@@ -652,6 +658,59 @@
       "preservedHistoricalCertificates": 15,
       "cartesianDenominatorNotInvented": true,
       "b4003Closed": false,
+      "productionPromotionAuthorized": false
+    },
+    "retainedHostingPreflight20261106": {
+      "recordedAtUtc": "2026-11-06T23:46:26Z",
+      "status": "CANONICAL_ARTIFACT_PASS_HOSTING_METADATA_PARSER_AND_CERTIFIED_CHANNEL_LOOKUP_UNRESOLVED",
+      "productSourceSha": "857f1222f360a42a06e012810a1c01bce155a26f",
+      "artifactId": 13549460562,
+      "attempts": [
+        {
+          "runId": 42313349097,
+          "runnerCommit": "c6ab19eb6df94dfb7dcb19cfa58980a0fed4240e",
+          "result": "WORKFLOW_VALIDATION_FAILURE_BEFORE_JOBS",
+          "cause": "runner.temp not valid in job env; corrected exactly two path variables to github.workspace",
+          "remoteOperations": 0
+        },
+        {
+          "runId": 42313579032,
+          "runnerCommit": "79e268194e20d041261b7ec9b3e343a69ea50466",
+          "artifactId": 13548954107,
+          "artifactZipSha256": "44b6d4f1ddaee4c0642e5ae4c27813302f1e19c6bc1c4bb5a3c6bc9a0afdf6d6",
+          "result": "EXACT_RETAINED_ARTIFACT_HOSTING_PREFLIGHT_FAIL",
+          "passedChecks": [
+            "exact_candidate_and_archive",
+            "artifact_run_metadata",
+            "reuse_existing_service_account_for_gets"
+          ],
+          "failedChecks": [
+            {
+              "check": "live_before_snapshot",
+              "code": "HOSTING_VERSION_NAME_MISSING_OR_WRONG_SITE"
+            },
+            {
+              "check": "preview_version_and_all_served_bytes",
+              "code": "HOSTING_VERSION_NAME_MISSING_OR_WRONG_SITE"
+            },
+            {
+              "check": "certified_rollback_version_and_all_served_bytes",
+              "code": "HOSTING_GET_404:projects/-/sites/ays-orbit-360-lab/channels/gi-i5-rb-34723814583"
+            },
+            {
+              "check": "live_unchanged_after_readonly_preflight",
+              "code": "LIVE_BEFORE_SNAPSHOT_REQUIRED"
+            }
+          ],
+          "hostingMutation": false,
+          "dataWrites": 0,
+          "functionsDeployment": false,
+          "rulesOrAuthChange": false,
+          "oldPreviewJobsSkipped": true
+        }
+      ],
+      "nextReadOnlyAction": "Persist safe actual channel/version fields and independent public LIVE build probes before strict parser; identify certified rollback from retained Hosting evidence without a new channel or weaker hash checks.",
+      "rollbackCertifiedByThisAttempt": false,
       "productionPromotionAuthorized": false
     }
   },

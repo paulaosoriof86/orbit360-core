@@ -165,7 +165,22 @@ async function hostingGet(resource,query={}){
     throw new Error('HOSTING_GET_'+String(e?.response?.status || e?.code || 'ERROR')+':'+resource);
   }
 }
-const getChannel=id=>hostingGet('projects/-/sites/'+binding.site+'/channels/'+id);
+async function getChannel(id){
+  const channel=await hostingGet('projects/-/sites/'+binding.site+'/channels/'+id);
+  const version=channel?.release?.version;
+  // Preserve only safe response fields before the strict version parser.
+  writeJson('hosting-channel-'+id+'-observed.json',{
+    requestedSite:binding.site,requestedChannelId:id,
+    name:typeof channel?.name==='string'?channel.name:null,
+    url:typeof channel?.url==='string'?channel.url:null,
+    release:{
+      name:typeof channel?.release?.name==='string'?channel.release.name:null,
+      versionType:version===null?'null':Array.isArray(version)?'array':typeof version,
+      versionName:typeof version==='string'?version:typeof version?.name==='string'?version.name:null
+    }
+  });
+  return channel;
+}
 function versionName(channel){
   const name=channel?.release?.version?.name;
   requireValue(typeof name==='string' &&
@@ -198,16 +213,25 @@ async function listFiles(version){
   return rows;
 }
 async function liveSnapshot(nonce){
-  const channel=compactChannel(await getChannel('live'));
   const origins=[];
   for(const base of binding.liveUrls){
     const probes=[];
     for(const rel of ['index.html','__recovery__/build.json']){
       const r=await publicRead(base,rel,nonce);
-      probes.push({path:rel,status:r.status,sha256:r.sha256,byteCount:r.byteCount});
+      let marker;
+      if(rel==='__recovery__/build.json' && r.status===200){
+        try{
+          const parsed=JSON.parse(r.bytes.toString('utf8'));
+          marker={sourceSha:parsed.sourceSha,buildId:parsed.buildId,gate:parsed.gate};
+        }catch{marker={parseError:true};}
+      }
+      probes.push({path:rel,status:r.status,sha256:r.sha256,byteCount:r.byteCount,...(marker?{marker}:{})});
     }
     origins.push({base,probes});
   }
+  // A metadata-format failure must not suppress independently read public bytes.
+  writeJson('live-public-probes-'+(nonce.startsWith('before-')?'before':'after')+'.json',{origins});
+  const channel=compactChannel(await getChannel('live'));
   return {channel,origins};
 }
 writeReceipt();
