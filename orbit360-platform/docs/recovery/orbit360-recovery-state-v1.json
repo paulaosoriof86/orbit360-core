@@ -10,7 +10,7 @@
   "branch": "recovery/fase-a-clean-20260831",
   "forensicOriginSha": "9c95f31461f2eabe9804625b5659bee772f5602a",
   "createdAtUtc": "2026-08-31T18:00:00Z",
-  "updatedAtUtc": "2026-11-06T17:42:06.839Z",
+  "updatedAtUtc": "2026-11-06T17:44:26.637Z",
   "status": "ITERATION_2_SOURCE_MATERIALIZED_VALIDATION_PENDING",
   "currentIteration": 2,
   "lastCompletedIteration": 1,
@@ -187,7 +187,7 @@
     "phaseAIterationStatuses": "HISTORICAL_FIELDS_ABOVE_PRESERVED_UNTIL_FORMAL_GATE_EVIDENCE;_NO_NEW_PASS_INFERRED",
     "labDataWriteScope": "ONLY_35_AUTHORIZED_COUNTRY_FIELDS;_NO_AUGUST_REFRESH"
   },
-  "nextAction": "B4-003 2026-11-06 CURRENT EXACT CANDIDATE: immutable Preview run 42263222517 SUCCESS, source f3e4503afbc7f3a67086d0e8ad0cc1b623743c39, build gi-i65-b4-f3e4503afbc7-57f234755dc1, archive artifact 13524899745 sha256 8811936a2ea12d482356d3a2ae179ff93a36ee96856b3135dbac9252c3f42ea2, served readback artifact 13526316484. Signed Paula Dirección TODOS focal Cobros QA B4-003/B2-REN search 0 with unchanged commercial KPIs; Cliente 360 QA removed from CLIENT COUNT 439 commercial/1 QA audit/440 all, 223 active policies/1416 commercial, GTQ632719 and COP175456570 commercial premium, QA orphan-policy warning excluded, zero commercial unmatched, QA still audit-visible. Two QA cohorts physical cleanup owner-authorized POSTPRODUCTION, 4 functional P0 PASS +2 OWNER_DEFERRED, 0 real data edits/deletions/reimports. NEXT Ops/Leads historical author human-name provenance (new Samuel name works, old fallback generic open), full current module×role×country×viewport Preview certification and retained same artifact LIVE module by module with rollback. Formal I6 50%; B4-003 gate HOLD; LIVE production NO-GO; no Rules/Auth/data deploy.",
+  "nextAction": "B4-003 2026-11-06 CURRENT EXACT CANDIDATE: immutable Preview run 42263222517 SUCCESS, source f3e4503afbc7f3a67086d0e8ad0cc1b623743c39, build gi-i65-b4-f3e4503afbc7-57f234755dc1, archive artifact 13524899745 sha256 8811936a2ea12d482356d3a2ae179ff93a36ee96856b3135dbac9252c3f42ea2, served readback artifact 13526316484. Signed Paula Dirección TODOS plus Cliente360 country GT 390 commercial clients/196 active/1291 commercial policies, CO 49/27/125, GT+CO parity with TODOS 439/223/1416, selector restored TODOS. Signed Paula Dirección TODOS focal Cobros QA B4-003/B2-REN search 0 with unchanged commercial KPIs; Cliente 360 QA removed from CLIENT COUNT 439 commercial/1 QA audit/440 all, 223 active policies/1416 commercial, GTQ632719 and COP175456570 commercial premium, QA orphan-policy warning excluded, zero commercial unmatched, QA still audit-visible. Two QA cohorts physical cleanup owner-authorized POSTPRODUCTION, 4 functional P0 PASS +2 OWNER_DEFERRED, 0 real data edits/deletions/reimports. NEXT Ops/Leads historical author human-name provenance (new Samuel name works, old fallback generic open), full current module×role×country×viewport Preview certification and retained same artifact LIVE module by module with rollback. Formal I6 50%; B4-003 gate HOLD; LIVE production NO-GO; no Rules/Auth/data deploy.",
   "sourceOfTruth": {
     "projectBoundaryPrevalentAddendum": "orbit360-platform/docs/recovery/ADDENDUM_PREVALENTE_CHATGPT_PROJECT_BOUNDARY_20260831.md",
     "mutableState": "orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json",
@@ -370,6 +370,44 @@
     "readbackArtifactId": 13526316484,
     "controlPlaneKey": "b4003Cliente360QaCommercialKpiSignedPreviewClosure20261106",
     "productionDeployed": false,
-    "realDataWrites": 0
+    "realDataWrites": 0,
+    "signedCountryMatrix": {
+      "GT": {
+        "clients": 390,
+        "activePolicies": 196,
+        "policies": 1291,
+        "netPremiumGTQ": 632719
+      },
+      "CO": {
+        "clients": 49,
+        "activePolicies": 27,
+        "policies": 125,
+        "netPremiumCOP": 175456570
+      },
+      "TODOS": {
+        "clients": 439,
+        "activePolicies": 223,
+        "policies": 1416,
+        "netPremiumGTQ": 632719,
+        "netPremiumCOP": 175456570
+      },
+      "restored": "TODOS"
+    }
+  },
+  "b4003EquipoSignedReadOnlyFresh20261106": {
+    "users": 7,
+    "internals": 4,
+    "freelancersExcluded": 3,
+    "sourceSha": "f3e4503afbc7f3a67086d0e8ad0cc1b623743c39",
+    "status": "FOCAL_PAULA_DIRECTION_READONLY_PASS_NOT_FULL_MODULE_PASS"
+  },
+  "b4003OpsLeadsHistoricalAttribution20261106": {
+    "status": "OPEN_HISTORICAL_USER_GENERIC_DATA_PROVENANCE_UNVERIFIED",
+    "sourceAuthorResolver": "orbit360-platform/core/ciclo.js:humanCommentAuthor",
+    "newNamedEventsObserved": [
+      "Samuel Daza"
+    ],
+    "noTechnicalEmailsAsAuthors": true,
+    "noDataWrites": true
   }
 }
