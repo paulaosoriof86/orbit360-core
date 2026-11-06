@@ -1,7 +1,7 @@
 {
   "schema": "B4-003-P0-PERSONAL-20261106-V1",
   "status": "REQUESTED",
-  "phase": "create",
+  "phase": "cleanup",
   "tenantId": "alianzas-soluciones",
   "gate": "I6.5/B4-003",
   "ownerAuthorization": "PAULA_SIGNED_SYNTHETIC_QA_ALLOWED_20261106",
@@ -22,10 +22,22 @@
     "status": "FAIL_BEFORE_ANY_WRITE",
     "cause": "QA_HARNESS_VARIABLE_NAME_ONLY"
   },
-  "createRunId": 42239715489,
+  "createRunId": 42252540995,
   "previousCleanupRunId": 42243853571,
   "secondProof": "CLIENT_ADVISOR_SCOPE_CORRECTED",
   "secondProofResult": "GOAL_Q200_VISIBLE_PERSONAL_COLLECTION_Q0_5_OF_5_SOURCES_GT",
   "probe": "SIGNED_PREVIEW_PAULA_ASESOR_GT_NOV_5_OF_5_PERSONAL_COLLECTION_Q111_11_VS_META_Q200",
-  "cleanupReason": "IMMEDIATE_EXACT_ID_RESTORE_AFTER_ONE_SIGNED_FIVE_OF_FIVE_CHROME_READBACK"
+  "cleanupReason": "IMMEDIATE_RESTORE_AFTER_SIGNED_FIVE_OF_FIVE_EXACT_Q111_11_DOM_READBACK",
+  "signedReadback": {
+    "role": "Paula Asesor",
+    "country": "GT",
+    "month": "2026-11",
+    "confirmedSources": "5/5",
+    "personalRecaudoGTQ": 111.11,
+    "personalGoalGTQ": 200,
+    "paymentCountBefore": 3,
+    "paymentCountWithFixture": 4,
+    "expectedSyntheticIdCount": 5,
+    "chromeDOMExactAttrs": true
+  }
 }
