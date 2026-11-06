@@ -10,7 +10,7 @@
   "branch": "recovery/fase-a-clean-20260831",
   "forensicOriginSha": "9c95f31461f2eabe9804625b5659bee772f5602a",
   "createdAtUtc": "2026-08-31T18:00:00Z",
-  "updatedAtUtc": "2026-11-06T16:52:35.876Z",
+  "updatedAtUtc": "2026-11-06T17:27:59.310Z",
   "status": "ITERATION_2_SOURCE_MATERIALIZED_VALIDATION_PENDING",
   "currentIteration": 2,
   "lastCompletedIteration": 1,
@@ -187,7 +187,7 @@
     "phaseAIterationStatuses": "HISTORICAL_FIELDS_ABOVE_PRESERVED_UNTIL_FORMAL_GATE_EVIDENCE;_NO_NEW_PASS_INFERRED",
     "labDataWriteScope": "ONLY_35_AUTHORIZED_COUNTRY_FIELDS;_NO_AUGUST_REFRESH"
   },
-  "nextAction": "B4-003 2026-11-06: Paula authorized POSTPRODUCTION PHYSICAL RETENTION of two exact QA cohorts after signed commercial KPI isolation (Pólizas raw 1425 minus 9 QA = 1416 commercial; B2 three orphans audit-only; Cobros KPIs commercial q source tests 5/5, pipeline 11/11; signed Direction TODOS confirmed 5 / Q2744 GTQ, pending Q2396 GTQ and overdue GTQ/COP separated). NO DELETE/UPDATE/REIMPORT. QA P0 disposition 4 resolved + 2 OWNER_DEFERRED (not two additional PASS). SIGNED UI FOUND ONE B4 cancelled-run QA expected receipt Q683.20 in Cobros commercial listing despite KPI exclusion: correct/verify this specific UI leak within current gate before Cobros module acceptance; do not reopen completed focal tests without causal invalidation. Then Ops/Leads author names attribution, current modules×roles×countries×viewports Preview matrix, same immutable artifact LIVE digest/readback. I6 formal 50%; B4-003 HOLD; production NO-GO. Source preview 3e87722d54871198a02d9b0909971fa2f4f913af, artifact 13472898683 until any causal product source change, then new exact digest/build required.",
+  "nextAction": "B4-003 2026-11-06: QA cohorts P0 physical cleanup deferred postproduction with signed commercial-KPI exclusion, 4 functional P0 PASS +2 owner-deferred, no QA data deleted/reimported. FOCAL COBROS QA operational-list leak CLOSED in signed Paula Dirección TODOS Preview: B4-003 search 0, B2-REN search 0 (formerly Q683.20 synthetic row), commercial KPIs unchanged 5 confirmed/Q2744 GTQ, Q2396 pending, Q227367 GTQ and COP109875840 overdue; Pólizas 1425 all/9 QA preserved/1416 commercial. Exact immutable Preview success workflow 42260955450 source 0f196e1cdd1962af81d979f5e63999c6411cd855 build gi-i65-b4-0f196e1cdd19-57f234755dc1 artifact 13524672844 and readback 13524308622. NEXT: Ops/Leads attributed human author labels, current module×role×country×viewport Preview matrix, followed by SAME retained artifact LIVE digest/module by module. Formal I6 50%; full B4-003 gate HOLD; production NO-GO; don't reopen previous PASS absent causal regression.",
   "sourceOfTruth": {
     "projectBoundaryPrevalentAddendum": "orbit360-platform/docs/recovery/ADDENDUM_PREVALENTE_CHATGPT_PROJECT_BOUNDARY_20260831.md",
     "mutableState": "orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json",
@@ -328,6 +328,26 @@
     "controlPlaneCommit": "94b1ebe4a3af432c53271992057e90e270cbd3f1",
     "observedCobrosQaRow": "B4-003-RENEWWRITE-38102224750_Q683_20_GTQ_VENCIDO_UI_LIST_NOT_COMMERCIAL_KPI",
     "physicalDataTouched": false,
-    "productionAccepted": false
+    "productionAccepted": false,
+    "previewSignedQaListLeakStatus": "CLOSED_FOCAL_SIGNED_PREVIEW_NOT_FULL_GATE_PASS",
+    "latestPreviewSourceSha": "0f196e1cdd1962af81d979f5e63999c6411cd855",
+    "latestImmutableArtifactId": 13524672844,
+    "latestBuildId": "gi-i65-b4-0f196e1cdd19-57f234755dc1"
+  },
+  "b4003CobrosQaSignedPreviewClosure20261106": {
+    "status": "FOCAL_PASS_ONLY",
+    "signedRole": "Paula_Direccion_TODOS",
+    "b4SearchRows": 0,
+    "b2RenSearchRows": 0,
+    "kpisUnchanged": true,
+    "qaPoliciesPreserved": 9,
+    "workflowRunId": 42260955450,
+    "sourceSha": "0f196e1cdd1962af81d979f5e63999c6411cd855",
+    "buildId": "gi-i65-b4-0f196e1cdd19-57f234755dc1",
+    "artifactId": 13524672844,
+    "readbackArtifactId": 13524308622,
+    "controlPlaneKey": "b4003CobrosQaSignedPreviewClosure20261106",
+    "b4003GateClosed": false,
+    "productionDeployed": false
   }
 }
