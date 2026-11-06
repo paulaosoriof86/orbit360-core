@@ -19165,6 +19165,31 @@
         "NO fabricated PASS or production claim"
       ],
       "releaseGateUnchanged": true
+    },
+    "credentialRevealPreviewIsolationResolution20261106": {
+      "dateLocal": "2026-11-06",
+      "ownerReport": "Paula Dirección on B4-003 Preview real insurer credential reveal and copy show 'No fue posible recuperar el acceso'",
+      "historicalAcceptance": {
+        "runId": 35300781558,
+        "status": "SUCCESS",
+        "i62CredentialTests": "3/3 previously signed; current #40 historical acceptance preserved under non-regression rule",
+        "sourceRef": "66d641d6f5efad7825099d9779d4563922278efc"
+      },
+      "currentSourceFindings": {
+        "operationalDirectoryOwnerModuleBlobUnchangedFromHistorical": "bd744f63e34465206744c58bfa411483398e453b",
+        "previewHostRoutesTo": "orbit360ProductInsurerCredentialCommandPreview / us-east1",
+        "liveHostRoutesTo": "orbit360ProductInsurerCredentialCommand / us-central1",
+        "previewVault": "orbit360-insurer-credentials-preview-{tenantId}",
+        "liveVault": "orbit360-insurer-credentials-{tenantId}",
+        "backendEnforcesVaultIsolation": true,
+        "uiLocalStatusNotRemoteVaultPresence": true
+      },
+      "adjudication": "PREVIEW_REAL_CREDENTIAL_UNAVAILABLE_IS_EXPLAINED_BY_SEPARATE_VAULT; NOT EVIDENCE THAT PREVIOUSLY LIVE-APPROVED PRODUCT_CREDENTIAL_REVEAL/COPY REGRESSED; actual unavailable status could also be authorization/provider failure until backend readback, no secret read attempted",
+      "releaseRule": "Do not bypass preview isolation, copy/seed production secrets into preview, alter roles/rules/IAM, or rebuild solely to alter this preview fixture. Preserve historical 3/3 PASS. Use already-approved synthetic isolated Preview canary when current proof needed, and re-check actual LIVE reveal and copy with authorized account after SAME artifact promotion.",
+      "currentLiveRetestPerformed": false,
+      "productionTouched": false,
+      "secretsReadOrLogged": false,
+      "isNewGeneralAuditBlocker": false
     }
   },
   "b4003PersonalCollectionP0SignedClosure20261106": {
