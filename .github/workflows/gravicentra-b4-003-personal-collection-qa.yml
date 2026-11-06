@@ -11,6 +11,10 @@ on:
         type: choice
         options: [create, cleanup]
         default: cleanup
+  push:
+    branches: [recovery/fase-a-clean-20260831]
+    paths:
+      - artifacts/orbit360-recovery/release-control/I6_5_B4_003_PERSONAL_COLLECTION_QA_REQUEST_20261106.json
 permissions:
   contents: read
 concurrency:
@@ -35,6 +39,21 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - name: Resolve one exact approved existing-gate request
+        run: |
+          set -euo pipefail
+          if [ "$GITHUB_EVENT_NAME" = 'push' ]; then
+            node - <<'NODE'
+          const fs=require('node:fs'),p='artifacts/orbit360-recovery/release-control/I6_5_B4_003_PERSONAL_COLLECTION_QA_REQUEST_20261106.json';
+          const x=JSON.parse(fs.readFileSync(p,'utf8'));
+          if(x.schema!=='B4-003-P0-PERSONAL-20261106-V1'||x.status!=='REQUESTED'||
+             !['create','cleanup'].includes(x.phase)||x.tenantId!=='alianzas-soluciones'||
+             x.syntheticOnly!==true||x.realBusinessWrites!==false||x.liveDeploy!==false)
+            throw Error('EXACT_B4_003_PERSONAL_QA_REQUEST_INVALID');
+          fs.appendFileSync(process.env.GITHUB_ENV,'QA_PHASE='+x.phase+'\n');
+          console.log('EXACT_PERSONAL_QA_REQUEST='+x.phase);
+          NODE
+          fi
       - name: Guard canonical branch and frozen B4-003 owner authorization
         run: |
           set -euo pipefail
