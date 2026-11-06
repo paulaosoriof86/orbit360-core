@@ -15,5 +15,11 @@
     "b4003p0personal_payment_20261106",
     "b4003p0personal_meta_20261106"
   ],
-  "cleanupRequired": true
+  "cleanupRequired": true,
+  "attempt": 2,
+  "previousAttempt": {
+    "runId": 42238285221,
+    "status": "FAIL_BEFORE_ANY_WRITE",
+    "cause": "QA_HARNESS_VARIABLE_NAME_ONLY"
+  }
 }
