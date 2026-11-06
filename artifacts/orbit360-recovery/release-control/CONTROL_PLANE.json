@@ -19004,7 +19004,35 @@
         "scope": "SIGNED_DIRECCION_TODOS_FIRST_PAINT_PLUS_HYDRATED_KPIS",
         "preservedRealRows": true,
         "qaRecordPhysicalChanges": 0,
-        "doesNotProveAllRolesOrPersistenceWritesOrLive": true
+        "doesNotProveAllRolesOrPersistenceWritesOrLive": true,
+        "signedCountryReadback": {
+          "role": "Paula_Direccion",
+          "TODOS": {
+            "commercialClients": 439,
+            "activeCommercialPolicies": 223,
+            "commercialPolicies": 1416,
+            "netPremiumGTQ": 632719,
+            "netPremiumCOP": 175456570,
+            "qaAuditClients": 1
+          },
+          "GT": {
+            "commercialClients": 390,
+            "activeCommercialPolicies": 196,
+            "commercialPolicies": 1291,
+            "netPremiumGTQ": 632719,
+            "qaAuditClients": 1
+          },
+          "CO": {
+            "commercialClients": 49,
+            "activeCommercialPolicies": 27,
+            "commercialPolicies": 125,
+            "netPremiumCOP": 175456570,
+            "qaAuditClients": 0
+          },
+          "sumInvariants": "GT_PLUS_CO_EQUALS_TODOS_FOR_CLIENTS_ACTIVE_AND_TOTAL_POLICIES",
+          "signedCountryRestored": "TODOS",
+          "otherPrincipalsStillNeedUat": true
+        }
       }
     ],
     "currentReleaseBinding": {
@@ -19272,6 +19300,71 @@
     "readbackUnmatchedCommercialPolicies": 0,
     "noDataWrites": true,
     "fullGate": "HOLD",
-    "liveDeploy": false
+    "liveDeploy": false,
+    "countryReadback": {
+      "role": "Paula_Direccion",
+      "TODOS": {
+        "commercialClients": 439,
+        "activeCommercialPolicies": 223,
+        "commercialPolicies": 1416,
+        "netPremiumGTQ": 632719,
+        "netPremiumCOP": 175456570,
+        "qaAuditClients": 1
+      },
+      "GT": {
+        "commercialClients": 390,
+        "activeCommercialPolicies": 196,
+        "commercialPolicies": 1291,
+        "netPremiumGTQ": 632719,
+        "qaAuditClients": 1
+      },
+      "CO": {
+        "commercialClients": 49,
+        "activeCommercialPolicies": 27,
+        "commercialPolicies": 125,
+        "netPremiumCOP": 175456570,
+        "qaAuditClients": 0
+      },
+      "sumInvariants": "GT_PLUS_CO_EQUALS_TODOS_FOR_CLIENTS_ACTIVE_AND_TOTAL_POLICIES",
+      "signedCountryRestored": "TODOS",
+      "otherPrincipalsStillNeedUat": true
+    }
+  },
+  "b4003SignedEquipoRosterReadOnly20261106": {
+    "status": "SIGNED_PAULA_DIRECCION_TODOS_FOCAL_READ_ONLY_PASS_NOT_FULL_MODULE_PASS",
+    "dateLocal": "2026-11-06",
+    "sourceSha": "f3e4503afbc7f3a67086d0e8ad0cc1b623743c39",
+    "buildId": "gi-i65-b4-f3e4503afbc7-57f234755dc1",
+    "usersTotal": 7,
+    "internals": 4,
+    "freelancersGoalExcluded": 3,
+    "freelancersByName": [
+      "Braulio Hernández",
+      "Johanna Salgado",
+      "Nicole Castro"
+    ],
+    "countryRolesObserved": [
+      "Paula_SuperAdmin_GT_CO",
+      "Carlos_Operativo_Asesor_GT_CO",
+      "Samuel_AdminTenant_Operativo_Asesor_GT_CO",
+      "Fernando_Asesor_Asistente_GT"
+    ],
+    "writes": 0,
+    "doesNotCertifyOtherPrincipals": true
+  },
+  "b4003OpsLeadsHistoricalAttributionReadOnly20261106": {
+    "status": "PARTIAL_NEW_HUMAN_NAMES_OBSERVED_HISTORICAL_GENERIC_AUTHOR_REMAINS",
+    "signedRole": "Paula_Direccion_TODOS",
+    "opsExample": "Renovación aceptada",
+    "opsHistoricalEventsGeneric": 2,
+    "leadsExample": "Vida Temporal",
+    "leadsHistoricalCommentsGeneric": 4,
+    "leadsRecentNamedEvents": "Samuel Daza",
+    "technicalEmailDisplayedAsCommentAuthor": false,
+    "sourceResolver": "orbit360-platform/core/ciclo.js:humanCommentAuthor",
+    "reasonUndetermined": "HISTORICAL_ACTOR_UID_PROVENANCE_NOT_YET_VERIFIED",
+    "doNotInferHistoricalIdentity": true,
+    "notTransversalPass": true,
+    "noDataMutation": true
   }
 }
