@@ -77,6 +77,27 @@ test('commercial pending, overdue and confirmed values exclude explicit, inherit
   assert.deepEqual(Array.from(q.carteraVencidaRows(),x=>x.id).sort(),['overCO','overGT']);
   assert.deepEqual(Array.from(q.cobrosConfirmadosRows(),x=>x.id).sort(),['paidCO','paidGT']);
   assert.equal(writes,0);
+  // B4-003: operational Cobros rows must not re-expose QA omitted from KPIs.
+  const cobrosSource=fs.readFileSync('orbit360-platform/modules/cobros.js','utf8');
+  const start=cobrosSource.indexOf('  function commercialCobrosRow(');
+  const end=cobrosSource.indexOf('\n  function rows(',start);
+  assert.ok(start>0&&end>start,'COBROS_COMMERCIAL_QA_FILTER_MISSING');
+  const idx={
+    policies:new Map([['good',{id:'good',clienteId:'goodClient'}],['qaPolicy',{id:'qaPolicy',clienteId:'goodClient',__syntheticQa:true}],['b2',{id:'b2',clienteId:'goodClient',sourceRef:'B2 QA firme — rótulo'}],['qaClientPolicy',{id:'qaClientPolicy',clienteId:'qaClient'}]]),
+    clients:new Map([['goodClient',{id:'goodClient'}],['qaClient',{id:'qaClient',syntheticQa:true}]])
+  };
+  const context={q,indexPolicy:(i,id)=>i.policies.get(String(id||''))||null,indexClient:(i,id)=>i.clients.get(String(id||''))||null};
+  vm.runInNewContext(cobrosSource.slice(start,end),context,{timeout:1500});
+  const visible=context.commercialCobrosRow;
+  assert.equal(visible({polizaId:'good'},idx),true,'REAL_COMMERCIAL_ROW_KEPT');
+  assert.equal(visible({polizaId:'good',__syntheticQa:true},idx),false,'EXPLICIT_QA_ROW_EXCLUDED');
+  assert.equal(visible({polizaId:'qaPolicy'},idx),false,'QA_PARENT_POLICY_EXCLUDED');
+  assert.equal(visible({polizaId:'b2'},idx),false,'B2_QA_SOURCE_REF_EXCLUDED');
+  assert.equal(visible({polizaId:'qaClientPolicy'},idx),false,'QA_PARENT_CLIENT_EXCLUDED');
+  assert.match(cobrosSource,/rows\(idx\)\.filter\(row => commercialCobrosRow/);
+  assert.match(cobrosSource,/portfolioPaymentRows\(idx\)\.filter\(row => commercialCobrosRow/);
+  assert.match(cobrosSource,/reportedRows\(idx\)\.filter\(row => commercialCobrosRow/);
+  assert.match(cobrosSource,/countryMatches\(c, idx\) && commercialCobrosRow\(c, idx\)/);
 });
 
 test('GT, CO and TODOS preserve country scope and TODOS equals GT plus CO without double counting',()=>{
