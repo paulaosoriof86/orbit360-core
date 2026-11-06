@@ -10,7 +10,7 @@
   "branch": "recovery/fase-a-clean-20260831",
   "forensicOriginSha": "9c95f31461f2eabe9804625b5659bee772f5602a",
   "createdAtUtc": "2026-08-31T18:00:00Z",
-  "updatedAtUtc": "2026-11-06T17:44:26.637Z",
+  "updatedAtUtc": "2026-11-06T22:03:41Z",
   "status": "ITERATION_2_SOURCE_MATERIALIZED_VALIDATION_PENDING",
   "currentIteration": 2,
   "lastCompletedIteration": 1,
@@ -187,7 +187,7 @@
     "phaseAIterationStatuses": "HISTORICAL_FIELDS_ABOVE_PRESERVED_UNTIL_FORMAL_GATE_EVIDENCE;_NO_NEW_PASS_INFERRED",
     "labDataWriteScope": "ONLY_35_AUTHORIZED_COUNTRY_FIELDS;_NO_AUGUST_REFRESH"
   },
-  "nextAction": "B4-003 2026-11-06 CURRENT EXACT CANDIDATE: immutable Preview run 42266346904 SUCCESS, source b01dceafc1ec2b1e786626116251e248be1e23f4 (last product source change 50bf069aaf3386bfc2c5f3dd25dc0776567b130f), build gi-i65-b4-b01dceafc1ec-57f234755dc1, archive artifact 13527102882 tar.sha256 a5c0853e39a4ec6c601565b57c505cd3bbbf565564dc02076166acf3a1295621, readback artifact 13528110095. Signed Paula Operativo-mode TODOS Inicio hydrated commercial indicators 439 clients/1416 policies, previously raw 440/1425 QA-inclusive; same served build source readback; QA retained physically (6 B4+3 B2), zero deletion/reimport. Prior signed Paula Direccion TODOS Cliente360 439 commercial clients/223 active/1416 policies, GT+CO parity; Cobros QA searches 0 and commercial sums protected. Asesor simulation denied insurers direct route, Operativo exposed directory/edit/accounts/username/masked password controls (reveal success and actual admin principals not yet certified). Formal I6 50%, 4 functional P0 PASS+2 OWNER_DEFERRED (not PASS); B4-003 HOLD; NEXT historical Ops/Leads human author provenance, remaining current module x role x country x viewport Preview actions and persistence, then ONLY same retained artifact LIVE byte check/controlled writes/rollback. NO production promotion, Rules/Auth/data writes.",
+  "nextAction": "B4-003 CURRENT OPERATIONAL AUTHORITY: CONTROL_PLANE.json#b4003ActiveCertificationCursor20261106 and #b4003CertificationInventory20261106. Preserve current #40 source b01dceafc1ec2b1e786626116251e248be1e23f4, build gi-i65-b4-b01dceafc1ec-57f234755dc1, immutable artifact 13527102882, readback artifact 13528110095. Resume prospective Ops/Leads author proof using latest existing fixture b4003qa_user_mw5htkgl_31u61t (creation persisted, zero comments) and original author fixture b4003qa_user_mw5eas6v_lphfrl (comment persisted, immediate human UI label; durable actorName/user email-valued). Both remain archivado:false; successful cleanup is pending and is not covered automatically by the deferred old QA cohorts. Prove required authenticated actor write/read/reload and remaining current Preview module x role x country x viewport deltas. Preserve all unaffected signed tests, four functional P0 PASS and two owner-deferred QA items (not PASS), formal I6 50%. Historical unresolved authors require no retroactive rewrite and are not release blockers. Preserve Aseguradoras historical 3/3; separate Preview vault is not a new general blocker; real LIVE reveal/copy retest follows same-artifact promotion. Prior product snapshot deadlines are WATCH after 3/3 recovery; browser focus automation timeouts are separate. B4-003 remains HOLD, productionPromotionAuthorized=false. Same retained artifact may be promoted only after applicable Preview formal PASS and authorized gate, followed by exact LIVE readback, controlled write/reload/restore, integrity and rollback. No reimport or routine Rules/Auth work.",
   "sourceOfTruth": {
     "projectBoundaryPrevalentAddendum": "orbit360-platform/docs/recovery/ADDENDUM_PREVALENTE_CHATGPT_PROJECT_BOUNDARY_20260831.md",
     "mutableState": "orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json",
@@ -408,7 +408,8 @@
       "Samuel Daza"
     ],
     "noTechnicalEmailsAsAuthors": true,
-    "noDataWrites": true
+    "noDataWrites": true,
+    "currentDisposition": "SUPERSEDED_AS_EXECUTION_BLOCKER_BY_CURRENT_CONTROL_PLANE_CURSOR; NO_RETROACTIVE_REWRITE_NOT_RELEASE_BLOCKING"
   },
   "b4003InicioCommercialQaCountsSignedReadback20261106": {
     "status": "FOCAL_PREVIEW_PASS_NOT_FULL_MODULE_PASS",
@@ -440,5 +441,19 @@
     "actualPasswordRevealNotCertified": true,
     "otherRolePrincipalsNotCertified": true,
     "noDataWrites": true
+  },
+  "b4003ActiveCertificationResume20261106": {
+    "recordedAtUtc": "2026-11-06T22:03:41Z",
+    "authorityPath": "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json",
+    "cursorKey": "b4003ActiveCertificationCursor20261106",
+    "inventoryKey": "b4003CertificationInventory20261106",
+    "evidenceReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CURRENT40_LEADS_NEW_HUMAN_AUTHOR_SYNTHETIC_UI_20261106.json",
+    "existingFindingId": "B4-003-UAT-20261011-03",
+    "latestInterruptedFixtureId": "b4003qa_user_mw5htkgl_31u61t",
+    "priorCommentFixtureId": "b4003qa_user_mw5eas6v_lphfrl",
+    "releaseStatus": "B4-003_HOLD",
+    "historicalTopLevelIterationFieldsAreNotActiveGate": true,
+    "b4003Closed": false,
+    "productionPromotionAuthorized": false
   }
 }

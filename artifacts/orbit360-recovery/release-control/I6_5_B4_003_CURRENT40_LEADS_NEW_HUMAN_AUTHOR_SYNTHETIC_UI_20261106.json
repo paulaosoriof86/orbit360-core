@@ -1,6 +1,6 @@
 {
   "schema": "GRAVICENTRA_I65_B4_003_CURRENT40_PROSPECTIVE_HUMAN_AUTHOR_ISOLATED_UI_PROOF_V1",
-  "recordType": "ADDITIVE_FOCAL_BROWSER_HUMAN_AUTHOR_WRITE_PROOF_CLEANUP_READBACK_PENDING",
+  "recordType": "ADDITIVE_FOCAL_BROWSER_HUMAN_AUTHOR_WRITE_PROOF_WITH_DURABLE_CONTINUITY_READBACK",
   "dateLocal": "2026-11-06",
   "gate": "I6.5/B4-003",
   "sourceSha": "b01dceafc1ec2b1e786626116251e248be1e23f4",
@@ -15,7 +15,9 @@
     "mode": "PREVIEW_SYNTHETIC_ISOLATED",
     "businessEntityChanged": false,
     "createdByBuiltInTestAction": true,
-    "authorTestComment": "B4-003 #40 prueba aislada de autor visible, recarga y limpieza; 06/11/2026."
+    "authorTestComment": "B4-003 #40 prueba aislada de autor visible, recarga y limpieza; 06/11/2026.",
+    "id": "b4003qa_user_mw5eas6v_lphfrl",
+    "matchEvidence": "Exact author-test comment, event ID and timestamp from durable Firestore readback"
   },
   "observed": {
     "newCommentPersistedInImmediateUi": true,
@@ -31,19 +33,124 @@
     "builtInActionClicked": "Limpiar documentos y archivar prueba",
     "confirmDialogAccepted": true,
     "confirmationDialogDismissed": true,
-    "finalBackendReadbackVerified": false,
-    "reason": "Chrome extension/CDP focus timeouts after confirmation; tab unavailable for stable post-action readback",
-    "noClaimZeroResidue": true
+    "finalBackendReadbackVerified": true,
+    "reason": "Read-only durable readback recovered after interruption: original fixture remains archivado:false; prior cleanup button/confirmation did not establish successful archive.",
+    "noClaimZeroResidue": true,
+    "initialReadbackGapReason": "Chrome extension/CDP focus timeouts after confirmation; tab unavailable for stable post-action readback",
+    "finalBackendReadbackResult": "EXISTING_FIXTURE_PRESENT_ARCHIVADO_FALSE",
+    "cleanupSucceeded": false,
+    "evidenceBoundary": "Cleanup was attempted earlier; readback now proves archivado:false, not successful archival. No inference about unobserved intermediate cleanup steps."
   },
   "status": "FOCAL_NEW_LEADS_AUTHOR_WRITE_UI_PASS_ONLY_CLEANUP_AND_CROSS_ROLE_RELOAD_PENDING",
   "notProven": [
-    "Same fixture after full page reload",
+    "Same fixture in product UI after full page reload",
     "Cross-role authorized reader (Carlos, Samuel)",
     "Ops new author writer",
-    "Synthetic fixture physical deletion or archival readback",
+    "Successful synthetic fixture archival cleanup (current durable readback is archivado:false)",
     "LIVE"
   ],
   "productionGateStillHold": true,
   "noSourceEdit": true,
-  "noRealBusinessMutation": true
+  "noRealBusinessMutation": true,
+  "continuityRecovery20261106": {
+    "recordedAtUtc": "2026-11-06T22:03:41Z",
+    "existingFindingId": "B4-003-UAT-20261011-03",
+    "method": "AUTHENTICATED_FIREBASE_CONSOLE_READ_ONLY_EXISTING_DOCUMENTS_AND_CURRENT_CANDIDATE_SOURCE_INSPECTION",
+    "collectionPath": "tenants/alianzas-soluciones/data/negocios/items",
+    "browserPreviewBuildMatchesCurrent40": true,
+    "sourceAndHeadComparison": {
+      "candidateSourceSha": "b01dceafc1ec2b1e786626116251e248be1e23f4",
+      "comparedHeadSha": "737ca2b3db6d8f0e21f4bf880699b6c9a1cbe5d2",
+      "commitsAhead": 18,
+      "changedPaths": 7,
+      "productOrBackendPathsChanged": 0,
+      "scope": "GOVERNANCE_AND_EXISTING_EVIDENCE_ONLY"
+    },
+    "fixtures": [
+      {
+        "id": "b4003qa_user_mw5eas6v_lphfrl",
+        "role": "PREVIOUS_AUTHOR_COMMENT_FIXTURE",
+        "matchedBy": "EXACT_AUTHOR_TEST_COMMENT_AND_EVENT_TIMESTAMP",
+        "createdAtDisplay": "2026-11-06 13:56:42 UTC-6",
+        "updatedAtDisplay": "2026-11-06 13:57:08 UTC-6",
+        "previewWrite": true,
+        "previewSource": "hosting-preview-uat",
+        "archivado": false,
+        "commentCount": 1,
+        "commentType": "Comentario comercial",
+        "commentEventId": "collab_mw5ebfro_bxdmr",
+        "commentTs": "2026-11-06T19:57:04.020Z",
+        "commentDirection": "",
+        "commentActorUidPresent": true,
+        "commentActorUidMatchesCreator": true,
+        "commentActorNameIsEmail": true,
+        "commentUserIsEmail": true,
+        "bitacoraActorNameIsEmail": true,
+        "bitacoraUserIsEmail": true,
+        "attachment": null,
+        "immediateUiAuthorPreviouslyObserved": "Paula Osorio",
+        "commentPersisted": true,
+        "successfulArchiveConfirmed": false
+      },
+      {
+        "id": "b4003qa_user_mw5htkgl_31u61t",
+        "role": "LATEST_INTERRUPTED_SCREENSHOT_FIXTURE_RESUME_HERE",
+        "createdAtDisplay": "2026-11-06 15:35:17 UTC-6",
+        "updatedAtDisplay": "2026-11-06 15:35:17 UTC-6",
+        "previewWrite": true,
+        "previewSource": "hosting-preview-uat",
+        "archivado": false,
+        "commentCount": 0,
+        "bitacoraCount": 1,
+        "creationEvent": "Creación / Ingreso (Leads)",
+        "creationEventTs": "2026-11-06T21:35:17.198Z",
+        "creationActorName": "Paula Osorio",
+        "creationUser": "Paula Osorio",
+        "creationActorUidPresent": true,
+        "creationActorUidMatchesCreator": true,
+        "creationDurablyConfirmed": true,
+        "subsequentCollaborationNotObserved": true,
+        "successfulArchiveConfirmed": false
+      }
+    ],
+    "prospectiveAuthorContractFinding": {
+      "scope": "EXISTING_OPEN_PROSPECTIVE_AUTHOR_FINDING_ONLY_NOT_HISTORICAL_ATTRIBUTION",
+      "clientOwner": {
+        "path": "orbit360-platform/core/ciclo.js",
+        "gitBlobSha": "4ea4c9c366d23900faee7033ca2283804f714b65",
+        "observation": "currentUserIdentity may accept an email-valued name; humanCommentAuthor resolves the visible author independently by UID/roster"
+      },
+      "serverOwner": {
+        "path": "functions/product-ops-leads-domain.js",
+        "gitBlobSha": "2fb2ec7aef5d9942acdb1ecc4604040febb33123",
+        "observation": "canonicalizeCollaborationPayload rewrites new event actors only when direction is advisor or operations; Comentario comercial has empty direction"
+      },
+      "causalInference": "The source distinction is consistent with an email persisted on the first commercial comment and a human name persisted on the second creation event; this does not invalidate the previously observed immediate human UI label",
+      "crossAuthenticatedWriteReadReloadStillRequired": true,
+      "noRetroactiveAuthorRewrite": true
+    },
+    "resume": {
+      "fixtureId": "b4003qa_user_mw5htkgl_31u61t",
+      "priorCommentFixtureId": "b4003qa_user_mw5eas6v_lphfrl",
+      "doNotCreateThirdFixture": true,
+      "createActionIsNotReopen": true,
+      "nextOnly": "Continue the already-open prospective Ops/Leads actor proof on these exact fixtures using supported product UI or the approved existing harness; prove authenticated actor/read/reload across required principals and the Ops write path, then confirmed archival cleanup. Preserve unaffected signed evidence.",
+      "oldQaCohortCleanupDeferralDoesNotAutomaticallyCoverTheseFixtures": true
+    },
+    "limitations": {
+      "fullInterruptedTranscriptRecovered": false,
+      "fullCurrentModuleRoleCountryViewportMatrixProven": false,
+      "actualCarlosSamuelPostWriteAndReloadProven": false,
+      "latestFixtureCommentWritten": false,
+      "successfulFixtureCleanupProven": false,
+      "browserIssue": "App interaction/focus commands timed out with Runtime.evaluate / Emulation.setFocusEmulationEnabled; DOM reads and Firebase document reads remained available. This is not evidence of a reproduced product STORE_SNAPSHOT_ERROR."
+    },
+    "noProductSourceChange": true,
+    "noBuild": true,
+    "noNewPreview": true,
+    "noRealBusinessWrites": true,
+    "noSyntheticDataWritesDuringRecovery": true,
+    "noLivePromotion": true,
+    "gateUnchanged": true
+  }
 }
