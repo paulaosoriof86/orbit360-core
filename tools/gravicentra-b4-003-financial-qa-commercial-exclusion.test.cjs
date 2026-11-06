@@ -97,7 +97,18 @@ test('commercial pending, overdue and confirmed values exclude explicit, inherit
   assert.match(cobrosSource,/rows\(idx\)\.filter\(row => commercialCobrosRow/);
   assert.match(cobrosSource,/portfolioPaymentRows\(idx\)\.filter\(row => commercialCobrosRow/);
   assert.match(cobrosSource,/reportedRows\(idx\)\.filter\(row => commercialCobrosRow/);
-  assert.match(cobrosSource,/countryMatches\(c, idx\) && commercialCobrosRow\(c, idx\)/);
+  assert.match(cobrosSource,/countryMatches\\(c, idx\\) && commercialCobrosRow\\(c, idx\\)/);
+  // Cliente 360 keeps QA records audit-visible, never in the commercial client counter.
+  const cliente360Source=fs.readFileSync('orbit360-platform/modules/cliente360.js','utf8');
+  assert.match(cliente360Source,/const commercialClientRows = rows\\.filter\\(c => !isQaRecord\\(c\\)\\)/);
+  assert.match(cliente360Source,/const kpiClientIds = new Set\\(commercialClientRows\\.map/);
+  assert.match(cliente360Source,/data-c360-kpi-client-count="\\$\\{commercialClientRows\\.length\\}"/);
+  assert.match(cliente360Source,/Clientes comerciales<\\/div><div class="k-val">\\$\\{commercialClientRows\\.length\\}/);
+  assert.match(cliente360Source,/data-c360-qa-audit="\\$\\{isQaAudit/);
+  assert.match(cliente360Source,/QA · solo auditoría/);
+  assert.equal(q.isSyntheticQaRecord({id:'qaClient',__syntheticQa:true}),true);
+  assert.equal(q.isSyntheticQaRecord({id:'b2',sourceRef:'B2 QA firme — histórico'}),true);
+  assert.equal(q.isSyntheticQaRecord({id:'commercial',nombre:'Cliente real'}),false);
 });
 
 test('GT, CO and TODOS preserve country scope and TODOS equals GT plus CO without double counting',()=>{
