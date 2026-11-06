@@ -18811,10 +18811,10 @@
     "signedContextualInicioP0Accepted": true
   },
   "b4003CertificationInventory20261106": {
-    "schema": "GRAVICENTRA_I6_5_B4_003_CERTIFICATION_INVENTORY_AND_SYNC_20261106_V4",
+    "schema": "GRAVICENTRA_I6_5_B4_003_CERTIFICATION_INVENTORY_AND_SYNC_20261106_V5",
     "gate": "I6.5/B4-003",
     "recordType": "ADDITIVE_RELEASE_SCOPED_CERTIFICATION_INDEX_NOT_GATE_PASS",
-    "status": "THREE_FOCAL_P0_SIGNED_PASSES_TWO_QA_P0_AND_FULL_GATE_HOLD",
+    "status": "FOUR_FUNCTIONAL_P0_PASS_TWO_QA_OWNER_DEFERRED_FULL_GATE_HOLD",
     "dateLocal": "2026-11-06",
     "authority": "CONTROL_PLANE_CURRENT_B4003_POINTER_AND_PHYSICAL_RECEIPTS",
     "historicalEvergreenCapabilities": {
@@ -18958,14 +18958,18 @@
       "b4003Closed": false,
       "productionPromotionAuthorized": false,
       "remainingEvidenceRequired": [
-        "TWO_REMAINING_QA_PROVENANCE_P0_EXACT_ADJUDICATION_AND_NON_DESTRUCTIVE_DISPOSITION",
+        "COBROS_QA_PORTFOLIO_ROW_VISIBLE_IN_COMMERCIAL_LIST_REQUIRES_FOCAL_UI_ISOLATION_BEFORE_MODULE_ACCEPTANCE",
         "OPS_LEADS_HUMAN_AUTHOR_TRANSVERSAL_RESOLVER",
         "FULL_CURRENT_MODULE_ROLE_COUNTRY_VIEWPORT_PREVIEW_MATRIX_NOT_ONLY_FOCAL_UAT",
         "SAME_RETAINED_ARTIFACT_INDEPENDENT_LIVE_DIGEST_AND_MODULE_BY_MODULE_READBACK"
       ],
       "fullGateRemainsHold": true,
       "goalParticipationWriterSignedSevenOfSeven": true,
-      "existingPreviewSourceAndServedBytesCertified": true
+      "existingPreviewSourceAndServedBytesCertified": true,
+      "p0DeferredWithOwnerAuthorization": 2,
+      "qaPhysicalCleanupBlocking": false,
+      "qaKpiExcludedFromCommerceVerified": true,
+      "cobrosQaOperationalListLeakStillOpen": true
     },
     "projectSources": {
       "package": "GRAVICENTRA_PROJECT_SOURCES_EVERGREEN_V7",
@@ -19066,5 +19070,58 @@
     "noSourceChange": true,
     "noRealWrites": true,
     "noProductionPromotion": true
+  },
+  "b4003OwnerQaPhysicalRetentionAuthorized20261106": {
+    "schema": "GI_I65_B4003_QA_OWNER_NONDESTRUCTIVE_POSTPROD_DISPOSITION_V1",
+    "dateLocal": "2026-11-06",
+    "status": "TWO_QA_P0_OWNER_DEFERRED_NONBLOCKING_FULL_GATE_HOLD",
+    "owner": "Paula Andrea Osorio Franco",
+    "consentScope": "PHYSICAL_CLEANUP_ONLY_POSTPRODUCTION_KEEP_ALL_RECORDS_INTACT",
+    "conditionSatisfied": "COMMERCIAL_KPI_EXCLUSION_SOURCE_5_5_AND_PIPELINE_11_11_SIGNED_PREVIEW",
+    "sourceSha": "3e87722d54871198a02d9b0909971fa2f4f913af",
+    "signedPreview": "https://ays-orbit-360-lab--gi-i65-b4-rc-41765742748-neoi3u7r.web.app/",
+    "policies": {
+      "rawTotal": 1425,
+      "qaAuditSeparate": 9,
+      "commercial": 1416,
+      "threeB2OrphansInAudit": true,
+      "commercialActive": 223,
+      "commercialNetPremiumGTQ": 632719,
+      "commercialNetPremiumCOP": 175456570
+    },
+    "cobros": {
+      "kpiConfirmedPayments": 5,
+      "kpiConfirmedGTQ": 2744,
+      "kpiPendingGTQ": 2396,
+      "kpiOverdueGTQ": 227367,
+      "kpiOverdueCOP": 109875840,
+      "b2RenQueryCommercialRows": 0,
+      "b4QueryCommercialRows": 1,
+      "b4QaRowGtt": 683.2,
+      "kpiValuesInvariantUnderSearch": true,
+      "operationalListQaLeak": "OPEN_MODULE_UX_DEFECT_NOT_KPI_PASS"
+    },
+    "exactReadback": {
+      "workflowRun": 41144205677,
+      "roots": 17,
+      "recordsObserved": 65,
+      "recordsPresent": 56,
+      "missingParentReferences": 9,
+      "declaredEdges": 147,
+      "physicalMutation": 0
+    },
+    "ledgerCommit": "d78d67b799c473f3c229334dabfe1e37d20a3047",
+    "frozenP0": {
+      "passed": 4,
+      "deferredWithOwner": 2,
+      "total": 6
+    },
+    "formalI6Percent": 50,
+    "b4003Closed": false,
+    "productionAccepted": false,
+    "noDataMutation": true,
+    "noDataReimport": true,
+    "noRulesDeploy": true,
+    "noNewBranchOrPreview": true
   }
 }
