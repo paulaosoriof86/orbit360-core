@@ -1,4 +1,5 @@
 # B4-003 same-artifact release lane (reusable); does not touch LIVE, Rules, Auth or business data.
+# Team classification projection repair updates only the EXISTING Preview read callable.
 # 2026-11-05: causal same-channel rebuild for source/runtime resource reconciliation (no LIVE/data changes).
 # 2026-11-05: final anti-drift commit - every canonical push runs governance; guarded from path-filter regressions.
 # 2026-11-05: advisor visibility selector and exact Inicio/Equipo served-byte readback.
@@ -19,6 +20,8 @@ on:
       - orbit360-platform/modules/equipo.js
       - orbit360-platform/data/store-firestore-product-operational-p0.js
       - tests/goal-participation-classification-writer.test.cjs
+      - functions/b4-003-scoped-bootstrap-reader.js
+      - tools/gravicentra-b4-003-scoped-bootstrap-reader.test.cjs
       - tools/gravicentra-b4-003-financial-qa-commercial-exclusion.test.cjs
 
 permissions:
@@ -82,6 +85,7 @@ jobs:
           node --check orbit360-platform/modules/polizas.js
           node --check orbit360-platform/modules/policy-receipts-v1199-detail-guard.js
           node tools/gravicentra-b4-003-scoped-policy-reader.test.cjs
+          node tools/gravicentra-b4-003-scoped-bootstrap-reader.test.cjs
           node tools/gravicentra-b4-003-polizas-advisor-hydration-20261102.test.cjs
           node tools/gravicentra-b4-003-policy-client-scope-link.test.cjs
           node --check orbit360-platform/modules/reportes.js
@@ -146,6 +150,32 @@ jobs:
           echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/gi-e4-auth/selected.json" >> "$GITHUB_ENV"
           echo "FIREBASE_CLI_BIN=$CLI" >> "$GITHUB_ENV"
           npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund firebase-admin@13.4.0 >/dev/null
+      - name: Repair ONLY existing scoped Preview reader team fields; no LIVE, Rules or Auth deploy
+        working-directory: candidate
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$SOURCE_SHA"
+          node tools/gravicentra-b4-003-scoped-bootstrap-reader.test.cjs
+          STAGING="$RUNNER_TEMP/gi-b4003-team-reader-preview"
+          mkdir -p "$STAGING"
+          cp -a functions "$STAGING/backend"
+          cmp functions/b4-003-scoped-bootstrap-reader.js "$STAGING/backend/b4-003-scoped-bootstrap-reader.js"
+          node - "$STAGING/backend/bootstrap.js" <<'NODE'
+          const fs=require('node:fs'),entry=process.argv[2],s=fs.readFileSync(entry,'utf8');
+          if(s.includes("require('./b4-003-scoped-policy-callable')"))throw Error('B4_003_READER_DUPLICATE_EXPORT');
+          fs.appendFileSync(entry,"\n// Only the existing Preview reader is selected for deployment.\nObject.assign(module.exports,require('./b4-003-scoped-policy-callable'));\n");
+          NODE
+          printf '{"functions":{"source":"backend"}}\n' > "$STAGING/firebase.json"
+          npm ci --prefix "$STAGING/backend" --ignore-scripts --no-audit --no-fund >/dev/null
+          node "$FIREBASE_CLI_BIN" deploy --only functions:orbit360ScopedPolicyReadPreview --config "$STAGING/firebase.json" --project "$PROJECT_ID" --non-interactive
+          node "$FIREBASE_CLI_BIN" functions:list --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/gi-team-reader-preview-readback.json"
+          node - "$RUNNER_TEMP/gi-team-reader-preview-readback.json" <<'NODE'
+          const fs=require('node:fs'),d=JSON.parse(fs.readFileSync(process.argv[2],'utf8'));
+          const r=Array.isArray(d.result)?d.result:Array.isArray(d)?d:[];
+          if(r.filter(x=>String(x.id||x.name||x.function||'').split('/').pop()==='orbit360ScopedPolicyReadPreview').length!==1)
+            throw Error('TEAM_READER_PREVIEW_FUNCTION_READBACK_MISSING');
+          console.log('TEAM_READER_PREVIEW_FUNCTION_PRESENT; LIVE_HOSTING_RULES_AUTH_UNCHANGED');
+          NODE
       - name: Build immutable exact E4 Hosting package once
         working-directory: candidate
         run: |

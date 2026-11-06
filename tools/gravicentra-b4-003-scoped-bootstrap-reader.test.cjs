@@ -74,7 +74,7 @@ async function denied(fn,code){let e;try{await fn()}catch(err){e=err}
     cuentas:[{banco:'Banco',tipo:'Monetaria',numero:'001122',moneda:'GTQ'}]},
    {id:'insCO',tenantId,pais:'CO',nombre:'Aseguradora CO'}],
   asesores:[
-   {id:'a1',tenantId,paises:['GT','CO'],nombre:'Asesora Uno'},
+   {id:'a1',tenantId,paises:['GT','CO'],nombre:'Asesora Uno',tipoVinculacion:'freelance',participaMetas:false,privateKey:'DO_NOT_RETURN'},
    {id:'a2',tenantId,paises:['GT'],nombre:'Asesor Dos'},
    {id:'a3',tenantId,paises:['CO'],nombre:'Asesor Tres'}]
  };
@@ -110,6 +110,8 @@ async function denied(fn,code){let e;try{await fn()}catch(err){e=err}
  await denied(()=>dir('aseguradoras','GT','Asesor'),'DIRECTORY_DENIED');directoryChecks++;
  const one=await dir('asesores','GT','Admin',{pageSize:1});
  assert.deepEqual(one.rows.map(x=>x.id),['a1']);assert.equal(one.nextCursor,'a1');directoryChecks++;
+ assert.equal(one.rows[0].tipoVinculacion,'freelance');assert.equal(one.rows[0].participaMetas,false);directoryChecks++;
+ assert.equal(JSON.stringify(one.rows[0]).includes('DO_NOT_RETURN'),false);directoryChecks++;
  const two=await dir('asesores','GT','Admin',{pageSize:1,cursor:'a1'});
  assert.deepEqual(two.rows.map(x=>x.id),['a2']);assert.equal(two.nextCursor,null);directoryChecks++;
  await denied(()=>dir('asesores','GT','Asesor'),'TEAM_DIRECTORY_DENIED');directoryChecks++;
