@@ -41,7 +41,7 @@
     "newLeadsActor": {
       "display": "Paula Osorio",
       "commentAndBitacoraPass": true,
-      "roleCrossReadPending": true,
+      "roleCrossReadPending": false,
       "syntheticFixtureCleanupReadbackPending": false,
       "commentAndBitacoraPassScope": "IMMEDIATE_UI_HUMAN_LABEL_ONLY",
       "originalCommentFixtureId": "b4003qa_user_mw5eas6v_lphfrl",
@@ -61,21 +61,19 @@
       "currentPaulaSessionCannotProveOwnNoticeRecipient": true,
       "durableEmailFieldAloneIsNotVisibleAuthorRegression": true,
       "recipientNoticeUiPass": true,
-      "recipientCommentAndBitacora": "FAIL_SAMUEL_GENERIC_AUTHOR_REAL_CURRENT_COMMENT",
+      "recipientCommentAndBitacora": "PASS_SAMUEL_ASESOR_PAULA_AFTER_RELOAD",
       "currentCandidate": 41,
-      "currentPostFixUiPending": true
+      "currentPostFixUiPending": false,
+      "reverseWriterCrossReadPending": true
     },
     "historicalOpsLeadsGenericAuthors": "NO_RETROACTIVE_REWRITE_NOT_RELEASE_BLOCKING",
     "insurerCredentialPreviewVault": "SEPARATE_FROM_LIVE; HISTORICAL_CREDENTIAL_TESTS_3_OF_3_PRESERVED; LIVE_RECHECK_AFTER_SAME_ARTIFACT_PROMOTION",
     "nextOnly": [
-      "Reconnect existing Chrome Preview tab with Samuel session, then reload build gi-i65-b4-131d346a3b2d-57f234755dc1. Do not create another fixture.",
-      "C04_SAMUEL_READ_ORIGINAL: After reconnect/reload, confirm build 41; open original existing notice evt_facd26eb0fcdee8d3ced6d20888e; verify Paula Osorio in notice, original comment and bitacora, repeat after reload.",
-      "C04_SAMUEL_NEW_WRITE: Use existing latest fixture b4003qa_user_mw5htkgl_31u61t; controlled comment, server confirmation and reload; verify human author and matching bitacora. Asesor modal is intentionally locked by existing bridge; do not claim an Asesor write.",
-      "C04_SECOND_UID_READ: Read the exact new Samuel event as another authenticated UID and reload. A role switch is not a second principal. No specific requirement for a new Carlos write was found.",
-      "CURRENT_FIXTURE_CLEANUP: Archive/clean only the two exact current author fixtures and verify durable archived state. Historical QA cohorts remain owner-deferred.",
-      "INICIO_RESPONSIVE_DELTA: Preserve signed desktop; complete unsigned applicable 390/320 layout checks. Do not invent every role x country x viewport combination.",
-      "CLIENTE360_SECOND_PRINCIPAL_DELTA: Complete other-principal commercial list/KPI and QA-exclusion proof in authorized scopes, preserving Paula Direccion GT/CO/TODOS evidence.",
-      "FORMAL_PREVIEW_AND_LIVE: Reconcile applicable signed evidence and obtain formal exact Preview acceptance; then validate certified rollback, promote same retained artifact, exact LIVE readback and required approved write/reload/integrity tests. No new source build for documentary commits."
+      "CURRENT41 author reader and Cliente360 other-principal country delta are PASS; preserve them.",
+      "Build/read exact CSS-only successor42 on same Preview; retain unchanged author owner bytes.",
+      "Canonical readback of new Samuel QA fixture and two comments; Paula Direccion opens Reenviado a Operaciones notice, verifies Samuel names after reload, responds; Samuel reloads and reads. Archive/read back all three current fixtures.",
+      "Verify Inicio 320/390 full numeric amounts and currencies on CSS successor, restore viewport.",
+      "Only after exact formal Preview acceptance: retained Hosting preflight/rollback binding, same artifact LIVE promotion and actual LIVE checks."
     ],
     "doNotRebuildForMetadata": true,
     "firestoreRulesNoRoutineBlocker": true,
@@ -158,7 +156,7 @@
       "actualDurableCommentActorFieldsRequireProspectiveReview": true,
       "continuityReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CURRENT40_LEADS_NEW_HUMAN_AUTHOR_SYNTHETIC_UI_20261106.json"
     },
-    "asOfUtc": "2026-11-06T23:06:00Z",
+    "asOfUtc": "2026-11-06T23:25:14Z",
     "continuityRecovery20261106": {
       "recordedAtUtc": "2026-11-06T22:03:41Z",
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CURRENT40_LEADS_NEW_HUMAN_AUTHOR_SYNTHETIC_UI_20261106.json",
@@ -174,7 +172,7 @@
       "fullInterruptedTranscriptRecovered": false,
       "stateNextActionSynchronized": true,
       "noGatePassInferred": true,
-      "receiptBlobSha": "26e79a1e527f682688a80b1f9c1a051796703396"
+      "receiptBlobSha": "d4f086ab19662e28a8ebceecf42dbd56fb1aa00a"
     },
     "prospectiveOutboxReadback20261106": {
       "recordedAtUtc": "2026-11-06T22:30:17Z",
@@ -188,7 +186,7 @@
       "recipientUiPass": true,
       "sourceChanged": false,
       "gateChanged": false,
-      "receiptBlobSha": "26e79a1e527f682688a80b1f9c1a051796703396",
+      "receiptBlobSha": "d4f086ab19662e28a8ebceecf42dbd56fb1aa00a",
       "recipientUiPassScope": "NOTICE_NAMES_ONLY_COMMENT_AND_BITACORA_FAIL"
     },
     "samuelRecipientCausalFix20261106": {
@@ -322,8 +320,8 @@
         "lastBrowserBuildObserved": "CURRENT40_BEFORE_NEW_BUILD",
         "toolError": "No connected browser was found for the originating browser instance.",
         "consecutiveAttempts": 3,
-        "postFixUiObserved": false,
-        "manualUserReconnectionRequired": true
+        "postFixUiObserved": true,
+        "manualUserReconnectionRequired": false
       },
       "supersedesCandidate40ForNextRelease": true,
       "oldCandidate40RetainedAsFailureEvidence": true,
@@ -395,13 +393,107 @@
       ],
       "totalPendingCartesianCellCount": "NOT_ENUMERATED_IN_PHYSICAL_AUTHORITY; DO_NOT_INVENT"
     },
-    "historicalTopLevelNextCandidateAndOldNextB4003WorkAreSupersededForExecution": true
+    "historicalTopLevelNextCandidateAndOldNextB4003WorkAreSupersededForExecution": true,
+    "samuelCandidate41AuthenticatedUat20261106": {
+      "recordedAtUtc": "2026-11-06T23:25:14Z",
+      "sourceSha": "131d346a3b2d857ee043f2feb590f4608f450e55",
+      "buildId": "gi-i65-b4-131d346a3b2d-57f234755dc1",
+      "artifactId": 13548166231,
+      "principal": "Samuel Daza",
+      "actorUid": "NvzM3e7NR9dXWtTrzKkVsiYbgd43",
+      "actualAuthenticatedPrincipal": true,
+      "originalAuthorRead": {
+        "role": "Asesor",
+        "fixtureId": "b4003qa_user_mw5eas6v_lphfrl",
+        "noticeId": "evt_facd26eb0fcdee8d3ced6d20888e",
+        "pageReloaded": true,
+        "noticeAuthor": "Paula Osorio",
+        "commentAuthor": "Paula Osorio",
+        "bitacoraAuthor": "Paula Osorio",
+        "actorUid": "pL8zkGdq6phHm5z2DiXIcoNHiw83",
+        "status": "ACTUAL_CROSS_UID_POST_RELOAD_UI_PASS",
+        "screenshotPath": "artifacts/orbit360-recovery/release-control/evidence/SAMUEL_C41_PAULA_AUTHOR_20261106.jpg",
+        "screenshotBlobSha": "d15ae5752c3e7fadebcf695aa0d46106e075fbb8",
+        "screenshotSha256": "619bedc6199397ea6db487a264ed402cc6ec41aea53f08a93844ec9503c51224"
+      },
+      "commercialWrite": {
+        "role": "Operativo",
+        "newSingleQaFixtureCreated": true,
+        "fixtureId": "PENDING_CANONICAL_DOCUMENT_ID_READBACK",
+        "beforeComments": 0,
+        "afterComments": 2,
+        "commercialComment": "Certificación B4-003 C41 · Samuel · comentario comercial · 06/11/2026. Prueba sintética de autor humano y persistencia.",
+        "directedComment": "Certificación B4-003 C41 · lectura cruzada para Dirección · 06/11/2026. Verificar nombre Samuel Daza en el comentario comercial y la bitácora de esta ficha sintética; responder aquí para completar la recarga.",
+        "directedType": "Reenviado a Operaciones",
+        "observedLocalTime": "2026-11-06 17:22 UTC-6",
+        "immediateCommentAndBitacoraAuthor": "Samuel Daza",
+        "newReaderReloadPending": true,
+        "attachments": 0,
+        "realBusinessChanges": 0
+      },
+      "fixtureException": {
+        "reason": "Two earlier fixtures are only reopenable from advisor-targeted notices under Asesor; existing lockAdvisorModal removes write controls; no business deep-link or QA board entry exists. One additional fixture uses the already-authorized isolated UI workflow for actual Operativo write and cross-UID read; no source or permission bypass.",
+        "maximumAdditionalFixtures": 1,
+        "totalCurrentFixturesForCleanup": 3,
+        "historicalQaCohortsUnchanged": true
+      },
+      "cliente360": {
+        "role": "Operativo",
+        "status": "ACTUAL_SECOND_PRINCIPAL_QA_COMMERCIAL_KPI_COUNTRY_DELTA_PASS",
+        "TODOS": {
+          "commercialClients": 439,
+          "activePolicies": 223,
+          "policies": 1416,
+          "premiumGTQ": 632719,
+          "premiumCOP": 175456570,
+          "qaAuditClients": 1
+        },
+        "GT": {
+          "commercialClients": 390,
+          "activePolicies": 196,
+          "policies": 1291,
+          "premiumGTQ": 632719,
+          "qaAuditClients": 1
+        },
+        "CO": {
+          "commercialClients": 49,
+          "activePolicies": 27,
+          "policies": 125,
+          "premiumCOP": 175456570,
+          "qaAuditClients": 0
+        },
+        "countryRestored": "TODOS",
+        "matchesPriorPaulaSignedCountryCounts": true,
+        "fullModuleCertificationNotReopened": true
+      },
+      "inicioResponsive": {
+        "role": "Operativo",
+        "country": "TODOS",
+        "viewport390": {
+          "heroReadable": true
+        },
+        "viewport320": {
+          "heroAndGaugesReadable": true,
+          "documentHorizontalOverflow": 0,
+          "financialCardCurrencyClipped": true
+        },
+        "status": "REAL_320_INTERNAL_FINANCIAL_CARD_CLIPPING_CAUSAL_CSS_FIX_PENDING_NEW_IMMUTABLE_PREVIEW",
+        "cssOwner": "orbit360-platform/styles/infra.css",
+        "beforeBlobSha": "7872b74a9a85a03a24d7eddcf9b4b74ae3e23c84",
+        "afterBlobSha": "788570e8f490dc5232bf8b4d6ff6fe5e87fb9bb2",
+        "change": "Two-line scoped single-column override for Inicio KPI row at max-width 500px; preserves desktop and author source.",
+        "postFixUiPass": false
+      },
+      "remaining": "Finish existing fixture archive readbacks, identify new controlled fixture, complete Paula cross-UID read/reload and response, Samuel final read/reload, new fixture archive; verify 320/390 on CSS successor. No new author retest matrix or source change.",
+      "b4003Closed": false,
+      "productionPromotionAuthorized": false
+    }
   },
   "b4003LeadsCurrent40ProspectiveHumanActorFocal20261106": {
     "dateLocal": "2026-11-06",
-    "status": "CURRENT40_RECIPIENT_AUTHOR_FAILURE_REPRODUCED_CURRENT41_EXACT_PREVIEW_TECHNICAL_PASS_SIGNED_UI_PENDING",
+    "status": "CURRENT41_AUTHOR_READER_PASS_AND_C360_SECOND_PRINCIPAL_PASS_WRITER_CROSS_READ_PENDING_CSS_SUCCESSOR_REQUIRED",
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CURRENT40_LEADS_NEW_HUMAN_AUTHOR_SYNTHETIC_UI_20261106.json",
-    "receiptBlobSha": "26e79a1e527f682688a80b1f9c1a051796703396",
+    "receiptBlobSha": "d4f086ab19662e28a8ebceecf42dbd56fb1aa00a",
     "sourceSha": "b01dceafc1ec2b1e786626116251e248be1e23f4",
     "buildId": "gi-i65-b4-b01dceafc1ec-57f234755dc1",
     "artifactId": 13527102882,
@@ -426,11 +518,12 @@
     "outboxHumanActorNames": "3_OF_3_PAULA_OSORIO",
     "recipientSignedUiPending": false,
     "recipientNoticeUiPass": true,
-    "recipientCommentAndBitacoraPass": false,
-    "currentCausalSuccessorRequired": true,
+    "recipientCommentAndBitacoraPass": true,
+    "currentCausalSuccessorRequired": false,
     "causalSuccessorArtifactId": 13548166231,
     "causalSuccessorSourceSha": "131d346a3b2d857ee043f2feb590f4608f450e55",
-    "currentPostFixUiPending": true
+    "currentPostFixUiPending": false,
+    "reverseWriteCrossReadStillPending": true
   },
   "b4003HistorialCurrent40OperativoCountryMatrixFocal20261106": {"dateLocal":"2026-11-06","status":"ONE_CURRENT_CANDIDATE_READ_ONLY_MATRIX_DELTA_PREVIEW_PASS_SCOPE_ONLY","receiptPath":"artifacts/orbit360-recovery/release-control/I6_5_B4_003_CURRENT40_HISTORIAL_OPERATIVO_COUNTRY_SCOPE_BROWSER_DELTA_20261106.json","receiptBlobSha":"3010cb55b2202dc5f7b2712fea173d44b461177f","sourceSha":"b01dceafc1ec2b1e786626116251e248be1e23f4","buildId":"gi-i65-b4-b01dceafc1ec-57f234755dc1","artifactId":13527102882,"principal":"Paula (Ver como Operativo)","module":"Historial","GT":23,"CO":13,"TODOS":36,"advisorTodos":24,"noWrite":true,"doesNotProveFullMatrix":true,"releaseGateUnchanged":true},
   "b4003E4GtCobrosReportesSameScopeCurrentCandidate20261106": {"dateLocal":"2026-11-06","status":"FOCAL_PREVIEW_PASS_SCOPE_ONLY_NOT_FULL_GATE","receiptPath":"artifacts/orbit360-recovery/release-control/I6_5_B4_003_E4_GT_COBROS_REPORTES_CURRENT_CANDIDATE_20261106.json","receiptBlobSha":"ab12c69a460798273abe22db09f3311ea5678a2e","sourceSha":"b01dceafc1ec2b1e786626116251e248be1e23f4","buildId":"gi-i65-b4-b01dceafc1ec-57f234755dc1","immutableArtifactId":13527102882,"role":"Paula Dirección","country":"GT","period":"Todos","filters":"Todos","cobros":2503,"reportes":2503,"anulado":12,"qaExcluded":1,"releaseGateUnchanged":true},
@@ -19251,7 +19344,7 @@
     "schema": "GRAVICENTRA_I6_5_B4_003_CERTIFICATION_INVENTORY_AND_SYNC_20261106_V7",
     "gate": "I6.5/B4-003",
     "recordType": "ADDITIVE_RELEASE_SCOPED_CERTIFICATION_INDEX_NOT_GATE_PASS",
-    "status": "CURRENT41_EXACT_IMMUTABLE_PREVIEW_TECHNICAL_PASS_SIGNED_AUTHOR_AND_REMAINING_DELTAS_PENDING",
+    "status": "AUTHOR_READER_AND_C360_DELTA_PASS_REVERSE_READ_PENDING_CSS_SUCCESSOR_PENDING",
     "dateLocal": "2026-11-06",
     "authority": "CONTROL_PLANE_CURRENT_B4003_POINTER_AND_PHYSICAL_RECEIPTS",
     "historicalEvergreenCapabilities": {
@@ -19318,7 +19411,7 @@
       },
       {
         "id": "LEADS_CURRENT40_PROSPECTIVE_HUMAN_NAME_SYNTHETIC_PAULA",
-        "status": "CURRENT40_RECIPIENT_AUTHOR_FAILURE_REPRODUCED_CURRENT41_EXACT_PREVIEW_TECHNICAL_PASS_SIGNED_UI_PENDING",
+        "status": "CURRENT41_ACTUAL_SAMUEL_READER_PASS_NEW_SAMUEL_WRITER_UI_PASS_OTHER_UID_RELOAD_PENDING",
         "sourceSha": "b01dceafc1ec2b1e786626116251e248be1e23f4",
         "artifactId": 13527102882,
         "role": "Paula_Direccion_GT",
@@ -19337,14 +19430,14 @@
         "latestFixtureComments": 0,
         "existingFindingId": "B4-003-UAT-20261011-03",
         "recoveredReadbackRecordedAtUtc": "2026-11-06T22:03:41Z",
-        "receiptBlobSha": "26e79a1e527f682688a80b1f9c1a051796703396",
+        "receiptBlobSha": "d4f086ab19662e28a8ebceecf42dbd56fb1aa00a",
         "outboxActorNames": "3_OF_3_DURABLE_PAULA_OSORIO",
         "outboxRecipient": "advisor:ase-samuel-daza",
-        "recipientUiAcceptancePending": true,
-        "currentNextProof": "RECONNECT_SAMUEL_AND_REPEAT_SAME_ORIGINAL_COMMENT_ON_CANDIDATE41_THEN_CONTROLLED_WRITE_CROSS_UID_RELOAD_AND_CLEANUP",
+        "recipientUiAcceptancePending": false,
+        "currentNextProof": "Finish existing fixture archive readbacks, identify new controlled fixture, complete Paula cross-UID read/reload and response, Samuel final read/reload, new fixture archive; verify 320/390 on CSS successor. No new author retest matrix or source change.",
         "recipientNoticeUiPass": true,
-        "recipientCommentAuthor": "Usuario del equipo",
-        "recipientBitacoraAuthor": "Usuario del equipo",
+        "recipientCommentAuthor": "Paula Osorio",
+        "recipientBitacoraAuthor": "Paula Osorio",
         "recipientPrincipal": "Samuel Daza",
         "recipientRole": "Asesor",
         "causalSuccessorSourceSha": "131d346a3b2d857ee043f2feb590f4608f450e55",
@@ -19999,7 +20092,36 @@
       },
       "sumInvariants": "GT_PLUS_CO_EQUALS_TODOS_FOR_CLIENTS_ACTIVE_AND_TOTAL_POLICIES",
       "signedCountryRestored": "TODOS",
-      "otherPrincipalsStillNeedUat": true
+      "otherPrincipalsStillNeedUat": false
+    },
+    "additionalSamuelOperativoAcceptance": {
+      "role": "Operativo",
+      "status": "ACTUAL_SECOND_PRINCIPAL_QA_COMMERCIAL_KPI_COUNTRY_DELTA_PASS",
+      "TODOS": {
+        "commercialClients": 439,
+        "activePolicies": 223,
+        "policies": 1416,
+        "premiumGTQ": 632719,
+        "premiumCOP": 175456570,
+        "qaAuditClients": 1
+      },
+      "GT": {
+        "commercialClients": 390,
+        "activePolicies": 196,
+        "policies": 1291,
+        "premiumGTQ": 632719,
+        "qaAuditClients": 1
+      },
+      "CO": {
+        "commercialClients": 49,
+        "activePolicies": 27,
+        "policies": 125,
+        "premiumCOP": 175456570,
+        "qaAuditClients": 0
+      },
+      "countryRestored": "TODOS",
+      "matchesPriorPaulaSignedCountryCounts": true,
+      "fullModuleCertificationNotReopened": true
     }
   },
   "b4003SignedEquipoRosterReadOnly20261106": {

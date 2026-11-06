@@ -187,7 +187,7 @@
     "phaseAIterationStatuses": "HISTORICAL_FIELDS_ABOVE_PRESERVED_UNTIL_FORMAL_GATE_EVIDENCE;_NO_NEW_PASS_INFERRED",
     "labDataWriteScope": "ONLY_35_AUTHORIZED_COUNTRY_FIELDS;_NO_AUGUST_REFRESH"
   },
-  "nextAction": "B4-003 ACTIVE authority: CONTROL_PLANE.json#b4003ActiveCertificationCursor20261106 and #b4003CertificationInventory20261106. Current immutable Preview is #41 source 131d346a3b2d857ee043f2feb590f4608f450e55, build gi-i65-b4-131d346a3b2d-57f234755dc1, artifact 13548166231, readback 13547228473, run 42308894583 SUCCESS, exact served bytes and independent archive hash verified. #40 is preserved as causal failure evidence: actual Samuel Asesor sees Paula in notices but generic actor in the recent original comment and bitacora. NEXT: reconnect existing Chrome tab with Samuel and reload #41; read original notice evt_facd26eb0fcdee8d3ced6d20888e and verify comment+bitacora names after reload. Then Samuel Operativo controlled write on latest existing fixture; second UID reads exact event; archive/verify both current fixtures; complete unsigned Inicio responsive and Cliente360 other-principal deltas. Preserve 15 historical certificates, 16 active evidence records, four functional P0 PASS and two owner-deferred QA (not PASS); no invented cartesian denominator or new Carlos-write requirement. Formal Preview acceptance precedes same-artifact promotion, exact LIVE verification, approved write/reload/integrity and rollback. Browser disconnected with explicit tool error; no post-fix signed UI PASS or B4 closure is claimed.",
+  "nextAction": "B4-003 active cursor: CONTROL_PLANE.b4003ActiveCertificationCursor20261106. Actual Samuel Asesor on41 after reload sees Paula Osorio in original notice/comment/bitacora: PASS. Samuel Operativo Cliente360 GT/CO/TODOS matches prior approved commercial+QA country counts: PASS. One necessary additional isolated fixture was created through existing UI (17:22 local), with two Samuel-name comments/bitacora; other-UID read/reload remains pending. Do not create further fixtures. A real 320px Inicio card currency clipping was found; two-line CSS-only fix now requires immutable successor42, same channel; do not reopen unchanged author/C360 proofs. Finish existing fixture archive readbacks, identify new controlled fixture, complete Paula cross-UID read/reload and response, Samuel final read/reload, new fixture archive; verify 320/390 on CSS successor. No new author retest matrix or source change. B4-003 not closed, formal production authorization false.",
   "sourceOfTruth": {
     "projectBoundaryPrevalentAddendum": "orbit360-platform/docs/recovery/ADDENDUM_PREVALENTE_CHATGPT_PROJECT_BOUNDARY_20260831.md",
     "mutableState": "orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json",
@@ -443,7 +443,7 @@
     "noDataWrites": true
   },
   "b4003ActiveCertificationResume20261106": {
-    "recordedAtUtc": "2026-11-06T23:06:00Z",
+    "recordedAtUtc": "2026-11-06T23:25:14Z",
     "authorityPath": "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json",
     "cursorKey": "b4003ActiveCertificationCursor20261106",
     "inventoryKey": "b4003CertificationInventory20261106",
@@ -451,7 +451,7 @@
     "existingFindingId": "B4-003-UAT-20261011-03",
     "latestInterruptedFixtureId": "b4003qa_user_mw5htkgl_31u61t",
     "priorCommentFixtureId": "b4003qa_user_mw5eas6v_lphfrl",
-    "releaseStatus": "B4-003_HOLD_CURRENT41_TECHNICAL_PREVIEW_PASS_BROWSER_RECONNECT_REQUIRED",
+    "releaseStatus": "B4-003_AUTHOR_READER_C360_DELTA_PASS_CSS_SUCCESSOR_PENDING",
     "historicalTopLevelIterationFieldsAreNotActiveGate": true,
     "b4003Closed": false,
     "productionPromotionAuthorized": false,
@@ -467,7 +467,9 @@
     "activeArtifactId": 13548166231,
     "activeReadbackArtifactId": 13547228473,
     "sourceFixCommitted": true,
-    "causalFixSignedUiPending": true,
-    "browserReconnectionRequired": true
+    "causalFixSignedUiPending": false,
+    "browserReconnectionRequired": false,
+    "reverseWriterCrossReadPending": true,
+    "cssSuccessorRequired": true
   }
 }

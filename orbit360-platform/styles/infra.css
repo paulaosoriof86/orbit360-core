@@ -1388,6 +1388,8 @@ a.fh-chip:hover{border-color:var(--red);color:var(--red)}
  .gi-insurance-analysis{grid-template-columns:1fr}
 }
 @media(max-width:500px){
+ /* Keep full financial amounts and currency visible in narrow Inicio cards. */
+ [data-inicio-reality-ready]>.kpi-row{grid-template-columns:minmax(0,1fr)!important}
  [data-gi-dashboard="insurance-live-v1"] .gi-leadership-card{padding:22px 14px;min-height:255px}
  .gi-insurance-analysis .gi-analysis-surface{padding:14px}
  .gi-insurance-analysis .gi-analysis-bar{grid-template-columns:minmax(0,1fr) auto;gap:7px}

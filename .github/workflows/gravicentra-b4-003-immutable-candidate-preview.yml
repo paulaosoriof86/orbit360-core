@@ -19,6 +19,7 @@ on:
       - orbit360-platform/core/queries.js
       - orbit360-platform/core/ciclo.js
       - orbit360-platform/index.html
+      - orbit360-platform/styles/infra.css
       - tools/gravicentra-b4-003-inbox-human-identity.test.cjs
       - tools/gravicentra-b4-003-commercial-pipeline-qa-isolation.test.cjs
       - orbit360-platform/modules/equipo.js
@@ -82,6 +83,7 @@ jobs:
           test "$(git rev-parse HEAD:orbit360-platform/modules/equipo.js)" = '1bd7881ed29f6d7488bb806a96a0ab52c5c5c3b8'
           test "$(git rev-parse HEAD:orbit360-platform/core/ciclo.js)" = '7068c028419c7c13d9dc12b0fb715dd7bb3ce8c1'
           test "$(git rev-parse HEAD:orbit360-platform/index.html)" = '867c5e108988b68ca49702e494e96fa9f01afd71'
+          test "$(git rev-parse HEAD:orbit360-platform/styles/infra.css)" = '788570e8f490dc5232bf8b4d6ff6fe5e87fb9bb2'
           test "$(git rev-parse HEAD:orbit360-platform/modules/ops.js)" = 'eadc3ffd5ce9eb8c3c696870a8a7069f78908dc1'
           test "$(git rev-parse HEAD:orbit360-platform/modules/leads.js)" = 'f4af7b02d79890ca7ab8c39fb9f0269dac772b93'
           test "$(git rev-parse HEAD:orbit360-platform/core/queries.js)" = '391d6c7df59b5d6fbb64adb419cb240c078545b8'
@@ -165,6 +167,11 @@ jobs:
           set -euo pipefail
           test "$(git rev-parse HEAD)" = "$SOURCE_SHA"
           node tools/gravicentra-b4-003-scoped-bootstrap-reader.test.cjs
+          # Run 42308894583 already deployed this exact reader source. Frontend-only fixes need no routine backend deployment.
+          if git diff --quiet 131d346a3b2d857ee043f2feb590f4608f450e55 HEAD -- functions; then
+            echo "PREVIEW_READER_SOURCE_UNCHANGED_FROM_VERIFIED_RUN_42308894583; NO_REDEPLOY"
+            exit 0
+          fi
           STAGING="$RUNNER_TEMP/gi-b4003-team-reader-preview"
           mkdir -p "$STAGING"
           cp -a functions "$STAGING/backend"
@@ -211,6 +218,7 @@ jobs:
           cmp orbit360-platform/modules/renovaciones.js "$ROOT/modules/renovaciones.js"
           cmp orbit360-platform/core/assignable-advisor-roster-client.js "$ROOT/core/assignable-advisor-roster-client.js"
           cmp orbit360-platform/core/ciclo.js "$ROOT/core/ciclo.js"
+          cmp orbit360-platform/styles/infra.css "$ROOT/styles/infra.css"
           cmp orbit360-platform/data/store-firestore-product-operational-p0.js "$ROOT/data/store-firestore-product-operational-p0.js"
           node - <<'NODE'
           const fs=require('node:fs'),r=process.env.RUNNER_TEMP+'/gi-e4-canonical-hosting/bundle';
@@ -282,7 +290,7 @@ jobs:
             echo 'PREVIEW_EXACT_BUILD_NOT_PROPAGATED_BEFORE_BOUNDED_DEADLINE' >&2
             exit 1
           fi
-          for rel in __recovery__/build.json product-runtime-config.js index.html modules/inicio.js modules/equipo.js modules/ops.js modules/leads.js modules/polizas.js modules/policy-receipts-v1199-detail-guard.js modules/cancelaciones.js modules/reportes.js modules/cobros.js modules/renovaciones.js core/assignable-advisor-roster-client.js core/ciclo.js data/store-firestore-product-operational-p0.js core/tenant-access-policy-effective-p0.js core/access-scope.js core/queries.js; do
+          for rel in __recovery__/build.json product-runtime-config.js index.html modules/inicio.js modules/equipo.js modules/ops.js modules/leads.js modules/polizas.js modules/policy-receipts-v1199-detail-guard.js modules/cancelaciones.js modules/reportes.js modules/cobros.js modules/renovaciones.js core/assignable-advisor-roster-client.js core/ciclo.js data/store-firestore-product-operational-p0.js core/tenant-access-policy-effective-p0.js core/access-scope.js core/queries.js styles/infra.css; do
             mkdir -p "$RUNNER_TEMP/gi-e4-readback/$(dirname "$rel")"
             curl -fsSL --retry 12 --retry-all-errors --retry-delay 5 --max-time 25 "$PREVIEW_URL/$rel" > "$RUNNER_TEMP/gi-e4-readback/$rel"
             cmp "$ROOT/$rel" "$RUNNER_TEMP/gi-e4-readback/$rel"
@@ -304,7 +312,7 @@ jobs:
              renovacionesSha256:digest('modules/renovaciones.js'),qaResidueRegression:'SOURCE_TEST_PASS',
             rosterClientSha256:digest('core/assignable-advisor-roster-client.js'),
             writerFacadeSha256:digest('data/store-firestore-product-operational-p0.js'),
-            indexSha256:digest('index.html'),servedArtifactExact:true,
+            indexSha256:digest('index.html'),infraSha256:digest('styles/infra.css'),servedArtifactExact:true,
             hostingDeploy:'reused_isolated_preview_only',bundleArtifact:'gi-b4003-immutable-release-bundle-'+process.env.GITHUB_RUN_ID,backendFunctionsDeployed:0,
             dataWrites:0,firestoreRulesWrites:0,authIamChanges:0,productionDeploy:false,
             liveLabStable:true,liveAppDomainStable:true,authenticatedUat:'PENDING',
