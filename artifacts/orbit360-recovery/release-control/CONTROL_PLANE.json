@@ -3,6 +3,7 @@
   "controlPlaneId": "GRAVICENTRA-INSURANCE-FASE-A",
   "status": "PRODUCTION_ACCEPTED",
   "productBrand": "Gravicentra Insurance",
+  "b4003E4GtCobrosReportesSameScopeCurrentCandidate20261106": {"dateLocal":"2026-11-06","status":"FOCAL_PREVIEW_PASS_SCOPE_ONLY_NOT_FULL_GATE","receiptPath":"artifacts/orbit360-recovery/release-control/I6_5_B4_003_E4_GT_COBROS_REPORTES_CURRENT_CANDIDATE_20261106.json","receiptBlobSha":"ab12c69a460798273abe22db09f3311ea5678a2e","sourceSha":"b01dceafc1ec2b1e786626116251e248be1e23f4","buildId":"gi-i65-b4-b01dceafc1ec-57f234755dc1","immutableArtifactId":13527102882,"role":"Paula Dirección","country":"GT","period":"Todos","filters":"Todos","cobros":2503,"reportes":2503,"anulado":12,"qaExcluded":1,"releaseGateUnchanged":true},
   "b4003E4AnuladoRootFixSignedPreview20261104": {
     "status": "SOURCE_CI_EXACT_PREVIEW_AND_SAMUEL_COUNTS_PASS_RELEASE_REMAINDER_HOLD",
     "recordType": "ADDITIVE_LATEST_FOCAL_E4_EVIDENCE_POINTER_NOT_PRODUCTION_ACCEPTANCE",
@@ -18835,6 +18836,7 @@
       "doNotReopenWithoutCausalChange": true
     },
     "currentB4003Evidence": [
+      {"id":"E4_GT_COBROS_REPORTES_CURRENT_40_SAME_SCOPE_2503","status":"FOCAL_PREVIEW_PASS_SCOPE_ONLY","sourceSha":"b01dceafc1ec2b1e786626116251e248be1e23f4","buildId":"gi-i65-b4-b01dceafc1ec-57f234755dc1","artifactId":13527102882,"role":"Paula_Direccion_GT","period":"TODOS","cobros":2503,"reportes":2503,"anuladoCausal":12,"receiptPath":"artifacts/orbit360-recovery/release-control/I6_5_B4_003_E4_GT_COBROS_REPORTES_CURRENT_CANDIDATE_20261106.json","doesNotProveFullMatrixOrLive":true},
       {
         "id": "SIGNED_REAL_UID_ROSTER_CALLABLE",
         "status": "PASS_SCOPE_ONLY",
