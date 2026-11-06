@@ -170,6 +170,16 @@ Orbit.ciclo = (function () {
     }
     return true;
   }
+  // B4-003: preserve QA records and their audit trail, but keep synthetic
+  // opportunities out of normal Ops, Leads, Inicio follow-ups and KPIs.
+  // IDs are recognized because historical Meta QA was created without a flag.
+  function isSyntheticQaBusiness(row) {
+    if (!row) return false;
+    if (row.__syntheticQa === true || row.syntheticQa === true) return true;
+    const id = String(row.id || '').trim();
+    return /^b4003qa(?:[_:-]|$)/i.test(id) ||
+      /^B2 QA firme(?:\s|$)/i.test(String(row.sourceRef || '').trim());
+  }
   function negocios(opts) {
     opts = opts || {};const surface=opts.surface||'ops';
     // A cached provisional advisor must not drive either Ops or Leads cards,
@@ -178,6 +188,7 @@ Orbit.ciclo = (function () {
     if(status&&(!Array.isArray(status.serverConfirmedCollections)||!status.serverConfirmedCollections.includes('negocios')))return[];
     const visible=S().all('negocios').filter(n =>
       (opts.incArchivado ? true : !n.archivado) &&
+      (opts.includeSyntheticQa === true || !isSyntheticQaBusiness(n)) &&
       paisOK(n.pais) &&
       (opts.ignoreRol ? true : scopeAllows(n.asesorId,surface)));
     ensureAdvisorRoster(visible.map(n=>n.pais));
