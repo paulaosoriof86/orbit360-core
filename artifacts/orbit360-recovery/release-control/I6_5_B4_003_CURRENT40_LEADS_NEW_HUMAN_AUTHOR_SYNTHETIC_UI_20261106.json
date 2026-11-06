@@ -1,0 +1,49 @@
+{
+  "schema": "GRAVICENTRA_I65_B4_003_CURRENT40_PROSPECTIVE_HUMAN_AUTHOR_ISOLATED_UI_PROOF_V1",
+  "recordType": "ADDITIVE_FOCAL_BROWSER_HUMAN_AUTHOR_WRITE_PROOF_CLEANUP_READBACK_PENDING",
+  "dateLocal": "2026-11-06",
+  "gate": "I6.5/B4-003",
+  "sourceSha": "b01dceafc1ec2b1e786626116251e248be1e23f4",
+  "buildId": "gi-i65-b4-b01dceafc1ec-57f234755dc1",
+  "artifactId": 13527102882,
+  "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-rc-41765742748-neoi3u7r.web.app/#/leads",
+  "principal": "Paula authenticated",
+  "activeRole": "Dirección",
+  "country": "GT",
+  "fixture": {
+    "name": "Prueba documental Ops/Leads (no operativa)",
+    "mode": "PREVIEW_SYNTHETIC_ISOLATED",
+    "businessEntityChanged": false,
+    "createdByBuiltInTestAction": true,
+    "authorTestComment": "B4-003 #40 prueba aislada de autor visible, recarga y limpieza; 06/11/2026."
+  },
+  "observed": {
+    "newCommentPersistedInImmediateUi": true,
+    "commentAuthorDisplay": "Paula Osorio",
+    "bitacoraEvent": "Colaboración Comentario comercial",
+    "bitacoraActorDisplay": "Paula Osorio",
+    "technicalEmailVisibleAsAuthor": false,
+    "priorRealLeadHistoricalGenericAuthorsUnchanged": true,
+    "commercialLeadsActiveBefore": 3,
+    "commercialLeadsActiveAfterNewTab": 3
+  },
+  "cleanup": {
+    "builtInActionClicked": "Limpiar documentos y archivar prueba",
+    "confirmDialogAccepted": true,
+    "confirmationDialogDismissed": true,
+    "finalBackendReadbackVerified": false,
+    "reason": "Chrome extension/CDP focus timeouts after confirmation; tab unavailable for stable post-action readback",
+    "noClaimZeroResidue": true
+  },
+  "status": "FOCAL_NEW_LEADS_AUTHOR_WRITE_UI_PASS_ONLY_CLEANUP_AND_CROSS_ROLE_RELOAD_PENDING",
+  "notProven": [
+    "Same fixture after full page reload",
+    "Cross-role authorized reader (Carlos, Samuel)",
+    "Ops new author writer",
+    "Synthetic fixture physical deletion or archival readback",
+    "LIVE"
+  ],
+  "productionGateStillHold": true,
+  "noSourceEdit": true,
+  "noRealBusinessMutation": true
+}
