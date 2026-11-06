@@ -1,0 +1,19 @@
+{
+  "schema": "B4-003-P0-PERSONAL-20261106-V1",
+  "status": "REQUESTED",
+  "phase": "create",
+  "tenantId": "alianzas-soluciones",
+  "gate": "I6.5/B4-003",
+  "ownerAuthorization": "PAULA_SIGNED_SYNTHETIC_QA_ALLOWED_20261106",
+  "syntheticOnly": true,
+  "realBusinessWrites": false,
+  "liveDeploy": false,
+  "exactFixtureIds": [
+    "b4003p0personal_client_20261106",
+    "b4003p0personal_policy_20261106",
+    "b4003p0personal_receipt_20261106",
+    "b4003p0personal_payment_20261106",
+    "b4003p0personal_meta_20261106"
+  ],
+  "cleanupRequired": true
+}
