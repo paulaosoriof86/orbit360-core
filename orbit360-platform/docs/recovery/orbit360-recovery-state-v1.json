@@ -187,7 +187,7 @@
     "phaseAIterationStatuses": "HISTORICAL_FIELDS_ABOVE_PRESERVED_UNTIL_FORMAL_GATE_EVIDENCE;_NO_NEW_PASS_INFERRED",
     "labDataWriteScope": "ONLY_35_AUTHORIZED_COUNTRY_FIELDS;_NO_AUGUST_REFRESH"
   },
-  "nextAction": "B4-003 2026-11-06 CURRENT AUTHORITATIVE CURSOR: same immutable Preview source 3e87722d54871198a02d9b0909971fa2f4f913af, run 42154167581 PASS, artifact 13472898683. FOUR_OF_SIX focused P0 RESOLVED with signed evidence: INSTITUTIONAL-GOALS previously, PERSONAL-COLLECTION now (Paula Asesor 5/5, Q111.11 synthetic vs goal Q200, cleanup 5/5 returned baseline 3 confirmed payments), FREELANCERS-GOAL-SCOPE (7 signed classifications, 4 internal, 3 freelance, GT 3/5 visible, CO 1/2 visible, Operativo GT and Asesor GT scope, source tests 6/6 and own/team/all), INICIO-MOTIVATIONAL-TEXTS (signed role/country contextual text Asesor TODOS/GT and Dirección GT/CO, month November 2026, 24d countdown, live reflection switch, desktop visual no overlap). Two P0 remain, BOTH QA RESIDUE provenance: 14 synthetic rows from canceled run 38102224750 and 3 orphan B2 renewal policies with 12 financial dependencies. DO NOT DELETE WITHOUT EXACT PROVENANCE/DEPENDENCY AND AUTHORIZED REVERSIBLE DISPOSITION; determine whether they remain genuine release blockers or can be explicitly deferred with preserved safety proof. Other gate work: transversal Ops/Leads named authors, full module×role×viewport Preview acceptance; only then exact retained artifact promotion independent digest and LIVE validations. I6 formal progress 50% preserved; B4-003 HOLD, production NO-GO. Last closed P0 ledger commit 8ef04d7de974928a4c5b9174d544087867d0d979 and Control Plane 21bb430870c8843c066e80f4ef5d3031c0397d4a. Signed browser session returned Asesor TODOS 5/5; no real business writes since seven owner-auth classification, no Rules redeploy, no country changes, no reimport, no new Preview product build.",
+  "nextAction": "B4-003 2026-11-06: Paula authorized POSTPRODUCTION PHYSICAL RETENTION of two exact QA cohorts after signed commercial KPI isolation (Pólizas raw 1425 minus 9 QA = 1416 commercial; B2 three orphans audit-only; Cobros KPIs commercial q source tests 5/5, pipeline 11/11; signed Direction TODOS confirmed 5 / Q2744 GTQ, pending Q2396 GTQ and overdue GTQ/COP separated). NO DELETE/UPDATE/REIMPORT. QA P0 disposition 4 resolved + 2 OWNER_DEFERRED (not two additional PASS). SIGNED UI FOUND ONE B4 cancelled-run QA expected receipt Q683.20 in Cobros commercial listing despite KPI exclusion: correct/verify this specific UI leak within current gate before Cobros module acceptance; do not reopen completed focal tests without causal invalidation. Then Ops/Leads author names attribution, current modules×roles×countries×viewports Preview matrix, same immutable artifact LIVE digest/readback. I6 formal 50%; B4-003 HOLD; production NO-GO. Source preview 3e87722d54871198a02d9b0909971fa2f4f913af, artifact 13472898683 until any causal product source change, then new exact digest/build required.",
   "sourceOfTruth": {
     "projectBoundaryPrevalentAddendum": "orbit360-platform/docs/recovery/ADDENDUM_PREVALENTE_CHATGPT_PROJECT_BOUNDARY_20260831.md",
     "mutableState": "orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json",
@@ -317,6 +317,17 @@
     "formalI6Percent": 50,
     "next": "FIVE_P0_DISPOSITIONS_AND_OPS_LEADS_AUTHOR_NAME_FOCAL; THEN_EXACT_ARTIFACT_LIVE_PROMOTION_AND_MODULE_ACCEPTANCE",
     "b4003FullGateClosed": false,
+    "productionAccepted": false
+  },
+  "b4003QaOwnerPostproductionRetention20261106": {
+    "status": "AUTHORIZATION_APPLIED_TO_FROZEN_QA_FINDINGS_NOT_PRODUCT_PASS",
+    "qaP0Count": 2,
+    "resolvedP0Count": 4,
+    "ownerDeferredP0Count": 2,
+    "ledgerCommit": "d78d67b799c473f3c229334dabfe1e37d20a3047",
+    "controlPlaneCommit": "94b1ebe4a3af432c53271992057e90e270cbd3f1",
+    "observedCobrosQaRow": "B4-003-RENEWWRITE-38102224750_Q683_20_GTQ_VENCIDO_UI_LIST_NOT_COMMERCIAL_KPI",
+    "physicalDataTouched": false,
     "productionAccepted": false
   }
 }
