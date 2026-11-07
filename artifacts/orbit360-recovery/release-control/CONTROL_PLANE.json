@@ -8792,7 +8792,7 @@
       "ownerConfirmed": true,
       "scope": "POLICY_ONLY_NOT_GLOBAL_FRACCIONADO_CEILING",
       "receiptPath": "artifacts/orbit360-recovery/release-control/OWNER_DECISION_FREEZE_AND_RECONCILIATION_PLAN_20261107.json",
-      "receiptBlobSha": "e14ffbc2d4bfff8e5c2c6ecfb5de71c5e5b374d6",
+      "receiptBlobSha": "95caa92d78456137078c54fdc862b190d17cb4d1",
       "dataApplied": false
     }
   },
@@ -21630,7 +21630,7 @@
     "status": "OWNER_DECISIONS_AND_WORK_PLAN_FROZEN",
     "recordedAtUtc": "2026-11-07T19:36:22Z",
     "path": "artifacts/orbit360-recovery/release-control/OWNER_DECISION_FREEZE_AND_RECONCILIATION_PLAN_20261107.json",
-    "blobSha": "e14ffbc2d4bfff8e5c2c6ecfb5de71c5e5b374d6",
+    "blobSha": "95caa92d78456137078c54fdc862b190d17cb4d1",
     "planPath": "artifacts/orbit360-recovery/release-control/PLAN_OPERATIVO_DECISIONES_PAULA_20261107.md",
     "planBlobSha": "c764aea8d8a2bb7c33e3745f585f1c55158f7a2e",
     "authorityBaseHead": "74312cc3621ba155ee288a0afb530a488246f0e6",
@@ -21703,7 +21703,7 @@
   },
   "b4004PolicyCaptureFrontendSuccessor20261107": {
     "schema": "GRAVICENTRA_B4_004_POLICY_CAPTURE_SUCCESSOR_CURSOR_V1",
-    "status": "FRONTEND_SUCCESSOR_FOCAL_PREVIEW_PASS_PREFLIGHT_PENDING",
+    "status": "FRONTEND_SUCCESSOR_PREVIEW_ACCEPTED_PROMOTION_AUTHORIZED",
     "preservedAcceptancePointer": "/b4003ActiveCertificationCursor20261106/formalLiveAcceptance",
     "preservedPriorSuccessorPointer": "/b4003CausalFrontendSuccessor20261107",
     "sourceContractPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_004_POLICY_CAPTURE_CAUSAL_FRONTEND_SUCCESSOR_CONTRACT_20261107.json",
@@ -21720,7 +21720,7 @@
       "archiveSha256": "02a42a2a3fc0dbc477a19937ad0a636ef94afd142977fd6ddf4c1a6e2177fba9",
       "previewChannelId": "gi-i65-b4-rc-41765742748",
       "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-rc-41765742748-neoi3u7r.web.app",
-      "versionName": null,
+      "versionName": "sites/ays-orbit-360-lab/versions/33af816375dd5cb5",
       "workflowConclusion": "success",
       "exactServedReadbackPassed": true,
       "hostedPayloadDigest": "018bf9acd64ddaa382d2ac73c35a6d8bbc0447ab3051a3d26a5b1e8c048a7e7d",
@@ -21732,7 +21732,7 @@
       "readbackReceiptBlobSha": "099af7e00debb6339b68e8f95b931d229f305de7",
       "readbackReceiptSha256": "8ecd062497c30a0080444c23c7446223d59fee9152afc75c3ae6d5fd499e5309"
     },
-    "productionPromotionAuthorized": false,
+    "productionPromotionAuthorized": true,
     "b4003Closed": true,
     "b4003HistoricalAcceptancePreserved": true,
     "nextGateAccepted": false,

@@ -4160,7 +4160,7 @@
   "policyCaptureFrontendTransportSuccessor20261107": {
     "schema": "GRAVICENTRA_POLICY_CAPTURE_FRONTEND_TRANSPORT_SUCCESSOR_V1",
     "sourceBaseHead": "6c45983610ce0d65a5c63bd07659ad968bfe9da3",
-    "phase": "FOCAL_PREVIEW_PASS_PREFLIGHT_PENDING",
+    "phase": "PROMOTION_AUTHORIZED",
     "sourceContractPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_004_POLICY_CAPTURE_CAUSAL_FRONTEND_SUCCESSOR_CONTRACT_20261107.json",
     "sourceContractBlobSha": "985c1444446e21f17f1eb6462131304e0c6cc413",
     "productSourceChangedAfterBuild": false,
@@ -4172,7 +4172,7 @@
     "realBusinessWrites": 0,
     "nextGateAccepted": false,
     "globalProductionAccepted": false,
-    "productionPromotionAuthorized": false,
+    "productionPromotionAuthorized": true,
     "changes": [
       {
         "path": "tools/gravicentra-b4-003-retained-hosting-preflight.mjs",
@@ -4215,6 +4215,12 @@
         "previousBlobSha": null,
         "blobSha": "8573480607ff4b98a1c9939ab89a6c812ca69564",
         "sha256": "ae9981dc99a47a8db30a8a291719a76ecbfc643349347fc627be4b2a962d9626"
+      },
+      {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_004_POLICY_CAPTURE_RETAINED_HOSTING_PREFLIGHT_20261107.json",
+        "previousBlobSha": null,
+        "blobSha": "2bd87fcd0a1c946d789ba8580ebf503d43e51838",
+        "sha256": "58421fbd5b39195c2ff2fc969714e477130fdc13ffe8f553526c36b6f9151aba"
       }
     ],
     "transportEvidence": {
@@ -4231,6 +4237,14 @@
       "sha256": "ae9981dc99a47a8db30a8a291719a76ecbfc643349347fc627be4b2a962d9626",
       "runId": 42418566181,
       "runnerCommit": "6c45983610ce0d65a5c63bd07659ad968bfe9da3",
+      "runConclusion": "success"
+    },
+    "preflightEvidence": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_004_POLICY_CAPTURE_RETAINED_HOSTING_PREFLIGHT_20261107.json",
+      "blobSha": "2bd87fcd0a1c946d789ba8580ebf503d43e51838",
+      "sha256": "58421fbd5b39195c2ff2fc969714e477130fdc13ffe8f553526c36b6f9151aba",
+      "runId": 42419197931,
+      "runnerCommit": "be2078657ae65d593bb7c862f77cbbe572bafcdb",
       "runConclusion": "success"
     }
   }
