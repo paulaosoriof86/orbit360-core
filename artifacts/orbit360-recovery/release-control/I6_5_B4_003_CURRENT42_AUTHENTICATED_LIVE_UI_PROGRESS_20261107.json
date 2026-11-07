@@ -1,0 +1,234 @@
+{
+  "schema": "B4_003_CURRENT42_AUTHENTICATED_LIVE_UI_PROGRESS_V1",
+  "status": "PARTIAL_LIVE_FUNCTIONAL_AND_CREDENTIAL_READBACK_COMPLETE_CONTROLLED_WRITE_PENDING",
+  "recordedAtUtc": "2026-11-07T01:43:10Z",
+  "gate": "I6.5/B4-003",
+  "sourceSha": "857f1222f360a42a06e012810a1c01bce155a26f",
+  "buildId": "gi-i65-b4-857f1222f360-57f234755dc1",
+  "artifactId": 13549460562,
+  "origin": "https://ays-orbit-360-lab.web.app",
+  "hostingVersion": "sites/ays-orbit-360-lab/versions/c5e1ae001fae793b",
+  "exactHostingReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_RETAINED_HOSTING_LIVE_PROMOTED_20261107.json",
+  "exactHostingReceiptBlobSha": "3e07e1e21192e878af668d03d077c8368837024c",
+  "session": {
+    "principal": "Paula Osorio",
+    "actualSignInObserved": true,
+    "savedBrowserCredentialsUsedWithoutReadingValues": true,
+    "assignedRolesObserved": [
+      "Dirección",
+      "Operativo",
+      "Asesor"
+    ],
+    "rolesActuallySelected": [
+      "Dirección",
+      "Operativo"
+    ],
+    "direccionSelectValueObserved": "SuperAdmin",
+    "browserModuleUrlBuildMarkerObserved": "gi-i65-b4-857f1222f360-57f234755dc1",
+    "naturalReloadPreservedSession": true,
+    "distinctLiveUidsTested": 1
+  },
+  "observations": {
+    "cliente360": {
+      "status": "LIVE_FOCAL_READ_AND_RELOAD_OBSERVED",
+      "role": "Dirección",
+      "country": "TODOS",
+      "commercialClients": 439,
+      "qaSeparate": 1,
+      "linkedActivePolicies": 223,
+      "linkedPolicies": 1416,
+      "netPremiumByCurrency": {
+        "GTQ": 632719,
+        "COP": 175456570
+      },
+      "existingClientOpenedByCanonicalId": true,
+      "sameClientRouteAndIdentityAfterNaturalReload": true,
+      "clientPrivateIdentityOmitted": true,
+      "policyTabRows": 12,
+      "activePolicyTabRows": 1
+    },
+    "vehicles": {
+      "status": "LIVE_EXISTING_CLIENT_VEHICLE_RELATION_READ_OBSERVED",
+      "embeddedClientTabOpened": true,
+      "vehiclesAndLinkedPolicyReferencesDisplayed": true,
+      "historicalVersionsGrouped": true,
+      "incompleteRelationshipClassifiedSeparately": true,
+      "actualPrivateVehicleIdentifiersOmitted": true,
+      "noWrite": true
+    },
+    "receiptsPortfolio": {
+      "status": "LIVE_EXISTING_CLIENT_RECEIPTS_READ_OBSERVED",
+      "relatedPolicyFilterDisplayed": true,
+      "currentRequirements": 19,
+      "priorRequirementsRetained": 11,
+      "portfolioItems": 12,
+      "sourceReportedPaymentDistinguishedFromConfirmedPayment": true,
+      "applyPaymentAndReconciliationActionsSeparated": true,
+      "noFinancialWrite": true,
+      "privateAmountsOmitted": true
+    },
+    "opsLeads": {
+      "status": "LIVE_CANONICAL_RELATION_AND_RELOAD_OBSERVED",
+      "role": "Dirección",
+      "country": "TODOS",
+      "opsBusinesses": 1,
+      "opsGestiones": 2,
+      "leadsBusinesses": 3,
+      "sameCanonicalBusinessIdOnBothBoards": true,
+      "sameStageOnBothBoards": "Cotizando",
+      "canonicalBusinessPresentAfterNaturalReload": true,
+      "currentThreeArchivedFixtureNamesAbsent": true,
+      "noNewCommentOrFixture": true,
+      "privateBusinessIdentityOmitted": true
+    },
+    "insurers": {
+      "status": "LIVE_DIRECTORY_CREDENTIAL_REVEAL_COPY_REHIDE_AND_BANK_COPY_FOCAL_PASS",
+      "directoryCount": 33,
+      "activeCount": 29,
+      "availableAccessCount": 7,
+      "insurerId": "gt-seguros-universales",
+      "role": "Dirección",
+      "revealConnectedDomNodeMaterialized": true,
+      "automaticRehideObserved": true,
+      "passwordClipboardMaterializedAfterEmptyClipboard": true,
+      "bankClipboardMaterializedAfterEmptyClipboard": true,
+      "clipboardClearedAfterEachSensitiveCopy": true,
+      "credentialAndBankValuesNotRecorded": true,
+      "operativoAssignedRoleSelectedAndAllInsurerTabsPresent": true,
+      "historicalOtherRolesEvidencePreserved": true,
+      "newCompleteFiveRoleMatrixClaimed": false
+    },
+    "cobros": {
+      "status": "LIVE_AUTHENTICATED_COMMERCIAL_READ_OBSERVED",
+      "role": "Operativo",
+      "country": "GT",
+      "commercialRows": 2503,
+      "sigaUnconfirmedRows": 1185,
+      "confirmedPayments": 5,
+      "reconciledPayments": 5,
+      "notReconciledConfirmedPayments": 0,
+      "currencySourceValidationRows": 12,
+      "sourceCurrencyAndPolicyDisagreementClassifiedWithoutConversion": true,
+      "qaCommercialExclusionPreserved": true,
+      "noPaymentWritten": true
+    },
+    "reportes": {
+      "status": "LIVE_AUTHENTICATED_COMMERCIAL_READ_OBSERVED",
+      "role": "Dirección",
+      "country": "GT",
+      "carteraCobrosRows": 2503,
+      "qaRowsExcluded": 1,
+      "sameCountryCountMatchesCobros": true,
+      "roleDifferenceExplicit": "Cobros read under assigned Operativo; Reportes under assigned Dirección, both GT. Do not claim a same-role comparison not performed.",
+      "exportsNotExecuted": true
+    },
+    "roleAccess": {
+      "status": "LIVE_ASSIGNED_ROLE_NAVIGATION_OBSERVED",
+      "operativoReportsUiDenied": true,
+      "operativoConciliacionesUiDenied": true,
+      "direccionReportsAllowed": true,
+      "direccionConciliacionesAllowed": true,
+      "noHiddenApiAuthorizationBypass": true,
+      "backendNegativeHistoricalEvidencePreserved": true,
+      "currentLiveBackendDenialNotDirectlyInvoked": true
+    },
+    "conciliaciones": {
+      "status": "LIVE_AUTHENTICATED_READ_OBSERVED",
+      "role": "Dirección",
+      "country": "GT",
+      "formalProposals": 0,
+      "paymentApplicationDoesNotOccurFromViewingProposal": true,
+      "paymentOperationsNotExecuted": true
+    },
+    "equipo": {
+      "status": "LIVE_AUTHORIZED_ROSTER_READ_OBSERVED",
+      "role": "Dirección",
+      "userRows": 7,
+      "unclassifiedRows": 7,
+      "authMembershipEmailVerifiedRows": 7,
+      "configurationWritten": false,
+      "classificationChanged": false
+    },
+    "historial": {
+      "status": "LIVE_AUTHORIZED_READ_OBSERVED",
+      "role": "Dirección",
+      "country": "GT",
+      "interactions": 23,
+      "authorLabelsAndRecordLinksDisplayed": true,
+      "historicalQaAuditEntriesRetained": true,
+      "historicalUnresolvedAuthorsNotRewritten": true
+    },
+    "polizas": {
+      "status": "LIVE_LIST_SEARCH_AND_FINANCIAL_DETAIL_OBSERVED",
+      "role": "Dirección",
+      "country": "GT",
+      "activePolicies": 196,
+      "commercialPolicies": 1292,
+      "qaPoliciesSeparate": 9,
+      "clientCentricVsPolicyCentricCountryDifferenceShown": 1,
+      "goldenId": "AUTO39012",
+      "netPremiumDisplayed": 1800,
+      "totalPremiumDisplayedRounded": 2117,
+      "receiptRows": 25,
+      "relatedReceiptTotalDisplayedRounded": 3482,
+      "sourceLabel": "I6_4_PRIMARY_POLICY_UNIVERSE · fila 291",
+      "activeCalendarNotConfirmedWarningVisible": true,
+      "partialInformationWarningVisible": true,
+      "historical2678_53GoldenReconciled": false,
+      "noNewCausalRegressionEstablished": true,
+      "noSourceOrDataChanged": true
+    },
+    "inicio": {
+      "status": "PARTIAL_LIVE_RENDER_OBSERVED_FINAL_READINESS_AND_RESPONSIVE_RECHECK_PENDING",
+      "shellAndSessionRendered": true,
+      "commercialClient439AndPolicy1416Displayed": true,
+      "latestObservedSourceReadiness": "4_OF_5",
+      "normalFlowTimeoutPassClaimed": false
+    },
+    "renovaciones": {
+      "status": "NAVIGATION_ATTEMPTED_FINAL_READBACK_PENDING",
+      "browserControlResetDuringRead": true
+    }
+  },
+  "warnings": [
+    {
+      "id": "ASEGURADORAS_LIVE_LOGO_PROVIDER_WARNINGS",
+      "status": "OBSERVED_CAUSE_UNDETERMINED",
+      "severity": "warning",
+      "count": 2,
+      "observedAtUtc": "2026-11-07T01:26:32Z",
+      "message": "[Orbit Aseguradoras] LOGO_ASSET_RESOLVE_FAILED",
+      "code": "functions/internal",
+      "providerFromSource": "orbit360ProductAssetRead",
+      "providerConfirmedByNetwork": false,
+      "functionalImpactObserved": "Did not prevent directory, ficha, credential reveal/rehide/copy or bank copy.",
+      "logoAvailabilityAccepted": false,
+      "newCausalRegressionDemonstrated": false,
+      "zeroWarningClaim": false,
+      "disposition": "Preserve observation; no reopening of accepted capability without reproducible causal regression."
+    }
+  ],
+  "browserControl": {
+    "intermittentCdpControlTimeouts": true,
+    "kernelResetObserved": true,
+    "theseAreNotInferredApplicationErrors": true,
+    "duplicateUiWritesIssued": false,
+    "readRecoveryRetainsVerifiedEvidence": true
+  },
+  "remaining": [
+    "Complete final Inicio readiness and applicable responsive readback, assigned Asesor scope readback, and Renovaciones readback.",
+    "Obtain exact LIVE synthetic-write and ephemeral-existing-UID authentication authorization; current Preview-only and consumed I5 authorizations are not reused.",
+    "Perform exactly approved controlled-write/reload/atomic-audit-cleanup/readback, then final affected-module integrity and exact LIVE identity verification."
+  ],
+  "preservedHistoricalCertificates": 15,
+  "currentEvidenceEntries": 16,
+  "sourceModified": false,
+  "functionsRedeployed": false,
+  "realBusinessWrites": 0,
+  "dataReimport": false,
+  "controlledLiveSyntheticWriteExecuted": false,
+  "formalLiveAcceptanceGranted": false,
+  "productionAccepted": false,
+  "b4003Closed": false,
+  "privacy": "Only aggregates and test facts retained. No private client names, emails, addresses, birth dates, vehicle identifiers, bank values, password values or full screenshots published."
+}
