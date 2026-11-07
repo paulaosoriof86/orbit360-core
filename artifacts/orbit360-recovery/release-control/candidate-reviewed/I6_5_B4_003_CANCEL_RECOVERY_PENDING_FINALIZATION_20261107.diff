@@ -1,0 +1,295 @@
+diff --git a/orbit360-platform/modules/cancelaciones.js b/orbit360-platform/modules/cancelaciones.js
+--- a/orbit360-platform/modules/cancelaciones.js
++++ b/orbit360-platform/modules/cancelaciones.js
+@@ -222,6 +222,16 @@
+   function findGestion(c) {
+     return allSafe('gestiones').find(g => g.cancelacionId === c.id || (g.origen === 'cancelaciones' && g.clienteId === c.clienteId && g.polizaId === c.polizaId && !g.archivado));
+   }
++  function pendingRecovery(c) {
++    const r=c&&c.recuperacionPendiente;
++    return r&&r.schemaVersion===1&&r.status==='PENDING_FINALIZATION'&&r.cancelacionId===c.id&&r.id&&
++      ACTIVAS.concat(FINALES).includes(r.recuperacion)&&typeof r.nota==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(r.fecha)&&
++      r.pais===recordCountry(c)&&r.moneda===recordCurrency(c)?r:null;
++  }
++  function appendRecoveryNote(notes,line) {
++    const old=String(notes||'');
++    return old.split('\n').includes(line)?old:(old?old+'\n':'')+line;
++  }
+ 
+   function render(host) {
+     const I = relationIndex();
+@@ -285,7 +295,7 @@
+               <td>${p ? U.esc(p.ramo||'—') : '—'}</td>
+               <td><span class="badge ${documentedReason(c)?'danger':'neutral'}">${U.esc(reasonLabel(c))}</span></td>
+               <td class="num">${U.money(c.valorPerdido, recordCurrency(c,I))}</td>
+-              <td><button type="button" class="btn ghost sm" data-cancel-open="${U.esc(String(c.id||''))}" data-cancel-open-policy="${U.esc(String(c.polizaId||''))}">Ver cancelación</button></td>
++              <td><button type="button" class="btn ghost sm" data-cancel-open="${U.esc(String(c.id||''))}" data-cancel-open-policy="${U.esc(String(c.polizaId||''))}">Ver cancelación</button>${pendingRecovery(c)?'<small class="muted" style="display:block">Pendiente de finalizar</small>':''}</td>
+             </tr>`;
+           }).join('') || `<tr><td colspan="8" class="muted" style="text-align:center;padding:30px">Sin cancelaciones.</td></tr>`}</tbody>
+         </table></div>
+@@ -329,6 +339,7 @@
+ 
+   function detalle(canId, policyId) {
+     const c = cancellationById(canId, policyId); if (!c) { U.toast('Registro fuera de tu alcance'); return; }
++    const pendingAtOpen=pendingRecovery(c);
+     const cli = S().get('clientes', c.clienteId), p = S().get('polizas', c.polizaId);
+     const asg = p ? q.aseguradora(p.aseguradoraId) : null, ase = q.asesor((p && p.asesorId) || (cli && cli.asesorId));
+     const cur = recordCurrency(c);
+@@ -371,15 +382,16 @@
+         </div>
+         <div class="vp-pay">
+           <div class="vp-sec-t">♻ Acción de recuperación</div>
+-          <select id="cx-rec" class="o-sel">${recOpts.map(o => `<option ${o === (c.recuperacion || 'Pendiente de contacto') ? 'selected' : ''}>${o}</option>`).join('')}</select>
+-          <label class="ce-l" style="margin-top:10px">Nota de retención<textarea id="cx-nota" class="o-sel" style="min-height:54px;resize:vertical;padding:9px 11px" placeholder="Gestión de recuperación, oferta, resultado…">${U.esc(c.notaRecuperacion || '')}</textarea></label>
++          <div id="cx-recovery-pending" class="muted" role="status" ${pendingAtOpen?'':'hidden'}>Pendiente de finalizar. Reintenta esta acción para confirmar la recuperación y sus vínculos.</div>
++          <select id="cx-rec" class="o-sel">${recOpts.map(o => `<option ${o === (pendingAtOpen?pendingAtOpen.recuperacion:(c.recuperacion || 'Pendiente de contacto')) ? 'selected' : ''}>${o}</option>`).join('')}</select>
++          <label class="ce-l" style="margin-top:10px">Nota de retención<textarea id="cx-nota" class="o-sel" style="min-height:54px;resize:vertical;padding:9px 11px" placeholder="Gestión de recuperación, oferta, resultado…">${U.esc(pendingAtOpen?pendingAtOpen.nota:(c.notaRecuperacion || ''))}</textarea></label>
+         </div>
+       </div>
+       <div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap">
+         ${c.__policyCancellationProjection ? '' : '<button class="btn ghost" id="cx-delete" style="margin-right:auto;color:var(--danger,var(--red))">Eliminar</button>'}
+         ${p ? `<button class="btn ghost" onclick="Orbit.modules.cliente360.verPoliza('${c.polizaId}')">📑 Ver póliza</button>` : ''}
+         <button type="button" class="btn ghost" id="cx-wa">Preparar WhatsApp</button>
+-        <button class="btn primary" id="cx-save">Guardar</button>
++        <button class="btn primary" id="cx-save">${pendingAtOpen?'Reintentar finalización':'Guardar'}</button>
+       </div>
+     </div>`;
+     document.body.appendChild(back);
+@@ -429,71 +441,96 @@
+     back.querySelector('#cx-save').addEventListener('click', async () => {
+       const save = back.querySelector('#cx-save');
+       if (save.disabled) return;
++      if(!Orbit.access||typeof Orbit.access.can!=='function'||!Orbit.access.can('cancelaciones','edit'))return U.toast('Tu rol activo no tiene permiso para editar cancelaciones.');
+       const rec = back.querySelector('#cx-rec').value;
+       const nota = back.querySelector('#cx-nota').value.trim();
++      if(!ACTIVAS.concat(FINALES).includes(rec))return U.toast('Selecciona una acción de recuperación válida.');
+       let motivo = nota;
+       if (FINALES.includes(rec) && !motivo) {
+         motivo = await Orbit.ui.prompt('Motivo obligatorio para marcar la recuperación como ' + rec + ':', { title: 'Motivo de recuperación' });
+         if (!motivo) return;
+       }
+-      if (!S().updateDurable || !S().insertDurable) return U.toast('Persistencia canónica no disponible.');
+-      const fecha = hoy();
+-      const patch = { recuperacion: rec, recuperada: rec === 'Recuperada', notaRecuperacion: nota || motivo };
++      if (!S().updateDurable || !S().insertDurable || !S().batchDurable) return U.toast('Persistencia canónica no disponible.');
++      const recoveryId=String(c.id),current=S().get('cancelaciones',recoveryId)||c;
++      let intent=pendingRecovery(current);
++      if(current.recuperacionPendiente&&!intent)return U.toast('La acción pendiente requiere revisión antes de continuar.');
++      if(intent&&(intent.recuperacion!==rec||intent.nota!==(nota||motivo)))return U.toast('Finaliza la acción pendiente antes de registrar otra recuperación.');
++      if(!intent){
++        const linked=c.clienteId?(ACTIVAS.includes(rec)?findNegocio(c):rec==='Recuperada'?findGestion(c):null):null;
++        const kind=c.clienteId?(ACTIVAS.includes(rec)?'negocios':rec==='Recuperada'?'gestiones':''):'';
++        intent={schemaVersion:1,status:'PENDING_FINALIZATION',id:'rec_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,10),cancelacionId:recoveryId,
++          recuperacion:rec,nota:nota||motivo,fecha:hoy(),pais:recordCountry(c),moneda:cur,
++          actorUid:String(Orbit.auth&&Orbit.auth.productUser&&Orbit.auth.productUser.uid||''),
++          activeRole:String(Orbit.session&&Orbit.session.rol?Orbit.session.rol():Orbit.auth&&Orbit.auth.productUser&&Orbit.auth.productUser.activeRole||''),
++          seguimientoCollection:kind,seguimientoId:linked?linked.id:kind?(kind==='negocios'?'neg_rec_':'ges_rec_')+recoveryId.replace(/[^A-Za-z0-9._:-]/g,'_'):''};
++      }
++      const fecha=intent.fecha,line='['+fecha+'] '+rec+' · '+(intent.nota||rec);
++      const patch = { recuperacion: rec, recuperada: rec === 'Recuperada', notaRecuperacion: intent.nota,recuperacionPendiente:null,recuperacionOperacionId:intent.id };
+       const original = save.textContent; save.disabled = true; save.textContent = 'Guardando…';
+       try {
+-        if (c.__policyCancellationProjection === true) {
+-          const materialized = Object.assign({}, c, patch);
+-          delete materialized.__policyCancellationProjection;
+-          await S().insertDurable('cancelaciones', materialized);
+-          c.__policyCancellationProjection = false;
+-        } else {
+-          await S().updateDurable('cancelaciones', canId, patch);
++        // Keep the recoverable intent in the existing canonical record. The
++        // semantic Ops/Leads owner still owns its workflow and request journal.
++        if(!pendingRecovery(current)){
++          if(current.__policyCancellationProjection===true){
++            const materialized=Object.assign({},current,{recuperacionPendiente:intent});delete materialized.__policyCancellationProjection;
++            await S().insertDurable('cancelaciones',materialized);
++          }else await S().updateDurable('cancelaciones',recoveryId,{recuperacionPendiente:intent});
+         }
+-        if (c.clienteId) {
+-          const activityId = 'act_rec_' + String(canId).replace(/[^A-Za-z0-9._:-]/g, '_');
+-          const activity = { id: activityId, clienteId: c.clienteId, asesorId: c.asesorId, tipo: 'recuperacion', icon: rec === 'Recuperada' ? '✅' : '♻', fecha, titulo: 'Recuperación: ' + rec, detalle: (p ? p.numero + ' · ' : '') + (nota || motivo || rec), __syntheticQa: c.__syntheticQa === true };
+-          if (S().get('actividades', activityId)) await S().updateDurable('actividades', activityId, activity);
+-          else await S().insertDurable('actividades', activity);
+-        }
++        const notice=back.querySelector('#cx-recovery-pending');if(notice)notice.hidden=false;
+         if (c.clienteId && ACTIVAS.includes(rec)) {
+-          const existente = findNegocio(Object.assign({}, c, patch));
++          const existente = S().get('negocios',intent.seguimientoId)||findNegocio(c);
+           if (existente) {
+-            const notas = (existente.notas ? existente.notas + '\n' : '') + '[' + fecha + '] ' + (nota || rec);
+-            await S().updateDurable('negocios', existente.id, { etapa: existente.etapa, nota: nota || rec, notas, actualizado: fecha, cancelacionId: canId, polizaId: c.polizaId });
+-            await S().updateDurable('cancelaciones', canId, { recuperacionNegocioId: existente.id });
++            if(existente.cancelacionId!==recoveryId&&(existente.clienteId!==c.clienteId||existente.polizaId!==c.polizaId))throw new Error('CANCELATION_RECOVERY_BUSINESS_LINK_MISMATCH');
++            const notas=appendRecoveryNote(existente.notas,line);
++            if(notas!==String(existente.notas||'')||existente.cancelacionId!==recoveryId||existente.polizaId!==c.polizaId)
++              await S().updateDurable('negocios', existente.id, { etapa: existente.etapa, nota: intent.nota || rec, notas, actualizado: fecha, cancelacionId: recoveryId, polizaId: c.polizaId });
++            patch.recuperacionNegocioId=existente.id;
+           } else {
+             const prox = new Date(); prox.setDate(prox.getDate() + 2);
+             const etapaMap = { 'Pendiente de contacto': 'nuevo', 'Llamada de retención agendada': 'contactado', 'Oferta de mejora enviada': 'propuesta', 'En negociación': 'negociacion' };
+             const neg = {
+-              id: 'neg_rec_' + String(canId).replace(/[^A-Za-z0-9._:-]/g, '_'), nombre: (cli ? cli.nombre : 'Cliente') + ' · recuperación', tipo: cli ? cli.tipo : 'Persona',
++              id: intent.seguimientoId, nombre: (cli ? cli.nombre : 'Cliente') + ' · recuperación', tipo: cli ? cli.tipo : 'Persona',
+               etapa: etapaMap[rec] || 'contactado', prob: 30, asesorId: c.asesorId, canal: 'Cliente actual/antiguo',
+-              pais: cli ? cli.pais : 'GT', moneda: cli ? cli.moneda : 'GTQ', producto: p ? p.producto : 'Por definir', ramo: p ? p.ramo : 'Auto',
++              pais: intent.pais, moneda: intent.moneda, producto: p ? p.producto : 'Por definir', ramo: p ? p.ramo : 'Auto',
+               aseguradoraId: c.aseguradoraId || (p ? p.aseguradoraId : ''), primaEst: p ? (p.prima || 0) : 0, prioridad: 'Alta',
+-              clienteId: c.clienteId, polizaId: c.polizaId, cancelacionId: canId, proximoToque: prox.toISOString().slice(0, 10),
+-              checklist: [], nota: nota || rec, notas: nota || '', descripcion: 'Recuperación de póliza cancelada ' + (p ? p.numero : ''),
++              clienteId: c.clienteId, polizaId: c.polizaId, cancelacionId: recoveryId, proximoToque: prox.toISOString().slice(0, 10),
++              checklist: [], nota: intent.nota || rec, notas: line, descripcion: 'Recuperación de póliza cancelada ' + (p ? p.numero : ''),
+               bitacora: [{ ts: fecha + ' 09:00', user: 'Equipo', campo: 'Creación', de: '', a: 'Recuperación desde cancelación', origen: 'cancelaciones' }],
+               comentarios: [], origen: 'Recuperación', creado: fecha, actualizado: fecha, archivado: false
+             };
+             await S().insertDurable('negocios', neg);
+-            await S().updateDurable('cancelaciones', canId, { recuperacionNegocioId: neg.id });
++            patch.recuperacionNegocioId=neg.id;
+           }
+         } else if (c.clienteId && rec === 'Recuperada') {
+-          const existenteG = findGestion(Object.assign({}, c, patch));
++          const existenteG = S().get('gestiones',intent.seguimientoId)||findGestion(c);
+           if (existenteG) {
+-            const notas = (existenteG.notas ? existenteG.notas + '\n' : '') + '[' + fecha + '] Recuperación confirmada · ' + (motivo || nota || 'Cliente recuperado');
+-            await S().updateDurable('gestiones', existenteG.id, { notas, estado: existenteG.estado || 'Pendiente', cancelacionId: canId });
+-            await S().updateDurable('cancelaciones', canId, { recuperacionGestionId: existenteG.id });
++            if(existenteG.cancelacionId!==recoveryId&&(existenteG.clienteId!==c.clienteId||existenteG.polizaId!==c.polizaId))throw new Error('CANCELATION_RECOVERY_MANAGEMENT_LINK_MISMATCH');
++            const notas=appendRecoveryNote(existenteG.notas,line);
++            if(notas!==String(existenteG.notas||'')||existenteG.cancelacionId!==recoveryId)
++              await S().updateDurable('gestiones', existenteG.id, { notas, estado: existenteG.estado || 'Pendiente', cancelacionId: recoveryId });
++            patch.recuperacionGestionId=existenteG.id;
+           } else if (Orbit.ciclo && Orbit.ciclo.crearGestion) {
+-            const res = await Orbit.ciclo.crearGestion({ tipo: 'Reemisión por recuperación', titulo: 'Reemisión: ' + (p ? p.numero : c.clienteId), clienteId: c.clienteId, polizaId: c.polizaId, asesorId: c.asesorId, nota: motivo || nota || 'Cliente recuperado', origen: 'cancelaciones', cancelacionId: canId });
++            const res = await Orbit.ciclo.crearGestion({ id:intent.seguimientoId,tipo: 'Reemisión por recuperación', titulo: 'Reemisión: ' + (p ? p.numero : c.clienteId), clienteId: c.clienteId, polizaId: c.polizaId, asesorId: c.asesorId, nota: intent.nota,notas:line,origen: 'cancelaciones', cancelacionId: recoveryId });
+             if (!res || !res.id) throw new Error('CANCELATION_RECOVERY_MANAGEMENT_READBACK_REQUIRED');
+-            await S().updateDurable('cancelaciones', canId, { recuperacionGestionId: res.id });
+-          }
++            patch.recuperacionGestionId=res.id;
++          }else throw new Error('CANCELATION_RECOVERY_MANAGEMENT_OWNER_REQUIRED');
+         }
++        // These records share the existing operational transaction and audit
++        // journal. Never place negocios/gestiones in the general batch.
++        const mutations=[{action:'update',collection:'cancelaciones',id:recoveryId,payload:patch}];
++        if(c.clienteId){
++          const activityId='act_rec_'+recoveryId.replace(/[^A-Za-z0-9._:-]/g,'_');
++          const activity={id:activityId,clienteId:c.clienteId,asesorId:c.asesorId,tipo:'recuperacion',icon:rec==='Recuperada'?'✅':'♻',fecha,titulo:'Recuperación: '+rec,detalle:(p?p.numero+' · ':'')+(intent.nota||rec),__syntheticQa:c.__syntheticQa===true};
++          mutations.push({action:S().get('actividades',activityId)?'update':'insert',collection:'actividades',id:activityId,payload:activity});
++        }
++        await S().batchDurable(mutations);
+         const t = document.createElement('div'); t.className = 'ciclo-toast'; t.textContent = rec === 'Recuperada' ? '✅ Cliente recuperado · reemisión confirmada en Ops' : rec === 'No recuperable' ? '⛔ Recuperación cerrada con motivo' : '♻ Acción de recuperación confirmada sin duplicar seguimiento'; document.body.appendChild(t); setTimeout(() => t.remove(), 2800);
+         close();
+       } catch (error) {
+-        save.disabled = false; save.textContent = original;
+-        U.toast('No fue posible confirmar la recuperación. No se registró un falso éxito.');
++        const pending=pendingRecovery(S().get('cancelaciones',recoveryId)||{});
++        save.disabled = false; save.textContent = pending?'Reintentar finalización':original;
++        const notice=back.querySelector('#cx-recovery-pending');if(notice)notice.hidden=!pending;
++        U.toast(pending?'Recuperación pendiente de finalizar. Puedes reintentar esta acción; se conservará el seguimiento.':'No fue posible confirmar la recuperación. Recarga la ficha para revisar el resultado. No se registró un falso éxito.');
+       }
+     });
+   }
+diff --git a/tools/gravicentra-b4-003-renewals-cancellations-focused.test.cjs b/tools/gravicentra-b4-003-renewals-cancellations-focused.test.cjs
+--- a/tools/gravicentra-b4-003-renewals-cancellations-focused.test.cjs
++++ b/tools/gravicentra-b4-003-renewals-cancellations-focused.test.cjs
+@@ -8,19 +8,25 @@
+ const fixed=Date.parse('2026-11-07T12:00:00Z');
+ class FixedDate extends Date{constructor(...a){super(...(a.length?a:[fixed]));}static now(){return fixed;}}
+ function setup(seed={},role='Direccion'){
+- const db=structuredClone(seed),writes=[],toasts=[],modals=[],opened=[],nodes=new Map();let deny=false,fail='',pending=null;
++ const db=structuredClone(seed),writes=[],toasts=[],modals=[],opened=[],nodes=new Map();let deny=false,fail='',afterFail='',pending=null;
+  function node(tag='div'){
+   const children=new Map(),events={};return {tag,id:'',style:{},dataset:{},textContent:'',innerHTML:'',disabled:false,value:'',events,children,removed:false,
+    addEventListener(k,fn){events[k]=fn;},appendChild(n){if(n.id)nodes.set(n.id,n);return n;},remove(){this.removed=true;if(this.id)nodes.delete(this.id);},
+-   querySelector(s){if(s==='#cx-delete'&&!this.innerHTML.includes('id="cx-delete"'))return null;if(!children.has(s)){const n=node('input');const id=s.slice(1);const m=this.innerHTML.match(new RegExp('id="'+id+'"[^>]*value="([^"]*)"'));n.value=m?m[1]:'';children.set(s,n);}return children.get(s);},
++   querySelector(s){if(s==='#cx-delete'&&!this.innerHTML.includes('id="cx-delete"'))return null;if(!children.has(s)){const n=node('input');const id=s.slice(1);const m=this.innerHTML.match(new RegExp('id="'+id+'"[^>]*value="([^"]*)"'));const ta=this.innerHTML.match(new RegExp('<textarea[^>]*id="'+id+'"[^>]*>([\\s\\S]*?)</textarea>'));const select=this.innerHTML.match(new RegExp('<select[^>]*id="'+id+'"[^>]*>([\\s\\S]*?)</select>'));const selected=select&&select[1].match(/<option\s+selected[^>]*>([^<]*)</);n.value=m?m[1]:ta?ta[1]:selected?selected[1]:'';children.set(s,n);}return children.get(s);},
+    querySelectorAll(){return [];},getAttribute(){return '';},classList:{add(){},remove(){}},removeAttribute(){},
+    async click(){return events.click?events.click({target:this,stopPropagation(){},preventDefault(){}}):this.onclick?.({target:this,stopPropagation(){},preventDefault(){}});}
+   };
+  }
+  const document={getElementById:id=>nodes.get(id)||null,createElement:node,body:node('body')};
+  const store={all:c=>db[c]||[],get:(c,id)=>(db[c]||[]).find(x=>String(x.id)===String(id))||null,where:(c,p)=>(db[c]||[]).filter(p),
+-  async updateDurable(c,id,p){writes.push({op:'update',c,id,p:structuredClone(p)});if(pending)await pending;if(fail===c)throw Error('synthetic_failure');const r=store.get(c,id);if(!r)throw Error('missing_record');Object.assign(r,structuredClone(p));return r;},
+-  async insertDurable(c,p){writes.push({op:'insert',c,id:p.id,p:structuredClone(p)});if(pending)await pending;if(fail===c)throw Error('synthetic_failure');db[c]??=[];if(store.get(c,p.id))throw Error('duplicate');db[c].push(structuredClone(p));return p;}};
++  async updateDurable(c,id,p){writes.push({op:'update',c,id,p:structuredClone(p)});if(pending)await pending;if(fail===c)throw Error('synthetic_failure');const r=store.get(c,id);if(!r)throw Error('missing_record');Object.assign(r,structuredClone(p));if(afterFail===c)throw Error('synthetic_ack_lost');return r;},
++  async insertDurable(c,p){writes.push({op:'insert',c,id:p.id,p:structuredClone(p)});if(pending)await pending;if(fail===c)throw Error('synthetic_failure');db[c]??=[];if(store.get(c,p.id))throw Error('duplicate');db[c].push(structuredClone(p));if(afterFail===c)throw Error('synthetic_ack_lost');return p;},
++  async batchDurable(mutations){
++   writes.push({op:'batch',mutations:structuredClone(mutations)});if(pending)await pending;
++   const next=structuredClone(db);
++   for(const x of mutations){assert.ok(!['negocios','gestiones'].includes(x.collection),'Workflow must keep its semantic owner');if(fail===x.collection)throw Error('synthetic_transaction_failure');next[x.collection]??=[];const row=next[x.collection].find(r=>r.id===x.id);if(x.action==='insert'){if(row)throw Error('duplicate');next[x.collection].push(structuredClone(x.payload));}else{if(!row)throw Error('missing_record');Object.assign(row,structuredClone(x.payload));}}
++   Object.keys(db).forEach(k=>delete db[k]);Object.assign(db,next);if(afterFail==='batch')throw Error('synthetic_batch_ack_lost');return{ok:true,canonicalReadback:true};
++  }};
+  const Orbit={modules:{},pais:'GT',store,route:{key:'cancelaciones'},session:{rol:()=>role},auth:{productUser:{uid:'synthetic'}},
+   ui:{esc:v=>String(v??''),today:()=> '2026-11-07',fmtDate:v=>String(v||''),money:(v,c)=>c+' '+v,moneyShort:v=>v,avatar:()=>'',daysFromNow:d=>d?Math.ceil((Date.parse(d+'T00:00:00Z')-Date.parse('2026-11-07'))/86400000):null,toast:t=>toasts.push(t),prompt:async()=> 'Synthetic closure reason'},
+   q:{isSyntheticQaRecord:p=>!!p?.__syntheticQa,aseguradora:id=>store.get('aseguradoras',id),asesor:id=>store.get('asesores',id)},kit:{asesorOptions:()=>[]},
+@@ -28,12 +34,12 @@
+   ciclo:{managementCreateModal:x=>{modals.push(x);return x;},async crearGestion(g){const r={id:'g_synthetic',...g};await store.insertDurable('gestiones',r);return r;}}};
+  const ctx={Orbit,document,location:{hash:'#/renovaciones',hostname:'test--preview.web.app'},Date:FixedDate,console,Map,Set,setTimeout:()=>0,clearTimeout(){},encodeURIComponent,decodeURIComponent,addEventListener(){},confirm:()=>true,open:(...a)=>opened.push(a)};ctx.window=ctx;
+  vm.createContext(ctx);for(const f of ['renovaciones.js','renewals-v1200-operational-bridge.js','renewals-v1200-permission-guard.js','cancelaciones.js'])vm.runInContext(src(f),ctx,{filename:f});
+- return {db,writes,toasts,modals,opened,nodes,ctx,Orbit,document,deny:v=>deny=v,fail:v=>fail=v,pending:v=>pending=v};
++ return {db,writes,toasts,modals,opened,nodes,ctx,Orbit,document,deny:v=>deny=v,fail:v=>fail=v,afterFail:v=>afterFail=v,pending:v=>pending=v};
+ }
+ const policy=(id='p',more={})=>({id,numero:'SYNTHETIC-'+id,tenantId:'t',clienteId:'c',aseguradoraId:'a',asesorId:'v',pais:'GT',moneda:'GTQ',ramo:'Autos',estado:'Vigente',renovable:true,vigenciaInicio:'2025-12-01',vigenciaFin:'2026-12-01',prima:1000,...more});
+ const seed=(more={})=>({clientes:[{id:'c',nombre:'Cliente Prueba',pais:'GT',moneda:'GTQ',telefono:'55555555'}],aseguradoras:[{id:'a',nombre:'Aseguradora Prueba'}],polizas:[policy()],...more});
+ const cancellation=(more={})=>({id:'b4003qa_cancel',polizaId:'p',clienteId:'c',asesorId:'v',pais:'GT',moneda:'GTQ',fecha:'2026-11-01',valorPerdido:1000,motivo:'Motivo confirmado',recuperacion:'Pendiente de contacto',...more});
+-const detail=h=>{h.Orbit.modules.cancelaciones.detalle('b4003qa_cancel');return h.nodes.get('c360-edit');};
++const detail=(h,id='b4003qa_cancel')=>{h.Orbit.modules.cancelaciones.detalle(id);return h.nodes.get('c360-edit');};
+ test('Renewal lifecycle distinguishes valid successor, conflicts, unknown renewability and terminal state without writes',()=>{
+  const cases=[
+   [policy(),[], 'PROXIMA_POR_GESTIONAR',true],
+@@ -64,17 +70,54 @@
+  const h=setup(seed({cancelaciones:[cancellation()]}));h.fail('cancelaciones');const b=detail(h);b.querySelector('#cx-motivo').value='Nuevo';await b.querySelector('#cx-save-motivo').click();assert.equal(h.db.cancelaciones[0].motivo,'Motivo confirmado');assert.equal(b.removed,false);assert.match(h.toasts.at(-1),/no se registró éxito/);
+ });
+ test('Recovery active flow persists cancellation/activity/business links and retry does not duplicate linked records',async()=>{
+- const h=setup(seed({cancelaciones:[cancellation()]}));for(let n=0;n<2;n++){const b=detail(h);b.querySelector('#cx-rec').value='En negociación';b.querySelector('#cx-nota').value='Synthetic follow-up';await b.querySelector('#cx-save').click();assert.equal(b.removed,true);}assert.equal(h.db.negocios.length,1);assert.equal(h.db.actividades.length,1);assert.equal(h.db.cancelaciones[0].recuperacionNegocioId,h.db.negocios[0].id);assert.equal(h.db.negocios[0].cancelacionId,'b4003qa_cancel');
++ const h=setup(seed({cancelaciones:[cancellation()]}));for(let n=0;n<2;n++){const b=detail(h);b.querySelector('#cx-rec').value='En negociación';b.querySelector('#cx-nota').value='Synthetic follow-up';await b.querySelector('#cx-save').click();assert.equal(b.removed,true);}assert.equal(h.db.negocios.length,1);assert.equal(h.db.actividades.length,1);assert.equal(h.db.cancelaciones[0].recuperacionNegocioId,h.db.negocios[0].id);assert.equal(h.db.negocios[0].cancelacionId,'b4003qa_cancel');assert.equal(h.db.negocios[0].nota,'Synthetic follow-up','preserve approved business note payload');
+ });
+ test('Recovered flow requires motive and persists canonical Ops management plus link',async()=>{
+- const h=setup(seed({cancelaciones:[cancellation()]}));const b=detail(h);b.querySelector('#cx-rec').value='Recuperada';b.querySelector('#cx-nota').value='';await b.querySelector('#cx-save').click();assert.equal(h.db.cancelaciones[0].recuperada,true);assert.equal(h.db.gestiones.length,1);assert.equal(h.db.cancelaciones[0].recuperacionGestionId,'g_synthetic');assert.match(h.db.gestiones[0].nota,/Synthetic closure/);
++ const h=setup(seed({cancelaciones:[cancellation()]}));const b=detail(h);b.querySelector('#cx-rec').value='Recuperada';b.querySelector('#cx-nota').value='';await b.querySelector('#cx-save').click();assert.equal(h.db.cancelaciones[0].recuperada,true);assert.equal(h.db.gestiones.length,1);assert.equal(h.db.cancelaciones[0].recuperacionGestionId,'ges_rec_b4003qa_cancel');assert.match(h.db.gestiones[0].nota,/Synthetic closure/);
+ });
+ test('Unrecoverable closure records mandatory reason and creates no new business or management',async()=>{
+  const h=setup(seed({cancelaciones:[cancellation()]}));const b=detail(h);b.querySelector('#cx-rec').value='No recuperable';b.querySelector('#cx-nota').value='';await b.querySelector('#cx-save').click();assert.equal(h.db.cancelaciones[0].recuperada,false);assert.match(h.db.cancelaciones[0].notaRecuperacion,/Synthetic closure/);assert.equal((h.db.negocios||[]).length,0);assert.equal((h.db.gestiones||[]).length,0);
+ });
+-test('Recovery intermediate write failure reports no false success; records partial non-atomic persistence',async()=>{
+- const h=setup(seed({cancelaciones:[cancellation()]}));h.fail('actividades');const b=detail(h);b.querySelector('#cx-rec').value='En negociación';b.querySelector('#cx-nota').value='Synthetic';await b.querySelector('#cx-save').click();assert.equal(b.removed,false);assert.match(h.toasts.at(-1),/No se registró un falso éxito/);assert.equal(h.db.cancelaciones[0].recuperacion,'En negociación');assert.equal((h.db.negocios||[]).length,0);
++test('Recovery final transaction failure preserves prior cancellation and durable resumable intent',async()=>{
++ const h=setup(seed({cancelaciones:[cancellation()]}));h.fail('actividades');const b=detail(h);b.querySelector('#cx-rec').value='En negociación';b.querySelector('#cx-nota').value='Synthetic';await b.querySelector('#cx-save').click();assert.equal(b.removed,false);assert.match(h.toasts.at(-1),/pendiente de finalizar/);assert.equal(h.db.cancelaciones[0].recuperacion,'Pendiente de contacto');assert.equal(h.db.cancelaciones[0].recuperacionPendiente.recuperacion,'En negociación');assert.equal((h.db.negocios||[]).length,1);assert.equal((h.db.actividades||[]).length,0);assert.equal(b.querySelector('#cx-save').textContent,'Reintentar finalización');
++ const reload=setup(h.db),retry=detail(reload);assert.match(retry.innerHTML,/Pendiente de finalizar/);assert.equal(retry.querySelector('#cx-rec').value,'En negociación');assert.equal(retry.querySelector('#cx-nota').value,'Synthetic');await retry.querySelector('#cx-save').click();assert.equal(retry.removed,true);assert.equal(reload.db.cancelaciones[0].recuperacion,'En negociación');assert.equal(reload.db.cancelaciones[0].recuperacionPendiente,null);assert.equal(reload.db.negocios.length,1);assert.equal(reload.db.negocios[0].notas.split('\n').length,1);assert.equal(reload.db.negocios[0].nota,'Synthetic','retry retains original note without another business write');assert.equal(reload.writes.filter(x=>x.c==='negocios').length,0);assert.equal(reload.db.actividades.length,1);
+ });
+ test('Cancellation WhatsApp renders personalized draft, normalizes GT phone, and preview blocks opening without writes',async()=>{
+  const h=setup(seed({cancelaciones:[cancellation()]}));const b=detail(h);await b.querySelector('#cx-wa').click();const draft=h.nodes.get('cancel-wa-drafts');assert.ok(draft);assert.equal(draft.querySelector('[data-wa-phone]').value,'50255555555');assert.match(draft.querySelector('[data-wa-message]').value,/Cliente Prueba/);await draft.querySelector('[data-wa-open]').click();assert.equal(h.opened.length,0);assert.match(h.toasts.at(-1),/Preview protegida/);assert.equal(h.writes.length,0);
+ });
++test('Failure before pending intent persists leaves all original recovery data intact',async()=>{
++ const h=setup(seed({cancelaciones:[cancellation()]}));h.fail('cancelaciones');const b=detail(h);b.querySelector('#cx-rec').value='Recuperada';b.querySelector('#cx-nota').value='confirmed reason';await b.querySelector('#cx-save').click();assert.equal(b.removed,false);assert.equal(h.db.cancelaciones[0].recuperacion,'Pendiente de contacto');assert.equal(h.db.cancelaciones[0].recuperacionPendiente,undefined);assert.equal((h.db.gestiones||[]).length,0);assert.equal((h.db.actividades||[]).length,0);
++});
++test('Lost pending-intent ACK survives reload and retry retains the same operation identity',async()=>{
++ const h=setup(seed({cancelaciones:[cancellation()]}));h.afterFail('cancelaciones');const b=detail(h);b.querySelector('#cx-rec').value='En negociación';b.querySelector('#cx-nota').value='reason';await b.querySelector('#cx-save').click();assert.equal(b.removed,false);const pending=structuredClone(h.db.cancelaciones[0].recuperacionPendiente);assert.equal(pending.activeRole,'Direccion');assert.equal(h.db.cancelaciones[0].recuperacion,'Pendiente de contacto');assert.equal((h.db.negocios||[]).length,0);
++ const r=setup(h.db),retry=detail(r);await retry.querySelector('#cx-save').click();assert.equal(r.db.cancelaciones[0].recuperacionOperacionId,pending.id);assert.equal(r.db.cancelaciones[0].recuperacionPendiente,null);assert.equal(r.db.negocios.length,1);assert.equal(r.db.actividades.length,1);
++});
++test('Workflow failure leaves only visible pending intent and reload retry completes once',async()=>{
++ const h=setup(seed({cancelaciones:[cancellation()]}));h.fail('negocios');const b=detail(h);b.querySelector('#cx-rec').value='Oferta de mejora enviada';b.querySelector('#cx-nota').value='reason';await b.querySelector('#cx-save').click();const pending=structuredClone(h.db.cancelaciones[0].recuperacionPendiente);assert.equal(pending.actorUid,'synthetic');assert.equal(pending.pais,'GT');assert.equal(h.db.cancelaciones[0].recuperacion,'Pendiente de contacto');assert.equal((h.db.negocios||[]).length,0);
++ const r=setup(h.db),retry=detail(r);await retry.querySelector('#cx-save').click();assert.equal(retry.removed,true);assert.equal(r.db.negocios.length,1);assert.equal(r.db.negocios[0].id,pending.seguimientoId);assert.equal(r.db.cancelaciones[0].recuperacionOperacionId,pending.id);assert.equal(r.db.cancelaciones[0].recuperacionPendiente,null);assert.equal(r.db.actividades.length,1);
++});
++test('Lost workflow ACK is recoverable after reload without repeating the workflow or note',async()=>{
++ const h=setup(seed({cancelaciones:[cancellation()]}));h.afterFail('gestiones');const b=detail(h);b.querySelector('#cx-rec').value='Recuperada';b.querySelector('#cx-nota').value='reason';await b.querySelector('#cx-save').click();assert.equal(b.removed,false);assert.equal(h.db.gestiones.length,1);assert.equal(h.db.cancelaciones[0].recuperada,undefined);assert.ok(h.db.cancelaciones[0].recuperacionPendiente);
++ const r=setup(h.db),retry=detail(r);await retry.querySelector('#cx-save').click();assert.equal(retry.removed,true);assert.equal(r.db.gestiones.length,1);assert.equal(r.db.gestiones[0].notas.split('\n').length,1);assert.equal(r.writes.filter(x=>x.c==='gestiones').length,0);assert.equal(r.db.cancelaciones[0].recuperada,true);assert.equal(r.db.cancelaciones[0].recuperacionGestionId,r.db.gestiones[0].id);
++});
++test('Recovered state and activity roll back together when final transaction fails after workflow',async()=>{
++ const h=setup(seed({cancelaciones:[cancellation({recuperada:false})]}));h.fail('actividades');const b=detail(h);b.querySelector('#cx-rec').value='Recuperada';b.querySelector('#cx-nota').value='reason';await b.querySelector('#cx-save').click();assert.equal(h.db.cancelaciones[0].recuperada,false);assert.equal(h.db.cancelaciones[0].recuperacionGestionId,undefined);assert.ok(h.db.cancelaciones[0].recuperacionPendiente);assert.equal(h.db.gestiones.length,1);assert.equal((h.db.actividades||[]).length,0);
++ const r=setup(h.db),retry=detail(r);await retry.querySelector('#cx-save').click();assert.equal(r.db.cancelaciones[0].recuperada,true);assert.equal(r.db.gestiones.length,1);assert.equal(r.db.actividades.length,1);assert.equal(r.db.cancelaciones[0].recuperacionGestionId,r.db.gestiones[0].id);
++});
++test('Lost final transaction ACK reports no success, while reload shows complete state with no pending intent',async()=>{
++ const h=setup(seed({cancelaciones:[cancellation()]}));h.afterFail('batch');const b=detail(h);b.querySelector('#cx-rec').value='Recuperada';b.querySelector('#cx-nota').value='reason';await b.querySelector('#cx-save').click();assert.equal(b.removed,false);assert.match(h.toasts.at(-1),/No se registró un falso éxito/);assert.equal(h.db.cancelaciones[0].recuperada,true);assert.equal(h.db.cancelaciones[0].recuperacionPendiente,null);assert.equal(h.db.actividades.length,1);
++ const r=setup(h.db),retry=detail(r);assert.equal(retry.querySelector('#cx-rec').value,'Recuperada');assert.match(retry.innerHTML,/id="cx-recovery-pending"[^>]*hidden/);await retry.querySelector('#cx-save').click();assert.equal(r.db.gestiones.length,1);assert.equal(r.db.gestiones[0].notas.split('\n').length,1);assert.equal(r.db.actividades.length,1);
++});
++test('Pending recovery cannot silently change intent during retry',async()=>{
++ const h=setup(seed({cancelaciones:[cancellation()]}));h.fail('negocios');let b=detail(h);b.querySelector('#cx-rec').value='En negociación';b.querySelector('#cx-nota').value='original';await b.querySelector('#cx-save').click();const before=structuredClone(h.db.cancelaciones[0].recuperacionPendiente),count=h.writes.length;b=detail(h);b.querySelector('#cx-rec').value='No recuperable';b.querySelector('#cx-nota').value='different';await b.querySelector('#cx-save').click();assert.equal(h.writes.length,count);assert.deepEqual(h.db.cancelaciones[0].recuperacionPendiente,before);assert.match(h.toasts.at(-1),/Finaliza la acción pendiente/);
++});
++test('Projected cancellation materializes the pending intent with original status and resumes once',async()=>{
++ const h=setup(seed({polizas:[policy('p',{estado:'Cancelada'})]}));h.fail('negocios');const b=detail(h,'can_pol_p');b.querySelector('#cx-rec').value='En negociación';b.querySelector('#cx-nota').value='reason';await b.querySelector('#cx-save').click();assert.equal(h.db.cancelaciones.length,1);assert.equal(h.db.cancelaciones[0].recuperacion,'Pendiente de contacto');assert.equal(h.db.cancelaciones[0].__policyCancellationProjection,undefined);assert.equal(h.Orbit.modules.cancelaciones.effectiveRows().length,1);
++ const r=setup(h.db),retry=detail(r,'can_pol_p');await retry.querySelector('#cx-save').click();assert.equal(r.db.cancelaciones.length,1);assert.equal(r.db.negocios.length,1);assert.equal(r.db.cancelaciones[0].recuperacionPendiente,null);assert.equal(r.db.cancelaciones[0].recuperacionNegocioId,r.db.negocios[0].id);
++});
++test('Recovery preserves policy operation country/currency when client has another country',async()=>{
++ const h=setup(seed({clientes:[{id:'c',nombre:'Cliente Prueba',pais:'CO',moneda:'COP'}],cancelaciones:[cancellation()]}));const b=detail(h);b.querySelector('#cx-rec').value='En negociación';b.querySelector('#cx-nota').value='reason';await b.querySelector('#cx-save').click();assert.equal(h.db.negocios[0].pais,'GT');assert.equal(h.db.negocios[0].moneda,'GTQ');assert.equal(h.db.negocios[0].asesorId,'v');
++});
++test('Permission denial or unavailable transaction prevents any recovery mutation',async()=>{
++ for(const mode of ['deny','missingBatch']){const h=setup(seed({cancelaciones:[cancellation()]}));if(mode==='deny')h.deny(true);else delete h.Orbit.store.batchDurable;const b=detail(h);b.querySelector('#cx-rec').value='En negociación';await b.querySelector('#cx-save').click();assert.equal(h.writes.length,0);assert.equal(h.db.cancelaciones[0].recuperacionPendiente,undefined);assert.equal(b.removed,false);}
++});

@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_OWNER_DECISION_FREEZE_20261107_V1",
   "status": "OWNER_DECISIONS_AND_EXECUTION_PLAN_FROZEN_NOT_NEW_PRODUCT_PASS",
-  "recordedAtUtc": "2026-11-07T18:47:29Z",
+  "recordedAtUtc": "2026-11-07T19:36:22Z",
   "operationalDate": "2026-11-07",
   "timeZone": "America/Guatemala",
   "repository": "paulaosoriof86/orbit360-core",
@@ -10,7 +10,7 @@
   "authority": "PAULA_EXPLICIT_REQUEST_TO_FREEZE_COMPLETE_DECISIONS_AND_WORK_PLAN",
   "plan": {
     "path": "artifacts/orbit360-recovery/release-control/PLAN_OPERATIVO_DECISIONES_PAULA_20261107.md",
-    "blobSha": "b9c9266de72a9155b37b9fb742225da6c91a90d1"
+    "blobSha": "272a75f7aa69a37be42d7f1cd38ed89bad221013"
   },
   "canonicalControlPlane": "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json",
   "canonicalMasterPlan": "artifacts/orbit360-recovery/release-control/I6_PENDING_CLOSURE_MASTER_PLAN_LOCK_20261004.json",
@@ -487,12 +487,12 @@
     "conclusion": "success",
     "sourceSha": "74312cc3621ba155ee288a0afb530a488246f0e6"
   },
-  "nextRequiredResult": "EXECUTE_SEPARATE_EXACT_CATALOG_ACTIVATION_WITH_FRESH_PREDECESSOR_MATCH_AND_EXACT_AFTER_READBACK_THEN_PROPUESTAS_FOCAL_LIVE_UAT; COMPLETE_REMAINING_FUNCTIONAL_FLOWS_WITHOUT_REPEATING_CONFIRMED_WRITES; MATCH_DOCUMENTARY_ROWS_TO_CAPTURED_REAL_BASELINE_AND_PRODUCE_RECONCILIATION_DIFF_AND_SPECIFIC_OWNER_QUERIES_BEFORE_ANY_APPLY",
+  "nextRequiredResult": "CONTINUE_FIRST_INCOMPLETE_FORMAL_B4_004_WITH_PRESERVED_CRONOGRAMA_OWNER_AND_FOCAL_DEPENDENCY_SCOPE; KEEP_REVIEWED_CANCEL_RECOVERY_AND_RENEWALS_SEARCH_CANDIDATES_UNAPPLIED_UNTIL_NEW_IMMUTABLE_BUILD_PREVIEW_UAT_AND_PROMOTION; EXTEND_EXISTING_RECONCILIATION_OWNER_ESTIMATED_DIRECT_DATE_AND_DURABLE_PENDING_ECONOMICS_BEFORE_ANY_APPLY; RESOLVE_SPECIFIC_PRIVATE_OWNER_QUERIES_INCLUDING_G_AND_T_TERM_CONFIRMATION; COMPLETE_DOMAIN_SSL_AFTER_HOSTDIME_REAUTH_WITHOUT_CHANGING_MAIL_OR_CURRENT_TRAFFIC",
   "governanceSuccessorValidation": {
     "schema": "GRAVICENTRA_OWNER_DOCUMENTARY_SUCCESSOR_VALIDATION_V1",
     "baseHead": "74312cc3621ba155ee288a0afb530a488246f0e6",
     "guardPath": "tools/gravicentra-b4-003-formal-live-closeout-guard.mjs",
-    "guardBlobSha": "bcfa4a3ca41396705179672fa9ff0b14df524042",
+    "guardBlobSha": "ff5428a38e4133ae595c055e6c2b510f29826277",
     "testPath": "tools/gravicentra-b4-003-owner-decision-successor.test.mjs",
     "testBlobSha": "6b18e69ad9196ce9d4ebec821928e619fb9fd300",
     "sealedMasterPlanBlobPreserved": "458c5af57b2f7d9453d0064eba0cd737edf14ef4",
@@ -1693,12 +1693,16 @@
       "status": "AUTHORIZED_EXACT_SINGLE_CATALOG_DEPLOY",
       "reviewedReadbackRunId": 42403740429,
       "reviewedSourceHead": "e60148effd9d55829ecf97767ac5cf2df780f69e",
-      "executionPending": true
+      "executionPending": false,
+      "executionRunId": 42404026879,
+      "executionConclusion": "success",
+      "exactAfterReadbackVerified": true,
+      "completeFunctionalAcceptanceGranted": false
     }
   },
   "currentExecutionObserved20261107": {
     "schema": "GRAVICENTRA_CURRENT_EXECUTION_OBSERVATION_20261107_V1",
-    "recordedAtUtc": "2026-11-07T18:47:29Z",
+    "recordedAtUtc": "2026-11-07T19:36:22Z",
     "authority": "ACTUAL_CI_RECEIPTS_AND_ROOT_AUTHENTICATED_LIVE_UI_OBSERVATION",
     "supersedesPreparationStatusOnly": "postE503ExecutionPreparation",
     "historicalGrantsChanged": false,
@@ -1731,7 +1735,7 @@
       "runId": 42401700593,
       "artifactId": 13585586988,
       "artifactZipSha256": "86827ef8895466c7083b3db26b7574084360e32ec3cd26df2c450bda544c58bf",
-      "capturedAtUtc": "2026-11-07T18:32:46Z",
+      "capturedAtUtc": "2026-11-07T18:32:46.026Z",
       "counts": {
         "polizas": 1425,
         "clientes": 443,
@@ -1743,7 +1747,11 @@
       },
       "encrypted": true,
       "durablePrivateCopyConfirmed": true,
-      "dataWrites": 0
+      "dataWrites": 0,
+      "captureStartedAtUtc": "2026-11-07T18:32:40.884Z",
+      "captureCompletedAtUtc": "2026-11-07T18:32:46.026Z",
+      "crossCollectionAtomic": false,
+      "revalidateCurrentDocumentVersionsBeforeApply": true
     },
     "focalLiveUi": {
       "observer": "ROOT_AUTHENTICATED_SESSION",
@@ -1773,19 +1781,176 @@
       "threeAffectedScriptsHaveExactOrbitBuild": "gi-i65-b4-e5030ec5ba98-57f234755dc1",
       "consoleWarnings": 0,
       "consoleErrors": 0,
-      "scope": "FOCAL_READ_RELOAD_AND_NOOP_ONLY_NOT_ALL_MODULE_FLOWS"
+      "scope": "FOCAL_READ_RELOAD_AND_NOOP_ONLY_NOT_ALL_MODULE_FLOWS",
+      "propuestas": {
+        "observedAtUtc": "2026-11-07T19:03:38Z",
+        "status": "FOCAL_EDITOR_LOAD_PASS",
+        "observer": "ROOT_AUTHENTICATED_SESSION",
+        "roleObservation": "Dirección / SuperAdmin asignado",
+        "countryScope": "TODOS",
+        "sampleCountry": "GT",
+        "sampleCount": 1,
+        "preselectedClientAndPolicy": true,
+        "expectedTypeVisible": "Solicitar propuestas de renovación",
+        "expectedQueueVisible": "Renovaciones / Modif.",
+        "assigneeAndInsurerFieldsVisible": true,
+        "checklistAndActionVisible": true,
+        "createOpsButtonVisible": true,
+        "domainUnsupportedErrorObserved": false,
+        "consoleWarnings": 0,
+        "consoleErrors": 0,
+        "exactScriptOwnersObserved": [
+          "tenant-domain-config-client",
+          "ops",
+          "renovaciones"
+        ],
+        "exactOrbitBuild": "gi-i65-b4-e5030ec5ba98-57f234755dc1",
+        "createClicked": false,
+        "businessWrites": 0,
+        "scope": "EDITOR_OPEN_AND_READ_ONLY; NO_CREATE_OR_COMPLETE_WORKFLOW_OR_CRUD_ACCEPTANCE"
+      },
+      "cronograma": {
+        "status": "FOCAL_OBLIGATION_RELATION_AND_READ_RELOAD_OBSERVED",
+        "observer": "ROOT_AUTHENTICATED_SESSION",
+        "roleObservation": "Dirección",
+        "countryScope": "TODOS",
+        "sampleCountry": "GT",
+        "sampleCount": 1,
+        "obligationTileOpenedExactReceiptInClient360": true,
+        "privateBaselineCobroCountForSample": 0,
+        "canonicalFieldsMatched": [
+          "cliente",
+          "poliza",
+          "recibo",
+          "serie",
+          "moneda",
+          "fechaLimite"
+        ],
+        "currency": "GTQ",
+        "directRouteReloadEventuallyPreservedSameReceipt": true,
+        "consoleWarnings": 0,
+        "consoleErrors": 0,
+        "loadingStillObservedAtUtc": "2026-11-07T19:06:47Z",
+        "completeReadObservedAtUtc": "2026-11-07T19:07:25Z",
+        "preciseLatencyMeasured": false,
+        "performancePassGranted": false,
+        "businessWrites": 0,
+        "ownTeamOtherUidCoverage": false,
+        "taskWriteCoverage": false,
+        "b4004Closed": false,
+        "sameAccountScopeObservations": {
+          "sameAuthenticatedAccount": true,
+          "country": "GT",
+          "roleContextsObserved": [
+            "Asesor/GT",
+            "Dirección/GT"
+          ],
+          "advisorViewOwnObligationOnlyObserved": true,
+          "directionViewOwnAndOtherAdvisorObligationObserved": true,
+          "canonicalAdvisorRelationsMatchedPrivateBaseline": true,
+          "novemberSeventhMonthAndDayEventCounts": {
+            "month": 3,
+            "day": 3
+          },
+          "secondAuthenticatedUidTested": false,
+          "newBackendRejectionTested": false,
+          "teamScopePassGranted": false,
+          "businessWrites": 0
+        },
+        "coEmptyReadObservation": {
+          "roleObservation": "Dirección",
+          "country": "CO",
+          "calendarMonth": "2026-11",
+          "eventsVisible": 0,
+          "consoleWarnings": 0,
+          "consoleErrors": 0,
+          "positiveCaseAvailable": false,
+          "completeCoScopeAccepted": false,
+          "businessWrites": 0
+        },
+        "timedReceiptDetailReadiness": {
+          "startMarker": "Date.now recorded immediately before reload",
+          "criterion": "Editar plan de recibos button visible in the same receipt detail",
+          "samples": [
+            {
+              "elapsedMs": 6230,
+              "visible": false
+            },
+            {
+              "elapsedMs": 21934,
+              "visible": false
+            },
+            {
+              "elapsedMs": 51338,
+              "visible": true
+            }
+          ],
+          "readinessIntervalMs": {
+            "lowerExclusive": 21934,
+            "upperInclusive": 51338
+          },
+          "exactReadinessDurationKnown": false,
+          "overThirtySecondsProven": false,
+          "sameReceiptContextPreserved": true,
+          "consoleWarnings": 0,
+          "consoleErrors": 0,
+          "performanceAccepted": false,
+          "businessWrites": 0
+        }
+      },
+      "finalRestoredContext": {
+        "roleObservation": "Dirección / SuperAdmin asignado",
+        "countryScope": "TODOS",
+        "route": "Cronograma",
+        "restorationObservedByRoot": true,
+        "deliverableMarked": true
+      }
     },
     "remainingFindings": [
       {
         "id": "LIVE_TENANT_CATALOG_SOURCE_STALE",
-        "status": "COMPLETE_READBACK_REVIEWED_SEPARATE_ACTIVATION_AUTHORIZED_PENDING_EXECUTION",
-        "impact": "Propuestas catalogs request is unsupported by deployed September source."
+        "status": "SOURCE_CORRECTED_EXACT_AND_FOCAL_EDITOR_LOAD_PASS_COMPLETE_FLOW_NOT_REACCEPTED",
+        "impact": "Propuestas catalogs request was previously unsupported by the deployed September source; the canonical source is now deployed and focal editor loading was observed."
       },
       {
         "id": "B4-005_REPORTES_LEGACY_HEADER_BRANDING",
         "status": "RESERVED_FOR_EXISTING_B4_005_BRANDING_SCOPE",
         "observedHeader": "Orbit Reportes",
         "blocksTheseFocalReadObservations": false
+      },
+      {
+        "id": "B4_005_PROPUESTAS_INSURER_SELECTOR_SYNTHETIC_QA",
+        "status": "FOCAL_LIVE_OBSERVATION_PENDING_CAUSAL_SCOPE",
+        "syntheticInsurerOptionsObserved": 2,
+        "businessWrites": 0
+      },
+      {
+        "id": "B4_005_PROPUESTAS_POLICY_LABEL_DISTINCT_TERM_AMBIGUITY",
+        "status": "FOCAL_LIVE_OBSERVATION_PENDING_PRESENTATION_REVIEW",
+        "sameDisplayedLabelAcrossDifferentTermsObserved": true,
+        "duplicateCanonicalPolicyClaimed": false
+      },
+      {
+        "id": "B4_005_RENEWALS_SEARCH_BYPASSES_APPROVED_ENHANCER",
+        "status": "REPRODUCED_LIVE_SOURCE_CANDIDATE_6_CHECKS_PASS_ARCHIVED_NOT_APPLIED",
+        "cause": "Search handlers call the closed-over render while the approved bridge wraps only mod.render; enhanced UI and KPI semantics are omitted after search.",
+        "mixedCurrencyMoneyShortRegressionObserved": true,
+        "historical24ScenarioAcceptancePreserved": true,
+        "newIntegralPassGranted": false
+      },
+      {
+        "id": "B4_004_CRONOGRAMA_RELOAD_STARTUP",
+        "status": "MEASURED_READINESS_INTERVAL_SOURCE_PATH_REVIEWED_CAUSE_UNASSIGNED",
+        "performancePassGranted": false,
+        "sourceReviewPending": false,
+        "readinessIntervalMs": {
+          "lowerExclusive": 21934,
+          "upperInclusive": 51338
+        },
+        "exactDurationKnown": false,
+        "overThirtySecondsProven": false,
+        "rootCauseAssigned": false,
+        "sourceReviewKey": "cronogramaMinimumDeltaReview20261107.receiptDetailStartupFinding"
       }
     ],
     "actualBusinessWrites": 0,
@@ -1815,6 +1980,1701 @@
       "hostingChanged": false,
       "rulesChanged": false,
       "functionalAcceptanceGranted": false
+    },
+    "catalogDeployment": {
+      "status": "EXACT_CATALOG_BYTES_CONFIG_IAM_PASS_FOCAL_EDITOR_LOAD_OBSERVED",
+      "sourceHead": "c625822ec18fcc6098e169be3f2d5bce80a190e0",
+      "runId": 42404026879,
+      "jobId": 128497771039,
+      "guardRunId": 42404026756,
+      "artifactId": 13586965413,
+      "artifactZipSha256": "287162dc33ef454b8e8fa047f0568a158d40591763926839117d7c0ad6e5b258",
+      "observedAtUtc": "2026-11-07T19:02:08.253Z",
+      "target": "orbit360TenantDomainConfig",
+      "region": "us-central1",
+      "revision": "orbit360tenantdomainconfig-00020-sog",
+      "sourceGitBlobSha": "231fb2f106a6c139bb83c367f0f5e1a1c8924823",
+      "completeSourceManifestSha256": "f7f250d16687b6282cc170a40aa502bea3268b1a6301e5821be8eaa1e233d1bf",
+      "sourceArchiveSha256": "f8fba37273381aefdd91e2423833b754c8c30751e441e20474dbd58e5d576752",
+      "sourceFiles": 5,
+      "serviceConfigurationUnchanged": true,
+      "environmentUnchanged": true,
+      "iamUnchanged": true,
+      "nonTargetFunctionsUnchanged": 80,
+      "businessWrites": 0,
+      "hostingChanged": false,
+      "rulesChanged": false,
+      "rollbackExecuted": false,
+      "integralFunctionalAcceptanceGranted": false
+    },
+    "octoberReconciliationDryRun": {
+      "status": "PRIVATE_SOURCE_MATCH_AND_SIMULATION_ONLY_NOT_APPLY_READY",
+      "obligationsReviewed": 74,
+      "obligationsLinkedByKeyOrNumber": 51,
+      "directDifferences": 33,
+      "documentaryIdentityConflicts": 1,
+      "directCandidatesWithoutThatConflict": 32,
+      "simulatedPreviousPayments": 20,
+      "privateArchiveSha256": "cc9f6367424a2edc109900136092596a5b64131613c87b55a3af2759f6c5a742",
+      "privateDurableCopyConfirmed": true,
+      "publicRepositoryContainsOnlyAggregatesAndHashes": true,
+      "businessWrites": 0,
+      "operationalApplyExecuted": false,
+      "financeEffectsDurablyQueued": false,
+      "pendingFinancePayloadImplemented": false,
+      "directEstimatedDateContractImplemented": false,
+      "applyReady": false,
+      "candidateMeaning": "The original 32 lack the first isolated documentary identity conflict; a second term review now leaves 31 without those two known reviews. None is APPLY_READY.",
+      "identityMatchScope": "The 51 original matches identify policy number; they do not certify exact policy-term validity.",
+      "originalDirectCandidatesWithoutTheFirstIdentityConflict": 32,
+      "additionalTermValidityHolds": 1,
+      "knownDocumentaryReviews": 2,
+      "directCandidatesWithoutTheTwoKnownDocumentaryReviews": 31,
+      "termReviewInsurer": "G&T",
+      "termQuestionStatus": "ALREADY_ASKED_OWNER_RENEWAL_OR_OLDER_TERM_LATE_PAYMENT",
+      "simulatedPriorPaymentsHeldForTermConfirmation": 2,
+      "doNotApplyThoseInferencesToPriorTerm": true,
+      "originalDocumentRequests": 17,
+      "additionalTermQuestion": 1,
+      "privateWorkbookAlertUpdatedByRoot": true,
+      "privateArchiveHashScope": "ORIGINAL_IMMUTABLE_ZIP_RETAINED_WITH_SEPARATE_PRIVATE_REVIEW_WORKBOOK",
+      "originalPrivateArchiveReplaced": false,
+      "privateReviewWorkbookDigestPending": false,
+      "privateReviewWorkbookPreparationStatus": "PRIVATE_REVIEW_READY_NOT_APPLY_READY",
+      "privateReviewWorkbook": {
+        "genericName": "Revisión de conciliación de octubre 2026",
+        "sha256": "17629640a4361c7a4147439bf2ece4199ea53192f29ee65b8a50752f3f628e05",
+        "bytes": 34556,
+        "durablePrivateCopyConfirmed": true,
+        "visualReviewConfirmed": true,
+        "formulaErrors": 0,
+        "publicContentStored": false
+      },
+      "privateTermValidityAddendum": {
+        "genericName": "Addendum privado de revisión de vigencia",
+        "sha256": "6f942b2f25426013191ccb3ded51d859520d09d45f81f9835544192952410e56",
+        "durablePrivateCopyConfirmed": true,
+        "publicContentStored": false
+      },
+      "ownerResponseRows": 28,
+      "ownerResponseBreakdown": {
+        "policyOrTerm": 18,
+        "paymentDate": 1,
+        "financial": 2,
+        "commissionSplitEffectiveDate": 7
+      },
+      "ownerResponsesAutomaticallyAuthorizeApply": false
+    },
+    "domain": {
+      "host": "app.aysseguros.com",
+      "project": "ays-orbit-360-lab",
+      "site": "ays-orbit-360-lab",
+      "ownershipStatus": "CONFIRMED_BY_FIREBASE_WIZARD",
+      "sslStatus": "CHALLENGE_ISSUED_NOT_APPLIED",
+      "acmeChallengeHost": "_acme-challenge.app.aysseguros.com",
+      "acmeTxtApplied": false,
+      "blocker": "HOSTDIME_REAUTHENTICATION_REQUIRED_AFTER_SESSION_IP_CHANGE",
+      "ownerAlreadyAskedToReauthenticate": true,
+      "trafficCutoverExecuted": false,
+      "corporateRootAndMailUnchanged": true,
+      "hostingArtifactUnchanged": true
+    }
+  },
+  "canonicalReconciliationOwnerMinimumDelta20261107": {
+    "sourceReviewDocument": "reconciliation_closure_review_nov07/CANONICAL_OWNER_MINIMUM_DELTA_20261107.json",
+    "sourceReviewSha256": "9683e494a6f567e09f067a229bf143fa3c561bf1980a157dd9283a1dab7e1a3e",
+    "status": "SOURCE_REVIEW_ONLY_NOT_APPLY_READY",
+    "review": {
+      "schema": "GRAVICENTRA_RECONCILIATION_EXISTING_OWNER_MINIMUM_DELTA_REVIEW_V1",
+      "status": "SOURCE_REVIEW_ONLY_NOT_APPLY_READY",
+      "examinedCanonicalHead": "e60148effd9d55829ecf97767ac5cf2df780f69e",
+      "repository": "paulaosoriof86/orbit360-core",
+      "branch": "recovery/fase-a-clean-20260831",
+      "canonicalSourcePins": {
+        "functions/cobros-reconciliation-domain.js": "5b27038d1c8380e4d2d0ed044996c1570d8c3767",
+        "functions/payment-inference-engine.js": "16bf21177364fbb94f39fab5b8e8ec8506bbd071",
+        "functions/recurring-insurance-import.js": "9a5c7046e8ce737b5d345f86e1890019a322886a",
+        "orbit360-platform/modules/conciliaciones.js": "3b77b2cff04e2f10ab78541d8802c191901de240",
+        "functions/tenant-domain-config.js": "231fb2f106a6c139bb83c367f0f5e1a1c8924823",
+        "orbit360-platform/core/cobros-reconciliation-domain-client.js": "7f00ced68ad64dd1ff4b9c0eff85f1f959dc6d68",
+        "orbit360-platform/core/tenant-domain-config-client.js": "0ce2acdd0022fae441e39992444c46ab99cc3585",
+        "orbit360-platform/core/comisiones-eng.js": "f1aa5dfc3b8191944023b581abdcff27adf0dba3",
+        "orbit360-platform/modules/finanzas.js": "c12d7324928f08d8127e60d2029f80928e5a0ed3",
+        "functions/product-operational-domain.js": "187efbfa9868531349154f26ec90a5e2c2ed33e8"
+      },
+      "findings": {
+        "existingOperationalJournal": {
+          "owner": "functions/cobros-reconciliation-domain.js",
+          "functions": [
+            "applyPayment",
+            "reconcileEvidence",
+            "operationRequestId"
+          ],
+          "paths": [
+            "tenants/{tenant}/reconciliationRequests/{requestId}",
+            "tenants/{tenant}/reconciliationEvents/{eventId}"
+          ],
+          "existingTransaction": [
+            "cobros",
+            "recibosEsperados",
+            "unique active carteraPrimas relation",
+            "request receipt",
+            "audit event"
+          ],
+          "idempotency": "Default ID is a stable SHA-based digest of tenant, operation and normalized payload; a previously committed request is reused.",
+          "limitation": "Caller-supplied request IDs are accepted and committed results are reused without comparing the new payloadDigest. A frozen exact ID/content binding must be enforced when extending this owner for the new batch."
+        },
+        "existingImportBatch": {
+          "owner": "functions/recurring-insurance-import.js",
+          "paths": [
+            "tenants/{tenant}/importBatches/{batchId}",
+            "tenants/{tenant}/importBatches/{batchId}/rows/{rowId}",
+            "tenants/{tenant}/importRequests/{requestId}",
+            "tenants/{tenant}/importEvents/{eventId}"
+          ],
+          "meaning": "Confirming a batch stages evidenciasCobro with deterministic evidence IDs; it does not apply payments, close portfolio or enqueue replayable Finance effects.",
+          "limitation": "confirm_batch uses bulkWriter followed by manifest/event writes, not a single transaction covering business application."
+        },
+        "historicalLedger": "cobrosLedgerRuns/control active is an immutable historical ledger contract; do not repoint it to October or reinterpret its proposals/HOLD as payments.",
+        "currentConciliacionesUI": {
+          "owner": "orbit360-platform/modules/conciliaciones.js",
+          "phase": "READ_ONLY_PROPOSALS_WITH_OPERATIONAL_PAYMENT_OWNER",
+          "reads": [
+            "conciliaciones",
+            "conciliacionesPrimas"
+          ],
+          "appliedBatchProjectionImplemented": false,
+          "durablePendingFinancialEffectsProjectionImplemented": false
+        },
+        "pendingFinanceJournalImplemented": false,
+        "directPaymentDateGap": "applyPayment accepts real paidDate and inferredEffectiveDate; its normalized request omits a separate direct-payment estimated effective date/accuracy and collection period. A documented direct payment with unknown day must not be relabeled as an inferred occurrence or given an invented real paidDate.",
+        "pendingEconomicsGap": "Current reconciliationRequests/result and events keep IDs/digests but not the complete documentary economics, reversible diff, rate snapshot and per-effect pending payload required by the frozen owner decision."
+      },
+      "liveConfigurationContract": {
+        "canonicalCallable": "orbit360TenantDomainConfig",
+        "region": "us-central1",
+        "readRequest": {
+          "tenantId": "<active tenant>",
+          "action": "get",
+          "domain": "reconciliation",
+          "activeRole": "<assigned active role>"
+        },
+        "canonicalPath": "tenants/{tenant}/config/reconciliation",
+        "requiredReadEvidence": [
+          "Authenticated canonical response and actual document version/updateTime or stable content digest",
+          "Explicit source=canonical; no Preview config, local-fallback or unhydrated cache treated as LIVE",
+          "Snapshot the effective applicable configuration with each reconciled operation"
+        ],
+        "engineActualRequirements": {
+          "autoCommitHighConfidence": true,
+          "humanConfirmationRequiredForHighConfidence": false,
+          "humanConfirmationRequired": false,
+          "requireSameCurrency": true
+        },
+        "modalityScope": "Read existing insurerPaymentPlans without overwriting ordinary/exception limits. Current ruleForPolicy resolves insurer only. The prepared local successor adds branch/product/frequency for documented monthly medical 12-payment cases; it is not present in the examined canonical source.",
+        "sellerCurrentFields": [
+          "asesor.shareCom",
+          "asesor.comModo",
+          "asesor.comValor"
+        ],
+        "insurerCurrentFields": [
+          "aseguradora.comisiones[ramo]",
+          "aseguradora.comisionesProd[producto]",
+          "aseguradora.comisionDefault"
+        ],
+        "missingRateContract": "Effective-from/version history and an immutable event snapshot. Current seven sellers already have percentages; October validity is not confirmed. Do not fill with default percentages or recalculate closed historical payouts from today's configuration.",
+        "directVsInference": "apply_payment/reconcile_payment direct does not read reconciliation configuration; reconcile_evidence does. Turning on autoCommit is neither sufficient nor a proper substitute for the missing direct-date/economic contract."
+      },
+      "thirtyTwo": {
+        "origin": "october_snapshot_private_20261107/CURRENT_OCTOBER_DRYRUN_DIFF_SUMMARY_20261107.json",
+        "meaning": "32 direct candidates without the isolated documentary identity conflict, not 32 all-flow approved applications.",
+        "status": "CANDIDATE_NOT_APPLY_READY",
+        "minimumBeforeOperationalApply": [
+          "Revalidate current target receipt/cobro/portfolio version and exact document-row identity.",
+          "Persist collection period and explicitly estimated direct date without changing due dates or prior-inference dates.",
+          "Persist full documentary economics plus pending Finance effects in the existing reconciliation journal before success.",
+          "Bind requestId to exact normalized payload/config/evidence revisions; reject reuse with different content.",
+          "Use the existing direct-payment owner for direct anchors; keep sequence/calendar exceptions out of backward inference."
+        ],
+        "financeDeferral": "Missing seller effective-date confirmation or unready Finance can remain an explicit BLOCKED_CONFIGURATION/PENDING effect after the durable journal extension. It need not block independently valid payment facts indefinitely. It currently cannot be described as saved pending Finance because that payload/replay is absent.",
+        "writesPerformed": 0
+      },
+      "minimumDeltaWithinExistingOwners": [
+        {
+          "paths": [
+            "functions/cobros-reconciliation-domain.js",
+            "orbit360-platform/core/cobros-reconciliation-domain-client.js"
+          ],
+          "change": "Extend the existing normalized command and transaction with direct estimated date/collection period, document-row revision, reversible before/after evidence and economics/effect payload; persist them with the current request/event journal. Validate digest on request reuse."
+        },
+        {
+          "paths": [
+            "functions/cobros-reconciliation-domain.js",
+            "orbit360-platform/modules/conciliaciones.js"
+          ],
+          "change": "In the same reconciliation transaction, maintain an applied-operation projection in the already used tenants/{tenant}/data/conciliaciones/items collection, referencing the existing request/event and document/batch identity. Extend its existing UI to show operationally applied / Finance pending while preserving historical proposals. No new root-level journal reader or parallel batch method is required."
+        },
+        {
+          "paths": [
+            "functions/payment-inference-engine.js",
+            "functions/tenant-domain-config.js"
+          ],
+          "change": "Reuse the already prepared scoped modality successor, then read back effective LIVE config. Preserve direct/inferred dates and block ambiguous/broken sequences; controlled schedule corrections remain separately scoped."
+        },
+        {
+          "paths": [
+            "orbit360-platform/core/comisiones-eng.js",
+            "orbit360-platform/modules/finanzas.js",
+            "functions/product-operational-domain.js"
+          ],
+          "change": "Later integrate replay through the existing operational financial write owner (already handles comisiones/finmovs), keyed by event+effect+currency+revision and effective rate snapshot; atomically persist destination and application receipt, preserve settled historical payouts and verify destination dedup. This integration is not implemented or certified by this review."
+        }
+      ],
+      "boundaries": {
+        "newArchitectureProposed": false,
+        "newRepository": false,
+        "newBackend": false,
+        "dataWrites": 0,
+        "financialWrites": 0,
+        "configWrites": 0,
+        "deploys": 0,
+        "livePassGranted": false,
+        "sourceReviewNotLiveConfigReadback": true
+      }
+    },
+    "currentExecutionConstraint": "Do not describe Finance as saved pending: the durable economic payload/replay and estimated direct-date contract are not implemented. Extend the existing reconciliationRequests/reconciliationEvents owner before operational apply."
+  },
+  "reconciliationLocalCandidateReview20261107": {
+    "status": "CANDIDATE_R2_LOCAL_QA_AND_FOCAL_INDEPENDENT_REVIEW_PASS_NOT_APPLY_READY",
+    "supersedesR1ReviewHold": true,
+    "r1Finding": "Explicitly contradictory documented rate scope was allowed pending in the r1 mock.",
+    "r2Correction": "Reject contradictory scopes; preserve blocked financial effects when scope cannot be verified; retain request digest and deduplication.",
+    "localSuitePassed": 16,
+    "independentScopeCasesPassed": 3,
+    "nanosecondVersionRejectionPassed": true,
+    "sourceIntegrated": false,
+    "built": false,
+    "deployed": false,
+    "businessWrites": 0,
+    "financialReplayImplemented": false,
+    "modulePassGranted": false
+  },
+  "moduleEvidenceMatrix20261107": {
+    "sourceReviewDocument": "module_evidence_closeout_nov07/MODULE_EVIDENCE_MATRIX_20261107.json",
+    "sourceReviewSha256": "a211a1966fc404379e6061712356cbf5d437e54ce7df550e21a781881433663a",
+    "rowCount": 29,
+    "scope": "DATED_LINEAGE_REVIEW_PRESERVED; LATER_EXECUTION_IS_IN_currentExecutionObserved20261107; NO_NEW_INTEGRAL_MODULE_PASS",
+    "matrix": {
+      "schema": "GRAVICENTRA_MODULE_EVIDENCE_CLOSEOUT_READONLY_20261107",
+      "repository": "paulaosoriof86/orbit360-core",
+      "branch": "recovery/fase-a-clean-20260831",
+      "asOfHead": "0444999adacb73b128943bb2287a427a8dfa6103",
+      "asOfProductSource": "e5030ec5ba9854f0c576fd905c2f510766347ffa",
+      "createdAtUtc": "2026-11-07T18:31:39Z",
+      "readOnlyAudit": true,
+      "newTestsExecuted": 0,
+      "businessDataRead": false,
+      "remoteMutations": 0,
+      "newPassGranted": false,
+      "scopeNotes": [
+        "Los estados son evidencia preservada al HEAD0444999, no resultados de despliegues posteriores que root ejecuta en paralelo.",
+        "N/D no significa 0 %: falta un denominador de criterios integral vigente para cada módulo.",
+        "La matriz I1 con PENDING es histórica; el ledger posterior y current42 preservan15 certificados base Preview/LIVE.",
+        "Un certificado base preservado no equivale a reaceptar integralmente cada modificación posterior."
+      ],
+      "metrics": [
+        {
+          "id": "baseCertificates",
+          "value": 100,
+          "numerator": 15,
+          "denominator": 15,
+          "meaning": "Certificados base de capabilities preservados; no porcentaje integral del producto actual",
+          "refs": [
+            "BASE",
+            "C42"
+          ]
+        },
+        {
+          "id": "formalI6",
+          "value": 50,
+          "numerator": 5,
+          "denominator": 10,
+          "meaning": "MinigatesI6 completamente congelados; no mitad de implementación ni tiempo restante",
+          "refs": [
+            "CP",
+            "C42"
+          ]
+        },
+        {
+          "id": "b4RootDisposition",
+          "value": 42.857142857142854,
+          "numerator": 3,
+          "denominator": 7,
+          "meaning": "Ítems raíz B4 con cierre registrado:001/002 machine,003 LIVE; estados de distinta profundidad. No porcentaje de módulos ni estimación de esfuerzo.",
+          "refs": [
+            "B41",
+            "B42",
+            "C42",
+            "PLAN"
+          ]
+        },
+        {
+          "id": "globalImplementation",
+          "value": null,
+          "numerator": null,
+          "denominator": null,
+          "meaning": "No inventar95/98/100 %: no adjudicación vigente por criterio",
+          "refs": [
+            "METRIC",
+            "OWNER"
+          ]
+        }
+      ],
+      "references": {
+        "CP": {
+          "title": "Cursor y métricas vigentes",
+          "path": "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json",
+          "blobSha": "232542fd19fe50fc00a466c467ad3a5458e14153",
+          "url": "https://github.com/paulaosoriof86/orbit360-core/blob/0444999adacb73b128943bb2287a427a8dfa6103/artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json"
+        },
+        "BASE": {
+          "title": "15 certificados base Preview/LIVE",
+          "path": "artifacts/orbit360-recovery/release-control/CAPABILITY_STATUS_LEDGER.json",
+          "blobSha": "81511551540dbe0c1dbc54d9c4f8e00537550716",
+          "url": "https://github.com/paulaosoriof86/orbit360-core/blob/0444999adacb73b128943bb2287a427a8dfa6103/artifacts/orbit360-recovery/release-control/CAPABILITY_STATUS_LEDGER.json"
+        },
+        "LINEAGE": {
+          "title": "Lineage 15/15 congelado",
+          "path": "artifacts/orbit360-recovery/release-control/CAPABILITY_LINEAGE_LOCK.json",
+          "blobSha": "c38e2d9354ea0afffd7d61364e528a590e49643e",
+          "url": "https://github.com/paulaosoriof86/orbit360-core/blob/0444999adacb73b128943bb2287a427a8dfa6103/artifacts/orbit360-recovery/release-control/CAPABILITY_LINEAGE_LOCK.json"
+        },
+        "C42": {
+          "title": "Cierre B4-003 current42",
+          "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CURRENT42_FINAL_LIVE_CLOSEOUT_20261107.json",
+          "blobSha": "0879188bf245248fa1092fb2014e35e14e802b44",
+          "url": "https://github.com/paulaosoriof86/orbit360-core/blob/0444999adacb73b128943bb2287a427a8dfa6103/artifacts/orbit360-recovery/release-control/I6_5_B4_003_CURRENT42_FINAL_LIVE_CLOSEOUT_20261107.json"
+        },
+        "UI42": {
+          "title": "Lecturas autenticadas current42",
+          "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CURRENT42_AUTHENTICATED_LIVE_UI_PROGRESS_20261107.json",
+          "blobSha": "56c8360ec284030b25f33b0f6d943464f3962ccf",
+          "url": "https://github.com/paulaosoriof86/orbit360-core/blob/0444999adacb73b128943bb2287a427a8dfa6103/artifacts/orbit360-recovery/release-control/I6_5_B4_003_CURRENT42_AUTHENTICATED_LIVE_UI_PROGRESS_20261107.json"
+        },
+        "OWNER": {
+          "title": "Decisiones actuales y auditoría focal",
+          "path": "artifacts/orbit360-recovery/release-control/OWNER_DECISION_FREEZE_AND_RECONCILIATION_PLAN_20261107.json",
+          "blobSha": "d1bfd601358042cb4a3fb3b0ea3f139502067779",
+          "url": "https://github.com/paulaosoriof86/orbit360-core/blob/0444999adacb73b128943bb2287a427a8dfa6103/artifacts/orbit360-recovery/release-control/OWNER_DECISION_FREEZE_AND_RECONCILIATION_PLAN_20261107.json"
+        },
+        "R24": {
+          "title": "Renovaciones 24 escenarios PASS",
+          "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_RENEWALS_POLICY_PAGING_AUTHENTICATED_FUNCTIONAL_PASS_20261015.json",
+          "blobSha": "e8c971abc1e676c98cafa65801b9d8cdbc473e38",
+          "url": "https://github.com/paulaosoriof86/orbit360-core/blob/0444999adacb73b128943bb2287a427a8dfa6103/artifacts/orbit360-recovery/release-control/I6_5_B4_003_RENEWALS_POLICY_PAGING_AUTHENTICATED_FUNCTIONAL_PASS_20261015.json"
+        },
+        "RVP": {
+          "title": "Aceptación visual Renovaciones",
+          "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PAULA_FREEZE_VISUAL_20261016.md",
+          "blobSha": "68c79350c7c02f20cf4427ca82300ba82c776ff8",
+          "url": "https://github.com/paulaosoriof86/orbit360-core/blob/0444999adacb73b128943bb2287a427a8dfa6103/artifacts/orbit360-recovery/release-control/I6_5_B4_003_PAULA_FREEZE_VISUAL_20261016.md"
+        },
+        "CVP": {
+          "title": "Aceptación visual Ops/Cancelaciones",
+          "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PAULA_SCOPED_VISUAL_PASS_OPS_CANCELACIONES_20261012.json",
+          "blobSha": "1bd7a04cd61c9f654b654e42776713326686c0b0",
+          "url": "https://github.com/paulaosoriof86/orbit360-core/blob/0444999adacb73b128943bb2287a427a8dfa6103/artifacts/orbit360-recovery/release-control/I6_5_B4_003_PAULA_SCOPED_VISUAL_PASS_OPS_CANCELACIONES_20261012.json"
+        },
+        "CRONO": {
+          "title": "Cronograma alta/actualización/recarga",
+          "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CRONOGRAMA_DIRECCION_AUTH_E2E_20261029.md",
+          "blobSha": "8ed63013a10a25d12c165429faa2674000a04e04",
+          "url": "https://github.com/paulaosoriof86/orbit360-core/blob/0444999adacb73b128943bb2287a427a8dfa6103/artifacts/orbit360-recovery/release-control/I6_5_B4_003_CRONOGRAMA_DIRECCION_AUTH_E2E_20261029.md"
+        },
+        "B41": {
+          "title": "Gestión única convergente",
+          "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_001_MACHINE_PASS_20261002.json",
+          "blobSha": "72ff0e5571358a6585856f5b453d104387138d7b",
+          "url": "https://github.com/paulaosoriof86/orbit360-core/blob/0444999adacb73b128943bb2287a427a8dfa6103/artifacts/orbit360-recovery/release-control/I6_5_B4_001_MACHINE_PASS_20261002.json"
+        },
+        "B42": {
+          "title": "Notificaciones post-commit/reintento",
+          "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_002_MACHINE_PASS_20261003.json",
+          "blobSha": "7d51a1551d73f144a5e80269ee4a811b2bc23c14",
+          "url": "https://github.com/paulaosoriof86/orbit360-core/blob/0444999adacb73b128943bb2287a427a8dfa6103/artifacts/orbit360-recovery/release-control/I6_5_B4_002_MACHINE_PASS_20261003.json"
+        },
+        "PLAN": {
+          "title": "Secuencia B4-004–007 e I6.6–9",
+          "path": "artifacts/orbit360-recovery/release-control/I6_PENDING_CLOSURE_MASTER_PLAN_LOCK_20261004.json",
+          "blobSha": "458c5af57b2f7d9453d0064eba0cd737edf14ef4",
+          "url": "https://github.com/paulaosoriof86/orbit360-core/blob/0444999adacb73b128943bb2287a427a8dfa6103/artifacts/orbit360-recovery/release-control/I6_PENDING_CLOSURE_MASTER_PLAN_LOCK_20261004.json"
+        },
+        "EP": {
+          "title": "Artifact e503 exacto 218 archivos",
+          "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_E503_IMMUTABLE_PREVIEW_TRANSPORT_20261107.json",
+          "blobSha": "c939ca0c44eddefcea9cbb2ffc448ddafda749ab",
+          "url": "https://github.com/paulaosoriof86/orbit360-core/blob/0444999adacb73b128943bb2287a427a8dfa6103/artifacts/orbit360-recovery/release-control/I6_5_B4_003_E503_IMMUTABLE_PREVIEW_TRANSPORT_20261107.json"
+        },
+        "EF": {
+          "title": "Equipo/Cancelaciones/Reportes focal Preview",
+          "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_E503_CAUSAL_FRONTEND_FOCAL_PREVIEW_ACCEPTANCE_20261107.json",
+          "blobSha": "953d55d5c1dd04f14522e3a12bbfa248a0a5da28",
+          "url": "https://github.com/paulaosoriof86/orbit360-core/blob/0444999adacb73b128943bb2287a427a8dfa6103/artifacts/orbit360-recovery/release-control/I6_5_B4_003_E503_CAUSAL_FRONTEND_FOCAL_PREVIEW_ACCEPTANCE_20261107.json"
+        },
+        "METRIC": {
+          "title": "Límites de porcentajes y denominadores",
+          "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_REAL_PROGRESS_RECONCILIATION_20261030.json",
+          "blobSha": "91f045bb4b34da32fffb9e299b78f972ce0af308",
+          "url": "https://github.com/paulaosoriof86/orbit360-core/blob/0444999adacb73b128943bb2287a427a8dfa6103/artifacts/orbit360-recovery/release-control/I6_5_B4_003_REAL_PROGRESS_RECONCILIATION_20261030.json"
+        },
+        "MATRIX_I1": {
+          "title": "Matriz histórica I1; no cursor actual",
+          "path": "orbit360-platform/docs/recovery/ORBIT360-FASE-A-MODULE-VALIDATION-MATRIX-v1.md",
+          "blobSha": "50e79118302c47232392458eb5784b215031c428",
+          "url": "https://github.com/paulaosoriof86/orbit360-core/blob/0444999adacb73b128943bb2287a427a8dfa6103/orbit360-platform/docs/recovery/ORBIT360-FASE-A-MODULE-VALIDATION-MATRIX-v1.md"
+        }
+      },
+      "modules": [
+        {
+          "id": "login",
+          "modulo": "Login y sesión",
+          "gate": "Base I1–I5 preservada; B4-005/007 delta",
+          "source": [
+            {
+              "path": "orbit360-platform/core/auth-product-runtime-p0.js",
+              "blobSha": "b508b6ffad78602af9bfc294f3ee60b13b82890e",
+              "url": "https://github.com/paulaosoriof86/orbit360-core/blob/0444999adacb73b128943bb2287a427a8dfa6103/orbit360-platform/core/auth-product-runtime-p0.js"
+            }
+          ],
+          "evidence": [
+            "BASE",
+            "UI42",
+            "C42"
+          ],
+          "accepted": "Certificado LIVE base preservado. Current42 observó login real y sesión tras recarga.",
+          "pending": "Probar origen app.aysseguros.com y sólo cambios causales de transporte/sesión; no reabrir Auth.",
+          "verifiedRatio": null,
+          "overallImplementationPercent": null,
+          "percentReason": "No existe adjudicación vigente de todos los criterios aplicables por módulo; no equivale a 0 %."
+        },
+        {
+          "id": "roles",
+          "modulo": "Roles, scopes y países",
+          "gate": "Base preservada; B4-003; B4-005",
+          "source": [
+            {
+              "path": "orbit360-platform/core/access-scope.js",
+              "blobSha": "a51598b5b1d31b6ee20673f9d9581ac445e5de37",
+              "url": "https://github.com/paulaosoriof86/orbit360-core/blob/0444999adacb73b128943bb2287a427a8dfa6103/orbit360-platform/core/access-scope.js"
+            }
+          ],
+          "evidence": [
+            "BASE",
+            "CP",
+            "UI42",
+            "C42"
+          ],
+          "accepted": "Certificado base preservado; 30/30 comprobaciones firmadas del roster y cambios de roles observados en LIVE.",
+          "pending": "Mantener alcance real de cada prueba; la simulación Ver como no sustituye varios UID. Excepción Rules vigente no es certificado de seguridad.",
+          "verifiedRatio": "30/30 checks del callable roster; no 100 % de permisos globales.",
+          "overallImplementationPercent": null,
+          "percentReason": "No existe adjudicación vigente de todos los criterios aplicables por módulo; no equivale a 0 %."
+        },
+        {
+          "id": "shell",
+          "modulo": "Shell, router, index único, hidratación y PWA",
+          "gate": "Base preservada; transporte e503",
+          "source": [
+            {
+              "path": "orbit360-platform/index.html",
+              "blobSha": "867c5e108988b68ca49702e494e96fa9f01afd71",
+              "url": "https://github.com/paulaosoriof86/orbit360-core/blob/0444999adacb73b128943bb2287a427a8dfa6103/orbit360-platform/index.html"
+            },
+            {
+              "path": "orbit360-platform/core/router.js",
+              "blobSha": "df3f134f16246c770418ad11323f6e9a931cb3bb",
+              "url": "https://github.com/paulaosoriof86/orbit360-core/blob/0444999adacb73b128943bb2287a427a8dfa6103/orbit360-platform/core/router.js"
+            },
+            {
+              "path": "orbit360-platform/core/pwa.js",
+              "blobSha": "14bc0d513a2ee3de8f7b598b38276e6136f05eb8",
+              "url": "https://github.com/paulaosoriof86/orbit360-core/blob/0444999adacb73b128943bb2287a427a8dfa6103/orbit360-platform/core/pwa.js"
+            }
+          ],
+          "evidence": [
+            "BASE",
+            "EP",
+            "C42"
+          ],
+          "accepted": "Certificados base preservados; artifact e503 comprobado con 218 archivos; no nuevo producto paralelo.",
+          "pending": "Promoción del mismo artifact y comprobación en LIVE; medir nueva regresión concreta si aparece.",
+          "verifiedRatio": "218/218 archivos e503 exactos; transporte, no cobertura funcional total.",
+          "overallImplementationPercent": null,
+          "percentReason": "No existe adjudicación vigente de todos los criterios aplicables por módulo; no equivale a 0 %."
+        },
+        {
+          "id": "inicio",
+          "modulo": "Inicio y metas",
+          "gate": "Base preservada; B4-003",
+          "source": [
+            {
+              "path": "orbit360-platform/modules/inicio.js",
+              "blobSha": "179b7a4b0def0af8b9d509407f199501bf56cfde",
+              "url": "https://github.com/paulaosoriof86/orbit360-core/blob/0444999adacb73b128943bb2287a427a8dfa6103/orbit360-platform/modules/inicio.js"
+            }
+          ],
+          "evidence": [
+            "BASE",
+            "CP",
+            "UI42",
+            "C42"
+          ],
+          "accepted": "Lectura LIVE 5/5 fuentes; GTQ/COP separados y responsive 320/390. Los P0 funcionales de metas/recaudo/freelance/textos quedaron cerrados o adjudicados en current42.",
+          "pending": "Reverificar únicamente impacto de clasificación/lector y nuevas conciliaciones; no restaurar cálculos históricos sin autoridad.",
+          "verifiedRatio": "5/5 fuentes en observación LIVE; no porcentaje de módulo.",
+          "overallImplementationPercent": null,
+          "percentReason": "No existe adjudicación vigente de todos los criterios aplicables por módulo; no equivale a 0 %."
+        },
+        {
+          "id": "clientes",
+          "modulo": "Clientes / Cliente 360",
+          "gate": "Base preservada; B4-003; I6.6/7 efectos",
+          "source": [
+            {
+              "path": "orbit360-platform/modules/cliente360.js",
+              "blobSha": "0fd9dc9452b2336f91e6e1506f06a5984e066edf",
+              "url": "https://github.com/paulaosoriof86/orbit360-core/blob/0444999adacb73b128943bb2287a427a8dfa6103/orbit360-platform/modules/cliente360.js"
+            }
+          ],
+          "evidence": [
+            "BASE",
+            "UI42",
+            "OWNER",
+            "C42"
+          ],
+          "accepted": "Certificado base; identidad/ruta tras recarga y relaciones con póliza, vehículo, recibos y cartera observadas en LIVE.",
+          "pending": "Proyectar conciliación en pagos/cobros/comisiones. Comparativo de renovación tiene guardado sin readback y valores supuestos; intervención delimitada, comparador integral diferido.",
+          "verifiedRatio": null,
+          "overallImplementationPercent": null,
+          "percentReason": "No existe adjudicación vigente de todos los criterios aplicables por módulo; no equivale a 0 %."
+        },
+        {
+          "id": "vehiculos",
+          "modulo": "Vehículos",
+          "gate": "Base preservada; B4-005 delta",
+          "source": [
+            {
+              "path": "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
+              "blobSha": "b295871ffca1d59c2434f4b75ab6929c3e9a6fbf",
+              "url": "https://github.com/paulaosoriof86/orbit360-core/blob/0444999adacb73b128943bb2287a427a8dfa6103/orbit360-platform/modules/policy-receipts-v1199-detail-guard.js"
+            }
+          ],
+          "evidence": [
+            "BASE",
+            "UI42",
+            "C42"
+          ],
+          "accepted": "Certificado base y relación Cliente360–vehículo–póliza observada; versiones históricas agrupadas.",
+          "pending": "Conservar identidad y relaciones. No se ha probado regresión causal nueva ni se justifica rehacerlo.",
+          "verifiedRatio": null,
+          "overallImplementationPercent": null,
+          "percentReason": "No existe adjudicación vigente de todos los criterios aplicables por módulo; no equivale a 0 %."
+        },
+        {
+          "id": "aseguradoras",
+          "modulo": "Aseguradoras y directorio operacional",
+          "gate": "Base preservada; B4-003; I6.7 tarifas",
+          "source": [
+            {
+              "path": "orbit360-platform/modules/aseguradoras.js",
+              "blobSha": "09be1762fc5392cc4daba8ad963f4b9ae7ba4db1",
+              "url": "https://github.com/paulaosoriof86/orbit360-core/blob/0444999adacb73b128943bb2287a427a8dfa6103/orbit360-platform/modules/aseguradoras.js"
+            }
+          ],
+          "evidence": [
+            "BASE",
+            "UI42",
+            "C42",
+            "OWNER"
+          ],
+          "accepted": "Directorio/credenciales/revelar-copiar-ocultar y cuenta bancaria focal LIVE; prueba sintética completa y limpieza current42.",
+          "pending": "Incorporar tarifas documentadas por ramo/producto/moneda/vigencia sin sobrescribirlas como tasa global. Conservar los permisos aprobados.",
+          "verifiedRatio": null,
+          "overallImplementationPercent": null,
+          "percentReason": "No existe adjudicación vigente de todos los criterios aplicables por módulo; no equivale a 0 %."
+        },
+        {
+          "id": "ops",
+          "modulo": "Ops",
+          "gate": "Base preservada; B4-001/003",
+          "source": [
+            {
+              "path": "orbit360-platform/modules/ops.js",
+              "blobSha": "eadc3ffd5ce9eb8c3c696870a8a7069f78908dc1",
+              "url": "https://github.com/paulaosoriof86/orbit360-core/blob/0444999adacb73b128943bb2287a427a8dfa6103/orbit360-platform/modules/ops.js"
+            },
+            {
+              "path": "orbit360-platform/core/ciclo.js",
+              "blobSha": "7068c028419c7c13d9dc12b0fb715dd7bb3ce8c1",
+              "url": "https://github.com/paulaosoriof86/orbit360-core/blob/0444999adacb73b128943bb2287a427a8dfa6103/orbit360-platform/core/ciclo.js"
+            }
+          ],
+          "evidence": [
+            "BASE",
+            "B41",
+            "CVP",
+            "UI42",
+            "C42"
+          ],
+          "accepted": "Aceptación visual preservada; registro canónico compartido con Leads y recarga LIVE. Colaboración bidireccional de UID reales recibida y archivada en cierre.",
+          "pending": "Probar sólo efecto del catálogo desplegado y cambios causales. No reconstruir gestiones ni reescribir autores históricos.",
+          "verifiedRatio": null,
+          "overallImplementationPercent": null,
+          "percentReason": "No existe adjudicación vigente de todos los criterios aplicables por módulo; no equivale a 0 %."
+        },
+        {
+          "id": "leads",
+          "modulo": "Leads",
+          "gate": "Base preservada; B4-001/003",
+          "source": [
+            {
+              "path": "orbit360-platform/modules/leads.js",
+              "blobSha": "f4af7b02d79890ca7ab8c39fb9f0269dac772b93",
+              "url": "https://github.com/paulaosoriof86/orbit360-core/blob/0444999adacb73b128943bb2287a427a8dfa6103/orbit360-platform/modules/leads.js"
+            },
+            {
+              "path": "orbit360-platform/core/ciclo.js",
+              "blobSha": "7068c028419c7c13d9dc12b0fb715dd7bb3ce8c1",
+              "url": "https://github.com/paulaosoriof86/orbit360-core/blob/0444999adacb73b128943bb2287a427a8dfa6103/orbit360-platform/core/ciclo.js"
+            }
+          ],
+          "evidence": [
+            "BASE",
+            "B41",
+            "CP",
+            "UI42",
+            "C42"
+          ],
+          "accepted": "Certificado base; negocio canónico igual en Ops, autores humanos y archivos QA confirmados. Evidencia responsive focal preservada.",
+          "pending": "Conservar handoff/relaciones y repetir sólo las dependencias afectadas por catálogo/lector.",
+          "verifiedRatio": null,
+          "overallImplementationPercent": null,
+          "percentReason": "No existe adjudicación vigente de todos los criterios aplicables por módulo; no equivale a 0 %."
+        },
+        {
+          "id": "gestiones",
+          "modulo": "Gestiones y Portal",
+          "gate": "B4-001; B4-005 transversal",
+          "source": [
+            {
+              "path": "orbit360-platform/modules/portal.js",
+              "blobSha": "dce6a980ea87eb3baab0c98a600edac9c4a8d356",
+              "url": "https://github.com/paulaosoriof86/orbit360-core/blob/0444999adacb73b128943bb2287a427a8dfa6103/orbit360-platform/modules/portal.js"
+            },
+            {
+              "path": "functions/product-ops-leads-domain.js",
+              "blobSha": "2fb2ec7aef5d9942acdb1ecc4604040febb33123",
+              "url": "https://github.com/paulaosoriof86/orbit360-core/blob/0444999adacb73b128943bb2287a427a8dfa6103/functions/product-ops-leads-domain.js"
+            }
+          ],
+          "evidence": [
+            "B41",
+            "PLAN",
+            "UI42"
+          ],
+          "accepted": "B4-001 CLOSED_PASS_MACHINE: una gestión canónica, convergencia, readback, cardinalidad y rechazo de duplicado.",
+          "pending": "No confundir prueba del flujo canónico con certificado integral de todas las superficies Portal. Completar sólo delta/matriz aplicable en B4-005.",
+          "verifiedRatio": "8/8 aserciones true del recibo B4-001; porcentaje de módulo N/D.",
+          "overallImplementationPercent": null,
+          "percentReason": "No existe adjudicación vigente de todos los criterios aplicables por módulo; no equivale a 0 %."
+        },
+        {
+          "id": "notificaciones",
+          "modulo": "Notificaciones y automatizaciones",
+          "gate": "B4-002; B4-005 transversal",
+          "source": [
+            {
+              "path": "functions/notification-outbox-processor.js",
+              "blobSha": "ce31ae776beb5945741ef0f9f9dbf53075d03910",
+              "url": "https://github.com/paulaosoriof86/orbit360-core/blob/0444999adacb73b128943bb2287a427a8dfa6103/functions/notification-outbox-processor.js"
+            },
+            {
+              "path": "functions/ops-advisor-inbox.js",
+              "blobSha": "a26aeefdb27344bf91f978ca054ae9c1bfa8c3f7",
+              "url": "https://github.com/paulaosoriof86/orbit360-core/blob/0444999adacb73b128943bb2287a427a8dfa6103/functions/ops-advisor-inbox.js"
+            }
+          ],
+          "evidence": [
+            "B42",
+            "CP",
+            "C42"
+          ],
+          "accepted": "B4-002 CLOSED_PASS_MACHINE: post-commit, bloqueo pre-commit, reintento visible e idempotente; avisos cruzados reales conservados en current42.",
+          "pending": "Entrega externa debe acreditarse por proveedor; un aviso interno o estado enviado no demuestra email/WhatsApp entregado.",
+          "verifiedRatio": "9/9 aserciones true del recibo B4-002; no cobertura total de proveedores.",
+          "overallImplementationPercent": null,
+          "percentReason": "No existe adjudicación vigente de todos los criterios aplicables por módulo; no equivale a 0 %."
+        },
+        {
+          "id": "polizas",
+          "modulo": "Pólizas / riesgos",
+          "gate": "Base preservada; I6.4; I6.6 correcciones documentales",
+          "source": [
+            {
+              "path": "orbit360-platform/modules/polizas.js",
+              "blobSha": "7fbb84ce77ffba0c0ffb8c3051ca579c5989d70f",
+              "url": "https://github.com/paulaosoriof86/orbit360-core/blob/0444999adacb73b128943bb2287a427a8dfa6103/orbit360-platform/modules/polizas.js"
+            },
+            {
+              "path": "orbit360-platform/core/policy-receipts-engine.js",
+              "blobSha": "b04fdd580efcc2fdfa8703238e92ab5bc51d6347",
+              "url": "https://github.com/paulaosoriof86/orbit360-core/blob/0444999adacb73b128943bb2287a427a8dfa6103/orbit360-platform/core/policy-receipts-engine.js"
+            }
+          ],
+          "evidence": [
+            "BASE",
+            "UI42",
+            "OWNER",
+            "C42"
+          ],
+          "accepted": "Certificado base y sucesores preservados. Lista/búsqueda/detalle financiero LIVE observados; avisos de calendario no confirmado conservan evidencia real.",
+          "pending": "Cruzar identidad/vigencia/endoso; corregir primas, modalidad y cuotas con diff y procedencia, preservando pagos. Nueva póliza sólo se confirma tras matching.",
+          "verifiedRatio": null,
+          "overallImplementationPercent": null,
+          "percentReason": "No existe adjudicación vigente de todos los criterios aplicables por módulo; no equivale a 0 %."
+        },
+        {
+          "id": "cartera",
+          "modulo": "Recibos y cartera",
+          "gate": "Base preservada; I6.5; I6.6 lote real",
+          "source": [
+            {
+              "path": "orbit360-platform/core/policy-receipts-engine.js",
+              "blobSha": "b04fdd580efcc2fdfa8703238e92ab5bc51d6347",
+              "url": "https://github.com/paulaosoriof86/orbit360-core/blob/0444999adacb73b128943bb2287a427a8dfa6103/orbit360-platform/core/policy-receipts-engine.js"
+            },
+            {
+              "path": "orbit360-platform/modules/policy-receipts-v1199-bridge.js",
+              "blobSha": "79e8eefc821b17b1abb3ba7b26558e90199a9ea5",
+              "url": "https://github.com/paulaosoriof86/orbit360-core/blob/0444999adacb73b128943bb2287a427a8dfa6103/orbit360-platform/modules/policy-receipts-v1199-bridge.js"
+            }
+          ],
+          "evidence": [
+            "BASE",
+            "UI42",
+            "OWNER",
+            "C42"
+          ],
+          "accepted": "Certificado base; recibosEsperados/carteraPrimas diferenciados de cobros; lectura relacional LIVE y semántica de pago fuente/confirmado preservadas.",
+          "pending": "Conciliar lote octubre y fechas retroactivas sin desplazar vencimientos; doce pagos médicos; no usar importación para arreglar presentación.",
+          "verifiedRatio": null,
+          "overallImplementationPercent": null,
+          "percentReason": "No existe adjudicación vigente de todos los criterios aplicables por módulo; no equivale a 0 %."
+        },
+        {
+          "id": "cobros",
+          "modulo": "Cobros",
+          "gate": "Base preservada; I6.6",
+          "source": [
+            {
+              "path": "orbit360-platform/modules/cobros.js",
+              "blobSha": "ed8e23f47f31401012ddc4632e75386f30dda158",
+              "url": "https://github.com/paulaosoriof86/orbit360-core/blob/0444999adacb73b128943bb2287a427a8dfa6103/orbit360-platform/modules/cobros.js"
+            },
+            {
+              "path": "functions/cobros-reconciliation-domain.js",
+              "blobSha": "5b27038d1c8380e4d2d0ed044996c1570d8c3767",
+              "url": "https://github.com/paulaosoriof86/orbit360-core/blob/0444999adacb73b128943bb2287a427a8dfa6103/functions/cobros-reconciliation-domain.js"
+            }
+          ],
+          "evidence": [
+            "BASE",
+            "CP",
+            "UI42",
+            "OWNER",
+            "C42"
+          ],
+          "accepted": "Certificado base; flujo sintético aplicar→recargar→conciliar→restaurar PASS previo. Paridad focal Cobros/Reportes en igual país observada.",
+          "pending": "Procesar pagos reales del lote con deduplicación, cuota/vigencia/moneda, antes/después y recarga; conservar pagos parciales y directos.",
+          "verifiedRatio": null,
+          "overallImplementationPercent": null,
+          "percentReason": "No existe adjudicación vigente de todos los criterios aplicables por módulo; no equivale a 0 %."
+        },
+        {
+          "id": "conciliaciones",
+          "modulo": "Conciliaciones",
+          "gate": "I6.6; preparación permitida por propietaria",
+          "source": [
+            {
+              "path": "orbit360-platform/modules/conciliaciones.js",
+              "blobSha": "3b77b2cff04e2f10ab78541d8802c191901de240",
+              "url": "https://github.com/paulaosoriof86/orbit360-core/blob/0444999adacb73b128943bb2287a427a8dfa6103/orbit360-platform/modules/conciliaciones.js"
+            },
+            {
+              "path": "functions/cobros-reconciliation-domain.js",
+              "blobSha": "5b27038d1c8380e4d2d0ed044996c1570d8c3767",
+              "url": "https://github.com/paulaosoriof86/orbit360-core/blob/0444999adacb73b128943bb2287a427a8dfa6103/functions/cobros-reconciliation-domain.js"
+            }
+          ],
+          "evidence": [
+            "CP",
+            "UI42",
+            "OWNER",
+            "PLAN"
+          ],
+          "accepted": "Existe módulo y flujo de propuesta, más journal/owners canónicos; la prueba sintética de pago/conciliación ya fue realizada.",
+          "pending": "Registrar primer lote real durable, hechos económicos, efectos pendientes y auditoría visible; la pantalla actual de propuestas no certifica lote aplicado.",
+          "verifiedRatio": null,
+          "overallImplementationPercent": null,
+          "percentReason": "No existe adjudicación vigente de todos los criterios aplicables por módulo; no equivale a 0 %."
+        },
+        {
+          "id": "comisiones",
+          "modulo": "Comisiones empresa y vendedores",
+          "gate": "B4-005 materialización; I6.7",
+          "source": [
+            {
+              "path": "orbit360-platform/modules/comisiones.js",
+              "blobSha": "5b26dfc1cf2331af99eadb7a71f8348c9c053594",
+              "url": "https://github.com/paulaosoriof86/orbit360-core/blob/0444999adacb73b128943bb2287a427a8dfa6103/orbit360-platform/modules/comisiones.js"
+            }
+          ],
+          "evidence": [
+            "OWNER",
+            "PLAN"
+          ],
+          "accepted": "Módulo y pestaña Cliente360 existen; configuración de reparto Equipo existente debe reutilizarse. No es un módulo por reconstruir.",
+          "pending": "Materializar por planilla/recibo/pago con porcentaje real; tarifas de vendedor con vigencia y snapshot histórico; sin defaults silenciosos 12/50 %.",
+          "verifiedRatio": null,
+          "overallImplementationPercent": null,
+          "percentReason": "No existe adjudicación vigente de todos los criterios aplicables por módulo; no equivale a 0 %."
+        },
+        {
+          "id": "finanzas",
+          "modulo": "Finanzas (CxC, CxP, liquidaciones, caja)",
+          "gate": "Cruces I6.6/I6.7; I6.8 condicionado",
+          "source": [
+            {
+              "path": "orbit360-platform/modules/finanzas.js",
+              "blobSha": "c12d7324928f08d8127e60d2029f80928e5a0ed3",
+              "url": "https://github.com/paulaosoriof86/orbit360-core/blob/0444999adacb73b128943bb2287a427a8dfa6103/orbit360-platform/modules/finanzas.js"
+            }
+          ],
+          "evidence": [
+            "OWNER",
+            "PLAN"
+          ],
+          "accepted": "Owner y cálculos existentes; se conserva lo desarrollado. Lote puede retener hechos pendientes para materialización posterior.",
+          "pending": "Distinguir devengo/factura/cobro bancario y comisión vendedor/pago; claves documento+moneda (G&T Q/USD); efectos idempotentes y readback al habilitar Finance.",
+          "verifiedRatio": null,
+          "overallImplementationPercent": null,
+          "percentReason": "No existe adjudicación vigente de todos los criterios aplicables por módulo; no equivale a 0 %."
+        },
+        {
+          "id": "renovaciones",
+          "modulo": "Renovaciones",
+          "gate": "B4-003 cerrado; corrección causal catálogo",
+          "source": [
+            {
+              "path": "orbit360-platform/modules/renovaciones.js",
+              "blobSha": "e3eecb72e7642d4c572338d89f119ae98135f6c1",
+              "url": "https://github.com/paulaosoriof86/orbit360-core/blob/0444999adacb73b128943bb2287a427a8dfa6103/orbit360-platform/modules/renovaciones.js"
+            },
+            {
+              "path": "orbit360-platform/modules/renewals-v1200-operational-bridge.js",
+              "blobSha": "43b3a6b07eba40baa50b61b238174540cd9bf430",
+              "url": "https://github.com/paulaosoriof86/orbit360-core/blob/0444999adacb73b128943bb2287a427a8dfa6103/orbit360-platform/modules/renewals-v1200-operational-bridge.js"
+            }
+          ],
+          "evidence": [
+            "R24",
+            "RVP",
+            "UI42",
+            "OWNER",
+            "C42"
+          ],
+          "accepted": "24 escenarios autenticados readonly PASS y visual Paula16 oct (Kanban, columnas, tarjetas, filtros, vigencias) preservados; 17 pruebas focales conjuntas nuevas/existentes PASS hoy.",
+          "pending": "Propuestas LIVE rechaza catálogo antiguo; corregir despliegue de esa dependencia. Comparativos de Cliente360 pendientes; no recrear tablero aprobado.",
+          "verifiedRatio": "24/24 escenarios históricos readonly (100 % de esa matriz); 17/17 suite focal conjunta, no 100 % de todos los flujos.",
+          "overallImplementationPercent": null,
+          "percentReason": "No existe adjudicación vigente de todos los criterios aplicables por módulo; no equivale a 0 %."
+        },
+        {
+          "id": "cancelaciones",
+          "modulo": "Cancelaciones",
+          "gate": "B4-003 cerrado; sucesor causal e503",
+          "source": [
+            {
+              "path": "orbit360-platform/modules/cancelaciones.js",
+              "blobSha": "c206f79a47b8aa8684dc0cf50756f3720166bdbe",
+              "url": "https://github.com/paulaosoriof86/orbit360-core/blob/0444999adacb73b128943bb2287a427a8dfa6103/orbit360-platform/modules/cancelaciones.js"
+            }
+          ],
+          "evidence": [
+            "CVP",
+            "OWNER",
+            "EF",
+            "C42"
+          ],
+          "accepted": "Visual Paula12 oct, motivo durable y borrador WhatsApp preservados. e503 Preview excluye 1 QA comercial y conserva auditoría; detalle/borrador observados.",
+          "pending": "Promover e503 y comprobar LIVE. Recuperación tiene riesgo reproducible de escritura parcial si falla actividad; resolver durable/atómico antes de afirmar todos los flujos.",
+          "verifiedRatio": "4/4 pruebas causales exclusión QA; 17/17 suite conjunta, no porcentaje integral.",
+          "overallImplementationPercent": null,
+          "percentReason": "No existe adjudicación vigente de todos los criterios aplicables por módulo; no equivale a 0 %."
+        },
+        {
+          "id": "equipo",
+          "modulo": "Equipo / clasificación / reparto / metas",
+          "gate": "B4-003 cerrado; sucesor causal e503",
+          "source": [
+            {
+              "path": "orbit360-platform/modules/equipo.js",
+              "blobSha": "1bd7881ed29f6d7488bb806a96a0ab52c5c5c3b8",
+              "url": "https://github.com/paulaosoriof86/orbit360-core/blob/0444999adacb73b128943bb2287a427a8dfa6103/orbit360-platform/modules/equipo.js"
+            },
+            {
+              "path": "orbit360-platform/data/store-firestore-product-operational-p0.js",
+              "blobSha": "da30be86aa065d26581693f3430c40ac7cac6165",
+              "url": "https://github.com/paulaosoriof86/orbit360-core/blob/0444999adacb73b128943bb2287a427a8dfa6103/orbit360-platform/data/store-firestore-product-operational-p0.js"
+            }
+          ],
+          "evidence": [
+            "OWNER",
+            "EF",
+            "CP",
+            "C42"
+          ],
+          "accepted": "Siete clasificaciones ya persistidas; e503 Preview muestra4 internos / 3 freelance tras recarga. Corrección ACK→store con48 comprobaciones.",
+          "pending": "Transportar lector LIVE exacto y mismo frontend e503; validar lectura y guardado permitido desde UI sin repetir siete escrituras históricas. Tarifas futuras separadas.",
+          "verifiedRatio": "48/48 comprobaciones de causa ACK/store; no 100 % de Equipo.",
+          "overallImplementationPercent": null,
+          "percentReason": "No existe adjudicación vigente de todos los criterios aplicables por módulo; no equivale a 0 %."
+        },
+        {
+          "id": "cronograma",
+          "modulo": "Cronograma",
+          "gate": "Primer gate formal incompleto B4-004",
+          "source": [
+            {
+              "path": "orbit360-platform/modules/cronograma.js",
+              "blobSha": "5d412e4ee263bb6cbfbd840b7124871a1e5b6ee8",
+              "url": "https://github.com/paulaosoriof86/orbit360-core/blob/0444999adacb73b128943bb2287a427a8dfa6103/orbit360-platform/modules/cronograma.js"
+            }
+          ],
+          "evidence": [
+            "CRONO",
+            "PLAN",
+            "OWNER"
+          ],
+          "accepted": "UAT auténtica29 oct: alta→recarga→marcar completada→recarga PASS Dirección GT; Todos negó alta ambigua. Código aprobado preservado.",
+          "pending": "Cerrar delta B4-004 de obligaciones/recibos y scopes aplicables con evidencia actual. El gate pendiente no significa módulo sin trabajo.",
+          "verifiedRatio": null,
+          "overallImplementationPercent": null,
+          "percentReason": "No existe adjudicación vigente de todos los criterios aplicables por módulo; no equivale a 0 %."
+        },
+        {
+          "id": "siniestros",
+          "modulo": "Siniestros",
+          "gate": "B4-004; OWNER_DEFERRED_NON_BLOCKING_PHASE_A",
+          "source": [
+            {
+              "path": "orbit360-platform/modules/siniestros.js",
+              "blobSha": "f52c2046157f0bc72008e09e826d34d05eeb668b",
+              "url": "https://github.com/paulaosoriof86/orbit360-core/blob/0444999adacb73b128943bb2287a427a8dfa6103/orbit360-platform/modules/siniestros.js"
+            }
+          ],
+          "evidence": [
+            "OWNER",
+            "PLAN"
+          ],
+          "accepted": "Trabajo/source conservado. Paula autorizó diferirlo de Fase A.",
+          "pending": "No bloquear salida ni etiquetar PASS. Retomar después según alcance propietario.",
+          "verifiedRatio": null,
+          "overallImplementationPercent": null,
+          "percentReason": "No existe adjudicación vigente de todos los criterios aplicables por módulo; no equivale a 0 %."
+        },
+        {
+          "id": "historial",
+          "modulo": "Historial / trazabilidad",
+          "gate": "B4-003 focal; I6.8 integral",
+          "source": [
+            {
+              "path": "orbit360-platform/modules/historial.js",
+              "blobSha": "4db071720d4df5a167d3b246e6581e49267e4e73",
+              "url": "https://github.com/paulaosoriof86/orbit360-core/blob/0444999adacb73b128943bb2287a427a8dfa6103/orbit360-platform/modules/historial.js"
+            }
+          ],
+          "evidence": [
+            "CP",
+            "UI42",
+            "C42",
+            "PLAN"
+          ],
+          "accepted": "Lectura LIVE con autores/enlaces y evidencia histórica conservada. Focal Operativo: GT 23 + CO 13 = Todos 36 preservado.",
+          "pending": "Propagar trazabilidad de conciliación y confirmar sólo eventos nuevos; no reescribir autores históricos sin evidencia.",
+          "verifiedRatio": null,
+          "overallImplementationPercent": null,
+          "percentReason": "No existe adjudicación vigente de todos los criterios aplicables por módulo; no equivale a 0 %."
+        },
+        {
+          "id": "endosos",
+          "modulo": "Endosos, certificados y anexos",
+          "gate": "B4-005",
+          "source": [
+            {
+              "path": "orbit360-platform/core/endorsement-workflow-v1201.js",
+              "blobSha": "24b70d05e8adcba8e6b15a88817ad39a46c6a066",
+              "url": "https://github.com/paulaosoriof86/orbit360-core/blob/0444999adacb73b128943bb2287a427a8dfa6103/orbit360-platform/core/endorsement-workflow-v1201.js"
+            },
+            {
+              "path": "orbit360-platform/modules/issuance-endosos-v1201-bridge.js",
+              "blobSha": "2020152b4b2df1338be4b3ef2a9f121d777e21db",
+              "url": "https://github.com/paulaosoriof86/orbit360-core/blob/0444999adacb73b128943bb2287a427a8dfa6103/orbit360-platform/modules/issuance-endosos-v1201-bridge.js"
+            }
+          ],
+          "evidence": [
+            "PLAN"
+          ],
+          "accepted": "Owners aprobados existentes reconocidos explícitamente por plan; no reconstrucción paralela.",
+          "pending": "Cerrar matriz aplicable de crear/editar/aplicar/documento/aprobación/readback/rol/relaciones; fuente y aprobación más reciente a adjudicar por flujo antes de intervenir.",
+          "verifiedRatio": null,
+          "overallImplementationPercent": null,
+          "percentReason": "No existe adjudicación vigente de todos los criterios aplicables por módulo; no equivale a 0 %."
+        },
+        {
+          "id": "reportes",
+          "modulo": "Reportes",
+          "gate": "B4-003 focal; B4-005 transversal",
+          "source": [
+            {
+              "path": "orbit360-platform/modules/reportes.js",
+              "blobSha": "0daba72ebd8e6f8bef84ced9739b71bcabff0973",
+              "url": "https://github.com/paulaosoriof86/orbit360-core/blob/0444999adacb73b128943bb2287a427a8dfa6103/orbit360-platform/modules/reportes.js"
+            }
+          ],
+          "evidence": [
+            "CP",
+            "UI42",
+            "EF",
+            "OWNER"
+          ],
+          "accepted": "Paridad cartera/cobros focal preservada. e503 Preview muestra489 cancelaciones y1 QA retenido fuera del universo comercial.",
+          "pending": "Promover e503 y verificar same-scope/moneda. Exportación byte a byte tiene aplazamiento propietario; no revocar descargas ya aprobadas.",
+          "verifiedRatio": null,
+          "overallImplementationPercent": null,
+          "percentReason": "No existe adjudicación vigente de todos los criterios aplicables por módulo; no equivale a 0 %."
+        },
+        {
+          "id": "calidad",
+          "modulo": "Calidad / salud de información",
+          "gate": "B4-003; seguimiento de inconsistencias",
+          "source": [
+            {
+              "path": "orbit360-platform/modules/calidad.js",
+              "blobSha": "4043b4ce2d05397ff79615c51ccf8ffe7a939e15",
+              "url": "https://github.com/paulaosoriof86/orbit360-core/blob/0444999adacb73b128943bb2287a427a8dfa6103/orbit360-platform/modules/calidad.js"
+            }
+          ],
+          "evidence": [
+            "PLAN",
+            "OWNER"
+          ],
+          "accepted": "Owner, acciones y trabajo previo conservados en candidata acumulativa; las alertas de inconsistencia documentada no prueban producto ausente.",
+          "pending": "Usar conciliación para adjudicar discrepancias de primas/cuotas/identidad. No cerrar alertas ocultándolas ni reescribiendo cifras por apariencia.",
+          "verifiedRatio": null,
+          "overallImplementationPercent": null,
+          "percentReason": "No existe adjudicación vigente de todos los criterios aplicables por módulo; no equivale a 0 %."
+        },
+        {
+          "id": "marketing",
+          "modulo": "Marketing",
+          "gate": "Después de Finanzas; antes de cotización/comparación/conocimiento",
+          "source": [
+            {
+              "path": "orbit360-platform/modules/marketing.js",
+              "blobSha": "2b1d3dd29624b3388eac42c03dd80be9d879b3e9",
+              "url": "https://github.com/paulaosoriof86/orbit360-core/blob/0444999adacb73b128943bb2287a427a8dfa6103/orbit360-platform/modules/marketing.js"
+            }
+          ],
+          "evidence": [
+            "OWNER"
+          ],
+          "accepted": "Módulo existente preservado. No aceptación integral nueva recuperada en esta revisión focal.",
+          "pending": "Recuperar último alcance aprobado al activar este trabajo; no usar ausencia de certificado en esta lectura como0 % de implementación.",
+          "verifiedRatio": null,
+          "overallImplementationPercent": null,
+          "percentReason": "No existe adjudicación vigente de todos los criterios aplicables por módulo; no equivale a 0 %."
+        },
+        {
+          "id": "cotizacion",
+          "modulo": "Cotización, comparación y conocimiento asegurador",
+          "gate": "OWNER_DEFERRED_AFTER_FINANCE_AND_MARKETING",
+          "source": [
+            {
+              "path": "orbit360-platform/modules/comparativo.js",
+              "blobSha": "982881a4c1e2f95be95428bd3f9f23360a9a2d5f",
+              "url": "https://github.com/paulaosoriof86/orbit360-core/blob/0444999adacb73b128943bb2287a427a8dfa6103/orbit360-platform/modules/comparativo.js"
+            },
+            {
+              "path": "orbit360-platform/core/quote-authority-contract-v1.js",
+              "blobSha": "7fb49d51476f21456540b0b7a178e82675231562",
+              "url": "https://github.com/paulaosoriof86/orbit360-core/blob/0444999adacb73b128943bb2287a427a8dfa6103/orbit360-platform/core/quote-authority-contract-v1.js"
+            }
+          ],
+          "evidence": [
+            "OWNER",
+            "PLAN"
+          ],
+          "accepted": "Owners, contratos y trabajo previo preservados; aplazamiento explícito más reciente prevalece sobre obligaciones históricas pre-LIVE.",
+          "pending": "Retomar después de Finanzas/Marketing. No bloquea Fase A ni borra comparativo Cliente360 pendiente.",
+          "verifiedRatio": null,
+          "overallImplementationPercent": null,
+          "percentReason": "No existe adjudicación vigente de todos los criterios aplicables por módulo; no equivale a 0 %."
+        },
+        {
+          "id": "academia",
+          "modulo": "Academia / enablement",
+          "gate": "I6.8",
+          "source": [
+            {
+              "path": "orbit360-platform/modules/academia.js",
+              "blobSha": "4d48ee3edbc6afc4163bf6365a80bbcb680b1852",
+              "url": "https://github.com/paulaosoriof86/orbit360-core/blob/0444999adacb73b128943bb2287a427a8dfa6103/orbit360-platform/modules/academia.js"
+            }
+          ],
+          "evidence": [
+            "PLAN"
+          ],
+          "accepted": "Owner existente; recuperación prevé habilitación gradual y permisos; no reintroducir LAB o semillas al entrypoint.",
+          "pending": "Recuperar evidencia específica al llegar al gate; esta revisión no concede PASS integral ni porcentaje.",
+          "verifiedRatio": null,
+          "overallImplementationPercent": null,
+          "percentReason": "No existe adjudicación vigente de todos los criterios aplicables por módulo; no equivale a 0 %."
+        }
+      ]
+    },
+    "baseCertificatesPreserved": 15,
+    "renovacionesAuthenticatedHistoricalScenariosPreserved": 24,
+    "firstIncompleteFormalGate": "B4-004-SINIESTROS-CRONOGRAMA",
+    "overallImplementationPercent": null
+  },
+  "cronogramaMinimumDeltaReview20261107": {
+    "sourceReviewDocument": "module_evidence_closeout_nov07/CRONOGRAMA_B4_004_DELTA_20261107.md",
+    "sourceReviewSha256": "d2621d757a5b5c65179113f71cb2ba45c4dee2a99cb9cd417d03c05d57fb9ab4",
+    "reviewedHead": "e60148effd9d55829ecf97767ac5cf2df780f69e",
+    "ownerBlobSha": "5d412e4ee263bb6cbfbd840b7124871a1e5b6ee8",
+    "adapterBlobSha": "a20facb46713ab859754b3fc0d011cf0cfdfc365",
+    "ownerAndAdapterUnchangedSinceAuthenticated20261029": true,
+    "existingFocusedSourceTestsPassed": 4,
+    "preservedAuthenticatedEvidencePath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CRONOGRAMA_DIRECCION_AUTH_E2E_20261029.md",
+    "preservedAuthenticatedEvidenceBlobSha": "8ed63013a10a25d12c165429faa2674000a04e04",
+    "preservedEvidenceScope": "PREVIEW Dirección/GT synthetic task create-reload-complete-reload and all-countries rejection; not blanket LIVE acceptance",
+    "currentFocalLiveReadRecorded": true,
+    "remaining": [
+      "Verify changed own/team/other-UID and country scope dependencies only.",
+      "Reuse existing synthetic task for controlled durable update/reload when the applicable gate permits.",
+      "Review observed startup/loading path without claiming measured performance."
+    ],
+    "b4004Closed": false,
+    "newPassGranted": false,
+    "receiptDetailStartupFinding": {
+      "status": "MEASURED_READINESS_INTERVAL_WITH_SOURCE_PATH_REVIEW_NO_PERFORMANCE_PASS",
+      "lowerExclusiveMs": 21934,
+      "upperInclusiveMs": 51338,
+      "exactDurationKnown": false,
+      "overThirtySecondsProven": false,
+      "priority": "B4-004 receipt/policy detail loading; preserve scope and hydration guards",
+      "sourceObservations": {
+        "cliente360RequiredCollections": 8,
+        "relatedUniversePageSizePerCountry": 200,
+        "relatedUniverseRequestHasPolicyIdFilter": false,
+        "rerenderDelayMs": 140
+      },
+      "missingRequiredDependencySupported": false,
+      "sourceObservationsProveLatencyRootCause": false,
+      "sourceChangeApplied": false
+    }
+  },
+  "reviewedDeferredCandidateArchives20261107": {
+    "schema": "GRAVICENTRA_REVIEWED_DEFERRED_SOURCE_ARCHIVES_V1",
+    "status": "ARCHIVED_REVIEWED_DIFFS_ONLY_NOT_INTEGRATED",
+    "productBaseSource": "e5030ec5ba9854f0c576fd905c2f510766347ffa",
+    "productBaseArtifactId": 13584456766,
+    "sourceIntegrated": false,
+    "built": false,
+    "deployed": false,
+    "previewAcceptanceGranted": false,
+    "liveAcceptanceGranted": false,
+    "artifacts": [
+      {
+        "path": "artifacts/orbit360-recovery/release-control/candidate-reviewed/I6_5_B4_003_CANCEL_RECOVERY_PENDING_FINALIZATION_20261107.diff",
+        "blobSha": "a16123bd19f426424564a1223ffeade9f12c0792",
+        "sha256": "bc57f2b5226a73a1f0ca25f4f613af05e6d55b9d54bdc460f08d97062a560401"
+      },
+      {
+        "path": "artifacts/orbit360-recovery/release-control/candidate-reviewed/I6_5_B4_003_RENOVACIONES_RENDER_OWNER_20261107.diff",
+        "blobSha": "2b31af1864377a7476fce19d1665db222a0ff5d9",
+        "sha256": "8f4adc8782275076ad1a8db593c1ea88fb8963acf5a91d34d6a29b6e30e45b04"
+      },
+      {
+        "path": "artifacts/orbit360-recovery/release-control/candidate-reviewed/I6_5_RECONCILIATION_OWNER_DURABLE_CONTEXT_R2_20261107.patch",
+        "blobSha": "95d9ccfa2ee0c9d93d0887a32015129d72021880",
+        "sha256": "89bfd98acdce0effa99ece7dbda70fb9f47eeb3f36689f00eccf278e7158e4a8"
+      },
+      {
+        "path": "artifacts/orbit360-recovery/release-control/candidate-reviewed/I6_5_MEDICAL12_PRESERVED_20261107.patch",
+        "blobSha": "9b2503855fb996db4410cdbf354f2beff819f4af",
+        "sha256": "244c392e9d9b13452f2c062450cf24b38b8e40db09b74c203d6a330da01e5cc9"
+      }
+    ]
+  },
+  "deferredSourceCandidateReviews20261107": {
+    "cancelaciones": {
+      "schema": "GRAVICENTRA_CANCEL_RECOVERY_PENDING_FINALIZATION_SOURCE_CANDIDATE_V1",
+      "recordedAtUtc": "2026-11-07T19:16:28.717775+00:00",
+      "status": "LOCAL_SOURCE_CANDIDATE_FOCAL_VM_PASS_NOT_BUILT_OR_DEPLOYED",
+      "repo": "paulaosoriof86/orbit360-core",
+      "branch": "recovery/fase-a-clean-20260831",
+      "examinedHead": "f1321d6bea245411fd09e9ae414d58510551ef3b",
+      "productBaseSource": "e5030ec5ba9854f0c576fd905c2f510766347ffa",
+      "productBaseArtifactId": 13584456766,
+      "productBaseUnchanged": true,
+      "preservedAcceptance": {
+        "cancelacionesVisualReceiptBlob": "1bd7a04cd61c9f654b654e42776713326686c0b0",
+        "status": "SCOPED_HUMAN_VISUAL_PASS_NO_GATE_CLOSURE",
+        "latestCausalSourceBlob": "c206f79a47b8aa8684dc0cf50756f3720166bdbe",
+        "commercialQaExclusionPreserved": true
+      },
+      "unchangedDependencies": {
+        "orbit360-platform/data/store-firestore-product-operational-p0.js": "da30be86aa065d26581693f3430c40ac7cac6165",
+        "orbit360-platform/core/ciclo.js": "7068c028419c7c13d9dc12b0fb715dd7bb3ce8c1",
+        "functions/product-operational-domain.js": "187efbfa9868531349154f26ec90a5e2c2ed33e8",
+        "functions/product-ops-leads-domain.js": "2fb2ec7aef5d9942acdb1ecc4604040febb33123"
+      },
+      "changes": [
+        {
+          "path": "orbit360-platform/modules/cancelaciones.js",
+          "previousBlobSha": "c206f79a47b8aa8684dc0cf50756f3720166bdbe",
+          "blobSha": "fa417620828e62bdb0a36adb498209ac4868bbba",
+          "sha256": "1d0da5b34d832046a96d0037217d78a8d97d4def9fe50e432427a933b2cc742d",
+          "bytes": 45637
+        },
+        {
+          "path": "tools/gravicentra-b4-003-renewals-cancellations-focused.test.cjs",
+          "previousBlobSha": "34e2ff040802b7b56013b2d4440fb3a82b2db68b",
+          "blobSha": "fad7940d18fd39d0084e9e218ed09ab7705cce31",
+          "sha256": "8ad376e4a488d3b099b90be0e7499c0949daba7873053d7a2762da8d03040cf3",
+          "bytes": 21935
+        }
+      ],
+      "rootCause": "Recovery status was persisted before its activity and semantic workflow; activity failure left an advanced cancellation without the remaining effects.",
+      "behavior": [
+        "Persist a resumable intent on the existing canonical cancellation without advancing its recovery status. Existing operationalRequests remains the server journal.",
+        "Preserve the semantic workflow owner and workflowRequests. Use a stable dependent ID and append each identical recovery note only once.",
+        "Commit recovery state, links, activity and pending-intent removal together with the existing batchDurable transaction. Negocios/gestiones never enter the general operational batch.",
+        "Expose Pending finalization in the list and detail. Reload pre-fills the original pending action/note and retry completes it; a different action cannot silently replace the pending intent.",
+        "Preserve operation country/currency and actor UID/active role in the intent; backend permissions and canonical creator identity remain authoritative."
+      ],
+      "tests": {
+        "command": "node --test tools/gravicentra-b4-003-renewals-cancellations-focused.test.cjs tools/gravicentra-b4-003-cancelaciones-commercial-qa.test.cjs",
+        "functionalTests": 21,
+        "commercialQaTests": 4,
+        "passed": 25,
+        "failed": 0,
+        "failureBoundaries": [
+          "before pending-intent commit",
+          "pending-intent committed but ACK lost",
+          "workflow before commit",
+          "workflow committed but ACK lost",
+          "second mutation of final transaction fails",
+          "final transaction committed but ACK lost"
+        ],
+        "reloadRetry": true,
+        "workflowAndNotesNoDuplicates": true,
+        "permissionsNoWritesWhenDenied": true,
+        "countryGtCoQaRegressionPass": true,
+        "notePayloadPreservedWithoutReappend": true
+      },
+      "boundaries": {
+        "networkCalls": 0,
+        "realBusinessWrites": 0,
+        "remoteCommits": 0,
+        "backendSourceChanges": 0,
+        "newCollections": 0,
+        "sourceFilesChanged": 1,
+        "testFilesChanged": 1,
+        "frontendArtifactPatched": false,
+        "previewAcceptanceGranted": false,
+        "liveAcceptanceGranted": false,
+        "nextGateExecuted": false,
+        "singleCrossOwnerTransactionClaimed": false
+      },
+      "limits": [
+        "Execution is a VM using synthetic DOM/store and an atomic transaction model; actual deployed callable execution and browser UAT remain pending.",
+        "Workflow may already exist while the cancellation is explicitly pending. Retrying reuses that canonical dependent and completes the final transaction. This is not an atomic transaction across both backend owners.",
+        "Concurrent competing sessions and a transport failure before operational hydration catches up are not certified by these focused tests. Reload is the tested path after lost ACK.",
+        "Any integration changes source and requires a new immutable artifact/Preview/UAT/promotion; never modify the currently certified e503 artifact."
+      ],
+      "revision": 2,
+      "supersedesLocalCandidate": {
+        "sourceBlob": "2b77eac9002dbaf62de5ab7bf53cf4c25b1f8b0f",
+        "testBlob": "e7d33a123bb738232b969d68d846ee42d6a452fb",
+        "zipSha256": "894e7f45b81c898c01355a36a9cc2b64bbdcb7a7efafd78db47a3877a12f0fd7",
+        "reason": "Restore approved business nota payload; keep notas dedup. Original archive preserved unchanged."
+      },
+      "noteFieldContractReview": "NOTE_FIELD_CONTRACT_REVIEW.json"
+    },
+    "renovaciones": {
+      "schema": "gravicentra-renovaciones-render-owner-candidate-v1",
+      "dateUtc": "2026-11-07",
+      "status": "SOURCE_CANDIDATE_FOCUSED_QA_PASS_NOT_APPLIED",
+      "sourceReviewedHead": "c625822ec18fcc6098e169be3f2d5bce80a190e0",
+      "observedLiveBuild": "gi-i65-b4-e5030ec5ba98-57f234755dc1",
+      "rootCause": "Base private callback renders bypass the already-approved public operational bridge wrapper. The initial public render is enhanced; direct rerenders restore base campaign, mixed KPI scope and premium formula.",
+      "minimumCorrection": "Five existing callbacks dispatch to Orbit.modules.renovaciones.render; retain the same base render and approved bridge. No new bridge, alternate lifecycle or renderer.",
+      "callbackPaths": [
+        "search debounce",
+        "clear search",
+        "late store hydration",
+        "readiness timer",
+        "explicit retry"
+      ],
+      "unchangedOwners": [
+        {
+          "path": "orbit360-platform/modules/renewals-v1200-operational-bridge.js",
+          "blob": "43b3a6b07eba40baa50b61b238174540cd9bf430",
+          "changed": false
+        },
+        {
+          "path": "orbit360-platform/modules/renewals-v1200-permission-guard.js",
+          "blob": "f3f75e25d32c7e4784a19b089353d9706c98dcda",
+          "changed": false
+        }
+      ],
+      "changes": [
+        {
+          "path": "orbit360-platform/modules/renovaciones.js",
+          "beforeBlob": "e3eecb72e7642d4c572338d89f119ae98135f6c1",
+          "afterBlob": "633b675b72a7161985d5ad54601d8ede56796ec9",
+          "afterSha256": "d4d99e38c01ba5fec8a1052c81bad5e28d5fce4e74e1d7ee2784bc989dc795fe",
+          "bytes": 33831
+        },
+        {
+          "path": "tools/gravicentra-b4-003-renovaciones-render-owner.test.cjs",
+          "beforeBlob": null,
+          "afterBlob": "dcb8cae75c908e9dcb4cef548337f7ae64a3d5ad",
+          "afterSha256": "8b8789c5eea089b14a59068aae81ddb641837abb8e9c1322184f0009e2957aeb",
+          "bytes": 10327
+        }
+      ],
+      "verification": {
+        "before": {
+          "exitCode": 1,
+          "tests": 6,
+          "pass": 1,
+          "fail": 5,
+          "log": "before-checks.tap",
+          "logSha256": "68179e3cbd5984091931124722db9dc37de541e5d0d2e2563600d83307dc94ad"
+        },
+        "candidate": {
+          "exitCode": 0,
+          "tests": 6,
+          "pass": 6,
+          "fail": 0,
+          "log": "candidate-checks.tap",
+          "logSha256": "0739a658b6c581673f292b979fef5f486ed4a0e6d0f7b756560cb1180d2c15e9"
+        }
+      },
+      "checks": [
+        "initial public render retains approved KPI, currency and actions",
+        "debounced search retains visible card counts, net premium, currency and cursor",
+        "clear restores visible card counts and separated currencies",
+        "late store snapshot uses same public composition",
+        "required-snapshot readiness timer uses same public composition",
+        "explicit retry uses same public composition"
+      ],
+      "runtimeAssertions": {
+        "actualSourceAndBridgeExecuted": true,
+        "syntheticDom": true,
+        "syntheticStore": true,
+        "syntheticClock": true,
+        "addedActionsExactlyOncePerVisibleCard": true,
+        "baseRenderExactlyOncePerCallback": true,
+        "databaseUnchanged": true,
+        "writeAttempts": 0,
+        "network": false,
+        "browser": false
+      },
+      "recursionReview": "Existing public wrapper calls its saved bound originalRender once, then enhance. Base render only binds listeners; no synchronous callback recursion. VM asserts exact per-event render counts and bounded timers.",
+      "historicalAcceptancePreserved": {
+        "visualReceiptBlob": "68c79350c7c02f20cf4427ca82300ba82c776ff8",
+        "functionalRunId": "38722133958",
+        "functionalScenarios": 24
+      },
+      "limitations": [
+        "Source candidate only; not committed, built, promoted or live-tested.",
+        "Synthetic DOM checks render ownership, KPI/currency semantics and added actions, not complete visual/responsive UAT.",
+        "Does not certify the observed 12-record lifecycle reclassification; record identities were not established. Existing lifecycle/hydration rules remain unchanged.",
+        "No proposal saves, campaigns/messages or real business writes tested; no global Renovaciones LIVE_PASS.",
+        "Applying source later requires a new immutable artifact/digest and focused preview/live checks; the existing e503 artifact must remain untouched."
+      ]
+    },
+    "reconciliationOwnerR2": {
+      "status": "LOCAL_SOURCE_CANDIDATE_REVIEWED_16_TESTS_PASS_NOT_INTEGRATED_NOT_APPLY_READY",
+      "sourceManifestSha256": "c1fca8465a64aeb6ded490ad9ef3e72daea19e287b6493417ab8adc4eb1678a8",
+      "sourceManifest": {
+        "schema": "GRAVICENTRA_RECONCILIATION_CANDIDATE_BEFORE_AFTER_V1",
+        "revision": "r2",
+        "preparedAt": "2026-11-07T19:31:19.690266+00:00",
+        "status": "LOCAL_CANDIDATE_REVIEWED_TESTS_ONLY",
+        "activation": "NO_APPLIED_NO_DEPLOY_NOT_APPLY_READY",
+        "sourceReferenceHead": "e60148effd9d55829ecf97767ac5cf2df780f69e",
+        "repository": "paulaosoriof86/orbit360-core",
+        "branch": "recovery/fase-a-clean-20260831",
+        "supersedesCandidateR1ForFutureIntegration": true,
+        "r1PreservedManifestSha256": "3328235a05c05d1ab5171e7525d7c75dc4d5bf33c50a748fae29b013b2653aa2",
+        "r1AllFilesPreservedAndHashVerified": true,
+        "r1ActivationHold": "DOCUMENTED_RATE_SCOPE_CONTRADICTION_ALLOWED_PENDING_IN_R1",
+        "scope": "ONLY_DOCUMENTED_RATE_EXPLICIT_SCOPE_VALIDATION_AND_DERIVED_EFFECT_HOLD",
+        "ownerFiles": [
+          {
+            "targetPath": "functions/cobros-reconciliation-domain.js",
+            "canonicalBefore": {
+              "bytes": 53492,
+              "sha256": "826a83e7690fcad90be6f3b2090eace727c67d8d416e87266c5fef9aef0a8f3f",
+              "gitBlobSha": "5b27038d1c8380e4d2d0ed044996c1570d8c3767"
+            },
+            "r1Before": {
+              "bytes": 72693,
+              "sha256": "1265207f97f6bd1b0546a6d1144a2b1dff5c18645329b520bda3b2af4650bc4b",
+              "gitBlobSha": "3512ac0d14ec44d00798fec4b4cb27a8a2c03f17"
+            },
+            "r2After": {
+              "bytes": 74470,
+              "sha256": "50d4d30ed8febc1e7164a8ec82ce11f80202d9a4a5f43e82d72c6d0ae5dd814a",
+              "gitBlobSha": "5eb1f0eaff18fc06e35befb62d97b4e92ac88efd"
+            },
+            "changedFromR1": true
+          },
+          {
+            "targetPath": "orbit360-platform/modules/conciliaciones.js",
+            "canonicalBefore": {
+              "bytes": 16309,
+              "sha256": "3a262de1c1e215163032cdafbd8b1c0a6ca5ba97e441a56dcf2d6b87c37a49d9",
+              "gitBlobSha": "3b77b2cff04e2f10ab78541d8802c191901de240"
+            },
+            "r1Before": {
+              "bytes": 16836,
+              "sha256": "d178545f92f7e7d060d83fb5b059739daf9364c9a4045e5c38ed93b96da69a65",
+              "gitBlobSha": "f5c2e3b31891237d13633622542889e4ca649d11"
+            },
+            "r2After": {
+              "bytes": 16836,
+              "sha256": "d178545f92f7e7d060d83fb5b059739daf9364c9a4045e5c38ed93b96da69a65",
+              "gitBlobSha": "f5c2e3b31891237d13633622542889e4ca649d11"
+            },
+            "changedFromR1": false
+          },
+          {
+            "targetPath": "tools/gravicentra-reconciliation-durable-context.test.cjs",
+            "canonicalBefore": null,
+            "r1Before": {
+              "bytes": 16845,
+              "sha256": "8c18f994395fa96c8e7181f550f2d2a4159ae0b7de90284d888f98842ce0622f",
+              "gitBlobSha": "53164fa4c732592ebf475494bae180e1a13c8e16"
+            },
+            "r2After": {
+              "bytes": 20307,
+              "sha256": "86b321373dda564aff5e378f6d2866adc116f58c0fc7d9a05a19537d821acf85",
+              "gitBlobSha": "f11ecdd5aaf08a947da510e31b26889ccd904413"
+            },
+            "changedFromR1": true
+          }
+        ],
+        "medical12UnchangedReference": [
+          {
+            "targetPath": "functions/payment-inference-engine.js",
+            "before": {
+              "bytes": 13116,
+              "sha256": "e1e6acd4793cd6cdfc563ca1d3417cbe3be15056fbd70efe36bafce8eae3b54a",
+              "gitBlobSha": "16bf21177364fbb94f39fab5b8e8ec8506bbd071"
+            },
+            "after": {
+              "bytes": 14983,
+              "sha256": "73de0ef3053536981f7197f1f336d9562932203e6ec917fa7aa2bddafce0d455",
+              "gitBlobSha": "e0db3b6779dd8ba3269c030015136041c6706999"
+            }
+          },
+          {
+            "targetPath": "functions/tenant-domain-config.js",
+            "before": {
+              "bytes": 25707,
+              "sha256": "85ec982a8dc979d74db3c76ab8943c593c1510f03d8f32bde0d362a5a7c77461",
+              "gitBlobSha": "231fb2f106a6c139bb83c367f0f5e1a1c8924823"
+            },
+            "after": {
+              "bytes": 26039,
+              "sha256": "5dd65b6f8228063a0690cf3d2c35238284b9d00c17902a5aa7608324a3135a8f",
+              "gitBlobSha": "d1905b25a002bcf794e5f296d4397bb7b75757e4"
+            }
+          },
+          {
+            "targetPath": "tools/gravicentra-i6-5-b3-005-contract.mjs",
+            "before": {
+              "bytes": 10783,
+              "sha256": "6f7748d7e8ae2c94ae746dbc0719fcfacb5f19cb8886328605bb2ac2c80b8a17",
+              "gitBlobSha": "89d1f612f933c5453db4db7f109c8e1027a9aca2"
+            },
+            "after": {
+              "bytes": 16837,
+              "sha256": "bac6139334f8d7d1dc1b95858cbdb63fc20a9601a72643637e24f8df414de3cb",
+              "gitBlobSha": "a38e397989915f8af3c4bec3472b5d407fd16f58"
+            }
+          }
+        ],
+        "authority": {
+          "currentGateUnchanged": true,
+          "I6_6PreparationOnly": true,
+          "noPermissionsOrRulesChanged": true,
+          "noNewJournalRoot": true,
+          "noImportMethodAdded": true,
+          "sourceIntegrationPerformed": false,
+          "remoteCommits": 0,
+          "deploys": 0,
+          "operationalDataWrites": 0,
+          "financialWrites": 0
+        },
+        "artifacts": {
+          "OWNER_SOURCE_AND_TESTS_R2_20261107.patch": {
+            "bytes": 56642,
+            "sha256": "89bfd98acdce0effa99ece7dbda70fb9f47eeb3f36689f00eccf278e7158e4a8",
+            "gitBlobSha": "95d9ccfa2ee0c9d93d0887a32015129d72021880"
+          },
+          "R1_TO_R2_SCOPE_CORRECTION_20261107.patch": {
+            "bytes": 9751,
+            "sha256": "a80b2532e22755d31e50b1a2ea08bcd419874731bda956342f72ece4fde66cf5",
+            "gitBlobSha": "c2a69e520af78b9eb68b64a725c5e5526478e2c1"
+          },
+          "LOCAL_TEST_LOG_R2_20261107.txt": {
+            "bytes": 1969,
+            "sha256": "21fcd36342713149700d6df428dcaa8627dc64d9acfb56e3ce15c25455051b4e",
+            "gitBlobSha": "4d30ed9180975574da936d70555d08fe2e2106a1"
+          },
+          "LOCAL_TEST_RECEIPT_R2_20261107.json": {
+            "bytes": 960,
+            "sha256": "4a58e96d2402eab8c4637cfda85fbe462e4912b72f3b7d2fbef9e084b2f5e6cf",
+            "gitBlobSha": "d50d32fad746ff49b220469f1cef10aed6d80456"
+          },
+          "REVIEW_R2_NOT_APPLIED_20261107.md": {
+            "bytes": 3053,
+            "sha256": "ab75579425a7ea4c4587762659360e191997668a39846fbf265142ae2ee35598",
+            "gitBlobSha": "17831dcfd98190d4ea2dfe83543439602226409a"
+          }
+        }
+      },
+      "originalTestReceiptSha256": "4a58e96d2402eab8c4637cfda85fbe462e4912b72f3b7d2fbef9e084b2f5e6cf",
+      "testReceiptPublicSummary": {
+        "schema": "GRAVICENTRA_RECONCILIATION_LOCAL_CANDIDATE_TEST_RECEIPT_V1",
+        "revision": "r2",
+        "testedAt": "2026-11-07T19:31:19.690266+00:00",
+        "status": "LOCAL_SYNTHETIC_PASS_NOT_LIVE",
+        "ownerCasesPassed": 16,
+        "ownerCasesFailed": 0,
+        "tests": [
+          {
+            "name": "ownerSyntax",
+            "command": [
+              "node",
+              "--check",
+              "functions/cobros-reconciliation-domain.js"
+            ],
+            "exitCode": 0,
+            "status": "LOCAL_PASS"
+          },
+          {
+            "name": "ownerSyntheticContractR2",
+            "command": [
+              "node",
+              "--test",
+              "tools/gravicentra-reconciliation-durable-context.test.cjs"
+            ],
+            "exitCode": 0,
+            "status": "LOCAL_PASS"
+          }
+        ],
+        "realWrites": 0,
+        "deploys": 0,
+        "replayImplemented": false,
+        "r1PreservedHashesVerified": true
+      },
+      "testReceiptPathNormalization": "Repository relative paths; hash refers to the unchanged original local receipt.",
+      "localSuitePassed": 16,
+      "localSuiteFailed": 0,
+      "independentNewScopeSubsetPassed": 3,
+      "independentReviewConfirmedByRoot": true,
+      "nanosecondVersionChangeRejectionPassed": true,
+      "explicitScopeContradictionRejected": true,
+      "unverifiableScopeBlocksEffectWithoutInventingValues": true,
+      "r1SupersededForFutureIntegration": true,
+      "r1ScopeFindingCorrected": true,
+      "sourceIntegrated": false,
+      "built": false,
+      "deployed": false,
+      "actualDataApplied": false,
+      "financialReplayImplemented": false,
+      "currentProductFinancePayloadSaved": false,
+      "moduleLivePassGranted": false
+    },
+    "medical12Preserved": {
+      "status": "EXISTING_LOCAL_SOURCE_CANDIDATE_PRESERVED_SEPARATELY_NOT_APPLIED",
+      "sourceFiles": [
+        {
+          "targetPath": "functions/payment-inference-engine.js",
+          "before": {
+            "bytes": 13116,
+            "sha256": "e1e6acd4793cd6cdfc563ca1d3417cbe3be15056fbd70efe36bafce8eae3b54a",
+            "gitBlobSha": "16bf21177364fbb94f39fab5b8e8ec8506bbd071"
+          },
+          "after": {
+            "bytes": 14983,
+            "sha256": "73de0ef3053536981f7197f1f336d9562932203e6ec917fa7aa2bddafce0d455",
+            "gitBlobSha": "e0db3b6779dd8ba3269c030015136041c6706999"
+          }
+        },
+        {
+          "targetPath": "functions/tenant-domain-config.js",
+          "before": {
+            "bytes": 25707,
+            "sha256": "85ec982a8dc979d74db3c76ab8943c593c1510f03d8f32bde0d362a5a7c77461",
+            "gitBlobSha": "231fb2f106a6c139bb83c367f0f5e1a1c8924823"
+          },
+          "after": {
+            "bytes": 26039,
+            "sha256": "5dd65b6f8228063a0690cf3d2c35238284b9d00c17902a5aa7608324a3135a8f",
+            "gitBlobSha": "d1905b25a002bcf794e5f296d4397bb7b75757e4"
+          }
+        },
+        {
+          "targetPath": "tools/gravicentra-i6-5-b3-005-contract.mjs",
+          "before": {
+            "bytes": 10783,
+            "sha256": "6f7748d7e8ae2c94ae746dbc0719fcfacb5f19cb8886328605bb2ac2c80b8a17",
+            "gitBlobSha": "89d1f612f933c5453db4db7f109c8e1027a9aca2"
+          },
+          "after": {
+            "bytes": 16837,
+            "sha256": "bac6139334f8d7d1dc1b95858cbdb63fc20a9601a72643637e24f8df414de3cb",
+            "gitBlobSha": "a38e397989915f8af3c4bec3472b5d407fd16f58"
+          }
+        }
+      ],
+      "existingLocalHarnessStatus": "LOCAL_PASS",
+      "originalTestReceiptSha256": "65bbb54d37bf75abf7d9456ad9d67538a998d164a1d1675f74293f40f1262273",
+      "reimplemented": false,
+      "sourceIntegrated": false,
+      "built": false,
+      "deployed": false,
+      "dataApplied": false
     }
   }
 }

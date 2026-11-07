@@ -433,6 +433,41 @@ export function validateCatalogTransportSuccessorSnapshot({record,fileBytes,base
  return{allowedPaths,comparableFileBytes,sourceBaseHead:CATALOG_BASE};
 }
 
+const REVIEWED_CANDIDATE_ARCHIVES={
+ [ROOT+'candidate-reviewed/I6_5_B4_003_CANCEL_RECOVERY_PENDING_FINALIZATION_20261107.diff']:{
+  blobSha:'a16123bd19f426424564a1223ffeade9f12c0792',
+  sha256:'bc57f2b5226a73a1f0ca25f4f613af05e6d55b9d54bdc460f08d97062a560401'
+ },
+ [ROOT+'candidate-reviewed/I6_5_B4_003_RENOVACIONES_RENDER_OWNER_20261107.diff']:{
+  blobSha:'2b31af1864377a7476fce19d1665db222a0ff5d9',
+  sha256:'8f4adc8782275076ad1a8db593c1ea88fb8963acf5a91d34d6a29b6e30e45b04'
+ },
+ [ROOT+'candidate-reviewed/I6_5_RECONCILIATION_OWNER_DURABLE_CONTEXT_R2_20261107.patch']:{
+  blobSha:'95d9ccfa2ee0c9d93d0887a32015129d72021880',
+  sha256:'89bfd98acdce0effa99ece7dbda70fb9f47eeb3f36689f00eccf278e7158e4a8'
+ },
+ [ROOT+'candidate-reviewed/I6_5_MEDICAL12_PRESERVED_20261107.patch']:{
+  blobSha:'9b2503855fb996db4410cdbf354f2beff819f4af',
+  sha256:'244c392e9d9b13452f2c062450cf24b38b8e40db09b74c203d6a330da01e5cc9'
+ }
+};
+export function validateReviewedDeferredCandidateArchives({record,fileBytes}){
+ const p=record.reviewedDeferredCandidateArchives20261107;
+ if(!p){need(!Object.keys(fileBytes).some(path=>path.startsWith(ROOT+'candidate-reviewed/')),'REVIEWED_CANDIDATE_UNDECLARED_ARCHIVE');return[];}
+ const keys=['schema','status','productBaseSource','productBaseArtifactId','sourceIntegrated','built','deployed','previewAcceptanceGranted','liveAcceptanceGranted','artifacts'];
+ need(same(Object.keys(p).sort(),keys.sort()),'REVIEWED_CANDIDATE_EXACT_KEYS');
+ need(p.schema==='GRAVICENTRA_REVIEWED_DEFERRED_SOURCE_ARCHIVES_V1'&&p.status==='ARCHIVED_REVIEWED_DIFFS_ONLY_NOT_INTEGRATED','REVIEWED_CANDIDATE_STATUS');
+ need(p.productBaseSource===READER_DEPLOY_BASE&&p.productBaseArtifactId===13584456766,'REVIEWED_CANDIDATE_PRODUCT_BASE');
+ for(const key of ['sourceIntegrated','built','deployed','previewAcceptanceGranted','liveAcceptanceGranted'])need(p[key]===false,'REVIEWED_CANDIDATE_NO_EXECUTION_OR_ACCEPTANCE');
+ need(Array.isArray(p.artifacts)&&same(p.artifacts.map(e=>e.path).sort(),Object.keys(REVIEWED_CANDIDATE_ARCHIVES).sort()),'REVIEWED_CANDIDATE_EXACT_PATHS');
+ for(const entry of p.artifacts){
+  need(same(Object.keys(entry).sort(),['path','blobSha','sha256'].sort()),'REVIEWED_CANDIDATE_ENTRY_KEYS');
+  const pinned=REVIEWED_CANDIDATE_ARCHIVES[entry.path],bytes=fileBytes[entry.path];
+  need(pinned&&entry.blobSha===pinned.blobSha&&entry.sha256===pinned.sha256&&bytes!=null&&blob(Buffer.from(bytes))===pinned.blobSha&&sha(Buffer.from(bytes))===pinned.sha256,'REVIEWED_CANDIDATE_EXACT_ARCHIVE_BYTES');
+ }
+ return Object.keys(REVIEWED_CANDIDATE_ARCHIVES);
+}
+
 export function validateOwnerDecisionSuccessorSnapshot({control,baseControl,state,baseState,changedPaths,fileBytes,baseSourceBytes,postBaseSourceBytes,catalogBaseSourceBytes}){
  const p=control[OWNER_KEY];
  need(p&&p.authorityBaseHead===OWNER_BASE,'OWNER_BASE_BINDING');
@@ -445,7 +480,8 @@ export function validateOwnerDecisionSuccessorSnapshot({control,baseControl,stat
  if(promotionExecution){control=promotionExecution.comparableControl;state=promotionExecution.comparableState;}
  const reconciliationExecution=validateReconciliationReadOnlySuccessorSnapshot({record:r,control,state,fileBytes,baseSourceBytes:postBaseSourceBytes});
  if(reconciliationExecution){control=reconciliationExecution.comparableControl;state=reconciliationExecution.comparableState;}
- const postAllowedPaths=[...(readerExecution?.allowedPaths||[]),...(promotionExecution?.allowedPaths||[]),...(reconciliationExecution?.allowedPaths||[]),...(catalogExecution?.allowedPaths||[])];
+ const candidateArchives=validateReviewedDeferredCandidateArchives({record:r,fileBytes});
+ const postAllowedPaths=[...(readerExecution?.allowedPaths||[]),...(promotionExecution?.allowedPaths||[]),...(reconciliationExecution?.allowedPaths||[]),...(catalogExecution?.allowedPaths||[]),...candidateArchives];
  const team=validateEquipoCausalSourceSuccessor({record:r,pointer:p,fileBytes:readerExecution?.comparableFileBytes||fileBytes,baseSourceBytes});
  const permitted=new Set([ROOT+'CONTROL_PLANE.json',STATE,OWNER_FREEZE,OWNER_PLAN,SELF,OWNER_TEST,...(team?.allowedPaths||[]),...postAllowedPaths]);
  need(changedPaths.every(x=>permitted.has(x)),'OWNER_UNDECLARED_PATH');
@@ -490,9 +526,11 @@ function verifyOwnerDecisionSuccessor(after){
  need(postEntries.every(x=>postPermitted.has(x.path)),'POST_E503_UNDECLARED_PATH');
  const catalogEntries=record.catalogTransportSuccessor?.changes||[];
  need(catalogEntries.every(e=>Object.hasOwn(CATALOG_PINS,e.path)),'CATALOG_UNDECLARED_PATH');
+ const candidateEntries=record.reviewedDeferredCandidateArchives20261107?.artifacts||[];
+ need(Array.isArray(candidateEntries)&&candidateEntries.every(e=>Object.hasOwn(REVIEWED_CANDIDATE_ARCHIVES,e.path)),'REVIEWED_CANDIDATE_UNDECLARED_PATH');
  const catalogActivationPresent=fs.existsSync(CATALOG_ACTIVATION);
  const activationPresent=fs.existsSync(READER_DEPLOY_ACTIVATION);
- const paths=[...new Set([ROOT+'CONTROL_PLANE.json',STATE,OWNER_FREEZE,OWNER_PLAN,SELF,OWNER_TEST,OWNER_V6,...extraPaths,...postEntries.map(x=>x.path),...(activationPresent?[READER_DEPLOY_ACTIVATION]:[]),...catalogEntries.map(e=>e.path),...(catalogActivationPresent?[CATALOG_ACTIVATION]:[])])];
+ const paths=[...new Set([ROOT+'CONTROL_PLANE.json',STATE,OWNER_FREEZE,OWNER_PLAN,SELF,OWNER_TEST,OWNER_V6,...extraPaths,...postEntries.map(x=>x.path),...(activationPresent?[READER_DEPLOY_ACTIVATION]:[]),...catalogEntries.map(e=>e.path),...(catalogActivationPresent?[CATALOG_ACTIVATION]:[]),...candidateEntries.map(e=>e.path)])];
  const fileBytes={},baseSourceBytes={},postBaseSourceBytes={},catalogBaseSourceBytes={};
  if(sourceProof){
   need(git('merge-base',TEAM_SOURCE_BASE,'HEAD')===TEAM_SOURCE_BASE,'TEAM_SOURCE_BASE_ANCESTRY');

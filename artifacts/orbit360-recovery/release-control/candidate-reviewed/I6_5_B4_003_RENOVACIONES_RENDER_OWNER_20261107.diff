@@ -1,0 +1,125 @@
+diff --git a/orbit360-platform/modules/renovaciones.js b/orbit360-platform/modules/renovaciones.js
+--- a/orbit360-platform/modules/renovaciones.js
++++ b/orbit360-platform/modules/renovaciones.js
+@@ -32,7 +32,7 @@
+   function scheduleReadinessRecheck(host,readiness){
+     if(readinessTimer||!host||readiness.state!=='pending')return;
+     const remaining=Math.max(0,READINESS_BUDGET_MS-Number(readiness.elapsedMs||0));
+-    readinessTimer=setTimeout(()=>{readinessTimer=null;if(host.isConnected&&Orbit.route?.key==='renovaciones'&&String(location.hash||'').startsWith('#/renovaciones'))render(host);},remaining+20);
++    readinessTimer=setTimeout(()=>{readinessTimer=null;if(host.isConnected&&Orbit.route?.key==='renovaciones'&&String(location.hash||'').startsWith('#/renovaciones'))Orbit.modules.renovaciones.render(host);},remaining+20);
+   }
+   function humanCollection(name){return({polizas:'pólizas',clientes:'clientes',aseguradoras:'aseguradoras'})[name]||name;}
+   /* B4-003: nunca presentar como completa una búsqueda con datos sin hidratar. */
+@@ -254,7 +254,7 @@
+       scheduleReadinessRecheck(host,readiness);
+       const waiting=readiness.state==='pending',missing=readiness.missing.map(humanCollection).join(', ');
+       host.innerHTML=`<div class="page" data-renewals-loading="${readiness.state}">${K.bannerFor('renovaciones','')}<div class="card pad" role="status" aria-live="polite"><b>${waiting?'Cargando cartera de renovaciones…':'No fue posible completar la cartera de renovaciones.'}</b><div class="muted" style="margin-top:5px">${waiting?'Estamos confirmando desde el servidor: '+U.esc(missing)+'.':'Falta confirmar desde el servidor: '+U.esc(missing||'fuentes requeridas')+'. No mostramos conteos parciales como si fueran definitivos.'}</div>${waiting?'':'<button type="button" class="btn ghost sm" data-renewals-retry style="margin-top:10px">Reintentar carga</button>'}</div></div>`;
+-      const retry=host.querySelector('[data-renewals-retry]');if(retry)retry.addEventListener('click',()=>{clearReadinessWait();ensureDataCollections();render(host);});
++      const retry=host.querySelector('[data-renewals-retry]');if(retry)retry.addEventListener('click',()=>{clearReadinessWait();ensureDataCollections();Orbit.modules.renovaciones.render(host);});
+       return;
+     }
+     clearReadinessWait();
+@@ -362,12 +362,12 @@
+       searchText=event.target.value;clearTimeout(searchTimer);
+       searchTimer=setTimeout(()=>{
+         if(!activeHost||!activeHost.isConnected||!String(location.hash||'').startsWith('#/renovaciones'))return;
+-        const pos=box.selectionStart;render(activeHost);
++        const pos=box.selectionStart;Orbit.modules.renovaciones.render(activeHost);
+         const input=activeHost.querySelector('[data-renewal-search-input]');if(input){input.focus();try{input.setSelectionRange(pos,pos);}catch(_){}}
+       },180);
+     });
+     const clear=host.querySelector('[data-renewal-search-clear]');
+-    if(clear)clear.addEventListener('click',()=>{searchText='';clearTimeout(searchTimer);render(host);host.querySelector('[data-renewal-search-input]')?.focus();});
++    if(clear)clear.addEventListener('click',()=>{searchText='';clearTimeout(searchTimer);Orbit.modules.renovaciones.render(host);host.querySelector('[data-renewal-search-input]')?.focus();});
+   }
+   /* Policies + clients determine readiness; insurer directory enriches names only.
+      Never publish partial policy counts while required snapshots are missing.
+@@ -384,7 +384,7 @@
+       refreshTimer = null;
+       if (!activeHost || !activeHost.isConnected || !String(location.hash || '').startsWith('#/renovaciones')) return;
+       const next = renewalDataReadiness();
+-      if (next.state === 'ready' || next.state === 'unavailable') render(activeHost);
++      if (next.state === 'ready' || next.state === 'unavailable') Orbit.modules.renovaciones.render(activeHost);
+     }, 45);
+   });
+   /* Acciones operativas: owner canónico en renewals-v1200-operational-bridge.js. */
+diff --git a/tools/gravicentra-b4-003-renovaciones-render-owner.test.cjs b/tools/gravicentra-b4-003-renovaciones-render-owner.test.cjs
+new file mode 100644
+--- /dev/null
++++ b/tools/gravicentra-b4-003-renovaciones-render-owner.test.cjs
+@@ -0,0 +1,75 @@
++'use strict';
++// Execute the canonical source/bridge with a bounded synthetic DOM, clock and store.
++// No browser, network, database, messages or deploy. This is not visual/live UAT.
++const {test}=require('node:test');
++const assert=require('node:assert/strict');
++const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
++const ROOT=process.env.GI_RENEWAL_RENDER_TEST_ROOT||path.resolve(__dirname,'..');
++const files=['renovaciones.js','renewals-v1200-operational-bridge.js','renewals-v1200-permission-guard.js'];
++const fixed=Date.parse('2026-11-07T12:00:00Z');
++const strip=s=>String(s??'').replace(/<[^>]*>/g,'');
++function setup({confirmed=['polizas','clientes','aseguradoras','asesores','vehiculos'],denied=[]}={}){
++  let clock=fixed,seq=0,renders=0,kpiDefs=[],writeAttempts=0;
++  const timers=new Map(),listeners=new Map(),ensures=[];
++  class Clock extends Date {constructor(...a){super(...(a.length?a:[clock]));}static now(){return clock;}}
++  const policy=(id,pais,moneda,fin,prima,primaNeta)=>({id,numero:id,tenantId:'synthetic',clienteId:'c-'+id,aseguradoraId:'a',asesorId:'v',pais,moneda,ramo:'Autos',estado:'Vigente',renovable:true,vigenciaInicio:'2025-10-01',vigenciaFin:fin,prima,primaNeta});
++  const db={polizas:[policy('GT-ONLY','GT','GTQ','2026-11-01',120,100),policy('CO-ONLY','CO','COP','2026-11-01',240000,200000),policy('GT-FUTURE','GT','GTQ','2026-12-31',500,400)],aseguradoras:[{id:'a',nombre:'Synthetic insurer'}],asesores:[{id:'v',nombre:'Synthetic advisor'}],vehiculos:[]};
++  db.clientes=db.polizas.map(p=>({id:p.clienteId,nombre:'Synthetic '+p.numero,pais:p.pais}));
++  const originalData=JSON.stringify(db);
++  const status={serverConfirmedCollections:[...confirmed],deniedCollections:[...denied],snapshotErrors:{}};
++  const denyWrite=()=>{writeAttempts++;throw Error('render must never write');};
++  const store={__productReadOnlyP0:true,_productStatus:()=>status,_ensureCollections:c=>ensures.push([...c]),all:c=>db[c]||[],get:(c,id)=>(db[c]||[]).find(r=>String(r.id)===String(id))||null,where:(c,p)=>(db[c]||[]).filter(p),insertDurable:denyWrite,updateDurable:denyWrite,batchDurable:denyWrite};
++  function node(tag='div',attrs={}){
++    let html='';const events={};return {tag,attrs,events,style:{},dataset:{},children:[],isConnected:true,value:'',selectionStart:0,
++      get innerHTML(){return html;},set innerHTML(v){html=String(v);},get textContent(){return strip(html);},set textContent(v){html=String(v);},
++      getAttribute:k=>attrs[k]??null,removeAttribute:k=>delete attrs[k],classList:{add(){}},remove(){this.removed=true;},
++      addEventListener(k,fn){events[k]=fn;},appendChild(n){n.parentElement=this;this.children.push(n);return n;},
++      querySelector(){return null;},querySelectorAll(s){return s==='a,button'?this.children:[];},focus(){this.focused=true;},setSelectionRange(a,b){this.selectionStart=a;this.selectionEnd=b;},
++      fire(k){return events[k]?.({target:this,stopPropagation(){},preventDefault(){}});}};
++  }
++  const host=node();let html='',kpis=[],buckets={},search=null,clear=null,retry=null,busy=null,campaign=null,proposals=[],whatsapps=[];
++  Object.defineProperty(host,'innerHTML',{get:()=>html,set(value){
++    html=String(value);renders++;assert.ok(renders<20,'render recursion is bounded');kpis=[];buckets={};proposals=[];whatsapps=[];
++    search=null;clear=null;retry=null;campaign=null;busy=html.includes('data-renewals-loading=')?node():null;
++    if(html.includes('data-renewals-retry'))retry=node('button');
++    if(html.includes('data-renewal-search-input')){search=node('input');search.value=html.match(/data-renewal-search-input[^>]*value="([^"]*)"/)?.[1]||'';clear=node('button');}
++    const campaignText=html.match(/<button[^>]*onclick="Orbit\.modules\.renovaciones\.campana\(\)"[^>]*>([^<]*)<\/button>/)?.[1];
++    if(campaignText){campaign=node('button');campaign.textContent=campaignText;}
++    if(!busy)kpis=kpiDefs.map(d=>{const el=node(),parts={'.k-label':node(),'.k-val':node(),'.k-foot':node()};parts['.k-label'].textContent=d.label;parts['.k-val'].innerHTML=d.val;parts['.k-foot'].textContent=d.foot;el.querySelector=s=>parts[s]||null;return el;});
++    for(const chunk of html.split('data-renewal-bucket="').slice(1)){
++      const key=chunk.split('"')[0],cards=[];buckets[key]=cards;
++      for(const card of chunk.split('data-renewal-policy="').slice(1)){
++        const id=card.split('"')[0];cards.push(node('div',{'data-renewal-policy':id}));
++        const onclick=card.match(/onclick="([^"]*solicitarPropuestas[^"\n]*)"/)?.[1];
++        if(onclick){const wrap=node(),a=node('a'),b=node('button',{onclick});a.textContent='💬 WhatsApp';b.textContent='📋 Propuestas';wrap.appendChild(a);wrap.appendChild(b);proposals.push(b);whatsapps.push(a);}
++      }
++    }
++  }});
++  host.querySelector=s=>({'[data-renewal-search-input]':search,'[data-renewal-search-clear]':clear,'[data-renewals-retry]':retry,'[data-renewals-loading]':busy})[s]||null;
++  host.querySelectorAll=s=>{const key=s.match(/^\[data-renewal-bucket="([^"]+)"\] \[data-renewal-policy\]$/)?.[1];if(key)return buckets[key]||[];if(s==='.kpi-row .kpi')return kpis;if(s==='.reno-wa')return whatsapps;if(s==='button[onclick*="solicitarPropuestas"]')return proposals;if(s==='button')return [campaign,...proposals.flatMap(p=>p.parentElement.children.filter(n=>n.tag==='button'))].filter(Boolean);return [];};
++  const Orbit={modules:{},pais:'TODOS',store,route:{key:'renovaciones'},auth:{productUser:{uid:'synthetic'}},session:{rol:()=> 'Direccion'},
++    ui:{esc:v=>String(v??''),today:()=> '2026-11-07',fmtDate:v=>String(v||''),moneyShort:(v,c)=>c+' '+v,daysFromNow:d=>d?Math.ceil((Date.parse(d+'T00:00:00Z')-Date.parse('2026-11-07'))/86400000):null,toast(){}},
++    q:{norm:v=>Number(v)||0,monedaPais:()=> 'GTQ',aseguradora:id=>store.get('aseguradoras',id),isSyntheticQaRecord:()=>false},
++    kit:{bannerFor:(_name,buttons)=>buttons,kpis:defs=>{kpiDefs=defs;return '<div class="kpi-row">synthetic KPI DOM</div>';}},
++    access:{norm:v=>String(v||'').toLowerCase(),filter:(_c,r)=>r,can:()=>true,esAsesor:()=>false}};
++  const ctx={Orbit,document:{getElementById:id=>id==='host'?host:null,createElement:node,body:node('body')},location:{hash:'#/renovaciones'},Date:Clock,console,Map,Set,encodeURIComponent,decodeURIComponent,
++    setTimeout:(fn,delay)=>{const id=++seq;timers.set(id,{fn,at:clock+delay});return id;},clearTimeout:id=>timers.delete(id),addEventListener:(name,fn)=>{const group=listeners.get(name)||[];group.push(fn);listeners.set(name,group);}};
++  ctx.window=ctx;vm.createContext(ctx);for(const file of files)vm.runInContext(fs.readFileSync(path.join(ROOT,'orbit360-platform/modules',file),'utf8'),ctx,{filename:file,timeout:1000});
++  const flush=()=>{let count=0;while(timers.size){assert.ok(++count<10,'no recursive timer/render loop');const [id,t]=[...timers].sort((a,b)=>a[1].at-b[1].at)[0];timers.delete(id);clock=t.at;t.fn();}};
++  const view=()=>({campaign:campaign?.textContent,kpis:kpis.map(k=>({label:k.querySelector('.k-label').textContent,value:k.querySelector('.k-val').innerHTML,foot:k.querySelector('.k-foot').textContent})),actions:proposals.map(p=>p.parentElement.children.map(n=>n.textContent)),buckets:Object.fromEntries(Object.entries(buckets).map(([key,rows])=>[key,rows.map(r=>r.getAttribute('data-renewal-policy'))]))});
++  return {Orbit,host,status,flush,view,get renders(){return renders;},render:()=>Orbit.modules.renovaciones.render(host),search(value){search.value=value;search.selectionStart=value.length;search.fire('input');flush();},clear(){clear.fire('click');},retry(){retry.fire('click');},emit(collection){for(const fn of listeners.get('orbit:store:emit')||[])fn({detail:{collection}});flush();},assertReadOnly(){assert.equal(writeAttempts,0);assert.equal(JSON.stringify(db),originalData);}};
++}
++function approved(h,{expired=2,gt=500,co=200000}={}){
++  const v=h.view();assert.equal(v.campaign,'Preparar campaña de renovación');assert.equal(v.kpis[0].label,'Vencidas');assert.equal(v.kpis[0].value,String(expired));
++  assert.equal(v.kpis[3].label,'Prima neta en gestión');assert.equal(v.kpis[3].foot,'Separada por moneda; horizonte 90 días');
++  assert.match(v.kpis[3].value,new RegExp('GTQ '+Number(gt).toLocaleString('es-GT',{maximumFractionDigits:0})));
++  if(co==null)assert.doesNotMatch(v.kpis[3].value,/COP/);else assert.ok(v.kpis[3].value.includes('COP '+Number(co).toLocaleString('es-GT',{maximumFractionDigits:0})));
++  for(const actions of v.actions){assert.equal(actions.filter(x=>x==='✅ Pedir renovar').length,1);assert.equal(actions.filter(x=>x==='🧮 Cotizar').length,1);assert.ok(actions.includes('Abrir WhatsApp'));}
++  h.assertReadOnly();
++}
++test('canonical first render keeps approved currency/KPI/action semantics',()=>{const h=setup();h.render();approved(h);assert.equal(h.renders,1);});
++test('debounced search reuses public owner once and keeps visible-card KPI/premium semantics',()=>{const h=setup();h.render();h.search('GT-ONLY');approved(h,{expired:1,gt:100,co:null});assert.equal(h.renders,2);assert.equal(h.host.querySelector('[data-renewal-search-input]').selectionStart,7);assert.deepEqual(h.view().buckets.vencidas,['GT-ONLY']);});
++test('clear reuses public owner once and restores separated currencies and actions',()=>{const h=setup();h.render();h.search('GT-ONLY');h.clear();approved(h);assert.equal(h.renders,3);assert.equal(h.host.querySelector('[data-renewal-search-input]').value,'');});
++test('late store hydration preserves public composition without duplicate actions or writes',()=>{const h=setup();h.render();h.emit('aseguradoras');approved(h);assert.equal(h.renders,2);});
++test('readiness timer resumes through public owner after required snapshots arrive',()=>{const h=setup({confirmed:[]});h.render();assert.ok(h.host.querySelector('[data-renewals-loading]'));h.status.serverConfirmedCollections=['polizas','clientes','aseguradoras','asesores','vehiculos'];h.flush();approved(h);assert.equal(h.renders,2);});
++test('explicit retry resumes through public owner after unavailable snapshots recover',()=>{const h=setup({confirmed:[],denied:['clientes']});h.render();assert.ok(h.host.querySelector('[data-renewals-retry]'));h.status.deniedCollections=[];h.status.serverConfirmedCollections=['polizas','clientes','aseguradoras','asesores','vehiculos'];h.retry();approved(h);assert.equal(h.renders,2);});

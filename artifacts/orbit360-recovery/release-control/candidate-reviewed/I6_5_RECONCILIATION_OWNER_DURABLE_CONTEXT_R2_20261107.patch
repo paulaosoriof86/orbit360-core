@@ -1,0 +1,593 @@
+--- a/functions/cobros-reconciliation-domain.js
++++ b/functions/cobros-reconciliation-domain.js
+@@ -400,17 +400,27 @@
+     evidenceId, evidenceType, anchorInstallment, inferenceRuleId, confidence,
+     forceReconciliation: payload.forceReconciliation === true, applicationEvidenceType: applicationEvidenceTypeInput
+   };
++  const context = documentaryContext(payload.reconciliationContext);
++  if (context) {
++    reconciliationAssert(!paidDate || payload.actualPaidDateEvidence === true, 'ACTUAL_DATE_DOCUMENTARY_EVIDENCE_REQUIRED');
++    reqPayload.reconciliationContext = context;
++    reqPayload.actualPaidDateEvidence = payload.actualPaidDateEvidence === true;
++  }
+   const reqId = operationRequestId(authz.tenantId, operationName, reqPayload, data.requestId);
+   const reqRef = requestRef(authz.tenantId, reqId);
+   const eventId = `payevt_${sha(`${authz.tenantId}|${receiptId}|${reqId}`).slice(0, 28)}`;
+ 
+-  const result = await db.runTransaction(async tx => {
++  const result = await db.runTransaction(async baseTx => {
++    let tx = baseTx;
+     const previous = await tx.get(reqRef);
++    assertRequestIdentity(previous, operationName, reqPayload);
+     if (previous.exists) {
+       const row = previous.data() || {};
+       if (row.status === 'committed') return Object.assign({ reused: true }, row.result || {});
+     }
+ 
++    const journal = await reconciliationJournal(baseTx, context, authz, reqId, eventId);
++    if (journal) tx = journal.tx;
+     const receiptSnap = await tx.get(receiptRef);
+     if (!receiptSnap.exists) throw new HttpsError('not-found', 'El recibo esperado no existe.');
+     const receipt = Object.assign({ id: receiptSnap.id }, receiptSnap.data() || {});
+@@ -434,6 +444,8 @@
+     const cobroDoc = cobroSnap.empty ? null : cobroSnap.docs[0];
+     const cobroId = cobroDoc ? cobroDoc.id : deterministicCobroId(authz.tenantId, receiptId);
+     const cobroRef = tenantData(authz.tenantId, 'cobros').doc(cobroId);
++    if (journal && !cobroDoc) { const exact = await tx.get(cobroRef); reconciliationAssert(!exact.exists, 'DETERMINISTIC_COBRO_ID_CONFLICT'); }
++    if (journal && advisorReportPending(receipt) && text(receipt.linkedOpsManagementId,180)) await tx.get(tenantData(authz.tenantId,'gestiones').doc(id(receipt.linkedOpsManagementId,'managementId')));
+     const beforeCobro = cobroDoc ? (cobroDoc.data() || {}) : {};
+     const advisorReported = advisorReportPending(receipt);
+     const existingPaidDate = text(beforeCobro.paidDate || beforeCobro.fechaPago, 32);
+@@ -483,6 +495,9 @@
+       updatedAt: technicalNow,
+       updatedByUid: authz.actor.uid
+     };
++    if (journal) reconciliationAssert(directOrInferred === (inferred ? 'INFERRED' : 'DIRECT'), 'PRESERVED_PAYMENT_ORIGIN_REQUIRES_REVIEW');
++    const documentaryDates = journal ? journal.record(receipt, policy, receiptCurrency, inferred, finalPaidDate, amount) : {};
++    Object.assign(shared, documentaryDates);
+     if (evidenceId) { shared.evidenceId = evidenceId; shared.sourceRef = text(payload.sourceRef || payload.documentRef || evidenceId, 500); }
+     if (evidenceType) shared.evidenceType = evidenceType;
+     if (anchorInstallment) shared.anchorInstallment = anchorInstallment;
+@@ -565,6 +580,7 @@
+         updatedAt: technicalNow,
+         updatedByUid: authz.actor.uid
+       };
++      Object.assign(portfolioPatch, documentaryDates);
+       if (finalPaidDate) portfolioPatch.fechaPago = finalPaidDate;
+       if (inferredEffectiveDate) portfolioPatch.inferredEffectiveDate = inferredEffectiveDate;
+       if (finalApplicationDate) portfolioPatch.applicationDate = finalApplicationDate;
+@@ -590,7 +606,10 @@
+       serverOwned: true,
+       idempotent: true
+     };
++    const reconciliation = journal ? journal.finish(technicalNow) : null;
++    if (reconciliation) Object.assign(committed, { collectionPeriod: context.collectionPeriod, financialEffectsStatus: 'PENDING_NOT_REPLAYED', eventId });
+     tx.set(eventRef(authz.tenantId, eventId), {
++      ...(reconciliation ? { reconciliation } : {}),
+       schemaVersion: VERSION,
+       contractVersion: CONTRACT_VERSION,
+       tenantId: authz.tenantId,
+@@ -604,13 +623,185 @@
+       resultDigest: digest(committed),
+       createdAt: technicalNow
+     }, { merge: false });
+-    tx.set(reqRef, { status: 'committed', operation: operationName, eventId, payloadDigest: digest(reqPayload), result: committed, committedAt: technicalNow }, { merge: true });
++    tx.set(reqRef, { ...(reconciliation ? { reconciliation } : {}), status: 'committed', operation: operationName, eventId, payloadDigest: digest(reqPayload), result: committed, committedAt: technicalNow }, { merge: true });
+     return committed;
+   });
+ 
+   const [receiptReadback, cobroReadback] = await Promise.all([receiptRef.get(), tenantData(authz.tenantId, 'cobros').doc(result.cobroId).get()]);
+   if (!receiptReadback.exists || !cobroReadback.exists) throw new HttpsError('data-loss', 'No fue posible confirmar la persistencia del pago.');
+   return result;
++}
++
++
++// Optional documentary reconciliation contract. Same owner, transaction and journals.
++// No Finance replay, settlement, rate fallback or operational import is performed here.
++const RECONCILIATION_CONTEXT_VERSION = 'documentary-reconciliation-v1';
++const PENDING_EFFECT_TYPES = ['RECONCILE_RECEIVABLE', 'INSURER_COMMISSION_RECEIVABLE', 'SELLER_COMMISSION_PAYABLE'];
++function reconciliationAssert(condition, code) {
++  if (!condition) throw new HttpsError('failed-precondition', code);
++}
++function auditValue(value) {
++  if (value == null || typeof value !== 'object') return value;
++  if (typeof value.toDate === 'function') {
++    const seconds = value.seconds == null ? value._seconds : value.seconds;
++    const nanoseconds = value.nanoseconds == null ? value._nanoseconds : value.nanoseconds;
++    reconciliationAssert(Number.isSafeInteger(seconds) && Number.isInteger(nanoseconds) && nanoseconds >= 0 && nanoseconds < 1000000000, 'EXACT_TIMESTAMP_VERSION_REQUIRED');
++    return { timestamp: { seconds: String(seconds), nanoseconds } };
++  }
++  if (value instanceof Date) return { timestamp: value.toISOString() };
++  if (Array.isArray(value)) return value.map(auditValue);
++  return Object.fromEntries(Object.entries(value).map(([key, item]) => [key, auditValue(item)]));
++}
++function documentaryContext(raw) {
++  if (raw == null) return null;
++  reconciliationAssert(Buffer.byteLength(JSON.stringify(raw), 'utf8') <= 120000, 'RECONCILIATION_CONTEXT_TOO_LARGE');
++  reconciliationAssert(raw.version === RECONCILIATION_CONTEXT_VERSION, 'RECONCILIATION_CONTEXT_VERSION');
++  reconciliationAssert(/^\d{4}-(0[1-9]|1[0-2])$/.test(raw.collectionPeriod || ''), 'COLLECTION_PERIOD_REQUIRED');
++  reconciliationAssert(/^[a-f0-9]{64}$/.test(raw.configDigest || ''), 'CANONICAL_CONFIG_DIGEST_REQUIRED');
++  const source = raw.source || {};
++  reconciliationAssert(source.fileId && /^[a-f0-9]{64}$/.test(source.fileSha256 || '') && /^[a-f0-9]{64}$/.test(source.rowRevisionSha256 || '') && source.normalizationVersion && Array.isArray(source.rowIds) && source.rowIds.length > 0 && source.rowIds.length <= 200, 'DOCUMENT_ROW_REVISION_REQUIRED');
++  reconciliationAssert(raw.expectedDocumentDigests && typeof raw.expectedDocumentDigests === 'object' && !Array.isArray(raw.expectedDocumentDigests), 'EXPECTED_DOCUMENT_VERSIONS_REQUIRED');
++  const expectedDocumentDigests = Object.fromEntries(Object.entries(raw.expectedDocumentDigests).map(([path, value]) => {
++    reconciliationAssert(/^tenants\/[^/]+\/data\/(polizas|recibosEsperados|cobros|carteraPrimas|gestiones)\/items\/[^/]+$/.test(path) && (value === 'MISSING' || /^[a-f0-9]{64}$/.test(value)), 'INVALID_DOCUMENT_VERSION');
++    return [path, value];
++  }));
++  reconciliationAssert(Array.isArray(raw.receipts) && raw.receipts.length > 0 && raw.receipts.length <= 24, 'RECONCILIATION_RECEIPT_LIMIT');
++  const seen = new Set();
++  const receipts = raw.receipts.map(row => {
++    const receiptId = id(row.receiptId, 'receiptId');
++    reconciliationAssert(!seen.has(receiptId), 'DUPLICATE_ECONOMIC_RECEIPT'); seen.add(receiptId);
++    reconciliationAssert(/^[A-Z]{3}$/.test(row.currency || ''), 'ECONOMIC_CURRENCY_REQUIRED');
++    const effectiveDate = isoDate(row.effectiveDate, 'Fecha efectiva', true);
++    reconciliationAssert(new Date(effectiveDate + 'T00:00:00Z').toISOString().slice(0,10) === effectiveDate, 'EFFECTIVE_DATE_INVALID');
++    reconciliationAssert(['ACTUAL_DOCUMENTED', 'ESTIMATED_CONTRACTUAL_DAY', 'INFERRED_CONTRACTUAL_DUE_DATE'].includes(row.dateAccuracy), 'DATE_ACCURACY_REQUIRED');
++    const economics = {};
++    for (const key of ['premiumNet', 'premiumGross', 'commissionBase', 'commissionRate', 'salesCommission', 'collectionCommission']) {
++      reconciliationAssert(Object.prototype.hasOwnProperty.call(row.economics || {}, key), 'ECONOMIC_FIELD_REQUIRED_' + key);
++      const value = row.economics[key];
++      reconciliationAssert(value === null || (typeof value === 'number' && Number.isFinite(value)), 'ECONOMIC_NUMBER_INVALID_' + key);
++      economics[key] = value;
++    }
++    reconciliationAssert(Array.isArray(row.economics.components) && row.economics.components.length > 0 && row.economics.components.length <= 200, 'DOCUMENTARY_ECONOMIC_COMPONENTS_REQUIRED');
++    economics.components = row.economics.components.map(component => {
++      reconciliationAssert(source.rowIds.includes(component.sourceRowId) && ['PREMIUM','SALES_COMMISSION','COLLECTION_COMMISSION','TAX','FEE','WITHHOLDING','ADJUSTMENT'].includes(component.kind) && component.currency === row.currency && typeof component.amount === 'number' && Number.isFinite(component.amount), 'DOCUMENTARY_ECONOMIC_COMPONENT_INVALID');
++      return { sourceRowId: text(component.sourceRowId,180), kind: component.kind, currency: component.currency, amount: component.amount, label: text(component.label,180) };
++    });
++    const rates = {};
++    for (const key of ['insurer', 'seller']) {
++      const rate = row.rateSnapshots && row.rateSnapshots[key];
++      reconciliationAssert(rate && ['DOCUMENTED', 'BLOCKED_CONFIGURATION', 'BLOCKED_SOURCE'].includes(rate.status), 'RATE_SNAPSHOT_REQUIRED_' + key);
++      reconciliationAssert(rate.status !== 'DOCUMENTED' || (rate.version && rate.effectiveFrom && typeof rate.percent === 'number' && Number.isFinite(rate.percent) && rate.percent >= 0 && rate.percent <= 100), 'EFFECTIVE_RATE_VERSION_REQUIRED_' + key);
++      reconciliationAssert(rate.status === 'DOCUMENTED' || text(rate.reason), 'RATE_BLOCK_REASON_REQUIRED_' + key);
++      reconciliationAssert(rate.percent == null || (typeof rate.percent === 'number' && Number.isFinite(rate.percent) && rate.percent >= 0 && rate.percent <= 100), 'RATE_PERCENT_INVALID');
++      rates[key] = { status: rate.status, version: text(rate.version,180), effectiveFrom: isoDate(rate.effectiveFrom, 'Vigencia'), effectiveTo: isoDate(rate.effectiveTo, 'Fin vigencia'), percent: rate.percent == null ? null : rate.percent, mode: text(rate.mode,80), reason: text(rate.reason,1000), reference: text(rate.reference,500), scope: { country: text(rate.scope && rate.scope.country,12), currency: text(rate.scope && rate.scope.currency,12), branch: text(rate.scope && rate.scope.branch,180), product: text(rate.scope && rate.scope.product,180), plan: text(rate.scope && rate.scope.plan,180) } };
++    }
++    reconciliationAssert(Array.isArray(row.pendingEffects) && row.pendingEffects.length === PENDING_EFFECT_TYPES.length, 'COMPLETE_PENDING_EFFECTS_REQUIRED');
++    const effects = PENDING_EFFECT_TYPES.map(type => {
++      const found = row.pendingEffects.filter(effect => effect.type === type);
++      reconciliationAssert(found.length === 1 && ['PENDING', 'BLOCKED_CONFIGURATION', 'BLOCKED_SOURCE'].includes(found[0].status), 'PENDING_EFFECT_INVALID_' + type);
++      const effect = found[0];
++      reconciliationAssert(effect.status === 'PENDING' || text(effect.reason), 'PENDING_EFFECT_REASON_REQUIRED');
++      if (type === 'SELLER_COMMISSION_PAYABLE' && rates.seller.status !== 'DOCUMENTED') reconciliationAssert(effect.status !== 'PENDING', 'SELLER_RATE_UNRESOLVED');
++      if (type === 'INSURER_COMMISSION_RECEIVABLE' && rates.insurer.status !== 'DOCUMENTED') reconciliationAssert(effect.status !== 'PENDING', 'INSURER_RATE_UNRESOLVED');
++      return { type, status: effect.status, reason: text(effect.reason,1000) };
++    });
++    reconciliationAssert(!Object.values(economics).some(value => value === null) || effects.some(effect => effect.status === 'BLOCKED_SOURCE'), 'INCOMPLETE_ECONOMICS_MUST_REMAIN_BLOCKED');
++    return { receiptId, policyId: id(row.policyId, 'policyId'), clientId: id(row.clientId, 'clientId'), insurerId: id(row.insurerId, 'insurerId'), sellerId: text(row.sellerId,180), currency: row.currency, effectiveDate, dateAccuracy: row.dateAccuracy, economics, rateSnapshots: rates, pendingEffects: effects };
++  });
++  return { version: raw.version, batchId: id(raw.batchId, 'batchId'), batchRevision: id(raw.batchRevision, 'batchRevision'), collectionPeriod: raw.collectionPeriod, configDigest: raw.configDigest, source: { fileId: text(source.fileId,180), fileSha256: source.fileSha256, rowIds: source.rowIds.map(value => text(value,180)), rowRevisionSha256: source.rowRevisionSha256, normalizationVersion: text(source.normalizationVersion,180) }, expectedDocumentDigests, receipts };
++}
++function assertRequestIdentity(previous, operation, payload) {
++  if (!previous.exists) return;
++  const row = previous.data() || {};
++  reconciliationAssert(row.operation === operation && row.payloadDigest === digest(payload), 'REQUEST_ID_PAYLOAD_MISMATCH');
++}
++async function reconciliationJournal(baseTx, context, authz, requestId, eventId) {
++  if (!context) return null;
++  const configSnap = await baseTx.get(reconciliationConfigRef(authz.tenantId));
++  reconciliationAssert(configSnap.exists && digest(auditValue(configSnap.data())) === context.configDigest, 'CANONICAL_RECONCILIATION_CONFIG_CHANGED_OR_MISSING');
++  const baselines = new Map(), changes = [], applied = [], effects = [];
++  const businessPath = path => path.startsWith('tenants/' + authz.tenantId + '/data/') && /\/(polizas|recibosEsperados|cobros|carteraPrimas|gestiones)\/items\//.test(path);
++  const remember = snap => {
++    if (!snap.ref || !businessPath(snap.ref.path)) return;
++    const value = snap.exists ? auditValue(snap.data()) : null;
++    baselines.set(snap.ref.path, { exists: snap.exists, value });
++    reconciliationAssert(context.expectedDocumentDigests[snap.ref.path] === (snap.exists ? digest(value) : 'MISSING'), 'CURRENT_DOCUMENT_VERSION_MISMATCH');
++  };
++  const tx = {
++    get: async ref => { const snap = await baseTx.get(ref); if (snap.docs) snap.docs.forEach(remember); else remember(snap); return snap; },
++    set: (ref, patch, options) => {
++      if (businessPath(ref.path)) {
++        reconciliationAssert(baselines.has(ref.path), 'BUSINESS_BASELINE_NOT_READ');
++        const baseline = baselines.get(ref.path);
++        // Technical timestamps stay on actual documents/event, never inside audit arrays.
++        const keys = Object.keys(patch).filter(key => !['createdAt','updatedAt','reconciledAt','resolvedAt'].includes(key));
++        changes.push({ path: ref.path, beforeExists: baseline.exists, fields: keys.map(key => ({ key, beforePresent: baseline.exists && Object.prototype.hasOwnProperty.call(baseline.value,key), before: baseline.exists && Object.prototype.hasOwnProperty.call(baseline.value,key) ? baseline.value[key] : null, after: auditValue(patch[key]) })) });
++      }
++      return baseTx.set(ref, patch, options);
++    }
++  };
++  const record = (receipt, policy, currency, inferred, actualPaidDate, appliedAmount) => {
++    const sourceRow = context.receipts.find(item => item.receiptId === receipt.id);
++    // Derived scope holds must not mutate the normalized request/payload digest.
++    const row = sourceRow ? { ...sourceRow, pendingEffects: sourceRow.pendingEffects.map(effect => ({ ...effect })) } : null;
++    reconciliationAssert(row && row.policyId === policy.id && row.clientId === (receipt.clienteId || policy.clienteId) && row.currency === currency, 'ECONOMIC_TARGET_IDENTITY_MISMATCH');
++    reconciliationAssert(row.insurerId === text(policy.aseguradoraId || receipt.aseguradoraId,180) && row.sellerId === text(receipt.asesorId || policy.asesorId,180), 'ECONOMIC_PARTY_IDENTITY_MISMATCH');
++    reconciliationAssert(!applied.some(item => item.receiptId === row.receiptId), 'RECEIPT_APPLIED_TWICE');
++    reconciliationAssert(appliedAmount === receiptAmount(receipt) && (row.economics.premiumGross === null || row.economics.premiumGross === appliedAmount), 'RECEIPT_PREMIUM_CORRECTION_REQUIRED_BEFORE_PAYMENT');
++    const knownScope = {
++      country: text(receipt.pais || policy.pais,12), currency,
++      branch: text(policy.ramo || policy.branch,180),
++      product: text(policy.producto || policy.subramo || policy.product,180),
++      plan: text(policy.plan,180)
++    };
++    const rateScopeValidation = {};
++    for (const [party, rate] of Object.entries(row.rateSnapshots)) {
++      reconciliationAssert(rate.status !== 'DOCUMENTED' || (rate.effectiveFrom <= row.effectiveDate && (!rate.effectiveTo || rate.effectiveTo >= row.effectiveDate)), 'RATE_VERSION_NOT_EFFECTIVE_FOR_EVENT');
++      if (rate.status !== 'DOCUMENTED') continue;
++      const checkedFields = [], missingTargetFields = [];
++      for (const [field, declared] of Object.entries(rate.scope || {})) {
++        if (!text(declared)) continue; // An absent scope is not invented or made mandatory.
++        if (!text(knownScope[field])) { missingTargetFields.push(field); continue; }
++        reconciliationAssert(norm(declared) === norm(knownScope[field]), 'RATE_SCOPE_CONTRADICTION_' + party + '_' + field);
++        checkedFields.push(field);
++      }
++      rateScopeValidation[party] = { status: missingTargetFields.length ? 'BLOCKED_CONFIGURATION' : (checkedFields.length ? 'MATCHED' : 'UNSPECIFIED'), checkedFields, missingTargetFields };
++      if (missingTargetFields.length) {
++        const effectType = party === 'insurer' ? 'INSURER_COMMISSION_RECEIVABLE' : 'SELLER_COMMISSION_PAYABLE';
++        const effect = row.pendingEffects.find(item => item.type === effectType);
++        if (effect.status === 'PENDING') {
++          effect.status = 'BLOCKED_CONFIGURATION';
++          effect.reason = 'RATE_SCOPE_TARGET_FIELDS_MISSING:' + missingTargetFields.join(',');
++        }
++      }
++    }
++    row.rateScopeValidation = rateScopeValidation;
++    reconciliationAssert(row.sellerId || row.pendingEffects.find(effect => effect.type === 'SELLER_COMMISSION_PAYABLE').status !== 'PENDING', 'UNRESOLVED_SELLER_MUST_REMAIN_BLOCKED');
++    if (inferred) reconciliationAssert(row.dateAccuracy === 'INFERRED_CONTRACTUAL_DUE_DATE' && row.effectiveDate === dueDate(receipt), 'INFERRED_DATE_MUST_PRESERVE_DUE_DATE');
++    else {
++      reconciliationAssert(row.effectiveDate.slice(0,7) === context.collectionPeriod, 'DIRECT_DATE_MUST_MATCH_COLLECTION_PERIOD');
++      reconciliationAssert(row.dateAccuracy !== 'INFERRED_CONTRACTUAL_DUE_DATE', 'DIRECT_PAYMENT_NOT_INFERRED');
++      if (row.dateAccuracy === 'ACTUAL_DOCUMENTED') reconciliationAssert(actualPaidDate && actualPaidDate === row.effectiveDate, 'ACTUAL_DATE_EVIDENCE_REQUIRED');
++      if (row.dateAccuracy === 'ESTIMATED_CONTRACTUAL_DAY') {
++        reconciliationAssert(!actualPaidDate, 'KNOWN_ACTUAL_DATE_MUST_BE_PRESERVED');
++        reconciliationAssert(/^\d{4}-\d{2}-\d{2}$/.test(dueDate(receipt)) && row.effectiveDate.slice(8) === dueDate(receipt).slice(8), 'ESTIMATED_DATE_MUST_USE_CONTRACTUAL_DAY');
++      }
++    }
++    applied.push({ ...row, country: text(receipt.pais || policy.pais,12).toUpperCase(), appliedPaymentAmount: appliedAmount, directOrInferred: inferred ? 'INFERRED' : 'DIRECT' });
++    for (const effect of row.pendingEffects) effects.push({ ...effect, effectId: 'receff_' + sha([authz.tenantId,context.source.fileSha256,context.source.rowRevisionSha256,row.receiptId,row.currency,effect.type].join('|')).slice(0,40), receiptId: row.receiptId, policyId: row.policyId, clientId: row.clientId, insurerId: row.insurerId, sellerId: row.sellerId, currency: row.currency, collectionPeriod: inferred ? null : context.collectionPeriod, evidenceCollectionPeriod: context.collectionPeriod, effectiveDate: row.effectiveDate, dateAccuracy: row.dateAccuracy, economics: row.economics, rateSnapshots: row.rateSnapshots, rateScopeValidation: row.rateScopeValidation, evidenceRevision: context.source.rowRevisionSha256, replayImplemented: false });
++    return inferred ? { evidenceCollectionPeriod: context.collectionPeriod, paymentDateAccuracy: row.dateAccuracy } : { collectionPeriod: context.collectionPeriod, evidenceCollectionPeriod: context.collectionPeriod, directEffectiveDate: row.effectiveDate, paymentDateAccuracy: row.dateAccuracy };
++  };
++  const finish = technicalNow => {
++    reconciliationAssert(applied.length === context.receipts.length, 'ECONOMIC_TARGET_SET_MISMATCH');
++    const journal = { version: context.version, batchId: context.batchId, batchRevision: context.batchRevision, collectionPeriod: context.collectionPeriod, source: context.source, configuration: { source: 'canonical', path: configSnap.ref.path, digest: context.configDigest, snapshot: auditValue(configSnap.data()) }, expectedDocumentDigests: context.expectedDocumentDigests, receipts: applied, pendingFinancialEffects: effects, beforeAfter: changes, financeReplayImplemented: false };
++    reconciliationAssert(Buffer.byteLength(JSON.stringify(journal), 'utf8') <= 650000, 'RECONCILIATION_JOURNAL_TOO_LARGE');
++    for (const row of applied) {
++      const projectionId = 'recop_' + sha(eventId + '|' + row.receiptId).slice(0,40);
++      baseTx.set(tenantData(authz.tenantId, 'conciliaciones').doc(projectionId), { id: projectionId, kind: 'APPLIED_RECONCILIATION_OPERATION', proposalIdentity: 'applied:' + eventId + ':' + row.receiptId, tenantId: authz.tenantId, requestId, eventId, batchId: context.batchId, batchRevision: context.batchRevision, polizaId: row.policyId, clienteId: row.clientId, reciboId: row.receiptId, asesorId: row.sellerId, aseguradoraId: row.insurerId, pais: row.country, moneda: row.currency, monto: row.appliedPaymentAmount, estado: 'APLICADA_FINANZAS_PENDIENTES', directOrInferred: row.directOrInferred, periodo: row.directOrInferred === 'DIRECT' ? context.collectionPeriod : row.effectiveDate.slice(0,7), evidenceCollectionPeriod: context.collectionPeriod, effectiveDate: row.effectiveDate, dateAccuracy: row.dateAccuracy, pendingFinancialEffects: row.pendingEffects.map(effect => ({ type: effect.type, status: effect.status, reason: effect.reason })), source_ref: { file: context.source.fileId, row: context.source.rowIds.join(', '), period: context.collectionPeriod }, createdAt: technicalNow, updatedAt: technicalNow }, { merge: false });
++    }
++    return journal;
++  };
++  return { tx, record, finish, configuration: Object.assign({ configSource: 'canonical' }, configSnap.data()) };
+ }
+ 
+ function evidenceOrigin(type) {
+@@ -626,7 +817,8 @@
+ }
+ async function reconcileEvidence(authz, data, payload, previewOnly) {
+   const policyId = id(payload.policyId || payload.polizaId, 'polizaId');
+-  const reconciliationConfig = await readReconciliationConfig(authz.tenantId, previewOnly === true);
++  const context = documentaryContext(payload.reconciliationContext);
++  const reconciliationConfig = context ? null : await readReconciliationConfig(authz.tenantId, previewOnly === true);
+   const evidencePayload = {
+     policyId,
+     evidenceType: text(payload.evidenceType || payload.type || payload.sourceType, 120),
+@@ -654,20 +846,25 @@
+     explicitInstallmentException: payload.explicitInstallmentException === true || payload.installmentExceptionApproved === true,
+     installmentExceptionReference: text(payload.installmentExceptionReference || payload.exceptionReference || payload.planExceptionReference, 500)
+   };
++  if (context) evidencePayload.reconciliationContext = context;
+   const reqId = operationRequestId(authz.tenantId, 'reconcile_evidence', evidencePayload, data.requestId);
+   const reqRef = requestRef(authz.tenantId, reqId);
+   const evtId = 'payinf_' + sha(authz.tenantId + '|' + policyId + '|' + reqId).slice(0, 28);
+   const policyRef = tenantData(authz.tenantId, 'polizas').doc(policyId);
+   const receiptQuery = tenantData(authz.tenantId, 'recibosEsperados').where('polizaId', '==', policyId);
+ 
+-  return db.runTransaction(async tx => {
++  return db.runTransaction(async baseTx => {
++    let tx = baseTx;
+     const previous = await tx.get(reqRef);
++    assertRequestIdentity(previous, 'reconcile_evidence', evidencePayload);
+     if (previous.exists && (previous.data() || {}).status === 'committed') return Object.assign({ reused: true }, (previous.data() || {}).result || {});
++    const journal = await reconciliationJournal(baseTx, context, authz, reqId, evtId);
++    if (journal) tx = journal.tx;
+     const [policySnap, receiptSnap] = await Promise.all([tx.get(policyRef), tx.get(receiptQuery)]);
+     if (!policySnap.exists) throw new HttpsError('not-found', 'La póliza no existe.');
+     const policy = Object.assign({ id: policySnap.id }, policySnap.data() || {});
+     const receipts = receiptSnap.docs.map(doc => Object.assign({ id: doc.id }, doc.data() || {}));
+-    const plan = planEvidence({ policy, receipts, evidence: evidencePayload, reconciliationConfig });
++    const plan = planEvidence({ policy, receipts, evidence: evidencePayload, reconciliationConfig: journal ? journal.configuration : reconciliationConfig });
+     if (!plan || plan.ok !== true) throw new HttpsError('failed-precondition', 'No fue posible evaluar la evidencia.');
+     if (plan.autoCommit !== true || plan.status === 'REVIEW_REQUIRED') {
+       return {
+@@ -688,6 +885,7 @@
+       };
+     }
+     if (!Array.isArray(plan.targets) || plan.targets.length === 0) {
++      reconciliationAssert(!context, 'DOCUMENTARY_CONTEXT_REQUIRES_EXACT_TARGETS');
+       const noop = { ok: true, operation: 'reconcile_evidence', status: 'NOOP_ALREADY_SATISFIED', policyId, writes: 0, serverOwned: true, idempotent: true, confidence: plan.confidence || 'HIGH' };
+       tx.set(reqRef, { status: 'committed', operation: 'reconcile_evidence', payloadDigest: digest(evidencePayload), result: noop, committedAt: now() }, { merge: true });
+       return noop;
+@@ -704,6 +902,7 @@
+       if (cobroSnap.size > 1) throw new HttpsError('failed-precondition', 'Más de un cobro corresponde al mismo recibo.');
+       const activePortfolioRows = portfolioSnap.docs.filter(doc => activePortfolio(doc.data() || {}));
+       if (activePortfolioRows.length > 1) throw new HttpsError('failed-precondition', 'Más de una obligación activa corresponde al mismo recibo.');
++      if (journal && cobroSnap.empty) { const exact = await tx.get(tenantData(authz.tenantId,'cobros').doc(deterministicCobroId(authz.tenantId,receiptId))); reconciliationAssert(!exact.exists,'DETERMINISTIC_COBRO_ID_CONFLICT'); }
+       states.push({ target, receipt, cobroDoc: cobroSnap.empty ? null : cobroSnap.docs[0], activePortfolioRows });
+     }
+ 
+@@ -765,6 +964,9 @@
+         updatedAt: technicalNow,
+         updatedByUid: authz.actor.uid
+       };
++      if (journal) reconciliationAssert(directOrInferred === (isInferred ? 'INFERRED' : 'DIRECT'), 'PRESERVED_PAYMENT_ORIGIN_REQUIRES_REVIEW');
++      const documentaryDates = journal ? journal.record(receipt, policy, text(receipt.moneda || policy.moneda,12).toUpperCase(), isInferred, paidDate, amount) : {};
++      Object.assign(shared, documentaryDates);
+       if (inferenceProvenance) shared.inferenceProvenance = inferenceProvenance;
+       if (paidDate) shared.paidDate = paidDate;
+       if (applicationDate) shared.applicationDate = applicationDate;
+@@ -824,6 +1026,7 @@
+           updatedAt: technicalNow,
+           updatedByUid: authz.actor.uid
+         };
++        Object.assign(portfolioPatch, documentaryDates);
+         if (isInferred) portfolioPatch.inferredEffectiveDate = target.inferredEffectiveDate;
+         if (paidDate) portfolioPatch.fechaPago = paidDate;
+         if (applicationDate) portfolioPatch.applicationDate = applicationDate;
+@@ -849,7 +1052,10 @@
+       idempotent: true,
+       humanApprovalRequired: false
+     };
++    const reconciliation = journal ? journal.finish(technicalNow) : null;
++    if (reconciliation) Object.assign(committed, { collectionPeriod: context.collectionPeriod, financialEffectsStatus: 'PENDING_NOT_REPLAYED', eventId: evtId });
+     tx.set(eventRef(authz.tenantId, evtId), {
++      ...(reconciliation ? { reconciliation } : {}),
+       schemaVersion: VERSION,
+       contractVersion: CONTRACT_VERSION,
+       tenantId: authz.tenantId,
+@@ -865,7 +1071,7 @@
+       resultDigest: digest(committed),
+       createdAt: technicalNow
+     }, { merge: false });
+-    tx.set(reqRef, { status: 'committed', operation: 'reconcile_evidence', eventId: evtId, payloadDigest: digest(evidencePayload), result: committed, committedAt: technicalNow }, { merge: true });
++    tx.set(reqRef, { ...(reconciliation ? { reconciliation } : {}), status: 'committed', operation: 'reconcile_evidence', eventId: evtId, payloadDigest: digest(evidencePayload), result: committed, committedAt: technicalNow }, { merge: true });
+     return committed;
+   });
+ }
+--- a/orbit360-platform/modules/conciliaciones.js
++++ b/orbit360-platform/modules/conciliaciones.js
+@@ -60,6 +60,7 @@
+   ].join('|');
+ 
+   function stateFor(row) {
++    if (row && row.kind === 'APPLIED_RECONCILIATION_OPERATION') return 'APLICADA_FINANZAS_PENDIENTES';
+     const raw = norm(first(row,['queue_state','estado_bandeja','estado','status','review_state','estado_revision']));
+     if (raw.includes('bloque')) return 'BLOQUEADA';
+     if (raw.includes('rechaz')) return 'RECHAZADA';
+@@ -69,6 +70,7 @@
+     return 'PROPUESTA';
+   }
+   function scoreFor(row) {
++    if (row && row.kind === 'APPLIED_RECONCILIATION_OPERATION') return 'PAGO_CONCILIADO';
+     const raw = norm(first(row,['score_decision','decision_score','score','decision','status','estado']));
+     if (raw.includes('bloque')) return 'BLOQUEADO';
+     if (raw.includes('requiere validacion')) return 'REQUIERE_VALIDACION';
+@@ -87,7 +89,7 @@
+       poliza: text(first(row,['polizaNumero','poliza','polizaId','poliza_id'])),
+       recibo: text(first(row,['reciboNumero','requerimiento','reciboId','recibo_id'])),
+       archivo: ref.file, hoja: ref.sheet, fila: ref.row, bloque: ref.block, periodo: ref.period,
+-      motivo: text(first(row,['reason','motivo','estado_revision','review_state'])),
++      motivo: row && row.kind === 'APPLIED_RECONCILIATION_OPERATION' ? `Pago conciliado. Finanzas pendiente (${(row.pendingFinancialEffects || []).length} efectos); fecha efectiva ${text(row.effectiveDate)} (${text(row.dateAccuracy)}).` : text(first(row,['reason','motivo','estado_revision','review_state'])),
+       sourceDifferences: Array.isArray(row && row.sourceDifferences) ? row.sourceDifferences.slice() : [],
+       original: row, readOnly: true
+     };
+@@ -193,10 +195,10 @@
+     freezeCobrosModule();
+     const rows = proposalRows();
+     const counts = rows.reduce((acc,row) => { acc[row.estado] = (acc[row.estado] || 0) + 1; return acc; },{});
+-    const filters = ['', 'PROPUESTA','EN_REVISION','REQUIERE_VALIDACION','VALIDADA','RECHAZADA','BLOQUEADA'];
++    const filters = ['', 'PROPUESTA','EN_REVISION','REQUIERE_VALIDACION','VALIDADA','RECHAZADA','BLOQUEADA','APLICADA_FINANZAS_PENDIENTES'];
+     const banner = K().banner ? K().banner({icon:'🔗',title:'Bandeja de conciliaciones',sub:'Revisión de coincidencias. Ninguna propuesta aplica pagos por sí sola.',features:[]}) : '<div class="card pad"><b>Bandeja de conciliaciones</b><div class="muted">Revisión de coincidencias. Ninguna propuesta aplica pagos por sí sola.</div></div>';
+     host.innerHTML = `<div class="page">${banner}
+-      <div class="cfg-note" style="margin-bottom:12px">Esta bandeja registra propuestas formales, distintas de pagos ya confirmados y pendientes de conciliar. Consultar pagos SIGA y otros orígenes en Cobros y cartera.</div>
++      <div class="cfg-note" style="margin-bottom:12px">Esta bandeja conserva propuestas y operaciones conciliadas. Las operaciones aplicadas muestran por separado sus efectos pendientes en Finanzas.</div>
+       <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px">${filters.map(state => `<button class="btn ${filterState===state?'primary':'ghost'} sm" data-conc-filter="${state}">${state?state.replaceAll('_',' '):'Todos'}${state?` · ${counts[state]||0}`:''}</button>`).join('')}</div>
+       <div class="card" style="overflow:hidden"><div style="overflow-x:auto"><table class="tbl"><thead><tr><th>Estado</th><th>Coincidencia</th><th>Fuente</th><th>País / moneda</th><th>Cliente · póliza · recibo</th><th class="num">Monto</th><th>Trazabilidad</th><th></th></tr></thead><tbody>
+       ${rows.map(row => `<tr><td><span class="badge ${tone(row.estado)}">${esc(row.estado.replaceAll('_',' '))}</span></td><td>${esc(row.score.replaceAll('_',' '))}</td><td>${esc(row.fuente)}</td><td>${esc([row.pais,row.moneda].filter(Boolean).join(' / ')||'—')}</td><td>${esc([row.cliente,row.poliza,row.recibo].filter(Boolean).join(' · ')||'—')}</td><td class="num">${row.moneda?money(row.monto,row.moneda):esc(row.monto||'—')}</td><td class="mono" style="font-size:10.5px">${esc([row.archivo,row.hoja,row.fila?`fila ${row.fila}`:'',row.periodo].filter(Boolean).join(' · ')||'—')}</td><td><button class="btn ghost sm" data-conc-id="${esc(row.id)}">Ver</button></td></tr>`).join('') || '<tr><td colspan="8" class="muted" style="text-align:center;padding:30px">No hay propuestas formales visibles. Los pagos pendientes se consultan en Cobros y cartera.</td></tr>'}
+@@ -214,7 +216,7 @@
+     ];
+     let back = document.getElementById('conc-readonly-detail'); if (back) back.remove();
+     back = document.createElement('div'); back.id='conc-readonly-detail'; back.className='drawer-back open'; back.style.cssText='display:grid;place-items:center;z-index:210';
+-    back.innerHTML = `<div class="card" style="width:min(520px,94vw);max-height:88vh;overflow:auto"><div style="padding:18px"><div style="display:flex;justify-content:space-between;gap:12px"><b style="font-family:var(--f-display);font-size:17px">Detalle de conciliación</b><button class="imp-x" data-close>✕</button></div><div class="cfg-note" style="margin:12px 0">Esta propuesta está en revisión y no aplica pagos automáticamente.</div>${summary.map(([label,value])=>`<div class="vp-row"><span class="vp-l">${esc(label)}</span><span class="vp-v">${esc(value)}</span></div>`).join('')}</div><div style="padding:13px 18px;border-top:1px solid var(--line);display:flex;justify-content:flex-end"><button class="btn ghost" data-close>Cerrar</button></div></div>`;
++    back.innerHTML = `<div class="card" style="width:min(520px,94vw);max-height:88vh;overflow:auto"><div style="padding:18px"><div style="display:flex;justify-content:space-between;gap:12px"><b style="font-family:var(--f-display);font-size:17px">Detalle de conciliación</b><button class="imp-x" data-close>✕</button></div><div class="cfg-note" style="margin:12px 0">${row.original && row.original.kind === 'APPLIED_RECONCILIATION_OPERATION' ? esc(row.motivo) : 'Esta propuesta está en revisión y no aplica pagos automáticamente.'}</div>${summary.map(([label,value])=>`<div class="vp-row"><span class="vp-l">${esc(label)}</span><span class="vp-v">${esc(value)}</span></div>`).join('')}</div><div style="padding:13px 18px;border-top:1px solid var(--line);display:flex;justify-content:flex-end"><button class="btn ghost" data-close>Cerrar</button></div></div>`;
+     document.body.appendChild(back);
+     const close=()=>back.remove(); back.querySelectorAll('[data-close]').forEach(button=>button.addEventListener('click',close)); back.addEventListener('click',event=>{if(event.target===back)close();});
+   }
+--- /dev/null
++++ b/tools/gravicentra-reconciliation-durable-context.test.cjs
+@@ -0,0 +1,193 @@
++'use strict';
++// Synthetic local transaction-contract tests. Does not connect to Firebase.
++const test = require('node:test');
++const assert = require('node:assert/strict');
++const fs = require('node:fs');
++const vm = require('node:vm');
++const path = require('node:path');
++const crypto = require('node:crypto');
++const clone = value => JSON.parse(JSON.stringify(value),(_key,item)=>item&&item.__testTimestamp?{...item,toDate:()=>new Date(item.seconds*1000+Math.floor(item.nanoseconds/1000000))}:item);
++const ownerPath = path.resolve(__dirname,'../functions/cobros-reconciliation-domain.js');
++const enginePath = process.env.PAYMENT_ENGINE_SOURCE || path.resolve(__dirname,'../functions/payment-inference-engine.js');
++const source = fs.readFileSync(ownerPath,'utf8');
++const tenant = 'qa_tenant';
++const p = (collection,id) => `tenants/${tenant}/data/${collection}/items/${id}`;
++const configPath = `tenants/${tenant}/config/reconciliation`;
++function load(initial, failPath) {
++  let records = new Map(Object.entries(clone(initial))), committedWrites = 0;
++  class Ref {
++    constructor(value, filters=[]) { this.path=value; this.filters=filters; this.id=value.split('/').at(-1); }
++    collection(value) { return new Ref(this.path+'/'+value); }
++    doc(value) { return new Ref(this.path+'/'+value); }
++    where(key,operator,value) { assert.equal(operator,'=='); return new Ref(this.path,[...this.filters,[key,value]]); }
++    async get() { return snapshot(this); }
++  }
++  function snapshot(ref) {
++    if (ref.filters.length) {
++      const docs=[...records.entries()].filter(([key,value])=>key.startsWith(ref.path+'/')&&!key.slice(ref.path.length+1).includes('/')&&ref.filters.every(([field,expected])=>value[field]===expected)).map(([key])=>snapshot(new Ref(key)));
++      return { docs,size:docs.length,empty:docs.length===0 };
++    }
++    return { ref,id:ref.id,exists:records.has(ref.path),data:()=>clone(records.get(ref.path)||{}) };
++  }
++  const db={ collection:name=>new Ref(name), runTransaction:async callback=>{
++    const writes=[];
++    const tx={get:async ref=>{assert.equal(writes.length,0,'Firestore reads must precede writes');return snapshot(ref);},set:(ref,value,options)=>{
++      if(failPath&&ref.path.includes(failPath))throw new Error('INJECTED_TRANSACTION_FAILURE');
++      writes.push({path:ref.path,value:clone(value),merge:options?.merge});return tx;
++    }};
++    const result=await callback(tx);
++    const next=new Map(records);
++    for(const write of writes) next.set(write.path,write.merge?{...(next.get(write.path)||{}),...write.value}:write.value);
++    records=next;committedWrites+=writes.length;return result;
++  }};
++  class HttpsError extends Error {constructor(code,message){super(message);this.code=code;}}
++  const module={exports:{}};
++  const context={module,exports:module.exports,process:{env:{}},console,Buffer,Date,require:name=>{
++    if(name==='node:crypto')return crypto;
++    if(name==='firebase-admin/app')return{getApps:()=>[{}],initializeApp:()=>({})};
++    if(name==='firebase-admin/firestore')return{getFirestore:()=>db,FieldValue:{serverTimestamp:()=>({__serverTimestamp:true})}};
++    if(name==='firebase-functions/v2/https')return{HttpsError,onCall:(_opts,fn)=>fn};
++    if(name==='./cobros-ledger-contract')return{validateActiveLedgerContract:()=>{}};
++    if(name==='./product-active-role-contract')return{normalizeRole:value=>value,resolveProductActiveRole:(_m,role)=>({activeRole:role})};
++    if(name==='./payment-inference-engine')return require(enginePath);
++    throw new Error('Unexpected dependency '+name);
++  }};
++  vm.runInNewContext(source+'\nmodule.exports.__test={applyPayment,reconcileEvidence,digest,auditValue,documentaryContext,deterministicCobroId,executePreview};',context,{filename:ownerPath});
++  return{api:module.exports.__test,records:()=>Object.fromEntries(records),writes:()=>committedWrites};
++}
++const auth={tenantId:tenant,actor:{uid:'qa_operator',activeRole:'operativo',advisorId:'qa_seller'}};
++function fixture(count=1) {
++  const policy={clienteId:'qa_client',aseguradoraId:'qa_insurer',asesorId:'qa_seller',moneda:'GTQ',pais:'GT'};
++  const records={ [configPath]:{autoCommitHighConfidence:true,humanConfirmationRequired:false,humanConfirmationRequiredForHighConfidence:false,requireSameCurrency:true,insurerPaymentPlans:[]},[p('polizas','qa_policy')]:policy };
++  for(let n=1;n<=count;n++){
++    const date=count===1?'2026-08-15':`2026-${String(n+7).padStart(2,'0')}-15`;
++    records[p('recibosEsperados','qa_receipt_'+n)]={polizaId:'qa_policy',clienteId:'qa_client',asesorId:'qa_seller',secuencia:n,cuota:`${n}/${count}`,vence:date,monto:112,moneda:'GTQ',estado:'Pendiente'};
++    records[p('carteraPrimas','qa_portfolio_'+n)]={polizaId:'qa_policy',reciboId:'qa_receipt_'+n,estado:'Pendiente',estadoCartera:'Pendiente',monto:112,moneda:'GTQ',vence:date};
++  }
++  return records;
++}
++function contextFor(h,initial,count=1) {
++  const expectedDocumentDigests=Object.fromEntries(Object.entries(initial).filter(([key])=>key.includes('/data/')).map(([key,value])=>[key,h.api.digest(h.api.auditValue(value))]));
++  for(let n=1;n<=count;n++)expectedDocumentDigests[p('cobros',h.api.deterministicCobroId(tenant,'qa_receipt_'+n))]='MISSING';
++  return{version:'documentary-reconciliation-v1',batchId:'qa_batch',batchRevision:'qa_revision_1',collectionPeriod:'2026-10',configDigest:h.api.digest(initial[configPath]),source:{fileId:'qa_document',fileSha256:'a'.repeat(64),rowIds:['sheet:1:row:2'],rowRevisionSha256:'b'.repeat(64),normalizationVersion:'qa-normalization-v1'},expectedDocumentDigests,receipts:Array.from({length:count},(_,i)=>{
++    const n=i+1,inferred=count>1&&n<count;
++    return{receiptId:'qa_receipt_'+n,policyId:'qa_policy',clientId:'qa_client',insurerId:'qa_insurer',sellerId:'qa_seller',currency:'GTQ',effectiveDate:inferred?initial[p('recibosEsperados','qa_receipt_'+n)].vence:'2026-10-15',dateAccuracy:inferred?'INFERRED_CONTRACTUAL_DUE_DATE':'ESTIMATED_CONTRACTUAL_DAY',economics:{premiumNet:100,premiumGross:112,commissionBase:100,commissionRate:10,salesCommission:10,collectionCommission:0,components:[{sourceRowId:'sheet:1:row:2',kind:'PREMIUM',currency:'GTQ',amount:100},{sourceRowId:'sheet:1:row:2',kind:'TAX',currency:'GTQ',amount:12},{sourceRowId:'sheet:1:row:2',kind:'SALES_COMMISSION',currency:'GTQ',amount:10}]},rateSnapshots:{insurer:{status:'DOCUMENTED',version:'qa_insurer_v1',effectiveFrom:'2026-01-01',percent:10,reference:'qa_planilla'},seller:{status:'BLOCKED_CONFIGURATION',reason:'October effective-from confirmation pending',percent:60,reference:'qa_current_config'}},pendingEffects:[{type:'RECONCILE_RECEIVABLE',status:'PENDING'},{type:'INSURER_COMMISSION_RECEIVABLE',status:'PENDING'},{type:'SELLER_COMMISSION_PAYABLE',status:'BLOCKED_CONFIGURATION',reason:'October effective-from confirmation pending'}]};
++  })};
++}
++const direct=(context,extra={})=>({receiptId:'qa_receipt_1',sourceType:'commission_statement',evidenceId:'qa_document',amount:112,reconciliationContext:context,...extra});
++function events(h){return Object.entries(h.records()).filter(([key])=>key.includes('/reconciliationEvents/')).map(([,value])=>value);}
++test('estimated direct payment preserves original due date and real paidDate absence; complete atomic journals and projection',async()=>{
++  const initial=fixture(),h=load(initial),ctx=contextFor(h,initial);
++  const result=await h.api.applyPayment(auth,{requestId:'qa_req_1'},direct(ctx));
++  const records=h.records(),receipt=records[p('recibosEsperados','qa_receipt_1')];
++  assert.equal(result.paymentState,'PAID_DIRECT');assert.equal(receipt.vence,'2026-08-15');assert.equal(receipt.collectionPeriod,'2026-10');assert.equal(receipt.directEffectiveDate,'2026-10-15');assert.equal(receipt.paymentDateAccuracy,'ESTIMATED_CONTRACTUAL_DAY');assert.equal(receipt.paidDate,undefined);assert.equal(receipt.fechaPago,undefined);
++  const journal=events(h)[0].reconciliation;assert.equal(journal.pendingFinancialEffects.length,3);assert.equal(journal.beforeAfter.length,3);assert.equal(journal.pendingFinancialEffects[2].status,'BLOCKED_CONFIGURATION');assert.equal(journal.pendingFinancialEffects[2].rateSnapshots.seller.percent,60);assert.equal(journal.financeReplayImplemented,false);
++  assert.equal(Object.keys(records).filter(key=>key.includes('/data/conciliaciones/items/')).length,1);
++  assert.deepEqual(records[`tenants/${tenant}/reconciliationRequests/qa_req_1`].reconciliation,journal);
++  assert.equal(journal.beforeAfter.find(item=>item.path===p('recibosEsperados','qa_receipt_1')).fields.find(item=>item.key==='estado').before,'Pendiente');
++});
++test('same request returns identical committed result with zero additional writes; changed payload or source revision rejects',async()=>{
++  const initial=fixture(),h=load(initial),ctx=contextFor(h,initial),payload=direct(ctx);
++  await h.api.applyPayment(auth,{requestId:'qa_req_reuse'},payload);const writes=h.writes();
++  const again=await h.api.applyPayment(auth,{requestId:'qa_req_reuse'},payload);assert.equal(again.reused,true);assert.equal(h.writes(),writes);
++  await assert.rejects(h.api.applyPayment(auth,{requestId:'qa_req_reuse'},direct(ctx,{amount:113})),/REQUEST_ID_PAYLOAD_MISMATCH/);
++  const changed=clone(ctx);changed.source.rowRevisionSha256='c'.repeat(64);
++  await assert.rejects(h.api.applyPayment(auth,{requestId:'qa_req_reuse'},direct(changed)),/REQUEST_ID_PAYLOAD_MISMATCH/);assert.equal(h.writes(),writes);
++});
++test('actual documented date preserved and never replaced with a synthetic estimate',async()=>{
++  const initial=fixture(),h=load(initial),ctx=contextFor(h,initial);ctx.receipts[0].dateAccuracy='ACTUAL_DOCUMENTED';ctx.receipts[0].effectiveDate='2026-10-17';
++  await h.api.applyPayment(auth,{requestId:'qa_actual'},direct(ctx,{paidDate:'2026-10-17',actualPaidDateEvidence:true}));
++  assert.equal(h.records()[p('recibosEsperados','qa_receipt_1')].paidDate,'2026-10-17');
++});
++test('currency, target identity, config revision, stale business version, incomplete economics and off-contract date fail closed',async()=>{
++  for(const mutate of [c=>c.receipts[0].currency='USD',c=>c.receipts[0].policyId='qa_wrong_policy',c=>c.configDigest='d'.repeat(64),c=>c.expectedDocumentDigests[p('recibosEsperados','qa_receipt_1')]='d'.repeat(64),c=>delete c.receipts[0].economics.salesCommission,c=>c.receipts[0].effectiveDate='2026-10-16']){
++    const initial=fixture(),h=load(initial),ctx=contextFor(h,initial);mutate(ctx);
++    await assert.rejects(h.api.applyPayment(auth,{requestId:'qa_invalid'},direct(ctx)));assert.equal(h.writes(),0);assert.deepEqual(h.records(),initial);
++  }
++});
++test('failure at final event or applied projection rolls back receipts, cobros, cartera and both journals',async()=>{
++  for(const failure of ['/reconciliationEvents/','/data/conciliaciones/items/']){
++    const initial=fixture(),h=load(initial,failure),ctx=contextFor(h,initial);
++    await assert.rejects(h.api.applyPayment(auth,{requestId:'qa_rollback'},direct(ctx)),/INJECTED_TRANSACTION_FAILURE/);assert.equal(h.writes(),0);assert.deepEqual(h.records(),initial);
++  }
++});
++test('backward inferred receipts retain original contractual dates and do not receive October collectionPeriod',async()=>{
++  const initial=fixture(3),h=load(initial),ctx=contextFor(h,initial,3);
++  const payload={policyId:'qa_policy',receiptId:'qa_receipt_3',evidenceType:'COMMISSION_STATEMENT_INSTALLMENT_N',evidenceId:'qa_document',totalInstallments:3,currency:'GTQ',evidenceAsOfDate:'2026-10-31',reconciliationContext:ctx};
++  const result=await h.api.reconcileEvidence(auth,{requestId:'qa_inference'},payload,false);assert.equal(result.results.length,3);
++  const records=h.records();for(let n=1;n<=2;n++){const receipt=records[p('recibosEsperados','qa_receipt_'+n)];assert.equal(receipt.inferredEffectiveDate,initial[p('recibosEsperados','qa_receipt_'+n)].vence);assert.equal(receipt.collectionPeriod,undefined);assert.equal(receipt.evidenceCollectionPeriod,'2026-10');assert.equal(receipt.paidDate,undefined);}
++  assert.equal(records[p('recibosEsperados','qa_receipt_3')].collectionPeriod,'2026-10');assert.equal(events(h)[0].reconciliation.pendingFinancialEffects.length,9);
++  const again=await h.api.reconcileEvidence(auth,{requestId:'qa_inference'},payload,false);assert.equal(again.reused,true);
++  await assert.rejects(h.api.reconcileEvidence(auth,{requestId:'qa_inference'},{...payload,invoiceNumber:'different'},false),/REQUEST_ID_PAYLOAD_MISMATCH/);
++});
++test('inference final failure rolls back all three receipt chains',async()=>{
++  const initial=fixture(3),h=load(initial,'/reconciliationEvents/'),ctx=contextFor(h,initial,3);
++  await assert.rejects(h.api.reconcileEvidence(auth,{requestId:'qa_multi_rollback'},{policyId:'qa_policy',receiptId:'qa_receipt_3',evidenceType:'COMMISSION_STATEMENT_INSTALLMENT_N',evidenceId:'qa_document',totalInstallments:3,currency:'GTQ',reconciliationContext:ctx},false),/INJECTED_TRANSACTION_FAILURE/);
++  assert.equal(h.writes(),0);assert.deepEqual(h.records(),initial);
++});
++test('legacy direct command remains operational without added projection or economics contract',async()=>{
++  const initial=fixture(),h=load(initial);await h.api.applyPayment(auth,{requestId:'qa_legacy'},{receiptId:'qa_receipt_1',sourceType:'manual',amount:112,paidDate:'2026-10-15'});
++  assert.equal(h.records()[p('recibosEsperados','qa_receipt_1')].fechaPago,'2026-10-15');assert.equal(events(h)[0].reconciliation,undefined);assert.equal(Object.keys(h.records()).filter(key=>key.includes('/data/conciliaciones/items/')).length,0);
++});
++test('new documentary contract blocks uncorrected premium and future rate instead of silently changing balances',async()=>{
++  const initial=fixture(),h=load(initial),ctx=contextFor(h,initial);
++  await assert.rejects(h.api.applyPayment(auth,{requestId:'qa_amount_diff'},direct(ctx,{amount:113})),/RECEIPT_PREMIUM_CORRECTION_REQUIRED/);
++  ctx.receipts[0].rateSnapshots.insurer.effectiveFrom='2026-11-01';
++  await assert.rejects(h.api.applyPayment(auth,{requestId:'qa_future_rate'},direct(ctx)),/RATE_VERSION_NOT_EFFECTIVE_FOR_EVENT/);assert.equal(h.writes(),0);
++});
++test('documentary enrichment cannot mislabel a preserved inferred payment as a new direct fact',async()=>{
++  const initial=fixture(),seed=load(initial),cobroId=seed.api.deterministicCobroId(tenant,'qa_receipt_1');
++  initial[p('cobros',cobroId)]={reciboId:'qa_receipt_1',paymentState:'PAID_INFERRED',directOrInferred:'INFERRED',inferredEffectiveDate:'2026-08-15'};
++  const h=load(initial),ctx=contextFor(h,initial);ctx.expectedDocumentDigests[p('cobros',cobroId)]=h.api.digest(initial[p('cobros',cobroId)]);
++  await assert.rejects(h.api.applyPayment(auth,{requestId:'qa_preserved_origin'},direct(ctx)),/PRESERVED_PAYMENT_ORIGIN_REQUIRES_REVIEW/);assert.equal(h.writes(),0);assert.deepEqual(h.records(),initial);
++});
++test('Preview synthetic-ID boundary remains unchanged',async()=>{
++  const h=load(fixture());await assert.rejects(h.api.executePreview({data:{payload:{receiptId:'real_receipt'}}}),/fixtures sintéticas/);assert.equal(h.writes(),0);
++});
++test('a one-nanosecond timestamp change invalidates the exact baseline even within the same millisecond',async()=>{
++  const initial=fixture();initial[p('recibosEsperados','qa_receipt_1')].updatedAt=clone({__testTimestamp:true,seconds:1793491200,nanoseconds:123456700});
++  const current=clone(initial);current[p('recibosEsperados','qa_receipt_1')].updatedAt.nanoseconds++;
++  const h=load(current),ctx=contextFor(h,initial);
++  const a=h.api.auditValue(initial[p('recibosEsperados','qa_receipt_1')].updatedAt),b=h.api.auditValue(current[p('recibosEsperados','qa_receipt_1')].updatedAt);
++  assert.notEqual(h.api.digest(a),h.api.digest(b));assert.equal(a.timestamp.nanoseconds,123456700);
++  await assert.rejects(h.api.applyPayment(auth,{requestId:'qa_nanosecond'},direct(ctx)),/CURRENT_DOCUMENT_VERSION_MISMATCH/);assert.equal(h.writes(),0);
++});
++test('existing Conciliaciones reader preserves proposal identity and displays applied operation without a write API',()=>{
++  const rows=[{id:'qa_old',proposalIdentity:'old',estado:'PROPUESTA',monto:50},{id:'qa_applied',proposalIdentity:'applied:event:receipt',kind:'APPLIED_RECONCILIATION_OPERATION',effectiveDate:'2026-10-15',dateAccuracy:'ESTIMATED_CONTRACTUAL_DAY',pendingFinancialEffects:[{status:'PENDING'}]}];
++  const Orbit={modules:{},store:{all:name=>name==='conciliaciones'?rows:[]}};
++  vm.runInNewContext(fs.readFileSync(path.resolve(__dirname,'../orbit360-platform/modules/conciliaciones.js'),'utf8'),{window:{Orbit},Orbit,document:{addEventListener:()=>{}}});
++  const projected=Orbit.cobrosConciliacionReadOnly.proposalRows();assert.equal(projected.length,2);assert.equal(projected[0].estado,'PROPUESTA');assert.equal(projected[1].estado,'APLICADA_FINANZAS_PENDIENTES');assert.equal(Orbit.cobrosConciliacionReadOnly.firestoreWrites,0);assert.equal(Orbit.cobrosConciliacionReadOnly.autoApply,false);
++});
++
++
++test('DOCUMENTED insurer rate rejects each explicit contradictory country, currency, branch, product and plan',async()=>{
++  const expected={country:'GT',currency:'GTQ',branch:'Gastos Médicos',product:'Salud Individual',plan:'Plan A'};
++  const wrong={country:'CO',currency:'COP',branch:'Vida',product:'No corresponde',plan:'Otro'};
++  for(const field of Object.keys(wrong)){
++    const initial=fixture();Object.assign(initial[p('polizas','qa_policy')],{ramo:expected.branch,producto:expected.product,plan:expected.plan});
++    const h=load(initial),ctx=contextFor(h,initial);ctx.receipts[0].rateSnapshots.insurer.scope={...expected,[field]:wrong[field]};
++    await assert.rejects(h.api.applyPayment(auth,{requestId:'qa_scope_wrong_'+field},direct(ctx)),new RegExp('RATE_SCOPE_CONTRADICTION_insurer_'+field));
++    assert.equal(h.writes(),0);assert.deepEqual(h.records(),initial);
++  }
++});
++test('explicit scope without target fields blocks only its financial effect and preserves retry identity',async()=>{
++  const initial=fixture(),h=load(initial),ctx=contextFor(h,initial);
++  ctx.receipts[0].rateSnapshots.insurer.scope={country:'GT',currency:'GTQ',branch:'Gastos Médicos',product:'Salud Individual',plan:'Plan A'};
++  const original=JSON.stringify(ctx),payload=direct(ctx);
++  await h.api.applyPayment(auth,{requestId:'qa_scope_missing'},payload);
++  const journal=events(h)[0].reconciliation,effect=journal.pendingFinancialEffects.find(item=>item.type==='INSURER_COMMISSION_RECEIVABLE');
++  assert.equal(effect.status,'BLOCKED_CONFIGURATION');assert.equal(effect.reason,'RATE_SCOPE_TARGET_FIELDS_MISSING:branch,product,plan');
++  assert.equal(effect.rateSnapshots.insurer.percent,10);assert.equal(effect.rateSnapshots.insurer.status,'DOCUMENTED');assert.equal(effect.rateScopeValidation.insurer.status,'BLOCKED_CONFIGURATION');
++  assert.equal(h.records()[p('recibosEsperados','qa_receipt_1')].paymentState,'PAID_DIRECT');
++  assert.equal(journal.pendingFinancialEffects.find(item=>item.type==='RECONCILE_RECEIVABLE').status,'PENDING');
++  const projection=Object.entries(h.records()).find(([key])=>key.includes('/data/conciliaciones/items/'))[1];assert.equal(projection.pendingFinancialEffects.find(item=>item.type==='INSURER_COMMISSION_RECEIVABLE').status,'BLOCKED_CONFIGURATION');
++  assert.equal(JSON.stringify(ctx),original);const writes=h.writes();assert.equal((await h.api.applyPayment(auth,{requestId:'qa_scope_missing'},payload)).reused,true);assert.equal(h.writes(),writes);
++});
++test('exact documented rate scope remains pending with unchanged economic values and percentages',async()=>{
++  const initial=fixture();Object.assign(initial[p('polizas','qa_policy')],{ramo:'Gastos Médicos',producto:'Salud Individual',plan:'Plan A'});
++  const h=load(initial),ctx=contextFor(h,initial);ctx.receipts[0].rateSnapshots.insurer.scope={country:'GT',currency:'GTQ',branch:'Gastos Médicos',product:'Salud Individual',plan:'Plan A'};
++  await h.api.applyPayment(auth,{requestId:'qa_scope_exact'},direct(ctx));
++  const effect=events(h)[0].reconciliation.pendingFinancialEffects.find(item=>item.type==='INSURER_COMMISSION_RECEIVABLE');
++  assert.equal(effect.status,'PENDING');assert.equal(effect.rateScopeValidation.insurer.status,'MATCHED');assert.equal(effect.rateScopeValidation.insurer.checkedFields.length,5);
++  assert.equal(effect.rateSnapshots.insurer.percent,10);assert.equal(effect.economics.salesCommission,10);assert.equal(effect.economics.commissionRate,10);
++});

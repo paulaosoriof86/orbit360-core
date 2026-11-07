@@ -1,0 +1,199 @@
+--- a/functions/payment-inference-engine.js
++++ b/functions/payment-inference-engine.js
+@@ -71,14 +71,42 @@
+   return [policy.aseguradoraNombre, policy.insurerName, policy.aseguradora, policy.aseguradoraId, policy.insurerId]
+     .map(norm).filter(Boolean);
+ }
+-function ruleForPolicy(config, policy) {
++function paymentFrequency(value) {
++  const key = norm(value);
++  return key === 'monthly' ? 'mensual' : key;
++}
++function resolvePaymentPlanRule(config, policy) {
++  policy = policy || {};
+   const tokens = normalizedTokens(policy);
++  const branch = norm(policy.ramo || policy.branch);
++  const product = norm(policy.producto || policy.subramo || policy.product);
++  const frequency = paymentFrequency(policy.frecuencia || policy.forma || policy.paymentFrequency || policy.modalidadPago || policy.paymentModality);
+   const rules = Array.isArray(config && config.insurerPaymentPlans) ? config.insurerPaymentPlans : [];
+   const matches = rules.filter(rule => {
++    const ruleBranch = norm(rule.branch || rule.ramo);
++    const ruleProduct = norm(rule.product || rule.producto);
++    const ruleFrequency = paymentFrequency(rule.paymentFrequency || rule.frecuencia);
++    if (ruleBranch && ruleBranch !== branch) return false;
++    if (ruleProduct && ruleProduct !== product) return false;
++    if (ruleFrequency && ruleFrequency !== frequency) return false;
++    // A tenant-wide plan requires an explicit branch/product + frequency scope.
++    const allInsurers = text(rule.insurer) === '*';
++    if (allInsurers) return !!(ruleBranch || ruleProduct) && !!ruleFrequency;
+     const ids = [rule.insurerId, rule.canonicalKey, rule.insurer, rule.name].concat(rule.aliases || []).map(norm).filter(Boolean);
+     return ids.some(id => tokens.some(token => token === id || token.includes(id) || id.includes(token)));
+-  });
+-  return matches.length === 1 ? matches[0] : null;
++  }).map(rule => ({
++    rule,
++    specificity: (norm(rule.branch || rule.ramo) ? 4 : 0)
++      + (norm(rule.product || rule.producto) ? 8 : 0)
++      + (paymentFrequency(rule.paymentFrequency || rule.frecuencia) ? 2 : 0)
++      + (text(rule.insurer) === '*' ? 0 : 1)
++  }));
++  const max = matches.reduce((value, match) => Math.max(value, match.specificity), -1);
++  const selected = matches.filter(match => match.specificity === max);
++  return { rule: selected.length === 1 ? selected[0].rule : null, ambiguous: selected.length > 1 };
++}
++function ruleForPolicy(config, policy) {
++  return resolvePaymentPlanRule(config, policy).rule;
+ }
+ function review(code, detail) {
+   return Object.assign({
+@@ -132,9 +160,11 @@
+   if (!(n > 0)) return review('ANCHOR_INSTALLMENT_INVALID');
+ 
+   const total = explicitTotal(evidence, anchorReceipt);
+-  const planRule = ruleForPolicy(config, policy);
++  const ruleResolution = resolvePaymentPlanRule(config, policy);
++  if (ruleResolution.ambiguous) return review('AMBIGUOUS_PAYMENT_PLAN_CONFIG');
++  const planRule = ruleResolution.rule;
+   let installmentException = null;
+-  if (planRule && norm(planRule.scope || 'fraccionado') === 'fraccionado') {
++  if (planRule) {
+     const max = Math.floor(number(planRule.maxInstallments) || 0);
+     const exceptionalMax = Math.floor(number(planRule.exceptionalMaxInstallments || planRule.maxInstallmentsException) || 0);
+     if (max > 0 && total && total > max) {
+@@ -254,7 +284,10 @@
+       maxInstallments: Math.floor(number(planRule.maxInstallments) || 0),
+       exceptionalMaxInstallments: Math.floor(number(planRule.exceptionalMaxInstallments || planRule.maxInstallmentsException) || 0) || null,
+       exceptionRequiresExplicitEvidence: planRule.exceptionRequiresExplicitEvidence === true || planRule.exceptionRequiresExplicitApproval === true,
+-      scope: text(planRule.scope || 'fraccionado')
++      scope: text(planRule.scope || 'fraccionado'),
++      branch: text(planRule.branch || planRule.ramo),
++      product: text(planRule.product || planRule.producto),
++      paymentFrequency: text(planRule.paymentFrequency || planRule.frecuencia)
+     } : null,
+     installmentException,
+     targets
+@@ -269,3 +302,4 @@
+   receiptSequence,
+   ruleForPolicy
+ });
++
+--- a/functions/tenant-domain-config.js
++++ b/functions/tenant-domain-config.js
+@@ -124,12 +124,19 @@
+     const maxInstallments = Math.floor(Number(row.maxInstallments || row.maxCuotas || 0));
+     const exceptionalMaxRaw = Math.floor(Number(row.exceptionalMaxInstallments || row.maxInstallmentsException || row.maxCuotasExcepcion || 0));
+     const exceptionalMaxInstallments = exceptionalMaxRaw > maxInstallments && exceptionalMaxRaw <= 24 ? exceptionalMaxRaw : null;
++    const branch = text(row.branch || row.ramo, 180);
++    const product = text(row.product || row.producto, 180);
++    const paymentFrequency = text(row.paymentFrequency || row.frecuencia, 80);
+     if (!insurer || !(maxInstallments > 0 && maxInstallments <= 24)) return null;
++    if (insurer === '*' && (!(branch || product) || !paymentFrequency)) return null;
+     return {
+       insurer,
+       insurerId: text(row.insurerId, 180),
+       canonicalKey: text(row.canonicalKey, 180),
+       aliases: unique(row.aliases || []).slice(0, 40),
++      branch,
++      product,
++      paymentFrequency,
+       scope: norm(row.scope || 'fraccionado') || 'fraccionado',
+       maxInstallments,
+       exceptionalMaxInstallments,
+@@ -312,3 +319,4 @@
+ }
+ exports.orbit360AcademiaManualRead=onCall({region:REGION,cors:true,timeoutSeconds:25},academyManualRead);
+ exports.orbit360AcademiaManualReadPreview=onCall({region:PREVIEW_REGION,cors:true,timeoutSeconds:25},academyManualRead);
++
+--- a/tools/gravicentra-i6-5-b3-005-contract.mjs
++++ b/tools/gravicentra-i6-5-b3-005-contract.mjs
+@@ -1,4 +1,5 @@
+ import fs from 'node:fs';
++import vm from 'node:vm';
+ import { createRequire } from 'node:module';
+ const require=createRequire(import.meta.url);
+ const engine=require('../functions/payment-inference-engine.js');
+@@ -67,8 +68,70 @@
+ const ambiguous=engine.planEvidence({policy,receipts:rows,evidence:{evidenceType:'BANK_STATEMENT_MATCH',evidenceId:'qa_bank',receiptId:'b3005qa_receipt_02',totalInstallments:10,currency:'GTQ',uniqueMatch:false},reconciliationConfig:cfg});
+ need(ambiguous.status==='REVIEW_REQUIRED'&&ambiguous.autoCommit===false,'B3_005_AMBIGUOUS_NOT_FAIL_CLOSED');
+ 
++
++// Paula 2026-11-07: Gastos Médicos monthly 12 is a tenant plan scope,
++// distinct from ordinary insurer fraccionado ceilings. No insurer hardcode.
++const medicalRule={insurer:'*',branch:'Gastos Médicos',paymentFrequency:'Mensual',scope:'mensual',maxInstallments:12};
++const medicalCfg={...cfg,insurerPaymentPlans:[...plans,medicalRule]};
++const medicalEvidence={evidenceType:'COMMISSION_STATEMENT_INSTALLMENT_N',evidenceId:'qa_medical_3_of_12',receiptId:'b3005qa_receipt_03',totalInstallments:12,currency:'GTQ'};
++for(const insurer of ['G&T SEGUROS','ASEGURADORA GENERAL','FICOHSA','ASEGURADORA DE LOS TRABAJADORES','OTRA ASEGURADORA']){
++ const p={...policy,aseguradoraNombre:insurer,ramo:'Gastos Médicos',frecuencia:'Mensual'};
++ const result=engine.planEvidence({policy:p,receipts:mkReceipts(12),evidence:medicalEvidence,reconciliationConfig:medicalCfg});
++ need(result.status==='AUTO_COMMIT'&&result.targets.length===3,'B3_005_MEDICAL_MONTHLY12_'+insurer);
++ need(result.insurerRule?.maxInstallments===12&&result.insurerRule?.branch==='Gastos Médicos','B3_005_MEDICAL_RULE_PROVENANCE');
++ need(result.targets.filter(x=>x.mode==='INFERRED').every(x=>x.paidDate===''&&x.inferredEffectiveDate===mkReceipts(12).find(r=>r.id===x.receiptId).vence),'B3_005_MEDICAL_PRIOR_DATES');
++}
++for(const p of [
++ {...policy,aseguradoraNombre:'G&T SEGUROS',ramo:'Auto',frecuencia:'Mensual'},
++ {...policy,aseguradoraNombre:'G&T SEGUROS',ramo:'Gastos Médicos',frecuencia:'Fraccionado'},
++ {...policy,aseguradoraNombre:'G&T SEGUROS',ramo:'Gastos Médicos'}
++]){
++ const result=engine.planEvidence({policy:p,receipts:mkReceipts(12),evidence:medicalEvidence,reconciliationConfig:medicalCfg});
++ need(result.status==='REVIEW_REQUIRED'&&result.reason==='INSTALLMENT_TOTAL_EXCEEDS_TENANT_CONFIG','B3_005_MEDICAL_SCOPE_MUST_NOT_RELAX_OTHER_PLANS');
++}
++const med13=engine.planEvidence({policy:{...policy,ramo:'Gastos Médicos',frecuencia:'Mensual'},receipts:mkReceipts(13),evidence:{...medicalEvidence,totalInstallments:13},reconciliationConfig:medicalCfg});
++need(med13.status==='REVIEW_REQUIRED'&&med13.reason==='INSTALLMENT_TOTAL_EXCEEDS_TENANT_CONFIG','B3_005_MEDICAL_MAX12');
++const duplicateMedical=engine.planEvidence({policy:{...policy,ramo:'Gastos Médicos',frecuencia:'Mensual'},receipts:mkReceipts(12),evidence:medicalEvidence,reconciliationConfig:{...medicalCfg,insurerPaymentPlans:[...medicalCfg.insurerPaymentPlans,{...medicalRule,maxInstallments:10}]}});
++need(duplicateMedical.status==='REVIEW_REQUIRED'&&duplicateMedical.reason==='AMBIGUOUS_PAYMENT_PLAN_CONFIG','B3_005_SCOPED_CONFIG_AMBIGUITY_MUST_NOT_BYPASS_CEILING');
++const medMismatch=engine.planEvidence({policy:{...policy,ramo:'Gastos Médicos',frecuencia:'Mensual'},receipts:mkReceipts(10),evidence:medicalEvidence,reconciliationConfig:medicalCfg});
++need(medMismatch.status==='REVIEW_REQUIRED'&&medMismatch.reason==='EXPECTED_RECEIPT_COUNT_MISMATCH','B3_005_MEDICAL_SCHEDULE_MISMATCH');
++const medNoApproval=engine.planEvidence({policy:{...policy,ramo:'Gastos Médicos',frecuencia:'Mensual'},receipts:mkReceipts(12),evidence:medicalEvidence,reconciliationConfig:cfg});
++need(medNoApproval.status==='REVIEW_REQUIRED','B3_005_MEDICAL_RULE_REQUIRES_TENANT_CONFIGURATION');
++
+ const server=read('functions/cobros-reconciliation-domain.js');
+ const tenant=read('functions/tenant-domain-config.js');
++const tenantModule={exports:{}};
++vm.runInNewContext(tenant,{
++ module:tenantModule,exports:tenantModule.exports,process:{env:{}},__dirname:'.',
++ require(name){
++  if(name==='firebase-admin/app')return{getApps:()=>[],initializeApp:()=>({})};
++  if(name==='firebase-admin/firestore')return{getFirestore:()=>({}),FieldValue:{serverTimestamp:()=>null}};
++  if(name==='firebase-functions/v2/https')return{HttpsError:class extends Error{},onCall:(_opts,handler)=>handler};
++  if(name==='./product-active-role-contract')return{resolveProductActiveRole:()=>({})};
++  return require(name);
++ }
++});
++const normalizedMedical=tenantModule.exports.__tenantDomainConfig.normalizeInsurerPaymentPlans([medicalRule]);
++need(normalizedMedical.length===1&&normalizedMedical[0].branch==='Gastos Médicos'&&normalizedMedical[0].paymentFrequency==='Mensual'&&normalizedMedical[0].maxInstallments===12,'B3_005_MEDICAL_CONFIG_SCOPE_PERSISTENCE');
++need(tenantModule.exports.__tenantDomainConfig.normalizeInsurerPaymentPlans([{insurer:'*',maxInstallments:12}]).length===0,'B3_005_UNSCOPED_WILDCARD_CONFIG_FORBIDDEN');
++need(tenantModule.exports.__tenantDomainConfig.validateReconciliation({insurerPaymentPlans:[...plans,medicalRule]}).insurerPaymentPlans.length===7,'B3_005_MEDICAL_CONFIG_PRESERVES_ORDINARY_RULES');
++
++
++const observedMedicalProductRule={insurer:'*',branch:'ACCIDENTES Y ENFERMEDADES',product:'Gastos Médicos Menores Individual',paymentFrequency:'Mensual',scope:'mensual',maxInstallments:12};
++const observedMedicalProductPolicy={...policy,ramo:'ACCIDENTES Y ENFERMEDADES',producto:'Gastos Médicos Menores Individual',frecuencia:'Mensual'};
++const productCfg={...medicalCfg,insurerPaymentPlans:[...medicalCfg.insurerPaymentPlans,observedMedicalProductRule]};
++const productMedical=engine.planEvidence({policy:observedMedicalProductPolicy,receipts:mkReceipts(12),evidence:medicalEvidence,reconciliationConfig:productCfg});
++need(productMedical.status==='AUTO_COMMIT'&&productMedical.insurerRule?.product===observedMedicalProductRule.product,'B3_005_MEDICAL_PRODUCT_EXACT_SCOPE');
++for(const p of [
++ {...observedMedicalProductPolicy,producto:'Accidentes personales'},
++ {...observedMedicalProductPolicy,frecuencia:''}
++]){
++ const result=engine.planEvidence({policy:p,receipts:mkReceipts(12),evidence:medicalEvidence,reconciliationConfig:productCfg});
++ need(result.status==='REVIEW_REQUIRED','B3_005_BROAD_ACCIDENTS_OR_UNKNOWN_FREQUENCY_MUST_NOT_BE_MEDICAL');
++}
++const normalizedProductRule=tenantModule.exports.__tenantDomainConfig.normalizeInsurerPaymentPlans([observedMedicalProductRule]);
++need(normalizedProductRule[0]?.product===observedMedicalProductRule.product,'B3_005_MEDICAL_PRODUCT_CONFIG_PERSISTENCE');
++
+ const client=read('orbit360-platform/core/cobros-reconciliation-domain-client.js');
+ const cobrosUi=read('orbit360-platform/modules/cobros.js');
+ const receiptUi=read('orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js');
+@@ -90,6 +153,8 @@
+ need(Number(byName.get('ASEGURADORA DE LOS TRABAJADORES').exceptionalMaxInstallments)===12&&byName.get('ASEGURADORA DE LOS TRABAJADORES').exceptionRequiresExplicitEvidence===true,'B3_005_LOCK_BANTRAB_EXCEPTION12');
+ need(!/Carlos Castro|Samuel Daza|Fernando Arias|Paula Osorio/.test(server),'B3_005_HARDCODED_IDENTITY_FORBIDDEN');
+ 
++console.log('B3_005_MEDICAL_MONTHLY12_SCOPED_CONFIG=PASS');
++console.log('B3_005_MEDICAL_OTHER_SCOPES_AND_AMBIGUITY_FAIL_CLOSED=PASS');
+ console.log('B3_005_SOURCE_CONTRACT=PASS');
+ console.log('B3_005_INVOICE_SEQUENCE=PASS');
+ console.log('B3_005_INSURER_STATEMENT_SEQUENCE=PASS');
+@@ -100,3 +165,4 @@
+ console.log('B3_005_AMBIGUOUS_FAIL_CLOSED=PASS');
+ console.log('B3_005_INFERRED_VISUAL_PROVENANCE=PASS');
+ console.log('B3_005_RECONCILIATION_SEPARATE_DIMENSION=PASS');
++
