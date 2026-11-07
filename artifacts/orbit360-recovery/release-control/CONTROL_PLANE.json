@@ -8792,7 +8792,7 @@
       "ownerConfirmed": true,
       "scope": "POLICY_ONLY_NOT_GLOBAL_FRACCIONADO_CEILING",
       "receiptPath": "artifacts/orbit360-recovery/release-control/OWNER_DECISION_FREEZE_AND_RECONCILIATION_PLAN_20261107.json",
-      "receiptBlobSha": "e29a2c6c53d85a8e33bb4829fad57ecfbd544045",
+      "receiptBlobSha": "b619996d417a23cf0c4e190043d542a25a9a2f01",
       "dataApplied": false
     }
   },
@@ -21628,9 +21628,9 @@
   "ownerDecisionFreeze20261107": {
     "recordType": "ADDITIVE_OWNER_DECISION_FREEZE_NOT_NEW_PASS",
     "status": "OWNER_DECISIONS_AND_WORK_PLAN_FROZEN",
-    "recordedAtUtc": "2026-11-07T18:25:02Z",
+    "recordedAtUtc": "2026-11-07T18:26:19Z",
     "path": "artifacts/orbit360-recovery/release-control/OWNER_DECISION_FREEZE_AND_RECONCILIATION_PLAN_20261107.json",
-    "blobSha": "e29a2c6c53d85a8e33bb4829fad57ecfbd544045",
+    "blobSha": "b619996d417a23cf0c4e190043d542a25a9a2f01",
     "planPath": "artifacts/orbit360-recovery/release-control/PLAN_OPERATIVO_DECISIONES_PAULA_20261107.md",
     "planBlobSha": "b9c9266de72a9155b37b9fb742225da6c91a90d1",
     "authorityBaseHead": "74312cc3621ba155ee288a0afb530a488246f0e6",
@@ -21638,7 +21638,7 @@
     "preservedB4003ReceiptBlobSha": "0879188bf245248fa1092fb2014e35e14e802b44",
     "preservedProductSourceSha": "857f1222f360a42a06e012810a1c01bce155a26f",
     "firstIncompleteGate": "B4-004-SINIESTROS-CRONOGRAMA",
-    "nextAction": "EXECUTE_EXACT_ISOLATED_READER_ACTIVATION_RECEIPT_THEN_READBACK_AND_FOCAL_LIVE_UAT; RETAIN_E503_FRONTEND_ARTIFACT_AND_CURRENT42_SEAL",
+    "nextAction": "E503_EXACT_RETAINED_PROMOTION_AUTHORIZED; SAME_ARTIFACT_13584456766_NO_REBUILD; FOCAL_LIVE_VERIFICATION_PENDING",
     "nextGateExecuted": false,
     "nextGateAccepted": false,
     "productSourceChanged": true,
@@ -21650,7 +21650,7 @@
   "currentExecutionDecisionPointer": "ownerDecisionFreeze20261107",
   "b4003CausalFrontendSuccessor20261107": {
     "schema": "GRAVICENTRA_B4_003_CAUSAL_FRONTEND_SUCCESSOR_CURSOR_V1",
-    "status": "FRONTEND_SUCCESSOR_FOCAL_PREVIEW_PASS_PREFLIGHT_PENDING",
+    "status": "FRONTEND_SUCCESSOR_PREVIEW_ACCEPTED_PROMOTION_AUTHORIZED",
     "preservedAcceptancePointer": "/b4003ActiveCertificationCursor20261106/formalLiveAcceptance",
     "sourceContractPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CURRENT42_CAUSAL_FRONTEND_SUCCESSOR_CONTRACT_20261107.json",
     "sourceContractBlobSha": "c792b7db1aa3f16ed7ee20cbdffe2b76dc61b97f",
@@ -21666,7 +21666,7 @@
       "archiveSha256": "cc710541a70afdaee8da882ef0b43b9dc9f24f89a7a198c3f48f18dc776a12fa",
       "previewChannelId": "gi-i65-b4-rc-41765742748",
       "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-rc-41765742748-neoi3u7r.web.app",
-      "versionName": null,
+      "versionName": "sites/ays-orbit-360-lab/versions/d8caae0d585bf6dd",
       "workflowConclusion": "success",
       "exactServedReadbackPassed": true,
       "hostedPayloadDigest": "09c91023d1d22687528a61edb5a768dadbd59c465af91bc48016d21c94c6537f",
@@ -21696,7 +21696,7 @@
       "artifactId": 13584456766,
       "archiveSha256": "cc710541a70afdaee8da882ef0b43b9dc9f24f89a7a198c3f48f18dc776a12fa"
     },
-    "productionPromotionAuthorized": false,
+    "productionPromotionAuthorized": true,
     "b4003Closed": true,
     "b4003HistoricalAcceptancePreserved": true,
     "nextGateExecuted": false

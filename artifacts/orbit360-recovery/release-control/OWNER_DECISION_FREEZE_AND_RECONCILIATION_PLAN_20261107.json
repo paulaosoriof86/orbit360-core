@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_OWNER_DECISION_FREEZE_20261107_V1",
   "status": "OWNER_DECISIONS_AND_EXECUTION_PLAN_FROZEN_NOT_NEW_PRODUCT_PASS",
-  "recordedAtUtc": "2026-11-07T18:25:02Z",
+  "recordedAtUtc": "2026-11-07T18:26:19Z",
   "operationalDate": "2026-11-07",
   "timeZone": "America/Guatemala",
   "repository": "paulaosoriof86/orbit360-core",
@@ -1438,7 +1438,7 @@
   "frontendPromotionSuccessor": {
     "schema": "GRAVICENTRA_B4_003_CAUSAL_FRONTEND_TRANSPORT_SUCCESSOR_V1",
     "sourceBaseHead": "e5030ec5ba9854f0c576fd905c2f510766347ffa",
-    "phase": "FOCAL_PREVIEW_PASS_PREFLIGHT_PENDING",
+    "phase": "PROMOTION_AUTHORIZED",
     "productSourceChangedAfterBuild": false,
     "rebuildExecuted": false,
     "artifactPatched": false,
@@ -1447,7 +1447,7 @@
     "realBusinessWrites": 0,
     "nextGateExecuted": false,
     "globalProductionAccepted": false,
-    "productionPromotionAuthorized": false,
+    "productionPromotionAuthorized": true,
     "changes": [
       {
         "path": ".github/workflows/gravicentra-b4-003-executor.yml",
@@ -1484,8 +1484,26 @@
         "previousBlobSha": null,
         "blobSha": "953d55d5c1dd04f14522e3a12bbfa248a0a5da28",
         "sha256": "3384ba17822b3309b249e9231716e37da7628f59fda8cb3e497fc25efbdd17dd"
+      },
+      {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_E503_RETAINED_HOSTING_PREFLIGHT_20261107.json",
+        "previousBlobSha": null,
+        "blobSha": "b7e8d6b005b12069870ba9d356ec2bce5263c15c",
+        "sha256": "f2ed37d94d7af1e1c5ee7c0156dea940136845d17bb45fd5db43ddd40e42c205"
       }
-    ]
+    ],
+    "preflightEvidence": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_E503_RETAINED_HOSTING_PREFLIGHT_20261107.json",
+      "blobSha": "b7e8d6b005b12069870ba9d356ec2bce5263c15c",
+      "sha256": "f2ed37d94d7af1e1c5ee7c0156dea940136845d17bb45fd5db43ddd40e42c205",
+      "runId": 42400488656,
+      "runnerCommit": "0444999adacb73b128943bb2287a427a8dfa6103",
+      "runConclusion": "success",
+      "jobId": 128486966372,
+      "artifactId": 13585197949,
+      "artifactZipSha256": "0e7646c991a1b600b55be2d6d6421e4b65fd9f3f47e07b1ca0efc434c7b21f7b",
+      "artifactZipBytes": 150589
+    }
   },
   "reconciliationReadOnlySuccessor": {
     "schema": "GRAVICENTRA_OCTOBER_PRIVATE_READBACK_SUCCESSOR_V1",
