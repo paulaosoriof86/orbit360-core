@@ -379,18 +379,73 @@ export function validateReconciliationReadOnlySuccessorSnapshot({record,control,
  return {allowedPaths:expected.map(x=>x[0]),comparableControl:clone(control),comparableState:clone(state)};
 }
 
-export function validateOwnerDecisionSuccessorSnapshot({control,baseControl,state,baseState,changedPaths,fileBytes,baseSourceBytes,postBaseSourceBytes}){
+const CATALOG_BASE='f1321d6bea245411fd09e9ae414d58510551ef3b';
+const CATALOG_ACTIVATION=ROOT+'I6_5_B4_003_LIVE_TENANT_CONFIG_DEPLOY_ACTIVATION_20261107.json';
+const CATALOG_PINS={
+  ".github/workflows/gravicentra-b4-003-executor.yml": [
+    "8178fdfd8c4c16a1b1bf17432c87e6b5115cdd4e",
+    "bdbfdd2c75be755dd8b3b1447424b43f799b7c44"
+  ],
+  "tools/gravicentra-b4-003-isolated-tenant-config-package.cjs": [
+    null,
+    "d19fde61a8383df2fb280a974acabe6e70baaaf9"
+  ],
+  "tools/gravicentra-b4-003-live-tenant-config-readback.cjs": [
+    null,
+    "ccb6959620b58e70eb530f810ab89eb8ff8045e0"
+  ],
+  "tools/gravicentra-b4-003-live-tenant-config-transport.test.cjs": [
+    null,
+    "1ca6a63fd86e97bcdf4226bd55244378d8fc49f4"
+  ],
+  "tools/gravicentra-b4-003-tenant-config-functional.test.cjs": [
+    null,
+    "0fc50301dfa6458c8d11e0028698c46b57f8cb8a"
+  ]
+};
+export function validateCatalogTransportSuccessorSnapshot({record,fileBytes,baseSourceBytes}){
+ const p=record.catalogTransportSuccessor;
+ if(!p){need(fileBytes[CATALOG_ACTIVATION]==null,'CATALOG_UNDECLARED_ACTIVATION');return null;}
+ need(p.schema==='GRAVICENTRA_LIVE_TENANT_CONFIG_TRANSPORT_SUCCESSOR_V1'&&p.status==='CANONICAL_CATALOG_PREPARED_READBACK_REQUIRED'&&p.sourceBaseHead===CATALOG_BASE&&p.preservedFrontendSource===READER_DEPLOY_BASE,'CATALOG_AUTHORITY_BASE');
+ need(p.target==='orbit360TenantDomainConfig'&&p.region==='us-central1'&&p.project==='ays-orbit-360-lab'&&p.deployAuthorized===true&&p.requiresActivationReceipt===true&&p.activationPath===CATALOG_ACTIVATION,'CATALOG_AUTHORITY_IDENTITY');
+ need(p.businessWrites===0&&p.hostingDeployAuthorized===false&&p.otherFunctionsDeployAuthorized===false&&p.readerGrantExpanded===false&&p.sourceChanged===false,'CATALOG_AUTHORITY_BOUNDARY');
+ need(p.expectedSourceManifestSha256==='f7f250d16687b6282cc170a40aa502bea3268b1a6301e5821be8eaa1e233d1bf'&&p.packageFiles===5&&p.singleExport===p.target,'CATALOG_PACKAGE_IDENTITY');
+ need(p.before?.sourceGitBlobSha==='e4b602b4abb26fcd3d9413b1ab9bb67998be78dd'&&p.before.archiveSha256==='4c3ed1a442c31f8e094e4c66e168fa8cc622c076bc6d6e68bf9c0c30ab2acf0e'&&p.before.revision==='orbit360tenantdomainconfig-00019-mar','CATALOG_EXACT_PREDECESSOR');
+ need(p.firstPublishMode==='READBACK_ONLY'&&p.allowedReadbackSubject==='test(b4-003): exact LIVE tenant catalogs source readback'&&p.allowedDeploySubject==='deploy(b4-003): exact isolated LIVE tenant catalogs canonical successor','CATALOG_EXACT_ROUTING');
+ need(Array.isArray(p.changes)&&same(p.changes.map(x=>x.path).sort(),Object.keys(CATALOG_PINS).sort()),'CATALOG_EXACT_PATHS');
+ const comparableFileBytes={...fileBytes};
+ for(const e of p.changes){
+  const [prior,next]=CATALOG_PINS[e.path],current=fileBytes[e.path],base=baseSourceBytes?.[e.path];
+  need(e.previousBlobSha===prior&&e.blobSha===next&&current!=null&&blob(Buffer.from(current))===next&&sha(Buffer.from(current))===e.sha256,'CATALOG_REVIEWED_CURRENT_PIN');
+  need(prior===null?base==null:base!=null&&blob(Buffer.from(base))===prior,'CATALOG_REVIEWED_BASE_PIN');
+  if(prior!==null)comparableFileBytes[e.path]=base;
+ }
+ const allowedPaths=Object.keys(CATALOG_PINS),aBytes=fileBytes[CATALOG_ACTIVATION];
+ if(aBytes!=null){
+  const a=JSON.parse(Buffer.from(aBytes).toString('utf8'));
+  need(a.schema==='GRAVICENTRA_LIVE_TENANT_CONFIG_ACTIVATION_V1'&&a.status==='AUTHORIZED_EXACT_SINGLE_CATALOG_DEPLOY'&&a.target===p.target&&a.region===p.region&&a.project===p.project&&a.preservedFrontendSource===READER_DEPLOY_BASE,'CATALOG_ACTIVATION_IDENTITY');
+  need(a.beforeArchiveSha256===p.before.archiveSha256&&a.beforeRevision===p.before.revision&&a.expectedSourceManifestSha256===p.expectedSourceManifestSha256,'CATALOG_ACTIVATION_SOURCE');
+  need(a.realBusinessWritesAuthorized===false&&a.otherFunctionsDeployAuthorized===false&&a.hostingDeployAuthorized===false&&a.readerGrantExpanded===false,'CATALOG_ACTIVATION_BOUNDARY');
+  need(a.reviewedReadbackConclusion==='success'&&Number.isSafeInteger(a.reviewedReadbackRunId)&&a.reviewedReadbackRunId>42401330631&&/^[a-f0-9]{40}$/.test(a.reviewedSourceHead||''),'CATALOG_ACTIVATION_FRESH_REVIEW');
+  for(const k of ['beforeSourceManifestSha256','beforeServiceConfigSha256','beforeEnvironmentSha256','beforeIamPolicySha256','beforeNonTargetInventorySha256'])need(/^[a-f0-9]{64}$/.test(a[k]||''),'CATALOG_ACTIVATION_METADATA_BINDING');
+  allowedPaths.push(CATALOG_ACTIVATION);
+ }
+ return{allowedPaths,comparableFileBytes,sourceBaseHead:CATALOG_BASE};
+}
+
+export function validateOwnerDecisionSuccessorSnapshot({control,baseControl,state,baseState,changedPaths,fileBytes,baseSourceBytes,postBaseSourceBytes,catalogBaseSourceBytes}){
  const p=control[OWNER_KEY];
  need(p&&p.authorityBaseHead===OWNER_BASE,'OWNER_BASE_BINDING');
  const bytes=path=>{need(fileBytes[path]!=null,'OWNER_FILE_MISSING');return Buffer.from(fileBytes[path]);};
  need(p.path===OWNER_FREEZE&&p.planPath===OWNER_PLAN&&blob(bytes(OWNER_FREEZE))===p.blobSha&&blob(bytes(OWNER_PLAN))===p.planBlobSha,'OWNER_DOCUMENT_HASH');
  const r=JSON.parse(bytes(OWNER_FREEZE).toString('utf8'));
  const readerExecution=validateReaderDeploymentSuccessorSnapshot({record:r,fileBytes,baseSourceBytes:postBaseSourceBytes});
- const promotionExecution=validateFrontendPromotionSuccessorSnapshot({record:r,control,state,fileBytes,baseSourceBytes:postBaseSourceBytes});
+ const catalogExecution=validateCatalogTransportSuccessorSnapshot({record:r,fileBytes,baseSourceBytes:catalogBaseSourceBytes});
+ const promotionExecution=validateFrontendPromotionSuccessorSnapshot({record:r,control,state,fileBytes:catalogExecution?.comparableFileBytes||fileBytes,baseSourceBytes:postBaseSourceBytes});
  if(promotionExecution){control=promotionExecution.comparableControl;state=promotionExecution.comparableState;}
  const reconciliationExecution=validateReconciliationReadOnlySuccessorSnapshot({record:r,control,state,fileBytes,baseSourceBytes:postBaseSourceBytes});
  if(reconciliationExecution){control=reconciliationExecution.comparableControl;state=reconciliationExecution.comparableState;}
- const postAllowedPaths=[...(readerExecution?.allowedPaths||[]),...(promotionExecution?.allowedPaths||[]),...(reconciliationExecution?.allowedPaths||[])];
+ const postAllowedPaths=[...(readerExecution?.allowedPaths||[]),...(promotionExecution?.allowedPaths||[]),...(reconciliationExecution?.allowedPaths||[]),...(catalogExecution?.allowedPaths||[])];
  const team=validateEquipoCausalSourceSuccessor({record:r,pointer:p,fileBytes:readerExecution?.comparableFileBytes||fileBytes,baseSourceBytes});
  const permitted=new Set([ROOT+'CONTROL_PLANE.json',STATE,OWNER_FREEZE,OWNER_PLAN,SELF,OWNER_TEST,...(team?.allowedPaths||[]),...postAllowedPaths]);
  need(changedPaths.every(x=>permitted.has(x)),'OWNER_UNDECLARED_PATH');
@@ -433,9 +488,12 @@ function verifyOwnerDecisionSuccessor(after){
   '.github/workflows/gravicentra-recovery-i6-postsalida.yml','tools/gravicentra-i6-5-encrypted-live-snapshot.mjs','tools/gravicentra-i6-5-october-private-snapshot.test.mjs',
   ROOT+'I6_5_OCTOBER_RECONCILIATION_PRIVATE_READBACK_REQUEST_20261107.json',ROOT+'I6_5_OCTOBER_RECONCILIATION_SNAPSHOT_PUBLIC_KEY_20261107.pem']);
  need(postEntries.every(x=>postPermitted.has(x.path)),'POST_E503_UNDECLARED_PATH');
+ const catalogEntries=record.catalogTransportSuccessor?.changes||[];
+ need(catalogEntries.every(e=>Object.hasOwn(CATALOG_PINS,e.path)),'CATALOG_UNDECLARED_PATH');
+ const catalogActivationPresent=fs.existsSync(CATALOG_ACTIVATION);
  const activationPresent=fs.existsSync(READER_DEPLOY_ACTIVATION);
- const paths=[...new Set([ROOT+'CONTROL_PLANE.json',STATE,OWNER_FREEZE,OWNER_PLAN,SELF,OWNER_TEST,OWNER_V6,...extraPaths,...postEntries.map(x=>x.path),...(activationPresent?[READER_DEPLOY_ACTIVATION]:[])])];
- const fileBytes={},baseSourceBytes={},postBaseSourceBytes={};
+ const paths=[...new Set([ROOT+'CONTROL_PLANE.json',STATE,OWNER_FREEZE,OWNER_PLAN,SELF,OWNER_TEST,OWNER_V6,...extraPaths,...postEntries.map(x=>x.path),...(activationPresent?[READER_DEPLOY_ACTIVATION]:[]),...catalogEntries.map(e=>e.path),...(catalogActivationPresent?[CATALOG_ACTIVATION]:[])])];
+ const fileBytes={},baseSourceBytes={},postBaseSourceBytes={},catalogBaseSourceBytes={};
  if(sourceProof){
   need(git('merge-base',TEAM_SOURCE_BASE,'HEAD')===TEAM_SOURCE_BASE,'TEAM_SOURCE_BASE_ANCESTRY');
   for(const path of extraPaths){
@@ -451,6 +509,18 @@ function verifyOwnerDecisionSuccessor(after){
    else postBaseSourceBytes[entry.path]=execFileSync('git',['show',READER_DEPLOY_BASE+':'+entry.path]);
   }
  }
+ if(catalogEntries.length){
+  need(git('merge-base',CATALOG_BASE,'HEAD')===CATALOG_BASE,'CATALOG_BASE_ANCESTRY');
+  for(const e of catalogEntries){
+   if(e.previousBlobSha===null){need(!git('ls-tree',CATALOG_BASE,'--',e.path),'CATALOG_NEW_PATH_ALREADY_EXISTS');catalogBaseSourceBytes[e.path]=null;}
+   else catalogBaseSourceBytes[e.path]=execFileSync('git',['show',CATALOG_BASE+':'+e.path]);
+  }
+ }
+ if(catalogActivationPresent){
+  const a=read(CATALOG_ACTIVATION);
+  need(/^[a-f0-9]{40}$/.test(a.reviewedSourceHead||'')&&git('merge-base',a.reviewedSourceHead,'HEAD')===a.reviewedSourceHead,'CATALOG_REVIEWED_HEAD_ANCESTRY');
+  need(!git('diff','--name-only',a.reviewedSourceHead,'HEAD','--','functions','orbit360-platform',':(exclude)orbit360-platform/docs/**',...Object.keys(CATALOG_PINS)),'CATALOG_SOURCE_CHANGED_AFTER_REVIEW');
+ }
  if(activationPresent){
   const activation=read(READER_DEPLOY_ACTIVATION);
   need(/^[a-f0-9]{40}$/.test(activation.reviewedSourceHead||'')&&git('merge-base',activation.reviewedSourceHead,'HEAD')===activation.reviewedSourceHead,'READER_ACTIVATION_SOURCE_ANCESTRY');
@@ -464,7 +534,7 @@ function verifyOwnerDecisionSuccessor(after){
  return validateOwnerDecisionSuccessorSnapshot({
   control:after,baseControl:old(OWNER_BASE,ROOT+'CONTROL_PLANE.json'),
   state:read(STATE),baseState:old(OWNER_BASE,STATE),
-  changedPaths:git('diff','--name-only',OWNER_BASE,'HEAD').split(/\r?\n/).filter(Boolean),fileBytes,baseSourceBytes,postBaseSourceBytes
+  changedPaths:git('diff','--name-only',OWNER_BASE,'HEAD').split(/\r?\n/).filter(Boolean),fileBytes,baseSourceBytes,postBaseSourceBytes,catalogBaseSourceBytes
  });
 }
 

@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_OWNER_DECISION_FREEZE_20261107_V1",
   "status": "OWNER_DECISIONS_AND_EXECUTION_PLAN_FROZEN_NOT_NEW_PRODUCT_PASS",
-  "recordedAtUtc": "2026-11-07T18:26:19Z",
+  "recordedAtUtc": "2026-11-07T18:47:29Z",
   "operationalDate": "2026-11-07",
   "timeZone": "America/Guatemala",
   "repository": "paulaosoriof86/orbit360-core",
@@ -487,12 +487,12 @@
     "conclusion": "success",
     "sourceSha": "74312cc3621ba155ee288a0afb530a488246f0e6"
   },
-  "nextRequiredResult": "EXACT_ISOLATED_READER_DEPLOY_AND_COMPLETE_SOURCE_READBACK_THEN_FOCAL_AUTHENTICATED_LIVE_RELOAD; SAME_ARTIFACT_FRONTEND_PROMOTION_FOLLOWS_RETAINED_PREFLIGHT_RECEIPT; OCTOBER_PRIVATE_BASELINE_PENDING_MARKER_EXECUTION; CATALOG_TRANSPORT_REQUIRES_SEPARATE_CAUSAL_AUTHORITY",
+  "nextRequiredResult": "EXACT_LIVE_CATALOG_SOURCE_CONFIG_IAM_INVENTORY_READBACK_THEN_ITS_SEPARATE_ACTIVATION_AND_PROPUESTAS_FOCAL_LIVE_UAT; COMPLETE_REMAINING_FUNCTIONAL_FLOWS_WITHOUT_REPEATING_CONFIRMED_WRITES; MATCH_DOCUMENTARY_ROWS_TO_CAPTURED_REAL_BASELINE_AND_PRODUCE_RECONCILIATION_DIFF_AND_SPECIFIC_OWNER_QUERIES_BEFORE_ANY_APPLY",
   "governanceSuccessorValidation": {
     "schema": "GRAVICENTRA_OWNER_DOCUMENTARY_SUCCESSOR_VALIDATION_V1",
     "baseHead": "74312cc3621ba155ee288a0afb530a488246f0e6",
     "guardPath": "tools/gravicentra-b4-003-formal-live-closeout-guard.mjs",
-    "guardBlobSha": "1b954f88bd6911229ccc355ec7cf04b8d21c74a8",
+    "guardBlobSha": "2869e98c830b05bc053aedde9bab5fc6f54db308",
     "testPath": "tools/gravicentra-b4-003-owner-decision-successor.test.mjs",
     "testBlobSha": "6b18e69ad9196ce9d4ebec821928e619fb9fd300",
     "sealedMasterPlanBlobPreserved": "458c5af57b2f7d9453d0064eba0cd737edf14ef4",
@@ -1438,7 +1438,7 @@
   "frontendPromotionSuccessor": {
     "schema": "GRAVICENTRA_B4_003_CAUSAL_FRONTEND_TRANSPORT_SUCCESSOR_V1",
     "sourceBaseHead": "e5030ec5ba9854f0c576fd905c2f510766347ffa",
-    "phase": "PROMOTION_AUTHORIZED",
+    "phase": "LIVE_BYTES_PASS_FOCAL_LIVE_PENDING",
     "productSourceChangedAfterBuild": false,
     "rebuildExecuted": false,
     "artifactPatched": false,
@@ -1447,7 +1447,7 @@
     "realBusinessWrites": 0,
     "nextGateExecuted": false,
     "globalProductionAccepted": false,
-    "productionPromotionAuthorized": true,
+    "productionPromotionAuthorized": false,
     "changes": [
       {
         "path": ".github/workflows/gravicentra-b4-003-executor.yml",
@@ -1490,6 +1490,12 @@
         "previousBlobSha": null,
         "blobSha": "b7e8d6b005b12069870ba9d356ec2bce5263c15c",
         "sha256": "f2ed37d94d7af1e1c5ee7c0156dea940136845d17bb45fd5db43ddd40e42c205"
+      },
+      {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_E503_RETAINED_HOSTING_PROMOTED_20261107.json",
+        "previousBlobSha": null,
+        "blobSha": "45f1d3e461b7e92b60c94be820f94cb2f89cac9d",
+        "sha256": "f75ecc2c5f7be6f208cb379892b5fa4d114210a9ae169dc6bb5efc786caf5a14"
       }
     ],
     "preflightEvidence": {
@@ -1503,6 +1509,18 @@
       "artifactId": 13585197949,
       "artifactZipSha256": "0e7646c991a1b600b55be2d6d6421e4b65fd9f3f47e07b1ca0efc434c7b21f7b",
       "artifactZipBytes": 150589
+    },
+    "promotionEvidence": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_E503_RETAINED_HOSTING_PROMOTED_20261107.json",
+      "blobSha": "45f1d3e461b7e92b60c94be820f94cb2f89cac9d",
+      "sha256": "f75ecc2c5f7be6f208cb379892b5fa4d114210a9ae169dc6bb5efc786caf5a14",
+      "runId": 42401700506,
+      "runnerCommit": "f1321d6bea245411fd09e9ae414d58510551ef3b",
+      "runConclusion": "success",
+      "jobId": 128490695474,
+      "artifactId": 13585264938,
+      "artifactZipSha256": "43f0edab6ed6b5a8fdbc5f324b2695995c3f5544ee7f8c34194d155fe588c9f3",
+      "artifactZipBytes": 241165
     }
   },
   "reconciliationReadOnlySuccessor": {
@@ -1586,5 +1604,166 @@
     "catalogLiveObservedDeploymentLocal": "2026-09-23 15:04 America/Guatemala",
     "catalogErrorBodyObserved": false,
     "current42Unchanged": true
+  },
+  "catalogTransportSuccessor": {
+    "schema": "GRAVICENTRA_LIVE_TENANT_CONFIG_TRANSPORT_SUCCESSOR_V1",
+    "status": "CANONICAL_CATALOG_PREPARED_READBACK_REQUIRED",
+    "sourceBaseHead": "f1321d6bea245411fd09e9ae414d58510551ef3b",
+    "preservedFrontendSource": "e5030ec5ba9854f0c576fd905c2f510766347ffa",
+    "target": "orbit360TenantDomainConfig",
+    "region": "us-central1",
+    "project": "ays-orbit-360-lab",
+    "deployAuthorized": true,
+    "requiresActivationReceipt": true,
+    "activationPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_LIVE_TENANT_CONFIG_DEPLOY_ACTIVATION_20261107.json",
+    "businessWrites": 0,
+    "hostingDeployAuthorized": false,
+    "otherFunctionsDeployAuthorized": false,
+    "readerGrantExpanded": false,
+    "sourceChanged": false,
+    "expectedSourceManifestSha256": "f7f250d16687b6282cc170a40aa502bea3268b1a6301e5821be8eaa1e233d1bf",
+    "packageFiles": 5,
+    "singleExport": "orbit360TenantDomainConfig",
+    "before": {
+      "sourceGitBlobSha": "e4b602b4abb26fcd3d9413b1ab9bb67998be78dd",
+      "archiveSha256": "4c3ed1a442c31f8e094e4c66e168fa8cc622c076bc6d6e68bf9c0c30ab2acf0e",
+      "revision": "orbit360tenantdomainconfig-00019-mar",
+      "observedReadbackRunId": 42400488638
+    },
+    "firstPublishMode": "READBACK_ONLY",
+    "allowedReadbackSubject": "test(b4-003): exact LIVE tenant catalogs source readback",
+    "allowedDeploySubject": "deploy(b4-003): exact isolated LIVE tenant catalogs canonical successor",
+    "activationNotYetCreated": true,
+    "productFunctionalAcceptance": false,
+    "changes": [
+      {
+        "path": ".github/workflows/gravicentra-b4-003-executor.yml",
+        "previousBlobSha": "8178fdfd8c4c16a1b1bf17432c87e6b5115cdd4e",
+        "blobSha": "bdbfdd2c75be755dd8b3b1447424b43f799b7c44",
+        "sha256": "88661fbfe6c89281774f4ced7e188fe885323ac80a4bf60ba8eed4106b9fbaff"
+      },
+      {
+        "path": "tools/gravicentra-b4-003-isolated-tenant-config-package.cjs",
+        "previousBlobSha": null,
+        "blobSha": "d19fde61a8383df2fb280a974acabe6e70baaaf9",
+        "sha256": "c2828e2a892d0d3978d8818426ef945b500c0e1e93fd2845222e808427863710"
+      },
+      {
+        "path": "tools/gravicentra-b4-003-live-tenant-config-readback.cjs",
+        "previousBlobSha": null,
+        "blobSha": "ccb6959620b58e70eb530f810ab89eb8ff8045e0",
+        "sha256": "c5a1d75b14001b6674136857274ce7c72a8e20f4527c6e345bf6d193c7234f90"
+      },
+      {
+        "path": "tools/gravicentra-b4-003-live-tenant-config-transport.test.cjs",
+        "previousBlobSha": null,
+        "blobSha": "1ca6a63fd86e97bcdf4226bd55244378d8fc49f4",
+        "sha256": "87ef21e3e3ae435aef7afe834d5b1f2cf086ed587b51a0962647b9d020ccd984"
+      },
+      {
+        "path": "tools/gravicentra-b4-003-tenant-config-functional.test.cjs",
+        "previousBlobSha": null,
+        "blobSha": "0fc50301dfa6458c8d11e0028698c46b57f8cb8a",
+        "sha256": "7efdfcc3dbb02b1d79ff6eaec80453d27643764f23f1d69515a1739d1423921b"
+      }
+    ]
+  },
+  "currentExecutionObserved20261107": {
+    "schema": "GRAVICENTRA_CURRENT_EXECUTION_OBSERVATION_20261107_V1",
+    "recordedAtUtc": "2026-11-07T18:47:29Z",
+    "authority": "ACTUAL_CI_RECEIPTS_AND_ROOT_AUTHENTICATED_LIVE_UI_OBSERVATION",
+    "supersedesPreparationStatusOnly": "postE503ExecutionPreparation",
+    "historicalGrantsChanged": false,
+    "reader": {
+      "status": "EXACT_DEPLOYED_SOURCE_BYTES_PASS_FOCAL_LIVE_READ_OBSERVED",
+      "runId": 42401330631,
+      "artifactId": 13584793858,
+      "workflowConclusion": "success",
+      "target": "orbit360ScopedPolicyRead",
+      "region": "us-east1",
+      "revision": "orbit360scopedpolicyread-00002-pok",
+      "completeSourceManifestSha256": "690d036074683b4ea1d46cf867fa14856b40536fe739388ff50801ec9d31786a",
+      "sourceFiles": 10,
+      "nonTargetFunctionsUnchanged": true,
+      "rollbackExecuted": false
+    },
+    "frontend": {
+      "status": "SAME_ARTIFACT_PROMOTED_EXACT_218_FILES_FOCAL_LIVE_OBSERVED",
+      "sourceSha": "e5030ec5ba9854f0c576fd905c2f510766347ffa",
+      "buildId": "gi-i65-b4-e5030ec5ba98-57f234755dc1",
+      "immutableArtifactId": 13584456766,
+      "promotionRunId": 42401700506,
+      "promotionEvidenceArtifactId": 13585264938,
+      "exactLiveFiles": 218,
+      "rebuilt": false,
+      "artifactPatched": false
+    },
+    "octoberPrivateSnapshot": {
+      "status": "CAPTURED_ENCRYPTED_DURABLE_NOT_APPLIED",
+      "runId": 42401700593,
+      "artifactId": 13585586988,
+      "artifactZipSha256": "86827ef8895466c7083b3db26b7574084360e32ec3cd26df2c450bda544c58bf",
+      "capturedAtUtc": "2026-11-07T18:32:46Z",
+      "counts": {
+        "polizas": 1425,
+        "clientes": 443,
+        "aseguradoras": 33,
+        "recibosEsperados": 1958,
+        "carteraPrimas": 1396,
+        "cobros": 5,
+        "asesores": 7
+      },
+      "encrypted": true,
+      "durablePrivateCopyConfirmed": true,
+      "dataWrites": 0
+    },
+    "focalLiveUi": {
+      "observer": "ROOT_AUTHENTICATED_SESSION",
+      "equipo": {
+        "observedMinuteUtc": "2026-11-07T18:35Z",
+        "status": "FOCAL_RELOAD_AND_SAME_VALUE_SAVE_OBSERVED",
+        "internos": 4,
+        "freelance": 3,
+        "reloadPreservedClassification": true,
+        "sameValueSaveOutcome": "NOOP_ALREADY_MATCHES",
+        "sameValueSaveBusinessWrites": 0,
+        "changedValueUiWriteProvenByThisObservation": false
+      },
+      "cancelaciones": {
+        "observedMinuteUtc": "2026-11-07T18:41Z",
+        "status": "FOCAL_COMMERCIAL_READ_OBSERVED",
+        "gt": 461,
+        "co": 28,
+        "todos": 489
+      },
+      "reportes": {
+        "observedMinuteUtcApproximate": "2026-11-07T18:45Z",
+        "status": "FOCAL_CANCELACIONES_REPORT_OBSERVED",
+        "commercialCancellations": 489,
+        "syntheticQaExcludedAndRetainedForAudit": 1
+      },
+      "threeAffectedScriptsHaveExactOrbitBuild": "gi-i65-b4-e5030ec5ba98-57f234755dc1",
+      "consoleWarnings": 0,
+      "consoleErrors": 0,
+      "scope": "FOCAL_READ_RELOAD_AND_NOOP_ONLY_NOT_ALL_MODULE_FLOWS"
+    },
+    "remainingFindings": [
+      {
+        "id": "LIVE_TENANT_CATALOG_SOURCE_STALE",
+        "status": "EXACT_READBACK_REQUIRED_BEFORE_SEPARATE_ACTIVATION",
+        "impact": "Propuestas catalogs request is unsupported by deployed September source."
+      },
+      {
+        "id": "B4-005_REPORTES_LEGACY_HEADER_BRANDING",
+        "status": "RESERVED_FOR_EXISTING_B4_005_BRANDING_SCOPE",
+        "observedHeader": "Orbit Reportes",
+        "blocksTheseFocalReadObservations": false
+      }
+    ],
+    "actualBusinessWrites": 0,
+    "realReconciliationStatus": "NOT_APPLIED",
+    "newIntegralAcceptanceGranted": false,
+    "newGatePassGranted": false,
+    "globalSynchronizationClaim": false
   }
 }

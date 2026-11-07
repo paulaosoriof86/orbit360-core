@@ -40,6 +40,11 @@ on:
       - recovery/fase-a-clean-20260831
     paths:
       - '.github/workflows/gravicentra-b4-003-executor.yml'
+      - 'tools/gravicentra-b4-003-isolated-tenant-config-package.cjs'
+      - 'tools/gravicentra-b4-003-live-tenant-config-readback.cjs'
+      - 'tools/gravicentra-b4-003-live-tenant-config-transport.test.cjs'
+      - 'tools/gravicentra-b4-003-tenant-config-functional.test.cjs'
+      - 'artifacts/orbit360-recovery/release-control/I6_5_B4_003_LIVE_TENANT_CONFIG_DEPLOY_ACTIVATION_20261107.json'
       - 'tools/gravicentra-b4-003-retained-hosting-preflight.mjs'
       - 'tools/gravicentra-b4-003-retained-hosting-promotion.mjs'
       - 'tools/gravicentra-b4-003-retained-rollback-certify.mjs'
@@ -78,7 +83,7 @@ concurrency:
 jobs:
   b4-003-renewals-cancelations-preview:
     # Both exact retained requests skip the legacy Preview build/deploy job.
-    if: "!(github.event_name == 'push' && ((github.event.head_commit.message == 'test(b4-003): retained artifact Hosting preflight' || (github.event.head_commit.message == 'test(b4-003): causal frontend retained artifact preflight' || startsWith(github.event.head_commit.message, format('{0}{1}', 'test(b4-003): causal frontend retained artifact preflight', fromJSON('\"\\n\"')))) || (github.event.head_commit.message == 'release(b4-003): promote causal frontend retained version' || startsWith(github.event.head_commit.message, format('{0}{1}', 'release(b4-003): promote causal frontend retained version', fromJSON('\"\\n\"'))))) || (github.event.head_commit.message == 'test(b4-003): certify retained rollback in existing Preview' || github.event.head_commit.message == 'release(b4-003): promote exact retained Hosting version') || github.event.head_commit.message == 'test(b4-003): read three synthetic archive states' || github.event.head_commit.message == 'test(b4-003): create one synthetic insurer LIVE' || github.event.head_commit.message == 'test(b4-003): cleanup one synthetic insurer LIVE' || github.event.head_commit.message == 'test(b4-003): complete one synthetic insurer LIVE'))"
+    if: "(!(github.event_name == 'push' && ((github.event.head_commit.message == 'test(b4-003): retained artifact Hosting preflight' || (github.event.head_commit.message == 'test(b4-003): causal frontend retained artifact preflight' || startsWith(github.event.head_commit.message, format('{0}{1}', 'test(b4-003): causal frontend retained artifact preflight', fromJSON('\"\\n\"')))) || (github.event.head_commit.message == 'release(b4-003): promote causal frontend retained version' || startsWith(github.event.head_commit.message, format('{0}{1}', 'release(b4-003): promote causal frontend retained version', fromJSON('\"\\n\"'))))) || (github.event.head_commit.message == 'test(b4-003): certify retained rollback in existing Preview' || github.event.head_commit.message == 'release(b4-003): promote exact retained Hosting version') || github.event.head_commit.message == 'test(b4-003): read three synthetic archive states' || github.event.head_commit.message == 'test(b4-003): create one synthetic insurer LIVE' || github.event.head_commit.message == 'test(b4-003): cleanup one synthetic insurer LIVE' || github.event.head_commit.message == 'test(b4-003): complete one synthetic insurer LIVE'))) && !(github.event_name == 'push' && ((github.event.head_commit.message == 'test(b4-003): exact LIVE tenant catalogs source readback' || startsWith(github.event.head_commit.message, format('{0}{1}', 'test(b4-003): exact LIVE tenant catalogs source readback', fromJSON('\"\\n\"')))) || github.event.head_commit.message == 'deploy(b4-003): exact isolated LIVE tenant catalogs canonical successor'))"
     runs-on: ubuntu-24.04
     timeout-minutes: 45
     env:
@@ -4309,3 +4314,152 @@ jobs:
         if: always()
         run: |
           rm -rf -- "$RUNNER_TEMP/gi-b4003-live-synthetic-auth"
+
+  b4-003-live-tenant-config-causal:
+    if: "github.event_name == 'push' && ((github.event.head_commit.message == 'test(b4-003): exact LIVE tenant catalogs source readback' || startsWith(github.event.head_commit.message, format('{0}{1}', 'test(b4-003): exact LIVE tenant catalogs source readback', fromJSON('\"\\n\"')))) || github.event.head_commit.message == 'deploy(b4-003): exact isolated LIVE tenant catalogs canonical successor')"
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    permissions:
+      contents: read
+    env:
+      PROJECT_ID: ays-orbit-360-lab
+      RELEASE_HEAD: ${{ github.sha }}
+      CATALOG_MODE: >-
+        ${{ github.event.head_commit.message == 'deploy(b4-003): exact isolated LIVE tenant catalogs canonical successor' && 'deploy' || 'readback' }}
+      ORBIT360_FUNCTIONS_REGION: us-central1
+      GI_CATALOG_INVENTORY_PATH: ${{ runner.temp }}/gi-b4003-tenant-config-before-inventory.json
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate the separate catalog authority and unchanged canonical product
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$RELEASE_HEAD"
+          test "$(git ls-remote origin refs/heads/recovery/fase-a-clean-20260831 | awk '{print $1}')" = "$RELEASE_HEAD"
+          git merge-base --is-ancestor f1321d6bea245411fd09e9ae414d58510551ef3b HEAD
+          git diff --exit-code e5030ec5ba9854f0c576fd905c2f510766347ffa HEAD -- functions orbit360-platform ':(exclude)orbit360-platform/docs/**'
+          node --check tools/gravicentra-b4-003-live-tenant-config-readback.cjs
+          node tools/gravicentra-b4-003-live-tenant-config-transport.test.cjs
+          node tools/gravicentra-b4-003-tenant-config-functional.test.cjs
+          node tools/gravicentra-i6-control-plane-guard-v1.mjs --mode=i6
+          node tools/gravicentra-b4-003-live-tenant-config-readback.cjs authority
+      - name: Stage the five exact canonical files with one export
+        shell: bash
+        run: |
+          set -euo pipefail
+          TARGET_ROOT="$RUNNER_TEMP/gi-b4003-live-tenant-config-only"
+          mkdir -p "$TARGET_ROOT"
+          node tools/gravicentra-b4-003-isolated-tenant-config-package.cjs stage functions "$TARGET_ROOT/backend" > "$RUNNER_TEMP/gi-b4003-tenant-config-package.json"
+          printf '{"functions":{"source":"backend","ignore":["node_modules","**/node_modules/**",".git","firebase-debug.log","firebase-debug.*.log"]}}\n' > "$TARGET_ROOT/firebase.json"
+          (cd "$TARGET_ROOT/backend" && npm ci --ignore-scripts --no-audit --no-fund)
+          echo "TARGET_ROOT=$TARGET_ROOT" >> "$GITHUB_ENV"
+          echo "GI_DEPS_DIR=$TARGET_ROOT/backend/node_modules" >> "$GITHUB_ENV"
+      - name: Select an existing identity and read the complete predecessor without mutation
+        shell: bash
+        run: |
+          set -euo pipefail
+          AUTH_ROOT="$RUNNER_TEMP/gi-b4003-live-tenant-config-auth"
+          mkdir -p "$AUTH_ROOT"
+          export AUTH_ROOT
+          python3 - <<'PY'
+          import json,os,pathlib
+          root=pathlib.Path(os.environ['AUTH_ROOT']);found=0
+          for label in ('SA_DEFAULT','SA_ORBIT360_LAB','SA_ORBIT_360_LAB'):
+              try:data=json.loads(os.environ.get(label,''))
+              except (ValueError,TypeError):continue
+              if data.get('type')!='service_account' or data.get('project_id')!='ays-orbit-360-lab' or not data.get('private_key'):continue
+              out=root/(str(found)+'.json');out.write_text(json.dumps(data));out.chmod(0o600);found+=1
+          if found==0:raise SystemExit('CATALOG_NO_EXISTING_PROJECT_CREDENTIAL')
+          PY
+          CLI_ROOT="$RUNNER_TEMP/gi-b4003-live-tenant-config-firebase-cli"
+          npm install --prefix "$CLI_ROOT" --ignore-scripts --no-audit --no-fund firebase-tools@14.10.1
+          node tools/gravicentra-firebase-tools-empty-extensions-workaround-v1.mjs "$CLI_ROOT"
+          CLI="$CLI_ROOT/node_modules/firebase-tools/lib/bin/firebase.js"
+          SELECTED=''
+          for F in "$AUTH_ROOT"/*.json; do
+            if GOOGLE_APPLICATION_CREDENTIALS="$F" node "$CLI" functions:list --project "$PROJECT_ID" --non-interactive --json > "$GI_CATALOG_INVENTORY_PATH" 2>/dev/null &&
+               GOOGLE_APPLICATION_CREDENTIALS="$F" node tools/gravicentra-b4-003-live-tenant-config-readback.cjs before &&
+               node -e "const t=require('./tools/gravicentra-b4-003-live-tenant-config-readback.cjs');t.validateSnapshot(require(process.env.RUNNER_TEMP+'/gi-b4003-tenant-config-before.json'))"; then
+              SELECTED="$F";break
+            fi
+          done
+          test -n "$SELECTED" || { echo 'CATALOG_EXISTING_IDENTITY_COMPLETE_SOURCE_CONFIG_IAM_READBACK_UNAVAILABLE';exit 1; }
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$SELECTED" >> "$GITHUB_ENV"
+          echo "FIREBASE_CLI_BIN=$CLI" >> "$GITHUB_ENV"
+      - name: Confirm single discovery target and require the later activation receipt
+        id: assess_catalog
+        shell: bash
+        run: |
+          set -euo pipefail
+          node - <<'NODE'
+          const assert=require('node:assert/strict');
+          const exported=require(process.env.TARGET_ROOT+'/backend/bootstrap.js');
+          assert.deepEqual(Object.keys(exported),['orbit360TenantDomainConfig']);
+          const endpoint=exported.orbit360TenantDomainConfig.__endpoint;
+          assert.equal(endpoint.platform,'gcfv2');assert.deepEqual(endpoint.region,['us-central1']);
+          NODE
+          node tools/gravicentra-b4-003-live-tenant-config-readback.cjs assess
+      - name: Prepare the exact predecessor package for rollback
+        if: steps.assess_catalog.outputs.needs_deploy == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          export RESTORE_ROOT="$RUNNER_TEMP/gi-b4003-live-tenant-config-previous"
+          mkdir -p "$RESTORE_ROOT"
+          python3 - <<'PY'
+          import os,pathlib,zipfile,shutil,stat
+          dst=pathlib.Path(os.environ['RESTORE_ROOT']);ex=dst/'extract';ex.mkdir()
+          src=pathlib.Path(os.environ['RUNNER_TEMP'])/'gi-b4003-tenant-config-before.zip'
+          with zipfile.ZipFile(src) as z:
+              for item in z.infolist():
+                  p=(ex/item.filename).resolve()
+                  if not p.is_relative_to(ex.resolve()) or stat.S_ISLNK(item.external_attr>>16):raise SystemExit('CATALOG_ARCHIVE_UNSAFE_PATH')
+              z.extractall(ex)
+          roots=[p.parent for p in ex.rglob('package.json') if (p.parent/'tenant-domain-config.js').is_file() and (p.parent/'bootstrap.js').is_file() and (p.parent/'package-lock.json').is_file()]
+          if len(roots)!=1:raise SystemExit('EXACT_CATALOG_BACKUP_INCOMPLETE')
+          shutil.copytree(roots[0],dst/'backend')
+          (dst/'firebase.json').write_text('{"functions":{"source":"backend"}}\n')
+          PY
+          (cd "$RESTORE_ROOT/backend" && npm ci --ignore-scripts --no-audit --no-fund)
+          echo "RESTORE_ROOT=$RESTORE_ROOT" >> "$GITHUB_ENV"
+      - name: Deploy only the canonical LIVE catalog and verify exact source configuration and IAM
+        id: deploy_catalog
+        if: steps.assess_catalog.outputs.needs_deploy == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git ls-remote origin refs/heads/recovery/fase-a-clean-20260831 | awk '{print $1}')" = "$RELEASE_HEAD"
+          node "$FIREBASE_CLI_BIN" deploy --only functions:orbit360TenantDomainConfig --config "$TARGET_ROOT/firebase.json" --project "$PROJECT_ID" --non-interactive
+          node "$FIREBASE_CLI_BIN" functions:list --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/gi-b4003-tenant-config-after-inventory.json"
+          GI_CATALOG_INVENTORY_PATH="$RUNNER_TEMP/gi-b4003-tenant-config-after-inventory.json" node tools/gravicentra-b4-003-live-tenant-config-readback.cjs after
+      - name: Restore only the exact predecessor when deployment or readback fails
+        if: failure() && steps.deploy_catalog.outcome == 'failure'
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f "$RESTORE_ROOT/backend/tenant-domain-config.js"
+          node "$FIREBASE_CLI_BIN" deploy --only functions:orbit360TenantDomainConfig --config "$RESTORE_ROOT/firebase.json" --project "$PROJECT_ID" --non-interactive
+          node "$FIREBASE_CLI_BIN" functions:list --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/gi-b4003-tenant-config-rollback-inventory.json"
+          GI_CATALOG_INVENTORY_PATH="$RUNNER_TEMP/gi-b4003-tenant-config-rollback-inventory.json" node tools/gravicentra-b4-003-live-tenant-config-readback.cjs rollback
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: gi-b4003-live-tenant-config-source-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/gi-b4003-tenant-config-package.json
+            ${{ runner.temp }}/gi-b4003-tenant-config-before.json
+            ${{ runner.temp }}/gi-b4003-tenant-config-after.json
+            ${{ runner.temp }}/gi-b4003-tenant-config-rollback.json
+            ${{ runner.temp }}/gi-b4003-tenant-config-result.json
+          retention-days: 30
+          if-no-files-found: warn
