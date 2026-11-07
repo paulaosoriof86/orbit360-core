@@ -3333,7 +3333,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "B4_003_CLOSED_RETURN_TO_FROZEN_PLAN_NEXT_GATE_NOT_EXECUTED",
+  "nextAction": "B4_004_CRONOGRAMA_MINIMUM_DELTA_LIVE_QA_THEN_GATE_SEAL",
   "postproductionExitProgress": {
     "formalPercent": 50,
     "frozenMiniGates": 5,
@@ -21703,7 +21703,7 @@
   },
   "b4004PolicyCaptureFrontendSuccessor20261107": {
     "schema": "GRAVICENTRA_B4_004_POLICY_CAPTURE_SUCCESSOR_CURSOR_V1",
-    "status": "FRONTEND_SUCCESSOR_PREVIEW_ACCEPTED_PROMOTION_AUTHORIZED",
+    "status": "FRONTEND_SUCCESSOR_LIVE_BYTES_AND_POLICY_CAPTURE_FUNCTIONAL_PASS_CRONOGRAMA_PENDING",
     "preservedAcceptancePointer": "/b4003ActiveCertificationCursor20261106/formalLiveAcceptance",
     "preservedPriorSuccessorPointer": "/b4003CausalFrontendSuccessor20261107",
     "sourceContractPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_004_POLICY_CAPTURE_CAUSAL_FRONTEND_SUCCESSOR_CONTRACT_20261107.json",
@@ -21757,6 +21757,20 @@
       "buildId": "gi-i65-b4-6c45983610ce-57f234755dc1",
       "artifactId": 13592378081,
       "archiveSha256": "02a42a2a3fc0dbc477a19937ad0a636ef94afd142977fd6ddf4c1a6e2177fba9"
+    },
+    "liveFunctionalAcceptance": {
+      "status": "POLICY_CAPTURE_FOCAL_LIVE_PASS",
+      "sourceSha": "6c45983610ce0d65a5c63bd07659ad968bfe9da3",
+      "buildId": "gi-i65-b4-6c45983610ce-57f234755dc1",
+      "artifactId": 13592378081,
+      "liveVersionName": "sites/ays-orbit-360-lab/versions/33af816375dd5cb5",
+      "runId": 42427273254,
+      "runAttempt": 1,
+      "evidencePath": "artifacts/orbit360-recovery/release-control/I6_5_B4_004_POLICY_CAPTURE_FOCAL_LIVE_QA_20261107.json",
+      "evidenceSha256": "774c5ea675bf7561b8172281b7d922703a3031ef26ceb535dfa60f90752d8a9f",
+      "syntheticFinalAbsent": true,
+      "realBusinessWrites": 0,
+      "productSourceChanged": false
     }
   },
   "workingCadenceFreeze20261107": {
@@ -21816,7 +21830,7 @@
     "schema": "GRAVICENTRA_B4_004_POLICY_CAPTURE_LIVE_SYNTHETIC_OWNER_AUTH_V1",
     "status": "AUTHORIZED_ONCE",
     "authorized": true,
-    "consumed": false,
+    "consumed": true,
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_004_POLICY_CAPTURE_LIVE_SYNTHETIC_OWNER_AUTH_20261107.json",
     "receiptBlobSha": "3a18ee07ee91231e8eb5313026e8cbc8a21ee92a",
     "authorizedParentSha": "f7197e9dccb111100efa1ad4b21bc512f2e29949",
@@ -21840,6 +21854,8 @@
       "rulesMutation": false,
       "authIamMutation": false,
       "reimport": false
-    }
+    },
+    "consumedByRunId": 42427273254,
+    "result": "PASS_CLEANUP_VERIFIED"
   }
 }

@@ -1,0 +1,283 @@
+{
+  "schema": "GRAVICENTRA_B4_004_POLICY_CAPTURE_FOCAL_LIVE_QA_V1",
+  "status": "FOCAL_AUTHENTICATED_UI_PASS",
+  "runId": "42427273254_1",
+  "target": "https://ays-orbit-360-lab.web.app",
+  "fixtures": {
+    "advisor": {
+      "collection": "asesores",
+      "id": "b4004qa_live_capture_42427273254_1_advisor"
+    },
+    "insurer": {
+      "collection": "aseguradoras",
+      "id": "b4004qa_live_capture_42427273254_1_insurer"
+    },
+    "client": {
+      "collection": "clientes",
+      "id": "b4004qa_live_capture_42427273254_1_client"
+    },
+    "clientActivity": {
+      "collection": "actividades",
+      "id": "b4004qa_live_capture_42427273254_1_client_activity"
+    },
+    "policy": {
+      "collection": "polizas",
+      "id": "b4004qa_live_capture_42427273254_1_policy"
+    },
+    "receipt": {
+      "collection": "recibosEsperados",
+      "id": "b4004qa_live_capture_42427273254_1_receipt"
+    },
+    "portfolio": {
+      "collection": "carteraPrimas",
+      "id": "b4004qa_live_capture_42427273254_1_portfolio"
+    },
+    "vehicle": {
+      "collection": "vehiculos",
+      "id": "b4004qa_live_capture_42427273254_1_vehicle"
+    },
+    "policyActivity": {
+      "collection": "actividades",
+      "id": "b4004qa_live_capture_42427273254_1_policy_activity"
+    },
+    "receiptActivity": {
+      "collection": "actividades",
+      "id": "b4004qa_live_capture_42427273254_1_receipt_activity"
+    },
+    "advisorAudit": {
+      "collection": "auditoria",
+      "id": "b4004qa_live_capture_42427273254_1_advisor_audit"
+    }
+  },
+  "businessWrites": 0,
+  "seedWrites": 2,
+  "syntheticMutations": 12,
+  "cleanupWrites": 22,
+  "authAccountsCreated": 0,
+  "membershipWrites": 0,
+  "productSourceChanged": false,
+  "backendChanged": false,
+  "assertions": {
+    "exactArtifactBeforeWrites": true,
+    "originalAbsenceVerified": true,
+    "advisorCommissionAndScopedAudit": true,
+    "clientFormAndAtomicActivity": true,
+    "policyFormAtomicBatchAndDerivedClientState": true,
+    "receiptEditFormAndAtomicPortfolioActivity": true,
+    "freshProductReloadWithoutAdapter": true
+  },
+  "limitations": [
+    "Synthetic identity/marker adapter is outside the product entrypoint; all economic/date/country/role fields are preserved.",
+    "Advisor commission/audit is tested on a synthetic profile. New advisor creation is not certified here.",
+    "Legacy supplementary A.audit is observed separately; scoped atomic activities are the acceptance subject.",
+    "This focal proof is not integral module acceptance or PRODUCTION_ACCEPTED."
+  ],
+  "errors": [],
+  "pageErrorCount": 0,
+  "consoleErrorCount": 0,
+  "httpErrorCount": 0,
+  "expectedConsoleDenials": [
+    {
+      "expected": true,
+      "code": "LEGACY_AUDIT_CANONICAL_DENIAL_OBSERVED",
+      "messageSha256": "3bba3cce8f2a7470b2842a39c65f24240784d0b66aa67fa8dce4e31bdd326496"
+    },
+    {
+      "expected": true,
+      "code": "LEGACY_AUDIT_CANONICAL_DENIAL_OBSERVED",
+      "messageSha256": "671347410306fc0394cb8f6827190ca57a4110d96970db247eed606fe9175c13"
+    },
+    {
+      "expected": true,
+      "code": "LEGACY_AUDIT_CANONICAL_DENIAL_OBSERVED",
+      "messageSha256": "3bba3cce8f2a7470b2842a39c65f24240784d0b66aa67fa8dce4e31bdd326496"
+    },
+    {
+      "expected": true,
+      "code": "LEGACY_AUDIT_CANONICAL_DENIAL_OBSERVED",
+      "messageSha256": "671347410306fc0394cb8f6827190ca57a4110d96970db247eed606fe9175c13"
+    }
+  ],
+  "syntheticFinalAbsent": true,
+  "artifact": {
+    "sourceSha": "6c45983610ce0d65a5c63bd07659ad968bfe9da3",
+    "buildId": "gi-i65-b4-6c45983610ce-57f234755dc1",
+    "artifactId": 13592378081,
+    "artifactZipSha256": "2cc92c916c602671f28d38595eaf8e41e9c8b6f4777a6051b728ee40d98befb9",
+    "archiveSha256": "02a42a2a3fc0dbc477a19937ad0a636ef94afd142977fd6ddf4c1a6e2177fba9",
+    "hostedPayloadDigest": "018bf9acd64ddaa382d2ac73c35a6d8bbc0447ab3051a3d26a5b1e8c048a7e7d",
+    "liveVersionName": "sites/ays-orbit-360-lab/versions/33af816375dd5cb5"
+  },
+  "sourceOwners": [
+    {
+      "path": "orbit360-platform/core/policy-receipts-engine.js",
+      "blobSha": "37471433de5b09ba4ecd2ca847baae55317ff8e5",
+      "sha256": "4cd2a33102396bdf3784b92a7b8e74b441052681185f663dfe96f702829ade10"
+    },
+    {
+      "path": "orbit360-platform/modules/policy-receipts-v1199-bridge.js",
+      "blobSha": "4867fb7db684908f6ca5a6edfc39460de5c1cf59",
+      "sha256": "91645e02afa01c52fbc745d45429f595b60e870a3ef79cdacf6b8ca705e6bdaa"
+    },
+    {
+      "path": "orbit360-platform/modules/equipo.js",
+      "blobSha": "f584c4109294f8e32621c9ee9dd5cfdd55ca2c79",
+      "sha256": "c820edcedce8655e11701264b2e85dc0b07e55795b6e723d44bad25062cea8fc"
+    },
+    {
+      "path": "orbit360-platform/modules/crm-v1198-operational-bridge.js",
+      "blobSha": "a60cba8f13f53f1934718770517c7261e6860de1",
+      "sha256": "e8696837fa3e50ba145816268d3969ae7f90e80c378fb67494e6cd95971de086"
+    },
+    {
+      "path": "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
+      "blobSha": "fce274b01bf2c52c50e186df1ece97e7474805e7",
+      "sha256": "c4c22130d3221deb0f272fe417287654d0689e38b4e75ecf08ca22589fb9fea6"
+    }
+  ],
+  "actor": {
+    "activeRole": "direccion",
+    "uidSha256": "f612197b077c598edd61d757c1e2995be7a3b17300602ce4802bccefed216a72",
+    "existingPrincipal": true
+  },
+  "sessionContext": {
+    "activeRole": "direccion",
+    "country": "GT",
+    "assignedRoleAndCountryVerified": true
+  },
+  "policyFormPreflight": {
+    "ok": true,
+    "errorCodes": [],
+    "missingFields": [],
+    "selectionMatches": true,
+    "economicsMatch": true
+  },
+  "economics": {
+    "currency": "USD",
+    "netPremium": 1000,
+    "insurerRate": 10,
+    "sellerRate": 60,
+    "insurerAmount": 100,
+    "sellerAmount": 60,
+    "expectedReceipts": 1,
+    "paymentCreated": false
+  },
+  "identityTransformations": [
+    {
+      "phase": "advisor-commission",
+      "method": "batchDurable",
+      "mutations": 1,
+      "beforeSha256": "2eaf1f808cf5f9390fa1d7cd6cc26b809b512939ab29e868b0364d691356038e",
+      "afterSha256": "e63a2f155a3523585eb953c87d431371da5053ec7b9f074c53a7d26d93b9dca7",
+      "businessFieldsUnchanged": true
+    },
+    {
+      "phase": "advisor-commission",
+      "method": "insertDurable",
+      "mutations": 1,
+      "beforeSha256": "075c51089b984a6820065231178be02ca5cd04039998dc70c01c7f78200cfbf7",
+      "afterSha256": "7df0f5d002153dfaeb8d0ce99414fc79b89fc7aa54e60c7b11d23671c94e9cf3",
+      "businessFieldsUnchanged": true
+    },
+    {
+      "phase": "client-create",
+      "method": "batchDurable",
+      "mutations": 2,
+      "beforeSha256": "3ede8077c4b85f212ad1cc057fcb0c5bcb947c88b7235b3fedf3e446cbc1203f",
+      "afterSha256": "2c55a2c2590319e6fc577c0c72e52448f356e01d657746b444a8a2b4ee191a83",
+      "businessFieldsUnchanged": true
+    },
+    {
+      "phase": "policy-create",
+      "method": "batchDurable",
+      "mutations": 4,
+      "beforeSha256": "7b889566cdd9afd9855268a5ddea0880025ed5065e7b6e05652c544935bc8105",
+      "afterSha256": "4f42aad36e567ad1168ea16905b56300ed328c149b7a8212a7ea57c5e6daaf86",
+      "businessFieldsUnchanged": true
+    },
+    {
+      "phase": "policy-create",
+      "method": "derivedClientState",
+      "mutations": 1,
+      "beforeSha256": "f7333de4df71a9168f0d46e98149d01c65996a06c6ee01f7c8a299f3bb326084",
+      "afterSha256": "630a30c4bbebc35f7ad051bc15f6ca8d5b65aea53ce38196f249ca26e6cfb6fd",
+      "businessFieldsUnchanged": true
+    },
+    {
+      "phase": "receipt-edit",
+      "method": "batchDurable",
+      "mutations": 3,
+      "beforeSha256": "3f6410ba46288fb8875359a402b2bd04041482ca75c2ecbdb19f3174ae427bf4",
+      "afterSha256": "dfb0f0aaaae1c517f6e492f9a42209526dea3f77d2f88f569b7605533888aff8",
+      "businessFieldsUnchanged": true
+    }
+  ],
+  "auxiliaryAudit": {
+    "attempts": 4,
+    "canonicalDenials": 4,
+    "codes": [
+      "PRODUCT_WRITE_COLLECTION_NOT_AUTHORIZED",
+      "PRODUCT_WRITE_RECORD_SCOPE_DENIED"
+    ],
+    "integralAuditPass": false
+  },
+  "expectedConsoleDenialParity": true,
+  "attemptedSyntheticMutations": 12,
+  "cleanup": {
+    "method": "EXACT_PREDECLARED_IDS_AND_CAPTURED_SERVER_RECEIPTS",
+    "actorTimeWindowQuery": false,
+    "prefixDelete": false,
+    "compareAndDeleteTransaction": true,
+    "verifiedAbsent": true
+  },
+  "commandReceipts": [
+    {
+      "requestId": "batch_1794095662091_o6qktr",
+      "eventId": "opevt_0a86b6c10282f3f12a19662469f5",
+      "payloadDigest": "d8664bb845d3ca2871f6930b23c59058f79185602cdc3ebc767f86d0efe67912",
+      "mutations": 1,
+      "canonicalReadback": true,
+      "recoveredForCleanupOnly": false
+    },
+    {
+      "requestId": "op_d9b29121791b1722f0ad6a33de7c720b",
+      "eventId": "opevt_0cb4f3785d8378db0e6cd9a05e7c",
+      "payloadDigest": "d95e597124ee782806d2bc6d0d3a6482442cc368090b99fa74c47b204dfb0cc7",
+      "mutations": 1,
+      "canonicalReadback": true,
+      "recoveredForCleanupOnly": false
+    },
+    {
+      "requestId": "crm_client_create_cli_mw728hzi_mw728i00",
+      "eventId": "opevt_f87023f5724b67f65351d2b886a3",
+      "payloadDigest": "dbda89e22044a1e7bb43f9a7b9a031af97e38fa7526ef931434b2b1e372a4e3a",
+      "mutations": 2,
+      "canonicalReadback": true,
+      "recoveredForCleanupOnly": false
+    },
+    {
+      "requestId": "pol_mw728j48_cqffn",
+      "eventId": "opevt_15f1fdd11b164e7c0e771f4aeaf1",
+      "payloadDigest": "4b0c80aeaf98cad02481df330c1a4c9d567f4f98fd7701143cd0f65d70ae4f85",
+      "mutations": 4,
+      "canonicalReadback": true,
+      "recoveredForCleanupOnly": false
+    },
+    {
+      "requestId": "op_c4898a0d24b22b74402c2e28eb7d6de5",
+      "eventId": "opevt_3de454d0ec6ead550239ca65b470",
+      "payloadDigest": "ab2400e84c0df9fe15ffea96c37272ca6a562b8870b96d3102518d7a19098831",
+      "mutations": 1,
+      "canonicalReadback": true,
+      "recoveredForCleanupOnly": false
+    },
+    {
+      "requestId": "recedit_mw728khr_ubgq3",
+      "eventId": "opevt_45e934b916f6d3b6046c521b1643",
+      "payloadDigest": "41d3fa3de04f6b6dd9c1c256eab7e9f5c29c9e9127cd96cc7179ac6d136b436e",
+      "mutations": 3,
+      "canonicalReadback": true,
+      "recoveredForCleanupOnly": false
+    }
+  ]
+}
