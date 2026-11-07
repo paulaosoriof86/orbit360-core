@@ -80,6 +80,31 @@ function localManifest(root){
   const text=rows.map(r=>r.sha256+'  '+r.path).join('\n')+'\n';
   return {rows,text,fileCount:rows.length,digest:sha(text)};
 }
+function previewFileContract(version,files,manifest){
+  // Firebase Hosting supplies these two SDK auto-configuration resources.
+  // https://firebase.google.com/docs/hosting/reserved-urls#sdk_auto-configuration
+  // Diagnostic 42315518247 observed exactly this pair outside the retained TAR.
+  // No other reserved URL or product path is excluded from exact comparison.
+  const managedInitPaths=['__/firebase/init.js','__/firebase/init.json'];
+  const paths=files.map(r=>r.path);
+  const retainedPaths=manifest.rows.map(r=>r.path);
+  const metadataFileCount=Number(version.fileCount);
+  requireValue(Number.isSafeInteger(metadataFileCount) && metadataFileCount>0,'PREVIEW_METADATA_FILE_COUNT_INVALID');
+  exact(metadataFileCount,files.length,'PREVIEW_METADATA_LIST_COUNT_MISMATCH');
+  exact(new Set(paths).size,paths.length,'PREVIEW_DUPLICATE_HOSTING_PATH');
+  exact(manifest.fileCount,retainedPaths.length,'PREVIEW_RETAINED_COUNT_MISMATCH');
+  exact(new Set(retainedPaths).size,retainedPaths.length,'PREVIEW_DUPLICATE_RETAINED_PATH');
+  requireValue(retainedPaths.every(p=>!managedInitPaths.includes(p)),'PREVIEW_RETAINED_MANAGED_INIT_COLLISION');
+  const managedInitFiles=files.filter(r=>managedInitPaths.includes(r.path));
+  const productFiles=files.filter(r=>!managedInitPaths.includes(r.path));
+  exact(JSON.stringify(managedInitFiles.map(r=>r.path).sort()),JSON.stringify(managedInitPaths),'PREVIEW_MANAGED_INIT_PATH_SET_MISMATCH');
+  exact(productFiles.length,manifest.fileCount,'PREVIEW_PRODUCT_FILE_COUNT_MISMATCH');
+  exact(JSON.stringify(productFiles.map(r=>r.path).sort()),JSON.stringify([...retainedPaths].sort()),'PREVIEW_PRODUCT_PATH_SET_MISMATCH');
+  return {productFiles,managedInitFiles,metadataFileCount,listedFileCount:files.length,
+    retainedProductFileCount:manifest.fileCount,managedInitFileCount:managedInitFiles.length,
+    managedInitPaths,managedInitDocumentation:'https://firebase.google.com/docs/hosting/reserved-urls#sdk_auto-configuration',
+    productManifestDigest:manifest.digest,anyOtherPathExcluded:false};
+}
 async function publicRead(base,rel,nonce){
   const origin=new URL(base).origin;
   const url=base.replace(/\/$/,'')+'/'+rel.split('/').map(encodeURIComponent).join('/')+
@@ -268,6 +293,15 @@ async function observeCertifiedLiveReleaseHistoryFirstPage(){
     });
     evidence.windowCandidateCount=evidence.windowCandidates.length;
     evidence.status='READ_ONLY_FIRST_PAGE_COMPLETE_NO_CERTIFICATION';
+    // Only the already observed exact I5 release/version may receive two GETs.
+    // Counts and API hashes cannot establish the certified raw-byte manifest.
+    const candidate=evidence.windowCandidates[0];
+    if(evidence.windowCandidateCount===1 &&
+      candidate.name==='sites/'+binding.site+'/channels/live/releases/1789786248527000' &&
+      candidate.releaseTime==='2026-09-19T02:50:48.527Z' &&
+      candidate.version.name==='sites/'+binding.site+'/versions/5d35a2bd0b326e75'){
+      await observeCertifiedVersionCandidate(candidate);
+    }
   }catch(error){
     evidence.status='READ_ONLY_FIRST_PAGE_FAILED';
     evidence.code=safeCode(error);
@@ -275,6 +309,50 @@ async function observeCertifiedLiveReleaseHistoryFirstPage(){
     evidence.observedAtUtc=new Date().toISOString();
     writeJson('live-release-history-first-page.json',evidence);
     receipt.liveReleaseHistoryProbeFile='live-release-history-first-page.json';
+  }
+}
+async function observeCertifiedVersionCandidate(candidate){
+  const versionName='sites/'+binding.site+'/versions/5d35a2bd0b326e75';
+  const evidence={schema:'B4_003_CERTIFIED_VERSION_CANDIDATE_READONLY_V1',
+    status:'READ_IN_PROGRESS',candidateRelease:candidate,candidateVersionName:versionName,
+    certifiedSourceSha:cp.certifiedCandidate.sourceSha,certifiedBuildId:cp.certifiedCandidate.buildId,
+    certifiedProductFileCount:Number(cp.certifiedCandidate.hostedFileCount),
+    certifiedProductDigest:cp.certifiedCandidate.hostedPayloadDigest,
+    requests:[],paginationFollowed:false,hostingMutation:false,
+    sourceIdentityVerified:false,rawPayloadDigestVerified:false,
+    rollbackCertifiedByThisProbe:false,certificateChanged:false};
+  try{
+    evidence.requests.push({method:'GET',resource:versionName});
+    const version=await hostingGet(versionName);
+    evidence.version=version;
+    exact(version.name,versionName,'CANDIDATE_VERSION_NAME_MISMATCH');
+    exact(version.status,'FINALIZED','CANDIDATE_VERSION_NOT_FINALIZED');
+    evidence.requests.push({method:'GET',resource:versionName+'/files',status:'ACTIVE',pageSize:1000});
+    const page=await hostingGet(versionName+'/files',{status:'ACTIVE',pageSize:1000});
+    requireValue(Array.isArray(page.files),'CANDIDATE_FILES_INVALID');
+    evidence.hasNextPage=Boolean(page.nextPageToken);
+    evidence.files=page.files.map(f=>({path:relativePath(f.path),hostingHash:f.hash,status:f.status}))
+      .sort((a,b)=>a.path<b.path?-1:a.path>b.path?1:0);
+    evidence.listedFileCount=evidence.files.length;
+    evidence.metadataFileCount=version.fileCount ?? null;
+    requireValue(!evidence.hasNextPage,'CANDIDATE_REQUIRES_UNAPPROVED_PAGINATION');
+    requireValue(evidence.files.every(f=>f.status==='ACTIVE'),'CANDIDATE_FILE_NOT_ACTIVE');
+    exact(new Set(evidence.files.map(f=>f.path)).size,evidence.files.length,'CANDIDATE_DUPLICATE_PATH');
+    exact(Number(version.fileCount),evidence.files.length,'CANDIDATE_METADATA_LIST_COUNT_MISMATCH');
+    const initPaths=['__/firebase/init.js','__/firebase/init.json'];
+    evidence.managedInitFiles=evidence.files.filter(f=>initPaths.includes(f.path));
+    evidence.productFiles=evidence.files.filter(f=>!initPaths.includes(f.path));
+    evidence.productFileCount=evidence.productFiles.length;
+    exact(JSON.stringify(evidence.managedInitFiles.map(f=>f.path)),JSON.stringify(initPaths),'CANDIDATE_MANAGED_INIT_PATH_SET_MISMATCH');
+    exact(evidence.productFileCount,evidence.certifiedProductFileCount,'CANDIDATE_PRODUCT_COUNT_MISMATCH');
+    evidence.status='READ_ONLY_CANDIDATE_LISTING_COMPLETE_NOT_CERTIFIED';
+  }catch(error){
+    evidence.status='READ_ONLY_CANDIDATE_LISTING_FAILED_NOT_CERTIFIED';
+    evidence.code=safeCode(error);
+  }finally{
+    evidence.observedAtUtc=new Date().toISOString();
+    writeJson('certified-version-candidate-observed.json',evidence);
+    receipt.certifiedVersionCandidateProbeFile='certified-version-candidate-observed.json';
   }
 }
 async function liveSnapshot(nonce){
@@ -426,17 +504,20 @@ try{
     writeJson('preview-hosting-version-observed.json',{channel:compact,version,files,
       metadataFileCount:version.fileCount ?? null,listedFileCount:files.length,
       retainedSiteFileCount:manifest.fileCount});
-    exact(Number(version.fileCount),manifest.fileCount,'PREVIEW_VERSION_FILE_COUNT_MISMATCH_'+String(version.fileCount)+'_EXPECTED_'+manifest.fileCount);
-    exact(JSON.stringify(files.map(r=>r.path)),JSON.stringify(manifest.rows.map(r=>r.path)),'PREVIEW_PATH_SET_MISMATCH');
-    writeJson('preview-hosting-version.json',{channel:compact,version,files});
-    const readback=await readManifest(binding.previewUrl,files.map(r=>r.path),manifest.rows,'preview',
+    const transportContract=previewFileContract(version,files,manifest);
+    writeJson('preview-hosting-version.json',{channel:compact,version,files,transportContract});
+    const readback=await readManifest(binding.previewUrl,transportContract.productFiles.map(r=>r.path),manifest.rows,'preview',
       binding.archiveSha256.slice(0,16)+'-'+env.GITHUB_RUN_ID,manifest.digest);
     exact(readback.digest,manifest.digest,'PREVIEW_MANIFEST_DIGEST_MISMATCH');
     exact(readback.marker?.sourceSha,binding.sourceSha,'PREVIEW_MARKER_SOURCE_MISMATCH');
     exact(readback.marker?.buildId,binding.buildId,'PREVIEW_MARKER_BUILD_MISMATCH');
     exact(versionName(await getChannel(binding.previewChannelId)),compact.versionName,'PREVIEW_CHANNEL_MOVED_DURING_READBACK');
     receipt.previewVersionName=compact.versionName;
-    return {...compact,...readback,immutableArtifactId:binding.artifactId};
+    return {...compact,...readback,immutableArtifactId:binding.artifactId,
+      hostingFileCount:transportContract.metadataFileCount,
+      hostingManagedInitFileCount:transportContract.managedInitFileCount,
+      hostingManagedInitPaths:transportContract.managedInitPaths,
+      transportContractEvidence:'preview-hosting-version.json'};
   });
   await check('certified_rollback_version_and_all_served_bytes',async()=>{
     const cert=cp.certifiedCandidate;
