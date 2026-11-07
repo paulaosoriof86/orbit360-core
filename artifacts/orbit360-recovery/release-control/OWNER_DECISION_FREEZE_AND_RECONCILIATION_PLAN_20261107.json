@@ -1,0 +1,443 @@
+{
+  "schema": "GRAVICENTRA_OWNER_DECISION_FREEZE_20261107_V1",
+  "status": "OWNER_DECISIONS_AND_EXECUTION_PLAN_FROZEN_NOT_NEW_PRODUCT_PASS",
+  "recordedAtUtc": "2026-11-07T16:25:48Z",
+  "operationalDate": "2026-11-07",
+  "timeZone": "America/Guatemala",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "authorityBaseHead": "74312cc3621ba155ee288a0afb530a488246f0e6",
+  "authority": "PAULA_EXPLICIT_REQUEST_TO_FREEZE_COMPLETE_DECISIONS_AND_WORK_PLAN",
+  "plan": {
+    "path": "artifacts/orbit360-recovery/release-control/PLAN_OPERATIVO_DECISIONES_PAULA_20261107.md",
+    "blobSha": "4f076ca32f38f3eead117a9384ff5351d54bb3fb"
+  },
+  "canonicalControlPlane": "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json",
+  "canonicalMasterPlan": "artifacts/orbit360-recovery/release-control/I6_PENDING_CLOSURE_MASTER_PLAN_LOCK_20261004.json",
+  "additiveOnly": true,
+  "supersedesForCurrentExecution": [
+    "Historical mandatory HostDime-only final transport: final hosting is now negotiable; existing Firebase is recommended, DNS not executed.",
+    "Pre-Phase-A quote/comparison/insurance-knowledge blocking obligations are owner-deferred until after Finance and Marketing.",
+    "Summaries omitting Renovaciones/Cancelaciones PASS; preserved receipts must be shown.",
+    "Old R20/R23 next-action snapshots; current42 closure and this additive execution plan govern current resumption."
+  ],
+  "preservedRelease": {
+    "gate": "I6.5/B4-003",
+    "status": "LATEST_APPROVED_VERSION_LIVE_PASS",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CURRENT42_FINAL_LIVE_CLOSEOUT_20261107.json",
+    "receiptBlobSha": "0879188bf245248fa1092fb2014e35e14e802b44",
+    "sourceSha": "857f1222f360a42a06e012810a1c01bce155a26f",
+    "buildId": "gi-i65-b4-857f1222f360-57f234755dc1",
+    "artifactId": 13549460562,
+    "artifactTarDigest": "5af8e1e6e98e861c5c1a2e25324841ac9dfb07fffae0524c1cabc1a6282ad338",
+    "hostedPayloadDigest": "308b669105c380294177f1a8d2350216af95fec31f800955d611e607542b42da",
+    "hostingVersion": "sites/ays-orbit-360-lab/versions/c5e1ae001fae793b",
+    "fileCount": 218,
+    "historicalCertificatesPreserved": 15,
+    "currentEvidenceEntriesPreserved": 16,
+    "closedP0Preserved": 4,
+    "ownerDeferredP0Preserved": 2,
+    "formalI6ProgressPercentPreserved": 50,
+    "noGlobalSynchronizationClaim": true
+  },
+  "firstIncompleteGate": "B4-004-SINIESTROS-CRONOGRAMA",
+  "nextAction": "FORENSIC_LINEAGE_AND_SCOPE_DISPOSITION_BEFORE_MODULE_DELTA; EQUIPO_CAUSAL_REPAIR_PRIORITY_WITHIN_SAME_CUMULATIVE_CONTINUITY",
+  "nextGateExecuted": false,
+  "nextGateAccepted": false,
+  "ownerDispositions": [
+    {
+      "module": "Siniestros",
+      "status": "OWNER_DEFERRED_NON_BLOCKING_PHASE_A",
+      "blockingPhaseA": false,
+      "preserveSourceEvidenceAndFindingIds": true
+    },
+    {
+      "module": "Cronograma",
+      "status": "RETAINED_IN_B4_004_FORENSIC_AUDIT_FIRST",
+      "blockingPhaseA": true,
+      "ownerDeferred": false
+    },
+    {
+      "module": "Cotizacion",
+      "status": "OWNER_DEFERRED_AFTER_FINANCE_AND_MARKETING",
+      "blockingPhaseA": false,
+      "after": [
+        "Finanzas",
+        "Marketing"
+      ],
+      "preserveSourceEvidenceAndFindingIds": true
+    },
+    {
+      "module": "Comparacion",
+      "status": "OWNER_DEFERRED_AFTER_FINANCE_AND_MARKETING",
+      "blockingPhaseA": false,
+      "after": [
+        "Finanzas",
+        "Marketing"
+      ],
+      "preserveSourceEvidenceAndFindingIds": true
+    },
+    {
+      "module": "Conocimiento_asegurador",
+      "status": "OWNER_DEFERRED_AFTER_FINANCE_AND_MARKETING",
+      "blockingPhaseA": false,
+      "after": [
+        "Finanzas",
+        "Marketing"
+      ],
+      "preserveSourceEvidenceAndFindingIds": true
+    },
+    {
+      "module": "Renovaciones",
+      "status": "PASS_PRESERVED_SCOPED_EVIDENCE",
+      "visualReceiptBlob": "68c79350c7c02f20cf4427ca82300ba82c776ff8",
+      "functionalReceiptBlob": "e8c971abc1e676c98cafa65801b9d8cdbc473e38",
+      "runtimeOwnerBlob": "e3eecb72e7642d4c572338d89f119ae98135f6c1",
+      "reopenOnlyOnCausalRegression": true
+    },
+    {
+      "module": "Cancelaciones",
+      "status": "PASS_PRESERVED_SCOPED_EVIDENCE",
+      "visualReceiptBlob": "1bd7a04cd61c9f654b654e42776713326686c0b0",
+      "runtimeOwnerBlob": "c9f6934beea57136daca0a3292451ad0792181c1",
+      "reopenOnlyOnCausalRegression": true
+    }
+  ],
+  "team": {
+    "atUtc": "2026-11-07T16:19:45Z",
+    "browser": "Chrome",
+    "url": "https://ays-orbit-360-lab.web.app/#/equipo",
+    "principal": "Paula/Direccion/TODOS",
+    "visibleUsers": 7,
+    "visibleUnclassified": 7,
+    "writeExecuted": false,
+    "previousSignedReadback": {
+      "date": "2026-11-05",
+      "canonical": 7,
+      "internal": 4,
+      "freelance": 3,
+      "receiptBlob": "73283916e2560ec2843ba1095371a398f1cf8b4e"
+    },
+    "deployedLiveReaderBytes": "NOT_YET_READ_BACK",
+    "staticCacheCause": "classifyAdvisorDurable does not update store row after server ACK"
+  },
+  "inferenceAuthority": {
+    "version": "V6_20261001",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_I6_6_PAYMENT_INFERENCE_RECONCILIATION_LOCK_V6_20261001.json",
+    "blobSha": "b47f91000713de9c8ac317e1f3fd118b2eafc0d5",
+    "temporalAddendumPath": "artifacts/orbit360-recovery/project-sources-v2/v7/11_ADDENDUM_PAGOS_COBROS_CONCILIACION_FECHAS_INFERENCIA_EVERGREEN_V7_2026-09-26.md",
+    "temporalAddendumBlobSha": "b51eb0f37f48a4fcab0336b8b300c559b0f76714",
+    "highConfidenceAutoApplicationPreserved": true,
+    "perRowApprovalRequired": false,
+    "directEvidenceMayEnrichExistingInferenceWithoutDuplicate": true,
+    "importerMustUseSameCanonicalEngine": true,
+    "unknownPolicyIsolatedForImmediateOwnerQuestion": true,
+    "missingConfigurationStatus": "REQUIERE_CONFIGURACION",
+    "noSilentDefaultCommissionRates": true,
+    "noImportForVisualizationRepair": true,
+    "crossModuleEffectsRequired": [
+      "recibos",
+      "cartera",
+      "cobros",
+      "cliente360_pagos_cobros_comisiones",
+      "clientes",
+      "polizas",
+      "comisiones_empresa",
+      "finanzas_cxc",
+      "finanzas_caja_bancos",
+      "finanzas_cxp",
+      "liquidacion_vendedores",
+      "inicio_metas_reportes",
+      "historial_procedencia"
+    ]
+  },
+  "sourceInventory": {
+    "status": "OBSERVED_CURRENT_FOLDER_METADATA_AND_FOCAL_DOCUMENT_REVIEW_NOT_FULL_BATCH_RECONCILIATION",
+    "folder": "https://drive.google.com/drive/folders/1dHNEDY60n9xvGlTaLAn4Gjdy-8YXdEKc",
+    "folderId": "1dHNEDY60n9xvGlTaLAn4Gjdy-8YXdEKc",
+    "name": "Noviembre",
+    "parentId": "1vA87CSxXPAuoMnz89zSu2fhjIVu8kpRn",
+    "documents": [
+      {
+        "id": "1RpilfpT8LoUmrqx4dsa0HqCqcAEq1jmt",
+        "name": "Planilla de comisiones Aseguradora Guatemalteca Octubre.xlsx",
+        "mimeType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "modifiedTime": "2026-11-07T15:39:07.128Z",
+        "url": "https://docs.google.com/spreadsheets/d/1RpilfpT8LoUmrqx4dsa0HqCqcAEq1jmt/edit?usp=drivesdk&ouid=113430520565810899322&rtpof=true&sd=true"
+      },
+      {
+        "id": "1X4W1tTEqx0smIKXMoHyksx2vmehzHveW",
+        "name": "FV Aseguradora Guatemalteca.pdf",
+        "mimeType": "application/pdf",
+        "modifiedTime": "2026-11-07T15:35:15.867Z",
+        "url": "https://drive.google.com/file/d/1X4W1tTEqx0smIKXMoHyksx2vmehzHveW/view?usp=drivesdk"
+      },
+      {
+        "id": "1LjKm3kH2m1UwP_Gr9mhiSKRon0NF9yON",
+        "name": "Planilla de comisiones GyT $ Octubre.pdf",
+        "mimeType": "application/pdf",
+        "modifiedTime": "2026-11-07T15:31:22.558Z",
+        "url": "https://drive.google.com/file/d/1LjKm3kH2m1UwP_Gr9mhiSKRon0NF9yON/view?usp=drivesdk"
+      },
+      {
+        "id": "1S4o6YCedAXmtyNR47F9XOUzgqf9EGIqO",
+        "name": "Planilla de comisiones GyT Q Octubre.pdf",
+        "mimeType": "application/pdf",
+        "modifiedTime": "2026-11-07T15:30:55.923Z",
+        "url": "https://drive.google.com/file/d/1S4o6YCedAXmtyNR47F9XOUzgqf9EGIqO/view?usp=drivesdk"
+      },
+      {
+        "id": "1K_7fE_OsBgWGy1O8-PpdXOfTB2daG3Ei",
+        "name": "FV Aseguradora General ok.pdf",
+        "mimeType": "application/pdf",
+        "modifiedTime": "2026-11-05T23:09:25.450Z",
+        "url": "https://drive.google.com/file/d/1K_7fE_OsBgWGy1O8-PpdXOfTB2daG3Ei/view?usp=drivesdk"
+      },
+      {
+        "id": "1tACLCULJv_wvFEy9qRLpD6em3eEBcMcU",
+        "name": "FV El Roble.pdf",
+        "mimeType": "application/pdf",
+        "modifiedTime": "2026-11-05T22:39:11.154Z",
+        "url": "https://drive.google.com/file/d/1tACLCULJv_wvFEy9qRLpD6em3eEBcMcU/view?usp=drivesdk"
+      },
+      {
+        "id": "1ZFVFR6lV0tQ1oGZTjTTgq2qU9IKPEP5c",
+        "name": "Planilla de Comisiones El Roble.CSV",
+        "mimeType": "text/csv",
+        "modifiedTime": "2026-11-05T22:38:22.030Z",
+        "url": "https://drive.google.com/file/d/1ZFVFR6lV0tQ1oGZTjTTgq2qU9IKPEP5c/view?usp=drivesdk"
+      },
+      {
+        "id": "10PhE2v3MA6hTF1Kbu9aZRrlSADOajcJg",
+        "name": "FV Mapfre.pdf",
+        "mimeType": "application/pdf",
+        "modifiedTime": "2026-11-05T22:35:50.787Z",
+        "url": "https://drive.google.com/file/d/10PhE2v3MA6hTF1Kbu9aZRrlSADOajcJg/view?usp=drivesdk"
+      },
+      {
+        "id": "19U_xqMJmlitl8_muzZ8Jp__q0h0Dke1P",
+        "name": "Planilla de comisiones Mapfre Octubre",
+        "mimeType": "text/html",
+        "modifiedTime": "2026-11-05T22:31:06.724Z",
+        "url": "https://drive.google.com/file/d/19U_xqMJmlitl8_muzZ8Jp__q0h0Dke1P/view?usp=drivesdk"
+      },
+      {
+        "id": "1rajJ0e74WiDowzo6heWPTS0xuEXh5wvN",
+        "name": "Planilla de comisiones Universales Octubre.pdf",
+        "mimeType": "application/pdf",
+        "modifiedTime": "2026-11-05T22:28:57.529Z",
+        "url": "https://drive.google.com/file/d/1rajJ0e74WiDowzo6heWPTS0xuEXh5wvN/view?usp=drivesdk"
+      },
+      {
+        "id": "1p2cCdLaD3MC7xJnscdtMSZHLdd-3OiCk",
+        "name": "FV Universales.pdf",
+        "mimeType": "application/pdf",
+        "modifiedTime": "2026-11-05T22:26:11.412Z",
+        "url": "https://drive.google.com/file/d/1p2cCdLaD3MC7xJnscdtMSZHLdd-3OiCk/view?usp=drivesdk"
+      },
+      {
+        "id": "11bzc6MbuhMJ4l0mBdnQNEDmuPQRlq4a0",
+        "name": "FV Ficohsa.pdf",
+        "mimeType": "application/pdf",
+        "modifiedTime": "2026-11-05T22:23:07.571Z",
+        "url": "https://drive.google.com/file/d/11bzc6MbuhMJ4l0mBdnQNEDmuPQRlq4a0/view?usp=drivesdk"
+      },
+      {
+        "id": "1_yH82M7deJ6og98wTI663s3urK2i3Au7",
+        "name": "Planilla de comisiones Ficohsa Octubre.xlsx",
+        "mimeType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "modifiedTime": "2026-11-05T22:22:11.013Z",
+        "url": "https://docs.google.com/spreadsheets/d/1_yH82M7deJ6og98wTI663s3urK2i3Au7/edit?usp=drivesdk&ouid=113430520565810899322&rtpof=true&sd=true"
+      },
+      {
+        "id": "1AsmY1NTxhqiCL6T657-Kz5X4Qpjyqnfg",
+        "name": "FV Banrural.pdf",
+        "mimeType": "application/pdf",
+        "modifiedTime": "2026-11-05T22:19:09.620Z",
+        "url": "https://drive.google.com/file/d/1AsmY1NTxhqiCL6T657-Kz5X4Qpjyqnfg/view?usp=drivesdk"
+      },
+      {
+        "id": "1wz6gJIymDdKrXC9SvYhftFt_rgFmY67s",
+        "name": "Planilla de comisiones Banrural Octubre.xlsx",
+        "mimeType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "modifiedTime": "2026-11-05T22:16:27.331Z",
+        "url": "https://docs.google.com/spreadsheets/d/1wz6gJIymDdKrXC9SvYhftFt_rgFmY67s/edit?usp=drivesdk&ouid=113430520565810899322&rtpof=true&sd=true"
+      },
+      {
+        "id": "1Wr04e-_vjiykrWHgMquwXfDgNVWattSF",
+        "name": "FV GyT $.pdf",
+        "mimeType": "application/pdf",
+        "modifiedTime": "2026-11-04T23:29:55.170Z",
+        "url": "https://drive.google.com/file/d/1Wr04e-_vjiykrWHgMquwXfDgNVWattSF/view?usp=drivesdk"
+      },
+      {
+        "id": "1Oj7A-EY4et4NiqAVHjoAyrRB8UtNS7S6",
+        "name": "FV GyT Q.pdf",
+        "mimeType": "application/pdf",
+        "modifiedTime": "2026-11-04T23:28:06.197Z",
+        "url": "https://drive.google.com/file/d/1Oj7A-EY4et4NiqAVHjoAyrRB8UtNS7S6/view?usp=drivesdk"
+      },
+      {
+        "id": "1I4ab1vEsxYXHZuy7T1WishEWT-_tZoDL",
+        "name": "Planilla de comisionesBantrab Octubre.pdf",
+        "mimeType": "application/pdf",
+        "modifiedTime": "2026-11-04T23:23:06.652Z",
+        "url": "https://drive.google.com/file/d/1I4ab1vEsxYXHZuy7T1WishEWT-_tZoDL/view?usp=drivesdk"
+      },
+      {
+        "id": "1jsSSV4DPKJpPPq7q7yfRoBz0YnAFJY96",
+        "name": "FV Bantrab.pdf",
+        "mimeType": "application/pdf",
+        "modifiedTime": "2026-11-04T23:22:49.387Z",
+        "url": "https://drive.google.com/file/d/1jsSSV4DPKJpPPq7q7yfRoBz0YnAFJY96/view?usp=drivesdk"
+      },
+      {
+        "id": "1C9yulQu52mfNmd9kiAC4pdecop2tb8m0",
+        "name": "Planilla de comisiones ASeguradora General Octubre.pdf",
+        "mimeType": "application/pdf",
+        "modifiedTime": "2026-11-04T23:03:37.821Z",
+        "url": "https://drive.google.com/file/d/1C9yulQu52mfNmd9kiAC4pdecop2tb8m0/view?usp=drivesdk"
+      }
+    ],
+    "documentCount": 20,
+    "invoiceCount": 10,
+    "statementCount": 10,
+    "insurerCount": 9,
+    "addedVerified": [
+      "1RpilfpT8LoUmrqx4dsa0HqCqcAEq1jmt",
+      "1X4W1tTEqx0smIKXMoHyksx2vmehzHveW",
+      "1LjKm3kH2m1UwP_Gr9mhiSKRon0NF9yON",
+      "1S4o6YCedAXmtyNR47F9XOUzgqf9EGIqO"
+    ],
+    "incorrectGeneralInvoiceAbsentFromCurrentFolder": "1Ab6E9TnvHqtyyVSt4T8aQptlDtJPBcGr",
+    "retainedCorrectGeneralInvoice": "1K_7fE_OsBgWGy1O8-PpdXOfTB2daG3Ei",
+    "documentContentHashes": "TO_PIN_BEFORE_DATA_DIFF_AND_APPLY",
+    "completePolicyMatchingExecuted": false,
+    "unmatchedPolicyListStatus": "NOT_YET_COMPUTED_DO_NOT_CLAIM_NONE",
+    "monthClarification": {
+      "ownerDeclaredLot": "NOVEMBER_COMMISSION_INVOICES_AND_COLLECTIONS",
+      "observedFact": "G&T invoices issued 2026-11-04 explicitly state October commissions; General paid section October and pending section November.",
+      "clarificationAskedOnce": true,
+      "answerReceived": false,
+      "interimHandling": "Preserve documentary premium dates/periods; November folder/billing lot is separate; no assumed bank collection or reattribution of historical payments."
+    },
+    "gyt": [
+      {
+        "currency": "GTQ",
+        "invoiceFileId": "1Oj7A-EY4et4NiqAVHjoAyrRB8UtNS7S6",
+        "statementFileId": "1S4o6YCedAXmtyNR47F9XOUzgqf9EGIqO",
+        "invoiceDate": "2026-11-04",
+        "commissionPeriod": "2026-10",
+        "invoiceTotal": 52.83,
+        "statementInvoiceTotal": 52.83,
+        "totalsMatch": true,
+        "policy": "VIME-18154",
+        "sourceInstallment": "3/12",
+        "sourceIncomeDate": "2026-10-01"
+      },
+      {
+        "currency": "USD",
+        "invoiceFileId": "1Wr04e-_vjiykrWHgMquwXfDgNVWattSF",
+        "statementFileId": "1LjKm3kH2m1UwP_Gr9mhiSKRon0NF9yON",
+        "invoiceDate": "2026-11-04",
+        "commissionPeriod": "2026-10",
+        "invoiceTotal": 20.47,
+        "statementInvoiceTotal": 20.47,
+        "totalsMatch": true,
+        "policy": "TLG$-7529",
+        "sourceInstallment": "1/1",
+        "sourceIncomeDate": "2026-10-30"
+      }
+    ],
+    "gytPolicyOwnerClarification": {
+      "policy": "VIME-18154",
+      "questionId": "gyt_vime18154_plan",
+      "ownerAnswer": "Plan mensual de doce",
+      "authority": "DIRECT_PAULA_ANSWER_THIS_SESSION",
+      "modality": "MONTHLY_12_PAYMENTS",
+      "scope": "THIS_POLICY_ONLY",
+      "applyTenInstallmentFraccionadoCeiling": false,
+      "increaseGlobalGytFraccionadoCeiling": false,
+      "remainingContractualDatesAndAmounts": "VERIFY_EXISTING_POLICY_AND_SCHEDULE; ASK_EXACT_MISSING_FIELDS_IF_NEEDED",
+      "dataApplied": false
+    },
+    "columna": {
+      "referenceAuthorized": true,
+      "currentMonthInvoicePending": true,
+      "folderId": "1s7JZiVfvgZ_6kmqR3pqLrLnmbntNlMz5",
+      "statementFileId": "1_dlAbltlzvnMSxvaRodUVhBgVNz8ASeT",
+      "invoiceFileId": "1dsFQZRYaGGS1K5Jb-ApJiUhIpWke35i4",
+      "documentPeriodFrom": "2026-09-01",
+      "documentPeriodThrough": "2026-09-30",
+      "invoiceDate": "2026-10-05",
+      "currency": "GTQ",
+      "statementCommission": 787.72,
+      "invoiceTotal": 882.25,
+      "effect": "REFERENCE_AND_PROVEN_HISTORICAL_FACTS_ONLY_NOT_NOVEMBER_PAYMENT_OR_INVOICE_EVIDENCE"
+    },
+    "statementsMayBeProvidedInDrive": true
+  },
+  "staticIntegrationFindings": [
+    {
+      "id": "NOV07-COMMISSION-MATERIALIZATION",
+      "status": "STATIC_GAP_REQUIRES_FOCAL_TEST",
+      "detail": "Canonical payment domain writes cobros/recibos/cartera; commission planner is dry-run; financial materialization and collection bridges not proven."
+    },
+    {
+      "id": "NOV07-COMMISSION-NO-DEFAULTS",
+      "status": "STATIC_MISMATCH_REQUIRES_FOCAL_TEST",
+      "detail": "Reachable comisiones-eng contains 12%/50% defaults, contrary to V6 missing-configuration semantics."
+    },
+    {
+      "id": "NOV07-GYT-CURRENCY-INVOICE-IDENTITY",
+      "status": "STATIC_MISMATCH_REQUIRES_FOCAL_TEST",
+      "detail": "Finanzas invoice dedup by insurer+period omits currency/document identity; actual two-currency G&T source requires distinct invoices."
+    },
+    {
+      "id": "NOV07-ADVISOR-PAYABLE-BASE",
+      "status": "STATIC_MISMATCH_REQUIRES_FOCAL_TEST",
+      "detail": "Liquidation base and durable CxP effects must be verified against company/advisor commission distinction."
+    }
+  ],
+  "hosting": {
+    "ownerAllowsExistingFirebaseAlternative": true,
+    "recommendation": "EXISTING_FIREBASE_HOSTING_WITH_CUSTOM_DOMAIN_APP_AYSSEGUROS_COM",
+    "domain": "app.aysseguros.com",
+    "currentFirebaseUrl": "https://ays-orbit-360-lab.web.app/",
+    "oldDomainApplicationReplaceable": true,
+    "hostdimeStillViable": true,
+    "finalDomainSwitchExecuted": false,
+    "dnsChanged": false,
+    "newFirebaseProject": false,
+    "backendMigration": false,
+    "preserveSameArtifact": true,
+    "frontendBackendParityRequired": true,
+    "operationalDataIncludedInDeploymentPackage": false,
+    "schemaMigration": "ADDITIVE_COMPATIBLE_VERSIONED_IDEMPOTENT_WITH_CONCURRENCY_PRECONDITIONS",
+    "rollback": "SOFTWARE_VERSION_ROLLBACK_DOES_NOT_RESTORE_OLD_COMPANY_DATA; SELECTIVE_DATA_COMPENSATION_IF_REQUIRED",
+    "docs": [
+      "https://firebase.google.com/docs/hosting/manage-hosting-resources",
+      "https://firebase.google.com/docs/hosting/custom-domain"
+    ]
+  },
+  "auditBeforeEveryModule": true,
+  "sourceOfHistoricalApproval": "REPOSITORY_RECEIPTS_AND_BLOBS; CHAT_IS_CONTEXT_ONLY",
+  "wholeLotCompleteRequiresAllAffectedModuleReadbacks": true,
+  "execution": {
+    "productSourceChanged": false,
+    "workflowChanged": false,
+    "productDeployed": false,
+    "dnsChanged": false,
+    "realBusinessWrites": 0,
+    "dataImportExecuted": false,
+    "newModulePassGranted": false,
+    "sourceFreezeBuildRequired": false,
+    "codexUsed": false
+  },
+  "baselineGovernance": {
+    "runId": 42330379248,
+    "conclusion": "success",
+    "sourceSha": "74312cc3621ba155ee288a0afb530a488246f0e6"
+  },
+  "nextRequiredResult": "FIX_EQUIPO_READ_PARITY_AND_IMMEDIATE_STORE_UPDATE; FORENSIC_AUDIT_CRONOGRAMA; PREPARE_SOURCE_DIFF_WITHOUT_REAL_WRITES"
+}

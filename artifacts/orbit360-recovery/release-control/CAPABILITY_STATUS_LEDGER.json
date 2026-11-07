@@ -763,5 +763,52 @@
     "acceptanceScope": "Current immutable candidate42 B4-003 only. Earlier accepted module evidence is preserved monotonically; no new global-IAM/security certification or other gate acceptance.",
     "subsequentGateAuthorized": false,
     "augustDataRefreshAuthorized": false
+  },
+  "ownerDecisionFreeze20261107": {
+    "recordType": "ADDITIVE_OWNER_DECISION_FREEZE_NOT_NEW_PASS",
+    "status": "OWNER_DECISIONS_AND_WORK_PLAN_FROZEN",
+    "recordedAtUtc": "2026-11-07T16:25:48Z",
+    "path": "artifacts/orbit360-recovery/release-control/OWNER_DECISION_FREEZE_AND_RECONCILIATION_PLAN_20261107.json",
+    "blobSha": "ca5a1cb2a26ddff1c6fafc4ea1ab73e97500b5d1",
+    "planPath": "artifacts/orbit360-recovery/release-control/PLAN_OPERATIVO_DECISIONES_PAULA_20261107.md",
+    "planBlobSha": "4f076ca32f38f3eead117a9384ff5351d54bb3fb",
+    "authorityBaseHead": "74312cc3621ba155ee288a0afb530a488246f0e6",
+    "basis": "PAULA_CURRENT_EXPLICIT_INSTRUCTIONS_AND_FOCAL_GYT_MONTHLY_12_ANSWER",
+    "preservedB4003ReceiptBlobSha": "0879188bf245248fa1092fb2014e35e14e802b44",
+    "preservedProductSourceSha": "857f1222f360a42a06e012810a1c01bce155a26f",
+    "firstIncompleteGate": "B4-004-SINIESTROS-CRONOGRAMA",
+    "nextAction": "FORENSIC_LINEAGE_AND_SCOPE_DISPOSITION_BEFORE_MODULE_DELTA; EQUIPO_CAUSAL_REPAIR_PRIORITY",
+    "nextGateExecuted": false,
+    "nextGateAccepted": false,
+    "productSourceChanged": false,
+    "realBusinessWrites": 0,
+    "currentExecutionPrecedence": "Current42 formal closure remains; this record governs current scope dispositions and planning over historical R20/R23 snapshots.",
+    "noNewIterationsOrParallelReleaseMethod": true,
+    "noGlobalSynchronizationClaim": true
+  },
+  "additionalApprovedModuleEvidence20261107": [
+    {
+      "module": "Renovaciones",
+      "status": "PASS_PRESERVED_SCOPED_EVIDENCE",
+      "visualReceiptBlob": "68c79350c7c02f20cf4427ca82300ba82c776ff8",
+      "functionalReceiptBlob": "e8c971abc1e676c98cafa65801b9d8cdbc473e38",
+      "runtimeOwnerBlob": "e3eecb72e7642d4c572338d89f119ae98135f6c1",
+      "reopenOnlyOnCausalRegression": true
+    },
+    {
+      "module": "Cancelaciones",
+      "status": "PASS_PRESERVED_SCOPED_EVIDENCE",
+      "visualReceiptBlob": "1bd7a04cd61c9f654b654e42776713326686c0b0",
+      "runtimeOwnerBlob": "c9f6934beea57136daca0a3292451ad0792181c1",
+      "reopenOnlyOnCausalRegression": true
+    }
+  ],
+  "currentTeamDiscrepancy20261107": {
+    "status": "LIVE_VISIBLE_CLASSIFICATION_DISCREPANCY_REPRODUCED",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/OWNER_DECISION_FREEZE_AND_RECONCILIATION_PLAN_20261107.json",
+    "receiptBlobSha": "ca5a1cb2a26ddff1c6fafc4ea1ab73e97500b5d1",
+    "newPass": false,
+    "repeatSevenClassifications": false,
+    "historicalCertificateArrayPreserved": true
   }
 }

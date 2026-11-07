@@ -1744,8 +1744,42 @@
     "historicalReadbackExecutionRecorded": true,
     "currentCleanupAttemptConfirmationObserved": false
   },
-  "b4003HistorialCurrent40OperativoCountryMatrixFocal20261106": {"dateLocal":"2026-11-06","status":"ONE_CURRENT_CANDIDATE_READ_ONLY_MATRIX_DELTA_PREVIEW_PASS_SCOPE_ONLY","receiptPath":"artifacts/orbit360-recovery/release-control/I6_5_B4_003_CURRENT40_HISTORIAL_OPERATIVO_COUNTRY_SCOPE_BROWSER_DELTA_20261106.json","receiptBlobSha":"3010cb55b2202dc5f7b2712fea173d44b461177f","sourceSha":"b01dceafc1ec2b1e786626116251e248be1e23f4","buildId":"gi-i65-b4-b01dceafc1ec-57f234755dc1","artifactId":13527102882,"principal":"Paula (Ver como Operativo)","module":"Historial","GT":23,"CO":13,"TODOS":36,"advisorTodos":24,"noWrite":true,"doesNotProveFullMatrix":true,"releaseGateUnchanged":true},
-  "b4003E4GtCobrosReportesSameScopeCurrentCandidate20261106": {"dateLocal":"2026-11-06","status":"FOCAL_PREVIEW_PASS_SCOPE_ONLY_NOT_FULL_GATE","receiptPath":"artifacts/orbit360-recovery/release-control/I6_5_B4_003_E4_GT_COBROS_REPORTES_CURRENT_CANDIDATE_20261106.json","receiptBlobSha":"ab12c69a460798273abe22db09f3311ea5678a2e","sourceSha":"b01dceafc1ec2b1e786626116251e248be1e23f4","buildId":"gi-i65-b4-b01dceafc1ec-57f234755dc1","immutableArtifactId":13527102882,"role":"Paula Dirección","country":"GT","period":"Todos","filters":"Todos","cobros":2503,"reportes":2503,"anulado":12,"qaExcluded":1,"releaseGateUnchanged":true},
+  "b4003HistorialCurrent40OperativoCountryMatrixFocal20261106": {
+    "dateLocal": "2026-11-06",
+    "status": "ONE_CURRENT_CANDIDATE_READ_ONLY_MATRIX_DELTA_PREVIEW_PASS_SCOPE_ONLY",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CURRENT40_HISTORIAL_OPERATIVO_COUNTRY_SCOPE_BROWSER_DELTA_20261106.json",
+    "receiptBlobSha": "3010cb55b2202dc5f7b2712fea173d44b461177f",
+    "sourceSha": "b01dceafc1ec2b1e786626116251e248be1e23f4",
+    "buildId": "gi-i65-b4-b01dceafc1ec-57f234755dc1",
+    "artifactId": 13527102882,
+    "principal": "Paula (Ver como Operativo)",
+    "module": "Historial",
+    "GT": 23,
+    "CO": 13,
+    "TODOS": 36,
+    "advisorTodos": 24,
+    "noWrite": true,
+    "doesNotProveFullMatrix": true,
+    "releaseGateUnchanged": true
+  },
+  "b4003E4GtCobrosReportesSameScopeCurrentCandidate20261106": {
+    "dateLocal": "2026-11-06",
+    "status": "FOCAL_PREVIEW_PASS_SCOPE_ONLY_NOT_FULL_GATE",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_E4_GT_COBROS_REPORTES_CURRENT_CANDIDATE_20261106.json",
+    "receiptBlobSha": "ab12c69a460798273abe22db09f3311ea5678a2e",
+    "sourceSha": "b01dceafc1ec2b1e786626116251e248be1e23f4",
+    "buildId": "gi-i65-b4-b01dceafc1ec-57f234755dc1",
+    "immutableArtifactId": 13527102882,
+    "role": "Paula Dirección",
+    "country": "GT",
+    "period": "Todos",
+    "filters": "Todos",
+    "cobros": 2503,
+    "reportes": 2503,
+    "anulado": 12,
+    "qaExcluded": 1,
+    "releaseGateUnchanged": true
+  },
   "b4003E4AnuladoRootFixSignedPreview20261104": {
     "status": "SOURCE_CI_EXACT_PREVIEW_AND_SAMUEL_COUNTS_PASS_RELEASE_REMAINDER_HOLD",
     "recordType": "ADDITIVE_LATEST_FOCAL_E4_EVIDENCE_POINTER_NOT_PRODUCTION_ACCEPTANCE",
@@ -2500,7 +2534,7 @@
     "capabilityCount": 15,
     "mayGovernGate": false,
     "mayGovernReleaseIdentity": false,
-    "latestBlobSha": "81511551540dbe0c1dbc54d9c4f8e00537550716"
+    "latestBlobSha": "46415766377892efe33cf57f750c7690198f87c5"
   },
   "projectSources": {
     "activePackage": "GRAVICENTRA_PROJECT_SOURCES_EVERGREEN_V7",
@@ -8728,9 +8762,9 @@
   },
   "paymentInferenceReconciliationControl": {
     "status": "FROZEN_ACTIVE",
-    "activeVersion": "V4_20260930",
-    "path": "artifacts/orbit360-recovery/release-control/I6_5_I6_6_PAYMENT_INFERENCE_RECONCILIATION_LOCK_V4_20260930.json",
-    "blobSha": "f31b38d5d7e0beeba6b2ef9f695516b9cbcac986",
+    "activeVersion": "V6_20261001",
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_I6_6_PAYMENT_INFERENCE_RECONCILIATION_LOCK_V6_20261001.json",
+    "blobSha": "b47f91000713de9c8ac317e1f3fd118b2eafc0d5",
     "autoCommitHighConfidence": true,
     "humanApprovalForHighConfidenceInference": false,
     "clientReportedPaymentSufficient": true,
@@ -8743,7 +8777,24 @@
     "operativeDirectPaymentRequiresSecondApproval": false,
     "individualReconciliationFallbackRequired": true,
     "clientPortalPaymentIntakeOperational": false,
-    "currentClientPortalPaymentCountExpected": 0
+    "currentClientPortalPaymentCountExpected": 0,
+    "previousActiveRulePointer": {
+      "activeVersion": "V4_20260930",
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_I6_6_PAYMENT_INFERENCE_RECONCILIATION_LOCK_V4_20260930.json",
+      "blobSha": "f31b38d5d7e0beeba6b2ef9f695516b9cbcac986",
+      "preservedInGitHistory": true
+    },
+    "currentOriginAndTimingAuthority": "V6 originContract and V7 temporal addendum; legacy flags do not authorize unvalidated advisor/portal reports as paid.",
+    "ownerPolicyModalities20261107": {
+      "policy": "VIME-18154",
+      "insurer": "G&T",
+      "modality": "MONTHLY_12_PAYMENTS",
+      "ownerConfirmed": true,
+      "scope": "POLICY_ONLY_NOT_GLOBAL_FRACCIONADO_CEILING",
+      "receiptPath": "artifacts/orbit360-recovery/release-control/OWNER_DECISION_FREEZE_AND_RECONCILIATION_PLAN_20261107.json",
+      "receiptBlobSha": "ca5a1cb2a26ddff1c6fafc4ea1ab73e97500b5d1",
+      "dataApplied": false
+    }
   },
   "currentB3": {
     "status": "B3_PASS_PENDING_B4_ENTRY_GUARD",
@@ -10386,7 +10437,7 @@
     "guardPath": "tools/gravicentra-open-findings-continuity-guard-v1.mjs",
     "guardBlobSha": "868a0ba1a492d9adc8d91655f152b6fa7980f499",
     "masterPlanPath": "artifacts/orbit360-recovery/release-control/I6_PENDING_CLOSURE_MASTER_PLAN_LOCK_20261004.json",
-    "masterPlanBlobSha": "458c5af57b2f7d9453d0064eba0cd737edf14ef4",
+    "masterPlanBlobSha": "75ba11734557e4d499a7f89c06a822a2f0f3abf5",
     "inventoryCount": 295,
     "attentionCount": 166,
     "rule": "Existing no-loss register now 289 findings; previously approved PASS preserved; only current P0 blocks current release.",
@@ -10412,14 +10463,16 @@
   "pendingClosureMasterPlan": {
     "status": "B4_003_CLOSED_PASS_CURRENT42_NEXT_FROZEN_GATE_NOT_EXECUTED",
     "path": "artifacts/orbit360-recovery/release-control/I6_PENDING_CLOSURE_MASTER_PLAN_LOCK_20261004.json",
-    "blobSha": "458c5af57b2f7d9453d0064eba0cd737edf14ef4",
+    "blobSha": "75ba11734557e4d499a7f89c06a822a2f0f3abf5",
     "baselineFindingCount": 282,
     "currentGate": "B4-003",
     "currentRevision": "R20-UAT3",
     "b4004Held": true,
     "extendsPlanV2": true,
     "conversationDependent": false,
-    "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_R23_CONTRACT_AND_EXACT_PREVIEW"
+    "nextAction": "I6_5_FORENSIC_REMEDIATION_B4_003_R23_CONTRACT_AND_EXACT_PREVIEW",
+    "currentDecisionPointer": "ownerDecisionFreeze20261107",
+    "firstIncompleteGateUnderCurrentOwnerScope": "B4-004-SINIESTROS-CRONOGRAMA"
   },
   "compositionLockBlobSha": "f9e3cce4f7b802966abdcc4072557821f3f1cac7",
   "findingLedgerBlobSha": "435850b4933003d9788cb28f24df8f64194aae62",
@@ -21571,5 +21624,28 @@
     "adminAndSuperadminRealUserUatNotDone": true,
     "noDataWrites": true,
     "sourceBuildAtRead": "gi-i65-b4-f3e4503afbc7-57f234755dc1"
-  }
+  },
+  "ownerDecisionFreeze20261107": {
+    "recordType": "ADDITIVE_OWNER_DECISION_FREEZE_NOT_NEW_PASS",
+    "status": "OWNER_DECISIONS_AND_WORK_PLAN_FROZEN",
+    "recordedAtUtc": "2026-11-07T16:25:48Z",
+    "path": "artifacts/orbit360-recovery/release-control/OWNER_DECISION_FREEZE_AND_RECONCILIATION_PLAN_20261107.json",
+    "blobSha": "ca5a1cb2a26ddff1c6fafc4ea1ab73e97500b5d1",
+    "planPath": "artifacts/orbit360-recovery/release-control/PLAN_OPERATIVO_DECISIONES_PAULA_20261107.md",
+    "planBlobSha": "4f076ca32f38f3eead117a9384ff5351d54bb3fb",
+    "authorityBaseHead": "74312cc3621ba155ee288a0afb530a488246f0e6",
+    "basis": "PAULA_CURRENT_EXPLICIT_INSTRUCTIONS_AND_FOCAL_GYT_MONTHLY_12_ANSWER",
+    "preservedB4003ReceiptBlobSha": "0879188bf245248fa1092fb2014e35e14e802b44",
+    "preservedProductSourceSha": "857f1222f360a42a06e012810a1c01bce155a26f",
+    "firstIncompleteGate": "B4-004-SINIESTROS-CRONOGRAMA",
+    "nextAction": "FORENSIC_LINEAGE_AND_SCOPE_DISPOSITION_BEFORE_MODULE_DELTA; EQUIPO_CAUSAL_REPAIR_PRIORITY",
+    "nextGateExecuted": false,
+    "nextGateAccepted": false,
+    "productSourceChanged": false,
+    "realBusinessWrites": 0,
+    "currentExecutionPrecedence": "Current42 formal closure remains; this record governs current scope dispositions and planning over historical R20/R23 snapshots.",
+    "noNewIterationsOrParallelReleaseMethod": true,
+    "noGlobalSynchronizationClaim": true
+  },
+  "currentExecutionDecisionPointer": "ownerDecisionFreeze20261107"
 }

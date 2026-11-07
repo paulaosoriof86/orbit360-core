@@ -10,7 +10,7 @@
   "branch": "recovery/fase-a-clean-20260831",
   "forensicOriginSha": "9c95f31461f2eabe9804625b5659bee772f5602a",
   "createdAtUtc": "2026-08-31T18:00:00Z",
-  "updatedAtUtc": "2026-11-07T02:24:53Z",
+  "updatedAtUtc": "2026-11-07T16:25:48Z",
   "status": "ITERATION_2_SOURCE_MATERIALIZED_VALIDATION_PENDING",
   "currentIteration": 2,
   "lastCompletedIteration": 1,
@@ -187,7 +187,7 @@
     "phaseAIterationStatuses": "HISTORICAL_FIELDS_ABOVE_PRESERVED_UNTIL_FORMAL_GATE_EVIDENCE;_NO_NEW_PASS_INFERRED",
     "labDataWriteScope": "ONLY_35_AUTHORIZED_COUNTRY_FIELDS;_NO_AUGUST_REFRESH"
   },
-  "nextAction": "B4-003 closed on immutable candidate42 after exact LIVE promotion, authorized single synthetic insurer create/read/reload, atomic remove+audit, canonical and UI absence, and final affected-module integrity. Preserve 15 historical certificates, 16 current evidence entries, 4 closed P0 plus 2 owner-deferred QA. Return to the first incomplete frozen-plan gate; no next-gate execution or data refresh is authorized by this seal.",
+  "nextAction": "Preserve current42 B4-003 LIVE acceptance. Follow ownerDecisionFreeze20261107 and its referenced complete plan: forensic audit before each module delta, causal Equipo synchronization repair, first incomplete B4-004 with Siniestros owner-deferred and Cronograma retained; prepare November documentary reconciliation under V6/V7. No new gate PASS or data import is claimed by this decision freeze.",
   "sourceOfTruth": {
     "projectBoundaryPrevalentAddendum": "orbit360-platform/docs/recovery/ADDENDUM_PREVALENTE_CHATGPT_PROJECT_BOUNDARY_20260831.md",
     "mutableState": "orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json",
@@ -623,5 +623,28 @@
     },
     "liveSyntheticCompleteRunId": 42329143683,
     "liveSyntheticTotalCustomTokensMinted": 2
-  }
+  },
+  "ownerDecisionFreeze20261107": {
+    "recordType": "ADDITIVE_OWNER_DECISION_FREEZE_NOT_NEW_PASS",
+    "status": "OWNER_DECISIONS_AND_WORK_PLAN_FROZEN",
+    "recordedAtUtc": "2026-11-07T16:25:48Z",
+    "path": "artifacts/orbit360-recovery/release-control/OWNER_DECISION_FREEZE_AND_RECONCILIATION_PLAN_20261107.json",
+    "blobSha": "ca5a1cb2a26ddff1c6fafc4ea1ab73e97500b5d1",
+    "planPath": "artifacts/orbit360-recovery/release-control/PLAN_OPERATIVO_DECISIONES_PAULA_20261107.md",
+    "planBlobSha": "4f076ca32f38f3eead117a9384ff5351d54bb3fb",
+    "authorityBaseHead": "74312cc3621ba155ee288a0afb530a488246f0e6",
+    "basis": "PAULA_CURRENT_EXPLICIT_INSTRUCTIONS_AND_FOCAL_GYT_MONTHLY_12_ANSWER",
+    "preservedB4003ReceiptBlobSha": "0879188bf245248fa1092fb2014e35e14e802b44",
+    "preservedProductSourceSha": "857f1222f360a42a06e012810a1c01bce155a26f",
+    "firstIncompleteGate": "B4-004-SINIESTROS-CRONOGRAMA",
+    "nextAction": "FORENSIC_LINEAGE_AND_SCOPE_DISPOSITION_BEFORE_MODULE_DELTA; EQUIPO_CAUSAL_REPAIR_PRIORITY",
+    "nextGateExecuted": false,
+    "nextGateAccepted": false,
+    "productSourceChanged": false,
+    "realBusinessWrites": 0,
+    "currentExecutionPrecedence": "Current42 formal closure remains; this record governs current scope dispositions and planning over historical R20/R23 snapshots.",
+    "noNewIterationsOrParallelReleaseMethod": true,
+    "noGlobalSynchronizationClaim": true
+  },
+  "currentExecutionDecisionPointer": "ownerDecisionFreeze20261107"
 }
