@@ -492,7 +492,7 @@
     "schema": "GRAVICENTRA_OWNER_DOCUMENTARY_SUCCESSOR_VALIDATION_V1",
     "baseHead": "74312cc3621ba155ee288a0afb530a488246f0e6",
     "guardPath": "tools/gravicentra-b4-003-formal-live-closeout-guard.mjs",
-    "guardBlobSha": "af38204b6de98e5ad7888dca0dddc8504101c44f",
+    "guardBlobSha": "65ad4e5b11f76d1c91c66b645c4bb49cb3fc7edd",
     "testPath": "tools/gravicentra-b4-003-owner-decision-successor.test.mjs",
     "testBlobSha": "790f27717ba9a1a985f007e4910a779898573d20",
     "sealedMasterPlanBlobPreserved": "458c5af57b2f7d9453d0064eba0cd737edf14ef4",
@@ -3767,14 +3767,14 @@
       {
         "path": "tools/gravicentra-b4-004-policy-capture-preview-qa.mjs",
         "previousBlobSha": null,
-        "blobSha": "f52fab5a3d4d1a657fa3a0426aa1a962a4ce91cf",
-        "sha256": "38ed2ffd0d784b3854a81fbeeef8d98a5fca55838ea51547bf1439cd16290cc7"
+        "blobSha": "c9a1442a5b740d950ed494e00515c07176bc957a",
+        "sha256": "e4cce219a95ef5f747d9f16b2a268f8d90103cadb1749f3a7142c92774004c34"
       },
       {
         "path": "tools/gravicentra-b4-004-policy-capture-preview-qa.test.mjs",
         "previousBlobSha": null,
-        "blobSha": "cacabf73a04e460cf1e18b9baee89f9fa7e03cfc",
-        "sha256": "22a45f1b73fff7cffbe1c57690a69b9ba83cf930e55092169ddf983be8387020"
+        "blobSha": "7200830634c275690bceb7a82d598b8b9ae51093",
+        "sha256": "80f8ddf7826d77b27847589d819659e16e0ddde531faaf2497f2c9701133c796"
       },
       {
         "path": "tools/gravicentra-b4-004-receipt-editor-preservation.test.cjs",
@@ -3799,6 +3799,12 @@
         "previousBlobSha": null,
         "blobSha": "2de8a838fd3f9fec83a4ea853ba5086bb9645203",
         "sha256": "d887cc6385bb51c18adcc5f2629dadd67c41d5a48c43a0edd4b6f5146597e84d"
+      },
+      {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_004_POLICY_CAPTURE_PREVIEW_FAILED_RUN42417572679_20261107.json",
+        "previousBlobSha": null,
+        "blobSha": "c214ee764ba333f341269b594c4e8c8a6b35ffd0",
+        "sha256": "76521668b57861f37e1f01c43b782ee8928dbc0193132248013b26e8682eab1a"
       }
     ],
     "preservedFiles": [
@@ -3832,9 +3838,9 @@
       "clientCreateCountryScopeTests": 6,
       "independentActualWriterBackendTests": 12,
       "governancePositiveNegativeChecks": 20,
-      "signedPreviewUat": "RUN42416303881_FAILED_AT_QA_FENCE_ZERO_PRODUCT_COMMANDS_RETRY_PENDING",
+      "signedPreviewUat": "RUN42417572679_FOUR_OF_SEVEN_FOCAL_CHECKS_PASSED_PRODUCT_SELECTION_RETRY_PENDING",
       "sameArtifactPromotion": "PENDING_NEW_RECEIPT_AND_CURSOR",
-      "previewIdentityBoundaryTests": 16,
+      "previewIdentityBoundaryTests": 19,
       "receiptEditorPreservationTests": 11
     },
     "authenticatedQaMode": {
@@ -3842,7 +3848,7 @@
       "helper": "tools/gravicentra-b4-004-policy-capture-preview-qa.mjs",
       "test": "tools/gravicentra-b4-004-policy-capture-preview-qa.test.mjs",
       "environmentMode": "B4_004_POLICY_CAPTURE_QA",
-      "status": "FIRST_AUTHENTICATED_RUN_FAILED_AT_QA_FENCE_CANONICAL_ROLE_FIX_PREPARED_RETRY_PENDING",
+      "status": "SECOND_AUTHENTICATED_RUN_FOUR_CHECKS_PASSED_REQUIRED_PRODUCT_SELECTION_FIX_PREPARED_RETRY_PENDING",
       "receiptSchema": "GRAVICENTRA_B4_004_POLICY_CAPTURE_FOCAL_PREVIEW_QA_V1",
       "requiredStatus": "FOCAL_AUTHENTICATED_UI_PASS",
       "afterExactArtifactReadback": true,
@@ -3887,6 +3893,43 @@
       "priorGuardConclusion": "success",
       "newImmutablePreviewUat": "PENDING",
       "productionAccepted": false
+    },
+    "currentQaAttemptDecisionPointer": "qaRequiredProductSelectionCorrection20261107",
+    "qaRequiredProductSelectionCorrection20261107": {
+      "schema": "GRAVICENTRA_POLICY_CAPTURE_QA_REQUIRED_PRODUCT_CORRECTION_V1",
+      "parentSourceSha": "70778ea57aefb03d3fe1b13cbee4e9f920a1b461",
+      "status": "SOURCE_PREPARED_AUTHENTICATED_RETRY_PENDING",
+      "failedRunId": 42417572679,
+      "failedReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_004_POLICY_CAPTURE_PREVIEW_FAILED_RUN42417572679_20261107.json",
+      "failedReceiptBlobSha": "c214ee764ba333f341269b594c4e8c8a6b35ffd0",
+      "previousRoleCorrectionPreserved": true,
+      "previousRetryRoleFencePassed": true,
+      "failedFocalChecksCompleted": 4,
+      "failedFocalChecksRequired": 7,
+      "failedProductCommandsAdmitted": 3,
+      "failedSyntheticMutations": 4,
+      "failedSeedWrites": 2,
+      "failedCleanupWrites": 11,
+      "failedSyntheticFinalAbsent": true,
+      "cause": "HARNESS_OMITTED_REQUIRED_PRODUCT_AFTER_RAMO_CHANGE_CLEAR",
+      "localReproducedError": "producto_requerido",
+      "selectedProduct": "Vehículo Liviano",
+      "selectedFrom": "EXISTING_RENDERED_CATALOG_AND_DECLARED_QA_INSURER_PRODUCT",
+      "actualFormAndEnginePreflight": true,
+      "requiredFieldCount": 18,
+      "immediateVisibleFormErrorCheck": true,
+      "unknownFormErrorTextHashedOnly": true,
+      "productOwnersChanged": false,
+      "sourceContractChanged": false,
+      "authOrScopeExpanded": false,
+      "waitsExtended": false,
+      "workflowExecutionChanged": false,
+      "newBuildRequired": true,
+      "failedArtifactPromotionAllowed": false,
+      "newImmutablePreviewUat": "PENDING",
+      "productionAccepted": false,
+      "priorGuardRunId": 42417572796,
+      "priorGuardConclusion": "success"
     }
   },
   "ownerResponseCriteriaAdditive20261107": {

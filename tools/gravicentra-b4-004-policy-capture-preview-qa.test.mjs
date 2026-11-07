@@ -3,10 +3,12 @@ import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
 import fs from 'node:fs';
 import vm from 'node:vm';
+import path from 'node:path';
+import {fileURLToPath} from 'node:url';
 import {createRequire} from 'node:module';
 const require=createRequire(import.meta.url);
 const {resolveProductActiveRole}=require('../functions/product-active-role-contract.js');
-import {fixturePlan,verifyIdentityOnly,assertCaptureInput,assertCleanupFixture,assertCleanupReceipt,receiptIdentity,policyActivityMatches,installCaptureIdentityAdapter} from './gravicentra-b4-004-policy-capture-preview-qa.mjs';
+import {fixturePlan,verifyIdentityOnly,assertCaptureInput,assertCleanupFixture,assertCleanupReceipt,receiptIdentity,policyActivityMatches,installCaptureIdentityAdapter,capturePolicyFormValidation,policyFormErrorDiagnostic} from './gravicentra-b4-004-policy-capture-preview-qa.mjs';
 const plan=fixturePlan('12345_1'),tenantId='alianzas-soluciones',uid='qa_signed_actor',copy=v=>JSON.parse(JSON.stringify(v));
 function harness(){
  const calls=[];globalThis.Orbit={store:{__productOperationalWriteP0:true,batchDurable:async(ms,o)=>{calls.push({method:'batch',ms:copy(ms),o});return{ok:true};},insertDurable:async(c,p)=>{calls.push({method:'insertDurable',c,p:copy(p)});return p;},update:(c,id,p)=>{calls.push({method:'update',c,id,p:copy(p)});return p;},insert:(c,p)=>{throw Error(c==='auditLog'?'PRODUCT_WRITE_COLLECTION_NOT_AUTHORIZED':'PRODUCT_WRITE_RECORD_SCOPE_DENIED');},remove:()=>{throw Error('unreachable');},removeDurable:()=>{throw Error('unreachable');},updateDurable:()=>{throw Error('unreachable');}}};
@@ -81,4 +83,49 @@ test('canonical role correction preserves actual country and assigned-role denia
  assert.equal(denied.calls.length,0);
  const h=canonicalFacadeHarness();h.setRole('SuperAdmin');
  assert.throws(()=>h.O.store.batchDurable([{action:'update',collection:'asesores',id:plan.advisor.id,payload:{shareCom:60,__syntheticQa:true}}]),/MEMBERSHIP_REQUIRED/);assert.equal(h.calls.length,0);
+});
+
+
+// Reuse the repository's existing real-owner/real-backend memory fixture. Only
+// its test registration is disabled; production source bytes are not rewritten.
+function realPolicyFixture(){
+ const file=fileURLToPath(new URL('./gravicentra-policy-writer-backend-causal.test.cjs',import.meta.url));
+ const fixtureRequire=createRequire(file),context=vm.createContext({console,process,Buffer,setTimeout,clearTimeout,__dirname:path.dirname(file),module:{exports:{}},require:n=>n==='node:test'?()=>{}:fixtureRequire(n)});
+ vm.runInContext(fs.readFileSync(file,'utf8')+'\nmodule.exports={integrated};',context,{filename:file});
+ const h=context.module.exports.integrated(),signedTenant=h.Orbit.tenant;
+ vm.runInContext(fs.readFileSync(new URL('../orbit360-platform/core/config.js',import.meta.url),'utf8'),h.context,{filename:'core/config.js'});
+ // The signed bootstrap supplies tenant authority after base config loads.
+ h.Orbit.tenant=signedTenant;h.Orbit.pais='GT';return h;
+}
+async function actualQaPolicyForm(selectProduct){
+ const h=realPolicyFixture();h.Orbit.modules.cliente360.nuevaPoliza('qa_client');
+ const form=h.doc.getElementById('policy-v1199'),field=k=>form.querySelector('[data-'+k+']');
+ for(const [k,v]of [['insurer','qa_insurer'],['advisor','qa_advisor'],['currency','USD'],['ramo','Automóviles']]){field(k).value=v;await field(k).fire('change');}
+ assert.equal(field('product').value,'','the actual ramo change clears the required product');
+ assert.ok(h.Orbit.cat.subramosDe('GT','Automóviles').includes('Vehículo Liviano'));
+ if(selectProduct){field('product').value='Vehículo Liviano';await field('product').fire('change');}
+ for(const [k,v]of Object.entries({number:'QA-CAPTURE-12345_1',renewable:'no',frequency:'Contado',start:'2026-11-07',end:'2026-12-07',net:'1000',issue:'0','commission-insurer':'10','commission-seller':'60'})){field(k).value=v;await field(k).fire('change');}
+ const expected={clientId:'qa_client',advisorId:'qa_advisor',insurerId:'qa_insurer',product:'Vehículo Liviano'};
+ const preflight=()=>vm.runInContext('('+capturePolicyFormValidation.toString()+')('+JSON.stringify(expected)+')',h.context);
+ return{...h,form,field,preflight};
+}
+test('the original Preview fill sequence leaves product empty, reports producto_requerido and starts zero writes',async()=>{
+ const h=await actualQaPolicyForm(false),p=h.preflight();assert.equal(p.ok,false);assert.deepEqual(copy(p.errorCodes),['producto_requerido']);assert.deepEqual(copy(p.missingFields),['product']);
+ await h.field('save').fire('click');const diagnostic=policyFormErrorDiagnostic(h.field('error').textContent);
+ assert.deepEqual(diagnostic.errorCodes,['producto_requerido']);assert.equal(h.calls.length,0);assert.equal(h.db.commits,0);assert.equal(h.db.rows('polizas').length,0);
+});
+test('explicit product selection follows the actual form and validates every required field before its atomic write',async()=>{
+ const h=await actualQaPolicyForm(true);assert.equal(h.preflight().ok,true);
+ for(const key of ['client','advisor','insurer','currency','number','status','renewable','ramo','product','start','end','frequency','installments','payment-form','conduct','net','commission-insurer','commission-seller']){
+  const field=h.field(key),prior=field.value;field.value='';const result=h.preflight();assert.equal(result.ok,false,key);assert.ok(result.missingFields.includes(key),key);field.value=prior;
+ }
+ assert.equal(h.calls.length,0);assert.equal(h.db.commits,0);await h.field('save').fire('click');
+ assert.equal(policyFormErrorDiagnostic(h.field('error').textContent),null);assert.equal(h.calls.length,1);assert.equal(h.db.commits,1);
+ const policy=h.db.rows('polizas')[0],receipt=h.db.rows('recibosEsperados')[0];
+ assert.equal(policy.producto,'Vehículo Liviano');assert.equal(policy.moneda,'USD');assert.equal(policy.primaNeta,1000);assert.equal(receipt.comAseguradora,100);assert.equal(receipt.comVendedor,60);
+});
+test('form diagnostics expose only known codes and message hashes, never raw unknown client or actor text',()=>{
+ assert.equal(policyFormErrorDiagnostic(''),null);
+ const text='Unexpected detail for private-client@example.invalid / private_actor';
+ const diagnostic=policyFormErrorDiagnostic(text);assert.deepEqual(diagnostic.errorCodes,['unmapped_form_error']);assert.equal(diagnostic.messageSha256,createHash('sha256').update(text).digest('hex'));assert.equal(JSON.stringify(diagnostic).includes('private'),false);
 });

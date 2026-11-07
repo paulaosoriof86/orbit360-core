@@ -1,0 +1,234 @@
+{
+  "schema": "GRAVICENTRA_B4_004_IMMUTABLE_PREVIEW_FAILED_CAPTURE_RECEIPT_V1",
+  "status": "EXACT_ARTIFACT_VERIFIED_AUTHENTICATED_QA_FAILED_HOLD",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "sourceSha": "70778ea57aefb03d3fe1b13cbee4e9f920a1b461",
+  "buildId": "gi-i65-b4-70778ea57aef-57f234755dc1",
+  "runId": 42417572679,
+  "runAttempt": 1,
+  "jobId": 128538868280,
+  "jobConclusion": "failure",
+  "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-rc-41765742748-neoi3u7r.web.app",
+  "previewHostingVersionName": null,
+  "previewHostingVersionEvidence": "NOT_RETAINED_IN_THESE_ARTIFACTS_REQUIRES_HOSTING_METADATA_PREFLIGHT",
+  "artifacts": [
+    {
+      "id": 13592250975,
+      "name": "gi-b4003-immutable-release-bundle-42417572679",
+      "bytes": 1521731,
+      "sha256": "97a7dfffb59c7493389673877e5ea18083ce54d48faa4d1cc296a9a97fb33ba2",
+      "sourceSha": "70778ea57aefb03d3fe1b13cbee4e9f920a1b461"
+    },
+    {
+      "id": 13591937809,
+      "name": "gi-b4003-candidate-readback-42417572679",
+      "bytes": 2175,
+      "sha256": "3bd156caef731661f44b3ff85e021e7f3d3e02179aa29c0316064830b54e8aeb",
+      "sourceSha": "70778ea57aefb03d3fe1b13cbee4e9f920a1b461"
+    },
+    {
+      "id": 13591348849,
+      "name": "gi-b4004-policy-capture-qa-42417572679",
+      "bytes": 2877,
+      "sha256": "388b50743de523bf695adbe97f5f7b38ea036ddea0e99bb6ff17455da6f27a69",
+      "sourceSha": "70778ea57aefb03d3fe1b13cbee4e9f920a1b461"
+    }
+  ],
+  "immutable": {
+    "sourceSha": "70778ea57aefb03d3fe1b13cbee4e9f920a1b461",
+    "buildId": "gi-i65-b4-70778ea57aef-57f234755dc1",
+    "artifactId": 13592250975,
+    "artifactZipSha256": "97a7dfffb59c7493389673877e5ea18083ce54d48faa4d1cc296a9a97fb33ba2",
+    "archiveSha256": "355a57f6d470704380d62562f18597bc8f50874a7aa2da6b903b7bb8e8c23f53",
+    "hostedPayloadDigest": "ed5c0eee00fbe301c6e8cc36c4eb5fd3218a1a12e35b90b2d3c6b4a27c4ea165",
+    "productFiles": 218,
+    "fullProductReadback": true,
+    "servedArtifactExact": true,
+    "sourceOwners": [
+      {
+        "path": "orbit360-platform/core/policy-receipts-engine.js",
+        "blobSha": "37471433de5b09ba4ecd2ca847baae55317ff8e5",
+        "sha256": "4cd2a33102396bdf3784b92a7b8e74b441052681185f663dfe96f702829ade10"
+      },
+      {
+        "path": "orbit360-platform/modules/policy-receipts-v1199-bridge.js",
+        "blobSha": "4867fb7db684908f6ca5a6edfc39460de5c1cf59",
+        "sha256": "91645e02afa01c52fbc745d45429f595b60e870a3ef79cdacf6b8ca705e6bdaa"
+      },
+      {
+        "path": "orbit360-platform/modules/equipo.js",
+        "blobSha": "f584c4109294f8e32621c9ee9dd5cfdd55ca2c79",
+        "sha256": "c820edcedce8655e11701264b2e85dc0b07e55795b6e723d44bad25062cea8fc"
+      },
+      {
+        "path": "orbit360-platform/modules/crm-v1198-operational-bridge.js",
+        "blobSha": "a60cba8f13f53f1934718770517c7261e6860de1",
+        "sha256": "e8696837fa3e50ba145816268d3969ae7f90e80c378fb67494e6cd95971de086"
+      },
+      {
+        "path": "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
+        "blobSha": "fce274b01bf2c52c50e186df1ece97e7474805e7",
+        "sha256": "c4c22130d3221deb0f272fe417287654d0689e38b4e75ecf08ca22589fb9fea6"
+      }
+    ]
+  },
+  "proofFileHashes": {
+    "exactPreview": {
+      "sha256": "7e60f6153f2a70dcf333eaa38acfd59f14865ac8462a3fdf8026d44877688f09",
+      "blobSha": "43549d4c02096196c8a1763124dbb7dc6223e529",
+      "bytes": 3807
+    },
+    "focalQa": {
+      "sha256": "9f9287b8f7e77ee5f7c52095ca3b7c494f58e54fddf3725eb78e821ed155f3be",
+      "blobSha": "5fd5635390c108468e6d616ac19913fd63685235",
+      "bytes": 6938
+    }
+  },
+  "qa": {
+    "status": "FAIL",
+    "expectedChecks": 7,
+    "completedChecks": 4,
+    "checks": {
+      "exactArtifactBeforeWrites": "PASS",
+      "originalAbsenceVerified": "PASS",
+      "advisorCommissionAndScopedAudit": "PASS",
+      "clientFormAndAtomicActivity": "PASS",
+      "policyFormAtomicBatchAndDerivedClientState": "FAILED_BEFORE_POLICY_WRITER",
+      "receiptEditFormAndAtomicPortfolioActivity": "NOT_REACHED",
+      "freshProductReloadWithoutAdapter": "NOT_REACHED"
+    },
+    "observedErrors": [
+      {
+        "messageSha256": "b965648b1aa1eb65927d6e366f66fd7a832cd77e004c248e3f306dc93298786e",
+        "code": "CAPTURE_QA_SERVER_READBACK_"
+      }
+    ],
+    "verifiedMessageHashes": {
+      "CAPTURE_QA_SERVER_READBACK_policy": "b965648b1aa1eb65927d6e366f66fd7a832cd77e004c248e3f306dc93298786e"
+    },
+    "signedSession": {
+      "activeRole": "direccion",
+      "country": "GT",
+      "assignedRoleAndCountryVerified": true
+    },
+    "actor": {
+      "activeRole": "direccion",
+      "uidSha256": "f612197b077c598edd61d757c1e2995be7a3b17300602ce4802bccefed216a72",
+      "existingPrincipal": true
+    },
+    "identityTransformations": [
+      {
+        "phase": "advisor-commission",
+        "method": "batchDurable",
+        "mutations": 1,
+        "beforeSha256": "2c16a641fcf4c739008635bf1e4896fc111979bad9db71728c621eac766a951b",
+        "afterSha256": "05cd7443df1c15a6035a59e6bb57b80e61675f60e1c134e3a7e6a257e3fea1db",
+        "businessFieldsUnchanged": true
+      },
+      {
+        "phase": "advisor-commission",
+        "method": "insertDurable",
+        "mutations": 1,
+        "beforeSha256": "48eef7b65d427bd5ea1d4c9d26b66d59ba540355036dbd11e81a0a883da4b741",
+        "afterSha256": "4369ecd1501b3ae63b4208f49a98b8182b089ba4339f340f241401b0704a33c9",
+        "businessFieldsUnchanged": true
+      },
+      {
+        "phase": "client-create",
+        "method": "batchDurable",
+        "mutations": 2,
+        "beforeSha256": "13400f64bff03d39528ca6bc85f236c7ada45924a6996d79b044815638118d7d",
+        "afterSha256": "3e136766f2014efaf34555e6884b05ac59a82da49ff57899a749e17b3b36c3e0",
+        "businessFieldsUnchanged": true
+      }
+    ],
+    "productCommandsAdmitted": 3,
+    "commandReceipts": [
+      {
+        "requestId": "batch_1794088205317_ifmyjv",
+        "eventId": "opevt_cca180943b496e828cd14fba6f9f",
+        "payloadDigest": "12608c28f19dbfc77928b9622bba282de94d82cc8ab79a46bf9964604ed4d30e",
+        "mutations": 1,
+        "canonicalReadback": true,
+        "recoveredForCleanupOnly": false
+      },
+      {
+        "requestId": "op_383d9e9e1dd4bc8edfb0ef95d02434d0",
+        "eventId": "opevt_54587596b066a7c5123e15794b91",
+        "payloadDigest": "3f9c05b935594ded5dff574d290d1a5e6deeca2f5cfb1294d7ae88ebc9bc4029",
+        "mutations": 1,
+        "canonicalReadback": true,
+        "recoveredForCleanupOnly": false
+      },
+      {
+        "requestId": "crm_client_create_cli_mw6xsqli_mw6xsqm0",
+        "eventId": "opevt_f2e7ba502358eb6d64ec5103c85e",
+        "payloadDigest": "f7f147310028f576afd0937e09169e4f31b362938b7ad59f84b08bc6d05505c5",
+        "mutations": 2,
+        "canonicalReadback": true,
+        "recoveredForCleanupOnly": false
+      }
+    ],
+    "businessWrites": 0,
+    "seedWrites": 2,
+    "attemptedSyntheticMutations": 4,
+    "confirmedSyntheticMutations": 4,
+    "cleanupWrites": 11,
+    "syntheticFinalAbsent": true,
+    "cleanup": {
+      "method": "EXACT_PREDECLARED_IDS_AND_CAPTURED_SERVER_RECEIPTS",
+      "actorTimeWindowQuery": false,
+      "prefixDelete": false,
+      "compareAndDeleteTransaction": true,
+      "verifiedAbsent": true
+    },
+    "pageErrorCount": 0,
+    "consoleErrorCount": 0,
+    "httpErrorCount": 0
+  },
+  "diagnosis": {
+    "verifiedFailureStage": "POLICY_READBACK_WITHOUT_POLICY_ADAPTER_OR_REQUEST_ADMISSION",
+    "productFailureDemonstrated": false,
+    "specificPolicyUiErrorNotPublishedByFailedHarness": true,
+    "actualRoleFencePassed": true,
+    "actualAdvisorCommissionAndScopedAuditPassed": true,
+    "actualClientAtomicActivityPassed": true,
+    "sourceAndLocalReproduction": {
+      "failureCode": "producto_requerido",
+      "formRamoChangeClearsProduct": true,
+      "harnessOmittedProductSelection": true,
+      "beforeWriterCalls": 0,
+      "correctedSelectionValidationErrors": [],
+      "correctedSelectionCreatesPolicyAndReceiptInMemory": true,
+      "runtimeUiMessageNotAssumedFromHash": true
+    },
+    "interpretation": "The authenticated receipt proves four focal checks and three committed commands before policy readback failure. Source and the real form/engine/backend memory reproduction establish the omitted required product selection; the failed runtime did not retain its policy UI validation text."
+  },
+  "preserved": {
+    "historicalB4003Acceptance": true,
+    "liveLabStableDuringTransport": true,
+    "liveDomainStableDuringTransport": true,
+    "rollbackSourceSha": "e5030ec5ba9854f0c576fd905c2f510766347ffa",
+    "rollbackBuildId": "gi-i65-b4-e5030ec5ba98-57f234755dc1",
+    "rollbackHostingVersionName": "sites/ays-orbit-360-lab/versions/d8caae0d585bf6dd",
+    "rollbackHostedPayloadDigest": "09c91023d1d22687528a61edb5a768dadbd59c465af91bc48016d21c94c6537f"
+  },
+  "boundaries": {
+    "artifactPromotionAllowed": false,
+    "productionDeploy": false,
+    "backendFunctionsDeployed": 0,
+    "firestoreRulesWrites": 0,
+    "authIamChanges": 0,
+    "newIntegralModulePass": false,
+    "productionAccepted": false,
+    "sourceArtifactsModified": false
+  },
+  "nextGate": "CORRECT_QA_HARNESS_AND_BUILD_NEW_SOURCE_THEN_REEXECUTE_AUTHENTICATED_PREVIEW; DO_NOT_PROMOTE_THIS_ARTIFACT",
+  "priorFailedAttempt": {
+    "sourceSha": "65bc0288b079883648642bf1474636b84d9d8e7a",
+    "runId": 42416303881,
+    "receiptBlobSha": "2de8a838fd3f9fec83a4ea853ba5086bb9645203",
+    "preservedUnmodified": true
+  }
+}

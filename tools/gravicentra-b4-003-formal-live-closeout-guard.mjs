@@ -523,11 +523,11 @@ const POLICY_CAPTURE_PINS={
   },
   "tools/gravicentra-b4-004-policy-capture-preview-qa.mjs": {
     "before": null,
-    "after": "f52fab5a3d4d1a657fa3a0426aa1a962a4ce91cf"
+    "after": "c9a1442a5b740d950ed494e00515c07176bc957a"
   },
   "tools/gravicentra-b4-004-policy-capture-preview-qa.test.mjs": {
     "before": null,
-    "after": "cacabf73a04e460cf1e18b9baee89f9fa7e03cfc"
+    "after": "7200830634c275690bceb7a82d598b8b9ae51093"
   },
   "tools/gravicentra-b4-004-receipt-editor-preservation.test.cjs": {
     "before": null,
@@ -544,6 +544,10 @@ const POLICY_CAPTURE_PINS={
   "artifacts/orbit360-recovery/release-control/I6_5_B4_004_POLICY_CAPTURE_PREVIEW_FAILED_RUN42416303881_20261107.json": {
     "before": null,
     "after": "2de8a838fd3f9fec83a4ea853ba5086bb9645203"
+  },
+  "artifacts/orbit360-recovery/release-control/I6_5_B4_004_POLICY_CAPTURE_PREVIEW_FAILED_RUN42417572679_20261107.json": {
+    "before": null,
+    "after": "c214ee764ba333f341269b594c4e8c8a6b35ffd0"
   }
 };
 const POLICY_CAPTURE_PRESERVED={
@@ -580,6 +584,13 @@ export function validatePolicyCaptureCausalSourceSuccessor({record,fileBytes,bas
  need(f.outboundFacadeRole==='Dirección'&&f.serverAuditNormalizedRole==='direccion'&&f.productOwnersChanged===false&&f.sourceContractChanged===false&&f.authOrScopeExpanded===false&&f.newBuildRequired===true&&f.failedArtifactPromotionAllowed===false&&f.newImmutablePreviewUat==='PENDING'&&f.productionAccepted===false,'POLICY_CAPTURE_QA_RETRY_SCOPE');
  const failed=JSON.parse(Buffer.from(fileBytes[failedPath]).toString('utf8'));
  need(failed.schema==='GRAVICENTRA_B4_004_IMMUTABLE_PREVIEW_FAILED_CAPTURE_RECEIPT_V1'&&failed.sourceSha===f.parentSourceSha&&failed.runId===42416303881&&f.failedRunId===failed.runId&&failed.status==='EXACT_ARTIFACT_VERIFIED_AUTHENTICATED_QA_FAILED_HOLD'&&failed.qa.status==='FAIL'&&failed.qa.productCommandsAdmitted===0&&failed.qa.seedWrites===2&&failed.qa.cleanupWrites===2&&failed.qa.syntheticFinalAbsent===true&&failed.qa.cleanup.verifiedAbsent===true&&f.failedProductCommandsAdmitted===failed.qa.productCommandsAdmitted&&f.failedSeedWrites===failed.qa.seedWrites&&f.failedCleanupWrites===failed.qa.cleanupWrites&&f.failedSyntheticFinalAbsent===failed.qa.syntheticFinalAbsent&&failed.boundaries.artifactPromotionAllowed===false&&failed.boundaries.productionAccepted===false,'POLICY_CAPTURE_QA_FAILED_EVIDENCE');
+ const required=p.qaRequiredProductSelectionCorrection20261107;
+ const requiredFailedPath='artifacts/orbit360-recovery/release-control/I6_5_B4_004_POLICY_CAPTURE_PREVIEW_FAILED_RUN42417572679_20261107.json';
+ need(p.currentQaAttemptDecisionPointer==='qaRequiredProductSelectionCorrection20261107'&&required?.schema==='GRAVICENTRA_POLICY_CAPTURE_QA_REQUIRED_PRODUCT_CORRECTION_V1'&&required.parentSourceSha==='70778ea57aefb03d3fe1b13cbee4e9f920a1b461'&&required.status==='SOURCE_PREPARED_AUTHENTICATED_RETRY_PENDING'&&required.failedReceiptPath===requiredFailedPath&&required.failedReceiptBlobSha===POLICY_CAPTURE_PINS[requiredFailedPath].after,'POLICY_CAPTURE_REQUIRED_PRODUCT_BINDING');
+ need(required.productOwnersChanged===false&&required.sourceContractChanged===false&&required.authOrScopeExpanded===false&&required.waitsExtended===false&&required.workflowExecutionChanged===false&&required.newBuildRequired===true&&required.failedArtifactPromotionAllowed===false&&required.newImmutablePreviewUat==='PENDING'&&required.productionAccepted===false&&required.actualFormAndEnginePreflight===true&&required.requiredFieldCount===18&&required.immediateVisibleFormErrorCheck===true&&required.unknownFormErrorTextHashedOnly===true,'POLICY_CAPTURE_REQUIRED_PRODUCT_SCOPE');
+ const requiredFailed=JSON.parse(Buffer.from(fileBytes[requiredFailedPath]).toString('utf8'));
+ need(requiredFailed.schema==='GRAVICENTRA_B4_004_IMMUTABLE_PREVIEW_FAILED_CAPTURE_RECEIPT_V1'&&requiredFailed.sourceSha===required.parentSourceSha&&requiredFailed.runId===42417572679&&required.failedRunId===requiredFailed.runId&&requiredFailed.status==='EXACT_ARTIFACT_VERIFIED_AUTHENTICATED_QA_FAILED_HOLD'&&requiredFailed.qa.status==='FAIL'&&requiredFailed.qa.completedChecks===4&&requiredFailed.qa.expectedChecks===7&&requiredFailed.qa.productCommandsAdmitted===3&&requiredFailed.qa.confirmedSyntheticMutations===4&&requiredFailed.qa.seedWrites===2&&requiredFailed.qa.cleanupWrites===11&&requiredFailed.qa.syntheticFinalAbsent===true&&requiredFailed.qa.cleanup.verifiedAbsent===true&&requiredFailed.boundaries.artifactPromotionAllowed===false&&requiredFailed.boundaries.productionAccepted===false,'POLICY_CAPTURE_REQUIRED_PRODUCT_FAILED_EVIDENCE');
+ need(required.failedFocalChecksCompleted===requiredFailed.qa.completedChecks&&required.failedFocalChecksRequired===requiredFailed.qa.expectedChecks&&required.failedProductCommandsAdmitted===requiredFailed.qa.productCommandsAdmitted&&required.failedSyntheticMutations===requiredFailed.qa.confirmedSyntheticMutations&&required.failedSeedWrites===requiredFailed.qa.seedWrites&&required.failedCleanupWrites===requiredFailed.qa.cleanupWrites&&required.failedSyntheticFinalAbsent===requiredFailed.qa.syntheticFinalAbsent&&required.previousRoleCorrectionPreserved===true&&required.previousRetryRoleFencePassed===true,'POLICY_CAPTURE_REQUIRED_PRODUCT_FAILED_COUNTS');
  const comparableFileBytes={...fileBytes,[POLICY_CAPTURE_WORKFLOW]:Buffer.from(baseSourceBytes[POLICY_CAPTURE_WORKFLOW])};
  return{allowedPaths:paths,comparableFileBytes,frozenPredecessorHead:POLICY_CAPTURE_BASE};
 }

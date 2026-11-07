@@ -34,6 +34,29 @@ export function verifyIdentityOnly(before,after,mapping){
  walk(before,after,'',true);need(after.__syntheticQa===true,'MARKER_REQUIRED');return true;
 }
 
+// Read-only preflight of the real form and its real validator. Only fixed
+// field names and safe error codes leave the browser; no actor/client values.
+export function capturePolicyFormValidation(expected){
+ const form=document.getElementById('policy-v1199');
+ if(!form)return{ok:false,errorCodes:['policy_form_missing'],missingFields:[],selectionMatches:false};
+ const value=k=>String(form.querySelector('[data-'+k+']')?.value??'').trim();
+ const required=['client','advisor','insurer','currency','number','status','renewable','ramo','product','start','end','frequency','installments','payment-form','conduct','net','commission-insurer','commission-seller'];
+ const missingFields=required.filter(k=>!value(k));
+ const raw={tenantId:Orbit.access.tenantId(),clienteId:value('client'),asesorId:value('advisor'),pais:value('country'),moneda:value('currency'),aseguradoraId:value('insurer'),numero:value('number'),estado:value('status'),ramo:value('ramo'),producto:value('product'),subramo:value('product'),renovable:value('renewable')==='yes',vigenciaInicio:value('start'),vigenciaFin:value('end'),frecuencia:value('frequency'),cuotas:Number(value('installments')),formaPago:value('payment-form'),conducto:value('conduct'),primaNeta:Number(value('net')),gastosEmision:Number(value('issue')),otros:Number(value('other')),recargoFinPct:Number(value('surcharge')),comAseguradoraPct:Number(value('commission-insurer')),comVendedorPct:Number(value('commission-seller'))};
+ const check=Orbit.policyReceipts.validatePolicy(Orbit.policyReceipts.preparePolicy(raw,null,'capture-qa-readonly-validation'),'');
+ const errorCodes=(check.errors||[]).map(x=>String(x).split(':')[0]).map(x=>/^[a-z_]+$/.test(x)?x:'unmapped_validation_error');
+ const selectionMatches=raw.clienteId===expected.clientId&&raw.asesorId===expected.advisorId&&raw.aseguradoraId===expected.insurerId&&raw.producto===expected.product&&raw.pais==='GT'&&raw.moneda==='USD';
+ const economicsMatch=raw.primaNeta===1000&&raw.comAseguradoraPct===10&&raw.comVendedorPct===60&&raw.frecuencia==='Contado'&&raw.cuotas===1;
+ return{ok:check.ok===true&&missingFields.length===0&&selectionMatches&&economicsMatch,errorCodes,missingFields,selectionMatches,economicsMatch};
+}
+
+export function policyFormErrorDiagnostic(text){
+ const message=String(text||'').trim();if(!message)return null;
+ const known={'Selecciona el producto o subramo.':'producto_requerido','Selecciona el ramo.':'ramo_requerido','Ingresa el número real de póliza.':'numero_poliza_requerido','Ingresa el inicio de vigencia.':'vigencia_inicio_requerida','Ingresa el fin de vigencia.':'vigencia_fin_requerida','La fecha final debe ser posterior a la inicial.':'vigencia_invalida','La prima neta debe ser mayor que cero.':'prima_neta_requerida','Completa ambos porcentajes de comisión entre 0 y 100; no se sustituye una tarifa pendiente por cero.':'commission_values_required'};
+ const errorCodes=Object.entries(known).filter(([label])=>message.includes(label)).map(([,code])=>code);
+ return{visibleError:true,errorCodes:errorCodes.length?errorCodes:['unmapped_form_error'],messageSha256:digest(message)};
+}
+
 export function assertCaptureInput(input,plan,tenantId){
  need(input?.tenantId===tenantId&&input.activeRole==='Dirección','REQUEST_ACTOR_CONTEXT');
  need(Array.isArray(input.mutations)&&input.mutations.length>=1&&input.mutations.length<=5&&!input.metaPreviewQa,'REQUEST_SHAPE');
@@ -144,8 +167,9 @@ export async function runPolicyCapturePreviewQa({db,auth,tenant,ref,chromium,act
  const persistPrivateLedger=extra=>{need(process.env.RUNNER_TEMP,'RUNNER_TEMP_REQUIRED');fs.mkdirSync(privateDirectory,{recursive:true,mode:0o700});fs.writeFileSync(privateDirectory+'/ledger.json',JSON.stringify({tenantId,actorUid:who?.uid,plan,seeds,seedAttempted,originalAbsenceRecorded,seedConfirmed,calls,...extra}),{mode:0o600});};
  const publicError=e=>({messageSha256:digest(String(e?.message||e)),code:/CAPTURE_QA_[A-Z_]+/.exec(String(e?.message||e))?.[0]||'FOCAL_EXECUTION_ERROR'});
  const read=async key=>{const s=await ref(plan[key].collection,plan[key].id).get();return s.exists?s.data():null;};
- const waitRead=async(key,test)=>{for(let i=0;i<45;i++){const row=await read(key);if(row&&test(row))return row;await new Promise(r=>setTimeout(r,400));}throw Error('CAPTURE_QA_SERVER_READBACK_'+key);};
+ const waitRead=async(key,test,diagnostic)=>{for(let i=0;i<45;i++){if(diagnostic)await diagnostic();const row=await read(key);if(row&&test(row))return row;await new Promise(r=>setTimeout(r,400));}throw Error('CAPTURE_QA_SERVER_READBACK_'+key);};
  const phase=async name=>page.evaluate(name=>__giCaptureQa.setPhase(name),name);
+ const checkPolicyFormError=async()=>{const text=await page.evaluate(()=>{const e=document.querySelector('#policy-v1199 [data-error]');return e&&getComputedStyle(e).display!=='none'&&getComputedStyle(e).visibility!=='hidden'?e.textContent:'';});const diagnostic=policyFormErrorDiagnostic(text);if(diagnostic){p.policyFormDiagnostic=diagnostic;throw Error('CAPTURE_QA_POLICY_FORM_VALIDATION_FAILED');}};
  try{
   need(projectId==='ays-orbit-360-lab'&&tenantId==='alianzas-soluciones','PROJECT_TENANT');
   need(/^https:\/\/ays-orbit-360-lab--gi-i65-b4-rc-41765742748-[a-z0-9]+\.web\.app$/.test(target),'EXISTING_PREVIEW_ONLY');
@@ -195,10 +219,12 @@ export async function runPolicyCapturePreviewQa({db,auth,tenant,ref,chromium,act
   await phase('policy-create');await page.evaluate(id=>Orbit.modules.cliente360.nuevaPoliza(id),plan.client.id);
   const form=page.locator('#policy-v1199');await form.waitFor();await form.locator('[data-insurer]').selectOption(plan.insurer.id);await form.locator('[data-advisor]').selectOption(plan.advisor.id);await form.locator('[data-currency]').selectOption('USD');
   const autoBranch=await form.locator('[data-ramo] option').evaluateAll(rows=>rows.map(x=>({value:x.value,label:x.textContent})).find(x=>/auto|veh/i.test(x.label))?.value);need(autoBranch,'EXISTING_AUTO_CATALOG');await form.locator('[data-ramo]').selectOption(autoBranch);
+  const expectedProduct=seeds.insurer.ramosDetalle[autoBranch]?.productos[0];need(expectedProduct,'DECLARED_AUTO_PRODUCT');await form.locator('[data-product]').selectOption({label:expectedProduct});need(await form.locator('[data-product]').inputValue()===expectedProduct,'POLICY_PRODUCT_SELECTED');
   await form.locator('[data-number]').fill('QA-CAPTURE-'+run);await form.locator('[data-renewable]').selectOption('no');await form.locator('[data-frequency]').selectOption({label:'Contado'});
   const start=new Date().toISOString().slice(0,10),end=new Date(Date.now()+30*86400000).toISOString().slice(0,10),due=new Date(Date.now()+12*86400000).toISOString().slice(0,10);
-  await form.locator('[data-start]').fill(start);await form.locator('[data-end]').fill(end);await form.locator('[data-net]').fill('1000');await form.locator('[data-issue]').fill('0');await form.locator('[data-commission-insurer]').fill('10');await form.locator('[data-commission-seller]').fill('60');await form.locator('[data-save]').click();
-  const policy=await waitRead('policy',x=>x.moneda==='USD'&&x.clienteId===plan.client.id);const receipt=await waitRead('receipt',x=>x.polizaId===plan.policy.id);const portfolio=await waitRead('portfolio',x=>x.reciboId===plan.receipt.id);await waitRead('policyActivity',x=>policyActivityMatches(x,policy,plan));await waitRead('client',x=>x.estado==='activo'&&x.estadoOperativo==='activo');
+  await form.locator('[data-start]').fill(start);await form.locator('[data-end]').fill(end);await form.locator('[data-net]').fill('1000');await form.locator('[data-issue]').fill('0');await form.locator('[data-commission-insurer]').fill('10');await form.locator('[data-commission-seller]').fill('60');
+  p.policyFormPreflight=await page.evaluate(capturePolicyFormValidation,{clientId:plan.client.id,advisorId:plan.advisor.id,insurerId:plan.insurer.id,product:expectedProduct});need(p.policyFormPreflight.ok,'POLICY_REQUIRED_FIELDS_OR_VALIDATION');await form.locator('[data-save]').click();await checkPolicyFormError();
+  const policy=await waitRead('policy',x=>x.moneda==='USD'&&x.clienteId===plan.client.id,checkPolicyFormError);const receipt=await waitRead('receipt',x=>x.polizaId===plan.policy.id);const portfolio=await waitRead('portfolio',x=>x.reciboId===plan.receipt.id);await waitRead('policyActivity',x=>policyActivityMatches(x,policy,plan));await waitRead('client',x=>x.estado==='activo'&&x.estadoOperativo==='activo');
   need(policy.primaNeta===1000&&policy.comAseguradoraPct===10&&policy.comVendedorPct===60&&receipt.comAseguradora===100&&receipt.comVendedor===60,'POLICY_ECONOMICS');
   need(receipt.moneda==='USD'&&portfolio.moneda==='USD'&&receipt.clienteId===plan.client.id&&portfolio.clienteId===plan.client.id&&!receipt.fechaPago&&!receipt.conciliado,'RECEIPT_PORTFOLIO');
   await form.waitFor({state:'detached',timeout:20000});p.assertions.policyFormAtomicBatchAndDerivedClientState=true;
