@@ -353,7 +353,7 @@ export function validateReconciliationReadOnlySuccessorSnapshot({record,control,
  need(grant.sourceBaseHead==='e5030ec5ba9854f0c576fd905c2f510766347ffa'&&grant.ownerCriteriaBaseBlobSha==='11830a98266625e07bc7d2fcb58d2728be864cd8','OCTOBER_READONLY_BASE');
  need(grant.realBusinessWrites===0&&grant.productDeployed===false&&grant.cursorChanged===false&&grant.encryptedOnly===true&&grant.dataImportExecuted===false&&grant.baselineCaptured===false&&grant.globalSynchronizationClaim===false,'OCTOBER_READONLY_BOUNDARY');
  const expected=[
-  ['.github/workflows/gravicentra-recovery-i6-postsalida.yml','734afcaf3b190ad8a17b9b465707d41290b57781','24ddfb3b2420ca4c44d55c199d58faec124a21c6'],
+  ['.github/workflows/gravicentra-recovery-i6-postsalida.yml','734afcaf3b190ad8a17b9b465707d41290b57781','7437f3b5f84f0c3c047eb59db978acd2a6b98a7a'],
   [ROOT+'I6_5_OCTOBER_RECONCILIATION_PRIVATE_READBACK_REQUEST_20261107.json',null,'8203160883bba996d901d8eae0f44228af6a5aee'],
   [ROOT+'I6_5_OCTOBER_RECONCILIATION_SNAPSHOT_PUBLIC_KEY_20261107.pem',null,'4d828240ad68943b14cfb687dd41a4aa78c15e9a'],
   ['tools/gravicentra-i6-5-encrypted-live-snapshot.mjs','a13df5fc0a4449795b3ccc12fe2e037dd260296d','89955b0cef59664d704754c5a22137a0e5d11c24'],

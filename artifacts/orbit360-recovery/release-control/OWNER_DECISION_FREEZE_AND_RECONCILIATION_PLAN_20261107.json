@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_OWNER_DECISION_FREEZE_20261107_V1",
   "status": "OWNER_DECISIONS_AND_EXECUTION_PLAN_FROZEN_NOT_NEW_PRODUCT_PASS",
-  "recordedAtUtc": "2026-11-07T18:15:19Z",
+  "recordedAtUtc": "2026-11-07T18:25:02Z",
   "operationalDate": "2026-11-07",
   "timeZone": "America/Guatemala",
   "repository": "paulaosoriof86/orbit360-core",
@@ -487,12 +487,12 @@
     "conclusion": "success",
     "sourceSha": "74312cc3621ba155ee288a0afb530a488246f0e6"
   },
-  "nextRequiredResult": "EXACT_RETAINED_ARTIFACT_PREFLIGHT_AND_CURRENT42_ROLLBACK_READBACK; LIVE_READER_AND_CATALOG_SOURCE_READBACK; ENCRYPTED_CURRENT_OCTOBER_BASELINE; THEN_PINNED_READER_ACTIVATION_AND_SAME_ARTIFACT_FRONTEND_PROMOTION_WITH_FOCAL_LIVE_UAT",
+  "nextRequiredResult": "EXACT_ISOLATED_READER_DEPLOY_AND_COMPLETE_SOURCE_READBACK_THEN_FOCAL_AUTHENTICATED_LIVE_RELOAD; SAME_ARTIFACT_FRONTEND_PROMOTION_FOLLOWS_RETAINED_PREFLIGHT_RECEIPT; OCTOBER_PRIVATE_BASELINE_PENDING_MARKER_EXECUTION; CATALOG_TRANSPORT_REQUIRES_SEPARATE_CAUSAL_AUTHORITY",
   "governanceSuccessorValidation": {
     "schema": "GRAVICENTRA_OWNER_DOCUMENTARY_SUCCESSOR_VALIDATION_V1",
     "baseHead": "74312cc3621ba155ee288a0afb530a488246f0e6",
     "guardPath": "tools/gravicentra-b4-003-formal-live-closeout-guard.mjs",
-    "guardBlobSha": "21bb2359e911b16f871b68964355b803042e46e1",
+    "guardBlobSha": "1b954f88bd6911229ccc355ec7cf04b8d21c74a8",
     "testPath": "tools/gravicentra-b4-003-owner-decision-successor.test.mjs",
     "testBlobSha": "6b18e69ad9196ce9d4ebec821928e619fb9fd300",
     "sealedMasterPlanBlobPreserved": "458c5af57b2f7d9453d0064eba0cd737edf14ef4",
@@ -1421,7 +1421,19 @@
       "workflowYamlAndBash": 8
     },
     "firstPublishMode": "READBACK_ONLY",
-    "activationNotYetCreated": true
+    "activationNotYetCreated": false,
+    "activationReceipt": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_ISOLATED_READER_DEPLOY_ACTIVATION_20261107.json",
+      "blobSha": "e980cf1bf1136631c160b162770e97f08615fab1",
+      "reviewedSourceHead": "0444999adacb73b128943bb2287a427a8dfa6103",
+      "reviewedReadbackRunId": 42400488638,
+      "reviewedReadbackArtifactId": 13584853792,
+      "reviewedReadbackConclusion": "success",
+      "reviewedGovernanceRunId": 42400488698,
+      "reviewedGovernanceConclusion": "success",
+      "deploymentObserved": false,
+      "liveFunctionalAcceptance": false
+    }
   },
   "frontendPromotionSuccessor": {
     "schema": "GRAVICENTRA_B4_003_CAUSAL_FRONTEND_TRANSPORT_SUCCESSOR_V1",
@@ -1514,7 +1526,7 @@
       {
         "path": ".github/workflows/gravicentra-recovery-i6-postsalida.yml",
         "previousBlobSha": "734afcaf3b190ad8a17b9b465707d41290b57781",
-        "blobSha": "24ddfb3b2420ca4c44d55c199d58faec124a21c6"
+        "blobSha": "7437f3b5f84f0c3c047eb59db978acd2a6b98a7a"
       },
       {
         "path": "artifacts/orbit360-recovery/release-control/I6_5_OCTOBER_RECONCILIATION_PRIVATE_READBACK_REQUEST_20261107.json",
@@ -1550,8 +1562,8 @@
     "previewTransport": "PASS_218_FILES_EXACT",
     "focalPreview": "PASS_EQUIPO_RELOAD_CANCELACIONES_REPORTES_ONLY",
     "liveFrontendPromotion": "NOT_EXECUTED",
-    "liveReaderDeployment": "NOT_EXECUTED_ACTIVATION_ABSENT",
-    "privateSnapshot": "REQUESTED_NOT_YET_CAPTURED",
+    "liveReaderDeployment": "ACTIVATION_AUTHORIZED_EXACT_RECEIPT_DEPLOY_NOT_YET_OBSERVED",
+    "privateSnapshot": "WORKFLOW_SIZE_CAUSE_CORRECTED_52_JOBS_UNCHANGED_NOT_YET_CAPTURED",
     "businessWrites": 0,
     "catalogLiveObservedDeploymentLocal": "2026-09-23 15:04 America/Guatemala",
     "catalogErrorBodyObserved": false,
