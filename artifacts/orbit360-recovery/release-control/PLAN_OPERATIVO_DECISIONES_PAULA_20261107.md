@@ -1,3 +1,75 @@
+# Gravicentra Insurance — actualización prevalente del 7 de noviembre de 2026
+
+## Alcance y estado verificable
+
+Esta actualización incorpora las instrucciones más recientes de Paula. Mantiene B4-003/current42 cerrado y todos sus recibos históricos. La corrección causal posterior de Equipo y de la proyección comercial de Cancelaciones no equivale a reapertura indiscriminada ni concede un nuevo PASS de Preview/LIVE. La candidata sigue siendo acumulativa, en la misma rama, proyecto Firebase y Firestore.
+
+El registro JSON enlazado desde CONTROL_PLANE contiene fuentes, hashes, pruebas y estado de ejecución. El texto histórico incluido al final conserva contexto; cualquier referencia allí a mes pendiente de aclarar, regla exclusivamente VIME-18154 o hosting aún no elegido queda sustituida por estas decisiones.
+
+## Decisiones congeladas de conciliación
+
+1. **Período.** Las filas de comisiones pagadas del lote documental Noviembre corresponden a recaudos de OCTUBRE 2026. La fecha de factura y la carpeta no desplazan el período del recaudo. Los apartados expresamente pendientes continúan pendientes. Columna de la carpeta Octubre mantiene su período documental septiembre como referencia histórica; no se copian sus movimientos como nuevos recaudos.
+2. **Fechas conocidas.** Se conserva la fecha real comprobada. Vencimiento contractual, recaudo, aplicación de aseguradora, factura, ingreso bancario y ejecución técnica son dimensiones separadas.
+3. **Recaudo de octubre sin día real.** Se usa como fecha efectiva estimada el día contractual de pago dentro de octubre, con marca de estimación. Una cuota atrasada mantiene su vencimiento original para calcular mora. No se hace pasar esa estimación por comprobante de la fecha real.
+4. **Inferencia hacia atrás.** Las cuotas anteriores continuas que se deduzcan pagadas conservan cada una su fecha contractual original. Descubrirlas en octubre o procesarlas en noviembre no suma artificialmente sus valores al recaudo de octubre ni traslada la antigüedad de cartera. Nueva evidencia enriquece el mismo hecho sin duplicarlo.
+5. **Gastos Médicos.** Doce pagos mensuales en todas las aseguradoras que ofrecen el ramo. No se aplica a esos planes el máximo ordinario de diez del fraccionado de otros ramos. La plataforma puede representar Gastos Médicos como producto dentro de Accidentes y Enfermedades: la regla debe resolver ramo, producto y modalidad reales, sin reclasificar accidentes, viajes u otros productos como médicos.
+6. **Correcciones respaldadas.** Planillas y estados de cuenta gobiernan los datos probados de forma de pago, cantidad de cuotas, primas, importes y expediente. Se corrige mediante los owners existentes con antes/después, evidencia e identidad estable. No se confunde prima neta con total; no se multiplica una cuota para inventar prima anual; no se eliminan cuotas pagadas para rehacer un calendario.
+7. **Excepciones puntuales.** Una póliza no localizada, vendedor ambiguo, moneda contradictoria o secuencia incompleta genera una pregunta inmediata con documento/fila/póliza y el dato faltante. Los demás casos confirmados continúan. No se exige autorización fila por fila para la inferencia de alta confianza ya aprobada.
+
+## Primera conciliación real y continuidad de Finanzas
+
+Se registra un lote durable y visible en Conciliaciones: documentos con huella, filas, vínculos, correcciones, pagos directos e inferidos, excepciones y estado de cada efecto. Se amplían `reconciliationRequests` y `reconciliationEvents` del owner existente; no se crea otro motor ni se sobrescribe el ledger histórico fijado a sus conteos/digests.
+
+Podemos adelantar pagos, recibos y cartera antes del cierre integral de Finanzas cuando el mismo acto durable conserve los importes, monedas, bases, versiones de tarifa, evidencia e identidad determinista de los efectos financieros pendientes. El estado será “conciliación operativa aplicada; efectos financieros pendientes”. La reproducción posterior crea cada comisión/CxC/CxP una sola vez y deja constancia de aplicación. Una factura emitida o planilla de comisión no basta para declarar ingreso bancario.
+
+Esta capacidad aún requiere extensión técnica: el journal actual audita pagos pero no retiene toda la economía necesaria para materializar Finanzas después. La pantalla actual muestra propuestas, no el lote aplicado con todos sus efectos. El lote real no debe declararse conciliado antes de guardar esa información y comprobar recarga. Se aprovecha el trabajo existente y se corrigen únicamente esas conexiones.
+
+## Porcentajes vivos sin alterar históricos
+
+Se lee primero la configuración ya existente en Equipo (`comModo`, `shareCom`, `comValor` y asesor canónico). Un cambio de porcentaje/modelo tiene fecha de vigencia y se aplica hacia adelante. Cada hecho conserva la tarifa y base que le correspondían cuando se devengó. No se recalculan automáticamente liquidaciones cerradas ni eventos anteriores con la tarifa actual; una corrección histórica expresa es otro movimiento trazado.
+
+El porcentaje de la planilla es la autoridad para la comisión concreta de la aseguradora. Su actualización en Aseguradoras conserva aseguradora, país, ramo, producto/plan, moneda y vigencia pertinentes. Una bonificación aislada no se convierte en tarifa general. G&T GTQ y USD siguen siendo facturas y saldos separados por documento y moneda. No se sustituyen configuraciones faltantes por 12% o 50% silenciosos.
+
+## Correcciones y pruebas realizadas
+
+El expediente completo de normalización (20 fuentes, 84 componentes; no 84 pagos) se conserva con acceso privado, enlazado por identidad y SHA-256 en el registro. El repositorio público conserva criterios y referencias; las filas nominativas no se incorporan al source.
+
+**Equipo:** reproducido ACK exitoso con listado aún “sin clasificar”. El cambio mínimo publica la clasificación confirmada en el store compartido y conserva esa proyección hasta que la hidratación canónica coincida. Prueba de 48 comprobaciones, incluidos rechazo, falta de ACK y respuesta atrasada. No se repiten las siete escrituras ya confirmadas el 5 de noviembre. Falta readback de bytes del lector LIVE y transportar el nuevo frontend con su artifact.
+
+**Cancelaciones:** LIVE mostró 462 GT, 28 CO y 490 total, incluyendo un QA como motivo principal. La corrección excluye QA comercial propio/heredado con el helper existente y conserva acceso de auditoría. Cuatro pruebas causales pasan; tres fallaban sobre el source anterior. Reportes recibe el modo auditable para conservar su contador de cuarentena; sus dos pruebas existentes siguen pasando. No se borra ningún registro.
+
+**Renovaciones y Cancelaciones:** 17 pruebas de harness pasan sobre lifecycle, enlaces, propuestas/gestiones, motivos, recuperación y borradores sin envío. En LIVE se comprobó consulta, búsqueda focal y cambios de país, detalle de cancelación y borrador de WhatsApp. El editor de Propuestas de Renovaciones quedó bloqueado por la confirmación de catálogos del tenant. La consola confirma que el callable existe en us-central1: una solicitud inicial respondió 200 y la acción posterior 400 con verificación callable aprobada. El cuerpo del error aún no está observado; no se atribuye a 404, IAM ni al reader de pólizas sin evidencia.
+
+La recuperación de cancelación tiene un riesgo reproducido de persistencia parcial si falla la actividad intermedia. El comparativo Cliente360 tiene guardado sin readback, valores supuestos (prima×1.10, deducible1%, asistencia Premium), etiqueta “mejor” basada solo en precio y texto de adjunto sin generar documento. Son pendientes delimitados; el cotizador/comparador integral sigue después de Finanzas y Marketing.
+
+El test legacy `CLIENT_TYPE_KPI_LEGAL` estaba desactualizado respecto a la exclusión QA aprobada. Se ajustó el test, conservando asserts estrictos y verificación funcional; 125 comprobaciones pasan y dos mutantes dañinos son rechazados. No se modifica Cliente360 para satisfacer una prueba textual antigua.
+
+## Publicación y preservación de datos
+
+Paula aprobó conectar app.aysseguros.com al mismo Firebase Hosting. El dominio ya se añadió y HostDime confirmó el TXT `hosting-site=ays-orbit-360-lab`, TTL14400, con lectura posterior. El A actual sigue 107.161.178.166; el sitio anterior continúa mientras Firebase valida dominio/certificado. No se han cambiado correo, raíz corporativa, nameservers ni datos operativos. El estado del asistente, no una suposición de propagación, gobierna el corte.
+
+Para las mejoras posteriores se publica código/configuración versionada y migraciones aditivas e idempotentes cuando sean necesarias. Los datos LIVE de la empresa no se empaquetan ni se sustituyen por snapshots del desarrollo. Un rollback de software no restaura una base de datos vieja. Se conserva la misma candidata acumulativa y un único index: nuevo source exige nuevo build; Preview y LIVE reciben el mismo artifact/digest.
+
+El builder existente ya añade `orbitBuild=<buildId>` a scripts/estilos, versiona PWA/SW y aplica no-cache. No hace falta un parche manual de index ni del artifact. El workflow del reader se publica inicialmente en modo solo lectura; antes de un deploy exige HEAD y manifest previos exactos, revisión de las dependencias y prueba autenticada posterior.
+
+## Orden de ejecución que continúa
+
+1. Publicar y validar el delta causal de fuente y este freeze, conservando sellos current42.
+2. Obtener readback del lector LIVE; corregir su transporte solo con paquete/dependencias exactos. Crear un nuevo artifact acumulativo en el Preview existente, probar Equipo/Cancelaciones/Reportes y promover ese mismo artifact tras la evidencia requerida.
+3. Resolver el contrato de catálogos que bloquea Propuestas y la persistencia conjunta de recuperación. Comprobar únicamente los flujos afectados sin descartar sus aprobaciones históricas.
+4. Mantener B4-004 como primer gate formal incompleto: Siniestros diferido por Paula, Cronograma retenido con auditoría de mejor versión; después continúan las pruebas transversales y de la versión exacta según el plan rector.
+5. Completar fechas estimadas, regla médica configurada por catálogo, journal de efectos pendientes y tarifas con vigencia; normalizar el lote con sus hashes y producir diff de pólizas/cuotas/primas. Las preguntas específicas se plantean al detectarlas.
+6. Aplicar casos unívocos por owners canónicos, con deduplicación, antes/después y recarga; proyectar Cliente360, pólizas, clientes, cobros, cartera, comisiones y Conciliaciones. Finanzas se materializa desde los hechos retenidos cuando estén preparados sus owners.
+7. Cerrar conexión del dominio al estar listo HTTPS, verificar login/rutas/roles/PWA en el dominio y conservar rollback de tráfico. Mantener el portal Firebase existente durante esa preparación.
+
+No se asignan porcentajes globales de avance sin matriz verificable de criterios y evidencia. Un test local, un deploy o un cuadro visible no son por sí solos PASS completo de módulo.
+
+---
+
+## Plan conservado de la primera congelación de hoy
+
+Se conserva a continuación como historial y detalle complementario. Las decisiones prevalentes anteriores sustituyen expresamente sus referencias superadas; no restauran sus preguntas ya resueltas.
+
 # Gravicentra Insurance — decisiones y plan operativo del 7 de noviembre de 2026
 
 Estado: CONGELADO POR INSTRUCCIÓN EXPRESA DE PAULA. Registro aditivo dentro del plan rector existente; no crea iteraciones, ramas ni otra candidata.
@@ -233,3 +305,4 @@ Para el importador integral futuro se reutilizan estas ocho etapas y la misma au
 - Owners financieros auditados: orbit360-platform/core/comisiones-eng.js y orbit360-platform/modules/finanzas.js.
 - Equipo: modules/equipo.js, data/store-firestore-product-operational-p0.js, data/store-firestore-product-readonly-p0.js y functions/b4-003-scoped-bootstrap-reader.js.
 - Firebase: https://firebase.google.com/docs/hosting/manage-hosting-resources ; https://firebase.google.com/docs/hosting/custom-domain ; https://firebase.google.com/docs/hosting/test-preview-deploy .
+

@@ -1,0 +1,85 @@
+{
+  "schema": "GRAVICENTRA_CURRENT42_CAUSAL_FRONTEND_SUCCESSOR_CONTRACT_V1",
+  "status": "SOURCE_CONTRACT_ONLY_PREVIEW_AND_PROMOTION_PENDING",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "sourceBaseHead": "b3dcd9d1a57bb4871b06df341ec6198c56f9cfe9",
+  "preservedAcceptance": {
+    "cursor": "b4003ActiveCertificationCursor20261106",
+    "status": "LATEST_APPROVED_VERSION_LIVE_PASS",
+    "sourceSha": "857f1222f360a42a06e012810a1c01bce155a26f",
+    "buildId": "gi-i65-b4-857f1222f360-57f234755dc1",
+    "artifactId": 13549460562,
+    "receiptBlobSha": "0879188bf245248fa1092fb2014e35e14e802b44"
+  },
+  "scope": {
+    "kind": "CAUSAL_POST_ACCEPTANCE_FRONTEND_CORRECTIONS",
+    "b4003Reopened": false,
+    "historicalCertificatesRewritten": false,
+    "nextGateExecuted": false,
+    "backendFunctionDeploys": 0,
+    "rulesWrites": 0,
+    "businessWrites": 0,
+    "authIamChanges": 0,
+    "reimport": false
+  },
+  "productChanges": [
+    {
+      "path": "orbit360-platform/data/store-firestore-product-operational-p0.js",
+      "beforeBlobSha": "adcee4c9cdf0ac5a8e9102068927614e4809d78a",
+      "afterBlobSha": "da30be86aa065d26581693f3430c40ac7cac6165"
+    },
+    {
+      "path": "orbit360-platform/modules/cancelaciones.js",
+      "beforeBlobSha": "c9f6934beea57136daca0a3292451ad0792181c1",
+      "afterBlobSha": "c206f79a47b8aa8684dc0cf50756f3720166bdbe"
+    },
+    {
+      "path": "orbit360-platform/modules/reportes.js",
+      "beforeBlobSha": "e00cdbaef2207b6e48c6507c0039161afa07c4e0",
+      "afterBlobSha": "0daba72ebd8e6f8bef84ced9739b71bcabff0973"
+    }
+  ],
+  "preservedBuilder": {
+    "path": "tools/gravicentra-i6-1-preview-package.mjs",
+    "blobSha": "d42337f326637d669834664289cb3cce36b56342",
+    "indexBlobSha": "867c5e108988b68ca49702e494e96fa9f01afd71",
+    "assetVersioning": "BUILDER_ORBITBUILD_FOR_EVERY_JS_CSS_NO_ARTIFACT_PATCH"
+  },
+  "preview": {
+    "workflow": ".github/workflows/gravicentra-b4-003-immutable-candidate-preview.yml",
+    "site": "ays-orbit-360-lab",
+    "channelId": "gi-i65-b4-rc-41765742748",
+    "buildExactlyOnce": true,
+    "reuseSameArtifactForLive": true,
+    "sourceSha": "RESOLVED_FROM_EXACT_CHECKED_OUT_GITHUB_SHA",
+    "artifactId": null,
+    "buildId": null,
+    "hostedPayloadDigest": null,
+    "authenticatedUat": "PENDING"
+  },
+  "rollback": {
+    "sourceSha": "857f1222f360a42a06e012810a1c01bce155a26f",
+    "buildId": "gi-i65-b4-857f1222f360-57f234755dc1",
+    "versionName": "sites/ays-orbit-360-lab/versions/c5e1ae001fae793b",
+    "artifactId": 13549460562,
+    "productFiles": 218,
+    "hostedPayloadDigest": "308b669105c380294177f1a8d2350216af95fec31f800955d611e607542b42da",
+    "archiveSha256": "5af8e1e6e98e861c5c1a2e25324841ac9dfb07fffae0524c1cabc1a6282ad338",
+    "requiredBeforePromotion": "VERIFY_CURRENT42_VERSION_METADATA_AND_RAW_RETAINED_CERTIFICATE_WITH_EXISTING_PREFLIGHT_NO_BUSINESS_RESTORE"
+  },
+  "promotion": {
+    "authorized": false,
+    "existingExecutor": ".github/workflows/gravicentra-b4-003-executor.yml",
+    "existingPreflight": "tools/gravicentra-b4-003-retained-hosting-preflight.mjs",
+    "existingPromotion": "tools/gravicentra-b4-003-retained-hosting-promotion.mjs",
+    "required": "New exact artifact/readback receipt plus focal authenticated acceptance and additive successor cursor. Promote existing preview version without build; rollback to retained current42. Preserve current42 sealed historical cursor unchanged."
+  },
+  "focalAcceptance": [
+    "Equipo acknowledged classification shared-store projection and reload",
+    "Cancelaciones commercial GT/CO/TODOS without QA in list, motives, amounts or rate",
+    "Reportes commercial results and retained QA quarantine count",
+    "No console/page/HTTP errors on changed paths",
+    "Backend catalog Propuestas failure remains a separate traced dependency; never infer it passed from these source fixes"
+  ]
+}

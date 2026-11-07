@@ -141,8 +141,23 @@ for(const [raw,want,label] of [
   ['', '', 'missing_unknown'],['Sin clasificar','Sin clasificar','unknown_not_invented']
 ])expect(typeContext.qaType(raw),want,'CLIENT_TYPE_'+label);
 assert.match(c360Src,/!f\.tipo \|\| tipoClienteVisible\(c\.tipo\) === f\.tipo/,'CLIENT_TYPE_FILTER_CANONICAL');checks++;
-assert.match(c360Src,/rows\.filter\(c => tipoClienteVisible\(c\.tipo\) === 'Empresa'\)/,'CLIENT_TYPE_KPI_LEGAL');checks++;
-assert.match(c360Src,/rows\.filter\(c => tipoClienteVisible\(c\.tipo\) === 'Persona'\)/,'CLIENT_TYPE_KPI_NATURAL');checks++;
+// The approved commercial KPI excludes auditable QA clients before classifying.
+// Preserve the exact typed-count contracts and exercise that exclusion; do not
+// widen to all rows merely to satisfy the historical textual assertion.
+const commercialRowProjection=c360Src.match(/const commercialClientRows = rows\.filter\(c => !isQaRecord\(c\)\);/);
+assert.ok(commercialRowProjection,'CLIENT_TYPE_KPI_COMMERCIAL_PROJECTION');checks++;
+assert.match(c360Src,/commercialClientRows\.filter\(c => tipoClienteVisible\(c\.tipo\) === 'Empresa'\)/,'CLIENT_TYPE_KPI_LEGAL');checks++;
+assert.match(c360Src,/commercialClientRows\.filter\(c => tipoClienteVisible\(c\.tipo\) === 'Persona'\)/,'CLIENT_TYPE_KPI_NATURAL');checks++;
+const commercialTypeContext={String,
+ rows:[{id:'legal-real',tipo:'juridica'},{id:'natural-real',tipo:'natural'},
+  {id:'legal-qa',tipo:'Empresa',__syntheticQa:true},{id:'natural-qa',tipo:'Persona',__syntheticQa:true}],
+ isQaRecord:r=>r.__syntheticQa===true};
+vm.runInNewContext(c360Src.slice(clientTypeFrom,clientTypeTo)+'\n'+commercialRowProjection[0]+
+ '\nthis.commercialQA={total:commercialClientRows.length,legal:commercialClientRows.filter(c => tipoClienteVisible(c.tipo) === "Empresa").length,natural:commercialClientRows.filter(c => tipoClienteVisible(c.tipo) === "Persona").length};',commercialTypeContext);
+expect(commercialTypeContext.commercialQA.total,2,'CLIENT_TYPE_KPI_EXCLUDES_QA');
+expect(commercialTypeContext.commercialQA.legal,1,'CLIENT_TYPE_KPI_LEGAL_COMMERCIAL_ONLY');
+expect(commercialTypeContext.commercialQA.natural,1,'CLIENT_TYPE_KPI_NATURAL_COMMERCIAL_ONLY');
+expect(commercialTypeContext.rows.length,4,'CLIENT_TYPE_KPI_PRESERVES_QA_RECORDS');
 assert.doesNotMatch(c360Src,/\$\{c\.tipo\}<\/span>/,'CLIENT_TYPE_RAW_HTML_LEAK');checks++;
 const entry=read('orbit360-platform/index.html');
 assert.match(entry,/modules\/cliente360\.js\?v=20261018-b4003-uat2-clienttype-canonical/,'CLIENT_TYPE_CURRENT_CACHE_KEY');checks++;
@@ -185,3 +200,4 @@ expect(countryCtx.countryQA.restoreCountry(),false,'UNAUTHENTICATED_CONTEXT_NOT_
 assert.match(entry,/!Orbit\.productAppP0\.persistCountry\(next\)/,'COUNTRY_SELECTOR_MUST_PERSIST_VALIDATED_CHOICE');checks++;
 
 console.log('B4_003_FIRST_PAINT_TEAM_ROLE_READINESS_SOURCE_VM_QA_PASS checks='+checks+' no_remote_access no_writes');
+

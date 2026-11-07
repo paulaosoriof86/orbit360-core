@@ -34,6 +34,17 @@ Orbit.modules.cancelaciones = (function () {
     if (!id) return null;
     return I && I.clientById ? (I.clientById.get(String(id)) || null) : S().get('clientes', id);
   }
+  // Retain QA records for audit while every commercial view shares the
+  // canonical provenance helper, including policy and client inheritance.
+  const isSyntheticQaRecord = row => typeof q.isSyntheticQaRecord === 'function' && q.isSyntheticQaRecord(row);
+  function isCommercialPolicy(p, I) {
+    return !!p && !isSyntheticQaRecord(p) && !isSyntheticQaRecord(linkedClient(null,p,I));
+  }
+  function isSyntheticCancellation(c, I) {
+    const p=linkedPolicy(c,I);
+    return isSyntheticQaRecord(c) || isSyntheticQaRecord(p) ||
+      isSyntheticQaRecord(linkedClient(c,p,I)) || isSyntheticQaRecord(linkedClient(null,p,I));
+  }
   function recordCountry(c, I) {
     const p=linkedPolicy(c,I),cli=linkedClient(c,p,I);
     return countryCode(c&&c.pais || p&&p.pais || p&&p.country || cli&&cli.pais || cli&&cli.country);
@@ -93,18 +104,19 @@ Orbit.modules.cancelaciones = (function () {
       __policyCancellationProjection: true
     };
   }
-  function effectiveCancelations(I) {
+  function effectiveCancelations(I, options) {
     const explicit = allSafe('cancelaciones');
     const explicitPolicies = new Set(explicit.map(c => String(c && c.polizaId || '')).filter(Boolean));
     const policyRows = I && I.policies ? I.policies : allSafe('polizas');
     const projected = policyRows.filter(isCancelledPolicy).filter(p => p && p.id && !explicitPolicies.has(String(p.id))).map(policyCancellation);
-    return explicit.concat(projected).filter(c => inActiveCountry(c,I));
+    const auditQa=!!(options && options.mode==='audit' && options.includeSyntheticQa===true);
+    return explicit.concat(projected).filter(c => inActiveCountry(c,I) && (auditQa || !isSyntheticCancellation(c,I)));
   }
   function cancellationById(id, policyId) {
     const I=relationIndex();
     const explicit = S().get('cancelaciones', id);
     if (explicit && inActiveCountry(explicit,I)) return explicit;
-    const all=effectiveCancelations(I), direct=all.find(c => c.id === id);
+    const all=effectiveCancelations(I,{mode:'audit',includeSyntheticQa:true}), direct=all.find(c => c.id === id);
     if (direct) return direct;
     const wanted=String(policyId||'');
     return wanted ? (all.find(c => String(c&&c.polizaId||'')===wanted) || null) : null;
@@ -219,7 +231,7 @@ Orbit.modules.cancelaciones = (function () {
     const withoutDocumentedReason=all.filter(c=>!documentedReason(c)).length;
     const motTot = all.length || 1;
     const perdidoPorMoneda = lostByCurrency(all,I);
-    const polizasBase = I.policies.filter(p => policyInActiveCountry(p,I));
+    const polizasBase = I.policies.filter(p => policyInActiveCountry(p,I) && isCommercialPolicy(p,I));
     const motCols = ['#7e1220', '#b5253b', '#c9821b', '#6b4ea0', '#1f3a5f'];
     const defs = FDEFS(all);
 
@@ -302,8 +314,8 @@ Orbit.modules.cancelaciones = (function () {
   }
 
   function detalleKpi(kind) {
-    const all=effectiveCancelations(), byMotivo={}; all.forEach(c=>{const reason=documentedReason(c);if(reason)byMotivo[reason]=(byMotivo[reason]||0)+1;});
-    const top=(Object.entries(byMotivo).sort((a,b)=>b[1]-a[1])[0]||['—',0]), currencies=lostByCurrency(all), pols=allSafe('polizas').filter(policyInActiveCountry);
+    const I=relationIndex(),all=effectiveCancelations(I), byMotivo={}; all.forEach(c=>{const reason=documentedReason(c);if(reason)byMotivo[reason]=(byMotivo[reason]||0)+1;});
+    const top=(Object.entries(byMotivo).sort((a,b)=>b[1]-a[1])[0]||['—',0]), currencies=lostByCurrency(all,I), pols=I.policies.filter(p=>policyInActiveCountry(p,I)&&isCommercialPolicy(p,I));
     let body='';
     if(kind==='valor') body=Object.keys(currencies).sort().map(cur=>'<div class="asg197-detail-row"><span><b>'+U.esc(cur)+'</b><small>'+all.filter(c=>recordCurrency(c)===cur).length+' cancelación(es)</small></span><span>'+U.money(currencies[cur],cur)+'</span></div>').join('')||'<div class="empty">Sin valor perdido para este alcance.</div>';
     else if(kind==='motivo') body='<div class="asg197-detail-row"><span><b>'+U.esc(top[0])+'</b><small>Motivo más frecuente en el país seleccionado</small></span><span>'+top[1]+'</span></div>';
@@ -489,6 +501,6 @@ Orbit.modules.cancelaciones = (function () {
   function filtrarMotivo(m) { st.fmot = m; const host = document.getElementById('host'); if (host) render(host); }
   // Read-only owner bridge for commercial reports. Keep all projections,
   // explicit-policy deduplication and active-country authority in one place.
-  function effectiveRows() { return effectiveCancelations(relationIndex()); }
+  function effectiveRows(options) { return effectiveCancelations(relationIndex(),options); }
   return { render, detalle, detalleKpi, filtrarMotivo, effectiveRows };
 })();

@@ -54,6 +54,7 @@ jobs:
       PROJECT_ID: ays-orbit-360-lab
       TENANT_HINT: alianzas-soluciones
       HOSTING_SITE: ays-orbit-360-lab
+      FRONTEND_CONTRACT: artifacts/orbit360-recovery/release-control/I6_5_B4_003_CURRENT42_CAUSAL_FRONTEND_SUCCESSOR_CONTRACT_20261107.json
       RELEASE_GATE: I6.5-B4-003
       BUILD_PREFIX: gi-i65-b4
       GRAVICENTRA_B4_003_SCOPED_PREVIEW: 'true'
@@ -91,6 +92,28 @@ jobs:
           test "$(git rev-parse HEAD:tools/gravicentra-b4-003-e4-anulado-projection.test.cjs)" = '3f471893daabc44e3d226b6983393114d568c1f8'
           test -f artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json
           test -f orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json
+          node - <<'NODE'
+          const fs=require('node:fs'),crypto=require('node:crypto'),{execFileSync}=require('node:child_process');
+          const git=(...args)=>execFileSync('git',args,{encoding:'utf8'}).trim();
+          const c=JSON.parse(fs.readFileSync(process.env.FRONTEND_CONTRACT,'utf8'));
+          const need=(v,e)=>{if(!v)throw Error('FRONTEND_SUCCESSOR_'+e);};
+          need(c.schema==='GRAVICENTRA_CURRENT42_CAUSAL_FRONTEND_SUCCESSOR_CONTRACT_V1'&&c.status==='SOURCE_CONTRACT_ONLY_PREVIEW_AND_PROMOTION_PENDING','CONTRACT');
+          need(c.repository===process.env.GITHUB_REPOSITORY&&process.env.GITHUB_REF==='refs/heads/'+c.branch,'BOUNDARY');
+          need(c.scope.b4003Reopened===false&&c.scope.nextGateExecuted===false&&c.scope.backendFunctionDeploys===0&&c.scope.businessWrites===0&&c.scope.rulesWrites===0&&c.promotion.authorized===false,'SCOPE');
+          git('merge-base','--is-ancestor',c.sourceBaseHead,'HEAD');
+          need(git('rev-parse','HEAD')===process.env.SOURCE_SHA,'HEAD');
+          const cp=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json','utf8'));
+          const seal=cp[c.preservedAcceptance.cursor]?.formalLiveAcceptance;
+          need(seal&&seal.status===c.preservedAcceptance.status&&seal.sourceSha===c.preservedAcceptance.sourceSha&&seal.buildId===c.preservedAcceptance.buildId&&Number(seal.artifactId)===c.preservedAcceptance.artifactId&&seal.receiptBlobSha===c.preservedAcceptance.receiptBlobSha,'PRESERVED_CURRENT42_SEAL');
+          const paths=git('diff','--name-only',c.sourceBaseHead,'HEAD','--','orbit360-platform').split(/\r?\n/).filter(p=>p&&!p.startsWith('orbit360-platform/docs/')).sort();
+          need(JSON.stringify(paths)===JSON.stringify(c.productChanges.map(x=>x.path).sort()),'UNDECLARED_PRODUCT_CHANGE');
+          for(const x of c.productChanges){need(git('rev-parse',c.sourceBaseHead+':'+x.path)===x.beforeBlobSha&&git('hash-object',x.path)===x.afterBlobSha,'PRODUCT_BLOB');}
+          need(git('hash-object',c.preservedBuilder.path)===c.preservedBuilder.blobSha&&git('hash-object','orbit360-platform/index.html')===c.preservedBuilder.indexBlobSha,'BUILDER_OR_INDEX_CHANGED');
+          need(git('diff','--name-only',c.preservedAcceptance.sourceSha,'HEAD','--','functions')==='','BACKEND_SOURCE_CHANGED');
+          console.log('FRONTEND_SUCCESSOR_CONTRACT_PASS_CURRENT42_PRESERVED_NO_LIVE_AUTHORIZATION');
+          NODE
+          node tools/gravicentra-b4-003-role-first-paint-and-team-regression.test.cjs
+          node --test tools/gravicentra-b4-003-renewals-cancellations-focused.test.cjs tools/gravicentra-b4-003-cancelaciones-commercial-qa.test.cjs
           node --check functions/b4-003-scoped-policy-reader.js
           node --check orbit360-platform/modules/polizas.js
           node --check orbit360-platform/modules/policy-receipts-v1199-detail-guard.js
@@ -161,36 +184,17 @@ jobs:
           echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/gi-e4-auth/selected.json" >> "$GITHUB_ENV"
           echo "FIREBASE_CLI_BIN=$CLI" >> "$GITHUB_ENV"
           npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund firebase-admin@13.4.0 >/dev/null
-      - name: Repair ONLY existing scoped Preview reader team fields; no LIVE, Rules or Auth deploy
+      - name: Preserve current backend for the authorized frontend-only successor
         working-directory: candidate
         run: |
           set -euo pipefail
-          test "$(git rev-parse HEAD)" = "$SOURCE_SHA"
-          node tools/gravicentra-b4-003-scoped-bootstrap-reader.test.cjs
-          # Run 42308894583 already deployed this exact reader source. Frontend-only fixes need no routine backend deployment.
-          if git diff --quiet 131d346a3b2d857ee043f2feb590f4608f450e55 HEAD -- functions; then
-            echo "PREVIEW_READER_SOURCE_UNCHANGED_FROM_VERIFIED_RUN_42308894583; NO_REDEPLOY"
-            exit 0
-          fi
-          STAGING="$RUNNER_TEMP/gi-b4003-team-reader-preview"
-          mkdir -p "$STAGING"
-          cp -a functions "$STAGING/backend"
-          cmp functions/b4-003-scoped-bootstrap-reader.js "$STAGING/backend/b4-003-scoped-bootstrap-reader.js"
-          node - "$STAGING/backend/bootstrap.js" <<'NODE'
-          const fs=require('node:fs'),entry=process.argv[2],s=fs.readFileSync(entry,'utf8');
-          if(s.includes("require('./b4-003-scoped-policy-callable')"))throw Error('B4_003_READER_DUPLICATE_EXPORT');
-          fs.appendFileSync(entry,"\n// Only the existing Preview reader is selected for deployment.\nObject.assign(module.exports,require('./b4-003-scoped-policy-callable'));\n");
-          NODE
-          printf '{"functions":{"source":"backend"}}\n' > "$STAGING/firebase.json"
-          npm ci --prefix "$STAGING/backend" --ignore-scripts --no-audit --no-fund >/dev/null
-          node "$FIREBASE_CLI_BIN" deploy --only functions:orbit360ScopedPolicyReadPreview --config "$STAGING/firebase.json" --project "$PROJECT_ID" --non-interactive
-          node "$FIREBASE_CLI_BIN" functions:list --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/gi-team-reader-preview-readback.json"
-          node - "$RUNNER_TEMP/gi-team-reader-preview-readback.json" <<'NODE'
-          const fs=require('node:fs'),d=JSON.parse(fs.readFileSync(process.argv[2],'utf8'));
-          const r=Array.isArray(d.result)?d.result:Array.isArray(d)?d:[];
-          if(r.filter(x=>String(x.id||x.name||x.function||'').split('/').pop()==='orbit360ScopedPolicyReadPreview').length!==1)
-            throw Error('TEAM_READER_PREVIEW_FUNCTION_READBACK_MISSING');
-          console.log('TEAM_READER_PREVIEW_FUNCTION_PRESENT; LIVE_HOSTING_RULES_AUTH_UNCHANGED');
+          # Backend readback/deployment is a separately reviewed existing workflow.
+          # This transport never redeploys any callable while fixing frontend state.
+          node - <<'NODE'
+          const fs=require('node:fs'),{execFileSync}=require('node:child_process');
+          const c=JSON.parse(fs.readFileSync(process.env.FRONTEND_CONTRACT,'utf8'));
+          execFileSync('git',['diff','--exit-code',c.preservedAcceptance.sourceSha,'HEAD','--','functions'],{stdio:'inherit'});
+          console.log('BACKEND_SOURCE_UNCHANGED_NO_FUNCTION_DEPLOY');
           NODE
       - name: Build immutable exact E4 Hosting package once
         working-directory: candidate
@@ -240,6 +244,7 @@ jobs:
           tar -tzf "$RUNNER_TEMP/gi-b4003-immutable-release-bundle.tar.gz" > "$RUNNER_TEMP/gi-b4003-immutable-bundle-entries.txt"
           grep -Fxq 'bundle/site/modules/reportes.js' "$RUNNER_TEMP/gi-b4003-immutable-bundle-entries.txt"
       - name: Retain exact artifact for same-byte LIVE promotion after gate approval
+        id: retained_bundle
         uses: actions/upload-artifact@v4
         with:
           name: gi-b4003-immutable-release-bundle-${{ github.run_id }}
@@ -271,6 +276,8 @@ jobs:
       - name: Verify exact served artifact, preserve both LIVE sites
         env:
           PREVIEW_URL: ${{ steps.hosting.outputs.url }}
+          RETAINED_ARTIFACT_ID: ${{ steps.retained_bundle.outputs.artifact-id }}
+          RETAINED_ZIP_SHA256: ${{ steps.retained_bundle.outputs.artifact-digest }}
         run: |
           set -euo pipefail
           ROOT="$RUNNER_TEMP/gi-e4-canonical-hosting/bundle/site"
@@ -290,11 +297,13 @@ jobs:
             echo 'PREVIEW_EXACT_BUILD_NOT_PROPAGATED_BEFORE_BOUNDED_DEADLINE' >&2
             exit 1
           fi
-          for rel in __recovery__/build.json product-runtime-config.js index.html modules/inicio.js modules/equipo.js modules/ops.js modules/leads.js modules/polizas.js modules/policy-receipts-v1199-detail-guard.js modules/cancelaciones.js modules/reportes.js modules/cobros.js modules/renovaciones.js core/assignable-advisor-roster-client.js core/ciclo.js data/store-firestore-product-operational-p0.js core/tenant-access-policy-effective-p0.js core/access-scope.js core/queries.js styles/infra.css; do
+          # Verify every product file from the immutable manifest, not a sample.
+          while IFS= read -r manifest_row; do
+            rel="${manifest_row#*  }"
             mkdir -p "$RUNNER_TEMP/gi-e4-readback/$(dirname "$rel")"
             curl -fsSL --retry 12 --retry-all-errors --retry-delay 5 --max-time 25 "$PREVIEW_URL/$rel" > "$RUNNER_TEMP/gi-e4-readback/$rel"
             cmp "$ROOT/$rel" "$RUNNER_TEMP/gi-e4-readback/$rel"
-          done
+          done < "$RUNNER_TEMP/gi-e4-canonical-hosting/evidence/site-manifest.sha256"
           curl -fsSL --retry 2 --max-time 30 https://ays-orbit-360-lab.web.app/ | sha256sum > "$RUNNER_TEMP/gi-e4-live-after.sha"
           curl -fsSL --retry 2 --max-time 30 https://app.aysseguros.com/ | sha256sum > "$RUNNER_TEMP/gi-e4-domain-after.sha"
           cmp "$RUNNER_TEMP/gi-e4-live-before.sha" "$RUNNER_TEMP/gi-e4-live-after.sha"
@@ -304,9 +313,17 @@ jobs:
           const root=process.env.RUNNER_TEMP+'/gi-e4-canonical-hosting/bundle/site';
           const b=JSON.parse(fs.readFileSync(root+'/__recovery__/build.json','utf8'));
           const digest=rel=>crypto.createHash('sha256').update(fs.readFileSync(root+'/'+rel)).digest('hex');
+          const contract=JSON.parse(fs.readFileSync('candidate/'+process.env.FRONTEND_CONTRACT,'utf8'));
+          const packageOutput=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/gi-e4-package-output.json','utf8'));
+          const tarSha=crypto.createHash('sha256').update(fs.readFileSync(process.env.RUNNER_TEMP+'/gi-b4003-immutable-release-bundle.tar.gz')).digest('hex');
+          if(!/^[0-9]+$/.test(process.env.RETAINED_ARTIFACT_ID||'')||!/^[a-f0-9]{64}$/.test(process.env.RETAINED_ZIP_SHA256||''))throw Error('IMMUTABLE_ARTIFACT_OUTPUTS_REQUIRED');
           const proof={
             schema:'I6_5_B4_003_IMMUTABLE_PREVIEW_RELEASE_BUNDLE_V1',
             sourceSha:process.env.SOURCE_SHA,buildId:b.buildId,previewUrl:process.env.PREVIEW_URL,
+            runId:Number(process.env.GITHUB_RUN_ID),artifactId:Number(process.env.RETAINED_ARTIFACT_ID),artifactZipSha256:process.env.RETAINED_ZIP_SHA256,archiveSha256:tarSha,
+            hostedPayloadDigest:packageOutput.hostedPayloadDigest,productFiles:packageOutput.hostedFileCount,fullProductReadback:true,
+            sourceContract:process.env.FRONTEND_CONTRACT,preservedCurrent42:contract.preservedAcceptance,rollback:contract.rollback,
+            successorStatus:'EXACT_IMMUTABLE_PREVIEW_TRANSPORT_PASS_FOCAL_SIGNED_UAT_PENDING',b4003HistoricalAcceptancePreserved:true,productionPromotionAuthorized:false,
             inicioSha256:digest('modules/inicio.js'),equipoSha256:digest('modules/equipo.js'),
             reportesSha256:digest('modules/reportes.js'),cobrosSha256:digest('modules/cobros.js'),cancelacionesSha256:digest('modules/cancelaciones.js'),
              renovacionesSha256:digest('modules/renovaciones.js'),qaResidueRegression:'SOURCE_TEST_PASS',
@@ -482,4 +499,5 @@ jobs:
             ${{ runner.temp }}/gi-b4003-transport-result.json
           if-no-files-found: warn
           retention-days: 30
+
 

@@ -137,20 +137,78 @@ const OWNER_CP_FIELDS=[
 const OWNER_STATE_FIELDS=['/'+OWNER_KEY,'/currentExecutionDecisionPointer','/updatedAtUtc','/nextAction'];
 // One documentary successor of the certified current42 closure. This never
 // grants product, deployment, data, Rules or historical-receipt mutation.
-export function validateOwnerDecisionSuccessorSnapshot({control,baseControl,state,baseState,changedPaths,fileBytes}){
+const TEAM_SOURCE_BASE='b3dcd9d1a57bb4871b06df341ec6198c56f9cfe9';
+const TEAM_SOURCE_PATHS={
+  "orbit360-platform/data/store-firestore-product-operational-p0.js": "adcee4c9cdf0ac5a8e9102068927614e4809d78a",
+  "tests/goal-participation-classification-writer.test.cjs": "770452dd7535c38b2a24ead7b13c6e9a2fb12e8a",
+  "tools/gravicentra-b4-003-live-backend-source-readback.cjs": "eafe52011da6380ee701cd94dac9226156bc1a8e",
+  ".github/workflows/gravicentra-b4-003-live-protected-reader-20261029.yml": "c9fe422c2c0e9bbe15a0a6f0dd793e8dbce965ac",
+  "tools/gravicentra-b4-003-live-reader-source-readback.test.cjs": null,
+  "tools/gravicentra-b4-003-role-first-paint-and-team-regression.test.cjs": "eb7f4a4512dbc6e17ed33217de4b36bb1281a27e",
+  "tools/gravicentra-b4-003-renewals-cancellations-focused.test.cjs": null,
+  "orbit360-platform/modules/cancelaciones.js": "c9f6934beea57136daca0a3292451ad0792181c1",
+  "tools/gravicentra-b4-003-cancelaciones-commercial-qa.test.cjs": null,
+  "orbit360-platform/modules/reportes.js": "e00cdbaef2207b6e48c6507c0039161afa07c4e0",
+  ".github/workflows/gravicentra-b4-003-immutable-candidate-preview.yml": "2b74f6d920f5da6016256dd40ce6666f0693cd1e",
+  "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CURRENT42_CAUSAL_FRONTEND_SUCCESSOR_CONTRACT_20261107.json": null
+};
+const TEAM_CLASSIFICATION_PATCH="      // Publish only the acknowledged classification through the shared store.\n      // Keep it until canonical hydration contains the same two fields.\n      setPending('asesores',id,Object.assign({},get('asesores',id)||prior,patch),{kind:'update',patch:expectedPatch(patch,'asesores')});\n      emit('asesores');\n";
+export function validateEquipoCausalSourceSuccessor({record,pointer,fileBytes,baseSourceBytes}){
+ const proof=record.equipoCausalSourceCorrection;
+ if(!proof)return null;
+ need(proof.schema==='GRAVICENTRA_EQUIPO_CAUSAL_SOURCE_SUCCESSOR_V1'&&proof.sourceBaseHead===TEAM_SOURCE_BASE,'TEAM_SOURCE_BASE');
+ need(proof.status===(proof.previewAllowedOnly?'SOURCE_AND_QA_READY_FRONTEND_PREVIEW_ONLY_NOT_DEPLOYED':'SOURCE_AND_QA_READY_READBACK_ONLY_NOT_DEPLOYED')&&proof.realBusinessWrites===0&&proof.repeatSevenClassificationWrites===false&&proof.rulesChanged===false&&proof.productionAccepted===false,'TEAM_SOURCE_SCOPE');
+ need(Array.isArray(proof.changes)&&proof.changes.length>=5&&proof.changes.length<=12,'TEAM_SOURCE_CHANGES');
+ const reviewedTransportPins={'.github/workflows/gravicentra-b4-003-live-protected-reader-20261029.yml':'bd45ef8297cb4d326929a01d5b8c4303369b72d4','tools/gravicentra-b4-003-live-backend-source-readback.cjs':'48edf21b50f05521a33159b5925e75a904841951','.github/workflows/gravicentra-b4-003-immutable-candidate-preview.yml':'8d17a2e1f4e2a6ff8da5d931790c364e8a2f828a','artifacts/orbit360-recovery/release-control/I6_5_B4_003_CURRENT42_CAUSAL_FRONTEND_SUCCESSOR_CONTRACT_20261107.json':'c792b7db1aa3f16ed7ee20cbdffe2b76dc61b97f'};
+ const listed=proof.changes.map(x=>x.path);
+ const previewWorkflow='.github/workflows/gravicentra-b4-003-immutable-candidate-preview.yml',previewContract='artifacts/orbit360-recovery/release-control/I6_5_B4_003_CURRENT42_CAUSAL_FRONTEND_SUCCESSOR_CONTRACT_20261107.json';
+ const previewIncluded=listed.includes(previewWorkflow)||listed.includes(previewContract);
+ need(previewIncluded===!!proof.previewAllowedOnly,'FRONTEND_PREVIEW_DECLARATION_REQUIRED');
+ if(previewIncluded){
+  need(listed.includes(previewWorkflow)&&listed.includes(previewContract),'FRONTEND_PREVIEW_SOURCE_CONTRACT_PAIR');
+  const pv=proof.previewAllowedOnly,contract=JSON.parse(Buffer.from(fileBytes[previewContract]).toString('utf8'));
+  const productPaths=['orbit360-platform/data/store-firestore-product-operational-p0.js','orbit360-platform/modules/cancelaciones.js','orbit360-platform/modules/reportes.js'];
+  need(pv.workflowPath===previewWorkflow&&pv.contractPath===previewContract&&pv.contractBlobSha==='c792b7db1aa3f16ed7ee20cbdffe2b76dc61b97f'&&pv.site==='ays-orbit-360-lab'&&pv.channelId==='gi-i65-b4-rc-41765742748'&&pv.buildExactlyOnce===true&&pv.livePromotionAuthorized===false&&pv.backendFunctionDeploys===0&&pv.current42Preserved===true&&same(pv.productPaths,productPaths),'FRONTEND_PREVIEW_EXACT_AUTHORITY');
+  need(contract.schema==='GRAVICENTRA_CURRENT42_CAUSAL_FRONTEND_SUCCESSOR_CONTRACT_V1'&&contract.sourceBaseHead===TEAM_SOURCE_BASE&&contract.scope.b4003Reopened===false&&contract.scope.historicalCertificatesRewritten===false&&contract.scope.nextGateExecuted===false&&contract.scope.backendFunctionDeploys===0&&contract.scope.businessWrites===0&&contract.scope.rulesWrites===0&&contract.promotion.authorized===false,'FRONTEND_PREVIEW_BOUNDARY');
+  need(contract.preservedAcceptance.receiptBlobSha==='0879188bf245248fa1092fb2014e35e14e802b44'&&contract.preservedAcceptance.sourceSha===SOURCE&&contract.preservedAcceptance.buildId===BUILD&&Number(contract.preservedAcceptance.artifactId)===13549460562&&contract.rollback.versionName===VERSION,'FRONTEND_PREVIEW_CURRENT42_PRESERVED');
+  need(same(contract.productChanges.map(x=>x.path),productPaths)&&contract.productChanges.every(x=>proof.changes.some(c=>c.path===x.path&&c.previousBlobSha===x.beforeBlobSha&&c.blobSha===x.afterBlobSha)),'FRONTEND_PREVIEW_THREE_SOURCE_DELTAS');
+ }
+ const cancellationPins={'orbit360-platform/modules/cancelaciones.js':'c206f79a47b8aa8684dc0cf50756f3720166bdbe','tools/gravicentra-b4-003-cancelaciones-commercial-qa.test.cjs':'03e5ffbf6ef798bc544098057bae211dbd0a612f','orbit360-platform/modules/reportes.js':'0daba72ebd8e6f8bef84ced9739b71bcabff0973'};
+ const cancellationIncluded=Object.keys(cancellationPins).some(path=>listed.includes(path));
+ if(cancellationIncluded)need(Object.keys(cancellationPins).every(path=>listed.includes(path)),'CANCELLATION_SOURCE_TEST_PAIR_REQUIRED');
+ need(new Set(listed).size===listed.length&&Object.keys(TEAM_SOURCE_PATHS).slice(0,5).every(path=>listed.includes(path)),'TEAM_SOURCE_REQUIRED_PATHS');
+ for(const entry of proof.changes){
+  if(reviewedTransportPins[entry.path])need(entry.blobSha===reviewedTransportPins[entry.path],'TEAM_SOURCE_REVIEWED_TRANSPORT_BLOB');
+  if(cancellationPins[entry.path])need(entry.blobSha===cancellationPins[entry.path],'CANCELLATION_EXACT_REVIEWED_BLOB');
+  need(Object.hasOwn(TEAM_SOURCE_PATHS,entry.path)&&entry.previousBlobSha===TEAM_SOURCE_PATHS[entry.path],'TEAM_SOURCE_PATH_OR_PREDECESSOR');
+  need(fileBytes[entry.path]!=null&&blob(Buffer.from(fileBytes[entry.path]))===entry.blobSha,'TEAM_SOURCE_CURRENT_BLOB');
+  const prior=baseSourceBytes?.[entry.path];
+  need(entry.previousBlobSha===null?prior==null:prior!=null&&blob(Buffer.from(prior))===entry.previousBlobSha,'TEAM_SOURCE_BASE_BYTES');
+ }
+ const storePath=Object.keys(TEAM_SOURCE_PATHS)[0],storeText=Buffer.from(fileBytes[storePath]).toString('utf8');
+ need(storeText.split(TEAM_CLASSIFICATION_PATCH).length===2&&storeText.replace(TEAM_CLASSIFICATION_PATCH,'')===Buffer.from(baseSourceBytes[storePath]).toString('utf8'),'TEAM_SOURCE_EXACT_ACK_PATCH');
+ const workflow=Buffer.from(fileBytes[Object.keys(TEAM_SOURCE_PATHS)[3]]).toString('utf8');
+ need(workflow.includes("REQUESTED_MODE: ${{ github.event_name == 'workflow_dispatch' && inputs.mode || 'readback' }}")&&workflow.includes('default: readback')&&workflow.includes('DEPLOYED_READER_CHANGED_SINCE_REVIEW')&&workflow.includes('test "$EXPECTED_DEPLOY_HEAD" = "$RELEASE_HEAD"')&&workflow.includes("if: steps.assess.outputs.needs_deploy == 'true'"),'TEAM_SOURCE_READBACK_DEFAULT');
+ need(pointer.productSourceChanged===true&&record.execution.productSourceChanged===true&&record.execution.workflowChanged===true,'TEAM_SOURCE_EXECUTION_FLAGS');
+ return {allowedPaths:listed};
+}
+
+export function validateOwnerDecisionSuccessorSnapshot({control,baseControl,state,baseState,changedPaths,fileBytes,baseSourceBytes}){
  const p=control[OWNER_KEY];
  need(p&&p.authorityBaseHead===OWNER_BASE,'OWNER_BASE_BINDING');
- const permitted=new Set([ROOT+'CONTROL_PLANE.json',STATE,OWNER_FREEZE,OWNER_PLAN,SELF,OWNER_TEST]);
- need(changedPaths.every(x=>permitted.has(x)),'OWNER_UNDECLARED_PATH');
- for(const path of [OWNER_FREEZE,OWNER_PLAN,SELF,OWNER_TEST])need(changedPaths.includes(path),'OWNER_REQUIRED_PATH');
  const bytes=path=>{need(fileBytes[path]!=null,'OWNER_FILE_MISSING');return Buffer.from(fileBytes[path]);};
  need(p.path===OWNER_FREEZE&&p.planPath===OWNER_PLAN&&blob(bytes(OWNER_FREEZE))===p.blobSha&&blob(bytes(OWNER_PLAN))===p.planBlobSha,'OWNER_DOCUMENT_HASH');
  const r=JSON.parse(bytes(OWNER_FREEZE).toString('utf8'));
+ const team=validateEquipoCausalSourceSuccessor({record:r,pointer:p,fileBytes,baseSourceBytes});
+ const permitted=new Set([ROOT+'CONTROL_PLANE.json',STATE,OWNER_FREEZE,OWNER_PLAN,SELF,OWNER_TEST,...(team?.allowedPaths||[])]);
+ need(changedPaths.every(x=>permitted.has(x)),'OWNER_UNDECLARED_PATH');
+ for(const path of [OWNER_FREEZE,OWNER_PLAN,SELF,OWNER_TEST,...(team?.allowedPaths||[])])need(changedPaths.includes(path),'OWNER_REQUIRED_PATH');
  need(r.schema==='GRAVICENTRA_OWNER_DECISION_FREEZE_20261107_V1'&&r.authorityBaseHead===OWNER_BASE&&r.additiveOnly===true&&r.repository==='paulaosoriof86/orbit360-core'&&r.branch==='recovery/fase-a-clean-20260831','OWNER_RECEIPT_IDENTITY');
  need(r.plan?.path===OWNER_PLAN&&r.plan.blobSha===p.planBlobSha,'OWNER_PLAN_BINDING');
- need(r.nextGateExecuted===false&&r.nextGateAccepted===false&&p.nextGateExecuted===false&&p.nextGateAccepted===false&&p.productSourceChanged===false&&p.realBusinessWrites===0,'OWNER_NO_NEW_ACCEPTANCE');
+ need(r.nextGateExecuted===false&&r.nextGateAccepted===false&&p.nextGateExecuted===false&&p.nextGateAccepted===false&&p.productSourceChanged===!!team&&p.realBusinessWrites===0,'OWNER_NO_NEW_ACCEPTANCE');
  const execution=r.execution||{};
- for(const key of ['productSourceChanged','workflowChanged','productDeployed','dnsChanged','dataImportExecuted','newModulePassGranted'])need(execution[key]===false,'OWNER_EXECUTION_'+key);
+ for(const key of ['productDeployed','dnsChanged','dataImportExecuted','newModulePassGranted'])need(execution[key]===false,'OWNER_EXECUTION_'+key);
+ for(const key of ['productSourceChanged','workflowChanged'])need(execution[key]===!!team,'OWNER_EXECUTION_'+key);
  need(execution.realBusinessWrites===0,'OWNER_BUSINESS_WRITES');
  need(p.preservedB4003ReceiptBlobSha==='0879188bf245248fa1092fb2014e35e14e802b44'&&p.preservedProductSourceSha===SOURCE,'OWNER_PRESERVED_RELEASE');
  const proof=r.governanceSuccessorValidation;
@@ -169,13 +227,23 @@ export function validateOwnerDecisionSuccessorSnapshot({control,baseControl,stat
  for(const path of OWNER_STATE_FIELDS)restoreField(projectedState,baseState,path);
  need(same(projected,baseControl),'OWNER_UNENUMERATED_CONTROL_CHANGE');
  need(same(projectedState,baseState),'OWNER_UNENUMERATED_STATE_CHANGE');
- return {comparableControl:projected,allowedPaths:[OWNER_FREEZE,OWNER_PLAN,OWNER_TEST]};
+ return {comparableControl:projected,allowedPaths:[OWNER_FREEZE,OWNER_PLAN,OWNER_TEST,...(team?.allowedPaths||[])]};
 }
 function verifyOwnerDecisionSuccessor(after){
  if(!after[OWNER_KEY])return null;
  need(git('merge-base',OWNER_BASE,'HEAD')===OWNER_BASE,'OWNER_BASE_NOT_ANCESTOR');
- const paths=[ROOT+'CONTROL_PLANE.json',STATE,OWNER_FREEZE,OWNER_PLAN,SELF,OWNER_TEST,OWNER_V6];
- const fileBytes={};
+ const sourceProof=read(OWNER_FREEZE).equipoCausalSourceCorrection;
+ const extraPaths=sourceProof?.changes?.map(x=>x.path)||[];
+ need(extraPaths.every(path=>Object.hasOwn(TEAM_SOURCE_PATHS,path)),'TEAM_SOURCE_PATH');
+ const paths=[ROOT+'CONTROL_PLANE.json',STATE,OWNER_FREEZE,OWNER_PLAN,SELF,OWNER_TEST,OWNER_V6,...extraPaths];
+ const fileBytes={},baseSourceBytes={};
+ if(sourceProof){
+  need(git('merge-base',TEAM_SOURCE_BASE,'HEAD')===TEAM_SOURCE_BASE,'TEAM_SOURCE_BASE_ANCESTRY');
+  for(const path of extraPaths){
+   if(TEAM_SOURCE_PATHS[path]===null){need(!git('ls-tree',TEAM_SOURCE_BASE,'--',path),'TEAM_SOURCE_NEW_PATH_ALREADY_EXISTS');baseSourceBytes[path]=null;}
+   else baseSourceBytes[path]=execFileSync('git',['show',TEAM_SOURCE_BASE+':'+path]);
+  }
+ }
  for(const path of paths){
   fileBytes[path]=fs.readFileSync(path);
   need(git('rev-parse','HEAD:'+path)===blob(fileBytes[path]),'OWNER_UNCOMMITTED_FILE');
@@ -183,7 +251,7 @@ function verifyOwnerDecisionSuccessor(after){
  return validateOwnerDecisionSuccessorSnapshot({
   control:after,baseControl:old(OWNER_BASE,ROOT+'CONTROL_PLANE.json'),
   state:read(STATE),baseState:old(OWNER_BASE,STATE),
-  changedPaths:git('diff','--name-only',OWNER_BASE,'HEAD').split(/\r?\n/).filter(Boolean),fileBytes
+  changedPaths:git('diff','--name-only',OWNER_BASE,'HEAD').split(/\r?\n/).filter(Boolean),fileBytes,baseSourceBytes
  });
 }
 
@@ -246,4 +314,5 @@ export function projectVerifiedB4003LiveClosure(after,certified){
  for(const p of mutable)restoreField(comparable,certified,p);
  return {comparableAfter:comparable,closed:true,receiptBlobSha:seal.receiptBlobSha};
 }
+
 

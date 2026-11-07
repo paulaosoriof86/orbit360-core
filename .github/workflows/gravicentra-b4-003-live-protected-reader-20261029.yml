@@ -1,13 +1,31 @@
 name: Gravicentra B4-003 Scoped LIVE Reader Only
 
-# One explicit, owner-authorized backend-only step after a verified full
-# Firestore export. This workflow never deploys Hosting, Rules or other Functions.
+# Publishing this workflow performs READBACK ONLY. A reviewed explicit dispatch
+# binds the exact branch HEAD and previous deployed manifest before one-function
+# deployment. Hosting, Rules, other Functions and business data are untouched.
 on:
   push:
     branches:
       - recovery/fase-a-clean-20260831
     paths:
       - '.github/workflows/gravicentra-b4-003-live-protected-reader-20261029.yml'
+
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: Read only, or deploy the one reviewed reader
+        type: choice
+        options: [readback, deploy]
+        default: readback
+        required: true
+      expected_head:
+        description: Exact canonical HEAD required for deploy
+        type: string
+        required: false
+      expected_before_source_manifest_sha256:
+        description: Exact before reader manifest from the readback artifact
+        type: string
+        required: false
 
 permissions:
   contents: read
@@ -24,6 +42,10 @@ jobs:
     env:
       PROJECT_ID: ays-orbit-360-lab
       RELEASE_HEAD: ${{ github.sha }}
+      GI_TARGET_FUNCTION: orbit360ScopedPolicyRead
+      REQUESTED_MODE: ${{ github.event_name == 'workflow_dispatch' && inputs.mode || 'readback' }}
+      EXPECTED_DEPLOY_HEAD: ${{ inputs.expected_head }}
+      EXPECTED_BEFORE_MANIFEST: ${{ inputs.expected_before_source_manifest_sha256 }}
       SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
       SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
       SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
@@ -47,6 +69,11 @@ jobs:
           REMOTE=$(git ls-remote origin refs/heads/recovery/fase-a-clean-20260831 | awk '{print $1}')
           test "$REMOTE" = "$RELEASE_HEAD"
           test "$PROJECT_ID" = ays-orbit-360-lab
+          case "$REQUESTED_MODE" in
+            readback) ;;
+            deploy) test "$EXPECTED_DEPLOY_HEAD" = "$RELEASE_HEAD"; [[ "$EXPECTED_BEFORE_MANIFEST" =~ ^[0-9a-f]{64}$ ]] ;;
+            *) exit 1 ;;
+          esac
           test -f functions/b4-003-scoped-policy-callable.js
           test -f functions/b4-003-scoped-access-boundary.js
           test -f functions/b4-003-scoped-policy-reader.js
@@ -58,6 +85,10 @@ jobs:
             echo 'B4_003_LIVE_READER_ALREADY_IN_SOURCE_BOOTSTRAP'; exit 1
           fi
           node --check functions/b4-003-scoped-policy-callable.js
+          node --check tools/gravicentra-b4-003-live-backend-source-readback.cjs
+          node tools/gravicentra-b4-003-live-reader-source-readback.test.cjs
+          node tests/goal-participation-classification-writer.test.cjs
+          node tools/gravicentra-b4-003-scoped-bootstrap-reader.test.cjs
           node tools/gravicentra-b4-003-scoped-policy-reader.test.cjs
           node tools/gravicentra-b4-003-scoped-related-reader.test.cjs
           node tools/gravicentra-b4-003-role-context-recovery.test.cjs
@@ -81,6 +112,7 @@ jobs:
           printf '{"functions":{"source":"backend"}}\n' > "$TARGET_ROOT/firebase.json"
           (cd "$TARGET_ROOT/backend" && npm ci --ignore-scripts --no-audit --no-fund)
           echo "TARGET_ROOT=$TARGET_ROOT" >> "$GITHUB_ENV"
+          echo "GI_DEPS_DIR=$TARGET_ROOT/backend/node_modules" >> "$GITHUB_ENV"
 
       - name: Select existing project-scoped deployment identity
         shell: bash
@@ -115,17 +147,88 @@ jobs:
           echo "GOOGLE_APPLICATION_CREDENTIALS=$SELECTED" >> "$GITHUB_ENV"
           echo "FIREBASE_CLI_BIN=$CLI" >> "$GITHUB_ENV"
 
-      - name: Deploy only orbit360ScopedPolicyRead and verify readback
+      - name: Read exact deployed source before any mutation
+        id: assess
         shell: bash
         run: |
           set -euo pipefail
-          node "$FIREBASE_CLI_BIN" deploy --only functions:orbit360ScopedPolicyRead --config "$TARGET_ROOT/firebase.json" --project "$PROJECT_ID" --non-interactive
-          node "$FIREBASE_CLI_BIN" functions:list --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/gi-b4003-live-reader-readback.json"
-          node - "$RUNNER_TEMP/gi-b4003-live-reader-readback.json" <<'NODE'
-          const fs=require('node:fs');
-          const data=JSON.parse(fs.readFileSync(process.argv[2],'utf8'));
-          const rows=Array.isArray(data.result)?data.result:Array.isArray(data)?data:[];
-          const matches=rows.filter(r=>String(r.id||r.name||r.function||'').split('/').pop()==='orbit360ScopedPolicyRead');
-          if(matches.length!==1)throw Error('B4_003_LIVE_READER_READBACK_NOT_ONE');
-          console.log('B4_003_LIVE_SCOPED_READER_ONE_FUNCTION_PRESENT; NO_HOSTING_OR_RULES_DEPLOY');
+          node tools/gravicentra-b4-003-live-backend-source-readback.cjs before
+          node - <<'NODE'
+          const fs=require('node:fs'),tmp=process.env.RUNNER_TEMP;
+          const before=JSON.parse(fs.readFileSync(tmp+'/gi-b4003-live-sources-before.json','utf8'));
+          if(before.target!=='orbit360ScopedPolicyRead'||before.region!=='us-east1'||before.functions.length!==3)throw Error('EXACT_READER_READBACK_REQUIRED');
+          if(process.env.REQUESTED_MODE==='deploy'&&before.readerSourceManifestSha256!==process.env.EXPECTED_BEFORE_MANIFEST)throw Error('DEPLOYED_READER_CHANGED_SINCE_REVIEW');
+          const needed=process.env.REQUESTED_MODE==='deploy'&&!before.readerSourceMatchesCurrent;
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'needs_deploy='+needed+'\n');
+          fs.writeFileSync(tmp+'/gi-b4003-live-reader-result.json',JSON.stringify({status:process.env.REQUESTED_MODE==='readback'?'READBACK_ONLY':needed?'EXACT_READER_DEPLOY_PREPARED':'READER_ALREADY_EXACT_NOOP',head:process.env.GITHUB_SHA,mode:process.env.REQUESTED_MODE,sourceManifest:before.readerSourceManifestSha256,readerSourceMatchesCurrent:before.readerSourceMatchesCurrent,productDeployed:false,businessWrites:0,productionAccepted:false},null,2)+'\n');
           NODE
+
+      - name: Prepare exact predecessor rollback package
+        if: steps.assess.outputs.needs_deploy == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          export RESTORE_ROOT="$RUNNER_TEMP/gi-b4003-live-reader-previous"
+          mkdir -p "$RESTORE_ROOT"
+          python3 - <<'PY'
+          import os,pathlib,zipfile,shutil
+          dst=pathlib.Path(os.environ['RESTORE_ROOT']);ex=dst/'extract';ex.mkdir()
+          src=pathlib.Path(os.environ['RUNNER_TEMP'])/'gi-b4003-before-orbit360ScopedPolicyRead.zip'
+          with zipfile.ZipFile(src) as z:
+              for item in z.infolist():
+                  p=(ex/item.filename).resolve()
+                  if not p.is_relative_to(ex.resolve()):raise SystemExit('SOURCE_ARCHIVE_PATH_ESCAPE')
+              z.extractall(ex)
+          roots=[p.parent for p in ex.rglob('package.json') if (p.parent/'b4-003-scoped-policy-callable.js').is_file() and (p.parent/'bootstrap.js').is_file() and (p.parent/'package-lock.json').is_file()]
+          if len(roots)!=1:raise SystemExit('EXACT_READER_BACKUP_INCOMPLETE')
+          shutil.copytree(roots[0],dst/'backend')
+          (dst/'firebase.json').write_text('{"functions":{"source":"backend"}}\n')
+          PY
+          (cd "$RESTORE_ROOT/backend" && npm ci --ignore-scripts --no-audit --no-fund)
+          echo "RESTORE_ROOT=$RESTORE_ROOT" >> "$GITHUB_ENV"
+
+      - name: Deploy only the reviewed reader and verify ten scoped source files
+        id: deploy_and_readback
+        if: steps.assess.outputs.needs_deploy == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$EXPECTED_DEPLOY_HEAD" = "$RELEASE_HEAD"
+          test "$(git ls-remote origin refs/heads/recovery/fase-a-clean-20260831 | awk '{print $1}')" = "$RELEASE_HEAD"
+          node "$FIREBASE_CLI_BIN" deploy --only functions:orbit360ScopedPolicyRead --config "$TARGET_ROOT/firebase.json" --project "$PROJECT_ID" --non-interactive
+          node tools/gravicentra-b4-003-live-backend-source-readback.cjs after
+          node "$FIREBASE_CLI_BIN" functions:list --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/gi-b4003-live-reader-after-inventory.json"
+          node - <<'NODE'
+          const fs=require('node:fs'),tmp=process.env.RUNNER_TEMP;
+          const stable=x=>Array.isArray(x)?x.map(stable):x&&typeof x==='object'?Object.fromEntries(Object.keys(x).sort().map(k=>[k,stable(x[k])])):x;
+          const rows=file=>{const data=JSON.parse(fs.readFileSync(file,'utf8')),raw=data.result??data,v=typeof raw==='string'?JSON.parse(raw):raw;return Array.isArray(v)?v:Array.isArray(v.functions)?v.functions:[];};
+          const identity=r=>String(r.id||r.name||r.function||'').split('/').pop();
+          const before=rows(tmp+'/gi-b4003-pre-functions.json'),after=rows(tmp+'/gi-b4003-live-reader-after-inventory.json');
+          const others=a=>a.filter(r=>identity(r)!=='orbit360ScopedPolicyRead').map(stable).sort((a,b)=>identity(a).localeCompare(identity(b)));
+          if(!before.length||after.length!==before.length||after.filter(r=>identity(r)==='orbit360ScopedPolicyRead').length!==1||JSON.stringify(others(before))!==JSON.stringify(others(after)))throw Error('NON_TARGET_FUNCTION_INVENTORY_CHANGED');
+          const readback=JSON.parse(fs.readFileSync(tmp+'/gi-b4003-live-sources-after.json','utf8'));
+          if(readback.readerSourceMatchesCurrent!==true)throw Error('EXACT_READER_BYTES_REQUIRED');
+          fs.writeFileSync(tmp+'/gi-b4003-live-reader-result.json',JSON.stringify({status:'EXACT_READER_BYTES_PASS_SIGNED_UI_PENDING',head:process.env.GITHUB_SHA,onlyDeployed:'orbit360ScopedPolicyRead',region:'us-east1',sourceManifest:readback.readerSourceManifestSha256,productDeployed:true,businessWrites:0,hostingChanged:false,rulesChanged:false,productionAccepted:false},null,2)+'\n');
+          NODE
+
+      - name: Restore exact predecessor if deploy or verification fails
+        if: failure() && steps.deploy_and_readback.outcome == 'failure'
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f "$RESTORE_ROOT/backend/b4-003-scoped-policy-callable.js"
+          node "$FIREBASE_CLI_BIN" deploy --only functions:orbit360ScopedPolicyRead --config "$RESTORE_ROOT/firebase.json" --project "$PROJECT_ID" --non-interactive
+          node tools/gravicentra-b4-003-live-backend-source-readback.cjs rollback
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: gi-b4003-live-reader-source-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/gi-b4003-live-sources-before.json
+            ${{ runner.temp }}/gi-b4003-live-sources-after.json
+            ${{ runner.temp }}/gi-b4003-live-sources-rollback.json
+            ${{ runner.temp }}/gi-b4003-live-reader-result.json
+          if-no-files-found: warn
+          retention-days: 30
+

@@ -1,7 +1,7 @@
 {
   "schema": "GRAVICENTRA_OWNER_DECISION_FREEZE_20261107_V1",
   "status": "OWNER_DECISIONS_AND_EXECUTION_PLAN_FROZEN_NOT_NEW_PRODUCT_PASS",
-  "recordedAtUtc": "2026-11-07T16:25:48Z",
+  "recordedAtUtc": "2026-11-07T17:44:05Z",
   "operationalDate": "2026-11-07",
   "timeZone": "America/Guatemala",
   "repository": "paulaosoriof86/orbit360-core",
@@ -10,7 +10,7 @@
   "authority": "PAULA_EXPLICIT_REQUEST_TO_FREEZE_COMPLETE_DECISIONS_AND_WORK_PLAN",
   "plan": {
     "path": "artifacts/orbit360-recovery/release-control/PLAN_OPERATIVO_DECISIONES_PAULA_20261107.md",
-    "blobSha": "60d5e264b440c29617d1aa23127486352542128b"
+    "blobSha": "aeecdadbefa4252acee23907c802748afea6a1fe"
   },
   "canonicalControlPlane": "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json",
   "canonicalMasterPlan": "artifacts/orbit360-recovery/release-control/I6_PENDING_CLOSURE_MASTER_PLAN_LOCK_20261004.json",
@@ -149,7 +149,10 @@
       "liquidacion_vendedores",
       "inicio_metas_reportes",
       "historial_procedencia"
-    ]
+    ],
+    "currentOwnerClarificationsPointer": "ownerClarifications20261107",
+    "periodQuestionResolved": true,
+    "allMedicalMonthlyTwelvePayments": true
   },
   "sourceInventory": {
     "status": "OBSERVED_CURRENT_FOLDER_METADATA_AND_FOCAL_DOCUMENT_REVIEW_NOT_FULL_BATCH_RECONCILIATION",
@@ -311,15 +314,17 @@
     ],
     "incorrectGeneralInvoiceAbsentFromCurrentFolder": "1Ab6E9TnvHqtyyVSt4T8aQptlDtJPBcGr",
     "retainedCorrectGeneralInvoice": "1K_7fE_OsBgWGy1O8-PpdXOfTB2daG3Ei",
-    "documentContentHashes": "TO_PIN_BEFORE_DATA_DIFF_AND_APPLY",
+    "documentContentHashes": "PINNED_IN_DOCUMENT_MANIFEST_BELOW; normalization and canonical matching are distinct pending steps.",
     "completePolicyMatchingExecuted": false,
     "unmatchedPolicyListStatus": "NOT_YET_COMPUTED_DO_NOT_CLAIM_NONE",
     "monthClarification": {
-      "ownerDeclaredLot": "NOVEMBER_COMMISSION_INVOICES_AND_COLLECTIONS",
+      "ownerDeclaredLot": "OCTOBER_2026_COLLECTIONS_NOVEMBER_DOCUMENTARY_INVOICING",
       "observedFact": "G&T invoices issued 2026-11-04 explicitly state October commissions; General paid section October and pending section November.",
       "clarificationAskedOnce": true,
-      "answerReceived": false,
-      "interimHandling": "Preserve documentary premium dates/periods; November folder/billing lot is separate; no assumed bank collection or reattribution of historical payments."
+      "answerReceived": true,
+      "interimHandling": "SUPERSEDED_BY_OWNER_CLARIFICATIONS_20261107; preserve pending sections and documentary dates.",
+      "ownerAnswer": "Toda la información de las planillas corresponde a recaudos de octubre exclusivamente con las inferencias hacia atrás.",
+      "resolvedAtUtc": "2026-11-07T17:44:05Z"
     },
     "gyt": [
       {
@@ -375,7 +380,46 @@
       "invoiceTotal": 882.25,
       "effect": "REFERENCE_AND_PROVEN_HISTORICAL_FACTS_ONLY_NOT_NOVEMBER_PAYMENT_OR_INVOICE_EVIDENCE"
     },
-    "statementsMayBeProvidedInDrive": true
+    "statementsMayBeProvidedInDrive": true,
+    "medicalMonthlyRule": {
+      "scope": "ALL_INSURERS_MEDICAL_MONTHLY_PLANS_ONLY",
+      "installments": 12,
+      "ownerConfirmed": true,
+      "ordinaryFraccionadoTenCeilingUnchanged": true,
+      "branchProductCatalogMappingRequired": true,
+      "dataApplied": false
+    },
+    "documentManifest20261107": {
+      "status": "HASHED_AND_NORMALIZED_PRIVATE_EVIDENCE_RETAINED",
+      "sourceFiles": 20,
+      "insurers": 9,
+      "groupsInsurerCurrency": 10,
+      "commissionComponentsNotPayments": 84,
+      "sourceManifestSha256": "495d6c396888d3ea3366034b617c0e97f9e6f730242e5d65a9a694c65814a984",
+      "normalizedRowsSha256": "7ff5fe4764bb87d252eebf0c94847ac23bd79ff45053fd2b6a84f4e887c58403",
+      "privateArchive": {
+        "library_file_id": "libfile_5bb95cb193788191aaf23be9c41a06b1",
+        "fileName": "Gravicentra_Conciliacion_Octubre_2026_Expediente_20261107.zip",
+        "fileSha256": "f907293f2e35e72af54754dd8ce25988048eb2bdaad16c380533af6454773ab9",
+        "access": "OWNER_PRIVATE"
+      },
+      "canonicalMatchingExecuted": false,
+      "realDataApplied": false
+    },
+    "specificQuestionsRaisedToOwner": [
+      {
+        "status": "ASKED_AWAITING_ANSWER_CONTINUE_OTHER_ROWS",
+        "insurer": "Mapfre",
+        "type": "UNALLOCATED_COLLECTION_COMMISSION",
+        "privateEvidence": "DOCUMENT_SUMMARY_20261107.json / MAPFRE_UNALLOCATED"
+      },
+      {
+        "status": "ASKED_AWAITING_ANSWER_PRESERVE_AMOUNTS_HOLD_RATE_GENERALIZATION",
+        "insurer": "Universales",
+        "type": "PRINTED_RATE_CONTRADICTS_COMMISSION_AMOUNT",
+        "privateEvidence": "DOCUMENT_SUMMARY_20261107.json / UNIVERSALES_RATE_CONTRADICTION"
+      }
+    ]
   },
   "staticIntegrationFindings": [
     {
@@ -407,7 +451,7 @@
     "oldDomainApplicationReplaceable": true,
     "hostdimeStillViable": true,
     "finalDomainSwitchExecuted": false,
-    "dnsChanged": false,
+    "dnsChanged": true,
     "newFirebaseProject": false,
     "backendMigration": false,
     "preserveSameArtifact": true,
@@ -418,37 +462,39 @@
     "docs": [
       "https://firebase.google.com/docs/hosting/manage-hosting-resources",
       "https://firebase.google.com/docs/hosting/custom-domain"
-    ]
+    ],
+    "ownerApprovedExistingFirebaseCustomDomain": true
   },
   "auditBeforeEveryModule": true,
   "sourceOfHistoricalApproval": "REPOSITORY_RECEIPTS_AND_BLOBS; CHAT_IS_CONTEXT_ONLY",
   "wholeLotCompleteRequiresAllAffectedModuleReadbacks": true,
   "execution": {
-    "productSourceChanged": false,
-    "workflowChanged": false,
+    "productSourceChanged": true,
+    "workflowChanged": true,
     "productDeployed": false,
     "dnsChanged": false,
     "realBusinessWrites": 0,
     "dataImportExecuted": false,
     "newModulePassGranted": false,
-    "sourceFreezeBuildRequired": false,
+    "sourceFreezeBuildRequired": true,
     "codexUsed": false,
     "governanceValidatorChanged": true,
-    "governanceTestsAdded": true
+    "governanceTestsAdded": true,
+    "scope": "THIS_REPOSITORY_SOURCE_PREPARATION_PACKAGE_ONLY; external domain preparation is truthfully recorded separately in domainExecution20261107."
   },
   "baselineGovernance": {
     "runId": 42330379248,
     "conclusion": "success",
     "sourceSha": "74312cc3621ba155ee288a0afb530a488246f0e6"
   },
-  "nextRequiredResult": "FIX_EQUIPO_READ_PARITY_AND_IMMEDIATE_STORE_UPDATE; FORENSIC_AUDIT_CRONOGRAMA; PREPARE_SOURCE_DIFF_WITHOUT_REAL_WRITES",
+  "nextRequiredResult": "READ_BACK_LIVE_READER; BUILD_NEW_CUMULATIVE_PREVIEW_ARTIFACT_FOR_ACK_STORE_AND_COMMERCIAL_QA_FIX; FOCAL_AUTHENTICATED_PROOF; PRESERVE_CURRENT42_AS_ROLLBACK; COMPLETE_CANONICAL_RECONCILIATION_DATE_AND_EFFECT_CONTRACT_BEFORE_APPLY",
   "governanceSuccessorValidation": {
     "schema": "GRAVICENTRA_OWNER_DOCUMENTARY_SUCCESSOR_VALIDATION_V1",
     "baseHead": "74312cc3621ba155ee288a0afb530a488246f0e6",
     "guardPath": "tools/gravicentra-b4-003-formal-live-closeout-guard.mjs",
-    "guardBlobSha": "475221ff978fbdcd106a480d3a2b49da530cf0ae",
+    "guardBlobSha": "0cc9578f3a3cbc2e451fdfb2fbc90a60634ade0e",
     "testPath": "tools/gravicentra-b4-003-owner-decision-successor.test.mjs",
-    "testBlobSha": "eab422a67537553547677df6da535f99c61083fd",
+    "testBlobSha": "583bd38ec2d471bb8b2b794f46aa5670f1579a43",
     "sealedMasterPlanBlobPreserved": "458c5af57b2f7d9453d0064eba0cd737edf14ef4",
     "sealedCapabilityLedgerBlobPreserved": "81511551540dbe0c1dbc54d9c4f8e00537550716",
     "initialDocumentationCommit": "766e30b1bda1543763b6e8d9d17119f84d7f75d8",
@@ -456,5 +502,836 @@
     "correction": "Preserve sealed master/capability bytes; validate exact additive owner documents and allowed CP/state fields against approved baseline; retain every original closure check.",
     "localPositiveAndNegativeChecks": 17,
     "doesNotAuthorizeProductDeployOrBusinessWrites": true
+  },
+  "executionHistory": [
+    {
+      "recordedAtUtc": "2026-11-07T16:25:48Z",
+      "execution": {
+        "productSourceChanged": false,
+        "workflowChanged": false,
+        "productDeployed": false,
+        "dnsChanged": false,
+        "realBusinessWrites": 0,
+        "dataImportExecuted": false,
+        "newModulePassGranted": false,
+        "sourceFreezeBuildRequired": false,
+        "codexUsed": false,
+        "governanceValidatorChanged": true,
+        "governanceTestsAdded": true
+      },
+      "repositoryHead": "b3dcd9d1a57bb4871b06df341ec6198c56f9cfe9"
+    }
+  ],
+  "ownerClarifications20261107": {
+    "schema": "GRAVICENTRA_OWNER_RECONCILIATION_CLARIFICATIONS_20261107_V3",
+    "status": "OWNER_APPROVED_CRITERIA_FROZEN_IMPLEMENTATION_AND_BATCH_PENDING",
+    "repository": "paulaosoriof86/orbit360-core",
+    "branch": "recovery/fase-a-clean-20260831",
+    "inspectedHead": "b3dcd9d1a57bb4871b06df341ec6198c56f9cfe9",
+    "basis": "Paula latest explicit instructions of 2026-11-07",
+    "preserves": {
+      "current42B4003LivePass": true,
+      "priorCertificates": true,
+      "firstIncompleteGate": "B4-004",
+      "oneCanonicalPaymentOwner": true,
+      "noNewReleaseMethod": true
+    },
+    "supersedesOnly": [
+      "Current freeze sourceInventory.monthClarification.answerReceived=false: owner has confirmed October collections.",
+      "Current freeze G&T MONTHLY_12_PAYMENTS rule limited to VIME-18154: owner expands to all insurers for Gastos Médicos monthly policies.",
+      "Any interpretation applying ordinary fraccionado ceiling of 10 to monthly Gastos Médicos."
+    ],
+    "approvedBusinessRules": [
+      {
+        "id": "OCTOBER_COLLECTION_LOT",
+        "rule": "Paid commission lines in the current November documentary lot correspond exclusively to October 2026 collections. Folder/invoice month does not change collection period.",
+        "preserveDistinct": [
+          "collectionPeriod",
+          "paidDate",
+          "dueDate",
+          "evidenceAsOfDate",
+          "applicationDate",
+          "invoiceDate",
+          "reconciledAt"
+        ],
+        "exceptions": "General pending-November section remains pending. Columna older October-folder statement remains authorized historical reference, not proof of new October collection."
+      },
+      {
+        "id": "DIRECT_PAID_UNKNOWN_DATE",
+        "rule": "Where the planilla confirms a paid installment but the real payment date is unknown, display an estimated effective date using the contractual payment day in October. A late earlier obligation retains its original due date.",
+        "actualPaidDate": null,
+        "dateAccuracy": "ESTIMATED_CONTRACTUAL_DAY_IN_CONFIRMED_COLLECTION_MONTH",
+        "collectionPeriod": "2026-10",
+        "mustNotPretendActualDateKnown": true
+      },
+      {
+        "id": "BACKWARD_INFERRED_DATE",
+        "rule": "Each earlier open contiguous installment closed by approved inference retains its own original scheduled date as inferredEffectiveDate. Do not move it to October or November merely because discovered in this lot.",
+        "paidDateUnknown": true,
+        "preserveEvidenceOfInference": true
+      },
+      {
+        "id": "MEDICAL_MONTHLY_12",
+        "scope": {
+          "branch": "Gastos Médicos",
+          "paymentModality": "MONTHLY",
+          "insurers": "ALL"
+        },
+        "totalInstallments": 12,
+        "ordinaryFraccionadoTenCapApplies": false,
+        "otherBranchesAndModalitiesUnchanged": true,
+        "unknownBranchOrModality": "ASK_IMMEDIATELY_ONLY_AFFECTED_ROW"
+      },
+      {
+        "id": "SOURCE_CONTRACT_CORRECTION",
+        "rule": "Authoritative planillas/statements govern payment mode, explicit total installments, policy/receipt premiums and known dossier fields. Apply controlled non-destructive correction through existing domain owners with before/after provenance; preserve already-paid facts and policy links.",
+        "missingOrContradictorySource": "ISOLATE_AND_ASK_PAULA",
+        "forbidden": [
+          "Use gross premium as net premium",
+          "Assume a receipt premium proves annual policy premium by multiplying without evidence",
+          "Overwrite conflicting sources silently",
+          "Delete historical paid receipts to rebuild a calendar"
+        ]
+      },
+      {
+        "id": "RECONCILIATION_LEDGER",
+        "rule": "Record this first real reconciliation as a durable batch with source versions, normalized rows, matches, corrections, inferred/direct outcomes, exceptions, actor, timestamps and per-effect state; expose it in Conciliaciones.",
+        "canonicalPaymentOwner": "functions/cobros-reconciliation-domain.js",
+        "reuseExistingJournal": [
+          "reconciliationRequests",
+          "reconciliationEvents"
+        ],
+        "newParallelPaymentEngine": false,
+        "technicalExtensionNeedsImplementation": true
+      },
+      {
+        "id": "FINANCE_CAN_FOLLOW",
+        "rule": "Confirmed payment/portfolio reconciliation may advance before full Finance completion only when every future financial effect is durably retained with immutable economics, currency, provenance, rate version and deterministic effect identity. Replay later is idempotent.",
+        "partialStatus": "OPERATIONAL_RECONCILED_FINANCIAL_EFFECTS_PENDING",
+        "fullSyncClaimUntilAllReadbacks": false,
+        "bankCash": "Create only with actual proof of commission receipt, not solely a commission statement or issued invoice."
+      },
+      {
+        "id": "ADVISOR_CONFIG_EXISTING",
+        "rule": "Read and preserve the already configured user commission model/participation in Equipo. Do not assume it is missing or substitute defaults. Ask immediately only where seller identity or a genuinely required value cannot be resolved.",
+        "configuration": [
+          "asesorId",
+          "comModo",
+          "shareCom",
+          "comValor"
+        ],
+        "missingState": "REQUIERE_CONFIGURACION",
+        "defaultRatesForbidden": true
+      },
+      {
+        "id": "ADVISOR_RATE_PROSPECTIVE",
+        "rule": "Each rate/model change affects calculations from its effective date onward. Persist the applied model/rate version and basis per accrued event; preserve closed/liquidated historical amounts. An explicit controlled historical correction is a separate event.",
+        "historicalPendingItems": "Use their applicable event-date configuration; do not silently recompute all old events with today's rate.",
+        "technicalEffectiveDateVersioningNeedsImplementation": true
+      },
+      {
+        "id": "INSURER_RATE_SOURCE_AUTHORITY",
+        "rule": "Use the planilla's explicit insurer commission percentage for its documented event. If only amounts are given, derive a percentage only with an unambiguous net base and known adjustments, retain formula/rounding/source and label derived.",
+        "configurationScope": [
+          "tenant",
+          "country",
+          "insurer",
+          "currency",
+          "branch",
+          "product",
+          "paymentPlan",
+          "validFrom",
+          "validThrough"
+        ],
+        "generalization": "Update Aseguradoras for future use only at the supported scope; transaction-specific bonuses/discounts do not become a global rate.",
+        "existingProductBranchConfigRetained": true
+      },
+      {
+        "id": "ISOLATED_QUESTIONS",
+        "rule": "For unmatched policy, seller, contradictory identity/date/currency, partial payment or broken sequence, ask Paula immediately with insurer, policy, row/document and the exact missing fact; continue independent confirmed cases.",
+        "highConfidencePerRowApprovalRequired": false
+      },
+      {
+        "id": "CROSS_MODULE_EFFECTS",
+        "surfaces": [
+          "Cliente 360 pagos/cobros/comisiones",
+          "Pólizas",
+          "Clientes",
+          "Recibos/cartera",
+          "Cobros",
+          "Comisiones",
+          "Conciliaciones",
+          "Finanzas CxC",
+          "Finanzas CxP",
+          "Liquidación de vendedores",
+          "Aseguradoras tarifas",
+          "Inicio/metas/reportes"
+        ],
+        "rule": "All surfaces derive from canonical facts. Pending financial effects remain visibly pending and are not reported as fully synchronized."
+      }
+    ],
+    "existingOwnersAndGaps": [
+      {
+        "path": "functions/payment-inference-engine.js",
+        "blobSha": "16bf21177364fbb94f39fab5b8e8ec8506bbd071",
+        "implemented": "Evidence rules, unique anchor, continuity, contradiction checks, backward scheduled dates.",
+        "gap": "Insurer rule matching ignores ramo/modality; no direct-payment estimated collection date or collection period."
+      },
+      {
+        "path": "functions/cobros-reconciliation-domain.js",
+        "blobSha": "5b27038d1c8380e4d2d0ed044996c1570d8c3767",
+        "implemented": "Authenticated transaction: canonical cobro + expected receipt + matching portfolio; deterministic request/result and audit event; preserves real dates unless direct evidence.",
+        "gap": "No durable economics/effect status sufficient for later commission/CxC/CxP materialization; no applied batch journal projection in Conciliaciones. A schedule mismatch returns REVIEW_REQUIRED, not an implemented schedule correction."
+      },
+      {
+        "path": "functions/cobros-ledger-contract.js",
+        "blobSha": "4aa76e65d7c43018f0b2b65108ce8b49756b4711",
+        "implemented": "Historical active-ledger contract with pinned counts and digests.",
+        "gap": "Not a generic October batch contract; preserve 365 payment records/132 proposals/233 holds historical state."
+      },
+      {
+        "path": "orbit360-platform/modules/conciliaciones.js",
+        "blobSha": "3b77b2cff04e2f10ab78541d8802c191901de240",
+        "implemented": "Read-only proposal projection from conciliaciones and conciliacionesPrimas; delegates payment actions to canonical Cobros.",
+        "gap": "No applied batch or pending financial effect display."
+      },
+      {
+        "path": "orbit360-platform/core/comisiones-eng.js",
+        "blobSha": "f1aa5dfc3b8191944023b581abdcff27adf0dba3",
+        "implemented": "Insurer product override/branch rates; adviser comision/neta/fijo model; durable adviser edits.",
+        "gap": "Silent 12%/50% fallbacks; mutable current values without effective dates; insurer setter uses ordinary store.update; no per-event rate snapshot."
+      },
+      {
+        "path": "orbit360-platform/core/planillas-comisiones-commission-dryrun-planner-p0.js",
+        "blobSha": "d73f55e421c2d3c2a45fdbf851341616079e24ad",
+        "implemented": "Pure source-bound candidate planning with planillasComisiones/comisionesDevengadas/conciliacionesComisiones and seller holds.",
+        "gap": "Writes zero; finance disabled; commission key omits currency and contains amount, so correction/version/dedup contract requires review before production."
+      },
+      {
+        "path": "orbit360-platform/modules/finanzas.js",
+        "blobSha": "c12d7324928f08d8127e60d2029f80928e5a0ed3",
+        "implemented": "Reads comisiones/facturas/finmovs; invoice/cash separated.",
+        "gap": "Current seller computation uses current configuration on all old rows. Paid total uses insurer c.monto rather than an explicit historical seller payout. facturaAseg derives currency by country and invoice duplicate guard omits currency/document identity; actual G&T GTQ/USD requires focal correction."
+      }
+    ],
+    "technicalExtensionProposal": {
+      "status": "DESIGN_TO_IMPLEMENT_IN_EXISTING_OWNERS",
+      "journalOwner": "functions/cobros-reconciliation-domain.js",
+      "atomicBoundary": "Per policy/receipt transaction persists payment facts plus its audit/effect obligations before success is acknowledged; large batches resume by durable row status.",
+      "existingEventExtension": [
+        "batchId",
+        "sourceFileId",
+        "sourceSha256",
+        "sheet",
+        "row",
+        "sourceRowKey",
+        "normalizationVersion",
+        "matchedCanonicalIds",
+        "beforeAfterOrReversibleDiff",
+        "collectionDateAccuracy",
+        "collectionPeriod",
+        "premiumBasis",
+        "commissionAmounts",
+        "rateVersionSnapshot",
+        "effectIds"
+      ],
+      "financialEffectStates": [
+        "PENDING",
+        "BLOCKED_CONFIGURATION",
+        "READY",
+        "APPLIED",
+        "FAILED_RETRYABLE",
+        "COMPENSATED"
+      ],
+      "deterministicEffectKey": "tenant + canonical reconciliation event + effect type + currency + financial fact revision; document revisions enrich or compensate the same business fact",
+      "effectTypes": [
+        "company_commission",
+        "commission_invoice_cxc",
+        "advisor_commission_cxp",
+        "commission_cash_match"
+      ],
+      "replay": "Recheck existing applied effect identity and source versions in server transaction; write destination and application receipt atomically; repeating the worker returns the previous result.",
+      "concurrentData": "Use version/updateTime preconditions; never replay an old before-image over later operational work.",
+      "projection": "Extend existing Conciliaciones read model with batch outcomes/effect states; do not use browser cache or localStorage as the pending queue.",
+      "historicalLedger": "Keep cobrosLedgerRuns historic active contract untouched; add batch/event links through the existing owner instead of repointing it to an incompatible October manifest."
+    },
+    "acceptanceCases": [
+      {
+        "id": "R01",
+        "input": "G&T Gastos Médicos monthly, statement 3/12, 12 contiguous receipts, ordinary G&T fraccionado cap 10.",
+        "expected": "Rule resolves monthly medical scope; 3 direct and 1..2 inferred; no cap failure. Non-medical ordinary 12 retains existing ceiling."
+      },
+      {
+        "id": "R02",
+        "input": "October paid installment due 2026-10-10; actual collection day unknown.",
+        "expected": "paidDate unknown; effective display 2026-10-10 labelled estimated; collectionPeriod 2026-10; dueDate unchanged."
+      },
+      {
+        "id": "R03",
+        "input": "Obligation due 2026-09-10, explicitly paid in October, day unknown.",
+        "expected": "Due remains Sep 10; estimated collection Oct 10; October collection attribution; no invented actual date."
+      },
+      {
+        "id": "R04",
+        "input": "October commission proves installment 3, earlier installments due Aug 10 and Sep 10 remain open.",
+        "expected": "Prior two become inferred at Aug 10 and Sep 10. October collections do not include their inferred historical amounts."
+      },
+      {
+        "id": "R05",
+        "input": "Later support proves actual collection date October 18 for R03.",
+        "expected": "Enrich same cobro with real date Oct 18; retain estimation provenance/history; no duplicate balance/commission/movement."
+      },
+      {
+        "id": "R06",
+        "input": "Statement says pending from installment 3; overdue-November section accompanies paid-October section.",
+        "expected": "Only prior contiguous installments infer paid; installment 3 onward and pending-November lines remain pending."
+      },
+      {
+        "id": "R07",
+        "input": "Source 3/12 while platform has 10; premium/receipt amount differs.",
+        "expected": "Controlled schedule/premium diff with source evidence, paid receipts retained, totals validated; then reconciliation. No generic reimport."
+      },
+      {
+        "id": "R08",
+        "input": "Missing seller for one unique policy while other rows match.",
+        "expected": "Payment facts and company commission evidence can advance; seller payable flagged pending; exact question raised; unaffected rows proceed."
+      },
+      {
+        "id": "R09",
+        "input": "Advisor configured 20%; eligible event Oct 20; change to 30% effective Nov 7; new event Nov 8.",
+        "expected": "Old event and closed payout stay at 20%; new uses 30%; no recalculation of old liquidation with current rate."
+      },
+      {
+        "id": "R10",
+        "input": "Same insurer provides different rates by ramo/product/plan/currency.",
+        "expected": "Planilla amount/rate wins for each event; supported scoped configuration updated; no flattening or cross-currency leakage."
+      },
+      {
+        "id": "R11",
+        "input": "G&T October invoices GTQ 52.83 and USD 20.47, both dated Nov 4.",
+        "expected": "Two distinct invoice/CxC identities with native currencies; neither duplicates or overwrites the other; no bank-cash receipt without evidence."
+      },
+      {
+        "id": "R12",
+        "input": "Finance unavailable at payment reconciliation time; later materializer retries after partial processing.",
+        "expected": "Payment, evidence and pending effect survive reload/restart. Replay creates each eligible commission/CxC/CxP exactly once, confirms destination readback; no data loss."
+      },
+      {
+        "id": "R13",
+        "input": "Same source reimport/retry; then revised source amount.",
+        "expected": "First retry NOOP or prior result; revision creates an audited correction/enrichment tied to same fact, not another payment."
+      },
+      {
+        "id": "R14",
+        "input": "Candidate release occurs while live users create/update company data.",
+        "expected": "Publish source artifact only; current business records retained; additive migration with preconditions if necessary; software rollback does not restore an obsolete database."
+      },
+      {
+        "id": "R15",
+        "input": "All applied rows after cold reload, permitted role and country/currency scopes.",
+        "expected": "Cliente360, Cobros, cartera, pólizas, commissions, Conciliaciones and available Finance projections agree by canonical IDs and amounts; pending effects visibly pending. No global PASS based solely on source tests."
+      }
+    ],
+    "verificationThisTask": {
+      "type": "READ_ONLY_SOURCE_AUDIT_PLUS_PURE_LOCAL_REPRODUCTION",
+      "observations": [
+        "Medical monthly 12 with existing insurer fraccionado config reproduces REVIEW_REQUIRED / INSTALLMENT_TOTAL_EXCEEDS_TENANT_CONFIG.",
+        "Existing engine retains scheduled dates for prior inferred receipts; direct target with no actual date has no estimated date field.",
+        "Pure comVendedorDe calculation for the same historical amounts changes 20→30 when current shareCom is changed 20→30."
+      ],
+      "productionTouched": false,
+      "remoteWrites": false,
+      "businessWrites": 0,
+      "importExecuted": false,
+      "newPass": false
+    },
+    "implementationCandidate": {
+      "status": "LOCAL_SOURCE_HARNESS_PASS_NOT_DEPLOYED_CONFIG_NOT_ACTIVATED",
+      "files": [
+        {
+          "path": "functions/payment-inference-engine.js",
+          "localPath": "/workspace/scratch/9ef41f7fed43/reconciliation_rules_nov07/patch/functions/payment-inference-engine.js",
+          "sha256": "73de0ef3053536981f7197f1f336d9562932203e6ec917fa7aa2bddafce0d455"
+        },
+        {
+          "path": "functions/tenant-domain-config.js",
+          "localPath": "/workspace/scratch/9ef41f7fed43/reconciliation_rules_nov07/patch/functions/tenant-domain-config.js",
+          "sha256": "5dd65b6f8228063a0690cf3d2c35238284b9d00c17902a5aa7608324a3135a8f"
+        },
+        {
+          "path": "tools/gravicentra-i6-5-b3-005-contract.mjs",
+          "localPath": "/workspace/scratch/9ef41f7fed43/reconciliation_rules_nov07/patch/tools/gravicentra-i6-5-b3-005-contract.mjs",
+          "sha256": "bac6139334f8d7d1dc1b95858cbdb63fc20a9601a72643637e24f8df414de3cb"
+        }
+      ],
+      "activationStatus": "HOLD_CANONICAL_POLICY_FREQUENCY_AND_CATALOG_VALIDATION",
+      "observedUiCaseFromParent": {
+        "policy": "PRIVATE_MEDICAL_POLICY_SAMPLE",
+        "branch": "ACCIDENTES Y ENFERMEDADES",
+        "product": "Gastos Médicos Menores Individual",
+        "frequency": "NOT_YET_VERIFIED"
+      },
+      "supportedRuleFields": [
+        "insurer",
+        "branch",
+        "product",
+        "paymentFrequency",
+        "scope",
+        "maxInstallments"
+      ],
+      "businessDataWrites": 0,
+      "doesNotImplement": [
+        "direct-estimated-date persistence",
+        "prospective commission versioning",
+        "durable financial effects replay"
+      ]
+    },
+    "integrationInstructions": {
+      "targetExistingFreeze": "OWNER_DECISION_FREEZE_AND_RECONCILIATION_PLAN_20261107.json",
+      "field": "ownerClarifications",
+      "preservePreviousExecutionAsHistory": true,
+      "updateCurrentMonthClarification": {
+        "answerReceived": true,
+        "collectionPeriod": "2026-10"
+      },
+      "doNotEditSealedMasterOrCapabilityLedger": true,
+      "noBusinessWriteByDocumentation": true
+    },
+    "frozenAtUtc": "2026-11-07T17:44:05Z",
+    "sourceOfAuthority": "Paula explicit user-authored instructions on 2026-11-07; not an inferred approval from documents."
+  },
+  "equipoCausalSourceCorrection": {
+    "schema": "GRAVICENTRA_EQUIPO_CAUSAL_SOURCE_SUCCESSOR_V1",
+    "sourceBaseHead": "b3dcd9d1a57bb4871b06df341ec6198c56f9cfe9",
+    "status": "SOURCE_AND_QA_READY_FRONTEND_PREVIEW_ONLY_NOT_DEPLOYED",
+    "realBusinessWrites": 0,
+    "repeatSevenClassificationWrites": false,
+    "rulesChanged": false,
+    "productionAccepted": false,
+    "changes": [
+      {
+        "path": "orbit360-platform/data/store-firestore-product-operational-p0.js",
+        "previousBlobSha": "adcee4c9cdf0ac5a8e9102068927614e4809d78a",
+        "blobSha": "da30be86aa065d26581693f3430c40ac7cac6165"
+      },
+      {
+        "path": "tests/goal-participation-classification-writer.test.cjs",
+        "previousBlobSha": "770452dd7535c38b2a24ead7b13c6e9a2fb12e8a",
+        "blobSha": "73c0cd8f78523dbbf161c5f6dd508baf4b3c1379"
+      },
+      {
+        "path": "tools/gravicentra-b4-003-live-backend-source-readback.cjs",
+        "previousBlobSha": "eafe52011da6380ee701cd94dac9226156bc1a8e",
+        "blobSha": "48edf21b50f05521a33159b5925e75a904841951"
+      },
+      {
+        "path": ".github/workflows/gravicentra-b4-003-live-protected-reader-20261029.yml",
+        "previousBlobSha": "c9fe422c2c0e9bbe15a0a6f0dd793e8dbce965ac",
+        "blobSha": "bd45ef8297cb4d326929a01d5b8c4303369b72d4"
+      },
+      {
+        "path": "tools/gravicentra-b4-003-live-reader-source-readback.test.cjs",
+        "previousBlobSha": null,
+        "blobSha": "43072eb1d054b18438a76d300214827652b61ad9"
+      },
+      {
+        "path": "tools/gravicentra-b4-003-role-first-paint-and-team-regression.test.cjs",
+        "previousBlobSha": "eb7f4a4512dbc6e17ed33217de4b36bb1281a27e",
+        "blobSha": "fbc192356189df519cbf2b68996fc6d5cf8977c7"
+      },
+      {
+        "path": "tools/gravicentra-b4-003-renewals-cancellations-focused.test.cjs",
+        "previousBlobSha": null,
+        "blobSha": "34e2ff040802b7b56013b2d4440fb3a82b2db68b"
+      },
+      {
+        "path": "orbit360-platform/modules/cancelaciones.js",
+        "previousBlobSha": "c9f6934beea57136daca0a3292451ad0792181c1",
+        "blobSha": "c206f79a47b8aa8684dc0cf50756f3720166bdbe"
+      },
+      {
+        "path": "tools/gravicentra-b4-003-cancelaciones-commercial-qa.test.cjs",
+        "previousBlobSha": null,
+        "blobSha": "03e5ffbf6ef798bc544098057bae211dbd0a612f"
+      },
+      {
+        "path": "orbit360-platform/modules/reportes.js",
+        "previousBlobSha": "e00cdbaef2207b6e48c6507c0039161afa07c4e0",
+        "blobSha": "0daba72ebd8e6f8bef84ced9739b71bcabff0973"
+      },
+      {
+        "path": ".github/workflows/gravicentra-b4-003-immutable-candidate-preview.yml",
+        "previousBlobSha": "2b74f6d920f5da6016256dd40ce6666f0693cd1e",
+        "blobSha": "8d17a2e1f4e2a6ff8da5d931790c364e8a2f828a"
+      },
+      {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CURRENT42_CAUSAL_FRONTEND_SUCCESSOR_CONTRACT_20261107.json",
+        "previousBlobSha": null,
+        "blobSha": "c792b7db1aa3f16ed7ee20cbdffe2b76dc61b97f"
+      }
+    ],
+    "localTests": {
+      "classificationBefore": "FAIL: acknowledged save still sin_clasificar",
+      "classificationAfter": 48,
+      "readbackSynthetic": 29,
+      "ownerSuccessorPositiveNegative": 32,
+      "protectedDirectoriesUnchanged": 20,
+      "protectedBootstrapUnchanged": 29,
+      "cancelCommercialQaBefore": "3 FAIL causally reproduced",
+      "cancelCommercialQaAfter": 4,
+      "reportesQuarantine": 2,
+      "fullTwelvePathPreviewSourceSuccessor": "PASS plus rejects LIVE promotion, backend deploy and current42 reset"
+    },
+    "deployment": "One push: exact cumulative frontend build once to existing Preview channel with retained artifact; separate existing reader workflow performs readback only. No backend deploy, LIVE promotion, Rules or business writes.",
+    "cacheAudit": {
+      "builderPath": "tools/gravicentra-i6-1-preview-package.mjs",
+      "builderBlobSha": "d42337f326637d669834664289cb3cce36b56342",
+      "indexSourceUnchanged": true,
+      "automaticAssetOrbitBuildQuery": true,
+      "automaticSwPwaBuildCacheBinding": true,
+      "allJsNoCacheMaxAgeZero": true,
+      "newImmutableBuildRequired": true
+    },
+    "transportScope": {
+      "pushMode": "READBACK_ONLY",
+      "fixedTarget": "orbit360ScopedPolicyRead",
+      "region": "us-east1",
+      "sourceManifestScope": "10 explicit reader source/package files; not entire loaded backend dependency closure",
+      "deployAdditionalReview": "Require isolated reader entrypoint or full transitive loaded closure before explicit deploy dispatch",
+      "oldDeployedMissingFiles": "Captured as null hashes; after requires full current ten-file match",
+      "noProductionAcceptanceClaim": true
+    },
+    "previewAllowedOnly": {
+      "workflowPath": ".github/workflows/gravicentra-b4-003-immutable-candidate-preview.yml",
+      "contractPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CURRENT42_CAUSAL_FRONTEND_SUCCESSOR_CONTRACT_20261107.json",
+      "contractBlobSha": "c792b7db1aa3f16ed7ee20cbdffe2b76dc61b97f",
+      "site": "ays-orbit-360-lab",
+      "channelId": "gi-i65-b4-rc-41765742748",
+      "productPaths": [
+        "orbit360-platform/data/store-firestore-product-operational-p0.js",
+        "orbit360-platform/modules/cancelaciones.js",
+        "orbit360-platform/modules/reportes.js"
+      ],
+      "buildExactlyOnce": true,
+      "livePromotionAuthorized": false,
+      "backendFunctionDeploys": 0,
+      "current42Preserved": true
+    }
+  },
+  "domainExecution20261107": {
+    "status": "DOMAIN_ADDED_TXT_SAVED_READ_BACK_DNS_SSL_VERIFICATION_PENDING",
+    "atUtc": "2026-11-07T17:44:05Z",
+    "domain": "app.aysseguros.com",
+    "project": "ays-orbit-360-lab",
+    "site": "ays-orbit-360-lab",
+    "userAuthorization": "Me parece bien lo que me indicas de dominio para publicación, haz lo que corresponda en cada parte",
+    "domainCreated": true,
+    "dnsChanged": true,
+    "hostingArtifactUnchanged": true,
+    "before": {
+      "name": "app.aysseguros.com.",
+      "type": "A",
+      "ttl": 14400,
+      "value": "107.161.178.166"
+    },
+    "addedAndReadBack": {
+      "name": "app.aysseguros.com.",
+      "type": "TXT",
+      "ttl": 14400,
+      "value": "hosting-site=ays-orbit-360-lab"
+    },
+    "configurationMode": "ADVANCED_PREPARE_CERTIFICATE_BEFORE_TRAFFIC_CUTOVER",
+    "trafficRecordChanged": false,
+    "certificateAccepted": false,
+    "customDomainLiveAccepted": false,
+    "corporateRootMailUnchanged": true,
+    "nameserversChanged": false,
+    "oldFilesDeleted": false,
+    "observedFirebaseMessage": "ACME challenge against former host 107.161.178.166 returned HTTP 500 while verification was pending; inspect next wizard state before traffic cutover.",
+    "rollback": "A record remains 107.161.178.166; original files retained. TXT addition does not redirect traffic."
+  },
+  "functionalAudit20261107": {
+    "sourceHead": "b3dcd9d1a57bb4871b06df341ec6198c56f9cfe9",
+    "localReceipt": {
+      "schema": "GRAVICENTRA_FOCUSED_RENEW_CANCEL_LOCAL_SYNTHETIC_REVIEW_V1",
+      "date": "2026-11-07",
+      "repository": "paulaosoriof86/orbit360-core",
+      "branch": "recovery/fase-a-clean-20260831",
+      "head": "b3dcd9d1a57bb4871b06df341ec6198c56f9cfe9",
+      "authority": {
+        "currentExecutionDecisionPointer": "ownerDecisionFreeze20261107",
+        "lastGate": "B4-003 LATEST_APPROVED_VERSION_LIVE_PASS",
+        "firstIncomplete": "B4-004 Siniestros/Cronograma; Siniestros owner-deferred",
+        "newGatePass": false
+      },
+      "sourceBlobs": {
+        "renovaciones": "e3eecb72e7642d4c572338d89f119ae98135f6c1",
+        "cancelaciones": "c9f6934beea57136daca0a3292451ad0792181c1",
+        "renewalsBridge": "43b3a6b07eba40baa50b61b238174540cd9bf430",
+        "cliente360": "0fd9dc9452b2336f91e6e1506f06a5984e066edf"
+      },
+      "sourceBytesGitHashVerified": true,
+      "testCommand": "node --test tools/gravicentra-b4-003-renewals-cancellations-focused.test.cjs tools/gravicentra-b4-003-renovaciones-whatsapp-name.test.cjs tools/gravicentra-b4-003-renovaciones-qa-provenance.test.cjs",
+      "results": {
+        "tests": 17,
+        "passed": 17,
+        "failed": 0,
+        "existingTests": 6,
+        "newFocusedTests": 11,
+        "exitCode": 0
+      },
+      "domainsVerified": [
+        "renewal lifecycle and successor validation",
+        "proposal and acceptance editor context",
+        "existing management reuse",
+        "advisor direct quote denial and scope denial",
+        "cancellation projection country and deduplication",
+        "motive durable acknowledgement and failure",
+        "motive simulated reload",
+        "active recovery activity/business linkage without duplicate",
+        "recovered flow canonical management linkage",
+        "unrecoverable mandatory motive",
+        "partial failure has no success toast",
+        "WhatsApp draft personalization and preview no-open",
+        "QA provenance isolation"
+      ],
+      "limits": [
+        "Synthetic in-memory VM only; no new browser or LIVE acceptance",
+        "Store readback methods mocked; existing backend proof retained",
+        "Persistence reload simulated by reconstructing VM from in-memory committed data",
+        "No real country/role credential matrix replay",
+        "No business writes, external sends, deploys or remote source commits"
+      ],
+      "findings": [
+        {
+          "id": "CANCEL_RECOVERY_PARTIAL_WRITE",
+          "classification": "PRODUCT",
+          "status": "CAUSALLY_REPRODUCED_LOCAL_SYNTHETIC",
+          "source": "orbit360-platform/modules/cancelaciones.js",
+          "detail": "Cancellation updates before linked activity/business/management. Injected activity write failure preserves cancellation update but leaves business absent; UI correctly reports failure. Multi-record workflow is not atomic."
+        },
+        {
+          "id": "C360_RENEWAL_COMPARATIVE_INCOMPLETE",
+          "classification": "PRODUCT",
+          "status": "SOURCE_CONFIRMED_UI_PENDING",
+          "source": "orbit360-platform/modules/cliente360.js",
+          "detail": "Add/remove uses S().update without awaited durable readback; defaults premium to 110% of existing, deductible 1.0%, assistance Premium. Lowest premium labeled best. Prepare email claims attached comparison but creates no attachment in this function."
+        },
+        {
+          "id": "HISTORICAL_V1200B_VALIDATOR",
+          "classification": "PIPELINE_VALIDATOR",
+          "status": "OBSOLETE_TEXT_CONTRACT_NOT_NEW_PRODUCT_FAIL",
+          "detail": "Fails academy script membership, exact b.remove and exact old success string. Current canonical source uses campaign.remove, separate permission guard and expanded confirmed-no-send wording. Do not re-add LAB or historical owners to appease validator."
+        },
+        {
+          "id": "CLIENT_TYPE_KPI_LEGAL",
+          "classification": "PIPELINE_VALIDATOR",
+          "status": "CAUSAL_TEXT_MISMATCH_CONFIRMED",
+          "detail": "Both legal/natural regex expect rows.filter while current accepted UI uses commercialClientRows.filter to exclude QA. Prepare narrow regex update; do not revert product QA exclusion."
+        }
+      ],
+      "preservedAcceptances": [
+        {
+          "module": "Renovaciones",
+          "status": "PAULA_VISUAL_PASS_PRESERVE",
+          "receiptBlob": "68c79350c7c02f20cf4427ca82300ba82c776ff8",
+          "functionalRun": 38722133958,
+          "scenarios": 24
+        },
+        {
+          "module": "Cancelaciones",
+          "status": "SCOPED_HUMAN_VISUAL_PASS_NO_GATE_CLOSURE",
+          "receiptBlob": "1bd7a04cd61c9f654b654e42776713326686c0b0"
+        }
+      ],
+      "validatorRepair": {
+        "originalBlob": "eb7f4a4512dbc6e17ed33217de4b36bb1281a27e",
+        "correctedBlob": "fbc192356189df519cbf2b68996fc6d5cf8977c7",
+        "reproducedOriginalFailure": "CLIENT_TYPE_KPI_LEGAL",
+        "completeOriginalExecutorAfterRepair": "PASS 125 checks",
+        "productSourceChanged": false,
+        "change": "Exact commercialClientRows KPI assertions and functional QA exclusion/retention checks",
+        "negativeMutationChecks": [
+          "PASS rejected missing QA exclusion",
+          "PASS rejected raw-row legal/natural KPI counts"
+        ]
+      }
+    },
+    "cancelacionesCausalReceipt": {
+      "schema": "GRAVICENTRA_CANCELACIONES_QA_CAUSAL_SOURCE_SUCCESSOR_V1",
+      "date": "2026-11-07",
+      "authorityBaseHead": "b3dcd9d1a57bb4871b06df341ec6198c56f9cfe9",
+      "status": "SOURCE_AND_LOCAL_SYNTHETIC_QA_PASS_PREVIEW_LIVE_PENDING",
+      "liveEvidenceFromRoot": {
+        "candidate": "current42",
+        "role": "Direccion",
+        "country": "GT",
+        "observedCancellationRows": 462,
+        "firstQaPolicy": "B4-003-CAN-38102224750",
+        "principalMotive": "B4-003 QA...",
+        "writes": 0
+      },
+      "rootCause": "Cancellation owner concatenated explicit and policy-projected records and filtered only active country. Unlike Renovaciones, it did not invoke the canonical QA provenance helper. CRM permission bridge never removes QA, so hydration does not fix the commercial universe.",
+      "changes": [
+        {
+          "path": "orbit360-platform/modules/cancelaciones.js",
+          "beforeBlob": "c9f6934beea57136daca0a3292451ad0792181c1",
+          "afterBlob": "c206f79a47b8aa8684dc0cf50756f3720166bdbe",
+          "sha256": "53b073a98b2320d1e2329e877affb7e1a5a5d0cea37f94388da8d2dd72414f02",
+          "description": "Commercial projection excludes canonical QA provenance from cancellation, policy and both linked clients. KPIs, motives, amounts and denominator align. Explicit audit mode and direct details retain auditable records within country."
+        },
+        {
+          "path": "orbit360-platform/modules/reportes.js",
+          "beforeBlob": "e00cdbaef2207b6e48c6507c0039161afa07c4e0",
+          "afterBlob": "0daba72ebd8e6f8bef84ced9739b71bcabff0973",
+          "sha256": "1c03e625265722e7b809df47ac35ba42a071a4b19b38a7797a7e70dd815e3d1d",
+          "description": "One-line consumer adaptation requests explicit audit mode. Existing Reportes QA quarantine remains counted and excluded from commercial rows and exports."
+        },
+        {
+          "path": "tools/gravicentra-b4-003-cancelaciones-commercial-qa.test.cjs",
+          "newBlob": "03e5ffbf6ef798bc544098057bae211dbd0a612f",
+          "sha256": "126423ae43667071f360d3b09e067ec02512d235b61adb9528752e3c788ce795"
+        }
+      ],
+      "validation": {
+        "causalTestsBefore": {
+          "pass": 1,
+          "fail": 3
+        },
+        "causalTestsAfter": {
+          "pass": 4,
+          "fail": 0
+        },
+        "preservedRenewalCancellationFunctionalTests": {
+          "pass": 11,
+          "fail": 0
+        },
+        "existingE4CancellationTests": {
+          "pass": 2,
+          "fail": 0,
+          "changed": false
+        },
+        "e4CompatibilityFinding": "Initial owner-only fix removed Reportes quarantine count; one-line audit-mode request restored both original E4 tests without changing their expectations."
+      },
+      "loader": {
+        "currentIndexCancelaciones": "modules/cancelaciones.js?v=20261103-b4003-e4-owner-bridge",
+        "currentIndexReportes": "modules/reportes.js?v=20261103-b4003-e4-owner-bridge",
+        "sharedQaHelper": "core/queries.js isSyntheticQaRecord",
+        "crmBridge": "modules/crm-v1198-operational-bridge.js applies scope and action permissions only",
+        "next": "Integrate into same cumulative source, ensure artifact/cache versioning, build new immutable digest, focal preview readback/UI then authorized promotion with same artifact."
+      },
+      "separateLiveFinding": {
+        "surface": "Renovaciones Propuestas on GMCO-26802",
+        "status": "LIVE_BLOCKED_BY_CATALOG_READBACK_NOT_FIXED_HERE",
+        "chain": [
+          "renewals operational bridge solicitarPropuestas",
+          "ciclo.js managementCreateModal await Orbit.cat.ensure",
+          "config.js canonical catalog provenance guard",
+          "tenant-domain-config-client get catches callable errors and returns local-fallback syncPending",
+          "guard rejects fallback"
+        ],
+        "liveCallable": "orbit360TenantDomainConfig",
+        "liveRegion": "OrbitBackend.functionsRegion or us-central1",
+        "previewCallable": "orbit360TenantDomainConfigPreview",
+        "previewRegion": "us-east1",
+        "exactBackendCause": "Pending root callable readback; not proven to be scoped-policy-reader mismatch",
+        "catGuardChanged": false
+      },
+      "preserved": {
+        "visualMarkup": true,
+        "realBusinessData": true,
+        "qaAuditRecords": true,
+        "existingHistoricalPass": true,
+        "scope": true,
+        "canonicalOwners": true
+      },
+      "remoteMutations": 0,
+      "realBusinessWrites": 0,
+      "externalSends": 0,
+      "newLivePass": false
+    },
+    "liveReadOnlyObservations": [
+      {
+        "module": "Renovaciones",
+        "role": "Direccion",
+        "country": "GT",
+        "search": "PRIVATE_DOCUMENTED_MEDICAL_RENEWAL_SAMPLE",
+        "result": "ONE_OF_73_AFTER_CANONICAL_HYDRATION",
+        "columns": {
+          "expired": 18,
+          "within15": 6,
+          "days16to45": 17,
+          "days46to90": 32
+        }
+      },
+      {
+        "module": "Renovaciones",
+        "action": "Propuestas",
+        "result": "BLOCKED_BEFORE_EDITOR",
+        "message": "No fue posible confirmar los catálogos del tenant. La operación queda bloqueada.",
+        "businessWrites": 0,
+        "causeBoundary": "ciclo.managementCreateModal -> Orbit.cat.ensure -> tenant-domain-config-client; do not bypass canonical catalog guard"
+      },
+      {
+        "module": "TenantDomainConfig",
+        "function": "orbit360TenantDomainConfig",
+        "region": "us-central1",
+        "existsInConsole": true,
+        "observedRequests": [
+          {
+            "localTime": "2026-11-07 11:20:25",
+            "httpStatus": 200
+          },
+          {
+            "localTime": "2026-11-07 11:22:34.805",
+            "httpStatus": 400
+          }
+        ],
+        "callableVerification": "PASSED",
+        "responseBody": "NOT_OBSERVED; do not claim exact error or missing endpoint"
+      },
+      {
+        "module": "Cancelaciones",
+        "result": "QA_CONTAMINATION_REPRODUCED_IN_LIVE_COMMERCIAL_KPI",
+        "counts": {
+          "GT": 462,
+          "CO": 28,
+          "ALL": 490
+        },
+        "qaCount": 1,
+        "qaPolicy": "B4-003-CAN-38102224750",
+        "expectedCommercialCountsAfterCorrection": {
+          "GT": 461,
+          "CO": 28,
+          "ALL": 489
+        },
+        "recordRetainedForAudit": true
+      },
+      {
+        "module": "Cancelaciones",
+        "action": "DETAIL_AND_WHATSAPP_DRAFT",
+        "policy": "PRIVATE_DOCUMENTED_CANCELLATION_SAMPLE",
+        "result": "DETAIL_LOADED_DRAFT_CORRECT_NO_SEND",
+        "country": "GT",
+        "documentedReasonUnknownPreserved": true,
+        "businessWrites": 0
+      },
+      {
+        "module": "Cancelaciones",
+        "action": "COUNTRY_SWITCH",
+        "result": "GT_CO_ALL_PROJECTION_CHANGED_WITH_COUNTRY",
+        "currencyObservation": "CO view contains both USD and COP; verify source currency semantics before correction. Amounts retained only in private evidence."
+      }
+    ],
+    "newLiveModulePass": false,
+    "newFullRoleMatrixPass": false,
+    "businessWrites": 0,
+    "messagesSent": 0,
+    "pendingCausalFindings": [
+      "Tenant catalog contract rejects LIVE proposal opening",
+      "Cancellation recovery has partial-write exposure when related activity write fails",
+      "Cliente360 comparative lacks durable confirmation and uses unsupported default proposal values",
+      "Finance rate snapshots and durable deferred effects remain pending"
+    ]
   }
 }

@@ -76,3 +76,56 @@ rejects('policy applied',f=>f.control.paymentInferenceReconciliationControl.owne
 rejects('wrong source base',f=>f.control[key].authorityBaseHead='0'.repeat(40),/OWNER_BASE_BINDING/);
 console.log('OWNER_DOCUMENTARY_SUCCESSOR_CONTRACT_PASS '+checks+' checks; no Git, network, product or business writes');
 
+const {validateEquipoCausalSourceSuccessor:validateTeam}=await import('./gravicentra-b4-003-formal-live-closeout-guard.mjs');
+const {execFileSync}=await import('node:child_process');
+const teamPaths=["orbit360-platform/data/store-firestore-product-operational-p0.js","tests/goal-participation-classification-writer.test.cjs","tools/gravicentra-b4-003-live-backend-source-readback.cjs",".github/workflows/gravicentra-b4-003-live-protected-reader-20261029.yml","tools/gravicentra-b4-003-live-reader-source-readback.test.cjs"];
+const teamBase='b3dcd9d1a57bb4871b06df341ec6198c56f9cfe9';
+const teamBytes=Object.fromEntries(teamPaths.map(path=>[path,fs.readFileSync(path)]));
+const baseSourceBytes=Object.fromEntries(teamPaths.map((path,index)=>[path,index===4?null:(process.env.GI_SOURCE_SUCCESSOR_BASE_DIR?fs.readFileSync(process.env.GI_SOURCE_SUCCESSOR_BASE_DIR+'/'+path):execFileSync('git',['show',teamBase+':'+path]))]));
+const teamRecord={execution:{productSourceChanged:true,workflowChanged:true},equipoCausalSourceCorrection:{
+ schema:'GRAVICENTRA_EQUIPO_CAUSAL_SOURCE_SUCCESSOR_V1',sourceBaseHead:teamBase,status:'SOURCE_AND_QA_READY_READBACK_ONLY_NOT_DEPLOYED',
+ realBusinessWrites:0,repeatSevenClassificationWrites:false,rulesChanged:false,productionAccepted:false,
+ changes:teamPaths.map(path=>({path,previousBlobSha:baseSourceBytes[path]===null?null:hash(baseSourceBytes[path]),blobSha:hash(teamBytes[path])}))
+}};
+const teamFixture=()=>({record:clone(teamRecord),pointer:{productSourceChanged:true},fileBytes:clone(teamBytes),baseSourceBytes:clone(baseSourceBytes)});
+assert.deepEqual(validateTeam(teamFixture()).allowedPaths,teamPaths);checks++;
+function rejectsTeam(label,edit,pattern){const f=teamFixture();edit(f);assert.throws(()=>validateTeam(f),pattern,label);checks++;}
+rejectsTeam('wrong source ancestor',f=>f.record.equipoCausalSourceCorrection.sourceBaseHead='0'.repeat(40),/TEAM_SOURCE_BASE/);
+rejectsTeam('repeat real writes',f=>f.record.equipoCausalSourceCorrection.repeatSevenClassificationWrites=true,/TEAM_SOURCE_SCOPE/);
+rejectsTeam('new PASS',f=>f.record.equipoCausalSourceCorrection.productionAccepted=true,/TEAM_SOURCE_SCOPE/);
+rejectsTeam('missing causal test',f=>f.record.equipoCausalSourceCorrection.changes.pop(),/TEAM_SOURCE_CHANGES/);
+rejectsTeam('file substitution',f=>f.record.equipoCausalSourceCorrection.changes[0].path='firestore.rules',/TEAM_SOURCE_REQUIRED_PATHS|TEAM_SOURCE_PATH_OR_PREDECESSOR/);
+rejectsTeam('hash mismatch',f=>f.fileBytes[teamPaths[0]]=Buffer.from('tampered'),/TEAM_SOURCE_CURRENT_BLOB/);
+rejectsTeam('different predecessor',f=>f.baseSourceBytes[teamPaths[0]]=Buffer.from('tampered'),/TEAM_SOURCE_BASE_BYTES/);
+rejectsTeam('unrelated product edit',f=>{f.fileBytes[teamPaths[0]]=Buffer.concat([Buffer.from(f.fileBytes[teamPaths[0]]),Buffer.from('// unrelated\n')]);f.record.equipoCausalSourceCorrection.changes[0].blobSha=hash(f.fileBytes[teamPaths[0]]);},/TEAM_SOURCE_EXACT_ACK_PATCH/);
+rejectsTeam('push deployment default',f=>{f.fileBytes[teamPaths[3]]=Buffer.from(Buffer.from(f.fileBytes[teamPaths[3]]).toString().replace('default: readback','default: deploy'));f.record.equipoCausalSourceCorrection.changes[3].blobSha=hash(f.fileBytes[teamPaths[3]]);},/TEAM_SOURCE_READBACK_DEFAULT|TEAM_SOURCE_REVIEWED_TRANSPORT_BLOB/);
+console.log('OWNER_AND_EQUIPO_BOUNDED_SUCCESSOR_CONTRACT_PASS '+checks+' checks; current42 historical checks retained');
+
+rejectsTeam('cancel source requires test',f=>f.record.equipoCausalSourceCorrection.changes.push({path:'orbit360-platform/modules/cancelaciones.js',previousBlobSha:'c9f6934beea57136daca0a3292451ad0792181c1',blobSha:'c206f79a47b8aa8684dc0cf50756f3720166bdbe'}),/CANCELLATION_SOURCE_TEST_PAIR_REQUIRED/);
+console.log('FINAL_BOUNDED_SUCCESSOR_PASS '+checks+' checks');
+
+const frontendPaths=[
+ ['orbit360-platform/modules/cancelaciones.js','c9f6934beea57136daca0a3292451ad0792181c1'],
+ ['tools/gravicentra-b4-003-cancelaciones-commercial-qa.test.cjs',null],
+ ['orbit360-platform/modules/reportes.js','e00cdbaef2207b6e48c6507c0039161afa07c4e0'],
+ ['.github/workflows/gravicentra-b4-003-immutable-candidate-preview.yml','2b74f6d920f5da6016256dd40ce6666f0693cd1e'],
+ [root+'I6_5_B4_003_CURRENT42_CAUSAL_FRONTEND_SUCCESSOR_CONTRACT_20261107.json',null]
+];
+function frontendFixture(){
+ const f=teamFixture(),proof=f.record.equipoCausalSourceCorrection;
+ for(const [path,prior] of frontendPaths){
+  f.fileBytes[path]=fs.readFileSync(path);
+  f.baseSourceBytes[path]=prior?(process.env.GI_SOURCE_SUCCESSOR_BASE_DIR?fs.readFileSync(process.env.GI_SOURCE_SUCCESSOR_BASE_DIR+'/'+path):execFileSync('git',['show',teamBase+':'+path])):null;
+  proof.changes.push({path,previousBlobSha:prior,blobSha:hash(f.fileBytes[path])});
+ }
+ const workflowPath=frontendPaths[3][0],contractPath=frontendPaths[4][0];
+ proof.status='SOURCE_AND_QA_READY_FRONTEND_PREVIEW_ONLY_NOT_DEPLOYED';
+ proof.previewAllowedOnly={workflowPath,contractPath,contractBlobSha:'c792b7db1aa3f16ed7ee20cbdffe2b76dc61b97f',site:'ays-orbit-360-lab',channelId:'gi-i65-b4-rc-41765742748',buildExactlyOnce:true,livePromotionAuthorized:false,backendFunctionDeploys:0,current42Preserved:true,productPaths:[teamPaths[0],frontendPaths[0][0],frontendPaths[2][0]]};
+ return f;
+}
+assert.equal(validateTeam(frontendFixture()).allowedPaths.length,10);checks++;
+for(const [key,value] of [['livePromotionAuthorized',true],['backendFunctionDeploys',1],['current42Preserved',false]]){
+ const f=frontendFixture();f.record.equipoCausalSourceCorrection.previewAllowedOnly[key]=value;
+ assert.throws(()=>validateTeam(f),/FRONTEND_PREVIEW_EXACT_AUTHORITY/);checks++;
+}
+console.log('FRONTEND_PREVIEW_BOUNDED_SUCCESSOR_PASS '+checks+' checks; LIVE, backend deployment and historical reset rejected');

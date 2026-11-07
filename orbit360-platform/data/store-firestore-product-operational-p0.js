@@ -509,6 +509,10 @@
         mutations:[{action:'update',collection:'asesores',id:id,payload:clone(patch)}]},'us-central1');
     }).then(function(result){
       requireServerReadback(result,[{action:'update',collection:'asesores',id:id}]);
+      // Publish only the acknowledged classification through the shared store.
+      // Keep it until canonical hydration contains the same two fields.
+      setPending('asesores',id,Object.assign({},get('asesores',id)||prior,patch),{kind:'update',patch:expectedPatch(patch,'asesores')});
+      emit('asesores');
       state.pending=Math.max(0,state.pending-1);state.committed+=1;state.lastCommittedAt=new Date().toISOString();state.lastError='';
       try{window.dispatchEvent(new CustomEvent('orbit:operational-write:committed',{detail:{collection:'asesores',id:id,action:'update',classificationOnly:true,serverOwned:true,canonicalReadback:true}}));}catch(e){}
       return {ok:true,classificationOnly:true,canonicalReadback:true,id:id};

@@ -145,7 +145,7 @@ Orbit.modules.reportes = (function () {
   function monedaMixtaActiva() { return !Orbit.pais || Orbit.pais === 'TODOS'; }
   // The Cancelaciones module owns historical policy-state projections and
   // deduplicates them against explicit cancellations. Reports only reads them.
-  function cancellationSourceRows() { return Orbit.modules.cancelaciones.effectiveRows(); }
+  function cancellationSourceRows() { return Orbit.modules.cancelaciones.effectiveRows({mode:'audit',includeSyntheticQa:true}); }
   function cancellationOwnerReady() {
     return !!(Orbit.modules && Orbit.modules.cancelaciones && typeof Orbit.modules.cancelaciones.effectiveRows === 'function');
   }
@@ -460,3 +460,4 @@ Orbit.modules.reportes = (function () {
 
   return { render, quitarProg, verFila };
 })();
+
