@@ -1,0 +1,533 @@
+{
+  "schema": "B4_003_ONE_LIVE_SYNTHETIC_INSURER_LOCAL_REVIEW_V1",
+  "recordedAtUtc": "2026-11-07T02:01:03Z",
+  "status": "PASS_REVIEW_LOCAL_NO_REMOTE_EXECUTION",
+  "planSha256": "a318932d732917737953c42a380b884ba200307f5e804c3b32c06662c012dcb6",
+  "helperGitBlob": "66995bd06b05e23faade01f5d0f5045d601a9fbe",
+  "executorGitBlob": "855e528eea7394b3841dadd3ea654e65ba89701c",
+  "executorBaseGitBlob": "e93f36b602443dcb5d56cb9c6e0ff254c71f2844",
+  "backendWriterGitBlob": "187efbfa9868531349154f26ec90a5e2c2ed33e8",
+  "reviewedBy": "Root plus independent focal review",
+  "findingsResolved": [
+    "Exact Hosting qualified/unqualified resource normalization restricted to expected project/site",
+    "Uncertain create POST never retried; exact request/event/fixture readback governs cleanup or HOLD",
+    "Already committed cleanup verified without another token or POST",
+    "First-attempt and exact parent CP/consent/event.before binding prevent phase replay/remint on a different push",
+    "Same owner command uses atomic remove plus external audit and server request/event proof"
+  ],
+  "helperLocalValidation": {
+    "status": "LOCAL_VALIDATION_ONLY",
+    "tests": 15,
+    "results": [
+      {
+        "name": "fixed plan scope is internally valid",
+        "status": "PASS_LOCAL_ONLY"
+      },
+      {
+        "name": "pending create authorization denied before execution",
+        "status": "PASS_LOCAL_ONLY"
+      },
+      {
+        "name": "pending cleanup authorization denied before execution",
+        "status": "PASS_LOCAL_ONLY"
+      },
+      {
+        "name": "new B4 scope permits valid metadata while old promotion auth is consumed",
+        "status": "PASS_LOCAL_ONLY"
+      },
+      {
+        "name": "custom token not authorized denied",
+        "status": "PASS_LOCAL_ONLY"
+      },
+      {
+        "name": "wrong principal denied",
+        "status": "PASS_LOCAL_ONLY"
+      },
+      {
+        "name": "second distinct fixture denied",
+        "status": "PASS_LOCAL_ONLY"
+      },
+      {
+        "name": "consumed approval denied",
+        "status": "PASS_LOCAL_ONLY"
+      },
+      {
+        "name": "phase replay denied",
+        "status": "PASS_LOCAL_ONLY"
+      },
+      {
+        "name": "missing cleanup authorization denied",
+        "status": "PASS_LOCAL_ONLY"
+      },
+      {
+        "name": "different reviewed helper denied",
+        "status": "PASS_LOCAL_ONLY"
+      },
+      {
+        "name": "wrong immutable promotion denied",
+        "status": "PASS_LOCAL_ONLY"
+      },
+      {
+        "name": "cleanup is exactly remove plus external audit, no UI activity",
+        "status": "PASS_LOCAL_ONLY"
+      },
+      {
+        "name": "canonical digests and event IDs deterministic and distinct",
+        "status": "PASS_LOCAL_ONLY"
+      },
+      {
+        "name": "Hosting accepts both observed resource formats only for exact project/site",
+        "status": "PASS_LOCAL_ONLY"
+      }
+    ],
+    "remoteRequests": 0,
+    "customTokens": 0,
+    "writes": 0,
+    "notProductionEvidence": true,
+    "cliFailClosedChecks": [
+      {
+        "mode": "--check-authorization",
+        "phase": "create",
+        "result": "PENDING_AUTH_DENIED_BEFORE_NETWORK_DEPS_OR_TOKEN"
+      },
+      {
+        "mode": "--check-authorization",
+        "phase": "cleanup",
+        "result": "PENDING_AUTH_DENIED_BEFORE_NETWORK_DEPS_OR_TOKEN"
+      },
+      {
+        "mode": "--execute",
+        "phase": "create",
+        "result": "PENDING_AUTH_DENIED_BEFORE_NETWORK_DEPS_OR_TOKEN"
+      },
+      {
+        "mode": "--execute",
+        "phase": "cleanup",
+        "result": "PENDING_AUTH_DENIED_BEFORE_NETWORK_DEPS_OR_TOKEN"
+      },
+      {
+        "mode": "--execute",
+        "phase": "create",
+        "localSyntheticApprovalFixtureOnly": true,
+        "runAttempt": 2,
+        "result": "RERUN_DENIED_BEFORE_NETWORK_DEPS_OR_TOKEN"
+      }
+    ],
+    "cliChecks": 5,
+    "latestParentBindingValidation": {
+      "test": "Second distinct push cannot reuse the approved phase parent",
+      "status": "REJECTED_LOCAL_BEFORE_NETWORK_CREDENTIALS_OR_TOKEN",
+      "remoteRequests": 0,
+      "customTokens": 0,
+      "writes": 0
+    },
+    "previousValidationNotRepeated": true
+  },
+  "workflowLocalValidation": {
+    "scope": "LOCAL_STATIC_AND_NEGATIVE_GUARD_ONLY",
+    "basePath": "/workspace/scratch/adf252ac75b5/b4_retained_promotion_draft/executor.integrated.after.yml",
+    "beforeGitBlobSha": "e93f36b602443dcb5d56cb9c6e0ff254c71f2844",
+    "afterGitBlobSha": "855e528eea7394b3841dadd3ea654e65ba89701c",
+    "beforeSha256": "cc4fa79430d06ef0cd45d7b141c25f295fcb3e6cf80975f0a08e6fffa8468e46",
+    "afterSha256": "ce6f87708891e1a30f86d3af08d580169a9f66aa3a36998c572a764009712cf0",
+    "patchSha256": "8c4d9296fc6b2b335a7a94a8064b413b3cda58beffa8e2f952936955bb7bbd77",
+    "checks": {
+      "yaml_parses": true,
+      "only_two_push_paths_added": true,
+      "retained_job_unchanged": true,
+      "archive_readback_job_unchanged": true,
+      "legacy_body_unchanged": true,
+      "permissions_readonly": true,
+      "node22_preserved": true,
+      "no_browser_or_playwright": true,
+      "only_pinned_admin_dependency": true,
+      "i5_not_used_in_new_job": true,
+      "promotion_authorization_not_reactivated": true,
+      "exact_two_phase_routing": true,
+      "legacy_and_retained_skipped_for_both_phases": true,
+      "old_routes_preserved": true,
+      "concurrency_unchanged_not_cancelled": true,
+      "credential_guard_before_secret_step": true,
+      "secrets_only_in_guarded_step": true,
+      "helper_modes_and_phase_present": true,
+      "artifact_and_credential_cleanup_always": true,
+      "candidate42_and_paula_pinned": true,
+      "no_build_deploy_or_direct_firestore_mutation": true,
+      "firebase_selection_has_no_token_or_remote_probe": true,
+      "head_lease_before_credentials_and_execution": true,
+      "promotion_and_preview_receipts_required": true,
+      "bash_syntax": true,
+      "inline_node_syntax": true,
+      "both_phases_refuse_all_seven_negative_cases_before_helper_or_head_network": true,
+      "execution_nonce_exact": true,
+      "execute_receives_github_token": true,
+      "custom_token_maximum_two_preserved": true,
+      "authorized_phase_parent_sha_bound": true,
+      "single_nonforced_existing_branch_push_required": true,
+      "event_before_mismatch_refused_before_helper_or_network": true
+    },
+    "routing": [
+      {
+        "event": "push",
+        "message": "test(b4-003): create one synthetic insurer LIVE",
+        "jobs": {
+          "b4-003-renewals-cancelations-preview": false,
+          "b4-003-readonly-renewals": false,
+          "b4-003-retained-hosting-preflight": false,
+          "b4-003-synthetic-archive-readback": false,
+          "b4003_one_live_synthetic_insurer": true
+        }
+      },
+      {
+        "event": "push",
+        "message": "test(b4-003): cleanup one synthetic insurer LIVE",
+        "jobs": {
+          "b4-003-renewals-cancelations-preview": false,
+          "b4-003-readonly-renewals": false,
+          "b4-003-retained-hosting-preflight": false,
+          "b4-003-synthetic-archive-readback": false,
+          "b4003_one_live_synthetic_insurer": true
+        }
+      },
+      {
+        "event": "push",
+        "message": "test(b4-003): certify one synthetic insurer LIVE",
+        "jobs": {
+          "b4-003-renewals-cancelations-preview": true,
+          "b4-003-readonly-renewals": false,
+          "b4-003-retained-hosting-preflight": false,
+          "b4-003-synthetic-archive-readback": false,
+          "b4003_one_live_synthetic_insurer": false
+        }
+      },
+      {
+        "event": "push",
+        "message": "test(b4-003): retained artifact Hosting preflight",
+        "jobs": {
+          "b4-003-renewals-cancelations-preview": false,
+          "b4-003-readonly-renewals": false,
+          "b4-003-retained-hosting-preflight": true,
+          "b4-003-synthetic-archive-readback": false,
+          "b4003_one_live_synthetic_insurer": false
+        }
+      },
+      {
+        "event": "push",
+        "message": "test(b4-003): certify retained rollback in existing Preview",
+        "jobs": {
+          "b4-003-renewals-cancelations-preview": false,
+          "b4-003-readonly-renewals": false,
+          "b4-003-retained-hosting-preflight": true,
+          "b4-003-synthetic-archive-readback": false,
+          "b4003_one_live_synthetic_insurer": false
+        }
+      },
+      {
+        "event": "push",
+        "message": "release(b4-003): promote exact retained Hosting version",
+        "jobs": {
+          "b4-003-renewals-cancelations-preview": false,
+          "b4-003-readonly-renewals": false,
+          "b4-003-retained-hosting-preflight": true,
+          "b4-003-synthetic-archive-readback": false,
+          "b4003_one_live_synthetic_insurer": false
+        }
+      },
+      {
+        "event": "push",
+        "message": "test(b4-003): read three synthetic archive states",
+        "jobs": {
+          "b4-003-renewals-cancelations-preview": false,
+          "b4-003-readonly-renewals": false,
+          "b4-003-retained-hosting-preflight": false,
+          "b4-003-synthetic-archive-readback": true,
+          "b4003_one_live_synthetic_insurer": false
+        }
+      },
+      {
+        "event": "push",
+        "message": "test(b4-003): create one synthetic insurer LIVE\n",
+        "jobs": {
+          "b4-003-renewals-cancelations-preview": true,
+          "b4-003-readonly-renewals": false,
+          "b4-003-retained-hosting-preflight": false,
+          "b4-003-synthetic-archive-readback": false,
+          "b4003_one_live_synthetic_insurer": false
+        }
+      },
+      {
+        "event": "push",
+        "message": "test(b4-003): cleanup one synthetic insurer LIVE extra",
+        "jobs": {
+          "b4-003-renewals-cancelations-preview": true,
+          "b4-003-readonly-renewals": false,
+          "b4-003-retained-hosting-preflight": false,
+          "b4-003-synthetic-archive-readback": false,
+          "b4003_one_live_synthetic_insurer": false
+        }
+      },
+      {
+        "event": "push",
+        "message": "other",
+        "jobs": {
+          "b4-003-renewals-cancelations-preview": true,
+          "b4-003-readonly-renewals": false,
+          "b4-003-retained-hosting-preflight": false,
+          "b4-003-synthetic-archive-readback": false,
+          "b4003_one_live_synthetic_insurer": false
+        }
+      },
+      {
+        "event": "workflow_dispatch",
+        "message": "test(b4-003): create one synthetic insurer LIVE",
+        "jobs": {
+          "b4-003-renewals-cancelations-preview": true,
+          "b4-003-readonly-renewals": false,
+          "b4-003-retained-hosting-preflight": false,
+          "b4-003-synthetic-archive-readback": false,
+          "b4003_one_live_synthetic_insurer": false
+        }
+      },
+      {
+        "event": "workflow_dispatch",
+        "message": "test(b4-003): cleanup one synthetic insurer LIVE",
+        "jobs": {
+          "b4-003-renewals-cancelations-preview": true,
+          "b4-003-readonly-renewals": false,
+          "b4-003-retained-hosting-preflight": false,
+          "b4-003-synthetic-archive-readback": false,
+          "b4003_one_live_synthetic_insurer": false
+        }
+      }
+    ],
+    "bashSyntax": [
+      {
+        "step": 2,
+        "exitCode": 0,
+        "stderr": ""
+      },
+      {
+        "step": 3,
+        "exitCode": 0,
+        "stderr": ""
+      },
+      {
+        "step": 4,
+        "exitCode": 0,
+        "stderr": ""
+      },
+      {
+        "step": 5,
+        "exitCode": 0,
+        "stderr": ""
+      },
+      {
+        "step": 6,
+        "exitCode": 0,
+        "stderr": ""
+      },
+      {
+        "step": 8,
+        "exitCode": 0,
+        "stderr": ""
+      }
+    ],
+    "inlineNodeSyntax": [
+      {
+        "step": 2,
+        "exitCode": 0,
+        "stderr": ""
+      },
+      {
+        "step": 3,
+        "exitCode": 0,
+        "stderr": ""
+      },
+      {
+        "step": 3,
+        "exitCode": 0,
+        "stderr": ""
+      },
+      {
+        "step": 4,
+        "exitCode": 0,
+        "stderr": ""
+      },
+      {
+        "step": 6,
+        "exitCode": 0,
+        "stderr": ""
+      }
+    ],
+    "negativeGuardTests": [
+      {
+        "case": "missing_scope",
+        "phase": "create",
+        "exitCode": 1,
+        "status": "HOLD",
+        "reason": "OWNER_AUTHORIZATION_PENDING_OR_CONSUMED",
+        "expectedReason": "OWNER_AUTHORIZATION_PENDING_OR_CONSUMED",
+        "matched": true
+      },
+      {
+        "case": "pending_scope",
+        "phase": "create",
+        "exitCode": 1,
+        "status": "HOLD",
+        "reason": "OWNER_AUTHORIZATION_PENDING_OR_CONSUMED",
+        "expectedReason": "OWNER_AUTHORIZATION_PENDING_OR_CONSUMED",
+        "matched": true
+      },
+      {
+        "case": "consumed_scope",
+        "phase": "create",
+        "exitCode": 1,
+        "status": "HOLD",
+        "reason": "OWNER_AUTHORIZATION_PENDING_OR_CONSUMED",
+        "expectedReason": "OWNER_AUTHORIZATION_PENDING_OR_CONSUMED",
+        "matched": true
+      },
+      {
+        "case": "wrong_candidate",
+        "phase": "create",
+        "exitCode": 1,
+        "status": "HOLD",
+        "reason": "CURSOR_SOURCE_MISMATCH",
+        "expectedReason": "CURSOR_SOURCE_MISMATCH",
+        "matched": true
+      },
+      {
+        "case": "missing_promotion_receipt",
+        "phase": "create",
+        "exitCode": 1,
+        "status": "HOLD",
+        "reason": "RETAINED_PROMOTION_RECEIPT_MISSING",
+        "expectedReason": "RETAINED_PROMOTION_RECEIPT_MISSING",
+        "matched": true
+      },
+      {
+        "case": "wrong_principal",
+        "phase": "create",
+        "exitCode": 1,
+        "status": "HOLD",
+        "reason": "EXACT_PAULA_UID_REQUIRED",
+        "expectedReason": "EXACT_PAULA_UID_REQUIRED",
+        "matched": true
+      },
+      {
+        "case": "wrong_role",
+        "phase": "create",
+        "exitCode": 1,
+        "status": "HOLD",
+        "reason": "EXISTING_CANONICAL_ROLE_REQUIRED",
+        "expectedReason": "EXISTING_CANONICAL_ROLE_REQUIRED",
+        "matched": true
+      },
+      {
+        "case": "missing_scope",
+        "phase": "cleanup",
+        "exitCode": 1,
+        "status": "HOLD",
+        "reason": "OWNER_AUTHORIZATION_PENDING_OR_CONSUMED",
+        "expectedReason": "OWNER_AUTHORIZATION_PENDING_OR_CONSUMED",
+        "matched": true
+      },
+      {
+        "case": "pending_scope",
+        "phase": "cleanup",
+        "exitCode": 1,
+        "status": "HOLD",
+        "reason": "OWNER_AUTHORIZATION_PENDING_OR_CONSUMED",
+        "expectedReason": "OWNER_AUTHORIZATION_PENDING_OR_CONSUMED",
+        "matched": true
+      },
+      {
+        "case": "consumed_scope",
+        "phase": "cleanup",
+        "exitCode": 1,
+        "status": "HOLD",
+        "reason": "OWNER_AUTHORIZATION_PENDING_OR_CONSUMED",
+        "expectedReason": "OWNER_AUTHORIZATION_PENDING_OR_CONSUMED",
+        "matched": true
+      },
+      {
+        "case": "wrong_candidate",
+        "phase": "cleanup",
+        "exitCode": 1,
+        "status": "HOLD",
+        "reason": "CURSOR_SOURCE_MISMATCH",
+        "expectedReason": "CURSOR_SOURCE_MISMATCH",
+        "matched": true
+      },
+      {
+        "case": "missing_promotion_receipt",
+        "phase": "cleanup",
+        "exitCode": 1,
+        "status": "HOLD",
+        "reason": "RETAINED_PROMOTION_RECEIPT_MISSING",
+        "expectedReason": "RETAINED_PROMOTION_RECEIPT_MISSING",
+        "matched": true
+      },
+      {
+        "case": "wrong_principal",
+        "phase": "cleanup",
+        "exitCode": 1,
+        "status": "HOLD",
+        "reason": "EXACT_PAULA_UID_REQUIRED",
+        "expectedReason": "EXACT_PAULA_UID_REQUIRED",
+        "matched": true
+      },
+      {
+        "case": "wrong_role",
+        "phase": "cleanup",
+        "exitCode": 1,
+        "status": "HOLD",
+        "reason": "EXISTING_CANONICAL_ROLE_REQUIRED",
+        "expectedReason": "EXISTING_CANONICAL_ROLE_REQUIRED",
+        "matched": true
+      }
+    ],
+    "helperVerified": false,
+    "remoteExecuted": false,
+    "tokensIssued": 0,
+    "operationalWrites": 0,
+    "runtimeDependenciesInstalled": false,
+    "limitations": [
+      "Only initial local guard tested with refusal fixtures; no helper execution, remote HEAD lease, credential loading, token issuance, API writes, or LIVE acceptance.",
+      "Helper owns exact phase evidence/replay/cleanup gates and real canonical LIVE/Auth checks.",
+      "CP remains pending; this draft does not authorize execution."
+    ],
+    "finalAdjustment": {
+      "change": "Added phase-specific authorized parent SHA and exact one-commit push checks before secrets",
+      "priorExecutorGitBlobSha": "4ccd57d72671544ecaad74aee543984228e3651f",
+      "yamlReparsed": true,
+      "newLocalNegativeTestsRun": 1,
+      "priorStaticAndNegativeChecksRetained": "Historical local results retained; only requested event.before mismatch rejection executed against this exact final guard.",
+      "selfReferenceCurrentCommitRequired": false
+    },
+    "priorNegativeGuardTestScope": {
+      "executedAgainstGitBlobSha": "c59956ec4635f55551cb8b73638c74e1f890478d",
+      "cases": 14,
+      "preservedAsPriorLocalEvidence": true,
+      "repeatedAfterParentBindingChange": false
+    },
+    "targetedParentGuardTest": {
+      "case": "event_before_differs_from_authorized_parent",
+      "phase": "create",
+      "exitCode": 1,
+      "status": "HOLD",
+      "reason": "AUTHORIZED_PARENT_MISMATCH",
+      "expectedReason": "AUTHORIZED_PARENT_MISMATCH",
+      "matched": true,
+      "remoteCalls": 0,
+      "tokensIssued": 0,
+      "operationalWrites": 0,
+      "executedAgainstGitBlobSha": "855e528eea7394b3841dadd3ea654e65ba89701c"
+    }
+  },
+  "executionAuthorized": false,
+  "customTokensIssued": 0,
+  "businessWrites": 0,
+  "productionAcceptanceGranted": false,
+  "b4003Closed": false
+}

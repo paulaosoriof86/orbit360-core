@@ -1,7 +1,7 @@
 {
   "schema": "B4_003_CURRENT42_AUTHENTICATED_LIVE_UI_PROGRESS_V1",
-  "status": "PARTIAL_LIVE_FUNCTIONAL_AND_CREDENTIAL_READBACK_COMPLETE_CONTROLLED_WRITE_PENDING",
-  "recordedAtUtc": "2026-11-07T01:43:10Z",
+  "status": "CURRENT42_AUTHENTICATED_LIVE_READ_ONLY_AND_CREDENTIAL_CHECKS_OBSERVED_CONTROLLED_WRITE_PENDING",
+  "recordedAtUtc": "2026-11-07T01:51:39Z",
   "gate": "I6.5/B4-003",
   "sourceSha": "857f1222f360a42a06e012810a1c01bce155a26f",
   "buildId": "gi-i65-b4-857f1222f360-57f234755dc1",
@@ -21,7 +21,8 @@
     ],
     "rolesActuallySelected": [
       "Dirección",
-      "Operativo"
+      "Operativo",
+      "Asesor"
     ],
     "direccionSelectValueObserved": "SuperAdmin",
     "browserModuleUrlBuildMarkerObserved": "gi-i65-b4-857f1222f360-57f234755dc1",
@@ -130,7 +131,15 @@
       "direccionConciliacionesAllowed": true,
       "noHiddenApiAuthorizationBypass": true,
       "backendNegativeHistoricalEvidencePreserved": true,
-      "currentLiveBackendDenialNotDirectlyInvoked": true
+      "currentLiveBackendDenialNotDirectlyInvoked": true,
+      "assignedAsesorSelected": true,
+      "asesorInsurerUiDenied": true,
+      "asesorCliente360GtCommercialClients": 358,
+      "asesorLinkedActivePolicies": 170,
+      "asesorLinkedPolicies": 1125,
+      "asesorNetPremiumGtq": 527739,
+      "asesorQaSeparate": 1,
+      "returnedToDireccionTodos": true
     },
     "conciliaciones": {
       "status": "LIVE_AUTHENTICATED_READ_OBSERVED",
@@ -179,15 +188,48 @@
       "noSourceOrDataChanged": true
     },
     "inicio": {
-      "status": "PARTIAL_LIVE_RENDER_OBSERVED_FINAL_READINESS_AND_RESPONSIVE_RECHECK_PENDING",
+      "status": "LIVE_SERVER_READINESS_AND_320_390_RESPONSIVE_FOCAL_PASS",
       "shellAndSessionRendered": true,
       "commercialClient439AndPolicy1416Displayed": true,
-      "latestObservedSourceReadiness": "4_OF_5",
-      "normalFlowTimeoutPassClaimed": false
+      "latestObservedSourceReadiness": "5_OF_5",
+      "normalFlowTimeoutPassClaimed": false,
+      "commercialClients": 439,
+      "policies": 1416,
+      "overdueObligations": 686,
+      "confirmedPayments": 5,
+      "gtqCopSeparated": true,
+      "personalProductionAndCollectionDisplayed": true,
+      "unconfiguredGoalsNotInvented": true,
+      "sourceReadyWithoutUserDataRepair": true,
+      "responsive": [
+        {
+          "requestedWidth": 320,
+          "actualClientWidth": 305,
+          "pageScrollWidth": 305,
+          "currenciesFullyVisible": true,
+          "oneColumnKpis": true
+        },
+        {
+          "requestedWidth": 390,
+          "actualClientWidth": 375,
+          "pageScrollWidth": 375,
+          "currenciesFullyVisible": true,
+          "oneColumnKpis": true
+        }
+      ],
+      "viewportRestored": true
     },
     "renovaciones": {
-      "status": "NAVIGATION_ATTEMPTED_FINAL_READBACK_PENDING",
-      "browserControlResetDuringRead": true
+      "status": "LIVE_CLASSIFIED_BOARD_READ_OBSERVED",
+      "role": "Dirección",
+      "country": "GT",
+      "overdue": 18,
+      "within15Days": 6,
+      "between16And45Days": 16,
+      "reviewSituations": 26,
+      "decisionAndHistoricalRelationWarningsPreserved": true,
+      "noCampaignPrepared": true,
+      "noWrite": true
     }
   },
   "warnings": [
@@ -216,9 +258,9 @@
     "readRecoveryRetainsVerifiedEvidence": true
   },
   "remaining": [
-    "Complete final Inicio readiness and applicable responsive readback, assigned Asesor scope readback, and Renovaciones readback.",
     "Obtain exact LIVE synthetic-write and ephemeral-existing-UID authentication authorization; current Preview-only and consumed I5 authorizations are not reused.",
-    "Perform exactly approved controlled-write/reload/atomic-audit-cleanup/readback, then final affected-module integrity and exact LIVE identity verification."
+    "Execute the single approved synthetic insurer create, actual browser reload/read, atomic remove+audit, canonical absence and actual browser reload absence.",
+    "Verify final affected-module integrity and exact LIVE identity, then reconcile formal LIVE acceptance and close B4-003."
   ],
   "preservedHistoricalCertificates": 15,
   "currentEvidenceEntries": 16,

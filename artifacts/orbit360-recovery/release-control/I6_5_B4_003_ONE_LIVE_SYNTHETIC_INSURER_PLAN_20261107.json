@@ -1,0 +1,303 @@
+{
+  "schema": "GRAVICENTRA_B4_003_ONE_LIVE_SYNTHETIC_INSURER_PLAN_V1",
+  "executionNonce": "B4-003-LIVE-ONE-INSURER-mw5qeno8",
+  "status": "PREPARED_REQUIRES_EXPLICIT_OWNER_AUTHORIZATION",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "authorityReadAtCommit": "7d81069e1b27fc83414932af7c2309515a6d5877",
+  "projectId": "ays-orbit-360-lab",
+  "tenantId": "alianzas-soluciones",
+  "hosting": {
+    "origin": "https://ays-orbit-360-lab.web.app",
+    "version": "sites/ays-orbit-360-lab/versions/c5e1ae001fae793b",
+    "sourceSha": "857f1222f360a42a06e012810a1c01bce155a26f",
+    "buildId": "gi-i65-b4-857f1222f360-57f234755dc1",
+    "artifactId": 13549460562,
+    "hostedPayloadDigest": "308b669105c380294177f1a8d2350216af95fec31f800955d611e607542b42da",
+    "promotionRunId": 42323326741,
+    "noRebuild": true
+  },
+  "sourceContracts": {
+    "backendWriterGitBlob": "187efbfa9868531349154f26ec90a5e2c2ed33e8",
+    "historicalI5IntentGitBlob": "c6edcfd925327271c3d9f73117e14a3a748750a8",
+    "historicalI5HelperGitBlob": "9a2aa5820975177571d0f06a15fa14bd0533296b",
+    "currentCreateUiBridgeGitBlob": "db5f012abe505c2dd27d77a47d0694868bee5348",
+    "historicalI5ReactivationAllowed": false
+  },
+  "principal": {
+    "displayName": "Paula Osorio",
+    "uid": "pL8zkGdq6phHm5z2DiXIcoNHiw83",
+    "uidBindingRequiredBeforeAuthorization": false,
+    "uidBindingSource": "Exact existing approved Paula membership/Auth account; do not select first administrator; do not read hidden browser authentication state",
+    "activeRole": "superadmin",
+    "assignedRoleAndCountryMustBeVerified": true,
+    "country": "GT",
+    "existingEnabledEmailVerifiedAccountRequired": true,
+    "customTokenCountMaximum": 2,
+    "additionalCustomClaims": false,
+    "signInRequired": true,
+    "tokenOnlyInMemory": true,
+    "persistTokenOrRefreshToken": false,
+    "noAccountCreation": true,
+    "noRoleChanges": true,
+    "noMembershipChanges": true,
+    "noIamChanges": true,
+    "noSecretOrPasswordChanges": true,
+    "visibleRoleLabel": "Dirección",
+    "uidEvidence": {
+      "cpCommit": "b34352ed7ff7a5fd5d0391ae81f6ecb8bd9385a7",
+      "cpBlob": "88f569ea5fc0f2a638caa5c4abe2ad23faecc6c6",
+      "jsonPath": "b4003ActiveCertificationCursor20261106.samuelCandidate41AuthenticatedUat20261106.originalAuthorRead.actorUid",
+      "humanAuthor": "Paula Osorio",
+      "screenshotBlob": "d15ae5752c3e7fadebcf695aa0d46106e075fbb8",
+      "assignedRoleReceiptBlob": "c17d0a8047e20570a343a8129a558eded19321c9",
+      "assignedRoleReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_SIGNED_REAL_UID_CALLABLE_NEGATIVES_PASS_20261104.json"
+    }
+  },
+  "fixture": {
+    "id": "asg_mw5qeno8",
+    "collection": "aseguradoras",
+    "maxDistinctBusinessIds": 1,
+    "beforeAbsentRequired": true,
+    "name": "QA B4-003 LIVE 2026-11-07",
+    "country": "GT",
+    "credentials": 0,
+    "accounts": 0,
+    "documents": 0,
+    "relations": 0
+  },
+  "commands": {
+    "owner": "orbit360ProductOperationalCommand",
+    "region": "us-central1",
+    "endpoint": "https://us-central1-ays-orbit-360-lab.cloudfunctions.net/orbit360ProductOperationalCommand",
+    "create": {
+      "tenantId": "alianzas-soluciones",
+      "activeRole": "superadmin",
+      "requestId": "b4003_live_create_mw5qeno8",
+      "mutations": [
+        {
+          "action": "insert",
+          "collection": "aseguradoras",
+          "id": "asg_mw5qeno8",
+          "auditReason": "Prueba sintética B4-003 LIVE autorizada; una sola ficha sin relaciones ni credenciales; eliminar al finalizar.",
+          "payload": {
+            "id": "asg_mw5qeno8",
+            "nombre": "QA B4-003 LIVE 2026-11-07",
+            "pais": "GT",
+            "monedaBase": "GTQ",
+            "entityType": "insurer",
+            "vinculada": false,
+            "activa": true,
+            "contactos": [],
+            "portales": [],
+            "cuentas": [],
+            "ramos": [],
+            "docs": [],
+            "fuente": "b4003_live_synthetic_qa"
+          }
+        }
+      ]
+    },
+    "cleanup": {
+      "tenantId": "alianzas-soluciones",
+      "activeRole": "superadmin",
+      "requestId": "b4003_live_cleanup_mw5qeno8",
+      "mutations": [
+        {
+          "action": "remove",
+          "collection": "aseguradoras",
+          "id": "asg_mw5qeno8"
+        },
+        {
+          "action": "insert",
+          "collection": "auditoriaAsegExterna",
+          "id": "audasg_b4003_live_mw5qeno8",
+          "payload": {
+            "id": "audasg_b4003_live_mw5qeno8",
+            "aseguradoraId": "asg_mw5qeno8",
+            "cambio": "B4-003 LIVE: eliminación de única aseguradora sintética",
+            "motivo": "Fin de prueba controlada: preservar auditoría y devolver ausencia inicial.",
+            "b4003Synthetic": true,
+            "containsSecrets": false
+          }
+        }
+      ]
+    },
+    "maximumDistinctBusinessMutations": 2,
+    "maximumExternalAuditInserts": 1,
+    "maximumCommandBatches": 2,
+    "idempotentRequestIds": true,
+    "directFirestoreWrites": false
+  },
+  "creationPath": {
+    "mode": "EXISTING_CANONICAL_OWNER_SIGNED_CALLABLE",
+    "reason": "Current UI bridge creates an additional linked actividad; this plan restricts business changes to one exact insurer and verifies UI only by reading/reloading it.",
+    "certifiesUiCreateButton": false,
+    "certifiesCanonicalWritePersistenceAndUiReload": true
+  },
+  "sequence": [
+    "Require explicit owner receipt and exact plan/helper/executor/HEAD binding; verify candidate42 LIVE version and full retained digest already proved.",
+    "Resolve only the existing Paula UID bound in the approval; verify assigned superadmin, GT, enabled Auth and verified email. Fail before issuing a token on any mismatch.",
+    "Read exact insurer/create-request/cleanup-request/external-audit paths; require all absent for a new execution. Existing evidence routes only to exact-id recovery.",
+    "In each of two phases issue at most one custom token for existing Paula and exchange it for a session held only in memory; no account or claim modification.",
+    "Invoke exact create command through existing canonical owner; retain sanitized response and confirm exact server row, authored server activity, request and event.",
+    "Root uses the approved connected-browser UI, with existing Paula session, to open same42 LIVE, reload, and verify exact fixture name/country/ID through visible ficha and persisted product read model.",
+    "Require zero exact-id business relations; invoke exact atomic remove + external-audit command through same owner.",
+    "Read exact canonical absence, external audit, committed cleanup request and event; reload UI and confirm absence.",
+    "Publish sanitized evidence; consume the one-run authorization. Only this controlled-write check can PASS; complete B4 closure still requires remaining LIVE gates."
+  ],
+  "exactReadPaths": {
+    "fixture": "tenants/alianzas-soluciones/data/aseguradoras/items/asg_mw5qeno8",
+    "createRequest": "tenants/alianzas-soluciones/operationalRequests/b4003_live_create_mw5qeno8",
+    "cleanupRequest": "tenants/alianzas-soluciones/operationalRequests/b4003_live_cleanup_mw5qeno8",
+    "externalAudit": "tenants/alianzas-soluciones/data/auditoriaAsegExterna/items/audasg_b4003_live_mw5qeno8",
+    "events": "Only the two event IDs returned by the two exact owner commands; event IDs must equal the deterministic expected hash of tenant|requestId.",
+    "membership": "tenants/alianzas-soluciones/members/pL8zkGdq6phHm5z2DiXIcoNHiw83",
+    "authAccount": "Only Firebase Auth getUser for exact existing Paula UID; never list users."
+  },
+  "auditContract": {
+    "sameTransactionCleanup": true,
+    "persistentCollections": [
+      "operationalRequests",
+      "operationalEvents",
+      "data/auditoriaAsegExterna/items"
+    ],
+    "expectedPersistentDocumentCount": 5,
+    "expectedPersistentDocumentBreakdown": {
+      "operationalRequests": 2,
+      "operationalEvents": 2,
+      "externalAudit": 1
+    },
+    "requiredBindings": [
+      "request status committed",
+      "actorUid equals approved Paula UID",
+      "activeRole equals assigned Dirección",
+      "request payloadDigest matches exact command",
+      "event requestId and eventId match",
+      "create result exists:true",
+      "cleanup result exists:false",
+      "externalAudit.aseguradoraId equals exact fixture id"
+    ],
+    "persistentAuditsAreExpectedNotCleanupResidue": true
+  },
+  "evidence": {
+    "defaultStatus": "HOLD",
+    "mustInclude": [
+      "authorization receipt binding",
+      "exact42 LIVE source/build/version/digest",
+      "before fixture absent",
+      "canonical after-create exact data",
+      "create server-owned insurer activity",
+      "UI after-create reload",
+      "exact relations absent",
+      "atomic cleanup response",
+      "three audit collections with exact bindings",
+      "final canonical absence",
+      "UI final absence after reload",
+      "no matches in specified exact-ID relationship and side-effect queries; no claim for unknown schemas",
+      "no page errors"
+    ],
+    "sanitizedOnly": true,
+    "tokensOrCredentialsAllowed": false,
+    "passCannotBeInferredFromSourceOrHttp200": true
+  },
+  "rollbackCleanup": {
+    "authorizedWithSameApproval": true,
+    "scope": "ONLY the exact fixture above and its one external cleanup audit; no other business row",
+    "onFailureAfterPossibleCreate": "Within the create process attempt the same atomic cleanup using its existing ephemeral token if the exact new fixture was possibly created and proof fails. Across phases cleanup accepts only the same fixed ID and recorded create evidence; it never creates another fixture.",
+    "ifCleanupFails": "Retain HOLD with exact residual ID; persist sanitized recovery evidence; do not delete directly with Admin SDK, change Rules, or broaden scope.",
+    "hostingRollback": "Outside this two-command fixture plan; retain existing certified release rollback authority separately.",
+    "authCleanup": "Destroy in-memory session/browser context; never revoke Paula's existing sessions or alter Auth account.",
+    "uncertainCreatePost": "A client timeout never proves absence. Observe only the exact fixture/create request/create event through the pinned writer 60-second timeout plus 15-second margin. If committed, run exact authorized cleanup with the same token. If unresolved, emit HOLD_CREATE_SUBMISSION_UNRESOLVED; do not retry create or claim absence."
+  },
+  "forbidden": [
+    "real business record writes",
+    "additional synthetic insurers",
+    "UI new-insurer activity creation",
+    "credential vault writes",
+    "Secret Manager writes",
+    "new users",
+    "role/membership/IAM changes",
+    "Rules deployment",
+    "Functions deployment",
+    "Hosting deployment",
+    "product source or artifact mutation",
+    "rebuild",
+    "reimport",
+    "routine collection-wide scans"
+  ],
+  "consentRequired": {
+    "oneLiveSyntheticInsurerCreateAndPhysicalCleanup": true,
+    "oneExternalAuditPersistedWithAutomaticRequestAndEventAudits": true,
+    "existingPaulaEphemeralCustomTokenAndSignedExecution": "At most TWO tokens total, one per API phase, same exact existing UID; no token is persisted or sent to the connected browser.",
+    "exactIdReadbacksAndTargetedRelationshipChecks": true,
+    "cleanupOnPartialFailureSameExactScope": true,
+    "currentlyGranted": false
+  },
+  "standaloneExecutionAuthorized": false,
+  "executionPhases": {
+    "create": {
+      "trigger": "test(b4-003): create one synthetic insurer LIVE",
+      "customTokenMaximum": 1,
+      "result": "CREATED_SERVER_READBACK_PENDING_UI_RELOAD"
+    },
+    "uiCreateReadback": {
+      "executor": "Root, approved connected browser with existing Paula session",
+      "requiredBeforeNormalCleanup": true,
+      "noHiddenStateOrCallableInjection": true
+    },
+    "cleanup": {
+      "trigger": "test(b4-003): cleanup one synthetic insurer LIVE",
+      "customTokenMaximum": 1,
+      "result": "CLEANED_CANONICAL_ABSENCE_PENDING_FINAL_UI_RELOAD"
+    },
+    "uiFinalReadback": {
+      "executor": "Root, same approved connected browser session",
+      "requiredForFinalControlledWritePass": true
+    },
+    "noCiRerunTokenRemint": true,
+    "cleanupAlreadyCommitted": "Verify final absence, exact audit/request/event read-only; issue no custom token or POST.",
+    "authorizedPushParentBinding": {
+      "fields": [
+        "createAuthorizedParentSha",
+        "cleanupAuthorizedParentSha"
+      ],
+      "guard": "For each phase, exact approved parent must match both consent receipt and GitHub event.before; existing canonical branch, non-forced, exactly one new commit, and run attempt 1.",
+      "initialPendingValues": null,
+      "createBinding": "Set to current canonical HEAD only after explicit owner consent, before the one create-trigger commit.",
+      "cleanupBinding": "Set once to current canonical HEAD containing verified create/UI evidence (or recorded bounded recovery evidence), before the one cleanup-trigger commit, within the same approved scope.",
+      "immutableAfterPhaseDispatch": true,
+      "parentChangeToRemintAuthorized": false,
+      "noSelfReferenceToTriggerCommitSha": true
+    }
+  },
+  "browserPolicy": {
+    "ciBrowserAutomation": false,
+    "standalonePlaywright": false,
+    "hiddenBrowserTokenAccess": false,
+    "browserCallableInjection": false,
+    "uiEvidence": "Separate visible UI work by root using approved Browser tools and existing Paula session."
+  },
+  "authorityControlBlob": "874347ef3653635caf054f166fd3bce954f45f25",
+  "sideEffectChecks": {
+    "kind": "bounded equality queries for exact fixture ID",
+    "collections": [
+      "notificationOutbox",
+      "workflowRequests",
+      "workflowEvents",
+      "data/actividades/items",
+      "data/eventosIntegracion/items"
+    ],
+    "fields": [
+      "aseguradoraId",
+      "entidadId",
+      "entityId",
+      "recordId",
+      "payload.aseguradoraId",
+      "data.aseguradoraId",
+      "context.aseguradoraId"
+    ],
+    "maxResultsPerQuery": 1,
+    "unknownSchemaAbsenceClaimed": false
+  }
+}

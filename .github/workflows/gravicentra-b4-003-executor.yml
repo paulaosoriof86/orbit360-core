@@ -44,6 +44,8 @@ on:
       - 'tools/gravicentra-b4-003-retained-hosting-promotion.mjs'
       - 'tools/gravicentra-b4-003-retained-rollback-certify.mjs'
       - 'tools/gravicentra-b4-003-synthetic-archive-readback.mjs'
+      - 'tools/gravicentra-b4-003-one-live-synthetic-insurer.mjs'
+      - 'artifacts/orbit360-recovery/release-control/I6_5_B4_003_ONE_LIVE_SYNTHETIC_INSURER_PLAN_20261107.json'
       - 'tools/gravicentra-i6-5-b4-003-preview-proof.mjs'
       - 'tools/gravicentra-b4-003-protected-hydration.test.cjs'
       - 'tools/gravicentra-b4-003-role-context-recovery.test.cjs'
@@ -76,7 +78,7 @@ concurrency:
 jobs:
   b4-003-renewals-cancelations-preview:
     # Both exact retained requests skip the legacy Preview build/deploy job.
-    if: "!(github.event_name == 'push' && (github.event.head_commit.message == 'test(b4-003): retained artifact Hosting preflight' || (github.event.head_commit.message == 'test(b4-003): certify retained rollback in existing Preview' || github.event.head_commit.message == 'release(b4-003): promote exact retained Hosting version') || github.event.head_commit.message == 'test(b4-003): read three synthetic archive states'))"
+    if: "!(github.event_name == 'push' && (github.event.head_commit.message == 'test(b4-003): retained artifact Hosting preflight' || (github.event.head_commit.message == 'test(b4-003): certify retained rollback in existing Preview' || github.event.head_commit.message == 'release(b4-003): promote exact retained Hosting version') || github.event.head_commit.message == 'test(b4-003): read three synthetic archive states' || github.event.head_commit.message == 'test(b4-003): create one synthetic insurer LIVE' || github.event.head_commit.message == 'test(b4-003): cleanup one synthetic insurer LIVE'))"
     runs-on: ubuntu-24.04
     timeout-minutes: 45
     env:
@@ -4042,3 +4044,234 @@ jobs:
         if: always()
         run: |
           rm -rf -- "$RUNNER_TEMP/gi-b4003-archive-readback-auth"
+
+
+  # One authorized synthetic insurer, in separate create and cleanup phases.
+  # Pending CP scope fails before any service-account secret or token is used.
+  b4003_one_live_synthetic_insurer:
+    if: "github.event_name == 'push' && (github.event.head_commit.message == 'test(b4-003): create one synthetic insurer LIVE' || github.event.head_commit.message == 'test(b4-003): cleanup one synthetic insurer LIVE')"
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      actions: read
+    env:
+      PROJECT_ID: ays-orbit-360-lab
+      HOSTING_SITE: ays-orbit-360-lab
+      CONTROL: artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json
+      B4_CURSOR_KEY: b4003ActiveCertificationCursor20261106
+      B4_LIVE_SYNTHETIC_KEY: liveSyntheticInsurerWrite20261107
+      B4_LIVE_SYNTHETIC_EXECUTION_NONCE: B4-003-LIVE-ONE-INSURER-mw5qeno8
+      B4_LIVE_SYNTHETIC_PLAN: artifacts/orbit360-recovery/release-control/I6_5_B4_003_ONE_LIVE_SYNTHETIC_INSURER_PLAN_20261107.json
+      B4_LIVE_SYNTHETIC_HELPER: tools/gravicentra-b4-003-one-live-synthetic-insurer.mjs
+      B4_LIVE_SYNTHETIC_PHASE: "${{ github.event.head_commit.message == 'test(b4-003): create one synthetic insurer LIVE' && 'create' || 'cleanup' }}"
+      B4_LIVE_SYNTHETIC_OUT: ${{ github.workspace }}/.b4-preflight-temp/live-synthetic-insurer
+      B4_LIVE_SYNTHETIC_DEPS_ROOT: ${{ runner.temp }}/gi-b4003-live-synthetic-deps
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 1
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Initialize closed B4 synthetic phase receipt
+        run: |
+          set -euo pipefail
+          mkdir -p "$B4_LIVE_SYNTHETIC_OUT"
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          import path from 'node:path';
+          fs.writeFileSync(path.join(process.env.B4_LIVE_SYNTHETIC_OUT,'runner-status.json'),JSON.stringify({
+            schema:'B4_003_ONE_LIVE_SYNTHETIC_PHASE_RUNNER_V1',status:'HOLD',
+            phase:process.env.B4_LIVE_SYNTHETIC_PHASE,runId:process.env.GITHUB_RUN_ID,
+            runnerCommit:process.env.GITHUB_SHA,serviceCredentialLoaded:false,
+            customTokensIssued:0,businessWrites:0,acceptanceGranted:false
+          },null,2)+'\n');
+          NODE
+
+      - name: Validate exact B4 authorization before service credentials
+        id: authorization
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          import path from 'node:path';
+          import crypto from 'node:crypto';
+          const env=process.env;
+          const out=path.join(env.B4_LIVE_SYNTHETIC_OUT,'authorization-precheck.json');
+          const need=(ok,code)=>{if(!ok)throw Error(code);};
+          const same=(a,b,code)=>need(a===b,code);
+          const hash=(bytes,algorithm='sha256')=>crypto.createHash(algorithm).update(bytes).digest('hex');
+          const blob=file=>{const bytes=fs.readFileSync(file);return hash(Buffer.concat([Buffer.from('blob '+bytes.length+'\0'),bytes]),'sha1');};
+          const pin={sourceSha:'857f1222f360a42a06e012810a1c01bce155a26f',
+            buildId:'gi-i65-b4-857f1222f360-57f234755dc1',artifactId:13549460562,
+            version:'sites/ays-orbit-360-lab/versions/c5e1ae001fae793b',
+            hostedPayloadDigest:'308b669105c380294177f1a8d2350216af95fec31f800955d611e607542b42da'};
+          const result={status:'HOLD',phase:env.B4_LIVE_SYNTHETIC_PHASE,customTokensIssued:0,
+            businessWrites:0,serviceCredentialLoaded:false,acceptanceGranted:false};
+          try{
+            same(env.GITHUB_EVENT_NAME,'push','EXACT_PUSH_REQUIRED');
+            same(env.GITHUB_REPOSITORY,'paulaosoriof86/orbit360-core','REPOSITORY_MISMATCH');
+            same(env.GITHUB_REF,'refs/heads/recovery/fase-a-clean-20260831','BRANCH_MISMATCH');
+            const event=JSON.parse(fs.readFileSync(env.GITHUB_EVENT_PATH,'utf8'));
+            const messages={create:'test(b4-003): create one synthetic insurer LIVE',
+              cleanup:'test(b4-003): cleanup one synthetic insurer LIVE'};
+            need(Object.hasOwn(messages,env.B4_LIVE_SYNTHETIC_PHASE),'PHASE_NOT_SUPPORTED');
+            same(event.head_commit?.message,messages[env.B4_LIVE_SYNTHETIC_PHASE],'EXACT_MESSAGE_REQUIRED');
+            same(event.head_commit?.id,env.GITHUB_SHA,'EVENT_HEAD_MISMATCH');
+            const cpBytes=fs.readFileSync(env.CONTROL),cp=JSON.parse(cpBytes);
+            const cur=cp[env.B4_CURSOR_KEY],scope=cur?.[env.B4_LIVE_SYNTHETIC_KEY];
+            need(scope?.status==='AUTHORIZED_ONCE'&&scope.authorized===true&&scope.consumed===false,'OWNER_AUTHORIZATION_PENDING_OR_CONSUMED');
+            const parentKey=env.B4_LIVE_SYNTHETIC_PHASE==='create'?'createAuthorizedParentSha':'cleanupAuthorizedParentSha';
+            const authorizedParent=scope[parentKey];
+            need(/^[0-9a-f]{40}$/.test(authorizedParent||'')&&!/^0{40}$/.test(authorizedParent),'AUTHORIZED_PARENT_SHA_MISSING_OR_INVALID');
+            same(event.before,authorizedParent,'AUTHORIZED_PARENT_MISMATCH');
+            need(event.forced!==true&&event.created!==true&&event.deleted!==true,'PUSH_REF_TRANSITION_NOT_ALLOWED');
+            same(event.ref,'refs/heads/recovery/fase-a-clean-20260831','EVENT_REF_MISMATCH');
+            need(Array.isArray(event.commits)&&event.commits.length===1&&event.commits[0]?.id===env.GITHUB_SHA,'EXACT_SINGLE_COMMIT_REQUIRED');
+            need(cur.b4003Closed!==true,'B4_ALREADY_CLOSED');
+            same(cur.activeSourceSha,pin.sourceSha,'CURSOR_SOURCE_MISMATCH');
+            same(cur.activeBuildId,pin.buildId,'CURSOR_BUILD_MISMATCH');
+            same(Number(cur.activeImmutableArtifactId),pin.artifactId,'CURSOR_ARTIFACT_MISMATCH');
+            for(const [key,value]of Object.entries(pin))same(scope[key],value,'SCOPE_'+key.toUpperCase()+'_MISMATCH');
+            same(cur.formalPreviewAcceptance?.status,'LATEST_APPROVED_VERSION_PREVIEW_PASS','FORMAL_PREVIEW_MISSING');
+            same(cur.formalPreviewAcceptance?.sourceSha,pin.sourceSha,'PREVIEW_SOURCE_MISMATCH');
+            same(cur.formalPreviewAcceptance?.buildId,pin.buildId,'PREVIEW_BUILD_MISMATCH');
+            same(Number(cur.formalPreviewAcceptance?.artifactId),pin.artifactId,'PREVIEW_ARTIFACT_MISMATCH');
+            same(cur.retainedHostingPromotion20261107?.status,
+              'EXACT_HOSTING_VERSION_PROMOTED_LIVE_BYTES_PASS_FUNCTIONAL_LIVE_PENDING','RETAINED_PROMOTION_RECEIPT_MISSING');
+            same(scope.projectId,'ays-orbit-360-lab','SCOPE_PROJECT_MISMATCH');
+            same(scope.tenantId,'alianzas-soluciones','SCOPE_TENANT_MISMATCH');
+            same(scope.origin,'https://ays-orbit-360-lab.web.app','SCOPE_ORIGIN_MISMATCH');
+            same(scope.principal?.uid,'pL8zkGdq6phHm5z2DiXIcoNHiw83','EXACT_PAULA_UID_REQUIRED');
+            same(scope.principal?.activeRole,'superadmin','EXISTING_CANONICAL_ROLE_REQUIRED');
+            same(scope.principal?.country,'GT','PRINCIPAL_COUNTRY_MISMATCH');
+            need(scope.principal?.existingAccountRequired===true&&scope.principal?.customTokenAuthorized===true&&
+              scope.principal?.customTokenCountMaximum===2&&scope.principal?.accountOrMembershipMutationAuthorized===false,
+              'EPHEMERAL_AUTH_SCOPE_MISMATCH');
+            same(scope.fixture?.id,'asg_mw5qeno8','EXACT_FIXTURE_REQUIRED');
+            same(scope.fixture?.collection,'aseguradoras','FIXTURE_COLLECTION_MISMATCH');
+            need(scope.fixture?.maxDistinctIds===1&&scope.fixture?.beforeAbsentRequired===true&&
+              scope.fixture?.finalAbsentRequired===true,'ONE_FIXTURE_RESTORE_REQUIRED');
+            same(JSON.stringify(scope.fixture?.allowedActions),JSON.stringify(['insert','remove']),'FIXTURE_ACTIONS_MISMATCH');
+            same(scope.auditId,'audasg_b4003_live_mw5qeno8','EXACT_AUDIT_REQUIRED');
+            same(scope.createRequestId,'b4003_live_create_mw5qeno8','EXACT_CREATE_REQUEST_REQUIRED');
+            same(scope.cleanupRequestId,'b4003_live_cleanup_mw5qeno8','EXACT_CLEANUP_REQUEST_REQUIRED');
+            need(scope.atomicExternalAuditInsertAuthorized===true&&scope.cleanupOnFailureAuthorized===true,'EXACT_CLEANUP_AUTHORIZATION_REQUIRED');
+            need(scope.noRebuild===true&&scope.realRecordWritesAuthorized===false&&scope.rebuildOrDeployAuthorized===false&&
+              scope.reimportAuthorized===false&&scope.acceptanceGranted===false,'BOUNDARIES_MISMATCH');
+            same(scope.planPath,env.B4_LIVE_SYNTHETIC_PLAN,'PLAN_PATH_MISMATCH');
+            const planBytes=fs.readFileSync(scope.planPath),plan=JSON.parse(planBytes);
+            same(hash(planBytes),scope.planSha256,'PLAN_SHA256_MISMATCH');
+            same(plan.principal?.uid,scope.principal.uid,'PLAN_PRINCIPAL_MISMATCH');
+            same(plan.fixture?.id,scope.fixture.id,'PLAN_FIXTURE_MISMATCH');
+            for(const [key,value]of Object.entries(pin))same(plan.hosting?.[key],value,'PLAN_'+key.toUpperCase()+'_MISMATCH');
+            need(/^[0-9a-f]{40}$/.test(scope.executorBlobSha||'')&&/^[0-9a-f]{40}$/.test(scope.helperBlobSha||''),'EXECUTOR_HELPER_PINS_MISSING');
+            same(blob('.github/workflows/gravicentra-b4-003-executor.yml'),scope.executorBlobSha,'EXECUTOR_BLOB_MISMATCH');
+            same(blob(env.B4_LIVE_SYNTHETIC_HELPER),scope.helperBlobSha,'HELPER_BLOB_MISMATCH');
+            need(/^artifacts\/orbit360-recovery\/release-control\/[A-Za-z0-9_-]+\.json$/.test(scope.authorizationReceiptPath||''),
+              'AUTHORIZATION_RECEIPT_PATH_MISSING_OR_UNSAFE');
+            same(blob(scope.authorizationReceiptPath),scope.authorizationReceiptBlobSha,'AUTHORIZATION_RECEIPT_BLOB_MISMATCH');
+            result.status='LOCAL_BINDINGS_MATCHED_PENDING_HELPER_AUTHORIZATION_AND_HEAD_LEASE';
+            result.controlSha256=hash(cpBytes);result.planSha256=scope.planSha256;
+          }catch(error){
+            result.reason=String(error.message||'AUTHORIZATION_PRECHECK_FAILED').replace(/[^A-Z0-9_:-]/gi,'_').slice(0,160);
+            process.exitCode=1;
+          }finally{
+            fs.writeFileSync(out,JSON.stringify(result,null,2)+'\n');
+            console.log(JSON.stringify({status:result.status,reason:result.reason||null,phase:result.phase}));
+          }
+          NODE
+          node "$B4_LIVE_SYNTHETIC_HELPER" --check-authorization --phase="$B4_LIVE_SYNTHETIC_PHASE"
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          import path from 'node:path';
+          const r=await fetch('https://api.github.com/repos/paulaosoriof86/orbit360-core/git/ref/heads/recovery/fase-a-clean-20260831',{
+            headers:{Authorization:'Bearer '+process.env.GH_TOKEN,Accept:'application/vnd.github+json'},
+            signal:AbortSignal.timeout(15000)});
+          if(!r.ok)throw Error('CANONICAL_HEAD_READ_FAILED');
+          const ref=await r.json();
+          if(ref.object?.sha!==process.env.GITHUB_SHA)throw Error('CANONICAL_HEAD_LEASE_MISMATCH');
+          fs.writeFileSync(path.join(process.env.B4_LIVE_SYNTHETIC_OUT,'head-lease-before-credentials.json'),JSON.stringify({
+            runnerCommit:process.env.GITHUB_SHA,canonicalHead:ref.object.sha,checkedAtUtc:new Date().toISOString(),
+            serviceCredentialLoaded:false,customTokensIssued:0,businessWrites:0},null,2)+'\n');
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'authorized=true\n');
+          NODE
+
+      - name: Prepare pinned dependency for authorized API phase
+        if: steps.authorization.outputs.authorized == 'true'
+        run: |
+          set -euo pipefail
+          npm install --prefix "$B4_LIVE_SYNTHETIC_DEPS_ROOT" --no-save --package-lock=false --ignore-scripts --no-audit --no-fund firebase-admin@13.10.0 >/dev/null
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          import path from 'node:path';
+          const p=path.join(process.env.B4_LIVE_SYNTHETIC_DEPS_ROOT,'node_modules/firebase-admin/package.json');
+          if(JSON.parse(fs.readFileSync(p,'utf8')).version!=='13.10.0')throw Error('FIREBASE_ADMIN_VERSION_MISMATCH');
+          NODE
+
+      - name: Select existing exact-project service credential after authorization
+        if: steps.authorization.outputs.authorized == 'true'
+        env:
+          SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+          SA_LAB_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+          SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/gi-b4003-live-synthetic-auth"
+          chmod 700 "$RUNNER_TEMP/gi-b4003-live-synthetic-auth"
+          python3 - <<'PYAUTH'
+          import json,os,pathlib
+          root=pathlib.Path(os.environ['RUNNER_TEMP'])/'gi-b4003-live-synthetic-auth'
+          selected=None
+          for key in ('SA_LAB','SA_LAB_ALT','SA_DEFAULT'):
+            try: value=json.loads(os.environ.get(key,''))
+            except (ValueError,TypeError): continue
+            if isinstance(value,dict) and value.get('type')=='service_account' and value.get('project_id')=='ays-orbit-360-lab' and value.get('private_key') and value.get('client_email'):
+              selected=value;break
+          if selected is None: raise SystemExit('LAB_SERVICE_ACCOUNT_NOT_CONFIGURED')
+          target=root/'selected.json';target.write_text(json.dumps(selected));target.chmod(0o600)
+          with open(os.environ['GITHUB_ENV'],'a') as handle:
+            handle.write('GOOGLE_APPLICATION_CREDENTIALS='+str(target)+'\n')
+          PYAUTH
+
+      - name: Execute only the authorized exact insurer phase
+        if: steps.authorization.outputs.authorized == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          node "$B4_LIVE_SYNTHETIC_HELPER" --check-authorization --phase="$B4_LIVE_SYNTHETIC_PHASE"
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          import path from 'node:path';
+          const r=await fetch('https://api.github.com/repos/paulaosoriof86/orbit360-core/git/ref/heads/recovery/fase-a-clean-20260831',{
+            headers:{Authorization:'Bearer '+process.env.GH_TOKEN,Accept:'application/vnd.github+json'},
+            signal:AbortSignal.timeout(15000)});
+          if(!r.ok)throw Error('CANONICAL_HEAD_READ_FAILED');
+          const ref=await r.json();
+          if(ref.object?.sha!==process.env.GITHUB_SHA)throw Error('CANONICAL_HEAD_LEASE_MISMATCH');
+          fs.writeFileSync(path.join(process.env.B4_LIVE_SYNTHETIC_OUT,'head-lease-before-execution.json'),JSON.stringify({
+            runnerCommit:process.env.GITHUB_SHA,canonicalHead:ref.object.sha,checkedAtUtc:new Date().toISOString(),
+            customTokensIssued:0,businessWrites:0},null,2)+'\n');
+          NODE
+          node "$B4_LIVE_SYNTHETIC_HELPER" --execute --phase="$B4_LIVE_SYNTHETIC_PHASE"
+
+      - name: Preserve sanitized B4 synthetic phase evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gi-b4003-one-live-synthetic-insurer-${{ env.B4_LIVE_SYNTHETIC_PHASE }}-${{ github.run_id }}
+          path: ${{ env.B4_LIVE_SYNTHETIC_OUT }}/*.json
+          if-no-files-found: error
+          retention-days: 90
+
+      - name: Remove temporary B4 synthetic service credential
+        if: always()
+        run: |
+          rm -rf -- "$RUNNER_TEMP/gi-b4003-live-synthetic-auth"

@@ -75,9 +75,9 @@
     "historicalOpsLeadsGenericAuthors": "NO_RETROACTIVE_REWRITE_NOT_RELEASE_BLOCKING",
     "insurerCredentialPreviewVault": "SEPARATE_FROM_LIVE; HISTORICAL_CREDENTIAL_TESTS_3_OF_3_PRESERVED; LIVE_RECHECK_AFTER_SAME_ARTIFACT_PROMOTION",
     "nextOnly": [
-      "Complete final Inicio readiness and applicable responsive readback, assigned Asesor scope readback, and Renovaciones readback.",
       "Obtain exact LIVE synthetic-write and ephemeral-existing-UID authentication authorization; current Preview-only and consumed I5 authorizations are not reused.",
-      "Perform exactly approved controlled-write/reload/atomic-audit-cleanup/readback, then final affected-module integrity and exact LIVE identity verification."
+      "Execute the single approved synthetic insurer create, actual browser reload/read, atomic remove+audit, canonical absence and actual browser reload absence.",
+      "Verify final affected-module integrity and exact LIVE identity, then reconcile formal LIVE acceptance and close B4-003."
     ],
     "doNotRebuildForMetadata": true,
     "firestoreRulesNoRoutineBlocker": true,
@@ -160,7 +160,7 @@
       "actualDurableCommentActorFieldsRequireProspectiveReview": true,
       "continuityReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CURRENT40_LEADS_NEW_HUMAN_AUTHOR_SYNTHETIC_UI_20261106.json"
     },
-    "asOfUtc": "2026-11-07T01:43:10Z",
+    "asOfUtc": "2026-11-07T02:01:03Z",
     "continuityRecovery20261106": {
       "recordedAtUtc": "2026-11-06T22:03:41Z",
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CURRENT40_LEADS_NEW_HUMAN_AUTHOR_SYNTHETIC_UI_20261106.json",
@@ -852,7 +852,7 @@
       }
     },
     "minimumRemainingDeltaPlan20261106": {
-      "recordedAtUtc": "2026-11-07T01:17:43Z",
+      "recordedAtUtc": "2026-11-07T02:01:03Z",
       "existingFindingId": "B4-003-UAT-20261011-03",
       "completed": [
         "Samuel actual Asesor reads original Paula author in notice/comment/bitacora after reload on41.",
@@ -863,12 +863,13 @@
         "All three current synthetic fixtures archived through UI and exact masked canonical GET3 returns archivado:true; no real business deletion.",
         "Formal exact42 Preview acceptance reconciled with15 preserved certificates and16 current evidence entries.",
         "Existing finalized candidate42 released to LIVE run42323326741; all218 raw files match artifact/Preview/LIVE, zero new build/functions/rules/data operations.",
-        "Actual Paula LIVE credential reveal/rehide/password copy/bank copy, client/policy/vehicle/receipt reads, Ops/Leads same-ID reload, Cobros2503/Reportes2503 GT, Equipo7 and Historial23 GT recorded in sanitized receipt."
+        "Actual Paula LIVE credential reveal/rehide/password copy/bank copy, client/policy/vehicle/receipt reads, Ops/Leads same-ID reload, Cobros2503/Reportes2503 GT, Equipo7 and Historial23 GT recorded in sanitized receipt.",
+        "Actual Paula LIVE Inicio reached5/5 server sources; 320px and390px screenshots showed complete currency values and no page horizontal overflow; viewport restored. Renovaciones board and assigned Asesor reduced Cliente360 scope/insurer denial readbacks completed."
       ],
       "next": [
-        "Complete final Inicio readiness and applicable responsive readback, assigned Asesor scope readback, and Renovaciones readback.",
         "Obtain exact LIVE synthetic-write and ephemeral-existing-UID authentication authorization; current Preview-only and consumed I5 authorizations are not reused.",
-        "Perform exactly approved controlled-write/reload/atomic-audit-cleanup/readback, then final affected-module integrity and exact LIVE identity verification."
+        "Execute the single approved synthetic insurer create, actual browser reload/read, atomic remove+audit, canonical absence and actual browser reload absence.",
+        "Verify final affected-module integrity and exact LIVE identity, then reconcile formal LIVE acceptance and close B4-003."
       ],
       "noNewFixtures": true,
       "noAdditionalPaulaResponseRequired": true,
@@ -877,7 +878,9 @@
       "preservedHistoricalCertificates": 15,
       "cartesianDenominatorNotInvented": true,
       "b4003Closed": false,
-      "productionPromotionAuthorized": false
+      "productionPromotionAuthorized": false,
+      "liveSyntheticPlanPreparedButNotAuthorized": true,
+      "noNewFixturesScope": "Existing Ops/Leads fixture constraint preserved. Separate one-insurer LIVE scope remains pending and does not grant any write."
     },
     "retainedHostingPreflight20261106": {
       "recordedAtUtc": "2026-11-07T00:48:20Z",
@@ -1169,7 +1172,7 @@
           "b4003Closed": false
         }
       ],
-      "nextReadOnlyAction": "Complete final Inicio readiness and applicable responsive readback, assigned Asesor scope readback, and Renovaciones readback. Obtain exact LIVE synthetic-write and ephemeral-existing-UID authentication authorization; current Preview-only and consumed I5 authorizations are not reused. Perform exactly approved controlled-write/reload/atomic-audit-cleanup/readback, then final affected-module integrity and exact LIVE identity verification.",
+      "nextReadOnlyAction": "Obtain exact LIVE synthetic-write and ephemeral-existing-UID authentication authorization; current Preview-only and consumed I5 authorizations are not reused. Execute the single approved synthetic insurer create, actual browser reload/read, atomic remove+audit, canonical absence and actual browser reload absence. Verify final affected-module integrity and exact LIVE identity, then reconcile formal LIVE acceptance and close B4-003.",
       "rollbackCertifiedByThisAttempt": true,
       "productionPromotionAuthorized": false,
       "parserFix": "Normalize only observed projects/646761409743/ qualified version resources after exact project/site/channel validation; retain original observed names.",
@@ -1272,7 +1275,7 @@
       },
       "lastAuthenticatedPrincipal": "Paula Osorio",
       "samuelSignOutCompleted": true,
-      "currentPage": "ACTUAL_PAULA_LIVE_SESSION_AVAILABLE_INTERMITTENT_BROWSER_CONTROL_RESET",
+      "currentPage": "ACTUAL_PAULA_LIVE_DIRECCION_TODOS_INICIO_SESSION_READY",
       "nativeConfirmationAcceptanceObserved": true,
       "manualNativeDialogResolutionRequired": false,
       "archiveUiActionsCompleted": 3,
@@ -1287,7 +1290,8 @@
       "preview42RestoredVerified": true,
       "paulaCrossUidReadComplete": true,
       "liveSignInCompleted": true,
-      "liveWriteAuthorizationPending": true
+      "liveWriteAuthorizationPending": true,
+      "currentBrowserTabRetainedForNextTurn": true
     },
     "retainedRollbackTemporaryCertificationAuthorization20261107": {
       "status": "CONSUMED_PASS_PREVIEW42_RESTORED",
@@ -1479,14 +1483,15 @@
       "b4003Closed": false
     },
     "liveReadOnlyUiProgress20261107": {
-      "recordedAtUtc": "2026-11-07T01:43:10Z",
-      "status": "PARTIAL_LIVE_FUNCTIONAL_AND_CREDENTIAL_READBACK_COMPLETE_CONTROLLED_WRITE_PENDING",
+      "recordedAtUtc": "2026-11-07T01:51:39Z",
+      "status": "CURRENT42_AUTHENTICATED_LIVE_READ_ONLY_AND_CREDENTIAL_CHECKS_OBSERVED_CONTROLLED_WRITE_PENDING",
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CURRENT42_AUTHENTICATED_LIVE_UI_PROGRESS_20261107.json",
-      "receiptBlobSha": "b94ac207b84ea78320eb568e69b9123d976d96bc",
+      "receiptBlobSha": "56c8360ec284030b25f33b0f6d943464f3962ccf",
       "actualPrincipal": "Paula Osorio",
       "assignedRolesSelected": [
         "Dirección",
-        "Operativo"
+        "Operativo",
+        "Asesor"
       ],
       "liveInsurerRevealCopyRehidePass": true,
       "liveBankCopyPass": true,
@@ -1497,11 +1502,80 @@
       "reportesGtRows": 2503,
       "historialGtInteractions": 23,
       "remaining": [
-        "Complete final Inicio readiness and applicable responsive readback, assigned Asesor scope readback, and Renovaciones readback.",
         "Obtain exact LIVE synthetic-write and ephemeral-existing-UID authentication authorization; current Preview-only and consumed I5 authorizations are not reused.",
-        "Perform exactly approved controlled-write/reload/atomic-audit-cleanup/readback, then final affected-module integrity and exact LIVE identity verification."
+        "Execute the single approved synthetic insurer create, actual browser reload/read, atomic remove+audit, canonical absence and actual browser reload absence.",
+        "Verify final affected-module integrity and exact LIVE identity, then reconcile formal LIVE acceptance and close B4-003."
       ],
-      "formalLiveAcceptanceGranted": false
+      "formalLiveAcceptanceGranted": false,
+      "liveInicioFiveOfFiveSourcesObserved": true,
+      "liveInicio320390ResponsivePass": true,
+      "liveAsesorReducedScopeObserved": true,
+      "liveRenovacionesReadObserved": true,
+      "distinctLiveUidsTested": 1,
+      "syntheticWritePlanPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_ONE_LIVE_SYNTHETIC_INSURER_PLAN_20261107.json",
+      "syntheticWritePlanSha256": "a318932d732917737953c42a380b884ba200307f5e804c3b32c06662c012dcb6"
+    },
+    "liveSyntheticInsurerWrite20261107": {
+      "schema": "B4_003_LIVE_SYNTHETIC_INSURER_WRITE_V1",
+      "status": "PENDING_OWNER_AUTHORIZATION",
+      "authorized": false,
+      "consumed": false,
+      "authorizationReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_ONE_LIVE_SYNTHETIC_INSURER_OWNER_AUTH_20261107.json",
+      "authorizationReceiptBlobSha": "eac4d6ff8017019b3147389845ad83f3a91eebf8",
+      "planPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_ONE_LIVE_SYNTHETIC_INSURER_PLAN_20261107.json",
+      "planSha256": "a318932d732917737953c42a380b884ba200307f5e804c3b32c06662c012dcb6",
+      "executorBlobSha": "855e528eea7394b3841dadd3ea654e65ba89701c",
+      "helperBlobSha": "66995bd06b05e23faade01f5d0f5045d601a9fbe",
+      "projectId": "ays-orbit-360-lab",
+      "tenantId": "alianzas-soluciones",
+      "origin": "https://ays-orbit-360-lab.web.app",
+      "version": "sites/ays-orbit-360-lab/versions/c5e1ae001fae793b",
+      "sourceSha": "857f1222f360a42a06e012810a1c01bce155a26f",
+      "buildId": "gi-i65-b4-857f1222f360-57f234755dc1",
+      "artifactId": 13549460562,
+      "hostedPayloadDigest": "308b669105c380294177f1a8d2350216af95fec31f800955d611e607542b42da",
+      "promotionRunId": 42323326741,
+      "noRebuild": true,
+      "principal": {
+        "displayName": "Paula Osorio",
+        "uid": "pL8zkGdq6phHm5z2DiXIcoNHiw83",
+        "activeRole": "superadmin",
+        "country": "GT",
+        "existingAccountRequired": true,
+        "customTokenAuthorized": false,
+        "customTokenCountMaximum": 2,
+        "accountOrMembershipMutationAuthorized": false,
+        "visibleRoleLabel": "Dirección"
+      },
+      "fixture": {
+        "collection": "aseguradoras",
+        "id": "asg_mw5qeno8",
+        "maxDistinctIds": 1,
+        "allowedActions": [
+          "insert",
+          "remove"
+        ],
+        "beforeAbsentRequired": true,
+        "finalAbsentRequired": true
+      },
+      "auditId": "audasg_b4003_live_mw5qeno8",
+      "createRequestId": "b4003_live_create_mw5qeno8",
+      "cleanupRequestId": "b4003_live_cleanup_mw5qeno8",
+      "atomicExternalAuditInsertAuthorized": false,
+      "cleanupOnFailureAuthorized": false,
+      "realRecordWritesAuthorized": false,
+      "rebuildOrDeployAuthorized": false,
+      "reimportAuthorized": false,
+      "acceptanceGranted": false,
+      "createEvidencePath": null,
+      "createEvidenceBlobSha": null,
+      "uiCreateReadbackPath": null,
+      "uiCreateReadbackBlobSha": null,
+      "recoveryOnly": false,
+      "createRunId": null,
+      "cleanupRunId": null,
+      "createAuthorizedParentSha": null,
+      "cleanupAuthorizedParentSha": null
     }
   },
   "b4003LeadsCurrent40ProspectiveHumanActorFocal20261106": {
@@ -20867,7 +20941,6 @@
       "b4003Closed": false,
       "productionPromotionAuthorized": false,
       "remainingEvidenceRequired": [
-        "FINAL_CURRENT42_LIVE_READINESS_ROLE_RESPONSIVE_READBACK",
         "EXPLICIT_SCOPED_LIVE_SYNTHETIC_WRITE_AUTHORIZATION",
         "CONTROLLED_LIVE_WRITE_RELOAD_ATOMIC_AUDIT_CLEANUP_INTEGRITY"
       ],
@@ -20896,7 +20969,10 @@
       "formalPreviewAcceptancePointer": "/b4003ActiveCertificationCursor20261106/formalPreviewAcceptance",
       "sameArtifactPromotedToLive": true,
       "exactLive218RawPass": true,
-      "liveFunctionalAcceptancePending": true
+      "liveFunctionalAcceptancePending": true,
+      "finalCurrent42ReadonlyRoleResponsiveFocalComplete": true,
+      "liveSyntheticPlanPrepared": true,
+      "liveSyntheticWritesAuthorized": false
     },
     "projectSources": {
       "package": "GRAVICENTRA_PROJECT_SOURCES_EVERGREEN_V7",
