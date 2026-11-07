@@ -1,0 +1,152 @@
+{
+  "schema": "B4_003_ONE_LIVE_SYNTHETIC_PHASE_EVIDENCE_V1",
+  "status": "CLEANED_CANONICAL_ABSENCE_UI_EVIDENCE_REQUIRED",
+  "phase": "complete",
+  "fixtureId": "asg_mw5qeno8",
+  "planSha256": "a318932d732917737953c42a380b884ba200307f5e804c3b32c06662c012dcb6",
+  "sourceSha": "857f1222f360a42a06e012810a1c01bce155a26f",
+  "buildId": "gi-i65-b4-857f1222f360-57f234755dc1",
+  "hostingVersion": "sites/ays-orbit-360-lab/versions/c5e1ae001fae793b",
+  "workflowRunId": "42329143683",
+  "principalUidSha256": "ef23e793fdfeb2213c659fd48a9d628569174bc9cb599f136efe9edad68bd112",
+  "activeRole": "superadmin",
+  "customTokensIssued": 1,
+  "mutationsExecuted": 3,
+  "browserAutomated": false,
+  "visibleUiReloadClaimed": false,
+  "observations": {
+    "beforeExists": false,
+    "sideEffectsBefore": {
+      "boundedEqualityQueriesOnly": true,
+      "collections": 5,
+      "fields": [
+        "aseguradoraId",
+        "entidadId",
+        "entityId",
+        "recordId",
+        "payload.aseguradoraId",
+        "data.aseguradoraId",
+        "context.aseguradoraId"
+      ],
+      "matches": 0,
+      "unknownSchemaAbsenceNotClaimed": true
+    },
+    "createRequestSubmittedAtUtc": "2026-11-07T02:25:27.191Z",
+    "createResponse": {
+      "ok": true,
+      "serverOwned": true,
+      "requestId": "b4003_live_create_mw5qeno8",
+      "eventId": "opevt_05c5b4243902bd93311364d4d6d2",
+      "mutationCount": 1,
+      "readback": [
+        {
+          "collection": "aseguradoras",
+          "id": "asg_mw5qeno8",
+          "action": "insert",
+          "exists": true
+        }
+      ]
+    },
+    "afterCreate": {
+      "id": "asg_mw5qeno8",
+      "nombre": "QA B4-003 LIVE 2026-11-07",
+      "pais": "GT",
+      "tenantMatched": true,
+      "actorMatched": true,
+      "serverOwnedActivity": true
+    },
+    "createAudit": {
+      "requestId": "b4003_live_create_mw5qeno8",
+      "eventId": "opevt_05c5b4243902bd93311364d4d6d2",
+      "requestCommitted": true,
+      "eventMatched": true,
+      "actorMatched": true,
+      "payloadDigest": "83bc0809d040a714aa6c22868ea868bf9cacd9fbd10f1e64a516d219df194007"
+    },
+    "relations": {
+      "queriedExactInsurerId": true,
+      "collections": 8,
+      "matches": 0
+    },
+    "sideEffectsAfterCreate": {
+      "boundedEqualityQueriesOnly": true,
+      "collections": 5,
+      "fields": [
+        "aseguradoraId",
+        "entidadId",
+        "entityId",
+        "recordId",
+        "payload.aseguradoraId",
+        "data.aseguradoraId",
+        "context.aseguradoraId"
+      ],
+      "matches": 0,
+      "unknownSchemaAbsenceNotClaimed": true
+    },
+    "uiWindow": {
+      "openedAtUtc": "2026-11-07T02:25:36.861Z",
+      "durationMs": 240000,
+      "closedAtUtc": "2026-11-07T02:29:36.866Z",
+      "uiObservationByThisHelper": false
+    },
+    "cleanupResponse": {
+      "ok": true,
+      "serverOwned": true,
+      "requestId": "b4003_live_cleanup_mw5qeno8",
+      "eventId": "opevt_636b7bf4761cd3e280e6ac2dfc9c",
+      "mutationCount": 2,
+      "readback": [
+        {
+          "collection": "aseguradoras",
+          "id": "asg_mw5qeno8",
+          "action": "remove",
+          "exists": false
+        },
+        {
+          "collection": "auditoriaAsegExterna",
+          "id": "audasg_b4003_live_mw5qeno8",
+          "action": "insert",
+          "exists": true
+        }
+      ]
+    },
+    "cleanupAudit": {
+      "requestId": "b4003_live_cleanup_mw5qeno8",
+      "eventId": "opevt_636b7bf4761cd3e280e6ac2dfc9c",
+      "requestCommitted": true,
+      "eventMatched": true,
+      "actorMatched": true,
+      "payloadDigest": "d2d09b203adae87448f263bebee891115ab42ac4951be5feb91774c27f7ebebd"
+    },
+    "externalAudit": {
+      "id": "audasg_b4003_live_mw5qeno8",
+      "exists": true,
+      "fixtureMatched": true,
+      "actorMatched": true
+    },
+    "finalCanonicalAbsence": true,
+    "sideEffectsAfterCleanup": {
+      "boundedEqualityQueriesOnly": true,
+      "collections": 5,
+      "fields": [
+        "aseguradoraId",
+        "entidadId",
+        "entityId",
+        "recordId",
+        "payload.aseguradoraId",
+        "data.aseguradoraId",
+        "context.aseguradoraId"
+      ],
+      "matches": 0,
+      "unknownSchemaAbsenceNotClaimed": true
+    },
+    "finalLiveIdentityVerified": true
+  },
+  "errors": [],
+  "tokensPreviouslyIssued": 1,
+  "tokenBudgetMaximumTotal": 2,
+  "previousCreateRunId": "42327828328",
+  "previousCreateReceiptBlobSha": "98d59774740eae283ac395c130621d9f4ebf9d41",
+  "customTokensTotal": 2,
+  "remainingTokenBudget": 0
+}

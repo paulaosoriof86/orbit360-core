@@ -1,0 +1,90 @@
+{
+  "schema": "GRAVICENTRA_B4_003_CURRENT42_FINAL_LIVE_CLOSEOUT_V1",
+  "status": "LATEST_APPROVED_VERSION_LIVE_PASS",
+  "gate": "I6.5/B4-003",
+  "b4003Closed": true,
+  "affectedGateOnly": "B4-003",
+  "parentHead": "9585fe3b9a2640b372952031ad414aab7cae24cb",
+  "release": {
+    "sourceSha": "857f1222f360a42a06e012810a1c01bce155a26f",
+    "buildId": "gi-i65-b4-857f1222f360-57f234755dc1",
+    "artifactId": 13549460562,
+    "hostingVersion": "sites/ays-orbit-360-lab/versions/c5e1ae001fae793b",
+    "hostedPayloadDigest": "308b669105c380294177f1a8d2350216af95fec31f800955d611e607542b42da",
+    "productFiles": 218
+  },
+  "evidence": {
+    "promotion": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_RETAINED_HOSTING_LIVE_PROMOTED_20261107.json",
+      "blobSha": "3e07e1e21192e878af668d03d077c8368837024c",
+      "sha256": "b7bb25bdf5a8c195f06cf8200e50a4b62773739c6b8b856b508f23675acd60ea"
+    },
+    "readonlyUi": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CURRENT42_AUTHENTICATED_LIVE_UI_PROGRESS_20261107.json",
+      "blobSha": "56c8360ec284030b25f33b0f6d943464f3962ccf",
+      "sha256": "31680a2e3f9bf3af5d68fa43d5ea2b33542dffba2d81aedca02be71b70e63312"
+    },
+    "failedCreate": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_ONE_LIVE_SYNTHETIC_INSURER_CREATE_ATTEMPT_20261107.json",
+      "blobSha": "98d59774740eae283ac395c130621d9f4ebf9d41",
+      "sha256": "d449ccc3fb5638181503369e0c94b13f95f83f405d271600017a56389d6e8baa"
+    },
+    "complete": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_ONE_LIVE_SYNTHETIC_INSURER_COMPLETE_20261107.json",
+      "blobSha": "622da6cf8e5459ca09d61bbdc0bac8e5a274608b",
+      "sha256": "89c7db40d65e6a4c3b2668a5b2ee29a9e0c323ca4925ffffb4a188cd13b224fc"
+    },
+    "uiCreate": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_ONE_LIVE_SYNTHETIC_INSURER_UI_CREATE_20261107.json",
+      "blobSha": "16ff665338de79be99587b4f71d5a23e120d1b63",
+      "sha256": "106f1a6ea6c5567fecfecbb0ced098c530037037fcd0198334e58733f7aaec05"
+    },
+    "uiCleanup": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_ONE_LIVE_SYNTHETIC_INSURER_UI_CLEANUP_20261107.json",
+      "blobSha": "65ff578901f8944d779945dd6a9b4982e56db2fd",
+      "sha256": "e81d8aa9484c61a8e4670178d5e06924b66de5abac43522025923f9955269612"
+    },
+    "finalIntegrity": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_ONE_LIVE_SYNTHETIC_INSURER_FINAL_INTEGRITY_20261107.json",
+      "blobSha": "737b3d389763663a8cddd19499d5ceafaf8ad74b",
+      "sha256": "b0795aea60e71fc4686bdcb84b4eb862b051bbcef969702dcc005cb5c08e8ff2"
+    }
+  },
+  "supportingEvidence": [],
+  "recordedAtUtc": "2026-11-07T02:32:57Z",
+  "execution": {
+    "completeRunId": 42329143683,
+    "completeJobId": 128271384830,
+    "completeRunConclusion": "success",
+    "completeRunnerCommit": "9585fe3b9a2640b372952031ad414aab7cae24cb",
+    "evidenceArtifactId": 13556631888,
+    "evidenceArtifactZipSha256": "4fcd53b7e4531ca7bd3ee9ecbb62d930d89aa2f953db59982b65ae8edf361cb5",
+    "failedCreateRunId": 42327828328,
+    "customTokensPreviouslyIssued": 1,
+    "customTokensIssuedInContinuation": 1,
+    "customTokensTotal": 2,
+    "remainingTokenBudget": 0,
+    "canonicalMutations": 3
+  },
+  "preserved": {
+    "historicalCapabilityCertificates": 15,
+    "currentEvidenceEntries": 16,
+    "resolvedFunctionalP0": 4,
+    "ownerDeferredQaP0": 2,
+    "frozenP0Total": 6,
+    "formalI6ProgressPercent": 50,
+    "historicalSourceAndProofs": true,
+    "ownerRulesExceptionStillOpen": true,
+    "globalIamPassClaimed": false
+  },
+  "remainingScope": {
+    "nextFrozenGate": "B4-004-SINIESTROS-CRONOGRAMA",
+    "nextGateExecuted": false,
+    "nextGateAccepted": false,
+    "augustRefreshAuthorized": false,
+    "oldQaPhysicalCleanupAuthorized": false,
+    "newBusinessWritesAuthorized": false,
+    "fullPhaseAI6TerminalAcceptanceClaimed": false
+  },
+  "authorityNote": "Current immutable candidate42 B4-003 closure only, supported by preserved accepted module evidence and the final physical LIVE receipts. The old promotion, UI and failed-attempt receipts retain their original historical status."
+}

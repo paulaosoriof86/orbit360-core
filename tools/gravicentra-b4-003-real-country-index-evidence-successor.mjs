@@ -1,6 +1,7 @@
 // Immutable physical country-index delta from successful bounded LAB read.
 // Freeze aggregate-only evidence into the ONE candidate, never authorize
 // document updates, Preview verification, or production.
+import {projectVerifiedB4003LiveClosure} from './gravicentra-b4-003-formal-live-closeout-guard.mjs';
 import fs from 'node:fs';
 import {createHash} from 'node:crypto';
 import {execFileSync} from 'node:child_process';
@@ -125,10 +126,11 @@ function verifyControl(){
  const after=json(CONTROL),p=after[KEY];
  need(Object.keys(before).length===441&&Object.keys(certified).length===442&&
   Object.keys(after).length>=442,'CERTIFIED_CONTROL_APPEND_CARDINALITY');
+ const closure=projectVerifiedB4003LiveClosure(after,certified);
  const stableCertified={...certified};
  delete stableCertified.projectSources;
  need(frozenEntriesUnchanged(before,certified)&&
-  frozenEntriesUnchanged(stableCertified,after),'HISTORICAL_CONTROL_CHANGED');
+  frozenEntriesUnchanged(stableCertified,closure.comparableAfter),'HISTORICAL_CONTROL_CHANGED');
  verifyProjectSourceReadback(certified.projectSources,after);
  need(same(Object.keys(certified).filter(k=>!(k in before)),[KEY]),
   'CERTIFIED_CONTROL_KEY_SET_INVALID');
@@ -189,6 +191,7 @@ function verifyControl(){
   r.releaseHold?.liveHostingDeployed===false&&
   r.releaseHold?.liveFunctionsDeployed===false,
   'RECEIPT_OR_RELEASE_HOLD_DRIFT');
+ return closure;
 }
 export function runB4003RealCountryIndexEvidenceSuccessorGuard(){
  if(!json(CONTROL)[KEY])return false;
@@ -207,9 +210,11 @@ export function runB4003RealCountryIndexEvidenceSuccessorGuard(){
  for(const file of GOV_PATHS)
   need(blob(head,file)===hash(file),'UNCOMMITTED_GOVERNANCE_DRIFT:'+file);
  need(!git('ls-files','--others','--exclude-standard'),'UNTRACKED_SOURCE');
- verifyControl();verifyAggregate();
+ const closure=verifyControl();verifyAggregate();
  console.log('B4_003_REAL_COUNTRY_INDEX_DRYRUN_EVIDENCE=PASS 443_clients indexed_408 correction_candidates_32 unresolved_3');
- console.log('B4_003_COUNTRY_INDEX_MIGRATION=NOT_AUTHORIZED B4_003_PRODUCTION=NO_GO');
+ console.log(closure.closed
+  ?'B4_003_CURRENT42_FINAL_LIVE_ACCEPTANCE=PASS B4_003=CLOSED NEXT_GATE=NOT_EXECUTED'
+  :'B4_003_COUNTRY_INDEX_MIGRATION=NOT_AUTHORIZED B4_003_PRODUCTION=NO_GO');
  console.log('GRAVICENTRA_I6_CONTROL_PLANE_GUARD=PASS');
  console.log('PRODUCT_SOURCE_DRIFT=false');
  return true;

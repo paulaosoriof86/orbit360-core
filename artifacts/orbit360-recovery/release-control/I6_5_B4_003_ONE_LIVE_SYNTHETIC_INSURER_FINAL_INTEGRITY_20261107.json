@@ -1,0 +1,71 @@
+{
+  "schema": "B4_003_ONE_LIVE_SYNTHETIC_INSURER_FINAL_INTEGRITY_V1",
+  "status": "PASS_FINAL_AFFECTED_MODULE_INTEGRITY_EXACT_LIVE_IDENTITY",
+  "recordedAtUtc": "2026-11-07T02:32:57Z",
+  "sourceSha": "857f1222f360a42a06e012810a1c01bce155a26f",
+  "buildId": "gi-i65-b4-857f1222f360-57f234755dc1",
+  "hostingVersion": "sites/ays-orbit-360-lab/versions/c5e1ae001fae793b",
+  "artifactId": 13549460562,
+  "hostedPayloadDigest": "308b669105c380294177f1a8d2350216af95fec31f800955d611e607542b42da",
+  "productFiles": 218,
+  "affectedModuleIntegrityPass": true,
+  "exactLiveIdentityUnchanged": true,
+  "unexpectedBusinessWrites": 0,
+  "fixtureId": "asg_mw5qeno8",
+  "continuationRunId": 42329143683,
+  "continuationJobId": 128271384830,
+  "continuationJobConclusion": "success",
+  "artifactIdForPhaseEvidence": 13556631888,
+  "artifactZipSha256": "4fcd53b7e4531ca7bd3ee9ecbb62d930d89aa2f953db59982b65ae8edf361cb5",
+  "phaseRawSha256": "89c7db40d65e6a4c3b2668a5b2ee29a9e0c323ca4925ffffb4a188cd13b224fc",
+  "canonicalBeforeAbsent": true,
+  "canonicalCreateReadbackMatched": true,
+  "actualUiCreateReloadPassed": true,
+  "atomicCleanupAndExternalAuditPassed": true,
+  "canonicalAfterCleanupAbsent": true,
+  "actualUiCleanupReloadAbsent": true,
+  "boundedRelationQueries": {
+    "collections": 8,
+    "exactFixtureId": true,
+    "matches": 0
+  },
+  "boundedSideEffectQueries": {
+    "collections": 5,
+    "before": 0,
+    "afterCreate": 0,
+    "afterCleanup": 0,
+    "unknownSchemaAbsenceNotClaimed": true
+  },
+  "uiDirectoryBaselineAndFinal": {
+    "directory": 33,
+    "active": 29,
+    "withPrincipalContact": 13,
+    "withRegisteredAccess": 7,
+    "withDocumentation": 1,
+    "requiringUpdate": 0
+  },
+  "expectedPersistentAuditRecords": {
+    "requestRecords": 2,
+    "eventRecords": 2,
+    "externalAuditRecords": 1,
+    "fixtureBusinessRecordRetained": false
+  },
+  "customTokensPreviouslyIssued": 1,
+  "customTokensIssuedInContinuation": 1,
+  "customTokensTotal": 2,
+  "remainingTokenBudget": 0,
+  "finalLiveIdentityVerifiedByContinuation": true,
+  "identityEvidenceScope": "Continuation checked the same finalized LIVE Hosting version and exact build/source at completion. Existing full raw218 artifact/Preview/LIVE promotion comparison remains preserved; no rebuild, source change, deploy or artifact patch occurred.",
+  "noBusinessDataImport": true,
+  "noRealInsurerMutation": true,
+  "noRoleOrUserMutation": true,
+  "noRulesFunctionsOrHostingMutation": true,
+  "uiErrorLogsObservedAfterCleanupReload": 0,
+  "globalConsoleWarningFreeClaimed": false,
+  "allUnknownSchemasAudited": false,
+  "priorKnownLimitationsPreserved": [
+    "Two historical QA cohorts remain owner-deferred; physical deletion is not claimed.",
+    "Existing logo warnings and the historical policy-total discrepancy are preserved in readonly UI evidence; no global clean-console or data-reconciliation PASS is inferred.",
+    "This affected-module integrity seal does not accept B4-004 or all Phase A."
+  ]
+}

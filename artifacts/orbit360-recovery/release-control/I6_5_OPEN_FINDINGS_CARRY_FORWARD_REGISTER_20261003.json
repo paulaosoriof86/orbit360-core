@@ -4,7 +4,7 @@
   "authority": "FAIL_CLOSED_FINDING_CONTINUITY",
   "sourceLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
   "sourceLedgerPreviousBlobSha": "b923461bc7b0bbff0df597187f0053228029e7b4",
-  "expectedLedgerNextBlobSha": "333963e16a21d9abe58274091c0f61a53473c71f",
+  "expectedLedgerNextBlobSha": "435850b4933003d9788cb28f24df8f64194aae62",
   "policy": {
     "allLedgerFindingsMustAppearExactlyOnce": true,
     "newHumanFindingsMustBeIndividualLedgerEntries": true,
@@ -2951,8 +2951,8 @@
       "block": "B4",
       "source": "FROZEN_PLAN",
       "finding": "Cumulative B4-003 remediation: lifecycle, premium/source authority, Information Health, insurer knowledge and Gravicentra↔CotComp Quote Authority.",
-      "status": "PAULA_VISUAL_PARTIAL_PASS_BLOCKING_20261011",
-      "blocking": true,
+      "status": "CLOSED_PASS",
+      "blocking": false,
       "mayDisappearWithoutDisposition": false,
       "humanEvidence": [
         "2026-09-30 clarification: Cancelaciones module is visible; the problem is that operational cancellation information is not populated/displayed.",
@@ -2991,7 +2991,7 @@
         "Exact Preview: Cliente 360 has bidirectional tab navigation.",
         "Exact Preview: Calidad respects global country and synchronous render path is measured under 2500 ms in authenticated harness."
       ],
-      "nextAction": "B4_003_R20_TARGETED_PAULA_VISUAL",
+      "nextAction": "B4_003_CLOSED_RETURN_TO_FROZEN_PLAN_NEXT_GATE_NOT_EXECUTED",
       "rootCause": "RENEWALS_CANCELATIONS_MULTI_CAUSAL_SOURCE_GAPS_WITH_CANONICAL_POLICY_PROJECTION_GAP",
       "causeClassification": "PRODUCT_LOGIC_DEFECT_DEMONSTRATED",
       "evidence": {
@@ -3271,7 +3271,64 @@
       "priorHumanVisualStatus": "REJECTED_R20_BUSINESS_LOGIC_CAUSAL_SOURCE_FIXED_PREVIEW_RETEST_REQUIRED",
       "r21PriorStatus": "MACHINE_PASS_PENDING_PAULA_VISUAL",
       "r21SourceReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R21_BUSINESS_LINEAGE_ATTACHMENTS_INBOX_SOURCE_FIX_20261009.json",
-      "r21SourceReceiptBlobSha": "ba6c57c5b703329eea92be8d04b8e5074e7aae50"
+      "r21SourceReceiptBlobSha": "ba6c57c5b703329eea92be8d04b8e5074e7aae50",
+      "closureStatus": "LATEST_APPROVED_VERSION_LIVE_PASS",
+      "closureReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CURRENT42_FINAL_LIVE_CLOSEOUT_20261107.json",
+      "closureReceiptBlobSha": "0879188bf245248fa1092fb2014e35e14e802b44",
+      "closureReceiptSha256": "209445fbf9e086e5f4e20c65d6a22b055e09c96511a716ec0d193f9dc93a461d",
+      "currentReleaseClosure20261107": {
+        "schema": "GRAVICENTRA_B4_003_CURRENT42_FORMAL_LIVE_ACCEPTANCE_V1",
+        "status": "LATEST_APPROVED_VERSION_LIVE_PASS",
+        "gate": "I6.5/B4-003",
+        "recordedAtUtc": "2026-11-07T02:32:57Z",
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CURRENT42_FINAL_LIVE_CLOSEOUT_20261107.json",
+        "receiptBlobSha": "0879188bf245248fa1092fb2014e35e14e802b44",
+        "receiptSha256": "209445fbf9e086e5f4e20c65d6a22b055e09c96511a716ec0d193f9dc93a461d",
+        "sourceSha": "857f1222f360a42a06e012810a1c01bce155a26f",
+        "buildId": "gi-i65-b4-857f1222f360-57f234755dc1",
+        "artifactId": 13549460562,
+        "artifactTarDigest": "5af8e1e6e98e861c5c1a2e25324841ac9dfb07fffae0524c1cabc1a6282ad338",
+        "hostingVersion": "sites/ays-orbit-360-lab/versions/c5e1ae001fae793b",
+        "productFiles": 218,
+        "hostedPayloadDigest": "308b669105c380294177f1a8d2350216af95fec31f800955d611e607542b42da",
+        "promotionRunId": 42323326741,
+        "fullRawLiveEvidencePath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_RETAINED_HOSTING_LIVE_PROMOTED_20261107.json",
+        "fullRawLiveEvidenceBlobSha": "3e07e1e21192e878af668d03d077c8368837024c",
+        "authenticatedReadonlyUiReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CURRENT42_AUTHENTICATED_LIVE_UI_PROGRESS_20261107.json",
+        "authenticatedReadonlyUiReceiptBlobSha": "56c8360ec284030b25f33b0f6d943464f3962ccf",
+        "actualSyntheticEvidence": {
+          "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_ONE_LIVE_SYNTHETIC_INSURER_COMPLETE_20261107.json",
+          "blobSha": "622da6cf8e5459ca09d61bbdc0bac8e5a274608b",
+          "sha256": "89c7db40d65e6a4c3b2668a5b2ee29a9e0c323ca4925ffffb4a188cd13b224fc",
+          "runId": 42329143683,
+          "jobId": 128271384830,
+          "artifactId": 13556631888,
+          "customTokensIssued": 1,
+          "tokensPreviouslyIssued": 1,
+          "totalCustomTokensMinted": 2
+        },
+        "actualPostCleanupUiEvidence": {
+          "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_ONE_LIVE_SYNTHETIC_INSURER_UI_CLEANUP_20261107.json",
+          "blobSha": "65ff578901f8944d779945dd6a9b4982e56db2fd",
+          "sha256": "e81d8aa9484c61a8e4670178d5e06924b66de5abac43522025923f9955269612"
+        },
+        "actualFinalIntegrityEvidence": {
+          "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_ONE_LIVE_SYNTHETIC_INSURER_FINAL_INTEGRITY_20261107.json",
+          "blobSha": "737b3d389763663a8cddd19499d5ceafaf8ad74b",
+          "sha256": "b0795aea60e71fc4686bdcb84b4eb862b051bbcef969702dcc005cb5c08e8ff2"
+        },
+        "preservedHistoricalCertificates": 15,
+        "currentEvidenceEntries": 16,
+        "preservedOwnerDeferredQaP0": 2,
+        "closedFunctionalP0": 4,
+        "frozenP0Total": 6,
+        "formalI6PercentPreserved": 50,
+        "b4003Closed": true,
+        "acceptanceScope": "Current immutable candidate42 B4-003 only. Earlier accepted module evidence is preserved monotonically; no new global-IAM/security certification or other gate acceptance.",
+        "subsequentGateAuthorized": false,
+        "augustDataRefreshAuthorized": false
+      },
+      "priorB4003StatusPreserved": "PAULA_VISUAL_PARTIAL_PASS_BLOCKING_20261011"
     },
     {
       "id": "B4-004",
@@ -11994,7 +12051,7 @@
       "source": "PAULA_REQUEST_AND_REPO_CAUSAL_AUDIT_20261012",
       "surface": "Inicio / Recaudo personal",
       "priority": "BLOCKING_P0",
-      "blocking": true,
+      "blocking": false,
       "owner": [
         "orbit360-platform/modules/inicio.js",
         "functions/assignable-advisor-roster.js"
@@ -12002,12 +12059,81 @@
       "finding": "Separar y verificar recaudo confirmado personal frente a meta individual.",
       "rootCause": "El fallback de splitCountrySummary restringe personal a production; atribución de recaudo pendiente de discriminante.",
       "closureCondition": "Prueba servidor+UI con asesor real, meta personal, recibos/cobros confirmados, GTQ/COP separados, permisos y reload.",
-      "status": "OPEN_P0_NOT_ACCEPTED",
+      "status": "RESOLVED_AUTHENTICATED_RUNTIME_PASS",
       "mayDisappearWithoutDisposition": false,
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_P0_FINDINGS_DECISIONS_FREEZE_20261012.md",
       "receiptBlobSha": "2760d2aeb961bac5a0ce11e326c689143d2cc083",
       "machineProofRunId": 38282275915,
-      "visualPassDoesNotClose": true
+      "visualPassDoesNotClose": true,
+      "closureProof": {
+        "scope": "PERSONAL_COLLECTION_FUNCTIONAL_P0_ONLY_NO_B4003_GATE_CLOSURE",
+        "dateLocal": "2026-11-06",
+        "immutablePreviewSourceSha": "3e87722d54871198a02d9b0909971fa2f4f913af",
+        "immutablePreviewRunId": 42154167581,
+        "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-rc-41765742748-neoi3u7r.web.app/",
+        "signedUser": "Paula",
+        "authenticatedRole": "Asesor",
+        "sessionCountryAfterTest": "TODOS",
+        "sessionPeriod": "2026-11",
+        "sourceReadiness": "5_OF_5_SIGNED_CHROME",
+        "scopedServerReadRunId": 42243486854,
+        "scopedServerReadCount": "7_OF_7",
+        "createSyntheticRunId": 42252540995,
+        "createSyntheticConclusion": "success",
+        "createdSyntheticDocuments": 5,
+        "syntheticAmountGTQ": 111.11,
+        "syntheticPersonalGoalGTQ": 200,
+        "previewReadbackWithSynthetic": {
+          "country": "GT",
+          "personalConfirmedGTQ": 111.11,
+          "personalGoalGTQ": 200,
+          "percentageVisible": 56,
+          "cobrosConfirmedCount": 4,
+          "aggregateCobrosGTQVisibleRounded": 2417,
+          "sourceReadiness": "5_OF_5"
+        },
+        "cleanupSyntheticRunId": 42252887414,
+        "cleanupSyntheticConclusion": "success",
+        "serverExactSyntheticCleanup": "PASS_REMOVED_5",
+        "finalSignedPreviewReload": {
+          "country": "GT",
+          "sources": "5_OF_5",
+          "personalConfirmedVisible": "Q0",
+          "personalGoal": "NOT_CONFIGURED",
+          "aggregateCobrosGTQVisible": 2306,
+          "aggregateCobrosCount": 3
+        },
+        "crossCountryAuthenticatedPreviewReadback": {
+          "country": "CO",
+          "sources": "5_OF_5",
+          "aggregateCobrosCOP": 0,
+          "aggregateCobrosCount": 0,
+          "currency": "COP"
+        },
+        "bothCountriesAfterRestore": {
+          "country": "TODOS",
+          "sources": "5_OF_5",
+          "currencies": "GTQ_AND_COP_NO_CONVERSION",
+          "aggregateCobrosGTQ": 2306,
+          "aggregateCobrosCOP": 0,
+          "aggregateCobrosCount": 3,
+          "personalConfirmedVisible": "Q0"
+        },
+        "residualSyntheticDocuments": 0,
+        "operationalDataReimport": false,
+        "firestoreRulesRedeploy": false,
+        "productRebuild": false,
+        "noProductionPromotion": true,
+        "doesNotClose": [
+          "FREELANCERS_GOAL_SCOPE",
+          "INICIO_MOTIVATIONAL_TEXTS",
+          "CANCELLED_RUN_QA_RESIDUE",
+          "ORPHAN_RENEWALS_QA_RESIDUE",
+          "OPS_LEADS_HUMAN_AUTHOR_RESOLVER",
+          "FULL_MODULE_ROLE_VIEWPORT_MATRIX",
+          "CURRENT_ARTIFACT_LIVE_READBACK"
+        ]
+      }
     },
     {
       "id": "B4-003-P0-20261012-INSTITUTIONAL-GOALS",
@@ -12045,7 +12171,7 @@
       "source": "PAULA_REQUEST_AND_REPO_CAUSAL_AUDIT_20261012",
       "surface": "Inicio / Freelancers y avance",
       "priority": "BLOCKING_P0",
-      "blocking": true,
+      "blocking": false,
       "owner": [
         "functions/assignable-advisor-roster.js",
         "orbit360-platform/modules/inicio.js"
@@ -12053,12 +12179,99 @@
       "finding": "Excluir del avance institucional freelancers no participantes conforme a elegibilidad real.",
       "rootCause": "r23Dashboard itera asesores sin filtrar elegibilidad de metas; clasificación de freelancer falta verificar.",
       "closureCondition": "Participación editable desde fuente canónica; interno/freelance sintético, scope own/team/all, meta y KPI sin hardcodes.",
-      "status": "OPEN_P0_NOT_ACCEPTED",
+      "status": "RESOLVED_AUTHENTICATED_RUNTIME_PASS",
       "mayDisappearWithoutDisposition": false,
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_P0_FINDINGS_DECISIONS_FREEZE_20261012.md",
       "receiptBlobSha": "2760d2aeb961bac5a0ce11e326c689143d2cc083",
       "machineProofRunId": 38282275915,
-      "visualPassDoesNotClose": true
+      "visualPassDoesNotClose": true,
+      "closureProof": {
+        "scope": "FREELANCERS_GOAL_PARTICIPATION_P0_FUNCTIONAL_ONLY_FULL_GATE_HOLD",
+        "dateLocal": "2026-11-06",
+        "immutablePreviewProductSourceSha": "3e87722d54871198a02d9b0909971fa2f4f913af",
+        "immutablePreviewRunId": 42154167581,
+        "immutablePreviewRegressionJobId": 127684227745,
+        "regressionJobResult": "SUCCESS",
+        "goalParticipationTestSuite": "6_OF_6_SUITES_PASS_ZERO_FAILED",
+        "sourceContractUnitAssertions": 31,
+        "goalParticipationContractBlobSha": "ff86fa441fd6cb4ec6254e2dc5078a37bf68fc36",
+        "canonicalProtectedRosterBlobSha": "9778d74b6d305ff56caf73bb68be3dadac4b14ce",
+        "canonicalInicioBlobSha": "9dff332315198504042519dd199720f81a481573",
+        "teamCanonicalSignedReadbackPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_TEAM_CLASSIFICATIONS_SIGNED_READBACK_20261105.json",
+        "teamSignedWrites": 7,
+        "teamSignedBrowserReload": 7,
+        "internal": 4,
+        "freelance": 3,
+        "freelanceParticipatingInInstitutionalGoals": 0,
+        "countryAndRoleReadback": [
+          {
+            "role": "Dirección",
+            "country": "GT",
+            "sources": "5_OF_5",
+            "roster": "5_ELIGIBLE_3_VISIBLE",
+            "internalDisplayed": [
+              "Fernando Arias",
+              "Paula Osorio",
+              "Samuel Daza"
+            ],
+            "freelanceHiddenByDefault": [
+              "Braulio Hernández",
+              "Johanna Salgado"
+            ]
+          },
+          {
+            "role": "Dirección",
+            "country": "CO",
+            "sources": "5_OF_5",
+            "roster": "2_ELIGIBLE_1_VISIBLE",
+            "internalDisplayed": [
+              "Carlos Castro"
+            ],
+            "freelanceHiddenByDefault": [
+              "Nicole Castro"
+            ]
+          },
+          {
+            "role": "Operativo",
+            "country": "GT",
+            "sources": "5_OF_5",
+            "roster": "5_ELIGIBLE_3_VISIBLE"
+          },
+          {
+            "role": "Asesor",
+            "country": "GT",
+            "sources": "5_OF_5",
+            "roster": "1_ELIGIBLE_1_VISIBLE",
+            "onlyAdvisor": "Paula Osorio"
+          }
+        ],
+        "fullDashboardSelectionCheck": "SHOW_ALL_REVEALED_2_GT_FREELANCERS_BUT_DATA_META_STATE_EXCLUDED_FOR_BOTH; SIN_FREELANCE_RESTORED_THREE_INTERNAL",
+        "signedSessionRestored": {
+          "role": "Asesor",
+          "country": "TODOS",
+          "sources": "5_OF_5"
+        },
+        "ownTeamAllContract": "TOOLS_INICIO_ROLE_COUNTRY_TEAM_TEST_PASSED_IN_IMMUTABLE_PREVIEW_CI",
+        "syntheticContract": {
+          "internalAlwaysParticipates": true,
+          "freelanceExcludedUnlessExplicitlyEnabled": true,
+          "unclassifiedExcluded": true,
+          "roleBasedDurableEditOnlyDireccionOrSuperAdmin": true,
+          "goalsBasedOnServerValuesNoInventedPercent": true
+        },
+        "modelLogic": "INSTITUTIONAL_KPI_AGGREGATES_FILTER_ACTIVO_ROLE_ELIGIBLE_PARTICIPA_METAS; CLIENT_VISIBILITY_PREFERENCE_SEPARATE_FROM_GOAL_CALCULATION",
+        "dataWritesThisClosure": 0,
+        "noReclassificationRepeated": true,
+        "noRulesRedeploy": true,
+        "noProductRebuild": true,
+        "noProductionPromotion": true,
+        "doesNotClose": [
+          "OTHER_THREE_OPEN_P0",
+          "OPS_LEADS_AUTHOR_RESOLVER",
+          "FULL_CURRENT_MODULE_MATRIX",
+          "LIVE_CANDIDATE_DIGEST_AND_FUNCTIONAL_ACCEPTANCE"
+        ]
+      }
     },
     {
       "id": "B4-003-P0-20261012-INICIO-MOTIVATIONAL-TEXTS",
@@ -12067,19 +12280,78 @@
       "source": "PAULA_REQUEST_AND_REPO_CAUSAL_AUDIT_20261012",
       "surface": "Inicio / Textos motivacionales",
       "priority": "BLOCKING_P0",
-      "blocking": true,
+      "blocking": false,
       "owner": [
         "orbit360-platform/modules/inicio.js"
       ],
       "finding": "Aplicar textos motivacionales contextuales preservando Inicio premium visualmente aceptado.",
       "rootCause": "El encabezado y mensaje de Inicio se definen de forma fija en la plantilla.",
       "closureCondition": "Validación visual de textos contextuales reales por rol/periodo, sin cifras ni logros inventados ni regresión de diseño.",
-      "status": "OPEN_P0_NOT_ACCEPTED",
+      "status": "RESOLVED_AUTHENTICATED_RUNTIME_PASS",
       "mayDisappearWithoutDisposition": false,
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_P0_FINDINGS_DECISIONS_FREEZE_20261012.md",
       "receiptBlobSha": "2760d2aeb961bac5a0ce11e326c689143d2cc083",
       "machineProofRunId": 38282275915,
-      "visualPassDoesNotClose": true
+      "visualPassDoesNotClose": true,
+      "closureProof": {
+        "scope": "CONTEXTUAL_INICIO_MOTIVATIONAL_TEXTS_FOCAL_DESKTOP_VISUAL_ONLY_FULL_RESPONSIVE_MATRIX_PENDING",
+        "dateLocal": "2026-11-06",
+        "immutablePreviewProductSha": "3e87722d54871198a02d9b0909971fa2f4f913af",
+        "immutablePreviewWorkflowRunId": 42154167581,
+        "contextualHeaderProof": [
+          {
+            "role": "Asesor",
+            "country": "TODOS",
+            "sourceReadiness": "5_OF_5",
+            "text": "Consulta las metas individuales disponibles y tus seguimientos autorizados en Guatemala y Colombia."
+          },
+          {
+            "role": "Asesor",
+            "country": "GT",
+            "sourceReadiness": "5_OF_5",
+            "text": "Consulta las metas individuales disponibles y tus seguimientos autorizados en Guatemala."
+          },
+          {
+            "role": "Dirección",
+            "country": "GT",
+            "sourceReadiness": "5_OF_5",
+            "text": "Revisa metas institucionales, cuando estén configuradas, y pendientes autorizados en Guatemala."
+          },
+          {
+            "role": "Dirección",
+            "country": "CO",
+            "sourceReadiness": "5_OF_5",
+            "text": "Revisa metas institucionales, cuando estén configuradas, y pendientes autorizados en Colombia."
+          }
+        ],
+        "temporalState": "WHEN_FEWER_THAN_FIVE_SOURCES_READY_BANNER_SAYS_VERIFYING_REAL_DATA_AND_PERMISSIONS_NO_IMAGINARY_STATS",
+        "observedPeriod": "Noviembre 2026",
+        "dateContextLocal": "2026-11-06",
+        "observedCountdown": "Faltan 24 días para cerrar el mes",
+        "serverReadinessVerified": "5_OF_5",
+        "reflectionButtonEnabled": true,
+        "reflectionBefore": "Un equipo que comparte prioridades transforma los datos en protección real.",
+        "reflectionAfter": "La prevención abre oportunidades; el seguimiento oportuno protege las relaciones.",
+        "desktopVisualObservation": "TWO_SIGNED_CHROME_SCREENSHOTS_ASESOR_TODOS_AND_DIRECCION_GT_AT_1520PX_NO_OVERLAPS_OR_BROKEN_CARD_GRID",
+        "premiumDesignPriorAcceptancePreservedScopeOnly": true,
+        "financialEmptyStatesDoNotInventGoals": true,
+        "sourceDataDrivenHeaderAndCalendar": true,
+        "sourceTextModuleBlobSha": "9dff332315198504042519dd199720f81a481573",
+        "sessionRestored": {
+          "role": "Asesor",
+          "country": "TODOS",
+          "sources": "5_OF_5"
+        },
+        "notClaimed": [
+          "RESPONSIVE_320_390_1024_1440_MATRICES",
+          "FULL_MODULE_VISUAL_REACCEPTANCE",
+          "LIVE_PROMOTION",
+          "GOAL_FIGURES_NOT_CONFIGURED"
+        ],
+        "noRealWrites": true,
+        "noProductRebuild": true,
+        "noRulesRedeploy": true
+      }
     },
     {
       "id": "B4-003-P0-20261012-QA-CANCELLED-RUN-FIXTURES",
@@ -12088,19 +12360,56 @@
       "source": "PAULA_REQUEST_AND_REPO_CAUSAL_AUDIT_20261012",
       "surface": "QA / Residuos de prueba interrumpida",
       "priority": "BLOCKING_P0",
-      "blocking": true,
+      "blocking": false,
       "owner": [
         "tools/gravicentra-i6-5-b4-003-preview-proof.mjs"
       ],
       "finding": "Adjudicar 14 filas sintéticas del run cancelado 38102224750, con limpieza permitida solo tras provenance.",
       "rootCause": "Run 38102224750 fue interrumpido; read-only inventario detectó 14 marcadores sintéticos.",
       "closureCondition": "Snapshot IDs y dependencias; autorización scoped de eliminación si procede, cleanup y readback íntegro o HOLD por ambigüedad.",
-      "status": "OPEN_P0_NOT_ACCEPTED",
+      "status": "OWNER_AUTHORIZED_POSTPRODUCTION_PHYSICAL_RETENTION_NOT_DELETED",
       "mayDisappearWithoutDisposition": false,
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_P0_FINDINGS_DECISIONS_FREEZE_20261012.md",
       "receiptBlobSha": "2760d2aeb961bac5a0ce11e326c689143d2cc083",
       "machineProofRunId": 38282275915,
-      "visualPassDoesNotClose": true
+      "visualPassDoesNotClose": true,
+      "ownerDecision20261106": {
+        "owner": "Paula Andrea Osorio Franco",
+        "dateLocal": "2026-11-06",
+        "authorization": "Deferir únicamente limpieza física de ambos grupos QA; no borrar ni modificar registros; condicionado a exclusión verificable de indicadores comerciales",
+        "status": "KPI_EXCLUSION_VERIFIED_SCOPE_ONLY_RETAINED_SAFELY",
+        "preservation": "NO_DELETE_NO_UPDATE_NO_REIMPORT",
+        "exactReadbackRunId": 41144205677,
+        "readbackReceipt": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_EXACT_QA_RESIDUE_DEPENDENCIES_ADJUDICATION_20261030.json",
+        "signedBrowser": {
+          "preview": "https://ays-orbit-360-lab--gi-i65-b4-rc-41765742748-neoi3u7r.web.app/",
+          "sourceCommit": "3e87722d54871198a02d9b0909971fa2f4f913af",
+          "role": "Paula_Direccion_TODOS",
+          "policyTotal": 1425,
+          "policyCommercialTotal": 1416,
+          "policyQaAuditTotal": 9,
+          "policyAuditIncludesThreeB2AndSixB4": true,
+          "policyCommercialActive": 223,
+          "policyNetPremium": "GTQ_632719_AND_COP_175456570_EXCLUDING_QA",
+          "cobrosKpiConfirmed": "5_PAYMENTS_2744_GTQ",
+          "cobrosKpiPending": "2396_GTQ",
+          "cobrosKpiOverdue": "109875840_COP_AND_227367_GTQ",
+          "cobrosQueryB2Ren": "ZERO_COMMERCIAL_ROWS",
+          "cobrosQueryB4003": "ONE_QA_PORTFOLIO_ROW_683_20_GTQ_VISIBLE_IN_LIST_NOT_FINANCIAL_KPI",
+          "cobrosKpisUnchangedUnderQueries": true
+        },
+        "ci": {
+          "runId": 42154167581,
+          "financialQaTests": "5_PASS_ZERO_FAIL",
+          "pipelineQaTests": "11_PASS_ZERO_FAIL",
+          "queryOwnerBlob": "391d6c7df59b5d6fbb64adb419cb240c078545b8"
+        },
+        "limitation": "Cobros operational list still shows one cancelled-run QA due portfolio projection; separate B4-003 UI acceptance defect OPEN, not a KPI payment or a certification PASS.",
+        "gate": "I6.5/B4-003_FULL_HOLD",
+        "postproductionAction": "EXACT_REVERSIBLE_OWNER_REVIEW_AFTER_LIVE_ACCEPTANCE",
+        "nonblockingScope": "ONLY_PHYSICAL_QA_CLEANUP_AND_IDENTIFIED_QA_P0_FINDING",
+        "notProductionAccepted": true
+      }
     },
     {
       "id": "B4-003-P0-20261012-QA-ORPHAN-RENEWALS",
@@ -12109,19 +12418,56 @@
       "source": "PAULA_REQUEST_AND_REPO_CAUSAL_AUDIT_20261012",
       "surface": "QA / Renovaciones huérfanas y cartera",
       "priority": "BLOCKING_P0",
-      "blocking": true,
+      "blocking": false,
       "owner": [
         "artifacts/orbit360-recovery/release-control/I6_5_B4_003_R19_B2_QA_RESIDUE_ADJUDICATION_20261005.json"
       ],
       "finding": "Adjudicar tres pólizas B2 QA sin padre con 12 relaciones financieras antes de cualquier cleanup.",
       "rootCause": "El último readback confirma parentExists=false y cuatro dependencias por cada una de tres pólizas.",
       "closureCondition": "Readback exacto de origen y 12 dependencias; tratamiento autorizado y reversible con integridad sin eliminar obligaciones reales.",
-      "status": "OPEN_P0_NOT_ACCEPTED",
+      "status": "OWNER_AUTHORIZED_POSTPRODUCTION_PHYSICAL_RETENTION_NOT_DELETED",
       "mayDisappearWithoutDisposition": false,
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_P0_FINDINGS_DECISIONS_FREEZE_20261012.md",
       "receiptBlobSha": "2760d2aeb961bac5a0ce11e326c689143d2cc083",
       "machineProofRunId": 38282275915,
-      "visualPassDoesNotClose": true
+      "visualPassDoesNotClose": true,
+      "ownerDecision20261106": {
+        "owner": "Paula Andrea Osorio Franco",
+        "dateLocal": "2026-11-06",
+        "authorization": "Deferir únicamente limpieza física de ambos grupos QA; no borrar ni modificar registros; condicionado a exclusión verificable de indicadores comerciales",
+        "status": "KPI_EXCLUSION_VERIFIED_SCOPE_ONLY_RETAINED_SAFELY",
+        "preservation": "NO_DELETE_NO_UPDATE_NO_REIMPORT",
+        "exactReadbackRunId": 41144205677,
+        "readbackReceipt": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_EXACT_QA_RESIDUE_DEPENDENCIES_ADJUDICATION_20261030.json",
+        "signedBrowser": {
+          "preview": "https://ays-orbit-360-lab--gi-i65-b4-rc-41765742748-neoi3u7r.web.app/",
+          "sourceCommit": "3e87722d54871198a02d9b0909971fa2f4f913af",
+          "role": "Paula_Direccion_TODOS",
+          "policyTotal": 1425,
+          "policyCommercialTotal": 1416,
+          "policyQaAuditTotal": 9,
+          "policyAuditIncludesThreeB2AndSixB4": true,
+          "policyCommercialActive": 223,
+          "policyNetPremium": "GTQ_632719_AND_COP_175456570_EXCLUDING_QA",
+          "cobrosKpiConfirmed": "5_PAYMENTS_2744_GTQ",
+          "cobrosKpiPending": "2396_GTQ",
+          "cobrosKpiOverdue": "109875840_COP_AND_227367_GTQ",
+          "cobrosQueryB2Ren": "ZERO_COMMERCIAL_ROWS",
+          "cobrosQueryB4003": "ONE_QA_PORTFOLIO_ROW_683_20_GTQ_VISIBLE_IN_LIST_NOT_FINANCIAL_KPI",
+          "cobrosKpisUnchangedUnderQueries": true
+        },
+        "ci": {
+          "runId": 42154167581,
+          "financialQaTests": "5_PASS_ZERO_FAIL",
+          "pipelineQaTests": "11_PASS_ZERO_FAIL",
+          "queryOwnerBlob": "391d6c7df59b5d6fbb64adb419cb240c078545b8"
+        },
+        "limitation": "Cobros operational list still shows one cancelled-run QA due portfolio projection; separate B4-003 UI acceptance defect OPEN, not a KPI payment or a certification PASS.",
+        "gate": "I6.5/B4-003_FULL_HOLD",
+        "postproductionAction": "EXACT_REVERSIBLE_OWNER_REVIEW_AFTER_LIVE_ACCEPTANCE",
+        "nonblockingScope": "ONLY_PHYSICAL_QA_CLEANUP_AND_IDENTIFIED_QA_P0_FINDING",
+        "notProductionAccepted": true
+      }
     }
   ],
   "attentionIds": [
@@ -13358,5 +13704,57 @@
     "overallImplementationPercent": null,
     "formalI6ProgressPercent": 50
   },
-  "attentionCountInterpretation": "FOLLOW_UP_INVENTORY_COUNT_NOT_CURRENT_OPEN_FINDING_COUNT"
+  "attentionCountInterpretation": "FOLLOW_UP_INVENTORY_COUNT_NOT_CURRENT_OPEN_FINDING_COUNT",
+  "b4003CurrentReleaseClosure20261107": {
+    "schema": "GRAVICENTRA_B4_003_CURRENT42_FORMAL_LIVE_ACCEPTANCE_V1",
+    "status": "LATEST_APPROVED_VERSION_LIVE_PASS",
+    "gate": "I6.5/B4-003",
+    "recordedAtUtc": "2026-11-07T02:32:57Z",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CURRENT42_FINAL_LIVE_CLOSEOUT_20261107.json",
+    "receiptBlobSha": "0879188bf245248fa1092fb2014e35e14e802b44",
+    "receiptSha256": "209445fbf9e086e5f4e20c65d6a22b055e09c96511a716ec0d193f9dc93a461d",
+    "sourceSha": "857f1222f360a42a06e012810a1c01bce155a26f",
+    "buildId": "gi-i65-b4-857f1222f360-57f234755dc1",
+    "artifactId": 13549460562,
+    "artifactTarDigest": "5af8e1e6e98e861c5c1a2e25324841ac9dfb07fffae0524c1cabc1a6282ad338",
+    "hostingVersion": "sites/ays-orbit-360-lab/versions/c5e1ae001fae793b",
+    "productFiles": 218,
+    "hostedPayloadDigest": "308b669105c380294177f1a8d2350216af95fec31f800955d611e607542b42da",
+    "promotionRunId": 42323326741,
+    "fullRawLiveEvidencePath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_RETAINED_HOSTING_LIVE_PROMOTED_20261107.json",
+    "fullRawLiveEvidenceBlobSha": "3e07e1e21192e878af668d03d077c8368837024c",
+    "authenticatedReadonlyUiReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CURRENT42_AUTHENTICATED_LIVE_UI_PROGRESS_20261107.json",
+    "authenticatedReadonlyUiReceiptBlobSha": "56c8360ec284030b25f33b0f6d943464f3962ccf",
+    "actualSyntheticEvidence": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_ONE_LIVE_SYNTHETIC_INSURER_COMPLETE_20261107.json",
+      "blobSha": "622da6cf8e5459ca09d61bbdc0bac8e5a274608b",
+      "sha256": "89c7db40d65e6a4c3b2668a5b2ee29a9e0c323ca4925ffffb4a188cd13b224fc",
+      "runId": 42329143683,
+      "jobId": 128271384830,
+      "artifactId": 13556631888,
+      "customTokensIssued": 1,
+      "tokensPreviouslyIssued": 1,
+      "totalCustomTokensMinted": 2
+    },
+    "actualPostCleanupUiEvidence": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_ONE_LIVE_SYNTHETIC_INSURER_UI_CLEANUP_20261107.json",
+      "blobSha": "65ff578901f8944d779945dd6a9b4982e56db2fd",
+      "sha256": "e81d8aa9484c61a8e4670178d5e06924b66de5abac43522025923f9955269612"
+    },
+    "actualFinalIntegrityEvidence": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_ONE_LIVE_SYNTHETIC_INSURER_FINAL_INTEGRITY_20261107.json",
+      "blobSha": "737b3d389763663a8cddd19499d5ceafaf8ad74b",
+      "sha256": "b0795aea60e71fc4686bdcb84b4eb862b051bbcef969702dcc005cb5c08e8ff2"
+    },
+    "preservedHistoricalCertificates": 15,
+    "currentEvidenceEntries": 16,
+    "preservedOwnerDeferredQaP0": 2,
+    "closedFunctionalP0": 4,
+    "frozenP0Total": 6,
+    "formalI6PercentPreserved": 50,
+    "b4003Closed": true,
+    "acceptanceScope": "Current immutable candidate42 B4-003 only. Earlier accepted module evidence is preserved monotonically; no new global-IAM/security certification or other gate acceptance.",
+    "subsequentGateAuthorized": false,
+    "augustDataRefreshAuthorized": false
+  }
 }

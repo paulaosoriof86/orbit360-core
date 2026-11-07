@@ -15272,5 +15272,64 @@
     "dataWritesAuthorized": false,
     "productionPromotionAuthorized": false,
     "nextActionFromControlPlaneOnly": true
+  },
+  "b4003CurrentReleaseClosure20261107": {
+    "schema": "GRAVICENTRA_B4_003_CURRENT42_FORMAL_LIVE_ACCEPTANCE_V1",
+    "status": "LATEST_APPROVED_VERSION_LIVE_PASS",
+    "gate": "I6.5/B4-003",
+    "recordedAtUtc": "2026-11-07T02:32:57Z",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CURRENT42_FINAL_LIVE_CLOSEOUT_20261107.json",
+    "receiptBlobSha": "0879188bf245248fa1092fb2014e35e14e802b44",
+    "receiptSha256": "209445fbf9e086e5f4e20c65d6a22b055e09c96511a716ec0d193f9dc93a461d",
+    "sourceSha": "857f1222f360a42a06e012810a1c01bce155a26f",
+    "buildId": "gi-i65-b4-857f1222f360-57f234755dc1",
+    "artifactId": 13549460562,
+    "artifactTarDigest": "5af8e1e6e98e861c5c1a2e25324841ac9dfb07fffae0524c1cabc1a6282ad338",
+    "hostingVersion": "sites/ays-orbit-360-lab/versions/c5e1ae001fae793b",
+    "productFiles": 218,
+    "hostedPayloadDigest": "308b669105c380294177f1a8d2350216af95fec31f800955d611e607542b42da",
+    "promotionRunId": 42323326741,
+    "fullRawLiveEvidencePath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_RETAINED_HOSTING_LIVE_PROMOTED_20261107.json",
+    "fullRawLiveEvidenceBlobSha": "3e07e1e21192e878af668d03d077c8368837024c",
+    "authenticatedReadonlyUiReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CURRENT42_AUTHENTICATED_LIVE_UI_PROGRESS_20261107.json",
+    "authenticatedReadonlyUiReceiptBlobSha": "56c8360ec284030b25f33b0f6d943464f3962ccf",
+    "actualSyntheticEvidence": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_ONE_LIVE_SYNTHETIC_INSURER_COMPLETE_20261107.json",
+      "blobSha": "622da6cf8e5459ca09d61bbdc0bac8e5a274608b",
+      "sha256": "89c7db40d65e6a4c3b2668a5b2ee29a9e0c323ca4925ffffb4a188cd13b224fc",
+      "runId": 42329143683,
+      "jobId": 128271384830,
+      "artifactId": 13556631888,
+      "customTokensIssued": 1,
+      "tokensPreviouslyIssued": 1,
+      "totalCustomTokensMinted": 2
+    },
+    "actualPostCleanupUiEvidence": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_ONE_LIVE_SYNTHETIC_INSURER_UI_CLEANUP_20261107.json",
+      "blobSha": "65ff578901f8944d779945dd6a9b4982e56db2fd",
+      "sha256": "e81d8aa9484c61a8e4670178d5e06924b66de5abac43522025923f9955269612"
+    },
+    "actualFinalIntegrityEvidence": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_ONE_LIVE_SYNTHETIC_INSURER_FINAL_INTEGRITY_20261107.json",
+      "blobSha": "737b3d389763663a8cddd19499d5ceafaf8ad74b",
+      "sha256": "b0795aea60e71fc4686bdcb84b4eb862b051bbcef969702dcc005cb5c08e8ff2"
+    },
+    "preservedHistoricalCertificates": 15,
+    "currentEvidenceEntries": 16,
+    "preservedOwnerDeferredQaP0": 2,
+    "closedFunctionalP0": 4,
+    "frozenP0Total": 6,
+    "formalI6PercentPreserved": 50,
+    "b4003Closed": true,
+    "acceptanceScope": "Current immutable candidate42 B4-003 only. Earlier accepted module evidence is preserved monotonically; no new global-IAM/security certification or other gate acceptance.",
+    "subsequentGateAuthorized": false,
+    "augustDataRefreshAuthorized": false,
+    "supersedesForCurrentExecution": [
+      "/currentState (old R20 candidate)",
+      "/nextAction (old R20 action)"
+    ],
+    "nextFrozenGate": "B4-004-SINIESTROS-CRONOGRAMA",
+    "nextGateExecuted": false,
+    "nextGateStatusPreserved": "NOT_STARTED"
   }
 }
