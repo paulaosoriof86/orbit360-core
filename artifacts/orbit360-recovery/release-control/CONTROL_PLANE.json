@@ -665,8 +665,8 @@
       "productionPromotionAuthorized": false
     },
     "retainedHostingPreflight20261106": {
-      "recordedAtUtc": "2026-11-07T00:00:25Z",
-      "status": "VERSION_PARSER_RESOLVED_PREVIEW_FILECOUNT_REQUIRES_OBSERVED_VALUES_ROLLBACK_RELEASE_LOOKUP_PENDING",
+      "recordedAtUtc": "2026-11-07T00:06:06Z",
+      "status": "EXACT_TWO_EXTRA_FIREBASE_INIT_PATHS_IDENTIFIED_EXISTING_I5_VERSION_CANDIDATE_FOUND_FULL_BYTES_AND_ROLLBACK_CERTIFICATION_PENDING",
       "productSourceSha": "857f1222f360a42a06e012810a1c01bce155a26f",
       "artifactId": 13549460562,
       "attempts": [
@@ -812,9 +812,52 @@
           "dataWrites": 0,
           "functionsDeployment": false,
           "rulesOrAuthChange": false
+        },
+        {
+          "recordedAtUtc": "2026-11-07T00:06:06Z",
+          "runId": 42315518247,
+          "runnerCommit": "adcc9028bcafce7b2ac8cd5d9d666161dfc8848a",
+          "artifactId": 13549309878,
+          "artifactZipSha256": "663d492740537086f842ee5549432c8485d6fc1cf2ce7c9dd861cedb2fa46e10",
+          "result": "FIVE_PASS_TWO_FAIL_OBSERVED_EXACT_PATH_DIFFERENCE_AND_HISTORIC_VERSION_CANDIDATE",
+          "preview": {
+            "versionName": "sites/ays-orbit-360-lab/versions/c5e1ae001fae793b",
+            "metadataFileCount": 220,
+            "listedFileCount": 220,
+            "immutableArtifactSiteFileCount": 218,
+            "artifactPathsMissingFromHosting": 0,
+            "additionalPathsExactly": [
+              "__/firebase/init.js",
+              "__/firebase/init.json"
+            ],
+            "fullArtifactBytesReadbackPass": false,
+            "meaning": "Count mismatch is localized to exactly these two additional Firebase init paths; no product regression inferred. Validator still needs an explicit transport-path contract and complete retained-product byte comparison."
+          },
+          "historicalRollbackCandidate": {
+            "versionName": "sites/ays-orbit-360-lab/versions/5d35a2bd0b326e75",
+            "releaseName": "sites/ays-orbit-360-lab/channels/live/releases/1789786248527000",
+            "releaseTime": "2026-09-19T02:50:48.527Z",
+            "status": "FINALIZED",
+            "metadataFileCount": 211,
+            "certifiedSourceRunId": 35416730679,
+            "certifiedSourceJobId": 105826717920,
+            "certifiedCloneLogTime": "2026-09-19T02:50:49.187Z",
+            "matchesTemporalWindow": true,
+            "candidatesInWindow": 1,
+            "historyPageReadCount": 1,
+            "historyReleasesRead": 100,
+            "paginationFollowed": false,
+            "sourceIdentityAndPayloadStillUnproven": true,
+            "rollbackPass": false
+          },
+          "liveUnchanged": true,
+          "hostingMutation": false,
+          "backendDeployment": false,
+          "rulesOrAuthChanged": false,
+          "dataWrites": 0
         }
       ],
-      "nextReadOnlyAction": "Persist actual Preview metadata/list counts before unchanged strict assertions; query only first100 existing LIVE releases for the certified Sept19 02:50:49Z window after rollbackchannel404. No automatic equivalence, certificate change, new channel, rebuild or promotion.",
+      "nextReadOnlyAction": "Use the observed exact 218 artifact paths plus separately documented two Firebase init paths in validator; prove all218 raw bytes. Inspect and certify existing historical version5d35a2bd0b326e75 against source4bf67/build/209-product-file digest; temporal proximity and211count alone are not PASS. Preserve source42 and all signed functional proofs. No new channel, rebuild, certificate rewrite, Rules work or automatic promotion.",
       "rollbackCertifiedByThisAttempt": false,
       "productionPromotionAuthorized": false,
       "parserFix": "Normalize only observed projects/646761409743/ qualified version resources after exact project/site/channel validation; retain original observed names.",
@@ -848,6 +891,26 @@
         "module/role/read/write/reload/integrity acceptance after same-artifact promotion"
       ],
       "notFormalLiveAcceptance": true
+    },
+    "browserContinuationUserActionRequired20261106": {
+      "recordedAtUtc": "2026-11-07T00:06:06Z",
+      "lastAuthenticatedPrincipal": "Samuel Daza",
+      "lastActiveRole": "Operativo",
+      "fixturePendingNativeArchiveConfirmation": "b4003qa_user_mw5htkgl_31u61t",
+      "nativePromptText": "¿Limpiar los archivos de prueba y archivar este negocio sintético?",
+      "nativeConfirmationAcceptanceNotObserved": true,
+      "canonicalArchiveAfterAttemptNotObserved": true,
+      "browserControlStillBlockedOnFinalRetry": true,
+      "finalControlFailure": "Emulation.setFocusEmulationEnabled timeout",
+      "nextUserAction": "Accept the native archive confirmation in the existing Gravicentra tab and keep Samuel signed in; then resume canonical readback and original-fixture cleanup before Paula cross-UID reader.",
+      "completedProofsPreserved": [
+        "Samuel reads Paula original human author after reload",
+        "Samuel two human-name writes plus canonical bitacora persistence",
+        "Samuel Cliente360 GT/CO/TODOS QA commercial segregation",
+        "Inicio320/390 full currency visual verification"
+      ],
+      "noNewSyntheticFixtureAllowed": true,
+      "b4003Closed": false
     }
   },
   "b4003LeadsCurrent40ProspectiveHumanActorFocal20261106": {
