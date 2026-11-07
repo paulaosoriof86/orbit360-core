@@ -8792,7 +8792,7 @@
       "ownerConfirmed": true,
       "scope": "POLICY_ONLY_NOT_GLOBAL_FRACCIONADO_CEILING",
       "receiptPath": "artifacts/orbit360-recovery/release-control/OWNER_DECISION_FREEZE_AND_RECONCILIATION_PLAN_20261107.json",
-      "receiptBlobSha": "8e4df4851223fa37e4bcbc385d305e806f453298",
+      "receiptBlobSha": "e14ffbc2d4bfff8e5c2c6ecfb5de71c5e5b374d6",
       "dataApplied": false
     }
   },
@@ -21630,7 +21630,7 @@
     "status": "OWNER_DECISIONS_AND_WORK_PLAN_FROZEN",
     "recordedAtUtc": "2026-11-07T19:36:22Z",
     "path": "artifacts/orbit360-recovery/release-control/OWNER_DECISION_FREEZE_AND_RECONCILIATION_PLAN_20261107.json",
-    "blobSha": "8e4df4851223fa37e4bcbc385d305e806f453298",
+    "blobSha": "e14ffbc2d4bfff8e5c2c6ecfb5de71c5e5b374d6",
     "planPath": "artifacts/orbit360-recovery/release-control/PLAN_OPERATIVO_DECISIONES_PAULA_20261107.md",
     "planBlobSha": "c764aea8d8a2bb7c33e3745f585f1c55158f7a2e",
     "authorityBaseHead": "74312cc3621ba155ee288a0afb530a488246f0e6",
@@ -21700,5 +21700,63 @@
     "b4003Closed": true,
     "b4003HistoricalAcceptancePreserved": true,
     "nextGateExecuted": false
+  },
+  "b4004PolicyCaptureFrontendSuccessor20261107": {
+    "schema": "GRAVICENTRA_B4_004_POLICY_CAPTURE_SUCCESSOR_CURSOR_V1",
+    "status": "FRONTEND_SUCCESSOR_FOCAL_PREVIEW_PASS_PREFLIGHT_PENDING",
+    "preservedAcceptancePointer": "/b4003ActiveCertificationCursor20261106/formalLiveAcceptance",
+    "preservedPriorSuccessorPointer": "/b4003CausalFrontendSuccessor20261107",
+    "sourceContractPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_004_POLICY_CAPTURE_CAUSAL_FRONTEND_SUCCESSOR_CONTRACT_20261107.json",
+    "sourceContractBlobSha": "985c1444446e21f17f1eb6462131304e0c6cc413",
+    "activeSourceSha": "6c45983610ce0d65a5c63bd07659ad968bfe9da3",
+    "activeBuildId": "gi-i65-b4-6c45983610ce-57f234755dc1",
+    "activeImmutableArtifactId": 13592378081,
+    "immutableSuccessor44PreviewReadback": {
+      "sourceSha": "6c45983610ce0d65a5c63bd07659ad968bfe9da3",
+      "buildId": "gi-i65-b4-6c45983610ce-57f234755dc1",
+      "runId": 42418566181,
+      "artifactId": 13592378081,
+      "artifactZipSha256": "2cc92c916c602671f28d38595eaf8e41e9c8b6f4777a6051b728ee40d98befb9",
+      "archiveSha256": "02a42a2a3fc0dbc477a19937ad0a636ef94afd142977fd6ddf4c1a6e2177fba9",
+      "previewChannelId": "gi-i65-b4-rc-41765742748",
+      "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-rc-41765742748-neoi3u7r.web.app",
+      "versionName": null,
+      "workflowConclusion": "success",
+      "exactServedReadbackPassed": true,
+      "hostedPayloadDigest": "018bf9acd64ddaa382d2ac73c35a6d8bbc0447ab3051a3d26a5b1e8c048a7e7d",
+      "productFiles": 218,
+      "artifactZipBytes": 1521723,
+      "readbackReceiptArtifactId": 13592293583,
+      "readbackReceiptArtifactZipSha256": "32f8d41d5788a17a350efdffc97eef609bf24cd58c0105eadf20702586f8694c",
+      "readbackReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_004_POLICY_CAPTURE_IMMUTABLE_PREVIEW_TRANSPORT_20261107.json",
+      "readbackReceiptBlobSha": "099af7e00debb6339b68e8f95b931d229f305de7",
+      "readbackReceiptSha256": "8ecd062497c30a0080444c23c7446223d59fee9152afc75c3ae6d5fd499e5309"
+    },
+    "productionPromotionAuthorized": false,
+    "b4003Closed": true,
+    "b4003HistoricalAcceptancePreserved": true,
+    "nextGateAccepted": false,
+    "focalAuthenticatedAcceptance": {
+      "status": "PASS",
+      "sourceSha": "6c45983610ce0d65a5c63bd07659ad968bfe9da3",
+      "buildId": "gi-i65-b4-6c45983610ce-57f234755dc1",
+      "artifactId": 13592378081,
+      "evidencePins": [
+        {
+          "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_004_POLICY_CAPTURE_FOCAL_PREVIEW_QA_20261107.json",
+          "blobSha": "8573480607ff4b98a1c9939ab89a6c812ca69564"
+        }
+      ],
+      "realBusinessWrites": 0,
+      "exactSyntheticCleanupVerified": true,
+      "syntheticIdentityAdaptationDeclared": true
+    },
+    "formalPreviewAcceptance": {
+      "status": "LATEST_APPROVED_VERSION_PREVIEW_PASS",
+      "sourceSha": "6c45983610ce0d65a5c63bd07659ad968bfe9da3",
+      "buildId": "gi-i65-b4-6c45983610ce-57f234755dc1",
+      "artifactId": 13592378081,
+      "archiveSha256": "02a42a2a3fc0dbc477a19937ad0a636ef94afd142977fd6ddf4c1a6e2177fba9"
+    }
   }
 }

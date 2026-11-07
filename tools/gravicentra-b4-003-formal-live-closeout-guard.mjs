@@ -595,14 +595,172 @@ export function validatePolicyCaptureCausalSourceSuccessor({record,fileBytes,bas
  return{allowedPaths:paths,comparableFileBytes,frozenPredecessorHead:POLICY_CAPTURE_BASE};
 }
 
-export function validateOwnerDecisionSuccessorSnapshot({control,baseControl,state,baseState,changedPaths,fileBytes,baseSourceBytes,postBaseSourceBytes,catalogBaseSourceBytes,policyCaptureBaseSourceBytes}){
+// Exact transport/evidence successor of the five-owner source commit. This
+// validator never manufactures a receipt, executes a build or performs a write.
+const CAPTURE_RELEASE_BASE='6c45983610ce0d65a5c63bd07659ad968bfe9da3';
+const CAPTURE_RELEASE_KEY='policyCaptureFrontendTransportSuccessor20261107';
+const CAPTURE_RELEASE_CURSOR='b4004PolicyCaptureFrontendSuccessor20261107';
+const CAPTURE_RELEASE_CONTRACT_BLOB='985c1444446e21f17f1eb6462131304e0c6cc413';
+const CAPTURE_RELEASE_PINS={
+  "tools/gravicentra-b4-003-retained-hosting-preflight.mjs": [
+    "f361d6840ebf4cc03657c36a1bf6a03039e5c993",
+    "9b4c166559ab35d9f60cc97d46abb7a3427ed41d"
+  ],
+  "tools/gravicentra-b4-003-retained-hosting-promotion.mjs": [
+    "404b5fd60df843fa6e857aed04bb39e6232b6e6b",
+    "268ad6992763084ed645fa766a6e22c1ccebb32f"
+  ],
+  ".github/workflows/gravicentra-b4-003-executor.yml": [
+    "6344a5b9603390014bed2cf8a564ccb11f542ba4",
+    "d02f776ddb11aa52731b1c6bf0ee29841fad83a0"
+  ],
+  "artifacts/orbit360-recovery/release-control/I6_5_B4_004_E503_ROLLBACK_DURABLE_CERTIFICATE_20261107.json": [
+    null,
+    "541b1560c18607e523fb3ae99ddd1d762476fb93"
+  ],
+  "tools/gravicentra-b4-004-policy-capture-retained-promotion.test.cjs": [
+    null,
+    "ba0e4ec0c48f2956c6653c5daaf8f6d676570fcd"
+  ]
+};
+const CAPTURE_RELEASE_RECEIPTS={
+ transport:ROOT+'I6_5_B4_004_POLICY_CAPTURE_IMMUTABLE_PREVIEW_TRANSPORT_20261107.json',
+ focal:ROOT+'I6_5_B4_004_POLICY_CAPTURE_FOCAL_PREVIEW_QA_20261107.json',
+ preflight:ROOT+'I6_5_B4_004_POLICY_CAPTURE_RETAINED_HOSTING_PREFLIGHT_20261107.json',
+ promoted:ROOT+'I6_5_B4_004_POLICY_CAPTURE_RETAINED_HOSTING_PROMOTED_20261107.json'
+};
+const CAPTURE_RELEASE_PHASES={
+ TRANSPORT_PREPARED_NO_ARTIFACT:null,
+ EXACT_PREVIEW_TRANSPORT_PASS_FOCAL_UAT_PENDING:'EXACT_PREVIEW_TRANSPORT_PASS_FOCAL_UAT_PENDING',
+ FOCAL_PREVIEW_PASS_PREFLIGHT_PENDING:'FRONTEND_SUCCESSOR_FOCAL_PREVIEW_PASS_PREFLIGHT_PENDING',
+ PREFLIGHT_PASS_PROMOTION_NOT_AUTHORIZED:'FRONTEND_SUCCESSOR_FOCAL_PREVIEW_PASS_PREFLIGHT_PENDING',
+ PROMOTION_AUTHORIZED:'FRONTEND_SUCCESSOR_PREVIEW_ACCEPTED_PROMOTION_AUTHORIZED',
+ LIVE_BYTES_PASS_FOCAL_LIVE_PENDING:'FRONTEND_SUCCESSOR_LIVE_BYTES_PASS_FOCAL_LIVE_PENDING'
+};
+const captureReleaseProofKeys=['sourceSha','buildId','runId','artifactId','artifactZipSha256','archiveSha256','previewChannelId','previewUrl','versionName','workflowConclusion','exactServedReadbackPassed','hostedPayloadDigest','productFiles','artifactZipBytes','readbackReceiptArtifactId','readbackReceiptArtifactZipSha256','readbackReceiptPath','readbackReceiptBlobSha','readbackReceiptSha256'];
+const captureReleaseAssertions=['exactArtifactBeforeWrites','originalAbsenceVerified','advisorCommissionAndScopedAudit','clientFormAndAtomicActivity','policyFormAtomicBatchAndDerivedClientState','receiptEditFormAndAtomicPortfolioActivity','freshProductReloadWithoutAdapter'];
+const captureReleaseDigest=value=>typeof value==='string'&&/^[a-f0-9]{64}$/.test(value);
+const captureReleaseGit=value=>typeof value==='string'&&/^[a-f0-9]{40}$/.test(value);
+const captureReleaseId=value=>Number.isSafeInteger(value)&&value>0;
+
+export function validatePolicyCaptureTransportSuccessorSnapshot({record,control,state,fileBytes,baseSourceBytes,baseControl,baseState}){
+ const p=record[CAPTURE_RELEASE_KEY],c=control[CAPTURE_RELEASE_CURSOR],s=state[CAPTURE_RELEASE_CURSOR];
+ if(!p){need(c===undefined&&s===undefined,'CAPTURE_RELEASE_UNDECLARED_CURSOR');return null;}
+ need(captureReleaseGit(CAPTURE_RELEASE_BASE)&&p.schema==='GRAVICENTRA_POLICY_CAPTURE_FRONTEND_TRANSPORT_SUCCESSOR_V1'&&p.sourceBaseHead===CAPTURE_RELEASE_BASE,'CAPTURE_RELEASE_BASE');
+ need(Object.hasOwn(CAPTURE_RELEASE_PHASES,p.phase),'CAPTURE_RELEASE_PHASE');
+ need(p.productSourceChangedAfterBuild===false&&p.rebuildExecuted===false&&p.artifactPatched===false&&p.backendFunctionDeploys===0&&p.rulesWrites===0&&p.authIamChanges===0&&p.realBusinessWrites===0&&p.nextGateAccepted===false&&p.globalProductionAccepted===false,'CAPTURE_RELEASE_BOUNDARY');
+ need(p.sourceContractPath===POLICY_CAPTURE_CONTRACT&&p.sourceContractBlobSha===CAPTURE_RELEASE_CONTRACT_BLOB&&fileBytes[POLICY_CAPTURE_CONTRACT]!=null&&blob(Buffer.from(fileBytes[POLICY_CAPTURE_CONTRACT]))===CAPTURE_RELEASE_CONTRACT_BLOB,'CAPTURE_RELEASE_CONTRACT');
+ need(record[POLICY_CAPTURE_KEY]?.sourceBaseHead===POLICY_CAPTURE_BASE&&record[POLICY_CAPTURE_KEY]?.livePromotionAuthorized===false,'CAPTURE_RELEASE_SOURCE_GRANT');
+ need(baseControl&&baseState&&!Object.hasOwn(baseControl,CAPTURE_RELEASE_CURSOR)&&!Object.hasOwn(baseState,CAPTURE_RELEASE_CURSOR),'CAPTURE_RELEASE_BASE_CURSOR_ABSENT');
+ for(const key of ['b4003ActiveCertificationCursor20261106','b4003CausalFrontendSuccessor20261107'])
+  need(same(control[key],baseControl[key])&&same(state[key],baseState[key]),'CAPTURE_RELEASE_HISTORICAL_CURSOR_'+key);
+ const contract=JSON.parse(Buffer.from(fileBytes[POLICY_CAPTURE_CONTRACT]).toString('utf8'));
+ const rollback=contract.rollback;
+ const prepared=p.phase==='TRANSPORT_PREPARED_NO_ARTIFACT';
+ const transportOnly=p.phase==='EXACT_PREVIEW_TRANSPORT_PASS_FOCAL_UAT_PENDING';
+ const authorized=p.phase==='PROMOTION_AUTHORIZED';
+ const observed=p.phase==='LIVE_BYTES_PASS_FOCAL_LIVE_PENDING';
+ const needsPreflight=['PREFLIGHT_PASS_PROMOTION_NOT_AUTHORIZED','PROMOTION_AUTHORIZED','LIVE_BYTES_PASS_FOCAL_LIVE_PENDING'].includes(p.phase);
+ need(p.productionPromotionAuthorized===authorized,'CAPTURE_RELEASE_AUTHORIZATION');
+ const pins={...CAPTURE_RELEASE_PINS};
+ const requiredRefs=[['transportEvidence','transport',!prepared],['focalEvidence','focal',!prepared&&!transportOnly],['preflightEvidence','preflight',needsPreflight],['promotionEvidence','promoted',observed]];
+ for(const [key,kind,required]of requiredRefs){
+  const ref=p[key];
+  if(!required){need(ref===undefined,'CAPTURE_RELEASE_PREMATURE_'+kind);continue;}
+  need(ref&&ref.path===CAPTURE_RELEASE_RECEIPTS[kind]&&captureReleaseGit(ref.blobSha)&&captureReleaseDigest(ref.sha256)&&captureReleaseId(ref.runId)&&captureReleaseGit(ref.runnerCommit)&&ref.runConclusion==='success','CAPTURE_RELEASE_REFERENCE_'+kind);
+  pins[ref.path]=[null,ref.blobSha];
+ }
+ need(Array.isArray(p.changes)&&p.changes.length===Object.keys(pins).length&&same(p.changes.map(e=>e.path).sort(),Object.keys(pins).sort()),'CAPTURE_RELEASE_EXACT_PATHS');
+ const comparableFileBytes={...fileBytes};
+ for(const e of p.changes){
+  const pin=pins[e.path],current=fileBytes[e.path],before=baseSourceBytes?.[e.path];
+  need(e.previousBlobSha===pin[0]&&e.blobSha===pin[1]&&current!=null&&blob(Buffer.from(current))===pin[1]&&sha(Buffer.from(current))===e.sha256,'CAPTURE_RELEASE_CURRENT_PIN');
+  need(pin[0]===null?before==null:before!=null&&blob(Buffer.from(before))===pin[0],'CAPTURE_RELEASE_BEFORE_PIN');
+  // Only validated predecessor bytes enter the old catalog/e503 validators.
+  if(pin[0]!==null)comparableFileBytes[e.path]=Buffer.from(before);
+ }
+ const json=path=>JSON.parse(Buffer.from(fileBytes[path]).toString('utf8'));
+ const readEvidence=(ref,kind)=>{
+  const bytes=Buffer.from(fileBytes[ref.path]);
+  need(blob(bytes)===ref.blobSha&&sha(bytes)===ref.sha256,'CAPTURE_RELEASE_EVIDENCE_BYTES_'+kind);
+  return json(ref.path);
+ };
+ if(prepared){need(c===undefined&&s===undefined,'CAPTURE_RELEASE_PREPARED_CURSOR_FORBIDDEN');}
+ else{
+  need(c&&s&&same(c,s)&&c.schema==='GRAVICENTRA_B4_004_POLICY_CAPTURE_SUCCESSOR_CURSOR_V1','CAPTURE_RELEASE_CURSOR_PARITY');
+  const expectedKeys=['schema','status','preservedAcceptancePointer','preservedPriorSuccessorPointer','sourceContractPath','sourceContractBlobSha','activeSourceSha','activeBuildId','activeImmutableArtifactId','immutableSuccessor44PreviewReadback','productionPromotionAuthorized','b4003Closed','b4003HistoricalAcceptancePreserved','nextGateAccepted',...(!transportOnly?['focalAuthenticatedAcceptance','formalPreviewAcceptance']:[])];
+  need(same(Object.keys(c).sort(),expectedKeys.sort()),'CAPTURE_RELEASE_CURSOR_KEYS');
+  need(c.status===CAPTURE_RELEASE_PHASES[p.phase]&&c.productionPromotionAuthorized===authorized&&c.b4003Closed===true&&c.b4003HistoricalAcceptancePreserved===true&&c.nextGateAccepted===false,'CAPTURE_RELEASE_CURSOR_STATUS');
+  need(c.preservedAcceptancePointer==='/b4003ActiveCertificationCursor20261106/formalLiveAcceptance'&&c.preservedPriorSuccessorPointer==='/b4003CausalFrontendSuccessor20261107'&&c.sourceContractPath===POLICY_CAPTURE_CONTRACT&&c.sourceContractBlobSha===CAPTURE_RELEASE_CONTRACT_BLOB,'CAPTURE_RELEASE_CURSOR_CONTRACT');
+  const proof=c.immutableSuccessor44PreviewReadback;
+  need(proof&&same(Object.keys(proof).sort(),captureReleaseProofKeys.slice().sort()),'CAPTURE_RELEASE_PROOF_KEYS');
+  need(c.activeSourceSha===CAPTURE_RELEASE_BASE&&proof.sourceSha===CAPTURE_RELEASE_BASE&&typeof proof.buildId==='string'&&proof.buildId.startsWith('gi-i65-b4-'+CAPTURE_RELEASE_BASE.slice(0,12)+'-')&&c.activeBuildId===proof.buildId&&captureReleaseId(proof.artifactId)&&c.activeImmutableArtifactId===proof.artifactId,'CAPTURE_RELEASE_ACTIVE_ARTIFACT');
+  need(captureReleaseId(proof.runId)&&captureReleaseId(proof.artifactZipBytes)&&captureReleaseId(proof.productFiles)&&captureReleaseId(proof.readbackReceiptArtifactId)&&![13549460562,13584456766].includes(proof.artifactId),'CAPTURE_RELEASE_ARTIFACT_ORIGIN');
+  for(const key of ['artifactZipSha256','archiveSha256','hostedPayloadDigest','readbackReceiptArtifactZipSha256','readbackReceiptSha256'])need(captureReleaseDigest(proof[key]),'CAPTURE_RELEASE_DIGEST_'+key);
+  need(proof.previewChannelId==='gi-i65-b4-rc-41765742748'&&proof.previewUrl==='https://ays-orbit-360-lab--gi-i65-b4-rc-41765742748-neoi3u7r.web.app'&&proof.workflowConclusion==='success'&&proof.exactServedReadbackPassed===true,'CAPTURE_RELEASE_EXACT_PREVIEW');
+  const validVersion=/^sites\/ays-orbit-360-lab\/versions\/[A-Za-z0-9_-]+$/.test(proof.versionName||'')&&![VERSION,rollback.versionName].includes(proof.versionName);
+  need(needsPreflight?validVersion:proof.versionName===null||validVersion,'CAPTURE_RELEASE_NEW_VERSION');
+  const tr=p.transportEvidence,t=readEvidence(tr,'transport');
+  need(tr.runnerCommit===CAPTURE_RELEASE_BASE&&tr.runId===proof.runId&&proof.readbackReceiptPath===tr.path&&proof.readbackReceiptBlobSha===tr.blobSha&&proof.readbackReceiptSha256===tr.sha256,'CAPTURE_RELEASE_TRANSPORT_ORIGIN');
+  need(t.schema==='I6_5_B4_003_IMMUTABLE_PREVIEW_RELEASE_BUNDLE_V1','CAPTURE_RELEASE_TRANSPORT_SCHEMA');
+  for(const key of ['sourceSha','buildId','runId','artifactId','artifactZipSha256','archiveSha256','hostedPayloadDigest','productFiles','previewUrl'])need(t[key]===proof[key],'CAPTURE_RELEASE_TRANSPORT_BINDING_'+key);
+  need(t.sourceContract===POLICY_CAPTURE_CONTRACT&&same(t.preservedCurrent42,contract.preservedAcceptance)&&same(t.rollback,rollback),'CAPTURE_RELEASE_TRANSPORT_PRESERVED');
+  need(t.servedArtifactExact===true&&t.fullProductReadback===true&&t.liveLabStable===true&&t.liveAppDomainStable===true&&t.backendFunctionsDeployed===0&&t.dataWrites===0&&t.firestoreRulesWrites===0&&t.authIamChanges===0&&t.productionDeploy===false&&t.authenticatedUat==='PENDING'&&t.productionPromotionAuthorized===false,'CAPTURE_RELEASE_TRANSPORT_SCOPE');
+  if(!transportOnly){
+   const qr=p.focalEvidence,q=readEvidence(qr,'focal');
+   need(qr.runnerCommit===CAPTURE_RELEASE_BASE&&qr.runId===proof.runId&&new RegExp('^'+String(proof.runId)+'_[1-9][0-9]*$').test(q.runId||'')&&q.target===proof.previewUrl,'CAPTURE_RELEASE_QA_ORIGIN');
+   need(q.schema==='GRAVICENTRA_B4_004_POLICY_CAPTURE_FOCAL_PREVIEW_QA_V1'&&q.status==='FOCAL_AUTHENTICATED_UI_PASS','CAPTURE_RELEASE_QA_STATUS');
+   for(const key of ['sourceSha','buildId','artifactId','artifactZipSha256','archiveSha256','hostedPayloadDigest'])need(q.artifact?.[key]===proof[key],'CAPTURE_RELEASE_QA_ARTIFACT_'+key);
+   need(Array.isArray(q.sourceOwners)&&same(q.sourceOwners.map(x=>({path:x.path,blobSha:x.blobSha})),contract.productChanges.map(x=>({path:x.path,blobSha:x.afterBlobSha}))),'CAPTURE_RELEASE_QA_OWNERS');
+   need(q.assertions&&same(Object.keys(q.assertions).sort(),captureReleaseAssertions.slice().sort())&&captureReleaseAssertions.every(k=>q.assertions[k]===true),'CAPTURE_RELEASE_QA_ASSERTIONS');
+   need(q.businessWrites===0&&q.authAccountsCreated===0&&q.membershipWrites===0&&q.productSourceChanged===false&&q.backendChanged===false&&q.syntheticFinalAbsent===true&&Array.isArray(q.errors)&&q.errors.length===0&&q.pageErrorCount===0&&q.consoleErrorCount===0&&q.httpErrorCount===0,'CAPTURE_RELEASE_QA_BOUNDARY');
+   need(q.actor?.existingPrincipal===true&&String(q.actor.activeRole||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().toLowerCase()==='direccion'&&captureReleaseDigest(q.actor.uidSha256),'CAPTURE_RELEASE_QA_ACTOR');
+   need(q.cleanup?.method==='EXACT_PREDECLARED_IDS_AND_CAPTURED_SERVER_RECEIPTS'&&q.cleanup.compareAndDeleteTransaction===true&&q.cleanup.verifiedAbsent===true&&q.cleanup.actorTimeWindowQuery===false&&q.cleanup.prefixDelete===false,'CAPTURE_RELEASE_QA_CLEANUP');
+   const acceptance=c.focalAuthenticatedAcceptance,seal=c.formalPreviewAcceptance;
+   need(acceptance?.status==='PASS'&&acceptance.sourceSha===proof.sourceSha&&acceptance.buildId===proof.buildId&&acceptance.artifactId===proof.artifactId&&same(acceptance.evidencePins,[{path:qr.path,blobSha:qr.blobSha}])&&acceptance.realBusinessWrites===0&&acceptance.exactSyntheticCleanupVerified===true&&acceptance.syntheticIdentityAdaptationDeclared===true,'CAPTURE_RELEASE_FOCAL_REFERENCE');
+   need(same(Object.keys(acceptance).sort(),['status','sourceSha','buildId','artifactId','evidencePins','realBusinessWrites','exactSyntheticCleanupVerified','syntheticIdentityAdaptationDeclared'].sort()),'CAPTURE_RELEASE_FOCAL_KEYS');
+   need(same(seal,{status:'LATEST_APPROVED_VERSION_PREVIEW_PASS',sourceSha:proof.sourceSha,buildId:proof.buildId,artifactId:proof.artifactId,archiveSha256:proof.archiveSha256}),'CAPTURE_RELEASE_FOCAL_SEAL');
+  }
+  if(needsPreflight){
+   const ref=p.preflightEvidence,r=readEvidence(ref,'preflight');
+   need(String(r.runId)===String(ref.runId)&&r.runnerCommit===ref.runnerCommit,'CAPTURE_RELEASE_PREFLIGHT_ORIGIN');
+   need(r.schema==='B4_003_RETAINED_HOSTING_PREFLIGHT_V1'&&r.status==='EXACT_RETAINED_ARTIFACT_HOSTING_PREFLIGHT_PASS'&&r.failedCheckCount===0&&r.b4003Closed===true&&r.b4003HistoricalAcceptancePreserved===true,'CAPTURE_RELEASE_PREFLIGHT_STATUS');
+   const names=['exact_candidate_and_archive','artifact_run_metadata','reuse_existing_service_account_for_gets','live_before_snapshot','preview_version_and_all_served_bytes','certified_rollback_version_and_all_served_bytes','live_unchanged_after_readonly_preflight'];
+   need(Array.isArray(r.checks)&&r.checks.length===7&&same(r.checks.map(x=>x.name).sort(),names.sort())&&r.checks.every(x=>x.status==='PASS'),'CAPTURE_RELEASE_SEVEN_PREFLIGHT_CHECKS');
+   for(const key of ['sourceSha','buildId','runId','artifactId','artifactZipSha256','archiveSha256','previewUrl'])need(r.binding?.[key]===proof[key],'CAPTURE_RELEASE_PREFLIGHT_BINDING_'+key);
+   need(r.binding?.site==='ays-orbit-360-lab'&&r.binding.projectId==='ays-orbit-360-lab'&&r.previewVersionName===proof.versionName&&r.rollbackVersionName===rollback.versionName&&r.liveVersionName===rollback.versionName,'CAPTURE_RELEASE_PREFLIGHT_VERSIONS');
+   need(r.control?.recordedB4003Closed===true&&r.control.recordedPromotionAuthorization===false,'CAPTURE_RELEASE_PREFLIGHT_NO_PRIOR_AUTHORIZATION');
+   need(r.scope?.remoteReadsOnly===true&&r.scope.buildExecuted===false&&r.scope.hostingMutation===false&&r.scope.functionsDeployment===false&&r.scope.rulesChanged===false&&r.scope.authConfigurationChanged===false&&r.scope.dataWrites===0,'CAPTURE_RELEASE_PREFLIGHT_SCOPE');
+   const pv=r.checks.find(x=>x.name==='preview_version_and_all_served_bytes').evidence;
+   const rb=r.checks.find(x=>x.name==='certified_rollback_version_and_all_served_bytes').evidence;
+   need(pv?.digest===proof.hostedPayloadDigest&&pv.fileCount===proof.productFiles,'CAPTURE_RELEASE_PREFLIGHT_PAYLOAD');
+   need(rb?.rawBytesReadInThisRun===true&&rb.rawPayloadDigestVerified===true&&rb.digest===rollback.hostedPayloadDigest&&rb.fileCount===rollback.productFiles,'CAPTURE_RELEASE_FRESH_E503_ROLLBACK');
+  }
+  if(observed){
+   const ref=p.promotionEvidence,r=readEvidence(ref,'promoted');
+   need(String(r.runId)===String(ref.runId)&&r.runnerCommit===ref.runnerCommit,'CAPTURE_RELEASE_PROMOTION_ORIGIN');
+   need(r.schema==='B4_003_EXACT_HOSTING_PROMOTION_V1'&&r.status==='EXACT_HOSTING_VERSION_PROMOTED_LIVE_BYTES_PASS_FUNCTIONAL_LIVE_PENDING'&&r.promotionAttempted===true&&r.rollbackAttempted===false&&r.formalLiveAcceptanceGranted===false&&r.b4003Closed===true&&r.b4003HistoricalAcceptancePreserved===true,'CAPTURE_RELEASE_PROMOTION_STATUS');
+   for(const key of ['sourceSha','buildId','artifactId','artifactZipSha256','archiveSha256'])need(r.binding?.[key]===proof[key],'CAPTURE_RELEASE_PROMOTION_BINDING_'+key);
+   need(r.previewVersionName===proof.versionName&&r.rollbackVersionName===rollback.versionName&&r.liveBeforeVersionName===rollback.versionName&&r.promotionMethod==='POST_EXISTING_VERSION_RELEASE_NO_NEW_VERSION'&&r.promotionTargetVersionName===proof.versionName,'CAPTURE_RELEASE_PROMOTION_METHOD');
+   need(r.liveAfter?.channel?.versionName===proof.versionName&&r.liveAfter.hostedFileCount===proof.productFiles&&r.liveAfter.hostedPayloadDigest===proof.hostedPayloadDigest&&r.liveAfter.nonTargetSentinelsUnchanged===true&&r.functionsDeployed===0&&r.rulesChanged===false&&r.authConfigurationChanged===false&&r.dataWrites===0,'CAPTURE_RELEASE_PROMOTION_READBACK');
+  }
+ }
+ const comparableControl=clone(control),comparableState=clone(state);
+ delete comparableControl[CAPTURE_RELEASE_CURSOR];delete comparableState[CAPTURE_RELEASE_CURSOR];
+ return {comparableFileBytes,comparableControl,comparableState,allowedPaths:Object.keys(pins),sourceBaseHead:CAPTURE_RELEASE_BASE,phase:p.phase};
+}
+
+export function validateOwnerDecisionSuccessorSnapshot({control,baseControl,state,baseState,changedPaths,fileBytes,baseSourceBytes,postBaseSourceBytes,catalogBaseSourceBytes,policyCaptureBaseSourceBytes,captureReleaseBaseSourceBytes,captureReleaseBaseControl,captureReleaseBaseState}){
  const p=control[OWNER_KEY];
  need(p&&p.authorityBaseHead===OWNER_BASE,'OWNER_BASE_BINDING');
  const bytes=path=>{need(fileBytes[path]!=null,'OWNER_FILE_MISSING');return Buffer.from(fileBytes[path]);};
  need(p.path===OWNER_FREEZE&&p.planPath===OWNER_PLAN&&blob(bytes(OWNER_FREEZE))===p.blobSha&&blob(bytes(OWNER_PLAN))===p.planBlobSha,'OWNER_DOCUMENT_HASH');
  const r=JSON.parse(bytes(OWNER_FREEZE).toString('utf8'));
- const captureExecution=validatePolicyCaptureCausalSourceSuccessor({record:r,fileBytes,baseSourceBytes:policyCaptureBaseSourceBytes});
- const predecessorFileBytes=captureExecution?.comparableFileBytes||fileBytes;
+ const captureRelease=validatePolicyCaptureTransportSuccessorSnapshot({record:r,control,state,fileBytes,baseSourceBytes:captureReleaseBaseSourceBytes,baseControl:captureReleaseBaseControl,baseState:captureReleaseBaseState});
+ if(captureRelease){control=captureRelease.comparableControl;state=captureRelease.comparableState;}
+ const sourceFileBytes=captureRelease?.comparableFileBytes||fileBytes;
+ const captureExecution=validatePolicyCaptureCausalSourceSuccessor({record:r,fileBytes:sourceFileBytes,baseSourceBytes:policyCaptureBaseSourceBytes});
+ const predecessorFileBytes=captureExecution?.comparableFileBytes||sourceFileBytes;
  const readerExecution=validateReaderDeploymentSuccessorSnapshot({record:r,fileBytes:predecessorFileBytes,baseSourceBytes:postBaseSourceBytes});
  const catalogExecution=validateCatalogTransportSuccessorSnapshot({record:r,fileBytes:predecessorFileBytes,baseSourceBytes:catalogBaseSourceBytes});
  const promotionExecution=validateFrontendPromotionSuccessorSnapshot({record:r,control,state,fileBytes:catalogExecution?.comparableFileBytes||predecessorFileBytes,baseSourceBytes:postBaseSourceBytes});
@@ -610,7 +768,7 @@ export function validateOwnerDecisionSuccessorSnapshot({control,baseControl,stat
  const reconciliationExecution=validateReconciliationReadOnlySuccessorSnapshot({record:r,control,state,fileBytes:predecessorFileBytes,baseSourceBytes:postBaseSourceBytes});
  if(reconciliationExecution){control=reconciliationExecution.comparableControl;state=reconciliationExecution.comparableState;}
  const candidateArchives=validateReviewedDeferredCandidateArchives({record:r,fileBytes});
- const postAllowedPaths=[...(readerExecution?.allowedPaths||[]),...(promotionExecution?.allowedPaths||[]),...(reconciliationExecution?.allowedPaths||[]),...(catalogExecution?.allowedPaths||[]),...candidateArchives,...(captureExecution?.allowedPaths||[])];
+ const postAllowedPaths=[...(readerExecution?.allowedPaths||[]),...(promotionExecution?.allowedPaths||[]),...(reconciliationExecution?.allowedPaths||[]),...(catalogExecution?.allowedPaths||[]),...candidateArchives,...(captureExecution?.allowedPaths||[]),...(captureRelease?.allowedPaths||[])];
  const team=validateEquipoCausalSourceSuccessor({record:r,pointer:p,fileBytes:readerExecution?.comparableFileBytes||predecessorFileBytes,baseSourceBytes});
  const permitted=new Set([ROOT+'CONTROL_PLANE.json',STATE,OWNER_FREEZE,OWNER_PLAN,SELF,OWNER_TEST,...(team?.allowedPaths||[]),...postAllowedPaths]);
  need(changedPaths.every(x=>permitted.has(x)),'OWNER_UNDECLARED_PATH');
@@ -646,6 +804,9 @@ function verifyOwnerDecisionSuccessor(after){
  need(git('merge-base',OWNER_BASE,'HEAD')===OWNER_BASE,'OWNER_BASE_NOT_ANCESTOR');
  const record=read(OWNER_FREEZE),sourceProof=record.equipoCausalSourceCorrection;
  const captureProof=record[POLICY_CAPTURE_KEY],captureEntries=captureProof?.changes||[];
+ const releaseProof=record[CAPTURE_RELEASE_KEY],releaseEntries=releaseProof?.changes||[];
+ const releasePermitted=new Set([...Object.keys(CAPTURE_RELEASE_PINS),...Object.values(CAPTURE_RELEASE_RECEIPTS)]);
+ need(releaseEntries.every(e=>releasePermitted.has(e.path)),'CAPTURE_RELEASE_UNDECLARED_PATH');
  need(captureEntries.every(e=>Object.hasOwn(POLICY_CAPTURE_PINS,e.path)),'POLICY_CAPTURE_UNDECLARED_PATH');
  const frozenProductEnd=captureProof?POLICY_CAPTURE_BASE:'HEAD';
  const extraPaths=sourceProof?.changes?.map(x=>x.path)||[];
@@ -662,8 +823,21 @@ function verifyOwnerDecisionSuccessor(after){
  need(Array.isArray(candidateEntries)&&candidateEntries.every(e=>Object.hasOwn(REVIEWED_CANDIDATE_ARCHIVES,e.path)),'REVIEWED_CANDIDATE_UNDECLARED_PATH');
  const catalogActivationPresent=fs.existsSync(CATALOG_ACTIVATION);
  const activationPresent=fs.existsSync(READER_DEPLOY_ACTIVATION);
- const paths=[...new Set([ROOT+'CONTROL_PLANE.json',STATE,OWNER_FREEZE,OWNER_PLAN,SELF,OWNER_TEST,OWNER_V6,...extraPaths,...postEntries.map(x=>x.path),...(activationPresent?[READER_DEPLOY_ACTIVATION]:[]),...catalogEntries.map(e=>e.path),...(catalogActivationPresent?[CATALOG_ACTIVATION]:[]),...candidateEntries.map(e=>e.path),...captureEntries.map(e=>e.path),...(captureProof?Object.keys(POLICY_CAPTURE_PRESERVED):[])])];
- const fileBytes={},baseSourceBytes={},postBaseSourceBytes={},catalogBaseSourceBytes={},policyCaptureBaseSourceBytes={};
+ const paths=[...new Set([ROOT+'CONTROL_PLANE.json',STATE,OWNER_FREEZE,OWNER_PLAN,SELF,OWNER_TEST,OWNER_V6,...extraPaths,...postEntries.map(x=>x.path),...(activationPresent?[READER_DEPLOY_ACTIVATION]:[]),...catalogEntries.map(e=>e.path),...(catalogActivationPresent?[CATALOG_ACTIVATION]:[]),...candidateEntries.map(e=>e.path),...captureEntries.map(e=>e.path),...releaseEntries.map(e=>e.path),...(captureProof?Object.keys(POLICY_CAPTURE_PRESERVED):[])])];
+ const fileBytes={},baseSourceBytes={},postBaseSourceBytes={},catalogBaseSourceBytes={},policyCaptureBaseSourceBytes={},captureReleaseBaseSourceBytes={};
+ let captureReleaseBaseControl,captureReleaseBaseState;
+ if(releaseProof){
+  need(captureReleaseGit(CAPTURE_RELEASE_BASE)&&releaseProof.sourceBaseHead===CAPTURE_RELEASE_BASE&&git('merge-base',CAPTURE_RELEASE_BASE,'HEAD')===CAPTURE_RELEASE_BASE,'CAPTURE_RELEASE_BASE_ANCESTRY');
+  need(!git('diff','--name-only',CAPTURE_RELEASE_BASE,'HEAD','--','functions','orbit360-platform',':(exclude)orbit360-platform/docs/**','tools/gravicentra-i6-1-preview-package.mjs',POLICY_CAPTURE_CONTRACT),'CAPTURE_RELEASE_PRODUCT_OR_BUILD_CHANGED');
+  const predecessorRecord=old(CAPTURE_RELEASE_BASE,OWNER_FREEZE);
+  need(!predecessorRecord[CAPTURE_RELEASE_KEY]&&same(record[POLICY_CAPTURE_KEY],predecessorRecord[POLICY_CAPTURE_KEY]),'CAPTURE_RELEASE_SOURCE_GRANT_CHANGED');
+  captureReleaseBaseControl=old(CAPTURE_RELEASE_BASE,ROOT+'CONTROL_PLANE.json');
+  captureReleaseBaseState=old(CAPTURE_RELEASE_BASE,STATE);
+  for(const e of releaseEntries){
+   if(e.previousBlobSha===null){need(!git('ls-tree',CAPTURE_RELEASE_BASE,'--',e.path),'CAPTURE_RELEASE_NEW_PATH_EXISTS');captureReleaseBaseSourceBytes[e.path]=null;}
+   else captureReleaseBaseSourceBytes[e.path]=execFileSync('git',['show',CAPTURE_RELEASE_BASE+':'+e.path]);
+  }
+ }
  if(captureProof){
   need(captureProof.sourceBaseHead===POLICY_CAPTURE_BASE&&git('merge-base',POLICY_CAPTURE_BASE,'HEAD')===POLICY_CAPTURE_BASE,'POLICY_CAPTURE_BASE_ANCESTRY');
   need(!git('diff','--name-only',POLICY_CAPTURE_BASE,'HEAD','--','functions'),'POLICY_CAPTURE_BACKEND_CHANGED');
@@ -714,7 +888,7 @@ function verifyOwnerDecisionSuccessor(after){
  return validateOwnerDecisionSuccessorSnapshot({
   control:after,baseControl:old(OWNER_BASE,ROOT+'CONTROL_PLANE.json'),
   state:read(STATE),baseState:old(OWNER_BASE,STATE),
-  changedPaths:git('diff','--name-only',OWNER_BASE,'HEAD').split(/\r?\n/).filter(Boolean),fileBytes,baseSourceBytes,postBaseSourceBytes,catalogBaseSourceBytes,policyCaptureBaseSourceBytes
+  changedPaths:git('diff','--name-only',OWNER_BASE,'HEAD').split(/\r?\n/).filter(Boolean),fileBytes,baseSourceBytes,postBaseSourceBytes,catalogBaseSourceBytes,policyCaptureBaseSourceBytes,captureReleaseBaseSourceBytes,captureReleaseBaseControl,captureReleaseBaseState
  });
 }
 

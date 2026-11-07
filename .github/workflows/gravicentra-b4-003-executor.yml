@@ -83,7 +83,7 @@ concurrency:
 jobs:
   b4-003-renewals-cancelations-preview:
     # Both exact retained requests skip the legacy Preview build/deploy job.
-    if: "(!(github.event_name == 'push' && ((github.event.head_commit.message == 'test(b4-003): retained artifact Hosting preflight' || (github.event.head_commit.message == 'test(b4-003): causal frontend retained artifact preflight' || startsWith(github.event.head_commit.message, format('{0}{1}', 'test(b4-003): causal frontend retained artifact preflight', fromJSON('\"\\n\"')))) || (github.event.head_commit.message == 'release(b4-003): promote causal frontend retained version' || startsWith(github.event.head_commit.message, format('{0}{1}', 'release(b4-003): promote causal frontend retained version', fromJSON('\"\\n\"'))))) || (github.event.head_commit.message == 'test(b4-003): certify retained rollback in existing Preview' || github.event.head_commit.message == 'release(b4-003): promote exact retained Hosting version') || github.event.head_commit.message == 'test(b4-003): read three synthetic archive states' || github.event.head_commit.message == 'test(b4-003): create one synthetic insurer LIVE' || github.event.head_commit.message == 'test(b4-003): cleanup one synthetic insurer LIVE' || github.event.head_commit.message == 'test(b4-003): complete one synthetic insurer LIVE'))) && !(github.event_name == 'push' && ((github.event.head_commit.message == 'test(b4-003): exact LIVE tenant catalogs source readback' || startsWith(github.event.head_commit.message, format('{0}{1}', 'test(b4-003): exact LIVE tenant catalogs source readback', fromJSON('\"\\n\"')))) || github.event.head_commit.message == 'deploy(b4-003): exact isolated LIVE tenant catalogs canonical successor'))"
+    if: "((!(github.event_name == 'push' && ((github.event.head_commit.message == 'test(b4-003): retained artifact Hosting preflight' || (github.event.head_commit.message == 'test(b4-003): causal frontend retained artifact preflight' || startsWith(github.event.head_commit.message, format('{0}{1}', 'test(b4-003): causal frontend retained artifact preflight', fromJSON('\"\\n\"')))) || (github.event.head_commit.message == 'release(b4-003): promote causal frontend retained version' || startsWith(github.event.head_commit.message, format('{0}{1}', 'release(b4-003): promote causal frontend retained version', fromJSON('\"\\n\"'))))) || (github.event.head_commit.message == 'test(b4-003): certify retained rollback in existing Preview' || github.event.head_commit.message == 'release(b4-003): promote exact retained Hosting version') || github.event.head_commit.message == 'test(b4-003): read three synthetic archive states' || github.event.head_commit.message == 'test(b4-003): create one synthetic insurer LIVE' || github.event.head_commit.message == 'test(b4-003): cleanup one synthetic insurer LIVE' || github.event.head_commit.message == 'test(b4-003): complete one synthetic insurer LIVE'))) && !(github.event_name == 'push' && ((github.event.head_commit.message == 'test(b4-003): exact LIVE tenant catalogs source readback' || startsWith(github.event.head_commit.message, format('{0}{1}', 'test(b4-003): exact LIVE tenant catalogs source readback', fromJSON('\"\\n\"')))) || github.event.head_commit.message == 'deploy(b4-003): exact isolated LIVE tenant catalogs canonical successor'))) && !(github.event_name == 'push' && ((github.event.head_commit.message == 'test(b4-004): policy capture retained artifact preflight' || startsWith(github.event.head_commit.message, format('{0}{1}', 'test(b4-004): policy capture retained artifact preflight', fromJSON('\"\\n\"')))) || (github.event.head_commit.message == 'release(b4-004): promote policy capture retained version' || startsWith(github.event.head_commit.message, format('{0}{1}', 'release(b4-004): promote policy capture retained version', fromJSON('\"\\n\"'))))))"
     runs-on: ubuntu-24.04
     timeout-minutes: 45
     env:
@@ -3787,7 +3787,7 @@ jobs:
   # Product source stays pinned and no artifact is built. Only the exact release
   # request can select an existing version for LIVE after the strict CP gates.
   b4-003-retained-hosting-preflight:
-    if: "github.event_name == 'push' && ((github.event.head_commit.message == 'test(b4-003): retained artifact Hosting preflight' || (github.event.head_commit.message == 'test(b4-003): causal frontend retained artifact preflight' || startsWith(github.event.head_commit.message, format('{0}{1}', 'test(b4-003): causal frontend retained artifact preflight', fromJSON('\"\\n\"')))) || (github.event.head_commit.message == 'release(b4-003): promote causal frontend retained version' || startsWith(github.event.head_commit.message, format('{0}{1}', 'release(b4-003): promote causal frontend retained version', fromJSON('\"\\n\"'))))) || (github.event.head_commit.message == 'test(b4-003): certify retained rollback in existing Preview' || github.event.head_commit.message == 'release(b4-003): promote exact retained Hosting version'))"
+    if: "(github.event_name == 'push' && ((github.event.head_commit.message == 'test(b4-003): retained artifact Hosting preflight' || (github.event.head_commit.message == 'test(b4-003): causal frontend retained artifact preflight' || startsWith(github.event.head_commit.message, format('{0}{1}', 'test(b4-003): causal frontend retained artifact preflight', fromJSON('\"\\n\"')))) || (github.event.head_commit.message == 'release(b4-003): promote causal frontend retained version' || startsWith(github.event.head_commit.message, format('{0}{1}', 'release(b4-003): promote causal frontend retained version', fromJSON('\"\\n\"'))))) || (github.event.head_commit.message == 'test(b4-003): certify retained rollback in existing Preview' || github.event.head_commit.message == 'release(b4-003): promote exact retained Hosting version'))) || (github.event_name == 'push' && ((github.event.head_commit.message == 'test(b4-004): policy capture retained artifact preflight' || startsWith(github.event.head_commit.message, format('{0}{1}', 'test(b4-004): policy capture retained artifact preflight', fromJSON('\"\\n\"')))) || (github.event.head_commit.message == 'release(b4-004): promote policy capture retained version' || startsWith(github.event.head_commit.message, format('{0}{1}', 'release(b4-004): promote policy capture retained version', fromJSON('\"\\n\"'))))))"
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     permissions:
@@ -3797,8 +3797,8 @@ jobs:
       PROJECT_ID: ays-orbit-360-lab
       HOSTING_SITE: ays-orbit-360-lab
       CONTROL: artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json
-      B4_CAUSAL_FRONTEND_SUCCESSOR: "${{ ((github.event.head_commit.message == 'test(b4-003): causal frontend retained artifact preflight' || startsWith(github.event.head_commit.message, format('{0}{1}', 'test(b4-003): causal frontend retained artifact preflight', fromJSON('\"\\n\"')))) || (github.event.head_commit.message == 'release(b4-003): promote causal frontend retained version' || startsWith(github.event.head_commit.message, format('{0}{1}', 'release(b4-003): promote causal frontend retained version', fromJSON('\"\\n\"'))))) && 'current42-frontend-20261107' || '' }}"
-      B4_CURSOR_KEY: "${{ ((github.event.head_commit.message == 'test(b4-003): causal frontend retained artifact preflight' || startsWith(github.event.head_commit.message, format('{0}{1}', 'test(b4-003): causal frontend retained artifact preflight', fromJSON('\"\\n\"')))) || (github.event.head_commit.message == 'release(b4-003): promote causal frontend retained version' || startsWith(github.event.head_commit.message, format('{0}{1}', 'release(b4-003): promote causal frontend retained version', fromJSON('\"\\n\"'))))) && 'b4003CausalFrontendSuccessor20261107' || 'b4003ActiveCertificationCursor20261106' }}"
+      B4_CAUSAL_FRONTEND_SUCCESSOR: "${{ ((github.event.head_commit.message == 'test(b4-004): policy capture retained artifact preflight' || startsWith(github.event.head_commit.message, format('{0}{1}', 'test(b4-004): policy capture retained artifact preflight', fromJSON('\"\\n\"')))) || (github.event.head_commit.message == 'release(b4-004): promote policy capture retained version' || startsWith(github.event.head_commit.message, format('{0}{1}', 'release(b4-004): promote policy capture retained version', fromJSON('\"\\n\"'))))) && 'policy-capture-20261107' || (((github.event.head_commit.message == 'test(b4-003): causal frontend retained artifact preflight' || startsWith(github.event.head_commit.message, format('{0}{1}', 'test(b4-003): causal frontend retained artifact preflight', fromJSON('\"\\n\"')))) || (github.event.head_commit.message == 'release(b4-003): promote causal frontend retained version' || startsWith(github.event.head_commit.message, format('{0}{1}', 'release(b4-003): promote causal frontend retained version', fromJSON('\"\\n\"'))))) && 'current42-frontend-20261107' || '') }}"
+      B4_CURSOR_KEY: "${{ ((github.event.head_commit.message == 'test(b4-004): policy capture retained artifact preflight' || startsWith(github.event.head_commit.message, format('{0}{1}', 'test(b4-004): policy capture retained artifact preflight', fromJSON('\"\\n\"')))) || (github.event.head_commit.message == 'release(b4-004): promote policy capture retained version' || startsWith(github.event.head_commit.message, format('{0}{1}', 'release(b4-004): promote policy capture retained version', fromJSON('\"\\n\"'))))) && 'b4004PolicyCaptureFrontendSuccessor20261107' || (((github.event.head_commit.message == 'test(b4-003): causal frontend retained artifact preflight' || startsWith(github.event.head_commit.message, format('{0}{1}', 'test(b4-003): causal frontend retained artifact preflight', fromJSON('\"\\n\"')))) || (github.event.head_commit.message == 'release(b4-003): promote causal frontend retained version' || startsWith(github.event.head_commit.message, format('{0}{1}', 'release(b4-003): promote causal frontend retained version', fromJSON('\"\\n\"'))))) && 'b4003CausalFrontendSuccessor20261107' || 'b4003ActiveCertificationCursor20261106') }}"
       # Evidence-bound candidate 42. Replace only from the next candidate's
       # actual successful run, artifact metadata and immutable readback receipt.
       RETAINED_SOURCE_SHA: 857f1222f360a42a06e012810a1c01bce155a26f
@@ -3857,6 +3857,33 @@ jobs:
           for(const[k,v]of Object.entries(values)){if(v===null||v===undefined||/[\r\n]/.test(String(v)))throw Error('CAUSAL_BINDING_INVALID_'+k);fs.appendFileSync(process.env.GITHUB_ENV,k+'='+v+'\n');}
           NODE
 
+      - name: Bind policy capture successor from exact immutable proof and preserved e503 rollback
+        if: env.B4_CAUSAL_FRONTEND_SUCCESSOR == 'policy-capture-20261107'
+        run: |
+          set -euo pipefail
+          node --check tools/gravicentra-b4-003-retained-hosting-preflight.mjs
+          node --check tools/gravicentra-b4-003-retained-hosting-promotion.mjs
+          node --test tools/gravicentra-b4-003-causal-frontend-retained-promotion.test.cjs
+          node --test tools/gravicentra-b4-004-policy-capture-retained-promotion.test.cjs
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const cp=JSON.parse(fs.readFileSync(process.env.CONTROL,'utf8'));
+          const c=cp.b4004PolicyCaptureFrontendSuccessor20261107;
+          const r=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/I6_5_B4_004_POLICY_CAPTURE_CAUSAL_FRONTEND_SUCCESSOR_CONTRACT_20261107.json','utf8')).rollback;
+          if(!c||c.b4003Closed!==true||c.b4003HistoricalAcceptancePreserved!==true||c.nextGateAccepted!==false)throw Error('CAPTURE_CURSOR_REQUIRED_NO_GLOBAL_ACCEPTANCE');
+          const proofs=Object.entries(c).filter(([k,v])=>/^immutableSuccessor\d+PreviewReadback/.test(k)&&v&&v.sourceSha===c.activeSourceSha&&Number(v.artifactId)===Number(c.activeImmutableArtifactId));
+          if(proofs.length!==1)throw Error('CAPTURE_EXACT_REAL_ARTIFACT_PROOF_REQUIRED');
+          const p=proofs[0][1];
+          const knownVersion=typeof p.versionName==='string'&&/^sites\/ays-orbit-360-lab\/versions\/[A-Za-z0-9_-]+$/.test(p.versionName);
+          if(p.versionName!=null&&!knownVersion)throw Error('CAPTURE_PREVIEW_VERSION_INVALID');
+          if(c.productionPromotionAuthorized===true&&!knownVersion)throw Error('CAPTURE_VERSION_PIN_REQUIRED_BEFORE_PROMOTION');
+          if(p.workflowConclusion!=='success'||p.exactServedReadbackPassed!==true||!/^[a-f0-9]{40}$/.test(p.sourceSha)||!Number.isSafeInteger(Number(p.artifactId))||Number(p.artifactId)<=0||!Number.isSafeInteger(Number(p.runId))||Number(p.runId)<=0)throw Error('CAPTURE_REAL_ARTIFACT_INVALID');
+          if(!/^[a-f0-9]{64}$/.test(p.artifactZipSha256)||!/^[a-f0-9]{64}$/.test(p.archiveSha256)||!/^[a-f0-9]{64}$/.test(p.hostedPayloadDigest))throw Error('CAPTURE_DIGEST_VERSION_REQUIRED');
+          if(p.previewChannelId!=='gi-i65-b4-rc-41765742748'||p.previewUrl!=='https://ays-orbit-360-lab--gi-i65-b4-rc-41765742748-neoi3u7r.web.app')throw Error('CAPTURE_EXISTING_CHANNEL_REQUIRED');
+          const values={RETAINED_SOURCE_SHA:p.sourceSha,RETAINED_BUILD_ID:p.buildId,RETAINED_RUN_ID:p.runId,RETAINED_ARTIFACT_ID:p.artifactId,RETAINED_ZIP_SHA256:p.artifactZipSha256,RETAINED_TAR_SHA256:p.archiveSha256,RETAINED_PREVIEW_CHANNEL:p.previewChannelId,RETAINED_PREVIEW_URL:p.previewUrl,ROLLBACK_SOURCE_SHA:r.sourceSha,ROLLBACK_BUILD_ID:r.buildId,ROLLBACK_CHANNEL:'live',ROLLBACK_FILE_COUNT:r.productFiles,ROLLBACK_PAYLOAD_SHA256:r.hostedPayloadDigest,PROMOTE_EXPECTED_PREVIEW_VERSION_NAME:knownVersion?p.versionName:'',PROMOTE_EXPECTED_ROLLBACK_VERSION_NAME:r.versionName,PROMOTE_EXPECTED_LIVE_BEFORE_VERSION_NAME:r.versionName,FORMAL_PREVIEW_POINTER:'/b4004PolicyCaptureFrontendSuccessor20261107/formalPreviewAcceptance'};
+          for(const[k,v]of Object.entries(values)){if(v===null||v===undefined||/[\r\n]/.test(String(v)))throw Error('CAPTURE_BINDING_INVALID_'+k);fs.appendFileSync(process.env.GITHUB_ENV,k+'='+v+'\n');}
+          NODE
+
       - name: Initialize retained read-only receipt
         run: |
           set -euo pipefail
@@ -3877,7 +3904,7 @@ jobs:
             'runId':os.environ['GITHUB_RUN_ID'],
             'remoteReadsOnly':True,
             'productionPromotionAuthorizedByThisReceipt':False,
-            'b4003Closed':os.environ.get('B4_CAUSAL_FRONTEND_SUCCESSOR')=='current42-frontend-20261107'
+            'b4003Closed':os.environ.get('B4_CAUSAL_FRONTEND_SUCCESSOR') in ('current42-frontend-20261107','policy-capture-20261107')
           },indent=2)+'\n')
           PY
 
@@ -3963,7 +3990,7 @@ jobs:
 
       - name: Promote the exact retained version to LIVE with conditional verified rollback
         id: retained_promote
-        if: "success() && github.event_name == 'push' && (github.event.head_commit.message == 'release(b4-003): promote exact retained Hosting version' || (github.event.head_commit.message == 'release(b4-003): promote causal frontend retained version' || startsWith(github.event.head_commit.message, format('{0}{1}', 'release(b4-003): promote causal frontend retained version', fromJSON('\"\\n\"')))))"
+        if: "success() && github.event_name == 'push' && ((github.event.head_commit.message == 'release(b4-004): promote policy capture retained version' || startsWith(github.event.head_commit.message, format('{0}{1}', 'release(b4-004): promote policy capture retained version', fromJSON('\"\\n\"')))) || github.event.head_commit.message == 'release(b4-003): promote exact retained Hosting version' || (github.event.head_commit.message == 'release(b4-003): promote causal frontend retained version' || startsWith(github.event.head_commit.message, format('{0}{1}', 'release(b4-003): promote causal frontend retained version', fromJSON('\"\\n\"')))))"
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -3971,7 +3998,7 @@ jobs:
           node tools/gravicentra-b4-003-retained-hosting-promotion.mjs
 
       - name: Fail closed unless exact retained LIVE promotion and raw readback completed
-        if: "always() && github.event_name == 'push' && (github.event.head_commit.message == 'release(b4-003): promote exact retained Hosting version' || (github.event.head_commit.message == 'release(b4-003): promote causal frontend retained version' || startsWith(github.event.head_commit.message, format('{0}{1}', 'release(b4-003): promote causal frontend retained version', fromJSON('\"\\n\"'))))) && steps.retained_promote.outcome != 'success'"
+        if: "always() && github.event_name == 'push' && ((github.event.head_commit.message == 'release(b4-004): promote policy capture retained version' || startsWith(github.event.head_commit.message, format('{0}{1}', 'release(b4-004): promote policy capture retained version', fromJSON('\"\\n\"')))) || github.event.head_commit.message == 'release(b4-003): promote exact retained Hosting version' || (github.event.head_commit.message == 'release(b4-003): promote causal frontend retained version' || startsWith(github.event.head_commit.message, format('{0}{1}', 'release(b4-003): promote causal frontend retained version', fromJSON('\"\\n\"'))))) && steps.retained_promote.outcome != 'success'"
         run: |
           echo "EXACT_RETAINED_LIVE_PROMOTION_OR_RAW_READBACK_NOT_SUCCESS"
           exit 1

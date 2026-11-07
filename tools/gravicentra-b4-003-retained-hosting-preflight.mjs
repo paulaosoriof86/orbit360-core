@@ -26,7 +26,7 @@ const receipt={
     dataWrites:0,controlPlaneUpdated:false},
   formalPreviewAcceptanceGranted:false,
   productionPromotionAuthorizedByThisReceipt:false,
-  b4003Closed:env.B4_CAUSAL_FRONTEND_SUCCESSOR==='current42-frontend-20261107'
+  b4003Closed:['current42-frontend-20261107','policy-capture-20261107'].includes(env.B4_CAUSAL_FRONTEND_SUCCESSOR)
 };
 const sha=b=>crypto.createHash('sha256').update(b).digest('hex');
 const fail=(code)=>{throw new Error(code);};
@@ -61,6 +61,7 @@ const git=(...args)=>execFileSync('git',args,{encoding:'utf8',stdio:['ignore','p
 // Explicit causal successor mode. The closed current42 acceptance is immutable;
 // a new operation cursor supplies only the new artifact and focal Preview seal.
 function causalSuccessorContext(control,activeCursor,requireAuthorization=false){
+  if(env.B4_CAUSAL_FRONTEND_SUCCESSOR==='policy-capture-20261107')return policyCaptureSuccessorContext(control,activeCursor,requireAuthorization);
   if(!env.B4_CAUSAL_FRONTEND_SUCCESSOR)return null;
   exact(env.B4_CAUSAL_FRONTEND_SUCCESSOR,'current42-frontend-20261107','CAUSAL_MODE_INVALID');
   exact(env.B4_CURSOR_KEY,'b4003CausalFrontendSuccessor20261107','CAUSAL_CURSOR_INVALID');
@@ -116,6 +117,138 @@ function causalSuccessorContext(control,activeCursor,requireAuthorization=false)
     manifest:{rows,text,fileCount:rows.length,digest:sha(text)},
     pin:{versionName:r.versionName,sourceSha:r.sourceSha,buildId:r.buildId,fileCount:r.productFiles,digest:r.hostedPayloadDigest},
     certified:{sourceSha:r.sourceSha,buildId:r.buildId,previewChannelId:'live',previewUrl:'https://ays-orbit-360-lab.web.app',productionUrl:'https://ays-orbit-360-lab.web.app',hostedFileCount:r.productFiles,hostedPayloadDigest:r.hostedPayloadDigest}};
+}
+
+// Bounded successor within the existing retained-version release lane.
+// The two preceding certificates remain immutable; rollback selects e503 bytes only.
+function policyCaptureSuccessorContext(control,activeCursor,requireAuthorization=false){
+  exact(env.B4_CAUSAL_FRONTEND_SUCCESSOR,'policy-capture-20261107','CAPTURE_MODE_INVALID');
+  exact(env.B4_CURSOR_KEY,'b4004PolicyCaptureFrontendSuccessor20261107','CAPTURE_CURSOR_INVALID');
+  const contractPath='artifacts/orbit360-recovery/release-control/I6_5_B4_004_POLICY_CAPTURE_CAUSAL_FRONTEND_SUCCESSOR_CONTRACT_20261107.json';
+  const blob=bytes=>crypto.createHash('sha1').update(Buffer.from('blob '+bytes.length+'\0')).update(bytes).digest('hex');
+  const contractBytes=fs.readFileSync(contractPath);
+  exact(blob(contractBytes),'985c1444446e21f17f1eb6462131304e0c6cc413','CAPTURE_CONTRACT_BLOB_CHANGED');
+  const contract=JSON.parse(contractBytes),p=contract.preservedAcceptance,r=contract.rollback;
+  exact(contract.sourceBaseHead,'932ccaca0a808b2b4ae577c0a3a27fa80220dbe5','CAPTURE_SOURCE_BASE_CHANGED');
+  requireValue(contract.scope.b4003Reopened===false&&contract.scope.backendFunctionDeploys===0&&contract.scope.rulesWrites===0&&contract.scope.businessWrites===0&&contract.scope.authIamChanges===0,'CAPTURE_CONTRACT_SCOPE_CHANGED');
+  const old=control.b4003ActiveCertificationCursor20261106,seal=old?.formalLiveAcceptance;
+  requireValue(old?.b4003Closed===true&&seal?.b4003Closed===true,'CAPTURE_CURRENT42_REOPENED');
+  exact(seal.status,'LATEST_APPROVED_VERSION_LIVE_PASS','CAPTURE_CURRENT42_SEAL_STATUS');
+  exact(seal.sourceSha,p.sourceSha,'CAPTURE_CURRENT42_SOURCE_CHANGED');
+  exact(seal.buildId,p.buildId,'CAPTURE_CURRENT42_BUILD_CHANGED');
+  exact(Number(seal.artifactId),p.artifactId,'CAPTURE_CURRENT42_ARTIFACT_CHANGED');
+  exact(seal.receiptBlobSha,p.receiptBlobSha,'CAPTURE_CURRENT42_SEAL_PIN_CHANGED');
+  const sealBytes=fs.readFileSync(seal.receiptPath);
+  exact(blob(sealBytes),p.receiptBlobSha,'CAPTURE_CURRENT42_SEAL_FILE_CHANGED');
+  exact(sha(sealBytes),seal.receiptSha256,'CAPTURE_CURRENT42_SEAL_SHA256_CHANGED');
+  const sealedReceipt=JSON.parse(sealBytes);
+  for(const key of ['sourceSha','buildId','artifactId','hostingVersion','hostedPayloadDigest','productFiles'])
+    exact(seal[key],sealedReceipt.release[key],'CAPTURE_CURRENT42_SEAL_CHANGED_'+key);
+  const historicalPromotion=sealedReceipt.evidence.promotion;
+  const historicalPromotionBytes=fs.readFileSync(historicalPromotion.path);
+  exact(blob(historicalPromotionBytes),historicalPromotion.blobSha,'CAPTURE_CURRENT42_PROMOTION_FILE_CHANGED');
+  exact(seal.artifactTarDigest,JSON.parse(historicalPromotionBytes).productArchiveSha256,'CAPTURE_CURRENT42_TAR_CHANGED');
+  const prior=control.b4003CausalFrontendSuccessor20261107;
+  requireValue(prior?.b4003Closed===true&&prior?.b4003HistoricalAcceptancePreserved===true&&prior?.productionPromotionAuthorized===false,'CAPTURE_E503_PARENT_STATE_CHANGED');
+  exact(prior.status,'FRONTEND_SUCCESSOR_LIVE_BYTES_PASS_FOCAL_LIVE_PENDING','CAPTURE_E503_PARENT_STATUS_CHANGED');
+  exact(prior.activeSourceSha,r.sourceSha,'CAPTURE_E503_SOURCE_CHANGED');
+  exact(prior.activeBuildId,r.buildId,'CAPTURE_E503_BUILD_CHANGED');
+  exact(Number(prior.activeImmutableArtifactId),r.artifactId,'CAPTURE_E503_ARTIFACT_CHANGED');
+  const priorBytes=fs.readFileSync(r.receiptPath);
+  exact(blob(priorBytes),r.receiptBlobSha,'CAPTURE_E503_PROMOTION_RECEIPT_CHANGED');
+  const promoted=JSON.parse(priorBytes);
+  exact(promoted.status,'EXACT_HOSTING_VERSION_PROMOTED_LIVE_BYTES_PASS_FUNCTIONAL_LIVE_PENDING','CAPTURE_E503_PROMOTION_STATUS');
+  requireValue(promoted.promotionAttempted===true&&promoted.rollbackAttempted===false&&promoted.dataWrites===0&&promoted.functionsDeployed===0&&promoted.rulesChanged===false,'CAPTURE_E503_PROMOTION_SCOPE');
+  exact(promoted.binding.sourceSha,r.sourceSha,'CAPTURE_E503_PROMOTED_SOURCE');
+  exact(promoted.binding.buildId,r.buildId,'CAPTURE_E503_PROMOTED_BUILD');
+  exact(Number(promoted.binding.artifactId),r.artifactId,'CAPTURE_E503_PROMOTED_ARTIFACT');
+  exact(promoted.liveAfter.channel.versionName,r.versionName,'CAPTURE_E503_PROMOTED_VERSION');
+  exact(promoted.liveAfter.hostedPayloadDigest,r.hostedPayloadDigest,'CAPTURE_E503_PROMOTED_DIGEST');
+  exact(promoted.liveAfter.hostedFileCount,r.productFiles,'CAPTURE_E503_PROMOTED_COUNT');
+  exact(activeCursor?.schema,'GRAVICENTRA_B4_004_POLICY_CAPTURE_SUCCESSOR_CURSOR_V1','CAPTURE_CURSOR_SCHEMA');
+  exact(activeCursor.preservedAcceptancePointer,'/b4003ActiveCertificationCursor20261106/formalLiveAcceptance','CAPTURE_CURRENT42_POINTER');
+  exact(activeCursor.preservedPriorSuccessorPointer,'/b4003CausalFrontendSuccessor20261107','CAPTURE_E503_POINTER');
+  exact(activeCursor.sourceContractPath,contractPath,'CAPTURE_CONTRACT_PATH');
+  exact(activeCursor.sourceContractBlobSha,'985c1444446e21f17f1eb6462131304e0c6cc413','CAPTURE_CONTRACT_PIN');
+  requireValue(activeCursor.b4003Closed===true&&activeCursor.b4003HistoricalAcceptancePreserved===true&&activeCursor.nextGateAccepted===false,'CAPTURE_ACCEPTANCE_BOUNDARY');
+  requireValue(![seal.sourceSha,r.sourceSha].includes(activeCursor.activeSourceSha)&&![Number(seal.artifactId),r.artifactId].includes(Number(activeCursor.activeImmutableArtifactId)),'CAPTURE_CANDIDATE_NOT_NEW');
+  requireValue(['EXACT_PREVIEW_TRANSPORT_PASS_FOCAL_UAT_PENDING','FRONTEND_SUCCESSOR_FOCAL_PREVIEW_PASS_PREFLIGHT_PENDING','FRONTEND_SUCCESSOR_PREVIEW_ACCEPTED_PROMOTION_AUTHORIZED'].includes(activeCursor.status),'CAPTURE_CURSOR_STATUS');
+  const artifactProofs=Object.entries(activeCursor).filter(([k,v])=>/^immutableSuccessor\d+PreviewReadback/.test(k)&&v&&v.sourceSha===activeCursor.activeSourceSha&&Number(v.artifactId)===Number(activeCursor.activeImmutableArtifactId));
+  exact(artifactProofs.length,1,'CAPTURE_QA_ARTIFACT_PROOF_COUNT');
+  const artifactProof=artifactProofs[0][1];
+  for(const key of ['artifactZipSha256','archiveSha256','hostedPayloadDigest'])
+    requireValue(/^[a-f0-9]{64}$/.test(artifactProof[key]),'CAPTURE_QA_PROOF_DIGEST_INVALID_'+key);
+  // The first read-only preflight discovers Hosting's actual retained version.
+  // A release requires that observation to have been frozen into this proof.
+  const previewVersionKnown=typeof artifactProof.versionName==='string'&&/^sites\/ays-orbit-360-lab\/versions\/[A-Za-z0-9_-]+$/.test(artifactProof.versionName);
+  if(artifactProof.versionName!=null)requireValue(previewVersionKnown,'CAPTURE_PREVIEW_VERSION_INVALID');
+  if(activeCursor.productionPromotionAuthorized===true)requireValue(previewVersionKnown,'CAPTURE_PREVIEW_VERSION_PIN_REQUIRED');
+  if(requireAuthorization){
+    requireValue(previewVersionKnown,'CAPTURE_PREVIEW_VERSION_PIN_REQUIRED');
+    exact(activeCursor.status,'FRONTEND_SUCCESSOR_PREVIEW_ACCEPTED_PROMOTION_AUTHORIZED','CAPTURE_PREVIEW_NOT_ACCEPTED');
+    exact(activeCursor.productionPromotionAuthorized,true,'CAPTURE_PROMOTION_NOT_AUTHORIZED');
+    const a=activeCursor.focalAuthenticatedAcceptance;
+    exact(a?.status,'PASS','CAPTURE_AUTHENTICATED_UAT_NOT_PASS');
+    exact(a.sourceSha,activeCursor.activeSourceSha,'CAPTURE_UAT_SOURCE_MISMATCH');
+    exact(a.buildId,activeCursor.activeBuildId,'CAPTURE_UAT_BUILD_MISMATCH');
+    exact(Number(a.artifactId),Number(activeCursor.activeImmutableArtifactId),'CAPTURE_UAT_ARTIFACT_MISMATCH');
+    requireValue(Array.isArray(a.evidencePins)&&a.evidencePins.length>0,'CAPTURE_UAT_EVIDENCE_REQUIRED');
+    let focalProofs=0;
+    for(const item of a.evidencePins){
+      requireValue(typeof item.path==='string'&&item.path.startsWith('artifacts/orbit360-recovery/release-control/')&&!item.path.includes('..')&&/^[a-f0-9]{40}$/.test(item.blobSha),'CAPTURE_UAT_EVIDENCE_PATH');
+      const evidenceBytes=fs.readFileSync(item.path);
+      exact(blob(evidenceBytes),item.blobSha,'CAPTURE_UAT_EVIDENCE_CHANGED');
+      const q=JSON.parse(evidenceBytes);
+      if(q.schema==='GRAVICENTRA_B4_004_POLICY_CAPTURE_FOCAL_PREVIEW_QA_V1'){
+        focalProofs++;
+        exact(q.status,'FOCAL_AUTHENTICATED_UI_PASS','CAPTURE_QA_STATUS');
+        exact(q.artifact.sourceSha,activeCursor.activeSourceSha,'CAPTURE_QA_SOURCE');
+        exact(q.artifact.buildId,activeCursor.activeBuildId,'CAPTURE_QA_BUILD');
+        exact(Number(q.artifact.artifactId),Number(activeCursor.activeImmutableArtifactId),'CAPTURE_QA_ARTIFACT');
+        for(const key of ['artifactZipSha256','archiveSha256','hostedPayloadDigest']){
+          requireValue(/^[a-f0-9]{64}$/.test(q.artifact[key]),'CAPTURE_QA_DIGEST_INVALID_'+key);
+          exact(q.artifact[key],artifactProof[key],'CAPTURE_QA_DIGEST_'+key);
+        }
+        requireValue(q.businessWrites===0&&q.authAccountsCreated===0&&q.membershipWrites===0&&q.syntheticFinalAbsent===true,'CAPTURE_QA_WRITE_SCOPE');
+        requireValue(Array.isArray(q.errors)&&q.errors.length===0,'CAPTURE_QA_ERRORS');
+        exact(q.cleanup.method,'EXACT_PREDECLARED_IDS_AND_CAPTURED_SERVER_RECEIPTS','CAPTURE_QA_CLEANUP_METHOD');
+        exact(q.cleanup.compareAndDeleteTransaction,true,'CAPTURE_QA_CLEANUP_TRANSACTION');
+        requireValue(Array.isArray(q.sourceOwners)&&q.sourceOwners.length===contract.productChanges.length&&contract.productChanges.every(e=>q.sourceOwners.some(o=>o.path===e.path&&o.blobSha===e.afterBlobSha)),'CAPTURE_QA_OWNER_BYTES');
+        const requiredAssertions=['exactArtifactBeforeWrites','originalAbsenceVerified','advisorCommissionAndScopedAudit','clientFormAndAtomicActivity','policyFormAtomicBatchAndDerivedClientState','receiptEditFormAndAtomicPortfolioActivity','freshProductReloadWithoutAdapter'];
+        requireValue(q.assertions&&Object.keys(q.assertions).length===requiredAssertions.length&&requiredAssertions.every(k=>q.assertions[k]===true),'CAPTURE_QA_ASSERTIONS');
+      }
+    }
+    exact(focalProofs,1,'CAPTURE_QA_EXACT_PROOF_REQUIRED');
+    requireValue(a.realBusinessWrites===0&&a.exactSyntheticCleanupVerified===true&&a.syntheticIdentityAdaptationDeclared===true,'CAPTURE_UAT_SCOPE_UNPROVEN');
+  }
+  const rawPath='artifacts/orbit360-recovery/release-control/I6_5_B4_004_E503_ROLLBACK_DURABLE_CERTIFICATE_20261107.json';
+  const rawBytes=fs.readFileSync(rawPath);
+  exact(blob(rawBytes),'541b1560c18607e523fb3ae99ddd1d762476fb93','CAPTURE_E503_RAW_CERTIFICATE_CHANGED');
+  const raw=JSON.parse(rawBytes);
+  exact(raw.schema,'B4_003_RETAINED_HOSTING_LIVE_PROMOTION_DURABLE_CERTIFICATE_BUNDLE_V1','CAPTURE_E503_RAW_SCHEMA');
+  exact(raw.liveVersionName,r.versionName,'CAPTURE_E503_RAW_VERSION');
+  exact(raw.productSourceSha,r.sourceSha,'CAPTURE_E503_RAW_SOURCE');
+  exact(raw.productBuildId,r.buildId,'CAPTURE_E503_RAW_BUILD');
+  exact(raw.liveRawDigest,r.hostedPayloadDigest,'CAPTURE_E503_RAW_DIGEST');
+  exact(raw.liveRawProductFiles,r.productFiles,'CAPTURE_E503_RAW_COUNT');
+  exact(String(raw.runId),String(promoted.runId),'CAPTURE_E503_RAW_RUN');
+  exact(raw.runnerCommit,promoted.runnerCommit,'CAPTURE_E503_RAW_RUNNER');
+  requireValue(raw.liveRawFiles.every(x=>x.status===200&&x.exact===true),'CAPTURE_E503_RAW_BYTES_NOT_EXACT');
+  const rows=raw.liveRawFiles.map(x=>({path:x.path,sha256:x.sha256})).sort((a,b)=>a.path<b.path?-1:a.path>b.path?1:0);
+  requireValue(new Set(rows.map(x=>x.path)).size===rows.length,'CAPTURE_E503_RAW_DUPLICATE_PATH');
+  const text=rows.map(x=>x.sha256+'  '+x.path).join('\n')+'\n';
+  exact(rows.length,r.productFiles,'CAPTURE_E503_RAW_ROW_COUNT');
+  exact(sha(text),r.hostedPayloadDigest,'CAPTURE_E503_RAW_MANIFEST_CHANGED');
+  return {contract,seal,artifactProof,raw,rawPath,rawBlobSha:'541b1560c18607e523fb3ae99ddd1d762476fb93',
+    manifest:{rows,text,fileCount:rows.length,digest:sha(text)},
+    pin:{versionName:r.versionName,sourceSha:r.sourceSha,buildId:r.buildId,fileCount:r.productFiles,digest:r.hostedPayloadDigest},
+    certified:{sourceSha:r.sourceSha,buildId:r.buildId,previewChannelId:'live',previewUrl:'https://ays-orbit-360-lab.web.app',productionUrl:'https://ays-orbit-360-lab.web.app',hostedFileCount:r.productFiles,hostedPayloadDigest:r.hostedPayloadDigest}};
+}
+
+function policyCapturePayloadBinding(artifactProof,manifest){
+  requireValue(/^[a-f0-9]{64}$/.test(artifactProof?.hostedPayloadDigest),'CAPTURE_PAYLOAD_PROOF_INVALID');
+  requireValue(/^[a-f0-9]{64}$/.test(manifest?.digest),'CAPTURE_COMPUTED_PAYLOAD_INVALID');
+  exact(artifactProof.hostedPayloadDigest,manifest.digest,'CAPTURE_PAYLOAD_BYTES_MISMATCH');
 }
 
 function relativePath(value){
@@ -504,6 +637,7 @@ try{
     exact(marker.buildId,binding.buildId,'BUNDLE_BUILD_MISMATCH');
     exact(marker.gate,'I6.5-B4-003','BUNDLE_GATE_MISMATCH');
     manifest=localManifest(path.join(root,'site'));
+    if(env.B4_CAUSAL_FRONTEND_SUCCESSOR==='policy-capture-20261107')policyCapturePayloadBinding(causal.artifactProof,manifest);
     fs.writeFileSync(path.join(out,'retained-site-manifest.sha256'),manifest.text);
     writeJson('retained-hosting-config.json',config);
     return {artifactId:binding.artifactId,archiveSha256:binding.archiveSha256,

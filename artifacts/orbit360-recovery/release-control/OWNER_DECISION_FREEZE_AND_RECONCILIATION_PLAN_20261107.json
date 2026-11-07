@@ -492,9 +492,9 @@
     "schema": "GRAVICENTRA_OWNER_DOCUMENTARY_SUCCESSOR_VALIDATION_V1",
     "baseHead": "74312cc3621ba155ee288a0afb530a488246f0e6",
     "guardPath": "tools/gravicentra-b4-003-formal-live-closeout-guard.mjs",
-    "guardBlobSha": "65ad4e5b11f76d1c91c66b645c4bb49cb3fc7edd",
+    "guardBlobSha": "bd35069537c487d2203bbe5e57277427724e1232",
     "testPath": "tools/gravicentra-b4-003-owner-decision-successor.test.mjs",
-    "testBlobSha": "790f27717ba9a1a985f007e4910a779898573d20",
+    "testBlobSha": "5a9b61a04eae7256523eabb54057062d13f62d4f",
     "sealedMasterPlanBlobPreserved": "458c5af57b2f7d9453d0064eba0cd737edf14ef4",
     "sealedCapabilityLedgerBlobPreserved": "81511551540dbe0c1dbc54d9c4f8e00537550716",
     "initialDocumentationCommit": "766e30b1bda1543763b6e8d9d17119f84d7f75d8",
@@ -4156,5 +4156,82 @@
       "Document evidence packet remains frozen; life-certificate factual correction is a separate private addendum."
     ],
     "sourceSha256": "123fd38d4972681f66aa763b38b1cc412ab249fbcb809e40517744929875e69e"
+  },
+  "policyCaptureFrontendTransportSuccessor20261107": {
+    "schema": "GRAVICENTRA_POLICY_CAPTURE_FRONTEND_TRANSPORT_SUCCESSOR_V1",
+    "sourceBaseHead": "6c45983610ce0d65a5c63bd07659ad968bfe9da3",
+    "phase": "FOCAL_PREVIEW_PASS_PREFLIGHT_PENDING",
+    "sourceContractPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_004_POLICY_CAPTURE_CAUSAL_FRONTEND_SUCCESSOR_CONTRACT_20261107.json",
+    "sourceContractBlobSha": "985c1444446e21f17f1eb6462131304e0c6cc413",
+    "productSourceChangedAfterBuild": false,
+    "rebuildExecuted": false,
+    "artifactPatched": false,
+    "backendFunctionDeploys": 0,
+    "rulesWrites": 0,
+    "authIamChanges": 0,
+    "realBusinessWrites": 0,
+    "nextGateAccepted": false,
+    "globalProductionAccepted": false,
+    "productionPromotionAuthorized": false,
+    "changes": [
+      {
+        "path": "tools/gravicentra-b4-003-retained-hosting-preflight.mjs",
+        "previousBlobSha": "f361d6840ebf4cc03657c36a1bf6a03039e5c993",
+        "blobSha": "9b4c166559ab35d9f60cc97d46abb7a3427ed41d",
+        "sha256": "5b95239a8371c3fbb38f94d16462d0c426682064ea023cae9bdb36f4568625e0"
+      },
+      {
+        "path": "tools/gravicentra-b4-003-retained-hosting-promotion.mjs",
+        "previousBlobSha": "404b5fd60df843fa6e857aed04bb39e6232b6e6b",
+        "blobSha": "268ad6992763084ed645fa766a6e22c1ccebb32f",
+        "sha256": "9d9fda66d5ef30a022daf99fa59cafcb3c062ab32d20a85506d041fbd69984d3"
+      },
+      {
+        "path": ".github/workflows/gravicentra-b4-003-executor.yml",
+        "previousBlobSha": "6344a5b9603390014bed2cf8a564ccb11f542ba4",
+        "blobSha": "d02f776ddb11aa52731b1c6bf0ee29841fad83a0",
+        "sha256": "f79a8ee043f1c76c0bbe98c7526ed740ee66465fca549a442fc61fea3a487ad3"
+      },
+      {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_004_E503_ROLLBACK_DURABLE_CERTIFICATE_20261107.json",
+        "previousBlobSha": null,
+        "blobSha": "541b1560c18607e523fb3ae99ddd1d762476fb93",
+        "sha256": "453f8d813f2b409c28e347dc7facec273d600f2e25d04521c2b6a83f84eef2f1"
+      },
+      {
+        "path": "tools/gravicentra-b4-004-policy-capture-retained-promotion.test.cjs",
+        "previousBlobSha": null,
+        "blobSha": "ba0e4ec0c48f2956c6653c5daaf8f6d676570fcd",
+        "sha256": "e09397d6d443bbff1cbb8f13447d92f6f19bb18b7eee0531622663ae922c9ec9"
+      },
+      {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_004_POLICY_CAPTURE_IMMUTABLE_PREVIEW_TRANSPORT_20261107.json",
+        "previousBlobSha": null,
+        "blobSha": "099af7e00debb6339b68e8f95b931d229f305de7",
+        "sha256": "8ecd062497c30a0080444c23c7446223d59fee9152afc75c3ae6d5fd499e5309"
+      },
+      {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_004_POLICY_CAPTURE_FOCAL_PREVIEW_QA_20261107.json",
+        "previousBlobSha": null,
+        "blobSha": "8573480607ff4b98a1c9939ab89a6c812ca69564",
+        "sha256": "ae9981dc99a47a8db30a8a291719a76ecbfc643349347fc627be4b2a962d9626"
+      }
+    ],
+    "transportEvidence": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_004_POLICY_CAPTURE_IMMUTABLE_PREVIEW_TRANSPORT_20261107.json",
+      "blobSha": "099af7e00debb6339b68e8f95b931d229f305de7",
+      "sha256": "8ecd062497c30a0080444c23c7446223d59fee9152afc75c3ae6d5fd499e5309",
+      "runId": 42418566181,
+      "runnerCommit": "6c45983610ce0d65a5c63bd07659ad968bfe9da3",
+      "runConclusion": "success"
+    },
+    "focalEvidence": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_004_POLICY_CAPTURE_FOCAL_PREVIEW_QA_20261107.json",
+      "blobSha": "8573480607ff4b98a1c9939ab89a6c812ca69564",
+      "sha256": "ae9981dc99a47a8db30a8a291719a76ecbfc643349347fc627be4b2a962d9626",
+      "runId": 42418566181,
+      "runnerCommit": "6c45983610ce0d65a5c63bd07659ad968bfe9da3",
+      "runConclusion": "success"
+    }
   }
 }
