@@ -1,0 +1,86 @@
+{
+  "schema": "B4_003_PAULA_ACTUAL_CROSS_UID_READ_AND_THREE_SYNTHETIC_ARCHIVES_V1",
+  "gate": "I6.5/B4-003",
+  "recordedAtUtc": "2026-11-07T01:16:00Z",
+  "status": "PREVIEW_CROSS_UID_AUTHOR_AND_THREE_ARCHIVES_PASS",
+  "sourceSha": "857f1222f360a42a06e012810a1c01bce155a26f",
+  "buildId": "gi-i65-b4-857f1222f360-57f234755dc1",
+  "artifactId": 13549460562,
+  "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-rc-41765742748-neoi3u7r.web.app",
+  "crossUidRead": {
+    "reader": "Paula Osorio",
+    "role": "Dirección",
+    "actualAccountObserved": true,
+    "normalAssignedRoleSelected": true,
+    "naturalReloadBeforeRead": true,
+    "identityEvidence": "User completed actual Paula sign-in; authenticated header Paula Osorio and assigned Dirección observed after reload. This was not Samuel's view-as simulation; no hidden auth state was read.",
+    "syntheticFixtureId": "b4003qa_user_mw5lmd7r_nu0l4r",
+    "noticeId": "collab_mw5lnqia_s0ajs",
+    "noticeAuthor": "Samuel Daza",
+    "commentAuthors": [
+      "Samuel Daza",
+      "Samuel Daza"
+    ],
+    "bitacoraAuthors": [
+      "Samuel Daza",
+      "Samuel Daza"
+    ],
+    "commentKinds": [
+      "Comentario comercial",
+      "Reenviado a Operaciones"
+    ],
+    "exactExistingCommentsRead": true,
+    "newReplyWritten": false,
+    "additionalFixtureCreated": false,
+    "status": "PASS_ACTUAL_PAULA_POST_RELOAD_SAMUEL_HUMAN_LABELS"
+  },
+  "archive": {
+    "uiActionsCompleted": 3,
+    "thirdAction": {
+      "fixtureId": "b4003qa_user_mw5lmd7r_nu0l4r",
+      "principal": "Paula Osorio",
+      "role": "Dirección",
+      "action": "Limpiar documentos y archivar prueba",
+      "nativeConfirmObserved": true,
+      "nativeConfirmAccepted": true,
+      "clickCompleted": true,
+      "modalClosed": true,
+      "observedBrowserErrors": []
+    },
+    "canonicalReadback": {
+      "status": "PASS",
+      "allThreeArchived": true,
+      "allThreePreviewWrite": true,
+      "httpStatuses": [
+        200,
+        200,
+        200
+      ],
+      "runId": 42322970248,
+      "jobId": 128251619980,
+      "runnerCommit": "ee77ddcbc5173effd550339416a969a0929414ef",
+      "artifactId": 13553378284,
+      "artifactZipSha256": "9a0ce828371a65fef4c9e0a39c17099c5b79bd12666fb68becaef870718c7a77",
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_THREE_SYNTHETIC_ARCHIVE_READBACK_20261107.json",
+      "receiptBlobSha": "209aec5d09130cf1572c6fcfcf22c69b15acfdcf",
+      "receiptSha256": "dc4b159ae691bc17922a6aa49b89af16b52ec4c01018d8beb9aee6194a7c53b2",
+      "fieldMask": [
+        "archivado",
+        "previewWrite"
+      ],
+      "exactDocumentCount": 3,
+      "remoteWrites": 0
+    }
+  },
+  "screenshotDisposition": "Authentic screenshot inspected internally. Not published or saved to Library because unrelated personal data was visible; this receipt retains only relevant synthetic test facts.",
+  "priorAuthorReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CURRENT40_LEADS_NEW_HUMAN_AUTHOR_SYNTHETIC_UI_20261106.json",
+  "priorAuthorReceiptBlobSha": "660e0dd7b3935ad8ee52899b87aaac9101f1b014",
+  "preservedHistoricalCertificates": 15,
+  "currentEvidenceEntries": 16,
+  "previewFunctionalDeltaResolved": true,
+  "productionAcceptedByThisReceipt": false,
+  "b4003Closed": false,
+  "sourceModified": false,
+  "dataReimported": false,
+  "realBusinessDeleted": false
+}

@@ -1,0 +1,126 @@
+{
+  "schema": "B4_003_THREE_SYNTHETIC_ARCHIVE_MASKED_READ_V1",
+  "status": "THREE_SYNTHETIC_MASKED_READ_PASS_OLDER_ARCHIVE_PAIR_CONFIRMED",
+  "startedAtUtc": "2026-11-07T01:14:57.534Z",
+  "runId": "42322970248",
+  "runnerCommit": "ee77ddcbc5173effd550339416a969a0929414ef",
+  "scope": {
+    "projectId": "ays-orbit-360-lab",
+    "databaseId": "(default)",
+    "collection": "tenants/alianzas-soluciones/data/negocios/items",
+    "exactIds": [
+      "b4003qa_user_mw5htkgl_31u61t",
+      "b4003qa_user_mw5eas6v_lphfrl",
+      "b4003qa_user_mw5lmd7r_nu0l4r"
+    ],
+    "fieldMask": [
+      "archivado",
+      "previewWrite"
+    ],
+    "firestoreMethod": "GET",
+    "firestoreListOrQuery": false,
+    "unmaskedRead": false,
+    "remoteWrites": 0,
+    "dataWrites": 0,
+    "hostingMutation": false,
+    "functionsDeployment": false,
+    "rulesOrAuthChanged": false
+  },
+  "userAuthorization": "Paula expressly authorized read-only access to these three current synthetic B4-003 fixtures.",
+  "observations": [
+    {
+      "id": "b4003qa_user_mw5htkgl_31u61t",
+      "requestedName": "projects/ays-orbit-360-lab/databases/(default)/documents/tenants/alianzas-soluciones/data/negocios/items/b4003qa_user_mw5htkgl_31u61t",
+      "fieldMask": [
+        "archivado",
+        "previewWrite"
+      ],
+      "httpStatus": 200,
+      "readStatus": "PASS",
+      "observedAtUtc": "2026-11-07T01:14:58.201Z",
+      "document": {
+        "name": "projects/ays-orbit-360-lab/databases/(default)/documents/tenants/alianzas-soluciones/data/negocios/items/b4003qa_user_mw5htkgl_31u61t",
+        "fields": {
+          "archivado": {
+            "booleanValue": true
+          },
+          "previewWrite": {
+            "booleanValue": true
+          }
+        },
+        "createTime": "2026-11-06T21:35:17.509823Z",
+        "updateTime": "2026-11-07T00:32:03.157887Z"
+      }
+    },
+    {
+      "id": "b4003qa_user_mw5eas6v_lphfrl",
+      "requestedName": "projects/ays-orbit-360-lab/databases/(default)/documents/tenants/alianzas-soluciones/data/negocios/items/b4003qa_user_mw5eas6v_lphfrl",
+      "fieldMask": [
+        "archivado",
+        "previewWrite"
+      ],
+      "httpStatus": 200,
+      "readStatus": "PASS",
+      "observedAtUtc": "2026-11-07T01:14:58.318Z",
+      "document": {
+        "name": "projects/ays-orbit-360-lab/databases/(default)/documents/tenants/alianzas-soluciones/data/negocios/items/b4003qa_user_mw5eas6v_lphfrl",
+        "fields": {
+          "archivado": {
+            "booleanValue": true
+          },
+          "previewWrite": {
+            "booleanValue": true
+          }
+        },
+        "createTime": "2026-11-06T19:56:43.037791Z",
+        "updateTime": "2026-11-07T00:35:12.880015Z"
+      }
+    },
+    {
+      "id": "b4003qa_user_mw5lmd7r_nu0l4r",
+      "requestedName": "projects/ays-orbit-360-lab/databases/(default)/documents/tenants/alianzas-soluciones/data/negocios/items/b4003qa_user_mw5lmd7r_nu0l4r",
+      "fieldMask": [
+        "archivado",
+        "previewWrite"
+      ],
+      "httpStatus": 200,
+      "readStatus": "PASS",
+      "observedAtUtc": "2026-11-07T01:14:58.414Z",
+      "document": {
+        "name": "projects/ays-orbit-360-lab/databases/(default)/documents/tenants/alianzas-soluciones/data/negocios/items/b4003qa_user_mw5lmd7r_nu0l4r",
+        "fields": {
+          "archivado": {
+            "booleanValue": true
+          },
+          "previewWrite": {
+            "booleanValue": true
+          }
+        },
+        "createTime": "2026-11-06T23:21:39.785279Z",
+        "updateTime": "2026-11-07T01:08:34.181487Z"
+      }
+    }
+  ],
+  "requestCount": 3,
+  "maskedReadPass": true,
+  "previouslyArchivedPairVerified": true,
+  "allThreeArchived": true,
+  "productionPromotionAuthorizedByThisReceipt": false,
+  "b4003Closed": false,
+  "control": {
+    "sourceSha": "857f1222f360a42a06e012810a1c01bce155a26f",
+    "buildId": "gi-i65-b4-857f1222f360-57f234755dc1",
+    "artifactId": 13549460562,
+    "cursorKey": "b4003ActiveCertificationCursor20261106",
+    "authorizedFixtureIds": [
+      "b4003qa_user_mw5htkgl_31u61t",
+      "b4003qa_user_mw5eas6v_lphfrl",
+      "b4003qa_user_mw5lmd7r_nu0l4r"
+    ],
+    "sha256": "46b751faaea709726d6ff1f06ed8fd167821537fc4444b60f661e1427db5dd8c"
+  },
+  "canonicalHeadUnchanged": true,
+  "archivedCount": 3,
+  "thirdFixtureArchived": true,
+  "finishedAtUtc": "2026-11-07T01:14:58.640Z"
+}

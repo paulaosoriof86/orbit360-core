@@ -41,6 +41,7 @@ on:
     paths:
       - '.github/workflows/gravicentra-b4-003-executor.yml'
       - 'tools/gravicentra-b4-003-retained-hosting-preflight.mjs'
+      - 'tools/gravicentra-b4-003-retained-hosting-promotion.mjs'
       - 'tools/gravicentra-b4-003-retained-rollback-certify.mjs'
       - 'tools/gravicentra-b4-003-synthetic-archive-readback.mjs'
       - 'tools/gravicentra-i6-5-b4-003-preview-proof.mjs'
@@ -75,7 +76,7 @@ concurrency:
 jobs:
   b4-003-renewals-cancelations-preview:
     # Both exact retained requests skip the legacy Preview build/deploy job.
-    if: "!(github.event_name == 'push' && (github.event.head_commit.message == 'test(b4-003): retained artifact Hosting preflight' || github.event.head_commit.message == 'test(b4-003): certify retained rollback in existing Preview' || github.event.head_commit.message == 'test(b4-003): read three synthetic archive states'))"
+    if: "!(github.event_name == 'push' && (github.event.head_commit.message == 'test(b4-003): retained artifact Hosting preflight' || (github.event.head_commit.message == 'test(b4-003): certify retained rollback in existing Preview' || github.event.head_commit.message == 'release(b4-003): promote exact retained Hosting version') || github.event.head_commit.message == 'test(b4-003): read three synthetic archive states'))"
     runs-on: ubuntu-24.04
     timeout-minutes: 45
     env:
@@ -3776,9 +3777,10 @@ jobs:
 
   # Retained artifact preflight. The exact rollback-certification request may
   # temporarily serve the retained version in the existing Preview and restore 42.
-  # Product source stays pinned; this job never releases to LIVE or builds artifacts.
+  # Product source stays pinned and no artifact is built. Only the exact release
+  # request can select an existing version for LIVE after the strict CP gates.
   b4-003-retained-hosting-preflight:
-    if: "github.event_name == 'push' && (github.event.head_commit.message == 'test(b4-003): retained artifact Hosting preflight' || github.event.head_commit.message == 'test(b4-003): certify retained rollback in existing Preview')"
+    if: "github.event_name == 'push' && (github.event.head_commit.message == 'test(b4-003): retained artifact Hosting preflight' || (github.event.head_commit.message == 'test(b4-003): certify retained rollback in existing Preview' || github.event.head_commit.message == 'release(b4-003): promote exact retained Hosting version'))"
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     permissions:
@@ -3804,6 +3806,11 @@ jobs:
       ROLLBACK_CHANNEL: gi-i5-rb-34723814583
       ROLLBACK_FILE_COUNT: '209'
       ROLLBACK_PAYLOAD_SHA256: 84a74f46498618ca36c142ff844dbfe670df5a64501a1ceca22d5cd069e62767
+      # Exact immutable versions; CP authorization and formal Preview seal remain mandatory.
+      PROMOTE_EXPECTED_PREVIEW_VERSION_NAME: sites/ays-orbit-360-lab/versions/c5e1ae001fae793b
+      PROMOTE_EXPECTED_ROLLBACK_VERSION_NAME: sites/ays-orbit-360-lab/versions/5d35a2bd0b326e75
+      PROMOTE_EXPECTED_LIVE_BEFORE_VERSION_NAME: sites/ays-orbit-360-lab/versions/3087fabd2db9b639
+      FORMAL_PREVIEW_POINTER: /b4003ActiveCertificationCursor20261106/formalPreviewAcceptance
       RETAINED_ARCHIVE_DIR: ${{ github.workspace }}/.b4-preflight-temp/archive
       B4_PREFLIGHT_OUT: ${{ github.workspace }}/.b4-preflight-temp/evidence
       B4_ROLLBACK_CERTIFY_OUT: ${{ github.workspace }}/.b4-preflight-temp/rollback-certify
@@ -3889,7 +3896,7 @@ jobs:
 
       - name: Verify retained artifact, Preview bytes and certified rollback using GET only
         id: retained_precheck
-        continue-on-error: "${{ github.event_name == 'push' && github.event.head_commit.message == 'test(b4-003): certify retained rollback in existing Preview' }}"
+        continue-on-error: "${{ github.event_name == 'push' && (github.event.head_commit.message == 'test(b4-003): certify retained rollback in existing Preview' || github.event.head_commit.message == 'release(b4-003): promote exact retained Hosting version') }}"
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -3920,6 +3927,21 @@ jobs:
         if: "always() && github.event_name == 'push' && github.event.head_commit.message == 'test(b4-003): certify retained rollback in existing Preview' && (steps.retained_certify.outcome != 'success' || steps.retained_restore.outcome != 'success')"
         run: |
           echo "RETAINED_ROLLBACK_CERTIFICATION_OR_EXACT_PREVIEW_RESTORATION_NOT_SUCCESS"
+          exit 1
+
+      - name: Promote the exact retained version to LIVE with conditional verified rollback
+        id: retained_promote
+        if: "success() && github.event_name == 'push' && github.event.head_commit.message == 'release(b4-003): promote exact retained Hosting version'"
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-b4-003-retained-hosting-promotion.mjs
+
+      - name: Fail closed unless exact retained LIVE promotion and raw readback completed
+        if: "always() && github.event_name == 'push' && github.event.head_commit.message == 'release(b4-003): promote exact retained Hosting version' && steps.retained_promote.outcome != 'success'"
+        run: |
+          echo "EXACT_RETAINED_LIVE_PROMOTION_OR_RAW_READBACK_NOT_SUCCESS"
           exit 1
 
       - name: Retain exact preflight proof, including a failure receipt

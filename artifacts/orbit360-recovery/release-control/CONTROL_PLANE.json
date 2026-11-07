@@ -42,7 +42,7 @@
       "display": "Paula Osorio",
       "commentAndBitacoraPass": true,
       "roleCrossReadPending": false,
-      "syntheticFixtureCleanupReadbackPending": true,
+      "syntheticFixtureCleanupReadbackPending": false,
       "commentAndBitacoraPassScope": "IMMEDIATE_UI_HUMAN_LABEL_ONLY",
       "originalCommentFixtureId": "b4003qa_user_mw5eas6v_lphfrl",
       "latestInterruptedFixtureId": "b4003qa_user_mw5htkgl_31u61t",
@@ -50,36 +50,38 @@
       "originalCommentDurableActorFields": "EMAIL_VALUED_NAME_AND_USER; UID_PRESENT; IMMEDIATE_UI_RESOLVED_PAULA",
       "latestFixtureCreationDurablyConfirmed": true,
       "latestFixtureCommentCount": 0,
-      "syntheticFixtureSuccessfulCleanupPending": true,
-      "syntheticFixtureArchiveReadback": "TWO_UI_ARCHIVE_ACTIONS_COMPLETED_CANONICAL_READBACK_PENDING; THIRD_RESERVED_FOR_PAULA_READ",
+      "syntheticFixtureSuccessfulCleanupPending": false,
+      "syntheticFixtureArchiveReadback": "PASS_THREE_OF_THREE_CANONICAL_ARCHIVADO_TRUE",
       "existingFindingId": "B4-003-UAT-20261011-03",
       "outboxNamesDurablyHuman": "3_OF_3_EXISTING_NOTICES_PAULA_OSORIO",
-      "nextRequiredPrincipal": "Paula Osorio",
-      "nextRequiredRole": "Dirección",
-      "nextRequiredAdvisorId": "ase-samuel-daza",
-      "exactReopenNoticeId": null,
-      "currentPaulaSessionCannotProveOwnNoticeRecipient": true,
+      "nextRequiredPrincipal": null,
+      "nextRequiredRole": null,
+      "nextRequiredAdvisorId": null,
+      "exactReopenNoticeId": "collab_mw5lnqia_s0ajs",
+      "currentPaulaSessionCannotProveOwnNoticeRecipient": false,
       "durableEmailFieldAloneIsNotVisibleAuthorRegression": true,
       "recipientNoticeUiPass": true,
       "recipientCommentAndBitacora": "PASS_SAMUEL_ASESOR_PAULA_AFTER_RELOAD",
       "currentCandidate": 42,
       "currentPostFixUiPending": false,
-      "reverseWriterCrossReadPending": true,
+      "reverseWriterCrossReadPending": false,
       "nextCrossUidFixtureId": "b4003qa_user_mw5lmd7r_nu0l4r",
       "originalReopenNoticeId": "evt_facd26eb0fcdee8d3ced6d20888e",
-      "reopenNoticeSelection": "Existing operations-directed notice for b4003qa_user_mw5lmd7r_nu0l4r under Paula Direccion; exact eventId to observe from UI."
+      "reopenNoticeSelection": "COMPLETED actual Paula Dirección post-reload Samuel notice, two comments and two bitacora entries; no additional reply required.",
+      "paulaActualCrossUidReadPass": true,
+      "completionReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PAULA_CROSS_READ_AND_THREE_ARCHIVES_PASS_20261107.json",
+      "completionReceiptBlobSha": "3a5dc252cfeeb4408ba0f88924b836d8c7637fe4"
     },
     "historicalOpsLeadsGenericAuthors": "NO_RETROACTIVE_REWRITE_NOT_RELEASE_BLOCKING",
     "insurerCredentialPreviewVault": "SEPARATE_FROM_LIVE; HISTORICAL_CREDENTIAL_TESTS_3_OF_3_PRESERVED; LIVE_RECHECK_AFTER_SAME_ARTIFACT_PROMOTION",
     "nextOnly": [
-      "Paula signs in with her own actual account; reload and read the two existing Samuel comments and bitacora plus the operations notice for b4003qa_user_mw5lmd7r_nu0l4r. No new reply, reverse reload or fixture.",
-      "Canonical archivado:true readback for b4003qa_user_mw5htkgl_31u61t and b4003qa_user_mw5eas6v_lphfrl after both authorized archive UI actions; archive the Samuel fixture only after Paula read and verify it too. Firebase console origin access was auto-review denied; request scoped approval, do not bypass.",
-      "Reconcile formal exact Preview acceptance using preserved15 certificates and16 current evidence entries, certified rollback209 and exact restored42; promote only the same retained artifact and perform actual required LIVE module/write/reload/integrity checks."
+      "Promote only retained candidate42 version sites/ays-orbit-360-lab/versions/c5e1ae001fae793b through the existing guarded executor; retain source857f1222f360/buildgi-i65-b4-857f1222f360-57f234755dc1/artifact13549460562 and exact218 raw files.",
+      "After exact LIVE byte verification, perform actual authenticated module/role/scope/relationship/readback/reload/controlled-write/cleanup/integrity checks, including LIVE Aseguradoras reveal/copy. Only then grant current-release LIVE PASS and close B4-003."
     ],
     "doNotRebuildForMetadata": true,
     "firestoreRulesNoRoutineBlocker": true,
     "b4003Closed": false,
-    "productionPromotionAuthorized": false,
+    "productionPromotionAuthorized": true,
     "doNotInferPass": true,
     "lastPreviewRecheck": {
       "id": "CURRENT40_PROTECTED_RESTORE_RECOVERY_3_OF_3_LOGS_CLOUDRUN_AND_OPS_ROLE_DELTA_20261106",
@@ -157,7 +159,7 @@
       "actualDurableCommentActorFieldsRequireProspectiveReview": true,
       "continuityReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CURRENT40_LEADS_NEW_HUMAN_AUTHOR_SYNTHETIC_UI_20261106.json"
     },
-    "asOfUtc": "2026-11-07T00:48:20Z",
+    "asOfUtc": "2026-11-07T01:17:43Z",
     "continuityRecovery20261106": {
       "recordedAtUtc": "2026-11-06T22:03:41Z",
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CURRENT40_LEADS_NEW_HUMAN_AUTHOR_SYNTHETIC_UI_20261106.json",
@@ -711,8 +713,8 @@
       "nextOnly": "Paula actual Direccion reloads and opens operations-directed notice for this fixture; verifies both Samuel comments, bitacora and corresponding notice name. No additional response or reverse reload required for existing finding."
     },
     "currentThreeFixtureCleanup20261106": {
-      "recordedAtUtc": "2026-11-07T00:38:00Z",
-      "status": "TWO_AUTHORIZED_SYNTHETIC_ARCHIVE_UI_ACTIONS_EXECUTED_CANONICAL_READBACK_PENDING",
+      "recordedAtUtc": "2026-11-07T01:17:43Z",
+      "status": "THREE_SYNTHETIC_ARCHIVE_UI_AND_CANONICAL_READBACK_PASS",
       "currentFixtureIds": [
         "b4003qa_user_mw5eas6v_lphfrl",
         "b4003qa_user_mw5htkgl_31u61t",
@@ -724,11 +726,11 @@
       "roleChangedByNormalSelectorTo": "Operativo",
       "cleanupButtonEnabled": true,
       "cleanupClickAttempted": true,
-      "toolOutcome": "Fresh tab restored control; both known synthetic cleanup buttons clicked under Samuel Operativo; documented confirm accepted and click completed; modal closed afterward. No canonical archivado:true observation yet.",
+      "toolOutcome": "All three authorized synthetic UI archive actions completed; exact three masked Firestore GETs returned HTTP200 and archivado:true, previewWrite:true.",
       "nativePromptSourceText": "¿Limpiar los archivos de prueba y archivar este negocio sintético?",
       "nativePromptBeforeAnyWrite": true,
-      "archiveReadbackRequired": true,
-      "archivePass": false,
+      "archiveReadbackRequired": false,
+      "archivePass": true,
       "backendOperation": "archive_business",
       "expectedTerminalField": "archivado:true",
       "retainsDocumentAndHistory": true,
@@ -737,11 +739,11 @@
       "noRealBusinessDeletion": true,
       "remoteBrowserControlBlocked": false,
       "lastTabMetadataObserved": {
-        "id": "1088561523",
-        "url": "https://ays-orbit-360-lab--gi-i65-b4-rc-41765742748-neoi3u7r.web.app/?utm_source=chatgpt.com#/leads",
-        "state": "SIGNED_OUT_LOGIN_HANDOFF_READY_FOR_PAULA"
+        "id": "1088561604",
+        "url": "https://ays-orbit-360-lab--gi-i65-b4-rc-41765742748-neoi3u7r.web.app/?utm_source=chatgpt.com#/ops",
+        "state": "PAULA_DIRECCION_CROSS_READ_AND_ARCHIVE_COMPLETE"
       },
-      "nextUiAction": "Paula signs in with her own actual account; reload and read the two existing Samuel comments and bitacora plus the operations notice for b4003qa_user_mw5lmd7r_nu0l4r. No new reply, reverse reload or fixture.",
+      "nextUiAction": null,
       "previousUnobservedNativePromptAttempt": {
         "recordedAtUtc": "2026-11-06T23:38:56Z",
         "status": "THREE_CURRENT_SYNTHETIC_FIXTURES_ARCHIVE_READBACK_PENDING",
@@ -776,7 +778,7 @@
       },
       "nativeConfirmationOutstanding": false,
       "manualNativeDialogResolutionRequired": false,
-      "canonicalArchiveReadbackPerformed": false,
+      "canonicalArchiveReadbackPerformed": true,
       "uiActions": [
         {
           "fixtureId": "b4003qa_user_mw5htkgl_31u61t",
@@ -786,7 +788,7 @@
           "expectedNativeConfirmAccepted": true,
           "clickCompleted": true,
           "modalClosed": true,
-          "canonicalArchivePass": false
+          "canonicalArchivePass": true
         },
         {
           "fixtureId": "b4003qa_user_mw5eas6v_lphfrl",
@@ -797,11 +799,50 @@
           "expectedNativeConfirmAccepted": true,
           "clickCompleted": true,
           "modalClosed": true,
-          "canonicalArchivePass": false
+          "canonicalArchivePass": true
+        },
+        {
+          "fixtureId": "b4003qa_user_mw5lmd7r_nu0l4r",
+          "principal": "Paula Osorio",
+          "role": "Dirección",
+          "action": "Limpiar documentos y archivar prueba",
+          "nativeConfirmObserved": true,
+          "nativeConfirmAccepted": true,
+          "clickCompleted": true,
+          "modalClosed": true,
+          "observedBrowserErrors": [],
+          "canonicalArchivePass": true
         }
       ],
-      "unarchivedFixtureReservedForPaulaRead": "b4003qa_user_mw5lmd7r_nu0l4r",
+      "unarchivedFixtureReservedForPaulaRead": null,
       "firestoreCanonicalReadback": {
+        "status": "THREE_EXACT_MASKED_GETS_PASS",
+        "projectId": "ays-orbit-360-lab",
+        "exactIds": [
+          "b4003qa_user_mw5htkgl_31u61t",
+          "b4003qa_user_mw5eas6v_lphfrl",
+          "b4003qa_user_mw5lmd7r_nu0l4r"
+        ],
+        "fieldMask": [
+          "archivado",
+          "previewWrite"
+        ],
+        "requestCount": 3,
+        "allThreeArchived": true,
+        "allThreePreviewWrite": true,
+        "runId": 42322970248,
+        "jobId": 128251619980,
+        "artifactId": 13553378284,
+        "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_THREE_SYNTHETIC_ARCHIVE_READBACK_20261107.json",
+        "receiptBlobSha": "209aec5d09130cf1572c6fcfcf22c69b15acfdcf",
+        "receiptSha256": "dc4b159ae691bc17922a6aa49b89af16b52ec4c01018d8beb9aee6194a7c53b2",
+        "observedAtUtc": "2026-11-07T01:14:58.640Z",
+        "remoteWrites": 0,
+        "consoleBypassAttempted": false,
+        "authorization": "Explicit latest owner authorization for the three exact current synthetic records."
+      },
+      "previousUiOnlyStatus": "TWO_AUTHORIZED_SYNTHETIC_ARCHIVE_UI_ACTIONS_EXECUTED_CANONICAL_READBACK_PENDING",
+      "previousFirestoreConsoleDenial": {
         "status": "SCOPED_BROWSER_ORIGIN_APPROVAL_REQUIRED_AFTER_AUTO_REVIEW_DENIAL",
         "attemptedExactProject": "ays-orbit-360-lab",
         "attemptedExactFixture": "b4003qa_user_mw5htkgl_31u61t",
@@ -810,18 +851,20 @@
       }
     },
     "minimumRemainingDeltaPlan20261106": {
-      "recordedAtUtc": "2026-11-06T23:38:56Z",
+      "recordedAtUtc": "2026-11-07T01:17:43Z",
       "existingFindingId": "B4-003-UAT-20261011-03",
       "completed": [
         "Samuel actual Asesor reads original Paula author in notice/comment/bitacora after reload on41.",
         "Samuel actual Operativo registers commercial and operations-directed comments; two canonical comments and bitacora contain human Samuel name and correct UID.",
         "Samuel actual Operativo Cliente360 GT/CO/TODOS commercial counts and QA segregation match signed Paula evidence.",
-        "Exact immutable42 readback plus actual320/390 complete currencies responsive PASS; unchanged author owners retain41 evidence."
+        "Exact immutable42 readback plus actual320/390 complete currencies responsive PASS; unchanged author owners retain41 evidence.",
+        "Paula actual Dirección reads Samuel notice/two comments/two bitacora entries after natural reload on exact42; cross-UID PASS.",
+        "All three current synthetic fixtures archived through UI and exact masked canonical GET3 returns archivado:true; no real business deletion.",
+        "Formal exact42 Preview acceptance reconciled with15 preserved certificates and16 current evidence entries."
       ],
       "next": [
-        "Paula signs in with her own actual account; reload and read the two existing Samuel comments and bitacora plus the operations notice for b4003qa_user_mw5lmd7r_nu0l4r. No new reply, reverse reload or fixture.",
-        "Canonical archivado:true readback for b4003qa_user_mw5htkgl_31u61t and b4003qa_user_mw5eas6v_lphfrl after both authorized archive UI actions; archive the Samuel fixture only after Paula read and verify it too. Firebase console origin access was auto-review denied; request scoped approval, do not bypass.",
-        "Reconcile formal exact Preview acceptance using preserved15 certificates and16 current evidence entries, certified rollback209 and exact restored42; promote only the same retained artifact and perform actual required LIVE module/write/reload/integrity checks."
+        "Promote only retained candidate42 version sites/ays-orbit-360-lab/versions/c5e1ae001fae793b through the existing guarded executor; retain source857f1222f360/buildgi-i65-b4-857f1222f360-57f234755dc1/artifact13549460562 and exact218 raw files.",
+        "After exact LIVE byte verification, perform actual authenticated module/role/scope/relationship/readback/reload/controlled-write/cleanup/integrity checks, including LIVE Aseguradoras reveal/copy. Only then grant current-release LIVE PASS and close B4-003."
       ],
       "noNewFixtures": true,
       "noAdditionalPaulaResponseRequired": true,
@@ -830,11 +873,11 @@
       "preservedHistoricalCertificates": 15,
       "cartesianDenominatorNotInvented": true,
       "b4003Closed": false,
-      "productionPromotionAuthorized": false
+      "productionPromotionAuthorized": true
     },
     "retainedHostingPreflight20261106": {
       "recordedAtUtc": "2026-11-07T00:48:20Z",
-      "status": "FULL_CURRENT_218_PREVIEW_AND_RETAINED_209_ROLLBACK_RAW_PASS_PAULA_AND_ARCHIVE_READBACK_PENDING",
+      "status": "FORMAL_EXACT42_PREVIEW_PASS_GUARDED_SAME_ARTIFACT_LIVE_AUTHORIZED",
       "productSourceSha": "857f1222f360a42a06e012810a1c01bce155a26f",
       "artifactId": 13549460562,
       "attempts": [
@@ -1122,12 +1165,12 @@
           "b4003Closed": false
         }
       ],
-      "nextReadOnlyAction": "Rollback raw209 is certified in durable Git bundle7ba72ca… and current42 Preview218 fully restored. Pending actual Paula cross-UID read and three-fixture canonical archive readback, then formal exact Preview acceptance and guarded same-artifact LIVE promotion. Old expired-channel404 remains historical evidence; do not rerun temporary releases solely because that channel expired.",
+      "nextReadOnlyAction": "Promote only retained candidate42 version sites/ays-orbit-360-lab/versions/c5e1ae001fae793b through the existing guarded executor; retain source857f1222f360/buildgi-i65-b4-857f1222f360-57f234755dc1/artifact13549460562 and exact218 raw files. After exact LIVE byte verification, perform actual authenticated module/role/scope/relationship/readback/reload/controlled-write/cleanup/integrity checks, including LIVE Aseguradoras reveal/copy. Only then grant current-release LIVE PASS and close B4-003.",
       "rollbackCertifiedByThisAttempt": true,
-      "productionPromotionAuthorized": false,
+      "productionPromotionAuthorized": true,
       "parserFix": "Normalize only observed projects/646761409743/ qualified version resources after exact project/site/channel validation; retain original observed names.",
       "existingLiveIntegrityHoldPreserved": true,
-      "hostingOnlyPromotionEligibilityNotYetGranted": true,
+      "hostingOnlyPromotionEligibilityNotYetGranted": false,
       "backendParityAuthorityReconciliationPending": false,
       "fullPreviewByteReadbackPass": true,
       "localImmutableArchiveAndCriticalServedPathsStillVerified": true,
@@ -1171,7 +1214,8 @@
         "productionPromotionAuthorized": false,
         "b4003Closed": false
       },
-      "lastProbeKind": "CONTROLLED_EXISTING_PREVIEW_TEMPORARY_RELEASE_AND_EXACT_RESTORE"
+      "lastProbeKind": "CONTROLLED_EXISTING_PREVIEW_TEMPORARY_RELEASE_AND_EXACT_RESTORE",
+      "formalPreviewAcceptancePointer": "/b4003ActiveCertificationCursor20261106/formalPreviewAcceptance"
     },
     "backendParityAuthorityReconciled20261106": {
       "recordedAtUtc": "2026-11-07T00:00:25Z",
@@ -1199,7 +1243,7 @@
       "notFormalLiveAcceptance": true
     },
     "browserContinuationUserActionRequired20261106": {
-      "recordedAtUtc": "2026-11-07T00:38:00Z",
+      "recordedAtUtc": "2026-11-07T01:17:43Z",
       "previousContinuation": {
         "recordedAtUtc": "2026-11-07T00:06:06Z",
         "lastAuthenticatedPrincipal": "Samuel Daza",
@@ -1220,21 +1264,22 @@
         "noNewSyntheticFixtureAllowed": true,
         "b4003Closed": false
       },
-      "lastAuthenticatedPrincipal": "Samuel Daza",
+      "lastAuthenticatedPrincipal": "Paula Osorio",
       "samuelSignOutCompleted": true,
-      "currentPage": "PAULA_LOGIN_FORM_READY",
+      "currentPage": "PAULA_DIRECCION_READY_FOR_LIVE",
       "nativeConfirmationAcceptanceObserved": true,
       "manualNativeDialogResolutionRequired": false,
-      "archiveUiActionsCompleted": 2,
-      "canonicalArchiveAfterActionsObserved": false,
-      "nextUserAction": "Sign in as Paula in prepared Gravicentra tab and authorize read-only access only to the three named current synthetic fixtures in Firebase project ays-orbit-360-lab.",
+      "archiveUiActionsCompleted": 3,
+      "canonicalArchiveAfterActionsObserved": true,
+      "nextUserAction": null,
       "screenshotPath": "artifacts/orbit360-recovery/release-control/evidence/PAULA_LOGIN_HANDOFF_20261107.jpg",
       "screenshotBlobSha": "6e02a86fa0e722260d9e885fcd8e37295422425b",
       "screenshotSha256": "c24ea7acffe6f13974e9d0196b19cf03c7397d97010c81b6937a87679877f2c6",
       "noNewSyntheticFixtureAllowed": true,
       "b4003Closed": false,
       "retainedRollbackReady": true,
-      "preview42RestoredVerified": true
+      "preview42RestoredVerified": true,
+      "paulaCrossUidReadComplete": true
     },
     "retainedRollbackTemporaryCertificationAuthorization20261107": {
       "status": "CONSUMED_PASS_PREVIEW42_RESTORED",
@@ -1257,7 +1302,7 @@
       "certificateReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_RETAINED_ROLLBACK_CERTIFIED_20261107.json",
       "certificateReceiptBlobSha": "7ba72ca211a9bb2771932f0b5ff95e6857732f9e"
     },
-    "activeAuthorReceiptBlobSha": "660e0dd7b3935ad8ee52899b87aaac9101f1b014",
+    "activeAuthorReceiptBlobSha": "3a5dc252cfeeb4408ba0f88924b836d8c7637fe4",
     "knownCausalPublishersReconciled20261107": {
       "recordedAtUtc": "2026-11-07 00:40:57 UTC",
       "status": "KNOWN_CAUSAL_SOURCE_PREVENTION_RECONFIRMED_HISTORICAL_INVENTORY_RECONCILED_NOT_GLOBAL_ACTIONS_IAM_CERTIFICATION",
@@ -1319,7 +1364,74 @@
       "formalPreviewAcceptanceGranted": false,
       "productionPromotionAuthorized": false,
       "b4003Closed": false
-    }
+    },
+    "paulaActualCrossUidRead20261107": {
+      "reader": "Paula Osorio",
+      "role": "Dirección",
+      "actualAccountObserved": true,
+      "normalAssignedRoleSelected": true,
+      "naturalReloadBeforeRead": true,
+      "identityEvidence": "User completed actual Paula sign-in; authenticated header Paula Osorio and assigned Dirección observed after reload. This was not Samuel's view-as simulation; no hidden auth state was read.",
+      "syntheticFixtureId": "b4003qa_user_mw5lmd7r_nu0l4r",
+      "noticeId": "collab_mw5lnqia_s0ajs",
+      "noticeAuthor": "Samuel Daza",
+      "commentAuthors": [
+        "Samuel Daza",
+        "Samuel Daza"
+      ],
+      "bitacoraAuthors": [
+        "Samuel Daza",
+        "Samuel Daza"
+      ],
+      "commentKinds": [
+        "Comentario comercial",
+        "Reenviado a Operaciones"
+      ],
+      "exactExistingCommentsRead": true,
+      "newReplyWritten": false,
+      "additionalFixtureCreated": false,
+      "status": "PASS_ACTUAL_PAULA_POST_RELOAD_SAMUEL_HUMAN_LABELS",
+      "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PAULA_CROSS_READ_AND_THREE_ARCHIVES_PASS_20261107.json",
+      "receiptBlobSha": "3a5dc252cfeeb4408ba0f88924b836d8c7637fe4"
+    },
+    "formalPreviewAcceptance": {
+      "status": "LATEST_APPROVED_VERSION_PREVIEW_PASS",
+      "recordedAtUtc": "2026-11-07T01:17:43Z",
+      "sourceSha": "857f1222f360a42a06e012810a1c01bce155a26f",
+      "buildId": "gi-i65-b4-857f1222f360-57f234755dc1",
+      "artifactId": 13549460562,
+      "archiveSha256": "5af8e1e6e98e861c5c1a2e25324841ac9dfb07fffae0524c1cabc1a6282ad338",
+      "hostingVersion": "sites/ays-orbit-360-lab/versions/c5e1ae001fae793b",
+      "productFiles": 218,
+      "productManifestSha256": "308b669105c380294177f1a8d2350216af95fec31f800955d611e607542b42da",
+      "preservedHistoricalCertificates": 15,
+      "currentEvidenceEntries": 16,
+      "priorCertificatesPreservedByCausalSuccessorLineage": true,
+      "paulaCrossUidReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PAULA_CROSS_READ_AND_THREE_ARCHIVES_PASS_20261107.json",
+      "paulaCrossUidReceiptBlobSha": "3a5dc252cfeeb4408ba0f88924b836d8c7637fe4",
+      "canonicalArchiveReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_THREE_SYNTHETIC_ARCHIVE_READBACK_20261107.json",
+      "canonicalArchiveReceiptBlobSha": "209aec5d09130cf1572c6fcfcf22c69b15acfdcf",
+      "canonicalThreeArchived": true,
+      "rollbackReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_RETAINED_ROLLBACK_CERTIFIED_20261107.json",
+      "approvalBasis": "Owner repeatedly requested final B4-003 closure and production completion; current exact Preview criteria now satisfied by actual evidence and preserved certificates. No new human approval act is invented.",
+      "productionAcceptanceGranted": false
+    },
+    "productionPromotionAuthorization20261107": {
+      "recordedAtUtc": "2026-11-07T01:17:43Z",
+      "scope": "ONE_EXISTING_FINALIZED_HOSTING_VERSION_TO_EXISTING_LIVE_CHANNEL_WITH_CONDITIONAL_CERTIFIED_ROLLBACK",
+      "basis": "Existing owner instruction to finish and close B4-003 and Gravicentra Fase A; formal exact Preview PASS now reconciled.",
+      "candidateVersion": "sites/ays-orbit-360-lab/versions/c5e1ae001fae793b",
+      "expectedLiveBefore": "sites/ays-orbit-360-lab/versions/3087fabd2db9b639",
+      "rollbackVersion": "sites/ays-orbit-360-lab/versions/5d35a2bd0b326e75",
+      "sameArtifactRequired": true,
+      "newBuild": false,
+      "functionsRedeploy": false,
+      "rulesChange": false,
+      "dataReimport": false,
+      "liveFunctionalAcceptanceRequiredAfterPromotion": true
+    },
+    "activeAuthorReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PAULA_CROSS_READ_AND_THREE_ARCHIVES_PASS_20261107.json",
+    "priorAuthorReceiptBlobSha": "660e0dd7b3935ad8ee52899b87aaac9101f1b014"
   },
   "b4003LeadsCurrent40ProspectiveHumanActorFocal20261106": {
     "dateLocal": "2026-11-06",
@@ -20182,7 +20294,7 @@
     "schema": "GRAVICENTRA_I6_5_B4_003_CERTIFICATION_INVENTORY_AND_SYNC_20261106_V7",
     "gate": "I6.5/B4-003",
     "recordType": "ADDITIVE_RELEASE_SCOPED_CERTIFICATION_INDEX_NOT_GATE_PASS",
-    "status": "CURRENT42_RESPONSIVE_AND_SAMUEL_CANONICAL_WRITER_PASS_PAULA_CROSS_UID_AND_CURRENT_CLEANUP_PENDING",
+    "status": "LATEST_APPROVED_VERSION_PREVIEW_PASS_LIVE_ACCEPTANCE_PENDING",
     "dateLocal": "2026-11-06",
     "authority": "CONTROL_PLANE_CURRENT_B4003_POINTER_AND_PHYSICAL_RECEIPTS",
     "historicalEvergreenCapabilities": {
@@ -20249,18 +20361,18 @@
       },
       {
         "id": "LEADS_CURRENT40_PROSPECTIVE_HUMAN_NAME_SYNTHETIC_PAULA",
-        "status": "ORIGINAL_AUTHOR_SAMUEL_READER_AND_NEW_SAMUEL_CANONICAL_WRITER_PASS_PAULA_CROSS_UID_PENDING",
+        "status": "ACTUAL_BIDIRECTIONAL_CROSS_UID_HUMAN_AUTHORS_AND_THREE_CANONICAL_ARCHIVES_PASS",
         "sourceSha": "b01dceafc1ec2b1e786626116251e248be1e23f4",
         "artifactId": 13527102882,
         "role": "Paula_Direccion_GT",
         "actorLabel": "Paula Osorio",
         "noEmailActor": true,
         "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CURRENT40_LEADS_NEW_HUMAN_AUTHOR_SYNTHETIC_UI_20261106.json",
-        "cleanupReadbackPending": true,
+        "cleanupReadbackPending": false,
         "doesNotProveFullTransversal": true,
         "noEmailActorScope": "IMMEDIATE_UI_ONLY",
-        "successfulCleanupPending": true,
-        "archiveReadback": "TWO_UI_ARCHIVE_ACTIONS_EXECUTED_CANONICAL_READBACK_PENDING",
+        "successfulCleanupPending": false,
+        "archiveReadback": "THREE_OF_THREE_CANONICAL_ARCHIVADO_TRUE",
         "originalCommentFixtureId": "b4003qa_user_mw5eas6v_lphfrl",
         "latestInterruptedFixtureId": "b4003qa_user_mw5htkgl_31u61t",
         "originalCommentDurableActorFields": "EMAIL_VALUED_NAME_AND_USER_WITH_ACTOR_UID",
@@ -20284,7 +20396,12 @@
         "samuelNewFixtureId": "b4003qa_user_mw5lmd7r_nu0l4r",
         "newSamuelCanonicalWriterPass": true,
         "lastCanonicalReadbackBeforeArchiveActions": "BOTH_ORIGINAL_FIXTURES_PRESENT_ARCHIVADO_FALSE",
-        "archiveUiActionsCompleted": 2
+        "archiveUiActionsCompleted": 2,
+        "reverseWriterCrossReadPending": false,
+        "completionReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_PAULA_CROSS_READ_AND_THREE_ARCHIVES_PASS_20261107.json",
+        "completionReceiptBlobSha": "3a5dc252cfeeb4408ba0f88924b836d8c7637fe4",
+        "paulaActualCrossUidReadPass": true,
+        "canonicalArchiveReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_THREE_SYNTHETIC_ARCHIVE_READBACK_20261107.json"
       },
       {
         "id": "HISTORIAL_CURRENT40_OPERATIVO_GT_CO_TODOS_COUNTRY_SUM",
@@ -20666,19 +20783,17 @@
       "hostedPayloadDigest": "308b669105c380294177f1a8d2350216af95fec31f800955d611e607542b42da",
       "fullPreview218ByteReadbackPass": true,
       "fullPreviewReadbackRunId": 42318956784,
-      "fullPreviewReadbackReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_C42_RETAINED_HOSTING_READBACK_20261107.json"
+      "fullPreviewReadbackReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_C42_RETAINED_HOSTING_READBACK_20261107.json",
+      "formalPreviewAcceptanceStatus": "LATEST_APPROVED_VERSION_PREVIEW_PASS"
     },
     "openClosure": {
       "formalI6Percent": 50,
       "p0Closed": 4,
       "p0Total": 6,
       "b4003Closed": false,
-      "productionPromotionAuthorized": false,
+      "productionPromotionAuthorized": true,
       "remainingEvidenceRequired": [
-        "SAMUEL_NEW_COMMENTS_PAULA_ACTUAL_CROSS_UID_POST_RELOAD",
-        "CURRENT_THREE_TEST_FIXTURE_ARCHIVE_CANONICAL_READBACK",
-        "FORMAL_EXACT_PREVIEW_ACCEPTANCE_RECONCILE_PRESERVED_CERTIFICATES",
-        "SAME_RETAINED_ARTIFACT_LIVE_MODULE_WRITE_RELOAD_INTEGRITY"
+        "SAME_RETAINED_ARTIFACT_LIVE_MODULE_ROLE_WRITE_RELOAD_CLEANUP_INTEGRITY"
       ],
       "fullGateRemainsHold": true,
       "goalParticipationWriterSignedSevenOfSeven": true,
@@ -20696,11 +20811,13 @@
         "SAME_RETAINED_ARTIFACT_INDEPENDENT_LIVE_DIGEST_AND_MODULE_BY_MODULE_READBACK"
       ],
       "noCartesianMatrixInvented": true,
-      "currentTestFixtureCleanupPending": true,
-      "currentFixtureArchiveUiActionsCompleted": 2,
-      "currentFixtureCanonicalArchiveReadbackPending": true,
+      "currentTestFixtureCleanupPending": false,
+      "currentFixtureArchiveUiActionsCompleted": 3,
+      "currentFixtureCanonicalArchiveReadbackPending": false,
       "retainedRollbackRaw209Certified": true,
-      "retainedRollbackCertificatePath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_RETAINED_ROLLBACK_CERTIFIED_20261107.json"
+      "retainedRollbackCertificatePath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_RETAINED_ROLLBACK_CERTIFIED_20261107.json",
+      "formalExactPreviewPass": true,
+      "formalPreviewAcceptancePointer": "/b4003ActiveCertificationCursor20261106/formalPreviewAcceptance"
     },
     "projectSources": {
       "package": "GRAVICENTRA_PROJECT_SOURCES_EVERGREEN_V7",
@@ -20713,7 +20830,7 @@
     "noRealBusinessWrites": true,
     "noDataReimport": true,
     "noRulesRedeploy": true,
-    "noLivePromotion": true,
+    "noLivePromotion": false,
     "certificatesOnlyReopenedByCausalInvalidation": true,
     "decisionFreeze20261106": {
       "dateLocal": "2026-11-06",
@@ -20803,7 +20920,8 @@
       "productionTouched": false,
       "secretsReadOrLogged": false,
       "isNewGeneralAuditBlocker": false
-    }
+    },
+    "originalInventoryNoLivePromotion": true
   },
   "b4003PersonalCollectionP0SignedClosure20261106": {
     "schema": "GI_B4003_SIGNED_PERSONAL_COLLECTION_FUNCTIONAL_CLOSURE_20261106_V1",
