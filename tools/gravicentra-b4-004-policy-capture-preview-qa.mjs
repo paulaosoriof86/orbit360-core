@@ -35,7 +35,7 @@ export function verifyIdentityOnly(before,after,mapping){
 }
 
 export function assertCaptureInput(input,plan,tenantId){
- need(input?.tenantId===tenantId&&input.activeRole==='direccion','REQUEST_ACTOR_CONTEXT');
+ need(input?.tenantId===tenantId&&input.activeRole==='Dirección','REQUEST_ACTOR_CONTEXT');
  need(Array.isArray(input.mutations)&&input.mutations.length>=1&&input.mutations.length<=5&&!input.metaPreviewQa,'REQUEST_SHAPE');
  const allowed=new Map(Object.values(plan).map(x=>[x.collection+'|'+x.id,x]));
  const seen=new Set();

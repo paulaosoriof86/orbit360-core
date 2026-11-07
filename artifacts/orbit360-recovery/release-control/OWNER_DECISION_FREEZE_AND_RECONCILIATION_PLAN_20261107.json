@@ -492,7 +492,7 @@
     "schema": "GRAVICENTRA_OWNER_DOCUMENTARY_SUCCESSOR_VALIDATION_V1",
     "baseHead": "74312cc3621ba155ee288a0afb530a488246f0e6",
     "guardPath": "tools/gravicentra-b4-003-formal-live-closeout-guard.mjs",
-    "guardBlobSha": "5f24f4c6df5951d5166c8bb50490caf5f6c2b16e",
+    "guardBlobSha": "af38204b6de98e5ad7888dca0dddc8504101c44f",
     "testPath": "tools/gravicentra-b4-003-owner-decision-successor.test.mjs",
     "testBlobSha": "790f27717ba9a1a985f007e4910a779898573d20",
     "sealedMasterPlanBlobPreserved": "458c5af57b2f7d9453d0064eba0cd737edf14ef4",
@@ -3767,14 +3767,14 @@
       {
         "path": "tools/gravicentra-b4-004-policy-capture-preview-qa.mjs",
         "previousBlobSha": null,
-        "blobSha": "f12dbad5182f36c2912fa1faa1944277f99cacb5",
-        "sha256": "5c2cab25e764ef52e653c3f9764a59b405b2cff130e1078522447ec601766328"
+        "blobSha": "f52fab5a3d4d1a657fa3a0426aa1a962a4ce91cf",
+        "sha256": "38ed2ffd0d784b3854a81fbeeef8d98a5fca55838ea51547bf1439cd16290cc7"
       },
       {
         "path": "tools/gravicentra-b4-004-policy-capture-preview-qa.test.mjs",
         "previousBlobSha": null,
-        "blobSha": "15388b57940e4fe894edb23e4e4bc9d468619b8a",
-        "sha256": "21d4a4c397cd5f4b536034c507393095cf015922075e4182bc41d730132dd8c3"
+        "blobSha": "cacabf73a04e460cf1e18b9baee89f9fa7e03cfc",
+        "sha256": "22a45f1b73fff7cffbe1c57690a69b9ba83cf930e55092169ddf983be8387020"
       },
       {
         "path": "tools/gravicentra-b4-004-receipt-editor-preservation.test.cjs",
@@ -3791,8 +3791,14 @@
       {
         "path": ".github/workflows/gravicentra-b4-003-immutable-candidate-preview.yml",
         "previousBlobSha": "8d17a2e1f4e2a6ff8da5d931790c364e8a2f828a",
-        "blobSha": "04e0779feaff7ee204fee67647220fac50576d9b",
-        "sha256": "1d889c26d87d943ef82bde034f1a5f50bf27276ac156f0105d3580c2a403605a"
+        "blobSha": "239d181370431484a8440532f4ceadf6ae1065a6",
+        "sha256": "0c2a2ac669e34246c2bd947d3197ceed3f1c267b95232a986a07bcaaef7c2c3e"
+      },
+      {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_004_POLICY_CAPTURE_PREVIEW_FAILED_RUN42416303881_20261107.json",
+        "previousBlobSha": null,
+        "blobSha": "2de8a838fd3f9fec83a4ea853ba5086bb9645203",
+        "sha256": "d887cc6385bb51c18adcc5f2629dadd67c41d5a48c43a0edd4b6f5146597e84d"
       }
     ],
     "preservedFiles": [
@@ -3826,9 +3832,9 @@
       "clientCreateCountryScopeTests": 6,
       "independentActualWriterBackendTests": 12,
       "governancePositiveNegativeChecks": 20,
-      "signedPreviewUat": "PENDING",
+      "signedPreviewUat": "RUN42416303881_FAILED_AT_QA_FENCE_ZERO_PRODUCT_COMMANDS_RETRY_PENDING",
       "sameArtifactPromotion": "PENDING_NEW_RECEIPT_AND_CURSOR",
-      "previewIdentityBoundaryTests": 14,
+      "previewIdentityBoundaryTests": 16,
       "receiptEditorPreservationTests": 11
     },
     "authenticatedQaMode": {
@@ -3836,7 +3842,7 @@
       "helper": "tools/gravicentra-b4-004-policy-capture-preview-qa.mjs",
       "test": "tools/gravicentra-b4-004-policy-capture-preview-qa.test.mjs",
       "environmentMode": "B4_004_POLICY_CAPTURE_QA",
-      "status": "IMPLEMENTED_NOT_EXECUTED_AUTHENTICATED",
+      "status": "FIRST_AUTHENTICATED_RUN_FAILED_AT_QA_FENCE_CANONICAL_ROLE_FIX_PREPARED_RETRY_PENDING",
       "receiptSchema": "GRAVICENTRA_B4_004_POLICY_CAPTURE_FOCAL_PREVIEW_QA_V1",
       "requiredStatus": "FOCAL_AUTHENTICATED_UI_PASS",
       "afterExactArtifactReadback": true,
@@ -3855,6 +3861,32 @@
       "operation": "REMOVE_PRIVATE_IDENTIFIER_FROM_NEW_PUBLIC_SUCCESSOR_ONLY",
       "evidenceHashPreserved": true,
       "historicalCommitUnchanged": true
+    },
+    "qaCanonicalRoleEnvelopeCorrection20261107": {
+      "schema": "GRAVICENTRA_POLICY_CAPTURE_QA_CANONICAL_ROLE_CORRECTION_V1",
+      "parentSourceSha": "65bc0288b079883648642bf1474636b84d9d8e7a",
+      "status": "SOURCE_PREPARED_AUTHENTICATED_RETRY_PENDING",
+      "failedRunId": 42416303881,
+      "failedReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_004_POLICY_CAPTURE_PREVIEW_FAILED_RUN42416303881_20261107.json",
+      "failedReceiptBlobSha": "2de8a838fd3f9fec83a4ea853ba5086bb9645203",
+      "outboundFacadeRole": "Dirección",
+      "serverAuditNormalizedRole": "direccion",
+      "change": "RECOGNIZE_EXACT_CANONICAL_FACADE_ROLE_WITHOUT_TRANSFORMING_REQUEST",
+      "productOwnersChanged": false,
+      "sourceContractChanged": false,
+      "authOrScopeExpanded": false,
+      "newBuildRequired": true,
+      "failedArtifactPromotionAllowed": false,
+      "failedProductCommandsAdmitted": 0,
+      "failedSeedWrites": 2,
+      "failedCleanupWrites": 2,
+      "failedSyntheticFinalAbsent": true,
+      "canonicalEnvelopeTests": "ACTUAL_TAXONOMY_ACCESS_AND_FACADE_BATCH_DURABLE_AUDIT_CLIENT_ACTIVITY_ORDINARY_STATE_UPDATE_WITH_BACKEND_ROLE_RESOLVER",
+      "workflowPushPaths": "EXACT_EXISTING_HELPER_TEST_RUNNER_NATIVE_RECEIPT_EDITOR_AND_RECEIPT_TEST",
+      "priorGuardRunId": 42416303851,
+      "priorGuardConclusion": "success",
+      "newImmutablePreviewUat": "PENDING",
+      "productionAccepted": false
     }
   },
   "ownerResponseCriteriaAdditive20261107": {

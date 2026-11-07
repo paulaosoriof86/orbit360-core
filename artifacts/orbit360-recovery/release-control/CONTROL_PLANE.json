@@ -8792,7 +8792,7 @@
       "ownerConfirmed": true,
       "scope": "POLICY_ONLY_NOT_GLOBAL_FRACCIONADO_CEILING",
       "receiptPath": "artifacts/orbit360-recovery/release-control/OWNER_DECISION_FREEZE_AND_RECONCILIATION_PLAN_20261107.json",
-      "receiptBlobSha": "b79c24dfe073c81442a6f212a34eeea1a5f4eb12",
+      "receiptBlobSha": "44056e0b3db42fbc4d74bc978d745b1dd028441a",
       "dataApplied": false
     }
   },
@@ -21630,7 +21630,7 @@
     "status": "OWNER_DECISIONS_AND_WORK_PLAN_FROZEN",
     "recordedAtUtc": "2026-11-07T19:36:22Z",
     "path": "artifacts/orbit360-recovery/release-control/OWNER_DECISION_FREEZE_AND_RECONCILIATION_PLAN_20261107.json",
-    "blobSha": "b79c24dfe073c81442a6f212a34eeea1a5f4eb12",
+    "blobSha": "44056e0b3db42fbc4d74bc978d745b1dd028441a",
     "planPath": "artifacts/orbit360-recovery/release-control/PLAN_OPERATIVO_DECISIONES_PAULA_20261107.md",
     "planBlobSha": "c764aea8d8a2bb7c33e3745f585f1c55158f7a2e",
     "authorityBaseHead": "74312cc3621ba155ee288a0afb530a488246f0e6",

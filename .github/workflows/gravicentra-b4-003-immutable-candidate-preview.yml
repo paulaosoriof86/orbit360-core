@@ -30,6 +30,11 @@ on:
       - tools/gravicentra-b4-004-equipo-commission-audit.test.cjs
       - tools/gravicentra-b4-004-client-create-country-scope.test.cjs
       - tools/gravicentra-policy-writer-backend-causal.test.cjs
+      - orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js
+      - tools/gravicentra-b4-004-policy-capture-preview-qa.mjs
+      - tools/gravicentra-b4-004-policy-capture-preview-qa.test.mjs
+      - tools/gravicentra-b4-004-receipt-editor-preservation.test.cjs
+      - tools/gravicentra-i6-5-b4-003-preview-proof.mjs
       - orbit360-platform/data/store-firestore-product-operational-p0.js
       - tests/goal-participation-classification-writer.test.cjs
       - functions/b4-003-scoped-bootstrap-reader.js

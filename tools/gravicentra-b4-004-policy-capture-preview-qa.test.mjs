@@ -1,6 +1,11 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
+import fs from 'node:fs';
+import vm from 'node:vm';
+import {createRequire} from 'node:module';
+const require=createRequire(import.meta.url);
+const {resolveProductActiveRole}=require('../functions/product-active-role-contract.js');
 import {fixturePlan,verifyIdentityOnly,assertCaptureInput,assertCleanupFixture,assertCleanupReceipt,receiptIdentity,policyActivityMatches,installCaptureIdentityAdapter} from './gravicentra-b4-004-policy-capture-preview-qa.mjs';
 const plan=fixturePlan('12345_1'),tenantId='alianzas-soluciones',uid='qa_signed_actor',copy=v=>JSON.parse(JSON.stringify(v));
 function harness(){
@@ -8,7 +13,7 @@ function harness(){
  installCaptureIdentityAdapter({plan});return{calls,s:Orbit.store,qa:__giCaptureQa,close(){__giCaptureQa.restore();delete globalThis.Orbit;}};
 }
 function clientBatch(){return[{action:'insert',collection:'clientes',id:'cli_original',payload:{id:'cli_original',pais:'GT',nombre:'Synthetic client',asesorId:plan.advisor.id,email:'qa@example.invalid',estado:'pendiente_polizas'}},{action:'insert',collection:'actividades',id:'act_original',payload:{id:'act_original',pais:'GT',clienteId:'cli_original',asesorId:plan.advisor.id,detalle:'cli_original is text and must not change'}}];}
-function wireInput(){return{tenantId,activeRole:'direccion',requestId:'qa_request_12345',mutations:[{action:'update',collection:'asesores',id:plan.advisor.id,payload:{id:plan.advisor.id,tenantId,pais:'GT',shareCom:60,__syntheticQa:true}}]};}
+function wireInput(){return{tenantId,activeRole:'Dirección',requestId:'qa_request_12345',mutations:[{action:'update',collection:'asesores',id:plan.advisor.id,payload:{id:plan.advisor.id,tenantId,pais:'GT',shareCom:60,__syntheticQa:true}}]};}
 
 test('fixture IDs require an Actions run and attempt and enumerate exact collections',()=>{assert.equal(Object.keys(plan).length,11);assert.equal(new Set(Object.values(plan).map(x=>x.id)).size,11);assert.throws(()=>fixturePlan('../live'),/RUN_REQUIRED/);});
 test('actual caller objects keep their references while only record identities and marker change',async()=>{const h=harness();try{h.qa.setPhase('client-create');const ms=clientBatch(),before=copy(ms),row=ms[0].payload;await h.s.batchDurable(ms,{requestId:'same-operation'});assert.equal(row.id,plan.client.id);assert.equal(ms[1].payload.clienteId,row.id);assert.equal(ms[1].payload.detalle,before[1].payload.detalle);assert.equal(h.calls[0].o.requestId,'same-operation');const r=h.qa.snapshot().records[0];r.before.forEach((m,i)=>assert.equal(verifyIdentityOnly(m.payload,r.after[i].payload,r.mapping),true));assert.equal(h.calls.length,1);}finally{h.close();}});
@@ -24,3 +29,56 @@ test('cleanup requires exact fixture identity, original owner, tenant and no aut
 test('request/event cleanup binds the exact normalized digest, actor, original absence and derived IDs',()=>{const input=wireInput(),exact=receiptIdentity(input,tenantId,uid),result={ok:true,serverOwned:true,requestId:exact.requestId,eventId:exact.eventId},event={...exact,tenantId,actorUid:uid,activeRole:'direccion',mutationCount:1},request={status:'committed',payloadDigest:exact.payloadDigest,result},call={input,response:result,originalReceiptAbsence:true};assert.equal(assertCleanupReceipt(event,request,call,tenantId,uid),true);for(const change of [{actorUid:'different'},{payloadDigest:'0'.repeat(64)},{eventId:'unrelated'},{mutationCount:2}])assert.throws(()=>assertCleanupReceipt({...event,...change},request,call,tenantId,uid),/CLEANUP_/);assert.throws(()=>assertCleanupReceipt(event,request,{...call,originalReceiptAbsence:false},tenantId,uid),/CLEANUP_/);});
 test('missing ACK can be resolved by the exact deterministic request/event addresses',()=>{const input=wireInput();delete input.requestId;const a=receiptIdentity(input,tenantId,uid),b=receiptIdentity(copy(input),tenantId,uid);assert.deepEqual(a,b);assert.match(a.requestId,/^op_[a-f0-9]{32}$/);assert.match(a.eventId,/^opevt_[a-f0-9]{28}$/);assert.notEqual(a.requestId,receiptIdentity(input,tenantId,'another_actor').requestId);assert.equal(a.eventId,'opevt_'+createHash('sha256').update(tenantId+'|'+a.requestId).digest('hex').slice(0,28));});
 test('canonical policy activity is linked by exact fixture, client, advisor and operation without inventing polizaId',()=>{const policy={numero:'QA-ONE',operationId:'policy_op_one'},activity={id:plan.policyActivity.id,clienteId:plan.client.id,asesorId:plan.advisor.id,pais:'GT',operacionId:policy.operationId,titulo:'Póliza creada: '+policy.numero};assert.equal(policyActivityMatches(activity,policy,plan),true);assert.equal(Object.hasOwn(activity,'polizaId'),false);for(const patch of [{operacionId:'other'},{clienteId:'foreign'},{id:'other'},{pais:'CO'}])assert.equal(policyActivityMatches({...activity,...patch},policy,plan),false);});
+
+
+// Use the product taxonomy, access owner and complete operational facade. The
+// provider is an in-memory boundary, not a replacement authorization engine.
+function canonicalFacadeHarness({countries=['GT'],sessionRole}={}){
+ const rows=new Map(),calls=[],listeners=[];
+ const put=(c,r)=>rows.set(c+'|'+r.id,copy(r)),get=(c,id)=>copy(rows.get(c+'|'+id)||null);
+ const all=c=>[...rows].filter(([k])=>k.startsWith(c+'|')).map(([,v])=>copy(v));
+ const readStore={__productReadOnlyP0:true,_productStatus:()=>({ready:true,status:'ready-read-only',noFallback:true,writeEnabled:false}),get,all,where:(c,f)=>all(c).filter(f),on:(c,f)=>listeners.push(f),pref:(k,d)=>d};
+ const context=vm.createContext({console,Date,Math,Set,Map,Promise,JSON,setTimeout,clearTimeout,location:{hostname:'ays-orbit-360-lab--gi-i65-b4-rc-41765742748-neoi3u7r.web.app'},document:{dispatchEvent(){}},CustomEvent:class {constructor(type,options){this.type=type;Object.assign(this,options);}},dispatchEvent(){},__ORBIT360_PRODUCT_PUBLIC_CONFIG__:{goalParticipationPreviewCandidate:true}});
+ context.window=context;context.Orbit={store:readStore,pais:'GT'};
+ const load=path=>vm.runInContext(fs.readFileSync(new URL('../orbit360-platform/'+path,import.meta.url),'utf8'),context,{filename:path});
+ load('core/product-role-taxonomy-p0.js');
+ const O=context.Orbit,member=O.productRoleTaxonomyP0.normalizeMembership({uid,tenantId,email:'synthetic@example.invalid',status:'active',active:true,productReadOnly:true,activeRole:'direccion',roles:['direccion'],countries,advisorId:plan.advisor.id,scopeDatos:'todos'});
+ let role=sessionRole||member.activeRole;
+ put('asesores',{id:plan.advisor.id,tenantId,pais:'GT',paisDefault:'GT',paises:['GT'],scopeDatos:'todos',shareCom:50,ownerUid:uid,__syntheticQa:true});
+ O.auth={productUser:member,user:()=>({uid,nombre:'Synthetic actor',rol:role})};
+ O.session={rol:()=>role,asesorId:()=>plan.advisor.id,rolesAsignados:()=>member.roles};
+ O.tenant={id:tenantId,get:()=>({tenantId}),isActive:()=>true};
+ O.ROLES={'Dirección':{modulos:['cliente360','polizas','cobros','equipo','inicio'],nivel:10}};
+ O.productRuntimeBrowserProvidersP0={browserFirestoreWriteAuthorized:false,serverWriteTransport:'firebase-functions',noFallback:true,initialize:async()=>({auth:{currentUser:{uid}}}),async callFunction(name,input,region){
+  const original=JSON.stringify(input);
+  assert.equal(name,'orbit360ProductOperationalCommandGoalsPreview');assert.equal(region,'us-east1');
+  assert.equal(assertCaptureInput(input,plan,tenantId),true);assert.equal(JSON.stringify(input),original);
+  assert.equal(resolveProductActiveRole(member,input.activeRole).activeRole,'direccion');
+  calls.push({name,input:copy(input),region});
+  for(const m of input.mutations)put(m.collection,m.payload);
+  listeners.forEach(fn=>fn('*'));
+  return{ok:true,serverOwned:true,canonicalReadback:true,canonicalReadbackCount:input.mutations.length,readback:input.mutations.map(m=>({action:m.action,collection:m.collection,id:m.id,exists:true}))};
+ }};
+ load('core/access-scope.js');load('data/store-firestore-product-operational-p0.js');
+ O.productOperationalWriteP0.install(readStore);
+ return{O,member,calls,get,setRole:v=>{role=v;}};
+}
+test('actual taxonomy/access/facade serialize Dirección for batch, durable audit, client activity and ordinary state update',async()=>{
+ const h=canonicalFacadeHarness();assert.equal(h.member.activeRole,'Dirección');
+ await h.O.store.batchDurable([{action:'update',collection:'asesores',id:plan.advisor.id,payload:{shareCom:60,__syntheticQa:true}}],{requestId:'qa_actual_advisor'});
+ await h.O.store.insertDurable('auditoria',{id:plan.advisorAudit.id,pais:'GT',asesorId:plan.advisor.id,actorUid:uid,after:{shareCom:60},__syntheticQa:true});
+ await h.O.store.batchDurable([{action:'insert',collection:'clientes',id:plan.client.id,payload:{id:plan.client.id,pais:'GT',asesorId:plan.advisor.id,nombre:'Synthetic client',estado:'pendiente_polizas',__syntheticQa:true}},{action:'insert',collection:'actividades',id:plan.clientActivity.id,payload:{id:plan.clientActivity.id,pais:'GT',clienteId:plan.client.id,asesorId:plan.advisor.id,titulo:'Synthetic creation',__syntheticQa:true}}],{requestId:'qa_actual_client'});
+ h.O.store.update('clientes',plan.client.id,{estado:'activo',estadoOperativo:'activo',__syntheticQa:true});
+ await new Promise(setImmediate);
+ assert.equal(h.calls.length,4);assert.equal(h.get('asesores',plan.advisor.id).shareCom,60);assert.equal(h.get('clientes',plan.client.id).estado,'activo');
+ for(const call of h.calls){assert.equal(call.input.activeRole,'Dirección');assert.equal(call.input.tenantId,tenantId);for(const m of call.input.mutations){assert.equal(m.payload.id,m.id);assert.equal(m.payload.tenantId,tenantId);assert.equal(m.payload.pais,'GT');assert.equal(m.payload.__syntheticQa,true);}}
+ assert.equal(h.calls[0].input.requestId,'qa_actual_advisor');assert.equal(Object.hasOwn(h.calls[1].input,'requestId'),false);assert.equal(Object.hasOwn(h.calls[3].input,'requestId'),false);
+ const outbound=h.calls[0].input;assert.throws(()=>assertCaptureInput({...outbound,activeRole:'direccion'},plan,tenantId),/REQUEST_ACTOR_CONTEXT/);
+});
+test('canonical role correction preserves actual country and assigned-role denials before provider admission',async()=>{
+ const denied=canonicalFacadeHarness({countries:['CO']});
+ await assert.rejects(denied.O.store.batchDurable([{action:'update',collection:'asesores',id:plan.advisor.id,payload:{shareCom:60,__syntheticQa:true}}]),/SCOPE_DENIED/);
+ assert.equal(denied.calls.length,0);
+ const h=canonicalFacadeHarness();h.setRole('SuperAdmin');
+ assert.throws(()=>h.O.store.batchDurable([{action:'update',collection:'asesores',id:plan.advisor.id,payload:{shareCom:60,__syntheticQa:true}}]),/MEMBERSHIP_REQUIRED/);assert.equal(h.calls.length,0);
+});

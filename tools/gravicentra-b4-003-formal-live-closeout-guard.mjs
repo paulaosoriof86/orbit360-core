@@ -523,11 +523,11 @@ const POLICY_CAPTURE_PINS={
   },
   "tools/gravicentra-b4-004-policy-capture-preview-qa.mjs": {
     "before": null,
-    "after": "f12dbad5182f36c2912fa1faa1944277f99cacb5"
+    "after": "f52fab5a3d4d1a657fa3a0426aa1a962a4ce91cf"
   },
   "tools/gravicentra-b4-004-policy-capture-preview-qa.test.mjs": {
     "before": null,
-    "after": "15388b57940e4fe894edb23e4e4bc9d468619b8a"
+    "after": "cacabf73a04e460cf1e18b9baee89f9fa7e03cfc"
   },
   "tools/gravicentra-b4-004-receipt-editor-preservation.test.cjs": {
     "before": null,
@@ -539,7 +539,11 @@ const POLICY_CAPTURE_PINS={
   },
   ".github/workflows/gravicentra-b4-003-immutable-candidate-preview.yml": {
     "before": "8d17a2e1f4e2a6ff8da5d931790c364e8a2f828a",
-    "after": "04e0779feaff7ee204fee67647220fac50576d9b"
+    "after": "239d181370431484a8440532f4ceadf6ae1065a6"
+  },
+  "artifacts/orbit360-recovery/release-control/I6_5_B4_004_POLICY_CAPTURE_PREVIEW_FAILED_RUN42416303881_20261107.json": {
+    "before": null,
+    "after": "2de8a838fd3f9fec83a4ea853ba5086bb9645203"
   }
 };
 const POLICY_CAPTURE_PRESERVED={
@@ -570,6 +574,12 @@ export function validatePolicyCaptureCausalSourceSuccessor({record,fileBytes,bas
  need(c.schema==='GRAVICENTRA_CURRENT42_CAUSAL_FRONTEND_SUCCESSOR_CONTRACT_V1'&&c.sourceBaseHead===POLICY_CAPTURE_BASE&&c.scope.b4003Reopened===false&&c.scope.historicalCertificatesRewritten===false&&c.scope.nextGateExecuted===false&&c.scope.backendFunctionDeploys===0&&c.scope.businessWrites===0&&c.scope.rulesWrites===0&&c.scope.authIamChanges===0&&c.scope.reimport===false&&c.promotion.authorized===false,'POLICY_CAPTURE_CONTRACT_SCOPE');
  need(same(c.productChanges.map(e=>e.path),POLICY_CAPTURE_PRODUCTS)&&c.productChanges.every(e=>e.beforeBlobSha===POLICY_CAPTURE_PINS[e.path].before&&e.afterBlobSha===POLICY_CAPTURE_PINS[e.path].after),'POLICY_CAPTURE_PRODUCT_CONTRACT');
  need(c.preservedAcceptance.receiptBlobSha===p.current42ReceiptBlobSha&&c.preservedPriorSuccessor.liveBytesReceiptBlobSha===p.preservedE503LiveBytesReceiptBlobSha&&c.rollback.sourceSha===p.preservedE503Source&&c.rollback.versionName==='sites/ays-orbit-360-lab/versions/d8caae0d585bf6dd'&&c.rollback.hostedPayloadDigest==='09c91023d1d22687528a61edb5a768dadbd59c465af91bc48016d21c94c6537f','POLICY_CAPTURE_ROLLBACK_PRESERVED');
+ const f=p.qaCanonicalRoleEnvelopeCorrection20261107;
+ const failedPath='artifacts/orbit360-recovery/release-control/I6_5_B4_004_POLICY_CAPTURE_PREVIEW_FAILED_RUN42416303881_20261107.json';
+ need(f?.schema==='GRAVICENTRA_POLICY_CAPTURE_QA_CANONICAL_ROLE_CORRECTION_V1'&&f.parentSourceSha==='65bc0288b079883648642bf1474636b84d9d8e7a'&&f.status==='SOURCE_PREPARED_AUTHENTICATED_RETRY_PENDING'&&f.failedReceiptPath===failedPath&&f.failedReceiptBlobSha===POLICY_CAPTURE_PINS[failedPath].after,'POLICY_CAPTURE_QA_RETRY_BINDING');
+ need(f.outboundFacadeRole==='Dirección'&&f.serverAuditNormalizedRole==='direccion'&&f.productOwnersChanged===false&&f.sourceContractChanged===false&&f.authOrScopeExpanded===false&&f.newBuildRequired===true&&f.failedArtifactPromotionAllowed===false&&f.newImmutablePreviewUat==='PENDING'&&f.productionAccepted===false,'POLICY_CAPTURE_QA_RETRY_SCOPE');
+ const failed=JSON.parse(Buffer.from(fileBytes[failedPath]).toString('utf8'));
+ need(failed.schema==='GRAVICENTRA_B4_004_IMMUTABLE_PREVIEW_FAILED_CAPTURE_RECEIPT_V1'&&failed.sourceSha===f.parentSourceSha&&failed.runId===42416303881&&f.failedRunId===failed.runId&&failed.status==='EXACT_ARTIFACT_VERIFIED_AUTHENTICATED_QA_FAILED_HOLD'&&failed.qa.status==='FAIL'&&failed.qa.productCommandsAdmitted===0&&failed.qa.seedWrites===2&&failed.qa.cleanupWrites===2&&failed.qa.syntheticFinalAbsent===true&&failed.qa.cleanup.verifiedAbsent===true&&f.failedProductCommandsAdmitted===failed.qa.productCommandsAdmitted&&f.failedSeedWrites===failed.qa.seedWrites&&f.failedCleanupWrites===failed.qa.cleanupWrites&&f.failedSyntheticFinalAbsent===failed.qa.syntheticFinalAbsent&&failed.boundaries.artifactPromotionAllowed===false&&failed.boundaries.productionAccepted===false,'POLICY_CAPTURE_QA_FAILED_EVIDENCE');
  const comparableFileBytes={...fileBytes,[POLICY_CAPTURE_WORKFLOW]:Buffer.from(baseSourceBytes[POLICY_CAPTURE_WORKFLOW])};
  return{allowedPaths:paths,comparableFileBytes,frozenPredecessorHead:POLICY_CAPTURE_BASE};
 }
