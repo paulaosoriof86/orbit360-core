@@ -4538,7 +4538,10 @@ jobs:
           const e=JSON.parse(fs.readFileSync(process.env.GITHUB_EVENT_PATH,'utf8'));
           const need=(v,c)=>{if(!v)throw Error(c);};
           need(a.status==='AUTHORIZED_ONCE'&&a.authorized===true&&a.consumed===false,'B4004_LIVE_AUTH_NOT_AVAILABLE');
-          need(cp.b4004LiveSyntheticPolicyCaptureAuthorization20261107?.receiptBlobSha===a.selfBlobSha,'B4004_LIVE_AUTH_POINTER_MISMATCH');
+          const {execFileSync}=require('node:child_process');
+          const authBlobSha=execFileSync('git',['hash-object',process.env.AUTH_RECEIPT],{encoding:'utf8'}).trim();
+          const authPtr=cp.b4004LiveSyntheticPolicyCaptureAuthorization20261107;
+          need(authPtr?.receiptPath===process.env.AUTH_RECEIPT&&authPtr.receiptBlobSha===authBlobSha,'B4004_LIVE_AUTH_POINTER_MISMATCH');
           need(e.before===a.authorizedParentSha&&e.after===process.env.GITHUB_SHA&&e.forced!==true,'B4004_LIVE_HEAD_LEASE_MISMATCH');
           need(p.status==='EXACT_HOSTING_VERSION_PROMOTED_LIVE_BYTES_PASS_FUNCTIONAL_LIVE_PENDING','B4004_LIVE_PROMOTION_MISSING');
           for(const k of ['sourceSha','buildId','artifactId','liveVersionName','hostedPayloadDigest'])need(a.release[k]===p[k],'B4004_LIVE_RELEASE_'+k.toUpperCase()+'_MISMATCH');

@@ -629,7 +629,7 @@
     "status": "OWNER_DECISIONS_AND_WORK_PLAN_FROZEN",
     "recordedAtUtc": "2026-11-07T19:36:22Z",
     "path": "artifacts/orbit360-recovery/release-control/OWNER_DECISION_FREEZE_AND_RECONCILIATION_PLAN_20261107.json",
-    "blobSha": "95caa92d78456137078c54fdc862b190d17cb4d1",
+    "blobSha": "fbef993bc929d8b079904da08b6968305a20a993",
     "planPath": "artifacts/orbit360-recovery/release-control/PLAN_OPERATIVO_DECISIONES_PAULA_20261107.md",
     "planBlobSha": "c764aea8d8a2bb7c33e3745f585f1c55158f7a2e",
     "authorityBaseHead": "74312cc3621ba155ee288a0afb530a488246f0e6",
@@ -756,6 +756,36 @@
       "buildId": "gi-i65-b4-6c45983610ce-57f234755dc1",
       "artifactId": 13592378081,
       "archiveSha256": "02a42a2a3fc0dbc477a19937ad0a636ef94afd142977fd6ddf4c1a6e2177fba9"
+    }
+  },
+  "b4004LiveSyntheticPolicyCaptureAuthorization20261107": {
+    "schema": "GRAVICENTRA_B4_004_POLICY_CAPTURE_LIVE_SYNTHETIC_OWNER_AUTH_V1",
+    "status": "AUTHORIZED_ONCE",
+    "authorized": true,
+    "consumed": false,
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_004_POLICY_CAPTURE_LIVE_SYNTHETIC_OWNER_AUTH_20261107.json",
+    "receiptBlobSha": "3ffb67c6b024882feecd6de4a14adddedbecd134",
+    "authorizedParentSha": "d511b4626e588acbd46ac474e335a0832117e072",
+    "release": {
+      "sourceSha": "6c45983610ce0d65a5c63bd07659ad968bfe9da3",
+      "buildId": "gi-i65-b4-6c45983610ce-57f234755dc1",
+      "artifactId": 13592378081,
+      "liveVersionName": "sites/ays-orbit-360-lab/versions/33af816375dd5cb5",
+      "hostedPayloadDigest": "018bf9acd64ddaa382d2ac73c35a6d8bbc0447ab3051a3d26a5b1e8c048a7e7d"
+    },
+    "scope": {
+      "syntheticOnly": true,
+      "realBusinessWrites": false,
+      "cleanupExact": true,
+      "finalAbsenceRequired": true,
+      "serverReadbackRequired": true,
+      "reloadRequired": true,
+      "maxFixtureIds": 11,
+      "productSourceMutation": false,
+      "backendMutation": false,
+      "rulesMutation": false,
+      "authIamMutation": false,
+      "reimport": false
     }
   }
 }

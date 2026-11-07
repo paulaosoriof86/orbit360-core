@@ -1,0 +1,33 @@
+{
+  "schema": "GRAVICENTRA_B4_004_POLICY_CAPTURE_LIVE_SYNTHETIC_OWNER_AUTH_V1",
+  "status": "AUTHORIZED_ONCE",
+  "gate": "I6.5/B4-004",
+  "authority": "Paula explicit authorization in active Gravicentra Insurance voice session",
+  "authorized": true,
+  "consumed": false,
+  "authorizedParentSha": "d511b4626e588acbd46ac474e335a0832117e072",
+  "release": {
+    "sourceSha": "6c45983610ce0d65a5c63bd07659ad968bfe9da3",
+    "buildId": "gi-i65-b4-6c45983610ce-57f234755dc1",
+    "artifactId": 13592378081,
+    "liveVersionName": "sites/ays-orbit-360-lab/versions/33af816375dd5cb5",
+    "hostedPayloadDigest": "018bf9acd64ddaa382d2ac73c35a6d8bbc0447ab3051a3d26a5b1e8c048a7e7d"
+  },
+  "scope": {
+    "syntheticOnly": true,
+    "realBusinessWrites": false,
+    "cleanupExact": true,
+    "finalAbsenceRequired": true,
+    "serverReadbackRequired": true,
+    "reloadRequired": true,
+    "maxFixtureIds": 11,
+    "productSourceMutation": false,
+    "backendMutation": false,
+    "rulesMutation": false,
+    "authIamMutation": false,
+    "reimport": false
+  },
+  "protocolPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_004_LONG_BLOCK_EXECUTION_PROTOCOL_20261107.json",
+  "livePromotionBindingPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_004_LIVE_PROMOTION_BINDING_20261107.json",
+  "singleUse": true
+}
