@@ -4513,13 +4513,13 @@ jobs:
       FRONTEND_CONTRACT: artifacts/orbit360-recovery/release-control/I6_5_B4_004_POLICY_CAPTURE_CAUSAL_FRONTEND_SUCCESSOR_CONTRACT_20261107.json
       SOURCE_SHA: 6c45983610ce0d65a5c63bd07659ad968bfe9da3
       B4_PREVIEW_URL: https://ays-orbit-360-lab.web.app
-      SA_DEFAULT: \${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-      SA_ORBIT360_LAB: \${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
-      SA_ORBIT_360_LAB: \${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: \${{ github.sha }}
+          ref: ${{ github.sha }}
           fetch-depth: 0
           persist-credentials: true
       - uses: actions/setup-node@v4
@@ -4570,8 +4570,8 @@ jobs:
       - name: Authenticated policy and receipt LIVE synthetic proof
         env:
           B4_004_POLICY_CAPTURE_LIVE_QA: 'true'
-          B4_004_LIVE_PROMOTION_PROOF: \${{ env.LIVE_PROMOTION }}
-          B4_003_PROOF_OUT: \${{ runner.temp }}/b4-004-policy-capture-live-qa.json
+          B4_004_LIVE_PROMOTION_PROOF: ${{ env.LIVE_PROMOTION }}
+          B4_003_PROOF_OUT: ${{ runner.temp }}/b4-004-policy-capture-live-qa.json
         run: |
           set -euo pipefail
           node tools/gravicentra-i6-5-b4-003-preview-proof.mjs
@@ -4584,7 +4584,7 @@ jobs:
           NODE
       - name: Seal focal LIVE proof and consume exact authorization
         env:
-          PROOF: \${{ runner.temp }}/b4-004-policy-capture-live-qa.json
+          PROOF: ${{ runner.temp }}/b4-004-policy-capture-live-qa.json
           RECEIPT: artifacts/orbit360-recovery/release-control/I6_5_B4_004_POLICY_CAPTURE_FOCAL_LIVE_QA_20261107.json
         run: |
           set -euo pipefail
@@ -4616,7 +4616,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: gravicentra-b4-004-policy-capture-live-\${{ github.run_id }}
-          path: \${{ runner.temp }}/b4-004-policy-capture-live-qa.json
+          name: gravicentra-b4-004-policy-capture-live-${{ github.run_id }}
+          path: ${{ runner.temp }}/b4-004-policy-capture-live-qa.json
           if-no-files-found: warn
           retention-days: 30

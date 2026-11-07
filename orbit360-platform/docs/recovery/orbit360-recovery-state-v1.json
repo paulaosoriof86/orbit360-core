@@ -764,8 +764,8 @@
     "authorized": true,
     "consumed": false,
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_004_POLICY_CAPTURE_LIVE_SYNTHETIC_OWNER_AUTH_20261107.json",
-    "receiptBlobSha": "3ffb67c6b024882feecd6de4a14adddedbecd134",
-    "authorizedParentSha": "d511b4626e588acbd46ac474e335a0832117e072",
+    "receiptBlobSha": "cf92d3e934776c5ef40c8f15634b66dfd81b1702",
+    "authorizedParentSha": "9f817946f0fcacce570fa1d8558dd3498f813132",
     "release": {
       "sourceSha": "6c45983610ce0d65a5c63bd07659ad968bfe9da3",
       "buildId": "gi-i65-b4-6c45983610ce-57f234755dc1",

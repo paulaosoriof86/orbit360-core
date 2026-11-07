@@ -5,7 +5,7 @@
   "authority": "Paula explicit authorization in active Gravicentra Insurance voice session",
   "authorized": true,
   "consumed": false,
-  "authorizedParentSha": "d511b4626e588acbd46ac474e335a0832117e072",
+  "authorizedParentSha": "9f817946f0fcacce570fa1d8558dd3498f813132",
   "release": {
     "sourceSha": "6c45983610ce0d65a5c63bd07659ad968bfe9da3",
     "buildId": "gi-i65-b4-6c45983610ce-57f234755dc1",
@@ -29,5 +29,15 @@
   },
   "protocolPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_004_LONG_BLOCK_EXECUTION_PROTOCOL_20261107.json",
   "livePromotionBindingPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_004_LIVE_PROMOTION_BINDING_20261107.json",
-  "singleUse": true
+  "singleUse": true,
+  "priorAttempts": [
+    {
+      "runId": 42426505919,
+      "jobId": 128565813736,
+      "result": "FAIL_BEFORE_AUTH_OR_WRITES_CHECKOUT_REF_ESCAPED",
+      "businessWrites": 0,
+      "syntheticWrites": 0,
+      "authorizationConsumed": false
+    }
+  ]
 }
