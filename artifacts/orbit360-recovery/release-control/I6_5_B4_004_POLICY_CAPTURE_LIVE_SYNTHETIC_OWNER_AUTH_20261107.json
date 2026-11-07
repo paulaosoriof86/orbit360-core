@@ -5,7 +5,7 @@
   "authority": "Paula explicit authorization in active Gravicentra Insurance voice session",
   "authorized": true,
   "consumed": false,
-  "authorizedParentSha": "9f817946f0fcacce570fa1d8558dd3498f813132",
+  "authorizedParentSha": "f7197e9dccb111100efa1ad4b21bc512f2e29949",
   "release": {
     "sourceSha": "6c45983610ce0d65a5c63bd07659ad968bfe9da3",
     "buildId": "gi-i65-b4-6c45983610ce-57f234755dc1",
@@ -37,6 +37,16 @@
       "result": "FAIL_BEFORE_AUTH_OR_WRITES_CHECKOUT_REF_ESCAPED",
       "businessWrites": 0,
       "syntheticWrites": 0,
+      "authorizationConsumed": false
+    },
+    {
+      "runId": 42426779424,
+      "jobId": 128566645749,
+      "result": "FUNCTIONAL_7_OF_7_PASS_CLEANUP_PASS_CONSOLE_CLASSIFICATION_HARNESS_FAIL",
+      "businessWrites": 0,
+      "syntheticMutations": 12,
+      "cleanupWrites": 22,
+      "syntheticFinalAbsent": true,
       "authorizationConsumed": false
     }
   ]

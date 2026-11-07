@@ -8,7 +8,7 @@ import {fileURLToPath} from 'node:url';
 import {createRequire} from 'node:module';
 const require=createRequire(import.meta.url);
 const {resolveProductActiveRole}=require('../functions/product-active-role-contract.js');
-import {fixturePlan,verifyIdentityOnly,assertCaptureInput,assertCleanupFixture,assertCleanupReceipt,receiptIdentity,policyActivityMatches,installCaptureIdentityAdapter,capturePolicyFormValidation,policyFormErrorDiagnostic} from './gravicentra-b4-004-policy-capture-live-qa.mjs';
+import {fixturePlan,verifyIdentityOnly,assertCaptureInput,assertCleanupFixture,assertCleanupReceipt,receiptIdentity,policyActivityMatches,installCaptureIdentityAdapter,capturePolicyFormValidation,policyFormErrorDiagnostic,classifyExpectedLiveAuditConsole} from './gravicentra-b4-004-policy-capture-live-qa.mjs';
 const plan=fixturePlan('12345_1'),tenantId='alianzas-soluciones',uid='qa_signed_actor',copy=v=>JSON.parse(JSON.stringify(v));
 function harness(){
  const calls=[];globalThis.Orbit={store:{__productOperationalWriteP0:true,batchDurable:async(ms,o)=>{calls.push({method:'batch',ms:copy(ms),o});return{ok:true};},insertDurable:async(c,p)=>{calls.push({method:'insertDurable',c,p:copy(p)});return p;},update:(c,id,p)=>{calls.push({method:'update',c,id,p:copy(p)});return p;},insert:(c,p)=>{throw Error(c==='auditLog'?'PRODUCT_WRITE_COLLECTION_NOT_AUTHORIZED':'PRODUCT_WRITE_RECORD_SCOPE_DENIED');},remove:()=>{throw Error('unreachable');},removeDurable:()=>{throw Error('unreachable');},updateDurable:()=>{throw Error('unreachable');}}};
@@ -128,4 +128,13 @@ test('form diagnostics expose only known codes and message hashes, never raw unk
  assert.equal(policyFormErrorDiagnostic(''),null);
  const text='Unexpected detail for private-client@example.invalid / private_actor';
  const diagnostic=policyFormErrorDiagnostic(text);assert.deepEqual(diagnostic.errorCodes,['unmapped_form_error']);assert.equal(diagnostic.messageSha256,createHash('sha256').update(text).digest('hex'));assert.equal(JSON.stringify(diagnostic).includes('private'),false);
+});
+
+test('LIVE console classifier admits only the exact observed legacy audit denial family',()=>{
+ const direct=classifyExpectedLiveAuditConsole('PRODUCT_WRITE_COLLECTION_NOT_AUTHORIZED');
+ assert.equal(direct.expected,true);assert.equal(direct.code,'PRODUCT_WRITE_COLLECTION_NOT_AUTHORIZED');
+ const scoped=classifyExpectedLiveAuditConsole('PRODUCT_WRITE_RECORD_SCOPE_DENIED');
+ assert.equal(scoped.expected,true);assert.equal(scoped.code,'PRODUCT_WRITE_RECORD_SCOPE_DENIED');
+ const unexpected=classifyExpectedLiveAuditConsole('TypeError: unexpected production failure');
+ assert.equal(unexpected.expected,false);assert.match(unexpected.messageSha256,/^[a-f0-9]{64}$/);
 });

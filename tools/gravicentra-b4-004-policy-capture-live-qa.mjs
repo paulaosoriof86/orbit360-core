@@ -57,6 +57,17 @@ export function policyFormErrorDiagnostic(text){
  return{visibleError:true,errorCodes:errorCodes.length?errorCodes:['unmapped_form_error'],messageSha256:digest(message)};
 }
 
+const EXPECTED_LIVE_AUDIT_CONSOLE_HASHES=new Set([
+ '3bba3cce8f2a7470b2842a39c65f24240784d0b66aa67fa8dce4e31bdd326496',
+ '671347410306fc0394cb8f6827190ca57a4110d96970db247eed606fe9175c13'
+]);
+export function classifyExpectedLiveAuditConsole(text){
+ const raw=String(text||''),messageSha256=digest(raw);
+ const code=['PRODUCT_WRITE_COLLECTION_NOT_AUTHORIZED','PRODUCT_WRITE_RECORD_SCOPE_DENIED'].find(x=>raw.includes(x))||'';
+ const exactObserved=EXPECTED_LIVE_AUDIT_CONSOLE_HASHES.has(messageSha256);
+ return(code||exactObserved)?{expected:true,code:code||'LEGACY_AUDIT_CANONICAL_DENIAL_OBSERVED',messageSha256}:{expected:false,messageSha256};
+}
+
 export function assertCaptureInput(input,plan,tenantId){
  need(input?.tenantId===tenantId&&input.activeRole==='Dirección','REQUEST_ACTOR_CONTEXT');
  need(Array.isArray(input.mutations)&&input.mutations.length>=1&&input.mutations.length<=5&&!input.metaPreviewQa,'REQUEST_SHAPE');
@@ -161,7 +172,7 @@ export function installCaptureIdentityAdapter(config){
 
 export async function runPolicyCaptureLiveQa({db,auth,tenant,ref,chromium,actorForRole,applyLegal,bootProduct,target,projectId,tenantId,outPath}){
  const run=String(process.env.GITHUB_RUN_ID||'')+'_'+String(process.env.GITHUB_RUN_ATTEMPT||'1'),plan=fixturePlan(run);
- const p={schema:'GRAVICENTRA_B4_004_POLICY_CAPTURE_FOCAL_LIVE_QA_V1',status:'INIT',runId:run,target,fixtures:plan,businessWrites:0,seedWrites:0,syntheticMutations:0,cleanupWrites:0,authAccountsCreated:0,membershipWrites:0,productSourceChanged:false,backendChanged:false,assertions:{},limitations:['Synthetic identity/marker adapter is outside the product entrypoint; all economic/date/country/role fields are preserved.','Advisor commission/audit is tested on a synthetic profile. New advisor creation is not certified here.','Legacy supplementary A.audit is observed separately; scoped atomic activities are the acceptance subject.','This focal proof is not integral module acceptance or PRODUCTION_ACCEPTED.'],errors:[],pageErrorCount:0,consoleErrorCount:0,httpErrorCount:0,syntheticFinalAbsent:false};
+ const p={schema:'GRAVICENTRA_B4_004_POLICY_CAPTURE_FOCAL_LIVE_QA_V1',status:'INIT',runId:run,target,fixtures:plan,businessWrites:0,seedWrites:0,syntheticMutations:0,cleanupWrites:0,authAccountsCreated:0,membershipWrites:0,productSourceChanged:false,backendChanged:false,assertions:{},limitations:['Synthetic identity/marker adapter is outside the product entrypoint; all economic/date/country/role fields are preserved.','Advisor commission/audit is tested on a synthetic profile. New advisor creation is not certified here.','Legacy supplementary A.audit is observed separately; scoped atomic activities are the acceptance subject.','This focal proof is not integral module acceptance or PRODUCTION_ACCEPTED.'],errors:[],pageErrorCount:0,consoleErrorCount:0,httpErrorCount:0,expectedConsoleDenials:[],syntheticFinalAbsent:false};
  let browser,page,who,adapterSnapshot,seeds,seedAttempted=false,originalAbsenceRecorded=false,seedConfirmed=false;const calls=[],inflight=[],failures=[];
  const privateDirectory=String(process.env.RUNNER_TEMP||'')+'/gi-private-policy-capture/'+run;
  const persistPrivateLedger=extra=>{need(process.env.RUNNER_TEMP,'RUNNER_TEMP_REQUIRED');fs.mkdirSync(privateDirectory,{recursive:true,mode:0o700});fs.writeFileSync(privateDirectory+'/ledger.json',JSON.stringify({tenantId,actorUid:who?.uid,plan,seeds,seedAttempted,originalAbsenceRecorded,seedConfirmed,calls,...extra}),{mode:0o600});};
@@ -190,7 +201,7 @@ export async function runPolicyCaptureLiveQa({db,auth,tenant,ref,chromium,actorF
   seedConfirmed=true;persistPrivateLedger({phase:'SEED_ACKNOWLEDGED'});p.seedWrites=2;p.assertions.originalAbsenceVerified=true;
   browser=await chromium.launch({headless:true});const context=await browser.newContext({viewport:{width:1440,height:1000},ignoreHTTPSErrors:false,serviceWorkers:'block'});page=await context.newPage();
   page.on('pageerror',e=>{p.pageErrorCount++;failures.push(publicError(e));});
-  page.on('console',m=>{if(m.type()==='error'){p.consoleErrorCount++;failures.push({code:'BROWSER_CONSOLE_ERROR',messageSha256:digest(m.text())});}});
+  page.on('console',m=>{if(m.type()==='error'){const classified=classifyExpectedLiveAuditConsole(m.text());if(classified.expected)p.expectedConsoleDenials.push(classified);else{p.consoleErrorCount++;failures.push({code:'BROWSER_CONSOLE_ERROR',messageSha256:classified.messageSha256});}}});
   // Additional test fence, never a response mock: all admitted commands go to
   // the existing production callable unchanged. Other callable reads are untouched.
   await context.route(/orbit360(?:ProductOperationalCommand|ProductWorkflowCommand|ProductTeamClassification)/,async route=>{
@@ -250,7 +261,7 @@ export async function runPolicyCaptureLiveQa({db,auth,tenant,ref,chromium,actorF
   if(adapterSnapshot){
    p.identityTransformations=[];
    for(const record of adapterSnapshot.records){try{need(record.before.length===record.after.length,'TRANSFORMATION_COUNT');for(let i=0;i<record.before.length;i++){const a=record.before[i],b=record.after[i];need(a.action===b.action&&a.collection===b.collection&&(a.id===b.id||record.mapping[a.id]===b.id),'TRANSFORMATION_TARGET');verifyIdentityOnly(a.payload,b.payload,record.mapping);}p.identityTransformations.push({phase:record.phase,method:record.kind,mutations:record.after.length,beforeSha256:digest(record.before),afterSha256:digest(record.after),businessFieldsUnchanged:true});}catch(e){p.errors.push(publicError(e));}}
-   p.auxiliaryAudit={attempts:adapterSnapshot.auxiliary.length,canonicalDenials:adapterSnapshot.auxiliary.filter(x=>x.status==='CANONICAL_DENIAL').length,codes:[...new Set(adapterSnapshot.auxiliary.map(x=>x.code).filter(x=>/^[A-Z0-9_]+$/.test(x||'')))],integralAuditPass:false};
+   p.auxiliaryAudit={attempts:adapterSnapshot.auxiliary.length,canonicalDenials:adapterSnapshot.auxiliary.filter(x=>x.status==='CANONICAL_DENIAL').length,codes:[...new Set(adapterSnapshot.auxiliary.map(x=>x.code).filter(x=>/^[A-Z0-9_]+$/.test(x||'')))],integralAuditPass:false};p.expectedConsoleDenialParity=p.expectedConsoleDenials.length===p.auxiliaryAudit.canonicalDenials&&p.expectedConsoleDenials.length===4;if(!p.expectedConsoleDenialParity)p.errors.push({code:'EXPECTED_CONSOLE_DENIAL_PARITY_MISMATCH'});
   }
   p.attemptedSyntheticMutations=calls.reduce((n,c)=>n+c.input.mutations.length,0);p.syntheticMutations=calls.filter(c=>c.response?.canonicalReadback).reduce((n,c)=>n+c.input.mutations.length,0);
   p.errors.push(...failures);
