@@ -1,0 +1,116 @@
+{
+  "schema": "B4_003_TEMPORARY_ROLLBACK_HELPER_LOCAL_VALIDATION_V1",
+  "status": "LOCAL_TESTS_PASS_NO_REMOTE_EXECUTION",
+  "helperBlob": "353e0968c74066229e6530b63fb53e5d72125b5d",
+  "helperSha256": "2cc5348d412b841b7d7487939af0bcccdc170b0892dc3a6ab6640b9216a7aaf1",
+  "observedPreflightRunId": 42318956784,
+  "observedPreflightArtifactId": 13551768280,
+  "actualPreflight218RawPassUsed": true,
+  "actualRetained209ListingUsed": true,
+  "retained209RawCertified": false,
+  "tests": [
+    {
+      "name": "real_run42318956784_six_PASS_one_exact404_and_all218_raw_rows_accepted",
+      "status": "PASS"
+    },
+    {
+      "name": "actual_historical_version_metadata_lists209_product_and_exact2_managed_paths",
+      "status": "PASS"
+    },
+    {
+      "name": "failure_other_than_old_channel404_rejected",
+      "status": "PASS",
+      "rejectedAs": "PRECHECK_NOT_PASS"
+    },
+    {
+      "name": "different_rollback_error_rejected",
+      "status": "PASS",
+      "rejectedAs": "UNEXPECTED_ROLLBACK_PRECHECK_FAILURE"
+    },
+    {
+      "name": "different_run_receipt_rejected",
+      "status": "PASS",
+      "rejectedAs": "PRECHECK_NOT_SAME_RUN"
+    },
+    {
+      "name": "different_checkout_receipt_rejected",
+      "status": "PASS",
+      "rejectedAs": "PRECHECK_COMMIT_MISMATCH"
+    },
+    {
+      "name": "tampered218_raw_evidence_digest_rejected",
+      "status": "PASS",
+      "rejectedAs": "PREVIEW_RAW_MANIFEST_MISMATCH"
+    },
+    {
+      "name": "historical_product_path_added_rejected",
+      "status": "PASS",
+      "rejectedAs": "PRODUCT_COUNT_MISMATCH"
+    },
+    {
+      "name": "missing_firebase_init_cannot_be_ignored",
+      "status": "PASS",
+      "rejectedAs": "MANAGED_INIT_SET_MISMATCH"
+    },
+    {
+      "name": "exact_CP_authorization_and_both_source_build_bindings_accepted",
+      "status": "PASS"
+    },
+    {
+      "name": "missing_CP_temporary_authorization_rejected",
+      "status": "PASS",
+      "rejectedAs": "CP_TEMPORARY_AUTHORIZATION_MISMATCH"
+    },
+    {
+      "name": "production_scope_expansion_rejected",
+      "status": "PASS",
+      "rejectedAs": "CP_TEMPORARY_AUTHORIZATION_MISMATCH"
+    },
+    {
+      "name": "different_retained_certificate_digest_rejected",
+      "status": "PASS",
+      "rejectedAs": "CP_CERTIFIED_DIGEST_MISMATCH"
+    },
+    {
+      "name": "POST_request_targets_only_existing_Preview_for_c5e1ae001fae793b",
+      "status": "PASS"
+    },
+    {
+      "name": "POST_request_targets_only_existing_Preview_for_5d35a2bd0b326e75",
+      "status": "PASS"
+    },
+    {
+      "name": "LIVE_version_forbidden_as_release_target",
+      "status": "PASS",
+      "rejectedAs": "RELEASE_VERSION_OUTSIDE_TWO_PINS"
+    },
+    {
+      "name": "successful_probe_always_restores",
+      "status": "PASS"
+    },
+    {
+      "name": "fault_guard_preserves_restore_contract",
+      "status": "PASS"
+    },
+    {
+      "name": "fault_arm_preserves_restore_contract",
+      "status": "PASS"
+    },
+    {
+      "name": "fault_activate_preserves_restore_contract",
+      "status": "PASS"
+    },
+    {
+      "name": "fault_verifyRollback_preserves_restore_contract",
+      "status": "PASS"
+    },
+    {
+      "name": "fault_restore_preserves_restore_contract",
+      "status": "PASS"
+    }
+  ],
+  "totalPassed": 22,
+  "networkRequests": 0,
+  "hostingMutation": false,
+  "localProposalOnly": true
+}

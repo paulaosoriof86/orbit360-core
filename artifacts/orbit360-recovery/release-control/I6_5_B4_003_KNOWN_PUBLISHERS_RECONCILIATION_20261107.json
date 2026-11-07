@@ -1,0 +1,328 @@
+{
+  "schema": "GRAVICENTRA_B4_003_KNOWN_PUBLISHER_RECONCILIATION_V1",
+  "recordedAtUtc": "2026-11-07 00:40:57 UTC",
+  "gate": "I6.5/B4-003",
+  "status": "KNOWN_CAUSAL_SOURCE_PREVENTION_RECONFIRMED_HISTORICAL_INVENTORY_RECONCILED_NOT_GLOBAL_ACTIONS_IAM_CERTIFICATION",
+  "observedCanonicalHead": "382000e045bbbcf9cdf5ea6d7442fc69a38fe9d0",
+  "observedControlPlaneBlobSha": "ad78bac770a601f917f9ba90333ea9d6139fccde",
+  "productUnchanged": {
+    "sourceSha": "857f1222f360a42a06e012810a1c01bce155a26f",
+    "buildId": "gi-i65-b4-857f1222f360-57f234755dc1",
+    "artifactId": 13549460562
+  },
+  "previousHold": {
+    "key": "b4003LiveHostingCausalAttribution",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_LIVE_HOSTING_CAUSAL_ATTRIBUTION_20261014.json",
+    "receiptBlobSha": "ff3f74523400c11b7be3aa162f47b2bb6418b73b",
+    "knownProtectedWorkflowsInThatSnapshot": 2,
+    "remainingPublishersAuditRequired": true
+  },
+  "currentKnownCriticalWorkflowSources": [
+    {
+      "label": "Portal S5.11F",
+      "branch": "ays/portal-p01-s511f-customer-shell-lab-20261007",
+      "head": "0088b1100aec2c81f5fb1d276aef0df7e0c65b00",
+      "path": ".github/workflows/portal-p01-s511f-customer-shell-lab.yml",
+      "blobSha": "24101a901ab7b76c86335a7e2e1106feda2a5a93",
+      "status": "CURRENT_SOURCE_ONLY_NO_HOSTING_PUBLISH_COMMAND",
+      "sourceUrl": "https://github.com/paulaosoriof86/orbit360-core/blob/0088b1100aec2c81f5fb1d276aef0df7e0c65b00/.github/workflows/portal-p01-s511f-customer-shell-lab.yml"
+    },
+    {
+      "label": "Siniestros S5.12D",
+      "branch": "ays/siniestros-s512d-public-resolver-lab-20261007",
+      "head": "5bd521889f741838159d725b524e80c40ea2b327",
+      "path": ".github/workflows/siniestros-s512d-public-resolver-lab.yml",
+      "blobSha": "2f693ea1a3a0d9b13b032d243b9d20503574f2cf",
+      "status": "CURRENT_SOURCE_ONLY_NO_HOSTING_PUBLISH_COMMAND",
+      "sourceUrl": "https://github.com/paulaosoriof86/orbit360-core/blob/5bd521889f741838159d725b524e80c40ea2b327/.github/workflows/siniestros-s512d-public-resolver-lab.yml"
+    },
+    {
+      "label": "Gravicentra S5.09",
+      "branch": "ays/gravicentra-s509-new-lead-attention-20261007",
+      "head": "32a3bfba10dbe0e8fbfb012f95d40a91b609f1c4",
+      "path": ".github/workflows/gravicentra-s509-new-lead-attention-lab.yml",
+      "blobSha": "8fea9ea20f7649ab7ca4870c7d34122650f294e5",
+      "status": "CURRENT_SOURCE_ONLY_NO_HOSTING_PUBLISH_COMMAND",
+      "sourceUrl": "https://github.com/paulaosoriof86/orbit360-core/blob/32a3bfba10dbe0e8fbfb012f95d40a91b609f1c4/.github/workflows/gravicentra-s509-new-lead-attention-lab.yml"
+    },
+    {
+      "label": "Gravicentra S5.10",
+      "branch": "ays/gravicentra-s510-lead-card-summary-20261007",
+      "head": "0f6922cece0505158b29751e79de4057da7125aa",
+      "path": ".github/workflows/gravicentra-s510-lead-card-summary-lab.yml",
+      "blobSha": "5408c4ffe2fd40af7f986a75c475f79ac257b452",
+      "status": "CURRENT_SOURCE_ONLY_NO_HOSTING_PUBLISH_COMMAND",
+      "sourceUrl": "https://github.com/paulaosoriof86/orbit360-core/blob/0f6922cece0505158b29751e79de4057da7125aa/.github/workflows/gravicentra-s510-lead-card-summary-lab.yml"
+    },
+    {
+      "label": "Gravicentra S5.10A",
+      "branch": "ays/gravicentra-s510a-lead-card-visual-hierarchy-20261007",
+      "head": "832b03b3bdbd4f9259fdc244a8354979ff5d5085",
+      "path": ".github/workflows/gravicentra-s510a-lead-card-visual-hierarchy-lab.yml",
+      "blobSha": "39ac13985fb817c8a94c23ea0b2e5fe15039a8e6",
+      "status": "CURRENT_SOURCE_ONLY_NO_HOSTING_PUBLISH_COMMAND",
+      "sourceUrl": "https://github.com/paulaosoriof86/orbit360-core/blob/832b03b3bdbd4f9259fdc244a8354979ff5d5085/.github/workflows/gravicentra-s510a-lead-card-visual-hierarchy-lab.yml"
+    },
+    {
+      "label": "CotComp S4.67",
+      "branch": "ays/cotcomp-s467-w5-first-real-intake-20261001",
+      "head": "5035983659ed2d8339c44fa8a3834c60e7e3ab4e",
+      "path": ".github/workflows/cotcomp-s467-w5-first-real-intake.yml",
+      "blobSha": "699434ce3a3cc2172710ab041d61a631f154a599",
+      "status": "CURRENT_SOURCE_ONLY_NO_HOSTING_PUBLISH_COMMAND",
+      "sourceUrl": "https://github.com/paulaosoriof86/orbit360-core/blob/5035983659ed2d8339c44fa8a3834c60e7e3ab4e/.github/workflows/cotcomp-s467-w5-first-real-intake.yml"
+    }
+  ],
+  "historicalEvidenceAlreadyExecuted": {
+    "branch": "audit/ays-g4-shared-hosting-sourceonly-20261013",
+    "currentHead": "ce830d4c88c5d3fd244e0251ada8a5e8df68770a",
+    "runId": 38652806628,
+    "runnerCommit": "815ffcebb1d1ffe418c24bc97c04d9b0ce85e108",
+    "jobId": 116155425009,
+    "workflowConclusion": "success",
+    "logsUrl": "https://github.com/paulaosoriof86/orbit360-core/actions/runs/38652806628/job/116155425009",
+    "artifactCurrentlyAvailable": false,
+    "logsReadDirectly": true,
+    "inventorySource": {
+      "path": "tools/ays-g11/G11_REPOSITORY_HOSTING_PUBLISHER_READONLY.py",
+      "blobSha": "98fb05f48524c22134ed029670ce18475c6c2fb4"
+    },
+    "triggerSource": {
+      "path": "tools/ays-g11/G13_RESIDUAL_PUBLISHER_TRIGGERS_READONLY.py",
+      "blobSha": "61acfd99865872ea1ffda9779bc7e4deed7adcbd"
+    },
+    "inventory": {
+      "timestamp": "2026-10-14T23:14:24.5511346Z",
+      "result": {
+        "classification": "HOLD_ADDITIONAL_SHARED_HOSTING_PUBLISHERS",
+        "critical_branches": {
+          "CotComp S4.67": {
+            "branch": "ays/cotcomp-s467-w5-first-real-intake-20261001",
+            "head": "5035983659ed2d8339c44fa8a3834c60e7e3ab4e",
+            "hosting_write": false,
+            "path": ".github/workflows/cotcomp-s467-w5-first-real-intake.yml",
+            "site_scope": true,
+            "workflow_dispatch_source": false
+          },
+          "Gravicentra S5.09": {
+            "branch": "ays/gravicentra-s509-new-lead-attention-20261007",
+            "head": "32a3bfba10dbe0e8fbfb012f95d40a91b609f1c4",
+            "hosting_write": false,
+            "path": ".github/workflows/gravicentra-s509-new-lead-attention-lab.yml",
+            "site_scope": false,
+            "workflow_dispatch_source": true
+          },
+          "Gravicentra S5.10": {
+            "branch": "ays/gravicentra-s510-lead-card-summary-20261007",
+            "head": "0f6922cece0505158b29751e79de4057da7125aa",
+            "hosting_write": false,
+            "path": ".github/workflows/gravicentra-s510-lead-card-summary-lab.yml",
+            "site_scope": false,
+            "workflow_dispatch_source": true
+          },
+          "Gravicentra S5.10A": {
+            "branch": "ays/gravicentra-s510a-lead-card-visual-hierarchy-20261007",
+            "head": "832b03b3bdbd4f9259fdc244a8354979ff5d5085",
+            "hosting_write": false,
+            "path": ".github/workflows/gravicentra-s510a-lead-card-visual-hierarchy-lab.yml",
+            "site_scope": false,
+            "workflow_dispatch_source": true
+          },
+          "Portal S5.11F": {
+            "branch": "ays/portal-p01-s511f-customer-shell-lab-20261007",
+            "head": "0088b1100aec2c81f5fb1d276aef0df7e0c65b00",
+            "hosting_write": false,
+            "path": ".github/workflows/portal-p01-s511f-customer-shell-lab.yml",
+            "site_scope": false,
+            "workflow_dispatch_source": true
+          },
+          "Siniestros S5.12D": {
+            "branch": "ays/siniestros-s512d-public-resolver-lab-20261007",
+            "head": "1c546c91d54c9cf18e5c8b24fefea94611da7830",
+            "hosting_write": false,
+            "path": ".github/workflows/siniestros-s512d-public-resolver-lab.yml",
+            "site_scope": false,
+            "workflow_dispatch_source": true
+          }
+        },
+        "indirect_deploy_review_count": 0,
+        "inspected_workflow_instances": 32545,
+        "sampled_remote_branch_count": 439,
+        "source_hosting_writer_branches": 98,
+        "source_hosting_writer_instances": 3082,
+        "unique_workflow_blobs": 767,
+        "writer_paths": {
+          ".github/workflows/gravicentra-s509-new-lead-attention-lab.yml": 15,
+          ".github/workflows/gravicentra-s510-lead-card-summary-lab.yml": 14,
+          ".github/workflows/orbit360-aseguradoras-op2-smoke.yml": 4,
+          ".github/workflows/orbit360-aseguradoras-runtime-gate-v20260716.yml": 79,
+          ".github/workflows/orbit360-auth-selfmanaged-credentials-runtime-v20260805.yml": 73,
+          ".github/workflows/orbit360-block12-operational-runtime-lab-rootfix-v20260804.yml": 73,
+          ".github/workflows/orbit360-block12-operational-runtime-lab-rootfix2-v20260804.yml": 73,
+          ".github/workflows/orbit360-block12-operational-runtime-lab-rootfix4-v20260804.yml": 73,
+          ".github/workflows/orbit360-block12-operational-runtime-lab-rootfix5-v20260804.yml": 73,
+          ".github/workflows/orbit360-block12-operational-runtime-lab-rootfix6-v20260804.yml": 73,
+          ".github/workflows/orbit360-block12-operational-runtime-lab-rootfix7-v20260804.yml": 73,
+          ".github/workflows/orbit360-block12-operational-runtime-lab-rootfix8-resume-v20260804.yml": 73,
+          ".github/workflows/orbit360-block12-operational-runtime-lab-rootfix8-v20260804.yml": 73,
+          ".github/workflows/orbit360-block12-operational-runtime-lab-rootfix9-v20260804.yml": 73,
+          ".github/workflows/orbit360-block12-operational-runtime-lab-v20260804.yml": 73,
+          ".github/workflows/orbit360-block12-visual-layoutfree-reactivation-lab-v20260804.yml": 73,
+          ".github/workflows/orbit360-block12-visual-reactivation-lab-v20260804.yml": 73,
+          ".github/workflows/orbit360-client360-optional-shape-hosting-lab-v20260731.yml": 76,
+          ".github/workflows/orbit360-client360-policies-vehicles-hosting-lab-v20260731.yml": 76,
+          ".github/workflows/orbit360-client360-sync-read-shape-hosting-lab-v20260731.yml": 76,
+          ".github/workflows/orbit360-fase-a-production-go-live-v20260813.yml": 3,
+          ".github/workflows/orbit360-gravicentra-rc1-go-live-macro-v20260803.yml": 73,
+          ".github/workflows/orbit360-gravicentra-rc11-real-data-go-live-resume-v20260803.yml": 73,
+          ".github/workflows/orbit360-gravicentra-rc11-real-data-go-live-v20260803.yml": 73,
+          ".github/workflows/orbit360-gravicentra-rc12-membership-go-live-v20260803.yml": 73,
+          ".github/workflows/orbit360-human-review-integrated-hosting-lab-v20260731.yml": 76,
+          ".github/workflows/orbit360-m5-corrective-delivery-runtime-544-v20260730.yml": 76,
+          ".github/workflows/orbit360-m5-lab-hosting-delivery-510-v20260729.yml": 76,
+          ".github/workflows/orbit360-m5-lab-hosting-delivery-513-v20260729.yml": 76,
+          ".github/workflows/orbit360-m5-lab-hosting-delivery-v20260728.yml": 76,
+          ".github/workflows/orbit360-m5-lab-hosting-delivery-v20260729.yml": 76,
+          ".github/workflows/orbit360-m6-corrective-go-live-v20260730.yml": 76,
+          ".github/workflows/orbit360-m6-product-go-live-v20260730.yml": 76,
+          ".github/workflows/orbit360-owner-drift-receipts-hosting-lab-v910-20260731.yml": 76,
+          ".github/workflows/orbit360-policies-visual-readonly-lab-v20260801.yml": 76,
+          ".github/workflows/orbit360-rc12-approved-roster-final-go-live-resume-v20260804.yml": 73,
+          ".github/workflows/orbit360-rc12-approved-roster-final-go-live-v20260804.yml": 73,
+          ".github/workflows/orbit360-rc12-gate7151-post-stop-retry-continuation-v20260804.yml": 73,
+          ".github/workflows/orbit360-rc12-normal-onboarding-close-v20260804.yml": 73,
+          ".github/workflows/orbit360-rc12-rootcause-cumulative-closure-post-rootfix-v20260803.yml": 73,
+          ".github/workflows/orbit360-rc12-rootcause-cumulative-closure-v20260803.yml": 73,
+          ".github/workflows/orbit360-receipts-portfolio-hosting-lab-lifecycle-fix-v910-20260730.yml": 76,
+          ".github/workflows/orbit360-receipts-portfolio-hosting-lab-visual-v910-20260730.yml": 76,
+          ".github/workflows/orbit360-rollback-only-visual-matrix-v6-run-31116830824-v2.yml": 1,
+          ".github/workflows/orbit360-rollback-only-visual-matrix-v6-run-31116830824.yml": 1,
+          ".github/workflows/orbit360-visual-runtime-rootfix-lab-v20260805.yml": 73,
+          ".github/workflows/orbit360-visual-runtime-rootfix-relay-v20260805.yml": 73
+        }
+      }
+    },
+    "triggerClassification": {
+      "timestamp": "2026-10-14T23:14:27.4426499Z",
+      "result": {
+        "classification": "HOLD_SOURCE_EXECUTABILITY_AND_REGISTRATION_REVIEW",
+        "default_branch_workflow_count": 0,
+        "dispatch_declared_but_default_path_missing": 109,
+        "dispatch_path_registered_on_default": 0,
+        "excluded_copy_count": 3082,
+        "other_event_review_count": 0,
+        "potentially_live_source_branch_count": 0,
+        "remote_branches_scanned": 439,
+        "selftest": {
+          "passed": 12,
+          "result": "PASS",
+          "total": 12
+        },
+        "source_push_matching_self_branch": 0,
+        "trigger_parse_unknown_count": 0,
+        "writer_source_instances": 3082
+      }
+    },
+    "potentiallyExecutableBranches": {
+      "timestamp": "2026-10-14T23:14:27.4429495Z",
+      "result": []
+    },
+    "countersAreHistoricalSourceInventoryOnlyNotCurrentFunctionalCertificationDenominators": true,
+    "historicalStatusIntentionallyPreserved": "HOLD_SOURCE_EXECUTABILITY_AND_REGISTRATION_REVIEW"
+  },
+  "defaultBranchRegistrationOnly": {
+    "defaultBranch": "main",
+    "observedTreeSha": "ae757a24c76de08fe81f2945b6cd655e00686f74",
+    "recursiveTreeTruncated": false,
+    "workflowPathCount": 0,
+    "usedAsProductOrReleaseAuthority": false
+  },
+  "canonicalLegacyPromoters": {
+    "i5": {
+      "workflowPath": ".github/workflows/gravicentra-recovery-i5-production.yml",
+      "blobSha": "2ad7046ae4f6a4f214a4ace864ac9c3e9fdfba2e",
+      "preflightBlobSha": "b4dd47ad7ce720ee8fc4e0d23f0c25669de40f44",
+      "disposition": "PRIOR_GATE_REENTRY_DENIED_WHILE_I6_ACTIVE_AND_HISTORIC_SOURCE_FIXED"
+    },
+    "i6": {
+      "workflowPath": ".github/workflows/gravicentra-recovery-i6-postsalida.yml",
+      "blobSha": "734afcaf3b190ad8a17b9b465707d41290b57781",
+      "productMutationAuthorized": false,
+      "nextAction": "I6_5_B4_003_AUTHENTICATED_EXACT_PREVIEW_UAT_AND_P0_CLOSEOUT",
+      "currentStatuses": {
+        "i64CodeDefect": "I6_4_POLIZAS_RIESGOS_LIVE_PASS_FROZEN",
+        "i65SyncCodeDefect": "I6_5_SYNC_CODE_DEFECT_SUCCESSOR_LIVE_PASS",
+        "i65HydrationDefect": "I6_5_HYDRATION_CODE_DEFECT_SUCCESSOR_LIVE_PASS",
+        "i65OperationalClosureDefect": "I6_5_OPERATIONAL_CLOSURE_CODE_DEFECT_SUCCESSOR_LIVE_PASS"
+      },
+      "disposition": "FOUR_LIVE_CLONE_JOBS_SELECT_NOOP_WITH_OBSERVED_CP_NOT_OLD_RELEASE_STATES"
+    }
+  },
+  "causalRunReplayWindow": {
+    "observationAtUtc": "2026-11-07T00:32:54Z",
+    "officialDocumentation": "https://docs.github.com/en/actions/how-tos/manage-workflow-runs/re-run-workflows-and-jobs?tool=webui",
+    "officialRuleParaphrase": "Normal workflow or job re-runs are available up to 30 days from the initial run.",
+    "runs": [
+      {
+        "id": 37666530245,
+        "name": "Portal P-01 S5.11F Customer Shell LAB",
+        "head_branch": "ays/portal-p01-s511f-customer-shell-lab-20261007",
+        "head_sha": "1623cac977498bb5bba0092748a8c70a9cd06189",
+        "path": ".github/workflows/portal-p01-s511f-customer-shell-lab.yml",
+        "created_at": "2026-10-07T18:24:04Z",
+        "run_started_at": "2026-10-07T18:24:04Z",
+        "status": "completed",
+        "conclusion": "success",
+        "run_attempt": 1,
+        "html_url": "https://github.com/paulaosoriof86/orbit360-core/actions/runs/37666530245",
+        "workflow_id": 377711728,
+        "normalRerunDeadlineUtc": "2026-11-06T18:24:04.000Z",
+        "olderThan30DaysAtObservation": true
+      },
+      {
+        "id": 37667921282,
+        "name": "Siniestros S5.12D Public Resolver LAB",
+        "head_branch": "ays/siniestros-s512d-public-resolver-lab-20261007",
+        "head_sha": "f873ce1f2b55dc5ad8cac07b58be43faddeb0a99",
+        "path": ".github/workflows/siniestros-s512d-public-resolver-lab.yml",
+        "created_at": "2026-10-07T18:34:53Z",
+        "run_started_at": "2026-10-07T18:34:53Z",
+        "status": "completed",
+        "conclusion": "success",
+        "run_attempt": 1,
+        "html_url": "https://github.com/paulaosoriof86/orbit360-core/actions/runs/37667921282",
+        "workflow_id": 377720527,
+        "normalRerunDeadlineUtc": "2026-11-06T18:34:53.000Z",
+        "olderThan30DaysAtObservation": true
+      }
+    ],
+    "inference": "Both identified causal runs are past the documented normal rerun window. This does not certify every workflow, IAM policy, external publisher or future source change."
+  },
+  "proposedControlPlaneSynchronization": {
+    "retainOriginalHistoricalHoldAndReceipts": true,
+    "recordLaterExistingG11G13AndCurrentSixSourceChecks": true,
+    "noNewBroadInventoryRequested": true,
+    "noChangeRequiredInKnownSixWorkflowSources": true,
+    "doNotSetGlobalActionsIamPass": true,
+    "retainExactArtifactRollbackAndLiveAcceptanceRequirements": true,
+    "releasePromotionAuthorizedByThisEvidence": false
+  },
+  "limits": [
+    "Source checks prove the six recorded current workflow bodies only; no GitHub Actions enabled-state or IAM certification was performed.",
+    "G11/G13 counters are the existing 2026-10-14 source snapshot; no new repository-wide scan was executed.",
+    "The retained Hosting promotion draft remains blocked until same-run certified raw rollback proof, formal exact Preview seal and existing CP release authorization are present.",
+    "No historical functional certificate or owner-approved Rules exception is reopened."
+  ],
+  "boundaries": {
+    "remoteWrites": 0,
+    "workflowDispatches": 0,
+    "hostingMutation": false,
+    "functionsDeployed": 0,
+    "rulesChanged": false,
+    "authOrIamChanged": false,
+    "operationalDataWrites": 0,
+    "productSourceChanged": false,
+    "b4003Closed": false
+  }
+}
+

@@ -1,0 +1,232 @@
+{
+  "schema": "B4_003_RETAINED_HOSTING_PREFLIGHT_V1",
+  "status": "EXACT_RETAINED_ARTIFACT_HOSTING_PREFLIGHT_FAIL",
+  "startedAtUtc": "2026-11-07T00:34:09.599Z",
+  "runId": "42318956784",
+  "runnerCommit": "8fa76947e3b62eee51631ae4ee98d241a41c1a73",
+  "checks": [
+    {
+      "name": "exact_candidate_and_archive",
+      "status": "PASS",
+      "startedAtUtc": "2026-11-07T00:34:09.599Z",
+      "finishedAtUtc": "2026-11-07T00:34:09.722Z",
+      "evidence": {
+        "artifactId": 13549460562,
+        "archiveSha256": "5af8e1e6e98e861c5c1a2e25324841ac9dfb07fffae0524c1cabc1a6282ad338",
+        "sourceSha": "857f1222f360a42a06e012810a1c01bce155a26f",
+        "buildId": "gi-i65-b4-857f1222f360-57f234755dc1",
+        "hostedFileCount": 218,
+        "hostedPayloadDigest": "308b669105c380294177f1a8d2350216af95fec31f800955d611e607542b42da",
+        "manifestFile": "retained-site-manifest.sha256"
+      }
+    },
+    {
+      "name": "artifact_run_metadata",
+      "status": "PASS",
+      "startedAtUtc": "2026-11-07T00:34:09.723Z",
+      "finishedAtUtc": "2026-11-07T00:34:10.197Z",
+      "evidence": {
+        "artifactId": 13549460562,
+        "name": "gi-b4003-immutable-release-bundle-42311921400",
+        "zipDigest": "sha256:ca67ec470e521a159201eb914675835efa4f2c614cb1fc47d5162fdf379d3c97",
+        "expired": false,
+        "expiresAt": "2026-12-06T23:27:16Z",
+        "runId": 42311921400,
+        "sourceSha": "857f1222f360a42a06e012810a1c01bce155a26f",
+        "conclusion": "success"
+      }
+    },
+    {
+      "name": "reuse_existing_service_account_for_gets",
+      "status": "PASS",
+      "startedAtUtc": "2026-11-07T00:34:10.197Z",
+      "finishedAtUtc": "2026-11-07T00:34:10.248Z",
+      "evidence": {
+        "projectId": "ays-orbit-360-lab",
+        "googleApiMethod": "GET",
+        "hostingEndpoint": "https://firebasehosting.googleapis.com/v1beta1/"
+      }
+    },
+    {
+      "name": "live_before_snapshot",
+      "status": "PASS",
+      "startedAtUtc": "2026-11-07T00:34:10.249Z",
+      "finishedAtUtc": "2026-11-07T00:34:11.924Z",
+      "evidence": {
+        "channel": {
+          "name": "projects/646761409743/sites/ays-orbit-360-lab/channels/live",
+          "url": "https://ays-orbit-360-lab.web.app",
+          "versionName": "sites/ays-orbit-360-lab/versions/3087fabd2db9b639",
+          "releaseName": "projects/646761409743/sites/ays-orbit-360-lab/channels/live/releases/1791398188833000",
+          "releaseTime": "2026-10-07T18:36:28.833Z",
+          "expireTime": null
+        },
+        "origins": [
+          {
+            "base": "https://ays-orbit-360-lab.web.app",
+            "probes": [
+              {
+                "path": "index.html",
+                "status": 200,
+                "sha256": "07571bf25485b07042f8a07d7510a323990f21d3cf809a76f99f5d39c454e7d0",
+                "byteCount": 15768
+              },
+              {
+                "path": "__recovery__/build.json",
+                "status": 404,
+                "sha256": "a5209717d04e1213c517d38211b545d82963a4880c6524eb29713b8c4972df36",
+                "byteCount": 21376
+              }
+            ]
+          },
+          {
+            "base": "https://app.aysseguros.com",
+            "probes": [
+              {
+                "path": "index.html",
+                "status": 200,
+                "sha256": "125b24a3fc215a368a7183a107cd55eb5a6332fc8a7f8354ed94e3169340ec4e",
+                "byteCount": 16893
+              },
+              {
+                "path": "__recovery__/build.json",
+                "status": 500,
+                "sha256": "07e2c9e80962ab9ff4072c4d192e5b5e51d993d7e100c5af563c2eeff21cc002",
+                "byteCount": 712
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "preview_version_and_all_served_bytes",
+      "status": "PASS",
+      "startedAtUtc": "2026-11-07T00:34:11.924Z",
+      "finishedAtUtc": "2026-11-07T00:34:17.355Z",
+      "evidence": {
+        "name": "projects/646761409743/sites/ays-orbit-360-lab/channels/gi-i65-b4-rc-41765742748",
+        "url": "https://ays-orbit-360-lab--gi-i65-b4-rc-41765742748-neoi3u7r.web.app",
+        "versionName": "sites/ays-orbit-360-lab/versions/c5e1ae001fae793b",
+        "releaseName": "projects/646761409743/sites/ays-orbit-360-lab/channels/gi-i65-b4-rc-41765742748/releases/1794007641461000",
+        "releaseTime": "2026-11-06T23:27:21.461Z",
+        "expireTime": "2026-11-13T23:27:19.581571614Z",
+        "fileCount": 218,
+        "digest": "308b669105c380294177f1a8d2350216af95fec31f800955d611e607542b42da",
+        "marker": {
+          "sourceSha": "857f1222f360a42a06e012810a1c01bce155a26f",
+          "buildId": "gi-i65-b4-857f1222f360-57f234755dc1",
+          "gate": "I6.5-B4-003"
+        },
+        "attempts": 1,
+        "manifestFile": "preview-manifest.sha256",
+        "filesEvidence": "preview-files.json",
+        "immutableArtifactId": 13549460562,
+        "hostingFileCount": 220,
+        "hostingManagedInitFileCount": 2,
+        "hostingManagedInitPaths": [
+          "__/firebase/init.js",
+          "__/firebase/init.json"
+        ],
+        "transportContractEvidence": "preview-hosting-version.json"
+      }
+    },
+    {
+      "name": "certified_rollback_version_and_all_served_bytes",
+      "status": "FAIL",
+      "startedAtUtc": "2026-11-07T00:34:17.355Z",
+      "finishedAtUtc": "2026-11-07T00:34:17.873Z",
+      "code": "HOSTING_GET_404:projects_-_sites_ays-orbit-360-lab_channels_gi-i5-rb-34723814583"
+    },
+    {
+      "name": "live_unchanged_after_readonly_preflight",
+      "status": "PASS",
+      "startedAtUtc": "2026-11-07T00:34:17.873Z",
+      "finishedAtUtc": "2026-11-07T00:34:19.023Z",
+      "evidence": {
+        "versionName": "sites/ays-orbit-360-lab/versions/3087fabd2db9b639",
+        "origins": [
+          {
+            "base": "https://ays-orbit-360-lab.web.app",
+            "probes": [
+              {
+                "path": "index.html",
+                "status": 200,
+                "sha256": "07571bf25485b07042f8a07d7510a323990f21d3cf809a76f99f5d39c454e7d0",
+                "byteCount": 15768
+              },
+              {
+                "path": "__recovery__/build.json",
+                "status": 404,
+                "sha256": "a5209717d04e1213c517d38211b545d82963a4880c6524eb29713b8c4972df36",
+                "byteCount": 21376
+              }
+            ]
+          },
+          {
+            "base": "https://app.aysseguros.com",
+            "probes": [
+              {
+                "path": "index.html",
+                "status": 200,
+                "sha256": "125b24a3fc215a368a7183a107cd55eb5a6332fc8a7f8354ed94e3169340ec4e",
+                "byteCount": 16893
+              },
+              {
+                "path": "__recovery__/build.json",
+                "status": 500,
+                "sha256": "07e2c9e80962ab9ff4072c4d192e5b5e51d993d7e100c5af563c2eeff21cc002",
+                "byteCount": 712
+              }
+            ]
+          }
+        ],
+        "note": "Observed LIVE bytes are a stability snapshot, not a certified rollback binding."
+      }
+    }
+  ],
+  "scope": {
+    "remoteReadsOnly": true,
+    "buildExecuted": false,
+    "hostingMutation": false,
+    "functionsDeployment": false,
+    "rulesChanged": false,
+    "authConfigurationChanged": false,
+    "dataWrites": 0,
+    "controlPlaneUpdated": false
+  },
+  "formalPreviewAcceptanceGranted": false,
+  "productionPromotionAuthorizedByThisReceipt": false,
+  "b4003Closed": false,
+  "binding": {
+    "sourceSha": "857f1222f360a42a06e012810a1c01bce155a26f",
+    "buildId": "gi-i65-b4-857f1222f360-57f234755dc1",
+    "runId": 42311921400,
+    "artifactId": 13549460562,
+    "artifactZipSha256": "ca67ec470e521a159201eb914675835efa4f2c614cb1fc47d5162fdf379d3c97",
+    "archiveSha256": "5af8e1e6e98e861c5c1a2e25324841ac9dfb07fffae0524c1cabc1a6282ad338",
+    "site": "ays-orbit-360-lab",
+    "projectId": "ays-orbit-360-lab",
+    "previewChannelId": "gi-i65-b4-rc-41765742748",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-rc-41765742748-neoi3u7r.web.app",
+    "liveUrls": [
+      "https://ays-orbit-360-lab.web.app",
+      "https://app.aysseguros.com"
+    ]
+  },
+  "control": {
+    "path": "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json",
+    "blobSha": "ad78bac770a601f917f9ba90333ea9d6139fccde",
+    "sha256": "779c2e2b6e03a21c3b87e1a1c7c6034f599f4ca47716f1426c765ece768cbed0",
+    "cursorKey": "b4003ActiveCertificationCursor20261106",
+    "immutableProofKey": "immutableSuccessor42PreviewReadback20261106",
+    "recordedPromotionAuthorization": false,
+    "recordedB4003Closed": false
+  },
+  "previewVersionName": "sites/ays-orbit-360-lab/versions/c5e1ae001fae793b",
+  "certifiedVersionCandidateProbeFile": "certified-version-candidate-observed.json",
+  "liveReleaseHistoryProbeFile": "live-release-history-first-page.json",
+  "liveVersionName": "sites/ays-orbit-360-lab/versions/3087fabd2db9b639",
+  "finishedAtUtc": "2026-11-07T00:34:19.024Z",
+  "failedCheckCount": 1
+}
