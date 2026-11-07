@@ -153,7 +153,8 @@ let binding,cp,cursor,manifest,authClient,previewChannel,rollbackChannel,liveBef
 const apiRoot='https://firebasehosting.googleapis.com/v1beta1/';
 async function hostingGet(resource,query={}){
   // Fixed host, fixed API prefix, GET only; no arbitrary outbound URL is accepted.
-  requireValue(/^(projects\/-\/sites\/[a-z0-9-]+\/channels\/[a-z0-9-]+|sites\/[a-z0-9-]+\/versions\/[A-Za-z0-9_-]+(?:\/files)?)$/.test(resource),
+  requireValue(/^(projects\/-\/sites\/[a-z0-9-]+\/channels\/[a-z0-9-]+|sites\/[a-z0-9-]+\/versions\/[A-Za-z0-9_-]+(?:\/files)?)$/.test(resource) ||
+    resource==='sites/'+binding.site+'/channels/live/releases',
     'HOSTING_RESOURCE_OUTSIDE_READ_ALLOWLIST');
   const url=new URL(apiRoot+resource);
   for(const [k,v] of Object.entries(query))url.searchParams.set(k,String(v));
@@ -223,6 +224,58 @@ async function listFiles(version){
   rows.sort((a,b)=>a.path<b.path?-1:a.path>b.path?1:0);
   requireValue(new Set(rows.map(r=>r.path)).size===rows.length,'HOSTING_DUPLICATE_PATH');
   return rows;
+}
+async function observeCertifiedLiveReleaseHistoryFirstPage(){
+  const evidence={
+    schema:'B4_003_CERTIFIED_LIVE_RELEASE_HISTORY_READONLY_V1',
+    status:'READ_IN_PROGRESS',
+    sourceRunId:35416730679,
+    sourceJobId:105826717920,
+    certifiedSourceSha:cp.certifiedCandidate.sourceSha,
+    certifiedBuildId:cp.certifiedCandidate.buildId,
+    certifiedPayloadDigest:cp.certifiedCandidate.hostedPayloadDigest,
+    observedCloneSuccessAtUtc:'2026-09-19T02:50:49.187Z',
+    windowStartUtc:'2026-09-19T02:50:00.000Z',
+    windowEndUtc:'2026-09-19T02:51:00.000Z',
+    request:{method:'GET',resource:'sites/'+binding.site+'/channels/live/releases',pageSize:100},
+    pageRequests:0,
+    paginationFollowed:false,
+    rollbackCertifiedByThisProbe:false,
+    certificateChanged:false,
+    hostingMutation:false
+  };
+  try{
+    evidence.pageRequests=1;
+    // Official sites.channels.releases.list route. Exactly one page; no token follow-up.
+    const page=await hostingGet(evidence.request.resource,{pageSize:100});
+    requireValue(Array.isArray(page.releases || []),'LIVE_RELEASE_HISTORY_INVALID_RESPONSE');
+    requireValue((page.releases || []).length<=100,'LIVE_RELEASE_HISTORY_PAGE_LIMIT_EXCEEDED');
+    const text=v=>typeof v==='string'?v:null;
+    evidence.releases=(page.releases || []).map(r=>({
+      name:text(r.name),releaseTime:text(r.releaseTime),type:text(r.type),
+      version:{
+        name:typeof r.version==='string'?r.version:text(r.version?.name),
+        status:text(r.version?.status),
+        fileCount:r.version?.fileCount===undefined?null:r.version.fileCount
+      }
+    }));
+    evidence.returnedCount=evidence.releases.length;
+    evidence.hasNextPage=Boolean(page.nextPageToken);
+    const start=Date.parse(evidence.windowStartUtc),end=Date.parse(evidence.windowEndUtc);
+    evidence.windowCandidates=evidence.releases.filter(r=>{
+      const time=Date.parse(r.releaseTime || '');
+      return Number.isFinite(time) && time>=start && time<=end;
+    });
+    evidence.windowCandidateCount=evidence.windowCandidates.length;
+    evidence.status='READ_ONLY_FIRST_PAGE_COMPLETE_NO_CERTIFICATION';
+  }catch(error){
+    evidence.status='READ_ONLY_FIRST_PAGE_FAILED';
+    evidence.code=safeCode(error);
+  }finally{
+    evidence.observedAtUtc=new Date().toISOString();
+    writeJson('live-release-history-first-page.json',evidence);
+    receipt.liveReleaseHistoryProbeFile='live-release-history-first-page.json';
+  }
 }
 async function liveSnapshot(nonce){
   const origins=[];
@@ -369,7 +422,11 @@ try{
     const version=await hostingGet(compact.versionName);
     exact(version.status,'FINALIZED','PREVIEW_VERSION_NOT_FINALIZED');
     const files=await listFiles(compact.versionName);
-    exact(Number(version.fileCount),manifest.fileCount,'PREVIEW_VERSION_FILE_COUNT_MISMATCH');
+    // Persist actual metadata and path counts before any comparison can fail.
+    writeJson('preview-hosting-version-observed.json',{channel:compact,version,files,
+      metadataFileCount:version.fileCount ?? null,listedFileCount:files.length,
+      retainedSiteFileCount:manifest.fileCount});
+    exact(Number(version.fileCount),manifest.fileCount,'PREVIEW_VERSION_FILE_COUNT_MISMATCH_'+String(version.fileCount)+'_EXPECTED_'+manifest.fileCount);
     exact(JSON.stringify(files.map(r=>r.path)),JSON.stringify(manifest.rows.map(r=>r.path)),'PREVIEW_PATH_SET_MISMATCH');
     writeJson('preview-hosting-version.json',{channel:compact,version,files});
     const readback=await readManifest(binding.previewUrl,files.map(r=>r.path),manifest.rows,'preview',
@@ -389,7 +446,15 @@ try{
     exact(cert.previewChannelId,requiredEnv('ROLLBACK_CHANNEL'),'ROLLBACK_CHANNEL_NOT_EXPECTED_CERTIFIED');
     exact(Number(cert.hostedFileCount),Number(requiredEnv('ROLLBACK_FILE_COUNT')),'ROLLBACK_FILE_COUNT_NOT_CERTIFIED');
     exact(cert.hostedPayloadDigest,requiredEnv('ROLLBACK_PAYLOAD_SHA256'),'ROLLBACK_DIGEST_NOT_CERTIFIED');
-    rollbackChannel=await getChannel(cert.previewChannelId);
+    try{
+      rollbackChannel=await getChannel(cert.previewChannelId);
+    }catch(originalError){
+      if(String(originalError?.message)==='HOSTING_GET_404:projects/-/sites/'+binding.site+'/channels/'+cert.previewChannelId){
+        try{await observeCertifiedLiveReleaseHistoryFirstPage();}
+        catch(probeError){receipt.liveReleaseHistoryProbeError=safeCode(probeError);}
+      }
+      throw originalError; // Preserve the original rollback failure and seven-check contract.
+    }
     exact(rollbackChannel.url,cert.previewUrl,'ROLLBACK_URL_MISMATCH');
     const compact=compactChannel(rollbackChannel);
     const version=await hostingGet(compact.versionName);
@@ -434,4 +499,5 @@ try{
     rollbackVersionName:receipt.rollbackVersionName,liveVersionName:receipt.liveVersionName}));
   process.exitCode=issues===0?0:1;
 }
+
 

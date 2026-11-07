@@ -566,7 +566,11 @@
         "browserErrorsAndWarningsObserved": 0,
         "viewportRestored": true,
         "unaffectedSignedDesktopPreserved": true
-      }
+      },
+      "exactServedReadbackScope": "EXISTING_IMMUTABLE_WORKFLOW_CRITICAL_PATHS; FULL_PAYLOAD_PREFLIGHT_PENDING",
+      "artifactSiteFileCount": 218,
+      "hostingApiFileCountVerified": false,
+      "fullPreviewByteReadbackPass": false
     },
     "samuelCanonicalCommercialWriterReadback20261106": {
       "recordedAtUtc": "2026-11-06T23:38:56Z",
@@ -661,8 +665,8 @@
       "productionPromotionAuthorized": false
     },
     "retainedHostingPreflight20261106": {
-      "recordedAtUtc": "2026-11-06T23:53:21Z",
-      "status": "STRICT_OBSERVED_PROJECT_VERSION_FORMAT_CORRECTED_FULL_PREFLIGHT_READBACK_PENDING_CERTIFIED_ROLLBACK_CHANNEL_404",
+      "recordedAtUtc": "2026-11-07T00:00:25Z",
+      "status": "VERSION_PARSER_RESOLVED_PREVIEW_FILECOUNT_REQUIRES_OBSERVED_VALUES_ROLLBACK_RELEASE_LOOKUP_PENDING",
       "productSourceSha": "857f1222f360a42a06e012810a1c01bce155a26f",
       "artifactId": 13549460562,
       "attempts": [
@@ -778,15 +782,72 @@
           "dataWrites": 0,
           "functionsDeployment": false,
           "rulesOrAuthChange": false
+        },
+        {
+          "runId": 42314799686,
+          "runnerCommit": "cce9151a029210908ba28d65c10e43fc128e52af",
+          "artifactId": 13549793895,
+          "artifactZipSha256": "14a00b97f3adeaaa147e184189accdd9e8c07ee06f51a3cac0a3fcd56b1bd41a",
+          "status": "EXACT_RETAINED_ARTIFACT_HOSTING_PREFLIGHT_FAIL",
+          "passedChecks": [
+            "exact_candidate_and_archive",
+            "artifact_run_metadata",
+            "reuse_existing_service_account_for_gets",
+            "live_before_snapshot",
+            "live_unchanged_after_readonly_preflight"
+          ],
+          "failedChecks": [
+            {
+              "check": "preview_version_and_all_served_bytes",
+              "code": "PREVIEW_VERSION_FILE_COUNT_MISMATCH",
+              "actualMetadataAndListedCountsNotRetainedByThatAttempt": true
+            },
+            {
+              "check": "certified_rollback_version_and_all_served_bytes",
+              "code": "HOSTING_GET_404:projects/-/sites/ays-orbit-360-lab/channels/gi-i5-rb-34723814583"
+            }
+          ],
+          "actualLiveVersionName": "sites/ays-orbit-360-lab/versions/3087fabd2db9b639",
+          "hostingMutation": false,
+          "dataWrites": 0,
+          "functionsDeployment": false,
+          "rulesOrAuthChange": false
         }
       ],
-      "nextReadOnlyAction": "Rerun same retained preflight with exact parser. Recover certified rollback version from existing I5 run35416730679/retained Hosting evidence. Existing LIVE965/marker404 drift is already governed by b4003LiveHostingIntegrityHold and causal attribution; do not create a new finding, weaken hashes, clone or create channels.",
+      "nextReadOnlyAction": "Persist actual Preview metadata/list counts before unchanged strict assertions; query only first100 existing LIVE releases for the certified Sept19 02:50:49Z window after rollbackchannel404. No automatic equivalence, certificate change, new channel, rebuild or promotion.",
       "rollbackCertifiedByThisAttempt": false,
       "productionPromotionAuthorized": false,
       "parserFix": "Normalize only observed projects/646761409743/ qualified version resources after exact project/site/channel validation; retain original observed names.",
       "existingLiveIntegrityHoldPreserved": true,
       "hostingOnlyPromotionEligibilityNotYetGranted": true,
-      "backendParityAuthorityReconciliationPending": true
+      "backendParityAuthorityReconciliationPending": false,
+      "fullPreviewByteReadbackPass": false,
+      "localImmutableArchiveAndCriticalServedPathsStillVerified": true
+    },
+    "backendParityAuthorityReconciled20261106": {
+      "recordedAtUtc": "2026-11-07T00:00:25Z",
+      "status": "PRESERVE_ACTUAL_LIVE_ROSTER_WRITER_GOAL_CONTRACT_SOURCE_PARITY_PASS",
+      "precedence": "Nov4 missing-roster/writer-false pointers are historical snapshots superseded by later exact deploy/readback; no risk exception needed.",
+      "latestRunId": 42140743795,
+      "jobId": 127640163708,
+      "actualAfterReadbackAtUtc": "2026-11-06T01:01:18.5766292Z",
+      "rosterSourceMatchesCurrent": true,
+      "writerSourceMatchesCurrent": true,
+      "writerGoalParticipationContractMatchesCurrent": true,
+      "rosterGitBlob": "9778d74b6d305ff56caf73bb68be3dadac4b14ce",
+      "writerGitBlob": "187efbfa9868531349154f26ec90a5e2c2ed33e8",
+      "goalContractGitBlob": "ff86fa441fd6cb4ec6254e2dc5078a37bf68fc36",
+      "signedReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_TEAM_CLASSIFICATIONS_SIGNED_READBACK_20261105.json",
+      "signedSevenOfSevenWritesAndReloadPreserved": true,
+      "source42FunctionsChangedSinceSignedBackend": false,
+      "routineBackendRedeployRequired": false,
+      "rulesExceptionPreserved": true,
+      "deferredQaCohortsPreserved": true,
+      "remainingLiveRequirements": [
+        "actual protected reader and scoped capabilities",
+        "module/role/read/write/reload/integrity acceptance after same-artifact promotion"
+      ],
+      "notFormalLiveAcceptance": true
     }
   },
   "b4003LeadsCurrent40ProspectiveHumanActorFocal20261106": {
@@ -826,7 +887,10 @@
     "reverseWriteCrossReadStillPending": true,
     "cleanupReadbackStatusMeaning": "Prior readback observed original fixtures still unarchived; this is not a cleanup PASS.",
     "newSamuelFixtureId": "b4003qa_user_mw5lmd7r_nu0l4r",
-    "newSamuelCanonicalWriterPass": true
+    "newSamuelCanonicalWriterPass": true,
+    "historicalCleanupConfirmationRecorded": true,
+    "historicalReadbackExecutionRecorded": true,
+    "currentCleanupAttemptConfirmationObserved": false
   },
   "b4003HistorialCurrent40OperativoCountryMatrixFocal20261106": {"dateLocal":"2026-11-06","status":"ONE_CURRENT_CANDIDATE_READ_ONLY_MATRIX_DELTA_PREVIEW_PASS_SCOPE_ONLY","receiptPath":"artifacts/orbit360-recovery/release-control/I6_5_B4_003_CURRENT40_HISTORIAL_OPERATIVO_COUNTRY_SCOPE_BROWSER_DELTA_20261106.json","receiptBlobSha":"3010cb55b2202dc5f7b2712fea173d44b461177f","sourceSha":"b01dceafc1ec2b1e786626116251e248be1e23f4","buildId":"gi-i65-b4-b01dceafc1ec-57f234755dc1","artifactId":13527102882,"principal":"Paula (Ver como Operativo)","module":"Historial","GT":23,"CO":13,"TODOS":36,"advisorTodos":24,"noWrite":true,"doesNotProveFullMatrix":true,"releaseGateUnchanged":true},
   "b4003E4GtCobrosReportesSameScopeCurrentCandidate20261106": {"dateLocal":"2026-11-06","status":"FOCAL_PREVIEW_PASS_SCOPE_ONLY_NOT_FULL_GATE","receiptPath":"artifacts/orbit360-recovery/release-control/I6_5_B4_003_E4_GT_COBROS_REPORTES_CURRENT_CANDIDATE_20261106.json","receiptBlobSha":"ab12c69a460798273abe22db09f3311ea5678a2e","sourceSha":"b01dceafc1ec2b1e786626116251e248be1e23f4","buildId":"gi-i65-b4-b01dceafc1ec-57f234755dc1","immutableArtifactId":13527102882,"role":"Paula Dirección","country":"GT","period":"Todos","filters":"Todos","cobros":2503,"reportes":2503,"anulado":12,"qaExcluded":1,"releaseGateUnchanged":true},
