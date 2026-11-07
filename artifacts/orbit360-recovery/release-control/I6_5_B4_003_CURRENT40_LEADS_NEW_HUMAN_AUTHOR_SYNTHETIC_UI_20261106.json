@@ -816,7 +816,7 @@
     "next": [
       "Paula signs in with her own actual account; reload and read the two existing Samuel comments and bitacora plus the operations notice for b4003qa_user_mw5lmd7r_nu0l4r. No new reply, reverse reload or fixture.",
       "Canonical archivado:true readback for b4003qa_user_mw5htkgl_31u61t and b4003qa_user_mw5eas6v_lphfrl after both authorized archive UI actions; archive the Samuel fixture only after Paula read and verify it too. Firebase console origin access was auto-review denied; request scoped approval, do not bypass.",
-      "Certify retained historical rollback5d35a2bd0b326e75 raw209 digest, restore exact current42 Preview, reconcile formal Preview seal, then same retained artifact LIVE promotion and actual required LIVE checks."
+      "Reconcile formal exact Preview acceptance using preserved15 certificates and16 current evidence entries, certified rollback209 and exact restored42; promote only the same retained artifact and perform actual required LIVE module/write/reload/integrity checks."
     ],
     "noNewFixtures": true,
     "noAdditionalPaulaResponseRequired": true,
@@ -826,5 +826,14 @@
     "cartesianDenominatorNotInvented": true,
     "b4003Closed": false,
     "productionPromotionAuthorized": false
+  },
+  "retainedRollbackCertified20261107": {
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_RETAINED_ROLLBACK_CERTIFIED_20261107.json",
+    "receiptBlobSha": "7ba72ca211a9bb2771932f0b5ff95e6857732f9e",
+    "runId": 42320351982,
+    "status": "RETAINED_ROLLBACK_RAW_CERTIFIED_PREVIEW_42_RESTORED_LIVE_UNCHANGED",
+    "preview42RestoredVerified": true,
+    "liveUnchanged": true,
+    "b4003Closed": false
   }
 }
