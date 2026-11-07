@@ -4066,7 +4066,7 @@ jobs:
       B4_LIVE_SYNTHETIC_HELPER: tools/gravicentra-b4-003-one-live-synthetic-insurer.mjs
       B4_LIVE_SYNTHETIC_PHASE: "${{ github.event.head_commit.message == 'test(b4-003): create one synthetic insurer LIVE' && 'create' || 'cleanup' }}"
       B4_LIVE_SYNTHETIC_OUT: ${{ github.workspace }}/.b4-preflight-temp/live-synthetic-insurer
-      B4_LIVE_SYNTHETIC_DEPS_ROOT: ${{ runner.temp }}/gi-b4003-live-synthetic-deps
+      B4_LIVE_SYNTHETIC_DEPS_ROOT: ${{ github.workspace }}/.b4-preflight-temp/live-synthetic-deps
     steps:
       - uses: actions/checkout@v4
         with:

@@ -160,7 +160,7 @@
       "actualDurableCommentActorFieldsRequireProspectiveReview": true,
       "continuityReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CURRENT40_LEADS_NEW_HUMAN_AUTHOR_SYNTHETIC_UI_20261106.json"
     },
-    "asOfUtc": "2026-11-07T02:01:03Z",
+    "asOfUtc": "2026-11-07T02:04:41Z",
     "continuityRecovery20261106": {
       "recordedAtUtc": "2026-11-06T22:03:41Z",
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CURRENT40_LEADS_NEW_HUMAN_AUTHOR_SYNTHETIC_UI_20261106.json",
@@ -1521,10 +1521,10 @@
       "authorized": false,
       "consumed": false,
       "authorizationReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_ONE_LIVE_SYNTHETIC_INSURER_OWNER_AUTH_20261107.json",
-      "authorizationReceiptBlobSha": "eac4d6ff8017019b3147389845ad83f3a91eebf8",
+      "authorizationReceiptBlobSha": "beb9d36b94427dc758b8ea6c7e7869e69972404c",
       "planPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_ONE_LIVE_SYNTHETIC_INSURER_PLAN_20261107.json",
       "planSha256": "a318932d732917737953c42a380b884ba200307f5e804c3b32c06662c012dcb6",
-      "executorBlobSha": "855e528eea7394b3841dadd3ea654e65ba89701c",
+      "executorBlobSha": "21209328d79127f841c522a6e71c18d197653dda",
       "helperBlobSha": "66995bd06b05e23faade01f5d0f5045d601a9fbe",
       "projectId": "ays-orbit-360-lab",
       "tenantId": "alianzas-soluciones",

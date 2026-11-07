@@ -10,7 +10,7 @@
   "branch": "recovery/fase-a-clean-20260831",
   "forensicOriginSha": "9c95f31461f2eabe9804625b5659bee772f5602a",
   "createdAtUtc": "2026-08-31T18:00:00Z",
-  "updatedAtUtc": "2026-11-07T02:01:03Z",
+  "updatedAtUtc": "2026-11-07T02:04:41Z",
   "status": "ITERATION_2_SOURCE_MATERIALIZED_VALIDATION_PENDING",
   "currentIteration": 2,
   "lastCompletedIteration": 1,
@@ -443,7 +443,7 @@
     "noDataWrites": true
   },
   "b4003ActiveCertificationResume20261106": {
-    "recordedAtUtc": "2026-11-07T02:01:03Z",
+    "recordedAtUtc": "2026-11-07T02:04:41Z",
     "authorityPath": "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json",
     "cursorKey": "b4003ActiveCertificationCursor20261106",
     "inventoryKey": "b4003CertificationInventory20261106",
@@ -548,6 +548,6 @@
     "liveSyntheticPlanSha256": "a318932d732917737953c42a380b884ba200307f5e804c3b32c06662c012dcb6",
     "liveSyntheticAuthorizationStatus": "PENDING_OWNER_AUTHORIZATION",
     "liveSyntheticHelperBlobSha": "66995bd06b05e23faade01f5d0f5045d601a9fbe",
-    "liveSyntheticExecutorBlobSha": "855e528eea7394b3841dadd3ea654e65ba89701c"
+    "liveSyntheticExecutorBlobSha": "21209328d79127f841c522a6e71c18d197653dda"
   }
 }

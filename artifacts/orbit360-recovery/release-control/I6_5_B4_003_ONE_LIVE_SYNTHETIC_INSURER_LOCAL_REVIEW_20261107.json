@@ -1,10 +1,10 @@
 {
   "schema": "B4_003_ONE_LIVE_SYNTHETIC_INSURER_LOCAL_REVIEW_V1",
-  "recordedAtUtc": "2026-11-07T02:01:03Z",
+  "recordedAtUtc": "2026-11-07T02:04:41Z",
   "status": "PASS_REVIEW_LOCAL_NO_REMOTE_EXECUTION",
   "planSha256": "a318932d732917737953c42a380b884ba200307f5e804c3b32c06662c012dcb6",
   "helperGitBlob": "66995bd06b05e23faade01f5d0f5045d601a9fbe",
-  "executorGitBlob": "855e528eea7394b3841dadd3ea654e65ba89701c",
+  "executorGitBlob": "21209328d79127f841c522a6e71c18d197653dda",
   "executorBaseGitBlob": "e93f36b602443dcb5d56cb9c6e0ff254c71f2844",
   "backendWriterGitBlob": "187efbfa9868531349154f26ec90a5e2c2ed33e8",
   "reviewedBy": "Root plus independent focal review",
@@ -523,11 +523,68 @@
       "tokensIssued": 0,
       "operationalWrites": 0,
       "executedAgainstGitBlobSha": "855e528eea7394b3841dadd3ea654e65ba89701c"
+    },
+    "staticActionsContextFix": {
+      "diagnosis": "STATIC_ACTIONS_SCHEMA_DEFECT_IDENTIFIED",
+      "githubRunIdProvidedByRoot": 42327135977,
+      "remoteAnnotationObserved": false,
+      "remoteParserAcceptanceStillRequired": true,
+      "officialContextReference": "https://docs.github.com/en/actions/reference/workflows-and-actions/contexts#context-availability",
+      "invalidContext": "runner at jobs.<job_id>.env",
+      "changedLines": 1,
+      "replacementContext": "github.workspace",
+      "parsedYamlEqualExceptOneEnvironmentValue": true,
+      "newJobEnvContextRootsAllowed": [
+        {
+          "field": "B4_LIVE_SYNTHETIC_PHASE",
+          "contextRoots": [
+            "github"
+          ]
+        },
+        {
+          "field": "B4_LIVE_SYNTHETIC_OUT",
+          "contextRoots": [
+            "github"
+          ]
+        },
+        {
+          "field": "B4_LIVE_SYNTHETIC_DEPS_ROOT",
+          "contextRoots": [
+            "github"
+          ]
+        }
+      ],
+      "helperChanged": false,
+      "planChanged": false,
+      "scopeChanged": false,
+      "authorizationEnabled": false,
+      "tokensIssued": 0,
+      "remoteMutations": 0,
+      "oldExecutorGitBlob": "855e528eea7394b3841dadd3ea654e65ba89701c",
+      "newExecutorGitBlob": "21209328d79127f841c522a6e71c18d197653dda",
+      "contextPatchSha256": "8473b08a78d2a396dc26fda6636e79d306f6fa1eff1d6b3abe6dc588047b856d"
     }
   },
   "executionAuthorized": false,
   "customTokensIssued": 0,
   "businessWrites": 0,
   "productionAcceptanceGranted": false,
-  "b4003Closed": false
+  "b4003Closed": false,
+  "workflowContextCorrection": {
+    "status": "STATIC_ACTIONS_SCHEMA_DEFECT_IDENTIFIED_AND_ONE_LINE_CORRECTED_REMOTE_PARSER_PENDING",
+    "previousPreparedCommit": "c98d85dbb8bf29a0c58ebe74b0a15443c997b3a0",
+    "previousExecutorBlob": "855e528eea7394b3841dadd3ea654e65ba89701c",
+    "rejectedWorkflowRunId": 42327135977,
+    "jobsCreated": 0,
+    "controlPlaneGuardJobId": 128264911497,
+    "controlPlaneGuardConclusion": "success",
+    "changedLines": 1,
+    "removedJobEnvContext": "runner.temp",
+    "replacementJobEnvContext": "github.workspace",
+    "officialContextAvailabilityUrl": "https://docs.github.com/en/actions/reference/workflows-and-actions/contexts#context-availability",
+    "exactFailureAnnotationNotRetrieved": true,
+    "helperUnchanged": true,
+    "planUnchanged": true,
+    "authorizationStillFalse": true
+  }
 }
