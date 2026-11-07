@@ -193,16 +193,208 @@ export function validateEquipoCausalSourceSuccessor({record,pointer,fileBytes,ba
  return {allowedPaths:listed};
 }
 
-export function validateOwnerDecisionSuccessorSnapshot({control,baseControl,state,baseState,changedPaths,fileBytes,baseSourceBytes}){
+const READER_DEPLOY_BASE='e5030ec5ba9854f0c576fd905c2f510766347ffa';
+const READER_DEPLOY_ACTIVATION=ROOT+'I6_5_B4_003_ISOLATED_READER_DEPLOY_ACTIVATION_20261107.json';
+const READER_DEPLOY_PINS={
+  ".github/workflows/gravicentra-b4-003-live-protected-reader-20261029.yml": [
+    "bd45ef8297cb4d326929a01d5b8c4303369b72d4",
+    "967fc96d3d263b34bec8c8cbb4be6ce0b3a40967"
+  ],
+  "tools/gravicentra-b4-003-live-backend-source-readback.cjs": [
+    "48edf21b50f05521a33159b5925e75a904841951",
+    "632e8ded686b2d9dba2b80cda6f5f54824575831"
+  ],
+  "tools/gravicentra-b4-003-live-reader-source-readback.test.cjs": [
+    "43072eb1d054b18438a76d300214827652b61ad9",
+    "46020dfb28143974f9701478edb9c6cfbb7be075"
+  ],
+  "tools/gravicentra-b4-003-isolated-reader-package.cjs": [
+    null,
+    "50e4bd4c2b4d5391d1c2097364e1786454818f31"
+  ],
+  "tools/gravicentra-b4-003-isolated-reader-package.test.cjs": [
+    null,
+    "6787010e0ef9a756ebfed093bc64619724c38e0f"
+  ]
+};
+export function validateReaderDeploymentSuccessorSnapshot({record,fileBytes,baseSourceBytes}){
+ const p=record.readerDeploymentSuccessor;
+ if(!p){need(fileBytes[READER_DEPLOY_ACTIVATION]==null,'READER_UNDECLARED_ACTIVATION');return null;}
+ need(p.schema==='GRAVICENTRA_READER_DEPLOYMENT_SUCCESSOR_V1'&&p.sourceBaseHead===READER_DEPLOY_BASE&&p.preservedFrontendSource===READER_DEPLOY_BASE,'READER_DEPLOY_BASE');
+ need(p.status==='EXACT_ISOLATED_READER_PREPARED_ACTIVATION_REQUIRED'&&p.target==='orbit360ScopedPolicyRead'&&p.region==='us-east1'&&p.project==='ays-orbit-360-lab','READER_DEPLOY_IDENTITY');
+ need(p.deployAuthorized===true&&p.requiresActivationReceipt===true&&p.activationPath===READER_DEPLOY_ACTIVATION&&p.allowedPushSubject==='deploy(b4-003): exact isolated LIVE reader e503 successor','READER_DEPLOY_ACTIVATION_CONTRACT');
+ need(p.hostingDeployAuthorized===false&&p.rulesWrites===0&&p.realBusinessWrites===0&&p.repeatSevenClassificationWrites===false&&p.otherFunctionsDeployAuthorized===false&&p.backendSourceFilesChanged===false,'READER_DEPLOY_BOUNDARY');
+ need(p.before?.runId===42397991685&&p.before.runConclusion==='success'&&p.before.sourceManifestSha256==='067c746216f25a8aecbcf435bd0cd00a2ed0f8463c7446bb9c36ee5dc5a822ff'&&p.before.archiveSha256==='eb076c9f52c16d1a66bd3bd0b31a25555a57fc6109cdfe9b6d0f61dcfcd27fe9'&&p.before.revision==='orbit360scopedpolicyread-00001-tiv','READER_DEPLOY_EXACT_OBSERVED_PREDECESSOR');
+ need(p.expectedIsolatedSourceManifestSha256==='690d036074683b4ea1d46cf867fa14856b40536fe739388ff50801ec9d31786a'&&p.singleExport==='orbit360ScopedPolicyRead'&&p.completeLocalDependencyFiles===7&&p.packageFiles===10,'READER_DEPLOY_ISOLATED_CLOSURE');
+ need(p.readOnlyDiagnostic?.target==='orbit360TenantDomainConfig'&&p.readOnlyDiagnostic.region==='us-central1'&&p.readOnlyDiagnostic.invokesCallable===false&&p.readOnlyDiagnostic.deployAuthorized===false&&p.readOnlyDiagnostic.businessDataReads===0,'READER_CATALOG_READONLY_SCOPE');
+ need(Array.isArray(p.changes)&&same(p.changes.map(x=>x.path).sort(),Object.keys(READER_DEPLOY_PINS).sort()),'READER_DEPLOY_EXACT_PATHS');
+ const comparableFileBytes={...fileBytes};
+ for(const entry of p.changes){
+  const [prior,next]=READER_DEPLOY_PINS[entry.path],bytes=fileBytes[entry.path],base=baseSourceBytes?.[entry.path];
+  need(entry.previousBlobSha===prior&&entry.blobSha===next&&bytes!=null&&blob(Buffer.from(bytes))===next&&sha(Buffer.from(bytes))===entry.sha256,'READER_DEPLOY_CURRENT_PIN');
+  need(prior===null?base==null:base!=null&&blob(Buffer.from(base))===prior,'READER_DEPLOY_BEFORE_PIN');
+  if(prior!==null)comparableFileBytes[entry.path]=base;
+ }
+ const allowedPaths=Object.keys(READER_DEPLOY_PINS),activationBytes=fileBytes[READER_DEPLOY_ACTIVATION];
+ if(activationBytes!=null){
+  const a=JSON.parse(Buffer.from(activationBytes).toString('utf8'));
+  need(a.schema==='GRAVICENTRA_ISOLATED_READER_DEPLOY_ACTIVATION_V1'&&a.status==='AUTHORIZED_EXACT_ISOLATED_READER_DEPLOY'&&a.target===p.target&&a.region===p.region&&a.project===p.project,'READER_ACTIVATION_IDENTITY');
+  need(a.beforeSourceManifestSha256===p.before.sourceManifestSha256&&a.beforeArchiveSha256===p.before.archiveSha256&&a.beforeRevision===p.before.revision&&a.expectedIsolatedSourceManifestSha256===p.expectedIsolatedSourceManifestSha256&&a.preservedFrontendSource===READER_DEPLOY_BASE,'READER_ACTIVATION_SOURCE_BINDING');
+  need(a.realBusinessWritesAuthorized===false&&a.otherFunctionsDeployAuthorized===false&&a.reviewedReadbackConclusion==='success'&&Number.isSafeInteger(a.reviewedReadbackRunId)&&a.reviewedReadbackRunId>42397991685&&/^[a-f0-9]{40}$/.test(a.reviewedSourceHead||''),'READER_ACTIVATION_FRESH_READBACK');
+  allowedPaths.push(READER_DEPLOY_ACTIVATION);
+ }
+ return{comparableFileBytes,allowedPaths,sourceBaseHead:READER_DEPLOY_BASE};
+}
+
+// Integrated by the single owner of formal-live-closeout-guard.mjs.
+// Uses its existing need/blob/sha/clone/same helpers; no network or writes.
+const FRONTPROMO_BASE='e5030ec5ba9854f0c576fd905c2f510766347ffa';
+const FRONTPROMO_KEY='b4003CausalFrontendSuccessor20261107';
+const FRONTPROMO_ROOT='artifacts/orbit360-recovery/release-control/';
+const FRONTPROMO_TRANSPORT=FRONTPROMO_ROOT+'I6_5_B4_003_E503_IMMUTABLE_PREVIEW_TRANSPORT_20261107.json';
+const FRONTPROMO_FOCAL=FRONTPROMO_ROOT+'I6_5_B4_003_E503_CAUSAL_FRONTEND_FOCAL_PREVIEW_ACCEPTANCE_20261107.json';
+const FRONTPROMO_PREFLIGHT=FRONTPROMO_ROOT+'I6_5_B4_003_E503_RETAINED_HOSTING_PREFLIGHT_20261107.json';
+const FRONTPROMO_PROMOTED=FRONTPROMO_ROOT+'I6_5_B4_003_E503_RETAINED_HOSTING_PROMOTED_20261107.json';
+const FRONTPROMO_ROLLBACK='sites/ays-orbit-360-lab/versions/c5e1ae001fae793b';
+const FRONTPROMO_EXPECTED={sourceSha:FRONTPROMO_BASE,buildId:'gi-i65-b4-e5030ec5ba98-57f234755dc1',runId:42397991730,artifactId:13584456766,
+ artifactZipSha256:'96f8a8319a27899fc8341dd1d0853cc5395d3c01d88a18cfc885f7cdf5fb5062',archiveSha256:'cc710541a70afdaee8da882ef0b43b9dc9f24f89a7a198c3f48f18dc776a12fa',
+ hostedPayloadDigest:'09c91023d1d22687528a61edb5a768dadbd59c465af91bc48016d21c94c6537f',productFiles:218,
+ previewUrl:'https://ays-orbit-360-lab--gi-i65-b4-rc-41765742748-neoi3u7r.web.app'};
+const FRONTPROMO_PINS={
+ '.github/workflows/gravicentra-b4-003-executor.yml':['ef7166292eea983c2165692725797e0ef46b06fb','8178fdfd8c4c16a1b1bf17432c87e6b5115cdd4e'],
+ 'tools/gravicentra-b4-003-retained-hosting-preflight.mjs':['9c2599ee4551d4cc87d209dec6e46e1152a44c97','f361d6840ebf4cc03657c36a1bf6a03039e5c993'],
+ 'tools/gravicentra-b4-003-retained-hosting-promotion.mjs':['aecc2ebd24b211797db431a6726f6a833d0dc298','404b5fd60df843fa6e857aed04bb39e6232b6e6b'],
+ 'tools/gravicentra-b4-003-causal-frontend-retained-promotion.test.cjs':[null,'2dfb8a2e982a8a21f554ac4c250fefd37223009a'],
+ [FRONTPROMO_TRANSPORT]:[null,'c939ca0c44eddefcea9cbb2ffc448ddafda749ab'],
+ [FRONTPROMO_FOCAL]:[null,'953d55d5c1dd04f14522e3a12bbfa248a0a5da28']
+};
+export function validateFrontendPromotionSuccessorSnapshot({record,control,state,fileBytes,baseSourceBytes}){
+ const p=record.frontendPromotionSuccessor,c=control[FRONTPROMO_KEY],s=state[FRONTPROMO_KEY];
+ if(!p){need(c===undefined&&s===undefined,'FRONTPROMO_UNDECLARED_CURSOR');return null;}
+ need(p.schema==='GRAVICENTRA_B4_003_CAUSAL_FRONTEND_TRANSPORT_SUCCESSOR_V1'&&p.sourceBaseHead===FRONTPROMO_BASE,'FRONTPROMO_BASE');
+ const phases={FOCAL_PREVIEW_PASS_PREFLIGHT_PENDING:'FRONTEND_SUCCESSOR_FOCAL_PREVIEW_PASS_PREFLIGHT_PENDING',PROMOTION_AUTHORIZED:'FRONTEND_SUCCESSOR_PREVIEW_ACCEPTED_PROMOTION_AUTHORIZED',LIVE_BYTES_PASS_FOCAL_LIVE_PENDING:'FRONTEND_SUCCESSOR_LIVE_BYTES_PASS_FOCAL_LIVE_PENDING'};
+ need(Object.hasOwn(phases,p.phase),'FRONTPROMO_PHASE');
+ need(p.productSourceChangedAfterBuild===false&&p.rebuildExecuted===false&&p.artifactPatched===false&&p.backendFunctionDeploys===0&&p.rulesWrites===0&&p.realBusinessWrites===0&&p.nextGateExecuted===false&&p.globalProductionAccepted===false,'FRONTPROMO_BOUNDARY');
+ need(c&&s&&same(c,s)&&c.schema==='GRAVICENTRA_B4_003_CAUSAL_FRONTEND_SUCCESSOR_CURSOR_V1','FRONTPROMO_CURSOR_PARITY');
+ need(same(Object.keys(c).sort(),['schema','status','preservedAcceptancePointer','sourceContractPath','sourceContractBlobSha','activeSourceSha','activeBuildId','activeImmutableArtifactId','immutableSuccessor43PreviewReadback','focalAuthenticatedAcceptance','formalPreviewAcceptance','productionPromotionAuthorized','b4003Closed','b4003HistoricalAcceptancePreserved','nextGateExecuted'].sort()),'FRONTPROMO_CURSOR_EXACT_KEYS');
+ need(c.status===phases[p.phase]&&c.b4003Closed===true&&c.b4003HistoricalAcceptancePreserved===true&&c.nextGateExecuted===false,'FRONTPROMO_CURSOR_STATUS');
+ need(c.preservedAcceptancePointer==='/b4003ActiveCertificationCursor20261106/formalLiveAcceptance'&&c.sourceContractPath===FRONTPROMO_ROOT+'I6_5_B4_003_CURRENT42_CAUSAL_FRONTEND_SUCCESSOR_CONTRACT_20261107.json'&&c.sourceContractBlobSha==='c792b7db1aa3f16ed7ee20cbdffe2b76dc61b97f','FRONTPROMO_PARENT_CONTRACT');
+ need(control.b4003ActiveCertificationCursor20261106?.b4003Closed===true&&control.b4003ActiveCertificationCursor20261106?.formalLiveAcceptance?.receiptBlobSha==='0879188bf245248fa1092fb2014e35e14e802b44','FRONTPROMO_CURRENT42_CLOSED');
+ need(c.activeSourceSha===FRONTPROMO_BASE&&c.activeBuildId===FRONTPROMO_EXPECTED.buildId&&Number(c.activeImmutableArtifactId)===FRONTPROMO_EXPECTED.artifactId,'FRONTPROMO_ACTIVE_ARTIFACT');
+ const proofs=Object.entries(c).filter(([k])=>/^immutableSuccessor\d+PreviewReadback/.test(k));
+ need(proofs.length===1&&proofs[0][0]==='immutableSuccessor43PreviewReadback','FRONTPROMO_ONE_PREVIEW_PROOF');
+ const proof=proofs[0][1];
+ need(same(Object.keys(proof).sort(),['sourceSha','buildId','runId','artifactId','artifactZipSha256','archiveSha256','previewChannelId','previewUrl','versionName','workflowConclusion','exactServedReadbackPassed','hostedPayloadDigest','productFiles','artifactZipBytes','readbackReceiptArtifactId','readbackReceiptArtifactZipSha256','readbackReceiptPath','readbackReceiptBlobSha','readbackReceiptSha256'].sort()),'FRONTPROMO_PROOF_EXACT_KEYS');
+ for(const [k,v]of Object.entries(FRONTPROMO_EXPECTED))need(proof[k]===v,'FRONTPROMO_ARTIFACT_'+k);
+ need(proof.previewChannelId==='gi-i65-b4-rc-41765742748'&&proof.workflowConclusion==='success'&&proof.exactServedReadbackPassed===true,'FRONTPROMO_EXACT_TRANSPORT');
+ need(proof.artifactZipBytes===1519756&&proof.readbackReceiptArtifactId===13583898538&&proof.readbackReceiptArtifactZipSha256==='60374fdcf9e0c5b18e020c93b3f0ccdb2e7c1f0634646a2432c675649e08f247','FRONTPROMO_GITHUB_ARTIFACT_ORIGIN');
+ const authorized=p.phase==='PROMOTION_AUTHORIZED',observed=p.phase==='LIVE_BYTES_PASS_FOCAL_LIVE_PENDING';
+ need(c.productionPromotionAuthorized===authorized&&p.productionPromotionAuthorized===authorized,'FRONTPROMO_AUTHORIZATION');
+ const pins={...FRONTPROMO_PINS};
+ for(const [required,ref,path]of [[authorized||observed,p.preflightEvidence,FRONTPROMO_PREFLIGHT],[observed,p.promotionEvidence,FRONTPROMO_PROMOTED]]){
+  if(required){need(ref?.path===path&&/^[a-f0-9]{40}$/.test(ref.blobSha||'')&&/^[a-f0-9]{64}$/.test(ref.sha256||'')&&Number.isSafeInteger(ref.runId)&&ref.runId>0&&/^[a-f0-9]{40}$/.test(ref.runnerCommit||'')&&ref.runConclusion==='success','FRONTPROMO_REQUIRED_RUN_EVIDENCE');pins[path]=[null,ref.blobSha];}
+  else need(ref===undefined,'FRONTPROMO_PREMATURE_RUN_EVIDENCE');
+ }
+ need(Array.isArray(p.changes)&&p.changes.length===Object.keys(pins).length&&same(p.changes.map(x=>x.path).sort(),Object.keys(pins).sort()),'FRONTPROMO_EXACT_PATHS');
+ for(const x of p.changes){
+  const pin=pins[x.path],bytes=fileBytes[x.path],before=baseSourceBytes?.[x.path];
+  need(x.previousBlobSha===pin[0]&&x.blobSha===pin[1]&&bytes!=null&&blob(Buffer.from(bytes))===pin[1]&&sha(Buffer.from(bytes))===x.sha256,'FRONTPROMO_CURRENT_PIN');
+  need(pin[0]===null?before==null:before!=null&&blob(Buffer.from(before))===pin[0],'FRONTPROMO_BEFORE_PIN');
+ }
+ const json=path=>JSON.parse(Buffer.from(fileBytes[path]).toString('utf8'));
+ const transport=json(FRONTPROMO_TRANSPORT);
+ need(transport.schema==='I6_5_B4_003_IMMUTABLE_PREVIEW_RELEASE_BUNDLE_V1','FRONTPROMO_TRANSPORT_SCHEMA');
+ for(const [k,v]of Object.entries(FRONTPROMO_EXPECTED))need(transport[k]===v,'FRONTPROMO_TRANSPORT_'+k);
+ need(transport.servedArtifactExact===true&&transport.fullProductReadback===true&&transport.liveLabStable===true&&transport.liveAppDomainStable===true&&transport.backendFunctionsDeployed===0&&transport.dataWrites===0&&transport.firestoreRulesWrites===0&&transport.productionDeploy===false&&transport.authenticatedUat==='PENDING','FRONTPROMO_TRANSPORT_SCOPE');
+ need(proof.readbackReceiptPath===FRONTPROMO_TRANSPORT&&proof.readbackReceiptBlobSha===FRONTPROMO_PINS[FRONTPROMO_TRANSPORT][1]&&proof.readbackReceiptSha256===sha(Buffer.from(fileBytes[FRONTPROMO_TRANSPORT])),'FRONTPROMO_TRANSPORT_REFERENCE');
+ const focal=json(FRONTPROMO_FOCAL);
+ need(focal.schema==='GRAVICENTRA_B4_003_CAUSAL_FRONTEND_FOCAL_PREVIEW_ACCEPTANCE_V1'&&focal.status==='LATEST_APPROVED_VERSION_PREVIEW_PASS'&&focal.acceptanceScope==='CAUSAL_FRONTEND_DELTA_ONLY','FRONTPROMO_FOCAL_SCOPE');
+ need(same(focal.browserArtifactIdentity?.scripts,[{path:'modules/cancelaciones.js',observedOrbitBuild:FRONTPROMO_EXPECTED.buildId},{path:'modules/reportes.js',observedOrbitBuild:FRONTPROMO_EXPECTED.buildId},{path:'data/store-firestore-product-operational-p0.js',observedOrbitBuild:FRONTPROMO_EXPECTED.buildId}])&&focal.browserArtifactIdentity.hiddenApplicationStateRead===false&&focal.browserArtifactIdentity.sdkStateRead===false,'FRONTPROMO_BROWSER_BUILD_IDENTITY');
+ need(same(focal.candidate,FRONTPROMO_EXPECTED)&&focal.checks.equipo.internal===4&&focal.checks.equipo.freelance===3&&focal.checks.equipo.reloadObserved===true&&focal.checks.equipo.sourceClassificationRegressionTestsPassed===48&&focal.checks.equipo.freshUiClassificationWrite===false,'FRONTPROMO_EQUIPO_FOCAL');
+ need(focal.checks.cancelaciones.GT===461&&focal.checks.cancelaciones.CO===28&&focal.checks.cancelaciones.TODOS===489&&focal.checks.cancelaciones.syntheticQaExcluded===true&&focal.checks.cancelaciones.syntheticQaDeleted===false&&focal.checks.reportes.cancelaciones===489&&focal.checks.reportes.syntheticQaExcludedAndRetainedForAudit===1&&same(focal.checks.reportes.consoleWarningAndErrorEntries,[]),'FRONTPROMO_CANCEL_REPORTES_FOCAL');
+ for(const key of ['freshUiClassificationWrite','allRenewalFlowsCertified','allCancellationFlowsCertified','propuestasCatalogCertified','newLiveAcceptanceGranted','globalSynchronizationCertified','rulesChanged','nextGateExecuted','productionPromotionAuthorizedByThisReceipt'])need(focal.boundaries[key]===false,'FRONTPROMO_NO_BROAD_ACCEPTANCE_'+key);
+ need(focal.boundaries.businessWrites===0&&focal.boundaries.backendFunctionsDeployedByThisDelta===0,'FRONTPROMO_NO_NEW_WRITES');
+ need(c.focalAuthenticatedAcceptance?.status==='PASS'&&c.focalAuthenticatedAcceptance.sourceSha===FRONTPROMO_BASE&&c.focalAuthenticatedAcceptance.artifactId===FRONTPROMO_EXPECTED.artifactId&&same(c.focalAuthenticatedAcceptance.evidencePaths,[FRONTPROMO_FOCAL])&&c.focalAuthenticatedAcceptance.freshUiClassificationWrite===false&&c.focalAuthenticatedAcceptance.receiptBlobSha===FRONTPROMO_PINS[FRONTPROMO_FOCAL][1]&&c.focalAuthenticatedAcceptance.receiptSha256===sha(Buffer.from(fileBytes[FRONTPROMO_FOCAL])),'FRONTPROMO_FOCAL_REFERENCE');
+ const seal=c.formalPreviewAcceptance;
+ need(same(Object.keys(c.focalAuthenticatedAcceptance).sort(),['status','sourceSha','artifactId','evidencePaths','freshUiClassificationWrite','receiptBlobSha','receiptSha256'].sort())&&same(Object.keys(seal||{}).sort(),['status','sourceSha','buildId','artifactId','archiveSha256'].sort()),'FRONTPROMO_ACCEPTANCE_EXACT_KEYS');
+ need(seal?.status==='LATEST_APPROVED_VERSION_PREVIEW_PASS'&&seal.sourceSha===FRONTPROMO_BASE&&seal.buildId===FRONTPROMO_EXPECTED.buildId&&seal.artifactId===FRONTPROMO_EXPECTED.artifactId&&seal.archiveSha256===FRONTPROMO_EXPECTED.archiveSha256,'FRONTPROMO_PREVIEW_SEAL');
+ if(authorized||observed){
+  need(/^sites\/ays-orbit-360-lab\/versions\/[A-Za-z0-9_-]+$/.test(proof.versionName||'')&&proof.versionName!==FRONTPROMO_ROLLBACK,'FRONTPROMO_NEW_VERSION_REQUIRED');
+  const r=json(FRONTPROMO_PREFLIGHT),ref=p.preflightEvidence;
+  need(blob(Buffer.from(fileBytes[ref.path]))===ref.blobSha&&sha(Buffer.from(fileBytes[ref.path]))===ref.sha256&&String(r.runId)===String(ref.runId)&&r.runnerCommit===ref.runnerCommit,'FRONTPROMO_PREFLIGHT_ORIGIN');
+  need(r.schema==='B4_003_RETAINED_HOSTING_PREFLIGHT_V1'&&r.status==='EXACT_RETAINED_ARTIFACT_HOSTING_PREFLIGHT_PASS'&&r.failedCheckCount===0&&r.b4003Closed===true&&r.b4003HistoricalAcceptancePreserved===true,'FRONTPROMO_PREFLIGHT_STATUS');
+  const names=['exact_candidate_and_archive','artifact_run_metadata','reuse_existing_service_account_for_gets','live_before_snapshot','preview_version_and_all_served_bytes','certified_rollback_version_and_all_served_bytes','live_unchanged_after_readonly_preflight'];
+  need(Array.isArray(r.checks)&&r.checks.length===7&&same(r.checks.map(x=>x.name).sort(),names.sort())&&r.checks.every(x=>x.status==='PASS'),'FRONTPROMO_SEVEN_PREFLIGHT_CHECKS');
+  for(const k of ['sourceSha','buildId','runId','artifactId','artifactZipSha256','archiveSha256','previewUrl'])need(r.binding?.[k]===FRONTPROMO_EXPECTED[k],'FRONTPROMO_PREFLIGHT_BINDING_'+k);
+  need(r.previewVersionName===proof.versionName&&r.rollbackVersionName===FRONTPROMO_ROLLBACK&&r.liveVersionName===FRONTPROMO_ROLLBACK&&r.control?.recordedB4003Closed===true&&r.control?.recordedPromotionAuthorization===false,'FRONTPROMO_PREFLIGHT_VERSIONS');
+  need(r.scope?.remoteReadsOnly===true&&r.scope.buildExecuted===false&&r.scope.hostingMutation===false&&r.scope.functionsDeployment===false&&r.scope.rulesChanged===false&&r.scope.dataWrites===0,'FRONTPROMO_PREFLIGHT_READ_ONLY');
+  const rollback=r.checks.find(x=>x.name==='certified_rollback_version_and_all_served_bytes').evidence;
+  need(rollback.rawBytesReadInThisRun===true&&rollback.rawPayloadDigestVerified===true&&rollback.digest==='308b669105c380294177f1a8d2350216af95fec31f800955d611e607542b42da'&&rollback.fileCount===218,'FRONTPROMO_FRESH_CURRENT42_ROLLBACK');
+ }else need(proof.versionName===null||/^sites\/ays-orbit-360-lab\/versions\/[A-Za-z0-9_-]+$/.test(proof.versionName),'FRONTPROMO_PENDING_VERSION');
+ if(observed){
+  const r=json(FRONTPROMO_PROMOTED),ref=p.promotionEvidence;
+  need(sha(Buffer.from(fileBytes[ref.path]))===ref.sha256&&String(r.runId)===String(ref.runId)&&r.runnerCommit===ref.runnerCommit,'FRONTPROMO_PROMOTION_ORIGIN');
+  need(r.schema==='B4_003_EXACT_HOSTING_PROMOTION_V1'&&r.status==='EXACT_HOSTING_VERSION_PROMOTED_LIVE_BYTES_PASS_FUNCTIONAL_LIVE_PENDING'&&r.promotionAttempted===true&&r.rollbackAttempted===false&&r.formalLiveAcceptanceGranted===false&&r.b4003Closed===true&&r.b4003HistoricalAcceptancePreserved===true,'FRONTPROMO_PROMOTION_STATUS');
+  for(const k of ['sourceSha','buildId','artifactId','artifactZipSha256','archiveSha256'])need(r.binding?.[k]===FRONTPROMO_EXPECTED[k],'FRONTPROMO_PROMOTION_BINDING_'+k);
+  need(r.previewVersionName===proof.versionName&&r.rollbackVersionName===FRONTPROMO_ROLLBACK&&r.liveBeforeVersionName===FRONTPROMO_ROLLBACK&&r.promotionMethod==='POST_EXISTING_VERSION_RELEASE_NO_NEW_VERSION'&&r.promotionTargetVersionName===proof.versionName,'FRONTPROMO_PROMOTION_METHOD');
+  need(r.liveAfter?.channel?.versionName===proof.versionName&&r.liveAfter.hostedFileCount===218&&r.liveAfter.hostedPayloadDigest===FRONTPROMO_EXPECTED.hostedPayloadDigest&&r.liveAfter.nonTargetSentinelsUnchanged===true&&r.functionsDeployed===0&&r.rulesChanged===false&&r.authConfigurationChanged===false&&r.dataWrites===0,'FRONTPROMO_PROMOTION_RAW_READBACK');
+ }
+ const comparableControl=clone(control),comparableState=clone(state);
+ delete comparableControl[FRONTPROMO_KEY];delete comparableState[FRONTPROMO_KEY];
+ return {comparableControl,comparableState,allowedPaths:Object.keys(pins),sourceBaseHead:FRONTPROMO_BASE,phase:p.phase};
+}
+
+// Merge into the existing formal-live-closeout guard; global need/blob/sha/clone/same/ROOT are reused.
+// No CP/state projection: the reconciliation read does not change any current cursor or certificate.
+export function validateReconciliationReadOnlySuccessorSnapshot({record,control,state,fileBytes,baseSourceBytes}){
+ const grant=record?.reconciliationReadOnlySuccessor;
+ if(!grant)return null;
+ need(grant.schema==='GRAVICENTRA_OCTOBER_PRIVATE_READBACK_SUCCESSOR_V1'&&grant.status==='AUTHORIZED_READONLY_ENCRYPTED_SNAPSHOT_PENDING','OCTOBER_READONLY_STATUS');
+ need(grant.sourceBaseHead==='e5030ec5ba9854f0c576fd905c2f510766347ffa'&&grant.ownerCriteriaBaseBlobSha==='11830a98266625e07bc7d2fcb58d2728be864cd8','OCTOBER_READONLY_BASE');
+ need(grant.realBusinessWrites===0&&grant.productDeployed===false&&grant.cursorChanged===false&&grant.encryptedOnly===true&&grant.dataImportExecuted===false&&grant.baselineCaptured===false&&grant.globalSynchronizationClaim===false,'OCTOBER_READONLY_BOUNDARY');
+ const expected=[
+  ['.github/workflows/gravicentra-recovery-i6-postsalida.yml','734afcaf3b190ad8a17b9b465707d41290b57781','24ddfb3b2420ca4c44d55c199d58faec124a21c6'],
+  [ROOT+'I6_5_OCTOBER_RECONCILIATION_PRIVATE_READBACK_REQUEST_20261107.json',null,'8203160883bba996d901d8eae0f44228af6a5aee'],
+  [ROOT+'I6_5_OCTOBER_RECONCILIATION_SNAPSHOT_PUBLIC_KEY_20261107.pem',null,'4d828240ad68943b14cfb687dd41a4aa78c15e9a'],
+  ['tools/gravicentra-i6-5-encrypted-live-snapshot.mjs','a13df5fc0a4449795b3ccc12fe2e037dd260296d','89955b0cef59664d704754c5a22137a0e5d11c24'],
+  ['tools/gravicentra-i6-5-october-private-snapshot.test.mjs',null,'1aec55c01e17e2f4337a04552255885e7f5df7b1']
+ ];
+ need(Array.isArray(grant.changes)&&same(grant.changes.map(x=>x.path).sort(),expected.map(x=>x[0]).sort()),'OCTOBER_READONLY_EXACT_PATHS');
+ for(const [p,prior,current]of expected){
+  const declared=grant.changes.find(x=>x.path===p);
+  need(declared.previousBlobSha===prior&&declared.blobSha===current&&fileBytes[p]&&blob(fileBytes[p])===current,'OCTOBER_READONLY_CURRENT_BYTES');
+  need(prior?baseSourceBytes[p]&&blob(baseSourceBytes[p])===prior:baseSourceBytes[p]==null,'OCTOBER_READONLY_BASE_BYTES');
+ }
+ const requestPath=expected[1][0],publicPath=expected[2][0],request=JSON.parse(Buffer.from(fileBytes[requestPath]).toString('utf8'));
+ need(grant.requestPath===requestPath&&grant.requestBlobSha===expected[1][2],'OCTOBER_READONLY_REQUEST_PIN');
+ need(request.schema==='GRAVICENTRA_OCTOBER_PRIVATE_READBACK_REQUEST_V1'&&request.mode==='READ_ONLY_ENCRYPTED_CURRENT_BASELINE'&&request.collectionPeriod==='2026-10'&&request.projectId==='ays-orbit-360-lab'&&request.tenantId==='alianzas-soluciones','OCTOBER_READONLY_REQUEST');
+ const collections=['polizas','clientes','aseguradoras','recibosEsperados','carteraPrimas','cobros','asesores'];
+ const config={asesores:['comModo','shareCom','comValor'],aseguradoras:['comisionDefault','comisiones','comisionesProd']};
+ need(same(request.collections,collections)&&same(grant.collectionAllowlist,collections)&&same(request.configSourceFields,config)&&same(grant.configSourceFields,config),'OCTOBER_READONLY_SCOPE');
+ for(const k of ['dataWrites','sourceDataApply','authWrites','membershipWrites','mintUserTokens','productWrites','deploy','governanceWrites','reimport','messages'])need(request[k]===false,'OCTOBER_READONLY_FORBIDDEN_CAPABILITY');
+ need(request.operationalWrites===0&&request.encryptedOnly===true&&request.repositoryPlaintextForbidden===true&&!Object.hasOwn(request,'expectedCounts')&&request.maxDocumentsPerCollection===20000,'OCTOBER_READONLY_LIMITS');
+ need(request.publicKeyPath===publicPath&&request.publicKeySha256===sha(fileBytes[publicPath])&&Buffer.from(fileBytes[publicPath]).toString('utf8').startsWith('-----BEGIN PUBLIC KEY-----\n'),'OCTOBER_READONLY_KEY');
+ need(request.sourceManifestSha256===record.sourceInventory?.documentManifest20261107?.sourceManifestSha256&&request.normalizedRowsSha256===record.sourceInventory?.documentManifest20261107?.normalizedRowsSha256,'OCTOBER_READONLY_DOCUMENT_AUTHORITY');
+ need(grant.executionSelector==='[october-private-readback]'&&grant.workflowJob==='i65-encrypted-current-october-readback','OCTOBER_READONLY_EXECUTION_SELECTOR');
+ return {allowedPaths:expected.map(x=>x[0]),comparableControl:clone(control),comparableState:clone(state)};
+}
+
+export function validateOwnerDecisionSuccessorSnapshot({control,baseControl,state,baseState,changedPaths,fileBytes,baseSourceBytes,postBaseSourceBytes}){
  const p=control[OWNER_KEY];
  need(p&&p.authorityBaseHead===OWNER_BASE,'OWNER_BASE_BINDING');
  const bytes=path=>{need(fileBytes[path]!=null,'OWNER_FILE_MISSING');return Buffer.from(fileBytes[path]);};
  need(p.path===OWNER_FREEZE&&p.planPath===OWNER_PLAN&&blob(bytes(OWNER_FREEZE))===p.blobSha&&blob(bytes(OWNER_PLAN))===p.planBlobSha,'OWNER_DOCUMENT_HASH');
  const r=JSON.parse(bytes(OWNER_FREEZE).toString('utf8'));
- const team=validateEquipoCausalSourceSuccessor({record:r,pointer:p,fileBytes,baseSourceBytes});
- const permitted=new Set([ROOT+'CONTROL_PLANE.json',STATE,OWNER_FREEZE,OWNER_PLAN,SELF,OWNER_TEST,...(team?.allowedPaths||[])]);
+ const readerExecution=validateReaderDeploymentSuccessorSnapshot({record:r,fileBytes,baseSourceBytes:postBaseSourceBytes});
+ const promotionExecution=validateFrontendPromotionSuccessorSnapshot({record:r,control,state,fileBytes,baseSourceBytes:postBaseSourceBytes});
+ if(promotionExecution){control=promotionExecution.comparableControl;state=promotionExecution.comparableState;}
+ const reconciliationExecution=validateReconciliationReadOnlySuccessorSnapshot({record:r,control,state,fileBytes,baseSourceBytes:postBaseSourceBytes});
+ if(reconciliationExecution){control=reconciliationExecution.comparableControl;state=reconciliationExecution.comparableState;}
+ const postAllowedPaths=[...(readerExecution?.allowedPaths||[]),...(promotionExecution?.allowedPaths||[]),...(reconciliationExecution?.allowedPaths||[])];
+ const team=validateEquipoCausalSourceSuccessor({record:r,pointer:p,fileBytes:readerExecution?.comparableFileBytes||fileBytes,baseSourceBytes});
+ const permitted=new Set([ROOT+'CONTROL_PLANE.json',STATE,OWNER_FREEZE,OWNER_PLAN,SELF,OWNER_TEST,...(team?.allowedPaths||[]),...postAllowedPaths]);
  need(changedPaths.every(x=>permitted.has(x)),'OWNER_UNDECLARED_PATH');
- for(const path of [OWNER_FREEZE,OWNER_PLAN,SELF,OWNER_TEST,...(team?.allowedPaths||[])])need(changedPaths.includes(path),'OWNER_REQUIRED_PATH');
+ for(const path of [OWNER_FREEZE,OWNER_PLAN,SELF,OWNER_TEST,...(team?.allowedPaths||[]),...postAllowedPaths])need(changedPaths.includes(path),'OWNER_REQUIRED_PATH');
  need(r.schema==='GRAVICENTRA_OWNER_DECISION_FREEZE_20261107_V1'&&r.authorityBaseHead===OWNER_BASE&&r.additiveOnly===true&&r.repository==='paulaosoriof86/orbit360-core'&&r.branch==='recovery/fase-a-clean-20260831','OWNER_RECEIPT_IDENTITY');
  need(r.plan?.path===OWNER_PLAN&&r.plan.blobSha===p.planBlobSha,'OWNER_PLAN_BINDING');
  need(r.nextGateExecuted===false&&r.nextGateAccepted===false&&p.nextGateExecuted===false&&p.nextGateAccepted===false&&p.productSourceChanged===!!team&&p.realBusinessWrites===0,'OWNER_NO_NEW_ACCEPTANCE');
@@ -227,16 +419,23 @@ export function validateOwnerDecisionSuccessorSnapshot({control,baseControl,stat
  for(const path of OWNER_STATE_FIELDS)restoreField(projectedState,baseState,path);
  need(same(projected,baseControl),'OWNER_UNENUMERATED_CONTROL_CHANGE');
  need(same(projectedState,baseState),'OWNER_UNENUMERATED_STATE_CHANGE');
- return {comparableControl:projected,allowedPaths:[OWNER_FREEZE,OWNER_PLAN,OWNER_TEST,...(team?.allowedPaths||[])]};
+ return {comparableControl:projected,allowedPaths:[OWNER_FREEZE,OWNER_PLAN,OWNER_TEST,...(team?.allowedPaths||[]),...postAllowedPaths]};
 }
 function verifyOwnerDecisionSuccessor(after){
  if(!after[OWNER_KEY])return null;
  need(git('merge-base',OWNER_BASE,'HEAD')===OWNER_BASE,'OWNER_BASE_NOT_ANCESTOR');
- const sourceProof=read(OWNER_FREEZE).equipoCausalSourceCorrection;
+ const record=read(OWNER_FREEZE),sourceProof=record.equipoCausalSourceCorrection;
  const extraPaths=sourceProof?.changes?.map(x=>x.path)||[];
  need(extraPaths.every(path=>Object.hasOwn(TEAM_SOURCE_PATHS,path)),'TEAM_SOURCE_PATH');
- const paths=[ROOT+'CONTROL_PLANE.json',STATE,OWNER_FREEZE,OWNER_PLAN,SELF,OWNER_TEST,OWNER_V6,...extraPaths];
- const fileBytes={},baseSourceBytes={};
+ const postGrants=[record.readerDeploymentSuccessor,record.frontendPromotionSuccessor,record.reconciliationReadOnlySuccessor].filter(Boolean);
+ const postEntries=postGrants.flatMap(x=>x.changes||[]);
+ const postPermitted=new Set([...Object.keys(READER_DEPLOY_PINS),...Object.keys(FRONTPROMO_PINS),FRONTPROMO_PREFLIGHT,FRONTPROMO_PROMOTED,
+  '.github/workflows/gravicentra-recovery-i6-postsalida.yml','tools/gravicentra-i6-5-encrypted-live-snapshot.mjs','tools/gravicentra-i6-5-october-private-snapshot.test.mjs',
+  ROOT+'I6_5_OCTOBER_RECONCILIATION_PRIVATE_READBACK_REQUEST_20261107.json',ROOT+'I6_5_OCTOBER_RECONCILIATION_SNAPSHOT_PUBLIC_KEY_20261107.pem']);
+ need(postEntries.every(x=>postPermitted.has(x.path)),'POST_E503_UNDECLARED_PATH');
+ const activationPresent=fs.existsSync(READER_DEPLOY_ACTIVATION);
+ const paths=[...new Set([ROOT+'CONTROL_PLANE.json',STATE,OWNER_FREEZE,OWNER_PLAN,SELF,OWNER_TEST,OWNER_V6,...extraPaths,...postEntries.map(x=>x.path),...(activationPresent?[READER_DEPLOY_ACTIVATION]:[])])];
+ const fileBytes={},baseSourceBytes={},postBaseSourceBytes={};
  if(sourceProof){
   need(git('merge-base',TEAM_SOURCE_BASE,'HEAD')===TEAM_SOURCE_BASE,'TEAM_SOURCE_BASE_ANCESTRY');
   for(const path of extraPaths){
@@ -244,6 +443,20 @@ function verifyOwnerDecisionSuccessor(after){
    else baseSourceBytes[path]=execFileSync('git',['show',TEAM_SOURCE_BASE+':'+path]);
   }
  }
+ if(postGrants.length){
+  need(git('merge-base',READER_DEPLOY_BASE,'HEAD')===READER_DEPLOY_BASE,'POST_E503_BASE_ANCESTRY');
+  need(!git('diff','--name-only',READER_DEPLOY_BASE,'HEAD','--','functions','orbit360-platform',':(exclude)orbit360-platform/docs/**'),'POST_E503_PRODUCT_REBUILD_FORBIDDEN');
+  for(const entry of postEntries){
+   if(entry.previousBlobSha===null){need(!git('ls-tree',READER_DEPLOY_BASE,'--',entry.path),'POST_E503_NEW_PATH_ALREADY_EXISTS');postBaseSourceBytes[entry.path]=null;}
+   else postBaseSourceBytes[entry.path]=execFileSync('git',['show',READER_DEPLOY_BASE+':'+entry.path]);
+  }
+ }
+ if(activationPresent){
+  const activation=read(READER_DEPLOY_ACTIVATION);
+  need(/^[a-f0-9]{40}$/.test(activation.reviewedSourceHead||'')&&git('merge-base',activation.reviewedSourceHead,'HEAD')===activation.reviewedSourceHead,'READER_ACTIVATION_SOURCE_ANCESTRY');
+  need(!git('diff','--name-only',activation.reviewedSourceHead,'HEAD','--','functions','orbit360-platform',':(exclude)orbit360-platform/docs/**',...Object.keys(READER_DEPLOY_PINS)),'READER_ACTIVATION_REVIEWED_CODE_CHANGED');
+ }
+
  for(const path of paths){
   fileBytes[path]=fs.readFileSync(path);
   need(git('rev-parse','HEAD:'+path)===blob(fileBytes[path]),'OWNER_UNCOMMITTED_FILE');
@@ -251,7 +464,7 @@ function verifyOwnerDecisionSuccessor(after){
  return validateOwnerDecisionSuccessorSnapshot({
   control:after,baseControl:old(OWNER_BASE,ROOT+'CONTROL_PLANE.json'),
   state:read(STATE),baseState:old(OWNER_BASE,STATE),
-  changedPaths:git('diff','--name-only',OWNER_BASE,'HEAD').split(/\r?\n/).filter(Boolean),fileBytes,baseSourceBytes
+  changedPaths:git('diff','--name-only',OWNER_BASE,'HEAD').split(/\r?\n/).filter(Boolean),fileBytes,baseSourceBytes,postBaseSourceBytes
  });
 }
 

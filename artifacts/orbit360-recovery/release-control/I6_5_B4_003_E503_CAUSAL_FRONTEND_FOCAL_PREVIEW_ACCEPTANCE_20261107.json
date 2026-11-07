@@ -1,0 +1,100 @@
+{
+  "schema": "GRAVICENTRA_B4_003_CAUSAL_FRONTEND_FOCAL_PREVIEW_ACCEPTANCE_V1",
+  "status": "LATEST_APPROVED_VERSION_PREVIEW_PASS",
+  "recordedAtUtc": "2026-11-07T17:59:41Z",
+  "acceptanceScope": "CAUSAL_FRONTEND_DELTA_ONLY",
+  "candidate": {
+    "sourceSha": "e5030ec5ba9854f0c576fd905c2f510766347ffa",
+    "buildId": "gi-i65-b4-e5030ec5ba98-57f234755dc1",
+    "runId": 42397991730,
+    "artifactId": 13584456766,
+    "artifactZipSha256": "96f8a8319a27899fc8341dd1d0853cc5395d3c01d88a18cfc885f7cdf5fb5062",
+    "archiveSha256": "cc710541a70afdaee8da882ef0b43b9dc9f24f89a7a198c3f48f18dc776a12fa",
+    "hostedPayloadDigest": "09c91023d1d22687528a61edb5a768dadbd59c465af91bc48016d21c94c6537f",
+    "productFiles": 218,
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-rc-41765742748-neoi3u7r.web.app"
+  },
+  "observer": "Coordinator using the existing authenticated browser session",
+  "evidenceBasis": "Coordinator observed UI and reload; exact Preview transport and existing source regression receipts; historical approved writer evidence preserved.",
+  "checks": {
+    "equipo": {
+      "status": "PASS_FOCAL_PROJECTION_AND_RELOAD",
+      "internal": 4,
+      "freelance": 3,
+      "reloadObserved": true,
+      "sourceClassificationRegressionTestsPassed": 48,
+      "historicalWriterAcceptancePreserved": true,
+      "freshUiClassificationWrite": false,
+      "noRepeatedSevenClassificationWrites": true
+    },
+    "cancelaciones": {
+      "status": "PASS_FOCAL_COMMERCIAL_UNIVERSE",
+      "GT": 461,
+      "CO": 28,
+      "TODOS": 489,
+      "previousLiveGT": 462,
+      "previousLiveCO": 28,
+      "previousLiveTODOS": 490,
+      "syntheticQaExcluded": true,
+      "syntheticQaDeleted": false,
+      "primaryMotiveWithoutInventedQaCause": true,
+      "businessWrites": 0
+    },
+    "reportes": {
+      "status": "PASS_FOCAL_COMMERCIAL_AND_AUDIT_COUNTS",
+      "cancelaciones": 489,
+      "syntheticQaExcludedAndRetainedForAudit": 1,
+      "observedQaRetentionNotice": true,
+      "consoleWarningAndErrorEntries": []
+    }
+  },
+  "sourceRegressionEvidence": {
+    "frozenReceiptPath": "artifacts/orbit360-recovery/release-control/OWNER_DECISION_FREEZE_AND_RECONCILIATION_PLAN_20261107.json",
+    "frozenReceiptPointer": "/equipoCausalSourceCorrection/localTests",
+    "successfulPreviewWorkflowRunId": 42397991730,
+    "classificationAfter": 48,
+    "cancelCommercialQaAfter": 4,
+    "reportesQuarantine": 2
+  },
+  "preservedAcceptance": {
+    "sourceSha": "857f1222f360a42a06e012810a1c01bce155a26f",
+    "buildId": "gi-i65-b4-857f1222f360-57f234755dc1",
+    "artifactId": 13549460562,
+    "receiptBlobSha": "0879188bf245248fa1092fb2014e35e14e802b44",
+    "historicalB4003Closed": true
+  },
+  "boundaries": {
+    "freshUiClassificationWrite": false,
+    "allRenewalFlowsCertified": false,
+    "allCancellationFlowsCertified": false,
+    "propuestasCatalogCertified": false,
+    "newLiveAcceptanceGranted": false,
+    "globalSynchronizationCertified": false,
+    "businessWrites": 0,
+    "backendFunctionsDeployedByThisDelta": 0,
+    "rulesChanged": false,
+    "nextGateExecuted": false,
+    "productionPromotionAuthorizedByThisReceipt": false
+  },
+  "openDependency": "LIVE Propuestas catalog callable returned HTTP400; exact error/deployed contract diagnosis remains separate. This receipt does not resolve that finding.",
+  "browserArtifactIdentity": {
+    "method": "Observed DOM script src attributes after authenticated Preview UAT",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-rc-41765742748-neoi3u7r.web.app",
+    "scripts": [
+      {
+        "path": "modules/cancelaciones.js",
+        "observedOrbitBuild": "gi-i65-b4-e5030ec5ba98-57f234755dc1"
+      },
+      {
+        "path": "modules/reportes.js",
+        "observedOrbitBuild": "gi-i65-b4-e5030ec5ba98-57f234755dc1"
+      },
+      {
+        "path": "data/store-firestore-product-operational-p0.js",
+        "observedOrbitBuild": "gi-i65-b4-e5030ec5ba98-57f234755dc1"
+      }
+    ],
+    "hiddenApplicationStateRead": false,
+    "sdkStateRead": false
+  }
+}

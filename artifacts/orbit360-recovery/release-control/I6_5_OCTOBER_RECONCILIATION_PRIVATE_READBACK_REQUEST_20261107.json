@@ -1,0 +1,50 @@
+{
+  "schema": "GRAVICENTRA_OCTOBER_PRIVATE_READBACK_REQUEST_V1",
+  "mode": "READ_ONLY_ENCRYPTED_CURRENT_BASELINE",
+  "basis": "PAULA_FROZEN_OCTOBER_RECONCILIATION_INSTRUCTIONS_20261107",
+  "collectionPeriod": "2026-10",
+  "projectId": "ays-orbit-360-lab",
+  "tenantId": "alianzas-soluciones",
+  "sourceBaseHead": "e5030ec5ba9854f0c576fd905c2f510766347ffa",
+  "ownerCriteriaBaseBlobSha": "11830a98266625e07bc7d2fcb58d2728be864cd8",
+  "sourceManifestSha256": "495d6c396888d3ea3366034b617c0e97f9e6f730242e5d65a9a694c65814a984",
+  "normalizedRowsSha256": "7ff5fe4764bb87d252eebf0c94847ac23bd79ff45053fd2b6a84f4e887c58403",
+  "collections": [
+    "polizas",
+    "clientes",
+    "aseguradoras",
+    "recibosEsperados",
+    "carteraPrimas",
+    "cobros",
+    "asesores"
+  ],
+  "configSourceFields": {
+    "asesores": [
+      "comModo",
+      "shareCom",
+      "comValor"
+    ],
+    "aseguradoras": [
+      "comisionDefault",
+      "comisiones",
+      "comisionesProd"
+    ]
+  },
+  "maxDocumentsPerCollection": 20000,
+  "publicKeyPath": "artifacts/orbit360-recovery/release-control/I6_5_OCTOBER_RECONCILIATION_SNAPSHOT_PUBLIC_KEY_20261107.pem",
+  "publicKeySha256": "64c1e5e3fc6720016aef689a7a780035b1865bf3dc0f190396fee55a9a6c6f80",
+  "encryptedOnly": true,
+  "repositoryPlaintextForbidden": true,
+  "operationalWrites": 0,
+  "nextResult": "ENCRYPTED_CURRENT_BASELINE_FOR_PRIVATE_MATCHING_NOT_IMPORT_NOT_MODULE_PASS",
+  "dataWrites": false,
+  "sourceDataApply": false,
+  "authWrites": false,
+  "membershipWrites": false,
+  "mintUserTokens": false,
+  "productWrites": false,
+  "deploy": false,
+  "governanceWrites": false,
+  "reimport": false,
+  "messages": false
+}

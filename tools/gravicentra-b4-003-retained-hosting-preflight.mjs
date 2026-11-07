@@ -26,7 +26,7 @@ const receipt={
     dataWrites:0,controlPlaneUpdated:false},
   formalPreviewAcceptanceGranted:false,
   productionPromotionAuthorizedByThisReceipt:false,
-  b4003Closed:false
+  b4003Closed:env.B4_CAUSAL_FRONTEND_SUCCESSOR==='current42-frontend-20261107'
 };
 const sha=b=>crypto.createHash('sha256').update(b).digest('hex');
 const fail=(code)=>{throw new Error(code);};
@@ -35,6 +35,7 @@ const writeJson=(name,value)=>fs.writeFileSync(path.join(out,name),JSON.stringif
 const writeReceipt=()=>writeJson('preflight.json',receipt);
 const safeCode=e=>String(e?.message || 'PREFLIGHT_ERROR').replace(/[^A-Z0-9_.:-]/gi,'_').slice(0,180);
 let issues=0;
+let causal=null;
 async function check(name,fn){
   const startedAtUtc=new Date().toISOString();
   try{
@@ -56,6 +57,67 @@ const requiredEnv=name=>{
 };
 const exact=(actual,want,code)=>requireValue(actual===want,code);
 const git=(...args)=>execFileSync('git',args,{encoding:'utf8',stdio:['ignore','pipe','pipe']}).trim();
+
+// Explicit causal successor mode. The closed current42 acceptance is immutable;
+// a new operation cursor supplies only the new artifact and focal Preview seal.
+function causalSuccessorContext(control,activeCursor,requireAuthorization=false){
+  if(!env.B4_CAUSAL_FRONTEND_SUCCESSOR)return null;
+  exact(env.B4_CAUSAL_FRONTEND_SUCCESSOR,'current42-frontend-20261107','CAUSAL_MODE_INVALID');
+  exact(env.B4_CURSOR_KEY,'b4003CausalFrontendSuccessor20261107','CAUSAL_CURSOR_INVALID');
+  const contractPath='artifacts/orbit360-recovery/release-control/I6_5_B4_003_CURRENT42_CAUSAL_FRONTEND_SUCCESSOR_CONTRACT_20261107.json';
+  const blob=bytes=>crypto.createHash('sha1').update(Buffer.from('blob '+bytes.length+'\0')).update(bytes).digest('hex');
+  const contractBytes=fs.readFileSync(contractPath);
+  exact(blob(contractBytes),'c792b7db1aa3f16ed7ee20cbdffe2b76dc61b97f','CAUSAL_CONTRACT_BLOB_CHANGED');
+  const contract=JSON.parse(contractBytes);
+  const old=control.b4003ActiveCertificationCursor20261106;
+  const seal=old?.formalLiveAcceptance;
+  requireValue(old?.b4003Closed===true&&seal?.b4003Closed===true,'CURRENT42_ACCEPTANCE_REOPENED');
+  exact(seal.status,'LATEST_APPROVED_VERSION_LIVE_PASS','CURRENT42_LIVE_SEAL_NOT_PASS');
+  exact(seal.sourceSha,contract.rollback.sourceSha,'CURRENT42_SOURCE_CHANGED');
+  exact(seal.buildId,contract.rollback.buildId,'CURRENT42_BUILD_CHANGED');
+  exact(Number(seal.artifactId),contract.rollback.artifactId,'CURRENT42_ARTIFACT_CHANGED');
+  exact(seal.hostingVersion,contract.rollback.versionName,'CURRENT42_VERSION_CHANGED');
+  exact(Number(seal.productFiles),contract.rollback.productFiles,'CURRENT42_COUNT_CHANGED');
+  exact(seal.hostedPayloadDigest,contract.rollback.hostedPayloadDigest,'CURRENT42_DIGEST_CHANGED');
+  exact(seal.receiptBlobSha,contract.preservedAcceptance.receiptBlobSha,'CURRENT42_SEAL_BLOB_CHANGED');
+  exact(blob(fs.readFileSync(seal.receiptPath)),contract.preservedAcceptance.receiptBlobSha,'CURRENT42_SEAL_FILE_CHANGED');
+  exact(activeCursor?.schema,'GRAVICENTRA_B4_003_CAUSAL_FRONTEND_SUCCESSOR_CURSOR_V1','CAUSAL_CURSOR_SCHEMA');
+  exact(activeCursor.preservedAcceptancePointer,'/b4003ActiveCertificationCursor20261106/formalLiveAcceptance','CAUSAL_PARENT_POINTER');
+  exact(activeCursor.sourceContractPath,contractPath,'CAUSAL_SOURCE_CONTRACT_PATH');
+  exact(activeCursor.sourceContractBlobSha,'c792b7db1aa3f16ed7ee20cbdffe2b76dc61b97f','CAUSAL_SOURCE_CONTRACT_PIN');
+  requireValue(activeCursor.b4003Closed===true&&activeCursor.b4003HistoricalAcceptancePreserved===true&&activeCursor.nextGateExecuted===false,'CAUSAL_CLOSED_B4_REQUIRED');
+  requireValue(activeCursor.activeSourceSha!==seal.sourceSha&&Number(activeCursor.activeImmutableArtifactId)!==Number(seal.artifactId),'CAUSAL_CANDIDATE_NOT_NEW');
+  requireValue(['EXACT_PREVIEW_TRANSPORT_PASS_FOCAL_UAT_PENDING','FRONTEND_SUCCESSOR_FOCAL_PREVIEW_PASS_PREFLIGHT_PENDING','FRONTEND_SUCCESSOR_PREVIEW_ACCEPTED_PROMOTION_AUTHORIZED'].includes(activeCursor.status),'CAUSAL_CURSOR_STATUS');
+  if(requireAuthorization){
+    exact(activeCursor.status,'FRONTEND_SUCCESSOR_PREVIEW_ACCEPTED_PROMOTION_AUTHORIZED','CAUSAL_FOCAL_PREVIEW_NOT_ACCEPTED');
+    exact(activeCursor.productionPromotionAuthorized,true,'CAUSAL_PROMOTION_NOT_AUTHORIZED');
+    exact(activeCursor.focalAuthenticatedAcceptance?.status,'PASS','CAUSAL_AUTHENTICATED_UAT_NOT_PASS');
+    exact(activeCursor.focalAuthenticatedAcceptance?.sourceSha,activeCursor.activeSourceSha,'CAUSAL_UAT_SOURCE_MISMATCH');
+    exact(Number(activeCursor.focalAuthenticatedAcceptance?.artifactId),Number(activeCursor.activeImmutableArtifactId),'CAUSAL_UAT_ARTIFACT_MISMATCH');
+    requireValue(Array.isArray(activeCursor.focalAuthenticatedAcceptance?.evidencePaths)&&activeCursor.focalAuthenticatedAcceptance.evidencePaths.length>0,'CAUSAL_UAT_EVIDENCE_REQUIRED');
+    for(const p of activeCursor.focalAuthenticatedAcceptance.evidencePaths)requireValue(typeof p==='string'&&p.startsWith('artifacts/orbit360-recovery/release-control/')&&!p.includes('..')&&fs.existsSync(p),'CAUSAL_UAT_EVIDENCE_MISSING');
+  }
+  const rawPath='artifacts/orbit360-recovery/release-control/I6_5_B4_003_RETAINED_HOSTING_LIVE_PROMOTED_20261107.json';
+  const rawBytes=fs.readFileSync(rawPath);
+  exact(blob(rawBytes),'3e07e1e21192e878af668d03d077c8368837024c','CURRENT42_RAW_CERTIFICATE_CHANGED');
+  const raw=JSON.parse(rawBytes),r=contract.rollback;
+  exact(raw.schema,'B4_003_RETAINED_HOSTING_LIVE_PROMOTION_DURABLE_CERTIFICATE_BUNDLE_V1','CURRENT42_RAW_SCHEMA');
+  exact(raw.liveVersionName,r.versionName,'CURRENT42_RAW_VERSION');
+  exact(raw.productSourceSha,r.sourceSha,'CURRENT42_RAW_SOURCE');
+  exact(raw.productBuildId,r.buildId,'CURRENT42_RAW_BUILD');
+  exact(raw.liveRawDigest,r.hostedPayloadDigest,'CURRENT42_RAW_DIGEST');
+  exact(raw.liveRawProductFiles,r.productFiles,'CURRENT42_RAW_COUNT');
+  requireValue(raw.liveRawFiles.every(x=>x.status===200&&x.exact===true),'CURRENT42_RAW_BYTES_NOT_EXACT');
+  const rows=raw.liveRawFiles.map(x=>({path:x.path,sha256:x.sha256})).sort((a,b)=>a.path<b.path?-1:a.path>b.path?1:0);
+  const text=rows.map(x=>x.sha256+'  '+x.path).join('\n')+'\n';
+  exact(rows.length,r.productFiles,'CURRENT42_RAW_ROW_COUNT');
+  exact(sha(text),r.hostedPayloadDigest,'CURRENT42_RAW_MANIFEST_CHANGED');
+  return {contract,seal,raw,rawPath,rawBlobSha:'3e07e1e21192e878af668d03d077c8368837024c',
+    manifest:{rows,text,fileCount:rows.length,digest:sha(text)},
+    pin:{versionName:r.versionName,sourceSha:r.sourceSha,buildId:r.buildId,fileCount:r.productFiles,digest:r.hostedPayloadDigest},
+    certified:{sourceSha:r.sourceSha,buildId:r.buildId,previewChannelId:'live',previewUrl:'https://ays-orbit-360-lab.web.app',productionUrl:'https://ays-orbit-360-lab.web.app',hostedFileCount:r.productFiles,hostedPayloadDigest:r.hostedPayloadDigest}};
+}
+
 function relativePath(value){
   requireValue(typeof value==='string','HOSTING_PATH_NOT_STRING');
   const result=value.startsWith('/')?value.slice(1):value;
@@ -401,6 +463,8 @@ try{
     cp=JSON.parse(bytes);
     cursor=cp[requiredEnv('B4_CURSOR_KEY')];
     requireValue(cursor && typeof cursor==='object','ACTIVE_CURSOR_MISSING');
+    causal=causalSuccessorContext(cp,cursor);
+    if(causal){receipt.b4003Closed=true;receipt.b4003HistoricalAcceptancePreserved=true;receipt.causalSuccessor=true;}
     exact(cursor.activeSourceSha,binding.sourceSha,'ACTIVE_SOURCE_MISMATCH');
     exact(cursor.activeBuildId,binding.buildId,'ACTIVE_BUILD_MISMATCH');
     exact(Number(cursor.activeImmutableArtifactId),binding.artifactId,'ACTIVE_ARTIFACT_MISMATCH');
@@ -520,7 +584,7 @@ try{
       transportContractEvidence:'preview-hosting-version.json'};
   });
   await check('certified_rollback_version_and_all_served_bytes',async()=>{
-    const cert=cp.certifiedCandidate;
+    const cert=causal?.certified||cp.certifiedCandidate;
     requireValue(cert && typeof cert==='object','CERTIFIED_CANDIDATE_MISSING');
     exact(cert.sourceSha,requiredEnv('ROLLBACK_SOURCE_SHA'),'ROLLBACK_SOURCE_NOT_EXPECTED_CERTIFIED');
     exact(cert.buildId,requiredEnv('ROLLBACK_BUILD_ID'),'ROLLBACK_BUILD_NOT_EXPECTED_CERTIFIED');
@@ -541,18 +605,27 @@ try{
     const version=await hostingGet(compact.versionName);
     exact(version.status,'FINALIZED','ROLLBACK_VERSION_NOT_FINALIZED');
     const files=await listFiles(compact.versionName);
-    exact(Number(version.fileCount),Number(cert.hostedFileCount),'ROLLBACK_VERSION_FILE_COUNT_MISMATCH');
-    exact(files.length,Number(cert.hostedFileCount),'ROLLBACK_PATH_COUNT_MISMATCH');
-    writeJson('rollback-hosting-version.json',{channel:compact,version,files});
+    let rollbackFiles=files;
+    let transportContract;
+    if(causal){
+      exact(compact.versionName,causal.pin.versionName,'CURRENT42_LIVE_VERSION_CHANGED');
+      transportContract=previewFileContract(version,files,causal.manifest);
+      requireValue(files.every(r=>r.status==='ACTIVE'),'CURRENT42_HOSTING_FILE_NOT_ACTIVE');
+      rollbackFiles=transportContract.productFiles;
+    }else{
+      exact(Number(version.fileCount),Number(cert.hostedFileCount),'ROLLBACK_VERSION_FILE_COUNT_MISMATCH');
+      exact(files.length,Number(cert.hostedFileCount),'ROLLBACK_PATH_COUNT_MISMATCH');
+    }
+    writeJson('rollback-hosting-version.json',{channel:compact,version,files,...(transportContract?{transportContract}:{})});
     // Hosting API hashes are not assumed to equal hashes of raw served bytes.
     // Reconstruct the same raw-file manifest used by the certified packager.
-    const readback=await readManifest(cert.previewUrl,files.map(r=>r.path),null,'rollback','rollback-'+env.GITHUB_RUN_ID,cert.hostedPayloadDigest);
+    const readback=await readManifest(cert.previewUrl,rollbackFiles.map(r=>r.path),causal?.manifest.rows||null,'rollback','rollback-'+env.GITHUB_RUN_ID,cert.hostedPayloadDigest);
     exact(readback.digest,cert.hostedPayloadDigest,'ROLLBACK_CERTIFIED_PAYLOAD_DIGEST_MISMATCH');
     exact(readback.marker?.sourceSha,cert.sourceSha,'ROLLBACK_MARKER_SOURCE_MISMATCH');
     exact(readback.marker?.buildId,cert.buildId,'ROLLBACK_MARKER_BUILD_MISMATCH');
     exact(versionName(await getChannel(cert.previewChannelId)),compact.versionName,'ROLLBACK_CHANNEL_MOVED_DURING_READBACK');
     receipt.rollbackVersionName=compact.versionName;
-    return {...compact,...readback,certifiedSourceSha:cert.sourceSha,certifiedBuildId:cert.buildId};
+    return {...compact,...readback,certifiedSourceSha:cert.sourceSha,certifiedBuildId:cert.buildId,...(causal?{rawPayloadDigestVerified:true,sourceIdentityVerified:true,rawBytesReadInThisRun:true,current42CertificatePath:causal.rawPath,current42CertificateBlobSha:causal.rawBlobSha,b4003HistoricalAcceptancePreserved:true}:{})};
   });
   await check('live_unchanged_after_readonly_preflight',async()=>{
     requireValue(liveBefore,'LIVE_BEFORE_SNAPSHOT_REQUIRED');

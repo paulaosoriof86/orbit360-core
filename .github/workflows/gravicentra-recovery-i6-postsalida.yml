@@ -4,6 +4,11 @@ name: Gravicentra I6 Post-Salida
 
 on:
   workflow_dispatch:
+    inputs:
+      private_october_readback:
+        description: "Read only the current tenant baseline into an encrypted artifact; no other job runs"
+        type: boolean
+        default: false
   push:
     branches:
       - recovery/fase-a-clean-20260831
@@ -108,6 +113,8 @@ on:
       - 'orbit360-platform/core/record-delete.js'
       - 'artifacts/orbit360-recovery/release-control/I6_5_FORENSIC_B3_EXECUTION_LOCK_20260929.json'
       - '.github/workflows/gravicentra-recovery-i6-postsalida.yml'
+      - 'artifacts/orbit360-recovery/release-control/I6_5_OCTOBER_RECONCILIATION_PRIVATE_READBACK_REQUEST_20261107.json'
+      - 'tools/gravicentra-i6-5-encrypted-live-snapshot.mjs'
 
 permissions:
   contents: write
@@ -128,6 +135,7 @@ env:
 
 jobs:
   i64-code-defect-successor:
+    if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 50
     env:
@@ -536,6 +544,7 @@ jobs:
 
 
   i65-sync-code-defect-successor:
+    if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 50
     env:
@@ -952,6 +961,7 @@ jobs:
 
 
   i65-hydration-code-defect-successor:
+    if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 50
     env:
@@ -1433,6 +1443,7 @@ jobs:
 
 
   i65-hydration-diagnostic:
+    if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     env:
@@ -1507,6 +1518,7 @@ jobs:
 
 
   i65-apply-public-key:
+    if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     env:
@@ -1565,6 +1577,7 @@ jobs:
 
 
   i65-deterministic-apply:
+    if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 45
     env:
@@ -1707,6 +1720,7 @@ jobs:
 
 
   i65-encrypted-diff-snapshot:
+    if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     env:
@@ -1779,6 +1793,7 @@ jobs:
 
 
   i65-operational-closure-successor:
+    if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 50
     env:
@@ -2218,6 +2233,7 @@ jobs:
 
 
   i65-operational-closure-diagnostic:
+    if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     env:
@@ -2264,6 +2280,7 @@ jobs:
 
 
   i65-live-readback:
+    if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     env:
@@ -2345,6 +2362,7 @@ jobs:
 
 
   i63-readonly-completeness-audit:
+    if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     env:
@@ -2391,6 +2409,7 @@ jobs:
 
 
   i63-identity-merge:
+    if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 25
     env:
@@ -2523,6 +2542,7 @@ jobs:
 
 
   i64-live-readback:
+    if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     env:
@@ -2615,6 +2635,7 @@ jobs:
 
 
   i64-diff-snapshot:
+    if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     env:
@@ -2665,6 +2686,7 @@ jobs:
 
 
   i64-deterministic-apply:
+    if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 45
     env:
@@ -2792,6 +2814,7 @@ jobs:
 
 
   i64-visual-correction:
+    if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 35
     env:
@@ -2912,6 +2935,7 @@ jobs:
 
 
   i65-forensic-b1-preview:
+    if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 50
     env:
@@ -3175,6 +3199,7 @@ jobs:
         run: echo "B1_R3_ONLY_AUTHORIZED_NORMALIZATION_AND_REVERSIBLE_TEST_WRITES"
 
   i65-b1-hosting-byte-diagnostic:
+    if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     env:
@@ -3245,6 +3270,7 @@ jobs:
           PY
 
   i65-b1-advisor-identity-diagnostic:
+    if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     env:
@@ -3296,6 +3322,7 @@ jobs:
           retention-days: 14
 
   i65-b1-equipo-runtime-diagnostic:
+    if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 25
     env:
@@ -3350,6 +3377,7 @@ jobs:
 
 
   i65-b1-r6-directed-diagnostic:
+    if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 25
     env:
@@ -3406,6 +3434,7 @@ jobs:
 
 
   i65-b1-r7-auth-team-diagnostic:
+    if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     env:
@@ -3459,6 +3488,7 @@ jobs:
 
 
   i65-b1-r7-bootstrap-diagnostic:
+    if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     env:
@@ -3514,6 +3544,7 @@ jobs:
 
 
   i65-b1-r8-access-email-diagnostic:
+    if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     env:
@@ -3563,6 +3594,7 @@ jobs:
           retention-days: 14
 
   i65-forensic-b2-preview:
+    if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 35
     env:
@@ -3865,7 +3897,7 @@ jobs:
     # governance commit even when that job concludes failure at the final push/freeze
     # boundary. Always enter this dependent job, then let its fail-closed gate decide
     # from the freshly checked-out branch tip whether authenticated proof is authorized.
-    if: ${{ always() }}
+    if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && (always()) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 12
     env:
@@ -4145,6 +4177,7 @@ jobs:
 
 
   i65-b2-synthetic-cleanup:
+    if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 12
     env:
@@ -4219,6 +4252,7 @@ jobs:
           git push origin "HEAD:$GITHUB_REF_NAME"
 
   i65-b1-r10-rootcause-readonly:
+    if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 12
     env:
@@ -4290,6 +4324,7 @@ jobs:
           retention-days: 30
 
   i65-b1-r11-route-trace-readonly:
+    if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     env:
@@ -4340,6 +4375,7 @@ jobs:
           retention-days: 30
 
   i65-b2-r3-oscar-readonly:
+    if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 8
     env:
@@ -4411,7 +4447,7 @@ jobs:
 
   i65-b2-r52-human-fixture:
     needs: i65-b2-authenticated-preview
-    if: ${{ always() }}
+    if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && (always()) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 12
     env:
@@ -4576,7 +4612,7 @@ jobs:
 
   i65-b2-r15-drive-human-fixture:
     needs: i65-b2-authenticated-preview
-    if: ${{ always() }}
+    if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && (always()) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 12
     env:
@@ -4679,7 +4715,7 @@ jobs:
 
   i65-b2-r102-logo-readonly:
     needs: i65-b2-r15-drive-human-fixture
-    if: always() && needs.i65-b2-r15-drive-human-fixture.result == 'success'
+    if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && (always() && needs.i65-b2-r15-drive-human-fixture.result == 'success') }}
     runs-on: ubuntu-24.04
     timeout-minutes: 12
     env:
@@ -4784,6 +4820,7 @@ jobs:
 
 
   i65-b2-google-auth-provider-remediation:
+    if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 12
     env:
@@ -4924,6 +4961,7 @@ jobs:
 
 
   i65-b2-r87-oauth-origin-discovery:
+    if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     env:
@@ -5111,7 +5149,7 @@ jobs:
 
   i65-b2-r77-r81-drive-durable-proof:
     needs: i65-b2-authenticated-preview
-    if: ${{ always() }}
+    if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && (always()) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 12
     env:
@@ -5231,7 +5269,7 @@ jobs:
 
   i65-b2-r91-r95-runtime-proof:
     needs: i65-b2-r77-r81-drive-durable-proof
-    if: ${{ always() }}
+    if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && (always()) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     env:
@@ -5352,7 +5390,7 @@ jobs:
 
   i65-b2-r82-delete-runtime-proof:
     needs: i65-b2-r91-r95-runtime-proof
-    if: ${{ always() }}
+    if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && (always()) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     env:
@@ -5473,7 +5511,7 @@ jobs:
 
   i65-b2-drive-qa-fixture-cleanup:
     needs: i65-b2-r82-delete-runtime-proof
-    if: ${{ always() }}
+    if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && (always()) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     env:
@@ -5581,7 +5619,7 @@ jobs:
 
 
   i65-b2-final-human-cleanup:
-    if: ${{ always() }}
+    if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && (always()) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 12
     env:
@@ -5724,7 +5762,7 @@ jobs:
 
 
   i65-b3-001-cobros-shell-preview:
-    if: ${{ always() }}
+    if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && (always()) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 25
     env:
@@ -5945,6 +5983,7 @@ jobs:
 
 
   i65-b3-002-performance-readonly:
+    if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     env:
@@ -6022,7 +6061,7 @@ jobs:
 
 
   i65-b3-002-performance-successor:
-    if: ${{ always() }}
+    if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && (always()) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     env:
@@ -6286,7 +6325,7 @@ jobs:
 
 
   i65-b3-003-kpi-aging-readonly:
-    if: ${{ always() }}
+    if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && (always()) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     env:
@@ -6350,7 +6389,7 @@ jobs:
 
 
   i65-b3-003-currency-aging-successor:
-    if: ${{ always() }}
+    if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && (always()) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     env:
@@ -6599,6 +6638,7 @@ jobs:
         run: echo "B3_003_FAILED_NO_LIVE_NO_DATA_WRITE_NO_REIMPORT_NO_B4"
 
   i65-b3-004-payment-owner-foundation:
+    if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 8
     steps:
@@ -6763,7 +6803,7 @@ jobs:
 
   i65-b3-004-exact-preview:
     needs: i65-b3-004-payment-owner-foundation
-    if: ${{ always() }}
+    if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && (always()) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 35
     env:
@@ -7144,6 +7184,7 @@ jobs:
         run: echo "B3_004_FAILED_NO_OPERATIONAL_DATA_WRITE_NO_REIMPORT_NO_LIVE_NO_B4"
 
   i65-b3-005-source-contract:
+    if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
@@ -7238,7 +7279,7 @@ jobs:
 
   i65-b3-005-exact-preview:
     needs: i65-b3-005-source-contract
-    if: ${{ always() }}
+    if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && (always()) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 35
     env:
@@ -7531,7 +7572,7 @@ jobs:
 
   i65-b3-005-human-close:
     needs: i65-b3-005-exact-preview
-    if: ${{ always() }}
+    if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) && (always()) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 12
     env:
@@ -7698,6 +7739,7 @@ jobs:
         run: echo "B3_005_HUMAN_CLOSE_FAILED_NO_LIVE_NO_REIMPORT_NO_B3006_WRITES"
 
   i65-b3-006-exact-preview:
+    if: ${{ !(inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]')) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 35
     env:
@@ -7767,3 +7809,46 @@ jobs:
         if: failure() && steps.b3006.outputs.run == 'true'
         run: echo "B3_006_FAILED_NO_OPERATIONAL_REIMPORT_NO_LIVE_NO_B3007_WRITES"
 
+
+  i65-encrypted-current-october-readback:
+    if: ${{ inputs.private_october_readback == true || contains(github.event.head_commit.message || '', '[october-private-readback]') }}
+    permissions:
+      contents: read
+      actions: read
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Preserve governance and validate exact private read authority
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-governance-preflight-v1.mjs --mode=i6
+          node --test tools/gravicentra-i6-5-october-private-snapshot.test.mjs
+          node tools/gravicentra-i6-5-encrypted-live-snapshot.mjs --check-october-request
+      - name: Install existing readback dependency
+        run: npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund firebase-admin@13.4.0 >/dev/null
+      - name: Capture only the authorized canonical baseline into encrypted bytes
+        env:
+          SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+          SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+          I65_DIFF_SNAPSHOT_FILE: ${{ runner.temp }}/i65-october-current-baseline.enc.json
+          I65_DIFF_PUBLIC_RECEIPT_FILE: ${{ runner.temp }}/i65-october-private-readback-receipt.json
+        run: node tools/gravicentra-i6-5-encrypted-live-snapshot.mjs --october-readonly
+      - name: Preserve encrypted baseline and non-PII execution receipt
+        uses: actions/upload-artifact@v4
+        with:
+          name: gravicentra-i6-5-encrypted-current-october-baseline-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/i65-october-current-baseline.enc.json
+            ${{ runner.temp }}/i65-october-private-readback-receipt.json
+          compression-level: 0
+          if-no-files-found: error
+          retention-days: 1

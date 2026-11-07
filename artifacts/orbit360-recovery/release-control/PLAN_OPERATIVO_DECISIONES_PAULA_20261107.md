@@ -1,3 +1,21 @@
+# Avance de ejecución del 7 de noviembre de 2026 — candidata e503
+
+Esta anotación actualiza únicamente los resultados de ejecución. Las decisiones de período, fechas, inferencias, doce pagos médicos, tarifas futuras y continuidad de Finanzas permanecen congeladas en el registro rector.
+
+La candidata e503 se construyó una sola vez. El run 42397991730 desplegó el artifact 13584456766 en el canal Preview existente y comprobó los 218 archivos servidos. Build: gi-i65-b4-e5030ec5ba98-57f234755dc1. Preview y LIVE se promoverán con ese mismo artifact; este paquete de herramientas y evidencia no modifica el producto ni lo reconstruye.
+
+La observación autenticada en Dirección confirmó Equipo con cuatro internos y tres freelance después de recargar; Cancelaciones con 461 GT, 28 CO y 489 en Todos; Reportes con 489 cancelaciones y un registro QA excluido, conservado para auditoría. Los tres scripts afectados identifican el build e503 en su DOM. El certificado es focal: no se repitieron las siete escrituras existentes, no acredita todos los flujos y no concede nueva aceptación LIVE. El cierre current42 de B4-003 se conserva.
+
+El readback real del lector LIVE demostró que su revisión del 29 de octubre no coincide con el source actual. Se prepara un paquete aislado con un solo export y sus siete dependencias locales. La primera ejecución de este delta sólo lee; desplegar requiere un recibo posterior con HEAD, manifest, archive y revisión anteriores exactos. El servicio de catálogos que bloquea Propuestas tiene una implementación del 23 de septiembre según Firebase; se obtiene su source antes de atribuir el HTTP 400 a una causa exacta.
+
+La lectura actual de conciliación reutiliza el snapshot cifrado existente. Se limita a siete colecciones canónicas, conserva versiones exactas y configuraciones reales de Equipo/Aseguradoras y excluye credenciales, portales y cuentas bancarias de esos directorios. El marcador de ejecución activa sólo el lector actual y excluye los jobs históricos del mismo workflow. Ninguna lectura concede autorización de importación ni prueba que la conciliación ya se aplicó.
+
+El TXT de app.aysseguros.com quedó visible también en la consulta pública de DNS. El A del hosting anterior sigue vigente mientras se resuelve el certificado; no existe aceptación del dominio LIVE todavía.
+
+El siguiente paso ejecutable es verificar el artifact retenido y el rollback current42, obtener los readbacks backend y recuperar el baseline privado actual. La promoción del frontend y la activación del lector quedan sujetas a sus pruebas exactas; después se verifica la UI en LIVE. El primer gate formal pendiente continúa siendo B4-004 con Siniestros diferido y Cronograma conservado.
+
+---
+
 # Gravicentra Insurance — actualización prevalente del 7 de noviembre de 2026
 
 ## Alcance y estado verificable

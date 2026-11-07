@@ -1,6 +1,6 @@
 name: Gravicentra B4-003 Scoped LIVE Reader Only
 
-# Publishing this workflow performs READBACK ONLY. A reviewed explicit dispatch
+# Ordinary pushes perform READBACK ONLY. The exact approved deploy subject or dispatch
 # binds the exact branch HEAD and previous deployed manifest before one-function
 # deployment. Hosting, Rules, other Functions and business data are untouched.
 on:
@@ -9,6 +9,7 @@ on:
       - recovery/fase-a-clean-20260831
     paths:
       - '.github/workflows/gravicentra-b4-003-live-protected-reader-20261029.yml'
+      - 'artifacts/orbit360-recovery/release-control/I6_5_B4_003_ISOLATED_READER_DEPLOY_ACTIVATION_20261107.json'
 
   workflow_dispatch:
     inputs:
@@ -43,9 +44,14 @@ jobs:
       PROJECT_ID: ays-orbit-360-lab
       RELEASE_HEAD: ${{ github.sha }}
       GI_TARGET_FUNCTION: orbit360ScopedPolicyRead
-      REQUESTED_MODE: ${{ github.event_name == 'workflow_dispatch' && inputs.mode || 'readback' }}
-      EXPECTED_DEPLOY_HEAD: ${{ inputs.expected_head }}
-      EXPECTED_BEFORE_MANIFEST: ${{ inputs.expected_before_source_manifest_sha256 }}
+      EXPECTED_READER_PREDECESSOR_ARCHIVE: eb076c9f52c16d1a66bd3bd0b31a25555a57fc6109cdfe9b6d0f61dcfcd27fe9
+      EXPECTED_READER_PREDECESSOR_REVISION: orbit360scopedpolicyread-00001-tiv
+      PRESERVED_FRONTEND_SOURCE: e5030ec5ba9854f0c576fd905c2f510766347ffa
+      READER_ACTIVATION_PATH: artifacts/orbit360-recovery/release-control/I6_5_B4_003_ISOLATED_READER_DEPLOY_ACTIVATION_20261107.json
+      REQUESTED_MODE: >-
+        ${{ github.event_name == 'workflow_dispatch' && inputs.mode || github.event_name == 'push' && github.event.head_commit.message == 'deploy(b4-003): exact isolated LIVE reader e503 successor' && 'deploy' || 'readback' }}
+      EXPECTED_DEPLOY_HEAD: ${{ github.event_name == 'workflow_dispatch' && inputs.expected_head || github.sha }}
+      EXPECTED_BEFORE_MANIFEST: ${{ github.event_name == 'workflow_dispatch' && inputs.expected_before_source_manifest_sha256 || '067c746216f25a8aecbcf435bd0cd00a2ed0f8463c7446bb9c36ee5dc5a822ff' }}
       SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
       SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
       SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
@@ -69,6 +75,7 @@ jobs:
           REMOTE=$(git ls-remote origin refs/heads/recovery/fase-a-clean-20260831 | awk '{print $1}')
           test "$REMOTE" = "$RELEASE_HEAD"
           test "$PROJECT_ID" = ays-orbit-360-lab
+          git diff --exit-code "$PRESERVED_FRONTEND_SOURCE" HEAD -- functions orbit360-platform ':(exclude)orbit360-platform/docs/**'
           case "$REQUESTED_MODE" in
             readback) ;;
             deploy) test "$EXPECTED_DEPLOY_HEAD" = "$RELEASE_HEAD"; [[ "$EXPECTED_BEFORE_MANIFEST" =~ ^[0-9a-f]{64}$ ]] ;;
@@ -87,6 +94,8 @@ jobs:
           node --check functions/b4-003-scoped-policy-callable.js
           node --check tools/gravicentra-b4-003-live-backend-source-readback.cjs
           node tools/gravicentra-b4-003-live-reader-source-readback.test.cjs
+          node tools/gravicentra-b4-003-isolated-reader-package.test.cjs
+          node tools/gravicentra-i6-control-plane-guard-v1.mjs --mode=i6
           node tests/goal-participation-classification-writer.test.cjs
           node tools/gravicentra-b4-003-scoped-bootstrap-reader.test.cjs
           node tools/gravicentra-b4-003-scoped-policy-reader.test.cjs
@@ -100,16 +109,8 @@ jobs:
           set -euo pipefail
           TARGET_ROOT="$RUNNER_TEMP/gi-b4003-live-reader-only"
           mkdir -p "$TARGET_ROOT"
-          cp -a functions "$TARGET_ROOT/backend"
-          node - "$TARGET_ROOT/backend/bootstrap.js" <<'NODE'
-          const fs=require('node:fs');
-          const entry=process.argv[2];
-          const current=fs.readFileSync(entry,'utf8');
-          if(current.includes("require('./b4-003-scoped-policy-callable')"))
-            throw Error('B4_003_DUPLICATE_SOURCE_BOOTSTRAP_DENIED');
-          fs.appendFileSync(entry,"\n// B4-003: stage reader exports; deploy only LIVE target.\nObject.assign(module.exports,require('./b4-003-scoped-policy-callable'));\n");
-          NODE
-          printf '{"functions":{"source":"backend"}}\n' > "$TARGET_ROOT/firebase.json"
+          node tools/gravicentra-b4-003-isolated-reader-package.cjs stage functions "$TARGET_ROOT/backend" > "$RUNNER_TEMP/gi-b4003-isolated-reader-package.json"
+          printf '{"functions":{"source":"backend","ignore":["node_modules","**/node_modules/**",".git","firebase-debug.log","firebase-debug.*.log"]}}\n' > "$TARGET_ROOT/firebase.json"
           (cd "$TARGET_ROOT/backend" && npm ci --ignore-scripts --no-audit --no-fund)
           echo "TARGET_ROOT=$TARGET_ROOT" >> "$GITHUB_ENV"
           echo "GI_DEPS_DIR=$TARGET_ROOT/backend/node_modules" >> "$GITHUB_ENV"
@@ -159,9 +160,29 @@ jobs:
           if(before.target!=='orbit360ScopedPolicyRead'||before.region!=='us-east1'||before.functions.length!==3)throw Error('EXACT_READER_READBACK_REQUIRED');
           if(process.env.REQUESTED_MODE==='deploy'&&before.readerSourceManifestSha256!==process.env.EXPECTED_BEFORE_MANIFEST)throw Error('DEPLOYED_READER_CHANGED_SINCE_REVIEW');
           const needed=process.env.REQUESTED_MODE==='deploy'&&!before.readerSourceMatchesCurrent;
+          if(needed){
+            const prior=before.functions[2];
+            if(prior.archiveSha256!==process.env.EXPECTED_READER_PREDECESSOR_ARCHIVE||prior.revision!==process.env.EXPECTED_READER_PREDECESSOR_REVISION||!prior.archiveSourceManifestSha256)throw Error('EXACT_READER_PREDECESSOR_ARCHIVE_REQUIRED');
+            const cp=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json','utf8'));
+            const freeze=JSON.parse(fs.readFileSync(cp.ownerDecisionFreeze20261107.path,'utf8'));
+            const grant=freeze.readerDeploymentSuccessor;
+            const activation=JSON.parse(fs.readFileSync(process.env.READER_ACTIVATION_PATH,'utf8'));
+            const git=(...args)=>require('node:child_process').execFileSync('git',args,{encoding:'utf8'}).trim();
+            if(activation.schema!=='GRAVICENTRA_ISOLATED_READER_DEPLOY_ACTIVATION_V1'||activation.status!=='AUTHORIZED_EXACT_ISOLATED_READER_DEPLOY'||activation.target!=='orbit360ScopedPolicyRead'||activation.region!=='us-east1'||activation.project!==process.env.PROJECT_ID||activation.beforeSourceManifestSha256!==before.readerSourceManifestSha256||activation.beforeArchiveSha256!==prior.archiveSha256||activation.beforeRevision!==prior.revision||activation.expectedIsolatedSourceManifestSha256!==before.expectedReaderSourceManifestSha256||activation.preservedFrontendSource!==process.env.PRESERVED_FRONTEND_SOURCE||activation.realBusinessWritesAuthorized!==false||activation.otherFunctionsDeployAuthorized!==false||!Number.isSafeInteger(activation.reviewedReadbackRunId)||activation.reviewedReadbackRunId<=0||!/^[a-f0-9]{40}$/.test(activation.reviewedSourceHead||''))throw Error('EXACT_READER_ACTIVATION_REQUIRED');
+            git('merge-base','--is-ancestor',activation.reviewedSourceHead,'HEAD');
+            if(git('diff','--name-only',activation.reviewedSourceHead,'HEAD','--','functions','orbit360-platform',':(exclude)orbit360-platform/docs/**','.github/workflows/gravicentra-b4-003-live-protected-reader-20261029.yml','tools/gravicentra-b4-003-live-backend-source-readback.cjs','tools/gravicentra-b4-003-isolated-reader-package.cjs')!=='')throw Error('READER_SOURCE_CHANGED_AFTER_REVIEW');
+            if(!grant||grant.deployAuthorized!==true||grant.target!=='orbit360ScopedPolicyRead'||grant.region!=='us-east1'||grant.preservedFrontendSource!==process.env.PRESERVED_FRONTEND_SOURCE||grant.before.archiveSha256!==prior.archiveSha256||grant.before.sourceManifestSha256!==before.readerSourceManifestSha256||grant.expectedIsolatedSourceManifestSha256!==before.expectedReaderSourceManifestSha256)throw Error('EXACT_READER_DEPLOYMENT_AUTHORITY_REQUIRED');
+          }
           fs.appendFileSync(process.env.GITHUB_OUTPUT,'needs_deploy='+needed+'\n');
           fs.writeFileSync(tmp+'/gi-b4003-live-reader-result.json',JSON.stringify({status:process.env.REQUESTED_MODE==='readback'?'READBACK_ONLY':needed?'EXACT_READER_DEPLOY_PREPARED':'READER_ALREADY_EXACT_NOOP',head:process.env.GITHUB_SHA,mode:process.env.REQUESTED_MODE,sourceManifest:before.readerSourceManifestSha256,readerSourceMatchesCurrent:before.readerSourceMatchesCurrent,productDeployed:false,businessWrites:0,productionAccepted:false},null,2)+'\n');
           NODE
+
+      - name: Diagnose tenant catalog source without invoking or deploying it
+        continue-on-error: true
+        env:
+          GI_TARGET_FUNCTION: orbit360TenantDomainConfig
+          GI_DIAGNOSTIC_ONLY: 'true'
+        run: node tools/gravicentra-b4-003-live-backend-source-readback.cjs before
 
       - name: Prepare exact predecessor rollback package
         if: steps.assess.outputs.needs_deploy == 'true'
@@ -187,7 +208,7 @@ jobs:
           (cd "$RESTORE_ROOT/backend" && npm ci --ignore-scripts --no-audit --no-fund)
           echo "RESTORE_ROOT=$RESTORE_ROOT" >> "$GITHUB_ENV"
 
-      - name: Deploy only the reviewed reader and verify ten scoped source files
+      - name: Deploy only the isolated reader and verify its complete source package
         id: deploy_and_readback
         if: steps.assess.outputs.needs_deploy == 'true'
         shell: bash
@@ -229,6 +250,8 @@ jobs:
             ${{ runner.temp }}/gi-b4003-live-sources-after.json
             ${{ runner.temp }}/gi-b4003-live-sources-rollback.json
             ${{ runner.temp }}/gi-b4003-live-reader-result.json
+            ${{ runner.temp }}/gi-b4003-isolated-reader-package.json
+            ${{ runner.temp }}/gi-b4003-tenant-config-source-readback.json
           if-no-files-found: warn
           retention-days: 30
 

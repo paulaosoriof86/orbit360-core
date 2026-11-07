@@ -3,16 +3,17 @@
 // Never prints credentials, members, business data or archive contents.
 const fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto');
 const {execFileSync}=require('node:child_process');
+const isolatedReader=require('./gravicentra-b4-003-isolated-reader-package.cjs');
 const {GoogleAuth}=require(path.join(process.env.GI_DEPS_DIR,'google-auth-library'));
 const phase=process.argv[2],tmp=process.env.RUNNER_TEMP,project=process.env.PROJECT_ID;
 if(!['before','after','rollback'].includes(phase)||project!=='ays-orbit-360-lab'||!tmp)throw Error('EXACT_PROJECT_AND_PHASE_REQUIRED');
 const sha=b=>crypto.createHash('sha256').update(b).digest('hex');
 const roster='orbit360AssignableAdvisorRoster',writer='orbit360ProductOperationalCommand';
-const reader='orbit360ScopedPolicyRead';
+const reader='orbit360ScopedPolicyRead',catalog='orbit360TenantDomainConfig';
 const target=process.env.GI_TARGET_FUNCTION||roster;
-if(![roster,writer,reader].includes(target))throw Error('ONLY_THREE_EXACT_B4003_BACKEND_TARGETS_ALLOWED');
-const READER_FILES=['bootstrap.js','package.json','package-lock.json','b4-003-scoped-policy-callable.js','b4-003-scoped-bootstrap-reader.js','b4-003-scoped-access-boundary.js','b4-003-scoped-policy-reader.js','b4-003-scoped-related-reader.js','b4-003-client-country-authority.js','b4-003-client-country-list-projection.js'];
-const READER_BOOTSTRAP_SUFFIX="\n// B4-003: stage reader exports; deploy only LIVE target.\nObject.assign(module.exports,require('./b4-003-scoped-policy-callable'));\n";
+if(![roster,writer,reader,catalog].includes(target))throw Error('ONLY_FOUR_EXACT_B4003_BACKEND_READBACK_TARGETS_ALLOWED');
+if(target===catalog&&(phase!=='before'||process.env.GI_DIAGNOSTIC_ONLY!=='true'))throw Error('TENANT_CONFIG_READBACK_ONLY_BEFORE_REQUIRED');
+const READER_FILES=isolatedReader.FILES;
 const sourceManifest=files=>sha(JSON.stringify(Object.keys(files).sort().map(file=>[file,files[file].sha256])));
 
 async function source(client,name){
@@ -32,17 +33,30 @@ async function source(client,name){
   if(matches.length!==1)throw Error('DEPLOYED_SOURCE_FILE_CARDINALITY:'+name+':'+file+':'+matches.length);
   return execFileSync('unzip',['-p',archive,matches[0]],{maxBuffer:10_000_000});
  };
- const file=name===roster?'assignable-advisor-roster.js':name===reader?'b4-003-scoped-bootstrap-reader.js':'product-operational-domain.js';
+ const file=name===roster?'assignable-advisor-roster.js':name===reader?'b4-003-scoped-bootstrap-reader.js':name===catalog?'tenant-domain-config.js':'product-operational-domain.js';
  const sourceBytes=readOne(file);
  const goalBytes=name===writer?readOne('goal-participation-contract.js'):null;
  const gitBlob=b=>crypto.createHash('sha1').update(Buffer.concat([Buffer.from('blob '+b.length+'\u0000'),b])).digest('hex');
+ let archiveSourceFiles=null;
+ if(name===reader){
+  const primary=names.find(n=>n===file||n.endsWith('/'+file)),prefix=primary.slice(0,-file.length);
+  archiveSourceFiles={};
+  for(const entry of names.filter(n=>!n.endsWith('/'))){
+   if(!entry.startsWith(prefix)||entry.startsWith('/')||entry.split('/').includes('..'))throw Error('DEPLOYED_ARCHIVE_UNSAFE_PATH');
+   const relative=entry.slice(prefix.length);
+   if(!relative||Object.hasOwn(archiveSourceFiles,relative))throw Error('DEPLOYED_ARCHIVE_DUPLICATE_FILE');
+   const bytes=execFileSync('unzip',['-p',archive,entry],{maxBuffer:10_000_000});
+   archiveSourceFiles[relative]={sha256:sha(bytes),bytes:bytes.length};
+  }
+ }
  const sourceFiles=name===reader?Object.fromEntries(READER_FILES.map(file=>{
   // An older deployed reader may predate a dependency. Record that absence;
   // after still requires the complete current source manifest byte for byte.
   if(!names.some(n=>n===file||n.endsWith('/'+file)))return[file,{sha256:null,gitBlobSha:null,bytes:0,present:false}];
   const bytes=readOne(file);return[file,{sha256:sha(bytes),gitBlobSha:gitBlob(bytes),bytes:bytes.length}];
  })):null;
- return {name,region,sourceFiles,sourceManifestSha256:sourceFiles?sourceManifest(sourceFiles):null,archive,archiveSha256:sha(buffer),sourceSha256:sha(sourceBytes),sourceGitBlobSha:gitBlob(sourceBytes),
+ const catalogStatic=name===catalog?{catalogsDomainListed:/const\s+DOMAINS\s*=\s*new Set\(\[[^\]]*['"]catalogs['"]/.test(sourceBytes.toString('utf8')),getActionListed:/\[['"]get['"],\s*['"]save['"]\]/.test(sourceBytes.toString('utf8')),version:(sourceBytes.toString('utf8').match(/const VERSION\s*=\s*['"]([^'"]+)['"]/)||[])[1]||null}:null;
+ return {name,region,sourceFiles,sourceManifestSha256:sourceFiles?sourceManifest(sourceFiles):null,archiveSourceFiles,archiveSourceManifestSha256:archiveSourceFiles?sourceManifest(archiveSourceFiles):null,catalogStatic,archive,archiveSha256:sha(buffer),sourceSha256:sha(sourceBytes),sourceGitBlobSha:gitBlob(sourceBytes),
   goalParticipationContractSha256:goalBytes?sha(goalBytes):null,
   goalParticipationContractGitBlobSha:goalBytes?gitBlob(goalBytes):null,
   generation:src.generation||null,sourceBucket:src.bucket,sourceObject:src.object,revision:meta.serviceConfig?.revision||null,updateTime:meta.updateTime||null,
@@ -51,20 +65,15 @@ async function source(client,name){
 async function readerFlow(client){
  const deployed=await Promise.all([roster,writer,reader].map(name=>source(client,name)));
  const current=deployed[2];
- const expectedFiles=Object.fromEntries(READER_FILES.map(file=>{
-  let bytes=fs.readFileSync('functions/'+file);
-  if(file==='bootstrap.js'){
-   if(bytes.toString('utf8').includes("require('./b4-003-scoped-policy-callable')"))throw Error('READER_SOURCE_BOOTSTRAP_ALREADY_BOUND');
-   bytes=Buffer.concat([bytes,Buffer.from(READER_BOOTSTRAP_SUFFIX)]);
-  }
-  return[file,{sha256:sha(bytes)}];
- }));
- const expectedManifest=sourceManifest(expectedFiles);
+ const expected=isolatedReader.plan('functions');
+ const expectedManifest=expected.sourceManifestSha256;
  const result={phase,target:reader,observedAtUtc:new Date().toISOString(),project,region:'us-east1',
   functions:deployed.map(({archive,...rest})=>rest),
   expectedReaderSourceManifestSha256:expectedManifest,
   readerSourceManifestSha256:current.sourceManifestSha256,
-  readerSourceMatchesCurrent:current.sourceManifestSha256===expectedManifest,
+  readerSourceMatchesCurrent:current.sourceManifestSha256===expectedManifest&&current.archiveSourceManifestSha256===expectedManifest,
+  completeLocalDependencyClosure:expected.localDependencyClosure,
+  isolatedExport:reader,
   readOnly:true,noAuthIamOrDataWrites:true,noHostingRulesWrites:true};
  const beforePath=path.join(tmp,'gi-b4003-live-sources-before.json');
  if(phase!=='before'){
@@ -79,14 +88,22 @@ async function readerFlow(client){
   if(phase==='after'){
    if(!result.readerSourceMatchesCurrent)throw Error('DEPLOYED_READER_DEPENDENCY_BYTES_MISMATCH');
    if(prior.revision===current.revision)throw Error('TARGET_REVISION_DID_NOT_MOVE');
-  }else if(prior.sourceManifestSha256!==current.sourceManifestSha256)throw Error('ROLLBACK_READER_DEPENDENCY_BYTES_NOT_RESTORED');
+  }else if(prior.sourceManifestSha256!==current.sourceManifestSha256||!prior.archiveSourceManifestSha256||prior.archiveSourceManifestSha256!==current.archiveSourceManifestSha256)throw Error('ROLLBACK_READER_DEPENDENCY_BYTES_NOT_RESTORED');
  }
  fs.writeFileSync(path.join(tmp,'gi-b4003-live-sources-'+phase+'.json'),JSON.stringify(result,null,2)+'\n');
  console.log(JSON.stringify({phase,status:'DEPLOYED_READER_SOURCE_BYTES_READBACK',region:'us-east1',readerSourceMatchesCurrent:result.readerSourceMatchesCurrent,readerSourceManifestSha256:result.readerSourceManifestSha256,expectedReaderSourceManifestSha256:expectedManifest,readerBootstrapGitBlob:current.sourceGitBlobSha}));
 }
+async function catalogFlow(client){
+ const {archive,...live}=await source(client,catalog);
+ const current=fs.readFileSync('functions/tenant-domain-config.js');
+ const result={target:catalog,region:'us-central1',project,observedAtUtc:new Date().toISOString(),status:'TENANT_CONFIG_SOURCE_READBACK_ONLY',live,sourceMatchesCurrent:live.sourceSha256===sha(current),writes:0,deployAuthorized:false};
+ fs.writeFileSync(path.join(tmp,'gi-b4003-tenant-config-source-readback.json'),JSON.stringify(result,null,2)+'\n');
+ console.log(JSON.stringify({target:catalog,status:result.status,sourceMatchesCurrent:result.sourceMatchesCurrent,sourceGitBlobSha:live.sourceGitBlobSha,catalogStatic:live.catalogStatic}));
+}
 (async()=>{
  const client=await new GoogleAuth({scopes:['https://www.googleapis.com/auth/cloud-platform']}).getClient();
  if(target===reader){await readerFlow(client);return;}
+ if(target===catalog){await catalogFlow(client);return;}
  const deployed=await Promise.all([roster,writer].map(n=>source(client,n)));
  const local={roster:sha(fs.readFileSync('functions/assignable-advisor-roster.js')),writer:sha(fs.readFileSync('functions/product-operational-domain.js')),goalParticipationContract:sha(fs.readFileSync('functions/goal-participation-contract.js'))};
  const result={phase,target,observedAtUtc:new Date().toISOString(),project,region:'us-central1',functions:deployed.map(({archive,...rest})=>rest),

@@ -80,7 +80,10 @@ const {validateEquipoCausalSourceSuccessor:validateTeam}=await import('./gravice
 const {execFileSync}=await import('node:child_process');
 const teamPaths=["orbit360-platform/data/store-firestore-product-operational-p0.js","tests/goal-participation-classification-writer.test.cjs","tools/gravicentra-b4-003-live-backend-source-readback.cjs",".github/workflows/gravicentra-b4-003-live-protected-reader-20261029.yml","tools/gravicentra-b4-003-live-reader-source-readback.test.cjs"];
 const teamBase='b3dcd9d1a57bb4871b06df341ec6198c56f9cfe9';
-const teamBytes=Object.fromEntries(teamPaths.map(path=>[path,fs.readFileSync(path)]));
+const postSourceBase='e5030ec5ba9854f0c576fd905c2f510766347ffa';
+const frozenTransportPaths=new Set([teamPaths[2],teamPaths[3],teamPaths[4]]);
+const readPostBase=path=>process.env.GI_POST_E503_BASE_DIR?fs.readFileSync(process.env.GI_POST_E503_BASE_DIR+'/'+path):execFileSync('git',['show',postSourceBase+':'+path]);
+const teamBytes=Object.fromEntries(teamPaths.map(path=>[path,frozenTransportPaths.has(path)?readPostBase(path):fs.readFileSync(path)]));
 const baseSourceBytes=Object.fromEntries(teamPaths.map((path,index)=>[path,index===4?null:(process.env.GI_SOURCE_SUCCESSOR_BASE_DIR?fs.readFileSync(process.env.GI_SOURCE_SUCCESSOR_BASE_DIR+'/'+path):execFileSync('git',['show',teamBase+':'+path]))]));
 const teamRecord={execution:{productSourceChanged:true,workflowChanged:true},equipoCausalSourceCorrection:{
  schema:'GRAVICENTRA_EQUIPO_CAUSAL_SOURCE_SUCCESSOR_V1',sourceBaseHead:teamBase,status:'SOURCE_AND_QA_READY_READBACK_ONLY_NOT_DEPLOYED',
@@ -129,3 +132,22 @@ for(const [key,value] of [['livePromotionAuthorized',true],['backendFunctionDepl
  assert.throws(()=>validateTeam(f),/FRONTEND_PREVIEW_EXACT_AUTHORITY/);checks++;
 }
 console.log('FRONTEND_PREVIEW_BOUNDED_SUCCESSOR_PASS '+checks+' checks; LIVE, backend deployment and historical reset rejected');
+
+const {validateReaderDeploymentSuccessorSnapshot:validateReader}=await import('./gravicentra-b4-003-formal-live-closeout-guard.mjs');
+const readerRecord={"schema":"GRAVICENTRA_READER_DEPLOYMENT_SUCCESSOR_V1","sourceBaseHead":"e5030ec5ba9854f0c576fd905c2f510766347ffa","status":"EXACT_ISOLATED_READER_PREPARED_ACTIVATION_REQUIRED","target":"orbit360ScopedPolicyRead","region":"us-east1","project":"ays-orbit-360-lab","preservedFrontendSource":"e5030ec5ba9854f0c576fd905c2f510766347ffa","deployAuthorized":true,"requiresActivationReceipt":true,"activationPath":"artifacts/orbit360-recovery/release-control/I6_5_B4_003_ISOLATED_READER_DEPLOY_ACTIVATION_20261107.json","allowedPushSubject":"deploy(b4-003): exact isolated LIVE reader e503 successor","hostingDeployAuthorized":false,"rulesWrites":0,"realBusinessWrites":0,"repeatSevenClassificationWrites":false,"otherFunctionsDeployAuthorized":false,"backendSourceFilesChanged":false,"before":{"runId":42397991685,"runConclusion":"success","observedAtUtc":"2026-11-07T17:47:31.769Z","sourceManifestSha256":"067c746216f25a8aecbcf435bd0cd00a2ed0f8463c7446bb9c36ee5dc5a822ff","archiveSha256":"eb076c9f52c16d1a66bd3bd0b31a25555a57fc6109cdfe9b6d0f61dcfcd27fe9","revision":"orbit360scopedpolicyread-00001-tiv"},"expectedIsolatedSourceManifestSha256":"690d036074683b4ea1d46cf867fa14856b40536fe739388ff50801ec9d31786a","singleExport":"orbit360ScopedPolicyRead","completeLocalDependencyFiles":7,"packageFiles":10,"readOnlyDiagnostic":{"target":"orbit360TenantDomainConfig","region":"us-central1","invokesCallable":false,"deployAuthorized":false,"businessDataReads":0},"changes":[{"path":".github/workflows/gravicentra-b4-003-live-protected-reader-20261029.yml","previousBlobSha":"bd45ef8297cb4d326929a01d5b8c4303369b72d4","blobSha":"967fc96d3d263b34bec8c8cbb4be6ce0b3a40967","sha256":"301a451e7ac059e2723c7aad276d923f62ac20c609c22ff75f672d3942012163"},{"path":"tools/gravicentra-b4-003-live-backend-source-readback.cjs","previousBlobSha":"48edf21b50f05521a33159b5925e75a904841951","blobSha":"632e8ded686b2d9dba2b80cda6f5f54824575831","sha256":"d446fd359a2ad6d3857fa21472651a9ebe446e21e90e24e0cc81a341aec44f55"},{"path":"tools/gravicentra-b4-003-live-reader-source-readback.test.cjs","previousBlobSha":"43072eb1d054b18438a76d300214827652b61ad9","blobSha":"46020dfb28143974f9701478edb9c6cfbb7be075","sha256":"28d002dacbfb09392714beab198c6d02f105db254d8a0a88ae1a45d00f389a25"},{"path":"tools/gravicentra-b4-003-isolated-reader-package.cjs","previousBlobSha":null,"blobSha":"50e4bd4c2b4d5391d1c2097364e1786454818f31","sha256":"e6eb5145079074c1dcd7a7e4f55f7aeb6e7ce0dd7ad5a5d5813b673f62a0eae5"},{"path":"tools/gravicentra-b4-003-isolated-reader-package.test.cjs","previousBlobSha":null,"blobSha":"6787010e0ef9a756ebfed093bc64619724c38e0f","sha256":"aee1bec53e6f4a397edbb31ed57609d429c7ccf5a5e91c3cfa8ad5df45a8058c"}],"tests":{"isolatedPackage":16,"sourceReadback":39,"workflowYamlAndBash":8},"firstPublishMode":"READBACK_ONLY","activationNotYetCreated":true};
+function readerFixture(){
+ const bytes={},baseBytes={};
+ for(const x of readerRecord.changes){bytes[x.path]=fs.readFileSync(x.path);baseBytes[x.path]=x.previousBlobSha?readPostBase(x.path):null;}
+ return{record:{readerDeploymentSuccessor:clone(readerRecord)},fileBytes:bytes,baseSourceBytes:baseBytes};
+}
+const readerGood=readerFixture(),readerValidated=validateReader(readerGood);
+assert.equal(readerValidated.allowedPaths.length,5);checks++;
+for(const x of readerRecord.changes.filter(x=>x.previousBlobSha))assert.equal(hash(Buffer.from(readerValidated.comparableFileBytes[x.path])),x.previousBlobSha);checks++;
+function rejectReader(edit,pattern){const f=readerFixture();edit(f);assert.throws(()=>validateReader(f),pattern);checks++;}
+rejectReader(f=>f.record.readerDeploymentSuccessor.target='orbit360TenantDomainConfig',/READER_DEPLOY_IDENTITY/);
+rejectReader(f=>f.record.readerDeploymentSuccessor.preservedFrontendSource='0'.repeat(40),/READER_DEPLOY_BASE/);
+rejectReader(f=>f.record.readerDeploymentSuccessor.before.archiveSha256='0'.repeat(64),/READER_DEPLOY_EXACT_OBSERVED_PREDECESSOR/);
+rejectReader(f=>f.record.readerDeploymentSuccessor.readOnlyDiagnostic.deployAuthorized=true,/READER_CATALOG_READONLY_SCOPE/);
+rejectReader(f=>f.record.readerDeploymentSuccessor.requiresActivationReceipt=false,/READER_DEPLOY_ACTIVATION_CONTRACT/);
+rejectReader(f=>f.fileBytes[readerRecord.changes[0].path]=Buffer.from('unreviewed workflow'),/READER_DEPLOY_CURRENT_PIN/);
+console.log('POST_E503_READER_BOUNDED_SUCCESSOR_PASS '+checks+' checks; historical source pins preserved, activation required');
