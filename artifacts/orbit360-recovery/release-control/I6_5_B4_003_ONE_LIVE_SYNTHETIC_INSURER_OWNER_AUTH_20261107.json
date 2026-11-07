@@ -1,7 +1,7 @@
 {
   "schema": "B4_003_ONE_LIVE_SYNTHETIC_INSURER_OWNER_AUTH_V1",
-  "status": "PENDING_EXPLICIT_OWNER_CONSENT",
-  "authorized": false,
+  "status": "AUTHORIZED_ONCE",
+  "authorized": true,
   "ownerUid": "pL8zkGdq6phHm5z2DiXIcoNHiw83",
   "ownerName": "Paula Osorio",
   "planSha256": "a318932d732917737953c42a380b884ba200307f5e804c3b32c06662c012dcb6",
@@ -15,9 +15,10 @@
     "atomic_remove_plus_external_audit",
     "same_scope_recovery"
   ],
-  "ownerMessageReference": null,
-  "authorizedAtUtc": null,
-  "createAuthorizedParentSha": null,
+  "ownerMessageReference": "CURRENT_CONVERSATION_USER_AUTORIZO_IN_RESPONSE_TO_EXACT_LIVE_TEST_CLEANUP_AND_TWO_TEMPORARY_ACCESS_REQUEST",
+  "authorizedAtUtc": "2026-11-07T02:08:09Z",
+  "createAuthorizedParentSha": "891f5c573abbecb1206ced40e30934217dc300cf",
   "cleanupAuthorizedParentSha": null,
-  "phaseParentBindingDelegation": "Bind each phase once to its actual canonical parent before its first dispatch, within this exact two-phase approved scope; never rebind a dispatched phase to remint tokens."
+  "phaseParentBindingDelegation": "Bind each phase once to its actual canonical parent before its first dispatch, within this exact two-phase approved scope; never rebind a dispatched phase to remint tokens.",
+  "ownerMessageText": "autorizo"
 }

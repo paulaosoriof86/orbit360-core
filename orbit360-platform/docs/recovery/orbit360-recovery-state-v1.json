@@ -10,7 +10,7 @@
   "branch": "recovery/fase-a-clean-20260831",
   "forensicOriginSha": "9c95f31461f2eabe9804625b5659bee772f5602a",
   "createdAtUtc": "2026-08-31T18:00:00Z",
-  "updatedAtUtc": "2026-11-07T02:04:41Z",
+  "updatedAtUtc": "2026-11-07T02:08:09Z",
   "status": "ITERATION_2_SOURCE_MATERIALIZED_VALIDATION_PENDING",
   "currentIteration": 2,
   "lastCompletedIteration": 1,
@@ -187,7 +187,7 @@
     "phaseAIterationStatuses": "HISTORICAL_FIELDS_ABOVE_PRESERVED_UNTIL_FORMAL_GATE_EVIDENCE;_NO_NEW_PASS_INFERRED",
     "labDataWriteScope": "ONLY_35_AUTHORIZED_COUNTRY_FIELDS;_NO_AUGUST_REFRESH"
   },
-  "nextAction": "B4-003 exact42 formally Preview PASS and SAME existing artifact/version promoted LIVE by run42323326741. All218 raw bytes match artifact/Preview/LIVE; promotion authorization consumed, do not redeploy or rebuild. Actual Paula LIVE focal module reads, credential reveal/copy/rehide, Inicio5/5 sources and320/390 responsive, assigned Asesor scope and Renovaciones completed; sanitized receipt artifacts/orbit360-recovery/release-control/I6_5_B4_003_CURRENT42_AUTHENTICATED_LIVE_UI_PROGRESS_20261107.json. Obtain exact LIVE synthetic-write and ephemeral-existing-UID authentication authorization; current Preview-only and consumed I5 authorizations are not reused. Execute the single approved synthetic insurer create, actual browser reload/read, atomic remove+audit, canonical absence and actual browser reload absence. Verify final affected-module integrity and exact LIVE identity, then reconcile formal LIVE acceptance and close B4-003. Preserve15 historical certificates/16 current evidence; B4-003 and current-release production acceptance remain open. Do not reuse Preview-only or consumed I5 write/token authorization. Exact one-insurer LIVE plan and default-deny helper are prepared at artifacts/orbit360-recovery/release-control/I6_5_B4_003_ONE_LIVE_SYNTHETIC_INSURER_PLAN_20261107.json; pending scope liveSyntheticInsurerWrite20261107. After real owner consent, bind each phase once to its actual parent HEAD, never rebind a dispatched phase or rerun for token remint. No additional technical action is required from Paula.",
+  "nextAction": "Owner explicitly authorized the exact single LIVE synthetic insurer plus atomic cleanup/audit and at most two temporary existing-Paula authentication accesses. Scope liveSyntheticInsurerWrite20261107 binds frozen plan/helper/executor and one parent per phase. Execute exactly one authorized LIVE synthetic insurer create through the pinned owner, then actual Paula browser reload/readback. Execute the same-scope atomic remove plus audit once, then canonical absence and actual UI reload absence. Verify final affected-module integrity and exact LIVE identity; only then reconcile formal LIVE acceptance and B4-003 closure. Preserve15cert/16current evidence and2owner-deferred QA cohorts; no rebuild, redeploy, reimport or real-business mutation.",
   "sourceOfTruth": {
     "projectBoundaryPrevalentAddendum": "orbit360-platform/docs/recovery/ADDENDUM_PREVALENTE_CHATGPT_PROJECT_BOUNDARY_20260831.md",
     "mutableState": "orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json",
@@ -443,7 +443,7 @@
     "noDataWrites": true
   },
   "b4003ActiveCertificationResume20261106": {
-    "recordedAtUtc": "2026-11-07T02:04:41Z",
+    "recordedAtUtc": "2026-11-07T02:08:09Z",
     "authorityPath": "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json",
     "cursorKey": "b4003ActiveCertificationCursor20261106",
     "inventoryKey": "b4003CertificationInventory20261106",
@@ -478,9 +478,9 @@
     "fixtureCleanupReadbackPending": false,
     "extraResponseAndReverseReloadRequired": false,
     "minimumNext": [
-      "Obtain exact LIVE synthetic-write and ephemeral-existing-UID authentication authorization; current Preview-only and consumed I5 authorizations are not reused.",
-      "Execute the single approved synthetic insurer create, actual browser reload/read, atomic remove+audit, canonical absence and actual browser reload absence.",
-      "Verify final affected-module integrity and exact LIVE identity, then reconcile formal LIVE acceptance and close B4-003."
+      "Execute exactly one authorized LIVE synthetic insurer create through the pinned owner, then actual Paula browser reload/readback.",
+      "Execute the same-scope atomic remove plus audit once, then canonical absence and actual UI reload absence.",
+      "Verify final affected-module integrity and exact LIVE identity; only then reconcile formal LIVE acceptance and B4-003 closure."
     ],
     "evidenceReceiptBlobSha": "3a5dc252cfeeb4408ba0f88924b836d8c7637fe4",
     "retainedHostingPreflightStatus": "FORMAL_EXACT42_PREVIEW_PASS_GUARDED_SAME_ARTIFACT_LIVE_AUTHORIZED",
@@ -537,7 +537,7 @@
     "liveUiProgressReceiptBlobSha": "56c8360ec284030b25f33b0f6d943464f3962ccf",
     "liveInsurerRevealCopyRehidePass": true,
     "liveBankCopyPass": true,
-    "liveControlledWritesAuthorized": false,
+    "liveControlledWritesAuthorized": true,
     "liveReadOnlyFocalComplete": true,
     "liveInicioFiveSourcesReady": true,
     "liveInicio320390ResponsivePass": true,
@@ -546,7 +546,7 @@
     "browserUserTechnicalActionRequired": false,
     "liveSyntheticPlanPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_ONE_LIVE_SYNTHETIC_INSURER_PLAN_20261107.json",
     "liveSyntheticPlanSha256": "a318932d732917737953c42a380b884ba200307f5e804c3b32c06662c012dcb6",
-    "liveSyntheticAuthorizationStatus": "PENDING_OWNER_AUTHORIZATION",
+    "liveSyntheticAuthorizationStatus": "AUTHORIZED_ONCE",
     "liveSyntheticHelperBlobSha": "66995bd06b05e23faade01f5d0f5045d601a9fbe",
     "liveSyntheticExecutorBlobSha": "21209328d79127f841c522a6e71c18d197653dda"
   }
