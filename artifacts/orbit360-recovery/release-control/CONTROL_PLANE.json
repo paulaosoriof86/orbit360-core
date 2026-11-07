@@ -21758,5 +21758,58 @@
       "artifactId": 13592378081,
       "archiveSha256": "02a42a2a3fc0dbc477a19937ad0a636ef94afd142977fd6ddf4c1a6e2177fba9"
     }
+  },
+  "workingCadenceFreeze20261107": {
+    "schema": "GRAVICENTRA_LONG_BLOCK_VOICE_EXECUTION_FREEZE_V1",
+    "status": "FROZEN_OWNER_EXECUTION_PROTOCOL",
+    "localDate": "2026-11-07",
+    "authority": "Paula explicit authorization in active Gravicentra Insurance session",
+    "branch": "recovery/fase-a-clean-20260831",
+    "rules": [
+      "Within an active turn, continue in long execution blocks instead of stopping after a status reply.",
+      "After each completed gate or material milestone, continue immediately to the next authorized incomplete step without waiting for a continue message.",
+      "Provide frequent short progress updates during long execution: material result, blocker, or next concrete transition; keep technical details visible in writing while voice carries conclusions.",
+      "Do not repeat accepted certifications or frozen decisions unless causal regression is reproduced.",
+      "If one record or subflow is ambiguous, fail closed only that scope and continue independent authorized work.",
+      "Never claim background execution between turns; continuity is physical GitHub + Control Plane + evidence.",
+      "No parallel methodology, repository, Firebase, or rebuilt product merely for QA/governance."
+    ],
+    "liveSyntheticAuthorization": {
+      "granted": true,
+      "scope": "B4-004 synthetic LIVE QA only",
+      "allowed": [
+        "policy/receipt capture focal synthetic flow",
+        "Cronograma controlled synthetic task flow"
+      ],
+      "constraints": [
+        "exact release pin",
+        "synthetic IDs only",
+        "no real business records",
+        "server readback",
+        "reload",
+        "exact cleanup",
+        "final absence",
+        "no Auth/IAM/Rules/backend/product-source mutation",
+        "per-run bound execution receipt required"
+      ]
+    }
+  },
+  "b4004LiveQaPreparation20261107": {
+    "schema": "GRAVICENTRA_B4_004_LIVE_QA_PREPARATION_V1",
+    "status": "QA_GOVERNANCE_ONLY_HARNESS_PREPARED_EXECUTION_RECEIPT_PENDING",
+    "sourceSha": "6c45983610ce0d65a5c63bd07659ad968bfe9da3",
+    "buildId": "gi-i65-b4-6c45983610ce-57f234755dc1",
+    "artifactId": 13592378081,
+    "liveVersionName": "sites/ays-orbit-360-lab/versions/33af816375dd5cb5",
+    "hostedPayloadDigest": "018bf9acd64ddaa382d2ac73c35a6d8bbc0447ab3051a3d26a5b1e8c048a7e7d",
+    "promotionRunId": 42419559075,
+    "promotionEvidenceArtifactId": 13592639533,
+    "productSourceChanged": false,
+    "rebuild": false,
+    "backendChanged": false,
+    "rulesChanged": false,
+    "authIamChanged": false,
+    "operationalWrites": 0,
+    "next": "CREATE_EXACT_ONCE_BOUND_POLICY_CAPTURE_LIVE_EXECUTION_RECEIPT"
   }
 }

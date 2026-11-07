@@ -50,6 +50,11 @@ on:
       - 'tools/gravicentra-b4-003-retained-rollback-certify.mjs'
       - 'tools/gravicentra-b4-003-synthetic-archive-readback.mjs'
       - 'tools/gravicentra-b4-003-one-live-synthetic-insurer.mjs'
+      - 'tools/gravicentra-b4-004-policy-capture-live-qa.mjs'
+      - 'tools/gravicentra-b4-004-policy-capture-live-qa.test.mjs'
+      - 'artifacts/orbit360-recovery/release-control/I6_5_B4_004_LONG_BLOCK_EXECUTION_PROTOCOL_20261107.json'
+      - 'artifacts/orbit360-recovery/release-control/I6_5_B4_004_LIVE_PROMOTION_BINDING_20261107.json'
+      - 'artifacts/orbit360-recovery/release-control/I6_5_B4_004_POLICY_CAPTURE_LIVE_SYNTHETIC_OWNER_AUTH_20261107.json'
       - 'artifacts/orbit360-recovery/release-control/I6_5_B4_003_ONE_LIVE_SYNTHETIC_INSURER_PLAN_20261107.json'
       - 'tools/gravicentra-i6-5-b4-003-preview-proof.mjs'
       - 'tools/gravicentra-b4-003-protected-hydration.test.cjs'
@@ -4490,3 +4495,125 @@ jobs:
             ${{ runner.temp }}/gi-b4003-tenant-config-result.json
           retention-days: 30
           if-no-files-found: warn
+
+
+  b4-004-policy-capture-live-qa:
+    if: "github.event_name == 'push' && (github.event.head_commit.message == 'test(b4-004): complete policy capture LIVE synthetic' || startsWith(github.event.head_commit.message, format('{0}{1}', 'test(b4-004): complete policy capture LIVE synthetic', fromJSON('\"\\n\"'))))"
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    permissions:
+      contents: write
+      actions: read
+    env:
+      PROJECT_ID: ays-orbit-360-lab
+      TENANT_HINT: alianzas-soluciones
+      CONTROL: artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json
+      AUTH_RECEIPT: artifacts/orbit360-recovery/release-control/I6_5_B4_004_POLICY_CAPTURE_LIVE_SYNTHETIC_OWNER_AUTH_20261107.json
+      LIVE_PROMOTION: artifacts/orbit360-recovery/release-control/I6_5_B4_004_LIVE_PROMOTION_BINDING_20261107.json
+      FRONTEND_CONTRACT: artifacts/orbit360-recovery/release-control/I6_5_B4_004_POLICY_CAPTURE_CAUSAL_FRONTEND_SUCCESSOR_CONTRACT_20261107.json
+      SOURCE_SHA: 6c45983610ce0d65a5c63bd07659ad968bfe9da3
+      B4_PREVIEW_URL: https://ays-orbit-360-lab.web.app
+      SA_DEFAULT: \${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      SA_ORBIT360_LAB: \${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ORBIT_360_LAB: \${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: \${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Fail-closed exact owner authorization and release binding
+        run: |
+          set -euo pipefail
+          node --check tools/gravicentra-b4-004-policy-capture-live-qa.mjs
+          node --test tools/gravicentra-b4-004-policy-capture-live-qa.test.mjs
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const cp=JSON.parse(fs.readFileSync(process.env.CONTROL,'utf8'));
+          const a=JSON.parse(fs.readFileSync(process.env.AUTH_RECEIPT,'utf8'));
+          const p=JSON.parse(fs.readFileSync(process.env.LIVE_PROMOTION,'utf8'));
+          const e=JSON.parse(fs.readFileSync(process.env.GITHUB_EVENT_PATH,'utf8'));
+          const need=(v,c)=>{if(!v)throw Error(c);};
+          need(a.status==='AUTHORIZED_ONCE'&&a.authorized===true&&a.consumed===false,'B4004_LIVE_AUTH_NOT_AVAILABLE');
+          need(cp.b4004LiveSyntheticPolicyCaptureAuthorization20261107?.receiptBlobSha===a.selfBlobSha,'B4004_LIVE_AUTH_POINTER_MISMATCH');
+          need(e.before===a.authorizedParentSha&&e.after===process.env.GITHUB_SHA&&e.forced!==true,'B4004_LIVE_HEAD_LEASE_MISMATCH');
+          need(p.status==='EXACT_HOSTING_VERSION_PROMOTED_LIVE_BYTES_PASS_FUNCTIONAL_LIVE_PENDING','B4004_LIVE_PROMOTION_MISSING');
+          for(const k of ['sourceSha','buildId','artifactId','liveVersionName','hostedPayloadDigest'])need(a.release[k]===p[k],'B4004_LIVE_RELEASE_'+k.toUpperCase()+'_MISMATCH');
+          need(a.scope.syntheticOnly===true&&a.scope.realBusinessWrites===false&&a.scope.cleanupExact===true&&a.scope.maxFixtureIds===11,'B4004_LIVE_SCOPE_INVALID');
+          need(cp.workingCadenceFreeze20261107?.status==='FROZEN_OWNER_EXECUTION_PROTOCOL','B4004_LONG_BLOCK_PROTOCOL_MISSING');
+          console.log('B4_004_POLICY_CAPTURE_LIVE_AUTHORIZATION=PASS');
+          NODE
+      - name: Prepare existing service account and browser dependencies
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json,os,pathlib
+          dest=pathlib.Path(os.environ['RUNNER_TEMP'])/'b4004-live-service-account.json'
+          chosen=None
+          for key in ('SA_ORBIT360_LAB','SA_ORBIT_360_LAB','SA_DEFAULT'):
+              try:item=json.loads(os.environ.get(key,''))
+              except (ValueError,TypeError):continue
+              if item.get('type')=='service_account' and item.get('project_id')=='ays-orbit-360-lab' and item.get('private_key'):
+                  chosen=item;break
+          if not chosen:raise SystemExit('B4_004_LIVE_SERVICE_ACCOUNT_MISSING')
+          dest.write_text(json.dumps(chosen),encoding='utf8');dest.chmod(0o600)
+          with open(os.environ['GITHUB_ENV'],'a',encoding='utf8') as h:h.write('GOOGLE_APPLICATION_CREDENTIALS='+str(dest)+'\n')
+          PY
+          npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund firebase-admin@13.4.0 playwright@1.55.0 >/dev/null
+          npx playwright install --with-deps chromium >/dev/null
+      - name: Authenticated policy and receipt LIVE synthetic proof
+        env:
+          B4_004_POLICY_CAPTURE_LIVE_QA: 'true'
+          B4_004_LIVE_PROMOTION_PROOF: \${{ env.LIVE_PROMOTION }}
+          B4_003_PROOF_OUT: \${{ runner.temp }}/b4-004-policy-capture-live-qa.json
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-i6-5-b4-003-preview-proof.mjs
+          node - <<'NODE'
+          const x=require(process.env.RUNNER_TEMP+'/b4-004-policy-capture-live-qa.json');
+          const a=x.assertions||{};
+          const required=['exactArtifactBeforeWrites','originalAbsenceVerified','advisorCommissionAndScopedAudit','clientFormAndAtomicActivity','policyFormAtomicBatchAndDerivedClientState','receiptEditFormAndAtomicPortfolioActivity','freshProductReloadWithoutAdapter'];
+          if(x.status!=='FOCAL_AUTHENTICATED_UI_PASS'||required.some(k=>a[k]!==true)||x.syntheticFinalAbsent!==true||x.pageErrorCount!==0||x.consoleErrorCount!==0||x.httpErrorCount!==0||x.businessWrites!==0||x.productSourceChanged!==false||x.backendChanged!==false)process.exit(1);
+          console.log('B4_004_POLICY_CAPTURE_LIVE_FUNCTIONAL=PASS');
+          NODE
+      - name: Seal focal LIVE proof and consume exact authorization
+        env:
+          PROOF: \${{ runner.temp }}/b4-004-policy-capture-live-qa.json
+          RECEIPT: artifacts/orbit360-recovery/release-control/I6_5_B4_004_POLICY_CAPTURE_FOCAL_LIVE_QA_20261107.json
+        run: |
+          set -euo pipefail
+          cp "$PROOF" "$RECEIPT"
+          node - <<'NODE'
+          const fs=require('node:fs'),crypto=require('node:crypto');
+          const cpPath=process.env.CONTROL,cp=JSON.parse(fs.readFileSync(cpPath,'utf8'));
+          const proof=JSON.parse(fs.readFileSync(process.env.PROOF,'utf8'));
+          const receiptBytes=fs.readFileSync(process.env.RECEIPT);
+          const c=cp.b4004PolicyCaptureFrontendSuccessor20261107;
+          if(!c||proof.status!=='FOCAL_AUTHENTICATED_UI_PASS'||proof.syntheticFinalAbsent!==true)throw Error('B4004_LIVE_SEAL_PROOF_INVALID');
+          c.status='FRONTEND_SUCCESSOR_LIVE_BYTES_AND_POLICY_CAPTURE_FUNCTIONAL_PASS_CRONOGRAMA_PENDING';
+          c.liveFunctionalAcceptance={status:'POLICY_CAPTURE_FOCAL_LIVE_PASS',sourceSha:c.activeSourceSha,buildId:c.activeBuildId,artifactId:c.activeImmutableArtifactId,liveVersionName:'sites/ays-orbit-360-lab/versions/33af816375dd5cb5',runId:Number(process.env.GITHUB_RUN_ID),runAttempt:Number(process.env.GITHUB_RUN_ATTEMPT||1),evidencePath:process.env.RECEIPT,evidenceSha256:crypto.createHash('sha256').update(receiptBytes).digest('hex'),syntheticFinalAbsent:true,realBusinessWrites:0,productSourceChanged:false};
+          c.nextGateAccepted=false;
+          const a=cp.b4004LiveSyntheticPolicyCaptureAuthorization20261107;
+          if(!a||a.consumed===true)throw Error('B4004_LIVE_AUTH_ALREADY_CONSUMED');
+          a.consumed=true;a.consumedByRunId=Number(process.env.GITHUB_RUN_ID);a.result='PASS_CLEANUP_VERIFIED';
+          cp.nextAction='B4_004_CRONOGRAMA_MINIMUM_DELTA_LIVE_QA_THEN_GATE_SEAL';
+          fs.writeFileSync(cpPath,JSON.stringify(cp,null,2)+'\n');
+          NODE
+          git add "$CONTROL" "$RECEIPT"
+          git config user.name gravicentra-recovery-bot
+          git config user.email gravicentra-recovery-bot@users.noreply.github.com
+          git commit -m "test(b4-004): seal policy capture LIVE focal pass"
+          git fetch origin "$GITHUB_REF_NAME"
+          test "$(git rev-parse "origin/$GITHUB_REF_NAME")" = "$GITHUB_SHA"
+          git push origin "HEAD:$GITHUB_REF_NAME"
+      - name: Preserve LIVE proof artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gravicentra-b4-004-policy-capture-live-\${{ github.run_id }}
+          path: \${{ runner.temp }}/b4-004-policy-capture-live-qa.json
+          if-no-files-found: warn
+          retention-days: 30
