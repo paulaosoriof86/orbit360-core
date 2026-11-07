@@ -4327,7 +4327,6 @@ jobs:
       CATALOG_MODE: >-
         ${{ github.event.head_commit.message == 'deploy(b4-003): exact isolated LIVE tenant catalogs canonical successor' && 'deploy' || 'readback' }}
       ORBIT360_FUNCTIONS_REGION: us-central1
-      GI_CATALOG_INVENTORY_PATH: ${{ runner.temp }}/gi-b4003-tenant-config-before-inventory.json
       SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
       SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
       SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
@@ -4344,6 +4343,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          echo "GI_CATALOG_INVENTORY_PATH=$RUNNER_TEMP/gi-b4003-tenant-config-before-inventory.json" >> "$GITHUB_ENV"
           test "$(git rev-parse HEAD)" = "$RELEASE_HEAD"
           test "$(git ls-remote origin refs/heads/recovery/fase-a-clean-20260831 | awk '{print $1}')" = "$RELEASE_HEAD"
           git merge-base --is-ancestor f1321d6bea245411fd09e9ae414d58510551ef3b HEAD

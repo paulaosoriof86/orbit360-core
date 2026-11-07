@@ -56,6 +56,12 @@ try{
  check('old diagnostic cannot activate',()=>assert.throws(()=>t.validateActivation({...activation,reviewedReadbackRunId:42400488638},grant,before),/ACTIVATION_FRESH_READBACK/));
  for(const [message,expected] of [[t.READ_SUBJECT,'readback'],[t.READ_SUBJECT+'\n\n[october-private-readback]','readback'],[t.READ_SUBJECT+' extra',null],[t.DEPLOY_SUBJECT,'deploy'],[t.DEPLOY_SUBJECT+'\n\nbody',null],[t.DEPLOY_SUBJECT+' extra',null],['ordinary commit',null]])check('routing '+JSON.stringify(message),()=>assert.equal(t.requestedMode(message),expected));
  const workflow=fs.readFileSync(path.join(root,'.github/workflows/gravicentra-b4-003-executor.yml'),'utf8');
+ // GitHub validates job env before assigning a runner; runner/steps/job/env are unavailable there.
+ const catalogJobHeader=workflow.split('\n  b4-003-live-tenant-config-causal:\n')[1].split('\n    steps:\n')[0];
+ const jobEnv=catalogJobHeader.split('\n    env:\n')[1];
+ const validateJobEnvContexts=source=>{for(const expression of source.matchAll(/\$\{\{([\s\S]*?)\}\}/g)){const literalsRemoved=expression[1].replace(/'(?:[^']|'')*'/g,"''");for(const token of literalsRemoved.matchAll(/(?<![.\w])([A-Za-z_][A-Za-z0-9_]*)\s*\./g))assert.ok(['github','needs','strategy','matrix','vars','secrets','inputs'].includes(token[1]),'UNAVAILABLE_JOB_ENV_CONTEXT:'+token[1]);}};
+ check('job env uses only contexts available before runner allocation',()=>validateJobEnvContexts(jobEnv));
+ check('published runner.temp job env regression is rejected',()=>assert.throws(()=>validateJobEnvContexts(jobEnv+'\n      GI_CATALOG_INVENTORY_PATH: ${{ runner.temp }}/inventory.json'),/UNAVAILABLE_JOB_ENV_CONTEXT:runner/));
  const condition=job=>{const block=workflow.split('\n  '+job+':\n')[1];assert.ok(block);return JSON.parse(block.match(/^    if: (.+)$/m)[1]);};
  const evaluate=(expr,message)=>Function('github','startsWith','format','fromJSON','return ('+expr+')')({event_name:'push',event:{head_commit:{message}}},(a,b)=>a.startsWith(b),(template,...args)=>template.replace(/\{(\d+)\}/g,(_,i)=>args[+i]),s=>JSON.parse(s.replace(/\n/g,'\\n')));
  for(const message of [t.READ_SUBJECT,t.READ_SUBJECT+'\n\n[october-private-readback]',t.DEPLOY_SUBJECT])check('actual workflow chooses only catalog job',()=>{assert.equal(evaluate(condition('b4-003-live-tenant-config-causal'),message),true);assert.equal(evaluate(condition('b4-003-renewals-cancelations-preview'),message),false);});

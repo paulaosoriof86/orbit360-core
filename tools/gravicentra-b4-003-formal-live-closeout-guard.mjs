@@ -384,7 +384,7 @@ const CATALOG_ACTIVATION=ROOT+'I6_5_B4_003_LIVE_TENANT_CONFIG_DEPLOY_ACTIVATION_
 const CATALOG_PINS={
   ".github/workflows/gravicentra-b4-003-executor.yml": [
     "8178fdfd8c4c16a1b1bf17432c87e6b5115cdd4e",
-    "bdbfdd2c75be755dd8b3b1447424b43f799b7c44"
+    "6344a5b9603390014bed2cf8a564ccb11f542ba4"
   ],
   "tools/gravicentra-b4-003-isolated-tenant-config-package.cjs": [
     null,
@@ -396,7 +396,7 @@ const CATALOG_PINS={
   ],
   "tools/gravicentra-b4-003-live-tenant-config-transport.test.cjs": [
     null,
-    "1ca6a63fd86e97bcdf4226bd55244378d8fc49f4"
+    "f257b8feae5755df1cdf1a8ca97c9628ddca3086"
   ],
   "tools/gravicentra-b4-003-tenant-config-functional.test.cjs": [
     null,

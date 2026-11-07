@@ -492,7 +492,7 @@
     "schema": "GRAVICENTRA_OWNER_DOCUMENTARY_SUCCESSOR_VALIDATION_V1",
     "baseHead": "74312cc3621ba155ee288a0afb530a488246f0e6",
     "guardPath": "tools/gravicentra-b4-003-formal-live-closeout-guard.mjs",
-    "guardBlobSha": "2869e98c830b05bc053aedde9bab5fc6f54db308",
+    "guardBlobSha": "bcfa4a3ca41396705179672fa9ff0b14df524042",
     "testPath": "tools/gravicentra-b4-003-owner-decision-successor.test.mjs",
     "testBlobSha": "6b18e69ad9196ce9d4ebec821928e619fb9fd300",
     "sealedMasterPlanBlobPreserved": "458c5af57b2f7d9453d0064eba0cd737edf14ef4",
@@ -1639,8 +1639,8 @@
       {
         "path": ".github/workflows/gravicentra-b4-003-executor.yml",
         "previousBlobSha": "8178fdfd8c4c16a1b1bf17432c87e6b5115cdd4e",
-        "blobSha": "bdbfdd2c75be755dd8b3b1447424b43f799b7c44",
-        "sha256": "88661fbfe6c89281774f4ced7e188fe885323ac80a4bf60ba8eed4106b9fbaff"
+        "blobSha": "6344a5b9603390014bed2cf8a564ccb11f542ba4",
+        "sha256": "4e314e50c41e4cc7de3daa7cb91775c34c694e5e1ed639d694ffec5370ac1817"
       },
       {
         "path": "tools/gravicentra-b4-003-isolated-tenant-config-package.cjs",
@@ -1657,8 +1657,8 @@
       {
         "path": "tools/gravicentra-b4-003-live-tenant-config-transport.test.cjs",
         "previousBlobSha": null,
-        "blobSha": "1ca6a63fd86e97bcdf4226bd55244378d8fc49f4",
-        "sha256": "87ef21e3e3ae435aef7afe834d5b1f2cf086ed587b51a0962647b9d020ccd984"
+        "blobSha": "f257b8feae5755df1cdf1a8ca97c9628ddca3086",
+        "sha256": "b82b6956bf627385b0f66da04798929950597bd1792914f799778f525ae3ebef"
       },
       {
         "path": "tools/gravicentra-b4-003-tenant-config-functional.test.cjs",
@@ -1666,7 +1666,26 @@
         "blobSha": "0fc50301dfa6458c8d11e0028698c46b57f8cb8a",
         "sha256": "7efdfcc3dbb02b1d79ff6eaec80453d27643764f23f1d69515a1739d1423921b"
       }
-    ]
+    ],
+    "workflowValidationCorrection": {
+      "schema": "GRAVICENTRA_CATALOG_WORKFLOW_CONTEXT_CORRECTION_V1",
+      "failedSourceHead": "69c82bf4659c260192df11424f510caf79bd0ca7",
+      "failedRunId": 42403208230,
+      "failureClass": "WORKFLOW_VALIDATION_BEFORE_JOBS",
+      "jobsStarted": 0,
+      "deployExecuted": false,
+      "cause": "runner.temp is unavailable in jobs.<job_id>.env before runner allocation.",
+      "officialContextReference": "https://docs.github.com/en/actions/reference/workflows-and-actions/contexts#context-availability",
+      "correction": "Resolve the same inventory path from RUNNER_TEMP in the first step and persist it through GITHUB_ENV.",
+      "previousExecutorBlobSha": "bdbfdd2c75be755dd8b3b1447424b43f799b7c44",
+      "correctedExecutorBlobSha": "6344a5b9603390014bed2cf8a564ccb11f542ba4",
+      "regressionBefore": "UNAVAILABLE_JOB_ENV_CONTEXT:runner",
+      "nextRunMode": "READBACK_ONLY",
+      "newActivationCreated": false,
+      "canonicalFunctionSourceChanged": false,
+      "frontendArtifactChanged": false,
+      "readerGrantChanged": false
+    }
   },
   "currentExecutionObserved20261107": {
     "schema": "GRAVICENTRA_CURRENT_EXECUTION_OBSERVATION_20261107_V1",

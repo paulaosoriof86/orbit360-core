@@ -629,7 +629,7 @@
     "status": "OWNER_DECISIONS_AND_WORK_PLAN_FROZEN",
     "recordedAtUtc": "2026-11-07T18:47:29Z",
     "path": "artifacts/orbit360-recovery/release-control/OWNER_DECISION_FREEZE_AND_RECONCILIATION_PLAN_20261107.json",
-    "blobSha": "3f70071ae8479a15c7066c62a9aeb0452090316b",
+    "blobSha": "a44cbff2b0b9b3fb87dee365c04925650cb8ffae",
     "planPath": "artifacts/orbit360-recovery/release-control/PLAN_OPERATIVO_DECISIONES_PAULA_20261107.md",
     "planBlobSha": "b9c9266de72a9155b37b9fb742225da6c91a90d1",
     "authorityBaseHead": "74312cc3621ba155ee288a0afb530a488246f0e6",
