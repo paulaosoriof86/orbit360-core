@@ -75,9 +75,8 @@
     "historicalOpsLeadsGenericAuthors": "NO_RETROACTIVE_REWRITE_NOT_RELEASE_BLOCKING",
     "insurerCredentialPreviewVault": "SEPARATE_FROM_LIVE; HISTORICAL_CREDENTIAL_TESTS_3_OF_3_PRESERVED; LIVE_RECHECK_AFTER_SAME_ARTIFACT_PROMOTION",
     "nextOnly": [
-      "Execute exactly one authorized LIVE synthetic insurer create through the pinned owner, then actual Paula browser reload/readback.",
-      "Execute the same-scope atomic remove plus audit once, then canonical absence and actual UI reload absence.",
-      "Verify final affected-module integrity and exact LIVE identity; only then reconcile formal LIVE acceptance and B4-003 closure."
+      "Run the single remaining-session continuation: exact synthetic insurer create, actual Paula UI reload/read inside the240second window, then automatic atomic cleanup with the same token.",
+      "After the job, verify canonical cleanup/audit, actual UI absence/reload and final affected-module integrity, then close B4-003 only with real PASS evidence."
     ],
     "doNotRebuildForMetadata": true,
     "firestoreRulesNoRoutineBlocker": true,
@@ -160,7 +159,7 @@
       "actualDurableCommentActorFieldsRequireProspectiveReview": true,
       "continuityReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CURRENT40_LEADS_NEW_HUMAN_AUTHOR_SYNTHETIC_UI_20261106.json"
     },
-    "asOfUtc": "2026-11-07T02:08:09Z",
+    "asOfUtc": "2026-11-07T02:24:53Z",
     "continuityRecovery20261106": {
       "recordedAtUtc": "2026-11-06T22:03:41Z",
       "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CURRENT40_LEADS_NEW_HUMAN_AUTHOR_SYNTHETIC_UI_20261106.json",
@@ -867,9 +866,8 @@
         "Actual Paula LIVE Inicio reached5/5 server sources; 320px and390px screenshots showed complete currency values and no page horizontal overflow; viewport restored. Renovaciones board and assigned Asesor reduced Cliente360 scope/insurer denial readbacks completed."
       ],
       "next": [
-        "Execute exactly one authorized LIVE synthetic insurer create through the pinned owner, then actual Paula browser reload/readback.",
-        "Execute the same-scope atomic remove plus audit once, then canonical absence and actual UI reload absence.",
-        "Verify final affected-module integrity and exact LIVE identity; only then reconcile formal LIVE acceptance and B4-003 closure."
+        "Run the single remaining-session continuation: exact synthetic insurer create, actual Paula UI reload/read inside the240second window, then automatic atomic cleanup with the same token.",
+        "After the job, verify canonical cleanup/audit, actual UI absence/reload and final affected-module integrity, then close B4-003 only with real PASS evidence."
       ],
       "noNewFixtures": true,
       "noAdditionalPaulaResponseRequired": true,
@@ -1173,7 +1171,7 @@
           "b4003Closed": false
         }
       ],
-      "nextReadOnlyAction": "Execute exactly one authorized LIVE synthetic insurer create through the pinned owner, then actual Paula browser reload/readback. Execute the same-scope atomic remove plus audit once, then canonical absence and actual UI reload absence. Verify final affected-module integrity and exact LIVE identity; only then reconcile formal LIVE acceptance and B4-003 closure.",
+      "nextReadOnlyAction": "Run the single remaining-session continuation: exact synthetic insurer create, actual Paula UI reload/read inside the240second window, then automatic atomic cleanup with the same token. After the job, verify canonical cleanup/audit, actual UI absence/reload and final affected-module integrity, then close B4-003 only with real PASS evidence.",
       "rollbackCertifiedByThisAttempt": true,
       "productionPromotionAuthorized": false,
       "parserFix": "Normalize only observed projects/646761409743/ qualified version resources after exact project/site/channel validation; retain original observed names.",
@@ -1503,9 +1501,8 @@
       "reportesGtRows": 2503,
       "historialGtInteractions": 23,
       "remaining": [
-        "Execute exactly one authorized LIVE synthetic insurer create through the pinned owner, then actual Paula browser reload/readback.",
-        "Execute the same-scope atomic remove plus audit once, then canonical absence and actual UI reload absence.",
-        "Verify final affected-module integrity and exact LIVE identity; only then reconcile formal LIVE acceptance and B4-003 closure."
+        "Run the single remaining-session continuation: exact synthetic insurer create, actual Paula UI reload/read inside the240second window, then automatic atomic cleanup with the same token.",
+        "After the job, verify canonical cleanup/audit, actual UI absence/reload and final affected-module integrity, then close B4-003 only with real PASS evidence."
       ],
       "formalLiveAcceptanceGranted": false,
       "liveInicioFiveOfFiveSourcesObserved": true,
@@ -1521,12 +1518,12 @@
       "status": "AUTHORIZED_ONCE",
       "authorized": true,
       "consumed": false,
-      "authorizationReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_ONE_LIVE_SYNTHETIC_INSURER_OWNER_AUTH_20261107.json",
-      "authorizationReceiptBlobSha": "b180b6a3566c6c5f9c0b9f9da66962c00511e963",
+      "authorizationReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_ONE_LIVE_SYNTHETIC_INSURER_OWNER_AUTH_CONTINUATION_20261107.json",
+      "authorizationReceiptBlobSha": "f70d62dedbc298235b27d22a40a3b84e97490d45",
       "planPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_ONE_LIVE_SYNTHETIC_INSURER_PLAN_20261107.json",
       "planSha256": "a318932d732917737953c42a380b884ba200307f5e804c3b32c06662c012dcb6",
-      "executorBlobSha": "21209328d79127f841c522a6e71c18d197653dda",
-      "helperBlobSha": "66995bd06b05e23faade01f5d0f5045d601a9fbe",
+      "executorBlobSha": "ef7166292eea983c2165692725797e0ef46b06fb",
+      "helperBlobSha": "1fed5804c9e6a072b2b1c9f0ad3733ec031ada51",
       "projectId": "ays-orbit-360-lab",
       "tenantId": "alianzas-soluciones",
       "origin": "https://ays-orbit-360-lab.web.app",
@@ -1568,17 +1565,64 @@
       "rebuildOrDeployAuthorized": false,
       "reimportAuthorized": false,
       "acceptanceGranted": false,
-      "createEvidencePath": null,
-      "createEvidenceBlobSha": null,
+      "createEvidencePath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_ONE_LIVE_SYNTHETIC_INSURER_CREATE_ATTEMPT_20261107.json",
+      "createEvidenceBlobSha": "98d59774740eae283ac395c130621d9f4ebf9d41",
       "uiCreateReadbackPath": null,
       "uiCreateReadbackBlobSha": null,
       "recoveryOnly": false,
-      "createRunId": null,
+      "createRunId": 42327828328,
       "cleanupRunId": null,
       "createAuthorizedParentSha": "891f5c573abbecb1206ced40e30934217dc300cf",
       "cleanupAuthorizedParentSha": null,
       "authorizedAtUtc": "2026-11-07T02:08:09Z",
-      "ownerMessageReference": "CURRENT_CONVERSATION_USER_AUTORIZO_IN_RESPONSE_TO_EXACT_LIVE_TEST_CLEANUP_AND_TWO_TEMPORARY_ACCESS_REQUEST"
+      "ownerMessageReference": "CURRENT_CONVERSATION_USER_AUTORIZO_IN_RESPONSE_TO_EXACT_LIVE_TEST_CLEANUP_AND_TWO_TEMPORARY_ACCESS_REQUEST",
+      "completeRunId": null,
+      "completeAuthorizedParentSha": "0bb30a3b9cd23d7e86610fed0d43c689e10e8cb2",
+      "tokensPreviouslyIssued": 1,
+      "remainingTokenBudget": 1,
+      "continuationMode": "COMPLETE_WITH_ONE_REMAINING_TOKEN",
+      "previousAuthorizationReceiptBlobSha": "b180b6a3566c6c5f9c0b9f9da66962c00511e963",
+      "previousHelperBlobSha": "66995bd06b05e23faade01f5d0f5045d601a9fbe",
+      "previousExecutorBlobSha": "21209328d79127f841c522a6e71c18d197653dda",
+      "continuationTechnicalNote": {
+        "schema": "B4_003_LAST_TOKEN_CAUSAL_CONTINUATION_NOTE_V1",
+        "cause": "REST_SIGN_IN_WITH_CUSTOM_TOKEN_DOES_NOT_REQUIRE_LOCAL_ID",
+        "officialRestUrl": "https://firebase.google.com/docs/reference/rest/auth#section-verify-custom-token",
+        "officialVerificationUrl": "https://firebase.google.com/docs/auth/admin/verify-id-tokens",
+        "correction": "Verify returned idToken using Firebase Admin verifyIdToken(checkRevoked=true); compare verified uid/sub/aud/iss. Do not require response.localId.",
+        "previousAttempt": {
+          "runId": 42327828328,
+          "jobId": 128267147052,
+          "tokensIssued": 1,
+          "canonicalOwnerPosts": 0,
+          "mutations": 0,
+          "failureReceiptBlobSha": "98d59774740eae283ac395c130621d9f4ebf9d41"
+        },
+        "authorizedMaximumTokensUnchanged": 2,
+        "tokensPreviouslyIssued": 1,
+        "remainingTokenBudget": 1,
+        "mode": "One complete invocation with one token: same fixed create, canonical readback, 240-second technical UI window, same atomic cleanup and final canonical readback.",
+        "uiWindowMs": 240000,
+        "uiEvidence": "Root uses existing actual Paula browser session; helper neither collects nor claims UI proof. Cleanup happens when window ends whether UI succeeded or failed.",
+        "noHandshakeOrRepositoryMutationDuringJob": true,
+        "previousCreateParentRebound": false,
+        "previousCreateParentSha": "891f5c573abbecb1206ced40e30934217dc300cf",
+        "completeAuthorizedParentSha": "0bb30a3b9cd23d7e86610fed0d43c689e10e8cb2",
+        "noNewOwnerPermissionClaimed": true,
+        "sameFixtureCommandsAuditAndPlan": true,
+        "planSha256": "a318932d732917737953c42a380b884ba200307f5e804c3b32c06662c012dcb6",
+        "previousPins": {
+          "helperBlobSha": "66995bd06b05e23faade01f5d0f5045d601a9fbe",
+          "executorBlobSha": "21209328d79127f841c522a6e71c18d197653dda",
+          "authorizationReceiptBlobSha": "b180b6a3566c6c5f9c0b9f9da66962c00511e963"
+        },
+        "newPins": {
+          "helperBlobSha": "1fed5804c9e6a072b2b1c9f0ad3733ec031ada51",
+          "executorBlobSha": "ef7166292eea983c2165692725797e0ef46b06fb"
+        },
+        "expectedTerminalStatus": "CLEANED_CANONICAL_ABSENCE_UI_EVIDENCE_REQUIRED",
+        "b4003Closed": false
+      }
     }
   },
   "b4003LeadsCurrent40ProspectiveHumanActorFocal20261106": {

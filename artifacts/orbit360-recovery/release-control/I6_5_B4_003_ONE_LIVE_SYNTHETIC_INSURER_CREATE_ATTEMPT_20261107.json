@@ -1,0 +1,60 @@
+{
+  "schema": "B4_003_ONE_LIVE_SYNTHETIC_PHASE_EVIDENCE_V1",
+  "status": "HOLD",
+  "phase": "create",
+  "fixtureId": "asg_mw5qeno8",
+  "planSha256": "a318932d732917737953c42a380b884ba200307f5e804c3b32c06662c012dcb6",
+  "sourceSha": "857f1222f360a42a06e012810a1c01bce155a26f",
+  "buildId": "gi-i65-b4-857f1222f360-57f234755dc1",
+  "hostingVersion": "sites/ays-orbit-360-lab/versions/c5e1ae001fae793b",
+  "workflowRunId": "42327828328",
+  "principalUidSha256": "ef23e793fdfeb2213c659fd48a9d628569174bc9cb599f136efe9edad68bd112",
+  "activeRole": "superadmin",
+  "customTokensIssued": 1,
+  "mutationsExecuted": 0,
+  "browserAutomated": false,
+  "visibleUiReloadClaimed": false,
+  "observations": {
+    "beforeExists": false,
+    "sideEffectsBefore": {
+      "boundedEqualityQueriesOnly": true,
+      "collections": 5,
+      "fields": [
+        "aseguradoraId",
+        "entidadId",
+        "entityId",
+        "recordId",
+        "payload.aseguradoraId",
+        "data.aseguradoraId",
+        "context.aseguradoraId"
+      ],
+      "matches": 0,
+      "unknownSchemaAbsenceNotClaimed": true
+    }
+  },
+  "errors": [
+    "SIGNED_PAULA_UID"
+  ],
+  "recordedAtUtc": "2026-11-07T02:15:11Z",
+  "runnerCommit": "0bb30a3b9cd23d7e86610fed0d43c689e10e8cb2",
+  "jobId": 128267147052,
+  "artifactId": 13555743414,
+  "artifactZipSha256": "ed28af8eea1262d260c51e055121939452ae57d659e7d4a050c6c0ea3303d5fa",
+  "authorizationReceiptBlobSha": "b180b6a3566c6c5f9c0b9f9da66962c00511e963",
+  "helperBlobSha": "66995bd06b05e23faade01f5d0f5045d601a9fbe",
+  "executorBlobSha": "21209328d79127f841c522a6e71c18d197653dda",
+  "canonicalOwnerPostSubmitted": false,
+  "canonicalOwnerPostNotSubmittedBasis": "Pinned helper invokes need(SIGNED_PAULA_UID) before assigning the session token and before any call(); receipt has no createRequestSubmittedAtUtc, status HOLD, mutationsExecuted0 and error SIGNED_PAULA_UID.",
+  "temporaryAccessBudget": {
+    "authorizedMaximum": 2,
+    "alreadyIssued": 1,
+    "remainingMaximum": 1
+  },
+  "cause": {
+    "code": "INCORRECT_REST_CUSTOM_TOKEN_RESPONSE_LOCALID_ASSUMPTION",
+    "verifiedContract": "The documented signInWithCustomToken success response has idToken/refreshToken/expiresIn, not a required localId. Correct existing-account binding uses Admin verifyIdToken and exact uid/aud/iss.",
+    "officialRestUrl": "https://firebase.google.com/docs/reference/rest/auth#section-verify-custom-token"
+  },
+  "acceptanceGranted": false,
+  "b4003Closed": false
+}

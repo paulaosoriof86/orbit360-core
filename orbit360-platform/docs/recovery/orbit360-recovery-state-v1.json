@@ -10,7 +10,7 @@
   "branch": "recovery/fase-a-clean-20260831",
   "forensicOriginSha": "9c95f31461f2eabe9804625b5659bee772f5602a",
   "createdAtUtc": "2026-08-31T18:00:00Z",
-  "updatedAtUtc": "2026-11-07T02:08:09Z",
+  "updatedAtUtc": "2026-11-07T02:24:53Z",
   "status": "ITERATION_2_SOURCE_MATERIALIZED_VALIDATION_PENDING",
   "currentIteration": 2,
   "lastCompletedIteration": 1,
@@ -187,7 +187,7 @@
     "phaseAIterationStatuses": "HISTORICAL_FIELDS_ABOVE_PRESERVED_UNTIL_FORMAL_GATE_EVIDENCE;_NO_NEW_PASS_INFERRED",
     "labDataWriteScope": "ONLY_35_AUTHORIZED_COUNTRY_FIELDS;_NO_AUGUST_REFRESH"
   },
-  "nextAction": "Owner explicitly authorized the exact single LIVE synthetic insurer plus atomic cleanup/audit and at most two temporary existing-Paula authentication accesses. Scope liveSyntheticInsurerWrite20261107 binds frozen plan/helper/executor and one parent per phase. Execute exactly one authorized LIVE synthetic insurer create through the pinned owner, then actual Paula browser reload/readback. Execute the same-scope atomic remove plus audit once, then canonical absence and actual UI reload absence. Verify final affected-module integrity and exact LIVE identity; only then reconcile formal LIVE acceptance and B4-003 closure. Preserve15cert/16current evidence and2owner-deferred QA cohorts; no rebuild, redeploy, reimport or real-business mutation.",
+  "nextAction": "B4-003 remains open. Exact one-insurer LIVE creation attempt42327828328 stopped before any owner POST with1temporary access consumed;0business mutations. Official Auth response validation defect corrected in test helper only. Existing owner authorization still permits the same sole fixture create and atomic cleanup, using only the one remaining access in a single240second UI-window invocation. Preserve failed attempt and original parent; no rerun/remint. Run the single remaining-session continuation: exact synthetic insurer create, actual Paula UI reload/read inside the240second window, then automatic atomic cleanup with the same token. After the job, verify canonical cleanup/audit, actual UI absence/reload and final affected-module integrity, then close B4-003 only with real PASS evidence.",
   "sourceOfTruth": {
     "projectBoundaryPrevalentAddendum": "orbit360-platform/docs/recovery/ADDENDUM_PREVALENTE_CHATGPT_PROJECT_BOUNDARY_20260831.md",
     "mutableState": "orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json",
@@ -443,7 +443,7 @@
     "noDataWrites": true
   },
   "b4003ActiveCertificationResume20261106": {
-    "recordedAtUtc": "2026-11-07T02:08:09Z",
+    "recordedAtUtc": "2026-11-07T02:24:53Z",
     "authorityPath": "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json",
     "cursorKey": "b4003ActiveCertificationCursor20261106",
     "inventoryKey": "b4003CertificationInventory20261106",
@@ -478,9 +478,8 @@
     "fixtureCleanupReadbackPending": false,
     "extraResponseAndReverseReloadRequired": false,
     "minimumNext": [
-      "Execute exactly one authorized LIVE synthetic insurer create through the pinned owner, then actual Paula browser reload/readback.",
-      "Execute the same-scope atomic remove plus audit once, then canonical absence and actual UI reload absence.",
-      "Verify final affected-module integrity and exact LIVE identity; only then reconcile formal LIVE acceptance and B4-003 closure."
+      "Run the single remaining-session continuation: exact synthetic insurer create, actual Paula UI reload/read inside the240second window, then automatic atomic cleanup with the same token.",
+      "After the job, verify canonical cleanup/audit, actual UI absence/reload and final affected-module integrity, then close B4-003 only with real PASS evidence."
     ],
     "evidenceReceiptBlobSha": "3a5dc252cfeeb4408ba0f88924b836d8c7637fe4",
     "retainedHostingPreflightStatus": "FORMAL_EXACT42_PREVIEW_PASS_GUARDED_SAME_ARTIFACT_LIVE_AUTHORIZED",
@@ -546,8 +545,11 @@
     "browserUserTechnicalActionRequired": false,
     "liveSyntheticPlanPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_ONE_LIVE_SYNTHETIC_INSURER_PLAN_20261107.json",
     "liveSyntheticPlanSha256": "a318932d732917737953c42a380b884ba200307f5e804c3b32c06662c012dcb6",
-    "liveSyntheticAuthorizationStatus": "AUTHORIZED_ONCE",
-    "liveSyntheticHelperBlobSha": "66995bd06b05e23faade01f5d0f5045d601a9fbe",
-    "liveSyntheticExecutorBlobSha": "21209328d79127f841c522a6e71c18d197653dda"
+    "liveSyntheticAuthorizationStatus": "AUTHORIZED_ONCE_REMAINING_SESSION_CONTINUATION",
+    "liveSyntheticHelperBlobSha": "1fed5804c9e6a072b2b1c9f0ad3733ec031ada51",
+    "liveSyntheticExecutorBlobSha": "ef7166292eea983c2165692725797e0ef46b06fb",
+    "liveSyntheticFailedCreateRunId": 42327828328,
+    "liveSyntheticTokensAlreadyIssued": 1,
+    "liveSyntheticRemainingTokenBudget": 1
   }
 }

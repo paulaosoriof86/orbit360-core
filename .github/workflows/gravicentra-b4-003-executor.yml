@@ -78,7 +78,7 @@ concurrency:
 jobs:
   b4-003-renewals-cancelations-preview:
     # Both exact retained requests skip the legacy Preview build/deploy job.
-    if: "!(github.event_name == 'push' && (github.event.head_commit.message == 'test(b4-003): retained artifact Hosting preflight' || (github.event.head_commit.message == 'test(b4-003): certify retained rollback in existing Preview' || github.event.head_commit.message == 'release(b4-003): promote exact retained Hosting version') || github.event.head_commit.message == 'test(b4-003): read three synthetic archive states' || github.event.head_commit.message == 'test(b4-003): create one synthetic insurer LIVE' || github.event.head_commit.message == 'test(b4-003): cleanup one synthetic insurer LIVE'))"
+    if: "!(github.event_name == 'push' && (github.event.head_commit.message == 'test(b4-003): retained artifact Hosting preflight' || (github.event.head_commit.message == 'test(b4-003): certify retained rollback in existing Preview' || github.event.head_commit.message == 'release(b4-003): promote exact retained Hosting version') || github.event.head_commit.message == 'test(b4-003): read three synthetic archive states' || github.event.head_commit.message == 'test(b4-003): create one synthetic insurer LIVE' || github.event.head_commit.message == 'test(b4-003): cleanup one synthetic insurer LIVE' || github.event.head_commit.message == 'test(b4-003): complete one synthetic insurer LIVE'))"
     runs-on: ubuntu-24.04
     timeout-minutes: 45
     env:
@@ -4046,10 +4046,10 @@ jobs:
           rm -rf -- "$RUNNER_TEMP/gi-b4003-archive-readback-auth"
 
 
-  # One authorized synthetic insurer, in separate create and cleanup phases.
+  # One exact insurer; complete continues the consumed create run within its remaining token budget.
   # Pending CP scope fails before any service-account secret or token is used.
   b4003_one_live_synthetic_insurer:
-    if: "github.event_name == 'push' && (github.event.head_commit.message == 'test(b4-003): create one synthetic insurer LIVE' || github.event.head_commit.message == 'test(b4-003): cleanup one synthetic insurer LIVE')"
+    if: "github.event_name == 'push' && (github.event.head_commit.message == 'test(b4-003): create one synthetic insurer LIVE' || github.event.head_commit.message == 'test(b4-003): cleanup one synthetic insurer LIVE' || github.event.head_commit.message == 'test(b4-003): complete one synthetic insurer LIVE')"
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     permissions:
@@ -4064,7 +4064,7 @@ jobs:
       B4_LIVE_SYNTHETIC_EXECUTION_NONCE: B4-003-LIVE-ONE-INSURER-mw5qeno8
       B4_LIVE_SYNTHETIC_PLAN: artifacts/orbit360-recovery/release-control/I6_5_B4_003_ONE_LIVE_SYNTHETIC_INSURER_PLAN_20261107.json
       B4_LIVE_SYNTHETIC_HELPER: tools/gravicentra-b4-003-one-live-synthetic-insurer.mjs
-      B4_LIVE_SYNTHETIC_PHASE: "${{ github.event.head_commit.message == 'test(b4-003): create one synthetic insurer LIVE' && 'create' || 'cleanup' }}"
+      B4_LIVE_SYNTHETIC_PHASE: "${{ github.event.head_commit.message == 'test(b4-003): create one synthetic insurer LIVE' && 'create' || github.event.head_commit.message == 'test(b4-003): cleanup one synthetic insurer LIVE' && 'cleanup' || 'complete' }}"
       B4_LIVE_SYNTHETIC_OUT: ${{ github.workspace }}/.b4-preflight-temp/live-synthetic-insurer
       B4_LIVE_SYNTHETIC_DEPS_ROOT: ${{ github.workspace }}/.b4-preflight-temp/live-synthetic-deps
     steps:
@@ -4120,20 +4120,29 @@ jobs:
             same(env.GITHUB_REF,'refs/heads/recovery/fase-a-clean-20260831','BRANCH_MISMATCH');
             const event=JSON.parse(fs.readFileSync(env.GITHUB_EVENT_PATH,'utf8'));
             const messages={create:'test(b4-003): create one synthetic insurer LIVE',
-              cleanup:'test(b4-003): cleanup one synthetic insurer LIVE'};
+              cleanup:'test(b4-003): cleanup one synthetic insurer LIVE',
+              complete:'test(b4-003): complete one synthetic insurer LIVE'};
             need(Object.hasOwn(messages,env.B4_LIVE_SYNTHETIC_PHASE),'PHASE_NOT_SUPPORTED');
             same(event.head_commit?.message,messages[env.B4_LIVE_SYNTHETIC_PHASE],'EXACT_MESSAGE_REQUIRED');
             same(event.head_commit?.id,env.GITHUB_SHA,'EVENT_HEAD_MISMATCH');
             const cpBytes=fs.readFileSync(env.CONTROL),cp=JSON.parse(cpBytes);
             const cur=cp[env.B4_CURSOR_KEY],scope=cur?.[env.B4_LIVE_SYNTHETIC_KEY];
             need(scope?.status==='AUTHORIZED_ONCE'&&scope.authorized===true&&scope.consumed===false,'OWNER_AUTHORIZATION_PENDING_OR_CONSUMED');
-            const parentKey=env.B4_LIVE_SYNTHETIC_PHASE==='create'?'createAuthorizedParentSha':'cleanupAuthorizedParentSha';
+            const parentKey={create:'createAuthorizedParentSha',cleanup:'cleanupAuthorizedParentSha',
+              complete:'completeAuthorizedParentSha'}[env.B4_LIVE_SYNTHETIC_PHASE];
             const authorizedParent=scope[parentKey];
             need(/^[0-9a-f]{40}$/.test(authorizedParent||'')&&!/^0{40}$/.test(authorizedParent),'AUTHORIZED_PARENT_SHA_MISSING_OR_INVALID');
             same(event.before,authorizedParent,'AUTHORIZED_PARENT_MISMATCH');
             need(event.forced!==true&&event.created!==true&&event.deleted!==true,'PUSH_REF_TRANSITION_NOT_ALLOWED');
             same(event.ref,'refs/heads/recovery/fase-a-clean-20260831','EVENT_REF_MISMATCH');
             need(Array.isArray(event.commits)&&event.commits.length===1&&event.commits[0]?.id===env.GITHUB_SHA,'EXACT_SINGLE_COMMIT_REQUIRED');
+            if(env.B4_LIVE_SYNTHETIC_PHASE==='complete'){
+              same(scope.completeRunId,null,'COMPLETE_RUN_ALREADY_BOUND_OR_MISSING');
+              same(scope.cleanupRunId,null,'CLEANUP_RUN_ALREADY_BOUND_OR_MISSING');
+              same(Number(scope.createRunId),42327828328,'CONSUMED_CREATE_RUN_MISMATCH');
+              same(scope.tokensPreviouslyIssued,1,'PRIOR_TOKEN_COUNT_MISMATCH');
+              same(scope.remainingTokenBudget,1,'REMAINING_TOKEN_BUDGET_MISMATCH');
+            }
             need(cur.b4003Closed!==true,'B4_ALREADY_CLOSED');
             same(cur.activeSourceSha,pin.sourceSha,'CURSOR_SOURCE_MISMATCH');
             same(cur.activeBuildId,pin.buildId,'CURSOR_BUILD_MISMATCH');

@@ -18,6 +18,11 @@ export const FIXED=Object.freeze({
  endpoint:'https://us-central1-ays-orbit-360-lab.cloudfunctions.net/orbit360ProductOperationalCommand',
  createRequest:'b4003_live_create_mw5qeno8',cleanupRequest:'b4003_live_cleanup_mw5qeno8',
  audit:'audasg_b4003_live_mw5qeno8',
+ failedCreateRun:'42327828328',failedCreateParent:'891f5c573abbecb1206ced40e30934217dc300cf',
+ failedCreateReceiptBlob:'98d59774740eae283ac395c130621d9f4ebf9d41',
+ previousConsentBlob:'b180b6a3566c6c5f9c0b9f9da66962c00511e963',
+ previousHelperBlob:'66995bd06b05e23faade01f5d0f5045d601a9fbe',
+ previousExecutorBlob:'21209328d79127f841c522a6e71c18d197653dda',uiWindowMs:240000,
  planPath:'artifacts/orbit360-recovery/release-control/I6_5_B4_003_ONE_LIVE_SYNTHETIC_INSURER_PLAN_20261107.json'
 });
 const SELF=fileURLToPath(import.meta.url);
@@ -43,7 +48,7 @@ export function normalizeVersionResource(raw){
  need(/^sites\/ays-orbit-360-lab\/versions\/[A-Za-z0-9_-]+$/.test(value),'HOSTING_VERSION_SITE_MISMATCH');return value;
 }
 export function requireAuthorizedPhasePush(scope,consent,event,phase,headSha){
- const key=phase==='create'?'createAuthorizedParentSha':'cleanupAuthorizedParentSha';
+ const key={create:'createAuthorizedParentSha',cleanup:'cleanupAuthorizedParentSha',complete:'completeAuthorizedParentSha'}[phase];need(key,'PHASE');
  const parent=scope[key];need(/^[a-f0-9]{40}$/.test(parent||'')&&!/^0+$/.test(parent),'AUTHORIZED_PARENT_REQUIRED');
  need(consent[key]===parent,'CONSENT_PARENT_BINDING');
  need(event.before===parent,'AUTHORIZED_PARENT_MISMATCH');
@@ -67,7 +72,7 @@ export function validatePlan(p){
  return true;
 }
 export function authorization(cp,p,phase,bindings){
- validatePlan(p);need(['create','cleanup'].includes(phase),'PHASE');
+ validatePlan(p);need(['create','cleanup','complete'].includes(phase),'PHASE');
  const c=cp.b4003ActiveCertificationCursor20261106,a=c?.liveSyntheticInsurerWrite20261107;
  need(a?.status==='AUTHORIZED_ONCE'&&a.authorized===true&&a.consumed===false,'OWNER_AUTHORIZATION_PENDING');
  need(c.activeSourceSha===FIXED.source&&c.activeBuildId===FIXED.build&&Number(c.activeImmutableArtifactId)===FIXED.artifact,'ACTIVE42');
@@ -80,8 +85,31 @@ export function authorization(cp,p,phase,bindings){
  need(a.principal.accountOrMembershipMutationAuthorized===false&&a.realRecordWritesAuthorized===false&&a.rebuildOrDeployAuthorized===false&&a.reimportAuthorized===false,'SCOPE_BOUNDARIES');
  need(a.fixture?.id===FIXED.fixture&&a.fixture.collection==='aseguradoras'&&a.fixture.maxDistinctIds===1&&JSON.stringify(a.fixture.allowedActions)===JSON.stringify(['insert','remove']),'APPROVED_ONE_FIXTURE');
  need(a.createRequestId===FIXED.createRequest&&a.cleanupRequestId===FIXED.cleanupRequest&&a.auditId===FIXED.audit&&a.atomicExternalAuditInsertAuthorized===true&&a.cleanupOnFailureAuthorized===true,'ATOMIC_CLEANUP_AUTHORIZATION');
- need(!a[phase==='create'?'createRunId':'cleanupRunId'],'PHASE_ALREADY_CONSUMED');
+ need(!a[{create:'createRunId',cleanup:'cleanupRunId',complete:'completeRunId'}[phase]],'PHASE_ALREADY_CONSUMED');
+ if(a.continuationMode==='COMPLETE_WITH_ONE_REMAINING_TOKEN')need(phase==='complete','ONLY_REMAINING_COMPLETE_ALLOWED');
+ if(phase==='complete'){
+  need(a.continuationMode==='COMPLETE_WITH_ONE_REMAINING_TOKEN'&&String(a.createRunId)===FIXED.failedCreateRun&&a.completeRunId===null&&a.cleanupRunId===null,'COMPLETE_PREVIOUS_ATTEMPT_REQUIRED');
+  need(a.tokensPreviouslyIssued===1&&a.remainingTokenBudget===1&&a.createAuthorizedParentSha===FIXED.failedCreateParent,'COMPLETE_BUDGET_AND_CONSUMED_PARENT');
+  need(a.createEvidenceBlobSha===FIXED.failedCreateReceiptBlob,'EXACT_FAILED_CREATE_RECEIPT_REQUIRED');
+ }
  return a;
+}
+export function validateFailedCreateReceipt(prior,planSha){
+ need(prior.schema==='B4_003_ONE_LIVE_SYNTHETIC_PHASE_EVIDENCE_V1'&&prior.phase==='create'&&prior.status==='HOLD'&&String(prior.workflowRunId)===FIXED.failedCreateRun,'FAILED_CREATE_IDENTITY');
+ need(prior.fixtureId===FIXED.fixture&&prior.planSha256===planSha&&prior.sourceSha===FIXED.source&&prior.buildId===FIXED.build&&prior.hostingVersion===FIXED.version,'FAILED_CREATE_BINDING');
+ need(prior.customTokensIssued===1&&prior.mutationsExecuted===0&&prior.observations?.beforeExists===false&&prior.canonicalOwnerPostSubmitted===false,'FAILED_CREATE_NO_MUTATION_PROOF');
+ need(!Object.hasOwn(prior.observations,'createRequestSubmittedAtUtc')&&!Object.hasOwn(prior.observations,'createResponse')&&JSON.stringify(prior.errors)===JSON.stringify(['SIGNED_PAULA_UID']),'FAILED_CREATE_PREPOST_FAILURE');
+ need(prior.helperBlobSha===FIXED.previousHelperBlob&&prior.executorBlobSha===FIXED.previousExecutorBlob&&prior.authorizationReceiptBlobSha===FIXED.previousConsentBlob,'FAILED_CREATE_ORIGINAL_BYTES');
+ need(prior.temporaryAccessBudget?.authorizedMaximum===2&&prior.temporaryAccessBudget.alreadyIssued===1&&prior.temporaryAccessBudget.remainingMaximum===1,'FAILED_CREATE_TOKEN_BUDGET');
+ return true;
+}
+export async function verifiedSessionIdToken(auth,session){
+ need(typeof session.idToken==='string'&&session.idToken.length>0,'SIGNED_PAULA_ID_TOKEN_MISSING');
+ delete session.refreshToken;
+ let decoded;try{decoded=await auth.verifyIdToken(session.idToken,true);}catch{need(false,'SIGNED_PAULA_ID_TOKEN_INVALID');}
+ need(decoded.uid===FIXED.uid&&decoded.sub===FIXED.uid&&decoded.aud===FIXED.project&&decoded.iss==='https://securetoken.google.com/'+FIXED.project,'SIGNED_PAULA_UID');
+ need(Number(decoded.exp)*1000-Date.now()>FIXED.uiWindowMs+180000,'SIGNED_SESSION_CLEANUP_TIME_REQUIRED');
+ return session.idToken;
 }
 async function fetchJson(url,options,code){
  let r;try{r=await fetch(url,{redirect:'error',signal:AbortSignal.timeout(25000),...options});}catch{need(false,code+'_TRANSPORT');}
@@ -120,6 +148,10 @@ async function main(){
  need(consent.operations?.join('|')==='create_exact_synthetic_insurer|readback_and_visible_ui_reload|atomic_remove_plus_external_audit|same_scope_recovery','EXPLICIT_OPERATIONS');
  need(process.env.GITHUB_EVENT_PATH,'CANONICAL_PUSH_EVENT_REQUIRED');
  requireAuthorizedPhasePush(a,consent,JSON.parse(fs.readFileSync(process.env.GITHUB_EVENT_PATH,'utf8')),phase,process.env.GITHUB_SHA);
+ if(phase==='complete'){
+  need(consent.tokensPreviouslyIssued===1&&consent.remainingTokenBudget===1&&consent.cleanupRunId===null&&consent.previousAuthorizationReceiptBlobSha===FIXED.previousConsentBlob&&consent.createAuthorizedParentSha===FIXED.failedCreateParent,'CONSENT_REMAINING_BUDGET');
+  validateFailedCreateReceipt(pinnedReceipt(a.createEvidencePath,a.createEvidenceBlobSha),bindings.planSha);
+ }
  if(phase==='cleanup'){
   const prior=pinnedReceipt(a.createEvidencePath,a.createEvidenceBlobSha);
   need(prior.fixtureId===FIXED.fixture&&prior.planSha256===bindings.planSha&&prior.sourceSha===FIXED.source&&prior.phase==='create','CREATE_EVIDENCE_BINDING');
@@ -140,6 +172,7 @@ async function main(){
  const request=id=>tenant.collection('operationalRequests').doc(id),event=id=>tenant.collection('operationalEvents').doc(eventId(id));
  const fixture=doc('aseguradoras',FIXED.fixture),audit=doc('auditoriaAsegExterna',FIXED.audit);
  const ev={schema:'B4_003_ONE_LIVE_SYNTHETIC_PHASE_EVIDENCE_V1',status:'HOLD',phase,fixtureId:FIXED.fixture,planSha256:bindings.planSha,sourceSha:FIXED.source,buildId:FIXED.build,hostingVersion:FIXED.version,workflowRunId:process.env.GITHUB_RUN_ID||null,principalUidSha256:sha(FIXED.uid),activeRole:FIXED.role,customTokensIssued:0,mutationsExecuted:0,browserAutomated:false,visibleUiReloadClaimed:false,observations:{},errors:[]};
+ if(phase==='complete'){ev.tokensPreviouslyIssued=1;ev.tokenBudgetMaximumTotal=2;ev.previousCreateRunId=FIXED.failedCreateRun;ev.previousCreateReceiptBlobSha=FIXED.failedCreateReceiptBlob;}
  let idToken='',attemptedCreate=false;
  async function call(command){
   await headLease();
@@ -205,7 +238,7 @@ async function main(){
   need(roles.includes(FIXED.role)&&[...(m.countries||[]),...(m.paises||[]),...(m.paisesAutorizados||[])].includes('GT'),'PAULA_ASSIGNED_ROLE_COUNTRY');
   need(u.uid===FIXED.uid&&!u.disabled&&u.emailVerified===true,'EXISTING_ENABLED_VERIFIED_PAULA');
   const before=await fixture.get();ev.observations.beforeExists=before.exists;
-  if(phase==='create'){
+  if(phase==='create'||phase==='complete'){
    const checks=await Promise.all([request(FIXED.createRequest).get(),request(FIXED.cleanupRequest).get(),audit.get(),event(FIXED.createRequest).get(),event(FIXED.cleanupRequest).get()]);
    need(!before.exists&&checks.every(x=>!x.exists),'NEW_EXECUTION_ABSENCE');
   }else{need(before.exists||((await audit.get()).exists&&(await request(FIXED.cleanupRequest).get()).exists),'CLEANUP_SCOPE_NOT_FOUND');if(before.exists)verifyFixture(before.data());}
@@ -218,18 +251,26 @@ async function main(){
   const config=await fetchJson(FIXED.origin+'/__/firebase/init.json',{},'PUBLIC_FIREBASE_CONFIG');need(config.projectId===FIXED.project&&typeof config.apiKey==='string','PUBLIC_CONFIG_PROJECT');
   const customToken=await auth.createCustomToken(FIXED.uid);ev.customTokensIssued=1;
   const session=await fetchJson('https://identitytoolkit.googleapis.com/v1/accounts:signInWithCustomToken?key='+encodeURIComponent(config.apiKey),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:customToken,returnSecureToken:true})},'EPHEMERAL_SIGN_IN');
-  need(session.localId===FIXED.uid&&typeof session.idToken==='string','SIGNED_PAULA_UID');idToken=session.idToken;delete session.refreshToken;
-  if(phase==='create'){
+  idToken=await verifiedSessionIdToken(auth,session);
+  if(phase==='create'||phase==='complete'){
    ev.observations.createResponse=await call(p.commands.create);ev.mutationsExecuted=1;
    const after=await fixture.get();need(after.exists,'CREATE_SERVER_ABSENCE');ev.observations.afterCreate=verifyFixture(after.data());ev.observations.createAudit=await auditProof(p.commands.create);
    ev.observations.relations=await exactRelations();ev.observations.sideEffectsAfterCreate=await exactSideEffects();ev.status='CREATED_SERVER_READBACK_PENDING_UI_RELOAD';
+   if(phase==='complete'){
+    ev.observations.uiWindow={openedAtUtc:new Date().toISOString(),durationMs:FIXED.uiWindowMs,closedAtUtc:null,uiObservationByThisHelper:false};
+    fs.mkdirSync(OUT,{recursive:true});fs.writeFileSync(path.join(OUT,'complete-created-checkpoint.json'),JSON.stringify(ev,null,2)+'\n');
+    console.log('B4_003_LIVE_SYNTHETIC_CREATED='+FIXED.fixture);console.log('B4_003_LIVE_SYNTHETIC_UI_WINDOW_SECONDS=240');
+    await new Promise(resolve=>setTimeout(resolve,FIXED.uiWindowMs));
+    ev.observations.uiWindow.closedAtUtc=new Date().toISOString();
+    await cleanup();ev.status='CLEANED_CANONICAL_ABSENCE_UI_EVIDENCE_REQUIRED';
+   }
   }else{
    ev.observations.createAudit=await auditProof(p.commands.create);await cleanup();ev.status='CLEANED_CANONICAL_ABSENCE_PENDING_FINAL_UI_RELOAD';
   }
-  await headLease();await liveBinding(credential);
+  await headLease();await liveBinding(credential);ev.observations.finalLiveIdentityVerified=true;
  }catch(e){
   ev.errors.push(e.safeCode||'UNEXPECTED_FAILURE_SANITIZED');process.exitCode=1;
-  if(phase==='create'&&attemptedCreate&&idToken){
+  if((phase==='create'||phase==='complete')&&attemptedCreate&&idToken){
    try{
     // Writer timeout is 60 s in the pinned backend. A timed-out client POST
     // is not proof of absence. Observe the exact transaction records, with
@@ -253,6 +294,7 @@ async function main(){
   }
  }finally{
   idToken='';await deleteApp(app).catch(()=>{});
+  if(phase==='complete'){ev.customTokensTotal=ev.tokensPreviouslyIssued+ev.customTokensIssued;ev.remainingTokenBudget=2-ev.customTokensTotal;}
   fs.mkdirSync(OUT,{recursive:true});fs.writeFileSync(path.join(OUT,'phase-'+phase+'.json'),JSON.stringify(ev,null,2)+'\n');
   console.log('B4_003_LIVE_SYNTHETIC_PHASE='+phase);console.log('B4_003_LIVE_SYNTHETIC_STATUS='+ev.status);console.log('B4_003_LIVE_SYNTHETIC_CUSTOM_TOKENS='+ev.customTokensIssued);
  }
