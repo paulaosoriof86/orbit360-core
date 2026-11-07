@@ -12,7 +12,7 @@ B4-003 conserva su cierre LATEST_APPROVED_VERSION_LIVE_PASS en current42. El mis
 
 Este cierre no acredita que todos los módulos, datos del negocio y Functions estén sincronizados. La observación autenticada de hoy en Equipo LIVE muestra siete usuarios como Sin clasificar, frente al recibo firmado del 5 de noviembre que demostró siete clasificaciones canónicas persistidas y correctas en Preview. Es una discrepancia focal comprobada; no invalida indiscriminadamente todas las aceptaciones anteriores.
 
-Esta actuación audita documentos, código, recibos y la UI de Equipo; congela decisiones y plan. No aplica inferencias, importa movimientos, cambia datos de empresa, despliega producto ni modifica DNS. Las correcciones y conciliaciones propuestas no reciben PASS por haber sido descritas.
+Esta actuación audita documentos, código, recibos y la UI de Equipo; congela decisiones y plan mediante un anexo enlazado desde CONTROL_PLANE y recovery state. El master plan y el inventario del cierre se conservan byte por byte; el validador admite únicamente este sucesor documental comprobado, preservando las pruebas históricas. No aplica inferencias, importa movimientos, cambia datos de empresa, despliega producto ni modifica DNS. Las correcciones y conciliaciones propuestas no reciben PASS por haber sido descritas.
 
 ## 2. Autoridad y método de continuidad
 
@@ -156,7 +156,7 @@ Cancelaciones: aceptación expresa de Paula del 12 de octubre, SCOPED_HUMAN_VISU
 
 Owners actuales en HEAD y source current42: Renovaciones e3eecb72e7642d4c572338d89f119ae98135f6c1; Cancelaciones c9f6934beea57136daca0a3292451ad0792181c1; bridge Renovaciones 43b3a6b07eba40baa50b61b238174540cd9bf430. No restaurar owners viejos porque un lock histórico conserve sus hashes.
 
-Corregir el resumen/inventario para hacer visibles estas aceptaciones. No hace falta un ciclo completo nuevo solo porque el inventario original de quince capacidades no las enumere por separado.
+Consolidar estas aceptaciones en el anexo actual y su resumen, conservando intacto el inventario sellado. No hace falta un ciclo completo nuevo solo porque el inventario original de quince capacidades no las enumere por separado.
 
 ## 9. Avance: medida honesta y útil
 
@@ -197,7 +197,7 @@ Cambios de esquema: aditivos y compatibles cuando sea posible, migraciones versi
 
 | Orden | Trabajo | Salida verificable |
 |---|---|---|
-| 0 | Congelar decisiones, inventario, fuentes y cursor en los controles actuales | Un registro único referenciado por Control Plane, state, master plan e inventario; B4-003 y certificados preservados. |
+| 0 | Congelar decisiones, inventario, fuentes y cursor en los controles actuales | Un anexo único referenciado por Control Plane y state; master plan, inventario, B4-003 y certificados históricos intactos. |
 | 1 | Resolver Equipo | Lectura LIVE exacta + caché tras ACK; clasificación inmediata/recarga/sesión, siete registros preservados. |
 | 2 | B4-004 | Disposición no bloqueante Siniestros; lineage profundo focal y únicamente delta de Cronograma. |
 | 3 | B4-005 | Matriz del alcance Fase A vigente, roles/países/viewports y relaciones; incluye contratos necesarios para comisiones, endosos/certificados/anexos; aplica aplazamientos autorizados. |

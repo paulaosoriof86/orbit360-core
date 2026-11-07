@@ -119,7 +119,77 @@ function verifyLedgerMetadata(r,seal,cp,parent){
  need(String(master.status).startsWith('FROZEN_ACTIVE'),'FROZEN_PLAN_STATUS');
  need(cp.capabilityStatusAuthority?.latestBlobSha===blob(fs.readFileSync(CAPABILITY))&&cp.pendingClosureMasterPlan?.blobSha===blob(fs.readFileSync(MASTER))&&cp.findingContinuityControl?.masterPlanBlobSha===blob(fs.readFileSync(MASTER)),'DERIVED_FILE_POINTERS');
 }
+
+const OWNER_BASE='74312cc3621ba155ee288a0afb530a488246f0e6';
+const OWNER_KEY='ownerDecisionFreeze20261107';
+const OWNER_FREEZE=ROOT+'OWNER_DECISION_FREEZE_AND_RECONCILIATION_PLAN_20261107.json';
+const OWNER_PLAN=ROOT+'PLAN_OPERATIVO_DECISIONES_PAULA_20261107.md';
+const OWNER_TEST='tools/gravicentra-b4-003-owner-decision-successor.test.mjs';
+const OWNER_V6=ROOT+'I6_5_I6_6_PAYMENT_INFERENCE_RECONCILIATION_LOCK_V6_20261001.json';
+const OWNER_V6_BLOB='b47f91000713de9c8ac317e1f3fd118b2eafc0d5';
+const OWNER_CP_FIELDS=[
+ '/'+OWNER_KEY,'/currentExecutionDecisionPointer',
+ '/pendingClosureMasterPlan/currentDecisionPointer',
+ '/pendingClosureMasterPlan/firstIncompleteGateUnderCurrentOwnerScope',
+ ...['activeVersion','path','blobSha','previousActiveRulePointer','currentOriginAndTimingAuthority',
+ 'ownerPolicyModalities20261107'].map(k=>'/paymentInferenceReconciliationControl/'+k)
+];
+const OWNER_STATE_FIELDS=['/'+OWNER_KEY,'/currentExecutionDecisionPointer','/updatedAtUtc','/nextAction'];
+// One documentary successor of the certified current42 closure. This never
+// grants product, deployment, data, Rules or historical-receipt mutation.
+export function validateOwnerDecisionSuccessorSnapshot({control,baseControl,state,baseState,changedPaths,fileBytes}){
+ const p=control[OWNER_KEY];
+ need(p&&p.authorityBaseHead===OWNER_BASE,'OWNER_BASE_BINDING');
+ const permitted=new Set([ROOT+'CONTROL_PLANE.json',STATE,OWNER_FREEZE,OWNER_PLAN,SELF,OWNER_TEST]);
+ need(changedPaths.every(x=>permitted.has(x)),'OWNER_UNDECLARED_PATH');
+ for(const path of [OWNER_FREEZE,OWNER_PLAN,SELF,OWNER_TEST])need(changedPaths.includes(path),'OWNER_REQUIRED_PATH');
+ const bytes=path=>{need(fileBytes[path]!=null,'OWNER_FILE_MISSING');return Buffer.from(fileBytes[path]);};
+ need(p.path===OWNER_FREEZE&&p.planPath===OWNER_PLAN&&blob(bytes(OWNER_FREEZE))===p.blobSha&&blob(bytes(OWNER_PLAN))===p.planBlobSha,'OWNER_DOCUMENT_HASH');
+ const r=JSON.parse(bytes(OWNER_FREEZE).toString('utf8'));
+ need(r.schema==='GRAVICENTRA_OWNER_DECISION_FREEZE_20261107_V1'&&r.authorityBaseHead===OWNER_BASE&&r.additiveOnly===true&&r.repository==='paulaosoriof86/orbit360-core'&&r.branch==='recovery/fase-a-clean-20260831','OWNER_RECEIPT_IDENTITY');
+ need(r.plan?.path===OWNER_PLAN&&r.plan.blobSha===p.planBlobSha,'OWNER_PLAN_BINDING');
+ need(r.nextGateExecuted===false&&r.nextGateAccepted===false&&p.nextGateExecuted===false&&p.nextGateAccepted===false&&p.productSourceChanged===false&&p.realBusinessWrites===0,'OWNER_NO_NEW_ACCEPTANCE');
+ const execution=r.execution||{};
+ for(const key of ['productSourceChanged','workflowChanged','productDeployed','dnsChanged','dataImportExecuted','newModulePassGranted'])need(execution[key]===false,'OWNER_EXECUTION_'+key);
+ need(execution.realBusinessWrites===0,'OWNER_BUSINESS_WRITES');
+ need(p.preservedB4003ReceiptBlobSha==='0879188bf245248fa1092fb2014e35e14e802b44'&&p.preservedProductSourceSha===SOURCE,'OWNER_PRESERVED_RELEASE');
+ const proof=r.governanceSuccessorValidation;
+ need(proof?.schema==='GRAVICENTRA_OWNER_DOCUMENTARY_SUCCESSOR_VALIDATION_V1'&&proof.baseHead===OWNER_BASE&&proof.guardPath===SELF&&proof.testPath===OWNER_TEST,'OWNER_VALIDATION_CONTRACT');
+ need(proof.guardBlobSha===blob(bytes(SELF))&&proof.testBlobSha===blob(bytes(OWNER_TEST)),'OWNER_VALIDATION_HASH');
+ need(control.currentExecutionDecisionPointer===OWNER_KEY&&state.currentExecutionDecisionPointer===OWNER_KEY&&same(state[OWNER_KEY],p),'OWNER_POINTER_PARITY');
+ need(control.pendingClosureMasterPlan?.currentDecisionPointer===OWNER_KEY&&control.pendingClosureMasterPlan?.firstIncompleteGateUnderCurrentOwnerScope===p.firstIncompleteGate,'OWNER_MASTER_POINTER');
+ need(state.updatedAtUtc===r.recordedAtUtc&&p.recordedAtUtc===r.recordedAtUtc&&typeof state.nextAction==='string'&&state.nextAction.includes(OWNER_KEY),'OWNER_STATE_POINTER');
+ const rules=control.paymentInferenceReconciliationControl,oldRules=baseControl.paymentInferenceReconciliationControl;
+ need(rules?.activeVersion==='V6_20261001'&&rules.path===OWNER_V6&&rules.blobSha===OWNER_V6_BLOB&&blob(bytes(OWNER_V6))===OWNER_V6_BLOB,'OWNER_V6_BINDING');
+ need(same(rules.previousActiveRulePointer,{activeVersion:oldRules.activeVersion,path:oldRules.path,blobSha:oldRules.blobSha,preservedInGitHistory:true}),'OWNER_PRIOR_RULE_POINTER');
+ const modality=rules.ownerPolicyModalities20261107;
+ need(modality?.policy==='VIME-18154'&&modality.insurer==='G&T'&&modality.modality==='MONTHLY_12_PAYMENTS'&&modality.ownerConfirmed===true&&modality.scope==='POLICY_ONLY_NOT_GLOBAL_FRACCIONADO_CEILING'&&modality.receiptPath===OWNER_FREEZE&&modality.receiptBlobSha===p.blobSha&&modality.dataApplied===false,'OWNER_POLICY_MODALITY');
+ const projected=clone(control),projectedState=clone(state);
+ for(const path of OWNER_CP_FIELDS)restoreField(projected,baseControl,path);
+ for(const path of OWNER_STATE_FIELDS)restoreField(projectedState,baseState,path);
+ need(same(projected,baseControl),'OWNER_UNENUMERATED_CONTROL_CHANGE');
+ need(same(projectedState,baseState),'OWNER_UNENUMERATED_STATE_CHANGE');
+ return {comparableControl:projected,allowedPaths:[OWNER_FREEZE,OWNER_PLAN,OWNER_TEST]};
+}
+function verifyOwnerDecisionSuccessor(after){
+ if(!after[OWNER_KEY])return null;
+ need(git('merge-base',OWNER_BASE,'HEAD')===OWNER_BASE,'OWNER_BASE_NOT_ANCESTOR');
+ const paths=[ROOT+'CONTROL_PLANE.json',STATE,OWNER_FREEZE,OWNER_PLAN,SELF,OWNER_TEST,OWNER_V6];
+ const fileBytes={};
+ for(const path of paths){
+  fileBytes[path]=fs.readFileSync(path);
+  need(git('rev-parse','HEAD:'+path)===blob(fileBytes[path]),'OWNER_UNCOMMITTED_FILE');
+ }
+ return validateOwnerDecisionSuccessorSnapshot({
+  control:after,baseControl:old(OWNER_BASE,ROOT+'CONTROL_PLANE.json'),
+  state:read(STATE),baseState:old(OWNER_BASE,STATE),
+  changedPaths:git('diff','--name-only',OWNER_BASE,'HEAD').split(/\r?\n/).filter(Boolean),fileBytes
+ });
+}
+
 export function projectVerifiedB4003LiveClosure(after,certified){
+ const ownerSuccessor=verifyOwnerDecisionSuccessor(after);
+ if(ownerSuccessor)after=ownerSuccessor.comparableControl;
  const cursor=after[CURSOR],seal=cursor?.formalLiveAcceptance;
  if(!seal&&cursor?.b4003Closed!==true)return {comparableAfter:after,closed:false};
  need(seal?.schema==='GRAVICENTRA_B4_003_CURRENT42_FORMAL_LIVE_ACCEPTANCE_V1'&&seal.status==='LATEST_APPROVED_VERSION_LIVE_PASS'&&cursor.b4003Closed===true,'FORMAL_SEAL_REQUIRED');
@@ -159,7 +229,7 @@ export function projectVerifiedB4003LiveClosure(after,certified){
  verifyLedgerMetadata(r,seal,after,r.parentHead);
  const supporting=r.supportingEvidence||[];need(Array.isArray(supporting),'SUPPORTING_EVIDENCE');
  for(const [i,ref]of supporting.entries())reference(ref,'SUPPORTING_'+i);
- const allowedCommitPaths=new Set([ROOT+'CONTROL_PLANE.json',STATE,LEDGER,REGISTER,CAPABILITY,MASTER,SELF,PARENT_GUARD,seal.receiptPath,...Object.values(evidence).map(x=>x.path),...supporting.map(x=>x.path)]);
+ const allowedCommitPaths=new Set([...(ownerSuccessor?.allowedPaths||[]),ROOT+'CONTROL_PLANE.json',STATE,LEDGER,REGISTER,CAPABILITY,MASTER,SELF,PARENT_GUARD,seal.receiptPath,...Object.values(evidence).map(x=>x.path),...supporting.map(x=>x.path)]);
  const changed=git('diff','--name-only',r.parentHead,'HEAD').split(/\r?\n/).filter(Boolean);
  need(changed.every(p=>allowedCommitPaths.has(p)),'CLOSURE_PRODUCT_OR_UNDECLARED_PATH_CHANGE');
  // Reconstruct only the historical comparator. The authoritative CP on disk
@@ -176,3 +246,4 @@ export function projectVerifiedB4003LiveClosure(after,certified){
  for(const p of mutable)restoreField(comparable,certified,p);
  return {comparableAfter:comparable,closed:true,receiptBlobSha:seal.receiptBlobSha};
 }
+

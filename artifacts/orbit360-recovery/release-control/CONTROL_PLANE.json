@@ -2534,7 +2534,7 @@
     "capabilityCount": 15,
     "mayGovernGate": false,
     "mayGovernReleaseIdentity": false,
-    "latestBlobSha": "46415766377892efe33cf57f750c7690198f87c5"
+    "latestBlobSha": "81511551540dbe0c1dbc54d9c4f8e00537550716"
   },
   "projectSources": {
     "activePackage": "GRAVICENTRA_PROJECT_SOURCES_EVERGREEN_V7",
@@ -8792,7 +8792,7 @@
       "ownerConfirmed": true,
       "scope": "POLICY_ONLY_NOT_GLOBAL_FRACCIONADO_CEILING",
       "receiptPath": "artifacts/orbit360-recovery/release-control/OWNER_DECISION_FREEZE_AND_RECONCILIATION_PLAN_20261107.json",
-      "receiptBlobSha": "ca5a1cb2a26ddff1c6fafc4ea1ab73e97500b5d1",
+      "receiptBlobSha": "0dbb47bc019b50a1428b556f8f976fd75d340107",
       "dataApplied": false
     }
   },
@@ -10437,7 +10437,7 @@
     "guardPath": "tools/gravicentra-open-findings-continuity-guard-v1.mjs",
     "guardBlobSha": "868a0ba1a492d9adc8d91655f152b6fa7980f499",
     "masterPlanPath": "artifacts/orbit360-recovery/release-control/I6_PENDING_CLOSURE_MASTER_PLAN_LOCK_20261004.json",
-    "masterPlanBlobSha": "75ba11734557e4d499a7f89c06a822a2f0f3abf5",
+    "masterPlanBlobSha": "458c5af57b2f7d9453d0064eba0cd737edf14ef4",
     "inventoryCount": 295,
     "attentionCount": 166,
     "rule": "Existing no-loss register now 289 findings; previously approved PASS preserved; only current P0 blocks current release.",
@@ -10463,7 +10463,7 @@
   "pendingClosureMasterPlan": {
     "status": "B4_003_CLOSED_PASS_CURRENT42_NEXT_FROZEN_GATE_NOT_EXECUTED",
     "path": "artifacts/orbit360-recovery/release-control/I6_PENDING_CLOSURE_MASTER_PLAN_LOCK_20261004.json",
-    "blobSha": "75ba11734557e4d499a7f89c06a822a2f0f3abf5",
+    "blobSha": "458c5af57b2f7d9453d0064eba0cd737edf14ef4",
     "baselineFindingCount": 282,
     "currentGate": "B4-003",
     "currentRevision": "R20-UAT3",
@@ -21630,9 +21630,9 @@
     "status": "OWNER_DECISIONS_AND_WORK_PLAN_FROZEN",
     "recordedAtUtc": "2026-11-07T16:25:48Z",
     "path": "artifacts/orbit360-recovery/release-control/OWNER_DECISION_FREEZE_AND_RECONCILIATION_PLAN_20261107.json",
-    "blobSha": "ca5a1cb2a26ddff1c6fafc4ea1ab73e97500b5d1",
+    "blobSha": "0dbb47bc019b50a1428b556f8f976fd75d340107",
     "planPath": "artifacts/orbit360-recovery/release-control/PLAN_OPERATIVO_DECISIONES_PAULA_20261107.md",
-    "planBlobSha": "4f076ca32f38f3eead117a9384ff5351d54bb3fb",
+    "planBlobSha": "60d5e264b440c29617d1aa23127486352542128b",
     "authorityBaseHead": "74312cc3621ba155ee288a0afb530a488246f0e6",
     "basis": "PAULA_CURRENT_EXPLICIT_INSTRUCTIONS_AND_FOCAL_GYT_MONTHLY_12_ANSWER",
     "preservedB4003ReceiptBlobSha": "0879188bf245248fa1092fb2014e35e14e802b44",

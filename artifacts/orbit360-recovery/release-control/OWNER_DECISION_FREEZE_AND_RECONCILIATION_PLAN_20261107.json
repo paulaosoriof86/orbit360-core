@@ -10,7 +10,7 @@
   "authority": "PAULA_EXPLICIT_REQUEST_TO_FREEZE_COMPLETE_DECISIONS_AND_WORK_PLAN",
   "plan": {
     "path": "artifacts/orbit360-recovery/release-control/PLAN_OPERATIVO_DECISIONES_PAULA_20261107.md",
-    "blobSha": "4f076ca32f38f3eead117a9384ff5351d54bb3fb"
+    "blobSha": "60d5e264b440c29617d1aa23127486352542128b"
   },
   "canonicalControlPlane": "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json",
   "canonicalMasterPlan": "artifacts/orbit360-recovery/release-control/I6_PENDING_CLOSURE_MASTER_PLAN_LOCK_20261004.json",
@@ -432,12 +432,29 @@
     "dataImportExecuted": false,
     "newModulePassGranted": false,
     "sourceFreezeBuildRequired": false,
-    "codexUsed": false
+    "codexUsed": false,
+    "governanceValidatorChanged": true,
+    "governanceTestsAdded": true
   },
   "baselineGovernance": {
     "runId": 42330379248,
     "conclusion": "success",
     "sourceSha": "74312cc3621ba155ee288a0afb530a488246f0e6"
   },
-  "nextRequiredResult": "FIX_EQUIPO_READ_PARITY_AND_IMMEDIATE_STORE_UPDATE; FORENSIC_AUDIT_CRONOGRAMA; PREPARE_SOURCE_DIFF_WITHOUT_REAL_WRITES"
+  "nextRequiredResult": "FIX_EQUIPO_READ_PARITY_AND_IMMEDIATE_STORE_UPDATE; FORENSIC_AUDIT_CRONOGRAMA; PREPARE_SOURCE_DIFF_WITHOUT_REAL_WRITES",
+  "governanceSuccessorValidation": {
+    "schema": "GRAVICENTRA_OWNER_DOCUMENTARY_SUCCESSOR_VALIDATION_V1",
+    "baseHead": "74312cc3621ba155ee288a0afb530a488246f0e6",
+    "guardPath": "tools/gravicentra-b4-003-formal-live-closeout-guard.mjs",
+    "guardBlobSha": "475221ff978fbdcd106a480d3a2b49da530cf0ae",
+    "testPath": "tools/gravicentra-b4-003-owner-decision-successor.test.mjs",
+    "testBlobSha": "eab422a67537553547677df6da535f99c61083fd",
+    "sealedMasterPlanBlobPreserved": "458c5af57b2f7d9453d0064eba0cd737edf14ef4",
+    "sealedCapabilityLedgerBlobPreserved": "81511551540dbe0c1dbc54d9c4f8e00537550716",
+    "initialDocumentationCommit": "766e30b1bda1543763b6e8d9d17119f84d7f75d8",
+    "initialGovernanceRun": 42391339515,
+    "correction": "Preserve sealed master/capability bytes; validate exact additive owner documents and allowed CP/state fields against approved baseline; retain every original closure check.",
+    "localPositiveAndNegativeChecks": 17,
+    "doesNotAuthorizeProductDeployOrBusinessWrites": true
+  }
 }
