@@ -1,0 +1,123 @@
+{
+  "schema": "GRAVICENTRA_CURRENT42_CAUSAL_FRONTEND_SUCCESSOR_CONTRACT_V1",
+  "status": "SOURCE_CONTRACT_ONLY_PREVIEW_AND_PROMOTION_PENDING",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "sourceBaseHead": "932ccaca0a808b2b4ae577c0a3a27fa80220dbe5",
+  "preservedAcceptance": {
+    "cursor": "b4003ActiveCertificationCursor20261106",
+    "status": "LATEST_APPROVED_VERSION_LIVE_PASS",
+    "sourceSha": "857f1222f360a42a06e012810a1c01bce155a26f",
+    "buildId": "gi-i65-b4-857f1222f360-57f234755dc1",
+    "artifactId": 13549460562,
+    "receiptBlobSha": "0879188bf245248fa1092fb2014e35e14e802b44"
+  },
+  "scope": {
+    "kind": "CAUSAL_POST_ACCEPTANCE_FRONTEND_CORRECTIONS",
+    "b4003Reopened": false,
+    "historicalCertificatesRewritten": false,
+    "nextGateExecuted": false,
+    "backendFunctionDeploys": 0,
+    "rulesWrites": 0,
+    "businessWrites": 0,
+    "authIamChanges": 0,
+    "reimport": false,
+    "reason": "Owner-authorized real client/policy capture exposed missing country in activity/audit and absent explicit currency/commission capture."
+  },
+  "productChanges": [
+    {
+      "path": "orbit360-platform/core/policy-receipts-engine.js",
+      "beforeBlobSha": "b04fdd580efcc2fdfa8703238e92ab5bc51d6347",
+      "afterBlobSha": "37471433de5b09ba4ecd2ca847baae55317ff8e5"
+    },
+    {
+      "path": "orbit360-platform/modules/policy-receipts-v1199-bridge.js",
+      "beforeBlobSha": "79e8eefc821b17b1abb3ba7b26558e90199a9ea5",
+      "afterBlobSha": "4867fb7db684908f6ca5a6edfc39460de5c1cf59"
+    },
+    {
+      "path": "orbit360-platform/modules/equipo.js",
+      "beforeBlobSha": "1bd7881ed29f6d7488bb806a96a0ab52c5c5c3b8",
+      "afterBlobSha": "f584c4109294f8e32621c9ee9dd5cfdd55ca2c79"
+    },
+    {
+      "path": "orbit360-platform/modules/crm-v1198-operational-bridge.js",
+      "beforeBlobSha": "0ec76280098c2f47982779fbd8d3a220745ea912",
+      "afterBlobSha": "a60cba8f13f53f1934718770517c7261e6860de1"
+    },
+    {
+      "path": "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
+      "beforeBlobSha": "9b52aeda135d0e371018e739dda5c4ecc9779b58",
+      "afterBlobSha": "fce274b01bf2c52c50e186df1ece97e7474805e7"
+    }
+  ],
+  "preservedBuilder": {
+    "path": "tools/gravicentra-i6-1-preview-package.mjs",
+    "blobSha": "d42337f326637d669834664289cb3cce36b56342",
+    "indexBlobSha": "867c5e108988b68ca49702e494e96fa9f01afd71",
+    "assetVersioning": "BUILDER_ORBITBUILD_FOR_EVERY_JS_CSS_NO_ARTIFACT_PATCH"
+  },
+  "preview": {
+    "workflow": ".github/workflows/gravicentra-b4-003-immutable-candidate-preview.yml",
+    "site": "ays-orbit-360-lab",
+    "channelId": "gi-i65-b4-rc-41765742748",
+    "buildExactlyOnce": true,
+    "reuseSameArtifactForLive": true,
+    "sourceSha": "RESOLVED_FROM_EXACT_CHECKED_OUT_GITHUB_SHA",
+    "artifactId": null,
+    "buildId": null,
+    "hostedPayloadDigest": null,
+    "authenticatedUat": "PENDING",
+    "authenticatedQaMode": {
+      "runner": "tools/gravicentra-i6-5-b4-003-preview-proof.mjs",
+      "helper": "tools/gravicentra-b4-004-policy-capture-preview-qa.mjs",
+      "receiptSchema": "GRAVICENTRA_B4_004_POLICY_CAPTURE_FOCAL_PREVIEW_QA_V1",
+      "requiredStatus": "FOCAL_AUTHENTICATED_UI_PASS",
+      "businessWrites": 0,
+      "fixtures": "EXACT_PREDECLARED_QA_IDENTITIES_WITH_ORIGINAL_ABSENCE",
+      "adapterChanges": "ONLY_RECORD_IDENTITY_AND_SYNTHETIC_MARKER; NO_BUSINESS_FIELDS_OR_AUTHORIZATION_CHANGE",
+      "cleanup": "EXACT_FIXTURE_AND_CAPTURED_REQUEST_EVENT_LEDGER_WITH_PROVENANCE_AND_TRANSACTION_VERSION_CHECK",
+      "historicalCleanupExecuted": false,
+      "entrypointChanged": false,
+      "existingActorOnly": true,
+      "authAccountsCreated": 0
+    }
+  },
+  "rollback": {
+    "sourceSha": "e5030ec5ba9854f0c576fd905c2f510766347ffa",
+    "buildId": "gi-i65-b4-e5030ec5ba98-57f234755dc1",
+    "versionName": "sites/ays-orbit-360-lab/versions/d8caae0d585bf6dd",
+    "artifactId": 13584456766,
+    "productFiles": 218,
+    "hostedPayloadDigest": "09c91023d1d22687528a61edb5a768dadbd59c465af91bc48016d21c94c6537f",
+    "archiveSha256": "cc710541a70afdaee8da882ef0b43b9dc9f24f89a7a198c3f48f18dc776a12fa",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_E503_RETAINED_HOSTING_PROMOTED_20261107.json",
+    "receiptBlobSha": "45f1d3e461b7e92b60c94be820f94cb2f89cac9d",
+    "requiredBeforePromotion": "VERIFY_CURRENT_LIVE_E503_VERSION_AND_ALL_RAW_BYTES_USING_EXISTING_RETAINED_PREFLIGHT; NO_BUSINESS_DATA_RESTORE"
+  },
+  "promotion": {
+    "authorized": false,
+    "existingExecutor": ".github/workflows/gravicentra-b4-003-executor.yml",
+    "existingPreflight": "tools/gravicentra-b4-003-retained-hosting-preflight.mjs",
+    "existingPromotion": "tools/gravicentra-b4-003-retained-hosting-promotion.mjs",
+    "required": "New exact artifact/readback receipt and focal authenticated acceptance; add a bounded successor cursor using this same executor/preflight/promotion before promoting. Existing e503 mode and its historical receipts remain unchanged. Promote the existing new preview version without rebuilding; rollback only application bytes to retained e503, never company data."
+  },
+  "focalAcceptance": [
+    "Effective CRM new-client owner: one client and scoped activity; complete reload and client/advisor relationship",
+    "Effective policy form: explicit GTQ/USD, documented net premium and rates, no fabricated zero or forced neta/fijo model",
+    "Policy atomic batch: policy, receipt, portfolio and scoped activity; no payment inferred by create",
+    "Receipt date correction: one outstanding receipt plus portfolio and scoped audit; paid receipts stay protected",
+    "Equipo advisor: one canonical profile, audit country/actor, truthful partial failure; commission60 requires actual server readback and fresh reload",
+    "Existing divisa USD aliases and policy commission snapshots preserved on edit",
+    "No new errors on changed routes; country, role and existing approval boundaries preserved"
+  ],
+  "preservedPriorSuccessor": {
+    "cursor": "b4003CausalFrontendSuccessor20261107",
+    "sourceSha": "e5030ec5ba9854f0c576fd905c2f510766347ffa",
+    "buildId": "gi-i65-b4-e5030ec5ba98-57f234755dc1",
+    "artifactId": 13584456766,
+    "immutablePreviewReceiptBlobSha": "c939ca0c44eddefcea9cbb2ffc448ddafda749ab",
+    "liveBytesReceiptBlobSha": "45f1d3e461b7e92b60c94be820f94cb2f89cac9d",
+    "historicalStatusUnchanged": true
+  }
+}

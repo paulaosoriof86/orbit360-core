@@ -1,0 +1,36 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import {execFileSync} from 'node:child_process';
+import {validatePolicyCaptureCausalSourceSuccessor as validate} from './gravicentra-b4-003-formal-live-closeout-guard.mjs';
+const root='artifacts/orbit360-recovery/release-control/';
+const freeze=root+'OWNER_DECISION_FREEZE_AND_RECONCILIATION_PLAN_20261107.json';
+const record=JSON.parse(fs.readFileSync(freeze,'utf8'));
+const proof=record.policyCaptureCausalSourceCorrection20261107;
+const before=path=>process.env.GI_POLICY_CAPTURE_BASE_DIR?fs.readFileSync(process.env.GI_POLICY_CAPTURE_BASE_DIR+'/'+path):execFileSync('git',['show',proof.sourceBaseHead+':'+path]);
+const fileBytes={},baseSourceBytes={};
+for(const e of proof.changes){fileBytes[e.path]=fs.readFileSync(e.path);baseSourceBytes[e.path]=e.previousBlobSha===null?null:before(e.path);}
+for(const e of proof.preservedFiles)fileBytes[e.path]=fs.readFileSync(e.path);
+const fixture=()=>({record:structuredClone(record),fileBytes:structuredClone(fileBytes),baseSourceBytes:structuredClone(baseSourceBytes)});
+let checks=0;
+const good=validate(fixture());assert.deepEqual(good.allowedPaths,proof.changes.map(e=>e.path));checks++;
+assert.equal(good.frozenPredecessorHead,'932ccaca0a808b2b4ae577c0a3a27fa80220dbe5');checks++;
+assert.deepEqual(Buffer.from(good.comparableFileBytes[proof.workflowPath]),Buffer.from(baseSourceBytes[proof.workflowPath]));checks++;
+function reject(edit,pattern){const f=fixture();edit(f);assert.throws(()=>validate(f),pattern);checks++;}
+reject(f=>f.record.policyCaptureCausalSourceCorrection20261107.sourceBaseHead='0'.repeat(40),/POLICY_CAPTURE_BASE/);
+reject(f=>f.record.policyCaptureCausalSourceCorrection20261107.productionAccepted=true,/POLICY_CAPTURE_SCOPE/);
+reject(f=>f.record.policyCaptureCausalSourceCorrection20261107.livePromotionAuthorized=true,/POLICY_CAPTURE_SCOPE/);
+reject(f=>f.record.policyCaptureCausalSourceCorrection20261107.realBusinessWrites=1,/POLICY_CAPTURE_SCOPE/);
+reject(f=>f.record.policyCaptureCausalSourceCorrection20261107.backendSourceChanged=true,/POLICY_CAPTURE_SCOPE/);
+reject(f=>f.record.policyCaptureCausalSourceCorrection20261107.changes.pop(),/POLICY_CAPTURE_EXACT_PATHS/);
+reject(f=>f.record.policyCaptureCausalSourceCorrection20261107.changes[0].path='firestore.rules',/POLICY_CAPTURE_EXACT_PATHS/);
+reject(f=>f.record.policyCaptureCausalSourceCorrection20261107.changes[0].previousBlobSha='0'.repeat(40),/POLICY_CAPTURE_PIN/);
+reject(f=>f.record.policyCaptureCausalSourceCorrection20261107.changes[0].blobSha='0'.repeat(40),/POLICY_CAPTURE_PIN/);
+reject(f=>f.fileBytes[proof.changes[0].path]=Buffer.from('unreviewed source'),/POLICY_CAPTURE_CURRENT_BYTES/);
+reject(f=>f.baseSourceBytes[proof.changes[0].path]=Buffer.from('wrong predecessor'),/POLICY_CAPTURE_BASE_BYTES/);
+reject(f=>f.fileBytes[proof.preservedFiles[0].path]=Buffer.from('rewritten historical evidence'),/POLICY_CAPTURE_PRESERVED_BYTES/);
+reject(f=>f.record.policyCaptureCausalSourceCorrection20261107.channelId='another-channel',/POLICY_CAPTURE_IDENTITY/);
+reject(f=>f.record.policyCaptureCausalSourceCorrection20261107.current42ReceiptBlobSha='0'.repeat(40),/POLICY_CAPTURE_PRESERVED_IDENTITY/);
+reject(f=>f.record.policyCaptureCausalSourceCorrection20261107.authenticatedQaMode.businessWrites=1,/POLICY_CAPTURE_QA_SCOPE/);
+reject(f=>f.record.sourceInventory.documentManifest20261107.privateArchive.library_file_id='unreviewed-private-identifier',/POLICY_CAPTURE_PRIVATE_IDENTIFIER/);
+reject(f=>f.record.sourceInventory.documentManifest20261107.privateArchive.fileSha256='0'.repeat(64),/POLICY_CAPTURE_PRIVATE_IDENTIFIER/);
+console.log('POLICY_CAPTURE_BOUNDED_SUCCESSOR_PASS '+checks+' checks; exact five owners, existing immutable workflow, old current42/e503 evidence preserved, no LIVE/data/backend authority');

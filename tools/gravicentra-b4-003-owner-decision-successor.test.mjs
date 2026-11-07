@@ -117,7 +117,7 @@ const frontendPaths=[
 function frontendFixture(){
  const f=teamFixture(),proof=f.record.equipoCausalSourceCorrection;
  for(const [path,prior] of frontendPaths){
-  f.fileBytes[path]=fs.readFileSync(path);
+  f.fileBytes[path]=path==='.github/workflows/gravicentra-b4-003-immutable-candidate-preview.yml'?readPostBase(path):fs.readFileSync(path);
   f.baseSourceBytes[path]=prior?(process.env.GI_SOURCE_SUCCESSOR_BASE_DIR?fs.readFileSync(process.env.GI_SOURCE_SUCCESSOR_BASE_DIR+'/'+path):execFileSync('git',['show',teamBase+':'+path])):null;
   proof.changes.push({path,previousBlobSha:prior,blobSha:hash(f.fileBytes[path])});
  }

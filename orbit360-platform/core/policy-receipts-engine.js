@@ -63,6 +63,13 @@ Orbit.policyReceipts = (function () {
     try { const p = (Orbit.PAISES || []).find(x => x.id === country); return (p && p.moneda) || ''; } catch (e) {}
     return '';
   }
+  // A country's default currency is not an exclusive policy currency.
+  // Guatemala's documented Q/USD policies retain their stated monetary unit.
+  function policyCurrencies(country) {
+    const values = [currencyFor(country)];
+    if (clean(country).toUpperCase() === 'GT') values.push('USD');
+    return [...new Set(values.map(value => clean(value).toUpperCase()).filter(Boolean))];
+  }
   function linkedInsurerCountry(insurer, country) {
     if (!insurer) return false;
     if (insurer.pais === country) return true;
@@ -99,7 +106,7 @@ Orbit.policyReceipts = (function () {
     const insurer = clean(p.aseguradoraId) ? S().get('aseguradoras', p.aseguradoraId) : null;
     const country = clean(p.pais || (client && client.pais));
     const currency = clean(p.moneda || p.divisa || currencyFor(country));
-    const expectedCurrency = currencyFor(country);
+    const allowedCurrencies = policyCurrencies(country);
     const statusActive = isActiveState(p.estado);
 
     if (!clean(p.tenantId || tenantId())) errors.push('tenant_requerido');
@@ -107,7 +114,7 @@ Orbit.policyReceipts = (function () {
     if (!country) errors.push('pais_requerido');
     if (!currency) errors.push('moneda_requerida');
     if (client && client.pais && country && client.pais !== country) errors.push('pais_no_coincide_cliente');
-    if (expectedCurrency && currency && expectedCurrency !== currency) errors.push('moneda_no_coincide_pais');
+    if (currency && !allowedCurrencies.includes(currency)) errors.push('moneda_no_coincide_pais');
     if (!insurer) errors.push('aseguradora_requerida');
     if (insurer && insurer.vinculada === false) errors.push('aseguradora_no_vinculada');
     if (insurer && country && !linkedInsurerCountry(insurer, country)) errors.push('aseguradora_no_habilitada_pais');
@@ -247,12 +254,17 @@ Orbit.policyReceipts = (function () {
       secuencia: i + 1,
       cuota: r.n,
       neta: r.neta,
+      primaNeta: r.neta,
       gastosEmision: r.gastosEmision,
+      gastosExpedicion: r.gastosEmision,
       gastosFinan: r.gastosFinan,
+      gastosFinanciamiento: r.gastosFinan,
       otros: r.otros,
       iva: r.iva,
+      impuestosIVA: r.iva,
       monto: r.total,
       montoTotal: r.total,
+      primaTotal: r.total,
       comAseguradora: r.comAseguradora,
       comVendedor: r.comVendedor,
       vence: r.vence,
@@ -380,7 +392,7 @@ Orbit.policyReceipts = (function () {
     return result;
   }
 
-  function activityRow(policy,title,detail,opId){return{id:'act_'+clean(opId),tenantId:policy.tenantId,clienteId:policy.clienteId,asesorId:policy.asesorId,tipo:'poliza',icon:'📑',fecha:today(),titulo:title,detalle:detail,operacionId:opId};}
+  function activityRow(policy,title,detail,opId){return{id:'act_'+clean(opId),tenantId:policy.tenantId,clienteId:policy.clienteId,asesorId:policy.asesorId,pais:policy.pais,tipo:'poliza',icon:'📑',fecha:today(),titulo:title,detalle:detail,operacionId:opId};}
   function planReceipts(policy,opId,mutations){
     const existing=(S().where('recibosEsperados',c=>c.polizaId===policy.id)||[]).slice().sort((a,b)=>sequenceOf(a)-sequenceOf(b)),expected=expectedReceipts(policy),used=new Set(),finalRows=new Map(existing.map(x=>[x.id,clone(x)]));
     const result={inserted:[],updated:[],preserved:[],annulled:[],expected:expected.length,operationId:opId,collection:'recibosEsperados'};
@@ -479,6 +491,9 @@ Orbit.policyReceipts = (function () {
     allowed.forEach(k=>{if(Object.prototype.hasOwnProperty.call(patch,k))nextPatch[k]=patch[k];});
     const numeric=['primaNeta','gastosExpedicion','gastosFinanciamiento','descuento','impuestosIVA','primaTotal'];
     for(const k of numeric){if(Object.prototype.hasOwnProperty.call(nextPatch,k)){const n=Number(nextPatch[k]);if(!Number.isFinite(n))return{ok:false,errors:['recibo_valor_invalido:'+k]};nextPatch[k]=n;}}
+    // Keep proven aliases of an explicitly edited amount coherent; a date-only
+    // edit never manufactures a financial value or changes an untouched amount.
+    for(const [canonical,legacy] of [['primaNeta','neta'],['gastosExpedicion','gastosEmision'],['gastosFinanciamiento','gastosFinan'],['impuestosIVA','iva']]){if(Object.prototype.hasOwnProperty.call(nextPatch,canonical))nextPatch[legacy]=nextPatch[canonical];}
     if(Object.prototype.hasOwnProperty.call(nextPatch,'fechaLimite')){const d=clean(nextPatch.fechaLimite);if(!/^\d{4}-\d{2}-\d{2}$/.test(d))return{ok:false,errors:['recibo_fecha_invalida']};nextPatch.fechaLimite=d;nextPatch.vence=d;nextPatch.fechaVencimiento=d;}
     if(Object.prototype.hasOwnProperty.call(nextPatch,'primaTotal')){nextPatch.montoTotal=Number(nextPatch.primaTotal);nextPatch.monto=Number(nextPatch.primaTotal);}
     const opId=options.operationId||operationId('recedit');nextPatch.operationId=opId;nextPatch.actualizado=now();
@@ -486,7 +501,7 @@ Orbit.policyReceipts = (function () {
     const portfolio=(S().where('carteraPrimas',r=>r&&clean(r.reciboId)===id)||[])[0]||null;
     let portfolioPatch=null;
     if(portfolio&&portfolio.carteraActiva!==false){const st=portfolioState(next),total=next.primaTotal!=null?Number(next.primaTotal):Number(next.montoTotal!=null?next.montoTotal:next.monto)||0;portfolioPatch={fechaLimite:next.fechaLimite||next.vence,vence:next.fechaLimite||next.vence,fechaVencimiento:next.fechaLimite||next.vence,monto:total,montoTotal:total,primaTotal:total,estado:st.estado,estadoOperativo:st.estadoOperativo,exigibilidad:st.exigibilidad,operationId:opId,actualizado:now()};mutations.push({action:'update',collection:'carteraPrimas',id:portfolio.id,payload:portfolioPatch});}
-    const activityId=('act_'+opId).slice(0,250);mutations.push({action:'insert',collection:'actividades',id:activityId,payload:{id:activityId,tenantId:current.tenantId||tenantId(),clienteId:current.clienteId,asesorId:current.asesorId,tipo:'recibo',icon:'🧾',fecha:today(),titulo:'Recibo actualizado',detalle:'Edición individual controlada · '+(current.serie||current.cuota||id),polizaId:current.polizaId,reciboId:id,operationId:opId,motivo:reason}});
+    const activityId=('act_'+opId).slice(0,250);mutations.push({action:'insert',collection:'actividades',id:activityId,payload:{id:activityId,tenantId:current.tenantId||tenantId(),clienteId:current.clienteId,asesorId:current.asesorId,pais:current.pais||policy.pais,tipo:'recibo',icon:'🧾',fecha:today(),titulo:'Recibo actualizado',detalle:'Edición individual controlada · '+(current.serie||current.cuota||id),polizaId:current.polizaId,reciboId:id,operationId:opId,motivo:reason}});
     try{await S().batchDurable(mutations,{requestId:opId,timeoutMs:25000});const persisted=S().get('recibosEsperados',id);if(!persisted)return{ok:false,errors:['recibo_edit_readback_missing']};return{ok:true,receipt:clone(persisted),portfolio:portfolio?clone(S().get('carteraPrimas',portfolio.id)):null,operationId:opId,atomicServerCommit:true};}
     catch(error){return{ok:false,errors:['recibo_edit_commit_failed'],error:String(error&&(error.code||error.message)||error),operationId:opId};}
   }
@@ -568,6 +583,6 @@ Orbit.policyReceipts = (function () {
     ACTIVE, isActiveState, isPaidReceipt, canManagePolicies, canApplyPayments,
     canonicalPolicyKey, policyVersionKey, validatePolicy, preparePolicy, normalizeVehicle, expectedReceipts, syncReceipts, syncPortfolio, buildAtomicWritePlan,
     createPolicy, updatePolicy, linkVehicleToPolicy, updateReceipt, receiptEditLocked, applyPayment, createReconciliationProposal, updateClientState,
-    receiptId, sequenceOf, installmentsForFrequency
+    receiptId, sequenceOf, installmentsForFrequency, policyCurrencies
   };
 })();

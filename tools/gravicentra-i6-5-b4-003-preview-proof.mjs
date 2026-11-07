@@ -949,6 +949,12 @@ async function runB4003CumulativeP0ReadOnly(){
    orphanDependencies:result.orphanRenewalFixtures.dependentTotal,
    realWrites:0,p0ClosureCount:0}));
 }
+// Focal synthetic capture mode exits before the historical seed/cleanup suite.
+if(process.env.B4_004_POLICY_CAPTURE_QA==='true'){
+ const {runPolicyCapturePreviewQa}=await import('./gravicentra-b4-004-policy-capture-preview-qa.mjs');
+ await runPolicyCapturePreviewQa({db,auth,tenant,ref,chromium,actorForRole,applyLegal,bootProduct,target,projectId,tenantId,outPath});
+ process.exit(0);
+}
 if(process.env.B4_003_P0_READONLY==='true'){
  await runB4003CumulativeP0ReadOnly();
  process.exit(0);

@@ -468,21 +468,129 @@ export function validateReviewedDeferredCandidateArchives({record,fileBytes}){
  return Object.keys(REVIEWED_CANDIDATE_ARCHIVES);
 }
 
-export function validateOwnerDecisionSuccessorSnapshot({control,baseControl,state,baseState,changedPaths,fileBytes,baseSourceBytes,postBaseSourceBytes,catalogBaseSourceBytes}){
+
+// Exact owner-authorized capture correction over the frozen e503 successor.
+// Historical current42/e503/reader/catalog bytes are still checked independently.
+const POLICY_CAPTURE_BASE='932ccaca0a808b2b4ae577c0a3a27fa80220dbe5';
+const POLICY_CAPTURE_KEY='policyCaptureCausalSourceCorrection20261107';
+const POLICY_CAPTURE_WORKFLOW='.github/workflows/gravicentra-b4-003-immutable-candidate-preview.yml';
+const POLICY_CAPTURE_CONTRACT='artifacts/orbit360-recovery/release-control/I6_5_B4_004_POLICY_CAPTURE_CAUSAL_FRONTEND_SUCCESSOR_CONTRACT_20261107.json';
+const POLICY_CAPTURE_PRODUCTS=["orbit360-platform/core/policy-receipts-engine.js","orbit360-platform/modules/policy-receipts-v1199-bridge.js","orbit360-platform/modules/equipo.js","orbit360-platform/modules/crm-v1198-operational-bridge.js","orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js"];
+const POLICY_CAPTURE_PINS={
+  "orbit360-platform/core/policy-receipts-engine.js": {
+    "before": "b04fdd580efcc2fdfa8703238e92ab5bc51d6347",
+    "after": "37471433de5b09ba4ecd2ca847baae55317ff8e5"
+  },
+  "orbit360-platform/modules/policy-receipts-v1199-bridge.js": {
+    "before": "79e8eefc821b17b1abb3ba7b26558e90199a9ea5",
+    "after": "4867fb7db684908f6ca5a6edfc39460de5c1cf59"
+  },
+  "orbit360-platform/modules/equipo.js": {
+    "before": "1bd7881ed29f6d7488bb806a96a0ab52c5c5c3b8",
+    "after": "f584c4109294f8e32621c9ee9dd5cfdd55ca2c79"
+  },
+  "orbit360-platform/modules/crm-v1198-operational-bridge.js": {
+    "before": "0ec76280098c2f47982779fbd8d3a220745ea912",
+    "after": "a60cba8f13f53f1934718770517c7261e6860de1"
+  },
+  "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js": {
+    "before": "9b52aeda135d0e371018e739dda5c4ecc9779b58",
+    "after": "fce274b01bf2c52c50e186df1ece97e7474805e7"
+  },
+  "tools/gravicentra-b4-004-policy-form-currency-commission.test.cjs": {
+    "before": null,
+    "after": "3b224bf02b2eaa7642de3692231f23125364ee97"
+  },
+  "tools/gravicentra-b4-004-equipo-commission-audit.test.cjs": {
+    "before": null,
+    "after": "7dba9e0557bc52c161ea0f5d1f8a0aaf133f15b5"
+  },
+  "tools/gravicentra-b4-004-client-create-country-scope.test.cjs": {
+    "before": null,
+    "after": "71eb60784e10d0820ed1918cfde37d65fd8198ab"
+  },
+  "tools/gravicentra-policy-writer-backend-causal.test.cjs": {
+    "before": null,
+    "after": "b26570f21440006fe22f30d4f3343f2de8eeb59b"
+  },
+  "tools/gravicentra-b4-004-policy-capture-successor.test.mjs": {
+    "before": null,
+    "after": "c5b0d4739e818532f6c76150b53b9867931ecab8"
+  },
+  "tools/gravicentra-i6-5-b4-003-preview-proof.mjs": {
+    "before": "f2b32ad5ae09cff159a9c479bd61147a36ae2af9",
+    "after": "315ac260c9d6c00a9cba37beb02c36ce951ac91e"
+  },
+  "tools/gravicentra-b4-004-policy-capture-preview-qa.mjs": {
+    "before": null,
+    "after": "f12dbad5182f36c2912fa1faa1944277f99cacb5"
+  },
+  "tools/gravicentra-b4-004-policy-capture-preview-qa.test.mjs": {
+    "before": null,
+    "after": "15388b57940e4fe894edb23e4e4bc9d468619b8a"
+  },
+  "tools/gravicentra-b4-004-receipt-editor-preservation.test.cjs": {
+    "before": null,
+    "after": "93516d466f67d829089e5be03f46c96709ad57ca"
+  },
+  "artifacts/orbit360-recovery/release-control/I6_5_B4_004_POLICY_CAPTURE_CAUSAL_FRONTEND_SUCCESSOR_CONTRACT_20261107.json": {
+    "before": null,
+    "after": "985c1444446e21f17f1eb6462131304e0c6cc413"
+  },
+  ".github/workflows/gravicentra-b4-003-immutable-candidate-preview.yml": {
+    "before": "8d17a2e1f4e2a6ff8da5d931790c364e8a2f828a",
+    "after": "04e0779feaff7ee204fee67647220fac50576d9b"
+  }
+};
+const POLICY_CAPTURE_PRESERVED={
+  "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CURRENT42_CAUSAL_FRONTEND_SUCCESSOR_CONTRACT_20261107.json": "c792b7db1aa3f16ed7ee20cbdffe2b76dc61b97f",
+  "artifacts/orbit360-recovery/release-control/I6_5_B4_003_E503_RETAINED_HOSTING_PROMOTED_20261107.json": "45f1d3e461b7e92b60c94be820f94cb2f89cac9d",
+  "orbit360-platform/index.html": "867c5e108988b68ca49702e494e96fa9f01afd71",
+  "tools/gravicentra-i6-1-preview-package.mjs": "d42337f326637d669834664289cb3cce36b56342"
+};
+
+export function validatePolicyCaptureCausalSourceSuccessor({record,fileBytes,baseSourceBytes}){
+ const p=record[POLICY_CAPTURE_KEY];if(!p)return null;
+ need(p.schema==='GRAVICENTRA_POLICY_CAPTURE_CAUSAL_SOURCE_SUCCESSOR_V1'&&p.sourceBaseHead===POLICY_CAPTURE_BASE,'POLICY_CAPTURE_BASE');
+ need(p.status==='EXACT_SOURCE_AND_QA_PREPARED_NEW_IMMUTABLE_PREVIEW_REQUIRED'&&p.realBusinessWrites===0&&p.backendSourceChanged===false&&p.rulesChanged===false&&p.authIamChanged===false&&p.livePromotionAuthorized===false&&p.productionAccepted===false&&p.newIntegralModulePass===false,'POLICY_CAPTURE_SCOPE');
+ need(p.workflowPath===POLICY_CAPTURE_WORKFLOW&&p.contractPath===POLICY_CAPTURE_CONTRACT&&p.site==='ays-orbit-360-lab'&&p.channelId==='gi-i65-b4-rc-41765742748'&&p.buildExactlyOnce===true&&p.sameArtifactForLive===true,'POLICY_CAPTURE_IDENTITY');
+ const q=p.authenticatedQaMode;need(q?.runner==='tools/gravicentra-i6-5-b4-003-preview-proof.mjs'&&q.helper==='tools/gravicentra-b4-004-policy-capture-preview-qa.mjs'&&q.test==='tools/gravicentra-b4-004-policy-capture-preview-qa.test.mjs'&&q.environmentMode==='B4_004_POLICY_CAPTURE_QA'&&q.businessWrites===0&&q.authAccountsCreated===0&&q.afterExactArtifactReadback===true&&q.existingSignedActorOnly===true&&q.fixtureIdentityAdapterOnly===true&&q.samePreviewWriterUnmodified===true&&q.exactLedgerCleanupOnly===true&&q.historicalCleanupNotExecuted===true&&q.testOutsideEntrypoint===true,'POLICY_CAPTURE_QA_SCOPE');
+ const privateArchive=record.sourceInventory?.documentManifest20261107?.privateArchive;need(privateArchive&&!Object.hasOwn(privateArchive,'library_file_id')&&privateArchive.fileSha256==='f907293f2e35e72af54754dd8ce25988048eb2bdaad16c380533af6454773ab9'&&privateArchive.access==='OWNER_PRIVATE','POLICY_CAPTURE_PRIVATE_IDENTIFIER');
+ need(p.current42ReceiptBlobSha==='0879188bf245248fa1092fb2014e35e14e802b44'&&p.preservedE503Source==='e5030ec5ba9854f0c576fd905c2f510766347ffa'&&p.preservedE503LiveBytesReceiptBlobSha==='45f1d3e461b7e92b60c94be820f94cb2f89cac9d','POLICY_CAPTURE_PRESERVED_IDENTITY');
+ const changes=p.changes||[],paths=changes.map(e=>e.path);
+ need(paths.length===new Set(paths).size&&same(paths.slice().sort(),Object.keys(POLICY_CAPTURE_PINS).sort()),'POLICY_CAPTURE_EXACT_PATHS');
+ for(const e of changes){const pin=POLICY_CAPTURE_PINS[e.path];
+  need(e.previousBlobSha===pin.before&&e.blobSha===pin.after,'POLICY_CAPTURE_PIN');
+  need(fileBytes[e.path]!=null&&blob(Buffer.from(fileBytes[e.path]))===pin.after&&sha(Buffer.from(fileBytes[e.path]))===e.sha256,'POLICY_CAPTURE_CURRENT_BYTES');
+  const prior=baseSourceBytes?.[e.path];need(pin.before===null?prior==null:prior!=null&&blob(Buffer.from(prior))===pin.before,'POLICY_CAPTURE_BASE_BYTES');
+ }
+ need(same((p.preservedFiles||[]).map(e=>e.path).sort(),Object.keys(POLICY_CAPTURE_PRESERVED).sort()),'POLICY_CAPTURE_PRESERVED_PATHS');
+ for(const e of p.preservedFiles){const pin=POLICY_CAPTURE_PRESERVED[e.path];need(e.blobSha===pin&&fileBytes[e.path]!=null&&blob(Buffer.from(fileBytes[e.path]))===pin,'POLICY_CAPTURE_PRESERVED_BYTES');}
+ const c=JSON.parse(Buffer.from(fileBytes[POLICY_CAPTURE_CONTRACT]).toString('utf8'));
+ need(c.schema==='GRAVICENTRA_CURRENT42_CAUSAL_FRONTEND_SUCCESSOR_CONTRACT_V1'&&c.sourceBaseHead===POLICY_CAPTURE_BASE&&c.scope.b4003Reopened===false&&c.scope.historicalCertificatesRewritten===false&&c.scope.nextGateExecuted===false&&c.scope.backendFunctionDeploys===0&&c.scope.businessWrites===0&&c.scope.rulesWrites===0&&c.scope.authIamChanges===0&&c.scope.reimport===false&&c.promotion.authorized===false,'POLICY_CAPTURE_CONTRACT_SCOPE');
+ need(same(c.productChanges.map(e=>e.path),POLICY_CAPTURE_PRODUCTS)&&c.productChanges.every(e=>e.beforeBlobSha===POLICY_CAPTURE_PINS[e.path].before&&e.afterBlobSha===POLICY_CAPTURE_PINS[e.path].after),'POLICY_CAPTURE_PRODUCT_CONTRACT');
+ need(c.preservedAcceptance.receiptBlobSha===p.current42ReceiptBlobSha&&c.preservedPriorSuccessor.liveBytesReceiptBlobSha===p.preservedE503LiveBytesReceiptBlobSha&&c.rollback.sourceSha===p.preservedE503Source&&c.rollback.versionName==='sites/ays-orbit-360-lab/versions/d8caae0d585bf6dd'&&c.rollback.hostedPayloadDigest==='09c91023d1d22687528a61edb5a768dadbd59c465af91bc48016d21c94c6537f','POLICY_CAPTURE_ROLLBACK_PRESERVED');
+ const comparableFileBytes={...fileBytes,[POLICY_CAPTURE_WORKFLOW]:Buffer.from(baseSourceBytes[POLICY_CAPTURE_WORKFLOW])};
+ return{allowedPaths:paths,comparableFileBytes,frozenPredecessorHead:POLICY_CAPTURE_BASE};
+}
+
+export function validateOwnerDecisionSuccessorSnapshot({control,baseControl,state,baseState,changedPaths,fileBytes,baseSourceBytes,postBaseSourceBytes,catalogBaseSourceBytes,policyCaptureBaseSourceBytes}){
  const p=control[OWNER_KEY];
  need(p&&p.authorityBaseHead===OWNER_BASE,'OWNER_BASE_BINDING');
  const bytes=path=>{need(fileBytes[path]!=null,'OWNER_FILE_MISSING');return Buffer.from(fileBytes[path]);};
  need(p.path===OWNER_FREEZE&&p.planPath===OWNER_PLAN&&blob(bytes(OWNER_FREEZE))===p.blobSha&&blob(bytes(OWNER_PLAN))===p.planBlobSha,'OWNER_DOCUMENT_HASH');
  const r=JSON.parse(bytes(OWNER_FREEZE).toString('utf8'));
- const readerExecution=validateReaderDeploymentSuccessorSnapshot({record:r,fileBytes,baseSourceBytes:postBaseSourceBytes});
- const catalogExecution=validateCatalogTransportSuccessorSnapshot({record:r,fileBytes,baseSourceBytes:catalogBaseSourceBytes});
- const promotionExecution=validateFrontendPromotionSuccessorSnapshot({record:r,control,state,fileBytes:catalogExecution?.comparableFileBytes||fileBytes,baseSourceBytes:postBaseSourceBytes});
+ const captureExecution=validatePolicyCaptureCausalSourceSuccessor({record:r,fileBytes,baseSourceBytes:policyCaptureBaseSourceBytes});
+ const predecessorFileBytes=captureExecution?.comparableFileBytes||fileBytes;
+ const readerExecution=validateReaderDeploymentSuccessorSnapshot({record:r,fileBytes:predecessorFileBytes,baseSourceBytes:postBaseSourceBytes});
+ const catalogExecution=validateCatalogTransportSuccessorSnapshot({record:r,fileBytes:predecessorFileBytes,baseSourceBytes:catalogBaseSourceBytes});
+ const promotionExecution=validateFrontendPromotionSuccessorSnapshot({record:r,control,state,fileBytes:catalogExecution?.comparableFileBytes||predecessorFileBytes,baseSourceBytes:postBaseSourceBytes});
  if(promotionExecution){control=promotionExecution.comparableControl;state=promotionExecution.comparableState;}
- const reconciliationExecution=validateReconciliationReadOnlySuccessorSnapshot({record:r,control,state,fileBytes,baseSourceBytes:postBaseSourceBytes});
+ const reconciliationExecution=validateReconciliationReadOnlySuccessorSnapshot({record:r,control,state,fileBytes:predecessorFileBytes,baseSourceBytes:postBaseSourceBytes});
  if(reconciliationExecution){control=reconciliationExecution.comparableControl;state=reconciliationExecution.comparableState;}
  const candidateArchives=validateReviewedDeferredCandidateArchives({record:r,fileBytes});
- const postAllowedPaths=[...(readerExecution?.allowedPaths||[]),...(promotionExecution?.allowedPaths||[]),...(reconciliationExecution?.allowedPaths||[]),...(catalogExecution?.allowedPaths||[]),...candidateArchives];
- const team=validateEquipoCausalSourceSuccessor({record:r,pointer:p,fileBytes:readerExecution?.comparableFileBytes||fileBytes,baseSourceBytes});
+ const postAllowedPaths=[...(readerExecution?.allowedPaths||[]),...(promotionExecution?.allowedPaths||[]),...(reconciliationExecution?.allowedPaths||[]),...(catalogExecution?.allowedPaths||[]),...candidateArchives,...(captureExecution?.allowedPaths||[])];
+ const team=validateEquipoCausalSourceSuccessor({record:r,pointer:p,fileBytes:readerExecution?.comparableFileBytes||predecessorFileBytes,baseSourceBytes});
  const permitted=new Set([ROOT+'CONTROL_PLANE.json',STATE,OWNER_FREEZE,OWNER_PLAN,SELF,OWNER_TEST,...(team?.allowedPaths||[]),...postAllowedPaths]);
  need(changedPaths.every(x=>permitted.has(x)),'OWNER_UNDECLARED_PATH');
  for(const path of [OWNER_FREEZE,OWNER_PLAN,SELF,OWNER_TEST,...(team?.allowedPaths||[]),...postAllowedPaths])need(changedPaths.includes(path),'OWNER_REQUIRED_PATH');
@@ -516,6 +624,9 @@ function verifyOwnerDecisionSuccessor(after){
  if(!after[OWNER_KEY])return null;
  need(git('merge-base',OWNER_BASE,'HEAD')===OWNER_BASE,'OWNER_BASE_NOT_ANCESTOR');
  const record=read(OWNER_FREEZE),sourceProof=record.equipoCausalSourceCorrection;
+ const captureProof=record[POLICY_CAPTURE_KEY],captureEntries=captureProof?.changes||[];
+ need(captureEntries.every(e=>Object.hasOwn(POLICY_CAPTURE_PINS,e.path)),'POLICY_CAPTURE_UNDECLARED_PATH');
+ const frozenProductEnd=captureProof?POLICY_CAPTURE_BASE:'HEAD';
  const extraPaths=sourceProof?.changes?.map(x=>x.path)||[];
  need(extraPaths.every(path=>Object.hasOwn(TEAM_SOURCE_PATHS,path)),'TEAM_SOURCE_PATH');
  const postGrants=[record.readerDeploymentSuccessor,record.frontendPromotionSuccessor,record.reconciliationReadOnlySuccessor].filter(Boolean);
@@ -530,8 +641,18 @@ function verifyOwnerDecisionSuccessor(after){
  need(Array.isArray(candidateEntries)&&candidateEntries.every(e=>Object.hasOwn(REVIEWED_CANDIDATE_ARCHIVES,e.path)),'REVIEWED_CANDIDATE_UNDECLARED_PATH');
  const catalogActivationPresent=fs.existsSync(CATALOG_ACTIVATION);
  const activationPresent=fs.existsSync(READER_DEPLOY_ACTIVATION);
- const paths=[...new Set([ROOT+'CONTROL_PLANE.json',STATE,OWNER_FREEZE,OWNER_PLAN,SELF,OWNER_TEST,OWNER_V6,...extraPaths,...postEntries.map(x=>x.path),...(activationPresent?[READER_DEPLOY_ACTIVATION]:[]),...catalogEntries.map(e=>e.path),...(catalogActivationPresent?[CATALOG_ACTIVATION]:[]),...candidateEntries.map(e=>e.path)])];
- const fileBytes={},baseSourceBytes={},postBaseSourceBytes={},catalogBaseSourceBytes={};
+ const paths=[...new Set([ROOT+'CONTROL_PLANE.json',STATE,OWNER_FREEZE,OWNER_PLAN,SELF,OWNER_TEST,OWNER_V6,...extraPaths,...postEntries.map(x=>x.path),...(activationPresent?[READER_DEPLOY_ACTIVATION]:[]),...catalogEntries.map(e=>e.path),...(catalogActivationPresent?[CATALOG_ACTIVATION]:[]),...candidateEntries.map(e=>e.path),...captureEntries.map(e=>e.path),...(captureProof?Object.keys(POLICY_CAPTURE_PRESERVED):[])])];
+ const fileBytes={},baseSourceBytes={},postBaseSourceBytes={},catalogBaseSourceBytes={},policyCaptureBaseSourceBytes={};
+ if(captureProof){
+  need(captureProof.sourceBaseHead===POLICY_CAPTURE_BASE&&git('merge-base',POLICY_CAPTURE_BASE,'HEAD')===POLICY_CAPTURE_BASE,'POLICY_CAPTURE_BASE_ANCESTRY');
+  need(!git('diff','--name-only',POLICY_CAPTURE_BASE,'HEAD','--','functions'),'POLICY_CAPTURE_BACKEND_CHANGED');
+  const changed=git('diff','--name-only',POLICY_CAPTURE_BASE,'HEAD','--','orbit360-platform',':(exclude)orbit360-platform/docs/**').split(/\r?\n/).filter(Boolean).sort();
+  need(same(changed,POLICY_CAPTURE_PRODUCTS.slice().sort()),'POLICY_CAPTURE_PRODUCT_DIFF');
+  for(const e of captureEntries){
+   if(POLICY_CAPTURE_PINS[e.path].before===null){need(!git('ls-tree',POLICY_CAPTURE_BASE,'--',e.path),'POLICY_CAPTURE_NEW_PATH_EXISTS');policyCaptureBaseSourceBytes[e.path]=null;}
+   else policyCaptureBaseSourceBytes[e.path]=execFileSync('git',['show',POLICY_CAPTURE_BASE+':'+e.path]);
+  }
+ }
  if(sourceProof){
   need(git('merge-base',TEAM_SOURCE_BASE,'HEAD')===TEAM_SOURCE_BASE,'TEAM_SOURCE_BASE_ANCESTRY');
   for(const path of extraPaths){
@@ -541,7 +662,7 @@ function verifyOwnerDecisionSuccessor(after){
  }
  if(postGrants.length){
   need(git('merge-base',READER_DEPLOY_BASE,'HEAD')===READER_DEPLOY_BASE,'POST_E503_BASE_ANCESTRY');
-  need(!git('diff','--name-only',READER_DEPLOY_BASE,'HEAD','--','functions','orbit360-platform',':(exclude)orbit360-platform/docs/**'),'POST_E503_PRODUCT_REBUILD_FORBIDDEN');
+  need(!git('diff','--name-only',READER_DEPLOY_BASE,frozenProductEnd,'--','functions','orbit360-platform',':(exclude)orbit360-platform/docs/**'),'POST_E503_PRODUCT_REBUILD_FORBIDDEN');
   for(const entry of postEntries){
    if(entry.previousBlobSha===null){need(!git('ls-tree',READER_DEPLOY_BASE,'--',entry.path),'POST_E503_NEW_PATH_ALREADY_EXISTS');postBaseSourceBytes[entry.path]=null;}
    else postBaseSourceBytes[entry.path]=execFileSync('git',['show',READER_DEPLOY_BASE+':'+entry.path]);
@@ -557,12 +678,12 @@ function verifyOwnerDecisionSuccessor(after){
  if(catalogActivationPresent){
   const a=read(CATALOG_ACTIVATION);
   need(/^[a-f0-9]{40}$/.test(a.reviewedSourceHead||'')&&git('merge-base',a.reviewedSourceHead,'HEAD')===a.reviewedSourceHead,'CATALOG_REVIEWED_HEAD_ANCESTRY');
-  need(!git('diff','--name-only',a.reviewedSourceHead,'HEAD','--','functions','orbit360-platform',':(exclude)orbit360-platform/docs/**',...Object.keys(CATALOG_PINS)),'CATALOG_SOURCE_CHANGED_AFTER_REVIEW');
+  need(!git('diff','--name-only',a.reviewedSourceHead,frozenProductEnd,'--','functions','orbit360-platform',':(exclude)orbit360-platform/docs/**',...Object.keys(CATALOG_PINS)),'CATALOG_SOURCE_CHANGED_AFTER_REVIEW');
  }
  if(activationPresent){
   const activation=read(READER_DEPLOY_ACTIVATION);
   need(/^[a-f0-9]{40}$/.test(activation.reviewedSourceHead||'')&&git('merge-base',activation.reviewedSourceHead,'HEAD')===activation.reviewedSourceHead,'READER_ACTIVATION_SOURCE_ANCESTRY');
-  need(!git('diff','--name-only',activation.reviewedSourceHead,'HEAD','--','functions','orbit360-platform',':(exclude)orbit360-platform/docs/**',...Object.keys(READER_DEPLOY_PINS)),'READER_ACTIVATION_REVIEWED_CODE_CHANGED');
+  need(!git('diff','--name-only',activation.reviewedSourceHead,frozenProductEnd,'--','functions','orbit360-platform',':(exclude)orbit360-platform/docs/**',...Object.keys(READER_DEPLOY_PINS)),'READER_ACTIVATION_REVIEWED_CODE_CHANGED');
  }
 
  for(const path of paths){
@@ -572,7 +693,7 @@ function verifyOwnerDecisionSuccessor(after){
  return validateOwnerDecisionSuccessorSnapshot({
   control:after,baseControl:old(OWNER_BASE,ROOT+'CONTROL_PLANE.json'),
   state:read(STATE),baseState:old(OWNER_BASE,STATE),
-  changedPaths:git('diff','--name-only',OWNER_BASE,'HEAD').split(/\r?\n/).filter(Boolean),fileBytes,baseSourceBytes,postBaseSourceBytes,catalogBaseSourceBytes
+  changedPaths:git('diff','--name-only',OWNER_BASE,'HEAD').split(/\r?\n/).filter(Boolean),fileBytes,baseSourceBytes,postBaseSourceBytes,catalogBaseSourceBytes,policyCaptureBaseSourceBytes
  });
 }
 

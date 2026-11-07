@@ -32,7 +32,7 @@ Orbit.modules = Orbit.modules || {};
     tenant_requerido: 'El tenant no está configurado.', cliente_requerido: 'Selecciona un cliente.',
     pais_requerido: 'El cliente necesita país.', moneda_requerida: 'El país necesita moneda configurada.',
     pais_no_coincide_cliente: 'El país de la póliza no coincide con el cliente.',
-    moneda_no_coincide_pais: 'La moneda no coincide con la configuración del país.',
+    moneda_no_coincide_pais: 'Selecciona una moneda de póliza habilitada para el país.',
     aseguradora_requerida: 'Selecciona una aseguradora.', aseguradora_no_vinculada: 'La aseguradora no está vinculada para operación.',
     aseguradora_no_habilitada_pais: 'La aseguradora no está habilitada para el país del cliente.',
     numero_poliza_requerido: 'Ingresa el número real de póliza.', ramo_requerido: 'Selecciona el ramo.',
@@ -70,6 +70,23 @@ Orbit.modules = Orbit.modules || {};
     return 'UNKNOWN';
   }
   function money(cur, n) { return U.money ? U.money(+n || 0, cur || '') : (cur + ' ' + (+n || 0)); }
+
+  function explicitCommission(value) {
+    if (value == null || String(value).trim() === '') return null;
+    const number = Number(value);
+    return Number.isFinite(number) && number >= 0 && number <= 100 ? number : null;
+  }
+  function insurerCommission(insurerId, branch, product) {
+    const insurer = S().get('aseguradoras', insurerId) || {};
+    if (product && insurer.comisionesProd && insurer.comisionesProd[product] != null) return explicitCommission(insurer.comisionesProd[product]);
+    if (branch && insurer.comisiones && insurer.comisiones[branch] != null) return explicitCommission(insurer.comisiones[branch]);
+    return explicitCommission(insurer.comisionDefault);
+  }
+  function sellerCommission(advisorId) {
+    const advisor = S().get('asesores', advisorId) || {};
+    if (advisor.comModo && advisor.comModo !== 'comision') return null;
+    return explicitCommission(advisor.shareCom);
+  }
 
   function countryTaxPct(country) {
     try {
@@ -115,7 +132,7 @@ Orbit.modules = Orbit.modules || {};
     const start = existing && existing.vigenciaInicio || today();
     const end = existing && existing.vigenciaFin || plusYear(start);
     const country = existing && existing.pais || selectedClient.pais;
-    const cur = existing && existing.moneda || A.currencyFor(country);
+    const cur = existing && (existing.moneda || existing.divisa) || A.currencyFor(country);
     const rs = ramos(country).slice(), initialRamo = existing && existing.ramo || rs[0] || '';
     if (initialRamo && !rs.includes(initialRamo)) rs.unshift(initialRamo);
     const initialProduct = existing && (existing.producto || existing.subramo) || '';
@@ -141,7 +158,8 @@ Orbit.modules = Orbit.modules || {};
         <div class="cgrid">
           <label class="ce-l">Cliente *<select class="o-sel" data-client>${clients.map(c => `<option value="${esc(c.id)}" ${c.id === selectedClient.id ? 'selected' : ''}>${esc(c.nombre)}</option>`).join('')}</select></label>
           <label class="ce-l">Asesor / vendedor *<select class="o-sel" data-advisor>${advisors.map(a => '<option value="'+esc(a.id)+'" '+(a.id === initialAdvisorId ? 'selected' : '')+'>'+esc(a.nombre)+'</option>').join('')}</select></label>
-          <label class="ce-l">País / moneda<input class="o-sel" data-country value="${esc(country + ' · ' + cur)}" disabled></label>
+          <label class="ce-l">País del cliente<input class="o-sel" data-country value="${esc(country)}" disabled></label>
+          <label class="ce-l">Moneda de la póliza *<select class="o-sel" data-currency><option value="">— Seleccionar —</option>${E.policyCurrencies(country).map(value => '<option value="'+esc(value)+'" '+(value === cur ? 'selected' : '')+'>'+esc(value)+'</option>').join('')}</select><small>Usa la moneda del documento; los importes no se convierten.</small></label>
           <label class="ce-l">Aseguradora *<select class="o-sel" data-insurer>${insurers.map(a => `<option value="${esc(a.id)}" ${existing && a.id === existing.aseguradoraId ? 'selected' : ''}>${esc(a.nombre)}</option>`).join('')}</select></label>
           <label class="ce-l">N.º real de póliza *<input class="o-sel" data-number value="${esc(existing && existing.numero || '')}" placeholder="No se genera un número ficticio"></label>
           <label class="ce-l">Estado *<select class="o-sel" data-status>${status.map(x => `<option ${existing && x === existing.estado ? 'selected' : (!existing && x === 'Vigente' ? 'selected' : '')}>${x}</option>`).join('')}</select></label>
@@ -166,6 +184,7 @@ Orbit.modules = Orbit.modules || {};
           <label class="ce-l">Recargo financiero %<input type="number" min="0" step="0.01" class="o-sel" data-surcharge value="${esc(existing && existing.recargoFinPct != null ? existing.recargoFinPct : '')}"></label>
           <label class="ce-l">Suma asegurada<input type="number" min="0" step="0.01" class="o-sel" data-sum value="${esc(existing && existing.sumaAsegurada || 0)}"></label>
         </div>
+        ${!existing ? '<div class="gi-form-section-title"><span>💼</span><div>Comisiones de esta póliza<small>Confirma los porcentajes con la planilla o la configuración vigente del vendedor.</small></div></div><div class="cgrid"><label class="ce-l">Comisión aseguradora % de prima neta *<input type="number" min="0" max="100" step="0.01" class="o-sel" data-commission-insurer value="" placeholder="Porcentaje documentado"></label><label class="ce-l">Participación vendedor % de comisión *<input type="number" min="0" max="100" step="0.01" class="o-sel" data-commission-seller value="" placeholder="Porcentaje confirmado"></label></div>' : ''}
         <div class="card pad gi-policy-preview" data-preview></div>
         <div data-vehicle class="gi-vehicle-panel" style="display:none"><div class="gi-form-section-title"><span>🚘</span><div>Vehículo asegurado<small>Completa el riesgo vinculado a esta póliza.</small></div></div><div class="cgrid" style="margin-top:12px"><label class="ce-l">Marca<input class="o-sel" data-vbrand value="${esc(existingVehicle && existingVehicle.marca || '')}"></label><label class="ce-l">Línea<input class="o-sel" data-vline value="${esc(existingVehicle && existingVehicle.linea || '')}"></label><label class="ce-l">Placa<input class="o-sel" data-vplate value="${esc(existingVehicle && existingVehicle.placa || '')}"></label><label class="ce-l">Año<input type="number" class="o-sel" data-vyear value="${esc(existingVehicle && existingVehicle.anio || '')}"></label><label class="ce-l">Uso<input class="o-sel" data-vuse value="${esc(existingVehicle && existingVehicle.uso || 'Particular')}"></label><label class="ce-l">Color<input class="o-sel" data-vcolor value="${esc(existingVehicle && existingVehicle.color || '')}"></label><label class="ce-l">VIN<input class="o-sel" data-vvin value="${esc(existingVehicle && existingVehicle.vin || '')}"></label><label class="ce-l">Chasis<input class="o-sel" data-vchasis value="${esc(existingVehicle && existingVehicle.chasis || '')}"></label><label class="ce-l">Motor<input class="o-sel" data-vmotor value="${esc(existingVehicle && existingVehicle.motor || '')}"></label></div></div>
         ${existing ? '<label class="ce-l">Motivo del cambio *<textarea class="o-sel" data-reason style="min-height:58px"></textarea></label>' : ''}
@@ -175,6 +194,7 @@ Orbit.modules = Orbit.modules || {};
     const b = modal('policy-v1199', inner, 800), $ = s => b.querySelector(s);
     if(opts.focusField==='renovabilidad')setTimeout(()=>{const el=$('[data-renewable]');if(el&&el.scrollIntoView)el.scrollIntoView({block:'center'});if(el)el.focus();},0);
     const clientEl = $('[data-client]'), advisorEl = $('[data-advisor]'), insurerEl = $('[data-insurer]'), ramoEl = $('[data-ramo]'), productEl = $('[data-product]');
+    const currencyEl = $('[data-currency]');
     const clientSearch = $('[data-client-search]');
     function paintClientOptions(query) {
       const current = clientEl.value || (selectedClient && selectedClient.id) || '';
@@ -186,8 +206,11 @@ Orbit.modules = Orbit.modules || {};
     if (clientSearch) clientSearch.addEventListener('input', () => paintClientOptions(clientSearch.value));
     function client() { return S().get('clientes', clientEl.value) || selectedClient; }
     function refreshCountry() {
-      const c = client(), country2 = c.pais || '', currency2 = A.currencyFor(country2);
-      $('[data-country]').value = country2 + ' · ' + currency2;
+      const c = client(), country2 = c.pais || '', currencies = E.policyCurrencies(country2);
+      const currency2 = currencies.includes(currencyEl.value) ? currencyEl.value : currencies[0] || '';
+      currencyEl.innerHTML = '<option value="">— Seleccionar —</option>'+currencies.map(value => '<option value="'+esc(value)+'">'+esc(value)+'</option>').join('');
+      currencyEl.value = currency2;
+      $('[data-country]').value = country2;
       const taxNote = $('[data-tax-note]'); if (taxNote) taxNote.textContent = 'IVA ' + countryTaxPct(country2) + '% según país. Emisión, asistencia y recargo continúan editables para conservar excepciones reales.';
       insurerEl.innerHTML = linkedInsurers(country2).map(a => `<option value="${esc(a.id)}">${esc(a.nombre)}</option>`).join('');
       ramoEl.innerHTML = ramos(country2).map(x => `<option>${esc(x)}</option>`).join(''); refreshProducts('');
@@ -220,8 +243,20 @@ Orbit.modules = Orbit.modules || {};
       }
       preview();
     }
+    function resetNewCommissions(scope) {
+      if (existing) return;
+      if (scope !== 'seller') {
+        const insurerRate = insurerCommission(insurerEl.value, ramoEl.value, productEl.value);
+        $('[data-commission-insurer]').value = insurerRate == null ? '' : String(insurerRate);
+      }
+      if (scope !== 'insurer') {
+        const sellerRate = sellerCommission(advisorEl.value);
+        $('[data-commission-seller]').value = sellerRate == null ? '' : String(sellerRate);
+      }
+      preview();
+    }
     function raw() {
-      const c = client(), country2 = c.pais || '', currency2 = A.currencyFor(country2);
+      const c = client(), country2 = c.pais || '', currency2 = currencyEl.value;
       return {
         id: existing && existing.id, tenantId: existing && existing.tenantId || A.tenantId(), clienteId: c.id, asesorId: advisorEl && advisorEl.value || c.asesorId,
         pais: country2, moneda: currency2, aseguradoraId: insurerEl.value, numero: $('[data-number]').value.trim(), estado: $('[data-status]').value,
@@ -229,7 +264,8 @@ Orbit.modules = Orbit.modules || {};
         frecuencia: $('[data-frequency]').value, formaPago: $('[data-payment-form]').value, conducto: $('[data-conduct]').value,
         cuotas: +$('[data-installments]').value || 1, ivaPct: countryTaxPct(country2), primaNeta: +$('[data-net]').value || 0, gastosEmision: +$('[data-issue]').value || 0,
         otros: +$('[data-other]').value || 0, recargoFinPct: +$('[data-surcharge]').value || 0, sumaAsegurada: +$('[data-sum]').value || 0,
-        comAseguradoraPct: existing && existing.comAseguradoraPct || 0, comVendedorPct: existing && existing.comVendedorPct || 0,
+        comAseguradoraPct: existing ? existing.comAseguradoraPct || 0 : explicitCommission($('[data-commission-insurer]').value),
+        comVendedorPct: existing ? existing.comVendedorPct || 0 : explicitCommission($('[data-commission-seller]').value),
         fuente: existing && existing.fuente || 'ingreso_manual_plataforma',
         vehiculo: /auto|veh/i.test(ramoEl.value) ? { id: existingVehicle && existingVehicle.id || '', marca: $('[data-vbrand]').value.trim(), linea: $('[data-vline]').value.trim(), placa: $('[data-vplate]').value.trim(), anio: $('[data-vyear]').value, uso: $('[data-vuse]').value.trim(), color: $('[data-vcolor]').value.trim(), vin: $('[data-vvin]').value.trim(), chasis: $('[data-vchasis]').value.trim(), motor: $('[data-vmotor]').value.trim(), sumaAsegurada: +$('[data-sum]').value || 0 } : null
       };
@@ -240,7 +276,9 @@ Orbit.modules = Orbit.modules || {};
       preview.innerHTML = `<div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start"><div><small class="muted">Resultado antes de guardar</small><b style="display:block">${active ? recs.length + ' recibo(s) en cartera' : 'Histórico · sin cartera nueva'}</b></div><b>${money(prepared.moneda, prepared.primaTotal)}</b></div><div class="asg197-info-grid" style="margin-top:10px"><div><small>Prima neta</small><b>${money(prepared.moneda, prepared.primaNeta)}</b></div><div><small>Gastos financieros</small><b>${money(prepared.moneda, prepared.gastosFinan)}</b></div><div><small>IVA</small><b>${money(prepared.moneda, prepared.ivaMonto)}</b></div><div><small>Total</small><b>${money(prepared.moneda, prepared.primaTotal)}</b></div></div>`;
       if(active&&recs.length)preview.insertAdjacentHTML('beforeend','<div style="margin-top:12px"><div style="font-weight:800;font-size:14px;margin-bottom:7px">🧾 Calendario que quedará guardado</div><div style="max-height:190px;overflow:auto;border:1px solid var(--line);border-radius:10px"><table class="tbl"><thead><tr><th>Recibo</th><th>Vence</th><th class="num">Monto</th></tr></thead><tbody>'+recs.map((r,i)=>'<tr><td>'+(i+1)+'</td><td>'+esc(r.fechaLimite||r.vence||r.fechaVencimiento||'—')+'</td><td class="num">'+esc(money(prepared.moneda,r.montoTotal!=null?r.montoTotal:r.monto))+'</td></tr>').join('')+'</tbody></table></div></div>');
     }
-    clientEl.addEventListener('change', () => { if (!existing && advisorEl) { const own = client().asesorId; if (own && advisors.some(a => a.id === own)) advisorEl.value = own; } refreshCountry(); }); ramoEl.addEventListener('change', () => refreshProducts('', false));
+    clientEl.addEventListener('change', () => { if (!existing && advisorEl) { const own = client().asesorId; if (own && advisors.some(a => a.id === own)) advisorEl.value = own; } refreshCountry(); resetNewCommissions(); }); ramoEl.addEventListener('change', () => refreshProducts('', false));
+    [insurerEl, ramoEl, productEl].forEach(el => el.addEventListener('change', () => resetNewCommissions('insurer')));
+    advisorEl.addEventListener('change', () => resetNewCommissions('seller'));
     $('[data-start]').addEventListener('change', () => { if (!$('[data-end]').value) $('[data-end]').value = plusYear($('[data-start]').value); preview(); });
     $('[data-frequency]').addEventListener('change', syncInstallments);
     b.querySelectorAll('input,select').forEach(el => el.addEventListener('input', preview));
@@ -264,6 +302,16 @@ Orbit.modules = Orbit.modules || {};
     $('[data-save]').addEventListener('click', async () => {
       const save = $('[data-save]'), payload = raw(), reason = existing ? $('[data-reason]').value.trim() : 'Alta operativa desde plataforma';
       const err = $('[data-error]'), originalText = save.textContent;
+      const commissionAdvisor = S().get('asesores', payload.asesorId) || {};
+      if (!existing && commissionAdvisor.comModo && commissionAdvisor.comModo !== 'comision') {
+        err.style.display = ''; err.textContent = 'El vendedor usa otro modelo de comisión. Conserva esa configuración y registra este caso mediante su flujo correspondiente; no se convertirá a participación porcentual.';
+        return;
+      }
+      if (!existing && (payload.comAseguradoraPct == null || payload.comVendedorPct == null)) {
+        err.style.display = ''; err.textContent = 'Completa ambos porcentajes de comisión entre 0 y 100; no se sustituye una tarifa pendiente por cero.';
+        const field = payload.comAseguradoraPct == null ? $('[data-commission-insurer]') : $('[data-commission-seller]');
+        field.focus(); return;
+      }
       if (existing && !reason) { err.style.display=''; err.textContent=ERROR_LABELS.motivo_requerido; $('[data-reason]').focus(); return; }
       if(existing&&protectedPreviewRealPolicy(existing.id)){err.style.display='';err.textContent='Esta Preview protege los registros reales. La persistencia se valida aquí con una póliza sintética equivalente; el cambio real se prueba únicamente en el gate LIVE autorizado.';return;}
       save.disabled = true; save.textContent = 'Guardando…';
@@ -277,7 +325,7 @@ Orbit.modules = Orbit.modules || {};
         save.disabled = false; save.textContent = originalText;
       }
     });
-    refreshProducts(initialProduct, true); syncInstallments(); preview();
+    refreshProducts(initialProduct, true); syncInstallments(); resetNewCommissions(); preview();
   }
 
   function openVehicleForm(vehicleId) {

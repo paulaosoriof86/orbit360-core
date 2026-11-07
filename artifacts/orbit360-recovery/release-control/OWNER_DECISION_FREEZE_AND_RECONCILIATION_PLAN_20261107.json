@@ -10,7 +10,7 @@
   "authority": "PAULA_EXPLICIT_REQUEST_TO_FREEZE_COMPLETE_DECISIONS_AND_WORK_PLAN",
   "plan": {
     "path": "artifacts/orbit360-recovery/release-control/PLAN_OPERATIVO_DECISIONES_PAULA_20261107.md",
-    "blobSha": "272a75f7aa69a37be42d7f1cd38ed89bad221013"
+    "blobSha": "c764aea8d8a2bb7c33e3745f585f1c55158f7a2e"
   },
   "canonicalControlPlane": "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json",
   "canonicalMasterPlan": "artifacts/orbit360-recovery/release-control/I6_PENDING_CLOSURE_MASTER_PLAN_LOCK_20261004.json",
@@ -398,10 +398,10 @@
       "sourceManifestSha256": "495d6c396888d3ea3366034b617c0e97f9e6f730242e5d65a9a694c65814a984",
       "normalizedRowsSha256": "7ff5fe4764bb87d252eebf0c94847ac23bd79ff45053fd2b6a84f4e887c58403",
       "privateArchive": {
-        "library_file_id": "libfile_5bb95cb193788191aaf23be9c41a06b1",
         "fileName": "Gravicentra_Conciliacion_Octubre_2026_Expediente_20261107.zip",
         "fileSha256": "f907293f2e35e72af54754dd8ce25988048eb2bdaad16c380533af6454773ab9",
-        "access": "OWNER_PRIVATE"
+        "access": "OWNER_PRIVATE",
+        "custody": "OWNER_PRIVATE_IDENTIFIER_REDACTED_FROM_PUBLIC_SUCCESSOR; fileSha256 and prior evidence status preserved"
       },
       "canonicalMatchingExecuted": false,
       "realDataApplied": false
@@ -492,9 +492,9 @@
     "schema": "GRAVICENTRA_OWNER_DOCUMENTARY_SUCCESSOR_VALIDATION_V1",
     "baseHead": "74312cc3621ba155ee288a0afb530a488246f0e6",
     "guardPath": "tools/gravicentra-b4-003-formal-live-closeout-guard.mjs",
-    "guardBlobSha": "ff5428a38e4133ae595c055e6c2b510f29826277",
+    "guardBlobSha": "5f24f4c6df5951d5166c8bb50490caf5f6c2b16e",
     "testPath": "tools/gravicentra-b4-003-owner-decision-successor.test.mjs",
-    "testBlobSha": "6b18e69ad9196ce9d4ebec821928e619fb9fd300",
+    "testBlobSha": "790f27717ba9a1a985f007e4910a779898573d20",
     "sealedMasterPlanBlobPreserved": "458c5af57b2f7d9453d0064eba0cd737edf14ef4",
     "sealedCapabilityLedgerBlobPreserved": "81511551540dbe0c1dbc54d9c4f8e00537550716",
     "initialDocumentationCommit": "766e30b1bda1543763b6e8d9d17119f84d7f75d8",
@@ -3676,5 +3676,410 @@
       "deployed": false,
       "dataApplied": false
     }
+  },
+  "policyCaptureCausalSourceCorrection20261107": {
+    "schema": "GRAVICENTRA_POLICY_CAPTURE_CAUSAL_SOURCE_SUCCESSOR_V1",
+    "sourceBaseHead": "932ccaca0a808b2b4ae577c0a3a27fa80220dbe5",
+    "status": "EXACT_SOURCE_AND_QA_PREPARED_NEW_IMMUTABLE_PREVIEW_REQUIRED",
+    "realBusinessWrites": 0,
+    "backendSourceChanged": false,
+    "rulesChanged": false,
+    "authIamChanged": false,
+    "livePromotionAuthorized": false,
+    "productionAccepted": false,
+    "newIntegralModulePass": false,
+    "workflowPath": ".github/workflows/gravicentra-b4-003-immutable-candidate-preview.yml",
+    "contractPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_004_POLICY_CAPTURE_CAUSAL_FRONTEND_SUCCESSOR_CONTRACT_20261107.json",
+    "site": "ays-orbit-360-lab",
+    "channelId": "gi-i65-b4-rc-41765742748",
+    "buildExactlyOnce": true,
+    "sameArtifactForLive": true,
+    "current42ReceiptBlobSha": "0879188bf245248fa1092fb2014e35e14e802b44",
+    "preservedE503Source": "e5030ec5ba9854f0c576fd905c2f510766347ffa",
+    "preservedE503LiveBytesReceiptBlobSha": "45f1d3e461b7e92b60c94be820f94cb2f89cac9d",
+    "changes": [
+      {
+        "path": "orbit360-platform/core/policy-receipts-engine.js",
+        "previousBlobSha": "b04fdd580efcc2fdfa8703238e92ab5bc51d6347",
+        "blobSha": "37471433de5b09ba4ecd2ca847baae55317ff8e5",
+        "sha256": "4cd2a33102396bdf3784b92a7b8e74b441052681185f663dfe96f702829ade10"
+      },
+      {
+        "path": "orbit360-platform/modules/policy-receipts-v1199-bridge.js",
+        "previousBlobSha": "79e8eefc821b17b1abb3ba7b26558e90199a9ea5",
+        "blobSha": "4867fb7db684908f6ca5a6edfc39460de5c1cf59",
+        "sha256": "91645e02afa01c52fbc745d45429f595b60e870a3ef79cdacf6b8ca705e6bdaa"
+      },
+      {
+        "path": "orbit360-platform/modules/equipo.js",
+        "previousBlobSha": "1bd7881ed29f6d7488bb806a96a0ab52c5c5c3b8",
+        "blobSha": "f584c4109294f8e32621c9ee9dd5cfdd55ca2c79",
+        "sha256": "c820edcedce8655e11701264b2e85dc0b07e55795b6e723d44bad25062cea8fc"
+      },
+      {
+        "path": "orbit360-platform/modules/crm-v1198-operational-bridge.js",
+        "previousBlobSha": "0ec76280098c2f47982779fbd8d3a220745ea912",
+        "blobSha": "a60cba8f13f53f1934718770517c7261e6860de1",
+        "sha256": "e8696837fa3e50ba145816268d3969ae7f90e80c378fb67494e6cd95971de086"
+      },
+      {
+        "path": "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
+        "previousBlobSha": "9b52aeda135d0e371018e739dda5c4ecc9779b58",
+        "blobSha": "fce274b01bf2c52c50e186df1ece97e7474805e7",
+        "sha256": "c4c22130d3221deb0f272fe417287654d0689e38b4e75ecf08ca22589fb9fea6"
+      },
+      {
+        "path": "tools/gravicentra-b4-004-policy-form-currency-commission.test.cjs",
+        "previousBlobSha": null,
+        "blobSha": "3b224bf02b2eaa7642de3692231f23125364ee97",
+        "sha256": "0741f036421c36ef5658aca81a3e9156f0a2985fb3f17cb7f1e4b87277a997da"
+      },
+      {
+        "path": "tools/gravicentra-b4-004-equipo-commission-audit.test.cjs",
+        "previousBlobSha": null,
+        "blobSha": "7dba9e0557bc52c161ea0f5d1f8a0aaf133f15b5",
+        "sha256": "c1937707fd3b1a5c86c0ce0fe616aaa74733f449e61d5c8d60cceb81d09e74c6"
+      },
+      {
+        "path": "tools/gravicentra-b4-004-client-create-country-scope.test.cjs",
+        "previousBlobSha": null,
+        "blobSha": "71eb60784e10d0820ed1918cfde37d65fd8198ab",
+        "sha256": "3b32d9390d7848e0cd1e1bdd17dd0b7c2b7733c17834ac47fd26d46f6f63ebde"
+      },
+      {
+        "path": "tools/gravicentra-policy-writer-backend-causal.test.cjs",
+        "previousBlobSha": null,
+        "blobSha": "b26570f21440006fe22f30d4f3343f2de8eeb59b",
+        "sha256": "fb74c94f96a7b6c606106f9b92b70999751ed94047a1d3b583a82a4f3bd0f514"
+      },
+      {
+        "path": "tools/gravicentra-b4-004-policy-capture-successor.test.mjs",
+        "previousBlobSha": null,
+        "blobSha": "c5b0d4739e818532f6c76150b53b9867931ecab8",
+        "sha256": "18799004907cdf915534681bcb018e0935b2f1207ac629ebda60583516347de0"
+      },
+      {
+        "path": "tools/gravicentra-i6-5-b4-003-preview-proof.mjs",
+        "previousBlobSha": "f2b32ad5ae09cff159a9c479bd61147a36ae2af9",
+        "blobSha": "315ac260c9d6c00a9cba37beb02c36ce951ac91e",
+        "sha256": "ea9d9a4a95e5399660b310d06e9daee8bd5be076d7a66c922554cb5d73436b5c"
+      },
+      {
+        "path": "tools/gravicentra-b4-004-policy-capture-preview-qa.mjs",
+        "previousBlobSha": null,
+        "blobSha": "f12dbad5182f36c2912fa1faa1944277f99cacb5",
+        "sha256": "5c2cab25e764ef52e653c3f9764a59b405b2cff130e1078522447ec601766328"
+      },
+      {
+        "path": "tools/gravicentra-b4-004-policy-capture-preview-qa.test.mjs",
+        "previousBlobSha": null,
+        "blobSha": "15388b57940e4fe894edb23e4e4bc9d468619b8a",
+        "sha256": "21d4a4c397cd5f4b536034c507393095cf015922075e4182bc41d730132dd8c3"
+      },
+      {
+        "path": "tools/gravicentra-b4-004-receipt-editor-preservation.test.cjs",
+        "previousBlobSha": null,
+        "blobSha": "93516d466f67d829089e5be03f46c96709ad57ca",
+        "sha256": "25ad3f67e11f73f66c65ba3ef6045df36eb5ed195199e2ffcc4e4ec71417a6e3"
+      },
+      {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_004_POLICY_CAPTURE_CAUSAL_FRONTEND_SUCCESSOR_CONTRACT_20261107.json",
+        "previousBlobSha": null,
+        "blobSha": "985c1444446e21f17f1eb6462131304e0c6cc413",
+        "sha256": "82e4c34a53c2d419f5bebb46029ac53f1b4599180be5edae77243a3b7c6a2c8b"
+      },
+      {
+        "path": ".github/workflows/gravicentra-b4-003-immutable-candidate-preview.yml",
+        "previousBlobSha": "8d17a2e1f4e2a6ff8da5d931790c364e8a2f828a",
+        "blobSha": "04e0779feaff7ee204fee67647220fac50576d9b",
+        "sha256": "1d889c26d87d943ef82bde034f1a5f50bf27276ac156f0105d3580c2a403605a"
+      }
+    ],
+    "preservedFiles": [
+      {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CURRENT42_CAUSAL_FRONTEND_SUCCESSOR_CONTRACT_20261107.json",
+        "blobSha": "c792b7db1aa3f16ed7ee20cbdffe2b76dc61b97f"
+      },
+      {
+        "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_E503_RETAINED_HOSTING_PROMOTED_20261107.json",
+        "blobSha": "45f1d3e461b7e92b60c94be820f94cb2f89cac9d"
+      },
+      {
+        "path": "orbit360-platform/index.html",
+        "blobSha": "867c5e108988b68ca49702e494e96fa9f01afd71"
+      },
+      {
+        "path": "tools/gravicentra-i6-1-preview-package.mjs",
+        "blobSha": "d42337f326637d669834664289cb3cce36b56342"
+      }
+    ],
+    "causalBoundary": [
+      "Missing country in actual client/policy activity and Equipo audit; no RBAC relaxation.",
+      "Explicit policy currency and documented commission input; no fabricated zero, no neta/fijo conversion.",
+      "Receipt date correction keeps paid-evidence lock and atomic receipt/portfolio/activity owner.",
+      "A native committed input change was confirmed as60 after fresh LIVE reload; no listener defect is claimed. Audit-context defect remains causal.",
+      "Native receipt editor preserves legacy and canonical premium amounts, sends only changed fields, and never treats a blank amount as zero. New receipt aliases and explicitly edited alias pairs remain coherent; date-only edits leave money untouched."
+    ],
+    "localVerification": {
+      "policyFormTests": 7,
+      "equipoRenderAuditTests": 3,
+      "clientCreateCountryScopeTests": 6,
+      "independentActualWriterBackendTests": 12,
+      "governancePositiveNegativeChecks": 20,
+      "signedPreviewUat": "PENDING",
+      "sameArtifactPromotion": "PENDING_NEW_RECEIPT_AND_CURSOR",
+      "previewIdentityBoundaryTests": 14,
+      "receiptEditorPreservationTests": 11
+    },
+    "authenticatedQaMode": {
+      "runner": "tools/gravicentra-i6-5-b4-003-preview-proof.mjs",
+      "helper": "tools/gravicentra-b4-004-policy-capture-preview-qa.mjs",
+      "test": "tools/gravicentra-b4-004-policy-capture-preview-qa.test.mjs",
+      "environmentMode": "B4_004_POLICY_CAPTURE_QA",
+      "status": "IMPLEMENTED_NOT_EXECUTED_AUTHENTICATED",
+      "receiptSchema": "GRAVICENTRA_B4_004_POLICY_CAPTURE_FOCAL_PREVIEW_QA_V1",
+      "requiredStatus": "FOCAL_AUTHENTICATED_UI_PASS",
+      "afterExactArtifactReadback": true,
+      "existingSignedActorOnly": true,
+      "authAccountsCreated": 0,
+      "businessWrites": 0,
+      "fixtureIdentityAdapterOnly": true,
+      "samePreviewWriterUnmodified": true,
+      "exactLedgerCleanupOnly": true,
+      "historicalCleanupNotExecuted": true,
+      "testOutsideEntrypoint": true
+    },
+    "documentSanitization": {
+      "path": "artifacts/orbit360-recovery/release-control/OWNER_DECISION_FREEZE_AND_RECONCILIATION_PLAN_20261107.json",
+      "field": "sourceInventory.documentManifest20261107.privateArchive.library_file_id",
+      "operation": "REMOVE_PRIVATE_IDENTIFIER_FROM_NEW_PUBLIC_SUCCESSOR_ONLY",
+      "evidenceHashPreserved": true,
+      "historicalCommitUnchanged": true
+    }
+  },
+  "ownerResponseCriteriaAdditive20261107": {
+    "schema": "GRAVICENTRA_OWNER_RESPONSE_CRITERIA_ADDITIVE_20261107_V1",
+    "status": "OWNER_CRITERIA_APPENDED_TO_EXISTING_FREEZE_NO_NEW_ACCEPTANCE",
+    "operationalDate": "2026-11-07",
+    "basis": "Latest explicit owner response and documentary evidence. Coordinating-agent operational observations are scoped and do not close in-progress operations.",
+    "authorityHead": "932ccaca0a808b2b4ae577c0a3a27fa80220dbe5",
+    "targetExistingFreeze": "artifacts/orbit360-recovery/release-control/OWNER_DECISION_FREEZE_AND_RECONCILIATION_PLAN_20261107.json",
+    "additiveOnly": true,
+    "preserved": {
+      "canonicalCandidate": "SAME_CUMULATIVE_CANDIDATE",
+      "canonicalBranch": "recovery/fase-a-clean-20260831",
+      "B4_003Current42Acceptance": "PRESERVED_WITH_EXISTING_SCOPE",
+      "firstIncompleteFormalGate": "B4-004",
+      "firestoreOperationalAuthority": true,
+      "driveDocumentaryAuthority": true,
+      "sameCanonicalPaymentOwnerAndEngine": true,
+      "existingApprovedModulesAndEvidence": true,
+      "sameImmutableArtifactAcrossPreviewAndPromotion": true
+    },
+    "criteria": [
+      {
+        "id": "STATEMENTS_FOLDER_FOUND",
+        "authority": "DOCUMENTARY_READ_ONLY_AUDIT",
+        "decision": "Se ubicó y revisó la carpeta de estados de cuenta de aseguradoras, subcarpeta Noviembre: 11 archivos de 10 aseguradoras.",
+        "state": "DOCUMENTS_FOUND_AND_REVIEWED_NOT_OPERATIONALLY_RECONCILED",
+        "constraints": [
+          "El mes de la carpeta no sustituye la fecha de corte de cada documento. Distinguir fecha interna y fecha indicada solo en el nombre.",
+          "No convertir una fila pendiente en pagada porque contenga una fecha de cobro o no aparezca en otro estado.",
+          "Un saldo anterior no revierte un pago explícito posterior.",
+          "Mantener separados el lote de recaudos de octubre, las fechas de facturación y los cortes documentales."
+        ]
+      },
+      {
+        "id": "MAPFRE_ADDITIONAL_COLLECTION_INCENTIVE",
+        "authority": "LATEST_EXPLICIT_OWNER_RESPONSE",
+        "decision": "El complemento de Mapfre es un incentivo adicional por cobro de la cartera.",
+        "state": "BUSINESS_MEANING_CONFIRMED_APPLICATION_PENDING",
+        "constraints": [
+          "Conservarlo como componente adicional con su fuente y alcance.",
+          "No convertirlo en tasa global ni repartirlo entre pólizas sin base documental.",
+          "Una factura o planilla no demuestra por sí sola ingreso efectivo en banco."
+        ]
+      },
+      {
+        "id": "LINKED_HEALTH_AND_LIFE_DOCUMENTS",
+        "authority": "LATEST_EXPLICIT_OWNER_RESPONSE_AND_DOCUMENT_REVIEW",
+        "decision": "Conservar las coberturas o certificados de vida vinculados a salud dentro de la relación documental de póliza y cliente correspondiente. Preservar componentes económicos sin duplicar clientes, recaudos ni cartera.",
+        "state": "RELATIONSHIP_CRITERION_CONFIRMED",
+        "constraints": [
+          "Un número de certificado o identificador técnico diferente no demuestra una póliza independiente.",
+          "Verificar la relación antes de consolidar primas y comisiones.",
+          "Un certificado de vida sí consta en el adjunto cuya ausencia se había indicado demasiado ampliamente; existe corrección privada separada. En ese caso siguen sin demostrarse calendario completo y prima de vida de todo el término."
+        ]
+      },
+      {
+        "id": "DISTINCT_ADDITIONAL_AND_EXCLUDED_POLICIES",
+        "authority": "LATEST_EXPLICIT_OWNER_RESPONSE_AND_DOCUMENT_REVIEW",
+        "decision": "Conservar separadas las pólizas confirmadas como diferentes, los vehículos distintos y las pólizas adicionales. No dar de alta la póliza expresamente excluida por la propietaria.",
+        "state": "OWNER_IDENTITY_AND_EXCLUSION_DECISIONS_CONFIRMED",
+        "constraints": [
+          "Las identidades de cada caso permanecen en el mapa privado.",
+          "No deduplicar por cliente cuando el riesgo o contrato es distinto.",
+          "La póliza adicional recién emitida mantiene su vigencia y fecha propias; pertenecer al mismo envío no la convierte en recaudo de octubre.",
+          "Aplicar altas y relaciones mediante owners canónicos con lectura posterior."
+        ]
+      },
+      {
+        "id": "TRANSPORT_TERM_AND_RENEWABILITY_PER_POLICY",
+        "authority": "LATEST_EXPLICIT_OWNER_RESPONSE",
+        "decision": "Las pólizas de transporte suelen tener vigencia de un mes y no ser renovables. Aplicar vigencia y renovabilidad acreditadas por contrato.",
+        "state": "PER_POLICY_CRITERION_CONFIRMED",
+        "constraints": [
+          "No convertir una observación mayoritaria en prohibición global de renovar todo el ramo.",
+          "No extender un contrato mensual a un año ni generar cuotas anuales predeterminadas."
+        ]
+      },
+      {
+        "id": "FOUR_RENEWAL_DOCUMENTS_FOUND",
+        "authority": "DOCUMENTARY_READ_ONLY_AUDIT",
+        "decision": "Se localizaron cuatro renovaciones en los expedientes documentales y se extrajeron vigencias y calendarios específicos para preparar su aplicación.",
+        "state": "FOUR_DOCUMENTARY_RENEWAL_CANDIDATES_FOUND",
+        "constraints": [
+          "Encontrar los documentos no demuestra que las renovaciones estén creadas en la plataforma.",
+          "Conservar sucesión de vigencias y póliza anterior, sin duplicar el término renovado.",
+          "Un caso adicional de pago de vigencia actual sigue requiriendo la carátula exacta de renovación; no sustituirla por la de la vigencia anterior.",
+          "No derivar una prima anual multiplicando la base de comisión de un movimiento."
+        ]
+      },
+      {
+        "id": "CURRENT_TERM_PAYMENT_COMPLETES_PREVIOUS_TERM_BY_INFERENCE",
+        "authority": "LATEST_EXPLICIT_OWNER_RESPONSE",
+        "decision": "Cuando existe un pago de la vigencia actual y no están completos los pagos de la vigencia anterior, completar por inferencia los pagos pendientes de esa vigencia anterior.",
+        "state": "OWNER_APPROVED_RULE_PENDING_IMPLEMENTATION_AND_FUNCTIONAL_VERIFICATION",
+        "constraints": [
+          "Verificar identidad, relación entre vigencias, calendario anterior y evidencia del pago actual.",
+          "Marcar resultados como inferidos y conservar procedencia, sin presentar una fecha real de pago desconocida como documentada.",
+          "Cada obligación anterior mantiene su fecha contractual original; no trasladarla a octubre por descubrirla en ese lote.",
+          "Preservar pagos y liquidaciones existentes; aplicar únicamente faltantes con identidad idempotente.",
+          "Implementar en el motor y owner canónicos existentes, sin motor paralelo ni escritura masiva fuera del flujo auditado.",
+          "No afirmar aplicación o aceptación funcional sin implementación, pruebas y readbacks."
+        ]
+      },
+      {
+        "id": "LIVING_ADVISOR_COMMISSION_RATES_FORWARD",
+        "authority": "LATEST_EXPLICIT_OWNER_RESPONSE_AND_PRESERVED_FREEZE",
+        "decision": "Los cambios de porcentaje o modelo de comisión de un vendedor afectan los cálculos desde su fecha efectiva hacia adelante.",
+        "state": "OWNER_APPROVED_CRITERION_EFFECTIVE_DATE_IMPLEMENTATION_PENDING",
+        "constraints": [
+          "Conservar versión, vigencia, base y porcentaje por evento.",
+          "No recalcular silenciosamente liquidaciones cerradas ni eventos históricos con la configuración actual.",
+          "Una corrección histórica explícita es un evento controlado separado.",
+          "Reutilizar la configuración por usuario; no sustituirla por valores predeterminados."
+        ]
+      },
+      {
+        "id": "ADDITIONAL_ADVISOR_CONFIRMED_SHARE_60",
+        "authority": "LATEST_EXPLICIT_OWNER_RESPONSE",
+        "decision": "La participación confirmada del asesor adicional indicado por la propietaria es del 60 %. Nombre e ID canónico permanecen en el expediente privado.",
+        "confirmedPercentage": 60,
+        "percentageMeaning": "Participación del vendedor según su modelo; no tasa pagada por la aseguradora.",
+        "state": "CRITERION_CONFIRMED_PERSISTENCE_VERIFIED_IN_SEPARATE_OPERATIONAL_RECEIPT",
+        "constraints": [
+          "Crear el perfil no demuestra que el 60 % se guardó.",
+          "No aceptar el 50 % predeterminado en sustitución del 60 % autorizado.",
+          "Documentar persistencia e incidencias en el recibo operacional separado.",
+          "La asignación del cliente y la activación de los cálculos económicos tienen comprobaciones distintas."
+        ],
+        "executionObservation": "Coordinating agent verified the configured60 after a full LIVE page reload; commission audit remains unverified and has a causal source correction."
+      },
+      {
+        "id": "DOCUMENTED_INSURER_RATE_AND_PREMIUM_SCOPE",
+        "authority": "LATEST_EXPLICIT_OWNER_RESPONSE_AND_PRESERVED_FREEZE",
+        "decision": "Usar el porcentaje de la planilla para su evento documentado. La propietaria confirmó un 10 % para Universales; el alcance exacto entre los casos consultados requiere aclaración ante una línea documental con otro porcentaje. Corregir primas, importes y calendarios únicamente con el alcance acreditado.",
+        "state": "OWNER_RATE_VALUE_CONFIRMED_CASE_SCOPE_AMBIGUOUS_HOLD_ONLY_CONFLICTING_FINANCIAL_EFFECT",
+        "constraints": [
+          "No sustituir el porcentaje documental de otro caso ni aplicar la tasa ambigua hasta resolver su alcance. La duda no bloquea la preparación de la identidad del cliente.",
+          "No generalizar una tasa a todos los ramos o productos.",
+          "Los planes mensuales anuales de Gastos Médicos pueden tener 12 pagos; no forzar 12 sobre vigencia parcial ni sustituir un calendario acreditado.",
+          "Los 12 pagos documentados en otros ramos son evidencia por póliza, sin ampliación global automática.",
+          "Distinguir moneda, prima neta, gastos, impuestos, prima total y base de comisión."
+        ]
+      },
+      {
+        "id": "DATA_QUALITY_FOCAL_PERSISTENCE_NOT_INTEGRAL_ACCEPTANCE",
+        "authority": "COORDINATING_AGENT_OPERATIONAL_READBACK_AND_PRESERVED_MODULE_EVIDENCE",
+        "decision": "Preservar aceptaciones previas de Calidad de Datos. Hay prueba focal de corrección documental de un contacto, guardado, desaparición de alerta, recarga completa y consistencia en Cliente 360.",
+        "state": "FOCAL_REAL_WRITE_RELOAD_CLIENT360_PASS_NOT_INTEGRAL_MODULE_PASS",
+        "scope": [
+          "Un campo de contacto real sustentado documentalmente.",
+          "Persistencia tras recarga completa.",
+          "Misma información al abrir Cliente 360."
+        ],
+        "constraints": [
+          "No equivale a aceptación integral de todas las acciones, roles, relaciones y pantallas del módulo.",
+          "No asignar porcentaje global de terminación sin matriz y evidencia suficientes.",
+          "No reabrir capacidades aprobadas salvo regresión causal reproducible.",
+          "Usar discrepancias reales de conciliación en Calidad, sin reconstruir ni reimportar para reparar visualización."
+        ]
+      },
+      {
+        "id": "DNS_ACME_PUBLIC_SSL_PENDING",
+        "authority": "COORDINATING_AGENT_DOMAIN_OBSERVATION",
+        "decision": "La verificación ACME requerida tiene publicación DNS pública observada. La emisión o aceptación de SSL sigue pendiente.",
+        "state": "PUBLIC_DNS_ACME_OBSERVED_SSL_PENDING",
+        "constraints": [
+          "Publicación DNS no equivale a certificado emitido ni a aceptación productiva del dominio.",
+          "Verificar proveedor, HTTPS, artifact/digest y aplicación antes de declarar el dominio listo.",
+          "Conservar mismo Firebase y candidata canónica acumulativa.",
+          "No publicar valores de desafíos DNS en este addendum.",
+          "Escrituras de DNS y readbacks permanecen en el recibo operacional; este addendum no modifica el artifact certificado."
+        ]
+      },
+      {
+        "id": "FINANCE_DEFERRED_EFFECTS_WITHOUT_DATA_LOSS",
+        "authority": "LATEST_EXPLICIT_OWNER_RESPONSE_AND_PRESERVED_FREEZE",
+        "decision": "La conciliación operativa puede adelantarse a la terminación integral de Finanzas si se conservan durablemente hechos, economía, moneda, procedencia, versiones de tasa y efectos financieros pendientes.",
+        "state": "PRESERVED_REQUIREMENT_NOT_A_FINANCIAL_REPLAY_IMPLEMENTATION_CLAIM",
+        "constraints": [
+          "Cruzar efectos posteriormente mediante el mismo contrato canónico, de forma idempotente.",
+          "Mostrar conciliación, excepciones y efectos pendientes con su estado real.",
+          "No afirmar sincronización completa antes de comprobar todas las superficies afectadas.",
+          "Las mejoras de aplicación no sustituyen ni borran información operativa actualizada por la empresa."
+        ]
+      },
+      {
+        "id": "REQUIRED_INSURER_CREDENTIALS_AND_BANK_ACCESS_PRESERVED",
+        "authority": "LATEST_EXPLICIT_OWNER_RESPONSE_AND_PRESERVED_ROLE_RULES",
+        "decision": "Las credenciales de aseguradoras y cuentas bancarias siguen siendo datos operativos necesarios, accesibles a los roles aprobados.",
+        "state": "APPROVED_ACCESS_PRESERVED",
+        "constraints": [
+          "Excluir valores sensibles de documentación pública no elimina campos ni permisos operativos aprobados.",
+          "Conservar lectura, revelado y operación de la última versión aprobada, sin publicar secretos."
+        ]
+      }
+    ],
+    "executionBoundary": {
+      "thisTaskOperationalWrites": 0,
+      "thisTaskRemoteWrites": 0,
+      "thisTaskCommits": 0,
+      "thisTaskDeploys": 0,
+      "existingFreezeModified": false,
+      "guardPatched": false,
+      "globalPassGranted": false,
+      "globalSynchronizationClaim": false,
+      "inProgressOperations": "Recorded and verified by coordinating agent in separate operational receipts. This addendum does not infer completion.",
+      "integration": "Additive to same owner freeze. Source preparation only; real operations remain in separate verified receipts."
+    },
+    "sanitization": {
+      "personalNamesIncluded": false,
+      "customerIdentifiersIncluded": false,
+      "policyNumbersIncluded": false,
+      "privateDriveIdsOrLinksIncluded": false,
+      "libraryIdsOrLinksIncluded": false,
+      "privateDocumentIdsIncluded": false,
+      "credentialsOrBankDetailsIncluded": false,
+      "dnsChallengeValuesIncluded": false,
+      "privateCaseMappings": "Retained separately in private documentary and operational evidence."
+    },
+    "coordinationNotes": [
+      "Client-create handoff timestamp corrected to date-only; business fields unchanged.",
+      "Current root writes require their own exact before/after and fresh reload receipts.",
+      "Document evidence packet remains frozen; life-certificate factual correction is a separate private addendum."
+    ],
+    "sourceSha256": "123fd38d4972681f66aa763b38b1cc412ab249fbcb809e40517744929875e69e"
   }
 }

@@ -23,6 +23,13 @@ on:
       - tools/gravicentra-b4-003-inbox-human-identity.test.cjs
       - tools/gravicentra-b4-003-commercial-pipeline-qa-isolation.test.cjs
       - orbit360-platform/modules/equipo.js
+      - orbit360-platform/core/policy-receipts-engine.js
+      - orbit360-platform/modules/policy-receipts-v1199-bridge.js
+      - orbit360-platform/modules/crm-v1198-operational-bridge.js
+      - tools/gravicentra-b4-004-policy-form-currency-commission.test.cjs
+      - tools/gravicentra-b4-004-equipo-commission-audit.test.cjs
+      - tools/gravicentra-b4-004-client-create-country-scope.test.cjs
+      - tools/gravicentra-policy-writer-backend-causal.test.cjs
       - orbit360-platform/data/store-firestore-product-operational-p0.js
       - tests/goal-participation-classification-writer.test.cjs
       - functions/b4-003-scoped-bootstrap-reader.js
@@ -54,7 +61,7 @@ jobs:
       PROJECT_ID: ays-orbit-360-lab
       TENANT_HINT: alianzas-soluciones
       HOSTING_SITE: ays-orbit-360-lab
-      FRONTEND_CONTRACT: artifacts/orbit360-recovery/release-control/I6_5_B4_003_CURRENT42_CAUSAL_FRONTEND_SUCCESSOR_CONTRACT_20261107.json
+      FRONTEND_CONTRACT: artifacts/orbit360-recovery/release-control/I6_5_B4_004_POLICY_CAPTURE_CAUSAL_FRONTEND_SUCCESSOR_CONTRACT_20261107.json
       RELEASE_GATE: I6.5-B4-003
       BUILD_PREFIX: gi-i65-b4
       GRAVICENTRA_B4_003_SCOPED_PREVIEW: 'true'
@@ -81,7 +88,7 @@ jobs:
           test "$(git rev-parse HEAD:functions/assignable-advisor-roster.js)" = '9778d74b6d305ff56caf73bb68be3dadac4b14ce'
           test "$(git rev-parse HEAD:functions/product-operational-domain.js)" = '187efbfa9868531349154f26ec90a5e2c2ed33e8'
           test "$(git rev-parse HEAD:functions/goal-participation-contract.js)" = 'ff86fa441fd6cb4ec6254e2dc5078a37bf68fc36'
-          test "$(git rev-parse HEAD:orbit360-platform/modules/equipo.js)" = '1bd7881ed29f6d7488bb806a96a0ab52c5c5c3b8'
+          test "$(git rev-parse HEAD:orbit360-platform/modules/equipo.js)" = 'f584c4109294f8e32621c9ee9dd5cfdd55ca2c79'
           test "$(git rev-parse HEAD:orbit360-platform/core/ciclo.js)" = '7068c028419c7c13d9dc12b0fb715dd7bb3ce8c1'
           test "$(git rev-parse HEAD:orbit360-platform/index.html)" = '867c5e108988b68ca49702e494e96fa9f01afd71'
           test "$(git rev-parse HEAD:orbit360-platform/styles/infra.css)" = '788570e8f490dc5232bf8b4d6ff6fe5e87fb9bb2'
@@ -145,6 +152,18 @@ jobs:
           node tools/gravicentra-b4-003-cross-module-readback-contract.test.cjs
           node --check functions/goal-participation-contract.js
           node --check orbit360-platform/modules/equipo.js
+          node --check orbit360-platform/core/policy-receipts-engine.js
+          node --check orbit360-platform/modules/policy-receipts-v1199-bridge.js
+          node --check orbit360-platform/modules/crm-v1198-operational-bridge.js
+          node --test tools/gravicentra-b4-004-policy-form-currency-commission.test.cjs
+          node --test tools/gravicentra-b4-004-equipo-commission-audit.test.cjs
+          node --test tools/gravicentra-b4-004-client-create-country-scope.test.cjs
+          node --test tools/gravicentra-policy-writer-backend-causal.test.cjs
+          node tools/gravicentra-b4-004-policy-capture-successor.test.mjs
+          node --test tools/gravicentra-b4-004-policy-capture-preview-qa.test.mjs
+          node --test tools/gravicentra-b4-004-receipt-editor-preservation.test.cjs
+          node --check orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js
+          node --check tools/gravicentra-i6-5-b4-003-preview-proof.mjs
           node --test tests/goal-participation*.test.cjs
           timeout -k 3s 55s node tools/gravicentra-i6-control-plane-guard-v1.mjs --mode=i6
       - name: Freeze LIVE fingerprints before isolated Preview
@@ -183,7 +202,7 @@ jobs:
           chmod 600 "$RUNNER_TEMP/gi-e4-auth/selected.json"
           echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/gi-e4-auth/selected.json" >> "$GITHUB_ENV"
           echo "FIREBASE_CLI_BIN=$CLI" >> "$GITHUB_ENV"
-          npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund firebase-admin@13.4.0 >/dev/null
+          npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund firebase-admin@13.4.0 playwright@1.55.0 >/dev/null
       - name: Preserve current backend for the authorized frontend-only successor
         working-directory: candidate
         run: |
@@ -217,6 +236,10 @@ jobs:
           cmp orbit360-platform/core/access-scope.js "$ROOT/core/access-scope.js"
           cmp orbit360-platform/core/queries.js "$ROOT/core/queries.js"
           cmp orbit360-platform/modules/equipo.js "$ROOT/modules/equipo.js"
+          cmp orbit360-platform/core/policy-receipts-engine.js "$ROOT/core/policy-receipts-engine.js"
+          cmp orbit360-platform/modules/policy-receipts-v1199-bridge.js "$ROOT/modules/policy-receipts-v1199-bridge.js"
+          cmp orbit360-platform/modules/crm-v1198-operational-bridge.js "$ROOT/modules/crm-v1198-operational-bridge.js"
+          cmp orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js "$ROOT/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js"
           cmp orbit360-platform/core/tenant-access-policy-effective-p0.js "$ROOT/core/tenant-access-policy-effective-p0.js"
            cmp orbit360-platform/modules/cobros.js "$ROOT/modules/cobros.js"
           cmp orbit360-platform/modules/renovaciones.js "$ROOT/modules/renovaciones.js"
@@ -328,6 +351,8 @@ jobs:
             reportesSha256:digest('modules/reportes.js'),cobrosSha256:digest('modules/cobros.js'),cancelacionesSha256:digest('modules/cancelaciones.js'),
              renovacionesSha256:digest('modules/renovaciones.js'),qaResidueRegression:'SOURCE_TEST_PASS',
             rosterClientSha256:digest('core/assignable-advisor-roster-client.js'),
+            policyEngineSha256:digest('core/policy-receipts-engine.js'),policyFormSha256:digest('modules/policy-receipts-v1199-bridge.js'),crmOwnerSha256:digest('modules/crm-v1198-operational-bridge.js'),
+            receiptEditorSha256:digest('core/backend-lab-receipts-portfolio-native-bridge-v20260801.js'),
             writerFacadeSha256:digest('data/store-firestore-product-operational-p0.js'),
             indexSha256:digest('index.html'),infraSha256:digest('styles/infra.css'),servedArtifactExact:true,
             hostingDeploy:'reused_isolated_preview_only',bundleArtifact:'gi-b4003-immutable-release-bundle-'+process.env.GITHUB_RUN_ID,backendFunctionsDeployed:0,
@@ -338,6 +363,31 @@ jobs:
           fs.writeFileSync(process.env.RUNNER_TEMP+'/gi-e4-exact-preview.json',JSON.stringify(proof,null,2)+'\n');
           NODE
           echo "B4-003 exact immutable Hosting Preview readback PASS; retained artifact is required for same-byte LIVE promotion. E4 and verified policy-bound display labels are included; other certified UAT preserved; LIVE unchanged." >> "$GITHUB_STEP_SUMMARY"
+      - name: Focal authenticated capture proof on the SAME exact Preview artifact
+        working-directory: candidate
+        env:
+          B4_004_POLICY_CAPTURE_QA: 'true'
+          B4_PREVIEW_URL: ${{ steps.hosting.outputs.url }}
+          B4_004_EXACT_TRANSPORT_PROOF: ${{ runner.temp }}/gi-e4-exact-preview.json
+          B4_003_PROOF_OUT: ${{ runner.temp }}/gi-b4004-policy-capture-qa.json
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$SOURCE_SHA"
+          node node_modules/playwright/cli.js install --with-deps chromium >/dev/null
+          node tools/gravicentra-i6-5-b4-003-preview-proof.mjs
+          node - <<'NODE'
+          const fs=require('node:fs'),p=JSON.parse(fs.readFileSync(process.env.B4_003_PROOF_OUT,'utf8'));
+          if(p.schema!=='GRAVICENTRA_B4_004_POLICY_CAPTURE_FOCAL_PREVIEW_QA_V1'||p.status!=='FOCAL_AUTHENTICATED_UI_PASS'||p.artifact.sourceSha!==process.env.SOURCE_SHA||p.businessWrites!==0||p.authAccountsCreated!==0||p.membershipWrites!==0||p.syntheticFinalAbsent!==true||p.errors.length)throw Error('FOCAL_AUTHENTICATED_CAPTURE_REQUIRED');
+          NODE
+          echo "Focal authenticated capture proof passed for the retained exact Preview artifact; synthetic fixtures and exact operational receipts removed. LIVE promotion remains gated." >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: gi-b4004-policy-capture-qa-${{ github.run_id }}
+          # Never upload the private in-job payload ledger, actor identity or token.
+          path: ${{ runner.temp }}/gi-b4004-policy-capture-qa.json
+          if-no-files-found: warn
+          retention-days: 30
       - uses: actions/upload-artifact@v4
         if: always()
         with:

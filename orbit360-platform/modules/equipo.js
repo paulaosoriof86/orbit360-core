@@ -125,19 +125,29 @@ Orbit.modules.equipo = (function () {
     const tone = role === 'Dirección' ? 'danger' : role === 'Asesor' ? 'info' : role === 'Operativo' ? 'ok' : 'neutral';
     return `<span class="badge ${tone}" style="margin:1px 3px 1px 0">${U.esc(role)}${role === LEGACY_ROLE ? ' · legado' : ''}</span>`;
   }
-  function auditEntry(action, motivo, before, after) {
+  function auditEntry(action, motivo, before, after, context) {
     const user = (() => { try { return (Orbit.auth && Orbit.auth.user && Orbit.auth.user()) || {}; } catch (e) { return {}; } })();
+    context = context || {};
+    const productUser = Orbit.auth && Orbit.auth.productUser || {};
+    const advisorId = String(context.asesorId || after && after.asesorId || before && before.asesorId || '').trim();
+    const advisor = advisorId && S().get('asesores', advisorId) || {};
+    // Bind the audit to the actual affected advisor, never an assumed actor country.
+    const country = String(context.pais || after && (after.paisDefault || after.pais) || before && (before.paisDefault || before.pais) || advisor.paisDefault || advisor.pais || '').trim().toUpperCase();
     const entry = {
       id: 'audit_equipo_' + Date.now() + '_' + Math.random().toString(16).slice(2),
       fecha: new Date().toISOString(), modulo: 'equipo', accion: action,
       motivo: motivo || '', usuario: user.email || user.nombre || user.uid || 'usuario_actual',
       tenantId: (OrbitBackend && (OrbitBackend.tenantId || OrbitBackend.tenant)) || 'tenant_actual',
-      before: before || null, after: after || null
+      before: before || null, after: after || null,
+      actorUid: productUser.uid || user.uid || '',
+      activeRole: Orbit.session && typeof Orbit.session.rol === 'function' ? Orbit.session.rol() : productUser.activeRole || '',
+      ...(advisorId ? { asesorId: advisorId, advisorId } : {}),
+      ...(['GT', 'CO'].includes(country) ? { pais: country } : {})
     };
     return entry;
   }
-  function audit(action, motivo, before, after) {
-    const entry=auditEntry(action,motivo,before,after);
+  function audit(action, motivo, before, after, context) {
+    const entry=auditEntry(action,motivo,before,after,context);
     try {
       const st = S();
       if (st && st.__productOperationalWriteP0 === true && typeof st.insertDurable === 'function') return st.insertDurable('auditoria', entry).then(() => entry);
@@ -773,7 +783,7 @@ Orbit.modules.equipo = (function () {
         const p=Orbit.productRuntimeBrowserProvidersP0,u=Orbit.auth&&Orbit.auth.productUser||{},ctx=await p.initialize(),m=ctx.modules&&ctx.modules.store;
         const snap=await (typeof m.getDocFromServer==='function'?m.getDocFromServer:m.getDoc)(m.doc(ctx.db,'tenants/'+u.tenantId+'/data/asesores/items/'+advisorId));
         if(!snap.exists()||snap.data().deleted!==true||snap.data().inactivo!==true)throw new Error('EQUIPO_DELETE_READBACK_MISMATCH');
-        await audit('eliminar_usuario',String(motivo).trim(),before,{deleted:true,inactivo:true});
+        await audit('eliminar_usuario',String(motivo).trim(),before,{deleted:true,inactivo:true},{asesorId:advisorId,pais:a.paisDefault||a.pais});
         toast('✓ Usuario eliminado y acceso bloqueado');
         dirty=false;close(true);render(document.getElementById('host')||document.getElementById('mod-host'));
       } catch(error) {
@@ -806,22 +816,23 @@ Orbit.modules.equipo = (function () {
       const advisorId = id ? canonicalAdvisorId(a, id) : nextStableId(nombre);
       if (id && !advisorId) return toast('No fue posible resolver la identidad canónica del usuario.');
       if (!id) { data.id = advisorId; data.iniciales = nombre.split(' ').map(x => x[0]).slice(0, 2).join('').toUpperCase(); data.comModo = 'comision'; data.shareCom = 50; data.accessProvisioned = false; data.invitacionEstado = 'pendiente_habilitacion'; data.createdAt = new Date().toISOString(); }
-      const st = S(); saveButton.dataset.busy = '1'; saveButton.disabled = true; saveButton.textContent = 'Guardando…';
+      const st = S(); let advisorCommitted = false; saveButton.dataset.busy = '1'; saveButton.disabled = true; saveButton.textContent = 'Guardando…';
       try {
         if (st && st.__productOperationalWriteP0 === true) {
           if (id) { if (typeof st.updateDurable !== 'function') throw new Error('PRODUCT_TEAM_DURABLE_UPDATE_MISSING'); await st.updateDurable('asesores', advisorId, data); }
           else { if (typeof st.insertDurable !== 'function') throw new Error('PRODUCT_TEAM_DURABLE_INSERT_MISSING'); await st.insertDurable('asesores', data); }
+          advisorCommitted = true;
           await canonicalAdvisorReadback(advisorId, data);
         } else { throw new Error('PRODUCT_TEAM_SERVER_WRITE_REQUIRED'); }
-        await audit(id ? 'editar_usuario' : 'crear_usuario', id ? (motivo || 'Actualización de datos de contacto') : motivo, id ? before : null, userSnapshot(Object.assign({},a,data)));
+        await audit(id ? 'editar_usuario' : 'crear_usuario', id ? (motivo || 'Actualización de datos de contacto') : motivo, id ? before : null, userSnapshot(Object.assign({},a,data)),{asesorId:advisorId,pais:data.pais});
         if(Orbit.assignableAdvisorRoster&&typeof Orbit.assignableAdvisorRoster.invalidate==='function') Orbit.assignableAdvisorRoster.invalidate();
         document.dispatchEvent(new CustomEvent('orbit:equipo:save-committed', { detail: { advisorId, created: !id, syncRequested: !!back.querySelector('#eu-sync-access')?.checked } }));
         toast(id ? '✓ Usuario actualizado y confirmado' : '✓ Usuario creado y confirmado');
         dirty = false; close(true); render(document.getElementById('host') || document.getElementById('mod-host'));
       } catch (error) {
-        saveButton.dataset.busy = '0'; saveButton.disabled = false; saveButton.textContent = 'Guardar';
+        saveButton.dataset.busy = advisorCommitted ? '1' : '0'; saveButton.disabled = advisorCommitted; saveButton.textContent = advisorCommitted ? 'Guardado; verificación pendiente' : 'Guardar';
         const code=String(error&&error.code||error&&error.message||'EQUIPO_SAVE_FAILED').replace(/^functions\//,'');
-        toast('No fue posible guardar: '+code);
+        toast(advisorCommitted ? 'El registro se guardó; falta confirmar la auditoría o verificación. No repitas el alta. Recarga y revisa el registro.' : 'No fue posible guardar: '+code);
         try { console.warn('[Orbit Equipo] USER_SAVE_FAILED', error && (error.code || error.message) || error); } catch (e) {}
       }
     });
@@ -864,13 +875,16 @@ Orbit.modules.equipo = (function () {
       }catch(error){inform('No fue posible confirmar el restablecimiento en el servidor. No se declaró guardado.','No guardado');}
     });
     host.querySelectorAll('[data-modo]').forEach(sel => sel.addEventListener('change', async () => {
-      try{await Orbit.comeng.setVendModo(sel.dataset.modo,sel.value);await audit('editar_comision','Modelo de comisión actualizado',null,{asesorId:sel.dataset.modo,comModo:sel.value});toast('✓ Comisión guardada y confirmada');render(host);}catch(error){inform('No fue posible confirmar la comisión en el servidor.','No guardado');}
+      let commissionCommitted=false;sel.disabled=true;toast('Guardando comisión…');
+      try{await Orbit.comeng.setVendModo(sel.dataset.modo,sel.value);commissionCommitted=true;await audit('editar_comision','Modelo de comisión actualizado',null,{asesorId:sel.dataset.modo,comModo:sel.value});toast('✓ Comisión guardada y confirmada');render(host);}catch(error){inform(commissionCommitted?'La comisión se guardó; falta confirmar su auditoría. Recarga y revisa antes de repetir.':'No fue posible confirmar la comisión en el servidor. Recarga y revisa antes de repetir.',commissionCommitted?'Auditoría pendiente':'Guardado sin confirmar');}finally{sel.disabled=false;}
     }));
     host.querySelectorAll('[data-vend]').forEach(inp => inp.addEventListener('change', async () => {
-      try{await Orbit.comeng.setVendShare(inp.dataset.vend,inp.value);await audit('editar_comision','Participación de comisión actualizada',null,{asesorId:inp.dataset.vend,shareCom:+inp.value||0});toast('✓ Comisión guardada y confirmada');}catch(error){inform('No fue posible confirmar la comisión en el servidor.','No guardado');}
+      let commissionCommitted=false;inp.disabled=true;toast('Guardando comisión…');
+      try{await Orbit.comeng.setVendShare(inp.dataset.vend,inp.value);commissionCommitted=true;await audit('editar_comision','Participación de comisión actualizada',null,{asesorId:inp.dataset.vend,shareCom:+inp.value||0});toast('✓ Comisión guardada y confirmada');}catch(error){inform(commissionCommitted?'La comisión se guardó; falta confirmar su auditoría. Recarga y revisa antes de repetir.':'No fue posible confirmar la comisión en el servidor. Recarga y revisa antes de repetir.',commissionCommitted?'Auditoría pendiente':'Guardado sin confirmar');}finally{inp.disabled=false;}
     }));
     host.querySelectorAll('[data-vval]').forEach(inp => inp.addEventListener('change', async () => {
-      try{await Orbit.comeng.setVendValor(inp.dataset.vval,inp.value);await audit('editar_comision','Valor de comisión actualizado',null,{asesorId:inp.dataset.vval,comValor:+inp.value||0});toast('✓ Comisión guardada y confirmada');}catch(error){inform('No fue posible confirmar la comisión en el servidor.','No guardado');}
+      let commissionCommitted=false;inp.disabled=true;toast('Guardando comisión…');
+      try{await Orbit.comeng.setVendValor(inp.dataset.vval,inp.value);commissionCommitted=true;await audit('editar_comision','Valor de comisión actualizado',null,{asesorId:inp.dataset.vval,comValor:+inp.value||0});toast('✓ Comisión guardada y confirmada');}catch(error){inform(commissionCommitted?'La comisión se guardó; falta confirmar su auditoría. Recarga y revisa antes de repetir.':'No fue posible confirmar la comisión en el servidor. Recarga y revisa antes de repetir.',commissionCommitted?'Auditoría pendiente':'Guardado sin confirmar');}finally{inp.disabled=false;}
     }));
     host.querySelectorAll('[data-meta-institucional]').forEach(inp => inp.addEventListener('change', async () => {
       if(!puedeEditarMetaInstitucional())return inform('Tu rol no puede editar metas institucionales.','Solo lectura');

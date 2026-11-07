@@ -360,3 +360,14 @@ Para el importador integral futuro se reutilizan estas ocho etapas y la misma au
 - Equipo: modules/equipo.js, data/store-firestore-product-operational-p0.js, data/store-firestore-product-readonly-p0.js y functions/b4-003-scoped-bootstrap-reader.js.
 - Firebase: https://firebase.google.com/docs/hosting/manage-hosting-resources ; https://firebase.google.com/docs/hosting/custom-domain ; https://firebase.google.com/docs/hosting/test-preview-deploy .
 
+
+
+## Adición causal de captura y respuesta de la propietaria — 2026-11-07
+
+La candidata canónica conserva B4-003/current42 y el sucesor e503. El primer gate formal incompleto continúa siendo B4-004. Se incorporan los catorce criterios de la respuesta más reciente en `ownerResponseCriteriaAdditive20261107`, sin crear aceptación integral ni afirmar sincronización completa.
+
+El grant `policyCaptureCausalSourceCorrection20261107` permite exclusivamente los cinco owners efectivos identificados y sus pruebas: motor de pólizas/recibos, formulario efectivo de póliza, Equipo, bridge CRM de alta y editor nativo de recibo. Corrige contexto de país de actividades/auditoría y captura explícita de moneda y porcentajes; conserva modelo neta/fijo, evidencia de pago protegida, fuentes de producción, permisos y datos. El editor de recibos muestra los aliases documentales sin convertir un vacío en cero y envía sólo campos cambiados. Corregir una fecha conserva todos los importes; una edición monetaria explícita mantiene sus aliases coherentes.
+
+Se usa el mismo workflow inmutable, builder, sitio y canal. El contrato nuevo fija base932 y before/after de cada owner; no modifica el contrato histórico. Se construye una vez, se verifica todo el artifact en Preview y se exige aceptación focal autenticada antes de enlazar un nuevo cursor de promoción. La promoción actual fijada a e503 no puede reutilizarse apuntándola al nuevo artifact. El rollback de aplicación es e503 y no restaura ni sustituye datos de la empresa.
+
+Calidad de Datos mantiene sus aceptaciones previas y suma una prueba focal real: corrección documental de contacto, recarga completa y comprobación en Cliente360 sin errores. Esto no es un PASS integral. El alta real del nuevo asesor persistió, aunque su auditoría falló. La participación60 sí fue confirmada por recarga fresca después de un cambio efectivo mediante teclado nativo. No se identificó defecto del listener; se corrige la auditoría y la comunicación de guardado parcial. No repetir el alta.

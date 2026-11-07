@@ -298,7 +298,7 @@ Orbit.__crmV1198GuardDiagnostics = guardDiagnostics;
       row.estadoOperativo = 'pendiente_polizas'; row.estado = 'pendiente_polizas';
       const opId = 'crm_client_create_' + row.id + '_' + Date.now().toString(36);
       const activity = {
-        id: 'act_' + opId, tenantId: row.tenantId, clienteId: row.id, asesorId: row.asesorId,
+        id: 'act_' + opId, tenantId: row.tenantId, clienteId: row.id, pais: row.pais, asesorId: row.asesorId,
         tipo: 'sistema', icon: '🧑‍💼', fecha: row.fechaAlta, titulo: 'Cliente creado',
         detalle: 'Ingreso manual en plataforma · estado inicial: pendiente de pólizas', fuente: 'ingreso_manual_plataforma',
         operacionId: opId
