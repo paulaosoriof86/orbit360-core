@@ -61,8 +61,7 @@ async function existingTasks(){
 function pickCase(actors,tasks){
  for(const country of ['GT','CO']){
   const countryTasks=tasks.filter(x=>clean(x.row.pais||x.row.country).toUpperCase()===country);
-  const preferred=countryTasks.find(x=>!clean(x.row.polizaId||x.row.policyId||x.row.clienteId||x.row.clientId))||countryTasks[0];
-  if(!preferred)continue;
+  const preferred=countryTasks.find(x=>!clean(x.row.polizaId||x.row.policyId||x.row.clienteId||x.row.clientId))||countryTasks[0]||null;
   const all=actors.filter(x=>x.country===country&&x.scope==='all');
   for(const creator of all)for(const peer of all){
    if(peer.uid===creator.uid)continue;
@@ -195,38 +194,38 @@ async function main(){
   const selected=pickCase(actors,tasks);
   proof.actorInventory=actors.map(x=>({uidSha256:digest(x.uid),role:x.role,country:x.country,scope:x.scope,denied:x.denied||'',hasAdvisorId:!!x.advisorId}));
   proof.taskInventory={count:tasks.length,byCountry:{GT:tasks.filter(x=>clean(x.row.pais||x.row.country).toUpperCase()==='GT').length,CO:tasks.filter(x=>clean(x.row.pais||x.row.country).toUpperCase()==='CO').length}};
-  need(selected,'NO_EXISTING_TASK_AND_DISTINCT_ALL_SCOPE_ACTORS');
+  need(selected,'NO_DISTINCT_ALL_SCOPE_ACTORS');
   const {creator,peer,countryActor,country,otherCountry,task}=selected;
   proof.actors={
    creator:{uidSha256:digest(creator.uid),role:creator.role,country,scope:creator.scope},
    peer:{uidSha256:digest(peer.uid),role:peer.role,country,scope:peer.scope},
    countryActor:{uidSha256:digest(countryActor.uid),role:countryActor.role,country:otherCountry,scope:countryActor.scope}
   };
-  proof.task={idSha256:digest(task.id),country,hasAdvisorId:!!clean(task.row.asesorId||task.row.advisorId||task.row.ownerAdvisorId),standalone:!clean(task.row.polizaId||task.row.policyId||task.row.clienteId||task.row.clientId)};
+  proof.task=task?{idSha256:digest(task.id),country,hasAdvisorId:!!clean(task.row.asesorId||task.row.advisorId||task.row.ownerAdvisorId),standalone:!clean(task.row.polizaId||task.row.policyId||task.row.clienteId||task.row.clientId)}:{status:'NO_EXISTING_TASK_READONLY_VISIBILITY_UNPROVABLE'};
   proof.assertions.distinctUid=creator.uid!==peer.uid;
   browser=await chromium.launch({headless:true});
 
-  const creatorObs=await observe(browser,creator,country,'creator-same-country',task.id);opened.push(creatorObs.ctx);
+  const creatorObs=await observe(browser,creator,country,'creator-same-country',task?.id||null);opened.push(creatorObs.ctx);
   proof.observations.creator={visible:creatorObs.visible,product:creatorObs.product};
-  proof.assertions.creatorTaskVisible=creatorObs.visible===true;
+  proof.assertions.creatorTaskVisible=task?creatorObs.visible===true:null;
 
   await routeTo(creatorObs.page,'inicio');await creatorObs.page.waitForTimeout(250);
   const perf=await measureUsableRoute(creatorObs.page,'cronograma',12000);proof.performance.cronogramaMs=perf.ms;proof.performance.state=perf.state;
   proof.assertions.cronogramaPerformance=perf.timeout!==true&&perf.ms<=6000;
 
-  const peerObs=await observe(browser,peer,country,'peer-same-country',task.id);opened.push(peerObs.ctx);
+  const peerObs=await observe(browser,peer,country,'peer-same-country',task?.id||null);opened.push(peerObs.ctx);
   proof.observations.peer={visible:peerObs.visible,product:peerObs.product};
-  proof.assertions.peerTaskVisible=peerObs.visible===true;
+  proof.assertions.peerTaskVisible=task?peerObs.visible===true:null;
 
-  const countryObs=await observe(browser,countryActor,otherCountry,'peer-other-country',task.id);opened.push(countryObs.ctx);
+  const countryObs=await observe(browser,countryActor,otherCountry,'peer-other-country',task?.id||null);opened.push(countryObs.ctx);
   proof.observations.country={visible:countryObs.visible,product:countryObs.product};
-  proof.assertions.crossCountryTaskAbsent=countryObs.visible===false;
+  proof.assertions.crossCountryTaskAbsent=task?countryObs.visible===false:null;
 
   for(const item of opened){try{await item.close();}catch{}}
   opened=[];
   proof.assertions.writeAttemptZero=proof.writeAttemptCount===0;
   proof.assertions.noMutations=proof.authAccountsCreated===0&&proof.membershipWrites===0&&proof.dataWrites===0;
-  proof.diagnosticStatus='EXECUTED';
+  proof.diagnosticStatus=task?'EXECUTED':'EXECUTED_WITH_HOLD';if(!task)proof.errors.push({code:'NO_EXISTING_TASK_VISIBILITY_NOT_CERTIFIED'});
  }catch(e){
   proof.errors.push({code:clean(e&&e.message||e).slice(0,200)});
   proof.diagnosticStatus='EXECUTED_WITH_HOLD';
