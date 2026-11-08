@@ -892,7 +892,68 @@ function verifyOwnerDecisionSuccessor(after){
  });
 }
 
+// Post-acceptance gate boundary: prove the already sealed B4-003 state against
+// its immutable accepted snapshot. New B4-004 evidence is validated separately
+// and must never be sent through the old one-shot release source diff.
+function projectFrozenB4003AfterB4004Preview(after,certified){
+ const p=after.b4004CronogramaCountryFocalPreviewPass20261107;
+ if(!p)return null;
+ const predecessor='6c45983610ce0d65a5c63bd07659ad968bfe9da3';
+ const historical='9bbcafd4af141cb8d12cc2495fbc814ce950c6b0';
+ const frozen=old(predecessor,ROOT+'CONTROL_PLANE.json');
+ const oldState=old(predecessor,STATE),state=read(STATE),historicalCp=old(historical,ROOT+'CONTROL_PLANE.json');
+ const allowedOldKeys=new Set(['nextAction','paymentInferenceReconciliationControl','ownerDecisionFreeze20261107']);
+ for(const [key,val] of Object.entries(frozen)){
+  if(allowedOldKeys.has(key))continue;
+  need(Object.hasOwn(after,key)&&same(after[key],val),'POST_B4004_B4003_FROZEN_KEY_'+key);
+ }
+ for(const [key,val] of Object.entries(oldState)){
+  if(key==='nextAction'||key==='ownerDecisionFreeze20261107')continue;
+  need(Object.hasOwn(state,key)&&same(state[key],val),'POST_B4004_B4003_STATE_'+key);
+ }
+ need(same(after.paymentInferenceReconciliationControl,historicalCp.paymentInferenceReconciliationControl),'POST_B4004_PAYMENT_AUTHORITY_CHANGED');
+ need(same(after.ownerDecisionFreeze20261107,state.ownerDecisionFreeze20261107),'POST_B4004_OWNER_POINTER_PARITY');
+ const owner=after.ownerDecisionFreeze20261107;
+ need(owner?.status==='OWNER_DECISIONS_AND_WORK_PLAN_FROZEN'&&owner.preservedProductSourceSha===SOURCE&&owner.preservedB4003ReceiptBlobSha==='0879188bf245248fa1092fb2014e35e14e802b44','POST_B4004_FROZEN_OWNER_AUTHORITY');
+ need(owner?.path===OWNER_FREEZE&&blob(fs.readFileSync(OWNER_FREEZE))===owner.blobSha,'POST_B4004_OWNER_DOCUMENT_DRIFT');
+ const seal=after[CURSOR]?.formalLiveAcceptance,previous=frozen[CURSOR]?.formalLiveAcceptance;
+ need(seal?.status==='LATEST_APPROVED_VERSION_LIVE_PASS'&&same(seal,previous)&&releaseIdentity(seal),'POST_B4004_B4003_LIVE_SEAL');
+ const receipt=reference({path:seal.receiptPath,blobSha:seal.receiptBlobSha,sha256:seal.receiptSha256},'POST_B4004_B4003_FINAL');
+ need(receipt.status==='LATEST_APPROVED_VERSION_LIVE_PASS'&&receipt.b4003Closed===true,'POST_B4004_FINAL_RECEIPT_UNSEALED');
+ need(after.currentB4?.status==='B4_003_CLOSED_PASS_CURRENT42'&&after.currentB4?.humanVisualStatus==='LATEST_APPROVED_VERSION_LIVE_PASS','POST_B4004_HISTORICAL_GATE_REOPENED');
+ need(after.b4004PolicyCaptureFrontendSuccessor20261107?.liveFunctionalAcceptance?.status==='POLICY_CAPTURE_FOCAL_LIVE_PASS','POST_B4004_CAPTURE_ACCEPTANCE_MISSING');
+ need(after.b4004PolicyCaptureFrontendSuccessor20261107?.cronogramaLiveAcceptance?.status==='SYNTHETIC_CORE_LIVE_PASS_SCOPE_HOLD','POST_B4004_CRONO_CORE_MISSING');
+ const sourcePin=after.b4004CronogramaCountryViewSourceFix20261107;
+ const fixPath=ROOT+'I6_5_B4_004_CRONOGRAMA_COUNTRY_VIEW_SOURCE_FIX_20261107.json';
+ need(sourcePin?.receiptPath===fixPath&&sourcePin?.sourceBlobSha==='5460b80442f33d51144b70dd83be87d6a263cf9c'&&sourcePin?.productSourceChanged===true,'POST_B4004_SOURCE_PIN');
+ need(blob(fs.readFileSync(fixPath))===sourcePin.receiptBlobSha,'POST_B4004_SOURCE_RECEIPT_DRIFT');
+ const fix=read(fixPath);
+ need(fix.status==='SOURCE_FIXED_REQUIRES_NEW_IMMUTABLE_ARTIFACT_PREVIEW_AND_LIVE'&&fix.productSource.afterBlobSha===sourcePin.sourceBlobSha,'POST_B4004_SOURCE_RECEIPT_INVALID');
+ need(git('merge-base',fix.sourceParentHead,'HEAD')===fix.sourceParentHead&&git('merge-base','f8fa00e4e2e6627cee66c8c521866874e39bc8da','HEAD')==='f8fa00e4e2e6627cee66c8c521866874e39bc8da','POST_B4004_SOURCE_ANCESTRY');
+ const changedProduct=git('diff','--name-only',predecessor,'HEAD','--','functions','orbit360-platform',':(exclude)orbit360-platform/docs/**').split(/\r?\n/).filter(Boolean).sort();
+ need(same(changedProduct,['orbit360-platform/modules/cronograma.js']),'POST_B4004_UNRELATED_PRODUCT_CHANGE');
+ need(git('rev-parse','HEAD:orbit360-platform/modules/cronograma.js')===sourcePin.sourceBlobSha,'POST_B4004_CRONOGRAMA_SOURCE_CHANGED');
+ need(git('rev-parse','HEAD:tools/gravicentra-i6-1-preview-package.mjs')==='13bad5b844f5c286d198efc796af58d00fc2a3d1','POST_B4004_BUILDER_DRIFT');
+ const proofPath=ROOT+'I6_5_B4_004_CRONOGRAMA_COUNTRY_FOCAL_PREVIEW_PASS_20261107.json';
+ need(p?.receiptPath===proofPath&&blob(fs.readFileSync(proofPath))===p.receiptBlobSha,'POST_B4004_PREVIEW_EVIDENCE_DRIFT');
+ const proof=read(proofPath);
+ need(proof.status==='CRONOGRAMA_COUNTRY_FOCAL_AUTHENTICATED_PREVIEW_PASS_LIVE_PENDING'&&
+ proof.currentBuild.sourceSha==='f8fa00e4e2e6627cee66c8c521866874e39bc8da'&&
+ proof.currentBuild.buildId==='gi-i65-b4-f8fa00e4e2e6-57f234755dc1'&&
+ proof.currentBuild.artifactId===13600357541&&
+ proof.currentBuild.hostedPayloadDigest==='819e36b57ef5042ed37458f80274f9db45303e881b4f268c34dec8d4506c9d56'&&
+ proof.authenticatedFocal.status==='FOCAL_SCOPE_PASS'&&proof.authenticatedFocal.dataWrites===0&&
+ proof.authenticatedFocal.scoped403===0&&proof.authenticatedFocal.cronogramaRouteMs<=6000,'POST_B4004_PREVIEW_FOCAL_PROOF_INVALID');
+ need(p.sourceSha===proof.currentBuild.sourceSha&&p.buildId===proof.currentBuild.buildId&&p.artifactId===proof.currentBuild.artifactId,'POST_B4004_CURRENT_PREVIEW_POINTER');
+ need(same(p,state.b4004CronogramaCountryFocalPreviewPass20261107)&&state.nextAction===after.nextAction&&after.nextAction.startsWith('B4_004_'),'POST_B4004_CURSOR_SYNC');
+ // Historical comparator is the already-certified plane, not a fabricated new PASS.
+ // This method never certifies B4-004 LIVE or changes any production state.
+ return {comparableAfter:clone(certified),closed:true,receiptBlobSha:seal.receiptBlobSha};
+}
+
 export function projectVerifiedB4003LiveClosure(after,certified){
+ const preservedPostGate=projectFrozenB4003AfterB4004Preview(after,certified);
+ if(preservedPostGate)return preservedPostGate;
  const ownerSuccessor=verifyOwnerDecisionSuccessor(after);
  if(ownerSuccessor)after=ownerSuccessor.comparableControl;
  const cursor=after[CURSOR],seal=cursor?.formalLiveAcceptance;
