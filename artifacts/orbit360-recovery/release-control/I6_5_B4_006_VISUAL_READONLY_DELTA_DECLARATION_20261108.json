@@ -1,0 +1,46 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_006_VISUAL_READONLY_DELTA_DECLARATION_V1",
+  "gate": "I6.5/B4-006",
+  "status": "SOURCE_VISUAL_DELTA_READY_FOR_NEW_IMMUTABLE_PREVIEW",
+  "owner": "Paula Andrea Osorio Franco",
+  "predecessorHead": "ef41edc671fe421d3f88eb47003b1dc1f60ce017",
+  "sourceCommit": "d056811f9980d0fc2c2e2214e165f7e008c1f025",
+  "changedProductPaths": [
+    {
+      "path": "orbit360-platform/modules/aseguradoras.js",
+      "gitBlobSha": "c06b87520a6dd40b7312e468781b78bd53c29222"
+    },
+    {
+      "path": "orbit360-platform/styles/infra.css",
+      "gitBlobSha": "91116b5db4304d703d402ed7f408f4164fbaf3b8"
+    },
+    {
+      "path": "orbit360-platform/index.html",
+      "gitBlobSha": "2fd58ce40ad5707d11d69ffc3074f877d3269448"
+    },
+    {
+      "path": "orbit360-platform/modules/siniestros.js",
+      "gitBlobSha": "b32cfcd9594ad116a8bb6135d80ce7142441bbd3"
+    }
+  ],
+  "classification": "PRODUCT_VISUAL_PRESENTATION_ONLY",
+  "scope": [
+    "Aseguradoras Documentos y Drive read mode: canonical table desktop and labeled mobile cards",
+    "Aseguradoras Productos y planes read mode: commission/segment text labels",
+    "Siniestros inherited visible title only",
+    "Index asset URL cache-bust for changed files"
+  ],
+  "integrity": {
+    "editorWriteSelectorsPreserved": true,
+    "operationalDataWrites": 0,
+    "backendChanges": 0,
+    "firestoreRulesChanges": 0,
+    "productionDeploys": 0,
+    "reimport": false,
+    "oldB4005SealPreserved": true,
+    "ownerAcceptanceInferred": false,
+    "latestApprovedModulesNotReopened": true
+  },
+  "nextAction": "B4_006_BUILD_ONE_NEW_IMMUTABLE_PREVIEW_THEN_VISUAL_QA_AND_OWNER_ACCEPTANCE",
+  "createdAtUtc": "2026-11-08T14:06:43.310Z"
+}

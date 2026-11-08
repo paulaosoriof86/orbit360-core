@@ -15,6 +15,8 @@ const RECEIPT=ROOT+'I6_5_B4_004_FINAL_GATE_SEAL_20261107.json';
 const OWNER=ROOT+'OWNER_DECISION_FREEZE_AND_RECONCILIATION_PLAN_20261107.json';
 const B4005_RECEIPT=ROOT+'I6_5_B4_005_ENDOSOS_DURABLE_SOURCE_AND_ISOLATED_QA_20261107.json';
 const B4005_CAUSAL_RECEIPT=ROOT+'I6_5_B4_005_ENDOSOS_SERVER_SEMANTIC_WRITER_CAUSAL_FIX_20261107.json';
+const B4006_VISUAL_RECEIPT=ROOT+'I6_5_B4_006_VISUAL_READONLY_DELTA_DECLARATION_20261108.json';
+const B4006_VISUAL_ACTION='B4_006_BUILD_ONE_NEW_IMMUTABLE_PREVIEW_THEN_VISUAL_QA_AND_OWNER_ACCEPTANCE';
 const SOURCE='f8fa00e4e2e6627cee66c8c521866874e39bc8da';
 const BUILD='gi-i65-b4-f8fa00e4e2e6-57f234755dc1';
 const ARTIFACT=13600357541;
@@ -72,6 +74,45 @@ export function verifyDeclaredB4005SourceSuccessor(cp=read(CP),state=read(STATE)
       receipt.releaseSafety?.formalB4005Pass===false&&receipt.releaseSafety?.liveFrontendUnchanged===true&&
       receipt.releaseSafety?.liveBackendUnchanged===true&&receipt.releaseSafety?.businessWritesBySourceFix===0,
       'B4005_CAUSAL_FALSE_CERTIFICATION');
+    // Preserve the sealed B4-005 six-file writer correction. Permit B4-006
+    // visual product files only when the exact four Git blobs are declared
+    // by a mirrored source receipt; never expand this allowlist implicitly.
+    const visual=cp.b4006VisualReadonlyCandidateSource20261108;
+    let visualPaths=[];
+    if(visual){
+      need(same(visual,state.b4006VisualReadonlyCandidateSource20261108)&&
+        visual.gate==='I6.5/B4-006'&&
+        visual.status==='SOURCE_VISUAL_DELTA_READY_FOR_NEW_IMMUTABLE_PREVIEW'&&
+        visual.receiptPath===B4006_VISUAL_RECEIPT&&
+        visual.firstIncompleteGate==='B4-006'&&
+        visual.ownerAccepted===false&&visual.realDataWrites===0&&visual.liveDeploys===0,
+        'B4006_VISUAL_POINTER');
+      const bytes=fs.readFileSync(B4006_VISUAL_RECEIPT),r=JSON.parse(bytes);
+      need(blob(bytes)===visual.receiptBlobSha&&
+        git('rev-parse','HEAD:'+B4006_VISUAL_RECEIPT)===visual.receiptBlobSha&&
+        r.schema==='GRAVICENTRA_I6_5_B4_006_VISUAL_READONLY_DELTA_DECLARATION_V1'&&
+        r.gate==='I6.5/B4-006'&&r.status===visual.status&&
+        r.sourceCommit===visual.sourceCommit&&
+        git('merge-base',r.sourceCommit,'HEAD')===r.sourceCommit&&
+        r.integrity.editorWriteSelectorsPreserved===true&&
+        r.integrity.operationalDataWrites===0&&
+        r.integrity.backendChanges===0&&r.integrity.firestoreRulesChanges===0&&
+        r.integrity.productionDeploys===0&&r.integrity.reimport===false&&
+        r.integrity.ownerAcceptanceInferred===false,
+        'B4006_VISUAL_RECEIPT');
+      visualPaths=[
+        'orbit360-platform/modules/aseguradoras.js',
+        'orbit360-platform/styles/infra.css',
+        'orbit360-platform/index.html',
+        'orbit360-platform/modules/siniestros.js'
+      ].sort();
+      need(same((r.changedProductPaths||[]).map(x=>x.path).sort(),visualPaths),'B4006_EXACT_VISUAL_PATHS');
+      for(const file of r.changedProductPaths){
+        need(git('rev-parse','HEAD:'+file.path)===file.gitBlobSha&&
+          blob(fs.readFileSync(file.path))===file.gitBlobSha,
+          'B4006_VISUAL_BLOB:'+file.path);
+      }
+    }
     const changed=git('diff','--name-only',SOURCE,'HEAD','--','functions','orbit360-platform',':(exclude)orbit360-platform/docs/**').split(/\r?\n/).filter(Boolean).sort();
     const expected=[
       'functions/product-ops-leads-domain.js',
@@ -80,7 +121,7 @@ export function verifyDeclaredB4005SourceSuccessor(cp=read(CP),state=read(STATE)
       'orbit360-platform/modules/issuance-endosos-v1201-bridge.js',
       'orbit360-platform/modules/issuance-endosos-v1201-refinements.js',
       'orbit360-platform/modules/policy-receipts-v1199-detail-guard.js'
-    ].sort();
+    ].concat(visualPaths).sort();
     need(same(changed,expected),'B4005_CAUSAL_UNDECLARED_PRODUCT_CHANGE');
     const declared=receipt.sourceAndTests||[];
     need(declared.length===4&&same(declared.map(x=>x.path).sort(),[
@@ -156,7 +197,7 @@ export function verifyB4004FormalGate(){
   need(blob(bytes)===ref.receiptBlobSha&&sha256(bytes)===ref.receiptSha256&&ref.receiptBlobSha===mirror.receiptBlobSha&&ref.receiptSha256===mirror.receiptSha256,'SEAL_HASH');
   need(releaseMatches(ref)&&releaseMatches(mirror)&&ref.hostingVersion===VERSION&&ref.hostedPayloadDigest===DIGEST,'SEAL_RELEASE_POINTER');
   need(ref.lastClosedGate==='B4-004'&&mirror.lastClosedGate==='B4-004'&&ref.firstIncompleteGate==='B4-005'&&mirror.firstIncompleteGate==='B4-005','NEXT_GATE');
-  need(cp.nextAction===ACTION&&state.nextAction===ACTION&&ref.nextAction===ACTION&&mirror.nextAction===ACTION,'NEXT_ACTION_SYNC');
+  need((cp.nextAction===ACTION&&state.nextAction===ACTION||cp.nextAction===B4006_VISUAL_ACTION&&state.nextAction===B4006_VISUAL_ACTION&&cp.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&state.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&cp.b4006VisualReadonlyCandidateSource20261108?.status==='SOURCE_VISUAL_DELTA_READY_FOR_NEW_IMMUTABLE_PREVIEW')&&ref.nextAction===ACTION&&mirror.nextAction===ACTION,'NEXT_ACTION_SYNC');
   need(cp.pendingClosureMasterPlan?.status==='B4_004_CLOSED_PASS_NEXT_B4_005_E2E_NOT_EXECUTED'&&cp.pendingClosureMasterPlan.currentGate==='B4-005'&&cp.pendingClosureMasterPlan.b4004Held===false,'PLAN_CURSOR');
   need(cp.currentB4?.status==='B4_003_CLOSED_PASS_CURRENT42'&&same(cp.currentB4,historic.currentB4),'B4003_FROZEN_POINTER');
   need(cp.b4003ActiveCertificationCursor20261106?.formalLiveAcceptance?.status==='LATEST_APPROVED_VERSION_LIVE_PASS'&&same(cp.b4003ActiveCertificationCursor20261106,historic.b4003ActiveCertificationCursor20261106),'B4003_PRESERVED');

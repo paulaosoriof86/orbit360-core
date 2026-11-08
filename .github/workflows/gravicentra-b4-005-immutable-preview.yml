@@ -1,6 +1,7 @@
 # B4-005: build exactly once, retain same-byte promotion artifact, reuse existing LAB Preview.
 # No LIVE, Rules, Auth/IAM, data seed or operational writes. The B4-006 visual
 # successor reuses the existing Preview Ops callable without redeploying it.
+# B4-006 visual source is pinned by the mirrored release-control receipt (never implicit).
 name: Gravicentra B4-005 Exact Immutable Preview
 on:
   push:
