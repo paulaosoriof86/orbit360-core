@@ -4810,10 +4810,16 @@ jobs:
           npx playwright install --with-deps chromium >/dev/null
       - name: Authenticated Cronograma LIVE read-only scope and performance diagnostic
         env:
-          PROOF_OUT: ${{ runner.temp }}/b4-004-cronograma-readonly-scope.json
+          B4_004_CRONOGRAMA_READONLY_OUT: ${{ runner.temp }}/b4-004-cronograma-readonly-scope.json
         run: |
           set -euo pipefail
           node tools/gravicentra-b4-004-cronograma-live-readonly-scope.mjs
+          test -s "$B4_004_CRONOGRAMA_READONLY_OUT"
+          node - <<'NODE'
+          const fs=require('fs'),p=JSON.parse(fs.readFileSync(process.env.B4_004_CRONOGRAMA_READONLY_OUT,'utf8'));
+          if(p.writeAttemptCount!==0||p.dataWrites!==0||p.membershipWrites!==0||p.authAccountsCreated!==0||p.productSourceChanged!==false||p.backendChanged!==false)throw Error('B4_004_READONLY_MUTATION_BARRIER');
+          console.log('B4_004_RETAINED_SCOPE_DIAGNOSTIC='+p.diagnosticStatus);
+          NODE
 
       - name: Preserve Cronograma read-only diagnostic artifact
         if: always()
@@ -4821,7 +4827,7 @@ jobs:
         with:
           name: gravicentra-b4-004-retained-scope-${{ github.run_id }}
           path: ${{ runner.temp }}/b4-004-cronograma-readonly-scope.json
-          if-no-files-found: warn
+          if-no-files-found: error
           retention-days: 30
 
 
