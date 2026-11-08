@@ -5006,14 +5006,17 @@ jobs:
           set -euo pipefail
           python3 - <<'PY'
           import json,os,pathlib
-          dest=pathlib.Path(os.environ['RUNNER_TEMP'])/'b4004-country-service-account.json'
-          for k in ('SA_ORBIT360_LAB','SA_ORBIT_360_LAB','SA_DEFAULT'):
+          root=pathlib.Path(os.environ['RUNNER_TEMP'])/'b4004-existing-service-accounts'
+          root.mkdir(exist_ok=True)
+          candidates=[]
+          for i,k in enumerate(('SA_ORBIT360_LAB','SA_ORBIT_360_LAB','SA_DEFAULT')):
             try:d=json.loads(os.environ.get(k,''))
             except (ValueError,TypeError):continue
             if d.get('type')=='service_account' and d.get('project_id')==os.environ['PROJECT_ID'] and d.get('private_key'):
-              dest.write_text(json.dumps(d));dest.chmod(0o600);break
-          else:raise SystemExit('B4_004_EXISTING_FIREBASE_AUTHORITY_UNAVAILABLE')
-          with open(os.environ['GITHUB_ENV'],'a') as f:f.write('GOOGLE_APPLICATION_CREDENTIALS='+str(dest)+'\n')
+              dest=root/(str(i)+'.json')
+              dest.write_text(json.dumps(d));dest.chmod(0o600);candidates.append(str(dest))
+          if not candidates:raise SystemExit('B4_004_EXISTING_FIREBASE_AUTHORITY_UNAVAILABLE')
+          (root/'candidates').write_text('\n'.join(candidates)+'\n')
           PY
           npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund firebase-admin@13.4.0 playwright@1.55.0 >/dev/null
           FROOT="$RUNNER_TEMP/gi-b4004-firebase"
@@ -5021,7 +5024,16 @@ jobs:
           node tools/gravicentra-firebase-tools-empty-extensions-workaround-v1.mjs "$FROOT"
           CLI="$FROOT/node_modules/firebase-tools/lib/bin/firebase.js"
           echo "FIREBASE_CLI_BIN=$CLI" >> "$GITHUB_ENV"
-          node "$CLI" apps:list WEB --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/b4004-apps.json"
+          SELECTED=''
+          while IFS= read -r CANDIDATE; do
+            if GOOGLE_APPLICATION_CREDENTIALS="$CANDIDATE" node "$CLI" apps:list WEB --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/b4004-apps.json" 2>"$RUNNER_TEMP/b4004-apps-attempt-stderr.log"; then
+              SELECTED="$CANDIDATE"; break
+            fi
+          done < "$RUNNER_TEMP/b4004-existing-service-accounts/candidates"
+          test -n "$SELECTED" || { echo 'B4_004_NO_EXISTING_FIREBASE_APP_READ_AUTHORITY' >&2; exit 1; }
+          export GOOGLE_APPLICATION_CREDENTIALS="$SELECTED"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$SELECTED" >> "$GITHUB_ENV"
+          echo 'B4_004_EXISTING_FIREBASE_APP_AUTHORITY=PASS'
           export APP_LIST="$RUNNER_TEMP/b4004-apps.json"
           APP_ID=$(python3 - <<'PY'
           import json,os
