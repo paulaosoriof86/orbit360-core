@@ -1,0 +1,72 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_006_EXACT_VISUAL_MANAGEMENT_PREVIEW_READBACK_V1",
+  "gate": "I6.5/B4-006",
+  "status": "EXACT_PREVIEW_HOSTING_AND_PREVIEW_OPS_BACKEND_PASS_AUTHENTICATED_UAT_PENDING",
+  "scope": "PRESERVE_B4003_B4004_B4005_CERTIFICATES_SOURCE_GLOBAL_VISUAL_AND_OPS_COLLAB_DELTA_ONLY",
+  "evidenceDateLocal": "2026-11-08",
+  "evidenceSource": "GitHub Actions run 42526139287 + local synthetic CSS fixture from exact retained artifact",
+  "sourceSha": "7c3fdd00c74334a05f2a6bb01a7ba6e301d88d66",
+  "sourceCssBlobSha": "b00fbfc7a99d7c86aa9b138cc2ee838b57f6215a",
+  "qaGuardRunId": 42526139288,
+  "qaGuardResult": "SUCCESS",
+  "buildId": "gi-i65-b4-7c3fdd00c743-57f234755dc1",
+  "workflowRunId": 42526139287,
+  "workflowConclusion": "success",
+  "immutableArtifactId": 13634768362,
+  "immutableArtifactZipSha256": "b7a8eb781e58ce0c7095ec6f9626a891204ca53469fbdd79ec5ea0004d9fe32a",
+  "immutableArchiveSha256": "de71b83bce33dd16af7bca677d42d704e4018e4bddc9d430b429a6049696f52c",
+  "exactPreviewReadbackArtifactId": 13635910334,
+  "exactPreviewReadbackZipSha256": "8f7f7faaf32d6ef7858673bc5cb15080cfa9fa6889dc95434a7b886f293ede39",
+  "hostedPayloadDigest": "3d9190a128e77cf5b5e49ab106086a53db647a54006cadfced1e19971dbd3681",
+  "backendSourceDigest": "7653fee3407e7c7cffe3fc0a89a4053dd8dae73d5562892872e709aade37b832",
+  "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-rc-41765742748-neoi3u7r.web.app",
+  "hostedFilesExact": 218,
+  "previewBackend": "orbit360OpsLeadsCommandPreview",
+  "previewBackendDeploys": 1,
+  "productionBackendDeploys": 0,
+  "liveHostingDeploys": 0,
+  "authChanges": 0,
+  "rulesWrites": 0,
+  "realDataWrites": 0,
+  "b4003B4004SealPreserved": true,
+  "approvedLiveRootsStable": true,
+  "staticSourceContracts": {
+    "endosos": "12/12_PASS_MOCK_ONLY",
+    "managementCollaboration": "18_CHECKS_PASS_SOURCE_ONLY",
+    "globalTableCards": "PASS_SOURCE_ONLY"
+  },
+  "syntheticVisualCssFixture": {
+    "status": "PASS_OFFLINE_RENDER_NOT_AUTHENTICATED_UAT",
+    "viewports": [
+      1440,
+      390,
+      320
+    ],
+    "headerTextColor": "rgb(255, 255, 255)",
+    "headerGradient": "linear-gradient(110deg, rgb(51, 62, 76), rgb(32, 40, 50))",
+    "headerAlign": "center",
+    "accentBorder": "rgb(197, 22, 46)",
+    "cardRadiusPx": 15,
+    "globalDocumentOverflow": 0,
+    "mobileTableScroll": "390px: 732px scroll content / 348px client; 320px: 732px scroll content / 278px client",
+    "limitations": [
+      "No authenticated live application visual UAT",
+      "Fonts not certified in offline fixture",
+      "No signed user visual acceptance"
+    ]
+  },
+  "pending": [
+    "Authenticated Ops management comment server-write canonical-readback reload/reopen and distinct-UID evidence",
+    "Controlled Drive attachment upload -> persistent reload/reopen",
+    "Actual authenticated cross-module table-card UI visual acceptance",
+    "Performance timings for Cobros/Cancelaciones/Renovaciones",
+    "Promote SAME immutable artifact to LIVE only after all required gates and approval; verify live before closing"
+  ],
+  "ownerAcceptedExactArtifact": false,
+  "fullB4006GatePass": false,
+  "productionPromotionAuthorizedByThisReceipt": false,
+  "nextAction": "B4_006_AUTHENTICATED_E2E_VISUAL_AND_PERFORMANCE_FOCAL_VALIDATION_ON_SAME_ARTIFACT",
+  "humanAcceptanceSource": "PENDING",
+  "historicalPassedEvidencePreserved": true,
+  "noProductMutationInEvidenceCommit": true
+}

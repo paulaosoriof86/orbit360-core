@@ -22466,5 +22466,21 @@
     "ownerAcceptedExactArtifact": false,
     "noLive": true,
     "noDataWrites": true
+  },
+  "b4006ExactVisualManagementPreviewReadback20261108": {
+    "status": "EXACT_PREVIEW_HOSTING_AND_PREVIEW_OPS_BACKEND_PASS_AUTHENTICATED_UAT_PENDING",
+    "gate": "I6.5/B4-006",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_006_EXACT_VISUAL_MANAGEMENT_PREVIEW_READBACK_20261108.json",
+    "receiptBlobSha": "cbf811bf20df9afbf168e3f25d0c181ef5e53729",
+    "sourceSha": "7c3fdd00c74334a05f2a6bb01a7ba6e301d88d66",
+    "buildId": "gi-i65-b4-7c3fdd00c743-57f234755dc1",
+    "artifactId": 13634768362,
+    "hostedPayloadDigest": "3d9190a128e77cf5b5e49ab106086a53db647a54006cadfced1e19971dbd3681",
+    "workflowRunId": 42526139287,
+    "guardRunId": 42526139288,
+    "ownerAcceptedExactArtifact": false,
+    "productionPromoted": false,
+    "e2ePending": true,
+    "nonMutatingGovernanceFreeze": true
   }
 }
