@@ -1199,5 +1199,20 @@
     "realDataWrites": 0,
     "liveDeploys": 0,
     "oneCanonicalPreviewChannel": true
+  },
+  "b4006RealInsurerVisualMicroRefinement20261108": {
+    "gate": "I6.5/B4-006",
+    "status": "FOCAL_VISUAL_MICRO_REFINEMENT_SINGLE_CANDIDATE_PREVIEW_PENDING",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_006_REAL_INSURER_VISUAL_MICRO_REFINEMENT_20261108.json",
+    "receiptBlobSha": "f64e13adc594ba85d56310a87b281f51c058b68f",
+    "sourcePredecessor": "1693598321f51911b880f9c9fe8e08332d88326f",
+    "previousStylesBlobSha": "70d15bf172313a43d951af6884e52177d5eca037",
+    "newStylesBlobSha": "7040f7d522fc25dda006f6dc6d61b1cbf9d2b43a",
+    "firstIncompleteGate": "B4-006",
+    "lastClosedGate": "B4-005",
+    "ownerAccepted": false,
+    "realDataWrites": 0,
+    "liveDeploys": 0,
+    "oneCanonicalPreviewChannel": true
   }
 }

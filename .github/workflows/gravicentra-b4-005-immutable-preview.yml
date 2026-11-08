@@ -3,7 +3,7 @@
 # successor reuses the existing Preview Ops callable without redeploying it.
 # B4-006 visual source is pinned by the mirrored release-control receipt (never implicit).
 # Cursor projection preserves the B4-003/B4-004 seals while B4-006 is active.
-# Mobile 320px header refinement is pinned in the same B4-006 visual receipt.
+# Mobile 320px and Docs heading micro-refinement is pinned in a signed B4-006 addendum; one canonical Preview channel.
 name: Gravicentra B4-005 Exact Immutable Preview
 on:
   push:
