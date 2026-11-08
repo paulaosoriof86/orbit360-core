@@ -45,7 +45,7 @@ async function actorInventory(){
  }
  return out;
 }
-function pickActors(rows){
+export function pickActors(rows){
  const direction=rows.find(x=>x.activeRole==='direccion'&&x.countries.includes('GT')&&x.advisorId);
  need(direction,'DIRECTION_GT_ACTOR');
  const own=rows.find(x=>x.uid!==direction.uid&&x.countries.includes('GT')&&x.advisorId&&x.advisorId!==direction.advisorId&&x.scope==='own');
