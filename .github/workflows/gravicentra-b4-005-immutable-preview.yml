@@ -78,8 +78,9 @@ jobs:
           if(r.sourceAndTests.length!==4||r.isolatedTests.passedGroups!==12)throw Error('B4005_SOURCE_TEST_CARDINALITY');
           const cp=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json','utf8'));
           for(const f of r.sourceAndTests){
-            const expected=(f.path==='functions/product-ops-leads-domain.js'&&cp.b4006ManagementCollaborationBackendHardening20261108)
-              ? cp.b4006ManagementCollaborationBackendHardening20261108.newBackendBlobSha : f.gitBlobSha;
+            const successor=cp.b4006ManagementCollaborationBackendHardening20261108;
+            const expected=(successor&&f.path==='functions/product-ops-leads-domain.js')?successor.newBackendBlobSha:
+              (successor&&f.path==='orbit360-platform/data/store-firestore-product-operational-p0.js')?successor.newWriterBlobSha:f.gitBlobSha;
             if(git('rev-parse','HEAD:'+f.path)!==expected)throw Error('B4005_SOURCE_DRIFT:'+f.path);
           }
           if(r.ownerScopePreserved.insurerKnowledgeAndTariffs!=='DEFERRED_POSTPRODUCTION'||r.ownerScopePreserved.cotcomp!=='DEFERRED_POSTPRODUCTION')throw Error('OWNER_SCOPE_NOT_FROZEN');
