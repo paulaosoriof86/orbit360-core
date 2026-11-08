@@ -84,13 +84,13 @@ fs.writeFileSync(path.join(EVIDENCE,'reachable-files.txt'),[...seen].sort().join
 
 function copyTree(src,dst){for(const e of fs.readdirSync(src,{withFileTypes:true})){if(e.name==='node_modules'||e.name==='.git'||e.name.endsWith('.local'))continue;const a=path.join(src,e.name),b=path.join(dst,e.name);if(e.isDirectory()){fs.mkdirSync(b,{recursive:true});copyTree(a,b);}else if(e.isFile()){fs.mkdirSync(path.dirname(b),{recursive:true});fs.copyFileSync(a,b);}}}
 copyTree(FUNCTIONS_SRC,BACKEND);
-// B4-003: stage the two callable names in ONE immutable backend package.
+// B4-003/B4-004: stage scoped callable names in ONE immutable Preview package without deploying the backend.
 // The executor deploys ONLY the Preview target; LIVE stays undeployed until I5.
 const SCOPED_PREVIEW=process.env.GRAVICENTRA_B4_003_SCOPED_PREVIEW==='true';
 const GOALS_PREVIEW=process.env.GRAVICENTRA_B4_003_GOALS_PREVIEW==='true';
 if(GOALS_PREVIEW&&!SCOPED_PREVIEW)throw new Error('B4_003_GOALS_PREVIEW_REQUIRES_SCOPED_PREVIEW');
 if(SCOPED_PREVIEW){
- if(RELEASE_GATE!=='I6.5-B4-003'||BUILD_PREFIX!=='gi-i65-b4'||!ENVIRONMENT_REF.includes('preview'))
+ if(!['I6.5-B4-003','I6.5-B4-004'].includes(RELEASE_GATE)||BUILD_PREFIX!=='gi-i65-b4'||!ENVIRONMENT_REF.includes('preview'))
   throw new Error('B4_003_SCOPED_PREVIEW_BOUNDARY_DENIED');
  const entry=path.join(BACKEND,'bootstrap.js');
  const base=read(entry);
