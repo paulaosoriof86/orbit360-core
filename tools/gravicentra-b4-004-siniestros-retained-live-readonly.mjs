@@ -42,10 +42,10 @@ async function legal(page,a){
 }
 async function checkActor(browser,a,index){
  const context=await browser.newContext({viewport:{width:index===0?1440:390,height:index===0?900:844},serviceWorkers:'block'}),page=await context.newPage();
- const errs=[],failed=[];
+ const errs=[],failed=[],reloadAborts=[];let controlledReload=false;
  page.on('pageerror',e=>errs.push({code:'PAGE_ERROR',hash:sha(String(e.message))}));
  page.on('response',r=>{if(r.status()===404){const u=new URL(r.url());errs.push({code:'HTTP_404',originHost:u.hostname,pathSha:sha(u.pathname),resourceType:r.request().resourceType(),staticAsset:/\.(js|css|png|svg|ico|webmanifest)$/i.test(u.pathname),documentDriveStatus:u.pathname.endsWith('/orbit360DocumentDriveStatus')});}});
- page.on('requestfailed',r=>{const u=new URL(r.url());if(!u.pathname.endsWith('/orbit360DocumentDriveStatus'))failed.push({code:'REQUEST_FAILED',originHost:u.hostname,pathSha:sha(u.pathname),resourceType:r.resourceType(),failureCode:String(r.failure()?.errorText||'').slice(0,80)});});
+ page.on('requestfailed',r=>{const u=new URL(r.url());if(u.pathname.endsWith('/orbit360DocumentDriveStatus'))return;const code=String(r.failure()?.errorText||'').slice(0,80);const signal={code:'REQUEST_FAILED',originHost:u.hostname,pathSha:sha(u.pathname),resourceType:r.resourceType(),failureCode:code};if(controlledReload&&r.resourceType()==='fetch'&&code==='net::ERR_ABORTED'){reloadAborts.push(signal);return;}failed.push(signal);});
  await context.route(/orbit360ProductOperationalCommand|orbit360OpsLeadsCommand/,async route=>{
   if(route.request().method()==='OPTIONS'){await route.continue();return;}
   receipt.writeAttempts++;await route.abort('blockedbyclient');
@@ -79,11 +79,14 @@ async function checkActor(browser,a,index){
   const modal=await page.evaluate(()=>({client:!!document.querySelector('#sn-cli'),policy:!!document.querySelector('#sn-pol'),type:!!document.querySelector('#sn-tipo'),amount:!!document.querySelector('#sn-monto'),submit:!!document.querySelector('#sn-ok'),cancel:!!document.querySelector('#sn-cancel')}));
   need(Object.values(modal).every(Boolean),'READONLY_CREATE_FORM_NOT_RENDERED');
   await page.locator('#sn-cancel').click();
-  await page.reload({waitUntil:'domcontentloaded',timeout:60000});
-  await page.waitForFunction(()=>!!document.querySelector('#si-new')&&!!document.querySelector('#host')?.textContent?.includes('Siniestros'),null,{timeout:30000});
+  controlledReload=true;
+  try{
+   await page.reload({waitUntil:'domcontentloaded',timeout:60000});
+   await page.waitForFunction(()=>!!document.querySelector('#si-new')&&!!document.querySelector('#host')?.textContent?.includes('Siniestros'),null,{timeout:30000});
+  }finally{controlledReload=false;}
   const after=await page.evaluate(()=>({route:Orbit.route?.key||'',bodyOk:!!document.querySelector('#si-new'),noModal:!document.querySelector('#sn-ok')}));
   need(after.bodyOk&&after.noModal,'RELOAD_STATE');
-  receipt.diagnostics.push({actorUidHash:sha(a.uid),role:a.role,country:a.country,observedRoute:before.route,firstRenderMs:ms,modal,after,errors:errs,requestFailures:failed,writeAttemptCount:receipt.writeAttempts});
+  receipt.diagnostics.push({actorUidHash:sha(a.uid),role:a.role,country:a.country,observedRoute:before.route,firstRenderMs:ms,modal,after,errors:errs,requestFailures:failed,controlledReloadAbortedFetches:reloadAborts.length,writeAttemptCount:receipt.writeAttempts});
   need(!errs.length&&!failed.length&&receipt.writeAttempts===0,'PAGE_OR_WRITE_ERRORS');
   const observed={uidHash:sha(a.uid),role:a.role,country:a.country,viewport:index===0?'1440x900':'390x844',sessionUidMatched:true,
     routeVisible:true,formOpenedAndCancelled:true,reloadPass:true,claimRowsObserved:before.claimCount,firstRouteRenderMs:ms,noBusinessWrite:true,pageErrors:errs,networkFailures:failed};
