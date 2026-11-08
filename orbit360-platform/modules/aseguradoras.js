@@ -988,7 +988,7 @@ Orbit.modules.aseguradoras = (function () {
     const det = (a.ramosDetalle && a.ramosDetalle[r]) || {},selectedProducts=selectedCommercialList(a,r,'productos','producto'),selectedPlans=selectedCommercialList(a,r,'planes','plan');
     const products=commercialProductCatalog(a,r),plans=commercialPlanCatalog(a,r);
     return `<section class="insurer-offering-card" data-offering-ramo="${U.esc(r)}"><div class="insurer-offering-head"><div><b>${U.esc(r)}</b><span>${selectedProducts.length} producto(s) · ${selectedPlans.length} plan(es)</span></div><label class="insurer-cotizador-toggle"><input type="checkbox" data-ramohab="${U.esc(r)}" ${hab ? 'checked' : ''} ${editing ? '' : 'disabled'}><span>${hab?'Disponible para Cotizador':'No habilitado para Cotizador'}</span></label></div>
-      <div class="insurer-offering-meta"><label>Comisión %<input class="o-sel" type="number" min="0" max="100" step="0.5" data-ramopct="${U.esc(r)}" value="${pct}" ${editing ? '' : 'disabled'}></label><label>Segmento<select class="o-sel" data-ramoseg="${U.esc(r)}" ${editing ? '' : 'disabled'}>${selectOptions((Orbit.cat&&Orbit.cat.get?Orbit.cat.get('segmentos'):[]).filter(x=>typeof x==='string'),det.segmento||'','Seleccionar…')}</select></label></div>
+      <div class="insurer-offering-meta">${editing ? `<label>Comisión %<input class="o-sel" type="number" min="0" max="100" step="0.5" data-ramopct="${U.esc(r)}" value="${pct}"></label><label>Segmento<select class="o-sel" data-ramoseg="${U.esc(r)}">${selectOptions((Orbit.cat&&Orbit.cat.get?Orbit.cat.get('segmentos'):[]).filter(x=>typeof x==='string'),det.segmento||'','Seleccionar…')}</select></label>` : `<div class="insurer-offering-readfield"><span>COMISIÓN</span><b>${pct === '' ? 'No registrada' : U.esc(String(pct)) + ' %'}</b></div><div class="insurer-offering-readfield"><span>SEGMENTO</span><b>${U.esc(det.segmento || 'Sin segmento')}</b></div>`}</div>
       <div class="insurer-offering-cols"><div><b>Productos</b><small>Catálogo del país, ramo y evidencia documental; seleccionar no equivale a validar tarifas</small>${editing?multiCheckOptions(products,selectedProducts,'data-ramoprod',r):(selectedProducts.map(v=>'<span class="badge neutral">'+U.esc(v)+'</span>').join('')||'<span class="muted">Sin productos seleccionados.</span>')}</div><div><b>Planes</b><small>Planes comerciales definidos para el tenant o documentados</small>${editing?multiCheckOptions(plans,selectedPlans,'data-ramoplancheck',r):(selectedPlans.map(v=>'<span class="badge neutral">'+U.esc(v)+'</span>').join('')||'<span class="muted">Sin planes específicos.</span>')}</div></div>
     </section>`;
   }
@@ -1068,7 +1068,7 @@ Orbit.modules.aseguradoras = (function () {
           <div class="insurer-knowledge-card"><span style="flex:1;min-width:0"><b>Fuentes clasificadas</b><small class="muted" style="display:block;margin-top:3px">Archivos ya relacionados con esta aseguradora y su uso.</small></span><span class="badge ${docs.length?'ok':'neutral'}">${docs.length}</span></div>
           <div class="insurer-knowledge-card"><span style="flex:1;min-width:0"><b>Conocimiento relacionado</b><small class="muted" style="display:block;margin-top:3px">Fuentes disponibles para revisión y validación.</small></span><span class="badge ${sources.length?'ok':'neutral'}">${sources.length}</span></div>
         </div>
-        <div id="af-docs">${docs.map((d, i) => docRow(d, i, editing, a)).join('') || '<div class="cfg-note" data-drive-empty="1"><b>Aún no hay fuentes clasificadas en la ficha.</b> Puedes cargar una fuente o navegar el expediente Drive si tu rol lo permite.</div>'}</div>
+        <div id="af-docs">${docs.length ? (editing ? docs.map((d,i) => docRow(d,i,true,a)).join('') : `<div class="insurer-doc-view"><div class="insurer-doc-scroll-hint">Vista de fuentes · desplázate horizontalmente para ver todas las columnas →</div><div class="insurer-doc-table-scroll" role="region" aria-label="Fuentes clasificadas por aseguradora" tabindex="0"><table class="tbl insurer-doc-table"><thead><tr><th scope="col">FUENTE</th><th scope="col">CLASIFICACIÓN</th><th scope="col">RAMO</th><th scope="col">PAÍS</th><th scope="col">MONEDA</th><th scope="col">PRODUCTO</th><th scope="col">PLAN</th><th scope="col">SEGMENTO</th><th scope="col">VALIDACIÓN</th></tr></thead><tbody>${docs.map((d,i) => docRow(d,i,false,a)).join('')}</tbody></table></div></div>`) : '<div class="cfg-note" data-drive-empty="1"><b>Aún no hay fuentes clasificadas en la ficha.</b> Puedes cargar una fuente o navegar el expediente Drive si tu rol lo permite.</div>'}</div>
         ${canEdit() ? '<button class="btn primary sm" id="af-imp-doc" style="margin-top:12px">＋ Cargar y clasificar fuente</button>' : ''}
         ${sourceRegistryHtml(a,editing)}
       </div>
@@ -1078,6 +1078,20 @@ Orbit.modules.aseguradoras = (function () {
     const ro = editing ? '' : 'disabled';
     const nd = normalizarFuente(Object.assign({ id: d.id || ('doc' + i) }, d), a);
     const ev = evaluarFuente(nd);
+    if (!editing) {
+      const cell = (label, value, fallback='—') => '<td data-label="'+label+'">'+U.esc(value == null || String(value).trim() === '' ? fallback : String(value))+'</td>';
+      const tone = ev.estado.indexOf('incompleto') >= 0 ? 'danger' : ev.estado.indexOf('Habilitado') === 0 ? 'ok' : 'neutral';
+      return '<tr class="insurer-doc-read-row">'+
+        cell('Fuente',d.nombre,'Sin nombre')+
+        cell('Clasificación',d.cat||nd.cat,'Sin clasificar')+
+        cell('Ramo',d.ramo,'Sin ramo')+
+        cell('País',d.pais||a.pais,'Sin país')+
+        cell('Moneda',d.moneda||nd.moneda,'—')+
+        cell('Producto',d.producto,'Sin producto')+
+        cell('Plan',d.plan,'Sin plan')+
+        cell('Segmento',d.segmento,'Sin segmento')+
+        '<td data-label="Validación"><span class="badge '+tone+'">'+U.esc(String(ev.estado))+'</span></td></tr>';
+    }
     return `<div class="asg-row" data-doc="${i}" style="flex-wrap:wrap">
       <span style="font-size:14px">📎</span>
       <input class="o-sel" data-dn value="${U.esc(d.nombre || '')}" style="flex:1.1" ${ro}>

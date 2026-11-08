@@ -1424,3 +1424,31 @@ a.fh-chip:hover{border-color:var(--red);color:var(--red)}
   .topbar .tb-rol{padding-left:4px;padding-right:4px;gap:2px}
   .topbar .tb-rol select{font-size:10.5px}
 }
+
+/* B4-006 · lectura de fuentes: tabla canónica en escritorio, ficha etiquetada en móvil.
+   Solo Aseguradoras; el editor y el contrato de guardado quedan intactos. */
+.insurer-doc-view{min-width:0;max-width:100%}
+.insurer-doc-scroll-hint{font:700 10.5px var(--f-display);color:var(--ink-3);text-align:right;margin:0 0 7px;letter-spacing:.01em}
+.insurer-doc-table-scroll{max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;border:1px solid var(--line);border-radius:12px;background:var(--card)}
+.insurer-doc-table{min-width:1160px;width:100%;table-layout:auto}
+.insurer-doc-table th{background:var(--card-2)}
+.insurer-doc-table td{font-size:12.5px;line-height:1.4;overflow-wrap:anywhere}
+.insurer-doc-table td:first-child{font-weight:700;min-width:155px}
+.insurer-doc-table td:last-child{min-width:140px}
+.insurer-doc-table .badge{white-space:normal;line-height:1.3}
+.insurer-offering-readfield{display:grid;gap:5px;align-content:start;min-width:0}
+.insurer-offering-readfield>span{font:800 11px var(--f-display);letter-spacing:.06em;color:var(--ink-3)}
+.insurer-offering-readfield>b{font-size:13px;line-height:1.45;color:var(--ink);overflow-wrap:anywhere}
+@media(max-width:760px){
+  .insurer-doc-scroll-hint{display:none}
+  .insurer-doc-table-scroll{border:0;overflow:visible;background:transparent}
+  .insurer-doc-table,.insurer-doc-table tbody{display:block;width:100%;min-width:0;max-width:100%;overflow:visible}
+  .insurer-doc-table thead{display:none}
+  .insurer-doc-table tbody{display:grid;gap:10px}
+  .insurer-doc-table .insurer-doc-read-row{display:block;background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:0 8px 20px -22px rgba(15,17,20,.5)}
+  .insurer-doc-table td{display:grid;grid-template-columns:minmax(88px,35%) minmax(0,1fr);align-items:start;gap:9px;padding:9px 12px;width:100%;min-width:0;white-space:normal;border-bottom:1px solid var(--line-2);font-size:12px}
+  .insurer-doc-table td:first-child,.insurer-doc-table td:last-child{min-width:0}
+  .insurer-doc-table td:last-child{border-bottom:0}
+  .insurer-doc-table td::before{content:attr(data-label);font:800 10px var(--f-display);letter-spacing:.045em;text-transform:uppercase;color:var(--ink-3);padding-top:2px}
+}
+@media(min-width:761px) and (max-width:900px){.insurer-doc-table{display:table;max-width:none;overflow:visible}}

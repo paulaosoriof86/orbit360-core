@@ -37,7 +37,7 @@ Orbit.modules.siniestros = (function () {
     const cierreDias = cerrados.map(r => { const pagoEv = (r.bitacora || []).slice().reverse().find(b => /pagad/i.test(b.t || '')); return pagoEv ? diasEntre(r.fecha, pagoEv.ts) : diasEntre(r.fecha, hoy); }).filter(d => !isNaN(d));
     const promCierre = cierreDias.length ? Math.round(cierreDias.reduce((a, b) => a + b, 0) / cierreDias.length) : 0;
     host.innerHTML = `<div class="page">
-      ${K.banner({ icon: '🚨', title: 'Orbit Siniestros', sub: 'Reclamos, bitácora y seguimiento con aseguradoras', features: [], actions: `<button class="btn ghost" id="si-imp" style="background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.25)">⬇ Importar bitácora</button><button class="btn primary" id="si-new" style="background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.28)">+ Reclamo</button>` })}
+      ${K.banner({ icon: '🚨', title: 'Siniestros', sub: 'Reclamos, bitácora y seguimiento con aseguradoras', features: [], actions: `<button class="btn ghost" id="si-imp" style="background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.25)">⬇ Importar bitácora</button><button class="btn primary" id="si-new" style="background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.28)">+ Reclamo</button>` })}
       ${K.kpis([
         { label: 'Reclamos', val: arr.length, color: 'var(--red)', foot: abiertos.length + ' abiertos', onclick: "location.hash='#/siniestros'" },
         { label: 'En proceso', val: abiertos.length, color: 'var(--warn)', foot: 'requieren gestión', onclick: "location.hash='#/siniestros'" },

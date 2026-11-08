@@ -1,12 +1,16 @@
 # B4-005: build exactly once, retain same-byte promotion artifact, reuse existing LAB Preview.
-# No LIVE, Rules, Auth/IAM, data seed or operational writes. The scoped
-# corrective successor deploys ONE existing Ops callable to Preview only.
+# No LIVE, Rules, Auth/IAM, data seed or operational writes. The B4-006 visual
+# successor reuses the existing Preview Ops callable without redeploying it.
 name: Gravicentra B4-005 Exact Immutable Preview
 on:
   push:
     branches: [recovery/fase-a-clean-20260831]
     paths:
       - .github/workflows/gravicentra-b4-005-immutable-preview.yml
+      - orbit360-platform/modules/aseguradoras.js
+      - orbit360-platform/modules/siniestros.js
+      - orbit360-platform/styles/infra.css
+      - orbit360-platform/index.html
       - orbit360-platform/modules/issuance-endosos-v1201-bridge.js
       - tools/gravicentra-b4-003-scoped-related-reader.test.cjs
   workflow_dispatch:
@@ -71,6 +75,8 @@ jobs:
           node --check orbit360-platform/modules/issuance-endosos-v1201-bridge.js
           node --check orbit360-platform/modules/issuance-endosos-v1201-refinements.js
           node --check orbit360-platform/modules/policy-receipts-v1199-detail-guard.js
+          node --check orbit360-platform/modules/aseguradoras.js
+          node --check orbit360-platform/modules/siniestros.js
       - name: Fingerprint existing LIVE sites without touching them
         run: |
           set -euo pipefail
@@ -123,6 +129,9 @@ jobs:
             cmp "orbit360-platform/$rel" "$ROOT/$rel"
           done
           cmp functions/product-ops-leads-domain.js "$RUNNER_TEMP/b4005-package/bundle/backend/product-ops-leads-domain.js"
+          for rel in modules/aseguradoras.js modules/siniestros.js styles/infra.css; do
+            cmp "orbit360-platform/$rel" "$ROOT/$rel"
+          done
           node - <<'NODE'
           const fs=require('node:fs'),base=process.env.RUNNER_TEMP+'/b4005-package/bundle';
           const cfg=JSON.parse(fs.readFileSync(base+'/firebase.json','utf8'));
@@ -147,35 +156,17 @@ jobs:
             ${{ runner.temp }}/b4005-exact-release-bundle.sha256
           retention-days: 30
           if-no-files-found: error
-      - name: Deploy exactly one already-existing Ops callable to isolated Preview
+      - name: Read back existing Preview Ops callable without redeploying it for visual-only change
         run: |
           set -euo pipefail
-          node "$FIREBASE_CLI_BIN" functions:list --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/b4005-functions-before.json"
+          node "$FIREBASE_CLI_BIN" functions:list --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/b4005-functions-readonly.json"
           node - <<'NODE'
-          const fs=require('node:fs'),r=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/b4005-functions-before.json','utf8'));
+          const fs=require('node:fs');
+          const r=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/b4005-functions-readonly.json','utf8'));
           const xs=Array.isArray(r.result)?r.result:Array.isArray(r)?r:[];
           const matches=xs.filter(x=>[x.entryPoint,x.id,x.name].some(v=>String(v||'').split('/').pop()==='orbit360OpsLeadsCommandPreview'));
-          if(matches.length!==1)throw Error('B4005_EXISTING_PREVIEW_OPS_FUNCTION_NOT_UNIQUE');
-          const loc=String(matches[0].region||matches[0].location||matches[0].name||'');
-          if(loc&&/us-central1/.test(loc))throw Error('B4005_PREVIEW_ONLY_FUNCTION_REGION_REQUIRED');
-          NODE
-          STAGE="$RUNNER_TEMP/b4005-one-function"
-          mkdir -p "$STAGE"
-          cp -a "$RUNNER_TEMP/b4005-package/bundle/backend" "$STAGE/backend"
-          (cd "$STAGE/backend" && npm ci --ignore-scripts --no-audit --no-fund >/dev/null)
-          printf '{"functions":{"source":"backend","runtime":"nodejs22"}}\n' > "$STAGE/firebase.json"
-          node "$FIREBASE_CLI_BIN" deploy --only functions:orbit360OpsLeadsCommandPreview --config "$STAGE/firebase.json" --project "$PROJECT_ID" --non-interactive
-          node "$FIREBASE_CLI_BIN" functions:list --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/b4005-functions-after.json"
-          node - <<'NODE'
-          const fs=require('node:fs'),p=process.env.RUNNER_TEMP;
-          const xs=f=>{const r=JSON.parse(fs.readFileSync(p+'/'+f,'utf8'));return Array.isArray(r.result)?r.result:Array.isArray(r)?r:[];};
-          const signature=xs=>xs.filter(x=>![x.entryPoint,x.id,x.name].some(v=>String(v||'').split('/').pop()==='orbit360OpsLeadsCommandPreview'))
-            .map(x=>({name:x.name||x.id||x.entryPoint,region:x.region||x.location,runtime:x.runtime||x.runtimeVersion,version:x.version||x.updateTime||x.updateTimestamp||''}))
-            .sort((a,b)=>String(a.name).localeCompare(String(b.name)));
-          if(JSON.stringify(signature(xs('b4005-functions-before.json')))!==JSON.stringify(signature(xs('b4005-functions-after.json'))))throw Error('B4005_UNRELATED_FUNCTION_CHANGED');
-          const target=xs('b4005-functions-after.json').filter(x=>[x.entryPoint,x.id,x.name].some(v=>String(v||'').split('/').pop()==='orbit360OpsLeadsCommandPreview'));
-          if(target.length!==1)throw Error('B4005_TARGET_PREVIEW_FUNCTION_MISSING_AFTER_DEPLOY');
-          console.log('B4005_ONE_EXISTING_PREVIEW_FUNCTION_DEPLOYED_LIVE_FUNCTIONS_PRESERVED');
+          if(matches.length!==1)throw Error('B4006_EXISTING_PREVIEW_WRITER_NOT_UNIQUE');
+          console.log('B4006_VISUAL_DELTA_BACKEND_UNCHANGED_EXISTING_PREVIEW_WRITER_CONFIRMED');
           NODE
       - name: Deploy immutable bundle ONLY to existing isolated Preview channel
         id: preview
@@ -227,11 +218,11 @@ jobs:
           const b=JSON.parse(fs.readFileSync(root+'/__recovery__/build.json','utf8'));
           const p=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/b4005-package-output.json','utf8'));
           const tar=fs.readFileSync(process.env.RUNNER_TEMP+'/b4005-exact-release-bundle.tar.gz');
-          const proof={schema:'GRAVICENTRA_I6_5_B4_005_EXACT_IMMUTABLE_PREVIEW_PROOF_V2',status:'EXACT_PREVIEW_TRANSPORT_AND_ONE_OPS_BACKEND_PASS_AUTHENTICATED_E2E_PENDING',gate:'I6.5/B4-005',sourceSha:process.env.SOURCE_SHA,buildId:b.buildId,previewUrl:process.env.PREVIEW_URL,runId:Number(process.env.GITHUB_RUN_ID),artifactId:Number(process.env.ARTIFACT_ID),artifactZipSha256:process.env.ARTIFACT_ZIP_SHA256,archiveSha256:crypto.createHash('sha256').update(tar).digest('hex'),hostedPayloadDigest:p.hostedPayloadDigest,backendSourceDigest:p.backendSourceDigest,productFiles:p.hostedFileCount,allHostedFilesExact:true,reusedExistingChannel:true,b4003B4004SealsPreserved:true,liveLabStable:true,liveCustomDomainStable:true,functionsDeploys:1,previewFunction:'orbit360OpsLeadsCommandPreview',liveFunctionDeploys:0,rulesDeploys:0,authChanges:0,realDataWrites:0,authenticatedE2e:'PENDING',production:'HOLD',formalB4005Pass:false};
+          const proof={schema:'GRAVICENTRA_I6_5_B4_005_EXACT_IMMUTABLE_PREVIEW_PROOF_V2',status:'EXACT_PREVIEW_TRANSPORT_AND_ONE_OPS_BACKEND_PASS_AUTHENTICATED_E2E_PENDING',gate:'I6.5/B4-005',sourceSha:process.env.SOURCE_SHA,buildId:b.buildId,previewUrl:process.env.PREVIEW_URL,runId:Number(process.env.GITHUB_RUN_ID),artifactId:Number(process.env.ARTIFACT_ID),artifactZipSha256:process.env.ARTIFACT_ZIP_SHA256,archiveSha256:crypto.createHash('sha256').update(tar).digest('hex'),hostedPayloadDigest:p.hostedPayloadDigest,backendSourceDigest:p.backendSourceDigest,productFiles:p.hostedFileCount,allHostedFilesExact:true,reusedExistingChannel:true,b4003B4004SealsPreserved:true,liveLabStable:true,liveCustomDomainStable:true,functionsDeploys:0,previewFunction:'orbit360OpsLeadsCommandPreview',liveFunctionDeploys:0,rulesDeploys:0,authChanges:0,realDataWrites:0,authenticatedE2e:'PENDING',production:'HOLD',formalB4005Pass:false};
           if(!proof.artifactId||!proof.productFiles||!proof.hostedPayloadDigest)throw Error('B4005_PREVIEW_PROOF_INCOMPLETE');
           fs.writeFileSync(process.env.RUNNER_TEMP+'/b4005-exact-preview-proof.json',JSON.stringify(proof,null,2)+'\n');
           NODE
-          echo "B4-005 exact immutable Preview Hosting and one existing Preview Ops function PASS; LIVE unchanged; authenticated role/country/write/reload E2E still pending. Preview: $PREVIEW_URL" >> "$GITHUB_STEP_SUMMARY"
+          echo "B4-006 visual successor immutable Preview Hosting PASS, existing Preview Ops function unchanged; LIVE unchanged; owner visual acceptance pending. Preview: $PREVIEW_URL" >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@v4
         if: always()
         with:
