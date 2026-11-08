@@ -1,0 +1,99 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_005_REUSE_AND_DELTA_ENTRY_V1",
+  "gate": "I6.5/B4-005",
+  "recordType": "ADDITIVE_EVIDENCE_REUSE_INDEX_UNDER_EXISTING_FROZEN_PLAN_NOT_ANOTHER_PLAN_OR_GATE",
+  "status": "IN_PROGRESS_PRIOR_EVIDENCE_RECONCILED_FULL_E2E_NOT_CERTIFIED",
+  "recordedAtUtc": "2026-11-08T03:46:52Z",
+  "operationalDateGuatemala": "2026-11-07",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "parentHead": "231e3cb0a4d596fcf81a50824db072bcb0a002a8",
+  "exactCandidate": {
+    "productSourceSha": "f8fa00e4e2e6627cee66c8c521866874e39bc8da",
+    "buildId": "gi-i65-b4-f8fa00e4e2e6-57f234755dc1",
+    "artifactId": 13600357541,
+    "hostingVersion": "sites/ays-orbit-360-lab/versions/439cb977fd4649d1",
+    "hostedPayloadDigest": "819e36b57ef5042ed37458f80274f9db45303e881b4f268c34dec8d4506c9d56",
+    "unchangedByThisEntry": true
+  },
+  "authority": {
+    "prevalentAddendum": "orbit360-platform/docs/recovery/ADDENDUM_PREVALENTE_CHATGPT_PROJECT_BOUNDARY_20260831.md",
+    "state": "orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json",
+    "masterPlan": "orbit360-platform/docs/recovery/GRAVICENTRA-INSURANCE-FASE-A-RECOVERY-MASTER-PLAN-v1.3-20260831.md",
+    "capabilityManifest": "orbit360-platform/docs/recovery/orbit360-approved-capability-manifest-v1.json",
+    "frozenExecutionPlan": "artifacts/orbit360-recovery/release-control/I6_PENDING_CLOSURE_MASTER_PLAN_LOCK_20261004.json",
+    "frozen86Tasks": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_AUDIT_COMPLEMENT_PLAN_FROZEN_20261016.md",
+    "historicalCapabilityCertificates": "artifacts/orbit360-recovery/release-control/CAPABILITY_STATUS_LEDGER.json",
+    "b4003LiveSeal": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CURRENT42_FINAL_LIVE_CLOSEOUT_20261107.json",
+    "b4004FinalSeal": "artifacts/orbit360-recovery/release-control/I6_5_B4_004_FINAL_GATE_SEAL_20261107.json",
+    "b4004FinalSealBlobSha": "db0307889cfedfd686dde6921fcf9e28277ac13a"
+  },
+  "reusedWorkWithoutRetesting": {
+    "historicalIndividualCapabilitiesPreviewPass": 15,
+    "historicalIndividualCapabilitiesLivePass": 15,
+    "historicalCapabilityReleaseSourceSha": "4bf67a3738751fe2432a130fd23254a6f1c7d16e",
+    "historicalFiveRoleLiveMatrixRunId": 34733712152,
+    "historicalStatus": "CERTIFIED_HISTORICALLY_DO_NOT_AUTOMATICALLY_UPGRADE_TO_CURRENT_B4_005_E2E_PASS",
+    "preservedPassCount": 71,
+    "preservedPassListAuthority": "I6_PENDING_CLOSURE_MASTER_PLAN_LOCK_20261004.json#/preservedPassPolicy/ids",
+    "frozenTaskCount": 86,
+    "frozenAreaCount": 44,
+    "findingsNoLossCount": 295,
+    "priorityP0FrozenCount": 6,
+    "b4003Current42SourceSha": "857f1222f360a42a06e012810a1c01bce155a26f",
+    "b4003Current42Status": "LATEST_APPROVED_VERSION_LIVE_PASS_SCOPED_B4_003",
+    "b4003Current42EvidenceEntries": 16,
+    "b4004Cronograma": "LATEST_APPROVED_VERSION_LIVE_PASS_TARGETED_B4_004_TWO_UID_COUNTRY",
+    "b4004CronogramaLiveRunId": 42440178249,
+    "b4004Siniestros": "TWO_UID_LIVE_READONLY_FOCAL_PASS_OWNER_DEFERRED_NOT_FULL_CRUD",
+    "b4004SiniestrosLiveRunId": 42441020887,
+    "b4004PolicyCapture": "FOCAL_LIVE_PASS_RETAINED",
+    "doNotReopenWithoutReproducibleCausalRegression": true
+  },
+  "currentSourceDeltaVersusSignedB4003": {
+    "fromSourceSha": "857f1222f360a42a06e012810a1c01bce155a26f",
+    "toSourceSha": "f8fa00e4e2e6627cee66c8c521866874e39bc8da",
+    "changedProductFileCount": 9,
+    "unchangedEntrypoint": true,
+    "unchangedBackendFunctionsInThisDelta": true,
+    "files": [
+      {"path": "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js", "beforeBlobSha": "9b52aeda135d0e371018e739dda5c4ecc9779b58", "afterBlobSha": "fce274b01bf2c52c50e186df1ece97e7474805e7", "targetedDependency": "Recibos individuales; edición sin sobrescribir importes hermanos"},
+      {"path": "orbit360-platform/core/policy-receipts-engine.js", "beforeBlobSha": "b04fdd580efcc2fdfa8703238e92ab5bc51d6347", "afterBlobSha": "37471433de5b09ba4ecd2ca847baae55317ff8e5", "targetedDependency": "Moneda GTQ/USD; póliza-recibo-cartera; importes y auditoría"},
+      {"path": "orbit360-platform/data/store-firestore-product-operational-p0.js", "beforeBlobSha": "adcee4c9cdf0ac5a8e9102068927614e4809d78a", "afterBlobSha": "da30be86aa065d26581693f3430c40ac7cac6165", "targetedDependency": "Equipo/asesores: clasificación reconocida por servidor y reflejada en tienda"},
+      {"path": "orbit360-platform/modules/cancelaciones.js", "beforeBlobSha": "c9f6934beea57136daca0a3292451ad0792181c1", "afterBlobSha": "c206f79a47b8aa8684dc0cf50756f3720166bdbe", "targetedDependency": "Cancelaciones: procedencia QA, estado y vistas comerciales/auditoría"},
+      {"path": "orbit360-platform/modules/crm-v1198-operational-bridge.js", "beforeBlobSha": "0ec76280098c2f47982779fbd8d3a220745ea912", "afterBlobSha": "a60cba8f13f53f1934718770517c7261e6860de1", "targetedDependency": "Póliza/CRM y estado funcional de navegación"},
+      {"path": "orbit360-platform/modules/cronograma.js", "beforeBlobSha": "5d412e4ee263bb6cbfbd840b7124871a1e5b6ee8", "afterBlobSha": "5460b80442f33d51144b70dd83be87d6a263cf9c", "targetedDependency": "Cronograma: filtro visual por país ya cerrado en B4-004"},
+      {"path": "orbit360-platform/modules/equipo.js", "beforeBlobSha": "1bd7881ed29f6d7488bb806a96a0ab52c5c5c3b8", "afterBlobSha": "f584c4109294f8e32621c9ee9dd5cfdd55ca2c79", "targetedDependency": "Equipo: comisión de asesor, clasificación, autor de auditoría"},
+      {"path": "orbit360-platform/modules/policy-receipts-v1199-bridge.js", "beforeBlobSha": "79e8eefc821b17b1abb3ba7b26558e90199a9ea5", "afterBlobSha": "4867fb7db684908f6ca5a6edfc39460de5c1cf59", "targetedDependency": "Captura póliza: GTQ/USD, porcentajes de comisión y validaciones"},
+      {"path": "orbit360-platform/modules/reportes.js", "beforeBlobSha": "e00cdbaef2207b6e48c6507c0039161afa07c4e0", "afterBlobSha": "0daba72ebd8e6f8bef84ced9739b71bcabff0973", "targetedDependency": "Reportes/Cancelaciones: alcance de auditoría con QA explícita"}
+    ],
+    "changedProductSourceAfterCertifiedB4004Artifact": false,
+    "policy": "REUSE_UNAFFECTED_CERTIFICATES; ONLY_CAUSALLY_AFFECTED_BEHAVIORS_REQUIRE_TARGETED_REGRESSION"
+  },
+  "unresolvedExistingB4005Obligations": [
+    {"findingId": "B4-003-R15-09-PHASEA-ENDORSEMENT-CERTIFICATE-ANNEX-CLOSURE", "disposition": "CURRENT_APPROVED_LINEAGE_AND_AUTHENTICATED_LIFECYCLE_E2E_REQUIRED", "reuseOwner": "endorsement-workflow-v1201/issuance-endosos-v1201", "doNotRebuild": true},
+    {"findingId": "B4-003-R11-12-ROLE-AWARE-AI-KNOWLEDGE", "disposition": "ROLE_SCOPE_SOURCE_BACKED_RETRIEVAL_AND_CITATIONS_PROOF_REQUIRED"},
+    {"findingId": "B4-003-R11-13-MULTIPRODUCT-INSURER-KNOWLEDGE", "disposition": "PRIOR_SOURCE_CONVERGENCE_PRESERVED; MACHINE_PROOF_AND_SOURCE_GAPS_REQUIRED"},
+    {"findingId": "B4-003-R11-14-INSURER-TARIFF-SOURCE-BACKLOG", "disposition": "EXISTING_BLOCKING_SOURCE_BACKLOG_REQUIRES_EXPLICIT_DISPOSITION_NO_INVENTED_RATES"},
+    {"findingId": "B4-003-R11-15-COTCOMP-CROSSPROJECT-HANDOFF", "disposition": "FROZEN_QUOTE_AUTHORITY_CONTRACT_RETAINED; REAL_TRANSPORT_REQUIRES_SEPARATE_AUTHORIZATION"}
+  ],
+  "additionalExistingB4005Coverage": {
+    "frozenTaskIds": ["C07.09", "C07.10", "C07.11", "C08.07", "C10.01", "C10.09", "C10.10", "C11.03", "C12.01", "C12.02", "C12.03", "C12.04", "C12.05"],
+    "frozenE2eGroups": 168,
+    "source": "I6_5_B4_003_AUDIT_COMPLEMENT_PLAN_FROZEN_20261016.md",
+    "notNewBacklog": true
+  },
+  "releaseSafety": {
+    "productCodeModified": false,
+    "newBuild": false,
+    "newDeployment": false,
+    "newBusinessWrites": false,
+    "dataReimport": false,
+    "firebaseRulesChanged": false,
+    "b4003OrB4004Reopened": false,
+    "fullB4005E2ePassClaimed": false,
+    "phaseAAcceptedClaimed": false,
+    "formalI6PercentPreserved": 50
+  },
+  "nextExecution": "B4_005_REUSE_SIGNED_PREVIEW_LIVE_EVIDENCE_AND_CLOSE_ONLY_UNCOVERED_AUTHENTICATED_ROLE_COUNTRY_VIEWPORT_RELATION_CROSSES_PLUS_FIVE_CARRIES"
+}

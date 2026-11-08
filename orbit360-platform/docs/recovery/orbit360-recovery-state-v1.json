@@ -996,5 +996,22 @@
     "nextAction": "B4_004_CLOSED_PASS_NEXT_B4_005_AUTHENTICATED_E2E_MATRIX",
     "allEarlierApprovedCertificatesPreserved": true,
     "i6FormalProgressPercentUnchanged": 50
+  },
+  "b4005ReuseAndDeltaEntry20261107": {
+    "gate": "I6.5/B4-005",
+    "status": "IN_PROGRESS_PRIOR_EVIDENCE_RECONCILED_FULL_E2E_NOT_CERTIFIED",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_005_REUSE_AND_DELTA_ENTRY_20261107.json",
+    "receiptBlobSha": "efa9024e886b8c93f94b485f471b839ff2cab1aa",
+    "receiptSha256": "7f2bd2a66e1e32ae38fcc7b9a96466f9ae4681e77b787ec8d29d17fe0bcf44f8",
+    "parentHead": "231e3cb0a4d596fcf81a50824db072bcb0a002a8",
+    "lastClosedGate": "B4-004",
+    "firstIncompleteGate": "B4-005",
+    "currentProductSourceSha": "f8fa00e4e2e6627cee66c8c521866874e39bc8da",
+    "historicalIndividualPreviewAndLiveCertificatesPreserved": 15,
+    "frozenHistoricalPassesPreserved": 71,
+    "currentSourceDeltaFiles": 9,
+    "existingCarryFindingsRequiringDispositions": 5,
+    "isFullB4005Pass": false,
+    "nextExecution": "B4_005_REUSE_SIGNED_PREVIEW_LIVE_EVIDENCE_AND_CLOSE_ONLY_UNCOVERED_AUTHENTICATED_ROLE_COUNTRY_VIEWPORT_RELATION_CROSSES_PLUS_FIVE_CARRIES"
   }
 }
