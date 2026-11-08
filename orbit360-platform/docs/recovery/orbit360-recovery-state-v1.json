@@ -10,7 +10,7 @@
   "branch": "recovery/fase-a-clean-20260831",
   "forensicOriginSha": "9c95f31461f2eabe9804625b5659bee772f5602a",
   "createdAtUtc": "2026-08-31T18:00:00Z",
-  "updatedAtUtc": "2026-11-08T14:23:25.039Z",
+  "updatedAtUtc": "2026-11-08T14:40:39.132Z",
   "status": "ITERATION_2_SOURCE_MATERIALIZED_VALIDATION_PENDING",
   "currentIteration": 2,
   "lastCompletedIteration": 1,
@@ -187,7 +187,7 @@
     "phaseAIterationStatuses": "HISTORICAL_FIELDS_ABOVE_PRESERVED_UNTIL_FORMAL_GATE_EVIDENCE;_NO_NEW_PASS_INFERRED",
     "labDataWriteScope": "ONLY_35_AUTHORIZED_COUNTRY_FIELDS;_NO_AUGUST_REFRESH"
   },
-  "nextAction": "B4_006_PAULA_VISUAL_ACCEPTANCE_EXACT_PREVIEW_ARTIFACT_13620896661_THEN_B4_007_SAME_ARTIFACT_LIVE",
+  "nextAction": "B4_006_SINGLE_VISUAL_SOURCE_SUCCESSOR_BUILD_EXACT_PREVIEW_REAL_INSURER_QA",
   "sourceOfTruth": {
     "projectBoundaryPrevalentAddendum": "orbit360-platform/docs/recovery/ADDENDUM_PREVALENTE_CHATGPT_PROJECT_BOUNDARY_20260831.md",
     "mutableState": "orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json",
@@ -1183,5 +1183,21 @@
     "ownerAccepted": false,
     "noLive": true,
     "realDataWrites": 0
+  },
+  "b4006RealInsurerVisualSuccessor20261108": {
+    "status": "USER_REJECTED_PREVIOUS_VISUAL_QA_SINGLE_SOURCE_SUCCESSOR_PREVIEW_PENDING",
+    "gate": "I6.5/B4-006",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_006_REAL_INSURER_VISUAL_HIERARCHY_SOURCE_SUCCESSOR_20261108.json",
+    "receiptBlobSha": "6adad3cbc42810e49558e3dae016c7ff92bd6a08",
+    "previousArtifactId": 13620896661,
+    "previousSourceCommit": "3e490bff1f12ccef5ccc8d007701245aa9599442",
+    "newStylesBlobSha": "70d15bf172313a43d951af6884e52177d5eca037",
+    "firstIncompleteGate": "B4-006",
+    "lastClosedGate": "B4-005",
+    "ownerRejectedPreviousVisual": true,
+    "ownerAcceptedNewCandidate": false,
+    "realDataWrites": 0,
+    "liveDeploys": 0,
+    "oneCanonicalPreviewChannel": true
   }
 }

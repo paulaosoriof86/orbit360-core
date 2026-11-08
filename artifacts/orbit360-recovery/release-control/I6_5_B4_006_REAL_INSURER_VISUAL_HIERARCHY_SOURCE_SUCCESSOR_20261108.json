@@ -1,0 +1,91 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_006_REAL_INSURER_VISUAL_HIERARCHY_SOURCE_SUCCESSOR_V1",
+  "gate": "I6.5/B4-006",
+  "status": "USER_REJECTED_PREVIOUS_VISUAL_QA_SINGLE_SOURCE_SUCCESSOR_PREVIEW_PENDING",
+  "dateLocal": "2026-11-08",
+  "owner": "Paula Andrea Osorio Franco",
+  "directOwnerFeedback": "La ficha real de Aseguradoras no cumple identidad visual: contraste insuficiente, tablas y tarjetas simples, falta de jerarquía visual y emojis.",
+  "sourcePredecessor": "f4e20eacc13646e7edd408ab0f5aea31060e4b01",
+  "previousProductSourceCommit": "3e490bff1f12ccef5ccc8d007701245aa9599442",
+  "previousBuildId": "gi-i65-b4-3e490bff1f12-57f234755dc1",
+  "previousImmutableArtifactId": 13620896661,
+  "previousAssistantVisualQaStatus": "SUPERSEDED_BY_OWNER_VISUAL_REJECTION_ON_REAL_INSURER",
+  "originalScreenshotSha256": "6010afdda5fbb3d7179057987580b022cf575e48061178316d25cfd2794d311c",
+  "actualBrowserObservation": {
+    "url": "https://ays-orbit-360-lab--gi-i65-b4-rc-41765742748-neoi3u7r.web.app/?utm_source=chatgpt.com#/aseguradoras?ficha=gt-aseguradora-guatemalteca",
+    "observedCssAssetBuildId": "gi-i65-b4-3e490bff1f12-57f234755dc1",
+    "reason": "Confirmed user was on current preview, not stale cache; previous synthetic case PASS insufficient",
+    "accessMode": "Paula authenticated; Operativo view simulator",
+    "dataWrites": 0
+  },
+  "changedProductPaths": [
+    {
+      "path": "orbit360-platform/styles/infra.css",
+      "gitBlobSha": "70d15bf172313a43d951af6884e52177d5eca037",
+      "visualLayerOnly": true
+    }
+  ],
+  "strictScope": {
+    "onlyInsurerPremiumSection": true,
+    "modulesOutsideInsurerUnchanged": true,
+    "selectors": [
+      ".insurer-premium-section",
+      ".insurer-role-guide",
+      ".asg-sec-t",
+      ".insurer-selected-ramos",
+      ".insurer-offering-matrix",
+      ".insurer-filter-bar",
+      ".insurer-doc-table",
+      ".insurer-drive-head",
+      ".insurer-knowledge-status-grid"
+    ],
+    "editorContractUnchanged": true,
+    "credentialVisibilityUnchanged": true,
+    "rolesScopesUnchanged": true,
+    "firestoreDataWrites": 0,
+    "backendDeploys": 0,
+    "rulesWrites": 0,
+    "reimport": false,
+    "cotizadorKnowledgeDeferredPostproduction": true
+  },
+  "designAuthority": {
+    "brand": "Gravicentra Insurance",
+    "palette": [
+      "corporate red",
+      "#C51635",
+      "graphite",
+      "#1c222b",
+      "white",
+      "technical gray"
+    ],
+    "approvedReference": "Existing premium Inicio section and red-graphite insurer hero, not new general frontend",
+    "objectives": [
+      "nonflat layered guide cards",
+      "clear headings/section bars with icons",
+      "consistent contrast and status hierarchy",
+      "read-only tables with corporate header",
+      "strong empty states in real and synthetic insurer records",
+      "responsive 320/390 and desktop"
+    ],
+    "cosmeticContentOnly": true
+  },
+  "intendedSinglePreviewChannel": "https://ays-orbit-360-lab--gi-i65-b4-rc-41765742748-neoi3u7r.web.app/",
+  "immutableRule": "new source commit => one fresh buildId and immutable artifact on SAME preview channel, prior artifact preserved, never patched",
+  "testPlan": [
+    "Real insurer guatemalteca Productos y planes desktop: hierarchy/contrast/empty states",
+    "Real insurer Documentos y Drive desktop: Drive heading/empty states/table if any",
+    "Real insurer Tarifas y conocimiento visual no tariffs activation",
+    "Synthetic QA insurer populated matrix and classified document table desktop",
+    "320px/390px products/documents no overflow and visible labels",
+    "Editing and Cancel 9 commission+segment fields, documents fields preserved, no save",
+    "No 404/console errors scoped to modified stylesheet",
+    "Production LIVE and custom domain unchanged"
+  ],
+  "lastClosedGate": "B4-005",
+  "firstIncompleteGate": "B4-006",
+  "ownerAccepted": false,
+  "realDataWrites": 0,
+  "liveDeploys": 0,
+  "nextAction": "B4_006_SINGLE_VISUAL_SOURCE_SUCCESSOR_BUILD_EXACT_PREVIEW_REAL_INSURER_QA",
+  "createdAtUtc": "2026-11-08T14:39:51.414Z"
+}

@@ -3333,7 +3333,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "B4_006_PAULA_VISUAL_ACCEPTANCE_EXACT_PREVIEW_ARTIFACT_13620896661_THEN_B4_007_SAME_ARTIFACT_LIVE",
+  "nextAction": "B4_006_SINGLE_VISUAL_SOURCE_SUCCESSOR_BUILD_EXACT_PREVIEW_REAL_INSURER_QA",
   "postproductionExitProgress": {
     "formalPercent": 50,
     "frozenMiniGates": 5,
@@ -22268,5 +22268,21 @@
     "ownerAccepted": false,
     "noLive": true,
     "realDataWrites": 0
+  },
+  "b4006RealInsurerVisualSuccessor20261108": {
+    "status": "USER_REJECTED_PREVIOUS_VISUAL_QA_SINGLE_SOURCE_SUCCESSOR_PREVIEW_PENDING",
+    "gate": "I6.5/B4-006",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_006_REAL_INSURER_VISUAL_HIERARCHY_SOURCE_SUCCESSOR_20261108.json",
+    "receiptBlobSha": "6adad3cbc42810e49558e3dae016c7ff92bd6a08",
+    "previousArtifactId": 13620896661,
+    "previousSourceCommit": "3e490bff1f12ccef5ccc8d007701245aa9599442",
+    "newStylesBlobSha": "70d15bf172313a43d951af6884e52177d5eca037",
+    "firstIncompleteGate": "B4-006",
+    "lastClosedGate": "B4-005",
+    "ownerRejectedPreviousVisual": true,
+    "ownerAcceptedNewCandidate": false,
+    "realDataWrites": 0,
+    "liveDeploys": 0,
+    "oneCanonicalPreviewChannel": true
   }
 }
