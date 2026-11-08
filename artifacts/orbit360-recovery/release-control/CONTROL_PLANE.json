@@ -3333,7 +3333,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "B4_006_CANONICAL_EXACT_PREVIEW_FOR_CAUSAL_320PX_KPI_CARD_FIX_THEN_FOCAL_RESPONSIVE_RECHECK",
+  "nextAction": "B4_006_DEPLOY_EXACT_PREVIEW_MANAGEMENT_COLLAB_BACKEND_AND_HOSTING_THEN_E2E",
   "postproductionExitProgress": {
     "formalPercent": 50,
     "frozenMiniGates": 5,
@@ -22485,9 +22485,9 @@
   },
   "b4006Kpi320MobileCardClippingCausalFix20261108": {
     "gate": "I6.5/B4-006",
-    "status": "SOURCE_CSS_DELTA_AND_FOCAL_TEST_DECLARED_EXACT_PREVIEW_PENDING",
+    "status": "CAUSAL_CSS_FIX_SOURCE_DECLARED_EXACT_PREVIEW_PENDING",
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_006_KPI_320_MOBILE_CARD_CLIPPING_CAUSAL_FIX_20261108.json",
-    "receiptBlobSha": "973233a7ba5372cc3f73763034d169fa6ff7fdf7",
+    "receiptBlobSha": "64e758c4a90fe38e4988197330181f89fbf0ea0b",
     "sourcePredecessorSha": "7c3fdd00c74334a05f2a6bb01a7ba6e301d88d66",
     "predecessorHead": "4177705623c361191b7184db5cd73331f93d6712",
     "previousArtifactId": 13634768362,
@@ -22505,6 +22505,7 @@
     "logicChanged": false,
     "realDataWrites": 0,
     "liveDeploys": 0,
-    "oneCanonicalPreviewChannel": true
+    "oneCanonicalPreviewChannel": true,
+    "nextAction": "B4_006_BUILD_EXACT_PREVIEW_FOR_CAUSAL_320PX_KPI_FIX_THEN_FOCAL_RESPONSIVE_RECHECK"
   }
 }

@@ -1397,5 +1397,30 @@
     "productionPromoted": false,
     "e2ePending": true,
     "nonMutatingGovernanceFreeze": true
+  },
+  "b4006Kpi320MobileCardClippingCausalFix20261108": {
+    "gate": "I6.5/B4-006",
+    "status": "CAUSAL_CSS_FIX_SOURCE_DECLARED_EXACT_PREVIEW_PENDING",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_006_KPI_320_MOBILE_CARD_CLIPPING_CAUSAL_FIX_20261108.json",
+    "receiptBlobSha": "64e758c4a90fe38e4988197330181f89fbf0ea0b",
+    "sourcePredecessorSha": "7c3fdd00c74334a05f2a6bb01a7ba6e301d88d66",
+    "predecessorHead": "4177705623c361191b7184db5cd73331f93d6712",
+    "previousArtifactId": 13634768362,
+    "previousCssBlobSha": "b00fbfc7a99d7c86aa9b138cc2ee838b57f6215a",
+    "newCssBlobSha": "cbfc1256d984e33c1eb436025b3708169ab43e0a",
+    "qaPath": "tools/gravicentra-b4-006-global-visual.test.cjs",
+    "previousQaBlobSha": "3f699189cd464ca03a475600baae21b79e2a5bba",
+    "newQaBlobSha": "94775402f9fa5cb5cf3d6b0d8c18639d25cc527b",
+    "firstIncompleteGate": "B4-006",
+    "lastClosedGate": "B4-005",
+    "ownerAuthorizedFocalCorrection": true,
+    "ownerAcceptedExactArtifact": false,
+    "sourceRequiresNewExactBuild": true,
+    "onlyAffectedResponsiveEvidenceInvalidated": true,
+    "logicChanged": false,
+    "realDataWrites": 0,
+    "liveDeploys": 0,
+    "oneCanonicalPreviewChannel": true,
+    "nextAction": "B4_006_BUILD_EXACT_PREVIEW_FOR_CAUSAL_320PX_KPI_FIX_THEN_FOCAL_RESPONSIVE_RECHECK"
   }
 }

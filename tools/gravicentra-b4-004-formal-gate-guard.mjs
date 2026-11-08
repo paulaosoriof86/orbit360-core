@@ -37,6 +37,7 @@ const B4006_MGMT_COLLAB_RECEIPT=ROOT+'I6_5_B4_006_OPS_MANAGEMENT_COLLABORATION_S
 const B4006_MGMT_COLLAB_ACTION='B4_006_BUILD_ONE_IMMUTABLE_PREVIEW_MANAGEMENT_COLLAB_AND_VISUAL_RECHECK';
 const B4006_MGMT_COLLAB_BACKEND_RECEIPT=ROOT+'I6_5_B4_006_OPS_MANAGEMENT_COLLABORATION_BACKEND_HARDENING_20261108.json';
 const B4006_MGMT_COLLAB_BACKEND_ACTION='B4_006_DEPLOY_EXACT_PREVIEW_MANAGEMENT_COLLAB_BACKEND_AND_HOSTING_THEN_E2E';
+const B4006_KPI320_ACTION='B4_006_BUILD_EXACT_PREVIEW_FOR_CAUSAL_320PX_KPI_FIX_THEN_FOCAL_RESPONSIVE_RECHECK';
 const B4006_GLOBAL_VISUAL_RECEIPT=ROOT+'I6_5_B4_006_GLOBAL_TABLE_CARD_SYSTEM_SOURCE_SUCCESSOR_20261108.json';
 const SOURCE='f8fa00e4e2e6627cee66c8c521866874e39bc8da';
 const BUILD='gi-i65-b4-f8fa00e4e2e6-57f234755dc1';
@@ -266,6 +267,38 @@ function verifyB4006ExactPolishPreviewReadback(cp,state){
 }
 
 
+function verifyB4006Kpi320MobileCardClippingFix(cp,state,priorStylesBlob){
+  const p=cp.b4006Kpi320MobileCardClippingCausalFix20261108;
+  need(p&&same(p,state.b4006Kpi320MobileCardClippingCausalFix20261108)&&
+    p.gate==='I6.5/B4-006'&&p.status==='CAUSAL_CSS_FIX_SOURCE_DECLARED_EXACT_PREVIEW_PENDING'&&
+    p.receiptPath==='artifacts/orbit360-recovery/release-control/I6_5_B4_006_KPI_320_MOBILE_CARD_CLIPPING_CAUSAL_FIX_20261108.json'&&
+    p.receiptBlobSha==='64e758c4a90fe38e4988197330181f89fbf0ea0b'&&
+    p.sourcePredecessorSha==='7c3fdd00c74334a05f2a6bb01a7ba6e301d88d66'&&
+    p.predecessorHead==='4177705623c361191b7184db5cd73331f93d6712'&&
+    p.previousArtifactId===13634768362&&p.previousCssBlobSha===priorStylesBlob&&
+    p.previousQaBlobSha==='3f699189cd464ca03a475600baae21b79e2a5bba'&&
+    p.newCssBlobSha==='cbfc1256d984e33c1eb436025b3708169ab43e0a'&&
+    p.newQaBlobSha==='94775402f9fa5cb5cf3d6b0d8c18639d25cc527b'&&
+    p.firstIncompleteGate==='B4-006'&&p.lastClosedGate==='B4-005'&&
+    p.ownerAuthorizedFocalCorrection===true&&p.ownerAcceptedExactArtifact===false&&
+    p.sourceRequiresNewExactBuild===true&&p.onlyAffectedResponsiveEvidenceInvalidated===true&&
+    p.logicChanged===false&&p.realDataWrites===0&&p.liveDeploys===0&&p.oneCanonicalPreviewChannel===true&&
+    p.nextAction===B4006_KPI320_ACTION,'B4006_KPI320_POINTER');
+  const r=readPinned(p.receiptPath,p.receiptBlobSha);
+  need(r.schema==='GRAVICENTRA_I6_5_B4_006_KPI_320_MOBILE_CARD_CLIPPING_CAUSAL_FIX_V1'&&
+    r.gate===p.gate&&r.status==='CAUSAL_CSS_FIX_SOURCE_DECLARED_EXACT_PREVIEW_PENDING'&&
+    r.sourcePredecessorSha===p.sourcePredecessorSha&&r.governancePredecessorHead===p.predecessorHead&&
+    r.previousArtifactId===p.previousArtifactId&&r.previousCssBlobSha===priorStylesBlob&&
+    r.correctiveScope?.path==='orbit360-platform/styles/infra.css'&&
+    r.correctiveScope?.logicChanged===false&&r.correctiveScope?.dataChanged===false&&
+    r.correctiveScope?.authOrRulesChanged===false&&r.regressionTest?.path==='tools/gravicentra-b4-006-global-visual.test.cjs'&&
+    r.nextAction===B4006_KPI320_ACTION&&git('merge-base',r.sourcePredecessorSha,'HEAD')===r.sourcePredecessorSha&&
+    git('rev-parse','HEAD:orbit360-platform/styles/infra.css')===p.newCssBlobSha&&
+    git('rev-parse','HEAD:tools/gravicentra-b4-006-global-visual.test.cjs')===p.newQaBlobSha,
+    'B4006_KPI320_RECEIPT');
+  return p.newCssBlobSha;
+}
+
 function verifyB4006GlobalTableCardSystemSourceSuccessor(cp,state){
   const p=cp.b4006GlobalTableCardSystemSourceSuccessor20261108;
   need(p&&same(p,state.b4006GlobalTableCardSystemSourceSuccessor20261108)&&
@@ -276,6 +309,8 @@ function verifyB4006GlobalTableCardSystemSourceSuccessor(cp,state){
     p.firstIncompleteGate==='B4-006'&&p.lastClosedGate==='B4-005'&&
     p.ownerApprovedScope===true&&p.ownerAcceptedExactArtifact===false&&p.noLive===true&&p.noDataWrites===true,
     'B4006_GLOBAL_VISUAL_POINTER');
+  const activeCssBlob=cp.b4006Kpi320MobileCardClippingCausalFix20261108 ? verifyB4006Kpi320MobileCardClippingFix(cp,state,p.newCssBlobSha) : p.newCssBlobSha;
+  const activeQaBlob=cp.b4006Kpi320MobileCardClippingCausalFix20261108?.newQaBlobSha||p.qaBlobSha;
   const r=readPinned(B4006_GLOBAL_VISUAL_RECEIPT,p.receiptBlobSha);
   need(r.schema==='GRAVICENTRA_I6_5_B4_006_GLOBAL_TABLE_CARD_SYSTEM_SOURCE_SUCCESSOR_V1'&&
     r.gate===p.gate&&r.status===p.status&&r.decision==='PAULA_APPROVED_TRANSVERSAL_VISUAL_CONSISTENCY'&&
@@ -290,9 +325,9 @@ function verifyB4006GlobalTableCardSystemSourceSuccessor(cp,state){
     git('merge-base',p.interimCssCommit,'HEAD')===p.interimCssCommit&&
     git('rev-parse',p.predecessorHead+':orbit360-platform/styles/infra.css')===p.previousCssBlobSha&&
     git('rev-parse',p.interimCssCommit+':orbit360-platform/styles/infra.css')===p.preSuccessorCssBlobSha&&
-    git('rev-parse','HEAD:orbit360-platform/styles/infra.css')===p.newCssBlobSha&&
-    blob(fs.readFileSync('orbit360-platform/styles/infra.css'))===p.newCssBlobSha&&
-    git('rev-parse','HEAD:'+p.qaPath)===p.qaBlobSha&&
+    git('rev-parse','HEAD:orbit360-platform/styles/infra.css')===activeCssBlob&&
+    blob(fs.readFileSync('orbit360-platform/styles/infra.css'))===activeCssBlob&&
+    git('rev-parse','HEAD:'+p.qaPath)===activeQaBlob&&
     same(git('diff','--name-only',p.predecessorHead,'HEAD','--','functions','orbit360-platform',':(exclude)orbit360-platform/docs/**').split(/\r?\n/).filter(Boolean),['orbit360-platform/styles/infra.css']),
     'B4006_GLOBAL_VISUAL_RECEIPT');
   return p.newCssBlobSha;
