@@ -3333,7 +3333,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "B4_004_ONE_TIME_SECOND_UID_SCOPE_LIVE_TEST",
+  "nextAction": "B4_004_SCOPE_PROOF_MISSING_DUE_NONPRESERVED_EXECUTION_JSON_AND_HISTORICAL_GUARD_HOLD_NO_AUTOMATIC_RETEST",
   "postproductionExitProgress": {
     "formalPercent": 50,
     "frozenMiniGates": 5,
@@ -21923,9 +21923,9 @@
   "b4004CronogramaSecondUidScopeAuthorization20261107": {
     "status": "AUTHORIZED_ONCE",
     "authorized": true,
-    "consumed": false,
+    "consumed": true,
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_004_CRONOGRAMA_SECOND_UID_SCOPE_AUTH_20261107.json",
-    "receiptBlobSha": "3e1673596868e80ae82caad8a70708cbbeeb2d92",
+    "receiptBlobSha": "988987cacd26d624bbaf633633332659bce2b929",
     "authorizedParentSha": "41ec4ad5b9bc667f0763bd3d891e0837c4b64c44",
     "release": {
       "sourceSha": "6c45983610ce0d65a5c63bd07659ad968bfe9da3",
@@ -21951,6 +21951,17 @@
       "backendChanged": false,
       "rulesChanged": false,
       "reimport": false
-    }
+    },
+    "consumedByRunId": 42434455172,
+    "consumptionResult": "FAIL_EXECUTION_PROOF_NOT_PRESERVED_EXACT_FINAL_ABSENCE_VERIFIED"
+  },
+  "b4004CronogramaSecondUidFinalAbsenceReadback20261107": {
+    "status": "EXACT_FINAL_ABSENCE_PASS_SECOND_UID_FUNCTIONAL_HOLD",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_004_CRONOGRAMA_SECOND_UID_FINAL_ABSENCE_READBACK_20261107.json",
+    "receiptBlobSha": "b5e59a28cd3a023c4fffbcd4a98d54923ebc6488",
+    "runId": 42434888888,
+    "artifactId": 13598548836,
+    "syntheticFinalAbsent": true,
+    "secondUidScopeCertified": false
   }
 }

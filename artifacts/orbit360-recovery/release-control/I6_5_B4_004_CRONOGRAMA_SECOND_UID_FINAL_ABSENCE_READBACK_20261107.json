@@ -1,0 +1,52 @@
+{
+  "schema": "GRAVICENTRA_B4_004_SECOND_UID_FINAL_ABSENCE_READBACK_SEAL_V1",
+  "gate": "I6.5/B4-004",
+  "status": "EXACT_FINAL_ABSENCE_PASS_SECOND_UID_FUNCTIONAL_HOLD",
+  "release": {
+    "sourceSha": "6c45983610ce0d65a5c63bd07659ad968bfe9da3",
+    "buildId": "gi-i65-b4-6c45983610ce-57f234755dc1",
+    "artifactId": 13592378081,
+    "hostingVersion": "sites/ays-orbit-360-lab/versions/33af816375dd5cb5"
+  },
+  "syntheticRun": {
+    "id": 42434455172,
+    "jobId": 128590215750,
+    "conclusion": "failure",
+    "proofJsonNotPreserved": true,
+    "reason": "EVIDENCE_ARTIFACT_PATH_MISMATCH",
+    "authorizationSingleUse": true
+  },
+  "exactReadback": {
+    "runId": 42434888888,
+    "jobId": 128591509677,
+    "artifactId": 13598548836,
+    "artifactZipSha256": "c5e2093653f214b386312ffe517010f74fe98aced9087c93c564e3ea85ff342e",
+    "proofSha256": "fddfc4a9f005fc8a16b699f381e9588a105630c713683e42fc2aa2db337fde69",
+    "fixtureId": "b4004qa_cronograma_42434455172_1",
+    "fixtureExists": false,
+    "syntheticFinalAbsent": true,
+    "readOnly": true
+  },
+  "preservedEarlierEvidence": {
+    "coreLiveRunId": 42431729157,
+    "coreSyntheticWrites": 2,
+    "coreCleanupVerified": true,
+    "performanceRunId": 42433637476,
+    "cronogramaRouteMs": 48,
+    "scopedRead403": 0,
+    "policyCaptureLivePass": true,
+    "b4003LivePassPreserved": true
+  },
+  "notProved": [
+    "SECOND_UID_SAME_COUNTRY_TASK_VISIBILITY",
+    "SECOND_UID_OTHER_COUNTRY_TASK_ABSENCE_DURING_FIXTURE_LIFETIME",
+    "GUARD_CENTRAL_PASS"
+  ],
+  "nonMutation": {
+    "businessWritesByReadback": 0,
+    "authChangesByReadback": 0,
+    "membershipWritesByReadback": 0,
+    "productChangesByReadback": 0
+  },
+  "nextAction": "B4_004_SCOPE_PROOF_MISSING_DUE_NONPRESERVED_EXECUTION_JSON_AND_HISTORICAL_GUARD_HOLD_NO_AUTOMATIC_RETEST"
+}

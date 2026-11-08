@@ -2,7 +2,7 @@
   "schema": "GRAVICENTRA_B4_004_CRONOGRAMA_SECOND_UID_SINGLE_USE_AUTH_V1",
   "status": "AUTHORIZED_ONCE",
   "authorized": true,
-  "consumed": false,
+  "consumed": true,
   "authorizedParentSha": "41ec4ad5b9bc667f0763bd3d891e0837c4b64c44",
   "authority": "Paula explicit authorization in current conversation for one synthetic Cronograma task UID-country LIVE scope test",
   "gate": "I6.5/B4-004",
@@ -31,5 +31,9 @@
     "rulesChanged": false,
     "reimport": false
   },
-  "previousAuthorizationConsumed": true
+  "previousAuthorizationConsumed": true,
+  "consumedByRunId": 42434455172,
+  "consumptionResult": "FAIL_EXECUTION_PROOF_NOT_PRESERVED_EXACT_FINAL_ABSENCE_VERIFIED",
+  "exactFinalAbsenceReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_004_CRONOGRAMA_SECOND_UID_FINAL_ABSENCE_READBACK_20261107.json",
+  "noReexecutionWithoutFreshAuthorization": true
 }
