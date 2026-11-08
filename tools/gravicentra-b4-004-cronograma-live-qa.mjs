@@ -23,7 +23,7 @@ const app=getApps()[0]||initializeApp({credential:applicationDefault(),projectId
 const db=getFirestore(app),auth=getAuth(app),tenant=db.collection('tenants').doc(tenantId);
 const ref=(c,id)=>tenant.collection('data').doc(c).collection('items').doc(id);
 const plan={collection:'tareas',id:'b4004qa_cronograma_'+run,title:'B4-004 Cronograma LIVE '+run,date:new Date().toISOString().slice(0,10)};
-const proof={schema:'GRAVICENTRA_B4_004_CRONOGRAMA_FOCAL_LIVE_QA_V1',status:'INIT',runId:run,target,plan,assertions:{},errors:[],consoleSignals:[],nonRelevantConsoleSignalCount:0,pageErrorCount:0,consoleErrorCount:0,httpErrorCount:0,syntheticWrites:0,cleanupWrites:0,syntheticFinalAbsent:false,authAccountsCreated:0,membershipWrites:0,productSourceChanged:false,backendChanged:false};
+const proof={schema:'GRAVICENTRA_B4_004_CRONOGRAMA_FOCAL_LIVE_QA_V1',status:'INIT',runId:run,target,plan,assertions:{},errors:[],consoleSignals:[],requestFailures:[],nonRelevantConsoleSignalCount:0,pageErrorCount:0,consoleErrorCount:0,httpErrorCount:0,syntheticWrites:0,cleanupWrites:0,syntheticFinalAbsent:false,authAccountsCreated:0,membershipWrites:0,productSourceChanged:false,backendChanged:false};
 
 function rolesOf(m){return [...new Set([m.activeRole,m.rolActivo,m.defaultRole,m.rolDefault,m.rol].concat(m.roles||[],m.assignedRoles||[],m.rolesAsignados||[]).map(norm).filter(Boolean))];}
 function countriesOf(m){return [...new Set([].concat(m.countries||[],m.paises||[],m.paisesAutorizados||[],m.paisDefault||[],m.pais||[]).map(x=>clean(x).toUpperCase()).filter(x=>x==='GT'||x==='CO'))];}
@@ -124,6 +124,7 @@ export function redactConsoleMessage(message){
 function recordBrowser(page,label){
  page.on('pageerror',e=>{proof.pageErrorCount++;proof.errors.push({code:'PAGE_ERROR',label,messageSha256:digest(String(e&&e.message||e))});});
  page.on('console',m=>{if(m.type()==='error'){const message=m.text(),category=classifyConsoleError(message),signal={label,category,messageSha256:digest(message),safeSummary:redactConsoleMessage(message)};proof.consoleSignals.push(signal);if(category==='HARNESS_SERVICE_WORKER_BLOCK'){proof.nonRelevantConsoleSignalCount++;return;}proof.consoleErrorCount++;proof.errors.push({code:'CONSOLE_ERROR',label,category,messageSha256:signal.messageSha256});}});
+ page.on('requestfailed',r=>{try{const u=new URL(r.url()),failure=r.failure()?.errorText||'';proof.requestFailures.push({label,host:u.hostname,path:u.pathname,failureCode:norm(failure).slice(0,80),urlSha256:digest(u.origin+u.pathname)});}catch{}});
  page.on('response',r=>{if(r.status()>=400){proof.httpErrorCount++;proof.errors.push({code:'HTTP_ERROR',label,status:r.status(),urlSha256:digest(r.url())});}});
 }
 async function readVisibility(browser,actor,country,label){

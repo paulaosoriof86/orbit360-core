@@ -5,7 +5,7 @@
   "authority": "Paula explicit B4-004 synthetic LIVE authorization frozen in long-block protocol",
   "authorized": true,
   "consumed": false,
-  "authorizedParentSha": "479e31fe191bacab64abf8a6a0c09ccbf2b8c420",
+  "authorizedParentSha": "a55c4b1501aaeeaee2038b8313973ade7fa98e2a",
   "release": {
     "sourceSha": "6c45983610ce0d65a5c63bd07659ad968bfe9da3",
     "buildId": "gi-i65-b4-6c45983610ce-57f234755dc1",
@@ -129,6 +129,21 @@
       "cleanupWrites": 0,
       "syntheticFinalAbsent": true,
       "authorizationConsumed": false
+    },
+    {
+      "runId": 42431239641,
+      "jobId": 128580373377,
+      "artifactId": 13596604752,
+      "result": "FAIL_PREWRITE_CORS_AND_NETWORK_RESOURCE_DIAGNOSTIC_REQUIRED",
+      "businessWrites": 0,
+      "syntheticWrites": 0,
+      "cleanupWrites": 0,
+      "syntheticFinalAbsent": true,
+      "authorizationConsumed": false,
+      "consoleCategories": [
+        "CORS",
+        "NETWORK_RESOURCE"
+      ]
     }
   ]
 }
