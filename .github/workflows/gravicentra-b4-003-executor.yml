@@ -4570,6 +4570,9 @@ jobs:
           PY
           npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund firebase-admin@13.4.0 playwright@1.55.0 >/dev/null
           npx playwright install --with-deps chromium >/dev/null
+          node --test tools/gravicentra-b4-004-cronograma-live-qa.test.mjs
+          node tools/gravicentra-b4-003-cronograma-durable-task.test.cjs
+          node tools/gravicentra-b4-003-role-first-paint-and-team-regression.test.cjs
       - name: Authenticated policy and receipt LIVE synthetic proof
         env:
           B4_004_POLICY_CAPTURE_LIVE_QA: 'true'
@@ -4657,9 +4660,6 @@ jobs:
         run: |
           set -euo pipefail
           node --check tools/gravicentra-b4-004-cronograma-live-qa.mjs
-          node --test tools/gravicentra-b4-004-cronograma-live-qa.test.mjs
-          node tools/gravicentra-b4-003-cronograma-durable-task.test.cjs
-          node tools/gravicentra-b4-003-role-first-paint-and-team-regression.test.cjs
           node - <<'NODE'
           const fs=require('node:fs'),{execFileSync}=require('node:child_process');
           const cp=JSON.parse(fs.readFileSync(process.env.CONTROL,'utf8'));
