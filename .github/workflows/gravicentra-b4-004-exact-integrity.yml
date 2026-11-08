@@ -1,0 +1,55 @@
+name: Gravicentra B4-004 Exact Synthetic Integrity Readback
+on:
+  push:
+    branches:
+      - recovery/fase-a-clean-20260831
+    paths:
+      - '.github/workflows/gravicentra-b4-004-exact-integrity.yml'
+jobs:
+  exact-readonly:
+    if: ${{ github.event.head_commit.message == 'test(b4-004): exact synthetic absence readonly' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    permissions:
+      contents: read
+      actions: read
+    env:
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      PROOF_OUT: ${{ runner.temp }}/b4-004-second-uid-exact-absence.json
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Prepare existing read-only service account
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json,os,pathlib
+          dest=pathlib.Path(os.environ['RUNNER_TEMP'])/'b4004-readonly-service-account.json'
+          chosen=None
+          for key in ('SA_ORBIT360_LAB','SA_ORBIT_360_LAB','SA_DEFAULT'):
+              try:item=json.loads(os.environ.get(key,''))
+              except (ValueError,TypeError):continue
+              if item.get('type')=='service_account' and item.get('project_id')=='ays-orbit-360-lab' and item.get('private_key'):
+                  chosen=item;break
+          if not chosen:raise SystemExit('B4004_READONLY_SERVICE_ACCOUNT_MISSING')
+          dest.write_text(json.dumps(chosen));dest.chmod(0o600)
+          with open(os.environ['GITHUB_ENV'],'a') as h:h.write('GOOGLE_APPLICATION_CREDENTIALS='+str(dest)+'\n')
+          PY
+          npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund firebase-admin@13.4.0 >/dev/null
+      - name: Verify exact synthetic task absence
+        run: node tools/gravicentra-b4-004-second-uid-exact-absence-readonly.mjs
+      - name: Upload exact readback JSON
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gravicentra-b4-004-absence-${{ github.run_id }}
+          path: ${{ env.PROOF_OUT }}
+          if-no-files-found: error
+          retention-days: 30
