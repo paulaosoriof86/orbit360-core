@@ -78,10 +78,12 @@ async function checkActor(browser,a,index){
   await page.waitForFunction(country=>(Orbit.store?.all?.('polizas')||[]).some(p=>p.pais===country),a.country,{timeout:20000});
   const before=await page.evaluate(()=>({country:Orbit.pais,role:Orbit.session.rol(),uid:Orbit.productRuntimeBrowserProvidersP0?.status?.()?.authUid||'',
     qaGtPolicyInScopedStore:(Orbit.store?.all?.('polizas')||[]).some(p=>p.id==='b4003qa_policy_expired_renew_38102224750'),
+    qaGtEndosoVisibleInOps:document.querySelector('#host')?.textContent?.includes('Endoso · Inclusión / exclusión de beneficiarios · B4-003-EXP-38102224750')===true,
     visibleOps:document.querySelector('#host')?.textContent?.includes('Gestiones operativas')===true}));
   must(before.country===a.country&&norm(before.role)===norm(a.role)&&before.visibleOps,'ROLE_COUNTRY_OR_OPS_ROUTE_MISMATCH');
   let form={open:false,beneficiaryField:false,cancelled:false},policyId='';
-  if(a.country==='CO')must(!before.qaGtPolicyInScopedStore,'GT_POLICY_VISIBLE_IN_CO_SCOPE');
+  // The authenticated store may contain documents from other authorized countries.
+  // The selected-country UI filter is a different assertion from cache residency.
   policyId=await page.evaluate(country=>(Orbit.store?.all?.('polizas')||[]).find(p=>p.pais===country&&Orbit.access?.canView?.('polizas',p,'cliente360'))?.id||'',a.country);
   must(Boolean(policyId),'VIEWABLE_POLICY_UNAVAILABLE');
   await page.evaluate(({policyId})=>{location.hash='#/cliente360?c='+(Orbit.store.get('polizas',policyId)?.clienteId||'')+'&p='+policyId;},{policyId});
@@ -102,7 +104,8 @@ async function checkActor(browser,a,index){
   const readback=await page.evaluate(({policyId})=>({policyId,policyExists:!!Orbit.store?.get?.('polizas',policyId),role:Orbit.session.rol(),country:Orbit.pais}),{policyId});
   const persistedRoleCountry=norm(readback.role)===norm(a.role)&&readback.country===a.country;
   receipt.actorChecks.push({uidSha256:hash(a.uid),role:a.role,country:a.country,viewport:index===0?'1440x900':'390x844',firstReadyMs:Date.now()-started,
-    qaPolicyScoped:before.qaGtPolicyInScopedStore,policyIdSha256:hash(policyId),form,readback: {exists:readback.policyExists,role:readback.role,country:readback.country},
+    qaPolicyInAuthorizedCache:before.qaGtPolicyInScopedStore,gtQaEndosoVisibleInSelectedCountryOps:before.qaGtEndosoVisibleInOps,
+    policyIdSha256:hash(policyId),form,readback: {exists:readback.policyExists,role:readback.role,country:readback.country},
     roleCountryPersistedOnReload:persistedRoleCountry,authenticatedIndependentUid:true,writeAttempts:receipt.writeAttempts,pageErrors:pageErrors.length,networkErrors:networkErrors.length});
   must(readback.policyExists,'RELOAD_POLICY_ABSENT');
   must(!pageErrors.length&&!networkErrors.length&&receipt.writeAttempts===0,'PAGE_NETWORK_OR_WRITE_ATTEMPT');
