@@ -5144,3 +5144,140 @@ jobs:
           path: ${{ runner.temp }}/b4004-cronograma-country-preview-qa.json
           if-no-files-found: warn
           retention-days: 30
+
+
+  b4-004-cronograma-exact-existing-version-live:
+    if: "github.event_name == 'push' && github.event.head_commit.message == 'release(b4-004): promote Cronograma existing Preview version'"
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    permissions:
+      contents: write
+      actions: read
+    env:
+      PROJECT_ID: ays-orbit-360-lab
+      B4_004_PROMOTION_OUT: ${{ runner.temp }}/b4004-country-promotion.json
+      B4_004_RETAINED_PACKAGE_ROOT: ${{ runner.temp }}/b4004-retained/b4004-country-package
+      B4_004_CRONOGRAMA_COUNTRY_QA_OUT: ${{ runner.temp }}/b4004-country-live-qa.json
+      B4_QA_TARGET_URL: https://ays-orbit-360-lab.web.app
+      B4_QA_STAGE: live
+      SOURCE_SHA: f8fa00e4e2e6627cee66c8c521866874e39bc8da
+      BUILD_ID: gi-i65-b4-f8fa00e4e2e6-57f234755dc1
+      ARTIFACT_ID: '13600357541'
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify guard run and frozen source/no rebuild
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor f8fa00e4e2e6627cee66c8c521866874e39bc8da HEAD
+          test -z "$(git diff --name-only f8fa00e4e2e6627cee66c8c521866874e39bc8da HEAD -- functions orbit360-platform ':!orbit360-platform/docs/**')"
+          test "$(git hash-object orbit360-platform/modules/cronograma.js)" = 5460b80442f33d51144b70dd83be87d6a263cf9c
+          node - <<'NODE'
+          const fs=require('fs');
+          const p=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json','utf8'));
+          const c=p.b4004CronogramaCountryFocalPreviewPass20261107;
+          if(c?.status!=='CRONOGRAMA_COUNTRY_FOCAL_AUTHENTICATED_PREVIEW_PASS_LIVE_PENDING'||c?.artifactId!==13600357541)throw Error('B4004_PREVIEW_RECEIPT_UNAVAILABLE');
+          NODE
+          GUARD_JSON=$(curl --fail --silent --show-error -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" "https://api.github.com/repos/paulaosoriof86/orbit360-core/actions/runs/42439734415")
+          export GUARD_JSON
+          python3 - <<'PY'
+          import json,os
+          r=json.loads(os.environ['GUARD_JSON'])
+          if r.get('conclusion')!='success' or r.get('head_sha')!='5d4a080a4152c41f7d847b5c3d2eb223945e4200':raise SystemExit('B4004_HISTORICAL_GUARD_NOT_PASS')
+          PY
+          echo B4_004_GUARD_RUN_STATUS=success >> "$GITHUB_ENV"
+      - uses: actions/download-artifact@v4
+        with:
+          name: gravicentra-b4-004-cronograma-country-42437945576
+          run-id: 42437945576
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          repository: paulaosoriof86/orbit360-core
+          path: ${{ runner.temp }}/b4004-retained
+      - name: Prepare existing Firebase authority for exact Hosting version
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json,os,pathlib
+          dest=pathlib.Path(os.environ['RUNNER_TEMP'])/'b4004-hosting-service-account.json'
+          for key in ('SA_ORBIT360_LAB','SA_ORBIT_360_LAB','SA_DEFAULT'):
+              try:obj=json.loads(os.environ.get(key,''))
+              except (ValueError,TypeError):continue
+              if obj.get('type')=='service_account' and obj.get('project_id')=='ays-orbit-360-lab' and obj.get('private_key'):
+                  dest.write_text(json.dumps(obj));dest.chmod(0o600)
+                  with open(os.environ['GITHUB_ENV'],'a') as f:f.write('GOOGLE_APPLICATION_CREDENTIALS='+str(dest)+'\n')
+                  break
+          else:raise SystemExit('B4004_EXISTING_FIREBASE_AUTHORITY_MISSING')
+          PY
+          npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund firebase-admin@13.4.0 playwright@1.55.0 google-auth-library@9.14.2 >/dev/null
+          npx playwright install chromium >/dev/null
+      - name: Promote exact existing Preview version, no new build or backend
+        run: node tools/gravicentra-b4-004-cronograma-country-hosting-release.mjs promote
+      - name: Authenticated Cronograma LIVE focal GT CO two UIDs without writes
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-b4-004-cronograma-country-preview-live-qa.mjs
+          node - <<'NODE'
+          const fs=require('fs'),r=JSON.parse(fs.readFileSync(process.env.B4_004_CRONOGRAMA_COUNTRY_QA_OUT,'utf8'));
+          const keys=['exactLiveBuild','distinctUid','creatorTaskUiVisible','peerTaskUiVisible','crossCountryTaskUiAbsent','cronogramaPerformance','writeAttemptZero','noMutations'];
+          if(r.diagnosticStatus!=='FOCAL_SCOPE_PASS'||keys.some(k=>r.assertions?.[k]!==true)||r.writeAttemptCount!==0||r.scoped403.length||r.pageErrors.length||r.dataWrites!==0)throw Error('B4004_LIVE_COUNTRY_FOCAL_NOT_PASS');
+          console.log('B4004_LIVE_COUNTRY_FOCAL_PASS');
+          NODE
+      - name: Roll back on any post-promotion functional failure
+        if: failure()
+        run: node tools/gravicentra-b4-004-cronograma-country-hosting-release.mjs rollback
+      - name: Preserve exact promotion and LIVE QA receipts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gravicentra-b4-004-cronograma-exact-live-${{ github.run_id }}
+          path: |
+            ${{ env.B4_004_PROMOTION_OUT }}
+            ${{ env.B4_004_CRONOGRAMA_COUNTRY_QA_OUT }}
+          if-no-files-found: warn
+          retention-days: 30
+      - name: Seal focal LIVE in canonical Control Plane on verified proof
+        env:
+          PROMO: ${{ env.B4_004_PROMOTION_OUT }}
+          QA: ${{ env.B4_004_CRONOGRAMA_COUNTRY_QA_OUT }}
+          RECEIPT: artifacts/orbit360-recovery/release-control/I6_5_B4_004_CRONOGRAMA_COUNTRY_EXACT_LIVE_PROMOTION_20261107.json
+          QA_RECEIPT: artifacts/orbit360-recovery/release-control/I6_5_B4_004_CRONOGRAMA_COUNTRY_LIVE_FOCAL_QA_20261107.json
+        run: |
+          set -euo pipefail
+          node - <<'NODE'
+          const fs=require('fs'),crypto=require('crypto');
+          const p=JSON.parse(fs.readFileSync(process.env.PROMO,'utf8')),q=JSON.parse(fs.readFileSync(process.env.QA,'utf8'));
+          if(p.status!=='EXACT_PREVIEW_VERSION_PROMOTED_AND_LIVE_BYTES_PASS_FUNCTIONAL_PENDING'||p.fullLiveByteReadback!==true||p.promotionAttempted!==true||p.rollbackAttempted!==false||q.diagnosticStatus!=='FOCAL_SCOPE_PASS'||q.assertions?.crossCountryTaskUiAbsent!==true||q.writeAttemptCount!==0||q.dataWrites!==0)throw Error('B4004_LIVE_SEAL_FAIL_CLOSED');
+          fs.copyFileSync(process.env.PROMO,process.env.RECEIPT);fs.copyFileSync(process.env.QA,process.env.QA_RECEIPT);
+          const cpPath='artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json',statePath='orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json';
+          const cp=JSON.parse(fs.readFileSync(cpPath)),state=JSON.parse(fs.readFileSync(statePath));
+          const pointer=cp.b4004CronogramaCountryFocalPreviewPass20261107;
+          if(pointer?.artifactId!==13600357541||pointer?.sourceSha!==p.sourceSha)throw Error('B4004_FROZEN_PREVIEW_MISMATCH');
+          const info={status:'CRONOGRAMA_COUNTRY_FOCAL_LIVE_PASS',sourceSha:p.sourceSha,buildId:p.buildId,artifactId:p.artifactId,previewVersionName:p.previewVersion,
+           liveVersionName:p.previewVersion,hostedPayloadDigest:p.hostedPayloadDigest,runId:Number(process.env.GITHUB_RUN_ID),promotionReceiptPath:process.env.RECEIPT,
+           promotionReceiptSha256:crypto.createHash('sha256').update(fs.readFileSync(process.env.RECEIPT)).digest('hex'),
+           liveQaReceiptPath:process.env.QA_RECEIPT,liveQaSha256:crypto.createHash('sha256').update(fs.readFileSync(process.env.QA_RECEIPT)).digest('hex'),
+           zeroBusinessWrites:true,exactReadback:true,roleCountryUiPass:true};
+          cp.b4004CronogramaCountryLiveAcceptance20261107=info;
+          state.b4004CronogramaCountryLiveAcceptance20261107=JSON.parse(JSON.stringify(info));
+          cp.nextAction='B4_004_FORMAL_GATE_SEAL_AFTER_SINIESTROS_RETAINED_EVIDENCE_READBACK';
+          state.nextAction=cp.nextAction;
+          fs.writeFileSync(cpPath,JSON.stringify(cp,null,2)+'\n');fs.writeFileSync(statePath,JSON.stringify(state,null,2)+'\n');
+          NODE
+          git add artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json "$RECEIPT" "$QA_RECEIPT"
+          git config user.name gravicentra-recovery-bot
+          git config user.email gravicentra-recovery-bot@users.noreply.github.com
+          git commit -m "release(b4-004): seal Cronograma same-artifact LIVE focal pass"
+          git fetch origin "$GITHUB_REF_NAME"
+          test "$(git rev-parse "origin/$GITHUB_REF_NAME")" = "$GITHUB_SHA"
+          git push origin "HEAD:$GITHUB_REF_NAME"
