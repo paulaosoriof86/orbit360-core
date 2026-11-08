@@ -4913,6 +4913,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: gravicentra-b4-004-second-uid-${{ github.run_id }}
-          path: ${{ runner.temp }}/b4-004-cronograma-live-qa.json
+          path: ${{ runner.temp }}/b4-004-second-uid-live-qa.json
           if-no-files-found: warn
           retention-days: 30
