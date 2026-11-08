@@ -1,0 +1,35 @@
+{
+  "schema": "GRAVICENTRA_B4_004_CRONOGRAMA_SECOND_UID_SINGLE_USE_AUTH_V1",
+  "status": "AUTHORIZED_ONCE",
+  "authorized": true,
+  "consumed": false,
+  "authorizedParentSha": "41ec4ad5b9bc667f0763bd3d891e0837c4b64c44",
+  "authority": "Paula explicit authorization in current conversation for one synthetic Cronograma task UID-country LIVE scope test",
+  "gate": "I6.5/B4-004",
+  "release": {
+    "sourceSha": "6c45983610ce0d65a5c63bd07659ad968bfe9da3",
+    "buildId": "gi-i65-b4-6c45983610ce-57f234755dc1",
+    "artifactId": 13592378081,
+    "liveVersionName": "sites/ays-orbit-360-lab/versions/33af816375dd5cb5",
+    "hostedPayloadDigest": "018bf9acd64ddaa382d2ac73c35a6d8bbc0447ab3051a3d26a5b1e8c048a7e7d"
+  },
+  "scope": {
+    "syntheticOnly": true,
+    "realBusinessWrites": false,
+    "maxTaskIds": 1,
+    "maxCommands": 1,
+    "distinctUidRequired": true,
+    "countryScopeRequired": true,
+    "serverReadbackRequired": true,
+    "reloadRequired": true,
+    "cleanupExact": true,
+    "finalAbsence": true,
+    "authAccountsChanged": false,
+    "membershipsChanged": false,
+    "productSourceChanged": false,
+    "backendChanged": false,
+    "rulesChanged": false,
+    "reimport": false
+  },
+  "previousAuthorizationConsumed": true
+}

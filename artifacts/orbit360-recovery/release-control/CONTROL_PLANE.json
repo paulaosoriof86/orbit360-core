@@ -3333,7 +3333,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "B4_004_EXISTING_EVIDENCE_SCOPE_ADJUDICATION_OR_NEW_MINIMUM_AUTHORIZATION_AND_HISTORICAL_GUARD_ROOTFIX_THEN_GATE_SEAL",
+  "nextAction": "B4_004_ONE_TIME_SECOND_UID_SCOPE_LIVE_TEST",
   "postproductionExitProgress": {
     "formalPercent": 50,
     "frozenMiniGates": 5,
@@ -21919,5 +21919,38 @@
     "distinctUid": true,
     "taskVisibility": "HOLD_NO_EXISTING_TASK",
     "noWrites": true
+  },
+  "b4004CronogramaSecondUidScopeAuthorization20261107": {
+    "status": "AUTHORIZED_ONCE",
+    "authorized": true,
+    "consumed": false,
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_004_CRONOGRAMA_SECOND_UID_SCOPE_AUTH_20261107.json",
+    "receiptBlobSha": "3e1673596868e80ae82caad8a70708cbbeeb2d92",
+    "authorizedParentSha": "41ec4ad5b9bc667f0763bd3d891e0837c4b64c44",
+    "release": {
+      "sourceSha": "6c45983610ce0d65a5c63bd07659ad968bfe9da3",
+      "buildId": "gi-i65-b4-6c45983610ce-57f234755dc1",
+      "artifactId": 13592378081,
+      "liveVersionName": "sites/ays-orbit-360-lab/versions/33af816375dd5cb5",
+      "hostedPayloadDigest": "018bf9acd64ddaa382d2ac73c35a6d8bbc0447ab3051a3d26a5b1e8c048a7e7d"
+    },
+    "scope": {
+      "syntheticOnly": true,
+      "realBusinessWrites": false,
+      "maxTaskIds": 1,
+      "maxCommands": 1,
+      "distinctUidRequired": true,
+      "countryScopeRequired": true,
+      "serverReadbackRequired": true,
+      "reloadRequired": true,
+      "cleanupExact": true,
+      "finalAbsence": true,
+      "authAccountsChanged": false,
+      "membershipsChanged": false,
+      "productSourceChanged": false,
+      "backendChanged": false,
+      "rulesChanged": false,
+      "reimport": false
+    }
   }
 }
