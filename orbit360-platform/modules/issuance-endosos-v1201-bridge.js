@@ -616,9 +616,38 @@ Orbit.modules = Orbit.modules || {};
   function installOpsEnhancement() {
     if (!Orbit.ciclo || Orbit.ciclo.__workflowV1201) return;
     const originalOpen = Orbit.ciclo.openGestion && Orbit.ciclo.openGestion.bind(Orbit.ciclo);
-    if (originalOpen) Orbit.ciclo.openGestion = function (id) { const out = originalOpen(id); setTimeout(() => enhanceGestion(id), 0); return out; };
+    // La ficha nativa de Ops espera catálogos y asesores de forma asíncrona.
+    // Inyectar el panel al siguiente tick puede ocurrir ANTES de crear el modal.
+    if (originalOpen) Orbit.ciclo.openGestion = async function (id) {
+      const out = await originalOpen(id);
+      enhanceGestion(id);
+      return out;
+    };
     const originalWire = Orbit.ciclo.wireCards && Orbit.ciclo.wireCards.bind(Orbit.ciclo);
-    if (originalWire) Orbit.ciclo.wireCards = function (host) { const out = originalWire(host); host.querySelectorAll('[data-ges]').forEach(el => el.addEventListener('click', () => setTimeout(() => enhanceGestion(el.dataset.ges), 0))); return out; };
+    if (originalWire) Orbit.ciclo.wireCards = function (host) {
+      const out = originalWire(host);
+      // Las tarjetas usan una referencia léxica al openGestion nativo, no el
+      // método envuelto. Observar la creación del modal evita esa carrera.
+      host.querySelectorAll('[data-ges]').forEach(el => el.addEventListener('click', () => {
+        const id = el.dataset.ges;
+        const g = S().get('gestiones', id);
+        if (!g || !['renewal_proposals','renewal_accepted','issuance_request','endorsement_request'].includes(g.workflowType)) return;
+        const expectedTitle = String(g.titulo || g.tipo || '').trim();
+        const enhanceIfReady = () => {
+          const back = document.getElementById('ciclo-modal');
+          if (!back || !back.querySelector('.ciclo-main') ||
+              back.querySelector('.ciclo-h h2')?.textContent.trim() !== expectedTitle) return false;
+          enhanceGestion(id);
+          return !!back.querySelector('[data-workflow-v1201]');
+        };
+        if (enhanceIfReady()) return;
+        const watcher = new MutationObserver(() => { if (enhanceIfReady()) watcher.disconnect(); });
+        watcher.observe(document.body, { childList: true, subtree: true });
+        // Límite de limpieza solamente: el flujo exitoso no espera el timeout.
+        setTimeout(() => watcher.disconnect(), 5000);
+      }));
+      return out;
+    };
     Orbit.ciclo.__workflowV1201 = { originalOpen, originalWire };
   }
 
