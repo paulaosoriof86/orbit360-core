@@ -159,8 +159,8 @@ function verifyB4006RealInsurerVisualSource(cp,state){
     r.ownerAccepted===false&&r.realDataWrites===0&&r.liveDeploys===0&&
     r.nextAction===B4006_OWNER_SOURCE_ACTION&&
     git('merge-base',r.sourcePredecessor,'HEAD')===r.sourcePredecessor&&
-    git('rev-parse','HEAD:orbit360-platform/styles/infra.css')===(cp.b4006GlobalTableCardSystemSourceSuccessor20261108?.newCssBlobSha||cp.b4006OwnerFinalVisualFeedbackSourceSuccessor20261108?.newStylesBlobSha||cp.b4006VisualPolishMicroRefinement20261108?.newStylesBlobSha||cp.b4006VisualUnificationSuccessor20261108?.newStylesBlobSha||activeStylesBlob)&&
-    blob(fs.readFileSync('orbit360-platform/styles/infra.css'))===(cp.b4006GlobalTableCardSystemSourceSuccessor20261108?.newCssBlobSha||cp.b4006OwnerFinalVisualFeedbackSourceSuccessor20261108?.newStylesBlobSha||cp.b4006VisualPolishMicroRefinement20261108?.newStylesBlobSha||cp.b4006VisualUnificationSuccessor20261108?.newStylesBlobSha||activeStylesBlob),
+    git('rev-parse','HEAD:orbit360-platform/styles/infra.css')===finalStylesBlob&&
+    blob(fs.readFileSync('orbit360-platform/styles/infra.css'))===finalStylesBlob,
     'B4006_OWNER_VISUAL_SOURCE_RECEIPT');
   return activeStylesBlob;
 }
@@ -367,7 +367,7 @@ function verifyB4006OwnerFinalVisualFeedbackSource(cp,state){
     git('merge-base',r.sourcePredecessor,'HEAD')===r.sourcePredecessor&&
     (cp.b4006GlobalTableCardSystemSourceSuccessor20261108
       ? git('rev-parse',cp.b4006GlobalTableCardSystemSourceSuccessor20261108.predecessorHead+':orbit360-platform/styles/infra.css')===p.newStylesBlobSha&&
-        verifyB4006GlobalTableCardSystemSourceSuccessor(cp,state)===cp.b4006GlobalTableCardSystemSourceSuccessor20261108.newCssBlobSha
+        verifyB4006GlobalTableCardSystemSourceSuccessor(cp,state)===(cp.b4006Kpi320MobileCardClippingCausalFix20261108?.newCssBlobSha||cp.b4006GlobalTableCardSystemSourceSuccessor20261108.newCssBlobSha)
       : git('rev-parse','HEAD:orbit360-platform/styles/infra.css')===p.newStylesBlobSha&&
         blob(fs.readFileSync('orbit360-platform/styles/infra.css'))===p.newStylesBlobSha)&&
     verifyB4006ExactPolishPreviewReadback(cp,state),
