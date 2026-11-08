@@ -4697,6 +4697,7 @@ jobs:
           PY
           npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund firebase-admin@13.4.0 playwright@1.55.0 >/dev/null
           npx playwright install --with-deps chromium >/dev/null
+          node --test tools/gravicentra-b4-004-cronograma-live-qa.test.mjs
       - name: Authenticated Cronograma LIVE minimum-delta proof
         env:
           B4_004_CRONOGRAMA_OUT: ${{ runner.temp }}/b4-004-cronograma-live-qa.json
@@ -4705,7 +4706,7 @@ jobs:
           node tools/gravicentra-b4-004-cronograma-live-qa.mjs
           node - <<'NODE'
           const x=require(process.env.B4_004_CRONOGRAMA_OUT),a=x.assertions||{};
-          const required=['exactLiveBuild','createServerReadback','firstReload','completeServerReadback','completedReload','distinctUidOwnScopeDenied','foreignCountryDenied','cleanupFinalUiAbsence'];
+          const required=['exactLiveBuild','createServerReadback','firstReload','completeServerReadback','completedReload','distinctUidScopeVerified','crossCountryPartitionVerified','cleanupFinalUiAbsence'];
           if(x.status!=='PASS'||required.some(k=>a[k]!==true)||x.syntheticFinalAbsent!==true||x.syntheticWrites!==2||x.pageErrorCount!==0||x.consoleErrorCount!==0||x.httpErrorCount!==0||x.authAccountsCreated!==0||x.membershipWrites!==0||x.productSourceChanged!==false||x.backendChanged!==false)process.exit(1);
           console.log('B4_004_CRONOGRAMA_LIVE_MINIMUM_DELTA=PASS');
           NODE

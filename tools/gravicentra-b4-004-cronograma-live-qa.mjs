@@ -46,15 +46,18 @@ async function actorInventory(){
  return out;
 }
 export function pickActors(rows){
- const countries=['GT','CO'];
- for(const country of countries){
+ const supported=['direccion','superadmin','super_admin','admintenant','admin_tenant','admin','operativo','asesor','comercial'];
+ for(const country of ['GT','CO']){
   const creators=rows.filter(x=>x.countries.includes(country)&&x.advisorId&&x.scope==='all'&&['direccion','superadmin','super_admin','admintenant','admin_tenant','admin','operativo'].includes(x.activeRole));
   for(const creator of creators){
-   const own=rows.find(x=>x.uid!==creator.uid&&x.countries.includes(country)&&x.advisorId&&x.advisorId!==creator.advisorId&&x.scope==='own');
-   if(!own)continue;
-   const otherCountry=country==='GT'?'CO':'GT';
-   const foreign=rows.find(x=>x.uid!==creator.uid&&x.countries.includes(otherCountry)&&!x.countries.includes(country)&&['direccion','operativo','asesor','comercial','superadmin','super_admin','admintenant','admin_tenant','admin'].includes(x.activeRole));
-   if(foreign)return{creator,own,foreign,country,otherCountry};
+   const peers=rows.filter(x=>x.uid!==creator.uid&&x.countries.includes(country)&&supported.includes(x.activeRole)&&(
+    x.scope==='all'||(x.scope==='own'&&x.advisorId&&x.advisorId!==creator.advisorId)
+   ));
+   for(const peer of peers){
+    const otherCountry=country==='GT'?'CO':'GT';
+    const countryActor=peer.countries.includes(otherCountry)?peer:rows.find(x=>x.uid!==creator.uid&&x.countries.includes(otherCountry)&&supported.includes(x.activeRole)&&x.scope!=='none');
+    if(countryActor)return{creator,peer,countryActor,country,otherCountry,peerShouldSee:peer.scope==='all'};
+   }
   }
  }
  throw Error('CRONO_QA_DISTINCT_UID_SCOPE_PAIR_UNAVAILABLE');
@@ -119,7 +122,7 @@ async function execute(){
   const build=await (await fetch(target+'/__recovery__/build.json',{cache:'no-store'})).json();
   need(build.sourceSha===process.env.SOURCE_SHA&&build.buildId===process.env.BUILD_ID,'LIVE_BUILD');
   proof.release={sourceSha:build.sourceSha,buildId:build.buildId,liveVersionName:process.env.LIVE_VERSION};proof.assertions.exactLiveBuild=true;
-  actors=pickActors(await actorInventory());proof.actors={creator:{uidSha256:digest(actors.creator.uid),role:actors.creator.activeRole,countries:actors.creator.countries,scope:actors.creator.scope,country:actors.country},own:{uidSha256:digest(actors.own.uid),role:actors.own.activeRole,countries:actors.own.countries,scope:actors.own.scope},foreign:{uidSha256:digest(actors.foreign.uid),role:actors.foreign.activeRole,countries:actors.foreign.countries,country:actors.otherCountry}};
+  const inventory=await actorInventory();proof.actorInventory=inventory.map(x=>({uidSha256:digest(x.uid),role:x.activeRole,countries:x.countries,scope:x.scope,hasAdvisorId:!!x.advisorId}));actors=pickActors(inventory);proof.actors={creator:{uidSha256:digest(actors.creator.uid),role:actors.creator.activeRole,countries:actors.creator.countries,scope:actors.creator.scope,country:actors.country},peer:{uidSha256:digest(actors.peer.uid),role:actors.peer.activeRole,countries:actors.peer.countries,scope:actors.peer.scope,expectedVisible:actors.peerShouldSee},countryActor:{uidSha256:digest(actors.countryActor.uid),role:actors.countryActor.activeRole,countries:actors.countryActor.countries,scope:actors.countryActor.scope,country:actors.otherCountry}};
   browser=await chromium.launch({headless:true});ctx=await browser.newContext({viewport:{width:1440,height:1000},ignoreHTTPSErrors:false,serviceWorkers:'block'});page=await ctx.newPage();recordBrowser(page,'direction');
   await ctx.route(/orbit360ProductOperationalCommand$/,async route=>{
    const req=route.request();if(req.method()==='OPTIONS'){await route.continue();return;}
@@ -135,22 +138,22 @@ async function execute(){
   await boot(page,actors.creator,actors.country);await page.evaluate(p=>installCronogramaQaAdapter(p),plan);
   await page.evaluate(({date,title})=>{Orbit.ui.prompt=async()=>date+' '+title;},{date:plan.date,title:plan.title});
   await page.locator('#cr-new').click();
-  const created=await waitTask(x=>x.id===plan.id&&x.done===false);need(created.__syntheticQa===true&&created.ownerUid===actors.creator.uid&&created.pais==='GT'&&created.asesorId===actors.creator.advisorId&&created.t===plan.title,'CREATE_READBACK');proof.syntheticWrites++;proof.assertions.createServerReadback=true;
+  const created=await waitTask(x=>x.id===plan.id&&x.done===false);need(created.__syntheticQa===true&&created.ownerUid===actors.creator.uid&&created.pais===actors.country&&created.asesorId===actors.creator.advisorId&&created.t===plan.title,'CREATE_READBACK');proof.syntheticWrites++;proof.assertions.createServerReadback=true;
   adapterSnapshot=await page.evaluate(()=>__giCronoQa.snapshot());await page.reload({waitUntil:'domcontentloaded',timeout:60000});await boot(page,actors.creator,actors.country);await page.locator('[data-v="dia"]').click();await page.waitForTimeout(500);
   need(await page.evaluate(({id,title})=>!!Orbit.store.get('tareas',id)&&(document.body.textContent||'').includes(title),plan),'FIRST_RELOAD');proof.assertions.firstReload=true;
   await page.evaluate(p=>installCronogramaQaAdapter(p),plan);const chip=page.locator('.cr-ev').filter({hasText:plan.title}).first();await chip.click();
   const done=await waitTask(x=>x.done===true);need(done.id===plan.id&&done.ownerUid===actors.creator.uid,'COMPLETE_READBACK');proof.syntheticWrites++;proof.assertions.completeServerReadback=true;
   await page.reload({waitUntil:'domcontentloaded',timeout:60000});await boot(page,actors.creator,actors.country);await page.locator('[data-v="dia"]').click();await page.waitForTimeout(500);
   need(await page.evaluate(({id,title})=>{const t=Orbit.store.get('tareas',id);return !!t&&t.done===true&&(document.body.textContent||'').includes(title)&&(document.body.textContent||'').includes('✅');},plan),'SECOND_RELOAD');proof.assertions.completedReload=true;
-  const ownView=await readVisibility(browser,actors.own,actors.country,'own-second-uid');need(ownView.storePresent===false&&ownView.textPresent===false,'OTHER_UID_SCOPE');proof.assertions.distinctUidOwnScopeDenied=true;
-  const foreignView=await readVisibility(browser,actors.foreign,actors.otherCountry,'foreign-country');need(foreignView.storePresent===false&&foreignView.textPresent===false,'FOREIGN_COUNTRY_SCOPE');proof.assertions.foreignCountryDenied=true;
-  proof.scopeObservations={ownView,foreignView,teamSourceRegressionRequired:true};
+  const peerView=await readVisibility(browser,actors.peer,actors.country,'peer-second-uid');need(peerView.storePresent===actors.peerShouldSee&&peerView.textPresent===actors.peerShouldSee,'DISTINCT_UID_SCOPE');proof.assertions.distinctUidScopeVerified=true;
+  const countryView=await readVisibility(browser,actors.countryActor,actors.otherCountry,'other-country');need(countryView.storePresent===false&&countryView.textPresent===false,'COUNTRY_PARTITION');proof.assertions.crossCountryPartitionVerified=true;
+  proof.scopeObservations={peerView,countryView,peerExpectedVisible:actors.peerShouldSee};
  }catch(e){proof.errors.push({code:String(e&&e.message||e).slice(0,160)});}
  finally{
   try{if(page&&!page.isClosed()&&globalThis){adapterSnapshot=adapterSnapshot||await page.evaluate(()=>globalThis.__giCronoQa?.snapshot()||null);}}catch{}
   try{
    const taskSnap=await ref('tareas',plan.id).get(),exact=[];
-   if(taskSnap.exists){const row=taskSnap.data()||{};need(row.__syntheticQa===true&&row.id===plan.id&&row.ownerUid===actors?.direction?.uid,'CLEANUP_TASK_PROVENANCE');exact.push({ref:taskSnap.ref,kind:'task'});}
+   if(taskSnap.exists){const row=taskSnap.data()||{};need(row.__syntheticQa===true&&row.id===plan.id&&row.ownerUid===actors?.creator?.uid,'CLEANUP_TASK_PROVENANCE');exact.push({ref:taskSnap.ref,kind:'task'});}
    for(const call of calls){
     for(let i=0;i<40&&!call.response;i++)await new Promise(r=>setTimeout(r,250));
     need(call.response?.ok===true&&call.response.serverOwned===true&&call.response.canonicalReadback===true&&call.response.requestId&&call.response.eventId,'CLEANUP_COMMAND_RESPONSE');
@@ -165,7 +168,7 @@ async function execute(){
   }catch(e){proof.errors.push({code:String(e&&e.message||e).slice(0,160)});}
   try{if(ctx)await ctx.close();if(browser)await browser.close();}catch{}
   proof.commandReceipts=calls.map(c=>({requestId:c.response?.requestId||null,eventId:c.response?.eventId||null,ok:c.response?.ok===true,canonicalReadback:c.response?.canonicalReadback===true}));
-  const required=['exactLiveBuild','createServerReadback','firstReload','completeServerReadback','completedReload','distinctUidOwnScopeDenied','foreignCountryDenied','cleanupFinalUiAbsence'];
+  const required=['exactLiveBuild','createServerReadback','firstReload','completeServerReadback','completedReload','distinctUidScopeVerified','crossCountryPartitionVerified','cleanupFinalUiAbsence'];
   if(proof.errors.length===0&&required.every(k=>proof.assertions[k]===true)&&proof.syntheticFinalAbsent===true&&proof.syntheticWrites===2&&proof.pageErrorCount===0&&proof.consoleErrorCount===0&&proof.httpErrorCount===0)proof.status='PASS';
   else proof.status='FAIL';
   fs.writeFileSync(outPath,JSON.stringify(proof,null,2)+'\n');

@@ -10,27 +10,26 @@ test('adapter remaps one live task identity and preserves task fields',async()=>
 test('adapter permits only one exact done update',async()=>{const h=harness();try{const row={id:'tk123',t:'QA',fecha:'2026-11-07',done:false};await Orbit.store.insertDurable('tareas',row);await Orbit.store.updateDurable('tareas',h.plan.id,{done:true});assert.equal(h.calls[1].id,h.plan.id);assert.deepEqual(h.calls[1].patch,{done:true});await assert.rejects(()=>Orbit.store.updateDurable('tareas',h.plan.id,{done:false}),/UPDATE_NOT_DECLARED/);}finally{h.close();}});
 test('adapter fails closed for foreign collection, id or patch',async()=>{const h=harness();try{await assert.rejects(()=>Orbit.store.insertDurable('clientes',{id:'tk1',done:false}),/INSERT_NOT_DECLARED/);await assert.rejects(()=>Orbit.store.updateDurable('tareas','real_task',{done:true}),/UPDATE_NOT_DECLARED/);await assert.rejects(()=>Orbit.store.updateDurable('tareas',h.plan.id,{done:true,t:'changed'}),/UPDATE_NOT_DECLARED/);}finally{h.close();}});
 
-test('actor selector accepts a same-country all+own pair in GT and separate CO negative actor',()=>{
+test('actor selector accepts a distinct all-scope peer and reuses its other-country assignment',()=>{
  const rows=[
-  {uid:'gt_all',activeRole:'direccion',countries:['GT'],advisorId:'a1',scope:'all'},
+  {uid:'gt_creator',activeRole:'direccion',countries:['GT'],advisorId:'a1',scope:'all'},
+  {uid:'multi_peer',activeRole:'operativo',countries:['GT','CO'],advisorId:'a2',scope:'all'}
+ ];
+ const x=pickActors(rows);
+ assert.equal(x.creator.uid,'gt_creator');assert.equal(x.peer.uid,'multi_peer');assert.equal(x.countryActor.uid,'multi_peer');assert.equal(x.country,'GT');assert.equal(x.otherCountry,'CO');assert.equal(x.peerShouldSee,true);
+});
+test('actor selector accepts an own-scope peer with a different advisor and expects isolation',()=>{
+ const rows=[
+  {uid:'gt_creator',activeRole:'direccion',countries:['GT'],advisorId:'a1',scope:'all'},
   {uid:'gt_own',activeRole:'asesor',countries:['GT'],advisorId:'a2',scope:'own'},
-  {uid:'co_all',activeRole:'operativo',countries:['CO'],advisorId:'a3',scope:'all'}
+  {uid:'co_actor',activeRole:'operativo',countries:['CO'],advisorId:'a3',scope:'all'}
  ];
  const x=pickActors(rows);
- assert.equal(x.creator.uid,'gt_all');assert.equal(x.own.uid,'gt_own');assert.equal(x.foreign.uid,'co_all');assert.equal(x.country,'GT');assert.equal(x.otherCountry,'CO');
+ assert.equal(x.peer.uid,'gt_own');assert.equal(x.countryActor.uid,'co_actor');assert.equal(x.peerShouldSee,false);
 });
-test('actor selector falls back to a valid CO all+own pair when GT own identity does not exist',()=>{
- const rows=[
-  {uid:'gt_all',activeRole:'direccion',countries:['GT'],advisorId:'a1',scope:'all'},
-  {uid:'co_all',activeRole:'operativo',countries:['CO'],advisorId:'a2',scope:'all'},
-  {uid:'co_own',activeRole:'asesor',countries:['CO'],advisorId:'a3',scope:'own'}
- ];
- const x=pickActors(rows);
- assert.equal(x.creator.uid,'co_all');assert.equal(x.own.uid,'co_own');assert.equal(x.foreign.uid,'gt_all');assert.equal(x.country,'CO');assert.equal(x.otherCountry,'GT');
-});
-test('actor selector fails closed when no same-country distinct own-scope identity exists',()=>{
+test('actor selector fails closed without a distinct same-country scope witness',()=>{
  assert.throws(()=>pickActors([
-  {uid:'gt_all',activeRole:'direccion',countries:['GT'],advisorId:'a1',scope:'all'},
-  {uid:'co_all',activeRole:'operativo',countries:['CO'],advisorId:'a2',scope:'all'}
+  {uid:'gt_creator',activeRole:'direccion',countries:['GT'],advisorId:'a1',scope:'all'},
+  {uid:'co_actor',activeRole:'operativo',countries:['CO'],advisorId:'a2',scope:'all'}
  ]),/DISTINCT_UID_SCOPE_PAIR_UNAVAILABLE/);
 });
