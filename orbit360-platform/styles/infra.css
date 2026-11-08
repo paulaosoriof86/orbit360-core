@@ -1452,3 +1452,12 @@ a.fh-chip:hover{border-color:var(--red);color:var(--red)}
   .insurer-doc-table td::before{content:attr(data-label);font:800 10px var(--f-display);letter-spacing:.045em;text-transform:uppercase;color:var(--ink-3);padding-top:2px}
 }
 @media(min-width:761px) and (max-width:900px){.insurer-doc-table{display:table;max-width:none;overflow:visible}}
+
+/* B4-006 · evitar títulos fracturados en tarjetas de oferta comercial móviles. */
+@media(max-width:760px){
+  .insurer-offering-head{flex-direction:column;align-items:stretch;gap:10px}
+  .insurer-offering-head>div:first-child{min-width:0}
+  .insurer-offering-head b{word-break:normal;overflow-wrap:normal}
+  .insurer-cotizador-toggle{align-self:flex-start;min-width:0;max-width:100%;flex-wrap:wrap}
+  .insurer-cotizador-toggle span{overflow-wrap:break-word}
+}

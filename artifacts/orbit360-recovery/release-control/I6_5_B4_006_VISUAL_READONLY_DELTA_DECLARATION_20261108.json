@@ -12,7 +12,7 @@
     },
     {
       "path": "orbit360-platform/styles/infra.css",
-      "gitBlobSha": "91116b5db4304d703d402ed7f408f4164fbaf3b8"
+      "gitBlobSha": "e436891d2cc94d56b2b9912dc2ca54ab0c4da277"
     },
     {
       "path": "orbit360-platform/index.html",
@@ -28,7 +28,8 @@
     "Aseguradoras Documentos y Drive read mode: canonical table desktop and labeled mobile cards",
     "Aseguradoras Productos y planes read mode: commission/segment text labels",
     "Siniestros inherited visible title only",
-    "Index asset URL cache-bust for changed files"
+    "Index asset URL cache-bust for changed files",
+    "Aseguradoras Productos y planes: mobile 320px header/title/toggle uncompressed"
   ],
   "integrity": {
     "editorWriteSelectorsPreserved": true,
@@ -42,5 +43,7 @@
     "latestApprovedModulesNotReopened": true
   },
   "nextAction": "B4_006_BUILD_ONE_NEW_IMMUTABLE_PREVIEW_THEN_VISUAL_QA_AND_OWNER_ACCEPTANCE",
-  "createdAtUtc": "2026-11-08T14:06:43.310Z"
+  "createdAtUtc": "2026-11-08T14:06:43.310Z",
+  "visualRevision": "read-only-grid-and-mobile-offering-header-v2",
+  "updatedAtUtc": "2026-11-08T14:15:26.915Z"
 }

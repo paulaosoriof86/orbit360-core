@@ -10,7 +10,7 @@
   "branch": "recovery/fase-a-clean-20260831",
   "forensicOriginSha": "9c95f31461f2eabe9804625b5659bee772f5602a",
   "createdAtUtc": "2026-08-31T18:00:00Z",
-  "updatedAtUtc": "2026-11-08T14:07:36.457Z",
+  "updatedAtUtc": "2026-11-08T14:15:36.668Z",
   "status": "ITERATION_2_SOURCE_MATERIALIZED_VALIDATION_PENDING",
   "currentIteration": 2,
   "lastCompletedIteration": 1,
@@ -1151,7 +1151,7 @@
     "status": "SOURCE_VISUAL_DELTA_READY_FOR_NEW_IMMUTABLE_PREVIEW",
     "gate": "I6.5/B4-006",
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_006_VISUAL_READONLY_DELTA_DECLARATION_20261108.json",
-    "receiptBlobSha": "e39bc228d4f801ca02f320d44051b4a0417f7b07",
+    "receiptBlobSha": "67b5c627d0c703180db5353846a00eb9bd699c6b",
     "sourceCommit": "d056811f9980d0fc2c2e2214e165f7e008c1f025",
     "predecessorHead": "ef41edc671fe421d3f88eb47003b1dc1f60ce017",
     "firstIncompleteGate": "B4-006",
@@ -1165,6 +1165,7 @@
       "orbit360-platform/styles/infra.css",
       "orbit360-platform/index.html",
       "orbit360-platform/modules/siniestros.js"
-    ]
+    ],
+    "visualRevision": "read-only-grid-and-mobile-offering-header-v2"
   }
 }
