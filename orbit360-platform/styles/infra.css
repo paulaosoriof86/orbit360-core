@@ -2111,3 +2111,59 @@ a.fh-chip:hover{border-color:var(--red);color:var(--red)}
 @media(prefers-reduced-motion:reduce){
   .asg-sec:not(.insurer-premium-section) :is(#af-contactos,#af-portales,#af-cuentas)>.asg-row:hover{transform:none;}
 }
+
+
+/* B4-006 · Patrón transversal de tablas y tarjetas aprobado por Dirección 2026-11-08.
+   Un mismo renderer .tbl para Clientes, Pólizas, Vehículos, Recibos y el resto.
+   No altera DOM, eventos, datos, roles, ni contratos de escritura.
+   Las tablas que se transforman en fichas móviles conservan su tratamiento propio. */
+.page table.tbl{
+  border-collapse:separate;
+  border-spacing:0;
+  font-variant-numeric:tabular-nums;
+}
+.page table.tbl thead th{
+  padding:13px 14px!important;
+  border-bottom:3px solid #c5162e!important;
+  background:linear-gradient(110deg,#333e4c,#202832)!important;
+  color:#fff!important;
+  font:800 11px/1.35 var(--f-display)!important;
+  letter-spacing:.035em;
+  text-align:center!important;
+  vertical-align:middle!important;
+  white-space:nowrap;
+}
+.page table.tbl tbody td{
+  padding:12px 14px;
+  border-bottom:1px solid #dce1e8;
+  vertical-align:middle;
+}
+.page table.tbl tbody tr:nth-child(even){background:#f3f5f8;}
+.page table.tbl tbody tr:hover{background:#fcebef;}
+.page .card:has(table.tbl){
+  border:1px solid #c7d0da;
+  border-radius:16px;
+  box-shadow:0 14px 30px -25px rgba(18,27,38,.5);
+}
+.page .card:has(table.tbl) > [style*="overflow-x:auto"]{
+  max-width:100%;
+  -webkit-overflow-scrolling:touch;
+}
+.page .card:has(table.tbl) table.tbl{
+  min-width:100%;
+}
+/* Tarjetas informativas normales: geometría compartida sin invadir modales,
+   componentes Kanban, fichas financieras ni estilos específicos aprobados. */
+.page > .card:not(.fichahdr):not(:has(table.tbl)),
+.page .cgrid > .card:not(:has(table.tbl)){
+  border-color:#c7d0da;
+  border-radius:15px;
+  box-shadow:0 11px 25px -24px rgba(18,27,38,.43),0 2px 7px rgba(18,27,38,.04);
+}
+@media(max-width:760px){
+  .page table.tbl{width:max-content;min-width:100%;}
+  .page .card:has(table.tbl){max-width:100%;}
+}
+@media(prefers-reduced-motion:reduce){
+  .page table.tbl tbody tr{transition:none;}
+}
