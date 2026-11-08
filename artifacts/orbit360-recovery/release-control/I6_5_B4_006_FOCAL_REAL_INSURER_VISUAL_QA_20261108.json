@@ -1,0 +1,107 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_006_FOCAL_VISUAL_PREVIEW_QA_V1",
+  "gate": "I6.5/B4-006",
+  "status": "ASSISTANT_FOCAL_VISUAL_QA_PASS_OWNER_ACCEPTANCE_PENDING",
+  "dateLocal": "2026-11-08",
+  "actor": "ChatGPT en Chrome conectado; Paula autenticada; vista Operativo simulada",
+  "actorProvenance": "Assistant-only visual observation, not human Paula acceptance",
+  "owner": "Paula Andrea Osorio Franco",
+  "latestSourceCommit": "feb8a9283061588c935dd2f0587bd98ac79ff91c",
+  "newCssBlobSha": "53a5e571ded91fbad1bae6496f776db323434583",
+  "buildId": "gi-i65-b4-feb8a9283061-57f234755dc1",
+  "artifactId": 13622257706,
+  "artifactZipSha256": "904f9df02d371bcd97a2688aee299b1057528c85f2d01f98ac0c795b12d909e9",
+  "workflowRunId": 42492868089,
+  "workflowStatus": "completed",
+  "workflowConclusion": "success",
+  "controlGuardRunId": 42492868085,
+  "controlGuardConclusion": "success",
+  "samePreviewChannel": "https://ays-orbit-360-lab--gi-i65-b4-rc-41765742748-neoi3u7r.web.app/",
+  "hostedReadback": {
+    "result": "PASS",
+    "allHostedFilesExact": true,
+    "previewRouteBuildIdObservedSameInTwoAuthenticatedBrowserTabs": true,
+    "liveLabUnchanged": true,
+    "customDomainUnchanged": true,
+    "functionsDeploys": 0,
+    "rulesDeploys": 0,
+    "authChanges": 0,
+    "operationalWrites": 0
+  },
+  "visualChecks": [
+    {
+      "scenario": "Real GT insurer Aseguradora Guatemalteca, Products and Plans",
+      "viewport": 390,
+      "result": "PASS",
+      "evidence": "Three premium guides, dark/red section bars, icon hierarchy, clear empty ramo/matrix/document requirement states",
+      "docWidth": 375,
+      "innerWidth": 390,
+      "overflow": false
+    },
+    {
+      "scenario": "Real GT insurer, Documents and Drive empty-state",
+      "viewport": 390,
+      "result": "PASS",
+      "evidence": "Premium document heading, black Drive header, red-accent classified/related cards, styled empty classifying box with folder emoji",
+      "driveConnectionStatus": "NONBLOCKING_HOLD_EXISTING_CANNOT_OPEN_EXPEDIENTE_DRIVE"
+    },
+    {
+      "scenario": "Real GT insurer, Documents required title alignment",
+      "viewport": 390,
+      "result": "PASS",
+      "evidence": "All three section headers justify-content:flex-start, no right-shift despite inherited inline styles"
+    },
+    {
+      "scenario": "Synthetic isolated QA insurer classified docs desktop",
+      "viewport": 1536,
+      "result": "PASS",
+      "evidence": "Nine columns, two rows, graphite table header rgb(37,45,56), white header text, red divider; wide-table horizontal scroll preserved"
+    },
+    {
+      "scenario": "Synthetic isolated QA insurer classified docs narrow mobile",
+      "viewport": 320,
+      "result": "PASS",
+      "evidence": "Nine-column table collapses into readable labelled cards with full filenames and classifications, whitespace normal, 305px document width at 320 viewport",
+      "docWidth": 305,
+      "innerWidth": 320,
+      "overflow": false
+    },
+    {
+      "scenario": "Synthetic isolated QA insurer edit/cancel without write",
+      "viewport": 1536,
+      "result": "PASS",
+      "evidence": "Edit revealed document selectors and fields; Cancel restored Edit button, no Guardar cambios, no Save invoked"
+    }
+  ],
+  "designAuthority": {
+    "brand": "Gravicentra Insurance",
+    "palette": [
+      "#C51635",
+      "graphite",
+      "#fff",
+      "technical gray"
+    ],
+    "rule": "existing approved premium Inicio and insurer hero; avoid flat unrelated panels, iconless hierarchy and unreadable tables"
+  },
+  "regressionLimits": {
+    "onlyCssProductChangeAfterPreviousVisualSource": true,
+    "sourceFilesOutsideInsurerUnchanged": true,
+    "canonicalIndexAndRoutingUnchanged": true,
+    "operationalReadWriteSemanticsUntestedInThisVisualQA": true,
+    "consolePageErrors": "NOT_REVERIFIED_BROWSER_DEVLOGS_TIMEOUT",
+    "humanOwnerVisualAcceptance": "PENDING",
+    "otherModulesVisualCertification": "PRESERVED_PREVIOUS_APPROVALS_NOT_REOPENED",
+    "cotizadorCotcompKnowledge": "POSTPRODUCTION_BY_OWNER_DECISION",
+    "drive": "OPTIONAL_NONBLOCKING_HOLD_NO_CONNECTOR_MUTATION"
+  },
+  "priorOwnerRejectedPreviewArtifact": 13620896661,
+  "previousSourceArtifactsRetainedReadOnly": true,
+  "oneCanonicalActivePreview": true,
+  "lastClosedGate": "B4-005",
+  "firstIncompleteGate": "B4-006",
+  "ownerAccepted": false,
+  "liveDeploys": 0,
+  "realDataWrites": 0,
+  "nextAction": "B4_006_OWNER_SIGNOFF_EXACT_VISUAL_ARTIFACT_13622257706_THEN_B4_007_SAME_ARTIFACT_LIVE",
+  "createdAtUtc": "2026-11-08T15:13:20.527Z"
+}

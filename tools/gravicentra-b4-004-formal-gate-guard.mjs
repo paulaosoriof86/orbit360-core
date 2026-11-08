@@ -23,6 +23,8 @@ const B4006_OWNER_SOURCE_RECEIPT=ROOT+'I6_5_B4_006_REAL_INSURER_VISUAL_HIERARCHY
 const B4006_OWNER_SOURCE_ACTION='B4_006_SINGLE_VISUAL_SOURCE_SUCCESSOR_BUILD_EXACT_PREVIEW_REAL_INSURER_QA';
 const B4006_REAL_MICRO_RECEIPT=ROOT+'I6_5_B4_006_REAL_INSURER_VISUAL_MICRO_REFINEMENT_20261108.json';
 const B4006_MOBILE_DOC_WRAP_RECEIPT=ROOT+'I6_5_B4_006_MOBILE_INSURER_DOCUMENT_TABLE_WRAP_20261108.json';
+const B4006_LATEST_VISUAL_QA_RECEIPT=ROOT+'I6_5_B4_006_FOCAL_REAL_INSURER_VISUAL_QA_20261108.json';
+const B4006_LATEST_VISUAL_QA_ACTION='B4_006_OWNER_SIGNOFF_EXACT_VISUAL_ARTIFACT_13622257706_THEN_B4_007_SAME_ARTIFACT_LIVE';
 const SOURCE='f8fa00e4e2e6627cee66c8c521866874e39bc8da';
 const BUILD='gi-i65-b4-f8fa00e4e2e6-57f234755dc1';
 const ARTIFACT=13600357541;
@@ -146,6 +148,48 @@ function verifyB4006RealInsurerVisualSource(cp,state){
     blob(fs.readFileSync('orbit360-platform/styles/infra.css'))===activeStylesBlob,
     'B4006_OWNER_VISUAL_SOURCE_RECEIPT');
   return activeStylesBlob;
+}
+
+function verifyB4006LatestActualVisualQa(cp,state){
+  const p=cp.b4006LatestActualVisualQa20261108;
+  need(p&&same(p,state.b4006LatestActualVisualQa20261108)&&
+    p.gate==='I6.5/B4-006'&&
+    p.status==='ASSISTANT_FOCAL_VISUAL_QA_PASS_OWNER_ACCEPTANCE_PENDING'&&
+    p.receiptPath===B4006_LATEST_VISUAL_QA_RECEIPT&&
+    p.receiptBlobSha==='89865b294fa012790feeac20d740ad29531e8915'&&
+    p.sourceCommit==='feb8a9283061588c935dd2f0587bd98ac79ff91c'&&
+    p.cssBlobSha==='53a5e571ded91fbad1bae6496f776db323434583'&&
+    p.buildId==='gi-i65-b4-feb8a9283061-57f234755dc1'&&
+    p.artifactId===13622257706&&
+    p.artifactZipSha256==='904f9df02d371bcd97a2688aee299b1057528c85f2d01f98ac0c795b12d909e9'&&
+    p.workflowRunId===42492868089&&
+    p.firstIncompleteGate==='B4-006'&&p.lastClosedGate==='B4-005'&&
+    p.ownerAccepted===false&&p.oneCanonicalPreviewChannel===true&&
+    p.liveDeploys===0&&p.realDataWrites===0,
+    'B4006_LATEST_ACTUAL_VISUAL_QA_POINTER');
+  const r=readPinned(B4006_LATEST_VISUAL_QA_RECEIPT,p.receiptBlobSha);
+  need(r.schema==='GRAVICENTRA_I6_5_B4_006_FOCAL_VISUAL_PREVIEW_QA_V1'&&
+    r.gate===p.gate&&r.status===p.status&&
+    r.latestSourceCommit===p.sourceCommit&&
+    r.newCssBlobSha===p.cssBlobSha&&r.buildId===p.buildId&&
+    r.artifactId===p.artifactId&&r.artifactZipSha256===p.artifactZipSha256&&
+    r.workflowRunId===p.workflowRunId&&
+    r.workflowStatus==='completed'&&r.workflowConclusion==='success'&&
+    r.controlGuardConclusion==='success'&&
+    r.hostedReadback?.allHostedFilesExact===true&&
+    r.hostedReadback?.previewRouteBuildIdObservedSameInTwoAuthenticatedBrowserTabs===true&&
+    r.hostedReadback?.liveLabUnchanged===true&&
+    r.hostedReadback?.customDomainUnchanged===true&&
+    r.visualChecks?.length===6&&r.visualChecks.every(x=>x.result==='PASS')&&
+    r.regressionLimits?.humanOwnerVisualAcceptance==='PENDING'&&
+    r.regressionLimits?.consolePageErrors==='NOT_REVERIFIED_BROWSER_DEVLOGS_TIMEOUT'&&
+    r.oneCanonicalActivePreview===true&&r.ownerAccepted===false&&
+    r.liveDeploys===0&&r.realDataWrites===0&&
+    r.nextAction===B4006_LATEST_VISUAL_QA_ACTION&&
+    git('merge-base',r.latestSourceCommit,'HEAD')===r.latestSourceCommit&&
+    verifyB4006RealInsurerVisualSource(cp,state)===p.cssBlobSha,
+    'B4006_LATEST_VISUAL_QA_SIGNED_RECEIPT');
+  return true;
 }
 
 function verifyB4006AssistantVisualQa(cp,state){
@@ -333,7 +377,7 @@ export function verifyB4004FormalGate(){
   need(blob(bytes)===ref.receiptBlobSha&&sha256(bytes)===ref.receiptSha256&&ref.receiptBlobSha===mirror.receiptBlobSha&&ref.receiptSha256===mirror.receiptSha256,'SEAL_HASH');
   need(releaseMatches(ref)&&releaseMatches(mirror)&&ref.hostingVersion===VERSION&&ref.hostedPayloadDigest===DIGEST,'SEAL_RELEASE_POINTER');
   need(ref.lastClosedGate==='B4-004'&&mirror.lastClosedGate==='B4-004'&&ref.firstIncompleteGate==='B4-005'&&mirror.firstIncompleteGate==='B4-005','NEXT_GATE');
-  need((cp.nextAction===ACTION&&state.nextAction===ACTION||(cp.nextAction===B4006_VISUAL_ACTION&&state.nextAction===B4006_VISUAL_ACTION&&cp.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&state.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&cp.b4006VisualReadonlyCandidateSource20261108?.status==='SOURCE_VISUAL_DELTA_READY_FOR_NEW_IMMUTABLE_PREVIEW'||cp.nextAction===B4006_FINAL_ACTION&&state.nextAction===B4006_FINAL_ACTION&&cp.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&state.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&verifyB4006AssistantVisualQa(cp,state)||cp.nextAction===B4006_OWNER_SOURCE_ACTION&&state.nextAction===B4006_OWNER_SOURCE_ACTION&&cp.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&state.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&verifyB4006RealInsurerVisualSource(cp,state)))&&ref.nextAction===ACTION&&mirror.nextAction===ACTION,'NEXT_ACTION_SYNC');
+  need((cp.nextAction===ACTION&&state.nextAction===ACTION||(cp.nextAction===B4006_VISUAL_ACTION&&state.nextAction===B4006_VISUAL_ACTION&&cp.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&state.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&cp.b4006VisualReadonlyCandidateSource20261108?.status==='SOURCE_VISUAL_DELTA_READY_FOR_NEW_IMMUTABLE_PREVIEW'||cp.nextAction===B4006_FINAL_ACTION&&state.nextAction===B4006_FINAL_ACTION&&cp.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&state.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&verifyB4006AssistantVisualQa(cp,state)||cp.nextAction===B4006_OWNER_SOURCE_ACTION&&state.nextAction===B4006_OWNER_SOURCE_ACTION&&cp.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&state.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&verifyB4006RealInsurerVisualSource(cp,state)||cp.nextAction===B4006_LATEST_VISUAL_QA_ACTION&&state.nextAction===B4006_LATEST_VISUAL_QA_ACTION&&cp.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&state.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&verifyB4006LatestActualVisualQa(cp,state)))&&ref.nextAction===ACTION&&mirror.nextAction===ACTION,'NEXT_ACTION_SYNC');
   need(cp.pendingClosureMasterPlan?.status==='B4_004_CLOSED_PASS_NEXT_B4_005_E2E_NOT_EXECUTED'&&cp.pendingClosureMasterPlan.currentGate==='B4-005'&&cp.pendingClosureMasterPlan.b4004Held===false,'PLAN_CURSOR');
   need(cp.currentB4?.status==='B4_003_CLOSED_PASS_CURRENT42'&&same(cp.currentB4,historic.currentB4),'B4003_FROZEN_POINTER');
   need(cp.b4003ActiveCertificationCursor20261106?.formalLiveAcceptance?.status==='LATEST_APPROVED_VERSION_LIVE_PASS'&&same(cp.b4003ActiveCertificationCursor20261106,historic.b4003ActiveCertificationCursor20261106),'B4003_PRESERVED');

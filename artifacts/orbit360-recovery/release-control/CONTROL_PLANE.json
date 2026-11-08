@@ -3333,7 +3333,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "B4_006_SINGLE_VISUAL_SOURCE_SUCCESSOR_BUILD_EXACT_PREVIEW_REAL_INSURER_QA",
+  "nextAction": "B4_006_OWNER_SIGNOFF_EXACT_VISUAL_ARTIFACT_13622257706_THEN_B4_007_SAME_ARTIFACT_LIVE",
   "postproductionExitProgress": {
     "formalPercent": 50,
     "frozenMiniGates": 5,
@@ -22314,5 +22314,23 @@
     "oneCanonicalPreviewChannel": true,
     "realDataWrites": 0,
     "liveDeploys": 0
+  },
+  "b4006LatestActualVisualQa20261108": {
+    "gate": "I6.5/B4-006",
+    "status": "ASSISTANT_FOCAL_VISUAL_QA_PASS_OWNER_ACCEPTANCE_PENDING",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_006_FOCAL_REAL_INSURER_VISUAL_QA_20261108.json",
+    "receiptBlobSha": "89865b294fa012790feeac20d740ad29531e8915",
+    "sourceCommit": "feb8a9283061588c935dd2f0587bd98ac79ff91c",
+    "cssBlobSha": "53a5e571ded91fbad1bae6496f776db323434583",
+    "buildId": "gi-i65-b4-feb8a9283061-57f234755dc1",
+    "artifactId": 13622257706,
+    "artifactZipSha256": "904f9df02d371bcd97a2688aee299b1057528c85f2d01f98ac0c795b12d909e9",
+    "workflowRunId": 42492868089,
+    "firstIncompleteGate": "B4-006",
+    "lastClosedGate": "B4-005",
+    "ownerAccepted": false,
+    "liveDeploys": 0,
+    "realDataWrites": 0,
+    "oneCanonicalPreviewChannel": true
   }
 }
