@@ -52,6 +52,9 @@ on:
       - 'tools/gravicentra-b4-003-one-live-synthetic-insurer.mjs'
       - 'tools/gravicentra-b4-004-policy-capture-live-qa.mjs'
       - 'tools/gravicentra-b4-004-policy-capture-live-qa.test.mjs'
+      - 'artifacts/orbit360-recovery/release-control/I6_5_B4_004_CRONOGRAMA_LIVE_SYNTHETIC_OWNER_AUTH_20261107.json'
+      - 'tools/gravicentra-b4-004-cronograma-live-qa.test.mjs'
+      - 'tools/gravicentra-b4-004-cronograma-live-qa.mjs'
       - 'artifacts/orbit360-recovery/release-control/I6_5_B4_004_LONG_BLOCK_EXECUTION_PROTOCOL_20261107.json'
       - 'artifacts/orbit360-recovery/release-control/I6_5_B4_004_LIVE_PROMOTION_BINDING_20261107.json'
       - 'artifacts/orbit360-recovery/release-control/I6_5_B4_004_POLICY_CAPTURE_LIVE_SYNTHETIC_OWNER_AUTH_20261107.json'
@@ -4620,3 +4623,126 @@ jobs:
           path: ${{ runner.temp }}/b4-004-policy-capture-live-qa.json
           if-no-files-found: warn
           retention-days: 30
+
+  b4-004-cronograma-live-qa:
+    if: "github.event_name == 'push' && (github.event.head_commit.message == 'test(b4-004): complete cronograma LIVE minimum delta' || startsWith(github.event.head_commit.message, format('{0}{1}', 'test(b4-004): complete cronograma LIVE minimum delta', fromJSON('\"\\n\"'))))"
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    permissions:
+      contents: write
+      actions: read
+    env:
+      PROJECT_ID: ays-orbit-360-lab
+      TENANT_HINT: alianzas-soluciones
+      CONTROL: artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json
+      STATE: orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json
+      AUTH_RECEIPT: artifacts/orbit360-recovery/release-control/I6_5_B4_004_CRONOGRAMA_LIVE_SYNTHETIC_OWNER_AUTH_20261107.json
+      SOURCE_SHA: 6c45983610ce0d65a5c63bd07659ad968bfe9da3
+      BUILD_ID: gi-i65-b4-6c45983610ce-57f234755dc1
+      LIVE_VERSION: sites/ays-orbit-360-lab/versions/33af816375dd5cb5
+      B4_LIVE_URL: https://ays-orbit-360-lab.web.app
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Fail-closed Cronograma authorization, release and inherited policy-capture PASS
+        run: |
+          set -euo pipefail
+          node --check tools/gravicentra-b4-004-cronograma-live-qa.mjs
+          node --test tools/gravicentra-b4-004-cronograma-live-qa.test.mjs
+          node tools/gravicentra-b4-003-cronograma-durable-task.test.cjs
+          node tools/gravicentra-b4-003-role-first-paint-and-team-regression.test.cjs
+          node - <<'NODE'
+          const fs=require('node:fs'),{execFileSync}=require('node:child_process');
+          const cp=JSON.parse(fs.readFileSync(process.env.CONTROL,'utf8'));
+          const a=JSON.parse(fs.readFileSync(process.env.AUTH_RECEIPT,'utf8'));
+          const e=JSON.parse(fs.readFileSync(process.env.GITHUB_EVENT_PATH,'utf8'));
+          const need=(v,c)=>{if(!v)throw Error(c);};
+          const blob=execFileSync('git',['hash-object',process.env.AUTH_RECEIPT],{encoding:'utf8'}).trim();
+          const ptr=cp.b4004CronogramaLiveSyntheticAuthorization20261107;
+          need(a.status==='AUTHORIZED_ONCE'&&a.authorized===true&&a.consumed===false,'B4004_CRONO_AUTH_NOT_AVAILABLE');
+          need(ptr?.receiptPath===process.env.AUTH_RECEIPT&&ptr.receiptBlobSha===blob,'B4004_CRONO_AUTH_POINTER_MISMATCH');
+          need(e.before===a.authorizedParentSha&&e.after===process.env.GITHUB_SHA&&e.forced!==true,'B4004_CRONO_HEAD_LEASE');
+          const c=cp.b4004PolicyCaptureFrontendSuccessor20261107;
+          need(c?.liveFunctionalAcceptance?.status==='POLICY_CAPTURE_FOCAL_LIVE_PASS','B4004_POLICY_CAPTURE_LIVE_PASS_REQUIRED');
+          need(c.activeSourceSha===a.release.sourceSha&&c.activeBuildId===a.release.buildId&&Number(c.activeImmutableArtifactId)===Number(a.release.artifactId),'B4004_CRONO_RELEASE_BINDING');
+          need(a.release.liveVersionName===process.env.LIVE_VERSION&&a.scope.syntheticOnly===true&&a.scope.realBusinessWrites===false&&a.scope.cleanupExact===true&&a.scope.maxTaskIds===1&&a.scope.maxCommands===2,'B4004_CRONO_SCOPE');
+          const cadence=cp.workingCadenceFreeze20261107;
+          need(cadence?.status==='FROZEN_OWNER_EXECUTION_PROTOCOL'&&cadence.liveSyntheticAuthorization?.allowed?.includes('Cronograma controlled synthetic task flow'),'B4004_CRONO_CADENCE_AUTH');
+          console.log('B4_004_CRONOGRAMA_LIVE_AUTHORIZATION=PASS');
+          NODE
+      - name: Prepare existing service account and browser dependencies
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json,os,pathlib
+          dest=pathlib.Path(os.environ['RUNNER_TEMP'])/'b4004-crono-live-service-account.json'
+          chosen=None
+          for key in ('SA_ORBIT360_LAB','SA_ORBIT_360_LAB','SA_DEFAULT'):
+              try:item=json.loads(os.environ.get(key,''))
+              except (ValueError,TypeError):continue
+              if item.get('type')=='service_account' and item.get('project_id')=='ays-orbit-360-lab' and item.get('private_key'):
+                  chosen=item;break
+          if not chosen:raise SystemExit('B4_004_CRONO_SERVICE_ACCOUNT_MISSING')
+          dest.write_text(json.dumps(chosen),encoding='utf8');dest.chmod(0o600)
+          with open(os.environ['GITHUB_ENV'],'a',encoding='utf8') as h:h.write('GOOGLE_APPLICATION_CREDENTIALS='+str(dest)+'\n')
+          PY
+          npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund firebase-admin@13.4.0 playwright@1.55.0 >/dev/null
+          npx playwright install --with-deps chromium >/dev/null
+      - name: Authenticated Cronograma LIVE minimum-delta proof
+        env:
+          B4_004_CRONOGRAMA_OUT: ${{ runner.temp }}/b4-004-cronograma-live-qa.json
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-b4-004-cronograma-live-qa.mjs
+          node - <<'NODE'
+          const x=require(process.env.B4_004_CRONOGRAMA_OUT),a=x.assertions||{};
+          const required=['exactLiveBuild','createServerReadback','firstReload','completeServerReadback','completedReload','distinctUidOwnScopeDenied','foreignCountryDenied','cleanupFinalUiAbsence'];
+          if(x.status!=='PASS'||required.some(k=>a[k]!==true)||x.syntheticFinalAbsent!==true||x.syntheticWrites!==2||x.pageErrorCount!==0||x.consoleErrorCount!==0||x.httpErrorCount!==0||x.authAccountsCreated!==0||x.membershipWrites!==0||x.productSourceChanged!==false||x.backendChanged!==false)process.exit(1);
+          console.log('B4_004_CRONOGRAMA_LIVE_MINIMUM_DELTA=PASS');
+          NODE
+      - name: Seal Cronograma focal LIVE proof and consume authorization
+        env:
+          PROOF: ${{ runner.temp }}/b4-004-cronograma-live-qa.json
+          RECEIPT: artifacts/orbit360-recovery/release-control/I6_5_B4_004_CRONOGRAMA_FOCAL_LIVE_QA_20261107.json
+        run: |
+          set -euo pipefail
+          cp "$PROOF" "$RECEIPT"
+          node - <<'NODE'
+          const fs=require('node:fs'),crypto=require('node:crypto');
+          const cp=JSON.parse(fs.readFileSync(process.env.CONTROL,'utf8'));
+          const state=JSON.parse(fs.readFileSync(process.env.STATE,'utf8'));
+          const proof=JSON.parse(fs.readFileSync(process.env.PROOF,'utf8'));
+          if(proof.status!=='PASS'||proof.syntheticFinalAbsent!==true)throw Error('B4004_CRONO_SEAL_PROOF_INVALID');
+          const c=cp.b4004PolicyCaptureFrontendSuccessor20261107;
+          const evidence=fs.readFileSync(process.env.RECEIPT),seal={status:'CRONOGRAMA_FOCAL_LIVE_PASS',sourceSha:c.activeSourceSha,buildId:c.activeBuildId,artifactId:c.activeImmutableArtifactId,liveVersionName:process.env.LIVE_VERSION,runId:Number(process.env.GITHUB_RUN_ID),runAttempt:Number(process.env.GITHUB_RUN_ATTEMPT||1),evidencePath:process.env.RECEIPT,evidenceSha256:crypto.createHash('sha256').update(evidence).digest('hex'),syntheticFinalAbsent:true,realBusinessWrites:0,distinctUid:true,countryScope:true};
+          c.status='FRONTEND_SUCCESSOR_LIVE_POLICY_CAPTURE_AND_CRONOGRAMA_FUNCTIONAL_PASS_PERFORMANCE_PENDING';c.cronogramaLiveAcceptance=seal;c.nextGateAccepted=false;
+          const a=cp.b4004CronogramaLiveSyntheticAuthorization20261107;if(!a||a.consumed===true)throw Error('B4004_CRONO_AUTH_ALREADY_CONSUMED');a.consumed=true;a.consumedByRunId=Number(process.env.GITHUB_RUN_ID);a.result='PASS_CLEANUP_VERIFIED';
+          cp.nextAction='B4_004_RECEIPT_DETAIL_PERFORMANCE_CAUSAL_FIX_OR_ACCEPTANCE_THEN_GATE_SEAL';
+          state.b4004PolicyCaptureFrontendSuccessor20261107=JSON.parse(JSON.stringify(c));state.b4004CronogramaLiveSyntheticAuthorization20261107=JSON.parse(JSON.stringify(a));state.nextAction=cp.nextAction;
+          fs.writeFileSync(process.env.CONTROL,JSON.stringify(cp,null,2)+'\n');fs.writeFileSync(process.env.STATE,JSON.stringify(state,null,2)+'\n');
+          NODE
+          git add "$CONTROL" "$STATE" "$RECEIPT"
+          git config user.name gravicentra-recovery-bot
+          git config user.email gravicentra-recovery-bot@users.noreply.github.com
+          git commit -m "test(b4-004): seal cronograma LIVE minimum delta"
+          git fetch origin "$GITHUB_REF_NAME"
+          test "$(git rev-parse "origin/$GITHUB_REF_NAME")" = "$GITHUB_SHA"
+          git push origin "HEAD:$GITHUB_REF_NAME"
+      - name: Preserve Cronograma LIVE proof artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gravicentra-b4-004-cronograma-live-${{ github.run_id }}
+          path: ${{ runner.temp }}/b4-004-cronograma-live-qa.json
+          if-no-files-found: warn
+          retention-days: 30
+

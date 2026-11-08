@@ -21857,5 +21857,39 @@
     },
     "consumedByRunId": 42427273254,
     "result": "PASS_CLEANUP_VERIFIED"
+  },
+  "b4004CronogramaLiveSyntheticAuthorization20261107": {
+    "schema": "GRAVICENTRA_B4_004_CRONOGRAMA_LIVE_SYNTHETIC_OWNER_AUTH_V1",
+    "status": "AUTHORIZED_ONCE",
+    "authorized": true,
+    "consumed": false,
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_004_CRONOGRAMA_LIVE_SYNTHETIC_OWNER_AUTH_20261107.json",
+    "receiptBlobSha": "7160d3996b0d6b7631c5fcc50042e7e97d1c46eb",
+    "authorizedParentSha": "e250cf57b8a565b1cb01de5070a926b70b86342b",
+    "release": {
+      "sourceSha": "6c45983610ce0d65a5c63bd07659ad968bfe9da3",
+      "buildId": "gi-i65-b4-6c45983610ce-57f234755dc1",
+      "artifactId": 13592378081,
+      "liveVersionName": "sites/ays-orbit-360-lab/versions/33af816375dd5cb5",
+      "hostedPayloadDigest": "018bf9acd64ddaa382d2ac73c35a6d8bbc0447ab3051a3d26a5b1e8c048a7e7d"
+    },
+    "scope": {
+      "syntheticOnly": true,
+      "realBusinessWrites": false,
+      "cleanupExact": true,
+      "finalAbsenceRequired": true,
+      "serverReadbackRequired": true,
+      "reloadRequired": true,
+      "distinctUidRequired": true,
+      "countryScopeRequired": true,
+      "maxTaskIds": 1,
+      "maxCommands": 2,
+      "authAccountMutation": false,
+      "membershipMutation": false,
+      "productSourceMutation": false,
+      "backendMutation": false,
+      "rulesMutation": false,
+      "reimport": false
+    }
   }
 }

@@ -1,0 +1,11 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {installCronogramaQaAdapter} from './gravicentra-b4-004-cronograma-live-qa.mjs';
+
+function harness(){
+ const calls=[];globalThis.Orbit={store:{__productOperationalWriteP0:true,insertDurable:async(c,row)=>{calls.push({method:'insert',c,row:structuredClone(row)});return structuredClone(row);},updateDurable:async(c,id,patch)=>{calls.push({method:'update',c,id,patch:structuredClone(patch)});return structuredClone(patch);}}};
+ const plan={id:'b4004qa_cronograma_123_1'};installCronogramaQaAdapter(plan);return{calls,plan,qa:globalThis.__giCronoQa,close(){globalThis.__giCronoQa.restore();delete globalThis.Orbit;}};
+}
+test('adapter remaps one live task identity and preserves task fields',async()=>{const h=harness();try{const row={id:'tk123',t:'QA',fecha:'2026-11-07',done:false};await Orbit.store.insertDurable('tareas',row);assert.equal(row.id,h.plan.id);assert.equal(row.__syntheticQa,true);assert.equal(row.t,'QA');assert.equal(row.fecha,'2026-11-07');assert.equal(h.calls.length,1);}finally{h.close();}});
+test('adapter permits only one exact done update',async()=>{const h=harness();try{const row={id:'tk123',t:'QA',fecha:'2026-11-07',done:false};await Orbit.store.insertDurable('tareas',row);await Orbit.store.updateDurable('tareas',h.plan.id,{done:true});assert.equal(h.calls[1].id,h.plan.id);assert.deepEqual(h.calls[1].patch,{done:true});await assert.rejects(()=>Orbit.store.updateDurable('tareas',h.plan.id,{done:false}),/UPDATE_NOT_DECLARED/);}finally{h.close();}});
+test('adapter fails closed for foreign collection, id or patch',async()=>{const h=harness();try{await assert.rejects(()=>Orbit.store.insertDurable('clientes',{id:'tk1',done:false}),/INSERT_NOT_DECLARED/);await assert.rejects(()=>Orbit.store.updateDurable('tareas','real_task',{done:true}),/UPDATE_NOT_DECLARED/);await assert.rejects(()=>Orbit.store.updateDurable('tareas',h.plan.id,{done:true,t:'changed'}),/UPDATE_NOT_DECLARED/);}finally{h.close();}});

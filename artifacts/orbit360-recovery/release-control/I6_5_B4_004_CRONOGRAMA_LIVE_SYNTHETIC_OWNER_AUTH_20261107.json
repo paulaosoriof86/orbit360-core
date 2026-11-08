@@ -1,0 +1,39 @@
+{
+  "schema": "GRAVICENTRA_B4_004_CRONOGRAMA_LIVE_SYNTHETIC_OWNER_AUTH_V1",
+  "status": "AUTHORIZED_ONCE",
+  "gate": "I6.5/B4-004",
+  "authority": "Paula explicit B4-004 synthetic LIVE authorization frozen in long-block protocol",
+  "authorized": true,
+  "consumed": false,
+  "authorizedParentSha": "e250cf57b8a565b1cb01de5070a926b70b86342b",
+  "release": {
+    "sourceSha": "6c45983610ce0d65a5c63bd07659ad968bfe9da3",
+    "buildId": "gi-i65-b4-6c45983610ce-57f234755dc1",
+    "artifactId": 13592378081,
+    "liveVersionName": "sites/ays-orbit-360-lab/versions/33af816375dd5cb5",
+    "hostedPayloadDigest": "018bf9acd64ddaa382d2ac73c35a6d8bbc0447ab3051a3d26a5b1e8c048a7e7d"
+  },
+  "scope": {
+    "syntheticOnly": true,
+    "realBusinessWrites": false,
+    "cleanupExact": true,
+    "finalAbsenceRequired": true,
+    "serverReadbackRequired": true,
+    "reloadRequired": true,
+    "distinctUidRequired": true,
+    "countryScopeRequired": true,
+    "maxTaskIds": 1,
+    "maxCommands": 2,
+    "authAccountMutation": false,
+    "membershipMutation": false,
+    "productSourceMutation": false,
+    "backendMutation": false,
+    "rulesMutation": false,
+    "reimport": false
+  },
+  "preservedEvidence": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CRONOGRAMA_DIRECCION_AUTH_E2E_20261029.md",
+    "blobSha": "8ed63013a10a25d12c165429faa2674000a04e04"
+  },
+  "singleUse": true
+}
