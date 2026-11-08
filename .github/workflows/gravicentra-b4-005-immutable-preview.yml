@@ -7,6 +7,7 @@ on:
     branches: [recovery/fase-a-clean-20260831]
     paths:
       - .github/workflows/gravicentra-b4-005-immutable-preview.yml
+      - orbit360-platform/modules/issuance-endosos-v1201-bridge.js
   workflow_dispatch:
 permissions:
   contents: read
