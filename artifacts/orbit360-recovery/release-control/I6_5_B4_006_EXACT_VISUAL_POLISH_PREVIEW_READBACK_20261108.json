@@ -1,0 +1,68 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_006_EXACT_VISUAL_POLISH_PREVIEW_READBACK_V1",
+  "gate": "I6.5/B4-006",
+  "status": "EXACT_IMMUTABLE_PREVIEW_READBACK_PASS_FOCAL_VISUAL_RECHECK_PENDING",
+  "recordedAtLocal": "2026-11-08",
+  "timezone": "America/Guatemala",
+  "sourceCommit": "0d202a8121043e776a7e1d1ec32678ebf8b72668",
+  "buildId": "gi-i65-b4-0d202a812104-57f234755dc1",
+  "artifactId": 13624916797,
+  "artifactZipSha256": "61bbcddc9b0120131a5317ce7ee045ea579506d023d8929c7e9915d047e02629",
+  "hostedPayloadDigest": "7ab7dd32bcfffb079e36f7602f19f19a4b3811247b20311627d1547fc14925ef",
+  "archiveSha256": "f004f73dac285514949c7f7f26a3551963a442d9fe5ca65212d1ab0a75b50424",
+  "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-rc-41765742748-neoi3u7r.web.app",
+  "workflowRunId": 42499438268,
+  "workflowConclusion": "success",
+  "hostedFilesExact": {
+    "passed": 218,
+    "total": 218
+  },
+  "proofArtifactId": 13624492933,
+  "previousArtifactId": 13624232385,
+  "previousVisualArtifactSuperseded": true,
+  "finalProductGitBlobs": {
+    "styles": "166f9cbf01839f80c833c48e692e6f1c5f16f90f",
+    "cobros": "89f5b0bdfb49a4f822de5d617ee8382ea269d916"
+  },
+  "previousBrowserPreviewQa": {
+    "status": "FOCAL_VISUAL_CHECKS_PASS_BEFORE_LAST_MICRO_REFINEMENT",
+    "observedModules": [
+      "Aseguradoras Resumen",
+      "Aseguradoras Contactos",
+      "Aseguradoras Plataformas",
+      "Aseguradoras Bancos y pagos",
+      "Aseguradoras Actividad",
+      "Aseguradoras Tarifas y conocimiento (except contrast defect corrected in source)",
+      "Cobros notices and table",
+      "Equipo usuarios and permisos",
+      "Cancelaciones table",
+      "Ops kanban",
+      "Leads kanban",
+      "Renovaciones card baseline (defect corrected in source)"
+    ],
+    "lastMicroRecheck": "PENDING_DUE_TO_CONNECTED_CHROME_TIMEOUT_ON_RENOVACIONES_AFTER_DEPLOY",
+    "ownerAcceptance": "PENDING_EXACT_ARTIFACT",
+    "consolePageErrors": "NOT_REVERIFIED_FULL_BROWSER_DEVLOGS"
+  },
+  "nonblockingReviewLimits": {
+    "opsManagementCollaborativeComments": "NO; management sheet has nota/contexto/bitacora and attachments, business lead cards have collaboration thread; feature work not authorized within visual gate.",
+    "opsAttachments": "Source has uploadDocument→updateDurable('gestiones')→immediate S().get readback, but no genuine file upload followed by reload in Preview; persistence not certified.",
+    "performance": "Observed late loading and 489 Cancelaciones rows / 86 Renovaciones cards. No exact latency measurements or optimization certified.",
+    "responsive": "320/390 actual post-micro mobile browser recheck pending",
+    "noHiddenDataChanges": true
+  },
+  "safety": {
+    "oneCanonicalPreviewChannel": true,
+    "backendSourceDigest": "4a4a42029ca2bf4c00096f001e4b8d703addc63e39ad5b78c7e6352f8dde66ca",
+    "functionsDeploys": 0,
+    "liveFunctionDeploys": 0,
+    "rulesDeploys": 0,
+    "authChanges": 0,
+    "realDataWrites": 0,
+    "liveLabStable": true,
+    "customDomainStable": true,
+    "production": "HOLD",
+    "noReimport": true
+  },
+  "nextAction": "B4_006_OWNER_VISUAL_POLISH_RECHECK_ARTIFACT_13624916797_THEN_B4_007_EXACT_LIVE"
+}

@@ -3333,7 +3333,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "B4_006_VISUAL_POLISH_SINGLE_PREVIEW_BUILD_AND_REAL_UI_RECHECK",
+  "nextAction": "B4_006_OWNER_VISUAL_POLISH_RECHECK_ARTIFACT_13624916797_THEN_B4_007_EXACT_LIVE",
   "postproductionExitProgress": {
     "formalPercent": 50,
     "frozenMiniGates": 5,
@@ -22365,6 +22365,28 @@
     "lastClosedGate": "B4-005",
     "ownerApprovedDirection": true,
     "ownerAcceptedExactArtifact": false,
+    "realDataWrites": 0,
+    "liveDeploys": 0,
+    "oneCanonicalPreviewChannel": true
+  },
+  "b4006PolishExactPreviewReadback20261108": {
+    "gate": "I6.5/B4-006",
+    "status": "EXACT_IMMUTABLE_PREVIEW_READBACK_PASS_FOCAL_VISUAL_RECHECK_PENDING",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_006_EXACT_VISUAL_POLISH_PREVIEW_READBACK_20261108.json",
+    "receiptBlobSha": "e6445bf51f2dc2392a3a8a5e56d802505d5f0bdd",
+    "sourceCommit": "0d202a8121043e776a7e1d1ec32678ebf8b72668",
+    "buildId": "gi-i65-b4-0d202a812104-57f234755dc1",
+    "artifactId": 13624916797,
+    "artifactZipSha256": "61bbcddc9b0120131a5317ce7ee045ea579506d023d8929c7e9915d047e02629",
+    "hostedPayloadDigest": "7ab7dd32bcfffb079e36f7602f19f19a4b3811247b20311627d1547fc14925ef",
+    "workflowRunId": 42499438268,
+    "hostedFilesExact": 218,
+    "sourceCssBlobSha": "166f9cbf01839f80c833c48e692e6f1c5f16f90f",
+    "sourceCobrosBlobSha": "89f5b0bdfb49a4f822de5d617ee8382ea269d916",
+    "firstIncompleteGate": "B4-006",
+    "lastClosedGate": "B4-005",
+    "ownerAcceptedExactArtifact": false,
+    "visualMicroRecheckPending": true,
     "realDataWrites": 0,
     "liveDeploys": 0,
     "oneCanonicalPreviewChannel": true
