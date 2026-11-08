@@ -3,7 +3,7 @@
   "gate": "I6.5/B4-004",
   "status": "AUTHORIZED_ONCE",
   "authorized": true,
-  "consumed": false,
+  "consumed": true,
   "authority": "Paula explicitly authorized new single synthetic task LIVE second UID/country final QA",
   "authorizedParentSha": "a3168d36c49d2890ca5b75da47a5a0bc395a43fb",
   "release": {
@@ -33,5 +33,9 @@
   },
   "priorAuthorizationConsumed": true,
   "priorCleanupRun": 42434888888,
-  "priorCleanupArtifactId": 13598548836
+  "priorCleanupArtifactId": 13598548836,
+  "consumedByRunId": 42435991594,
+  "consumptionResult": "CREATE_SERVER_PASS_CLEANUP_PASS_FIRST_RELOAD_HOLD",
+  "partialEvidencePath": "artifacts/orbit360-recovery/release-control/I6_5_B4_004_CRONOGRAMA_FINAL_SECOND_UID_PARTIAL_20261107.json",
+  "noFurtherWritesWithoutNewAuthority": true
 }

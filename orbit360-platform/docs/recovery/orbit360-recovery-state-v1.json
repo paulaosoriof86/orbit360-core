@@ -187,7 +187,7 @@
     "phaseAIterationStatuses": "HISTORICAL_FIELDS_ABOVE_PRESERVED_UNTIL_FORMAL_GATE_EVIDENCE;_NO_NEW_PASS_INFERRED",
     "labDataWriteScope": "ONLY_35_AUTHORIZED_COUNTRY_FIELDS;_NO_AUGUST_REFRESH"
   },
-  "nextAction": "B4_004_FINAL_SINGLE_SYNTHETIC_UID_COUNTRY_SCOPE_LIVE",
+  "nextAction": "B4_004_READONLY_REUSE_HISTORICAL_QA_TASK_SCOPE_OR_DISPOSITION_THEN_HISTORICAL_GUARD_REPAIR",
   "sourceOfTruth": {
     "projectBoundaryPrevalentAddendum": "orbit360-platform/docs/recovery/ADDENDUM_PREVALENTE_CHATGPT_PROJECT_BOUNDARY_20260831.md",
     "mutableState": "orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json",
@@ -884,9 +884,9 @@
   "b4004CronogramaFinalSecondUidAuthorization20261107": {
     "status": "AUTHORIZED_ONCE",
     "authorized": true,
-    "consumed": false,
+    "consumed": true,
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_004_CRONOGRAMA_FINAL_SECOND_UID_AUTH_20261107.json",
-    "receiptBlobSha": "0dd8783b949b24e93937d00a8baf4c57bfd82efc",
+    "receiptBlobSha": "6334eb67a2d05d352fcfabc240a9f92c6b65eb93",
     "authorizedParentSha": "a3168d36c49d2890ca5b75da47a5a0bc395a43fb",
     "release": {
       "sourceSha": "6c45983610ce0d65a5c63bd07659ad968bfe9da3",
@@ -912,6 +912,18 @@
       "backendChanged": false,
       "rulesChanged": false,
       "reimport": false
-    }
+    },
+    "consumedByRunId": 42435991594,
+    "consumptionResult": "CREATE_SERVER_PASS_CLEANUP_PASS_FIRST_RELOAD_HOLD",
+    "partialEvidencePath": "artifacts/orbit360-recovery/release-control/I6_5_B4_004_CRONOGRAMA_FINAL_SECOND_UID_PARTIAL_20261107.json"
+  },
+  "b4004CronogramaFinalSecondUidPartial20261107": {
+    "status": "CREATE_SERVER_PASS_CLEANUP_PASS_FIRST_RELOAD_HOLD",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_004_CRONOGRAMA_FINAL_SECOND_UID_PARTIAL_20261107.json",
+    "receiptBlobSha": "a8f596d2deedddb379d091a0d3a8ea5cae0f8e99",
+    "runId": 42435991594,
+    "artifactId": 13599861171,
+    "syntheticFinalAbsent": true,
+    "scopeCertified": false
   }
 }

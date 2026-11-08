@@ -1,0 +1,55 @@
+{
+  "schema": "GRAVICENTRA_B4_004_FINAL_SECOND_UID_LIVE_PARTIAL_AND_CONSUMPTION_V1",
+  "gate": "I6.5/B4-004",
+  "status": "CREATE_SERVER_PASS_CLEANUP_PASS_FIRST_RELOAD_HOLD",
+  "run": {
+    "id": 42435991594,
+    "attempt": 1,
+    "jobId": 128594816233,
+    "artifactId": 13599861171,
+    "proofSha256": "6b2a0c2cbf4ba5db9056f9f32ac35ec59fb53ace8b07531a587853a3bbdf6780",
+    "artifactZipSha256": "59a2b6b29d55ae89cd82cf50f70f8409b8d39a3eec2ccbce403bbefe7ce637c7"
+  },
+  "release": {
+    "sourceSha": "6c45983610ce0d65a5c63bd07659ad968bfe9da3",
+    "buildId": "gi-i65-b4-6c45983610ce-57f234755dc1",
+    "artifactId": 13592378081,
+    "liveVersionName": "sites/ays-orbit-360-lab/versions/33af816375dd5cb5"
+  },
+  "passed": {
+    "exactLiveBuild": true,
+    "preWriteBrowserClean": true,
+    "createServerReadback": true,
+    "syntheticWrites": 1,
+    "cleanupWrites": 3,
+    "syntheticFinalAbsent": true,
+    "cleanupFinalUiAbsence": true,
+    "finalBrowserClean": true,
+    "requestReceipts": 1
+  },
+  "failed": {
+    "code": "CRONO_QA_FIRST_RELOAD",
+    "firstReloadCertifiedByThisRun": false,
+    "secondUidScopeCertified": false,
+    "countryPartitionCertified": false
+  },
+  "actorEvidence": {
+    "creatorRole": "direccion",
+    "creatorCountry": "GT",
+    "creatorScope": "all",
+    "peerRole": "superadmin",
+    "peerCountry": "GT",
+    "peerScope": "all",
+    "foreignActorCountry": "CO"
+  },
+  "safeguards": {
+    "realBusinessWrites": 0,
+    "authAccountsCreated": 0,
+    "membershipWrites": 0,
+    "productSourceChanged": false,
+    "backendChanged": false,
+    "reimport": false
+  },
+  "decision": "SINGLE_USE_AUTH_CONSUMED_NO_REPEAT; REUSE_PREVIOUS_CORE_RELOAD_PASS_AND_READ_ONLY_SCOPE_EVIDENCE",
+  "nextAction": "B4_004_READONLY_REUSE_HISTORICAL_QA_TASK_SCOPE_OR_DISPOSITION_THEN_HISTORICAL_GUARD_REPAIR"
+}
