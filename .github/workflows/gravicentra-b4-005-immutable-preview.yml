@@ -8,6 +8,7 @@ on:
     paths:
       - .github/workflows/gravicentra-b4-005-immutable-preview.yml
       - orbit360-platform/modules/issuance-endosos-v1201-bridge.js
+      - tools/gravicentra-b4-003-scoped-related-reader.test.cjs
   workflow_dispatch:
 permissions:
   contents: read
