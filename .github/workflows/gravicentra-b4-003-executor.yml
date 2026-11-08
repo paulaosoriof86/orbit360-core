@@ -55,6 +55,7 @@ on:
       - 'artifacts/orbit360-recovery/release-control/I6_5_B4_004_CRONOGRAMA_LIVE_SYNTHETIC_OWNER_AUTH_20261107.json'
       - 'tools/gravicentra-b4-004-cronograma-live-qa.test.mjs'
       - 'tools/gravicentra-b4-004-cronograma-live-qa.mjs'
+      - 'tools/gravicentra-b4-004-cronograma-live-readonly-scope.mjs'
       - 'artifacts/orbit360-recovery/release-control/I6_5_B4_004_LONG_BLOCK_EXECUTION_PROTOCOL_20261107.json'
       - 'artifacts/orbit360-recovery/release-control/I6_5_B4_004_LIVE_PROMOTION_BINDING_20261107.json'
       - 'artifacts/orbit360-recovery/release-control/I6_5_B4_004_POLICY_CAPTURE_LIVE_SYNTHETIC_OWNER_AUTH_20261107.json'
@@ -4744,6 +4745,91 @@ jobs:
         with:
           name: gravicentra-b4-004-cronograma-live-${{ github.run_id }}
           path: ${{ runner.temp }}/b4-004-cronograma-live-qa.json
+          if-no-files-found: warn
+          retention-days: 30
+
+  b4-004-cronograma-live-readonly-scope:
+    if: "github.event_name == 'push' && (github.event.head_commit.message == 'test(b4-004): cronograma readonly scope diagnostic' || startsWith(github.event.head_commit.message, format('{0}{1}', 'test(b4-004): cronograma readonly scope diagnostic', fromJSON('\"\\n\"'))))"
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    permissions:
+      contents: read
+      actions: read
+    env:
+      PROJECT_ID: ays-orbit-360-lab
+      TENANT_HINT: alianzas-soluciones
+      CONTROL: artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json
+      PARTIAL_RECEIPT: artifacts/orbit360-recovery/release-control/I6_5_B4_004_CRONOGRAMA_LIVE_SYNTHETIC_EXECUTION_PARTIAL_20261107.json
+      SOURCE_SHA: 6c45983610ce0d65a5c63bd07659ad968bfe9da3
+      BUILD_ID: gi-i65-b4-6c45983610ce-57f234755dc1
+      ARTIFACT_ID: '13592378081'
+      LIVE_VERSION: sites/ays-orbit-360-lab/versions/33af816375dd5cb5
+      B4_LIVE_URL: https://ays-orbit-360-lab.web.app
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Fail-closed read-only cursor and release binding
+        run: |
+          set -euo pipefail
+          node --check tools/gravicentra-b4-004-cronograma-live-readonly-scope.mjs
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const cp=JSON.parse(fs.readFileSync(process.env.CONTROL,'utf8'));
+          const p=JSON.parse(fs.readFileSync(process.env.PARTIAL_RECEIPT,'utf8'));
+          const a=cp.b4004CronogramaLiveSyntheticAuthorization20261107;
+          const c=cp.b4004PolicyCaptureFrontendSuccessor20261107;
+          const need=(v,c)=>{if(!v)throw Error(c);};
+          need(cp.nextAction==='B4_004_CRONOGRAMA_READONLY_SCOPE_403_DIAGNOSTIC_THEN_PERFORMANCE_AND_GATE_SEAL','B4004_READONLY_CURSOR');
+          need(a?.consumed===true&&Number(a.consumedByRunId)===42431729157,'B4004_SYNTHETIC_AUTH_MUST_BE_CONSUMED');
+          need(p?.status==='SYNTHETIC_EXECUTION_CONSUMED_CLEANUP_VERIFIED_SCOPE_HOLD'&&p?.passed?.syntheticFinalAbsent===true,'B4004_PARTIAL_RECEIPT');
+          need(c?.cronogramaLiveAcceptance?.status==='SYNTHETIC_CORE_LIVE_PASS_SCOPE_HOLD','B4004_CRONO_PARTIAL_STATE');
+          need(c.activeSourceSha===process.env.SOURCE_SHA&&c.activeBuildId===process.env.BUILD_ID&&String(c.activeImmutableArtifactId)===String(process.env.ARTIFACT_ID),'B4004_RELEASE_BINDING');
+          console.log('B4_004_CRONOGRAMA_READONLY_CURSOR=PASS');
+          NODE
+      - name: Prepare existing service account and browser dependencies
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json,os,pathlib
+          dest=pathlib.Path(os.environ['RUNNER_TEMP'])/'b4004-crono-readonly-service-account.json'
+          chosen=None
+          for key in ('SA_ORBIT360_LAB','SA_ORBIT_360_LAB','SA_DEFAULT'):
+              try:item=json.loads(os.environ.get(key,''))
+              except (ValueError,TypeError):continue
+              if item.get('type')=='service_account' and item.get('project_id')=='ays-orbit-360-lab' and item.get('private_key'):
+                  chosen=item;break
+          if not chosen:raise SystemExit('B4_004_CRONO_READONLY_SERVICE_ACCOUNT_MISSING')
+          dest.write_text(json.dumps(chosen),encoding='utf8');dest.chmod(0o600)
+          with open(os.environ['GITHUB_ENV'],'a',encoding='utf8') as h:h.write('GOOGLE_APPLICATION_CREDENTIALS='+str(dest)+'\n')
+          PY
+          npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund firebase-admin@13.4.0 playwright@1.55.0 >/dev/null
+          npx playwright install --with-deps chromium >/dev/null
+      - name: Authenticated Cronograma LIVE read-only scope and performance diagnostic
+        env:
+          B4_004_CRONOGRAMA_READONLY_OUT: ${{ runner.temp }}/b4-004-cronograma-readonly-scope.json
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-b4-004-cronograma-live-readonly-scope.mjs
+          node - <<'NODE'
+          const x=require(process.env.B4_004_CRONOGRAMA_READONLY_OUT),a=x.assertions||{};
+          if(!['EXECUTED','EXECUTED_WITH_HOLD'].includes(x.diagnosticStatus)||a.exactLiveBuild!==true||a.writeAttemptZero!==true||a.noMutations!==true||x.writeAttemptCount!==0||x.authAccountsCreated!==0||x.membershipWrites!==0||x.dataWrites!==0||x.productSourceChanged!==false||x.backendChanged!==false)process.exit(1);
+          console.log('B4_004_CRONOGRAMA_READONLY_DIAGNOSTIC=EXECUTED_ZERO_WRITES');
+          NODE
+      - name: Preserve Cronograma read-only diagnostic artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gravicentra-b4-004-cronograma-readonly-${{ github.run_id }}
+          path: ${{ runner.temp }}/b4-004-cronograma-readonly-scope.json
           if-no-files-found: warn
           retention-days: 30
 
