@@ -4956,3 +4956,176 @@ jobs:
           git fetch origin "$GITHUB_REF_NAME"
           test "$(git rev-parse "origin/$GITHUB_REF_NAME")" = "$GITHUB_SHA"
           git push origin "HEAD:$GITHUB_REF_NAME"
+
+
+  b4-004-cronograma-country-preview:
+    if: "github.event_name == 'push' && github.event.head_commit.message == 'build(b4-004): cronograma country exact preview'"
+    runs-on: ubuntu-24.04
+    timeout-minutes: 50
+    permissions:
+      contents: read
+      actions: write
+    env:
+      PROJECT_ID: ays-orbit-360-lab
+      HOSTING_SITE: ays-orbit-360-lab
+      TENANT_HINT: alianzas-soluciones
+      SOURCE_SHA: f8fa00e4e2e6627cee66c8c521866874e39bc8da
+      BUILD_PREFIX: gi-i65-b4
+      RELEASE_GATE: I6.5-B4-004
+      ENVIRONMENT_REF: firebase-hosting-preview-i6-5-b4-004
+      CHANNEL: gi-i65-b4-rc-41765742748
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Source and approved predecessor fail-closed boundary
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor "$SOURCE_SHA" "$GITHUB_SHA"
+          test -z "$(git diff --name-only "$SOURCE_SHA" "$GITHUB_SHA" -- orbit360-platform ':!orbit360-platform/docs/**' functions)"
+          node --check orbit360-platform/modules/cronograma.js
+          node --check tools/gravicentra-b4-004-cronograma-country-preview-live-qa.mjs
+          node --test tools/gravicentra-b4-003-cronograma-durable-task.test.cjs
+          node - <<'NODE'
+          const fs=require('fs'),c=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json','utf8'));
+          const old=c.b4003ActiveCertificationCursor20261106?.formalLiveAcceptance;
+          if(old?.status!=='LATEST_APPROVED_VERSION_LIVE_PASS'||old.sourceSha!=='857f1222f360a42a06e012810a1c01bce155a26f'||old.artifactId!==13549460562||c.b4004CronogramaCountryViewSourceFix20261107?.requiresNewArtifact!==true)throw Error('B4004_SOURCE_OR_ACCEPTANCE_FROZEN_BOUNDARY');
+          console.log('B4_004_COUNTRY_SOURCE_CONTRACT_PASS');
+          NODE
+      - name: Select existing Firebase authority and resolve public SDK config
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json,os,pathlib
+          dest=pathlib.Path(os.environ['RUNNER_TEMP'])/'b4004-country-service-account.json'
+          for k in ('SA_ORBIT360_LAB','SA_ORBIT_360_LAB','SA_DEFAULT'):
+            try:d=json.loads(os.environ.get(k,''))
+            except (ValueError,TypeError):continue
+            if d.get('type')=='service_account' and d.get('project_id')==os.environ['PROJECT_ID'] and d.get('private_key'):
+              dest.write_text(json.dumps(d));dest.chmod(0o600);break
+          else:raise SystemExit('B4_004_EXISTING_FIREBASE_AUTHORITY_UNAVAILABLE')
+          with open(os.environ['GITHUB_ENV'],'a') as f:f.write('GOOGLE_APPLICATION_CREDENTIALS='+str(dest)+'\n')
+          PY
+          npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund firebase-admin@13.4.0 playwright@1.55.0 >/dev/null
+          FROOT="$RUNNER_TEMP/gi-b4004-firebase"
+          npm install --prefix "$FROOT" --ignore-scripts --no-audit --no-fund firebase-tools@14.10.1 >/dev/null
+          node tools/gravicentra-firebase-tools-empty-extensions-workaround-v1.mjs "$FROOT"
+          CLI="$FROOT/node_modules/firebase-tools/lib/bin/firebase.js"
+          echo "FIREBASE_CLI_BIN=$CLI" >> "$GITHUB_ENV"
+          node "$CLI" apps:list WEB --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/b4004-apps.json"
+          export APP_LIST="$RUNNER_TEMP/b4004-apps.json"
+          APP_ID=$(python3 - <<'PY'
+          import json,os
+          d=json.load(open(os.environ['APP_LIST']));rows=d.get('result') or []
+          web=[x for x in rows if str(x.get('platform','')).upper() in ('WEB','PLATFORM_WEB','')]
+          if len(web)!=1:raise SystemExit('B4_004_WEB_APP_CARDINALITY')
+          print(web[0]['appId'])
+          PY
+          )
+          node "$CLI" apps:sdkconfig WEB "$APP_ID" --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/b4004-public-config.json"
+          npx playwright install chromium >/dev/null
+      - name: One immutable build from accepted source
+        id: build
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-i6-5-b1-branding-snapshot.mjs "$RUNNER_TEMP/b4004-branding.json"
+          export TENANT_BRANDING_SNAPSHOT_FILE="$RUNNER_TEMP/b4004-branding.json"
+          node tools/gravicentra-i6-1-preview-package.mjs . "$RUNNER_TEMP/b4004-country-package" "$RUNNER_TEMP/b4004-public-config.json" > "$RUNNER_TEMP/b4004-package-result.json"
+          export OUTPUT="$RUNNER_TEMP/b4004-country-package/evidence/package-output.json"
+          python3 - <<'PY'
+          import json,os
+          d=json.load(open(os.environ['OUTPUT']))
+          if d['hostedFileCount']<200:raise SystemExit('B4004_SITE_FILE_COUNT_TOO_LOW')
+          with open(os.environ['GITHUB_OUTPUT'],'a') as f:
+            for k,v in [('build_id',d['buildId']),('payload_digest',d['hostedPayloadDigest']),('product_files',d['hostedFileCount'])]:f.write(k+'='+str(v)+'\n')
+          print('B4004_IMMUTABLE_BUILD',d['buildId'],d['hostedFileCount'],d['hostedPayloadDigest'])
+          PY
+      - name: Deploy identical built site to existing isolated Preview channel
+        id: deploy
+        run: |
+          set -euo pipefail
+          cd "$RUNNER_TEMP/b4004-country-package/bundle"
+          node "$FIREBASE_CLI_BIN" hosting:channel:deploy "$CHANNEL" --config firebase.json --project "$PROJECT_ID" --expires 7d --non-interactive --json > "$RUNNER_TEMP/b4004-country-deploy.json"
+          export DEPLOY_JSON="$RUNNER_TEMP/b4004-country-deploy.json"
+          PREVIEW_URL=$(python3 - <<'PY'
+          import re,os
+          data=open(os.environ['DEPLOY_JSON']).read()
+          urls=[v.rstrip('/') for v in re.findall(r'https://[A-Za-z0-9._-]+\.web\.app',data) if v.rstrip('/')!='https://ays-orbit-360-lab.web.app']
+          if not urls:raise SystemExit('B4004_PREVIEW_URL_NOT_FOUND')
+          u=urls[-1]
+          if not u.startswith('https://ays-orbit-360-lab--gi-i65-b4-rc-41765742748-'):raise SystemExit('B4004_PREVIEW_WRONG_CHANNEL')
+          print(u)
+          PY
+          )
+          echo "preview_url=$PREVIEW_URL" >> "$GITHUB_OUTPUT"
+          echo "B4004_PREVIEW_URL=$PREVIEW_URL" >> "$GITHUB_ENV"
+      - name: Byte-by-byte exact Preview readback
+        env:
+          BUILD_ID: ${{ steps.build.outputs.build_id }}
+          PREVIEW_URL: ${{ steps.deploy.outputs.preview_url }}
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import concurrent.futures,hashlib,json,os,time,urllib.request,urllib.parse
+          manifest=os.path.join(os.environ['RUNNER_TEMP'],'b4004-country-package/evidence/site-manifest.sha256')
+          rows=[tuple(x.split('  ',1)) for x in open(manifest) if x.strip()]
+          base=os.environ['PREVIEW_URL'].rstrip('/')
+          def check(item):
+            digest,rel=item
+            req=urllib.request.Request(base+'/'+urllib.parse.quote(rel,safe='/')+'?b4004='+str(time.time_ns()),headers={'Accept-Encoding':'identity','Cache-Control':'no-cache'})
+            with urllib.request.urlopen(req,timeout=30) as res:data=res.read()
+            return rel if hashlib.sha256(data).hexdigest()!=digest else None
+          for retry in range(3):
+            with concurrent.futures.ThreadPoolExecutor(max_workers=12) as pool:
+              bad=[r for r in pool.map(check,rows) if r is not None]
+            if not bad:break
+            if retry==2:raise SystemExit('B4004_PREVIEW_HASH_MISMATCH:'+str(bad[:6]))
+            time.sleep(4)
+          with urllib.request.urlopen(base+'/__recovery__/build.json?b4004='+str(time.time_ns()),timeout=20) as f:marker=json.load(f)
+          if marker.get('sourceSha')!=os.environ['SOURCE_SHA'] or marker.get('buildId')!=os.environ['BUILD_ID']:raise SystemExit('B4004_PREVIEW_BUILD_IDENTITY_MISMATCH')
+          result={'status':'EXACT_BYTES_PASS','sourceSha':marker['sourceSha'],'buildId':marker['buildId'],'url':base,'files':len(rows),'hostedPayloadDigest':hashlib.sha256(open(manifest,'rb').read()).hexdigest(),'liveTouched':False}
+          open(os.path.join(os.environ['RUNNER_TEMP'],'b4004-preview-bytes.json'),'w').write(json.dumps(result,indent=2)+'\n')
+          print('B4_004_PREVIEW_BYTE_READBACK_PASS files='+str(len(rows)))
+          PY
+      - name: Upload single immutable package and readback
+        id: upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: gravicentra-b4-004-cronograma-country-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/b4004-country-package
+            ${{ runner.temp }}/b4004-preview-bytes.json
+            ${{ runner.temp }}/b4004-country-deploy.json
+          if-no-files-found: error
+          retention-days: 30
+      - name: Authenticated focused Cronograma country Preview QA, no writes
+        env:
+          B4_QA_TARGET_URL: ${{ steps.deploy.outputs.preview_url }}
+          B4_QA_STAGE: preview
+          BUILD_ID: ${{ steps.build.outputs.build_id }}
+          ARTIFACT_ID: ${{ steps.upload.outputs.artifact-id }}
+          B4_004_CRONOGRAMA_COUNTRY_QA_OUT: ${{ runner.temp }}/b4004-cronograma-country-preview-qa.json
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-b4-004-cronograma-country-preview-live-qa.mjs
+          node - <<'NODE'
+          const fs=require('fs'),p=JSON.parse(fs.readFileSync(process.env.B4_004_CRONOGRAMA_COUNTRY_QA_OUT,'utf8'));
+          if(p.diagnosticStatus!=='FOCAL_SCOPE_PASS'||p.writeAttemptCount!==0||p.scoped403.length!==0||p.pageErrors.length!==0||p.assertions?.crossCountryTaskUiAbsent!==true||p.assertions?.peerTaskUiVisible!==true)throw Error('B4004_COUNTRY_PREVIEW_QA_NOT_PASS');
+          console.log('B4_004_CRONOGRAMA_COUNTRY_PREVIEW_FUNCTIONAL_PASS');
+          NODE
+      - name: Upload Preview functional evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gravicentra-b4-004-cronograma-preview-qa-${{ github.run_id }}
+          path: ${{ runner.temp }}/b4004-cronograma-country-preview-qa.json
+          if-no-files-found: warn
+          retention-days: 30
