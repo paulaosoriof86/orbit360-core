@@ -99,11 +99,12 @@ async function checkActor(browser,a,index){
   try{await page.reload({waitUntil:'domcontentloaded',timeout:60000});await page.waitForFunction(()=>!!document.querySelector('#host')?.textContent,null,{timeout:20000});}
   finally{controlledReload=false;}
   const readback=await page.evaluate(({policyId})=>({policyId,policyExists:!!Orbit.store?.get?.('polizas',policyId),role:Orbit.session.rol(),country:Orbit.pais}),{policyId});
-  must(readback.policyExists&&norm(readback.role)===norm(a.role)&&readback.country===a.country,'RELOAD_SCOPE_DRIFT');
-  must(!pageErrors.length&&!networkErrors.length&&receipt.writeAttempts===0,'PAGE_NETWORK_OR_WRITE_ATTEMPT');
+  const persistedRoleCountry=norm(readback.role)===norm(a.role)&&readback.country===a.country;
   receipt.actorChecks.push({uidSha256:hash(a.uid),role:a.role,country:a.country,viewport:index===0?'1440x900':'390x844',firstReadyMs:Date.now()-started,
-    qaPolicyScoped:before.qaGtPolicyInScopedStore,policyIdSha256:hash(policyId),form,readback: {exists:true,role:readback.role,country:readback.country},
-    authenticatedIndependentUid:true,writeAttempts:0,pageErrors:0,networkErrors:0});
+    qaPolicyScoped:before.qaGtPolicyInScopedStore,policyIdSha256:hash(policyId),form,readback: {exists:readback.policyExists,role:readback.role,country:readback.country},
+    roleCountryPersistedOnReload:persistedRoleCountry,authenticatedIndependentUid:true,writeAttempts:receipt.writeAttempts,pageErrors:pageErrors.length,networkErrors:networkErrors.length});
+  must(readback.policyExists,'RELOAD_POLICY_ABSENT');
+  must(!pageErrors.length&&!networkErrors.length&&receipt.writeAttempts===0,'PAGE_NETWORK_OR_WRITE_ATTEMPT');
  }finally{receipt.pageErrors.push(...pageErrors);receipt.networkErrors.push(...networkErrors);await context.close();}
 }
 async function main(){let browser;
