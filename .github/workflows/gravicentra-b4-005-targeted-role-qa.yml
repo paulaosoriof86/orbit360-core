@@ -1,0 +1,68 @@
+name: Gravicentra B4-005 Existing Preview Two-UID Readonly QA
+
+on:
+  push:
+    branches:
+      - recovery/fase-a-clean-20260831
+    paths:
+      - '.github/workflows/gravicentra-b4-005-targeted-role-qa.yml'
+      - 'tools/gravicentra-b4-005-targeted-role-qa.mjs'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: gravicentra-b4-005-distinct-role-readonly-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  distinct-existing-uid-preview-readonly:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      B4005_ROLE_QA_OUT: ${{ github.workspace }}/b4005-distinct-role-preview.json
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify immutable candidate and no changed product owner
+        run: |
+          set -euo pipefail
+          node --check tools/gravicentra-b4-005-targeted-role-qa.mjs
+          test "$(git hash-object orbit360-platform/modules/issuance-endosos-v1201-bridge.js)" = "$(git rev-parse 6c2266311b156b4a5d19be456bcef197a43b888e:orbit360-platform/modules/issuance-endosos-v1201-bridge.js)"
+          test "$(git hash-object orbit360-platform/core/endorsement-workflow-v1201.js)" = "$(git rev-parse 6c2266311b156b4a5d19be456bcef197a43b888e:orbit360-platform/core/endorsement-workflow-v1201.js)"
+      - name: Prepare existing Firebase authority and browser
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json,os,pathlib
+          dest=pathlib.Path(os.environ['RUNNER_TEMP'])/'b4005-readonly-existing-sa.json'
+          for key in ('SA_ORBIT360_LAB','SA_ORBIT_360_LAB','SA_DEFAULT'):
+              try:x=json.loads(os.environ.get(key,''))
+              except (ValueError,TypeError):continue
+              if x.get('type')=='service_account' and x.get('project_id')=='ays-orbit-360-lab' and x.get('private_key'):
+                  dest.write_text(json.dumps(x));dest.chmod(0o600)
+                  with open(os.environ['GITHUB_ENV'],'a') as h:h.write('GOOGLE_APPLICATION_CREDENTIALS='+str(dest)+'\n')
+                  break
+          else:raise SystemExit('B4005_NO_EXISTING_AUTHORITY')
+          PY
+          npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund firebase-admin@13.4.0 playwright@1.55.0 >/dev/null
+          npx playwright install chromium >/dev/null
+      - name: Two independent existing UIDs and exact Firestore field readback
+        run: node tools/gravicentra-b4-005-targeted-role-qa.mjs
+      - name: Retain read-only evidence even on HOLD
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gravicentra-b4005-two-uid-preview-${{ github.run_id }}
+          path: ${{ env.B4005_ROLE_QA_OUT }}
+          if-no-files-found: error
+          retention-days: 30
