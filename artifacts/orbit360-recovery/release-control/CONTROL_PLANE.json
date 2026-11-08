@@ -22487,7 +22487,7 @@
     "gate": "I6.5/B4-006",
     "status": "CAUSAL_CSS_FIX_SOURCE_DECLARED_EXACT_PREVIEW_PENDING",
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_006_KPI_320_MOBILE_CARD_CLIPPING_CAUSAL_FIX_20261108.json",
-    "receiptBlobSha": "64e758c4a90fe38e4988197330181f89fbf0ea0b",
+    "receiptBlobSha": "4ef5d53faf0b45ded25790742a16d2bf6bd2d208",
     "sourcePredecessorSha": "7c3fdd00c74334a05f2a6bb01a7ba6e301d88d66",
     "predecessorHead": "4177705623c361191b7184db5cd73331f93d6712",
     "previousArtifactId": 13634768362,

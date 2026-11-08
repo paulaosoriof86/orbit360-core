@@ -62,5 +62,9 @@
     "Authenticated Preview readback at 320/390/1024/1440",
     "Complete remaining B4-006 UAT"
   ],
-  "nextAction": "B4_006_BUILD_EXACT_PREVIEW_FOR_CAUSAL_320PX_KPI_FIX_THEN_FOCAL_RESPONSIVE_RECHECK"
+  "nextAction": "B4_006_BUILD_EXACT_PREVIEW_FOR_CAUSAL_320PX_KPI_FIX_THEN_FOCAL_RESPONSIVE_RECHECK",
+  "previousCssBlobSha": "b00fbfc7a99d7c86aa9b138cc2ee838b57f6215a",
+  "newCssBlobSha": "cbfc1256d984e33c1eb436025b3708169ab43e0a",
+  "previousQaBlobSha": "3f699189cd464ca03a475600baae21b79e2a5bba",
+  "newQaBlobSha": "94775402f9fa5cb5cf3d6b0d8c18639d25cc527b"
 }
