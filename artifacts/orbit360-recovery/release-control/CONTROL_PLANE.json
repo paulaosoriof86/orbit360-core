@@ -21864,8 +21864,8 @@
     "authorized": true,
     "consumed": false,
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_004_CRONOGRAMA_LIVE_SYNTHETIC_OWNER_AUTH_20261107.json",
-    "receiptBlobSha": "7160d3996b0d6b7631c5fcc50042e7e97d1c46eb",
-    "authorizedParentSha": "e250cf57b8a565b1cb01de5070a926b70b86342b",
+    "receiptBlobSha": "5ffb38cd7ac5380c977a184bd724039263419040",
+    "authorizedParentSha": "2227a5af7c2338daa5397644638e220e2756e50f",
     "release": {
       "sourceSha": "6c45983610ce0d65a5c63bd07659ad968bfe9da3",
       "buildId": "gi-i65-b4-6c45983610ce-57f234755dc1",

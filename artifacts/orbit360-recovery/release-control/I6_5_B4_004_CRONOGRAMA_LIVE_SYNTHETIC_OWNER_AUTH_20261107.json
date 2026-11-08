@@ -5,7 +5,7 @@
   "authority": "Paula explicit B4-004 synthetic LIVE authorization frozen in long-block protocol",
   "authorized": true,
   "consumed": false,
-  "authorizedParentSha": "e250cf57b8a565b1cb01de5070a926b70b86342b",
+  "authorizedParentSha": "2227a5af7c2338daa5397644638e220e2756e50f",
   "release": {
     "sourceSha": "6c45983610ce0d65a5c63bd07659ad968bfe9da3",
     "buildId": "gi-i65-b4-6c45983610ce-57f234755dc1",
@@ -35,5 +35,15 @@
     "path": "artifacts/orbit360-recovery/release-control/I6_5_B4_003_CRONOGRAMA_DIRECCION_AUTH_E2E_20261029.md",
     "blobSha": "8ed63013a10a25d12c165429faa2674000a04e04"
   },
-  "singleUse": true
+  "singleUse": true,
+  "priorAttempts": [
+    {
+      "runId": 42427891519,
+      "jobId": 128570019324,
+      "result": "FAIL_LOCAL_SYNTAX_BEFORE_BROWSER_OR_WRITES",
+      "syntheticWrites": 0,
+      "businessWrites": 0,
+      "authorizationConsumed": false
+    }
+  ]
 }

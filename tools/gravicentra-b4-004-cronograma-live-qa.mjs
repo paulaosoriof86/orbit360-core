@@ -108,7 +108,7 @@ async function readVisibility(browser,actor,country,label){
   return state;
  }finally{await ctx.close();}
 }
-async function run(){
+async function execute(){
  let browser,ctx,page,actors,calls=[],adapterSnapshot=null;
  try{
   const build=await (await fetch(target+'/__recovery__/build.json',{cache:'no-store'})).json();
@@ -167,4 +167,4 @@ async function run(){
  }
  need(proof.status==='PASS','FOCAL_PROOF_FAILED');
 }
-if(process.argv[1]&&fileURLToPath(import.meta.url)===process.argv[1])run().catch(e=>{console.error(e&&e.stack||e);process.exit(1);});
+if(process.argv[1]&&fileURLToPath(import.meta.url)===process.argv[1])execute().catch(e=>{console.error(e&&e.stack||e);process.exit(1);});
