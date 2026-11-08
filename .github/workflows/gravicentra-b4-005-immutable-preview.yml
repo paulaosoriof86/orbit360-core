@@ -14,6 +14,8 @@ on:
       - orbit360-platform/modules/aseguradoras.js
       - orbit360-platform/core/ciclo.js
       - tools/gravicentra-b4-006-management-collaboration.test.cjs
+      - tools/gravicentra-b4-003-formal-live-closeout-guard.mjs
+      - tools/gravicentra-b4-004-formal-gate-guard.mjs
       - orbit360-platform/modules/cobros.js
       - orbit360-platform/modules/siniestros.js
       - orbit360-platform/styles/infra.css
