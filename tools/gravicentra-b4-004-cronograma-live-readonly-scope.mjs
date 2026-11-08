@@ -49,7 +49,7 @@ async function actorInventory(){
    let ctx=null,denied='';
    try{ctx=resolve({auth:{uid:u.uid,token:{}},member:m,config:proof._accessConfig,tenantId,activeRole:role,collection:'tareas',country});}
    catch(e){denied=clean(e&&e.code||e&&e.message||e);}
-   out.push({uid:u.uid,email:clean(u.email),role,country,member,scope:ctx&&ctx.scope||'none',advisorId:ctx&&ctx.advisorId||clean(m.advisorId||m.asesorId),denied});
+   out.push({uid:u.uid,email:clean(u.email),role,country,member:m,scope:ctx&&ctx.scope||'none',advisorId:ctx&&ctx.advisorId||clean(m.advisorId||m.asesorId),denied});
   }
  }
  return out;
