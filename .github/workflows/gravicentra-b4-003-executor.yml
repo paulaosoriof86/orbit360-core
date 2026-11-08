@@ -5089,7 +5089,7 @@ jobs:
           python3 - <<'PY'
           import concurrent.futures,hashlib,json,os,time,urllib.request,urllib.parse
           manifest=os.path.join(os.environ['RUNNER_TEMP'],'b4004-country-package/evidence/site-manifest.sha256')
-          rows=[tuple(x.split('  ',1)) for x in open(manifest) if x.strip()]
+          rows=[tuple(x.rstrip('\\r\\n').split('  ',1)) for x in open(manifest) if x.strip()]
           base=os.environ['PREVIEW_URL'].rstrip('/')
           def check(item):
             digest,rel=item
@@ -5109,6 +5109,7 @@ jobs:
           print('B4_004_PREVIEW_BYTE_READBACK_PASS files='+str(len(rows)))
           PY
       - name: Upload single immutable package and readback
+        if: always() && steps.build.conclusion == 'success'
         id: upload
         uses: actions/upload-artifact@v4
         with:
