@@ -1,0 +1,72 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_005_ENDOSOS_SERVER_SEMANTIC_WRITER_CAUSAL_FIX_V1",
+  "gate": "I6.5/B4-005",
+  "status": "CAUSAL_SOURCE_FIX_12_OF_12_ISOLATED_CONTRACT_PASS_REAL_PREVIEW_WRITES_PENDING",
+  "recordedAtUtc": "2026-11-08T05:02:44Z",
+  "operationalDateGuatemala": "2026-11-07",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "predecessorSourceSha": "ef5baec55057a88720b98ff67fcd138a8f89a5f3",
+  "previousImmutablePreview": {
+    "runId": 42448115081,
+    "buildId": "gi-i65-b4-ef5baec55057-57f234755dc1",
+    "artifactId": 13604069254,
+    "hostedPayloadDigest": "4f10801400d9435e5a7f23091545d828fe64e4b023497b8d57b2de246d5bd05b",
+    "filesReadback": 218,
+    "previewTransportPass": true,
+    "functionalEndososWritePass": false
+  },
+  "authenticatedFailure": {
+    "surface": "Chrome connected; existing LAB isolated Hosting Preview; actor Paula Osorio, active role Operativo",
+    "country": "Todos los paises; policy country GT",
+    "syntheticPolicyId": "b4003qa_policy_expired_renew_38102224750",
+    "operation": "Solicitar endoso > Inclusion/exclusion de beneficiarios > Crear gestion",
+    "visibleResult": "No se creo: solicitud_endoso_no_confirmada",
+    "sourceCorrelatedRootCause": "Endosos v1.201 called general batchDurable with gestiones; general backend excludes gestiones and Ops semantic backend stripped endorsement fields",
+    "policyApplicationCertified": false,
+    "noRealBusinessPolicyMutated": true
+  },
+  "rootFix": {
+    "semanticOwner": "functions/product-ops-leads-domain.js; OpsLeadsCommandPreview and subsequent LIVE equivalent",
+    "requestAndApproval": "gestiones through insertDurable/updateDurable with Ops canonical server readback and document/reference/stage validation",
+    "policyApplication": "atomic product-operational policy/vehicle/optional activity batch, followed by guarded Ops closeout; recovery via ultimoEndosoId and policy historial gestionId",
+    "financialApplication": "existing policy-receipts engine preserved with endosoFinancieroAplicadoId idempotency",
+    "previewSafety": "isolated Hosting Preview and QA-only synthetic policy writes; no real production data in this source patch",
+    "notClaimed": ["single ACID transaction across Ops and policy", "LIVE execution", "certificates/annexes first-class lifecycle", "formal B4-005 PASS"]
+  },
+  "sourceAndTests": [
+    {"path": "functions/product-ops-leads-domain.js", "gitBlobSha": "e024bf764cbbf49d74d322cb1050463b88da868b"},
+    {"path": "orbit360-platform/core/endorsement-workflow-v1201.js", "gitBlobSha": "99b298e121546f8974970a6c5e1bb305702fdb8b"},
+    {"path": "orbit360-platform/data/store-firestore-product-operational-p0.js", "gitBlobSha": "92cd41bae61c2d69f37c1acd1b5927a76261d0fb"},
+    {"path": "tools/gravicentra-b4-005-endosos-durable-contract.mjs", "gitBlobSha": "c90b3abcd6b2a487de4855ff149baaa3aa23a2a1"}
+  ],
+  "isolatedTests": {
+    "command": "node tools/gravicentra-b4-005-endosos-durable-contract.mjs",
+    "passedGroups": 12,
+    "totalGroups": 12,
+    "result": "PASS_IN_MEMORY_NO_FIREBASE",
+    "serverRuntimeExecuted": false,
+    "authenticatedWriteConfirmed": false
+  },
+  "ownerScopePreserved": {
+    "insurerKnowledgeAndTariffs": "DEFERRED_POSTPRODUCTION",
+    "quoteComparative": "DEFERRED_POSTPRODUCTION",
+    "cotcomp": "DEFERRED_POSTPRODUCTION",
+    "driveLinkage": "NON_BLOCKING_OPTIONAL",
+    "operationalInsurerDirectory": "RETAINED",
+    "certificatesAnnexes": "CURRENT_APPROVED_SCOPE_LINEAGE_UNRESOLVED_NOT_FALSE_PASS"
+  },
+  "releaseSafety": {
+    "b4003ClosedPreserved": true,
+    "b4004ClosedPreserved": true,
+    "liveFrontendUnchanged": true,
+    "liveBackendUnchanged": true,
+    "functionsDeployedBySourceFix": 0,
+    "businessWritesBySourceFix": 0,
+    "firebaseRulesChanged": false,
+    "sourceChangedRequiresFreshBuild": true,
+    "formalB4005Pass": false,
+    "formalI6PercentPreserved": 50
+  },
+  "nextAction": "B4_005_NEW_EXACT_PREVIEW_BUILD_ONE_OPS_PREVIEW_BACKEND_ONLY_AUTHENTICATED_SYNTHETIC_REQUEST_APPROVAL_APPLY_RELOAD_CERTIFICATION"
+}

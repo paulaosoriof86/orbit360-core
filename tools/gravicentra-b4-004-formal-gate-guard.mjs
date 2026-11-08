@@ -14,6 +14,7 @@ const STATE='orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json';
 const RECEIPT=ROOT+'I6_5_B4_004_FINAL_GATE_SEAL_20261107.json';
 const OWNER=ROOT+'OWNER_DECISION_FREEZE_AND_RECONCILIATION_PLAN_20261107.json';
 const B4005_RECEIPT=ROOT+'I6_5_B4_005_ENDOSOS_DURABLE_SOURCE_AND_ISOLATED_QA_20261107.json';
+const B4005_CAUSAL_RECEIPT=ROOT+'I6_5_B4_005_ENDOSOS_SERVER_SEMANTIC_WRITER_CAUSAL_FIX_20261107.json';
 const SOURCE='f8fa00e4e2e6627cee66c8c521866874e39bc8da';
 const BUILD='gi-i65-b4-f8fa00e4e2e6-57f234755dc1';
 const ARTIFACT=13600357541;
@@ -50,6 +51,50 @@ function releaseMatches(x){
 // acceptance. Permit precisely its signed four-file delta while still
 // rejecting any unrelated source mutation, backend, Rules or false PASS.
 export function verifyDeclaredB4005SourceSuccessor(cp=read(CP),state=read(STATE)){
+  const corrective=cp.b4005EndososServerSemanticWriterCausalFix20261107;
+  if(corrective){
+    const mirror=state.b4005EndososServerSemanticWriterCausalFix20261107;
+    need(same(corrective,mirror)&&corrective.gate==='I6.5/B4-005'&&
+      corrective.status==='CAUSAL_SOURCE_FIX_12_OF_12_ISOLATED_CONTRACT_PASS_REAL_PREVIEW_WRITES_PENDING'&&
+      corrective.receiptPath===B4005_CAUSAL_RECEIPT&&corrective.predecessorSourceSha==='ef5baec55057a88720b98ff67fcd138a8f89a5f3'&&
+      corrective.isolatedAssertionGroupsPassed===12&&corrective.formalB4005Pass===false&&
+      corrective.firstIncompleteGate==='B4-005'&&corrective.realDataWrites===0,
+      'B4005_CAUSAL_POINTER_INVALID');
+    const bytes=fs.readFileSync(B4005_CAUSAL_RECEIPT),receipt=JSON.parse(bytes);
+    need(blob(bytes)===corrective.receiptBlobSha&&sha256(bytes)===corrective.receiptSha256&&
+      git('rev-parse','HEAD:'+B4005_CAUSAL_RECEIPT)===corrective.receiptBlobSha,
+      'B4005_CAUSAL_RECEIPT_DRIFT');
+    need(receipt.schema==='GRAVICENTRA_I6_5_B4_005_ENDOSOS_SERVER_SEMANTIC_WRITER_CAUSAL_FIX_V1'&&
+      receipt.gate==='I6.5/B4-005'&&receipt.status===corrective.status&&
+      receipt.predecessorSourceSha===corrective.predecessorSourceSha&&
+      receipt.isolatedTests?.result==='PASS_IN_MEMORY_NO_FIREBASE'&&
+      receipt.isolatedTests?.passedGroups===12&&receipt.isolatedTests?.authenticatedWriteConfirmed===false&&
+      receipt.releaseSafety?.formalB4005Pass===false&&receipt.releaseSafety?.liveFrontendUnchanged===true&&
+      receipt.releaseSafety?.liveBackendUnchanged===true&&receipt.releaseSafety?.businessWritesBySourceFix===0,
+      'B4005_CAUSAL_FALSE_CERTIFICATION');
+    const changed=git('diff','--name-only',SOURCE,'HEAD','--','functions','orbit360-platform',':(exclude)orbit360-platform/docs/**').split(/\r?\n/).filter(Boolean).sort();
+    const expected=[
+      'functions/product-ops-leads-domain.js',
+      'orbit360-platform/core/endorsement-workflow-v1201.js',
+      'orbit360-platform/data/store-firestore-product-operational-p0.js',
+      'orbit360-platform/modules/issuance-endosos-v1201-bridge.js',
+      'orbit360-platform/modules/issuance-endosos-v1201-refinements.js',
+      'orbit360-platform/modules/policy-receipts-v1199-detail-guard.js'
+    ].sort();
+    need(same(changed,expected),'B4005_CAUSAL_UNDECLARED_PRODUCT_CHANGE');
+    const declared=receipt.sourceAndTests||[];
+    need(declared.length===4&&same(declared.map(x=>x.path).sort(),[
+      'functions/product-ops-leads-domain.js',
+      'orbit360-platform/core/endorsement-workflow-v1201.js',
+      'orbit360-platform/data/store-firestore-product-operational-p0.js',
+      'tools/gravicentra-b4-005-endosos-durable-contract.mjs'
+    ].sort()),'B4005_CAUSAL_CHANGED_FILES_MISMATCH');
+    for(const f of declared)need(git('rev-parse','HEAD:'+f.path)===f.gitBlobSha&&
+      blob(fs.readFileSync(f.path))===f.gitBlobSha,'B4005_CAUSAL_CHANGED_BLOB_'+f.path);
+    need(git('rev-parse','HEAD:'+B4005_RECEIPT)==='295a73390427c2c907a36f51adc11650bb7a64a4',
+      'B4005_HISTORICAL_SOURCE_RECEIPT_REWRITTEN');
+    return {paths:expected,status:'CORRECTIVE_SOURCE_PREVIEW_E2E_PENDING',receiptBlobSha:corrective.receiptBlobSha};
+  }
   const pointer=cp.b4005EndososDurableSourceAndIsolatedQa20261107;
   if(!pointer)return null;
   const mirror=state.b4005EndososDurableSourceAndIsolatedQa20261107;

@@ -1,5 +1,6 @@
 # B4-005: build exactly once, retain same-byte promotion artifact, reuse existing LAB Preview.
-# No LIVE, Functions, Rules, Auth/IAM, data seed or operational writes.
+# No LIVE, Rules, Auth/IAM, data seed or operational writes. The scoped
+# corrective successor deploys ONE existing Ops callable to Preview only.
 name: Gravicentra B4-005 Exact Immutable Preview
 on:
   push:
@@ -45,24 +46,25 @@ jobs:
         run: |
           set -euo pipefail
           test "$(git rev-parse HEAD)" = "$SOURCE_SHA"
-          git merge-base --is-ancestor 308294d4ca8e2167793b94a18bf810ba2a99e0d1 HEAD
+          git merge-base --is-ancestor ef5baec55057a88720b98ff67fcd138a8f89a5f3 HEAD
           test "$(git rev-parse HEAD:tools/gravicentra-i6-1-preview-package.mjs)" = ad48cfea93b846129189ff890225220153d12eff
-          git diff --exit-code f8fa00e4e2e6627cee66c8c521866874e39bc8da HEAD -- functions
+          test "$(git diff --name-only ef5baec55057a88720b98ff67fcd138a8f89a5f3 HEAD -- functions)" = 'functions/product-ops-leads-domain.js'
           node tools/gravicentra-b4-004-formal-gate-guard.mjs
           node tools/gravicentra-i6-control-plane-guard-v1.mjs --mode=governance
           node tools/gravicentra-b4-005-endosos-durable-contract.mjs
           node - <<'NODE'
           const fs=require('node:fs'),{execFileSync}=require('node:child_process');
-          const p='artifacts/orbit360-recovery/release-control/I6_5_B4_005_ENDOSOS_DURABLE_SOURCE_AND_ISOLATED_QA_20261107.json';
+          const p='artifacts/orbit360-recovery/release-control/I6_5_B4_005_ENDOSOS_SERVER_SEMANTIC_WRITER_CAUSAL_FIX_20261107.json';
           const r=JSON.parse(fs.readFileSync(p,'utf8'));
           const git=(...a)=>execFileSync('git',a,{encoding:'utf8'}).trim();
-          if(r.status!=='SOURCE_FIX_AND_ISOLATED_CONTRACT_QA_PASS_PREVIEW_AND_LIVE_CERTIFICATION_PENDING'||r.releaseSafety.formalB4005Pass!==false)throw Error('PREVIEW_CANNOT_CLAIM_GATE_PASS');
-          if(r.sourceFiles.length!==4)throw Error('B4005_SOURCE_CARDINALITY');
-          for(const f of r.sourceFiles){if(git('rev-parse','HEAD:'+f.path)!==f.gitBlobSha)throw Error('B4005_SOURCE_DRIFT:'+f.path);}
-          if(git('rev-parse','HEAD:'+r.isolatedQa.testPath)!==r.isolatedQa.testGitBlobSha)throw Error('B4005_TEST_DRIFT');
-          if(!r.ownerDeferredToPostproduction.insurerKnowledgeAndTariffs||!r.ownerDeferredToPostproduction.cotcomp)throw Error('OWNER_SCOPE_NOT_FROZEN');
-          console.log('B4005_APPROVED_SCOPE_EXACT_SOURCE_AND_QA_PASS_NO_GATE_SEAL');
+          if(r.status!=='CAUSAL_SOURCE_FIX_12_OF_12_ISOLATED_CONTRACT_PASS_REAL_PREVIEW_WRITES_PENDING'||r.releaseSafety.formalB4005Pass!==false)throw Error('PREVIEW_CANNOT_CLAIM_GATE_PASS');
+          if(r.sourceAndTests.length!==4||r.isolatedTests.passedGroups!==12)throw Error('B4005_SOURCE_TEST_CARDINALITY');
+          for(const f of r.sourceAndTests){if(git('rev-parse','HEAD:'+f.path)!==f.gitBlobSha)throw Error('B4005_SOURCE_DRIFT:'+f.path);}
+          if(r.ownerScopePreserved.insurerKnowledgeAndTariffs!=='DEFERRED_POSTPRODUCTION'||r.ownerScopePreserved.cotcomp!=='DEFERRED_POSTPRODUCTION')throw Error('OWNER_SCOPE_NOT_FROZEN');
+          console.log('B4005_CAUSAL_SOURCE_AND_12_OF_12_QA_PASS_NO_GATE_SEAL');
           NODE
+          node --check functions/product-ops-leads-domain.js
+          node --check orbit360-platform/data/store-firestore-product-operational-p0.js
           node --check orbit360-platform/core/endorsement-workflow-v1201.js
           node --check orbit360-platform/modules/issuance-endosos-v1201-bridge.js
           node --check orbit360-platform/modules/issuance-endosos-v1201-refinements.js
@@ -115,9 +117,10 @@ jobs:
           export TENANT_BRANDING_SNAPSHOT_FILE="$RUNNER_TEMP/b4005-branding.json"
           node tools/gravicentra-i6-1-preview-package.mjs . "$RUNNER_TEMP/b4005-package" "$RUNNER_TEMP/b4005-sdkconfig.json" > "$RUNNER_TEMP/b4005-package-output.json"
           ROOT="$RUNNER_TEMP/b4005-package/bundle/site"
-          for rel in core/endorsement-workflow-v1201.js modules/issuance-endosos-v1201-bridge.js modules/issuance-endosos-v1201-refinements.js modules/policy-receipts-v1199-detail-guard.js; do
+          for rel in core/endorsement-workflow-v1201.js data/store-firestore-product-operational-p0.js modules/issuance-endosos-v1201-bridge.js modules/issuance-endosos-v1201-refinements.js modules/policy-receipts-v1199-detail-guard.js; do
             cmp "orbit360-platform/$rel" "$ROOT/$rel"
           done
+          cmp functions/product-ops-leads-domain.js "$RUNNER_TEMP/b4005-package/bundle/backend/product-ops-leads-domain.js"
           node - <<'NODE'
           const fs=require('node:fs'),base=process.env.RUNNER_TEMP+'/b4005-package/bundle';
           const cfg=JSON.parse(fs.readFileSync(base+'/firebase.json','utf8'));
@@ -142,6 +145,36 @@ jobs:
             ${{ runner.temp }}/b4005-exact-release-bundle.sha256
           retention-days: 30
           if-no-files-found: error
+      - name: Deploy exactly one already-existing Ops callable to isolated Preview
+        run: |
+          set -euo pipefail
+          node "$FIREBASE_CLI_BIN" functions:list --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/b4005-functions-before.json"
+          node - <<'NODE'
+          const fs=require('node:fs'),r=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/b4005-functions-before.json','utf8'));
+          const xs=Array.isArray(r.result)?r.result:Array.isArray(r)?r:[];
+          const matches=xs.filter(x=>[x.entryPoint,x.id,x.name].some(v=>String(v||'').split('/').pop()==='orbit360OpsLeadsCommandPreview'));
+          if(matches.length!==1)throw Error('B4005_EXISTING_PREVIEW_OPS_FUNCTION_NOT_UNIQUE');
+          const loc=String(matches[0].region||matches[0].location||matches[0].name||'');
+          if(loc&&/us-central1/.test(loc))throw Error('B4005_PREVIEW_ONLY_FUNCTION_REGION_REQUIRED');
+          NODE
+          STAGE="$RUNNER_TEMP/b4005-one-function"
+          mkdir -p "$STAGE"
+          cp -a "$RUNNER_TEMP/b4005-package/bundle/backend" "$STAGE/backend"
+          (cd "$STAGE/backend" && npm ci --ignore-scripts --no-audit --no-fund >/dev/null)
+          printf '{"functions":{"source":"backend","runtime":"nodejs22"}}\n' > "$STAGE/firebase.json"
+          node "$FIREBASE_CLI_BIN" deploy --only functions:orbit360OpsLeadsCommandPreview --config "$STAGE/firebase.json" --project "$PROJECT_ID" --non-interactive
+          node "$FIREBASE_CLI_BIN" functions:list --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/b4005-functions-after.json"
+          node - <<'NODE'
+          const fs=require('node:fs'),p=process.env.RUNNER_TEMP;
+          const xs=f=>{const r=JSON.parse(fs.readFileSync(p+'/'+f,'utf8'));return Array.isArray(r.result)?r.result:Array.isArray(r)?r:[];};
+          const signature=xs=>xs.filter(x=>![x.entryPoint,x.id,x.name].some(v=>String(v||'').split('/').pop()==='orbit360OpsLeadsCommandPreview'))
+            .map(x=>({name:x.name||x.id||x.entryPoint,region:x.region||x.location,runtime:x.runtime||x.runtimeVersion,version:x.version||x.updateTime||x.updateTimestamp||''}))
+            .sort((a,b)=>String(a.name).localeCompare(String(b.name)));
+          if(JSON.stringify(signature(xs('b4005-functions-before.json')))!==JSON.stringify(signature(xs('b4005-functions-after.json'))))throw Error('B4005_UNRELATED_FUNCTION_CHANGED');
+          const target=xs('b4005-functions-after.json').filter(x=>[x.entryPoint,x.id,x.name].some(v=>String(v||'').split('/').pop()==='orbit360OpsLeadsCommandPreview'));
+          if(target.length!==1)throw Error('B4005_TARGET_PREVIEW_FUNCTION_MISSING_AFTER_DEPLOY');
+          console.log('B4005_ONE_EXISTING_PREVIEW_FUNCTION_DEPLOYED_LIVE_FUNCTIONS_PRESERVED');
+          NODE
       - name: Deploy immutable bundle ONLY to existing isolated Preview channel
         id: preview
         run: |
@@ -192,11 +225,11 @@ jobs:
           const b=JSON.parse(fs.readFileSync(root+'/__recovery__/build.json','utf8'));
           const p=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/b4005-package-output.json','utf8'));
           const tar=fs.readFileSync(process.env.RUNNER_TEMP+'/b4005-exact-release-bundle.tar.gz');
-          const proof={schema:'GRAVICENTRA_I6_5_B4_005_EXACT_IMMUTABLE_PREVIEW_PROOF_V1',status:'EXACT_PREVIEW_TRANSPORT_PASS_AUTHENTICATED_E2E_PENDING',gate:'I6.5/B4-005',sourceSha:process.env.SOURCE_SHA,buildId:b.buildId,previewUrl:process.env.PREVIEW_URL,runId:Number(process.env.GITHUB_RUN_ID),artifactId:Number(process.env.ARTIFACT_ID),artifactZipSha256:process.env.ARTIFACT_ZIP_SHA256,archiveSha256:crypto.createHash('sha256').update(tar).digest('hex'),hostedPayloadDigest:p.hostedPayloadDigest,productFiles:p.hostedFileCount,allHostedFilesExact:true,reusedExistingChannel:true,b4003B4004SealsPreserved:true,liveLabStable:true,liveCustomDomainStable:true,functionsDeploys:0,rulesDeploys:0,authChanges:0,realDataWrites:0,authenticatedE2e:'PENDING',production:'HOLD',formalB4005Pass:false};
+          const proof={schema:'GRAVICENTRA_I6_5_B4_005_EXACT_IMMUTABLE_PREVIEW_PROOF_V2',status:'EXACT_PREVIEW_TRANSPORT_AND_ONE_OPS_BACKEND_PASS_AUTHENTICATED_E2E_PENDING',gate:'I6.5/B4-005',sourceSha:process.env.SOURCE_SHA,buildId:b.buildId,previewUrl:process.env.PREVIEW_URL,runId:Number(process.env.GITHUB_RUN_ID),artifactId:Number(process.env.ARTIFACT_ID),artifactZipSha256:process.env.ARTIFACT_ZIP_SHA256,archiveSha256:crypto.createHash('sha256').update(tar).digest('hex'),hostedPayloadDigest:p.hostedPayloadDigest,backendSourceDigest:p.backendSourceDigest,productFiles:p.hostedFileCount,allHostedFilesExact:true,reusedExistingChannel:true,b4003B4004SealsPreserved:true,liveLabStable:true,liveCustomDomainStable:true,functionsDeploys:1,previewFunction:'orbit360OpsLeadsCommandPreview',liveFunctionDeploys:0,rulesDeploys:0,authChanges:0,realDataWrites:0,authenticatedE2e:'PENDING',production:'HOLD',formalB4005Pass:false};
           if(!proof.artifactId||!proof.productFiles||!proof.hostedPayloadDigest)throw Error('B4005_PREVIEW_PROOF_INCOMPLETE');
           fs.writeFileSync(process.env.RUNNER_TEMP+'/b4005-exact-preview-proof.json',JSON.stringify(proof,null,2)+'\n');
           NODE
-          echo "B4-005 exact immutable Preview readback PASS; LIVE unchanged; authenticated role/country/write/reload E2E still pending. Preview: $PREVIEW_URL" >> "$GITHUB_STEP_SUMMARY"
+          echo "B4-005 exact immutable Preview Hosting and one existing Preview Ops function PASS; LIVE unchanged; authenticated role/country/write/reload E2E still pending. Preview: $PREVIEW_URL" >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@v4
         if: always()
         with:

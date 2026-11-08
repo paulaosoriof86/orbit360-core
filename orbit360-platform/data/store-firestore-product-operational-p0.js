@@ -246,6 +246,9 @@
         return /portal|solicitud del cliente/.test(origin)?'portal_request':'create_management';
       }
       if(action==='remove'||(prior&&prior.archivado!==true&&row&&row.archivado===true))return'archive_management';
+      // Endoso closure requires the Ops state guard to verify the already
+      // committed policy marker. Generic resolve_management bypasses it.
+      if(action==='update'&&prior&&row&&row.workflowType==='endorsement_request'&&row.endorsementStage==='APLICADO')return'update_management';
       if(action==='update'&&prior&&row&&text(prior.estado)!=='Resuelta'&&text(row.estado)==='Resuelta')return'resolve_management';
       if(action==='update'&&prior&&row&&text(prior.estado)==='Resuelta'&&text(row.estado)!=='Resuelta')return'reopen_management';
       if(action==='update'&&prior&&row&&text(prior.asesorId)!==text(row.asesorId))return'assign_management';
@@ -293,6 +296,15 @@
       return p.callFunction(previewGeneral?previewGeneralCommand():GENERAL_COMMAND,{tenantId:m.tenantId,activeRole:m.activeRole,mutations:[mutation]},previewGeneral?'us-east1':'us-central1');
     }).then(function(result){
       if(!workflow||action==='insert')requireServerReadback(result,[{collection:collection,id:id,action:action}]);
+      if(workflow&&collection==='gestiones'&&payload&&payload.workflowType==='endorsement_request'){
+        var ep=result&&result.endorsementReadback;
+        if(!ep||ep.workflowType!=='endorsement_request'||text(ep.policyId)!==text(payload.polizaId)||
+           text(ep.endorsementKey)!==text(payload.endorsementKey)||
+           text(ep.endorsementStage)!==text(payload.endorsementStage)||
+           text(ep.documentRef)!==text(payload.documentRef)||
+           text(ep.referenciaAseguradora)!==text(payload.referenciaAseguradora))
+          throw new Error('ENDOSO_CANONICAL_SERVER_READBACK_REQUIRED');
+      }
       if(collection==='aseguradoras'&&action!=='remove')acceptInsurerActivity(result,{collection:collection,id:id,action:action});
       if(workflow&&payload&&payload.deleted===true){
         var dr=result&&result.deleteAuditReadback||null;

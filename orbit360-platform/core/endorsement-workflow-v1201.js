@@ -44,6 +44,12 @@ Orbit.endorsements = (function () {
   }
   function typeDef(id) { return typeDefs().find(x => x.id === id) || DEFAULT_TYPES.find(x => x.id === id) || null; }
   function operationId(prefix) { return (prefix || 'end') + '_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 7); }
+  function isolatedQaPolicy(policy) {
+    try {
+      return /^ays-orbit-360-lab--gi-i65-b4-(?:rc|e4|goals)-[a-z0-9-]+\.web\.app$/i.test(location.hostname) &&
+        /^b4003qa_[A-Za-z0-9._:-]+$/.test(clean(policy && policy.id));
+    } catch (e) { return false; }
+  }
   function requestKey(policyId, typeId) { return [tenantId(), policyId, typeId].join('|'); }
   function existing(policyId, typeId) {
     const key = requestKey(policyId, typeId);
@@ -62,8 +68,9 @@ Orbit.endorsements = (function () {
     const client = S().get('clientes', policy.clienteId) || {};
     const opId = options.operationId || operationId('endreq');
     const requiresValidation = !clean(options.documentRef || proposal.documentRef);
+    const qa = isolatedQaPolicy(policy);
     const row = {
-      id: 'ges_end_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 7), tenantId: policy.tenantId || tenantId(),
+      id: (qa ? 'b4003qa_ges_end_' : 'ges_end_') + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 7), tenantId: policy.tenantId || tenantId(),
       workflowType: 'endorsement_request', endorsementKey: requestKey(policyId, typeId),
       endorsementType: typeId, endorsementLabel: def.label, endorsementStage: 'SOLICITADO', operationId: opId,
       lista: 'Renovaciones / Modif.', tipo: 'Endoso · ' + def.label,
@@ -85,23 +92,27 @@ Orbit.endorsements = (function () {
       bitacora: [{ ts: now(), user: actor().nombre || role(), campo: 'Creación', de: '', a: 'Solicitud de endoso creada', origen: 'manual' }],
       creado: today(), actualizado: today(), archivado: false
     };
-    if (!S().batchDurable) return { ok: false, errors: ['escritura_durable_endoso_no_disponible'] };
-    const activity = { id: 'act_' + opId, tenantId: row.tenantId, clienteId: row.clienteId,
+    if (!S().insertDurable) return { ok: false, errors: ['escritura_durable_endoso_no_disponible'] };
+    const activity = { id: (qa ? 'b4003qa_act_' : 'act_') + opId, tenantId: row.tenantId, clienteId: row.clienteId,
       asesorId: row.asesorId, pais: row.pais, tipo: 'endoso', icon: '📜', fecha: today(),
-      titulo: 'Endoso solicitado', detalle: def.label + ' · póliza ' + policy.numero,
+      titulo: 'Endoso solicitado', detalle: def.label + ' · póliza ' + policy.numero, __syntheticQa: qa || undefined,
       gestionId: row.id, polizaId: policy.id, operationId: opId };
     // El asesor puede solicitar una gestión propia, pero no necesariamente
     // crear actividades en Cliente 360. No bloquear esa capacidad aprobada.
     const canCreateActivity = !!(A() && A().can && A().can('cliente360', 'create'));
-    const mutations = [{ action: 'insert', collection: 'gestiones', id: row.id, payload: row }];
-    if (canCreateActivity) mutations.push({ action: 'insert', collection: 'actividades', id: activity.id, payload: activity });
     try {
-      const ack = await S().batchDurable(mutations, { requestId: opId });
-      if (!ack || ack.ok !== true || ack.canonicalReadback !== true) throw Error('ENDOSO_CREATE_SERVER_ACK_REQUIRED');
+      // Ops is the sole durable owner of gestiones. The general product writer
+      // cannot atomically batch this collection with Cliente 360 activities.
+      await S().insertDurable('gestiones', row);
       const saved = S().get('gestiones', row.id);
       if (!saved || saved.workflowType !== 'endorsement_request') throw Error('ENDOSO_CREATE_READBACK_REQUIRED');
+      let activityWarning = '';
+      if (canCreateActivity && S().insertDurable) {
+        try { await S().insertDurable('actividades', activity); }
+        catch (error) { activityWarning = 'ENDOSO_ACTIVITY_SECONDARY_WRITE_PENDING'; }
+      }
       try { if (A() && A().audit) A().audit('solicitar_endoso', 'gestiones', row.id, null, saved, options.motivo || def.label, { operationId: opId, policyId }); } catch (ignore) {}
-      return { ok: true, request: saved, operationId: opId, durable: true };
+      return { ok: true, request: saved, operationId: opId, durable: true, activityWarning };
     } catch (error) {
       return { ok: false, errors: ['solicitud_endoso_no_confirmada'], error: clean(error && (error.code || error.message || error)) };
     }
@@ -143,7 +154,7 @@ Orbit.endorsements = (function () {
     const currentId = clean(proposal.vehiculoId || policy.vehiculoId);
     const current = currentId ? S().get('vehiculos', currentId) : (S().all('vehiculos') || []).find(v => v.polizaId === policy.id && norm(v.estado) !== 'historico');
     if (current && clean(current.polizaId) !== clean(policy.id)) return { ok: false, errors: ['vehiculo_fuera_poliza'] };
-    const id = clean(next.id || ('veh_' + Date.now().toString(36)));
+    const id = clean(next.id || ((isolatedQaPolicy(policy) ? 'b4003qa_veh_end_' : 'veh_end_') + request.id));
     const row = Object.assign({}, next, {
       id, tenantId: policy.tenantId || tenantId(), clienteId: policy.clienteId, polizaId: policy.id,
       asesorId: policy.asesorId, pais: policy.pais, estado: 'Activo', vigenciaInicio: request.fechaEfectiva,
@@ -213,18 +224,20 @@ Orbit.endorsements = (function () {
     const policy = S().get('polizas', request.polizaId);
     if (!policy) return { ok: false, errors: ['poliza_no_encontrada'] };
     if (A() && A().canView && !A().canView('polizas', policy, 'cliente360')) return { ok: false, errors: ['poliza_fuera_alcance'] };
-    if (!S().batchDurable) return { ok: false, errors: ['escritura_durable_endoso_no_disponible'] };
+    if (!S().batchDurable || !S().updateDurable) return { ok: false, errors: ['escritura_durable_endoso_no_disponible'] };
     const before = clone(policy), proposal = request.propuestaCambios || {};
     const opId = approval.operationId || ('endapply_' + request.id);
-    let result;
-    if (request.endorsementType === 'sustitucion_vehiculo') result = applyVehicleSubstitution(request, policy, proposal, opId);
-    else if (request.endorsementType === 'beneficiarios') result = applyBeneficiaries(request, policy, proposal);
-    else if (request.endorsementType === 'forma_pago') {
+    const policyAlreadyCompleted = policy.ultimoEndosoId === request.id &&
+      [].concat(policy.historial || []).some(x => x && x.gestionId === request.id);
+    let result = policyAlreadyCompleted ? { ok: true, policyAlreadyUpdated: true, mutations: [], policyPatch: {} } : null;
+    if (!result && request.endorsementType === 'sustitucion_vehiculo') result = applyVehicleSubstitution(request, policy, proposal, opId);
+    else if (!result && request.endorsementType === 'beneficiarios') result = applyBeneficiaries(request, policy, proposal);
+    else if (!result && request.endorsementType === 'forma_pago') {
       try { result = await applyPaymentPlan(request, policy, proposal); }
       catch (error) { return { ok: false, errors: ['motor_poliza_endoso_no_confirmado'], error: clean(error && (error.code || error.message || error)) }; }
     }
-    else if (request.endorsementType === 'datos_riesgo') result = applyRiskData(request, policy, proposal);
-    else result = { ok: false, errors: ['tipo_endoso_requiere_flujo_configurado'] };
+    else if (!result && request.endorsementType === 'datos_riesgo') result = applyRiskData(request, policy, proposal);
+    else if (!result) result = { ok: false, errors: ['tipo_endoso_requiere_flujo_configurado'] };
     if (!result.ok) return result;
     const updatedPolicy = S().get('polizas', policy.id);
     if (!updatedPolicy) return { ok: false, errors: ['poliza_readback_endoso_no_disponible'] };
@@ -237,27 +250,43 @@ Orbit.endorsements = (function () {
       proximaAccion: 'Cerrada', resueltaAt: now(), operationId: opId, actualizado: today(),
       bitacora: [].concat(request.bitacora || [], [{ ts: now(), user: actor().nombre || role(), campo: 'Aplicación', de: request.endorsementStage, a: 'APLICADO', origen: 'manual' }])
     };
+    const qa = isolatedQaPolicy(policy);
     const policyPatch = Object.assign({}, result.policyPatch || {}, { historial: hist, ultimoEndosoId: request.id, actualizado: now() });
-    const activity = { id: 'act_' + opId, tenantId: policy.tenantId || tenantId(), clienteId: policy.clienteId,
+    if (qa) policyPatch.__syntheticQa = true;
+    const activity = { id: (qa ? 'b4003qa_act_' : 'act_') + opId, tenantId: policy.tenantId || tenantId(), clienteId: policy.clienteId,
       asesorId: policy.asesorId, pais: policy.pais, tipo: 'endoso', icon: '✅', fecha: request.fechaEfectiva || today(),
       titulo: 'Endoso aplicado', detalle: request.endorsementLabel + ' · póliza ' + policy.numero,
-      gestionId: request.id, polizaId: policy.id, operationId: opId };
+      gestionId: request.id, polizaId: policy.id, operationId: opId, __syntheticQa: qa || undefined };
     try {
-      const ack = await S().batchDurable([].concat(result.mutations || [], [
-        { action: 'update', collection: 'polizas', id: policy.id, payload: policyPatch },
-        { action: 'update', collection: 'gestiones', id: request.id, payload: requestPatch },
-        { action: 'insert', collection: 'actividades', id: activity.id, payload: activity }
-      ]), { requestId: opId + '_complete' });
-      if (!ack || ack.ok !== true || ack.canonicalReadback !== true) throw Error('ENDOSO_APPLY_SERVER_ACK_REQUIRED');
+      if (!policyAlreadyCompleted) {
+        // Policy/vehicles/optional activity share the product transaction;
+        // Ops owns the separate workflow closeout. The persisted policy marker
+        // makes a failed second phase safe to resume without duplicate effects.
+        const mutations = [].concat(result.mutations || [], [
+          { action: 'update', collection: 'polizas', id: policy.id, payload: policyPatch }
+        ]);
+        if (A() && A().can && A().can('cliente360', 'create'))
+          mutations.push({ action: 'insert', collection: 'actividades', id: activity.id, payload: activity });
+        const ack = await S().batchDurable(mutations, { requestId: opId + '_policy' });
+        if (!ack || ack.ok !== true || ack.canonicalReadback !== true) throw Error('ENDOSO_POLICY_BATCH_ACK_REQUIRED');
+      }
+      const committedPolicy = S().get('polizas', policy.id);
+      if (!committedPolicy || committedPolicy.ultimoEndosoId !== request.id ||
+          ![].concat(committedPolicy.historial || []).some(x => x && x.gestionId === request.id))
+        throw Error('ENDOSO_POLICY_MARKER_READBACK_REQUIRED');
+      await S().updateDurable('gestiones', request.id, requestPatch);
       const savedRequest = S().get('gestiones', request.id), savedPolicy = S().get('polizas', policy.id);
       if (!savedRequest || savedRequest.endorsementStage !== 'APLICADO' || !savedPolicy || savedPolicy.ultimoEndosoId !== request.id)
         throw Error('ENDOSO_APPLY_READBACK_REQUIRED');
       try { if (A() && A().audit) A().audit('aplicar_endoso', 'polizas', policy.id, before, savedPolicy, approval.motivo || request.endorsementLabel, { gestionId: request.id, operationId: opId, documentRef: request.documentRef }); } catch (ignore) {}
       return { ok: true, request: savedRequest, policy: savedPolicy, result, operationId: opId, durable: true };
     } catch (error) {
-      const financiallyApplied = request.endorsementType === 'forma_pago' && (S().get('polizas', policy.id) || {}).endosoFinancieroAplicadoId === request.id;
+      const currentPolicy = S().get('polizas', policy.id) || {};
+      const financiallyApplied = request.endorsementType === 'forma_pago' && currentPolicy.endosoFinancieroAplicadoId === request.id;
+      const policyCommitted = currentPolicy.ultimoEndosoId === request.id &&
+        [].concat(currentPolicy.historial || []).some(x => x && x.gestionId === request.id);
       return { ok: false, errors: ['aplicacion_endoso_no_confirmada'], error: clean(error && (error.code || error.message || error)), operationId: opId,
-        partialCommit: financiallyApplied, retrySameRequest: financiallyApplied };
+        partialCommit: financiallyApplied || policyCommitted, retrySameRequest: financiallyApplied || policyCommitted };
     }
   }
 

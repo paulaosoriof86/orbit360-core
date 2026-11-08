@@ -1071,5 +1071,21 @@
     "formalB4005Pass": false,
     "realDataWrites": 0,
     "nextExecution": "B4_005_IMMUTABLE_PREVIEW_READBACK_AND_AUTHENTICATED_DURABLE_E2E"
+  },
+  "b4005EndososServerSemanticWriterCausalFix20261107": {
+    "gate": "I6.5/B4-005",
+    "status": "CAUSAL_SOURCE_FIX_12_OF_12_ISOLATED_CONTRACT_PASS_REAL_PREVIEW_WRITES_PENDING",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_005_ENDOSOS_SERVER_SEMANTIC_WRITER_CAUSAL_FIX_20261107.json",
+    "receiptBlobSha": "be2d96a80ea6aba93e29e8c76bb810072f909c89",
+    "receiptSha256": "a6f1e8c60a51afc23691bf160c7fdc2cd33101d5e2b91440b61900d5fcdbba2a",
+    "predecessorSourceSha": "ef5baec55057a88720b98ff67fcd138a8f89a5f3",
+    "isolatedAssertionGroupsPassed": 12,
+    "changedProductSourceRequiresNewBuild": true,
+    "previewBackendOneExistingFunctionPlanned": "orbit360OpsLeadsCommandPreview",
+    "lastClosedGate": "B4-004",
+    "firstIncompleteGate": "B4-005",
+    "formalB4005Pass": false,
+    "realDataWrites": 0,
+    "nextExecution": "B4_005_NEW_EXACT_PREVIEW_BUILD_ONE_OPS_PREVIEW_BACKEND_ONLY_AUTHENTICATED_SYNTHETIC_REQUEST_APPROVAL_APPLY_RELOAD_CERTIFICATION"
   }
 }

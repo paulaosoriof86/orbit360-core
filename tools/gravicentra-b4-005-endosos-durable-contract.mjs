@@ -22,13 +22,23 @@ function fixture(initialRole = 'Dirección') {
     vehiculos: [{ id: 'v1', pais: 'GT', tenantId: 't1', clienteId: 'c1', asesorId: 'a1', polizaId: 'p1', estado: 'Activo', placa: 'TEST-OLD' }],
     gestiones: [], actividades: []
   };
-  let role = initialRole, nextDelay = null, nextError = null, financialError = null;
+  let role = initialRole, nextDelay = null, nextError = null, financialError = null, opsCloseError = null;
   const transactions = [], audits = [], policyUpdates = [];
   const get = (collection, id) => (data[collection] || []).find(record => record.id === id) || null;
   const store = {
     get,
     all: collection => (data[collection] || []).slice(),
+    async insertDurable(collection, payload) {
+      if (collection !== 'gestiones' && collection !== 'actividades') throw Error('WRONG_SEMANTIC_WRITER');
+      if (nextDelay) { const wait = nextDelay; nextDelay = null; await wait; }
+      if (nextError) { const error = nextError; nextError = null; throw error; }
+      if (get(collection, payload.id)) throw Error('DUPLICATE_INSERT');
+      data[collection].push(clone(payload));
+      transactions.push({ kind: collection === 'gestiones' ? 'ops-insert' : 'activity-insert', collection, payload: clone(payload) });
+      return clone(payload);
+    },
     async batchDurable(mutations, { requestId } = {}) {
+      if (mutations.some(mutation => mutation.collection === 'gestiones')) throw Error('PRODUCT_SERVER_REJECTS_GESTIONES');
       if (nextDelay) { const wait = nextDelay; nextDelay = null; await wait; }
       if (nextError) { const error = nextError; nextError = null; throw error; }
       const staged = clone(data);
@@ -44,15 +54,20 @@ function fixture(initialRole = 'Dirección') {
         } else throw Error('INVALID_ACTION');
       }
       for (const collection of Object.keys(staged)) data[collection] = staged[collection];
-      transactions.push({ requestId, mutations: clone(mutations) });
+      transactions.push({ kind: 'product-batch', requestId, mutations: clone(mutations) });
       return { ok: true, canonicalReadback: true, mutationCount: mutations.length };
     },
     async updateDurable(collection, id, patch) {
+      if (collection !== 'gestiones') throw Error('WRONG_SEMANTIC_WRITER');
+      if (patch.endorsementStage === 'APLICADO' && opsCloseError) {
+        const error = opsCloseError; opsCloseError = null; throw error;
+      }
       if (nextDelay) { const wait = nextDelay; nextDelay = null; await wait; }
       if (nextError) { const error = nextError; nextError = null; throw error; }
       const record = get(collection, id);
       if (!record) throw Error('UPDATE_MISSING');
       Object.assign(record, clone(patch));
+      transactions.push({ kind: 'ops-update', collection, id, patch: clone(patch) });
       return clone(record);
     }
   };
@@ -80,7 +95,7 @@ function fixture(initialRole = 'Dirección') {
   vm.runInNewContext(source, context, { filename: 'endorsement-workflow-v1201.js' });
   return { engine: Orbit.endorsements, store, data, get, transactions, audits, policyUpdates,
     role: value => { role = value; }, delayNext: promise => { nextDelay = promise; }, failNext: msg => { nextError = new Error(msg); },
-    failFinancial: msg => { financialError = msg; } };
+    failFinancial: msg => { financialError = msg; }, failOpsClose: msg => { opsCloseError = new Error(msg); } };
 }
 
 await check('Solicitar endoso espera confirmación duradera y no altera póliza', async () => {
@@ -96,7 +111,7 @@ await check('Solicitar endoso espera confirmación duradera y no altera póliza'
   assert.equal(f.data.gestiones.length, 1);
   assert.equal(f.data.actividades.length, 1);
   assert.deepEqual(f.get('polizas', 'p1'), before);
-  assert.equal(f.transactions[0].mutations.length, 2);
+  assert.deepEqual(f.transactions.map(t => t.kind), ['ops-insert','activity-insert']);
   const again = await f.engine.createRequest('p1', 'beneficiarios', {}, {});
   assert.equal(again.reused, true);
   assert.equal(f.data.gestiones.length, 1);
@@ -116,7 +131,7 @@ await check('Asesor solicita gestión propia sin escritura prohibida en activida
   const f = fixture('Asesor');
   const result = await f.engine.createRequest('p1', 'beneficiarios', { beneficiarios: ['B'] }, {});
   assert.equal(result.ok, true);
-  assert.equal(f.transactions[0].mutations.length, 1);
+  assert.equal(f.transactions[0].kind, 'ops-insert');
   assert.equal(f.data.actividades.length, 0);
   assert.equal((await f.engine.approve(result.request.id, approval)).errors[0], 'permiso_endoso_denegado');
   assert.equal((await f.engine.apply(result.request.id, approval)).errors[0], 'permiso_endoso_denegado');
@@ -143,7 +158,7 @@ await check('Aprobación exige referencia/documento/fecha y ACK; fallo mantiene 
   assert.equal(f.get('gestiones', request.id).endorsementStage, 'APROBADO_PENDIENTE_APLICACION');
 });
 
-await check('Sustitución de vehículo: histórico + nuevo activo + póliza + gestión + actividad, misma transacción', async () => {
+await check('Sustitución de vehículo: vehículo/póliza/actividad atómicos; cierre por Ops verificado', async () => {
   const f = fixture();
   const request = (await f.engine.createRequest('p1', 'sustitucion_vehiculo', {
     vehiculoId: 'v1', nuevoVehiculo: { placa: 'TEST-NEW', marca: 'Marca QA', chasis: 'CH-QA' }
@@ -156,7 +171,9 @@ await check('Sustitución de vehículo: histórico + nuevo activo + póliza + ge
   assert.equal(active.placa, 'TEST-NEW');
   assert.equal(f.get('polizas', 'p1').vehiculoId, active.id);
   assert.equal(f.get('gestiones', request.id).endorsementStage, 'APLICADO');
-  assert.equal(f.transactions.at(-1).mutations.length, 5);
+  const productBatch = f.transactions.filter(t => t.kind === 'product-batch').at(-1);
+  assert.equal(productBatch.mutations.length, 4);
+  assert.deepEqual(f.transactions.slice(-2).map(t => t.kind), ['product-batch','ops-update']);
   assert.equal(f.data.actividades.length, 2);
   assert.equal((await f.engine.apply(request.id, approval)).alreadyApplied, true);
   assert.equal(f.data.vehiculos.length, 2);
@@ -216,6 +233,39 @@ await check('Forma de pago: rechazo del motor no cierra gestión; reintento del 
   assert.equal((await f.engine.apply(request.id, approval)).alreadyApplied, true);
 });
 
+await check('Si Ops falla tras póliza confirmada, el reintento no duplica vehículo/actividad ni mutaciones', async () => {
+  const f = fixture();
+  const request = (await f.engine.createRequest('p1','sustitucion_vehiculo',{
+    vehiculoId:'v1',nuevoVehiculo:{placa:'QA-NEW',chasis:'QA-CHASSIS'}
+  },{})).request;
+  f.failOpsClose('OPS_TEMPORARILY_UNAVAILABLE');
+  const partial = await f.engine.apply(request.id,approval);
+  assert.equal(partial.ok,false);
+  assert.equal(partial.partialCommit,true);
+  assert.equal(f.get('polizas','p1').ultimoEndosoId,request.id);
+  assert.equal(f.get('gestiones',request.id).endorsementStage,'APROBADO_PENDIENTE_APLICACION');
+  const productCount=f.transactions.filter(t=>t.kind==='product-batch').length;
+  const vehicleCount=f.data.vehiculos.length,activityCount=f.data.actividades.length;
+  const retry=await f.engine.apply(request.id,approval);
+  assert.equal(retry.ok,true,JSON.stringify(retry));
+  assert.equal(f.transactions.filter(t=>t.kind==='product-batch').length,productCount);
+  assert.equal(f.data.vehiculos.length,vehicleCount);
+  assert.equal(f.data.actividades.length,activityCount);
+  assert.equal(f.get('gestiones',request.id).endorsementStage,'APLICADO');
+});
+
+await check('Servicio Ops conserva campos endoso; servidor exige etapa, documento y marca de póliza', async () => {
+  const backend=fs.readFileSync(path.resolve(process.cwd(),'functions/product-ops-leads-domain.js'),'utf8');
+  const writer=read('data/store-firestore-product-operational-p0.js');
+  assert.match(backend,/ENDORSEMENT_CREATE_FIELDS/);
+  assert.match(backend,/ENDORSEMENT_MUTABLE_FIELDS/);
+  assert.match(backend,/ENDOSO_POLICY_DURABLE_APPLICATION_REQUIRED/);
+  assert.match(backend,/ENDOSO_PREVIEW_SYNTHETIC_POLICY_ONLY/);
+  assert.match(backend,/endorsementReadback=/);
+  assert.match(writer,/ENDOSO_CANONICAL_SERVER_READBACK_REQUIRED/);
+  assert.match(writer,/row\.endorsementStage==='APLICADO'\)return'update_management'/);
+});
+
 await check('UI canónica enlaza solicitud y ambos modales esperan await explícito', async () => {
   const detail = read('modules/policy-receipts-v1199-detail-guard.js');
   const bridge = read('modules/issuance-endosos-v1201-bridge.js');
@@ -227,4 +277,4 @@ await check('UI canónica enlaza solicitud y ambos modales esperan await explíc
   assert.match(refinements, /await I\.advanceRequest\(/);
 });
 
-console.log(`B4-005 ENDOSOS DURABLE CONTRACT: ${passes}/${passes} PASS · fixtures sintéticos; sin Firebase, LIVE ni datos reales`);
+console.log(`B4-005 ENDOSOS DURABLE CONTRACT: ${passes}/${passes} PASS · escrituras simuladas separadas por owner; sin Firebase, LIVE ni datos reales`);

@@ -41,6 +41,11 @@ const BUSINESS_CREATE_EXTRA_FIELDS = Object.freeze(['plan','segmento','polizaId'
 const MANAGEMENT_CREATE_EXTRA_FIELDS = Object.freeze(['cancelacionId','ramo','pais','moneda','producto','vence','proximaAccion','checklist','notas','bitacora','comentarios','creado','actualizado','resultado','adjuntos','documentoCargaPendiente','documentoCargaFallida']);
 const ISSUANCE_MANAGEMENT_FIELDS = Object.freeze(['workflowType','requestKey','operationId','issuanceMode','sourcePolicyId','renewalManagementId','pais','moneda','producto','acceptedOffer','acceptedConfirmed','emissionStage','requiereInspeccion','documentosCompletos','requiereValidacion','validacionAlertas','policyCreatedId','policyNumber','documentRef','resueltaAt','nuevaPolizaId','emisionGestionId']);
 const RENEWAL_MANAGEMENT_FIELDS = Object.freeze(['workflowType','renewalAction','sourcePolicyId','acceptedConfirmed','clientApprovalAt','clientApprovalNote','quoteContext','directRenewalPolicyId','issuanceRequestId','nuevaPolizaId','emisionGestionId']);
+// Endosos are owned by Ops, never by the general product-operational writer.
+// The proposed contract is immutable after creation; only the documented
+// approval/application fields can advance through the guarded lifecycle.
+const ENDORSEMENT_CREATE_FIELDS = Object.freeze(['workflowType','endorsementKey','endorsementType','endorsementLabel','endorsementStage','operationId','propuestaCambios','documentRef','requiereValidacion','validacionAlertas']);
+const ENDORSEMENT_MUTABLE_FIELDS = Object.freeze(['endorsementStage','referenciaAseguradora','documentRef','fechaEfectiva','aprobadoAt','aprobadoPor','policyUpdatedId','resueltaAt','operationId']);
 const DELETE_AUDIT_FIELDS = Object.freeze(['deleted','eliminado','archivado','deletedAt','eliminadoAt','deleteReason','motivoEliminacion','deletedByRole','deletedByUid','deletedByEmail','estadoEliminacion','deletedParentCollection','deletedParentId']);
 
 const text=(v,max=1000)=>String(v==null?'':v).replace(/\u0000/g,'').trim().slice(0,max);
@@ -151,6 +156,7 @@ function copyWorkflowManagementFields(target,input,before){
   const wt=text((before&&before.workflowType)||(input&&input.workflowType),80);
   if(wt==='issuance_request')copyAllowed(target,input,ISSUANCE_MANAGEMENT_FIELDS);
   if(['renewal_proposals','renewal_accepted'].includes(wt))copyAllowed(target,input,RENEWAL_MANAGEMENT_FIELDS);
+  if(wt==='endorsement_request')copyAllowed(target,input,ENDORSEMENT_MUTABLE_FIELDS);
   return target;
 }
 function sanitizeBusiness(input,actor){const out={id:id(input.id||`neg_${Date.now().toString(36)}`,'businessId'),nombre:text(input.nombre||input.name,220),tipo:text(input.tipo||input.type,80),email:text(input.email||input.correo,320),telefono:text(input.telefono||input.phone,100),etapa:norm(input.etapa||input.stage||'nuevo'),asesorId:id(input.asesorId||input.advisorId||actor.advisorId,'advisorId'),clienteId:text(input.clienteId||input.clientId,180),pais:text(input.pais||input.country,8).toUpperCase(),moneda:text(input.moneda||input.currency,8).toUpperCase(),canal:text(input.canal||input.channel,100),piezaOrigen:text(input.piezaOrigen,120),producto:text(input.producto||input.product,180),ramo:text(input.ramo||input.line,140),aseguradoraId:text(input.aseguradoraId||input.insurerId,180),primaEst:Number(input.primaEst||input.estimatedPremium||0),prioridad:text(input.prioridad||input.priority||'Media',40),origen:text(input.origen||input.origin||'Plataforma',100),archivado:false};copyAllowed(out,input,BUSINESS_CREATE_EXTRA_FIELDS);return out;}
@@ -159,7 +165,7 @@ function canonicalizeCreationAudit(business,actor){
  business.bitacora=[{ts:new Date().toISOString(),user:name,actorUid:text(actor&&actor.uid,180),actorName:name,campo:'Creación',de:'',a:'Ingreso ('+(norm(business.origen)==='ops'?'Ops':'Leads')+')',origen:'manual'}];
  return business;
 }
-function sanitizeManagement(input,actor){const out={id:id(input.id||`ges_${Date.now().toString(36)}`,'managementId'),lista:text(input.lista||input.opsList||'Gestiones Admin',120),tipo:text(input.tipo||input.type||'Gestión',180),titulo:text(input.titulo||input.title||input.tipo||'Gestión',240),clienteId:text(input.clienteId||input.clientId,180),polizaId:text(input.polizaId||input.policyId,180),negocioId:text(input.negocioId||input.businessId,180),asesorId:id(input.asesorId||input.advisorId||actor.advisorId,'advisorId'),aseguradoraId:text(input.aseguradoraId||input.insurerId,180),ramo:text(input.ramo||input.line,140),pais:text(input.pais||input.country,8).toUpperCase(),moneda:text(input.moneda||input.currency,8).toUpperCase(),producto:text(input.producto||input.product,180),estado:text(input.estado||input.status||'Pendiente',80),prioridad:text(input.prioridad||input.priority||'Media',40),origen:text(input.origen||input.origin||'Plataforma',100),nota:text(input.nota||input.note,3000),archivado:false};copyAllowed(out,input,MANAGEMENT_CREATE_EXTRA_FIELDS);const wt=text(input.workflowType,80);if(wt==='issuance_request')copyAllowed(out,input,ISSUANCE_MANAGEMENT_FIELDS);if(wt==='renewal_proposals'||wt==='renewal_accepted')copyAllowed(out,input,RENEWAL_MANAGEMENT_FIELDS);return out;}
+function sanitizeManagement(input,actor){const out={id:id(input.id||`ges_${Date.now().toString(36)}`,'managementId'),lista:text(input.lista||input.opsList||'Gestiones Admin',120),tipo:text(input.tipo||input.type||'Gestión',180),titulo:text(input.titulo||input.title||input.tipo||'Gestión',240),clienteId:text(input.clienteId||input.clientId,180),polizaId:text(input.polizaId||input.policyId,180),negocioId:text(input.negocioId||input.businessId,180),asesorId:id(input.asesorId||input.advisorId||actor.advisorId,'advisorId'),aseguradoraId:text(input.aseguradoraId||input.insurerId,180),ramo:text(input.ramo||input.line,140),pais:text(input.pais||input.country,8).toUpperCase(),moneda:text(input.moneda||input.currency,8).toUpperCase(),producto:text(input.producto||input.product,180),estado:text(input.estado||input.status||'Pendiente',80),prioridad:text(input.prioridad||input.priority||'Media',40),origen:text(input.origen||input.origin||'Plataforma',100),nota:text(input.nota||input.note,3000),archivado:false};copyAllowed(out,input,MANAGEMENT_CREATE_EXTRA_FIELDS);const wt=text(input.workflowType,80);if(wt==='issuance_request')copyAllowed(out,input,ISSUANCE_MANAGEMENT_FIELDS);if(wt==='renewal_proposals'||wt==='renewal_accepted')copyAllowed(out,input,RENEWAL_MANAGEMENT_FIELDS);if(wt==='endorsement_request')copyAllowed(out,input,ENDORSEMENT_CREATE_FIELDS);return out;}
 async function enrichManagementContext(tenantId,row){if(!row)return row;let policy=null,client=null;if(row.polizaId){const s=await dataRef(tenantId,'polizas',row.polizaId).get();policy=s.exists?s.data():null;}if(!row.clienteId&&policy&&policy.clienteId)row.clienteId=text(policy.clienteId,180);if(row.clienteId){const s=await dataRef(tenantId,'clientes',row.clienteId).get();client=s.exists?s.data():null;}row.pais=text(row.pais||(policy&&policy.pais)||(client&&client.pais),8).toUpperCase();row.moneda=text(row.moneda||(policy&&policy.moneda)||(client&&client.moneda),8).toUpperCase();row.ramo=text(row.ramo||(policy&&policy.ramo),140);row.producto=text(row.producto||(policy&&(policy.producto||policy.subramo)),180);return row;}
 function requestId(t,op,entity,payload,supplied){const explicit=text(supplied,180);return explicit?id(explicit,'requestId'):`wf_${sha(JSON.stringify(stable({t,op,entity,payload}))).slice(0,28)}`;}
 function reason(data){const out=text(data.reason||data.motivo,600);if(!out)throw new HttpsError('invalid-argument','El motivo es obligatorio.');return out;}
@@ -170,6 +176,57 @@ function deterministicVehicleId(tenantId,businessId,plate){return`veh_${sha(`${t
 function deterministicActivityId(tenantId,businessId){return`act_${sha(`${tenantId}|business-issued|${businessId}`).slice(0,24)}`;}
 function validDate(value){return /^\d{4}-\d{2}-\d{2}$/.test(text(value,40));}
 
+async function validateEndorsementMutation(tx,{tenantId,authz,operation,entityId,payload,before,after,previewOnly}){
+  if(after.workflowType!=='endorsement_request')return;
+  if(!['create_management','update_management','assign_management'].includes(operation))
+    throw new HttpsError('failed-precondition','ENDOSO_WORKFLOW_OWNER_REQUIRED: usa el ciclo de aprobación del endoso.');
+  if(!text(after.polizaId,180)||!text(after.clienteId,180)||!text(after.endorsementType,100)||!text(after.endorsementKey,400))
+    throw new HttpsError('failed-precondition','ENDOSO_POLICY_LINK_REQUIRED');
+  if(!/^[a-z][a-z0-9_]{1,99}$/.test(text(after.endorsementType,100)))
+    throw new HttpsError('invalid-argument','ENDOSO_TYPE_INVALID');
+  if(after.endorsementKey!==`${tenantId}|${after.polizaId}|${after.endorsementType}`)
+    throw new HttpsError('failed-precondition','ENDOSO_REQUEST_KEY_MISMATCH');
+  const ps=await tx.get(dataRef(tenantId,'polizas',id(after.polizaId,'policyId'))),policy=ps.exists?ps.data()||{}:null;
+  if(!policy||policy.tenantId&&policy.tenantId!==tenantId||
+    text(policy.clienteId,180)!==text(after.clienteId,180)||
+    text(policy.asesorId,180)!==text(after.asesorId,180))
+    throw new HttpsError('permission-denied','ENDOSO_CANONICAL_POLICY_SCOPE_MISMATCH');
+  const countries=unique(authz.member.countries||authz.member.paises||[]).map(x=>text(x,8).toUpperCase());
+  if(!['GT','CO'].includes(text(policy.pais,8).toUpperCase())||
+    text(policy.pais,8).toUpperCase()!==text(after.pais,8).toUpperCase()||
+    (countries.length&&!countries.includes(text(policy.pais,8).toUpperCase())))
+    throw new HttpsError('permission-denied','ENDOSO_COUNTRY_SCOPE_MISMATCH');
+  if(previewOnly&&(!/^b4003qa_[A-Za-z0-9._:-]+$/.test(after.polizaId)||policy.__syntheticQa!==true))
+    throw new HttpsError('permission-denied','ENDOSO_PREVIEW_SYNTHETIC_POLICY_ONLY');
+  if(!before){
+    if(operation!=='create_management'||after.endorsementStage!=='SOLICITADO'||
+      !after.propuestaCambios||typeof after.propuestaCambios!=='object'||
+      JSON.stringify(after.propuestaCambios).length>12000)
+      throw new HttpsError('failed-precondition','ENDOSO_REQUEST_CONTRACT_INVALID');
+    return;
+  }
+  if(payload.propuestaCambios!==undefined&&digest(payload.propuestaCambios)!==digest(before.propuestaCambios))
+    throw new HttpsError('failed-precondition','ENDOSO_APPROVED_PROPOSAL_IMMUTABLE');
+  if(text(after.endorsementStage)!==text(before.endorsementStage)){
+    if(!ADMIN_ROLES.has(authz.actor.activeRole))
+      throw new HttpsError('permission-denied','ENDOSO_APPROVAL_REQUIRES_OPERATIONS_ROLE');
+    if(after.endorsementStage==='APROBADO_PENDIENTE_APLICACION'&&
+      ['SOLICITADO','EN_REVISION'].includes(before.endorsementStage)){
+      if(!text(after.referenciaAseguradora)||!text(after.documentRef)||!validDate(after.fechaEfectiva))
+        throw new HttpsError('failed-precondition','ENDOSO_APPROVAL_REFERENCE_DOCUMENT_DATE_REQUIRED');
+      after.aprobadoAt=new Date().toISOString();
+      after.aprobadoPor={uid:authz.actor.uid,nombre:authz.actor.name,rolActivo:authz.actor.activeRole};
+    }else if(after.endorsementStage==='APLICADO'&&before.endorsementStage==='APROBADO_PENDIENTE_APLICACION'){
+      if(text(policy.ultimoEndosoId)!==entityId||
+        ![].concat(policy.historial||[]).some(x=>x&&text(x.gestionId)===entityId))
+        throw new HttpsError('failed-precondition','ENDOSO_POLICY_DURABLE_APPLICATION_REQUIRED');
+      after.policyUpdatedId=after.polizaId;
+    }else throw new HttpsError('failed-precondition','ENDOSO_STAGE_TRANSITION_INVALID');
+  }
+  if(after.endorsementStage!=='APLICADO'&&norm(after.estado)==='resuelta')
+    throw new HttpsError('failed-precondition','ENDOSO_CANNOT_RESOLVE_BEFORE_APPLICATION');
+}
+
 async function execute(request,previewOnly=false){const d=request.data||{},operation=norm(d.operation);if(!OPERATIONS.has(operation))throw new HttpsError('invalid-argument','Operación no soportada.');const authz=await authorize(request,operation),cfg=await config(authz.tenantId),motivo=reason(d);let payload=d.payload&&typeof d.payload==='object'?d.payload:{};const isBusiness=operation.includes('business'),entityType=isBusiness?'negocios':'gestiones';let entityId=text(d.entityId||payload.id,180),prepared=null;
 const metaQaId='b4003qa_meta_tr_v27_20261025_01';
 if(entityId===metaQaId||text(payload.id,180)===metaQaId){
@@ -178,6 +235,8 @@ if(entityId===metaQaId||text(payload.id,180)===metaQaId){
 }
 if(operation==='create_business')prepared=canonicalizeCreationAudit(sanitizeBusiness(payload,authz.actor),authz.actor);if(operation==='create_management'||operation==='portal_request')prepared=sanitizeManagement(payload,authz.actor);if(prepared&&entityType==='gestiones')prepared=await enrichManagementContext(authz.tenantId,prepared);if(prepared)entityId=prepared.id;entityId=id(entityId,isBusiness?'businessId':'managementId');const entity=dataRef(authz.tenantId,entityType,entityId);if(previewOnly===true&&!['create_management','create_business','portal_request'].includes(operation)){const ps=await entity.get(),pr=ps.exists?ps.data():null;if(!pr||pr.previewWrite!==true)throw new HttpsError('permission-denied','PREVIEW_TEST_RECORD_ONLY: en Preview solo se modifican gestiones/negocios creados durante la prueba.');}const rid=requestId(authz.tenantId,operation,entityId,payload,d.requestId),req=requestRef(authz.tenantId,rid,previewOnly),eventId=`evt_${sha(`${authz.tenantId}|${rid}`).slice(0,28)}`;
 const committed=await db.runTransaction(async tx=>{const priorReq=await tx.get(req);if(priorReq.exists&&priorReq.data().status==='committed')return Object.assign({reused:true},priorReq.data().result||{});const snap=await tx.get(entity),before=snap.exists?snap.data():null;if(prepared&&before)throw new HttpsError('already-exists','El registro ya existe.');if(!prepared&&!before)throw new HttpsError('not-found','El registro no existe.');let after=prepared?Object.assign({},prepared):Object.assign({},before);if(operation==='update_business')payload=canonicalizeCollaborationPayload(before,payload,authz.actor);const authorizationDomain=workflowAuthorizationDomain(authz,operation,entityType,before,payload,cfg);if(!advisorAllowed(authz.member,after.asesorId||payload.asesorId||payload.advisorId,authorizationDomain,authz.actor.activeRole))throw new HttpsError('permission-denied','El asesor está fuera de su alcance activo.');
+if(entityType==='gestiones'&&after.workflowType==='endorsement_request'&&prepared)
+  await validateEndorsementMutation(tx,{tenantId:authz.tenantId,authz,operation,entityId,payload,before,after,previewOnly});
 if(operation==='transition_business'){const from=norm(before.etapa),to=norm(payload.to||payload.etapa||payload.stage),stage=cfg.stages[from];if(!cfg.stages[to])throw new HttpsError('failed-precondition','La etapa destino no está configurada.');if(!stage||!stage.next.includes(to))throw new HttpsError('failed-precondition','Transición no permitida.');copyAllowed(after,payload,BUSINESS_MUTABLE_FIELDS.filter(k=>!['etapa','archivado'].includes(k)));after.etapa=to;after.prob=Number(payload.prob!=null?payload.prob:after.prob||0);after.opsVisible=cfg.stages[to].ops===true;after.opsList=cfg.stages[to].opsList||'';if(to==='propuesta'&&cfg.cadenceEnabled){after.cadenciaActiva=true;after.cadenciaPaso=Math.max(1,Number(after.cadenciaPaso)||1);if(!text(after.proximoToque,40))after.proximoToque=new Date(Date.now()+3*86400000).toISOString().slice(0,10);}
 if(to==='emitido'){
   const emission=after.emissionContract&&typeof after.emissionContract==='object'?after.emissionContract:{},policyDraft=emission.policy&&typeof emission.policy==='object'?emission.policy:{},vehicleDraft=emission.vehicle&&typeof emission.vehicle==='object'?emission.vehicle:null;
@@ -219,6 +278,8 @@ else if(operation==='assign_management'){copyAllowed(after,payload,MANAGEMENT_MU
 else if(operation==='resolve_management'){copyAllowed(after,payload,MANAGEMENT_MUTABLE_FIELDS.filter(k=>k!=='estado'));copyWorkflowManagementFields(after,payload,before);after.estado='Resuelta';after.resultado=text(payload.resultado||payload.result||after.resultado,3000);after.resolvedAt=now();}
 else if(operation==='reopen_management'){copyAllowed(after,payload,MANAGEMENT_MUTABLE_FIELDS.filter(k=>k!=='estado'));copyWorkflowManagementFields(after,payload,before);after.estado='Pendiente';after.reopenedAt=now();}
 else if(operation==='archive_management'){after.archivado=true;copyAllowed(after,payload,DELETE_AUDIT_FIELDS);}
+if(!prepared&&entityType==='gestiones'&&after.workflowType==='endorsement_request')
+  await validateEndorsementMutation(tx,{tenantId:authz.tenantId,authz,operation,entityId,payload,before,after,previewOnly});
 if(!advisorAllowed(authz.member,after.asesorId||payload.asesorId||payload.advisorId,authorizationDomain,authz.actor.activeRole))throw new HttpsError('permission-denied','El asesor está fuera de su alcance activo.');
 if(previewOnly===true){after.previewWrite=true;after.previewSource='hosting-preview-uat';after.previewWriteAt=now();}
 after.tenantId=authz.tenantId;after.schemaVersion=VERSION;after.updatedAt=now();after.updatedByUid=authz.actor.uid;if(!before){after.createdAt=now();after.createdByUid=authz.actor.uid;}tx.set(entity,after,{merge:true});tx.set(eventRef(authz.tenantId,eventId,previewOnly),{schemaVersion:VERSION,tenantId:authz.tenantId,operation,entityType,entityId:entityId,requestId:rid,actor:authz.actor,reason:motivo,beforeDigest:before?digest(before):'',afterDigest:digest(after),previewWrite:previewOnly===true,createdAt:now()},{merge:false});const comments=[].concat(after.comentarios||[]),collab=comments.length?comments[comments.length-1]:null,collabDirection=entityType==='negocios'?collaborationWriteDirection(before,after):'',targets=[];
@@ -234,7 +295,15 @@ after.tenantId=authz.tenantId;after.schemaVersion=VERSION;after.updatedAt=now();
   if(!clientReadback||!clientReadback.exists||!policyReadback||!policyReadback.exists)throw new HttpsError('internal','EMISSION_INTEGRATED_READBACK_MISSING');
   response.emissionReadback={clientId,clientExists:true,policyId,policyExists:true,vehicleId,vehicleExists:vehicleId?!!(vehicleReadback&&vehicleReadback.exists):false,transactional:true};
 }
-if(['archive_business','archive_management'].includes(operation)){response.deleteAuditReadback={deleted:confirmedRow.deleted===true,eliminado:confirmedRow.eliminado===true,archivado:confirmedRow.archivado===true,deleteReason:text(confirmedRow.deleteReason||confirmedRow.motivoEliminacion,600),deletedAt:text(confirmedRow.deletedAt||confirmedRow.eliminadoAt,120),deletedByRole:text(confirmedRow.deletedByRole,120),estadoEliminacion:text(confirmedRow.estadoEliminacion,120)};}return Object.assign({},committed,response);}
+if(['archive_business','archive_management'].includes(operation)){response.deleteAuditReadback={deleted:confirmedRow.deleted===true,eliminado:confirmedRow.eliminado===true,archivado:confirmedRow.archivado===true,deleteReason:text(confirmedRow.deleteReason||confirmedRow.motivoEliminacion,600),deletedAt:text(confirmedRow.deletedAt||confirmedRow.eliminadoAt,120),deletedByRole:text(confirmedRow.deletedByRole,120),estadoEliminacion:text(confirmedRow.estadoEliminacion,120)};}
+if(entityType==='gestiones'&&confirmedRow.workflowType==='endorsement_request'){
+  response.endorsementReadback={workflowType:confirmedRow.workflowType,endorsementKey:confirmedRow.endorsementKey,
+    endorsementType:confirmedRow.endorsementType,endorsementStage:confirmedRow.endorsementStage,
+    policyId:confirmedRow.polizaId,documentRef:confirmedRow.documentRef||'',
+    referenciaAseguradora:confirmedRow.referenciaAseguradora||'',fechaEfectiva:confirmedRow.fechaEfectiva||'',
+    policyUpdatedId:confirmedRow.policyUpdatedId||'',proposalDigest:digest(confirmedRow.propuestaCambios)};
+}
+return Object.assign({},committed,response);}
 
 const CADENCE_STEPS=Object.freeze([
  {label:'Día 3 · WhatsApp de seguimiento',nextDays:4},
