@@ -336,8 +336,8 @@ function verifyB4006ManagementCollaborationBackendHardening(cp,state){
   const p=cp.b4006ManagementCollaborationBackendHardening20261108;
   need(p&&same(p,state.b4006ManagementCollaborationBackendHardening20261108)&&
     p.gate==='I6.5/B4-006'&&p.status==='MANAGEMENT_COLLAB_SERVER_CANONICAL_SOURCE_PASS_EXACT_PREVIEW_DEPLOY_PENDING'&&p.receiptPath===B4006_MGMT_COLLAB_BACKEND_RECEIPT&&
-    p.receiptBlobSha==='039ec66fa0213f8171f0afd1c5af09003164fe60'&&p.sourcePredecessor==='dc63bcf77342a041e3d17014b6fd08cf90ea62c4'&&
-    p.newBackendBlobSha==='42d00a7b97d5752eb545dcd24ffd2905bdb08bb4'&&p.newWriterBlobSha==='da7493e445b712b4434364e231ffacf296018e07'&&
+    p.receiptBlobSha==='4eea1bf6af47d01740a2d80da2e557ec64307bd7'&&p.sourcePredecessor==='dc63bcf77342a041e3d17014b6fd08cf90ea62c4'&&
+    p.newBackendBlobSha==='be9aef378e1b3155408325352ca1678923b86014'&&p.newWriterBlobSha==='da7493e445b712b4434364e231ffacf296018e07'&&
     p.testPath==='tools/gravicentra-b4-006-management-collaboration.test.cjs'&&p.testBlobSha==='098e3db6a2277cbd230898f33e0d22f5df4377ac'&&
     p.previewBackendDeployAuthorized===true&&p.onlyPreviewCallable==='orbit360OpsLeadsCommandPreview'&&
     p.firstIncompleteGate==='B4-006'&&p.lastClosedGate==='B4-005'&&p.ownerAcceptedExactArtifact===false&&

@@ -11,7 +11,7 @@
   "changedProductPaths": [
     {
       "path": "functions/product-ops-leads-domain.js",
-      "gitBlobSha": "42d00a7b97d5752eb545dcd24ffd2905bdb08bb4",
+      "gitBlobSha": "be9aef378e1b3155408325352ca1678923b86014",
       "kind": "PREVIEW_AND_LIVE_SAME_SOURCE_BACKEND"
     },
     {
@@ -34,7 +34,8 @@
     "technicalEmailAuthorRejected": true,
     "previewFunction": "orbit360OpsLeadsCommandPreview",
     "productionFunction": "orbit360OpsLeadsCommand",
-    "sourceTestFirebaseWrites": 0
+    "sourceTestFirebaseWrites": 0,
+    "noStaleDirectionOnUnrelatedManagementSave": true
   },
   "predecessorExactPreview": {
     "sourceSha": "dc63bcf77342a041e3d17014b6fd08cf90ea62c4",
