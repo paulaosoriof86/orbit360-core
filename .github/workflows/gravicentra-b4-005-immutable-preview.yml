@@ -11,6 +11,7 @@ on:
     paths:
       - .github/workflows/gravicentra-b4-005-immutable-preview.yml
       - orbit360-platform/modules/aseguradoras.js
+      - orbit360-platform/modules/cobros.js
       - orbit360-platform/modules/siniestros.js
       - orbit360-platform/styles/infra.css
       - orbit360-platform/index.html
@@ -79,6 +80,7 @@ jobs:
           node --check orbit360-platform/modules/issuance-endosos-v1201-refinements.js
           node --check orbit360-platform/modules/policy-receipts-v1199-detail-guard.js
           node --check orbit360-platform/modules/aseguradoras.js
+          node --check orbit360-platform/modules/cobros.js
           node --check orbit360-platform/modules/siniestros.js
       - name: Fingerprint existing LIVE sites without touching them
         run: |
