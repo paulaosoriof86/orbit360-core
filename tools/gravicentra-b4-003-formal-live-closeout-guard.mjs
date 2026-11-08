@@ -966,7 +966,7 @@ function projectFrozenB4003AfterB4004Preview(after,certified){
  proof.authenticatedFocal.status==='FOCAL_SCOPE_PASS'&&proof.authenticatedFocal.dataWrites===0&&
  proof.authenticatedFocal.scoped403===0&&proof.authenticatedFocal.cronogramaRouteMs<=6000,'POST_B4004_PREVIEW_FOCAL_PROOF_INVALID');
  need(p.sourceSha===proof.currentBuild.sourceSha&&p.buildId===proof.currentBuild.buildId&&p.artifactId===proof.currentBuild.artifactId,'POST_B4004_CURRENT_PREVIEW_POINTER');
- need(same(p,state.b4004CronogramaCountryFocalPreviewPass20261107)&&state.nextAction===after.nextAction&&after.nextAction.startsWith('B4_004_'),'POST_B4004_CURSOR_SYNC');
+ need(same(p,state.b4004CronogramaCountryFocalPreviewPass20261107)&&state.nextAction===after.nextAction&&(after.nextAction.startsWith('B4_004_')||after.nextAction==='B4_006_BUILD_ONE_NEW_IMMUTABLE_PREVIEW_THEN_VISUAL_QA_AND_OWNER_ACCEPTANCE'&&after.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&after.b4006VisualReadonlyCandidateSource20261108?.status==='SOURCE_VISUAL_DELTA_READY_FOR_NEW_IMMUTABLE_PREVIEW'&&same(after.b4006VisualReadonlyCandidateSource20261108,state.b4006VisualReadonlyCandidateSource20261108)),'POST_B4004_CURSOR_SYNC');
  if(after.b4004FormalGateSeal20261107){
   const next=verifyB4004FormalGate();
   need(next.status==='PASS'&&next.nextGate==='B4-005','POST_B4004_TERMINAL_SEAL');
