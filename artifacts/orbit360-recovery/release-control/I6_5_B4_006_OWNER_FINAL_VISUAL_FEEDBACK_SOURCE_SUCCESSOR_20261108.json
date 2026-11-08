@@ -1,0 +1,65 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_006_OWNER_FINAL_VISUAL_FEEDBACK_SOURCE_SUCCESSOR_V1",
+  "gate": "I6.5/B4-006",
+  "status": "OWNER_FINAL_VISUAL_FEEDBACK_SOURCE_SUCCESSOR_PREVIEW_PENDING",
+  "recordedAtLocal": "2026-11-08",
+  "timezone": "America/Guatemala",
+  "sourcePredecessor": "bf229e02416d13ca0ef342859e5efc75420c0a53",
+  "previousImmutableArtifact": {
+    "sourceCommit": "0d202a8121043e776a7e1d1ec32678ebf8b72668",
+    "buildId": "gi-i65-b4-0d202a812104-57f234755dc1",
+    "artifactId": 13624916797,
+    "exactHostedFiles": "218/218",
+    "previousCssBlobSha": "166f9cbf01839f80c833c48e692e6f1c5f16f90f"
+  },
+  "ownerFeedback": {
+    "cards": "Mejorar todavía contraste, acabado visual e iconografía/emoticones de las tarjetas.",
+    "tables": "Conservar encabezado premium y centrar el texto de encabezados.",
+    "performance": "Persisten demoras al cambiar módulos; Cancelaciones mejoró. Medir transiciones directamente antes de PASS de performance.",
+    "expectedDecision": "Probable aprobación visual en la siguiente pasada."
+  },
+  "changedProductPaths": [
+    {
+      "path": "orbit360-platform/styles/infra.css",
+      "gitBlobSha": "46ad6fee77a591073994a6d77018b7855192d950",
+      "scope": "visual-only"
+    }
+  ],
+  "appliedVisualDelta": [
+    "Encabezados de tablas canónicas centrados sin cambiar contenido ni orden.",
+    "Mayor contraste, profundidad y jerarquía en tarjetas de Contactos, Plataformas y Bancos de Aseguradoras.",
+    "Iconografía contextual en filas/tarjetas operativas de esas pestañas.",
+    "Refuerzo sutil de tarjetas de conocimiento y Kanban Ops/Leads sin cambiar semántica ni acciones."
+  ],
+  "managementSheetReview": {
+    "collaborativeThreadOnManagementSheet": false,
+    "presentCapabilities": [
+      "Nota / contexto",
+      "Bitácora",
+      "Checklist",
+      "Adjuntos Drive"
+    ],
+    "businessOpportunityCollaborativeThread": true,
+    "attachmentSourceContract": "uploadDocument → updateDurable('gestiones') → immediate canonical S().get readback",
+    "attachmentReloadPersistenceCertification": "PENDING_SYNTHETIC_UPLOAD_RELOAD_REOPEN_E2E",
+    "disposition": "OPEN_REVIEW_FINDING_NOT_SILENTLY_ADDED_INSIDE_VISUAL_ONLY_DELTA"
+  },
+  "performanceReview": {
+    "exactModuleTransitionTiming": "PENDING_CONNECTED_AUTHENTICATED_BROWSER_MEASUREMENT",
+    "knownObservation": "Perceived late loading remains; prior evidence noted 489 Cancelaciones rows and 86 Renovaciones cards.",
+    "sourceOptimizationInThisDelta": false
+  },
+  "safety": {
+    "editorContractsChanged": false,
+    "businessSemanticsChanged": false,
+    "backendDeploys": 0,
+    "firestoreRulesWrites": 0,
+    "authChanges": 0,
+    "realDataWrites": 0,
+    "liveDeploys": 0,
+    "reimport": false,
+    "sameCanonicalPreviewChannel": true,
+    "immutableRule": "Source changed after artifact 13624916797; therefore a fresh buildId/digest/artifact is required. Never patch the certified artifact."
+  },
+  "nextAction": "B4_006_BUILD_ONE_NEW_IMMUTABLE_PREVIEW_AFTER_OWNER_FINAL_VISUAL_FEEDBACK"
+}

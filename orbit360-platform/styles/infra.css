@@ -2041,3 +2041,73 @@ a.fh-chip:hover{border-color:var(--red);color:var(--red)}
 @media(max-width:480px){
   .page:has(.renewal-board) .renewal-policy-card{padding:12px!important;}
 }
+
+
+/* B4-006 · Dirección 2026-11-08: acabado final de tarjetas + encabezados centrados. */
+:is(.tbl,.insurer-doc-table) thead th{
+  text-align:center!important;
+  vertical-align:middle!important;
+}
+.asg-sec:not(.insurer-premium-section) :is(#af-contactos,#af-portales,#af-cuentas)>.asg-row{
+  position:relative;
+  border-color:#bfc8d4!important;
+  border-left:5px solid #c51635!important;
+  background:linear-gradient(132deg,#ffffff 0%,#f4f6f9 100%)!important;
+  box-shadow:0 14px 30px -26px rgba(17,24,39,.68),0 3px 9px rgba(17,24,39,.055)!important;
+  transition:border-color .16s ease,box-shadow .16s ease,transform .16s ease;
+}
+.asg-sec:not(.insurer-premium-section) :is(#af-contactos,#af-portales,#af-cuentas)>.asg-row::before{
+  display:grid;
+  place-items:center;
+  flex:0 0 38px;
+  width:38px;height:38px;
+  margin-right:2px;
+  border:1px solid #e7b9c4;
+  border-radius:12px;
+  background:linear-gradient(145deg,#fff,#f8e6eb);
+  box-shadow:0 8px 18px -15px rgba(17,24,39,.65);
+  font:normal 18px/1 var(--f-text);
+}
+.asg-sec:not(.insurer-premium-section) #af-contactos>.asg-row::before{content:"👤";}
+.asg-sec:not(.insurer-premium-section) #af-portales>.asg-row::before{content:"🔐";}
+.asg-sec:not(.insurer-premium-section) #af-cuentas>.asg-row::before{content:"💳";}
+.asg-sec:not(.insurer-premium-section) :is(#af-contactos,#af-portales,#af-cuentas)>.asg-row:hover{
+  border-color:#a91330!important;
+  box-shadow:0 17px 34px -25px rgba(17,24,39,.62),0 4px 10px rgba(17,24,39,.07)!important;
+  transform:translateY(-1px);
+}
+.insurer-knowledge-card{
+  position:relative;
+  border-left:4px solid #c51635!important;
+  background:linear-gradient(132deg,#fff 0%,#f4f7fa 100%)!important;
+  box-shadow:0 12px 25px -23px rgba(17,24,39,.62),0 2px 7px rgba(17,24,39,.05);
+}
+.insurer-knowledge-card::before{
+  content:"🧠";
+  display:grid;
+  place-items:center;
+  flex:0 0 34px;
+  width:34px;height:34px;
+  border-radius:10px;
+  border:1px solid #ecc5ce;
+  background:#f9e8ec;
+  font:normal 17px/1 var(--f-text);
+}
+.page:has(.kanban) .kcard{
+  box-shadow:0 14px 29px -24px rgba(17,24,39,.68),0 3px 9px rgba(17,24,39,.06);
+}
+.page:has(.kanban) .kcard:hover{
+  box-shadow:0 18px 34px -24px rgba(17,24,39,.62),0 5px 13px rgba(17,24,39,.07);
+}
+.page:has(.kanban) .kcard .badge{
+  border-color:#c4ccd6;
+  box-shadow:0 2px 5px rgba(17,24,39,.045);
+}
+@media(max-width:760px){
+  .asg-sec:not(.insurer-premium-section) :is(#af-contactos,#af-portales,#af-cuentas)>.asg-row::before{
+    flex-basis:32px;width:32px;height:32px;font-size:15px;
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  .asg-sec:not(.insurer-premium-section) :is(#af-contactos,#af-portales,#af-cuentas)>.asg-row:hover{transform:none;}
+}
