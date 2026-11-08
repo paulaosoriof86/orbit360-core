@@ -35,6 +35,8 @@ const B4006_OWNER_FINAL_FEEDBACK_RECEIPT=ROOT+'I6_5_B4_006_OWNER_FINAL_VISUAL_FE
 const B4006_OWNER_FINAL_FEEDBACK_ACTION='B4_006_BUILD_ONE_NEW_IMMUTABLE_PREVIEW_AFTER_OWNER_FINAL_VISUAL_FEEDBACK';
 const B4006_MGMT_COLLAB_RECEIPT=ROOT+'I6_5_B4_006_OPS_MANAGEMENT_COLLABORATION_SOURCE_SUCCESSOR_20261108.json';
 const B4006_MGMT_COLLAB_ACTION='B4_006_BUILD_ONE_IMMUTABLE_PREVIEW_MANAGEMENT_COLLAB_AND_VISUAL_RECHECK';
+const B4006_MGMT_COLLAB_BACKEND_RECEIPT=ROOT+'I6_5_B4_006_OPS_MANAGEMENT_COLLABORATION_BACKEND_HARDENING_20261108.json';
+const B4006_MGMT_COLLAB_BACKEND_ACTION='B4_006_DEPLOY_EXACT_PREVIEW_MANAGEMENT_COLLAB_BACKEND_AND_HOSTING_THEN_E2E';
 const SOURCE='f8fa00e4e2e6627cee66c8c521866874e39bc8da';
 const BUILD='gi-i65-b4-f8fa00e4e2e6-57f234755dc1';
 const ARTIFACT=13600357541;
@@ -330,6 +332,40 @@ function verifyB4006ManagementCollaborationSource(cp,state){
   return true;
 }
 
+function verifyB4006ManagementCollaborationBackendHardening(cp,state){
+  const p=cp.b4006ManagementCollaborationBackendHardening20261108;
+  need(p&&same(p,state.b4006ManagementCollaborationBackendHardening20261108)&&
+    p.gate==='I6.5/B4-006'&&p.status==='MANAGEMENT_COLLAB_SERVER_CANONICAL_SOURCE_PASS_EXACT_PREVIEW_DEPLOY_PENDING'&&p.receiptPath===B4006_MGMT_COLLAB_BACKEND_RECEIPT&&
+    p.receiptBlobSha==='039ec66fa0213f8171f0afd1c5af09003164fe60'&&p.sourcePredecessor==='dc63bcf77342a041e3d17014b6fd08cf90ea62c4'&&
+    p.newBackendBlobSha==='42d00a7b97d5752eb545dcd24ffd2905bdb08bb4'&&p.newWriterBlobSha==='da7493e445b712b4434364e231ffacf296018e07'&&
+    p.testPath==='tools/gravicentra-b4-006-management-collaboration.test.cjs'&&p.testBlobSha==='098e3db6a2277cbd230898f33e0d22f5df4377ac'&&
+    p.previewBackendDeployAuthorized===true&&p.onlyPreviewCallable==='orbit360OpsLeadsCommandPreview'&&
+    p.firstIncompleteGate==='B4-006'&&p.lastClosedGate==='B4-005'&&p.ownerAcceptedExactArtifact===false&&
+    p.realDataWrites===0&&p.liveDeploys===0&&p.oneCanonicalPreviewChannel===true,
+    'B4006_MGMT_COLLAB_BACKEND_POINTER');
+  const r=readPinned(B4006_MGMT_COLLAB_BACKEND_RECEIPT,p.receiptBlobSha);
+  need(r.schema==='GRAVICENTRA_I6_5_B4_006_OPS_MANAGEMENT_COLLABORATION_BACKEND_HARDENING_V1'&&
+    r.gate===p.gate&&r.status===p.status&&r.sourcePredecessor===p.sourcePredecessor&&
+    same((r.changedProductPaths||[]).map(x=>x.path).sort(),[
+      'functions/product-ops-leads-domain.js',
+      'orbit360-platform/data/store-firestore-product-operational-p0.js',
+      'tools/gravicentra-b4-006-management-collaboration.test.cjs'
+    ].sort())&&
+    r.contract?.managementUpdateServerCanonicalizesNewComment===true&&
+    r.contract?.serverCollaborationReadback===true&&r.contract?.technicalEmailAuthorRejected===true&&
+    r.boundaries?.previewBackendDeployAuthorized===true&&r.boundaries?.onlyPreviewCallable==='orbit360OpsLeadsCommandPreview'&&
+    r.boundaries?.liveBackendDeploys===0&&r.boundaries?.liveHostingDeploys===0&&
+    r.boundaries?.firestoreRulesWrites===0&&r.boundaries?.realDataWrites===0&&r.boundaries?.reimport===false&&
+    r.nextAction===B4006_MGMT_COLLAB_BACKEND_ACTION&&
+    git('merge-base',r.sourcePredecessor,'HEAD')===r.sourcePredecessor&&
+    git('rev-parse','HEAD:functions/product-ops-leads-domain.js')===p.newBackendBlobSha&&
+    git('rev-parse','HEAD:orbit360-platform/data/store-firestore-product-operational-p0.js')===p.newWriterBlobSha&&
+    git('rev-parse','HEAD:'+p.testPath)===p.testBlobSha&&
+    verifyB4006ManagementCollaborationSource(cp,state),
+    'B4006_MGMT_COLLAB_BACKEND_RECEIPT');
+  return true;
+}
+
 function verifyB4006LatestActualVisualQa(cp,state){
   const p=cp.b4006LatestActualVisualQa20261108;
   need(p&&same(p,state.b4006LatestActualVisualQa20261108)&&
@@ -482,7 +518,7 @@ export function verifyDeclaredB4005SourceSuccessor(cp=read(CP),state=read(STATE)
       'orbit360-platform/modules/issuance-endosos-v1201-bridge.js',
       'orbit360-platform/modules/issuance-endosos-v1201-refinements.js',
       'orbit360-platform/modules/policy-receipts-v1199-detail-guard.js'
-    ].concat(visualPaths,cp.b4006VisualUnificationSuccessor20261108?['orbit360-platform/modules/cobros.js']:[],cp.b4006ManagementCollaborationSourceSuccessor20261108?['orbit360-platform/core/ciclo.js']:[]).sort();
+    ].concat(visualPaths,cp.b4006VisualUnificationSuccessor20261108?['orbit360-platform/modules/cobros.js']:[],cp.b4006ManagementCollaborationSourceSuccessor20261108?['orbit360-platform/core/ciclo.js']:[],cp.b4006ManagementCollaborationBackendHardening20261108?['orbit360-platform/data/store-firestore-product-operational-p0.js']:[]).sort();
     need(same(changed,expected),'B4005_CAUSAL_UNDECLARED_PRODUCT_CHANGE');
     const declared=receipt.sourceAndTests||[];
     need(declared.length===4&&same(declared.map(x=>x.path).sort(),[
@@ -491,8 +527,13 @@ export function verifyDeclaredB4005SourceSuccessor(cp=read(CP),state=read(STATE)
       'orbit360-platform/data/store-firestore-product-operational-p0.js',
       'tools/gravicentra-b4-005-endosos-durable-contract.mjs'
     ].sort()),'B4005_CAUSAL_CHANGED_FILES_MISMATCH');
-    for(const f of declared)need(git('rev-parse','HEAD:'+f.path)===f.gitBlobSha&&
-      blob(fs.readFileSync(f.path))===f.gitBlobSha,'B4005_CAUSAL_CHANGED_BLOB_'+f.path);
+    for(const f of declared){
+      const expectedB4005Blob=(f.path==='functions/product-ops-leads-domain.js'&&cp.b4006ManagementCollaborationBackendHardening20261108)
+        ? cp.b4006ManagementCollaborationBackendHardening20261108.newBackendBlobSha : f.gitBlobSha;
+      need(git('rev-parse','HEAD:'+f.path)===expectedB4005Blob&&
+        blob(fs.readFileSync(f.path))===expectedB4005Blob,'B4005_CAUSAL_CHANGED_BLOB_'+f.path);
+    }
+    if(cp.b4006ManagementCollaborationBackendHardening20261108)verifyB4006ManagementCollaborationBackendHardening(cp,state);
     need(git('rev-parse','HEAD:'+B4005_RECEIPT)==='295a73390427c2c907a36f51adc11650bb7a64a4',
       'B4005_HISTORICAL_SOURCE_RECEIPT_REWRITTEN');
     return {paths:expected,status:'CORRECTIVE_SOURCE_PREVIEW_E2E_PENDING',receiptBlobSha:corrective.receiptBlobSha};
@@ -558,7 +599,7 @@ export function verifyB4004FormalGate(){
   need(blob(bytes)===ref.receiptBlobSha&&sha256(bytes)===ref.receiptSha256&&ref.receiptBlobSha===mirror.receiptBlobSha&&ref.receiptSha256===mirror.receiptSha256,'SEAL_HASH');
   need(releaseMatches(ref)&&releaseMatches(mirror)&&ref.hostingVersion===VERSION&&ref.hostedPayloadDigest===DIGEST,'SEAL_RELEASE_POINTER');
   need(ref.lastClosedGate==='B4-004'&&mirror.lastClosedGate==='B4-004'&&ref.firstIncompleteGate==='B4-005'&&mirror.firstIncompleteGate==='B4-005','NEXT_GATE');
-  need((cp.nextAction===ACTION&&state.nextAction===ACTION||(cp.nextAction===B4006_VISUAL_ACTION&&state.nextAction===B4006_VISUAL_ACTION&&cp.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&state.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&cp.b4006VisualReadonlyCandidateSource20261108?.status==='SOURCE_VISUAL_DELTA_READY_FOR_NEW_IMMUTABLE_PREVIEW'||cp.nextAction===B4006_FINAL_ACTION&&state.nextAction===B4006_FINAL_ACTION&&cp.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&state.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&verifyB4006AssistantVisualQa(cp,state)||cp.nextAction===B4006_OWNER_SOURCE_ACTION&&state.nextAction===B4006_OWNER_SOURCE_ACTION&&cp.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&state.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&verifyB4006RealInsurerVisualSource(cp,state)||cp.nextAction===B4006_LATEST_VISUAL_QA_ACTION&&state.nextAction===B4006_LATEST_VISUAL_QA_ACTION&&cp.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&state.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&verifyB4006LatestActualVisualQa(cp,state)||cp.nextAction===B4006_UNIFICATION_ACTION&&state.nextAction===B4006_UNIFICATION_ACTION&&cp.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&state.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&verifyB4006VisualUnificationSuccessor(cp,state)||cp.nextAction===B4006_POLISH_ACTION&&state.nextAction===B4006_POLISH_ACTION&&cp.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&state.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&verifyB4006VisualUnificationSuccessor(cp,state)||cp.nextAction===B4006_FINAL_POLISH_ACTION&&state.nextAction===B4006_FINAL_POLISH_ACTION&&cp.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&state.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&verifyB4006ExactPolishPreviewReadback(cp,state)||cp.nextAction===B4006_OWNER_FINAL_FEEDBACK_ACTION&&state.nextAction===B4006_OWNER_FINAL_FEEDBACK_ACTION&&cp.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&state.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&verifyB4006OwnerFinalVisualFeedbackSource(cp,state)||cp.nextAction===B4006_MGMT_COLLAB_ACTION&&state.nextAction===B4006_MGMT_COLLAB_ACTION&&cp.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&state.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&verifyB4006ManagementCollaborationSource(cp,state)))&&ref.nextAction===ACTION&&mirror.nextAction===ACTION,'NEXT_ACTION_SYNC');
+  need((cp.nextAction===ACTION&&state.nextAction===ACTION||(cp.nextAction===B4006_VISUAL_ACTION&&state.nextAction===B4006_VISUAL_ACTION&&cp.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&state.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&cp.b4006VisualReadonlyCandidateSource20261108?.status==='SOURCE_VISUAL_DELTA_READY_FOR_NEW_IMMUTABLE_PREVIEW'||cp.nextAction===B4006_FINAL_ACTION&&state.nextAction===B4006_FINAL_ACTION&&cp.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&state.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&verifyB4006AssistantVisualQa(cp,state)||cp.nextAction===B4006_OWNER_SOURCE_ACTION&&state.nextAction===B4006_OWNER_SOURCE_ACTION&&cp.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&state.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&verifyB4006RealInsurerVisualSource(cp,state)||cp.nextAction===B4006_LATEST_VISUAL_QA_ACTION&&state.nextAction===B4006_LATEST_VISUAL_QA_ACTION&&cp.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&state.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&verifyB4006LatestActualVisualQa(cp,state)||cp.nextAction===B4006_UNIFICATION_ACTION&&state.nextAction===B4006_UNIFICATION_ACTION&&cp.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&state.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&verifyB4006VisualUnificationSuccessor(cp,state)||cp.nextAction===B4006_POLISH_ACTION&&state.nextAction===B4006_POLISH_ACTION&&cp.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&state.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&verifyB4006VisualUnificationSuccessor(cp,state)||cp.nextAction===B4006_FINAL_POLISH_ACTION&&state.nextAction===B4006_FINAL_POLISH_ACTION&&cp.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&state.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&verifyB4006ExactPolishPreviewReadback(cp,state)||cp.nextAction===B4006_OWNER_FINAL_FEEDBACK_ACTION&&state.nextAction===B4006_OWNER_FINAL_FEEDBACK_ACTION&&cp.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&state.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&verifyB4006OwnerFinalVisualFeedbackSource(cp,state)||cp.nextAction===B4006_MGMT_COLLAB_ACTION&&state.nextAction===B4006_MGMT_COLLAB_ACTION&&cp.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&state.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&verifyB4006ManagementCollaborationSource(cp,state)||cp.nextAction===B4006_MGMT_COLLAB_BACKEND_ACTION&&state.nextAction===B4006_MGMT_COLLAB_BACKEND_ACTION&&cp.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&state.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&verifyB4006ManagementCollaborationBackendHardening(cp,state)))&&ref.nextAction===ACTION&&mirror.nextAction===ACTION,'NEXT_ACTION_SYNC');
   need(cp.pendingClosureMasterPlan?.status==='B4_004_CLOSED_PASS_NEXT_B4_005_E2E_NOT_EXECUTED'&&cp.pendingClosureMasterPlan.currentGate==='B4-005'&&cp.pendingClosureMasterPlan.b4004Held===false,'PLAN_CURSOR');
   need(cp.currentB4?.status==='B4_003_CLOSED_PASS_CURRENT42'&&same(cp.currentB4,historic.currentB4),'B4003_FROZEN_POINTER');
   need(cp.b4003ActiveCertificationCursor20261106?.formalLiveAcceptance?.status==='LATEST_APPROVED_VERSION_LIVE_PASS'&&same(cp.b4003ActiveCertificationCursor20261106,historic.b4003ActiveCertificationCursor20261106),'B4003_PRESERVED');

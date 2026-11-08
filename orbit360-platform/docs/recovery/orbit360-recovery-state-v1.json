@@ -187,7 +187,7 @@
     "phaseAIterationStatuses": "HISTORICAL_FIELDS_ABOVE_PRESERVED_UNTIL_FORMAL_GATE_EVIDENCE;_NO_NEW_PASS_INFERRED",
     "labDataWriteScope": "ONLY_35_AUTHORIZED_COUNTRY_FIELDS;_NO_AUGUST_REFRESH"
   },
-  "nextAction": "B4_006_BUILD_ONE_IMMUTABLE_PREVIEW_MANAGEMENT_COLLAB_AND_VISUAL_RECHECK",
+  "nextAction": "B4_006_DEPLOY_EXACT_PREVIEW_MANAGEMENT_COLLAB_BACKEND_AND_HOSTING_THEN_E2E",
   "sourceOfTruth": {
     "projectBoundaryPrevalentAddendum": "orbit360-platform/docs/recovery/ADDENDUM_PREVALENTE_CHATGPT_PROJECT_BOUNDARY_20260831.md",
     "mutableState": "orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json",
@@ -1340,6 +1340,25 @@
     "ownerAcceptedExactArtifact": false,
     "backendSourceChanged": false,
     "functionsDeployRequired": false,
+    "realDataWrites": 0,
+    "liveDeploys": 0,
+    "oneCanonicalPreviewChannel": true
+  },
+  "b4006ManagementCollaborationBackendHardening20261108": {
+    "gate": "I6.5/B4-006",
+    "status": "MANAGEMENT_COLLAB_SERVER_CANONICAL_SOURCE_PASS_EXACT_PREVIEW_DEPLOY_PENDING",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_006_OPS_MANAGEMENT_COLLABORATION_BACKEND_HARDENING_20261108.json",
+    "receiptBlobSha": "039ec66fa0213f8171f0afd1c5af09003164fe60",
+    "sourcePredecessor": "dc63bcf77342a041e3d17014b6fd08cf90ea62c4",
+    "newBackendBlobSha": "42d00a7b97d5752eb545dcd24ffd2905bdb08bb4",
+    "newWriterBlobSha": "da7493e445b712b4434364e231ffacf296018e07",
+    "testPath": "tools/gravicentra-b4-006-management-collaboration.test.cjs",
+    "testBlobSha": "098e3db6a2277cbd230898f33e0d22f5df4377ac",
+    "previewBackendDeployAuthorized": true,
+    "onlyPreviewCallable": "orbit360OpsLeadsCommandPreview",
+    "firstIncompleteGate": "B4-006",
+    "lastClosedGate": "B4-005",
+    "ownerAcceptedExactArtifact": false,
     "realDataWrites": 0,
     "liveDeploys": 0,
     "oneCanonicalPreviewChannel": true

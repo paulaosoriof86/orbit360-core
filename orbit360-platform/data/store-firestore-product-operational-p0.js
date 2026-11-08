@@ -318,6 +318,25 @@
         if(Object.prototype.hasOwnProperty.call(payload,'documentoCargaPendiente')&&!!payload.documentoCargaPendiente!==!!result.managementDocumentReadback.documentoCargaPendiente)throw new Error('PRODUCT_WORKFLOW_DOCUMENT_PENDING_READBACK_MISMATCH');
         if(Array.isArray(payload.documentoCargaFallida)&&payload.documentoCargaFallida.length!==Number(result.managementDocumentReadback.documentoCargaFallidaCount||0))throw new Error('PRODUCT_WORKFLOW_DOCUMENT_FAILURE_READBACK_MISMATCH');
       }
+      if(workflow&&(collection==='negocios'||collection==='gestiones')&&action==='update'&&payload&&prior&&Array.isArray(payload.comentarios)){
+        var priorComments=[].concat(prior.comentarios||[]),nextComments=[].concat(payload.comentarios||[]);
+        if(nextComments.length>priorComments.length){
+          var wantedComment=nextComments[nextComments.length-1]||{},confirmedComment=result&&result.collaborationReadback||null;
+          if(!confirmedComment||
+             text(confirmedComment.eventId)!==text(wantedComment.eventId)||
+             text(confirmedComment.texto)!==text(wantedComment.texto)||
+             text(confirmedComment.tipo)!==text(wantedComment.tipo)||
+             text(confirmedComment.direction)!==text(wantedComment.direction)||
+             !text(confirmedComment.actorUid)||!text(confirmedComment.actorName)||
+             text(confirmedComment.actorName).indexOf('@')>=0)
+            throw new Error('PRODUCT_WORKFLOW_COLLABORATION_DURABLE_READBACK_REQUIRED');
+          if(pending[collection]&&pending[collection][id]){
+            var pendingComments=[].concat(pending[collection][id].comentarios||[]);
+            if(pendingComments.length)pendingComments[pendingComments.length-1]=clone(confirmedComment);
+            pending[collection][id].comentarios=pendingComments;
+          }
+        }
+      }
       state.pending=Math.max(0,state.pending-1);state.committed+=1;state.lastCommittedAt=new Date().toISOString();state.lastError='';
       if(collection==='negocios'&&result&&result.projection&&text(result.projection.clientId)&&pending[collection]&&pending[collection][id]&&pending[collection][id].clienteIdCreado===SERVER_EMISSION_GUARD){pending[collection][id].clienteIdCreado=text(result.projection.clientId);pending[collection][id].clienteId=pending[collection][id].clienteId||text(result.projection.clientId);}
       try{window.dispatchEvent(new CustomEvent('orbit:operational-write:committed',{detail:{collection:collection,id:id,action:action,version:VERSION,serverOwned:true,canonicalReadback:!workflow}}));}catch(e){}

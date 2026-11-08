@@ -18,4 +18,10 @@ ok(management.includes("'comentarios'"),'backend management mutable allowlist la
 ok(management.includes("'bitacora'"),'backend management mutable allowlist lacks bitacora');
 ok(writer.includes("if(collection==='gestiones')")&&writer.includes("return'update_management'"),'durable writer does not map management update');
 ok(front.includes("sourceModule:'ops-management-collab'"),'management collaboration document context missing');
+ok(backend.includes("operation==='update_business'||operation==='update_management'"),'management collaboration is not server-canonicalized');
+ok(backend.includes("collabDirection=collaborationWriteDirection(before,after)"),'management collaboration direction is not server-derived');
+ok(backend.includes("collaborationReadback:[].concat(confirmedRow.comentarios||[]).slice(-1)[0]||null"),'management collaboration server readback missing');
+ok(writer.includes('PRODUCT_WORKFLOW_COLLABORATION_DURABLE_READBACK_REQUIRED'),'browser writer lacks collaboration readback guard');
+ok(writer.includes("text(confirmedComment.eventId)!==text(wantedComment.eventId)"),'collaboration event id is not compared to server readback');
+ok(writer.includes("text(confirmedComment.actorName).indexOf('@')>=0"),'technical/email author rejection missing');
 console.log('B4_006_MANAGEMENT_COLLAB_SOURCE_CONTRACT_PASS checks='+checks+' source_only_no_firebase_writes');

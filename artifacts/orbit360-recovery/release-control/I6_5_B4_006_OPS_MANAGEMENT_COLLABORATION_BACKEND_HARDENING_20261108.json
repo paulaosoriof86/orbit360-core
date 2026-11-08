@@ -1,0 +1,66 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_006_OPS_MANAGEMENT_COLLABORATION_BACKEND_HARDENING_V1",
+  "gate": "I6.5/B4-006",
+  "status": "MANAGEMENT_COLLAB_SERVER_CANONICAL_SOURCE_PASS_EXACT_PREVIEW_DEPLOY_PENDING",
+  "recordedAtLocal": "2026-11-08",
+  "timezone": "America/Guatemala",
+  "sourcePredecessor": "dc63bcf77342a041e3d17014b6fd08cf90ea62c4",
+  "supersedesOnlyForManagementCollab": "I6_5_B4_006_OPS_MANAGEMENT_COLLABORATION_SOURCE_SUCCESSOR_20261108.json",
+  "ownerAuthorization": "Paula confirmed continuing the collaborative-comments addition to the Ops management sheet.",
+  "rationale": "The first UI successor could persist through the existing management writer, but its immediate UI readback could still be satisfied by the optimistic overlay. This successor makes author, event and collaboration readback server-owned before any persistence PASS.",
+  "changedProductPaths": [
+    {
+      "path": "functions/product-ops-leads-domain.js",
+      "gitBlobSha": "42d00a7b97d5752eb545dcd24ffd2905bdb08bb4",
+      "kind": "PREVIEW_AND_LIVE_SAME_SOURCE_BACKEND"
+    },
+    {
+      "path": "orbit360-platform/data/store-firestore-product-operational-p0.js",
+      "gitBlobSha": "da7493e445b712b4434364e231ffacf296018e07",
+      "kind": "SERVER_READBACK_GUARD"
+    },
+    {
+      "path": "tools/gravicentra-b4-006-management-collaboration.test.cjs",
+      "gitBlobSha": "098e3db6a2277cbd230898f33e0d22f5df4377ac",
+      "kind": "SOURCE_CONTRACT"
+    }
+  ],
+  "contract": {
+    "managementUpdateServerCanonicalizesNewComment": true,
+    "serverAuthorFromMembershipOrCanonicalAdvisor": true,
+    "serverTimestamp": true,
+    "serverCollaborationReadback": true,
+    "browserRequiresEventTextTypeDirectionActorMatch": true,
+    "technicalEmailAuthorRejected": true,
+    "previewFunction": "orbit360OpsLeadsCommandPreview",
+    "productionFunction": "orbit360OpsLeadsCommand",
+    "sourceTestFirebaseWrites": 0
+  },
+  "predecessorExactPreview": {
+    "sourceSha": "dc63bcf77342a041e3d17014b6fd08cf90ea62c4",
+    "buildId": "gi-i65-b4-dc63bcf77342-57f234755dc1",
+    "runId": 42510702967,
+    "artifactId": 13629506396,
+    "artifactZipSha256": "5ceaeb244941fcd7cee880e5e9908e84fa3b91879c75e207cab63a45fec0a48b",
+    "hostedPayloadDigest": "88c26c2898bd9983993d978ff08cd0e8ebc0ea6490c3b1a553690cccc55a29ab",
+    "hostedFiles": 218,
+    "liveLabStable": true,
+    "liveCustomDomainStable": true
+  },
+  "boundaries": {
+    "previewBackendDeployAuthorized": true,
+    "onlyPreviewCallable": "orbit360OpsLeadsCommandPreview",
+    "liveBackendDeploys": 0,
+    "liveHostingDeploys": 0,
+    "firestoreRulesWrites": 0,
+    "authChanges": 0,
+    "realDataWrites": 0,
+    "reimport": false,
+    "sameCanonicalPreviewChannel": true,
+    "newImmutableBuildRequired": true
+  },
+  "firstIncompleteGate": "B4-006",
+  "lastClosedGate": "B4-005",
+  "ownerAcceptedExactArtifact": false,
+  "nextAction": "B4_006_DEPLOY_EXACT_PREVIEW_MANAGEMENT_COLLAB_BACKEND_AND_HOSTING_THEN_E2E"
+}
