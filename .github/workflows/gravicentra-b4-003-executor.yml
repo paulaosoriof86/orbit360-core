@@ -5051,6 +5051,7 @@ jobs:
           set -euo pipefail
           node tools/gravicentra-i6-5-b1-branding-snapshot.mjs "$RUNNER_TEMP/b4004-branding.json"
           export TENANT_BRANDING_SNAPSHOT_FILE="$RUNNER_TEMP/b4004-branding.json"
+          export GRAVICENTRA_B4_003_SCOPED_PREVIEW=true
           node tools/gravicentra-i6-1-preview-package.mjs . "$RUNNER_TEMP/b4004-country-package" "$RUNNER_TEMP/b4004-public-config.json" > "$RUNNER_TEMP/b4004-package-result.json"
           export OUTPUT="$RUNNER_TEMP/b4004-country-package/evidence/package-output.json"
           python3 - <<'PY'
