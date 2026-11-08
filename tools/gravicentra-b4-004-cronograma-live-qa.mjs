@@ -46,13 +46,18 @@ async function actorInventory(){
  return out;
 }
 export function pickActors(rows){
- const direction=rows.find(x=>x.activeRole==='direccion'&&x.countries.includes('GT')&&x.advisorId);
- need(direction,'DIRECTION_GT_ACTOR');
- const own=rows.find(x=>x.uid!==direction.uid&&x.countries.includes('GT')&&x.advisorId&&x.advisorId!==direction.advisorId&&x.scope==='own');
- need(own,'DISTINCT_GT_OWN_ACTOR');
- const foreign=rows.find(x=>x.uid!==direction.uid&&x.countries.includes('CO')&&['operativo','asesor','comercial','direccion'].includes(x.activeRole));
- need(foreign,'CO_ACTOR');
- return{direction,own,foreign};
+ const countries=['GT','CO'];
+ for(const country of countries){
+  const creators=rows.filter(x=>x.countries.includes(country)&&x.advisorId&&x.scope==='all'&&['direccion','superadmin','super_admin','admintenant','admin_tenant','admin','operativo'].includes(x.activeRole));
+  for(const creator of creators){
+   const own=rows.find(x=>x.uid!==creator.uid&&x.countries.includes(country)&&x.advisorId&&x.advisorId!==creator.advisorId&&x.scope==='own');
+   if(!own)continue;
+   const otherCountry=country==='GT'?'CO':'GT';
+   const foreign=rows.find(x=>x.uid!==creator.uid&&x.countries.includes(otherCountry)&&!x.countries.includes(country)&&['direccion','operativo','asesor','comercial','superadmin','super_admin','admintenant','admin_tenant','admin'].includes(x.activeRole));
+   if(foreign)return{creator,own,foreign,country,otherCountry};
+  }
+ }
+ throw Error('CRONO_QA_DISTINCT_UID_SCOPE_PAIR_UNAVAILABLE');
 }
 async function applyLegal(page,actor){
  const scope='user:'+clean(actor.email||actor.uid);
@@ -114,31 +119,31 @@ async function execute(){
   const build=await (await fetch(target+'/__recovery__/build.json',{cache:'no-store'})).json();
   need(build.sourceSha===process.env.SOURCE_SHA&&build.buildId===process.env.BUILD_ID,'LIVE_BUILD');
   proof.release={sourceSha:build.sourceSha,buildId:build.buildId,liveVersionName:process.env.LIVE_VERSION};proof.assertions.exactLiveBuild=true;
-  actors=pickActors(await actorInventory());proof.actors={direction:{uidSha256:digest(actors.direction.uid),role:actors.direction.activeRole,countries:actors.direction.countries},own:{uidSha256:digest(actors.own.uid),role:actors.own.activeRole,countries:actors.own.countries,scope:actors.own.scope},foreign:{uidSha256:digest(actors.foreign.uid),role:actors.foreign.activeRole,countries:actors.foreign.countries}};
+  actors=pickActors(await actorInventory());proof.actors={creator:{uidSha256:digest(actors.creator.uid),role:actors.creator.activeRole,countries:actors.creator.countries,scope:actors.creator.scope,country:actors.country},own:{uidSha256:digest(actors.own.uid),role:actors.own.activeRole,countries:actors.own.countries,scope:actors.own.scope},foreign:{uidSha256:digest(actors.foreign.uid),role:actors.foreign.activeRole,countries:actors.foreign.countries,country:actors.otherCountry}};
   browser=await chromium.launch({headless:true});ctx=await browser.newContext({viewport:{width:1440,height:1000},ignoreHTTPSErrors:false,serviceWorkers:'block'});page=await ctx.newPage();recordBrowser(page,'direction');
   await ctx.route(/orbit360ProductOperationalCommand$/,async route=>{
    const req=route.request();if(req.method()==='OPTIONS'){await route.continue();return;}
    try{
     const input=req.postDataJSON()?.data,m=input?.mutations?.[0];
-    need(input?.tenantId===tenantId&&norm(input.activeRole)==='direccion'&&Array.isArray(input.mutations)&&input.mutations.length===1,'WRITE_ENVELOPE');
-    need(m&&m.collection==='tareas'&&m.id===plan.id&&['insert','update'].includes(m.action)&&m.payload?.id===plan.id&&m.payload.__syntheticQa===true&&m.payload.pais==='GT'&&m.payload.asesorId===actors.direction.advisorId,'WRITE_TARGET');
+    need(input?.tenantId===tenantId&&norm(input.activeRole)===norm(actors.creator.activeRole)&&Array.isArray(input.mutations)&&input.mutations.length===1,'WRITE_ENVELOPE');
+    need(m&&m.collection==='tareas'&&m.id===plan.id&&['insert','update'].includes(m.action)&&m.payload?.id===plan.id&&m.payload.__syntheticQa===true&&m.payload.pais===actors.country&&m.payload.asesorId===actors.creator.advisorId,'WRITE_TARGET');
     if(m.action==='insert')need(m.payload.done===false&&m.payload.t===plan.title&&m.payload.fecha===plan.date,'INSERT_PAYLOAD');else need(m.payload.done===true,'UPDATE_PAYLOAD');
     need(calls.length<2,'WRITE_COUNT');calls.push({input,response:null});await route.continue();
    }catch(e){proof.errors.push({code:String(e&&e.message||e)});await route.abort('blockedbyclient');}
   });
   page.on('response',r=>{try{const u=new URL(r.url());if(u.pathname.endsWith('/orbit360ProductOperationalCommand')&&r.request().method()==='POST')calls.filter(x=>!x.response).slice(0,1).forEach(call=>Promise.resolve(r.json()).then(body=>{call.response=body.result||body.data;}).catch(()=>{}));}catch{}});
-  await boot(page,actors.direction,'GT');await page.evaluate(p=>installCronogramaQaAdapter(p),plan);
+  await boot(page,actors.creator,actors.country);await page.evaluate(p=>installCronogramaQaAdapter(p),plan);
   await page.evaluate(({date,title})=>{Orbit.ui.prompt=async()=>date+' '+title;},{date:plan.date,title:plan.title});
   await page.locator('#cr-new').click();
-  const created=await waitTask(x=>x.id===plan.id&&x.done===false);need(created.__syntheticQa===true&&created.ownerUid===actors.direction.uid&&created.pais==='GT'&&created.asesorId===actors.direction.advisorId&&created.t===plan.title,'CREATE_READBACK');proof.syntheticWrites++;proof.assertions.createServerReadback=true;
-  adapterSnapshot=await page.evaluate(()=>__giCronoQa.snapshot());await page.reload({waitUntil:'domcontentloaded',timeout:60000});await boot(page,actors.direction,'GT');await page.locator('[data-v="dia"]').click();await page.waitForTimeout(500);
+  const created=await waitTask(x=>x.id===plan.id&&x.done===false);need(created.__syntheticQa===true&&created.ownerUid===actors.creator.uid&&created.pais==='GT'&&created.asesorId===actors.creator.advisorId&&created.t===plan.title,'CREATE_READBACK');proof.syntheticWrites++;proof.assertions.createServerReadback=true;
+  adapterSnapshot=await page.evaluate(()=>__giCronoQa.snapshot());await page.reload({waitUntil:'domcontentloaded',timeout:60000});await boot(page,actors.creator,actors.country);await page.locator('[data-v="dia"]').click();await page.waitForTimeout(500);
   need(await page.evaluate(({id,title})=>!!Orbit.store.get('tareas',id)&&(document.body.textContent||'').includes(title),plan),'FIRST_RELOAD');proof.assertions.firstReload=true;
   await page.evaluate(p=>installCronogramaQaAdapter(p),plan);const chip=page.locator('.cr-ev').filter({hasText:plan.title}).first();await chip.click();
-  const done=await waitTask(x=>x.done===true);need(done.id===plan.id&&done.ownerUid===actors.direction.uid,'COMPLETE_READBACK');proof.syntheticWrites++;proof.assertions.completeServerReadback=true;
-  await page.reload({waitUntil:'domcontentloaded',timeout:60000});await boot(page,actors.direction,'GT');await page.locator('[data-v="dia"]').click();await page.waitForTimeout(500);
+  const done=await waitTask(x=>x.done===true);need(done.id===plan.id&&done.ownerUid===actors.creator.uid,'COMPLETE_READBACK');proof.syntheticWrites++;proof.assertions.completeServerReadback=true;
+  await page.reload({waitUntil:'domcontentloaded',timeout:60000});await boot(page,actors.creator,actors.country);await page.locator('[data-v="dia"]').click();await page.waitForTimeout(500);
   need(await page.evaluate(({id,title})=>{const t=Orbit.store.get('tareas',id);return !!t&&t.done===true&&(document.body.textContent||'').includes(title)&&(document.body.textContent||'').includes('✅');},plan),'SECOND_RELOAD');proof.assertions.completedReload=true;
-  const ownView=await readVisibility(browser,actors.own,'GT','own-second-uid');need(ownView.storePresent===false&&ownView.textPresent===false,'OTHER_UID_SCOPE');proof.assertions.distinctUidOwnScopeDenied=true;
-  const foreignView=await readVisibility(browser,actors.foreign,'CO','foreign-country');need(foreignView.storePresent===false&&foreignView.textPresent===false,'FOREIGN_COUNTRY_SCOPE');proof.assertions.foreignCountryDenied=true;
+  const ownView=await readVisibility(browser,actors.own,actors.country,'own-second-uid');need(ownView.storePresent===false&&ownView.textPresent===false,'OTHER_UID_SCOPE');proof.assertions.distinctUidOwnScopeDenied=true;
+  const foreignView=await readVisibility(browser,actors.foreign,actors.otherCountry,'foreign-country');need(foreignView.storePresent===false&&foreignView.textPresent===false,'FOREIGN_COUNTRY_SCOPE');proof.assertions.foreignCountryDenied=true;
   proof.scopeObservations={ownView,foreignView,teamSourceRegressionRequired:true};
  }catch(e){proof.errors.push({code:String(e&&e.message||e).slice(0,160)});}
  finally{
@@ -150,13 +155,13 @@ async function execute(){
     for(let i=0;i<40&&!call.response;i++)await new Promise(r=>setTimeout(r,250));
     need(call.response?.ok===true&&call.response.serverOwned===true&&call.response.canonicalReadback===true&&call.response.requestId&&call.response.eventId,'CLEANUP_COMMAND_RESPONSE');
     const rr=tenant.collection('operationalRequests').doc(call.response.requestId),er=tenant.collection('operationalEvents').doc(call.response.eventId),[rs,es]=await Promise.all([rr.get(),er.get()]);
-    need(rs.exists&&es.exists&&rs.data().status==='committed'&&es.data().actorUid===actors.direction.uid&&es.data().tenantId===tenantId&&Number(es.data().mutationCount)===1,'CLEANUP_RECEIPT_PROVENANCE');
+    need(rs.exists&&es.exists&&rs.data().status==='committed'&&es.data().actorUid===actors.creator.uid&&es.data().tenantId===tenantId&&Number(es.data().mutationCount)===1,'CLEANUP_RECEIPT_PROVENANCE');
     exact.push({ref:rr,kind:'request'},{ref:er,kind:'event'});
    }
    const uniq=new Map(exact.map(x=>[x.ref.path,x]));
    if(uniq.size){await db.runTransaction(async tx=>{const refs=[];for(const x of uniq.values()){const s=await tx.get(x.ref);need(s.exists,'CLEANUP_TARGET_MISSING');refs.push(x.ref);}for(const r of refs)tx.delete(r);});proof.cleanupWrites=uniq.size;}
    need(!(await ref('tareas',plan.id).get()).exists,'FINAL_TASK_ABSENCE');proof.syntheticFinalAbsent=true;
-   if(page&&!page.isClosed()){await page.reload({waitUntil:'domcontentloaded',timeout:60000});await boot(page,actors.direction,'GT');await page.locator('[data-v="dia"]').click();await page.waitForTimeout(500);need(await page.evaluate(({id,title})=>!Orbit.store.get('tareas',id)&&!(document.body.textContent||'').includes(title),plan),'FINAL_UI_ABSENCE');proof.assertions.cleanupFinalUiAbsence=true;}
+   if(page&&!page.isClosed()){await page.reload({waitUntil:'domcontentloaded',timeout:60000});await boot(page,actors.creator,actors.country);await page.locator('[data-v="dia"]').click();await page.waitForTimeout(500);need(await page.evaluate(({id,title})=>!Orbit.store.get('tareas',id)&&!(document.body.textContent||'').includes(title),plan),'FINAL_UI_ABSENCE');proof.assertions.cleanupFinalUiAbsence=true;}
   }catch(e){proof.errors.push({code:String(e&&e.message||e).slice(0,160)});}
   try{if(ctx)await ctx.close();if(browser)await browser.close();}catch{}
   proof.commandReceipts=calls.map(c=>({requestId:c.response?.requestId||null,eventId:c.response?.eventId||null,ok:c.response?.ok===true,canonicalReadback:c.response?.canonicalReadback===true}));

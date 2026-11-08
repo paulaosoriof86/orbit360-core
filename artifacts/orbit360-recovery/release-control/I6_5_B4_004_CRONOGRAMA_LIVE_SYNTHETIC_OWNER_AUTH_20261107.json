@@ -5,7 +5,7 @@
   "authority": "Paula explicit B4-004 synthetic LIVE authorization frozen in long-block protocol",
   "authorized": true,
   "consumed": false,
-  "authorizedParentSha": "b1b60a2c965de821816905b9d7e4bf03e902951d",
+  "authorizedParentSha": "1598020a5df29b90b06bbebdd1f420f15e3f92c3",
   "release": {
     "sourceSha": "6c45983610ce0d65a5c63bd07659ad968bfe9da3",
     "buildId": "gi-i65-b4-6c45983610ce-57f234755dc1",
@@ -57,6 +57,16 @@
       "runId": 42428609528,
       "jobId": 128572259409,
       "result": "FAIL_BEFORE_WRITES_DISTINCT_GT_OWN_ACTOR_UNAVAILABLE_HARNESS_PREMISE_TOO_NARROW",
+      "businessWrites": 0,
+      "syntheticWrites": 0,
+      "cleanupWrites": 0,
+      "syntheticFinalAbsent": true,
+      "authorizationConsumed": false
+    },
+    {
+      "runId": 42428926293,
+      "jobId": 128573233846,
+      "result": "FAIL_BEFORE_WRITES_OLD_SELECTOR_REINTRODUCED_DURING_QA_COMPOSITION",
       "businessWrites": 0,
       "syntheticWrites": 0,
       "cleanupWrites": 0,
