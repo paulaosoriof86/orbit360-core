@@ -22082,6 +22082,19 @@
     "firstIncompleteGate": "B4-005",
     "nextAction": "B4_004_CLOSED_PASS_NEXT_B4_005_AUTHENTICATED_E2E_MATRIX"
   },
+  "b4005LiveReadonlyAndContractMilestone20261107": {
+    "gate": "I6.5/B4-005",
+    "status": "PARTIAL_EVIDENCE_READONLY_AND_SOURCE_CONTRACTS_PASS_FULL_E2E_NOT_CERTIFIED",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_005_LIVE_READONLY_AND_CONTRACT_MILESTONE_20261107.json",
+    "receiptBlobSha": "46e24b0dad3aa522b8e34aa127124c02b0a6b403",
+    "receiptSha256": "4b10f0bdf530850c13ad0d957598717e82388b904128edacc44f2af27a9a22cb",
+    "sourceContractAssertionsPass": 51,
+    "authenticatedLiveReadonlyCases": 6,
+    "fullE2eAndDurableWritesCertified": false,
+    "productSourceChanged": false,
+    "dataMutated": false,
+    "firstIncompleteGate": "B4-005"
+  },
   "b4005ReuseAndDeltaEntry20261107": {
     "gate": "I6.5/B4-005",
     "status": "IN_PROGRESS_PRIOR_EVIDENCE_RECONCILED_FULL_E2E_NOT_CERTIFIED",

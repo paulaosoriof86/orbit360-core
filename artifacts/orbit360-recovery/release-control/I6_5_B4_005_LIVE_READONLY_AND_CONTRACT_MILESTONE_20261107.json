@@ -1,0 +1,107 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_005_LIVE_READONLY_AND_CONTRACT_MILESTONE_V1",
+  "gate": "I6.5/B4-005",
+  "status": "PARTIAL_EVIDENCE_READONLY_AND_SOURCE_CONTRACTS_PASS_FULL_E2E_NOT_CERTIFIED",
+  "observedAtUtc": "2026-11-08T03:57:38Z",
+  "canonicalRepository": "paulaosoriof86/orbit360-core",
+  "canonicalBranch": "recovery/fase-a-clean-20260831",
+  "currentProductSourceSha": "f8fa00e4e2e6627cee66c8c521866874e39bc8da",
+  "currentBuildId": "gi-i65-b4-f8fa00e4e2e6-57f234755dc1",
+  "currentArtifactId": 13600357541,
+  "currentLiveHostingVersion": "439cb977fd4649d1",
+  "liveUrl": "https://ays-orbit-360-lab.web.app",
+  "actor": {
+    "displayName": "Paula Osorio",
+    "authenticatedRole": "Dirección",
+    "uid": "NOT_CAPTURED_IN_UI_DO_NOT_INFER",
+    "countrySelection": "Todos los países",
+    "roleSimulation": "Asesor selected via Ver como; NOT independent identity or backend role proof"
+  },
+  "sourceContractsCurrentTree": [
+    {
+      "test": "node tools/gravicentra-i6-5-b4-003-knowledge-contract.mjs",
+      "result": "PASS",
+      "assertions": 21,
+      "operationalWrites": 0,
+      "scope": "Source/contract only; not live knowledge-retrieval end-to-end"
+    },
+    {
+      "test": "node tools/gravicentra-quote-authority-contract-v1.mjs",
+      "result": "PASS",
+      "assertions": 30,
+      "operationalWrites": 0,
+      "scope": "Source/contract only; no actual CotComp transport or insurer premium"
+    }
+  ],
+  "authenticatedLiveReadonlyObservations": [
+    {
+      "case": "INSURER_KNOWLEDGE_QA_FIXTURE",
+      "route": "#/aseguradoras?ficha=b4003qa_human_insurer_r20",
+      "observed": "Tarifas y conocimiento: 2 sources, 0 validated, 0 enabled for calculation; missing source remains explicit, not generic rate",
+      "result": "FOCAL_UI_FAIL_CLOSED_OBSERVED",
+      "limitation": "Fixture-specific; no rate or computation submitted"
+    },
+    {
+      "case": "ASEGURADORA_GUATEMALTECA_HISTORICAL_KNOWLEDGE_REUSE",
+      "route": "#/aseguradoras?ficha=gt-aseguradora-guatemalteca",
+      "observed": "6 sources shown: 3 validated current source-backed sources and 3 classified historical; explicit rules and source names rendered; product matrix has 0 selected commercial lines and 0 calculation-ready lines",
+      "result": "FOCAL_UI_SOURCE_LINEAGE_AND_BLOCKER_OBSERVED",
+      "limitation": "Do not confuse 3 validated source facts with a validated automatic tariff table; no operational configuration mutated"
+    },
+    {
+      "case": "ROLE_SIMULATED_INSURER_DIRECTORY_ACCESS",
+      "route": "#/aseguradoras",
+      "observed": "Selecting Asesor in Ver como hides insurer navigation and displays access denied; Dirección restored after test",
+      "result": "FOCAL_UI_ROLE_SIMULATION_PASS",
+      "limitation": "Not a separate real UID or Firestore Rules evidence"
+    },
+    {
+      "case": "COTIZADOR_SOURCE_GATE",
+      "route": "#/cotizador",
+      "observed": "Source/configuration/compatibility validation required before automatic quote; manual proposals require review",
+      "result": "FOCAL_UI_COPY_AND_INPUT_READY",
+      "limitation": "No quote or comparison submitted; calculation guard not challenged with a real source variation"
+    },
+    {
+      "case": "AI_PROVIDER_AND_CITATIONS",
+      "route": "#/ia",
+      "observed": "Assistant labels its engine Modo heurístico and instructs connection of provider key; no source-backed retrieval or citation proven",
+      "result": "NOT_CERTIFIED_SOURCE_BACKED_AI",
+      "limitation": "No prompt transmitted or AI response requested"
+    },
+    {
+      "case": "POLICY_QA_PROVENANCE_AND_MANAGEMENT_OPTIONS",
+      "route": "#/polizas then #/cliente360?c=b4003qa_client_38102224750&p=b4003qa_policy_renewwrite_38102224750",
+      "observed": "9 QA-origin policies excluded from productive KPIs; synthetic policy details show GT/GTQ, linked insurer and client; Gestión dialog preselects policy and offers Emisión de certificado and Endoso de beneficiario; dialog cancelled",
+      "result": "FOCAL_READONLY_RELATION_AND_UI_OPTIONS_OBSERVED",
+      "limitation": "No actual certificate file, endorsement request persisted, or policy mutation/reload certified"
+    }
+  ],
+  "focusedWriteContractGap": {
+    "owner": "orbit360-platform/core/endorsement-workflow-v1201.js",
+    "currentCodeObservation": "endorsements.createRequest/apply use fire-and-forget store.insert/store.update; operational store overrides these with asynchronous callDurable(...).catch(...) while insertDurable/updateDurable await server confirmation",
+    "status": "PERSISTENCE_RACE_RISK_CODE_OBSERVED_LIVE_RELOAD_REPRO_PENDING",
+    "action": "Prove on isolated authorized synthetic Preview with server readback; correct owner only if reproduced; then rebuild and recertify artifact if source changes",
+    "doNotClaim": "That the live write failed or that all prior Endosos work is unusable"
+  },
+  "historicalWorkPreserved": {
+    "signedIndividualCapabilityPreviewAndLiveCertificates": 15,
+    "otherHistoricalPasses": 71,
+    "b4004FormalGate": "CLOSED_PASS_SCOPED",
+    "currentNineProductFileDeltaPreviouslyPinned": true,
+    "knowledgeSourceCorpus": "2026-10-03 source summary preserves 16 quote PDFs, five risk clusters and ten insurer families; not newly imported or re-extracted",
+    "completedCurrentSourceContractAssertions": 51
+  },
+  "unclosedExactCarries": [
+    "B4-003-R15-09-PHASEA-ENDORSEMENT-CERTIFICATE-ANNEX-CLOSURE",
+    "B4-003-R11-12-ROLE-AWARE-AI-KNOWLEDGE",
+    "B4-003-R11-13-MULTIPRODUCT-INSURER-KNOWLEDGE",
+    "B4-003-R11-14-INSURER-TARIFF-SOURCE-BACKLOG",
+    "B4-003-R11-15-COTCOMP-CROSSPROJECT-HANDOFF"
+  ],
+  "nextAction": "B4_005_REUSE_ALL_SIGNED_EVIDENCE; ISOLATED_SYNTHETIC_PREVIEW_DURABLE_ENDORSEMENT_CERTIFICATE_ANNEX_PROOF; R11_SOURCE_AND_ROLE_CONTRACT_READBACK; EXACT_ROLE_COUNTRY_VIEWPORT_E2E_ONLY_UNCOVERED_CELLS",
+  "productSourceChanged": false,
+  "operationalDataMutated": false,
+  "isFormalB4005Pass": false,
+  "i6FormalProgressPercentUnchanged": 50
+}
