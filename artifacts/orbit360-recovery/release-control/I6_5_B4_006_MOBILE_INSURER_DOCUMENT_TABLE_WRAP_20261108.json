@@ -1,0 +1,50 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_006_MOBILE_INSURER_DOCUMENT_TABLE_WRAP_V1",
+  "gate": "I6.5/B4-006",
+  "status": "ONE_FINAL_MOBILE_READABILITY_DELTA_BEFORE_VISUAL_QA",
+  "dateLocal": "2026-11-08",
+  "owner": "Paula Andrea Osorio Franco",
+  "cause": "The real 320px synthetic 9-column classified-documents cards use a later loaded legacy table white-space:nowrap style; some text rendered clipped despite no page horizontal overflow.",
+  "observed": "At 320px, file name and classification cells visually truncated (e.g. Cotización oficial/ejem...); output inaccessible in narrow card.",
+  "sourcePredecessor": "20af6769a439b944f76ecfe7bf90ede9bfb38936",
+  "priorReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_006_REAL_INSURER_VISUAL_MICRO_REFINEMENT_20261108.json",
+  "priorReceiptBlobSha": "f64e13adc594ba85d56310a87b281f51c058b68f",
+  "priorCssBlobSha": "7040f7d522fc25dda006f6dc6d61b1cbf9d2b43a",
+  "newCssBlobSha": "53a5e571ded91fbad1bae6496f776db323434583",
+  "changedProductPaths": [
+    {
+      "path": "orbit360-platform/styles/infra.css",
+      "gitBlobSha": "53a5e571ded91fbad1bae6496f776db323434583",
+      "visualLayerOnly": true
+    }
+  ],
+  "delta": {
+    "scope": "@media(max-width:760px) .insurer-premium-section .insurer-doc-table td",
+    "changes": [
+      "white-space:normal!important",
+      "overflow-wrap:anywhere!important",
+      "word-break:break-word!important"
+    ],
+    "backendWrites": 0,
+    "rolesChange": false,
+    "authChange": false,
+    "editorLogicChange": false,
+    "liveDeploys": 0
+  },
+  "previousImmutableArtifactId": 13621582577,
+  "previewWorkflowRunId": 42492179202,
+  "previewChannel": "https://ays-orbit-360-lab--gi-i65-b4-rc-41765742748-neoi3u7r.web.app/",
+  "oneCanonicalCandidate": true,
+  "firstIncompleteGate": "B4-006",
+  "lastClosedGate": "B4-005",
+  "ownerAccepted": false,
+  "validation": [
+    "320px full filename/classification visible no page overflow",
+    "390px responsive table and premium guides",
+    "desktop synthetic table header corporate graphite/white",
+    "real insurer Docs empty/read section alignment",
+    "preview bundle exact readback and LIVE unchanged"
+  ],
+  "nextAction": "B4_006_SINGLE_VISUAL_SOURCE_SUCCESSOR_BUILD_EXACT_PREVIEW_REAL_INSURER_QA",
+  "createdAtUtc": "2026-11-08T15:02:53.279Z"
+}

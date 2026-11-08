@@ -22299,5 +22299,20 @@
     "realDataWrites": 0,
     "liveDeploys": 0,
     "oneCanonicalPreviewChannel": true
+  },
+  "b4006MobileInsurerDocTableWrap20261108": {
+    "gate": "I6.5/B4-006",
+    "status": "ONE_FINAL_MOBILE_READABILITY_DELTA_BEFORE_VISUAL_QA",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_006_MOBILE_INSURER_DOCUMENT_TABLE_WRAP_20261108.json",
+    "receiptBlobSha": "6d5c637c9bffd95d0455e4aab1cf9764be8f94b8",
+    "sourcePredecessor": "20af6769a439b944f76ecfe7bf90ede9bfb38936",
+    "priorStylesBlobSha": "7040f7d522fc25dda006f6dc6d61b1cbf9d2b43a",
+    "newStylesBlobSha": "53a5e571ded91fbad1bae6496f776db323434583",
+    "firstIncompleteGate": "B4-006",
+    "lastClosedGate": "B4-005",
+    "ownerAccepted": false,
+    "oneCanonicalPreviewChannel": true,
+    "realDataWrites": 0,
+    "liveDeploys": 0
   }
 }

@@ -22,6 +22,7 @@ const B4006_FINAL_RECEIPT=ROOT+'I6_5_B4_006_VISUAL_EXACT_PREVIEW_QA_20261108.jso
 const B4006_OWNER_SOURCE_RECEIPT=ROOT+'I6_5_B4_006_REAL_INSURER_VISUAL_HIERARCHY_SOURCE_SUCCESSOR_20261108.json';
 const B4006_OWNER_SOURCE_ACTION='B4_006_SINGLE_VISUAL_SOURCE_SUCCESSOR_BUILD_EXACT_PREVIEW_REAL_INSURER_QA';
 const B4006_REAL_MICRO_RECEIPT=ROOT+'I6_5_B4_006_REAL_INSURER_VISUAL_MICRO_REFINEMENT_20261108.json';
+const B4006_MOBILE_DOC_WRAP_RECEIPT=ROOT+'I6_5_B4_006_MOBILE_INSURER_DOCUMENT_TABLE_WRAP_20261108.json';
 const SOURCE='f8fa00e4e2e6627cee66c8c521866874e39bc8da';
 const BUILD='gi-i65-b4-f8fa00e4e2e6-57f234755dc1';
 const ARTIFACT=13600357541;
@@ -50,6 +51,37 @@ function readPinned(path,hash){
   need(git('rev-parse','HEAD:'+path)===hash,'RECEIPT_NOT_COMMITTED_'+path);
   return JSON.parse(bytes);
 }
+function verifyB4006MobileInsurerDocTableWrap(cp,state,previousStylesBlob){
+  const p=cp.b4006MobileInsurerDocTableWrap20261108;
+  need(p&&same(p,state.b4006MobileInsurerDocTableWrap20261108)&&
+    p.gate==='I6.5/B4-006'&&
+    p.status==='ONE_FINAL_MOBILE_READABILITY_DELTA_BEFORE_VISUAL_QA'&&
+    p.receiptPath===B4006_MOBILE_DOC_WRAP_RECEIPT&&
+    p.receiptBlobSha==='6d5c637c9bffd95d0455e4aab1cf9764be8f94b8'&&
+    p.sourcePredecessor==='20af6769a439b944f76ecfe7bf90ede9bfb38936'&&
+    p.priorStylesBlobSha===previousStylesBlob&&
+    p.newStylesBlobSha==='53a5e571ded91fbad1bae6496f776db323434583'&&
+    p.firstIncompleteGate==='B4-006'&&p.lastClosedGate==='B4-005'&&
+    p.ownerAccepted===false&&p.oneCanonicalPreviewChannel===true&&
+    p.realDataWrites===0&&p.liveDeploys===0,
+    'B4006_MOBILE_DOC_WRAP_POINTER');
+  const r=readPinned(B4006_MOBILE_DOC_WRAP_RECEIPT,p.receiptBlobSha);
+  need(r.schema==='GRAVICENTRA_I6_5_B4_006_MOBILE_INSURER_DOCUMENT_TABLE_WRAP_V1'&&
+    r.status===p.status&&r.gate===p.gate&&
+    r.sourcePredecessor===p.sourcePredecessor&&
+    r.priorReceiptBlobSha==='f64e13adc594ba85d56310a87b281f51c058b68f'&&
+    r.priorCssBlobSha===previousStylesBlob&&r.newCssBlobSha===p.newStylesBlobSha&&
+    r.changedProductPaths?.length===1&&
+    r.changedProductPaths[0].path==='orbit360-platform/styles/infra.css'&&
+    r.changedProductPaths[0].gitBlobSha===p.newStylesBlobSha&&
+    r.delta?.scope==='@media(max-width:760px) .insurer-premium-section .insurer-doc-table td'&&
+    r.delta?.backendWrites===0&&r.delta?.liveDeploys===0&&
+    r.oneCanonicalCandidate===true&&r.ownerAccepted===false&&
+    git('merge-base',r.sourcePredecessor,'HEAD')===r.sourcePredecessor,
+    'B4006_MOBILE_DOC_WRAP_RECEIPT');
+  return p.newStylesBlobSha;
+}
+
 function verifyB4006RealInsurerVisualMicroRefinement(cp,state,priorStylesBlob){
   const p=cp.b4006RealInsurerVisualMicroRefinement20261108;
   need(p&&same(p,state.b4006RealInsurerVisualMicroRefinement20261108)&&
@@ -77,7 +109,7 @@ function verifyB4006RealInsurerVisualMicroRefinement(cp,state,priorStylesBlob){
     r.scope?.noReimport===true&&r.control?.ownerAccepted===false&&
     git('merge-base',r.sourcePredecessor,'HEAD')===r.sourcePredecessor,
     'B4006_REAL_MICRO_SIGNED_SOURCE');
-  return p.newStylesBlobSha;
+  return cp.b4006MobileInsurerDocTableWrap20261108 ? verifyB4006MobileInsurerDocTableWrap(cp,state,p.newStylesBlobSha) : p.newStylesBlobSha;
 }
 
 function verifyB4006RealInsurerVisualSource(cp,state){

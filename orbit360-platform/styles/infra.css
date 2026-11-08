@@ -1732,3 +1732,12 @@ a.fh-chip:hover{border-color:var(--red);color:var(--red)}
   .insurer-premium-section .insurer-doc-table-scroll{border:0;box-shadow:none;}
   .insurer-premium-section .insurer-offering-head{gap:8px;}
 }
+
+/* B4-006 · tabular móvil: valores completos y legibles en fichas Aseguradoras. */
+@media(max-width:760px){
+  .insurer-premium-section .insurer-doc-table td{
+    white-space:normal!important;
+    overflow-wrap:anywhere!important;
+    word-break:break-word!important;
+  }
+}
