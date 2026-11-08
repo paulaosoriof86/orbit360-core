@@ -140,7 +140,7 @@ function verifyB4006RealInsurerVisualSource(cp,state){
     p.realDataWrites===0&&p.liveDeploys===0&&p.oneCanonicalPreviewChannel===true,
     'B4006_OWNER_REJECTED_VISUAL_POINTER');
   const activeStylesBlob=cp.b4006RealInsurerVisualMicroRefinement20261108 ? verifyB4006RealInsurerVisualMicroRefinement(cp,state,p.newStylesBlobSha) : p.newStylesBlobSha;
-  const finalStylesBlob=cp.b4006Kpi320MobileCardClippingCausalFix20261108?.newCssBlobSha||cp.b4006Kpi320MobileCardClippingCausalFix20261108?.newCssBlobSha||cp.b4006GlobalTableCardSystemSourceSuccessor20261108?.newCssBlobSha||cp.b4006OwnerFinalVisualFeedbackSourceSuccessor20261108?.newStylesBlobSha||cp.b4006VisualPolishMicroRefinement20261108?.newStylesBlobSha||cp.b4006VisualUnificationSuccessor20261108?.newStylesBlobSha||activeStylesBlob;
+  const finalStylesBlob=cp.b4006Kpi320MobileCardClippingCausalFix20261108?.newCssBlobSha||cp.b4006GlobalTableCardSystemSourceSuccessor20261108?.newCssBlobSha||cp.b4006OwnerFinalVisualFeedbackSourceSuccessor20261108?.newStylesBlobSha||cp.b4006VisualPolishMicroRefinement20261108?.newStylesBlobSha||cp.b4006VisualUnificationSuccessor20261108?.newStylesBlobSha||activeStylesBlob;
   const r=readPinned(B4006_OWNER_SOURCE_RECEIPT,p.receiptBlobSha);
   need(r.schema==='GRAVICENTRA_I6_5_B4_006_REAL_INSURER_VISUAL_HIERARCHY_SOURCE_SUCCESSOR_V1'&&
     r.gate==='I6.5/B4-006'&&r.status===p.status&&
@@ -313,7 +313,6 @@ function verifyB4006GlobalTableCardSystemSourceSuccessor(cp,state){
     'B4006_GLOBAL_VISUAL_POINTER');
   const activeCssBlob=cp.b4006Kpi320MobileCardClippingCausalFix20261108 ? verifyB4006Kpi320MobileCardClippingFix(cp,state,p.newCssBlobSha) : p.newCssBlobSha;
   const activeQaBlob=cp.b4006Kpi320MobileCardClippingCausalFix20261108?.newQaBlobSha||p.qaBlobSha;
-  const activeQaBlob=cp.b4006Kpi320MobileCardClippingCausalFix20261108?.newQaBlobSha||p.qaBlobSha;
   const r=readPinned(B4006_GLOBAL_VISUAL_RECEIPT,p.receiptBlobSha);
   need(r.schema==='GRAVICENTRA_I6_5_B4_006_GLOBAL_TABLE_CARD_SYSTEM_SOURCE_SUCCESSOR_V1'&&
     r.gate===p.gate&&r.status===p.status&&r.decision==='PAULA_APPROVED_TRANSVERSAL_VISUAL_CONSISTENCY'&&
@@ -333,7 +332,7 @@ function verifyB4006GlobalTableCardSystemSourceSuccessor(cp,state){
     git('rev-parse','HEAD:'+p.qaPath)===activeQaBlob&&
     same(git('diff','--name-only',p.predecessorHead,'HEAD','--','functions','orbit360-platform',':(exclude)orbit360-platform/docs/**').split(/\r?\n/).filter(Boolean),['orbit360-platform/styles/infra.css']),
     'B4006_GLOBAL_VISUAL_RECEIPT');
-  return p.newCssBlobSha;
+  return activeCssBlob;
 }
 
 function verifyB4006OwnerFinalVisualFeedbackSource(cp,state){
@@ -579,7 +578,7 @@ export function verifyDeclaredB4005SourceSuccessor(cp=read(CP),state=read(STATE)
       const latestCssBlob=cp.b4006RealInsurerVisualSuccessor20261108 ? verifyB4006RealInsurerVisualSource(cp,state) : null;
       const unificationActive=cp.b4006VisualUnificationSuccessor20261108 ? verifyB4006VisualUnificationSuccessor(cp,state) : false;
       for(const file of r.changedProductPaths){
-        const expectedBlob=unificationActive&&file.path==='orbit360-platform/styles/infra.css'?(cp.b4006GlobalTableCardSystemSourceSuccessor20261108?.newCssBlobSha||cp.b4006OwnerFinalVisualFeedbackSourceSuccessor20261108?.newStylesBlobSha||cp.b4006VisualPolishMicroRefinement20261108?.newStylesBlobSha||cp.b4006VisualUnificationSuccessor20261108.newStylesBlobSha):(latestCssBlob&&file.path==='orbit360-platform/styles/infra.css'?latestCssBlob:file.gitBlobSha);
+        const expectedBlob=unificationActive&&file.path==='orbit360-platform/styles/infra.css'?(cp.b4006Kpi320MobileCardClippingCausalFix20261108?.newCssBlobSha||cp.b4006GlobalTableCardSystemSourceSuccessor20261108?.newCssBlobSha||cp.b4006OwnerFinalVisualFeedbackSourceSuccessor20261108?.newStylesBlobSha||cp.b4006VisualPolishMicroRefinement20261108?.newStylesBlobSha||cp.b4006VisualUnificationSuccessor20261108.newStylesBlobSha):(latestCssBlob&&file.path==='orbit360-platform/styles/infra.css'?latestCssBlob:file.gitBlobSha);
         need(git('rev-parse','HEAD:'+file.path)===expectedBlob&&
           blob(fs.readFileSync(file.path))===expectedBlob,
           'B4006_VISUAL_BLOB:'+file.path);
