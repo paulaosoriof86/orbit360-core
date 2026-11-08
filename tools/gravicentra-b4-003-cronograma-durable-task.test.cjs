@@ -26,7 +26,8 @@ function scenario(hostname, reject = false, rejectedError = new Error('DENIED'))
     insertDurable(collection, row) {
       written.push({ collection, row: { ...row } });
       if (reject) return Promise.reject(rejectedError);
-      rows.push({ ...row });
+      // The real operational writer scopes manual tasks to the selected country before persistence.
+      rows.push({ ...row, pais: row.pais || orbit.pais });
       return Promise.resolve(row);
     }
   };
