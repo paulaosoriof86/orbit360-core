@@ -1986,3 +1986,58 @@ a.fh-chip:hover{border-color:var(--red);color:var(--red)}
 @media(prefers-reduced-motion:reduce){
   .page:has(.kanban) .kcard:hover{transform:none;}
 }
+
+/* B4-006 · afinación visual basada en inspección REAL de Preview.
+   La ficha de tarifas tenía título oscuro por una regla heredada !important.
+   Renovaciones dibuja tarjetas con estilos inline; estos overrides son intencionales. */
+.insurer-knowledge-block>.asg-sec-t,
+.insurer-knowledge-block>.asg-sec-t :is(b,span){
+  color:#fff!important;
+  text-shadow:0 1px 2px rgba(0,0,0,.22);
+}
+.page:has(.renewal-board) .renewal-bucket{
+  border:1px solid #bec9d5!important;
+  border-radius:15px!important;
+  background:#edf1f5!important;
+  box-shadow:0 13px 26px -24px rgba(18,25,35,.5);
+}
+.page:has(.renewal-board) .renewal-bucket>div:first-child{
+  min-height:52px;
+  background:linear-gradient(112deg,#313c49,#1b222b)!important;
+  border-top:4px solid #c51635!important;
+  border-bottom:3px solid #c51635!important;
+  border-radius:14px 14px 0 0;
+  color:#fff!important;
+}
+.page:has(.renewal-board) .renewal-bucket>div:first-child>b{
+  color:#fff!important;
+  font-size:13px!important;
+}
+.page:has(.renewal-board) .renewal-bucket>div:first-child>b::before{
+  content:"📅 ";
+  font:normal 15px var(--f-text);
+}
+.page:has(.renewal-board) [data-renewal-bucket="vencidas"]>div:first-child>b::before{content:"⏰ ";}
+.page:has(.renewal-board) [data-renewal-bucket="d15"]>div:first-child>b::before{content:"📆 ";}
+.page:has(.renewal-board) [data-renewal-bucket="d90"]>div:first-child>b::before{content:"🔭 ";}
+.page:has(.renewal-board) [data-renewal-bucket="d45"]>div:first-child{border-top-color:#cb8b25!important;}
+.page:has(.renewal-board) [data-renewal-bucket="d90"]>div:first-child{border-top-color:#224e73!important;}
+.page:has(.renewal-board) .renewal-policy-card{
+  padding:12px 13px!important;
+  border:1px solid #c5cfdc!important;
+  border-left:4px solid #be1b3c!important;
+  border-radius:13px!important;
+  background:linear-gradient(132deg,#fff,#f6f8fb)!important;
+  box-shadow:0 11px 22px -21px rgba(18,26,38,.65),0 2px 6px rgba(18,26,38,.05)!important;
+}
+.page:has(.renewal-board) .renewal-policy-card:hover{
+  border-color:#b82846!important;
+  box-shadow:0 15px 28px -22px rgba(18,26,38,.52)!important;
+}
+.page:has(.renewal-board) .renewal-policy-name{
+  color:#222c3a!important;
+  font-weight:800!important;
+}
+@media(max-width:480px){
+  .page:has(.renewal-board) .renewal-policy-card{padding:12px!important;}
+}

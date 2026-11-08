@@ -1,0 +1,65 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_006_VISUAL_MICRO_POLISH_AFTER_REAL_PREVIEW_REVIEW_V1",
+  "gate": "I6.5/B4-006",
+  "status": "FOCAL_UI_MICRO_POLISH_SOURCE_PREVIEW_PENDING",
+  "recordedAtLocal": "2026-11-08",
+  "timezone": "America/Guatemala",
+  "previousSourceCommit": "421029328af573344bd46f650d13194baa2de8c8",
+  "previousArtifactId": 13624232385,
+  "previousArtifactZipSha256": "b63c020f4c4786f86bea82451e6efa3ba5fdd4ed08851daae19ec8c2b6ce317c",
+  "previousHostedPayloadDigest": "73373fa9eea5cd5d1bfb030e2acee300bdafed992e15d5754b5ab798ca14f58e",
+  "previousCssBlobSha": "8e8f44c687da1e79fa236595eb1046d726cb6c98",
+  "newCssBlobSha": "166f9cbf01839f80c833c48e692e6f1c5f16f90f",
+  "cobrosBlobSha": "89f5b0bdfb49a4f822de5d617ee8382ea269d916",
+  "sourcePredecessor": "421029328af573344bd46f650d13194baa2de8c8",
+  "changedProductPaths": [
+    {
+      "path": "orbit360-platform/styles/infra.css",
+      "gitBlobSha": "166f9cbf01839f80c833c48e692e6f1c5f16f90f",
+      "kind": "STYLES_ONLY"
+    }
+  ],
+  "realBrowserFindings": {
+    "inspectedPreviewUrl": "https://ays-orbit-360-lab--gi-i65-b4-rc-41765742748-neoi3u7r.web.app",
+    "readOnlyActor": "Paula / Dirección authenticated browser session; assistant operated UI, not human owner signoff",
+    "positive": [
+      "Insurer Resumen, Contactos, Plataformas, Bancos and Actividad section titles premium dark/red",
+      "Real insurer knowledge list cards with red accents",
+      "Cobros disclosures collapsed and 9-column table premium header",
+      "Equipo and Permisos role tables premium header",
+      "Cancelaciones table premium header",
+      "Ops Kanban 5 columns / 4 cards styled",
+      "Leads Kanban 8 columns / 3 cards styled",
+      "Preview hosted readback 218 of 218 exact"
+    ],
+    "defects": [
+      {
+        "path": "Aseguradoras > Tarifas y conocimiento",
+        "observed": "Three .asg-sec-t.od-section-title titles rendered dark text rgb(27,31,36) on charcoal dark background due competing color !important",
+        "fix": "Set explicit white !important for knowledge headings"
+      },
+      {
+        "path": "Renovaciones > Tarjetas",
+        "observed": "86 renewal-policy-card nodes retained inline border-radius var(--r-sm) computed 7px overriding previous 13px CSS",
+        "fix": "Scope intentional !important overrides for card border, radius, surface, hierarchy; premium dark column headers"
+      }
+    ]
+  },
+  "limits": {
+    "performance": "Not certified; Cancelaciones rendered 489 table rows and Renovaciones 86 cards. Need measured latency separate from design gate; no semantic changes.",
+    "opsGestionesCollab": "No collaborative comment thread in management ficha; Ops negocios/Leads do have thread.",
+    "opsFiles": "Drive attachment writer and immediate canonical readback exist; no end-to-end file upload and reload test, no persistence PASS.",
+    "humanOwnerVisualSignoff": false
+  },
+  "safety": {
+    "sameCanonicalPreviewChannel": true,
+    "newFirebaseProject": false,
+    "liveDeploys": 0,
+    "backendDeploys": 0,
+    "realDataWrites": 0,
+    "firestoreRulesWrites": 0,
+    "reimport": false,
+    "priorArtifactsImmutable": true
+  },
+  "nextAction": "B4_006_VISUAL_POLISH_SINGLE_PREVIEW_BUILD_AND_REAL_UI_RECHECK"
+}
