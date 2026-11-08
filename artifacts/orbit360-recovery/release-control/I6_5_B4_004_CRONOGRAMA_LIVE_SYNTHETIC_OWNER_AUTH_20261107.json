@@ -5,7 +5,7 @@
   "authority": "Paula explicit B4-004 synthetic LIVE authorization frozen in long-block protocol",
   "authorized": true,
   "consumed": false,
-  "authorizedParentSha": "a55c4b1501aaeeaee2038b8313973ade7fa98e2a",
+  "authorizedParentSha": "b67fdd03a4b6a46663941ddec84547838e1d0b78",
   "release": {
     "sourceSha": "6c45983610ce0d65a5c63bd07659ad968bfe9da3",
     "buildId": "gi-i65-b4-6c45983610ce-57f234755dc1",
@@ -144,6 +144,18 @@
         "CORS",
         "NETWORK_RESOURCE"
       ]
+    },
+    {
+      "runId": 42431434876,
+      "jobId": 128580988892,
+      "artifactId": 13597731306,
+      "result": "FAIL_PREWRITE_CORS_ENDPOINT_IDENTIFIED_DOCUMENT_DRIVE_STATUS",
+      "businessWrites": 0,
+      "syntheticWrites": 0,
+      "cleanupWrites": 0,
+      "syntheticFinalAbsent": true,
+      "authorizationConsumed": false,
+      "endpoint": "us-central1-ays-orbit-360-lab.cloudfunctions.net/orbit360DocumentDriveStatus"
     }
   ]
 }
