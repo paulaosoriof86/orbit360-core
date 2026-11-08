@@ -14,3 +14,5 @@ for(const path of ['orbit360-platform/modules/cliente360.js','orbit360-platform/
 }
 assert(!rule.includes('display:none'), 'B4006_NO_HIDE_TABLE_HEAD');
 console.log('B4006_GLOBAL_TABLE_CARD_SHARED_SOURCE_CONTRACT_PASS; VISUAL_AUTHENTICATED_UAT_PENDING; NO_PRODUCTION_ACCEPTANCE');
+
+assert(/@media\(max-width:360px\)\s*\{\s*\.page \.kpi-row\s*\{grid-template-columns:minmax\(0,1fr\)!important;\}\s*\.page \.kpi\{min-width:0;\}/s.test(css), 'B4006_KPI_320_CARDS_MUST_STACK_WITHOUT_CLIPPING');

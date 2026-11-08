@@ -1,0 +1,66 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_006_KPI_320_MOBILE_CARD_CLIPPING_CAUSAL_FIX_V1",
+  "gate": "I6.5/B4-006",
+  "status": "CAUSAL_CSS_FIX_SOURCE_DECLARED_EXACT_PREVIEW_PENDING",
+  "evidenceDateLocal": "2026-11-08",
+  "sourcePredecessorSha": "7c3fdd00c74334a05f2a6bb01a7ba6e301d88d66",
+  "governancePredecessorHead": "4177705623c361191b7184db5cd73331f93d6712",
+  "previousArtifactId": 13634768362,
+  "previousArtifactZipSha256": "b7a8eb781e58ce0c7095ec6f9626a891204ca53469fbdd79ec5ea0004d9fe32a",
+  "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-rc-41765742748-neoi3u7r.web.app",
+  "authenticatedRole": "Dirección",
+  "authenticatedIdentity": "Paula Osorio",
+  "observedModule": "Cobros y cartera",
+  "viewportEvidence": {
+    "at320": {
+      "viewportWidth": 320,
+      "documentWidth": 305,
+      "kpiGridColumns": 2,
+      "kpiCardClientWidth": 133,
+      "kpiValueInnerClientWidth": 101,
+      "kpiValueTextWidth": 142,
+      "kpiOverflow": "hidden",
+      "reproducedClipping": true
+    },
+    "at390": {
+      "viewportWidth": 390,
+      "documentWidth": 375,
+      "kpiGridColumns": 2,
+      "amountsVisible": true
+    }
+  },
+  "cause": "En CSS global, una regla tardía conserva dos columnas de .kpi-row hasta 320 px. La tarjeta KPI recorta su valor por overflow hidden: el texto mide 142 px y la tarjeta 133 px.",
+  "correctiveScope": {
+    "path": "orbit360-platform/styles/infra.css",
+    "change": "At <=360 px, apilar KPI cards en una columna y permitir que el item de grid encoja.",
+    "logicChanged": false,
+    "dataChanged": false,
+    "authOrRulesChanged": false
+  },
+  "regressionTest": {
+    "path": "tools/gravicentra-b4-006-global-visual.test.cjs",
+    "assertionAdded": "B4006_KPI_320_CARDS_MUST_STACK_WITHOUT_CLIPPING",
+    "execution": "PENDING_CANONICAL_WORKFLOW"
+  },
+  "releaseSafety": {
+    "sameCanonicalBranch": true,
+    "newExactBuildRequired": true,
+    "productionTouched": false,
+    "liveDeploys": 0,
+    "realDataWrites": 0,
+    "previousPassEvidencePreserved": true,
+    "ownerAcceptedExactArtifact": false
+  },
+  "invalidatedEvidence": [
+    "KPI card responsive visual check at 320 px for shared global card renderer"
+  ],
+  "preservedEvidence": [
+    "All prior passes not causally affected by KPI-card layout at <=360 px"
+  ],
+  "pending": [
+    "Canonical workflow and new artifact",
+    "Authenticated Preview readback at 320/390/1024/1440",
+    "Complete remaining B4-006 UAT"
+  ],
+  "nextAction": "RUN_CANONICAL_EXACT_PREVIEW_FOR_THIS_SOURCE_THEN_VERIFY_KPI_CARD_LAYOUT_AT_320PX"
+}

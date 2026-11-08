@@ -2169,3 +2169,10 @@ table.tbl tbody tr:hover{background:#fcebef;}
 @media(prefers-reduced-motion:reduce){
   table.tbl tbody tr{transition:none;}
 }
+
+
+/* B4-006 · preservar montos completos en KPI a 320px; solo layout. */
+@media(max-width:360px){
+  .page .kpi-row{grid-template-columns:minmax(0,1fr)!important;}
+  .page .kpi{min-width:0;}
+}
