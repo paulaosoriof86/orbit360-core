@@ -187,7 +187,7 @@
     "phaseAIterationStatuses": "HISTORICAL_FIELDS_ABOVE_PRESERVED_UNTIL_FORMAL_GATE_EVIDENCE;_NO_NEW_PASS_INFERRED",
     "labDataWriteScope": "ONLY_35_AUTHORIZED_COUNTRY_FIELDS;_NO_AUGUST_REFRESH"
   },
-  "nextAction": "B4_004_CRONOGRAMA_READONLY_SCOPE_403_DIAGNOSTIC_THEN_PERFORMANCE_AND_GATE_SEAL",
+  "nextAction": "B4_004_EXISTING_EVIDENCE_SCOPE_ADJUDICATION_OR_NEW_MINIMUM_AUTHORIZATION_AND_HISTORICAL_GUARD_ROOTFIX_THEN_GATE_SEAL",
   "sourceOfTruth": {
     "projectBoundaryPrevalentAddendum": "orbit360-platform/docs/recovery/ADDENDUM_PREVALENTE_CHATGPT_PROJECT_BOUNDARY_20260831.md",
     "mutableState": "orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json",
@@ -825,5 +825,16 @@
     "consumedByRunAttempt": 1,
     "result": "SYNTHETIC_EXECUTION_CLEANUP_VERIFIED_SCOPE_HOLD",
     "executionReceipt": "artifacts/orbit360-recovery/release-control/I6_5_B4_004_CRONOGRAMA_LIVE_SYNTHETIC_EXECUTION_PARTIAL_20261107.json"
+  },
+  "b4004CronogramaReadOnlyScopePerformance20261107": {
+    "status": "PARTIAL_READONLY_PERFORMANCE_PASS_TASK_VISIBILITY_HOLD",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_004_CRONOGRAMA_READONLY_SCOPE_PERFORMANCE_DIAGNOSTIC_20261107.json",
+    "diagnosticArtifactId": 13598069587,
+    "diagnosticRunId": 42433637476,
+    "cronogramaRouteUsableMs": 48,
+    "scoped403": 0,
+    "distinctUid": true,
+    "taskVisibility": "HOLD_NO_EXISTING_TASK",
+    "noWrites": true
   }
 }

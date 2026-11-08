@@ -1,0 +1,52 @@
+{
+  "schema": "GRAVICENTRA_B4_004_CRONOGRAMA_READONLY_SCOPE_PERFORMANCE_DIAGNOSTIC_SEAL_V1",
+  "gate": "I6.5/B4-004",
+  "status": "PARTIAL_READONLY_PERFORMANCE_PASS_TASK_VISIBILITY_HOLD",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "diagnosticRunId": 42433637476,
+  "diagnosticRunAttempt": 1,
+  "diagnosticJobId": 128587714588,
+  "diagnosticArtifactId": 13598069587,
+  "sourceSha": "6c45983610ce0d65a5c63bd07659ad968bfe9da3",
+  "buildId": "gi-i65-b4-6c45983610ce-57f234755dc1",
+  "artifactId": 13592378081,
+  "liveVersion": "sites/ays-orbit-360-lab/versions/33af816375dd5cb5",
+  "observations": {
+    "distinctUidActorsSelected": true,
+    "cronogramaRouteUsableMs": 48,
+    "cronogramaRouteHistoricalThresholdMs": 6000,
+    "routePerformanceWithinThreshold": true,
+    "scopedPolicyRead403Count": 0,
+    "taskCollectionServerConfirmed": true,
+    "existingCanonicalNonSyntheticTaskCount": 0,
+    "taskCrossUidVisibilityCertified": false,
+    "taskCountryPartitionCertified": false,
+    "pageErrorCount": 0,
+    "documentDriveStatusCorsSignal": "INDEPENDENT_NOT_CERTIFIED"
+  },
+  "mutations": {
+    "writeAttempts": 0,
+    "authAccountsCreated": 0,
+    "membershipWrites": 0,
+    "dataWrites": 0,
+    "productSourceChanged": false,
+    "backendChanged": false
+  },
+  "preservedSyntheticCore": {
+    "runId": 42431729157,
+    "artifactId": 13598250598,
+    "syntheticWrites": 2,
+    "cleanupWrites": 5,
+    "syntheticFinalAbsent": true,
+    "authorizationConsumed": true
+  },
+  "limitations": [
+    "Green diagnostic job indicates executed zero-write assessment, not functional acceptance",
+    "48 ms covers authenticated route navigation, not initial login or hydration",
+    "No existing task available to prove cross-UID positive visibility or country partition",
+    "DocumentDriveStatus CORS signal outside Cronograma focal acceptance",
+    "Historical B4-003 snapshot guard still fails current pin; no previous accepted gate reopened"
+  ],
+  "nextAction": "B4_004_EXISTING_EVIDENCE_SCOPE_ADJUDICATION_OR_NEW_MINIMUM_AUTHORIZATION_AND_HISTORICAL_GUARD_ROOTFIX_THEN_GATE_SEAL"
+}
