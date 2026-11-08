@@ -96,7 +96,8 @@ async function checkActor(browser,a,index){
   form.cancelled=await page.locator('#end-type').count()===0;
   must(form.cancelled,'FORM_CLOSE_FAILED');
   controlledReload=true;
-  try{await page.reload({waitUntil:'domcontentloaded',timeout:60000});await page.waitForFunction(()=>!!document.querySelector('#host')?.textContent,null,{timeout:20000});}
+  try{await page.reload({waitUntil:'domcontentloaded',timeout:60000});await page.waitForFunction(()=>!!document.querySelector('#host')?.textContent,null,{timeout:20000});
+    await page.waitForFunction(id=>!!Orbit.store?.get?.('polizas',id),policyId,{timeout:30000});}
   finally{controlledReload=false;}
   const readback=await page.evaluate(({policyId})=>({policyId,policyExists:!!Orbit.store?.get?.('polizas',policyId),role:Orbit.session.rol(),country:Orbit.pais}),{policyId});
   const persistedRoleCountry=norm(readback.role)===norm(a.role)&&readback.country===a.country;
