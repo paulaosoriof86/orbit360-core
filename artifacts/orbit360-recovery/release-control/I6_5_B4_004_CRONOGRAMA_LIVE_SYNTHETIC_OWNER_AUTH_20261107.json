@@ -5,7 +5,7 @@
   "authority": "Paula explicit B4-004 synthetic LIVE authorization frozen in long-block protocol",
   "authorized": true,
   "consumed": false,
-  "authorizedParentSha": "2855391604d0cf28fc9bcc156d7541fda202e572",
+  "authorizedParentSha": "4c646852b4984d7f54c136d57212615e9c4381e2",
   "release": {
     "sourceSha": "6c45983610ce0d65a5c63bd07659ad968bfe9da3",
     "buildId": "gi-i65-b4-6c45983610ce-57f234755dc1",
@@ -109,6 +109,16 @@
       "consoleErrorCount": 4,
       "httpErrorCount": 0,
       "pageErrorCount": 0
+    },
+    {
+      "runId": 42430986647,
+      "jobId": 128579597456,
+      "result": "FAIL_UNIT_TEST_EXPECTATION_BEFORE_BROWSER",
+      "businessWrites": 0,
+      "syntheticWrites": 0,
+      "cleanupWrites": 0,
+      "syntheticFinalAbsent": true,
+      "authorizationConsumed": false
     }
   ]
 }

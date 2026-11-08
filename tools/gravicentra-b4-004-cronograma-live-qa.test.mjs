@@ -36,7 +36,7 @@ test('actor selector fails closed without a distinct same-country scope witness'
 
 test('console classifier allows only harness-induced service-worker blocking',()=>{
  assert.equal(classifyConsoleError('Service Worker registration failed because service workers are blocked'),'HARNESS_SERVICE_WORKER_BLOCK');
- assert.equal(classifyConsoleError('Failed to load resource: the server responded with a status of 404'),'RELEVANT_OR_UNKNOWN');
+ assert.equal(classifyConsoleError('Failed to load resource: the server responded with a status of 404'),'NETWORK_RESOURCE');
  assert.equal(classifyConsoleError('FirebaseError: permission-denied'),'RELEVANT_OR_UNKNOWN');
 });
 
