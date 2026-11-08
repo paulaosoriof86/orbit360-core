@@ -4,7 +4,7 @@
   "gate": "I6.5/B4-004",
   "authority": "Paula explicit B4-004 synthetic LIVE authorization frozen in long-block protocol",
   "authorized": true,
-  "consumed": false,
+  "consumed": true,
   "authorizedParentSha": "b67fdd03a4b6a46663941ddec84547838e1d0b78",
   "release": {
     "sourceSha": "6c45983610ce0d65a5c63bd07659ad968bfe9da3",
@@ -156,6 +156,43 @@
       "syntheticFinalAbsent": true,
       "authorizationConsumed": false,
       "endpoint": "us-central1-ays-orbit-360-lab.cloudfunctions.net/orbit360DocumentDriveStatus"
+    },
+    {
+      "runId": 42431729157,
+      "jobId": 128581915545,
+      "artifactId": 13598250598,
+      "result": "SYNTHETIC_EXECUTION_CONSUMED_CLEANUP_VERIFIED_SCOPE_HOLD",
+      "businessWrites": 0,
+      "syntheticWrites": 2,
+      "cleanupWrites": 5,
+      "syntheticFinalAbsent": true,
+      "authorizationConsumed": true,
+      "assertionsPassed": [
+        "exactLiveBuild",
+        "preWriteBrowserClean",
+        "documentStatusProbeDisposed",
+        "createServerReadback",
+        "firstReload",
+        "completeServerReadback",
+        "completedReload",
+        "cleanupFinalUiAbsence"
+      ],
+      "failure": "CRONO_QA_DISTINCT_UID_SCOPE",
+      "scopedPolicyRead403Count": 3
     }
+  ],
+  "consumedByRunId": 42431729157,
+  "consumedByRunAttempt": 1,
+  "consumedArtifactId": 13598250598,
+  "consumptionResult": "SYNTHETIC_EXECUTION_CLEANUP_VERIFIED_SCOPE_HOLD",
+  "syntheticWrites": 2,
+  "cleanupWrites": 5,
+  "syntheticFinalAbsent": true,
+  "businessWrites": 0,
+  "scopeProofComplete": false,
+  "remainingHold": [
+    "DISTINCT_UID_SCOPE_READONLY_PROOF",
+    "SCOPED_POLICY_READ_403_DIAGNOSTIC",
+    "PERFORMANCE_ACCEPTANCE"
   ]
 }

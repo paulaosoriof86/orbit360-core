@@ -1,0 +1,56 @@
+{
+  "schema": "GRAVICENTRA_B4_004_CRONOGRAMA_LIVE_SYNTHETIC_EXECUTION_PARTIAL_V1",
+  "recordedAt": "2026-11-07",
+  "gate": "I6.5/B4-004",
+  "status": "SYNTHETIC_EXECUTION_CONSUMED_CLEANUP_VERIFIED_SCOPE_HOLD",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "run": {
+    "id": 42431729157,
+    "attempt": 1,
+    "jobId": 128581915545,
+    "artifactId": 13598250598
+  },
+  "release": {
+    "sourceSha": "6c45983610ce0d65a5c63bd07659ad968bfe9da3",
+    "buildId": "gi-i65-b4-6c45983610ce-57f234755dc1",
+    "hostingVersion": "sites/ays-orbit-360-lab/versions/33af816375dd5cb5",
+    "artifactId": 13592378081
+  },
+  "passed": {
+    "exactLiveBuild": true,
+    "preWriteBrowserClean": true,
+    "documentStatusProbeDisposed": true,
+    "createServerReadback": true,
+    "firstReload": true,
+    "completeServerReadback": true,
+    "completedReload": true,
+    "cleanupWrites": 5,
+    "syntheticFinalAbsent": true,
+    "cleanupFinalUiAbsence": true,
+    "syntheticWrites": 2,
+    "commandReceipts": 2,
+    "canonicalReadbackReceipts": 2,
+    "businessWrites": 0
+  },
+  "hold": {
+    "code": "DISTINCT_UID_SCOPE_AND_SCOPED_POLICY_READ_403_DIAGNOSTIC_REQUIRED",
+    "scopedPolicyRead403Count": 3,
+    "secondUidScopeProved": false,
+    "countryPartitionProved": false
+  },
+  "nonBlockingSignal": {
+    "endpoint": "us-central1-ays-orbit-360-lab.cloudfunctions.net/orbit360DocumentDriveStatus",
+    "disposition": "NON_BLOCKING_DOCUMENT_STATUS_PROBE_FOR_CRONOGRAMA_ONLY",
+    "doesNotCertifyDriveProvider": true
+  },
+  "boundaries": {
+    "productSourceChanged": false,
+    "backendChanged": false,
+    "authAccountsCreated": 0,
+    "membershipWrites": 0,
+    "realBusinessWrites": 0,
+    "noFurtherSyntheticWriteWithoutNewAuthority": true
+  },
+  "nextAction": "B4_004_CRONOGRAMA_READONLY_SCOPE_403_DIAGNOSTIC_THEN_PERFORMANCE_AND_GATE_SEAL"
+}

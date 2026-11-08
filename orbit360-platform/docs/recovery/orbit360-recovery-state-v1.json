@@ -187,7 +187,7 @@
     "phaseAIterationStatuses": "HISTORICAL_FIELDS_ABOVE_PRESERVED_UNTIL_FORMAL_GATE_EVIDENCE;_NO_NEW_PASS_INFERRED",
     "labDataWriteScope": "ONLY_35_AUTHORIZED_COUNTRY_FIELDS;_NO_AUGUST_REFRESH"
   },
-  "nextAction": "B4_004_CRONOGRAMA_MINIMUM_DELTA_LIVE_QA_THEN_GATE_SEAL",
+  "nextAction": "B4_004_CRONOGRAMA_READONLY_SCOPE_403_DIAGNOSTIC_THEN_PERFORMANCE_AND_GATE_SEAL",
   "sourceOfTruth": {
     "projectBoundaryPrevalentAddendum": "orbit360-platform/docs/recovery/ADDENDUM_PREVALENTE_CHATGPT_PROJECT_BOUNDARY_20260831.md",
     "mutableState": "orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json",
@@ -792,9 +792,9 @@
     "schema": "GRAVICENTRA_B4_004_CRONOGRAMA_LIVE_SYNTHETIC_OWNER_AUTH_V1",
     "status": "AUTHORIZED_ONCE",
     "authorized": true,
-    "consumed": false,
+    "consumed": true,
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_004_CRONOGRAMA_LIVE_SYNTHETIC_OWNER_AUTH_20261107.json",
-    "receiptBlobSha": "f93357f43a455829cb89a209690f1822e17a6966",
+    "receiptBlobSha": "214783060fa5b93f826feaba1252d8a654e00845",
     "authorizedParentSha": "b67fdd03a4b6a46663941ddec84547838e1d0b78",
     "release": {
       "sourceSha": "6c45983610ce0d65a5c63bd07659ad968bfe9da3",
@@ -820,6 +820,10 @@
       "backendMutation": false,
       "rulesMutation": false,
       "reimport": false
-    }
+    },
+    "consumedByRunId": 42431729157,
+    "consumedByRunAttempt": 1,
+    "result": "SYNTHETIC_EXECUTION_CLEANUP_VERIFIED_SCOPE_HOLD",
+    "executionReceipt": "artifacts/orbit360-recovery/release-control/I6_5_B4_004_CRONOGRAMA_LIVE_SYNTHETIC_EXECUTION_PARTIAL_20261107.json"
   }
 }

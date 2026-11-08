@@ -3333,7 +3333,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "B4_004_CRONOGRAMA_MINIMUM_DELTA_LIVE_QA_THEN_GATE_SEAL",
+  "nextAction": "B4_004_CRONOGRAMA_READONLY_SCOPE_403_DIAGNOSTIC_THEN_PERFORMANCE_AND_GATE_SEAL",
   "postproductionExitProgress": {
     "formalPercent": 50,
     "frozenMiniGates": 5,
@@ -21703,7 +21703,7 @@
   },
   "b4004PolicyCaptureFrontendSuccessor20261107": {
     "schema": "GRAVICENTRA_B4_004_POLICY_CAPTURE_SUCCESSOR_CURSOR_V1",
-    "status": "FRONTEND_SUCCESSOR_LIVE_BYTES_AND_POLICY_CAPTURE_FUNCTIONAL_PASS_CRONOGRAMA_PENDING",
+    "status": "FRONTEND_SUCCESSOR_LIVE_POLICY_CAPTURE_PASS_CRONOGRAMA_CORE_PASS_SCOPE_PERFORMANCE_PENDING",
     "preservedAcceptancePointer": "/b4003ActiveCertificationCursor20261106/formalLiveAcceptance",
     "preservedPriorSuccessorPointer": "/b4003CausalFrontendSuccessor20261107",
     "sourceContractPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_004_POLICY_CAPTURE_CAUSAL_FRONTEND_SUCCESSOR_CONTRACT_20261107.json",
@@ -21770,6 +21770,19 @@
       "evidenceSha256": "774c5ea675bf7561b8172281b7d922703a3031ef26ceb535dfa60f90752d8a9f",
       "syntheticFinalAbsent": true,
       "realBusinessWrites": 0,
+      "productSourceChanged": false
+    },
+    "cronogramaLiveAcceptance": {
+      "status": "SYNTHETIC_CORE_LIVE_PASS_SCOPE_HOLD",
+      "runId": 42431729157,
+      "artifactId": 13598250598,
+      "evidencePath": "artifacts/orbit360-recovery/release-control/I6_5_B4_004_CRONOGRAMA_LIVE_SYNTHETIC_EXECUTION_PARTIAL_20261107.json",
+      "syntheticWrites": 2,
+      "cleanupWrites": 5,
+      "syntheticFinalAbsent": true,
+      "realBusinessWrites": 0,
+      "distinctUidScope": false,
+      "countryScope": false,
       "productSourceChanged": false
     }
   },
@@ -21862,9 +21875,9 @@
     "schema": "GRAVICENTRA_B4_004_CRONOGRAMA_LIVE_SYNTHETIC_OWNER_AUTH_V1",
     "status": "AUTHORIZED_ONCE",
     "authorized": true,
-    "consumed": false,
+    "consumed": true,
     "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_004_CRONOGRAMA_LIVE_SYNTHETIC_OWNER_AUTH_20261107.json",
-    "receiptBlobSha": "f93357f43a455829cb89a209690f1822e17a6966",
+    "receiptBlobSha": "214783060fa5b93f826feaba1252d8a654e00845",
     "authorizedParentSha": "b67fdd03a4b6a46663941ddec84547838e1d0b78",
     "release": {
       "sourceSha": "6c45983610ce0d65a5c63bd07659ad968bfe9da3",
@@ -21890,6 +21903,10 @@
       "backendMutation": false,
       "rulesMutation": false,
       "reimport": false
-    }
+    },
+    "consumedByRunId": 42431729157,
+    "consumedByRunAttempt": 1,
+    "result": "SYNTHETIC_EXECUTION_CLEANUP_VERIFIED_SCOPE_HOLD",
+    "executionReceipt": "artifacts/orbit360-recovery/release-control/I6_5_B4_004_CRONOGRAMA_LIVE_SYNTHETIC_EXECUTION_PARTIAL_20261107.json"
   }
 }
