@@ -1,0 +1,48 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_006_GLOBAL_TABLE_CARD_SYSTEM_SOURCE_SUCCESSOR_V1",
+  "gate": "I6.5/B4-006",
+  "status": "SOURCE_GLOBAL_TABLE_CARD_SYSTEM_PENDING_EXACT_PREVIEW_AND_VISUAL_UAT",
+  "decision": "PAULA_APPROVED_TRANSVERSAL_VISUAL_CONSISTENCY",
+  "branch": "recovery/fase-a-clean-20260831",
+  "repository": "paulaosoriof86/orbit360-core",
+  "predecessorHead": "69722b2e3a92265cd65f29c37bdc786f394ec9e9",
+  "interimCssCommit": "e20e4ae4a7bb2472747408ca095f9f24eacd3789",
+  "approvedPriorCssBlobSha": "46ad6fee77a591073994a6d77018b7855192d950",
+  "preSuccessorCssBlobSha": "22ff5dce20deb2205b94baac9c947238bed4572e",
+  "newCssBlobSha": "b00fbfc7a99d7c86aa9b138cc2ee838b57f6215a",
+  "productPath": "orbit360-platform/styles/infra.css",
+  "changedProductPaths": [
+    "orbit360-platform/styles/infra.css"
+  ],
+  "qaPath": "tools/gravicentra-b4-006-global-visual.test.cjs",
+  "qaBlobSha": "3f699189cd464ca03a475600baae21b79e2a5bba",
+  "coverage": {
+    "sharedHeader": "dark charcoal + white centered text + corporate red line",
+    "tableRenderer": "table.tbl globally; includes main listings and authenticated modal tables without changing semantic HTML",
+    "rows": "spacing, alternating backgrounds and focus hover readable",
+    "cards": "standard page cards, grid cards and KPIs; keep specialist cards and existing Kanban",
+    "responsive": "preserve existing table scroll and special mobile card renderers",
+    "targetedModules": [
+      "Cliente 360",
+      "Pólizas",
+      "Equipo/Permisos",
+      "Cobros",
+      "Cancelaciones"
+    ],
+    "broaderModules": "All existing views using canonical table.tbl and card selectors"
+  },
+  "noBusinessSemanticsChanges": true,
+  "backendSourceChanged": false,
+  "firestoreRulesWrites": 0,
+  "authChanges": 0,
+  "realDataWrites": 0,
+  "liveDeploys": 0,
+  "ownerAcceptedExactArtifact": false,
+  "reimport": false,
+  "firstIncompleteGate": "B4-006",
+  "lastClosedGate": "B4-005",
+  "oneCanonicalPreviewChannel": true,
+  "nextAction": "B4_006_DEPLOY_EXACT_PREVIEW_MANAGEMENT_COLLAB_BACKEND_AND_HOSTING_THEN_E2E",
+  "evidenceBoundary": "SOURCE_ONLY_NOT_BROWSER_VISUAL_OR_PERFORMANCE_CERTIFICATE",
+  "priorSuccessorsAndHistoricalReceiptsUnmodified": true
+}

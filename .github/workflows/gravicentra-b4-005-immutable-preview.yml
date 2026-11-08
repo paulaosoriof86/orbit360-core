@@ -16,6 +16,7 @@ on:
       - orbit360-platform/data/store-firestore-product-operational-p0.js
       - functions/product-ops-leads-domain.js
       - tools/gravicentra-b4-006-management-collaboration.test.cjs
+      - tools/gravicentra-b4-006-global-visual.test.cjs
       - tools/gravicentra-b4-003-formal-live-closeout-guard.mjs
       - tools/gravicentra-b4-004-formal-gate-guard.mjs
       - orbit360-platform/modules/cobros.js
@@ -97,6 +98,7 @@ jobs:
           node --check orbit360-platform/modules/siniestros.js
           node --check orbit360-platform/core/ciclo.js
           node tools/gravicentra-b4-006-management-collaboration.test.cjs
+          node tools/gravicentra-b4-006-global-visual.test.cjs
       - name: Fingerprint existing LIVE sites without touching them
         run: |
           set -euo pipefail
