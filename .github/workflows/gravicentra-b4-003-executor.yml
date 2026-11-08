@@ -4826,7 +4826,7 @@ jobs:
 
 
   b4-004-cronograma-second-uid-live:
-    if: "github.event_name == 'push' && (github.event.head_commit.message == 'test(b4-004): one-time second UID LIVE scope' || startsWith(github.event.head_commit.message, format('{0}{1}', 'test(b4-004): one-time second UID LIVE scope', fromJSON('\"\\n\"'))))"
+    if: "github.event_name == 'push' && (github.event.head_commit.message == 'test(b4-004): final second UID LIVE scope' || startsWith(github.event.head_commit.message, format('{0}{1}', 'test(b4-004): final second UID LIVE scope', fromJSON('\"\\n\"'))))"
     runs-on: ubuntu-24.04
     timeout-minutes: 35
     permissions:
@@ -4837,7 +4837,7 @@ jobs:
       TENANT_HINT: alianzas-soluciones
       CONTROL: artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json
       STATE: orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json
-      AUTH_RECEIPT: artifacts/orbit360-recovery/release-control/I6_5_B4_004_CRONOGRAMA_SECOND_UID_SCOPE_AUTH_20261107.json
+      AUTH_RECEIPT: artifacts/orbit360-recovery/release-control/I6_5_B4_004_CRONOGRAMA_FINAL_SECOND_UID_AUTH_20261107.json
       SOURCE_SHA: 6c45983610ce0d65a5c63bd07659ad968bfe9da3
       BUILD_ID: gi-i65-b4-6c45983610ce-57f234755dc1
       LIVE_VERSION: sites/ays-orbit-360-lab/versions/33af816375dd5cb5
@@ -4857,7 +4857,7 @@ jobs:
       - name: Fail-closed Cronograma authorization, release and inherited policy-capture PASS
         run: |
           set -euo pipefail
-          node --check tools/gravicentra-b4-004-cronograma-second-uid-live-qa.mjs
+          node --check tools/gravicentra-b4-004-cronograma-final-second-uid-qa.mjs
           node - <<'NODE'
           const fs=require('node:fs'),{execFileSync}=require('node:child_process');
           const cp=JSON.parse(fs.readFileSync(process.env.CONTROL,'utf8'));
@@ -4865,7 +4865,7 @@ jobs:
           const e=JSON.parse(fs.readFileSync(process.env.GITHUB_EVENT_PATH,'utf8'));
           const need=(v,c)=>{if(!v)throw Error(c);};
           const blob=execFileSync('git',['hash-object',process.env.AUTH_RECEIPT],{encoding:'utf8'}).trim();
-          const ptr=cp.b4004CronogramaSecondUidScopeAuthorization20261107;
+          const ptr=cp.b4004CronogramaFinalSecondUidAuthorization20261107;
           need(a.status==='AUTHORIZED_ONCE'&&a.authorized===true&&a.consumed===false,'B4004_CRONO_AUTH_NOT_AVAILABLE');
           need(ptr?.receiptPath===process.env.AUTH_RECEIPT&&ptr.receiptBlobSha===blob,'B4004_CRONO_AUTH_POINTER_MISMATCH');
           need(e.before===a.authorizedParentSha&&e.after===process.env.GITHUB_SHA&&e.forced!==true,'B4004_CRONO_HEAD_LEASE');
@@ -4896,23 +4896,57 @@ jobs:
           npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund firebase-admin@13.4.0 playwright@1.55.0 >/dev/null
           npx playwright install --with-deps chromium >/dev/null
           node --test tools/gravicentra-b4-004-cronograma-live-qa.test.mjs
-      - name: Authenticated Cronograma LIVE minimum-delta proof
+      - name: Authenticated final second UID and country LIVE proof
+        continue-on-error: true
         env:
-          B4_004_CRONOGRAMA_OUT: ${{ runner.temp }}/b4-004-second-uid-live-qa.json
+          B4_004_CRONOGRAMA_OUT: ${{ runner.temp }}/b4-004-final-second-uid-live-qa.json
         run: |
           set -euo pipefail
-          node tools/gravicentra-b4-004-cronograma-second-uid-live-qa.mjs
+          node tools/gravicentra-b4-004-cronograma-final-second-uid-qa.mjs
           node - <<'NODE'
           const x=require(process.env.B4_004_CRONOGRAMA_OUT),a=x.assertions||{};
           const required=['exactLiveBuild','createServerReadback','firstReload','distinctUidScopeVerified','crossCountryPartitionVerified','cleanupFinalUiAbsence'];
           if(x.status!=='PASS'||required.some(k=>a[k]!==true)||x.syntheticFinalAbsent!==true||x.syntheticWrites!==1||x.pageErrorCount!==0||x.consoleErrorCount!==0||x.httpErrorCount!==0||x.authAccountsCreated!==0||x.membershipWrites!==0||x.productSourceChanged!==false||x.backendChanged!==false)process.exit(1);
           console.log('B4_004_CRONOGRAMA_LIVE_MINIMUM_DELTA=PASS');
           NODE
-      - name: Preserve Cronograma LIVE proof artifact
+      - name: Preserve final second UID evidence even on failure
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: gravicentra-b4-004-second-uid-${{ github.run_id }}
-          path: ${{ runner.temp }}/b4-004-second-uid-live-qa.json
-          if-no-files-found: warn
+          name: gravicentra-b4-004-final-second-uid-${{ github.run_id }}
+          path: ${{ runner.temp }}/b4-004-final-second-uid-live-qa.json
+          if-no-files-found: error
           retention-days: 30
+
+      - name: Seal final second UID proof to Control Plane on verified PASS
+        env:
+          PROOF: ${{ runner.temp }}/b4-004-final-second-uid-live-qa.json
+          RECEIPT: artifacts/orbit360-recovery/release-control/I6_5_B4_004_CRONOGRAMA_FINAL_SECOND_UID_LIVE_QA_20261107.json
+        run: |
+          set -euo pipefail
+          node - <<'NODE'
+          const fs=require('node:fs'),crypto=require('node:crypto');
+          const p=JSON.parse(fs.readFileSync(process.env.PROOF,'utf8')),cp=JSON.parse(fs.readFileSync(process.env.CONTROL,'utf8')),state=JSON.parse(fs.readFileSync(process.env.STATE,'utf8'));
+          const required=['exactLiveBuild','createServerReadback','firstReload','distinctUidScopeVerified','crossCountryPartitionVerified','cleanupFinalUiAbsence'];
+          if(p.status!=='PASS'||required.some(k=>p.assertions?.[k]!==true)||p.syntheticWrites!==1||p.syntheticFinalAbsent!==true||p.errors.length>0||p.pageErrorCount!==0||p.httpErrorCount!==0||p.consoleErrorCount!==0)throw Error('B4004_FINAL_UID_PROOF_NOT_PASS');
+          const a=cp.b4004CronogramaFinalSecondUidAuthorization20261107,c=cp.b4004PolicyCaptureFrontendSuccessor20261107;
+          if(!a||a.consumed||c?.cronogramaLiveAcceptance?.status!=='SYNTHETIC_CORE_LIVE_PASS_SCOPE_HOLD')throw Error('B4004_FINAL_UID_BAD_CURSORS');
+          fs.copyFileSync(process.env.PROOF,process.env.RECEIPT);
+          const bytes=fs.readFileSync(process.env.RECEIPT);
+          c.cronogramaScopeLiveAcceptance={status:'CRONOGRAMA_SECOND_UID_COUNTRY_LIVE_PASS',sourceSha:c.activeSourceSha,buildId:c.activeBuildId,artifactId:c.activeImmutableArtifactId,runId:Number(process.env.GITHUB_RUN_ID),runAttempt:Number(process.env.GITHUB_RUN_ATTEMPT||1),evidencePath:process.env.RECEIPT,evidenceSha256:crypto.createHash('sha256').update(bytes).digest('hex'),syntheticFinalAbsent:true,realBusinessWrites:0};
+          c.status='FRONTEND_SUCCESSOR_LIVE_POLICY_CAPTURE_CRONOGRAMA_SCOPE_PERFORMANCE_FOCAL_PASS_PENDING_GUARD';
+          a.consumed=true;a.consumedByRunId=Number(process.env.GITHUB_RUN_ID);a.result='PASS_CLEANUP_VERIFIED';
+          cp.nextAction='B4_004_HISTORICAL_GUARD_CAUSAL_REPAIR_AND_FORMAL_GATE_SEAL';
+          state.b4004PolicyCaptureFrontendSuccessor20261107=JSON.parse(JSON.stringify(c));
+          state.b4004CronogramaFinalSecondUidAuthorization20261107=JSON.parse(JSON.stringify(a));
+          state.nextAction=cp.nextAction;
+          fs.writeFileSync(process.env.CONTROL,JSON.stringify(cp,null,2)+'\n');
+          fs.writeFileSync(process.env.STATE,JSON.stringify(state,null,2)+'\n');
+          NODE
+          git add "$CONTROL" "$STATE" "$RECEIPT"
+          git config user.name gravicentra-recovery-bot
+          git config user.email gravicentra-recovery-bot@users.noreply.github.com
+          git commit -m "test(b4-004): seal final UID country LIVE proof"
+          git fetch origin "$GITHUB_REF_NAME"
+          test "$(git rev-parse "origin/$GITHUB_REF_NAME")" = "$GITHUB_SHA"
+          git push origin "HEAD:$GITHUB_REF_NAME"

@@ -187,7 +187,7 @@
     "phaseAIterationStatuses": "HISTORICAL_FIELDS_ABOVE_PRESERVED_UNTIL_FORMAL_GATE_EVIDENCE;_NO_NEW_PASS_INFERRED",
     "labDataWriteScope": "ONLY_35_AUTHORIZED_COUNTRY_FIELDS;_NO_AUGUST_REFRESH"
   },
-  "nextAction": "B4_004_SCOPE_PROOF_MISSING_DUE_NONPRESERVED_EXECUTION_JSON_AND_HISTORICAL_GUARD_HOLD_NO_AUTOMATIC_RETEST",
+  "nextAction": "B4_004_FINAL_SINGLE_SYNTHETIC_UID_COUNTRY_SCOPE_LIVE",
   "sourceOfTruth": {
     "projectBoundaryPrevalentAddendum": "orbit360-platform/docs/recovery/ADDENDUM_PREVALENTE_CHATGPT_PROJECT_BOUNDARY_20260831.md",
     "mutableState": "orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json",
@@ -880,5 +880,38 @@
     "artifactId": 13598548836,
     "syntheticFinalAbsent": true,
     "secondUidScopeCertified": false
+  },
+  "b4004CronogramaFinalSecondUidAuthorization20261107": {
+    "status": "AUTHORIZED_ONCE",
+    "authorized": true,
+    "consumed": false,
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_004_CRONOGRAMA_FINAL_SECOND_UID_AUTH_20261107.json",
+    "receiptBlobSha": "0dd8783b949b24e93937d00a8baf4c57bfd82efc",
+    "authorizedParentSha": "a3168d36c49d2890ca5b75da47a5a0bc395a43fb",
+    "release": {
+      "sourceSha": "6c45983610ce0d65a5c63bd07659ad968bfe9da3",
+      "buildId": "gi-i65-b4-6c45983610ce-57f234755dc1",
+      "artifactId": 13592378081,
+      "liveVersionName": "sites/ays-orbit-360-lab/versions/33af816375dd5cb5",
+      "hostedPayloadDigest": "018bf9acd64ddaa382d2ac73c35a6d8bbc0447ab3051a3d26a5b1e8c048a7e7d"
+    },
+    "scope": {
+      "syntheticOnly": true,
+      "realBusinessWrites": false,
+      "maxTaskIds": 1,
+      "maxCommands": 1,
+      "distinctUidRequired": true,
+      "countryScopeRequired": true,
+      "serverReadbackRequired": true,
+      "reloadRequired": true,
+      "cleanupExact": true,
+      "finalAbsence": true,
+      "authAccountsChanged": false,
+      "membershipsChanged": false,
+      "productSourceChanged": false,
+      "backendChanged": false,
+      "rulesChanged": false,
+      "reimport": false
+    }
   }
 }

@@ -1,0 +1,37 @@
+{
+  "schema": "GRAVICENTRA_B4_004_FINAL_SECOND_UID_SCOPE_AUTH_V1",
+  "gate": "I6.5/B4-004",
+  "status": "AUTHORIZED_ONCE",
+  "authorized": true,
+  "consumed": false,
+  "authority": "Paula explicitly authorized new single synthetic task LIVE second UID/country final QA",
+  "authorizedParentSha": "a3168d36c49d2890ca5b75da47a5a0bc395a43fb",
+  "release": {
+    "sourceSha": "6c45983610ce0d65a5c63bd07659ad968bfe9da3",
+    "buildId": "gi-i65-b4-6c45983610ce-57f234755dc1",
+    "artifactId": 13592378081,
+    "liveVersionName": "sites/ays-orbit-360-lab/versions/33af816375dd5cb5",
+    "hostedPayloadDigest": "018bf9acd64ddaa382d2ac73c35a6d8bbc0447ab3051a3d26a5b1e8c048a7e7d"
+  },
+  "scope": {
+    "syntheticOnly": true,
+    "realBusinessWrites": false,
+    "maxTaskIds": 1,
+    "maxCommands": 1,
+    "distinctUidRequired": true,
+    "countryScopeRequired": true,
+    "serverReadbackRequired": true,
+    "reloadRequired": true,
+    "cleanupExact": true,
+    "finalAbsence": true,
+    "authAccountsChanged": false,
+    "membershipsChanged": false,
+    "productSourceChanged": false,
+    "backendChanged": false,
+    "rulesChanged": false,
+    "reimport": false
+  },
+  "priorAuthorizationConsumed": true,
+  "priorCleanupRun": 42434888888,
+  "priorCleanupArtifactId": 13598548836
+}
