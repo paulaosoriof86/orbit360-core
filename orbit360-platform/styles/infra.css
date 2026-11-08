@@ -1542,7 +1542,7 @@ a.fh-chip:hover{border-color:var(--red);color:var(--red)}
 .insurer-premium-section .insurer-role-guide>div:nth-child(3) span{color:#edf0f5;}
 .insurer-premium-section .insurer-premium-body>.asg-sec-t{
   display:flex!important;
-  justify-content:flex-start;
+  justify-content:flex-start!important;
   align-items:center;
   gap:12px;
   min-height:54px;
@@ -1629,6 +1629,23 @@ a.fh-chip:hover{border-color:var(--red);color:var(--red)}
   top:12px;
   font-size:18px;
 }
+.insurer-premium-section #af-docs>.cfg-note{
+  position:relative;
+  border:1px dashed #b9c5d3;
+  border-left:5px solid #c51635;
+  border-radius:12px;
+  background:linear-gradient(118deg,#fff,#f1f4f8);
+  color:#344052;
+  padding:15px 17px 15px 49px;
+  font:650 13px/1.55 var(--f-text);
+}
+.insurer-premium-section #af-docs>.cfg-note::before{
+  content:"📂";
+  position:absolute;
+  left:16px;
+  top:15px;
+  font-size:19px;
+}
 .insurer-premium-section .insurer-filter-bar{
   border:1px solid #c7ced7;
   border-top:4px solid #c51635;
@@ -1699,6 +1716,7 @@ a.fh-chip:hover{border-color:var(--red);color:var(--red)}
   .insurer-premium-section .insurer-role-guide>div{min-height:80px;padding:12px 14px;}
 }
 @media(max-width:760px){
+  .insurer-premium-section{padding:0!important;}
   .insurer-premium-section .insurer-premium-body{padding:13px 12px 17px;}
   .insurer-premium-section .insurer-premium-body>.asg-sec-t{
     font-size:14px;

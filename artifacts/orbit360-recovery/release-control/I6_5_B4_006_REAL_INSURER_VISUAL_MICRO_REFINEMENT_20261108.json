@@ -1,0 +1,69 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_006_REAL_INSURER_VISUAL_MICRO_REFINEMENT_V1",
+  "gate": "I6.5/B4-006",
+  "status": "FOCAL_VISUAL_MICRO_REFINEMENT_SINGLE_CANDIDATE_PREVIEW_PENDING",
+  "dateLocal": "2026-11-08",
+  "owner": "Paula Andrea Osorio Franco",
+  "sourcePredecessor": "1693598321f51911b880f9c9fe8e08332d88326f",
+  "priorSourceReceipt": "artifacts/orbit360-recovery/release-control/I6_5_B4_006_REAL_INSURER_VISUAL_HIERARCHY_SOURCE_SUCCESSOR_20261108.json",
+  "priorSourceReceiptBlobSha": "6adad3cbc42810e49558e3dae016c7ff92bd6a08",
+  "priorCssBlobSha": "70d15bf172313a43d951af6884e52177d5eca037",
+  "newCssBlobSha": "7040f7d522fc25dda006f6dc6d61b1cbf9d2b43a",
+  "changedProductPaths": [
+    {
+      "path": "orbit360-platform/styles/infra.css",
+      "gitBlobSha": "7040f7d522fc25dda006f6dc6d61b1cbf9d2b43a",
+      "visualLayerOnly": true
+    }
+  ],
+  "microChanges": [
+    {
+      "id": "DOCUMENTS_TITLE_ALIGNMENT",
+      "selector": ".insurer-premium-section .insurer-premium-body>.asg-sec-t",
+      "change": "Override existing inline justify-content:space-between with important flex-start; preserve trailing editor action auto-margin"
+    },
+    {
+      "id": "DOCUMENTS_EMPTY_STATE",
+      "selector": ".insurer-premium-section #af-docs>.cfg-note",
+      "change": "Premium red-border and folder icon on real-insurer no classified documents state"
+    },
+    {
+      "id": "MOBILE_CONTENT_WIDTH",
+      "selector": "@media(max-width:760px) .insurer-premium-section",
+      "change": "Remove legacy outer card padding on insurer section alone, retain mobile inner body padding"
+    }
+  ],
+  "scope": {
+    "onlyCss": true,
+    "onlyInsurerPremiumSection": true,
+    "noNewComponentOrModule": true,
+    "noEditorLogicChanges": true,
+    "noBusinessFieldChanges": true,
+    "noFirestoreWrites": true,
+    "noRulesWrites": true,
+    "noLiveDeploy": true,
+    "noReimport": true,
+    "samePreviewChannel": true,
+    "priorImmutableArtifactsNotPatched": true
+  },
+  "control": {
+    "lastClosedGate": "B4-005",
+    "firstIncompleteGate": "B4-006",
+    "ownerAccepted": false,
+    "previewQaRequired": true,
+    "newBuildIdAndImmutableArtifactRequired": true,
+    "previousPreviewWorkflowRunId": 42491094535,
+    "previousImmutableArtifactId": 13621199676,
+    "previousArtifactDigest": "sha256:08ecc6b18fbb66b5df5f8ab87959baebbe60e18b549ff3eebc55c097c04f1933",
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-rc-41765742748-neoi3u7r.web.app/"
+  },
+  "validationPlan": [
+    "Real Aseguradora Guatemalteca desktop and mobile 390/320",
+    "Documentos required title left aligned, real empty Docs classifier styled",
+    "Synthetic populated 9-column document table dark corporate headings",
+    "No horizontal overflow at 320/390 and no editor actions saved",
+    "LIVE unchanged and isolated Preview exactly new build"
+  ],
+  "nextAction": "B4_006_SINGLE_VISUAL_SOURCE_SUCCESSOR_BUILD_EXACT_PREVIEW_REAL_INSURER_QA",
+  "createdAtUtc": "2026-11-08T14:52:17.349Z"
+}

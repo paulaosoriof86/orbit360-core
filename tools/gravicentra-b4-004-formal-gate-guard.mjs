@@ -21,6 +21,7 @@ const B4006_FINAL_ACTION='B4_006_PAULA_VISUAL_ACCEPTANCE_EXACT_PREVIEW_ARTIFACT_
 const B4006_FINAL_RECEIPT=ROOT+'I6_5_B4_006_VISUAL_EXACT_PREVIEW_QA_20261108.json';
 const B4006_OWNER_SOURCE_RECEIPT=ROOT+'I6_5_B4_006_REAL_INSURER_VISUAL_HIERARCHY_SOURCE_SUCCESSOR_20261108.json';
 const B4006_OWNER_SOURCE_ACTION='B4_006_SINGLE_VISUAL_SOURCE_SUCCESSOR_BUILD_EXACT_PREVIEW_REAL_INSURER_QA';
+const B4006_REAL_MICRO_RECEIPT=ROOT+'I6_5_B4_006_REAL_INSURER_VISUAL_MICRO_REFINEMENT_20261108.json';
 const SOURCE='f8fa00e4e2e6627cee66c8c521866874e39bc8da';
 const BUILD='gi-i65-b4-f8fa00e4e2e6-57f234755dc1';
 const ARTIFACT=13600357541;
@@ -49,6 +50,36 @@ function readPinned(path,hash){
   need(git('rev-parse','HEAD:'+path)===hash,'RECEIPT_NOT_COMMITTED_'+path);
   return JSON.parse(bytes);
 }
+function verifyB4006RealInsurerVisualMicroRefinement(cp,state,priorStylesBlob){
+  const p=cp.b4006RealInsurerVisualMicroRefinement20261108;
+  need(p&&same(p,state.b4006RealInsurerVisualMicroRefinement20261108)&&
+    p.status==='FOCAL_VISUAL_MICRO_REFINEMENT_SINGLE_CANDIDATE_PREVIEW_PENDING'&&
+    p.gate==='I6.5/B4-006'&&p.receiptPath===B4006_REAL_MICRO_RECEIPT&&
+    p.receiptBlobSha==='f64e13adc594ba85d56310a87b281f51c058b68f'&&
+    p.sourcePredecessor==='1693598321f51911b880f9c9fe8e08332d88326f'&&
+    p.previousStylesBlobSha===priorStylesBlob&&
+    p.newStylesBlobSha==='7040f7d522fc25dda006f6dc6d61b1cbf9d2b43a'&&
+    p.firstIncompleteGate==='B4-006'&&p.lastClosedGate==='B4-005'&&
+    p.ownerAccepted===false&&p.realDataWrites===0&&p.liveDeploys===0&&
+    p.oneCanonicalPreviewChannel===true,'B4006_REAL_MICRO_POINTER');
+  const r=readPinned(B4006_REAL_MICRO_RECEIPT,p.receiptBlobSha);
+  need(r.schema==='GRAVICENTRA_I6_5_B4_006_REAL_INSURER_VISUAL_MICRO_REFINEMENT_V1'&&
+    r.gate==='I6.5/B4-006'&&r.status===p.status&&
+    r.sourcePredecessor===p.sourcePredecessor&&
+    r.priorSourceReceiptBlobSha==='6adad3cbc42810e49558e3dae016c7ff92bd6a08'&&
+    r.priorCssBlobSha===priorStylesBlob&&r.newCssBlobSha===p.newStylesBlobSha&&
+    r.changedProductPaths?.length===1&&
+    r.changedProductPaths[0].path==='orbit360-platform/styles/infra.css'&&
+    r.changedProductPaths[0].gitBlobSha===p.newStylesBlobSha&&
+    r.microChanges?.length===3&&r.scope?.onlyCss===true&&
+    r.scope?.onlyInsurerPremiumSection===true&&
+    r.scope?.noFirestoreWrites===true&&r.scope?.noLiveDeploy===true&&
+    r.scope?.noReimport===true&&r.control?.ownerAccepted===false&&
+    git('merge-base',r.sourcePredecessor,'HEAD')===r.sourcePredecessor,
+    'B4006_REAL_MICRO_SIGNED_SOURCE');
+  return p.newStylesBlobSha;
+}
+
 function verifyB4006RealInsurerVisualSource(cp,state){
   const p=cp.b4006RealInsurerVisualSuccessor20261108;
   need(p&&same(p,state.b4006RealInsurerVisualSuccessor20261108)&&
@@ -60,6 +91,7 @@ function verifyB4006RealInsurerVisualSource(cp,state){
     p.firstIncompleteGate==='B4-006'&&p.lastClosedGate==='B4-005'&&
     p.realDataWrites===0&&p.liveDeploys===0&&p.oneCanonicalPreviewChannel===true,
     'B4006_OWNER_REJECTED_VISUAL_POINTER');
+  const activeStylesBlob=cp.b4006RealInsurerVisualMicroRefinement20261108 ? verifyB4006RealInsurerVisualMicroRefinement(cp,state,p.newStylesBlobSha) : p.newStylesBlobSha;
   const r=readPinned(B4006_OWNER_SOURCE_RECEIPT,p.receiptBlobSha);
   need(r.schema==='GRAVICENTRA_I6_5_B4_006_REAL_INSURER_VISUAL_HIERARCHY_SOURCE_SUCCESSOR_V1'&&
     r.gate==='I6.5/B4-006'&&r.status===p.status&&
@@ -78,10 +110,10 @@ function verifyB4006RealInsurerVisualSource(cp,state){
     r.ownerAccepted===false&&r.realDataWrites===0&&r.liveDeploys===0&&
     r.nextAction===B4006_OWNER_SOURCE_ACTION&&
     git('merge-base',r.sourcePredecessor,'HEAD')===r.sourcePredecessor&&
-    git('rev-parse','HEAD:orbit360-platform/styles/infra.css')===p.newStylesBlobSha&&
-    blob(fs.readFileSync('orbit360-platform/styles/infra.css'))===p.newStylesBlobSha,
+    git('rev-parse','HEAD:orbit360-platform/styles/infra.css')===activeStylesBlob&&
+    blob(fs.readFileSync('orbit360-platform/styles/infra.css'))===activeStylesBlob,
     'B4006_OWNER_VISUAL_SOURCE_RECEIPT');
-  return p.newStylesBlobSha;
+  return activeStylesBlob;
 }
 
 function verifyB4006AssistantVisualQa(cp,state){
