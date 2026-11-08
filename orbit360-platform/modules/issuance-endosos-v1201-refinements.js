@@ -25,7 +25,7 @@ Orbit.modules = Orbit.modules || {};
             : 'Confirma que los documentos requeridos para emitir están completos.';
           const ok = await U.confirm(text, { title: 'Lista para emisión', ok: 'Confirmar requisitos' });
           if (!ok) return;
-          const result = I.advanceRequest(request.id, 'PENDIENTE_EMISION', {
+          const result = await I.advanceRequest(request.id, 'PENDIENTE_EMISION', {
             documentosCompletos: true,
             inspeccionAprobada: request.requiereInspeccion ? true : false
           }, { motivo: 'Requisitos de emisión verificados por usuario autorizado' });

@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import {createHash} from 'node:crypto';
 import {execFileSync} from 'node:child_process';
-import {verifyB4004FormalGate} from './gravicentra-b4-004-formal-gate-guard.mjs';
+import {verifyB4004FormalGate,verifyDeclaredB4005SourceSuccessor} from './gravicentra-b4-004-formal-gate-guard.mjs';
 
 // Terminal B4-003 metadata reconciliation only. No network or product execution.
 // Existing frozen control keys remain immutable except the explicit fields below,
@@ -936,7 +936,10 @@ function projectFrozenB4003AfterB4004Preview(after,certified){
  need(fix.status==='SOURCE_FIXED_REQUIRES_NEW_IMMUTABLE_ARTIFACT_PREVIEW_AND_LIVE'&&fix.productSource.afterBlobSha===sourcePin.sourceBlobSha,'POST_B4004_SOURCE_RECEIPT_INVALID');
  need(git('merge-base',fix.sourceParentHead,'HEAD')===fix.sourceParentHead&&git('merge-base','f8fa00e4e2e6627cee66c8c521866874e39bc8da','HEAD')==='f8fa00e4e2e6627cee66c8c521866874e39bc8da','POST_B4004_SOURCE_ANCESTRY');
  const changedProduct=git('diff','--name-only',predecessor,'HEAD','--','functions','orbit360-platform',':(exclude)orbit360-platform/docs/**').split(/\r?\n/).filter(Boolean).sort();
- need(same(changedProduct,['orbit360-platform/modules/cronograma.js']),'POST_B4004_UNRELATED_PRODUCT_CHANGE');
+ const b4005=after.b4005EndososDurableSourceAndIsolatedQa20261107
+  ?verifyDeclaredB4005SourceSuccessor(after,state):null;
+ const expectedProduct=['orbit360-platform/modules/cronograma.js',...(b4005?.paths||[])].sort();
+ need(same(changedProduct,expectedProduct),'POST_B4004_UNRELATED_PRODUCT_CHANGE');
  need(git('rev-parse','HEAD:orbit360-platform/modules/cronograma.js')===sourcePin.sourceBlobSha,'POST_B4004_CRONOGRAMA_SOURCE_CHANGED');
  need(git('rev-parse','HEAD:tools/gravicentra-i6-1-preview-package.mjs')==='13bad5b844f5c286d198efc796af58d00fc2a3d1','POST_B4004_BUILDER_DRIFT');
  const proofPath=ROOT+'I6_5_B4_004_CRONOGRAMA_COUNTRY_FOCAL_PREVIEW_PASS_20261107.json';

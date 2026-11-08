@@ -368,21 +368,33 @@ Orbit.modules = Orbit.modules || {};
     const type = b.querySelector('#end-type'), dynamic = b.querySelector('#end-dynamic');
     const paint = () => { dynamic.innerHTML = endFields(type.value, policy); };
     type.onchange = paint; paint();
-    b.querySelector('[data-create]').onclick = () => {
-      const result = E.createRequest(policy.id, type.value, endorsementProposalFromForm(b, type.value), { documentRef: b.querySelector('#end-doc').value.trim(), nota: b.querySelector('#end-note').value.trim(), motivo: 'Solicitud de endoso desde Cliente 360' });
-      if (!result.ok) return toast('No se creó: ' + (result.errors || []).join(', '));
-      b.remove(); toast(result.reused ? 'Ya existe una gestión activa de este tipo.' : 'Endoso creado en Ops.');
-      location.hash = '#/ops'; window.__orbitOpenGestion = result.request.id;
+    const create = b.querySelector('[data-create]');
+    create.onclick = async () => {
+      create.disabled = true;
+      try {
+        const result = await E.createRequest(policy.id, type.value, endorsementProposalFromForm(b, type.value), { documentRef: b.querySelector('#end-doc').value.trim(), nota: b.querySelector('#end-note').value.trim(), motivo: 'Solicitud de endoso desde Cliente 360' });
+        if (!result.ok) return toast('No se creó: ' + (result.errors || []).join(', '));
+        b.remove(); toast(result.reused ? 'Ya existe una gestión activa de este tipo.' : 'Endoso confirmado en Ops.');
+        location.hash = '#/ops'; window.__orbitOpenGestion = result.request.id;
+      } catch (error) { toast('No se confirmó la creación del endoso.'); }
+      finally { create.disabled = false; }
     };
   }
 
   function openApplyEndorsement(request) {
     const body = `<div class="cfg-note" style="margin-bottom:12px">Aplica únicamente con aprobación real. El documento y la referencia quedan vinculados a la gestión y a la auditoría.</div><div class="cgrid"><label class="ce-l">Referencia de aseguradora *<input id="enda-ref" class="o-sel"></label><label class="ce-l">Documento de endoso aprobado *<input id="enda-doc" class="o-sel" value="${esc(request.documentRef || '')}"></label><label class="ce-l">Fecha efectiva *<input id="enda-date" type="date" class="o-sel" value="${esc(request.fechaEfectiva || today())}"></label></div><label class="ce-l" style="margin-top:12px">Motivo de aplicación *<textarea id="enda-mot" class="o-sel" style="min-height:64px"></textarea></label>`;
     const b = modal('endorsement-apply-v1201','Aplicar endoso aprobado',body,'<button class="btn primary" data-apply>Aplicar cambio</button>',620);
-    b.querySelector('[data-apply]').onclick = () => {
-      const result = E.apply(request.id, { referenciaAseguradora: b.querySelector('#enda-ref').value.trim(), documentRef: b.querySelector('#enda-doc').value.trim(), fechaEfectiva: b.querySelector('#enda-date').value, motivo: b.querySelector('#enda-mot').value.trim() });
-      if (!result.ok) return toast('No se aplicó: ' + (result.errors || []).join(', '));
-      b.remove(); const base = document.getElementById('ciclo-modal'); if (base) base.remove(); toast('Endoso aplicado y auditado.'); Orbit.modules.cliente360.verPoliza(result.policy.id);
+    const apply = b.querySelector('[data-apply]');
+    apply.onclick = async () => {
+      apply.disabled = true;
+      try {
+        const result = await E.apply(request.id, { referenciaAseguradora: b.querySelector('#enda-ref').value.trim(), documentRef: b.querySelector('#enda-doc').value.trim(), fechaEfectiva: b.querySelector('#enda-date').value, motivo: b.querySelector('#enda-mot').value.trim() });
+        if (!result.ok) return toast('No se aplicó: ' + (result.errors || []).join(', '));
+        b.remove(); const base = document.getElementById('ciclo-modal'); if (base) base.remove();
+        toast(result.alreadyApplied ? 'El endoso ya estaba aplicado.' : 'Endoso confirmado y auditado.');
+        Orbit.modules.cliente360.verPoliza(result.policy.id);
+      } catch (error) { toast('No se confirmó la aplicación del endoso.'); }
+      finally { apply.disabled = false; }
     };
   }
 

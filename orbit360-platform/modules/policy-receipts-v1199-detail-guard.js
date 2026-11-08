@@ -467,13 +467,15 @@ Orbit.modules = Orbit.modules || {};
     const scheduleTolerance = reconciliationTolerance();
     const canManage = canEditVehicle();
     const renewAction = renewalEligible(p) ? `<button class="btn primary" onclick="Orbit.policyVehicleReadModelV1199c.startRenewal('${esc(p.id)}')">🔄 Renovar</button>` : '';
+    const endosoAction = Orbit.endorsements && Orbit.modules.cliente360 && typeof Orbit.modules.cliente360.endoso === 'function'
+      ? '<button class="btn ghost" type="button" data-policy-endoso-request="1">📜 Solicitar endoso</button>' : '';
     const deleteAction = canManage ? `<button class="btn ghost" style="color:var(--danger,var(--red))" onclick="Orbit.policyVehicleReadModelV1199c.deletePolicy('${esc(p.id)}')">Eliminar</button>` : '';
     host.innerHTML = `<div class="page orbit-policy-fullpage" data-policy-fullpage="1" data-policy-context-vehicle="${esc(contextVehicleId||'')}">
       <div class="crumb" style="margin-bottom:14px"><a style="cursor:pointer;color:var(--red)" href="${clientLinkAllowed?back:'#/polizas'}">‹ ${clientLinkAllowed?esc(cli.nombre || 'Cliente 360'):'Pólizas'}</a> / Póliza ${esc(p.numero || '')}</div>
       <div class="card gi-policy-hero" style="overflow:hidden;margin-bottom:16px">
         <div style="padding:20px 22px;background:linear-gradient(120deg,var(--graph),#10141a);display:flex;align-items:flex-start;gap:18px;justify-content:space-between;flex-wrap:wrap">
           <div style="min-width:0;display:flex;gap:14px;align-items:flex-start"><div class="gi-hero-icon">📑</div><div><div class="muted" style="color:rgba(255,255,255,.7);font-size:11px;text-transform:uppercase;letter-spacing:.12em">Póliza · ${esc(p.tipoPoliza)}</div><h2 style="color:#fff;margin:4px 0 3px;font-family:var(--f-display);font-size:24px;overflow-wrap:anywhere">${esc(p.ramo || 'Póliza')} · ${esc(p.producto || p.subramo || 'Detalle')}</h2><div class="mono" style="color:rgba(255,255,255,.86)">${esc(p.numero || 'Número pendiente')} · ${esc(insurerName || 'Aseguradora pendiente')} · ${esc(fmtDate(p.vigenciaInicio))} → ${esc(fmtDate(p.vigenciaFin))}</div></div></div>
-          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">${badge(p.estado)}${renewAction}<button class="btn primary" onclick="Orbit.modules.cliente360.editarPoliza('${esc(p.id)}')">✏️ Editar póliza</button><button class="btn ghost" onclick="Orbit.ciclo&&Orbit.ciclo.solicitarGestion&&Orbit.ciclo.solicitarGestion('${esc(p.clienteId)}','${esc(p.id)}',false,{tipo:'Gestión de póliza',lista:'Gestiones Admin',origen:'Póliza'})">🗂 Gestión</button>${deleteAction}${clientAction}</div>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">${badge(p.estado)}${renewAction}<button class="btn primary" onclick="Orbit.modules.cliente360.editarPoliza('${esc(p.id)}')">✏️ Editar póliza</button>${endosoAction}<button class="btn ghost" onclick="Orbit.ciclo&&Orbit.ciclo.solicitarGestion&&Orbit.ciclo.solicitarGestion('${esc(p.clienteId)}','${esc(p.id)}',false,{tipo:'Gestión de póliza',lista:'Gestiones Admin',origen:'Póliza'})">🗂 Gestión</button>${deleteAction}${clientAction}</div>
         </div>
       </div>
       ${versionContext}
@@ -516,6 +518,8 @@ Orbit.modules = Orbit.modules || {};
         </div>
       </div>
     </div>`;
+    const requestEndoso = host.querySelector('[data-policy-endoso-request]');
+    if (requestEndoso) requestEndoso.addEventListener('click', () => Orbit.modules.cliente360.endoso(p.id));
   }
 
   function renderVehiclePage(host, vehicleId) {

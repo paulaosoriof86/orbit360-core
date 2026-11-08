@@ -1026,6 +1026,21 @@
     "formalB4005Pass": false,
     "nextExecution": "B4_005_FOCUSED_CORE_E2E_ENDOSO_APPROVED_LIFECYCLE_AND_DURABLE_READBACK_ONLY"
   },
+  "b4005EndososDurableSourceAndIsolatedQa20261107": {
+    "gate": "I6.5/B4-005",
+    "status": "SOURCE_FIX_AND_ISOLATED_10_OF_10_PASS_PREVIEW_AND_AUTHENTICATED_E2E_PENDING",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_005_ENDOSOS_DURABLE_SOURCE_AND_ISOLATED_QA_20261107.json",
+    "receiptBlobSha": "295a73390427c2c907a36f51adc11650bb7a64a4",
+    "receiptSha256": "b96d88e3ebb62f954b7f0eda1416a16807b671be0d4918785d9664e3e8d47ae8",
+    "sourceFilesChanged": 4,
+    "isolatedAssertionGroupsPassed": 10,
+    "currentApprovedLiveArtifactPreserved": 13600357541,
+    "sourceRequiresNewExactBuild": true,
+    "realDataWrites": 0,
+    "formalB4005Pass": false,
+    "firstIncompleteGate": "B4-005",
+    "nextExecution": "B4_005_NEW_IMMUTABLE_PREVIEW_AND_AUTHENTICATED_ENDOSOS_E2E; R15_09_CERTIFICATE_ANNEX_LINEAGE_RECONCILIATION"
+  },
   "b4005ReuseAndDeltaEntry20261107": {
     "gate": "I6.5/B4-005",
     "status": "IN_PROGRESS_PRIOR_EVIDENCE_RECONCILED_FULL_E2E_NOT_CERTIFIED",

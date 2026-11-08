@@ -1,0 +1,132 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_005_ENDOSOS_DURABLE_SOURCE_AND_ISOLATED_QA_V1",
+  "gate": "I6.5/B4-005",
+  "status": "SOURCE_FIX_AND_ISOLATED_CONTRACT_QA_PASS_PREVIEW_AND_LIVE_CERTIFICATION_PENDING",
+  "observedAtUtc": "2026-11-08T04:34:01Z",
+  "owner": "Paula Andrea Osorio Franco / Direccion",
+  "canonicalRepository": "paulaosoriof86/orbit360-core",
+  "canonicalBranch": "recovery/fase-a-clean-20260831",
+  "parentRemoteHeadBeforeThisDelta": "65c4ac1c879295dd0ff435ea2e3e51e7124c0092",
+  "parentRemoteTree": "0a6f320f4a727d69315c6002e0a3a188553f209e",
+  "lastClosedGate": "B4-004",
+  "firstIncompleteGate": "B4-005",
+  "scope": {
+    "target": "Causal repair of approved Endosos v1.201, preserving existing Ops, Cliente360, policies and vehicle owners",
+    "endorsementRequest": "Durable server-confirmed gestion write; optional activity only when role grants Cliente360 create permission",
+    "endorsementApproval": "Durable server-confirmed insurer reference, document, effective date and role guard",
+    "vehicleAndNonFinancialApplication": "One server-confirmed batch for prior vehicle history, replacement vehicle, policy, gestion and activity; no delete",
+    "financialApplication": "Wait for existing policy/receipt atomic engine, persist recoverable applied-policy marker; separate gestion closeout is retry-safe, not one cross-engine transaction",
+    "canonicalPolicyEntry": "Restore typed solicitar endoso action in current policy detail owner; modal waits on durable result",
+    "issuanceRefinement": "Await the existing async emission stage transition",
+    "sourceFixIsNotAPassForRealWrite": true,
+    "newProductBuildRequired": true,
+    "lastApprovedLiveVersionPreserved": true,
+    "noNewBackendOrRulesChange": true
+  },
+  "sourceFiles": [
+    {
+      "path": "orbit360-platform/core/endorsement-workflow-v1201.js",
+      "gitBlobSha": "12bfc68b4faabef71a21978ac2a2fc11deceedcf",
+      "sha256": "0fff46fa50d9e482b4c6ecba8fce544f2770452441eb68588d07a9adb3646965"
+    },
+    {
+      "path": "orbit360-platform/modules/issuance-endosos-v1201-bridge.js",
+      "gitBlobSha": "cf185403e7a6c475a4b4f7074cb78321d7c20260",
+      "sha256": "e7406957b3f862f4424be842a858a83583d0ae96c3398ca46aea9c5f7e4b5c09"
+    },
+    {
+      "path": "orbit360-platform/modules/issuance-endosos-v1201-refinements.js",
+      "gitBlobSha": "e31c9ac4334cd61c95fa2edff17acbc1a6682515",
+      "sha256": "b07697eae9250dada8059f7e2d8bb2fb9ece33363df7fc4d03bb6935ffac31d3"
+    },
+    {
+      "path": "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js",
+      "gitBlobSha": "e46bf0592d158dc064a6e0518c1c721eb3d0fbe0",
+      "sha256": "694eea51cbd006c8027044948179a8df1fd5fa1099747c278dd20ec73d29258f"
+    }
+  ],
+  "isolatedQa": {
+    "command": "node tools/gravicentra-b4-005-endosos-durable-contract.mjs",
+    "testPath": "tools/gravicentra-b4-005-endosos-durable-contract.mjs",
+    "testGitBlobSha": "4d9e75eed720b0684288a19ff73e8978272d8986",
+    "testSha256": "26b9463e37b46c3e1c09698a6754b88984f0c2339e4a322045d35d63d24001f6",
+    "assertionGroups": 10,
+    "passedGroups": 10,
+    "result": "PASS_IN_MEMORY_NO_FIREBASE",
+    "cases": [
+      "Deferred create ACK and idempotent active request",
+      "Create failure without activity or audit false positive",
+      "Advisor request allowed but approval and apply denied",
+      "Country-scoped create denial",
+      "Approval reference/document/effective date with fail-closed retry",
+      "Atomic vehicle substitution and repeated apply",
+      "Atomic final-batch rollback and retry",
+      "Beneficiary and risk-field whitelist",
+      "Financial policy partial-commit detection, recovery without duplicate receipt recalculation",
+      "Canonical UI and async await wiring"
+    ],
+    "realFirestoreReads": 0,
+    "realFirestoreWrites": 0,
+    "mockOnly": true,
+    "authenticatedPreview": false,
+    "authenticatedLive": false
+  },
+  "otherRegressionObservations": [
+    {
+      "test": "node tools/gravicentra-b4-004-formal-gate-guard.mjs",
+      "result": "PASS_PREVIOUS_GATE_RETAINED"
+    },
+    {
+      "test": "node tools/gravicentra-b4-003-ops-leads-role-scopes.test.cjs",
+      "result": "PASS_SOURCE_FIXTURE_ONLY"
+    },
+    {
+      "test": "node tools/gravicentra-b4-003-cross-module-readback-contract.test.cjs",
+      "result": "PASS_8_OF_8_SOURCE_CONTRACTS"
+    },
+    {
+      "test": "node tools/gravicentra-i6-5-b2-r15-contract.mjs",
+      "result": "LEGACY_EXACT_STRING_FAILURE_R15_DELETE_OWNER_NOT_COMPOSED",
+      "limitation": "Existing contract expects old index query suffix; index unchanged by this delta, not new runtime failure"
+    },
+    {
+      "test": "node orbit360-platform/tools/orbit360-validar-emision-endosos-v1201.mjs",
+      "result": "LEGACY_BASELINE_TEST_INCOMPATIBLE_WITH_CLEAN_PRODUCTION_ENTRYPOINT",
+      "limitation": "Requires LAB/auth/store.js in production index, contrary to governing clean source rules; not used to certify release"
+    },
+    {
+      "test": "node --test tools/gravicentra-b4-004-policy-capture-successor.test.mjs",
+      "result": "FROZEN_PREVIOUS_SOURCE_BLOB_PIN_MISMATCH_AFTER_INTENTIONAL_B4005_CHANGE",
+      "limitation": "Historical B4-004 source snapshot remains preserved; new product candidate needs B4-005-specific exact-source gate"
+    }
+  ],
+  "certificateAndAnnexLineage": {
+    "previousApprovedSurfaceObserved": "Config tiposGestion includes Emision de certificado as Ops management type; Cliente360 has historic endorsement context",
+    "firstClassGeneratedPolicyCertificateOrAnnexDocumentLifecycle": "NOT_PROVEN_BY_CURRENT_CANONICAL_OWNERS",
+    "disposition": "R15-09_RECONCILE_APPROVED_SCOPE_BEFORE_B4005_CLOSURE_NO_PARALLEL_REBUILD",
+    "noFalseCertification": true
+  },
+  "ownerDeferredToPostproduction": {
+    "insurerKnowledgeAndTariffs": true,
+    "automaticQuoteAndComparison": true,
+    "cotcomp": true,
+    "driveDocumentLinkOptional": true,
+    "sourceReceipt": "artifacts/orbit360-recovery/release-control/I6_5_B4_005_OWNER_SCOPE_DEFER_QUOTE_KNOWLEDGE_20261107.json",
+    "preserveInsurerOperationalDirectory": true
+  },
+  "releaseSafety": {
+    "b4003AndB4004ClosedUnmodified": true,
+    "currentApprovedLiveSourceSha": "f8fa00e4e2e6627cee66c8c521866874e39bc8da",
+    "currentApprovedLiveArtifactId": 13600357541,
+    "currentApprovedLiveVersion": "439cb977fd4649d1",
+    "candidatePreviewBuildCreated": false,
+    "candidateDeployed": false,
+    "productionDeployed": false,
+    "businessWrites": 0,
+    "rulesWrites": 0,
+    "reimport": false,
+    "formalB4005Pass": false,
+    "formalI6Percent": 50
+  },
+  "nextAction": "B4_005_EXACT_SOURCE_PREVIEW_AND_AUTHENTICATED_DURABLE_E2E_ENDOSOS_GT_CO_ROLES_RELOAD_RESTORE; RECONCILE_CERT_ANNEX_SCOPE; COMPLETE_UNCOVERED_CORE_RELATION_CROSSES; THEN_B4_006"
+}
