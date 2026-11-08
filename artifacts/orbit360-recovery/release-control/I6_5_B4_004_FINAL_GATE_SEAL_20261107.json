@@ -1,0 +1,81 @@
+{
+  "schema": "GRAVICENTRA_B4_004_TARGETED_FINAL_GATE_SEAL_V1",
+  "gate": "I6.5/B4-004",
+  "status": "CLOSED_PASS_SCOPED_TO_APPROVED_B4_004_DISPOSITIONS",
+  "formalClosure": true,
+  "parentHead": "eaa2e95fa2f733ed2708fd7f2c17b1dcb3d092dd",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "operationalDateGuatemala": "2026-11-07",
+  "authority": {
+    "ownerDecisionPath": "artifacts/orbit360-recovery/release-control/OWNER_DECISION_FREEZE_AND_RECONCILIATION_PLAN_20261107.json",
+    "ownerDecisionBlobSha": "fbef993bc929d8b079904da08b6968305a20a993",
+    "b4003PreservedLiveStatus": "LATEST_APPROVED_VERSION_LIVE_PASS",
+    "b4003PreservedReceiptBlobSha": "0879188bf245248fa1092fb2014e35e14e802b44"
+  },
+  "release": {
+    "sourceSha": "f8fa00e4e2e6627cee66c8c521866874e39bc8da",
+    "buildId": "gi-i65-b4-f8fa00e4e2e6-57f234755dc1",
+    "artifactId": 13600357541,
+    "hostingVersionPreview": "sites/ays-orbit-360-lab/versions/439cb977fd4649d1",
+    "hostingVersionLive": "sites/ays-orbit-360-lab/versions/439cb977fd4649d1",
+    "hostedPayloadDigest": "819e36b57ef5042ed37458f80274f9db45303e881b4f268c34dec8d4506c9d56",
+    "productFiles": 218,
+    "rebuildForCloseout": false,
+    "newPromotionForCloseout": false
+  },
+  "dispositions": {
+    "Cronograma": {
+      "status": "LATEST_APPROVED_VERSION_LIVE_PASS_TARGETED_B4_004",
+      "scope": "Existing durable synthetic core acceptance preserved from predecessor; current source changed only country-view filtering, with exact Preview/LIVE functional readback, two distinct authorized UIDs, GT/CO exclusion and no errors. Not an all-roles/new-CRUD recertification.",
+      "runtimeOwner": "orbit360-platform/modules/cronograma.js",
+      "sourceBlobSha": "5460b80442f33d51144b70dd83be87d6a263cf9c",
+      "sourceOnlyChangedFromPreviousRelease": true,
+      "syntheticCorePriorRunId": 42431729157,
+      "countryPreviewRunId": 42437945576,
+      "countryLiveRunId": 42440178249,
+      "countryPreviewReceiptBlobSha": "173a22e30d656acfa2e543e83dfb3cc1dedd82ce",
+      "promotionReceiptBlobSha": "2b9060a843fdb90f5a5b1e6428ad5a44f92f4249",
+      "countryLiveReceiptBlobSha": "8fe1af5251b282114bff3d7f62c890744220b858",
+      "previewAndLiveSameArtifact": true,
+      "countryScopePass": true,
+      "distinctAuthorizedUidPass": true,
+      "syntheticCleanupPreviouslyVerified": true,
+      "newWritesForCurrentCountryFix": 0,
+      "remainingFullE2e": "B4-005"
+    },
+    "Siniestros": {
+      "status": "OWNER_DEFERRED_NON_BLOCKING_PHASE_A",
+      "scope": "Source retained unchanged; only LIVE route, open/cancel, two authorized UIDs, GT desktop/CO mobile and reload passed. No existing claims observed and no new claim write certified.",
+      "sourceBlobSha": "f52c2046157f0bc72008e09e826d34d05eeb668b",
+      "liveReadonlyRunId": 42441020887,
+      "liveReadonlyReceiptBlobSha": "80c890823be66cb18462c5a498c1d19bca36bf35",
+      "notFullCrudPass": true,
+      "ownerDecisionPreserved": true,
+      "findingIdsPreserved": true
+    },
+    "PolicyCapture": {
+      "status": "PREVIOUS_FOCAL_LIVE_PASS_PRESERVED_NOT_REOPENED",
+      "liveRunId": 42427273254,
+      "liveReceiptBlobSha": "a651361239a498574fc5abb4e9423173506db256"
+    }
+  },
+  "integrity": {
+    "previousCurrent42AcceptancePreserved": true,
+    "existingApprovedModuleCertificatesNotReopened": true,
+    "noProductSourceChangedAfterAcceptedArtifact": true,
+    "noNewBuild": true,
+    "noNewHostingOrBackendDeployment": true,
+    "noNewBusinessWrites": true,
+    "noReimport": true,
+    "noAuthIamRulesChanges": true,
+    "syntheticFinalAbsencePreserved": true,
+    "historicalFindingsExpected": 295,
+    "historicalCapabilitiesExpected": 15,
+    "formalI6ProgressPercentUnchanged": 50,
+    "notGlobalPhaseAAcceptance": true
+  },
+  "nextGate": "B4-005",
+  "nextAction": "B4_004_CLOSED_PASS_NEXT_B4_005_AUTHENTICATED_E2E_MATRIX",
+  "note": "The gate closes the specific Cronograma regression and documents Paula's non-blocking Siniestros deferral. It does not certify Siniestros write CRUD, all 15 modules, or B4-005/B4-006/B4-007. Those remain subject to their own evidence."
+}

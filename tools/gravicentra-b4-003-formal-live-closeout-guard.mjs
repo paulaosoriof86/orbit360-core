@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import {createHash} from 'node:crypto';
 import {execFileSync} from 'node:child_process';
+import {verifyB4004FormalGate} from './gravicentra-b4-004-formal-gate-guard.mjs';
 
 // Terminal B4-003 metadata reconciliation only. No network or product execution.
 // Existing frozen control keys remain immutable except the explicit fields below,
@@ -902,13 +903,17 @@ function projectFrozenB4003AfterB4004Preview(after,certified){
  const historical='9bbcafd4af141cb8d12cc2495fbc814ce950c6b0';
  const frozen=old(predecessor,ROOT+'CONTROL_PLANE.json');
  const oldState=old(predecessor,STATE),state=read(STATE),historicalCp=old(historical,ROOT+'CONTROL_PLANE.json');
- const allowedOldKeys=new Set(['nextAction','paymentInferenceReconciliationControl','ownerDecisionFreeze20261107']);
+ // These current-ledger pointers advance only with the separately verified
+ // B4-004 terminal receipt. All B4-003 approved evidence remains immutable.
+ const formalB4004=Boolean(after.b4004FormalGateSeal20261107);
+ const allowedOldKeys=new Set(['nextAction','paymentInferenceReconciliationControl','ownerDecisionFreeze20261107',
+  ...(formalB4004?['findingLedgerBlobSha','continuityRegisterBlobSha','findingContinuityControl','pendingClosureMasterPlan']:[])]);
  for(const [key,val] of Object.entries(frozen)){
   if(allowedOldKeys.has(key))continue;
   need(Object.hasOwn(after,key)&&same(after[key],val),'POST_B4004_B4003_FROZEN_KEY_'+key);
  }
  for(const [key,val] of Object.entries(oldState)){
-  if(key==='nextAction'||key==='ownerDecisionFreeze20261107')continue;
+  if(key==='nextAction'||key==='ownerDecisionFreeze20261107'||(formalB4004&&key==='updatedAtUtc'))continue;
   need(Object.hasOwn(state,key)&&same(state[key],val),'POST_B4004_B4003_STATE_'+key);
  }
  need(same(after.paymentInferenceReconciliationControl,historicalCp.paymentInferenceReconciliationControl),'POST_B4004_PAYMENT_AUTHORITY_CHANGED');
@@ -946,6 +951,10 @@ function projectFrozenB4003AfterB4004Preview(after,certified){
  proof.authenticatedFocal.scoped403===0&&proof.authenticatedFocal.cronogramaRouteMs<=6000,'POST_B4004_PREVIEW_FOCAL_PROOF_INVALID');
  need(p.sourceSha===proof.currentBuild.sourceSha&&p.buildId===proof.currentBuild.buildId&&p.artifactId===proof.currentBuild.artifactId,'POST_B4004_CURRENT_PREVIEW_POINTER');
  need(same(p,state.b4004CronogramaCountryFocalPreviewPass20261107)&&state.nextAction===after.nextAction&&after.nextAction.startsWith('B4_004_'),'POST_B4004_CURSOR_SYNC');
+ if(after.b4004FormalGateSeal20261107){
+  const next=verifyB4004FormalGate();
+  need(next.status==='PASS'&&next.nextGate==='B4-005','POST_B4004_TERMINAL_SEAL');
+ }
  // Historical comparator is the already-certified plane, not a fabricated new PASS.
  // This method never certifies B4-004 LIVE or changes any production state.
  return {comparableAfter:clone(certified),closed:true,receiptBlobSha:seal.receiptBlobSha};

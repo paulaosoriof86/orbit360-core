@@ -10,7 +10,7 @@
   "branch": "recovery/fase-a-clean-20260831",
   "forensicOriginSha": "9c95f31461f2eabe9804625b5659bee772f5602a",
   "createdAtUtc": "2026-08-31T18:00:00Z",
-  "updatedAtUtc": "2026-11-07T19:36:22Z",
+  "updatedAtUtc": "2026-11-08T03:27:00Z",
   "status": "ITERATION_2_SOURCE_MATERIALIZED_VALIDATION_PENDING",
   "currentIteration": 2,
   "lastCompletedIteration": 1,
@@ -187,7 +187,7 @@
     "phaseAIterationStatuses": "HISTORICAL_FIELDS_ABOVE_PRESERVED_UNTIL_FORMAL_GATE_EVIDENCE;_NO_NEW_PASS_INFERRED",
     "labDataWriteScope": "ONLY_35_AUTHORIZED_COUNTRY_FIELDS;_NO_AUGUST_REFRESH"
   },
-  "nextAction": "B4_004_FINAL_RECEIPTS_LEDGER_GUARD_AND_FORMAL_GATE_SEAL",
+  "nextAction": "B4_004_CLOSED_PASS_NEXT_B4_005_AUTHENTICATED_E2E_MATRIX",
   "sourceOfTruth": {
     "projectBoundaryPrevalentAddendum": "orbit360-platform/docs/recovery/ADDENDUM_PREVALENTE_CHATGPT_PROJECT_BOUNDARY_20260831.md",
     "mutableState": "orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json",
@@ -979,5 +979,22 @@
     "dataWrites": 0,
     "readOnly": true,
     "scope": "UNCHANGED_SINIESTROS_FOCAL_UI_ROUTE_FORM_NO_SAVE_RELOAD_NOT_FULL_CRUD_RECERTIFICATION"
+  },
+  "b4004FormalGateSeal20261107": {
+    "gate": "I6.5/B4-004",
+    "status": "CLOSED_PASS_SCOPED_TO_APPROVED_B4_004_DISPOSITIONS",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_004_FINAL_GATE_SEAL_20261107.json",
+    "receiptBlobSha": "db0307889cfedfd686dde6921fcf9e28277ac13a",
+    "receiptSha256": "0d8429146d1a7392aa660e2cf86d1531e2fd4797d5bbea2f2535765421192084",
+    "sourceSha": "f8fa00e4e2e6627cee66c8c521866874e39bc8da",
+    "buildId": "gi-i65-b4-f8fa00e4e2e6-57f234755dc1",
+    "artifactId": 13600357541,
+    "cronograma": "LATEST_APPROVED_VERSION_LIVE_PASS_TARGETED_B4_004",
+    "siniestros": "OWNER_DEFERRED_NON_BLOCKING_PHASE_A_NOT_FULL_CRUD_PASS",
+    "lastClosedGate": "B4-004",
+    "firstIncompleteGate": "B4-005",
+    "nextAction": "B4_004_CLOSED_PASS_NEXT_B4_005_AUTHENTICATED_E2E_MATRIX",
+    "allEarlierApprovedCertificatesPreserved": true,
+    "i6FormalProgressPercentUnchanged": 50
   }
 }

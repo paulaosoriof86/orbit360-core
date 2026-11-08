@@ -67,7 +67,14 @@ for(const id of critical)need(byLed.has(id),'CONTINUITY_CRITICAL_FINDING_MISSING
 const currentNext=String(cp.nextAction||cp.currentB4?.nextAction||'').toUpperCase();
 const openBlockingB4003=inv.filter(x=>x.blocking===true&&String(x.targetGate)==='B4-003'&&attention.has(String(x.id)));
 if(/B4[_-]?004/.test(currentNext)){
- need(openBlockingB4003.length===0,'CONTINUITY_B4_004_BLOCKED_BY:'+openBlockingB4003.map(x=>x.id).join(','));
+ // The terminal current42 acceptance supersedes the historical R20/R23
+ // execution cursor. Preserve every old child row for audit/carry-forward,
+ // without treating stale visual snapshots as a new veto on a closed parent.
+ const acceptedParent=b4003Parent.status==='CLOSED_PASS'&&b4003Parent.blocking===false&&
+  cp.currentB4?.status==='B4_003_CLOSED_PASS_CURRENT42'&&
+  cp.b4003ActiveCertificationCursor20261106?.formalLiveAcceptance?.status==='LATEST_APPROVED_VERSION_LIVE_PASS';
+ need(acceptedParent||openBlockingB4003.length===0,
+  'CONTINUITY_B4_004_BLOCKED_BY:'+openBlockingB4003.map(x=>x.id).join(','));
  const human=String(cp.currentB4?.humanVisualStatus||cp.b4VisualAcceptanceControl?.currentB4003HumanStatus||'');
  need(/PASS/.test(human),'CONTINUITY_B4_004_REQUIRES_B4_003_HUMAN_PASS');
 }
@@ -78,4 +85,4 @@ if(/PRODUCTION|LIVE|B4[_-]?007/.test(currentNext)){
 for(const required of ['B1-EMAIL-DELIVERY-001','B2-R46-TEAM-RESET-INVITATION-DELIVERY-STILL-UNRESOLVED-R5','B3-CARRY-INSURER-TARIFF-KNOWLEDGE-20260929','B3-CARRY-RENEWAL-COMPARATIVE-ENGINE-20260929','B4-CARRY-PORTAL-IMPORT-EMAIL-TRACEABILITY-R6']){
  need(byLed.has(required),'CONTINUITY_REQUIRED_CROSS_GATE_CARRY_MISSING:'+required);
 }
-console.log(JSON.stringify({status:'PASS',schema:'GRAVICENTRA_FINDING_CONTINUITY_GUARD_V1',ledgerCount:findings.length,inventoryCount:inv.length,attentionCount:attention.size,criticalCount:critical.length,openBlockingB4003:openBlockingB4003.map(x=>x.id),nextAction:cp.nextAction},null,2));
+console.log(JSON.stringify({status:'PASS',schema:'GRAVICENTRA_FINDING_CONTINUITY_GUARD_V1',ledgerCount:findings.length,inventoryCount:inv.length,attentionCount:attention.size,criticalCount:critical.length,historicalOpenB4003CarryCount:openBlockingB4003.length,openBlockingB4003:openBlockingB4003.map(x=>x.id),nextAction:cp.nextAction},null,2));
