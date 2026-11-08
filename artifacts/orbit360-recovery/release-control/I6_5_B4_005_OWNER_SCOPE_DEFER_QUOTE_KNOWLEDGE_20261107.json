@@ -1,0 +1,88 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_005_OWNER_SCOPE_DEFER_QUOTE_KNOWLEDGE_V1",
+  "gate": "I6.5/B4-005",
+  "recordType": "DIRECT_OWNER_SCOPE_DISPOSITION_WITHOUT_ERASING_HISTORIC_FINDINGS",
+  "status": "B4_005_SCOPE_REDUCED_OWNER_APPROVED_STILL_PENDING_CORE_E2E",
+  "recordedAtUtc": "2026-11-08T04:15:59Z",
+  "operationalDateGuatemala": "2026-11-07",
+  "authority": {
+    "actor": "Paula Andrea Osorio Franco / Direccion",
+    "instruction": "El conocimiento de aseguradoras no debe bloquear B4-005 ni la salida LIVE; llevarlo con Cotizador y Comparativo a postproduccion. CotComp tambien queda para postproduccion. Vincular Drive solo si es rapido, en ningun caso bloqueante.",
+    "repository": "paulaosoriof86/orbit360-core",
+    "branch": "recovery/fase-a-clean-20260831",
+    "precedingReceipt": "artifacts/orbit360-recovery/release-control/I6_5_B4_005_LIVE_READONLY_AND_CONTRACT_MILESTONE_20261107.json",
+    "precedingReceiptBlobSha": "04b6ee385984f5aa3c9e244407731d673d0903cf",
+    "precedingCommit": "18bf3552a1abfb327404cc7e95301fef14ad6ca9",
+    "supportingPriorOwnerDecision": "artifacts/orbit360-recovery/release-control/PLAN_OPERATIVO_DECISIONES_PAULA_20261107.md"
+  },
+  "deferredToPostproductionNotB4005Blocking": [
+    {
+      "findingId": "B4-003-R11-12-ROLE-AWARE-AI-KNOWLEDGE",
+      "capability": "IA y consultas respaldadas por conocimiento de aseguradoras, citas y verificacion por rol",
+      "disposition": "POSTPRODUCTION_OWNER_APPROVED_NOT_CERTIFIED"
+    },
+    {
+      "findingId": "B4-003-R11-13-MULTIPRODUCT-INSURER-KNOWLEDGE",
+      "capability": "Conocimiento multiproducto, fuentes y extraccion documental aseguradora por ramo/producto/plan",
+      "disposition": "POSTPRODUCTION_OWNER_APPROVED_NOT_CERTIFIED"
+    },
+    {
+      "findingId": "B4-003-R11-14-INSURER-TARIFF-SOURCE-BACKLOG",
+      "capability": "Tarifas de aseguradoras y activacion automatica de calculos con fuente aprobada",
+      "disposition": "POSTPRODUCTION_OWNER_APPROVED_NOT_CERTIFIED"
+    },
+    {
+      "findingId": "B4-003-R11-15-COTCOMP-CROSSPROJECT-HANDOFF",
+      "capability": "CotComp, intercambio real entre proyectos y transporte Quote Authority",
+      "disposition": "POSTPRODUCTION_OWNER_APPROVED_REAL_TRANSPORT_NOT_AUTHORIZED"
+    }
+  ],
+  "relatedProductScopeDeferred": [
+    "Desarrollo y certificacion E2E nuevos del Cotizador automatico",
+    "Desarrollo y certificacion E2E nuevos del Comparativo de ofertas",
+    "Activacion comercial de precios sin fuente primaria vigente",
+    "Integracion operativa externa con CotComp"
+  ],
+  "driveDocumentLinkage": {
+    "disposition": "OPTIONAL_IF_EXISTING_OWNER_FAST_AND_SAFE_OTHERWISE_POSTPRODUCTION",
+    "mustNotBlockB4005OrLive": true,
+    "noNewImportOrDataReplication": true,
+    "existingSecureResourcesAndDocumentOwnersPreserved": true,
+    "noNewSharingOrCredentialExposure": true
+  },
+  "stillRequiredWithinB4005": [
+    "Reuse signed individual Fase A Preview/LIVE receipts and unchanged roles/country/source owners; never repeat without causal delta",
+    "Close uncovered authenticated core E2E role-country-viewport-relationship-and-durable-write discriminants necessary for current release",
+    "Reconcile latest approved Endosos/Certificados/Anexos scope and the R15-09 finding without mistaking generic Ops types for certified document lifecycle",
+    "Resolve reproduced Endoso async application/durability defect causally or retain an explicit no-PASS gate hold until an authorized disposition",
+    "Preserve Aseguradoras operational directory and authorised credentials/accounts as Fase A; only knowledge/tariff/quote engines defer",
+    "No false PASS for a source-only, simulated-role or read-only observation"
+  ],
+  "frozenEvidencePreserved": {
+    "b4003": "LATEST_APPROVED_VERSION_LIVE_PASS_CURRENT42",
+    "b4004": "CLOSED_PASS_SCOPED",
+    "historicalIndividualCapabilityPreviewAndLiveCertificates": 15,
+    "historicalOtherPasses": 71,
+    "authenticatedLiveReadonlyB4005Cases": 8,
+    "currentSourceContractAssertionsPassed": 51,
+    "findingIdsPreservedNoErasure": true,
+    "productSourceSha": "f8fa00e4e2e6627cee66c8c521866874e39bc8da",
+    "buildId": "gi-i65-b4-f8fa00e4e2e6-57f234755dc1",
+    "artifactId": 13600357541,
+    "hostingVersion": "439cb977fd4649d1"
+  },
+  "releaseSafety": {
+    "gateB4005FormallyClosed": false,
+    "b4006OrB4007Started": false,
+    "newBuild": false,
+    "newDeployment": false,
+    "sourceChanged": false,
+    "businessWrites": 0,
+    "reimport": false,
+    "firebaseRulesChanged": false,
+    "historicalLedgersRewritten": false,
+    "formalI6PercentPreserved": 50
+  },
+  "nextAction": "B4_005_FOCUSED_CORE_E2E_ENDOSO_APPROVED_LIFECYCLE_AND_DURABLE_READBACK_ONLY; REUSE_SIGNED_ROLE_COUNTRY_EVIDENCE; THEN_B4_006_PAULA_VISUAL_AND_B4_007_EXACT_ARTIFACT_LIVE",
+  "formalPassClaimed": false
+}

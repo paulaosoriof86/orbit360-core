@@ -22095,6 +22095,22 @@
     "dataMutated": false,
     "firstIncompleteGate": "B4-005"
   },
+  "b4005OwnerScopeDeferralQuoteKnowledge20261107": {
+    "gate": "I6.5/B4-005",
+    "status": "OWNER_APPROVED_DEFERRED_QUOTE_KNOWLEDGE_COTCOMP_DRIVE_OPTIONAL_CORE_E2E_PENDING",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_005_OWNER_SCOPE_DEFER_QUOTE_KNOWLEDGE_20261107.json",
+    "receiptBlobSha": "60d863194aa49d871a6b4956498379b0e56c2fa0",
+    "receiptSha256": "452baef9d93013768e91eafa2e02f00e5e38a468c827f19db08da67c6014fb06",
+    "latestOwnerDisposition": true,
+    "deferredFindingsCount": 4,
+    "driveLinkageBlocking": false,
+    "b4004ClosedPreserved": true,
+    "firstIncompleteGate": "B4-005",
+    "productSourceChanged": false,
+    "dataMutated": false,
+    "formalB4005Pass": false,
+    "nextExecution": "B4_005_FOCUSED_CORE_E2E_ENDOSO_APPROVED_LIFECYCLE_AND_DURABLE_READBACK_ONLY"
+  },
   "b4005ReuseAndDeltaEntry20261107": {
     "gate": "I6.5/B4-005",
     "status": "IN_PROGRESS_PRIOR_EVIDENCE_RECONCILED_FULL_E2E_NOT_CERTIFIED",
