@@ -56,7 +56,7 @@ async function actorInventory(){
 }
 async function existingTasks(){
  const snap=await tenant.collection('data').doc('tareas').collection('items').orderBy('__name__').limit(1000).get();
- return snap.docs.map(d=>({id:d.id,row:d.data()||{}})).filter(x=>x.row.__syntheticQa!==true&&!/^b400[0-9a-z._:-]*qa/i.test(x.id));
+ return snap.docs.map(d=>({id:d.id,row:d.data()||{}})).filter(x=>x.row.__syntheticQa===true&&/^b4003qa_tareas_[a-z0-9._:-]+$/i.test(x.id)&&['GT','CO'].includes(clean(x.row.pais||x.row.country).toUpperCase())&&!!clean(x.row.asesorId||x.row.advisorId||x.row.ownerAdvisorId)&&!!clean(x.row.fecha)&&!!clean(x.row.t));
 }
 function pickCase(actors,tasks){
  for(const country of ['GT','CO']){
@@ -166,11 +166,24 @@ async function boot(browser,actor,country,label){
  };function cleanCode(v){return String(v||'').slice(0,120);}});
  return{ctx,page,tracker,product};
 }
-async function observe(browser,actor,country,label,taskId){
+async function observe(browser,actor,country,label,task){
  const b=await boot(browser,actor,country,label);
- const visible=await b.page.evaluate(id=>!!Orbit.store?.get?.('tareas',id),taskId);
+ const visible=await b.page.evaluate(id=>!!Orbit.store?.get?.('tareas',id),task?.id||null);
+ let day={tested:false,textVisible:false,reason:'NO_TASK'};
+ if(task){
+  const today=await b.page.evaluate(()=>new Date(Orbit.ui.NOW||Date.now()).toISOString().slice(0,10));
+  const targetDate=clean(task.row.fecha).slice(0,10);
+  const delta=Math.round((Date.parse(targetDate+'T12:00:00Z')-Date.parse(today+'T12:00:00Z'))/86400000);
+  if(Number.isFinite(delta)&&Math.abs(delta)<=60){
+   await b.page.locator('[data-v="dia"]').click();
+   for(let i=0;i<Math.abs(delta);i++)await b.page.locator(delta<0?'#cr-prev':'#cr-next').click();
+   await b.page.waitForTimeout(200);
+   const textVisible=await b.page.evaluate(t=>(document.querySelector('[data-cronograma-ready="1"]')?.textContent||'').includes(t),clean(task.row.t));
+   day={tested:true,textVisible,deltaDays:delta};
+  }else day={tested:false,textVisible:false,reason:'DATE_OUTSIDE_BOUND'};
+ }
  await b.tracker.flush();
- return{...b,visible};
+ return{...b,visible,day};
 }
 
 async function main(){
@@ -205,27 +218,27 @@ async function main(){
   proof.assertions.distinctUid=creator.uid!==peer.uid;
   browser=await chromium.launch({headless:true});
 
-  const creatorObs=await observe(browser,creator,country,'creator-same-country',task?.id||null);opened.push(creatorObs.ctx);
+  const creatorObs=await observe(browser,creator,country,'creator-same-country',task);opened.push(creatorObs.ctx);
   proof.observations.creator={visible:creatorObs.visible,product:creatorObs.product};
-  proof.assertions.creatorTaskVisible=task?creatorObs.visible===true:null;
+  proof.assertions.creatorTaskVisible=task?creatorObs.visible===true:null;proof.assertions.creatorTaskUiVisible=task?creatorObs.day.tested===true&&creatorObs.day.textVisible===true:null;
 
   await routeTo(creatorObs.page,'inicio');await creatorObs.page.waitForTimeout(250);
   const perf=await measureUsableRoute(creatorObs.page,'cronograma',12000);proof.performance.cronogramaMs=perf.ms;proof.performance.state=perf.state;
   proof.assertions.cronogramaPerformance=perf.timeout!==true&&perf.ms<=6000;
 
-  const peerObs=await observe(browser,peer,country,'peer-same-country',task?.id||null);opened.push(peerObs.ctx);
+  const peerObs=await observe(browser,peer,country,'peer-same-country',task);opened.push(peerObs.ctx);
   proof.observations.peer={visible:peerObs.visible,product:peerObs.product};
-  proof.assertions.peerTaskVisible=task?peerObs.visible===true:null;
+  proof.assertions.peerTaskVisible=task?peerObs.visible===true:null;proof.assertions.peerTaskUiVisible=task?peerObs.day.tested===true&&peerObs.day.textVisible===true:null;
 
-  const countryObs=await observe(browser,countryActor,otherCountry,'peer-other-country',task?.id||null);opened.push(countryObs.ctx);
+  const countryObs=await observe(browser,countryActor,otherCountry,'peer-other-country',task);opened.push(countryObs.ctx);
   proof.observations.country={visible:countryObs.visible,product:countryObs.product};
-  proof.assertions.crossCountryTaskAbsent=task?countryObs.visible===false:null;
+  proof.assertions.crossCountryTaskAbsent=task?countryObs.visible===false:null;proof.assertions.crossCountryTaskUiAbsent=task?countryObs.day.tested===true&&countryObs.day.textVisible===false:null;
 
   for(const item of opened){try{await item.close();}catch{}}
   opened=[];
   proof.assertions.writeAttemptZero=proof.writeAttemptCount===0;
   proof.assertions.noMutations=proof.authAccountsCreated===0&&proof.membershipWrites===0&&proof.dataWrites===0;
-  proof.diagnosticStatus=task?'EXECUTED':'EXECUTED_WITH_HOLD';if(!task)proof.errors.push({code:'NO_EXISTING_TASK_VISIBILITY_NOT_CERTIFIED'});
+  proof.diagnosticStatus='EXECUTED_WITH_HOLD';if(!task)proof.errors.push({code:'NO_VERIFIED_RETAINED_QA_TASK_AVAILABLE'});
  }catch(e){
   proof.errors.push({code:clean(e&&e.message||e).slice(0,200)});
   proof.diagnosticStatus='EXECUTED_WITH_HOLD';
@@ -236,6 +249,9 @@ async function main(){
   proof.scoped403=proof.scopedRequests.filter(x=>x.status===403);
   proof.assertions.writeAttemptZero=proof.writeAttemptCount===0;
   proof.assertions.noMutations=proof.authAccountsCreated===0&&proof.membershipWrites===0&&proof.dataWrites===0;
+  const required=['exactLiveBuild','distinctUid','creatorTaskVisible','creatorTaskUiVisible','peerTaskVisible','peerTaskUiVisible','crossCountryTaskAbsent','crossCountryTaskUiAbsent','cronogramaPerformance','writeAttemptZero','noMutations'];
+  if(required.every(k=>proof.assertions[k]===true)&&proof.errors.length===0&&proof.scoped403.length===0&&proof.pageErrors.length===0&&proof.writeAttemptCount===0)proof.diagnosticStatus='FOCAL_SCOPE_PASS';
+  else proof.diagnosticStatus='EXECUTED_WITH_HOLD';
   fs.writeFileSync(outPath,JSON.stringify(proof,null,2)+'\n');
  }
  need(proof.assertions.exactLiveBuild===true,'EXACT_RELEASE');
