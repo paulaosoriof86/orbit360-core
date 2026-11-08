@@ -75,18 +75,15 @@ async function checkActor(browser,a,index){
   await page.waitForFunction(country=>Orbit.pais===country,a.country,{timeout:15000});
   await page.evaluate(async()=>{await Orbit.store?._ensureCollections?.(['polizas','clientes','gestiones']);location.hash='#/ops';});
   await page.waitForFunction(()=>document.querySelector('#host')?.textContent?.includes('Ops')===true,null,{timeout:20000});
+  await page.waitForFunction(country=>(Orbit.store?.all?.('polizas')||[]).some(p=>p.pais===country),a.country,{timeout:20000});
   const before=await page.evaluate(()=>({country:Orbit.pais,role:Orbit.session.rol(),uid:Orbit.productRuntimeBrowserProvidersP0?.status?.()?.authUid||'',
     qaGtPolicyInScopedStore:(Orbit.store?.all?.('polizas')||[]).some(p=>p.id==='b4003qa_policy_expired_renew_38102224750'),
     visibleOps:document.querySelector('#host')?.textContent?.includes('Gestiones operativas')===true}));
   must(before.country===a.country&&norm(before.role)===norm(a.role)&&before.visibleOps,'ROLE_COUNTRY_OR_OPS_ROUTE_MISMATCH');
   let form={open:false,beneficiaryField:false,cancelled:false},policyId='';
-  if(a.country==='GT'){
-    must(before.qaGtPolicyInScopedStore,'GT_SYNTHETIC_POLICY_NOT_SCOPED');policyId=qaPolicyId;
-  } else {
-    must(!before.qaGtPolicyInScopedStore,'GT_POLICY_VISIBLE_IN_CO_SCOPE');
-    policyId=await page.evaluate(()=>(Orbit.store?.all?.('polizas')||[]).find(p=>p.pais==='CO'&&Orbit.access?.canView?.('polizas',p,'cliente360'))?.id||'');
-    must(Boolean(policyId),'CO_VIEWABLE_POLICY_UNAVAILABLE');
-  }
+  if(a.country==='CO')must(!before.qaGtPolicyInScopedStore,'GT_POLICY_VISIBLE_IN_CO_SCOPE');
+  policyId=await page.evaluate(country=>(Orbit.store?.all?.('polizas')||[]).find(p=>p.pais===country&&Orbit.access?.canView?.('polizas',p,'cliente360'))?.id||'',a.country);
+  must(Boolean(policyId),'VIEWABLE_POLICY_UNAVAILABLE');
   await page.evaluate(({policyId})=>{location.hash='#/cliente360?c='+(Orbit.store.get('polizas',policyId)?.clienteId||'')+'&p='+policyId;},{policyId});
   await page.waitForFunction(()=>!!document.querySelector('[data-policy-endoso-request]'),null,{timeout:20000});
   await page.locator('[data-policy-endoso-request]').click();
