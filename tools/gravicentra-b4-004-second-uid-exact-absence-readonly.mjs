@@ -1,0 +1,11 @@
+import fs from 'node:fs';
+import {initializeApp,applicationDefault,getApps} from 'firebase-admin/app';
+import {getFirestore} from 'firebase-admin/firestore';
+const id='b4004qa_cronograma_42434455172_1';
+const projectId='ays-orbit-360-lab',tenantId='alianzas-soluciones';
+const app=getApps()[0]||initializeApp({credential:applicationDefault(),projectId});
+const db=getFirestore(app),base=db.collection('tenants').doc(tenantId);
+const snap=await base.collection('data').doc('tareas').collection('items').doc(id).get();
+const output={schema:'GRAVICENTRA_B4_004_SECOND_UID_EXACT_FINAL_ABSENCE_V1',gate:'I6.5/B4-004',priorRunId:42434455172,exactFixtureId:id,fixtureExists:snap.exists,syntheticFinalAbsent:!snap.exists,readOnly:true,serverReadback:true,authChanges:0,membershipWrites:0,businessWrites:0,productChanges:0,interpretation:snap.exists?'HOLD_EXACT_SYNTHETIC_FIXTURE_PRESENT':'PASS_EXACT_FIXTURE_ABSENCE_ONLY',doesNotCertifySecondUidScope:true};
+fs.writeFileSync(process.env.PROOF_OUT||'/tmp/b4004-exact-absence.json',JSON.stringify(output,null,2)+'\n');
+console.log('B4_004_SECOND_UID_EXACT_ABSENCE='+output.interpretation);
