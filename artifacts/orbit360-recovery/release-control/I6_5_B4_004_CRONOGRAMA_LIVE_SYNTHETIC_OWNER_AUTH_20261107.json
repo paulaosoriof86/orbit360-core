@@ -5,7 +5,7 @@
   "authority": "Paula explicit B4-004 synthetic LIVE authorization frozen in long-block protocol",
   "authorized": true,
   "consumed": false,
-  "authorizedParentSha": "10dc8ea5dceacf793b5d27d6d206ccb48e19e2b9",
+  "authorizedParentSha": "1720be7825e5f2aff014273669f4eaf3e3d5ad0c",
   "release": {
     "sourceSha": "6c45983610ce0d65a5c63bd07659ad968bfe9da3",
     "buildId": "gi-i65-b4-6c45983610ce-57f234755dc1",
@@ -83,6 +83,18 @@
       "cleanupWrites": 0,
       "syntheticFinalAbsent": true,
       "authorizationConsumed": false
+    },
+    {
+      "runId": 42430582802,
+      "jobId": 128578364957,
+      "artifactId": 13597770150,
+      "result": "FAIL_BEFORE_WRITES_BROWSER_ADAPTER_CONTEXT_REFERENCE",
+      "businessWrites": 0,
+      "syntheticWrites": 0,
+      "cleanupWrites": 0,
+      "syntheticFinalAbsent": true,
+      "authorizationConsumed": false,
+      "diagnostic": "PLAYWRIGHT_BROWSER_CONTEXT_DID_NOT_RECEIVE_NODE_FUNCTION_SYMBOL"
     }
   ]
 }

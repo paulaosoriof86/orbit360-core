@@ -23,7 +23,7 @@ const app=getApps()[0]||initializeApp({credential:applicationDefault(),projectId
 const db=getFirestore(app),auth=getAuth(app),tenant=db.collection('tenants').doc(tenantId);
 const ref=(c,id)=>tenant.collection('data').doc(c).collection('items').doc(id);
 const plan={collection:'tareas',id:'b4004qa_cronograma_'+run,title:'B4-004 Cronograma LIVE '+run,date:new Date().toISOString().slice(0,10)};
-const proof={schema:'GRAVICENTRA_B4_004_CRONOGRAMA_FOCAL_LIVE_QA_V1',status:'INIT',runId:run,target,plan,assertions:{},errors:[],pageErrorCount:0,consoleErrorCount:0,httpErrorCount:0,syntheticWrites:0,cleanupWrites:0,syntheticFinalAbsent:false,authAccountsCreated:0,membershipWrites:0,productSourceChanged:false,backendChanged:false};
+const proof={schema:'GRAVICENTRA_B4_004_CRONOGRAMA_FOCAL_LIVE_QA_V1',status:'INIT',runId:run,target,plan,assertions:{},errors:[],consoleSignals:[],nonRelevantConsoleSignalCount:0,pageErrorCount:0,consoleErrorCount:0,httpErrorCount:0,syntheticWrites:0,cleanupWrites:0,syntheticFinalAbsent:false,authAccountsCreated:0,membershipWrites:0,productSourceChanged:false,backendChanged:false};
 
 function rolesOf(m){return [...new Set([m.activeRole,m.rolActivo,m.defaultRole,m.rolDefault,m.rol].concat(m.roles||[],m.assignedRoles||[],m.rolesAsignados||[]).map(norm).filter(Boolean))];}
 function countriesOf(m){return [...new Set([].concat(m.countries||[],m.paises||[],m.paisesAutorizados||[],m.paisDefault||[],m.pais||[]).map(x=>clean(x).toUpperCase()).filter(x=>x==='GT'||x==='CO'))];}
@@ -103,9 +103,14 @@ async function waitTask(test){
  for(let i=0;i<60;i++){const s=await ref('tareas',plan.id).get();if(s.exists&&test(s.data()||{}))return s.data();await new Promise(r=>setTimeout(r,400));}
  throw Error('CRONO_QA_TASK_READBACK_TIMEOUT');
 }
+export function classifyConsoleError(message){
+ const s=String(message==null?'':message).toLowerCase();
+ if((s.includes('service worker')||s.includes('serviceworker'))&&(s.includes('blocked')||s.includes('disabled')||s.includes('registration failed')||s.includes('not supported')))return'HARNESS_SERVICE_WORKER_BLOCK';
+ return'RELEVANT_OR_UNKNOWN';
+}
 function recordBrowser(page,label){
  page.on('pageerror',e=>{proof.pageErrorCount++;proof.errors.push({code:'PAGE_ERROR',label,messageSha256:digest(String(e&&e.message||e))});});
- page.on('console',m=>{if(m.type()==='error'){proof.consoleErrorCount++;proof.errors.push({code:'CONSOLE_ERROR',label,messageSha256:digest(m.text())});}});
+ page.on('console',m=>{if(m.type()==='error'){const message=m.text(),category=classifyConsoleError(message),signal={label,category,messageSha256:digest(message)};proof.consoleSignals.push(signal);if(category==='HARNESS_SERVICE_WORKER_BLOCK'){proof.nonRelevantConsoleSignalCount++;return;}proof.consoleErrorCount++;proof.errors.push({code:'CONSOLE_ERROR',label,category,messageSha256:signal.messageSha256});}});
  page.on('response',r=>{if(r.status()>=400){proof.httpErrorCount++;proof.errors.push({code:'HTTP_ERROR',label,status:r.status(),urlSha256:digest(r.url())});}});
 }
 async function readVisibility(browser,actor,country,label){
@@ -135,13 +140,13 @@ async function execute(){
    }catch(e){proof.errors.push({code:String(e&&e.message||e)});await route.abort('blockedbyclient');}
   });
   page.on('response',r=>{try{const u=new URL(r.url());if(u.pathname.endsWith('/orbit360ProductOperationalCommand')&&r.request().method()==='POST')calls.filter(x=>!x.response).slice(0,1).forEach(call=>Promise.resolve(r.json()).then(body=>{call.response=body.result||body.data;}).catch(()=>{}));}catch{}});
-  await boot(page,actors.creator,actors.country);await page.evaluate(p=>installCronogramaQaAdapter(p),plan);
+  await boot(page,actors.creator,actors.country);need(proof.consoleErrorCount===0&&proof.pageErrorCount===0&&proof.httpErrorCount===0,'PREWRITE_BROWSER_ERRORS');proof.assertions.preWriteBrowserClean=true;await page.evaluate(installCronogramaQaAdapter,plan);
   await page.evaluate(({date,title})=>{Orbit.ui.prompt=async()=>date+' '+title;},{date:plan.date,title:plan.title});
   await page.locator('#cr-new').click();
   const created=await waitTask(x=>x.id===plan.id&&x.done===false);need(created.__syntheticQa===true&&created.ownerUid===actors.creator.uid&&created.pais===actors.country&&created.asesorId===actors.creator.advisorId&&created.t===plan.title,'CREATE_READBACK');proof.syntheticWrites++;proof.assertions.createServerReadback=true;
   adapterSnapshot=await page.evaluate(()=>__giCronoQa.snapshot());await page.reload({waitUntil:'domcontentloaded',timeout:60000});await boot(page,actors.creator,actors.country);await page.locator('[data-v="dia"]').click();await page.waitForTimeout(500);
   need(await page.evaluate(({id,title})=>!!Orbit.store.get('tareas',id)&&(document.body.textContent||'').includes(title),plan),'FIRST_RELOAD');proof.assertions.firstReload=true;
-  await page.evaluate(p=>installCronogramaQaAdapter(p),plan);const chip=page.locator('.cr-ev').filter({hasText:plan.title}).first();await chip.click();
+  await page.evaluate(installCronogramaQaAdapter,plan);const chip=page.locator('.cr-ev').filter({hasText:plan.title}).first();await chip.click();
   const done=await waitTask(x=>x.done===true);need(done.id===plan.id&&done.ownerUid===actors.creator.uid,'COMPLETE_READBACK');proof.syntheticWrites++;proof.assertions.completeServerReadback=true;
   await page.reload({waitUntil:'domcontentloaded',timeout:60000});await boot(page,actors.creator,actors.country);await page.locator('[data-v="dia"]').click();await page.waitForTimeout(500);
   need(await page.evaluate(({id,title})=>{const t=Orbit.store.get('tareas',id);return !!t&&t.done===true&&(document.body.textContent||'').includes(title)&&(document.body.textContent||'').includes('✅');},plan),'SECOND_RELOAD');proof.assertions.completedReload=true;

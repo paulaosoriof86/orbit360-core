@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {installCronogramaQaAdapter,pickActors} from './gravicentra-b4-004-cronograma-live-qa.mjs';
+import {installCronogramaQaAdapter,pickActors,classifyConsoleError} from './gravicentra-b4-004-cronograma-live-qa.mjs';
 
 function harness(){
  const calls=[];globalThis.Orbit={store:{__productOperationalWriteP0:true,insertDurable:async(c,row)=>{calls.push({method:'insert',c,row:structuredClone(row)});return structuredClone(row);},updateDurable:async(c,id,patch)=>{calls.push({method:'update',c,id,patch:structuredClone(patch)});return structuredClone(patch);}}};
@@ -32,4 +32,10 @@ test('actor selector fails closed without a distinct same-country scope witness'
   {uid:'gt_creator',activeRole:'direccion',countries:['GT'],advisorId:'a1',scope:'all'},
   {uid:'co_actor',activeRole:'operativo',countries:['CO'],advisorId:'a2',scope:'all'}
  ]),/DISTINCT_UID_SCOPE_PAIR_UNAVAILABLE/);
+});
+
+test('console classifier allows only harness-induced service-worker blocking',()=>{
+ assert.equal(classifyConsoleError('Service Worker registration failed because service workers are blocked'),'HARNESS_SERVICE_WORKER_BLOCK');
+ assert.equal(classifyConsoleError('Failed to load resource: the server responded with a status of 404'),'RELEVANT_OR_UNKNOWN');
+ assert.equal(classifyConsoleError('FirebaseError: permission-denied'),'RELEVANT_OR_UNKNOWN');
 });
