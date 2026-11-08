@@ -31,7 +31,7 @@ function scenario(hostname, reject = false, rejectedError = new Error('DENIED'))
     }
   };
   const orbit = {
-    modules: {}, store,
+    modules: {}, store, pais: 'GT',
     ui: { NOW: new Date('2026-10-28T12:00:00Z'), prompt: async () => '2026-10-28 QA B4-003 tarea sin acción externa', toast: message => messages.push(message), esc: x => x },
     kit: { banner: () => '' },
     q: { renovacionesProximas: () => [] }
@@ -39,7 +39,7 @@ function scenario(hostname, reject = false, rejectedError = new Error('DENIED'))
   const context = { window: { Orbit: orbit }, Orbit: orbit, location: { hostname }, Date, Map, Set, String, Number, Array, Object, RegExp, encodeURIComponent };
   vm.runInNewContext(source, context, { filename: 'cronograma.js' });
   orbit.modules.cronograma.render(view);
-  return { click: clicks['#cr-new'], rows, written, messages, view };
+  return { click: clicks['#cr-new'], rows, written, messages, view, orbit };
 }
 
 test('Preview creates a marked B4-003 synthetic task with durable confirmation', async () => {
@@ -80,4 +80,24 @@ test('Preview shows only a safe failure code for faster authenticated UAT', asyn
   const live = scenario('gravicentra.example.com', true, denied);
   await live.click();
   assert.ok(live.messages.every(message => !message.includes('[código:')));
+});
+
+test('B4-004 active country filters authorized multi-country task cache without changing data', () => {
+  const x=scenario('ays-orbit-360-lab.web.app');
+  x.rows.push(
+    {id:'qa_gt',t:'QA B4-004 Guatemala',pais:'GT',fecha:'2026-10-28',done:false},
+    {id:'qa_co',t:'QA B4-004 Colombia',pais:'CO',fecha:'2026-10-28',done:false},
+    {id:'qa_unknown',t:'QA B4-004 Unclassified',fecha:'2026-10-28',done:false}
+  );
+  x.orbit.pais='GT';x.orbit.modules.cronograma.render(x.view);
+  assert.match(x.view.innerHTML,/QA B4-004 Guatemala/);
+  assert.doesNotMatch(x.view.innerHTML,/QA B4-004 Colombia|QA B4-004 Unclassified/);
+  x.orbit.pais='CO';x.orbit.modules.cronograma.render(x.view);
+  assert.match(x.view.innerHTML,/QA B4-004 Colombia/);
+  assert.doesNotMatch(x.view.innerHTML,/QA B4-004 Guatemala|QA B4-004 Unclassified/);
+  x.orbit.pais='TODOS';x.orbit.modules.cronograma.render(x.view);
+  assert.match(x.view.innerHTML,/QA B4-004 Guatemala/);
+  assert.match(x.view.innerHTML,/QA B4-004 Colombia/);
+  assert.doesNotMatch(x.view.innerHTML,/QA B4-004 Unclassified/);
+  assert.equal(x.rows.length,3,'country selection must never mutate underlying rows');
 });

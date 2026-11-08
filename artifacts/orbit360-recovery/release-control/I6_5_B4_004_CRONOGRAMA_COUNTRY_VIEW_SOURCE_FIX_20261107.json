@@ -1,0 +1,39 @@
+{
+  "schema": "GRAVICENTRA_B4_004_CRONOGRAMA_COUNTRY_PROJECTION_CAUSAL_SOURCE_V1",
+  "gate": "I6.5/B4-004",
+  "status": "SOURCE_FIXED_REQUIRES_NEW_IMMUTABLE_ARTIFACT_PREVIEW_AND_LIVE",
+  "authorizer": "Paula B4-004 urgent approved causal recovery; no reimport",
+  "sourceParentHead": "fd501288ae353b14adb89909ada1970647a32b23",
+  "failedLiveScopeRun": 42436547226,
+  "failedLiveScopeArtifactId": 13598893953,
+  "rootCause": "Cronograma renders all authorized multi-country tasks without applying selected Orbit.pais; server country requests individually authorized.",
+  "productSource": {
+    "path": "orbit360-platform/modules/cronograma.js",
+    "beforeBlobSha": "5d412e4ee263bb6cbfbd840b7124871a1e5b6ee8",
+    "afterBlobSha": "5460b80442f33d51144b70dd83be87d6a263cf9c"
+  },
+  "regressionTest": {
+    "path": "tools/gravicentra-b4-003-cronograma-durable-task.test.cjs",
+    "beforeBlobSha": "3f7a9c28d3eb3d1e084ca5f35e0818379467c5c4",
+    "afterBlobSha": "8d7bb213b873f0b0f5051aa9c0dce4e96fa46273",
+    "expected": "GT_CO_TODOS_WITH_UNCLASSIFIED_FAIL_CLOSED"
+  },
+  "release": {
+    "previousSourceSha": "6c45983610ce0d65a5c63bd07659ad968bfe9da3",
+    "previousBuildId": "gi-i65-b4-6c45983610ce-57f234755dc1",
+    "previousArtifactId": 13592378081,
+    "newBuildRequired": true,
+    "newArtifactDigestRequired": true,
+    "sameArtifactPreviewLive": true
+  },
+  "boundaries": {
+    "firestoreWrites": 0,
+    "membershipWrites": 0,
+    "authChanges": 0,
+    "rulesChanged": false,
+    "backendChanged": false,
+    "reimport": false,
+    "unrelatedModulesReopened": 0
+  },
+  "nextAction": "B4_004_SOURCE_FIX_CONTRACT_THEN_ONE_NEW_ARTIFACT_TO_EXISTING_ISOLATED_PREVIEW"
+}

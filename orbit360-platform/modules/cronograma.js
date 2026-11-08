@@ -81,7 +81,17 @@ Orbit.modules.cronograma = (function () {
     // renovacionesProximas() already applies the linked policy's country.
     (q.renovacionesProximas ? q.renovacionesProximas(90) : []).forEach(p => add(p.vigenciaFin, { tipo: 'renov', icon: '🔄', color: '#0f766e', t: 'Renueva ' + p.numero, go: () => Orbit.modules.cliente360.verPoliza(p.id) }));
     S().all('gestiones').filter(g => !g.archivado).forEach(g => add(g.vence, { tipo: 'gestion', icon: '🗂', color: '#1f3a5f', t: (g.titulo || g.tipo), go: () => Orbit.ciclo && Orbit.ciclo.openGestion && Orbit.ciclo.openGestion(g.id) }));
-    S().all('tareas').forEach(tk => add(tk.fecha, { tipo: 'tarea', icon: tk.done ? '✅' : '📌', color: '#C5162E', t: tk.t, go: () => toggleTarea(tk.id), id: tk.id }));
+    // The protected store may legitimately hydrate GT and CO for an authorized
+    // multi-country actor. The selected calendar country still controls which
+    // tasks are rendered; this is a view filter, never a server access grant.
+    const activeCountry = String(Orbit.pais || '').trim().toUpperCase();
+    const taskCountryVisible = tk => {
+      const country = String(tk && (tk.pais || tk.country) || '').trim().toUpperCase();
+      if (country !== 'GT' && country !== 'CO') return false;
+      if (activeCountry === 'GT' || activeCountry === 'CO') return country === activeCountry;
+      return activeCountry === 'TODOS' || activeCountry === 'ALL';
+    };
+    S().all('tareas').filter(taskCountryVisible).forEach(tk => add(tk.fecha, { tipo: 'tarea', icon: tk.done ? '✅' : '📌', color: '#C5162E', t: tk.t, go: () => toggleTarea(tk.id), id: tk.id }));
     return ev;
   }
   function previewUat() {
