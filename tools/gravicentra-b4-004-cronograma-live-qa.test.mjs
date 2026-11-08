@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {installCronogramaQaAdapter,pickActors,classifyConsoleError} from './gravicentra-b4-004-cronograma-live-qa.mjs';
+import {installCronogramaQaAdapter,pickActors,classifyConsoleError,redactConsoleMessage} from './gravicentra-b4-004-cronograma-live-qa.mjs';
 
 function harness(){
  const calls=[];globalThis.Orbit={store:{__productOperationalWriteP0:true,insertDurable:async(c,row)=>{calls.push({method:'insert',c,row:structuredClone(row)});return structuredClone(row);},updateDurable:async(c,id,patch)=>{calls.push({method:'update',c,id,patch:structuredClone(patch)});return structuredClone(patch);}}};
@@ -38,4 +38,12 @@ test('console classifier allows only harness-induced service-worker blocking',()
  assert.equal(classifyConsoleError('Service Worker registration failed because service workers are blocked'),'HARNESS_SERVICE_WORKER_BLOCK');
  assert.equal(classifyConsoleError('Failed to load resource: the server responded with a status of 404'),'RELEVANT_OR_UNKNOWN');
  assert.equal(classifyConsoleError('FirebaseError: permission-denied'),'RELEVANT_OR_UNKNOWN');
+});
+
+test('console diagnostic classification and redaction never preserves URLs, emails or long identifiers',()=>{
+ assert.equal(classifyConsoleError('Refused to connect because of Content Security Policy'),'CSP_OR_BROWSER_POLICY');
+ assert.equal(classifyConsoleError('FirebaseError: permission-denied'),'FIREBASE_AUTH_OR_FIRESTORE');
+ assert.equal(classifyConsoleError('Failed to load resource: net::ERR_BLOCKED_BY_CLIENT'),'NETWORK_RESOURCE');
+ const safe=redactConsoleMessage('problem https://example.test/a?token=abc someone@example.com ABCDEFGHIJKLMNOPQRSTUVWXYZ123456');
+ assert.equal(safe.includes('https://'),false);assert.equal(safe.includes('@'),false);assert.equal(safe.includes('ABCDEFGHIJKLMNOPQRSTUVWXYZ'),false);
 });

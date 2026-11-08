@@ -106,11 +106,24 @@ async function waitTask(test){
 export function classifyConsoleError(message){
  const s=String(message==null?'':message).toLowerCase();
  if((s.includes('service worker')||s.includes('serviceworker'))&&(s.includes('blocked')||s.includes('disabled')||s.includes('registration failed')||s.includes('not supported')))return'HARNESS_SERVICE_WORKER_BLOCK';
- return'RELEVANT_OR_UNKNOWN';
+ if(/content security policy|trusted.?types|refused to (?:execute|load|connect|frame|apply)/i.test(s))return'CSP_OR_BROWSER_POLICY';
+ if(/cors|cross-origin|cross origin/i.test(s))return'CORS';
+ if(/firebase|firestore|permission-denied|unauthenticated|identity toolkit/i.test(s))return'FIREBASE_AUTH_OR_FIRESTORE';
+ if(/failed to load resource|net::|networkerror|network error/i.test(s))return'NETWORK_RESOURCE';
+ if(/favicon|manifest\.json|site\.webmanifest/i.test(s))return'NONCRITICAL_ASSET';
+ return'OTHER';
+}
+export function redactConsoleMessage(message){
+ return String(message==null?'':message)
+  .replace(/https?:\/\/[^\s)'"]+/gi,'[URL]')
+  .replace(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi,'[EMAIL]')
+  .replace(/\b[A-Za-z0-9_-]{20,}\b/g,'[LONG_ID]')
+  .replace(/\b\d{7,}\b/g,'[LONG_NUMBER]')
+  .replace(/\s+/g,' ').trim().slice(0,240);
 }
 function recordBrowser(page,label){
  page.on('pageerror',e=>{proof.pageErrorCount++;proof.errors.push({code:'PAGE_ERROR',label,messageSha256:digest(String(e&&e.message||e))});});
- page.on('console',m=>{if(m.type()==='error'){const message=m.text(),category=classifyConsoleError(message),signal={label,category,messageSha256:digest(message)};proof.consoleSignals.push(signal);if(category==='HARNESS_SERVICE_WORKER_BLOCK'){proof.nonRelevantConsoleSignalCount++;return;}proof.consoleErrorCount++;proof.errors.push({code:'CONSOLE_ERROR',label,category,messageSha256:signal.messageSha256});}});
+ page.on('console',m=>{if(m.type()==='error'){const message=m.text(),category=classifyConsoleError(message),signal={label,category,messageSha256:digest(message),safeSummary:redactConsoleMessage(message)};proof.consoleSignals.push(signal);if(category==='HARNESS_SERVICE_WORKER_BLOCK'){proof.nonRelevantConsoleSignalCount++;return;}proof.consoleErrorCount++;proof.errors.push({code:'CONSOLE_ERROR',label,category,messageSha256:signal.messageSha256});}});
  page.on('response',r=>{if(r.status()>=400){proof.httpErrorCount++;proof.errors.push({code:'HTTP_ERROR',label,status:r.status(),urlSha256:digest(r.url())});}});
 }
 async function readVisibility(browser,actor,country,label){
