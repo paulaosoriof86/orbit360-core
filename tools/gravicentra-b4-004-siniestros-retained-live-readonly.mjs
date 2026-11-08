@@ -17,7 +17,7 @@ const receipt={schema:'GRAVICENTRA_B4_004_SINIESTROS_RETAINED_SOURCE_LIVE_READON
  artifactId:13600357541,hostingVersion:'sites/ays-orbit-360-lab/versions/439cb977fd4649d1',
  siniestrosSourceBlob:'f52c2046157f0bc72008e09e826d34d05eeb668b',
  authAccountsChanged:0,membershipWrites:0,operationalWrites:0,writeAttempts:0,productChanges:0,
- actors:[],checks:[],errors:[],screenshots:[],firstRenderMs:[],noClaimsAssumed:false,previousApprovalRetained:true};
+ actors:[],checks:[],errors:[],diagnostics:[],screenshots:[],firstRenderMs:[],noClaimsAssumed:false,previousApprovalRetained:true};
 function save(){fs.writeFileSync(out,JSON.stringify(receipt,null,2)+'\n');}
 async function actors(){
  const members=await tenant.collection('members').get(),ret=[];
@@ -44,8 +44,8 @@ async function checkActor(browser,a,index){
  const context=await browser.newContext({viewport:{width:index===0?1440:390,height:index===0?900:844},serviceWorkers:'block'}),page=await context.newPage();
  const errs=[],failed=[];
  page.on('pageerror',e=>errs.push({code:'PAGE_ERROR',hash:sha(String(e.message))}));
- page.on('response',r=>{if(r.status()===404)errs.push({code:'HTTP_404',pathSha:sha(new URL(r.url()).pathname)});});
- page.on('requestfailed',r=>{const u=new URL(r.url());if(!u.pathname.endsWith('/orbit360DocumentDriveStatus'))failed.push({code:'REQUEST_FAILED',pathSha:sha(u.pathname)});});
+ page.on('response',r=>{if(r.status()===404){const u=new URL(r.url());errs.push({code:'HTTP_404',originHost:u.hostname,pathSha:sha(u.pathname),resourceType:r.request().resourceType(),staticAsset:/\.(js|css|png|svg|ico|webmanifest)$/i.test(u.pathname),documentDriveStatus:u.pathname.endsWith('/orbit360DocumentDriveStatus')});}});
+ page.on('requestfailed',r=>{const u=new URL(r.url());if(!u.pathname.endsWith('/orbit360DocumentDriveStatus'))failed.push({code:'REQUEST_FAILED',originHost:u.hostname,pathSha:sha(u.pathname),resourceType:r.resourceType(),failureCode:String(r.failure()?.errorText||'').slice(0,80)});});
  await context.route(/orbit360ProductOperationalCommand|orbit360OpsLeadsCommand/,async route=>{
   if(route.request().method()==='OPTIONS'){await route.continue();return;}
   receipt.writeAttempts++;await route.abort('blockedbyclient');
@@ -83,6 +83,7 @@ async function checkActor(browser,a,index){
   await page.waitForFunction(()=>!!document.querySelector('#si-new')&&!!document.querySelector('#host')?.textContent?.includes('Siniestros'),null,{timeout:30000});
   const after=await page.evaluate(()=>({route:Orbit.route?.key||'',bodyOk:!!document.querySelector('#si-new'),noModal:!document.querySelector('#sn-ok')}));
   need(after.bodyOk&&after.noModal,'RELOAD_STATE');
+  receipt.diagnostics.push({actorUidHash:sha(a.uid),role:a.role,country:a.country,observedRoute:before.route,firstRenderMs:ms,modal,after,errors:errs,requestFailures:failed,writeAttemptCount:receipt.writeAttempts});
   need(!errs.length&&!failed.length&&receipt.writeAttempts===0,'PAGE_OR_WRITE_ERRORS');
   const observed={uidHash:sha(a.uid),role:a.role,country:a.country,viewport:index===0?'1440x900':'390x844',sessionUidMatched:true,
     routeVisible:true,formOpenedAndCancelled:true,reloadPass:true,claimRowsObserved:before.claimCount,firstRouteRenderMs:ms,noBusinessWrite:true,pageErrors:errs,networkFailures:failed};
