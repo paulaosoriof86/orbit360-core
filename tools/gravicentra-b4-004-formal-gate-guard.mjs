@@ -33,6 +33,8 @@ const B4006_FINAL_POLISH_PREVIEW_RECEIPT=ROOT+'I6_5_B4_006_EXACT_VISUAL_POLISH_P
 const B4006_FINAL_POLISH_ACTION='B4_006_OWNER_VISUAL_POLISH_RECHECK_ARTIFACT_13624916797_THEN_B4_007_EXACT_LIVE';
 const B4006_OWNER_FINAL_FEEDBACK_RECEIPT=ROOT+'I6_5_B4_006_OWNER_FINAL_VISUAL_FEEDBACK_SOURCE_SUCCESSOR_20261108.json';
 const B4006_OWNER_FINAL_FEEDBACK_ACTION='B4_006_BUILD_ONE_NEW_IMMUTABLE_PREVIEW_AFTER_OWNER_FINAL_VISUAL_FEEDBACK';
+const B4006_MGMT_COLLAB_RECEIPT=ROOT+'I6_5_B4_006_OPS_MANAGEMENT_COLLABORATION_SOURCE_SUCCESSOR_20261108.json';
+const B4006_MGMT_COLLAB_ACTION='B4_006_BUILD_ONE_IMMUTABLE_PREVIEW_MANAGEMENT_COLLAB_AND_VISUAL_RECHECK';
 const SOURCE='f8fa00e4e2e6627cee66c8c521866874e39bc8da';
 const BUILD='gi-i65-b4-f8fa00e4e2e6-57f234755dc1';
 const ARTIFACT=13600357541;
@@ -297,6 +299,37 @@ function verifyB4006OwnerFinalVisualFeedbackSource(cp,state){
   return true;
 }
 
+function verifyB4006ManagementCollaborationSource(cp,state){
+  const p=cp.b4006ManagementCollaborationSourceSuccessor20261108;
+  need(p&&same(p,state.b4006ManagementCollaborationSourceSuccessor20261108)&&
+    p.gate==='I6.5/B4-006'&&p.status==='OWNER_AUTHORIZED_MANAGEMENT_COLLAB_SOURCE_CONTRACT_PASS_PREVIEW_PENDING'&&
+    p.receiptPath===B4006_MGMT_COLLAB_RECEIPT&&p.receiptBlobSha==='04aa258007667c466c7418fa1de545b13dcaf42c'&&
+    p.sourcePredecessor==='940d0e635915d33437bb499c15f3ad1096d581b2'&&p.newCicloBlobSha==='b4d3a6da94ceaed83452484826b8bc8a5e4049ab'&&
+    p.testPath==='tools/gravicentra-b4-006-management-collaboration.test.cjs'&&p.testBlobSha==='d5a0674d3540048b7b2ecb63029bff85f0262b73'&&
+    p.firstIncompleteGate==='B4-006'&&p.lastClosedGate==='B4-005'&&p.ownerAuthorized===true&&
+    p.ownerAcceptedExactArtifact===false&&p.backendSourceChanged===false&&p.functionsDeployRequired===false&&
+    p.realDataWrites===0&&p.liveDeploys===0&&p.oneCanonicalPreviewChannel===true,
+    'B4006_MGMT_COLLAB_POINTER');
+  const r=readPinned(B4006_MGMT_COLLAB_RECEIPT,p.receiptBlobSha);
+  need(r.schema==='GRAVICENTRA_I6_5_B4_006_OPS_MANAGEMENT_COLLABORATION_SOURCE_SUCCESSOR_V1'&&
+    r.gate===p.gate&&r.status===p.status&&r.sourcePredecessor===p.sourcePredecessor&&
+    r.changedProductPaths?.length===1&&r.changedProductPaths[0].path==='orbit360-platform/core/ciclo.js'&&
+    r.changedProductPaths[0].gitBlobSha===p.newCicloBlobSha&&
+    r.sourceContract?.testPath===p.testPath&&r.sourceContract?.testBlobSha===p.testBlobSha&&
+    r.sourceContract?.firebaseWrites===0&&r.behavior?.immediateReadbackRequired===true&&
+    r.boundaries?.backendSourceChanged===false&&r.boundaries?.functionsDeployRequired===false&&
+    r.boundaries?.firestoreRulesWrites===0&&r.boundaries?.realDataWrites===0&&r.boundaries?.liveDeploys===0&&
+    r.boundaries?.reimport===false&&r.boundaries?.sameCanonicalPreviewChannel===true&&
+    r.nextAction===B4006_MGMT_COLLAB_ACTION&&
+    git('merge-base',r.sourcePredecessor,'HEAD')===r.sourcePredecessor&&
+    git('rev-parse','HEAD:orbit360-platform/core/ciclo.js')===p.newCicloBlobSha&&
+    blob(fs.readFileSync('orbit360-platform/core/ciclo.js'))===p.newCicloBlobSha&&
+    git('rev-parse','HEAD:'+p.testPath)===p.testBlobSha&&
+    verifyB4006OwnerFinalVisualFeedbackSource(cp,state),
+    'B4006_MGMT_COLLAB_RECEIPT');
+  return true;
+}
+
 function verifyB4006LatestActualVisualQa(cp,state){
   const p=cp.b4006LatestActualVisualQa20261108;
   need(p&&same(p,state.b4006LatestActualVisualQa20261108)&&
@@ -449,7 +482,7 @@ export function verifyDeclaredB4005SourceSuccessor(cp=read(CP),state=read(STATE)
       'orbit360-platform/modules/issuance-endosos-v1201-bridge.js',
       'orbit360-platform/modules/issuance-endosos-v1201-refinements.js',
       'orbit360-platform/modules/policy-receipts-v1199-detail-guard.js'
-    ].concat(visualPaths,cp.b4006VisualUnificationSuccessor20261108?['orbit360-platform/modules/cobros.js']:[]).sort();
+    ].concat(visualPaths,cp.b4006VisualUnificationSuccessor20261108?['orbit360-platform/modules/cobros.js']:[],cp.b4006ManagementCollaborationSourceSuccessor20261108?['orbit360-platform/core/ciclo.js']:[]).sort();
     need(same(changed,expected),'B4005_CAUSAL_UNDECLARED_PRODUCT_CHANGE');
     const declared=receipt.sourceAndTests||[];
     need(declared.length===4&&same(declared.map(x=>x.path).sort(),[
@@ -525,7 +558,7 @@ export function verifyB4004FormalGate(){
   need(blob(bytes)===ref.receiptBlobSha&&sha256(bytes)===ref.receiptSha256&&ref.receiptBlobSha===mirror.receiptBlobSha&&ref.receiptSha256===mirror.receiptSha256,'SEAL_HASH');
   need(releaseMatches(ref)&&releaseMatches(mirror)&&ref.hostingVersion===VERSION&&ref.hostedPayloadDigest===DIGEST,'SEAL_RELEASE_POINTER');
   need(ref.lastClosedGate==='B4-004'&&mirror.lastClosedGate==='B4-004'&&ref.firstIncompleteGate==='B4-005'&&mirror.firstIncompleteGate==='B4-005','NEXT_GATE');
-  need((cp.nextAction===ACTION&&state.nextAction===ACTION||(cp.nextAction===B4006_VISUAL_ACTION&&state.nextAction===B4006_VISUAL_ACTION&&cp.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&state.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&cp.b4006VisualReadonlyCandidateSource20261108?.status==='SOURCE_VISUAL_DELTA_READY_FOR_NEW_IMMUTABLE_PREVIEW'||cp.nextAction===B4006_FINAL_ACTION&&state.nextAction===B4006_FINAL_ACTION&&cp.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&state.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&verifyB4006AssistantVisualQa(cp,state)||cp.nextAction===B4006_OWNER_SOURCE_ACTION&&state.nextAction===B4006_OWNER_SOURCE_ACTION&&cp.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&state.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&verifyB4006RealInsurerVisualSource(cp,state)||cp.nextAction===B4006_LATEST_VISUAL_QA_ACTION&&state.nextAction===B4006_LATEST_VISUAL_QA_ACTION&&cp.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&state.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&verifyB4006LatestActualVisualQa(cp,state)||cp.nextAction===B4006_UNIFICATION_ACTION&&state.nextAction===B4006_UNIFICATION_ACTION&&cp.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&state.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&verifyB4006VisualUnificationSuccessor(cp,state)||cp.nextAction===B4006_POLISH_ACTION&&state.nextAction===B4006_POLISH_ACTION&&cp.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&state.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&verifyB4006VisualUnificationSuccessor(cp,state)||cp.nextAction===B4006_FINAL_POLISH_ACTION&&state.nextAction===B4006_FINAL_POLISH_ACTION&&cp.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&state.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&verifyB4006ExactPolishPreviewReadback(cp,state)||cp.nextAction===B4006_OWNER_FINAL_FEEDBACK_ACTION&&state.nextAction===B4006_OWNER_FINAL_FEEDBACK_ACTION&&cp.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&state.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&verifyB4006OwnerFinalVisualFeedbackSource(cp,state)))&&ref.nextAction===ACTION&&mirror.nextAction===ACTION,'NEXT_ACTION_SYNC');
+  need((cp.nextAction===ACTION&&state.nextAction===ACTION||(cp.nextAction===B4006_VISUAL_ACTION&&state.nextAction===B4006_VISUAL_ACTION&&cp.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&state.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&cp.b4006VisualReadonlyCandidateSource20261108?.status==='SOURCE_VISUAL_DELTA_READY_FOR_NEW_IMMUTABLE_PREVIEW'||cp.nextAction===B4006_FINAL_ACTION&&state.nextAction===B4006_FINAL_ACTION&&cp.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&state.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&verifyB4006AssistantVisualQa(cp,state)||cp.nextAction===B4006_OWNER_SOURCE_ACTION&&state.nextAction===B4006_OWNER_SOURCE_ACTION&&cp.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&state.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&verifyB4006RealInsurerVisualSource(cp,state)||cp.nextAction===B4006_LATEST_VISUAL_QA_ACTION&&state.nextAction===B4006_LATEST_VISUAL_QA_ACTION&&cp.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&state.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&verifyB4006LatestActualVisualQa(cp,state)||cp.nextAction===B4006_UNIFICATION_ACTION&&state.nextAction===B4006_UNIFICATION_ACTION&&cp.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&state.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&verifyB4006VisualUnificationSuccessor(cp,state)||cp.nextAction===B4006_POLISH_ACTION&&state.nextAction===B4006_POLISH_ACTION&&cp.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&state.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&verifyB4006VisualUnificationSuccessor(cp,state)||cp.nextAction===B4006_FINAL_POLISH_ACTION&&state.nextAction===B4006_FINAL_POLISH_ACTION&&cp.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&state.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&verifyB4006ExactPolishPreviewReadback(cp,state)||cp.nextAction===B4006_OWNER_FINAL_FEEDBACK_ACTION&&state.nextAction===B4006_OWNER_FINAL_FEEDBACK_ACTION&&cp.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&state.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&verifyB4006OwnerFinalVisualFeedbackSource(cp,state)||cp.nextAction===B4006_MGMT_COLLAB_ACTION&&state.nextAction===B4006_MGMT_COLLAB_ACTION&&cp.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&state.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&verifyB4006ManagementCollaborationSource(cp,state)))&&ref.nextAction===ACTION&&mirror.nextAction===ACTION,'NEXT_ACTION_SYNC');
   need(cp.pendingClosureMasterPlan?.status==='B4_004_CLOSED_PASS_NEXT_B4_005_E2E_NOT_EXECUTED'&&cp.pendingClosureMasterPlan.currentGate==='B4-005'&&cp.pendingClosureMasterPlan.b4004Held===false,'PLAN_CURSOR');
   need(cp.currentB4?.status==='B4_003_CLOSED_PASS_CURRENT42'&&same(cp.currentB4,historic.currentB4),'B4003_FROZEN_POINTER');
   need(cp.b4003ActiveCertificationCursor20261106?.formalLiveAcceptance?.status==='LATEST_APPROVED_VERSION_LIVE_PASS'&&same(cp.b4003ActiveCertificationCursor20261106,historic.b4003ActiveCertificationCursor20261106),'B4003_PRESERVED');

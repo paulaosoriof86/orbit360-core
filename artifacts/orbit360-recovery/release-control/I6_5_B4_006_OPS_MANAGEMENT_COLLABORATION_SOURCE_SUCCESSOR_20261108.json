@@ -1,0 +1,67 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_006_OPS_MANAGEMENT_COLLABORATION_SOURCE_SUCCESSOR_V1",
+  "gate": "I6.5/B4-006",
+  "status": "OWNER_AUTHORIZED_MANAGEMENT_COLLAB_SOURCE_CONTRACT_PASS_PREVIEW_PENDING",
+  "recordedAtLocal": "2026-11-08",
+  "timezone": "America/Guatemala",
+  "ownerAuthorization": "Paula confirmed adding collaborative comments to the Ops management sheet using the same durable criterion already used by the business/opportunity collaboration thread.",
+  "sourcePredecessor": "940d0e635915d33437bb499c15f3ad1096d581b2",
+  "previousImmutablePreview": {
+    "sourceCommit": "940d0e635915d33437bb499c15f3ad1096d581b2",
+    "runId": 42500449981,
+    "artifactId": 13624907418,
+    "artifactZipSha256": "290866db3b7134a0476d86428b5c9ad3603e0385d9020609ecb8be325252df21",
+    "exactHostedFiles": "218/218",
+    "liveUnchanged": true
+  },
+  "changedProductPaths": [
+    {
+      "path": "orbit360-platform/core/ciclo.js",
+      "gitBlobSha": "b4d3a6da94ceaed83452484826b8bc8a5e4049ab",
+      "kind": "FUNCTIONAL_UI_DURABLE_GESTION_COLLAB"
+    }
+  ],
+  "sourceContract": {
+    "testPath": "tools/gravicentra-b4-006-management-collaboration.test.cjs",
+    "testBlobSha": "d5a0674d3540048b7b2ecb63029bff85f0262b73",
+    "assertions": 12,
+    "firebaseWrites": 0,
+    "expected": "PASS"
+  },
+  "behavior": {
+    "managementSheetNowIncludes": [
+      "Comentarios colaborativos",
+      "Nota / contexto",
+      "Bitácora",
+      "Checklist",
+      "Adjuntos Drive"
+    ],
+    "commentsPersistVia": "Orbit.store.updateDurable('gestiones',...)",
+    "immediateReadbackRequired": true,
+    "actorFields": [
+      "actorUid",
+      "actorName",
+      "user"
+    ],
+    "auditBitacoraRequired": true,
+    "commentTypesReuseCanonicalOpsLeadsList": true,
+    "kanbanManagementCommentCount": true,
+    "attachmentUploadContractUnchanged": true,
+    "attachmentReloadPersistenceStillRequiresE2E": true
+  },
+  "boundaries": {
+    "backendSourceChanged": false,
+    "functionsDeployRequired": false,
+    "firestoreRulesWrites": 0,
+    "authChanges": 0,
+    "realDataWrites": 0,
+    "liveDeploys": 0,
+    "reimport": false,
+    "sameCanonicalPreviewChannel": true,
+    "newBuildRequired": true
+  },
+  "firstIncompleteGate": "B4-006",
+  "lastClosedGate": "B4-005",
+  "ownerAcceptedExactArtifact": false,
+  "nextAction": "B4_006_BUILD_ONE_IMMUTABLE_PREVIEW_MANAGEMENT_COLLAB_AND_VISUAL_RECHECK"
+}

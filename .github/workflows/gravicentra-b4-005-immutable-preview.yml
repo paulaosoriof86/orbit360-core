@@ -12,6 +12,8 @@ on:
     paths:
       - .github/workflows/gravicentra-b4-005-immutable-preview.yml
       - orbit360-platform/modules/aseguradoras.js
+      - orbit360-platform/core/ciclo.js
+      - tools/gravicentra-b4-006-management-collaboration.test.cjs
       - orbit360-platform/modules/cobros.js
       - orbit360-platform/modules/siniestros.js
       - orbit360-platform/styles/infra.css
@@ -83,6 +85,8 @@ jobs:
           node --check orbit360-platform/modules/aseguradoras.js
           node --check orbit360-platform/modules/cobros.js
           node --check orbit360-platform/modules/siniestros.js
+          node --check orbit360-platform/core/ciclo.js
+          node tools/gravicentra-b4-006-management-collaboration.test.cjs
       - name: Fingerprint existing LIVE sites without touching them
         run: |
           set -euo pipefail
@@ -135,7 +139,7 @@ jobs:
             cmp "orbit360-platform/$rel" "$ROOT/$rel"
           done
           cmp functions/product-ops-leads-domain.js "$RUNNER_TEMP/b4005-package/bundle/backend/product-ops-leads-domain.js"
-          for rel in modules/aseguradoras.js modules/siniestros.js styles/infra.css; do
+          for rel in modules/aseguradoras.js modules/siniestros.js styles/infra.css core/ciclo.js; do
             cmp "orbit360-platform/$rel" "$ROOT/$rel"
           done
           node - <<'NODE'

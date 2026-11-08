@@ -411,8 +411,9 @@ Orbit.ciclo = (function () {
     const done = (g.checklist || []).filter(c => c.done).length, tot = (g.checklist || []).length;
     const pr = { Alta: 'danger', Media: 'warn', Baja: 'neutral' }[g.prioridad] || 'neutral';
     const est = { 'Pendiente': 'warn', 'En proceso': 'info', 'Resuelta': 'ok' }[g.estado] || 'neutral';
+    const commentCount=[].concat(g.comentarios||[]).length;
     return `<div class="kcard" data-ges="${g.id}">
-      <div class="kcard-top"><span class="badge ${pr}">${U.esc(U.text(g.prioridad, 'Sin prioridad'))}</span><span class="badge ${est}">${U.esc(U.text(g.estado, 'Sin estado'))}</span></div>
+      <div class="kcard-top"><span class="badge ${pr}">${U.esc(U.text(g.prioridad, 'Sin prioridad'))}</span><span class="badge ${est}">${U.esc(U.text(g.estado, 'Sin estado'))}</span>${commentCount?'<span class="badge neutral" title="Comentarios colaborativos">💬 '+commentCount+'</span>':''}</div>
       <div class="kcard-t">${U.esc(g.titulo || g.tipo)}</div>
       <div class="kcard-cli">${cli ? U.esc(cli.nombre) : '<span class="muted">Sin cliente</span>'}</div>
       <div class="kcard-meta"><span class="dot-s" style="background:${asg ? asg.color : '#999'}"></span>${asg ? U.esc(asg.nombre) : '—'}</div>
@@ -830,6 +831,16 @@ Orbit.ciclo = (function () {
             </label>
             <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:8px"><button type="button" id="gs-upload-files" class="btn ghost sm">Subir documentos a Drive</button><span id="gs-upload-status" class="muted" role="status" aria-live="polite"></span></div>
           </div>
+          <div class="ciclo-sec ciclo-collab-panel" data-management-collab="1">
+            <div class="ciclo-sec-t ciclo-collab-title"><span>💬 Comentarios colaborativos</span><span class="badge neutral">${(g.comentarios||[]).length}</span></div>
+            <div class="ciclo-collab-help">Este hilo complementa la nota y la bitácora. <b>Registrar guarda el comentario inmediatamente en la gestión</b> con autor humano y trazabilidad; no necesitas pulsar “Guardar cambios” después.</div>
+            <div id="gs-coms" class="ciclo-collab-thread">${(g.comentarios||[]).slice().reverse().map(comRow).join('')||'<div class="muted ciclo-collab-empty">Todavía no hay comentarios en esta gestión.</div>'}</div>
+            <div class="cadd ciclo-collab-add" style="grid-template-columns:minmax(170px,.8fr) minmax(220px,1.4fr) auto">
+              <select id="gs-com-type" class="o-sel">${COLLAB_TYPES.map(v=>'<option>'+U.esc(v)+'</option>').join('')}</select>
+              <input id="gs-com-new" class="o-sel" placeholder="Escribe una solicitud, respuesta u observación…">
+              <button class="btn primary sm" id="gs-com-add">Registrar ahora</button>
+            </div>
+          </div>
         </div>
         <aside class="ciclo-aside">
           <div class="ciclo-sec">
@@ -853,6 +864,37 @@ Orbit.ciclo = (function () {
       </div>`;
     const back = modal(html, 820);
     back.querySelectorAll('[data-gdoc]').forEach(btn => btn.addEventListener('click', () => openGestionDocument((g.adjuntos || [])[+btn.dataset.gdoc], g.id)));
+    back.querySelectorAll('[data-collab-doc]').forEach(btn=>btn.addEventListener('click',async(e)=>{
+      e.preventDefault();e.stopPropagation();
+      const ref=btn.dataset.collabDoc;if(!ref)return;
+      const provider=Orbit.productDriveDocumentProviderP0;
+      if(!provider||typeof provider.download!=='function')return U.toast('El documento no está disponible en este momento.');
+      btn.disabled=true;
+      try{const out=await provider.download(ref,{entidad:'gestion',entidadId:id,clienteId:g.clienteId,polizaId:g.polizaId,sourceModule:'ops-management-collab'});if(!out||out.ok!==true)U.toast('No fue posible abrir el documento.');}
+      finally{btn.disabled=false;}
+    }));
+    const managementCommentAdd=back.querySelector('#gs-com-add');
+    if(managementCommentAdd)managementCommentAdd.addEventListener('click',async()=>{
+      const input=back.querySelector('#gs-com-new'),value=String(input&&input.value||'').trim();
+      if(!value)return;
+      const type=(back.querySelector('#gs-com-type')||{}).value||'Observación operativa';
+      const actor=currentUserIdentity(),ts=stamp(),eventId='collab_mgmt_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,7);
+      const priorComments=[].concat(g.comentarios||[]),priorBits=[].concat(g.bitacora||[]);
+      const direction=collaborationDirection(type);
+      const nextComment={ts,user:actor.name,actorUid:actor.uid,actorName:actor.name,tipo:type,texto:value,direction,eventId};
+      const nextBit={ts,user:actor.name,actorUid:actor.uid,actorName:actor.name,campo:'Colaboración',de:'',a:type,origen:'manual',direction,eventId};
+      managementCommentAdd.disabled=true;managementCommentAdd.dataset.originalLabel=managementCommentAdd.textContent;
+      managementCommentAdd.textContent='Registrando…';managementCommentAdd.setAttribute('aria-busy','true');
+      try{
+        await S().updateDurable('gestiones',id,{comentarios:priorComments.concat([nextComment]),bitacora:priorBits.concat([nextBit]),actualizado:today()});
+        const saved=S().get('gestiones',id),savedComment=[].concat(saved&&saved.comentarios||[]).find(x=>String(x&&x.eventId||'')===eventId);
+        if(!saved||!savedComment)throw Error('OPS_MANAGEMENT_COLLAB_DURABLE_READBACK_REQUIRED');
+        U.toast('Comentario colaborativo registrado y confirmado.');openGestion(id);
+      }catch(error){
+        managementCommentAdd.disabled=false;managementCommentAdd.textContent=managementCommentAdd.dataset.originalLabel||'Registrar ahora';managementCommentAdd.removeAttribute('aria-busy');
+        U.toast(collaborationErrorMessage(error));
+      }
+    });
     const uploadButton = back.querySelector('#gs-upload-files');
     uploadButton.addEventListener('click',async()=>{
       const files = Array.from(back.querySelector('#gs-new-files').files || []);

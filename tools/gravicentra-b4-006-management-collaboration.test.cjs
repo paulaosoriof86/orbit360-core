@@ -1,0 +1,21 @@
+'use strict';
+const assert=require('node:assert/strict'),fs=require('node:fs');
+const front=fs.readFileSync('orbit360-platform/core/ciclo.js','utf8');
+const backend=fs.readFileSync('functions/product-ops-leads-domain.js','utf8');
+const writer=fs.readFileSync('orbit360-platform/data/store-firestore-product-operational-p0.js','utf8');
+let checks=0;
+function ok(v,m){assert.ok(v,m);checks++;}
+ok(front.includes('data-management-collab="1"'),'management collaboration panel missing');
+ok(front.includes('id="gs-com-add"'),'management collaboration save action missing');
+ok(front.includes("S().updateDurable('gestiones',id,{comentarios:"),'management comments are not durable');
+ok(front.includes('OPS_MANAGEMENT_COLLAB_DURABLE_READBACK_REQUIRED'),'management collaboration readback guard missing');
+ok(front.includes("campo:'Colaboración'"),'management collaboration audit bit missing');
+ok(front.includes("eventId='collab_mgmt_"),'management collaboration event id missing');
+ok(front.includes('actorUid:actor.uid')&&front.includes('actorName:actor.name'),'human actor identity fields missing');
+ok(front.includes('Comentarios colaborativos')&&front.includes('commentCount'),'management kanban comment count missing');
+const management=backend.slice(backend.indexOf('const MANAGEMENT_MUTABLE_FIELDS'),backend.indexOf('const BUSINESS_CREATE_EXTRA_FIELDS'));
+ok(management.includes("'comentarios'"),'backend management mutable allowlist lacks comentarios');
+ok(management.includes("'bitacora'"),'backend management mutable allowlist lacks bitacora');
+ok(writer.includes("if(collection==='gestiones')")&&writer.includes("return'update_management'"),'durable writer does not map management update');
+ok(front.includes("sourceModule:'ops-management-collab'"),'management collaboration document context missing');
+console.log('B4_006_MANAGEMENT_COLLAB_SOURCE_CONTRACT_PASS checks='+checks+' source_only_no_firebase_writes');
