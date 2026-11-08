@@ -3333,7 +3333,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "B4_006_BUILD_ONE_NEW_IMMUTABLE_PREVIEW_THEN_VISUAL_QA_AND_OWNER_ACCEPTANCE",
+  "nextAction": "B4_006_PAULA_VISUAL_ACCEPTANCE_EXACT_PREVIEW_ARTIFACT_13620896661_THEN_B4_007_SAME_ARTIFACT_LIVE",
   "postproductionExitProgress": {
     "formalPercent": 50,
     "frozenMiniGates": 5,
@@ -22252,5 +22252,21 @@
       "orbit360-platform/modules/siniestros.js"
     ],
     "visualRevision": "read-only-grid-and-mobile-offering-header-v2"
+  },
+  "b4006ExactVisualPreviewQa20261108": {
+    "status": "ASSISTANT_VISUAL_PREVIEW_QA_PASS_OWNER_ACCEPTANCE_PENDING",
+    "gate": "I6.5/B4-006",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_006_VISUAL_EXACT_PREVIEW_QA_20261108.json",
+    "receiptBlobSha": "e4ba23c9a7db9adf41268747c19172e39e77055b",
+    "sourceCommit": "3e490bff1f12ccef5ccc8d007701245aa9599442",
+    "buildId": "gi-i65-b4-3e490bff1f12-57f234755dc1",
+    "artifactId": 13620896661,
+    "artifactDigest": "sha256:97996954daf72e8d17fbf23fe6ad26bd7f36de65948b3e8b3122c1c122901a6c",
+    "workflowRunId": 42488943178,
+    "firstIncompleteGate": "B4-006",
+    "lastClosedGate": "B4-005",
+    "ownerAccepted": false,
+    "noLive": true,
+    "realDataWrites": 0
   }
 }

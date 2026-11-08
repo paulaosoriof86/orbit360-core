@@ -17,6 +17,8 @@ const B4005_RECEIPT=ROOT+'I6_5_B4_005_ENDOSOS_DURABLE_SOURCE_AND_ISOLATED_QA_202
 const B4005_CAUSAL_RECEIPT=ROOT+'I6_5_B4_005_ENDOSOS_SERVER_SEMANTIC_WRITER_CAUSAL_FIX_20261107.json';
 const B4006_VISUAL_RECEIPT=ROOT+'I6_5_B4_006_VISUAL_READONLY_DELTA_DECLARATION_20261108.json';
 const B4006_VISUAL_ACTION='B4_006_BUILD_ONE_NEW_IMMUTABLE_PREVIEW_THEN_VISUAL_QA_AND_OWNER_ACCEPTANCE';
+const B4006_FINAL_ACTION='B4_006_PAULA_VISUAL_ACCEPTANCE_EXACT_PREVIEW_ARTIFACT_13620896661_THEN_B4_007_SAME_ARTIFACT_LIVE';
+const B4006_FINAL_RECEIPT=ROOT+'I6_5_B4_006_VISUAL_EXACT_PREVIEW_QA_20261108.json';
 const SOURCE='f8fa00e4e2e6627cee66c8c521866874e39bc8da';
 const BUILD='gi-i65-b4-f8fa00e4e2e6-57f234755dc1';
 const ARTIFACT=13600357541;
@@ -45,6 +47,37 @@ function readPinned(path,hash){
   need(git('rev-parse','HEAD:'+path)===hash,'RECEIPT_NOT_COMMITTED_'+path);
   return JSON.parse(bytes);
 }
+function verifyB4006AssistantVisualQa(cp,state){
+  const p=cp.b4006ExactVisualPreviewQa20261108;
+  need(p&&same(p,state.b4006ExactVisualPreviewQa20261108)&&
+    p.gate==='I6.5/B4-006'&&p.status==='ASSISTANT_VISUAL_PREVIEW_QA_PASS_OWNER_ACCEPTANCE_PENDING'&&
+    p.receiptPath===B4006_FINAL_RECEIPT&&p.receiptBlobSha==='e4ba23c9a7db9adf41268747c19172e39e77055b'&&
+    p.sourceCommit==='3e490bff1f12ccef5ccc8d007701245aa9599442'&&
+    p.buildId==='gi-i65-b4-3e490bff1f12-57f234755dc1'&&
+    p.artifactId===13620896661&&p.workflowRunId===42488943178&&
+    p.firstIncompleteGate==='B4-006'&&p.lastClosedGate==='B4-005'&&
+    p.ownerAccepted===false&&p.noLive===true&&p.realDataWrites===0,
+    'B4006_FINAL_VISUAL_POINTER');
+  const r=readPinned(B4006_FINAL_RECEIPT,p.receiptBlobSha);
+  need(r.schema==='GRAVICENTRA_I6_5_B4_006_ASSISTANT_VISUAL_PREVIEW_QA_V1'&&
+    r.status===p.status&&r.gate===p.gate&&r.ownerAccepted===false&&
+    r.sourceCommit===p.sourceCommit&&
+    r.immutablePreview?.buildId===p.buildId&&
+    r.immutablePreview?.artifactId===p.artifactId&&
+    r.immutablePreview?.artifactDigest===p.artifactDigest&&
+    r.workflow?.id===p.workflowRunId&&r.workflow?.conclusion==='success'&&
+    r.immutablePreview?.productFilesReadback?.passed===218&&
+    r.immutablePreview?.productFilesReadback?.total===218&&
+    r.immutablePreview?.hasProductionPromotion===false&&
+    r.governance?.paulaVisualAcceptancePending===true&&
+    r.governance?.operationalDataWrites===0&&r.governance?.backendDeploys===0&&
+    r.governance?.firestoreRulesWrites===0&&r.governance?.productionLiveUnchanged===true&&
+    r.nextAction===B4006_FINAL_ACTION&&
+    git('merge-base',r.sourceCommit,'HEAD')===r.sourceCommit,
+    'B4006_FINAL_VISUAL_RECEIPT');
+  return true;
+}
+
 function releaseMatches(x){
   return x?.sourceSha===SOURCE&&x?.buildId===BUILD&&Number(x?.artifactId)===ARTIFACT;
 }
@@ -197,7 +230,7 @@ export function verifyB4004FormalGate(){
   need(blob(bytes)===ref.receiptBlobSha&&sha256(bytes)===ref.receiptSha256&&ref.receiptBlobSha===mirror.receiptBlobSha&&ref.receiptSha256===mirror.receiptSha256,'SEAL_HASH');
   need(releaseMatches(ref)&&releaseMatches(mirror)&&ref.hostingVersion===VERSION&&ref.hostedPayloadDigest===DIGEST,'SEAL_RELEASE_POINTER');
   need(ref.lastClosedGate==='B4-004'&&mirror.lastClosedGate==='B4-004'&&ref.firstIncompleteGate==='B4-005'&&mirror.firstIncompleteGate==='B4-005','NEXT_GATE');
-  need((cp.nextAction===ACTION&&state.nextAction===ACTION||cp.nextAction===B4006_VISUAL_ACTION&&state.nextAction===B4006_VISUAL_ACTION&&cp.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&state.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&cp.b4006VisualReadonlyCandidateSource20261108?.status==='SOURCE_VISUAL_DELTA_READY_FOR_NEW_IMMUTABLE_PREVIEW')&&ref.nextAction===ACTION&&mirror.nextAction===ACTION,'NEXT_ACTION_SYNC');
+  need((cp.nextAction===ACTION&&state.nextAction===ACTION||(cp.nextAction===B4006_VISUAL_ACTION&&state.nextAction===B4006_VISUAL_ACTION&&cp.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&state.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&cp.b4006VisualReadonlyCandidateSource20261108?.status==='SOURCE_VISUAL_DELTA_READY_FOR_NEW_IMMUTABLE_PREVIEW'||cp.nextAction===B4006_FINAL_ACTION&&state.nextAction===B4006_FINAL_ACTION&&cp.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&state.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&verifyB4006AssistantVisualQa(cp,state)))&&ref.nextAction===ACTION&&mirror.nextAction===ACTION,'NEXT_ACTION_SYNC');
   need(cp.pendingClosureMasterPlan?.status==='B4_004_CLOSED_PASS_NEXT_B4_005_E2E_NOT_EXECUTED'&&cp.pendingClosureMasterPlan.currentGate==='B4-005'&&cp.pendingClosureMasterPlan.b4004Held===false,'PLAN_CURSOR');
   need(cp.currentB4?.status==='B4_003_CLOSED_PASS_CURRENT42'&&same(cp.currentB4,historic.currentB4),'B4003_FROZEN_POINTER');
   need(cp.b4003ActiveCertificationCursor20261106?.formalLiveAcceptance?.status==='LATEST_APPROVED_VERSION_LIVE_PASS'&&same(cp.b4003ActiveCertificationCursor20261106,historic.b4003ActiveCertificationCursor20261106),'B4003_PRESERVED');

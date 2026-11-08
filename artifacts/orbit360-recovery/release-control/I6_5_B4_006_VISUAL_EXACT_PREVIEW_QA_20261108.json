@@ -1,0 +1,92 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_006_ASSISTANT_VISUAL_PREVIEW_QA_V1",
+  "gate": "I6.5/B4-006",
+  "status": "ASSISTANT_VISUAL_PREVIEW_QA_PASS_OWNER_ACCEPTANCE_PENDING",
+  "dateLocal": "2026-11-08",
+  "owner": "Paula Andrea Osorio Franco",
+  "ownerAccepted": false,
+  "lastClosedGate": "B4-005",
+  "firstIncompleteGate": "B4-006",
+  "supersedesSourceOnlyCandidate": "d056811f9980d0fc2c2e2214e165f7e008c1f025",
+  "sourceCommit": "3e490bff1f12ccef5ccc8d007701245aa9599442",
+  "branch": "recovery/fase-a-clean-20260831",
+  "workflow": {
+    "id": 42488943178,
+    "name": "Gravicentra B4-005 Exact Immutable Preview",
+    "status": "completed",
+    "conclusion": "success",
+    "note": "B4-006 targeted visual source successor reused the single retained exact packaging pipeline; B4-005 formal seal untouched"
+  },
+  "immutablePreview": {
+    "url": "https://ays-orbit-360-lab--gi-i65-b4-rc-41765742748-neoi3u7r.web.app/",
+    "buildId": "gi-i65-b4-3e490bff1f12-57f234755dc1",
+    "artifactId": 13620896661,
+    "artifactDigest": "sha256:97996954daf72e8d17fbf23fe6ad26bd7f36de65948b3e8b3122c1c122901a6c",
+    "readbackArtifactId": 13620865997,
+    "readbackArtifactDigest": "sha256:8a0fb898e348efa57e8baf718f59c7e7b4a33dd5f14be0d2663f095a914447dc",
+    "productFilesReadback": {
+      "passed": 218,
+      "total": 218
+    },
+    "sourceArtifactSameBuild": true,
+    "hasProductionPromotion": false
+  },
+  "visualChecks": [
+    {
+      "module": "Aseguradoras",
+      "surface": "Documentos y Drive, desktop canonical semantic table: nine column headers",
+      "outcome": "ASSISTANT_VISUAL_PASS",
+      "syntheticRows": 2
+    },
+    {
+      "module": "Aseguradoras",
+      "surface": "Documentos y Drive, 390 and 320 px labeled stacked cards",
+      "outcome": "ASSISTANT_VISUAL_PASS",
+      "horizontalOverflowObserved": false
+    },
+    {
+      "module": "Aseguradoras",
+      "surface": "Productos y planes, desktop commissions and segments read-only",
+      "outcome": "ASSISTANT_VISUAL_PASS"
+    },
+    {
+      "module": "Aseguradoras",
+      "surface": "Productos y planes, 390 and 320 px card header/toggle after final source reload",
+      "outcome": "ASSISTANT_VISUAL_PASS"
+    },
+    {
+      "module": "Aseguradoras",
+      "surface": "Edit UI regression: nine commission and segment editors preserved; two document rows editable; Cancel restored read-only without save",
+      "outcome": "ASSISTANT_UI_ONLY_PASS",
+      "dataWrites": 0
+    },
+    {
+      "module": "Siniestros",
+      "surface": "Visible banner now starts Siniestros · Reclamos...",
+      "outcome": "ASSISTANT_VISUAL_PASS",
+      "dataWrites": 0
+    }
+  ],
+  "governance": {
+    "auditType": "PRESENTATION_ONLY_NOT_FULL_ROLE_OR_PERSISTENCE_CERTIFICATION",
+    "roleContext": "Paula authenticated, Ver como Operativo simulator; not independent Operativo UID login",
+    "operationalDataWrites": 0,
+    "backendDeploys": 0,
+    "firestoreRulesWrites": 0,
+    "reimports": 0,
+    "productionLiveUnchanged": true,
+    "customLiveUnchanged": true,
+    "b4003B4004B4005FormalSealsPreserved": true,
+    "postproductionDeferred": [
+      "Cotizador",
+      "CotComp",
+      "Comparativo",
+      "Conocimiento y tarifas de aseguradoras"
+    ],
+    "driveNonBlocking": true,
+    "otherApprovedModulesNotReopened": true,
+    "paulaVisualAcceptancePending": true
+  },
+  "nextAction": "B4_006_PAULA_VISUAL_ACCEPTANCE_EXACT_PREVIEW_ARTIFACT_13620896661_THEN_B4_007_SAME_ARTIFACT_LIVE",
+  "createdAtUtc": "2026-11-08T14:22:46.553Z"
+}
