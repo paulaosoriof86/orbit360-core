@@ -4749,7 +4749,7 @@ jobs:
           retention-days: 30
 
   b4-004-cronograma-live-readonly-scope:
-    if: "github.event_name == 'push' && (github.event.head_commit.message == 'test(b4-004): cronograma readonly scope diagnostic' || startsWith(github.event.head_commit.message, format('{0}{1}', 'test(b4-004): cronograma readonly scope diagnostic', fromJSON('\"\\n\"'))))"
+    if: "github.event_name == 'push' && (github.event.head_commit.message == 'test(b4-004): exact synthetic absence readonly' || startsWith(github.event.head_commit.message, format('{0}{1}', 'test(b4-004): exact synthetic absence readonly', fromJSON('\"\\n\"'))))"
     runs-on: ubuntu-24.04
     timeout-minutes: 35
     permissions:
@@ -4780,7 +4780,7 @@ jobs:
       - name: Fail-closed read-only cursor and release binding
         run: |
           set -euo pipefail
-          node --check tools/gravicentra-b4-004-cronograma-live-readonly-scope.mjs
+          node --check tools/gravicentra-b4-004-second-uid-exact-absence-readonly.mjs
           node - <<'NODE'
           const fs=require('node:fs');
           const cp=JSON.parse(fs.readFileSync(process.env.CONTROL,'utf8'));
@@ -4815,21 +4815,17 @@ jobs:
           npx playwright install --with-deps chromium >/dev/null
       - name: Authenticated Cronograma LIVE read-only scope and performance diagnostic
         env:
-          B4_004_CRONOGRAMA_READONLY_OUT: ${{ runner.temp }}/b4-004-cronograma-readonly-scope.json
+          PROOF_OUT: ${{ runner.temp }}/b4-004-second-uid-exact-absence.json
         run: |
           set -euo pipefail
-          node tools/gravicentra-b4-004-cronograma-live-readonly-scope.mjs
-          node - <<'NODE'
-          const x=require(process.env.B4_004_CRONOGRAMA_READONLY_OUT),a=x.assertions||{};
-          if(!['EXECUTED','EXECUTED_WITH_HOLD'].includes(x.diagnosticStatus)||a.exactLiveBuild!==true||a.writeAttemptZero!==true||a.noMutations!==true||x.writeAttemptCount!==0||x.authAccountsCreated!==0||x.membershipWrites!==0||x.dataWrites!==0||x.productSourceChanged!==false||x.backendChanged!==false)process.exit(1);
-          console.log('B4_004_CRONOGRAMA_READONLY_DIAGNOSTIC=EXECUTED_ZERO_WRITES');
-          NODE
+          node tools/gravicentra-b4-004-second-uid-exact-absence-readonly.mjs
+
       - name: Preserve Cronograma read-only diagnostic artifact
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: gravicentra-b4-004-cronograma-readonly-${{ github.run_id }}
-          path: ${{ runner.temp }}/b4-004-cronograma-readonly-scope.json
+          name: gravicentra-b4-004-absence-${{ github.run_id }}
+          path: ${{ env.PROOF_OUT }}
           if-no-files-found: warn
           retention-days: 30
 
