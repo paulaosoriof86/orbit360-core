@@ -5281,3 +5281,94 @@ jobs:
           git fetch origin "$GITHUB_REF_NAME"
           test "$(git rev-parse "origin/$GITHUB_REF_NAME")" = "$GITHUB_SHA"
           git push origin "HEAD:$GITHUB_REF_NAME"
+
+
+  b4-004-siniestros-retained-live-readonly:
+    if: "github.event_name == 'push' && github.event.head_commit.message == 'test(b4-004): Siniestros retained LIVE readonly'"
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    permissions:
+      contents: write
+      actions: read
+    env:
+      PROJECT_ID: ays-orbit-360-lab
+      B4_004_SINIESTROS_OUT: ${{ github.workspace }}/.b4004-siniestros-live.json
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Exact prior Siniestros source and active LIVE focal binding
+        run: |
+          set -euo pipefail
+          test "$(git hash-object orbit360-platform/modules/siniestros.js)" = f52c2046157f0bc72008e09e826d34d05eeb668b
+          test -z "$(git diff --name-only 6c45983610ce0d65a5c63bd07659ad968bfe9da3 HEAD -- orbit360-platform/modules/siniestros.js)"
+          node --check tools/gravicentra-b4-004-siniestros-retained-live-readonly.mjs
+          node - <<'NODE'
+          const c=require('./artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json');
+          const a=c.b4004CronogramaCountryLiveAcceptance20261107;
+          if(a?.status!=='CRONOGRAMA_COUNTRY_FOCAL_LIVE_PASS'||a?.artifactId!==13600357541||a.liveVersionName!=='sites/ays-orbit-360-lab/versions/439cb977fd4649d1'||c.currentB4?.status!=='B4_003_CLOSED_PASS_CURRENT42')throw Error('B4_004_LIVE_OR_PRIOR_PASS_INVALID');
+          NODE
+      - name: Prepare existing Firebase service account and Chromium
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json,os,pathlib
+          dest=pathlib.Path(os.environ['RUNNER_TEMP'])/'b4004-siniestros-existing-sa.json'
+          for key in ('SA_ORBIT360_LAB','SA_ORBIT_360_LAB','SA_DEFAULT'):
+              try:x=json.loads(os.environ.get(key,''))
+              except (ValueError,TypeError):continue
+              if x.get('type')=='service_account' and x.get('project_id')=='ays-orbit-360-lab' and x.get('private_key'):
+                  dest.write_text(json.dumps(x));dest.chmod(0o600)
+                  with open(os.environ['GITHUB_ENV'],'a') as h:h.write('GOOGLE_APPLICATION_CREDENTIALS='+str(dest)+'\n')
+                  break
+          else:raise SystemExit('B4004_SINIESTROS_NO_EXISTING_FIREBASE_AUTHORITY')
+          PY
+          npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund firebase-admin@13.4.0 playwright@1.55.0 >/dev/null
+          npx playwright install chromium >/dev/null
+      - name: Two signed existing UIDs LIVE Siniestros read-only UI and reload
+        run: node tools/gravicentra-b4-004-siniestros-retained-live-readonly.mjs
+      - name: Preserve proof regardless of result
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gravicentra-b4-004-siniestros-live-readonly-${{ github.run_id }}
+          path: |
+            ${{ env.B4_004_SINIESTROS_OUT }}
+            ${{ runner.temp }}/b4004-siniestros-*.png
+          if-no-files-found: warn
+          retention-days: 30
+      - name: Seal unchanged Siniestros LIVE read-only acceptance
+        env:
+          PROOF: ${{ env.B4_004_SINIESTROS_OUT }}
+          RECEIPT: artifacts/orbit360-recovery/release-control/I6_5_B4_004_SINIESTROS_RETAINED_LIVE_READONLY_20261107.json
+        run: |
+          set -euo pipefail
+          node - <<'NODE'
+          const fs=require('fs'),crypto=require('crypto'),p=JSON.parse(fs.readFileSync(process.env.PROOF));
+          if(p.status!=='SINIESTROS_RETAINED_SOURCE_TWO_UID_LIVE_READONLY_FOCAL_PASS'||p.checks?.length!==2||p.writeAttempts!==0||p.errors.length)throw Error('B4004_SINIESTROS_FOCAL_HOLD');
+          fs.copyFileSync(process.env.PROOF,process.env.RECEIPT);
+          const cpPath='artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json',statePath='orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json';
+          const cp=JSON.parse(fs.readFileSync(cpPath)),state=JSON.parse(fs.readFileSync(statePath));
+          const x={status:p.status,sourceSha:p.sourceSha,buildId:p.buildId,artifactId:p.artifactId,hostingVersion:p.hostingVersion,
+           siniestrosSourceBlob:p.siniestrosSourceBlob,runId:Number(process.env.GITHUB_RUN_ID),receiptPath:process.env.RECEIPT,
+           receiptSha256:crypto.createHash('sha256').update(fs.readFileSync(process.env.RECEIPT)).digest('hex'),
+           dataWrites:0,readOnly:true,scope:'UNCHANGED_SINIESTROS_FOCAL_UI_ROUTE_FORM_NO_SAVE_RELOAD_NOT_FULL_CRUD_RECERTIFICATION'};
+          cp.b4004SiniestrosRetainedLiveReadOnly20261107=x;state.b4004SiniestrosRetainedLiveReadOnly20261107=JSON.parse(JSON.stringify(x));
+          cp.nextAction='B4_004_FINAL_RECEIPTS_LEDGER_GUARD_AND_FORMAL_GATE_SEAL';state.nextAction=cp.nextAction;
+          fs.writeFileSync(cpPath,JSON.stringify(cp,null,2)+'\n');fs.writeFileSync(statePath,JSON.stringify(state,null,2)+'\n');
+          NODE
+          git add artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json "$RECEIPT"
+          git config user.name gravicentra-recovery-bot
+          git config user.email gravicentra-recovery-bot@users.noreply.github.com
+          git commit -m "test(b4-004): seal Siniestros retained LIVE readonly"
+          git fetch origin "$GITHUB_REF_NAME"
+          test "$(git rev-parse "origin/$GITHUB_REF_NAME")" = "$GITHUB_SHA"
+          git push origin "HEAD:$GITHUB_REF_NAME"
