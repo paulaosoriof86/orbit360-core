@@ -941,7 +941,20 @@ function projectFrozenB4003AfterB4004Preview(after,certified){
  const expectedProduct=['orbit360-platform/modules/cronograma.js',...(b4005?.paths||[])].sort();
  need(same(changedProduct,expectedProduct),'POST_B4004_UNRELATED_PRODUCT_CHANGE');
  need(git('rev-parse','HEAD:orbit360-platform/modules/cronograma.js')===sourcePin.sourceBlobSha,'POST_B4004_CRONOGRAMA_SOURCE_CHANGED');
- need(git('rev-parse','HEAD:tools/gravicentra-i6-1-preview-package.mjs')==='13bad5b844f5c286d198efc796af58d00fc2a3d1','POST_B4004_BUILDER_DRIFT');
+ // B4-005 only extends the same immutable builder's scoped Preview gate allowlist.
+ // Its two-line successor is pinned; the B4-004 certified artifact and seal stay immutable.
+ const expectedBuilder=b4005?'ad48cfea93b846129189ff890225220153d12eff':'13bad5b844f5c286d198efc796af58d00fc2a3d1';
+ need(git('rev-parse','HEAD:tools/gravicentra-i6-1-preview-package.mjs')===expectedBuilder,'POST_B4004_BUILDER_DRIFT');
+ if(b4005){
+  const b=after.b4005ExactPreviewExecutorScope20261107;
+  need(b&&same(b,state.b4005ExactPreviewExecutorScope20261107)&&b.builderAfterBlobSha===expectedBuilder&&
+    b.existingPreviewChannelReused==='gi-i65-b4-rc-41765742748'&&b.formalB4005Pass===false,
+    'POST_B4004_B4005_BUILDER_SCOPE_NOT_MIRRORED');
+  const r=reference({path:b.receiptPath,blobSha:b.receiptBlobSha,sha256:b.receiptSha256},'POST_B4004_B4005_BUILDER_SCOPE');
+  need(r.status==='EXACT_PREVIEW_EXECUTOR_SOURCE_READY_TRANSPORT_AND_AUTHENTICATED_E2E_PENDING'&&
+    r.existingBuilder.afterBlobSha===expectedBuilder&&r.safety.liveDeployAuthorizedInThisExecutor===false,
+    'POST_B4004_B4005_BUILDER_SCOPE_RECEIPT_INVALID');
+ }
  const proofPath=ROOT+'I6_5_B4_004_CRONOGRAMA_COUNTRY_FOCAL_PREVIEW_PASS_20261107.json';
  need(p?.receiptPath===proofPath&&blob(fs.readFileSync(proofPath))===p.receiptBlobSha,'POST_B4004_PREVIEW_EVIDENCE_DRIFT');
  const proof=read(proofPath);

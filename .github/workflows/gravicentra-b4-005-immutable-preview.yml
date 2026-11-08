@@ -1,0 +1,206 @@
+# B4-005: build exactly once, retain same-byte promotion artifact, reuse existing LAB Preview.
+# No LIVE, Functions, Rules, Auth/IAM, data seed or operational writes.
+name: Gravicentra B4-005 Exact Immutable Preview
+on:
+  push:
+    branches: [recovery/fase-a-clean-20260831]
+    paths:
+      - .github/workflows/gravicentra-b4-005-immutable-preview.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: gravicentra-b4-005-one-preview
+  cancel-in-progress: false
+jobs:
+  b4005-exact-immutable-preview:
+    if: github.repository == 'paulaosoriof86/orbit360-core' && github.ref == 'refs/heads/recovery/fase-a-clean-20260831'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    env:
+      SOURCE_SHA: ${{ github.sha }}
+      PROJECT_ID: ays-orbit-360-lab
+      HOSTING_SITE: ays-orbit-360-lab
+      TENANT_HINT: alianzas-soluciones
+      RELEASE_GATE: I6.5-B4-005
+      BUILD_PREFIX: gi-i65-b4
+      ENVIRONMENT_REF: firebase-hosting-preview-i6-5-b4-005
+      GRAVICENTRA_B4_003_SCOPED_PREVIEW: 'true'
+      GRAVICENTRA_B4_003_GOALS_PREVIEW: 'true'
+      SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_LAB_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+    steps:
+      - name: Checkout exact canonical branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+          path: candidate
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify previous seals, declared source, exact builder and isolated QA
+        working-directory: candidate
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$SOURCE_SHA"
+          git merge-base --is-ancestor 308294d4ca8e2167793b94a18bf810ba2a99e0d1 HEAD
+          test "$(git rev-parse HEAD:tools/gravicentra-i6-1-preview-package.mjs)" = ad48cfea93b846129189ff890225220153d12eff
+          git diff --exit-code f8fa00e4e2e6627cee66c8c521866874e39bc8da HEAD -- functions
+          node tools/gravicentra-b4-004-formal-gate-guard.mjs
+          node tools/gravicentra-i6-control-plane-guard-v1.mjs --mode=governance
+          node tools/gravicentra-b4-005-endosos-durable-contract.mjs
+          node - <<'NODE'
+          const fs=require('node:fs'),{execFileSync}=require('node:child_process');
+          const p='artifacts/orbit360-recovery/release-control/I6_5_B4_005_ENDOSOS_DURABLE_SOURCE_AND_ISOLATED_QA_20261107.json';
+          const r=JSON.parse(fs.readFileSync(p,'utf8'));
+          const git=(...a)=>execFileSync('git',a,{encoding:'utf8'}).trim();
+          if(r.status!=='SOURCE_FIX_AND_ISOLATED_CONTRACT_QA_PASS_PREVIEW_AND_LIVE_CERTIFICATION_PENDING'||r.releaseSafety.formalB4005Pass!==false)throw Error('PREVIEW_CANNOT_CLAIM_GATE_PASS');
+          if(r.sourceFiles.length!==4)throw Error('B4005_SOURCE_CARDINALITY');
+          for(const f of r.sourceFiles){if(git('rev-parse','HEAD:'+f.path)!==f.gitBlobSha)throw Error('B4005_SOURCE_DRIFT:'+f.path);}
+          if(git('rev-parse','HEAD:'+r.isolatedQa.testPath)!==r.isolatedQa.testGitBlobSha)throw Error('B4005_TEST_DRIFT');
+          if(!r.ownerDeferredToPostproduction.insurerKnowledgeAndTariffs||!r.ownerDeferredToPostproduction.cotcomp)throw Error('OWNER_SCOPE_NOT_FROZEN');
+          console.log('B4005_APPROVED_SCOPE_EXACT_SOURCE_AND_QA_PASS_NO_GATE_SEAL');
+          NODE
+          node --check orbit360-platform/core/endorsement-workflow-v1201.js
+          node --check orbit360-platform/modules/issuance-endosos-v1201-bridge.js
+          node --check orbit360-platform/modules/issuance-endosos-v1201-refinements.js
+          node --check orbit360-platform/modules/policy-receipts-v1199-detail-guard.js
+      - name: Fingerprint existing LIVE sites without touching them
+        run: |
+          set -euo pipefail
+          curl -fsSL --retry 2 --max-time 30 https://ays-orbit-360-lab.web.app/ | sha256sum > "$RUNNER_TEMP/b4005-live-before.sha"
+          curl -fsSL --retry 2 --max-time 30 https://app.aysseguros.com/ | sha256sum > "$RUNNER_TEMP/b4005-domain-before.sha"
+      - name: Reuse configured LAB authority for read-only config and Preview Hosting
+        working-directory: candidate
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/b4005-auth"
+          python3 - <<'PY'
+          import json,os,pathlib
+          root=pathlib.Path(os.environ['RUNNER_TEMP'])/'b4005-auth'; paths=[]
+          for n,key in enumerate(('SA_LAB','SA_LAB_ALT','SA_DEFAULT')):
+            try: value=json.loads(os.environ.get(key,''))
+            except (ValueError,TypeError): continue
+            if value.get('type')=='service_account' and value.get('project_id')==os.environ['PROJECT_ID'] and value.get('private_key'):
+              p=root/f'{n}.json';p.write_text(json.dumps(value));p.chmod(0o600);paths.append(str(p))
+          if not paths: raise SystemExit('LAB_SERVICE_ACCOUNT_NOT_CONFIGURED')
+          (root/'candidates').write_text('\n'.join(paths)+'\n')
+          PY
+          npm install --prefix "$RUNNER_TEMP/b4005-cli" --no-save --ignore-scripts --no-audit --no-fund firebase-tools@14.10.1 >/dev/null
+          node tools/gravicentra-firebase-tools-empty-extensions-workaround-v1.mjs "$RUNNER_TEMP/b4005-cli"
+          CLI="$RUNNER_TEMP/b4005-cli/node_modules/firebase-tools/lib/bin/firebase.js"
+          selected=''
+          while IFS= read -r candidate; do
+            if GOOGLE_APPLICATION_CREDENTIALS="$candidate" node "$CLI" apps:list WEB --project "$PROJECT_ID" --non-interactive --json >/dev/null 2>&1; then
+              selected="$candidate";break
+            fi
+          done < "$RUNNER_TEMP/b4005-auth/candidates"
+          test -n "$selected"
+          cp "$selected" "$RUNNER_TEMP/b4005-auth/selected.json"
+          chmod 600 "$RUNNER_TEMP/b4005-auth/selected.json"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/b4005-auth/selected.json" >> "$GITHUB_ENV"
+          echo "FIREBASE_CLI_BIN=$CLI" >> "$GITHUB_ENV"
+          npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund firebase-admin@13.4.0 >/dev/null
+      - name: Build B4-005 once from the exact canonical source
+        working-directory: candidate
+        run: |
+          set -euo pipefail
+          node "$FIREBASE_CLI_BIN" apps:list WEB --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/b4005-apps.json"
+          APP_ID=$(node -e "const x=require(process.env.RUNNER_TEMP+'/b4005-apps.json');const a=(x.result||[]).filter(y=>['WEB','PLATFORM_WEB',''].includes(String(y.platform||'').toUpperCase()));if(a.length!==1)process.exit(2);process.stdout.write(a[0].appId)")
+          test -n "$APP_ID"
+          node "$FIREBASE_CLI_BIN" apps:sdkconfig WEB "$APP_ID" --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/b4005-sdkconfig.json"
+          node tools/gravicentra-i6-5-b1-branding-snapshot.mjs "$RUNNER_TEMP/b4005-branding.json"
+          export TENANT_BRANDING_SNAPSHOT_FILE="$RUNNER_TEMP/b4005-branding.json"
+          node tools/gravicentra-i6-1-preview-package.mjs . "$RUNNER_TEMP/b4005-package" "$RUNNER_TEMP/b4005-sdkconfig.json" > "$RUNNER_TEMP/b4005-package-output.json"
+          ROOT="$RUNNER_TEMP/b4005-package/bundle/site"
+          for rel in core/endorsement-workflow-v1201.js modules/issuance-endosos-v1201-bridge.js modules/issuance-endosos-v1201-refinements.js modules/policy-receipts-v1199-detail-guard.js; do
+            cmp "orbit360-platform/$rel" "$ROOT/$rel"
+          done
+          node - <<'NODE'
+          const fs=require('node:fs'),base=process.env.RUNNER_TEMP+'/b4005-package/bundle';
+          const cfg=JSON.parse(fs.readFileSync(base+'/firebase.json','utf8'));
+          const build=JSON.parse(fs.readFileSync(base+'/site/__recovery__/build.json','utf8'));
+          const runtime=fs.readFileSync(base+'/site/product-runtime-config.js','utf8');
+          if(Object.keys(cfg).join(',')!=='hosting'||cfg.hosting.site!==process.env.HOSTING_SITE||cfg.hosting.public!=='site')throw Error('HOSTING_ONLY_EXISTING_LAB');
+          if(build.gate!==process.env.RELEASE_GATE||build.sourceSha!==process.env.SOURCE_SHA||!runtime.includes('"scopedReadPreviewCandidate":true')||!runtime.includes('"goalParticipationPreviewCandidate":true'))throw Error('B4005_BUILD_IDENTITY_OR_SCOPED_READ_INVALID');
+          NODE
+      - name: Retain immutable package for future exact-byte LIVE promotion
+        id: retained
+        run: |
+          set -euo pipefail
+          tar --sort=name --mtime='@0' --owner=0 --group=0 --numeric-owner -czf "$RUNNER_TEMP/b4005-exact-release-bundle.tar.gz" -C "$RUNNER_TEMP/b4005-package" bundle
+          sha256sum "$RUNNER_TEMP/b4005-exact-release-bundle.tar.gz" > "$RUNNER_TEMP/b4005-exact-release-bundle.sha256"
+          test -s "$RUNNER_TEMP/b4005-exact-release-bundle.tar.gz"
+      - uses: actions/upload-artifact@v4
+        id: retained_artifact
+        with:
+          name: gi-b4005-immutable-release-bundle-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/b4005-exact-release-bundle.tar.gz
+            ${{ runner.temp }}/b4005-exact-release-bundle.sha256
+          retention-days: 30
+          if-no-files-found: error
+      - name: Deploy immutable bundle ONLY to existing isolated Preview channel
+        id: preview
+        run: |
+          set -euo pipefail
+          CHANNEL_ID=gi-i65-b4-rc-41765742748
+          cd "$RUNNER_TEMP/b4005-package/bundle"
+          node "$FIREBASE_CLI_BIN" hosting:channel:deploy "$CHANNEL_ID" --config firebase.json --project "$PROJECT_ID" --expires 7d --non-interactive --json > "$RUNNER_TEMP/b4005-preview-result.json" 2>&1
+          export CHANNEL_ID
+          PREVIEW_URL=$(python3 - <<'PY'
+          import os,re
+          raw=open(os.environ['RUNNER_TEMP']+'/b4005-preview-result.json').read()
+          prefix='https://ays-orbit-360-lab--'+os.environ['CHANNEL_ID']+'-'
+          urls=sorted(set(u.rstrip('/') for u in re.findall(r'https://[A-Za-z0-9._-]+\.web\.app',raw) if u.startswith(prefix)))
+          if len(urls)!=1:raise SystemExit('B4005_PREVIEW_URL_NOT_UNIQUE')
+          print(urls[0])
+          PY
+          )
+          echo "url=$PREVIEW_URL" >> "$GITHUB_OUTPUT"
+      - name: Verify every hosted file and assert LIVE fingerprints preserved
+        env:
+          PREVIEW_URL: ${{ steps.preview.outputs.url }}
+          ARTIFACT_ID: ${{ steps.retained_artifact.outputs.artifact-id }}
+          ARTIFACT_ZIP_SHA256: ${{ steps.retained_artifact.outputs.artifact-digest }}
+        run: |
+          set -euo pipefail
+          ROOT="$RUNNER_TEMP/b4005-package/bundle/site"
+          mkdir -p "$RUNNER_TEMP/b4005-readback/__recovery__"
+          READY=0
+          for attempt in $(seq 1 65); do
+            if curl -fsSL --max-time 20 "$PREVIEW_URL/__recovery__/build.json" -o "$RUNNER_TEMP/b4005-readback/__recovery__/build.json" 2>/dev/null &&
+               cmp -s "$ROOT/__recovery__/build.json" "$RUNNER_TEMP/b4005-readback/__recovery__/build.json"; then READY=1;break;fi
+            sleep 5
+          done
+          test "$READY" = 1
+          while IFS= read -r line; do
+            rel="${line#*  }"
+            mkdir -p "$RUNNER_TEMP/b4005-readback/$(dirname "$rel")"
+            curl -fsSL --retry 5 --retry-all-errors --retry-delay 3 --max-time 25 "$PREVIEW_URL/$rel" -o "$RUNNER_TEMP/b4005-readback/$rel"
+            cmp "$ROOT/$rel" "$RUNNER_TEMP/b4005-readback/$rel"
+          done < "$RUNNER_TEMP/b4005-package/evidence/site-manifest.sha256"
+          curl -fsSL --retry 2 --max-time 30 https://ays-orbit-360-lab.web.app/ | sha256sum > "$RUNNER_TEMP/b4005-live-after.sha"
+          curl -fsSL --retry 2 --max-time 30 https://app.aysseguros.com/ | sha256sum > "$RUNNER_TEMP/b4005-domain-after.sha"
+          cmp "$RUNNER_TEMP/b4005-live-before.sha" "$RUNNER_TEMP/b4005-live-after.sha"
+          cmp "$RUNNER_TEMP/b4005-domain-before.sha" "$RUNNER_TEMP/b4005-domain-after.sha"
+          node - <<'NODE'
+          const fs=require('node:fs'),crypto=require('node:crypto');
+          const root=process.env.RUNNER_TEMP+'/b4005-package/bundle/site';
+          const b=JSON.parse(fs.readFileSync(root+'/__recovery__/build.json','utf8'));
+          const p=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/b4005-package-output.json','utf8'));
+          const tar=fs.readFileSync(process.env.RUNNER_TEMP+'/b4005-exact-release-bundle.tar.gz');
+          const proof={schema:'GRAVICENTRA_I6_5_B4_005_EXACT_IMMUTABLE_PREVIEW_PROOF_V1',status:'EXACT_PREVIEW_TRANSPORT_PASS_AUTHENTICATED_E2E_PENDING',gate:'I6.5/B4-005',sourceSha:process.env.SOURCE_SHA,buildId:b.buildId,previewUrl:process.env.PREVIEW_URL,runId:Number(process.env.GITHUB_RUN_ID),artifactId:Number(process.env.ARTIFACT_ID),artifactZipSha256:process.env.ARTIFACT_ZIP_SHA256,archiveSha256:crypto.createHash('sha256').update(tar).digest('hex'),hostedPayloadDigest:p.hostedPayloadDigest,productFiles:p.hostedFileCount,allHostedFilesExact:true,reusedExistingChannel:true,b4003B4004SealsPreserved:true,liveLabStable:true,liveCustomDomainStable:true,functionsDeploys:0,rulesDeploys:0,authChanges:0,realDataWrites:0,authenticatedE2e:'PENDING',production:'HOLD',formalB4005Pass:false};
+          if(!proof.artifactId||!proof.productFiles||!proof.hostedPayloadDigest)throw Error('B4005_PREVIEW_PROOF_INCOMPLETE');
+          fs.writeFileSync(process.env.RUNNER_TEMP+'/b4005-exact-preview-proof.json',JSON.stringify(proof,null,2)+'\n');
+          NODE
+          echo "B4-005 exact immutable Preview readback PASS; LIVE unchanged; authenticated role/country/write/reload E2E still pending. Preview: $PREVIEW_URL" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: gi-b4005-preview-readback-${{ github.run_id }}
+          path: ${{ runner.temp }}/b4005-exact-preview-proof.json
+          retention-days: 30
+          if-no-files-found: warn

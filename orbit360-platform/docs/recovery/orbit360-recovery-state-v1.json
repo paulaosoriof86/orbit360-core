@@ -1057,5 +1057,19 @@
     "existingCarryFindingsRequiringDispositions": 5,
     "isFullB4005Pass": false,
     "nextExecution": "B4_005_REUSE_SIGNED_PREVIEW_LIVE_EVIDENCE_AND_CLOSE_ONLY_UNCOVERED_AUTHENTICATED_ROLE_COUNTRY_VIEWPORT_RELATION_CROSSES_PLUS_FIVE_CARRIES"
+  },
+  "b4005ExactPreviewExecutorScope20261107": {
+    "gate": "I6.5/B4-005",
+    "status": "EXACT_PREVIEW_EXECUTOR_SOURCE_READY_TRANSPORT_AND_AUTHENTICATED_E2E_PENDING",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_005_EXACT_PREVIEW_EXECUTOR_SCOPE_20261107.json",
+    "receiptBlobSha": "8f79f9657185d7b1340aec7cc423e660f1c518ee",
+    "receiptSha256": "67b7a91bb316489aede477ac4ce8d1c98569e61565a5f4752ee10881426c5f34",
+    "builderAfterBlobSha": "ad48cfea93b846129189ff890225220153d12eff",
+    "existingPreviewChannelReused": "gi-i65-b4-rc-41765742748",
+    "lastClosedGate": "B4-004",
+    "firstIncompleteGate": "B4-005",
+    "formalB4005Pass": false,
+    "realDataWrites": 0,
+    "nextExecution": "B4_005_IMMUTABLE_PREVIEW_READBACK_AND_AUTHENTICATED_DURABLE_E2E"
   }
 }

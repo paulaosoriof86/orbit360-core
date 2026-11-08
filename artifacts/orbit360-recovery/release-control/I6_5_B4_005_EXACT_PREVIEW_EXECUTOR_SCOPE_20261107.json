@@ -1,0 +1,54 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_005_EXACT_PREVIEW_EXECUTOR_SCOPE_V1",
+  "gate": "I6.5/B4-005",
+  "status": "EXACT_PREVIEW_EXECUTOR_SOURCE_READY_TRANSPORT_AND_AUTHENTICATED_E2E_PENDING",
+  "operationalDateGuatemala": "2026-11-07",
+  "owner": "Paula Andrea Osorio Franco / Direccion",
+  "canonicalRepository": "paulaosoriof86/orbit360-core",
+  "canonicalBranch": "recovery/fase-a-clean-20260831",
+  "lastSignedLiveGate": "B4-004",
+  "firstIncompleteGate": "B4-005",
+  "sourceCandidateParentRemoteHead": "308294d4ca8e2167793b94a18bf810ba2a99e0d1",
+  "existingBuilder": {
+    "path": "tools/gravicentra-i6-1-preview-package.mjs",
+    "beforeBlobSha": "13bad5b844f5c286d198efc796af58d00fc2a3d1",
+    "afterBlobSha": "ad48cfea93b846129189ff890225220153d12eff",
+    "delta": "Add only I6.5-B4-005 to existing scoped Preview allowed gates; preserve build and Hosting behavior"
+  },
+  "existingPreviewChannel": "gi-i65-b4-rc-41765742748",
+  "executorPath": ".github/workflows/gravicentra-b4-005-immutable-preview.yml",
+  "releaseGate": "I6.5-B4-005",
+  "buildOnce": true,
+  "promotionContract": "Retained exact bundle and hash are mandatory for subsequent LIVE promotion; never rebuild a different product under this artifact ID",
+  "previewOnly": true,
+  "hostingSite": "ays-orbit-360-lab",
+  "scopedReadCandidateRequired": true,
+  "goalsPreviewCandidateRequired": true,
+  "testBeforeBuild": "node tools/gravicentra-b4-005-endosos-durable-contract.mjs (10/10 isolated)",
+  "testAfterPreview": "Authenticated GT/CO/role/viewport durable Endosos E2E, server readback/reload, restore and residual R15-09 certificate/annex lineage; not yet performed",
+  "ownerDeferred": [
+    "Conocimiento integral y tarifas de aseguradoras",
+    "Cotizador y comparativo automaticos",
+    "CotComp",
+    "Vinculacion opcional de Drive"
+  ],
+  "preservedCapabilities": [
+    "Aseguradoras directorio operativo",
+    "Polizas/Recibos y captura",
+    "Cliente360 y Ops",
+    "B4-003 y B4-004 aceptados"
+  ],
+  "safety": {
+    "currentLiveSourceSha": "f8fa00e4e2e6627cee66c8c521866874e39bc8da",
+    "currentLiveBuildId": "gi-i65-b4-f8fa00e4e2e6-57f234755dc1",
+    "currentLiveArtifactId": 13600357541,
+    "realDataWrites": 0,
+    "functionsDeploys": 0,
+    "rulesDeploys": 0,
+    "authIamChanges": 0,
+    "liveDeployAuthorizedInThisExecutor": false,
+    "formalB4005Pass": false,
+    "i6FormalProgressPercent": 50
+  },
+  "nextAction": "RUN_EXACT_IMMUTABLE_PREVIEW_AND_READBACK; THEN_AUTHENTICATED_FOCAL_B4_005_E2E_AND_FORMAL_GATE_SEAL"
+}
