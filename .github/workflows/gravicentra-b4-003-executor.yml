@@ -5155,9 +5155,9 @@ jobs:
       actions: read
     env:
       PROJECT_ID: ays-orbit-360-lab
-      B4_004_PROMOTION_OUT: ${{ runner.temp }}/b4004-country-promotion.json
-      B4_004_RETAINED_PACKAGE_ROOT: ${{ runner.temp }}/b4004-retained/b4004-country-package
-      B4_004_CRONOGRAMA_COUNTRY_QA_OUT: ${{ runner.temp }}/b4004-country-live-qa.json
+      B4_004_PROMOTION_OUT: ${{ github.workspace }}/.b4004-country-promotion.json
+      B4_004_RETAINED_PACKAGE_ROOT: ${{ github.workspace }}/.b4004-retained/b4004-country-package
+      B4_004_CRONOGRAMA_COUNTRY_QA_OUT: ${{ github.workspace }}/.b4004-country-live-qa.json
       B4_QA_TARGET_URL: https://ays-orbit-360-lab.web.app
       B4_QA_STAGE: live
       SOURCE_SHA: f8fa00e4e2e6627cee66c8c521866874e39bc8da
@@ -5203,7 +5203,7 @@ jobs:
           run-id: 42437945576
           github-token: ${{ secrets.GITHUB_TOKEN }}
           repository: paulaosoriof86/orbit360-core
-          path: ${{ runner.temp }}/b4004-retained
+          path: ${{ github.workspace }}/.b4004-retained
       - name: Prepare existing Firebase authority for exact Hosting version
         run: |
           set -euo pipefail
