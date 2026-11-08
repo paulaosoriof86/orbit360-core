@@ -5292,7 +5292,7 @@ jobs:
       actions: read
     env:
       PROJECT_ID: ays-orbit-360-lab
-      B4_004_SINIESTROS_OUT: ${{ github.workspace }}/.b4004-siniestros-live.json
+      B4_004_SINIESTROS_OUT: ${{ github.workspace }}/b4004-siniestros-live.json
       SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
       SA_ORBIT360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
       SA_ORBIT_360_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
@@ -5343,7 +5343,7 @@ jobs:
           path: |
             ${{ env.B4_004_SINIESTROS_OUT }}
             ${{ runner.temp }}/b4004-siniestros-*.png
-          if-no-files-found: warn
+          if-no-files-found: error
           retention-days: 30
       - name: Seal unchanged Siniestros LIVE read-only acceptance
         env:
