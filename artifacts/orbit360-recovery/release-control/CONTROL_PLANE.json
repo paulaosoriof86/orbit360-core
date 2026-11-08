@@ -3333,7 +3333,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "B4_004_CLOSED_PASS_NEXT_B4_005_AUTHENTICATED_E2E_MATRIX",
+  "nextAction": "B4_006_PAULA_VISUAL_ACCEPTANCE_EXACT_PREVIEW_ARTIFACT_13605062717_THEN_B4_007_SAME_ARTIFACT_LIVE",
   "postproductionExitProgress": {
     "formalPercent": 50,
     "frozenMiniGates": 5,
@@ -22189,5 +22189,47 @@
     "formalB4005Pass": false,
     "livePromoted": false,
     "nextExecution": "B4_005_ONLY_UNCOVERED_AUTHENTICATED_E2E_AND_R15_09_CARRY_RECONCILIATION_NO_PRIOR_PASS_RETEST"
+  },
+  "b4005TwoUidAndFirestoreFieldFocal20261107": {
+    "status": "TWO_DISTINCT_REAL_UID_ROLE_COUNTRY_VIEWPORT_READONLY_PASS_PLUS_INDEPENDENT_FIRESTORE_ENDOSO_FIELD",
+    "gate": "I6.5/B4-005",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_005_TWO_UID_AND_FIRESTORE_FIELD_FOCAL_READBACK_20261107.json",
+    "receiptBlobSha": "2fbeaf62856cd984e9991a1e66fc68714b7d7bf8",
+    "runId": 42452796046,
+    "workflowResult": "SUCCESS",
+    "artifactId": 13606337400,
+    "sourceSha": "6c2266311b156b4a5d19be456bcef197a43b888e",
+    "buildId": "gi-i65-b4-6c2266311b15-57f234755dc1",
+    "immutableArtifactId": 13605062717,
+    "independentUidCount": 2,
+    "firestoreBeneficiaryReadback": true,
+    "readOnly": true,
+    "noLive": true
+  },
+  "b4005FormalGateSeal20261107": {
+    "status": "CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY",
+    "gate": "I6.5/B4-005",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_005_FORMAL_SCOPED_GATE_SEAL_20261107.json",
+    "receiptBlobSha": "ed7fa00fc31e95ae607089caf7419aac3e9a7fb3",
+    "sourceSha": "6c2266311b156b4a5d19be456bcef197a43b888e",
+    "buildId": "gi-i65-b4-6c2266311b15-57f234755dc1",
+    "artifactId": 13605062717,
+    "fullUnboundedProductPass": false,
+    "nonblockingR1509StillOpen": true,
+    "knowledgeQuoteCotCompDeferred": true,
+    "lastClosedGate": "B4-005",
+    "firstIncompleteGate": "B4-006",
+    "noLive": true
+  },
+  "b4006ExactPreviewOwnerVisualEntry20261107": {
+    "status": "IN_PROGRESS_OWNER_VISUAL_ACCEPTANCE_PENDING",
+    "gate": "I6.5/B4-006",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_006_EXACT_PREVIEW_OWNER_VISUAL_ENTRY_20261107.json",
+    "receiptBlobSha": "92eaec5a5d62e9ddd9db7a8c4c4dfb2a1ef32469",
+    "sourceSha": "6c2266311b156b4a5d19be456bcef197a43b888e",
+    "buildId": "gi-i65-b4-6c2266311b15-57f234755dc1",
+    "artifactId": 13605062717,
+    "ownerAccepted": false,
+    "noLive": true
   }
 }

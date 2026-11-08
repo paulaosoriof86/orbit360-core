@@ -1,0 +1,87 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_005_FORMAL_SCOPED_GATE_SEAL_V1",
+  "gate": "I6.5/B4-005",
+  "status": "CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY",
+  "recordType": "GOVERNED_SCOPED_PASS_NOT_UNBOUNDED_PRODUCT_CERTIFICATION",
+  "branch": "recovery/fase-a-clean-20260831",
+  "repository": "paulaosoriof86/orbit360-core",
+  "lastClosedGate": "B4-005",
+  "firstIncompleteGate": "B4-006",
+  "immutablePreview": {
+    "sourceSha": "6c2266311b156b4a5d19be456bcef197a43b888e",
+    "buildId": "gi-i65-b4-6c2266311b15-57f234755dc1",
+    "artifactId": 13605062717,
+    "url": "https://ays-orbit-360-lab--gi-i65-b4-rc-41765742748-neoi3u7r.web.app",
+    "workflowRunId": 42450363493,
+    "workflowResult": "SUCCESS",
+    "everyHostedFileReadback": "218_OF_218_PASS",
+    "liveUnchanged": true
+  },
+  "newEvidence": {
+    "focalReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_005_TWO_UID_AND_FIRESTORE_FIELD_FOCAL_READBACK_20261107.json",
+    "signedRunId": 42452796046,
+    "runResult": "SUCCESS",
+    "artifactId": 13606337400,
+    "distinctUidCount": 2,
+    "identities": [
+      "Direccion GT 1440x900",
+      "Operativo CO 390x844"
+    ],
+    "independentBeneficiaryFirestoreReadback": true,
+    "realUserOperationalWritesInThisReadOnlyRun": 0
+  },
+  "priorEvidencePreserved": {
+    "b4003": "LATEST_APPROVED_VERSION_LIVE_PASS_CURRENT42",
+    "b4004": "CLOSED_PASS_SCOPED",
+    "historicalIndividualCapabilities": 15,
+    "historicalOtherPasses": 71,
+    "b4005SourceContracts": 12,
+    "b4005EarlierLiveReadonlyCases": 8,
+    "authenticatedPaulaSyntheticEndosoLifecycle": "CREATE_APPROVE_APPLY_OPS_POLICY_HISTORY_RELOAD_DURABLE_PASS",
+    "serverWriterAndHostingPreview": "SUCCESS"
+  },
+  "frozenOwnerDeferments": {
+    "insurerKnowledge": true,
+    "sourceBackedAi": true,
+    "insurerTariffs": true,
+    "automaticCotizador": true,
+    "ComparativoE2E": true,
+    "CotComp": true,
+    "DriveLinkage": "OPTIONAL_NO_GATE_BLOCK",
+    "authority": "I6_5_B4_005_OWNER_SCOPE_DEFER_QUOTE_KNOWLEDGE_20261107.json"
+  },
+  "preservedRequiredScope": {
+    "insurerOperationalDirectory": "PREEXISTING_LIVE_APPROVAL_RETAINED",
+    "Endosos": "SYNTHETIC_DURABLE_PREVIEW_LIFECYCLE_FOCAL_PASS",
+    "certificatesAnnexes": {
+      "findingId": "B4-003-R15-09-PHASEA-ENDORSEMENT-CERTIFICATE-ANNEX-CLOSURE",
+      "status": "OPEN_VISIBLE_NONBLOCKING_UNCERTIFIED_FIRST_CLASS_CARRY",
+      "historicalBlocking": false,
+      "existingApprovedOwners": [
+        "orbit360-platform/core/endorsement-workflow-v1201.js",
+        "orbit360-platform/modules/issuance-endosos-v1201-bridge.js",
+        "Ops management/document attachment owners"
+      ],
+      "observed": "Emision de certificado appears as Ops management type; generic attachment controls exist; no proven first-class certificate/annex issuance lifecycle",
+      "disposition": "PRESERVED_EXACTLY_AS_NONBLOCKING_CARRY_NO_FALSE_PASS_NO_UNAUTHORIZED_POSTPRODUCTION_DEFERMENT",
+      "condition": "Do not certify or commercially claim standalone certificate/annex generation until current explicit owner acceptance lineage and E2E proof exist."
+    }
+  },
+  "boundaries": {
+    "noNewProductSource": true,
+    "noNewBuild": true,
+    "noProductionDeployment": true,
+    "noCommercialWrite": true,
+    "noReimport": true,
+    "noRulesIamChanges": true,
+    "notFullPhaseAProductionAccepted": true,
+    "notRealInsurerDocumentApproval": true,
+    "noNewIndependentOperativoWriteClaim": true,
+    "noFreshCertificationOfUnaffectedModules": true
+  },
+  "nextExecution": "B4_006_PAULA_EXPLICIT_VISUAL_ACCEPTANCE_ON_EXACT_IMMUTABLE_PREVIEW_THEN_B4_007_SAME_ARTIFACT_LIVE_WITH_FUNCTIONAL_QA",
+  "b4006AcceptanceYet": false,
+  "b4007LiveYet": false,
+  "formalI6ProgressPercentUnchanged": 50,
+  "recordedAtUtc": "2026-11-08T06:02:18.471Z"
+}

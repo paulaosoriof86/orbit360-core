@@ -1,0 +1,87 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_005_TWO_UID_AND_FIRESTORE_FIELD_FOCAL_READBACK_V1",
+  "gate": "I6.5/B4-005",
+  "recordType": "ADDITIVE_EXACT_PREVIEW_QA_NO_PRODUCTION_CHANGE",
+  "status": "TWO_DISTINCT_REAL_UID_ROLE_COUNTRY_VIEWPORT_READONLY_PASS_PLUS_INDEPENDENT_FIRESTORE_ENDOSO_FIELD",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "sourceSha": "6c2266311b156b4a5d19be456bcef197a43b888e",
+  "buildId": "gi-i65-b4-6c2266311b15-57f234755dc1",
+  "immutableArtifactId": 13605062717,
+  "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-rc-41765742748-neoi3u7r.web.app",
+  "signedWorkflow": {
+    "runId": 42452796046,
+    "result": "SUCCESS",
+    "artifactId": 13606337400,
+    "artifactZipSha256": "2e3ddfd0df03db0508731505b83a0ae1ac6341127f6cf572a086bacc89d8d0c2"
+  },
+  "actors": [
+    {
+      "uidSha256": "f612197b077c598edd61d757c1e2995be7a3b17300602ce4802bccefed216a72",
+      "role": "direccion",
+      "country": "GT",
+      "viewport": "1440x900",
+      "firstReadyMs": 17540,
+      "qaPolicyInAuthorizedCache": true,
+      "gtQaEndosoVisibleInSelectedCountryOps": true,
+      "policyIdSha256": "9b29b4422febd25a2cc4fa72cb77d41f537076861ee729f4777ecf5dc1d7bd4a",
+      "form": {
+        "open": true,
+        "beneficiaryField": true,
+        "cancelled": true
+      },
+      "readback": {
+        "exists": true,
+        "role": "Dirección",
+        "country": "GT"
+      },
+      "roleCountryPersistedOnReload": true,
+      "authenticatedIndependentUid": true,
+      "writeAttempts": 0,
+      "pageErrors": 0,
+      "networkErrors": 0
+    },
+    {
+      "uidSha256": "0c4b85787597056bcbb1a906ef7ebe18c1795946068b5f3da51c8b757dc52500",
+      "role": "operativo",
+      "country": "CO",
+      "viewport": "390x844",
+      "firstReadyMs": 15607,
+      "qaPolicyInAuthorizedCache": true,
+      "gtQaEndosoVisibleInSelectedCountryOps": false,
+      "policyIdSha256": "3e3156fca78d666a260e04b221824c79b1d10a93408a543249f6cb07ca8e185e",
+      "form": {
+        "open": true,
+        "beneficiaryField": true,
+        "cancelled": true
+      },
+      "readback": {
+        "exists": true,
+        "role": "Operativo",
+        "country": "CO"
+      },
+      "roleCountryPersistedOnReload": true,
+      "authenticatedIndependentUid": true,
+      "writeAttempts": 0,
+      "pageErrors": 0,
+      "networkErrors": 0
+    }
+  ],
+  "backendProof": {
+    "source": "FIRESTORE_ADMIN_READONLY",
+    "policyId": "b4003qa_policy_expired_renew_38102224750",
+    "beneficiariesExact": true,
+    "managementIdMatched": true,
+    "independentChromeFirebaseConsoleFieldObserved": true,
+    "proposalValue": "Beneficiario QA sintético 42449448186",
+    "managementId": "b4003qa_ges_end_mw7di0gc_0wqpn"
+  },
+  "syntheticLifecyclePriorReceipt": "I6_5_B4_005_ENDOSOS_AUTHENTICATED_PREVIEW_E2E_AND_FINAL_READBACK_20261107.json",
+  "sourceContractGroupsPassed": 12,
+  "liveTouched": false,
+  "newProductArtifact": false,
+  "realBusinessPolicyWrites": 0,
+  "authUsersCreated": 0,
+  "note": "Role/country/viewport assertions were read-only with actual distinct existing UIDs. This does not claim a real insurer approval, a new independent Operativo endoso write, or complete first-class Certificates/Annexes lifecycle.",
+  "recordedAtUtc": "2026-11-08T06:02:18.471Z"
+}

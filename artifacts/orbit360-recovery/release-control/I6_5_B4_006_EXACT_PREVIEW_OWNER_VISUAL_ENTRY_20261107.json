@@ -1,0 +1,23 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_006_EXACT_PREVIEW_OWNER_VISUAL_ENTRY_V1",
+  "gate": "I6.5/B4-006",
+  "status": "IN_PROGRESS_OWNER_VISUAL_ACCEPTANCE_PENDING",
+  "owner": "Paula Andrea Osorio Franco",
+  "immutablePreview": {
+    "sourceSha": "6c2266311b156b4a5d19be456bcef197a43b888e",
+    "buildId": "gi-i65-b4-6c2266311b15-57f234755dc1",
+    "artifactId": 13605062717,
+    "url": "https://ays-orbit-360-lab--gi-i65-b4-rc-41765742748-neoi3u7r.web.app",
+    "workflowRunId": 42450363493,
+    "workflowResult": "SUCCESS",
+    "everyHostedFileReadback": "218_OF_218_PASS",
+    "liveUnchanged": true
+  },
+  "coverageToReview": "Only final B4-005 Endosos visual delta and previously affected parts; do not repeat all 15 preserved module PASS",
+  "requiredOwnerOutcome": "Explicit acceptance of this exact source/build/artifact in Preview; no inference from assistant QA",
+  "ownerAccepted": false,
+  "noLivePromotion": true,
+  "b4007Pending": true,
+  "scopeAndCarriedFinding": "I6_5_B4_005_FORMAL_SCOPED_GATE_SEAL_20261107.json",
+  "recordedAtUtc": "2026-11-08T06:02:18.471Z"
+}
