@@ -187,7 +187,7 @@
     "phaseAIterationStatuses": "HISTORICAL_FIELDS_ABOVE_PRESERVED_UNTIL_FORMAL_GATE_EVIDENCE;_NO_NEW_PASS_INFERRED",
     "labDataWriteScope": "ONLY_35_AUTHORIZED_COUNTRY_FIELDS;_NO_AUGUST_REFRESH"
   },
-  "nextAction": "B4_004_SOURCE_FIX_CONTRACT_THEN_ONE_NEW_ARTIFACT_TO_EXISTING_ISOLATED_PREVIEW",
+  "nextAction": "B4_004_RETRIEVE_EXACT_PREVIEW_HOSTING_VERSION_AND_FRESH_LIVE_BINDING_THEN_PROMOTE_SAME_ARTIFACT_IF_GUARD_PASS",
   "sourceOfTruth": {
     "projectBoundaryPrevalentAddendum": "orbit360-platform/docs/recovery/ADDENDUM_PREVALENTE_CHATGPT_PROJECT_BOUNDARY_20260831.md",
     "mutableState": "orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json",
@@ -936,5 +936,17 @@
     "requiresNewArtifact": true,
     "productSourceChanged": true,
     "realBusinessWrites": 0
+  },
+  "b4004CronogramaCountryFocalPreviewPass20261107": {
+    "status": "CRONOGRAMA_COUNTRY_FOCAL_AUTHENTICATED_PREVIEW_PASS_LIVE_PENDING",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_004_CRONOGRAMA_COUNTRY_FOCAL_PREVIEW_PASS_20261107.json",
+    "receiptBlobSha": "173a22e30d656acfa2e543e83dfb3cc1dedd82ce",
+    "sourceSha": "f8fa00e4e2e6627cee66c8c521866874e39bc8da",
+    "buildId": "gi-i65-b4-f8fa00e4e2e6-57f234755dc1",
+    "artifactId": 13600357541,
+    "hostedPayloadDigest": "819e36b57ef5042ed37458f80274f9db45303e881b4f268c34dec8d4506c9d56",
+    "runId": 42437945576,
+    "authenticatedPreviewFocal": true,
+    "livePromoted": false
   }
 }
