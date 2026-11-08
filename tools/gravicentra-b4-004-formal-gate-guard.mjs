@@ -326,7 +326,7 @@ function verifyB4006ManagementCollaborationSource(cp,state){
     git('merge-base',r.sourcePredecessor,'HEAD')===r.sourcePredecessor&&
     git('rev-parse','HEAD:orbit360-platform/core/ciclo.js')===p.newCicloBlobSha&&
     blob(fs.readFileSync('orbit360-platform/core/ciclo.js'))===p.newCicloBlobSha&&
-    git('rev-parse','HEAD:'+p.testPath)===p.testBlobSha&&
+    git('rev-parse','HEAD:'+p.testPath)===(cp.b4006ManagementCollaborationBackendHardening20261108?.testBlobSha||p.testBlobSha)&&
     verifyB4006OwnerFinalVisualFeedbackSource(cp,state),
     'B4006_MGMT_COLLAB_RECEIPT');
   return true;
