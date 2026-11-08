@@ -4784,16 +4784,11 @@ jobs:
           node - <<'NODE'
           const fs=require('node:fs');
           const cp=JSON.parse(fs.readFileSync(process.env.CONTROL,'utf8'));
-          const p=JSON.parse(fs.readFileSync(process.env.PARTIAL_RECEIPT,'utf8'));
-          const a=cp.b4004CronogramaLiveSyntheticAuthorization20261107;
+          const prior=cp.b4004CronogramaLiveSyntheticAuthorization20261107;
+          const later=cp.b4004CronogramaSecondUidScopeAuthorization20261107;
           const c=cp.b4004PolicyCaptureFrontendSuccessor20261107;
-          const need=(v,c)=>{if(!v)throw Error(c);};
-          need(cp.nextAction==='B4_004_CRONOGRAMA_READONLY_SCOPE_403_DIAGNOSTIC_THEN_PERFORMANCE_AND_GATE_SEAL','B4004_READONLY_CURSOR');
-          need(a?.consumed===true&&Number(a.consumedByRunId)===42431729157,'B4004_SYNTHETIC_AUTH_MUST_BE_CONSUMED');
-          need(p?.status==='SYNTHETIC_EXECUTION_CONSUMED_CLEANUP_VERIFIED_SCOPE_HOLD'&&p?.passed?.syntheticFinalAbsent===true,'B4004_PARTIAL_RECEIPT');
-          need(c?.cronogramaLiveAcceptance?.status==='SYNTHETIC_CORE_LIVE_PASS_SCOPE_HOLD','B4004_CRONO_PARTIAL_STATE');
-          need(c.activeSourceSha===process.env.SOURCE_SHA&&c.activeBuildId===process.env.BUILD_ID&&String(c.activeImmutableArtifactId)===String(process.env.ARTIFACT_ID),'B4004_RELEASE_BINDING');
-          console.log('B4_004_CRONOGRAMA_READONLY_CURSOR=PASS');
+          if(prior?.consumed!==true||later?.authorized!==true||c?.cronogramaLiveAcceptance?.status!=='SYNTHETIC_CORE_LIVE_PASS_SCOPE_HOLD'||c.activeSourceSha!==process.env.SOURCE_SHA||c.activeBuildId!==process.env.BUILD_ID||String(c.activeImmutableArtifactId)!==String(process.env.ARTIFACT_ID))throw Error('B4004_EXACT_ABSENCE_READONLY_PREFLIGHT');
+          console.log('B4_004_EXACT_ABSENCE_READONLY_PREFLIGHT_PASS');
           NODE
       - name: Prepare existing service account and browser dependencies
         run: |
