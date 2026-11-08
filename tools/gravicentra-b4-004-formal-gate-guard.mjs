@@ -518,7 +518,7 @@ export function verifyDeclaredB4005SourceSuccessor(cp=read(CP),state=read(STATE)
       'orbit360-platform/modules/issuance-endosos-v1201-bridge.js',
       'orbit360-platform/modules/issuance-endosos-v1201-refinements.js',
       'orbit360-platform/modules/policy-receipts-v1199-detail-guard.js'
-    ].concat(visualPaths,cp.b4006VisualUnificationSuccessor20261108?['orbit360-platform/modules/cobros.js']:[],cp.b4006ManagementCollaborationSourceSuccessor20261108?['orbit360-platform/core/ciclo.js']:[],cp.b4006ManagementCollaborationBackendHardening20261108?['orbit360-platform/data/store-firestore-product-operational-p0.js']:[]).sort();
+    ].concat(visualPaths,cp.b4006VisualUnificationSuccessor20261108?['orbit360-platform/modules/cobros.js']:[],cp.b4006ManagementCollaborationSourceSuccessor20261108?['orbit360-platform/core/ciclo.js']:[]).sort();
     need(same(changed,expected),'B4005_CAUSAL_UNDECLARED_PRODUCT_CHANGE');
     const declared=receipt.sourceAndTests||[];
     need(declared.length===4&&same(declared.map(x=>x.path).sort(),[
@@ -528,8 +528,9 @@ export function verifyDeclaredB4005SourceSuccessor(cp=read(CP),state=read(STATE)
       'tools/gravicentra-b4-005-endosos-durable-contract.mjs'
     ].sort()),'B4005_CAUSAL_CHANGED_FILES_MISMATCH');
     for(const f of declared){
-      const expectedB4005Blob=(f.path==='functions/product-ops-leads-domain.js'&&cp.b4006ManagementCollaborationBackendHardening20261108)
-        ? cp.b4006ManagementCollaborationBackendHardening20261108.newBackendBlobSha : f.gitBlobSha;
+      const successor=cp.b4006ManagementCollaborationBackendHardening20261108;
+      const expectedB4005Blob=(successor&&f.path==='functions/product-ops-leads-domain.js')?successor.newBackendBlobSha:
+        (successor&&f.path==='orbit360-platform/data/store-firestore-product-operational-p0.js')?successor.newWriterBlobSha:f.gitBlobSha;
       need(git('rev-parse','HEAD:'+f.path)===expectedB4005Blob&&
         blob(fs.readFileSync(f.path))===expectedB4005Blob,'B4005_CAUSAL_CHANGED_BLOB_'+f.path);
     }
