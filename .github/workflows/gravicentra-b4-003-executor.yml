@@ -54,6 +54,7 @@ on:
       - 'tools/gravicentra-b4-004-policy-capture-live-qa.test.mjs'
       - 'artifacts/orbit360-recovery/release-control/I6_5_B4_004_CRONOGRAMA_LIVE_SYNTHETIC_OWNER_AUTH_20261107.json'
       - 'tools/gravicentra-b4-004-cronograma-live-qa.test.mjs'
+      - 'tools/gravicentra-b4-003-cronograma-durable-task.test.cjs'
       - 'tools/gravicentra-b4-004-cronograma-live-qa.mjs'
       - 'tools/gravicentra-b4-004-cronograma-live-readonly-scope.mjs'
       - 'artifacts/orbit360-recovery/release-control/I6_5_B4_004_LONG_BLOCK_EXECUTION_PROTOCOL_20261107.json'
