@@ -1087,5 +1087,22 @@
     "formalB4005Pass": false,
     "realDataWrites": 0,
     "nextExecution": "B4_005_NEW_EXACT_PREVIEW_BUILD_ONE_OPS_PREVIEW_BACKEND_ONLY_AUTHENTICATED_SYNTHETIC_REQUEST_APPROVAL_APPLY_RELOAD_CERTIFICATION"
+  },
+  "b4005EndososAuthenticatedPreviewFinalReadback20261107": {
+    "gate": "I6.5/B4-005",
+    "status": "AUTHENTICATED_SYNTHETIC_PREVIEW_ENDOSO_LIFECYCLE_FOCAL_PASS_FULL_B4005_PENDING",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_005_ENDOSOS_AUTHENTICATED_PREVIEW_E2E_AND_FINAL_READBACK_20261107.json",
+    "receiptBlobSha": "f16198d6a31f218b28c80ed02a95c1dc881df999",
+    "receiptSha256": "599920b05883038fdc311663979159e1fafee4c7f4254b27efdd7a118038d641",
+    "finalExactPreviewSourceSha": "6c2266311b156b4a5d19be456bcef197a43b888e",
+    "finalImmutableArtifactId": 13605062717,
+    "finalPreviewRunId": 42450363493,
+    "sharedGovernanceGuardRunId": 42450363488,
+    "syntheticDurableEndosoLifecycleObserved": true,
+    "previousB4003B4004PassPreserved": true,
+    "firstIncompleteGate": "B4-005",
+    "formalB4005Pass": false,
+    "livePromoted": false,
+    "nextExecution": "B4_005_ONLY_UNCOVERED_AUTHENTICATED_E2E_AND_R15_09_CARRY_RECONCILIATION_NO_PRIOR_PASS_RETEST"
   }
 }
