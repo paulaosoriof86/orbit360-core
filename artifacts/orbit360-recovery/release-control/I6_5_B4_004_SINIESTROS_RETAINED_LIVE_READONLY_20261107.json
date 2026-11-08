@@ -1,0 +1,126 @@
+{
+  "schema": "GRAVICENTRA_B4_004_SINIESTROS_RETAINED_SOURCE_LIVE_READONLY_V1",
+  "status": "SINIESTROS_RETAINED_SOURCE_TWO_UID_LIVE_READONLY_FOCAL_PASS",
+  "runId": "42441020887",
+  "sourceSha": "f8fa00e4e2e6627cee66c8c521866874e39bc8da",
+  "buildId": "gi-i65-b4-f8fa00e4e2e6-57f234755dc1",
+  "artifactId": 13600357541,
+  "hostingVersion": "sites/ays-orbit-360-lab/versions/439cb977fd4649d1",
+  "siniestrosSourceBlob": "f52c2046157f0bc72008e09e826d34d05eeb668b",
+  "authAccountsChanged": 0,
+  "membershipWrites": 0,
+  "operationalWrites": 0,
+  "writeAttempts": 0,
+  "productChanges": 0,
+  "actors": [
+    {
+      "uidHash": "f612197b077c598edd61d757c1e2995be7a3b17300602ce4802bccefed216a72",
+      "role": "direccion",
+      "country": "GT"
+    },
+    {
+      "uidHash": "0c4b85787597056bcbb1a906ef7ebe18c1795946068b5f3da51c8b757dc52500",
+      "role": "operativo",
+      "country": "CO"
+    }
+  ],
+  "checks": [
+    {
+      "uidHash": "f612197b077c598edd61d757c1e2995be7a3b17300602ce4802bccefed216a72",
+      "role": "direccion",
+      "country": "GT",
+      "viewport": "1440x900",
+      "sessionUidMatched": true,
+      "routeVisible": true,
+      "formOpenedAndCancelled": true,
+      "reloadPass": true,
+      "claimRowsObserved": 0,
+      "firstRouteRenderMs": 2808,
+      "noBusinessWrite": true,
+      "pageErrors": [],
+      "networkFailures": []
+    },
+    {
+      "uidHash": "0c4b85787597056bcbb1a906ef7ebe18c1795946068b5f3da51c8b757dc52500",
+      "role": "operativo",
+      "country": "CO",
+      "viewport": "390x844",
+      "sessionUidMatched": true,
+      "routeVisible": true,
+      "formOpenedAndCancelled": true,
+      "reloadPass": true,
+      "claimRowsObserved": 0,
+      "firstRouteRenderMs": 2547,
+      "noBusinessWrite": true,
+      "pageErrors": [],
+      "networkFailures": []
+    }
+  ],
+  "errors": [],
+  "diagnostics": [
+    {
+      "actorUidHash": "f612197b077c598edd61d757c1e2995be7a3b17300602ce4802bccefed216a72",
+      "role": "direccion",
+      "country": "GT",
+      "observedRoute": "siniestros",
+      "firstRenderMs": 2808,
+      "modal": {
+        "client": true,
+        "policy": true,
+        "type": true,
+        "amount": true,
+        "submit": true,
+        "cancel": true
+      },
+      "after": {
+        "route": "siniestros",
+        "bodyOk": true,
+        "noModal": true
+      },
+      "errors": [],
+      "requestFailures": [],
+      "controlledReloadAbortedFetches": 11,
+      "writeAttemptCount": 0
+    },
+    {
+      "actorUidHash": "0c4b85787597056bcbb1a906ef7ebe18c1795946068b5f3da51c8b757dc52500",
+      "role": "operativo",
+      "country": "CO",
+      "observedRoute": "siniestros",
+      "firstRenderMs": 2547,
+      "modal": {
+        "client": true,
+        "policy": true,
+        "type": true,
+        "amount": true,
+        "submit": true,
+        "cancel": true
+      },
+      "after": {
+        "route": "siniestros",
+        "bodyOk": true,
+        "noModal": true
+      },
+      "errors": [],
+      "requestFailures": [],
+      "controlledReloadAbortedFetches": 5,
+      "writeAttemptCount": 0
+    }
+  ],
+  "screenshots": [
+    {
+      "path": "/home/runner/work/_temp/b4004-siniestros-0.png",
+      "sha256": "9c2a46ee34c1fd441c2b8280b8d5fb5b4073f590d70273b1249604e5b74070e4"
+    },
+    {
+      "path": "/home/runner/work/_temp/b4004-siniestros-1.png",
+      "sha256": "4053fe36d31e3797fa5a9fad176a783f98e4df470dbe6c1f1643f6524c9571f1"
+    }
+  ],
+  "firstRenderMs": [
+    2808,
+    2547
+  ],
+  "noClaimsAssumed": false,
+  "previousApprovalRetained": true
+}

@@ -3333,7 +3333,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "B4_004_FORMAL_GATE_SEAL_AFTER_SINIESTROS_RETAINED_EVIDENCE_READBACK",
+  "nextAction": "B4_004_FINAL_RECEIPTS_LEDGER_GUARD_AND_FORMAL_GATE_SEAL",
   "postproductionExitProgress": {
     "formalPercent": 50,
     "frozenMiniGates": 5,
@@ -22048,5 +22048,19 @@
     "zeroBusinessWrites": true,
     "exactReadback": true,
     "roleCountryUiPass": true
+  },
+  "b4004SiniestrosRetainedLiveReadOnly20261107": {
+    "status": "SINIESTROS_RETAINED_SOURCE_TWO_UID_LIVE_READONLY_FOCAL_PASS",
+    "sourceSha": "f8fa00e4e2e6627cee66c8c521866874e39bc8da",
+    "buildId": "gi-i65-b4-f8fa00e4e2e6-57f234755dc1",
+    "artifactId": 13600357541,
+    "hostingVersion": "sites/ays-orbit-360-lab/versions/439cb977fd4649d1",
+    "siniestrosSourceBlob": "f52c2046157f0bc72008e09e826d34d05eeb668b",
+    "runId": 42441020887,
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_004_SINIESTROS_RETAINED_LIVE_READONLY_20261107.json",
+    "receiptSha256": "04fc4a1fcd20b5eb467e77ad753ffbffbfc5be5f8a88ae53af7f8f211c7ffe2c",
+    "dataWrites": 0,
+    "readOnly": true,
+    "scope": "UNCHANGED_SINIESTROS_FOCAL_UI_ROUTE_FORM_NO_SAVE_RELOAD_NOT_FULL_CRUD_RECERTIFICATION"
   }
 }
