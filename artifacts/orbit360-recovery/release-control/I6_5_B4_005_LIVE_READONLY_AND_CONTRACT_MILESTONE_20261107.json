@@ -1,8 +1,9 @@
 {
   "schema": "GRAVICENTRA_I6_5_B4_005_LIVE_READONLY_AND_CONTRACT_MILESTONE_V1",
   "gate": "I6.5/B4-005",
-  "status": "PARTIAL_EVIDENCE_READONLY_AND_SOURCE_CONTRACTS_PASS_FULL_E2E_NOT_CERTIFIED",
+  "status": "PARTIAL_EVIDENCE_AND_ISOLATED_ENDOSO_ASYNC_DEFECT_REPRODUCED_FULL_E2E_NOT_CERTIFIED",
   "observedAtUtc": "2026-11-08T03:57:38Z",
+  "updatedAtUtc": "2026-11-08T04:04:01Z",
   "canonicalRepository": "paulaosoriof86/orbit360-core",
   "canonicalBranch": "recovery/fase-a-clean-20260831",
   "currentProductSourceSha": "f8fa00e4e2e6627cee66c8c521866874e39bc8da",
@@ -75,13 +76,39 @@
       "observed": "9 QA-origin policies excluded from productive KPIs; synthetic policy details show GT/GTQ, linked insurer and client; Gestión dialog preselects policy and offers Emisión de certificado and Endoso de beneficiario; dialog cancelled",
       "result": "FOCAL_READONLY_RELATION_AND_UI_OPTIONS_OBSERVED",
       "limitation": "No actual certificate file, endorsement request persisted, or policy mutation/reload certified"
+    },
+    {
+      "case": "INSURER_KNOWLEDGE_RESPONSIVE_390_AND_320",
+      "route": "#/aseguradoras?ficha=gt-aseguradora-guatemalteca",
+      "observed": "At 390px viewport document scrollWidth 375px; at 320px viewport document scrollWidth 305px; knowledge tab and validated-source text remained present; no captured console errors",
+      "result": "FOCAL_MOBILE_NO_GLOBAL_OVERFLOW_PASS",
+      "limitation": "Not a full keyboard, scroll, screenshot, or multi-role responsive certification; viewport reset to desktop"
+    },
+    {
+      "case": "CANCELACIONES_ROLE_DIRECCION_COUNTRY_FILTER",
+      "route": "#/cancelaciones",
+      "observed": "All countries: 489 cancellation rows; Guatemala: 461 rows and 0 CO customer markers; Colombia: 28 rows and 0 GT customer markers; money remains separated by currency; restored Todos",
+      "result": "FOCAL_LIVE_READONLY_COUNTRY_SCOPE_PASS",
+      "limitation": "Only Paula Dirección identity, no edit, no persistence/reload or second backend UID proof"
     }
   ],
   "focusedWriteContractGap": {
     "owner": "orbit360-platform/core/endorsement-workflow-v1201.js",
-    "currentCodeObservation": "endorsements.createRequest/apply use fire-and-forget store.insert/store.update; operational store overrides these with asynchronous callDurable(...).catch(...) while insertDurable/updateDurable await server confirmation",
-    "status": "PERSISTENCE_RACE_RISK_CODE_OBSERVED_LIVE_RELOAD_REPRO_PENDING",
-    "action": "Prove on isolated authorized synthetic Preview with server readback; correct owner only if reproduced; then rebuild and recertify artifact if source changes",
+    "currentCodeObservation": "endorsements.createRequest/apply use fire-and-forget store.insert/store.update; operational store overrides these with asynchronous callDurable(...).catch(...) while insertDurable/updateDurable await server confirmation. Payment endorsement calls async policyReceipts.updatePolicy without await, then returns before applying final request stage",
+    "status": "DETERMINISTIC_ASYNC_CONTRACT_DEFECT_REPRODUCED_ISOLATED_NO_LIVE_WRITE",
+    "isolatedDeterministicReproduction": {
+      "environment": "Node vm evaluating current endorsement-workflow-v1201.js with in-memory store and asynchronous mock policyReceipts.updatePolicy; no Firebase or user data",
+      "requestCreated": true,
+      "applyReturnType": "Promise",
+      "resolvedUpdateOk": true,
+      "policyPaymentFrequencyAfter": "Mensual",
+      "requestEndorsementStageAfter": "APROBADO_PENDIENTE_APLICACION",
+      "expectedStage": "APLICADO",
+      "result": "FAIL_REAL_CONTRACT_GAP",
+      "operationalWrites": 0
+    },
+    "currentDisplayOwnerGap": "The modern policy-receipts-v1199-detail-guard.js overrides the old Cliente360 detail UI, shows Historial y endosos but omits its earlier + Endoso / gestión button; the generic Ops form alone is not proof of the typed endorsement workflow",
+    "action": "Make one causal scoped fix for async endorsement persistence/application and restore typed entry point in canonical detail owner; first validate isolated mock and authorized Preview synthetic durable readback, then new immutable build and exact release certification",
     "doNotClaim": "That the live write failed or that all prior Endosos work is unusable"
   },
   "historicalWorkPreserved": {
@@ -99,7 +126,7 @@
     "B4-003-R11-14-INSURER-TARIFF-SOURCE-BACKLOG",
     "B4-003-R11-15-COTCOMP-CROSSPROJECT-HANDOFF"
   ],
-  "nextAction": "B4_005_REUSE_ALL_SIGNED_EVIDENCE; ISOLATED_SYNTHETIC_PREVIEW_DURABLE_ENDORSEMENT_CERTIFICATE_ANNEX_PROOF; R11_SOURCE_AND_ROLE_CONTRACT_READBACK; EXACT_ROLE_COUNTRY_VIEWPORT_E2E_ONLY_UNCOVERED_CELLS",
+  "nextAction": "B4_005_CAUSAL_ENDOSO_ASYNC_AND_DETAIL_OWNER_FIX_WITH_MOCK_TEST; ISOLATED_SYNTHETIC_PREVIEW_DURABLE_READBACK; CERTIFICATE_ANNEX_CONTRACT; R11_SOURCE_AND_ROLE_READBACK; EXACT_UNCOVERED_ROLE_COUNTRY_VIEWPORT_E2E",
   "productSourceChanged": false,
   "operationalDataMutated": false,
   "isFormalB4005Pass": false,
