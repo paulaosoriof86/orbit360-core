@@ -13,7 +13,7 @@ concurrency:
 env:
   PROJECT_ID: ays-orbit-360-lab
   FUNCTION_NAME: siniestrosPublicResolverS512D
-  EXPECTED_PARENT: 5ee628c09049ea86eeb0a72b098fce302cd7b0ff
+  EXPECTED_PARENT: 7a4613c7744c1fb0379a1ec432b8555479457d34
   WORKFLOW_PATH: .github/workflows/siniestros-s512d-function-only-lab-20261023.yml
 jobs:
   publish:
@@ -129,8 +129,8 @@ jobs:
           test "$CODE" = 400
           CODE="$(curl -sS --max-time 20 -o "$RUNNER_TEMP/s512d/probes/post" -w '%{http_code}' -X POST "$URL" -H 'Origin: https://aysseguros.com')"
           test "$CODE" = 405
-          node <<'NODE'
-          const assert=require('node:assert/strict');
+          node --input-type=module <<'NODE'
+          import assert from 'node:assert/strict';
           const base='https://us-central1-ays-orbit-360-lab.cloudfunctions.net/siniestrosPublicResolverS512D';
           const origin='https://ays-web-publica.web.app';
           const validated=[
