@@ -1,0 +1,221 @@
+# B4-007 owner-authorized LIVE transport. Exact retained Hosting and backend;
+# same Firebase tenant, no rebuild, data import, Auth, Rules or IAM changes.
+# A separate temporary channel stores the preexisting LIVE version for rollback.
+name: Gravicentra B4-007 Exact LIVE Promotion
+on:
+  push:
+    branches: [recovery/fase-a-clean-20260831]
+    paths:
+      - .github/workflows/gravicentra-b4-007-exact-live-promotion.yml
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: gravicentra-b4-007-exact-live-promotion
+  cancel-in-progress: false
+jobs:
+  promote:
+    if: github.repository == 'paulaosoriof86/orbit360-core' && github.ref == 'refs/heads/recovery/fase-a-clean-20260831'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 65
+    env:
+      PROJECT_ID: ays-orbit-360-lab
+      SITE: ays-orbit-360-lab
+      SOURCE_SHA: 45020d748dd5fa4328a96f99fe9919a6fcb207eb
+      BUILD_ID: gi-i65-b4-45020d748dd5-57f234755dc1
+      ARTIFACT_ID: '13681376540'
+      ARTIFACT_DIGEST: sha256:74a1120fd9abe9533a709baa882fdf656d09206702a57f80672bc677f16147ef
+      ARTIFACT_RUN: '42632631502'
+      PREVIEW_CHANNEL: gi-i65-b4-rc-41765742748
+      PREVIEW_URL: https://ays-orbit-360-lab--gi-i65-b4-rc-41765742748-neoi3u7r.web.app
+      LIVE_URL: https://ays-orbit-360-lab.web.app
+      CUSTOM_URL: https://app.aysseguros.com
+      PREVIOUS_LIVE_SHA: f8fa00e4e2e6627cee66c8c521866874e39bc8da
+      SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_LAB_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: recovery/fase-a-clean-20260831
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Fail closed on unapproved source or broken prior gates
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor "$SOURCE_SHA" HEAD
+          test -z "$(git diff --name-only "$SOURCE_SHA" HEAD -- functions orbit360-platform ':(exclude)orbit360-platform/docs/**')"
+          node tools/gravicentra-b4-004-formal-gate-guard.mjs
+          node tools/gravicentra-open-findings-continuity-guard-v1.mjs > "$RUNNER_TEMP/b4007-findings.json"
+          node - <<'NODE'
+          const s=require('./artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json').b4006FormalOwnerVisualGateSeal20261109||{};
+          if(s.status!=='CLOSED_PASS_SCOPED_TO_EXPLICIT_OWNER_VISUAL_ACCEPTANCE'||s.firstIncompleteGate!=='B4-007'||
+             s.sourceSha!==process.env.SOURCE_SHA||s.buildId!==process.env.BUILD_ID||
+             String(s.artifactId)!==process.env.ARTIFACT_ID||s.artifactDigest!==process.env.ARTIFACT_DIGEST||
+             s.ownerAcceptedExactPresentedVisual!==true||s.fullProductOrLiveCertification!==false)
+            throw Error('B4007_OWNER_SEAL_OR_PRODUCT_DRIFT');
+          NODE
+      - uses: actions/download-artifact@v4
+        with:
+          name: gi-b4005-immutable-release-bundle-42632631502
+          run-id: ${{ env.ARTIFACT_RUN }}
+          repository: ${{ github.repository }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: ${{ runner.temp }}/b4007-retained
+      - uses: actions/download-artifact@v4
+        with:
+          name: gi-b4005-preview-readback-42632631502
+          run-id: ${{ env.ARTIFACT_RUN }}
+          repository: ${{ github.repository }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: ${{ runner.temp }}/b4007-proof
+      - name: Confirm immutable bytes, exact Preview marker and unchanged LIVE
+        run: |
+          set -euo pipefail
+          ARCH="$RUNNER_TEMP/b4007-retained/b4005-exact-release-bundle.tar.gz"
+          test -s "$ARCH"
+          WANT=$(awk '{print $1}' "$RUNNER_TEMP/b4007-retained/b4005-exact-release-bundle.sha256")
+          test "$(sha256sum "$ARCH" | awk '{print $1}')" = "$WANT"
+          mkdir -p "$RUNNER_TEMP/b4007-packet"
+          tar -xzf "$ARCH" -C "$RUNNER_TEMP/b4007-packet" --no-same-owner
+          export B4007_ARCHIVE_SHA="$WANT"
+          node - <<'NODE'
+          const fs=require('fs'),r=process.env.RUNNER_TEMP;
+          const p=JSON.parse(fs.readFileSync(r+'/b4007-proof/b4005-exact-preview-proof.json'));
+          const b=JSON.parse(fs.readFileSync(r+'/b4007-packet/bundle/site/__recovery__/build.json'));
+          const cfg=JSON.parse(fs.readFileSync(r+'/b4007-packet/bundle/firebase.json'));
+          if(p.sourceSha!==process.env.SOURCE_SHA||p.buildId!==process.env.BUILD_ID||
+             String(p.artifactId)!==process.env.ARTIFACT_ID||
+             String(p.artifactZipSha256).replace(/^sha256:/,'')!==process.env.ARTIFACT_DIGEST.replace(/^sha256:/,'')||
+             p.archiveSha256!==process.env.B4007_ARCHIVE_SHA||p.allHostedFilesExact!==true||
+             p.previewUrl!==process.env.PREVIEW_URL||b.sourceSha!==process.env.SOURCE_SHA||
+             b.buildId!==process.env.BUILD_ID||cfg.hosting?.site!==process.env.SITE||
+             cfg.hosting?.public!=='site'||Object.keys(cfg).join(',')!=='hosting'||
+             !fs.existsSync(r+'/b4007-packet/bundle/backend/index.js'))
+            throw Error('B4007_EXACT_RETAINED_PACKET_PROOF_INVALID');
+          NODE
+          curl -fsSL --max-time 30 "$LIVE_URL/__recovery__/build.json?b4007=before" > "$RUNNER_TEMP/b4007-live-before.json"
+          curl -fsSL --max-time 30 "$PREVIEW_URL/__recovery__/build.json?b4007=before" > "$RUNNER_TEMP/b4007-preview-before.json"
+          node - <<'NODE'
+          const fs=require('fs'),r=process.env.RUNNER_TEMP;
+          const l=JSON.parse(fs.readFileSync(r+'/b4007-live-before.json'));
+          const p=JSON.parse(fs.readFileSync(r+'/b4007-preview-before.json'));
+          if(l.sourceSha!==process.env.PREVIOUS_LIVE_SHA||p.sourceSha!==process.env.SOURCE_SHA||p.buildId!==process.env.BUILD_ID)
+            throw Error('B4007_UNEXPECTED_LIVE_OR_PREVIEW_VERSION');
+          NODE
+      - name: Use existing matching Firebase authority; no IAM changes
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/b4007-auth"
+          node - <<'NODE'
+          const fs=require('fs'),path=require('path'),r=process.env.RUNNER_TEMP+'/b4007-auth',keys=['SA_LAB','SA_LAB_ALT','SA_DEFAULT'];
+          const xs=[];for(let i=0;i<keys.length;i++)try{const a=JSON.parse(process.env[keys[i]]||'');
+            if(a.type==='service_account'&&a.project_id===process.env.PROJECT_ID&&a.private_key){
+              const p=path.join(r,i+'.json');fs.writeFileSync(p,JSON.stringify(a),{mode:0o600});xs.push(p);}
+          }catch{}
+          if(!xs.length)throw Error('B4007_NO_CONFIGURED_SAME_PROJECT_SERVICE_ACCOUNT');
+          fs.writeFileSync(path.join(r,'candidates'),xs.join('\n')+'\n');
+          NODE
+          npm install --prefix "$RUNNER_TEMP/b4007-cli" --no-save --ignore-scripts --no-audit --no-fund firebase-tools@14.10.1 >/dev/null
+          node tools/gravicentra-firebase-tools-empty-extensions-workaround-v1.mjs "$RUNNER_TEMP/b4007-cli"
+          CLI="$RUNNER_TEMP/b4007-cli/node_modules/firebase-tools/lib/bin/firebase.js"
+          SEL=''
+          while IFS= read -r P;do
+            if GOOGLE_APPLICATION_CREDENTIALS="$P" node "$CLI" functions:list --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/b4007-before-functions.json" 2>/dev/null;then SEL="$P";break;fi
+          done < "$RUNNER_TEMP/b4007-auth/candidates"
+          test -n "$SEL"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$SEL" >> "$GITHUB_ENV"
+          echo "FIREBASE_CLI_BIN=$CLI" >> "$GITHUB_ENV"
+      - uses: google-github-actions/setup-gcloud@v2
+        with:
+          version: '>= 483.0.0'
+      - name: Capture old Cloud Run revision and Hosting channel before any mutation
+        id: baseline
+        run: |
+          set -euo pipefail
+          gcloud auth activate-service-account --key-file="$GOOGLE_APPLICATION_CREDENTIALS" --quiet >/dev/null
+          gcloud config set project "$PROJECT_ID" --quiet >/dev/null
+          gcloud functions describe orbit360OpsLeadsCommand --gen2 --region us-central1 --project "$PROJECT_ID" --format=json > "$RUNNER_TEMP/b4007-function-before.json"
+          node - <<'NODE'
+          const f=require('fs'),r=process.env.RUNNER_TEMP,v=JSON.parse(f.readFileSync(r+'/b4007-function-before.json'));
+          const service=String(v.serviceConfig?.service||'').split('/').pop();
+          if(!/^[a-z][a-z0-9-]+$/.test(service)||!String(v.serviceConfig?.service||'').includes('/locations/us-central1/services/'))
+            throw Error('B4007_PRODUCTION_FUNCTION_ROLLBACK_SERVICE_UNAVAILABLE');
+          f.writeFileSync(r+'/b4007-service-name',service);
+          NODE
+          SERV=$(cat "$RUNNER_TEMP/b4007-service-name")
+          gcloud run services describe "$SERV" --region us-central1 --project "$PROJECT_ID" --format=json > "$RUNNER_TEMP/b4007-run-before.json"
+          node - <<'NODE'
+          const fs=require('fs'),r=process.env.RUNNER_TEMP,v=JSON.parse(fs.readFileSync(r+'/b4007-run-before.json'));
+          const service=fs.readFileSync(r+'/b4007-service-name','utf8');
+          const traffic=v.status?.traffic||v.traffic||[];
+          const exact=traffic.filter(x=>Number(x.percent)===100);
+          const rev=String(exact[0]?.revisionName||exact[0]?.revision||'');
+          if(exact.length!==1||!rev.startsWith(service+'-'))throw Error('B4007_PREVIOUS_FUNCTION_REVISION_NOT_UNIQUE');
+          fs.writeFileSync(r+'/b4007-old-revision',rev);
+          NODE
+          echo "B4007_SERVICE=$SERV" >> "$GITHUB_ENV"
+          echo "B4007_OLD_REVISION=$(cat "$RUNNER_TEMP/b4007-old-revision")" >> "$GITHUB_ENV"
+          node "$FIREBASE_CLI_BIN" hosting:channel:list --site "$SITE" --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/b4007-channels-before.json"
+          grep -Fq "$PREVIEW_CHANNEL" "$RUNNER_TEMP/b4007-channels-before.json"
+          echo "ready=true" >> "$GITHUB_OUTPUT"
+      - name: Create temporary rollback-only copy of existing LIVE Hosting
+        id: backup
+        run: |
+          set -euo pipefail
+          RB="gi-b4007-rb-$GITHUB_RUN_ID"
+          node "$FIREBASE_CLI_BIN" hosting:clone "$SITE:live" "$SITE:$RB" --project "$PROJECT_ID" --non-interactive
+          node "$FIREBASE_CLI_BIN" hosting:channel:list --site "$SITE" --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/b4007-channels-backup.json"
+          grep -Fq "$RB" "$RUNNER_TEMP/b4007-channels-backup.json"
+          echo "B4007_ROLLBACK_CHANNEL=$RB" >> "$GITHUB_ENV"
+          echo "ready=true" >> "$GITHUB_OUTPUT"
+      - name: Deploy ONLY retained Ops backend then clone SAME certified Hosting version to LIVE
+        id: transport
+        run: |
+          set -euo pipefail
+          FROOT="$RUNNER_TEMP/b4007-functions";mkdir -p "$FROOT"
+          cp -a "$RUNNER_TEMP/b4007-packet/bundle/backend" "$FROOT/backend"
+          (cd "$FROOT/backend" && npm ci --ignore-scripts --no-audit --no-fund >/dev/null)
+          printf '{"functions":{"source":"backend"}}\n' > "$FROOT/firebase.json"
+          node "$FIREBASE_CLI_BIN" deploy --only functions:orbit360OpsLeadsCommand --config "$FROOT/firebase.json" --project "$PROJECT_ID" --non-interactive
+          echo "production_ops_function_deployed=true" >> "$GITHUB_OUTPUT"
+          node "$FIREBASE_CLI_BIN" hosting:clone "$SITE:$PREVIEW_CHANNEL" "$SITE:live" --project "$PROJECT_ID" --non-interactive
+          echo "live_hosting_promoted=true" >> "$GITHUB_OUTPUT"
+      - name: Read back all immutable LIVE bytes and custom domain
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-b4-007-exact-hosting-readback.mjs "$RUNNER_TEMP/b4007-packet/bundle/site" "$LIVE_URL" "$SOURCE_SHA" "$BUILD_ID" "$RUNNER_TEMP/b4007-live-readback.json"
+          curl -fsSL --max-time 30 "$CUSTOM_URL/__recovery__/build.json?b4007=domain" > "$RUNNER_TEMP/b4007-domain-marker.json"
+          node - <<'NODE'
+          const fs=require('fs'),r=process.env.RUNNER_TEMP;
+          const b=JSON.parse(fs.readFileSync(r+'/b4007-domain-marker.json'));
+          if(b.sourceSha!==process.env.SOURCE_SHA||b.buildId!==process.env.BUILD_ID)
+            throw Error('B4007_CUSTOM_DOMAIN_MARKER_NOT_EXACT');
+          NODE
+          node "$FIREBASE_CLI_BIN" functions:list --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/b4007-functions-after.json"
+          echo 'B4007_EXACT_LIVE_TRANSPORT_PASS. Role×country and real insurer write/reload certification pending.' >> "$GITHUB_STEP_SUMMARY"
+      - name: Automatically restore previous Hosting and function traffic on error
+        if: failure() && steps.backup.outputs.ready == 'true'
+        run: |
+          set +e
+          gcloud run services update-traffic "$B4007_SERVICE" --to-revisions="$B4007_OLD_REVISION=100" --region us-central1 --project "$PROJECT_ID" --quiet
+          FRC=$?
+          node "$FIREBASE_CLI_BIN" hosting:clone "$SITE:$B4007_ROLLBACK_CHANNEL" "$SITE:live" --project "$PROJECT_ID" --non-interactive
+          HRC=$?
+          printf '{"functionTrafficRestored":%s,"hostingRestored":%s}\n' "$([ "$FRC" = 0 ] && echo true || echo false)" "$([ "$HRC" = 0 ] && echo true || echo false)" > "$RUNNER_TEMP/b4007-rollback-result.json"
+          test "$FRC" = 0 && test "$HRC" = 0
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: gi-b4007-live-transport-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/b4007-live-before.json
+            ${{ runner.temp }}/b4007-preview-before.json
+            ${{ runner.temp }}/b4007-live-readback.json
+            ${{ runner.temp }}/b4007-domain-marker.json
+            ${{ runner.temp }}/b4007-rollback-result.json
+          if-no-files-found: warn
+          retention-days: 30
