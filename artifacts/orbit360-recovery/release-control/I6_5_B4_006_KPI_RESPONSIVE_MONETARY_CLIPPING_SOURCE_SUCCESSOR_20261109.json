@@ -1,0 +1,66 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_006_KPI_RESPONSIVE_MONETARY_CLIPPING_SOURCE_SUCCESSOR_V1",
+  "gate": "I6.5/B4-006",
+  "status": "SOURCE_CAUSAL_FIX_DECLARED_NEW_IMMUTABLE_PREVIEW_REQUIRED",
+  "sourcePredecessorSha": "5965566df806283f95309add173f5f30c91a16d1",
+  "parentArtifactId": 13639312174,
+  "priorCssBlobSha": "cbfc1256d984e33c1eb436025b3708169ab43e0a",
+  "newCssBlobSha": "82dee9afe89fd9c12dfa32e13a2af2d922d37545",
+  "priorQaBlobSha": "94775402f9fa5cb5cf3d6b0d8c18639d25cc527b",
+  "newQaBlobSha": "9a644dfa8254fad6177924fef2807300c756d0cf",
+  "changedProductPaths": [
+    "orbit360-platform/styles/infra.css"
+  ],
+  "changedTestPaths": [
+    "tools/gravicentra-b4-006-global-visual.test.cjs"
+  ],
+  "causalEvidence": {
+    "environment": "Authenticated Paula Osorio, immutable Hosting Preview from GitHub Actions 42535653892",
+    "route": "/cobros",
+    "widths": [
+      {
+        "viewportPx": 320,
+        "observed": "ONE_COLUMN_NO_KPI_CLIPPING"
+      },
+      {
+        "viewportPx": 390,
+        "observed": "TWO_COLUMNS_COP_AMOUNT_CLIPPED",
+        "cardWidthPx": 169,
+        "scrollWidthPx": 174
+      },
+      {
+        "viewportPx": 1024,
+        "observed": "FOUR_COLUMNS_COP_AMOUNT_OVERFLOW",
+        "cardWidthPx": 165,
+        "scrollWidthPx": 174
+      },
+      {
+        "viewportPx": 1440,
+        "observed": "FOUR_COLUMNS_FULL_AMOUNT_FITS"
+      }
+    ]
+  },
+  "correction": {
+    "cssMediaMaxWidthTabletPx": 1240,
+    "columnsTablet": 2,
+    "cssMediaMaxWidthSmallPx": 540,
+    "columnsSmall": 1,
+    "pathsChangedOnlyCssAndQa": true,
+    "businessLogicChanged": false,
+    "backendChanged": false,
+    "rulesChanged": false,
+    "reimport": false
+  },
+  "certification": {
+    "staticSourceQa": "PENDING_NEW_GITHUB_ACTIONS",
+    "authenticatedVisualQa": "PENDING_NEW_EXACT_PREVIEW",
+    "ownerAcceptance": "PENDING",
+    "production": "HOLD"
+  },
+  "safety": {
+    "operationalWrites": 0,
+    "liveDeploys": 0,
+    "sameCanonicalBranch": true
+  },
+  "nextAction": "B4_006_BUILD_NEW_EXACT_PREVIEW_FOR_390_AND_1024_KPI_RESPONSIVE_FIX_THEN_AUTHENTICATED_VISUAL_RECHECK"
+}

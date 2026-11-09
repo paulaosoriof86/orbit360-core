@@ -22507,5 +22507,26 @@
     "liveDeploys": 0,
     "oneCanonicalPreviewChannel": true,
     "nextAction": "B4_006_BUILD_EXACT_PREVIEW_FOR_CAUSAL_320PX_KPI_FIX_THEN_FOCAL_RESPONSIVE_RECHECK"
+  },
+  "b4006KpiResponsiveWidthsCausalSuccessor20261109": {
+    "gate": "I6.5/B4-006",
+    "status": "SOURCE_CAUSAL_FIX_DECLARED_NEW_IMMUTABLE_PREVIEW_REQUIRED",
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_006_KPI_RESPONSIVE_MONETARY_CLIPPING_SOURCE_SUCCESSOR_20261109.json",
+    "receiptBlobSha": "3a4006106b98829353896edb615185cfdaa91464",
+    "sourcePredecessorSha": "5965566df806283f95309add173f5f30c91a16d1",
+    "parentArtifactId": 13639312174,
+    "priorCssBlobSha": "cbfc1256d984e33c1eb436025b3708169ab43e0a",
+    "newCssBlobSha": "82dee9afe89fd9c12dfa32e13a2af2d922d37545",
+    "priorQaBlobSha": "94775402f9fa5cb5cf3d6b0d8c18639d25cc527b",
+    "newQaBlobSha": "9a644dfa8254fad6177924fef2807300c756d0cf",
+    "firstIncompleteGate": "B4-006",
+    "lastClosedGate": "B4-005",
+    "ownerAcceptedExactArtifact": false,
+    "newExactPreviewRequired": true,
+    "realDataWrites": 0,
+    "liveDeploys": 0,
+    "reimport": false,
+    "oneCanonicalPreviewChannel": true,
+    "nextAction": "B4_006_BUILD_NEW_EXACT_PREVIEW_FOR_390_AND_1024_KPI_RESPONSIVE_FIX_THEN_AUTHENTICATED_VISUAL_RECHECK"
   }
 }

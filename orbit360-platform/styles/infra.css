@@ -2176,3 +2176,13 @@ table.tbl tbody tr:hover{background:#fcebef;}
   .page .kpi-row{grid-template-columns:minmax(0,1fr)!important;}
   .page .kpi{min-width:0;}
 }
+
+/* B4-006 · corrección causal de importes KPI recortados en 390/1024 px;
+   mantener las tarjetas completas, sin alterar datos, renderers ni navegación. */
+@media(max-width:1240px){
+  .page .kpi-row{grid-template-columns:repeat(2,minmax(0,1fr))!important;}
+  .page .kpi{min-width:0;}
+}
+@media(max-width:540px){
+  .page .kpi-row{grid-template-columns:minmax(0,1fr)!important;}
+}

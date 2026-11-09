@@ -39,6 +39,7 @@ const B4006_MGMT_COLLAB_BACKEND_RECEIPT=ROOT+'I6_5_B4_006_OPS_MANAGEMENT_COLLABO
 const B4006_MGMT_COLLAB_BACKEND_ACTION='B4_006_DEPLOY_EXACT_PREVIEW_MANAGEMENT_COLLAB_BACKEND_AND_HOSTING_THEN_E2E';
 const B4006_KPI320_ACTION='B4_006_BUILD_EXACT_PREVIEW_FOR_CAUSAL_320PX_KPI_FIX_THEN_FOCAL_RESPONSIVE_RECHECK';
 const B4006_GLOBAL_VISUAL_RECEIPT=ROOT+'I6_5_B4_006_GLOBAL_TABLE_CARD_SYSTEM_SOURCE_SUCCESSOR_20261108.json';
+const B4006_KPI_RESPONSIVE_RECEIPT=ROOT+'I6_5_B4_006_KPI_RESPONSIVE_MONETARY_CLIPPING_SOURCE_SUCCESSOR_20261109.json';
 const SOURCE='f8fa00e4e2e6627cee66c8c521866874e39bc8da';
 const BUILD='gi-i65-b4-f8fa00e4e2e6-57f234755dc1';
 const ARTIFACT=13600357541;
@@ -140,7 +141,7 @@ function verifyB4006RealInsurerVisualSource(cp,state){
     p.realDataWrites===0&&p.liveDeploys===0&&p.oneCanonicalPreviewChannel===true,
     'B4006_OWNER_REJECTED_VISUAL_POINTER');
   const activeStylesBlob=cp.b4006RealInsurerVisualMicroRefinement20261108 ? verifyB4006RealInsurerVisualMicroRefinement(cp,state,p.newStylesBlobSha) : p.newStylesBlobSha;
-  const finalStylesBlob=cp.b4006Kpi320MobileCardClippingCausalFix20261108?.newCssBlobSha||cp.b4006GlobalTableCardSystemSourceSuccessor20261108?.newCssBlobSha||cp.b4006OwnerFinalVisualFeedbackSourceSuccessor20261108?.newStylesBlobSha||cp.b4006VisualPolishMicroRefinement20261108?.newStylesBlobSha||cp.b4006VisualUnificationSuccessor20261108?.newStylesBlobSha||activeStylesBlob;
+  const finalStylesBlob=cp.b4006KpiResponsiveWidthsCausalSuccessor20261109?.newCssBlobSha||cp.b4006Kpi320MobileCardClippingCausalFix20261108?.newCssBlobSha||cp.b4006GlobalTableCardSystemSourceSuccessor20261108?.newCssBlobSha||cp.b4006OwnerFinalVisualFeedbackSourceSuccessor20261108?.newStylesBlobSha||cp.b4006VisualPolishMicroRefinement20261108?.newStylesBlobSha||cp.b4006VisualUnificationSuccessor20261108?.newStylesBlobSha||activeStylesBlob;
   const r=readPinned(B4006_OWNER_SOURCE_RECEIPT,p.receiptBlobSha);
   need(r.schema==='GRAVICENTRA_I6_5_B4_006_REAL_INSURER_VISUAL_HIERARCHY_SOURCE_SUCCESSOR_V1'&&
     r.gate==='I6.5/B4-006'&&r.status===p.status&&
@@ -268,6 +269,39 @@ function verifyB4006ExactPolishPreviewReadback(cp,state){
 }
 
 
+
+function verifyB4006KpiResponsiveMonetaryClippingSuccessor(cp,state,priorCssBlob,priorQaBlob){
+  const p=cp.b4006KpiResponsiveWidthsCausalSuccessor20261109;
+  need(p&&same(p,state.b4006KpiResponsiveWidthsCausalSuccessor20261109)&&
+    p.gate==='I6.5/B4-006'&&p.status==='SOURCE_CAUSAL_FIX_DECLARED_NEW_IMMUTABLE_PREVIEW_REQUIRED'&&
+    p.receiptPath===B4006_KPI_RESPONSIVE_RECEIPT&&p.receiptBlobSha==='3a4006106b98829353896edb615185cfdaa91464'&&
+    p.sourcePredecessorSha==='5965566df806283f95309add173f5f30c91a16d1'&&
+    p.parentArtifactId===13639312174&&p.priorCssBlobSha===priorCssBlob&&p.priorQaBlobSha===priorQaBlob&&
+    p.newCssBlobSha==='82dee9afe89fd9c12dfa32e13a2af2d922d37545'&&p.newQaBlobSha==='9a644dfa8254fad6177924fef2807300c756d0cf'&&
+    p.lastClosedGate==='B4-005'&&p.firstIncompleteGate==='B4-006'&&
+    p.ownerAcceptedExactArtifact===false&&p.newExactPreviewRequired===true&&
+    p.realDataWrites===0&&p.liveDeploys===0&&p.reimport===false&&p.oneCanonicalPreviewChannel===true,
+    'B4006_KPI_RESPONSIVE_POINTER');
+  const r=readPinned(p.receiptPath,p.receiptBlobSha);
+  need(r.schema==='GRAVICENTRA_I6_5_B4_006_KPI_RESPONSIVE_MONETARY_CLIPPING_SOURCE_SUCCESSOR_V1'&&
+    r.gate===p.gate&&r.status===p.status&&r.sourcePredecessorSha===p.sourcePredecessorSha&&
+    r.parentArtifactId===p.parentArtifactId&&r.priorCssBlobSha===p.priorCssBlobSha&&
+    r.priorQaBlobSha===p.priorQaBlobSha&&r.newCssBlobSha===p.newCssBlobSha&&r.newQaBlobSha===p.newQaBlobSha&&
+    same(r.changedProductPaths,['orbit360-platform/styles/infra.css'])&&
+    same(r.changedTestPaths,['tools/gravicentra-b4-006-global-visual.test.cjs'])&&
+    r.correction?.businessLogicChanged===false&&r.correction?.backendChanged===false&&
+    r.correction?.rulesChanged===false&&r.correction?.reimport===false&&
+    r.certification?.authenticatedVisualQa==='PENDING_NEW_EXACT_PREVIEW'&&
+    r.certification?.production==='HOLD'&&r.safety?.operationalWrites===0&&r.safety?.liveDeploys===0&&
+    git('merge-base',r.sourcePredecessorSha,'HEAD')===r.sourcePredecessorSha&&
+    git('rev-parse','HEAD:orbit360-platform/styles/infra.css')===p.newCssBlobSha&&
+    git('rev-parse','HEAD:tools/gravicentra-b4-006-global-visual.test.cjs')===p.newQaBlobSha&&
+    blob(fs.readFileSync('orbit360-platform/styles/infra.css'))===p.newCssBlobSha&&
+    blob(fs.readFileSync('tools/gravicentra-b4-006-global-visual.test.cjs'))===p.newQaBlobSha,
+    'B4006_KPI_RESPONSIVE_RECEIPT');
+  return {css:p.newCssBlobSha,qa:p.newQaBlobSha};
+}
+
 function verifyB4006Kpi320MobileCardClippingFix(cp,state,priorStylesBlob){
   const p=cp.b4006Kpi320MobileCardClippingCausalFix20261108;
   need(p&&same(p,state.b4006Kpi320MobileCardClippingCausalFix20261108)&&
@@ -286,6 +320,9 @@ function verifyB4006Kpi320MobileCardClippingFix(cp,state,priorStylesBlob){
     p.logicChanged===false&&p.realDataWrites===0&&p.liveDeploys===0&&p.oneCanonicalPreviewChannel===true&&
     p.nextAction===B4006_KPI320_ACTION,'B4006_KPI320_POINTER');
   const r=readPinned(p.receiptPath,p.receiptBlobSha);
+  const responsive=cp.b4006KpiResponsiveWidthsCausalSuccessor20261109?
+    verifyB4006KpiResponsiveMonetaryClippingSuccessor(cp,state,p.newCssBlobSha,p.newQaBlobSha):
+    {css:p.newCssBlobSha,qa:p.newQaBlobSha};
   need(r.schema==='GRAVICENTRA_I6_5_B4_006_KPI_320_MOBILE_CARD_CLIPPING_CAUSAL_FIX_V1'&&
     r.gate===p.gate&&r.status==='CAUSAL_CSS_FIX_SOURCE_DECLARED_EXACT_PREVIEW_PENDING'&&
     r.sourcePredecessorSha===p.sourcePredecessorSha&&r.governancePredecessorHead===p.predecessorHead&&
@@ -295,10 +332,10 @@ function verifyB4006Kpi320MobileCardClippingFix(cp,state,priorStylesBlob){
     r.correctiveScope?.logicChanged===false&&r.correctiveScope?.dataChanged===false&&
     r.correctiveScope?.authOrRulesChanged===false&&r.regressionTest?.path==='tools/gravicentra-b4-006-global-visual.test.cjs'&&
     r.nextAction===B4006_KPI320_ACTION&&git('merge-base',r.sourcePredecessorSha,'HEAD')===r.sourcePredecessorSha&&
-    git('rev-parse','HEAD:orbit360-platform/styles/infra.css')===p.newCssBlobSha&&
-    git('rev-parse','HEAD:tools/gravicentra-b4-006-global-visual.test.cjs')===p.newQaBlobSha,
+    git('rev-parse','HEAD:orbit360-platform/styles/infra.css')===responsive.css&&
+    git('rev-parse','HEAD:tools/gravicentra-b4-006-global-visual.test.cjs')===responsive.qa,
     'B4006_KPI320_RECEIPT');
-  return p.newCssBlobSha;
+  return responsive.css;
 }
 
 function verifyB4006GlobalTableCardSystemSourceSuccessor(cp,state){
@@ -312,7 +349,7 @@ function verifyB4006GlobalTableCardSystemSourceSuccessor(cp,state){
     p.ownerApprovedScope===true&&p.ownerAcceptedExactArtifact===false&&p.noLive===true&&p.noDataWrites===true,
     'B4006_GLOBAL_VISUAL_POINTER');
   const activeCssBlob=cp.b4006Kpi320MobileCardClippingCausalFix20261108 ? verifyB4006Kpi320MobileCardClippingFix(cp,state,p.newCssBlobSha) : p.newCssBlobSha;
-  const activeQaBlob=cp.b4006Kpi320MobileCardClippingCausalFix20261108?.newQaBlobSha||p.qaBlobSha;
+  const activeQaBlob=cp.b4006KpiResponsiveWidthsCausalSuccessor20261109?.newQaBlobSha||cp.b4006Kpi320MobileCardClippingCausalFix20261108?.newQaBlobSha||p.qaBlobSha;
   const r=readPinned(B4006_GLOBAL_VISUAL_RECEIPT,p.receiptBlobSha);
   need(r.schema==='GRAVICENTRA_I6_5_B4_006_GLOBAL_TABLE_CARD_SYSTEM_SOURCE_SUCCESSOR_V1'&&
     r.gate===p.gate&&r.status===p.status&&r.decision==='PAULA_APPROVED_TRANSVERSAL_VISUAL_CONSISTENCY'&&
@@ -367,7 +404,7 @@ function verifyB4006OwnerFinalVisualFeedbackSource(cp,state){
     git('merge-base',r.sourcePredecessor,'HEAD')===r.sourcePredecessor&&
     (cp.b4006GlobalTableCardSystemSourceSuccessor20261108
       ? git('rev-parse',cp.b4006GlobalTableCardSystemSourceSuccessor20261108.predecessorHead+':orbit360-platform/styles/infra.css')===p.newStylesBlobSha&&
-        verifyB4006GlobalTableCardSystemSourceSuccessor(cp,state)===(cp.b4006Kpi320MobileCardClippingCausalFix20261108?.newCssBlobSha||cp.b4006GlobalTableCardSystemSourceSuccessor20261108.newCssBlobSha)
+        verifyB4006GlobalTableCardSystemSourceSuccessor(cp,state)===(cp.b4006KpiResponsiveWidthsCausalSuccessor20261109?.newCssBlobSha||cp.b4006Kpi320MobileCardClippingCausalFix20261108?.newCssBlobSha||cp.b4006GlobalTableCardSystemSourceSuccessor20261108.newCssBlobSha)
       : git('rev-parse','HEAD:orbit360-platform/styles/infra.css')===p.newStylesBlobSha&&
         blob(fs.readFileSync('orbit360-platform/styles/infra.css'))===p.newStylesBlobSha)&&
     verifyB4006ExactPolishPreviewReadback(cp,state),
@@ -578,7 +615,7 @@ export function verifyDeclaredB4005SourceSuccessor(cp=read(CP),state=read(STATE)
       const latestCssBlob=cp.b4006RealInsurerVisualSuccessor20261108 ? verifyB4006RealInsurerVisualSource(cp,state) : null;
       const unificationActive=cp.b4006VisualUnificationSuccessor20261108 ? verifyB4006VisualUnificationSuccessor(cp,state) : false;
       for(const file of r.changedProductPaths){
-        const expectedBlob=unificationActive&&file.path==='orbit360-platform/styles/infra.css'?(cp.b4006Kpi320MobileCardClippingCausalFix20261108?.newCssBlobSha||cp.b4006GlobalTableCardSystemSourceSuccessor20261108?.newCssBlobSha||cp.b4006OwnerFinalVisualFeedbackSourceSuccessor20261108?.newStylesBlobSha||cp.b4006VisualPolishMicroRefinement20261108?.newStylesBlobSha||cp.b4006VisualUnificationSuccessor20261108.newStylesBlobSha):(latestCssBlob&&file.path==='orbit360-platform/styles/infra.css'?latestCssBlob:file.gitBlobSha);
+        const expectedBlob=unificationActive&&file.path==='orbit360-platform/styles/infra.css'?(cp.b4006KpiResponsiveWidthsCausalSuccessor20261109?.newCssBlobSha||cp.b4006Kpi320MobileCardClippingCausalFix20261108?.newCssBlobSha||cp.b4006GlobalTableCardSystemSourceSuccessor20261108?.newCssBlobSha||cp.b4006OwnerFinalVisualFeedbackSourceSuccessor20261108?.newStylesBlobSha||cp.b4006VisualPolishMicroRefinement20261108?.newStylesBlobSha||cp.b4006VisualUnificationSuccessor20261108.newStylesBlobSha):(latestCssBlob&&file.path==='orbit360-platform/styles/infra.css'?latestCssBlob:file.gitBlobSha);
         need(git('rev-parse','HEAD:'+file.path)===expectedBlob&&
           blob(fs.readFileSync(file.path))===expectedBlob,
           'B4006_VISUAL_BLOB:'+file.path);
