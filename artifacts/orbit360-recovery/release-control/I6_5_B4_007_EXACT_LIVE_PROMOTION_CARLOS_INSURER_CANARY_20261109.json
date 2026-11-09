@@ -6,7 +6,7 @@
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "operationalDateGuatemala": "2026-11-09",
-  "recordedAtUtc": "2026-11-09T17:14:59.461Z",
+  "recordedAtUtc": "2026-11-09T17:20:15.463Z",
   "authority": {
     "owner": "Paula Andrea Osorio Franco",
     "releaseApproval": "Autorizó promoción controlada del mismo artefacto; B4-006 visual aprobado y sellado",
@@ -71,7 +71,25 @@
     "actualSecretRevealed": false,
     "bankAccountSectionVisible": true,
     "bankValuesCopied": false,
-    "fullSecretAndBankCredentialWriteE2e": false
+    "fullSecretAndBankCredentialWriteE2e": false,
+    "carlosReadOnlyModuleSmoke": {
+      "ops": {
+        "result": "PASS_FOCAL_READ_AND_KANBAN_RENDER",
+        "evidence": "Authenticated Carlos/Operativo LIVE #/ops; heading Ops · Gestiones operativas; 1 negocio en flujo; responsible filter includes existing users; no write"
+      },
+      "leads": {
+        "result": "PASS_FOCAL_READ_AND_PIPELINE_RENDER",
+        "evidence": "Authenticated Carlos/Operativo LIVE #/leads; 3 active leads; pipeline columns and Ops sync visible; no write"
+      },
+      "polizas": {
+        "result": "PASS_FOCAL_READ_AND_COMMERCIAL_KPI_RENDER",
+        "evidence": "Authenticated Carlos/Operativo LIVE #/polizas; 1416 total, 223 active; QA policies segregated from business KPIs; no write"
+      },
+      "cobros": {
+        "result": "UNVERIFIED_UI_BROWSER_TIMEOUT",
+        "evidence": "No PASS: browser control timed out during route navigation"
+      }
+    }
   },
   "otherExistingUsers": {
     "Paula": {
