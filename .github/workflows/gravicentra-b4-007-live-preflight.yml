@@ -95,7 +95,8 @@ jobs:
             source:proof.sourceSha===process.env.SOURCE_SHA,
             build:proof.buildId===process.env.BUILD_ID,
             artifactId:String(proof.artifactId)===process.env.ARTIFACT_ID,
-            artifactDigest:proof.artifactZipSha256===process.env.ARTIFACT_DIGEST,
+            artifactDigest:String(proof.artifactZipSha256||'').replace(/^sha256:/,'')===
+              String(process.env.ARTIFACT_DIGEST||'').replace(/^sha256:/,''),
             archiveDigest:proof.archiveSha256===process.env.B4007_TAR_SHA,
             readback:proof.allHostedFilesExact===true,
             channel:proof.previewUrl===process.env.PREVIEW_URL,
@@ -103,10 +104,6 @@ jobs:
             archiveBuild:b.buildId===process.env.BUILD_ID
           };
           const failed=Object.entries(checks).filter(([,v])=>!v).map(([k])=>k);
-          if(!checks.artifactDigest)console.log('B4007_DIGEST_PROVENANCE_READBACK',JSON.stringify({
-            previewProofArtifactDigest:proof.artifactZipSha256,
-            pinnedGitHubArtifactDigest:process.env.ARTIFACT_DIGEST
-          }));
           if(failed.length)throw Error('B4007_IMMUTABLE_ARTIFACT_PROOF_MISMATCH:'+failed.join(','));
           fs.writeFileSync(path.join(root,'b4007-artifact-proof.json'),JSON.stringify({
             status:'PASS',sourceSha:b.sourceSha,buildId:b.buildId,
