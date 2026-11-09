@@ -46,12 +46,14 @@ test('S5.12D endpoint allows exact LAB and A&S HTTPS origins without wildcard',(
   assert.deepEqual([...r.ALLOWED_ORIGINS].sort(),[
     'https://ays-orbit-360-lab.web.app',
     'https://ays-orbit-360-lab.firebaseapp.com',
+    'https://ays-web-publica.web.app',
     'https://aysseguros.com'
   ].sort());
   for(const denied of [
     'http://aysseguros.com',
     'https://www.aysseguros.com',
     'https://aysseguros.com.evil.invalid',
+    'https://ays-web-publica.web.app.evil.invalid',
     'https://aysseguros.com:443',
     'https://example.com',
     '*',

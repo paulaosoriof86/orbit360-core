@@ -10,6 +10,7 @@ const VERSION='ays-siniestros-s512d-public-resolver-v1';
 const ALLOWED_ORIGINS=new Set([
   'https://ays-orbit-360-lab.web.app',
   'https://ays-orbit-360-lab.firebaseapp.com',
+  'https://ays-web-publica.web.app',
   'https://aysseguros.com'
 ]);
 
