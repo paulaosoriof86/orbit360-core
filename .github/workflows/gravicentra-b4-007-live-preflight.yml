@@ -1,0 +1,183 @@
+# B4-007: read-only transport preflight for the one existing owner-approved
+# immutable Preview artifact. No build, Firebase mutation, data write or LIVE.
+name: Gravicentra B4-007 Exact Artifact LIVE Preflight
+on:
+  push:
+    branches: [recovery/fase-a-clean-20260831]
+    paths:
+      - .github/workflows/gravicentra-b4-007-live-preflight.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: gravicentra-b4-007-readonly-preflight
+  cancel-in-progress: false
+jobs:
+  preflight:
+    if: github.repository == 'paulaosoriof86/orbit360-core' && github.ref == 'refs/heads/recovery/fase-a-clean-20260831'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      SOURCE_SHA: 45020d748dd5fa4328a96f99fe9919a6fcb207eb
+      BUILD_ID: gi-i65-b4-45020d748dd5-57f234755dc1
+      ARTIFACT_ID: '13681376540'
+      ARTIFACT_DIGEST: sha256:74a1120fd9abe9533a709baa882fdf656d09206702a57f80672bc677f16147ef
+      ARTIFACT_RUN: '42632631502'
+      PREVIEW_CHANNEL: gi-i65-b4-rc-41765742748
+      PREVIEW_URL: https://ays-orbit-360-lab--gi-i65-b4-rc-41765742748-neoi3u7r.web.app
+      LIVE_URL: https://ays-orbit-360-lab.web.app
+      EXPECTED_LIVE_SOURCE: f8fa00e4e2e6627cee66c8c521866874e39bc8da
+      PROJECT_ID: ays-orbit-360-lab
+      SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_LAB_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: recovery/fase-a-clean-20260831
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Freeze exact parent and preserved B4-006 visual seal
+        shell: bash
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor "$SOURCE_SHA" HEAD
+          test -z "$(git diff --name-only "$SOURCE_SHA" HEAD -- functions orbit360-platform ':(exclude)orbit360-platform/docs/**')"
+          node tools/gravicentra-b4-004-formal-gate-guard.mjs
+          node tools/gravicentra-open-findings-continuity-guard-v1.mjs > "$RUNNER_TEMP/b4007-continuity.json"
+          node - <<'NODE'
+          const fs=require('fs'),c=require('./artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json');
+          const p=c.b4006FormalOwnerVisualGateSeal20261109||{};
+          if(p.status!=='CLOSED_PASS_SCOPED_TO_EXPLICIT_OWNER_VISUAL_ACCEPTANCE'||
+             p.firstIncompleteGate!=='B4-007'||p.sourceSha!==process.env.SOURCE_SHA||
+             p.buildId!==process.env.BUILD_ID||String(p.artifactId)!==process.env.ARTIFACT_ID||
+             p.artifactDigest!==process.env.ARTIFACT_DIGEST||p.realInsurerLiveWritesCertified!==false)
+            throw Error('B4007_PREDECESSOR_OR_ARTIFACT_DRIFT');
+          if(fs.existsSync('artifacts/orbit360-recovery/release-control/I6_5_B4_007_FORMAL_LIVE_SEAL.json'))
+            throw Error('B4007_UNEXPECTED_EARLIER_LIVE_SEAL');
+          NODE
+      - uses: actions/download-artifact@v4
+        with:
+          name: gi-b4005-immutable-release-bundle-42632631502
+          run-id: ${{ env.ARTIFACT_RUN }}
+          repository: ${{ github.repository }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: ${{ runner.temp }}/b4007-package
+      - uses: actions/download-artifact@v4
+        with:
+          name: gi-b4005-preview-readback-42632631502
+          run-id: ${{ env.ARTIFACT_RUN }}
+          repository: ${{ github.repository }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: ${{ runner.temp }}/b4007-proof
+      - name: Verify retained archive and exact Preview proof without rebuilding
+        shell: bash
+        run: |
+          set -euo pipefail
+          PK="$RUNNER_TEMP/b4007-package"
+          TAR="$PK/b4005-exact-release-bundle.tar.gz"
+          test -s "$TAR"
+          EXPECTED_TAR=$(awk '{print $1}' "$PK/b4005-exact-release-bundle.sha256")
+          test "$(sha256sum "$TAR" | awk '{print $1}')" = "$EXPECTED_TAR"
+          mkdir -p "$RUNNER_TEMP/b4007-bundle"
+          tar -xzf "$TAR" -C "$RUNNER_TEMP/b4007-bundle" --no-same-owner
+          test -f "$RUNNER_TEMP/b4007-bundle/bundle/site/__recovery__/build.json"
+          export B4007_TAR_SHA="$EXPECTED_TAR"
+          node - <<'NODE'
+          const fs=require('fs'),path=require('path'),root=process.env.RUNNER_TEMP;
+          const proof=JSON.parse(fs.readFileSync(path.join(root,'b4007-proof/b4005-exact-preview-proof.json')));
+          const b=JSON.parse(fs.readFileSync(path.join(root,'b4007-bundle/bundle/site/__recovery__/build.json')));
+          if(proof.sourceSha!==process.env.SOURCE_SHA||proof.buildId!==process.env.BUILD_ID||
+             String(proof.artifactId)!==process.env.ARTIFACT_ID||
+             proof.artifactZipSha256!==process.env.ARTIFACT_DIGEST||
+             proof.archiveSha256!==process.env.B4007_TAR_SHA||
+             proof.allHostedFilesExact!==true||proof.previewUrl!==process.env.PREVIEW_URL||
+             b.sourceSha!==process.env.SOURCE_SHA||b.buildId!==process.env.BUILD_ID)
+            throw Error('B4007_IMMUTABLE_ARTIFACT_PROOF_MISMATCH');
+          fs.writeFileSync(path.join(root,'b4007-artifact-proof.json'),JSON.stringify({
+            status:'PASS',sourceSha:b.sourceSha,buildId:b.buildId,
+            artifactId:proof.artifactId,artifactDigest:proof.artifactZipSha256,
+            archiveSha256:proof.archiveSha256,hostedPayloadDigest:proof.hostedPayloadDigest,
+            hostedFileCount:proof.productFiles,readbackExact:proof.allHostedFilesExact,
+            livePromotionAttempted:false,productRebuilt:false,backendDeployed:false,
+            dataWrites:0},null,2)+'\n');
+          NODE
+      - name: Read current LIVE and exact Preview build markers
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -fsSL --retry 2 --max-time 25 -H 'Cache-Control: no-cache' "$LIVE_URL/__recovery__/build.json?b4007=read" > "$RUNNER_TEMP/b4007-live-marker.json"
+          curl -fsSL --retry 2 --max-time 25 -H 'Cache-Control: no-cache' "$PREVIEW_URL/__recovery__/build.json?b4007=read" > "$RUNNER_TEMP/b4007-preview-marker.json"
+          node - <<'NODE'
+          const fs=require('fs'),r=process.env.RUNNER_TEMP;
+          const live=JSON.parse(fs.readFileSync(r+'/b4007-live-marker.json'));
+          const preview=JSON.parse(fs.readFileSync(r+'/b4007-preview-marker.json'));
+          if(live.sourceSha!==process.env.EXPECTED_LIVE_SOURCE)throw Error('B4007_LIVE_OVERWRITTEN_OR_UNEXPECTED_SOURCE');
+          if(preview.sourceSha!==process.env.SOURCE_SHA||preview.buildId!==process.env.BUILD_ID)
+            throw Error('B4007_PREVIEW_CHANNEL_NOT_EXACT_ACCEPTED_BYTES');
+          NODE
+      - name: Discover existing Firebase Hosting and callable inventory in read-only mode
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/b4007-auth"
+          node - <<'NODE'
+          const fs=require('fs'),path=require('path'),root=process.env.RUNNER_TEMP+'/b4007-auth';
+          let accepted=[];
+          for(const [i,key] of ['SA_LAB','SA_LAB_ALT','SA_DEFAULT'].entries()){
+            try{
+              const j=JSON.parse(process.env[key]||'');
+              if(j.type==='service_account'&&j.project_id===process.env.PROJECT_ID&&j.private_key){
+                const p=path.join(root,i+'.json');fs.writeFileSync(p,JSON.stringify(j),{mode:0o600});accepted.push(p);
+              }
+            }catch{}
+          }
+          if(!accepted.length)throw Error('B4007_NO_CONFIGURED_SAME_PROJECT_SA');
+          fs.writeFileSync(path.join(root,'candidates'),accepted.join('\n')+'\n');
+          NODE
+          npm install --prefix "$RUNNER_TEMP/b4007-cli" --no-save --ignore-scripts --no-audit --no-fund firebase-tools@14.10.1 >/dev/null
+          node tools/gravicentra-firebase-tools-empty-extensions-workaround-v1.mjs "$RUNNER_TEMP/b4007-cli"
+          CLI="$RUNNER_TEMP/b4007-cli/node_modules/firebase-tools/lib/bin/firebase.js"
+          SEL=''
+          while IFS= read -r P; do
+            if GOOGLE_APPLICATION_CREDENTIALS="$P" node "$CLI" hosting:channel:list --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/b4007-channels.json" 2>/dev/null;then SEL="$P";break;fi
+          done < "$RUNNER_TEMP/b4007-auth/candidates"
+          test -n "$SEL"
+          GOOGLE_APPLICATION_CREDENTIALS="$SEL" node "$CLI" functions:list --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/b4007-functions.json"
+          node - <<'NODE'
+          const fs=require('fs'),root=process.env.RUNNER_TEMP;
+          const channels=JSON.parse(fs.readFileSync(root+'/b4007-channels.json'));
+          const funcs=JSON.parse(fs.readFileSync(root+'/b4007-functions.json'));
+          const ch=JSON.stringify(channels),fn=JSON.stringify(funcs);
+          if(!ch.includes(process.env.PREVIEW_CHANNEL))throw Error('B4007_PREVIEW_CHANNEL_MISSING');
+          if(!fn.includes('orbit360OpsLeadsCommand')||!fn.includes('orbit360OpsLeadsCommandPreview'))
+            throw Error('B4007_CALLABLE_BASELINE_NOT_UNIQUE_OR_MISSING');
+          fs.writeFileSync(root+'/b4007-readonly-summary.json',JSON.stringify({
+            schema:'GRAVICENTRA_B4_007_LIVE_TRANSPORT_PREFLIGHT_V1',
+            status:'READONLY_PREFLIGHT_PASS_LIVE_PROMOTION_NOT_YET_AUTHORIZED_BY_EVIDENCE',
+            acceptedSourceSha:process.env.SOURCE_SHA,acceptedBuildId:process.env.BUILD_ID,
+            artifactId:Number(process.env.ARTIFACT_ID),
+            liveSourceShaBefore:process.env.EXPECTED_LIVE_SOURCE,
+            hostingSite:process.env.PROJECT_ID,previewChannel:process.env.PREVIEW_CHANNEL,
+            retainedArtifactExact:true,previewMarkerExact:true,
+            productionCallablePresent:true,previewCallablePresent:true,
+            promotionMethod:'SAME_RETAINED_HOSTING_VERSION_WITH_ROLLBACK',
+            blockerBeforePromotion:'CAPTURE_LIVE_BACKEND_ROLLBACK_REVISION_AND_HOSTING_BACKUP',
+            businessWrites:0,builds:0,functionsDeployed:0,rulesWrites:0,iamWrites:0,
+            liveHostingWrites:0,productionAccepted:false},null,2)+'\n');
+          NODE
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: gi-b4007-readonly-preflight-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/b4007-artifact-proof.json
+            ${{ runner.temp }}/b4007-live-marker.json
+            ${{ runner.temp }}/b4007-preview-marker.json
+            ${{ runner.temp }}/b4007-readonly-summary.json
+          if-no-files-found: warn
+          retention-days: 30
