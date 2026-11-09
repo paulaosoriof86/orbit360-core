@@ -103,6 +103,10 @@ jobs:
             archiveBuild:b.buildId===process.env.BUILD_ID
           };
           const failed=Object.entries(checks).filter(([,v])=>!v).map(([k])=>k);
+          if(!checks.artifactDigest)console.log('B4007_DIGEST_PROVENANCE_READBACK',JSON.stringify({
+            previewProofArtifactDigest:proof.artifactZipSha256,
+            pinnedGitHubArtifactDigest:process.env.ARTIFACT_DIGEST
+          }));
           if(failed.length)throw Error('B4007_IMMUTABLE_ARTIFACT_PROOF_MISMATCH:'+failed.join(','));
           fs.writeFileSync(path.join(root,'b4007-artifact-proof.json'),JSON.stringify({
             status:'PASS',sourceSha:b.sourceSha,buildId:b.buildId,
