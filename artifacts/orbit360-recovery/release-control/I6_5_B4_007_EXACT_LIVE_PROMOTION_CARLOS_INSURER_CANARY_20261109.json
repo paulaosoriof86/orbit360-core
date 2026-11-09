@@ -160,7 +160,12 @@
       "sourceSha": "45020d748dd5fa4328a96f99fe9919a6fcb207eb",
       "buildId": "gi-i65-b4-45020d748dd5-57f234755dc1"
     },
-    "nonTargetDnsChanges": 0
+    "nonTargetDnsChanges": 0,
+    "firebaseAuthAuthorizedDomainPresent": false,
+    "firebaseAuthAuthorizationNeeded": "APP_DOMAIN_NOT_IN_AUTHENTICATION_AUTHORIZED_DOMAINS_FOR_GOOGLE_OAUTH",
+    "firebaseAuthDomainMutationPerformed": false,
+    "firebaseAuthOwnerActionTimeConfirmation": "PENDING",
+    "primaryNextBlocker": "ADD_APP_AYSSEGUROS_COM_TO_FIREBASE_AUTHORIZED_DOMAINS_AFTER_ACTION_TIME_CONFIRMATION"
   },
   "carryForward": {
     "liveRoleCountryMatrix": "PENDING",
@@ -172,5 +177,5 @@
     "firstIncompleteGate": "B4-007",
     "lastClosedGate": "B4-006"
   },
-  "nextAction": "B4_007_FINISH_FOCAL_INDIVIDUAL_AUTH_ROLE_COUNTRY_AND_MODULE_QA_THEN_FORMAL_LIVE_GATE_CLOSURE_NO_REBUILD"
+  "nextAction": "B4_007_WAIT_FOR_AUTHORIZED_DOMAIN_OWNER_ACTION_TIME_CONFIRMATION_THEN_VERIFY_AUTH_AND_FIREBASE_PROPAGATION_AND_OTHER_USERS"
 }
