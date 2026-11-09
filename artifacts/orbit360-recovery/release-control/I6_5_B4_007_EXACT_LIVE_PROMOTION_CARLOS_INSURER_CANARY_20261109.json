@@ -1,0 +1,121 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_007_EXACT_LIVE_PROMOTION_AND_FOCAL_UAT_V1",
+  "gate": "I6.5/B4-007",
+  "status": "CANONICAL_LIVE_TRANSPORT_PASS_CARLOS_REAL_SESSION_INSURER_EDIT_PERSIST_RESTORE_PASS_FULL_LIVE_USER_MODULE_MATRIX_IN_PROGRESS",
+  "recordType": "INCREMENTAL_SIGNED_TRANSPORT_AND_FOCAL_FUNCTIONAL_EVIDENCE_NOT_FULL_PRODUCTION_ACCEPTANCE",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "operationalDateGuatemala": "2026-11-09",
+  "recordedAtUtc": "2026-11-09T17:14:59.461Z",
+  "authority": {
+    "owner": "Paula Andrea Osorio Franco",
+    "releaseApproval": "Autorizó promoción controlada del mismo artefacto; B4-006 visual aprobado y sellado",
+    "userRequirement": "LIVE habilitado para todos los usuarios existentes, no solamente Carlos; Priscila después de LIVE",
+    "preserveCanonicalCandidate": true
+  },
+  "retainedApprovedSource": {
+    "sourceSha": "45020d748dd5fa4328a96f99fe9919a6fcb207eb",
+    "buildId": "gi-i65-b4-45020d748dd5-57f234755dc1",
+    "immutablePreviewArtifactId": 13681376540,
+    "digest": "sha256:74a1120fd9abe9533a709baa882fdf656d09206702a57f80672bc677f16147ef",
+    "previewWorkflowRun": 42632631502,
+    "noNewBuild": true
+  },
+  "liveTransport": {
+    "canonicalUrl": "https://ays-orbit-360-lab.web.app/",
+    "preflightWorkflowRun": 42656320704,
+    "firstAttemptWorkflowRun": 42659048090,
+    "firstAttemptRolledBackSafely": true,
+    "successfulWorkflowRun": 42660305513,
+    "successfulWorkflowHead": "c0a95f65b0c3180013f857052a287ce146390904",
+    "successfulWorkflowJob": 129309792568,
+    "successConclusion": "success",
+    "readbackStatus": "PASS_ALL_RETAINED_BYTES",
+    "allSiteFilesExact": 218,
+    "siteFilesTotal": 218,
+    "readbackArtifactId": 13693254823,
+    "productionCallableUpdated": "orbit360OpsLeadsCommand",
+    "rollbackCopyChannel": "gi-b4007-rb-42660305513",
+    "automaticRollbackExecutedOnSuccessfulAttempt": false,
+    "governanceRun": 42660305518,
+    "governanceConclusion": "success",
+    "firebaseProject": "ays-orbit-360-lab",
+    "firestoreReimport": false,
+    "authUsersEdited": false,
+    "iamRulesEdited": false
+  },
+  "focalLiveUat": {
+    "person": "Carlos Castro",
+    "authenticatedIdentity": "Carlos Castro",
+    "role": "Operativo",
+    "countryBusinessContext": "CO",
+    "liveDirectoryCountryOption": "TODOS",
+    "realDirectoryLoaded": true,
+    "insurerCountShown": 33,
+    "activeShown": 29,
+    "insurerQaFixtureId": "b4003qa_insurer_38102224750",
+    "insurerQaFixtureName": "B4 R20 Aseguradora QA",
+    "beforeField": "Observaciones",
+    "beforeValue": "",
+    "action": "EDIT_AND_SAVE_WITH_AUDIT_MOTIVE_IN_LIVE_QA_FIXTURE",
+    "syntheticCanaryValue": "CANARIA B4-007 2026-11-09 — lectura, guardado, recarga y reversión controlada.",
+    "reloadPersisted": true,
+    "reversionSavedWithAuditMotive": true,
+    "afterReloadValue": "",
+    "restorationVerified": true,
+    "qaFixtureWrites": 2,
+    "realBusinessInsurerWrites": 0,
+    "realInsurerScopedRead": "MAPFRE SEGUROS GT",
+    "realInsurerEditButtonVisible": true,
+    "platformCredentialLabelsAndActionsVisible": true,
+    "actualSecretRevealed": false,
+    "bankAccountSectionVisible": true,
+    "bankValuesCopied": false,
+    "fullSecretAndBankCredentialWriteE2e": false
+  },
+  "otherExistingUsers": {
+    "Paula": {
+      "expectedRole": "Direccion GT",
+      "liveIndividualLoginTest": "PENDING"
+    },
+    "Samuel": {
+      "expectedRole": "Operativo/Asesor CO",
+      "liveIndividualLoginTest": "PENDING"
+    },
+    "German": {
+      "expectedRole": "Asesor",
+      "liveIndividualLoginTest": "PENDING"
+    },
+    "Carlos": {
+      "expectedRole": "Operativo CO",
+      "liveIndividualLoginTest": "PASS_FOR_THIS_FOCAL_INSURER_UAT"
+    },
+    "noExistingAccessIntentionallyChanged": true,
+    "fullRoleCountryAcceptance": false
+  },
+  "priscila": {
+    "accountCreated": false,
+    "countryRoleAndPermissions": "NOT_DEFINED_BY_OWNER",
+    "postLiveUserProvisioning": "PENDING_CONFIGURATION_NO_IMPLICIT_ACCESS_ESCALATION"
+  },
+  "separatedCustomDomain": {
+    "url": "https://app.aysseguros.com/",
+    "observation": "LEGACY_ORBIT_360_ORIGIN_SEPARATE_FROM_CANONICAL_FIREBASE_HOSTING",
+    "rootHttp": 200,
+    "buildMarkerHttp": 500,
+    "notChangedByThisRelease": true,
+    "notProofOfCanonicalLiveVersion": false,
+    "futureDomainMigrationSeparateAction": true
+  },
+  "carryForward": {
+    "liveRoleCountryMatrix": "PENDING",
+    "otherModulesLiveFunctionalE2e": "PENDING_REUSE_VALID_PRIOR_ACCEPTANCES_ONLY",
+    "credentialsWriteAndRevealPermissionsAllRequiredRoles": "PENDING",
+    "performanceTimingFocal": "PENDING",
+    "opsAttachmentPersistence": "PENDING",
+    "productionAccepted": false,
+    "firstIncompleteGate": "B4-007",
+    "lastClosedGate": "B4-006"
+  },
+  "nextAction": "B4_007_FINISH_FOCAL_INDIVIDUAL_AUTH_ROLE_COUNTRY_AND_MODULE_QA_THEN_FORMAL_LIVE_GATE_CLOSURE_NO_REBUILD"
+}
