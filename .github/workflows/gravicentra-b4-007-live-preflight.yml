@@ -91,13 +91,19 @@ jobs:
           const fs=require('fs'),path=require('path'),root=process.env.RUNNER_TEMP;
           const proof=JSON.parse(fs.readFileSync(path.join(root,'b4007-proof/b4005-exact-preview-proof.json')));
           const b=JSON.parse(fs.readFileSync(path.join(root,'b4007-bundle/bundle/site/__recovery__/build.json')));
-          if(proof.sourceSha!==process.env.SOURCE_SHA||proof.buildId!==process.env.BUILD_ID||
-             String(proof.artifactId)!==process.env.ARTIFACT_ID||
-             proof.artifactZipSha256!==process.env.ARTIFACT_DIGEST||
-             proof.archiveSha256!==process.env.B4007_TAR_SHA||
-             proof.allHostedFilesExact!==true||proof.previewUrl!==process.env.PREVIEW_URL||
-             b.sourceSha!==process.env.SOURCE_SHA||b.buildId!==process.env.BUILD_ID)
-            throw Error('B4007_IMMUTABLE_ARTIFACT_PROOF_MISMATCH');
+          const checks={
+            source:proof.sourceSha===process.env.SOURCE_SHA,
+            build:proof.buildId===process.env.BUILD_ID,
+            artifactId:String(proof.artifactId)===process.env.ARTIFACT_ID,
+            artifactDigest:proof.artifactZipSha256===process.env.ARTIFACT_DIGEST,
+            archiveDigest:proof.archiveSha256===process.env.B4007_TAR_SHA,
+            readback:proof.allHostedFilesExact===true,
+            channel:proof.previewUrl===process.env.PREVIEW_URL,
+            archiveSource:b.sourceSha===process.env.SOURCE_SHA,
+            archiveBuild:b.buildId===process.env.BUILD_ID
+          };
+          const failed=Object.entries(checks).filter(([,v])=>!v).map(([k])=>k);
+          if(failed.length)throw Error('B4007_IMMUTABLE_ARTIFACT_PROOF_MISMATCH:'+failed.join(','));
           fs.writeFileSync(path.join(root,'b4007-artifact-proof.json'),JSON.stringify({
             status:'PASS',sourceSha:b.sourceSha,buildId:b.buildId,
             artifactId:proof.artifactId,artifactDigest:proof.artifactZipSha256,
