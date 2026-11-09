@@ -6,7 +6,7 @@
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "operationalDateGuatemala": "2026-11-09",
-  "recordedAtUtc": "2026-11-09T17:20:15.463Z",
+  "recordedAtUtc": "2026-11-09T17:34:22.942Z",
   "authority": {
     "owner": "Paula Andrea Osorio Franco",
     "releaseApproval": "Autorizó promoción controlada del mismo artefacto; B4-006 visual aprobado y sellado",
@@ -123,7 +123,31 @@
     "buildMarkerHttp": 500,
     "notChangedByThisRelease": true,
     "notProofOfCanonicalLiveVersion": false,
-    "futureDomainMigrationSeparateAction": true
+    "futureDomainMigrationSeparateAction": true,
+    "dateGuatemala": "2026-11-09",
+    "firebaseProject": "ays-orbit-360-lab",
+    "hostingSite": "ays-orbit-360-lab",
+    "customDomain": "app.aysseguros.com",
+    "firebaseConsoleStatus": "REQUIERE_CONFIGURACION",
+    "observedInAuthenticatedFirebaseConsole": true,
+    "requiredDnsRemove": {
+      "type": "A",
+      "name": "app.aysseguros.com",
+      "value": "107.161.178.166"
+    },
+    "requiredDnsAdd": {
+      "type": "CNAME",
+      "name": "app.aysseguros.com",
+      "value": "ays-orbit-360-lab.web.app"
+    },
+    "currentHttpObservation": "LEGACY_ORBIT_360_HTML_200",
+    "canonicalFirebaseBuildUnchanged": true,
+    "hostdimeCpanelLoginExpired": true,
+    "dnsMutationPerformed": false,
+    "domainCutoverComplete": false,
+    "otherDomainsAndEmailUntouched": true,
+    "blocker": "REAUTHENTICATE_EXISTING_HOSTDIME_CPANEL_SESSION",
+    "nextSafeAction": "AFTER_LOGIN_EXACT_APP_RECORD_SWITCH_AND_FIREBASE_VERIFY_HTTPS_BYTE_MARKER_WITH_ROLLBACK_PREPARED"
   },
   "carryForward": {
     "liveRoleCountryMatrix": "PENDING",
