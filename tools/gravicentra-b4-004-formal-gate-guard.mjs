@@ -40,6 +40,8 @@ const B4006_MGMT_COLLAB_BACKEND_ACTION='B4_006_DEPLOY_EXACT_PREVIEW_MANAGEMENT_C
 const B4006_KPI320_ACTION='B4_006_BUILD_EXACT_PREVIEW_FOR_CAUSAL_320PX_KPI_FIX_THEN_FOCAL_RESPONSIVE_RECHECK';
 const B4006_GLOBAL_VISUAL_RECEIPT=ROOT+'I6_5_B4_006_GLOBAL_TABLE_CARD_SYSTEM_SOURCE_SUCCESSOR_20261108.json';
 const B4006_KPI_RESPONSIVE_RECEIPT=ROOT+'I6_5_B4_006_KPI_RESPONSIVE_MONETARY_CLIPPING_SOURCE_SUCCESSOR_20261109.json';
+const B4006_FORMAL_RECEIPT=ROOT+'I6_5_B4_006_OWNER_VISUAL_FORMAL_GATE_SEAL_20261109.json';
+const B4006_FORMAL_NEXT_ACTION='B4_006_CLOSED_PASS_PREPARE_EXACT_ARTIFACT_PROMOTION_PREFLIGHT';
 const SOURCE='f8fa00e4e2e6627cee66c8c521866874e39bc8da';
 const BUILD='gi-i65-b4-f8fa00e4e2e6-57f234755dc1';
 const ARTIFACT=13600357541;
@@ -694,6 +696,64 @@ export function verifyDeclaredB4005SourceSuccessor(cp=read(CP),state=read(STATE)
   return {paths,status:'SOURCE_ONLY_PREVIEW_PENDING',receiptBlobSha:pointer.receiptBlobSha};
 }
 
+function verifyB4006FormalGateSuccessor(cp,state,ledger,reg){
+  const p=cp.b4006FormalOwnerVisualGateSeal20261109;
+  if(!p)return false;
+  need(same(p,state.b4006FormalOwnerVisualGateSeal20261109)&&
+    cp.nextAction===B4006_FORMAL_NEXT_ACTION&&state.nextAction===B4006_FORMAL_NEXT_ACTION&&
+    p.gate==='I6.5/B4-006'&&p.status==='CLOSED_PASS_SCOPED_TO_EXPLICIT_OWNER_VISUAL_ACCEPTANCE'&&
+    p.receiptPath===B4006_FORMAL_RECEIPT&&
+    p.sourceSha==='45020d748dd5fa4328a96f99fe9919a6fcb207eb'&&
+    p.buildId==='gi-i65-b4-45020d748dd5-57f234755dc1'&&
+    p.artifactId===13681376540&&
+    p.artifactDigest==='sha256:74a1120fd9abe9533a709baa882fdf656d09206702a57f80672bc677f16147ef'&&
+    p.workflowRunId===42632631502&&p.guardRunId===42632631496&&
+    p.ownerAcceptedExactPresentedVisual===true&&p.fullProductOrLiveCertification===false&&
+    p.lastClosedGate==='B4-006'&&p.firstIncompleteGate==='B4-007'&&
+    p.noLiveDeployment===true&&p.realInsurerLiveWritesCertified===false,
+    'B4006_FORMAL_POINTER');
+  const bytes=fs.readFileSync(B4006_FORMAL_RECEIPT);
+  need(blob(bytes)===p.receiptBlobSha&&sha256(bytes)===p.receiptSha256&&
+    git('rev-parse','HEAD:'+B4006_FORMAL_RECEIPT)===p.receiptBlobSha,
+    'B4006_FORMAL_RECEIPT_DIGEST');
+  const r=JSON.parse(bytes);
+  need(r.schema==='GRAVICENTRA_I6_5_B4_006_OWNER_VISUAL_FORMAL_GATE_SEAL_V1'&&
+    r.gate===p.gate&&r.status===p.status&&r.parentHeadBeforeGovernanceSeal===p.sourceSha&&
+    r.ownerApproval?.explicitVisualAcceptance===true&&
+    r.ownerApproval?.notIndependentAttestationOfLiveWrites===true&&
+    r.immutablePreview?.sourceSha===p.sourceSha&&
+    r.immutablePreview?.buildId===p.buildId&&
+    r.immutablePreview?.artifactId===p.artifactId&&
+    r.immutablePreview?.artifactDigest===p.artifactDigest&&
+    r.immutablePreview?.workflowRunId===p.workflowRunId&&
+    r.immutablePreview?.workflowConclusion==='success'&&
+    r.immutablePreview?.guardRunId===p.guardRunId&&
+    r.immutablePreview?.guardConclusion==='success'&&
+    r.visualDisposition?.status==='OWNER_APPROVED_FINAL_DESIGN'&&
+    r.visualDisposition?.realInsurerPersistenceProvenByThisSeal===false&&
+    r.priorGateLineage?.b4005==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&
+    r.boundaries?.formalClosure===true&&r.boundaries?.lastClosedGate==='B4-006'&&
+    r.boundaries?.firstIncompleteGate==='B4-007'&&
+    r.boundaries?.noProductSourceChange===true&&r.boundaries?.noNewBuild===true&&
+    r.boundaries?.noLiveDeployment===true&&r.boundaries?.noRealBusinessWrites===true&&
+    r.boundaries?.notProductionAccepted===true&&r.boundaries?.carlosOperationalReadinessNotYetCertified===true&&
+    git('merge-base',p.sourceSha,'HEAD')===p.sourceSha&&
+    git('diff','--name-only',p.sourceSha,'HEAD','--','functions','orbit360-platform',':(exclude)orbit360-platform/docs/**').trim()==='',
+    'B4006_FORMAL_SCOPE_AND_RELEASE_FREEZE');
+  const b5=ledger.findings.find(x=>x.id==='B4-005');
+  const b6=ledger.findings.find(x=>x.id==='B4-006');
+  const rb5=reg.inventory.find(x=>x.id==='B4-005');
+  const rb6=reg.inventory.find(x=>x.id==='B4-006');
+  need(b5?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&
+    b5.blocking===false&&b5.fullUnboundedE2eCertification===false&&
+    b5.closureReceiptBlobSha===cp.b4005FormalGateSeal20261107?.receiptBlobSha&&
+    b6?.status===p.status&&b6.blocking===false&&
+    b6.closureReceiptBlobSha===p.receiptBlobSha&&b6.closureReceiptSha256===p.receiptSha256&&
+    b6.firstIncompleteGate==='B4-007'&&b6.notFullProductOrLiveCertification===true&&
+    same(rb5,b5)&&same(rb6,b6),'B4006_LEDGER_REGISTER_SCOPED_SEAL');
+  return true;
+}
+
 export function verifyB4004FormalGate(){
   const cp=read(CP),state=read(STATE),seal=read(RECEIPT);
   const historic=prior(seal.parentHead,CP);
@@ -701,6 +761,7 @@ export function verifyB4004FormalGate(){
   const ledger=read(LEDGER),reg=read(REGISTER);
   const owner=readPinned(OWNER,seal.authority.ownerDecisionBlobSha);
   const ref=cp.b4004FormalGateSeal20261107,mirror=state.b4004FormalGateSeal20261107;
+  const b4006Closed=verifyB4006FormalGateSuccessor(cp,state,ledger,reg);
   need(seal.schema==='GRAVICENTRA_B4_004_TARGETED_FINAL_GATE_SEAL_V1'&&seal.gate==='I6.5/B4-004'&&seal.formalClosure===true&&seal.status==='CLOSED_PASS_SCOPED_TO_APPROVED_B4_004_DISPOSITIONS','SEAL_SCOPE');
   need(seal.parentHead==='eaa2e95fa2f733ed2708fd7f2c17b1dcb3d092dd'&&git('merge-base',seal.parentHead,'HEAD')===seal.parentHead,'SEAL_PARENT');
   need(cp.branch===seal.branch&&seal.repository==='paulaosoriof86/orbit360-core'&&seal.branch==='recovery/fase-a-clean-20260831','REPO_AND_BRANCH');
@@ -711,7 +772,7 @@ export function verifyB4004FormalGate(){
   need(blob(bytes)===ref.receiptBlobSha&&sha256(bytes)===ref.receiptSha256&&ref.receiptBlobSha===mirror.receiptBlobSha&&ref.receiptSha256===mirror.receiptSha256,'SEAL_HASH');
   need(releaseMatches(ref)&&releaseMatches(mirror)&&ref.hostingVersion===VERSION&&ref.hostedPayloadDigest===DIGEST,'SEAL_RELEASE_POINTER');
   need(ref.lastClosedGate==='B4-004'&&mirror.lastClosedGate==='B4-004'&&ref.firstIncompleteGate==='B4-005'&&mirror.firstIncompleteGate==='B4-005','NEXT_GATE');
-  need((cp.nextAction===ACTION&&state.nextAction===ACTION||(cp.nextAction===B4006_VISUAL_ACTION&&state.nextAction===B4006_VISUAL_ACTION&&cp.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&state.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&cp.b4006VisualReadonlyCandidateSource20261108?.status==='SOURCE_VISUAL_DELTA_READY_FOR_NEW_IMMUTABLE_PREVIEW'||cp.nextAction===B4006_FINAL_ACTION&&state.nextAction===B4006_FINAL_ACTION&&cp.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&state.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&verifyB4006AssistantVisualQa(cp,state)||cp.nextAction===B4006_OWNER_SOURCE_ACTION&&state.nextAction===B4006_OWNER_SOURCE_ACTION&&cp.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&state.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&verifyB4006RealInsurerVisualSource(cp,state)||cp.nextAction===B4006_LATEST_VISUAL_QA_ACTION&&state.nextAction===B4006_LATEST_VISUAL_QA_ACTION&&cp.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&state.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&verifyB4006LatestActualVisualQa(cp,state)||cp.nextAction===B4006_UNIFICATION_ACTION&&state.nextAction===B4006_UNIFICATION_ACTION&&cp.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&state.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&verifyB4006VisualUnificationSuccessor(cp,state)||cp.nextAction===B4006_POLISH_ACTION&&state.nextAction===B4006_POLISH_ACTION&&cp.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&state.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&verifyB4006VisualUnificationSuccessor(cp,state)||cp.nextAction===B4006_FINAL_POLISH_ACTION&&state.nextAction===B4006_FINAL_POLISH_ACTION&&cp.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&state.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&verifyB4006ExactPolishPreviewReadback(cp,state)||cp.nextAction===B4006_OWNER_FINAL_FEEDBACK_ACTION&&state.nextAction===B4006_OWNER_FINAL_FEEDBACK_ACTION&&cp.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&state.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&verifyB4006OwnerFinalVisualFeedbackSource(cp,state)||cp.nextAction===B4006_MGMT_COLLAB_ACTION&&state.nextAction===B4006_MGMT_COLLAB_ACTION&&cp.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&state.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&verifyB4006ManagementCollaborationSource(cp,state)||cp.nextAction===B4006_MGMT_COLLAB_BACKEND_ACTION&&state.nextAction===B4006_MGMT_COLLAB_BACKEND_ACTION&&cp.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&state.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&verifyB4006ManagementCollaborationBackendHardening(cp,state)))&&ref.nextAction===ACTION&&mirror.nextAction===ACTION,'NEXT_ACTION_SYNC');
+  need((b4006Closed||cp.nextAction===ACTION&&state.nextAction===ACTION||(cp.nextAction===B4006_VISUAL_ACTION&&state.nextAction===B4006_VISUAL_ACTION&&cp.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&state.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&cp.b4006VisualReadonlyCandidateSource20261108?.status==='SOURCE_VISUAL_DELTA_READY_FOR_NEW_IMMUTABLE_PREVIEW'||cp.nextAction===B4006_FINAL_ACTION&&state.nextAction===B4006_FINAL_ACTION&&cp.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&state.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&verifyB4006AssistantVisualQa(cp,state)||cp.nextAction===B4006_OWNER_SOURCE_ACTION&&state.nextAction===B4006_OWNER_SOURCE_ACTION&&cp.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&state.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&verifyB4006RealInsurerVisualSource(cp,state)||cp.nextAction===B4006_LATEST_VISUAL_QA_ACTION&&state.nextAction===B4006_LATEST_VISUAL_QA_ACTION&&cp.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&state.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&verifyB4006LatestActualVisualQa(cp,state)||cp.nextAction===B4006_UNIFICATION_ACTION&&state.nextAction===B4006_UNIFICATION_ACTION&&cp.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&state.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&verifyB4006VisualUnificationSuccessor(cp,state)||cp.nextAction===B4006_POLISH_ACTION&&state.nextAction===B4006_POLISH_ACTION&&cp.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&state.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&verifyB4006VisualUnificationSuccessor(cp,state)||cp.nextAction===B4006_FINAL_POLISH_ACTION&&state.nextAction===B4006_FINAL_POLISH_ACTION&&cp.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&state.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&verifyB4006ExactPolishPreviewReadback(cp,state)||cp.nextAction===B4006_OWNER_FINAL_FEEDBACK_ACTION&&state.nextAction===B4006_OWNER_FINAL_FEEDBACK_ACTION&&cp.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&state.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&verifyB4006OwnerFinalVisualFeedbackSource(cp,state)||cp.nextAction===B4006_MGMT_COLLAB_ACTION&&state.nextAction===B4006_MGMT_COLLAB_ACTION&&cp.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&state.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&verifyB4006ManagementCollaborationSource(cp,state)||cp.nextAction===B4006_MGMT_COLLAB_BACKEND_ACTION&&state.nextAction===B4006_MGMT_COLLAB_BACKEND_ACTION&&cp.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&state.b4005FormalGateSeal20261107?.status==='CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY'&&verifyB4006ManagementCollaborationBackendHardening(cp,state)))&&ref.nextAction===ACTION&&mirror.nextAction===ACTION,'NEXT_ACTION_SYNC');
   need(cp.pendingClosureMasterPlan?.status==='B4_004_CLOSED_PASS_NEXT_B4_005_E2E_NOT_EXECUTED'&&cp.pendingClosureMasterPlan.currentGate==='B4-005'&&cp.pendingClosureMasterPlan.b4004Held===false,'PLAN_CURSOR');
   need(cp.currentB4?.status==='B4_003_CLOSED_PASS_CURRENT42'&&same(cp.currentB4,historic.currentB4),'B4003_FROZEN_POINTER');
   need(cp.b4003ActiveCertificationCursor20261106?.formalLiveAcceptance?.status==='LATEST_APPROVED_VERSION_LIVE_PASS'&&same(cp.b4003ActiveCertificationCursor20261106,historic.b4003ActiveCertificationCursor20261106),'B4003_PRESERVED');
@@ -742,14 +803,14 @@ export function verifyB4004FormalGate(){
   need(ledger.findings.length===295&&reg.inventory.length===295&&same([...byId(ledger.findings).keys()].sort(),[...byId(reg.inventory).keys()].sort()),'NO_FINDING_LOSS');
   const row=byId(ledger.findings).get('B4-004'),mirrorRow=byId(reg.inventory).get('B4-004');
   need(row?.status==='CLOSED_PASS'&&row.blocking===false&&same(row,mirrorRow)&&row.closureReceiptBlobSha===ref.receiptBlobSha&&row.closureReceiptSha256===ref.receiptSha256&&row.nextAction===ACTION&&row.siniestros==='OWNER_DEFERRED_NON_BLOCKING_PHASE_A_NOT_FULL_CRUD_PASS','LEDGER_DISPOSITION');
-  for(const old of oldLedger.findings)if(old.id!=='B4-004')need(same(old,byId(ledger.findings).get(old.id)),'UNRELATED_FINDING_CHANGED:'+old.id);
-  for(const old of oldRegister.inventory)if(old.id!=='B4-004')need(same(old,byId(reg.inventory).get(old.id)),'UNRELATED_REGISTER_CHANGED:'+old.id);
+  for(const old of oldLedger.findings)if(old.id!=='B4-004'&&!(b4006Closed&&['B4-005','B4-006'].includes(old.id)))need(same(old,byId(ledger.findings).get(old.id)),'UNRELATED_FINDING_CHANGED:'+old.id);
+  for(const old of oldRegister.inventory)if(old.id!=='B4-004'&&!(b4006Closed&&['B4-005','B4-006'].includes(old.id)))need(same(old,byId(reg.inventory).get(old.id)),'UNRELATED_REGISTER_CHANGED:'+old.id);
   need(reg.expectedLedgerNextBlobSha===blob(fs.readFileSync(LEDGER))&&cp.findingLedgerBlobSha===reg.expectedLedgerNextBlobSha,'LEDGER_HASH');
   need(cp.continuityRegisterBlobSha===blob(fs.readFileSync(REGISTER))&&cp.findingContinuityControl.registerBlobSha===cp.continuityRegisterBlobSha&&cp.findingContinuityControl.lastLedgerBlobSha===cp.findingLedgerBlobSha,'REGISTER_HASH');
   need(cp.findingContinuityControl.guardBlobSha===git('rev-parse','HEAD:tools/gravicentra-open-findings-continuity-guard-v1.mjs'),'CONTINUITY_GUARD_VERSION');
   need(read(ROOT+'CAPABILITY_STATUS_LEDGER.json').capabilities.length===15,'CAPABILITY_COUNT');
   need(cp.postproductionExitProgress.formalPercent===50&&seal.nextGate==='B4-005'&&seal.nextAction===ACTION,'FORMAL_PROGRESS');
-  return {status:'PASS',gate:'I6.5/B4-004',scope:'TARGETED_CRONOGRAMA_LIVE_PLUS_OWNER_DEFERRED_SINIESTROS',sourceSha:SOURCE,artifactId:ARTIFACT,ledgerCount:295,nextGate:'B4-005'};
+  return {status:'PASS',gate:'I6.5/B4-004',scope:'TARGETED_CRONOGRAMA_LIVE_PLUS_OWNER_DEFERRED_SINIESTROS',sourceSha:SOURCE,artifactId:ARTIFACT,ledgerCount:295,historicalNextGate:'B4-005',latestClosedGate:b4006Closed?'B4-006':'B4-004',firstIncompleteGate:b4006Closed?'B4-007':'B4-005',b4006OwnerVisualSealVerified:b4006Closed};
 }
 
 if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href){

@@ -1,0 +1,80 @@
+{
+  "schema": "GRAVICENTRA_I6_5_B4_006_OWNER_VISUAL_FORMAL_GATE_SEAL_V1",
+  "gate": "I6.5/B4-006",
+  "status": "CLOSED_PASS_SCOPED_TO_EXPLICIT_OWNER_VISUAL_ACCEPTANCE",
+  "recordType": "OWNER_VISUAL_GATE_SEAL_NOT_FULL_PRODUCT_OR_LIVE_CERTIFICATION",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "parentHeadBeforeGovernanceSeal": "45020d748dd5fa4328a96f99fe9919a6fcb207eb",
+  "operationalDateGuatemala": "2026-11-09",
+  "ownerApproval": {
+    "owner": "Paula Andrea Osorio Franco",
+    "explicitVisualAcceptance": true,
+    "userStatement": "el diseño ya lo aprobé",
+    "followupAuthority": "por favor procede con la aprobación del gate y el cierre documental, necesitamos avanzar rápido para que Carlos trabaje",
+    "scope": "LAST_PRESENTED_CANONICAL_PREVIEW_VISUAL_DESIGN",
+    "notIndependentAttestationOfLiveWrites": true
+  },
+  "immutablePreview": {
+    "sourceSha": "45020d748dd5fa4328a96f99fe9919a6fcb207eb",
+    "buildId": "gi-i65-b4-45020d748dd5-57f234755dc1",
+    "artifactId": 13681376540,
+    "artifactDigest": "sha256:74a1120fd9abe9533a709baa882fdf656d09206702a57f80672bc677f16147ef",
+    "previewReadbackArtifactId": 13680409937,
+    "previewUrl": "https://ays-orbit-360-lab--gi-i65-b4-rc-41765742748-neoi3u7r.web.app",
+    "workflowRunId": 42632631502,
+    "workflowStatus": "completed",
+    "workflowConclusion": "success",
+    "guardRunId": 42632631496,
+    "guardStatus": "completed",
+    "guardConclusion": "success",
+    "samePreviewChannelRetained": true,
+    "artifactReusableWithoutRebuild": true
+  },
+  "visualDisposition": {
+    "status": "OWNER_APPROVED_FINAL_DESIGN",
+    "scope": [
+      "Premium cards and KPI hierarchy",
+      "Canonical tables and lists",
+      "Responsive monetary KPI legibility at 320/390/1024/1440 px",
+      "Aseguradoras real-record information and editable-form presentation",
+      "Ops and Leads visual consistency"
+    ],
+    "specificAdditionalEvidence": "Authenticated Direccion Preview: real insurer Editar enabled editable sections and Guardar cambios; Cancelar restored read-only state; no write attempted and no observed browser-console errors.",
+    "realInsurerPersistenceProvenByThisSeal": false,
+    "noDesignReopeningWithoutNewCausalRegression": true
+  },
+  "priorGateLineage": {
+    "b4003": "LATEST_APPROVED_VERSION_LIVE_PASS_PRESERVED",
+    "b4004": "CLOSED_PASS_SCOPED_PRESERVED",
+    "b4005": "CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY",
+    "b4005Seal": "artifacts/orbit360-recovery/release-control/I6_5_B4_005_FORMAL_SCOPED_GATE_SEAL_20261107.json",
+    "historicalCapabilities": 15,
+    "noPriorPassReissued": true
+  },
+  "unresolvedFunctionalAndReleaseCarries": {
+    "aseguradorasRealLiveEditSaveServerReadbackReloadAndRestore": "PENDING_B4_007",
+    "aseguradorasRealCredentialsAndBankAccountsRoleBoundSafeE2E": "PENDING_B4_007_AS_APPLICABLE",
+    "opsAttachmentUploadPersistenceReload": "PENDING_E2E_NO_FALSE_PASS",
+    "cobrosCancelacionesRenovacionesReproducibleTransitionTiming": "PENDING_FOCAL_PERFORMANCE_QA",
+    "endorsementCertificatesAnnexesR1509": "OPEN_VISIBLE_NONBLOCKING_CARRY_NO_FIRST_CLASS_CERTIFICATE_CLAIM",
+    "knowledgeTariffQuoteComparisonCotComp": "OWNER_DEFERRED_POSTPRODUCTION",
+    "driveLinkage": "OPTIONAL_NONBLOCKING"
+  },
+  "boundaries": {
+    "formalClosure": true,
+    "lastClosedGate": "B4-006",
+    "firstIncompleteGate": "B4-007",
+    "noProductSourceChange": true,
+    "noNewBuild": true,
+    "noPreviewPromotion": true,
+    "noLiveDeployment": true,
+    "noRealBusinessWrites": true,
+    "noReimport": true,
+    "noRulesIamChanges": true,
+    "notProductionAccepted": true,
+    "carlosOperationalReadinessNotYetCertified": true,
+    "sameArtifactAndDigestRequiredForB4007": true
+  },
+  "nextExecution": "B4_007_CONTROLLED_SAME_ARTIFACT_PROMOTION_PREFLIGHT_THEN_LIVE_MODULE_AND_WRITE_QA"
+}

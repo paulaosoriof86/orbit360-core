@@ -4,7 +4,7 @@
   "authority": "FAIL_CLOSED_FINDING_CONTINUITY",
   "sourceLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
   "sourceLedgerPreviousBlobSha": "b923461bc7b0bbff0df597187f0053228029e7b4",
-  "expectedLedgerNextBlobSha": "1fdf515ef604c2deade869004c9c6756dc302e2e",
+  "expectedLedgerNextBlobSha": "7a125c1bdc9da12f545643d44be7c6a5aeb8314f",
   "policy": {
     "allLedgerFindingsMustAppearExactlyOnce": true,
     "newHumanFindingsMustBeIndividualLedgerEntries": true,
@@ -3357,8 +3357,8 @@
       "block": "B4",
       "source": "FROZEN_PLAN",
       "finding": "Authenticated module × role × viewport E2E matrix; zero relevant page/console/request errors.",
-      "status": "NOT_STARTED",
-      "blocking": true,
+      "status": "CLOSED_PASS_SCOPED_WITH_EXPLICIT_NONBLOCKING_R1509_CARRY",
+      "blocking": false,
       "mayDisappearWithoutDisposition": false,
       "additionalRequiredModules": [
         "comisiones"
@@ -3372,19 +3372,30 @@
       },
       "owner": "CONTROL_PLANE_CONTINUITY_OWNER",
       "targetGate": "B4-005",
-      "closureCondition": "Explicit evidence-backed disposition required; item may not disappear from continuity tracking."
+      "closureCondition": "Explicit evidence-backed disposition required; item may not disappear from continuity tracking.",
+      "closureReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_005_FORMAL_SCOPED_GATE_SEAL_20261107.json",
+      "closureReceiptBlobSha": "ed7fa00fc31e95ae607089caf7419aac3e9a7fb3",
+      "closureReceiptSha256": "f3f40aa03461be9fde967ae100cfe1473ee6c0d26fe1d09f5d46da885c1c9d86",
+      "fullUnboundedE2eCertification": false,
+      "r1509VisibleNonblockingCarry": true
     },
     {
       "id": "B4-006",
       "block": "B4",
       "source": "FROZEN_PLAN",
       "finding": "Paula visual acceptance on exact final Preview.",
-      "status": "NOT_STARTED",
-      "blocking": true,
+      "status": "CLOSED_PASS_SCOPED_TO_EXPLICIT_OWNER_VISUAL_ACCEPTANCE",
+      "blocking": false,
       "mayDisappearWithoutDisposition": false,
       "owner": "CONTROL_PLANE_CONTINUITY_OWNER",
       "targetGate": "B4-006",
-      "closureCondition": "Explicit evidence-backed disposition required; item may not disappear from continuity tracking."
+      "closureCondition": "Explicit evidence-backed disposition required; item may not disappear from continuity tracking.",
+      "closureReceiptPath": "artifacts/orbit360-recovery/release-control/I6_5_B4_006_OWNER_VISUAL_FORMAL_GATE_SEAL_20261109.json",
+      "closureReceiptBlobSha": "8a600e3d33cfa6faa77cdc6b6b25c7ae13f35582",
+      "closureReceiptSha256": "9813c6adf7b86e48698a986dab28c239298eda361b9ac28ef76c05116a344618",
+      "lastClosedGate": "B4-006",
+      "firstIncompleteGate": "B4-007",
+      "notFullProductOrLiveCertification": true
     },
     {
       "id": "B4-007",
