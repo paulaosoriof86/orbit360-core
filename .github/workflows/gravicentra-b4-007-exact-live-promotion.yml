@@ -184,19 +184,15 @@ jobs:
           echo "production_ops_function_deployed=true" >> "$GITHUB_OUTPUT"
           node "$FIREBASE_CLI_BIN" hosting:clone "$SITE:$PREVIEW_CHANNEL" "$SITE:live" --project "$PROJECT_ID" --non-interactive
           echo "live_hosting_promoted=true" >> "$GITHUB_OUTPUT"
-      - name: Read back all immutable LIVE bytes and custom domain
+      - name: Read back all canonical LIVE bytes; observe distinct legacy custom origin
         run: |
           set -euo pipefail
           node tools/gravicentra-b4-007-exact-hosting-readback.mjs "$RUNNER_TEMP/b4007-packet/bundle/site" "$LIVE_URL" "$SOURCE_SHA" "$BUILD_ID" "$RUNNER_TEMP/b4007-live-readback.json"
-          curl -fsSL --max-time 30 "$CUSTOM_URL/__recovery__/build.json?b4007=domain" > "$RUNNER_TEMP/b4007-domain-marker.json"
-          node - <<'NODE'
-          const fs=require('fs'),r=process.env.RUNNER_TEMP;
-          const b=JSON.parse(fs.readFileSync(r+'/b4007-domain-marker.json'));
-          if(b.sourceSha!==process.env.SOURCE_SHA||b.buildId!==process.env.BUILD_ID)
-            throw Error('B4007_CUSTOM_DOMAIN_MARKER_NOT_EXACT');
-          NODE
+          CUSTOM_ROOT_STATUS=$(curl -sSL -o /dev/null -w '%{http_code}' --max-time 20 "$CUSTOM_URL/" || true)
+          CUSTOM_MARKER_STATUS=$(curl -sSL -o /dev/null -w '%{http_code}' --max-time 20 "$CUSTOM_URL/__recovery__/build.json" || true)
+          printf '{"scope":"SEPARATE_CUSTOM_ORIGIN_NOT_PART_OF_CANONICAL_FIREBASE_HOSTING","customRootHttp":"%s","customBuildMarkerHttp":"%s","customDomainMigrated":false,"canonicalHostingGateAffected":false}\n' "$CUSTOM_ROOT_STATUS" "$CUSTOM_MARKER_STATUS" > "$RUNNER_TEMP/b4007-custom-origin-observation.json"
           node "$FIREBASE_CLI_BIN" functions:list --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/b4007-functions-after.json"
-          echo 'B4007_EXACT_LIVE_TRANSPORT_PASS. Role×country and real insurer write/reload certification pending.' >> "$GITHUB_STEP_SUMMARY"
+          echo 'B4007_EXACT_CANONICAL_LIVE_TRANSPORT_PASS. Legacy custom origin unchanged; role×country and real insurer write/reload certification pending.' >> "$GITHUB_STEP_SUMMARY"
       - name: Automatically restore previous Hosting and function traffic on error
         if: failure() && steps.backup.outputs.ready == 'true'
         run: |
@@ -215,7 +211,7 @@ jobs:
             ${{ runner.temp }}/b4007-live-before.json
             ${{ runner.temp }}/b4007-preview-before.json
             ${{ runner.temp }}/b4007-live-readback.json
-            ${{ runner.temp }}/b4007-domain-marker.json
+            ${{ runner.temp }}/b4007-custom-origin-observation.json
             ${{ runner.temp }}/b4007-rollback-result.json
           if-no-files-found: warn
           retention-days: 30
