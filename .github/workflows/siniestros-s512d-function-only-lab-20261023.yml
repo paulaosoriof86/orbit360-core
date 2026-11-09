@@ -13,7 +13,7 @@ concurrency:
 env:
   PROJECT_ID: ays-orbit-360-lab
   FUNCTION_NAME: siniestrosPublicResolverS512D
-  EXPECTED_PARENT: f1e6276085508a1756dc8837ab59c5ce16781e0c
+  EXPECTED_PARENT: 5ee628c09049ea86eeb0a72b098fce302cd7b0ff
   WORKFLOW_PATH: .github/workflows/siniestros-s512d-function-only-lab-20261023.yml
 jobs:
   publish:
@@ -41,6 +41,7 @@ jobs:
           grep -Fq "'https://aysseguros.com'" functions/siniestros-public-resolver-s512d.js
           grep -Fq "'https://ays-web-publica.web.app'" functions/siniestros-public-resolver-s512d.js
           grep -Fq "'https://ays-web-publica.web.app.evil.invalid'" functions/siniestros-s512d-public-surface.test.js
+          grep -Fq "'mapfre_guatemala':'mapfre_seguros'" functions/siniestros-public-contract-s512.js
           grep -Fq "require('./siniestros-public-resolver-s512d')" functions/bootstrap.js
       - uses: actions/setup-node@v4
         with:
@@ -128,6 +129,51 @@ jobs:
           test "$CODE" = 400
           CODE="$(curl -sS --max-time 20 -o "$RUNNER_TEMP/s512d/probes/post" -w '%{http_code}' -X POST "$URL" -H 'Origin: https://aysseguros.com')"
           test "$CODE" = 405
+          node <<'NODE'
+          const assert=require('node:assert/strict');
+          const base='https://us-central1-ays-orbit-360-lab.cloudfunctions.net/siniestrosPublicResolverS512D';
+          const origin='https://ays-web-publica.web.app';
+          const validated=[
+            ['Aseguradora General','1757'],
+            ['Aseguradora Guatemalteca','2388-6868 Ext. 1'],
+            ['Aseguradora La Ceiba','2379-1818 / 2311-1223'],
+            ['Aseguradora Rural','2294-8811'],
+            ['G&T Seguros','1778'],
+            ['MAPFRE Guatemala','2328-5060 / 2375-5060'],
+            ['Seguros El Roble','1797'],
+            ['Seguros Bantrab','2410-2696']
+          ];
+          const unvalidated=[
+            'Ficohsa Seguros','Seguros Columna · MICOOP',
+            'Seguros Privanza','Seguros Agromercantil · BAM',
+            'Seguros Universales','Pan American Life'
+          ];
+          async function query(insurer){
+            const url=new URL(base);
+            url.searchParams.set('country','GT');
+            url.searchParams.set('insurer',insurer);
+            const response=await fetch(url,{headers:{Origin:origin,Accept:'application/json'}});
+            assert.equal(response.status,200,insurer+' HTTP');
+            assert.equal(response.headers.get('access-control-allow-origin'),origin,insurer+' CORS');
+            const payload=await response.json();
+            assert.equal(payload.ok,true,insurer+' payload');
+            assert.equal(payload.country,'GT',insurer+' country');
+            assert.equal(payload.truth.coverageConfirmed,false,insurer+' truth');
+            return payload;
+          }
+          for(const [name,expected] of validated){
+            const payload=await query(name);
+            assert.equal(payload.insurerChannelStatus,'CURRENT_CHANNEL_VALIDATED',name);
+            assert.equal(payload.insurerChannel?.value,expected,name);
+            assert.equal(payload.insurerChannel?.validated,true,name);
+          }
+          for(const name of unvalidated){
+            const payload=await query(name);
+            assert.equal(payload.insurerChannelStatus,'NO_VALIDATED_INSURER_CHANNEL',name);
+            assert.equal(payload.insurerChannel,null,name);
+          }
+          console.log('S512D_FIREBASE_ORIGIN_8_VALIDATED_6_SAFE_FALLBACK_PASS');
+          NODE
           echo 'S512D_LAB_RUNTIME_SECURITY_PASS'
       - name: Delete temporary credential
         if: always()
