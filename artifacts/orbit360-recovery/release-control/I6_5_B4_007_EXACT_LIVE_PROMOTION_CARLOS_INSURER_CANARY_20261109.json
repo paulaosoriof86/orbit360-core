@@ -118,36 +118,49 @@
   },
   "separatedCustomDomain": {
     "url": "https://app.aysseguros.com/",
-    "observation": "LEGACY_ORBIT_360_ORIGIN_SEPARATE_FROM_CANONICAL_FIREBASE_HOSTING",
+    "observation": "HOSTDIME_ADVANCED_A_RECORD_CUTOVER_SAVED_CUSTOM_DOMAIN_HTTPS_AND_MARKER_READBACK_PASS_FIREBASE_STATUS_PENDING",
     "rootHttp": 200,
-    "buildMarkerHttp": 500,
-    "notChangedByThisRelease": true,
+    "buildMarkerHttp": 200,
+    "notChangedByThisRelease": false,
     "notProofOfCanonicalLiveVersion": false,
-    "futureDomainMigrationSeparateAction": true,
+    "futureDomainMigrationSeparateAction": false,
     "dateGuatemala": "2026-11-09",
     "firebaseProject": "ays-orbit-360-lab",
     "hostingSite": "ays-orbit-360-lab",
     "customDomain": "app.aysseguros.com",
-    "firebaseConsoleStatus": "REQUIERE_CONFIGURACION",
+    "firebaseConsoleStatus": "REQUIERE_CONFIGURACION_PROPAGATION_PENDING",
     "observedInAuthenticatedFirebaseConsole": true,
     "requiredDnsRemove": {
       "type": "A",
       "name": "app.aysseguros.com",
-      "value": "107.161.178.166"
+      "value": "107.161.178.166",
+      "status": "REPLACED_BY_EDIT_NO_RECORD_DELETION"
     },
     "requiredDnsAdd": {
-      "type": "CNAME",
+      "type": "A",
       "name": "app.aysseguros.com",
-      "value": "ays-orbit-360-lab.web.app"
+      "value": "199.36.158.100",
+      "source": "Firebase Hosting advanced setup"
     },
-    "currentHttpObservation": "LEGACY_ORBIT_360_HTML_200",
+    "currentHttpObservation": "GRAVICENTRA_INSURANCE_CANONICAL_HTTPS_200_AUTHENTICATED_PAULA_DIRECCION",
     "canonicalFirebaseBuildUnchanged": true,
-    "hostdimeCpanelLoginExpired": true,
-    "dnsMutationPerformed": false,
+    "hostdimeCpanelLoginExpired": false,
+    "dnsMutationPerformed": true,
     "domainCutoverComplete": false,
     "otherDomainsAndEmailUntouched": true,
-    "blocker": "REAUTHENTICATE_EXISTING_HOSTDIME_CPANEL_SESSION",
-    "nextSafeAction": "AFTER_LOGIN_EXACT_APP_RECORD_SWITCH_AND_FIREBASE_VERIFY_HTTPS_BYTE_MARKER_WITH_ROLLBACK_PREPARED"
+    "blocker": "FIREBASE_DOMAIN_CONSOLE_VERIFICATION_PENDING_DNS_PROPAGATION",
+    "nextSafeAction": "RECHECK_FIREBASE_CUSTOM_DOMAIN_STATUS_AND_DNS_PROPAGATION_KEEP_APP_A_RECORD_AS_199_36_158_100_NO_REDEPLOY",
+    "dnsChangeReadback": "CPANEL_SUCCESS_APP_A_RECORD_NOW_199_36_158_100_TTL_14400",
+    "dnsResolverReadback": "GOOGLE_DNS_STATUS_0_A_199_36_158_100_TTL_14400",
+    "domainTrafficObservedNew": true,
+    "httpsPageTitle": "Gravicentra Insurance · Plataforma",
+    "authenticatedUserOnNewDomain": "Paula Osorio · Dirección",
+    "exactBuildMarker": {
+      "product": "Gravicentra Insurance",
+      "sourceSha": "45020d748dd5fa4328a96f99fe9919a6fcb207eb",
+      "buildId": "gi-i65-b4-45020d748dd5-57f234755dc1"
+    },
+    "nonTargetDnsChanges": 0
   },
   "carryForward": {
     "liveRoleCountryMatrix": "PENDING",
