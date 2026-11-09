@@ -10,7 +10,7 @@
   "branch": "recovery/fase-a-clean-20260831",
   "forensicOriginSha": "9c95f31461f2eabe9804625b5659bee772f5602a",
   "createdAtUtc": "2026-08-31T18:00:00Z",
-  "updatedAtUtc": "2026-11-09T17:50:57.351Z",
+  "updatedAtUtc": "2026-11-09T18:09:48.967Z",
   "status": "ITERATION_2_SOURCE_MATERIALIZED_VALIDATION_PENDING",
   "currentIteration": 2,
   "lastCompletedIteration": 1,
@@ -187,7 +187,7 @@
     "phaseAIterationStatuses": "HISTORICAL_FIELDS_ABOVE_PRESERVED_UNTIL_FORMAL_GATE_EVIDENCE;_NO_NEW_PASS_INFERRED",
     "labDataWriteScope": "ONLY_35_AUTHORIZED_COUNTRY_FIELDS;_NO_AUGUST_REFRESH"
   },
-  "nextAction": "B4_007_PENDING_FIREBASE_AUTH_CUSTOM_DOMAIN_ACTION_TIME_CONFIRMATION_THEN_DOMAIN_VERIFY_FULL_ROLE_LIVE_UAT",
+  "nextAction": "B4_007_RESOLVE_GERMAN_NO_AUTH_NO_EMAIL_AND_VALIDATE_INDIVIDUAL_USER_ROLE_UAT_AND_HOSTING_DNS_PROPAGATION_NO_NEW_BUILD",
   "sourceOfTruth": {
     "projectBoundaryPrevalentAddendum": "orbit360-platform/docs/recovery/ADDENDUM_PREVALENTE_CHATGPT_PROJECT_BOUNDARY_20260831.md",
     "mutableState": "orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json",
@@ -1479,10 +1479,14 @@
     "productionAccepted": false,
     "lastClosedGate": "B4-006",
     "firstIncompleteGate": "B4-007",
-    "customDomainCutover": "HOSTDIME_A_RECORD_SAVED_199_36_158_100_GOOGLE_DNS_PASS_HTTPS_BRAND_PAULA_AUTH_EXACT_BUILD_MARKER_PASS_FIREBASE_CONSOLE_PENDING",
+    "customDomainCutover": "HOSTDIME_A_199_36_158_100_GOOGLE_DNS_HTTPS_BRAND_BUILD_MARKER_AND_FIREBASE_AUTHORIZED_DOMAIN_PASS_HOSTING_CONSOLE_PROPAGATION_PENDING",
     "customDomainDNSAndHttpsVerified": true,
     "firebaseConsoleCompleted": false,
-    "firebaseAuthAppCustomDomainApproved": false,
-    "firebaseAuthCustomDomainApprovalPending": true
+    "firebaseAuthAppCustomDomainApproved": true,
+    "firebaseAuthCustomDomainApprovalPending": false,
+    "firebaseAuthAuthorizedDomainReadback": "FIREBASE_AUTH_CUSTOM_DOMAIN_ROW_APP_AYSSEGUROS_COM_PRESENT_PASS",
+    "customDomainPaulaExistingAuthenticatedSessionReadOnly": "PASS_INICIO_5_OF_5_SERVER_SOURCES",
+    "liveTeamRosterReadback": "8_TOTAL_7_AUTH_ACTIVE_1_GERMAN_REYES_NO_AUTH_NO_EMAIL",
+    "germanNoAuthAccess": "BLOCKING_FOR_ALL_USERS_GOAL_PENDING_CORRECT_EMAIL_AND_AUTH_PROVISIONING"
   }
 }
