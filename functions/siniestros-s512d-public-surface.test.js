@@ -18,6 +18,11 @@ test('S5.12D resolver returns only validated registry channel plus A&S fallbacks
   assert.equal(ok.truth.coverageConfirmed,false);
   assert.equal(ok.truth.eligibilityConfirmed,false);
 
+  const mapfre=r.publicResolved('MAPFRE Guatemala');
+  assert.equal(mapfre.insurerChannelStatus,'CURRENT_CHANNEL_VALIDATED');
+  assert.equal(mapfre.insurerChannel.value,'2328-5060 / 2375-5060');
+  assert.equal(mapfre.truth.coverageConfirmed,false);
+
   const stale=r.publicResolved('SEGUROS UNIVERSALES');
   assert.equal(stale.insurerChannel,null);
   assert.equal(stale.insurerChannelStatus,'NO_VALIDATED_INSURER_CHANNEL');

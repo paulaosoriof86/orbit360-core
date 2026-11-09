@@ -117,6 +117,7 @@ function validatedGtChannel(insurerName){
   if(VALIDATED_GT_CHANNELS[key])return VALIDATED_GT_CHANNELS[key];
   const aliases={
     'mapfre':'mapfre_seguros',
+    'mapfre_guatemala':'mapfre_seguros',
     'mapfre_seguros_guatemala':'mapfre_seguros',
     'seguros_g_t':'g_t_seguros',
     'g_t':'g_t_seguros',
