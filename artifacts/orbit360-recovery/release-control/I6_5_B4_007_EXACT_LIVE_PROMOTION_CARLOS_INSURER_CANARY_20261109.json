@@ -6,7 +6,7 @@
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "operationalDateGuatemala": "2026-11-09",
-  "recordedAtUtc": "2026-11-09T18:09:37.442Z",
+  "recordedAtUtc": "2026-11-09T18:11:18.167Z",
   "authority": {
     "owner": "Paula Andrea Osorio Franco",
     "releaseApproval": "Autorizó promoción controlada del mismo artefacto; B4-006 visual aprobado y sellado",
@@ -170,11 +170,22 @@
     "primaryNextBlocker": "FIREBASE_HOSTING_DOMAIN_DNS_PROPAGATION_STATUS_PENDING_AND_FULL_ROLE_LIVE_VALIDATION",
     "authReadbackEvidence": "Firebase Console Authentication > Configuracion > Dominios autorizados row 'app.aysseguros.com Custom Acciones' PASS after owner-approved Add",
     "firebaseHostingLatestCheck": "ADVANCED_A_199_36_158_100_REQUIRED; REMOVAL_A_107_161_178_166_STALE_VERIFIER; LIVE_GOOGLE_RESOLVER_AND_DIRECT_HTTPS_CONFIRM_NEW_A; WAIT_UP_TO_24H",
-    "paulaCustomDomainSession": "AUTHENTICATED_PAULA_DIRECCION_LIVE_INICIO_5_OF_5_SERVER_SOURCES_REAL_READ_ONLY_PASS_FRESH_LOGIN_NOT_RETESTED"
+    "paulaCustomDomainSession": "AUTHENTICATED_PAULA_DIRECCION_LIVE_INICIO_5_OF_5_SERVER_SOURCES_REAL_READ_ONLY_PASS_FRESH_LOGIN_NOT_RETESTED",
+    "customDomainCobrosLiveReadOnly": {
+      "session": "Paula Osorio Direccion",
+      "route": "https://app.aysseguros.com/#/cobros",
+      "status": "PASS_FOCAL_READ_AND_TABLE_RENDER_NOT_WRITE_E2E",
+      "recordsDisplayed": 2559,
+      "legacySigaUnconfirmed": 1227,
+      "confirmedPayments": 5,
+      "conciliatedPayments": 5,
+      "consoleErrorsCapturedByBrowser": 0,
+      "performanceSlaCertified": false
+    }
   },
   "carryForward": {
     "liveRoleCountryMatrix": "PENDING_SEVEN_ACTIVE_ROSTER_NOT_EQUIVALENT_TO_SEVEN_INDIVIDUAL_SIGNINS_GERMAN_NO_ACCESS",
-    "otherModulesLiveFunctionalE2e": "PENDING_REUSE_VALID_PRIOR_ACCEPTANCES_ONLY",
+    "otherModulesLiveFunctionalE2e": "COBROS_PAULA_FOCAL_READ_PASS_AT_CUSTOM_ORIGIN_WRITES_AND_OTHER_ROLES_STILL_PENDING",
     "credentialsWriteAndRevealPermissionsAllRequiredRoles": "PENDING",
     "performanceTimingFocal": "PENDING",
     "opsAttachmentPersistence": "PENDING",
