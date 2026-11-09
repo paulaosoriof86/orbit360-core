@@ -6,7 +6,7 @@
   "repository": "paulaosoriof86/orbit360-core",
   "branch": "recovery/fase-a-clean-20260831",
   "operationalDateGuatemala": "2026-11-09",
-  "recordedAtUtc": "2026-11-09T17:34:22.942Z",
+  "recordedAtUtc": "2026-11-09T18:09:37.442Z",
   "authority": {
     "owner": "Paula Andrea Osorio Franco",
     "releaseApproval": "Autorizó promoción controlada del mismo artefacto; B4-006 visual aprobado y sellado",
@@ -94,7 +94,7 @@
   "otherExistingUsers": {
     "Paula": {
       "expectedRole": "Direccion GT",
-      "liveIndividualLoginTest": "PENDING"
+      "liveIndividualLoginTest": "AUTHENTICATED_EXISTING_SESSION_APP_AYSSEGUROS_COM_INICIO_READ_ONLY_PASS_FRESH_LOGIN_NOT_RETESTED"
     },
     "Samuel": {
       "expectedRole": "Operativo/Asesor CO",
@@ -102,14 +102,16 @@
     },
     "German": {
       "expectedRole": "Asesor",
-      "liveIndividualLoginTest": "PENDING"
+      "liveIndividualLoginTest": "HOLD_NO_AUTH_ACCESS_VISIBLE_IN_TEAM_ROSTER_EMAIL_ABSENT",
+      "teamRosterEvidence": "Germán Reyes · Asesor · GT · Freelance · Sin correo · Sin acceso · Registro de equipo sin Auth/membresía vinculados"
     },
     "Carlos": {
       "expectedRole": "Operativo CO",
       "liveIndividualLoginTest": "PASS_FOR_THIS_FOCAL_INSURER_UAT"
     },
     "noExistingAccessIntentionallyChanged": true,
-    "fullRoleCountryAcceptance": false
+    "fullRoleCountryAcceptance": false,
+    "teamRosterReadback": "EQUIPO_PERMISOS_APP_AYSSEGUROS_COM_8_ROSTER_ENTRIES_7_AUTH_AND_MEMBERSHIP_ACTIVE_1_GERMAN_NO_ACCESS"
   },
   "priscila": {
     "accountCreated": false,
@@ -148,8 +150,8 @@
     "dnsMutationPerformed": true,
     "domainCutoverComplete": false,
     "otherDomainsAndEmailUntouched": true,
-    "blocker": "FIREBASE_DOMAIN_CONSOLE_VERIFICATION_PENDING_DNS_PROPAGATION",
-    "nextSafeAction": "RECHECK_FIREBASE_CUSTOM_DOMAIN_STATUS_AND_DNS_PROPAGATION_KEEP_APP_A_RECORD_AS_199_36_158_100_NO_REDEPLOY",
+    "blocker": "FIREBASE_HOSTING_CONSOLE_STILL_REQUIRES_CONFIGURACION_WHILE_PUBLIC_HTTPS_BRAND_MARKER_PASS",
+    "nextSafeAction": "WAIT_FOR_HOSTING_DNS_VERIFIER_TO_REFRESH_TTL_14400_AND_RUN_OTHER_ROLE_LIVE_UAT_NO_DNS_REWRITE_OR_REBUILD",
     "dnsChangeReadback": "CPANEL_SUCCESS_APP_A_RECORD_NOW_199_36_158_100_TTL_14400",
     "dnsResolverReadback": "GOOGLE_DNS_STATUS_0_A_199_36_158_100_TTL_14400",
     "domainTrafficObservedNew": true,
@@ -161,14 +163,17 @@
       "buildId": "gi-i65-b4-45020d748dd5-57f234755dc1"
     },
     "nonTargetDnsChanges": 0,
-    "firebaseAuthAuthorizedDomainPresent": false,
-    "firebaseAuthAuthorizationNeeded": "APP_DOMAIN_NOT_IN_AUTHENTICATION_AUTHORIZED_DOMAINS_FOR_GOOGLE_OAUTH",
-    "firebaseAuthDomainMutationPerformed": false,
-    "firebaseAuthOwnerActionTimeConfirmation": "PENDING",
-    "primaryNextBlocker": "ADD_APP_AYSSEGUROS_COM_TO_FIREBASE_AUTHORIZED_DOMAINS_AFTER_ACTION_TIME_CONFIRMATION"
+    "firebaseAuthAuthorizedDomainPresent": true,
+    "firebaseAuthAuthorizationNeeded": "RESOLVED_APP_AYSSEGUROS_COM_AUTHORIZED_CUSTOM_DOMAIN",
+    "firebaseAuthDomainMutationPerformed": true,
+    "firebaseAuthOwnerActionTimeConfirmation": "PAULA_EXPLICIT_AUTHORIZATION_2026-11-09_AND_FIREBASE_CONSOLE_WRITE_READBACK_PASS",
+    "primaryNextBlocker": "FIREBASE_HOSTING_DOMAIN_DNS_PROPAGATION_STATUS_PENDING_AND_FULL_ROLE_LIVE_VALIDATION",
+    "authReadbackEvidence": "Firebase Console Authentication > Configuracion > Dominios autorizados row 'app.aysseguros.com Custom Acciones' PASS after owner-approved Add",
+    "firebaseHostingLatestCheck": "ADVANCED_A_199_36_158_100_REQUIRED; REMOVAL_A_107_161_178_166_STALE_VERIFIER; LIVE_GOOGLE_RESOLVER_AND_DIRECT_HTTPS_CONFIRM_NEW_A; WAIT_UP_TO_24H",
+    "paulaCustomDomainSession": "AUTHENTICATED_PAULA_DIRECCION_LIVE_INICIO_5_OF_5_SERVER_SOURCES_REAL_READ_ONLY_PASS_FRESH_LOGIN_NOT_RETESTED"
   },
   "carryForward": {
-    "liveRoleCountryMatrix": "PENDING",
+    "liveRoleCountryMatrix": "PENDING_SEVEN_ACTIVE_ROSTER_NOT_EQUIVALENT_TO_SEVEN_INDIVIDUAL_SIGNINS_GERMAN_NO_ACCESS",
     "otherModulesLiveFunctionalE2e": "PENDING_REUSE_VALID_PRIOR_ACCEPTANCES_ONLY",
     "credentialsWriteAndRevealPermissionsAllRequiredRoles": "PENDING",
     "performanceTimingFocal": "PENDING",
@@ -177,5 +182,5 @@
     "firstIncompleteGate": "B4-007",
     "lastClosedGate": "B4-006"
   },
-  "nextAction": "B4_007_WAIT_FOR_AUTHORIZED_DOMAIN_OWNER_ACTION_TIME_CONFIRMATION_THEN_VERIFY_AUTH_AND_FIREBASE_PROPAGATION_AND_OTHER_USERS"
+  "nextAction": "B4_007_PENDING_HOSTING_PROPAGATION_AND_INDIVIDUAL_LIVE_ROLE_UAT_GERMAN_MISSING_AUTH_EMAIL"
 }
