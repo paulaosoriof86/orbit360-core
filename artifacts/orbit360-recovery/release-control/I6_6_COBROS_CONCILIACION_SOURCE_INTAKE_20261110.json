@@ -653,7 +653,8 @@
     "insurerStatementsNativeFormatsParsed": true,
     "all35CurrentSourceRawHashesPinned": true,
     "fourHistoricalReferenceHashesPinned": true,
-    "liveTopLevelReadback": true
+    "liveTopLevelReadback": true,
+    "latestVerifiedAccountStatements": "Rural 2026-11-06; Universales 2026-11-09; primary Bayron issue PDF"
   },
   "periodSemantics": {
     "commissionInvoiceMonth": "2026-11",
@@ -1089,7 +1090,28 @@
         "interpretation": "Cannot attribute full delay exclusively to platform; connected browser/CDP deadline contributed."
       }
     ],
-    "nextDiagnostics": "Instrument navigation, first render/data-ready and filter response independently; compare warmed vs fresh load and eliminate nonessential startup waits only on canonical source with regression QA. Do not block insurer reconciliation."
+    "nextDiagnostics": "Instrument navigation, first render/data-ready and filter response independently; compare warmed vs fresh load and eliminate nonessential startup waits only on canonical source with regression QA. Do not block insurer reconciliation.",
+    "bayronReceiptSchedulerBug": {
+      "observedOn": "2026-11-10",
+      "module": "Polizas > Editar póliza > Guardar y sincronizar recibos",
+      "policy": "VA125-00010478",
+      "input": {
+        "start": "2026-08-20",
+        "end": "2027-08-20",
+        "frequency": "Mensual",
+        "count": 2
+      },
+      "proposedDueDates": [
+        "2026-09-04",
+        "2027-03-07"
+      ],
+      "authenticDueDates": [
+        "2026-08-20",
+        "2026-09-20"
+      ],
+      "status": "BLOCKS_APPLY_OF_2_RECEIPTS",
+      "action": "Do not save misdated receipt schedule; requires ability to preserve actual issued due dates."
+    }
   },
   "operationalActions": [
     {
@@ -1140,6 +1162,106 @@
       "after": "443 commercial / 444 total; exact search 1 de 444 and Samuel Daza, no policies yet",
       "linkedPolicyCreate": "PENDING",
       "notes": "No invented phone, identification or email; payment frequency monthly source backed, mechanism not confirmed; frontend click timed out while write did persist."
+    }
+  ],
+  "verifiedSourceReadbacks": [
+    {
+      "id": "RURAL_BAYRON_20261106",
+      "source": "https://docs.google.com/spreadsheets/d/1njDdh2raI7rmnyTN_R7M3Y7d9-dYI4BI/edit",
+      "statementAsOf": "2026-11-06",
+      "policy": "VA125-00010478",
+      "record": "Acsel-E row 10",
+      "status": "VERIFIED_SOURCE_READ",
+      "insurerMode": "PagoCaja",
+      "periodicidad": "Mensual",
+      "openReceiptId": "62444671",
+      "openReceiptIssueDate": "2026-09-20",
+      "pendingAmountGTQ": 1557.92,
+      "remarks": "As-of date older than any subsequent settlement; do not infer current-day payment status."
+    },
+    {
+      "id": "RURAL_BAYRON_ISSUANCE",
+      "source": "https://drive.google.com/file/d/1DMNU1duf8Ok3OLLOnUEpeV1cT6u1UuGw/view",
+      "status": "VERIFIED_PRIMARY_POLICY_PDF",
+      "policy": "VA125-00010478",
+      "client": "BAYRON ESTUARDO CONTRERAS PORTILLO",
+      "advisor": "Paula Osorio per latest direction, UI wrong Samuel",
+      "netGTQ": 2600,
+      "issueExpensesGTQ": 130,
+      "financialSurchargeGTQ": 52,
+      "vatGTQ": 333.84,
+      "grossGTQ": 3115.84,
+      "paymentPlan": [
+        {
+          "sequence": 1,
+          "due": "2026-08-20",
+          "totalGTQ": 1557.92
+        },
+        {
+          "sequence": 2,
+          "due": "2026-09-20",
+          "totalGTQ": 1557.92
+        }
+      ],
+      "vehicle": {
+        "make": "NISSAN",
+        "line": "ROGUE SL FWD",
+        "model": 2014,
+        "plate": "P-720LHT",
+        "color": "AZUL POLICROMADO",
+        "motor": "421166V QR25",
+        "chassis": "5N1AT2MT6EC839650"
+      },
+      "notes": "Actual PDF includes distinct Anexo de Pagos Fraccionados. One paid 2026-10-29 according to Dirección, other pending source 2026-11-06; do not mistake issue date for payment date."
+    },
+    {
+      "id": "UNIVERSALES_STATEMENTS_20261109",
+      "sourcePayments": "https://drive.google.com/file/d/1ugk2ra8cAXQsfrY9BPE76LWKQUPm3nH9/view",
+      "sourceAge": "https://drive.google.com/file/d/1JUJVCqh9kL1KX9C9Qu_2W--R0Vyj1-5i/view",
+      "status": "VERIFIED_PRIMARY_STATEMENTS",
+      "date": "2026-11-09",
+      "payments": [
+        {
+          "policy": "04-05-01-15590-0",
+          "client": "JULIA MONICA MARISOL ROMERO LOAIZA",
+          "paidOn": "2026-11-05",
+          "requirement": "39470707",
+          "amountGTQ": 764.4,
+          "netGTQ": 650,
+          "method": "TC DEL DEPTO."
+        },
+        {
+          "policy": "04-15-01-603-0",
+          "client": "MARIA GABRIELA MONTEPEQUE PALMA VETTORAZZI",
+          "paidOn": "2026-11-05",
+          "requirement": "39460327",
+          "amountGTQ": 952.56,
+          "netGTQ": 810,
+          "method": "TC DEL DEPTO."
+        }
+      ],
+      "pendingAsOf": [
+        {
+          "client": "JULIA",
+          "receipts": 10,
+          "period": "2026-12-01 through 2027-09-01",
+          "perReceiptGTQ": 789.04,
+          "totalGTQ": 7890.4,
+          "issuePolicyMonthlyGTQ": 764.4,
+          "deltaPerFutureReceiptGTQ": 24.64,
+          "deltaTotalGTQ": 246.4,
+          "classification": "UNRESOLVED_DIFFERENCE; check endoso/vida rider before overwriting contractual net"
+        },
+        {
+          "client": "MARIA GABRIELA",
+          "receipts": 10,
+          "period": "2026-12-01 through 2027-09-01",
+          "perReceiptGTQ": 952.56,
+          "totalGTQ": 9525.6,
+          "classification": "SOURCE_MATCHES_PRIMARY_POLICY"
+        }
+      ],
+      "interpretation": "Report explicitly named Cobros noviembre not invoice commissions for October; verify in reporting ledger separately."
     }
   ]
 }
