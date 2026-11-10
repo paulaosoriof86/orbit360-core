@@ -96,8 +96,13 @@
       // to browser Firestore reads during a release promotion.
       var runtimeHost=String(window.location&&window.location.hostname||'').toLowerCase();
       var releaseHostMode=providers&&typeof providers.protectedHostMode==='function'?providers.protectedHostMode():'';
-      var previewChannel=releaseHostMode==='preview';
-      var liveChannel=releaseHostMode==='live';
+      // B4 historical isolated VM checks intentionally omit the provider.
+      // Preserve exact-host fail-closed flag checks in that case only.
+      var previewChannel=releaseHostMode==='preview'||(!providers&&(
+        /^ays-orbit-360-lab--gi-i65-b4-[a-z0-9-]+\.web\.app$/.test(runtimeHost)||
+        /^ays-orbit-360-lab--gi-i66-rc-[a-z0-9-]+\.web\.app$/.test(runtimeHost)));
+      var liveChannel=releaseHostMode==='live'||(!providers&&(
+        runtimeHost==='ays-orbit-360-lab.web.app'||runtimeHost==='ays-orbit-360-lab.firebaseapp.com'||runtimeHost==='app.aysseguros.com'));
       var scopedChannel=previewChannel||liveChannel;
       if(scopedChannel&&cfg.scopedReadPreviewCandidate!==true)
         throw new Error('PROTECTED_READ_CANDIDATE_DISABLED');
