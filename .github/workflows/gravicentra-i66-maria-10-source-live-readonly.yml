@@ -91,137 +91,140 @@ jobs:
           else:raise SystemExit('I66_MARIA_EXACT_LAB_CREDENTIAL_UNAVAILABLE')
           PY
 
-      - name: Discover exact tenant using LIVE policy ID + number + client + country, read only
+      - name: Remap exact LIVE ids and dry-run source numbers with independent due-date HOLD; NO writes
         shell: bash
         run: |
           set -euo pipefail
           node - <<'JS'
           'use strict';
-          const fs=require('fs'),crypto=require('crypto');
-          const fixture=JSON.parse(fs.readFileSync(process.env.GI_I66_FIXTURE_PATH,'utf8'));
+          const fs=require('fs');
+          const crypto=require('crypto');
           const {getApps,initializeApp}=require('firebase-admin/app');
           const {getFirestore}=require('firebase-admin/firestore');
-          const hash=x=>crypto.createHash('sha256').update(String(x)).digest('hex');
-          const id=x=>String(x==null?'':x).trim();
+          const sha=v=>crypto.createHash('sha256').update(typeof v==='string'?v:JSON.stringify(v)).digest('hex');
+          const str=x=>String(x===null||x===undefined?'':x).trim();
+          const pad=i=>String(i).padStart(3,'0');
+          const stable=v=>{
+            if(v===null||typeof v!=='object')return v;
+            if(typeof v.toJSON==='function')return stable(v.toJSON());
+            if(Array.isArray(v))return v.map(stable);
+            return Object.fromEntries(Object.keys(v).sort().map(k=>[k,stable(v[k])]));
+          };
+          const snapshotHash=x=>sha(JSON.stringify(stable(x)));
+          const reportPath=process.env.GI_I66_REPORT_PATH;
+          const sourcePath='artifacts/orbit360-recovery/release-control/I6_6_COBROS_CONCILIACION_SOURCE_INTAKE_20261110.json';
           (async()=>{
-            if(process.env.GCLOUD_PROJECT!=='ays-orbit-360-lab'||process.env.FIRESTORE_EMULATOR_HOST)throw Error('PROJECT_OR_EMULATOR_BLOCK');
-            const app=getApps()[0]||initializeApp({projectId:'ays-orbit-360-lab'});
-            const db=getFirestore(app);
-            const tenants=await db.collection('tenants').listDocuments();
-            if(tenants.length===0||tenants.length>300)throw Error('TENANT_SCAN_BOUNDARY');
-            const found=[], seen=[];
-            const numberKeys=['numero','numeroPoliza','numPoliza','numero_poliza','numeroPolizaCanonica'];
-            const clientKeys=['clienteId','cliente_id','contratanteId','clienteRefId'];
-            const countryKeys=['pais','paisCodigo','country','countryCode','countryCodeISO'];
-            for(const t of tenants){
-              const p=await t.collection('data').doc('polizas').collection('items').doc(fixture.policyId).get();
-              if(!p.exists)continue;
-              const x=p.data()||{};
-              const hits=(keys,expected,transform=id)=>keys.filter(k=>x[k]!=null&&transform(x[k])===expected);
-              const flags={
-                tenantHash:hash(t.id).slice(0,12),
-                hasPolicyDocument:true,
-                idExact:!id(x.id)||id(x.id)===fixture.policyId,
-                numberAliasMatches:hits(numberKeys,fixture.policyNumber),
-                clientAliasMatches:hits(clientKeys,fixture.clientId),
-                countryAliasMatches:hits(countryKeys,'GT',v=>id(v).toUpperCase()),
-                tenantExact:!id(x.tenantId)||id(x.tenantId)===t.id,
-                presentRecognizedKeys:Object.keys(x).filter(k=>[...numberKeys,...clientKeys,...countryKeys,'id','tenantId'].includes(k))
-              };
-              seen.push(flags);
-              if(flags.idExact&&flags.numberAliasMatches.includes('numero')&&flags.clientAliasMatches.includes('clienteId')&&flags.countryAliasMatches.includes('pais')&&flags.tenantExact)found.push(t.id);
+            if(process.env.PROJECT_ID!=='ays-orbit-360-lab'||process.env.GCLOUD_PROJECT!=='ays-orbit-360-lab'||process.env.FIRESTORE_EMULATOR_HOST)throw Error('PROJECT_OR_EMULATOR_HOLD');
+            const archived=JSON.parse(fs.readFileSync(process.env.GI_I66_FIXTURE_PATH,'utf8'));
+            const ledger=JSON.parse(fs.readFileSync(sourcePath,'utf8'));
+            const checkpoint=ledger.i66UniversalesBatchCheckpoint20261110||{};
+            const nums=checkpoint.insurerReceiptNumbers||[];
+            if(archived.projectId!=='ays-orbit-360-lab'||archived.status!=='NOT_APPLIED'||archived.rows.length!==10||checkpoint.recordCount!==10||nums.length!==10)throw Error('SOURCE_10_FIXTURE_HOLD');
+            if(archived.policyId!=='pol_mwajp407_fizii'||archived.policyNumber!=='04-15-01-000603-0'||checkpoint.policyNumber!==archived.policyNumber||archived.clientId!=='cli_mwafruvk')throw Error('ORIGINAL_SOURCE_IDENTITY_HOLD');
+            if(checkpoint.archive?.blobSha!=='0938c08daa1238b77007eb785ab5bd955dfac3ab')throw Error('SOURCE_ARCHIVE_SHA_HOLD');
+            for(let i=0;i<10;i++){
+              if(str(archived.rows[i].receiptId)!=='cob_pol_mwajp407_fizii_'+pad(i+3)||str(nums[i])!==String(39460328+i))throw Error('ARCHIVED_SOURCE_SEQUENCE_HOLD');
             }
-            console.log('I66_MARIA_POLICY_ID_FOUND_COUNT='+seen.length);
-            console.log('I66_MARIA_POLICY_ID_SCHEMA_DIAGNOSTIC='+JSON.stringify(seen.slice(0,5)));
-            const byNumber=[],byNumberRaw=[];
-            async function lookupExactNumber(col,scope,scopeId){
-              for(const field of ['numero','numeroPoliza','numero_poliza']){
-                const q=await col.where(field,'==',fixture.policyNumber).limit(3).get();
-                for(const doc of q.docs){
-                  const p=doc.data()||{};
-                  byNumberRaw.push({scope,scopeId,docId:doc.id,rowId:id(p.id),clientId:id(p.clienteId),country:id(p.pais),policyNumber:id(p.numero)});
-                  byNumber.push({
-                    scope,scopeHash:hash(scopeId).slice(0,12),field,
-                    docIdMatches:doc.id===fixture.policyId,
-                    rowIdMatches:id(p.id)===fixture.policyId,
-                    clientAliasMatches:clientKeys.filter(k=>id(p[k])===fixture.clientId),
-                    countryAliasMatches:countryKeys.filter(k=>id(p[k]).toUpperCase()==='GT'),
-                    recognizedKeys:Object.keys(p).filter(k=>[...numberKeys,...clientKeys,...countryKeys,'id','tenantId'].includes(k))
-                  });
+            const db=getFirestore(getApps()[0]||initializeApp({projectId:'ays-orbit-360-lab'}));
+            const tenantDocs=await db.collection('tenants').listDocuments();
+            if(!tenantDocs.length||tenantDocs.length>300)throw Error('TENANT_LIST_BOUNDARY_HOLD');
+            const eligible=new Map();
+            for(const tenant of tenantDocs){
+              const policies=tenant.collection('data').doc('polizas').collection('items');
+              for(const key of ['numero','numeroPoliza','numero_poliza']){
+                const q=await policies.where(key,'==',archived.policyNumber).limit(3).get();
+                for(const d of q.docs){
+                  const p=d.data()||{};
+                  if(d.id==='pol_mwajp407'&&str(p.id)==='pol_mwajp407'&&str(p.clienteId)===archived.clientId&&str(p.pais).toUpperCase()==='GT'&&(!p.tenantId||p.tenantId===tenant.id)){
+                    eligible.set(tenant.id+'/'+d.id,{tenantId:tenant.id,policyId:d.id,policy:p});
+                  }
                 }
               }
             }
-            for(const t of tenants)await lookupExactNumber(t.collection('data').doc('polizas').collection('items'),'tenant',t.id);
-            await lookupExactNumber(db.collection('polizas'),'legacy_root','polizas');
-            await lookupExactNumber(db.collection('data').doc('polizas').collection('items'),'legacy_data_root','data/polizas/items');
-            console.log('I66_MARIA_TENANT_ROOT_LIST_COUNT='+tenants.length);
-            console.log('I66_MARIA_EXACT_NUMBER_BOUND_QUERY_COUNT='+byNumber.length);
-            console.log('I66_MARIA_EXACT_NUMBER_LOCATIONS='+JSON.stringify(byNumber.slice(0,8)));
-            if(found.length!==1){
-              const eligibleMap=new Map();
-              for(const x of byNumberRaw){
-                if(x.scope==='tenant'&&x.policyNumber===fixture.policyNumber&&x.clientId===fixture.clientId&&x.country.toUpperCase()==='GT')eligibleMap.set(x.scopeId+'|'+x.docId,x);
-              }
-              const eligible=[...eligibleMap.values()];
-              if(eligible.length===1){
-                const policy=eligible[0],col=db.collection('tenants').doc(policy.scopeId).collection('data').doc('recibosEsperados').collection('items');
-                const ids=[...new Set([policy.docId,policy.rowId,fixture.policyId])].filter(Boolean);
-                const docs=new Map();
-                for(const policyId of ids){
-                  const q=await col.where('polizaId','==',policyId).limit(25).get();
-                  for(const d of q.docs)docs.set(d.id,Object.assign({id:d.id},d.data()||{}));
-                }
-                const receipts=[...docs.values()].map(x=>({
-                  id:x.id,polizaId:x.polizaId||null,serie:x.serie||null,secuencia:x.secuencia||null,cuota:x.cuota||null,
-                  monto:x.monto??null,montoTotal:x.montoTotal??null,primaTotal:x.primaTotal??null,
-                  vence:x.vence||null,fechaLimite:x.fechaLimite||null,estado:x.estado||null,estadoPago:x.estadoPago||null,
-                  numeroReciboFuente:x.numeroReciboFuente||null,pagado:x.pagado===true,conciliado:x.conciliado===true,
-                  fechaPago:x.fechaPago||null
-                })).sort((a,b)=>String(a.id).localeCompare(String(b.id)));
-                const fingerprint=hash(JSON.stringify(receipts));
-                const report={
-                  schemaVersion:'gi.i66.universales.source-id-reconciliation.READONLY.v1',
-                  status:'HOLD_FIXTURE_POLICY_ID_DIFFERS_FROM_LIVE_NO_PATCH',
-                  projectId:'ays-orbit-360-lab',tenantId:policy.scopeId,
-                  sourceFixturePolicyId:fixture.policyId,
-                  livePolicyDocumentId:policy.docId,livePolicyRowId:policy.rowId,
-                  policyNumber:fixture.policyNumber,clientId:fixture.clientId,country:'GT',
-                  receiptCount:receipts.length,receipts,readOnlySnapshotDigest:fingerprint,
-                  dataWrites:0,neverApplyOldFixture:true
-                };
-                fs.writeFileSync(process.env.GI_I66_REPORT_PATH,JSON.stringify(report,null,2)+'\n',{mode:0o600});
-                console.log('I66_MARIA_LIVE_POLICY_ID_MISMATCH_READONLY_REPORT=CREATED');
-                console.log('I66_MARIA_LIVE_RECEIPT_INVENTORY_COUNT='+receipts.length);
-                console.log('I66_MARIA_LIVE_RECEIPT_INVENTORY_DIGEST='+fingerprint);
-                console.log('I66_MARIA_LIVE_CANONICAL_IDS='+JSON.stringify({policyDocumentId:policy.docId,policyRowId:policy.rowId,tenantIdHash:hash(policy.scopeId).slice(0,12)}));
-                console.log('I66_MARIA_LIVE_RECEIPT_SAFE_SUMMARY='+JSON.stringify(receipts.map(x=>({id:x.id,polizaId:x.polizaId,serie:x.serie,secuencia:x.secuencia,cuota:x.cuota,monto:x.monto,montoTotal:x.montoTotal,primaTotal:x.primaTotal,vence:x.vence,fechaLimite:x.fechaLimite,estado:x.estado,estadoPago:x.estadoPago,numeroReciboFuente:x.numeroReciboFuente,fechaPagoPresent:!!x.fechaPago,pagado:x.pagado,conciliado:x.conciliado}))));
-              }
-              console.log('I66_MARIA_TENANT_EXACT_MATCH_COUNT='+found.length);
-              throw Error('I66_MARIA_TENANT_NOT_EXACTLY_ONE');
+            if(eligible.size!==1)throw Error('EXACT_LIVE_POLICY_NOT_UNIQUE_HOLD_'+eligible.size);
+            const target=[...eligible.values()][0];
+            const base=db.collection('tenants').doc(target.tenantId).collection('data').doc('recibosEsperados').collection('items');
+            const allBefore=[];
+            for(let seq=1;seq<=12;seq++){
+              const receiptId='cob_pol_mwajp407_'+pad(seq);
+              const d=await base.doc(receiptId).get();
+              if(!d.exists)throw Error('MISSING_LIVE_RECEIPT_SEQUENCE_HOLD_'+seq);
+              const data=d.data()||{};
+              if(data.id&&data.id!==receiptId)throw Error('LIVE_RECEIPT_ROW_ID_HOLD_'+seq);
+              allBefore.push({id:d.id,...data});
             }
-            fs.appendFileSync(process.env.GITHUB_ENV,'GI_I66_TENANT_ID='+found[0]+'\n');
-            const fixtureDigest=hash(JSON.stringify(fixture.rows));
-            const reqId='i66_maria_source_'+fixtureDigest.slice(0,24);
-            const req=await db.collection('tenants').doc(found[0]).collection('operationalRequests').doc(reqId).get();
-            console.log('I66_MARIA_EXACT_TENANT_RESOLVED=PASS_HASH_'+hash(found[0]).slice(0,12));
-            console.log('I66_MARIA_EXISTING_REQUEST_MARKER='+String(req.exists));
-            console.log('I66_MARIA_READONLY_TENANT_SCAN_COUNT='+tenants.length);
-          })().catch(e=>{console.error('I66_MARIA_TENANT_DISCOVERY_HOLD='+String(e.message||e).slice(0,80));process.exitCode=1});
-          JS
-
-      - name: Validate all ten current receipts and compute beforeDigest with NO writes
-        shell: bash
-        run: |
-          set -euo pipefail
-          test -n "$GI_I66_TENANT_ID"
-          node "$GI_I66_RUNNER_PATH" --mode=dry-run --fixture="$GI_I66_FIXTURE_PATH" > "$RUNNER_TEMP/i66-maria-private-runner-output.txt"
-          node - <<'JS'
-          const fs=require('fs'),r=JSON.parse(fs.readFileSync(process.env.GI_I66_REPORT_PATH,'utf8'));
-          if(r.mode!=='dry-run'||r.dataWrites!==0||r.receipts?.length!==10)throw Error('UNVERIFIED_READONLY_REPORT');
-          console.log('I66_MARIA_LIVE_TEN_RECEIPT_INSPECTION='+r.status);
-          console.log('I66_MARIA_LIVE_BEFORE_DIGEST='+r.beforeDigest);
-          console.log('I66_MARIA_LIVE_PATCH_COUNT='+r.patchCount);
-          console.log('I66_MARIA_LIVE_DATA_WRITES=0');
+            if(allBefore.length!==12)throw Error('NOT_12_LIVE_RECEIPTS_HOLD');
+            const issues=[];
+            const proposedNumbers=[];
+            const contractDateDiff=[];
+            const preserveFields=['serie','secuencia','cuota','monto','montoTotal','primaTotal','vence','fechaLimite','estado','estadoPago','fechaPago','pagado','conciliado','polizaId'];
+            for(let i=0;i<12;i++){
+              const seq=i+1,r=allBefore[i];
+              if(str(r.polizaId)!=='pol_mwajp407'||Number(r.secuencia)!==seq||str(r.cuota)!==seq+'/12')issues.push('RECEIPT_RELATION_OR_SERIES_'+seq);
+              if(Number(r.monto).toFixed(2)!=='952.56')issues.push('AMOUNT_NOT_952_56_'+seq);
+              if(seq<3)continue;
+              const sourceNumber=nums[seq-3];
+              const beforeNumber=str(r.numeroReciboFuente);
+              if(beforeNumber&&beforeNumber!==sourceNumber)issues.push('SOURCE_NUMBER_CONFLICT_'+seq);
+              if(r.pagado===true||r.conciliado===true||r.fechaPago||r.estadoPago&&str(r.estadoPago).toLowerCase().includes('pagad'))issues.push('PAYMENT_FIELD_CONFLICT_'+seq);
+              if(str(r.estado).toLowerCase()!=='pendiente')issues.push('NON_PENDING_RECEIPT_'+seq);
+              proposedNumbers.push({sequence:seq,receiptId:r.id,changeOnly:'numeroReciboFuente',before:beforeNumber||null,after:sourceNumber,requiresPatch:beforeNumber!==sourceNumber,preserveFields});
+              const insurerDate=new Date(Date.UTC(2026,11+seq-3,1)).toISOString().slice(0,10);
+              const liveDate=str(r.vence);
+              if(liveDate!==insurerDate){
+                contractDateDiff.push({sequence:seq,receiptId:r.id,insurerContractualDueDate:insurerDate,liveContractualDueDate:liveDate,liveOperationalLimit:str(r.fechaLimite),separateAction:'REVIEW_DATE_ENGINE_NO_DATE_WRITE'});
+              }
+            }
+            for(const candidate of proposedNumbers){
+              const q=await base.where('numeroReciboFuente','==',candidate.after).limit(3).get();
+              if(q.docs.some(d=>d.id!==candidate.receiptId))issues.push('DUPLICATE_SOURCE_NUMBER_'+candidate.sequence);
+              if(q.docs.length>1)issues.push('SOURCE_NUMBER_NON_UNIQUE_'+candidate.sequence);
+            }
+            const allAfter=[];
+            for(let seq=1;seq<=12;seq++){
+              const receiptId='cob_pol_mwajp407_'+pad(seq);
+              const d=await base.doc(receiptId).get();
+              if(!d.exists)throw Error('CONCURRENT_DELETE_HOLD_'+seq);
+              allAfter.push({id:d.id,...(d.data()||{})});
+            }
+            const beforeDigest=snapshotHash({policy:target.policy,receipts:allBefore});
+            const afterReReadDigest=snapshotHash({policy:target.policy,receipts:allAfter});
+            if(beforeDigest!==afterReReadDigest)issues.push('CONCURRENT_RECEIPT_CHANGE');
+            const policyAgain=await db.collection('tenants').doc(target.tenantId).collection('data').doc('polizas').collection('items').doc(target.policyId).get();
+            if(!policyAgain.exists||snapshotHash(policyAgain.data()||{})!==snapshotHash(target.policy))issues.push('CONCURRENT_POLICY_CHANGE');
+            const cleanReport={
+              schemaVersion:'gi.i66.universales.remap.10_numbers_and_contractual_due.READONLY.v1',
+              dateGuatemala:'2026-11-10',projectId:'ays-orbit-360-lab',
+              authorityLedger:sourcePath,sourceArchiveBlob:'0938c08daa1238b77007eb785ab5bd955dfac3ab',
+              insurerAgingDate:'2026-11-09',insurerAgingPdfSha256:'f7bd1833a1573d4d0a1e6b494b71383aa1209f0b9afec3f06972a31213f1bd4b',
+              oldArchivedPolicyId:archived.policyId,livePolicyId:target.policyId,
+              tenantIdHash:sha(target.tenantId).slice(0,12),livePolicyUniqueCount:eligible.size,
+              receiptCount:12,sourceNumberCount:proposedNumbers.length,
+              beforeDigest,afterReReadDigest,concurrentReadbackMatch:beforeDigest===afterReReadDigest,
+              independentDiffs:{
+                numbersOnly:{field:'numeroReciboFuente',expectedCount:10,patchCount:proposedNumbers.filter(x=>x.requiresPatch).length,rows:proposedNumbers},
+                contractualDueDates:{field:'vence',source:'Universales aging 2026-11-09; first of month',mismatchCount:contractDateDiff.length,rows:contractDateDiff,noDateWrites:true},
+                operationalDeadlines:{field:'fechaLimite',keptSeparate:true,writeCount:0}
+              },
+              anomalies:issues,
+              status:issues.length?'HOLD_STRICT_READONLY_GUARD':'READ_ONLY_NUMBERS_DRY_RUN_PASS_DATE_RECONCILIATION_HOLD',
+              applied:false,liveDataWrites:0,livePaymentWrites:0,liveDateWrites:0,liveReceiptCreates:0,
+              futureApplyContract:'EXACT_TENANT_AND_12_RECEIPT_CAS_BEFORE_DIGEST_RECHECK_SOURCE_NUMBER_ONLY'
+            };
+            fs.writeFileSync(reportPath,JSON.stringify(cleanReport,null,2)+'\n',{mode:0o600});
+            console.log('I66_MARIA_REMAP_POLICY_FOUND_COUNT='+eligible.size);
+            console.log('I66_MARIA_REMAP_LIVE_RECEIPTS='+allBefore.length);
+            console.log('I66_MARIA_REMAP_SOURCE_NUMBERS='+proposedNumbers.length);
+            console.log('I66_MARIA_REMAP_NUMBERS_ONLY_PATCH_COUNT='+proposedNumbers.filter(x=>x.requiresPatch).length);
+            console.log('I66_MARIA_REMAP_DATE_MISMATCH_COUNT='+contractDateDiff.length);
+            console.log('I66_MARIA_REMAP_DATE_MISMATCH_SEQUENCES='+contractDateDiff.map(x=>x.sequence).join(','));
+            console.log('I66_MARIA_REMAP_BEFORE_DIGEST='+beforeDigest);
+            console.log('I66_MARIA_REMAP_AFTER_REREAD_DIGEST='+afterReReadDigest);
+            console.log('I66_MARIA_REMAP_GUARD_ANOMALY_COUNT='+issues.length);
+            console.log('I66_MARIA_REMAP_STATUS='+cleanReport.status);
+            console.log('I66_MARIA_REMAP_DATA_WRITES=0');
+            if(issues.length)throw Error('STRICT_DATA_GUARD_HOLD_'+issues.join('_').slice(0,120));
+          })().catch(e=>{console.error('I66_MARIA_REMAP_READONLY_HOLD='+String(e.message||e).slice(0,150));process.exitCode=1});
           JS
 
       - name: Preserve exact sanitized before-snapshot evidence even on HOLD
