@@ -1,0 +1,188 @@
+# Only a source/receipt linkage and backend precondition inspection. No Firestore mutation.
+name: Gravicentra I6.6 Bayron LIVE payment READ ONLY
+
+on:
+  push:
+    branches: [recovery/fase-a-clean-20260831]
+    paths:
+      - .github/workflows/gravicentra-i66-bayron-live-payment-readonly.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: gi-i66-bayron-live-payment-readonly
+  cancel-in-progress: false
+
+jobs:
+  inspect-without-writing:
+    if: github.ref_name == 'recovery/fase-a-clean-20260831'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      PROJECT_ID: ays-orbit-360-lab
+      GCLOUD_PROJECT: ays-orbit-360-lab
+      FIREBASE_PROJECT_ID: ays-orbit-360-lab
+      SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_LAB_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+    steps:
+      - name: Guard exact repo/branch/project and checkout
+        uses: actions/checkout@v4
+        with:
+          ref: recovery/fase-a-clean-20260831
+          persist-credentials: false
+
+      - name: Install pinned Firebase Admin for read-only inspection
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = "recovery/fase-a-clean-20260831"
+          test "$PROJECT_ID" = "ays-orbit-360-lab"
+          test -z "${FIRESTORE_EMULATOR_HOST:-}"
+          npm install --prefix "$RUNNER_TEMP/gi-i66-bayron-admin" --no-audit --no-fund --ignore-scripts firebase-admin@13.4.0 >/dev/null
+          echo "NODE_PATH=$RUNNER_TEMP/gi-i66-bayron-admin/node_modules" >> "$GITHUB_ENV"
+          echo "REPORT_PATH=$RUNNER_TEMP/gi-i66-bayron-payment-readonly.json" >> "$GITHUB_ENV"
+
+      - name: Resolve existing service account for exact Firebase project
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/gi-i66-bayron-auth"
+          chmod 700 "$RUNNER_TEMP/gi-i66-bayron-auth"
+          python3 - <<'PY'
+          import json, os, pathlib
+          target='ays-orbit-360-lab'
+          path=pathlib.Path(os.environ['RUNNER_TEMP'])/'gi-i66-bayron-auth'/'existing-lab.json'
+          for key in ('SA_LAB','SA_LAB_ALT','SA_DEFAULT'):
+              try: credential=json.loads(os.environ.get(key,''))
+              except (ValueError,TypeError): continue
+              if credential.get('type')!='service_account' or credential.get('project_id')!=target or not credential.get('private_key'): continue
+              path.write_text(json.dumps(credential), encoding='utf-8')
+              path.chmod(0o600)
+              with open(os.environ['GITHUB_ENV'],'a') as out: out.write('GOOGLE_APPLICATION_CREDENTIALS='+str(path)+'\n')
+              print('I66_BAYRON_EXACT_SERVICE_ACCOUNT_PROJECT_PASS')
+              break
+          else: raise SystemExit('I66_BAYRON_SERVICE_ACCOUNT_HOLD')
+          PY
+
+      - name: Audit exact policy and receipt-payment prerequisites without writes
+        shell: bash
+        run: |
+          set -euo pipefail
+          node - <<'JS'
+          'use strict';
+          const fs=require('node:fs');
+          const crypto=require('node:crypto');
+          const {getApps,initializeApp}=require('firebase-admin/app');
+          const {getFirestore}=require('firebase-admin/firestore');
+          const PROJECT='ays-orbit-360-lab';
+          const POLICY='VA125-00010478';
+          const NUMBERS=['58876231','62444671'];
+          const DUES=['2026-08-20','2026-09-20'];
+          const SOURCE='https://docs.google.com/spreadsheets/d/1wz6gJIymDdKrXC9SvYhftFt_rgFmY67s/edit';
+          const fnSha=s=>crypto.createHash('sha256').update(String(s)).digest('hex');
+          const str=x=>String(x==null?'':x).trim();
+          const money=x=>{const n=Number(x);return Number.isFinite(n)?Math.round(n*100)/100:null};
+          const date=x=>str(x).slice(0,10);
+          const names=r=>[r.numeroReciboFuente,r.numeroReciboAseguradora,r.numeroRecibo,r.receiptNumber,r.numero,r.referenciaRecibo,r.reciboNumero].map(str).filter(Boolean);
+          const amount=r=>{for(const k of ['monto','montoTotal','primaTotal','saldo'])if(r[k]!=null&&money(r[k])!=null)return money(r[k]);return null};
+          const paid=r=>r.pagado===true||r.conciliadoPago===true||r.estado==='Pagado'||r.estadoPago==='Pagado'||String(r.paymentState||'').startsWith('PAID_')||!!r.fechaPago;
+          const norm=v=>JSON.stringify(v,(key,val)=>val&&typeof val.toJSON==='function'?val.toJSON():val);
+          async function main(){
+            if(process.env.PROJECT_ID!==PROJECT||process.env.GCLOUD_PROJECT!==PROJECT||process.env.FIRESTORE_EMULATOR_HOST)throw Error('PROJECT_OR_EMULATOR_BOUNDARY');
+            const db=getFirestore(getApps()[0]||initializeApp({projectId:PROJECT}));
+            const tenants=await db.collection('tenants').listDocuments();
+            if(!tenants.length||tenants.length>300)throw Error('TENANT_SCOPE_HOLD');
+            const matches=new Map();
+            for(const tenant of tenants){
+              const pcol=tenant.collection('data').doc('polizas').collection('items');
+              for(const field of ['numero','numeroPoliza','numero_poliza']){
+                const snap=await pcol.where(field,'==',POLICY).limit(5).get();
+                for(const doc of snap.docs)matches.set(tenant.id+'/'+doc.id,{tenant,doc,policy:doc.data()||{}});
+              }
+            }
+            const report={schemaVersion:'gi.i66.bayron.payment.LIVE_READONLY.v1', projectId:PROJECT,
+              policyNumber:POLICY, paymentFacts:{first:{source:'Rural commission October',insurerReceipt:'58876231',paidDate:'2026-10-29',grossGTQ:1557.92,sourceUrl:SOURCE},second:{source:'Rural outstanding 2026-11-06',insurerReceipt:'62444671',grossGTQ:1557.92,paidDate:null,statusAsOf:'PENDING_2026-11-06'}},
+              livePolicyCount:matches.size,policyId:null,tenantIdHash:null,receipts:[],duplicateOperationalCobros:[],anomalies:[],status:'HOLD',
+              applied:false,writeCount:0,paymentWriteCount:0};
+            if(matches.size!==1)report.anomalies.push('POLICY_UNIQUE_MATCH_COUNT_'+matches.size);
+            if(matches.size===1){
+              const {tenant,doc,policy}=Array.from(matches.values())[0],pid=doc.id;
+              report.policyId=pid;report.tenantIdHash=fnSha(tenant.id).slice(0,12);report.country=str(policy.pais).toUpperCase();
+              if(report.country!=='GT')report.anomalies.push('POLICY_COUNTRY_NOT_GT');
+              const base=(collection)=>tenant.collection('data').doc(collection).collection('items');
+              const clientId=str(policy.clienteId);
+              const client=clientId?await base('clientes').doc(clientId).get():null;
+              if(!client||!client.exists)report.anomalies.push('POLICY_CLIENT_MISSING');
+              const rSnap=await base('recibosEsperados').where('polizaId','==',pid).limit(40).get();
+              if(rSnap.size>=40)report.anomalies.push('RECEIPT_SCOPE_TOO_WIDE');
+              const before=[];
+              for(const receipt of rSnap.docs){
+                const data=receipt.data()||{},rid=receipt.id;
+                if(str(data.polizaId)!==pid)report.anomalies.push('RECEIPT_POLICY_RELATION_MISMATCH');
+                const nums=names(data),a=amount(data);
+                const carSnap=await base('carteraPrimas').where('reciboId','==',rid).limit(10).get();
+                const cobSnap=await base('cobros').where('reciboId','==',rid).limit(10).get();
+                const cartera=carSnap.docs.map(d=>({id:d.id,data:d.data()||{}}));
+                const cobros=cobSnap.docs.map(d=>({id:d.id,data:d.data()||{}}));
+                const activePortfolio=cartera.filter(x=>x.data.carteraActiva!==false&&!['Anulado','Cancelado','Superseded','Reemplazado'].includes(str(x.data.estadoCartera||x.data.estado)));
+                const summary={id:rid,sourceReceiptNumbers:nums,sequence:str(data.secuencia||data.cuota||data.serie),dueDate:date(data.vence||data.fechaLimite||data.fechaVencimiento),amountGTQ:a,currency:str(data.moneda),
+                  receiptPaid:paid(data),receiptState:str(data.estado),paymentState:str(data.paymentState),carteraCount:cartera.length,activePortfolioCount:activePortfolio.length,cobroCount:cobros.length,
+                  cobroPaid:cobros.some(x=>paid(x.data)),cobroStatus:cobros.map(x=>str(x.data.estado)),linkedCobroIds:cobros.map(x=>x.id),clientLinkMatches:!data.clienteId||str(data.clienteId)===clientId};
+                before.push({id:rid,data,cartera,cobros});report.receipts.push(summary);
+              }
+              const linkedCobros=await base('cobros').where('polizaId','==',pid).limit(40).get();
+              for(const d of linkedCobros.docs){const c=d.data()||{};
+                if(!report.receipts.some(r=>r.id===str(c.reciboId)))report.duplicateOperationalCobros.push({id:d.id,reciboId:str(c.reciboId),state:str(c.estado),amount:amount(c)});
+              }
+              report.receiptCount=report.receipts.length;
+              report.byDueDate=DUES.map((due,i)=>{
+                const candidates=report.receipts.filter(r=>r.dueDate===due&&r.amountGTQ===1557.92);
+                const sourceMatches=report.receipts.filter(r=>r.sourceReceiptNumbers.includes(NUMBERS[i])&&r.amountGTQ===1557.92);
+                if(candidates.length!==1)report.anomalies.push('DUE_AMOUNT_NOT_UNIQUE_'+(i+1)+'_'+candidates.length);
+                if(sourceMatches.length!==1)report.anomalies.push('SOURCE_RECEIPT_NOT_UNIQUE_'+(i+1)+'_'+sourceMatches.length);
+                if(candidates.length===1&&sourceMatches.length===1&&candidates[0].id!==sourceMatches[0].id)report.anomalies.push('SOURCE_DUE_MAPPING_CONFLICT_'+(i+1));
+                const target=candidates.length===1?candidates[0]:null;
+                if(target){
+                  if(target.receiptPaid||target.cobroPaid)report.anomalies.push('ALREADY_PAID_'+(i+1));
+                  if(target.activePortfolioCount>1||target.cobroCount>1)report.anomalies.push('BACKEND_DUPLICATE_PRECONDITION_'+(i+1));
+                  if(!target.clientLinkMatches)report.anomalies.push('CLIENT_RELATION_MISMATCH_'+(i+1));
+                }
+                return{index:i+1,contractualDue:due,sourceReceiptNumber:NUMBERS[i],exactDueAmountReceiptId:target&&target.id,exactSourceNumberReceiptId:sourceMatches.length===1?sourceMatches[0].id:null,firstPaidDateEvidence:i===0?'2026-10-29':null,paymentDateForWrite:i===0?'2026-10-29':null,
+                  stateBefore:target&&{receiptPaid:target.receiptPaid,cobroPaid:target.cobroPaid,activePortfolioCount:target.activePortfolioCount,cobroCount:target.cobroCount}};
+              });
+              report.beforeDigest=fnSha(norm(before));
+              const after=[];
+              for(const r of before){
+                const rd=await base('recibosEsperados').doc(r.id).get();
+                const cartera=[];for(const x of r.cartera){const d=await base('carteraPrimas').doc(x.id).get();cartera.push({id:x.id,data:d.exists?d.data():null});}
+                const cobros=[];for(const x of r.cobros){const d=await base('cobros').doc(x.id).get();cobros.push({id:x.id,data:d.exists?d.data():null});}
+                after.push({id:r.id,data:rd.exists?rd.data():null,cartera,cobros});
+              }
+              report.afterDigest=fnSha(norm(after));
+              if(report.beforeDigest!==report.afterDigest)report.anomalies.push('CONCURRENT_CHANGE_HOLD');
+            }
+            report.status=report.anomalies.length?'HOLD_BACKEND_PRECONDITION':'READ_ONLY_MAPPINGS_MATCH';
+            fs.writeFileSync(process.env.REPORT_PATH,JSON.stringify(report,null,2)+'\n',{mode:0o600});
+            console.log('I66_BAYRON_POLICY_MATCHES='+report.livePolicyCount);
+            console.log('I66_BAYRON_POLICY_ID='+str(report.policyId));
+            console.log('I66_BAYRON_RECEIPT_COUNT='+str(report.receiptCount));
+            for(const r of report.byDueDate||[])console.log('I66_BAYRON_RECEIPT_'+r.index+'_MAPPING='+JSON.stringify(r));
+            console.log('I66_BAYRON_ANOMALIES='+JSON.stringify(report.anomalies));
+            console.log('I66_BAYRON_STATUS='+report.status);
+            console.log('I66_BAYRON_WRITES=0');
+            if(report.anomalies.length)process.exitCode=1;
+          }
+          main().catch(e=>{console.error('I66_BAYRON_PREFLIGHT_ERROR='+str(e.message).slice(0,140));process.exitCode=1});
+          JS
+
+      - name: Upload sanitized read-only evidence even on HOLD
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gi-i66-bayron-payment-readonly-${{ github.run_id }}
+          path: ${{ runner.temp }}/gi-i66-bayron-payment-readonly.json
+          if-no-files-found: warn
+          retention-days: 30
