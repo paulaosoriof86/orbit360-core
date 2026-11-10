@@ -1,0 +1,80 @@
+# First payment ALREADY posted through Paula signed LIVE session. This
+# workflow only reconciles its insurer commission evidence and receipt number;
+# it never creates another payment or modifies the second installment.
+# GitHub Environment gravicentra-live-data-writes REQUIRED REVIEWER must
+# approve this EXACT run before the job can execute.
+name: Gravicentra I6.6 Bayron FIRST commission application PROTECTED
+
+on:
+  push:
+    branches: [recovery/fase-a-clean-20260831]
+    paths:
+      - .github/workflows/gravicentra-i66-bayron-postpayment-sparse-protected.yml
+
+permissions:
+  actions: read
+  contents: read
+
+concurrency:
+  # Shared finance gate with Maria/Universales; never concurrently mutate LIVE
+  # finance through two unrelated case-specific workflows.
+  group: gravicentra-live-data-writes-i66
+  cancel-in-progress: false
+
+jobs:
+  reconcile-existing-first-payment-commission:
+    if: github.repository == 'paulaosoriof86/orbit360-core' && github.ref_name == 'recovery/fase-a-clean-20260831'
+    environment:
+      name: gravicentra-live-data-writes
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      GCLOUD_PROJECT: ays-orbit-360-lab
+      GI_I66_POSTPAYMENT_MODE: apply_commission_reconciliation
+      GI_I66_ENVIRONMENT: gravicentra-live-data-writes
+      GI_I66_INTENT: BAYRON_FIRST_ONLY_COMMISSION_58876231_TECHNICAL_RECONCILIATION
+      # Fixed reviewed intent is NOT sufficient without actual required
+      # reviewer approval; script checks exact run approval+HEAD SHA too.
+      GI_I66_POSTPAYMENT_WRITE_ENABLED: YES_APPROVED_BAYRON_FIRST_58876231
+      GI_I66_GITHUB_ACTIONS_READ_TOKEN: ${{ github.token }}
+      SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_LAB_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Syntax and 18 focused fail-closed regression tests BEFORE LIVE writes
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check tools/gravicentra-i66-bayron-postpayment.cjs
+          node --test tools/gravicentra-i66-bayron-postpayment.test.cjs
+      - name: Resolve existing project credential only
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = 'recovery/fase-a-clean-20260831'
+          test "$GCLOUD_PROJECT" = 'ays-orbit-360-lab'
+          test -z "${FIRESTORE_EMULATOR_HOST:-}"
+          npm install --prefix "$RUNNER_TEMP/gi-i66-bayron-sparse" --no-audit --no-fund --ignore-scripts firebase-admin@13.4.0 >/dev/null
+          echo "NODE_PATH=$RUNNER_TEMP/gi-i66-bayron-sparse/node_modules" >> "$GITHUB_ENV"
+          python3 - <<'PY'
+          import json,os,pathlib
+          p=pathlib.Path(os.environ['RUNNER_TEMP'])/'gi-i66-bayron-sparse-sa.json'
+          for key in ('SA_LAB','SA_LAB_ALT','SA_DEFAULT'):
+              try: c=json.loads(os.environ.get(key,''))
+              except (TypeError,ValueError): continue
+              if c.get('type')!='service_account' or c.get('project_id')!='ays-orbit-360-lab' or not c.get('private_key'): continue
+              p.write_text(json.dumps(c),encoding='utf8');p.chmod(0o600)
+              with open(os.environ['GITHUB_ENV'],'a') as out:out.write('GOOGLE_APPLICATION_CREDENTIALS='+str(p)+'\n')
+              print('GI_I66_BAYRON_EXISTING_LAB_METADATA_CAS_IDENTITY_SELECTED')
+              break
+          else: raise SystemExit('GI_I66_BAYRON_METADATA_SA_HOLD')
+          PY
+      - name: Protected FIRST receipt commission statement CAS plus signed-payment proof
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-i66-bayron-postpayment.cjs
