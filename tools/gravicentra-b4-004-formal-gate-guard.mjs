@@ -820,8 +820,13 @@ export function verifyB4004FormalGate(){
   need(cp.continuityRegisterBlobSha===blob(fs.readFileSync(REGISTER))&&cp.findingContinuityControl.registerBlobSha===cp.continuityRegisterBlobSha&&cp.findingContinuityControl.lastLedgerBlobSha===cp.findingLedgerBlobSha,'REGISTER_HASH');
   need(cp.findingContinuityControl.guardBlobSha===git('rev-parse','HEAD:tools/gravicentra-open-findings-continuity-guard-v1.mjs'),'CONTINUITY_GUARD_VERSION');
   need(read(ROOT+'CAPABILITY_STATUS_LEDGER.json').capabilities.length===15,'CAPABILITY_COUNT');
-  need(cp.postproductionExitProgress.formalPercent===50&&seal.nextGate==='B4-005'&&seal.nextAction===ACTION,'FORMAL_PROGRESS');
-  return {status:'PASS',gate:'I6.5/B4-004',scope:'TARGETED_CRONOGRAMA_LIVE_PLUS_OWNER_DEFERRED_SINIESTROS',sourceSha:SOURCE,artifactId:ARTIFACT,ledgerCount:295,historicalNextGate:'B4-005',latestClosedGate:b4006Closed?'B4-006':'B4-004',firstIncompleteGate:b4006Closed?'B4-007':'B4-005',b4006OwnerVisualSealVerified:b4006Closed};
+  const currentLiveI66=cp.b4007OwnerOperationalGateClosure20261110?.operationalReleaseClosedByDirection===true&&
+    cp.gateState?.gates?.I6?.activeSubgate==='I6.6'&&state.currentIteration===6;
+  need((currentLiveI66
+    ? cp.postproductionExitProgress.formalPercent===60&&cp.postproductionExitProgress.lastFrozenMiniGate==='I6.5'
+    : cp.postproductionExitProgress.formalPercent===50)&&
+    seal.nextGate==='B4-005'&&seal.nextAction===ACTION,'FORMAL_PROGRESS');
+  return {status:'PASS',gate:'I6.5/B4-004',scope:'TARGETED_CRONOGRAMA_LIVE_PLUS_OWNER_DEFERRED_SINIESTROS',sourceSha:SOURCE,artifactId:ARTIFACT,ledgerCount:295,historicalNextGate:'B4-005',latestClosedGate:currentLiveI66?'B4-007':b4006Closed?'B4-006':'B4-004',firstIncompleteGate:currentLiveI66?'I6.6':b4006Closed?'B4-007':'B4-005',b4006OwnerVisualSealVerified:b4006Closed};
 }
 
 if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href){
