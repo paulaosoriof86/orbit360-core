@@ -1,6 +1,6 @@
 {
   "schemaVersion": "gi.i66.calendar.forward_only.source_qa_manifest.v1",
-  "status": "I66_UTC_AND_PERIODICITY_SOURCE_CANDIDATE_NEW_CI_PENDING_NO_PREVIEW_NO_LIVE",
+  "status": "I66_UTC_PERIODICITY_SOURCE_CI_PASS_27_OF_27_PREVIEW_PENDING_NO_LIVE",
   "dateGuatemala": "2026-11-10",
   "product": "Gravicentra Insurance",
   "repository": "paulaosoriof86/orbit360-core",
@@ -58,13 +58,14 @@
       "MONTHLY_5_CONSECUTIVE",
       "TERM_REJECT_5_MONTHLY_IN_3_MONTHS_AND_24_IN_YEAR"
     ],
-    "runId": null,
-    "conclusion": "PENDING_NEW_CI_3_ZONES",
+    "runId": 42883220523,
+    "conclusion": "PASS_3_OF_3_JOBS_GT_CO_UTC_9_TEST_GROUPS_PER_TZ_27_TOTAL",
     "lastProvenPreviousRun": {
       "runId": 42882704534,
-      "status": "PASS_3_ZONES_7_TEST_GROUPS",
-      "sourceBoundary": "UTC_TIMEZONE_FIX_PRIOR_TO_PERIODICITY_EXTENSION"
-    }
+      "status": "PASS_3_ZONES_7_GROUPS",
+      "sourceBoundary": "PREVIOUS_TIMEZONE_ONLY_BEFORE_PERIODICITY"
+    },
+    "verifiedSourceCommit": "d1d97f2afb85f4a93beec4de848e4f8fd71ac4d7"
   },
   "strictDataSeparation": {
     "thisCandidateWritesToLive": 0,
