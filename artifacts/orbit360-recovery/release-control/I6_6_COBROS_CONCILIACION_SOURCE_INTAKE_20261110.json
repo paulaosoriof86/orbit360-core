@@ -649,7 +649,7 @@
     "operationalWrites": 3,
     "sourceChangeInProduction": false,
     "importerRebuildRequired": false,
-    "nextRequiredStep": "Read remaining authentic insurer statements under period semantics and exact policy edition keys; G&T transport TLG$-7529 account Oct27 one pending USD214.95, no LIVE Cobros row. Do not create fake receipts; repair source scheduler and importer fail-closed then certify. Preserve previously passed Cobros perf, investigate global search O(policies×vehicles) and Client360 recalc with isolated app vs browser measures.",
+    "nextRequiredStep": "Continue source-by-source readback and exact LIVE edition/receipt matching; avoid unverified import: authentic Rural Excel currently displays unrelated demo preview. Repair importer fail-closed and source-driven installment dates via canonical gated source+QA; verify cross-insurer renewal linkage; current connected Chrome DOM operations intermittently fail CDP focus. Preserve previously certified Cobros B3-002 performance and separate browser transport vs actual page latency. No duplicate or speculative payment writes.",
     "insurerStatementsNativeFormatsParsed": true,
     "all35CurrentSourceRawHashesPinned": true,
     "fourHistoricalReferenceHashesPinned": true,
@@ -1207,7 +1207,8 @@
       "attribution": "Transport and page responsiveness both possible; the router.js full multicollection scan per keypress is a concrete source-risk; do not equate CDP timeout to exact app-only TTI.",
       "sourceBlobSha": "df3f134f16246c770418ad11323f6e9a931cb3bb",
       "action": "No further global-search stress repeated in production; use narrower module filters and source diagnostics."
-    }
+    },
+    "browserTransportNotes": "undefined Reattempted authenticated Chrome tabs for Julia and Cobros on 2026-11-10: three DOM snapshots failed CDP Emulation.setFocusEmulationEnabled after 3000ms. This is browser-control transport instability and not proof of application-only TTI. No destructive or financial write retried."
   },
   "operationalActions": [
     {
@@ -1514,6 +1515,54 @@
       "collectedActual": "NOT_EVIDENCED",
       "liveCobrosFilter": "TLG$-7529 shows Sin cobros in authenticated LIVE (does not alone prove policy absent).",
       "interpretation": "Short-term transport one month, not annual/multi installment. Oct27 pending as of report; Nov10 payment must be independently verified before paid marking."
+    },
+    {
+      "id": "FICOHSA_SPLIT_REPORT_SEPT_COLLECTED_VS_OCT_PROJECTION_20261110",
+      "status": "AUTHENTIC_EXCEL_CONTENT_READBACK_VERIFIED",
+      "source": "https://docs.google.com/spreadsheets/d/1qnOMyFHKnZlAgLNnACmsmgky3avOHsl4/edit",
+      "driveFileId": "1qnOMyFHKnZlAgLNnACmsmgky3avOHsl4",
+      "sourceFilename": "Ficohsa - Estado de cuenta - Reporte 2026-10-22.xlsx",
+      "sourcePreviouslyPinnedSha256": "0246c29d7982e548011add8af150f2c657eed42b0bac9f9b58abeb4d5ea46f23",
+      "subreports": [
+        {
+          "type": "PRIMAS_COBRADAS",
+          "displayedReportPeriod": "2026-09-01 through 2026-09-30",
+          "exactPolicy": "AUTO-1000007073",
+          "client": "MARCO VINICIO PAYES ESCOBAR",
+          "requirement": "7315461",
+          "payment": "1/1",
+          "grossGTQ": 2704.8,
+          "actualApplicationDate": "2026-10-02",
+          "invoiceRef": "3AD64C65-2823637152",
+          "interpretation": "The period header and row application date differ; preserve both, use exact payment application date as evidence for this paid row, never pending."
+        },
+        {
+          "type": "PRIMAS_POR_COBRAR",
+          "label": "PROYECCION AL CIERRE DEL MES DE OCTUBRE",
+          "reportGeneratedAt": "2026-10-22",
+          "projectionHorizon": "2026-10-31",
+          "rows": [
+            {
+              "policy": "AUTO-1000002937",
+              "requirement": "7301819",
+              "pendingGTQ": 176.4
+            },
+            {
+              "policy": "AUTO-1000000181",
+              "requirement": "7313398",
+              "pendingGTQ": 12658.17
+            },
+            {
+              "policy": "AUTO-1000000334",
+              "requirement": "7317082",
+              "pendingGTQ": 3880.8
+            }
+          ],
+          "interpretation": "Future projection relative to report generation, not 2026-11-10 real-time aging."
+        }
+      ],
+      "writeStatus": "READ_ONLY_NO_POLICY_OR_PAYMENT_MUTATION",
+      "lineage": "Keep Marco P788KJN previous El Roble policy and Ficohsa successor linked as renewal; do not connect unrelated Chery risk."
     }
   ]
 }
