@@ -1,0 +1,352 @@
+{
+  "schema": "GI_I66_UNIVERSALES_MARIA_EXACT_CURRENT_LIVE_CAS_PREVIEW_NOT_APPLIED_V1",
+  "status": "STRICT_READONLY_24_DOCUMENT_PREIMAGE_VERIFIED_APPLY_PROTECTED_ENV_HOLD",
+  "dateGuatemala": "2026-11-10",
+  "canonicalLedger": "artifacts/orbit360-recovery/release-control/I6_6_COBROS_CONCILIACION_SOURCE_INTAKE_20261110.json",
+  "projectId": "ays-orbit-360-lab",
+  "country": "GT",
+  "policyNumber": "04-15-01-000603-0",
+  "livePolicyDocumentId": "pol_mwajp407",
+  "clientId": "cli_mwafruvk",
+  "tenantsMatchCount": 1,
+  "source": {
+    "insurer": "Seguros Universales",
+    "statement": "Antigüedad de saldos",
+    "cut": "2026-11-09",
+    "pdfSha256": "f7bd1833a1573d4d0a1e6b494b71383aa1209f0b9afec3f06972a31213f1bd4b",
+    "installmentFrequency": "Mensual",
+    "contractualDueDay": 1
+  },
+  "readOnlyEvidence": {
+    "runId": 42904276754,
+    "receiptAndPolicyBeforeDigest": "dee08f3697dfd3f6c3e8fbb9570b46d3b2fa17c72784b9fa8db66fe6ecf84cff",
+    "portfolioBeforeDigest": "4198b39a18be9c520ae4eca6255471aefd80a42d25e13ed5aa948fa247857aa8",
+    "receiptCount": 12,
+    "portfolioCount": 12,
+    "oneToOneLinks": 12,
+    "concurrentReadbackMatch": true,
+    "sourceNumberPatchCount": 10,
+    "contractualDuePatchCount": 7,
+    "operationalPlus15PatchCount": 7,
+    "portfolioDerivedDatePatchCount": 7,
+    "anomalies": 0,
+    "dataWrites": 0
+  },
+  "patches": {
+    "receiptSourceNumbers": [
+      {
+        "sequence": 3,
+        "receiptId": "cob_pol_mwajp407_003",
+        "sourceReceiptNumber": "39460328"
+      },
+      {
+        "sequence": 4,
+        "receiptId": "cob_pol_mwajp407_004",
+        "sourceReceiptNumber": "39460329"
+      },
+      {
+        "sequence": 5,
+        "receiptId": "cob_pol_mwajp407_005",
+        "sourceReceiptNumber": "39460330"
+      },
+      {
+        "sequence": 6,
+        "receiptId": "cob_pol_mwajp407_006",
+        "sourceReceiptNumber": "39460331"
+      },
+      {
+        "sequence": 7,
+        "receiptId": "cob_pol_mwajp407_007",
+        "sourceReceiptNumber": "39460332"
+      },
+      {
+        "sequence": 8,
+        "receiptId": "cob_pol_mwajp407_008",
+        "sourceReceiptNumber": "39460333"
+      },
+      {
+        "sequence": 9,
+        "receiptId": "cob_pol_mwajp407_009",
+        "sourceReceiptNumber": "39460334"
+      },
+      {
+        "sequence": 10,
+        "receiptId": "cob_pol_mwajp407_010",
+        "sourceReceiptNumber": "39460335"
+      },
+      {
+        "sequence": 11,
+        "receiptId": "cob_pol_mwajp407_011",
+        "sourceReceiptNumber": "39460336"
+      },
+      {
+        "sequence": 12,
+        "receiptId": "cob_pol_mwajp407_012",
+        "sourceReceiptNumber": "39460337"
+      }
+    ],
+    "receiptAndPortfolioDates": [
+      {
+        "sequence": 4,
+        "receiptId": "cob_pol_mwajp407_004",
+        "portfolioId": "car_cob_pol_mwajp407_004",
+        "receiptPatchPreview": {
+          "vence": {
+            "before": "2026-12-31",
+            "after": "2027-01-01"
+          },
+          "fechaLimite": {
+            "before": "2027-01-15",
+            "after": "2027-01-16"
+          }
+        },
+        "portfolioPatchPreview": {
+          "vence": {
+            "before": "2026-12-31",
+            "after": "2027-01-01"
+          },
+          "fechaLimite": {
+            "before": "2027-01-15",
+            "after": "2027-01-16"
+          },
+          "fechaVencimiento": {
+            "before": "2027-01-15",
+            "after": "2027-01-16"
+          }
+        }
+      },
+      {
+        "sequence": 5,
+        "receiptId": "cob_pol_mwajp407_005",
+        "portfolioId": "car_cob_pol_mwajp407_005",
+        "receiptPatchPreview": {
+          "vence": {
+            "before": "2027-01-31",
+            "after": "2027-02-01"
+          },
+          "fechaLimite": {
+            "before": "2027-02-15",
+            "after": "2027-02-16"
+          }
+        },
+        "portfolioPatchPreview": {
+          "vence": {
+            "before": "2027-01-31",
+            "after": "2027-02-01"
+          },
+          "fechaLimite": {
+            "before": "2027-02-15",
+            "after": "2027-02-16"
+          },
+          "fechaVencimiento": {
+            "before": "2027-02-15",
+            "after": "2027-02-16"
+          }
+        }
+      },
+      {
+        "sequence": 6,
+        "receiptId": "cob_pol_mwajp407_006",
+        "portfolioId": "car_cob_pol_mwajp407_006",
+        "receiptPatchPreview": {
+          "vence": {
+            "before": "2027-03-03",
+            "after": "2027-03-01"
+          },
+          "fechaLimite": {
+            "before": "2027-03-18",
+            "after": "2027-03-16"
+          }
+        },
+        "portfolioPatchPreview": {
+          "vence": {
+            "before": "2027-03-03",
+            "after": "2027-03-01"
+          },
+          "fechaLimite": {
+            "before": "2027-03-18",
+            "after": "2027-03-16"
+          },
+          "fechaVencimiento": {
+            "before": "2027-03-18",
+            "after": "2027-03-16"
+          }
+        }
+      },
+      {
+        "sequence": 7,
+        "receiptId": "cob_pol_mwajp407_007",
+        "portfolioId": "car_cob_pol_mwajp407_007",
+        "receiptPatchPreview": {
+          "vence": {
+            "before": "2027-03-31",
+            "after": "2027-04-01"
+          },
+          "fechaLimite": {
+            "before": "2027-04-15",
+            "after": "2027-04-16"
+          }
+        },
+        "portfolioPatchPreview": {
+          "vence": {
+            "before": "2027-03-31",
+            "after": "2027-04-01"
+          },
+          "fechaLimite": {
+            "before": "2027-04-15",
+            "after": "2027-04-16"
+          },
+          "fechaVencimiento": {
+            "before": "2027-04-15",
+            "after": "2027-04-16"
+          }
+        }
+      },
+      {
+        "sequence": 9,
+        "receiptId": "cob_pol_mwajp407_009",
+        "portfolioId": "car_cob_pol_mwajp407_009",
+        "receiptPatchPreview": {
+          "vence": {
+            "before": "2027-05-31",
+            "after": "2027-06-01"
+          },
+          "fechaLimite": {
+            "before": "2027-06-15",
+            "after": "2027-06-16"
+          }
+        },
+        "portfolioPatchPreview": {
+          "vence": {
+            "before": "2027-05-31",
+            "after": "2027-06-01"
+          },
+          "fechaLimite": {
+            "before": "2027-06-15",
+            "after": "2027-06-16"
+          },
+          "fechaVencimiento": {
+            "before": "2027-06-15",
+            "after": "2027-06-16"
+          }
+        }
+      },
+      {
+        "sequence": 11,
+        "receiptId": "cob_pol_mwajp407_011",
+        "portfolioId": "car_cob_pol_mwajp407_011",
+        "receiptPatchPreview": {
+          "vence": {
+            "before": "2027-07-31",
+            "after": "2027-08-01"
+          },
+          "fechaLimite": {
+            "before": "2027-08-15",
+            "after": "2027-08-16"
+          }
+        },
+        "portfolioPatchPreview": {
+          "vence": {
+            "before": "2027-07-31",
+            "after": "2027-08-01"
+          },
+          "fechaLimite": {
+            "before": "2027-08-15",
+            "after": "2027-08-16"
+          },
+          "fechaVencimiento": {
+            "before": "2027-08-15",
+            "after": "2027-08-16"
+          }
+        }
+      },
+      {
+        "sequence": 12,
+        "receiptId": "cob_pol_mwajp407_012",
+        "portfolioId": "car_cob_pol_mwajp407_012",
+        "receiptPatchPreview": {
+          "vence": {
+            "before": "2027-08-31",
+            "after": "2027-09-01"
+          },
+          "fechaLimite": {
+            "before": "2027-09-15",
+            "after": "2027-09-16"
+          }
+        },
+        "portfolioPatchPreview": {
+          "vence": {
+            "before": "2027-08-31",
+            "after": "2027-09-01"
+          },
+          "fechaLimite": {
+            "before": "2027-09-15",
+            "after": "2027-09-16"
+          },
+          "fechaVencimiento": {
+            "before": "2027-09-15",
+            "after": "2027-09-16"
+          }
+        }
+      }
+    ]
+  },
+  "invariant": {
+    "noChangesToSequences": [
+      1,
+      2
+    ],
+    "noDateChangesToSequences": [
+      3,
+      8,
+      10
+    ],
+    "allowedReceiptFields": [
+      "numeroReciboFuente",
+      "vence",
+      "fechaLimite"
+    ],
+    "allowedPortfolioFields": [
+      "vence",
+      "fechaLimite",
+      "fechaVencimiento"
+    ],
+    "neverChange": [
+      "clienteId",
+      "polizaId",
+      "tenantId",
+      "pais",
+      "moneda",
+      "monto",
+      "primaTotal",
+      "estado",
+      "estadoOperativo",
+      "exigibilidad",
+      "carteraActiva",
+      "pagado",
+      "conciliado",
+      "fechaPago",
+      "metodo",
+      "conducto",
+      "serie",
+      "cuota",
+      "secuencia",
+      "fuente"
+    ],
+    "transactionCAS": "FIRESTORE_TRANSACTION_READ_EXACT_POLICY_12_RECEIPTS_12_PORTFOLIO_AGAINST_PINNED_FULL_DIGEST_BEFORE_ALL_WRITES",
+    "idempotence": "operationRequest immutable exact source + digest; already applied must read back identical"
+  },
+  "gate": {
+    "protectedGitHubEnvironment": "gravicentra-live-data-writes",
+    "reviewerVerified": false,
+    "applyAllowed": false,
+    "requirements": [
+      "Confirm protected environment reviewer before job launch",
+      "Re-read exact LIVE preimage digests under transactional CAS",
+      "Restrict single atomic batch to allowed patch fields",
+      "Before/after all 24 readback and audit requestId",
+      "Targeted rollback exact prior snapshots on approved anomaly"
+    ]
+  },
+  "zeroLiveWrites": true
+}
