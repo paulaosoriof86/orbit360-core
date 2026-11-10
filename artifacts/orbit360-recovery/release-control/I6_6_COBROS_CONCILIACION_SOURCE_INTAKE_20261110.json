@@ -8013,5 +8013,67 @@
       "safeConfigureLocation": "Provider site for instance/scenario; Firebase backend secret + secure dispatcher for transport. Never paste credentials into app frontend aut_cfg."
     },
     "next": "Paula signs into existing Make and GreenAPI tabs; continue inspecting existing scenarios/instances without duplicate creation or external messages; independent Carlos real UAT."
+  },
+  "i66OwnerNotificationRoutingAndSignedOpsHold20261110": {
+    "id": "GI_I66_OWNER_NOTIFICATION_ROUTING_AND_SIGNED_OPS_HOLD_20261110",
+    "dateGuatemala": "2026-11-10",
+    "owner": "Paula Andrea Osorio Franco",
+    "status": "OWNER_ROUTING_FROZEN_PENDING_PROVIDER_DISPATCH_AND_SIGNED_LIVE_E2E",
+    "notifications": {
+      "operativeActions": {
+        "channel": "WhatsApp",
+        "displayGroupName": "AyS Operaciones",
+        "scope": "operational events and requests"
+      },
+      "paymentApplications": {
+        "channel": "WhatsApp",
+        "displayGroupName": "AyS Pagos",
+        "scope": "payment application confirmations and related control"
+      },
+      "advisorRequests": {
+        "channel": "WhatsApp",
+        "recipientPolicy": "the requesting advisor's corresponding WhatsApp group; resolve exact group per advisor and country"
+      },
+      "groupChatIds": "UNVERIFIED; obtain each group chatId from active Green API instance rather than infer from display names",
+      "provider": "Existing paid active Green API instance candidate; state authorized and callback delivery unverified",
+      "integration": "Direct server-side Green API path preferred by owner, Make not required for first release; existing Make scenario for Gravicentra absent",
+      "emailSender": "info@aysseguros.com; require verified send-as/service integration; never replace with personal Gmail",
+      "safeguards": [
+        "No credentials/tokens in browser frontend or canonical ledger",
+        "Test send only to confirmed intended exact group after provider and destination verification",
+        "Idempotent per event; persistence, retry, audit and provider delivery receipts required",
+        "No claim of sent or delivered until actual provider and recipient readback"
+      ],
+      "liveDeliveryStatus": "NOT_CONFIGURED_NOT_SENT"
+    },
+    "signedOpsDelete": {
+      "status": "P0_LIVE_DELETE_AND_ARCHIVE_SIGNED_WRITE_UAT_HOLD",
+      "userEvidence": [
+        "LIVE Paula Fernando Arias CO business: deletion toast functions/not-found",
+        "LIVE Paula B4-003-EXP-38102224750 already-applied endoso management: deletion toast functions/not-found"
+      ],
+      "readOnlyProof": {
+        "actionRun": 42895076852,
+        "businessesCollectionDocs": 14,
+        "managementCollectionDocs": 16,
+        "fernandoRecordFound": true,
+        "endosoRecordFound": true,
+        "physicalLogicalIdMismatchForTargets": false
+      },
+      "backendCallable": "orbit360OpsLeadsCommand us-central1 is deployed; absence of callable not established as cause",
+      "protection": "Do not delete already APLICADO endoso; backend has applied/referenced mutation guard; UI must explain",
+      "rootCause": "UNKNOWN_PENDING_EXACT_SIGNED_REQUEST_CONTEXT; Cloud Logging IAM read unavailable; authenticated browser UI controller not reliably available",
+      "decision": "No team retest and no LIVE_PASS until corrected, released, authenticated role write, reload persistence, no console/page errors, and audit evidence"
+    },
+    "carlosRetest": {
+      "status": "HOLD_REAL_CARLOS_AUTHENTICATED_WRITE_AND_RELOAD",
+      "syntheticBackendQa": "20/20 and 17/17 checks reported in workflow 42879288326",
+      "permissionAndPersistence": "NOT_CERTIFIED_BY_REAL_SIGNED_CARLOS_SESSION"
+    },
+    "carteraPayments": {
+      "execution": "PARALLEL_CONTINUING_ON_CURRENT_I6_6_SOURCE_INTAKE",
+      "preservation": "Do not reset, reimport, or overwrite verified LIVE writes",
+      "hold": "Payment application failed for Bayron and Universales exact receipt number/date patches remain source-CAS/readback pending"
+    }
   }
 }
