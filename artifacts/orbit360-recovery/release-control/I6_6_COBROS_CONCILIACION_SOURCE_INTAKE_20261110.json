@@ -8187,5 +8187,143 @@
       "priorI66EntriesRetained": true,
       "nextSignedGate": "Obtain genuine Ops/Cobros failure code using authorized roles and validate UAT; separate proper payment/due-date guarded patches from diagnostic Hosting release."
     }
+  },
+  "i66OpsLeadsSignedCrudMariaCashlessCasBayronGreenApiFreeze20261110": {
+    "id": "GI_I66_SIGNED_OPS_LEADS_FOCAL_CRUD_AND_MARIA_PROTECTED_CAS_20261110",
+    "dateGuatemala": "2026-11-10",
+    "branch": "recovery/fase-a-clean-20260831",
+    "historicalGate": "B4-007 CLOSED",
+    "currentGate": "I6.6",
+    "status": "OPS_AND_LEADS_FOCAL_SIGNED_LIVE_CRUD_PASS; MARIA_17_SPARSE_DOCS_LIVE_CAS_PASS; BAYRON_APPLICATION_AND_EXTERNAL_DISPATCH_HOLD",
+    "supersedesStatusOnly": [
+      "i66OpsCobrosDiagnosticLiveAndDispatchHolds20261110.functionalCertification.opsBusinessDelete previous HOLD for the exact new synthetic signed scenario",
+      "i66OwnerNotificationRoutingAndSignedOpsHold20261110.signedOpsDelete previous HOLD for the exact new synthetic signed scenario",
+      "i66MariaDueDateCorrectionFinding20261110.datePatch previous HOLD for the exact 7 current matching records",
+      "i66UniversalesExactIdentityHold20261110 prior old source ID risk remains forbidden, current protected CAS used current IDs"
+    ],
+    "backendTraffic": {
+      "evidenceRun": 42917115013,
+      "conclusion": "SUCCESS",
+      "functionName": "orbit360OpsLeadsCommand",
+      "region": "us-central1",
+      "oldServingRevision": "orbit360opsleadscommand-00002-nop",
+      "newServingRevision": "orbit360opsleadscommand-00003-wed",
+      "newRevisionTrafficPercent": 100,
+      "sameBackendEnvironment": true,
+      "deploymentScope": "Existing provisioned Gen2 service traffic switch; function not recreated; zero Firestore writes by traffic workflow",
+      "status": "LIVE_TRAFFIC_00003_READBACK_PASS"
+    },
+    "authenticatedLiveCrud": {
+      "actor": "Paula Dirección signed LIVE Chrome",
+      "countryAndTenant": "Inherited current authenticated context; no global cross-role/GT/CO matrix claimed",
+      "opsBusiness": {
+        "scenario": "B4-003 synthetic authorized QA business, not customer business",
+        "beforeCount": 3,
+        "afterCreateCount": 4,
+        "afterDeleteCount": 3,
+        "createReadbackAfterReload": "PASS",
+        "deleteAction": "Button Eliminar with reason, then persistent reload count 3",
+        "state": "FOCAL_CREATE_AND_DELETE_LIVE_PASS"
+      },
+      "leadsBusiness": {
+        "scenario": "QA I6.6 LEAD SINTÉTICO NO CONTACTAR 20261110",
+        "beforeCount": 3,
+        "afterCreateCount": 4,
+        "afterDeleteCount": 3,
+        "createReadbackAfterReload": "PASS",
+        "deleteAction": "Button Eliminar with reason; toast Registro eliminado y confirmado; persistent reload count 3",
+        "state": "FOCAL_CREATE_AND_DELETE_LIVE_PASS"
+      },
+      "rollbackAndCleanup": "Synthetic QA records removed with business-action readback, no real client record deleted",
+      "certificationScope": "FOCAL_ONLY: signed Paula Dirección session, two synthetic create/delete paths. No general OPS/LEADS CRUD, archiving applied endorsements, other roles/tenants/countries, attachments, payment or notification delivery PASS."
+    },
+    "universalesMariaProtectedFinancialCas": {
+      "run": 42914107853,
+      "conclusion": "SUCCESS",
+      "policyNumber": "04-15-01-000603-0",
+      "currentPolicyId": "pol_mwajp407",
+      "fieldsWritten": {
+        "receiptsNumeroReciboFuente": 10,
+        "portfolioDueDateFields": 7,
+        "totalSparseWrites": 17
+      },
+      "finalReadback": "PASS_ALL_24_DOCUMENTS_AUDIT_AND_TEN_SOURCE_NUMBERS",
+      "readbackCount": 24,
+      "sourceDigest": "dee08f3697dfd3f6c3e8fbb9570b46d3b2fa17c72784b9fa8db66fe6ecf84cff",
+      "portfolioDigest": "4198b39a18be9c520ae4eca6255471aefd80a42d25e13ed5aa948fa247857aa8",
+      "internalReceiptSeriesPreserved": true,
+      "paymentFieldsTouched": 0,
+      "moneyAmountTouched": 0,
+      "paymentApplications": 0,
+      "auditTrail": "PASS",
+      "status": "LIVE_SPARSE_CAS_APPLIED_WITH_EXACT_PREIMAGE_AND_READBACK",
+      "note": "Supersedes prior NOT_APPLIED Maria candidate; not a general portfolio or cash-reconciliation certification."
+    },
+    "bayron": {
+      "policyNumber": "VA125-00010478",
+      "signedLiveReadOnlyRun": 42917054110,
+      "conclusion": "SUCCESS",
+      "firstReceipt": {
+        "receiptId": "cob_pol_cb085b8b5cd85a922c3b29164820_001",
+        "sourcePaymentDate": "2026-10-29",
+        "currency": "GTQ",
+        "grossAmount": 1557.92,
+        "paymentState": "PAID_DIRECT",
+        "applicationState": "PENDING_APPLICATION",
+        "actualEffect": "NO_NEW_PAYMENT_APPLICATION_BY_READONLY_PROBE",
+        "insurerSourceReceiptNumber": "58876231",
+        "insurerSourceNumberAssociation": "PENDING_EXACT_IDENTITY_MATCH_AND_GUARDED_METADATA_PATCH"
+      },
+      "secondReceipt": {
+        "ownerReportsPaid": true,
+        "liveReadOnlyStatus": "SECOND_NOT_PAID",
+        "sourcePaymentDate": "MISSING",
+        "next": "HOLD_NO_INFERRED_DATE_OR_SYNTHETIC_PAYMENT"
+      },
+      "exactReadOnlyEvidence": {
+        "signedReadbackAgreement": true,
+        "newWrites": 0,
+        "sourceNumberPresent": false
+      },
+      "status": "FIRST_PAID_BUT_PENDING_APPLICATION; SECOND_OWNER_PAID_VS_LIVE_UNRESOLVED; ZERO_NEW_FINANCIAL_ACTIONS_THIS_ENTRY"
+    },
+    "externalNotifications": {
+      "greenApi": {
+        "providerInstanceId": "710522720868",
+        "sourceCodeCommit": "5f2c31",
+        "sourceSwitch": "OFF",
+        "qaSimulation": "44/44 PASS",
+        "deployment": "NOT_DEPLOYED",
+        "actualWhatsAppDispatch": 0,
+        "recipients": "AyS Operaciones 120363420665870658@g.us; AyS Pagos 120363421316253378@g.us verified but no sends",
+        "next": "Authenticated protected backend configuration, consent/routing/idempotency/sender delivery proof prior to any dispatch"
+      },
+      "email": {
+        "from": "info@aysseguros.com",
+        "transport": "NOT_CONFIGURED_OR_VERIFIED",
+        "sent": 0
+      },
+      "status": "EXTERNAL_NOTIFICATION_DELIVERY_HOLD"
+    },
+    "remainingCertification": {
+      "carlosRealSignedWriteAndReload": "HOLD",
+      "legacyCasesUnclassified": 2,
+      "realCustomerCrossRoleCRUD": "HOLD",
+      "advisorPaymentReportFunctionalAndOpsDelivery": "HOLD",
+      "WhatsAppAndEmailDelivery": "HOLD",
+      "PwaChromeInstallVisual": "HOLD",
+      "FaseAPlatformGlobal": "NOT_CLAIMED_BY_THIS_FOCAL_RECEIPT"
+    },
+    "integrity": {
+      "appendOnlyLedger": true,
+      "priorRecordsPreserved": true,
+      "productCodeChangedByThisDocumentationCommit": false,
+      "hostingBuildDeploymentByThisDocumentationCommit": false,
+      "firestoreRulesAuthChangesByThisDocumentationCommit": 0,
+      "liveFinancialWritesByThisDocumentationCommit": 0,
+      "futureOpsNewRecordsProtected": true,
+      "noDataReimportOrOverwrite": true,
+      "oneCanonicalBranchAndCandidate": true
+    }
   }
 }
