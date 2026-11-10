@@ -665,7 +665,7 @@
     }
   ],
   "technicalCursor": {
-    "currentProtocolStep": "I6_6_LIVE_BAYRON_POLICY_PLAN_CORRECTED_MARIA_POLICY_CREATED_PAYMENT_AND_SOURCE_DATES_HOLD",
+    "currentProtocolStep": "I6_6_MARIA_SOURCE_NUMBER_UI_BLOCKED_CONTRACTUAL_VS_OPERATIVE_DATES_CORRECTED",
     "fileByteSha256Pinned": true,
     "insurerStatementsFullyParsed": false,
     "owner28DecisionsRecoveredExactly": false,
@@ -674,7 +674,7 @@
     "operationalWrites": 7,
     "sourceChangeInProduction": false,
     "importerRebuildRequired": false,
-    "nextRequiredStep": "Use continuityFreeze20261110 immediateBatch and sequential nextActions; first unblock exact paid command and verify stored receipt IDs; Maria 10 future source-backed receipt updates are prepared but not executed. No duplicate policy/importer demonstration/Finance writes.",
+    "nextRequiredStep": "I6.6: correct previous apparent due-date mismatch in canonical state (confirmed #3/12 contractual due 2026-12-01 and separate operational deadline 2026-12-16); receipt edit UI maps 'Serie / recibo' only to internal serie, not insurer numeroReciboFuente. No unsafe LIVE mutation. Implement/test guarded source-number edit in single candidate before 10 source numbers, then payment command diagnosis and Drive join.",
     "insurerStatementsNativeFormatsParsed": true,
     "all35CurrentSourceRawHashesPinned": true,
     "fourHistoricalReferenceHashesPinned": true,
@@ -2031,7 +2031,8 @@
       "No new LIVE insurer receipt mutations performed in this checkpoint",
       "No server payment posted or retried",
       "No source release build or deployment performed",
-      "No Finance entries created"
+      "No Finance entries created",
+      "No change to contractual installment dates, operational grace deadline, or internal series; direct LIVE detail proved earlier apparent mismatch was a wrong interpretation of summary heading."
     ],
     "immediateBatch": {
       "id": "UNIVERSALES_MARIA_10_FUTURE_RECEIPTS",
@@ -2050,11 +2051,11 @@
           "amountGTQ": 952.56,
           "expectedStatusAtInsurerCutoff": "PENDING_FUTURE_2026_11_09",
           "requiredPatchFields": [
-            "numeroReciboFuente",
-            "fechaLimite"
+            "numeroReciboFuente"
           ],
           "source": "UNIVERSALES_AGING_CUTOFF_2026_11_09",
-          "writeStatus": "NOT_EXECUTED_REQUIRES_EXISTING_ID_AND_CURRENT_VALUE_READBACK"
+          "writeStatus": "NOT_EXECUTED_UI_FIELD_MISSING_AND_CAS_NOT_PROVEN",
+          "contractualDateWrite": "NOT_AUTHORIZED_NOT_REQUIRED_BY_SINGLE_VERIFIED_3_12"
         },
         {
           "policyId": "pol_mwajp407_fizii",
@@ -2066,11 +2067,11 @@
           "amountGTQ": 952.56,
           "expectedStatusAtInsurerCutoff": "PENDING_FUTURE_2026_11_09",
           "requiredPatchFields": [
-            "numeroReciboFuente",
-            "fechaLimite"
+            "numeroReciboFuente"
           ],
           "source": "UNIVERSALES_AGING_CUTOFF_2026_11_09",
-          "writeStatus": "NOT_EXECUTED_REQUIRES_EXISTING_ID_AND_CURRENT_VALUE_READBACK"
+          "writeStatus": "NOT_EXECUTED_UI_FIELD_MISSING_AND_CAS_NOT_PROVEN",
+          "contractualDateWrite": "NOT_AUTHORIZED_NOT_REQUIRED_BY_SINGLE_VERIFIED_3_12"
         },
         {
           "policyId": "pol_mwajp407_fizii",
@@ -2082,11 +2083,11 @@
           "amountGTQ": 952.56,
           "expectedStatusAtInsurerCutoff": "PENDING_FUTURE_2026_11_09",
           "requiredPatchFields": [
-            "numeroReciboFuente",
-            "fechaLimite"
+            "numeroReciboFuente"
           ],
           "source": "UNIVERSALES_AGING_CUTOFF_2026_11_09",
-          "writeStatus": "NOT_EXECUTED_REQUIRES_EXISTING_ID_AND_CURRENT_VALUE_READBACK"
+          "writeStatus": "NOT_EXECUTED_UI_FIELD_MISSING_AND_CAS_NOT_PROVEN",
+          "contractualDateWrite": "NOT_AUTHORIZED_NOT_REQUIRED_BY_SINGLE_VERIFIED_3_12"
         },
         {
           "policyId": "pol_mwajp407_fizii",
@@ -2098,11 +2099,11 @@
           "amountGTQ": 952.56,
           "expectedStatusAtInsurerCutoff": "PENDING_FUTURE_2026_11_09",
           "requiredPatchFields": [
-            "numeroReciboFuente",
-            "fechaLimite"
+            "numeroReciboFuente"
           ],
           "source": "UNIVERSALES_AGING_CUTOFF_2026_11_09",
-          "writeStatus": "NOT_EXECUTED_REQUIRES_EXISTING_ID_AND_CURRENT_VALUE_READBACK"
+          "writeStatus": "NOT_EXECUTED_UI_FIELD_MISSING_AND_CAS_NOT_PROVEN",
+          "contractualDateWrite": "NOT_AUTHORIZED_NOT_REQUIRED_BY_SINGLE_VERIFIED_3_12"
         },
         {
           "policyId": "pol_mwajp407_fizii",
@@ -2114,11 +2115,11 @@
           "amountGTQ": 952.56,
           "expectedStatusAtInsurerCutoff": "PENDING_FUTURE_2026_11_09",
           "requiredPatchFields": [
-            "numeroReciboFuente",
-            "fechaLimite"
+            "numeroReciboFuente"
           ],
           "source": "UNIVERSALES_AGING_CUTOFF_2026_11_09",
-          "writeStatus": "NOT_EXECUTED_REQUIRES_EXISTING_ID_AND_CURRENT_VALUE_READBACK"
+          "writeStatus": "NOT_EXECUTED_UI_FIELD_MISSING_AND_CAS_NOT_PROVEN",
+          "contractualDateWrite": "NOT_AUTHORIZED_NOT_REQUIRED_BY_SINGLE_VERIFIED_3_12"
         },
         {
           "policyId": "pol_mwajp407_fizii",
@@ -2130,11 +2131,11 @@
           "amountGTQ": 952.56,
           "expectedStatusAtInsurerCutoff": "PENDING_FUTURE_2026_11_09",
           "requiredPatchFields": [
-            "numeroReciboFuente",
-            "fechaLimite"
+            "numeroReciboFuente"
           ],
           "source": "UNIVERSALES_AGING_CUTOFF_2026_11_09",
-          "writeStatus": "NOT_EXECUTED_REQUIRES_EXISTING_ID_AND_CURRENT_VALUE_READBACK"
+          "writeStatus": "NOT_EXECUTED_UI_FIELD_MISSING_AND_CAS_NOT_PROVEN",
+          "contractualDateWrite": "NOT_AUTHORIZED_NOT_REQUIRED_BY_SINGLE_VERIFIED_3_12"
         },
         {
           "policyId": "pol_mwajp407_fizii",
@@ -2146,11 +2147,11 @@
           "amountGTQ": 952.56,
           "expectedStatusAtInsurerCutoff": "PENDING_FUTURE_2026_11_09",
           "requiredPatchFields": [
-            "numeroReciboFuente",
-            "fechaLimite"
+            "numeroReciboFuente"
           ],
           "source": "UNIVERSALES_AGING_CUTOFF_2026_11_09",
-          "writeStatus": "NOT_EXECUTED_REQUIRES_EXISTING_ID_AND_CURRENT_VALUE_READBACK"
+          "writeStatus": "NOT_EXECUTED_UI_FIELD_MISSING_AND_CAS_NOT_PROVEN",
+          "contractualDateWrite": "NOT_AUTHORIZED_NOT_REQUIRED_BY_SINGLE_VERIFIED_3_12"
         },
         {
           "policyId": "pol_mwajp407_fizii",
@@ -2162,11 +2163,11 @@
           "amountGTQ": 952.56,
           "expectedStatusAtInsurerCutoff": "PENDING_FUTURE_2026_11_09",
           "requiredPatchFields": [
-            "numeroReciboFuente",
-            "fechaLimite"
+            "numeroReciboFuente"
           ],
           "source": "UNIVERSALES_AGING_CUTOFF_2026_11_09",
-          "writeStatus": "NOT_EXECUTED_REQUIRES_EXISTING_ID_AND_CURRENT_VALUE_READBACK"
+          "writeStatus": "NOT_EXECUTED_UI_FIELD_MISSING_AND_CAS_NOT_PROVEN",
+          "contractualDateWrite": "NOT_AUTHORIZED_NOT_REQUIRED_BY_SINGLE_VERIFIED_3_12"
         },
         {
           "policyId": "pol_mwajp407_fizii",
@@ -2178,11 +2179,11 @@
           "amountGTQ": 952.56,
           "expectedStatusAtInsurerCutoff": "PENDING_FUTURE_2026_11_09",
           "requiredPatchFields": [
-            "numeroReciboFuente",
-            "fechaLimite"
+            "numeroReciboFuente"
           ],
           "source": "UNIVERSALES_AGING_CUTOFF_2026_11_09",
-          "writeStatus": "NOT_EXECUTED_REQUIRES_EXISTING_ID_AND_CURRENT_VALUE_READBACK"
+          "writeStatus": "NOT_EXECUTED_UI_FIELD_MISSING_AND_CAS_NOT_PROVEN",
+          "contractualDateWrite": "NOT_AUTHORIZED_NOT_REQUIRED_BY_SINGLE_VERIFIED_3_12"
         },
         {
           "policyId": "pol_mwajp407_fizii",
@@ -2194,14 +2195,14 @@
           "amountGTQ": 952.56,
           "expectedStatusAtInsurerCutoff": "PENDING_FUTURE_2026_11_09",
           "requiredPatchFields": [
-            "numeroReciboFuente",
-            "fechaLimite"
+            "numeroReciboFuente"
           ],
           "source": "UNIVERSALES_AGING_CUTOFF_2026_11_09",
-          "writeStatus": "NOT_EXECUTED_REQUIRES_EXISTING_ID_AND_CURRENT_VALUE_READBACK"
+          "writeStatus": "NOT_EXECUTED_UI_FIELD_MISSING_AND_CAS_NOT_PROVEN",
+          "contractualDateWrite": "NOT_AUTHORIZED_NOT_REQUIRED_BY_SINGLE_VERIFIED_3_12"
         }
       ],
-      "boundary": "Only update exact currently pending source-backed future requirements; do not mark them paid; insurer paid 2/12 #39460327 on 2026-11-05 needs separate payment command after server fix; 1/12 requires exact original source."
+      "boundary": "Only insurer requirement number if absent/different and primary source + fresh row validate; do not alter contractual due/fechaLimite or internal serie. Browser form currently writes serie only; HOLD until dedicated source-number field and concurrent-write guard PASS. No paid status writes."
     },
     "nextActions": [
       {
@@ -2211,8 +2212,8 @@
       },
       {
         "priority": 2,
-        "action": "Update 10 existing Maria future requirement IDs and due dates using updateReceipt atomic writer; no new receipt/policy; verify 10 readbacks in Client360, Cartera, Cobros and report.",
-        "status": "READY_WITH_PRECONDITIONS"
+        "action": "Correct source-number edit surface without changing internal serie or contractual/operational dates; test/publish same candidate under I6.6, then verify and update only ten existing LIVE receipt numeroReciboFuente values via safeguarded patch, with individual readback.",
+        "status": "HOLD_UNSAFE_UI_CONFLATES_SERIE_AND_INSURER_REQUIREMENT; NO_LIVE_WRITES"
       },
       {
         "priority": 3,
@@ -2226,7 +2227,7 @@
       },
       {
         "priority": 5,
-        "action": "Repair reproduced month-frequency/receipt-count schedule bug in same canonical source release with focused tests and exact insurer-source date priority; profile nav/filter performance in parallel; importer is non-blocking; Finance deferred.",
+        "action": "Fix the reproduced Mensual×2 schedule issue and misleading 'Vence' header as separate source/UI defects in same canonical source release; preserve correct contractual date + operational limit distinction.",
         "status": "P0_REPRODUCED_FIX_PENDING"
       },
       {
@@ -7100,8 +7101,8 @@
     "id": "GI_I66_UNIVERSALES_MARIA_20261110_DIRECT_LIVE_READBACK_VERIFIED",
     "environment": "https://app.aysseguros.com",
     "role": "Dirección · Paula Osorio",
-    "method": "Authenticated read-only filter by insurer UNIVERSALES, then individual policy Desglose; no name, policy number, client or payment values typed/submitted",
-    "status": "READBACK_PARTIAL_12_RECEIPTS_EXIST_PENDING_IDS_AND_RAW_VALUES_PROOF_BEFORE_WRITE",
+    "method": "Authenticated LIVE read-only insurer/policy table plus individual 3/12 receipt detail and edit form; zero LIVE writes.",
+    "status": "READBACK_CORRECTED_3_OF_12_CONTRACTUAL_DUE_CONFIRMED_PENDING_OTHER_9_AND_SOURCE_IDS",
     "policyNumber": "04-15-01-000603-0",
     "client": "MARIA GABRIELA MONTEPEQUE PALMA VETTORAZZI",
     "insurer": "SEGUROS UNIVERSALES",
@@ -7113,7 +7114,32 @@
     "totalPremiumGTQ": 11430.72,
     "receiptsCount": 12,
     "allVisiblePaymentStatuses": "Pendiente",
-    "dueDatesVisibleByInstallment": [
+    "futureSourceComparison": {
+      "installments": "3/12 to 12/12",
+      "source": "UNIVERSALES aging as of 2026-11-09, primary source already pinned",
+      "sourceDueDays": "2026-12-01 to 2027-09-01, first day monthly",
+      "mismatchedVisibleDueDates": null,
+      "matchInterpretation": "PRIOR_FINDING_SUPERSEDED: summary dates are operational grace deadlines, NOT contractual installment due dates; never replace them with insurer contractual due dates.",
+      "contractualDueDateVerifiedInLIVE": {
+        "seq": 3,
+        "live": "2026-12-01",
+        "insurer": "2026-12-01",
+        "result": "MATCH"
+      },
+      "othersContractualDueDates": "NOT_YET_OPENED_INDIVIDUALLY; do not state 10/10 match",
+      "operationalDeadlineVerifiedInLIVE": {
+        "seq": 3,
+        "live": "2026-12-16",
+        "meaning": "separate 15-day operational limit; correct, not mismatch"
+      },
+      "visualDefect": "Policy/overview header 'Vence' uses fechaLimite; detail view correctly distinguishes 'Vencimiento de cuota' and 'Fecha límite operativa'."
+    },
+    "secondPayment": "Still pending in LIVE even though insurer evidence indicates #39460327, GTQ952.56, paid 2026-11-05; do not fake posted payment.",
+    "firstReceipt": "Insurer identity/source requires specific verification; leave unchanged until source confirmed.",
+    "nextRequiredOperation": "Do not edit dates or serie. Correct existing canonical data/update form field for source number and protect against concurrent write; after release, verify existing source numbers and patch only missing numeroReciboFuente for 3/12..12/12 with readback. No payment statuses updated.",
+    "dataWrites": 0,
+    "codeDeploys": 0,
+    "operationalLimitDatesVisibleByInstallment": [
       "2026-10-16",
       "2026-11-15",
       "2026-12-16",
@@ -7127,16 +7153,17 @@
       "2027-08-15",
       "2027-09-15"
     ],
-    "futureSourceComparison": {
-      "installments": "3/12 to 12/12",
-      "source": "UNIVERSALES aging as of 2026-11-09, primary source already pinned",
-      "sourceDueDays": "2026-12-01 to 2027-09-01, first day monthly",
-      "mismatchedVisibleDueDates": 10
-    },
-    "secondPayment": "Still pending in LIVE even though insurer evidence indicates #39460327, GTQ952.56, paid 2026-11-05; do not fake posted payment.",
-    "firstReceipt": "Insurer identity/source requires specific verification; leave unchanged until source confirmed.",
-    "nextRequiredOperation": "Reverify exact physical receipt IDs, raw amounts and any recent mutations with canonical LIVE reader. Apply only 10 future number/date patch fields using atomic CAS, keep all other fields and payment statuses. Payment #2 separate after live callable failure resolved.",
-    "dataWrites": 0,
-    "codeDeploys": 0
+    "editControlFinding": {
+      "sourcePath": "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
+      "formTitle": "Edición individual controlada",
+      "visibleField": "Serie / recibo",
+      "boundPatchField": "serie",
+      "notBoundTo": "numeroReciboFuente",
+      "existingValue": "3/12",
+      "safety": "NEVER put insurer requirement 39460328 into internal serie; modal cannot safely write numeroReciboFuente",
+      "enginePath": "orbit360-platform/core/policy-receipts-engine.js",
+      "engineAllows": "numeroReciboFuente",
+      "action": "NO_LIVE_DATA_WRITE; add separately labelled field with patch-only update and concurrency guard, verify/test/release SAME artifact before batch"
+    }
   }
 }
