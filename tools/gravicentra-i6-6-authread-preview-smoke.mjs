@@ -57,7 +57,13 @@ try{
     const req=route.request(),url=new URL(req.url());
     if(req.method()==='POST'&&/\.cloudfunctions\.net$/i.test(url.hostname)){
       const name=url.pathname.split('/').filter(Boolean).pop()||'';
-      if(!allowedReadCallables.has(name)){violations.push('WRITER_CALLABLE_REQUEST_DENIED');await route.abort();return;}
+      if(name==='orbit360TenantBranding'){
+        let payload=null;try{payload=JSON.parse(req.postData()||'{}')?.data||null;}catch{}
+        if(!payload||payload.action!=='get'||payload.tenantId!==TENANT||
+           Object.keys(payload).some(k=>k!=='action'&&k!=='tenantId')){
+          violations.push('WRITER_CALLABLE_REQUEST_DENIED');await route.abort();return;
+        }
+      }else if(!allowedReadCallables.has(name)){violations.push('WRITER_CALLABLE_REQUEST_DENIED');await route.abort();return;}
     }
     if(req.method()==='POST'&&/firestore\.googleapis\.com$/i.test(url.hostname)&&/:(commit|batchWrite)/i.test(url.pathname)){
       violations.push('DIRECT_FIRESTORE_WRITE_DENIED');await route.abort();return;
@@ -74,14 +80,18 @@ try{
   },token);
   need(authenticated.auth&&authenticated.started&&authenticated.mode==='preview'&&authenticated.readonly,'QA_AUTHENTICATED_RUNTIME_NOT_READY');
   evidence.authenticated=true;
+  evidence.stage='AUTHENTICATED';
   const roleSet=await page.evaluate(()=>window.Orbit.session?.set?.('Operativo')===true);
   need(roleSet,'QA_OPERATIVO_ROLE_NOT_ASSIGNED');
   await page.waitForFunction(()=>window.Orbit.session?.rol?.()==='Operativo');
   evidence.role='Operativo';
+  evidence.stage='OPERATIVO_ROLE_READY';
   await page.evaluate(()=>{if(window.Orbit.router?.go)window.Orbit.router.go('cobros');else location.hash='#/cobros';});
   await page.waitForFunction(()=>location.hash.includes('cobros'));
   evidence.route='cobros';
+  evidence.stage='COBROS_ROUTE_ACTIVE';
   await page.waitForFunction(()=>Array.isArray(window.Orbit?.store?.all?.('recibosEsperados'))&&window.Orbit.store.all('recibosEsperados').length>0,null,{timeout:25000});
+  evidence.stage='RECEIPTS_LOADED';
   const inspected=await page.evaluate(()=>{
     const r=(window.Orbit.store.all('recibosEsperados')||[]).filter(Boolean),bridge=window.Orbit.receiptsPortfolioProjection;
     if(!bridge||typeof bridge.editReceipt!=='function')return{bridge:false,opened:false,internal:false,source:false,safe:false};
@@ -96,6 +106,7 @@ try{
       sourceLabel:!!source?.closest('label')?.textContent?.includes('Número de requerimiento de aseguradora'),
       saveExists:!!save,legalGate:!!document.querySelector('[data-legal-gate]')};
   });
+  evidence.stage='RECEIPTS_FIELDS_INSPECTED';
   evidence.fields={receiptProjectionPresent:inspected.bridge,editPanelOpened:inspected.opened,internalFieldPresent:inspected.internal,insurerSourceFieldPresent:inspected.source,separateFields:inspected.separate,semanticLabels:inspected.internalLabel&&inspected.sourceLabel};
   evidence.legalGate=inspected.legalGate;
   need(inspected.bridge&&inspected.opened&&inspected.separate&&inspected.internalLabel&&inspected.sourceLabel&&inspected.saveExists,'QA_RECEIPT_TWO_FIELDS_NOT_VISIBLE');
@@ -116,6 +127,8 @@ try{
 }
 console.log('I66_AUTH_QA_STATUS='+evidence.status);
 console.log('I66_AUTH_QA_ROLE='+evidence.role);
+console.log('I66_AUTH_QA_STAGE='+String(evidence.stage||'START')); 
+console.log('I66_AUTH_QA_BLOCKER='+String(evidence.blocker||'none'));
 console.log('I66_AUTH_QA_BUSINESS_WRITES='+evidence.backendWritesObserved+':'+evidence.firestoreWritesObserved);
 console.log('I66_AUTH_QA_CREDENTIAL_CLEANUP='+evidence.sessionSignedOut);
 if(evidence.status!=='AUTHENTICATED_READONLY_SMOKE_PASS_NOT_UAT'||!evidence.sessionSignedOut)process.exitCode=1;
