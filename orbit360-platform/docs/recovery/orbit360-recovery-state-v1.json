@@ -1507,5 +1507,20 @@
     "fullQAOutstandingNonblocking": true,
     "dataRefreshLedger": "artifacts/orbit360-recovery/release-control/I6_6_COBROS_CONCILIACION_SOURCE_INTAKE_20261110.json",
     "canonicalControlPlane": "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json"
+  },
+  "i66LiveCarteraDriveCensus20261110": {
+    "status": "READ_ONLY_DRIVE_CENSUS_COMPLETED_HISTORICAL_COMPARISON_DONE_LIVE_EXACT_INVENTORY_PENDING",
+    "ownerDecision": "Continuity of I6.6 cartera, no release gate reopening",
+    "auditedClientDossiers": 306,
+    "modifiedSinceJuly2026Documents": 332,
+    "recentClientDossiers": 157,
+    "primaryPolicyDocumentsReadAndClassified": 78,
+    "matchedToHistoricalExcel": 63,
+    "absentFromHistoricalExcel": 15,
+    "noClaimAllLivePoliciesMatch": true,
+    "canonicalEvidencePath": "artifacts/orbit360-recovery/release-control/I6_6_COBROS_CONCILIACION_SOURCE_INTAKE_20261110.json",
+    "canonicalEvidenceBlob": "7cef64b4ec3ae75530432936a9c53e979f9cbae8",
+    "lastAction": "Record 78 source PDFs and full 332 recent file metadata, preserve verified B4-007 operational LIVE close, next authoritative join LIVE policies and I6.6 safe updates; do not reimport.",
+    "noLiveDataChangeFromThisAudit": true
   }
 }
