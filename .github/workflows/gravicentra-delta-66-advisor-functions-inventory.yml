@@ -103,3 +103,49 @@ jobs:
             done
           done
           echo 'I66_ADVISOR_ALL_FOUR_FUNCTIONS_READONLY_INVENTORY_PASS; REAL_DATA_WRITES=0'
+      - name: I6.6 P0 Ops Leads callable and record path read-only identity
+        run: |
+          set -euo pipefail
+          gcloud auth activate-service-account --key-file="$GOOGLE_APPLICATION_CREDENTIALS" --quiet >/dev/null
+          gcloud config set project "$PROJECT_ID" --quiet >/dev/null
+          gcloud functions describe orbit360OpsLeadsCommand --gen2 --region us-central1 --project "$PROJECT_ID" --format='value(state)' | sed 's/^/I66_OPS_LIVE_FUNCTION_STATE=/'
+          python3 - <<'PY'
+          import json,os,subprocess,urllib.request,urllib.parse,urllib.error
+          project=os.environ['PROJECT_ID']
+          token=subprocess.check_output(['gcloud','auth','print-access-token'],text=True).strip()
+          root='https://firestore.googleapis.com/v1/projects/'+project+'/databases/(default)/documents/tenants/alianzas-soluciones/data/'
+          def field(row,key):
+              v=(row.get('fields') or {}).get(key) or {}
+              return str(v.get('stringValue') or '')
+          def query(collection):
+              rows=[];page=''
+              for _ in range(10):
+                  url=root+collection+'/items?pageSize=500'+('&pageToken='+urllib.parse.quote(page,safe='') if page else '')
+                  req=urllib.request.Request(url,headers={'Authorization':'Bearer '+token,'Accept':'application/json'})
+                  try:
+                      with urllib.request.urlopen(req,timeout=25) as response:
+                          body=json.load(response)
+                  except urllib.error.HTTPError as e:
+                      print('I66_OPS_CANONICAL_READ_ERROR='+collection+':HTTP_'+str(e.code))
+                      raise
+                  rows.extend(body.get('documents') or [])
+                  page=str(body.get('nextPageToken') or '')
+                  if not page:break
+              else:
+                  raise RuntimeError('I66_OPS_READONLY_PAGINATION_LIMIT_'+collection)
+              bad=[d for d in rows if field(d,'id') and field(d,'id') != d['name'].split('/')[-1]]
+              missing=[d for d in rows if not field(d,'id')]
+              if collection=='negocios':
+                  sample=[d for d in rows if field(d,'nombre').casefold()=='fernando arias']
+              else:
+                  sample=[d for d in rows if 'B4-003-EXP-38102224750' in field(d,'titulo')]
+              matched=[{'physicalEqualsLogical':field(d,'id')==d['name'].split('/')[-1],
+                        'hasCanonicalId':bool(field(d,'id')),
+                        'archiveState':str((d.get('fields') or {}).get('archivado') or {})[:45]}
+                       for d in sample]
+              print('I66_OPS_CANONICAL_IDENTITY='+json.dumps({'collection':collection,'physicalDocumentCount':len(rows),'idMismatchCount':len(bad),'missingLogicalIdCount':len(missing),'specificScreenshotRecordCount':len(sample),'specificScreenshotRecordIdentity':matched},sort_keys=True))
+              return rows
+          for collection in ('negocios','gestiones'):
+              query(collection)
+          print('I66_OPS_LIVE_IDENTITY_READONLY_COMPLETE; MUTATIONS=0')
+          PY
