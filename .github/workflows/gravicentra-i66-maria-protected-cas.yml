@@ -1,0 +1,160 @@
+# I6.6 DATA-ONLY CANDIDATE. Required reviewer protection verified by root
+# in GitHub Settings (paulaosoriof86; admin bypass disabled; recovery only).
+# Publish ONLY after coordinated source CAS; GitHub reviewer must then approve
+# this ONE targeted job before Firestore updates can start.
+name: Gravicentra I6.6 Maria 17 exact protected CAS
+
+on:
+  push:
+    branches:
+      - recovery/fase-a-clean-20260831
+    paths:
+      - .github/workflows/gravicentra-i66-maria-protected-cas.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: gravicentra-live-data-writes-i66
+  cancel-in-progress: false
+
+jobs:
+  maria-exact-financial-cas:
+    if: >
+      github.ref == 'refs/heads/recovery/fase-a-clean-20260831' &&
+      github.event_name == 'push' &&
+      contains(github.event.head_commit.message, 'I66_MARIA_17_EXACT_DOCS')
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment:
+      name: gravicentra-live-data-writes
+    env:
+      PROJECT_ID: ays-orbit-360-lab
+      GCLOUD_PROJECT: ays-orbit-360-lab
+      SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_LAB_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+    steps:
+      - name: Checkout immutable dispatch commit on the one recovery branch
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          ref: ${{ github.sha }}
+
+      - name: Exact source and write-boundary pin
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = "recovery/fase-a-clean-20260831"
+          test "$PROJECT_ID" = "ays-orbit-360-lab"
+          test "$GCLOUD_PROJECT" = "ays-orbit-360-lab"
+          test -z "${FIRESTORE_EMULATOR_HOST:-}"
+          [[ "$(git log -1 --format=%B)" == *"I66_MARIA_17_EXACT_DOCS"* ]]
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          echo "6d973cd7f6562fc671d0cfb98f6609c687053d3415762ece89f41ad1b7727c4c  tools/gravicentra-i6-6-universales-maria-protected-cas.NOT_APPLIED.cjs" | sha256sum -c -
+          echo "d79906dc087495fa4abaa9a16122cb098ec12afcf8cea712f115d82db07425da  tools/gravicentra-i6-6-universales-maria-cas-unit.test.cjs" | sha256sum -c -
+          test "$(git hash-object artifacts/orbit360-recovery/release-control/I6_6_UNIVERSALES_MARIA_EXACT_CURRENT_CAS_PREVIEW_NOT_APPLIED_20261110.json)" = "c54016e61743ccce6688f45f50d4cf18b4150b84"
+          node --check tools/gravicentra-i6-6-universales-maria-protected-cas.NOT_APPLIED.cjs
+          echo "GI_I66_MARIA_EXACT_SOURCE_PIN=PASS"
+
+      - name: Exact pure CAS and negative-path unit tests (no credentials yet)
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-i6-6-universales-maria-cas-unit.test.cjs
+
+      - name: Install pinned major Firebase Admin dependency
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --prefix "$RUNNER_TEMP/gi-i66-maria-admin" --no-audit --no-fund --ignore-scripts firebase-admin@13.4.0 >/dev/null
+          echo "NODE_PATH=$RUNNER_TEMP/gi-i66-maria-admin/node_modules" >> "$GITHUB_ENV"
+
+      - name: Resolve exact configured Firebase project credential without exposing it
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/gi-i66-maria-auth"
+          chmod 700 "$RUNNER_TEMP/gi-i66-maria-auth"
+          python3 - <<'PY'
+          import json,os,pathlib
+          target='ays-orbit-360-lab'
+          out=pathlib.Path(os.environ['RUNNER_TEMP'])/'gi-i66-maria-auth'/'service.json'
+          for name in ('SA_LAB','SA_LAB_ALT','SA_DEFAULT'):
+              try:
+                  obj=json.loads(os.environ.get(name,''))
+              except (ValueError,TypeError):
+                  continue
+              if obj.get('type')!='service_account' or obj.get('project_id')!=target or not obj.get('private_key'):
+                  continue
+              out.write_text(json.dumps(obj),encoding='utf8')
+              out.chmod(0o600)
+              with open(os.environ['GITHUB_ENV'],'a') as h:
+                  h.write('GOOGLE_APPLICATION_CREDENTIALS='+str(out)+'\n')
+              print('I66_EXACT_FIREBASE_AUTH_PROJECT=PASS')
+              break
+          else:
+              raise SystemExit('I66_EXACT_FIREBASE_AUTH_PROJECT_HOLD')
+          PY
+
+      - name: Full 24-record preimage read twice and pin sparse rollback preview
+        shell: bash
+        run: |
+          set -euo pipefail
+          export GI_I66_CAS_REPORT_PATH="$RUNNER_TEMP/gi-i66-maria-protected-preflight.json"
+          node tools/gravicentra-i6-6-universales-maria-protected-cas.NOT_APPLIED.cjs --mode=dry-run
+          node - "$GI_I66_CAS_REPORT_PATH" <<'JS'
+          const fs=require('node:fs');
+          const r=JSON.parse(fs.readFileSync(process.argv[2],'utf8'));
+          if(r.status!=='EXACT_PREIMAGE_DRY_RUN_PASS_APPLY_NOT_ENABLED'||
+             r.receiptPatches.length!==10||r.portfolioPatches.length!==7||
+             r.rollbackSparseBeforeFields.receipts.length!==10||
+             r.rollbackSparseBeforeFields.portfolio.length!==7||
+             r.documentWritesIfApproved!==18||r.liveDataWrites!==0)
+             throw Error('I66_PROTECTED_EXACT_PREFLIGHT_HOLD');
+          console.log('I66_PROTECTED_EXACT_17_DOCUMENT_PREFLIGHT=PASS_0_WRITES');
+          JS
+
+      - name: Single protected atomic CAS 17 docs + immutable audit, then readback
+        shell: bash
+        run: |
+          set -euo pipefail
+          node - <<'JS'
+          'use strict';
+          const fs=require('node:fs');
+          const {initializeApp,getApps}=require('firebase-admin/app');
+          const {getFirestore}=require('firebase-admin/firestore');
+          const c=require('./tools/gravicentra-i6-6-universales-maria-protected-cas.NOT_APPLIED.cjs');
+          const f=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/I6_6_UNIVERSALES_MARIA_EXACT_CURRENT_CAS_PREVIEW_NOT_APPLIED_20261110.json','utf8'));
+          (async()=>{
+            if(process.env.GITHUB_ACTIONS!=='true'||process.env.GITHUB_REF!=='refs/heads/recovery/fase-a-clean-20260831'||process.env.GCLOUD_PROJECT!=='ays-orbit-360-lab')throw Error('I66_ACTION_CONTEXT_HOLD');
+            // The GitHub job's *native required reviewer* gate is mandatory:
+            // this script is published only after Settings readback confirms it.
+            const db=getFirestore(getApps()[0]||initializeApp({projectId:'ays-orbit-360-lab'}));
+            const result=await c.protectedTransactionalApply(db,f,{
+              environment:'gravicentra-live-data-writes',reviewerEvidence:true
+            });
+            if(result.receiptWrites!==10||result.portfolioWrites!==7||result.auditWrites!==1||
+               result.readback!=='PASS_ALL_24_DOCUMENTS_AUDIT_AND_TEN_SOURCE_NUMBERS')
+              throw Error('I66_AFTER_READBACK_HOLD');
+            const report={schema:'I66_MARIA_17_EXACT_PROTECTED_CAS_READBACK_V1',commit:process.env.GITHUB_SHA,
+              status:result.readback,requestId:result.requestId,receiptWrites:10,portfolioWrites:7,
+              auditWrites:1,receiptAndPolicyAfterDigest:result.receiptAndPolicyAfterDigest,
+              portfolioAfterDigest:result.portfolioAfterDigest,otherPoliciesTouched:0,
+              paymentFieldsTouched:0};
+            fs.writeFileSync(process.env.RUNNER_TEMP+'/gi-i66-maria-protected-readback.json',JSON.stringify(report,null,2)+'\n',{mode:0o600});
+            console.log('I66_MARIA_PROTECTED_RESULT=PASS_READBACK_17_SPARSE_DOCS_AUDIT');
+            console.log('I66_MARIA_PROTECTED_PAYMENT_FIELDS_MODIFIED=0');
+          })().catch(e=>{console.error('I66_MARIA_PROTECTED_FAIL_CLOSED='+String(e.message||e).slice(0,180));process.exitCode=1});
+          JS
+
+      - name: Save sanitized preflight and postread evidence for audit
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gi-i66-maria-exact-protected-cas-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/gi-i66-maria-protected-preflight.json
+            ${{ runner.temp }}/gi-i66-maria-protected-readback.json
+          if-no-files-found: warn
+          retention-days: 90
