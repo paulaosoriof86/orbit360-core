@@ -599,7 +599,7 @@
     "operationalWrites": 0,
     "sourceChangeInProduction": false,
     "importerRebuildRequired": false,
-    "nextRequiredStep": "Recover residual exact individual owner responses from authorized source if accessible (no repeated user questionnaires); then LIVE receipt/policy edition readback, per insurer+policy+edition+quota+requirement+source date idempotent deterministic diff, commit through already approved server-owned write chain, before/after readback and visual certification. No blind import or paid marking.",
+    "nextRequiredStep": "Live exact client-policy-edition readback required; 4 Guatemalteca renewals' source PDFs and target Drive dossier checks now pinned in policyClientDocumentationReadback. Do not create duplicates, apply payments or represent those records as updated until authenticated current LIVE readback and idempotent before/after proof.",
     "insurerStatementsNativeFormatsParsed": true,
     "all35CurrentSourceRawHashesPinned": true,
     "fourHistoricalReferenceHashesPinned": true
@@ -612,5 +612,121 @@
     "sourceDatePrecedence": "LATER_PAID_EVIDENCE_CAN_SUPERSEDE_EARLIER_PENDING_SNAPSHOT_FOR_SAME_EXACT_REQUIREMENT",
     "historicalCalibrationMonth": "2026-09",
     "customerTotalVsNetCommissionBase": "DISTINCT_FIELDS_NO_BASIS_SUBSTITUTION"
+  },
+  "policyClientDocumentationReadback": {
+    "source": "AYSGUATEMALA_DRIVE_CUSTOMER_DOSSIERS_AND_AUTHENTIC_POLICY_PDFS",
+    "verifiedAtGuatemala": "2026-11-10",
+    "rootFolder": {
+      "label": "AyS Guatemala / Clientes",
+      "driveFolderId": "13H7zMGwFC9f1UnHyfNqzzSfFex1jJRHE"
+    },
+    "scope": "DRIVE_DOCUMENT_READBACK_ONLY_NO_OPERATIONAL_FIRESTORE_READBACK",
+    "pastWorkContinuity": {
+      "paulaPreviouslyAuthorizedCreatingNewClientsPoliciesAndApplyingCurrentPayments": true,
+      "paulaPreviouslyAnsweredIndividualExceptions": true,
+      "currentEvidenceOfSuccessfulBusinessRecordsCreatedInLive": false,
+      "actualLiveClientPolicyReceiptWriteReceiptsRecovered": 0,
+      "doNotConcludeAbsentFromLiveWithoutLiveReadback": true,
+      "doNotDuplicateRecordsOrReAskAlreadyAnsweredCaseMatrix": true
+    },
+    "issuerRenewalsFound": [
+      {
+        "policy": "AUTO-38209",
+        "fileId": "1Gu3Fk-Yg9MDJet2-W8zaSRihSVvSJKQi",
+        "period": "2026-08-30/2027-08-30",
+        "netGTQ": 1800,
+        "totalGTQ": 2678.53,
+        "documentStatus": "AUTHENTIC_PDF_READ"
+      },
+      {
+        "policy": "AUTO-38446",
+        "fileId": "1XqN6uMvZWySMxCwKVQbfxqB7ORXx2fGb",
+        "period": "2026-10-06/2027-10-06",
+        "netGTQ": 1800,
+        "totalGTQ": 2508.8,
+        "documentStatus": "AUTHENTIC_PDF_READ"
+      },
+      {
+        "policy": "AUTO-38594",
+        "fileId": "1q3cpWWvsPHM6-rTwT5MSzAtPdjArrRga",
+        "period": "2026-10-21/2027-10-21",
+        "netGTQ": 2122.56,
+        "totalGTQ": 2888.13,
+        "documentStatus": "AUTHENTIC_PDF_READ",
+        "clarification": "Requirement net Q124.16 is not partial payment; exact requirement+quota matching required."
+      },
+      {
+        "policy": "AUTO-38624",
+        "fileId": "19Z_7QNfBpxWIPhGucAWOtqULzAxVQs6X",
+        "period": "2026-10-27/2027-10-27",
+        "netGTQ": 1800,
+        "totalGTQ": 2508.8,
+        "documentStatus": "AUTHENTIC_PDF_READ"
+      }
+    ],
+    "caseDossiers": [
+      {
+        "case": "MARCO_FICOHSA_DISTINCT",
+        "clientFolderId": "1saV55Q6h8OboNiGhkPDn74JoMFUC_1xi",
+        "observed": "Drive has documents for earlier AUTO-1000000187 and other historical policies, but no individual PDF visibly identified as AUTO-1000007073 in current folder; 7073 appears in insurer planilla and account statement.",
+        "action": "KEEP_7073_SEPARATE; retrieve issue document if needed; live lookup first"
+      },
+      {
+        "case": "SONIA_ADDITIONAL_NOVEMBER",
+        "clientFolderId": "1u8VS6_iWvDb8bw1NQRwQjsbtFNJgMryV",
+        "observed": "Existing Roble PDF 91-8350081 renewal Apr 07 2026-Apr 07 2027, file 1neH81Oi_oqc8EL-uUO6BiTW-o7Qgixdz. New additional issued Nov 06 not in four currently listed dossier children.",
+        "action": "Do not substitute April renewal for additional November policy"
+      },
+      {
+        "case": "PRISCILA_MAPFRE",
+        "clientFolderId": "1M2X9B_PQ1DWHbo8-CuaUGk-yZ1HC7CIh",
+        "observed": "Application file 1U4K7cUq6SdnRH0eSnmPByc23GJcgMVh3, quotation file 14p3azXqxDNMm9d6y45935j3pWgjuFk2O and onboarding file; not proof issued policy exists.",
+        "advisor": "Samuel Daza",
+        "action": "Check LIVE first and seek issued policy identifier/support only if missing"
+      },
+      {
+        "case": "MARIA_LARIOS_DISTINCT",
+        "clientFolderId": "1_dgPS_Lsxu-X5OYkMy-cQEbmoDV_XnCV",
+        "observed": "Contains Roble 91-8278775 renewal 2026-2027 file 1IFBaRIjVXO-0LNGKsw9wB-3As7Lmpw4l, separate La Ceiba 0223092797 file 1IM0DpqnLL2l9ww-DXOQDzB07bRjMDoK_; no merging by person.",
+        "action": "Keep insurer, vehicle and edition keys separate"
+      },
+      {
+        "case": "JOSUE_ADDITIONAL",
+        "clientFolderId": "1wLRjo90S1W9PamNUxTUz5LS6nTU45fLG",
+        "observed": "Folder contains multiple insurer/incident PDFs, including 91834554165490, and separate incident subfolders; not yet uniquely linked to additional policy.",
+        "action": "No automatic merge or creation until exact edition crossmatch"
+      },
+      {
+        "case": "CAMILA_GT_RENEWAL",
+        "clientFolderId": null,
+        "observed": "Found G&T VIME-18154 policy PDF file 1z4VlklvbD-Xp8n9GgoqJe-G2n3c0tyE4 in another dossier: its visible coverage was 2025-08-01 to 2026-08-01 with Q500.57 monthly total, NOT owner-confirmed current 2026-08-01 to 2027-08-01 Q538.35. Search did not surface current issued renewal PDF.",
+        "action": "Never reuse 2025 PDF or 2025 invoice for current edition; keep renewal and exact quota 3/12 distinct"
+      },
+      {
+        "case": "JULIA_UNIVERSALES",
+        "clientFolderId": null,
+        "observed": "No exact-name direct customer folder found in AyS Guatemala/Clientes by targeted Drive folder search; commission planilla includes Universales policies.",
+        "advisor": "Germán Reyes",
+        "action": "Preserve new freelance sale and one linked policy; Live match first"
+      },
+      {
+        "case": "MARIA_GABRIELA_UNIVERSALES",
+        "clientFolderId": null,
+        "observed": "No exact-name direct customer folder found by targeted Drive folder search; insurer commission planilla carries policy 041501603-0.",
+        "advisor": "Germán Reyes",
+        "action": "No reassign to Paula, live match before insert"
+      },
+      {
+        "case": "AURA_SAQUIC_EXCLUDED",
+        "observed": "Prior owner decision explicitly excludes policy/client from bulk creation",
+        "action": "DO_NOT_IMPORT"
+      }
+    ],
+    "sourceStatusNotes": [
+      "Direct Drive folder results are not an exhaustive recursive census; absence of a file from these folder children or targeted search is not proof that no document exists elsewhere.",
+      "Commission liquidations issued November correspond to October collections. Insurer age balances reflect pending as-of their own cutoff, except explicit collected-reports.",
+      "No live mutation, customer creation, policy creation, payment marking or receipt update was performed in this documentation step."
+    ],
+    "nextOperation": "Live authenticated per-customer exact policy+edition+receipt readback, source matching without duplicate writes, recover recent issued PDFs from prior conversation attachments or Drive; then idempotent approved server command with before/after and reload proof. Ask Paula only for specific missing issued document if the normal sources truly do not contain it."
   }
 }
