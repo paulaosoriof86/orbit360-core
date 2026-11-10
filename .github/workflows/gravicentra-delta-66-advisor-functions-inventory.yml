@@ -293,6 +293,83 @@ jobs:
           print('I66_OPS_1604_WORKFLOW_REQUESTS='+json.dumps({'inspectedCount':reqCount,'windowMatches':len(window),'rows':window},sort_keys=True))
           print('I66_OPS_LIVE_IDENTITY_READONLY_COMPLETE; MUTATIONS=0')
           PY
+      - name: I6.6 P0 committed legacy write inventory for no-duplicate reconciliation
+        run: |
+          set -euo pipefail
+          gcloud auth activate-service-account --key-file="$GOOGLE_APPLICATION_CREDENTIALS" --quiet >/dev/null
+          python3 - <<'PY'
+          import json,os,subprocess,urllib.request,urllib.parse,urllib.error,hashlib,datetime,collections,concurrent.futures
+          project=os.environ['PROJECT_ID']
+          token=subprocess.check_output(['gcloud','auth','print-access-token'],text=True).strip()
+          base='https://firestore.googleapis.com/v1/projects/'+project+'/databases/(default)/documents/'
+          hdr={'Authorization':'Bearer '+token,'Accept':'application/json'}
+          def get(path):
+              req=urllib.request.Request(base+path,headers=hdr)
+              try:
+                  with urllib.request.urlopen(req,timeout=25) as response:return json.load(response),200
+              except urllib.error.HTTPError as error:
+                  if error.code==404:return None,404
+                  raise
+          def value(row,key):
+              return str(((row.get('fields') or {}).get(key) or {}).get('stringValue') or '')
+          start=datetime.datetime.fromisoformat('2026-11-10T17:56:02+00:00')
+          cutover=datetime.datetime.fromisoformat('2026-11-10T22:43:56+00:00')
+          root='tenants/alianzas-soluciones/workflowRequests';docs=[];page=''
+          for _ in range(15):
+              path=root+'?pageSize=500'+('&pageToken='+urllib.parse.quote(page,safe='') if page else '')
+              url=base+path
+              with urllib.request.urlopen(urllib.request.Request(url,headers=hdr),timeout=25) as response:body=json.load(response)
+              docs.extend(body.get('documents') or [])
+              page=str(body.get('nextPageToken') or '')
+              if not page:break
+          else:raise RuntimeError('I66_OPS_LEGACY_REQ_PAGINATION_LIMIT')
+          rows=[];seen=set()
+          for doc in docs:
+              if value(doc,'status')!='committed':continue
+              fields=doc.get('fields') or {}
+              stamp=(fields.get('committedAt') or {}).get('timestampValue') or ''
+              try:when=datetime.datetime.fromisoformat(stamp.replace('Z','+00:00'))
+              except ValueError:continue
+              op=value(doc,'operation')
+              result=((fields.get('result') or {}).get('mapValue') or {}).get('fields') or {}
+              resultText=lambda key:str((result.get(key) or {}).get('stringValue') or '')
+              entity=resultText('entityId')
+              entityType=resultText('entityType')
+              mode=resultText('storageMode') or 'legacyCompatible'
+              if not entity or entityType not in ('negocios','gestiones') or not op.startswith('create_'):continue
+              key=(entityType,entity,mode)
+              if key in seen:continue
+              seen.add(key)
+              period=('BEFORE_2026_11_10_DEPLOY' if when<start else 'OLD_TRAFFIC_WINDOW' if when<cutover else 'AFTER_TRAFFIC_REPAIR')
+              safeHash=hashlib.sha256(('alianzas-soluciones|'+entityType+'|'+entity).encode()).hexdigest()[:16]
+              prefix=('tenants/alianzas-soluciones/workflow/' if mode=='canonicalV2' else 'tenantId/alianzas-soluciones/')
+              legacyPath=(prefix+entityType+'/items/' if mode=='canonicalV2' else prefix+entityType+'/')+urllib.parse.quote(entity,safe='')
+              canonicalPath='tenants/alianzas-soluciones/data/'+entityType+'/items/'+urllib.parse.quote(entity,safe='')
+              rows.append({'period':period,'when':stamp,'op':op,'type':entityType,'mode':mode,
+                  'referenceHash16':safeHash,'legacyPath':legacyPath,'canonicalPath':canonicalPath})
+          def inspect(row):
+              legacy,legacyCode=get(row['legacyPath'])
+              canonical,canonicalCode=get(row['canonicalPath'])
+              marker=' '.join(value(legacy or {},name) for name in ('proximaAccion','nota','notas','titulo','nombre','descripcion')).casefold()
+              synthetic=('qa i6.6' in marker or 'prueba controlada qa' in marker)
+              return {k:row[k] for k in ('period','when','op','type','mode','referenceHash16')}|{
+                  'legacyHttp':legacyCode,'canonicalHttp':canonicalCode,'explicitQaMarker':synthetic}
+          with concurrent.futures.ThreadPoolExecutor(max_workers=6) as pool:checked=list(pool.map(inspect,rows))
+          byPeriod={}
+          for period in ('BEFORE_2026_11_10_DEPLOY','OLD_TRAFFIC_WINDOW','AFTER_TRAFFIC_REPAIR'):
+              a=[v for v in checked if v['period']==period]
+              counts=collections.Counter((x['type'],x['op'],x['legacyHttp'],x['canonicalHttp'],x['explicitQaMarker']) for x in a)
+              byPeriod[period]={'uniqueCreatedEntityCount':len(a),
+                  'legacyExistsCanonicalMissing':sum(x['legacyHttp']==200 and x['canonicalHttp']==404 for x in a),
+                  'legacyOnlyExplicitQaMarker':sum(x['legacyHttp']==200 and x['canonicalHttp']==404 and x['explicitQaMarker'] for x in a),
+                  'legacyOnlyUnclassifiedPotentiallyReal':sum(x['legacyHttp']==200 and x['canonicalHttp']==404 and not x['explicitQaMarker'] for x in a),
+                  'operationCounts':dict(collections.Counter(x['op'] for x in a))}
+          affected=[x for x in checked if x['period']=='OLD_TRAFFIC_WINDOW' and x['legacyHttp']==200 and x['canonicalHttp']==404]
+          print('I66_OPS_LEGACY_CREATED_WRITE_INVENTORY='+json.dumps({'inspectedWorkflowRequests':len(docs),
+              'inspectedUniqueCreateEntities':len(checked),'byPeriod':byPeriod,
+              'oldTrafficWindowOrphanCandidates':affected},sort_keys=True))
+          print('I66_OPS_LEGACY_RECONCILIATION_READONLY_COMPLETE; WRITES=0; NO_IMPORT_OR_RETRY')
+          PY
       - name: I6.6 P0 Ops Leads Cloud Run error evidence read-only
         run: |
           set -euo pipefail
