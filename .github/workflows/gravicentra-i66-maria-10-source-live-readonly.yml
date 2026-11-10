@@ -187,6 +187,46 @@ jobs:
               if(!d.exists)throw Error('CONCURRENT_DELETE_HOLD_'+seq);
               allAfter.push({id:d.id,...(d.data()||{})});
             }
+            // Read linked operational portfolio in the SAME tenant, without writes.
+            const portfolioCol=db.collection('tenants').doc(target.tenantId).collection('data').doc('carteraPrimas').collection('items');
+            const portfolioQuery=await portfolioCol.where('polizaId','==',target.policyId).limit(40).get();
+            const portfolioBefore=portfolioQuery.docs.map(d=>({id:d.id,...(d.data()||{})})).sort((a,b)=>a.id.localeCompare(b.id));
+            const portfolioAfter=[];
+            for(const row of portfolioBefore){
+            const d=await portfolioCol.doc(row.id).get();
+            if(!d.exists)issues.push('PORTFOLIO_CONCURRENT_DELETE_'+row.id.slice(-4));
+            else portfolioAfter.push({id:d.id,...(d.data()||{})});
+            }
+            portfolioAfter.sort((a,b)=>a.id.localeCompare(b.id));
+            const portfolioBeforeDigest=snapshotHash(portfolioBefore);
+            const portfolioAfterDigest=snapshotHash(portfolioAfter);
+            if(portfolioBeforeDigest!==portfolioAfterDigest)issues.push('PORTFOLIO_CONCURRENT_CHANGE');
+            const portfolioSafe=portfolioBefore.map(x=>({id:x.id,reciboId:x.reciboId||null,polizaId:x.polizaId||null,
+            vence:x.vence||null,fechaLimite:x.fechaLimite||null,fechaVencimiento:x.fechaVencimiento||null,
+            estado:x.estado||null,estadoOperativo:x.estadoOperativo||null,carteraActiva:x.carteraActiva===true,
+            monto:x.monto??null,primaTotal:x.primaTotal??null}));
+            const operationalLimitDiff=[];
+            const plus15=day=>{const d=new Date(day+'T00:00:00Z');d.setUTCDate(d.getUTCDate()+15);return d.toISOString().slice(0,10)};
+            for(const diff of contractDateDiff){
+            const receipt=allBefore.find(r=>r.id===diff.receiptId);
+            const newLimit=plus15(diff.insurerContractualDueDate);
+            if(str(receipt.fechaLimite)!==plus15(str(receipt.vence)))issues.push('ORIGINAL_LIMIT_NOT_PLUS_15_'+diff.sequence);
+            if(str(receipt.fechaLimite)!==newLimit)operationalLimitDiff.push({sequence:diff.sequence,receiptId:diff.receiptId,
+            field:'fechaLimite',before:str(receipt.fechaLimite),after:newLimit,
+            contractRule:'UTC_PLUS_15_CALENDAR_DAYS',noWrite:true});
+            }
+            const portfolioLinkDiff=[];
+            for(const diff of contractDateDiff){
+            const matches=portfolioSafe.filter(x=>x.reciboId===diff.receiptId);
+            if(matches.length!==1){issues.push('PORTFOLIO_LINK_NOT_ONE_'+diff.sequence);continue;}
+            const car=matches[0],newDue=diff.insurerContractualDueDate,newLimit=plus15(newDue);
+            portfolioLinkDiff.push({sequence:diff.sequence,id:car.id,reciboId:car.reciboId,
+            fieldPatchPreview:{vence:{before:car.vence,after:newDue},
+            fechaLimite:{before:car.fechaLimite,after:newLimit},
+            fechaVencimiento:{before:car.fechaVencimiento,after:newLimit}},
+            stateReadOnly:{estado:car.estado,estadoOperativo:car.estadoOperativo,carteraActiva:car.carteraActiva},
+            noWrite:true});
+            }
             const beforeDigest=snapshotHash({policy:target.policy,receipts:allBefore});
             const afterReReadDigest=snapshotHash({policy:target.policy,receipts:allAfter});
             if(beforeDigest!==afterReReadDigest)issues.push('CONCURRENT_RECEIPT_CHANGE');
@@ -200,11 +240,14 @@ jobs:
               oldArchivedPolicyId:archived.policyId,livePolicyId:target.policyId,
               tenantIdHash:sha(target.tenantId).slice(0,12),livePolicyUniqueCount:eligible.size,
               receiptCount:12,sourceNumberCount:proposedNumbers.length,
+              portfolioCount:portfolioBefore.length,portfolioBeforeDigest,portfolioAfterDigest,
+              portfolioRows:portfolioSafe,portfolioConcurrentReadbackMatch:portfolioBeforeDigest===portfolioAfterDigest,
               beforeDigest,afterReReadDigest,concurrentReadbackMatch:beforeDigest===afterReReadDigest,
               independentDiffs:{
                 numbersOnly:{field:'numeroReciboFuente',expectedCount:10,patchCount:proposedNumbers.filter(x=>x.requiresPatch).length,rows:proposedNumbers},
                 contractualDueDates:{field:'vence',source:'Universales aging 2026-11-09; first of month',mismatchCount:contractDateDiff.length,rows:contractDateDiff,noDateWrites:true},
-                operationalDeadlines:{field:'fechaLimite',keptSeparate:true,writeCount:0}
+                operationalDeadlines:{field:'fechaLimite',keptSeparate:true,ruleVerifiedInLive:'PLUS_15_CALENDAR_DAYS',patchPreviewCount:operationalLimitDiff.length,rows:operationalLimitDiff,writeCount:0},
+                portfolioDerivedDates:{collection:'carteraPrimas',patchPreviewCount:portfolioLinkDiff.length,rows:portfolioLinkDiff,writeCount:0}
               },
               anomalies:issues,
               status:issues.length?'HOLD_STRICT_READONLY_GUARD':'READ_ONLY_NUMBERS_DRY_RUN_PASS_DATE_RECONCILIATION_HOLD',
@@ -220,6 +263,12 @@ jobs:
             console.log('I66_MARIA_REMAP_DATE_MISMATCH_SEQUENCES='+contractDateDiff.map(x=>x.sequence).join(','));
             console.log('I66_MARIA_REMAP_BEFORE_DIGEST='+beforeDigest);
             console.log('I66_MARIA_REMAP_AFTER_REREAD_DIGEST='+afterReReadDigest);
+            console.log('I66_MARIA_REMAP_CAR_PORTFOLIO_COUNT='+portfolioBefore.length);
+            console.log('I66_MARIA_REMAP_CAR_PORTFOLIO_DIGEST='+portfolioBeforeDigest);
+            console.log('I66_MARIA_REMAP_CAR_PORTFOLIO_REREAD_DIGEST='+portfolioAfterDigest);
+            console.log('I66_MARIA_REMAP_CAR_PORTFOLIO_SAFE_SUMMARY='+JSON.stringify(portfolioSafe));
+            console.log('I66_MARIA_REMAP_OPERATIONAL_PLUS15_DIFF='+operationalLimitDiff.length);
+            console.log('I66_MARIA_REMAP_CAR_LINKED_DATE_DIFF='+portfolioLinkDiff.length);
             console.log('I66_MARIA_REMAP_GUARD_ANOMALY_COUNT='+issues.length);
             console.log('I66_MARIA_REMAP_STATUS='+cleanReport.status);
             console.log('I66_MARIA_REMAP_DATA_WRITES=0');
