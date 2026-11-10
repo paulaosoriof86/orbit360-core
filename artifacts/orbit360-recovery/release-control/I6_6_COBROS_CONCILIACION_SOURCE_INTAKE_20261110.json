@@ -7534,5 +7534,37 @@
     "remaining": "Authenticated live role-based create/edit/archive human UAT including before/after readback; no LIVE data writes performed by release",
     "legacyGate": "B4-007 CLOSED",
     "activeGate": "I6.6"
+  },
+  "i66AdvisorOpsNotificationQa20261110": {
+    "id": "GI_I66_ADVISOR_PAYMENT_REPORT_OUTBOX_EMULATOR_QA_20261110",
+    "dateGuatemala": "2026-11-10",
+    "status": "EMULATOR_48_OF_48_PASS_SOURCE_AND_GUARD_PASS_NOT_YET_LIVE",
+    "sourceCommit": "439ff7aebc685866c5605407dbc920fb329a552b",
+    "emulatorRun": 42870010579,
+    "checks": 48,
+    "emulatorResult": "SUCCESS",
+    "demoProject": "demo-gravicentra-i66-payments",
+    "scope": [
+      "Report payment GT/CO as advisor own authorized country",
+      "Reject other tenant and country",
+      "Idempotent event and no duplicate notifications",
+      "Write reconciliationEvents + notificationOutbox and readback internalNotifs",
+      "Notify Ops/AdminTenant/SuperAdmin/Direction by permitted scope",
+      "No payment application or cobros writes",
+      "Deny resolving other user's notification",
+      "Do not project orphan outbox event",
+      "Normalize workflowType and persist country in Ops management"
+    ],
+    "guardRun": 42870010697,
+    "guardResult": "SUCCESS",
+    "immutableBuildRun": 42870013249,
+    "immutableBuildResult": "SUCCESS",
+    "previewFunction": "NOT_YET_DEPLOYED",
+    "previewHosting": "NOT_YET_VERIFIED",
+    "liveFunction": "NOT_YET_DEPLOYED",
+    "liveHosting": "NOT_YET_PROMOTED",
+    "productionWrites": 0,
+    "whatsappSent": 0,
+    "note": "Reporter UX original failure still requires authenticated LIVE readback; emulator confirms contract, not production acceptance. Do not change built source without new artifact."
   }
 }
