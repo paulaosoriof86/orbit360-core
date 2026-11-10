@@ -419,6 +419,69 @@
         "fullGuardPending": true,
         "liveRelease": false
       }
+    },
+    {
+      "id": "I6_6_GREENAPI_DIRECT_WHATSAPP_GROUP_QA_DISABLED_P0",
+      "approvedByDirection": true,
+      "receipt": "Paula Dirección 2026-11-10 authorized direct Green API backend QA-only on same recovery candidate, OFF by default, no secrets, Make, external sends, production deploy or retroactive backlog; Ops/AyS Pagos GT exact groups, no advisor/client messages in this gate",
+      "sourceStatus": "BACKEND_SOURCE_CANDIDATE_44_OF_44_MOCK_QA_PASS_FUNCTIONS_PREVIEW_LIVE_AND_REAL_PROVIDER_UAT_HOLD",
+      "capabilityOwners": [
+        "IN_APP_NOTIFICATION_OUTBOX",
+        "OPS_PRIMARY_RUNTIME",
+        "COBROS_RECONCILIATION"
+      ],
+      "scope": "Server-only GreenAPI delivery planner, provider status transport, deterministic event+channel+destination idempotency, canonical tenant/country verification, Secret Manager dual OFF switch, authorized group allowlist, rate hold, signed status webhook/receipt index; no enabled emitters, no vendor traffic, no writes from this commit",
+      "dataWrites": 0,
+      "paths": [
+        {
+          "path": "functions/bootstrap.js",
+          "gitBlobSha": "160f943dd993bb4dfa88e24fd00ede422e3d5a7b"
+        },
+        {
+          "path": "functions/greenapi-delivery-plan.js",
+          "gitBlobSha": "7f674c846a782a5ed7829836e998b79808dd5ed8"
+        },
+        {
+          "path": "functions/greenapi-direct-transport.js",
+          "gitBlobSha": "f302694f5f764870d6c1d2b6d29c0cd64d714aef"
+        },
+        {
+          "path": "functions/greenapi-firebase-bridge.js",
+          "gitBlobSha": "5ef0205765b77a5d16772dc17acf3f11c3cc6f28"
+        },
+        {
+          "path": "functions/greenapi-outbox-core.js",
+          "gitBlobSha": "2e9b4594e48dae0a596756f62481dea2f27c8d33"
+        }
+      ],
+      "tests": [
+        {
+          "path": "tools/gravicentra-i6-6-greenapi-delivery-contract.test.cjs",
+          "gitBlobSha": "1538564811ce772f88ba1e7c5d844704959214b8"
+        },
+        {
+          "path": "tools/gravicentra-i6-6-greenapi-firebase-emulated.test.cjs",
+          "gitBlobSha": "36006758d4de0265c11d863bf7ae030d8a613ad8"
+        },
+        {
+          "path": "tools/gravicentra-i6-6-greenapi-firebase-scaffold.test.cjs",
+          "gitBlobSha": "45361d32cfd344e890581f714d753d8c5473e27e"
+        },
+        {
+          "path": "tools/gravicentra-i6-6-greenapi-outbox-core.test.cjs",
+          "gitBlobSha": "ffb6b6eff83f835f58ef3f9646ab4551d7219de1"
+        }
+      ],
+      "qa": {
+        "localInjectedTestsPassed": 44,
+        "localInjectedTestsFailed": 0,
+        "realProviderCalls": 0,
+        "emulatorDeployed": false,
+        "previewDeployed": false,
+        "liveReleased": false,
+        "activationEnabled": false,
+        "consentAndWebhookHold": true
+      }
     }
   ]
 }

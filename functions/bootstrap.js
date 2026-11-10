@@ -16,5 +16,6 @@ module.exports = Object.assign(
   require('./recurring-insurance-import'),
   require('./index'),
   require('./bank-accounts'),
-  require('./document-drive-domain')
+  require('./document-drive-domain'),
+  require('./greenapi-firebase-bridge')
 );
