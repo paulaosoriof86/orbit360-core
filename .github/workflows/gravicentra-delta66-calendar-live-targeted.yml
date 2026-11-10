@@ -1,0 +1,166 @@
+# I6.6 forward-only UTC/periodicity engine: Hosting-only immutable artifact transport; PWA remains byte-identical.
+name: Gravicentra I6.6 CALENDAR Exact LIVE Hosting Transport
+on:
+  push:
+    branches: [recovery/fase-a-clean-20260831]
+    paths:
+      - .github/workflows/gravicentra-delta66-calendar-live-targeted.yml
+      - tools/gravicentra-i6-6-calendar-live-exact-transport.mjs
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: gi-i66-calendar-prod-hosting-only
+  cancel-in-progress: false
+jobs:
+  promote:
+    if: github.repository == 'paulaosoriof86/orbit360-core' && github.ref == 'refs/heads/recovery/fase-a-clean-20260831'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    env:
+      PROJECT_ID: ays-orbit-360-lab
+      SITE: ays-orbit-360-lab
+      I66_CALENDAR_SOURCE_SHA: a9c52e4ee8e358d065f8723bd7964595d772009b
+      I66_CALENDAR_ARTIFACT_ID: '13795297616'
+      I66_CALENDAR_ARTIFACT_DIGEST: sha256:4b6a4ba17ab7b165303946b2891b83cc15298b8f9882e41ef61e7d81a65c2378
+      I66_CALENDAR_PREVIEW_CHANNEL: gi-i66-rc-42883578427
+      I66_CALENDAR_PREVIEW_URL: https://ays-orbit-360-lab--gi-i66-rc-42883578427-ki5nqejv.web.app
+      SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify approved CALENDAR-only source, green CI and immutable digest
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          git cat-file -e "$I66_CALENDAR_SOURCE_SHA^{commit}"
+          node --check tools/gravicentra-i6-6-calendar-live-exact-transport.mjs
+          node - <<'NODE'
+          const assert=require('node:assert/strict'),{execFileSync}=require('node:child_process');
+          (async()=>{
+            const H={Authorization:'Bearer '+process.env.GH_TOKEN,Accept:'application/vnd.github+json','User-Agent':'GI-I66-CALENDAR-Live'};
+            const U='https://api.github.com/repos/paulaosoriof86/orbit360-core/actions/';
+            const [qa,build,art]=await Promise.all([
+              fetch(U+'runs/42883578539',{headers:H}).then(r=>r.json()),
+              fetch(U+'runs/42883578427',{headers:H}).then(r=>r.json()),
+              fetch(U+'artifacts/'+process.env.I66_CALENDAR_ARTIFACT_ID,{headers:H}).then(r=>r.json())]);
+            assert.equal(qa.conclusion,'success','CALENDAR_CONTROL_GUARD_NOT_GREEN');
+            assert.equal(qa.head_sha,process.env.I66_CALENDAR_SOURCE_SHA,'CALENDAR_GUARD_SOURCE_DRIFT');
+            assert.equal(build.conclusion,'success','CALENDAR_IMMUTABLE_PACKAGE_NOT_GREEN');
+            assert.equal(build.head_sha,process.env.I66_CALENDAR_SOURCE_SHA,'CALENDAR_BUILD_SOURCE_DRIFT');
+            assert.equal(art.digest,process.env.I66_CALENDAR_ARTIFACT_DIGEST,'CALENDAR_ZIP_DIGEST_DRIFT');
+            assert.equal(art.workflow_run.id,42883578427,'CALENDAR_PACKAGE_RUN_DRIFT');
+            assert.equal(art.expired,false,'CALENDAR_PACKAGE_EXPIRED');
+            const changed=execFileSync('git',['diff','--name-only','13345caebe981940d8aae9dcbf274f44aad04deb',process.env.I66_CALENDAR_SOURCE_SHA,'--','orbit360-platform','functions'],{encoding:'utf8'}).trim().split('\n').filter(Boolean).sort();
+            const approved=['orbit360-platform/core/primas.js','orbit360-platform/core/policy-receipts-engine.js'].sort();
+            assert.deepEqual(changed,approved,'CALENDAR_UNAPPROVED_PRODUCT_OR_FUNCTION_DIFF');
+            console.log('I66_CALENDAR_GUARD_ARTIFACT_DIGEST_AND_TWO_SOURCE_FILES_EXACT_PASS_BACKEND_UNCHANGED');
+          })().catch(e=>{console.error(e.message);process.exitCode=1;});
+          NODE
+      - uses: actions/download-artifact@v4
+        with:
+          artifact-ids: 13795297616
+          run-id: 42883578427
+          github-token: ${{ github.token }}
+          path: ${{ runner.temp }}/calendar-live-archive
+      - name: Verify one byte-exact package, CALENDAR manifest/icons and source pin
+        run: |
+          set -euo pipefail
+          DL="$RUNNER_TEMP/calendar-live-archive"
+          test "$(find "$DL" -maxdepth 3 -type f -name gi-i66-exact-package.tar.gz | wc -l)" -eq 1
+          test "$(find "$DL" -maxdepth 3 -type f -name gi-i66-exact-package.sha256 | wc -l)" -eq 1
+          TAR="$(find "$DL" -maxdepth 3 -type f -name gi-i66-exact-package.tar.gz -print -quit)"
+          SUM="$(find "$DL" -maxdepth 3 -type f -name gi-i66-exact-package.sha256 -print -quit)"
+          test "$(dirname "$TAR")" = "$(dirname "$SUM")"
+          test "$(sha256sum "$TAR" | awk '{print $1}')" = "$(awk '{print $1}' "$SUM")"
+          mkdir -p "$RUNNER_TEMP/calendar-live-packet"
+          tar -xzf "$TAR" -C "$RUNNER_TEMP/calendar-live-packet" --no-same-owner
+          echo "I66_PACKAGE_ROOT=$RUNNER_TEMP/calendar-live-packet" >> "$GITHUB_ENV"
+          export CALENDAR_LIVE_PKT="$RUNNER_TEMP/calendar-live-packet"
+          node - <<'NODE'
+          const fs=require('node:fs'),{execFileSync}=require('node:child_process'),root=process.env.CALENDAR_LIVE_PKT;
+          const p=root+'/bundle/',m=JSON.parse(fs.readFileSync(p+'site/__recovery__/build.json'));
+          if(m.sourceSha!==process.env.I66_CALENDAR_SOURCE_SHA||m.gate!=='I6.6'||m.buildId!=='gi-i66-a9c52e4ee8e3-57f234755dc1')
+            throw Error('CALENDAR_PACKET_MARKER_DRIFT');
+          for(const [target,source] of [
+            ['site/core/primas.js','orbit360-platform/core/primas.js'],
+            ['site/core/policy-receipts-engine.js','orbit360-platform/core/policy-receipts-engine.js'],
+            ['site/manifest.webmanifest','orbit360-platform/manifest.webmanifest'],
+            ['site/assets/icons/gravicentra-192.png','orbit360-platform/assets/icons/gravicentra-192.png'],
+            ['site/assets/icons/gravicentra-512.png','orbit360-platform/assets/icons/gravicentra-512.png']
+          ])if(!fs.readFileSync(p+target).equals(execFileSync('git',['show',process.env.I66_CALENDAR_SOURCE_SHA+':'+source])))
+            throw Error('CALENDAR_ENGINE_OR_PWA_ASSET_MISMATCH:'+source);
+          if(!fs.existsSync(root+'/evidence/site-manifest.sha256'))throw Error('CALENDAR_SITE_HASH_MANIFEST_MISSING');
+          console.log('I66_CALENDAR_PACKAGE_AND_BYTES_EXACT_PASS');
+          NODE
+      - name: Select configured existing Firebase LAB credential for Hosting clone only
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/calendar-live-auth"
+          python3 - <<'PY'
+          import os,json,pathlib
+          b=pathlib.Path(os.environ['RUNNER_TEMP'])/'calendar-live-auth';found=[]
+          for i,k in enumerate(('SA_LAB','SA_ALT','SA_DEFAULT')):
+              try:d=json.loads(os.environ.get(k,''))
+              except (ValueError,TypeError):continue
+              if d.get('type')=='service_account' and d.get('project_id')=='ays-orbit-360-lab' and d.get('private_key'):
+                  f=b/f'{i}.json';f.write_text(json.dumps(d));f.chmod(0o600);found.append(str(f))
+          if not found:raise SystemExit('I66_CALENDAR_CONFIGURED_FIREBASE_CREDENTIAL_MISSING')
+          (b/'candidates').write_text('\n'.join(found)+'\n')
+          PY
+          npm install --prefix "$RUNNER_TEMP/calendar-live-cli" --no-save --ignore-scripts --no-audit --no-fund firebase-tools@14.10.1 >/dev/null
+          node tools/gravicentra-firebase-tools-empty-extensions-workaround-v1.mjs "$RUNNER_TEMP/calendar-live-cli"
+          CLI="$RUNNER_TEMP/calendar-live-cli/node_modules/firebase-tools/lib/bin/firebase.js"
+          SEL=''
+          while IFS= read -r c;do
+            if GOOGLE_APPLICATION_CREDENTIALS="$c" node "$CLI" hosting:channel:list --project "$PROJECT_ID" --non-interactive --json > "$RUNNER_TEMP/calendar-live-hosting-before.json" 2>/dev/null;then SEL="$c";break;fi
+          done < "$RUNNER_TEMP/calendar-live-auth/candidates"
+          test -n "$SEL"
+          cp "$SEL" "$RUNNER_TEMP/calendar-live-auth/selected.json"
+          chmod 600 "$RUNNER_TEMP/calendar-live-auth/selected.json"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/calendar-live-auth/selected.json" >> "$GITHUB_ENV"
+          echo "FIREBASE_CLI_BIN=$CLI" >> "$GITHUB_ENV"
+          npm install --no-save --package-lock=false --ignore-scripts --no-audit --no-fund google-auth-library@10.9.1 >/dev/null
+      - name: Snapshot immutable Hosting rollback before any LIVE modification
+        run: |
+          set -euo pipefail
+          RB="gi-i66-calendarrb-$GITHUB_RUN_ID"
+          node "$FIREBASE_CLI_BIN" hosting:clone "$SITE:live" "$SITE:$RB" --project "$PROJECT_ID" --non-interactive
+          echo "I66_CALENDAR_ROLLBACK_CHANNEL=$RB" >> "$GITHUB_ENV"
+          echo "I66_CALENDAR_HOSTING_ONLY_BACKUP_READY"
+      - name: Promote Preview Hosting version exactly; verify both origins and auto-rollback on failure
+        run: |
+          set -euo pipefail
+          completed=0;promotion_started=0
+          rollback(){
+            code=$?
+            if test "$completed" != 1 && test "$promotion_started" = 1;then
+              set +e
+              node "$FIREBASE_CLI_BIN" hosting:clone "$SITE:$I66_CALENDAR_ROLLBACK_CHANNEL" "$SITE:live" --project "$PROJECT_ID" --non-interactive
+              if test "$?" != 0;then echo 'I66_CALENDAR_CRITICAL_FALLBACK_ROLLBACK_UNCONFIRMED';fi
+            fi
+            exit "$code"
+          }
+          trap rollback EXIT
+          promotion_started=1
+          node tools/gravicentra-i6-6-calendar-live-exact-transport.mjs
+          completed=1
+          trap - EXIT
+          echo 'I66_CALENDAR_HOSTING_ONLY_SAME_ARTIFACT_DUAL_ORIGIN_PASS_FUNCTIONS_ZERO_DATA_WRITES_ZERO_CHROME_INSTALL_UAT_HOLD'
+      - name: Upload non-PII byte readback evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gi-i66-calendar-live-exact-proof-${{ github.run_id }}
+          path: ${{ runner.temp }}/i66-calendar-live-exact-readback.json
+          retention-days: 30
+          if-no-files-found: warn
