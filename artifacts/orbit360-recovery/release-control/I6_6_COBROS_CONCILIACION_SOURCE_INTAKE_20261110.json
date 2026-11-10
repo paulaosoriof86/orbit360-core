@@ -649,7 +649,7 @@
     "operationalWrites": 3,
     "sourceChangeInProduction": false,
     "importerRebuildRequired": false,
-    "nextRequiredStep": "P0 exact-domain repairs before financial apply: importer fake fallback blocks source evidence; receipt schedule uses 12/n and contains ghost 10/10 2026; renewal lifecycle hardcodes same insurer so Marco cross-carrier replacement cannot be declared as renewal. Preserve previous accepted B3-002 fast Cobros without reopening gate. Continue read-only issuer proofs and do controlled exact UI writes only when all role/edition/receipt preconditions can be satisfied.",
+    "nextRequiredStep": "Read remaining authentic insurer statements under period semantics and exact policy edition keys; G&T transport TLG$-7529 account Oct27 one pending USD214.95, no LIVE Cobros row. Do not create fake receipts; repair source scheduler and importer fail-closed then certify. Preserve previously passed Cobros perf, investigate global search O(policies×vehicles) and Client360 recalc with isolated app vs browser measures.",
     "insurerStatementsNativeFormatsParsed": true,
     "all35CurrentSourceRawHashesPinned": true,
     "fourHistoricalReferenceHashesPinned": true,
@@ -1198,6 +1198,15 @@
       "followupObserved": "22 rows after filter settled (11 operational + 11 unconfirmed SIGA)",
       "elapsedCaveat": "Not app-only TTI; includes connected-browser transport and asynchronous debounce.",
       "sourceReference": "Bantrab 2026-11-04 pending report"
+    },
+    "globalSearchTest": {
+      "environment": "LIVE Chrome authenticated on Cobros route",
+      "query": "TLG$-7529",
+      "tool": "Visible global search textbox",
+      "result": "locator.fill timed out after 10000ms waiting for CDP Runtime.evaluate",
+      "attribution": "Transport and page responsiveness both possible; the router.js full multicollection scan per keypress is a concrete source-risk; do not equate CDP timeout to exact app-only TTI.",
+      "sourceBlobSha": "df3f134f16246c770418ad11323f6e9a931cb3bb",
+      "action": "No further global-search stress repeated in production; use narrower module filters and source diagnostics."
     }
   },
   "operationalActions": [
@@ -1484,6 +1493,27 @@
         }
       ],
       "interpretation": "Column FECHA_COBRO may be scheduled/contractual, not settlement proof; first date is in the future relative to cutoff. Do not mark paid without affirmative source."
+    },
+    {
+      "id": "GYT_TLG7529_PENDING_OCT27_SOURCE",
+      "status": "ORIGINAL_ACCOUNT_PENDING_MATCH_TO_ISSUED_TRANSPORT_SOURCE",
+      "source": "https://docs.google.com/spreadsheets/d/1Q1UTkxp5i14vGR2d6fRmrmS9u4vdX58g/edit",
+      "policy": "TLG$-7529",
+      "client": "INDUSTRIA Y COMERCIO MEDITERRANEO SOCIEDAD ANONIMA",
+      "sourceCutoff": "2026-10-27",
+      "primaryPolicy": "libfile_34207ad8aed481918c24595716777475",
+      "term": "2026-10-19 to 2026-11-19",
+      "paymentCount": 1,
+      "requirement": "E-996196409",
+      "netUSD": 182.78,
+      "grossUSD": 214.95,
+      "pendingUSD": 214.95,
+      "sourceFx": "7.63979",
+      "reportedEquivalentGTQ": 1642.17286,
+      "sourceStatus": "INC",
+      "collectedActual": "NOT_EVIDENCED",
+      "liveCobrosFilter": "TLG$-7529 shows Sin cobros in authenticated LIVE (does not alone prove policy absent).",
+      "interpretation": "Short-term transport one month, not annual/multi installment. Oct27 pending as of report; Nov10 payment must be independently verified before paid marking."
     }
   ]
 }
