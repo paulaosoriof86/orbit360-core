@@ -26,7 +26,7 @@ jobs:
       SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
       SA_LAB_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
       SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-      I66_PACKAGE_ROOT: ${{ runner.temp }}/gi-i66-promote-package
+      I66_PACKAGE_ROOT: /tmp/gi-i66-promote-package
     steps:
       - uses: actions/checkout@v4
         with:
