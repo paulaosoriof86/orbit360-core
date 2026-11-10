@@ -1,0 +1,86 @@
+# QA-only existing LAB identity and immutable I6.6 Preview; zero business writes.
+name: Gravicentra I6.6 Authenticated Read-Only Preview Smoke
+
+on:
+  push:
+    branches: [recovery/fase-a-clean-20260831]
+    paths:
+      - .github/workflows/gravicentra-delta-66-authread-smoke.yml
+      - artifacts/orbit360-recovery/release-control/I6_6_AUTHENTICATED_READONLY_SMOKE_REQUEST_20261110.json
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: gravicentra-delta-66-readonly-smoke
+  cancel-in-progress: false
+
+jobs:
+  scoped-authenticated-readonly:
+    if: github.repository == 'paulaosoriof86/orbit360-core' && github.ref == 'refs/heads/recovery/fase-a-clean-20260831'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 18
+    env:
+      SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_LAB_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      I66_QA_URL: https://ays-orbit-360-lab--gi-i66-rc-42859356672-irla5ypi.web.app
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify pinned source, exact package, active gate and zero product delta
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-i6-6-delta-guard.mjs
+          node - <<'NODE'
+          const fs=require('node:fs'),cp=require('node:child_process');
+          const p='artifacts/orbit360-recovery/release-control/I6_6_AUTHENTICATED_READONLY_SMOKE_REQUEST_20261110.json';
+          const j=JSON.parse(fs.readFileSync(p,'utf8'));
+          if(j.schema!=='I6_6_PREVIEW_AUTHENTICATED_READONLY_SMOKE_V1'||j.status!=='AUTHORIZED_READONLY_SMOKE_REQUESTED'||j.businessDataWritesAuthorized!==false||j.promotionAuthorized!==false)throw Error('I66_QA_REQUEST_NOT_READONLY_AUTHORIZED');
+          if(!/^[a-f0-9]{40}$/.test(j.sourceSha||'')||!/^gi-i66-rc-[0-9]+$/.test(j.previewChannel||'')||!/^https:\/\/ays-orbit-360-lab--gi-i66-rc-[0-9]+-[a-z0-9-]+\.web\.app$/.test(j.previewUrl||''))throw Error('I66_QA_SOURCE_OR_ORIGIN_INVALID');
+          if(j.previewUrl!==process.env.I66_QA_URL)throw Error('I66_QA_PREVIEW_ORIGIN_DRIFT');
+          cp.execFileSync('git',['merge-base','--is-ancestor',j.sourceSha,'HEAD']);
+          const diff=cp.execFileSync('git',['diff','--name-only',j.sourceSha,'HEAD','--','orbit360-platform','functions','firebase.json','firestore.rules','storage.rules'],{encoding:'utf8'}).trim();
+          if(diff)throw Error('I66_QA_PRODUCT_SOURCE_CHANGED_AFTER_PACKAGE');
+          fs.appendFileSync(process.env.GITHUB_ENV,'I66_QA_URL='+j.previewUrl+'\n');
+          const run=j.buildRunId,id=j.artifactId;
+          if(!Number.isInteger(run)||run<1||!Number.isInteger(id)||id<1||!/^[a-f0-9]{64}$/.test(j.artifactZipSha256||''))throw Error('I66_QA_ARTIFACT_IDENTITY_INVALID');
+          (async()=>{
+            const response=await fetch('https://api.github.com/repos/paulaosoriof86/orbit360-core/actions/artifacts/'+id,{headers:{Authorization:'Bearer '+process.env.GITHUB_TOKEN,'User-Agent':'GI-I66-QA-ReadOnly','X-GitHub-Api-Version':'2022-11-28'}});
+            if(!response.ok)throw Error('I66_QA_ARTIFACT_READBACK_UNAVAILABLE');
+            const a=await response.json();
+            if(a.id!==id||a.workflow_run?.id!==run||a.digest!=='sha256:'+j.artifactZipSha256||a.expired===true)throw Error('I66_QA_ARTIFACT_DIGEST_DRIFT');
+            console.log('I66_QA_ARTIFACT_PIN_VALIDATED_WITH_GITHUB');
+          })().catch(e=>{console.error(e.message);process.exitCode=1;});
+          NODE
+          curl --fail --location --silent --show-error --max-time 30 "$I66_QA_URL/__recovery__/build.json" -o "$RUNNER_TEMP/i66-qa-build.json"
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const j=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/I6_6_AUTHENTICATED_READONLY_SMOKE_REQUEST_20261110.json','utf8'));
+          const b=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/i66-qa-build.json','utf8'));
+          if(b.gate!=='I6.6'||b.sourceSha!==j.sourceSha||b.buildId!==j.buildId)throw Error('I66_QA_PREVIEW_BUILD_MARKER_DRIFT');
+          console.log('I66_QA_PREVIEW_MARKER_EXACT_PASS');
+          NODE
+      - name: Install transient test runner dependencies
+        run: |
+          npm install --no-save --no-package-lock firebase-admin@13.4.0 playwright@1.55.0
+          npx playwright install --with-deps chromium
+      - name: Authenticate existing Operativo and inspect receipt UI without any writes
+        run: node tools/gravicentra-i6-6-authread-preview-smoke.mjs
+      - name: Preserve anonymized read-only QA result
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gi-i66-authenticated-readonly-evidence-${{ github.run_id }}
+          path: ${{ runner.temp }}/i66-authenticated-readonly-smoke.json
+          retention-days: 7
+          if-no-files-found: warn

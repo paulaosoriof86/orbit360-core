@@ -1,0 +1,23 @@
+{
+  "schema": "I6_6_PREVIEW_AUTHENTICATED_READONLY_SMOKE_V1",
+  "gate": "I6.6",
+  "historicalGateClosed": "B4-007",
+  "authorizedByDirectionOn": "2026-11-10",
+  "scope": "Existing Operativo/privileged membership; ephemeral Firebase custom token; read-only app activation, Cobros route and receipt editing fields; no submit, no business writes",
+  "status": "AUTHORIZED_READONLY_SMOKE_REQUESTED",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "sourceSha": "0919914071fb40d4451861b50322fdd04a2bad2b",
+  "buildRunId": 42859356672,
+  "artifactId": 13785280178,
+  "artifactZipSha256": "7fde07bcd274942ce5ea639db302baadb4036b13e7ca33cc158dcf244fe62f93",
+  "buildId": "gi-i66-0919914071fb-57f234755dc1",
+  "previewChannel": "gi-i66-rc-42859356672",
+  "previewUrl": "https://ays-orbit-360-lab--gi-i66-rc-42859356672-irla5ypi.web.app",
+  "businessDataWritesAuthorized": false,
+  "promotionAuthorized": false,
+  "mustKeepArtifactImmutable": true,
+  "mustAbortAnyWriterCall": true,
+  "credentialHandling": "No custom token/UID/email/service account in logs, screenshots, filesystem or artifacts; sign out and close browser.",
+  "assertionLevel": "AUTHENTICATED_READONLY_SMOKE_ONLY_NOT_FULL_UAT"
+}
