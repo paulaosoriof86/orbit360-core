@@ -7453,10 +7453,11 @@
       "emulatorRoleCountryCrudRun": 42867352575,
       "emulatorStatus": "PASS_16_OF_16_NO_PRODUCTION_WRITES",
       "scope": "new business Ops GT/CO with idempotency; deny advisor/foreign tenant/country; soft archive pending business and management; deny archive applied endorsement",
-      "firebasePreviewFunction": "NOT_YET_DEPLOYED",
-      "firebaseLiveFunction": "NOT_YET_DEPLOYED",
-      "firebaseLiveHosting": "NOT_YET_PROMOTED",
-      "warning": "Ops source pass and Preview UI pass are NOT LIVE permission/persistence certification; promote only exact e8986c artifact after function role UAT"
+      "firebasePreviewFunction": "DEPLOYED_SUCCESS_42869020697",
+      "firebaseLiveFunction": "DEPLOYED_HEALTHY_42869612792",
+      "firebaseLiveHosting": "DEPLOYED_3372f81dd6ee2964",
+      "warning": "Ops source pass and Preview UI pass are NOT LIVE permission/persistence certification; promote only exact e8986c artifact after function role UAT",
+      "liveRoleWriteUat": "PENDING"
     },
     "advisorReport": {
       "sourceCommit": "6c5997f43fbfa39273e7b33dea095155c7c0703a",
@@ -7484,5 +7485,54 @@
       "warning": "chime and manifest source prepared but no PWA install certificate; Make/GreenAPI not configured, no WhatsApp notifications sent"
     },
     "concurrency": "Product source commits after e8986c do not modify the already pinned Ops immutable artifact; later builds required for later features."
+  },
+  "i66OpsP0LiveRelease20261110": {
+    "id": "GI_I66_OPS_P0_LIVE_SCOPE_PERMISSIONS_CREATION_ARCHIVE_RELEASE_20261110",
+    "dateGuatemala": "2026-11-10",
+    "status": "LIVE_FUNCTION_AND_HOSTING_TRANSPORT_PASS_EMULATOR_16_OF_16_PASS_LIVE_AUTHENTICATED_WRITE_UAT_PENDING",
+    "releaseRun": 42869612792,
+    "releaseResult": "SUCCESS",
+    "productSourceCommit": "e8986c81ed1748bea680447d07d2f37dc0c1db7a",
+    "immutableArtifactId": 13786263277,
+    "artifactZipSha256": "9168acf6701443349897226976cde9174628133074e47d2fd286fa768ddaf1e3",
+    "buildId": "gi-i66-e8986c81ed17-57f234755dc1",
+    "emulatorRun": 42867352575,
+    "emulatorResult": "16/16 PASS, ephemeral demo Firestore, 0 LIVE writes",
+    "previewFunctionRun": 42869020697,
+    "previewFunctionResult": "SUCCESS",
+    "liveBackend": "orbit360OpsLeadsCommand(us-central1) updated and healthy",
+    "liveHostingVersionBefore": "0912035255bdf0be",
+    "liveHostingVersionAfter": "3372f81dd6ee2964",
+    "liveReadback": {
+      "preview": "218/218",
+      "firebaseLive": "218/218",
+      "appAysseguros": "218/218"
+    },
+    "rollbackChannel": "gi-i66-opsrb-42869612792",
+    "rollbackPerformed": false,
+    "productionFirestoreWrites": 0,
+    "productionDataImports": 0,
+    "proofArtifact": {
+      "id": 13789725587,
+      "sha256": "4711a91a71802c84c5b07b905aa6934a4a119848eee96569fa75af7c28791a8b",
+      "url": "https://github.com/paulaosoriof86/orbit360-core/actions/runs/42869612792/artifacts/13789725587"
+    },
+    "includedFixes": [
+      "Ops creation business country role scope",
+      "Idempotent new-business creation",
+      "Ops archive business and management pending with audit",
+      "deny archive applied operational endorsement",
+      "Preserve insurer IDs and source entry point",
+      "More specific guard/feedback"
+    ],
+    "excludedFromThisPinnedArtifact": [
+      "Client 360 create policy CTA d947f97",
+      "Advisor report payment/notification 6c599 and later country fix 439ff7",
+      "Carlos nonrenewable edit not yet committed",
+      "PWA, sound and WhatsApp"
+    ],
+    "remaining": "Authenticated live role-based create/edit/archive human UAT including before/after readback; no LIVE data writes performed by release",
+    "legacyGate": "B4-007 CLOSED",
+    "activeGate": "I6.6"
   }
 }
