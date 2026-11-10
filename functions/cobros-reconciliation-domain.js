@@ -282,6 +282,10 @@ async function reportAdvisorPayment(authz, data, payload) {
     const notificationCountry = text(policy.pais || receipt.pais, 8).toUpperCase();
     if (!['GT', 'CO'].includes(notificationCountry))
       throw new HttpsError('failed-precondition', 'PAYMENT_REPORT_COUNTRY_UNRESOLVED: la póliza requiere país válido.');
+    const signedCountries = unique([...(Array.isArray(authz.member.countries) ? authz.member.countries : []),
+      ...(Array.isArray(authz.member.paises) ? authz.member.paises : [])]).map(v => text(v, 8).toUpperCase());
+    if (!signedCountries.includes(notificationCountry))
+      throw new HttpsError('permission-denied', 'PAYMENT_REPORT_COUNTRY_OUTSIDE_MEMBERSHIP');
     const clientId = id(receipt.clienteId || policy.clienteId, 'clienteId');
     const receiptAdvisorId = text(receipt.asesorId || policy.asesorId, 180);
     if (!authz.actor.advisorId || !receiptAdvisorId || receiptAdvisorId !== authz.actor.advisorId) {
@@ -322,6 +326,7 @@ async function reportAdvisorPayment(authz, data, payload) {
       titulo: 'Validar pago reportado',
       clienteId: clientId,
       polizaId: policyId,
+      pais: notificationCountry,
       asesorId: authz.actor.advisorId,
       estado: 'Pendiente',
       prioridad: 'Alta',

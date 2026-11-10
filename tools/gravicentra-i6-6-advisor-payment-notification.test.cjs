@@ -21,6 +21,8 @@ assert.match(report,/targets: \[\{ type: 'role', id: 'operations' \}\]/,'notify 
 assert.match(report,/channels: \['in_app'\]/,'external delivery is not authorized');
 assert.match(report,/pais: notificationCountry/,'country must travel with the event');
 assert.match(report,/if \(!\['GT', 'CO'\]\.includes\(notificationCountry\)\)/,'undefined country must fail closed');
+assert.match(report,/PAYMENT_REPORT_COUNTRY_OUTSIDE_MEMBERSHIP/,'advisor country must match signed membership');
+assert.match(report,/pais: notificationCountry/,'linked Ops management must preserve country');
 assert.doesNotMatch(report,/tx\.set\([^\n]*collection\('cobros'\)/,'a report must not apply a collection cobro');
 assert.match(report,/paymentState: 'REPORTED_PENDING_OPERATIVE_VALIDATION'/,'report status must remain pending validation');
 assert.match(processor,/const eventSource = norm\(row\.eventSource \|\| 'workflow'\)/);
@@ -56,6 +58,12 @@ assert.equal(context.recipientMatch(target,auth('Operativo',['GT'],'none'),'acto
 assert.equal(context.recipientMatch(target,auth('Operativo',['GT'],'own','ase_other'),'actor',event),false,'unrelated advisor scope must be denied');
 assert.equal(context.recipientMatch(target,auth('Operativo',['GT'],'own','ase_1'),'actor',event),true,'own-scope matching advisor allowed');
 assert.equal(context.recipientMatch(target,auth('Direccion',['GT']),'reader',event),false,'actor self-alert must not duplicate');
+const visibleStart=inbox.indexOf('function visible('),visibleEnd=inbox.indexOf('\nfunction project(',visibleStart);
+assert(visibleStart>=0&&visibleEnd>visibleStart);
+vm.runInContext(inbox.slice(visibleStart,visibleEnd),context);
+const management={archivado:false,workflowType:'advisor_payment_validation',pais:'CO',asesorId:'ase_1'};
+assert.equal(context.visible(management,auth('Operativo',['GT']),'ops'),false,'GT Ops must not see CO payment management');
+assert.equal(context.visible(management,auth('Operativo',['CO']),'ops'),true,'CO Ops may see CO payment management');
 
 const updateStart=inbox.indexOf('async function updateInboxState(');
 const updateEnd=inbox.indexOf('\nexports.orbit360GetAdvisorOpsInbox',updateStart);

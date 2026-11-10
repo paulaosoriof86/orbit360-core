@@ -128,17 +128,17 @@
       "id": "I6_6_ADVISOR_REPORT_OPS_INTERNAL_OUTBOX_ROLE_COUNTRY_P0",
       "approvedByDirection": true,
       "receipt": "artifacts/orbit360-recovery/release-control/I6_6_ADVISOR_REPORT_OPS_OUTBOX_AUTH_20261110.json",
-      "sourceStatus": "SOURCE_COMMIT_CANDIDATE_INTERNAL_ONLY_PREVIEW_FUNCTION_QA_REQUIRED_NO_LIVE",
+      "sourceStatus": "SOURCE_COUNTRY_SCOPE_MICROFIX_EMULATOR_CI_PENDING_NO_LIVE",
       "capabilityOwners": [
         "COBROS_RECONCILIATION",
         "OPS_ADVISOR_INBOX",
         "IN_APP_NOTIFICATION_OUTBOX"
       ],
-      "scope": "Asesor reportar pago only; create deterministic internal Ops notification after canonical reconciliation event, enforce tenant/country/role inbox and reject foreign resolution, preserve pending validation. No payment applied or external push.",
+      "scope": "Asesor reportar pago only; create deterministic internal Ops notification after canonical reconciliation event, enforce tenant/country/role inbox and reject foreign resolution, preserve pending validation. No payment applied or external push.; signed country membership guard for advisor and linked Ops management",
       "paths": [
         {
           "path": "functions/cobros-reconciliation-domain.js",
-          "gitBlobSha": "8fa714493b2f3cdf93655b4b252bf4fda9c30ee2"
+          "gitBlobSha": "1bceb40153326ab22a7010a6a047aec05fbb5b45"
         },
         {
           "path": "functions/notification-outbox-processor.js",
@@ -146,7 +146,7 @@
         },
         {
           "path": "functions/ops-advisor-inbox.js",
-          "gitBlobSha": "6a9908ef6ab78301279184988bd6f954ff990a4f"
+          "gitBlobSha": "fe743ad94dadb43af5c1b17c3513365ac3d45209"
         },
         {
           "path": "orbit360-platform/modules/cobros.js",
@@ -156,7 +156,7 @@
       "tests": [
         {
           "path": "tools/gravicentra-i6-6-advisor-payment-notification.test.cjs",
-          "gitBlobSha": "4600c54a69c671847ed633feacb28ac0f8758a19"
+          "gitBlobSha": "e598f230081571be58f014938190ddbb3852acb9"
         }
       ]
     },
