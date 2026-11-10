@@ -159,6 +159,30 @@
           "gitBlobSha": "4600c54a69c671847ed633feacb28ac0f8758a19"
         }
       ]
+    },
+    {
+      "id": "I6_6_CLIENTE360_LINKED_POLICY_CREATE_CTA_P0",
+      "approvedByDirection": true,
+      "receipt": "Paula Andrea Osorio Franco, Dirección, 2026-11-10: desde la ficha Cliente360 habilitar '+ Crear póliza' pre-vinculada al cliente actual; Carlos como Asesor estaba correctamente bloqueado y como Operativo sí crea desde Pólizas. Sólo UI, sin ampliar permisos ni crear clientes, sin LIVE hasta pruebas.",
+      "sourceCommit": "d947f97efa3049dadb5f2e06ee5e75c7ccdb83ec",
+      "sourceStatus": "UI_SOURCE_COMMITTED_EXACT_READBACK_PASS_PREVIEW_AND_LIVE_PENDING",
+      "capabilityOwners": [
+        "CLIENTE360_PRIMARY_RUNTIME",
+        "POLIZAS_PRIMARY_RUNTIME"
+      ],
+      "scope": "Agregar un CTA en cabecera de ficha Cliente360 reutilizando Orbit.modules.cliente360.nuevaPoliza(cid), preselección de cliente y guard de país/tenant ya existentes. No modificar rol Asesor, backend, Functions, datos ni flujo de Pólizas.",
+      "paths": [
+        {
+          "path": "orbit360-platform/modules/cliente360.js",
+          "gitBlobSha": "e1ea909944992d5811d781dbded69190fcfa23eb"
+        }
+      ],
+      "tests": [
+        {
+          "path": "tools/gravicentra-i6-6-cliente360-policy-cta.test.cjs",
+          "gitBlobSha": "1ec351360e752d707b7f88f6668aedc14dbc6958"
+        }
+      ]
     }
   ]
 }
