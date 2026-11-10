@@ -1535,36 +1535,5 @@
     "stalePreviewTriggerRemovedByCommit": "53892c70ebfb41490653e9346651850b042f2bcd",
     "canonicalLedgerBlob": "a743f55c0369851eb017f12ce88823e0f58bc12d",
     "fullLiveModuleQaNotFalselyCertified": true
-  },
-  "i66OpsLeadsDeletionAndTransportHold20261110": {
-    "status": "P0_LIVE_DELETE_UNCONFIRMED_BOTH_FUNCTIONS_NOT_FOUND",
-    "dateGuatemala": "2026-11-10",
-    "lastClosedReleaseGate": "B4-007",
-    "activeOperationalGate": "I6.6",
-    "findings": [
-      "Paula Dirección: Fernando Arias negocio delete returned functions/not-found; no successful delete/readback.",
-      "Paula Dirección: B4-003 applied endorsement management delete returned functions/not-found; this applied and linked endorsement remains server-guarded and cannot be removed generically.",
-      "orbit360OpsLeadsCommand gen2 us-central1 is ACTIVE; HTTP GET probe returns INVALID_ARGUMENT, not 404.",
-      "LIVE Firestore read-only same-tenant inventory: negocios 14 docs (3 missing logical id, 0 mismatched nonempty id); gestiones 16 docs (0 missing id, 0 mismatched id); both exact screenshot records present with physical id equal to logical id.",
-      "Cloud Logging read with configured workflow credentials unavailable; backend request failure not root-caused.",
-      "Carlos policy nonrenewable static/emulator scope evidence exists; distinct real Carlos signed write/save/reload for this flow not certified."
-    ],
-    "evidence": {
-      "identityRunId": 42895076852,
-      "cloudLoggingRunId": 42896041217,
-      "productSourceBlob": "012feb9e1a3cd119ce128edd6ce835556df3e827"
-    },
-    "decisionFreeze": {
-      "noPASSWithoutSignedLiveReadback": true,
-      "noReimportDataForDeleteError": true,
-      "noDeletionOfAppliedEndorsementViaGenericUI": true,
-      "noUnverifiedEmailOrWhatsAppSend": true,
-      "emailSenderRequired": "info@aysseguros.com",
-      "greenApiDirectServerTransportPreferred": true,
-      "makeGravicentraScenarioCreated": false,
-      "GreenAPITransportSendCertified": false
-    },
-    "currentAction": "P0 root cause needs signed LIVE invocation error detail and target exact request; fix one canonical source, preserve rollback, test LIVE as Paula and Carlos before PASS.",
-    "productionMutationsPerformedByThisDiagnostic": 0
   }
 }
