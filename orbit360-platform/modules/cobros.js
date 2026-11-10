@@ -854,6 +854,39 @@ Orbit.modules.cobros = (function () {
     }
   }
 
+  function paymentFailureFeedback(error) {
+    const localCode = String(error && error.message || '').trim();
+    const preflight = {
+      'COBROS_RECONCILIATION_BACKEND_NOT_ACTIVE': 'backend-not-active',
+      'PAYMENT_DOMAIN_UNAVAILABLE': 'payment-domain-unavailable',
+      'PAYMENT_DOCUMENT_PROVIDER_UNAVAILABLE': 'document-provider-unavailable',
+      'PAYMENT_DOCUMENT_UPLOAD_FAILED': 'document-upload-failed'
+    };
+    const rawCode = String(error && error.code || preflight[localCode] || 'unknown').trim().toLowerCase().replace(/^functions\//, '');
+    const code = /^[a-z][a-z-]{0,39}$/.test(rawCode) ? rawCode : 'unknown';
+    const uncertain = new Set(['data-loss', 'deadline-exceeded', 'unavailable', 'internal', 'unknown', 'cancelled', 'aborted']).has(code);
+    const descriptions = {
+      'permission-denied': 'Tu rol o país no está autorizado para aplicar este cobro.',
+      'unauthenticated': 'La sesión necesita renovarse antes de operar este cobro.',
+      'not-found': 'El recibo o su póliza ya no está disponible; actualiza la ficha.',
+      'failed-precondition': 'Los datos del recibo requieren revisión antes de registrar el pago.',
+      'invalid-argument': 'El servidor rechazó uno de los datos del cobro; revisa la ficha.',
+      'already-exists': 'Ya existe un registro relacionado; verifica antes de repetir.',
+      'backend-not-active': 'El servicio de cobros no está habilitado en esta sesión.',
+      'payment-domain-unavailable': 'La función de registro de pagos no está disponible en esta pantalla.',
+      'document-provider-unavailable': 'El servicio de adjuntos no está disponible; no se envió el pago.',
+      'document-upload-failed': 'No se pudo adjuntar el documento; no se envió el pago.',
+      'data-loss': 'El servidor no pudo confirmar la lectura posterior al registro.',
+      'deadline-exceeded': 'El servidor no confirmó el resultado dentro del plazo.',
+      'unavailable': 'El servicio de cobros no respondió; hay que verificar el estado.',
+      'internal': 'El servicio de cobros no pudo confirmar el resultado.'
+    };
+    const message = descriptions[code] || 'El servicio de cobros no confirmó el resultado.';
+    const requestId = String(error && error.gravicentraPayment && error.gravicentraPayment.requestId || '')
+      .replace(/[^A-Za-z0-9_-]/g, '').slice(0, 45);
+    return { code, uncertain, message, requestId };
+  }
+
   /* ---- Registrar pago por el owner canónico: pago y aplicación son hechos distintos ---- */
   function aplicarPago(cobroId) {
     if (!directPaymentRole()) return U.toast('El rol Asesor reporta el pago a Ops; no puede aplicarlo directamente.');
@@ -910,7 +943,22 @@ Orbit.modules.cobros = (function () {
         close();U.toast(docsOk?'✓ Pago registrado':'✓ Pago registrado. Un documento quedó en recuperación controlada.');baseCache=null;
         if(docsOk&&avisar&&Orbit.notify&&cli&&cli.id){Orbit.notify.pedir(cli.id,{tipo:'Aviso de pago confirmado',icon:'💳',asunto:'Confirmación de pago · póliza '+(p.numero||''),mensaje:'Hola '+(cli.nombre||'')+', registramos tu pago de '+U.money(c.monto,c.moneda)+' (cuota '+(c.cuota||'')+') de la póliza '+(p.numero||'')+'. ¡Gracias por tu confianza!'});}
         /* B3-004 R14: router/store reactive owner preserves the active payment context. */
-      }catch(error){console.error('[Gravicentra][Cobros] Registrar pago falló',{code:String(error&&(error.code||error.message)||'UNKNOWN'),trace:error&&error.gravicentraPayment||{},cobroId:c.id||'',receiptId:receipt.id||''});btn.disabled=false;btn.textContent='Registrar pago';pm.removeAttribute('aria-busy');if(state)state.textContent='No se guardaron cambios.';U.toast(isPreviewHost()?'La prueba Preview no fue aceptada por el servidor. No se guardaron cambios.':'No fue posible registrar el pago. No se guardaron cambios.');}
+      } catch (error) {
+        const feedback = paymentFailureFeedback(error);
+        console.error('[Gravicentra][Cobros] Registrar pago falló', {
+          code: String(error && (error.code || error.message) || 'UNKNOWN'),
+          trace: error && error.gravicentraPayment || {},
+          diagnosticCategory: feedback.code,
+          cobroId: c.id || '', receiptId: receipt.id || ''
+        });
+        btn.disabled = false; btn.textContent = 'Registrar pago'; pm.removeAttribute('aria-busy');
+        const status = feedback.uncertain
+          ? 'Resultado no confirmado. Recarga y comprueba si ya quedó aplicado antes de reintentar.'
+          : 'No se guardaron cambios.';
+        const reference = feedback.requestId ? ' · Ref. ' + feedback.requestId : '';
+        if (state) state.textContent = status + ' Código: ' + feedback.code + reference;
+        U.toast((isPreviewHost() ? 'Preview: ' : '') + feedback.message + ' Código: ' + feedback.code + reference + '. ' + status);
+      }
     };
   }
 

@@ -337,6 +337,53 @@
         "liveRelease": false,
         "protectedPreviewPending": true
       }
+    },
+    {
+      "id": "I6_6_OPS_COBROS_SAFE_FAILURE_DIAGNOSTICS_P0",
+      "approvedByDirection": true,
+      "receipt": "Paula Andrea Osorio Franco, Dirección 2026-11-10: targeted I6.6 Ops deletion and Cobros advisor payment failure diagnostics; root confirms one combined source release, no data/role/backend change, fail-closed, no false success",
+      "sourceStatus": "DIAGNOSTIC_SOURCE_QA_14_OF_14_PASS_PREVIEW_AND_LIVE_NOT_APPLIED",
+      "capabilityOwners": [
+        "OPS_PRIMARY_RUNTIME",
+        "COBROS_RECONCILIATION",
+        "ROLE_SCOPE_RUNTIME"
+      ],
+      "scope": "Only safe error classification and non-PII caller fingerprint on Ops delete for signed privileged roles; Cobros payment report fail-closed category and request reference; no reattempt/no change in CRUD validation, authorization, business operations, data, Functions, Rules or imports",
+      "paths": [
+        {
+          "path": "orbit360-platform/core/ciclo.js",
+          "gitBlobSha": "b1d308f3faef022f40340df685deb4d5ddde53ff",
+          "replaces": {
+            "path": "orbit360-platform/core/ciclo.js",
+            "priorGitBlobSha": "4c3baf147757347d7a5954ae8fa63bd79526d57d",
+            "priorChangeId": "I6_6_OPS_CRUD_ROLE_COUNTRY_AUDITED_SOFT_DELETE_P0"
+          }
+        },
+        {
+          "path": "orbit360-platform/modules/cobros.js",
+          "gitBlobSha": "aca0b2948e9484aaf21ecd367047d61676ae305d",
+          "replaces": {
+            "path": "orbit360-platform/modules/cobros.js",
+            "priorGitBlobSha": "ffdc305d9103252b92893689d37d5597a72bf69a",
+            "priorChangeId": "I6_6_ADVISOR_REPORT_OPS_INTERNAL_OUTBOX_ROLE_COUNTRY_P0"
+          }
+        }
+      ],
+      "tests": [
+        {
+          "path": "tools/gravicentra-i6-6-ops-delete-diagnostic.test.cjs",
+          "gitBlobSha": "d3e38aafd458b0ea5ced0275305cddb49f0f620c"
+        },
+        {
+          "path": "tools/gravicentra-i6-6-cobros-payment-failure-category.test.cjs",
+          "gitBlobSha": "dca70538b5534d5054983289374097220b4e6a93"
+        }
+      ],
+      "readOnlyDiagnosticWorkflow": {
+        "path": ".github/workflows/gravicentra-delta-66-advisor-functions-inventory.yml",
+        "gitBlobSha": "2659a8c218e915df139bb8604213612aa501ab39",
+        "scope": "Only hashed identity readback, no Firestore writes or customer identifiers in output"
+      }
     }
   ]
 }

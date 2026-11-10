@@ -87,6 +87,29 @@ Orbit.ciclo = (function () {
     if(/UPLOAD|DOCUMENT.*CONFIRM|mime|size/i.test(code))return'No fue posible confirmar el archivo. Puedes quitarlo, reemplazarlo o reintentar sin crear un comentario duplicado.';
     return'No fue posible guardar la colaboración. El texto y el archivo seleccionado permanecen disponibles para reintentar.';
   }
+  // P0 LIVE diagnostics: never expose a real customer, document ID, tenant or UID.
+  // The caller-scoped fingerprint can be matched to a read-only backend inventory;
+  // it is not evidence of a successful delete and never authorizes a retry.
+  async function safeDeletionFailure(error, collection, entityId){
+    const code=String(error&&error.code||'DELETE_UNCONFIRMED').replace(/[^A-Za-z0-9_/.-]/g,'').slice(0,64);
+    const raw=String(error&&error.message||'');
+    const category=code==='functions/not-found'
+      ? (/^\s*(?:El registro no existe\.?|OPS_CANONICAL_DOCUMENT_NOT_FOUND)\s*$/i.test(raw)?'DOCUMENTO_NO_ENCONTRADO_EN_ALCANCE':'ORIGEN_NO_DETERMINADO')
+      : (code==='functions/permission-denied'?'PERMISO_RECHAZADO':'FALLO_NO_CONFIRMADO');
+    let fingerprint='';
+    try {
+      const role=String(Orbit.session&&Orbit.session.rol&&Orbit.session.rol()||'').trim().normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+      const authorized=['direccion','admin','admintenant','superadmin','operativo'].includes(role);
+      const tenant=String(Orbit.auth&&Orbit.auth.productUser&&Orbit.auth.productUser.tenantId||'').trim();
+      if(authorized&&tenant&&entityId&&window.crypto&&crypto.subtle&&typeof TextEncoder==='function'){
+        const bytes=new TextEncoder().encode(tenant+'|'+collection+'|'+String(entityId));
+        const digest=await crypto.subtle.digest('SHA-256',bytes);
+        fingerprint=Array.from(new Uint8Array(digest)).slice(0,8).map(b=>b.toString(16).padStart(2,'0')).join('');
+      }
+    } catch (_) { /* Fail closed: omit fingerprint. */ }
+    try { console.warn('[Gravicentra Ops] DELETE_UNCONFIRMED_SAFE', { code, category, fingerprint: fingerprint||'NO_DISPONIBLE' }); } catch (_) {}
+    return { code, category, fingerprint };
+  }
   function tiposGestion() { return Orbit.cat.get('tiposGestion'); }
 
   /* ===================== datos / filtros ===================== */
@@ -733,9 +756,8 @@ Orbit.ciclo = (function () {
         const result = await Orbit.recordDelete.remove('negocios', id, { label: n.nombre || n.id });
         if (result && result.ok) { back.remove(); refresh(); return; }
       } catch (error) {
-        const errorCode = String(error && error.code || 'DELETE_UNCONFIRMED').replace(/[^A-Za-z0-9_/.-]/g, '').slice(0, 64);
-        try { console.warn('[Gravicentra Ops] DELETE_BUSINESS_UNCONFIRMED', { code: errorCode }); } catch (_) {}
-        U.toast('No fue posible confirmar la eliminación del negocio (código: ' + errorCode + ').');
+        const diag=await safeDeletionFailure(error,'negocios',id);
+        U.toast('No se eliminó el negocio (código: '+diag.code+(diag.fingerprint?' · ref. '+diag.fingerprint:'')+').');
       }
       ngDelete.disabled = false;
     });
@@ -979,9 +1001,8 @@ Orbit.ciclo = (function () {
           const result = await Orbit.recordDelete.remove('gestiones', id, { label: g.titulo || g.tipo || g.id });
           if (result && result.ok) { back.remove(); refresh(); return; }
         } catch (error) {
-          const errorCode = String(error && error.code || 'DELETE_UNCONFIRMED').replace(/[^A-Za-z0-9_/.-]/g, '').slice(0, 64);
-          try { console.warn('[Gravicentra Ops] DELETE_MANAGEMENT_UNCONFIRMED', { code: errorCode }); } catch (_) {}
-          U.toast('No fue posible confirmar la eliminación de la gestión (código: ' + errorCode + ').');
+          const diag=await safeDeletionFailure(error,'gestiones',id);
+          U.toast('No se eliminó la gestión (código: '+diag.code+(diag.fingerprint?' · ref. '+diag.fingerprint:'')+').');
         }
         b.disabled = false;
         return;

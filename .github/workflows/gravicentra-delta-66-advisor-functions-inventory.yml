@@ -110,7 +110,7 @@ jobs:
           gcloud config set project "$PROJECT_ID" --quiet >/dev/null
           gcloud functions describe orbit360OpsLeadsCommand --gen2 --region us-central1 --project "$PROJECT_ID" --format='value(state)' | sed 's/^/I66_OPS_LIVE_FUNCTION_STATE=/'
           python3 - <<'PY'
-          import json,os,subprocess,urllib.request,urllib.parse,urllib.error
+          import json,os,subprocess,urllib.request,urllib.parse,urllib.error,hashlib
           project=os.environ['PROJECT_ID']
           token=subprocess.check_output(['gcloud','auth','print-access-token'],text=True).strip()
           root='https://firestore.googleapis.com/v1/projects/'+project+'/databases/(default)/documents/tenants/alianzas-soluciones/data/'
@@ -141,6 +141,7 @@ jobs:
                   sample=[d for d in rows if 'B4-003-EXP-38102224750' in field(d,'titulo')]
               matched=[{'physicalEqualsLogical':field(d,'id')==d['name'].split('/')[-1],
                         'hasCanonicalId':bool(field(d,'id')),
+                        'referenceHash16':hashlib.sha256(('alianzas-soluciones|'+collection+'|'+d['name'].split('/')[-1]).encode()).hexdigest()[:16],
                         'archiveState':str((d.get('fields') or {}).get('archivado') or {})[:45]}
                        for d in sample]
               print('I66_OPS_CANONICAL_IDENTITY='+json.dumps({'collection':collection,'physicalDocumentCount':len(rows),'idMismatchCount':len(bad),'missingLogicalIdCount':len(missing),'specificScreenshotRecordCount':len(sample),'specificScreenshotRecordIdentity':matched},sort_keys=True))
