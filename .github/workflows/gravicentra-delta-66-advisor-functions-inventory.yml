@@ -298,7 +298,7 @@ jobs:
           set -euo pipefail
           gcloud auth activate-service-account --key-file="$GOOGLE_APPLICATION_CREDENTIALS" --quiet >/dev/null
           python3 - <<'PY'
-          import json,os,subprocess,urllib.request,urllib.parse,urllib.error,hashlib,datetime,collections,concurrent.futures
+          import json,os,subprocess,urllib.request,urllib.parse,urllib.error,hashlib,datetime,collections,concurrent.futures,unicodedata,re
           project=os.environ['PROJECT_ID']
           token=subprocess.check_output(['gcloud','auth','print-access-token'],text=True).strip()
           base='https://firestore.googleapis.com/v1/projects/'+project+'/databases/(default)/documents/'
@@ -352,8 +352,27 @@ jobs:
               canonical,canonicalCode=get(row['canonicalPath'])
               marker=' '.join(value(legacy or {},name) for name in ('proximaAccion','nota','notas','titulo','nombre','descripcion')).casefold()
               synthetic=('qa i6.6' in marker or 'prueba controlada qa' in marker)
+              # Pseudonymous yes/no comparison to two user-reported identities.
+              # The plaintext names never enter workflow source or logs.
+              contactHash='5a5997fd708aea57bbb4828f436b80517347a3533668d61341891382c7318297'
+              screenshotNameHash='7a034d9eab1423559cd231413e1f5ebb4345568ae7ff64d7ac8e2d436e63c8da'
+              fields=(legacy or {}).get('fields') or {}
+              def stringValues(x):
+                  if isinstance(x,dict):
+                      if isinstance(x.get('stringValue'),str):yield x['stringValue']
+                      for key,v in x.items():
+                          if key!='stringValue':yield from stringValues(v)
+                  elif isinstance(x,list):
+                      for v in x:yield from stringValues(v)
+              allWords=[]
+              for s in stringValues(fields):
+                  noAccent=unicodedata.normalize('NFKD',s).encode('ascii','ignore').decode('ascii').casefold()
+                  allWords.extend(re.findall(r'[a-z0-9]+',noAccent))
+              digests={hashlib.sha256((allWords[i]+' '+allWords[i+1]).encode()).hexdigest() for i in range(len(allWords)-1)}
               return {k:row[k] for k in ('period','when','op','type','mode','referenceHash16')}|{
-                  'legacyHttp':legacyCode,'canonicalHttp':canonicalCode,'explicitQaMarker':synthetic}
+                  'legacyHttp':legacyCode,'canonicalHttp':canonicalCode,'explicitQaMarker':synthetic,
+                  'matchesPreviouslyReportedContact':contactHash in digests,
+                  'matchesPreviouslyReportedScreenshotName':screenshotNameHash in digests}
           with concurrent.futures.ThreadPoolExecutor(max_workers=6) as pool:checked=list(pool.map(inspect,rows))
           byPeriod={}
           for period in ('BEFORE_2026_11_10_DEPLOY','OLD_TRAFFIC_WINDOW','AFTER_TRAFFIC_REPAIR'):
