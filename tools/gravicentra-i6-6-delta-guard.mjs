@@ -30,9 +30,29 @@ need(ancestry.status===0,'B4007_HISTORICAL_GUARD_SOURCE_NOT_ANCESTOR');
 const manifest=JSON.parse(fs.readFileSync(MANIFEST_PATH,'utf8'));
 need(manifest.schema==='GRAVICENTRA_I6_6_APPROVED_PRODUCT_DELTAS_V1'&&manifest.baselineSuccessfulHead===BASE&&manifest.baselineSuccessfulRun===HISTORICAL_GUARD_RUN,'DELTA_MANIFEST_AUTHORITY_INVALID');
 need(Array.isArray(manifest.changes)&&manifest.changes.length>0,'DELTA_MANIFEST_EMPTY');
-const approved=new Map(),tests=new Set();
+const approved=new Map(),tests=new Set(),seenChangeIds=new Set();
+// An I6.6 path may evolve in the same release branch only through an explicit,
+// audited successor. Historical entries retain their original immutable blobs.
+// The last linked entry is the sole blob permitted at HEAD.
+function approveOrSupersede(entry,changeId){
+  const p=entry.path||'';
+  need(/^[0-9a-f]{40}$/.test(entry.gitBlobSha||''),'BAD_APPROVED_BLOB:'+p);
+  const previous=approved.get(p);
+  if(previous){
+    const r=entry.replaces;
+    need(Boolean(r)&&r.path===p&&r.priorGitBlobSha===previous.gitBlobSha&&
+      r.priorChangeId===previous.changeId&&previous.changeId!==changeId&&
+      entry.gitBlobSha!==previous.gitBlobSha,
+    'UNAUTHORIZED_OR_BROKEN_SUPERSESSION_CHAIN:'+p);
+  }else{
+    need(!entry.replaces,'SUPERSESSION_WITHOUT_PREDECESSOR:'+p);
+  }
+  approved.set(p,{gitBlobSha:entry.gitBlobSha,changeId});
+}
 for(const change of manifest.changes){
   need(/^I6_6_[A-Z0-9_]+$/.test(change.id||'')&&change.approvedByDirection===true&&Array.isArray(change.paths)&&change.paths.length>0,'CHANGE_NOT_AUTHORIZED_OR_MISSING_PATHS');
+  need(!seenChangeIds.has(change.id),'DUPLICATE_CHANGE_ID:'+change.id);
+  seenChangeIds.add(change.id);
   need(typeof change.receipt==='string'&&change.receipt.length>12,'CHANGE_AUTHORITY_RECEIPT_MISSING:'+change.id);
   need(Array.isArray(change.tests)&&change.tests.length>0,'CHANGE_TESTS_MISSING:'+change.id);
   for(const entry of change.paths){
@@ -42,8 +62,7 @@ for(const change of manifest.changes){
     const frontend=/^orbit360-platform\/[A-Za-z0-9_./-]+\.(?:js|html|css|json|webmanifest|svg|png|jpg|jpeg|webp|woff2?)$/.test(p);
     const backend=/^functions\/[A-Za-z0-9_./-]+\.js$/.test(p);
     need(frontend||backend,'UNSUPPORTED_PRODUCT_PATH:'+p);
-    need(/^[0-9a-f]{40}$/.test(entry.gitBlobSha||'')&&!approved.has(p),'DUPLICATE_OR_BAD_BLOB:'+p);
-    approved.set(p,entry.gitBlobSha);
+    approveOrSupersede(entry,change.id);
   }
   for(const entry of change.tests){
     const p=entry.path||'';
@@ -55,8 +74,8 @@ for(const change of manifest.changes){
 const expectedPaths=[...approved.keys()].sort();
 const diff=git('diff','--name-only',BASE,'HEAD','--','orbit360-platform','functions','firestore.rules','storage.rules','database.rules.json','firebase.json').split('\n').filter(Boolean).sort();
 need(JSON.stringify(diff)===JSON.stringify(expectedPaths),'UNDECLARED_PRODUCT_SOURCE_DELTA:'+diff.join(','));
-for(const [p,blob] of approved){
-  need(git('rev-parse','HEAD:'+p)===blob,'UNAPPROVED_OR_STALE_SOURCE_BLOB:'+p);
+for(const [p,approval] of approved){
+  need(git('rev-parse','HEAD:'+p)===approval.gitBlobSha,'UNAPPROVED_OR_STALE_SOURCE_BLOB:'+p);
   if(p.endsWith('.js')){
     const syntax=spawnSync(process.execPath,['--check',p],{stdio:'inherit'});
     need(syntax.status===0,'SOURCE_SYNTAX_FAILED:'+p);

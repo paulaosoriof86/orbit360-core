@@ -394,6 +394,18 @@
   function batchDurable(mutations,options){
     options=options||{};
     if(!Array.isArray(mutations)||!mutations.length||mutations.length>80)return Promise.reject(new Error('PRODUCT_BATCH_INVALID'));
+    if(options.policyRenewabilityOnly===true){
+      var policyMutations=mutations.filter(function(m){return m&&m.collection==='polizas';});
+      var activityMutations=mutations.filter(function(m){return m&&m.collection==='actividades';});
+      var policyPatch=policyMutations[0]&&policyMutations[0].payload;
+      if(mutations.length!==2||policyMutations.length!==1||activityMutations.length!==1||
+         policyMutations[0].action!=='update'||activityMutations[0].action!=='insert'||
+         !policyPatch||Object.keys(policyPatch).length!==1||
+         !Object.prototype.hasOwnProperty.call(policyPatch,'renovable')||
+         ![true,false,null].includes(policyPatch.renovable)){
+        return Promise.reject(new Error('PRODUCT_RENEWABILITY_PATCH_CONTRACT_INVALID'));
+      }
+    }
     var m=member(),seen={},prepared=[],backups=[],serverCommitted=false,previewBatch=isB2PreviewHost(),metaPreviewQa=null;
     var syntheticId=function(v){return /(?:^|_)(?:b3004qa|b4003qa)_[A-Za-z0-9._:-]+$/i.test(text(v));};
     var rootSynthetic=previewBatch?mutations.find(function(x){return text(x&&x.collection)==='polizas'&&syntheticId(x&&(x.id||(x.payload&&x.payload.id)))&&x.payload&&x.payload.__syntheticQa===true;}):null;
@@ -442,8 +454,13 @@
       var previewGeneral=isB2PreviewHost();
       var input={tenantId:m.tenantId,activeRole:m.activeRole,requestId:requestId,mutations:prepared.map(function(x){
         // For existing insurer obligations, transmit only the changed fields. The server merges the patch in a Firestore transaction with the latest row; a cached complete row could erase concurrent LIVE changes.
-        var preserveConcurrentFields=x.action==='update'&&(x.collection==='recibosEsperados'||x.collection==='carteraPrimas');
+        var preserveConcurrentFields=x.action==='update'&&
+          (x.collection==='recibosEsperados'||x.collection==='carteraPrimas'||
+           (x.collection==='polizas'&&options.policyRenewabilityOnly===true));
         var mutation={action:x.action,collection:x.collection,id:x.id,payload:x.action==='remove'?null:clone(preserveConcurrentFields?x.payload:x.row)};
+        if(x.collection==='polizas'&&x.action==='update'&&options.policyRenewabilityOnly===true){
+          mutation.expectedBefore={renovable:x.prior&&Object.prototype.hasOwnProperty.call(x.prior,'renovable')?clone(x.prior.renovable):null};
+        }
         if(x.collection==='aseguradoras'&&x.action!=='remove'){
           mutation.payload=x.action==='update'?clone(x.payload):insurerWritePayload(x.action,x.row,x.prior);
           mutation.auditReason=x.auditReason;
@@ -611,3 +628,4 @@
   }
   window.Orbit.productOperationalWriteP0=Object.freeze({VERSION:VERSION,install:install,status:status,failClosed:true,noFallback:true,urlTenantAllowed:false,labModeAllowed:false,writeTransport:'firebase-functions',workflowSemanticOwner:true});
 })();
+

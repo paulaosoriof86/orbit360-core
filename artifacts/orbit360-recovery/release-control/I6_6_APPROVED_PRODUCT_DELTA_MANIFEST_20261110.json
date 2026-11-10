@@ -183,6 +183,65 @@
           "gitBlobSha": "1ec351360e752d707b7f88f6668aedc14dbc6958"
         }
       ]
+    },
+    {
+      "id": "I6_6_CARLOS_POLICY_RENEWABILITY_ONLY_CAS_OPERATIVE_SCOPE_P0",
+      "approvedByDirection": true,
+      "receipt": "artifacts/orbit360-recovery/release-control/I6_6_CARLOS_NONRENEWABLE_SOURCE_QA_20261110.json",
+      "sourceStatus": "SOURCE_QA_17_OF_17_PASS_PREVIEW_AND_LIVE_HOLD_NOT_DEPLOYED",
+      "capabilityOwners": [
+        "POLIZAS_PRIMARY_RUNTIME",
+        "ROLE_SCOPE_RUNTIME",
+        "RECIBOS_CARTERA_PRIMARY_RUNTIME"
+      ],
+      "scope": "Operativo CO/GT edit cross-advisor only within signed tenant/country and explicit Operativo roleScope=all; Asesor unchanged. Non-renewable policy patch+audited activity only, optimistic CAS requestId/readback; no rematerialization of carteras, recibos, cobros or vehiculos; deploy requires server+UI parity QA and new immutable artifact.",
+      "paths": [
+        {
+          "path": "orbit360-platform/core/policy-receipts-engine.js",
+          "gitBlobSha": "83a46af3d3bd24b65b90fe042308bfee511176f2",
+          "replaces": {
+            "path": "orbit360-platform/core/policy-receipts-engine.js",
+            "priorGitBlobSha": "6d21573cc2215ae72fa1075a9b7a2930be03fb34",
+            "priorChangeId": "I6_6_RECEIPT_SOURCE_NUMBER_AND_SPARSE_DURABLE_PATCH"
+          }
+        },
+        {
+          "path": "orbit360-platform/modules/policy-receipts-v1199-bridge.js",
+          "gitBlobSha": "a39ddcc8a53cefa55bc5edd56e7f5a628db31c03",
+          "replaces": {
+            "path": "orbit360-platform/modules/policy-receipts-v1199-bridge.js",
+            "priorGitBlobSha": "cb35ecbb6dd59dea0d09b1e93d288de57d7eb00f",
+            "priorChangeId": "I6_6_PROTECTED_READONLY_HOST_ROUTING_AND_WRITE_DENIAL_ALL_SURFACES"
+          }
+        },
+        {
+          "path": "orbit360-platform/data/store-firestore-product-operational-p0.js",
+          "gitBlobSha": "4bebe4f61eacdc499c048bf69dfb25535d4d5c2e",
+          "replaces": {
+            "path": "orbit360-platform/data/store-firestore-product-operational-p0.js",
+            "priorGitBlobSha": "0fc392d55599bf8388c51d1b3a5cbd8d60545803",
+            "priorChangeId": "I6_6_RECEIPT_SOURCE_NUMBER_AND_SPARSE_DURABLE_PATCH"
+          }
+        },
+        {
+          "path": "functions/product-operational-domain.js",
+          "gitBlobSha": "a27810c65e6a5a761d40c0e1f20cae61df483d1f"
+        }
+      ],
+      "tests": [
+        {
+          "path": "tools/gravicentra-i6-6-carlos-renewability-only.test.cjs",
+          "gitBlobSha": "0bbb3c9625a6dd66f144a30229e16f140ef9bc72"
+        },
+        {
+          "path": "tools/gravicentra-i6-6-operativo-cross-advisor-scope.test.cjs",
+          "gitBlobSha": "21a14c76fbe8ca5861568a9e62bc8d96490f4392"
+        },
+        {
+          "path": "tools/gravicentra-i6-6-delta-supersession.test.cjs",
+          "gitBlobSha": "128b1e778d32e7a99c5efc5f0d31050381fddc17"
+        }
+      ]
     }
   ]
 }

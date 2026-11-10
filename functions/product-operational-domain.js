@@ -184,7 +184,17 @@ function scopeRank(v){return{none:0,own:1,team:2,all:3}[v]||0;}
 function effectiveScope(member,accessConfig,role,moduleKey){
   const ds=member&&member.dataScopes&&typeof member.dataScopes==='object'?member.dataScopes:{},mods=ds.modules&&typeof ds.modules==='object'?ds.modules:{};
   let requested=normalizedScope(moduleScopeValue(mods,moduleKey)); if(!requested)requested=normalizedScope(ds.default||member.scopeDatos||member.dataScope);
-  const ceiling=roleScope(accessConfig,role); if(!requested)return ceiling; return scopeRank(requested)<=scopeRank(ceiling)?requested:ceiling;
+  const ceiling=roleScope(accessConfig,role);
+  // A signed Operativo role may manage any advisor in the SAME authorized
+  // country when the tenant explicitly grants that role portfolio-wide scope.
+  // A legacy Asesor own-only profile is not allowed to shrink that active role;
+  // an explicit none, module deny, missing country or another tenant still denies.
+  const configured=accessConfig&&accessConfig.roleScopes&&typeof accessConfig.roleScopes==='object'?accessConfig.roleScopes:{};
+  const roleKey=Object.keys(configured).find(k=>norm(k)===norm(role));
+  const explicitRoleScope=roleKey?normalizedScope(configured[roleKey]):'';
+  if(norm(role)==='operativo'&&['polizas','cliente360','cobros'].includes(norm(moduleKey))&&
+     explicitRoleScope==='all'&&requested!=='none')return 'all';
+  if(!requested)return ceiling;return scopeRank(requested)<=scopeRank(ceiling)?requested:ceiling;
 }
 function listHas(values,moduleKey){return unique(values).map(norm).includes(norm(moduleKey));}
 function moduleVisibleForWrite(member,accessConfig,role,moduleKey){
@@ -469,6 +479,20 @@ function normalizeMutation(raw, allowMetaFixtureRemove = false) {
   const id = cleanId(mutation.id || mutation.payload && mutation.payload.id, 'documentId');
   const payload = mutation.payload && typeof mutation.payload === 'object' ? stable(mutation.payload) : null;
   if (action !== 'remove' && !payload) throw new HttpsError('invalid-argument', 'Payload requerido.');
+  // CAS is opt-in solely for classification-only policy updates; it cannot
+  // be used to bypass a module's existing role/country authorization.
+  let expectedBefore;
+  if(mutation.expectedBefore!==undefined){
+    const e=mutation.expectedBefore;
+    if(collection!=='polizas'||action!=='update'||!payload||
+       Object.keys(payload).length!==1||!Object.prototype.hasOwnProperty.call(payload,'renovable')||
+       !e||typeof e!=='object'||Array.isArray(e)||Object.keys(e).length!==1||
+       !Object.prototype.hasOwnProperty.call(e,'renovable')||
+       (e.renovable!==null&&typeof e.renovable!=='boolean'&&typeof e.renovable!=='string')||
+       (typeof e.renovable==='string'&&e.renovable.length>80))
+      throw new HttpsError('invalid-argument','Precondición de renovabilidad inválida.');
+    expectedBefore=stable(e);
+  }
   let auditReason;
   if(mutation.auditReason!==undefined&&collection!=='aseguradoras')throw new HttpsError('invalid-argument','El motivo de aseguradoras no corresponde a esta colección.');
   if(collection==='aseguradoras'&&action!=='remove'){
@@ -481,7 +505,8 @@ function normalizeMutation(raw, allowMetaFixtureRemove = false) {
   }
   const secret = containsSecret(payload);
   if (secret) throw new HttpsError('failed-precondition', `Material secreto no permitido en dato operativo: ${secret}`);
-  return Object.assign({ action, collection, id, payload },auditReason===undefined?{}:{auditReason});
+  return Object.assign({ action, collection, id, payload },auditReason===undefined?{}:{auditReason},
+    expectedBefore===undefined?{}:{expectedBefore});
 }
 
 const INSURER_ACTIVITY_SCHEMA='gravicentra-insurer-activity-v1';
@@ -597,6 +622,11 @@ async function execute(request, metaPreviewContext = null) {
       if(!metaPreviewContext&&before?.__metasPreviewQa===true)throw new HttpsError('permission-denied','El fixture requiere su contexto de prueba y actor originales.');
       if (mutation.action === 'insert' && before) throw new HttpsError('already-exists', `${mutation.collection}/${mutation.id} ya existe.`);
       if ((mutation.action === 'update' || mutation.action === 'remove') && !before) throw new HttpsError('not-found', `${mutation.collection}/${mutation.id} no existe.`);
+      if(mutation.expectedBefore){
+        const actualRenewable=before&&Object.prototype.hasOwnProperty.call(before,'renovable')?before.renovable:null;
+        if(JSON.stringify(stable(actualRenewable))!==JSON.stringify(stable(mutation.expectedBefore.renovable)))
+          throw new HttpsError('failed-precondition','La renovabilidad cambió desde la lectura anterior; recarga y revisa antes de guardar.');
+      }
       if(before && !withinScope(actor,mutation.collection,COLLECTION_MODULE[mutation.collection],Object.assign({id:mutation.id,tenantId},before))) throw new HttpsError('permission-denied','No autorizado para modificar el registro original.');
       let participationChange=null;
        if(mutation.collection==='asesores'&&mutation.action!=='remove'){
@@ -828,3 +858,4 @@ exports.orbit360ProductOperationalCommandPreview = onCall({ region: PREVIEW_REGI
 // Additive isolated Preview endpoint retains the synthetic-only executePreview gate.
 exports.orbit360ProductOperationalCommandGoalsPreview = onCall({ region: PREVIEW_REGION, cors: true, timeoutSeconds: 60, memory: '256MiB' }, executePreview);
 exports.__productOperationalDomain = Object.freeze({ VERSION, COLLECTION_MODULE, INSERT_ONLY, REMOVABLE, authorize, authorizeRead, withinScope, canonicalRef, text, cleanId, readProductAsset });
+

@@ -40,6 +40,7 @@ Orbit.modules = Orbit.modules || {};
     vigencia_inicio_requerida: 'Ingresa el inicio de vigencia.', vigencia_fin_requerida: 'Ingresa el fin de vigencia.',
     vigencia_invalida: 'La fecha final debe ser posterior a la inicial.', prima_neta_requerida: 'La prima neta debe ser mayor que cero.',
     cuotas_requeridas: 'La cantidad de recibos no es válida.', motivo_requerido: 'Explica el motivo del cambio.',
+    renovabilidad_sin_cambios: 'La renovabilidad ya tiene ese valor. No se modificó la póliza.',
     permiso_poliza_denegado: 'Tu rol activo no puede modificar pólizas.', permiso_cobro_denegado: 'Tu rol activo no puede aplicar cobros.',
     reporte_cliente_requiere_validacion: 'Valida primero el pago reportado por el cliente.', poliza_sin_cartera_activa: 'La póliza no tiene cartera activa.',
     pagos_existentes_requieren_endoso: 'La póliza tiene pagos aplicados. Los cambios financieros o de asignación requieren un endoso/gestión controlada.',
@@ -303,6 +304,12 @@ Orbit.modules = Orbit.modules || {};
       }
       deletePolicy.disabled = false;
     });
+    let nonRenewalBaseline = null;
+    function otherPolicyFieldsUnchanged() {
+      return !!nonRenewalBaseline && nonRenewalBaseline.every(function(item){
+        return item.el.isConnected && item.el.value === item.value;
+      });
+    }
     $('[data-save]').addEventListener('click', async () => {
       const save = $('[data-save]'), payload = raw(), reason = existing ? $('[data-reason]').value.trim() : 'Alta operativa desde plataforma';
       const err = $('[data-error]'), originalText = save.textContent;
@@ -317,12 +324,32 @@ Orbit.modules = Orbit.modules || {};
         field.focus(); return;
       }
       if (existing && !reason) { err.style.display=''; err.textContent=ERROR_LABELS.motivo_requerido; $('[data-reason]').focus(); return; }
+      const renewableNow=payload.renovable===true?'YES':payload.renovable===false?'NO':'UNKNOWN';
+      const otherFieldsSame=!!existing&&otherPolicyFieldsUnchanged();
+      const renewabilityOnly=otherFieldsSame&&renewableNow!==renewabilityState(existing);
+      if(otherFieldsSame&&!renewabilityOnly){
+        err.style.display='';err.textContent='No se detectaron otros cambios. Selecciona un valor distinto en Renovabilidad para registrar su actualización.';return;
+      }
       if(existing&&protectedPreviewRealPolicy(existing.id)){err.style.display='';err.textContent='Esta Preview protege los registros reales. La persistencia se valida aquí con una póliza sintética equivalente; el cambio real se prueba únicamente en el gate LIVE autorizado.';return;}
       save.disabled = true; save.textContent = 'Guardando…';
       try {
-        const result = existing ? await E.updatePolicy(existing.id, payload, { motivo: reason }) : await E.createPolicy(payload, { motivo: reason });
-        if (!result.ok) { err.style.display = ''; err.textContent = errorText(result.errors); save.disabled = false; save.textContent = originalText; return; }
-        err.style.display = 'none'; b.remove(); toast(existing ? 'Póliza actualizada; recibos y vehículo confirmados' : 'Póliza creada; recibos y vehículo confirmados');
+        const result = existing
+          ? await E.updatePolicy(existing.id,renewabilityOnly?{renovable:payload.renovable}:payload,{motivo:reason})
+          : await E.createPolicy(payload,{motivo:reason});
+        if (!result.ok) {
+          err.style.display='';err.textContent=errorText(result.errors);
+          if((result.errors||[]).includes('operacion_atomica_no_confirmada')){
+            const reference=String(result.operationId||'').replace(/[^A-Za-z0-9._:-]/g,'').slice(0,110);
+            const match=String(result.error||'').match(/(?:permission-denied|deadline-exceeded|failed-precondition|already-exists|not-found|unavailable|internal|PRODUCT_[A-Z_]+)/);
+            err.textContent+=(reference?' Referencia: '+reference+'.':'')+
+              (match?' Código: '+match[0]+'.':'')+
+              ' Verifica el estado antes de intentar otro guardado.';
+            save.disabled=true;save.textContent='Verificación requerida';
+            return;
+          }
+          save.disabled=false;save.textContent=originalText;return;
+        }
+        err.style.display = 'none'; b.remove(); toast(renewabilityOnly ? 'Renovabilidad actualizada y auditada; cartera y recibos preservados' : existing ? 'Póliza actualizada; recibos y vehículo confirmados' : 'Póliza creada; recibos y vehículo confirmados');
         location.hash = '#/cliente360?c=' + encodeURIComponent(result.policy.clienteId) + '&t=polizas';
       } catch (error) {
         err.style.display = ''; err.textContent = 'No fue posible confirmar el guardado. Revisa y reintenta.';
@@ -330,6 +357,10 @@ Orbit.modules = Orbit.modules || {};
       }
     });
     refreshProducts(initialProduct, true); syncInstallments(); resetNewCommissions(); preview();
+    // Snapshot after default normalization: classify only user-originated form changes.
+    nonRenewalBaseline=existing?Array.from(b.querySelectorAll('input,select'))
+      .filter(el=>!el.matches('[data-client-search],[data-country],[data-renewable]'))
+      .map(el=>({el,value:el.value})):null;
   }
 
   function openVehicleForm(vehicleId) {
@@ -500,3 +531,4 @@ Orbit.modules = Orbit.modules || {};
     // workflows but must not asynchronously overwrite canonical policy metrics after render.
   }
 })();
+

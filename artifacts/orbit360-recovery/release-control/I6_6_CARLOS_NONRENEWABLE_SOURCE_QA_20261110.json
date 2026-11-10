@@ -1,0 +1,79 @@
+{
+  "schema": "gravicentra.i66.carlos.nonrenewable.source-qa.v1",
+  "status": "SOURCE_QA_17_OF_17_PASS_PREVIEW_AND_LIVE_HOLD",
+  "dateGuatemala": "2026-11-10",
+  "product": "Gravicentra Insurance",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "gate": "I6.6",
+  "businessCase": {
+    "actor": "Carlos Castro",
+    "role": "Operativo",
+    "country": "CO",
+    "operation": "Marcar póliza como no renovable con motivo de cambio",
+    "observedError": "No fue posible confirmar el guardado en el servidor. Ningún cambio debe darse por aplicado hasta obtener readback.",
+    "exactOriginalServerErrorCode": "NOT_OBSERVED_AUTHENTICATED",
+    "falseHypothesisDiscarded": "El bloqueo de creación en rol Asesor era esperado; con Operativo sí pudo crear póliza. No ampliar Asesor."
+  },
+  "sourceOnlyRemedy": {
+    "intent": "Aislar cambio exclusivo de renovabilidad del plan de cuotas y de materialización de cartera, proteger concurrente y exigir auditoría servidor",
+    "sourcePaths": [
+      "orbit360-platform/core/policy-receipts-engine.js",
+      "orbit360-platform/modules/policy-receipts-v1199-bridge.js",
+      "orbit360-platform/data/store-firestore-product-operational-p0.js",
+      "functions/product-operational-domain.js"
+    ],
+    "sourceSha256": {
+      "orbit360-platform/core/policy-receipts-engine.js": "cff6b438707cc517600bf601cb507b14d5be937c0b3e5c79382fb5de9b4879ab",
+      "orbit360-platform/modules/policy-receipts-v1199-bridge.js": "9b8336569fbda820d66e4f3cb8d91653ab2f32f6595b9c33991426cbeb33fa6e",
+      "orbit360-platform/data/store-firestore-product-operational-p0.js": "0d0a9efa60caefa537a7793d536d923df42583a4b42693326bc8f539f64ad795",
+      "functions/product-operational-domain.js": "705f8f5b968f129fcf1a47422aed0d1bf1767da9813510aa5346e61b16d04868"
+    },
+    "allowedPolicyPatch": ["renovable"],
+    "parallelAuditMutation": "actividades append-only entry with motive and operationId",
+    "preservedCollections": ["recibosEsperados", "carteraPrimas", "cobros", "vehiculos"],
+    "concurrencyGuard": "expectedBefore.renovable checked within the same server Firestore transaction; stale values yield failed-precondition",
+    "idempotency": "requestId from operationId, server eventId and canonical readback",
+    "errorHandling": "The UI retains operationId plus server code if confirmed unavailable and does not advise blind retry."
+  },
+  "roleScope": {
+    "operativeCrossAdvisor": "Allowed ONLY when active Operativo role has explicit tenant roleScope=all and signed membership allows country",
+    "caseCountries": ["GT", "CO"],
+    "oppositeCountry": "DENY",
+    "countryMissingOrUnclassified": "DENY",
+    "advisors": "Own scope remains; no change to canManagePolicies or advisor privilege",
+    "moduleRestrictions": "Existing explicit module denies and requested none remain effective",
+    "tenant": "Server resolves member from the authenticated request under the requested tenant; no cross-tenant grants"
+  },
+  "qa": {
+    "nodeSyntaxChecks": "4_OF_4_PASS",
+    "focalSyntheticTests": "17_OF_17_PASS",
+    "tests": [
+      "tools/gravicentra-i6-6-carlos-renewability-only.test.cjs",
+      "tools/gravicentra-i6-6-operativo-cross-advisor-scope.test.cjs",
+      "tools/gravicentra-i6-6-delta-supersession.test.cjs"
+    ],
+    "deltaManifestGuard": "New successor source must declare replaces(path, priorGitBlobSha, priorChangeId), previous receipts untouched; supersession positive and 3+ fail-closed negative tests pass",
+    "sourceShaVerified": true,
+    "authenticatedOperativeRealUid": "HOLD_NOT_EXECUTED",
+    "serverPreviewDeploy": "HOLD_NOT_EXECUTED",
+    "immutablePreviewBuild": "HOLD_NOT_EXECUTED",
+    "liveFunctionDeploy": "HOLD_NOT_EXECUTED",
+    "liveFrontendDeploy": "HOLD_NOT_EXECUTED",
+    "liveReadbackBeforeAfter": "HOLD_NOT_EXECUTED",
+    "productionWrites": 0,
+    "deployment": 0
+  },
+  "releaseSafety": {
+    "sameCandidateOnly": true,
+    "existingOpsPreviewArtifact": "e8986c81ed1748bea680447d07d2f37dc0c1db7a remains separate and unaffected",
+    "requiresNewImmutableBuild": true,
+    "deployPrerequisites": [
+      "Exact current branch tree and active backend function parity",
+      "Approved controlled Preview callable, signed Operativo own/cross-advisor and Asesor DENY tests by country",
+      "New immutable frontend Preview artifact with module-level readback and rollback",
+      "Real LIVE operationId/server error capture or controlled nonfinancial write and authoritative readback",
+      "No production data write until explicit LIVE evidence acceptance"
+    ]
+  }
+}

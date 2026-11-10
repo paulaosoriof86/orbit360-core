@@ -464,9 +464,39 @@ Orbit.policyReceipts = (function () {
     catch(error){return{ok:false,errors:['operacion_atomica_no_confirmada'],error:String(error&&(error.code||error.message||error)),policy:prepared,operationId:opId};}
   }
 
+  // Renewal classification is metadata, never a financial re-materialization.
+  function isRenewabilityOnlyPatch(patch) {
+    return !!patch && !Array.isArray(patch) && Object.keys(patch).length === 1 &&
+      Object.prototype.hasOwnProperty.call(patch, 'renovable') &&
+      (patch.renovable === true || patch.renovable === false || patch.renovable === null);
+  }
+
   async function updatePolicy(id, patch, options) {
     options=options||{};if(!canManagePolicies())return{ok:false,errors:['permiso_poliza_denegado']};if(!S()||typeof S().batchDurable!=='function')return{ok:false,errors:['contrato_atomico_no_disponible']};
-    const current=S().get('polizas',id);if(!current)return{ok:false,errors:['poliza_no_encontrada']};const before=clone(current),opId=options.operationId||operationId('polupd'),merged=preparePolicy(Object.assign({},current,patch||{},{id}),current,opId),changedCritical=Object.keys(patch||{}).filter(k=>CRITICAL_FIELDS.has(k)&&JSON.stringify(before[k])!==JSON.stringify(merged[k])),paidReceipts=(S().where('cobros',c=>c.polizaId===id)||[]).filter(isPaidReceipt),lockedChanges=changedCritical.filter(k=>LOCKED_AFTER_PAYMENT.has(k)),reactivatingWithPayments=paidReceipts.length&&!isActiveState(before.estado)&&isActiveState(merged.estado);
+    const current=S().get('polizas',id);if(!current)return{ok:false,errors:['poliza_no_encontrada']};
+    const before=clone(current),opId=options.operationId||operationId('polupd');
+    if (isRenewabilityOnlyPatch(patch)) {
+      if (!clean(options.motivo)) return {ok:false,errors:['motivo_requerido'],operationId:opId};
+      if (before.renovable === patch.renovable) return {ok:false,errors:['renovabilidad_sin_cambios'],operationId:opId};
+      const renewal = { renovable: patch.renovable };
+      const finalPolicy = Object.assign({}, before, renewal);
+      const activity = activityRow(finalPolicy,'Renovabilidad actualizada: '+(before.numero||before.id),
+        options.motivo,opId);
+      const mutations = [
+        {action:'update',collection:'polizas',id,payload:renewal},
+        {action:'insert',collection:'actividades',id:activity.id,payload:activity}
+      ];
+      try {
+        await S().batchDurable(mutations,{requestId:opId,policyRenewabilityOnly:true});
+        return {ok:true,policy:finalPolicy,operationId:opId,
+          receipts:{preserved:true},portfolio:{preserved:true},vehicle:null,
+          renewabilityOnly:true,atomicServerCommit:true};
+      } catch (error) {
+        return {ok:false,errors:['operacion_atomica_no_confirmada'],
+          error:String(error&&(error.code||error.message||error)),operationId:opId};
+      }
+    }
+    const merged=preparePolicy(Object.assign({},current,patch||{},{id}),current,opId),changedCritical=Object.keys(patch||{}).filter(k=>CRITICAL_FIELDS.has(k)&&JSON.stringify(before[k])!==JSON.stringify(merged[k])),paidReceipts=(S().where('cobros',c=>c.polizaId===id)||[]).filter(isPaidReceipt),lockedChanges=changedCritical.filter(k=>LOCKED_AFTER_PAYMENT.has(k)),reactivatingWithPayments=paidReceipts.length&&!isActiveState(before.estado)&&isActiveState(merged.estado);
     if(paidReceipts.length&&(lockedChanges.length||reactivatingWithPayments))return{ok:false,errors:['pagos_existentes_requieren_endoso'],lockedChanges,paidReceipts:paidReceipts.map(c=>c.id)};if(!clean(options.motivo))return{ok:false,errors:['motivo_requerido'],changedCritical};
     const check=validatePolicy(merged,id);if(!check.ok)return Object.assign({ok:false,policy:merged},check);merged.policyKey=check.key;merged.policyVersionKey=check.versionKey;merged.requiereValidacion=check.warnings.length>0;merged.validacion={estado:merged.requiereValidacion?'REQUIERE_VALIDACION':'VALIDADA_EN_CAPTURA',alertas:check.warnings,fecha:now()};merged.historial=[].concat(current.historial||[],[{icon:'✏',fecha:today(),t:'Actualización de póliza',d:(options.motivo||'Actualización')+(changedCritical.length?' · '+changedCritical.join(', '):'')}]);
     const plan=buildAtomicWritePlan(merged,patch||{},current,opId,'Póliza actualizada: '+merged.numero,options.motivo||'Actualización operativa');
@@ -587,3 +617,4 @@ Orbit.policyReceipts = (function () {
     receiptId, sequenceOf, installmentsForFrequency, policyCurrencies
   };
 })();
+
