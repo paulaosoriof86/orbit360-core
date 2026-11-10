@@ -1,0 +1,75 @@
+name: Gravicentra I6.6 Carlos LIVE authorization and incident READ-ONLY
+on:
+  push:
+    branches: [recovery/fase-a-clean-20260831]
+    paths:
+      - .github/workflows/gravicentra-i66-carlos-live-readonly.yml
+permissions:
+  contents: read
+concurrency:
+  group: gi-i66-carlos-readonly-once
+  cancel-in-progress: false
+jobs:
+  inspect:
+    if: github.repository == 'paulaosoriof86/orbit360-core' && github.ref == 'refs/heads/recovery/fase-a-clean-20260831'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      GI_CARLOS_READONLY_PROJECT: ays-orbit-360-lab
+      GI_CARLOS_PRODUCT_SOURCE_BLOB: a27810c65e6a5a761d40c0e1f20cae61df483d1f
+      SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
+      SA_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
+      SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify exact I6.6 source owner and strictly read-only diagnostic
+        run: |
+          set -euo pipefail
+          test "$(git hash-object functions/product-operational-domain.js)" = "$GI_CARLOS_PRODUCT_SOURCE_BLOB"
+          node --check tools/gravicentra-i6-6-carlos-live-readonly.mjs
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const script=fs.readFileSync('tools/gravicentra-i6-6-carlos-live-readonly.mjs','utf8');
+          for(const forbidden of [/\.set\s*\(/,/\.update\s*\(/,/\.delete\s*\(/,/\.create\s*\(/,/\.runTransaction\s*\(/,/\.signIn/,/\.createCustomToken/,/\.setCustomUserClaims/])
+            if(forbidden.test(script))throw Error('MUTATION_API_IN_READONLY_SOURCE:'+forbidden);
+          if(!script.includes("const PROJECT_ID = 'ays-orbit-360-lab'"))throw Error('READONLY_PROJECT_GUARD_MISSING');
+          console.log('I66_CARLOS_READONLY_CODE_STATIC_GUARD_PASS');
+          NODE
+      - name: Select configured existing LAB credential without exposing key
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import os,json,pathlib
+          root=pathlib.Path(os.environ['RUNNER_TEMP'])/'gi-carlos-auth';root.mkdir(mode=0o700)
+          for key in ('SA_LAB','SA_ALT','SA_DEFAULT'):
+              try:cred=json.loads(os.environ.get(key,''))
+              except (ValueError,TypeError):continue
+              if cred.get('type')!='service_account' or cred.get('project_id')!='ays-orbit-360-lab' or not cred.get('private_key'):continue
+              target=root/'selected.json';target.write_text(json.dumps(cred));target.chmod(0o600)
+              with open(os.environ['GITHUB_ENV'],'a') as out:out.write(f'GOOGLE_APPLICATION_CREDENTIALS={target}\n')
+              print('I66_CARLOS_EXISTING_PROJECT_SCOPED_AUTH_SELECTED')
+              break
+          else:raise SystemExit('HOLD_NO_CONFIGURED_MATCHING_LIVE_LAB_CREDENTIAL')
+          PY
+      - name: Install existing exact backend lock dependencies
+        run: npm ci --prefix functions --ignore-scripts --no-audit --no-fund
+      - name: Read actual LIVE member/access and scoped operational event references
+        env:
+          GI_CARLOS_READONLY_REPORT: ${{ runner.temp }}/gi-carlos-private-report.json
+        run: |
+          set -euo pipefail
+          node tools/gravicentra-i6-6-carlos-live-readonly.mjs
+      - name: Archive short-lived private evidence, no service credentials
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gi-i66-carlos-live-readonly-private
+          path: ${{ runner.temp }}/gi-carlos-private-report.json
+          if-no-files-found: ignore
+          retention-days: 1
