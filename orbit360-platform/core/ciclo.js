@@ -91,7 +91,7 @@ Orbit.ciclo = (function () {
   // The caller-scoped fingerprint can be matched to a read-only backend inventory;
   // it is not evidence of a successful delete and never authorizes a retry.
   async function safeDeletionFailure(error, collection, entityId){
-    const code=String(error&&error.code||'DELETE_UNCONFIRMED').replace(/[^A-Za-z0-9_/.-]/g,'').slice(0,64);
+    const code=String(error&&error.code||(collection==='gestiones'?'DELETE_MANAGEMENT_UNCONFIRMED':'DELETE_UNCONFIRMED')).replace(/[^A-Za-z0-9_/.-]/g,'').slice(0,64);
     const raw=String(error&&error.message||'');
     const category=code==='functions/not-found'
       ? (/^\s*(?:El registro no existe\.?|OPS_CANONICAL_DOCUMENT_NOT_FOUND)\s*$/i.test(raw)?'DOCUMENTO_NO_ENCONTRADO_EN_ALCANCE':'ORIGEN_NO_DETERMINADO')

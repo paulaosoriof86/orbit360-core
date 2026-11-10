@@ -384,6 +384,41 @@
         "gitBlobSha": "2659a8c218e915df139bb8604213612aa501ab39",
         "scope": "Only hashed identity readback, no Firestore writes or customer identifiers in output"
       }
+    },
+    {
+      "id": "I6_6_OPS_MANAGEMENT_DELETE_LEGACY_DIAGNOSTIC_COMPAT_P0",
+      "approvedByDirection": true,
+      "receipt": "Dirección 2026-11-10 approved I6.6 same-source fail-closed Ops diagnostic compatibility after guard 42906473061 rejected missing management delete marker; canonical backend, authorization, CRUD semantics and live data unchanged",
+      "sourceStatus": "SOURCE_QA_LEGACY_AND_NEW_OPS_DIAGNOSTIC_PASS_PREVIEW_LIVE_NOT_APPLIED",
+      "capabilityOwners": ["OPS_PRIMARY_RUNTIME", "ROLE_SCOPE_RUNTIME"],
+      "scope": "Restore the previously approved fallback DELETE_MANAGEMENT_UNCONFIRMED for unclassified management deletion errors, while retaining new error.code classification and private fingerprint; no backend, tenant, role, data, or workflow operation change",
+      "dataWrites": 0,
+      "paths": [
+        {
+          "path": "orbit360-platform/core/ciclo.js",
+          "gitBlobSha": "fd262f2923f9307bdaa960fb8b3e0c8b256d7d38",
+          "replaces": {
+            "path": "orbit360-platform/core/ciclo.js",
+            "priorGitBlobSha": "b1d308f3faef022f40340df685deb4d5ddde53ff",
+            "priorChangeId": "I6_6_OPS_COBROS_SAFE_FAILURE_DIAGNOSTICS_P0"
+          }
+        }
+      ],
+      "tests": [
+        {
+          "path": "tools/gravicentra-i6-6-ops-crud-role-country.test.cjs",
+          "gitBlobSha": "2ff01c2cf871e39027841678e70082856b8cef4e"
+        },
+        {
+          "path": "tools/gravicentra-i6-6-ops-delete-diagnostic.test.cjs",
+          "gitBlobSha": "d3e38aafd458b0ea5ced0275305cddb49f0f620c"
+        }
+      ],
+      "qa": {
+        "regressionTriggerRun": 42906473061,
+        "fullGuardPending": true,
+        "liveRelease": false
+      }
     }
   ]
 }
