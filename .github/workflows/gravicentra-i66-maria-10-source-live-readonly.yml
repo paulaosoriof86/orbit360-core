@@ -109,13 +109,30 @@ jobs:
             const db=getFirestore(app);
             const tenants=await db.collection('tenants').listDocuments();
             if(tenants.length===0||tenants.length>300)throw Error('TENANT_SCAN_BOUNDARY');
-            const found=[];
+            const found=[], seen=[];
+            const numberKeys=['numero','numeroPoliza','numPoliza','numero_poliza','numeroPolizaCanonica'];
+            const clientKeys=['clienteId','cliente_id','contratanteId','clienteRefId'];
+            const countryKeys=['pais','paisCodigo','country','countryCode','countryCodeISO'];
             for(const t of tenants){
               const p=await t.collection('data').doc('polizas').collection('items').doc(fixture.policyId).get();
               if(!p.exists)continue;
               const x=p.data()||{};
-              if((!id(x.id)||id(x.id)===fixture.policyId)&&id(x.numero)===fixture.policyNumber&&id(x.clienteId)===fixture.clientId&&id(x.pais).toUpperCase()==='GT'&&(!id(x.tenantId)||id(x.tenantId)===t.id))found.push(t.id);
+              const hits=(keys,expected,transform=id)=>keys.filter(k=>x[k]!=null&&transform(x[k])===expected);
+              const flags={
+                tenantHash:hash(t.id).slice(0,12),
+                hasPolicyDocument:true,
+                idExact:!id(x.id)||id(x.id)===fixture.policyId,
+                numberAliasMatches:hits(numberKeys,fixture.policyNumber),
+                clientAliasMatches:hits(clientKeys,fixture.clientId),
+                countryAliasMatches:hits(countryKeys,'GT',v=>id(v).toUpperCase()),
+                tenantExact:!id(x.tenantId)||id(x.tenantId)===t.id,
+                presentRecognizedKeys:Object.keys(x).filter(k=>[...numberKeys,...clientKeys,...countryKeys,'id','tenantId'].includes(k))
+              };
+              seen.push(flags);
+              if(flags.idExact&&flags.numberAliasMatches.includes('numero')&&flags.clientAliasMatches.includes('clienteId')&&flags.countryAliasMatches.includes('pais')&&flags.tenantExact)found.push(t.id);
             }
+            console.log('I66_MARIA_POLICY_ID_FOUND_COUNT='+seen.length);
+            console.log('I66_MARIA_POLICY_ID_SCHEMA_DIAGNOSTIC='+JSON.stringify(seen.slice(0,5)));
             if(found.length!==1){
               console.log('I66_MARIA_TENANT_EXACT_MATCH_COUNT='+found.length);
               throw Error('I66_MARIA_TENANT_NOT_EXACTLY_ONE');
