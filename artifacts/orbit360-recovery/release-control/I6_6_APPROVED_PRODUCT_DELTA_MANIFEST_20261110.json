@@ -92,7 +92,7 @@
       "tests": [
         {
           "path": "tools/gravicentra-i6-6-preview-writer-failclosed.test.cjs",
-          "gitBlobSha": "51b451da933ecfa0aff7972867ba7207a5157505"
+          "gitBlobSha": "a0dbb67c82687e40a2e2b07cadb42fa680bc5137"
         }
       ]
     }

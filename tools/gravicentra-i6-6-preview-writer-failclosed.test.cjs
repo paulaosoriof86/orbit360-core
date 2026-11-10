@@ -23,7 +23,7 @@ const bodies=[
   ['orbit360-platform/modules/aseguradoras.js','isB2PreviewHost',[]],
   ['orbit360-platform/modules/cronograma.js','previewUat',[]],
   ['orbit360-platform/core/product-insurer-credential-provider-p0.js','isCertifiedPreviewHost',[]],
-  ['orbit360-platform/modules/policy-receipts-v1199-bridge.js','protectedPreviewRealPolicy',['receiptId']]
+  ['orbit360-platform/modules/policy-receipts-v1199-bridge.js','protectedPreviewRealPolicy',['id']]
 ];
 function extractBody(source,name){
   const start=source.indexOf('function '+name+'(');
