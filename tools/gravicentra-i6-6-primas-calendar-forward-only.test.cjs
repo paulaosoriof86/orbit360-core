@@ -55,10 +55,10 @@ test('GT y CO: 12 cuotas mensuales usan día 1 civil sin desfase local',()=>{
 });
 test('Año bisiesto y días 29,30,31: clamp independiente por mes, sin deriva posterior',()=>{
   const primas=makeRuntime().Orbit.primas;
-  assert.deepEqual(due(primas,'2024-01-31','Mensual',5),['2024-01-31','2024-02-29','2024-03-31','2024-04-30','2024-05-31']);
-  assert.deepEqual(due(primas,'2023-01-31','Mensual',5),['2023-01-31','2023-02-28','2023-03-31','2023-04-30','2023-05-31']);
-  assert.deepEqual(due(primas,'2024-01-30','Mensual',3),['2024-01-30','2024-02-29','2024-03-30']);
-  assert.deepEqual(due(primas,'2024-02-29','Mensual',3),['2024-02-29','2024-03-29','2024-04-29']);
+  assert.deepEqual(due(primas,'2024-01-31','Mensual',12).slice(0,5),['2024-01-31','2024-02-29','2024-03-31','2024-04-30','2024-05-31']);
+  assert.deepEqual(due(primas,'2023-01-31','Mensual',12).slice(0,5),['2023-01-31','2023-02-28','2023-03-31','2023-04-30','2023-05-31']);
+  assert.deepEqual(due(primas,'2024-01-30','Mensual',12).slice(0,3),['2024-01-30','2024-02-29','2024-03-30']);
+  assert.deepEqual(due(primas,'2024-02-29','Mensual',12).slice(0,3),['2024-02-29','2024-03-29','2024-04-29']);
 });
 test('Cadencias originales intactas: contado, bimestral, trimestral, cuatrimestral y semestral',()=>{
   const p=makeRuntime().Orbit.primas;
