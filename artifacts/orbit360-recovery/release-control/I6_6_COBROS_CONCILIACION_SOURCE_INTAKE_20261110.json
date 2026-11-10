@@ -600,6 +600,26 @@
       "id": "GUATEMALTECA_STATEMENT_BASIS_SOURCE_OVERRIDE_20261110",
       "authority": "VERIFIED_GUATEMALTECA_PDF_AND_ISSUED_POLICY_CROSSCHECK_2026_11_10",
       "rule": "Supersedes shorthand asserting Guatemalteca aging line values are necessarily net simply because the report title says 'primas netas'. Specific rows 38624 Q2508.80 and 41523 Q2678.53 match their issued policy GROSS totals whereas net base Q1800 each. Determine numeric basis per requirement/edition/receipt rather than label; do not aggregate or change net premium from aging title alone."
+    },
+    {
+      "id": "OPEN_RECEIPT_DUE_STATUS_CUTOFF_20261110",
+      "authority": "PAULA_DIRECT_2026_11_10",
+      "rule": "For an insurer statement listing pending requirements, capture EVERY contractual requirement (overdue, currently due and future) as a separate uniquely identified receivable in the exact policy edition. Classify based on actual per-requirement due date versus an explicit statement cutoff; at processing time distinguish an older as-of snapshot from today. Due date before the comparison date and still outstanding = vencido; currently due within insurer billing window = cuota vigente; later due = cobro futuro. A pending statement is NOT itself evidence of payment. Explicit paid-collection statements are a different source category."
+    },
+    {
+      "id": "INSTALLMENT_COUNT_AND_DUE_SOURCE_WINS_20261110",
+      "authority": "PAULA_DIRECT_2026_11_10",
+      "rule": "Correct number of installments, contractual schedule, individual due dates, real payment method and net/total premiums on the exact issued policy edition according to insurer statement/planilla/issued policy; an existing platform default (including 12 annual receipts) is not authoritative. Reconcile stable receipt IDs and preserve authentic payments; never add to an erroneous schedule or silently delete paid history. A source snapshot with only SOME future rows must not cause invented missing rows; use original plan and later source reconciliation."
+    },
+    {
+      "id": "FAST_APPLY_DIRECT_OR_IMPORTER_20261110",
+      "authority": "PAULA_DIRECT_2026_11_10",
+      "rule": "Pursue fastest auditable safe method on existing canonical LIVE platform to update policies, receipts and inferred collections. Importer is non-blocking: if file-specific parser and preview can be repaired and confirmed quickly with QA, use it; otherwise use direct controlled edits/batches with exact unique identity, per-source before/after, immutable references, role-country scope, reload and cross-module readback. No demo/sample fallback, no speculative paid mark, no broad reimport, no new parallel candidate. Finish partially done cases before adding unrelated ones."
+    },
+    {
+      "id": "COLLECTION_INFERENCE_EVIDENCE_BOUNDARY_20261110",
+      "authority": "PAULA_DIRECT_2026_11_10_AND_PREVIOUS_CONFIRMED_RULES",
+      "rule": "Apply verified or supported inferred recaudados only to exact receipt(s): paid commission for installment N is evidence for N and may justify earlier contiguous N−1 if no contradictory later outstanding evidence; explicit paid report is direct receipt evidence. Preserve nature of inference, source ID/hash/cutoff, actual collection date if known or unknown otherwise, no invented timestamp. Later paid statement supersedes earlier outstanding as-of snapshot; no duplicate payment ledger, and classify source reports of pending separately."
     }
   ],
   "newlyObservedStatementEvidence": [
@@ -654,7 +674,7 @@
     "operationalWrites": 3,
     "sourceChangeInProduction": false,
     "importerRebuildRequired": false,
-    "nextRequiredStep": "P0 scheduler/receipt identity: Bayron currently shows 12 wrong Cobros rows Q2912 while source requires 2 Q1557.92 exact due dates and gross Q3115.84; prior Pólizas view counted 0 receipts, so compare actual receipt IDs across modules before correction. Source importer demo fallback fail-closed, renewal same risk cross-insurer issuer history, then controlled QA+LIVE write with fresh readback. Performance: warm Pólizas exact filter 2.47–2.84s tool-inclusive and Cobros route CDP delays, preserve B3-002 PASS. Continue insurer as-of classification, no speculative paid writes or duplicate customer records.",
+    "nextRequiredStep": "I6.6 PRIORITY: ensure source-specific safe writer for existing policies/receipts and reconciled due dates, verify receipt IDs of Bayron 12 wrong projections before correction; use statement as-of due status; apply evidence-backed collected separately; new policies follow exact client/vehicle creation. Importer demo fallback must NEVER be confirmed; may bypass via traceable direct UI or canonical controlled batch with QA+LIVE readbacks. Performance observations parallel without blocking.",
     "insurerStatementsNativeFormatsParsed": true,
     "all35CurrentSourceRawHashesPinned": true,
     "fourHistoricalReferenceHashesPinned": true,
@@ -669,7 +689,8 @@
     "statementException": "PAID_REPORT_ACTUAL_COLLECTIONS_IN_EXPLICIT_REPORTED_PERIOD",
     "sourceDatePrecedence": "LATER_PAID_EVIDENCE_CAN_SUPERSEDE_EARLIER_PENDING_SNAPSHOT_FOR_SAME_EXACT_REQUIREMENT",
     "historicalCalibrationMonth": "2026-09",
-    "customerTotalVsNetCommissionBase": "DISTINCT_FIELDS_NO_BASIS_SUBSTITUTION"
+    "customerTotalVsNetCommissionBase": "DISTINCT_FIELDS_NO_BASIS_SUBSTITUTION",
+    "requirementStatusAtCutoff": "PENDING requirements with dueDate<asOf are overdue, dueDate at/current insurer window is current, dueDate>asOf future; re-evaluate at today with latest source status; paid statements override older pending on exact match."
   },
   "policyClientDocumentationReadback": {
     "source": "AYSGUATEMALA_DRIVE_CUSTOMER_DOSSIERS_AND_AUTHENTIC_POLICY_PDFS",
